@@ -32,7 +32,7 @@ int main (int argc, char** argv) {
 		
 		for (i = 0; i < d; i++)
 			for (j = 0; j < d; j++)
-				data[i*d+j] = complex<float> ((float) i, (float) j);
+				data.at(i,j) = complex<float> ((float) i, (float) j);
 		
 		client.SetRaw(data);
 		client.Requestprocess_data(test);
@@ -40,8 +40,22 @@ int main (int argc, char** argv) {
 		
 		for (i = 0; i < d; i++)
 			for (j = 0; j < d; j++)
-				cout << data[i*d+j] << endl;
+				cout << data.at(i,j) << endl;
+
+		Matrix< short > pdata (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
+		for (i = 0; i < d; i++)
+			for (j = 0; j < d; j++)
+				pdata.at(i,j) = (i+1)*(j+1);
+		
+		client.SetPixel(pdata);
+		client.Requestprocess_data(test);
+		client.GetPixel(pdata); 
+		
+		for (i = 0; i < d; i++)
+			for (j = 0; j < d; j++)
+				cout << pdata.at(i,j) << endl;
+
 		return 0;
 
 	} else

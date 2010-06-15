@@ -87,33 +87,6 @@ public:
     inline              Matrix              (T s) {};
 	
 	
-	/**
-     * @brief           Constructs a new 1^16 matrix initialized with scalar s.
-     *
-     * @param  s        Scalar Value.
-     * @return          A new matrix with one cell.
-     */
-    //inline              Matrix              (int n) { return Matrix(n, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1) };
-	
-	
-    /**
-     * @brief           Constructs a new 1^16 matrix initialized with scalar s.
-     *
-     * @param  s        Scalar Value.
-     * @return          A new matrix with one cell.
-     */
-    //inline              Matrix              (int m, int n) {};
-	
-	
-    /**
-     * @brief           Constructs a new 1^16 matrix initialized with scalar s.
-     *
-     * @param  s        Scalar Value.
-     * @return          A new matrix with one cell.
-     */
-    //inline              Matrix              (int m, int n, int o) {};
-	
-	
     /**
      * @brief           Constructs an uninitialised matrix with desired size.
      *
@@ -158,7 +131,10 @@ public:
 	 * @return          Contructed matrix.
 	 */
 	#ifdef ICEIDEAFUNCTORS_EXPORTS
-	inline void         Populate             (IceAs ias);
+	inline long         Import             (IceAs ias, long pos);
+	inline long         Import             (IceAs ias);
+	inline long         Export             (IceAs ias);
+	inline long         Export             (IceAs ias, long pos);
 	#endif
 
     /**
@@ -237,27 +213,48 @@ public:
 	inline void         Reset              (T* M, const int* dim)                                      {
 		for (int i = 0; i < INVALID_DIM; i++) 
 			_dim[i] = dim[i];
-		delete _M;
+		if (_M != 0)
+			delete _M;
 		_M = M;
 	}
 	
-	
+
 	inline void         Reset              (const int* dim)                                      {
 		for (int i = 0; i < INVALID_DIM; i++) 
 			_dim[i] = dim[i];
-			_M = new T[Size()]();
+		if (_M != 0)
+			delete _M;
+		_M = new T[Size()]();
 	}
 	
 	
-	inline void         Set              (T s, int pos)                                      {
+
+	
+	inline void         Set              (T s, int pos)                                               {
 		_M[pos] = s;
 	}
 	
-	inline T         Get              (int pos)                                      {
+	inline T         Get              (int pos)                                                      {
 		return _M[pos];
 	}
+
 	
+	inline T            at                 (int col, int lin)  const {
+		return _M[col + _dim[LIN]*lin ];
+	}
 	
+
+	inline T            at                 (int col, int lin, int slc)  const {
+		return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
+	}
+	
+	inline T&           at  (int col, int lin) {
+		return _M[col + _dim[LIN]*lin ];
+	}
+	
+	inline T&            at                 (int col, int lin, int slc) {
+		return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
+	}
 	
     /**
      * @brief           Get the number of matrix cells, i.e. dim_0*...*dim_16.
@@ -710,33 +707,91 @@ Matrix<T>::Matrix (Matrix<int> &dim) {
 
 
 #ifdef ICEIDEAFUNCTORS_EXPORTS
+
 template <class T> 
-void Matrix<T>::Populate(IceAs ias) {
+long Matrix<T>::Import(IceAs ias, long pos) {
 
 	ICE_SET_FN("Matrix<T>::Matrix()")
 
-	int i;
+	int  i    = 0;
+	long size = 1;
 
+	for (i = 0; i < INVALID_DIM; i++) {
+		size *= (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
+	}
+					 
+	T* data = (T*) ias.calcSplObjStartAddr() ;
+
+	for (i = 0; i < size; i++, data++)
+		_M[i+pos] = *data;
+
+	return size;
+
+};
+
+template <class T> 
+long Matrix<T>::Import(IceAs ias) {
+
+	ICE_SET_FN("Matrix<T>::Import(IceAs ias)")
+		
+	int i;
+	
 	for (i = 0; i < INVALID_DIM; i++) {
 		_dim[i] = (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
 	}
-							 
+	
     #ifdef TEST_ALLOC
 	    nb_alloc++;
     #endif
 
-	ICE_WARN ("Allocating " << Size() * sizeof(T) << "of RAM");
-
     _M = new T[Size()]();
-
+	
 	T* data = (T*) ias.calcSplObjStartAddr() ;
-
+	
 	for (i = 0; i < Size(); i++, data++)
 		_M[i] = *data;
-
-	ICE_WARN("Populated matrix with " << Size() << "elements");
-
+	
+	return Size();
+	
 };
+
+template <class T> 
+long Matrix<T>::Export(IceAs ias) {
+
+	ICE_SET_FN("Matrix<T>::Import(IceAs ias)")
+		
+	T* data = (T*) ias.calcSplObjStartAddr() ;
+	
+	for (int i = 0; i < Size(); i++, data++)
+		*data = _M[i];
+	
+	return Size();
+	
+};
+
+template <class T> 
+long Matrix<T>::Export(IceAs ias, long pos) {
+
+	ICE_SET_FN("Matrix<T>::Import(IceAs ias)")
+		
+	int  i    = 0;
+	long size = 1;
+
+	for (i = 0; i < INVALID_DIM; i++) {
+		size *= (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
+	}
+					 
+	T* data = (T*) ias.calcSplObjStartAddr() ;
+	
+	for (i = 0; i < size; i++, data++)
+		*data = _M[i+pos];
+	
+	return size;
+	
+};
+
+
+
 #endif
 
 template <class T> 
@@ -744,10 +799,11 @@ Matrix<T>::~Matrix() {
 
 #ifdef ICEIDEAFUNCTORS_EXPORTS
 	ICE_SET_FN ("Matrix<T>::Matrix()")
-	ICE_WARN   ("Freeing " << Size() * sizeof(T) << "of RAM.");
+	ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
 #endif
 
-	delete[](_M);
+	if (_M !=0 )
+		delete[](_M);
 
     #ifdef TEST_ALLOC
         nb_alloc--;
@@ -912,15 +968,17 @@ T  Matrix<T>::Minabs() {
 
 template <class T>
 Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
+	
+	int i;
 
-	for (int i = 0; i < INVALID_DIM; i++) 
-		_dim[i] = M.Dim[i];
+	for (i = 0; i < INVALID_DIM; i++) 
+		_dim[i] = M.Dim()[i];
     
     delete[](_M);
 
     _M = new T[Size()]();
 
-    for (int i = 0; i < Size(); i++)
+    for (i = 0; i < Size(); i++)
         _M[i] = M[i];
 
     return *this;
@@ -1023,8 +1081,10 @@ Matrix<T> Matrix<T>::operator!() const {
 template <class T>
 Matrix<T> Matrix<T>::operator&(Matrix<bool> &M)	{
 
-	/*	for (int i = 0; i < INVALID_DIM; i++) 
-		assert (_dim[i] == (int) M.Dim[i]);*/
+	for (int i = 0; i < INVALID_DIM; i++) 
+		assert (_dim[i] == (int) M.Dim()[i]);
+
+
     int k = 0, i;
     for (i = 0; i < Size(); i++)
         if (M[i])
