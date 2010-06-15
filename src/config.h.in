@@ -27,9 +27,6 @@
 /* Define to 1 if you have the <omniORB4/CORBA.h> header file. */
 #undef HAVE_OMNIORB4_CORBA_H
 
-/* Define to 1 if you have the <omnithread.h> header file. */
-#undef HAVE_OMNITHREAD_H
-
 /* Define to 1 if you have the <signal.h> header file. */
 #undef HAVE_SIGNAL_H
 
