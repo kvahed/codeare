@@ -75,11 +75,11 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
 	m_raw    = new raw_data;
 	m_helper = new raw_data;
 	m_pixel  = new pixel_data;
-
+	
 	m_raw->dims.length(INVALID_DIM);
 	m_helper->dims.length(INVALID_DIM);
 	m_pixel->dims.length(INVALID_DIM);
-
+	
 	return;
 	
 };
@@ -113,7 +113,7 @@ ReconClient::Requestprocess_data  (int method)  {
 	
 	// Get data back from recon
 	if (result == OK)
-	m_raw = m_rrsi->raw();
+		m_raw = m_rrsi->raw();
 
 	return result;
 	
@@ -121,14 +121,41 @@ ReconClient::Requestprocess_data  (int method)  {
 
 
 
+/**************************************************************************************************/
 long 
-ReconClient::GetSize () {
+ReconClient::GetRawSize () {
 
 	long size = 1;
 	for (int i = 0; i < 16; i++)
 		size *= m_raw->dims[i];
 	return size;
+	
+};
 
+
+
+/**************************************************************************************************/
+long 
+ReconClient::GetHelperSize () {
+	
+	long size = 1;
+	for (int i = 0; i < 16; i++)
+		size *= m_helper->dims[i];
+	return size;
+	
+};
+
+
+
+/**************************************************************************************************/
+long 
+ReconClient::GetPixelSize () {
+	
+	long size = 1;
+	for (int i = 0; i < 16; i++)
+		size *= m_pixel->dims[i];
+	return size;
+	
 };
 
 	
