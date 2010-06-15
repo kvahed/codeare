@@ -76,7 +76,7 @@ public:
 		for (i = 0; i < 16; i++)
 			m_raw->dims[i] = M.Dim()[i];
 		
-		long size = GetSize();
+		long size = GetRawSize();
 		
 		cout << size << endl;
 		
@@ -101,14 +101,14 @@ public:
 	void 
 	GetRaw              (Matrix< complex<float> >& M) {
 		
-		complex<float>* raw = new complex<float> [GetSize()];
+		complex<float>* raw = new complex<float> [GetRawSize()];
 		int             dim[INVALID_DIM], i;
 
 		for (i = 0; i < INVALID_DIM; i++)
 			dim[i] = m_raw->dims[i];
 		
 		M.Reset(raw, dim);
-		for (i = 0; i < GetSize(); i++)
+		for (i = 0; i < GetRawSize(); i++)
 			M[i] = complex<float>(m_raw->dabs[i],m_raw->darg[i]);
 		
 	};
