@@ -1,0 +1,82 @@
+#ifndef __RRS_MODULE_IDL__
+#define __RRS_MODULE_IDL__
+
+/**
+ * Remote recon service module
+ */
+module RRSModule {
+
+
+	#include "common.h"
+
+	typedef sequence<float>  floats;
+	typedef sequence<long>   longs;
+	typedef sequence<short>  shorts;
+	typedef sequence<string> strings;
+
+
+	/**
+	 * No complex numbers in CORBA
+	 */
+	struct    raw_data          {
+		
+		// Complex
+		floats dabs;  /**< Data abs      */
+		floats darg;  /**< Data argument */
+		longs  dims;  /**< Dimesions     */
+
+	};
+
+
+	/**
+	 * No complex numbers in CORBA
+	 */
+	struct     pixel_data       {
+		
+		// Complex
+		shorts vals;  /**< Data abs      */
+		longs  dims;  /**< Dimesions     */
+
+	};
+
+
+	/**
+	 * @brief Remote recon service interface definition
+	 */
+	interface RRSInterface {
+		
+		/**
+		 * @brief         Process data
+		 *                Process data according to a particular method
+		 *
+		 * @param  m      Method for reconstruction
+		 * @return        Status
+		 */
+		error_code             process_data (in method m);
+
+		/**
+		 * @brief Declare CORBA attibute ice_cplx;
+		 */
+		attribute              raw_data     raw;
+
+		/**
+		 * @brief Declare CORBA attibute ice_cplx;
+		 */
+		attribute              raw_data     helper;
+		
+		/**
+		 * @brief Declare CORBA attibute ice_image;
+		 */
+		attribute              pixel_data   pixel;
+
+		/**
+		 * @brief Declare attibute name
+		 */
+		attribute              strings      labels;
+
+
+	};
+
+};
+
+#endif
