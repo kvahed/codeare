@@ -24,7 +24,6 @@ AC_CHECK_HEADERS([iostream], [], [AC_MSG_ERROR([cannot find iostream, bailing ou
 AC_CHECK_HEADERS([fstream], [], [AC_MSG_ERROR([cannot find fstream, bailing out])])
 AC_CHECK_HEADERS([signal.h], [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
 AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/CORBA.h, bailing out])])
-AC_CHECK_HEADERS([omnithread.h], [], [AC_MSG_ERROR([cannot find omnithread.h, bailing out])])
 
 # Checks for libraries.
 AC_CHECK_LIB([omnithread],   [read], [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
