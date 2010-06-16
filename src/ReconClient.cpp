@@ -101,7 +101,7 @@ ReconClient::~ReconClient         ()            {
 
 /**************************************************************************************************/
 error_code 
-ReconClient::Requestprocess_data  (int method)  {
+ReconClient::Requestprocess_data  (method m)  {
 	
 	error_code result = OK;
 	
@@ -109,7 +109,7 @@ ReconClient::Requestprocess_data  (int method)  {
 	m_rrsi->raw(m_raw[0]);
 	
 	// Reconstruct on remote service
-	result = m_rrsi->process_data(DUMMY_RECON);
+	result = m_rrsi->process_data(m);
 	
 	// Get data back from recon
 	if (result == OK)

@@ -35,7 +35,7 @@ int main (int argc, char** argv) {
 				data.at(i,j) = complex<float> ((float) i, (float) j);
 		
 		client.SetRaw(data);
-		client.Requestprocess_data(test);
+		client.Requestprocess_data((RRSModule::method) test);
 		client.GetRaw(data); 
 		
 		for (i = 0; i < d; i++)
@@ -49,7 +49,7 @@ int main (int argc, char** argv) {
 				pdata.at(i,j) = (i+1)*(j+1);
 		
 		client.SetPixel(pdata);
-		client.Requestprocess_data(test);
+		client.Requestprocess_data((RRSModule::method) test);
 		client.GetPixel(pdata); 
 		
 		for (i = 0; i < d; i++)
