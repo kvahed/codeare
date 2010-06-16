@@ -53,7 +53,7 @@ public:
 	 * @brief Process data with given strategy
 	 */
 	inline RRSModule::error_code
-	ProcessData (method m) {
+	ProcessData () {
 		return m_strategy->ProcessData();
 	}
 	

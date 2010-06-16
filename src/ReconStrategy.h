@@ -24,7 +24,7 @@ public:
 	/**
 	 * @brief Missing
 	 */ 
-	ReconStrategy  () {};
+	ReconStrategy  () {  };
 	
 	/**
 	 * @brief Missing
@@ -109,7 +109,7 @@ public:
 
 		for (int i = 0; i < m_pixel.Size(); i++)
 			pixel->vals[i] = m_pixel[i];
-			
+
 	}
 	
 	/**
@@ -125,7 +125,7 @@ public:
 
 		m_pixel.Reset (dim);
 
-		for (int i = 0; i < m_pixel.Size(); i++)
+		for (int i = 0; i < m_pixel.Size(); i++) 
 			m_pixel[i] =  pixel->vals[i];
 		
 	};

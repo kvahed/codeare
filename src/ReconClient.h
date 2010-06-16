@@ -2,7 +2,6 @@
 #define __RECON_CLIENT_H__
 
 #include <complex>
-
 #include "Matrix.h"
 
 #ifdef __WIN32__ 
@@ -23,44 +22,32 @@ class ReconClient                  {
 	
 public:
 	
-
 	/**
-	 * @brief             Construct and initialise remote recon interface
-	 *                    CORBA connection is initialised, data sequences setup.
-	 *                    Set of exception handling for different stages of errors.
-	 *                    Thus far only omniORB4 supported.
-	 *          
-	 * @param  name       Service name announced to name server
-	 * @param  tracelevel Trace level [0-40]
-	 *                    level 0:  critical errors only
-     *                    level 1:  informational messages only
-	 *					  level 2:  configuration information and warnings
-	 *					  level 5:  notifications when server threads are created and communication endpoints are shutdown
-	 *					  level 10: execution and exception traces
-	 *					  level 25: trace each send or receive of a giop message
-	 *					  level 30: dump up to 128 bytes of each giop message
-	 *					  level 40: dump complete contents of each giop message
+	 * @brief           Construct and initialise remote recon interface
 	 */
-	ReconClient           (const char* name, const char* tracelevel);
+	ReconClient         (const char* name, const char* tracelevel);
 	
 	
 	/**
-	 * @brief             Destruct CORBA data and connection 
+	 * @brief           Default destructor
 	 */
-	~ReconClient          ();
+	~ReconClient        ();
 	
-
 	/**
-	 * @brief             Request server-side data procession 
+	 * @brief           Default destructor
+	 */
+	void 
+	Cleanup             ();
+	
+	/**
+	 * @brief           Request data procession on recon service
 	 *
-	 * @param  method     Recon method
-	 *
-	 * @return            Error code
+	 * @param  method   Recon method
+	 * @return          Error code
 	 */ 
 	error_code              
-	Requestprocess_data (int method);
+	Requestprocess_data (method m);
 	
-
 	/**
 	 * @brief           Set raw my data with ...
 	 *
@@ -72,20 +59,22 @@ public:
 		floats dabs;
 		floats darg;
 		int    i;
+
+		m_have_raw = true;
+		
+		m_raw->dims.length(16);
 		
 		for (i = 0; i < 16; i++)
-			m_raw->dims[i] = M.Dim()[i];
-		
+			m_raw->dims[i] = M.Dim(i);
+
 		long size = GetRawSize();
-		
-		cout << size << endl;
-		
+
 		m_raw->dabs.length(size); 
 		m_raw->darg.length(size);
 		
 		for (i = 0; i < size; i++) {
-			m_raw->dabs[i] = abs(M[i]);
-			m_raw->darg[i] = arg(M[i]); 
+			m_raw->dabs[i] = M[i].real();
+			m_raw->darg[i] = M[i].imag(); 
 		}
 		
 		m_rrsi->raw(m_raw[0]);
@@ -112,25 +101,22 @@ public:
 			M[i] = complex<float>(m_raw->dabs[i],m_raw->darg[i]);
 		
 	};
+	
 
-
-	/**
-	 * @brief           Set my pixel data with ...
-	 *
-	 * @param  M        Given matrix
-	 */
 	void 
 	SetPixel            (Matrix<short>& M) {
 		
 		shorts vals;
 		int    i;
 		
+		m_have_pixel = true;
+		
 		m_pixel->dims.length(16);
 		
 		for (i = 0; i < 16; i++)
 			m_pixel->dims[i] = M.Dim(i);
 		
-		long size = GetPixelSize();
+		long   size = GetPixelSize();
 		
 		m_pixel->vals.length(size); 
 		
@@ -140,12 +126,6 @@ public:
 		m_rrsi->pixel(m_pixel[0]);
 	};
 	
-
-	/**
-	 * @brief           Return pixel data after recon to ...
-	 *
-	 * @param  M        Given matrix
-	 */
 	void 
 	GetPixel            (Matrix<short>& M) {
 	
@@ -155,105 +135,80 @@ public:
 		for (i = 0; i < INVALID_DIM; i++)
 			dim[i] = m_pixel->dims[i];
 		
-		M.Reset(pixel, dim);
+		M.Reset(dim);
 		for (i = 0; i < GetPixelSize(); i++)
 			M[i] = (short)m_pixel->vals[i];
 	
 	};
 	
-
 	/**
-	 * @brief               Raw repository size
+	 * @brief Repository size
 	 *
-	 * @return              Size
+	 * @return          Size
 	 */
 	long
-	GetRawSize              ();
+	GetRawSize             ();
 	
-
 	/**
-	 * @brief               Pixel repository size
+	 * @brief Repository size
 	 *
-	 * @return              Size
+	 * @return          Size
 	 */
 	long
-	GetPixelSize            ();
+	GetPixelSize             ();
 	
-
 	/**
-	 * @brief               Helper repository size
+	 * @brief Repository size
 	 *
-	 * @return              Size
+	 * @return          Size
 	 */
 	long
-	GetHelperSize           ();
+	GetHelperSize             ();
 	
 	
-
 private:
 	
-
-	RRSInterface_var             m_rrsi;   /**< My remote recon interface                       */
+	RRSInterface_var             m_rrsi;   /**< Remote Recon interface               */
 	
-	raw_data*                    m_raw;    /**< Raw data repository   (complex float sequence)  */
-	raw_data*                    m_helper; /**< Helper data repository (complex float sequence) */
-	pixel_data*                  m_pixel;  /**< Pixel data repository (short sequence)          */
+	raw_data*                    m_raw;    /**< Raw data    (complex float sequence) */
+	raw_data*                    m_helper; /**< Helper data (complex float sequence) */
+	pixel_data*                  m_pixel;  /**< Pixel data  (short sequence)         */
 
-	CORBA::ORB_var               m_orb;    /**< Object request broker                           */
+	bool                         m_have_raw;
+	bool                         m_have_pixel;
+	bool                         m_have_helper;
+
+	CORBA::ORB_var               m_orb;
 	
 };
 
 
-/**
- * @brief CORBA server connection exception
- */
 class DS_ServerConnectionException {
 public:
-	/**
-	 * @brief Handle CORBA server connection exceptions
-	 */
 	DS_ServerConnectionException () { 
 		cerr << "CORBA COMM_FAILURE" << endl; 
 	};
 };
 
 
-/**
- * @brief CORBA system exception
- */
 class DS_SystemException           {
 public:
-	/**
-	 * @brief Handle system exceptions
-	 */
 	DS_SystemException           () { 
 		cerr << "CORBA Exception" << endl; 
 	};
 };
 
 
-/**
- * @brief CORBA fatal exception
- */
 class DS_FatalException            {
 public:
-	/**
-	 * @brief Handle fatals exceptions
-	 */
 	DS_FatalException            () { 
 		cerr << "CORBA Fatal Exception" << endl; 
 	};
 };
 
 
-/**
- * @brief CORBA general exception :(
- */
 class DS_Exception                 {
 public:
-	/**
-	 * @brief Not much help here
-	 */
 	DS_Exception                 () { 
 		cerr << "Exception" << endl; 
 	};

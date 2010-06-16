@@ -22,6 +22,8 @@ ReconServant::~ReconServant ()               {
 error_code
 ReconServant::process_data  (method m)       {
 
+	error_code e = OK;
+
 	ReconContext* context = new ReconContext();
 	context->Strategy(m);
 
@@ -34,7 +36,9 @@ ReconServant::process_data  (method m)       {
 	if (m_have_labels)
 		context->Strategy()->SetLabels(m_labels);
 
-	return context->ProcessData(m);
+	e = context->ProcessData();
+	
+	cout << "Finished processing. Getting results ..." << endl;
 
 	if (m_have_raw)
 		context->Strategy()->GetRaw(&m_raw);
@@ -45,6 +49,11 @@ ReconServant::process_data  (method m)       {
 	if (m_have_labels)
 		context->Strategy()->GetLabels(m_labels);
 
+	cout << "... done. Will handle control back to client." << endl;
+
+	return e;
+
+	
 }
 
 
