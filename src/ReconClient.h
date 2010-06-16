@@ -96,7 +96,7 @@ public:
 		for (i = 0; i < INVALID_DIM; i++)
 			dim[i] = m_raw->dims[i];
 		
-		M.Reset(raw, dim);
+		M.Reset(dim);
 		for (i = 0; i < GetRawSize(); i++)
 			M[i] = complex<float>(m_raw->dabs[i],m_raw->darg[i]);
 		

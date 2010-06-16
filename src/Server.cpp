@@ -139,7 +139,7 @@ bool init (int argc, char** argv) {
 	opt->addUsage  (" -h, --help   Print this help screen"); 
 	opt->addUsage  ("");
 	opt->addUsage  ("If no options are given the following options are assumed:");
-	opt->addUsage  ("testclt -n ReconService -d 10 -l ./reconserver.log");
+	opt->addUsage  ("testclt -n ReconService -d 5 -l ./reconserver.log");
 	opt->addUsage  ("");
 	
 	
@@ -159,7 +159,7 @@ bool init (int argc, char** argv) {
 		
 	} 
 	
-	debug   = (opt->getValue("debug"  ) && atoi(opt->getValue("debug" )) >= 0 &&  atoi(opt->getValue("debug" )) <= 40) ?      opt->getValue("debug" )  : (char*)"10";
+	debug   = (opt->getValue("debug"  ) && atoi(opt->getValue("debug" )) >= 0 &&  atoi(opt->getValue("debug" )) <= 40) ?      opt->getValue("debug" )  : (char*)"5";
 	logfile = (opt->getValue("logfile") &&      opt->getValue("logfile") != (char*)"")                                 ?      opt->getValue("logfile") : (char*)"./reconserver.log" ;
 	name    = (opt->getValue("name"   ) &&      opt->getValue("name"   ) != (char*)"")                                 ?      opt->getValue("name"   ) : (char*)"ReconService" ;
 
