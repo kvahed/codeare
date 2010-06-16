@@ -4,7 +4,7 @@
 #include "ReconStrategy.h"
 
 /**
- * @brief Empty recon for test purposes
+ * @brief Dump data to file
  */
 class DumpToFile : public ReconStrategy {
 

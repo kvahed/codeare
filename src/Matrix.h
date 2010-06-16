@@ -53,7 +53,7 @@ enum IceDim {
 # define PI  3.1415926535897931159979634685441851615906
 
 /**
- * @brief   C++-like Array template for ICE
+ * @brief   Matrix template
  * 
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
@@ -131,6 +131,7 @@ public:
 	 * @return          Contructed matrix.
 	 */
 	#ifdef ICEIDEAFUNCTORS_EXPORTS
+	
 	inline long         Import             (IceAs ias, long pos);
 	inline long         Import             (IceAs ias);
 	inline long         Export             (IceAs ias);
@@ -210,15 +211,11 @@ public:
 	}
 	
 	
-	inline void         Reset              (T* M, const int* dim)                                      {
-		for (int i = 0; i < INVALID_DIM; i++) 
-			_dim[i] = dim[i];
-		if (_M != 0)
-			delete [] (_M);
-		_M = M;
-	}
-	
-
+	/**
+	 * @brief           Resize to dim and zero
+	 * 
+	 * @param  dim      New dimensions
+	 */
 	inline void         Reset              (const int* dim)                                      {
 		for (int i = 0; i < INVALID_DIM; i++) 
 			_dim[i] = dim[i];
@@ -227,31 +224,53 @@ public:
 		_M = new T[Size()]();
 	}
 	
-	
 
-	
-	inline void         Set              (T s, int pos)                                               {
-		_M[pos] = s;
-	}
-	
-	inline T         Get              (int pos)                                                      {
-		return _M[pos];
-	}
-
-	
+	/**
+	 * @brief            Get value in slice
+	 *  
+	 * @param  col       Column
+	 * @param  lin       Line
+	 *
+	 * @return           Value
+	 */
 	inline T            at                 (int col, int lin)  const {
 		return _M[col + _dim[LIN]*lin ];
 	}
 	
-
-	inline T            at                 (int col, int lin, int slc)  const {
-		return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
-	}
-	
+	/**
+	 * @brief            Set value in slice
+	 *  
+	 * @param  col       Column
+	 * @param  lin       Line
+	 *
+	 * @return           Reference to element
+	 */
 	inline T&           at  (int col, int lin) {
 		return _M[col + _dim[LIN]*lin ];
 	}
 	
+	/**
+	 * @brief            Get value in slice
+	 *  
+	 * @param  col       Column
+	 * @param  lin       Line
+	 * @param  slc       Slice
+	 *
+	 * @return           Value
+	 */
+	inline T            at                 (int col, int lin, int slc)  const {
+		return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
+	}
+	
+	/**
+	 * @brief            Set value in slice
+	 *  
+	 * @param  col       Column
+	 * @param  lin       Line
+	 * @param  slc       Slice
+	 *
+	 * @return           Reference to element
+	 */
 	inline T&            at                 (int col, int lin, int slc) {
 		return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
 	}
@@ -1265,29 +1284,5 @@ Matrix<T> Matrix<T>::tr() const {
     return res;
 
 }
-
-/*template <class T>
-T Matrix<T>::operator() (int col, int lin) const {
-
-    assert(lin < _dim[LIN]);
-    assert(col < _dim[COL]);
-
-    assert(lin * _dim[LIN] + w < Size());
-
-    return _M[col * _dim[LIN] + lin];
-
-}
-
-
-template <class T>
-T& Matrix<T>::operator()(int col, int lin) {
-
-    assert(lin < _dim[LIN]);
-    assert(col < _dim[COL]);
-    assert(lin * _dim[LIN] + w < Size());
-
-    return _M[col * _dim[LIN] + lin];
-
-	}*/
 
 #endif // __MATRIX_H__

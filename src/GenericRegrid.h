@@ -4,7 +4,8 @@
 #include "ReconStrategy.h"
 
 /**
- * @brief Empty recon for test purposes
+ * @brief Generic regridder
+ *        Expects to identically sized matrices (data & k-space positions)
  */
 class GenericRegrid : public ReconStrategy {
 
