@@ -68,13 +68,14 @@ int main (int argc, char** argv) {
 bool init (int argc, char** argv) {
 
 	cout << endl;
-	//cout << "jrrs "         << VERSION                                      << endl;
-	cout << "juelich remote reconstruction service "                        << endl;
-//	cout << "Test client "  << " [build " << SVN_REVISION << "]"            << endl;
-	cout << "Kaveh Vahedipour -  k.vahedipour@fz-juelich.de"                << endl;
-	cout << "Juelich Research Centre"                                       << endl;
-	cout << "Institute of Neuroscience and Medicine"                        << endl;
-	cout << "Medical Imaging Physics"                                       << endl;
+	cout << "jrrs "         << VERSION                                        << endl;
+	cout << "juelich remote reconstruction service "                          << endl;
+	cout << "Test client "  << " [build " << SVN_REVISION << "]"              << endl;
+    cout << "Copyright (C) 2010	Kaveh Vahedipour<k.vahedipour@fz-jeulich.de>" << endl;
+	cout << "Kaveh Vahedipour -  k.vahedipour@fz-juelich.de"                  << endl;
+	cout << "Juelich Research Centre"                                         << endl;
+	cout << "Institute of Neuroscience and Medicine"                          << endl;
+	cout << "Medical Imaging Physics"                                         << endl;
 	cout << endl;
 
 	Options *opt = new Options();
