@@ -219,8 +219,8 @@ public:
 	inline void         Reset              (const int* dim)                                      {
 		for (int i = 0; i < INVALID_DIM; i++) 
 			_dim[i] = dim[i];
-		if (_M != 0)
-			delete [] (_M);
+		//if (_M != 0)
+			//delete [] (_M);
 		_M = new T[Size()]();
 	}
 	
@@ -821,8 +821,8 @@ Matrix<T>::~Matrix() {
 	ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
 #endif
 
-	if (_M !=0 )
-		delete [](_M);
+	//if (_M !=0 )
+		//delete [](_M);
 
     #ifdef TEST_ALLOC
         nb_alloc--;
@@ -993,8 +993,8 @@ Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
 	for (i = 0; i < INVALID_DIM; i++) 
 		_dim[i] = M.Dim()[i];
     
-	if (_M != 0)
-		delete[](_M);
+	//if (_M != 0)
+		//delete[](_M);
 
     _M = new T[Size()]();
 
