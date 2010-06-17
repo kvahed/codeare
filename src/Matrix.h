@@ -650,6 +650,24 @@ public:
      */
     Matrix<T>           tr()                const;
 
+	/**
+	 * @brief           Dump binary column-major matrix.
+	 * 
+	 * @param  fname    File name.
+	 * 
+	 * @return          Success.
+	 */
+	bool                dump (char* fname);
+
+	/**
+	 * @brief           Read in binary column-major matrix.
+	 *
+	 * @param  fname    File name.
+	 *
+	 * @return          Success.
+	 */
+	bool                read (char* fname);
+
     //@}
 
 
@@ -1283,6 +1301,38 @@ Matrix<T> Matrix<T>::tr() const {
 
     return res;
 
+}
+
+template <class T>
+bool Matrix<T>::dump (char* fname) {
+
+	if (fname != "") {
+
+		std::ofstream fout(fname , std::ios::out | std::ios::binary);
+
+		for (int i = 0; i < Size(); i++)
+			fout.write ((char*)(&(_M[i])), sizeof(T));
+		
+		fout.close();
+
+	}
+	
+}
+
+template <class T>
+bool Matrix<T>::read (char* fname) {
+
+	if (fname != "") {
+
+		std::ifstream fin  (fname , std::ios::in | std::ios::binary);
+
+		for (int i = 0; i < Size(); i++)
+			fin.read  ((char*)(&(_M[i])), sizeof(T));
+		
+		fin.close();
+
+	}
+	
 }
 
 #endif // __MATRIX_H__

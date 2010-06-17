@@ -59,6 +59,8 @@ public:
 
 		int dim[16];
 
+		m_have_raw = true;
+
 		for (int i = 0; i < 16; i++){
 			dim[i] = raw->dims[i];
 		}
@@ -89,6 +91,8 @@ public:
 	void 
 	SetHelper           (const raw_data* helper)   {
 
+		m_have_helper = true;
+
 		int dim[16];
 
 		for (int i = 0; i < 16; i++)
@@ -117,6 +121,8 @@ public:
 	 */
 	void 
 	SetPixel           (const pixel_data* pixel)   {
+
+		m_have_pixel = true;
 
 		int dim[16];
 
@@ -157,9 +163,13 @@ public:
 	
 protected:
 
-	Matrix< complex<float> > m_raw;    /**< raw data matrix   >*/
-	Matrix< complex<float> > m_helper; /**< helper matrix     >*/
-	Matrix< short >          m_pixel;  /**< pixel data matrix >*/
+	Matrix< complex<float> > m_raw;         /**< raw data matrix   >*/
+	Matrix< complex<float> > m_helper;      /**< helper matrix     >*/
+	Matrix< short >          m_pixel;       /**< pixel data matrix >*/
+
+	bool                     m_have_raw;
+	bool                     m_have_helper;
+	bool                     m_have_pixel;
 
 	strings                  m_labels; /**< Labels from the sequence (UID etc)*/
 

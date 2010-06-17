@@ -3,14 +3,15 @@
 error_code 
 DumpToFile::ProcessData () {
 
-	cout << m_labels[0] << endl;
+	if (m_have_raw) {
+		m_raw.dump    ((char*) "raw.bin"   );
+		cout << "Dumping raw data" << endl;
+	}
 
-	//filename = "out.bin";
-
-	//for (int i=0; i++)
-	//ofstream fout(fname.c_str() , ios::binary);
-	//fout.write((char*)(&(mag)), sizeof(mag));
-	//fout.write((char*)(&(pha)), sizeof(pha));
+	if (m_have_helper)
+		m_helper.dump ((char*) "helper.bin");
+	if (m_have_pixel)
+		m_pixel.dump  ((char*) "pixel.bin" );
 
 	return RRSModule::OK;
 
