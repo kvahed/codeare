@@ -103,6 +103,11 @@ public:
 	};
 	
 
+	/**
+	 * @brief           Set my Pixel data
+	 * 
+	 * @param           Given matrix
+	 */
 	void 
 	SetPixel            (Matrix<short>& M) {
 		
@@ -126,6 +131,12 @@ public:
 		m_rrsi->pixel(m_pixel[0]);
 	};
 	
+
+	/**
+	 * @brief           Put my Pixel data into 
+	 * 
+	 * @param           Given matrix
+	 */
 	void 
 	GetPixel            (Matrix<short>& M) {
 	
