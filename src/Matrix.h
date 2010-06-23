@@ -77,24 +77,23 @@ public:
     
 
     /**
-     * @brief           Default constructor.
+     * @brief           Contruct a 1^16 type matrix with (T)0.
      */
     inline              
     Matrix              ();
     
     
     /**
-     * @brief           Constructs a new 1^16 matrix initialized with scalar s.
+     * @brief           Construct a new 1^16 matrix initialized with scalar s.
      *
      * @param  s        Scalar Value.
-     * @return          A new matrix with one cell.
      */
     inline              
-    Matrix              (T s) {};
+    Matrix              (T s) ;
     
     
     /**
-     * @brief           Constructs an uninitialised matrix with desired size.
+     * @brief           Constructs a 1^16 matrix matrix with desired dimensions values = 0.
      *
      * @param  col      Columns
      * @param  lin      Lines
@@ -112,7 +111,6 @@ public:
      * @param  idd      IDD
      * @param  ide      IDE
      * @param  ave      Averages
-     * @return          Constructed matrix.
      */
     inline              
     Matrix               (int col, int lin, int cha, int set, 
@@ -126,13 +124,29 @@ public:
      *
      * @param  dim      Integer vector of 16 elements with dimensions in following order (In acordance to ICE):
      *                  COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE
-     * @return          Constructed matrix.
      */
     inline              
     Matrix              (Matrix<int> &dim);
     
 
-    // If compiled within IDEA we know of access specifiers
+    /**
+     * @brief           Delete array containing data.
+     */
+    ~Matrix             ();
+
+    //@}
+
+
+
+
+
+    /**
+     * @name            Import export functions for ICE access specifiers.
+     */
+
+    //{@
+
+    // If compiled within IDEA we know of access specifiers.
     #ifdef ICEIDEAFUNCTORS_EXPORTS
     
     /**
@@ -177,15 +191,9 @@ public:
  
     #endif
 
-
-    /**
-     * @brief           Default destructor.
-     */
-    ~Matrix             ();
-    
     //@}
 
-
+    
     /**
      * @name            Elementwise access
      *                  Elementwise access
@@ -882,6 +890,8 @@ Matrix<T>::Matrix () {
     for (int i = 0; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
+    _M = new T[1];
+
     #ifdef ALLOC
         nb_alloc++;
     #endif
@@ -890,6 +900,23 @@ Matrix<T>::Matrix () {
 
 
 template <class T> 
+Matrix<T>::Matrix (T s) {
+
+    for (int i = 0; i < INVALID_DIM; i++)
+        _dim [i] = 1;
+
+    _M = new T[1];
+
+    #ifdef ALLOC
+        nb_alloc++;
+    #endif
+
+    _M[0] = s;
+
+};
+
+
+template <class T>
 Matrix<T>::Matrix (int col, int lin, int cha, int set, 
                    int eco, int phs, int rep, int seg, 
                    int par, int slc, int ida, int idb, 
@@ -912,11 +939,13 @@ Matrix<T>::Matrix (int col, int lin, int cha, int set,
     _dim[IDE] = ide;
     _dim[AVE] = ave;
 
+    _M = new T[Size()]();
+
     #ifdef ALLOC
         nb_alloc++;
     #endif
 
-    _M = new T[Size()]();
+
 
 };
 
