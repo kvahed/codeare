@@ -54,6 +54,10 @@ enum IceDim {
 
 /**
  * @brief   Matrix template
+ *          This class intends to offer a simple interface for handling
+ *          MR data in a simple way. Version 0.3 copes with SIEMENS MRIR.
+ *          The data is organised in a 16 member long array for dimensions
+ *          and a template array for the data. The order is column-major.
  * 
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
@@ -120,7 +124,7 @@ public:
     /**
      * @brief           Constructs an uninitialised matrix with desired size in integer matrix.
      *
-     * @param  dim      integer array of 16 elements with dimensions in following order:
+     * @param  dim      Integer vector of 16 elements with dimensions in following order (In acordance to ICE):
      *                  COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE
      * @return          Constructed matrix.
      */
@@ -128,6 +132,7 @@ public:
     Matrix              (Matrix<int> &dim);
     
 
+    // If compiled within IDEA we know of access specifiers
     #ifdef ICEIDEAFUNCTORS_EXPORTS
     
     /**
@@ -190,13 +195,13 @@ public:
     
     
     /**
-     * @brief           Get an element of a vector at position p, i.e. this(p).
+     * @brief           Get an element from data repository.
      *
      * @param  p        Requested position.
      * @return          Requested Scalar value.
      */
     T                   
-    operator[]          (int p)                             const ;
+    operator[]          (int p)                             const;
     
     
     /**
