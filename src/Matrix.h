@@ -205,20 +205,20 @@ public:
     
     
     /**
-     * @brief           Get an element from data repository.
+     * @brief           Get pth element from data repository.
      *
      * @param  p        Requested position.
-     * @return          Requested Scalar value.
+     * @return          Value at _M[p].
      */
     T                   
     operator[]          (int p)                             const;
     
     
     /**
-     * @brief           Get an element of a vector at position p, i.e. this(p).
+     * @brief           Reference to pth element from data repository.
      *
      * @param  p        Requested position.
-     * @return          Reference to the requested Scalar value.
+     * @return          Reference to _M[p].
      */
     T                   
     &operator[]         (int p)                              ;
@@ -230,7 +230,7 @@ public:
      * @param  col      Column
      * @param  lin      Line
      *
-     * @return          Value
+     * @return          Value at _M[col + _dim[LIN]*lin]
      */
     inline T            
     at                  (int col, int lin)  const {
@@ -239,12 +239,12 @@ public:
 
     
     /**
-     * @brief            Set value in slice
+     * @brief            Reference to value in slice
      *  
      * @param  col       Column
      * @param  lin       Line
      *
-     * @return           Reference to element
+     * @return           Reference to _M[col + _dim[LIN]*lin]
      */
     inline T&           
     at                  (int col, int lin) {
@@ -259,7 +259,7 @@ public:
      * @param  lin       Line
      * @param  slc       Slice
      *
-     * @return           Value
+     * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T            
     at                   (int col, int lin, int slc)  const {
@@ -268,13 +268,13 @@ public:
     
     
     /**
-     * @brief            Set value in volume
+     * @brief            Reference to value in volume
      *  
      * @param  col       Column
      * @param  lin       Line
      * @param  slc       Slice
      *
-     * @return           Reference to element
+     * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&            
     at                   (int col, int lin, int slc) {
@@ -293,7 +293,7 @@ public:
 
     
     /**
-     * @brief           Get the element at position p of the vector, i.e. this(p).
+     * @brief           Get value of pth element of repository.
      *
      * @param  p        Requested position.
      * @return          Requested scalar value.
@@ -303,27 +303,27 @@ public:
 
     
     /**
-     * @brief            Get value in slice
-     *
-     * @param  col       Column
-     * @param  lin       Line
-     *
-     * @return           Value
-     */
-    T                  
-    operator()           (int col, int lin) const {
+	 * @brief           Get value in slice
+	 *
+	 * @param  col      Column
+	 * @param  lin      Line
+	 *
+	 * @return          Value at _M[col + _dim[LIN]*lin]
+	 */
+    T
+    operator()          (int col, int lin) const {
         return _M[col + _dim[LIN]*lin ];
     }
     
 
     /**
-     * @brief            Set value in slice
-     *
-     * @param  col       Column
-     * @param  lin       Line
-     *
-     * @return           Reference to element.
-     */
+	 * @brief           Reference to value in slice
+	 *
+	 * @param  col      Column
+	 * @param  lin      Line
+	 *
+	 * @return          Reference to _M[col + _dim[LIN]*lin]
+	 */
     T&                  
     operator()           (int col, int lin) {
         return _M[col + _dim[LIN]*lin ];
@@ -337,7 +337,7 @@ public:
      * @param  lin       Line
      * @param  slc       Slice
      *
-     * @return           Value
+     * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     T                  
     operator()           (int col, int lin, int slc) const {
@@ -346,13 +346,13 @@ public:
     
     
     /**
-     * @brief            Set value in column
+     * @brief            Reference to value in volume
      *
      * @param  col       Column
      * @param  lin       Line
      * @param  slc       Slice
      *
-     * @return           Reference to element
+     * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     T&                 
     operator()           (int col, int lin, int slc) {
@@ -374,44 +374,57 @@ public:
     
     /**
      * @brief           Get a vector with as copy of line l of this Matrix, i.e. this(l,:).
+     *                  NOT IMPLEMETED YET
      *
      * @param  l        Requested line.
      * @return          Vector copied from requested row.
      */
     Matrix<T>          
-    lin                 (int l)                             const;
+    lin                 (int lin)                             const;
     
     
     /**
      * @brief           Get a vector with as copy of column c of this Matrix, i.e. this(:,c).
+	 *                  NOT IMPLEMETED YET
      *
      * @param  c        Requested column.
      * @return          Vector copied from requested column.
      */
     Matrix<T>           
-    col                 (int c)                             const;
+    col                 (int col)                             const;
     
     
     /**
      * @brief           Get a matrix as a copy of lines l[i] of this matrix, i.e. this(l,:);
+     *                  NOT IMPLEMETED YET
      *
      * @param  l        Requested rows.
      * @return          Matrix copied from requested rows.
      */
     Matrix<T>           
-    lin                 (Matrix<int> l)                     const;
+    lin                 (Matrix<int> lin)                     const;
     
     
     /**
      * @brief           Get a matrix as a copy of columns c[i] of this matrix, i.e. this(:,c);
+     *                  NOT IMPLEMETED YET
      *
      * @param  c        Requested rows.
      * @return          Matrix copied from requested columns.
      */
     Matrix<T>           
-    col                 (Matrix<int> c)                     const;
+    col                 (Matrix<int> col)                     const;
+
+
+	//@}
     
+	/**
+	 * @name            Dimensions
+	 *                  Some convenience functions to access dimensionality
+	 */
     
+    //@{
+
     /**
      * @brief           Get number of rows, i.e. tmp = size(this); tmp(1).
      *
