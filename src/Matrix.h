@@ -919,7 +919,7 @@ Matrix<T>::Matrix (int col, int lin, int cha, int set,
 template <class T> 
 Matrix<T>::Matrix (Matrix<int> &dim) {
 
-    assert (dim->Size() == INVALID_DIM);
+    assert (dim.Size() == INVALID_DIM);
 
     for (int i = 0; i < INVALID_DIM; i++) {
         _dim[i] = dim[i];
@@ -1027,9 +1027,8 @@ Matrix<T>::~Matrix() {
     ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
 #endif
 
-
-    //if (_M !=0 )
-    //delete [](_M);
+    if (_M !=0 )
+    	delete [] (_M);
     
     #ifdef ALLOC
         nb_alloc--;
@@ -1495,6 +1494,10 @@ Matrix<T> Matrix<T>::tr() const {
 template <class T>
 bool Matrix<T>::dump (char* fname) {
 
+	// TODO: Error checking.
+	//       File not found.
+	//       HDF5 file format.
+
     if (fname != "") {
 
         std::ofstream fout(fname , std::ios::out | std::ios::binary);
@@ -1510,6 +1513,11 @@ bool Matrix<T>::dump (char* fname) {
 
 template <class T>
 bool Matrix<T>::read (char* fname) {
+
+	// TODO: Error checking.
+	//       File not found.
+	//       EOF before Size.
+	//       HDF5 file format.
 
     if (fname != "") {
 
