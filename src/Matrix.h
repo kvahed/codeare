@@ -142,6 +142,8 @@ public:
 
     /**
      * @name            Import export functions for ICE access specifiers.
+     *                  Ice access specifiers can be handled in one of the following ways.
+     *                  It is crucial to understand that the
      */
 
     //{@
