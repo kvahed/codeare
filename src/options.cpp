@@ -307,9 +307,6 @@ void  Options::useFileName         (const char *_filename)                     {
 
 }
 
-/**
- * set methods for options 
- */
 
 void  Options::setCommandOption     (const char *opt)                           {
 

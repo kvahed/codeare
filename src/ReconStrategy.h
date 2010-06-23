@@ -163,15 +163,15 @@ public:
 	
 protected:
 
-	Matrix< complex<float> > m_raw;         /**< raw data matrix   >*/
-	Matrix< complex<float> > m_helper;      /**< helper matrix     >*/
-	Matrix< short >          m_pixel;       /**< pixel data matrix >*/
+	Matrix< complex<float> > m_raw;         /*!< raw data matrix                    */
+	Matrix< complex<float> > m_helper;      /*!< helper matrix                      */
+	Matrix< short >          m_pixel;       /*!< pixel data matrix                  */
 
-	bool                     m_have_raw;
-	bool                     m_have_helper;
-	bool                     m_have_pixel;
+	bool                     m_have_raw;    /*!< Do we have raw    data?            */
+	bool                     m_have_helper; /*!< Do we have raw    data?            */
+	bool                     m_have_pixel;  /*!< Do we have helper data?            */
 
-	strings                  m_labels; /**< Labels from the sequence (UID etc)*/
+	strings                  m_labels;      /*!< Labels from the sequence (UID etc) */
 
 };
 

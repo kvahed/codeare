@@ -14,7 +14,7 @@ public:
 	/**
 	 * @brief Default constructor
 	 */
-	MedianFilter  () {m_ww = 25; m_wh = 25; };
+	MedianFilter  () {};
 	
 	/**
 	 * @brief Default destructor
@@ -25,11 +25,8 @@ public:
 	/**
 	 * @brief Apply Median filter to image space
 	 */
-	virtual RRSModule::error_code ProcessData ();
-
-	void SetFilterWidth (int val) { m_ww = val; };	
-	void SetFilterHeight(int val) { m_wh = val; };	
-	void SetFilterSize  (int val) { m_ww = val;  m_wh = val; };
+	virtual RRSModule::error_code
+	ProcessData ();
 
 
 private:	

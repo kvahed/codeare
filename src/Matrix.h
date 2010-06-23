@@ -520,8 +520,8 @@ public:
      * @brief           Get one or more elements of a matri, i.e. this=[1 2 3;4 5 6;7 8 9],
      *                  m1=[2], m2=[1 3], returns [2 8].
      *
-     * @param  r        Requested rows.
      * @param  c        Requested columns.
+     * @param  l        Requested lines.
      * @return          matrix of requested elements.
      */
     Matrix<T>           

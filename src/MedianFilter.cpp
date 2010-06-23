@@ -14,39 +14,25 @@ int compare_ints( const void* a, const void* b ) {
 //process the median filter
 RRSModule::error_code MedianFilter::ProcessData () {
 	
-	/*	int ex = (m_ww / 2), ey = (m_wh / 2);
+	int m_ww = 25;
+	int m_wh = 25;
+
+	int ex = (m_ww / 2), ey = (m_wh / 2);
 	int array[m_ww*m_wh];
 	
 	cout << "MedianFilter::ProcessData() running on " << m_pixel.width() << "x" << 	m_pixel.height() << " image " << endl; 
 
 	int x,y,fx,fy;
 
-		for (x=ex; x<m_pixel.width()-ex; ++x)
-		for (y=ey; y<m_pixel.height()-ey; ++y) 
-			{
-				
-				for (fx=0; fx<m_ww; ++fx) for (fy=0; fy<m_wh; ++fy) array[fx+fy*m_ww] = m_pixel.at(x+fx-ex,y+fy-ey);
-				qsort(array, m_ww*m_wh, sizeof(int), compare_ints );
-				m_pixel.at(x,y) = array[m_ww*m_wh/2] ;
-
-				}*/
-
-
-	int ww = 20;  //window width
-	int wh = 20;  //window height
-	int ex = (ww / 2), ey = (wh / 2);
-	int array[ww][wh];
-	
-	int x,y,fx,fy;
 	for (x=ex; x<m_pixel.width()-ex; ++x)
-		for (y=ey; y<m_pixel.height()-ey; ++y) {
-			for (fx=0; fx<ww; ++fx)
-				for (fy=0; fy<wh; ++fy)
-					array[fx][fy] = m_pixel.at(x+fx-ex, (y+fy-ey));
-			qsort(array[0], ww*wh, sizeof(int), compare_ints );
-			m_pixel.at(x,y) = array[ww/2][wh/2] ;
+		for (y=ey; y<m_pixel.height()-ey; ++y)  {
+			for (fx=0; fx<m_ww; ++fx)
+				for (fy=0; fy<m_wh; ++fy)
+					array[fx+fy*m_ww] = m_pixel.at(x+fx-ex,y+fy-ey);
+			qsort(array, m_ww*m_wh, sizeof(int), compare_ints );
+			m_pixel.at(x,y) = array[m_ww*m_wh/2] ;
 		}
-	
+
 	return RRSModule::OK;
 
 };

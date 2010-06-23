@@ -105,7 +105,7 @@ class Options {
     /**
      * @brief Set command line arguments given
      *
-     * @param _args Number of arguments.
+     * @param _argc Number of arguments.
      * @param _argv Arguments.
      */
     void useCommandArgs( int _argc, char **_argv );

@@ -42,7 +42,7 @@ public:
 	/**
 	 * @brief           Request data procession on recon service
 	 *
-	 * @param  method   Recon method
+	 * @param  m        Recon method
 	 * @return          Error code
 	 */ 
 	error_code              
@@ -104,9 +104,64 @@ public:
 	
 
 	/**
+	 * @brief           Set helper my data with ...
+	 *
+	 * @param  M        Given matrix
+	 */
+	void
+	SetHelper              (Matrix< complex<float> >& M) {
+
+		floats dabs;
+		floats darg;
+		int    i;
+
+		m_have_helper = true;
+
+		m_helper->dims.length(16);
+
+		for (i = 0; i < 16; i++)
+			m_helper->dims[i] = M.Dim(i);
+
+		long size = GetHelperSize();
+
+		m_helper->dabs.length(size);
+		m_helper->darg.length(size);
+
+		for (i = 0; i < size; i++) {
+			m_helper->dabs[i] = M[i].real();
+			m_helper->darg[i] = M[i].imag();
+		}
+
+		m_rrsi->helper(m_helper[0]);
+
+	};
+
+
+	/**
+	 * @brief           Return helper data after recon to ...
+	 *
+	 * @param  M        Given matrix
+	 */
+	void
+	GetHelper              (Matrix< complex<float> >& M) {
+
+		complex<float>* helper = new complex<float> [GetHelperSize()];
+		int             dim[INVALID_DIM], i;
+
+		for (i = 0; i < INVALID_DIM; i++)
+			dim[i] = m_helper->dims[i];
+
+		M.Reset(dim);
+		for (i = 0; i < GetHelperSize(); i++)
+			M[i] = complex<float>(m_helper->dabs[i],m_helper->darg[i]);
+
+	};
+
+
+	/**
 	 * @brief           Set my Pixel data
 	 * 
-	 * @param           Given matrix
+	 * @param  M        Given matrix
 	 */
 	void 
 	SetPixel            (Matrix<short>& M) {
@@ -135,7 +190,7 @@ public:
 	/**
 	 * @brief           Put my Pixel data into 
 	 * 
-	 * @param           Given matrix
+	 * @param  M        Given matrix
 	 */
 	void 
 	GetPixel            (Matrix<short>& M) {
@@ -194,32 +249,57 @@ private:
 };
 
 
+/**
+ * @brief Corba communication exception
+ */
 class DS_ServerConnectionException {
 public:
+	/**
+	 * @brief Handle communication exceptions
+	 */
 	DS_ServerConnectionException () { 
 		cerr << "CORBA COMM_FAILURE" << endl; 
 	};
 };
 
 
+/**
+ * @brief Corba system exception
+ */
+
 class DS_SystemException           {
 public:
+	/**
+	 * @brief Handle system exceptions
+	 */
 	DS_SystemException           () { 
 		cerr << "CORBA Exception" << endl; 
 	};
 };
 
 
+/**
+ * @brief Corba fatal exception
+ */
 class DS_FatalException            {
 public:
+	/**
+	 * @brief Handle fatal exception
+	 */
 	DS_FatalException            () { 
 		cerr << "CORBA Fatal Exception" << endl; 
 	};
 };
 
 
+/**
+ * @brief Corba unspecified exception
+ */
 class DS_Exception                 {
 public:
+	/**
+	 * @brief Handle unspecified exception
+	 */
 	DS_Exception                 () { 
 		cerr << "Exception" << endl; 
 	};

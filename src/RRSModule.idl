@@ -9,10 +9,10 @@ module RRSModule {
 
 	#include "common.h"
 
-	typedef sequence<float>  floats;
-	typedef sequence<long>   longs;
-	typedef sequence<short>  shorts;
-	typedef sequence<string> strings;
+	typedef sequence<float>  floats;   /*!< raw data real or imaginary repositories */
+	typedef sequence<short>  shorts;   /*!< pixel data repositories                 */
+	typedef sequence<long>   longs;    /*!< dimension reositories                   */
+	typedef sequence<string> strings;  /*!< string repositories                     */
 
 
 	/**
