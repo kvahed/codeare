@@ -42,10 +42,8 @@ enum IceDim {
 /**
  * Defined for memory allocation testing.
  */
-#define ALLOC
-#ifdef ALLOC
-  static int nb_alloc = 0;
-#endif
+static int nb_alloc = 0;
+
 
 /**
  * Old friend pi.
@@ -416,6 +414,31 @@ public:
     col                 (Matrix<int> col)                     const;
 
 
+    /**
+	 * @brief           Get one or more elements of a vector, i.e. this(p).
+	 *                  NOT IMPLEMENTED YET
+	 *
+	 * @param  p        Requested positions
+	 * @return          Vector of requested elements.
+	 */
+	Matrix<T>
+	operator()          (Matrix<int> &p)                    const;
+
+
+	/**
+	 * @brief           Get one or more elements of a matri, i.e. this=[1 2 3;4 5 6;7 8 9],
+	 *                  m1=[2], m2=[1 3], returns [2 8]. NOT IMPLEMENTED YET.
+	 *
+	 * @param  col      Requested columns.
+	 * @param  lin      Requested lines.
+	 * @return          matrix of requested elements.
+	 */
+	Matrix<T>
+	operator()          (Matrix<int> &col, Matrix<int> &lin)  const;
+
+
+
+
 	//@}
     
 	/**
@@ -497,11 +520,17 @@ public:
      */
     inline void         
     Reset               (const int* dim)                                      {
-        for (int i = 0; i < INVALID_DIM; i++)
+
+    	for (int i = 0; i < INVALID_DIM; i++)
             _dim[i] = dim[i];
-        //if (_M != 0)
-        //delete [] (_M);
+
+        if (nb_alloc) {
+            delete [] (_M);
+            nb_alloc = 0;
+        }
+
         _M = new T[Size()]();
+
     }
     
 
@@ -527,34 +556,13 @@ public:
     
 
     /**
-     * @name            Operators
+     * @name            Some operators
      *                  Operator definitions. Needs big expansion still.
      */
     
     //@{
     
 
-    /**
-     * @brief           Get one or more elements of a vector, i.e. this(p).
-     *
-     * @param  p        Requested positions
-     * @return          Vector of requested elements.
-     */
-    Matrix<T>           
-    operator()          (Matrix<int> &p)                    const;
-
-    
-    /**
-     * @brief           Get one or more elements of a matri, i.e. this=[1 2 3;4 5 6;7 8 9],
-     *                  m1=[2], m2=[1 3], returns [2 8].
-     *
-     * @param  c        Requested columns.
-     * @param  l        Requested lines.
-     * @return          matrix of requested elements.
-     */
-    Matrix<T>           
-    operator()          (Matrix<int> &c, Matrix<int> &l)  const;
-    
     
     /**
      * @brief           Assignment operator. i.e. this = m.
@@ -577,7 +585,7 @@ public:
     /**
      * @brief           Elementwise substruction of two matrices. i.e. this - M.
      *
-     * @param  M        The reference to the substruent.
+     * @param  M        Matrix substruent.
      */
     Matrix<T>           
     operator-           (Matrix<T> &M);
@@ -585,6 +593,8 @@ public:
     
     /**
      * @brief           Elementwise substruction all elements by a given value. i.e. this - s.
+     *
+     * @param  s        Scalar substruent.
      */
     Matrix<T>           
     operator-           (T s);
@@ -767,7 +777,7 @@ public:
     operator*           (Matrix<T> &M);
     
     /**
-     *                  Elementwise multiplication with a scalar. i.e. this * m.
+     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
      */
     Matrix<T>           
     operator*           (T s);
@@ -906,10 +916,8 @@ Matrix<T>::Matrix () {
         _dim [i] = 1;
 
     _M = new T[1];
+    nb_alloc = 1;
 
-    #ifdef ALLOC
-        nb_alloc++;
-    #endif
 
 };
 
@@ -921,10 +929,7 @@ Matrix<T>::Matrix (T s) {
         _dim [i] = 1;
 
     _M = new T[1];
-
-    #ifdef ALLOC
-        nb_alloc++;
-    #endif
+    nb_alloc = 1;
 
     _M[0] = s;
 
@@ -955,11 +960,7 @@ Matrix<T>::Matrix (int col, int lin, int cha, int set,
     _dim[AVE] = ave;
 
     _M = new T[Size()]();
-
-    #ifdef ALLOC
-        nb_alloc++;
-    #endif
-
+    nb_alloc = 1;
 
 
 };
@@ -974,11 +975,9 @@ Matrix<T>::Matrix (Matrix<int> &dim) {
         _dim[i] = dim[i];
     }
                              
-    #ifdef ALLOC
-        nb_alloc++;
-    #endif
 
     _M = new T[Size()]();
+    nb_alloc = 1;
 
 };
 
@@ -1015,10 +1014,8 @@ long Matrix<T>::Import(IceAs ias) {
     for (i = 0; i < INVALID_DIM; i++)
         _dim[i] = (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
     
-    #ifdef ALLOC
-        nb_alloc++;
-    #endif
     _M = new T[Size()]();
+    nb_alloc = 1;
     
     T* data = (T*) ias.calcSplObjStartAddr() ;
     
@@ -1076,12 +1073,10 @@ Matrix<T>::~Matrix() {
     ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
 #endif
 
-    if (_M !=0 )
+    if (nb_alloc) {
     	delete [] (_M);
-    
-    #ifdef ALLOC
-        nb_alloc--;
-    #endif
+        nb_alloc = 0;
+    }
     
 };
 
@@ -1248,10 +1243,13 @@ Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
     for (i = 0; i < INVALID_DIM; i++) 
         _dim[i] = M.Dim()[i];
     
-    //if (_M != 0)
-        //delete[](_M);
+    if (nb_alloc) {
+        delete[](_M);
+        nb_alloc = 0;
+    }
 
     _M = new T[Size()]();
+    nb_alloc = 1;
 
     for (i = 0; i < Size(); i++)
         _M[i] = M[i];
