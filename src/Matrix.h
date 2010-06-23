@@ -777,8 +777,8 @@ public:
     &operator<<         (std::ostream &os);
 
 
-    /*
-     * @brief           Dump binary column-major matrix.
+    /**
+     * @brief           Dump binary matrix column-major.
      * 
      * @param  fname    File name.
      * @return          Success.
@@ -788,7 +788,7 @@ public:
     
 
     /**
-     * @brief           Read in binary column-major matrix.
+     * @brief           Read in binary matrix column-major.
      *
      * @param  fname    File name.
      * @return          Success.
