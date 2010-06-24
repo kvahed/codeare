@@ -4,7 +4,7 @@ LDFLAGS       = /L C:/Temp/omniORB-4.1.1/lib
 OMNIIDL       = omniidl -bcxx -Wbh=.h -Wbs=.cpp
 COMMON        = Matrix.obj RRSModule.obj options.obj 
 CLIENT        = ReconClient.obj testclt.obj
-SERVER        = ReconServant.obj MedianFilter.obj ReconStrategy.obj ReconContext.obj DummyRecon.obj DumpToFile.obj InvertOrder.obj Server.obj
+SERVER        = ReconServant.obj MedianFilter.obj ReconStrategy.obj ReconContext.obj DummyRecon.obj DumpToFile.obj InvertOrder.obj reconserver.obj
 
 LINK32=link.exe
 LINK32_FLAGS=-nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib -libpath:C:\Temp\omniORB-4.1.1\lib\x86_win32
@@ -53,10 +53,13 @@ options.obj: options.cpp options.h
 testclt.obj: testclt.cpp
 	$(CC) $(CPPFLAGS) testclt.cpp
 
-testclt.exe: $(COMMON) $(CLIENT) testclt.obj
+reconserver.obj: reconserver.cpp
+	$(CC) $(CPPFLAGS) reconserver.cpp
+
+testclt.exe: $(COMMON) $(CLIENT)
 	$(LINK32) -out:testclt.exe $(CLIENT) $(COMMON) $(LINK32_FLAGS) 
 
-reconserver.exe: $(COMMON) $(SERVER) Server.cpp
+reconserver.exe: $(COMMON) $(SERVER)
 	$(LINK32) -out:reconserver.exe $(SERVER) $(COMMON) $(LINK32_FLAGS) 
 
 clean clean_all:
