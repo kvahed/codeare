@@ -13,7 +13,7 @@ CLIENT_SIDE =  ReconClient.h ReconClient.cpp testclt.cpp
 
 # Reconstruction strategies & server side stuff
 RECON_STRATEGIES = DummyRecon.h DummyRecon.cpp DumpToFile.h DumpToFile.cpp GenericRegrid.h GenericRegrid.cpp HannWindow.h HannWindow.cpp InvertOrder.h InvertOrder.cpp MedianFilter.h MedianFilter.cpp 
-SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp Server.cpp 
+SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp reconserver.cpp 
 
 # Rules for the binaries
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
