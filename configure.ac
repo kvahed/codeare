@@ -1,5 +1,5 @@
 AC_PREREQ([2.63])
-AC_INIT([jrc], [0.2], [k.vahedipour@fz-juelich.cd])
+AC_INIT([jrrs], [0.2], [k.vahedipour@fz-juelich.cd])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([src/config.h])
@@ -52,6 +52,6 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
 AC_OUTPUT
 
