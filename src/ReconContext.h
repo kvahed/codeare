@@ -19,7 +19,7 @@ public:
 	 * @brief Construct with setting up available strategies
 	 */
 	ReconContext ();
-
+	~ReconContext () {delete m_strategy;};
 	/**
 	 * @brief Construct with a strategy
 	 */

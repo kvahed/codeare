@@ -24,7 +24,7 @@ public:
 	/**
 	 * @brief Missing
 	 */ 
-	ReconStrategy  () {  };
+	ReconStrategy  () {};
 	
 	/**
 	 * @brief Missing

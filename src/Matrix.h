@@ -50,6 +50,9 @@ static int nb_alloc = 0;
  */
 # define PI  3.1415926535897931159979634685441851615906
 
+
+using namespace std;
+
 /**
  * @brief   Matrix template
  *          This class intends to offer a simple interface for handling
@@ -60,8 +63,8 @@ static int nb_alloc = 0;
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
  */
-
-template <typename T> class Matrix {
+template <typename T>
+class Matrix {
     
 
 public:
@@ -530,6 +533,7 @@ public:
         }
 
         _M = new T[Size()]();
+        nb_alloc = 1;
 
     }
     

@@ -50,6 +50,7 @@ ReconServant::process_data  (method m)       {
 		context->Strategy()->GetLabels(m_labels);
 
 	cout << "... done. Will handle control back to client." << endl;
+	delete context;
 
 	return e;
 

@@ -50,7 +50,7 @@ int main (int argc, char** argv) {
 		
 		client.SetPixel(pdata);
 		client.Requestprocess_data((RRSModule::method) test);
-		client.GetPixel(pdata); 
+		client.GetPixel(pdata);
 		
 		for (i = 0; i < d; i++)
 			for (j = 0; j < d; j++)
