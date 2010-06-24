@@ -35,7 +35,7 @@ int main (int argc, char** argv) {
 		client.SetRaw(data);
 		client.Requestprocess_data((RRSModule::method) test);
 		client.GetRaw(data); 
-		
+
 		Matrix< short > pdata (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
 		for (i = 0; i < d; i++)
