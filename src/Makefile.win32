@@ -2,18 +2,19 @@ CC	          = cl
 CPPFLAGS      = -c -DDEBUG /IC:/Temp/omniORB-4.1.1/include  /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 -GX
 LDFLAGS       = /L C:/Temp/omniORB-4.1.1/lib
 OMNIIDL       = omniidl -bcxx -Wbh=.h -Wbs=.cpp
-LIBS	      = -lomniORB4 -lomnithread -lomniDynamic4
-OBJECTS       = ReconClient.obj Matrix.obj RRSModule.obj options.obj testclt.obj
+COMMON        = Matrix.obj RRSModule.obj options.obj 
+CLIENT        = ReconClient.obj testclt.obj
+SERVER        = ReconServant.obj MedianFilter.obj ReconStrategy.obj ReconContext.obj DummyRecon.obj DumpToFile.obj InvertOrder.obj Server.obj
 
 LINK32=link.exe
-LINK32_FLAGS=-nologo omniORB4_rt.lib omnithread_rt.lib msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib -libpath:C:\Temp\omniORB-4.1.1\lib\x86_win32
+LINK32_FLAGS=-nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib -libpath:C:\Temp\omniORB-4.1.1\lib\x86_win32
 
-all: $(OBJECTS) testclt.exe
+all: $(COMMON) $(CLIENT) testclt.exe $(SERVER) reconserver.exe
 
 RRSModule.h : RRSModule.idl
 	$(OMNIIDL)  RRSModule.idl
 
-RRSModule.cpp: RRSModule.idl
+RRSModule.cpp : RRSModule.idl
 	$(OMNIIDL)  RRSModule.idl
 
 RRSModule.obj: RRSModule.cpp RRSModule.h
@@ -25,14 +26,38 @@ Matrix.obj: Matrix.cpp Matrix.h
 ReconClient.obj: ReconClient.cpp ReconClient.h RRSModule.h
 	$(CC) $(CPPFLAGS) ReconClient.cpp
 
-testclt.obj: testclt.cpp ReconClient.obj
-	$(CC) $(CPPFLAGS) testclt.cpp
+ReconServant.obj: ReconServant.cpp ReconServant.h RRSModule.h
+	$(CC) $(CPPFLAGS) ReconServant.cpp
+
+ReconStrategy.obj: ReconStrategy.cpp ReconStrategy.h RRSModule.h
+	$(CC) $(CPPFLAGS) ReconStrategy.cpp
+
+ReconContext.obj: ReconContext.cpp ReconContext.h
+	$(CC) $(CPPFLAGS) ReconContext.cpp
+
+DummyRecon.obj: DummyRecon.cpp DummyRecon.h
+	$(CC) $(CPPFLAGS) DummyRecon.cpp
+
+DumpToFile.obj: DumpToFile.cpp DumpToFile.h
+	$(CC) $(CPPFLAGS) DumpToFile.cpp
+
+MedianFilter.obj: MedianFilter.cpp MedianFilter.h
+	$(CC) $(CPPFLAGS) MedianFilter.cpp
+
+InvertOrder.obj: InvertOrder.cpp InvertOrder.h
+	$(CC) $(CPPFLAGS) InvertOrder.cpp
 
 options.obj: options.cpp options.h
 	$(CC) $(CPPFLAGS) options.cpp
 
-testclt.exe: $(OBJECTS) 
-	$(LINK32) -out:testclt.exe $(OBJECTS) $(LINK32_FLAGS) 
+testclt.obj: testclt.cpp
+	$(CC) $(CPPFLAGS) testclt.cpp
+
+testclt.exe: $(COMMON) $(CLIENT) testclt.obj
+	$(LINK32) -out:testclt.exe $(CLIENT) $(COMMON) $(LINK32_FLAGS) 
+
+reconserver.exe: $(COMMON) $(SERVER) Server.cpp
+	$(LINK32) -out:reconserver.exe $(SERVER) $(COMMON) $(LINK32_FLAGS) 
 
 clean clean_all:
 	del *.obj

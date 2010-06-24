@@ -24,10 +24,8 @@ int main (int argc, char** argv) {
 	if (init (argc, argv)) {
 
 		ReconClient client (name, debug);
-		
-		int         i, j, d;
-		
-		d = 2;
+		int         i = 0, j = 0, d = 512;
+
 		Matrix< complex<float> > data (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
 		for (i = 0; i < d; i++)
@@ -38,10 +36,6 @@ int main (int argc, char** argv) {
 		client.Requestprocess_data((RRSModule::method) test);
 		client.GetRaw(data); 
 		
-		for (i = 0; i < d; i++)
-			for (j = 0; j < d; j++)
-				cout << data.at(i,j) << endl;
-
 		Matrix< short > pdata (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
 		for (i = 0; i < d; i++)
@@ -51,11 +45,9 @@ int main (int argc, char** argv) {
 		client.SetPixel(pdata);
 		client.Requestprocess_data((RRSModule::method) test);
 		client.GetPixel(pdata);
-		
-		for (i = 0; i < d; i++)
-			for (j = 0; j < d; j++)
-				cout << pdata.at(i,j) << endl;
 
+		cout << "We're good" << endl;
+		
 		return 0;
 
 	} else
@@ -68,11 +60,20 @@ int main (int argc, char** argv) {
 bool init (int argc, char** argv) {
 
 	cout << endl;
+#ifdef VERSION
 	cout << "jrrs "         << VERSION                                        << endl;
+#else
+	cout << "jrrs "         << endl;
+#endif
 	cout << "juelich remote reconstruction service "                          << endl;
+#ifdef SVN_REVISION
 	cout << "Test client "  << " [build " << SVN_REVISION << "]"              << endl;
-    cout << "Copyright (C) 2010	Kaveh Vahedipour<k.vahedipour@fz-jeulich.de>" << endl;
-	cout << "Kaveh Vahedipour -  k.vahedipour@fz-juelich.de"                  << endl;
+#else
+	cout << "Test client "  << endl;
+#endif
+
+    cout << "Copyright (C) 2010"                                              << endl;
+	cout << "Kaveh Vahedipour - k.vahedipour@fz-juelich.de"                   << endl;
 	cout << "Juelich Research Centre"                                         << endl;
 	cout << "Institute of Neuroscience and Medicine"                          << endl;
 	cout << "Medical Imaging Physics"                                         << endl;

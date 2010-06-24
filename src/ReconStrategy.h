@@ -2,7 +2,13 @@
 #define __RECON_STRATEGY_H__
 
 #include "Matrix.h"
-#include "RRSModule.hh"
+
+#ifdef __WIN32__ 
+    #include "RRSModule.h"
+#else
+    #include "RRSModule.hh"
+#endif
+
 
 #include <cstdlib>
 #include <complex>
@@ -58,16 +64,16 @@ public:
 	SetRaw           (const raw_data* raw)   {
 
 		int dim[16];
+		int i = 0;
 
 		m_have_raw = true;
 
-		for (int i = 0; i < 16; i++){
+		for (i = 0; i < 16; i++)
 			dim[i] = raw->dims[i];
-		}
 
 		m_raw.Reset (dim);
 
-		for (int i = 0; i < m_raw.Size(); i++)
+		for (i = 0; i < m_raw.Size(); i++)
 			m_raw[i] =  complex<float> (raw->dabs[i], raw->darg[i]);
 		
 	};
@@ -94,13 +100,14 @@ public:
 		m_have_helper = true;
 
 		int dim[16];
+		int i = 0;
 
-		for (int i = 0; i < 16; i++)
+		for (i = 0; i < 16; i++)
 			dim[i] = helper->dims[i];
 
 		m_helper.Reset (dim);
 
-		for (int i = 0; i < m_helper.Size(); i++)
+		for (i = 0; i < m_helper.Size(); i++)
 			m_helper[i] =  complex<float> (helper->dabs[i], helper->darg[i]);
 		
 	};
@@ -125,13 +132,14 @@ public:
 		m_have_pixel = true;
 
 		int dim[16];
+		int i = 0;
 
-		for (int i = 0; i < 16; i++)
+		for (i = 0; i < 16; i++)
 			dim[i] = pixel->dims[i];
 
 		m_pixel.Reset (dim);
 
-		for (int i = 0; i < m_pixel.Size(); i++) 
+		for (i = 0; i < m_pixel.Size(); i++) 
 			m_pixel[i] =  pixel->vals[i];
 		
 	};

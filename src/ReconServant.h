@@ -2,7 +2,13 @@
 #define __RECON_SERVANT_H__
 
 #include "Matrix.h"
-#include "RRSModule.hh"
+
+#ifdef __WIN32__ 
+    #include "RRSModule.h"
+#else
+    #include "RRSModule.hh"
+#endif
+
 
 using namespace RRSModule;
 

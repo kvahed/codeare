@@ -6,9 +6,11 @@
 #include <signal.h>
                                                                                 
 #include "ReconServant.h"
-#include "RRSModule.hh"
 
+#ifndef __WIN32__
 #include "config.h"
+#endif
+
 #include "options.h"
 
 #ifndef SVN_REVISION
@@ -118,7 +120,11 @@ int main (int argc, char** argv) {
 bool init (int argc, char** argv) {
 
 	cout << endl;
+#ifdef VERSION
 	cout << "jrrs "         << VERSION                                        << endl;
+#else
+	cout << "jrrs "         << endl;
+#endif
 	cout << "juelich remote reconstruction service "                          << endl;
 	cout << "Reconstruction server "  << " [build " << SVN_REVISION << "]"    << endl;
     cout << "Copyright (C) 2010	Kaveh Vahedipour<k.vahedipour@fz-jeulich.de>" << endl;

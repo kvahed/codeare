@@ -1559,6 +1559,8 @@ bool Matrix<T>::dump (char* fname) {
         fout.close();
 
     }
+
+	return true;
     
 }
 
@@ -1580,6 +1582,8 @@ bool Matrix<T>::read (char* fname) {
         fin.close();
 
     }
+
+	return true;
     
 }
 
