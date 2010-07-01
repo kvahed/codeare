@@ -62,9 +62,9 @@ public:
 
 		m_have_raw = true;
 		
-		m_raw->dims.length(16);
+		m_raw->dims.length(INVALID_DIM);
 		
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < INVALID_DIM; i++)
 			m_raw->dims[i] = M.Dim(i);
 
 		long size = GetRawSize();
@@ -90,7 +90,6 @@ public:
 	void 
 	GetRaw              (Matrix< complex<float> >& M) {
 		
-		complex<float>* raw = new complex<float> [GetRawSize()];
 		int             dim[INVALID_DIM], i;
 
 		for (i = 0; i < INVALID_DIM; i++)
@@ -117,9 +116,9 @@ public:
 
 		m_have_helper = true;
 
-		m_helper->dims.length(16);
+		m_helper->dims.length(INVALID_DIM);
 
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < INVALID_DIM; i++)
 			m_helper->dims[i] = M.Dim(i);
 
 		long size = GetHelperSize();
@@ -145,7 +144,6 @@ public:
 	void
 	GetHelper              (Matrix< complex<float> >& M) {
 
-		complex<float>* helper = new complex<float> [GetHelperSize()];
 		int             dim[INVALID_DIM], i;
 
 		for (i = 0; i < INVALID_DIM; i++)
@@ -171,9 +169,9 @@ public:
 		
 		m_have_pixel = true;
 		
-		m_pixel->dims.length(16);
+		m_pixel->dims.length(INVALID_DIM);
 		
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < INVALID_DIM; i++)
 			m_pixel->dims[i] = M.Dim(i);
 		
 		long   size = GetPixelSize();
@@ -195,7 +193,6 @@ public:
 	void 
 	GetPixel            (Matrix<short>& M) {
 	
-		short* pixel = new short [GetPixelSize()];
 		int             dim[INVALID_DIM], i;
 
 		for (i = 0; i < INVALID_DIM; i++)
@@ -243,6 +240,8 @@ private:
 	bool                         m_have_raw;
 	bool                         m_have_pixel;
 	bool                         m_have_helper;
+
+	strings*                     m_labels;
 
 	CORBA::ORB_var               m_orb;
 	

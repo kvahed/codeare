@@ -112,9 +112,19 @@ ReconClient::Requestprocess_data  (method m)  {
 	result = m_rrsi->process_data(m);
 	
 	// Get data back from recon
-	if (result == OK)
-		m_raw = m_rrsi->raw();
-
+	if (result == OK) {
+		
+		if(m_have_raw == true)
+			m_raw = m_rrsi->raw();
+		if (m_have_helper == true)
+			m_helper = m_rrsi->helper();
+		if (m_have_pixel == true)
+			m_pixel = m_rrsi->pixel();
+		
+		m_labels = m_rrsi->labels();
+		
+	}
+	
 	return result;
 	
 };
@@ -126,7 +136,7 @@ long
 ReconClient::GetRawSize () {
 
 	long size = 1;
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < INVALID_DIM; i++)
 		size *= m_raw->dims[i];
 	return size;
 	
@@ -139,7 +149,7 @@ long
 ReconClient::GetHelperSize () {
 	
 	long size = 1;
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < INVALID_DIM; i++)
 		size *= m_helper->dims[i];
 	return size;
 	
@@ -152,7 +162,7 @@ long
 ReconClient::GetPixelSize () {
 	
 	long size = 1;
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < INVALID_DIM; i++)
 		size *= m_pixel->dims[i];
 	return size;
 	
