@@ -48,7 +48,8 @@ am__objects_1 = Matrix.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
 	options.$(OBJEXT)
 am__objects_2 = DummyRecon.$(OBJEXT) DumpToFile.$(OBJEXT) \
 	GenericRegrid.$(OBJEXT) HannWindow.$(OBJEXT) \
-	InvertOrder.$(OBJEXT) MedianFilter.$(OBJEXT)
+	InvertOrder.$(OBJEXT) MedianFilter.$(OBJEXT) \
+	MedianFilter_OMP.$(OBJEXT)
 am__objects_3 = ReconContext.$(OBJEXT) ReconStrategy.$(OBJEXT) \
 	ReconServant.$(OBJEXT) reconserver.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2) \
@@ -173,7 +174,7 @@ COMMON = Matrix.h Matrix.cpp RRSModule.hh RRSModuleSK.cc options.h options.cpp
 CLIENT_SIDE = ReconClient.h ReconClient.cpp testclt.cpp
 
 # Reconstruction strategies & server side stuff
-RECON_STRATEGIES = DummyRecon.h DummyRecon.cpp DumpToFile.h DumpToFile.cpp GenericRegrid.h GenericRegrid.cpp HannWindow.h HannWindow.cpp InvertOrder.h InvertOrder.cpp MedianFilter.h MedianFilter.cpp 
+RECON_STRATEGIES = DummyRecon.h DummyRecon.cpp DumpToFile.h DumpToFile.cpp GenericRegrid.h GenericRegrid.cpp HannWindow.h HannWindow.cpp InvertOrder.h InvertOrder.cpp MedianFilter.h MedianFilter.cpp MedianFilter_OMP.h MedianFilter_OMP.cpp
 SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp reconserver.cpp 
 
 # Rules for the binaries
@@ -273,6 +274,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InvertOrder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Matrix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RRSModuleSK.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@

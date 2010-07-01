@@ -10,7 +10,8 @@ enum      method       {
 	HANN_WINDOW,
 	MEDIAN_FILTER,
 	INVERT_ORDER,
-	DUMP_TO_FILE
+	DUMP_TO_FILE,
+	MEDIAN_FILTER_OMP
 	
 };
 

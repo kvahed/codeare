@@ -7,6 +7,7 @@
 
 // Pixel strategies
 #include "MedianFilter.h"
+#include "MedianFilter_OMP.h"
 //#include "NUFFT.h"
 //#include "CGSENSE.h"
 
@@ -20,11 +21,12 @@ ReconContext::ReconContext () {
 
 	m_strategies.begin();
 
-	m_strategies.push_back( ((ReconStrategy*) new DummyRecon())   );
-	m_strategies.push_back( ((ReconStrategy*) new HannWindow())   );
-	m_strategies.push_back( ((ReconStrategy*) new MedianFilter()) );
-	m_strategies.push_back( ((ReconStrategy*) new InvertOrder())  );
-	m_strategies.push_back( ((ReconStrategy*) new DumpToFile())   );
+	m_strategies.push_back( ((ReconStrategy*) new DummyRecon())       );
+	m_strategies.push_back( ((ReconStrategy*) new HannWindow())       );
+	m_strategies.push_back( ((ReconStrategy*) new MedianFilter())     );
+	m_strategies.push_back( ((ReconStrategy*) new InvertOrder())      );
+	m_strategies.push_back( ((ReconStrategy*) new DumpToFile())       );
+	m_strategies.push_back( ((ReconStrategy*) new MedianFilter_OMP()) );
 		
 }
 

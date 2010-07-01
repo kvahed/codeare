@@ -12,7 +12,7 @@ COMMON = Matrix.h Matrix.cpp RRSModule.hh RRSModuleSK.cc options.h options.cpp
 CLIENT_SIDE =  ReconClient.h ReconClient.cpp testclt.cpp
 
 # Reconstruction strategies & server side stuff
-RECON_STRATEGIES = DummyRecon.h DummyRecon.cpp DumpToFile.h DumpToFile.cpp GenericRegrid.h GenericRegrid.cpp HannWindow.h HannWindow.cpp InvertOrder.h InvertOrder.cpp MedianFilter.h MedianFilter.cpp 
+RECON_STRATEGIES = DummyRecon.h DummyRecon.cpp DumpToFile.h DumpToFile.cpp GenericRegrid.h GenericRegrid.cpp HannWindow.h HannWindow.cpp InvertOrder.h InvertOrder.cpp MedianFilter.h MedianFilter.cpp MedianFilter_OMP.h MedianFilter_OMP.cpp
 SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp reconserver.cpp 
 
 # Rules for the binaries

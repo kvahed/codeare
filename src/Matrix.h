@@ -377,7 +377,7 @@ public:
      * @brief           Get a vector with as copy of line l of this Matrix, i.e. this(l,:).
      *                  NOT IMPLEMETED YET
      *
-     * @param  l        Requested line.
+     * @param  lin      Requested line.
      * @return          Vector copied from requested row.
      */
     Matrix<T>          
@@ -388,7 +388,7 @@ public:
      * @brief           Get a vector with as copy of column c of this Matrix, i.e. this(:,c).
 	 *                  NOT IMPLEMETED YET
      *
-     * @param  c        Requested column.
+     * @param  col      Requested column.
      * @return          Vector copied from requested column.
      */
     Matrix<T>           
@@ -399,7 +399,7 @@ public:
      * @brief           Get a matrix as a copy of lines l[i] of this matrix, i.e. this(l,:);
      *                  NOT IMPLEMETED YET
      *
-     * @param  l        Requested rows.
+     * @param  lin      Requested rows.
      * @return          Matrix copied from requested rows.
      */
     Matrix<T>           
@@ -410,7 +410,7 @@ public:
      * @brief           Get a matrix as a copy of columns c[i] of this matrix, i.e. this(:,c);
      *                  NOT IMPLEMETED YET
      *
-     * @param  c        Requested rows.
+     * @param  col      Requested rows.
      * @return          Matrix copied from requested columns.
      */
     Matrix<T>           
