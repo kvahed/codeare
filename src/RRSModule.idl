@@ -21,9 +21,12 @@ module RRSModule {
 	struct    raw_data          {
 		
 		// Complex
-		floats dabs;  /**< Data abs      */
-		floats darg;  /**< Data argument */
-		longs  dims;  /**< Dimesions     */
+		floats dreal;  /**< Data abs      */
+		floats dimag;  /**< Data argument */
+		longs  dims;   /**< Dimesions     */
+
+		//float abs ();
+		//float arg ();
 
 	};
 

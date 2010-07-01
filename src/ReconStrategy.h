@@ -51,8 +51,8 @@ public:
 	GetRaw           (raw_data* raw)   {
 		
 		for (int i = 0; i < m_raw.Size(); i++) {
-			raw->dabs[i] = abs(m_raw[i]);
-			raw->darg[i] = arg(m_raw[i]); 
+			raw->dreal[i] = abs(m_raw[i]);
+			raw->dimag[i] = arg(m_raw[i]); 
 		}
 			
 	}
@@ -74,7 +74,7 @@ public:
 		m_raw.Reset (dim);
 
 		for (i = 0; i < m_raw.Size(); i++)
-			m_raw[i] =  complex<float> (raw->dabs[i], raw->darg[i]);
+			m_raw[i] =  complex<float> (raw->dreal[i], raw->dimag[i]);
 		
 	};
 	
@@ -85,8 +85,8 @@ public:
 	GetHelper           (raw_data* helper)   {
 
 		for (int i = 0; i < m_helper.Size(); i++) {
-			helper->dabs[i] = abs(m_helper[i]);
-			helper->darg[i] = arg(m_helper[i]); 
+			helper->dreal[i] = abs(m_helper[i]);
+			helper->dimag[i] = arg(m_helper[i]); 
 		}
 			
 	}
@@ -108,7 +108,7 @@ public:
 		m_helper.Reset (dim);
 
 		for (i = 0; i < m_helper.Size(); i++)
-			m_helper[i] =  complex<float> (helper->dabs[i], helper->darg[i]);
+			m_helper[i] =  complex<float> (helper->dreal[i], helper->dimag[i]);
 		
 	};
 	

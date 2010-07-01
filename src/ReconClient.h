@@ -56,8 +56,8 @@ public:
 	void 
 	SetRaw              (Matrix< complex<float> >& M) {
 		
-		floats dabs;
-		floats darg;
+		floats dreal;
+		floats dimag;
 		int    i;
 
 		m_have_raw = true;
@@ -69,12 +69,12 @@ public:
 
 		long size = GetRawSize();
 
-		m_raw->dabs.length(size); 
-		m_raw->darg.length(size);
+		m_raw->dreal.length(size); 
+		m_raw->dimag.length(size);
 		
 		for (i = 0; i < size; i++) {
-			m_raw->dabs[i] = M[i].real();
-			m_raw->darg[i] = M[i].imag(); 
+			m_raw->dreal[i] = M[i].real();
+			m_raw->dimag[i] = M[i].imag(); 
 		}
 		
 		m_rrsi->raw(m_raw[0]);
@@ -97,7 +97,7 @@ public:
 		
 		M.Reset(dim);
 		for (i = 0; i < GetRawSize(); i++)
-			M[i] = complex<float>(m_raw->dabs[i],m_raw->darg[i]);
+			M[i] = complex<float>(m_raw->dreal[i],m_raw->dimag[i]);
 		
 	};
 	
@@ -110,8 +110,8 @@ public:
 	void
 	SetHelper              (Matrix< complex<float> >& M) {
 
-		floats dabs;
-		floats darg;
+		floats dreal;
+		floats dimag;
 		int    i;
 
 		m_have_helper = true;
@@ -123,12 +123,12 @@ public:
 
 		long size = GetHelperSize();
 
-		m_helper->dabs.length(size);
-		m_helper->darg.length(size);
+		m_helper->dreal.length(size);
+		m_helper->dimag.length(size);
 
 		for (i = 0; i < size; i++) {
-			m_helper->dabs[i] = M[i].real();
-			m_helper->darg[i] = M[i].imag();
+			m_helper->dreal[i] = M[i].real();
+			m_helper->dimag[i] = M[i].imag();
 		}
 
 		m_rrsi->helper(m_helper[0]);
@@ -145,14 +145,13 @@ public:
 	GetHelper              (Matrix< complex<float> >& M) {
 
 		int             dim[INVALID_DIM], i;
-
 		for (i = 0; i < INVALID_DIM; i++)
 			dim[i] = m_helper->dims[i];
-
+		
 		M.Reset(dim);
 		for (i = 0; i < GetHelperSize(); i++)
-			M[i] = complex<float>(m_helper->dabs[i],m_helper->darg[i]);
-
+			M[i] = complex<float>(m_helper->dreal[i],m_helper->dimag[i]);
+		
 	};
 
 
@@ -182,6 +181,7 @@ public:
 			m_pixel->vals[i] = M[i];
 		
 		m_rrsi->pixel(m_pixel[0]);
+
 	};
 	
 
@@ -199,6 +199,7 @@ public:
 			dim[i] = m_pixel->dims[i];
 		
 		M.Reset(dim);
+
 		for (i = 0; i < GetPixelSize(); i++)
 			M[i] = (short)m_pixel->vals[i];
 	
