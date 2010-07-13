@@ -22,5 +22,5 @@ SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp 
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
 reconserver_SOURCES = $(COMMON) $(RECON_STRATEGIES) $(SERVER_SIDE)
 
-EXTRA_DIST = RRSModule.idl
+EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
