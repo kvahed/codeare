@@ -26,7 +26,9 @@ ReconContext::ReconContext () {
 	m_strategies.push_back( ((ReconStrategy*) new MedianFilter())     );
 	m_strategies.push_back( ((ReconStrategy*) new InvertOrder())      );
 	m_strategies.push_back( ((ReconStrategy*) new DumpToFile())       );
+    #ifndef __WIN32__
 	m_strategies.push_back( ((ReconStrategy*) new MedianFilter_OMP()) );
+	#endif
 		
 }
 
