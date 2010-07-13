@@ -1,8 +1,28 @@
+/*
+ *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
+ *                               Forschungszentrum Jülich, Germany
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but 
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ *  General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+ *  02110-1301  USA
+ */
+
 #ifndef __RRS_MODULE_IDL__
 #define __RRS_MODULE_IDL__
 
 /**
- * Remote recon service module
+ * @brief Remote recon service module
  */
 module RRSModule {
 
@@ -25,9 +45,6 @@ module RRSModule {
 		floats dimag;  /**< Data argument */
 		longs  dims;   /**< Dimesions     */
 
-		//float abs ();
-		//float arg ();
-
 	};
 
 
@@ -35,8 +52,7 @@ module RRSModule {
 	 * No complex numbers in CORBA
 	 */
 	struct     pixel_data       {
-		
-		// Complex
+
 		shorts vals;  /**< Data abs      */
 		longs  dims;  /**< Dimesions     */
 
@@ -56,12 +72,12 @@ module RRSModule {
 		 * @return        Status
 		 */
 		error_code             process_data (in method m);
-
+		
 		/**
 		 * @brief Declare CORBA attibute ice_cplx;
 		 */
 		attribute              raw_data     raw;
-
+		
 		/**
 		 * @brief Declare CORBA attibute ice_cplx;
 		 */
@@ -71,15 +87,15 @@ module RRSModule {
 		 * @brief Declare CORBA attibute ice_image;
 		 */
 		attribute              pixel_data   pixel;
-
+		
 		/**
 		 * @brief Declare attibute name
 		 */
 		attribute              strings      labels;
-
-
+		
+		
 	};
-
+	
 };
 
 #endif
