@@ -18,3 +18,5 @@ SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp 
 # Rules for the binaries
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
 reconserver_SOURCES = $(COMMON) $(RECON_STRATEGIES) $(SERVER_SIDE)
+
+EXTRD_DIST=RRSModule.idl

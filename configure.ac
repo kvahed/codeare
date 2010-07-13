@@ -1,5 +1,5 @@
 AC_PREREQ([1.10])
-AC_INIT([jrrs], [0.2], [k.vahedipour@fz-juelich.cd])
+AC_INIT([jrrs], [0.3b], [k.vahedipour@fz-juelich.cd])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([src/config.h])
