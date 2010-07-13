@@ -14,8 +14,8 @@ int compare_ints( const void* a, const void* b ) {
 //process the median filter
 RRSModule::error_code MedianFilter::ProcessData () {
 	
-	const int m_ww = 25;
-	const int m_wh = 25;
+	const int m_ww = 16;
+	const int m_wh = 16;
 
 	int ex = (m_ww / 2), ey = (m_wh / 2);
 	int array[m_ww*m_wh];
