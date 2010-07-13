@@ -2,6 +2,9 @@
 %.hh: %.idl
 	omniidl -bcxx $<
 
+%SK.cc: %.idl
+	omniidl -bcxx $<
+
 # Binaries 
 bin_PROGRAMS = testclt reconserver
 
@@ -20,3 +23,4 @@ testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
 reconserver_SOURCES = $(COMMON) $(RECON_STRATEGIES) $(SERVER_SIDE)
 
 EXTRA_DIST = RRSModule.idl
+CLEANFILES = RRSModule.hh RRSModuleSK.cc
