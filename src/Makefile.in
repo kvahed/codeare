@@ -46,8 +46,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 = Matrix.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
-	options.$(OBJEXT)
+am__objects_1 = Matrix.$(OBJEXT) options.$(OBJEXT) \
+	RRSModuleSK.$(OBJEXT)
 am__objects_2 = DummyRecon.$(OBJEXT) DumpToFile.$(OBJEXT) \
 	GenericRegrid.$(OBJEXT) HannWindow.$(OBJEXT) \
 	InvertOrder.$(OBJEXT) MedianFilter.$(OBJEXT) \
@@ -172,7 +172,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Common sources
-COMMON = Matrix.h Matrix.cpp RRSModule.hh RRSModuleSK.cc options.h options.cpp
+COMMON = common.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc
 
 # Client side stuff
 CLIENT_SIDE = ReconClient.h ReconClient.cpp testclt.cpp
@@ -184,7 +184,7 @@ SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp 
 # Rules for the binaries
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
 reconserver_SOURCES = $(COMMON) $(RECON_STRATEGIES) $(SERVER_SIDE)
-EXTRD_DIST = RRSModule.idl
+EXTRA_DIST = RRSModule.idl
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

@@ -81,19 +81,15 @@ bool init (int argc, char** argv) {
 
 	Options *opt = new Options();
 	
-	opt->addUsage  ("Usage: testclt [OPTIONS]");
+	opt->addUsage  ("Usage: testclt --name <name> [OPTIONS]");
 	opt->addUsage  ("");
-	opt->addUsage  (" -n, --name   Remote service name (default: ReconService)");
+	opt->addUsage  (" -n, --name   Remote service name (for example: ReconService)");
 	opt->addUsage  (" -t, --test   Test case (default: 0, no recon. Just connectivity test)");
 	opt->addUsage  (" -d, --debug  Debug level 0-40 (default: 0)");
 	opt->addUsage  (" -b, --base   Base directory of approved files.");
 	opt->addUsage  ("");
 	opt->addUsage  (" -h, --help   Print this help screen"); 
 	opt->addUsage  ("");
-	opt->addUsage  ("If no options are given the following options are assumed:");
-	opt->addUsage  ("testclt -n ReconService -t 0 -d 0 -b ." );
-	opt->addUsage  ("");
-	
 	
 	opt->setFlag   ("help"  , 'h');
 
@@ -104,7 +100,7 @@ bool init (int argc, char** argv) {
 	
 	opt->processCommandArgs(argc, argv);
 	
-	if ( opt->getFlag("help") ) {
+	if ( !(opt->hasOptions()) || opt->getFlag("help") ) {
 		
 		opt->printUsage();
 		delete opt;

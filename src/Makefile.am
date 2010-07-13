@@ -6,7 +6,7 @@
 bin_PROGRAMS = testclt reconserver
 
 # Common sources
-COMMON = Matrix.h Matrix.cpp RRSModule.hh RRSModuleSK.cc options.h options.cpp
+COMMON =  common.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc
 
 # Client side stuff
 CLIENT_SIDE =  ReconClient.h ReconClient.cpp testclt.cpp
@@ -19,4 +19,4 @@ SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp 
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
 reconserver_SOURCES = $(COMMON) $(RECON_STRATEGIES) $(SERVER_SIDE)
 
-EXTRD_DIST=RRSModule.idl
+EXTRA_DIST = RRSModule.idl

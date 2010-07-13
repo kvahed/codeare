@@ -134,7 +134,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRD_DIST = README.TXT
+EXTRA_DIST = README.TXT
 all: all-am
 
 .SUFFIXES:
