@@ -36,7 +36,7 @@ module RRSModule {
 
 
 	/**
-	 * No complex numbers in CORBA
+	 * @brief Raw data
 	 */
 	struct    raw_data          {
 		
@@ -49,7 +49,7 @@ module RRSModule {
 
 
 	/**
-	 * No complex numbers in CORBA
+	 * @brief Pixel data
 	 */
 	struct     pixel_data       {
 

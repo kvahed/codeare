@@ -59,3 +59,9 @@ AC_TYPE_SIZE_T
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
 AC_OUTPUT
 
+AC_MSG_RESULT([
+***********************************************
+  You have configured $PACKAGE $VERSION
+  Run 'make && sudo make install' to install.
+***********************************************
+])

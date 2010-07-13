@@ -2225,7 +2225,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 # Revision string
 
 cat >>confdefs.h <<\_ACEOF
-#define SVN_REVISION "47:49M"
+#define SVN_REVISION "49:50M"
 _ACEOF
 
 
@@ -7497,3 +7497,15 @@ if test "$no_create" != yes; then
 fi
 
 
+{ echo "$as_me:$LINENO: result:
+***********************************************
+  You have configured $PACKAGE $VERSION
+  Run 'make && sudo make install' to install.
+***********************************************
+" >&5
+echo "${ECHO_T}
+***********************************************
+  You have configured $PACKAGE $VERSION
+  Run 'make && sudo make install' to install.
+***********************************************
+" >&6; }

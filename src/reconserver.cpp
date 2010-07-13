@@ -55,21 +55,23 @@ int main (int argc, char** argv) {
 	// --------------------------------------------------------------------------
 	try {
 
+		streambuf* out;
+		streambuf* err;
 		ofstream   log (logfile);
 
 		if (log.is_open()) {
-			cerr.rdbuf (log.rdbuf()); // redirect output into the file
-			cout.rdbuf (log.rdbuf()); // redirect output into the file
+			 out = cout.rdbuf(log.rdbuf());
+			 err = cerr.rdbuf(log.rdbuf());
 		} else {
 			cout << "Could not open logfile " << logfile << "." << endl;
 			cout << "Exiting :(" << endl << endl;
 			return 1;
 		}
-
+		
 		// Initialise ORB
 		const char*    options[][2] = { { (char*)"traceLevel", debug }, { 0, 0 } };
 		CORBA::ORB_var orb          = CORBA::ORB_init(argc, argv, "omniORB4", options);
-
+		
 		// Get reference to the RootPOA.
 		CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
 		PortableServer::POA_var _poa = PortableServer::POA::_narrow(obj.in());
@@ -114,8 +116,11 @@ int main (int argc, char** argv) {
                                                                                 
 		free(m_name[0].id); // str_dup does a malloc internally
 
+		cout.rdbuf(out);
+		cerr.rdbuf(err);
+
 	}
-                                                                                
+	
 	catch(CORBA::SystemException&) {
 		cerr << "Caught CORBA::SystemException." << endl;
 	}
@@ -159,7 +164,7 @@ bool init (int argc, char** argv) {
 	opt->addUsage  ("Usage: testclt --name <name> [OPTIONS]");
 	opt->addUsage  ("");
 	opt->addUsage  (" -n, --name    Remote service name (for example RemoteRecon)");
-	opt->addUsage  (" -d, --debug   Debug level 0-40 (default)");
+	opt->addUsage  (" -d, --debug   Debug level 0-40 (default: 5)");
 	opt->addUsage  (" -l, --logfile Log file (default: ./reconserver.log)");
 	opt->addUsage  ("");
 	opt->addUsage  (" -h, --help    Print this help screen"); 
@@ -177,16 +182,21 @@ bool init (int argc, char** argv) {
 		
 		opt->printUsage();
 		delete opt;
-		return 0;
+		return true;
 		
 	} 
 	
-	debug   = (opt->getValue("debug"  ) && atoi(opt->getValue("debug" )) >= 0 &&  atoi(opt->getValue("debug" )) <= 40) ?      opt->getValue("debug" )  : (char*)"5";
-	logfile = (opt->getValue("logfile") &&      opt->getValue("logfile") != (char*)"")                                 ?      opt->getValue("logfile") : (char*)"./reconserver.log" ;
-	name    = (opt->getValue("name"   ) &&      opt->getValue("name"   ) != (char*)"")                                 ?      opt->getValue("name"   ) : (char*)"ReconService" ;
+	debug   = (opt->getValue("debug")                && 
+			   atoi(opt->getValue("debug")) >= 0     &&  
+			   atoi(opt->getValue("debug")) <= 40)    ? opt->getValue("debug")   : (char*)"5";
+
+	logfile = (opt->getValue("logfile")              &&
+			   opt->getValue("logfile") != (char*)"") ? opt->getValue("logfile") : (char*)"./reconserver.log";
+
+	name    = (opt->getValue("name")                 &&      
+			   opt->getValue("name") != (char*)"")    ? opt->getValue("name")    : (char*)"ReconService";
 
 	delete opt;
-
 	return true;
 
 }
