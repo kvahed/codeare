@@ -4,8 +4,12 @@ AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([foreign])
+
+# Revision string
 define([svnversion], esyscmd([sh -c "svnversion|tr -d '\n'"]))dnl
 AC_DEFINE(SVN_REVISION, "svnversion", [SVN Revision])
+
+# Produce first version of idl derivates
 esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 
 # Checks for programs.
@@ -16,16 +20,16 @@ AC_PROG_CC
 AC_LANG(C++)
 
 # Checks for header files.
-AC_CHECK_HEADERS([complex], [], [AC_MSG_ERROR([cannot find complex, bailing out])])
-AC_CHECK_HEADERS([assert.h], [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
-AC_CHECK_HEADERS([stdlib.h], [], [AC_MSG_ERROR([cannot find cstdlib, bailing out])])
-AC_CHECK_HEADERS([string.h], [], [AC_MSG_ERROR([cannot find ctime, bailing out])])
-AC_CHECK_HEADERS([iostream], [], [AC_MSG_ERROR([cannot find iostream, bailing out])])
-AC_CHECK_HEADERS([fstream], [], [AC_MSG_ERROR([cannot find fstream, bailing out])])
-AC_CHECK_HEADERS([signal.h], [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
+AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
+AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
+AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find cstdlib, bailing out])])
+AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find ctime, bailing out])])
+AC_CHECK_HEADERS([iostream],         [], [AC_MSG_ERROR([cannot find iostream, bailing out])])
+AC_CHECK_HEADERS([fstream],          [], [AC_MSG_ERROR([cannot find fstream, bailing out])])
+AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
 AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/CORBA.h, bailing out])])
 
-# Checks for libraries.
+# Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read], [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
 AC_CHECK_LIB([omniDynamic4], [main], [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
 
