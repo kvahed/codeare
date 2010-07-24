@@ -52,3 +52,23 @@ public:
 };
 
 #endif /* __INVERT_ORDER_H__ */
+
+extern "C" {
+
+	ReconStrategy* maker() {
+		return new InvertOrder;
+	}
+
+	class Proxy { 
+
+	public:
+		
+		Proxy(){
+			// register the maker with the factory
+			factory["InvertOrder"] = maker;
+		}
+	};
+	
+	// our one instance of the proxy
+	Proxy p;
+}

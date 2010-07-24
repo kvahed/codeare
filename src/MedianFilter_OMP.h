@@ -51,3 +51,23 @@ public:
 };
 
 #endif /* __MEDIAN_FILTER_OMP_H__ */
+
+extern "C" {
+
+	ReconStrategy* maker() {
+		return new MedianFilter_OMP;
+	}
+
+	class Proxy { 
+
+	public:
+		
+		Proxy(){
+			// register the maker with the factory
+			factory["MedianFilter_OMP"] = maker;
+		}
+	};
+	
+	// our one instance of the proxy
+	Proxy p;
+}

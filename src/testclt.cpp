@@ -45,6 +45,7 @@ int main (int argc, char** argv) {
 
 		ReconClient client (name, debug);
 		int         i = 0, j = 0, d = 512;
+		string rmethod = "DummyRecon";
 
 		Matrix< complex<float> > data (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
@@ -53,7 +54,7 @@ int main (int argc, char** argv) {
 				data.at(i,j) = complex<float> ((float) i, (float) j);
 		
 		client.SetRaw(data);
-		client.Requestprocess_data((RRSModule::method) test);
+		client.RequestProcess(rmethod.c_str());
 		client.GetRaw(data); 
 
 		Matrix< short > pdata (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -63,7 +64,7 @@ int main (int argc, char** argv) {
 				pdata.at(i,j) = (i+1)*(j+1);
 		
 		client.SetPixel(pdata);
-		client.Requestprocess_data((RRSModule::method) test);
+		client.RequestProcess(rmethod.c_str());
 		client.GetPixel(pdata);
 
 		cout << "We're good" << endl;

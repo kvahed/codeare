@@ -21,7 +21,8 @@
 #ifndef __RECONCONTEXT_H__
 #define __RECONCONTEXT_H__
 
-#include <vector>
+#include <dlfcn.h>
+
 #include "ReconStrategy.h"
 
 using namespace std;
@@ -35,15 +36,31 @@ class ReconContext {
   
 public:
 
+
 	/**
 	 * @brief Construct with setting up available strategies
 	 */
 	ReconContext ();
-	~ReconContext () {delete m_strategy;};
+
+
+	/**
+	 * @brief Default destructor
+	 */
+	~ReconContext () {
+		
+		delete m_strategy;
+
+		if (m_dlib != NULL)
+			dlclose (m_dlib);
+
+	};
+
+
 	/**
 	 * @brief Construct with a strategy
 	 */
 	ReconContext (ReconStrategy* strategy) {};
+
 
 	/**
 	 * @brief Alter strategy
@@ -53,14 +70,36 @@ public:
 		m_strategy = strategy;
 	}
 	
+
 	/**
 	 * @brief Alter strategy
 	 */
 	inline void 
 	Strategy     (method m) {
-		m_strategy = m_strategies.at((int) m);
+
+		//m_strategy = m_strategies.at(m);
+
 	}
-	
+
+
+	/**
+	 * @brief Alter strategy
+	 */
+	bool
+	Strategy     (const char* name) {
+
+		m_dlib = dlopen(name, RTLD_NOW);
+
+		if(m_dlib == NULL){
+			cerr << dlerror() << endl;
+			exit(-1);
+		}
+
+		m_strategy = factory [name]();
+
+	}
+
+
 	/**
 	 * @brief get active startegy
 	 */
@@ -69,6 +108,7 @@ public:
 		return m_strategy;
 	}
 	
+
 	/**
 	 * @brief Process data with given strategy
 	 */
@@ -80,9 +120,12 @@ public:
 
 private:
 
-	ReconStrategy*            m_strategy;   /**< Active strategy      */
-	vector< ReconStrategy* >  m_strategies;  /**< Available strategies */
-	
+	ReconStrategy*             m_strategy;    /**< Active strategy      */
+	//vector < ReconStrategy* >  m_strategies;  /**< Available strategies */
+
+	void*                      m_dlib;
+	map <string, maker_t *, less<string> >           factory;
+	map <string, maker_t *, less<string> >::iterator factitr;	
 };
 
 #endif 

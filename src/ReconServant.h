@@ -60,6 +60,9 @@ public:
 	virtual error_code
 	process_data  (method m);
 	
+	virtual error_code 
+	Process (const char* name);
+
 	/**
 	 * @brief Get data from recon
 	 */

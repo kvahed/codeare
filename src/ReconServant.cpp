@@ -79,6 +79,46 @@ ReconServant::process_data  (method m)       {
 
 
 /**************************************************************************************************/
+error_code
+ReconServant::Process  (const char* name) {
+
+	error_code e = OK;
+
+	ReconContext* context = new ReconContext();
+
+	context->Strategy(name);
+
+	if (m_have_raw)
+		context->Strategy()->SetRaw(&m_raw);
+	if (m_have_helper)
+		context->Strategy()->SetHelper(&m_helper);
+	if (m_have_pixel)
+		context->Strategy()->SetPixel(&m_pixel);
+	if (m_have_labels)
+		context->Strategy()->SetLabels(m_labels);
+
+	e = context->ProcessData();
+	
+	cout << "Finished processing. Getting results ..." << endl;
+
+	if (m_have_raw)
+		context->Strategy()->GetRaw(&m_raw);
+	if (m_have_helper)
+		context->Strategy()->GetHelper(&m_helper);
+	if (m_have_pixel)
+		context->Strategy()->GetPixel(&m_pixel);
+	if (m_have_labels)
+		context->Strategy()->GetLabels(m_labels);
+
+	cout << "... done. Will handle control back to client." << endl;
+	delete context;
+
+	return e;
+	
+}
+
+
+/**************************************************************************************************/
 void
 ReconServant::raw          (const raw_data& d)   {
 	m_raw = d;

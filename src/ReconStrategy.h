@@ -32,6 +32,7 @@
 
 #include <cstdlib>
 #include <complex>
+#include <map>
 
 
 using namespace std;
@@ -202,5 +203,10 @@ protected:
 	strings                  m_labels;      /*!< Labels from the sequence (UID etc) */
 
 };
+
+typedef ReconStrategy* maker_t();
+
+// our global factory
+extern std::map< string, maker_t *, less<string> > factory;
 
 #endif /* __RECON_STRATEGY_H__ */
