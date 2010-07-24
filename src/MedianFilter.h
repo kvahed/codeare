@@ -57,24 +57,3 @@ private:
 };
 
 #endif /* __MEDIAN_FILTER_H__ */
-
-extern "C" {
-
-	ReconStrategy* maker() {
-		return new MedianFilter;
-	}
-
-	class Proxy { 
-
-	public:
-		
-		Proxy(){
-			// register the maker with the factory
-			//factory["MedianFilter"] = maker;
-			m_maker = maker;
-		}
-	};
-	
-	// our one instance of the proxy
-	Proxy p;
-}

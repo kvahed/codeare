@@ -20,7 +20,7 @@
 
 #include "ReconContext.h"
 
-/*// Raw strategies 
+// Raw strategies 
 #include "HannWindow.h"
 #include "GenericRegrid.h"
 //#include "ConvolutionGridder.h"
@@ -34,12 +34,12 @@
 // Raw & Pixel strategies
 #include "DummyRecon.h"
 #include "InvertOrder.h"
-#include "DumpToFile.h"*/
+#include "DumpToFile.h"
 
 
 ReconContext::ReconContext () {
 
-	/*	m_strategies.begin();
+	m_strategies.begin();
 
 	m_strategies.push_back( ((ReconStrategy*) new DummyRecon())       );
 	m_strategies.push_back( ((ReconStrategy*) new HannWindow())       );
@@ -49,7 +49,6 @@ ReconContext::ReconContext () {
     #ifndef __WIN32__
 	m_strategies.push_back( ((ReconStrategy*) new MedianFilter_OMP()) );
 	#endif
-	*/
 		
 }
 

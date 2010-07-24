@@ -69,15 +69,6 @@ public:
 	Requestprocess_data (method m);
 	
 	/**
-	 * @brief           Request data procession on recon service
-	 *
-	 * @param  name     Name of reconstruction method
-	 * @return          Error code
-	 */ 
-	error_code              
-	RequestProcess      (const char* name);
-	
-	/**
 	 * @brief           Set raw my data with ...
 	 *
 	 * @param  M        Given matrix

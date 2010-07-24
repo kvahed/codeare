@@ -55,25 +55,3 @@ DumpToFile::ProcessData () {
 	return RRSModule::OK;
 
 }
-
-extern "C" {
-	
-	ReconStrategy* maker() {
-		return new DumpToFile;
-	}
-	
-	class proxy { 
-		
-	public:
-		
-		proxy(){
-			// register the maker with the factory
-			//factory["DumpToFile"] = maker;
-			m_maker = maker;
-
-		}
-	};
-	
-	// our one instance of the proxy
-	proxy p;
-}

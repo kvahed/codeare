@@ -50,5 +50,4 @@ public:
 	
 };
 
-#endif /* __DUMP_TO_FILE_H__ */
-
+#endif /* __DUMMY_RECON_H__ */

@@ -23,7 +23,7 @@
 
 #include "Matrix.h"
 
-#ifdef __WIN32__
+#ifdef __WIN32__ 
     #include "RRSModule.h"
 #else
     #include "RRSModule.hh"
@@ -32,7 +32,6 @@
 
 #include <cstdlib>
 #include <complex>
-#include <map>
 
 
 using namespace std;
@@ -203,12 +202,5 @@ protected:
 	strings                  m_labels;      /*!< Labels from the sequence (UID etc) */
 
 };
-
-
-typedef ReconStrategy *maker_t();
-extern maker_t * m_maker;
-extern map<string, maker_t *, less<string> > factory;
-
-
 
 #endif /* __RECON_STRATEGY_H__ */

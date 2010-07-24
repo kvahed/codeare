@@ -54,24 +54,3 @@ public:
 };
 
 #endif /* __GENERIC_REGRID_H__ */
-
-extern "C" {
-
-	ReconStrategy* maker() {
-		return new GenericRegrid;
-	}
-
-	class Proxy { 
-
-	public:
-		
-		Proxy(){
-			// register the maker with the factory
-			//factory["GenericRegrid"] = maker;
-			m_maker = maker;
-		}
-	};
-	
-	// our one instance of the proxy
-	Proxy p;
-}

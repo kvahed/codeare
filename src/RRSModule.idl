@@ -74,15 +74,6 @@ module RRSModule {
 		error_code             process_data (in method m);
 		
 		/**
-		 * @brief         Process data
-		 *                Process data according to a particular method
-		 *
-		 * @param  name   Name of reconstruction strategy
-		 * @return        Status
-		 */
-		error_code             Process (in string name);
-		
-		/**
 		 * @brief Declare CORBA attibute ice_cplx;
 		 */
 		attribute              raw_data     raw;

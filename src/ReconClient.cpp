@@ -152,38 +152,6 @@ ReconClient::Requestprocess_data  (method m)  {
 
 
 /**************************************************************************************************/
-error_code 
-ReconClient::RequestProcess  (const char* name)  {
-	
-	error_code result = OK;
-	
-	// Set data for recon
-	m_rrsi->raw(m_raw[0]);
-	
-	// Reconstruct on remote service
-	result = m_rrsi->Process(name);
-	
-	// Get data back from recon
-	if (result == OK) {
-		
-		if(m_have_raw == true)
-			m_raw = m_rrsi->raw();
-		if (m_have_helper == true)
-			m_helper = m_rrsi->helper();
-		if (m_have_pixel == true)
-			m_pixel = m_rrsi->pixel();
-		
-		m_labels = m_rrsi->labels();
-		
-	}
-	
-	return result;
-	
-};
-
-
-
-/**************************************************************************************************/
 long 
 ReconClient::GetRawSize () {
 

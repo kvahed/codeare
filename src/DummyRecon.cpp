@@ -18,55 +18,15 @@
  *  02110-1301  USA
  */
 
-#ifndef __DUMMY_RECON_H__
-#define __DUMMY_RECON_H__
+#include "DummyRecon.h"
 
-#include "ReconStrategy.h"
+RRSModule::error_code
+ProcessData () { 
 
-/**
- * @brief Empty recon for test purposes
- */
-class DummyRecon : public ReconStrategy {
+	return RRSModule::OK;
 
-
-public:
-
-	/**
-	 * @brief Default constructor
-	 */
-	DummyRecon  () {
-		std::cout << "=========== We're actually called =============" << endl; 
-	};
-	
-	/**
-	 * @brief Default destructor
-	 */
-	virtual 
-	~DummyRecon () {};
-	
-	/**
-	 * @brief Do nothing 
-	 */
-	virtual RRSModule::error_code
-	ProcessData () { 
-		return RRSModule::OK;
-	};
-	
 };
 
-#endif /* __DUMMY_RECON_H__ */
 
-extern "C" {
-	ReconStrategy *maker(){
-		return new DummyRecon();
-	}
-	class proxy {
-	public:
-		proxy(){
-			// register the maker with the factory
-			factory["DummyRecon"] = maker;
-		}
-	};
-	// our one instance of the proxy
-	proxy p;
-}
+
+

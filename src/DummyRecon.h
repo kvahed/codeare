@@ -35,7 +35,7 @@ public:
 	 * @brief Default constructor
 	 */
 	DummyRecon  () {
-		std::cout << "=========== We're actually called =============" << endl; 
+		
 	};
 	
 	/**
@@ -50,8 +50,15 @@ public:
 	virtual RRSModule::error_code
 	ProcessData () { 
 
-		std::cout << "=========== We're actually called =============" << endl; 
-
+		/*for (int i = 0; i < m_raw.Size(); i++)
+			m_raw[i] = m_raw[i];
+		
+		for (int i = 0; i < m_pixel.Size(); i++)
+			m_pixel[i] = m_pixel[i];
+		
+		for (int i = 0; i < m_helper.Size(); i++)
+		m_helper[i] = m_helper[i];*/
+		
 		return RRSModule::OK;
 
 	};
@@ -59,5 +66,3 @@ public:
 };
 
 #endif /* __DUMMY_RECON_H__ */
-
-

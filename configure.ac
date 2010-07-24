@@ -2,7 +2,6 @@ AC_PREREQ([1.10])
 AC_INIT([jrrs], [0.3b], [k.vahedipour@fz-juelich.cd])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR(config)
-AC_CONFIG_MACRO_DIR([config])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([foreign])
 
@@ -15,8 +14,7 @@ esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 
 # Checks for programs.
 AC_PROG_CXX
-AC_PROG_LIBTOOL
-
+AC_PROG_CC
 
 # Set programming language
 AC_LANG(C++)
@@ -34,7 +32,6 @@ AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/COR
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read], [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
 AC_CHECK_LIB([omniDynamic4], [main], [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
-AC_CHECK_LIB([dl], [dlopen], [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 
 # Checks for C++ libraries with name spaces
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
