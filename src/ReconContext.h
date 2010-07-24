@@ -87,22 +87,18 @@ public:
 	bool
 	Strategy     (const char* name) {
 
-		void *dlib;
+		maker_t* m_maker;
+
+		void*    dlib;
+
 		dlib = dlopen(name, RTLD_NOW);
 
 		if(dlib == NULL)
 			cerr << dlerror() << endl;
 
-		//factory[name]();
-
-		/*m_dlib = dlopen(name, RTLD_NOW);
-
-		if(m_dlib == NULL){
-			cerr << dlerror() << endl;
-		}
-
-		void*  maker = dlsym(m_dlib, "maker");
-		m_strategy   = static_cast<ReconStrategy *()>(maker) ();*/
+		void* maker = dlsym(m_dlib, "maker");
+		//m_strategy  = static_cast<maker_t>(maker)();
+		
 
 	}
 
@@ -127,14 +123,10 @@ public:
 
 private:
 
-	ReconStrategy*             m_strategy;    /**< Active strategy      */
-	//vector < ReconStrategy* >  m_strategies;  /**< Available strategies */
-
-	void*                      m_dlib;
-
+	ReconStrategy*                        m_strategy;    /**< Active strategy      */
+	void*                                 m_dlib;
 };
 
-extern maker_t* m_maker;
-
+map<string, maker_t *, less<string> > factory;
 
 #endif 

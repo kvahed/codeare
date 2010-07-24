@@ -23,7 +23,7 @@
 
 #include "Matrix.h"
 
-#ifdef __WIN32__ 
+#ifdef __WIN32__
     #include "RRSModule.h"
 #else
     #include "RRSModule.hh"
@@ -205,8 +205,10 @@ protected:
 };
 
 
-typedef ReconStrategy* maker_t();
-extern  maker_t*       m_maker;
+typedef ReconStrategy *maker_t();
+extern maker_t * m_maker;
+extern map<string, maker_t *, less<string> > factory;
+
 
 
 #endif /* __RECON_STRATEGY_H__ */

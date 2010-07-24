@@ -22,7 +22,7 @@ lib_LTLIBRARIES = libDumpToFile.la libDummyRecon.la libGenericRegrid.la libHannW
 libDumpToFile_la_SOURCES = DumpToFile.h DumpToFile.cpp
 libDumpToFile_la_LDFLAGS = $(all_libraries) --version-info 1.0.0 
 
-libDummyRecon_la_SOURCES = DummyRecon.h DummyRecon.cpp
+libDummyRecon_la_SOURCES = DummyRecon.cpp
 libDummyRecon_la_LDFLAGS = $(all_libraries) --version-info 1.0.0 
 
 libGenericRegrid_la_SOURCES = GenericRegrid.h GenericRegrid.cpp
