@@ -92,7 +92,6 @@ public:
 
 		if(m_dlib == NULL){
 			cerr << dlerror() << endl;
-			exit(-1);
 		}
 
 		m_strategy = factory [name]();

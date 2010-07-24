@@ -45,7 +45,7 @@ int main (int argc, char** argv) {
 
 		ReconClient client (name, debug);
 		int         i = 0, j = 0, d = 512;
-		string rmethod = "DummyRecon";
+		string rmethod = "/usr/local/lib/libDummyRecon.dylib";
 
 		Matrix< complex<float> > data (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
