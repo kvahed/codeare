@@ -40,7 +40,7 @@ libMedianFilter_la_LDFLAGS = $(all_libraries) --version-info 1.0.0
 libMedianFilter_OMP_la_SOURCES = MedianFilter_OMP.h MedianFilter_OMP.cpp
 libMedianFilter_OMP_la_LDFLAGS = $(all_libraries) --version-info 1.0.0 
 
-SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp reconserver.cpp 
+SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconServant.h ReconServant.cpp reconserver.cpp 
 
 # Rules for the binaries
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)

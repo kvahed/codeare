@@ -119,8 +119,8 @@ libMedianFilter_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = Matrix.$(OBJEXT) options.$(OBJEXT) \
 	RRSModuleSK.$(OBJEXT)
-am__objects_2 = ReconContext.$(OBJEXT) ReconStrategy.$(OBJEXT) \
-	ReconServant.$(OBJEXT) reconserver.$(OBJEXT)
+am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT) \
+	reconserver.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2)
 reconserver_OBJECTS = $(am_reconserver_OBJECTS)
 reconserver_LDADD = $(LDADD)
@@ -303,7 +303,7 @@ libMedianFilter_la_SOURCES = MedianFilter.h MedianFilter.cpp
 libMedianFilter_la_LDFLAGS = $(all_libraries) --version-info 1.0.0 
 libMedianFilter_OMP_la_SOURCES = MedianFilter_OMP.h MedianFilter_OMP.cpp
 libMedianFilter_OMP_la_LDFLAGS = $(all_libraries) --version-info 1.0.0 
-SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp reconserver.cpp 
+SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconServant.h ReconServant.cpp reconserver.cpp 
 
 # Rules for the binaries
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
@@ -476,7 +476,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconServant.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconStrategy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclt.Po@am__quote@

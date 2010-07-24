@@ -35,7 +35,7 @@ public:
 	 * @brief Default constructor
 	 */
 	DummyRecon  () {
-		
+		std::cout << "=========== We're actually called =============" << endl; 
 	};
 	
 	/**
@@ -52,15 +52,6 @@ public:
 
 		std::cout << "=========== We're actually called =============" << endl; 
 
-		/*for (int i = 0; i < m_raw.Size(); i++)
-			m_raw[i] = m_raw[i];
-		
-		for (int i = 0; i < m_pixel.Size(); i++)
-			m_pixel[i] = m_pixel[i];
-		
-		for (int i = 0; i < m_helper.Size(); i++)
-		m_helper[i] = m_helper[i];*/
-		
 		return RRSModule::OK;
 
 	};
@@ -76,16 +67,16 @@ extern "C" {
 		return new DummyRecon;
 	}
 
-	class Proxy { 
+	class proxy { 
 
 	public:
 		
-		Proxy(){
+		proxy() {
 			// register the maker with the factory
-			factory["DummyRecon"] = maker;
+			//factory["DummyRecon"] = maker;
 		}
 	};
 	
 	// our one instance of the proxy
-	Proxy p;
+	proxy p;
 }

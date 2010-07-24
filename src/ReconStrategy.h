@@ -204,9 +204,8 @@ protected:
 
 };
 
-typedef ReconStrategy* maker_t();
 
-// our global factory
-extern std::map< string, maker_t *, less<string> > factory;
+typedef ReconStrategy *maker_t();
+extern  map< string, maker_t *, less<string> > factory;
 
 #endif /* __RECON_STRATEGY_H__ */

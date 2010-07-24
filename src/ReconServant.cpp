@@ -88,6 +88,8 @@ ReconServant::Process  (const char* name) {
 
 	context->Strategy(name);
 
+	cout << "Setting data for processing ... " << endl;
+
 	if (m_have_raw)
 		context->Strategy()->SetRaw(&m_raw);
 	if (m_have_helper)
@@ -96,6 +98,8 @@ ReconServant::Process  (const char* name) {
 		context->Strategy()->SetPixel(&m_pixel);
 	if (m_have_labels)
 		context->Strategy()->SetLabels(m_labels);
+
+	cout << "Done. Processing now ..." << endl;
 
 	e = context->ProcessData();
 	

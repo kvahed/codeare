@@ -94,8 +94,8 @@ public:
 			cerr << dlerror() << endl;
 		}
 
-		m_strategy = factory [name]();
-
+		void*  maker = dlsym(m_dlib, "maker");
+		m_strategy   = static_cast<ReconStrategy *()>(maker)();
 	}
 
 
