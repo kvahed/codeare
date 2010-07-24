@@ -2,6 +2,7 @@ AC_PREREQ([1.10])
 AC_INIT([jrrs], [0.3b], [k.vahedipour@fz-juelich.cd])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR(config)
+AC_CONFIG_MACRO_DIR([config])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([foreign])
 
@@ -14,7 +15,8 @@ esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 
 # Checks for programs.
 AC_PROG_CXX
-AC_PROG_CC
+AC_PROG_LIBTOOL
+
 
 # Set programming language
 AC_LANG(C++)
