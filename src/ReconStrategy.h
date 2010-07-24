@@ -205,7 +205,8 @@ protected:
 };
 
 
-typedef ReconStrategy *maker_t();
-extern  map< string, maker_t *, less<string> > factory;
+typedef ReconStrategy* maker_t();
+extern  maker_t*       m_maker;
+
 
 #endif /* __RECON_STRATEGY_H__ */

@@ -22,10 +22,11 @@
 #define __RECONCONTEXT_H__
 
 #include <dlfcn.h>
-
+#include <list>
 #include "ReconStrategy.h"
 
 using namespace std;
+
 
 /**
  * @brief Context of a reconstruction method
@@ -40,7 +41,7 @@ public:
 	/**
 	 * @brief Construct with setting up available strategies
 	 */
-	ReconContext ();
+	ReconContext () {};
 
 
 	/**
@@ -76,9 +77,7 @@ public:
 	 */
 	inline void 
 	Strategy     (method m) {
-
 		//m_strategy = m_strategies.at(m);
-
 	}
 
 
@@ -88,14 +87,23 @@ public:
 	bool
 	Strategy     (const char* name) {
 
-		m_dlib = dlopen(name, RTLD_NOW);
+		void *dlib;
+		dlib = dlopen(name, RTLD_NOW);
+
+		if(dlib == NULL)
+			cerr << dlerror() << endl;
+
+		//factory[name]();
+
+		/*m_dlib = dlopen(name, RTLD_NOW);
 
 		if(m_dlib == NULL){
 			cerr << dlerror() << endl;
 		}
 
 		void*  maker = dlsym(m_dlib, "maker");
-		m_strategy   = static_cast<ReconStrategy *()>(maker)();
+		m_strategy   = static_cast<ReconStrategy *()>(maker) ();*/
+
 	}
 
 
@@ -123,8 +131,10 @@ private:
 	//vector < ReconStrategy* >  m_strategies;  /**< Available strategies */
 
 	void*                      m_dlib;
-	map <string, maker_t *, less<string> >           factory;
-	map <string, maker_t *, less<string> >::iterator factitr;	
+
 };
+
+extern maker_t* m_maker;
+
 
 #endif 

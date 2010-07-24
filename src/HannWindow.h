@@ -66,7 +66,8 @@ extern "C" {
 		
 		Proxy(){
 			// register the maker with the factory
-			factory["HannWindow"] = maker;
+			//factory["HannWindow"] = maker;
+			m_maker = maker;
 		}
 	};
 	

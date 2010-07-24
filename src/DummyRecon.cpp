@@ -27,6 +27,23 @@ ProcessData () {
 
 };
 
+extern "C" {
 
+	ReconStrategy* maker() {
+		return new DummyRecon;
+	}
 
+	class proxy { 
 
+	public:
+		
+		proxy() {
+			// register the maker with the factory
+			cout << "registration " << endl;
+			m_maker = maker;
+		}
+	};
+	
+	// our one instance of the proxy
+	proxy p;
+}

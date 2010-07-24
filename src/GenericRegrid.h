@@ -67,7 +67,8 @@ extern "C" {
 		
 		Proxy(){
 			// register the maker with the factory
-			factory["GenericRegrid"] = maker;
+			//factory["GenericRegrid"] = maker;
+			m_maker = maker;
 		}
 	};
 	

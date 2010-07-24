@@ -70,7 +70,8 @@ extern "C" {
 		
 		Proxy(){
 			// register the maker with the factory
-			factory["MedianFilter"] = maker;
+			//factory["MedianFilter"] = maker;
+			m_maker = maker;
 		}
 	};
 	

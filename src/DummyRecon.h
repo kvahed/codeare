@@ -61,22 +61,3 @@ public:
 #endif /* __DUMMY_RECON_H__ */
 
 
-extern "C" {
-
-	ReconStrategy* maker() {
-		return new DummyRecon;
-	}
-
-	class proxy { 
-
-	public:
-		
-		proxy() {
-			// register the maker with the factory
-			//factory["DummyRecon"] = maker;
-		}
-	};
-	
-	// our one instance of the proxy
-	proxy p;
-}

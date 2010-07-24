@@ -64,10 +64,11 @@ extern "C" {
 		
 		Proxy(){
 			// register the maker with the factory
-			factory["MedianFilter_OMP"] = maker;
+			//factory["MedianFilter_OMP"] = maker;
+			m_maker = maker;
 		}
 	};
 	
-	// our one instance of the proxy
+	// Our one instance of the proxy
 	Proxy p;
 }

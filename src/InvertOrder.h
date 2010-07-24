@@ -65,7 +65,8 @@ extern "C" {
 		
 		Proxy(){
 			// register the maker with the factory
-			factory["InvertOrder"] = maker;
+			//factory["InvertOrder"] = maker;
+			m_maker = maker;
 		}
 	};
 	

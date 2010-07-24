@@ -52,22 +52,3 @@ public:
 
 #endif /* __DUMP_TO_FILE_H__ */
 
-extern "C" {
-
-	ReconStrategy* maker() {
-		return new DumpToFile;
-	}
-
-	class Proxy { 
-
-	public:
-		
-		Proxy(){
-			// register the maker with the factory
-			factory["DumpToFile"] = maker;
-		}
-	};
-	
-	// our one instance of the proxy
-	Proxy p;
-}
