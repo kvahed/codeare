@@ -57,3 +57,11 @@ RRSModule::error_code MedianFilter::ProcessData () {
 
 };
 
+// the class factories
+extern "C" ReconStrategy* create() {
+    return new MedianFilter;
+}
+
+extern "C" void destroy (ReconStrategy* p) {
+    delete p;
+}

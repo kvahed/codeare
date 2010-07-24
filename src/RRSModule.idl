@@ -68,30 +68,30 @@ module RRSModule {
 		 * @brief         Process data
 		 *                Process data according to a particular method
 		 *
-		 * @param  m      Method for reconstruction
+		 * @param  m      Name of recontruction method
 		 * @return        Status
 		 */
-		error_code             process_data (in method m);
+		error_code        Process (in string name);
 		
 		/**
 		 * @brief Declare CORBA attibute ice_cplx;
 		 */
-		attribute              raw_data     raw;
+		attribute         raw_data     raw;
 		
 		/**
 		 * @brief Declare CORBA attibute ice_cplx;
 		 */
-		attribute              raw_data     helper;
+		attribute         raw_data     helper;
 		
 		/**
 		 * @brief Declare CORBA attibute ice_image;
 		 */
-		attribute              pixel_data   pixel;
+		attribute         pixel_data   pixel;
 		
 		/**
 		 * @brief Declare attibute name
 		 */
-		attribute              strings      labels;
+		attribute         strings      labels;
 		
 		
 	};

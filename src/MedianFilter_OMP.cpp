@@ -77,3 +77,11 @@ RRSModule::error_code MedianFilter_OMP::ProcessData () {
 
 }
 
+// the class factories
+extern "C" ReconStrategy* create() {
+    return new MedianFilter_OMP;
+}
+
+extern "C" void destroy (ReconStrategy* p) {
+    delete p;
+}

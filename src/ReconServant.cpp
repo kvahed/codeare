@@ -40,12 +40,13 @@ ReconServant::~ReconServant ()               {
 
 /**************************************************************************************************/
 error_code
-ReconServant::process_data  (method m)       {
+ReconServant::Process  (const char* name)       {
 
 	error_code e = OK;
 
-	ReconContext* context = new ReconContext();
-	context->Strategy(m);
+	cout << "Setting incoming data ... " << endl;
+
+	ReconContext* context = new ReconContext(name);
 
 	if (m_have_raw)
 		context->Strategy()->SetRaw(&m_raw);
@@ -56,9 +57,11 @@ ReconServant::process_data  (method m)       {
 	if (m_have_labels)
 		context->Strategy()->SetLabels(m_labels);
 
+	cout << "... done. Will invoke data procession ... " << endl;
+
 	e = context->ProcessData();
 	
-	cout << "Finished processing. Getting results ..." << endl;
+	cout << "done. Getting processed data..." << endl;
 
 	if (m_have_raw)
 		context->Strategy()->GetRaw(&m_raw);
@@ -70,8 +73,8 @@ ReconServant::process_data  (method m)       {
 		context->Strategy()->GetLabels(m_labels);
 
 	cout << "... done. Will handle control back to client." << endl;
-	delete context;
 
+	delete context;
 	return e;
 
 	

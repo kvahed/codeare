@@ -62,11 +62,11 @@ public:
 	/**
 	 * @brief           Request data procession on recon service
 	 *
-	 * @param  m        Recon method
+	 * @param  name     Recon method
 	 * @return          Error code
 	 */ 
 	error_code              
-	Requestprocess_data (method m);
+	RequestProcess      (const char* name);
 	
 	/**
 	 * @brief           Set raw my data with ...

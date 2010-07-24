@@ -121,7 +121,7 @@ ReconClient::~ReconClient         ()            {
 
 /**************************************************************************************************/
 error_code 
-ReconClient::Requestprocess_data  (method m)  {
+ReconClient::RequestProcess  (const char* name)  {
 	
 	error_code result = OK;
 	
@@ -129,7 +129,7 @@ ReconClient::Requestprocess_data  (method m)  {
 	m_rrsi->raw(m_raw[0]);
 	
 	// Reconstruct on remote service
-	result = m_rrsi->process_data(m);
+	result = m_rrsi->Process(name);
 	
 	// Get data back from recon
 	if (result == OK) {

@@ -27,6 +27,11 @@ ProcessData () {
 
 };
 
+// the class factories
+extern "C" ReconStrategy* create() {
+    return new DummyRecon;
+}
 
-
-
+extern "C" void destroy (ReconStrategy* p) {
+    delete p;
+}

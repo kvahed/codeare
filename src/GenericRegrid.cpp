@@ -19,3 +19,12 @@
  */
 
 #include "GenericRegrid.h"
+
+// the class factories
+extern "C" ReconStrategy* create() {
+    return new GenericRegrid;
+}
+
+extern "C" void destroy (ReconStrategy* p) {
+    delete p;
+}

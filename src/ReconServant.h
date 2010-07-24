@@ -58,7 +58,7 @@ public:
 	 * @brief Dispatch data to available methods 
 	 */
 	virtual error_code
-	process_data  (method m);
+	Process  (const char* name);
 	
 	/**
 	 * @brief Get data from recon

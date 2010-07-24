@@ -34,7 +34,7 @@ using namespace std;
 char*  name;
 char*  base;
 char*  debug;
-int    test;
+char*  test;
 
 bool init (int argc, char** argv);
 
@@ -53,7 +53,7 @@ int main (int argc, char** argv) {
 				data.at(i,j) = complex<float> ((float) i, (float) j);
 		
 		client.SetRaw(data);
-		client.Requestprocess_data((RRSModule::method) test);
+		client.RequestProcess(test);
 		client.GetRaw(data); 
 
 		Matrix< short > pdata (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -63,7 +63,7 @@ int main (int argc, char** argv) {
 				pdata.at(i,j) = (i+1)*(j+1);
 		
 		client.SetPixel(pdata);
-		client.Requestprocess_data((RRSModule::method) test);
+		client.RequestProcess(test);
 		client.GetPixel(pdata);
 
 		cout << "We're good" << endl;
@@ -104,7 +104,7 @@ bool init (int argc, char** argv) {
 	opt->addUsage  ("Usage: testclt --name <name> [OPTIONS]");
 	opt->addUsage  ("");
 	opt->addUsage  (" -n, --name   Remote service name (for example: ReconService)");
-	opt->addUsage  (" -t, --test   Test case (default: 0, no recon. Just connectivity test)");
+	opt->addUsage  (" -t, --test   Test case (default: DummyRecon. Just connectivity test)");
 	opt->addUsage  (" -d, --debug  Debug level 0-40 (default: 0)");
 	opt->addUsage  (" -b, --base   Base directory of approved files.");
 	opt->addUsage  ("");
@@ -128,11 +128,10 @@ bool init (int argc, char** argv) {
 		
 	} 
 	
-	test  = (opt->getValue("test"  ) && atoi(opt->getValue("test"  )) >= 0)                                        ? atoi(opt->getValue("test"  )) : 0 ;
 	debug = (opt->getValue("debug" ) && atoi(opt->getValue("debug" )) >= 0 && atoi(opt->getValue("debug" )) <= 40) ?      opt->getValue("debug" )  : (char*)"0";
 	name  = (opt->getValue("name"  ) &&      opt->getValue("name"  )  != (char*)"")                                ?      opt->getValue("name"  )  : (char*)"ReconService" ;
 	base  = (opt->getValue("base"  ) &&      opt->getValue("base"  )  != (char*)"")                                ?      opt->getValue("base"  )  : (char*)".";
-
+	test  = (opt->getValue("test"  ) &&      opt->getValue("test"  )  != (char*)"")                                ?      opt->getValue("test"  )  : (char*)"DummyRecon.so";
 	delete opt;
 
 	return true;

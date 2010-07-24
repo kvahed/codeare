@@ -6,6 +6,9 @@
 /* Define to 1 if you have the <complex> header file. */
 #undef HAVE_COMPLEX
 
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
 /* Define to 1 if you have the <fstream> header file. */
 #undef HAVE_FSTREAM
 
@@ -14,6 +17,9 @@
 
 /* Define to 1 if you have the <iostream> header file. */
 #undef HAVE_IOSTREAM
+
+/* Define to 1 if you have the `dl' library (-ldl). */
+#undef HAVE_LIBDL
 
 /* Define to 1 if you have the `omniDynamic4' library (-lomniDynamic4). */
 #undef HAVE_LIBOMNIDYNAMIC4
@@ -56,6 +62,10 @@
 
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
 
 /* Name of package */
 #undef PACKAGE

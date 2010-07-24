@@ -22,6 +22,7 @@
 #define __RECONCONTEXT_H__
 
 #include <vector>
+#include <dlfcn.h>
 #include "ReconStrategy.h"
 
 using namespace std;
@@ -34,31 +35,57 @@ class ReconContext {
 
   
 public:
+	
 
 	/**
-	 * @brief Construct with setting up available strategies
+	 * @brief Default Constructor
 	 */
-	ReconContext ();
-	~ReconContext () {delete m_strategy;};
+	ReconContext () {}
+	
+	
+	/**
+	 * @brief Invoce destruction on my startegy and exit
+	 */ 
+	~ReconContext () {
+		
+		// load destroy symbol
+		destroy_t* destroy = (destroy_t*) dlsym(m_dlib, "destroy");
+		err                = dlerror();
+
+		if (err)
+			cerr << "Cannot load symbol destroy: " << err << '\n';
+		
+		destroy(m_strategy);
+		dlclose(m_dlib);
+
+	};
+
+
 	/**
 	 * @brief Construct with a strategy
 	 */
-	ReconContext (ReconStrategy* strategy) {};
+	ReconContext (const char* name) {
 
-	/**
-	 * @brief Alter strategy
-	 */
-	inline void 
-	Strategy     (ReconStrategy* strategy) {
-		m_strategy = strategy;
-	}
-	
-	/**
-	 * @brief Alter strategy
-	 */
-	inline void 
-	Strategy     (method m) {
-		m_strategy = m_strategies.at((int) m);
+		m_dlib = dlopen(name, RTLD_NOW);
+
+		err = dlerror();
+
+		if (!m_dlib) 
+			cerr << "Cannot load library: " << err << '\n';
+		
+		// reset errors
+		err = dlerror();
+		
+		// load create symbol
+		create_t* create = (create_t*) dlsym(m_dlib, "create");
+
+		err = dlerror();
+
+		if (err) 
+			cerr << "Cannot load symbol create: " << err << '\n';
+		
+		m_strategy = create();
+
 	}
 	
 	/**
@@ -81,8 +108,10 @@ public:
 private:
 
 	ReconStrategy*            m_strategy;   /**< Active strategy      */
-	vector< ReconStrategy* >  m_strategies;  /**< Available strategies */
+	void*                     m_dlib;
 	
+	const char*               err; 
+
 };
 
 #endif 

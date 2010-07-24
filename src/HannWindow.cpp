@@ -19,3 +19,12 @@
  */
 
 #include "HannWindow.h"
+
+// the class factories
+extern "C" ReconStrategy* create() {
+    return new HannWindow;
+}
+
+extern "C" void destroy (ReconStrategy* p) {
+    delete p;
+}

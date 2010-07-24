@@ -39,3 +39,12 @@ InvertOrder::ProcessData () {
 	return RRSModule::OK;
 
 }
+
+// the class factories
+extern "C" ReconStrategy* create() {
+    return new InvertOrder;
+}
+
+extern "C" void destroy (ReconStrategy* p) {
+    delete p;
+}
