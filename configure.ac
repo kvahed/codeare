@@ -5,7 +5,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([config])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([foreign])
-
+LT_INIT([dlopen])
 # Revision string
 define([svnversion], esyscmd([sh -c "svnversion|tr -d '\n'"]))dnl
 AC_DEFINE(SVN_REVISION, "svnversion", [SVN Revision])
