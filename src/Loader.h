@@ -70,7 +70,7 @@ GetFunction       (void* handle, char* name) {
 		const char* err = dlerror();
 	    fnptr = dlsym (handle, name);
 		if (err) 
-			std::cerr << "Cannot load symbol create: " << err << std::endl;
+			std::cerr << "Cannot load symbol " << name << ": " << err << std::endl;
 
     #endif
 
@@ -92,6 +92,10 @@ CloseModule       (void* handle) {
         return FreeLibrary((HINSTANCE)handle);
     #elif defined(__GNUC__)
         return dlclose(handle);
+		const char* err = dlerror();
+		if (err) 
+			std::cerr << "Cannot unload: " << err << std::endl;
+
     #endif
 
 };
