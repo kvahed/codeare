@@ -58,6 +58,6 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile src/modules/Makefile])
 AC_OUTPUT
 
