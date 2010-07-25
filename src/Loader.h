@@ -1,7 +1,9 @@
 #ifndef __LOADER_H__
 #define __LOADER_H__
 
-#include <string>
+
+#include <cstring>
+#include <cstdlib>
 #include <iostream>
 
 #if defined(_MSC_VER)
