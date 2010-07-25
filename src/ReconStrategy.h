@@ -205,5 +205,5 @@ protected:
 
 #endif /* __RECON_STRATEGY_H__ */
 
-typedef ReconStrategy* create_t();
-typedef void destroy_t(ReconStrategy*);
+typedef ReconStrategy* create_t  ();
+typedef void           destroy_t (ReconStrategy*);

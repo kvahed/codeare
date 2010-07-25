@@ -22,10 +22,11 @@
 #define __RECONCONTEXT_H__
 
 #include <vector>
-#include <dlfcn.h>
+
 #include "ReconStrategy.h"
 
 using namespace std;
+
 
 /**
  * @brief Context of a reconstruction method
@@ -46,47 +47,14 @@ public:
 	/**
 	 * @brief Invoce destruction on my startegy and exit
 	 */ 
-	~ReconContext () {
-		
-		// load destroy symbol
-		destroy_t* destroy = (destroy_t*) dlsym(m_dlib, "destroy");
-		err                = dlerror();
-
-		if (err)
-			cerr << "Cannot load symbol destroy: " << err << '\n';
-		
-		destroy(m_strategy);
-		dlclose(m_dlib);
-
-	};
+	~ReconContext ();
 
 
 	/**
 	 * @brief Construct with a strategy
 	 */
-	ReconContext (const char* name) {
+	ReconContext (const char* name);
 
-		m_dlib = dlopen(name, RTLD_NOW);
-
-		err = dlerror();
-
-		if (!m_dlib) 
-			cerr << "Cannot load library: " << err << '\n';
-		
-		// reset errors
-		err = dlerror();
-		
-		// load create symbol
-		create_t* create = (create_t*) dlsym(m_dlib, "create");
-
-		err = dlerror();
-
-		if (err) 
-			cerr << "Cannot load symbol create: " << err << '\n';
-		
-		m_strategy = create();
-
-	}
 	
 	/**
 	 * @brief get active startegy
@@ -104,13 +72,11 @@ public:
 		return m_strategy->ProcessData();
 	}
 	
-
-private:
-
-	ReconStrategy*            m_strategy;   /**< Active strategy      */
-	void*                     m_dlib;
 	
-	const char*               err; 
+private:
+	
+	ReconStrategy*            m_strategy;   /**< Active strategy           */
+	void*                     m_dlib;       /**< Handle on startegy module */
 
 };
 
