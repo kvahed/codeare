@@ -21,10 +21,11 @@
 #include "GenericRegrid.h"
 
 // the class factories
-extern "C" ReconStrategy* create() {
+extern "C" DLLEXPORT ReconStrategy* create  ()                 {
     return new GenericRegrid;
 }
 
-extern "C" void destroy (ReconStrategy* p) {
+extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
     delete p;
 }
+

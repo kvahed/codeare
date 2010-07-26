@@ -1,10 +1,9 @@
 CC	          = cl
 CPPFLAGS      = -c -DDEBUG /IC:/Temp/omniORB-4.1.1/include  /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 -GX
-LDFLAGS       = /L C:/Temp/omniORB-4.1.1/lib
 OMNIIDL       = omniidl -bcxx -Wbh=.h -Wbs=.cpp
 COMMON        = Matrix.obj RRSModule.obj options.obj 
 CLIENT        = ReconClient.obj testclt.obj
-SERVER        = ReconServant.obj MedianFilter.obj ReconStrategy.obj ReconContext.obj DummyRecon.obj DumpToFile.obj InvertOrder.obj reconserver.obj
+SERVER        = ReconServant.obj ReconStrategy.obj ReconContext.obj	reconserver.obj
 
 LINK32=link.exe
 LINK32_FLAGS=-nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib -libpath:C:\Temp\omniORB-4.1.1\lib\x86_win32
@@ -32,20 +31,8 @@ ReconServant.obj: ReconServant.cpp ReconServant.h RRSModule.h
 ReconStrategy.obj: ReconStrategy.cpp ReconStrategy.h RRSModule.h
 	$(CC) $(CPPFLAGS) ReconStrategy.cpp
 
-ReconContext.obj: ReconContext.cpp ReconContext.h
+ReconContext.obj: ReconContext.cpp ReconContext.h Loader.h
 	$(CC) $(CPPFLAGS) ReconContext.cpp
-
-DummyRecon.obj: DummyRecon.cpp DummyRecon.h
-	$(CC) $(CPPFLAGS) DummyRecon.cpp
-
-DumpToFile.obj: DumpToFile.cpp DumpToFile.h
-	$(CC) $(CPPFLAGS) DumpToFile.cpp
-
-MedianFilter.obj: MedianFilter.cpp MedianFilter.h
-	$(CC) $(CPPFLAGS) MedianFilter.cpp
-
-InvertOrder.obj: InvertOrder.cpp InvertOrder.h
-	$(CC) $(CPPFLAGS) InvertOrder.cpp
 
 options.obj: options.cpp options.h
 	$(CC) $(CPPFLAGS) options.cpp
@@ -64,7 +51,7 @@ reconserver.exe: $(COMMON) $(SERVER)
 
 clean clean_all:
 	del *.obj
-	del core
-	del RRSModule.h
+	del *.exe
+	del RRSModule.h 
 	del RRSModule.cpp
-	del client
+

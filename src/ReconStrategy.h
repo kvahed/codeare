@@ -22,6 +22,7 @@
 #define __RECON_STRATEGY_H__
 
 #include "Matrix.h"
+#include "DllExport.h"
 
 #ifdef __WIN32__ 
     #include "RRSModule.h"

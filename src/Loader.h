@@ -34,9 +34,11 @@ LoadModule        (char *name) {
 	
     #if defined(_MSC_VER) 
 
-	    name = strcat (name, ".so");
+	    name = strcat (name, ".dll");
 	    handle = (void*)LoadLibrary(name);
-
+		if (!handle)
+			std::cerr << "Cannot open " << name << std::endl;
+			
     #elif defined(__GNUC__) 
 
 		name = strcat (name, ".so");
