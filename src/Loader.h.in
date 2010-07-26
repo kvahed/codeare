@@ -41,7 +41,7 @@ LoadModule        (char *name) {
 			
     #elif defined(__GNUC__) 
 
-		handle = dlopen ((std::string("/usr/local/lib/") + std::string(name) + std::string(".so")).c_str(), RTLD_NOW);
+		handle = dlopen ((std::string("@prefix@/lib/") + std::string(name) + std::string(".so")).c_str(), RTLD_NOW);
 		const char* err = dlerror();
 		if (err)
 			std::cerr << "Cannot open " << err << std::endl;
