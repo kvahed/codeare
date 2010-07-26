@@ -2,7 +2,7 @@
 #define __LOADER_H__
 
 
-#include <cstring>
+#include <string.h>
 #include <cstdlib>
 #include <iostream>
 
@@ -41,8 +41,7 @@ LoadModule        (char *name) {
 			
     #elif defined(__GNUC__) 
 
-		name = strcat (name, ".so");
-		handle = dlopen (name, RTLD_NOW);
+		handle = dlopen ((std::string("/usr/local/lib/") + std::string(name) + std::string(".so")).c_str(), RTLD_NOW);
 		const char* err = dlerror();
 		if (err)
 			std::cerr << "Cannot open " << err << std::endl;
