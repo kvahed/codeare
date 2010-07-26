@@ -33,7 +33,7 @@ AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/COR
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read], [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
 AC_CHECK_LIB([omniDynamic4], [main], [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
-AC_CHECK_LIB([dl], [dlopen], [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
+#AC_CHECK_LIB([dl], [dlopen], [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 
 # Checks for C++ libraries with name spaces
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
