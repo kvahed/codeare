@@ -1,24 +1,24 @@
-CXX	          = cl
-CXXFLAGS      = -c -DDEBUG /IC:/Temp/omniORB-4.1.1/include  /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 -GX
+CXX	     = cl
+CXXFLAGS = -c -DDEBUG /IC:/Temp/omniORB-4.1.1/include  /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 -GX
 
-LD            = link.exe
-LDFLAGS       = -nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib -libpath:C:\Temp\omniORB-4.1.1\lib\x86_win32
+LD       = link.exe
+LDFLAGS  = -nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib -libpath:C:\Temp\omniORB-4.1.1\lib\x86_win32
 
-OMNIIDL       = omniidl -bcxx -Wbh=.h -Wbs=.cpp
+OMNIIDL  = omniidl -bcxx -Wbh=.h -Wbs=.cpp
 
-CP            = copy
+CP       = copy
 
-COMMON        = Matrix.obj RRSModule.obj options.obj 
-CLIENT        = ReconClient.obj testclt.obj
-SERVER        = ReconServant.obj ReconStrategy.obj ReconContext.obj	reconserver.obj
+COMMON   = Matrix.obj RRSModule.obj options.obj 
+CLIENT   = ReconClient.obj testclt.obj
+SERVER   = ReconServant.obj ReconStrategy.obj ReconContext.obj	reconserver.obj
 
 all: $(COMMON) $(CLIENT) testclt.exe $(SERVER) reconserver.exe
 
-RRSModule.h : RRSModule.idl
-	$(OMNIIDL)  RRSModule.idl
+RRSModule.h: RRSModule.idl
+	$(OMNIIDL) RRSModule.idl
 
-RRSModule.cpp : RRSModule.idl
-	$(OMNIIDL)  RRSModule.idl
+RRSModule.cpp: RRSModule.idl
+	$(OMNIIDL) RRSModule.idl
 
 RRSModule.obj: RRSModule.cpp RRSModule.h
 	$(CXX) $(CXXFLAGS) RRSModule.cpp
@@ -61,4 +61,4 @@ clean clean_all:
 	del *.exe
 	del RRSModule.h 
 	del RRSModule.cpp
-
+	del Loader.h

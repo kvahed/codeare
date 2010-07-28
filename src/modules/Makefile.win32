@@ -1,14 +1,26 @@
-CC	          = cl
-CPPFLAGS      = -c -DDEBUG /IC:/Temp/omniORB-4.1.1/include /I../ /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 -GX 
+CXX      = cl
+CXXFLAGS = -c -DDEBUG /IC:/Temp/omniORB-4.1.1/include /I../ /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 -GX 
 
-LINK32=link.exe
-LINK32_FLAGS=-nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib -libpath:C:\Temp\omniORB-4.1.1\lib\x86_win32 /DLL
+LD       = link.exe
+LDFLAGS  = -nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib -libpath:C:\Temp\omniORB-4.1.1\lib\x86_win32 -DLL
 
-all: DummyRecon.dll DumpToFile.dll GenericRegrid.dll HannWindow.dll InvertOrder.dll MedianFilter.dll
+OMNIIDL  = omniidl -bcxx -Wbh=.h -Wbs=.cpp
+
+all: ../RRSModule.h ../RRSModule.cpp DummyRecon.dll DumpToFile.dll GenericRegrid.dll HannWindow.dll InvertOrder.dll MedianFilter.dll
+
+../RRSModule.h: ../RRSModule.idl
+	cd ..
+	$(OMNIIDL) RRSModule.idl
+	cd modules
+
+../RRSModule.cpp: ../RRSModule.idl
+	cd ..
+	$(OMNIIDL) RRSModule.idl
+	cd modules
 
 .cpp.dll:
-	$(CC) $(CPPFLAGS) $*.cpp
-	$(LINK32) -out:$*.dll $(LINK32_FLAGS) $*.obj
+	$(CXX) $(CXXFLAGS) $*.cpp
+	$(LD) -out:$*.dll $(LDFLAGS) $*.obj
 
 clean clean_all:
 	del *.obj
