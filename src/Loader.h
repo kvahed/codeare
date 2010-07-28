@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <iostream>
 
-// Thus far only cl.exe and g++
 #if defined(_MSC_VER)
     #include <windows.h>
 #elif defined(__GNUC__)
@@ -14,7 +13,6 @@
 #else
     #error Unknown compiler
 #endif
-
 
 /**
  * @brief         Load module
