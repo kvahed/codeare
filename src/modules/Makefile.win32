@@ -13,4 +13,5 @@ all: DummyRecon.dll DumpToFile.dll GenericRegrid.dll HannWindow.dll InvertOrder.
 clean clean_all:
 	del *.obj
 	del *.dll
+	del *.exp
  
