@@ -6,7 +6,11 @@ LDFLAGS  = -nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstu
 
 OMNIIDL  = omniidl -bcxx -Wbh=.h -Wbs=.cpp
 
-all: ../RRSModule.h ../RRSModule.cpp DummyRecon.dll DumpToFile.dll GenericRegrid.dll HannWindow.dll InvertOrder.dll MedianFilter.dll
+all: ../RRSModule.h ../RRSModule.cpp DLLs
+
+DLLs: 
+	for %f in (*.cpp) do $(CXX) $(CXXFLAGS) %f
+	for %f in (*.obj) do $(LD)  $(LDFLAGS)  %f 
 
 ../RRSModule.h: ../RRSModule.idl
 	cd ..
@@ -18,13 +22,12 @@ all: ../RRSModule.h ../RRSModule.cpp DummyRecon.dll DumpToFile.dll GenericRegrid
 	$(OMNIIDL) RRSModule.idl
 	cd modules
 
-.cpp.dll:
-	$(CXX) $(CXXFLAGS) $*.cpp
-	$(LD) -out:$*.dll $(LDFLAGS) $*.obj
+#.cpp.dll:
+#	$(CXX) $(CXXFLAGS) $*.cpp
+#	$(LD) -out:$*.dll $(LDFLAGS) $*.obj
 
 clean clean_all:
 	del *.obj
 	del *.lib
 	del *.exp
 	del *.dll
- 
