@@ -68,7 +68,7 @@ module RRSModule {
 		 * @brief         Process data
 		 *                Process data according to a particular method
 		 *
-		 * @param  m      Name of recontruction method
+		 * @param  name   Name of recontruction method
 		 * @return        Status
 		 */
 		error_code        Process (in string name);

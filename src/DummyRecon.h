@@ -67,11 +67,3 @@ public:
 
 #endif /* __DUMMY_RECON_H__ */
 
-// the class factories
-extern "C" polygon* create() {
-    return new triangle;
-}
-
-extern "C" void destroy (polygon* p) {
-    delete p;
-}
