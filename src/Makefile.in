@@ -55,8 +55,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = Matrix.$(OBJEXT) options.$(OBJEXT) \
 	RRSModuleSK.$(OBJEXT) tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
 	tinyxmlparser.$(OBJEXT)
-am__objects_2 = ReconContext.$(OBJEXT) ReconStrategy.$(OBJEXT) \
-	ReconServant.$(OBJEXT) reconserver.$(OBJEXT)
+am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT) \
+	reconserver.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2)
 reconserver_OBJECTS = $(am_reconserver_OBJECTS)
 reconserver_LDADD = $(LDADD)
@@ -257,7 +257,7 @@ COMMON = common.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModu
 CLIENT_SIDE = ReconClient.h ReconClient.cpp testclt.cpp
 
 # Reconstruction strategies & server side stuff
-SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp reconserver.cpp Loader.h
+SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconServant.h ReconServant.cpp reconserver.cpp Loader.h
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
@@ -383,7 +383,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconServant.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconStrategy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclt.Po@am__quote@

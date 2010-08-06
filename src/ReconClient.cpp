@@ -154,7 +154,7 @@ ReconClient::Process  (const char* name)  {
         m_raw    = m_rrsi->raw();
         m_helper = m_rrsi->helper();
         m_pixel  = m_rrsi->pixel();
-        m_config_doc.Parse(m_rrsi->config());
+        //m_config_doc.Parse(m_rrsi->config());
     }
 
     return result;

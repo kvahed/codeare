@@ -43,6 +43,7 @@ public:
 	 */
 	virtual 
 	~DummyRecon () {};
+
 	
 	/**
 	 * @brief Do nothing 

@@ -17,7 +17,7 @@ COMMON =  common.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSMod
 CLIENT_SIDE =  ReconClient.h ReconClient.cpp testclt.cpp
 
 # Reconstruction strategies & server side stuff
-SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp reconserver.cpp Loader.h
+SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconServant.h ReconServant.cpp reconserver.cpp Loader.h
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)

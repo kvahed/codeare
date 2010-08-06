@@ -33,5 +33,5 @@ extern "C" DLLEXPORT ReconStrategy* create  ()                 {
 }
 
 extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
-    delete p;
+	delete p;
 }

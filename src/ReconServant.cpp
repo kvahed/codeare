@@ -80,8 +80,10 @@ ReconServant::Process  (const char* name)       {
 	cout << "... done. Will handle control back to client." << endl;
 
 	delete context;
-	return e;
 
+	cout << "Context deleted." << endl;
+	
+	return e;
 	
 }
 

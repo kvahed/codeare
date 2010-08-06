@@ -54,11 +54,7 @@ public:
 	 * @brief Missing
 	 */ 
 	ReconStrategy  () {
-
-		m_have_raw    = false;
-		m_have_helper = false;
-		m_have_pixel  = false;
-
+		
 	};
 	
 	/**
@@ -66,9 +62,28 @@ public:
 	 */ 
 	virtual
 	~ReconStrategy () {
-		delete m_config;
-		delete m_config_doc;
+
 	};
+
+
+	void Init () {
+
+		m_have_raw = false;
+		m_have_helper = false;
+		m_have_pixel = false;
+
+	}
+	
+
+	void CleanUp () {
+
+		cout << "Destructor" << endl;
+
+		m_config_doc->Clear();
+		delete m_config_doc;
+
+	}
+	
 
 	/**
 	 * @brief Data procession function 
@@ -181,9 +196,7 @@ public:
 	 */
 	void 
 	GetConfig           (string config)   {
-
 		config << *(m_config_doc);
-			
 	}
 	
 	/**
@@ -191,12 +204,10 @@ public:
 	 */
 	void 
 	SetConfig          (const string config)   {
-		
 		m_config_doc = new TiXmlDocument();
 		m_config_doc->Clear();
 		m_config_doc->Parse(config.c_str());
 		m_config     = m_config_doc->RootElement();
-
 	};
 
 
