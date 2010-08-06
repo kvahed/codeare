@@ -304,6 +304,97 @@ public:
     
     
     /**
+     * @brief            Get value in volume
+     *  
+     * @param  col       Column
+     * @param  lin       Line
+     * @param  slc       Slice
+     *
+     * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
+     */
+    inline T            
+    at                   (int col, 
+						  int lin, 
+						  int cha,
+						  int set,
+						  int eco,
+						  int phs,
+						  int rep,
+						  int seg,
+						  int par,
+						  int slc,
+						  int ida,
+						  int idb,
+						  int idc,
+						  int idd,
+						  int ide,
+						  int ave) const {
+        return _M[
+				  col 
+				  _dim[COL]*lin +
+				  _dim[COL]*_dim[LIN]*lin +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA] +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO] +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd*_dim[IDE]*ide +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd*_dim[IDE]*ide*_dim[AVE]*ave];
+    }
+    
+    
+    /**
+     * @brief            Reference to value in volume
+     *  
+     * @param  col       Column
+     * @param  lin       Line
+     * @param  slc       Slice
+     *
+     * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
+     */
+	inline T&            
+    at                   (int col, 
+						  int lin, 
+						  int cha,
+						  int set,
+						  int eco,
+						  int phs,
+						  int rep,
+						  int seg,
+						  int par,
+						  int slc,
+						  int ida,
+						  int idb,
+						  int idc,
+						  int idd,
+						  int ide,
+						  int ave) {
+        return _M[
+				  col 
+				  _dim[COL]*lin +
+				  _dim[COL]*_dim[LIN]*lin +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA] +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO] +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd*_dim[IDE]*ide +
+				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_sim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd*_dim[IDE]*ide*_dim[AVE]*ave];
+    }
+    
+     /**
      * @brief           Get the element at position p of the vector, i.e. this(p).
      *
      * @param  p        Requested position.

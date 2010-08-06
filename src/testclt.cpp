@@ -46,25 +46,21 @@ int main (int argc, char** argv) {
 		ReconClient client (name, debug);
 		int         i = 0, j = 0, d = 512;
 
-		Matrix< complex<float> > data (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix< complex<float> > raw (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix< short > pixel (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
 		for (i = 0; i < d; i++)
-			for (j = 0; j < d; j++)
-				data.at(i,j) = complex<float> ((float) i, (float) j);
+			for (j = 0; j < d; j++) {
+				raw.at(i,j) = complex<float> ((float) i, (float) j);
+				pixel.at(i,j) = (i+1)*(j+1);
+			}
 		
-		client.SetRaw(data);
+		
+		client.SetRaw(raw);
+		client.SetPixel(pixel);
 		client.RequestProcess(test);
-		client.GetRaw(data); 
-
-		Matrix< short > pdata (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-		
-		for (i = 0; i < d; i++)
-			for (j = 0; j < d; j++)
-				pdata.at(i,j) = (i+1)*(j+1);
-		
-		client.SetPixel(pdata);
-		client.RequestProcess(test);
-		client.GetPixel(pdata);
+		client.GetRaw(raw);
+		client.GetPixel(pixel);
 
 		cout << "We're good" << endl;
 		
