@@ -195,19 +195,23 @@ public:
 	 * @brief Get data from recon
 	 */
 	void 
-	GetConfig           (string config)   {
-		config << *(m_config_doc);
+	GetConfig           (char* config)   {
+		//config->clear(); 
+		//config << *(m_config_doc);
+		cout   << *(config);
 	}
 	
 	/**
 	 * @brief Set data for recon
 	 */
 	void 
-	SetConfig          (const string config)   {
+	SetConfig          (const char* config)   {
 		m_config_doc = new TiXmlDocument();
 		m_config_doc->Clear();
-		m_config_doc->Parse(config.c_str());
+		m_config_doc->Parse(config);
 		m_config     = m_config_doc->RootElement();
+		SetAttribute("String", "b");
+		SetAttribute("Doubl2", 2.3);
 	};
 
 

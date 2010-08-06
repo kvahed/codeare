@@ -26,7 +26,7 @@ ReconContext::~ReconContext () {
 		
 	m_strategy->CleanUp();
 	destroy_t* destroy = (destroy_t*) GetFunction(m_dlib, (char*)"destroy");
-	//destroy(m_strategy);
+	destroy(m_strategy);
 	CloseModule (m_dlib);
 	
 };

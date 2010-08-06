@@ -81,7 +81,7 @@ ReconServant::Process  (const char* name)       {
 
 	delete context;
 
-	cout << "Context deleted." << endl;
+	cout << m_config << endl;
 	
 	return e;
 	
