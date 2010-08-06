@@ -22,6 +22,8 @@
 #define __RECON_STRATEGY_H__
 
 #include "Matrix.h"
+#include "tinyxml.h"
+
 #include "DllExport.h"
 
 #ifdef __WIN32__ 
@@ -52,9 +54,11 @@ public:
 	 * @brief Missing
 	 */ 
 	ReconStrategy  () {
+
 		m_have_raw    = false;
 		m_have_helper = false;
 		m_have_pixel  = false;
+
 	};
 	
 	/**
@@ -175,7 +179,7 @@ public:
 	void 
 	GetConfig           (string config)   {
 
-		m_config = config;
+		//config << m_config_doc;
 			
 	}
 	
@@ -183,13 +187,87 @@ public:
 	 * @brief Set data for recon
 	 */
 	void 
-	SetConfig          (string config)   {
-
-		config = m_config;
+	SetConfig          (const string config)   {
+		
+		m_config_doc = new TiXmlDocument();
+		m_config_doc->Clear();
+		m_config_doc->Parse(config.c_str());
+		m_
 
 	};
+
+
+	/**
+	 * @brief           Set a string type attribute for processing
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline void
+	SetAttribute           (const char* name, const char* value) {
+		m_config->SetAttribute (name, value);
+	}
+
 	
+	/**
+	 * @brief           Set a integer type attribute for processing
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline void
+	SetAttribute           (const char* name, int value) {
+		m_config->SetAttribute (name, value);
+	}
+
 	
+	/**
+	 * @brief           Set a float type attribute for processing
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline void 
+	SetAttribute           (const char* name, double value) {
+		m_config->SetDoubleAttribute (name, value);
+	}
+
+
+	/**
+	 * @brief           Set a string type attribute for processing
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline const char*
+	Attribute           (const char* name) const {
+		return m_config->Attribute (name);
+	}
+	
+
+	/**
+	 * @brief           Set a integer type attribute for processing
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline const char*
+	Attribute           (const char* name, int* value) const {
+		return m_config->Attribute (name, value);
+	}
+
+	
+	/**
+	 * @brief           Set a float type attribute for processing
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline const char*
+	Attribute           (const char* name, double* value) const {
+		return m_config->Attribute (name, value);
+	}
+
 protected:
 
 	Matrix< complex<float> > m_raw;         /*!< raw data matrix                    */
@@ -199,9 +277,10 @@ protected:
 	bool                     m_have_raw;    /*!< Do we have raw    data?            */
 	bool                     m_have_helper; /*!< Do we have raw    data?            */
 	bool                     m_have_pixel;  /*!< Do we have helper data?            */
-	bool                     m_have_config;
 
-	string                   m_config;      /*!< Labels from the sequence (UID etc) */
+	TiXmlElement*            m_config;
+	TiXmlDocument*           m_config_doc;
+
 
 };
 

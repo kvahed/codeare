@@ -10603,7 +10603,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"81:82M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"87M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -14380,6 +14380,20 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 # Checks for header files.
 
+for ac_header in assert.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "assert.h" "ac_cv_header_assert_h" "$ac_includes_default"
+if test "x$ac_cv_header_assert_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_ASSERT_H 1
+_ACEOF
+
+else
+  as_fn_error "cannot find assert.h, bailing out" "$LINENO" 5
+fi
+
+done
+
 for ac_header in complex
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "complex" "ac_cv_header_complex" "$ac_includes_default"
@@ -14394,16 +14408,44 @@ fi
 
 done
 
-for ac_header in assert.h
+for ac_header in ctype.h
 do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "assert.h" "ac_cv_header_assert_h" "$ac_includes_default"
-if test "x$ac_cv_header_assert_h" = x""yes; then :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "ctype.h" "ac_cv_header_ctype_h" "$ac_includes_default"
+if test "x$ac_cv_header_ctype_h" = x""yes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_ASSERT_H 1
+#define HAVE_CTYPE_H 1
 _ACEOF
 
 else
-  as_fn_error "cannot find assert.h, bailing out" "$LINENO" 5
+  as_fn_error "cannot find ctype, bailing out" "$LINENO" 5
+fi
+
+done
+
+for ac_header in fstream
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "fstream" "ac_cv_header_fstream" "$ac_includes_default"
+if test "x$ac_cv_header_fstream" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_FSTREAM 1
+_ACEOF
+
+else
+  as_fn_error "cannot find fstream, bailing out" "$LINENO" 5
+fi
+
+done
+
+for ac_header in iostream
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "iostream" "ac_cv_header_iostream" "$ac_includes_default"
+if test "x$ac_cv_header_iostream" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_IOSTREAM 1
+_ACEOF
+
+else
+  as_fn_error "cannot find iostream, bailing out" "$LINENO" 5
 fi
 
 done
@@ -14432,34 +14474,6 @@ _ACEOF
 
 else
   as_fn_error "cannot find ctime, bailing out" "$LINENO" 5
-fi
-
-done
-
-for ac_header in iostream
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "iostream" "ac_cv_header_iostream" "$ac_includes_default"
-if test "x$ac_cv_header_iostream" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_IOSTREAM 1
-_ACEOF
-
-else
-  as_fn_error "cannot find iostream, bailing out" "$LINENO" 5
-fi
-
-done
-
-for ac_header in fstream
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "fstream" "ac_cv_header_fstream" "$ac_includes_default"
-if test "x$ac_cv_header_fstream" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_FSTREAM 1
-_ACEOF
-
-else
-  as_fn_error "cannot find fstream, bailing out" "$LINENO" 5
 fi
 
 done

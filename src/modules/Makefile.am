@@ -3,7 +3,9 @@
 	omniidl -bcxx $<
 ../%SK.cc: ../%.idl
 	omniidl -bcxx $<
-COMMON = RRSModule.hh RRSModuleSK.cc
+COMMON = #../RRSModule.hh ../RRSModuleSK.cc
+
+AM_CPPFLAGS = -DTIXML_USE_STL
 
 # Rules for recon strategies
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la HannWindow.la InvertOrder.la MedianFilter_OMP.la 

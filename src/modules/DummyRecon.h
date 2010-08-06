@@ -35,7 +35,7 @@ public:
 	 * @brief Default constructor
 	 */
 	DummyRecon  () {
-		
+
 	};
 	
 	/**

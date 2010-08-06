@@ -53,7 +53,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = Matrix.$(OBJEXT) options.$(OBJEXT) \
-	RRSModuleSK.$(OBJEXT)
+	RRSModuleSK.$(OBJEXT) tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
+	tinyxmlparser.$(OBJEXT)
 am__objects_2 = ReconContext.$(OBJEXT) ReconStrategy.$(OBJEXT) \
 	ReconServant.$(OBJEXT) reconserver.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2)
@@ -247,9 +248,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+AM_CPPFLAGS = -DTIXML_USE_STL
 
 # Common sources
-COMMON = common.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc
+COMMON = common.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp
 
 # Client side stuff
 CLIENT_SIDE = ReconClient.h ReconClient.cpp testclt.cpp
@@ -262,7 +264,7 @@ testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE)
-reconserver_LDFLAGS = -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/HannWindow.la -dlopen modules/InvertOrder.la -dlopen modules/MedianFilter.la -dlopen modules/MedianFilter_OMP.la
+reconserver_LDFLAGS = -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/HannWindow.la -dlopen modules/InvertOrder.la -dlopen modules/MedianFilter_OMP.la
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 SUBDIRS = modules
@@ -385,6 +387,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxml.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlerror.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlparser.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

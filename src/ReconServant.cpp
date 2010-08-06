@@ -30,13 +30,15 @@ ReconServant::ReconServant  ()               {
 	m_have_pixel  = false;
 	m_have_config = false;
 
-	m_config = new char;
+	m_config      = new char;
 
 }
 
 
 /**************************************************************************************************/
 ReconServant::~ReconServant ()               {
+
+	delete m_config;
 
 }
 
@@ -140,8 +142,6 @@ ReconServant::config       (const char* d)    {
 /**************************************************************************************************/
 char* 
 ReconServant::config       ()                    {
-	if (m_have_config)
-		return CORBA::string_dup(m_config);
-	else 
-		return CORBA::string_dup("");
+	return CORBA::string_dup(m_config);
 }
+

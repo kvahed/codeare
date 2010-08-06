@@ -46,15 +46,11 @@ DumpToFile::ProcessData () {
 		m_pixel.dump  ((char*) "pixel.bin" );
 	}
 
-	if (m_have_config) {
-
-	    ofstream of;
-	    of.open ("config.txt");
-		of << m_config << "\n";
-	    of.close();
-
-	}
-
+	ofstream of;
+	of.open ("config.txt");
+	of << m_config_doc;
+	of.close();
+	
 	printf ("... done \n");
 
 	return RRSModule::OK;
