@@ -192,7 +192,7 @@ public:
 		m_config_doc = new TiXmlDocument();
 		m_config_doc->Clear();
 		m_config_doc->Parse(config.c_str());
-		m_
+		m_config = m_config_doc->RootElement();
 
 	};
 
