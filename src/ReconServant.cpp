@@ -28,7 +28,10 @@ ReconServant::ReconServant  ()               {
 	m_have_raw    = false;
 	m_have_helper = false;
 	m_have_pixel  = false;
-	m_have_labels = false;
+	m_have_config = false;
+
+	m_config = new char;
+
 }
 
 
@@ -54,8 +57,8 @@ ReconServant::Process  (const char* name)       {
 		context->Strategy()->SetHelper(&m_helper);
 	if (m_have_pixel)
 		context->Strategy()->SetPixel(&m_pixel);
-	if (m_have_labels)
-		context->Strategy()->SetLabels(m_labels);
+	if (m_have_config)
+		context->Strategy()->SetConfig(m_config);
 
 	cout << "... done. Will invoke data procession ... " << endl;
 
@@ -69,8 +72,8 @@ ReconServant::Process  (const char* name)       {
 		context->Strategy()->GetHelper(&m_helper);
 	if (m_have_pixel)
 		context->Strategy()->GetPixel(&m_pixel);
-	if (m_have_labels)
-		context->Strategy()->GetLabels(m_labels);
+	if (m_have_config)
+		context->Strategy()->GetConfig(m_config);
 
 	cout << "... done. Will handle control back to client." << endl;
 
@@ -128,14 +131,17 @@ ReconServant::pixel        ()                    {
 
 /**************************************************************************************************/
 void 
-ReconServant::labels       (const strings& d)    {
-	m_labels = d;
-	m_have_labels = true;
+ReconServant::config       (const char* d)    {
+	strcpy (m_config, d);
+	m_have_config = true;
 }
 
 
 /**************************************************************************************************/
-strings* 
-ReconServant::labels       ()                    {
-		return new strings (m_labels);
+char* 
+ReconServant::config       ()                    {
+	if (m_have_config)
+		return CORBA::string_dup(m_config);
+	else 
+		return CORBA::string_dup("");
 }

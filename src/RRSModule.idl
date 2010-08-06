@@ -32,7 +32,6 @@ module RRSModule {
 	typedef sequence<float>  floats;   /*!< raw data real or imaginary repositories */
 	typedef sequence<short>  shorts;   /*!< pixel data repositories                 */
 	typedef sequence<long>   longs;    /*!< dimension reositories                   */
-	typedef sequence<string> strings;  /*!< string repositories                     */
 
 
 	/**
@@ -74,24 +73,24 @@ module RRSModule {
 		error_code        Process (in string name);
 		
 		/**
-		 * @brief Declare CORBA attibute ice_cplx;
+		 * @brief         Declare CORBA attribute raw
 		 */
 		attribute         raw_data     raw;
 		
 		/**
-		 * @brief Declare CORBA attibute ice_cplx;
+		 * @brief         Declare CORBA attribute helper
 		 */
 		attribute         raw_data     helper;
 		
 		/**
-		 * @brief Declare CORBA attibute ice_image;
+		 * @brief         Declare CORBA attribute pixel
 		 */
 		attribute         pixel_data   pixel;
 		
 		/**
-		 * @brief Declare attibute name
+		 * @brief         Declare attributes labels and values.
 		 */
-		attribute         strings      labels;
+		attribute         string       config;
 		
 		
 	};

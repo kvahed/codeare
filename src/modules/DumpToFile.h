@@ -34,7 +34,7 @@ public:
 	/**
 	 * @brief Default constructor
 	 */
-	DumpToFile  () {};
+	DumpToFile  ();
 	
 	/**
 	 * @brief Default destructor

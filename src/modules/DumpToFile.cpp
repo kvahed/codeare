@@ -20,10 +20,16 @@
 
 #include "DumpToFile.h"
 
+DumpToFile::DumpToFile () {}
+/*	m_have_raw    = false;
+	m_have_helper = false;
+	m_have_pixel  = false;
+	}*/
+
 error_code 
 DumpToFile::ProcessData () {
 
-	printf ("Dumping ... ");
+	printf ("Dumping ... \n");
 
 	if (m_have_raw) {
 		printf ("raw data.\n");
@@ -40,17 +46,16 @@ DumpToFile::ProcessData () {
 		m_pixel.dump  ((char*) "pixel.bin" );
 	}
 
-	if (m_labels.length() > 0) {
-		printf ("pixel data.\n");
+	if (m_have_config) {
 
 	    ofstream of;
-
-	    of.open ("labels.txt");
-		for (int i = 0; i < m_labels.length(); i++)
-			of << m_labels[i] << "\n";
+	    of.open ("config.txt");
+		of << m_config << "\n";
 	    of.close();
 
 	}
+
+	printf ("... done \n");
 
 	return RRSModule::OK;
 

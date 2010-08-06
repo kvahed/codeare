@@ -15,8 +15,6 @@
 
 @SET_MAKE@
 
-# Add idl to dependencies.
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -74,43 +72,38 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 DummyRecon_la_LIBADD =
-am_DummyRecon_la_OBJECTS = DummyRecon.lo
+am__objects_1 = RRSModuleSK.lo
+am_DummyRecon_la_OBJECTS = $(am__objects_1) DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
 DummyRecon_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DummyRecon_la_LDFLAGS) $(LDFLAGS) -o $@
 DumpToFile_la_LIBADD =
-am_DumpToFile_la_OBJECTS = DumpToFile.lo
+am_DumpToFile_la_OBJECTS = $(am__objects_1) DumpToFile.lo
 DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
 DumpToFile_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) -o $@
 GenericRegrid_la_LIBADD =
-am_GenericRegrid_la_OBJECTS = GenericRegrid.lo
+am_GenericRegrid_la_OBJECTS = $(am__objects_1) GenericRegrid.lo
 GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
 GenericRegrid_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) $(LDFLAGS) -o $@
 HannWindow_la_LIBADD =
-am_HannWindow_la_OBJECTS = HannWindow.lo
+am_HannWindow_la_OBJECTS = $(am__objects_1) HannWindow.lo
 HannWindow_la_OBJECTS = $(am_HannWindow_la_OBJECTS)
 HannWindow_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(HannWindow_la_LDFLAGS) $(LDFLAGS) -o $@
 InvertOrder_la_LIBADD =
-am_InvertOrder_la_OBJECTS = InvertOrder.lo
+am_InvertOrder_la_OBJECTS = $(am__objects_1) InvertOrder.lo
 InvertOrder_la_OBJECTS = $(am_InvertOrder_la_OBJECTS)
 InvertOrder_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(InvertOrder_la_LDFLAGS) $(LDFLAGS) -o $@
-MedianFilter_la_LIBADD =
-am_MedianFilter_la_OBJECTS = MedianFilter.lo
-MedianFilter_la_OBJECTS = $(am_MedianFilter_la_OBJECTS)
-MedianFilter_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(MedianFilter_la_LDFLAGS) $(LDFLAGS) -o $@
 MedianFilter_OMP_la_LIBADD =
-am_MedianFilter_OMP_la_OBJECTS = MedianFilter_OMP.lo
+am_MedianFilter_OMP_la_OBJECTS = $(am__objects_1) MedianFilter_OMP.lo
 MedianFilter_OMP_la_OBJECTS = $(am_MedianFilter_OMP_la_OBJECTS)
 MedianFilter_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -139,12 +132,10 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
 	$(GenericRegrid_la_SOURCES) $(HannWindow_la_SOURCES) \
-	$(InvertOrder_la_SOURCES) $(MedianFilter_la_SOURCES) \
-	$(MedianFilter_OMP_la_SOURCES)
+	$(InvertOrder_la_SOURCES) $(MedianFilter_OMP_la_SOURCES)
 DIST_SOURCES = $(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
 	$(GenericRegrid_la_SOURCES) $(HannWindow_la_SOURCES) \
-	$(InvertOrder_la_SOURCES) $(MedianFilter_la_SOURCES) \
-	$(MedianFilter_OMP_la_SOURCES)
+	$(InvertOrder_la_SOURCES) $(MedianFilter_OMP_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -264,27 +255,26 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+COMMON = RRSModule.hh RRSModuleSK.cc
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la HannWindow.la InvertOrder.la MedianFilter.la MedianFilter_OMP.la 
-DummyRecon_la_SOURCES = DummyRecon.h DummyRecon.cpp
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la HannWindow.la InvertOrder.la MedianFilter_OMP.la 
+DummyRecon_la_SOURCES = $(COMMON) DummyRecon.h DummyRecon.cpp
 DummyRecon_la_LDFLAGS = -module
-GenericRegrid_la_SOURCES = GenericRegrid.h GenericRegrid.cpp
+GenericRegrid_la_SOURCES = $(COMMON) GenericRegrid.h GenericRegrid.cpp
 GenericRegrid_la_LDFLAGS = -module
-MedianFilter_la_SOURCES = MedianFilter.h MedianFilter.cpp
-MedianFilter_la_LDFLAGS = -module
-MedianFilter_OMP_la_SOURCES = MedianFilter_OMP.h MedianFilter_OMP.cpp
+MedianFilter_OMP_la_SOURCES = $(COMMON) MedianFilter_OMP.h MedianFilter_OMP.cpp
 MedianFilter_OMP_la_LDFLAGS = -module
-HannWindow_la_SOURCES = HannWindow.h HannWindow.cpp
+HannWindow_la_SOURCES = $(COMMON) HannWindow.h HannWindow.cpp
 HannWindow_la_LDFLAGS = -module
-InvertOrder_la_SOURCES = InvertOrder.h InvertOrder.cpp
+InvertOrder_la_SOURCES = $(COMMON) InvertOrder.h InvertOrder.cpp
 InvertOrder_la_LDFLAGS = -module
-DumpToFile_la_SOURCES = DumpToFile.h DumpToFile.cpp
+DumpToFile_la_SOURCES = $(COMMON) DumpToFile.h DumpToFile.cpp
 DumpToFile_la_LDFLAGS = -module
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .lo .o .obj
+.SUFFIXES: .cc .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -356,8 +346,6 @@ HannWindow.la: $(HannWindow_la_OBJECTS) $(HannWindow_la_DEPENDENCIES)
 	$(HannWindow_la_LINK) -rpath $(libdir) $(HannWindow_la_OBJECTS) $(HannWindow_la_LIBADD) $(LIBS)
 InvertOrder.la: $(InvertOrder_la_OBJECTS) $(InvertOrder_la_DEPENDENCIES) 
 	$(InvertOrder_la_LINK) -rpath $(libdir) $(InvertOrder_la_OBJECTS) $(InvertOrder_la_LIBADD) $(LIBS)
-MedianFilter.la: $(MedianFilter_la_OBJECTS) $(MedianFilter_la_DEPENDENCIES) 
-	$(MedianFilter_la_LINK) -rpath $(libdir) $(MedianFilter_la_OBJECTS) $(MedianFilter_la_LIBADD) $(LIBS)
 MedianFilter_OMP.la: $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_DEPENDENCIES) 
 	$(MedianFilter_OMP_la_LINK) -rpath $(libdir) $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_LIBADD) $(LIBS)
 
@@ -372,8 +360,29 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GenericRegrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HannWindow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InvertOrder.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RRSModuleSK.Plo@am__quote@
+
+.cc.o:
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
+
+.cc.obj:
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cc.lo:
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -603,6 +612,12 @@ uninstall-am: uninstall-libLTLIBRARIES
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-libLTLIBRARIES
 
+
+# Add idl to dependencies.
+../%.hh: ../%.idl
+	omniidl -bcxx $<
+../%SK.cc: ../%.idl
+	omniidl -bcxx $<
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

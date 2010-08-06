@@ -58,7 +58,7 @@ int main (int argc, char** argv) {
 		
 		client.SetRaw(raw);
 		client.SetPixel(pixel);
-		client.RequestProcess(test);
+		client.Process(test);
 		client.GetRaw(raw);
 		client.GetPixel(pixel);
 

@@ -66,7 +66,7 @@ public:
 	 * @return          Error code
 	 */ 
 	error_code              
-	RequestProcess      (const char* name);
+	Process             (const char* name);
 	
 	/**
 	 * @brief           Set raw my data with ...
@@ -261,8 +261,9 @@ private:
 	bool                         m_have_raw;
 	bool                         m_have_pixel;
 	bool                         m_have_helper;
+	bool                         m_have_config;
 
-	strings*                     m_labels;
+	char*                        m_config;
 
 	CORBA::ORB_var               m_orb;
 	

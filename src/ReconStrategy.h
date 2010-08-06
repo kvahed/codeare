@@ -51,7 +51,11 @@ public:
 	/**
 	 * @brief Missing
 	 */ 
-	ReconStrategy  () {};
+	ReconStrategy  () {
+		m_have_raw    = false;
+		m_have_helper = false;
+		m_have_pixel  = false;
+	};
 	
 	/**
 	 * @brief Missing
@@ -169,12 +173,9 @@ public:
 	 * @brief Get data from recon
 	 */
 	void 
-	GetLabels           (strings labels)   {
+	GetConfig           (string config)   {
 
-		m_labels.length(labels.length());
-
-		for (int i = 0; i < m_labels.length(); i++)
-			m_labels[i] = labels[i];
+		m_config = config;
 			
 	}
 	
@@ -182,10 +183,9 @@ public:
 	 * @brief Set data for recon
 	 */
 	void 
-	SetLabels          (strings labels)   {
+	SetConfig          (string config)   {
 
-		for (int i = 0; i < m_labels.length(); i++)
-			labels[i] = m_labels[i];			
+		config = m_config;
 
 	};
 	
@@ -199,8 +199,9 @@ protected:
 	bool                     m_have_raw;    /*!< Do we have raw    data?            */
 	bool                     m_have_helper; /*!< Do we have raw    data?            */
 	bool                     m_have_pixel;  /*!< Do we have helper data?            */
+	bool                     m_have_config;
 
-	strings                  m_labels;      /*!< Labels from the sequence (UID etc) */
+	string                   m_config;      /*!< Labels from the sequence (UID etc) */
 
 };
 
