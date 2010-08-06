@@ -1,5 +1,5 @@
 CXX	     = cl
-CXXFLAGS = -c -DDEBUG /IC:/Temp/omniORB-4.1.1/include  /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 -GX
+CXXFLAGS = -c -DDEBUG /IC:/Temp/omniORB-4.1.1/include  /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 -GX -DTIXML_USE_STL
 
 LD       = link.exe
 LDFLAGS  = -nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib -libpath:C:\Temp\omniORB-4.1.1\lib\x86_win32
@@ -8,9 +8,9 @@ OMNIIDL  = omniidl -bcxx -Wbh=.h -Wbs=.cpp
 
 CP       = copy
 
-COMMON   = Matrix.obj RRSModule.obj options.obj 
+COMMON   = Matrix.obj RRSModule.obj options.obj tinyxml.obj tinyxmlparser.obj tinyxmlerror.obj
 CLIENT   = ReconClient.obj testclt.obj
-SERVER   = ReconServant.obj ReconStrategy.obj ReconContext.obj	reconserver.obj
+SERVER   = ReconServant.obj ReconStrategy.obj ReconContext.obj reconserver.obj
 
 all: $(COMMON) $(CLIENT) testclt.exe $(SERVER) reconserver.exe
 
@@ -50,11 +50,22 @@ testclt.obj: testclt.cpp
 reconserver.obj: reconserver.cpp
 	$(CXX) $(CXXFLAGS) reconserver.cpp
 
+tinyxml.obj: tinyxml.h tinyxml.cpp
+    $(CXX) $(CXXFLAGS) tinyxml.cpp	
+
+tinyxmlerror.obj: tinyxml.h tinyxmlerror.cpp
+    $(CXX) $(CXXFLAGS) tinyxmlerror.cpp	
+
+tinyxmlparser.obj: tinyxml.h tinyxmlparser.cpp
+    $(CXX) $(CXXFLAGS) tinyxmlparser.cpp	
+
+
 testclt.exe: $(COMMON) $(CLIENT)
 	$(LD) -out:testclt.exe $(CLIENT) $(COMMON) $(LDFLAGS) 
 
 reconserver.exe: $(COMMON) $(SERVER)
 	$(LD) -out:reconserver.exe $(SERVER) $(COMMON) $(LDFLAGS) 
+
 
 clean clean_all:
 	del *.obj
