@@ -65,7 +65,10 @@ public:
 	 * @brief Missing
 	 */ 
 	virtual
-	~ReconStrategy () {};
+	~ReconStrategy () {
+		delete m_config;
+		delete m_config_doc;
+	};
 
 	/**
 	 * @brief Data procession function 
@@ -179,7 +182,7 @@ public:
 	void 
 	GetConfig           (string config)   {
 
-		//config << m_config_doc;
+		config << *(m_config_doc);
 			
 	}
 	
@@ -192,7 +195,7 @@ public:
 		m_config_doc = new TiXmlDocument();
 		m_config_doc->Clear();
 		m_config_doc->Parse(config.c_str());
-		m_config = m_config_doc->RootElement();
+		m_config     = m_config_doc->RootElement();
 
 	};
 
