@@ -77,8 +77,6 @@ public:
 
 	void CleanUp () {
 
-		cout << "Destructor" << endl;
-
 		m_config_doc->Clear();
 		delete m_config_doc;
 
@@ -196,9 +194,9 @@ public:
 	 */
 	void 
 	GetConfig           (char* config)   {
-		//config->clear(); 
-		//config << *(m_config_doc);
-		cout   << *(config);
+		string buf;
+		buf << *(m_config_doc);
+		strcpy(config, buf.c_str());
 	}
 	
 	/**

@@ -8,7 +8,7 @@
 # Binaries 
 bin_PROGRAMS = testclt reconserver
 
-AM_CPPFLAGS = -DTIXML_USE_STL
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Common sources
 COMMON =  common.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp

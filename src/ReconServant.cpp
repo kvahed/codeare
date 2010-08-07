@@ -66,7 +66,7 @@ ReconServant::Process  (const char* name)       {
 
 	e = context->ProcessData();
 	
-	cout << "done. Getting processed data..." << endl;
+	cout << "... done. Getting processed data..." << endl;
 
 	if (m_have_raw)
 		context->Strategy()->GetRaw(&m_raw);
@@ -77,12 +77,10 @@ ReconServant::Process  (const char* name)       {
 	if (m_have_config)
 		context->Strategy()->GetConfig(m_config);
 
+	cout << "... done. Deleting context ..." << endl;
+	delete context;
 	cout << "... done. Will handle control back to client." << endl;
 
-	delete context;
-
-	cout << m_config << endl;
-	
 	return e;
 	
 }

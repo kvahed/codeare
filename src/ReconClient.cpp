@@ -157,8 +157,6 @@ ReconClient::Process  (const char* name)  {
         m_config_doc.Parse(m_rrsi->config());
     }
 
-	cout << m_config_doc << endl;
-
     return result;
     
 };

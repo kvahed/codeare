@@ -5,7 +5,7 @@
 	omniidl -bcxx $<
 COMMON = #../RRSModule.hh ../RRSModuleSK.cc
 
-AM_CPPFLAGS = -DTIXML_USE_STL
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la HannWindow.la InvertOrder.la MedianFilter_OMP.la 
