@@ -48,7 +48,7 @@ template <class T> void DeleteImage(T** pp){
 }
 
 
-RRSModule::error_code MedianFilter_OMP::ProcessData () {
+RRSModule::error_code MedianFilter_OMP::Process () {
 	
 	const int ww = 25;
 	const int wh = 25;
@@ -70,7 +70,7 @@ RRSModule::error_code MedianFilter_OMP::ProcessData () {
 		int chunk    = iw/nthreads; //chunk-size for loop splitting
 
 		if (tid==0) 
-			cout << "MedianFilter_OMP::ProcessData() running on " << iw << "x" << ih << " image with " << nthreads << " threads" << endl; 
+			cout << "MedianFilter_OMP::Process() running on " << iw << "x" << ih << " image with " << nthreads << " threads" << endl; 
 
 #pragma omp for schedule(dynamic,chunk)
 		for (x=0; x<iw; ++x)

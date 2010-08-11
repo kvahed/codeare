@@ -23,7 +23,8 @@
 
 #include <complex>
 #include "Matrix.h"
-#include "tinyxml.h"
+#include "Configurable.h"
+
 
 #ifdef __WIN32__ 
     #include "RRSModule.h"
@@ -38,7 +39,8 @@ using namespace RRSModule;
 /**
  * @brief              CORBA ICE reconstruction client 
  */
-class ReconClient                  {
+class ReconClient :
+	public Configurable {
 	
 	
 public:
@@ -81,8 +83,6 @@ public:
 		floats dimag;
 		int    i;
 
-		m_have_raw = true;
-		
 		m_raw->dims.length(INVALID_DIM);
 		
 		for (i = 0; i < INVALID_DIM; i++)
@@ -135,8 +135,6 @@ public:
 		floats dimag;
 		int    i;
 
-		m_have_helper = true;
-
 		m_helper->dims.length(INVALID_DIM);
 
 		for (i = 0; i < INVALID_DIM; i++)
@@ -186,8 +184,6 @@ public:
 		
 		shorts vals;
 		int    i;
-		
-		m_have_pixel = true;
 		
 		m_pixel->dims.length(INVALID_DIM);
 		
@@ -254,96 +250,15 @@ public:
 	GetHelperSize          ();
 	
 
-	/**
-	 * @brief           Set a string type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline void
-	SetAttribute           (const char* name, const char* value) {
-		m_config->SetAttribute (name, value);
-	}
-
+ private:
 	
-	/**
-	 * @brief           Set a integer type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline void
-	SetAttribute           (const char* name, int value) {
-		m_config->SetAttribute (name, value);
-	}
-
+	RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
 	
-	/**
-	 * @brief           Set a float type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline void 
-	SetAttribute           (const char* name, double value) {
-		m_config->SetDoubleAttribute (name, value);
-	}
+	raw_data*           m_raw;        /**< Raw data    (complex float sequence) */
+	raw_data*           m_helper;     /**< Helper data (complex float sequence) */
+	pixel_data*         m_pixel;      /**< Pixel data  (short sequence)         */
 
-
-	/**
-	 * @brief           Set a string type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline const char*
-	Attribute           (const char* name) const {
-		return m_config->Attribute (name);
-	}
-	
-
-	/**
-	 * @brief           Set a integer type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline const char*
-	Attribute           (const char* name, int* value) const {
-		return m_config->Attribute (name, value);
-	}
-
-	
-	/**
-	 * @brief           Set a float type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline const char*
-	Attribute           (const char* name, double* value) const {
-		return m_config->Attribute (name, value);
-	};
-	
-	
-	
-private:
-	
-	RRSInterface_var    m_rrsi;   /**< Remote Recon interface               */
-	
-	raw_data*           m_raw;    /**< Raw data    (complex float sequence) */
-	raw_data*           m_helper; /**< Helper data (complex float sequence) */
-	pixel_data*         m_pixel;  /**< Pixel data  (short sequence)         */
-
-	bool                m_have_raw;
-	bool                m_have_pixel;
-	bool                m_have_helper;
-	bool                m_have_config;
-
-	TiXmlElement*       m_config;
-	TiXmlDocument       m_config_doc;
-
-	CORBA::ORB_var      m_orb;
+	CORBA::ORB_var      m_orb;        /**< Orb                                  */
 	
 };
 

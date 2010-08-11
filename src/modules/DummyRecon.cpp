@@ -21,7 +21,7 @@
 #include "DummyRecon.h"
 
 RRSModule::error_code
-ProcessData () { 
+Process () { 
 
 	return RRSModule::OK;
 

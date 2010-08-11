@@ -21,7 +21,7 @@
 #include "InvertOrder.h"
 
 RRSModule::error_code
-InvertOrder::ProcessData () {
+InvertOrder::Process () {
 
 	/*	RRSModule::floats tmpabs (m_raw.dabs);
 	RRSModule::floats tmparg (m_raw.darg);

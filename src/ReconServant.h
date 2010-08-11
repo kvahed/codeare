@@ -116,11 +116,6 @@ private:
 	pixel_data    m_pixel;  /**< Helper data (short)         */
 	char*         m_config;
 
-	bool          m_have_raw;
-	bool          m_have_helper;
-	bool          m_have_pixel;
-	bool          m_have_config;
-
 };
 
 #endif // __RECON_SERVANT_H__

@@ -20,38 +20,32 @@
 
 #include "DumpToFile.h"
 
+
 DumpToFile::DumpToFile () {}
-/*	m_have_raw    = false;
-	m_have_helper = false;
-	m_have_pixel  = false;
-	}*/
 
 error_code 
-DumpToFile::ProcessData () {
+DumpToFile::Process () {
 
-	printf ("Dumping ... \n");
+	stringstream fname;
+	const char* uid = Attribute ("UID");
 
-	if (m_have_raw) {
-		printf ("raw data.\n");
-		m_raw.dump    ((char*) "raw.bin"   );
-	}
+	fname << uid << "_raw.bin";
+	m_raw.dump    (fname.str().c_str());
 
-	if (m_have_helper) {
-		printf ("helper data.\n");
-		m_helper.dump ((char*) "helper.bin");
-	}
+	fname.str("");
 
-	if (m_have_pixel) {
-		printf ("pixel data.\n");
-		m_pixel.dump  ((char*) "pixel.bin" );
-	}
+	fname << uid << "_helper.bin";
+	m_helper.dump (fname.str().c_str());
 
-	ofstream of;
-	of.open ("config.txt");
-	of << m_config_doc;
-	of.close();
-	
-	printf ("... done \n");
+	fname.str("");
+
+	fname << uid << "_pixel.bin";
+	m_pixel.dump (fname.str().c_str());
+
+	fname.str("");
+
+	fname << uid << "_config.xml";
+	DumpConfig (fname.str().c_str());
 
 	return RRSModule::OK;
 

@@ -18,13 +18,35 @@
  *  02110-1301  USA
  */
 
-#include "HannWindow.h"
+#ifndef __NUFFT_H__
+#define __NUFFT_H__
 
-// the class factories
-extern "C" DLLEXPORT ReconStrategy* create  ()                 {
-    return new HannWindow;
-}
+#include "ReconStrategy.h"
 
-extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
-    delete p;
-}
+/**
+ * @brief Non uniform FFT
+ */
+class NuFFT : public ReconStrategy {
+
+	public:
+	
+	/**
+	 * @brief Default constructor
+	 */
+	NuFFT  ();
+	
+	/**
+	 * @brief Default destructor
+	 */
+	virtual 
+	~NuFFT () {};
+	
+	/**
+	 * @brief Dump data to disk
+	 */
+	virtual RRSModule::error_code
+	Process ();
+	
+};
+
+#endif /* __NUFFT_H__ */

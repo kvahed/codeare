@@ -55,8 +55,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = Matrix.$(OBJEXT) options.$(OBJEXT) \
 	RRSModuleSK.$(OBJEXT) tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
 	tinyxmlparser.$(OBJEXT)
-am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT) \
-	reconserver.$(OBJEXT)
+am__objects_2 = ReconContext.$(OBJEXT) ReconStrategy.$(OBJEXT) \
+	ReconServant.$(OBJEXT) reconserver.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2)
 reconserver_OBJECTS = $(am_reconserver_OBJECTS)
 reconserver_LDADD = $(LDADD)
@@ -179,7 +179,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OPENMP_CXXFLAGS = @OPENMP_CXXFLAGS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -252,13 +251,13 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = common.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp
+COMMON = common.h Configuration.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp 
 
 # Client side stuff
 CLIENT_SIDE = ReconClient.h ReconClient.cpp testclt.cpp
 
 # Reconstruction strategies & server side stuff
-SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconServant.h ReconServant.cpp reconserver.cpp Loader.h
+SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp reconserver.cpp Loader.h
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
@@ -384,6 +383,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconServant.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconStrategy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclt.Po@am__quote@

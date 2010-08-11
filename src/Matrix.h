@@ -937,7 +937,7 @@ public:
      * @return          Success.
      */
     bool                
-    dump                (char* fname);
+    dump                (const char* fname);
     
 
     /**
@@ -947,7 +947,7 @@ public:
      * @return          Success.
      */
     bool                
-    read                (char* fname);
+    read                (const char* fname);
     
     //@}
     
@@ -1654,7 +1654,7 @@ Matrix<T> Matrix<T>::tr() const {
 }
 
 template <class T>
-bool Matrix<T>::dump (char* fname) {
+bool Matrix<T>::dump (const char* fname) {
 
 	// TODO: Error checking.
 	//       File not found.
@@ -1676,7 +1676,7 @@ bool Matrix<T>::dump (char* fname) {
 }
 
 template <class T>
-bool Matrix<T>::read (char* fname) {
+bool Matrix<T>::read (const char* fname) {
 
 	// TODO: Error checking.
 	//       File not found.

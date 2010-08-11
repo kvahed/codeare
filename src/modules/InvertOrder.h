@@ -47,7 +47,7 @@ public:
 	 *        No good for anything besides testing.
 	 */
 	virtual RRSModule::error_code
-	ProcessData ();
+	Process ();
 	
 };
 

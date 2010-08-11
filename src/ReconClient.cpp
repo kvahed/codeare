@@ -96,22 +96,11 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
     m_helper = new raw_data;
     m_pixel  = new pixel_data;
 
-    m_have_raw    = false;
-    m_have_helper = false;
-    m_have_pixel  = false;
-    
     m_raw->dims.length(INVALID_DIM);
     m_helper->dims.length(INVALID_DIM);
     m_pixel->dims.length(INVALID_DIM);
 
-	TiXmlDeclaration * decl     = new TiXmlDeclaration ("1.0", "", "");
-    m_config = new TiXmlElement     ("Config");
-    m_config_doc.LinkEndChild( decl );
-    m_config_doc.LinkEndChild( m_config );
 
-    SetAttribute("String", "a");
-	SetAttribute("Double", 2.4);
-	SetAttribute("Integer", 66);
 };
 
 
@@ -137,14 +126,14 @@ ReconClient::Process  (const char* name)  {
 	string     confstr = "";
 
     // Send data for procession to remote interface
-    if (m_have_raw)    m_rrsi->raw    (m_raw[0]);
-    if (m_have_helper) m_rrsi->helper (m_helper[0]);
-    if (m_have_pixel)  m_rrsi->pixel  (m_pixel[0]);
+    m_rrsi->raw    (m_raw[0]);
+    m_rrsi->helper (m_helper[0]);
+    m_rrsi->pixel  (m_pixel[0]);
 
-	// Serialize config document and send to remote interface
-	confstr << m_config_doc;
-	m_rrsi->config (confstr.c_str());
-	m_config_doc.Clear();
+	// Serialize configuration and send to remote interface
+	char* temp = 0;
+
+	m_rrsi->config (GetConfig());
 
     // Process through remote interface
     result = m_rrsi->Process(name);
@@ -154,7 +143,7 @@ ReconClient::Process  (const char* name)  {
         m_raw    = m_rrsi->raw();
         m_helper = m_rrsi->helper();
         m_pixel  = m_rrsi->pixel();
-        m_config_doc.Parse(m_rrsi->config());
+		SetConfig (m_rrsi->config());
     }
 
     return result;

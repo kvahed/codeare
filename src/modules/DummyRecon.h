@@ -49,7 +49,7 @@ public:
 	 * @brief Do nothing 
 	 */
 	virtual RRSModule::error_code
-	ProcessData () { 
+	Process () { 
 
 		/*for (int i = 0; i < m_raw.Size(); i++)
 			m_raw[i] = m_raw[i];

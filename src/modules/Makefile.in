@@ -72,7 +72,7 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 DummyRecon_la_LIBADD =
-am__objects_1 =
+am__objects_1 = tinyxml.lo tinyxmlerror.lo tinyxmlparser.lo
 am_DummyRecon_la_OBJECTS = $(am__objects_1) DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
 DummyRecon_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -90,12 +90,6 @@ GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
 GenericRegrid_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) $(LDFLAGS) -o $@
-HannWindow_la_LIBADD =
-am_HannWindow_la_OBJECTS = $(am__objects_1) HannWindow.lo
-HannWindow_la_OBJECTS = $(am_HannWindow_la_OBJECTS)
-HannWindow_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(HannWindow_la_LDFLAGS) $(LDFLAGS) -o $@
 InvertOrder_la_LIBADD =
 am_InvertOrder_la_OBJECTS = $(am__objects_1) InvertOrder.lo
 InvertOrder_la_OBJECTS = $(am_InvertOrder_la_OBJECTS)
@@ -108,6 +102,12 @@ MedianFilter_OMP_la_OBJECTS = $(am_MedianFilter_OMP_la_OBJECTS)
 MedianFilter_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(MedianFilter_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
+NuFFT_la_LIBADD =
+am_NuFFT_la_OBJECTS = $(am__objects_1) NuFFT.lo
+NuFFT_la_OBJECTS = $(am_NuFFT_la_OBJECTS)
+NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -131,11 +131,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
-	$(GenericRegrid_la_SOURCES) $(HannWindow_la_SOURCES) \
-	$(InvertOrder_la_SOURCES) $(MedianFilter_OMP_la_SOURCES)
+	$(GenericRegrid_la_SOURCES) $(InvertOrder_la_SOURCES) \
+	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES)
 DIST_SOURCES = $(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
-	$(GenericRegrid_la_SOURCES) $(HannWindow_la_SOURCES) \
-	$(InvertOrder_la_SOURCES) $(MedianFilter_OMP_la_SOURCES)
+	$(GenericRegrid_la_SOURCES) $(InvertOrder_la_SOURCES) \
+	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -186,7 +186,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OPENMP_CXXFLAGS = @OPENMP_CXXFLAGS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -256,19 +255,19 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-COMMON = #../RRSModule.hh ../RRSModuleSK.cc
+COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la HannWindow.la InvertOrder.la MedianFilter_OMP.la 
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la InvertOrder.la MedianFilter_OMP.la NuFFT.la 
 DummyRecon_la_SOURCES = $(COMMON) DummyRecon.h DummyRecon.cpp
 DummyRecon_la_LDFLAGS = -module
 GenericRegrid_la_SOURCES = $(COMMON) GenericRegrid.h GenericRegrid.cpp
 GenericRegrid_la_LDFLAGS = -module
 MedianFilter_OMP_la_SOURCES = $(COMMON) MedianFilter_OMP.h MedianFilter_OMP.cpp
 MedianFilter_OMP_la_LDFLAGS = -module
-HannWindow_la_SOURCES = $(COMMON) HannWindow.h HannWindow.cpp
-HannWindow_la_LDFLAGS = -module
+NuFFT_la_SOURCES = $(COMMON) NuFFT.h NuFFT.cpp
+NuFFT_la_LDFLAGS = -module
 InvertOrder_la_SOURCES = $(COMMON) InvertOrder.h InvertOrder.cpp
 InvertOrder_la_LDFLAGS = -module
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.h DumpToFile.cpp
@@ -344,12 +343,12 @@ DumpToFile.la: $(DumpToFile_la_OBJECTS) $(DumpToFile_la_DEPENDENCIES)
 	$(DumpToFile_la_LINK) -rpath $(libdir) $(DumpToFile_la_OBJECTS) $(DumpToFile_la_LIBADD) $(LIBS)
 GenericRegrid.la: $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_DEPENDENCIES) 
 	$(GenericRegrid_la_LINK) -rpath $(libdir) $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_LIBADD) $(LIBS)
-HannWindow.la: $(HannWindow_la_OBJECTS) $(HannWindow_la_DEPENDENCIES) 
-	$(HannWindow_la_LINK) -rpath $(libdir) $(HannWindow_la_OBJECTS) $(HannWindow_la_LIBADD) $(LIBS)
 InvertOrder.la: $(InvertOrder_la_OBJECTS) $(InvertOrder_la_DEPENDENCIES) 
 	$(InvertOrder_la_LINK) -rpath $(libdir) $(InvertOrder_la_OBJECTS) $(InvertOrder_la_LIBADD) $(LIBS)
 MedianFilter_OMP.la: $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_DEPENDENCIES) 
 	$(MedianFilter_OMP_la_LINK) -rpath $(libdir) $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_LIBADD) $(LIBS)
+NuFFT.la: $(NuFFT_la_OBJECTS) $(NuFFT_la_DEPENDENCIES) 
+	$(NuFFT_la_LINK) -rpath $(libdir) $(NuFFT_la_OBJECTS) $(NuFFT_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -360,9 +359,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GenericRegrid.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HannWindow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InvertOrder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxml.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlerror.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlparser.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -384,6 +386,27 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+tinyxml.lo: ../tinyxml.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxml.lo -MD -MP -MF $(DEPDIR)/tinyxml.Tpo -c -o tinyxml.lo `test -f '../tinyxml.cpp' || echo '$(srcdir)/'`../tinyxml.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxml.Tpo $(DEPDIR)/tinyxml.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml.cpp' object='tinyxml.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxml.lo `test -f '../tinyxml.cpp' || echo '$(srcdir)/'`../tinyxml.cpp
+
+tinyxmlerror.lo: ../tinyxmlerror.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxmlerror.lo -MD -MP -MF $(DEPDIR)/tinyxmlerror.Tpo -c -o tinyxmlerror.lo `test -f '../tinyxmlerror.cpp' || echo '$(srcdir)/'`../tinyxmlerror.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxmlerror.Tpo $(DEPDIR)/tinyxmlerror.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxmlerror.cpp' object='tinyxmlerror.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlerror.lo `test -f '../tinyxmlerror.cpp' || echo '$(srcdir)/'`../tinyxmlerror.cpp
+
+tinyxmlparser.lo: ../tinyxmlparser.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxmlparser.lo -MD -MP -MF $(DEPDIR)/tinyxmlparser.Tpo -c -o tinyxmlparser.lo `test -f '../tinyxmlparser.cpp' || echo '$(srcdir)/'`../tinyxmlparser.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxmlparser.Tpo $(DEPDIR)/tinyxmlparser.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxmlparser.cpp' object='tinyxmlparser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlparser.lo `test -f '../tinyxmlparser.cpp' || echo '$(srcdir)/'`../tinyxmlparser.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

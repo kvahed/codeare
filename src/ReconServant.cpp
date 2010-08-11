@@ -25,12 +25,7 @@
 /**************************************************************************************************/
 ReconServant::ReconServant  ()               {
 
-	m_have_raw    = false;
-	m_have_helper = false;
-	m_have_pixel  = false;
-	m_have_config = false;
-
-	m_config      = new char;
+	m_config = new char;
 
 }
 
@@ -53,34 +48,26 @@ ReconServant::Process  (const char* name)       {
 
 	ReconContext* context = new ReconContext(name);
 
-	if (m_have_raw)
-		context->Strategy()->SetRaw(&m_raw);
-	if (m_have_helper)
-		context->Strategy()->SetHelper(&m_helper);
-	if (m_have_pixel)
-		context->Strategy()->SetPixel(&m_pixel);
-	if (m_have_config)
-		context->Strategy()->SetConfig(m_config);
-
+	context->Strategy()->SetRaw(&m_raw);
+	context->Strategy()->SetHelper(&m_helper);
+	context->Strategy()->SetPixel(&m_pixel);
+	context->Strategy()->SetConfig(m_config);
+	
 	cout << "... done. Will invoke data procession ... " << endl;
-
-	e = context->ProcessData();
+	
+	e = context->Strategy()->Process();
 	
 	cout << "... done. Getting processed data..." << endl;
-
-	if (m_have_raw)
-		context->Strategy()->GetRaw(&m_raw);
-	if (m_have_helper)
-		context->Strategy()->GetHelper(&m_helper);
-	if (m_have_pixel)
-		context->Strategy()->GetPixel(&m_pixel);
-	if (m_have_config)
-		context->Strategy()->GetConfig(m_config);
-
+	
+	context->Strategy()->GetRaw(&m_raw);
+	context->Strategy()->GetHelper(&m_helper);
+	context->Strategy()->GetPixel(&m_pixel);
+	context->Strategy()->GetConfig(m_config);
+	
 	cout << "... done. Deleting context ..." << endl;
 	delete context;
 	cout << "... done. Will handle control back to client." << endl;
-
+	
 	return e;
 	
 }
@@ -90,7 +77,6 @@ ReconServant::Process  (const char* name)       {
 void
 ReconServant::raw          (const raw_data& d)   {
 	m_raw = d;
-	m_have_raw = true;
 }
 
 
@@ -105,7 +91,6 @@ ReconServant::raw          ()                    {
 void
 ReconServant::helper       (const raw_data& d)   {
 	m_helper = d;
-	m_have_helper = true;
 }
 
 
@@ -120,7 +105,6 @@ ReconServant::helper       ()                    {
 void
 ReconServant::pixel        (const pixel_data& d) {
 	m_pixel = d;
-	m_have_pixel = true;
 }
 
 
@@ -135,7 +119,6 @@ ReconServant::pixel        ()                    {
 void 
 ReconServant::config       (const char* d)    {
 	strcpy (m_config, d);
-	m_have_config = true;
 }
 
 

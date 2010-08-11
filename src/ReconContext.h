@@ -67,9 +67,9 @@ public:
 	/**
 	 * @brief Process data with given strategy
 	 */
-	inline RRSModule::error_code
-	ProcessData () {
-		return m_strategy->ProcessData();
+	RRSModule::error_code
+	Process () {
+		return m_strategy->Process();
 	}
 	
 	

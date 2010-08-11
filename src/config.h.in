@@ -24,9 +24,6 @@
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
-/* Define to 1 if you have the `gomp' library (-lgomp). */
-#undef HAVE_LIBGOMP
-
 /* Define to 1 if you have the `omniDynamic4' library (-lomniDynamic4). */
 #undef HAVE_LIBOMNIDYNAMIC4
 

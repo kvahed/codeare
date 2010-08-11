@@ -46,8 +46,8 @@ int main (int argc, char** argv) {
 		ReconClient client (name, debug);
 		int         i = 0, j = 0, d = 512;
 
-		Matrix< complex<float> > raw (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-		Matrix< short > pixel (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix< complex<float> > raw   (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix< short >          pixel (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
 		for (i = 0; i < d; i++)
 			for (j = 0; j < d; j++) {
@@ -55,10 +55,15 @@ int main (int argc, char** argv) {
 				pixel.at(i,j) = (i+1)*(j+1);
 			}
 		
-		
 		client.SetRaw(raw);
 		client.SetPixel(pixel);
+
+		client.SetAttribute("UID", "1234");
+		client.SetAttribute("Pi", 3.1415);
+		client.SetAttribute("Dim", d);
+		
 		client.Process(test);
+
 		client.GetRaw(raw);
 		client.GetPixel(pixel);
 

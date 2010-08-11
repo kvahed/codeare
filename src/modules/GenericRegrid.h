@@ -47,7 +47,7 @@ public:
 	 * @brief Regrid data to Cartesian k-space
 	 */
 	virtual RRSModule::error_code
-	ProcessData () {
+	Process () {
 		return RRSModule::OK;
 	};
 	

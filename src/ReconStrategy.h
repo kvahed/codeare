@@ -22,7 +22,8 @@
 #define __RECON_STRATEGY_H__
 
 #include "Matrix.h"
-#include "tinyxml.h"
+#include "Configurable.h"
+
 
 #include "DllExport.h"
 
@@ -45,7 +46,8 @@ using namespace RRSModule;
  *        Derive hereof to expand the reconstruction toolbox
  *
  */
-class ReconStrategy {
+class ReconStrategy : 
+	public Configurable {
 
 
 public:
@@ -66,28 +68,11 @@ public:
 	};
 
 
-	void Init () {
-
-		m_have_raw = false;
-		m_have_helper = false;
-		m_have_pixel = false;
-
-	}
-	
-
-	void CleanUp () {
-
-		m_config_doc->Clear();
-		delete m_config_doc;
-
-	}
-	
-
 	/**
 	 * @brief Data procession function 
 	 */ 
 	virtual error_code
-	ProcessData     () = 0;
+	Process     () = 0;
 	
 	/**
 	 * @brief Get data from recon
@@ -110,8 +95,6 @@ public:
 
 		int dim[16];
 		int i = 0;
-
-		m_have_raw = true;
 
 		for (i = 0; i < 16; i++)
 			dim[i] = raw->dims[i];
@@ -141,8 +124,6 @@ public:
 	 */
 	void 
 	SetHelper           (const raw_data* helper)   {
-
-		m_have_helper = true;
 
 		int dim[16];
 		int i = 0;
@@ -174,8 +155,6 @@ public:
 	void 
 	SetPixel           (const pixel_data* pixel)   {
 
-		m_have_pixel = true;
-
 		int dim[16];
 		int i = 0;
 
@@ -189,114 +168,11 @@ public:
 		
 	};
 	
-	/**
-	 * @brief Get data from recon
-	 */
-	void 
-	GetConfig           (char* config)   {
-		string buf;
-		buf << *(m_config_doc);
-		strcpy(config, buf.c_str());
-	}
-	
-	/**
-	 * @brief Set data for recon
-	 */
-	void 
-	SetConfig          (const char* config)   {
-		m_config_doc = new TiXmlDocument();
-		m_config_doc->Clear();
-		m_config_doc->Parse(config);
-		m_config     = m_config_doc->RootElement();
-		SetAttribute("String", "b");
-		SetAttribute("Doubl2", 2.3);
-	};
-
-
-	/**
-	 * @brief           Set a string type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline void
-	SetAttribute           (const char* name, const char* value) {
-		m_config->SetAttribute (name, value);
-	}
-
-	
-	/**
-	 * @brief           Set a integer type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline void
-	SetAttribute           (const char* name, int value) {
-		m_config->SetAttribute (name, value);
-	}
-
-	
-	/**
-	 * @brief           Set a float type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline void 
-	SetAttribute           (const char* name, double value) {
-		m_config->SetDoubleAttribute (name, value);
-	}
-
-
-	/**
-	 * @brief           Set a string type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline const char*
-	Attribute           (const char* name) const {
-		return m_config->Attribute (name);
-	}
-	
-
-	/**
-	 * @brief           Set a integer type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline const char*
-	Attribute           (const char* name, int* value) const {
-		return m_config->Attribute (name, value);
-	}
-
-	
-	/**
-	 * @brief           Set a float type attribute for processing
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline const char*
-	Attribute           (const char* name, double* value) const {
-		return m_config->Attribute (name, value);
-	}
-
 protected:
 
 	Matrix< complex<float> > m_raw;         /*!< raw data matrix                    */
 	Matrix< complex<float> > m_helper;      /*!< helper matrix                      */
 	Matrix< short >          m_pixel;       /*!< pixel data matrix                  */
-
-	bool                     m_have_raw;    /*!< Do we have raw    data?            */
-	bool                     m_have_helper; /*!< Do we have raw    data?            */
-	bool                     m_have_pixel;  /*!< Do we have helper data?            */
-
-	TiXmlElement*            m_config;
-	TiXmlDocument*           m_config_doc;
-
 
 };
 

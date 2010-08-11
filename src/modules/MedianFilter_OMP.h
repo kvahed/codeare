@@ -46,7 +46,7 @@ public:
 	 * @brief Apply Median filter to image space
 	 */
 	virtual RRSModule::error_code
-	ProcessData ();
+	Process ();
 
 };
 
