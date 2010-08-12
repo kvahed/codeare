@@ -57,15 +57,15 @@ private:
 	
 	// Some more stuff
 	int       m_M;
-	float     m_b;
+	double    m_b;
 	int       m_q;
 
-	float*    m_tra;
+	double*   m_tra;
 	
-	double* k_data;
-	double* r_data;
-	double* k_d;
-	double* r_d;
+	double*   k_data;
+	double*   r_data;
+	double*   k_d;
+	double*   r_d;
 	
 };
 
