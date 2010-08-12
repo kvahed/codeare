@@ -1,0 +1,8 @@
+This is the Juelich Remote Reconstruction Suite (jrrs).
+This software is a framework for live communication with MRI sequence and 
+reconstruction software. It was started on Siemens VB15 line. 
+
+TODO:
+	Cient stubs for more MRI hardware vendors.
+
+

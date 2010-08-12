@@ -1,0 +1,22 @@
+all:
+	cd src
+	nmake /nologo /f Makefile.win32
+	cd modules
+	nmake /nologo /f Makefile.win32
+	cd ..\..
+	copy src\*.exe win32
+	copy src\modules\*.dll win32
+	
+	@echo =================
+	@echo Runtime binaries and dynamic reconstruction libraries have been copied to win32 folder.
+    @echo =================
+
+clean:
+	cd src
+	nmake /nologo /f Makefile.win32 clean
+	cd modules
+	nmake /nologo /f Makefile.win32 clean
+	cd ..\..
+	del win32\*.exe win32\*.dll
+	cd src
+	 
