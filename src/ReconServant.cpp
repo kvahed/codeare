@@ -51,6 +51,7 @@ ReconServant::Process  (const char* name)       {
 	context->Strategy()->SetRaw(&m_raw);
 	context->Strategy()->SetHelper(&m_helper);
 	context->Strategy()->SetPixel(&m_pixel);
+
 	context->Strategy()->SetConfig(m_config);
 	
 	cout << "... done. Will invoke data procession ... " << endl;
@@ -65,7 +66,9 @@ ReconServant::Process  (const char* name)       {
 	context->Strategy()->GetConfig(m_config);
 	
 	cout << "... done. Deleting context ..." << endl;
+
 	delete context;
+
 	cout << "... done. Will handle control back to client." << endl;
 	
 	return e;
@@ -118,7 +121,11 @@ ReconServant::pixel        ()                    {
 /**************************************************************************************************/
 void 
 ReconServant::config       (const char* d)    {
-	strcpy (m_config, d);
+	stringstream tmp;
+	tmp << d;
+	cout << tmp.str().length() << endl;
+	m_config = new char[tmp.str().length()*sizeof(char*)];
+	strcpy (m_config, tmp.str().c_str());
 }
 
 
