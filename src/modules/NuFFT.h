@@ -49,16 +49,16 @@ public:
 	
 private:
 	
-	int N [2]      = {0,0};
-	int Nk[2]      = {0,0};
+	int N [2];
+	int Nk[2];
 	
 	// We only support 2 dims for the time being
-	const int m_dim  = 2;
+	int m_dim;
 	
 	// Some more stuff
-	int       m_M    = 2;
-	float     m_b    = 2.4;
-	int       m_q    = 32;
+	int       m_M;
+	float     m_b;
+	int       m_q;
 
 	float*    m_tra;
 	
