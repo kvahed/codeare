@@ -28,7 +28,7 @@
  */
 class NuFFT : public ReconStrategy {
 
-	public:
+public:
 	
 	/**
 	 * @brief Default constructor
@@ -46,6 +46,26 @@ class NuFFT : public ReconStrategy {
 	 */
 	virtual RRSModule::error_code
 	Process ();
+	
+private:
+	
+	int N [2]      = {0,0};
+	int Nk[2]      = {0,0};
+	
+	// We only support 2 dims for the time being
+	const int m_dim  = 2;
+	
+	// Some more stuff
+	int       m_M    = 2;
+	float     m_b    = 2.4;
+	int       m_q    = 32;
+
+	float*    m_tra;
+	
+	double* k_data;
+	double* r_data;
+	double* k_d;
+	double* r_d;
 	
 };
 

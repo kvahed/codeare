@@ -131,8 +131,6 @@ ReconClient::Process  (const char* name)  {
     m_rrsi->pixel  (m_pixel[0]);
 
 	// Serialize configuration and send to remote interface
-	char* temp = 0;
-
 	m_rrsi->config (GetConfig());
 
     // Process through remote interface
