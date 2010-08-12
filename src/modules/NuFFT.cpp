@@ -3,6 +3,8 @@
 RRSModule::error_code
 NuFFT::Process () {
 
+	RRSModule::error_code error = OK;
+
 	m_dim  = 2;
 
 	for (int i = 0; i < 2; i++) {
@@ -14,6 +16,7 @@ NuFFT::Process () {
 	m_b    = 2.4;
 	m_q    = 32;
 
+	return error;
 
 };
 
