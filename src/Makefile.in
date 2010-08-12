@@ -55,16 +55,18 @@ PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = Matrix.$(OBJEXT) options.$(OBJEXT) \
 	RRSModuleSK.$(OBJEXT) tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
 	tinyxmlparser.$(OBJEXT)
-am__objects_2 = ReconContext.$(OBJEXT) ReconStrategy.$(OBJEXT) \
-	ReconServant.$(OBJEXT) reconserver.$(OBJEXT)
-am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2)
+am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT) \
+	ReconStrategy.$(OBJEXT)
+am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2) \
+	reconserver.$(OBJEXT)
 reconserver_OBJECTS = $(am_reconserver_OBJECTS)
 reconserver_LDADD = $(LDADD)
 reconserver_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(reconserver_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_3 = ReconClient.$(OBJEXT) testclt.$(OBJEXT)
-am_testclt_OBJECTS = $(am__objects_1) $(am__objects_3)
+am__objects_3 = ReconClient.$(OBJEXT)
+am_testclt_OBJECTS = $(am__objects_1) $(am__objects_3) \
+	testclt.$(OBJEXT)
 testclt_OBJECTS = $(am_testclt_OBJECTS)
 testclt_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -251,20 +253,20 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = common.h Configuration.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp 
+COMMON = common.h Configurable.h DllExport.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp 
 
 # Client side stuff
-CLIENT_SIDE = ReconClient.h ReconClient.cpp testclt.cpp
+CLIENT_SIDE = ReconClient.h ReconClient.cpp
 
 # Reconstruction strategies & server side stuff
-SERVER_SIDE = ReconContext.h ReconContext.cpp ReconStrategy.h ReconStrategy.cpp ReconServant.h ReconServant.cpp reconserver.cpp Loader.h
+SERVER_SIDE = Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServant.cpp ReconStrategy.h ReconStrategy.cpp
 
 # Rules for testclt
-testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)
+testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
 
 # Rules for reconserver
-reconserver_SOURCES = $(COMMON) $(SERVER_SIDE)
-reconserver_LDFLAGS = -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/HannWindow.la -dlopen modules/InvertOrder.la -dlopen modules/MedianFilter_OMP.la
+reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
+reconserver_LDFLAGS = -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/InvertOrder.la -dlopen modules/MedianFilter_OMP.la
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 SUBDIRS = modules
