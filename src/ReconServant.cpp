@@ -123,8 +123,7 @@ void
 ReconServant::config       (const char* d)    {
 	stringstream tmp;
 	tmp << d;
-	cout << tmp.str().length() << endl;
-	m_config = new char[tmp.str().length()*sizeof(char*)];
+	m_config = new char[tmp.str().length()];
 	strcpy (m_config, tmp.str().c_str());
 }
 
@@ -132,6 +131,8 @@ ReconServant::config       (const char* d)    {
 /**************************************************************************************************/
 char* 
 ReconServant::config       ()                    {
-	return CORBA::string_dup(m_config);
+	stringstream tmp;
+	tmp << m_config;
+	return CORBA::string_dup(tmp.str().c_str());
 }
 
