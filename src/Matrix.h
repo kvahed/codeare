@@ -169,7 +169,7 @@ public:
     //{@
 
     // If compiled within IDEA we know of access specifiers.
-    #ifdef PARC_MODULE_NAME
+	#ifdef PARC_MODULE_NAME
     
     /**
      * @brief           Reset and fill data from IceAs
@@ -211,7 +211,7 @@ public:
     inline long         
     Export              (IceAs ias, long pos);
  
-    #endif
+	#endif
 
     //@}
 
@@ -1096,7 +1096,7 @@ Matrix<T>::Matrix (Matrix<int> &dim) {
 };
 
 
-#ifdef ICEIDEAFUNCTORS_EXPORTS
+#ifdef PARC_MODULE_NAME
 
 template <class T>
 long Matrix<T>::Import(IceAs ias, long pos) {
@@ -1175,14 +1175,13 @@ long Matrix<T>::Export(IceAs ias, long pos) {
     
 };
 
-
-
 #endif
+
 
 template <class T> 
 Matrix<T>::~Matrix() {
     
-#ifdef ICEIDEAFUNCTORS_EXPORTS
+#ifdef PARC_MODULE_NAME
     ICE_SET_FN ("Matrix<T>::~Matrix()")
     ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
 #endif

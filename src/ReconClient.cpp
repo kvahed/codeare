@@ -55,38 +55,38 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
         
         m_rrsi       = RRSInterface::_narrow(orid.in());
         if (CORBA::is_nil(m_rrsi.in()))
-        cerr << "IOR is not an SA object reference." << endl;
+        std::cerr << "IOR is not an SA object reference." << std::endl;
 
     } catch (CORBA::COMM_FAILURE&)        {
 
-        cerr << "Caught system exception COMM_FAILURE -- unable to contact the object.\n" << endl;
+        std::cerr << "Caught system exception COMM_FAILURE -- unable to contact the object.\n" << std::endl;
         throw DS_ServerConnectionException();
         return;
         
     } catch (CORBA::SystemException&)     {
         
-        cerr << "Caught a CORBA::SystemException." << endl;
+        std::cerr << "Caught a CORBA::SystemException." << std::endl;
         throw DS_SystemException();
         return;
         
     } catch (CORBA::Exception&)           {
         
-        cerr << "Caught CORBA::Exception." << endl;
+        std::cerr << "Caught CORBA::Exception." << std::endl;
         throw DS_Exception();
         return;
         
     } catch (omniORB::fatalException& fe) {
 
-        cerr << "Caught omniORB::fatalException:" << endl;
-        cerr << "  file: " << fe.file() << endl;
-        cerr << "  line: " << fe.line() << endl;
-        cerr << "  mesg: " << fe.errmsg() << endl;
+        std::cerr << "Caught omniORB::fatalException:" << std::endl;
+        std::cerr << "  file: " << fe.file() << std::endl;
+        std::cerr << "  line: " << fe.line() << std::endl;
+        std::cerr << "  mesg: " << fe.errmsg() << std::endl;
         throw DS_FatalException();
         return;
         
     } catch(...) {
         
-        cerr << "Caught unknown exception." << endl;
+        std::cerr << "Caught unknown exception." << std::endl;
         throw DS_Exception();
         return;
         

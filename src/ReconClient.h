@@ -271,7 +271,7 @@ public:
 	 * @brief Handle communication exceptions
 	 */
 	DS_ServerConnectionException () { 
-		cerr << "CORBA COMM_FAILURE" << endl; 
+		std::cerr << "CORBA COMM_FAILURE" << std::endl; 
 	};
 };
 
@@ -286,7 +286,7 @@ public:
 	 * @brief Handle system exceptions
 	 */
 	DS_SystemException           () { 
-		cerr << "CORBA Exception" << endl; 
+		std::cerr << "CORBA Exception" << std::endl; 
 	};
 };
 
@@ -300,7 +300,7 @@ public:
 	 * @brief Handle fatal exception
 	 */
 	DS_FatalException            () { 
-		cerr << "CORBA Fatal Exception" << endl; 
+		std::cerr << "CORBA Fatal Exception" << std::endl; 
 	};
 };
 
@@ -314,7 +314,7 @@ public:
 	 * @brief Handle unspecified exception
 	 */
 	DS_Exception                 () { 
-		cerr << "Exception" << endl; 
+		std::cerr << "Exception" << std::endl; 
 	};
 };
 
