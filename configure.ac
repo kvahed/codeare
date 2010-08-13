@@ -1,4 +1,4 @@
-AC_PREREQ([2.65])
+AC_PREREQ([1.10])
 AC_INIT([jrrs], [0.4], [k.vahedipour@fz-juelich.cd])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR(config)

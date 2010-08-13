@@ -78,17 +78,15 @@ public:
 	void 
 	SetRaw              (Matrix< std::complex<float> >& M) {
 		
-		floats dreal;
-		floats dimag;
-		int    i;
-
+		int i;
+		
 		m_raw->dims.length(INVALID_DIM);
 		
 		for (i = 0; i < INVALID_DIM; i++)
 			m_raw->dims[i] = M.Dim(i);
-
+		
 		long size = GetRawSize();
-
+		
 		m_raw->dreal.length(size); 
 		m_raw->dimag.length(size);
 		
@@ -110,7 +108,7 @@ public:
 	void 
 	GetRaw              (Matrix< std::complex<float> >& M) {
 		
-		int             dim[INVALID_DIM], i;
+		int dim[INVALID_DIM], i;
 
 		for (i = 0; i < INVALID_DIM; i++)
 			dim[i] = m_raw->dims[i];
@@ -130,11 +128,7 @@ public:
 	void
 	SetHelper              (Matrix< std::complex<float> >& M) {
 
-		floats dreal;
-		floats dimag;
-		int    i;
-
-		m_helper->dims.length(INVALID_DIM);
+		int i;
 
 		for (i = 0; i < INVALID_DIM; i++)
 			m_helper->dims[i] = M.Dim(i);
@@ -162,7 +156,8 @@ public:
 	void
 	GetHelper              (Matrix< std::complex<float> >& M) {
 
-		int             dim[INVALID_DIM], i;
+		int dim[INVALID_DIM], i;
+
 		for (i = 0; i < INVALID_DIM; i++)
 			dim[i] = m_helper->dims[i];
 		
@@ -181,10 +176,7 @@ public:
 	void 
 	SetPixel            (Matrix<short>& M) {
 		
-		shorts vals;
 		int    i;
-		
-		m_pixel->dims.length(INVALID_DIM);
 		
 		for (i = 0; i < INVALID_DIM; i++)
 			m_pixel->dims[i] = M.Dim(i);
@@ -192,11 +184,11 @@ public:
 		long   size = GetPixelSize();
 		
 		m_pixel->vals.length(size); 
-		
+
 		for (i = 0; i < size; i++)
 			m_pixel->vals[i] = M[i];
 		
-		m_rrsi->pixel(m_pixel[0]);
+		m_rrsi->pixel(*(m_pixel));
 
 	};
 	

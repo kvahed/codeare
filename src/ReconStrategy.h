@@ -80,8 +80,8 @@ public:
 	GetRaw           (raw_data* raw)   {
 		
 		for (int i = 0; i < m_raw.Size(); i++) {
-			raw->dreal[i] = abs(m_raw[i]);
-			raw->dimag[i] = arg(m_raw[i]); 
+			raw->dreal[i] = m_raw[i].real();
+			raw->dimag[i] = m_raw[i].imag(); 
 		}
 			
 	}

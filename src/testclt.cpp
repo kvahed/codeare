@@ -21,13 +21,16 @@
 #include "options.h"
 #include "Matrix.h"
 #include "ReconClient.h"
+
 #ifndef __WIN32__
-#include "config.h"
+    #include "config.h"
 #endif
 
 #ifndef SVN_REVISION
 	#define SVN_REVISION "unkown"
 #endif
+
+using namespace std;
 
 char*  name;
 char*  base;
@@ -36,40 +39,51 @@ char*  test;
 
 bool init (int argc, char** argv);
 
-
 int main (int argc, char** argv) {
 	
 	if (init (argc, argv)) {
-
+		
 		ReconClient client (name, debug);
-		int         i = 0, j = 0, d = 512;
-
-		Matrix< std::complex<float> > raw   (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		int         i = 0, j = 0, d = 8;
+		
+		Matrix< complex<float> > raw   (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		Matrix< short >          pixel (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
 		for (i = 0; i < d; i++)
 			for (j = 0; j < d; j++) {
-				raw.at(i,j) = std::complex<float> ((float) i, (float) j);
+				raw.at(i,j) = complex<float> ((float) i, (float) j);
 				pixel.at(i,j) = (i+1)*(j+1);
 			}
 		
-		for (i = 0; i < 100; i++) {
-
-			client.SetRaw(raw);
-			client.SetPixel(pixel);
-			
-			client.SetAttribute("UID", "1234");
-			client.SetAttribute("Pi", 3.1415);
-			client.SetAttribute("Dim", d);
-			
-			client.Process(test);
-			
-			client.GetRaw(raw);
-			client.GetPixel(pixel);
-
+		for (i = 0; i < d; i++) {
+			for (j = 0; j < d; j++) 
+				printf (" %2i", pixel.at(i,j));
+			std::cout << std::endl;
 		}
-			
-		std::cout << "We're good" << endl;
+
+		std::cout << std::endl;
+
+		client.SetRaw(raw);
+		client.SetPixel(pixel);
+		
+		client.SetAttribute("UID", "1234");
+		client.SetAttribute("Pi", 3.1415);
+		client.SetAttribute("Dim", d);
+		
+		client.Process(test);
+
+		client.GetRaw(raw);
+		client.GetPixel(pixel);
+
+		for (i = 0; i < d; i++) {
+			for (j = 0; j < d; j++) 
+				printf (" %2i", pixel.at(i,j));
+			std::cout << std::endl;
+		}
+
+		std::cout << std::endl;
+
+		cout << "We're good" << endl;
 		
 		return 0;
 
@@ -82,25 +96,25 @@ int main (int argc, char** argv) {
 
 bool init (int argc, char** argv) {
 
-	std::cout << endl;
+	cout << endl;
 #ifdef VERSION
-	std::cout << "jrrs "         << VERSION                                        << endl;
+	cout << "jrrs "         << VERSION                                        << endl;
 #else
-	std::cout << "jrrs "         << endl;
+	cout << "jrrs "         << endl;
 #endif
-	std::cout << "juelich remote reconstruction service "                          << endl;
+	cout << "juelich remote reconstruction service "                          << endl;
 #ifdef SVN_REVISION
-	std::cout << "Test client "  << " [build " << SVN_REVISION << "]"              << endl;
+	cout << "Test client "  << " [build " << SVN_REVISION << "]"              << endl;
 #else
-	std::cout << "Test client "  << endl;
+	cout << "Test client "  << endl;
 #endif
 
-    std::cout << "Copyright (C) 2010"                                              << endl;
-	std::cout << "Kaveh Vahedipour - k.vahedipour@fz-juelich.de"                   << endl;
-	std::cout << "Juelich Research Centre"                                         << endl;
-	std::cout << "Institute of Neuroscience and Medicine"                          << endl;
-	std::cout << "Medical Imaging Physics"                                         << endl;
-	std::cout << endl;
+    cout << "Copyright (C) 2010"                                              << endl;
+	cout << "Kaveh Vahedipour - k.vahedipour@fz-juelich.de"                   << endl;
+	cout << "Juelich Research Centre"                                         << endl;
+	cout << "Institute of Neuroscience and Medicine"                          << endl;
+	cout << "Medical Imaging Physics"                                         << endl;
+	cout << endl;
 
 	Options *opt = new Options();
 	
