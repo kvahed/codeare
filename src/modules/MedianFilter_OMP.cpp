@@ -70,7 +70,8 @@ RRSModule::error_code MedianFilter_OMP::Process () {
 		int chunk    = iw/nthreads; //chunk-size for loop splitting
 
 		if (tid==0) 
-			cout << "MedianFilter_OMP::Process() running on " << iw << "x" << ih << " image with " << nthreads << " threads" << endl; 
+			std::cout << "MedianFilter_OMP::Process() running on " << iw << "x" << ih 
+					  << " image with " << nthreads << " threads" << std::endl; 
 
 #pragma omp for schedule(dynamic,chunk)
 		for (x=0; x<iw; ++x)

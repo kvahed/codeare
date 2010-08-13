@@ -26,7 +26,7 @@ DumpToFile::DumpToFile () {}
 error_code 
 DumpToFile::Process () {
 
-	stringstream fname;
+	std::stringstream fname;
 	const char* uid = Attribute ("UID");
 
 	fname << uid << "_raw.bin";

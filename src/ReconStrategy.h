@@ -38,7 +38,6 @@
 #include <complex>
 
 
-using namespace std;
 using namespace RRSModule;
 
 /**
@@ -102,7 +101,7 @@ public:
 		m_raw.Reset (dim);
 
 		for (i = 0; i < m_raw.Size(); i++)
-			m_raw[i] =  complex<float> (raw->dreal[i], raw->dimag[i]);
+			m_raw[i] =  std::complex<float> (raw->dreal[i], raw->dimag[i]);
 		
 	};
 	
@@ -134,7 +133,7 @@ public:
 		m_helper.Reset (dim);
 
 		for (i = 0; i < m_helper.Size(); i++)
-			m_helper[i] =  complex<float> (helper->dreal[i], helper->dimag[i]);
+			m_helper[i] =  std::complex<float> (helper->dreal[i], helper->dimag[i]);
 		
 	};
 	
@@ -170,9 +169,9 @@ public:
 	
 protected:
 
-	Matrix< complex<float> > m_raw;         /*!< raw data matrix                    */
-	Matrix< complex<float> > m_helper;      /*!< helper matrix                      */
-	Matrix< short >          m_pixel;       /*!< pixel data matrix                  */
+	Matrix< std::complex<float> > m_raw;         /*!< raw data matrix                    */
+	Matrix< std::complex<float> > m_helper;      /*!< helper matrix                      */
+	Matrix< short >               m_pixel;       /*!< pixel data matrix                  */
 
 };
 

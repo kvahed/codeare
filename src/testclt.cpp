@@ -29,8 +29,6 @@
 	#define SVN_REVISION "unkown"
 #endif
 
-using namespace std;
-
 char*  name;
 char*  base;
 char*  debug;
@@ -46,28 +44,32 @@ int main (int argc, char** argv) {
 		ReconClient client (name, debug);
 		int         i = 0, j = 0, d = 512;
 
-		Matrix< complex<float> > raw   (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix< std::complex<float> > raw   (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		Matrix< short >          pixel (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
 		for (i = 0; i < d; i++)
 			for (j = 0; j < d; j++) {
-				raw.at(i,j) = complex<float> ((float) i, (float) j);
+				raw.at(i,j) = std::complex<float> ((float) i, (float) j);
 				pixel.at(i,j) = (i+1)*(j+1);
 			}
 		
-		client.SetRaw(raw);
-		client.SetPixel(pixel);
+		for (i = 0; i < 100; i++) {
 
-		client.SetAttribute("UID", "1234");
-		client.SetAttribute("Pi", 3.1415);
-		client.SetAttribute("Dim", d);
-		
-		client.Process(test);
+			client.SetRaw(raw);
+			client.SetPixel(pixel);
+			
+			client.SetAttribute("UID", "1234");
+			client.SetAttribute("Pi", 3.1415);
+			client.SetAttribute("Dim", d);
+			
+			client.Process(test);
+			
+			client.GetRaw(raw);
+			client.GetPixel(pixel);
 
-		client.GetRaw(raw);
-		client.GetPixel(pixel);
-
-		cout << "We're good" << endl;
+		}
+			
+		std::cout << "We're good" << endl;
 		
 		return 0;
 
@@ -80,25 +82,25 @@ int main (int argc, char** argv) {
 
 bool init (int argc, char** argv) {
 
-	cout << endl;
+	std::cout << endl;
 #ifdef VERSION
-	cout << "jrrs "         << VERSION                                        << endl;
+	std::cout << "jrrs "         << VERSION                                        << endl;
 #else
-	cout << "jrrs "         << endl;
+	std::cout << "jrrs "         << endl;
 #endif
-	cout << "juelich remote reconstruction service "                          << endl;
+	std::cout << "juelich remote reconstruction service "                          << endl;
 #ifdef SVN_REVISION
-	cout << "Test client "  << " [build " << SVN_REVISION << "]"              << endl;
+	std::cout << "Test client "  << " [build " << SVN_REVISION << "]"              << endl;
 #else
-	cout << "Test client "  << endl;
+	std::cout << "Test client "  << endl;
 #endif
 
-    cout << "Copyright (C) 2010"                                              << endl;
-	cout << "Kaveh Vahedipour - k.vahedipour@fz-juelich.de"                   << endl;
-	cout << "Juelich Research Centre"                                         << endl;
-	cout << "Institute of Neuroscience and Medicine"                          << endl;
-	cout << "Medical Imaging Physics"                                         << endl;
-	cout << endl;
+    std::cout << "Copyright (C) 2010"                                              << endl;
+	std::cout << "Kaveh Vahedipour - k.vahedipour@fz-juelich.de"                   << endl;
+	std::cout << "Juelich Research Centre"                                         << endl;
+	std::cout << "Institute of Neuroscience and Medicine"                          << endl;
+	std::cout << "Medical Imaging Physics"                                         << endl;
+	std::cout << endl;
 
 	Options *opt = new Options();
 	

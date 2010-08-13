@@ -44,7 +44,7 @@ ReconServant::Process  (const char* name)       {
 
 	error_code e = OK;
 
-	cout << "Setting incoming data ... " << endl;
+	std::cout << "Setting incoming data ... " << std::endl;
 
 	ReconContext* context = new ReconContext(name);
 
@@ -54,22 +54,22 @@ ReconServant::Process  (const char* name)       {
 
 	context->Strategy()->SetConfig(m_config);
 	
-	cout << "... done. Will invoke data procession ... " << endl;
+	std::cout << "... done. Will invoke data procession ... " << std::endl;
 	
 	e = context->Strategy()->Process();
 	
-	cout << "... done. Getting processed data..." << endl;
+	std::cout << "... done. Getting processed data..." << std::endl;
 	
 	context->Strategy()->GetRaw(&m_raw);
 	context->Strategy()->GetHelper(&m_helper);
 	context->Strategy()->GetPixel(&m_pixel);
 	context->Strategy()->GetConfig(m_config);
 	
-	cout << "... done. Deleting context ..." << endl;
+	std::cout << "... done. Deleting context ..." << std::endl;
 
 	delete context;
 
-	cout << "... done. Will handle control back to client." << endl;
+	std::cout << "... done. Will handle control back to client." << std::endl;
 	
 	return e;
 	
@@ -121,7 +121,7 @@ ReconServant::pixel        ()                    {
 /**************************************************************************************************/
 void 
 ReconServant::config       (const char* d)    {
-	stringstream tmp;
+	std::stringstream tmp;
 	tmp << d;
 	m_config = new char[tmp.str().length()];
 	strcpy (m_config, tmp.str().c_str());
@@ -131,7 +131,7 @@ ReconServant::config       (const char* d)    {
 /**************************************************************************************************/
 char* 
 ReconServant::config       ()                    {
-	stringstream tmp;
+	std::stringstream tmp;
 	tmp << m_config;
 	return CORBA::string_dup(tmp.str().c_str());
 }

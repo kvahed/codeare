@@ -20,11 +20,12 @@
 
 #include "DummyRecon.h"
 
+DummyRecon::DummyRecon  () {};
+DummyRecon::~DummyRecon () {};
+
 RRSModule::error_code
-Process () { 
-
+DummyRecon::Process     () { 
 	return RRSModule::OK;
-
 };
 
 // the class factories

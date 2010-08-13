@@ -25,8 +25,6 @@
 
 #include "ReconStrategy.h"
 
-using namespace std;
-
 
 /**
  * @brief Context of a reconstruction method
