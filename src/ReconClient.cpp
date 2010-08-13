@@ -122,8 +122,8 @@ ReconClient::~ReconClient         ()            {
 error_code 
 ReconClient::Process  (const char* name)  {
     
-    error_code result  = OK;
-	string     confstr = "";
+    error_code  result  = OK;
+	std::string confstr = "";
 
     // Send data for procession to remote interface
     m_rrsi->raw    (m_raw[0]);

@@ -115,7 +115,7 @@ class Configurable {
 	inline void 
 	GetConfig           (char* cstr) {
 
-		string temp = "";
+		std::string temp = "";
 		temp << *(m_config_doc);
 		strcpy (cstr, temp.c_str());
 
@@ -128,7 +128,7 @@ class Configurable {
 	inline const char*
 	GetConfig           ()             {
 
-		string temp = "";
+		std::string temp = "";
 		temp << *(m_config_doc);
 		return temp.c_str();
 

@@ -21,7 +21,7 @@
 #ifndef __MATRIX_H__
 #define __MATRIX_H__
 
-#ifdef ICEIDEAFUNCTORS_EXPORTS
+#ifdef PARC_MODULE_NAME
 
   #include     "MrServers/MrVista/include/Ice/IceBasic/IceAs.h"
   #include     "MrServers/MrVista/include/Ice/IceBasic/IceObj.h"
@@ -71,7 +71,6 @@ static int nb_alloc = 0;
 # define PI  3.1415926535897931159979634685441851615906
 
 
-using namespace std;
 
 /**
  * @brief   Matrix template
@@ -170,7 +169,7 @@ public:
     //{@
 
     // If compiled within IDEA we know of access specifiers.
-    #ifdef ICEIDEAFUNCTORS_EXPORTS
+    #ifdef PARC_MODULE_NAME
     
     /**
      * @brief           Reset and fill data from IceAs

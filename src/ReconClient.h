@@ -32,7 +32,6 @@
     #include "RRSModule.hh"
 #endif
 
-using namespace std;
 using namespace RRSModule;
                                                                                 
 
@@ -77,7 +76,7 @@ public:
 	 * @param  M        Given matrix
 	 */
 	void 
-	SetRaw              (Matrix< complex<float> >& M) {
+	SetRaw              (Matrix< std::complex<float> >& M) {
 		
 		floats dreal;
 		floats dimag;
@@ -109,7 +108,7 @@ public:
 	 * @param  M        Given matrix
 	 */
 	void 
-	GetRaw              (Matrix< complex<float> >& M) {
+	GetRaw              (Matrix< std::complex<float> >& M) {
 		
 		int             dim[INVALID_DIM], i;
 
@@ -118,7 +117,7 @@ public:
 		
 		M.Reset(dim);
 		for (i = 0; i < GetRawSize(); i++)
-			M[i] = complex<float>(m_raw->dreal[i],m_raw->dimag[i]);
+			M[i] = std::complex<float>(m_raw->dreal[i],m_raw->dimag[i]);
 		
 	};
 	
@@ -129,7 +128,7 @@ public:
 	 * @param  M        Given matrix
 	 */
 	void
-	SetHelper              (Matrix< complex<float> >& M) {
+	SetHelper              (Matrix< std::complex<float> >& M) {
 
 		floats dreal;
 		floats dimag;
@@ -161,7 +160,7 @@ public:
 	 * @param  M        Given matrix
 	 */
 	void
-	GetHelper              (Matrix< complex<float> >& M) {
+	GetHelper              (Matrix< std::complex<float> >& M) {
 
 		int             dim[INVALID_DIM], i;
 		for (i = 0; i < INVALID_DIM; i++)
@@ -169,7 +168,7 @@ public:
 		
 		M.Reset(dim);
 		for (i = 0; i < GetHelperSize(); i++)
-			M[i] = complex<float>(m_helper->dreal[i],m_helper->dimag[i]);
+			M[i] = std::complex<float>(m_helper->dreal[i],m_helper->dimag[i]);
 		
 	};
 
