@@ -112,8 +112,8 @@ public:
 	GetHelper           (raw_data* helper)   {
 
 		for (int i = 0; i < m_helper.Size(); i++) {
-			helper->dreal[i] = abs(m_helper[i]);
-			helper->dimag[i] = arg(m_helper[i]); 
+			helper->dreal[i] = m_helper[i].real();
+			helper->dimag[i] = m_helper[i].imag(); 
 		}
 			
 	}
