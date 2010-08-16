@@ -100,6 +100,11 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
     m_helper->dims.length(INVALID_DIM);
     m_pixel->dims.length(INVALID_DIM);
 
+	for (int i = 0; i < INVALID_DIM; i++) {
+		m_raw->dims[i] = 0;
+		m_helper->dims[i] = 0;
+		m_pixel->dims[i] = 0;
+	}
 
 };
 
@@ -125,14 +130,14 @@ ReconClient::Process  (const char* name)  {
     error_code  result  = OK;
 	std::string confstr = "";
 
-    // Send data for procession to remote interface
-    m_rrsi->raw    (m_raw[0]);
-    m_rrsi->helper (m_helper[0]);
-    m_rrsi->pixel  (m_pixel[0]);
-
-	// Serialize configuration and send to remote interface
+	// Prepare configuration for the journey
 	std::stringstream  temp;
 	temp << GetConfig();
+
+    // Send data for procession to remote interface
+    m_rrsi->raw    (*(m_raw));
+    m_rrsi->helper (*(m_helper));
+    m_rrsi->pixel  (*(m_pixel));
 	m_rrsi->config (temp.str().c_str());
 	
     // Process through remote interface
