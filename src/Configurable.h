@@ -130,7 +130,9 @@ class Configurable {
 
 		std::string temp = "";
 		temp << *(m_config_doc);
-		return temp.c_str();
+		char* t = new char[temp.length()];
+		strcpy (t, temp.c_str());
+		return t;
 
 	}
 
