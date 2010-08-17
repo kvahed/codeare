@@ -140,19 +140,18 @@ public:
     
     
     /**
-     * @brief           Constructs an uninitialised matrix with desired size in integer matrix.
-     *
-     * @param  dim      Integer vector of 16 elements with dimensions in following order (In acordance to ICE):
-     *                  COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE
-     */
-    inline              
-    Matrix              (Matrix<int> &dim);
-    
-
-    /**
      * @brief           Delete array containing data.
      */
     ~Matrix             ();
+
+
+	/**
+	 * @brief           Copy constructor
+	 *
+	 * @param  M        Right hand side
+	 */
+	inline 
+	Matrix              (const Matrix<T> &M);
 
     //@}
 
@@ -611,6 +610,15 @@ public:
      *
      * @return          Number of rows.
      */
+    inline int&          
+    Dim                 (int i)                                 {return _dim[i];}
+    
+    
+    /**
+     * @brief           Get size a given dimension.
+     *
+     * @return          Number of rows.
+     */
     inline const int*   
     Dim                 ()                                     const {return _dim;}
     
@@ -636,6 +644,25 @@ public:
 
     	for (int i = 0; i < INVALID_DIM; i++)
             _dim[i] = dim[i];
+
+        if (nb_alloc) {
+            delete [] (_M);
+            nb_alloc = 0;
+        }
+
+        _M = new T[Size()]();
+        nb_alloc = 1;
+
+    }
+    
+
+    /**
+     * @brief           Resize to dim and zero
+     *
+     * @param  dim      New dimensions
+     */
+    inline void         
+    Reset               ()                                      {
 
         if (nb_alloc) {
             delete [] (_M);
@@ -1080,21 +1107,21 @@ Matrix<T>::Matrix (int col, int lin, int cha, int set,
 };
 
 
-template <class T> 
-Matrix<T>::Matrix (Matrix<int> &dim) {
+template <class T>
+Matrix<T>::Matrix (const Matrix<T> &M)
+{
 
-    assert (dim.Size() == INVALID_DIM);
+	for (int i = 0; i < INVALID_DIM; i++) 
+		_dim[i] = M.Dim(i);
 
-    for (int i = 0; i < INVALID_DIM; i++) {
-        _dim[i] = dim[i];
-    }
-                             
+	_M = new T[Size()]();
 
-    _M = new T[Size()]();
-    nb_alloc = 1;
+	for (int k = 0; k < M.Size(); k++)
+		_M[k] = M[k];
+	
+	nb_alloc = 1;
 
-};
-
+}
 
 #ifdef PARC_MODULE_NAME
 

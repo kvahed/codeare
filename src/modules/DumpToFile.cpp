@@ -29,6 +29,9 @@ DumpToFile::Process () {
 	std::stringstream fname;
 	const char* uid = Attribute ("UID");
 
+	if (uid == 0  ||  uid == "")
+		uid = "unspecified";
+
 	fname << uid << "_raw.bin";
 	m_raw.dump    (fname.str().c_str());
 

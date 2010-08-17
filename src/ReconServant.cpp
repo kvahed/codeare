@@ -27,6 +27,10 @@ ReconServant::ReconServant  ()               {
 
 	m_config = new char;
 
+	m_raw.dims.length(INVALID_DIM);
+	m_helper.dims.length(INVALID_DIM);
+    m_pixel.dims.length(INVALID_DIM);
+
 }
 
 
@@ -51,7 +55,6 @@ ReconServant::Process  (const char* name)       {
 	context->Strategy()->SetRaw(&m_raw);
 	context->Strategy()->SetHelper(&m_helper);
 	context->Strategy()->SetPixel(&m_pixel);
-
 	context->Strategy()->SetConfig(m_config);
 	
 	std::cout << "... done. Will invoke data procession ... " << std::endl;

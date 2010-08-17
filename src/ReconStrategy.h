@@ -92,16 +92,13 @@ public:
 	void 
 	SetRaw           (const raw_data* raw)   {
 
-		int dim[INVALID_DIM];
-		int i = 0;
+		for (int i = 0; i < INVALID_DIM; i++)
+			m_raw.Dim(i) = raw->dims[i];
 		
-		for (i = 0; i < INVALID_DIM; i++)
-			dim[i] = raw->dims[i];
+		m_raw.Reset ();
 		
-		m_raw.Reset (dim);
-		
-		for (i = 0; i < m_raw.Size(); i++)
-			m_raw[i] =  std::complex<float> (raw->dreal[i], raw->dimag[i]);
+		for (int j = 0; j < m_raw.Size(); j++)
+			m_raw[j] =  std::complex<float> (raw->dreal[j], raw->dimag[j]);
 		
 	};
 	
@@ -124,16 +121,13 @@ public:
 	void 
 	SetHelper           (const raw_data* helper)   {
 
-		int dim[INVALID_DIM];
-		int i = 0;
+		for (int i = 0; i < INVALID_DIM; i++)
+			m_helper.Dim(i) = helper->dims[i];
 
-		for (i = 0; i < INVALID_DIM; i++)
-			dim[i] = helper->dims[i];
+		m_helper.Reset ();
 
-		m_helper.Reset (dim);
-
-		for (i = 0; i < m_helper.Size(); i++)
-			m_helper[i] =  std::complex<float> (helper->dreal[i], helper->dimag[i]);
+		for (int j = 0; j < m_helper.Size(); j++)
+			m_helper[j] =  std::complex<float> (helper->dreal[j], helper->dimag[j]);
 		
 	};
 	
@@ -154,16 +148,13 @@ public:
 	void 
 	SetPixel           (const pixel_data* pixel)   {
 
-		int dim[INVALID_DIM];
-		int i = 0;
+		for (int i = 0; i < INVALID_DIM; i++)
+			m_pixel.Dim(i) = pixel->dims[i];
 
-		for (i = 0; i < INVALID_DIM; i++)
-			dim[i] = pixel->dims[i];
+		m_pixel.Reset ();
 
-		m_pixel.Reset (dim);
-
-		for (i = 0; i < m_pixel.Size(); i++) 
-			m_pixel[i] =  pixel->vals[i];
+		for (int j = 0; j < m_pixel.Size(); j++) 
+			m_pixel[j] =  pixel->vals[j];
 		
 	};
 	
