@@ -23,6 +23,8 @@
 
 #include "ReconStrategy.h"
 
+typedef std::complex<float> raw;
+
 /**
  * @brief Non uniform FFT
  */
@@ -56,16 +58,16 @@ private:
 	 * @brief Multiply with Hermitian counterpart of the k-space sampling 
 	 */
 	void
-	EH (Matrix* in, Matrix* out);
+	EH (Matrix< raw >* in, Matrix< raw >* out);
 
 	/**
 	 * @brief Multiply with spatial image data of 
 	 */
 	void
-	E  (Matrix* in, Matrix* out);
+	E  (Matrix< raw >* in, Matrix< raw >* out);
 
-	Matrix < std::complex<float> > m_sens;
-	Matrix < std::complex<float> > m_temp;
+	Matrix < raw > m_sens;
+	Matrix < raw > m_temp;
 
 	unsigned short int             m_iter;
 	

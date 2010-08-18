@@ -8,7 +8,7 @@ COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = CGSENSE.la DummyRecon.la DumpToFile.la GenericRegrid.la InvertOrder.la MedianFilter_OMP.la NuFFT.la 
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la InvertOrder.la MedianFilter_OMP.la NuFFT.la CGSENSE.la 
 
 DummyRecon_la_SOURCES = $(COMMON) DummyRecon.h DummyRecon.cpp
 DummyRecon_la_LDFLAGS = -module
@@ -27,3 +27,7 @@ InvertOrder_la_LDFLAGS = -module
 
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.h DumpToFile.cpp
 DumpToFile_la_LDFLAGS = -module
+
+CGSENSE_la_SOURCES = $(COMMON) CGSENSE.h CGSENSE.cpp
+CGSENSE_la_LDFLAGS = -module
+
