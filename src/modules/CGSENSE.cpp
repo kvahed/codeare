@@ -20,30 +20,45 @@ CGSENSE::CGSENSE () {
 
 	m_raw.Reset();
 
+	
+
 }
 
-void 
-CGSENSE::E  (Matrix< raw >* in, Matrix< raw >* out) {
-	
-	int ncoils   = m_sens.Dim(CHA);
-	int nsamples = m_raw.Size(); 
 
-	// Full density k-spaces per coil
-	Matrix<raw> fdkspaces;
+E  (Matrix<raw>* data_in, matrix<raw>* sensitivity, Matrix<raw>* k, Matrix<raw>* data_out) {
+	
+	int ncoils   = sensitivity->Dim(CHA);
+	int nsamples = data_in->Size(); 
+
+	// Full density k-spaces 
+	Matrix<raw> FT;
 	out->Reset(m_raw.Dim());
-	
+
 	// Reverse grid full density k-space on actual trajectory
-	
+
+	return 0;
 
 }
 
-void 
-CGSENSE::EH (Matrix< raw >* in, Matrix< raw >* out) {
 
-	int ncoils   = m_sens.Dim(CHA);
-	int nsamples = m_raw.Size(); 
 
-	// Backward nufft
+EH (Matrix<raw>* data_in, matrix<raw>* sensitivity, Matrix<raw>* k, Matrix<raw>* data_out) {
+
+	int ncoils   = sensitivity->Dim(CHA);
+	int nsamples = data_in->Size(); 
+
+}
+
+RRSModules::error_code
+Process () {
+
+	// CG iterations
+	for (int iter = 0; i < m_iter; i++) {
+
+		EH (p, s, k, q);
+		E  (q, s, k, q);
+		
+	}
 
 }
 

@@ -33,4 +33,3 @@ DumpToFile_la_LDFLAGS = -module
 
 CGSENSE_la_SOURCES = $(COMMON) CGSENSE.h CGSENSE.cpp
 CGSENSE_la_LDFLAGS = -module -lnoncart
-
