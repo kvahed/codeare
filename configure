@@ -10608,7 +10608,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"113M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"113:114M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -14792,7 +14792,7 @@ rm -f core conftest.err conftest.$ac_objext \
 if test -z $noncart_found; then
     LIBS="${LIBS} -lnoncart"
 fi
- if test x$noncart_found = xtrue; then
+ if test x$noncart_found = xyes; then
   NONCART_TRUE=
   NONCART_FALSE='#'
 else

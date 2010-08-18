@@ -68,7 +68,7 @@ AC_TRY_LINK([#include "noncart/nufft.h"],
 if test -z $noncart_found; then
     LIBS="${LIBS} -lnoncart"
 fi
-AM_CONDITIONAL([NONCART], [test x$noncart_found = xtrue])
+AM_CONDITIONAL([NONCART], [test x$noncart_found = xyes])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

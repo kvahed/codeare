@@ -23,7 +23,7 @@
 
 #include "ReconStrategy.h"
 
-#include <nufft.h>
+#include <noncart/nufft.h>
 
 typedef std::complex<float> raw;
 
