@@ -19,7 +19,7 @@ AC_PROG_LIBTOOL
 
 # Set programming language
 AC_LANG(C++)
-#AC_OPENMP
+AC_OPENMP
 
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
@@ -31,12 +31,13 @@ AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find cstdlib, bai
 AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find ctime, bailing out])])
 AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
 AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/CORBA.h, bailing out])])
+AC_CHECK_HEADERS([noncart/nufft.h], [], [AC_MSG_RESULT([cannot find noncart/nufft.h, NuFFT/CGSENSE unavailable!])])
 
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read],   [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
 AC_CHECK_LIB([omniDynamic4], [main],   [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
 AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
-#AC_CHECK_LIB([gomp], [omp_get_num_threads], [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
+
 
 # Checks for C++ libraries with name spaces
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
@@ -54,6 +55,20 @@ AC_TRY_LINK([#include "src/RRSModule.hh"],
 if test -z $omniORB4_found; then
     LIBS="${LIBS} -lomniORB4"
 fi
+
+AC_MSG_CHECKING([for noncart::nufft() in -lnoncart])
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -lnoncart"
+AC_TRY_LINK([#include "noncart/nufft.h"],
+   [int argc = 0; noncart::nufft nufft;],
+   [AC_MSG_RESULT([yes])]
+   noncart_found=yes,
+   [LIBS=$OLD_LIBS]
+   [AC_MSG_RESULT([no. cannot find libnoncart, NuFFT/CGSENSE unavailable ])])
+if test -z $noncart_found; then
+    LIBS="${LIBS} -lnoncart"
+fi
+AM_CONDITIONAL([NONCART], [test x$noncart_found = xtrue])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

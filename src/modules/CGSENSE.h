@@ -23,6 +23,8 @@
 
 #include "ReconStrategy.h"
 
+#include <nufft.h>
+
 typedef std::complex<float> raw;
 
 /**
@@ -66,12 +68,14 @@ private:
 	void
 	E  (Matrix< raw >* in, Matrix< raw >* out);
 
-	Matrix < raw > m_sens;
-	Matrix < raw > m_temp;
+	Matrix < raw >     m_sens;
+	Matrix < raw >     m_temp;
 
-	unsigned short int             m_iter;
+	unsigned short int m_iter;
 	
-	
+	int                m_verbose;
+
+	noncart::nufft     m_nufft;
 
 };
 

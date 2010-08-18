@@ -16,7 +16,7 @@ CGSENSE::CGSENSE () {
 	// Keep iterations [LOTS OF DATA]? Allocate data.
 	Attribute ("verbose", (int*) &m_verbose);
 	if (m_verbose)
-		m_raw.Dim(SET) = m_interations;
+		m_raw.Dim(SET) = m_iter;
 
 	m_raw.Reset();
 
