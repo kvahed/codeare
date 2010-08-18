@@ -65,9 +65,6 @@ AC_TRY_LINK([#include "noncart/nufft.h"],
    noncart_found=yes,
    [LIBS=$OLD_LIBS]
    [AC_MSG_RESULT([no. cannot find libnoncart, NuFFT/CGSENSE unavailable ])])
-if test -z $noncart_found; then
-    LIBS="${LIBS} -lnoncart"
-fi
 AM_CONDITIONAL([NONCART], [test x$noncart_found = xyes])
 
 # Checks for typedefs, structures, and compiler characteristics.
