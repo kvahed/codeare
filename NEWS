@@ -1,0 +1,4 @@
+0.4 (2010-08-12)
+
+		Reconstruction algos loaded now at runtime.
+		Reconstrcution algos are configured now on client side with XML backend.

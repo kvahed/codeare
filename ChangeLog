@@ -1,0 +1,12 @@
+2010-08-12 Kaveh Vahedipour <k.vahedipour@fz-juelich.de> (0.4)
+	
+	* ReconStrategy.h configured now with XML backend
+	* RRSModule.idl removed obsolete labels and introduced config
+	* ReconClient.h configures remote interface with XML
+	* testclt.cpp reflects those changes
+	* ReconContext.h loads modules dynamically with this version
+	* ReconContext.cpp ditto
+	* Loader.h introduced for the above
+	* configure.ac checks now for -ldl
+
+	
