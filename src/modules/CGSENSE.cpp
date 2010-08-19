@@ -19,17 +19,28 @@ CGSENSE::CGSENSE () {
 		m_raw.Dim(SET) = m_iter;
 
 	m_raw.Reset();
+	
+	int N [2] = {m_raw.Dim(COL), m_raw.Dim(LIN)};
+	int Nk[2] = {m_helper.Dim(COL), m_helper.Dim(LIN)}; 
+	
+	m_nufft.init (2, N, Nk, &m_helper[0], 2, 2.4, 32, 0, 0);
+
 
 }
 
 
+/**
+ * @brief               Compute left hand side (i.e. Multiply E with spatial (image) data)
+ *
+ * @param  in           Original discretised sample O (Nx x Ny)
+ * @param  sens         Sensitivity maps            O (Nx x Ny x Nc)
+ * @param  traj         k-space trajectory          O (Nk x 1)
+ * @param  out          Result                      O (Nk x Nc)
+ */
 RRSModule::error_code 
-E  (Matrix<raw>* data_in, Matrix<raw>* sensitivity, Matrix<raw>* k, Matrix<raw>* data_out) {
+E  (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, Matrix<raw>* out) {
 	
 	/*
-	  Nb_coils = size(sensitivity,3);
-
-	  Nb_samples = size(k,1);
 	  FT = cell(1,Nb_coils);
 	  data_out = zeros(Nb_samples,Nb_coils);
 	  %pos = [6 3 2 1 4 7 8 9];
@@ -53,26 +64,46 @@ E  (Matrix<raw>* data_in, Matrix<raw>* sensitivity, Matrix<raw>* k, Matrix<raw>*
 	  end
 	  end
 	*/
-	int ncoils   = sensitivity->Dim(CHA);
-	int nsamples = data_in->Size(); 
+
+	int nc   = sm->Dim(CHA);
+	int nk   = in->Dim(COL); 
+
+	int nx   = sm->Dim(COL);
+	int ny   = sm->Dim(LIN);
+	int nz   = sm->Dim(SLC);
 
 	// Full density k-spaces 
-	Matrix<raw> FT;
+	Matrix<raw>* tmp = new Matrix<raw> (nx, ny, nz, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); 
+	((noncart::nufft*)ncs)->forward_2d(in, out);
+
+		
+
+		//fftshift(fftn(data_in.*sensitivity(:,:,ind_coil)));
 
 	// Reverse grid full density k-space on actual trajectory
 	return OK;
 
 }
 
-RRSModule::error_code
-EH (Matrix<raw>* data_in, Matrix<raw>* sensitivity, Matrix<raw>* k, Matrix<raw>* data_out) {
 
-	int ncoils   = sensitivity->Dim(CHA);
-	int nsamples = data_in->Size(); 
+/**
+ * @brief               Compute right hand side (i.e. Multiply EH, Hermitian counterpart to E, with k-space data)
+ *
+ * @param  in           K-space samples along trajectory O (Nk x Nc)
+ * @param  sens         Sensitivity maps                 O (Nx x Ny x Nc)
+ * @param  traj         k-space trajectory               O (Nk x 1)
+ * @param  out          Returned product                 O (Nx x Ny)
+ */
+RRSModule::error_code
+EH (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, Matrix<raw>* out) {
+
+	int ncoils   = sm->Dim(CHA);
+	int nsamples = in->Size(); 
 
 	return OK;
 
 }
+
 
 RRSModule::error_code
 CGSENSE::Process () {
@@ -82,12 +113,12 @@ CGSENSE::Process () {
 	// CG iterations
 	for (int iter = 0; iter < m_iter; iter++) {
 
-		EH (p, s, k, q);
+		EH (p, s, k, &m_nufft, q);
 
 		delete p;
 		p = new Matrix<raw> (*(q));
 
-		E  (p, s, k, q);
+		E  (p, s, k, &m_nufft, q);
 
 		/*
 		  delta = r(:)'*r(:)/(a(:)'*a(:));
