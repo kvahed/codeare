@@ -1335,13 +1335,13 @@ T Matrix<T>::Max() {
 template <class T>
 T  Matrix<T>::Maxabs() {
 
-    T old = fabs(_M[0]);
+    T max = fabs(_M[0]);
 
     for (int i = 0; i < Size(); i++)
-        if (fabs(_M[i]) > old)
-            old = fabs(_M[i]);
+        if (fabs(_M[i]) > max)
+            max = fabs(_M[i]);
 
-    return old;
+    return max;
 
 }
 
@@ -1349,13 +1349,13 @@ T  Matrix<T>::Maxabs() {
 template <class T>
 T Matrix<T>::Min() {
 
-    T old = _M[0];
+    T min = _M[0];
 
     for (int i = 0; i < Size(); i++)
-        if (_M[i] < old)
-            old = _M[i];
+        if (_M[i] < min)
+            min = _M[i];
 
-    return old;
+    return min;
 
 }
 

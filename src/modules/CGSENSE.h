@@ -56,24 +56,11 @@ public:
 
 private:
 
-	/**
-	 * @brief Multiply with Hermitian counterpart of the k-space sampling 
-	 */
-	void
-	EH (Matrix< raw >* in, Matrix< raw >* out);
-
-	/**
-	 * @brief Multiply with spatial image data of 
-	 */
-	void
-	E  (Matrix< raw >* in, Matrix< raw >* out);
+	int                m_iter;
+	int                m_verbose;
 
 	Matrix < raw >     m_sens;
 	Matrix < raw >     m_temp;
-
-	unsigned short int m_iter;
-	
-	int                m_verbose;
 
 	noncart::nufft     m_nufft;
 

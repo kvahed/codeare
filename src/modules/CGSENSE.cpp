@@ -20,43 +20,48 @@ CGSENSE::CGSENSE () {
 
 	m_raw.Reset();
 
-	
-
 }
 
 
-E  (Matrix<raw>* data_in, matrix<raw>* sensitivity, Matrix<raw>* k, Matrix<raw>* data_out) {
+RRSModule::error_code 
+E  (Matrix<raw>* data_in, Matrix<raw>* sensitivity, Matrix<raw>* k, Matrix<raw>* data_out) {
 	
 	int ncoils   = sensitivity->Dim(CHA);
 	int nsamples = data_in->Size(); 
 
 	// Full density k-spaces 
 	Matrix<raw> FT;
-	out->Reset(m_raw.Dim());
 
 	// Reverse grid full density k-space on actual trajectory
 
-	return 0;
+	return OK;
 
 }
 
-
-
-EH (Matrix<raw>* data_in, matrix<raw>* sensitivity, Matrix<raw>* k, Matrix<raw>* data_out) {
+RRSModule::error_code
+EH (Matrix<raw>* data_in, Matrix<raw>* sensitivity, Matrix<raw>* k, Matrix<raw>* data_out) {
 
 	int ncoils   = sensitivity->Dim(CHA);
 	int nsamples = data_in->Size(); 
 
+	return OK;
+
 }
 
-RRSModules::error_code
-Process () {
+RRSModule::error_code
+CGSENSE::Process () {
+
+	Matrix<raw> *p, *s, *k, *q;
 
 	// CG iterations
-	for (int iter = 0; i < m_iter; i++) {
+	for (int iter = 0; iter < m_iter; iter++) {
 
 		EH (p, s, k, q);
-		E  (q, s, k, q);
+
+		delete p;
+		p = new Matrix<raw> (*(q));
+
+		E  (p, s, k, q);
 		
 	}
 
