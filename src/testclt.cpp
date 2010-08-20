@@ -54,7 +54,7 @@ int main (int argc, char** argv) {
 				p.at(i,j) = (i-d/2+1)*(j-d/2+1);
 			}
 
-		Matrix<raw> n = r/r;
+		Matrix<raw> n = r.tr();
 
 		std::cout << n << std::endl;
 		std::cout << p.Minabs() << " " << p.Min() << std::endl;

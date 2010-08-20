@@ -803,7 +803,7 @@ public:
     
     
     /**
-     * @brief           Transposition. i.e. this'.
+     * @brief           Transposition / Complex conjugation. i.e. this'.
      */
     Matrix<T>           
     operator!           () const;
