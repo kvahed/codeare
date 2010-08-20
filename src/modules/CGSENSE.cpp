@@ -74,6 +74,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, M
 
 	// Full density k-spaces 
 	Matrix<raw>* tmp = new Matrix<raw> (nx, ny, nz, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); 
+	
 	((noncart::nufft*)ncs)->forward_2d(in, out);
 
 		

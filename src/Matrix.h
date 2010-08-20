@@ -36,10 +36,9 @@ enum IceDim {
 #endif
 
 #include <complex>
+#include <assert.h>
 #include <iostream>
 #include <fstream>
-#include <assert.h>
-
 
 /**
  * Short test if the matrix is a vector.
@@ -71,6 +70,12 @@ static int nb_alloc = 0;
 # define PI  3.1415926535897931159979634685441851615906
 
 
+/**
+ * @brief raw data
+ */
+typedef std::complex<float> raw;
+
+
 
 /**
  * @brief   Matrix template
@@ -82,7 +87,7 @@ static int nb_alloc = 0;
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
  */
-template <typename T>
+template <class T>
 class Matrix {
     
 
@@ -115,8 +120,8 @@ public:
     /**
      * @brief           Constructs a 1^16 matrix matrix with desired dimensions values = 0.
      *
-     * @param  col      Columns
-     * @param  lin      Lines
+     * @param  col      Scan
+     * @param  lin      Phase encoding lines
      * @param  cha      Channels
      * @param  set      Sets
      * @param  eco      Echoes
@@ -154,8 +159,6 @@ public:
 	Matrix              (const Matrix<T> &M);
 
     //@}
-
-
 
 
 
@@ -494,17 +497,6 @@ public:
     
     
     /**
-     * @brief           Get a vector with as copy of column c of this Matrix, i.e. this(:,c).
-	 *                  NOT IMPLEMETED YET
-     *
-     * @param  col      Requested column.
-     * @return          Vector copied from requested column.
-     */
-    Matrix<T>           
-    col                 (int col)                             const;
-    
-    
-    /**
      * @brief           Get a matrix as a copy of lines l[i] of this matrix, i.e. this(l,:);
      *                  NOT IMPLEMETED YET
      *
@@ -513,6 +505,17 @@ public:
      */
     Matrix<T>           
     lin                 (Matrix<int> lin)                     const;
+    
+    
+    /**
+     * @brief           Get a vector with as copy of column c of this Matrix, i.e. this(:,c).
+	 *                  NOT IMPLEMETED YET
+     *
+     * @param  col      Requested column.
+     * @return          Vector copied from requested column.
+     */
+    Matrix<T>           
+    col                 (int col)                             const;
     
     
     /**
@@ -526,6 +529,28 @@ public:
     col                 (Matrix<int> col)                     const;
 
 
+    /**
+     * @brief           Get a vector with as copy of line l of this Matrix, i.e. this(l,:).
+     *                  NOT IMPLEMETED YET
+     *
+     * @param  lin      Requested line.
+     * @return          Vector copied from requested row.
+     */
+    Matrix<T>          
+    slc                 (int slc)                             const;
+    
+    
+    /**
+     * @brief           Get a matrix as a copy of lines l[i] of this matrix, i.e. this(l,:);
+     *                  NOT IMPLEMETED YET
+     *
+     * @param  lin      Requested rows.
+     * @return          Matrix copied from requested rows.
+     */
+    Matrix<T>           
+    slc                 (Matrix<int> slc)                     const;
+    
+    
     /**
 	 * @brief           Get one or more elements of a vector, i.e. this(p).
 	 *                  NOT IMPLEMENTED YET
@@ -670,6 +695,10 @@ public:
         }
 
         _M = new T[Size()]();
+
+		for (int i = 0; i < Size(); i++)
+			_M[i] = (T) 0;
+
         nb_alloc = 1;
 
     }
@@ -724,7 +753,7 @@ public:
     
     
     /**
-     * @brief           Elementwise substruction of two matrices. i.e. this - M.
+     * @brief           Elementwise substruction of two matrices
      *
      * @param  M        Matrix substruent.
      */
@@ -733,7 +762,7 @@ public:
     
     
     /**
-     * @brief           Elementwise substruction all elements by a given value. i.e. this - s.
+     * @brief           Elementwise substruction all elements by a scalar
      *
      * @param  s        Scalar substruent.
      */
@@ -746,6 +775,31 @@ public:
      */
     Matrix<T>           
     operator-           ();
+    
+    
+    /**
+     * @brief           Elementwise addition of two matrices
+     *
+     * @param  M        Matrix substruent.
+     */
+    Matrix<T>           
+    operator+           (Matrix<T> &M);
+    
+    
+    /**
+     * @brief           Elementwise addition iof all elements with a scalar
+     *
+     * @param  s        Scalar substruent.
+     */
+    Matrix<T>           
+    operator+           (T s);
+    
+    
+    /**
+     * @brief           Add to 0
+     */
+    Matrix<T>           
+    operator+           ();
     
     
     /**
@@ -923,6 +977,20 @@ public:
     Matrix<T>           
     operator*           (T s);
     
+    /**
+     * @brief           Matrix multiplication. i.e. this * M.
+     *
+     * @param  M        The factor.
+     */
+    Matrix<T>           
+    operator/           (Matrix<T> &M);
+    
+    /**
+     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
+     */
+    Matrix<T>           
+    operator/           (T s);
+    
     //@}
     
     
@@ -942,8 +1010,8 @@ public:
      * @param  os       The output stream.
      * @return          The output stream.
      */
-    std::ostream        
-    &print              (std::ostream &os) const;
+    std::ostream&       
+    Print               (std::ostream &os) const;
     
 
     /**
@@ -952,8 +1020,8 @@ public:
      * @param  os       The output stream.
      * @return          The output stream.
      */
-    std::ostream        
-    &operator<<         (std::ostream &os);
+    std::ostream&
+    operator<<          (std::ostream &os);
 
 
     /**
@@ -1125,8 +1193,8 @@ Matrix<T>::Matrix (const Matrix<T> &M)
 
 #ifdef PARC_MODULE_NAME
 
-template <class T>
-long Matrix<T>::Import(IceAs ias, long pos) {
+template <class T> long 
+Matrix<T>::Import     (IceAs ias, long pos) {
     
     ICE_SET_FN("Matrix<T>::Import(IceAs, long)")
         
@@ -1143,10 +1211,11 @@ long Matrix<T>::Import(IceAs ias, long pos) {
     
     return size;
     
-};
+}
 
-template <class T> 
-long Matrix<T>::Import(IceAs ias) {
+
+template <class T> long 
+Matrix<T>::Import(IceAs ias) {
     
     ICE_SET_FN("Matrix<T>::Import(IceAs)")
         
@@ -1165,10 +1234,11 @@ long Matrix<T>::Import(IceAs ias) {
     
     return Size();
     
-};
+}
 
-template <class T> 
-long Matrix<T>::Export(IceAs ias) {
+
+template <class T> long 
+Matrix<T>::Export(IceAs ias) {
     
     ICE_SET_FN("Matrix<T>::Export(IceAs)")
         
@@ -1179,10 +1249,11 @@ long Matrix<T>::Export(IceAs ias) {
     
     return Size();
     
-};
+}
 
-template <class T> 
-long Matrix<T>::Export(IceAs ias, long pos) {
+
+template <class T> long
+Matrix<T>::Export(IceAs ias, long pos) {
 
     ICE_SET_FN("Matrix<T>::Export(IceAs, long)")
         
@@ -1200,7 +1271,7 @@ long Matrix<T>::Export(IceAs ias, long pos) {
     
     return size;
     
-};
+}
 
 #endif
 
@@ -1218,26 +1289,85 @@ Matrix<T>::~Matrix() {
         nb_alloc = 0;
     }
     
-};
+}
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator* (Matrix<T> &M) {
-    
-    assert(Size() == M.Size());
-    
-    Matrix<T> res(_dim);
-    
-    for (int i = 0; i < Size(); i++)
-        res[i] = _M[i] * M[i];
-    
-    return res;
-    
-};
+template <class T> Matrix<T> 
+Matrix<T>::operator*(Matrix<T> &M) {
+
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[i] * M[i];
+
+	return res;
+
+}
 
 
-template <class T>
-long         Matrix<T>::Size() const {
+template <class T> Matrix<T> 
+Matrix<T>::operator* (T s) {
+    
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[i] * s;
+
+	return res;
+
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::operator/(Matrix<T> &M) {
+
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		(M[i] != (T)0) ? res[i] = _M[i] / M[i] : 0;
+
+	return res;
+
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::operator/ (T s) {
+    
+	assert (s != (T)0);
+
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[i] * s;
+
+	return res;
+
+}
+
+
+template <class T> long 
+Matrix<T>::Size() const {
     
     long size = 1;
     
@@ -1246,40 +1376,41 @@ long         Matrix<T>::Size() const {
     
     return size;
     
-};
+}
 
 
-template <class T>
-inline int  Matrix<T>::SizeInRAM() const {
+template <class T> inline int 
+Matrix<T>::SizeInRAM() const {
     
     return Size() * sizeof(T);
     
-};
+}
 
 
-template <class T>
-T           Matrix<T>::operator[]  (int p) const {
+template <class T> T           
+Matrix<T>::operator[]  (int p) const {
     
     assert(p >= 0);
     assert(p <  Size());
     
     return _M[p];
     
-};
+}
 
-template <class T>
-T           &Matrix<T>::operator[] (int p) {
+
+template <class T> T           
+&Matrix<T>::operator[] (int p) {
     
     assert(p >= 0);
     assert(p <  Size());
     
     return _M[p];
     
-};
+}
 
 
-template <class T>
-Matrix<T>   Matrix<T>::operator()(Matrix<int> &m) const {
+template <class T> Matrix<T>   
+Matrix<T>::operator()(Matrix<int> &m) const {
     
     VECT(&m);
     
@@ -1293,8 +1424,8 @@ Matrix<T>   Matrix<T>::operator()(Matrix<int> &m) const {
 };
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator()(Matrix<int> &m1, Matrix<int> &m2) const {
+template <class T> Matrix<T> 
+Matrix<T>::operator() (Matrix<int> &m1, Matrix<int> &m2) const {
 
     Matrix<T> res(m1.Size(),  m2.Size());
     
@@ -1303,8 +1434,8 @@ Matrix<T> Matrix<T>::operator()(Matrix<int> &m1, Matrix<int> &m2) const {
             res[i * m2.Size() + j] = _M[m1[i] * _dim[LIN] + m2[j]];
     
     return res;
-
-};
+	
+}
 
 
 template <class T>
@@ -1315,20 +1446,37 @@ T Matrix<T>::operator() (int a) const {
 
     return _M[a];
 
-};
+}
 
 
-template <class T>
-T Matrix<T>::Max() {
-
-    T old = _M[0];
-
+template <> inline short 
+Matrix<short>::Max() {
+	
+    short max = _M[0];
+	
     for (int i = 0; i < Size(); i++)
-        if (_M[i] > old)
-            old = _M[i];
+        if (_M[i] > max)
+            max = _M[i];
+	
+    return max;
+	
+}
 
-    return old;
 
+template <> inline raw
+Matrix<raw>::Max() {
+	
+	raw   max = raw(0.0,0.0);
+	float tmp = abs(_M[0]);
+	
+    for (int i = 0; i < Size(); i++)
+		if (abs(_M[i]) > tmp) {
+			tmp = abs(_M[i]);
+			max = _M[i];
+		}
+	
+    return max;
+	
 }
 
 
@@ -1372,7 +1520,6 @@ T  Matrix<T>::Minabs() {
     return old;
 
 }
-
 
 
 template <class T>
@@ -1607,14 +1754,110 @@ Matrix<bool> Matrix<T>::operator<(Matrix<T> M) {
 template <class T>
 Matrix<T> Matrix<T>::operator-() {
 
-    Matrix<T> res(_dim[LIN], _dim[COL]);
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
 
     for (int i = 0; i < Size(); i++)
-        res[i] = -_M[i];
+        res[i] =- _M[i];
 
     return res;
 
-};
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::operator-(Matrix<T> &M) {
+
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[i] - M[i];
+
+	return res;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::operator-(T s) {
+
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[i] - s;
+
+	return res;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::operator+() {
+
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+    for (int i = 0; i < Size(); i++)
+        res[i] =+ _M[i];
+
+    return res;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::operator+(Matrix<T> &M) {
+
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[i] + M[i];
+
+	return res;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::operator+(T s) {
+
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[i] + s;
+
+	return res;
+
+}
+
 
 template <class T>
 static T power(T p, int b) {
@@ -1722,6 +1965,48 @@ bool Matrix<T>::read (const char* fname) {
 	return true;
     
 }
+
+
+template<> inline std::ostream&  
+Matrix<short>::Print     (std::ostream &os) const {
+
+	int i,j;
+	
+	for (i = 0; i < _dim[COL]; i++) {
+		for(j = 0; j < _dim[LIN]; j++)
+			printf ("%4i ", _M [i * _dim[COL] + j]);
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+template<> inline std::ostream&  
+Matrix<raw>::Print       (std::ostream& os) const {
+	
+	int i,j;
+	
+	for (i = 0; i < _dim[COL]; i++) {
+		for(j = 0; j < _dim[LIN]; j++)
+			printf ("%.2f+%.2fi ", _M [i*_dim[COL]+j].real(), _M [i*_dim[COL]+j].imag());
+		printf("\n");
+	}
+	
+	return os;
+
+}
+
+
+template <class T> std::ostream& 
+operator<<    (std::ostream& os, Matrix<T>& M) {
+
+	M.Print(os);
+	return os;
+
+}
+
 
 #endif // __MATRIX_H__
 

@@ -11,7 +11,7 @@ bin_PROGRAMS = testclt reconserver
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON =  common.h Configurable.h DllExport.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp 
+COMMON =  common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp 
 
 # Client side stuff
 CLIENT_SIDE =  ReconClient.h ReconClient.cpp

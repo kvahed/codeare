@@ -20,13 +20,13 @@
 
 #include "DummyRecon.h"
 
-DummyRecon::DummyRecon  () {};
-DummyRecon::~DummyRecon () {};
+DummyRecon::DummyRecon  () {}
+DummyRecon::~DummyRecon () {}
 
 RRSModule::error_code
 DummyRecon::Process     () { 
 	return RRSModule::OK;
-};
+}
 
 // the class factories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {

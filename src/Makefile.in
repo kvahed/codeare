@@ -52,8 +52,8 @@ CONFIG_CLEAN_FILES = Loader.h
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 = Matrix.$(OBJEXT) options.$(OBJEXT) \
-	RRSModuleSK.$(OBJEXT) tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
+am__objects_1 = options.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
+	tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
 	tinyxmlparser.$(OBJEXT)
 am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT) \
 	ReconStrategy.$(OBJEXT)
@@ -254,7 +254,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = common.h Configurable.h DllExport.h Matrix.h Matrix.cpp options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp 
+COMMON = common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp 
 
 # Client side stuff
 CLIENT_SIDE = ReconClient.h ReconClient.cpp
@@ -381,7 +381,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Matrix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RRSModuleSK.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@

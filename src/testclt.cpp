@@ -19,7 +19,6 @@
  */
 
 #include "options.h"
-#include "Matrix.h"
 #include "ReconClient.h"
 
 #ifndef __WIN32__
@@ -46,25 +45,22 @@ int main (int argc, char** argv) {
 		ReconClient client (name, debug);
 		int         i = 0, j = 0, d = 8;
 		
-		Matrix< complex<float> > raw   (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-		Matrix< short >          pixel (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix<raw>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix<short> p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
 		for (i = 0; i < d; i++)
 			for (j = 0; j < d; j++) {
-				raw.at(i,j) = complex<float> ((float) i, (float) j);
-				pixel.at(i,j) = (i+1)*(j+1);
+				r.at(i,j)  = raw ((float) i, (float) j) - raw (d/2,d/2);
+				p.at(i,j) = (i-d/2+1)*(j-d/2+1);
 			}
+
+		Matrix<raw> n = r/r;
+
+		std::cout << n << std::endl;
+		std::cout << p.Minabs() << " " << p.Min() << std::endl;
 		
-		for (i = 0; i < d; i++) {
-			for (j = 0; j < d; j++) 
-				printf (" %2i", pixel.at(i,j));
-			std::cout << std::endl;
-		}
-
-		std::cout << std::endl;
-
-		client.SetRaw(raw);
-		client.SetPixel(pixel);
+		client.SetRaw(r);
+		client.SetPixel(p);
 		
 		client.SetAttribute("UID", "1234");
 		client.SetAttribute("Pi", 3.1415);
@@ -72,16 +68,11 @@ int main (int argc, char** argv) {
 		
 		client.Process(test);
 
-		client.GetRaw(raw);
-		client.GetPixel(pixel);
+		client.GetRaw(r);
+		client.GetPixel(p);
 
-		for (i = 0; i < d; i++) {
-			for (j = 0; j < d; j++) 
-				printf (" %2i", pixel.at(i,j));
-			std::cout << std::endl;
-		}
-
-		std::cout << std::endl;
+		
+		//std::cout << r << std::endl;
 
 		cout << "We're good" << endl;
 		
