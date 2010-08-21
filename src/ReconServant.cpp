@@ -95,15 +95,15 @@ ReconServant::raw          ()                    {
 
 /**************************************************************************************************/
 void
-ReconServant::helper       (const raw_data& d)   {
+ReconServant::helper       (const helper_data& d)   {
 	m_helper = d;
 }
 
 
 /**************************************************************************************************/
-raw_data*
+helper_data*
 ReconServant::helper       ()                    {
-	return new raw_data (m_helper);
+	return new helper_data (m_helper);
 }
 
 

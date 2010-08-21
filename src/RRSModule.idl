@@ -30,6 +30,7 @@ module RRSModule {
 	#include "common.h"
 
 	typedef sequence<float>  floats;   /*!< raw data real or imaginary repositories */
+	typedef sequence<double> doubles;  /*!< helper data                             */
 	typedef sequence<short>  shorts;   /*!< pixel data repositories                 */
 	typedef sequence<long>   longs;    /*!< dimension reositories                   */
 
@@ -59,6 +60,17 @@ module RRSModule {
 
 
 	/**
+	 * @brief Pixel data
+	 */
+	struct     helper_data       {
+
+		doubles vals;  /**< Data abs      */
+		longs   dims;  /**< Dimesions     */
+
+	};
+
+
+	/**
 	 * @brief Remote recon service interface definition
 	 */
 	interface RRSInterface {
@@ -80,10 +92,10 @@ module RRSModule {
 		/**
 		 * @brief         Declare CORBA attribute helper
 		 */
-		attribute         raw_data     helper;
+		attribute         helper_data  helper;
 		
 		/**
-		 * @brief         Declare CORBA attribute pixel
+		 * @brief         Declare CORBA attribute helper
 		 */
 		attribute         pixel_data   pixel;
 		

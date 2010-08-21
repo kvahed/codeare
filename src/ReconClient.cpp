@@ -93,7 +93,7 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
     }
     
     m_raw    = new raw_data;
-    m_helper = new raw_data;
+    m_helper = new helper_data;
     m_pixel  = new pixel_data;
 
     m_raw->dims.length(INVALID_DIM);

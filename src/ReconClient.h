@@ -126,27 +126,20 @@ public:
 	 * @param  M        Given matrix
 	 */
 	void
-	SetHelper              (Matrix< std::complex<float> >& M) {
-
-		int i;
-
-		for (i = 0; i < INVALID_DIM; i++)
-			m_helper->dims[i] = M.Dim(i);
-
-		long size = GetHelperSize();
-
-		m_helper->dreal.length(size);
-		m_helper->dimag.length(size);
-
-		for (i = 0; i < size; i++) {
-			m_helper->dreal[i] = M[i].real();
-			m_helper->dimag[i] = M[i].imag();
-		}
-
-		m_rrsi->helper(m_helper[0]);
+	SetHelper              (Matrix< double >& M) {
+		
+		for (int j = 0; j < INVALID_DIM; j++)
+			m_helper->dims[j] = M.Dim(j);
+		
+		m_helper->vals.length(M.Size());
+		
+		for (int i = 0; i < M.Size(); i++)
+			m_helper->vals[i] = M[i];
+		
+		m_rrsi->helper(*(m_helper));
 
 	};
-
+	
 
 	/**
 	 * @brief           Return helper data after recon to ...
@@ -154,16 +147,15 @@ public:
 	 * @param  M        Given matrix
 	 */
 	void
-	GetHelper              (Matrix< std::complex<float> >& M) {
-
-		int dim[INVALID_DIM], i;
-
-		for (i = 0; i < INVALID_DIM; i++)
-			dim[i] = m_helper->dims[i];
+	GetHelper              (Matrix< double >& M) {
 		
-		M.Reset(dim);
-		for (i = 0; i < GetHelperSize(); i++)
-			M[i] = std::complex<float>(m_helper->dreal[i],m_helper->dimag[i]);
+		for (int j = 0; j < INVALID_DIM; j++)
+			M.Dim(j) = m_helper->dims[j];
+		
+		M.Reset();
+
+		for (int i = 0; i < GetHelperSize(); i++)
+			M[i] = m_helper->vals[i];
 		
 	};
 
@@ -176,16 +168,12 @@ public:
 	void 
 	SetPixel            (Matrix<short>& M) {
 		
-		int    i;
+		for (int j = 0; j < INVALID_DIM; j++)
+			m_pixel->dims[j] = M.Dim(j);
 		
-		for (i = 0; i < INVALID_DIM; i++)
-			m_pixel->dims[i] = M.Dim(i);
-		
-		long   size = GetPixelSize();
-		
-		m_pixel->vals.length(size); 
+		m_pixel->vals.length(M.Size()); 
 
-		for (i = 0; i < size; i++)
+		for (int i = 0; i < M.Size(); i++)
 			m_pixel->vals[i] = M[i];
 		
 		m_rrsi->pixel(*(m_pixel));
@@ -201,15 +189,13 @@ public:
 	void 
 	GetPixel            (Matrix<short>& M) {
 	
-		int             dim[INVALID_DIM], i;
-
-		for (i = 0; i < INVALID_DIM; i++)
-			dim[i] = m_pixel->dims[i];
+		for (int j = 0; j < INVALID_DIM; j++)
+			M.Dim(j) = m_pixel->dims[j];
 		
-		M.Reset(dim);
-
-		for (i = 0; i < GetPixelSize(); i++)
-			M[i] = (short)m_pixel->vals[i];
+		M.Reset();
+		
+		for (int i = 0; i < GetPixelSize(); i++)
+			M[i] = m_pixel->vals[i];
 	
 	};
 	
@@ -246,7 +232,7 @@ public:
 	RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
 	
 	raw_data*           m_raw;        /**< Raw data    (complex float sequence) */
-	raw_data*           m_helper;     /**< Helper data (complex float sequence) */
+	helper_data*        m_helper;     /**< Helper data (complex float sequence) */
 	pixel_data*         m_pixel;      /**< Pixel data  (short sequence)         */
 
 	CORBA::ORB_var      m_orb;        /**< Orb                                  */

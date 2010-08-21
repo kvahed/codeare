@@ -75,14 +75,14 @@ public:
 	/**
 	 * @brief     Get data from recon
 	 */
-	raw_data* 
+	helper_data* 
 	helper        ();
 	
 	/**
 	 * @brief     Set data for recon
 	 */
 	void 
-	helper        (const raw_data&);
+	helper        (const helper_data&);
 	
 	/**
 	 * @brief     Get data from recon
@@ -112,7 +112,7 @@ public:
 private:
 	
 	raw_data      m_raw;    /**< Raw data    (complex float) */
-	raw_data      m_helper; /**< Image data  (complex float) */
+	helper_data   m_helper; /**< Image data  (complex float) */
 	pixel_data    m_pixel;  /**< Helper data (short)         */
 	char*         m_config;
 

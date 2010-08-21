@@ -1985,6 +1985,22 @@ Matrix<short>::Print     (std::ostream &os) const {
 
 
 template<> inline std::ostream&  
+Matrix<double>::Print     (std::ostream &os) const {
+
+	int i,j;
+	
+	for (i = 0; i < _dim[COL]; i++) {
+		for(j = 0; j < _dim[LIN]; j++)
+			printf ("%.2f ", _M [i * _dim[COL] + j]);
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+template<> inline std::ostream&  
 Matrix<raw>::Print       (std::ostream& os) const {
 	
 	int i,j;

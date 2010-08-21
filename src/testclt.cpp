@@ -45,22 +45,25 @@ int main (int argc, char** argv) {
 		ReconClient client (name, debug);
 		int         i = 0, j = 0, d = 8;
 		
-		Matrix<raw>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-		Matrix<short> p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix<raw>    r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
 		for (i = 0; i < d; i++)
 			for (j = 0; j < d; j++) {
-				r.at(i,j)  = raw ((float) i, (float) j) - raw (d/2,d/2);
+				r.at(i,j) = raw ((float) i, (float) j) - raw (d/2,d/2);
+				h.at(i,j) = sin(double (i-d/2+1)*(j-d/2+1));
 				p.at(i,j) = (i-d/2+1)*(j-d/2+1);
 			}
 
-		Matrix<raw> n = r;
+		//Matrix<raw> n = r.tr();
 
-		std::cout << n << std::endl;
-		std::cout << p << " " << p.Min() << std::endl;
+		std::cout << h << std::endl;
+		std::cout << h.Minabs() << " " << h.Min() << std::endl;
 		
 		client.SetRaw(r);
 		client.SetPixel(p);
+		client.SetHelper(h);
 		
 		client.SetAttribute("UID", "1234");
 		client.SetAttribute("Pi", 3.1415);
@@ -70,8 +73,12 @@ int main (int argc, char** argv) {
 
 		client.GetRaw(r);
 		client.GetPixel(p);
-
+		client.GetHelper(h);
 		
+		std::cout << h << std::endl;
+		std::cout << h.Minabs() << " " << h.Min() << std::endl;
+		
+
 		//std::cout << r << std::endl;
 
 		cout << "We're good" << endl;
