@@ -54,10 +54,10 @@ int main (int argc, char** argv) {
 				p.at(i,j) = (i-d/2+1)*(j-d/2+1);
 			}
 
-		Matrix<raw> n = r.tr();
+		Matrix<raw> n = r;
 
 		std::cout << n << std::endl;
-		std::cout << p.Minabs() << " " << p.Min() << std::endl;
+		std::cout << p << " " << p.Min() << std::endl;
 		
 		client.SetRaw(r);
 		client.SetPixel(p);
