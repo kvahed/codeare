@@ -1465,17 +1465,18 @@ Matrix<short>::Max() {
 
 template <> inline raw
 Matrix<raw>::Max() {
-	
-	raw   max = raw(0.0,0.0);
-	float tmp = abs(_M[0]);
-	
-    for (int i = 0; i < Size(); i++)
-		if (abs(_M[i]) > tmp) {
-			tmp = abs(_M[i]);
-			max = _M[i];
+		
+		raw   max = raw(0.0,0.0);
+		float tmp = 0.0;
+		
+		for (int i = 0; i < Size(); i++) {
+				float abs = sqrt(_M[0].real()*_M[0].real() + _M[0].imag()*_M[0].imag());
+				if (abs > tmp) {
+						tmp = abs;
+						max = _M[i];
+				}
 		}
-	
-    return max;
+		return max;
 	
 }
 
