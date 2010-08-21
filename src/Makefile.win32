@@ -59,7 +59,7 @@ tinyxmlerror.obj: tinyxml.h tinyxmlerror.cpp
 tinyxmlparser.obj: tinyxml.h tinyxmlparser.cpp
     $(CXX) $(CXXFLAGS) tinyxmlparser.cpp	
 
-testclt.exe: $(COMMON) $(CLIENT)
+testclt.exe: $(COMMON) $(CLIENT) testclt.obj
 	$(LD) $(LDFLAGS) $(COMMON) $(CLIENT) testclt.obj /out:testclt.exe 
 
 reconserver.exe: $(COMMON) $(SERVER)
