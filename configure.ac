@@ -15,10 +15,11 @@ esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 
 # Checks for programs.
 AC_PROG_CXX
+AC_PROG_F77
 AC_PROG_LIBTOOL
 
 # Set programming language
-AC_LANG(C++)
+AC_LANG([C++])
 AC_OPENMP
 
 # Checks for header files.
@@ -31,13 +32,14 @@ AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find cstdlib, bai
 AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find ctime, bailing out])])
 AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
 AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/CORBA.h, bailing out])])
-AC_CHECK_HEADERS([noncart/nufft.h], [], [AC_MSG_RESULT([cannot find noncart/nufft.h, NuFFT/CGSENSE unavailable!])])
+AC_CHECK_HEADERS([noncart/nufft.h],  [], [AC_MSG_RESULT([cannot find noncart/nufft.h, NuFFT/CGSENSE unavailable!])])
+
+AC_CHECK_HEADERS([cblas.h],          [], [AC_MSG_RESULT([cannot find cblas.h, blas functions not available])])
 
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read],   [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
 AC_CHECK_LIB([omniDynamic4], [main],   [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
-AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
-
+AC_CHECK_LIB([dl],           [dlopen], [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 
 # Checks for C++ libraries with name spaces
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
@@ -66,6 +68,17 @@ AC_TRY_LINK([#include "noncart/nufft.h"],
    [LIBS=$OLD_LIBS]
    [AC_MSG_RESULT([no. cannot find libnoncart, NuFFT/CGSENSE unavailable ])])
 AM_CONDITIONAL([NONCART], [test x$noncart_found = xyes])
+
+if test ! -z "$F77"; then
+  AC_F77_LIBRARY_LDFLAGS
+  # This just implicitly checks that FLIBS can co-exist with the C++ linker                                                           
+  AC_CHECK_LIB(c,exit,[],[
+      FLIBS=
+      AC_MSG_WARN([F77 libraries don't seem to link with C++ programs])
+      ],
+      $FLIBS)
+fi
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

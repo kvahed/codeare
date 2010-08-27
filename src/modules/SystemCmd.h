@@ -28,7 +28,7 @@ using namespace RRServer;
 namespace RRStrategy {
 	
 	/**
-	 * @brief Empty recon for test purposes
+	 * @brief Data manipulation through system cmd
 	 */
 	class SystemCmd : public ReconStrategy {
 		
