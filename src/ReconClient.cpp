@@ -20,6 +20,8 @@
 
 #include "ReconClient.h"
 
+using namespace RRClient;
+
 #include <assert.h>
 #include <complex>
 

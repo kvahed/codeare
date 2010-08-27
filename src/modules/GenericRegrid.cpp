@@ -20,6 +20,8 @@
 
 #include "GenericRegrid.h"
 
+using namespace RRStrategy;
+
 // the class factories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {
     return new GenericRegrid;

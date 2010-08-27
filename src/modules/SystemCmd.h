@@ -18,37 +18,43 @@
  *  02110-1301  USA
  */
 
-#ifndef __INVERT_ORDER_H__
-#define __INVERT_ORDER_H__
+#ifndef __SYSTEM_CMD_H__
+#define __SYSTEM_CMD_H__
 
 #include "ReconStrategy.h"
 
-/**
- * @brief Reorder for test purposes
- */
-class InvertOrder : public ReconStrategy {
+using namespace RRServer;
 
-
-public:
-
-	/**
-	 * @brief Default constructor
-	 */
-	InvertOrder  () {};
+namespace RRStrategy {
 	
 	/**
-	 * @brief Default destructor
+	 * @brief Empty recon for test purposes
 	 */
-	virtual 
-	~InvertOrder () {};
-	
-	/**
-	 * @brief Invert the order of the data. 
-	 *        No good for anything besides testing.
-	 */
-	virtual RRSModule::error_code
-	Process ();
+	class SystemCmd : public ReconStrategy {
+		
+		
+	public:
+		
+		/**
+		 * @brief Default constructor
+		 */
+		SystemCmd  () {};
+		
+		/**
+		 * @brief Default destructor
+		 */
+		virtual 
+		~SystemCmd () {};
+		
+		
+		/**
+		 * @brief Do nothing 
+		 */
+		virtual RRSModule::error_code
+		Process ();
+		
+	};
 	
 };
 
-#endif /* __INVERT_ORDER_H__ */
+#endif /* __SYSTEM_CMD_H__ */

@@ -1,5 +1,7 @@
 #include "NuFFT.h"
 
+using namespace RRStrategy;
+
 NuFFT::NuFFT () {
 
 	Attribute("dim", &m_dim);

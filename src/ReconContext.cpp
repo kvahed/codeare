@@ -21,9 +21,10 @@
 #include "Loader.h"
 #include "ReconContext.h"
 
+using namespace RRServer;
 
 ReconContext::~ReconContext () {
-		
+	
 	destroy_t* destroy = (destroy_t*) GetFunction(m_dlib, (char*)"destroy");
 	destroy(m_strategy);
 	CloseModule (m_dlib);

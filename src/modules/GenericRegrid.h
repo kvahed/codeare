@@ -23,32 +23,38 @@
 
 #include "ReconStrategy.h"
 
-/**
- * @brief Generic regridder
- *        Expects to identically sized matrices (data & k-space positions)
- */
-class GenericRegrid : public ReconStrategy {
+using namespace RRServer;
 
-
-public:
-
-	/**
-	 * @brief Default constructor
-	 */
-	GenericRegrid  () {};
+namespace RRStrategy {
 	
 	/**
-	 * @brief Default destructor
+	 * @brief Generic regridder
+	 *        Expects to identically sized matrices (data & k-space positions)
 	 */
-	virtual 
-	~GenericRegrid () {};
-	
-	/**
-	 * @brief Regrid data to Cartesian k-space
-	 */
-	virtual RRSModule::error_code
-	Process () {
-		return RRSModule::OK;
+	class GenericRegrid : public ReconStrategy {
+		
+		
+	public:
+		
+		/**
+		 * @brief Default constructor
+		 */
+		GenericRegrid  () {};
+		
+		/**
+		 * @brief Default destructor
+		 */
+		virtual 
+		~GenericRegrid () {};
+		
+		/**
+		 * @brief Regrid data to Cartesian k-space
+		 */
+		virtual RRSModule::error_code
+		Process () {
+			return RRSModule::OK;
+		};
+		
 	};
 	
 };

@@ -23,31 +23,36 @@
 
 #include "ReconStrategy.h"
 
-/**
- * @brief Median filter with OpenMP support
- */
-class MedianFilter_OMP : public ReconStrategy {
+using namespace RRServer;
 
-
-public:
+namespace RRStrategy {
 
 	/**
-	 * @brief Default constructor
+	 * @brief Median filter with OpenMP support
 	 */
-	MedianFilter_OMP  () {};
-	
-	/**
-	 * @brief Default destructor
-	 */
-	virtual 
-	~MedianFilter_OMP () {};
-
-	/**
-	 * @brief Apply Median filter to image space
-	 */
-	virtual RRSModule::error_code
-	Process ();
+	class MedianFilter_OMP : public ReconStrategy {
+		
+		
+	public:
+		
+		/**
+		 * @brief Default constructor
+		 */
+		MedianFilter_OMP  () {};
+		
+		/**
+		 * @brief Default destructor
+		 */
+		virtual 
+		~MedianFilter_OMP () {};
+		
+		/**
+		 * @brief Apply Median filter to image space
+		 */
+		virtual RRSModule::error_code
+		Process ();
+		
+	};
 
 };
-
 #endif /* __MEDIAN_FILTER_OMP_H__ */

@@ -98,12 +98,6 @@ GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
 GenericRegrid_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) $(LDFLAGS) -o $@
-InvertOrder_la_LIBADD =
-am_InvertOrder_la_OBJECTS = $(am__objects_1) InvertOrder.lo
-InvertOrder_la_OBJECTS = $(am_InvertOrder_la_OBJECTS)
-InvertOrder_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(InvertOrder_la_LDFLAGS) $(LDFLAGS) -o $@
 MedianFilter_OMP_la_LIBADD =
 am_MedianFilter_OMP_la_OBJECTS = $(am__objects_1) MedianFilter_OMP.lo
 MedianFilter_OMP_la_OBJECTS = $(am_MedianFilter_OMP_la_OBJECTS)
@@ -117,6 +111,12 @@ NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
 @NONCART_TRUE@am_NuFFT_la_rpath = -rpath $(libdir)
+SystemCmd_la_LIBADD =
+am_SystemCmd_la_OBJECTS = $(am__objects_1) SystemCmd.lo
+SystemCmd_la_OBJECTS = $(am_SystemCmd_la_OBJECTS)
+SystemCmd_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(SystemCmd_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -141,12 +141,12 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
 	$(DumpToFile_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(InvertOrder_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES)
+	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
+	$(SystemCmd_la_SOURCES)
 DIST_SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
 	$(DumpToFile_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(InvertOrder_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES)
+	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
+	$(SystemCmd_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -272,7 +272,7 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
-	InvertOrder.la MedianFilter_OMP.la $(am__append_1)
+	MedianFilter_OMP.la SystemCmd.la $(am__append_1)
 DummyRecon_la_SOURCES = $(COMMON) DummyRecon.h DummyRecon.cpp
 DummyRecon_la_LDFLAGS = -module
 GenericRegrid_la_SOURCES = $(COMMON) GenericRegrid.h GenericRegrid.cpp
@@ -281,12 +281,13 @@ MedianFilter_OMP_la_SOURCES = $(COMMON) MedianFilter_OMP.h MedianFilter_OMP.cpp
 MedianFilter_OMP_la_LDFLAGS = -module
 NuFFT_la_SOURCES = $(COMMON) NuFFT.h NuFFT.cpp
 NuFFT_la_LDFLAGS = -module -lnoncart
-InvertOrder_la_SOURCES = $(COMMON) InvertOrder.h InvertOrder.cpp
-InvertOrder_la_LDFLAGS = -module
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.h DumpToFile.cpp
 DumpToFile_la_LDFLAGS = -module
 CGSENSE_la_SOURCES = $(COMMON) CGSENSE.h CGSENSE.cpp
 CGSENSE_la_LDFLAGS = -module -lnoncart
+SystemCmd_la_SOURCES = $(COMMON) SystemCmd.h SystemCmd.cpp
+SystemCmd_la_LDFLAGS = -module
+CLEANFILES = RRSModule.hh RRSModuleSK.cc
 all: all-am
 
 .SUFFIXES:
@@ -360,12 +361,12 @@ DumpToFile.la: $(DumpToFile_la_OBJECTS) $(DumpToFile_la_DEPENDENCIES)
 	$(DumpToFile_la_LINK) -rpath $(libdir) $(DumpToFile_la_OBJECTS) $(DumpToFile_la_LIBADD) $(LIBS)
 GenericRegrid.la: $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_DEPENDENCIES) 
 	$(GenericRegrid_la_LINK) -rpath $(libdir) $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_LIBADD) $(LIBS)
-InvertOrder.la: $(InvertOrder_la_OBJECTS) $(InvertOrder_la_DEPENDENCIES) 
-	$(InvertOrder_la_LINK) -rpath $(libdir) $(InvertOrder_la_OBJECTS) $(InvertOrder_la_LIBADD) $(LIBS)
 MedianFilter_OMP.la: $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_DEPENDENCIES) 
 	$(MedianFilter_OMP_la_LINK) -rpath $(libdir) $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_LIBADD) $(LIBS)
 NuFFT.la: $(NuFFT_la_OBJECTS) $(NuFFT_la_DEPENDENCIES) 
 	$(NuFFT_la_LINK) $(am_NuFFT_la_rpath) $(NuFFT_la_OBJECTS) $(NuFFT_la_LIBADD) $(LIBS)
+SystemCmd.la: $(SystemCmd_la_OBJECTS) $(SystemCmd_la_DEPENDENCIES) 
+	$(SystemCmd_la_LINK) -rpath $(libdir) $(SystemCmd_la_OBJECTS) $(SystemCmd_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -377,9 +378,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GenericRegrid.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InvertOrder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxml.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlerror.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlparser.Plo@am__quote@
@@ -538,6 +539,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)

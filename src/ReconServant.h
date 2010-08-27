@@ -32,6 +32,10 @@
 
 using namespace RRSModule;
 
+/**
+ * @brief Remote recon server
+ */
+namespace RRServer {
 
 /**
  * @brief Servant implementation 
@@ -115,6 +119,8 @@ private:
 	helper_data   m_helper; /**< Image data  (complex float) */
 	pixel_data    m_pixel;  /**< Helper data (short)         */
 	char*         m_config;
+
+};
 
 };
 

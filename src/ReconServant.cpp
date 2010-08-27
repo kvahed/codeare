@@ -21,6 +21,7 @@
 #include "ReconServant.h"
 #include "ReconContext.h"
 
+using namespace RRServer;
 
 /**************************************************************************************************/
 ReconServant::ReconServant  ()               {

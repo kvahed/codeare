@@ -20,8 +20,9 @@
 
 #include "DummyRecon.h"
 
-DummyRecon::DummyRecon  () {}
-DummyRecon::~DummyRecon () {}
+
+using namespace RRStrategy;
+
 
 RRSModule::error_code
 DummyRecon::Process     () { 

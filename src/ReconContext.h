@@ -25,57 +25,59 @@
 
 #include "ReconStrategy.h"
 
-
-/**
- * @brief Context of a reconstruction method
- */
-class ReconContext {
-  
-
-  
-public:
-	
+namespace RRServer {
 
 	/**
-	 * @brief Default Constructor
+	 * @brief Context of a reconstruction method
 	 */
-	ReconContext () {}
+	class ReconContext {
+		
+		
+		
+	public:
+		
+		
+		/**
+		 * @brief Default Constructor
+		 */
+		ReconContext () {}
+		
+		
+		/**
+		 * @brief Invoce destruction on my startegy and exit
+		 */ 
+		~ReconContext ();
+		
+		
+		/**
+		 * @brief Construct with a strategy
+		 */
+		ReconContext (const char* name);
+		
+		
+		/**
+		 * @brief get active startegy
+		 */
+		inline ReconStrategy*
+			Strategy     () {
+			return m_strategy;
+		}
+		
+		/**
+		 * @brief Process data with given strategy
+		 */
+		RRSModule::error_code
+			Process () {
+			return m_strategy->Process();
+		}
+		
+		
+	private:
+		
+		ReconStrategy*            m_strategy;   /**< Active strategy           */
+		void*                     m_dlib;       /**< Handle on startegy module */
+		
+	};
 	
-	
-	/**
-	 * @brief Invoce destruction on my startegy and exit
-	 */ 
-	~ReconContext ();
-
-
-	/**
-	 * @brief Construct with a strategy
-	 */
-	ReconContext (const char* name);
-
-	
-	/**
-	 * @brief get active startegy
-	 */
-	inline ReconStrategy*
-	Strategy     () {
-		return m_strategy;
-	}
-	
-	/**
-	 * @brief Process data with given strategy
-	 */
-	RRSModule::error_code
-	Process () {
-		return m_strategy->Process();
-	}
-	
-	
-private:
-	
-	ReconStrategy*            m_strategy;   /**< Active strategy           */
-	void*                     m_dlib;       /**< Handle on startegy module */
-
 };
-
 #endif 

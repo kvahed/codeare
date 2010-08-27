@@ -1,5 +1,7 @@
 #include "CGSENSE.h"
 
+using namespace RRStrategy;
+
 CGSENSE::CGSENSE () {
 
 	// Copy incoming data to m_temp             */
@@ -20,10 +22,29 @@ CGSENSE::CGSENSE () {
 
 	m_raw.Reset();
 	
-	int N [2] = {m_raw.Dim(COL), m_raw.Dim(LIN)};
-	int Nk[2] = {m_helper.Dim(COL), m_helper.Dim(LIN)}; 
+	N[0]  = m_raw.Dim(COL);
+	N[1]  = m_raw.Dim(LIN);
+	N[2]  = m_raw.Dim(SLC);
+
+	Nk[0] = m_helper.Dim(COL);
+	Nk[1] = m_helper.Dim(LIN);
+	Nk[2] = m_helper.Dim(SLC);
+
+	// Maximum k-vector reached
+	kmax[0] = 0.0;
+	for (int i = 0; i < m_helper.Dim(COL); i++)
+		if (kmax[0] < m_helper(i,0,0))
+			kmax[0] = m_helper(i,0,0);
+	kmax[1] = 0.0;
+	for (int j = 0; j < m_helper.Dim(LIN); j++)
+		if (kmax[1] < m_helper(0,j,0))
+			kmax[1] = m_helper(0,j,0);
+	kmax[2] = 0.0;
+	for (int k = 0; k < m_helper.Dim(SLC); k++)
+		if (kmax[2] < m_helper(0,0,k))
+			kmax[2] = m_helper(0,0,k);
 	
-	m_nufft.init (2, N, Nk, &m_helper[0], 2, 2.4, 32, 0, 0);
+	//m_nufft.init (2, N, Nk, m_helper.at(0), 2, 2.4, 32, 0, 0);
 
 
 }
@@ -40,31 +61,6 @@ CGSENSE::CGSENSE () {
 RRSModule::error_code 
 E  (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, Matrix<raw>* out) {
 	
-	/*
-	  FT = cell(1,Nb_coils);
-	  data_out = zeros(Nb_samples,Nb_coils);
-	  %pos = [6 3 2 1 4 7 8 9];
-	  
-	  
-	  %% Computation of full density k-space for each coil
-	  for ind_coil = 1:Nb_coils
-	  %figure(8), subplot (3,3,pos(ind_coil)), imagesc(abs(data_in.*sensitivity(:,:,ind_coil))), colormap gray, axis image;
-	  FT{ind_coil} = fftshift(fftn(data_in.*sensitivity(:,:,ind_coil)));
-	  end
-	  % pause;
-	  
-	  %% reverse-gridding of full density k-space on actual k-trajectory
-	  k_max(1) = abs(min(k(:,1)));
-	  k_max(2) = abs(min(k(:,2)));
-	  %figure(3);
-	  for ind_sample = 1:Nb_samples
-	  for ind_coil = 1:Nb_coils 
-	  data_out(ind_sample,ind_coil) = FT{ind_coil}(k(ind_sample,1)+k_max(1)+1,k(ind_sample,2)+k_max(2)+1);
-	  %subplot(3,3,ind_coil), imagesc(abs(data_out(ind_sample,ind_coil)));
-	  end
-	  end
-	*/
-
 	int nc   = sm->Dim(CHA);
 	int nk   = in->Dim(COL); 
 
@@ -73,15 +69,22 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, M
 	int nz   = sm->Dim(SLC);
 
 	// Full density k-spaces 
-	Matrix<raw>* tmp = new Matrix<raw> (nx, ny, nz, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); 
-	
-	((noncart::nufft*)ncs)->forward_2d(in, out);
+	Matrix<raw> tmp_in  (nx, ny, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); 
+	Matrix<raw> tmp_sm  (nx, ny, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); 
+	Matrix<raw> tmp_out (nx, ny, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
-		
+	for (int i = 0; i < nz; i++ )
+		for (int j = 0; j < nc; j++) {
 
-		//fftshift(fftn(data_in.*sensitivity(:,:,ind_coil)));
+			memcpy (&tmp_in.at(0), &in->at(0, 0, nc, 0, 0, 0, 0, 0, 0, nz, 0, 0, 0, 0, 0, 0),   nx*ny*sizeof(double)); 
+			memcpy (&tmp_sm.at(0), &sm->at(0, 0, nc, 0, 0, 0, 0, 0, 0, nz, 0, 0, 0, 0, 0, 0),   nx*ny*sizeof(double));
 
-	// Reverse grid full density k-space on actual trajectory
+			((noncart::nufft*)ncs)->forward_2d(&tmp_in, &tmp_out);
+
+			memcpy (&out->at(0, 0, nc, 0, 0, 0, 0, 0, 0, nz, 0, 0, 0, 0, 0, 0), &tmp_out.at(0), nx*ny*sizeof(double));
+
+		}
+
 	return OK;
 
 }
@@ -104,7 +107,6 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, M
 	return OK;
 
 }
-
 
 RRSModule::error_code
 CGSENSE::Process () {

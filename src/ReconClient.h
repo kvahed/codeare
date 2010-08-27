@@ -33,209 +33,210 @@
 #endif
 
 using namespace RRSModule;
-                                                                                
 
 /**
- * @brief              CORBA ICE reconstruction client 
+ * @brief Remote recon client
  */
-class ReconClient :
+namespace RRClient {
+	
+	/**
+	 * @brief              CORBA ICE reconstruction client 
+	 */
+	class ReconClient :
 	public Configurable {
-	
-	
-public:
-	
-	/**
-	 * @brief           Construct and initialise remote recon interface
-	 */
-	ReconClient         (const char* name, const char* tracelevel);
-	
-	
-	/**
-	 * @brief           Default destructor
-	 */
-	~ReconClient        ();
-	
-	/**
-	 * @brief           Default destructor
-	 */
-	void 
-	Cleanup             ();
-	
-	/**
-	 * @brief           Request data procession on recon service
-	 *
-	 * @param  name     Recon method
-	 * @return          Error code
-	 */ 
-	error_code              
-	Process             (const char* name);
-	
-	/**
-	 * @brief           Set raw my data with ...
-	 *
-	 * @param  M        Given matrix
-	 */
-	void 
-	SetRaw              (Matrix< std::complex<float> >& M) {
 		
-		int i;
 		
-		m_raw->dims.length(INVALID_DIM);
+	public:
 		
-		for (i = 0; i < INVALID_DIM; i++)
-			m_raw->dims[i] = M.Dim(i);
+		/**
+		 * @brief           Construct and initialise remote recon interface
+		 */
+		ReconClient         (const char* name, const char* tracelevel);
 		
-		long size = GetRawSize();
 		
-		m_raw->dreal.length(size); 
-		m_raw->dimag.length(size);
+		/**
+		 * @brief           Default destructor
+		 */
+		~ReconClient        ();
 		
-		for (i = 0; i < size; i++) {
-			m_raw->dreal[i] = M[i].real();
-			m_raw->dimag[i] = M[i].imag(); 
-		}
+		/**
+		 * @brief           Default destructor
+		 */
+		void 
+		Cleanup             ();
 		
-		m_rrsi->raw(m_raw[0]);
+		/**
+		 * @brief           Request data procession on recon service
+		 *
+		 * @param  name     Recon method
+		 * @return          Error code
+		 */ 
+		error_code              
+		Process             (const char* name);
+		
+		/**
+		 * @brief           Set raw my data with ...
+		 *
+		 * @param  M        Given matrix
+		 */
+		void 
+		SetRaw              (Matrix< std::complex<float> >& M) {
+			
+			m_raw->dims.length(INVALID_DIM);
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				m_raw->dims[j] = M.Dim(j);
+			
+			m_raw->dreal.length(M.Size()); 
+			m_raw->dimag.length(M.Size());
+			
+			for (int i = 0; i < M.Size(); i++) {
+				m_raw->dreal[i] = M[i].real();
+				m_raw->dimag[i] = M[i].imag(); 
+			}
+			
+			m_rrsi->raw(*(m_raw));
+			
+		};
+		
+		
+		/**
+		 * @brief           Return raw data after recon to ...
+		 *
+		 * @param  M        Given matrix
+		 */
+		void 
+		GetRaw              (Matrix< std::complex<float> >& M) {
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				M.Dim(j) = m_raw->dims[j];
+			
+			M.Reset();
+			
+			for (int i = 0; i < GetRawSize(); i++)
+				M[i] = std::complex<float>(m_raw->dreal[i],m_raw->dimag[i]);
+			
+		};
+		
+		
+		/**
+		 * @brief           Set helper my data with ...
+		 *
+		 * @param  M        Given matrix
+		 */
+		void
+		SetHelper              (Matrix< double >& M) {
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				m_helper->dims[j] = M.Dim(j);
+			
+			m_helper->vals.length(M.Size());
+			
+			for (int i = 0; i < M.Size(); i++)
+				m_helper->vals[i] = M[i];
+			
+			m_rrsi->helper(*(m_helper));
+			
+		};
+		
+		
+		/**
+		 * @brief           Return helper data after recon to ...
+		 *
+		 * @param  M        Given matrix
+		 */
+		void
+		GetHelper              (Matrix< double >& M) {
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				M.Dim(j) = m_helper->dims[j];
+			
+			M.Reset();
+			
+			for (int i = 0; i < GetHelperSize(); i++)
+				M[i] = m_helper->vals[i];
+			
+		};
+		
+		
+		/**
+		 * @brief           Set my Pixel data
+		 * 
+		 * @param  M        Given matrix
+		 */
+		void 
+		SetPixel            (Matrix<short>& M) {
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				m_pixel->dims[j] = M.Dim(j);
+			
+			m_pixel->vals.length(M.Size()); 
+			
+			for (int i = 0; i < M.Size(); i++)
+				m_pixel->vals[i] = M[i];
+			
+			m_rrsi->pixel(*(m_pixel));
+			
+		};
+		
+		
+		/**
+		 * @brief           Put my Pixel data into 
+		 * 
+		 * @param  M        Given matrix
+		 */
+		void 
+		GetPixel            (Matrix<short>& M) {
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				M.Dim(j) = m_pixel->dims[j];
+			
+			M.Reset();
+			
+			for (int i = 0; i < GetPixelSize(); i++)
+				M[i] = m_pixel->vals[i];
+			
+		};
+		
+		
+		/**
+		 * @brief           Raw repository size
+		 *
+		 * @return          Size
+		 */
+		long
+		GetRawSize             ();
+		
+		
+		/**
+		 * @brief           Pixel repository size
+		 *
+		 * @return          Size
+		 */
+		long
+		GetPixelSize           ();
+		
+		
+		/**
+		 * @brief           Helper repository size
+		 *
+		 * @return          Size
+		 */
+		long
+		GetHelperSize          ();
+		
+		
+	private:
+		
+		RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
+		
+		raw_data*           m_raw;        /**< Raw data    (complex float sequence) */
+		helper_data*        m_helper;     /**< Helper data (complex float sequence) */
+		pixel_data*         m_pixel;      /**< Pixel data  (short sequence)         */
+		
+		CORBA::ORB_var      m_orb;        /**< Orb                                  */
 		
 	};
-	
-
-	/**
-	 * @brief           Return raw data after recon to ...
-	 *
-	 * @param  M        Given matrix
-	 */
-	void 
-	GetRaw              (Matrix< std::complex<float> >& M) {
-		
-		int dim[INVALID_DIM], i;
-
-		for (i = 0; i < INVALID_DIM; i++)
-			dim[i] = m_raw->dims[i];
-		
-		M.Reset(dim);
-		for (i = 0; i < GetRawSize(); i++)
-			M[i] = std::complex<float>(m_raw->dreal[i],m_raw->dimag[i]);
-		
-	};
-	
-
-	/**
-	 * @brief           Set helper my data with ...
-	 *
-	 * @param  M        Given matrix
-	 */
-	void
-	SetHelper              (Matrix< double >& M) {
-		
-		for (int j = 0; j < INVALID_DIM; j++)
-			m_helper->dims[j] = M.Dim(j);
-		
-		m_helper->vals.length(M.Size());
-		
-		for (int i = 0; i < M.Size(); i++)
-			m_helper->vals[i] = M[i];
-		
-		m_rrsi->helper(*(m_helper));
-
-	};
-	
-
-	/**
-	 * @brief           Return helper data after recon to ...
-	 *
-	 * @param  M        Given matrix
-	 */
-	void
-	GetHelper              (Matrix< double >& M) {
-		
-		for (int j = 0; j < INVALID_DIM; j++)
-			M.Dim(j) = m_helper->dims[j];
-		
-		M.Reset();
-
-		for (int i = 0; i < GetHelperSize(); i++)
-			M[i] = m_helper->vals[i];
-		
-	};
-
-
-	/**
-	 * @brief           Set my Pixel data
-	 * 
-	 * @param  M        Given matrix
-	 */
-	void 
-	SetPixel            (Matrix<short>& M) {
-		
-		for (int j = 0; j < INVALID_DIM; j++)
-			m_pixel->dims[j] = M.Dim(j);
-		
-		m_pixel->vals.length(M.Size()); 
-
-		for (int i = 0; i < M.Size(); i++)
-			m_pixel->vals[i] = M[i];
-		
-		m_rrsi->pixel(*(m_pixel));
-
-	};
-	
-
-	/**
-	 * @brief           Put my Pixel data into 
-	 * 
-	 * @param  M        Given matrix
-	 */
-	void 
-	GetPixel            (Matrix<short>& M) {
-	
-		for (int j = 0; j < INVALID_DIM; j++)
-			M.Dim(j) = m_pixel->dims[j];
-		
-		M.Reset();
-		
-		for (int i = 0; i < GetPixelSize(); i++)
-			M[i] = m_pixel->vals[i];
-	
-	};
-	
-
-	/**
-	 * @brief           Raw repository size
-	 *
-	 * @return          Size
-	 */
-	long
-	GetRawSize             ();
-	
-
-	/**
-	 * @brief           Pixel repository size
-	 *
-	 * @return          Size
-	 */
-	long
-	GetPixelSize           ();
-	
-
-	/**
-	 * @brief           Helper repository size
-	 *
-	 * @return          Size
-	 */
-	long
-	GetHelperSize          ();
-	
-
- private:
-	
-	RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
-	
-	raw_data*           m_raw;        /**< Raw data    (complex float sequence) */
-	helper_data*        m_helper;     /**< Helper data (complex float sequence) */
-	pixel_data*         m_pixel;      /**< Pixel data  (short sequence)         */
-
-	CORBA::ORB_var      m_orb;        /**< Orb                                  */
 	
 };
 

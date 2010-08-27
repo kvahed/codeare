@@ -247,6 +247,34 @@ public:
 
     
     /**
+     * @brief           Get element at position 
+     *  
+     * @param  pos      Position
+     * @param  lin      Line
+     *
+     * @return          Value at _M[pos]
+     */
+    inline T            
+    at                  (int pos)  const {
+        return _M[pos];
+    }
+
+    
+    /**
+     * @brief            Reference to value at position
+     *  
+     * @param  pos       Position
+     * @param  lin       Line
+     *
+     * @return           Reference to _M[pos]
+     */
+    inline T&           
+    at                  (int pos) {
+        return _M[pos];
+    }
+
+    
+    /**
      * @brief           Get value in slice
      *  
      * @param  col      Column
@@ -470,7 +498,7 @@ public:
     T&                 
     operator()           (int col, int lin, int slc) {
            return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
-    };
+    }
     
     //@}
     
@@ -1933,9 +1961,11 @@ bool Matrix<T>::dump (const char* fname) {
 
         std::ofstream fout(fname , std::ios::out | std::ios::binary);
 
-        for (int i = 0; i < Size(); i++)
+        for (int i = 0; i < Size(); i++) {
+			std::cout << _M[i] << std::endl;
             fout.write ((char*)(&(_M[i])), sizeof(T));
-        
+		}
+		        
         fout.close();
 
     }

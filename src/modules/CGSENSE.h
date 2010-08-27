@@ -27,43 +27,54 @@
 
 typedef std::complex<float> raw;
 
-/**
- * @brief Non uniform FFT
- */
-class CGSENSE : public ReconStrategy {
+using namespace RRServer;
 
 
-public:
+namespace RRStrategy {
 	
 	/**
-	 * @brief Default constructor
+	 * @brief Non uniform FFT
 	 */
-	CGSENSE  ();
+	class CGSENSE : public ReconStrategy {
+		
+		
+	public:
+		
+		/**
+		 * @brief Default constructor
+		 */
+		CGSENSE  ();
+		
+		/**
+		 * @brief Default destructor
+		 */
+		virtual 
+			~CGSENSE () {};
+		
+		/**
+		 * @brief Dump data to disk
+		 */
+		virtual RRSModule::error_code
+			Process ();
+		
+		
+		
+	private:
+		
+		int                m_iter;
+		int                m_verbose;
+		
+		Matrix < raw >     m_sens;
+		Matrix < raw >     m_temp;
+		
+		noncart::nufft     m_nufft;
+		
+		int*               N;
+		int*               Nk;
+		
+		double*            kmax;
+		
+	};
 	
-	/**
-	 * @brief Default destructor
-	 */
-	virtual 
-	~CGSENSE () {};
-	
-	/**
-	 * @brief Dump data to disk
-	 */
-	virtual RRSModule::error_code
-	Process ();
-	
- 
-
-private:
-
-	int                m_iter;
-	int                m_verbose;
-
-	Matrix < raw >     m_sens;
-	Matrix < raw >     m_temp;
-
-	noncart::nufft     m_nufft;
-
 };
-
 #endif /* __CGSENSE_H__ */

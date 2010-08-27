@@ -42,6 +42,7 @@ char*  debug;
 char*  logfile;
 
 using namespace std;
+using namespace RRServer;
 
 bool init (int argc, char** argv);
                                                                                 

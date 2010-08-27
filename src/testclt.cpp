@@ -30,6 +30,7 @@
 #endif
 
 using namespace std;
+using namespace RRClient;
 
 char*  name;
 char*  base;

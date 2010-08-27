@@ -23,50 +23,55 @@
 
 #include "ReconStrategy.h"
 
-/**
- * @brief Non uniform FFT
- */
-class NuFFT : public ReconStrategy {
+using namespace RRServer;
 
-public:
+namespace RRStrategy {
 	
 	/**
-	 * @brief Default constructor
+	 * @brief Non uniform FFT
 	 */
-	NuFFT  ();
-	
-	/**
-	 * @brief Default destructor
-	 */
-	virtual 
-	~NuFFT () {};
-	
-	/**
-	 * @brief Dump data to disk
-	 */
-	virtual RRSModule::error_code
-	Process ();
-	
-private:
-	
-	int N [2];
-	int Nk[2];
-	
-	// We only support 2 dims for the time being
-	int m_dim;
-	
-	// Some more stuff
-	int       m_M;
-	double    m_b;
-	int       m_q;
-
-	double*   m_tra;
-	
-	double*   k_data;
-	double*   r_data;
-	double*   k_d;
-	double*   r_d;
+	class NuFFT : public ReconStrategy {
+		
+	public:
+		
+		/**
+		 * @brief Default constructor
+		 */
+		NuFFT  ();
+		
+		/**
+		 * @brief Default destructor
+		 */
+		virtual 
+		~NuFFT () {};
+		
+		/**
+		 * @brief Dump data to disk
+		 */
+		virtual RRSModule::error_code
+		Process ();
+		
+	private:
+		
+		int N [2];
+		int Nk[2];
+		
+		// We only support 2 dims for the time being
+		int m_dim;
+		
+		// Some more stuff
+		int       m_M;
+		double    m_b;
+		int       m_q;
+		
+		double*   m_tra;
+		
+		double*   k_data;
+		double*   r_data;
+		double*   k_d;
+		double*   r_d;
+		
+	};
 	
 };
-
 #endif /* __NUFFT_H__ */

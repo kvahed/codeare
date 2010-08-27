@@ -40,6 +40,8 @@
 
 using namespace RRSModule;
 
+
+namespace RRServer {
 /**
  * @brief Strategy for reconstruction strategies
  *        Derive hereof to expand the reconstruction toolbox
@@ -164,7 +166,12 @@ protected:
 
 };
 
+
+
 #endif /* __RECON_STRATEGY_H__ */
 
-typedef ReconStrategy* create_t  ();
-typedef void           destroy_t (ReconStrategy*);
+};
+
+typedef RRServer::ReconStrategy* create_t  ();
+typedef void           destroy_t (RRServer::ReconStrategy*);
+

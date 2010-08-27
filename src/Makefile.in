@@ -35,6 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = testclt$(EXEEXT) reconserver$(EXEEXT)
+@NONCART_TRUE@am__append_1 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 subdir = src
 DIST_COMMON = $(srcdir)/Loader.h.in $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in
@@ -267,7 +268,10 @@ testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
-reconserver_LDFLAGS = -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/InvertOrder.la -dlopen modules/MedianFilter_OMP.la
+reconserver_LDFLAGS = -dlopen modules/DummyRecon.la -dlopen \
+	modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen \
+	modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la \
+	$(am__append_1)
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 SUBDIRS = modules
@@ -759,10 +763,10 @@ uninstall-am: uninstall-binPROGRAMS
 
 
 # Add idl to dependencies.
-%.hh: %.idl
+%.hh: common.h %.idl
 	omniidl -bcxx $<
 
-%SK.cc: %.idl
+%SK.cc: common.h %.idl
 	omniidl -bcxx $<
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

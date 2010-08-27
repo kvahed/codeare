@@ -23,33 +23,42 @@
 
 #include "ReconStrategy.h"
 
+using namespace RRServer;
+
+
 /**
- * @brief Empty recon for test purposes
+ * @brief Reconstruction startegies
  */
-class DummyRecon : public ReconStrategy {
-
-
-public:
+namespace RRStrategy {
 
 	/**
-	 * @brief Default constructor
+	 * @brief Empty recon for test purposes
 	 */
-	DummyRecon  ();
-	
-	/**
-	 * @brief Default destructor
-	 */
-	virtual 
-	~DummyRecon ();
+	class DummyRecon : public ReconStrategy {
+		
+		
+	public:
+		
+		/**
+		 * @brief Default constructor
+		 */
+		DummyRecon  () {};
+		
+		/**
+		 * @brief Default destructor
+		 */
+		virtual 
+		~DummyRecon () {};
+		
+		
+		/**
+		 * @brief Do nothing 
+		 */
+		virtual RRSModule::error_code
+		Process ();
+		
+	};
 
-	
-	/**
-	 * @brief Do nothing 
-	 */
-	virtual RRSModule::error_code
-	Process ();
-	
 };
-
 #endif /* __DUMMY_RECON_H__ */
 

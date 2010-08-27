@@ -1,8 +1,8 @@
 # Add idl to dependencies.
-%.hh: %.idl
+%.hh: common.h %.idl
 	omniidl -bcxx $<
 
-%SK.cc: %.idl
+%SK.cc: common.h %.idl
 	omniidl -bcxx $<
 
 # Binaries 
@@ -24,7 +24,10 @@ testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
-reconserver_LDFLAGS = -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/InvertOrder.la -dlopen modules/MedianFilter_OMP.la
+reconserver_LDFLAGS = -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la
+if NONCART
+  reconserver_LDFLAGS += -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
+endif
 
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc

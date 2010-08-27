@@ -20,6 +20,8 @@
 
 #include "MedianFilter_OMP.h"
 
+using namespace RRStrategy;
+
 #ifdef _OPENMP
 #include <omp.h>
 #else

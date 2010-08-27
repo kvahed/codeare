@@ -20,6 +20,7 @@
 
 #include "DumpToFile.h"
 
+using namespace RRStrategy;
 
 DumpToFile::DumpToFile () {}
 

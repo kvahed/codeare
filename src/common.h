@@ -28,7 +28,8 @@ enum      error_code   {
 	
 	OK,
 	ERROR_GENERAL,
-	ERROR_UNKNOWN_METHOD
+	ERROR_UNKNOWN_METHOD,
+	FATAL_SYSTEM_CALL
 	
 };
 
