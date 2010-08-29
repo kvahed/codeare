@@ -26,7 +26,9 @@ using namespace RRStrategy;
 
 RRSModule::error_code
 DummyRecon::Process     () { 
+
 	return RRSModule::OK;
+
 }
 
 // the class factories

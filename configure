@@ -10681,7 +10681,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"136M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"136:137M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -15284,6 +15284,7 @@ if test -z "$BLAS"; then
   as_fn_error "\"Did not find a BLAS library.\"" "$LINENO" 5
 fi
 
+#AC_DEFINE(HAVE_BLAS)
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: BLAS library is $BLAS" >&5
 $as_echo "BLAS library is $BLAS" >&6; }
 LIBS=$SAVE_LIBS
@@ -15457,6 +15458,7 @@ else
 $as_echo "LAPACK library is included in BLAS+LIBS" >&6; }
 fi
 
+#AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
 

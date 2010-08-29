@@ -175,6 +175,7 @@ if test -z "$BLAS"; then
   AC_MSG_ERROR("Did not find a BLAS library.")
 fi
 AC_SUBST(BLAS)
+#AC_DEFINE(HAVE_BLAS)
 AC_MSG_RESULT([BLAS library is $BLAS])
 LIBS=$SAVE_LIBS
 
@@ -212,6 +213,7 @@ else
   AC_MSG_RESULT([LAPACK library is included in BLAS+LIBS])
 fi
 AC_SUBST(LAPACK)
+#AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
 

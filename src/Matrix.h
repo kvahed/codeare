@@ -39,6 +39,18 @@ enum IceDim {
 #include <assert.h>
 #include <iostream>
 #include <fstream>
+#include <stdio.h>
+#include <typeinfo>
+
+/**
+ * @brief raw data
+ */
+typedef std::complex<float> raw;
+
+extern "C" {
+	void cgeev_(char* jobvl, char* jobvr, int* n, raw*    a, int* lda, raw*    w,              raw*    vl, int* ldvl, raw*    vr, int* ldvr, raw*    work, int* lwork, float* rwork, int* info);
+	void dgeev_(char* jobvl, char* jobvr, int* n, double* a, int* lda, double* wr, double* wi, double* vl, int* ldvl, double* vr, int* ldvr, double* work, int* lwork, int* info);
+}
 
 /**
  * Short test if the matrix is a vector.
@@ -70,10 +82,6 @@ static int nb_alloc = 0;
 # define PI  3.1415926535897931159979634685441851615906
 
 
-/**
- * @brief raw data
- */
-typedef std::complex<float> raw;
 
 
 
@@ -686,6 +694,15 @@ public:
             _dim[i] = dim[i];
     }
     
+    /**
+     * @brief           Get size a given dimension.
+     *
+     * @return          Number of rows.
+     */
+    inline int
+	geev                ();
+    
+    
     
     /**
      * @brief           Resize to dim and zero
@@ -1020,9 +1037,6 @@ public:
     operator/           (T s);
     
     //@}
-    
-    
-    
     
     /**
      * @name Display and IO functions.
@@ -2053,6 +2067,100 @@ operator<<    (std::ostream& os, Matrix<T>& M) {
 	return os;
 
 }
+
+
+template <>
+inline int Matrix<double>::geev () {
+	
+	char    jobvl = 'N';
+	char    jobvr = 'N';
+	
+	int     n     = _dim[COL];
+
+	int     lda   = n;
+	
+	double* wr    = new double[n];
+	double* wi    = new double[n];
+	double* vl    = new double[1];
+	double* vr    = new double[1];
+
+    int     ldvr  =  1;
+    int     ldvl  =  1;
+	
+	double* work  = new double[1];
+
+	int     info  =  0;
+	int     lwork = -1;
+
+	dgeev_ (&jobvl, &jobvr, &n, _M, &lda, wr, wi, vl, &ldvl, vr, &ldvr, work, &lwork, &info);
+	lwork = (int) work[0];
+
+	//std::cout << "cgeev_ (lwork = " << lwork << ")" << std::endl;
+
+	delete [] work;
+	work = new double[lwork];
+
+	dgeev_ (&jobvl, &jobvr, &n, _M, &lda, wr, wi, vl, &ldvl, vr, &ldvr, work, &lwork, &info);
+
+	//std::cout << "dgeev_ (info = " << info << ")" << std::endl;
+
+	delete [] wr;
+	delete [] wi;
+	delete [] vl;
+	delete [] vr;
+	delete [] work;
+
+	return info;
+
+}
+
+
+template <>
+inline int Matrix<raw>::geev () {
+	
+	char    jobvl = 'N';
+	char    jobvr = 'N';
+	
+	int     n     = _dim[COL];
+
+	int     lda   = n;
+	
+	raw*    w     = new raw[n];
+	raw*    vl    = new raw[1];
+	raw*    vr    = new raw[1];
+
+    int     ldvr  =  1;
+    int     ldvl  =  1;
+	
+	raw*    work  = new raw[1];
+
+	int     info  =  0;
+	int     lwork = -1;
+
+	float*  rwork = new float[2*n];
+
+	cgeev_ (&jobvl, &jobvr, &n, _M, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
+	lwork = (int) work[0].real();
+
+	//std::cout << "cgeev_ (lwork = " << lwork << ")" << std::endl;
+
+	delete [] work;
+	work = new raw[lwork];
+
+	cgeev_ (&jobvl, &jobvr, &n, _M, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
+
+	//std::cout << "cgeev_ (info = " << info << ")" << std::endl;
+
+	delete [] w;
+	delete [] vl;
+	delete [] vr;
+	delete [] work;
+
+	return info;
+
+}
+
+    
 
 
 #endif // __MATRIX_H__
