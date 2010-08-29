@@ -15,7 +15,7 @@ esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 
 # Checks for programs.
 AC_PROG_CXX
-AC_PROG_F77
+#AC_PROG_F77
 AC_PROG_LIBTOOL
 
 # Set programming language
@@ -34,7 +34,7 @@ AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, ba
 AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/CORBA.h, bailing out])])
 AC_CHECK_HEADERS([noncart/nufft.h],  [], [AC_MSG_RESULT([cannot find noncart/nufft.h, NuFFT/CGSENSE unavailable!])])
 
-AC_CHECK_HEADERS([cblas.h],          [], [AC_MSG_RESULT([cannot find cblas.h, blas functions not available])])
+#AC_CHECK_HEADERS([cblas.h],          [], [AC_MSG_RESULT([cannot find cblas.h, blas functions not available])])
 
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read],   [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
@@ -69,15 +69,150 @@ AC_TRY_LINK([#include "noncart/nufft.h"],
    [AC_MSG_RESULT([no. cannot find libnoncart, NuFFT/CGSENSE unavailable ])])
 AM_CONDITIONAL([NONCART], [test x$noncart_found = xyes])
 
-if test ! -z "$F77"; then
-  AC_F77_LIBRARY_LDFLAGS
+#if test ! -z "$F77"; then
+#  AC_F77_LIBRARY_LDFLAGS
   # This just implicitly checks that FLIBS can co-exist with the C++ linker                                                           
-  AC_CHECK_LIB(c,exit,[],[
-      FLIBS=
-      AC_MSG_WARN([F77 libraries don't seem to link with C++ programs])
-      ],
-      $FLIBS)
+#  AC_CHECK_LIB(c,exit,[],[
+#      FLIBS=
+#      AC_MSG_WARN([F77 libraries don't seem to link with C++ programs])
+#      ],
+#      $FLIBS)
+#fi
+
+AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
+case $withval in
+  yes)
+    BLAS='-lblas'
+    ;;
+  no)
+    BLAS=''
+    ;;
+  *)
+    BLAS=$withval
+    ;;
+esac
+])
+
+AC_ARG_WITH(lapack,[  --with-lapack           which lapack library to use],[
+case $withval in
+  yes)
+    LAPACK='-llapack'
+    ;;
+  no)
+    LAPACK=''
+    ;;
+  *)
+    LAPACK=" $withval"
+    ;;
+esac
+])
+
+# Set strings for particular BLAS and LAPACK functions for later testing                                                                    
+#case $FC_SYMBOL in
+#  1)
+#    DGEMM_SYMBOL=cgemm
+#    DGEEV_SYMBOL=cgeev
+#    ;;
+#  2)
+    DGEMM_SYMBOL=cgemm_
+    DGEEV_SYMBOL=cgeev_
+#    ;;
+#  3)
+#    DGEMM_SYMBOL=CGEMM
+#    DGEEV_SYMBOL=CGEEV
+#    ;;
+#  4)
+#    DGEMM_SYMBOL=CGEMM_
+#    DGEEV_SYMBOL=CGEEV_
+#    ;;
+#esac
+
+SAVE_LIBS=$LIBS
+LIBS="$LIBS $CLIBS $FLIBS"
+
+# If we're using the Intel compilers, we prefer MKL as well                                                                                 
+if test -z "$BLAS"; then
+  if test $CC = icc -o $CXX = icpc; then
+    AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
+  fi
 fi
+# Otherwise, run through a list of possibilities                                                                                            
+if test -z "$BLAS"; then
+  AC_CHECK_LIB(essl, $DGEMM_SYMBOL, BLAS="-lessl -lpthread")
+fi
+if test -z "$BLAS"; then
+  AC_CHECK_LIB(scs, $DGEMM_SYMBOL, BLAS="-lscs")
+fi
+
+if test -z "$BLAS"; then
+  SAVE_LIBS2=$LIBS
+  LIBS="-lpthread $LIBS"
+  AC_CHECK_LIB(goto, $DGEMM_SYMBOL, BLAS="-lgoto -lpthread")
+  LIBS=$SAVE_LIBS2
+fi
+if test -z "$BLAS"; then
+  SAVE_LIBS2=$LIBS
+  LIBS="-latlas $LIBS"
+  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -latlas")
+  LIBS=$SAVE_LIBS2
+fi
+if test -z "$BLAS"; then
+  AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
+fi
+if test -z "$BLAS"; then
+  AC_CHECK_LIB(blas, $DGEMM_SYMBOL, BLAS="-lblas")
+fi
+if test -z "$BLAS"; then
+case $target_vendor in
+  apple)
+    BLAS="-altivec -framework vecLib"
+    AUTOAPPLE="yes"
+    AC_MSG_RESULT([No BLAS specified and vendor is Apple: Assuming vecLib is available!])
+    ;;
+esac
+fi
+if test -z "$BLAS"; then
+  AC_MSG_ERROR("Did not find a BLAS library.")
+fi
+AC_SUBST(BLAS)
+AC_MSG_RESULT([BLAS library is $BLAS])
+LIBS=$SAVE_LIBS
+
+# Similar checks for LAPACK, except that sometimes BLAS includes LAPACK                                                                     
+# Also note that LAPACK often (always?) depends on BLAS                                                                                     
+SAVE_LIBS=$LIBS
+LIBS="$BLAS $LIBS $CLIBS $FLIBS"
+if test -z "$LAPACK"; then
+  if test ! -z "$AUTOAPPLE"; then
+    AC_MSG_RESULT([Assuming vecLib for LAPACK])
+    LAPACK="$BLAS"
+    LAPACK_IN_BLAS=yes
+  else
+    AC_CHECK_FUNC($DGEEV_SYMBOL,LAPACK_IN_BLAS=yes)
+  fi
+fi
+if test -z "$LAPACK_IN_BLAS"; then
+  if test -z "$LAPACK"; then
+    if test $CC = icc -o $CXX = icpc; then
+      # Intel's libmkl_lapack64 contains the double-precision routines                                                                      
+      AC_CHECK_LIB(mkl_lapack64,$DGEEV_SYMBOL,LAPACK="-lmkl_lapack64")
+    fi
+  fi
+  if test -z "$LAPACK"; then
+    AC_CHECK_LIB(lapack,$DGEEV_SYMBOL,LAPACK="-llapack")
+  fi
+  if test -z "$LAPACK"; then
+    AC_CHECK_LIB(lapack-3,$DGEEV_SYMBOL,LAPACK="-llapack-3")
+  fi
+  if test -z "$LAPACK"; then
+    AC_MSG_ERROR("Did not find a LAPACK library.");
+  fi
+  AC_MSG_RESULT([LAPACK library is $LAPACK])
+else
+  AC_MSG_RESULT([LAPACK library is included in BLAS+LIBS])
+fi
+AC_SUBST(LAPACK)
+LIBS=$SAVE_LIBS
 
 
 # Checks for typedefs, structures, and compiler characteristics.
