@@ -50,14 +50,9 @@ int main (int argc, char** argv) {
 		Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		
-		for (i = 0; i < d; i++)
-			for (j = 0; j < d; j++) {
-				r.at(i,j) = raw ((float) i, (float) j) - raw (d/2,d/2);
-				h.at(i,j) = sin(double (i-d/2+1)*(j-d/2+1));
-				p.at(i,j) = (i-d/2+1)*(j-d/2+1);
-			}
-
-		//Matrix<raw> n = r.tr();
+		r.Random();
+		h.Random();
+		p.Random();
 
 		std::cout << h << std::endl;
 		std::cout << h.Minabs() << " " << h.Min() << std::endl;

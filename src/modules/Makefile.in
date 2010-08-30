@@ -98,6 +98,12 @@ GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
 GenericRegrid_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) $(LDFLAGS) -o $@
+LapackTests_la_LIBADD =
+am_LapackTests_la_OBJECTS = $(am__objects_1) LapackTests.lo
+LapackTests_la_OBJECTS = $(am_LapackTests_la_OBJECTS)
+LapackTests_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(LapackTests_la_LDFLAGS) $(LDFLAGS) -o $@
 MedianFilter_OMP_la_LIBADD =
 am_MedianFilter_OMP_la_OBJECTS = $(am__objects_1) MedianFilter_OMP.lo
 MedianFilter_OMP_la_OBJECTS = $(am_MedianFilter_OMP_la_OBJECTS)
@@ -141,12 +147,12 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
 	$(DumpToFile_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
-	$(SystemCmd_la_SOURCES)
+	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
+	$(NuFFT_la_SOURCES) $(SystemCmd_la_SOURCES)
 DIST_SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
 	$(DumpToFile_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
-	$(SystemCmd_la_SOURCES)
+	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
+	$(NuFFT_la_SOURCES) $(SystemCmd_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -274,8 +280,13 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
-	MedianFilter_OMP.la SystemCmd.la $(am__append_1)
+	MedianFilter_OMP.la SystemCmd.la LapackTests.la \
+	$(am__append_1)
+
+# Common linker flags
 COMMON_la_LDFLAGS = -module $(BLAS) $(LAPACK)
+
+# Libraries
 DummyRecon_la_SOURCES = $(COMMON) DummyRecon.h DummyRecon.cpp
 DummyRecon_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 GenericRegrid_la_SOURCES = $(COMMON) GenericRegrid.h GenericRegrid.cpp
@@ -290,6 +301,8 @@ CGSENSE_la_SOURCES = $(COMMON) CGSENSE.h CGSENSE.cpp
 CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 SystemCmd_la_SOURCES = $(COMMON) SystemCmd.h SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+LapackTests_la_SOURCES = $(COMMON) LapackTests.h LapackTests.cpp
+LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 all: all-am
 
@@ -364,6 +377,8 @@ DumpToFile.la: $(DumpToFile_la_OBJECTS) $(DumpToFile_la_DEPENDENCIES)
 	$(DumpToFile_la_LINK) -rpath $(libdir) $(DumpToFile_la_OBJECTS) $(DumpToFile_la_LIBADD) $(LIBS)
 GenericRegrid.la: $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_DEPENDENCIES) 
 	$(GenericRegrid_la_LINK) -rpath $(libdir) $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_LIBADD) $(LIBS)
+LapackTests.la: $(LapackTests_la_OBJECTS) $(LapackTests_la_DEPENDENCIES) 
+	$(LapackTests_la_LINK) -rpath $(libdir) $(LapackTests_la_OBJECTS) $(LapackTests_la_LIBADD) $(LIBS)
 MedianFilter_OMP.la: $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_DEPENDENCIES) 
 	$(MedianFilter_OMP_la_LINK) -rpath $(libdir) $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_LIBADD) $(LIBS)
 NuFFT.la: $(NuFFT_la_OBJECTS) $(NuFFT_la_DEPENDENCIES) 
@@ -381,6 +396,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GenericRegrid.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LapackTests.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@

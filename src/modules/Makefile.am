@@ -9,13 +9,16 @@ COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la
+
 if NONCART
   lib_LTLIBRARIES += CGSENSE.la NuFFT.la
 endif
 
+# Common linker flags
 COMMON_la_LDFLAGS = -module $(BLAS) $(LAPACK)
 
+# Libraries
 DummyRecon_la_SOURCES = $(COMMON) DummyRecon.h DummyRecon.cpp
 DummyRecon_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 
@@ -36,5 +39,8 @@ CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 
 SystemCmd_la_SOURCES = $(COMMON) SystemCmd.h SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+
+LapackTests_la_SOURCES = $(COMMON) LapackTests.h LapackTests.cpp
+LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 
 CLEANFILES = RRSModule.hh RRSModuleSK.cc

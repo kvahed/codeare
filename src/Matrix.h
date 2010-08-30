@@ -39,9 +39,10 @@ enum IceDim {
 #include <assert.h>
 #include <iostream>
 #include <fstream>
-#include <stdio.h>
 #include <typeinfo>
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 /**
  * @brief raw data
  */
@@ -683,6 +684,7 @@ public:
     inline const int*   
     Dim                 ()                                     const {return _dim;}
     
+
     /**
      * @brief           Get size a given dimension.
      *
@@ -693,15 +695,6 @@ public:
         for (int i = 0; i<INVALID_DIM; i++)
             _dim[i] = dim[i];
     }
-    
-    /**
-     * @brief           Get size a given dimension.
-     *
-     * @return          Number of rows.
-     */
-    inline int
-	geev                ();
-    
     
     
     /**
@@ -1009,6 +1002,15 @@ public:
     //@{
     
     /**
+     * @brief           Fill with random data
+     */
+    /**
+     * @brief           Resize to dim and zero
+     */
+    inline void         
+	Random               ();    
+
+    /**
      * @brief           Matrix multiplication. i.e. this * M.
      *
      * @param  M        The factor.
@@ -1147,6 +1149,27 @@ public:
      */
     Matrix<T>           
     tr()                const;
+    
+    //@}
+
+
+    /**
+     * @name Lapack functions.
+     *       Only available when lapack detected.
+     */
+    
+    //@{
+    
+
+    /**
+     * @brief           Compute eigen values.
+     *
+	 * @param  out      Vector containing the computed eigenvalues.
+     * @return          Info from Lapack operation.
+     */
+    inline int
+	geev                (Matrix<raw>& out);
+    
     
     //@}
     
@@ -2070,12 +2093,17 @@ operator<<    (std::ostream& os, Matrix<T>& M) {
 
 
 template <>
-inline int Matrix<double>::geev () {
+inline int Matrix<double>::geev (Matrix<raw>& out) {
 	
 	char    jobvl = 'N';
 	char    jobvr = 'N';
 	
 	int     n     = _dim[COL];
+
+	double* a     = new double[Size()];
+
+	for (int i = 0; i < Size(); i++)
+		a[i] = _M[i];
 
 	int     lda   = n;
 	
@@ -2092,7 +2120,7 @@ inline int Matrix<double>::geev () {
 	int     info  =  0;
 	int     lwork = -1;
 
-	dgeev_ (&jobvl, &jobvr, &n, _M, &lda, wr, wi, vl, &ldvl, vr, &ldvr, work, &lwork, &info);
+	dgeev_ (&jobvl, &jobvr, &n, a, &lda, wr, wi, vl, &ldvl, vr, &ldvr, work, &lwork, &info);
 	lwork = (int) work[0];
 
 	//std::cout << "cgeev_ (lwork = " << lwork << ")" << std::endl;
@@ -2100,10 +2128,20 @@ inline int Matrix<double>::geev () {
 	delete [] work;
 	work = new double[lwork];
 
-	dgeev_ (&jobvl, &jobvr, &n, _M, &lda, wr, wi, vl, &ldvl, vr, &ldvr, work, &lwork, &info);
+	dgeev_ (&jobvl, &jobvr, &n, a, &lda, wr, wi, vl, &ldvl, vr, &ldvr, work, &lwork, &info);
 
 	//std::cout << "dgeev_ (info = " << info << ")" << std::endl;
+	
+	out.Dim(COL) = n;
+	out.Reset();
+	
+	for (int j = 0; j < n; j++)
+		out[j] = raw (wr[j], wi[j]);
 
+	std::cout << out << std::endl;
+
+
+	delete [] a;
 	delete [] wr;
 	delete [] wi;
 	delete [] vl;
@@ -2116,12 +2154,17 @@ inline int Matrix<double>::geev () {
 
 
 template <>
-inline int Matrix<raw>::geev () {
+inline int  Matrix<raw>::geev (Matrix<raw>& out) {
 	
 	char    jobvl = 'N';
 	char    jobvr = 'N';
 	
 	int     n     = _dim[COL];
+
+	raw*    a     = new raw[Size()];
+
+	for (int i = 0; i < Size(); i++)
+		a[i] = _M[i];
 
 	int     lda   = n;
 	
@@ -2151,6 +2194,14 @@ inline int Matrix<raw>::geev () {
 
 	//std::cout << "cgeev_ (info = " << info << ")" << std::endl;
 
+	out.Dim(COL) = n;
+	out.Reset();
+	
+	for (int j = 0; j < n; j++)
+		out[j] = w[j];
+
+	std::cout << out << std::endl;
+
 	delete [] w;
 	delete [] vl;
 	delete [] vr;
@@ -2160,8 +2211,36 @@ inline int Matrix<raw>::geev () {
 
 }
 
-    
+template<>
+inline void Matrix<raw>::Random () {
+	
+	srand (time(NULL));
 
+	for (int i = 0; i < Size(); i++)
+		_M[i] = raw ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
+	
+}
+    
+template<>
+inline void Matrix<double>::Random () {
+
+	srand (time(NULL));
+
+	for (int i = 0; i < Size(); i++)
+		_M[i] = (double) rand() / (double) RAND_MAX*2-1;
+
+}
+    
+template<>
+inline void Matrix<short>::Random () {
+
+	srand (time(NULL));
+
+	for (int i = 0; i < Size(); i++)
+		_M[i] = (short) 4096 * (double)rand() / (double)RAND_MAX*2-1;
+
+}
+    
 
 #endif // __MATRIX_H__
 
