@@ -10681,7 +10681,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"138M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"138:139M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -15203,8 +15203,8 @@ fi
 fi
 
 if test -z "$BLAS"; then
-case $target_vendor in
-  apple)
+case $host in
+  *darwin*)
     BLAS="-altivec -framework vecLib"
     AUTOAPPLE="yes"
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: No BLAS specified and vendor is Apple: Assuming vecLib is available!" >&5

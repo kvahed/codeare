@@ -137,8 +137,8 @@ if test -z "$BLAS"; then
 fi
 
 if test -z "$BLAS"; then
-case $target_vendor in
-  apple)
+case $host in
+  *darwin*)
     BLAS="-altivec -framework vecLib"
     AUTOAPPLE="yes"
     AC_MSG_RESULT([No BLAS specified and vendor is Apple: Assuming vecLib is available!])
