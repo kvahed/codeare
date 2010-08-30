@@ -10681,7 +10681,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"136:137M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"138M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -14446,7 +14446,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-#AC_PROG_F77
 
 
 # Set programming language
@@ -14873,16 +14872,6 @@ else
 fi
 
 
-#if test ! -z "$F77"; then
-#  AC_F77_LIBRARY_LDFLAGS
-  # This just implicitly checks that FLIBS can co-exist with the C++ linker
-#  AC_CHECK_LIB(c,exit,[],[
-#      FLIBS=
-#      AC_MSG_WARN([F77 libraries don't seem to link with C++ programs])
-#      ],
-#      $FLIBS)
-#fi
-
 
 # Check whether --with-blas was given.
 if test "${with_blas+set}" = set; then :
@@ -14921,25 +14910,8 @@ esac
 fi
 
 
-# Set strings for particular BLAS and LAPACK functions for later testing
-#case $FC_SYMBOL in
-#  1)
-#    DGEMM_SYMBOL=cgemm
-#    DGEEV_SYMBOL=cgeev
-#    ;;
-#  2)
-    DGEMM_SYMBOL=cgemm_
-    DGEEV_SYMBOL=cgeev_
-#    ;;
-#  3)
-#    DGEMM_SYMBOL=CGEMM
-#    DGEEV_SYMBOL=CGEEV
-#    ;;
-#  4)
-#    DGEMM_SYMBOL=CGEMM_
-#    DGEEV_SYMBOL=CGEEV_
-#    ;;
-#esac
+DGEMM_SYMBOL=cgemm_
+DGEEV_SYMBOL=cgeev_
 
 SAVE_LIBS=$LIBS
 LIBS="$LIBS $CLIBS $FLIBS"
@@ -14992,6 +14964,7 @@ fi
 
   fi
 fi
+
 # Otherwise, run through a list of possibilities
 if test -z "$BLAS"; then
   as_ac_Lib=`$as_echo "ac_cv_lib_essl_$DGEMM_SYMBOL" | $as_tr_sh`
@@ -15038,6 +15011,7 @@ eval as_val=\$$as_ac_Lib
 fi
 
 fi
+
 if test -z "$BLAS"; then
   as_ac_Lib=`$as_echo "ac_cv_lib_scs_$DGEMM_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEMM_SYMBOL in -lscs" >&5
@@ -15132,6 +15106,7 @@ fi
 
   LIBS=$SAVE_LIBS2
 fi
+
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
@@ -15180,6 +15155,7 @@ fi
 
   LIBS=$SAVE_LIBS2
 fi
+
 if test -z "$BLAS"; then
   as_ac_Lib=`$as_echo "ac_cv_lib_mkl_$DGEMM_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEMM_SYMBOL in -lmkl" >&5
@@ -15225,6 +15201,18 @@ eval as_val=\$$as_ac_Lib
 fi
 
 fi
+
+if test -z "$BLAS"; then
+case $target_vendor in
+  apple)
+    BLAS="-altivec -framework vecLib"
+    AUTOAPPLE="yes"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: No BLAS specified and vendor is Apple: Assuming vecLib is available!" >&5
+$as_echo "No BLAS specified and vendor is Apple: Assuming vecLib is available!" >&6; }
+    ;;
+esac
+fi
+
 if test -z "$BLAS"; then
   as_ac_Lib=`$as_echo "ac_cv_lib_blas_$DGEMM_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEMM_SYMBOL in -lblas" >&5
@@ -15270,16 +15258,7 @@ eval as_val=\$$as_ac_Lib
 fi
 
 fi
-if test -z "$BLAS"; then
-case $target_vendor in
-  apple)
-    BLAS="-altivec -framework vecLib"
-    AUTOAPPLE="yes"
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: No BLAS specified and vendor is Apple: Assuming vecLib is available!" >&5
-$as_echo "No BLAS specified and vendor is Apple: Assuming vecLib is available!" >&6; }
-    ;;
-esac
-fi
+
 if test -z "$BLAS"; then
   as_fn_error "\"Did not find a BLAS library.\"" "$LINENO" 5
 fi

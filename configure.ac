@@ -15,7 +15,6 @@ esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 
 # Checks for programs.
 AC_PROG_CXX
-#AC_PROG_F77
 AC_PROG_LIBTOOL
 
 # Set programming language
@@ -69,16 +68,6 @@ AC_TRY_LINK([#include "noncart/nufft.h"],
    [AC_MSG_RESULT([no. cannot find libnoncart, NuFFT/CGSENSE unavailable ])])
 AM_CONDITIONAL([NONCART], [test x$noncart_found = xyes])
 
-#if test ! -z "$F77"; then
-#  AC_F77_LIBRARY_LDFLAGS
-  # This just implicitly checks that FLIBS can co-exist with the C++ linker                                                           
-#  AC_CHECK_LIB(c,exit,[],[
-#      FLIBS=
-#      AC_MSG_WARN([F77 libraries don't seem to link with C++ programs])
-#      ],
-#      $FLIBS)
-#fi
-
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
 case $withval in
   yes)
@@ -107,25 +96,8 @@ case $withval in
 esac
 ])
 
-# Set strings for particular BLAS and LAPACK functions for later testing                                                                    
-#case $FC_SYMBOL in
-#  1)
-#    DGEMM_SYMBOL=cgemm
-#    DGEEV_SYMBOL=cgeev
-#    ;;
-#  2)
-    DGEMM_SYMBOL=cgemm_
-    DGEEV_SYMBOL=cgeev_
-#    ;;
-#  3)
-#    DGEMM_SYMBOL=CGEMM
-#    DGEEV_SYMBOL=CGEEV
-#    ;;
-#  4)
-#    DGEMM_SYMBOL=CGEMM_
-#    DGEEV_SYMBOL=CGEEV_
-#    ;;
-#esac
+DGEMM_SYMBOL=cgemm_
+DGEEV_SYMBOL=cgeev_
 
 SAVE_LIBS=$LIBS
 LIBS="$LIBS $CLIBS $FLIBS"
@@ -136,10 +108,12 @@ if test -z "$BLAS"; then
     AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
   fi
 fi
+
 # Otherwise, run through a list of possibilities                                                                                            
 if test -z "$BLAS"; then
   AC_CHECK_LIB(essl, $DGEMM_SYMBOL, BLAS="-lessl -lpthread")
 fi
+
 if test -z "$BLAS"; then
   AC_CHECK_LIB(scs, $DGEMM_SYMBOL, BLAS="-lscs")
 fi
@@ -150,18 +124,18 @@ if test -z "$BLAS"; then
   AC_CHECK_LIB(goto, $DGEMM_SYMBOL, BLAS="-lgoto -lpthread")
   LIBS=$SAVE_LIBS2
 fi
+
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
   AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -latlas")
   LIBS=$SAVE_LIBS2
 fi
+
 if test -z "$BLAS"; then
   AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
 fi
-if test -z "$BLAS"; then
-  AC_CHECK_LIB(blas, $DGEMM_SYMBOL, BLAS="-lblas")
-fi
+
 if test -z "$BLAS"; then
 case $target_vendor in
   apple)
@@ -171,6 +145,11 @@ case $target_vendor in
     ;;
 esac
 fi
+
+if test -z "$BLAS"; then
+  AC_CHECK_LIB(blas, $DGEMM_SYMBOL, BLAS="-lblas")
+fi
+
 if test -z "$BLAS"; then
   AC_MSG_ERROR("Did not find a BLAS library.")
 fi
