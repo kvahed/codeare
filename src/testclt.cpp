@@ -54,8 +54,9 @@ int main (int argc, char** argv) {
 		h.Random();
 		p.Random();
 
+		std::cout << r << std::endl;
 		std::cout << h << std::endl;
-		std::cout << h.Minabs() << " " << h.Min() << std::endl;
+		std::cout << p << std::endl;
 		
 		client.SetRaw(r);
 		client.SetPixel(p);
@@ -72,10 +73,6 @@ int main (int argc, char** argv) {
 		client.GetHelper(h);
 		
 		std::cout << h << std::endl;
-		std::cout << h.Minabs() << " " << h.Min() << std::endl;
-		
-
-		//std::cout << r << std::endl;
 
 		cout << "We're good" << endl;
 		

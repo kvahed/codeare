@@ -31,11 +31,20 @@ LapackTests::Process     () {
 
 	Matrix<raw> evs;
 
-	std::cout << "Testing GEEV for helper: "    << std::endl;
-	std::cout << "INFO: " << m_helper.geev(evs) << std::endl;
+	std::cout << "Testing GEEV(dgeev) for helper: ";
+	std::cout << "INFO: " << m_helper.GEEV (evs) << std::endl;
 
-	std::cout << "Testing GEEV for raw:    "    << std::endl;
-	std::cout << "INFO: " << m_raw.geev(evs)    << std::endl;
+	std::cout << "Testing GEEV for raw:    ";
+	std::cout << "INFO: " << m_raw.GEEV (evs)    << std::endl;
+
+	// SGEEV, DGEEV, CGEEV: Eigen value computation
+
+	Matrix<double> lsv;
+	Matrix<double> rsv;
+	Matrix<double> sv;
+
+	std::cout << "Testing SVD(dgesdd) for helper: ";
+	std::cout << "INFO: " << m_helper.SVD (lsv, rsv, sv) << std::endl;
 
 	return RRSModule::OK;
 

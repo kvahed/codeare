@@ -49,8 +49,15 @@ enum IceDim {
 typedef std::complex<float> raw;
 
 extern "C" {
-	void cgeev_(char* jobvl, char* jobvr, int* n, raw*    a, int* lda, raw*    w,              raw*    vl, int* ldvl, raw*    vr, int* ldvr, raw*    work, int* lwork, float* rwork, int* info);
-	void dgeev_(char* jobvl, char* jobvr, int* n, double* a, int* lda, double* wr, double* wi, double* vl, int* ldvl, double* vr, int* ldvr, double* work, int* lwork, int* info);
+
+	// Eigen value computations
+	void cgeev_  (char *jobvl, char *jobvr, int *n, raw    *a, int *lda, raw     *w,             raw    *vl, int *ldvl, raw    *vr, int *ldvr, raw    *work, int *lwork, float *rwork, int *info);
+	void dgeev_  (char *jobvl, char *jobvr, int *n, double *a, int *lda, double *wr, double *wi, double *vl, int *ldvl, double *vr, int *ldvr, double *work, int *lwork,               int *info);
+
+	// Singular value decomposition 
+	void cgesdd_ (char *jobz, int *m, int *n, raw    *a, int *lda, float  *s, raw    *u, int  *ldu, raw    *vt, int *ldvt, raw    *work, int *lwork, float *rwork, int   *iwork, int *info);
+	void dgesdd_ (char *jobz, int *m, int *n, double *a, int *lda, double *s, double *u, int  *ldu, double *vt, int *ldvt, double *work, int *lwork,               int   *iwork, int *info);
+
 }
 
 /**
@@ -62,6 +69,16 @@ extern "C" {
  * Return absolute value.
  */
 # define ABS(A) (A > 0 ? A : -A)
+
+/**
+ * Return minimum of two numbers
+ */
+# define MIN(A,B) (A > B ? A : B)
+
+/**
+ * Return maximum of two numbers 
+ */
+# define MAX(A,B) (A < B ? A : B)
 
 /**
  * Return rounded value as in MATLAB.
@@ -1162,13 +1179,25 @@ public:
     
 
     /**
-     * @brief           Compute eigen values.
+     * @brief           Compute eigen values with Lapack.
      *
-	 * @param  out      Vector containing the computed eigenvalues.
+	 * @param  ev       Vector containing the computed eigenvalues.
      * @return          Info from Lapack operation.
      */
     inline int
-	geev                (Matrix<raw>& out);
+	GEEV                (Matrix<raw>& ev);
+    
+
+    /**
+     * @brief           Compute singular value decomposition with lapack.
+     *
+	 * @param  lsv      Left hand singular vectors.
+	 * @param  rsv      Right hand singular vectors.
+	 * @param  sv       Sorted singular values.
+     * @return          Info from Lapack operation.
+     */
+    inline int
+	SVD                 (Matrix<T>& lsv, Matrix<T>& rsv, Matrix<T>& sv);
     
     
     //@}
@@ -1189,7 +1218,7 @@ Matrix<T>::Matrix () {
     for (int i = 0; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    _M = new T[1];
+    _M = new T[Size()];
     nb_alloc = 1;
 
 
@@ -1202,7 +1231,7 @@ Matrix<T>::Matrix (T s) {
     for (int i = 0; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    _M = new T[1];
+    _M = new T[Size()];
     nb_alloc = 1;
 
     _M[0] = s;
@@ -2038,10 +2067,8 @@ bool Matrix<T>::read (const char* fname) {
 template<> inline std::ostream&  
 Matrix<short>::Print     (std::ostream &os) const {
 
-	int i,j;
-	
-	for (i = 0; i < _dim[COL]; i++) {
-		for(j = 0; j < _dim[LIN]; j++)
+	for (int i = 0; i < _dim[LIN]; i++) {
+		for(int j = 0; j < _dim[COL]; j++)
 			printf ("%4i ", _M [i * _dim[COL] + j]);
 		printf("\n");
 	}
@@ -2054,10 +2081,8 @@ Matrix<short>::Print     (std::ostream &os) const {
 template<> inline std::ostream&  
 Matrix<double>::Print     (std::ostream &os) const {
 
-	int i,j;
-	
-	for (i = 0; i < _dim[COL]; i++) {
-		for(j = 0; j < _dim[LIN]; j++)
+	for (int i = 0; i < _dim[LIN]; i++) {
+		for(int j = 0; j < _dim[COL]; j++)
 			printf ("%.2f ", _M [i * _dim[COL] + j]);
 		printf("\n");
 	}
@@ -2070,10 +2095,8 @@ Matrix<double>::Print     (std::ostream &os) const {
 template<> inline std::ostream&  
 Matrix<raw>::Print       (std::ostream& os) const {
 	
-	int i,j;
-	
-	for (i = 0; i < _dim[COL]; i++) {
-		for(j = 0; j < _dim[LIN]; j++)
+	for (int i = 0; i < _dim[LIN]; i++) {
+		for(int j = 0; j < _dim[COL]; j++)
 			printf ("%.2f+%.2fi ", _M [i*_dim[COL]+j].real(), _M [i*_dim[COL]+j].imag());
 		printf("\n");
 	}
@@ -2093,7 +2116,7 @@ operator<<    (std::ostream& os, Matrix<T>& M) {
 
 
 template <>
-inline int Matrix<double>::geev (Matrix<raw>& out) {
+inline int Matrix<double>::GEEV (Matrix<raw>& ev) {
 	
 	char    jobvl = 'N';
 	char    jobvr = 'N';
@@ -2132,13 +2155,13 @@ inline int Matrix<double>::geev (Matrix<raw>& out) {
 
 	//std::cout << "dgeev_ (info = " << info << ")" << std::endl;
 	
-	out.Dim(COL) = n;
-	out.Reset();
+	ev.Dim(COL) = n;
+	ev.Reset();
 	
 	for (int j = 0; j < n; j++)
-		out[j] = raw (wr[j], wi[j]);
+		ev[j] = raw (wr[j], wi[j]);
 
-	std::cout << out << std::endl;
+	std::cout << ev << std::endl;
 
 
 	delete [] a;
@@ -2154,7 +2177,7 @@ inline int Matrix<double>::geev (Matrix<raw>& out) {
 
 
 template <>
-inline int  Matrix<raw>::geev (Matrix<raw>& out) {
+inline int  Matrix<raw>::GEEV (Matrix<raw>& ev) {
 	
 	char    jobvl = 'N';
 	char    jobvr = 'N';
@@ -2182,7 +2205,7 @@ inline int  Matrix<raw>::geev (Matrix<raw>& out) {
 
 	float*  rwork = new float[2*n];
 
-	cgeev_ (&jobvl, &jobvr, &n, _M, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
+	cgeev_ (&jobvl, &jobvr, &n, a, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
 	lwork = (int) work[0].real();
 
 	//std::cout << "cgeev_ (lwork = " << lwork << ")" << std::endl;
@@ -2190,26 +2213,103 @@ inline int  Matrix<raw>::geev (Matrix<raw>& out) {
 	delete [] work;
 	work = new raw[lwork];
 
-	cgeev_ (&jobvl, &jobvr, &n, _M, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
+	cgeev_ (&jobvl, &jobvr, &n, a, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
 
 	//std::cout << "cgeev_ (info = " << info << ")" << std::endl;
 
-	out.Dim(COL) = n;
-	out.Reset();
+	ev.Dim(COL) = n;
+	ev.Reset();
 	
 	for (int j = 0; j < n; j++)
-		out[j] = w[j];
+		ev[j] = w[j];
 
-	std::cout << out << std::endl;
+	std::cout << ev << std::endl;
 
+	delete [] a;
 	delete [] w;
 	delete [] vl;
 	delete [] vr;
 	delete [] work;
+	delete [] rwork;
 
 	return info;
 
 }
+
+
+template<>
+inline int Matrix<double>::SVD (Matrix<double>& lsv, Matrix<double>& rsv, Matrix<double>& sv) {
+
+	char     jobz = 'A';
+	
+	int      m    = _dim[COL];
+	int      n    = _dim[LIN];
+
+	int      lda  = _dim[COL];
+	int      ldu  = (m >= n) ? m : n;
+	int      ldvt = (m >= n) ? n : m;
+
+
+	double*  a    = new double[Size()];
+
+	for (int i = 0; i < Size(); i++)
+		a[i] = _M[i];
+
+	double*  s    = new double[MIN(_dim[0],_dim[1])];
+	double*  u    = new double[ldu*ldu];
+	double*  vt   = new double[ldvt*ldvt];
+	double*  work = new double[1];
+	
+	int     lwork = -1;
+	int*    iwork = new int[8 * MIN(_dim[0],_dim[1])];
+	int      info = 0;
+
+	dgesdd_ (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
+	lwork = work[0];
+
+	std::cout << "dgesdd_ (lwork = " << lwork << ")" << std::endl;
+
+	delete [] work;
+	work = new double[lwork];
+
+	dgesdd_ (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
+
+	lsv.Dim(0) = ldu;
+	lsv.Dim(1) = ldu;
+	lsv.Reset();
+	for (int j = 0; j < ldu*ldu; j++)
+		lsv[j] = u[j];
+	
+	printf ("rsv----------------\n");
+	std::cout << lsv << std::endl;
+
+	rsv.Dim(0) = ldvt;
+	rsv.Dim(1) = ldvt;
+	rsv.Reset();
+	for (int k = 0; k < ldvt*ldvt; k++)
+		rsv[k] = vt[k];
+	
+	printf ("rsv----------------\n");
+	std::cout << rsv << std::endl;
+
+	sv.Dim(0) = MIN(_dim[0],_dim[1]);
+	sv.Reset();
+	for (int l = 0; l < MIN(_dim[0],_dim[1]); l++)
+		sv[l] = s[l];
+
+	printf ("sv ----------------\n");
+	std::cout << sv << std::endl;
+
+	delete [] a;
+	delete [] s;
+	delete [] u;
+	delete [] vt;
+	delete [] work;
+	delete [] iwork;
+
+	return 0;
+
+} 
 
 template<>
 inline void Matrix<raw>::Random () {
