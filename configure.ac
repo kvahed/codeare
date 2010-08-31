@@ -22,30 +22,53 @@ AC_LANG([C++])
 #AC_OPENMP
 
 # Checks for header files.
-AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR   ([cannot find assert.h, bailing out])])
-AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR   ([cannot find complex, bailing out])])
-AC_CHECK_HEADERS([ctype.h],          [], [AC_MSG_ERROR   ([cannot find ctype, bailing out])])
-AC_CHECK_HEADERS([fstream],          [], [AC_MSG_ERROR   ([cannot find fstream, bailing out])])
-AC_CHECK_HEADERS([iostream],         [], [AC_MSG_ERROR   ([cannot find iostream, bailing out])])
-AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR   ([cannot find cstdlib, bailing out])])
-AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR   ([cannot find ctime, bailing out])])
-AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR   ([cannot find signal.h, bailing out])])
-AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR   ([cannot find omniORB4/CORBA.h, bailing out])])
-AC_CHECK_HEADERS([noncart/nufft.h],  [], [AC_MSG_RESULT  ([cannot find noncart/nufft.h, NuFFT/CGSENSE unavailable!])])
-AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT  ([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
+AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
+AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
+AC_CHECK_HEADERS([ctype.h],          [], [AC_MSG_ERROR([cannot find ctype, bailing out])])
+AC_CHECK_HEADERS([fstream],          [], [AC_MSG_ERROR([cannot find fstream, bailing out])])
+AC_CHECK_HEADERS([iostream],         [], [AC_MSG_ERROR([cannot find iostream, bailing out])])
+AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find cstdlib, bailing out])])
+AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find ctime, bailing out])])
+AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
+AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/CORBA.h, bailing out])])
+AC_CHECK_HEADERS([noncart/nufft.h],  [], [AC_MSG_RESULT([cannot find noncart/nufft.h, NuFFT/CGSENSE unavailable!])])
+AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
 
 # Checks for C libraries.
-AC_CHECK_LIB([omnithread],   [read],   [], [AC_MSG_ERROR ([cannot find libomnithread, bailing out])])
-AC_CHECK_LIB([omniDynamic4], [main],   [], [AC_MSG_ERROR ([cannot find libomniDynamic, bailing out])])
-AC_CHECK_LIB([dl],           [dlopen], [], [AC_MSG_ERROR ([cannot find libdl, bailing out])])
-AC_CHECK_LIB([z],        [deflate],                     [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+AC_CHECK_LIB([omnithread],   [read],        [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
+AC_CHECK_LIB([omniDynamic4], [main],        [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
+AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
+AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 case "$host" in
   *darwin*)
-AC_CHECK_LIB([sz],       [SZ_Compress],                 [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 ;;
 esac
 
 # Checks for C++ libraries with name spaces
+
+AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+
+AC_TRY_LINK([#include <H5Cpp.h>],
+   [
+     H5::H5File file ("test.bin", H5F_ACC_RDONLY); 
+	 H5::DataSet dataset = file.openDataSet("IntArray"); 
+	 H5::IntType intype = dataset.getIntType(); 
+	 H5std_string order_string; 
+	 H5T_order_t order = intype.getOrder( order_string );
+   ],
+   [AC_MSG_RESULT([yes])]
+   hdf5_found=yes,
+   [LIBS=$OLD_LIBS]
+   [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
+
+if test -z $hdf5_found; then
+    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+fi
+
+
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -lomniORB4"
@@ -72,27 +95,6 @@ AC_TRY_LINK([#include "noncart/nufft.h"],
    [LIBS=$OLD_LIBS]
    [AC_MSG_RESULT([no. cannot find libnoncart, NuFFT/CGSENSE unavailable ])])
 AM_CONDITIONAL([NONCART], [test x$noncart_found = xyes])
-
-AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -lhdf5_cpp -lhdf5"
-
-AC_TRY_LINK([#include <H5Cpp.h>],
-   [
-     H5::H5File file ("test.bin", H5F_ACC_RDONLY); 
-	 H5::DataSet dataset = file.openDataSet("IntArray"); 
-	 H5::IntType intype = dataset.getIntType(); 
-	 H5std_string order_string; 
-	 H5T_order_t order = intype.getOrder( order_string );
-   ],
-   [AC_MSG_RESULT([yes])]
-   hdf5_found=yes,
-   [LIBS=$OLD_LIBS]
-   [AC_MSG_ERROR([cannot find libhdf5_cpp, bailing out])])
-
-if test -z $hdf5_found; then
-    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
-fi
 
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
 case $withval in
