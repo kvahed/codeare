@@ -45,6 +45,9 @@ enum IceDim {
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#ifdef HAVE_HDF5
+#include <H5Cpp.h>
+#endif
 
 /**
  * @brief raw data
