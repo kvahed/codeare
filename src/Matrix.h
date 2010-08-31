@@ -21,8 +21,6 @@
 #ifndef __MATRIX_H__
 #define __MATRIX_H__
 
-#define HAVE_HDF5
-
 #ifdef PARC_MODULE_NAME
 
   #include     "MrServers/MrVista/include/Ice/IceBasic/IceAs.h"
@@ -45,7 +43,7 @@ enum IceDim {
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#ifdef HAVE_HDF5
+#ifdef HAVE_H5CPP_H
 #include <H5Cpp.h>
 #endif
 
@@ -2041,7 +2039,7 @@ inline bool Matrix<raw>::dump (const char* fname) {
 	
     if (fname != "") {
 		
-#ifdef HAVE_HDF5 
+#define HAVE_H5CPP_H
 
 		H5::hid_t cxid, file, space, dset;
 		
