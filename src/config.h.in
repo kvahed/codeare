@@ -15,6 +15,9 @@
 /* Define to 1 if you have the <fstream> header file. */
 #undef HAVE_FSTREAM
 
+/* Define to 1 if you have the <H5Cpp.h> header file. */
+#undef HAVE_H5CPP_H
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
@@ -29,6 +32,12 @@
 
 /* Define to 1 if you have the `omnithread' library (-lomnithread). */
 #undef HAVE_LIBOMNITHREAD
+
+/* Define to 1 if you have the `sz' library (-lsz). */
+#undef HAVE_LIBSZ
+
+/* Define to 1 if you have the `z' library (-lz). */
+#undef HAVE_LIBZ
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -87,9 +96,6 @@
 
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
-
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION

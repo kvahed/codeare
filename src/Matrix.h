@@ -43,10 +43,21 @@ enum IceDim {
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 /**
  * @brief raw data
  */
 typedef std::complex<float> raw;
+
+/**
+ * @brief complex float for hdf5.
+ */
+typedef struct {
+   float re;   /*real part */
+   float im;   /*imaginary part */
+} complex_t;
+
+#define DATASET "data"
 
 extern "C" {
 
@@ -2020,40 +2031,47 @@ Matrix<T> Matrix<T>::tr() const {
 
 }
 
-template <class T>
-bool Matrix<T>::dump (const char* fname) {
+template <>
+inline bool Matrix<raw>::dump (const char* fname) {
 	
     if (fname != "") {
 		
 #ifdef HAVE_HDF5 
+
+		hid_t cxid, file, space, dset;
 		
-		try {
-			
-			hsize_t dsd [INVALID_DIM];
-			
-			for (int i = 0; i < INVALID_DIM; i++)
-				dsd [i] = _dim[i];
-			
-			// Open file and specified data set
-			H5File          h5f (fname, H5F_ACC_RDWR);
-			const DataSpace dsp (INVALID_DIM, dsd);
-			
-			DataSet ds;
-			
-			if (typeid(T) == typeid(float))
-				ds = file.createDataSet ("hdr", PredType::NATIVE_FLOAT, dsp);
-			else if (typei(T) == typeid(raw))
-				ds = file.createDataSet ("hdr", PredType::NATIVE_FLOAT, dsp);
-			else
-				ds = file.createDataSet ("hdr", PredType::NATIVE_INT, dsp);
-			
-			sp = ds.getSpace();
-			ds.write(_M, type, dsp, sp);
-			
-			ds.close();
-			file.close();
-			
-		}
+		file = H5Fcreate (FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+		
+		/*
+		 * Create the compound datatype for memory.
+		 */
+		cxid = H5Tcreate (H5T_COMPOUND, sizeof(complex_t));
+		H5Tinsert (cxid, "real", HOFFSET(cmpx,re), H5T_NATIVE_FLOAT);
+		H5Tinsert (cxid, "imag", HOFFSET(cmpx,im), H5T_NATIVE_FLOAT);
+		
+		/*
+		 * Create the dataset and write the compound data to it.
+		 */
+		hsize_t dims [2];
+		
+		for (int i = 0; i < 2; i++)
+			dims[i] = _dim[i];
+		
+		complex_t data [_dim[COL]][_dim[LIN]];
+
+		for (int i = 0; i < _dim[LIN]; i++)
+			for (int j = 0; j < _dim[COL]; j++) {
+				data[i][j].re = _M[j + _dim[LIN] * i].real();
+				data[i][j].im = _M[j + _dim[LIN] * i].imag();
+		
+		space  = H5Screate_simple (1, dims, NULL);
+		
+		dset   = H5Dcreate (file, DATASET, cxid, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		status = H5Dwrite  (dset, cxid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+		
+		status = H5Dclose (dset);
+		status = H5Sclose (space);
+		status = H5Fclose (file);
 		
 #else // HAVE_HDF5
 		
@@ -2062,7 +2080,7 @@ bool Matrix<T>::dump (const char* fname) {
 		
 		for (int i = 0; i < Size(); i++) {
 			std::cout << _M[i] << std::endl;
-			fout.write ((char*)(&(_M[i])), sizeof(T));
+			fout.write ((char*)(&(_M[i])), sizeof(double));
 		}
 		
 		fout.close();

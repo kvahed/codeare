@@ -39,12 +39,12 @@ DumpToFile::Process () {
 	fname.str("");
 
 	fname << uid << "_helper.bin";
-	m_helper.dump (fname.str().c_str());
+	//m_helper.dump (fname.str().c_str());
 
 	fname.str("");
 
 	fname << uid << "_pixel.bin";
-	m_pixel.dump (fname.str().c_str());
+	//m_pixel.dump (fname.str().c_str());
 
 	fname.str("");
 
