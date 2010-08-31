@@ -51,12 +51,16 @@ typedef std::complex<float> raw;
 extern "C" {
 
 	// Eigen value computations
-	void cgeev_  (char *jobvl, char *jobvr, int *n, raw    *a, int *lda, raw     *w,             raw    *vl, int *ldvl, raw    *vr, int *ldvr, raw    *work, int *lwork, float *rwork, int *info);
-	void dgeev_  (char *jobvl, char *jobvr, int *n, double *a, int *lda, double *wr, double *wi, double *vl, int *ldvl, double *vr, int *ldvr, double *work, int *lwork,               int *info);
+	void cgeev_  (char *jobvl, char *jobvr, int *n, raw    *a, int *lda, raw     *w,             raw    *vl,
+				  int *ldvl, raw    *vr, int *ldvr, raw    *work, int *lwork, float *rwork, int *info);
+	void dgeev_  (char *jobvl, char *jobvr, int *n, double *a, int *lda, double *wr, double *wi, double *vl, 
+				  int *ldvl, double *vr, int *ldvr, double *work, int *lwork,               int *info);
 
 	// Singular value decomposition 
-	void cgesdd_ (char *jobz, int *m, int *n, raw    *a, int *lda, float  *s, raw    *u, int  *ldu, raw    *vt, int *ldvt, raw    *work, int *lwork, float *rwork, int   *iwork, int *info);
-	void dgesdd_ (char *jobz, int *m, int *n, double *a, int *lda, double *s, double *u, int  *ldu, double *vt, int *ldvt, double *work, int *lwork,               int   *iwork, int *info);
+	void cgesdd_ (char *jobz, int *m, int *n, raw    *a, int *lda, float  *s, raw    *u, int  *ldu, 
+				  raw    *vt, int *ldvt, raw    *work, int *lwork, float *rwork, int   *iwork, int *info);
+	void dgesdd_ (char *jobz, int *m, int *n, double *a, int *lda, double *s, double *u, int  *ldu, 
+				  double *vt, int *ldvt, double *work, int *lwork,               int   *iwork, int *info);
 
 }
 
@@ -2018,26 +2022,57 @@ Matrix<T> Matrix<T>::tr() const {
 
 template <class T>
 bool Matrix<T>::dump (const char* fname) {
-
-	// TODO: Error checking.
-	//       File not found.
-	//       HDF5 file format.
-
+	
     if (fname != "") {
-
-        std::ofstream fout(fname , std::ios::out | std::ios::binary);
-
-        for (int i = 0; i < Size(); i++) {
-			std::cout << _M[i] << std::endl;
-            fout.write ((char*)(&(_M[i])), sizeof(T));
+		
+#ifdef HAVE_HDF5 
+		
+		try {
+			
+			hsize_t dsd [INVALID_DIM];
+			
+			for (int i = 0; i < INVALID_DIM; i++)
+				dsd [i] = _dim[i];
+			
+			// Open file and specified data set
+			H5File          h5f (fname, H5F_ACC_RDWR);
+			const DataSpace dsp (INVALID_DIM, dsd);
+			
+			DataSet ds;
+			
+			if (typeid(T) == typeid(float))
+				ds = file.createDataSet ("hdr", PredType::NATIVE_FLOAT, dsp);
+			else if (typei(T) == typeid(raw))
+				ds = file.createDataSet ("hdr", PredType::NATIVE_FLOAT, dsp);
+			else
+				ds = file.createDataSet ("hdr", PredType::NATIVE_INT, dsp);
+			
+			sp = ds.getSpace();
+			ds.write(_M, type, dsp, sp);
+			
+			ds.close();
+			file.close();
+			
 		}
-		        
-        fout.close();
-
-    }
-
+		
+#else // HAVE_HDF5
+		
+		
+		std::ofstream fout(fname , std::ios::out | std::ios::binary);
+		
+		for (int i = 0; i < Size(); i++) {
+			std::cout << _M[i] << std::endl;
+			fout.write ((char*)(&(_M[i])), sizeof(T));
+		}
+		
+		fout.close();
+		
+	}
+		
+#endif // HAVE_HDF5
+	
 	return true;
-    
+	
 }
 
 template <class T>
@@ -2161,7 +2196,7 @@ inline int Matrix<double>::GEEV (Matrix<raw>& ev) {
 	for (int j = 0; j < n; j++)
 		ev[j] = raw (wr[j], wi[j]);
 
-	std::cout << ev << std::endl;
+	std::cout << ev ;
 
 
 	delete [] a;
@@ -2223,7 +2258,7 @@ inline int  Matrix<raw>::GEEV (Matrix<raw>& ev) {
 	for (int j = 0; j < n; j++)
 		ev[j] = w[j];
 
-	std::cout << ev << std::endl;
+	std::cout << ev ;
 
 	delete [] a;
 	delete [] w;
@@ -2265,9 +2300,9 @@ inline int Matrix<double>::SVD (Matrix<double>& lsv, Matrix<double>& rsv, Matrix
 	int      info = 0;
 
 	dgesdd_ (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
-	lwork = work[0];
+	lwork = (int) work[0];
 
-	std::cout << "dgesdd_ (lwork = " << lwork << ")" << std::endl;
+	// std::cout << "dgesdd_ (lwork = " << lwork << ")" << std::endl;
 
 	delete [] work;
 	work = new double[lwork];
@@ -2280,25 +2315,86 @@ inline int Matrix<double>::SVD (Matrix<double>& lsv, Matrix<double>& rsv, Matrix
 	for (int j = 0; j < ldu*ldu; j++)
 		lsv[j] = u[j];
 	
-	printf ("rsv----------------\n");
-	std::cout << lsv << std::endl;
-
 	rsv.Dim(0) = ldvt;
 	rsv.Dim(1) = ldvt;
 	rsv.Reset();
 	for (int k = 0; k < ldvt*ldvt; k++)
 		rsv[k] = vt[k];
 	
-	printf ("rsv----------------\n");
-	std::cout << rsv << std::endl;
-
 	sv.Dim(0) = MIN(_dim[0],_dim[1]);
 	sv.Reset();
 	for (int l = 0; l < MIN(_dim[0],_dim[1]); l++)
 		sv[l] = s[l];
 
-	printf ("sv ----------------\n");
-	std::cout << sv << std::endl;
+	std::cout << sv;
+
+	delete [] a;
+	delete [] s;
+	delete [] u;
+	delete [] vt;
+	delete [] work;
+	delete [] iwork;
+
+	return 0;
+
+} 
+
+template<>
+inline int Matrix<raw>::SVD (Matrix<raw>& lsv, Matrix<raw>& rsv, Matrix<raw>& sv) {
+
+	char     jobz = 'A';
+	
+	int      m    = _dim[COL];
+	int      n    = _dim[LIN];
+
+	int      lda  = _dim[COL];
+	int      ldu  = (m >= n) ? m : n;
+	int      ldvt = (m >= n) ? n : m;
+
+
+	raw*  a    = new raw[Size()];
+
+	for (int i = 0; i < Size(); i++)
+		a[i] = _M[i];
+
+	float*  s     = new float[MIN(_dim[0],_dim[1])];
+	raw*     u    = new raw[ldu*ldu];
+	raw*     vt   = new raw[ldvt*ldvt];
+	raw*     work = new raw[1];
+	float* rwork  = new float[MIN(m,n)*MAX(5*MIN(m,n)+7,2*MAX(m,n)+2*MIN(m,n)+1)];
+	
+	int     lwork = -1;
+	int*    iwork = new int[8 * MIN(_dim[0],_dim[1])];
+	int      info = 0;
+
+	cgesdd_ (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
+	lwork = (int) work[0].real();
+
+	//std::cout << "cgesdd_ (lwork = " << lwork << ")" << std::endl;
+
+	delete [] work;
+	work = new raw[lwork];
+
+	cgesdd_ (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
+
+	lsv.Dim(0) = ldu;
+	lsv.Dim(1) = ldu;
+	lsv.Reset();
+	for (int j = 0; j < ldu*ldu; j++)
+		lsv[j] = u[j];
+	
+	rsv.Dim(0) = ldvt;
+	rsv.Dim(1) = ldvt;
+	rsv.Reset();
+	for (int k = 0; k < ldvt*ldvt; k++)
+		rsv[k] = vt[k];
+	
+	sv.Dim(0) = MIN(_dim[0],_dim[1]);
+	sv.Reset();
+	for (int l = 0; l < MIN(_dim[0],_dim[1]); l++)
+		sv[l] = s[l];
+
+	std::cout << sv;
 
 	delete [] a;
 	delete [] s;
