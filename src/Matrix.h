@@ -21,6 +21,8 @@
 #ifndef __MATRIX_H__
 #define __MATRIX_H__
 
+#define HAVE_HDF5
+
 #ifdef PARC_MODULE_NAME
 
   #include     "MrServers/MrVista/include/Ice/IceBasic/IceAs.h"
@@ -2038,16 +2040,16 @@ inline bool Matrix<raw>::dump (const char* fname) {
 		
 #ifdef HAVE_HDF5 
 
-		hid_t cxid, file, space, dset;
+		H5::hid_t cxid, file, space, dset;
 		
-		file = H5Fcreate (FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+		file = H5::H5Fcreate (FILE, H5::H5F_ACC_TRUNC, H5::H5P_DEFAULT, H5::H5P_DEFAULT);
 		
 		/*
 		 * Create the compound datatype for memory.
 		 */
-		cxid = H5Tcreate (H5T_COMPOUND, sizeof(complex_t));
-		H5Tinsert (cxid, "real", HOFFSET(cmpx,re), H5T_NATIVE_FLOAT);
-		H5Tinsert (cxid, "imag", HOFFSET(cmpx,im), H5T_NATIVE_FLOAT);
+		cxid = H5::H5Tcreate (H5::H5T_COMPOUND, sizeof(complex_t));
+		H5::H5Tinsert (cxid, "real", HOFFSET(cmpx,re), H5::H5T_NATIVE_FLOAT);
+		H5::H5Tinsert (cxid, "imag", HOFFSET(cmpx,im), H5::H5T_NATIVE_FLOAT);
 		
 		/*
 		 * Create the dataset and write the compound data to it.
@@ -2064,14 +2066,14 @@ inline bool Matrix<raw>::dump (const char* fname) {
 				data[i][j].re = _M[j + _dim[LIN] * i].real();
 				data[i][j].im = _M[j + _dim[LIN] * i].imag();
 		
-		space  = H5Screate_simple (1, dims, NULL);
+		space  = H5::H5Screate_simple (1, dims, NULL);
 		
-		dset   = H5Dcreate (file, DATASET, cxid, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Dwrite  (dset, cxid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+		dset   = H5::H5Dcreate (file, DATASET, cxid, space, H5::H5P_DEFAULT, H5::H5P_DEFAULT, H5::H5P_DEFAULT);
+		status = H5::H5Dwrite  (dset, cxid, H5::H5S_ALL, H5::H5S_ALL, H5::H5P_DEFAULT, data);
 		
-		status = H5Dclose (dset);
-		status = H5Sclose (space);
-		status = H5Fclose (file);
+		status = H5::H5Dclose (dset);
+		status = H5::H5Sclose (space);
+		status = H5::H5Fclose (file);
 		
 #else // HAVE_HDF5
 		
