@@ -31,13 +31,13 @@ LapackTests::Process     () {
 
 	Matrix<raw> evs;
 
-	std::cout << "Testing GEEV (dgeev) for helper: ";
-	std::cout << "INFO: " << m_helper.GEEV (evs) << std::endl;
+	std::cout << "Testing EIG (dgeev) for helper: ";
+	std::cout << "INFO: " << m_helper.EIG (evs) << std::endl;
 
-	std::cout << "Testing GEEV (cgeev) for raw:    ";
-	std::cout << "INFO: " << m_raw.GEEV (evs)    << std::endl;
+	std::cout << "Testing EIG (cgeev) for raw:    ";
+	std::cout << "INFO: " << m_raw.EIG (evs)    << std::endl;
 
-	// SGEEV, DGEEV, CGEEV: Eigen value computation
+	// SEIG, DEIG, CEIG: Eigen value computation
 
 	Matrix<double> dlsv;
 	Matrix<double> drsv;
@@ -48,10 +48,9 @@ LapackTests::Process     () {
 
 	Matrix<raw>    rlsv;
 	Matrix<raw>    rrsv;
-	Matrix<raw>    rsv;
 
 	std::cout << "Testing SVD (cgesdd) for raw:     ";
-	std::cout << "INFO: " << m_raw.SVD (rlsv, rrsv, rsv)    << std::endl;
+	std::cout << "INFO: " << m_raw.SVD (rlsv, rrsv, dsv)    << std::endl;
 
 	return RRSModule::OK;
 

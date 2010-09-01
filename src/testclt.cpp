@@ -72,8 +72,6 @@ int main (int argc, char** argv) {
 		client.GetPixel(p);
 		client.GetHelper(h);
 		
-		std::cout << h << std::endl;
-
 		cout << "We're good" << endl;
 		
 		return 0;
@@ -86,7 +84,7 @@ int main (int argc, char** argv) {
 
 
 bool init (int argc, char** argv) {
-
+	
 	cout << endl;
 #ifdef VERSION
 	cout << "jrrs "         << VERSION                                        << endl;
