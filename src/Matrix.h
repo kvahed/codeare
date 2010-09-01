@@ -785,6 +785,24 @@ public:
     
     
     /**
+     * @brief           Check if we are 2D (i.e. COL, LIN)
+     *
+     * @return          2D matrix?
+     */
+    bool                
+    Is2D                ()                                    const;
+    
+    
+    /**
+     * @brief           Check if we are 3D (i.e. COL, LIN, SLC)
+     *
+     * @return          3D matrix?
+     */
+    bool                
+    Is3D                ()                                    const;
+    
+    
+    /**
      * @brief           Get the number of matrix cells, i.e. Size * sizeof(T).
      *
      * @return          Size in RAM in bytes.
@@ -1710,6 +1728,31 @@ inline void Matrix<short>::Random () {
 
 }
     
+template <class T> 
+inline bool Matrix<T>::Is2D () const {
+	
+	for (int i = 2; i < INVALID_DIM; i++)
+		if (_dim[i] != 1) 
+			return false;
+
+	return true;
+
+}
+
+template <class T> 
+inline bool Matrix<T>::Is3D () const {
+	
+	for (int i = 2;       i < SLC;         i++)
+		if (_dim[i] != 1) 
+			return false;
+
+	for (int j = SLC + 1; j < INVALID_DIM; j++)
+		if (_dim[j] != 1) 
+			return false;
+
+	return true;
+
+}
 
 #include "Matrix_IO.cpp"
 #include "Matrix_Lapack.cpp"
