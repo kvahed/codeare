@@ -48,8 +48,10 @@ enum IceDim {
 #ifdef HAVE_H5CPP_H
 #include <H5Cpp.h>
 using namespace H5;
-const H5std_string REAL ("real");
-const H5std_string IMAG ("imag");
+const H5std_string RAW_RE ("raw_real");
+const H5std_string RAW_IM ("raw_imag");
+const H5std_string HELPER ("helper");
+const H5std_string PIXEL  ("pixel");
 #endif
 
 
@@ -740,7 +742,7 @@ public:
             _dim[i] = dim[i];
 
         if (nb_alloc) {
-            delete [] (_M);
+            delete [] _M;
             nb_alloc = 0;
         }
 
@@ -759,7 +761,7 @@ public:
     Reset               ()                                      {
 
         if (nb_alloc) {
-            delete [] (_M);
+            delete [] _M;
             nb_alloc = 0;
         }
 
@@ -1393,7 +1395,7 @@ Matrix<T>::~Matrix() {
 #endif
 
     if (nb_alloc) {
-    	delete [] (_M);
+    	delete [] _M;
         nb_alloc = 0;
     }
     

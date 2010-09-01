@@ -1,3 +1,14 @@
+inline bool fexists (const char* fname) {
+	
+	std::ifstream fs (fname);
+	
+	if (fs)
+		return true;
+	else
+		return false;
+
+}
+
 template<> inline std::ostream&  
 Matrix<short>::Print     (std::ostream &os) const {
 
@@ -56,11 +67,6 @@ bool Matrix<T>::dump (const char* fname) {
 		
 #ifdef HAVE_H5CPP_H
 		
-		if (typeid(T) == typeid(raw))
-			std::cout << raw(_M[0]).real() << std::endl;
-		else 
-			std::cout << _M[0] << std::endl;
-		
 		try {
 			
 			Exception::dontPrint();
@@ -70,17 +76,17 @@ bool Matrix<T>::dump (const char* fname) {
 			for (int i = 0; i < INVALID_DIM; i++)
 				dims[i] = _dim[i];
 			
+			unsigned int mode = (fexists(fname)) ? H5F_ACC_RDWR : H5F_ACC_TRUNC;
 
-			H5File    file  (fname, H5F_ACC_TRUNC);
+			H5File    file  (fname, mode);
 
 			if (typeid(T) == typeid(raw)) {
 
 				DataSpace rspace (INVALID_DIM, dims);
 				DataSpace ispace (INVALID_DIM, dims);
 				FloatType type   (PredType::NATIVE_FLOAT);
-				type.setOrder    (H5T_ORDER_LE);
-				DataSet   iset = file.createDataSet( IMAG, type, ispace );
-				DataSet   rset = file.createDataSet( REAL, type, rspace );
+				DataSet   iset = file.createDataSet(RAW_IM, type, ispace );
+				DataSet   rset = file.createDataSet(RAW_RE, type, rspace );
 
 
 				float     real[Size()];
@@ -92,24 +98,31 @@ bool Matrix<T>::dump (const char* fname) {
 				}
 				
 
-				rset.write (real, type);
-				iset.write (imag, type);
-
-				iset.close();
+				rset.write  (real, type);
+				iset.write  (imag, type);
+				rset.close  ();
+				iset.close  ();
 				ispace.close();
 
-			} else {
+			} else if (typeid(T) == typeid(double)) {
 
-				DataSpace rspace (INVALID_DIM, dims);
+				DataSpace space (INVALID_DIM, dims);
+				FloatType type  (PredType::NATIVE_DOUBLE);
+				DataSet   set = file.createDataSet(HELPER, type, space);
 				
-				FloatType type  (sizeof(T));
-				type.setOrder   (H5T_ORDER_LE);
+				set.write  (_M, type);
+				set.close  ();
+				space.close();
+			
+			} else if (typeid(T) == typeid(short)) {
+
+				DataSpace space (INVALID_DIM, dims);
+				IntType   type  (PredType::NATIVE_SHORT);
+				DataSet   set = file.createDataSet(PIXEL, type, space);
 				
-				DataSet   rset = file.createDataSet( REAL, type, rspace );
-				
-				rset.write (_M, type);
-				rset.close();
-				rspace.close();
+				set.write  (_M, type);
+				set.close  ();
+				space.close();
 			
 			}
 
@@ -152,7 +165,33 @@ template <class T>
 bool Matrix<T>::read (const char* fname) {
 	
     if (fname != "") {
+		
+#ifdef HAVE_H5CPP_H
 
+		try {
+			
+			Exception::dontPrint();
+			
+			H5File    file  (fname, H5F_ACC_RDONLY);
+			DataSet dataset = file.openDataSet(RAW_RE);
+
+
+		} catch(FileIException      e) {
+			e.printError();
+			return false;
+		} catch(DataSetIException   e) {
+			e.printError();
+			return false;
+		} catch(DataSpaceIException e) {
+			e.printError();
+			return false;
+		} catch(DataTypeIException  e) {
+			e.printError();
+			return false;
+		}
+		
+#else // HAVE_H5CPP_H
+		
         std::ifstream fin  (fname , std::ios::in | std::ios::binary);
 
         for (int i = 0; i < Size(); i++)
@@ -160,10 +199,11 @@ bool Matrix<T>::read (const char* fname) {
         
         fin.close();
 
+#endif // HAVE_H5CPP_H
+
     }
 
 	return true;
     
 }
-
 

@@ -22,8 +22,6 @@
 
 using namespace RRStrategy;
 
-DumpToFile::DumpToFile () {}
-
 error_code 
 DumpToFile::Process () {
 
@@ -33,18 +31,11 @@ DumpToFile::Process () {
 	if (uid == 0  ||  uid == "")
 		uid = "unspecified";
 
-	fname << uid << "_raw.bin";
+	fname << uid << "_data.h5";
+
 	m_raw.dump    (fname.str().c_str());
-
-	fname.str("");
-
-	fname << uid << "_helper.bin";
 	m_helper.dump (fname.str().c_str());
-
-	fname.str("");
-
-	fname << uid << "_pixel.bin";
-	m_pixel.dump (fname.str().c_str());
+	m_pixel.dump  (fname.str().c_str());
 
 	fname.str("");
 

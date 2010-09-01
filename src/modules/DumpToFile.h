@@ -38,22 +38,22 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		DumpToFile  ();
+		DumpToFile  () {};
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-			~DumpToFile () {};
+		~DumpToFile () {};
 		
 		/**
 		 * @brief Dump data to disk
 		 */
 		virtual RRSModule::error_code
-			Process ();
+		Process     ();
 		
 	};
 
 };
 
-#endif /* __DUMMY_RECON_H__ */
+#endif /* __DUMP_TO_FILE_H__ */
