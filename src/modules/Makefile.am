@@ -11,7 +11,7 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 # Rules for recon strategies
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la
 
-if NONCART
+if HAVE_NONCART
   lib_LTLIBRARIES += CGSENSE.la NuFFT.la
 endif
 

@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@NONCART_TRUE@am__append_1 = CGSENSE.la NuFFT.la
+@HAVE_NONCART_TRUE@am__append_1 = CGSENSE.la NuFFT.la
 subdir = src/modules
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -79,7 +79,7 @@ CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
 CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
-@NONCART_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
+@HAVE_NONCART_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
 DummyRecon_la_LIBADD =
 am_DummyRecon_la_OBJECTS = $(am__objects_1) DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
@@ -116,7 +116,7 @@ NuFFT_la_OBJECTS = $(am_NuFFT_la_OBJECTS)
 NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
-@NONCART_TRUE@am_NuFFT_la_rpath = -rpath $(libdir)
+@HAVE_NONCART_TRUE@am_NuFFT_la_rpath = -rpath $(libdir)
 SystemCmd_la_LIBADD =
 am_SystemCmd_la_OBJECTS = $(am__objects_1) SystemCmd.lo
 SystemCmd_la_OBJECTS = $(am_SystemCmd_la_OBJECTS)

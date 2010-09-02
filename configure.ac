@@ -66,25 +66,36 @@ if test -z $omniORB4_found; then
    LIBS="${LIBS} -lomniORB4"
 fi
 
+AC_ARG_WITH(hdf5,[  --with-hdf5             which hdf5 library to use],[
+case $withval in
+  yes)
+    BLAS='-lhdf5'
+    ;;
+  no)
+    BLAS=''
+    ;;
+  *)
+    BLAS=$withval
+    ;;
+esac
+])
+
 # HDF5. Not mandatory. 
-AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
+AC_MSG_CHECKING([for H5File in -lhdf5_cpp -lhdf5])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -lhdf5_cpp -lhdf5"
 AC_TRY_LINK([#include <H5Cpp.h>],
-   [
-   H5::H5File file ("test.bin", H5F_ACC_RDONLY); 
-	 H5::DataSet dataset = file.openDataSet("IntArray"); 
-	 H5::IntType intype = dataset.getIntType(); 
-	 H5std_string order_string; 
-	 H5T_order_t order = intype.getOrder( order_string );
-   ],
+   [H5::H5File f ("t.h5", H5F_ACC_RDONLY);],
    [AC_MSG_RESULT([yes])]
-	 [AC_DEFINE([HAVE_HDF5], [1], [HDF5 found])]
-   HDF5="-lhdf5_cpp -lhdf5"
-	 [AC_SUBST(HDF5)]
+   hdf5_found=yes,
+   [LIBS=$OLD_LIBS]
    [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
+if test "$hdf5_found" = yes; then
+   AC_DEFINE([HAVE_HDF5], [1], [HDF5 found])
+   HDF5="-lhdf5_cpp -lhdf5"
+   AC_SUBST(HDF5)
+fi
 LIBS=$OLD_LIBS
-
 
 # NonCart (FZJ). Not Mandatory.
 AC_MSG_CHECKING([for noncart::nufft() in -lnoncart])
@@ -96,7 +107,8 @@ AC_TRY_LINK([#include "noncart/nufft.h"],
    noncart_found=yes,
    [LIBS=$OLD_LIBS]
    [AC_MSG_RESULT([no. cannot find libnoncart, NuFFT/CGSENSE unavailable ])])
-AM_CONDITIONAL([NONCART], [test x$noncart_found = xyes])
+AM_CONDITIONAL([HAVE_NONCART], [test "$noncart_found" = yes])
+LIBS=$OLD_LIBS
 
 # BLAS level 1 and 2. Not mandatory.
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
