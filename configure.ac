@@ -49,28 +49,6 @@ esac
 
 # Checks for C++ libraries with name spaces
 
-# HDF5. Not mandatory. 
-AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -lhdf5_cpp -lhdf5"
-
-AC_TRY_LINK([#include <H5Cpp.h>],
-   [
-     H5::H5File file ("test.bin", H5F_ACC_RDONLY); 
-	 H5::DataSet dataset = file.openDataSet("IntArray"); 
-	 H5::IntType intype = dataset.getIntType(); 
-	 H5std_string order_string; 
-	 H5T_order_t order = intype.getOrder( order_string );
-   ],
-   [AC_MSG_RESULT([yes])]
-   hdf5_found=yes,
-   [LIBS=$OLD_LIBS]
-   [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
-
-if test -z $hdf5_found; then
-    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
-fi
-
 # OmniORB. Mandatory.
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
 OLD_LIBS=$LIBS
@@ -87,6 +65,26 @@ AC_TRY_LINK([#include "src/RRSModule.hh"],
 if test -z $omniORB4_found; then
    LIBS="${LIBS} -lomniORB4"
 fi
+
+# HDF5. Not mandatory. 
+AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+AC_TRY_LINK([#include <H5Cpp.h>],
+   [
+   H5::H5File file ("test.bin", H5F_ACC_RDONLY); 
+	 H5::DataSet dataset = file.openDataSet("IntArray"); 
+	 H5::IntType intype = dataset.getIntType(); 
+	 H5std_string order_string; 
+	 H5T_order_t order = intype.getOrder( order_string );
+   ],
+   [AC_MSG_RESULT([yes])]
+	 [AC_DEFINE([HAVE_HDF5], [1], [HDF5 found])]
+   HDF5="-lhdf5_cpp -lhdf5"
+	 [AC_SUBST(HDF5)]
+   [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
+LIBS=$OLD_LIBS
+
 
 # NonCart (FZJ). Not Mandatory.
 AC_MSG_CHECKING([for noncart::nufft() in -lnoncart])

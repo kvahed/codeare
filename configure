@@ -751,6 +751,7 @@ LAPACK
 BLAS
 NONCART_FALSE
 NONCART_TRUE
+HDF5
 OPENMP_CXXFLAGS
 CXXCPP
 am__fastdepCXX_FALSE
@@ -4732,13 +4733,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:4735: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:4736: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4738: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:4739: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4741: output\"" >&5)
+  (eval echo "\"\$as_me:4742: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -5944,7 +5945,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5947 "configure"' > conftest.$ac_ext
+  echo '#line 5948 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7473,11 +7474,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7476: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7477: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7480: \$? = $ac_status" >&5
+   echo "$as_me:7481: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7812,11 +7813,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7815: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7816: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7819: \$? = $ac_status" >&5
+   echo "$as_me:7820: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7917,11 +7918,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7920: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7921: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7924: \$? = $ac_status" >&5
+   echo "$as_me:7925: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -7972,11 +7973,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7975: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7976: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7979: \$? = $ac_status" >&5
+   echo "$as_me:7980: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10356,7 +10357,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 10359 "configure"
+#line 10360 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10452,7 +10453,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 10455 "configure"
+#line 10456 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10681,7 +10682,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"153M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"154M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -13347,11 +13348,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13350: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13351: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13354: \$? = $ac_status" >&5
+   echo "$as_me:13355: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13446,11 +13447,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13449: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13450: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13453: \$? = $ac_status" >&5
+   echo "$as_me:13454: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13498,11 +13499,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13501: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13502: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13505: \$? = $ac_status" >&5
+   echo "$as_me:13506: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14919,45 +14920,6 @@ esac
 
 # Checks for C++ libraries with name spaces
 
-# HDF5. Not mandatory.
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for getOrder in -lhdf5_cpp" >&5
-$as_echo_n "checking for getOrder in -lhdf5_cpp... " >&6; }
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -lhdf5_cpp -lhdf5"
-
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <H5Cpp.h>
-int
-main ()
-{
-
-     H5::H5File file ("test.bin", H5F_ACC_RDONLY);
-	 H5::DataSet dataset = file.openDataSet("IntArray");
-	 H5::IntType intype = dataset.getIntType();
-	 H5std_string order_string;
-	 H5T_order_t order = intype.getOrder( order_string );
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-   hdf5_found=yes
-else
-  LIBS=$OLD_LIBS
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no. Cannot find libhdf5_cpp, hdf5 dump/read not available." >&5
-$as_echo "no. Cannot find libhdf5_cpp, hdf5 dump/read not available." >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-
-if test -z $hdf5_found; then
-    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
-fi
-
 # OmniORB. Mandatory.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CORBA::ORB_init(int, char**) in -lomniORB4" >&5
 $as_echo_n "checking for CORBA::ORB_init(int, char**) in -lomniORB4... " >&6; }
@@ -14990,6 +14952,44 @@ rm -f core conftest.err conftest.$ac_objext \
 if test -z $omniORB4_found; then
    LIBS="${LIBS} -lomniORB4"
 fi
+
+# HDF5. Not mandatory.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for getOrder in -lhdf5_cpp" >&5
+$as_echo_n "checking for getOrder in -lhdf5_cpp... " >&6; }
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <H5Cpp.h>
+int
+main ()
+{
+
+   H5::H5File file ("test.bin", H5F_ACC_RDONLY);
+	 H5::DataSet dataset = file.openDataSet("IntArray");
+	 H5::IntType intype = dataset.getIntType();
+	 H5std_string order_string;
+	 H5T_order_t order = intype.getOrder( order_string );
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_HDF5 1" >>confdefs.h
+
+   HDF5="-lhdf5_cpp -lhdf5"
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no. Cannot find libhdf5_cpp, hdf5 dump/read not available." >&5
+$as_echo "no. Cannot find libhdf5_cpp, hdf5 dump/read not available." >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$OLD_LIBS
+
 
 # NonCart (FZJ). Not Mandatory.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for noncart::nufft() in -lnoncart" >&5

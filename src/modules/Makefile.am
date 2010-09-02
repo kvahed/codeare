@@ -16,7 +16,7 @@ if NONCART
 endif
 
 # Common linker flags
-COMMON_la_LDFLAGS = -module $(BLAS) $(LAPACK)
+COMMON_la_LDFLAGS = -module
 
 # Libraries
 DummyRecon_la_SOURCES = $(COMMON) DummyRecon.h DummyRecon.cpp
@@ -32,7 +32,7 @@ NuFFT_la_SOURCES = $(COMMON) NuFFT.h NuFFT.cpp
 NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.h DumpToFile.cpp
-DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(HDF5)
 
 CGSENSE_la_SOURCES = $(COMMON) CGSENSE.h CGSENSE.cpp
 CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
@@ -41,6 +41,6 @@ SystemCmd_la_SOURCES = $(COMMON) SystemCmd.h SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 
 LapackTests_la_SOURCES = $(COMMON) LapackTests.h LapackTests.cpp
-LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
