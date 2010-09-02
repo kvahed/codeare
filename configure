@@ -10681,7 +10681,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"147M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"153M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -14863,9 +14863,11 @@ else
   as_fn_error "cannot find libfftw, bailing out" "$LINENO" 5
 fi
 
+
+# Mac OSX needs libsz
 case "$host" in
   *darwin*)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for SZ_Compress in -lsz" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SZ_Compress in -lsz" >&5
 $as_echo_n "checking for SZ_Compress in -lsz... " >&6; }
 if test "${ac_cv_lib_sz_SZ_Compress+set}" = set; then :
   $as_echo_n "(cached) " >&6
@@ -14917,6 +14919,7 @@ esac
 
 # Checks for C++ libraries with name spaces
 
+# HDF5. Not mandatory.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getOrder in -lhdf5_cpp" >&5
 $as_echo_n "checking for getOrder in -lhdf5_cpp... " >&6; }
 OLD_LIBS=$LIBS
@@ -14955,7 +14958,7 @@ if test -z $hdf5_found; then
     LIBS="${LIBS} -lhdf5_cpp -lhdf5"
 fi
 
-
+# OmniORB. Mandatory.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CORBA::ORB_init(int, char**) in -lomniORB4" >&5
 $as_echo_n "checking for CORBA::ORB_init(int, char**) in -lomniORB4... " >&6; }
 OLD_LIBS=$LIBS
@@ -14985,9 +14988,10 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 if test -z $omniORB4_found; then
-    LIBS="${LIBS} -lomniORB4"
+   LIBS="${LIBS} -lomniORB4"
 fi
 
+# NonCart (FZJ). Not Mandatory.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for noncart::nufft() in -lnoncart" >&5
 $as_echo_n "checking for noncart::nufft() in -lnoncart... " >&6; }
 OLD_LIBS=$LIBS
@@ -15023,6 +15027,7 @@ else
 fi
 
 
+# BLAS level 1 and 2. Not mandatory.
 
 # Check whether --with-blas was given.
 if test "${with_blas+set}" = set; then :
@@ -15042,6 +15047,7 @@ esac
 fi
 
 
+# BLAS level 3. Not mandatory.
 
 # Check whether --with-lapack was given.
 if test "${with_lapack+set}" = set; then :
@@ -15067,7 +15073,7 @@ DGEEV_SYMBOL=cgeev_
 SAVE_LIBS=$LIBS
 LIBS="$LIBS $CLIBS $FLIBS"
 
-# If we're using the Intel compilers, we prefer MKL as well
+# Intel compiler go with MKL
 if test -z "$BLAS"; then
   if test $CC = icc -o $CXX = icpc; then
     as_ac_Lib=`$as_echo "ac_cv_lib_mkl_$DGEMM_SYMBOL" | $as_tr_sh`
@@ -15116,7 +15122,7 @@ fi
   fi
 fi
 
-# Otherwise, run through a list of possibilities
+# ESSL
 if test -z "$BLAS"; then
   as_ac_Lib=`$as_echo "ac_cv_lib_essl_$DGEMM_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEMM_SYMBOL in -lessl" >&5
@@ -15163,6 +15169,7 @@ fi
 
 fi
 
+# SCS
 if test -z "$BLAS"; then
   as_ac_Lib=`$as_echo "ac_cv_lib_scs_$DGEMM_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEMM_SYMBOL in -lscs" >&5
@@ -15209,6 +15216,7 @@ fi
 
 fi
 
+# Goto
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-lpthread $LIBS"
@@ -15258,6 +15266,7 @@ fi
   LIBS=$SAVE_LIBS2
 fi
 
+# Atlas
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
@@ -15307,6 +15316,7 @@ fi
   LIBS=$SAVE_LIBS2
 fi
 
+# MKL without icpc?
 if test -z "$BLAS"; then
   as_ac_Lib=`$as_echo "ac_cv_lib_mkl_$DGEMM_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEMM_SYMBOL in -lmkl" >&5
@@ -15353,6 +15363,7 @@ fi
 
 fi
 
+# Mac OS X
 if test -z "$BLAS"; then
 case $host in
   *darwin*)
@@ -15364,6 +15375,7 @@ $as_echo "No BLAS specified and vendor is Apple: Assuming vecLib is available!" 
 esac
 fi
 
+# Last hope
 if test -z "$BLAS"; then
   as_ac_Lib=`$as_echo "ac_cv_lib_blas_$DGEMM_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEMM_SYMBOL in -lblas" >&5
@@ -15410,25 +15422,34 @@ fi
 
 fi
 
+# No blas
 if test -z "$BLAS"; then
-  as_fn_error "\"Did not find a BLAS library.\"" "$LINENO" 5
-fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: \"Did not find a BLAS library.\"" >&5
+$as_echo "\"Did not find a BLAS library.\"" >&6; }
+else
 
-#AC_DEFINE(HAVE_BLAS)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: BLAS library is $BLAS" >&5
+
+$as_echo "#define HAVE_BLAS 1" >>confdefs.h
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: BLAS library is $BLAS" >&5
 $as_echo "BLAS library is $BLAS" >&6; }
 LIBS=$SAVE_LIBS
+fi
 
-# Similar checks for LAPACK, except that sometimes BLAS includes LAPACK
-# Also note that LAPACK often (always?) depends on BLAS
+# Lapack.
 SAVE_LIBS=$LIBS
 LIBS="$BLAS $LIBS $CLIBS $FLIBS"
+
+# Mac OS X
 if test -z "$LAPACK"; then
   if test ! -z "$AUTOAPPLE"; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: Assuming vecLib for LAPACK" >&5
 $as_echo "Assuming vecLib for LAPACK" >&6; }
     LAPACK="$BLAS"
     LAPACK_IN_BLAS=yes
+
+$as_echo "#define HAVE_LAPACK 1" >>confdefs.h
+
   else
     as_ac_var=`$as_echo "ac_cv_func_$DGEEV_SYMBOL" | $as_tr_sh`
 ac_fn_cxx_check_func "$LINENO" "$DGEEV_SYMBOL" "$as_ac_var"
@@ -15439,11 +15460,13 @@ fi
 
   fi
 fi
+
 if test -z "$LAPACK_IN_BLAS"; then
-  if test -z "$LAPACK"; then
-    if test $CC = icc -o $CXX = icpc; then
-      # Intel's libmkl_lapack64 contains the double-precision routines
-      as_ac_Lib=`$as_echo "ac_cv_lib_mkl_lapack64_$DGEEV_SYMBOL" | $as_tr_sh`
+
+	if test -z "$LAPACK"; then
+		if test $CC = icc -o $CXX = icpc; then
+      	 # Intel's libmkl_lapack64 contains the double-precision routines
+      		as_ac_Lib=`$as_echo "ac_cv_lib_mkl_lapack64_$DGEEV_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEEV_SYMBOL in -lmkl_lapack64" >&5
 $as_echo_n "checking for $DGEEV_SYMBOL in -lmkl_lapack64... " >&6; }
 if { as_var=$as_ac_Lib; eval "test \"\${$as_var+set}\" = set"; }; then :
@@ -15486,10 +15509,10 @@ eval as_val=\$$as_ac_Lib
   LAPACK="-lmkl_lapack64"
 fi
 
-    fi
-  fi
-  if test -z "$LAPACK"; then
-    as_ac_Lib=`$as_echo "ac_cv_lib_lapack_$DGEEV_SYMBOL" | $as_tr_sh`
+   		fi
+	fi
+	if test -z "$LAPACK"; then
+		as_ac_Lib=`$as_echo "ac_cv_lib_lapack_$DGEEV_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEEV_SYMBOL in -llapack" >&5
 $as_echo_n "checking for $DGEEV_SYMBOL in -llapack... " >&6; }
 if { as_var=$as_ac_Lib; eval "test \"\${$as_var+set}\" = set"; }; then :
@@ -15532,9 +15555,9 @@ eval as_val=\$$as_ac_Lib
   LAPACK="-llapack"
 fi
 
-  fi
-  if test -z "$LAPACK"; then
-    as_ac_Lib=`$as_echo "ac_cv_lib_lapack-3_$DGEEV_SYMBOL" | $as_tr_sh`
+	fi
+	if test -z "$LAPACK"; then
+		as_ac_Lib=`$as_echo "ac_cv_lib_lapack-3_$DGEEV_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEEV_SYMBOL in -llapack-3" >&5
 $as_echo_n "checking for $DGEEV_SYMBOL in -llapack-3... " >&6; }
 if { as_var=$as_ac_Lib; eval "test \"\${$as_var+set}\" = set"; }; then :
@@ -15577,18 +15600,25 @@ eval as_val=\$$as_ac_Lib
   LAPACK="-llapack-3"
 fi
 
-  fi
-  if test -z "$LAPACK"; then
-    as_fn_error "\"Did not find a LAPACK library.\"" "$LINENO" 5;
-  fi
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: LAPACK library is $LAPACK" >&5
+	fi
+	if test -z "$LAPACK"; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: \"Did not find a LAPACK library.\"" >&5
+$as_echo "\"Did not find a LAPACK library.\"" >&6; };
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: LAPACK library is $LAPACK" >&5
 $as_echo "LAPACK library is $LAPACK" >&6; }
+
+$as_echo "#define HAVE_LAPACK 1" >>confdefs.h
+
+	fi
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: LAPACK library is included in BLAS+LIBS" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: LAPACK library is included in BLAS+LIBS" >&5
 $as_echo "LAPACK library is included in BLAS+LIBS" >&6; }
+
+$as_echo "#define HAVE_LAPACK 1" >>confdefs.h
+
 fi
 
-#AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
 

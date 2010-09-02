@@ -3,6 +3,9 @@
 /* Define to 1 if you have the <assert.h> header file. */
 #undef HAVE_ASSERT_H
 
+/* BLAS found */
+#undef HAVE_BLAS
+
 /* Define to 1 if you have the <complex> header file. */
 #undef HAVE_COMPLEX
 
@@ -23,6 +26,9 @@
 
 /* Define to 1 if you have the <iostream> header file. */
 #undef HAVE_IOSTREAM
+
+/* Lapack found */
+#undef HAVE_LAPACK
 
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL

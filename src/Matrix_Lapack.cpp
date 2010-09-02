@@ -1,6 +1,8 @@
 template <class T>
 int  Matrix<T>::EIG (Matrix<raw>& ev) {
 	
+#ifdef HAVE_LAPACK
+
 	char    jobvl = 'N';
 	char    jobvr = 'N';
 	
@@ -75,11 +77,19 @@ int  Matrix<T>::EIG (Matrix<raw>& ev) {
 
 	return info;
 
+#else
+
+	return -1;
+
+#endif
+
 }
 
 
 template<class T>
 int Matrix<T>::SVD (Matrix<T>& lsv, Matrix<T>& rsv, Matrix<double>& sv) {
+
+#ifdef HAVE_LAPACK
 
 	char    jobz = 'A';
 	
@@ -166,7 +176,13 @@ int Matrix<T>::SVD (Matrix<T>& lsv, Matrix<T>& rsv, Matrix<double>& sv) {
 	delete [] rwork;
 	delete [] iwork;
 	
-	return 0;
+	return info;
+
+#else //  HAVE_LAPACK
+	
+	return -1;
+
+#endif // HAVE_LAPACK
 	
 } 
 

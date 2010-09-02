@@ -39,14 +39,17 @@ AC_CHECK_LIB([omnithread],   [read],        [], [AC_MSG_ERROR([cannot find libom
 AC_CHECK_LIB([omniDynamic4], [main],        [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
 AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+
+# Mac OSX needs libsz
 case "$host" in
   *darwin*)
-AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+  AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 ;;
 esac
 
 # Checks for C++ libraries with name spaces
 
+# HDF5. Not mandatory. 
 AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -lhdf5_cpp -lhdf5"
@@ -68,7 +71,7 @@ if test -z $hdf5_found; then
     LIBS="${LIBS} -lhdf5_cpp -lhdf5"
 fi
 
-
+# OmniORB. Mandatory.
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -lomniORB4"
@@ -82,9 +85,10 @@ AC_TRY_LINK([#include "src/RRSModule.hh"],
    [LIBS=$OLD_LIBS]
    [AC_MSG_ERROR([no. cannot find libomniORB4, bailing out])])
 if test -z $omniORB4_found; then
-    LIBS="${LIBS} -lomniORB4"
+   LIBS="${LIBS} -lomniORB4"
 fi
 
+# NonCart (FZJ). Not Mandatory.
 AC_MSG_CHECKING([for noncart::nufft() in -lnoncart])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -lnoncart"
@@ -96,6 +100,7 @@ AC_TRY_LINK([#include "noncart/nufft.h"],
    [AC_MSG_RESULT([no. cannot find libnoncart, NuFFT/CGSENSE unavailable ])])
 AM_CONDITIONAL([NONCART], [test x$noncart_found = xyes])
 
+# BLAS level 1 and 2. Not mandatory.
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
 case $withval in
   yes)
@@ -110,6 +115,7 @@ case $withval in
 esac
 ])
 
+# BLAS level 3. Not mandatory.
 AC_ARG_WITH(lapack,[  --with-lapack           which lapack library to use],[
 case $withval in
   yes)
@@ -130,22 +136,24 @@ DGEEV_SYMBOL=cgeev_
 SAVE_LIBS=$LIBS
 LIBS="$LIBS $CLIBS $FLIBS"
 
-# If we're using the Intel compilers, we prefer MKL as well                                                                                 
+# Intel compiler go with MKL
 if test -z "$BLAS"; then
   if test $CC = icc -o $CXX = icpc; then
     AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
   fi
 fi
 
-# Otherwise, run through a list of possibilities                                                                                            
+# ESSL
 if test -z "$BLAS"; then
   AC_CHECK_LIB(essl, $DGEMM_SYMBOL, BLAS="-lessl -lpthread")
 fi
 
+# SCS
 if test -z "$BLAS"; then
   AC_CHECK_LIB(scs, $DGEMM_SYMBOL, BLAS="-lscs")
 fi
 
+# Goto
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-lpthread $LIBS"
@@ -153,6 +161,7 @@ if test -z "$BLAS"; then
   LIBS=$SAVE_LIBS2
 fi
 
+# Atlas
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
@@ -160,10 +169,12 @@ if test -z "$BLAS"; then
   LIBS=$SAVE_LIBS2
 fi
 
+# MKL without icpc?
 if test -z "$BLAS"; then
   AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
 fi
 
+# Mac OS X
 if test -z "$BLAS"; then
 case $host in
   *darwin*)
@@ -174,53 +185,62 @@ case $host in
 esac
 fi
 
+# Last hope
 if test -z "$BLAS"; then
   AC_CHECK_LIB(blas, $DGEMM_SYMBOL, BLAS="-lblas")
 fi
 
+# No blas
 if test -z "$BLAS"; then
-  AC_MSG_ERROR("Did not find a BLAS library.")
-fi
-AC_SUBST(BLAS)
-#AC_DEFINE(HAVE_BLAS)
-AC_MSG_RESULT([BLAS library is $BLAS])
+  AC_MSG_RESULT("Did not find a BLAS library.")
+else 
+  AC_SUBST(BLAS)
+  AC_DEFINE([HAVE_BLAS], [1], [BLAS found])
+  AC_MSG_RESULT([BLAS library is $BLAS])
 LIBS=$SAVE_LIBS
+fi 
 
-# Similar checks for LAPACK, except that sometimes BLAS includes LAPACK                                                                     
-# Also note that LAPACK often (always?) depends on BLAS                                                                                     
+# Lapack. 
 SAVE_LIBS=$LIBS
 LIBS="$BLAS $LIBS $CLIBS $FLIBS"
+
+# Mac OS X
 if test -z "$LAPACK"; then
   if test ! -z "$AUTOAPPLE"; then
     AC_MSG_RESULT([Assuming vecLib for LAPACK])
     LAPACK="$BLAS"
     LAPACK_IN_BLAS=yes
+	AC_DEFINE([HAVE_LAPACK], [1], [Lapack found])
   else
     AC_CHECK_FUNC($DGEEV_SYMBOL,LAPACK_IN_BLAS=yes)
   fi
 fi
+
 if test -z "$LAPACK_IN_BLAS"; then
-  if test -z "$LAPACK"; then
-    if test $CC = icc -o $CXX = icpc; then
-      # Intel's libmkl_lapack64 contains the double-precision routines                                                                      
-      AC_CHECK_LIB(mkl_lapack64,$DGEEV_SYMBOL,LAPACK="-lmkl_lapack64")
-    fi
-  fi
-  if test -z "$LAPACK"; then
-    AC_CHECK_LIB(lapack,$DGEEV_SYMBOL,LAPACK="-llapack")
-  fi
-  if test -z "$LAPACK"; then
-    AC_CHECK_LIB(lapack-3,$DGEEV_SYMBOL,LAPACK="-llapack-3")
-  fi
-  if test -z "$LAPACK"; then
-    AC_MSG_ERROR("Did not find a LAPACK library.");
-  fi
-  AC_MSG_RESULT([LAPACK library is $LAPACK])
+	
+	if test -z "$LAPACK"; then
+		if test $CC = icc -o $CXX = icpc; then
+      	 # Intel's libmkl_lapack64 contains the double-precision routines                                                                      
+      		AC_CHECK_LIB(mkl_lapack64,$DGEEV_SYMBOL,LAPACK="-lmkl_lapack64")
+   		fi
+	fi
+	if test -z "$LAPACK"; then
+		AC_CHECK_LIB(lapack,$DGEEV_SYMBOL,LAPACK="-llapack")
+	fi
+	if test -z "$LAPACK"; then
+		AC_CHECK_LIB(lapack-3,$DGEEV_SYMBOL,LAPACK="-llapack-3")
+	fi
+	if test -z "$LAPACK"; then
+		AC_MSG_RESULT("Did not find a LAPACK library.");
+	else 
+		AC_MSG_RESULT([LAPACK library is $LAPACK])
+		AC_DEFINE([HAVE_LAPACK], [1], [Lapack found])
+	fi
 else
-  AC_MSG_RESULT([LAPACK library is included in BLAS+LIBS])
+	AC_MSG_RESULT([LAPACK library is included in BLAS+LIBS])
+	AC_DEFINE([HAVE_LAPACK], [1], [Lapack found])
 fi
 AC_SUBST(LAPACK)
-#AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
 
