@@ -1,10 +1,18 @@
 template <class T>
-int  Matrix<T>::EIG (Matrix<raw>& ev) {
+int  Matrix<T>::EIG (Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* rev, bool cl, bool cr) {
+
+	// 2D square matrix.
+
+	if (!Is2D())
+		return -2;
+
+	if (_dim[COL] != _dim[LIN])
+		return -3;
 	
 #ifdef HAVE_LAPACK
 
-	char    jobvl = 'N';
-	char    jobvr = 'N';
+	char    jobvl = (cl) ? 'V' : 'N';
+	char    jobvr = (cr) ? 'V' : 'N';
 	
 	int     n     = _dim[COL];
 
@@ -23,12 +31,12 @@ int  Matrix<T>::EIG (Matrix<raw>& ev) {
 	else 
 		wi        = new T[1];
 
-	T*       vl   = new T[1];
-	T*       vr   = new T[1];
-
-    int     ldvr  =  1;
-    int     ldvl  =  1;
+    int     ldvl  =  (cl) ? n : 1;
+    int     ldvr  =  (cr) ? n : 1;
 	
+	T*       vl   = new T[ldvl*ldvl];
+	T*       vr   = new T[ldvr*ldvr];
+
 	T*      work  = new T[1];
 
 	int     info  =  0;
@@ -59,13 +67,39 @@ int  Matrix<T>::EIG (Matrix<raw>& ev) {
 
 	std::cout << "xgeev_ (info = " << info << ")" << std::endl;
 
-	ev.Dim(COL) = n;
-	ev.Reset();
+	ev->Dim(COL) = n;
+	ev->Reset();
 	
-	for (int j = 0; j < n; j++)
-		ev[j] = w[j];
+	if (typeid(T) == typeid(raw))
+		for (int j = 0; j < n; j++)
+			ev->at(j) = w[j];
+	else if (typeid(T) == typeid(double))
+		for (int k = 0; k < n; k++)
+			ev->at(k) = raw(raw(w[k]).real(),raw(wi[k]).real());
 
-	std::cout << ev ;
+	if (cl) {
+
+		lev->Dim(0) = ldvl;
+		lev->Dim(1) = ldvl;
+		lev->Reset();
+
+		for (int m = 0; m < ldvl*ldvl; m++)
+			lev->at(m) = vl[m];
+		
+	}
+		
+	if (cr) {
+
+		rev->Dim(0) = ldvr;
+		rev->Dim(1) = ldvr;
+		rev->Reset();
+
+		for (int l = 0; l < ldvr*ldvr; l++)
+			rev->at(l) = vl[l];
+		
+	}
+		
+	std::cout << *(ev) ;
 
 	delete [] a;
 	delete [] w;
@@ -87,18 +121,18 @@ int  Matrix<T>::EIG (Matrix<raw>& ev) {
 
 
 template<class T>
-int Matrix<T>::SVD (Matrix<T>& lsv, Matrix<T>& rsv, Matrix<double>& sv) {
+int Matrix<T>::SVD (Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double>* sv, bool cu) {
 
 #ifdef HAVE_LAPACK
 
-	char    jobz = 'A';
+	char    jobz = (cu) ? 'A' : 'N';
 	
 	int     m    = _dim[COL];
 	int     n    = _dim[LIN];
 
 	int     lda  = _dim[COL];
-	int     ldu  = (m >= n) ? m : n;
-	int     ldvt = (m >= n) ? n : m;
+	int     ldu  = (cu) : ((m >= n) ? m : n) : 1;
+	int     ldvt = (cu) : ((m >= n) ? n : m) : 1;
 
 	T*      a    = new T[Size()];
 	
@@ -148,22 +182,22 @@ int Matrix<T>::SVD (Matrix<T>& lsv, Matrix<T>& rsv, Matrix<double>& sv) {
 	else if (typeid(T) == typeid(double))
 		dgesdd_ (&jobz, &m, &n, a, &lda, sd, u, &ldu, vt, &ldvt, work, &lwork,        iwork, &info);
 	
-	lsv.Dim(0) = ldu;
-	lsv.Dim(1) = ldu;
-	lsv.Reset();
+	lsv->Dim(0) = ldu;
+	lsv->Dim(1) = ldu;
+	lsv->Reset();
 	for (int j = 0; j < ldu*ldu; j++)
-		lsv[j] = u[j];
+		lsv->at(j) = u[j];
 	
-	rsv.Dim(0) = ldvt;
-	rsv.Dim(1) = ldvt;
-	rsv.Reset();
+	rsv->Dim(0) = ldvt;
+	rsv->Dim(1) = ldvt;
+	rsv->Reset();
 	for (int k = 0; k < ldvt*ldvt; k++)
-		rsv[k] = vt[k];
+		rsv->at(k) = vt[k];
 	
-	sv.Dim(0) = MIN(_dim[0],_dim[1]);
-	sv.Reset();
+	sv->Dim(0) = MIN(_dim[0],_dim[1]);
+	sv->Reset();
 	for (int l = 0; l < MIN(_dim[0],_dim[1]); l++)
-		sv[l] = (typeid(T) == typeid(raw)) ? sf[l] : sd[l];
+		sv->at(l) = (typeid(T) == typeid(raw)) ? sf[l] : sd[l];
 	
 	std::cout << sv;
 	

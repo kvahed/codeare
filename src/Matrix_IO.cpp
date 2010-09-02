@@ -28,7 +28,7 @@ Matrix<double>::Print     (std::ostream &os) const {
 
 	for (int i = 0; i < _dim[LIN]; i++) {
 		for(int j = 0; j < _dim[COL]; j++)
-			printf ("%.4f ", _M [i * _dim[COL] + j]);
+			printf ("%+.4f ", _M [i * _dim[COL] + j]);
 		printf("\n");
 	}
 	
@@ -42,7 +42,7 @@ Matrix<raw>::Print       (std::ostream& os) const {
 	
 	for (int i = 0; i < _dim[LIN]; i++) {
 		for(int j = 0; j < _dim[COL]; j++)
-			printf ("%.4f+%.4fi ", _M [i*_dim[COL]+j].real(), _M [i*_dim[COL]+j].imag());
+			printf ("%+.4f+%+.4fi ", _M [i*_dim[COL]+j].real(), _M [i*_dim[COL]+j].imag());
 		printf("\n");
 	}
 	

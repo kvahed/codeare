@@ -29,13 +29,22 @@ LapackTests::Process     () {
 
 	// SGEEV, DGEEV, CGEEV: Eigen value computation
 
-	Matrix<raw> evs;
-
+	Matrix<raw> ev;
+	Matrix<double> hlev;
+	Matrix<double> hrev;
+	
 	std::cout << "Testing EIG (dgeev) for helper: ";
-	std::cout << "INFO: " << m_helper.EIG (evs) << std::endl;
+	std::cout << "INFO: " << m_helper.EIG (&ev, &hlev, &hrev, true, false) << std::endl;
+
+	std::cout << hlev << std::endl;
+
+	Matrix<raw> rlev;
+	Matrix<raw> rrev;
 
 	std::cout << "Testing EIG (cgeev) for raw:    ";
-	std::cout << "INFO: " << m_raw.EIG (evs)    << std::endl;
+	std::cout << "INFO: " << m_raw.EIG (&ev, &rlev, &rrev, false, true)    << std::endl;
+
+	std::cout << rrev << std::endl;
 
 	// SEIG, DEIG, CEIG: Eigen value computation
 
@@ -44,13 +53,13 @@ LapackTests::Process     () {
 	Matrix<double> dsv;
 
 	std::cout << "Testing SVD (dgesdd) for helper:  ";
-	std::cout << "INFO: " << m_helper.SVD (dlsv, drsv, dsv) << std::endl;
+	std::cout << "INFO: " << m_helper.SVD (&dlsv, &drsv, &dsv, true) << std::endl;
 
 	Matrix<raw>    rlsv;
 	Matrix<raw>    rrsv;
 
 	std::cout << "Testing SVD (cgesdd) for raw:     ";
-	std::cout << "INFO: " << m_raw.SVD (rlsv, rrsv, dsv)    << std::endl;
+	std::cout << "INFO: " << m_raw.SVD (&rlsv, &rrsv, &dsv, true)    << std::endl;
 
 	return RRSModule::OK;
 

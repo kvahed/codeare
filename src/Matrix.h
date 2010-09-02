@@ -1213,13 +1213,17 @@ public:
     
 
     /**
-     * @brief           Compute eigen values with Lapack.
+     * @brief           Compute eigen values with Lapack
      *
-	 * @param  ev       Vector containing the computed eigenvalues.
-     * @return          Info from Lapack operation.
+	 * @param  ev       Vector containing the computed eigenvalues
+	 * @param  lev      Left hand eigen vectors 
+	 * @param  rev      right hand eigen vectors 
+	 * @param  cl       Compute also left hand eigen vectors
+	 * @param  cr       Compute also right hand eigen vectors
+     * @return          Feedback from Lapack operation
      */
     inline int
-	EIG                 (Matrix<raw>& ev);
+	EIG                 (Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* rev, const bool cl, const bool cr);
     
 
     /**
@@ -1228,10 +1232,11 @@ public:
 	 * @param  lsv      Left hand singular vectors.
 	 * @param  rsv      Right hand singular vectors.
 	 * @param  sv       Sorted singular values.
+	 * @param  cu       Compute matrices U and V**T
      * @return          Info from Lapack operation.
      */
     inline int
-	SVD                 (Matrix<T>& lsv, Matrix<T>& rsv, Matrix<double>& sv);
+	SVD                 (Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double>* sv, bool cu);
     
     
     //@}
