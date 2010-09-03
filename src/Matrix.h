@@ -62,6 +62,20 @@ typedef std::complex<float> raw;
 
 extern "C" {
 
+	// This is all defined only on 2D
+	
+	// Matrix vector multiplication
+	void dgemv_  (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
+				  void     *y, int *incy);
+	void cgemv_  (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
+				  void     *y, int *incy);
+	
+	// Matrix matrix multiplication
+	void dgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, 
+				  int     *ldb, void   *beta, void *c, int *ldc);
+	void cgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, 
+				  int     *ldb, void   *beta, void *c, int *ldc);
+	
 	// Eigen value computations
 	void cgeev_  (char *jobvl, char *jobvr, int    *n, void    *a, int   *lda, void      *w,             void   *vl,
 				  int   *ldvl, void    *vr, int *ldvr, void *work, int *lwork, float *rwork, int  *info);
@@ -1191,7 +1205,7 @@ public:
      * @return          Product of this and M.
      */
     Matrix<T>           
-    prod                (Matrix<T> &M);
+    dot                 (Matrix<T> &M);
     
     /**
      * @brief           Transposition.
@@ -1322,91 +1336,6 @@ Matrix<T>::Matrix (const Matrix<T> &M)
 	nb_alloc = 1;
 
 }
-
-#ifdef PARC_MODULE_NAME
-
-template <class T> long 
-Matrix<T>::Import     (IceAs ias, long pos) {
-    
-    ICE_SET_FN("Matrix<T>::Import(IceAs, long)")
-        
-    int  i    = 0;
-    long size = 1;
-    
-    for (i = 0; i < INVALID_DIM; i++)
-        size *= (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
-    
-    T* data = (T*) ias.calcSplObjStartAddr() ;
-    
-    for (i = 0; i < size; i++, data++)
-        _M[i+pos] = *data;
-    
-    return size;
-    
-}
-
-
-template <class T> long 
-Matrix<T>::Import(IceAs ias) {
-    
-    ICE_SET_FN("Matrix<T>::Import(IceAs)")
-        
-        int i;
-    
-    for (i = 0; i < INVALID_DIM; i++)
-        _dim[i] = (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
-    
-    _M = new T[Size()]();
-    nb_alloc = 1;
-    
-    T* data = (T*) ias.calcSplObjStartAddr() ;
-    
-    for (i = 0; i < Size(); i++, data++)
-        _M[i] = *data;
-    
-    return Size();
-    
-}
-
-
-template <class T> long 
-Matrix<T>::Export(IceAs ias) {
-    
-    ICE_SET_FN("Matrix<T>::Export(IceAs)")
-        
-    T* data = (T*) ias.calcSplObjStartAddr() ;
-    
-    for (int i = 0; i < Size(); i++, data++)
-        *data = _M[i];
-    
-    return Size();
-    
-}
-
-
-template <class T> long
-Matrix<T>::Export(IceAs ias, long pos) {
-
-    ICE_SET_FN("Matrix<T>::Export(IceAs, long)")
-        
-        int  i    = 0;
-    long size = 1;
-    
-    for (i = 0; i < INVALID_DIM; i++) {
-        size *= (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
-    }
-    
-    T* data = (T*) ias.calcSplObjStartAddr() ;
-    
-    for (i = 0; i < size; i++, data++)
-        *data = _M[i+pos];
-    
-    return size;
-    
-}
-
-#endif
-
 
 template <class T> 
 Matrix<T>::~Matrix() {
@@ -1673,7 +1602,7 @@ static T power(T p, int b) {
 }
 
 
-template <class T>
+/*template <class T>
 Matrix<T> Matrix<T>::prod(Matrix<T> &m) {
     
     assert(_dim[COL] == m.height());
@@ -1687,7 +1616,7 @@ Matrix<T> Matrix<T>::prod(Matrix<T> &m) {
                     m[k * m.width() + j];
         }
     return res;
-}
+	}*/
 
 template <class T>
 Matrix<T> Matrix<T>::tr() const {
@@ -1761,6 +1690,8 @@ inline bool Matrix<T>::Is3D () const {
 #include "Matrix_IO.cpp"
 #include "Matrix_Lapack.cpp"
 #include "Matrix_Operators.cpp"
+#include "Matrix_BLAS.cpp"
+#include "Matrix_ICE.cpp"
 
 #endif // __MATRIX_H__
 

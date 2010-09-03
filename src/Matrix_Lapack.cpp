@@ -18,8 +18,11 @@ int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* 
 
 	T*      a     = new T[Size()];
 
-	for (int i = 0; i < Size(); i++)
-		a[i] = _M[i];
+	int     i = 0, j = 0, k = 0;
+
+	for (j = 0; j < _dim[COL]; j++)
+		for (k = 0; k < _dim[LIN]; k++, i++)
+			a[i] = _M[j+k*_dim[LIN]];
 
 	int     lda   = n;
 	
@@ -69,27 +72,32 @@ int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* 
 	ev->Reset();
 	
 	if (typeid(T) == typeid(raw))
-		for (int j = 0; j < n; j++)
-			ev->at(j) = w[j];
+		for (i = 0; i < n; i++)
+			ev->at(i) = w[i];
+
 	else if (typeid(T) == typeid(double))
-		for (int k = 0; k < n; k++)
-			ev->at(k) = raw(raw(w[k]).real(),raw(wi[k]).real());
+		for (i = 0; i < n; i++)
+			ev->at(i) = raw(raw(w[i]).real(),raw(wi[i]).real());
 
 	if (cv) {
 
 		lev->Dim(0) = ldvl;
 		lev->Dim(1) = ldvl;
 		lev->Reset();
-
-		for (int m = 0; m < ldvl*ldvl; m++)
-			lev->at(m) = vl[m];
+		
+		i = 0;
+		for (j = 0; j < ldvl; j++)
+			for (k = 0; k < ldvl; k++, i++)
+				lev->at(i) = vl[j+k*ldvl];
 		
 		rev->Dim(0) = ldvr;
 		rev->Dim(1) = ldvr;
 		rev->Reset();
 
-		for (int l = 0; l < ldvr*ldvr; l++)
-			rev->at(l) = vl[l];
+		i = 0;
+		for (j = 0; j < ldvr; j++)
+			for (k = 0; k < ldvr; k++, i++)
+				rev->at(i) = vl[j+k*ldvr];
 		
 	}
 		
@@ -133,11 +141,12 @@ int Matrix<T>::SVD (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double
 
 	T*      a    = new T[Size()];
 	
-	int i = 0;
-	for (int j = 0; j < _dim[COL]; j++)
-		for (int k = 0; k < _dim[LIN]; k++, i++)
-		a[i] = _M[j + i*_dim[LIN]];
-	
+	int i = 0, j = 0, k = 0;
+
+	for (j = 0; j < _dim[COL]; j++)
+		for (k = 0; k < _dim[LIN]; k++, i++)
+			a[i] = _M[j+k*_dim[LIN]];
+
 	float*  sf = new float[1];
 	double* sd = new double[1];
 	
@@ -186,21 +195,23 @@ int Matrix<T>::SVD (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double
 		lsv->Dim(0) = ldu;
 		lsv->Dim(1) = ldu;
 		lsv->Reset();
-		for (int j = 0; j < ldu*ldu; j++)
-			lsv->at(j) = u[j];
+		int i = 0;
+		for (j = 0; j < ldu; j++)
+			for (k = 0; k < ldu; k++, i++)
+				lsv->at(i) = u[k*ldu+j];
 		
 		rsv->Dim(0) = ldvt;
 		rsv->Dim(1) = ldvt;
 		rsv->Reset();
-		for (int k = 0; k < ldvt*ldvt; k++)
-			rsv->at(k) = vt[k];
+		for (i = 0; i < ldvt*ldvt; i++)
+			rsv->at(i) = vt[i];
 		
 	}
 	
 	sv->Dim(0) = MIN(_dim[0],_dim[1]);
 	sv->Reset();
-	for (int l = 0; l < MIN(_dim[0],_dim[1]); l++)
-		sv->at(l) = (typeid(T) == typeid(raw)) ? sf[l] : sd[l];
+	for (i = 0; i < MIN(_dim[0],_dim[1]); i++)
+		sv->at(i) = (typeid(T) == typeid(raw)) ? sf[i] : sd[i];
 	
 	delete [] a;
 	delete [] sf;
