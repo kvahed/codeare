@@ -632,11 +632,11 @@ public:
 
 
     /**
-     * @brief           Get a vector with as copy of line l of this Matrix, i.e. this(l,:).
+     * @brief           Get a slice from the matrix
      *                  NOT IMPLEMETED YET
      *
-     * @param  lin      Requested line.
-     * @return          Vector copied from requested row.
+     * @param  slc      Requested line.
+     * @return          Matrix copied from slice
      */
     Matrix<T>          
     slc                 (int slc)                             const;
@@ -646,8 +646,8 @@ public:
      * @brief           Get a matrix as a copy of lines l[i] of this matrix, i.e. this(l,:);
      *                  NOT IMPLEMETED YET
      *
-     * @param  lin      Requested rows.
-     * @return          Matrix copied from requested rows.
+     * @param  slc      Requested rows.
+     * @return          Matrix copied from slices 
      */
     Matrix<T>           
     slc                 (Matrix<int> slc)                     const;
@@ -785,9 +785,7 @@ public:
     
 
     /**
-     * @brief           Resize to dim and zero
-     *
-     * @param  dim      New dimensions
+     * @brief           Reset. i.e. Set all fields = T(0)
      */
     inline void         
     Reset               ()                                      {
@@ -1267,7 +1265,7 @@ public:
      * @return          Info from Lapack operation.
      */
     inline int
-	SVD                 (const bool cu, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double>* sv);
+	SVD                 (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double>* sv);
     
     
     //@}

@@ -56,6 +56,7 @@ CGSENSE::CGSENSE () {
  * @param  in           Original discretised sample O (Nx x Ny)
  * @param  sm           Sensitivity maps            O (Nx x Ny x Nc)
  * @param  kt           k-space trajectory          O (Nk x 1)
+ * @param  ncs          Non-Cartesian strategy for non uniform ft
  * @param  out          Result                      O (Nk x Nc)
  */
 RRSModule::error_code 
@@ -96,6 +97,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, M
  * @param  in           K-space samples along trajectory O (Nk x Nc)
  * @param  sm           Sensitivity maps                 O (Nx x Ny x Nc)
  * @param  kt           k-space trajectory               O (Nk x 1)
+ * @param  ncs          Non-Cartesian strategy for non uniform ft
  * @param  out          Returned product                 O (Nx x Ny)
  */
 RRSModule::error_code
