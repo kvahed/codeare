@@ -392,6 +392,7 @@ public:
      * @param  col       Column
      * @param  lin       Line
 	 * @param  cha       Channel
+	 * @param  set       Set
 	 * @param  eco       Echo
 	 * @param  phs       Phase
 	 * @param  rep       Repetition
@@ -447,6 +448,7 @@ public:
      * @param  col       Column
      * @param  lin       Line
 	 * @param  cha       Channel
+	 * @param  set       Set
 	 * @param  eco       Echo
 	 * @param  phs       Phase
 	 * @param  rep       Repetition
