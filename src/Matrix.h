@@ -306,7 +306,6 @@ public:
      * @brief           Get element at position 
      *  
      * @param  pos      Position
-     * @param  lin      Line
      *
      * @return          Value at _M[pos]
      */
@@ -320,7 +319,6 @@ public:
      * @brief            Reference to value at position
      *  
      * @param  pos       Position
-     * @param  lin       Line
      *
      * @return           Reference to _M[pos]
      */
@@ -1252,7 +1250,7 @@ public:
      * @return          Feedback from Lapack operation
      */
     inline int
-	EIG                 (const bool cr, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* rev);
+	EIG                 (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* rev);
     
 
     /**
