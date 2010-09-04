@@ -77,7 +77,7 @@ class Configurable {
 	 * @brief           Set a string type attribute
 	 *
 	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
+	 * @return          String representation of value
 	 */
 	inline const char*
 	Attribute           (const char* name) const {
@@ -90,6 +90,7 @@ class Configurable {
 	 *
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
+	 * @return          Status
 	 */
 	inline const char*
 	Attribute           (const char* name, int* value) const {
@@ -102,6 +103,7 @@ class Configurable {
 	 *
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
+	 * @return          Status
 	 */
 	inline const char*
 	Attribute           (const char* name, double* value) const {
@@ -124,6 +126,8 @@ class Configurable {
 
 	/**
 	 * @brief           Serialize configuration to string
+	 *
+	 * @return          String representation of configuration
 	 */
 	inline const char*
 	GetConfig           ()             {
@@ -139,6 +143,8 @@ class Configurable {
 
 	/**
 	 * @brief          Set configuration from string
+	 *
+	 * @param  cstr    Serialized configuration
 	 */
 	inline void 
 	SetConfig          (const char* cstr) {
@@ -152,6 +158,8 @@ class Configurable {
 
 	/**
 	 * @brief          Get configuration element
+	 *
+	 * @return         Element "Config"
 	 */
 	TiXmlElement* 
 	Configuration      () {
@@ -160,6 +168,12 @@ class Configurable {
 		
 	}
 
+
+	/**
+	 * @brief          Dump XML configuration to file
+	 *
+	 * @param  fname   Name of output file
+	 */
 	void 
 	DumpConfig        (const char* fname) {
 		m_config_doc->SaveFile (fname);
