@@ -364,7 +364,6 @@ public:
      * @param  col       Column
      * @param  lin       Line
      * @param  slc       Slice
-     *
      * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T            
@@ -379,7 +378,6 @@ public:
      * @param  col       Column
      * @param  lin       Line
      * @param  slc       Slice
-     *
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&            
@@ -393,9 +391,20 @@ public:
      *  
      * @param  col       Column
      * @param  lin       Line
-     * @param  slc       Slice
-     *
-     * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
+	 * @param  cha       Channel
+	 * @param  eco       Echo
+	 * @param  phs       Phase
+	 * @param  rep       Repetition
+	 * @param  seg       Segment
+	 * @param  par       Partition
+	 * @param  slc       Slice
+	 * @param  ida       Free index A
+	 * @param  idb       Free index B
+	 * @param  idc       Free index C
+	 * @param  idd       Free index D
+	 * @param  ide       Free index E
+     * @param  ave       Average
+     * @return           Value at position
      */
     inline T            
     at                   (int col, 
@@ -414,23 +423,21 @@ public:
 						  int idd,
 						  int ide,
 						  int ave) const {
-        return _M[
-				  col +
-				  _dim[COL]*lin +
-				  _dim[COL]*_dim[LIN]*lin +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA] +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO] +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd*_dim[IDE]*ide +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd*_dim[IDE]*ide*_dim[AVE]*ave];
+        return _M [col+
+				   lin*_dim[COL]+
+				   cha*_dim[COL]*_dim[LIN]+
+				   eco*_dim[COL]*_dim[LIN]*lin*_dim[CHA]+
+				   phs*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]+
+				   rep*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]+
+				   seg*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]+
+				   par*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
+				   slc*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
+				   ida*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
+				   idb*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
+				   idc*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
+				   idd*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
+				   ide*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
+				   ave*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
     }
     
     
@@ -439,9 +446,20 @@ public:
      *  
      * @param  col       Column
      * @param  lin       Line
-     * @param  slc       Slice
-     *
-     * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
+	 * @param  cha       Channel
+	 * @param  eco       Echo
+	 * @param  phs       Phase
+	 * @param  rep       Repetition
+	 * @param  seg       Segment
+	 * @param  par       Partition
+	 * @param  slc       Slice
+	 * @param  ida       Free index A
+	 * @param  idb       Free index B
+	 * @param  idc       Free index C
+	 * @param  idd       Free index D
+	 * @param  ide       Free index E
+     * @param  ave       Average
+     * @return           Reference to position
      */
 	inline T&            
     at                   (int col, 
@@ -460,23 +478,21 @@ public:
 						  int idd,
 						  int ide,
 						  int ave) {
-        return _M[
-				  col +
-				  _dim[COL]*lin +
-				  _dim[COL]*_dim[LIN]*lin +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA] +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO] +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd*_dim[IDE]*ide +
-				  _dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*phs*_dim[REP]*rep*_dim[SEG]*seg*_dim[PAR]*par*_dim[SLC]*slc*_dim[IDA]*ida*_dim[IDB]*idb*_dim[IDC]*idc*_dim[IDD]*idd*_dim[IDE]*ide*_dim[AVE]*ave];
+        return _M [col+
+				   lin*_dim[COL]+
+				   cha*_dim[COL]*_dim[LIN]+
+				   eco*_dim[COL]*_dim[LIN]*lin*_dim[CHA]+
+				   phs*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]+
+				   rep*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]+
+				   seg*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]+
+				   par*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
+				   slc*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
+				   ida*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
+				   idb*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
+				   idc*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
+				   idd*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
+				   ide*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
+				   ave*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
     }
     
      /**
