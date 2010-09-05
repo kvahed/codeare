@@ -33,13 +33,13 @@ LapackTests::Process     () {
 	Matrix<double> hlev;
 	Matrix<double> hrev;
 	
-	std::cout << "Testing EIG (dgeev) for helper: ";
+	std::cout << "Testing EIG (dgeev) for helper:  ";
 	std::cout << "INFO: " << m_helper.EIG (true, &ev, &hlev, &hrev) << std::endl;
 
 	Matrix<raw> rlev;
 	Matrix<raw> rrev;
 
-	std::cout << "Testing EIG (cgeev) for raw:    ";
+	std::cout << "Testing EIG (cgeev) for raw:     ";
 	std::cout << "INFO: " << m_raw.EIG (true, &ev, &rlev, &rrev)    << std::endl;
 
 	// SEIG, DEIG, CEIG: Eigen value computation
@@ -48,13 +48,13 @@ LapackTests::Process     () {
 	Matrix<double> drsv;
 	Matrix<double> dsv;
 
-	std::cout << "Testing SVD (dgesdd) for helper:  ";
+	std::cout << "Testing SVD (dgesdd) for helper: ";
 	std::cout << "INFO: " << m_helper.SVD (true, &dlsv, &drsv, &dsv) << std::endl;
 
 	Matrix<raw>    rlsv;
 	Matrix<raw>    rrsv;
 
-	std::cout << "Testing SVD (cgesdd) for raw:     ";
+	std::cout << "Testing SVD (cgesdd) for raw:    ";
 	std::cout << "INFO: " << m_raw.SVD (true, &rlsv, &rrsv, &dsv)    << std::endl;
 
 	Matrix<double> test;
@@ -66,6 +66,10 @@ LapackTests::Process     () {
 	std::cout << "Testing mm multiplication (dgemm) for helper:     ";
 	Matrix<double> product = test.dot(m_helper);
 	
+	/*std::cout << test;
+	printf ("\n");
+	std::cout << product;*/
+
 	return RRSModule::OK;
 
 }

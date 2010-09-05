@@ -78,7 +78,7 @@ int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* 
 	
 	lwork = (int) (raw(work[0]).real());
 
-	std::cout << "xgeev_ (lwork = " << lwork << ")" << std::endl;
+	//std::cout << "xgeev_ (lwork = " << lwork << ")" << std::endl;
 
 	delete [] work;
 	work = new T[lwork];
@@ -200,7 +200,7 @@ int Matrix<T>::SVD (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double
 	
 	lwork = (int) raw(work[0]).real();
 	
-	std::cout << "xgesdd_ (lwork = " << lwork << ")" << std::endl;
+	//std::cout << "xgesdd_ (lwork = " << lwork << ")" << std::endl;
 	
 	delete [] work;
 	work = new T[lwork];
