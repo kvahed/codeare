@@ -1,5 +1,34 @@
+template <class T>
+Matrix<T> 
+Matrix<T>::prod(Matrix<T> &m) {
+
+    assert(width() == m.height());
+
+	if (typeid(T) == typeid(double) || typeid(T) == typeid(double)) // Fast BLAS code
+		return GEMM(m);
+
+	else {                                                          // Standard impl
+
+		Matrix<T> res;
+		
+		res.width()  = height();
+		res.height() = m.width();
+		res.Reset();
+		
+		for (int i = 0; i < res.height(); i++)
+			for (int j = 0; j < res.width(); j++)
+				for (int k = 0; k < width(); k++)
+					res[i * res.width() + j] += _M[i * width() + k] * m[k * m.width() + j];
+		
+		return res;
+		
+	}
+	
+}
+
 template<class T>
-Matrix<T> Matrix<T>::dot (Matrix<T>& M) {
+Matrix<T> 
+Matrix<T>::GEMM (Matrix<T>& M) {
 	
 	Matrix<T> res;
 

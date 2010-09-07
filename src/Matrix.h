@@ -1219,7 +1219,7 @@ public:
      * @return          Product of this and M.
      */
     Matrix<T>           
-    dot                 (Matrix<T> &M);
+    prod                (Matrix<T> &M);
     
     /**
      * @brief           Transposition.
@@ -1274,6 +1274,14 @@ private:
     
     int                 _dim[INVALID_DIM]; /// Dimnesions
     T*                  _M;                /// Data repository
+
+    /**
+     * @brief           Matrix Product with BLAS.
+     *
+     * @return          Product of this and M.
+     */
+    Matrix<T>           
+    GEMM                (Matrix<T> &M);
     
 };
 
@@ -1615,22 +1623,6 @@ static T power(T p, int b) {
 
 }
 
-
-/*template <class T>
-Matrix<T> Matrix<T>::prod(Matrix<T> &m) {
-    
-    assert(_dim[COL] == m.height());
-    Matrix<T> res(_dim[LIN], m.width());
-
-    for (int i = 0; i < res.height(); i++)
-        for (int j = 0; j < res.width(); j++) {
-            res[i * res.width() + j] = 0;
-            for (int k = 0; k < _dim[COL]; k++)
-                    res[i * res.width() + j] += _M[i * _dim[COL] + k] *
-                    m[k * m.width() + j];
-        }
-    return res;
-	}*/
 
 template <class T>
 Matrix<T> Matrix<T>::tr() const {

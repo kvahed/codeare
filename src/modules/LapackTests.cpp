@@ -64,7 +64,7 @@ LapackTests::Process     () {
 	test.Random();
 
 	std::cout << "Testing mm multiplication (dgemm) for helper:     ";
-	Matrix<double> product = test.dot(m_helper);
+	Matrix<double> product = test.prod(m_helper);
 	
 	/*std::cout << test;
 	printf ("\n");
