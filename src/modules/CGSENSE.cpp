@@ -1,12 +1,65 @@
 #include "CGSENSE.h"
-#include "nfft3util.h"
-#include "nfft3.h"
 
 using namespace RRStrategy;
 
 CGSENSE::CGSENSE () {
 
-	// Copy incoming data to m_temp             */
+	m_N = new int[2];
+	m_n = new int[2];
+
+	FILE* fin;
+
+	bool     weight      = true;
+
+	double   epsilon     = 0.0000003;               /* Epsilon is a the break criterium for the iteration */
+	unsigned infft_flags = CGNR | PRECOMPUTE_DAMP;  /* Flags for the infft */
+	int      m           = 6;
+	double   alpha       = 2.0;
+
+	m_config->Attribute ("Nx", &m_N[0]);
+	m_config->Attribute ("Ny", &m_N[1]);
+
+	/* initialise my_plan */
+	m_n[0] = ceil(m_N[0]*alpha);
+	m_n[1] = ceil(m_N[1]*alpha);
+
+	nfft_init_guru (&m_plan, 2, m_N, m_raw.Dim(COL), m_n, m, 
+					PRE_PHI_HUT| PRE_PSI| MALLOC_X| MALLOC_F_HAT| MALLOC_F|	FFTW_INIT| FFT_OUT_OF_PLACE, FFTW_MEASURE| FFTW_DESTROY_INPUT);
+
+	/* Precompute lin psi if set */
+	if(m_plan.nfft_flags & PRE_LIN_PSI)
+		nfft_precompute_lin_psi(&m_plan);
+
+	/* Set the flags for the infft*/
+	if (weight)
+		infft_flags = infft_flags | PRECOMPUTE_WEIGHT;
+
+	/* Get the weights */
+	if (m_iplan.flags & PRECOMPUTE_WEIGHT) {
+		fin = fopen ("weights.dat","r");
+		for(int j = 0; j < m_plan.M_total; j++)
+			fscanf (fin, "%le ", &m_iplan.w[j]);
+		fclose (fin);
+	}
+
+	/* initialise my_iplan, advanced */
+	solver_init_advanced_complex (&m_iplan, (mv_plan_complex*)&m_plan, infft_flags);
+
+	/* get the damping factors */
+	if (m_iplan.flags & PRECOMPUTE_DAMP)
+		for (int j = 0; j < m_N[0]; j++) {
+			for (int k = 0; k < m_N[1]; k++) {
+				int    j2 = j - m_N[0]/2;
+				int    k2 = k - m_N[1]/2;
+				double r  = sqrt (j2*j2 + k2*k2);
+				if (r > (double)m_N[0]/2)
+					m_iplan.w_hat[j*m_N[0]+k] = 0.0;
+				else
+					m_iplan.w_hat[j*m_N[0]+k] = 1.0;
+			}
+		}
+
+	/* Copy incoming data to m_temp             */
 	Matrix < raw > m_temp = (m_raw);
 
 	// Reshape for outgoing format
@@ -24,14 +77,6 @@ CGSENSE::CGSENSE () {
 
 	m_raw.Reset();
 	
-	N[0]  = m_raw.Dim(COL);
-	N[1]  = m_raw.Dim(LIN);
-	N[2]  = m_raw.Dim(SLC);
-
-	Nk[0] = m_helper.Dim(COL);
-	Nk[1] = m_helper.Dim(LIN);
-	Nk[2] = m_helper.Dim(SLC);
-
 	// Maximum k-vector reached
 	kmax[0] = 0.0;
 	for (int i = 0; i < m_helper.Dim(COL); i++)
@@ -62,7 +107,7 @@ CGSENSE::CGSENSE () {
  * @param  out          Result                      O (Nk x Nc)
  */
 RRSModule::error_code 
-E  (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, Matrix<raw>* out) {
+E  (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, nfft_plan* plan, Matrix<raw>* out) {
 	
 	int nc   = sm->Dim(CHA);
 	int nk   = in->Dim(COL); 
@@ -82,7 +127,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, M
 			memcpy (&tmp_in.at(0), &in->at(0, 0, nc, 0, 0, 0, 0, 0, 0, nz, 0, 0, 0, 0, 0, 0),   nx*ny*sizeof(double)); 
 			memcpy (&tmp_sm.at(0), &sm->at(0, 0, nc, 0, 0, 0, 0, 0, 0, nz, 0, 0, 0, 0, 0, 0),   nx*ny*sizeof(double));
 
-			((noncart::nufft*)ncs)->forward_2d(&tmp_in, &tmp_out);
+			//((noncart::nufft*)ncs)->forward_2d(&tmp_in, &tmp_out);
 
 			memcpy (&out->at(0, 0, nc, 0, 0, 0, 0, 0, 0, nz, 0, 0, 0, 0, 0, 0), &tmp_out.at(0), nx*ny*sizeof(double));
 
@@ -103,13 +148,37 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, M
  * @param  out          Returned product                 O (Nx x Ny)
  */
 RRSModule::error_code
-EH (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, noncart::strategy* ncs, Matrix<raw>* out) {
+EH (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, solver_plan_complex* plan, double epsilon, int maxit, Matrix<raw>* out) {
 
 	int ncoils   = sm->Dim(CHA);
 	int nsamples = in->Size(); 
 
-	return OK;
+	double t=nfft_second();
+	
+	/* inverse trafo */
+	solver_before_loop_complex(plan);
+	
+	for(int l=0; l < maxit; l++)  {
+		/* break if dot_r_iter is smaller than epsilon*/
+		if(plan->dot_r_iter<epsilon)
+			break;
+#ifdef VERBOSE
+		fprintf(stderr,"%e,  %i of %i\n",sqrt(plan->dot_r_iter), l+1, maxit);
+#endif
+		solver_loop_one_step_complex(plan);
+	}
 
+	t=nfft_second()-t;
+
+	/*
+	  for (k=0;k<my_plan.N_total;k++) {
+	  fprintf(fout_real,"%le ", creal(my_iplan.f_hat_iter[k]));
+	  fprintf(fout_imag,"%le ", cimag(my_iplan.f_hat_iter[k]));
+	  }
+	*/
+	
+	return OK;
+	
 }
 
 RRSModule::error_code
@@ -120,12 +189,12 @@ CGSENSE::Process () {
 	// CG iterations
 	for (int iter = 0; iter < m_iter; iter++) {
 
-		EH (p, s, k, &m_nufft, q);
+		EH (p, s, k, &m_iplan, m_epsilon, m_iter, q);
 
 		delete p;
 		p = new Matrix<raw> (*(q));
 
-		E  (p, s, k, &m_nufft, q);
+		E  (p, s, k, &m_plan, q);
 
 		/*
 		  delta = r(:)'*r(:)/(a(:)'*a(:));

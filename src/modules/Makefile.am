@@ -9,11 +9,7 @@ COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la
-
-if HAVE_NONCART
-  lib_LTLIBRARIES += CGSENSE.la NuFFT.la
-endif
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la CGSENSE.la NuFFT.la
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module

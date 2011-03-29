@@ -67,10 +67,12 @@ namespace RRStrategy {
 		Matrix < raw >     m_sens;
 		Matrix < raw >     m_temp;
 		
-		nfft_plan          my_plan;            /* plan for nfft  */
+		nfft_plan           m_plan;           /* plan for forward nfft  */
+		solver_plan_complex m_iplan;           /* plan for inverse nfft */
+
 		
-		int*               N;
-		int*               Nk;
+		int*               m_N;
+		int*               m_n;
 		
 		double*            kmax;
 		

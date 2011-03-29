@@ -40,13 +40,14 @@ AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hd
 AC_CHECK_LIB([omnithread],   [read],        [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
 AC_CHECK_LIB([omniDynamic4], [main],        [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
 AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
-AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libz, bailing out])])
+AC_CHECK_LIB([fftw],         [fftw_create_plan],     [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 case "$host" in
   *darwin*)
 AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 ;;
 esac
-AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [AM_CONDITIONAL([HAVE_NONCART], [test x$noncart_found = xyes])], [AC_MSG_ERROR([cannot find libnfft3, bailing out])])
+AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [], [AC_MSG_ERROR([cannot find libnfft3, bailing out])])
 # Checks for C++ libraries with name spaces
 
 AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])

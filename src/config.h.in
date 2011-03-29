@@ -27,6 +27,12 @@
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
+/* Define to 1 if you have the `fftw' library (-lfftw). */
+#undef HAVE_LIBFFTW
+
+/* Define to 1 if you have the `nfft3' library (-lnfft3). */
+#undef HAVE_LIBNFFT3
+
 /* Define to 1 if you have the `omniDynamic4' library (-lomniDynamic4). */
 #undef HAVE_LIBOMNIDYNAMIC4
 
