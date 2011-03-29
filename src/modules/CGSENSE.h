@@ -22,8 +22,8 @@
 #define __CGSENSE_H__
 
 #include "ReconStrategy.h"
-
-#include <noncart/nufft.h>
+#include "nfft3util.h"
+#include "nfft3.h"
 
 typedef std::complex<float> raw;
 
@@ -67,7 +67,7 @@ namespace RRStrategy {
 		Matrix < raw >     m_sens;
 		Matrix < raw >     m_temp;
 		
-		noncart::nufft     m_nufft;
+		nfft_plan          my_plan;            /* plan for nfft  */
 		
 		int*               N;
 		int*               Nk;

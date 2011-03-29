@@ -1,5 +1,5 @@
 AC_PREREQ([1.10])
-AC_INIT([jrrs], [0.5], [k.vahedipour@fz-juelich.cd])
+AC_INIT([jrrs], [0.4], [k.vahedipour@fz-juelich.cd])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([config])
@@ -19,7 +19,7 @@ AC_PROG_LIBTOOL
 
 # Set programming language
 AC_LANG([C++])
-AC_OPENMP
+#AC_OPENMP
 
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
@@ -32,7 +32,8 @@ AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find cstdlib, bai
 AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find ctime, bailing out])])
 AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
 AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/CORBA.h, bailing out])])
-AC_CHECK_HEADERS([noncart/nufft.h],  [], [AC_MSG_RESULT([cannot find noncart/nufft.h, NuFFT/CGSENSE unavailable!])])
+AC_CHECK_HEADERS([nfft3.h],          [], [AC_MSG_RESULT([cannot find nfft3.h, NuFFT/CGSENSE unavailable!])])
+AC_CHECK_HEADERS([nfft3util.h],      [], [AC_MSG_RESULT([cannot find nfft3util.h, NuFFT/CGSENSE unavailable!])])
 AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
 
 # Checks for C libraries.
@@ -40,17 +41,36 @@ AC_CHECK_LIB([omnithread],   [read],        [], [AC_MSG_ERROR([cannot find libom
 AC_CHECK_LIB([omniDynamic4], [main],        [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
 AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
-
-# Mac OSX needs libsz
 case "$host" in
   *darwin*)
-  AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 ;;
 esac
-
+AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [AM_CONDITIONAL([HAVE_NONCART], [test x$noncart_found = xyes])], [AC_MSG_ERROR([cannot find libnfft3, bailing out])])
 # Checks for C++ libraries with name spaces
 
-# OmniORB. Mandatory.
+AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+
+AC_TRY_LINK([#include <H5Cpp.h>],
+   [
+     H5::H5File file ("test.bin", H5F_ACC_RDONLY); 
+	 H5::DataSet dataset = file.openDataSet("IntArray"); 
+	 H5::IntType intype = dataset.getIntType(); 
+	 H5std_string order_string; 
+	 H5T_order_t order = intype.getOrder( order_string );
+   ],
+   [AC_MSG_RESULT([yes])]
+   hdf5_found=yes,
+   [LIBS=$OLD_LIBS]
+   [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
+
+if test -z $hdf5_found; then
+    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+fi
+
+
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -lomniORB4"
@@ -64,54 +84,9 @@ AC_TRY_LINK([#include "src/RRSModule.hh"],
    [LIBS=$OLD_LIBS]
    [AC_MSG_ERROR([no. cannot find libomniORB4, bailing out])])
 if test -z $omniORB4_found; then
-   LIBS="${LIBS} -lomniORB4"
+    LIBS="${LIBS} -lomniORB4"
 fi
 
-AC_ARG_WITH(hdf5,[  --with-hdf5             which hdf5 library to use],[
-case $withval in
-  yes)
-    BLAS='-lhdf5'
-    ;;
-  no)
-    BLAS=''
-    ;;
-  *)
-    BLAS=$withval
-    ;;
-esac
-])
-
-# HDF5. Not mandatory. 
-AC_MSG_CHECKING([for H5File in -lhdf5_cpp -lhdf5])
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -lhdf5_cpp -lhdf5"
-AC_TRY_LINK([#include <H5Cpp.h>],
-   [H5::H5File f ("t.h5", H5F_ACC_RDONLY);],
-   [AC_MSG_RESULT([yes])]
-   hdf5_found=yes,
-   [LIBS=$OLD_LIBS]
-   [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
-if test "$hdf5_found" = yes; then
-   AC_DEFINE([HAVE_HDF5], [1], [HDF5 found])
-   HDF5="-lhdf5_cpp -lhdf5"
-   AC_SUBST(HDF5)
-fi
-LIBS=$OLD_LIBS
-
-# NonCart (FZJ). Not Mandatory.
-AC_MSG_CHECKING([for noncart::nufft() in -lnoncart])
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -lnoncart"
-AC_TRY_LINK([#include "noncart/nufft.h"],
-   [int argc = 0; noncart::nufft nufft;],
-   [AC_MSG_RESULT([yes])]
-   noncart_found=yes,
-   [LIBS=$OLD_LIBS]
-   [AC_MSG_RESULT([no. cannot find libnoncart, NuFFT/CGSENSE unavailable ])])
-AM_CONDITIONAL([HAVE_NONCART], [test "$noncart_found" = yes])
-LIBS=$OLD_LIBS
-
-# BLAS level 1 and 2. Not mandatory.
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
 case $withval in
   yes)
@@ -126,7 +101,6 @@ case $withval in
 esac
 ])
 
-# BLAS level 3. Not mandatory.
 AC_ARG_WITH(lapack,[  --with-lapack           which lapack library to use],[
 case $withval in
   yes)
@@ -147,24 +121,22 @@ DGEEV_SYMBOL=cgeev_
 SAVE_LIBS=$LIBS
 LIBS="$LIBS $CLIBS $FLIBS"
 
-# Intel compiler go with MKL
+# If we're using the Intel compilers, we prefer MKL as well                                                                                 
 if test -z "$BLAS"; then
   if test $CC = icc -o $CXX = icpc; then
     AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
   fi
 fi
 
-# ESSL
+# Otherwise, run through a list of possibilities                                                                                            
 if test -z "$BLAS"; then
   AC_CHECK_LIB(essl, $DGEMM_SYMBOL, BLAS="-lessl -lpthread")
 fi
 
-# SCS
 if test -z "$BLAS"; then
   AC_CHECK_LIB(scs, $DGEMM_SYMBOL, BLAS="-lscs")
 fi
 
-# Goto
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-lpthread $LIBS"
@@ -172,7 +144,6 @@ if test -z "$BLAS"; then
   LIBS=$SAVE_LIBS2
 fi
 
-# Atlas
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
@@ -180,12 +151,10 @@ if test -z "$BLAS"; then
   LIBS=$SAVE_LIBS2
 fi
 
-# MKL without icpc?
 if test -z "$BLAS"; then
   AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
 fi
 
-# Mac OS X
 if test -z "$BLAS"; then
 case $host in
   *darwin*)
@@ -196,62 +165,53 @@ case $host in
 esac
 fi
 
-# Last hope
 if test -z "$BLAS"; then
   AC_CHECK_LIB(blas, $DGEMM_SYMBOL, BLAS="-lblas")
 fi
 
-# No blas
 if test -z "$BLAS"; then
-  AC_MSG_RESULT("Did not find a BLAS library.")
-else 
-  AC_SUBST(BLAS)
-  AC_DEFINE([HAVE_BLAS], [1], [BLAS found])
-  AC_MSG_RESULT([BLAS library is $BLAS])
+  AC_MSG_ERROR("Did not find a BLAS library.")
+fi
+AC_SUBST(BLAS)
+#AC_DEFINE(HAVE_BLAS)
+AC_MSG_RESULT([BLAS library is $BLAS])
 LIBS=$SAVE_LIBS
-fi 
 
-# Lapack. 
+# Similar checks for LAPACK, except that sometimes BLAS includes LAPACK                                                                     
+# Also note that LAPACK often (always?) depends on BLAS                                                                                     
 SAVE_LIBS=$LIBS
 LIBS="$BLAS $LIBS $CLIBS $FLIBS"
-
-# Mac OS X
 if test -z "$LAPACK"; then
   if test ! -z "$AUTOAPPLE"; then
     AC_MSG_RESULT([Assuming vecLib for LAPACK])
     LAPACK="$BLAS"
     LAPACK_IN_BLAS=yes
-	AC_DEFINE([HAVE_LAPACK], [1], [Lapack found])
   else
     AC_CHECK_FUNC($DGEEV_SYMBOL,LAPACK_IN_BLAS=yes)
   fi
 fi
-
 if test -z "$LAPACK_IN_BLAS"; then
-	
-	if test -z "$LAPACK"; then
-		if test $CC = icc -o $CXX = icpc; then
-      	 # Intel's libmkl_lapack64 contains the double-precision routines                                                                      
-      		AC_CHECK_LIB(mkl_lapack64,$DGEEV_SYMBOL,LAPACK="-lmkl_lapack64")
-   		fi
-	fi
-	if test -z "$LAPACK"; then
-		AC_CHECK_LIB(lapack,$DGEEV_SYMBOL,LAPACK="-llapack")
-	fi
-	if test -z "$LAPACK"; then
-		AC_CHECK_LIB(lapack-3,$DGEEV_SYMBOL,LAPACK="-llapack-3")
-	fi
-	if test -z "$LAPACK"; then
-		AC_MSG_RESULT("Did not find a LAPACK library.");
-	else 
-		AC_MSG_RESULT([LAPACK library is $LAPACK])
-		AC_DEFINE([HAVE_LAPACK], [1], [Lapack found])
-	fi
+  if test -z "$LAPACK"; then
+    if test $CC = icc -o $CXX = icpc; then
+      # Intel's libmkl_lapack64 contains the double-precision routines                                                                      
+      AC_CHECK_LIB(mkl_lapack64,$DGEEV_SYMBOL,LAPACK="-lmkl_lapack64")
+    fi
+  fi
+  if test -z "$LAPACK"; then
+    AC_CHECK_LIB(lapack,$DGEEV_SYMBOL,LAPACK="-llapack")
+  fi
+  if test -z "$LAPACK"; then
+    AC_CHECK_LIB(lapack-3,$DGEEV_SYMBOL,LAPACK="-llapack-3")
+  fi
+  if test -z "$LAPACK"; then
+    AC_MSG_ERROR("Did not find a LAPACK library.");
+  fi
+  AC_MSG_RESULT([LAPACK library is $LAPACK])
 else
-	AC_MSG_RESULT([LAPACK library is included in BLAS+LIBS])
-	AC_DEFINE([HAVE_LAPACK], [1], [Lapack found])
+  AC_MSG_RESULT([LAPACK library is included in BLAS+LIBS])
 fi
 AC_SUBST(LAPACK)
+#AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
 

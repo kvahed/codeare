@@ -3,9 +3,6 @@
 /* Define to 1 if you have the <assert.h> header file. */
 #undef HAVE_ASSERT_H
 
-/* BLAS found */
-#undef HAVE_BLAS
-
 /* Define to 1 if you have the <complex> header file. */
 #undef HAVE_COMPLEX
 
@@ -21,17 +18,11 @@
 /* Define to 1 if you have the <H5Cpp.h> header file. */
 #undef HAVE_H5CPP_H
 
-/* HDF5 found */
-#undef HAVE_HDF5
-
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
 /* Define to 1 if you have the <iostream> header file. */
 #undef HAVE_IOSTREAM
-
-/* Lapack found */
-#undef HAVE_LAPACK
 
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
@@ -54,8 +45,11 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define to 1 if you have the <noncart/nufft.h> header file. */
-#undef HAVE_NONCART_NUFFT_H
+/* Define to 1 if you have the <nfft3util.h> header file. */
+#undef HAVE_NFFT3UTIL_H
+
+/* Define to 1 if you have the <nfft3.h> header file. */
+#undef HAVE_NFFT3_H
 
 /* Define to 1 if you have the <omniORB4/CORBA.h> header file. */
 #undef HAVE_OMNIORB4_CORBA_H
