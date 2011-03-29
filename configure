@@ -10684,7 +10684,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"155:156M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"167:169M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -14592,6 +14592,20 @@ _ACEOF
 
 else
   as_fn_error "cannot find iostream, bailing out" "$LINENO" 5
+fi
+
+done
+
+for ac_header in limits.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "limits.h" "ac_cv_header_limits_h" "$ac_includes_default"
+if test "x$ac_cv_header_limits_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIMITS_H 1
+_ACEOF
+
+else
+  as_fn_error "cannot find limits.h, bailing out" "$LINENO" 5
 fi
 
 done

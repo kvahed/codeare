@@ -27,6 +27,7 @@ AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bai
 AC_CHECK_HEADERS([ctype.h],          [], [AC_MSG_ERROR([cannot find ctype, bailing out])])
 AC_CHECK_HEADERS([fstream],          [], [AC_MSG_ERROR([cannot find fstream, bailing out])])
 AC_CHECK_HEADERS([iostream],         [], [AC_MSG_ERROR([cannot find iostream, bailing out])])
+AC_CHECK_HEADERS([limits.h],         [], [AC_MSG_ERROR([cannot find limits.h, bailing out])])
 AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find cstdlib, bailing out])])
 AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find ctime, bailing out])])
 AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])

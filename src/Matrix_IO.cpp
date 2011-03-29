@@ -63,18 +63,20 @@ operator<<    (std::ostream& os, Matrix<T>& M) {
 template <class T>
 bool Matrix<T>::dump (const char* fname) {
 	
+	int i = 0;
+
     if (fname != "") {
 		
 #ifdef HAVE_H5CPP_H
-		
+
 		try {
 			
 			Exception::dontPrint();
 			
 			hsize_t dims [INVALID_DIM];
 
-			for (int i = 0; i < INVALID_DIM; i++)
-				dims[i] = _dim[i];
+			for (i = 0; i < INVALID_DIM; i++)
+				dims[i] = _dim[INVALID_DIM-1-i];
 			
 			unsigned int mode = (fexists(fname)) ? H5F_ACC_RDWR : H5F_ACC_TRUNC;
 
@@ -92,9 +94,9 @@ bool Matrix<T>::dump (const char* fname) {
 				float     real[Size()];
 				float     imag[Size()];
 				
-				for (int j = 0; j < Size(); j++) {
-					real[j] = raw(_M[j]).real();
-					imag[j] = raw(_M[j]).imag();
+				for (i = 0; i < Size(); i++) {
+					real[i] = raw(_M[i]).real();
+					imag[i] = raw(_M[i]).imag();
 				}
 				
 
@@ -146,7 +148,7 @@ bool Matrix<T>::dump (const char* fname) {
 		
 		std::ofstream fout(fname , std::ios::out | std::ios::binary);
 		
-		for (int i = 0; i < Size(); i++) {
+		for (i = 0; i < Size(); i++) {
 			std::cout << _M[i] << std::endl;
 			fout.write ((char*)(&(_M[i])), sizeof(double));
 		}

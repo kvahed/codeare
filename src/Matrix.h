@@ -44,6 +44,7 @@ enum IceDim {
 #include <stdlib.h>
 #include <time.h>
 #include <config.h>
+#include <limits.h>
 
 #ifdef HAVE_H5CPP_H
 #include <H5Cpp.h>
@@ -54,6 +55,7 @@ const H5std_string HELPER ("helper");
 const H5std_string PIXEL  ("pixel");
 #endif
 
+#define ICE_SHRT_MAX 4095
 
 /**
  * @brief raw data
@@ -690,8 +692,17 @@ public:
      *
      * @return          Number of rows.
      */
-    int                 
+    inline int                 
     height              () const {return _dim[LIN];}
+    
+    
+    /**
+     * @brief           Get number of rows, i.e. tmp = size(this); tmp(1).
+     *
+     * @return          Number of rows.
+     */
+    inline int&
+    height              () {return _dim[LIN];}
     
     
     /**
@@ -699,8 +710,17 @@ public:
      *
      * @return          Number of columns.
      */
-    int                 
+    inline int                 
     width               () const {return _dim[COL];}
+    
+    
+    /**
+     * @brief           Get number of columns, i.e. tmp = size(this); tmp(2).
+     *
+     * @return          Number of columns.
+     */
+    inline int&
+    width               ()  {return _dim[COL];}
     
     
     /**
@@ -1663,7 +1683,7 @@ inline void Matrix<short>::Random () {
 	srand (time(NULL));
 
 	for (int i = 0; i < Size(); i++)
-		_M[i] = (short) 4096 * (double)rand() / (double)RAND_MAX*2-1;
+		_M[i] = (short) 12 * (double)rand() / (double)RAND_MAX*2-1;
 
 }
     

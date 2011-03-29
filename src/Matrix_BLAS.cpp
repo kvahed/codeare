@@ -1,24 +1,31 @@
 template <class T>
 Matrix<T> 
-Matrix<T>::prod(Matrix<T> &m) {
+Matrix<T>::prod(Matrix<T> &M) {
 
-    assert(width() == m.height());
+    assert(width() == M.height());
 
 	if (typeid(T) == typeid(double) || typeid(T) == typeid(double)) // Fast BLAS code
-		return GEMM(m);
+		return GEMM(M);
 
 	else {                                                          // Standard impl
 
 		Matrix<T> res;
 		
-		res.width()  = height();
-		res.height() = m.width();
+		res.Dim(0)  = M.Dim(COL);//_dim[0];
+		res.Dim(1)  = _dim[LIN];//M.Dim(1);
 		res.Reset();
 		
 		for (int i = 0; i < res.height(); i++)
 			for (int j = 0; j < res.width(); j++)
-				for (int k = 0; k < width(); k++)
-					res[i * res.width() + j] += _M[i * width() + k] * m[k * m.width() + j];
+				for (int k = 0; k < width(); k++) {
+					res[i * res.width() + j] += _M[i * width() + k] * M[k * M.width() + j];
+					if (res[i * res.width() + j] < 0 || res[i * res.width() + j] > ICE_SHRT_MAX) {
+						res[i * res.width() + j] = ICE_SHRT_MAX;
+						break;
+					}
+				}
+
+
 		
 		return res;
 		
