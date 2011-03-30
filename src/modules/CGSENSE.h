@@ -61,20 +61,25 @@ namespace RRStrategy {
 		
 	private:
 		
-		int                m_iter;
-		int                m_verbose;
+		int                 m_iter;
+		int                 m_verbose;
 		
-		Matrix < raw >     m_sens;
-		Matrix < raw >     m_temp;
+		Matrix < raw >      m_sens;
+		Matrix < raw >      m_temp;
 		
-		nfft_plan           m_plan;           /* plan for forward nfft  */
-		solver_plan_complex m_iplan;           /* plan for inverse nfft */
+		nfft_plan           m_plan;   /**< base plan for infft */
+		solver_plan_complex m_iplan;  /**< plan for inverse nfft */
+		nfft_plan           m_fplan;  /**< plan for forward nfft  */
 
+
+		double              m_epsilon;         /**< NFFT convergence criterium */
+		double              m_cgconv;          /**< CG SENSE convergence criterium */
+		double              m_maxit;           /**< Maximum number of CG iterations */
 		
-		int*               m_N;
-		int*               m_n;
+		int*                m_N;
+		int*                m_n;
 		
-		double*            kmax;
+		double*             kmax;
 		
 	};
 	

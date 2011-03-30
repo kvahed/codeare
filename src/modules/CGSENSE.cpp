@@ -11,13 +11,16 @@ CGSENSE::CGSENSE () {
 
 	bool     weight      = true;
 
-	double   epsilon     = 0.0000003;               /* Epsilon is a the break criterium for the iteration */
 	unsigned infft_flags = CGNR | PRECOMPUTE_DAMP;  /* Flags for the infft */
 	int      m           = 6;
 	double   alpha       = 2.0;
 
-	m_config->Attribute ("Nx", &m_N[0]);
-	m_config->Attribute ("Ny", &m_N[1]);
+	m_config->Attribute ("nx",      &m_N[0]);
+	m_config->Attribute ("ny",      &m_N[1]);
+	m_config->Attribute ("epsilon", &m_epsilon);
+	m_config->Attribute ("maxit",   &m_maxit);
+	m_config->Attribute ("cgconv",  &m_cgconv);
+	
 
 	/* initialise my_plan */
 	m_n[0] = ceil(m_N[0]*alpha);
@@ -91,8 +94,6 @@ CGSENSE::CGSENSE () {
 		if (kmax[2] < m_helper(0,0,k))
 			kmax[2] = m_helper(0,0,k);
 	
-	//m_nufft.init (2, N, Nk, m_helper.at(0), 2, 2.4, 32, 0, 0);
-
 
 }
 
@@ -181,32 +182,45 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, solver_plan_complex* plan
 	
 }
 
+// L2 norm
+bool Converged (Matrix<raw>* r, Matrix<raw>* a, double cgconv) {
+
+	return (real(r->sos())/real(a->sos()) < cgconv);
+
+}
+
 RRSModule::error_code
 CGSENSE::Process () {
-
-	Matrix<raw> *p, *s, *k, *q;
-
+	
+	Matrix<raw> a, b, p, q, r, r_new, s, k;
+	
+	double residue = 1;
+	
 	// CG iterations
 	for (int iter = 0; iter < m_iter; iter++) {
-
-		EH (p, s, k, &m_iplan, m_epsilon, m_iter, q);
-
-		delete p;
-		p = new Matrix<raw> (*(q));
-
-		E  (p, s, k, &m_plan, q);
-
-		/*
-		  delta = r(:)'*r(:)/(a(:)'*a(:));
-		  q     = eh(e(p , sensitivity, k), sensitivity, k);
-		  b     = b + r(:)'*r(:)/(p(:)'*q(:))*p;
-		  r_new = r - r(:)'*r(:)/(p(:)'*q(:))*q;
-		  p     = r_new + r_new(:)'*r_new(:)/(r(:)'*r(:))*p;
-		  r     = r_new;
-		*/
 		
-	}
+		if (Converged(&r, &a, m_cgconv))
+			break;
+		
+		// E
+		E  (&p, &s, &k, &m_fplan, &q);
+		// E^H
+		EH (&p, &s, &k, &m_iplan, m_epsilon, m_maxit, &q);
+		
+		//p = Matrix<raw>(q);
+		
+		
 
+		
+	/*  q     = eh(e(p , sensitivity, k), sensitivity, k);
+		b     = b + r.sos()/(p(:)'*q(:))*p;
+		r_new = r - r.sos()/(p(:)'*q(:))*q;
+		p     = r_new + r_new(:)'*r_new(:)/(r(:)'*r(:))*p;
+		r     = r_new;
+	*/
+	
+	}
+	
 }
 
 

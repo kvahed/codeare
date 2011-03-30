@@ -1249,6 +1249,14 @@ public:
     Matrix<T>           
     tr()                const;
     
+    /**
+     * @brief           Euclidean norm.
+     *
+     * @return          The norm
+     */
+    T
+    sos()               const;
+    
     //@}
 
 
@@ -1651,7 +1659,19 @@ Matrix<T> Matrix<T>::tr() const {
 
     for (int i = 0; i < res.height(); i++)
         for (int j = 0; j < res.width(); j++)
-            res[i * res.width() + j] = _M[j * _dim[COL] + i];
+            res[i * res.width() + j] = _M[j * height() + i];
+
+    return res;
+
+}
+
+template <class T>
+T Matrix<T>::nrm2() const {
+
+	T res = (T) 0;
+
+	for (int i = 0; i < Size(); i++)
+		res += _M[i]*_M[i];
 
     return res;
 

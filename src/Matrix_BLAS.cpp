@@ -95,3 +95,9 @@ Matrix<T>::GEMM (Matrix<T>& M) {
 	return res;
 	
 }
+
+template <class T>
+Matrix<T> 
+Matrix<T>::prod(Matrix<T> &M) {
+
+}
