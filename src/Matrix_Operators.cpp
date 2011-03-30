@@ -23,6 +23,30 @@ Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
 
 
 template <class T>
+Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
+    
+    int i;
+
+    for (i = 0; i < INVALID_DIM; i++) 
+        _dim[i] = M.Dim()[i];
+    
+    if (nb_alloc) {
+        delete[](_M);
+        nb_alloc = 0;
+    }
+
+    _M = new T[Size()]();
+    nb_alloc = 1;
+
+    for (i = 0; i < Size(); i++)
+        _M[i] = M[i];
+
+    return *this;
+
+}
+
+
+template <class T>
 Matrix<bool> Matrix<T>::operator==(T s)    {
 
     Matrix<bool> res(_dim);

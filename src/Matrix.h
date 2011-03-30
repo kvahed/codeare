@@ -65,6 +65,11 @@ typedef std::complex<float> raw;
 extern "C" {
 
 	// This is all defined only on 2D
+
+	// Euclidean norm
+	float scnrm2_ (int      *n, void   *x, int *incx);
+
+	raw   cdotc_  (int      *n, void   *x, int *incx, void *y, int *incy);
 	
 	// Matrix vector multiplication
 	void dgemv_  (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
@@ -881,6 +886,15 @@ public:
     
     
     /**
+     * @brief           Assignment operator. i.e. this = m.
+     *
+     * @param  M        The assigned matrix.
+     */
+    Matrix<T>           
+    operator=           (const Matrix<T> &M);
+    
+    
+    /**
      * @brief           Matrix product. i.e. this * M.
      *
      * @param  M        The factor.
@@ -1087,6 +1101,7 @@ public:
     Matrix<T>           
     operator^           (int p);
     
+	//friend Matrix<T> operator+(Matrix<T> &a, Matrix<T> &b){return a+b;};
     //@}
 
 
@@ -1247,15 +1262,23 @@ public:
      * @return          The transposed matrix
      */
     Matrix<T>           
-    tr()                const;
+    tr   ()             const;
     
     /**
      * @brief           Euclidean norm.
      *
-     * @return          The norm
+     * @param  res      The norm
      */
-    T
-    sos()               const;
+	void
+    norm (void* res)     const;
+    
+    /**
+     * @brief           Dot product, complex, conjugate first vector
+     *
+     * @param  res      
+     */
+	T
+    dotc (Matrix<T>& M) const;
     
     //@}
 
@@ -1293,7 +1316,7 @@ public:
     inline int
 	SVD                 (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double>* sv);
     
-    
+	
     //@}
     
     
@@ -1665,7 +1688,7 @@ Matrix<T> Matrix<T>::tr() const {
 
 }
 
-template <class T>
+/*template <class T>
 T Matrix<T>::nrm2() const {
 
 	T res = (T) 0;
@@ -1675,7 +1698,7 @@ T Matrix<T>::nrm2() const {
 
     return res;
 
-}
+	}*/
 
 template<>
 inline void Matrix<raw>::Random () {
@@ -1740,5 +1763,3 @@ inline bool Matrix<T>::Is3D () const {
 #include "Matrix_ICE.cpp"
 
 #endif // __MATRIX_H__
-
-

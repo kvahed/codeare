@@ -185,40 +185,63 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, Matrix<raw>* kt, solver_plan_complex* plan
 // L2 norm
 bool Converged (Matrix<raw>* r, Matrix<raw>* a, double cgconv) {
 
-	return (real(r->sos())/real(a->sos()) < cgconv);
+	float rn;
+	float an;
+
+	r->norm(&rn);
+	a->norm(&an);
+
+	return((rn/an) < cgconv);
 
 }
 
 RRSModule::error_code
 CGSENSE::Process () {
 	
-	Matrix<raw> a, b, p, q, r, r_new, s, k;
+	Matrix<raw> a, b, p, q, r, r_new, k;
 	
 	double residue = 1;
+	double delta   = 0;
 	
 	// CG iterations
 	for (int iter = 0; iter < m_iter; iter++) {
 		
-		if (Converged(&r, &a, m_cgconv))
+		float       rn;
+		float       an;
+		float       rnewn;
+		raw         rtmp;
+		Matrix<raw> mtmp;
+
+		r.norm(&rn);
+		a.norm(&an);
+
+		delta = rn/an;
+
+		if (delta < m_cgconv)
 			break;
 		
-		// E
-		E  (&p, &s, &k, &m_fplan, &q);
-		// E^H
-		EH (&p, &s, &k, &m_iplan, m_epsilon, m_maxit, &q);
-		
-		//p = Matrix<raw>(q);
-		
-		
+		/* q     = eh(e(p , sensitivity, k), sensitivity, k); */
+		E  (&p,    &m_sens, &k, &m_fplan, &mtmp);
+		EH (&mtmp, &m_sens, &k, &m_iplan, m_epsilon, m_maxit, &q);
 
+		/* b     = b + r(:)'*r(:)/(p(:)'*q(:))*p;*/
+		rtmp  = (rn / (p.dotc(q)));
+		mtmp  = p * rtmp;
+		b     = b + mtmp;
 		
-	/*  q     = eh(e(p , sensitivity, k), sensitivity, k);
-		b     = b + r.sos()/(p(:)'*q(:))*p;
-		r_new = r - r.sos()/(p(:)'*q(:))*q;
-		p     = r_new + r_new(:)'*r_new(:)/(r(:)'*r(:))*p;
+		/* r_new = r - r(:)'*r(:)/(p(:)'*q(:))*q; */
+		mtmp  = q * rtmp;
+		r_new = r - mtmp;
+
+		/* p     = r_new + r_new(:)'*r_new(:)/(r(:)'*r(:))*p */
+		r_new.norm(&rnewn);
+		rtmp  = rnewn/rn;
+		mtmp  = p * rtmp;
+		p     = r_new + mtmp;
+
+		/*  r     = r_new; */ 
 		r     = r_new;
-	*/
-	
+
 	}
 	
 }

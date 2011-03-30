@@ -96,8 +96,35 @@ Matrix<T>::GEMM (Matrix<T>& M) {
 	
 }
 
-template <class T>
-Matrix<T> 
-Matrix<T>::prod(Matrix<T> &M) {
+
+
+template<class T>
+void
+Matrix<T>::norm (void* res) const {
+	
+	int n    = Size();
+	int incx = sizeof(raw);
+
+	if (typeid(T) == typeid(raw)) {
+		float norm = scnrm2_ (&n, _M, &incx);
+		memcpy (res, &norm, sizeof(float));
+	}
+
+}
+
+template<class T>
+T 
+Matrix<T>::dotc (Matrix<T>& M) const {
+	
+	T   res  = (T) 0;
+
+	int n    = Size();
+	int incx = sizeof(raw);
+
+	if (typeid(T) == typeid(raw)) {
+		res = cdotc_ (&n, &_M[0], &incx, &M[0], &incx);
+	}
+
+	return res;
 
 }
