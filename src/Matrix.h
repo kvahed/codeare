@@ -49,10 +49,6 @@ enum IceDim {
 #ifdef HAVE_H5CPP_H
 #include <H5Cpp.h>
 using namespace H5;
-const H5std_string RAW_RE ("raw_real");
-const H5std_string RAW_IM ("raw_imag");
-const H5std_string HELPER ("helper");
-const H5std_string PIXEL  ("pixel");
 #endif
 
 #define ICE_SHRT_MAX 4095
@@ -1213,20 +1209,24 @@ public:
      * @brief           Dump binary matrix column-major.
      * 
      * @param  fname    File name.
+	 * @param  dname    Dataset name.
+	 * @param  dloc     Dataset location.
      * @return          Success.
      */
     bool                
-    dump                (const char* fname);
+    dump                (std::string fname, std::string dname = "", std::string dloc = "/");
     
 
     /**
      * @brief           Read in binary matrix column-major.
      *
      * @param  fname    File name.
+	 * @param  dname    Dataset name.
+	 * @param  dloc     Dataset location.
      * @return          Success.
      */
     bool                
-    read                (const char* fname);
+    read                (std::string fname, std::string dname = "", std::string dloc = "/");
     
     //@}
     
