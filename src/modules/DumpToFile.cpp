@@ -31,16 +31,16 @@ DumpToFile::Process () {
 	if (uid == 0  ||  uid == "")
 		uid = "unspecified";
 
+	fname << uid << "_config.xml";
+	DumpConfig (fname.str().c_str());
+
+	fname.str("");
+
 	fname << uid << "_data.h5";
 
 	m_raw.dump    (fname.str().c_str());
 	m_helper.dump (fname.str().c_str());
 	m_pixel.dump  (fname.str().c_str());
-
-	fname.str("");
-
-	fname << uid << "_config.xml";
-	DumpConfig (fname.str().c_str());
 
 	return RRSModule::OK;
 

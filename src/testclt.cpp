@@ -25,6 +25,9 @@
     #include "config.h"
 #endif
 
+#include <time.h>
+#include <stdio.h>
+
 #ifndef SVN_REVISION
 	#define SVN_REVISION "unkown"
 #endif
@@ -61,8 +64,12 @@ int main (int argc, char** argv) {
 		client.SetRaw(r);
 		client.SetPixel(p);
 		client.SetHelper(h);
+
+		time_t seconds = time (NULL);
+		char   uid[16];
+		sprintf(uid,"%ld",seconds);
 		
-		client.SetAttribute("UID", "1234");
+		client.SetAttribute("UID", uid);
 		client.SetAttribute("Pi", 3.1415);
 		client.SetAttribute("Dim", d);
 		

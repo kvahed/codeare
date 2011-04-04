@@ -74,8 +74,6 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 			Exception::dontPrint();
 #endif
 			
-			hsize_t dims [INVALID_DIM];
-
 			H5File        file; 
 			
 			try {
@@ -143,29 +141,28 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 				dims[INVALID_DIM] = 2;
 
 			DataSpace space (tmpdim, dims);
-			FloatType type;
+			PredType*  type;
 			
-			if (typeid(T) == typeid(raw))
-				type (PredType::NATIVE_FLOAT);
-			else if (typeid(T) == typeid(double))
-				type (PredType::NATIVE_DOUBLE);
-			else 
-				type (PredType::NATIVE_SHORT);
-				
-			if (dname == "")
-				if (typeid(T) == typeid(raw)) {
+			if (typeid(T) == typeid(raw)) {
+				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
+				if (dname == "") 
 					dname = "raw";
-				else if (typeid(T) == typeid(double))
-					dname = "helper";
-				else 
+			} else if (typeid(T) == typeid(double)) {
+				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
+				if (dname == "") 
+					dname = "double";
+			} else {
+				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
+				if (dname == "") 
 					dname = "pixel";
-
-				DataSet   set = group.createDataSet(dname, type, space);
+			}
 				
-				set.write   (_M, type);
-				set.close   ();
-				space.close ();
-				file.close  ();
+			DataSet set = group.createDataSet(dname, (*type), space);
+				
+			set.write   (_M, (*type));
+			set.close   ();
+			space.close ();
+			file.close  ();
 			
 		} catch(FileIException      e) {
 			e.printError();
@@ -211,50 +208,48 @@ bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
 		Exception::dontPrint();
 #endif
 		
-		H5File    file (fname, H5F_ACC_RDONLY);
-		DataSet   dataset = file.openDataSet(dloc);
-		DataSpace space   = dataset.getSpace();
-
-		hsize_t   dims [space.getSimpleExtentNdims()];
-		int       ndim    = space.getSimpleExtentDims(dims, NULL);
-
-		for (int i = 0; i < ndim; i++)
-			_dim[i] = dims[INVALID_DIM-1-i];
-
-		Reset();
-		
-#ifdef VERBOSE
-		if (!read) {
-			std::cout << "rank: " << ndim << ", dimensions: ";
-			for (int i = 0; i < ndim; i++) {
-				std::cout << (unsigned long)(dims[i]);
-				if (i == ndim - 1)
-					std::cout << std::endl;
-				else
-					std::cout << " x ";
-			}
-		}
-#endif
-		
-		if (typeid(T) == typeid(raw)) {
+		try {
 			
-			float*    re = (float*) malloc (sizeof(float) * Size());
-			float*    im = (float*) malloc (sizeof(float) * Size());
-
-			DataType  type    = dataset.getFloatType();
-			dataset.read (data, type);
-
+			
+			H5File    file (fname, H5F_ACC_RDONLY);
+			DataSet   dataset = file.openDataSet(dloc);
+			DataSpace space   = dataset.getSpace();
+			
+			hsize_t   dims [space.getSimpleExtentNdims()];
+			int       ndim    = space.getSimpleExtentDims(dims, NULL);
+			
+			for (int i = 0; i < ndim; i++)
+				_dim[i] = dims[INVALID_DIM-1-i];
+			
+			Reset();
+			
+#ifdef VERBOSE
+			if (!read) {
+				std::cout << "rank: " << ndim << ", dimensions: ";
+				for (int i = 0; i < ndim; i++) {
+					std::cout << (unsigned long)(dims[i]);
+					if (i == ndim - 1)
+						std::cout << std::endl;
+					else
+						std::cout << " x ";
+				}
+			}
+#endif
+			
+			if (typeid(T) == typeid(raw)) {
+				
+				float*    re = (float*) malloc (sizeof(float) * Size());
+				float*    im = (float*) malloc (sizeof(float) * Size());
+				
+				DataType  type    = dataset.getFloatType();
+				//dataset.read (data, type);
+			}
 			
 			
 			space.close();
 			dataset.close();
 			file.close();
-
-		try {
 			
-			H5File    file  (fname.c_str(), H5F_ACC_RDONLY);
-			DataSet dataset = file.openDataSet(RAW_RE);
-
 		} catch(FileIException      e) {
 			e.printError();
 			return false;
@@ -271,18 +266,19 @@ bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
 		
 #else // HAVE_H5CPP_H
 		
-        std::ifstream fin  (fname.c_str() , std::ios::in | std::ios::binary);
-
-        for (int i = 0; i < Size(); i++)
-            fin.read  ((char*)(&(_M[i])), sizeof(T));
-        
-        fin.close();
-
+		std::ifstream fin  (fname.c_str() , std::ios::in | std::ios::binary);
+		
+		for (int i = 0; i < Size(); i++)
+			fin.read  ((char*)(&(_M[i])), sizeof(T));
+		
+		fin.close();
+		
 #endif // HAVE_H5CPP_H
-
-    }
-
+		
+	}
+	
 	return true;
-    
+	
 }
 
+	
