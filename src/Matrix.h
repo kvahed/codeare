@@ -67,7 +67,8 @@ extern "C" {
 	// This is all defined only on 2D
 
 	// Euclidean norm
-	float scnrm2_ (int      *n, void   *x, int *incx);
+	float  scnrm2_ (int      *n, void   *x, int *incx);
+	double  dnrm2_ (int      *n, void   *x, int *incx);
 
 	raw   cdotc_  (int      *n, void   *x, int *incx, void *y, int *incy);
 	
@@ -1295,8 +1296,8 @@ public:
      *
      * @param  res      The norm
      */
-	void
-    norm (void* res)     const;
+	T
+    norm ()             const;
     
     /**
      * @brief           Dot product, complex, conjugate first vector
@@ -1755,6 +1756,7 @@ inline void Matrix<short>::Random () {
 		_M[i] = (short) 12 * (double)rand() / (double)RAND_MAX*2-1;
 
 }
+
     
 template <class T> 
 inline bool Matrix<T>::Is2D () const {

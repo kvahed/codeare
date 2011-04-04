@@ -1,3 +1,5 @@
+#include <cstdlib>
+
 template <class T>
 Matrix<T> 
 Matrix<T>::prod(Matrix<T> &M) {
@@ -99,16 +101,19 @@ Matrix<T>::GEMM (Matrix<T>& M) {
 
 
 template<class T>
-void
-Matrix<T>::norm (void* res) const {
-	
+T
+Matrix<T>::norm () const {
+
 	int n    = Size();
 	int incx = sizeof(raw);
+	T   norm = 0.0;
 
-	if (typeid(T) == typeid(raw)) {
-		float norm = scnrm2_ (&n, _M, &incx);
-		memcpy (res, &norm, sizeof(float));
-	}
+	if (typeid(T)      == typeid(raw))
+		norm = raw(scnrm2_ (&n, _M, &incx),0);
+	else if (typeid(T) == typeid(double))
+		norm = dnrm2_(&n, _M, &incx);
+
+	return norm;
 
 }
 

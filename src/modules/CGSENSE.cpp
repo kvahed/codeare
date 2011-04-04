@@ -38,12 +38,9 @@ CGSENSE::CGSENSE () {
 		infft_flags = infft_flags | PRECOMPUTE_WEIGHT;
 
 	/* Get the weights */
-	/*if (m_iplan.flags & PRECOMPUTE_WEIGHT) {
-		fin = fopen ("weights.dat","r");
+	if (m_iplan.flags & PRECOMPUTE_WEIGHT)
 		for(int j = 0; j < m_plan.M_total; j++)
-			fscanf (fin, "%le ", &m_iplan.w[j]);
-		fclose (fin);
-		}*/
+			memcpy(&m_iplan.w[0], &m_weights[0], sizeof(double)*m_weights.Size());
 
 	/* initialise my_iplan, advanced */
 	solver_init_advanced_complex (&m_iplan, (mv_plan_complex*)&m_plan, infft_flags);
@@ -121,6 +118,9 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* plan, Matrix<raw>* out) {
 		
 	}
 
+
+	return OK;
+
 }
 
 
@@ -183,8 +183,15 @@ CGSENSE::Process () {
 	
 	Matrix<raw> a, b, p, q, r, r_new;
 	
-	double residue = 1;
-	double delta   = 0;
+	EH (&m_temp, &m_sens, &m_iplan, m_epsilon, m_maxit, &a);
+	p = a;
+	r = a;
+	b.Dim(COL) = a.Dim(COL);
+	b.Dim(LIN) = a.Dim(LIN);
+	b.Reset();
+
+	double residue = 1.0;
+	double delta   = 1.0;
 	
 	// CG iterations
 	for (int iter = 0; iter < m_iter; iter++) {
@@ -195,8 +202,8 @@ CGSENSE::Process () {
 		raw         rtmp;
 		Matrix<raw> mtmp;
 
-		r.norm(&rn);
-		a.norm(&an);
+		rn = r.norm().real();
+		an = a.norm().real();
 
 		delta = rn/an;
 
@@ -217,7 +224,7 @@ CGSENSE::Process () {
 		r_new = r - mtmp;
 
 		// p  = r_new + r_new(:)'*r_new(:)/(r(:)'*r(:))*p
-		r_new.norm(&rnewn);
+		rnewn = r_new.norm().real();
 		rtmp  = rnewn/rn;
 		mtmp  = p * rtmp;
 		p     = r_new + mtmp;
@@ -227,6 +234,8 @@ CGSENSE::Process () {
 
 	}
 	
+	return OK;
+
 }
 
 
