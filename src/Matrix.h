@@ -310,6 +310,32 @@ public:
 
     
     /**
+     * @brief            Reference to slice 
+     *  
+     * @param  pos       Slice
+     *
+     * @return           Reference to _M[COL*LIN*CHA*pos]
+     */
+    inline T*           
+    slice                (int pos) {
+        return &_M[_dim[COL]*_dim[LIN]*_dim[CHA]*pos];
+    }
+
+    
+    /**
+     * @brief            Reference to channel
+     *  
+     * @param  pos       Channel
+     *
+     * @return           Reference to _M[COL*LIN*pos]
+     */
+    inline T*           
+    channel              (int pos) {
+        return &_M[_dim[COL]*_dim[LIN]*pos];
+    }
+
+    
+    /**
      * @brief           Get element at position 
      *  
      * @param  pos      Position
