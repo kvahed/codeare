@@ -72,8 +72,7 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 CGSENSE_la_LIBADD =
-am__objects_1 = tinyxml.lo tinyxmlerror.lo tinyxmlparser.lo \
-	nfftstub.lo
+am__objects_1 = tinyxml.lo tinyxmlerror.lo tinyxmlparser.lo
 am_CGSENSE_la_OBJECTS = $(am__objects_1) CGSENSE.lo nfftstub.lo
 CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
 CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -272,7 +271,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp nfftstub.c
+COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp 
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
@@ -288,11 +287,11 @@ GenericRegrid_la_SOURCES = $(COMMON) GenericRegrid.h GenericRegrid.cpp
 GenericRegrid_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 MedianFilter_OMP_la_SOURCES = $(COMMON) MedianFilter_OMP.h MedianFilter_OMP.cpp
 MedianFilter_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-NuFFT_la_SOURCES = $(COMMON) NuFFT.h NuFFT.cpp nfftstub.c
+NuFFT_la_SOURCES = $(COMMON) NuFFT.h NuFFT.cpp nfftstub.h nfftstub.c
 NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.h DumpToFile.cpp
 DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(HDF5)
-CGSENSE_la_SOURCES = $(COMMON) CGSENSE.h CGSENSE.cpp nfftstub.c
+CGSENSE_la_SOURCES = $(COMMON) CGSENSE.h CGSENSE.cpp nfftstub.h nfftstub.c
 CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 SystemCmd_la_SOURCES = $(COMMON) SystemCmd.h SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)

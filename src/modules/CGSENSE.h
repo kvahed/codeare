@@ -24,7 +24,6 @@
 #include "ReconStrategy.h"
 #include "nfft3util.h"
 #include "nfft3.h"
-//#include "nfftstub.h"
 
 typedef std::complex<float> raw;
 
@@ -69,11 +68,9 @@ namespace RRStrategy {
 		Matrix < raw >      m_temp;
 		Matrix < double >   m_weights;
 		
-		nfft_plan           m_plan;            /**< base plan for infft */
-		solver_plan_complex m_iplan;           /**< plan for inverse nfft */
-		nfft_plan           m_fplan;           /**< plan for forward nfft  */
-
-
+		nfft_plan           m_fplan;            /**< nfft plan */
+		solver_plan_complex m_iplan;
+	
 		double              m_epsilon;         /**< NFFT convergence criterium */
 		double              m_cgconv;          /**< CG SENSE convergence criterium */
 		double              m_maxit;           /**< Maximum number of CG iterations */

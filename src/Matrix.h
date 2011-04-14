@@ -313,10 +313,8 @@ public:
      *
      * @return           Reference to _M[COL*LIN*CHA*pos]
      */
-    inline T*           
-    slice                (int pos) {
-        return &_M[_dim[COL]*_dim[LIN]*_dim[CHA]*pos];
-    }
+    Matrix <T>           
+    slice                (int s);
 
     
     /**
@@ -326,10 +324,8 @@ public:
      *
      * @return           Reference to _M[COL*LIN*pos]
      */
-    inline T*           
-    channel              (int pos) {
-        return &_M[_dim[COL]*_dim[LIN]*pos];
-    }
+    Matrix <T>           
+    channel              (int c);
 
     
     /**
@@ -1483,6 +1479,24 @@ Matrix<T>::operator* (T s) {
 
 	for (int i = 0; i < Size(); i++)
 		res[i] = _M[i] * s;
+
+	return res;
+
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::channel (int c) {
+    
+    Matrix<T> res;
+
+	for (int j = 0; j < CHA; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[c*_dim[COL]*_dim[LIN] + i];
 
 	return res;
 

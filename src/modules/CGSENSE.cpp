@@ -1,11 +1,13 @@
 #include "CGSENSE.h"
+#include "nfftstub.h"
 
 using namespace RRStrategy;
 
 CGSENSE::CGSENSE () {
 
-	m_N = new int[2];
-	m_n = new int[2];
+	int   d      = 3;
+	m_N = new int[3];
+	m_n = new int[3];
 
 	FILE* fin;
 
@@ -17,47 +19,13 @@ CGSENSE::CGSENSE () {
 
 	m_config->Attribute ("nx",      &m_N[0]);
 	m_config->Attribute ("ny",      &m_N[1]);
+	m_config->Attribute ("ny",      &m_N[2]);
 	m_config->Attribute ("epsilon", &m_epsilon);
 	m_config->Attribute ("maxit",   &m_maxit);
 	m_config->Attribute ("cgconv",  &m_cgconv);
+	m_config->Attribute ("ndim",    &d);
 	
-
-	/* initialise my_plan */
-	m_n[0] = ceil(m_N[0]*alpha);
-	m_n[1] = ceil(m_N[1]*alpha);
-
-	nfft_init_guru (&m_plan, 2, m_N, m_raw.Dim(COL), m_n, m, 
-					PRE_PHI_HUT| PRE_PSI| MALLOC_X| MALLOC_F_HAT| MALLOC_F|	FFTW_INIT| FFT_OUT_OF_PLACE, FFTW_MEASURE| FFTW_DESTROY_INPUT);
-
-	/* Precompute lin psi if set */
-	if(m_plan.nfft_flags & PRE_LIN_PSI)
-		nfft_precompute_lin_psi(&m_plan);
-
-	/* Set the flags for the infft*/
-	if (weight)
-		infft_flags = infft_flags | PRECOMPUTE_WEIGHT;
-
-	/* Get the weights */
-	if (m_iplan.flags & PRECOMPUTE_WEIGHT)
-		for(int j = 0; j < m_plan.M_total; j++)
-			memcpy(&m_iplan.w[0], &m_weights[0], sizeof(double)*m_weights.Size());
-
-	/* initialise my_iplan, advanced */
-	solver_init_advanced_complex (&m_iplan, (mv_plan_complex*)&m_plan, infft_flags);
-
-	/* get the damping factors */
-	if (m_iplan.flags & PRECOMPUTE_DAMP)
-		for (int j = 0; j < m_N[0]; j++) {
-			for (int k = 0; k < m_N[1]; k++) {
-				int    j2 = j - m_N[0]/2;
-				int    k2 = k - m_N[1]/2;
-				double r  = sqrt (j2*j2 + k2*k2);
-				if (r > (double)m_N[0]/2)
-					m_iplan.w_hat[j*m_N[0]+k] = 0.0;
-				else
-					m_iplan.w_hat[j*m_N[0]+k] = 1.0;
-			}
-		}
+	nfft::init (d, m_N, m_helper.Dim(COL), m_n, m, &m_fplan, &m_iplan, m_epsilon);
 
 	/* Copy incoming data to m_temp             */
 	Matrix < raw > m_temp = (m_raw);
@@ -103,23 +71,40 @@ CGSENSE::CGSENSE () {
  * 
  * @param  in           Original discretised sample O (Nx x Ny)
  * @param  sm           Sensitivity maps            O (Nx x Ny x Nc)
- * @param  ncs          Non-Cartesian strategy for non uniform ft
+ * @param  np           Non-Cartesian strategy for non uniform ft
  * @param  out          Result                      O (Nk x Nc)
  */
 RRSModule::error_code 
-E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* plan, Matrix<raw>* out) {
+E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out) {
 
+	out->Reset();
+	
 	int    ncoils   = sm->Dim(CHA);
 	int    nsamples = out->Size(); 
 	int    ndim     = in->Dim(COL);
-	
+
+	Matrix<raw> tmp;
+
+	double ftin  [2 *  in->Size()];
+
 	for (int j = 0; j < ncoils; j++) {
 
-		/*nfft_trafo(&plan);
+		double ftout [2 * out->Size()/ncoils];
+	
+		tmp = sm->channel(j);
+	    tmp = (*in) * tmp;
 
-		for(int i=0; i < plan.M_total;i++) 
-			out->at(0, 0, j) = raw(plan->f[j], plan->f[j+1]);
-		*/
+		for (int i = 0; i < in->Size(); i++) {
+			raw tmp = sm->at(j*sm->Dim(COL)*sm->Dim(LIN) + i) * in->at(i);
+			ftin[2*i  ] = tmp.real(); 
+			ftin[2*i+1] = tmp.imag(); 
+		}
+
+		nfft::ft (np, ftin, ftout);
+
+		for (int i = 0; i < out->Size()/ncoils; i++) 
+			out->at(j*out->Dim(COL)*out->Dim(LIN) + i) = raw(ftout[2*i],ftout[2*i+1]);
+
 	}
 
 	return OK;
@@ -136,43 +121,31 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* plan, Matrix<raw>* out) {
  * @param  out          Returned product                 O (Nx x Ny)
  */
 RRSModule::error_code
-EH (Matrix<raw>* in, Matrix<raw>* sm, solver_plan_complex* plan, double epsilon, int maxit, Matrix<raw>* out) {
+EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, double epsilon, int maxit, Matrix<raw>* out) {
 
-	int    ncoils   = sm->Dim(CHA);
-	int    nsamples = in->Size(); 
-	int    ndim     = out->Dim(COL);
+	out->Reset();
+
+	int         ncoils   = sm->Dim(CHA);
+	int         nsamples = in->Size(); 
+	int         ndim     = out->Dim(COL);
+
+	double      ftin [2 *  in->Size()/ncoils]; 
 
 	for (int j = 0; j < ncoils; j++) {
 		
-		for (int i=0; i < nsamples; i++) {
-			plan->y[i][0] = (in->channel(j))[i].real();
-			plan->y[i][1] = (in->channel(j))[i].imag();
+		double      ftout[2 * out->Size()];
+
+		for (int i = 0; i < in->Size()/ncoils; i++) {
+			ftin[2*i  ] = (in->at(j*in->Dim(COL)*in->Dim(LIN)+i)).real();
+			ftin[2*i+1] = (in->at(j*in->Dim(COL)*in->Dim(LIN)+i)).imag();
 		}
 		
-		double t        = nfft_second();
+		nfft::ift (np, spc, ftin, ftout, maxit, epsilon);
 
-		/* inverse trafo */
-		solver_before_loop_complex(plan);
-		
-		for (int i = 0; i < maxit; i++)  {
-
-			/* break if dot_r_iter is smaller than epsilon*/
-			if(plan->dot_r_iter<epsilon)
-				break;
-
-#ifdef VERBOSE
-			fprintf(stderr,"%e,  %i of %i\n",sqrt(plan->dot_r_iter), i+1, maxit);
-#endif
-
-			solver_loop_one_step_complex(plan);
-
+		for (int i = 0; i < out->Size(); i++) {
+			raw sens = sm->at(j*sm->Dim(COL)*sm->Dim(LIN)+i);
+			out->at(i) += raw(ftout[2*i] * sens.real(), ftout[2*i+1] * -sens.imag());
 		}
-		
-		t = nfft_second()-t;
-		
-		for (int i = 0; i < out->Size(); i++)
-			out->at(i) += sm->at(i) * raw(plan->f_hat_iter[i][0], plan->f_hat_iter[i][1]);
-		
 	}
 	
 	return OK;
@@ -186,7 +159,7 @@ CGSENSE::Process () {
 	
 	Matrix<raw> a, b, p, q, r, r_new;
 	
-	EH (&m_temp, &m_sens, &m_iplan, m_epsilon, m_maxit, &a);
+	EH (&m_temp, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
 	p = a;
 	r = a;
 	b.Dim(COL) = a.Dim(COL);
@@ -214,8 +187,8 @@ CGSENSE::Process () {
 			break;
 		
 		// q  = eh(e(p , sensitivity, k), sensitivity, k);
-		E  (&p,    &m_sens, &m_fplan,                     &mtmp);
-		EH (&mtmp, &m_sens, &m_iplan, m_epsilon, m_maxit, &q);
+		E  (&p,    &m_sens, &m_fplan,                               &mtmp);
+		EH (&mtmp, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &q);
 
 		// b  = b + r(:)'*r(:)/(p(:)'*q(:))*p;
 		rtmp  = (rn / (p.dotc(q)));
