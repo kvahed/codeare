@@ -99,7 +99,8 @@ CGSENSE::CGSENSE () {
 
 /**
  * @brief               Compute left hand side (i.e. Multiply E with spatial (image) data)
- *
+ *                      Forward NFFT in and elementwise multiply with spatial sensitivity of every channel 
+ * 
  * @param  in           Original discretised sample O (Nx x Ny)
  * @param  sm           Sensitivity maps            O (Nx x Ny x Nc)
  * @param  ncs          Non-Cartesian strategy for non uniform ft
@@ -114,10 +115,12 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* plan, Matrix<raw>* out) {
 	
 	for (int j = 0; j < ncoils; j++) {
 
-		
-		
-	}
+		/*nfft_trafo(&plan);
 
+		for(int i=0; i < plan.M_total;i++) 
+			out->at(0, 0, j) = raw(plan->f[j], plan->f[j+1]);
+		*/
+	}
 
 	return OK;
 

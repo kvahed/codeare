@@ -4,7 +4,7 @@
 ../%SK.cc: ../%.idl
 	omniidl -bcxx $<
 
-COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp
+COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp nfftstub.c
 
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
@@ -24,13 +24,13 @@ GenericRegrid_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 MedianFilter_OMP_la_SOURCES = $(COMMON) MedianFilter_OMP.h MedianFilter_OMP.cpp
 MedianFilter_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 
-NuFFT_la_SOURCES = $(COMMON) NuFFT.h NuFFT.cpp
+NuFFT_la_SOURCES = $(COMMON) NuFFT.h NuFFT.cpp nfftstub.c
 NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.h DumpToFile.cpp
 DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(HDF5)
 
-CGSENSE_la_SOURCES = $(COMMON) CGSENSE.h CGSENSE.cpp
+CGSENSE_la_SOURCES = $(COMMON) CGSENSE.h CGSENSE.cpp nfftstub.c
 CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 
 SystemCmd_la_SOURCES = $(COMMON) SystemCmd.h SystemCmd.cpp
