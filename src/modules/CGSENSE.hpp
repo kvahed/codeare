@@ -18,8 +18,8 @@
  *  02110-1301  USA
  */
 
-#ifndef __CGSENSE_H__
-#define __CGSENSE_H__
+#ifndef __CGSENSE_HPP__
+#define __CGSENSE_HPP__
 
 #include "ReconStrategy.h"
 #include "nfft3util.h"
@@ -49,13 +49,13 @@ namespace RRStrategy {
 		 * @brief Default destructor
 		 */
 		virtual 
-			~CGSENSE () {};
+		~CGSENSE () {};
 		
 		/**
 		 * @brief Dump data to disk
 		 */
 		virtual RRSModule::error_code
-			Process ();
+		Process ();
 		
 		
 		
@@ -70,7 +70,7 @@ namespace RRStrategy {
 		
 		nfft_plan           m_fplan;            /**< nfft plan */
 		solver_plan_complex m_iplan;
-	
+		
 		double              m_epsilon;         /**< NFFT convergence criterium */
 		double              m_cgconv;          /**< CG SENSE convergence criterium */
 		double              m_maxit;           /**< Maximum number of CG iterations */
