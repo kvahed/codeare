@@ -1,3 +1,5 @@
+#include "Toolbox.hpp"
+
 inline bool fexists (const char* fname) {
 	
 	std::ifstream fs (fname);
@@ -88,7 +90,7 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 #endif
 			}
 			
-			Group group;
+			Group group, *tmp;
 			
 			try {
 				
@@ -100,26 +102,24 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 			} catch (Exception e) {
 				
 				int    depth   = 0;
-				char   path [dloc.length()];
-				strcpy (path, dloc.c_str());
-				char*  subpath = strtok (path, "/");
-				Group* tmp;
-				
-				while (subpath != NULL) {
+
+				std::vector<std::string> sv;
+
+				split(sv, dloc, "/");
+
+				for (int i = 0; i < sv.size(); i++) {
 					
 					try {
 						if (depth)
-							group = (*tmp).openGroup(subpath);
+							group = (*tmp).openGroup(sv.at(i));
 						else
-							group = file.openGroup(subpath);
+							group = file.openGroup(sv.at(i));
 					} catch (Exception e) {
 						if (depth)
-							group = (*tmp).createGroup(subpath);
+							group = (*tmp).createGroup(sv.at(i));
 						else
-							group = file.createGroup(subpath);
+							group = file.createGroup(sv.at(i));
 					}
-					
-					subpath = strtok (NULL, "/");
 					
 					tmp = &group;
 					depth++;
