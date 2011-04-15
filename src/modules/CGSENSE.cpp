@@ -77,36 +77,39 @@ CGSENSE::CGSENSE () {
 RRSModule::error_code 
 E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out) {
 
+	// Clear output container
 	out->Reset();
 	
-	int    ncoils   = sm->Dim(CHA);
-	int    nsamples = out->Size(); 
-	int    ndim     = in->Dim(COL);
+	// Some dimensions
+	int        ncoils   = sm->Dim(CHA);
+	int        nsamples = out->Size(); 
+	int        ndim     = in->Dim(COL);
 
-	Matrix<raw> tmp;
+	// Create container for FT input
+	double     ftin  [2 *  in->Size()];
 
-	double ftin  [2 *  in->Size()];
-
+	// Loop over coils, Elementwise multiplication of maps with in (s.*in), ft and store in out
 	for (int j = 0; j < ncoils; j++) {
 
 		double ftout [2 * out->Size()/ncoils];
+		int    pos = j*sm->Dim(COL)*sm->Dim(LIN);
 	
-		tmp = sm->channel(j);
-	    tmp = (*in) * tmp;
-
 		for (int i = 0; i < in->Size(); i++) {
-			raw tmp = sm->at(j*sm->Dim(COL)*sm->Dim(LIN) + i) * in->at(i);
+			
+			raw tmp = sm->at(pos + i) * in->at(i);
 			ftin[2*i  ] = tmp.real(); 
 			ftin[2*i+1] = tmp.imag(); 
+
 		}
 
 		nfft::ft (np, ftin, ftout);
 
 		for (int i = 0; i < out->Size()/ncoils; i++) 
-			out->at(j*out->Dim(COL)*out->Dim(LIN) + i) = raw(ftout[2*i],ftout[2*i+1]);
+			out->at(pos + i) = raw(ftout[2*i],ftout[2*i+1]);
 
 	}
 
+	// Return success
 	return OK;
 
 }
@@ -117,35 +120,45 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out) {
  *
  * @param  in           K-space samples along trajectory O (Nk x Nc)
  * @param  sm           Sensitivity maps                 O (Nx x Ny x Nc)
- * @param  ncs          Non-Cartesian strategy for non uniform ft
+ * @param  np           NuFFT plan
+ * @param  spc          Solver plan
+ * @param  epsilon      Convergence criterium for ift (default 3e-7)
+ * @param  maxit        Maximum number of solver iterations (default 3)
  * @param  out          Returned product                 O (Nx x Ny)
  */
 RRSModule::error_code
 EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, double epsilon, int maxit, Matrix<raw>* out) {
 
+	// Clear outgoing container
 	out->Reset();
 
+	// Some dimensions
 	int         ncoils   = sm->Dim(CHA);
 	int         nsamples = in->Size(); 
 	int         ndim     = out->Dim(COL);
 
+	// Container for FT input
 	double      ftin [2 *  in->Size()/ncoils]; 
 
+	// Loop over coils, Inverse FT every signal in *in, 
+	// Sum elementwise mutiplied images with according sensitivity maps 
 	for (int j = 0; j < ncoils; j++) {
 		
-		double      ftout[2 * out->Size()];
+		double  ftout[2 * out->Size()];
+		int     pos = j*in->Dim(COL)*in->Dim(LIN);
 
 		for (int i = 0; i < in->Size()/ncoils; i++) {
-			ftin[2*i  ] = (in->at(j*in->Dim(COL)*in->Dim(LIN)+i)).real();
-			ftin[2*i+1] = (in->at(j*in->Dim(COL)*in->Dim(LIN)+i)).imag();
+			ftin[2*i  ] = (in->at(pos + i)).real();
+			ftin[2*i+1] = (in->at(pos + i)).imag();
 		}
 		
 		nfft::ift (np, spc, ftin, ftout, maxit, epsilon);
 
 		for (int i = 0; i < out->Size(); i++) {
-			raw sens = sm->at(j*sm->Dim(COL)*sm->Dim(LIN)+i);
+			raw sens = sm->at(pos + i);
 			out->at(i) += raw(ftout[2*i] * sens.real(), ftout[2*i+1] * -sens.imag());
 		}
+
 	}
 	
 	return OK;
