@@ -52,7 +52,28 @@ int main (int argc, char** argv) {
 		Matrix<raw>    r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+
+		std::string cgfile = "share/cgsense/cgsense.h5";
+		std::string app    = "2d";
+
+		client.SetAttribute ("nx",      "128");
+		m_config->Attribute ("ny",      "128");
+		m_config->Attribute ("epsilon", &m_epsilon);
+		m_config->Attribute ("maxit",   &m_maxit);
+		m_config->Attribute ("cgconv",  &m_cgconv);
+		m_config->Attribute ("ndim",    "2");
+	
+		// Matrix<raw> data;
+		// data.read          (cgfile, app, "data");
+		// Matrix<raw> sensitivities;
+		// sensitivities.read (cgfile, app, "sensitivities");
+		// Matrix<double> kspace
+		// kspace.read        (cgfile, app, "kspace");
+		// Matrix<double> weights
+		// kspace.read        (cgfile, app, "weights");
+
 		
+
 		r.Random();
 		h.Random();
 		p.Random();

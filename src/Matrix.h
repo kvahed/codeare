@@ -355,6 +355,27 @@ public:
 
     
     /**
+     * @brief            Reference to value at position
+     *  
+     * @param  dim       Dimension
+	 * @param  pos       Position
+     *
+     * @return           Reference to _M[pos]
+     */
+    inline T&           
+	at                  (IceDim dim, int pos) {
+
+		int n = 1;
+
+		for (int i = 0; i < dim; i++)
+			n *= _dim[i];
+			
+        return _M[pos*n-1];
+
+    }
+
+    
+    /**
      * @brief           Get value in slice
      *  
      * @param  col      Column
@@ -1497,6 +1518,24 @@ Matrix<T>::channel (int c) {
 
 	for (int i = 0; i < Size(); i++)
 		res[i] = _M[c*_dim[COL]*_dim[LIN] + i];
+
+	return res;
+
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::slice (int s) {
+    
+    Matrix<T> res;
+
+	for (int j = 0; j < SLC; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[s*_dim[COL]*_dim[LIN]*_dim[CHA] + i];
 
 	return res;
 
