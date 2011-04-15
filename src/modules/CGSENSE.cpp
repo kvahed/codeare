@@ -1,4 +1,4 @@
-#include "CGSENSE.h"
+#include "CGSENSE.hpp"
 #include "nfftstub.h"
 
 using namespace RRStrategy;

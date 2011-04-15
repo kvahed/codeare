@@ -56,12 +56,12 @@ int main (int argc, char** argv) {
 		std::string cgfile = "share/cgsense/cgsense.h5";
 		std::string app    = "2d";
 
-		client.SetAttribute ("nx",      "128");
+		/*client.SetAttribute ("nx",      "128");
 		m_config->Attribute ("ny",      "128");
-		m_config->Attribute ("epsilon", &m_epsilon);
+		m_config->Attribute ("epsilon", "");
 		m_config->Attribute ("maxit",   &m_maxit);
 		m_config->Attribute ("cgconv",  &m_cgconv);
-		m_config->Attribute ("ndim",    "2");
+		m_config->Attribute ("ndim",    "2");*/
 	
 		// Matrix<raw> data;
 		// data.read          (cgfile, app, "data");
