@@ -108,6 +108,19 @@ int main (int argc, char** argv) {
 		
 		return 1;
 
+	/*Matrix<raw>    sensitivities;
+	Matrix<raw>    data;
+	Matrix<helper> weights;
+	Matrix<helper> kspace;
+
+	sensitivities.read ("2dcgsense.h5", "sensitivities");
+	weights.read       ("2dcgsense.h5", "weights");
+	data.read          ("2dcgsense.h5", "data");
+	kspace.read        ("2dcgsense.h5", "kspace");*/
+
+	
+
+
 }
 
 
