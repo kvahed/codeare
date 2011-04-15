@@ -180,6 +180,28 @@ class Configurable {
 	}
 	
 
+	/**
+	 * @brief          Read configuration from XML file
+	 *
+	 * @param  fname   Name of input file
+	 */
+	void 
+	ReadConfig        (const char* fname) {
+		m_config_doc->LoadFile (fname);
+	}
+	
+
+	/**
+	 * @brief          Read configuration from XML file
+	 *
+	 * @param  fname   Name of input file
+	 */
+	void 
+	ReadConfig        (FILE* file) {
+		m_config_doc->LoadFile (file);
+	}
+	
+
  protected:
 	
 

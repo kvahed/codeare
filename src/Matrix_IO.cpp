@@ -105,7 +105,8 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 
 				std::vector<std::string> sv;
 
-				split(sv, dloc, "/");
+				Toolbox tb;
+				tb.split(sv, dloc, "/");
 
 				for (int i = 0; i < sv.size(); i++) {
 					

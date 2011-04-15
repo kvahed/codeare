@@ -25,15 +25,16 @@
     #include "config.h"
 #endif
 
-#include <time.h>
-#include <stdio.h>
-
 #ifndef SVN_REVISION
 	#define SVN_REVISION "unkown"
 #endif
 
 using namespace std;
 using namespace RRClient;
+
+#include <time.h>
+#include <stdio.h>
+
 
 char*  name;
 char*  base;
@@ -53,16 +54,9 @@ int main (int argc, char** argv) {
 		Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
-		std::string cgfile = "share/cgsense/cgsense.h5";
+		std::string data   = "share/cgsense/cgsense.h5";
 		std::string app    = "2d";
 
-		/*client.SetAttribute ("nx",      "128");
-		m_config->Attribute ("ny",      "128");
-		m_config->Attribute ("epsilon", "");
-		m_config->Attribute ("maxit",   &m_maxit);
-		m_config->Attribute ("cgconv",  &m_cgconv);
-		m_config->Attribute ("ndim",    "2");*/
-	
 		// Matrix<raw> data;
 		// data.read          (cgfile, app, "data");
 		// Matrix<raw> sensitivities;
@@ -71,8 +65,6 @@ int main (int argc, char** argv) {
 		// kspace.read        (cgfile, app, "kspace");
 		// Matrix<double> weights
 		// kspace.read        (cgfile, app, "weights");
-
-		
 
 		r.Random();
 		h.Random();
@@ -90,8 +82,12 @@ int main (int argc, char** argv) {
 		char   uid[16];
 		sprintf(uid,"%ld",seconds);
 		
+		FILE* config = fopen ("test.xml" , "r");
+		client.ReadConfig(config);
+		fclose (config);
+
 		client.SetAttribute("UID", uid);
-		client.SetAttribute("Pi", 3.1415);
+		client.SetAttribute("Pi", 3.14156);
 		client.SetAttribute("Dim", d);
 		
 		client.Process(test);
