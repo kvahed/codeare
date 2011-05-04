@@ -18,8 +18,8 @@
  *  02110-1301  USA
  */
 
-#include "ReconServant.h"
-#include "ReconContext.h"
+#include "ReconServant.hpp"
+#include "ReconContext.hpp"
 
 using namespace RRServer;
 

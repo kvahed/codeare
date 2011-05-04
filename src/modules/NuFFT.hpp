@@ -18,45 +18,60 @@
  *  02110-1301  USA
  */
 
-#ifndef __GENERIC_REGRID_H__
-#define __GENERIC_REGRID_H__
+#ifndef __NUFFT_HPP__
+#define __NUFFT_HPP__
 
-#include "ReconStrategy.h"
+#include "ReconStrategy.hpp"
 
 using namespace RRServer;
 
 namespace RRStrategy {
 	
 	/**
-	 * @brief Generic regridder
-	 *        Expects to identically sized matrices (data & k-space positions)
+	 * @brief Non uniform FFT
 	 */
-	class GenericRegrid : public ReconStrategy {
-		
+	class NuFFT : public ReconStrategy {
 		
 	public:
 		
 		/**
 		 * @brief Default constructor
 		 */
-		GenericRegrid  () {};
+		NuFFT  ();
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-		~GenericRegrid () {};
+		~NuFFT () {};
 		
 		/**
-		 * @brief Regrid data to Cartesian k-space
+		 * @brief Dump data to disk
 		 */
 		virtual RRSModule::error_code
-		Process () {
-			return RRSModule::OK;
-		};
+		Process ();
+		
+	private:
+		
+		int N [2];
+		int Nk[2];
+		
+		// We only support 2 dims for the time being
+		int m_dim;
+		
+		// Some more stuff
+		int       m_M;
+		double    m_b;
+		int       m_q;
+		
+		double*   m_tra;
+		
+		double*   k_data;
+		double*   r_data;
+		double*   k_d;
+		double*   r_d;
 		
 	};
 	
-};
-
-#endif /* __GENERIC_REGRID_H__ */
+}
+#endif /* __NUFFT_HPP__ */

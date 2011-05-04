@@ -18,47 +18,66 @@
  *  02110-1301  USA
  */
 
-#ifndef __DUMMY_RECON_H__
-#define __DUMMY_RECON_H__
+#ifndef __RECONCONTEXT_HPP__
+#define __RECONCONTEXT_HPP__
 
-#include "ReconStrategy.h"
+#include <vector>
 
-using namespace RRServer;
+#include "ReconStrategy.hpp"
 
-
-/**
- * @brief Reconstruction startegies
- */
-namespace RRStrategy {
+namespace RRServer {
 
 	/**
-	 * @brief Empty recon for test purposes
+	 * @brief Context of a reconstruction method
 	 */
-	class DummyRecon : public ReconStrategy {
+	class ReconContext {
+		
 		
 		
 	public:
 		
-		/**
-		 * @brief Default constructor
-		 */
-		DummyRecon  () {};
 		
 		/**
-		 * @brief Default destructor
+		 * @brief Default Constructor
 		 */
-		virtual 
-		~DummyRecon () {};
+		ReconContext () {}
 		
 		
 		/**
-		 * @brief Do nothing 
+		 * @brief Invoce destruction on my startegy and exit
+		 */ 
+		~ReconContext ();
+		
+		
+		/**
+		 * @brief Construct with a strategy
 		 */
-		virtual RRSModule::error_code
-		Process ();
+		ReconContext (const char* name);
+		
+		
+		/**
+		 * @brief get active startegy
+		 */
+		inline ReconStrategy*
+			Strategy     () {
+			return m_strategy;
+		}
+		
+		/**
+		 * @brief Process data with given strategy
+		 */
+		RRSModule::error_code
+			Process () {
+			return m_strategy->Process();
+		}
+		
+		
+	private:
+		
+		ReconStrategy*            m_strategy;   /**< Active strategy           */
+		void*                     m_dlib;       /**< Handle on startegy module */
 		
 	};
-
-};
-#endif /* __DUMMY_RECON_H__ */
-
+	
+}
+#endif 

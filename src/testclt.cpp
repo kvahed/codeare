@@ -35,7 +35,6 @@ using namespace RRClient;
 #include <time.h>
 #include <stdio.h>
 
-
 char*  name;
 char*  base;
 char*  debug;
@@ -59,10 +58,13 @@ int main (int argc, char** argv) {
 
 		// Matrix<raw> data;
 		// data.read          (cgfile, app, "data");
+
 		// Matrix<raw> sensitivities;
 		// sensitivities.read (cgfile, app, "sensitivities");
+
 		// Matrix<double> kspace
 		// kspace.read        (cgfile, app, "kspace");
+
 		// Matrix<double> weights
 		// kspace.read        (cgfile, app, "weights");
 
@@ -82,10 +84,7 @@ int main (int argc, char** argv) {
 		char   uid[16];
 		sprintf(uid,"%ld",seconds);
 		
-		FILE* config = fopen ("test.xml" , "r");
-		client.ReadConfig(config);
-		fclose (config);
-
+		client.ReadConfig("test.xml");
 		client.SetAttribute("UID", uid);
 		client.SetAttribute("Pi", 3.14156);
 		client.SetAttribute("Dim", d);

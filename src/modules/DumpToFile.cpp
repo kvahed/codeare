@@ -18,7 +18,7 @@
  *  02110-1301  USA
  */
 
-#include "DumpToFile.h"
+#include "DumpToFile.hpp"
 
 using namespace RRStrategy;
 

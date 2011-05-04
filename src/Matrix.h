@@ -1391,7 +1391,7 @@ Matrix<T>::Matrix () {
     nb_alloc = 1;
 
 
-};
+}
 
 
 template <class T> 
@@ -1405,7 +1405,7 @@ Matrix<T>::Matrix (T s) {
 
     _M[0] = s;
 
-};
+}
 
 
 template <class T>
@@ -1435,7 +1435,7 @@ Matrix<T>::Matrix (int col, int lin, int cha, int set,
     nb_alloc = 1;
 
 
-};
+}
 
 
 template <class T>
@@ -1635,7 +1635,7 @@ Matrix<T>::operator()(Matrix<int> &m) const {
     
     return res;
 
-};
+}
 
 
 template <class T> Matrix<T> 

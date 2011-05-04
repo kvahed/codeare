@@ -19,7 +19,7 @@
  */
 
 #include "Loader.h"
-#include "ReconContext.h"
+#include "ReconContext.hpp"
 
 using namespace RRServer;
 
@@ -29,7 +29,7 @@ ReconContext::~ReconContext () {
 	destroy(m_strategy);
 	CloseModule (m_dlib);
 	
-};
+}
 
 
 ReconContext::ReconContext (const char* name) {
@@ -38,7 +38,7 @@ ReconContext::ReconContext (const char* name) {
 	create_t* create = (create_t*) GetFunction (m_dlib, (char*)"create");
 	m_strategy = create();
 	
-};
+}
 
 
 

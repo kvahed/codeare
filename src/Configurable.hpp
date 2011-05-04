@@ -1,5 +1,5 @@
-#ifndef __CONFIGURABLE_H__
-#define __CONFIGURABLE_H__
+#ifndef __CONFIGURABLE_HPP__
+#define __CONFIGURABLE_HPP__
 
 #include "tinyxml.h"
 

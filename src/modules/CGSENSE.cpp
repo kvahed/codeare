@@ -28,12 +28,7 @@ CGSENSE::CGSENSE () {
 	nfft::init (d, m_N, m_helper.Dim(COL), m_n, m, &m_fplan, &m_iplan, m_epsilon);
 
 	/* Copy incoming data to m_temp             */
-	Matrix < raw > m_temp = (m_raw);
-
-	// Reshape for outgoing format
-	Attribute ("Nx",             &m_raw.Dim(COL));
-	Attribute ("Ny",             &m_raw.Dim(LIN));
-	Attribute ("Nz",             &m_raw.Dim(SLC));
+	Matrix < raw > m_measured = (m_raw);
 
 	for (int i = 3; i < INVALID_DIM; i++)
 		m_raw.Dim(i) = 1;
@@ -45,21 +40,6 @@ CGSENSE::CGSENSE () {
 
 	m_raw.Reset();
 	
-	// Maximum k-vector reached
-	kmax[0] = 0.0;
-	for (int i = 0; i < m_helper.Dim(COL); i++)
-		if (kmax[0] < m_helper(i,0,0))
-			kmax[0] = m_helper(i,0,0);
-	kmax[1] = 0.0;
-	for (int j = 0; j < m_helper.Dim(LIN); j++)
-		if (kmax[1] < m_helper(0,j,0))
-			kmax[1] = m_helper(0,j,0);
-	kmax[2] = 0.0;
-	for (int k = 0; k < m_helper.Dim(SLC); k++)
-		if (kmax[2] < m_helper(0,0,k))
-			kmax[2] = m_helper(0,0,k);
-	
-
 }
 
 
@@ -86,13 +66,13 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out) {
 	int        ndim     = in->Dim(COL);
 
 	// Create container for FT input
-	double     ftin  [2 *  in->Size()];
+	double*    ftin     = new double[2 *  in->Size()];
 
 	// Loop over coils, Elementwise multiplication of maps with in (s.*in), ft and store in out
 	for (int j = 0; j < ncoils; j++) {
 
-		double ftout [2 * out->Size()/ncoils];
-		int    pos = j*sm->Dim(COL)*sm->Dim(LIN);
+		double* ftout = new double[2 * out->Size()/ncoils];
+		int     pos   = j*sm->Dim(COL)*sm->Dim(LIN);
 	
 		for (int i = 0; i < in->Size(); i++) {
 			
@@ -107,7 +87,11 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out) {
 		for (int i = 0; i < out->Size()/ncoils; i++) 
 			out->at(pos + i) = raw(ftout[2*i],ftout[2*i+1]);
 
+		delete [] ftout;
+
 	}
+
+	delete [] ftin;
 
 	// Return success
 	return OK;
@@ -138,14 +122,14 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 	int         ndim     = out->Dim(COL);
 
 	// Container for FT input
-	double      ftin [2 *  in->Size()/ncoils]; 
+	double*     ftin     = new double[2 *  in->Size()/ncoils]; 
 
 	// Loop over coils, Inverse FT every signal in *in, 
 	// Sum elementwise mutiplied images with according sensitivity maps 
 	for (int j = 0; j < ncoils; j++) {
 		
-		double  ftout[2 * out->Size()];
-		int     pos = j*in->Dim(COL)*in->Dim(LIN);
+		double* ftout = new double[2 * out->Size()];
+		int     pos   = j*in->Dim(COL)*in->Dim(LIN);
 
 		for (int i = 0; i < in->Size()/ncoils; i++) {
 			ftin[2*i  ] = (in->at(pos + i)).real();
@@ -159,8 +143,12 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 			out->at(i) += raw(ftout[2*i] * sens.real(), ftout[2*i+1] * -sens.imag());
 		}
 
+		delete [] ftout;
+
 	}
 	
+	delete [] ftin;
+
 	return OK;
 	
 }
@@ -171,8 +159,8 @@ RRSModule::error_code
 CGSENSE::Process () {
 	
 	Matrix<raw> a, b, p, q, r, r_new;
-	
-	EH (&m_temp, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
+	    
+	EH (&m_measured, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
 	p = a;
 	r = a;
 	b.Dim(COL) = a.Dim(COL);

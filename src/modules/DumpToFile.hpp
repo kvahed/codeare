@@ -18,60 +18,42 @@
  *  02110-1301  USA
  */
 
-#ifndef __NUFFT_H__
-#define __NUFFT_H__
+#ifndef __DUMP_TO_FILE_HPP__
+#define __DUMP_TO_FILE_HPP__
 
-#include "ReconStrategy.h"
+#include "ReconStrategy.hpp"
 
 using namespace RRServer;
 
 namespace RRStrategy {
 	
 	/**
-	 * @brief Non uniform FFT
+	 * @brief Dump data to file
 	 */
-	class NuFFT : public ReconStrategy {
+	class DumpToFile : public ReconStrategy {
+		
 		
 	public:
 		
 		/**
 		 * @brief Default constructor
 		 */
-		NuFFT  ();
+		DumpToFile  () {};
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-		~NuFFT () {};
+		~DumpToFile () {};
 		
 		/**
 		 * @brief Dump data to disk
 		 */
 		virtual RRSModule::error_code
-		Process ();
-		
-	private:
-		
-		int N [2];
-		int Nk[2];
-		
-		// We only support 2 dims for the time being
-		int m_dim;
-		
-		// Some more stuff
-		int       m_M;
-		double    m_b;
-		int       m_q;
-		
-		double*   m_tra;
-		
-		double*   k_data;
-		double*   r_data;
-		double*   k_d;
-		double*   r_d;
+		Process     ();
 		
 	};
-	
-};
-#endif /* __NUFFT_H__ */
+
+}
+
+#endif /* __DUMP_TO_FILE_H__ */

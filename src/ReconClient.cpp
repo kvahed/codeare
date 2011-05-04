@@ -108,7 +108,7 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
 		m_pixel->dims[i] = 0;
 	}
 
-};
+}
 
 
 
@@ -121,7 +121,7 @@ ReconClient::~ReconClient         ()            {
 
     m_orb->destroy();
     
-};
+}
 
 
 
@@ -155,7 +155,7 @@ ReconClient::Process  (const char* name)  {
 
     return result;
     
-};
+}
 
 
 
@@ -168,7 +168,7 @@ ReconClient::GetRawSize () {
         size *= m_raw->dims[i];
     return size;
     
-};
+}
 
 
 
@@ -181,7 +181,7 @@ ReconClient::GetHelperSize () {
         size *= m_helper->dims[i];
     return size;
     
-};
+}
 
 
 
@@ -194,6 +194,6 @@ ReconClient::GetPixelSize () {
         size *= m_pixel->dims[i];
     return size;
     
-};
+}
 
     

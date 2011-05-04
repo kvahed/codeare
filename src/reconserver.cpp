@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <signal.h>
                                                                                 
-#include "ReconServant.h"
+#include "ReconServant.hpp"
 
 #ifndef __WIN32__
 #include "config.h"

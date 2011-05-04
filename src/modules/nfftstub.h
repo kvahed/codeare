@@ -54,8 +54,8 @@ namespace nfft {
 		kspace               (nfft_plan* np, double* k);
 
 #ifdef __cplusplus
-	};
+	}
 #endif /* __cplusplus */
 	
-};
+}
 #endif //__NFFT_STUB_H__

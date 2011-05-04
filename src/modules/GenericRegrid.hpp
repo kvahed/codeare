@@ -18,19 +18,20 @@
  *  02110-1301  USA
  */
 
-#ifndef __MEDIAN_FILTER_OMP_H__
-#define __MEDIAN_FILTER_OMP_H__
+#ifndef __GENERIC_REGRID_HPP__
+#define __GENERIC_REGRID_HPP__
 
-#include "ReconStrategy.h"
+#include "ReconStrategy.hpp"
 
 using namespace RRServer;
 
 namespace RRStrategy {
-
+	
 	/**
-	 * @brief Median filter with OpenMP support
+	 * @brief Generic regridder
+	 *        Expects to identically sized matrices (data & k-space positions)
 	 */
-	class MedianFilter_OMP : public ReconStrategy {
+	class GenericRegrid : public ReconStrategy {
 		
 		
 	public:
@@ -38,21 +39,24 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		MedianFilter_OMP  () {};
+		GenericRegrid  () {};
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-		~MedianFilter_OMP () {};
+		~GenericRegrid () {};
 		
 		/**
-		 * @brief Apply Median filter to image space
+		 * @brief Regrid data to Cartesian k-space
 		 */
 		virtual RRSModule::error_code
-		Process ();
+		Process () {
+			return RRSModule::OK;
+		};
 		
 	};
+	
+}
 
-};
-#endif /* __MEDIAN_FILTER_OMP_H__ */
+#endif /* __GENERIC_REGRID_HPP__ */
