@@ -21,7 +21,7 @@
 #ifndef __RECON_SERVANT_HPP__
 #define __RECON_SERVANT_HPP__
 
-#include "Matrix.h"
+#include "Matrix.hpp"
 
 #ifdef __WIN32__ 
     #include "RRSModule.h"

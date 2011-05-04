@@ -22,7 +22,8 @@
 #define __RECON_CLIENT_H__
 
 #include <complex>
-#include "Matrix.h"
+
+#include "Matrix.hpp"
 #include "Configurable.hpp"
 
 

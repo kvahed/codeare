@@ -21,7 +21,7 @@
 #ifndef __RECON_STRATEGY_HPP__
 #define __RECON_STRATEGY_HPP__
 
-#include "Matrix.h"
+#include "Matrix.hpp"
 #include "Configurable.hpp"
 
 

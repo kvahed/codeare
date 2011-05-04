@@ -19,7 +19,7 @@
  */
 
 #include "options.h"
-#include "ReconClient.h"
+#include "ReconClient.hpp"
 
 #ifndef __WIN32__
     #include "config.h"

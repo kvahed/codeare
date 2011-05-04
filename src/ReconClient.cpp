@@ -18,7 +18,7 @@
  *  02110-1301  USA
  */
 
-#include "ReconClient.h"
+#include "ReconClient.hpp"
 
 using namespace RRClient;
 
