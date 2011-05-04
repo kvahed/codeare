@@ -18,11 +18,9 @@
  *  02110-1301  USA
  */
 
-#include "DummyRecon.h"
-
+#include "DummyRecon.hpp"
 
 using namespace RRStrategy;
-
 
 RRSModule::error_code
 DummyRecon::Process     () { 
@@ -33,9 +31,14 @@ DummyRecon::Process     () {
 
 // the class factories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {
+
     return new DummyRecon;
+
 }
 
+
 extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
+
 	delete p;
+
 }

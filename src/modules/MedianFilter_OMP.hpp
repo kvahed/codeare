@@ -18,19 +18,19 @@
  *  02110-1301  USA
  */
 
-#ifndef __SYSTEM_CMD_H__
-#define __SYSTEM_CMD_H__
+#ifndef __MEDIAN_FILTER_OMP_HPP__
+#define __MEDIAN_FILTER_OMP_HPP__
 
-#include "ReconStrategy.h"
+#include "ReconStrategy.hpp"
 
 using namespace RRServer;
 
 namespace RRStrategy {
-	
+
 	/**
-	 * @brief Data manipulation through system cmd
+	 * @brief Median filter with OpenMP support
 	 */
-	class SystemCmd : public ReconStrategy {
+	class MedianFilter_OMP : public ReconStrategy {
 		
 		
 	public:
@@ -38,23 +38,21 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		SystemCmd  () {};
+		MedianFilter_OMP  () {};
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-		~SystemCmd () {};
-		
+		~MedianFilter_OMP () {};
 		
 		/**
-		 * @brief Do nothing 
+		 * @brief Apply Median filter to image space
 		 */
 		virtual RRSModule::error_code
 		Process ();
 		
 	};
-	
-};
 
-#endif /* __SYSTEM_CMD_H__ */
+}
+#endif /* __MEDIAN_FILTER_OMP_HPP__ */

@@ -39,9 +39,6 @@
 /* Define to 1 if you have the `omnithread' library (-lomnithread). */
 #undef HAVE_LIBOMNITHREAD
 
-/* Define to 1 if you have the `sz' library (-lsz). */
-#undef HAVE_LIBSZ
-
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
 

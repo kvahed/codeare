@@ -18,19 +18,23 @@
  *  02110-1301  USA
  */
 
-#ifndef __DUMP_TO_FILE_H__
-#define __DUMP_TO_FILE_H__
+#ifndef __DUMMY_RECON_HPP__
+#define __DUMMY_RECON_HPP__
 
-#include "ReconStrategy.h"
+#include "ReconStrategy.hpp"
 
 using namespace RRServer;
 
+
+/**
+ * @brief Reconstruction startegies
+ */
 namespace RRStrategy {
-	
+
 	/**
-	 * @brief Dump data to file
+	 * @brief Empty recon for test purposes
 	 */
-	class DumpToFile : public ReconStrategy {
+	class DummyRecon : public ReconStrategy {
 		
 		
 	public:
@@ -38,22 +42,23 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		DumpToFile  () {};
+		DummyRecon  () {};
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-		~DumpToFile () {};
+		~DummyRecon () {};
+		
 		
 		/**
-		 * @brief Dump data to disk
+		 * @brief Do nothing 
 		 */
 		virtual RRSModule::error_code
-		Process     ();
+		Process ();
 		
 	};
 
-};
+}
+#endif /* __DUMMY_RECON_H__ */
 
-#endif /* __DUMP_TO_FILE_H__ */

@@ -18,11 +18,11 @@
  *  02110-1301  USA
  */
 
-#ifndef __RECON_STRATEGY_H__
-#define __RECON_STRATEGY_H__
+#ifndef __RECON_STRATEGY_HPP__
+#define __RECON_STRATEGY_HPP__
 
 #include "Matrix.h"
-#include "Configurable.h"
+#include "Configurable.hpp"
 
 
 #include "DllExport.h"
@@ -160,17 +160,17 @@ public:
 	
 protected:
 
-	Matrix< std::complex<float> > m_raw;         /*!< raw data matrix                    */
-	Matrix< double >              m_helper;      /*!< helper matrix                      */
-	Matrix< short >               m_pixel;       /*!< pixel data matrix                  */
+	Matrix<raw>     m_raw;         /*!< raw data matrix                    */
+	Matrix<double>  m_helper;      /*!< helper matrix                      */
+	Matrix<short>   m_pixel;       /*!< pixel data matrix                  */
 
 };
 
 
 
-#endif /* __RECON_STRATEGY_H__ */
+#endif /* __RECON_STRATEGY_HPP__ */
 
-};
+}
 
 typedef RRServer::ReconStrategy* create_t  ();
 typedef void           destroy_t (RRServer::ReconStrategy*);

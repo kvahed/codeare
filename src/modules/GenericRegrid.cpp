@@ -18,7 +18,7 @@
  *  02110-1301  USA
  */
 
-#include "GenericRegrid.h"
+#include "GenericRegrid.hpp"
 
 using namespace RRStrategy;
 

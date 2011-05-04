@@ -18,66 +18,43 @@
  *  02110-1301  USA
  */
 
-#ifndef __RECONCONTEXT_H__
-#define __RECONCONTEXT_H__
+#ifndef __SYSTEM_CMD_HPP__
+#define __SYSTEM_CMD_HPP__
 
-#include <vector>
+#include "ReconStrategy.hpp"
 
-#include "ReconStrategy.h"
+using namespace RRServer;
 
-namespace RRServer {
-
+namespace RRStrategy {
+	
 	/**
-	 * @brief Context of a reconstruction method
+	 * @brief Data manipulation through system cmd
 	 */
-	class ReconContext {
-		
+	class SystemCmd : public ReconStrategy {
 		
 		
 	public:
 		
-		
 		/**
-		 * @brief Default Constructor
+		 * @brief Default constructor
 		 */
-		ReconContext () {}
-		
-		
-		/**
-		 * @brief Invoce destruction on my startegy and exit
-		 */ 
-		~ReconContext ();
-		
+		SystemCmd  () {};
 		
 		/**
-		 * @brief Construct with a strategy
+		 * @brief Default destructor
 		 */
-		ReconContext (const char* name);
+		virtual 
+		~SystemCmd () {};
 		
 		
 		/**
-		 * @brief get active startegy
+		 * @brief Do nothing 
 		 */
-		inline ReconStrategy*
-			Strategy     () {
-			return m_strategy;
-		}
-		
-		/**
-		 * @brief Process data with given strategy
-		 */
-		RRSModule::error_code
-			Process () {
-			return m_strategy->Process();
-		}
-		
-		
-	private:
-		
-		ReconStrategy*            m_strategy;   /**< Active strategy           */
-		void*                     m_dlib;       /**< Handle on startegy module */
+		virtual RRSModule::error_code
+		Process ();
 		
 	};
 	
-};
-#endif 
+}
+
+#endif /* __SYSTEM_CMD_HPP__ */

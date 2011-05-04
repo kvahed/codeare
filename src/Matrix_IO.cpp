@@ -133,7 +133,7 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 			
 			// One more field for complex numbers
 			int tmpdim = (typeid(T) == typeid(raw)) ? INVALID_DIM+1 : INVALID_DIM;
-			hsize_t dims [tmpdim];
+			hsize_t* dims = new hsize_t[tmpdim];
 
 			for (i = 0; i < INVALID_DIM; i++)
 				dims[i] = _dim[INVALID_DIM-1-i];
@@ -144,6 +144,8 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 			DataSpace space (tmpdim, dims);
 			PredType*  type;
 			
+			delete [] dims;
+
 			if (typeid(T) == typeid(raw)) {
 				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
 				if (dname == "") 
@@ -213,14 +215,15 @@ bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
 			
 			
 			H5File    file (fname, H5F_ACC_RDONLY);
-			DataSet   dataset = file.openDataSet(dloc);
+			DataSet   dataset = file.openDataSet(dloc+"/"+dname);
 			DataSpace space   = dataset.getSpace();
 			
 			hsize_t   dims [space.getSimpleExtentNdims()];
 			int       ndim    = space.getSimpleExtentDims(dims, NULL);
+
 			
-			for (int i = 0; i < ndim; i++)
-				_dim[i] = dims[INVALID_DIM-1-i];
+			for (int i = 0; i < INVALID_DIM; i++)
+				_dim[INVALID_DIM-i] = dims[i];
 			
 			Reset();
 			
@@ -237,15 +240,16 @@ bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
 			}
 #endif
 			
-			if (typeid(T) == typeid(raw)) {
-				
-				float*    re = (float*) malloc (sizeof(float) * Size());
-				float*    im = (float*) malloc (sizeof(float) * Size());
-				
-				DataType  type    = dataset.getFloatType();
-				//dataset.read (data, type);
-			}
+			PredType*  type;
 			
+			if (typeid(T) == typeid(raw))
+				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
+			else if (typeid(T) == typeid(double))
+				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
+			else
+				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
+				
+			dataset.read (_M, (*type));
 			
 			space.close();
 			dataset.close();

@@ -18,7 +18,7 @@
  *  02110-1301  USA
  */
 
-#include "LapackTests.h"
+#include "LapackTests.hpp"
 
 
 using namespace RRStrategy;

@@ -36,7 +36,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = testclt$(EXEEXT) reconserver$(EXEEXT)
 subdir = src
-DIST_COMMON = $(srcdir)/Loader.h.in $(srcdir)/Makefile.am \
+DIST_COMMON = $(srcdir)/Loader.hpp.in $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
@@ -48,7 +48,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = Loader.h
+CONFIG_CLEAN_FILES = Loader.hpp
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -261,7 +261,7 @@ COMMON = RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h op
 CLIENT_SIDE = ReconClient.h ReconClient.cpp
 
 # Reconstruction strategies & server side stuff
-SERVER_SIDE = Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServant.cpp ReconStrategy.h ReconStrategy.cpp
+SERVER_SIDE = Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServant.cpp ReconStrategy.hpp ReconStrategy.cpp
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
@@ -324,7 +324,7 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-Loader.h: $(top_builddir)/config.status $(srcdir)/Loader.h.in
+Loader.hpp: $(top_builddir)/config.status $(srcdir)/Loader.hpp.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)

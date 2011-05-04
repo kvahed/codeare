@@ -44,7 +44,7 @@ AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libz,
 AC_CHECK_LIB([fftw],         [fftw_create_plan],     [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 case "$host" in
   *darwin*)
-AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+#AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libsz, bailing out])])
 ;;
 esac
 AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [], [AC_MSG_ERROR([cannot find libnfft3, bailing out])])
@@ -222,6 +222,6 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile src/modules/Makefile src/Loader.h])
+AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile src/modules/Makefile src/Loader.hpp])
 AC_OUTPUT
 

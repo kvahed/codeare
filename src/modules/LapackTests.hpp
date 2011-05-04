@@ -18,10 +18,10 @@
  *  02110-1301  USA
  */
 
-#ifndef __LAPACK_TESTS_H__
-#define __LAPACK_TESTS_H__
+#ifndef __LAPACK_TESTS_HPP__
+#define __LAPACK_TESTS_HPP__
 
-#include "ReconStrategy.h"
+#include "ReconStrategy.hpp"
 
 using namespace RRServer;
 
@@ -59,6 +59,6 @@ namespace RRStrategy {
 		
 	};
 
-};
-#endif /* __LAPACK_TESTS_H__ */
+}
+#endif /* __LAPACK_TESTS_HPP__ */
 

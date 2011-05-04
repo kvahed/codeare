@@ -21,7 +21,8 @@
 #ifndef __CGSENSE_HPP__
 #define __CGSENSE_HPP__
 
-#include "ReconStrategy.h"
+#include "ReconStrategy.hpp"
+
 #include "nfft3util.h"
 #include "nfft3.h"
 
@@ -65,7 +66,7 @@ namespace RRStrategy {
 		int                 m_verbose;
 		
 		Matrix < raw >      m_sens;
-		Matrix < raw >      m_temp;
+		Matrix < raw >      m_measured;
 		Matrix < double >   m_weights;
 		
 		nfft_plan           m_fplan;            /**< nfft plan */
@@ -82,5 +83,5 @@ namespace RRStrategy {
 		
 	};
 	
-};
+}
 #endif /* __CGSENSE_H__ */

@@ -23,7 +23,7 @@
 
 #include <complex>
 #include "Matrix.h"
-#include "Configurable.h"
+#include "Configurable.hpp"
 
 
 #ifdef __WIN32__ 
@@ -238,7 +238,7 @@ namespace RRClient {
 		
 	};
 	
-};
+}
 
 
 /**

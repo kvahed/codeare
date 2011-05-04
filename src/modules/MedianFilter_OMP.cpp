@@ -18,7 +18,7 @@
  *  02110-1301  USA
  */
 
-#include "MedianFilter_OMP.h"
+#include "MedianFilter_OMP.hpp"
 
 using namespace RRStrategy;
 
@@ -97,7 +97,7 @@ RRSModule::error_code MedianFilter_OMP::Process () {
 
 	return RRSModule::OK;
 
-};
+}
 
 // the class factories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {
