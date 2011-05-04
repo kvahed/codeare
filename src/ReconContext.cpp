@@ -18,7 +18,7 @@
  *  02110-1301  USA
  */
 
-#include "Loader.h"
+#include "Loader.hpp"
 #include "ReconContext.hpp"
 
 using namespace RRServer;
