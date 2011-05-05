@@ -5,11 +5,9 @@ using namespace RRStrategy;
 
 CGSENSE::CGSENSE () {
 
-	int   d      = 3;
-	m_N = new int[3];
-	m_n = new int[3];
-
-	FILE* fin;
+	int      d           = 3;
+	m_N                  = new int[3];
+	m_n                  = new int[3];
 
 	bool     weight      = true;
 
@@ -27,7 +25,7 @@ CGSENSE::CGSENSE () {
 	
 	nfft::init (d, m_N, m_helper.Dim(COL), m_n, m, &m_fplan, &m_iplan, m_epsilon);
 
-	/* Copy incoming data to m_temp             */
+	/* Copy incoming data to m_temp */
 	Matrix < raw > m_measured = (m_raw);
 
 	for (int i = 3; i < INVALID_DIM; i++)
@@ -159,7 +157,7 @@ RRSModule::error_code
 CGSENSE::Process () {
 	
 	Matrix<raw> a, b, p, q, r, r_new;
-	    
+
 	EH (&m_measured, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
 	p = a;
 	r = a;
@@ -171,7 +169,7 @@ CGSENSE::Process () {
 	double delta   = 1.0;
 	
 	// CG iterations
-	for (int iter = 0; iter < m_iter; iter++) {
+	/*for (int iter = 0; iter < m_iter; iter++) {
 		
 		float       rn;
 		float       an;
@@ -209,7 +207,7 @@ CGSENSE::Process () {
 		// r  = r_new
 		r     = r_new;
 
-	}
+		}*/
 	
 	return OK;
 
