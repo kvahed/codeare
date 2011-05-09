@@ -60,16 +60,12 @@ namespace RRStrategy {
 		int m_dim;
 		
 		// Some more stuff
-		int       m_M;
-		double    m_b;
-		int       m_q;
-		
-		double*   m_tra;
-		
-		double*   k_data;
-		double*   r_data;
-		double*   k_d;
-		double*   r_d;
+		int       m_N;
+		int       m_iter;
+
+		nfft_plan           m_fplan;            /**< nfft plan */
+		solver_plan_complex m_iplan;
+
 		
 	};
 	
