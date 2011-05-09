@@ -30,6 +30,7 @@ ReconServant::ReconServant  ()               {
 
 	m_raw.dims.length(INVALID_DIM);
 	m_helper.dims.length(INVALID_DIM);
+	m_kspace.dims.length(INVALID_DIM);
     m_pixel.dims.length(INVALID_DIM);
 
 }
@@ -55,8 +56,9 @@ ReconServant::Process  (const char* name)       {
 
 	context->Strategy()->SetRaw(&m_raw);
 	context->Strategy()->SetHelper(&m_helper);
-	context->Strategy()->SetPixel(&m_pixel);
-	context->Strategy()->SetConfig(m_config);
+	//	context->Strategy()->SetKSpace(&m_kspace);
+	//context->Strategy()->SetPixel(&m_pixel);
+	//context->Strategy()->SetConfig(m_config);
 	
 	std::cout << "... done. Will invoke data procession ... " << std::endl;
 	
@@ -66,8 +68,9 @@ ReconServant::Process  (const char* name)       {
 	
 	context->Strategy()->GetRaw(&m_raw);
 	context->Strategy()->GetHelper(&m_helper);
-	context->Strategy()->GetPixel(&m_pixel);
-	context->Strategy()->GetConfig(m_config);
+	//context->Strategy()->GetKSpace(&m_kspace);
+	//context->Strategy()->GetPixel(&m_pixel);
+	//context->Strategy()->GetConfig(m_config);
 	
 	std::cout << "... done. Deleting context ..." << std::endl;
 
@@ -105,6 +108,20 @@ ReconServant::helper       (const helper_data& d)   {
 helper_data*
 ReconServant::helper       ()                    {
 	return new helper_data (m_helper);
+}
+
+
+/**************************************************************************************************/
+void
+ReconServant::kspace       (const helper_data& d)   {
+	m_kspace = d;
+}
+
+
+/**************************************************************************************************/
+helper_data*
+ReconServant::kspace       ()                    {
+	return new helper_data (m_kspace);
 }
 
 

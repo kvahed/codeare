@@ -49,12 +49,12 @@ module RRSModule {
 
 
 	/**
-	 * @brief Pixel data
+	 * @brief Helper data
 	 */
-	struct     pixel_data       {
+	struct     helper_data       {
 
-		shorts vals;  /**< Data abs      */
-		longs  dims;  /**< Dimesions     */
+		doubles vals;  /**< Data     */
+		longs   dims;  /**< Dimesions     */
 
 	};
 
@@ -62,10 +62,10 @@ module RRSModule {
 	/**
 	 * @brief Pixel data
 	 */
-	struct     helper_data       {
+	struct     pixel_data       {
 
-		doubles vals;  /**< Data abs      */
-		longs   dims;  /**< Dimesions     */
+		shorts vals;  /**< Data      */
+		longs  dims;  /**< Dimesions     */
 
 	};
 
@@ -93,6 +93,11 @@ module RRSModule {
 		 * @brief         Declare CORBA attribute helper
 		 */
 		attribute         helper_data  helper;
+		
+		/**
+		 * @brief         Declare CORBA attribute helper
+		 */
+		attribute         helper_data  kspace;
 		
 		/**
 		 * @brief         Declare CORBA attribute helper

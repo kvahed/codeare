@@ -135,6 +135,33 @@ public:
 	 * @brief Get data from recon
 	 */
 	void 
+	GetKSpace           (helper_data* kspace)   {
+
+		for (int i = 0; i < m_kspace.Size(); i++)
+			kspace->vals[i] = m_kspace[i];
+
+	}
+	
+	/**
+	 * @brief Set data for recon
+	 */
+	void 
+	SetKSpace           (const helper_data* kspace)   {
+
+		for (int i = 0; i < INVALID_DIM; i++)
+			m_kspace.Dim(i) = kspace->dims[i];
+
+		m_kspace.Reset ();
+
+		for (int j = 0; j < m_kspace.Size(); j++)
+			m_kspace[j] =  kspace->vals[j];
+		
+	};
+	
+	/**
+	 * @brief Get data from recon
+	 */
+	void 
 	GetPixel           (pixel_data* pixel)   {
 
 		for (int i = 0; i < m_pixel.Size(); i++)
@@ -162,6 +189,7 @@ protected:
 
 	Matrix<raw>     m_raw;         /*!< raw data matrix                    */
 	Matrix<double>  m_helper;      /*!< helper matrix                      */
+	Matrix<double>  m_kspace;      /*!< kspace matrix                      */
 	Matrix<short>   m_pixel;       /*!< pixel data matrix                  */
 
 };

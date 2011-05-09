@@ -91,6 +91,18 @@ namespace RRServer {
 		/**
 		 * @brief     Get data from recon
 		 */
+		helper_data* 
+		kspace        ();
+		
+		/**
+		 * @brief     Set data for recon
+		 */
+		void 
+		kspace        (const helper_data&);
+		
+		/**
+		 * @brief     Get data from recon
+		 */
 		pixel_data* 
 		pixel         ();
 		
@@ -116,9 +128,10 @@ namespace RRServer {
 	private:
 		
 		raw_data      m_raw;    /**< Raw data    (complex float) */
-		helper_data   m_helper; /**< Image data  (complex float) */
+		helper_data   m_helper; /**< Helper data (double) */
+		helper_data   m_kspace; /**< Kspace data (double) */
 		pixel_data    m_pixel;  /**< Helper data (short)         */
-		char*         m_config;
+		char*         m_config; /**< Configuration xml document */
 		
 	};
 

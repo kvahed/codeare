@@ -21,6 +21,8 @@
 #ifndef __NUFFT_HPP__
 #define __NUFFT_HPP__
 
+#include "nfftstub.h"
+
 #include "ReconStrategy.hpp"
 
 using namespace RRServer;
@@ -43,7 +45,7 @@ namespace RRStrategy {
 		 * @brief Default destructor
 		 */
 		virtual 
-		~NuFFT () {};
+		~NuFFT ();
 		
 		/**
 		 * @brief Dump data to disk
@@ -53,19 +55,18 @@ namespace RRStrategy {
 		
 	private:
 		
-		int N [2];
-		int Nk[2];
-		
 		// We only support 2 dims for the time being
 		int m_dim;
 		
 		// Some more stuff
-		int       m_N;
-		int       m_iter;
+		int*      m_N;                          /**< Image matrix side length */
+		int*      m_n;                          /**< Oversampling */
+		int       m_M;                          /**< Number of k-space knots */
+		int       m_maxit;                      /**< Number of Recon iterations (NFFT 3) */
+		int       m_epsilon;                    /**< Convergence criterium */
 
-		nfft_plan           m_fplan;            /**< nfft plan */
-		solver_plan_complex m_iplan;
-
+		nfft_plan           m_fplan;            /**< nfft  plan */
+		solver_plan_complex m_iplan;            /**< infft plan */
 		
 	};
 	
