@@ -10676,7 +10676,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"191M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"194\"" >>confdefs.h
 
 
 # Produce first version of idl derivates

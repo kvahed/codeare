@@ -53,21 +53,6 @@ int main (int argc, char** argv) {
 		Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 		Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
-		std::string data   = "share/cgsense/cgsense.h5";
-		std::string app    = "2d";
-
-		// Matrix<raw> data;
-		// data.read          (cgfile, app, "data");
-
-		// Matrix<raw> sensitivities;
-		// sensitivities.read (cgfile, app, "sensitivities");
-
-		// Matrix<double> kspace
-		// kspace.read        (cgfile, app, "kspace");
-
-		// Matrix<double> weights
-		// kspace.read        (cgfile, app, "weights");
-
 		r.Random();
 		h.Random();
 		p.Random();
@@ -79,6 +64,7 @@ int main (int argc, char** argv) {
 		client.SetRaw(r);
 		client.SetPixel(p);
 		client.SetHelper(h);
+		client.SetKSpace(h);
 
 		time_t seconds = time (NULL);
 		char   uid[16];
@@ -94,8 +80,18 @@ int main (int argc, char** argv) {
 		client.GetRaw(r);
 		client.GetPixel(p);
 		client.GetHelper(h);
+		client.GetKSpace(h);
 		
 		cout << "We're good" << endl;
+		
+		// Matrix<raw>    sensitivities;
+		Matrix<raw>    data;
+		Matrix<double> weights;
+		Matrix<double> kspace;
+		
+		weights.read       ("share/nufft/data.h5", "weights");
+		data.read          ("share/nufft/data.h5", "data");
+		kspace.read        ("share/nufft/data.h5", "8_shot_spiral");
 		
 		return 0;
 
@@ -103,15 +99,6 @@ int main (int argc, char** argv) {
 		
 		return 1;
 
-	/*Matrix<raw>    sensitivities;
-	Matrix<raw>    data;
-	Matrix<helper> weights;
-	Matrix<helper> kspace;
-
-	sensitivities.read ("2dcgsense.h5", "sensitivities");
-	weights.read       ("2dcgsense.h5", "weights");
-	data.read          ("2dcgsense.h5", "data");
-	kspace.read        ("2dcgsense.h5", "kspace");*/
 
 	
 

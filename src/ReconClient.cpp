@@ -96,15 +96,18 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
     
     m_raw    = new raw_data;
     m_helper = new helper_data;
+    m_kspace = new helper_data;
     m_pixel  = new pixel_data;
 
     m_raw->dims.length(INVALID_DIM);
     m_helper->dims.length(INVALID_DIM);
+    m_kspace->dims.length(INVALID_DIM);
     m_pixel->dims.length(INVALID_DIM);
 
 	for (int i = 0; i < INVALID_DIM; i++) {
 		m_raw->dims[i] = 0;
 		m_helper->dims[i] = 0;
+		m_kspace->dims[i] = 0;
 		m_pixel->dims[i] = 0;
 	}
 
@@ -117,6 +120,7 @@ ReconClient::~ReconClient         ()            {
 
     delete m_raw;
     delete m_helper;
+    delete m_kspace;
     delete m_pixel;
 
     m_orb->destroy();
@@ -139,6 +143,7 @@ ReconClient::Process  (const char* name)  {
     // Send data for procession to remote interface
     m_rrsi->raw    (*(m_raw));
     m_rrsi->helper (*(m_helper));
+    m_rrsi->kspace (*(m_kspace));
     m_rrsi->pixel  (*(m_pixel));
 	m_rrsi->config (temp.str().c_str());
 	
@@ -149,6 +154,7 @@ ReconClient::Process  (const char* name)  {
     if (result == OK) {
         m_raw    = m_rrsi->raw();
         m_helper = m_rrsi->helper();
+        m_kspace = m_rrsi->kspace();
         m_pixel  = m_rrsi->pixel();
 		SetConfig (m_rrsi->config());
     }
@@ -179,6 +185,19 @@ ReconClient::GetHelperSize () {
     long size = 1;
     for (int i = 0; i < INVALID_DIM; i++)
         size *= m_helper->dims[i];
+    return size;
+    
+}
+
+
+
+/**************************************************************************************************/
+long 
+ReconClient::GetKSpaceSize () {
+    
+    long size = 1;
+    for (int i = 0; i < INVALID_DIM; i++)
+        size *= m_kspace->dims[i];
     return size;
     
 }

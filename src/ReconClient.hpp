@@ -161,6 +161,46 @@ namespace RRClient {
 		
 		
 		/**
+		 * @brief           Set kspace my data with ...
+		 *
+		 * @param  M        Given matrix
+		 */
+		void
+		SetKSpace              (Matrix< double >& M) {
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				m_kspace->dims[j] = M.Dim(j);
+			
+			m_kspace->vals.length(M.Size());
+			
+			for (int i = 0; i < M.Size(); i++)
+				m_kspace->vals[i] = M[i];
+			
+			m_rrsi->kspace(*(m_kspace));
+			
+		};
+		
+		
+		/**
+		 * @brief           Return kspace data after recon to ...
+		 *
+		 * @param  M        Given matrix
+		 */
+		void
+		GetKSpace              (Matrix< double >& M) {
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				M.Dim(j) = m_kspace->dims[j];
+			
+			M.Reset();
+			
+			for (int i = 0; i < GetKSpaceSize(); i++)
+				M[i] = m_kspace->vals[i];
+			
+		};
+		
+		
+		/**
 		 * @brief           Set my Pixel data
 		 * 
 		 * @param  M        Given matrix
@@ -227,12 +267,22 @@ namespace RRClient {
 		GetHelperSize          ();
 		
 		
+		/**
+		 * @brief           KSpace repository size
+		 *
+		 * @return          Size
+		 */
+		long
+		GetKSpaceSize          ();
+		
+		
 	private:
 		
 		RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
 		
 		raw_data*           m_raw;        /**< Raw data    (complex float sequence) */
-		helper_data*        m_helper;     /**< Helper data (complex float sequence) */
+		helper_data*        m_helper;     /**< Helper data (double sequence) */
+		helper_data*        m_kspace;     /**< Kspace data (double sequence) */
 		pixel_data*         m_pixel;      /**< Pixel data  (short sequence)         */
 		
 		CORBA::ORB_var      m_orb;        /**< Orb                                  */

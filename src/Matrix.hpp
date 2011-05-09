@@ -131,7 +131,9 @@ static int nb_alloc = 0;
 /**
  * Old friend pi.
  */
-# define PI  3.1415926535897931159979634685441851615906
+#ifndef PI
+    # define PI  3.1415926535897931159979634685441851615906
+#endif
 
 
 
