@@ -29,6 +29,7 @@ ReconServant::ReconServant  ()               {
 	m_config = new char;
 
 	m_raw.dims.length(INVALID_DIM);
+	m_rhelper.dims.length(INVALID_DIM);
 	m_helper.dims.length(INVALID_DIM);
 	m_kspace.dims.length(INVALID_DIM);
     m_pixel.dims.length(INVALID_DIM);
@@ -49,13 +50,13 @@ error_code
 ReconServant::Process  (const char* name)       {
 
 	error_code e = OK;
-	int err = 0;
 
 	std::cout << "Setting incoming data ... " << std::endl;
 
 	ReconContext* context = new ReconContext(name);
 
 	context->Strategy()->SetRaw(&m_raw);
+	context->Strategy()->SetRHelper(&m_rhelper);
 	context->Strategy()->SetHelper(&m_helper);
 	context->Strategy()->SetKSpace(&m_kspace);
 	context->Strategy()->SetPixel(&m_pixel);
@@ -69,6 +70,7 @@ ReconServant::Process  (const char* name)       {
 	std::cout << "... done. Getting processed data..." << std::endl;
 	
 	context->Strategy()->GetRaw(&m_raw);
+	context->Strategy()->GetRHelper(&m_rhelper);
 	context->Strategy()->GetHelper(&m_helper);
 	context->Strategy()->GetKSpace(&m_kspace);
 	context->Strategy()->GetPixel(&m_pixel);
@@ -96,6 +98,20 @@ ReconServant::raw          (const raw_data& d)   {
 raw_data*
 ReconServant::raw          ()                    {
 	return new raw_data (m_raw);
+}
+
+
+/**************************************************************************************************/
+void
+ReconServant::rhelper          (const raw_data& d)   {
+	m_rhelper = d;
+}
+
+
+/**************************************************************************************************/
+raw_data*
+ReconServant::rhelper          ()                    {
+	return new raw_data (m_rhelper);
 }
 
 

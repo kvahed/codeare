@@ -62,6 +62,7 @@ int main (int argc, char** argv) {
 		std::cout << p << std::endl;
 		
 		client.SetRaw(r);
+		client.SetRHelper(r);
 		client.SetPixel(p);
 		client.SetHelper(h);
 		client.SetKSpace(h);
@@ -78,6 +79,7 @@ int main (int argc, char** argv) {
 		client.Process(test);
 
 		client.GetRaw(r);
+		client.GetRHelper(r);
 		client.GetPixel(p);
 		client.GetHelper(h);
 		client.GetKSpace(h);

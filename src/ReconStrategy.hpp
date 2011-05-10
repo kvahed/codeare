@@ -120,6 +120,35 @@ public:
 	 * @brief Get data from recon
 	 */
 	void 
+	GetRHelper           (raw_data* rhelper)   {
+		
+		for (int i = 0; i < m_rhelper.Size(); i++) {
+			rhelper->dreal[i] = m_rhelper[i].real();
+			rhelper->dimag[i] = m_rhelper[i].imag(); 
+		}
+			
+	}
+	
+	/**
+	 * @brief Set data for recon
+	 */
+	void 
+	SetRHelper           (const raw_data* rhelper)   {
+
+		for (int i = 0; i < INVALID_DIM; i++)
+			m_rhelper.Dim(i) = rhelper->dims[i];
+		
+		m_rhelper.Reset ();
+		
+		for (int j = 0; j < m_rhelper.Size(); j++)
+			m_rhelper[j] =  std::complex<float> (rhelper->dreal[j], rhelper->dimag[j]);
+		
+	};
+	
+	/**
+	 * @brief Get data from recon
+	 */
+	void 
 	GetHelper           (helper_data* helper)   {
 
 		for (int i = 0; i < m_helper.Size(); i++)
@@ -200,6 +229,7 @@ public:
 protected:
 
 	Matrix<raw>     m_raw;         /*!< raw data matrix                    */
+	Matrix<raw>     m_rhelper;     /*!< raw helper matrix                  */
 	Matrix<double>  m_helper;      /*!< helper matrix                      */
 	Matrix<double>  m_kspace;      /*!< kspace matrix                      */
 	Matrix<short>   m_pixel;       /*!< pixel data matrix                  */

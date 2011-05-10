@@ -8,11 +8,11 @@ NuFFT::NuFFT () {
 
 NuFFT::~NuFFT () {
 
-	/*	free (m_ftk);
+	free (m_ftk);
 	free (m_ftw);
 	free (m_ftin);
 	free (m_ftout);
-	*/
+
 	nfft::finalize (&m_fplan, &m_iplan);
 
 	delete [] m_N;
@@ -47,8 +47,10 @@ NuFFT::Init () {
 
 	nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan, &m_iplan, m_epsilon);
 
+	m_ftin     = (double*) malloc (2          * m_M    * sizeof(double)); 
 	m_ftk      = (double*) malloc (    m_dim  * m_M    * sizeof(double)); 
 	m_ftw      = (double*) malloc (             m_M    * sizeof(double)); 
+	m_ftout    = (double*) malloc (2 * m_N[0] * m_N[1] * sizeof(double)); 
 
 	return error;
 

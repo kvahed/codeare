@@ -179,12 +179,19 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 RRSModule::error_code
 CGSENSE::Process () {
 	
+	RRSModule::error_code error = CG_DID_NOT_CONVERGE;
+
 	Matrix<raw> a, p, q, r, r_new;
 
 	// First application of the right hand side
 	EH (&m_raw, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
 	p = a;
 	r = a;
+
+	// Prepare q
+	q.Dim(COL) = a.Dim(COL);
+	q.Dim(LIN) = a.Dim(LIN);
+	q.Reset();
 
 	// Out going image
 	// Resize m_raw for output
@@ -210,8 +217,10 @@ CGSENSE::Process () {
 		
 		res.push_back(rn/an);
 		
-		if (res.at(i) < m_cgeps)
+		if (res.at(i) < m_cgeps) {
+			error = OK;
 			break;
+		}
 		
 		// q  = eh(e(p , sensitivity, k), sensitivity, k);
 		E  (&p,    &m_sens, &m_fplan,                               &mtmp);
@@ -237,7 +246,7 @@ CGSENSE::Process () {
 		
 	}
 	
-	return OK;
+	return error;
 
 }
 
