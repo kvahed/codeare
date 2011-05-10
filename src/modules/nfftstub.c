@@ -7,8 +7,6 @@
 
 int init   (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_complex* inp, double epsilon) {
 	
-	//assert (d == 2 || d == 3); 
-	
 	int      i, j, k, l;                            /* Some counters       */
 	unsigned infft_flags = CGNR | PRECOMPUTE_DAMP;  /* flags for the infft */
 	
@@ -123,13 +121,13 @@ void ift (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int 
 #ifdef VERBOSE		
 		fprintf( stderr, "%e,  %i of %i\n", sqrt(spc->dot_r_iter), l+1, maxiter);
 #endif		
-
+		
 	}
 
 	t = nfft_second()-t;
-
+	
 #ifdef VERBOSE
-	fprintf(stderr,"time: %e seconds.\n",t);
+	fprintf(stderr,"nfft time: %.4f seconds.\n",t);
 #endif
 
 	memcpy (out, spc->f_hat_iter, 2 * np->N_total * sizeof (double));

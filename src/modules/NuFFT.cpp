@@ -37,7 +37,10 @@ NuFFT::Init () {
    	m_n[0] = ceil (m_N[0]*alpha);
 	m_n[1] = ceil (m_N[1]*alpha);
 
-	nfft::init (m_dim, m_N, m_helper.Size(), m_n, m, &m_fplan, &m_iplan, m_epsilon);
+	// Number of samples
+	m_M = m_helper.Size();
+
+	nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan, &m_iplan, m_epsilon);
 
 	return error;
 
@@ -46,51 +49,53 @@ NuFFT::Init () {
 RRSModule::error_code
 NuFFT::Process () {
 
-	m_M = m_kspace.Size() / m_dim;
-
 	RRSModule::error_code error = OK;
+	static clock_t runtime = clock();
 
-	Matrix<raw> in = m_raw;
-
-	/*for (int i = 0; i < m_dim; i++)
-		m_raw.Dim(i) = m_N[i];
-
-	for (int i = m_dim; i < INVALID_DIM; i++)
-	m_raw.Dim(i) = 1;*/
-
-	for (int i = 0; i<INVALID_DIM; i++)
-		m_raw.Dim(i) = 1;
-	
-	m_raw.Dim(0) = m_N[0];
-	m_raw.Dim(1) = m_N[1];
-
-	m_raw.Reset();
-
-	double*     ftin     = (double*) malloc (2 *    in.Size() * sizeof(double)); 
+	// Allocate memory for nufft (incoming data, kspace and weights)
+	double*     ftin     = (double*) malloc (2 * m_raw.Size() * sizeof(double)); 
 	double*     ftk      = (double*) malloc ( m_kspace.Size() * sizeof(double)); 
 	double*     ftw      = (double*) malloc ( m_helper.Size() * sizeof(double)); 
-	double*     ftout    = (double*) malloc (2 * m_raw.Size() * sizeof(double)); 
 
-	for (int i = 0; i < in.Size(); i++) {
-		ftin[2*i  ] = (in[i]).real();
-		ftin[2*i+1] = (in[i]).imag();
+	for (int i = 0; i < m_raw.Size(); i++) {
+		ftin[2*i  ] = (m_raw[i]).real();
+		ftin[2*i+1] = (m_raw[i]).imag();
 	}
 
+	// Resize m_raw for output
+	for (int i = 0; i < INVALID_DIM; i++)
+		m_raw.Dim(i) = 1;
+	for (int i = 0; i < m_dim; i++)
+		m_raw.Dim(i) = m_N[i];
+	m_raw.Reset();
+
+	// Allocate memory for nufft result
+	double*     ftout    = (double*) malloc (2 * m_raw.Size() * sizeof(double)); 
+
+	// Kspace adjustment (Don't know yet why necessary)
 	m_kspace = m_kspace / (1/(GAMMA/128*m_N[0]));
 	
+	// Copy k-space and weights to allocated memory
 	memcpy (ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
 	memcpy (ftw, &m_helper[0], m_helper.Size()*sizeof(double));
 
+	// Assign k-space and weights to FT
 	nfft::kspace  (&m_fplan,           ftk);
 	nfft::weights (&m_fplan, &m_iplan, ftw);
 	nfft::ift     (&m_fplan, &m_iplan, ftin, ftout, m_maxit, m_epsilon);
 
+	// Copy back reconstructed image to outgoing matrix
 	for (int i = 0; i < m_raw.Size(); i++)
 		m_raw[i] = raw(ftout[2*i], ftout[2*i+1]); 
 
-	delete [] ftout;
-	delete [] ftk;
-	delete [] ftin;
+	// Clear RAM
+	free (ftout);
+	free (ftk);
+	free (ftw);
+	free (ftin);
+	
+	runtime = clock() - runtime;
+	printf ("Complete NuFFT runtime: %.4f seconds.\n", runtime / 1000000.0);
 
 	return error;
 
