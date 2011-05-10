@@ -121,6 +121,51 @@ namespace RRClient {
 		
 		
 		/**
+		 * @brief           Set raw my data with ...
+		 *
+		 * @param  M        Given matrix
+		 */
+		void 
+		SetRHelper              (Matrix< std::complex<float> >& M) {
+			
+			m_rhelper->dims.length(INVALID_DIM);
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				m_rhelper->dims[j] = M.Dim(j);
+			
+			m_rhelper->dreal.length(M.Size()); 
+			m_rhelper->dimag.length(M.Size());
+			
+			for (int i = 0; i < M.Size(); i++) {
+				m_rhelper->dreal[i] = M[i].real();
+				m_rhelper->dimag[i] = M[i].imag(); 
+			}
+			
+			m_rrsi->raw(*(m_rhelper));
+			
+		};
+		
+		
+		/**
+		 * @brief           Return raw data after recon to ...
+		 *
+		 * @param  M        Given matrix
+		 */
+		void 
+		GetRHelper              (Matrix< std::complex<float> >& M) {
+			
+			for (int j = 0; j < INVALID_DIM; j++)
+				M.Dim(j) = m_rhelper->dims[j];
+			
+			M.Reset();
+			
+			for (int i = 0; i < GetRawSize(); i++)
+				M[i] = std::complex<float>(m_rhelper->dreal[i],m_rhelper->dimag[i]);
+			
+		};
+		
+		
+		/**
 		 * @brief           Set helper my data with ...
 		 *
 		 * @param  M        Given matrix
@@ -246,7 +291,16 @@ namespace RRClient {
 		 * @return          Size
 		 */
 		long
-		GetRawSize             ();
+		GetRawSize          ();
+		
+		
+		/**
+		 * @brief           Raw helper repository size
+		 *
+		 * @return          Size
+		 */
+		long
+		GetRHelperSize      ();
 		
 		
 		/**
@@ -281,6 +335,7 @@ namespace RRClient {
 		RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
 		
 		raw_data*           m_raw;        /**< Raw data    (complex float sequence) */
+		raw_data*           m_rhelper;    /**< Raw Hellper data (complex float sequence) */
 		helper_data*        m_helper;     /**< Helper data (double sequence) */
 		helper_data*        m_kspace;     /**< Kspace data (double sequence) */
 		pixel_data*         m_pixel;      /**< Pixel data  (short sequence)         */

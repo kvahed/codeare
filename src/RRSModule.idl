@@ -90,6 +90,11 @@ module RRSModule {
 		attribute         raw_data     raw;
 		
 		/**
+		 * @brief         Declare CORBA attribute rhelper
+		 */
+		attribute         raw_data     rhelper;
+		
+		/**
 		 * @brief         Declare CORBA attribute helper
 		 */
 		attribute         helper_data  helper;

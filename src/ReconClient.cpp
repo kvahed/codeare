@@ -94,18 +94,21 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
         
     }
     
-    m_raw    = new raw_data;
-    m_helper = new helper_data;
-    m_kspace = new helper_data;
-    m_pixel  = new pixel_data;
+    m_raw     = new raw_data;
+    m_rhelper = new raw_data;
+    m_helper  = new helper_data;
+    m_kspace  = new helper_data;
+    m_pixel   = new pixel_data;
 
     m_raw->dims.length(INVALID_DIM);
+    m_rhelper->dims.length(INVALID_DIM);
     m_helper->dims.length(INVALID_DIM);
     m_kspace->dims.length(INVALID_DIM);
     m_pixel->dims.length(INVALID_DIM);
 
 	for (int i = 0; i < INVALID_DIM; i++) {
 		m_raw->dims[i] = 0;
+		m_rhelper->dims[i] = 0;
 		m_helper->dims[i] = 0;
 		m_kspace->dims[i] = 0;
 		m_pixel->dims[i] = 0;
@@ -119,6 +122,7 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
 ReconClient::~ReconClient         ()            {
 
     delete m_raw;
+    delete m_rhelper;
     delete m_helper;
     delete m_kspace;
     delete m_pixel;
@@ -141,21 +145,23 @@ ReconClient::Process  (const char* name)  {
 	temp << GetConfig();
 
     // Send data for procession to remote interface
-    m_rrsi->raw    (*(m_raw));
-    m_rrsi->helper (*(m_helper));
-    m_rrsi->kspace (*(m_kspace));
-    m_rrsi->pixel  (*(m_pixel));
-	m_rrsi->config (temp.str().c_str());
+    m_rrsi->raw     (*(m_raw));
+    m_rrsi->rhelper (*(m_rhelper));
+    m_rrsi->helper  (*(m_helper));
+    m_rrsi->kspace  (*(m_kspace));
+    m_rrsi->pixel   (*(m_pixel));
+	m_rrsi->config  (temp.str().c_str());
 	
     // Process through remote interface
     result = m_rrsi->Process(name);
     
     // Get data back from remote interface
     if (result == OK) {
-        m_raw    = m_rrsi->raw();
-        m_helper = m_rrsi->helper();
-        m_kspace = m_rrsi->kspace();
-        m_pixel  = m_rrsi->pixel();
+        m_raw     = m_rrsi->raw();
+        m_rhelper = m_rrsi->rhelper();
+        m_helper  = m_rrsi->helper();
+        m_kspace  = m_rrsi->kspace();
+        m_pixel   = m_rrsi->pixel();
 		SetConfig (m_rrsi->config());
     }
 
@@ -172,6 +178,19 @@ ReconClient::GetRawSize () {
     long size = 1;
     for (int i = 0; i < INVALID_DIM; i++)
         size *= m_raw->dims[i];
+    return size;
+    
+}
+
+
+
+/**************************************************************************************************/
+long 
+ReconClient::GetRHelperSize () {
+    
+    long size = 1;
+    for (int i = 0; i < INVALID_DIM; i++)
+        size *= m_rhelper->dims[i];
     return size;
     
 }
