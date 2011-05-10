@@ -25,7 +25,7 @@ namespace nfft {
 		 * @param  inp       Inverse FT plan
 		 * @param  scp       Solver plan
 		 */
-		extern int
+		extern const int
 		init                 (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_complex* inp, double epsilon  = 0.0000003);
 
 		/**
@@ -36,8 +36,8 @@ namespace nfft {
 		 * @param  dk        Jacobian determinants of k(t). (i.e. det(D_f(k))
 		 * @param  out       FTed data
 		 */
-		extern int
-		ift                  (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int maxiter = 3, double epsilon = 3e-7);
+		extern const int
+		ift                  (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int maxiter = 3, double epsilon = 3e-7) ;
 		
 		/**
 		 * @brief            Forward FT
@@ -49,13 +49,13 @@ namespace nfft {
 		extern int
 		ft                   (nfft_plan* np, double* in, double* out);
 
-		extern int
+		extern const int
 		weights              (nfft_plan* np, solver_plan_complex* spc, double* w);
 
-		extern int
+		extern const int
 		kspace               (nfft_plan* np, double* k);
 
-		extern int
+		extern const int
 		finalize             (nfft_plan* np, solver_plan_complex* spc);
 
 #ifdef __cplusplus
