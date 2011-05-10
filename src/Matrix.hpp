@@ -827,7 +827,7 @@ public:
     
     
     /**
-     * @brief           Resize to dim and zero
+     * @brief           Resize to dims, reallocate and zero repository
      *
      * @param  dim      New dimensions
      */
@@ -852,7 +852,7 @@ public:
     
 
     /**
-     * @brief           Reset. i.e. Set all fields = T(0)
+     * @brief           Reset. i.e. reallocate and set all fields = T(0)
      */
     inline void         
     Reset               ()                                      {
@@ -864,6 +864,18 @@ public:
 
 		_M = (T*) malloc (Size() * sizeof (T));
         nb_alloc++;
+
+		for (int i = 0; i < Size(); i++)
+			_M[i] = (T) 0;
+
+    }
+    
+
+    /**
+     * @brief           Reset. i.e. Set all fields = T(0)
+     */
+    inline void         
+    Zero               ()                                      {
 
 		for (int i = 0; i < Size(); i++)
 			_M[i] = (T) 0;
