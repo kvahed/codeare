@@ -85,13 +85,13 @@ int main (int argc, char** argv) {
 		cout << "We're good" << endl;
 		
 		// Matrix<raw>    sensitivities;
-		Matrix<raw>    data;
+		/*Matrix<raw>    data;
 		Matrix<double> weights;
 		Matrix<double> kspace;
 		
 		weights.read       ("share/nufft/data.h5", "weights");
 		data.read          ("share/nufft/data.h5", "data");
-		kspace.read        ("share/nufft/data.h5", "8_shot_spiral");
+		kspace.read        ("share/nufft/data.h5", "8_shot_piral");*/
 		
 		return 0;
 

@@ -125,7 +125,6 @@ extern "C" {
 /**
  * Defined for memory allocation testing.
  */
-static int nb_alloc = 0;
 
 
 /**
@@ -839,12 +838,15 @@ public:
             _dim[i] = dim[i];
 
         if (nb_alloc) {
-            delete [] _M;
-            nb_alloc = 0;
+            free (_M);
+            nb_alloc--;
         }
 
-        _M = new T[Size()]();
-        nb_alloc = 1;
+        _M = (T*) malloc (Size()*sizeof(T));
+        nb_alloc++;
+
+		for (int i = 0; i < Size(); i++)
+			_M[i] = (T) 0;
 
     }
     
@@ -856,16 +858,15 @@ public:
     Reset               ()                                      {
 
         if (nb_alloc) {
-            delete [] _M;
-            nb_alloc = 0;
+            free (_M);
+            nb_alloc--;
         }
 
-        _M = new T[Size()]();
+		_M = (T*) malloc (Size() * sizeof (T));
+        nb_alloc++;
 
 		for (int i = 0; i < Size(); i++)
 			_M[i] = (T) 0;
-
-        nb_alloc = 1;
 
     }
     
@@ -1371,6 +1372,7 @@ private:
     
     int                 _dim[INVALID_DIM]; /// Dimnesions
     T*                  _M;                /// Data repository
+	int                 nb_alloc;
 
     /**
      * @brief           Matrix Product with BLAS.
@@ -1386,11 +1388,13 @@ private:
 template <class T> 
 Matrix<T>::Matrix () {
 
+	nb_alloc = 0;
+
     for (int i = 0; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    _M = new T[Size()];
-    nb_alloc = 1;
+    _M = (T*) malloc (Size()*sizeof(T));
+    nb_alloc++;
 
 
 }
@@ -1399,11 +1403,13 @@ Matrix<T>::Matrix () {
 template <class T> 
 Matrix<T>::Matrix (T s) {
 
+	nb_alloc = 0;
+
     for (int i = 0; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    _M = new T[Size()];
-    nb_alloc = 1;
+    _M = (T*) malloc (Size()*sizeof(T));
+    nb_alloc++;
 
     _M[0] = s;
 
@@ -1415,6 +1421,8 @@ Matrix<T>::Matrix (int col, int lin, int cha, int set,
                    int eco, int phs, int rep, int seg, 
                    int par, int slc, int ida, int idb, 
                    int idc, int idd, int ide, int ave) {
+
+	nb_alloc = 0;
 
     _dim[COL] = col;
     _dim[LIN] = lin;
@@ -1433,8 +1441,8 @@ Matrix<T>::Matrix (int col, int lin, int cha, int set,
     _dim[IDE] = ide;
     _dim[AVE] = ave;
 
-    _M = new T[Size()]();
-    nb_alloc = 1;
+    _M = (T*) malloc (Size() * sizeof (T));
+    nb_alloc++;
 
 
 }
@@ -1444,15 +1452,17 @@ template <class T>
 Matrix<T>::Matrix (const Matrix<T> &M)
 {
 
+	nb_alloc = 0;
+
 	for (int i = 0; i < INVALID_DIM; i++) 
 		_dim[i] = M.Dim(i);
 
-	_M = new T[Size()]();
+	_M = (T*) malloc (Size() * sizeof (T));
 
 	for (int k = 0; k < M.Size(); k++)
 		_M[k] = M[k];
 	
-	nb_alloc = 1;
+	nb_alloc++;
 
 }
 
@@ -1465,8 +1475,8 @@ Matrix<T>::~Matrix() {
 #endif
 
     if (nb_alloc) {
-    	delete [] _M;
-        nb_alloc = 0;
+    	free (_M);
+        nb_alloc--;
     }
     
 }
