@@ -47,11 +47,8 @@ NuFFT::Init () {
 
 	nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan, &m_iplan, m_epsilon);
 
-	// Allocate memory
-	m_ftin     = (double*) malloc (2          * m_M    * sizeof(double)); 
 	m_ftk      = (double*) malloc (    m_dim  * m_M    * sizeof(double)); 
 	m_ftw      = (double*) malloc (             m_M    * sizeof(double)); 
-	m_ftout    = (double*) malloc (2 * m_N[0] * m_N[1] * sizeof(double)); 
 
 	return error;
 

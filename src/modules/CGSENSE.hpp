@@ -53,31 +53,43 @@ namespace RRStrategy {
 		~CGSENSE () {};
 		
 		/**
-		 * @brief Dump data to disk
+		 * @brief Process conjugate gradient SENSE
 		 */
 		virtual RRSModule::error_code
 		Process ();
+
+		/**
+		 * @brief Initialise NuFFT plans
+		 */
+		virtual RRSModule::error_code
+		Init ();
 		
 		
 		
 	private:
 		
-		int                 m_iter;
-		int                 m_verbose;
+		int                 m_iter;            /**< Maximum number of NuFFT solver iterations */
+		int                 m_verbose;         /**< Verbose should give back the reconstruction series? */
 		
-		Matrix < raw >      m_sens;
-		Matrix < raw >      m_measured;
-		Matrix < double >   m_weights;
+		Matrix < raw >      m_sens;            /**< Sensitivity maps                */
+		Matrix < raw >      m_measured;        /**< Measured data                   */
+		Matrix < double >   m_weights;         /**< K-space weights                 */
 		
-		nfft_plan           m_fplan;            /**< nfft plan */
-		solver_plan_complex m_iplan;
+		nfft_plan           m_fplan;           /**< NuFFT plan                      */
+		solver_plan_complex m_iplan;           /**< iNuFFT plan                     */
 		
-		double              m_epsilon;         /**< NFFT convergence criterium */
-		double              m_cgconv;          /**< CG SENSE convergence criterium */
-		double              m_maxit;           /**< Maximum number of CG iterations */
+		double              m_epsilon;         /**< NuFFT convergence criterium     */
+		double              m_maxit;           /**< Maximum number of NuFFT solver iterations */
+		double              m_cgeps;           /**< CG SENSE convergence criterium  */
+		double              m_cgmaxit;         /**< Maximum number of CG iterations */
 		
 		int*                m_N;
 		int*                m_n;
+		int                 m_M;
+		int                 m_dim;
+
+		double*             m_ftw;
+		double*             m_ftk;
 		
 		double*             kmax;
 		
