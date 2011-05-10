@@ -65,11 +65,16 @@ namespace RRStrategy {
 		int m_dim;
 		
 		// Some more stuff
-		int*      m_N;                          /**< Image matrix side length */
-		int*      m_n;                          /**< Oversampling */
-		int       m_M;                          /**< Number of k-space knots */
-		int       m_maxit;                      /**< Number of Recon iterations (NFFT 3) */
-		int       m_epsilon;                    /**< Convergence criterium */
+		int*      m_N;                          /**< @brief Image matrix side length */
+		int*      m_n;                          /**< @brief Oversampling */
+		int       m_M;                          /**< @brief Number of k-space knots */
+		int       m_maxit;                      /**< @brief Number of Recon iterations (NFFT 3) */
+		int       m_epsilon;                    /**< @brief Convergence criterium */
+
+		double*   m_ftk;
+		double*   m_ftw;
+		double*   m_ftin;
+		double*   m_ftout;
 
 		nfft_plan           m_fplan;            /**< nfft  plan */
 		solver_plan_complex m_iplan;            /**< infft plan */
