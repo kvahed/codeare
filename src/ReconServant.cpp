@@ -49,16 +49,23 @@ error_code
 ReconServant::Process  (const char* name)       {
 
 	error_code e = OK;
+	int err = 0;
 
 	std::cout << "Setting incoming data ... " << std::endl;
 
 	ReconContext* context = new ReconContext(name);
 
+	printf ("%i\n", err++);
 	context->Strategy()->SetRaw(&m_raw);
+	printf ("%i\n", err++);
 	context->Strategy()->SetHelper(&m_helper);
-	//	context->Strategy()->SetKSpace(&m_kspace);
-	//context->Strategy()->SetPixel(&m_pixel);
-	//context->Strategy()->SetConfig(m_config);
+	printf ("%i\n", err++);
+	context->Strategy()->SetKSpace(&m_kspace);
+	printf ("%i\n", err++);
+	context->Strategy()->SetPixel(&m_pixel);
+	printf ("%i\n", err++);
+	context->Strategy()->SetConfig(m_config);
+	printf ("%i\n", err++);
 	
 	std::cout << "... done. Will invoke data procession ... " << std::endl;
 	
@@ -68,9 +75,9 @@ ReconServant::Process  (const char* name)       {
 	
 	context->Strategy()->GetRaw(&m_raw);
 	context->Strategy()->GetHelper(&m_helper);
-	//context->Strategy()->GetKSpace(&m_kspace);
-	//context->Strategy()->GetPixel(&m_pixel);
-	//context->Strategy()->GetConfig(m_config);
+	context->Strategy()->GetKSpace(&m_kspace);
+	context->Strategy()->GetPixel(&m_pixel);
+	context->Strategy()->GetConfig(m_config);
 	
 	std::cout << "... done. Deleting context ..." << std::endl;
 
