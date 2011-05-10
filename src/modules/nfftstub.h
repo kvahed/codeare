@@ -1,6 +1,8 @@
 #ifndef __NFFT_STUB_H__
 #define __NFFT_STUB_H__
 
+#define GAMMA 4.15
+
 #include "nfft3util.h"
 #include "nfft3.h"
 
@@ -35,7 +37,7 @@ namespace nfft {
 		 * @param  out       FTed data
 		 */
 		extern int
-		ift                  (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int maxiter = 100, double epsilon = 3e-7);
+		ift                  (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int maxiter = 3, double epsilon = 3e-7);
 		
 		/**
 		 * @brief            Forward FT
@@ -48,10 +50,13 @@ namespace nfft {
 		ft                   (nfft_plan* np, double* in, double* out);
 
 		extern int
-		weights              (nfft_plan* np, solver_plan_complex spc, double* w);
+		weights              (nfft_plan* np, solver_plan_complex* spc, double* w);
 
 		extern int
 		kspace               (nfft_plan* np, double* k);
+
+		extern int
+		finalize             (nfft_plan* np, solver_plan_complex* spc);
 
 #ifdef __cplusplus
 	}

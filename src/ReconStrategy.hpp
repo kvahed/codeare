@@ -76,16 +76,28 @@ public:
 	Process     () = 0;
 	
 	/**
+	 * @brief Initilise
+	 */ 
+	virtual error_code
+	Init     () {};
+	
+	/**
 	 * @brief Get data from recon
 	 */
 	void 
 	GetRaw           (raw_data* raw)   {
 		
+		for (int j = 0; j < INVALID_DIM; j++)
+			raw->dims[j] = m_raw.Dim(j);
+			
+		raw->dreal.length(m_raw.Size()); 
+		raw->dimag.length(m_raw.Size());
+			
 		for (int i = 0; i < m_raw.Size(); i++) {
 			raw->dreal[i] = m_raw[i].real();
 			raw->dimag[i] = m_raw[i].imag(); 
 		}
-			
+		
 	}
 	
 	/**
