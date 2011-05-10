@@ -55,20 +55,15 @@ ReconServant::Process  (const char* name)       {
 
 	ReconContext* context = new ReconContext(name);
 
-	printf ("%i\n", err++);
 	context->Strategy()->SetRaw(&m_raw);
-	printf ("%i\n", err++);
 	context->Strategy()->SetHelper(&m_helper);
-	printf ("%i\n", err++);
 	context->Strategy()->SetKSpace(&m_kspace);
-	printf ("%i\n", err++);
 	context->Strategy()->SetPixel(&m_pixel);
-	printf ("%i\n", err++);
 	context->Strategy()->SetConfig(m_config);
-	printf ("%i\n", err++);
 	
 	std::cout << "... done. Will invoke data procession ... " << std::endl;
 	
+	e = context->Strategy()->Init();
 	e = context->Strategy()->Process();
 	
 	std::cout << "... done. Getting processed data..." << std::endl;

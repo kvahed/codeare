@@ -229,23 +229,19 @@ bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
 				_dim[i] = 1;
 			
 			if (nb_alloc)
-			  free (_M);
-
-			printf ("Size of data repository reset to %i", Size());
+				free (_M);
 
 			_M = (T*) malloc (Size() * sizeof (T));
 			
 #ifdef VERBOSE
-			//			if (!read) {
-				std::cout << "rank: " << ndim << ", dimensions: ";
-				for (int i = 0; i < ndim; i++) {
-					std::cout << (unsigned long)(dims[i]);
-					if (i == ndim - 1)
-						std::cout << std::endl;
-					else
-						std::cout << " x ";
-				}
-				//}
+			std::cout << "rank: " << ndim << ", dimensions: ";
+			for (int i = 0; i < ndim; i++) {
+				std::cout << (unsigned long)(dims[i]);
+				if (i == ndim - 1)
+					std::cout << std::endl;
+				else
+					std::cout << " x ";
+			}
 #endif
 			
 			PredType*  type;
