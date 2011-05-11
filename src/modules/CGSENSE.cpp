@@ -87,12 +87,13 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out) {
 	// Loop over coils, Elementwise multiplication of maps with in (s.*in), ft and store in out
 	for (int j = 0; j < ncoils; j++) {
 
-		int     pos     = j * imgsize;
+		int     ipos     = j * imgsize;
+		int     spos     = j * nsamples;
 	
 		// Copy data to FT
 		for (int i = 0; i < imgsize; i++) {
 			
-			raw tmp     = sm->at(pos + i) * in->at(i);
+			raw tmp     = sm->at(ipos + i) * in->at(i);
 
 			ftin[2*i  ] = tmp.real(); 
 			ftin[2*i+1] = tmp.imag(); 
@@ -104,7 +105,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out) {
 
 		// Copy FTed data back
 		for (int i = 0; i < nsamples; i++) 
-			out->at(pos + i) = raw(ftout[2*i],ftout[2*i+1]);
+			out->at(spos + i) = raw(ftout[2*i],ftout[2*i+1]);
 
 	}
 
@@ -147,13 +148,13 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 	// Loop over coils, Inverse FT every signal in *in, 
 	// Sum elementwise mutiplied images with according sensitivity maps 
 	for (int j = 0; j < ncoils; j++) {
-		
-		int     pos      = j * nsamples;
+		int    spos      = j * nsamples;
+		int    ipos      = j * imgsize;
 
 		// Copy to iFT
 		for (int i = 0; i < nsamples; i++) {
-			ftin[2*i  ] = (in->at(pos + i)).real();
-			ftin[2*i+1] = (in->at(pos + i)).imag();
+			ftin[2*i  ] = (in->at(spos + i)).real();
+			ftin[2*i+1] = (in->at(spos + i)).imag();
 		}
 		
 		// Inverse FT
@@ -161,7 +162,7 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 
 		// Copy back from iFT
 		for (int i = 0; i < out->Size(); i++) {
-			raw sens = sm->at(pos + i);
+			raw sens = sm->at(ipos + i);
 			out->at(i) += raw(ftout[2*i] * sens.real(), ftout[2*i+1] * -sens.imag());
 		}
 
@@ -183,10 +184,28 @@ CGSENSE::Process () {
 
 	Matrix<raw> a, p, q, r, r_new;
 
-	// First application of the right hand side
-	EH (&m_raw, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
-	p = a;
-	r = a;
+	for (int i = 0; i < INVALID_DIM; i++)
+		a.Dim(i) = 1;
+	a.Dim(COL) = 128;
+	a.Dim(LIN) = 128;
+	a.Reset();
+
+	m_raw = m_raw * 10000;
+
+	m_kspace = m_kspace / (1/(GAMMA/128*m_N[0]));
+
+	double*     ftk      = (double*) malloc (   m_kspace.Size() * sizeof(double)); 
+	double*     ftw      = (double*) malloc (   m_helper.Size() * sizeof(double)); 
+
+	memcpy (ftw, &m_helper[0], m_helper.Size()*sizeof(double));
+	memcpy (ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
+	
+	nfft::kspace  (&m_fplan,           ftk);
+	nfft::weights (&m_fplan, &m_iplan, ftw);
+
+	EH (&m_raw, &m_rhelper, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
+	p = Matrix<raw>(a);
+	r = Matrix<raw>(a);
 
 	// Prepare q
 	q.Dim(COL) = a.Dim(COL);
@@ -203,19 +222,30 @@ CGSENSE::Process () {
 
 	std::vector<double> res;
 	
+	Matrix<raw> sigtmp;
+	sigtmp.Dim (COL) = m_M;
+	sigtmp.Dim (LIN) = 8;
+	sigtmp.Reset();
+
+	Matrix<raw> imgtmp;
+	imgtmp.Dim (COL) = m_N[0];
+	imgtmp.Dim (LIN) = m_N[1];
+	imgtmp.Reset();
+
+	float       rn    = 0.0;
+	float       an    = 0.0;
+	float       rnewn = 0.0;
+	raw         rtmp  = raw(0.0,0.0);
+	
 	// CG iterations
 	for (int i = 0; i < m_cgmaxit; i++) {
-		
-		float       rn;
-		float       an;
-		float       rnewn;
-		raw         rtmp;
-		Matrix<raw> mtmp;
-		
+
 		rn = r.norm().real();
 		an = a.norm().real();
 		
 		res.push_back(rn/an);
+		
+		printf ("%i: CG residuum: %.9f\n", i, res.at(i));
 		
 		if (res.at(i) < m_cgeps) {
 			error = OK;
@@ -223,29 +253,37 @@ CGSENSE::Process () {
 		}
 		
 		// q  = eh(e(p , sensitivity, k), sensitivity, k);
-		E  (&p,    &m_sens, &m_fplan,                               &mtmp);
-		EH (&mtmp, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &q);
+
+		E  (&p,      &m_rhelper, &m_fplan,                               &sigtmp);
+		EH (&sigtmp, &m_rhelper, &m_fplan, &m_iplan, m_epsilon, m_maxit, &q);
 		
-		// b  = b + r(:)'*r(:)/(p(:)'*q(:))*p;
-		rtmp  = (rn / (p.dotc(q)));
-		mtmp  = p * rtmp;
-		m_raw = m_raw + mtmp;
+		// b     = b + r(:)'*r(:)/(p(:)'*q(:))*p;
+		rtmp     = (rn / (p.dotc(q)));
+		printf ("rtmp = (%.9f,%.9f)\n", real(rtmp), imag(rtmp));
+		imgtmp   = p * rtmp;
+		m_raw    = m_raw + imgtmp;
 		
 		// r_new = r - r(:)'*r(:)/(p(:)'*q(:))*q; 
-		mtmp  = q * rtmp;
-		r_new = r - mtmp;
+		imgtmp   = q * rtmp;
+		r_new    = r - imgtmp;
 		
-		// p  = r_new + r_new(:)'*r_new(:)/(r(:)'*r(:))*p
-		rnewn = r_new.norm().real();
-		rtmp  = rnewn/rn;
-		mtmp  = p * rtmp;
-		p     = r_new + mtmp;
+		// p     = r_new + r_new(:)'*r_new(:)/(r(:)'*r(:))*p
+		rnewn    = r_new.norm().real();
+		rtmp     = rnewn/rn;
+		imgtmp   = p * rtmp;
+		p        = r_new + imgtmp;
 		
-		// r  = r_new
-		r     = r_new;
-		
+		// r     = r_new
+		r        = r_new;
+
 	}
-	
+
+
+	m_raw.dump("share/cgsense/test.h5");
+
+	free (ftk);
+	free (ftw);
+
 	return error;
 
 }

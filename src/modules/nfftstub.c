@@ -93,7 +93,7 @@ void ift (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int 
 	int j, k, l;
 
 	memcpy (spc->y, in, 2 * np->M_total * sizeof(double));
-
+	
 	// precompute lin psi
 	if(np->nfft_flags & PRE_PSI)
 		nfft_precompute_psi(np);
@@ -118,7 +118,7 @@ void ift (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int 
 
 		solver_loop_one_step_complex(spc);
 
-#ifdef VERBOSE		
+#ifdef NVERBOSE		
 		fprintf( stderr, "%e,  %i of %i\n", sqrt(spc->dot_r_iter), l+1, maxiter);
 #endif		
 		
@@ -126,7 +126,7 @@ void ift (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int 
 
 	t = nfft_second()-t;
 	
-#ifdef VERBOSE
+#ifdef NVERBOSE
 	fprintf(stderr,"nfft time: %.4f seconds.\n",t);
 #endif
 
