@@ -108,10 +108,13 @@ Matrix<T>::norm () const {
 	int incx = sizeof(raw);
 	T   norm = 0.0;
 
-	if (typeid(T)      == typeid(raw))
+	for (int i = 0; i < Size(); i++)
+		norm += pow(_M[i],2);
+
+	/*if (typeid(T)      == typeid(raw))
 		norm = raw(scnrm2_ (&n, _M, &incx),0);
 	else if (typeid(T) == typeid(double))
-		norm = dnrm2_(&n, _M, &incx);
+	norm = dnrm2_(&n, _M, &incx);*/
 
 	return norm;
 
@@ -124,11 +127,14 @@ Matrix<T>::dotc (Matrix<T>& M) const {
 	T   res  = (T) 0;
 
 	int n    = Size();
-	int incx = sizeof(raw);
+	int incx = 1;
 
-	if (typeid(T) == typeid(raw)) {
+	for (int i = 0; i < Size(); i++)
+		res += conj(_M[i]) * M[i];
+
+	/*if (typeid(T) == typeid(raw)) {
 		res = cdotc_ (&n, &_M[0], &incx, &M[0], &incx);
-	}
+		}*/
 
 	return res;
 

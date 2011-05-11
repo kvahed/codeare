@@ -221,9 +221,11 @@ bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
 			hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
 			int       ndim    = space.getSimpleExtentDims(dims, NULL);
 
-			
+			if (typeid(T) == typeid(raw)) 
+				ndim--;
+
 			for (int i = 0; i < ndim; i++)
-				_dim[i] = dims[i];
+				_dim[i] = dims[ndim-i-1];
 			
 			for (int i = ndim; i < INVALID_DIM; i++)
 				_dim[i] = 1;
@@ -233,7 +235,7 @@ bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
 
 			_M = (T*) malloc (Size() * sizeof (T));
 			
-#ifdef VERBOSE
+
 			std::cout << "rank: " << ndim << ", dimensions: ";
 			for (int i = 0; i < ndim; i++) {
 				std::cout << (unsigned long)(dims[i]);
@@ -242,7 +244,7 @@ bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
 				else
 					std::cout << " x ";
 			}
-#endif
+
 			
 			PredType*  type;
 			

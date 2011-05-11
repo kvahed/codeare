@@ -86,14 +86,15 @@ int main (int argc, char** argv) {
 		
 		cout << "We're good" << endl;
 
-		// Matrix<raw>    sensitivities;
+		/*
+		// NuFFT
 		Matrix<raw>    data;
 		Matrix<double> weights;
 		Matrix<double> kspace;
 		
-		weights.read ("share/nufft/ndata.h5", "weights");
-		data.read ("share/nufft/ndata.h5", "data");
-		kspace.read ("share/nufft/ndata.h5", "8_shot_spiral");
+		weights.read ("share/nufft/data.h5", "weights");
+		data.read ("share/nufft/data.h5", "data");
+		kspace.read ("share/nufft/data.h5", "8_shot_spiral");
 
 		client.ReadConfig ("share/nufft/config.xml");
 		client.SetRaw (data);
@@ -104,6 +105,29 @@ int main (int argc, char** argv) {
 
 		client.GetRaw(data);
 		data.dump("share/nufft/recon.h5");
+		*/
+
+		// CGSENSE
+		Matrix<raw>    data;
+		Matrix<double> weights;
+		Matrix<double> kspace;
+		Matrix<raw>    sensitivities;
+		
+		weights.read ("share/cgsense/data.h5", "weights");
+		data.read ("share/cgsense/data.h5", "data");
+		kspace.read ("share/cgsense/data.h5", "kspace");
+		sensitivities.read ("share/cgsense/data.h5", "sensitivities");
+
+		client.ReadConfig ("share/cgsense/config.xml");
+		client.SetRaw (data);
+		client.SetRHelper (sensitivities);
+		client.SetHelper (weights);
+		client.SetKSpace (kspace);
+		
+		client.Process ("CGSENSE");
+
+		client.GetRaw(data);
+		data.dump("share/cgsense/recon.h5");
 
 		return 0;
 

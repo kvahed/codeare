@@ -46,7 +46,7 @@ namespace nfft {
 		 * @param  k         K-space trajectory
 		 * @param  out       FTed data 
 		 */
-		extern int
+		extern const int
 		ft                   (nfft_plan* np, double* in, double* out);
 
 		extern const int
