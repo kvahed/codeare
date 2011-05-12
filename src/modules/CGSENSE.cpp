@@ -163,7 +163,7 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 		// Copy back from iFT
 		for (int i = 0; i < out->Size(); i++) {
 			raw sens = sm->at(ipos + i);
-			out->at(i) += raw(ftout[2*i] * sens.real(), ftout[2*i+1] * -sens.imag());
+			out->at(i) += raw(ftout[2*i], ftout[2*i+1]) * conj(sens);
 		}
 
 	}
@@ -186,8 +186,8 @@ CGSENSE::Process () {
 
 	for (int i = 0; i < INVALID_DIM; i++)
 		a.Dim(i) = 1;
-	a.Dim(COL) = 128;
-	a.Dim(LIN) = 128;
+	for (int i = 0; i < m_dim      ; i++)
+		a.Dim(i) = m_N[i];
 	a.Reset();
 
 	m_raw = m_raw * 10000;
@@ -259,7 +259,6 @@ CGSENSE::Process () {
 		
 		// b     = b + r(:)'*r(:)/(p(:)'*q(:))*p;
 		rtmp     = (rn / (p.dotc(q)));
-		printf ("rtmp = (%.9f,%.9f)\n", real(rtmp), imag(rtmp));
 		imgtmp   = p * rtmp;
 		m_raw    = m_raw + imgtmp;
 		
