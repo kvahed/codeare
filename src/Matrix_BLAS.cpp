@@ -109,7 +109,7 @@ Matrix<T>::norm () const {
 	T   norm = 0.0;
 
 	for (int i = 0; i < Size(); i++)
-		norm += pow(_M[i],2);
+		norm += conj(_M[i])*_M[i];
 
 	/*if (typeid(T)      == typeid(raw))
 		norm = raw(scnrm2_ (&n, _M, &incx),0);

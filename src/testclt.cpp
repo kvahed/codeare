@@ -113,12 +113,13 @@ int main (int argc, char** argv) {
 		Matrix<double> kspace;
 		Matrix<raw>    sensitivities;
 		
-		weights.read ("share/cgsense/data.h5", "weights");
-		data.read ("share/cgsense/data.h5", "data");
-		kspace.read ("share/cgsense/data.h5", "kspace");
-		sensitivities.read ("share/cgsense/data.h5", "sensitivities");
-
 		client.ReadConfig ("share/cgsense/config.xml");
+
+		weights.read ("share/cgsense/ndata.h5", "weights");
+		data.read ("share/cgsense/ndata.h5", "data");
+		kspace.read ("share/cgsense/ndata.h5", "kspace");
+		sensitivities.read ("share/cgsense/ndata.h5", "sensitivities");
+
 		client.SetRaw (data);
 		client.SetRHelper (sensitivities);
 		client.SetHelper (weights);
