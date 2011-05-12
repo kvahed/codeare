@@ -181,6 +181,7 @@ RRSModule::error_code
 CGSENSE::Process () {
 	
 	RRSModule::error_code error = CG_DID_NOT_CONVERGE;
+	static clock_t runtime = clock();
 
 	Matrix<raw> a, p, q, r, r_new;
 
@@ -282,6 +283,9 @@ CGSENSE::Process () {
 
 	free (ftk);
 	free (ftw);
+
+	runtime = clock() - runtime;
+	printf ("Processing NuFFT took: %.4f seconds.\n", runtime / 1000000.0);
 
 	return error;
 
