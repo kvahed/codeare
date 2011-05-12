@@ -15,6 +15,11 @@ CGSENSE::Init() {
 	
 	RRSModule::error_code error = OK; 
 
+	// Verbosity ----------------------------
+
+	Attribute ("verbose", &m_verbose);
+	// --------------------------------------
+
 	// Dimensions ---------------------------
 	Attribute("dim",     &m_dim);
 
@@ -278,8 +283,8 @@ CGSENSE::Process () {
 
 	}
 
-
-	m_raw.dump("share/cgsense/test.h5");
+	if (m_verbose)
+		a.dump("share/cgsense/test.h5");
 
 	free (ftk);
 	free (ftw);
