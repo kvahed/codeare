@@ -115,10 +115,10 @@ int main (int argc, char** argv) {
 		
 		client.ReadConfig ("share/cgsense/config.xml");
 
-		weights.read ("share/cgsense/ndata.h5", "weights");
-		data.read ("share/cgsense/ndata.h5", "data");
-		kspace.read ("share/cgsense/ndata.h5", "kspace");
-		sensitivities.read ("share/cgsense/ndata.h5", "sensitivities");
+		weights.read ("share/cgsense/testing.h5", "weights");
+		data.read ("share/cgsense/testing.h5", "data");
+		kspace.read ("share/cgsense/testing.h5", "kspace");
+		sensitivities.read ("share/cgsense/testing.h5", "sensitivities");
 
 		client.SetRaw (data);
 		client.SetRHelper (sensitivities);
