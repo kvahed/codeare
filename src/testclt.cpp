@@ -128,7 +128,10 @@ int main (int argc, char** argv) {
 		client.Process ("CGSENSE");
 
 		client.GetRaw(data);
+		client.GetRHelper(sensitivities);
+
 		data.dump("share/cgsense/recon.h5");
+		sensitivities.dump("share/cgsense/pulses.h5");
 
 		return 0;
 

@@ -122,6 +122,12 @@ public:
 	void 
 	GetRHelper           (raw_data* rhelper)   {
 		
+		for (int j = 0; j < INVALID_DIM; j++)
+			rhelper->dims[j] = m_rhelper.Dim(j);
+		
+		rhelper->dreal.length(m_rhelper.Size()); 
+		rhelper->dimag.length(m_rhelper.Size());
+		
 		for (int i = 0; i < m_rhelper.Size(); i++) {
 			rhelper->dreal[i] = m_rhelper[i].real();
 			rhelper->dimag[i] = m_rhelper[i].imag(); 

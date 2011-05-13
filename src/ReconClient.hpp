@@ -156,10 +156,10 @@ namespace RRClient {
 			
 			for (int j = 0; j < INVALID_DIM; j++)
 				M.Dim(j) = m_rhelper->dims[j];
-			
+
 			M.Reset();
-			
-			for (int i = 0; i < GetRawSize(); i++)
+
+			for (int i = 0; i < GetRHelperSize(); i++)
 				M[i] = std::complex<float>(m_rhelper->dreal[i],m_rhelper->dimag[i]);
 			
 		};
