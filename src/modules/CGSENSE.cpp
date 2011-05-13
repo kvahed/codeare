@@ -210,8 +210,8 @@ CGSENSE::Process () {
 	nfft::weights (&m_fplan, &m_iplan, ftw);
 
 	EH (&m_raw, &m_rhelper, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
-	p = Matrix<raw>(a);
-	r = Matrix<raw>(a);
+	p = a;
+	r = a;
 
 	// Prepare q
 	q.Dim(COL) = a.Dim(COL);
@@ -261,7 +261,7 @@ CGSENSE::Process () {
 		// q  = eh(e(p , sensitivity, k), sensitivity, k);
 
 		E  (&p,      &m_rhelper, &m_fplan,                               &sigtmp);
-		EH (&sigtmp, &m_rhelper, &m_fplan, &m_iplan, m_epsilon, m_maxit, &q);
+		EH (&sigtmp, &m_rhelper, &m_fplan, &m_iplan, m_epsilon, m_maxit, &q     );
 		
 		// b     = b + r(:)'*r(:)/(p(:)'*q(:))*p;
 		rtmp     = (rn / (p.dotc(q)));
@@ -290,7 +290,7 @@ CGSENSE::Process () {
 	free (ftw);
 
 	runtime = clock() - runtime;
-	printf ("Processing NuFFT took: %.4f seconds.\n", runtime / 1000000.0);
+	printf ("Processing CG-SENSE took: %.4f seconds.\n", runtime / 1000000.0);
 
 	return error;
 
