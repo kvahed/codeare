@@ -200,23 +200,31 @@ CGSENSE::Process () {
 
 	m_kspace = m_kspace / (1/(GAMMA/128*m_N[0]));
 
-	double*     ftk      = (double*) malloc (   m_kspace.Size() * sizeof(double)); 
-	double*     ftw      = (double*) malloc (   m_helper.Size() * sizeof(double)); 
-
-	memcpy (ftw, &m_helper[0], m_helper.Size()*sizeof(double));
-	memcpy (ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
+	memcpy (m_ftw, &m_helper[0], m_helper.Size()*sizeof(double));
+	memcpy (m_ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
 	
-	nfft::kspace  (&m_fplan,           ftk);
-	nfft::weights (&m_fplan, &m_iplan, ftw);
+	nfft::kspace  (&m_fplan,           m_ftk);
+	nfft::weights (&m_fplan, &m_iplan, m_ftw);
 
-	EH (&m_raw, &m_rhelper, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
+	m_sens = m_rhelper;
+
+	Matrix<raw> store;
+	for (int i = 0; i < INVALID_DIM; i++)
+		store.Dim(i) = 1;
+
+	if (m_verbose == 1) {
+		for (int i = 0; i < m_dim      ; i++)
+			store.Dim(i) = m_N[i];
+	}
+	store.Dim(m_dim) = m_cgmaxit;
+	store.Reset();
+
+	m_rhelper = m_raw;
+
+	EH (&m_raw, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
 	p = a;
 	r = a;
-
-	// Prepare q
-	q.Dim(COL) = a.Dim(COL);
-	q.Dim(LIN) = a.Dim(LIN);
-	q.Reset();
+	q = a;
 
 	// Out going image
 	// Resize m_raw for output
@@ -260,34 +268,33 @@ CGSENSE::Process () {
 		
 		// q  = eh(e(p , sensitivity, k), sensitivity, k);
 
-		E  (&p,      &m_rhelper, &m_fplan,                               &sigtmp);
-		EH (&sigtmp, &m_rhelper, &m_fplan, &m_iplan, m_epsilon, m_maxit, &q     );
+		E  (&p,      &m_sens, &m_fplan,                               &sigtmp);
+		EH (&sigtmp, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &q     );
 		
-		// b     = b + r(:)'*r(:)/(p(:)'*q(:))*p;
-		rtmp     = (rn / (p.dotc(q)));
-		imgtmp   = p * rtmp;
-		m_raw    = m_raw + imgtmp;
+		// b      = b + r(:)'*r(:)/(p(:)'*q(:))*p;
+		rtmp      = (rn / (p.dotc(q)));
+		imgtmp    = p * rtmp;
+		m_raw     = m_raw + imgtmp;
+		m_rhelper = m_rhelper - sigtmp;
+		memcpy (&store[i*m_raw.Size()], &m_raw[0], m_raw.Size() * sizeof(double));
 		
-		// r_new = r - r(:)'*r(:)/(p(:)'*q(:))*q; 
-		imgtmp   = q * rtmp;
-		r_new    = r - imgtmp;
+		// r_new  = r - r(:)'*r(:)/(p(:)'*q(:))*q; 
+		imgtmp    = q * rtmp;
+		r_new     = r - imgtmp;
 		
-		// p     = r_new + r_new(:)'*r_new(:)/(r(:)'*r(:))*p
-		rnewn    = r_new.norm().real();
-		rtmp     = rnewn/rn;
-		imgtmp   = p * rtmp;
-		p        = r_new + imgtmp;
+		// p      = r_new + r_new(:)'*r_new(:)/(r(:)'*r(:))*p
+		rnewn     = r_new.norm().real();
+		rtmp      = rnewn/rn;
+		imgtmp    = p * rtmp;
+		p         = r_new + imgtmp;
 		
-		// r     = r_new
-		r        = r_new;
+		// r      = r_new
+		r         = r_new;
 
 	}
 
-	if (m_verbose)
-		a.dump("share/cgsense/test.h5");
-
-	free (ftk);
-	free (ftw);
+	if (m_verbose == 1)
+		store.dump("share/cgsense/test.h5");
 
 	runtime = clock() - runtime;
 	printf ("Processing CG-SENSE took: %.4f seconds.\n", runtime / 1000000.0);
