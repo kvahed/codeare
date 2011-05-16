@@ -220,7 +220,7 @@ CGSENSE::Process () {
 	store.Reset();
 
 	m_rhelper = m_raw;
-
+	
 	EH (&m_raw, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
 	p = a;
 	r = a;
@@ -261,7 +261,7 @@ CGSENSE::Process () {
 		
 		printf ("%i: CG residuum: %.9f\n", i, res.at(i));
 		
-		if (res.at(i) < m_cgeps) {
+		if (res.at(i) <= m_cgeps) {
 			error = OK;
 			break;
 		}
@@ -275,7 +275,9 @@ CGSENSE::Process () {
 		rtmp      = (rn / (p.dotc(q)));
 		imgtmp    = p * rtmp;
 		m_raw     = m_raw + imgtmp;
-		m_rhelper = m_rhelper - sigtmp;
+		sigtmp    = sigtmp * rtmp;
+		m_rhelper = m_rhelper + sigtmp;
+
 		memcpy (&store[i*m_raw.Size()], &m_raw[0], m_raw.Size() * sizeof(double));
 		
 		// r_new  = r - r(:)'*r(:)/(p(:)'*q(:))*q; 
