@@ -259,7 +259,7 @@ CGSENSE::Process () {
 		
 		res.push_back(rn/an);
 		
-		printf ("%i: CG residuum: %.9f\n", i, res.at(i));
+		printf ("%03i: CG residuum: %.9f\n", i, res.at(i));
 		
 		if (res.at(i) <= m_cgeps) {
 			error = OK;
