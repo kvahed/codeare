@@ -37,112 +37,136 @@ using namespace RRClient;
 
 char*  name;
 char*  base;
-char*  debug;
+char*  data;
+char*  config;
+char*  verbose;
 char*  test;
 
 bool init (int argc, char** argv);
+
+bool internaltest (ReconClient* rc); 
+bool cgsensetest (ReconClient* rc);
+bool nuffttest (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
 	if (init (argc, argv)) {
 		
-		ReconClient client (name, debug);
-		int         i = 0, j = 0, d = 8;
-		
-		Matrix<raw>    r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-		Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-		Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		ReconClient client (name, verbose);
 
-		r.Random();
-		h.Random();
-		p.Random();
-
-		std::cout << r << std::endl;
-		std::cout << h << std::endl;
-		std::cout << p << std::endl;
-		
-		client.SetRaw(r);
-		client.SetRHelper(r);
-		client.SetPixel(p);
-		client.SetHelper(h);
-		client.SetKSpace(h);
-
-		time_t seconds = time (NULL);
-		char   uid[16];
-		sprintf(uid,"%ld",seconds);
-		
-		client.ReadConfig("test.xml");
-		client.SetAttribute("UID", uid);
-		client.SetAttribute("Pi", 3.14156);
-		client.SetAttribute("Dim", d);
-		
-		client.Process(test);
-
-		client.GetRaw(r);
-		client.GetRHelper(r);
-		client.GetPixel(p);
-		client.GetHelper(h);
-		client.GetKSpace(h);
-		
-		cout << "We're good" << endl;
-
-		/*
-		// NuFFT
-		Matrix<raw>    data;
-		Matrix<double> weights;
-		Matrix<double> kspace;
-		
-		weights.read ("share/nufft/data.h5", "weights");
-		data.read ("share/nufft/data.h5", "data");
-		kspace.read ("share/nufft/data.h5", "8_shot_spiral");
-
-		client.ReadConfig ("share/nufft/config.xml");
-		client.SetRaw (data);
-		client.SetHelper (weights);
-		client.SetKSpace (kspace);
-		
-		client.Process ("NuFFT");
-
-		client.GetRaw(data);
-		data.dump("share/nufft/recon.h5");
-		*/
-
-		// CGSENSE
-		Matrix<raw>    data;
-		Matrix<double> weights;
-		Matrix<double> kspace;
-		Matrix<raw>    sensitivities;
-		
-		client.ReadConfig ("share/cgsense/config.xml");
-
-		weights.read ("share/cgsense/testing.h5", "weights");
-		data.read ("share/cgsense/testing.h5", "data");
-		kspace.read ("share/cgsense/testing.h5", "kspace");
-		sensitivities.read ("share/cgsense/testing.h5", "sensitivities");
-
-		client.SetRaw (data);
-		client.SetRHelper (sensitivities);
-		client.SetHelper (weights);
-		client.SetKSpace (kspace);
-		
-		client.Process ("CGSENSE");
-
-		client.GetRaw(data);
-		client.GetRHelper(sensitivities);
-
-		data.dump("share/cgsense/recon.h5");
-		sensitivities.dump("share/cgsense/pulses.h5");
-
+		if (strcmp (test, "NuFFT")   == 0)
+			nuffttest (&client);
+		if (strcmp (test, "CGSENSE") == 0)
+			cgsensetest (&client);
+		else
+			internaltest (&client);
+			
 		return 0;
 
 	} else
 		
 		return 1;
 
+}
 
+bool cgsensetest (ReconClient* rc) {
+
+	Matrix<raw>    rawdata;
+	Matrix<double> weights;
+	Matrix<double> kspace;
+	Matrix<raw>    sensitivities;
 	
+	std::string    cf  = base + std::string(config);
 
+	std::string    df  = base + std::string(data);
+	std::string    odf = base + std::string("/images.h5");
+	std::string    opf = base + std::string("/pulses.h5");
 
+	rc->ReadConfig  (cf.c_str());
+	
+	weights.read       (df, "weights");
+	rawdata.read       (df, "data");
+	kspace.read        (df, "kspace");
+	sensitivities.read (df, "sensitivities");
+	
+	rc->SetRaw (rawdata);
+	rc->SetRHelper (sensitivities);
+	rc->SetHelper (weights);
+	rc->SetKSpace (kspace);
+	
+	rc->Process ("CGSENSE");
+	
+	rc->GetRaw(rawdata);
+	rc->GetRHelper(sensitivities);
+	
+	rawdata.dump(odf.c_str());
+	sensitivities.dump(opf.c_str());
+	
+}
+
+bool nuffttest (ReconClient* rc) {
+
+	Matrix<raw>    data;
+	Matrix<double> weights;
+	Matrix<double> kspace;
+	
+	weights.read ("share/nufft/data.h5", "weights");
+	data.read ("share/nufft/data.h5", "data");
+	kspace.read ("share/nufft/data.h5", "8_shot_spiral");
+	
+	rc->ReadConfig ("share/nufft/config.xml");
+	rc->SetRaw (data);
+	rc->SetHelper (weights);
+	rc->SetKSpace (kspace);
+	
+	rc->Process ("NuFFT");
+	
+	rc->GetRaw(data);
+	data.dump("share/nufft/recon.h5");
+	
+}
+
+bool internaltest (ReconClient* rc) {
+
+	int         i = 0, j = 0, d = 8;
+	
+	Matrix<raw>    r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	
+	r.Random();
+	h.Random();
+	p.Random();
+	
+	std::cout << r << std::endl;
+	std::cout << h << std::endl;
+	std::cout << p << std::endl;
+	
+	rc->SetRaw(r);
+	rc->SetRHelper(r);
+	rc->SetPixel(p);
+	rc->SetHelper(h);
+	rc->SetKSpace(h);
+	
+	time_t seconds = time (NULL);
+	char   uid[16];
+	sprintf(uid,"%ld",seconds);
+	
+	rc->ReadConfig("test.xml");
+	rc->SetAttribute("UID", uid);
+	rc->SetAttribute("Pi", 3.14156);
+	rc->SetAttribute("Dim", d);
+	
+	rc->Process(test);
+	
+	rc->GetRaw(r);
+	rc->GetRHelper(r);
+	rc->GetPixel(p);
+	rc->GetHelper(h);
+	rc->GetKSpace(h);
+	
+	cout << "We're good" << endl;
+	
 }
 
 
@@ -161,7 +185,7 @@ bool init (int argc, char** argv) {
 	cout << "Test client "  << endl;
 #endif
 
-    cout << "Copyright (C) 2010"                                              << endl;
+    cout << "Copyright (C) 2010-2011"                                         << endl;
 	cout << "Kaveh Vahedipour - k.vahedipour@fz-juelich.de"                   << endl;
 	cout << "Juelich Research Centre"                                         << endl;
 	cout << "Institute of Neuroscience and Medicine"                          << endl;
@@ -172,20 +196,24 @@ bool init (int argc, char** argv) {
 	
 	opt->addUsage  ("Usage: testclt --name <name> [OPTIONS]");
 	opt->addUsage  ("");
-	opt->addUsage  (" -n, --name   Remote service name (for example: ReconService)");
-	opt->addUsage  (" -t, --test   Test case (default: DummyRecon. Just connectivity test)");
-	opt->addUsage  (" -d, --debug  Debug level 0-40 (default: 0)");
-	opt->addUsage  (" -b, --base   Base directory of approved files.");
+	opt->addUsage  (" -n, --name    Remote service name (for example: ReconService)");
+	opt->addUsage  (" -t, --test    Test case (default: DummyRecon. Just connectivity test)");
+	opt->addUsage  (" -v, --verbose Debug level 0-40 (default: 0)");
+	opt->addUsage  (" -b, --base    Base directory of approved files.");
+	opt->addUsage  (" -c, --config  Configuration XML (NuFFT, CGSENSE).");
+	opt->addUsage  (" -d, --data    Incoming binary data in HDF5 format.");
 	opt->addUsage  ("");
-	opt->addUsage  (" -h, --help   Print this help screen"); 
+	opt->addUsage  (" -h, --help    Print this help screen"); 
 	opt->addUsage  ("");
 	
-	opt->setFlag   ("help"  , 'h');
+	opt->setFlag   ("help"   , 'h');
 
-	opt->setOption ("name"  , 'n');
-	opt->setOption ("test"  , 't');
-	opt->setOption ("debug" , 'd');
-	opt->setOption ("base"  , 'b');
+	opt->setOption ("name"   , 'n');
+	opt->setOption ("test"   , 't');
+	opt->setOption ("verbose", 'v');
+	opt->setOption ("config" , 'c');
+	opt->setOption ("data"   , 'd');
+	opt->setOption ("base"   , 'b');
 	
 	opt->processCommandArgs(argc, argv);
 	
@@ -197,10 +225,12 @@ bool init (int argc, char** argv) {
 		
 	} 
 	
-	debug = (opt->getValue("debug" ) && atoi(opt->getValue("debug" )) >= 0 && atoi(opt->getValue("debug" )) <= 40) ?      opt->getValue("debug" )  : (char*)"0";
-	name  = (opt->getValue("name"  ) &&      opt->getValue("name"  )  != (char*)"")                                ?      opt->getValue("name"  )  : (char*)"ReconService" ;
-	base  = (opt->getValue("base"  ) &&      opt->getValue("base"  )  != (char*)"")                                ?      opt->getValue("base"  )  : (char*)".";
-	test  = (opt->getValue("test"  ) &&      opt->getValue("test"  )  != (char*)"")                                ?      opt->getValue("test"  )  : (char*)"DummyRecon";
+	verbose = (opt->getValue("verbose" ) && atoi(opt->getValue("verbose" )) >= 0 && atoi(opt->getValue("verbose" )) <= 40) ?      opt->getValue("verbose" )  : (char*)"0";
+	name    = (opt->getValue("name"  ) &&      opt->getValue("name"  )  != (char*)"")                                ?      opt->getValue("name"  )  : (char*)"ReconService" ;
+	base    = (opt->getValue("base"  ) &&      opt->getValue("base"  )  != (char*)"")                                ?      opt->getValue("base"  )  : (char*)".";
+	data    = (opt->getValue("data"  )     &&      opt->getValue("data"  )  != (char*)"")                                ?      opt->getValue("data"  )  : (char*)".";
+	config  = (opt->getValue("config"  ) &&      opt->getValue("config"  )  != (char*)"")                                ?      opt->getValue("config"  )  : (char*)".";
+	test    = (opt->getValue("test"  ) &&      opt->getValue("test"  )  != (char*)"")                                ?      opt->getValue("test"  )  : (char*)"DummyRecon";
 	delete opt;
 
 	return true;
