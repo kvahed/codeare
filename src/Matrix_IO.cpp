@@ -79,7 +79,7 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 			H5File        file; 
 			
 			try {
-				file = H5File  (fname, H5F_ACC_RDWR);
+				file = H5File  (fname, H5F_ACC_TRUNC);
 #ifdef VERBOSE
 				printf ("File %s opened for RW\n", fname.c_str());
 #endif
