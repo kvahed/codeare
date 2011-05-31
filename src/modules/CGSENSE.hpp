@@ -71,6 +71,8 @@ namespace RRStrategy {
 		int                 m_iter;            /**< Maximum number of NuFFT solver iterations */
 		int                 m_verbose;         /**< Verbose should give back the reconstruction series? */
 		
+		int                 m_testcase;        /**< Test case. Generate forward data first. */
+
 		Matrix < raw >      m_sens;            /**< Sensitivity maps                */
 		Matrix < raw >      m_measured;        /**< Measured data                   */
 		Matrix < double >   m_weights;         /**< K-space weights                 */
@@ -83,15 +85,16 @@ namespace RRStrategy {
 		double              m_cgeps;           /**< CG SENSE convergence criterium  */
 		double              m_cgmaxit;         /**< Maximum number of CG iterations */
 		
-		int*                m_N;
-		int*                m_n;
-		int                 m_M;
-		int                 m_dim;
+		int*                m_N;               /**< Size of image matrix.           */
+		int*                m_FOV;               /**< Size of image matrix.           */
+		int*                m_n;               /**< Oversampling                    */ 
+		int                 m_M;               /**< Measurement points              */
+		int                 m_dim;             /**< Dimensions of image space (2D/3D) */
 
-		double*             m_ftw;
-		double*             m_ftk;
+		double*             m_ftw;             /**< Fourier weights, Jacobian determinant, Density compensation */
+		double*             m_ftk;             /**< K-space points */
 		
-		double*             kmax;
+		double*             kmax;              /**< Maximum k-space vector          */
 		
 	};
 	

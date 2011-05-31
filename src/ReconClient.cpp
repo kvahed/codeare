@@ -156,14 +156,14 @@ ReconClient::Process  (const char* name)  {
     result = m_rrsi->Process(name);
     
     // Get data back from remote interface
-    if (result == OK) {
+    //if (result == OK) {
         m_raw     = m_rrsi->raw();
         m_rhelper = m_rrsi->rhelper();
         m_helper  = m_rrsi->helper();
         m_kspace  = m_rrsi->kspace();
         m_pixel   = m_rrsi->pixel();
 		SetConfig (m_rrsi->config());
-    }
+		//}
 
     return result;
     

@@ -14,6 +14,12 @@ RRSModule::error_code
 CGSENSE::Init() {
 	
 	RRSModule::error_code error = OK; 
+	m_testcase = 0;
+
+	// Verbosity ----------------------------
+
+	Attribute ("testcase", &m_testcase);
+	// --------------------------------------
 
 	// Verbosity ----------------------------
 
@@ -23,14 +29,17 @@ CGSENSE::Init() {
 	// Dimensions ---------------------------
 	Attribute("dim",     &m_dim);
 
-	m_N = new int[m_dim];
-	m_n = new int[m_dim];
+	m_N   = new int[m_dim];
+	m_FOV = new int[m_dim];
+	m_n   = new int[m_dim];
 
 	Attribute ("Nx",      &m_N[0]);
 	Attribute ("Ny",      &m_N[1]);
+	Attribute ("FOVx",    &m_FOV[0]);
+	Attribute ("FOVy",    &m_FOV[1]);
 	Attribute ("M",       &m_M);
 
-	m_M = m_helper.Size();
+	m_M   = m_helper.Size();
 	// --------------------------------------
 
 	// iNFFT convergence and break criteria -
@@ -198,7 +207,7 @@ CGSENSE::Process () {
 
 	m_raw = m_raw * 10000;
 
-	m_kspace = m_kspace / (1/(GAMMA/128*m_N[0]));
+	m_kspace = m_kspace / (1/(GAMMA/128*m_FOV[0]*2));
 
 	memcpy (m_ftw, &m_helper[0], m_helper.Size()*sizeof(double));
 	memcpy (m_ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
@@ -220,7 +229,23 @@ CGSENSE::Process () {
 	store.Reset();
 
 	m_rhelper = m_raw;
-	
+
+	Matrix<raw> sigtmp;
+	sigtmp.Dim (COL) = m_M;
+	sigtmp.Dim (LIN) = 8;
+	sigtmp.Reset();
+
+	Matrix<raw> imgtmp;
+	imgtmp.Dim (COL) = m_N[0];
+	imgtmp.Dim (LIN) = m_N[1];
+	imgtmp.Reset();
+
+	if (m_testcase) {
+		E  (&m_rhelper, &m_sens, &m_fplan,                               &sigtmp);
+		m_rhelper = sigtmp;
+		m_raw     = sigtmp;
+	}
+
 	EH (&m_raw, &m_sens, &m_fplan, &m_iplan, m_epsilon, m_maxit, &a);
 	p = a;
 	r = a;
@@ -236,22 +261,12 @@ CGSENSE::Process () {
 
 	std::vector<double> res;
 	
-	Matrix<raw> sigtmp;
-	sigtmp.Dim (COL) = m_M;
-	sigtmp.Dim (LIN) = 8;
-	sigtmp.Reset();
-
-	Matrix<raw> imgtmp;
-	imgtmp.Dim (COL) = m_N[0];
-	imgtmp.Dim (LIN) = m_N[1];
-	imgtmp.Reset();
-
 	float       rn    = 0.0;
 	float       an    = 0.0;
 	float       rnewn = 0.0;
 	raw         rtmp  = raw(0.0,0.0);
 	
-	// CG iterations
+	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.)
 	for (int i = 0; i < m_cgmaxit; i++) {
 
 		rn = r.norm().real();
