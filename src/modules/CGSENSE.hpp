@@ -86,7 +86,6 @@ namespace RRStrategy {
 		double              m_cgmaxit;         /**< Maximum number of CG iterations */
 		
 		int*                m_N;               /**< Size of image matrix.           */
-		int*                m_FOV;               /**< Size of image matrix.           */
 		int*                m_n;               /**< Oversampling                    */ 
 		int                 m_M;               /**< Measurement points              */
 		int                 m_dim;             /**< Dimensions of image space (2D/3D) */
