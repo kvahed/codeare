@@ -30,13 +30,10 @@ CGSENSE::Init() {
 	Attribute("dim",     &m_dim);
 
 	m_N   = new int[m_dim];
-	m_FOV = new int[m_dim];
 	m_n   = new int[m_dim];
 
 	Attribute ("Nx",      &m_N[0]);
 	Attribute ("Ny",      &m_N[1]);
-	Attribute ("FOVx",    &m_FOV[0]);
-	Attribute ("FOVy",    &m_FOV[1]);
 	Attribute ("M",       &m_M);
 
 	m_M   = m_helper.Size();
@@ -205,10 +202,6 @@ CGSENSE::Process () {
 		a.Dim(i) = m_N[i];
 	a.Reset();
 
-	m_raw = m_raw * 10000;
-
-	m_kspace = m_kspace / (1/(GAMMA/128*m_FOV[0]*2));
-
 	memcpy (m_ftw, &m_helper[0], m_helper.Size()*sizeof(double));
 	memcpy (m_ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
 	
@@ -241,7 +234,7 @@ CGSENSE::Process () {
 	imgtmp.Reset();
 
 	if (m_testcase) {
-		E  (&m_rhelper, &m_sens, &m_fplan,                               &sigtmp);
+		E  (&m_rhelper, &m_sens, &m_fplan, &sigtmp);
 		m_rhelper = sigtmp;
 		m_raw     = sigtmp;
 	}
@@ -265,9 +258,10 @@ CGSENSE::Process () {
 	float       an    = 0.0;
 	float       rnewn = 0.0;
 	raw         rtmp  = raw(0.0,0.0);
-	
+
+	int         iters = 0;
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.)
-	for (int i = 0; i < m_cgmaxit; i++) {
+	for (int i = 0; i < m_cgmaxit; i++, iters++) {
 
 		rn = r.norm().real();
 		an = a.norm().real();
@@ -310,8 +304,11 @@ CGSENSE::Process () {
 
 	}
 
-	if (m_verbose == 1)
-		store.dump("share/cgsense/test.h5");
+	if (m_verbose == 1) {
+		m_raw.Dim(2) = iters;
+		m_raw.Reset();
+		memcpy (&m_raw[0], &store[0], m_raw.Size() * sizeof(double));
+	}
 
 	runtime = clock() - runtime;
 	printf ("Processing CG-SENSE took: %.4f seconds.\n", runtime / 1000000.0);
