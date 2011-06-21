@@ -18,6 +18,8 @@ inline int omp_get_num_threads() { return 1;}
 #define LA 16807
 #define LR 2836
 #define LQ 127773
+#define NTHREADS 8;
+
 
 long idum;
 
@@ -95,7 +97,7 @@ CGSENSE::Init() {
 
 	// Initialise FT plans ------------------
 	
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 8; i++)
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 	// --------------------------------------
 
@@ -138,6 +140,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
 	{
 		
 		int tid      = omp_get_thread_num();
+		omp_set_num_threads(8);
 		
 #pragma omp for
 		for (int j = 0; j < ncoils; j++) {
@@ -208,8 +211,7 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 	{
 		
 		int tid      = omp_get_thread_num();
-		int nthreads = omp_get_num_threads();
-		int chunk    = 1; //chunk-size for loop splitting
+		omp_set_num_threads(8);
 		
 #pragma omp for
 		for (int j = 0; j < ncoils; j++) {
@@ -327,7 +329,7 @@ CGSENSE::Process () {
 	memcpy (m_ftw, &m_helper[0], m_helper.Size()*sizeof(double));
 	memcpy (m_ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 8; i++) {
 		nfft::kspace  (&m_fplan[i],              m_ftk);
 		nfft::weights (&m_fplan[i], &m_iplan[i], m_ftw);
 	}
