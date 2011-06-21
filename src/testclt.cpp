@@ -76,11 +76,11 @@ bool cgsensetest (ReconClient* rc) {
 	Matrix<double> kspace;
 	Matrix<raw>    sensitivities;
 	
-	std::string    cf  = base + std::string(config);
+	std::string    cf  = std::string (base + std::string(config));
 
-	std::string    df  = base + std::string(data);
-	std::string    odf = base + std::string("/images.h5");
-	std::string    opf = base + std::string("/pulses.h5");
+	std::string    df  = std::string (base + std::string(data));
+	std::string    odf = std::string (base + std::string("/images.h5"));
+	std::string    opf = std::string (base + std::string("/pulses.h5"));
 
 	rc->ReadConfig  (cf.c_str());
 	
