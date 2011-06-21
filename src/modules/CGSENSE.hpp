@@ -68,32 +68,32 @@ namespace RRStrategy {
 		
 	private:
 		
-		int                 m_iter;            /**< Maximum number of NuFFT solver iterations */
-		int                 m_verbose;         /**< Verbose should give back the reconstruction series? */
-		
-		int                 m_testcase;        /**< Test case. Generate forward data first. */
+		int                  m_iter;            /**< Maximum number of NuFFT solver iterations */
+		int                  m_verbose;         /**< Verbose should give back the reconstruction series? */
+		double               m_noise;           /**< Add noise? */
+		int                  m_testcase;        /**< Test case. Generate forward data first. */
 
-		Matrix < raw >      m_sens;            /**< Sensitivity maps                */
-		Matrix < raw >      m_measured;        /**< Measured data                   */
-		Matrix < double >   m_weights;         /**< K-space weights                 */
+		Matrix < raw >       m_sens;            /**< Sensitivity maps                */
+		Matrix < raw >       m_measured;        /**< Measured data                   */
+		Matrix < double >    m_weights;         /**< K-space weights                 */
 		
-		nfft_plan           m_fplan;           /**< NuFFT plan                      */
-		solver_plan_complex m_iplan;           /**< iNuFFT plan                     */
+		nfft_plan           m_fplan[4];           /**< NuFFT plan                      */
+		solver_plan_complex m_iplan[4];           /**< iNuFFT plan                     */
 		
-		double              m_epsilon;         /**< NuFFT convergence criterium     */
-		double              m_maxit;           /**< Maximum number of NuFFT solver iterations */
-		double              m_cgeps;           /**< CG SENSE convergence criterium  */
-		double              m_cgmaxit;         /**< Maximum number of CG iterations */
+		double               m_epsilon;         /**< NuFFT convergence criterium     */
+		double               m_maxit;           /**< Maximum number of NuFFT solver iterations */
+		double               m_cgeps;           /**< CG SENSE convergence criterium  */
+		double               m_cgmaxit;         /**< Maximum number of CG iterations */
 		
-		int*                m_N;               /**< Size of image matrix.           */
-		int*                m_n;               /**< Oversampling                    */ 
-		int                 m_M;               /**< Measurement points              */
-		int                 m_dim;             /**< Dimensions of image space (2D/3D) */
+		int*                 m_N;               /**< Size of image matrix.           */
+		int*                 m_n;               /**< Oversampling                    */ 
+		int                  m_M;               /**< Measurement points              */
+		int                  m_dim;             /**< Dimensions of image space (2D/3D) */
 
-		double*             m_ftw;             /**< Fourier weights, Jacobian determinant, Density compensation */
-		double*             m_ftk;             /**< K-space points */
+		double*              m_ftw;             /**< Fourier weights, Jacobian determinant, Density compensation */
+		double*              m_ftk;             /**< K-space points */
 		
-		double*             kmax;              /**< Maximum k-space vector          */
+		double*              kmax;              /**< Maximum k-space vector          */
 		
 	};
 	

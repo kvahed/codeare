@@ -5,13 +5,14 @@
 #include "nfft3util.h"
 #include "nfft3.h"
 
+#define VERBOSE
 int init   (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_complex* inp, double epsilon) {
 	
 	int      i, j, k, l;                            /* Some counters       */
 	unsigned infft_flags = CGNR | PRECOMPUTE_DAMP;  /* flags for the infft */
-	
+
 #ifdef VERBOSE
-	printf ("Initialising nfftplan with d:%i, Nx:%i, Ny:%i, M:%i, nx:%i, ny:%i\n", d, N[0], N[1], M, n[0], n[1]);
+	printf ("Initialising nfftplan with d:%i, Nx:%i, Ny:%i, Nz:%i, M:%i, nx:%i, ny:%i, nz:%i\n", d, N[0], N[1], N[2], M, n[0], n[1], n[2]);
 #endif
 	
 	nfft_init_guru (fnp, d, N, M, n, m,
