@@ -19,7 +19,7 @@ AC_PROG_LIBTOOL
 
 # Set programming language
 AC_LANG([C++])
-#AC_OPENMP
+AC_OPENMP
 
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
