@@ -9,6 +9,7 @@ inline int omp_get_num_threads() { return 1;}
 #endif
 
 #include <vector>
+#include <cycle.h>
 
 #define M 714025
 #define IA 1366
@@ -245,15 +246,8 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 		}
 	}
 	
-	clock_t runtime = clock();
-	char   uid[16];
-	sprintf (uid, "%ld", runtime);
-	
-	out->dump    (uid);
-
 	// Free RAM
 	free (ftout);
-	//free (ftin);
 
 	return OK;
 	
@@ -313,7 +307,7 @@ RRSModule::error_code
 CGSENSE::Process () {
 
 	RRSModule::error_code error = OK;
-	static clock_t runtime = clock();
+
 
 	Matrix<raw> a, p, q, r, r_new;
 
@@ -367,6 +361,8 @@ CGSENSE::Process () {
 		m_rhelper = sigtmp;
 		m_raw     = sigtmp;
 	}
+
+	ticks cgstart = getticks();
 
 	EH (&m_raw, &m_sens, &m_fplan[0], &m_iplan[0], m_epsilon, m_maxit, &a, m_dim);
 	p = a;
@@ -424,14 +420,13 @@ CGSENSE::Process () {
 
 	}
 
+	printf ("Processing CG-SENSE took: %.4f seconds.\n", elapsed(cgstart,getticks()));
+
 	if (m_verbose == 1) {
 		m_raw.Dim(2) = iters;
 		m_raw.Reset();
 		memcpy (&m_raw[0], &store[0], m_raw.Size() * sizeof(double));
 	}
-
-	runtime = clock() - runtime;
-	printf ("Processing CG-SENSE took: %.4f seconds.\n", runtime / 1000000.0);
 
 	return error;
 
