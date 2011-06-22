@@ -18,8 +18,6 @@ inline int omp_get_num_threads() { return 1;}
 #define LA 16807
 #define LR 2836
 #define LQ 127773
-#define NTHREADS 8;
-
 
 long idum;
 
@@ -64,6 +62,7 @@ CGSENSE::Init() {
 	// --------------------------------------
 
 	// Dimensions ---------------------------
+
 	Attribute("dim",       &m_dim);
 
 	for (int i = 0; i < m_dim; i++)
@@ -73,11 +72,13 @@ CGSENSE::Init() {
 	// --------------------------------------
 
 	// iNFFT convergence and break criteria -
+
 	Attribute ("maxit",   &m_maxit);
 	Attribute ("epsilon", &m_epsilon);
 	// --------------------------------------
 
 	// CG convergence and break criteria
+
 	Attribute ("cgeps",   &m_cgeps);
 	Attribute ("cgmaxit", &m_cgmaxit);
 	// --------------------------------------
@@ -92,16 +93,16 @@ CGSENSE::Init() {
 
 	for (int i = 0; i < m_dim; i++)
 		m_n[i] = ceil (m_N[i]*alpha);
-
 	// --------------------------------------
 
 	// Initialise FT plans ------------------
 	
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NTHREADS; i++)
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 	// --------------------------------------
 
 	// Allocate RAM for fix size memories (weights and k-space)
+
 	m_ftk      = (double*) malloc (    m_dim  * m_M    * sizeof(double)); 
 	m_ftw      = (double*) malloc (             m_M    * sizeof(double)); 
 	// --------------------------------------
@@ -140,7 +141,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
 	{
 		
 		int tid      = omp_get_thread_num();
-		omp_set_num_threads(8);
+		omp_set_num_threads(NTHREADS);
 		
 #pragma omp for
 		for (int j = 0; j < ncoils; j++) {
@@ -203,15 +204,15 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 	int        nsamples = in->Size() / ncoils;
 	int        imgsize  = out->Size();
 
-	// Loop over coils, Inverse FT every signal in *in, 
-	// Sum elementwise mutiplied images with according sensitivity maps 
 	double* ftout = (double*) malloc (2 * ncoils * imgsize  * sizeof(double));
 	
+	// OMP Loop over coils, Inverse FT every signal in *in, 
+	// Sum elementwise mutiplied images with according sensitivity maps 
 #pragma omp parallel default (shared) 
 	{
 		
 		int tid      = omp_get_thread_num();
-		omp_set_num_threads(8);
+		omp_set_num_threads(NTHREADS);
 		
 #pragma omp for
 		for (int j = 0; j < ncoils; j++) {
@@ -329,7 +330,7 @@ CGSENSE::Process () {
 	memcpy (m_ftw, &m_helper[0], m_helper.Size()*sizeof(double));
 	memcpy (m_ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < NTHREADS; i++) {
 		nfft::kspace  (&m_fplan[i],              m_ftk);
 		nfft::weights (&m_fplan[i], &m_iplan[i], m_ftw);
 	}

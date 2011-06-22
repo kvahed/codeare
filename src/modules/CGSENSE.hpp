@@ -30,6 +30,8 @@ typedef std::complex<float> raw;
 
 using namespace RRServer;
 
+static const int NTHREADS = 8;
+
 namespace RRStrategy {
 	
 	/**
@@ -76,8 +78,8 @@ namespace RRStrategy {
 		Matrix < raw >       m_measured;        /**< Measured data                   */
 		Matrix < double >    m_weights;         /**< K-space weights                 */
 		
-		nfft_plan           m_fplan[8];           /**< NuFFT plan                      */
-		solver_plan_complex m_iplan[8];           /**< iNuFFT plan                     */
+		nfft_plan           m_fplan[NTHREADS];           /**< NuFFT plan                      */
+		solver_plan_complex m_iplan[NTHREADS];           /**< iNuFFT plan                     */
 		
 		double               m_epsilon;         /**< NuFFT convergence criterium     */
 		double               m_maxit;           /**< Maximum number of NuFFT solver iterations */
