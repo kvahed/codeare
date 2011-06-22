@@ -213,8 +213,8 @@ double clockrate () {
 	
 	std::string fname = "/proc/cpuinfo";
 	
-	if ( ( cpuInfo = fopen(fname.c_str(), "rb") == NULL ) )
-		printf("Error! Cannot open %s", fname.c_str());
+	cpuInfo = fopen (fname.c_str(), "rb");
+		//		printf("Error! Cannot open %s", fname.c_str());
 	
 	else 
 		while (!feof(cpuInfo)) {
