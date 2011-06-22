@@ -207,25 +207,21 @@ double clockrate () {
 
 #else
 
-	struct CpuInfo info = {"", 0, "", 0.0, ""};
-	
-	FILE *cpuInfo;
-	
-	std::string fname = "/proc/cpuinfo";
-	
-	cpuInfo = fopen (fname.c_str(), "rb");
-		//		printf("Error! Cannot open %s", fname.c_str());
-	
-	else 
-		while (!feof(cpuInfo)) {
+	FILE* scf;
+	std::string fname = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq";
+    int   freq = 1;
 
-			fread(&info, sizeof(struct CpuInfo), 1, cpuInfo);
-			if(info.family !=0) {
-				printf("%s\n%d\n%s\n%.2f\n%s\n", info.vendor_id, info.family, info.model, info.freq, info.cache);
-			}
-		}
+    scf = fopen(fname.c_str(), "rb");
 
-	return (double)info.freq;
+	if (scf != NULL) {
+		int read = fscanf(scf,"%i",&freq);
+		#ifdef VERBOSE
+		printf ("Read %i from %s\n", read, fname.c_str());
+		#endif
+		fclose(scf);
+	}
+
+	return 1000.0*freq;
 
 #endif
 }

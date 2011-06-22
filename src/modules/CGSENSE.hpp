@@ -30,7 +30,7 @@ typedef std::complex<float> raw;
 
 using namespace RRServer;
 
-static const int NTHREADS = 8;
+static const int NTHREADS = 16;
 
 namespace RRStrategy {
 	
