@@ -11,6 +11,10 @@ inline int omp_get_num_threads() { return 1;}
 #include <vector>
 #include <cycle.h>
 
+#include <stdint.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
 #define M 714025
 #define IA 1366
 #define IC 150889
@@ -182,6 +186,49 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
 	
 }
 
+struct CpuInfo {
+	char vendor_id[50];
+	int family;
+	char model[50];
+	float freq;
+	char cache[20];
+};
+
+double clockrate () {
+#if defined(HAVE_MACH_ABSOLUTE_TIME)
+
+    uint64_t freq = 0;
+    size_t   size = sizeof(freq);
+	
+    if (sysctlbyname("hw.tbfrequency", &freq, &size, NULL, 0) < 0)
+		perror("sysctl");
+	
+    return freq;
+
+#else
+
+	struct CpuInfo info = {"", 0, "", 0.0, ""};
+	
+	FILE *cpuInfo;
+	
+	std::string fname = "/proc/cpuinfo";
+	
+	if ( ( cpuInfo = fopen(fname.c_str(), "rb") == NULL ) )
+		printf("Error! Cannot open %s", fname.c_str());
+	
+	else 
+		while (!feof(cpuInfo)) {
+
+			fread(&info, sizeof(struct CpuInfo), 1, cpuInfo);
+			if(info.family !=0) {
+				printf("%s\n%d\n%s\n%.2f\n%s\n", info.vendor_id, info.family, info.model, info.freq, info.cache);
+			}
+		}
+
+	return (double)info.freq;
+
+#endif
+}
 
 /**
  * @brief               Compute right hand side (i.e. Multiply E^H, Hermitian counterpart to E, with k-space data)
@@ -420,7 +467,7 @@ CGSENSE::Process () {
 
 	}
 
-	printf ("Processing CG-SENSE took: %.4f seconds.\n", elapsed(cgstart,getticks()));
+	printf ("Processing CG-SENSE took: %.4f seconds.\n", elapsed(getticks(), cgstart) / clockrate());
 
 	if (m_verbose == 1) {
 		m_raw.Dim(2) = iters;

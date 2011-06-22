@@ -21,6 +21,12 @@ AC_PROG_LIBTOOL
 AC_LANG([C++])
 AC_OPENMP
 
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_TIME
+AC_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
 AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
@@ -35,13 +41,15 @@ AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/COR
 AC_CHECK_HEADERS([nfft3.h],          [], [AC_MSG_RESULT([cannot find nfft3.h, NuFFT/CGSENSE unavailable!])])
 AC_CHECK_HEADERS([nfft3util.h],      [], [AC_MSG_RESULT([cannot find nfft3util.h, NuFFT/CGSENSE unavailable!])])
 AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
+AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+
 
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read],        [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
 AC_CHECK_LIB([omniDynamic4], [main],        [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
 AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libz, bailing out])])
-AC_CHECK_LIB([fftw],         [fftw_create_plan],     [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+AC_CHECK_LIB([fftw],         [fftw_create_plan], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 case "$host" in
   *darwin*)
 #AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libsz, bailing out])])
@@ -49,6 +57,22 @@ case "$host" in
 esac
 AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [], [AC_MSG_ERROR([cannot find libnfft3, bailing out])])
 # Checks for C++ libraries with name spaces
+
+AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+])
+AC_CHECK_FUNCS([gethrtime read_real_time time_base_to_time clock_gettime mach_absolute_time])
+dnl Cray UNICOS _rtc() (real-time clock) intrinsic
+AC_MSG_CHECKING([for _rtc intrinsic])
+rtc_ok=yes
+AC_TRY_LINK([
+#ifdef HAVE_INTRINSICS_H
+#include <intrinsics.h>
+#endif
+], [_rtc()], [AC_DEFINE(HAVE__RTC,1,[Define if you have the UNICOS _rtc() intrinsic.])], [rtc_ok=no])
+AC_MSG_RESULT($rtc_ok)
 
 AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
 OLD_LIBS=$LIBS
@@ -215,11 +239,6 @@ AC_SUBST(LAPACK)
 #AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_INLINE
-AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile src/modules/Makefile src/Loader.hpp])
