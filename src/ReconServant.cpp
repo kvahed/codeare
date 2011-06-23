@@ -50,7 +50,7 @@ error_code
 ReconServant::Process  (const char* name)       {
 
 	error_code e = OK;
-
+	
 	std::cout << "Setting incoming data ... " << std::endl;
 
 	ReconContext* context = new ReconContext(name);

@@ -5,7 +5,6 @@
 #include "nfft3util.h"
 #include "nfft3.h"
 
-#define VERBOSE
 int init   (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_complex* inp, double epsilon) {
 	
 	int      i, j, k, l;                            /* Some counters       */

@@ -153,6 +153,7 @@ class Configurable {
 		m_config_doc->Parse(cstr);
 		m_config = m_config_doc->RootElement();
 
+
 	}
 
 

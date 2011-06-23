@@ -96,6 +96,6 @@ CloseModule       (void* handle) {
 
     #endif
 
-};
+}
 
 #endif // __LOADER_H__

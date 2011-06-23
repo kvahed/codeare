@@ -45,7 +45,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		CGSENSE  ();
+		CGSENSE () {};
 		
 		/**
 		 * @brief Default destructor
