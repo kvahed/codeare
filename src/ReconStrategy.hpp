@@ -24,7 +24,6 @@
 #include "Matrix.hpp"
 #include "Configurable.hpp"
 
-
 #include "DllExport.h"
 
 #ifdef __WIN32__ 
@@ -33,10 +32,13 @@
     #include "RRSModule.hh"
 #endif
 
-
 #include <cstdlib>
 #include <complex>
+#include <stdint.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
 
+#include "cycle.h"            // FFTW cycle implementation
 
 using namespace RRSModule;
 
@@ -82,6 +84,50 @@ public:
 	Init     () {};
 	
 	/**
+	 * @brief  CPU clock rate
+	 *
+	 * @return clock rate
+	 */
+	
+	double 
+	ClockRate () {
+
+#if defined(HAVE_MACH_ABSOLUTE_TIME)
+
+		// OSX
+
+		uint64_t freq = 0;
+		size_t   size = sizeof(freq);
+		
+		if (sysctlbyname("hw.tbfrequency", &freq, &size, NULL, 0) < 0)
+			perror("sysctl");
+		
+		return freq;
+
+#else
+		
+		// LINUX
+
+		FILE* scf;
+		std::string fname = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq";
+		int   freq = 1;
+		
+		scf = fopen(fname.c_str(), "rb");
+		
+		if (scf != NULL) {
+			int read = fscanf(scf,"%i",&freq);
+#ifdef VERBOSE
+			printf ("Read %i from %s\n", read, fname.c_str());
+#endif
+			fclose(scf);
+		}
+		
+		return 1000.0 * freq;
+		
+#endif
+	}
+
+	/**
 	 * @brief Get data from recon
 	 */
 	void 
@@ -105,7 +151,7 @@ public:
 	 */
 	void 
 	SetRaw           (const raw_data* raw)   {
-
+		
 		for (int i = 0; i < INVALID_DIM; i++)
 			m_raw.Dim(i) = raw->dims[i];
 		
@@ -114,7 +160,7 @@ public:
 		for (int j = 0; j < m_raw.Size(); j++)
 			m_raw[j] =  std::complex<float> (raw->dreal[j], raw->dimag[j]);
 		
-	};
+	}
 	
 	/**
 	 * @brief Get data from recon
