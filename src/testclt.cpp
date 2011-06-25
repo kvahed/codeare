@@ -56,7 +56,9 @@ int main (int argc, char** argv) {
 
 		if (strcmp (test, "NuFFT")   == 0)
 			nuffttest (&client);
-		if (strcmp (test, "CGSENSE") == 0)
+		else if (strcmp (test, "NuFFT_OMP")   == 0)
+			nuffttest (&client);
+		else if (strcmp (test, "CGSENSE") == 0)
 			cgsensetest (&client);
 		else
 			internaltest (&client);
@@ -119,7 +121,7 @@ bool nuffttest (ReconClient* rc) {
 	rc->SetHelper (weights);
 	rc->SetKSpace (kspace);
 	
-	rc->Process ("NuFFT");
+	rc->Process (test);
 	
 	rc->GetRaw(data);
 	data.dump("share/nufft/recon.h5");

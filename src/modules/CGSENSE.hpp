@@ -51,7 +51,7 @@ namespace RRStrategy {
 		 * @brief Default destructor
 		 */
 		virtual 
-		~CGSENSE () {};
+		~CGSENSE ();
 		
 		/**
 		 * @brief Process conjugate gradient SENSE
@@ -82,7 +82,7 @@ namespace RRStrategy {
 		solver_plan_complex m_iplan[NTHREADS];           /**< iNuFFT plan                     */
 		
 		double               m_epsilon;         /**< NuFFT convergence criterium     */
-		double               m_maxit;           /**< Maximum number of NuFFT solver iterations */
+		int                  m_maxit;           /**< Maximum number of NuFFT solver iterations */
 		double               m_cgeps;           /**< CG SENSE convergence criterium  */
 		double               m_cgmaxit;         /**< Maximum number of CG iterations */
 		
