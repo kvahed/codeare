@@ -76,55 +76,58 @@ bool cgsensetest (ReconClient* rc) {
 	Matrix<raw>    rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
-	Matrix<raw>    sensitivities;
+	Matrix<raw>    sens;
 	
 	std::string    cf  = std::string (base + std::string(config));
-
 	std::string    df  = std::string (base + std::string(data));
 	std::string    odf = std::string (base + std::string("/images.h5"));
 	std::string    opf = std::string (base + std::string("/pulses.h5"));
 
-	rc->ReadConfig  (cf.c_str());
+	weights.read   (df, "weights");
+	rawdata.read   (df, "data");
+	kspace.read    (df, "kspace");
+	sens.read      (df, "sensitivities");
 	
-	weights.read       (df, "weights");
-	rawdata.read       (df, "data");
-	kspace.read        (df, "kspace");
-	sensitivities.read (df, "sensitivities");
+	rc->ReadConfig (cf.c_str());
+	rc->SetRaw     (rawdata);
+	rc->SetRHelper (sens);
+	rc->SetHelper  (weights);
+	rc->SetKSpace  (kspace);
 	
-	rc->SetRaw (rawdata);
-	rc->SetRHelper (sensitivities);
-	rc->SetHelper (weights);
-	rc->SetKSpace (kspace);
+	rc->Process    (test);
 	
-	rc->Process ("CGSENSE");
+	rc->GetRaw     (rawdata);
+	rc->GetRHelper (sens);
 	
-	rc->GetRaw(rawdata);
-	rc->GetRHelper(sensitivities);
-	
-	rawdata.dump(odf.c_str());
-	sensitivities.dump(opf.c_str());
+	rawdata.dump   (odf.c_str());
+	sens.dump      (opf.c_str());
 	
 }
 
 bool nuffttest (ReconClient* rc) {
 
-	Matrix<raw>    data;
+	Matrix<raw>    rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
 	
-	weights.read ("share/nufft/data.h5", "weights");
-	data.read ("share/nufft/data.h5", "data");
-	kspace.read ("share/nufft/data.h5", "8_shot_spiral");
+	std::string    cf  = std::string (base + std::string(config));
+	std::string    df  = std::string (base + std::string(data));
+	std::string    odf = std::string (base + std::string("/images.h5"));
+
+	weights.read   (df, "weights");
+	rawdata.read   (df, "data");
+	kspace.read    (df, "8_shot_spiral");
+
+	rc->ReadConfig (cf.c_str());
+	rc->SetRaw     (rawdata);
+	rc->SetHelper  (weights);
+	rc->SetKSpace  (kspace);
 	
-	rc->ReadConfig ("share/nufft/config.xml");
-	rc->SetRaw (data);
-	rc->SetHelper (weights);
-	rc->SetKSpace (kspace);
+	rc->Process    (test);
 	
-	rc->Process (test);
-	
-	rc->GetRaw(data);
-	data.dump("share/nufft/recon.h5");
+	rc->GetRaw     (rawdata);
+
+	rawdata.dump   (odf.c_str());
 	
 }
 
