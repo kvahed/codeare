@@ -62,7 +62,7 @@ NuFFT::Process () {
 	// Some variables
 	RRSModule::error_code error = OK;
 
-	printf ("Processing NuFFT_OMP ...\n");
+	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
 
 	// Copy data from incoming matrix to the nufft input array
