@@ -61,7 +61,9 @@ NuFFT::Process () {
 
 	// Some variables
 	RRSModule::error_code error = OK;
-	static clock_t runtime = clock();
+
+	printf ("Processing NuFFT_OMP ...\n");
+	ticks start = getticks();
 
 	// Copy data from incoming matrix to the nufft input array
 	for (int i = 0; i < m_raw.Size(); i++) {
@@ -92,9 +94,8 @@ NuFFT::Process () {
 	for (int i = 0; i < m_raw.Size(); i++)
 		m_raw[i] = raw(m_ftout[2*i], m_ftout[2*i+1]); 
 
-	runtime = clock() - runtime;
-	printf ("Processing NuFFT took: %.4f seconds.\n", runtime / 1000000.0);
-
+	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / ClockRate());
+	
 	return error;
 
 }

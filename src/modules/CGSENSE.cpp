@@ -10,6 +10,20 @@ std::string sides[3] = {"Nx", "Ny", "Nz"};
 using namespace RRStrategy;
 
 
+CGSENSE::~CGSENSE () {
+
+	free (m_ftw);
+	free (m_ftk);
+
+	for (int i = 0; i < NTHREADS; i++)
+		nfft::finalize (&m_fplan[i], &m_iplan[i]);
+
+	delete [] m_N;
+	delete [] m_n;
+
+};
+
+
 RRSModule::error_code 
 CGSENSE::Init() {
 

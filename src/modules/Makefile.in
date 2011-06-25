@@ -114,6 +114,12 @@ NuFFT_la_OBJECTS = $(am_NuFFT_la_OBJECTS)
 NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
+NuFFT_OMP_la_LIBADD =
+am_NuFFT_OMP_la_OBJECTS = $(am__objects_1) NuFFT_OMP.lo nfftstub.lo
+NuFFT_OMP_la_OBJECTS = $(am_NuFFT_OMP_la_OBJECTS)
+NuFFT_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(NuFFT_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
 SystemCmd_la_LIBADD =
 am_SystemCmd_la_OBJECTS = $(am__objects_1) SystemCmd.lo
 SystemCmd_la_OBJECTS = $(am_SystemCmd_la_OBJECTS)
@@ -145,11 +151,13 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
 	$(DumpToFile_la_SOURCES) $(GenericRegrid_la_SOURCES) \
 	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES) $(SystemCmd_la_SOURCES)
+	$(NuFFT_la_SOURCES) $(NuFFT_OMP_la_SOURCES) \
+	$(SystemCmd_la_SOURCES)
 DIST_SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
 	$(DumpToFile_la_SOURCES) $(GenericRegrid_la_SOURCES) \
 	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES) $(SystemCmd_la_SOURCES)
+	$(NuFFT_la_SOURCES) $(NuFFT_OMP_la_SOURCES) \
+	$(SystemCmd_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -276,7 +284,7 @@ COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp ..
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la CGSENSE.la NuFFT.la
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la CGSENSE.la NuFFT.la NuFFT_OMP.la
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module
@@ -290,6 +298,8 @@ MedianFilter_OMP_la_SOURCES = $(COMMON) MedianFilter_OMP.hpp MedianFilter_OMP.cp
 MedianFilter_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 NuFFT_la_SOURCES = $(COMMON) NuFFT.hpp NuFFT.cpp nfftstub.h nfftstub.c
 NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
+NuFFT_OMP_la_SOURCES = $(COMMON) NuFFT_OMP.hpp NuFFT_OMP.cpp nfftstub.h nfftstub.c
+NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.hpp DumpToFile.cpp
 DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(HDF5)
 CGSENSE_la_SOURCES = $(COMMON) CGSENSE.hpp CGSENSE.cpp nfftstub.h nfftstub.c Noise.hpp SEM.hpp
@@ -378,6 +388,8 @@ MedianFilter_OMP.la: $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_DEPEND
 	$(MedianFilter_OMP_la_LINK) -rpath $(libdir) $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_LIBADD) $(LIBS)
 NuFFT.la: $(NuFFT_la_OBJECTS) $(NuFFT_la_DEPENDENCIES) 
 	$(NuFFT_la_LINK) -rpath $(libdir) $(NuFFT_la_OBJECTS) $(NuFFT_la_LIBADD) $(LIBS)
+NuFFT_OMP.la: $(NuFFT_OMP_la_OBJECTS) $(NuFFT_OMP_la_DEPENDENCIES) 
+	$(NuFFT_OMP_la_LINK) -rpath $(libdir) $(NuFFT_OMP_la_OBJECTS) $(NuFFT_OMP_la_LIBADD) $(LIBS)
 SystemCmd.la: $(SystemCmd_la_OBJECTS) $(SystemCmd_la_DEPENDENCIES) 
 	$(SystemCmd_la_LINK) -rpath $(libdir) $(SystemCmd_la_OBJECTS) $(SystemCmd_la_LIBADD) $(LIBS)
 
@@ -394,6 +406,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LapackTests.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT_OMP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nfftstub.Plo@am__quote@
