@@ -21,7 +21,7 @@ CGSENSE::~CGSENSE () {
 	delete [] m_N;
 	delete [] m_n;
 
-};
+}
 
 
 RRSModule::error_code 

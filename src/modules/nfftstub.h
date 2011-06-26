@@ -36,7 +36,7 @@ namespace nfft {
 		 * @param  dk        Jacobian determinants of k(t). (i.e. det(D_f(k))
 		 * @param  out       FTed data
 		 */
-		extern const int
+		extern int
 		ift                  (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int maxiter = 3, double epsilon = 3e-7) ;
 		
 		/**
@@ -46,16 +46,16 @@ namespace nfft {
 		 * @param  k         K-space trajectory
 		 * @param  out       FTed data 
 		 */
-		extern const int
+		extern int
 		ft                   (nfft_plan* np, double* in, double* out);
 
-		extern const int
+		extern int
 		weights              (nfft_plan* np, solver_plan_complex* spc, double* w);
 
-		extern const int
+		extern int
 		kspace               (nfft_plan* np, double* k);
 
-		extern const int
+		extern int
 		finalize             (nfft_plan* np, solver_plan_complex* spc);
 
 #ifdef __cplusplus
