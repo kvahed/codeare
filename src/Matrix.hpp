@@ -336,6 +336,19 @@ public:
      *
      * @return          Value at _M[pos]
      */
+    inline T*            
+    data                ()  const {
+        return _M;
+    }
+
+    
+    /**
+     * @brief           Get element at position 
+     *  
+     * @param  pos      Position
+     *
+     * @return          Value at _M[pos]
+     */
     inline T            
     at                  (int pos)  const {
         return _M[pos];

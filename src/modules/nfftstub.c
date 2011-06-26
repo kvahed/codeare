@@ -29,7 +29,8 @@ int init   (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_com
 	
 }
 
-int  weights (nfft_plan* np, solver_plan_complex* spc, double* w) {
+
+int weights (nfft_plan* np, solver_plan_complex* spc, double* w) {
 
 	int j, k, z;
 
