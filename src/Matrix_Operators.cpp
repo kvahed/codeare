@@ -3,7 +3,8 @@ Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
     
     int i;
 
-	memcpy (_dim, M.Dim(), i * sizeof(int));
+	for (int i = 0; i < INVALID_DIM; i++)
+		_dim[i] = M.Dim()[i];
     
     if (nb_alloc) {
         delete[](_M);
@@ -13,7 +14,8 @@ Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
     _M = new T[Size()]();
     nb_alloc = 1;
 
-	memcpy (_M, M.data(), Size() * sizeof (T));
+	for (int i = 0; i < Size(); i++)
+		_M[i] = M[i];
 
     return *this;
 
@@ -25,7 +27,8 @@ Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
     
     int i;
 
-	memcpy (_dim, M.Dim(), i * sizeof(int));
+	for (int i = 0; i < INVALID_DIM; i++)
+		_dim[i] = M.Dim()[i];
     
     if (nb_alloc) {
         delete[](_M);
@@ -35,7 +38,8 @@ Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
     _M = new T[Size()]();
     nb_alloc = 1;
 
-	memcpy (_M, M.data(), Size() * sizeof (T));
+	for (int i = 0; i < Size(); i++)
+		_M[i] = M[i];
 
     return *this;
 
