@@ -9,7 +9,8 @@ COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp ..
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la CGSENSE.la NuFFT.la NuFFT_OMP.la
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la CGSENSE.la NuFFT_OMP.la 
+#NuFFT.la 
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module
@@ -24,8 +25,8 @@ GenericRegrid_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 MedianFilter_OMP_la_SOURCES = $(COMMON) MedianFilter_OMP.hpp MedianFilter_OMP.cpp
 MedianFilter_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 
-NuFFT_la_SOURCES = $(COMMON) NuFFT.hpp NuFFT.cpp nfftstub.h nfftstub.c
-NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
+#NuFFT_la_SOURCES = $(COMMON) NuFFT.hpp NuFFT.cpp nfftstub.h nfftstub.c
+#NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 
 NuFFT_OMP_la_SOURCES = $(COMMON) NuFFT_OMP.hpp NuFFT_OMP.cpp nfftstub.h nfftstub.c OMP.hpp
 NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
