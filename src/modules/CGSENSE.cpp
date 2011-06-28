@@ -12,11 +12,11 @@ using namespace RRStrategy;
 
 CGSENSE::~CGSENSE () {
 
-	free (m_ftw);
-	free (m_ftk);
+	//free (m_ftw);
+	//free (m_ftk);
 
-	for (int i = 0; i < NTHREADS; i++)
-		nfft::finalize (&m_fplan[i], &m_iplan[i]);
+	//for (int i = 0; i < NTHREADS; i++)
+	//	nfft::finalize (&m_fplan[i], &m_iplan[i]);
 
 	delete [] m_N;
 	delete [] m_n;
@@ -40,6 +40,7 @@ CGSENSE::Init() {
 	m_testcase = 0;
 	m_verbose  = 0;
 	m_noise    = 0;
+	m_dim      = 1;
 
 	// Verbosity ----------------------------
 
@@ -72,7 +73,7 @@ CGSENSE::Init() {
 	Attribute ("epsilon", &m_epsilon);
 	// --------------------------------------
 
-	// CG convergence and break criteria
+	// CG convergence and break criteria ----
 
 	Attribute ("cgeps",   &m_cgeps);
 	Attribute ("cgmaxit", &m_cgmaxit);
@@ -80,8 +81,8 @@ CGSENSE::Init() {
 
 	// Oversampling -------------------------
 
-	int      m           = 0;
-	double   alpha       = 0.0;
+	int      m           = 1;
+	double   alpha       = 1.0;
 
 	Attribute ("m",       &m);
 	Attribute ("alpha",   &alpha);
@@ -112,78 +113,88 @@ CGSENSE::Process () {
 
 	RRSModule::error_code error = OK;
 
+	// CG matrices ----------------------------------------------------
 	Matrix<raw> a, p, q, r, r_new;
 
+	// Add white noise? (Only for testing) ----------------------------
 	if (m_noise > 0.0)
 		AddPseudoRandomNoise (&m_raw, (float)m_noise);
 	
-	for (int i = 0; i < INVALID_DIM; i++)
-		a.Dim(i) = 1;
+	// ----------------------------------------------------------------
 	for (int i = 0; i < m_dim      ; i++)
 		a.Dim(i) = m_N[i];
-
 	a.Reset();
 	
+	// Set k-space ----------------------------------------------------
 	memcpy (m_ftw, &m_helper[0], m_helper.Size()*sizeof(double));
-	memcpy (m_ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
+	//memcpy (m_ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
 	
 	for (int i = 0; i < NTHREADS; i++) {
-		nfft::kspace  (&m_fplan[i],              m_ftk);
-		nfft::weights (&m_fplan[i], &m_iplan[i], m_ftw);
+		memcpy (m_fplan[i].x, &m_kspace[0], m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
+		memcpy (m_iplan[i].w, &m_helper[0],                m_fplan[i].M_total * sizeof(double)) ;
+		nfft::weights (&m_fplan[i], &m_iplan[i]);
 	}
 
-	m_sens = m_rhelper;
+	// Copying sensitivities. Will use helper for Pulses --------------
+	m_sens    = m_rhelper;
+	m_rhelper = m_raw;
 
-	Matrix<raw> store;
-	for (int i = 0; i < INVALID_DIM; i++)
-		store.Dim(i) = 1;
+	// Out going images -----------------------------------------------
+	Matrix<raw> istore;
 
 	if (m_verbose == 1) 
 		for (int i = 0; i < m_dim; i++)
-			store.Dim(i) = m_N[i];
+			istore.Dim(i) = m_N[i];
 
-	store.Dim(m_dim) = m_cgmaxit;
-	store.Reset();
+	istore.Dim(m_dim) = m_cgmaxit;
+	istore.Reset();
 
-	m_rhelper = m_raw;
+	// Temporary signal repository ------------------------------------ 
+	Matrix<raw> stmp;
+	stmp.Dim (COL) = m_M;
+	stmp.Dim (LIN) = 8;
+	stmp.Reset();
 
-	Matrix<raw> sigtmp;
-	sigtmp.Dim (COL) = m_M;
-	sigtmp.Dim (LIN) = 8;
-	sigtmp.Reset();
+	// Out going signals ----------------------------------------------
+	Matrix<raw> sstore = stmp;
+	if (m_verbose == 1) 
+		sstore.Dim (CHA) = m_cgmaxit;
+	sstore.Reset();
 
-	Matrix<raw> imgtmp;
-	
+	// Temporary imag repository --------------------------------------
+	Matrix<raw> itmp;
 	for (int i = 0; i < m_dim; i++)
-		imgtmp.Dim (i) = m_N[i];
-
-	imgtmp.Reset();
-
+		itmp.Dim (i) = m_N[i];
+	itmp.Reset();
+	
+	// Create test data (Incoming data is image space) ----------------
 	if (m_testcase) {
-		E  (&m_rhelper, &m_sens, &m_fplan[0], &sigtmp, m_dim);
-		m_rhelper = sigtmp;
-		m_raw     = sigtmp;
+		E  (&m_rhelper, &m_sens, &m_fplan[0], &stmp, m_dim);
+		m_rhelper = stmp;
+		m_raw     = stmp;
 	}
 
+	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
 
+	// First left side action -----------------------------------------
 	EH (&m_raw, &m_sens, &m_fplan[0], &m_iplan[0], m_epsilon, m_maxit, &a, m_dim);
 	p = a;
 	r = a;
 	q = a;
 
-	// Out going image
+	// Out going image ------------------------------------------------
 	// Resize m_raw for output
 	for (int i = 0; i < INVALID_DIM; i++)
 		m_raw.Dim(i) = 1;
-
 	for (int i = 0; i < m_dim; i++)
 		m_raw.Dim(i) = m_N[i];
 
 	m_raw.Reset();
-
-	std::vector<double> res;
 	
+	// CG residuals storage and helper variables ----------------------
+	std::vector<double> res;
+
 	float       rn    = 0.0;
 	float       an    = 0.0;
 	float       rnewn = 0.0;
@@ -192,45 +203,57 @@ CGSENSE::Process () {
 
 	printf ("Processing CG-SENSE ...\n");
 
-	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.)
+	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 	for (int i = 0; i < m_cgmaxit; i++, iters++) {
 
 		rn = r.norm().real();
 		an = a.norm().real();
-		
+
 		res.push_back(rn/an);
 		
 		printf ("%03i: CG residuum: %.9f\n", i, res.at(i));
+
+		// Convergence ? ----------------------------------------------
 		if (res.at(i) <= m_cgeps)
 			break;
 		
-		E  (&p,      &m_sens, &m_fplan[0],                               &sigtmp, m_dim);
-		EH (&sigtmp, &m_sens, &m_fplan[0], &m_iplan[0], m_epsilon, m_maxit, &q     , m_dim);
+		// CG step ----------------------------------------------------
+		E  (&p,    &m_sens, &m_fplan[0],                                  &stmp, m_dim);
+		EH (&stmp, &m_sens, &m_fplan[0], &m_iplan[0], m_epsilon, m_maxit, &q   , m_dim);
 		
 		rtmp      = (rn / (p.dotc(q)));
-		imgtmp    = p * rtmp;
-		m_raw     = m_raw + imgtmp;
-		sigtmp    = sigtmp * rtmp;
-		m_rhelper = m_rhelper + sigtmp;
-		imgtmp    = q * rtmp;
-		r_new     = r - imgtmp;
+		itmp      = p * rtmp;
+		m_raw     = m_raw + itmp;
+		stmp      = stmp * rtmp;
+		m_rhelper = m_rhelper + stmp;
+		itmp      = q * rtmp;
+		r_new     = r - itmp;
 		rnewn     = r_new.norm().real();
 		rtmp      = rnewn/rn;
-		imgtmp    = p * rtmp;
-		p         = r_new + imgtmp;
+		itmp      = p * rtmp;
+		p         = r_new + itmp;
 		r         = r_new;
 
-		if (m_verbose == 1)
-			memcpy (&store[i*m_raw.Size()], &m_raw[0], m_raw.Size() * sizeof(double));
+		// Verbose out put keeps all intermediate steps ---------------
+		if (m_verbose) {
+			memcpy (&istore[i *     m_raw.Size()],     &m_raw[0],     m_raw.Size() * sizeof(double));
+			memcpy (&sstore[i * m_rhelper.Size()], &m_rhelper[0], m_rhelper.Size() * sizeof(double));
+		}
 
 	}
 
+	// Report timimng -------------------------------------------------
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), cgstart) / ClockRate());
 
-	if (m_verbose == 1) {
-		m_raw.Dim(2) = iters;
+	// Verbose output needs to 
+	if (m_verbose) {
+		m_raw.Dim(m_dim) = iters;
 		m_raw.Reset();
-		memcpy (&m_raw[0], &store[0], m_raw.Size() * sizeof(double));
+		memcpy (    &m_raw[0], &istore[0],     m_raw.Size() * sizeof(double));
+
+		m_rhelper.Dim(CHA) = iters;
+		m_rhelper.Reset();
+		memcpy (&m_rhelper[0], &sstore[0], m_rhelper.Size() * sizeof(double));
 	}
 
 	return error;

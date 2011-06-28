@@ -47,13 +47,10 @@ namespace nfft {
 		 * @param  out       FTed data 
 		 */
 		extern int
-		ft                   (nfft_plan* np, double* in, double* out);
+		ft                   (nfft_plan* np);
 
 		extern int
-		weights              (nfft_plan* np, solver_plan_complex* spc, double* w);
-
-		extern int
-		kspace               (nfft_plan* np, double* k);
+		weights              (nfft_plan* np, solver_plan_complex* spc);
 
 		extern int
 		finalize             (nfft_plan* np, solver_plan_complex* spc);

@@ -30,13 +30,9 @@ int init   (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_com
 }
 
 
-int weights (nfft_plan* np, solver_plan_complex* spc, double* w) {
+int weights (nfft_plan* np, solver_plan_complex* spc) {
 
-	int j, k, z;
-
-	memcpy (spc->w, w, np->M_total * sizeof(double));
-
-	int N = np->N[0];
+	int j, k, z, N = np->N[0];
 
 	if (spc->flags & PRECOMPUTE_DAMP) {
 		if (np->d == 3) {
@@ -55,6 +51,7 @@ int weights (nfft_plan* np, solver_plan_complex* spc, double* w) {
 					    int    j2 = j-N/2;
 						int    k2 = k-N/2;
 						double r  = sqrt(j2*j2+k2*k2);
+						printf ("%i\n", j*N+k);
 						spc->w_hat[j*N+k]       = (r > (double) N/2) ? 0.0 : 1.0;
 				}
 		}
@@ -65,24 +62,17 @@ int weights (nfft_plan* np, solver_plan_complex* spc, double* w) {
 }
 
 
-int  kspace  (nfft_plan* np, double* k) {
+int ft (nfft_plan* np) {
 
-	memcpy (np->x, k, np->d * np->M_total * sizeof(double));
-	return np->d * np->M_total;
-	
-}
-
-
-int ft (nfft_plan* np, double* in, double* out) {
-
-	memcpy (np->f_hat, in, 2 * np->N_total * sizeof (double));
+	/*memcpy (np->f_hat, in, 2 * np->N_total * sizeof (double));
+	  np->f_hat = in;*/
 
 	if(np->nfft_flags & PRE_PSI)
 		nfft_precompute_psi (np);
 	
 	nfft_trafo (np);
 
-	memcpy (out,    np->f, 2 * np->M_total * sizeof(double));
+	/* memcpy (out,    np->f, 2 * np->M_total * sizeof(double));*/
 
 	return 0;
 
@@ -93,7 +83,7 @@ void ift (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int 
 	
 	int j, k, l;
 
-	memcpy (spc->y, in, 2 * np->M_total * sizeof(double));
+	spc->y = in;
 	
 	// precompute lin psi
 	if(np->nfft_flags & PRE_PSI)
