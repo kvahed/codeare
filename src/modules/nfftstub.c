@@ -78,12 +78,10 @@ int ft (nfft_plan* np) {
 }
 
 
-void ift (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int maxiter, double epsilon) {
+void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) {
 	
 	int j, k, l;
 
-	//spc->y = in;
-	
 	// precompute lin psi
 	if(np->nfft_flags & PRE_PSI)
 		nfft_precompute_psi(np);
@@ -119,9 +117,6 @@ void ift (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int 
 #ifdef NVERBOSE
 	fprintf(stderr,"nfft time: %.4f seconds.\n",t);
 #endif
-
-	//memcpy (out, spc->f_hat_iter, 2 * np->N_total * sizeof (double));
-
 
 }
 

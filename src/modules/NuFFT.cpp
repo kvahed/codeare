@@ -8,10 +8,7 @@ NuFFT::NuFFT () {
 
 NuFFT::~NuFFT () {
 
-	free (m_ftin);
-	free (m_ftout);
-
-	//nfft::finalize (&m_fplan, &m_iplan);
+	nfft::finalize (&m_fplan, &m_iplan);
 
 	delete [] m_N;
 	delete [] m_n;
@@ -59,7 +56,6 @@ NuFFT::Process () {
 	ticks start = getticks();
 
 	// Copy data from incoming matrix to the nufft input array
-
 	for (int i = 0; i < m_raw.Size(); i++) {
 		(m_iplan.y[i])[0] = (m_raw[i]).real();
 		(m_iplan.y[i])[1] = (m_raw[i]).imag();
@@ -75,7 +71,7 @@ NuFFT::Process () {
 	// Precompute PSI
 	nfft::weights (&m_fplan, &m_iplan);
 
-	nfft::ift     (&m_fplan, &m_iplan, m_ftin, m_ftout, m_maxit, m_epsilon);
+	nfft::ift     (&m_fplan, &m_iplan, m_maxit, m_epsilon);
 
 	// Resize m_raw for output
 	for (int i = 0; i < INVALID_DIM; i++)

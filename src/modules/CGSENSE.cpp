@@ -12,11 +12,8 @@ using namespace RRStrategy;
 
 CGSENSE::~CGSENSE () {
 
-	//free (m_ftw);
-	//free (m_ftk);
-
-	//for (int i = 0; i < NTHREADS; i++)
-	//	nfft::finalize (&m_fplan[i], &m_iplan[i]);
+	for (int i = 0; i < NTHREADS; i++)
+		nfft::finalize (&m_fplan[i], &m_iplan[i]);
 
 	delete [] m_N;
 	delete [] m_n;
@@ -97,12 +94,6 @@ CGSENSE::Init() {
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 	// --------------------------------------
 
-	// Allocate RAM for fix size memories (weights and k-space)
-
-	m_ftk      = (double*) malloc (    m_dim  * m_M    * sizeof(double)); 
-	m_ftw      = (double*) malloc (             m_M    * sizeof(double)); 
-	// --------------------------------------
-
 	return error;
 
 }
@@ -125,13 +116,10 @@ CGSENSE::Process () {
 		a.Dim(i) = m_N[i];
 	a.Reset();
 	
-	// Set k-space ----------------------------------------------------
-	memcpy (m_ftw, &m_helper[0], m_helper.Size()*sizeof(double));
-	//memcpy (m_ftk, &m_kspace[0], m_kspace.Size()*sizeof(double));
-	
+	// Set k-space and weights ----------------------------------------
 	for (int i = 0; i < NTHREADS; i++) {
-		memcpy (m_fplan[i].x, &m_kspace[0], m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
-		memcpy (m_iplan[i].w, &m_helper[0],                m_fplan[i].M_total * sizeof(double)) ;
+		memcpy (&(m_fplan[i].x[0]), &m_kspace[0], m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
+		memcpy (&(m_iplan[i].w[0]), &m_helper[0],                m_fplan[i].M_total * sizeof(double)) ;
 		nfft::weights (&m_fplan[i], &m_iplan[i]);
 	}
 
@@ -169,7 +157,7 @@ CGSENSE::Process () {
 	
 	// Create test data (Incoming data is image space) ----------------
 	if (m_testcase) {
-		E  (&m_rhelper, &m_sens, &m_fplan[0], &stmp, m_dim);
+		E  (&m_rhelper, &m_sens, m_fplan, &stmp, m_dim);
 		m_rhelper = stmp;
 		m_raw     = stmp;
 	}
@@ -178,7 +166,7 @@ CGSENSE::Process () {
 	ticks cgstart = getticks();
 
 	// First left side action -----------------------------------------
-	EH (&m_raw, &m_sens, &m_fplan[0], &m_iplan[0], m_epsilon, m_maxit, &a, m_dim);
+	EH (&m_raw, &m_sens, m_fplan, m_iplan, m_epsilon, m_maxit, &a, m_dim);
 	p = a;
 	r = a;
 	q = a;
@@ -218,8 +206,8 @@ CGSENSE::Process () {
 			break;
 		
 		// CG step ----------------------------------------------------
-		E  (&p,    &m_sens, &m_fplan[0],                                  &stmp, m_dim);
-		EH (&stmp, &m_sens, &m_fplan[0], &m_iplan[0], m_epsilon, m_maxit, &q   , m_dim);
+		E  (&p,    &m_sens, m_fplan,                                  &stmp, m_dim);
+		EH (&stmp, &m_sens, m_fplan, m_iplan, m_epsilon, m_maxit, &q   , m_dim);
 		
 		rtmp      = (rn / (p.dotc(q)));
 		itmp      = p * rtmp;
