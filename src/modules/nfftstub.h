@@ -37,7 +37,7 @@ namespace nfft {
 		 * @param  out       FTed data
 		 */
 		extern int
-		ift                  (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int maxiter = 3, double epsilon = 3e-7) ;
+		ift                  (nfft_plan* np, solver_plan_complex* spc, int maxiter = 3, double epsilon = 3e-7) ;
 		
 		/**
 		 * @brief            Forward FT

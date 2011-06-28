@@ -25,36 +25,29 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
 #pragma omp parallel default (shared) 
 	{
 		
-		int tid      = omp_get_thread_num();
 		omp_set_num_threads(NTHREADS);
+		int tid      = omp_get_thread_num();
 		
 #pragma omp for
 		for (int j = 0; j < ncoils; j++) {
 			
 			int    ipos   = j * imgsize;
 			int    spos   = j * nsamples;
-			double dt [2] = {0.0, 0.0};
 			raw    tmp    = raw(0.0, 0.0);
-			int    sof    = sizeof (fftw_complex);
 
 			// Copy data to FT
 			for (int i = 0; i < imgsize; i++) {
-				
 				tmp = sm->at(ipos + i) * in->at(i);
-				dt[0] = tmp.real();
-				dt[1] = tmp.imag();
-				memcpy ( &(np[tid].f_hat)[i], dt, sof);
-				
+				(np[tid].f_hat[i])[0] = tmp.real();
+				(np[tid].f_hat[i])[1] = tmp.imag();
 			}
-			
+
 			// Forward ft
 			nfft::ft (&np[tid]);
 			
 			// Copy FTed data back
-			for (int i = 0; i < nsamples; i++) {
-				memcpy (dt, &(np[tid].f)[i+spos], sof);
-				out->at(i+spos) = raw(dt[0],dt[1]);
-			}
+			for (int i = 0; i < nsamples; i++)
+				out->at(i+spos) = raw(np[tid].f[i][0], np[tid].f[i][1]);
 			
 		}
 		
@@ -83,55 +76,54 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 	out->Zero();
 
 	// Some dimensions
-	int        ncoils   = sm->Dim(dim);
-	int        nsamples = in->Size() / ncoils;
-	int        imgsize  = out->Size();
+	int           ncoils   = sm->Dim(dim);
+	int           nsamples = in->Size() / ncoils;
+	int           imgsize  = out->Size();
 
-	double* ftout = (double*) malloc (2 * ncoils * imgsize  * sizeof(double));
-	
+	fftw_complex* ftout    = (fftw_complex*) malloc (imgsize * ncoils * sizeof (fftw_complex)); 
+
 	// OMP Loop over coils, Inverse FT every signal in *in, 
 	// Sum elementwise mutiplied images with according sensitivity maps 
 #pragma omp parallel default (shared) 
 	{
 		
-		int tid      = omp_get_thread_num();
 		omp_set_num_threads(NTHREADS);
+		int tid      = omp_get_thread_num();
 		
 #pragma omp for
+
 		for (int j = 0; j < ncoils; j++) {
-			
-			// Containers for FT I/O
-			double* ftin  = (double*) malloc (2 * nsamples * sizeof(double));
 			
 			int    spos   = j * nsamples;
 			int    ipos   = j * imgsize;
 			
 			// Copy to iFT
 			for (int i = 0; i < nsamples; i++) {
-				ftin[2*i  ] = (in->at(spos + i)).real();
-				ftin[2*i+1] = (in->at(spos + i)).imag();
+				spc[tid].y[i][0] = (in->at(spos + i)).real();
+				spc[tid].y[i][1] = (in->at(spos + i)).imag();
 			}
 			
 			// Inverse FT
-			nfft::ift (&np[tid], &spc[tid], ftin, &ftout[2*ipos], maxit, epsilon);
-			
-			//free (ftin);
+			nfft::ift (&np[tid], &spc[tid], maxit, epsilon);
+			memcpy (&ftout[imgsize * j], &spc[tid].f_hat_iter[0][0], imgsize * sizeof (fftw_complex));
+
 			
 		}
+
+		raw sens  = raw(0.0,0.0);
+		int chunk = imgsize / NTHREADS;
+
+#pragma omp for schedule (dynamic, chunk)
+
+		for (int i = 0; i < imgsize; i++) 
+			for (int j = 0; j < ncoils; j++) {
+				int    ipos   = j * imgsize;
+				sens        = sm->at(ipos + i);
+				out->at(i) += raw(ftout[ipos + i][0], ftout[ipos + i][1]) * conj(sens);
+			}
+
 	}
-
-	int chunk    = out->Size()/NTHREADS; 
-		
-#pragma omp for schedule(dynamic,chunk)
-
-	for (int i = 0; i < out->Size(); i++)
-		for (int j = 0; j < ncoils; j++) {
-			int ipos = j * imgsize;
-			raw sens = sm->at(ipos + i);
-			out->at(i) += raw(ftout[2*i+2*ipos], ftout[2*i+1+2*ipos]) * conj(sens);
-		}
 	
-	// Free RAM
 	free (ftout);
 
 	return OK;

@@ -11,8 +11,8 @@ NuFFT_OMP::NuFFT_OMP () {
 
 NuFFT_OMP::~NuFFT_OMP () {
 
-	//for (int i = 0; i < NTHREADS; i++)
-	//	nfft::finalize (&m_fplan[i], &m_iplan[i]);
+	for (int i = 0; i < NTHREADS; i++)
+		nfft::finalize (&m_fplan[i], &m_iplan[i]);
 
 	delete [] m_N;
 	delete [] m_n;
@@ -78,7 +78,7 @@ NuFFT_OMP::Process () {
 	// Kspace adjustment (Don't know yet why necessary)
 	m_kspace = m_kspace / (1/(GAMMA/128*m_N[0]));
 
-	int imgsize = 2;
+	int imgsize = 1;
 	for (int i = 0; i < m_dim; i++)
 		imgsize *= m_N[i];
 
@@ -93,19 +93,13 @@ NuFFT_OMP::Process () {
 
 	tmp.Reset();
 
-	double* m_ftout    = (double*) malloc (imgsize * m_shots * sizeof(double)); 
-
-	/*#pragma omp parallel default (shared) 
+#pragma omp parallel default (shared) 
 	{
 		
-	omp_set_num_threads(NTHREADS);*/
-		int tid      = 0;//omp_get_thread_num();
+		omp_set_num_threads(NTHREADS);
+		int tid      = omp_get_thread_num();
 		
-		double* m_ftin     = (double*) malloc (2     * m_M * sizeof(double)); 
-		//double* m_ftk      = (double*) malloc (m_dim * m_M * sizeof(double)); 
-		//double* m_ftw      = (double*) malloc (        m_M * sizeof(double)); 
-
-		//#pragma omp for
+#pragma omp for
 
 		for (int j = 0; j < m_shots; j++) {
 			
@@ -113,48 +107,31 @@ NuFFT_OMP::Process () {
 
 			// Copy data from incoming matrix to the nufft input array
 			for (int i = 0; i < m_M; i++) {
-				m_ftin[2*i  ] = (m_raw[i + os]).real();
-				m_ftin[2*i+1] = (m_raw[i + os]).imag();
+				(m_iplan[tid].y[i])[0] = (m_raw[i + os]).real();
+				(m_iplan[tid].y[i])[1] = (m_raw[i + os]).imag();
 			}
 
 			// Copy k-space and weights to allocated memory
-			memcpy (&(m_fplan[tid].x), &m_kspace[os * m_dim], m_M * m_dim * sizeof(double));
-			memcpy (&(m_iplan[tid].w), &m_helper[os]        , m_M *         sizeof(double));
-			printf ("Made %i\n", 0);
+			memcpy (&(m_fplan[tid].x[0]), &m_kspace[os * m_dim], m_M * m_dim * sizeof(double));
+			memcpy (&(m_iplan[tid].w[0]), &m_helper[os]        , m_M *         sizeof(double));
 
 			// Precompute PSI
 			nfft::weights (&m_fplan[tid], &m_iplan[tid]);
-			printf ("Made %i\n", 1);
 			
-			//nfft::ift     (&m_fplan[tid], &m_iplan[tid], m_ftin, &m_ftout[j * imgsize], m_maxit, m_epsilon);
-			printf ("Made %i\n", 2);
-			
+			nfft::ift     (&m_fplan[tid], &m_iplan[tid], m_maxit, m_epsilon);
 
 			if (m_verbose)
-				for (int i = 0; i < imgsize/2; i++)
-					tmp[(j+1) * imgsize/2 + i] = raw(m_ftout[2*i + j*imgsize], m_ftout[2*i+1 + j*imgsize]);
-			printf ("Made %i\n", 1);
+				for (int i = 0; i < imgsize; i++) {
+					tmp[(j+1) * imgsize + i] = raw(m_iplan[tid].f_hat_iter[i][0], m_iplan[tid].f_hat_iter[i][1]);
+					tmp[i] += tmp[(j+1) * imgsize + i];
+				}
 			
 			
 		}
 
-		//free (m_ftk);
-		//free (m_ftw);
-		free (m_ftin);
-
-		int chunk    = imgsize/2/NTHREADS; 
-		
-		//#pragma omp for schedule(dynamic,chunk)
-		
-		for (int i = 0; i < imgsize/2; i++) {
-			for (int j = 0; j < m_shots; j++)
-				tmp[i] += raw(m_ftout[2*i + j*imgsize], m_ftout[2*i+1 + j*imgsize]); 
-		
 	}
-	
+
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / ClockRate());
-	
-	free (m_ftout);
 
 	m_raw = tmp;
 	return error;
