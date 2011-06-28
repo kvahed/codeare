@@ -51,7 +51,6 @@ int weights (nfft_plan* np, solver_plan_complex* spc) {
 					    int    j2 = j-N/2;
 						int    k2 = k-N/2;
 						double r  = sqrt(j2*j2+k2*k2);
-						printf ("%i\n", j*N+k);
 						spc->w_hat[j*N+k]       = (r > (double) N/2) ? 0.0 : 1.0;
 				}
 		}
@@ -83,7 +82,7 @@ void ift (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int 
 	
 	int j, k, l;
 
-	spc->y = in;
+	//spc->y = in;
 	
 	// precompute lin psi
 	if(np->nfft_flags & PRE_PSI)
@@ -121,7 +120,7 @@ void ift (nfft_plan* np, solver_plan_complex* spc, double* in, double* out, int 
 	fprintf(stderr,"nfft time: %.4f seconds.\n",t);
 #endif
 
-	memcpy (out, spc->f_hat_iter, 2 * np->N_total * sizeof (double));
+	//memcpy (out, spc->f_hat_iter, 2 * np->N_total * sizeof (double));
 
 
 }
