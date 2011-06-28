@@ -2,8 +2,15 @@
 #include "nfftstub.h"
 #include "Noise.hpp"
 #include "SEM.hpp"
+#include <math.h>
 
 #include <vector>
+
+#ifndef isnan
+inline bool isnan (double x) {
+    return x != x;
+}
+#endif
 
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
@@ -221,6 +228,9 @@ CGSENSE::Process () {
 		itmp      = p * rtmp;
 		p         = r_new + itmp;
 		r         = r_new;
+
+		if (isnan(r.norm().real()))
+			break;
 
 		// Verbose out put keeps all intermediate steps ---------------
 		if (m_verbose) {
