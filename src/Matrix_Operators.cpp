@@ -6,16 +6,27 @@ Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
 	for (int i = 0; i < INVALID_DIM; i++)
 		_dim[i] = M.Dim()[i];
     
-    if (nb_alloc) {
-        delete[](_M);
-        nb_alloc = 0;
-    }
+    if (nb_alloc)
+		if (Size() != M.Size()) {
+			delete[](_M);
+			_M = new T[Size()]();
+		} else {
+			_M = new T[Size()]();
+			nb_alloc = 1;
+		}
 
-    _M = new T[Size()]();
-    nb_alloc = 1;
-
-	for (int i = 0; i < Size(); i++)
-		_M[i] = M[i];
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
+		for (int i = 0; i < Size(); i++)
+			_M[i] = M[i];
+		
+	}
 
     return *this;
 
@@ -30,17 +41,28 @@ Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
 	for (int i = 0; i < INVALID_DIM; i++)
 		_dim[i] = M.Dim()[i];
     
-    if (nb_alloc) {
-        delete[](_M);
-        nb_alloc = 0;
-    }
+    if (nb_alloc)
+		if (Size() != M.Size()) {
+			delete[](_M);
+			_M = new T[Size()]();
+		} else {
+			_M = new T[Size()]();
+			nb_alloc = 1;
+		}
 
-    _M = new T[Size()]();
-    nb_alloc = 1;
-
-	for (int i = 0; i < Size(); i++)
-		_M[i] = M[i];
-
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
+		for (int i = 0; i < Size(); i++)
+			_M[i] = M[i];
+		
+	}
+	
     return *this;
 
 }
@@ -180,12 +202,23 @@ Matrix<T> Matrix<T>::operator&&(Matrix<T> &M) {
 template <class T>
 Matrix<T> Matrix<T>::operator||(Matrix<T> M) {
 
-    assert(M.Size() == Size());
+	for (int i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
 
-    Matrix<T> res(_dim);
+    Matrix<bool> res(_dim);
 
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
     for (int i = 0; i < Size(); i++)
-        res[i] = (M[i] || _M[i]);
+        res[i] = (_M[i] || M[i]) ? true : false;
+
+	}
 
     return res;
 
@@ -193,66 +226,157 @@ Matrix<T> Matrix<T>::operator||(Matrix<T> M) {
 
 template <class T>
 Matrix<bool> Matrix<T>::operator==(Matrix<T> M) {
-    assert(_dim[COL] == M.width() && _dim[LIN] == M.height());
+
+	for (int i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
+
     Matrix<bool> res(_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
     for (int i = 0; i < Size(); i++)
-        res[i] = (_M[i] == M[i]);
+        res[i] = (_M[i] == M[i]) ? true : false;
+
+	}
+
     return res;
+
 }
 
 template <class T>
 Matrix<bool> Matrix<T>::operator>=(Matrix<T> M) {
-    assert(_dim[COL] == M.width() && _dim[LIN] == M.height());
+
+	for (int i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
+
     Matrix<bool> res(_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
     for (int i = 0; i < Size(); i++)
-        res[i] = (_M[i] >= M[i]);
+        res[i] = (_M[i] >= M[i]) ? true : false;
+
+	}
+
     return res;
+
 }
 
 template <class T>
-Matrix<bool> Matrix<T>::operator<=(Matrix<T> M) {
-    assert(_dim[COL] == M.width() && _dim[LIN] == M.height());
+Matrix<bool> Matrix<T>::operator<= (Matrix<T> M) {
+
+	for (int i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
+
     Matrix<bool> res(_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
     for (int i = 0; i < Size(); i++)
-        res[i] = (_M[i] >= M[i]);
+        res[i] = (_M[i] <= M[i]) ? true : false;
+
+	}
+
     return res;
+
 }
 
 template <class T>
 Matrix<bool> Matrix<T>::operator!=(Matrix<T> M) {
-    assert(_dim[COL] == M.width() && _dim[LIN] == M.height());
+
+	for (int i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
+
     Matrix<bool> res(_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
     for (int i = 0; i < Size(); i++)
-        res[i] = (_M[i] != M[i]);
+        res[i] = (_M[i] != M[i]) ? true : false;
+
+	}
+
     return res;
+
 }
 
 template <class T>
-Matrix<bool> Matrix<T>::operator>(Matrix<T> M) {
-    assert(_dim[COL] == M.wridth() && _dim[LIN] == M.height());
+Matrix<bool> Matrix<T>::operator> (Matrix<T> M) {
+	
+	for (int i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
+
     Matrix<bool> res(_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
     for (int i = 0; i < Size(); i++)
         res[i] = (_M[i] > M[i]) ? true : false;
+
+	}
+
     return res;
+
 }
 
 template <class T>
-Matrix<bool> Matrix<T>::operator<(Matrix<T> M) {
+Matrix<bool> Matrix<T>::operator< (Matrix<T> M) {
 
-    assert(_dim[COL] == M.width() && _dim[LIN] == M.height());
+	for (int i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
 
     Matrix<bool> res(_dim);
 
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
     for (int i = 0; i < Size(); i++)
         res[i] = (_M[i] < M[i]);
 
+	}
+
     return res;
 
 }
 
 
 template <class T>
-Matrix<T> Matrix<T>::operator-() {
+Matrix<T> Matrix<T>::operator- () {
 
     Matrix<T> res;
 
@@ -261,8 +385,18 @@ Matrix<T> Matrix<T>::operator-() {
 
 	res.Reset();
 
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
     for (int i = 0; i < Size(); i++)
         res[i] =- _M[i];
+
+	}
 
     return res;
 
@@ -279,8 +413,18 @@ Matrix<T> Matrix<T>::operator-(Matrix<T> &M) {
 
 	res.Reset();
 
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
 	for (int i = 0; i < Size(); i++)
 		res[i] = _M[i] - M[i];
+
+	}
 
 	return res;
 
@@ -297,8 +441,18 @@ Matrix<T> Matrix<T>::operator-(T s) {
 
 	res.Reset();
 
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
 	for (int i = 0; i < Size(); i++)
 		res[i] = _M[i] - s;
+
+	}
 
 	return res;
 
@@ -315,8 +469,18 @@ Matrix<T> Matrix<T>::operator+() {
 
 	res.Reset();
 
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
     for (int i = 0; i < Size(); i++)
         res[i] =+ _M[i];
+
+	}
 
     return res;
 
@@ -333,8 +497,18 @@ Matrix<T> Matrix<T>::operator+(Matrix<T> &M) {
 
 	res.Reset();
 
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
 	for (int i = 0; i < Size(); i++)
 		res[i] = _M[i] + M[i];
+
+	}
 
 	return res;
 
@@ -351,8 +525,18 @@ Matrix<T> Matrix<T>::operator+(T s) {
 
 	res.Reset();
 
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
 	for (int i = 0; i < Size(); i++)
 		res[i] = _M[i] + s;
+
+	}
 
 	return res;
 
@@ -361,8 +545,23 @@ Matrix<T> Matrix<T>::operator+(T s) {
 
 template <class T>
 Matrix<T> Matrix<T>::operator^(int p) {
-    Matrix<T> res(_dim[LIN], _dim[COL]);
-    for (int i = 0; i < Size(); i++)
+    
+	Matrix<T> res;
+    
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
+	for (int i = 0; i < Size(); i++)
         if (p == 0)
             res[i] = 1;
         else
@@ -370,7 +569,11 @@ Matrix<T> Matrix<T>::operator^(int p) {
                 res[i] = power(_M[i], p);
             else
                 res[i] = 1 / power(_M[i], -p);
+
+	}
+
     return res;
+
 }
 
 

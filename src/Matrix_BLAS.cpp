@@ -6,7 +6,7 @@ Matrix<T>::prod(Matrix<T> &M) {
 
     assert(width() == M.height());
 
-	if (typeid(T) == typeid(double) || typeid(T) == typeid(double)) // Fast BLAS code
+	if (typeid(T) == typeid(double) || typeid(T) == typeid(raw)) // Fast BLAS code
 		return GEMM(M);
 
 	else {                                                          // Standard impl
@@ -59,7 +59,7 @@ Matrix<T>::GEMM (Matrix<T>& M) {
 		for (l = 0; l < _dim[LIN]; l++, i++)
 			a[i] = _M[j+l*_dim[COL]];
 
-	int  lda    = _dim[LIN];//_dim[0];
+	int  lda    = _dim[LIN];
 
 	T*   b      = new T[M.Size()];
 	i = 0;
@@ -67,13 +67,13 @@ Matrix<T>::GEMM (Matrix<T>& M) {
 		for (l = 0; l < M.Dim(LIN); l++, i++)
 			b[i] = M[j+l*M.Dim(COL)];
 
-	int  ldb    = M.Dim(LIN);//M.Dim(0);
+	int  ldb    = M.Dim(LIN);
 
 	T    beta   = T(0);
 
 
-	res.Dim(0)  = M.Dim(COL);//_dim[0];
-	res.Dim(1)  = _dim[LIN];//M.Dim(1);
+	res.Dim(0)  = M.Dim(COL);
+	res.Dim(1)  = _dim[LIN];
 	res.Reset();
 	
 
@@ -104,19 +104,20 @@ template<class T>
 T
 Matrix<T>::norm () const {
 
+	T   res   = (T)0.0;
+
 	int n    = Size();
-	int incx = sizeof(raw);
-	T   norm = 0.0;
+	int incx = 1;
 
 	for (int i = 0; i < Size(); i++)
-		norm += conj(_M[i])*_M[i];
+		res += conj(_M[i]) * _M[i];
 
-	/*if (typeid(T)      == typeid(raw))
-		norm = raw(scnrm2_ (&n, _M, &incx),0);
-	else if (typeid(T) == typeid(double))
-	norm = dnrm2_(&n, _M, &incx);*/
+	if (typeid(T)      == typeid(raw)) {
+		res = scnrm2_ (&n, _M, &incx);
+	} else if (typeid(T) == typeid(double))
+		res = dnrm2_(&n, _M, &incx);
 
-	return norm;
+	return pow(res,2);
 
 }
 
@@ -124,18 +125,14 @@ template<class T>
 T 
 Matrix<T>::dotc (Matrix<T>& M) const {
 	
-	T   res  = (T) 0;
+	T   res  = (T)0.0;
 
 	int n    = Size();
 	int incx = 1;
 
-	for (int i = 0; i < Size(); i++)
-		res += conj(_M[i]) * M[i];
-
-	/*if (typeid(T) == typeid(raw)) {
-		res = cdotc_ (&n, &_M[0], &incx, &M[0], &incx);
-		}*/
-
+	if (typeid(T) == typeid(raw))
+		cdotc_ (&res, &n, &_M[0], &incx, &M[0], &incx);
+	
 	return res;
 
 }

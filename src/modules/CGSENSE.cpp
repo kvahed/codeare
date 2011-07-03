@@ -8,7 +8,8 @@
 
 #ifndef isnan
 inline bool isnan (double x) {
-    return x != x;
+	volatile double d  = x;
+    return          d != d;
 }
 #endif
 
@@ -169,11 +170,13 @@ CGSENSE::Process () {
 		m_raw     = stmp;
 	}
 
+
 	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
 
 	// First left side action -----------------------------------------
 	EH (&m_raw, &m_sens, m_fplan, m_iplan, m_epsilon, m_maxit, &a, m_dim);
+
 	p = a;
 	r = a;
 	q = a;
@@ -199,23 +202,25 @@ CGSENSE::Process () {
 	printf ("Processing CG-SENSE ...\n");
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
+
+	an = a.norm().real();
+
 	for (int i = 0; i < m_cgmaxit; i++, iters++) {
 
 		rn = r.norm().real();
-		an = a.norm().real();
 
 		res.push_back(rn/an);
 		
 		printf ("%03i: CG residuum: %.9f\n", i, res.at(i));
 
 		// Convergence ? ----------------------------------------------
-		if (res.at(i) <= m_cgeps)
+		if (isnan(res.at(i)) || res.at(i) <= m_cgeps)
 			break;
 		
 		// CG step ----------------------------------------------------
-		E  (&p,    &m_sens, m_fplan,                                  &stmp, m_dim);
+		E  (&p,    &m_sens, m_fplan,                              &stmp, m_dim);
 		EH (&stmp, &m_sens, m_fplan, m_iplan, m_epsilon, m_maxit, &q   , m_dim);
-		
+
 		rtmp      = (rn / (p.dotc(q)));
 		itmp      = p * rtmp;
 		m_raw     = m_raw + itmp;
@@ -229,14 +234,14 @@ CGSENSE::Process () {
 		p         = r_new + itmp;
 		r         = r_new;
 
-		if (isnan(r.norm().real()))
-			break;
-
 		// Verbose out put keeps all intermediate steps ---------------
 		if (m_verbose) {
 			memcpy (&istore[i *     m_raw.Size()],     &m_raw[0],     m_raw.Size() * sizeof(double));
 			memcpy (&sstore[i * m_rhelper.Size()], &m_rhelper[0], m_rhelper.Size() * sizeof(double));
 		}
+
+		if (isnan(res.at(i)))
+			break;
 
 	}
 
@@ -245,6 +250,7 @@ CGSENSE::Process () {
 
 	// Verbose output needs to 
 	if (m_verbose) {
+
 		m_raw.Dim(m_dim) = iters;
 		m_raw.Reset();
 		memcpy (    &m_raw[0], &istore[0],     m_raw.Size() * sizeof(double));
@@ -252,6 +258,15 @@ CGSENSE::Process () {
 		m_rhelper.Dim(CHA) = iters;
 		m_rhelper.Reset();
 		memcpy (&m_rhelper[0], &sstore[0], m_rhelper.Size() * sizeof(double));
+		
+		m_helper.Dim(COL) = iters;
+		for (int i = 1; i < INVALID_DIM; i++)
+			m_helper.Dim(i) = 1;
+		m_helper.Reset();
+
+		for (int i = 0; i < iters; i++)
+			m_helper[i] = res.at(i);
+
 	}
 
 	return error;

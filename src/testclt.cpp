@@ -82,6 +82,7 @@ bool cgsensetest (ReconClient* rc) {
 	std::string    df  = std::string (base + std::string(data));
 	std::string    odf = std::string (base + std::string("/images.h5"));
 	std::string    opf = std::string (base + std::string("/pulses.h5"));
+	std::string    oif = std::string (base + std::string("/iters.h5"));
 
 	weights.read   (df, "weights");
 	rawdata.read   (df, "data");
@@ -98,9 +99,11 @@ bool cgsensetest (ReconClient* rc) {
 	
 	rc->GetRaw     (rawdata);
 	rc->GetRHelper (sens);
+	rc->GetHelper  (weights);
 	
 	rawdata.dump   (odf.c_str());
 	sens.dump      (opf.c_str());
+	weights.dump   (oif.c_str());
 	
 }
 
