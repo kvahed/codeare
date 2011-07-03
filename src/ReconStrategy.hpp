@@ -127,6 +127,7 @@ public:
 #endif
 	}
 
+
 	/**
 	 * @brief Get data from recon
 	 */
@@ -145,6 +146,7 @@ public:
 		}
 		
 	}
+
 	
 	/**
 	 * @brief Set data for recon
@@ -203,6 +205,11 @@ public:
 	void 
 	GetHelper           (helper_data* helper)   {
 
+		for (int j = 0; j < INVALID_DIM; j++)
+			helper->dims[j] = m_helper.Dim(j);
+		
+		helper->vals.length(m_helper.Size()); 
+		
 		for (int i = 0; i < m_helper.Size(); i++)
 			helper->vals[i] = m_helper[i];
 

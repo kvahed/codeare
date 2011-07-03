@@ -41,6 +41,7 @@ ReconServant::ReconServant  ()               {
 ReconServant::~ReconServant ()               {
 
 	delete m_config;
+	
 
 }
 
@@ -61,9 +62,16 @@ ReconServant::Process  (const char* name)       {
 	context->Strategy()->SetKSpace(&m_kspace);
 	context->Strategy()->SetPixel(&m_pixel);
 	context->Strategy()->SetConfig(m_config);
-	
+
+	m_raw.dreal.length(0);
+	m_raw.dimag.length(0);
+	m_rhelper.dreal.length(0);
+	m_rhelper.dimag.length(0);
+	m_helper.vals.length(0);
+	m_helper.vals.length(0);
+
 	std::cout << "... done. Will invoke data procession ... " << std::endl;
-	
+
 	e = context->Strategy()->Init();
 	e = context->Strategy()->Process();
 	

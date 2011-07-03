@@ -35,8 +35,11 @@ enum IceDim {
 
 #endif
 
+#include "modules/OMP.hpp"
+
 #include <complex>
 #include <assert.h>
+
 #include <iostream>
 #include <fstream>
 #include <typeinfo>
@@ -64,15 +67,15 @@ extern "C" {
 
 	// Euclidean norm
 	float  scnrm2_ (int      *n, void   *x, int *incx);
-	double  dnrm2_ (int      *n, void   *x, int *incx);
+	double dnrm2_  (int      *n, void   *x, int *incx);
 
-	raw   cdotc_  (int      *n, void   *x, int *incx, void *y, int *incy);
+	raw    cdotc_   (void*    r, int     *n, void   *x, int *incx, void *y, int *incy);
 	
 	// Matrix vector multiplication
-	void dgemv_  (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
-				  void     *y, int *incy);
-	void cgemv_  (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
-				  void     *y, int *incy);
+	void   dgemv_    (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
+				    void     *y, int *incy);
+	void   cgemv_    (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
+				    void     *y, int *incy);
 	
 	// Matrix matrix multiplication
 	void dgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, 
@@ -874,7 +877,7 @@ public:
             free (_M);
             nb_alloc--;
         }
-
+		
 		_M = (T*) malloc (Size() * sizeof (T));
         nb_alloc++;
 
@@ -1517,9 +1520,18 @@ Matrix<T>::operator*(Matrix<T> &M) {
 
 	res.Reset();
 
-	for (int i = 0; i < Size(); i++)
-		res[i] = _M[i] * M[i];
+#pragma omp parallel default (shared) 
+	{
 
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		for (int i = 0; i < Size(); i++)
+			res[i] = _M[i] * M[i];
+
+	}
+	
 	return res;
 
 }
@@ -1535,8 +1547,17 @@ Matrix<T>::operator* (T s) {
 
 	res.Reset();
 
+#pragma omp parallel default (shared) 
+	{
+
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
 	for (int i = 0; i < Size(); i++)
 		res[i] = _M[i] * s;
+	
+	}
 
 	return res;
 

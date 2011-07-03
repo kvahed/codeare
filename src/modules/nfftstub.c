@@ -63,15 +63,10 @@ int weights (nfft_plan* np, solver_plan_complex* spc) {
 
 int ft (nfft_plan* np) {
 
-	/*memcpy (np->f_hat, in, 2 * np->N_total * sizeof (double));
-	  np->f_hat = in;*/
-
-	if(np->nfft_flags & PRE_PSI)
+	if (np->nfft_flags & PRE_PSI)
 		nfft_precompute_psi (np);
 	
 	nfft_trafo (np);
-
-	/* memcpy (out,    np->f, 2 * np->M_total * sizeof(double));*/
 
 	return 0;
 
@@ -81,7 +76,7 @@ int ft (nfft_plan* np) {
 void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) {
 	
 	int j, k, l;
-
+	
 	// precompute lin psi
 	if(np->nfft_flags & PRE_PSI)
 		nfft_precompute_psi(np);
@@ -98,14 +93,14 @@ void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) 
 	
 	// inverse trafo 
 	solver_before_loop_complex(spc);
-   
+	
 	for( l = 0; l < maxiter; l++) {
 		
 		if (spc->dot_r_iter < epsilon) 
 			break;
-
+		
 		solver_loop_one_step_complex(spc);
-
+		
 #ifdef NVERBOSE		
 		fprintf( stderr, "%e,  %i of %i\n", sqrt(spc->dot_r_iter), l+1, maxiter);
 #endif		

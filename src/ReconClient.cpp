@@ -152,18 +152,27 @@ ReconClient::Process  (const char* name)  {
     m_rrsi->pixel   (*(m_pixel));
 	m_rrsi->config  (temp.str().c_str());
 	
-    // Process through remote interface
+	delete m_raw;
+	delete m_rhelper;
+	delete m_helper;
+	delete m_kspace;
+	delete m_pixel;
+
     result = m_rrsi->Process(name);
     
+    m_raw     = new raw_data;
+	m_rhelper = new raw_data;
+    m_helper  = new helper_data;
+    m_kspace  = new helper_data;
+    m_pixel   = new pixel_data;
+
     // Get data back from remote interface
-    //if (result == OK) {
-        m_raw     = m_rrsi->raw();
-        m_rhelper = m_rrsi->rhelper();
-        m_helper  = m_rrsi->helper();
-        m_kspace  = m_rrsi->kspace();
-        m_pixel   = m_rrsi->pixel();
-		SetConfig (m_rrsi->config());
-		//}
+	m_raw     = m_rrsi->raw();
+	m_rhelper = m_rrsi->rhelper();
+	m_helper  = m_rrsi->helper();
+	m_kspace  = m_rrsi->kspace();
+	m_pixel   = m_rrsi->pixel();
+	SetConfig (m_rrsi->config());
 
     return result;
     

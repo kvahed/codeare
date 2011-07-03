@@ -183,7 +183,7 @@ fi
 if test -z "$BLAS"; then
 case $host in
   *darwin*)
-    BLAS="-altivec -framework vecLib"
+    BLAS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -lcblas -llapack -framework vecLib"
     AUTOAPPLE="yes"
     AC_MSG_RESULT([No BLAS specified and vendor is Apple: Assuming vecLib is available!])
     ;;

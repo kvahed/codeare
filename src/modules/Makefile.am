@@ -34,7 +34,7 @@ DumpToFile_la_SOURCES = $(COMMON) DumpToFile.hpp DumpToFile.cpp
 DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(HDF5)
 
 CGSENSE_la_SOURCES = $(COMMON) CGSENSE.hpp CGSENSE.cpp nfftstub.h nfftstub.c Noise.hpp SEM.hpp OMP.hpp
-CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
+CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart $(BLAS) $(LAPACK)
 
 SystemCmd_la_SOURCES = $(COMMON) SystemCmd.hpp SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
