@@ -38,8 +38,8 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
 			// Copy data to FT
 			for (int i = 0; i < imgsize; i++) {
 				tmp = sm->at(ipos + i) * in->at(i);
-				(np[tid].f_hat[i])[0] = tmp.real();
-				(np[tid].f_hat[i])[1] = tmp.imag();
+				np[tid].f_hat[i][0] = tmp.real();
+				np[tid].f_hat[i][1] = tmp.imag();
 			}
 
 			// Forward ft

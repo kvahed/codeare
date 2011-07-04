@@ -39,6 +39,9 @@
 /* Define to 1 if you have the <iostream> header file. */
 #undef HAVE_IOSTREAM
 
+/* Define to 1 if you have the `isnan' function. */
+#undef HAVE_ISNAN
+
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 

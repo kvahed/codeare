@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#ifndef isnan
+#ifndef HAVE_ISNAN
 inline bool isnan (double x) {
 	volatile double d  = x;
     return          d != d;
