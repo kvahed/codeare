@@ -20,8 +20,15 @@ using namespace RRStrategy;
 
 CGSENSE::~CGSENSE () {
 
-	for (int i = 0; i < NTHREADS; i++)
-		nfft::finalize (&m_fplan[i], &m_iplan[i]);
+#pragma omp parallel default (shared) 
+	{
+		
+		omp_set_num_threads(NTHREADS);
+		int tid      = omp_get_thread_num();
+		
+		nfft::finalize (&m_fplan[tid], &m_iplan[tid]);
+
+	}
 
 	delete [] m_N;
 	delete [] m_n;
