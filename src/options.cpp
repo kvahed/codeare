@@ -95,7 +95,8 @@ void  Options::init                 (int maxopt, int maxcharopt)                
 	hasoptions          = false;
 	autousage           = false;
 
-	//strcpy(long_opt_prefix, "--");
+	long_opt_prefix[0] = '-';
+	long_opt_prefix[1] = '-';
 	
 	if(alloc() == false){
 		cout << endl << "OPTIONS ERROR : Failed allocating memory" ;

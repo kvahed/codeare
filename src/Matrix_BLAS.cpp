@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cblas.h>
 
 template <class T>
 Matrix<T> 
@@ -109,13 +110,10 @@ Matrix<T>::norm () const {
 	int n    = Size();
 	int incx = 1;
 
-	for (int i = 0; i < Size(); i++)
-		res += conj(_M[i]) * _M[i];
-
 	if (typeid(T)      == typeid(raw)) {
-		res = scnrm2_ (&n, _M, &incx);
+		res = cblas_scnrm2 (n, _M, incx);
 	} else if (typeid(T) == typeid(double))
-		res = dnrm2_(&n, _M, &incx);
+		res = cblas_scnrm2 (n, _M, incx);
 
 	return pow(res,2);
 
@@ -131,7 +129,7 @@ Matrix<T>::dotc (Matrix<T>& M) const {
 	int incx = 1;
 
 	if (typeid(T) == typeid(raw))
-		cdotc_ (&res, &n, &_M[0], &incx, &M[0], &incx);
+		cblas_cdotc_sub (n, &_M[0], incx, &M[0], incx, &res);
 	
 	return res;
 
