@@ -89,12 +89,14 @@ bool cgsensetest (ReconClient* rc) {
 	kspace.read    (df, "kspace");
 	sens.read      (df, "sensitivities");
 	
+	rc->Init       (test);
+	
 	rc->ReadConfig (cf.c_str());
 	rc->SetRaw     (rawdata);
 	rc->SetRHelper (sens);
 	rc->SetHelper  (weights);
 	rc->SetKSpace  (kspace);
-	
+
 	rc->Process    (test);
 	
 	rc->GetRaw     (rawdata);

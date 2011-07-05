@@ -19,7 +19,6 @@
  */
 
 #include "ReconServant.hpp"
-#include "ReconContext.hpp"
 
 using namespace RRServer;
 
@@ -40,8 +39,42 @@ ReconServant::ReconServant  ()               {
 /**************************************************************************************************/
 ReconServant::~ReconServant ()               {
 
+	this->Finalise ("");
 	delete m_config;
+
+}
+
+
+error_code
+ReconServant::Init (const char* name) {
+
+	error_code e = OK;
 	
+	std::cout << "Loading library ... " << name << std::endl;
+	m_contexts.push_back(new ReconContext(name));
+	m_contexts.back()->Info(std::string(name));
+	std::cout << "... done." << std::endl;
+
+	return e;
+
+}
+
+
+error_code
+ReconServant::Finalise (const char* name) {
+
+	error_code e = OK;
+
+	std::cout << "Deleting context ..." << std::endl;
+
+	for (int i = 0; i < m_contexts.size(); i++) {
+		delete m_contexts.back();
+		m_contexts.pop_back();
+	}
+
+	std::cout << "... done. Handling control back to client." << std::endl;
+
+	return e;
 
 }
 
@@ -54,41 +87,26 @@ ReconServant::Process  (const char* name)       {
 	
 	std::cout << "Setting incoming data ... " << std::endl;
 
-	ReconContext* context = new ReconContext(name);
+	m_contexts.at(0)->Strategy()->SetConfig(m_config);
 
-	context->Strategy()->SetRaw(&m_raw);
-	context->Strategy()->SetRHelper(&m_rhelper);
-	context->Strategy()->SetHelper(&m_helper);
-	context->Strategy()->SetKSpace(&m_kspace);
-	context->Strategy()->SetPixel(&m_pixel);
-	context->Strategy()->SetConfig(m_config);
+	std::cout << "... done. Initilising algorithm ... " << std::endl;
 
-	m_raw.dreal.length(0);
-	m_raw.dimag.length(0);
-	m_rhelper.dreal.length(0);
-	m_rhelper.dimag.length(0);
-	m_helper.vals.length(0);
-	m_helper.vals.length(0);
+	e = m_contexts.at(0)->Strategy()->Init();
 
-	std::cout << "... done. Will invoke data procession ... " << std::endl;
+	std::cout << "... done. Processing ... " << std::endl;
 
-	e = context->Strategy()->Init();
-	e = context->Strategy()->Process();
+	e = m_contexts.at(0)->Strategy()->Process();
 	
 	std::cout << "... done. Getting processed data..." << std::endl;
 	
-	context->Strategy()->GetRaw(&m_raw);
-	context->Strategy()->GetRHelper(&m_rhelper);
-	context->Strategy()->GetHelper(&m_helper);
-	context->Strategy()->GetKSpace(&m_kspace);
-	context->Strategy()->GetPixel(&m_pixel);
-	context->Strategy()->GetConfig(m_config);
+	m_contexts.at(0)->Strategy()->GetRaw(&m_raw);
+	m_contexts.at(0)->Strategy()->GetRHelper(&m_rhelper);
+	m_contexts.at(0)->Strategy()->GetHelper(&m_helper);
+	m_contexts.at(0)->Strategy()->GetKSpace(&m_kspace);
+	m_contexts.at(0)->Strategy()->GetPixel(&m_pixel);
+	m_contexts.at(0)->Strategy()->GetConfig(m_config);
 	
-	std::cout << "... done. Deleting context ..." << std::endl;
-
-	delete context;
-
-	std::cout << "... done. Will handle control back to client." << std::endl;
+	std::cout << "... done. " << std::endl;
 	
 	return e;
 	
@@ -98,21 +116,27 @@ ReconServant::Process  (const char* name)       {
 /**************************************************************************************************/
 void
 ReconServant::raw          (const raw_data& d)   {
-	m_raw = d;
+	
+	m_contexts.at(0)->Strategy()->SetRaw(&d);
+
 }
 
 
 /**************************************************************************************************/
 raw_data*
 ReconServant::raw          ()                    {
+
 	return new raw_data (m_raw);
+
 }
 
 
 /**************************************************************************************************/
 void
 ReconServant::rhelper          (const raw_data& d)   {
-	m_rhelper = d;
+
+	m_contexts.at(0)->Strategy()->SetRHelper(&d);
+
 }
 
 
@@ -126,7 +150,9 @@ ReconServant::rhelper          ()                    {
 /**************************************************************************************************/
 void
 ReconServant::helper       (const helper_data& d)   {
-	m_helper = d;
+
+	m_contexts.at(0)->Strategy()->SetHelper(&d);
+
 }
 
 
@@ -140,7 +166,9 @@ ReconServant::helper       ()                    {
 /**************************************************************************************************/
 void
 ReconServant::kspace       (const helper_data& d)   {
-	m_kspace = d;
+
+	m_contexts.at(0)->Strategy()->SetKSpace(&d);
+
 }
 
 
@@ -154,7 +182,9 @@ ReconServant::kspace       ()                    {
 /**************************************************************************************************/
 void
 ReconServant::pixel        (const pixel_data& d) {
-	m_pixel = d;
+
+	m_contexts.at(0)->Strategy()->SetPixel(&d);
+
 }
 
 
@@ -168,18 +198,25 @@ ReconServant::pixel        ()                    {
 /**************************************************************************************************/
 void 
 ReconServant::config       (const char* d)    {
+
 	std::stringstream tmp;
+
 	tmp << d;
 	m_config = new char[tmp.str().length()];
 	strcpy (m_config, tmp.str().c_str());
+
 }
 
 
 /**************************************************************************************************/
 char* 
 ReconServant::config       ()                    {
+
 	std::stringstream tmp;
+
 	tmp << m_config;
+
 	return CORBA::string_dup(tmp.str().c_str());
+
 }
 

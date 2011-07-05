@@ -84,6 +84,12 @@ public:
 	Init     () {};
 	
 	/**
+	 * @brief Initilise
+	 */ 
+	virtual error_code
+	Finalise     () {};
+	
+	/**
 	 * @brief  CPU clock rate
 	 *
 	 * @return clock rate
@@ -131,7 +137,7 @@ public:
 	/**
 	 * @brief Get data from recon
 	 */
-	void 
+	void
 	GetRaw           (raw_data* raw)   {
 		
 		for (int j = 0; j < INVALID_DIM; j++)
@@ -144,7 +150,7 @@ public:
 			raw->dreal[i] = m_raw[i].real();
 			raw->dimag[i] = m_raw[i].imag(); 
 		}
-		
+
 	}
 
 	
@@ -237,8 +243,17 @@ public:
 	void 
 	GetKSpace           (helper_data* kspace)   {
 
-		for (int i = 0; i < m_kspace.Size(); i++)
-			kspace->vals[i] = m_kspace[i];
+		for (int j = 0; j < INVALID_DIM; j++)
+			kspace->dims[j] = m_kspace.Dim(j);
+		
+		kspace->vals.length(m_kspace.Size()); 
+		
+		std::cout << m_kspace.Size() << std::endl;
+
+		/*for (int i = 0; i < m_kspace.Size(); i++)
+		  kspace->vals[i] = m_kspace[i];*/
+
+		std::cout << "4" << std::endl;
 
 	}
 	
@@ -256,7 +271,7 @@ public:
 		for (int j = 0; j < m_kspace.Size(); j++)
 			m_kspace[j] =  kspace->vals[j];
 		
-	};
+	}
 	
 	/**
 	 * @brief Get data from recon
@@ -284,6 +299,11 @@ public:
 			m_pixel[j] =  pixel->vals[j];
 		
 	};
+
+
+	void Info (std::string info) { m_info = info;}
+
+	std::string Info () {return m_info;}
 	
 protected:
 
@@ -292,6 +312,8 @@ protected:
 	Matrix<double>  m_helper;      /*!< helper matrix                      */
 	Matrix<double>  m_kspace;      /*!< kspace matrix                      */
 	Matrix<short>   m_pixel;       /*!< pixel data matrix                  */
+
+	std::string     m_info;
 
 };
 
