@@ -85,6 +85,24 @@ module RRSModule {
 		error_code        Process (in string name);
 		
 		/**
+		 * @brief         Finalise
+		 *                Clear data. Unload library.
+		 *
+		 * @param  name   Name of recontruction method
+		 * @return        Status
+		 */
+		error_code        Finalise (in string name);
+		
+		/**
+		 * @brief         Intialise
+		 *                Initilise process library
+		 *
+		 * @param  name   Name of recontruction method
+		 * @return        Status
+		 */
+		error_code        Init (in string name);
+		
+		/**
 		 * @brief         Declare CORBA attribute raw
 		 */
 		attribute         raw_data     raw;

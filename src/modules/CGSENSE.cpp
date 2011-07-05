@@ -6,12 +6,12 @@
 
 #include <vector>
 
-#ifndef HAVE_ISNAN
+//#ifndef HAVE_ISNAN
 inline bool isnan (double x) {
 	volatile double d  = x;
     return          d != d;
 }
-#endif
+//#endif
 
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
@@ -211,6 +211,8 @@ CGSENSE::Process () {
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
 	an = a.norm().real();
+
+	m_rhelper.Zero();
 
 	for (int i = 0; i < m_cgmaxit; i++, iters++) {
 

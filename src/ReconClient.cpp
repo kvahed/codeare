@@ -132,6 +132,15 @@ ReconClient::~ReconClient         ()            {
 }
 
 
+error_code
+ReconClient::Init (const char* name) {
+
+    error_code  result  = OK;
+    result = m_rrsi->Init (name);
+    
+
+}
+
 
 /**************************************************************************************************/
 error_code 
@@ -158,7 +167,7 @@ ReconClient::Process  (const char* name)  {
 	delete m_kspace;
 	delete m_pixel;
 
-    result = m_rrsi->Process(name);
+    result    = m_rrsi->Process ("");
     
     m_raw     = new raw_data;
 	m_rhelper = new raw_data;
@@ -168,11 +177,14 @@ ReconClient::Process  (const char* name)  {
 
     // Get data back from remote interface
 	m_raw     = m_rrsi->raw();
+
 	m_rhelper = m_rrsi->rhelper();
 	m_helper  = m_rrsi->helper();
 	m_kspace  = m_rrsi->kspace();
 	m_pixel   = m_rrsi->pixel();
 	SetConfig (m_rrsi->config());
+
+	result    = m_rrsi->Finalise("");
 
     return result;
     

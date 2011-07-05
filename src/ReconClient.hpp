@@ -66,7 +66,7 @@ namespace RRClient {
 		void 
 		Cleanup             ();
 		
-		/**
+ 		/**
 		 * @brief           Request data procession on recon service
 		 *
 		 * @param  name     Recon method
@@ -74,6 +74,15 @@ namespace RRClient {
 		 */ 
 		error_code              
 		Process             (const char* name);
+		
+ 		/**
+		 * @brief           Request data procession on recon service
+		 *
+		 * @param  name     Recon method
+		 * @return          Error code
+		 */ 
+		error_code              
+		Init                (const char* name);
 		
 		/**
 		 * @brief           Set raw my data with ...

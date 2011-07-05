@@ -72,6 +72,27 @@ namespace RRServer {
 		}
 		
 		
+		/**
+		 * @brief Process data with given strategy
+		 */
+		RRSModule::error_code
+			Init () {
+			return m_strategy->Init();
+		}
+		
+		
+		/**
+		 * @brief Process data with given strategy
+		 */
+		RRSModule::error_code
+			Finalise () {
+			return m_strategy->Finalise();
+		}
+		
+		void Info (std::string info) { m_strategy->Info(info);}
+		
+		std::string Info () {return m_strategy->Info();}
+		
 	private:
 		
 		ReconStrategy*            m_strategy;   /**< Active strategy           */
