@@ -89,6 +89,214 @@ namespace RRServer {
 			return m_strategy->Finalise();
 		}
 		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetConfig (const char* cstr) {
+			m_strategy->SetConfig(cstr);
+		}
+		
+		
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		ReadConfig (const char* fname) {
+			m_strategy->ReadConfig(fname);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetConfig (char* cstr) {
+			m_strategy->GetConfig(cstr);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetRaw (const raw_data* r) {
+			m_strategy->SetRaw(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetRaw (const Matrix<raw>* r) {
+			m_strategy->SetRaw(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetRaw (Matrix<raw>* r) {
+			m_strategy->GetRaw(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetRaw (raw_data* r) {
+			m_strategy->GetRaw(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetRHelper (const raw_data* r) {
+			m_strategy->SetRHelper(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetRHelper (const Matrix<raw>* r) {
+			m_strategy->SetRHelper(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetRHelper (Matrix<raw>* r) {
+			m_strategy->GetRHelper(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetRHelper (raw_data* r) {
+			m_strategy->GetRHelper(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetHelper (const helper_data* r) {
+			m_strategy->SetHelper(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetHelper (const Matrix<double>* r) {
+			m_strategy->SetHelper(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetHelper (Matrix<double>* r) {
+			m_strategy->GetHelper(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetHelper (helper_data* r) {
+			m_strategy->GetHelper(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetKSpace (const helper_data* r) {
+			m_strategy->SetKSpace(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetKSpace (const Matrix<double>* r) {
+			m_strategy->SetKSpace(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetKSpace (Matrix<double>* r) {
+			m_strategy->GetKSpace(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetKSpace (helper_data* r) {
+			m_strategy->GetKSpace(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetPixel (const pixel_data* r) {
+			m_strategy->SetPixel(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		SetPixel (const Matrix<short>* r) {
+			m_strategy->SetPixel(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetPixel (Matrix<short>* r) {
+			m_strategy->GetPixel(r);
+		}
+		
+
+		/**
+		 * @brief Process data with given strategy
+		 */
+		void
+		GetPixel (pixel_data* r) {
+			m_strategy->GetPixel(r);
+		}
+		
+
 		void Info (std::string info) { m_strategy->Info(info);}
 		
 		std::string Info () {return m_strategy->Info();}
