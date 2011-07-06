@@ -87,24 +87,24 @@ ReconServant::Process  (const char* name)       {
 	
 	std::cout << "Setting incoming data ... " << std::endl;
 
-	m_contexts.at(0)->Strategy()->SetConfig(m_config);
+	m_contexts.at(0)->SetConfig(m_config);
 
 	std::cout << "... done. Initilising algorithm ... " << std::endl;
 
-	e = m_contexts.at(0)->Strategy()->Init();
+	e = m_contexts.at(0)->Init();
 
 	std::cout << "... done. Processing ... " << std::endl;
 
-	e = m_contexts.at(0)->Strategy()->Process();
+	e = m_contexts.at(0)->Process();
 	
 	std::cout << "... done. Getting processed data..." << std::endl;
 	
-	m_contexts.at(0)->Strategy()->GetRaw(&m_raw);
-	m_contexts.at(0)->Strategy()->GetRHelper(&m_rhelper);
-	m_contexts.at(0)->Strategy()->GetHelper(&m_helper);
-	m_contexts.at(0)->Strategy()->GetKSpace(&m_kspace);
-	m_contexts.at(0)->Strategy()->GetPixel(&m_pixel);
-	m_contexts.at(0)->Strategy()->GetConfig(m_config);
+	m_contexts.at(0)->GetRaw(&m_raw);
+	m_contexts.at(0)->GetRHelper(&m_rhelper);
+	m_contexts.at(0)->GetHelper(&m_helper);
+	m_contexts.at(0)->GetKSpace(&m_kspace);
+	m_contexts.at(0)->GetPixel(&m_pixel);
+	m_contexts.at(0)->GetConfig(m_config);
 	
 	std::cout << "... done. " << std::endl;
 	
@@ -117,7 +117,7 @@ ReconServant::Process  (const char* name)       {
 void
 ReconServant::raw          (const raw_data& d)   {
 	
-	m_contexts.at(0)->Strategy()->SetRaw(&d);
+	m_contexts.at(0)->SetRaw(&d);
 
 }
 
@@ -135,7 +135,7 @@ ReconServant::raw          ()                    {
 void
 ReconServant::rhelper          (const raw_data& d)   {
 
-	m_contexts.at(0)->Strategy()->SetRHelper(&d);
+	m_contexts.at(0)->SetRHelper(&d);
 
 }
 
@@ -151,7 +151,7 @@ ReconServant::rhelper          ()                    {
 void
 ReconServant::helper       (const helper_data& d)   {
 
-	m_contexts.at(0)->Strategy()->SetHelper(&d);
+	m_contexts.at(0)->SetHelper(&d);
 
 }
 
@@ -167,7 +167,7 @@ ReconServant::helper       ()                    {
 void
 ReconServant::kspace       (const helper_data& d)   {
 
-	m_contexts.at(0)->Strategy()->SetKSpace(&d);
+	m_contexts.at(0)->SetKSpace(&d);
 
 }
 
@@ -183,7 +183,7 @@ ReconServant::kspace       ()                    {
 void
 ReconServant::pixel        (const pixel_data& d) {
 
-	m_contexts.at(0)->Strategy()->SetPixel(&d);
+	m_contexts.at(0)->SetPixel(&d);
 
 }
 

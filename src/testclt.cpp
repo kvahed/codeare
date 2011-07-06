@@ -1,5 +1,5 @@
 /*
- *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
+ *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipßour
  *                               Forschungszentrum JÃ¼lich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
 #include "options.h"
 #include "ReconClient.hpp"
+#include "ReconContext.hpp"
 
 #ifndef __WIN32__
     #include "config.h"
@@ -41,6 +42,8 @@ char*  data;
 char*  config;
 char*  verbose;
 char*  test;
+bool   remote;
+
 
 bool init (int argc, char** argv);
 
@@ -50,6 +53,8 @@ bool nuffttest (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
+	remote = false;
+
 	if (init (argc, argv)) {
 		
 		ReconClient client (name, verbose);
@@ -88,21 +93,42 @@ bool cgsensetest (ReconClient* rc) {
 	rawdata.read   (df, "data");
 	kspace.read    (df, "kspace");
 	sens.read      (df, "sensitivities");
-	
-	rc->Init       (test);
-	
-	rc->ReadConfig (cf.c_str());
-	rc->SetRaw     (rawdata);
-	rc->SetRHelper (sens);
-	rc->SetHelper  (weights);
-	rc->SetKSpace  (kspace);
 
-	rc->Process    (test);
+	if (remote) {
 	
-	rc->GetRaw     (rawdata);
-	rc->GetRHelper (sens);
-	rc->GetHelper  (weights);
-	
+		rc->Init       (test);
+		
+		rc->ReadConfig (cf.c_str());
+		rc->SetRaw     (rawdata);
+		rc->SetRHelper (sens);
+		rc->SetHelper  (weights);
+		rc->SetKSpace  (kspace);
+		
+		rc->Process    (test);
+		
+		rc->GetRaw     (rawdata);
+		rc->GetRHelper (sens);
+		rc->GetHelper  (weights);
+
+	} else {
+
+		RRServer::ReconContext* rx = new RRServer::ReconContext(test);
+
+		rx->ReadConfig(cf.c_str());
+		rx->SetRaw     (&rawdata);
+		rx->SetRHelper (&sens);
+		rx->SetHelper  (&weights);
+		rx->SetKSpace  (&kspace);
+
+		rx->Init();
+		rx->Process    ();
+		
+		rx->GetRaw     (&rawdata);
+		rx->GetRHelper (&sens);
+		rx->GetHelper  (&weights);
+			
+	}
+		
 	rawdata.dump   (odf.c_str());
 	sens.dump      (opf.c_str());
 	weights.dump   (oif.c_str());

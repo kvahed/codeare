@@ -138,17 +138,17 @@ public:
 	 * @brief Get data from recon
 	 */
 	void
-	GetRaw           (raw_data* raw)   {
+	GetRaw           (raw_data* r)   {
 		
 		for (int j = 0; j < INVALID_DIM; j++)
-			raw->dims[j] = m_raw.Dim(j);
+			r->dims[j] = m_raw.Dim(j);
 			
-		raw->dreal.length(m_raw.Size()); 
-		raw->dimag.length(m_raw.Size());
+		r->dreal.length(m_raw.Size()); 
+		r->dimag.length(m_raw.Size());
 			
 		for (int i = 0; i < m_raw.Size(); i++) {
-			raw->dreal[i] = m_raw[i].real();
-			raw->dimag[i] = m_raw[i].imag(); 
+			r->dreal[i] = m_raw[i].real();
+			r->dimag[i] = m_raw[i].imag(); 
 		}
 
 	}
@@ -158,15 +158,36 @@ public:
 	 * @brief Set data for recon
 	 */
 	void 
-	SetRaw           (const raw_data* raw)   {
+	SetRaw           (const raw_data* r)   {
 		
 		for (int i = 0; i < INVALID_DIM; i++)
-			m_raw.Dim(i) = raw->dims[i];
+			m_raw.Dim(i) = r->dims[i];
 		
 		m_raw.Reset ();
 		
 		for (int j = 0; j < m_raw.Size(); j++)
-			m_raw[j] =  std::complex<float> (raw->dreal[j], raw->dimag[j]);
+			m_raw[j] =  std::complex<float> (r->dreal[j], r->dimag[j]);
+		
+	}
+	
+	/**
+	 * @brief Get data from recon
+	 */
+	void
+	GetRaw           (Matrix<raw>* m)   {
+
+		m = &m_raw;
+
+	}
+
+	
+	/**
+	 * @brief Set data for recon
+	 */
+	void 
+	SetRaw           (const Matrix<raw>* m)   {
+		
+		m_raw = (*m);
 		
 	}
 	
@@ -208,6 +229,27 @@ public:
 	/**
 	 * @brief Get data from recon
 	 */
+	void
+	GetRHelper           (Matrix<raw>* m)   {
+
+		m = &m_rhelper;
+
+	}
+
+	
+	/**
+	 * @brief Set data for recon
+	 */
+	void 
+	SetRHelper           (const Matrix<raw>* m)   {
+		
+		m_rhelper = (*m);
+		
+	}
+	
+	/**
+	 * @brief Get data from recon
+	 */
 	void 
 	GetHelper           (helper_data* helper)   {
 
@@ -236,6 +278,27 @@ public:
 			m_helper[j] =  helper->vals[j];
 		
 	};
+	
+	/**
+	 * @brief Get data from recon
+	 */
+	void
+	GetHelper           (Matrix<double>* m)   {
+
+		m = &m_helper;
+
+	}
+
+	
+	/**
+	 * @brief Set data for recon
+	 */
+	void 
+	SetHelper           (const Matrix<double>* m)   {
+		
+		m_helper = (*m);
+		
+	}
 	
 	/**
 	 * @brief Get data from recon
@@ -276,6 +339,27 @@ public:
 	/**
 	 * @brief Get data from recon
 	 */
+	void
+	GetKSpace           (Matrix<double>* m)   {
+
+		m = &m_kspace;
+
+	}
+
+	
+	/**
+	 * @brief Set data for recon
+	 */
+	void 
+	SetKSpace           (const Matrix<double>* m)   {
+		
+		m_kspace = (*m);
+		
+	}
+	
+	/**
+	 * @brief Get data from recon
+	 */
 	void 
 	GetPixel           (pixel_data* pixel)   {
 
@@ -299,6 +383,28 @@ public:
 			m_pixel[j] =  pixel->vals[j];
 		
 	};
+
+	/**
+	 * @brief Get data from recon
+	 */
+	void
+	GetPixel           (Matrix<short>* m)   {
+
+		m = &m_pixel;
+
+	}
+
+	
+	/**
+	 * @brief Set data for recon
+	 */
+	void 
+	SetPixel           (const Matrix<short>* m)   {
+		
+		m_pixel = (*m);
+		
+	}
+	
 
 
 	void Info (std::string info) { m_info = info;}
