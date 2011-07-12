@@ -25,10 +25,13 @@ using namespace RRServer;
 
 ReconContext::~ReconContext () {
 	
-	int err = 0;
+	std::cout << "Deleting context " << m_strategy->Name() << " ..." << std::endl;
+
 	destroy_t* destroy = (destroy_t*) GetFunction(m_dlib, (char*)"destroy");
 	destroy(m_strategy);
 	CloseModule (m_dlib);
+
+	std::cout << "... done." << std::endl << "-----------------------------" << std::endl; 
 	
 }
 
@@ -38,7 +41,7 @@ ReconContext::ReconContext (const char* name) {
 	m_dlib = LoadModule ((char*)name);
 	create_t* create = (create_t*) GetFunction (m_dlib, (char*)"create");
 	m_strategy = create();
-
+	m_strategy->Name (name);
 }
 
 

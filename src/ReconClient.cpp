@@ -136,8 +136,10 @@ error_code
 ReconClient::Init (const char* name) {
 
     error_code  result  = OK;
-    result = m_rrsi->Init (name);
+    m_rstrats.push_back (m_rrsi->Init (name));
     
+	if (m_rstrats.back() == -1)
+		result = COULD_NOT_LOAD_LIBRARY;
 
 }
 
@@ -167,7 +169,7 @@ ReconClient::Process  (const char* name)  {
 	delete m_kspace;
 	delete m_pixel;
 
-    result    = m_rrsi->Process ("");
+    result    = m_rrsi->Process (m_rstrats.back());
     
     m_raw     = new raw_data;
 	m_rhelper = new raw_data;
@@ -184,7 +186,7 @@ ReconClient::Process  (const char* name)  {
 	m_pixel   = m_rrsi->pixel();
 	SetConfig (m_rrsi->config());
 
-	result    = m_rrsi->Finalise("");
+	result    = m_rrsi->Finalise(m_rstrats.back());
 
     return result;
     

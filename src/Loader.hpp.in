@@ -23,24 +23,38 @@
  * @param  mode   Loader mode
  */ 
 void* 
-LoadModule        (char *name) {
+LoadModule        (char* name) {
 
 	void* handle = 0;
 	
     #if defined(_MSC_VER) 
 
 	    name = strcat (name, ".dll");
+		std::cout << "Loading library ... " << name << std::endl;
+
 	    handle = (void*)LoadLibrary(name);
-		if (!handle)
-			std::cerr << "Cannot open " << name << std::endl;
-			
+		
+		if (!handle) 
+			std::cerr << "... FAILED! Cannot open " << name << std::endl;
+		else
+			std::cout << "... done." << std::endl;
+
+
     #elif defined(__GNUC__) 
 
-		handle = dlopen ((std::string("@prefix@/lib/") + std::string(name) + std::string(".so")).c_str(), RTLD_NOW);
+		std::string fname = std::string("@prefix@/lib/") + std::string(name) + std::string(".so");
+
+		std::cout << "Loading library ... " << fname.c_str() << std::endl;
+
+		handle = dlopen ((fname).c_str(), RTLD_NOW);
+
 		const char* err = dlerror();
+
 		if (err)
 			std::cerr << "Cannot open " << err << std::endl;
-
+		else
+			std::cout << "... done." << std::endl;
+		
     #endif
 
 	return handle;

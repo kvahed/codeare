@@ -350,6 +350,8 @@ namespace RRClient {
 		pixel_data*         m_pixel;      /**< Pixel data  (short sequence)         */
 		
 		CORBA::ORB_var      m_orb;        /**< Orb                                  */
+
+		std::vector<short>  m_rstrats;    /**< Remote reconstruction strategies    */
 		
 	};
 	
