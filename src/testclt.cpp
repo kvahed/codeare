@@ -53,8 +53,6 @@ bool nuffttest (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
-	remote = false;
-
 	if (init (argc, argv)) {
 		
 		ReconClient client (name, verbose);
@@ -242,7 +240,8 @@ bool init (int argc, char** argv) {
 	opt->addUsage  (" -h, --help    Print this help screen"); 
 	opt->addUsage  ("");
 	
-	opt->setFlag   ("help"   , 'h');
+	opt->setFlag   ("help"    ,'h');
+	opt->setFlag   ("remote"  ,'r');
 
 	opt->setOption ("name"   , 'n');
 	opt->setOption ("test"   , 't');
@@ -252,6 +251,8 @@ bool init (int argc, char** argv) {
 	opt->setOption ("base"   , 'b');
 	
 	opt->processCommandArgs(argc, argv);
+
+	remote = opt->getFlag("remote");
 	
 	if ( !(opt->hasOptions()) || opt->getFlag("help") ) {
 		

@@ -311,12 +311,8 @@ public:
 		
 		kspace->vals.length(m_kspace.Size()); 
 		
-		std::cout << m_kspace.Size() << std::endl;
-
-		/*for (int i = 0; i < m_kspace.Size(); i++)
-		  kspace->vals[i] = m_kspace[i];*/
-
-		std::cout << "4" << std::endl;
+		for (int i = 0; i < m_kspace.Size(); i++)
+			kspace->vals[i] = m_kspace[i];
 
 	}
 	
@@ -407,9 +403,9 @@ public:
 	
 
 
-	void Info (std::string info) { m_info = info;}
+	void Name (const char* name) { m_name = std::string(name);}
 
-	std::string Info () {return m_info;}
+	const char* Name () {return m_name.c_str();}
 	
 protected:
 
@@ -419,7 +415,7 @@ protected:
 	Matrix<double>  m_kspace;      /*!< kspace matrix                      */
 	Matrix<short>   m_pixel;       /*!< pixel data matrix                  */
 
-	std::string     m_info;
+	std::string     m_name;
 
 };
 

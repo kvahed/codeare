@@ -297,9 +297,9 @@ namespace RRServer {
 		}
 		
 
-		void Info (std::string info) { m_strategy->Info(info);}
+		void Name (const char* name) { m_strategy->Name(name);}
 		
-		std::string Info () {return m_strategy->Info();}
+		const char* Name () {return m_strategy->Name();}
 		
 	private:
 		

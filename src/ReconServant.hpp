@@ -60,22 +60,28 @@ namespace RRServer {
 		~ReconServant ();
 		
 		/**
-		 * @brief     Process algorithm
+		 * @brief     Process startegy
+		 *
+		 * @param s   Initialised strategy
+		 * @return    Sucess
 		 */
 		virtual error_code
-		Process       (const char* name);
+		Process       (const short s);
 		
 		/**
-		 * @brief     Initialise algorithm
+		 * @brief     Initialise strategy
+		 * 
+		 * @param name Name of processing library
+		 * @return    Id of 
 		 */
-		virtual error_code
+		virtual short int
 		Init          (const char* name);
 		
 		/**
 		 * @brief     Finalise algorithm
 		 */
 		virtual error_code
-		Finalise      (const char* name);
+		Finalise      (const short s);
 		
 		/**
 		 * @brief     Get data from recon

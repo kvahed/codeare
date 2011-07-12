@@ -39,40 +39,19 @@ ReconServant::ReconServant  ()               {
 /**************************************************************************************************/
 ReconServant::~ReconServant ()               {
 
-	this->Finalise ("");
+	this->Finalise (-1);
 	delete m_config;
 
 }
 
 
-error_code
+/**************************************************************************************************/
+short
 ReconServant::Init (const char* name) {
 
 	error_code e = OK;
 	
-	std::cout << "Loading library ... " << name << std::endl;
 	m_contexts.push_back(new ReconContext(name));
-	m_contexts.back()->Info(std::string(name));
-	std::cout << "... done." << std::endl;
-
-	return e;
-
-}
-
-
-error_code
-ReconServant::Finalise (const char* name) {
-
-	error_code e = OK;
-
-	std::cout << "Deleting context ..." << std::endl;
-
-	for (int i = 0; i < m_contexts.size(); i++) {
-		delete m_contexts.back();
-		m_contexts.pop_back();
-	}
-
-	std::cout << "... done. Handling control back to client." << std::endl;
 
 	return e;
 
@@ -81,30 +60,53 @@ ReconServant::Finalise (const char* name) {
 
 /**************************************************************************************************/
 error_code
-ReconServant::Process  (const char* name)       {
+ReconServant::Finalise (const short s) {
+
+	error_code e = OK;
+
+	if (s == -1)
+		for (int i = 0; i < m_contexts.size(); i++) {
+			delete m_contexts.back();
+			m_contexts.pop_back();
+		}
+	else {
+		
+		delete m_contexts.at(s);
+		m_contexts.erase (m_contexts.begin()+s);
+		
+	}
+
+	return e;
+
+}
+
+
+/**************************************************************************************************/
+error_code
+ReconServant::Process  (const short s)       {
 
 	error_code e = OK;
 	
-	std::cout << "Setting incoming data ... " << std::endl;
+	std::cout << "Configuring " << m_contexts.at(s)->Name() << " ... " << std::endl;
 
-	m_contexts.at(0)->SetConfig(m_config);
+	m_contexts.at(s)->SetConfig(m_config);
 
-	std::cout << "... done. Initilising algorithm ... " << std::endl;
+	std::cout << "... done. Initialising algorithm ... " << std::endl;
 
-	e = m_contexts.at(0)->Init();
+	e = m_contexts.at(s)->Init();
 
 	std::cout << "... done. Processing ... " << std::endl;
 
-	e = m_contexts.at(0)->Process();
+	e = m_contexts.at(s)->Process();
 	
 	std::cout << "... done. Getting processed data..." << std::endl;
 	
-	m_contexts.at(0)->GetRaw(&m_raw);
-	m_contexts.at(0)->GetRHelper(&m_rhelper);
-	m_contexts.at(0)->GetHelper(&m_helper);
-	m_contexts.at(0)->GetKSpace(&m_kspace);
-	m_contexts.at(0)->GetPixel(&m_pixel);
-	m_contexts.at(0)->GetConfig(m_config);
+	m_contexts.at(s)->GetRaw(&m_raw);
+	m_contexts.at(s)->GetRHelper(&m_rhelper);
+	m_contexts.at(s)->GetHelper(&m_helper);
+	m_contexts.at(s)->GetKSpace(&m_kspace);
+	m_contexts.at(s)->GetPixel(&m_pixel);
+	m_contexts.at(s)->GetConfig(m_config);
 	
 	std::cout << "... done. " << std::endl;
 	

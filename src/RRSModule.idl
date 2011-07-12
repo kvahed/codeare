@@ -82,7 +82,7 @@ module RRSModule {
 		 * @param  name   Name of recontruction method
 		 * @return        Status
 		 */
-		error_code        Process (in string name);
+		error_code        Process (in short s);
 		
 		/**
 		 * @brief         Finalise
@@ -91,7 +91,7 @@ module RRSModule {
 		 * @param  name   Name of recontruction method
 		 * @return        Status
 		 */
-		error_code        Finalise (in string name);
+		error_code        Finalise (in short s);
 		
 		/**
 		 * @brief         Intialise
@@ -100,7 +100,7 @@ module RRSModule {
 		 * @param  name   Name of recontruction method
 		 * @return        Status
 		 */
-		error_code        Init (in string name);
+		short               Init (in string name);
 		
 		/**
 		 * @brief         Declare CORBA attribute raw
