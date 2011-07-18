@@ -125,7 +125,7 @@ NuFFT_OMP::Process () {
 
 			if (m_verbose)
 				for (int i = 0; i < imgsize; i++) {
-					tmp[(j+1) * imgsize + i] = raw(m_iplan[tid].f_hat_iter[i][0], m_iplan[tid].f_hat_iter[i][1]);
+   				tmp[(j+1) * imgsize + i] = raw(m_iplan[tid].f_hat_iter[i][0], m_iplan[tid].f_hat_iter[i][1]);
 					tmp[i] += tmp[(j+1) * imgsize + i];
 				}
 			
