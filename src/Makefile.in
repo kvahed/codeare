@@ -55,8 +55,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = options.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
 	tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
 	tinyxmlparser.$(OBJEXT) Toolbox.$(OBJEXT)
-am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT) \
-	ReconStrategy.$(OBJEXT)
+am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	reconserver.$(OBJEXT)
 reconserver_OBJECTS = $(am_reconserver_OBJECTS)
@@ -64,8 +63,7 @@ reconserver_LDADD = $(LDADD)
 reconserver_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(reconserver_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_3 = ReconClient.$(OBJEXT) ReconContext.$(OBJEXT) \
-	ReconStrategy.$(OBJEXT)
+am__objects_3 = ReconClient.$(OBJEXT) ReconContext.$(OBJEXT)
 am_testclt_OBJECTS = $(am__objects_1) $(am__objects_3) \
 	testclt.$(OBJEXT)
 testclt_OBJECTS = $(am_testclt_OBJECTS)
@@ -260,10 +258,10 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 COMMON = RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp Toolbox.cpp
 
 # Client side stuff
-CLIENT_SIDE = ReconClient.h ReconClient.cpp ReconContext.h ReconContext.cpp  ReconStrategy.hpp ReconStrategy.cpp
+CLIENT_SIDE = ReconClient.h ReconClient.cpp ReconContext.h ReconContext.cpp  ReconStrategy.hpp #ReconStrategy.cpp
 
 # Reconstruction strategies & server side stuff
-SERVER_SIDE = Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServant.cpp ReconStrategy.hpp ReconStrategy.cpp
+SERVER_SIDE = Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServant.cpp ReconStrategy.hpp #ReconStrategy.cpp
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
@@ -388,7 +386,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconServant.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconStrategy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@

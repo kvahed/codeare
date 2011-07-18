@@ -133,6 +133,7 @@ CGSENSE::Init() {
 
 	// Initialise FT plans ------------------
 	
+	printf ("  intilise: %.9f ...\n");
 	for (int i = 0; i < NTHREADS; i++)
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 	// --------------------------------------

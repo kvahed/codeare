@@ -14,10 +14,10 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 COMMON =  RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp Toolbox.cpp
 
 # Client side stuff
-CLIENT_SIDE =  ReconClient.h ReconClient.cpp ReconContext.h ReconContext.cpp  ReconStrategy.hpp ReconStrategy.cpp
+CLIENT_SIDE =  ReconClient.h ReconClient.cpp ReconContext.h ReconContext.cpp  ReconStrategy.hpp #ReconStrategy.cpp
 
 # Reconstruction strategies & server side stuff
-SERVER_SIDE =  Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServant.cpp ReconStrategy.hpp ReconStrategy.cpp
+SERVER_SIDE =  Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServant.cpp ReconStrategy.hpp #ReconStrategy.cpp
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
