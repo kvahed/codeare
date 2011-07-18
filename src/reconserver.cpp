@@ -70,7 +70,7 @@ int main (int argc, char** argv) {
 		}
 		
 		// Initialise ORB
-		const char*    options[][2] = { { (char*)"traceLevel", debug}, { (char*)"traceFile", logfile}, { 0, 0 } };
+		const char*    options[][2] = { { (char*)"traceLevel", debug}, /*{ (char*)"traceFile", logfile}, */{ 0, 0 } };
 		CORBA::ORB_var orb          = CORBA::ORB_init(argc, argv, "omniORB4", options);
 		
 		// Get reference to the RootPOA.

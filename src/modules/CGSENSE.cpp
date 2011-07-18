@@ -20,18 +20,21 @@ using namespace RRStrategy;
 
 CGSENSE::~CGSENSE () {
 
+	if (initialised) {
 #pragma omp parallel default (shared) 
-	{
-		
-		omp_set_num_threads(NTHREADS);
-		int tid      = omp_get_thread_num();
-		
-		nfft::finalize (&m_fplan[tid], &m_iplan[tid]);
-
+		{
+			
+			omp_set_num_threads(NTHREADS);
+			int tid      = omp_get_thread_num();
+			
+			nfft::finalize (&m_fplan[tid], &m_iplan[tid]);
+			
+		}
 	}
 
 	delete [] m_N;
 	delete [] m_n;
+
 
 }
 
@@ -39,13 +42,21 @@ CGSENSE::~CGSENSE () {
 RRSModule::error_code 
 CGSENSE::Init() {
 
+	printf ("Intialising CG-SENSE ...\n");
+
 	RRSModule::error_code error = OK; 
 
+	initialised = false;
+
+	// Image space dimensions ----------------
 	m_N   = new int[3];
+
+	// Oversampling --------------------------
 	m_n   = new int[3];
 
+	// Some defaults
 	for (int i = 0; i < 3; i++) {
-		m_N[i] = 0; 
+		m_N[i] = 1; 
 		m_n[i] = 0;
 	}
 
@@ -53,6 +64,29 @@ CGSENSE::Init() {
 	m_verbose  = 0;
 	m_noise    = 0;
 	m_dim      = 1;
+
+	// Dimensions ---------------------------
+
+	Attribute("dim",       &m_dim);
+	printf ("  dimensions: %iD ...\n", m_dim);
+
+
+	if (m_dim < 2 || m_dim > 3) {
+		printf ("%s only supports 2-3 dimensions. %i was specified.\n", Name(), m_dim);
+		return UNSUPPORTED_DIMENSION;
+	}
+
+	for (int i = 0; i < m_dim; i++)
+		Attribute (sides[i].c_str(),       &m_N[i]);
+
+	for (int i = 0; i < m_dim; i++)
+		if (m_N[i] < 16) {
+			printf ("%s only supports image matrix sides >= 16. (%ix%ix%i) was specified.\n", Name(), m_N[0], m_N[1], m_N[2]);
+			return UNSUPPORTED_IMAGE_MATRIX;
+		}
+
+	m_M   = m_helper.Size();
+	// --------------------------------------
 
 	// Verbosity ----------------------------
 
@@ -62,33 +96,27 @@ CGSENSE::Init() {
 	// Verbosity ----------------------------
 
 	Attribute ("verbose",   &m_verbose);
+	printf ("  verbose feedback: %i ...\n", m_verbose);
 	// --------------------------------------
 
 	// Noise --------------------------------
 
 	Attribute ("noise",   &m_noise);
-	// --------------------------------------
-
-	// Dimensions ---------------------------
-
-	Attribute("dim",       &m_dim);
-
-	for (int i = 0; i < m_dim; i++)
-		Attribute (sides[i].c_str(),       &m_N[i]);
-
-	m_M   = m_helper.Size();
-	// --------------------------------------
-
-	// iNFFT convergence and break criteria -
-
-	Attribute ("maxit",   &m_maxit);
-	Attribute ("epsilon", &m_epsilon);
+	printf ("  gaussian white noise (normalised): %.9f ...\n", m_noise);
 	// --------------------------------------
 
 	// CG convergence and break criteria ----
 
 	Attribute ("cgeps",   &m_cgeps);
 	Attribute ("cgmaxit", &m_cgmaxit);
+	printf ("  maximum #iterations: %i ...\n", m_cgmaxit);
+	printf ("  convergence criterium: %.9f ...\n", m_cgeps);
+	// --------------------------------------
+
+	// iNFFT convergence and break criteria -
+
+	Attribute ("maxit",   &m_maxit);
+	Attribute ("epsilon", &m_epsilon);
 	// --------------------------------------
 
 	// Oversampling -------------------------
@@ -108,6 +136,8 @@ CGSENSE::Init() {
 	for (int i = 0; i < NTHREADS; i++)
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 	// --------------------------------------
+
+	initialised = true;
 
 	return error;
 

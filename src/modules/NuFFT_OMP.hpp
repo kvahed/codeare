@@ -25,7 +25,7 @@
 
 #include "ReconStrategy.hpp"
 
-static const int NTHREADS = 8;
+static const int NTHREADS = 4;
 
 using namespace RRServer;
 
