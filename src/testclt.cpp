@@ -94,7 +94,10 @@ bool cgsensetest (ReconClient* rc) {
 
 	if (remote) {
 	
-		rc->Init       (test);
+		if (rc->Init (test) != OK) {
+			printf ("Intialising failed ... bailing out!"); 
+			return false;
+		}
 		
 		rc->ReadConfig (cf.c_str());
 		rc->SetRaw     (rawdata);
@@ -143,9 +146,11 @@ bool nuffttest (ReconClient* rc) {
 	std::string    df  = std::string (base + std::string(data));
 	std::string    odf = std::string (base + std::string("/images.h5"));
 
+	rc->Init(test);
+
 	weights.read   (df, "weights");
 	rawdata.read   (df, "data");
-	kspace.read    (df, "8_shot_spiral");
+	kspace.read    (df, "kspace");
 
 	rc->ReadConfig (cf.c_str());
 	rc->SetRaw     (rawdata);

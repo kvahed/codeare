@@ -42,7 +42,6 @@
 
 using namespace RRSModule;
 
-
 namespace RRServer {
 /**
  * @brief Strategy for reconstruction strategies
@@ -311,8 +310,8 @@ public:
 		
 		kspace->vals.length(m_kspace.Size()); 
 		
-		for (int i = 0; i < m_kspace.Size(); i++)
-			kspace->vals[i] = m_kspace[i];
+		/*for (int i = 0; i < m_kspace.Size(); i++)
+		  kspace->vals[i] = m_kspace[i];*/
 
 	}
 	

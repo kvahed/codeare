@@ -136,10 +136,13 @@ error_code
 ReconClient::Init (const char* name) {
 
     error_code  result  = OK;
+
     m_rstrats.push_back (m_rrsi->Init (name));
     
 	if (m_rstrats.back() == -1)
-		result = COULD_NOT_LOAD_LIBRARY;
+		result = CANNOT_LOAD_LIBRARY;
+
+	return result;
 
 }
 

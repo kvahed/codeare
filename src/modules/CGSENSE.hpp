@@ -84,7 +84,7 @@ namespace RRStrategy {
 		double               m_epsilon;         /**< NuFFT convergence criterium     */
 		int                  m_maxit;           /**< Maximum number of NuFFT solver iterations */
 		double               m_cgeps;           /**< CG SENSE convergence criterium  */
-		double               m_cgmaxit;         /**< Maximum number of CG iterations */
+		int                  m_cgmaxit;         /**< Maximum number of CG iterations */
 		
 		int*                 m_N;               /**< Size of image matrix.           */
 		int*                 m_n;               /**< Oversampling                    */ 
@@ -95,6 +95,8 @@ namespace RRStrategy {
 		double*              m_ftk;             /**< K-space points */
 		
 		double*              kmax;              /**< Maximum k-space vector          */
+
+		bool                 initialised;       
 		
 	};
 	

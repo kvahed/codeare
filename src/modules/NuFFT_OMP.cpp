@@ -37,21 +37,27 @@ NuFFT_OMP::Init () {
 
 	for (int i = 0; i < m_dim; i++)
 		Attribute (sides[i].c_str(),       &m_N[i]);
+
+	m_M   = m_helper.Size();
 	// --------------------------------------
+
+	//Attribute("M",       &m_M);
 
 	Attribute("maxit",   &m_maxit);
 	Attribute("epsilon", &m_epsilon);
-	Attribute("verbose", &m_verbose);
+
+	// Oversampling -------------------------
 
 	int      m           = 1;
 	double   alpha       = 1.0;
 
-	Attribute("m",       &m);
-	Attribute("alpha",   &alpha);
+	Attribute ("m",       &m);
+	Attribute ("alpha",   &alpha);
 
-   	m_n[0] = ceil (m_N[0]*alpha);
-	m_n[1] = ceil (m_N[1]*alpha);
+	for (int i = 0; i < m_dim; i++)
+		m_n[i] = ceil (m_N[i]*alpha);
 
+	// --------------------------------------
 	// Number of samples
 	m_shots = m_raw.Dim(LIN);
 	m_M     = m_raw.Dim(COL);
@@ -74,9 +80,6 @@ NuFFT_OMP::Process () {
 
 	printf ("Processing NuFFT_OMP ...\n");
 	ticks start = getticks();
-
-	// Kspace adjustment (Don't know yet why necessary)
-	m_kspace = m_kspace / (1/(GAMMA/128*m_N[0]));
 
 	int imgsize = 1;
 	for (int i = 0; i < m_dim; i++)

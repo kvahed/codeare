@@ -93,7 +93,10 @@ ReconServant::Process  (const short s)       {
 
 	std::cout << "... done. Initialising algorithm ... " << std::endl;
 
-	e = m_contexts.at(s)->Init();
+	if ((e = m_contexts.at(s)->Init()) != OK) {
+		std::cout << "... FAILED!!! Bailing out." << std::endl;
+		return e;
+	}
 
 	std::cout << "... done. Processing ... " << std::endl;
 
