@@ -868,6 +868,25 @@ public:
     
 
     /**
+     * @brief           Resize to dims, reallocate and zero repository
+     *
+     * @param  dim      New dimensions
+     */
+    inline void         
+    Clear               ()                                      {
+
+    	for (int i = 0; i < INVALID_DIM; i++)
+            _dim[i] = 1;
+
+        if (nb_alloc) {
+            free (_M);
+            nb_alloc--;
+        }
+
+    }
+    
+
+    /**
      * @brief           Reset. i.e. reallocate and set all fields = T(0)
      */
     inline void         
