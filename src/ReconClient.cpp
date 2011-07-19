@@ -160,21 +160,25 @@ ReconClient::Process  (const char* name)  {
 
     // Send data for procession to remote interface
     m_rrsi->raw     (*(m_raw));
-    m_rrsi->rhelper (*(m_rhelper));
-    m_rrsi->helper  (*(m_helper));
-    m_rrsi->kspace  (*(m_kspace));
-    m_rrsi->pixel   (*(m_pixel));
-	m_rrsi->config  (temp.str().c_str());
-	
 	delete m_raw;
+
+    m_rrsi->rhelper (*(m_rhelper));
 	delete m_rhelper;
+
+    m_rrsi->helper  (*(m_helper));
 	delete m_helper;
+
+    m_rrsi->kspace  (*(m_kspace));
 	delete m_kspace;
+
+    m_rrsi->pixel   (*(m_pixel));
 	delete m_pixel;
 
+	m_rrsi->config  (temp.str().c_str());
+
     result    = m_rrsi->Process (m_rstrats.back());
-    
-    m_raw     = new raw_data;
+
+	m_raw     = new raw_data;
 	m_rhelper = new raw_data;
     m_helper  = new helper_data;
     m_kspace  = new helper_data;
