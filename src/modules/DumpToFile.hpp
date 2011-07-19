@@ -52,6 +52,22 @@ namespace RRStrategy {
 		virtual RRSModule::error_code
 		Process     ();
 		
+		/**
+		 * @brief Do nothing 
+		 */
+		virtual RRSModule::error_code
+		Init () {
+			return OK;
+		}
+
+		/**
+		 * @brief Do nothing 
+		 */
+		virtual RRSModule::error_code
+		Finalise () {
+			return OK;
+		}
+		
 	};
 
 }

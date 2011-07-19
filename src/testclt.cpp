@@ -181,6 +181,8 @@ bool internaltest (ReconClient* rc) {
 	std::cout << h << std::endl;
 	std::cout << p << std::endl;
 	
+	rc->Init(test);
+
 	rc->SetRaw(r);
 	rc->SetRHelper(r);
 	rc->SetPixel(p);

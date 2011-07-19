@@ -61,6 +61,12 @@ namespace RRStrategy {
 		virtual RRSModule::error_code
 		Init ();
 		
+		/**
+		 * @brief Dump data to disk
+		 */
+		virtual RRSModule::error_code
+		Finalise ();
+		
 	private:
 		
 		// We only support 2 dims for the time being

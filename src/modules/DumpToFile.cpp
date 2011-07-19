@@ -28,6 +28,8 @@ DumpToFile::Process () {
 	std::stringstream fname;
 	const char* uid = Attribute ("UID");
 
+	printf ("Dumping ...\n");
+
 	if (uid == 0  ||  uid == "")
 		uid = "unspecified";
 
@@ -41,6 +43,8 @@ DumpToFile::Process () {
 	m_raw.dump    (fname.str().c_str());
 	m_helper.dump (fname.str().c_str());
 	m_pixel.dump  (fname.str().c_str());
+
+	printf ("... done\n");
 
 	return RRSModule::OK;
 

@@ -65,7 +65,11 @@ namespace RRStrategy {
 		virtual RRSModule::error_code
 		Init ();
 		
-		
+		/**
+		 * @brief Initialise NuFFT plans
+		 */
+		virtual RRSModule::error_code
+		Finalise ();
 		
 	private:
 		
@@ -96,8 +100,6 @@ namespace RRStrategy {
 		
 		double*              kmax;              /**< Maximum k-space vector          */
 
-		bool                 initialised;       
-		
 	};
 	
 }

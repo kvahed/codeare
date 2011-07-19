@@ -5,23 +5,36 @@ using namespace RRStrategy;
 
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
-NuFFT_OMP::NuFFT_OMP () {
+NuFFT_OMP::NuFFT_OMP () {}
 
-}
 
 NuFFT_OMP::~NuFFT_OMP () {
+	
+	this->Finalise();
+	
+}
 
-	for (int i = 0; i < NTHREADS; i++)
-		nfft::finalize (&m_fplan[i], &m_iplan[i]);
+
+RRSModule::error_code
+NuFFT_OMP::Finalise () {
+
+	if(m_initialised)	
+		for (int i = 0; i < NTHREADS; i++)
+			nfft::finalize (&m_fplan[i], &m_iplan[i]);
 
 	delete [] m_N;
 	delete [] m_n;
+
+	return OK;
+
 }
 
 RRSModule::error_code
 NuFFT_OMP::Init () {
 
 	RRSModule::error_code error = OK; 
+
+	m_initialised = false;
 
 	m_N   = new int[3];
 	m_n   = new int[3];
@@ -67,6 +80,8 @@ NuFFT_OMP::Init () {
 	for (int i = 0; i < NTHREADS; i++)
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 	// --------------------------------------
+
+	m_initialised = true;
 
 	return error;
 
