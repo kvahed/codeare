@@ -150,6 +150,8 @@ public:
 			r->dimag[i] = m_raw[i].imag(); 
 		}
 
+		m_raw.Clear();
+
 	}
 
 	
@@ -175,7 +177,8 @@ public:
 	void
 	GetRaw           (Matrix<raw>* m)   {
 
-		m = &m_raw;
+		(*m) = m_raw;
+		m_raw.Clear();
 
 	}
 

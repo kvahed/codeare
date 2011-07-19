@@ -37,7 +37,7 @@ LoadModule        (char* name) {
 		if (!handle) 
 			std::cerr << "... FAILED! Cannot open " << name << std::endl;
 		else
-			std::cout << "... done." << std::endl;
+			std::cout << "... done.\n" << std::endl;
 
 
     #elif defined(__GNUC__) 
@@ -53,7 +53,7 @@ LoadModule        (char* name) {
 		if (err)
 			std::cerr << "Cannot open " << err << std::endl;
 		else
-			std::cout << "... done." << std::endl;
+			std::cout << "... done.\n" << std::endl;
 		
     #endif
 

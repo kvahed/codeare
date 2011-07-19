@@ -68,7 +68,7 @@ CGSENSE::Init() {
 	// Dimensions ---------------------------
 
 	Attribute("dim",       &m_dim);
-	printf ("  dimensions: %iD ...\n", m_dim);
+	printf ("  dimensions: %iD \n", m_dim);
 
 
 	if (m_dim < 2 || m_dim > 3) {
@@ -96,21 +96,21 @@ CGSENSE::Init() {
 	// Verbosity ----------------------------
 
 	Attribute ("verbose",   &m_verbose);
-	printf ("  verbose feedback: %i ...\n", m_verbose);
+	printf ("  verbose feedback: %i \n", m_verbose);
 	// --------------------------------------
 
 	// Noise --------------------------------
 
 	Attribute ("noise",   &m_noise);
-	printf ("  gaussian white noise (normalised): %.9f ...\n", m_noise);
+	printf ("  gaussian white noise (normalised): %.9f \n", m_noise);
 	// --------------------------------------
 
 	// CG convergence and break criteria ----
 
 	Attribute ("cgeps",   &m_cgeps);
 	Attribute ("cgmaxit", &m_cgmaxit);
-	printf ("  maximum #iterations: %i ...\n", m_cgmaxit);
-	printf ("  convergence criterium: %.9f ...\n", m_cgeps);
+	printf ("  maximum #iterations: %i \n", m_cgmaxit);
+	printf ("  convergence criterium: %.9f \n", m_cgeps);
 	// --------------------------------------
 
 	// iNFFT convergence and break criteria -
@@ -133,12 +133,20 @@ CGSENSE::Init() {
 
 	// Initialise FT plans ------------------
 	
-	printf ("  intilise: %.9f ...\n");
+	printf ("  intialising nfft::init (%i, {%i, %i, %i}, %i, {%i, %i, %i}, %i, *, *, %.9f)\n", 
+			m_dim, 
+			m_N[0], m_N[1], m_N[2],
+			m_M,
+			m_n[0], m_n[1], m_n[2],
+			m,
+			m_epsilon);
 	for (int i = 0; i < NTHREADS; i++)
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 	// --------------------------------------
 
 	initialised = true;
+
+	printf ("... done.\n\n");
 
 	return error;
 
@@ -151,7 +159,7 @@ CGSENSE::Process () {
 	RRSModule::error_code error = OK;
 
 	// CG matrices ----------------------------------------------------
-	Matrix<raw> a, p, q, r, r_new;
+	Matrix<raw> p, q, r;
 
 	// Add white noise? (Only for testing) ----------------------------
 	if (m_noise > 0.0)
@@ -159,8 +167,8 @@ CGSENSE::Process () {
 	
 	// ----------------------------------------------------------------
 	for (int i = 0; i < m_dim      ; i++)
-		a.Dim(i) = m_N[i];
-	a.Reset();
+		p.Dim(i) = m_N[i];
+	p.Reset();
 	
 	// Set k-space and weights ----------------------------------------
 	for (int i = 0; i < NTHREADS; i++) {
@@ -195,12 +203,6 @@ CGSENSE::Process () {
 		sstore.Dim (CHA) = m_cgmaxit;
 	sstore.Reset();
 
-	// Temporary imag repository --------------------------------------
-	Matrix<raw> itmp;
-	for (int i = 0; i < m_dim; i++)
-		itmp.Dim (i) = m_N[i];
-	itmp.Reset();
-	
 	// Create test data (Incoming data is image space) ----------------
 	if (m_testcase) {
 		E  (&m_rhelper, &m_sens, m_fplan, &stmp, m_dim);
@@ -213,11 +215,10 @@ CGSENSE::Process () {
 	ticks cgstart = getticks();
 
 	// First left side action -----------------------------------------
-	EH (&m_raw, &m_sens, m_fplan, m_iplan, m_epsilon, m_maxit, &a, m_dim);
+	EH (&m_raw, &m_sens, m_fplan, m_iplan, m_epsilon, m_maxit, &p, m_dim);
 
-	p = a;
-	r = a;
-	q = a;
+	r = p;
+	q = p;
 
 	// Out going image ------------------------------------------------
 	// Resize m_raw for output
@@ -241,7 +242,7 @@ CGSENSE::Process () {
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
-	an = a.norm().real();
+	an = p.norm().real();
 
 	m_rhelper.Zero();
 
@@ -251,7 +252,7 @@ CGSENSE::Process () {
 
 		res.push_back(rn/an);
 		
-		printf ("%03i: CG residuum: %.9f\n", i, res.at(i));
+		printf ("  %03i: CG residuum: %.9f\n", i, res.at(i));
 
 		// Convergence ? ----------------------------------------------
 		if (isnan(res.at(i)) || res.at(i) <= m_cgeps)
@@ -262,17 +263,13 @@ CGSENSE::Process () {
 		EH (&stmp, &m_sens, m_fplan, m_iplan, m_epsilon, m_maxit, &q   , m_dim);
 
 		rtmp      = (rn / (p.dotc(q)));
-		itmp      = p * rtmp;
-		m_raw     = m_raw + itmp;
+		m_raw     = (p * rtmp) + m_raw;
 		stmp      = stmp * rtmp;
 		m_rhelper = m_rhelper + stmp;
-		itmp      = q * rtmp;
-		r_new     = r - itmp;
-		rnewn     = r_new.norm().real();
+		r         = - (q * rtmp) + r ;
+		rnewn     = r.norm().real();
 		rtmp      = rnewn/rn;
-		itmp      = p * rtmp;
-		p         = r_new + itmp;
-		r         = r_new;
+		p         = (p * rtmp) + r ;
 
 		// Verbose out put keeps all intermediate steps ---------------
 		if (m_verbose) {

@@ -3,18 +3,25 @@ Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
     
     int i;
 
+    if (nb_alloc) {
+		
+		if (this->Size() != M.Size()) {
+
+			delete[](_M);
+			_M = (T*) malloc (M.Size() * sizeof (T));
+
+		}
+		
+	} else {
+
+		_M = (T*) malloc (M.Size() * sizeof (T));
+		nb_alloc = 1;
+
+	}
+
 	for (int i = 0; i < INVALID_DIM; i++)
 		_dim[i] = M.Dim()[i];
-    
-    if (nb_alloc)
-		if (Size() != M.Size()) {
-			delete[](_M);
-			_M = new T[Size()]();
-		} else {
-			_M = new T[Size()]();
-			nb_alloc = 1;
-		}
-
+		
 #pragma omp parallel default (shared) 
 	{
 		
@@ -38,18 +45,25 @@ Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
     
     int i;
 
+    if (nb_alloc) {
+		
+		if (this->Size() != M.Size()) {
+
+			delete[](_M);
+			_M = (T*) malloc (M.Size() * sizeof (T));
+
+		}
+		
+	} else {
+
+		_M = (T*) malloc (M.Size() * sizeof (T));
+		nb_alloc = 1;
+
+	}
+
 	for (int i = 0; i < INVALID_DIM; i++)
 		_dim[i] = M.Dim()[i];
-    
-    if (nb_alloc)
-		if (Size() != M.Size()) {
-			delete[](_M);
-			_M = new T[Size()]();
-		} else {
-			_M = new T[Size()]();
-			nb_alloc = 1;
-		}
-
+		
 #pragma omp parallel default (shared) 
 	{
 		
@@ -57,10 +71,10 @@ Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
 		int chunk    = Size() / omp_get_num_threads();
 		
 #pragma omp for schedule (dynamic, chunk)
-		
+
 		for (int i = 0; i < Size(); i++)
 			_M[i] = M[i];
-		
+
 	}
 	
     return *this;
