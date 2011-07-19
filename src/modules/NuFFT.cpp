@@ -9,8 +9,9 @@ NuFFT::NuFFT () {
 }
 
 NuFFT::~NuFFT () {
-
-	nfft::finalize (&m_fplan, &m_iplan);
+	
+	if (m_initialised)
+		nfft::finalize (&m_fplan, &m_iplan);
 
 	delete [] m_N;
 	delete [] m_n;
@@ -20,6 +21,7 @@ RRSModule::error_code
 NuFFT::Init () {
 
 	RRSModule::error_code error = OK; 
+	m_initialised               = false;
 
 	m_N   = new int[3];
 	m_n   = new int[3];
@@ -57,6 +59,8 @@ NuFFT::Init () {
 	// --------------------------------------
 
 	nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan, &m_iplan, m_epsilon);
+
+	m_initialised = true;
 
 	return error;
 

@@ -63,7 +63,7 @@ namespace RRStrategy {
 		 * @brief Do nothing 
 		 */
 		virtual RRSModule::error_code
-		Finalise () {};
+		Finalise ();
 		
 	private:
 		
