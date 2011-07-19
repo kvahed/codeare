@@ -4,18 +4,31 @@ using namespace RRStrategy;
 
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
+
 NuFFT::NuFFT () {
 
 }
 
+
 NuFFT::~NuFFT () {
-	
+
+	this->Finalise();
+
+}
+
+
+RRSModule::error_code 
+NuFFT::Finalise () {
+
 	if (m_initialised)
 		nfft::finalize (&m_fplan, &m_iplan);
 
 	delete [] m_N;
 	delete [] m_n;
+
 }
+
+
 
 RRSModule::error_code
 NuFFT::Init () {
