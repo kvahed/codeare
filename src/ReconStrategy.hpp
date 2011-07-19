@@ -80,13 +80,13 @@ public:
 	 * @brief Initilise
 	 */ 
 	virtual error_code
-	Init     () {};
+	Init     () = 0;
 	
 	/**
 	 * @brief Initilise
 	 */ 
 	virtual error_code
-	Finalise     () {};
+	Finalise     () = 0;
 	
 	/**
 	 * @brief  CPU clock rate
@@ -209,6 +209,8 @@ public:
 			rhelper->dreal[i] = m_rhelper[i].real();
 			rhelper->dimag[i] = m_rhelper[i].imag(); 
 		}
+
+		m_rhelper.Clear();
 			
 	}
 	
@@ -263,6 +265,8 @@ public:
 		for (int i = 0; i < m_helper.Size(); i++)
 			helper->vals[i] = m_helper[i];
 
+		m_helper.Clear();
+
 	}
 	
 	/**
@@ -316,6 +320,8 @@ public:
 		for (int i = 0; i < m_kspace.Size(); i++)
 		  kspace->vals[i] = m_kspace[i];
 
+		m_kspace.Clear();
+
 	}
 	
 	/**
@@ -361,8 +367,15 @@ public:
 	void 
 	GetPixel           (pixel_data* pixel)   {
 
+		for (int j = 0; j < INVALID_DIM; j++)
+			pixel->dims[j] = m_pixel.Dim(j);
+		
+		pixel->vals.length(m_pixel.Size()); 
+		
 		for (int i = 0; i < m_pixel.Size(); i++)
-			pixel->vals[i] = m_pixel[i];
+		  pixel->vals[i] = m_pixel[i];
+
+		m_pixel.Clear();
 
 	}
 	
@@ -418,6 +431,8 @@ protected:
 	Matrix<short>   m_pixel;       /*!< pixel data matrix                  */
 
 	std::string     m_name;
+
+	bool            m_initialised; /*!< Reco is initialised                */
 
 };
 

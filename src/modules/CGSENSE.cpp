@@ -19,8 +19,14 @@ using namespace RRStrategy;
 
 
 CGSENSE::~CGSENSE () {
+	this->Finalise();
+}
 
-	if (initialised) {
+
+RRSModule::error_code 
+CGSENSE::Finalise () {
+
+	if (m_initialised) {
 #pragma omp parallel default (shared) 
 		{
 			
@@ -35,6 +41,7 @@ CGSENSE::~CGSENSE () {
 	delete [] m_N;
 	delete [] m_n;
 
+	return OK;
 
 }
 
@@ -46,7 +53,7 @@ CGSENSE::Init() {
 
 	RRSModule::error_code error = OK; 
 
-	initialised = false;
+	m_initialised = false;
 
 	// Image space dimensions ----------------
 	m_N   = new int[3];
@@ -140,11 +147,12 @@ CGSENSE::Init() {
 			m_n[0], m_n[1], m_n[2],
 			m,
 			m_epsilon);
+
 	for (int i = 0; i < NTHREADS; i++)
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 	// --------------------------------------
 
-	initialised = true;
+	m_initialised = true;
 
 	printf ("... done.\n\n");
 
