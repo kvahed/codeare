@@ -56,13 +56,17 @@ namespace RRStrategy {
 		 * @brief Do nothing 
 		 */
 		virtual RRSModule::error_code
-		Init () {};
+		Init () {
+			return OK;
+		}
 		
 		/**
 		 * @brief Do nothing 
 		 */
 		virtual RRSModule::error_code
-		Finalise () {};
+		Finalise () {
+			return OK;
+		}
 		
 	};
 
