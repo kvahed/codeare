@@ -23,15 +23,8 @@
 using namespace RRServer;
 
 /**************************************************************************************************/
-ReconServant::ReconServant  ()               {
-
-	m_config = new char;
-
-	m_raw.dims.length(INVALID_DIM);
-	m_rhelper.dims.length(INVALID_DIM);
-	m_helper.dims.length(INVALID_DIM);
-	m_kspace.dims.length(INVALID_DIM);
-    m_pixel.dims.length(INVALID_DIM);
+ReconServant::ReconServant  () : 
+	m_config (new char) {
 
 }
 
@@ -102,15 +95,6 @@ ReconServant::Process  (const short s)       {
 
 	e = m_contexts.at(s)->Process();
 	
-	std::cout << "... done. Getting processed data..." << std::endl;
-	
-	m_contexts.at(s)->GetRaw(&m_raw);
-	m_contexts.at(s)->GetRHelper(&m_rhelper);
-	m_contexts.at(s)->GetHelper(&m_helper);
-	m_contexts.at(s)->GetKSpace(&m_kspace);
-	m_contexts.at(s)->GetPixel(&m_pixel);
-	m_contexts.at(s)->GetConfig(m_config);
-	
 	std::cout << "... done. " << std::endl;
 	
 	return e;
@@ -131,7 +115,10 @@ ReconServant::raw          (const raw_data& d)   {
 raw_data*
 ReconServant::raw          ()                    {
 
-	return new raw_data (m_raw);
+	raw_data tmp;      
+	tmp.dims.length(INVALID_DIM);
+	m_contexts.at(0)->GetRaw(&tmp);
+	return new raw_data (tmp);
 
 }
 
@@ -148,7 +135,12 @@ ReconServant::rhelper          (const raw_data& d)   {
 /**************************************************************************************************/
 raw_data*
 ReconServant::rhelper          ()                    {
-	return new raw_data (m_rhelper);
+
+	raw_data tmp;      
+	tmp.dims.length(INVALID_DIM);
+	m_contexts.at(0)->GetRHelper(&tmp);
+	return new raw_data (tmp);
+
 }
 
 
@@ -164,7 +156,12 @@ ReconServant::helper       (const helper_data& d)   {
 /**************************************************************************************************/
 helper_data*
 ReconServant::helper       ()                    {
-	return new helper_data (m_helper);
+
+	helper_data tmp;      
+	tmp.dims.length(INVALID_DIM);
+	m_contexts.at(0)->GetHelper(&tmp);
+	return new helper_data (tmp);
+
 }
 
 
@@ -180,7 +177,12 @@ ReconServant::kspace       (const helper_data& d)   {
 /**************************************************************************************************/
 helper_data*
 ReconServant::kspace       ()                    {
-	return new helper_data (m_kspace);
+
+	helper_data tmp;      
+	tmp.dims.length(INVALID_DIM);
+	m_contexts.at(0)->GetKSpace(&tmp);
+	return new helper_data (tmp);
+
 }
 
 
@@ -196,7 +198,12 @@ ReconServant::pixel        (const pixel_data& d) {
 /**************************************************************************************************/
 pixel_data*
 ReconServant::pixel        ()                    {
-	return new pixel_data (m_pixel);
+
+	pixel_data tmp;      
+	tmp.dims.length(INVALID_DIM);
+	m_contexts.at(0)->GetPixel(&tmp);
+	return new pixel_data (tmp);
+
 }
 
 
