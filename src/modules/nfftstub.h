@@ -20,7 +20,7 @@ namespace nfft {
 		 * @param  M         Number of k-space samples
 		 * @param  n         Oversampled N
 		 * @param  m         Spatial cutoff
-		 * @parma  fnp       Forward FT plan
+		 * @param  fnp       Forward FT plan
 		 * @param  inp       Inverse FT plan
 		 * @param  epsilon   Convergence criterium for solver (default: 3e-7)
 		 *
