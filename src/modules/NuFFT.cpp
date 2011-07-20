@@ -21,7 +21,7 @@ RRSModule::error_code
 NuFFT::Finalise () {
 
 	if (m_initialised)
-		nfft::finalize (&m_fplan, &m_iplan);
+	  nfft::finalize (&m_fplan, &m_iplan);
 
 	delete [] m_N;
 	delete [] m_n;

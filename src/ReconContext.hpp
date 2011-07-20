@@ -27,8 +27,9 @@
 
 namespace RRServer {
 
+
 	/**
-	 * @brief Context of a reconstruction method
+	 * @brief Context of a reconstruction method. Abstraction layer to algorithm backends. 
 	 */
 	class ReconContext {
 		
@@ -38,123 +39,150 @@ namespace RRServer {
 		
 		
 		/**
-		 * @brief Default Constructor
+		 * @brief        Default Constructor.
 		 */
-		ReconContext () {}
+		ReconContext     () {}
 		
 		
 		/**
-		 * @brief Invoce destruction on my startegy and exit
+		 * @brief        Unload library and destruct.
 		 */ 
-		~ReconContext ();
+		~ReconContext    ();
 		
 		
 		/**
-		 * @brief Construct with a strategy
+		 * @brief        Construct with a strategy name.
+		 *               Loads and initialises algorithm. 
+		 *               Needs a present config [@see ReconServant::config(const char*)]).
+		 *
+		 * @name         Name of algorithm
 		 */
-		ReconContext (const char* name);
+		ReconContext     (const char* name);
 		
 		
 		/**
-		 * @brief get active startegy
+		 * @brief        Direct access pointer to underlying algorithm.
+		 *
+		 * @return       Algorithm
 		 */
 		inline ReconStrategy*
-			Strategy     () {
+		Strategy         () {
 			return m_strategy;
 		}
 		
+
 		/**
-		 * @brief Process data with given strategy
+		 * @brief        Process data with underlying strategy
+		 *
+		 * @return       Success
 		 */
 		RRSModule::error_code
-			Process () {
+		Process          () {
 			return m_strategy->Process();
 		}
 		
 		
 		/**
-		 * @brief Process data with given strategy
+		 * @brief        @see ReconStrategy
+		 *
+		 * @return       Success
 		 */
 		RRSModule::error_code
-			Init () {
+		Init             () {
 			return m_strategy->Init();
 		}
 		
 		
 		/**
-		 * @brief Process data with given strategy
+		 * @brief        @see ReconStrategy
+		 *
+		 * @return       Success
 		 */
 		RRSModule::error_code
-			Finalise () {
+			Finalise     () {
 			return m_strategy->Finalise();
 		}
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief        @see Reconstrategy
+		 *
+		 * @param  cstr  Serialised XML configuration
 		 */
 		void
-		SetConfig (const char* cstr) {
+		SetConfig        (const char* cstr) {
 			m_strategy->SetConfig(cstr);
 		}
 		
 		
 		/**
-		 * @brief Process data with given strategy
+		 * @brief        @see ReconStrategy::ReadConfig(const char*)
+		 *
+		 * @param  fname File name
 		 */
 		void
-		ReadConfig (const char* fname) {
+		ReadConfig       (const char* fname) {
 			m_strategy->ReadConfig(fname);
 		}
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief        @see ReconStrategy::GetConfig(char*)
 		 */
 		void
-		GetConfig (char* cstr) {
+		GetConfig        (char* cstr) {
 			m_strategy->GetConfig(cstr);
 		}
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief        @see ReconStrategy::SetRaw(const char*)
+		 *
+		 * @param  r     Complex data sequence
 		 */
 		void
-		SetRaw (const raw_data* r) {
+		SetRaw          (const raw_data* r) {
 			m_strategy->SetRaw(r);
 		}
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Complex data matrix
 		 */
 		void
-		SetRaw (const Matrix<raw>* r) {
+		SetRaw          (const Matrix<raw>* r) {
 			m_strategy->SetRaw(r);
 		}
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Complex data sequence
 		 */
 		void
-		GetRaw (Matrix<raw>* r) {
+		GetRaw          (raw_data* r) {
 			m_strategy->GetRaw(r);
 		}
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Complex data matrix
 		 */
 		void
-		GetRaw (raw_data* r) {
+		GetRaw          (Matrix<raw>* r) {
 			m_strategy->GetRaw(r);
 		}
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Complex data sequence
 		 */
 		void
 		SetRHelper (const raw_data* r) {
@@ -163,7 +191,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Complex data matrix
 		 */
 		void
 		SetRHelper (const Matrix<raw>* r) {
@@ -172,16 +202,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
-		 */
-		void
-		GetRHelper (Matrix<raw>* r) {
-			m_strategy->GetRHelper(r);
-		}
-		
-
-		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Complex data sequence
 		 */
 		void
 		GetRHelper (raw_data* r) {
@@ -190,7 +213,20 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Complex data matrix
+		 */
+		void
+		GetRHelper (Matrix<raw>* r) {
+			m_strategy->GetRHelper(r);
+		}
+		
+
+		/**
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Real data sequence
 		 */
 		void
 		SetHelper (const helper_data* r) {
@@ -199,7 +235,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Real data matrix
 		 */
 		void
 		SetHelper (const Matrix<double>* r) {
@@ -208,7 +246,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Real data matrix
 		 */
 		void
 		GetHelper (Matrix<double>* r) {
@@ -217,7 +257,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Real data sequence
 		 */
 		void
 		GetHelper (helper_data* r) {
@@ -226,7 +268,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Real data sequence
 		 */
 		void
 		SetKSpace (const helper_data* r) {
@@ -235,7 +279,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Real data matrix
 		 */
 		void
 		SetKSpace (const Matrix<double>* r) {
@@ -244,7 +290,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Real data sequence
 		 */
 		void
 		GetKSpace (Matrix<double>* r) {
@@ -253,7 +301,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Real data sequence
 		 */
 		void
 		GetKSpace (helper_data* r) {
@@ -262,7 +312,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Pixel data sequence
 		 */
 		void
 		SetPixel (const pixel_data* r) {
@@ -271,7 +323,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Pixel data matrix
 		 */
 		void
 		SetPixel (const Matrix<short>* r) {
@@ -280,7 +334,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Pixel data matrix
 		 */
 		void
 		GetPixel (Matrix<short>* r) {
@@ -289,7 +345,9 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief Process data with given strategy
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param  r    Pixel data sequence
 		 */
 		void
 		GetPixel (pixel_data* r) {
@@ -297,14 +355,30 @@ namespace RRServer {
 		}
 		
 
-		void Name (const char* name) { m_strategy->Name(name);}
+ 		/**
+		 * @brief       @see ReconStrategy
+		 *
+		 * @param name  Name
+		 */
+		void Name (const char* name) { 
+			m_strategy->Name(name);
+		}
 		
+		
+ 		/**
+		 * @brief       @see ReconStrategy
+		 *
+		 * @return      Name
+		 */
 		const char* Name () {return m_strategy->Name();}
 		
+
+
 	private:
+
 		
-		ReconStrategy*            m_strategy;   /**< Active strategy           */
-		void*                     m_dlib;       /**< Handle on startegy module */
+		ReconStrategy*  m_strategy;   /**< Active strategy           */
+		void*           m_dlib;       /**< Handle on startegy module */
 		
 	};
 	

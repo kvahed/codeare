@@ -43,6 +43,7 @@ char*  config;
 char*  verbose;
 char*  test;
 bool   remote;
+bool   pulses;
 
 
 bool init (int argc, char** argv);
@@ -102,7 +103,6 @@ bool cgsensetest (ReconClient* rc) {
 		}
 		
 		// Outgoing -------------
-
 		
 		rc->SetRaw     (rawdata); // Measurement data
 		rawdata.Clear();
@@ -112,17 +112,18 @@ bool cgsensetest (ReconClient* rc) {
 		weights.Clear();
 		rc->SetKSpace  (kspace);  // K-space
 		kspace.Clear();
+
 		// ---------------------
 
 		rc->Process    (test);
 		
-
 		// Incoming -------------
 
-		
-		rc->GetRaw     (rawdata); // Images
-		rc->GetRHelper (sens);    // Pulses (Excitation)
-		rc->GetHelper  (weights); // CG residuals
+		rc->GetRaw     (rawdata);  // Images
+		if (pulses)
+			rc->GetRHelper (sens); // Pulses (Excitation)
+		rc->GetHelper  (weights);  // CG residuals
+
 		// ---------------------
 
 		rc->Finalise   (test);
@@ -155,7 +156,8 @@ bool cgsensetest (ReconClient* rc) {
 	}
 		
 	rawdata.dump   (odf.c_str());
-	sens.dump      (opf.c_str());
+	if (pulses)
+		sens.dump      (opf.c_str());
 	weights.dump   (oif.c_str());
 	
 }
@@ -269,12 +271,14 @@ bool init (int argc, char** argv) {
 	opt->addUsage  (" -b, --base    Base directory of approved files.");
 	opt->addUsage  (" -c, --config  Configuration XML (NuFFT, CGSENSE).");
 	opt->addUsage  (" -d, --data    Incoming binary data in HDF5 format.");
+	opt->addUsage  (" -p, --pulses  Pulses (Only excitation).");
 	opt->addUsage  ("");
 	opt->addUsage  (" -h, --help    Print this help screen"); 
 	opt->addUsage  ("");
 	
 	opt->setFlag   ("help"    ,'h');
 	opt->setFlag   ("remote"  ,'r');
+	opt->setFlag   ("pulses"  ,'p');
 
 	opt->setOption ("name"   , 'n');
 	opt->setOption ("test"   , 't');

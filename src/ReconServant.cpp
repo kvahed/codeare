@@ -48,7 +48,7 @@ ReconServant::Init (const char* name) {
 
 	std::cout << "Configuring " << m_contexts.at(0)->Name() << " ... " << std::endl;
 
-	m_contexts.at(0)->SetConfig(m_config);
+	m_contexts.at(0)->SetConfig (m_config);
 
 	std::cout << "... done. Initialising algorithm ... " << std::endl;
 

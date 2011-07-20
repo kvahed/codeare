@@ -38,6 +38,7 @@ using namespace RRSModule;
  */
 namespace RRServer {
 	
+
 	/**
 	 * @brief Servant implementation 
 	 *        Perform duties on remote server
@@ -46,123 +47,166 @@ namespace RRServer {
 		public POA_RRSModule::RRSInterface , 
 		public PortableServer::RefCountServantBase {
 		
+
+
 	public:
+
 		
 		/**
-		 * @brief     Default constructor
+		 * @brief     Construct and prepare configuration document
 		 */
 		ReconServant  ();
 		
+
 		/**
 		 * @brief     Default destructor
 		 */
 		virtual 
 		~ReconServant ();
 		
+
 		/**
-		 * @brief     Process startegy
+		 * @brief      Process startegy (Needs initialisation @see Init)
 		 *
-		 * @param s   Initialised strategy
-		 * @return    Sucess
+		 * @param s    sth Initialised strategy
+		 * @return     Sucess
 		 */
 		virtual error_code
-		Process       (const short s);
+		Process        (const short s);
+
 		
 		/**
-		 * @brief     Initialise strategy
+		 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
 		 * 
 		 * @param name Name of processing library
-		 * @return    Id of 
+		 * @return     Id of 
 		 */
 		virtual short int
 		Init          (const char* name);
 		
+
 		/**
 		 * @brief     Finalise algorithm
+		 *
+		 * @param s   sth Intialised startegy
 		 */
 		virtual error_code
 		Finalise      (const short s);
 		
+
 		/**
-		 * @brief     Get data from recon
+		 * @brief     Retreive measurement data
+		 *
+		 * @return    Pointer to data
 		 */
 		raw_data* 
 		raw           ();
 		
+
 		/**
-		 * @brief     Set data for recon
+		 * @brief     Set measurement data
+		 *
+		 * @param r   Complex measurement data
 		 */
 		void 
-		raw           (const raw_data&);
+		raw           (const raw_data& r);
+
 		
 		/**
-		 * @brief     Get data from recon
+		 * @brief     Get complex helper data from recon
+		 *
+		 * @return    Pointer to data
 		 */
 		raw_data* 
-		rhelper           ();
+		rhelper       ();
 		
+
 		/**
-		 * @brief     Set data for recon
+		 * @brief     Set complex helper data for recon
+		 *
+		 * @param r   Complex helper data (f.e. sensitivities)
 		 */
 		void 
-		rhelper           (const raw_data&);
+		rhelper       (const raw_data& r);
 		
+
 		/**
-		 * @brief     Get data from recon
+		 * @brief     Get real helper data from recon
+		 *
+		 * @return    Pointer to real data
 		 */
 		helper_data* 
 		helper        ();
 		
+
 		/**
-		 * @brief     Set data for recon
+		 * @brief     Set real helper data for recon
+		 *
+		 * @param r   Real helper data
 		 */
 		void 
-		helper        (const helper_data&);
+		helper        (const helper_data& r);
 		
+
 		/**
-		 * @brief     Get data from recon
+		 * @brief     Get real helper data from recon
+		 *
+		 * @param     Pointer to real helper data
 		 */
 		helper_data* 
 		kspace        ();
+
 		
 		/**
-		 * @brief     Set data for recon
+		 * @brief     Set kspace for recon
+		 *
+		 * @param k   Kspace 
 		 */
 		void 
-		kspace        (const helper_data&);
+		kspace        (const helper_data& k);
+
 		
 		/**
-		 * @brief     Get data from recon
+		 * @brief     Get pixel data from recon
+		 *
+		 * @return    Pointer to pixel data
 		 */
 		pixel_data* 
 		pixel         ();
 		
+
 		/**
-		 * @brief     Set data for recon
+		 * @brief     Set pixel data for recon
+		 *
+		 * @param p   Pixel data
 		 */
 		void 
-		pixel         (const pixel_data&);
+		pixel         (const pixel_data& p);
 		
+
 		/**
-		 * @brief     Get data from recon
+		 * @brief     Get serialised configuration from backend
+		 *
+		 * @return    Serialised configuration
 		 */
 		char*
 		config        ();
+
 		
 		/**
-		 * @brief     Set data for recon
+		 * @brief     Set serialised configuration
+		 *
+		 * @param     Configuration
 		 */
 		void 
 		config        (const char*);
+
 		
 		
 	private:
 		
-		char*                 m_config;   /**< Configuration xml document  */
-		std::vector<ReconContext*> m_contexts; /**< Reconstruction contexts     */
-
-		raw_data* tmp;
-
+		char*                      m_config;   /**< Serialised XML document  */
+		std::vector<ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
 	};
 

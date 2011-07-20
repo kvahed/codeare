@@ -15,7 +15,7 @@ class Configurable {
 
 
 	/**
-	 * @brief           Initialise configuration 
+	 * @brief           Construct and initialise configuration DOM
 	 */
 	Configurable() {
 
@@ -30,7 +30,7 @@ class Configurable {
 
 
 	/**
-	 * @brief           Delete configuration
+	 * @brief           Delete configuration DOM
 	 */
 	virtual ~Configurable() {
 		delete m_config_doc;
@@ -44,7 +44,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 */
 	inline void
-	SetAttribute           (const char* name, const char* value) {
+	SetAttribute        (const char* name, const char* value) {
 		m_config->SetAttribute (name, value);
 	}
 
@@ -56,7 +56,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 */
 	inline void
-	SetAttribute           (const char* name, int value) {
+	SetAttribute        (const char* name, int value) {
 		m_config->SetAttribute (name, value);
 	}
 
@@ -68,7 +68,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 */
 	inline void 
-	SetAttribute           (const char* name, double value) {
+	SetAttribute        (const char* name, double value) {
 		m_config->SetDoubleAttribute (name, value);
 	}
 
@@ -112,7 +112,9 @@ class Configurable {
 
 
 	/**
-	 * @brief           Serialize configuration to string
+	 * @brief           Serialize configuration to given c string
+	 *
+	 * @param           Storage
 	 */
 	inline void 
 	GetConfig           (char* cstr) {
@@ -158,9 +160,9 @@ class Configurable {
 
 
 	/**
-	 * @brief          Get configuration element
+	 * @brief          Get configuration element for more elaborate manipulation. (i.e. Adding children etc)
 	 *
-	 * @return         Element "Config"
+	 * @return         Reference to Element "Config"
 	 */
 	TiXmlElement* 
 	Configuration      () {
