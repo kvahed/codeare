@@ -20,10 +20,11 @@ namespace nfft {
 		 * @param  M         Number of k-space samples
 		 * @param  n         Oversampled N
 		 * @param  m         Spatial cutoff
-		 * @param  epsilon   Convergence criterium for solver (default: 3e-7)
 		 * @parma  fnp       Forward FT plan
 		 * @param  inp       Inverse FT plan
-		 * @param  scp       Solver plan
+		 * @param  epsilon   Convergence criterium for solver (default: 3e-7)
+		 *
+		 * @return success
 		 */
 		extern const int
 		init                 (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_complex* inp, double epsilon  = 0.0000003);
@@ -31,28 +32,36 @@ namespace nfft {
 		/**
 		 * @brief            Inverse FT
 		 * 
-		 * @param  in        Data for inverse FT
-		 * @param  k         K-space trajectory
-		 * @param  dk        Jacobian determinants of k(t). (i.e. det(D_f(k))
-		 * @param  out       FTed data
+		 * @param  np        NFFT plan
+		 * @param  spc       iNFFT plan
+		 * @param  maxiter   Maximum NFFT iterations        
+		 * @param  epsilon   Convergence criterium
+		 *
+		 * @return success
 		 */
-		extern int
+		extern const int
 		ift                  (nfft_plan* np, solver_plan_complex* spc, int maxiter = 3, double epsilon = 3e-7) ;
 		
 		/**
 		 * @brief            Forward FT
 		 *
-		 * @param  in        Data for forward FT
-		 * @param  k         K-space trajectory
-		 * @param  out       FTed data 
+		 * @param  np        NFFT plan
+		 *
+		 * @return success
 		 */
-		extern int
+		extern const int
 		ft                   (nfft_plan* np);
 
-		extern int
+		/**
+		 * @brief            Set weights
+		 */
+		extern const int
 		weights              (nfft_plan* np, solver_plan_complex* spc);
 
-		extern int
+		/**
+		 * @brief            Finalise
+		 */
+		extern const int
 		finalize             (nfft_plan* np, solver_plan_complex* spc);
 
 #ifdef __cplusplus
