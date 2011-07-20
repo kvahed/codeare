@@ -72,7 +72,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief        @see ReconStrategy::Process()
+		 * @brief        Process. @see ReconStrategy::Process()
 		 *
 		 * @return       Success
 		 */
@@ -83,7 +83,7 @@ namespace RRServer {
 		
 		
 		/**
-		 * @brief        @see ReconStrategy::Init()
+		 * @brief        Initialise. @see ReconStrategy::Init()
 		 *
 		 * @return       Success
 		 */
@@ -94,7 +94,7 @@ namespace RRServer {
 		
 		
 		/**
-		 * @brief        @see ReconStrategy::Finalise()
+		 * @brief        Finalise. @see ReconStrategy::Finalise()
 		 *
 		 * @return       Success
 		 */
