@@ -98,15 +98,15 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
 }
 
 
-
 /**************************************************************************************************/
 ReconClient::~ReconClient         ()            {
 
-    m_orb->destroy();
+	m_orb->destroy();
     
 }
 
 
+/**************************************************************************************************/
 error_code
 ReconClient::Init (const char* name) {
 
@@ -117,6 +117,7 @@ ReconClient::Init (const char* name) {
 	temp << GetConfig();
 	m_rrsi->config  (temp.str().c_str());
 
+	// Initialise back end
     m_rstrats.push_back (m_rrsi->Init (name));
     
 	if (m_rstrats.back() == -1)
@@ -133,6 +134,7 @@ ReconClient::Process  (const char* name)  {
     
     error_code  result  = OK;
 
+	// Actually process data
     result    = m_rrsi->Process (m_rstrats.back());
 	SetConfig (m_rrsi->config());
 
@@ -140,6 +142,8 @@ ReconClient::Process  (const char* name)  {
     
 }
 
+
+/**************************************************************************************************/
 error_code
 ReconClient::Finalise (const char* name) {
 
@@ -153,8 +157,10 @@ long
 ReconClient::GetSize (longs dims) {
 
     long size = 1;
+
 	for (int i = 0; i < INVALID_DIM; i++)
 		size *= dims[i];
+
     return size;
     
 }

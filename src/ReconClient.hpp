@@ -41,7 +41,7 @@ using namespace RRSModule;
 namespace RRClient {
 	
 	/**
-	 * @brief              CORBA ICE reconstruction client 
+	 * @brief               Remote reconstruction client 
 	 */
 	class ReconClient :
 	public Configurable {
@@ -50,24 +50,19 @@ namespace RRClient {
 	public:
 		
 		/**
-		 * @brief           Construct and initialise remote recon interface
+		 * @brief           Construct and initialise remote interface
 		 */
 		ReconClient         (const char* name, const char* tracelevel);
 		
 		
 		/**
-		 * @brief           Default destructor
+		 * @brief           Destroy ORB
 		 */
 		~ReconClient        ();
 		
-		/**
-		 * @brief           Default destructor
-		 */
-		void 
-		Cleanup             ();
 		
  		/**
-		 * @brief           Request data procession on recon service
+		 * @brief           Request data procession on remote service
 		 *
 		 * @param  name     Recon method
 		 * @return          Error code
@@ -75,8 +70,9 @@ namespace RRClient {
 		error_code              
 		Process             (const char* name);
 		
+
  		/**
-		 * @brief           Request data procession on recon service
+		 * @brief           Initialise remote service
 		 *
 		 * @param  name     Recon method
 		 * @return          Error code
@@ -84,8 +80,9 @@ namespace RRClient {
 		error_code              
 		Init                (const char* name);
 		
+
  		/**
-		 * @brief           Request data procession on recon service
+		 * @brief           Finalise remote service
 		 *
 		 * @param  name     Recon method
 		 * @return          Error code
@@ -93,103 +90,95 @@ namespace RRClient {
 		error_code              
 		Finalise            (const char* name);
 		
+
 		/**
-		 * @brief           Set raw my data with ...
+		 * @brief           Transmit measurement data to remote service
 		 *
-		 * @param  M        Given matrix
+		 * @param  M        Complex data
 		 */
 		void 
 		SetRaw              (Matrix< std::complex<float> >& M);
 		
 		
 		/**
-		 * @brief           Return raw data after recon to ...
+		 * @brief           Retrieve manipulated data from remote service
 		 *
-		 * @param  M        Given matrix
+		 * @param  M        Receive storage
 		 */
 		void 
 		GetRaw              (Matrix< std::complex<float> >& M);
 		
 		
 		/**
-		 * @brief           Set raw my data with ...
+		 * @brief           Transmit complex helper data (f.e. sensitivity maps)
 		 *
-		 * @param  M        Given matrix
+		 * @param  M        Complex data
 		 */
 		void 
 		SetRHelper          (Matrix< std::complex<float> >& M);
 		
 		
 		/**
-		 * @brief           Return raw data after recon to ...
+		 * @brief           Get complex helper data (f.e. 2nd set of images)
 		 *
-		 * @param  M        Given matrix
+		 * @param  M        Receive storage
 		 */
 		void 
 		GetRHelper          (Matrix< std::complex<float> >& M);
 		
 		
 		/**
-		 * @brief           Set helper my data with ...
+		 * @brief           Transmit real data to service (f.e. k-space weights)
 		 *
-		 * @param  M        Given matrix
+		 * @param  M        Real data
 		 */
 		void
 		SetHelper           (Matrix< double >& M);
 		
 		
 		/**
-		 * @brief           Return helper data after recon to ...
+		 * @brief           Get helper data after recon to ...
 		 *
-		 * @param  M        Given matrix
+		 * @param  M        Receive storage
 		 */
 		void
 		GetHelper           (Matrix< double >& M);
 		
 		
 		/**
-		 * @brief           Set kspace my data with ...
+		 * @brief           Transmit k-space data to storage
 		 *
-		 * @param  M        Given matrix
+		 * @param  M        Real data
 		 */
 		void
 		SetKSpace           (Matrix< double >& M);
 		
 		
 		/**
-		 * @brief           Return kspace data after recon to ...
+		 * @brief           Get k-space data after manipulation?
 		 *
-		 * @param  M        Given matrix
+		 * @param  M        Real data
 		 */
 		void
 		GetKSpace           (Matrix< double >& M);
 		
 		
 		/**
-		 * @brief           Set my Pixel data
+		 * @brief           Transmit gray-scale images to remote service
 		 * 
-		 * @param  M        Given matrix
+		 * @param  M        Short int data
 		 */
 		void 
 		SetPixel            (Matrix<short>& M);
 		
 		
 		/**
-		 * @brief           Put my Pixel data into 
+		 * @brief           Get gray-scale data after recon
 		 * 
-		 * @param  M        Given matrix
+		 * @param  M        Short int storage
 		 */
 		void 
 		GetPixel            (Matrix<short>& M);
-		
-		
-		/**
-		 * @brief           Get size from dimensions
-		 *
-		 * @return          Size
-		 */
-		long
-		GetSize            (longs dims);
 		
 		
 	private:
@@ -197,6 +186,16 @@ namespace RRClient {
 		RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
 		CORBA::ORB_var      m_orb;        /**< Orb                                  */
 		std::vector<short>  m_rstrats;    /**< Remote reconstruction strategies    */
+		
+		/**
+		 * @brief           Get size from dimensions (Needed internally)
+		 *
+		 * @param  dims     Dimension array from the CORBA types 
+		 * @return          Size
+		 */
+		long
+		GetSize             (longs dims);
+		
 		
 	};
 	
