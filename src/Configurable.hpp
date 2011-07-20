@@ -205,6 +205,7 @@ class Configurable {
 	}
 	
 
+
  protected:
 	
 
