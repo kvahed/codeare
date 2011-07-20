@@ -114,7 +114,7 @@ class Configurable {
 	/**
 	 * @brief           Serialize configuration to given c string
 	 *
-	 * @param           Storage
+	 * @param  cstr     Storage
 	 */
 	inline void 
 	GetConfig           (char* cstr) {
@@ -197,7 +197,7 @@ class Configurable {
 	/**
 	 * @brief          Read configuration from XML file
 	 *
-	 * @param  fname   Name of input file
+	 * @param  file    File pointer
 	 */
 	void 
 	ReadConfig        (FILE* file) {

@@ -151,7 +151,7 @@ namespace RRServer {
 		/**
 		 * @brief     Get real helper data from recon
 		 *
-		 * @param     Pointer to real helper data
+		 * @return    Pointer to real helper data
 		 */
 		helper_data* 
 		kspace        ();
@@ -196,10 +196,10 @@ namespace RRServer {
 		/**
 		 * @brief     Set serialised configuration
 		 *
-		 * @param     Configuration
+		 * @param c   Serialised Configuration
 		 */
 		void 
-		config        (const char*);
+		config        (const char* c);
 
 		
 		

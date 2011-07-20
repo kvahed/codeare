@@ -79,7 +79,7 @@ module RRSModule {
 		 * @brief         Process data
 		 *                Process data according to a particular method
 		 *
-		 * @param  name   Name of recontruction method
+		 * @param  s      Id of initialised reconstruction algorithm
 		 * @return        Status
 		 */
 		error_code        Process (in short s);
@@ -88,7 +88,7 @@ module RRSModule {
 		 * @brief         Finalise
 		 *                Clear data. Unload library.
 		 *
-		 * @param  name   Name of recontruction method
+		 * @param  s      Id of initialised reconstruction algorithm
 		 * @return        Status
 		 */
 		error_code        Finalise (in short s);
