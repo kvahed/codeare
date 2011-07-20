@@ -26,6 +26,7 @@
 #include <signal.h>
                                                                                 
 #include "ReconServant.hpp"
+#include "CorbaExceptions.hpp"
 
 #ifndef __WIN32__
 #include "config.h"
@@ -120,22 +121,21 @@ int main (int argc, char** argv) {
 		cout.rdbuf(out);
 		cerr.rdbuf(err);
 
-	}
-	
-	catch(CORBA::SystemException&) {
+	} catch(CORBA::SystemException&) {
 		cerr << "Caught CORBA::SystemException." << endl;
-	}
-	catch(CORBA::Exception&) {
+        throw DS_SystemException();
+	} catch(CORBA::Exception&) {
 		cerr << "Caught CORBA::Exception." << endl;
-	}
-	catch(omniORB::fatalException& fe) {
+        throw DS_Exception();
+	} catch(omniORB::fatalException& fe) {
 		cerr << "Caught omniORB::fatalException:" << endl;
 		cerr << "  file: " << fe.file() << endl;
 		cerr << "  line: " << fe.line() << endl;
 		cerr << "  mesg: " << fe.errmsg() << endl;
-	}
-	catch(...) {
+        throw DS_FatalException();
+	} catch(...) {
 		cerr << "Caught unknown exception." << endl;
+        throw DS_Exception();
 	}
 	
 	return 0;

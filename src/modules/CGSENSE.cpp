@@ -71,6 +71,7 @@ CGSENSE::Init() {
 	m_verbose  = 0;
 	m_noise    = 0;
 	m_dim      = 1;
+	m_M        = 0;
 
 	// Dimensions ---------------------------
 
@@ -93,6 +94,11 @@ CGSENSE::Init() {
 		}
 
 	Attribute("M",         &m_M);
+
+	if (m_M == 0) {
+		printf ("Initialising %s with %i mesurement nodes? Check configuration! FAILED: Bailing out!\n", Name(), m_M);
+		return ZERO_NODES;
+	}
 	// --------------------------------------
 
 	// Verbosity ----------------------------

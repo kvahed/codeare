@@ -19,6 +19,7 @@
  */
 
 #include "ReconClient.hpp"
+#include "CorbaExceptions.hpp"
 
 using namespace RRClient;
 
@@ -146,6 +147,7 @@ ReconClient::Finalise (const char* name) {
 
 }
 
+
 /**************************************************************************************************/
 long 
 ReconClient::GetSize (longs dims) {
@@ -158,4 +160,194 @@ ReconClient::GetSize (longs dims) {
 }
 
 
-    
+/**************************************************************************************************/
+void 
+ReconClient::SetRaw (Matrix< std::complex<float> >& M) {
+	
+	raw_data r; 
+	
+	r.dims.length(INVALID_DIM);
+	
+	for (int j = 0; j < INVALID_DIM; j++)
+		r.dims[j] = M.Dim(j);
+	
+	r.dreal.length(M.Size()); 
+	r.dimag.length(M.Size());
+	
+	for (int i = 0; i < M.Size(); i++) {
+		r.dreal[i] = M[i].real();
+		r.dimag[i] = M[i].imag(); 
+	}
+	
+	m_rrsi->raw(r);
+	
+}
+		    
+
+/**************************************************************************************************/
+void 
+ReconClient::GetRaw (Matrix< std::complex<float> >& M) {
+	
+	raw_data* rp = m_rrsi->raw();
+	
+	for (int j = 0; j < INVALID_DIM; j++)
+		M.Dim(j) = rp->dims[j];
+	
+	M.Reset();
+	
+	for (int i = 0; i < GetSize(rp->dims); i++)
+		M[i] = std::complex<float>(rp->dreal[i],rp->dimag[i]);
+	
+}
+
+
+/**************************************************************************************************/
+void 
+ReconClient::SetRHelper (Matrix< std::complex<float> >& M) {
+	
+	raw_data r; 
+	
+	r.dims.length(INVALID_DIM);
+	
+	for (int j = 0; j < INVALID_DIM; j++)
+		r.dims[j] = M.Dim(j);
+	
+	r.dreal.length(M.Size()); 
+	r.dimag.length(M.Size());
+	
+	for (int i = 0; i < M.Size(); i++) {
+		r.dreal[i] = M[i].real();
+		r.dimag[i] = M[i].imag(); 
+	}
+	
+	m_rrsi->rhelper(r);
+	
+}
+		    
+
+/**************************************************************************************************/
+void 
+ReconClient::GetRHelper (Matrix< std::complex<float> >& M) {
+	
+	raw_data* rp = m_rrsi->rhelper();
+	
+	for (int j = 0; j < INVALID_DIM; j++)
+		M.Dim(j) = rp->dims[j];
+	
+	M.Reset();
+	
+	for (int i = 0; i < GetSize(rp->dims); i++)
+		M[i] = std::complex<float>(rp->dreal[i],rp->dimag[i]);
+	
+}
+
+
+
+void
+ReconClient::SetHelper              (Matrix< double >& M) {
+	
+	helper_data h;
+	
+	h.dims.length(INVALID_DIM);
+	
+	for (int j = 0; j < INVALID_DIM; j++)
+		h.dims[j] = M.Dim(j);
+	
+	h.vals.length(M.Size());
+	
+	for (int i = 0; i < M.Size(); i++)
+		h.vals[i] = M[i];
+	
+	m_rrsi->helper(h);
+	
+}
+		
+
+void
+ReconClient::GetHelper              (Matrix< double >& M) {
+	
+	helper_data* hp = m_rrsi->helper();
+	
+	for (int j = 0; j < INVALID_DIM; j++)
+		M.Dim(j) = hp->dims[j];
+	
+	M.Reset();
+	
+	for (int i = 0; i < GetSize(hp->dims); i++)
+		M[i] = hp->vals[i];
+	
+}
+
+
+void
+ReconClient::SetKSpace              (Matrix< double >& M) {
+	
+	helper_data h;
+	
+	h.dims.length(INVALID_DIM);
+	
+	for (int j = 0; j < INVALID_DIM; j++)
+		h.dims[j] = M.Dim(j);
+	
+	h.vals.length(M.Size());
+	
+	for (int i = 0; i < M.Size(); i++)
+		h.vals[i] = M[i];
+	
+	m_rrsi->kspace(h);
+	
+}
+
+
+void
+ReconClient::GetKSpace              (Matrix< double >& M) {
+			
+	helper_data* hp = m_rrsi->kspace();
+
+	for (int j = 0; j < INVALID_DIM; j++)
+				M.Dim(j) = hp->dims[j];
+	
+	M.Reset();
+	
+	for (int i = 0; i < GetSize(hp->dims); i++)
+		M[i] = hp->vals[i];
+	
+}
+
+
+void
+ReconClient::SetPixel            (Matrix<short>& M) {
+			
+	pixel_data p;
+	
+	p.dims.length(INVALID_DIM);
+	
+	for (int j = 0; j < INVALID_DIM; j++)
+		p.dims[j] = M.Dim(j);
+	
+	p.vals.length(M.Size()); 
+	
+	for (int i = 0; i < M.Size(); i++)
+		p.vals[i] = M[i];
+	
+	m_rrsi->pixel(p);
+	
+}
+
+
+void
+ReconClient::GetPixel            (Matrix<short>& M) {
+	
+	pixel_data* pp = m_rrsi->pixel();
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		M.Dim(j) = pp->dims[j];
+	
+	M.Reset();
+	
+	for (int i = 0; i < GetSize(pp->dims); i++)
+		M[i] = pp->vals[i];
+	
+}
+
+

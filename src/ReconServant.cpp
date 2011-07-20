@@ -53,8 +53,9 @@ ReconServant::Init (const char* name) {
 	std::cout << "... done. Initialising algorithm ... " << std::endl;
 
 	if ((e = m_contexts.at(0)->Init()) != OK) {
+		Finalise(-1);
 		std::cout << "... FAILED!!! Bailing out." << std::endl;
-		return e;
+		return -1;
 	}
 
 	std::cout << "... done. Handling back control to client ... " << std::endl;
