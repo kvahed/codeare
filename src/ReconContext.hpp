@@ -72,7 +72,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief        Process data with underlying strategy
+		 * @brief        @see ReconStrategy::Process()
 		 *
 		 * @return       Success
 		 */
@@ -83,7 +83,7 @@ namespace RRServer {
 		
 		
 		/**
-		 * @brief        @see ReconStrategy
+		 * @brief        @see ReconStrategy::Init()
 		 *
 		 * @return       Success
 		 */
@@ -94,7 +94,7 @@ namespace RRServer {
 		
 		
 		/**
-		 * @brief        @see ReconStrategy
+		 * @brief        @see ReconStrategy::Finalise()
 		 *
 		 * @return       Success
 		 */
@@ -105,7 +105,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief        @see Reconstrategy
+		 * @brief        @see Reconstrategy::SetConfig(const char*)
 		 *
 		 * @param  cstr  Serialised XML configuration
 		 */
@@ -136,7 +136,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief        @see ReconStrategy::SetRaw(const char*)
+		 * @brief        @see ReconStrategy::SetRaw(const raw_data*)
 		 *
 		 * @param  r     Complex data sequence
 		 */
@@ -147,7 +147,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetRaw(const Matrix<raw>*)
 		 *
 		 * @param  r    Complex data matrix
 		 */
@@ -158,7 +158,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::GetRaw(raw_data*)
 		 *
 		 * @param  r    Complex data sequence
 		 */
@@ -169,7 +169,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::GetRaw(Matrix<raw>*)
 		 *
 		 * @param  r    Complex data matrix
 		 */
@@ -180,7 +180,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetRHelper(const raw_data*)
 		 *
 		 * @param  r    Complex data sequence
 		 */
@@ -191,7 +191,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetRHelper(const Matrix<raw>*)
 		 *
 		 * @param  r    Complex data matrix
 		 */
@@ -202,7 +202,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::GetRHelper(raw_data*)
 		 *
 		 * @param  r    Complex data sequence
 		 */
@@ -213,7 +213,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::GetRHelper(Matrix<raw>*)
 		 *
 		 * @param  r    Complex data matrix
 		 */
@@ -224,7 +224,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetHelper(const helper_data*)
 		 *
 		 * @param  r    Real data sequence
 		 */
@@ -235,7 +235,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetHelper(const Matrix<double>*)
 		 *
 		 * @param  r    Real data matrix
 		 */
@@ -246,7 +246,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetHelper(const Matrix<double>*)
 		 *
 		 * @param  r    Real data matrix
 		 */
@@ -257,7 +257,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::GetHelper(helper_data*)
 		 *
 		 * @param  r    Real data sequence
 		 */
@@ -268,7 +268,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetKSpace(helper_data*)
 		 *
 		 * @param  r    Real data sequence
 		 */
@@ -279,7 +279,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetKSpace(const Matrix<double>*)
 		 *
 		 * @param  r    Real data matrix
 		 */
@@ -290,7 +290,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::GetKSPace(Matrix<double>*)
 		 *
 		 * @param  r    Real data sequence
 		 */
@@ -301,7 +301,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::GetKSpace(helper_data*)
 		 *
 		 * @param  r    Real data sequence
 		 */
@@ -312,7 +312,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetPixel(const pixel_data*)
 		 *
 		 * @param  r    Pixel data sequence
 		 */
@@ -323,7 +323,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::SetPixel(const Matrix<short>*)
 		 *
 		 * @param  r    Pixel data matrix
 		 */
@@ -334,7 +334,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::GetPixel(Matrix<short>*)
 		 *
 		 * @param  r    Pixel data matrix
 		 */
@@ -345,7 +345,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::GetPixel(pixel_data*)
 		 *
 		 * @param  r    Pixel data sequence
 		 */
@@ -356,7 +356,7 @@ namespace RRServer {
 		
 
  		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::Name(const char*)
 		 *
 		 * @param name  Name
 		 */
@@ -366,7 +366,7 @@ namespace RRServer {
 		
 		
  		/**
-		 * @brief       @see ReconStrategy
+		 * @brief       @see ReconStrategy::Name()
 		 *
 		 * @return      Name
 		 */
