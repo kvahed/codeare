@@ -8,6 +8,7 @@
  * @param  sm           Sensitivity maps            O (Nx x Ny x Nz x Nc)
  * @param  np           Non-Cartesian strategy for non uniform ft
  * @param  out          Result                      O (Nk x Nc)
+ * @param  dim          FT dimensions
  */
 RRSModule::error_code 
 E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) {
@@ -68,6 +69,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
  * @param  epsilon      Convergence criterium for ift (default 3e-7)
  * @param  maxit        Maximum number of solver iterations (default 3)
  * @param  out          Returned product                 O (Nx x Ny x Nz)
+ * @param  dim          FT dimensions
  */
 RRSModule::error_code
 EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, double epsilon, int maxit, Matrix<raw>* out, int dim) {
