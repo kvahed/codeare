@@ -94,38 +94,12 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
         
     }
     
-    m_raw     = new raw_data;
-    m_rhelper = new raw_data;
-    m_helper  = new helper_data;
-    m_kspace  = new helper_data;
-    m_pixel   = new pixel_data;
-
-    m_raw->dims.length(INVALID_DIM);
-    m_rhelper->dims.length(INVALID_DIM);
-    m_helper->dims.length(INVALID_DIM);
-    m_kspace->dims.length(INVALID_DIM);
-    m_pixel->dims.length(INVALID_DIM);
-
-	for (int i = 0; i < INVALID_DIM; i++) {
-		m_raw->dims[i] = 0;
-		m_rhelper->dims[i] = 0;
-		m_helper->dims[i] = 0;
-		m_kspace->dims[i] = 0;
-		m_pixel->dims[i] = 0;
-	}
-
 }
 
 
 
 /**************************************************************************************************/
 ReconClient::~ReconClient         ()            {
-
-    delete m_raw;
-    delete m_rhelper;
-    delete m_helper;
-    delete m_kspace;
-    delete m_pixel;
 
     m_orb->destroy();
     
@@ -136,6 +110,11 @@ error_code
 ReconClient::Init (const char* name) {
 
     error_code  result  = OK;
+
+	// Prepare configuration for the journey
+	std::stringstream  temp;
+	temp << GetConfig();
+	m_rrsi->config  (temp.str().c_str());
 
     m_rstrats.push_back (m_rrsi->Init (name));
     
@@ -152,116 +131,31 @@ error_code
 ReconClient::Process  (const char* name)  {
     
     error_code  result  = OK;
-	std::string confstr = "";
-
-	// Prepare configuration for the journey
-	std::stringstream  temp;
-	temp << GetConfig();
-
-    // Send data for procession to remote interface
-    m_rrsi->raw     (*(m_raw));
-	delete m_raw;
-
-    m_rrsi->rhelper (*(m_rhelper));
-	delete m_rhelper;
-
-    m_rrsi->helper  (*(m_helper));
-	delete m_helper;
-
-    m_rrsi->kspace  (*(m_kspace));
-	delete m_kspace;
-
-    m_rrsi->pixel   (*(m_pixel));
-	delete m_pixel;
-
-	m_rrsi->config  (temp.str().c_str());
 
     result    = m_rrsi->Process (m_rstrats.back());
-
-	m_raw     = new raw_data;
-	m_rhelper = new raw_data;
-    m_helper  = new helper_data;
-    m_kspace  = new helper_data;
-    m_pixel   = new pixel_data;
-
-    // Get data back from remote interface
-	m_raw     = m_rrsi->raw();
-	m_rhelper = m_rrsi->rhelper();
-	m_helper  = m_rrsi->helper();
-	m_kspace  = m_rrsi->kspace();
-	m_pixel   = m_rrsi->pixel();
-
 	SetConfig (m_rrsi->config());
-
-	result    = m_rrsi->Finalise(m_rstrats.back());
 
     return result;
     
 }
 
+error_code
+ReconClient::Finalise (const char* name) {
 
+	return m_rrsi->Finalise(m_rstrats.back());
+
+}
 
 /**************************************************************************************************/
 long 
-ReconClient::GetRawSize () {
+ReconClient::GetSize (longs dims) {
 
     long size = 1;
-    for (int i = 0; i < INVALID_DIM; i++)
-        size *= m_raw->dims[i];
+	for (int i = 0; i < INVALID_DIM; i++)
+		size *= dims[i];
     return size;
     
 }
 
-
-
-/**************************************************************************************************/
-long 
-ReconClient::GetRHelperSize () {
-    
-    long size = 1;
-    for (int i = 0; i < INVALID_DIM; i++)
-        size *= m_rhelper->dims[i];
-    return size;
-    
-}
-
-
-
-/**************************************************************************************************/
-long 
-ReconClient::GetHelperSize () {
-    
-    long size = 1;
-    for (int i = 0; i < INVALID_DIM; i++)
-        size *= m_helper->dims[i];
-    return size;
-    
-}
-
-
-
-/**************************************************************************************************/
-long 
-ReconClient::GetKSpaceSize () {
-    
-    long size = 1;
-    for (int i = 0; i < INVALID_DIM; i++)
-        size *= m_kspace->dims[i];
-    return size;
-    
-}
-
-
-
-/**************************************************************************************************/
-long 
-ReconClient::GetPixelSize () {
-    
-    long size = 1;
-    for (int i = 0; i < INVALID_DIM; i++)
-        size *= m_pixel->dims[i];
-    return size;
-    
-}
 
     

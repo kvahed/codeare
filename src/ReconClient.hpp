@@ -84,6 +84,15 @@ namespace RRClient {
 		error_code              
 		Init                (const char* name);
 		
+ 		/**
+		 * @brief           Request data procession on recon service
+		 *
+		 * @param  name     Recon method
+		 * @return          Error code
+		 */ 
+		error_code              
+		Finalise            (const char* name);
+		
 		/**
 		 * @brief           Set raw my data with ...
 		 *
@@ -92,21 +101,23 @@ namespace RRClient {
 		void 
 		SetRaw              (Matrix< std::complex<float> >& M) {
 			
-			m_raw->dims.length(INVALID_DIM);
+			raw_data r; 
+
+			r.dims.length(INVALID_DIM);
 			
 			for (int j = 0; j < INVALID_DIM; j++)
-				m_raw->dims[j] = M.Dim(j);
+				r.dims[j] = M.Dim(j);
 			
-			m_raw->dreal.length(M.Size()); 
-			m_raw->dimag.length(M.Size());
+			r.dreal.length(M.Size()); 
+			r.dimag.length(M.Size());
 			
 			for (int i = 0; i < M.Size(); i++) {
-				m_raw->dreal[i] = M[i].real();
-				m_raw->dimag[i] = M[i].imag(); 
+				r.dreal[i] = M[i].real();
+				r.dimag[i] = M[i].imag(); 
 			}
 			
-			m_rrsi->raw(*(m_raw));
-			
+			m_rrsi->raw(r);
+	
 		};
 		
 		
@@ -118,13 +129,15 @@ namespace RRClient {
 		void 
 		GetRaw              (Matrix< std::complex<float> >& M) {
 			
+			raw_data* rp = m_rrsi->raw();
+
 			for (int j = 0; j < INVALID_DIM; j++)
-				M.Dim(j) = m_raw->dims[j];
+				M.Dim(j) = rp->dims[j];
 			
 			M.Reset();
 			
-			for (int i = 0; i < GetRawSize(); i++)
-				M[i] = std::complex<float>(m_raw->dreal[i],m_raw->dimag[i]);
+			for (int i = 0; i < GetSize(rp->dims); i++)
+				M[i] = std::complex<float>(rp->dreal[i],rp->dimag[i]);
 			
 		};
 		
@@ -137,20 +150,22 @@ namespace RRClient {
 		void 
 		SetRHelper              (Matrix< std::complex<float> >& M) {
 			
-			m_rhelper->dims.length(INVALID_DIM);
+			raw_data r;
+
+			r.dims.length(INVALID_DIM);
 			
 			for (int j = 0; j < INVALID_DIM; j++)
-				m_rhelper->dims[j] = M.Dim(j);
+				r.dims[j] = M.Dim(j);
 			
-			m_rhelper->dreal.length(M.Size()); 
-			m_rhelper->dimag.length(M.Size());
+			r.dreal.length(M.Size()); 
+			r.dimag.length(M.Size());
 			
 			for (int i = 0; i < M.Size(); i++) {
-				m_rhelper->dreal[i] = M[i].real();
-				m_rhelper->dimag[i] = M[i].imag(); 
+				r.dreal[i] = M[i].real();
+				r.dimag[i] = M[i].imag(); 
 			}
 			
-			m_rrsi->raw(*(m_rhelper));
+			m_rrsi->rhelper(r);
 			
 		};
 		
@@ -163,13 +178,15 @@ namespace RRClient {
 		void 
 		GetRHelper              (Matrix< std::complex<float> >& M) {
 			
+			raw_data* rp = m_rrsi->rhelper();
+
 			for (int j = 0; j < INVALID_DIM; j++)
-				M.Dim(j) = m_rhelper->dims[j];
-
+				M.Dim(j) = rp->dims[j];
+			
 			M.Reset();
-
-			for (int i = 0; i < GetRHelperSize(); i++)
-				M[i] = std::complex<float>(m_rhelper->dreal[i],m_rhelper->dimag[i]);
+			
+			for (int i = 0; i < GetSize(rp->dims); i++)
+				M[i] = std::complex<float>(rp->dreal[i],rp->dimag[i]);
 			
 		};
 		
@@ -182,15 +199,19 @@ namespace RRClient {
 		void
 		SetHelper              (Matrix< double >& M) {
 			
-			for (int j = 0; j < INVALID_DIM; j++)
-				m_helper->dims[j] = M.Dim(j);
+			helper_data h;
+
+			h.dims.length(INVALID_DIM);
 			
-			m_helper->vals.length(M.Size());
+			for (int j = 0; j < INVALID_DIM; j++)
+				h.dims[j] = M.Dim(j);
+			
+			h.vals.length(M.Size());
 			
 			for (int i = 0; i < M.Size(); i++)
-				m_helper->vals[i] = M[i];
+				h.vals[i] = M[i];
 			
-			m_rrsi->helper(*(m_helper));
+			m_rrsi->helper(h);
 			
 		};
 		
@@ -203,13 +224,15 @@ namespace RRClient {
 		void
 		GetHelper              (Matrix< double >& M) {
 			
+			helper_data* hp = m_rrsi->helper();
+
 			for (int j = 0; j < INVALID_DIM; j++)
-				M.Dim(j) = m_helper->dims[j];
+				M.Dim(j) = hp->dims[j];
 			
 			M.Reset();
 			
-			for (int i = 0; i < GetHelperSize(); i++)
-				M[i] = m_helper->vals[i];
+			for (int i = 0; i < GetSize(hp->dims); i++)
+				M[i] = hp->vals[i];
 			
 		};
 		
@@ -222,15 +245,19 @@ namespace RRClient {
 		void
 		SetKSpace              (Matrix< double >& M) {
 			
-			for (int j = 0; j < INVALID_DIM; j++)
-				m_kspace->dims[j] = M.Dim(j);
+			helper_data h;
+
+			h.dims.length(INVALID_DIM);
 			
-			m_kspace->vals.length(M.Size());
+			for (int j = 0; j < INVALID_DIM; j++)
+				h.dims[j] = M.Dim(j);
+			
+			h.vals.length(M.Size());
 			
 			for (int i = 0; i < M.Size(); i++)
-				m_kspace->vals[i] = M[i];
+				h.vals[i] = M[i];
 			
-			m_rrsi->kspace(*(m_kspace));
+			m_rrsi->kspace(h);
 			
 		};
 		
@@ -243,13 +270,15 @@ namespace RRClient {
 		void
 		GetKSpace              (Matrix< double >& M) {
 			
+			helper_data* hp = m_rrsi->kspace();
+
 			for (int j = 0; j < INVALID_DIM; j++)
-				M.Dim(j) = m_kspace->dims[j];
+				M.Dim(j) = hp->dims[j];
 			
 			M.Reset();
 			
-			for (int i = 0; i < GetKSpaceSize(); i++)
-				M[i] = m_kspace->vals[i];
+			for (int i = 0; i < GetSize(hp->dims); i++)
+				M[i] = hp->vals[i];
 			
 		};
 		
@@ -262,15 +291,19 @@ namespace RRClient {
 		void 
 		SetPixel            (Matrix<short>& M) {
 			
-			for (int j = 0; j < INVALID_DIM; j++)
-				m_pixel->dims[j] = M.Dim(j);
+			pixel_data p;
+
+			p.dims.length(INVALID_DIM);
 			
-			m_pixel->vals.length(M.Size()); 
+			for (int j = 0; j < INVALID_DIM; j++)
+				p.dims[j] = M.Dim(j);
+			
+			p.vals.length(M.Size()); 
 			
 			for (int i = 0; i < M.Size(); i++)
-				m_pixel->vals[i] = M[i];
+				p.vals[i] = M[i];
 			
-			m_rrsi->pixel(*(m_pixel));
+			m_rrsi->pixel(p);
 			
 		};
 		
@@ -283,13 +316,15 @@ namespace RRClient {
 		void 
 		GetPixel            (Matrix<short>& M) {
 			
+			pixel_data* pp = m_rrsi->pixel();
+
 			for (int j = 0; j < INVALID_DIM; j++)
-				M.Dim(j) = m_pixel->dims[j];
+				M.Dim(j) = pp->dims[j];
 			
 			M.Reset();
 			
-			for (int i = 0; i < GetPixelSize(); i++)
-				M[i] = m_pixel->vals[i];
+			for (int i = 0; i < GetSize(pp->dims); i++)
+				M[i] = pp->vals[i];
 			
 		};
 		
@@ -300,57 +335,13 @@ namespace RRClient {
 		 * @return          Size
 		 */
 		long
-		GetRawSize          ();
-		
-		
-		/**
-		 * @brief           Raw helper repository size
-		 *
-		 * @return          Size
-		 */
-		long
-		GetRHelperSize      ();
-		
-		
-		/**
-		 * @brief           Pixel repository size
-		 *
-		 * @return          Size
-		 */
-		long
-		GetPixelSize           ();
-		
-		
-		/**
-		 * @brief           Helper repository size
-		 *
-		 * @return          Size
-		 */
-		long
-		GetHelperSize          ();
-		
-		
-		/**
-		 * @brief           KSpace repository size
-		 *
-		 * @return          Size
-		 */
-		long
-		GetKSpaceSize          ();
+		GetSize            (longs dims);
 		
 		
 	private:
 		
 		RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
-		
-		raw_data*           m_raw;        /**< Raw data    (complex float sequence) */
-		raw_data*           m_rhelper;    /**< Raw Hellper data (complex float sequence) */
-		helper_data*        m_helper;     /**< Helper data (double sequence) */
-		helper_data*        m_kspace;     /**< Kspace data (double sequence) */
-		pixel_data*         m_pixel;      /**< Pixel data  (short sequence)         */
-		
 		CORBA::ORB_var      m_orb;        /**< Orb                                  */
-
 		std::vector<short>  m_rstrats;    /**< Remote reconstruction strategies    */
 		
 	};

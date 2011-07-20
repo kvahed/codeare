@@ -51,10 +51,11 @@ NuFFT_OMP::Init () {
 	for (int i = 0; i < m_dim; i++)
 		Attribute (sides[i].c_str(),       &m_N[i]);
 
-	m_M   = m_helper.Size();
-	// --------------------------------------
 
-	//Attribute("M",       &m_M);
+	Attribute("M",       &m_M);
+	Attribute("shots",     &m_shots);
+
+	// --------------------------------------
 
 	Attribute("maxit",   &m_maxit);
 	Attribute("epsilon", &m_epsilon);
@@ -70,15 +71,11 @@ NuFFT_OMP::Init () {
 	for (int i = 0; i < m_dim; i++)
 		m_n[i] = ceil (m_N[i]*alpha);
 
-	// --------------------------------------
-	// Number of samples
-	m_shots = m_raw.Dim(LIN);
-	m_M     = m_raw.Dim(COL);
-
 	// Initialise FT plans ------------------
 	
 	for (int i = 0; i < NTHREADS; i++)
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
+
 	// --------------------------------------
 
 	m_initialised = true;

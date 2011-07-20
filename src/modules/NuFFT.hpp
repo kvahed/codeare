@@ -76,6 +76,7 @@ namespace RRStrategy {
 		int       m_M;                          /**< @brief Number of k-space knots */
 		int       m_maxit;                      /**< @brief Number of Recon iterations (NFFT 3) */
 		int       m_epsilon;                    /**< @brief Convergence criterium */
+		int       m_shots;
 
 		double*   m_ftk;
 		double*   m_ftw;

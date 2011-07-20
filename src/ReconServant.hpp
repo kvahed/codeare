@@ -161,6 +161,8 @@ namespace RRServer {
 		char*                 m_config;   /**< Configuration xml document  */
 		std::vector<ReconContext*> m_contexts; /**< Reconstruction contexts     */
 
+		raw_data* tmp;
+
 		
 	};
 
