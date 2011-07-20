@@ -313,7 +313,7 @@ public:
     /**
      * @brief            Reference to slice 
      *  
-     * @param  pos       Slice
+     * @param  s         Slice
      *
      * @return           Reference to _M[COL*LIN*CHA*pos]
      */
@@ -324,7 +324,7 @@ public:
     /**
      * @brief            Reference to channel
      *  
-     * @param  pos       Channel
+     * @param  c         Channel
      *
      * @return           Reference to _M[COL*LIN*pos]
      */
@@ -333,11 +333,9 @@ public:
 
     
     /**
-     * @brief           Get element at position 
+     * @brief           Get pointer to data
      *  
-     * @param  pos      Position
-     *
-     * @return          Value at _M[pos]
+     * @return          Data 
      */
     inline T*            
     data                ()  const {
@@ -868,9 +866,7 @@ public:
     
 
     /**
-     * @brief           Resize to dims, reallocate and zero repository
-     *
-     * @param  dim      New dimensions
+     * @brief           Clear matrix. Purge data.
      */
     inline void         
     Clear               ()                                      {
@@ -1361,7 +1357,7 @@ public:
     /**
      * @brief           Euclidean norm.
      *
-     * @param  res      The norm
+     * @return          Norm
      */
 	T
     norm ()             const;
@@ -1369,7 +1365,7 @@ public:
     /**
      * @brief           Dot product, complex, conjugate first vector
      *
-     * @param  res      
+     * @param  M        Factor      
      */
 	T
     dotc (Matrix<T>& M) const;
