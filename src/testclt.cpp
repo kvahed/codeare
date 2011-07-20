@@ -94,32 +94,56 @@ bool cgsensetest (ReconClient* rc) {
 
 	if (remote) {
 	
+		rc->ReadConfig (cf.c_str());
+
 		if (rc->Init (test) != OK) {
 			printf ("Intialising failed ... bailing out!"); 
 			return false;
 		}
 		
-		rc->ReadConfig (cf.c_str());
-		rc->SetRaw     (rawdata);
-		rc->SetRHelper (sens);
-		rc->SetHelper  (weights);
-		rc->SetKSpace  (kspace);
+		// Outgoing -------------
+
 		
+		rc->SetRaw     (rawdata); // Measurement data
+		rawdata.Clear();
+		rc->SetRHelper (sens);    // Sensitivities
+		sens.Clear();
+		rc->SetHelper  (weights); // Weights
+		weights.Clear();
+		rc->SetKSpace  (kspace);  // K-space
+		kspace.Clear();
+		// ---------------------
+
 		rc->Process    (test);
 		
-		rc->GetRaw     (rawdata);
-		rc->GetRHelper (sens);
-		rc->GetHelper  (weights);
+
+		// Incoming -------------
+
+		
+		rc->GetRaw     (rawdata); // Images
+		rc->GetRHelper (sens);    // Pulses (Excitation)
+		rc->GetHelper  (weights); // CG residuals
+		// ---------------------
+
+		rc->Finalise   (test);
 
 	} else {
 
 		RRServer::ReconContext* rx = new RRServer::ReconContext(test);
 
 		rx->ReadConfig(cf.c_str());
+
 		rx->SetRaw     (&rawdata);
+		rawdata.Clear();
+
 		rx->SetRHelper (&sens);
+		sens.Clear();
+
 		rx->SetHelper  (&weights);
+		weights.Clear();
+
 		rx->SetKSpace  (&kspace);
+		kspace.Clear();
 
 		rx->Init();
 		rx->Process    ();
@@ -146,13 +170,13 @@ bool nuffttest (ReconClient* rc) {
 	std::string    df  = std::string (base + std::string(data));
 	std::string    odf = std::string (base + std::string("/images.h5"));
 
+	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 
 	weights.read   (df, "weights");
 	rawdata.read   (df, "data");
 	kspace.read    (df, "kspace");
 
-	rc->ReadConfig (cf.c_str());
 	rc->SetRaw     (rawdata);
 	rc->SetHelper  (weights);
 	rc->SetKSpace  (kspace);
@@ -162,6 +186,8 @@ bool nuffttest (ReconClient* rc) {
 	rc->GetRaw     (rawdata);
 
 	rawdata.dump   (odf.c_str());
+
+	rc->Finalise(test);
 	
 }
 

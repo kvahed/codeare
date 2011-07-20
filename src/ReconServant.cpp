@@ -46,6 +46,19 @@ ReconServant::Init (const char* name) {
 	
 	m_contexts.push_back(new ReconContext(name));
 
+	std::cout << "Configuring " << m_contexts.at(0)->Name() << " ... " << std::endl;
+
+	m_contexts.at(0)->SetConfig(m_config);
+
+	std::cout << "... done. Initialising algorithm ... " << std::endl;
+
+	if ((e = m_contexts.at(0)->Init()) != OK) {
+		std::cout << "... FAILED!!! Bailing out." << std::endl;
+		return e;
+	}
+
+	std::cout << "... done. Handling back control to client ... " << std::endl;
+
 	return e;
 
 }
@@ -78,23 +91,8 @@ ReconServant::Finalise (const short s) {
 error_code
 ReconServant::Process  (const short s)       {
 
-	error_code e = OK;
-	
-	std::cout << "Configuring " << m_contexts.at(s)->Name() << " ... " << std::endl;
-
-	m_contexts.at(s)->SetConfig(m_config);
-
-	std::cout << "... done. Initialising algorithm ... " << std::endl;
-
-	if ((e = m_contexts.at(s)->Init()) != OK) {
-		std::cout << "... FAILED!!! Bailing out." << std::endl;
-		return e;
-	}
-
-	std::cout << "... done. Processing ... " << std::endl;
-
-	e = m_contexts.at(s)->Process();
-	
+	std::cout << "Processing ... " << std::endl;
+	error_code e = m_contexts.at(s)->Process();
 	std::cout << "... done. " << std::endl;
 	
 	return e;
@@ -107,6 +105,7 @@ void
 ReconServant::raw          (const raw_data& d)   {
 	
 	m_contexts.at(0)->SetRaw(&d);
+	
 
 }
 

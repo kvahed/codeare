@@ -92,7 +92,7 @@ CGSENSE::Init() {
 			return UNSUPPORTED_IMAGE_MATRIX;
 		}
 
-	m_M   = m_helper.Size();
+	Attribute("M",         &m_M);
 	// --------------------------------------
 
 	// Verbosity ----------------------------

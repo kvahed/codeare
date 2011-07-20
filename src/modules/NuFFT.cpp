@@ -51,10 +51,10 @@ NuFFT::Init () {
 	for (int i = 0; i < m_dim; i++)
 		Attribute (sides[i].c_str(),       &m_N[i]);
 
-	m_M   = m_helper.Size();
-	// --------------------------------------
+	Attribute("M",         &m_M);
+	Attribute("shots",     &m_shots);
 
-	//Attribute("M",       &m_M);
+	// --------------------------------------
 
 	Attribute("maxit",   &m_maxit);
 	Attribute("epsilon", &m_epsilon);
@@ -69,9 +69,18 @@ NuFFT::Init () {
 
 	for (int i = 0; i < m_dim; i++)
 		m_n[i] = ceil (m_N[i]*alpha);
+
 	// --------------------------------------
 
-	nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan, &m_iplan, m_epsilon);
+	printf ("  intialising nfft::init (%i, {%i, %i, %i}, %i, {%i, %i, %i}, %i, *, *, %.9f)\n", 
+			m_dim, 
+			m_N[0], m_N[1], m_N[2],
+			m_M * m_shots,
+			m_n[0], m_n[1], m_n[2],
+			m,
+			m_epsilon);
+
+	nfft::init (m_dim, m_N, m_M*m_shots, m_n, m, &m_fplan, &m_iplan, m_epsilon);
 
 	m_initialised = true;
 
