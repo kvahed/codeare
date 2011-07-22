@@ -302,14 +302,17 @@ CGSENSE::Process () {
 	// Verbose output needs to 
 	if (m_verbose) {
 
+		// All intermediate images ------
 		m_raw.Dim(m_dim) = iters;
 		m_raw.Reset();
 		memcpy (    &m_raw[0], &istore[0],     m_raw.Size() * sizeof(double));
 
+		// Pulses (Excitation) ----------
 		m_rhelper.Dim(CHA) = iters;
 		m_rhelper.Reset();
 		memcpy (&m_rhelper[0], &sstore[0], m_rhelper.Size() * sizeof(double));
-		
+
+		// CG residuals ------------------
 		m_helper.Dim(COL) = iters;
 		for (int i = 1; i < INVALID_DIM; i++)
 			m_helper.Dim(i) = 1;

@@ -64,36 +64,30 @@ typedef std::complex<float> raw;
 extern "C" {
 
 	// This is all defined only on 2D
-
-	// Euclidean norm
-	float  scnrm2_ (int      *n, void   *x, int *incx);
-	double dnrm2_  (int      *n, void   *x, int *incx);
-
-	raw    cdotc_   (void*    r, int     *n, void   *x, int *incx, void *y, int *incy);
 	
 	// Matrix vector multiplication
-	void   dgemv_    (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
+	void   dgemv_  (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
 				    void     *y, int *incy);
-	void   cgemv_    (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
+	void   cgemv_  (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
 				    void     *y, int *incy);
 	
 	// Matrix matrix multiplication
-	void dgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, 
-				  int     *ldb, void   *beta, void *c, int *ldc);
-	void cgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, 
-				  int     *ldb, void   *beta, void *c, int *ldc);
+	void dgemm_    (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, 
+				    int     *ldb, void   *beta, void *c, int *ldc);
+	void cgemm_    (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, 
+				    int     *ldb, void   *beta, void *c, int *ldc);
 	
 	// Eigen value computations
-	void cgeev_  (char *jobvl, char *jobvr, int    *n, void    *a, int   *lda, void      *w,             void   *vl,
-				  int   *ldvl, void    *vr, int *ldvr, void *work, int *lwork, float *rwork, int  *info);
-	void dgeev_  (char *jobvl, char *jobvr, int    *n, void    *a, int   *lda, void     *wr, void   *wi, void   *vl, 
-				  int   *ldvl, void    *vr, int *ldvr, void *work, int *lwork,               int  *info);
+	void cgeev_    (char *jobvl, char *jobvr, int    *n, void    *a, int   *lda, void      *w,             void   *vl,
+				    int   *ldvl, void    *vr, int *ldvr, void *work, int *lwork, float *rwork, int  *info);
+	void dgeev_    (char *jobvl, char *jobvr, int    *n, void    *a, int   *lda, void     *wr, void   *wi, void   *vl, 
+				    int   *ldvl, void    *vr, int *ldvr, void *work, int *lwork,               int  *info);
 
 	// Singular value decomposition 
-	void cgesdd_ (char *jobz, int    *m, int     *n, void     *a, int     *lda, float     *s, void    *u, int  *ldu, 
-				  void   *vt, int *ldvt, void *work, int  *lwork, float *rwork, int   *iwork, int  *info);
-	void dgesdd_ (char *jobz, int    *m, int     *n, void     *a, int     *lda, void      *s, void    *u, int  *ldu, 
-				  void   *vt, int *ldvt, void *work, int  *lwork,               int   *iwork, int  *info);
+	void cgesdd_   (char *jobz, int    *m, int     *n, void     *a, int     *lda, float     *s, void    *u, int  *ldu, 
+				    void   *vt, int *ldvt, void *work, int  *lwork, float *rwork, int   *iwork, int  *info);
+	void dgesdd_   (char *jobz, int    *m, int     *n, void     *a, int     *lda, void      *s, void    *u, int  *ldu, 
+				    void   *vt, int *ldvt, void *work, int  *lwork,               int   *iwork, int  *info);
 
 }
 
@@ -351,7 +345,7 @@ public:
      * @return          Value at _M[pos]
      */
     inline T            
-    at                  (int pos)  const {
+    at                  (const int pos)  const {
         return _M[pos];
     }
 
@@ -364,7 +358,7 @@ public:
      * @return           Reference to _M[pos]
      */
     inline T&           
-    at                  (int pos) {
+    at                  (const int pos) {
         return _M[pos];
     }
 
@@ -378,7 +372,28 @@ public:
      * @return           Reference to _M[pos]
      */
     inline T&           
-	at                  (IceDim dim, int pos) {
+	at                  (const IceDim dim, const int pos) {
+
+		int n = 1;
+
+		for (int i = 0; i < dim; i++)
+			n *= _dim[i];
+			
+        return _M[pos*n-1];
+
+    }
+
+    
+    /**
+     * @brief            Reference to value at position
+     *  
+     * @param  dim       Dimension
+	 * @param  pos       Position
+     *
+     * @return           Reference to _M[pos]
+     */
+    inline T           
+	at                  (const IceDim dim, const int pos) const {
 
 		int n = 1;
 
@@ -399,8 +414,10 @@ public:
      * @return          Value at _M[col + _dim[LIN]*lin]
      */
     inline T            
-    at                  (int col, int lin)  const {
+    at                  (const int col, const int lin) const {
+
         return _M[col + _dim[LIN]*lin ];
+
     }
 
     
@@ -414,7 +431,9 @@ public:
      */
     inline T&           
     at                  (int col, int lin) {
+
         return _M[col + _dim[LIN]*lin ];
+
     }
 
     
@@ -428,7 +447,9 @@ public:
      */
     inline T            
     at                   (int col, int lin, int slc)  const {
+
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
+
     }
     
     
@@ -442,12 +463,14 @@ public:
      */
     inline T&            
     at                   (int col, int lin, int slc) {
+
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
+
     }
     
     
     /**
-     * @brief            Get value in volume
+     * @brief            Get value in store
      *  
      * @param  col       Column
      * @param  lin       Line
@@ -468,22 +491,22 @@ public:
      * @return           Value at position
      */
     inline T            
-    at                   (int col, 
-						  int lin, 
-						  int cha,
-						  int set,
-						  int eco,
-						  int phs,
-						  int rep,
-						  int seg,
-						  int par,
-						  int slc,
-						  int ida,
-						  int idb,
-						  int idc,
-						  int idd,
-						  int ide,
-						  int ave) const {
+    at                   (const int col, 
+						  const int lin, 
+						  const int cha,
+						  const int set,
+						  const int eco,
+						  const int phs,
+						  const int rep,
+						  const int seg,
+						  const int par,
+						  const int slc,
+						  const int ida,
+						  const int idb,
+						  const int idc,
+						  const int idd,
+						  const int ide,
+						  const int ave) const {
         return _M [col+
 				   lin*_dim[COL]+
 				   cha*_dim[COL]*_dim[LIN]+
@@ -524,22 +547,22 @@ public:
      * @return           Reference to position
      */
 	inline T&            
-    at                   (int col, 
-						  int lin, 
-						  int cha,
-						  int set,
-						  int eco,
-						  int phs,
-						  int rep,
-						  int seg,
-						  int par,
-						  int slc,
-						  int ida,
-						  int idb,
-						  int idc,
-						  int idd,
-						  int ide,
-						  int ave) {
+    at                   (const int col, 
+						  const int lin, 
+						  const int cha,
+						  const int set,
+						  const int eco,
+						  const int phs,
+						  const int rep,
+						  const int seg,
+						  const int par,
+						  const int slc,
+						  const int ida,
+						  const int idb,
+						  const int idc,
+						  const int idd,
+						  const int ide,
+						  const int ave) {
         return _M [col+
 				   lin*_dim[COL]+
 				   cha*_dim[COL]*_dim[LIN]+
@@ -564,7 +587,7 @@ public:
      * @return          Requested scalar value.
      */
     T                  
-    operator()          (int p) const;
+    operator()          (const int p) const;
 
     
     /**
@@ -574,7 +597,7 @@ public:
      * @return          Requested scalar value.
      */
     T&                 
-    operator()          (int p) ;
+    operator()          (const int p) ;
 
     
     /**
@@ -586,7 +609,7 @@ public:
 	 * @return          Value at _M[col + _dim[LIN]*lin]
 	 */
     T
-    operator()          (int col, int lin) const {
+    operator()          (const int col, const int lin) const {
         return _M[col + _dim[LIN]*lin ];
     }
     
@@ -600,7 +623,7 @@ public:
 	 * @return          Reference to _M[col + _dim[LIN]*lin]
 	 */
     T&                  
-    operator()           (int col, int lin) {
+    operator()           (const int col, const int lin) {
         return _M[col + _dim[LIN]*lin ];
     }
     
@@ -615,7 +638,7 @@ public:
      * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     T                  
-    operator()           (int col, int lin, int slc) const {
+    operator()           (const int col, const int lin, const int slc) const {
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
     }
     
@@ -630,7 +653,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     T&                 
-    operator()           (int col, int lin, int slc) {
+    operator()           (const int col, const int lin, const int slc) {
            return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
     }
     
@@ -655,7 +678,7 @@ public:
      * @return          Vector copied from requested row.
      */
     Matrix<T>          
-    lin                 (int lin)                             const;
+    lin                 (const int lin)                             const;
     
     
     /**
@@ -677,7 +700,7 @@ public:
      * @return          Vector copied from requested column.
      */
     Matrix<T>           
-    col                 (int col)                             const;
+    col                 (const int col)                             const;
     
     
     /**
@@ -699,7 +722,7 @@ public:
      * @return          Matrix copied from slice
      */
     Matrix<T>          
-    slc                 (int slc)                             const;
+    slc                 (const int slc)                             const;
     
     
     /**
@@ -807,7 +830,7 @@ public:
      * @return          Number of rows.
      */
     inline int          
-    Dim                 (int i)                                const {return _dim[i];}
+    Dim                 (const int i)                                const {return _dim[i];}
     
     
     /**
@@ -816,7 +839,7 @@ public:
      * @return          Number of rows.
      */
     inline int&          
-    Dim                 (int i)                                 {return _dim[i];}
+    Dim                 (const int i)                                 {return _dim[i];}
     
     
     /**
