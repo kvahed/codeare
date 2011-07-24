@@ -214,7 +214,7 @@ ReconServant::config       (const char* d)    {
 	std::stringstream tmp;
 
 	tmp << d;
-	m_config = new char[tmp.str().length()];
+	m_config = new char[tmp.str().length() + 1];
 	strcpy (m_config, tmp.str().c_str());
 
 }

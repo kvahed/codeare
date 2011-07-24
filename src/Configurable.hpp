@@ -112,21 +112,6 @@ class Configurable {
 
 
 	/**
-	 * @brief           Serialize configuration to given c string
-	 *
-	 * @param  cstr     Storage
-	 */
-	inline void 
-	GetConfig           (char* cstr) {
-
-		std::string temp = "";
-		temp << *(m_config_doc);
-		strcpy (cstr, temp.c_str());
-
-	}
-
-
-	/**
 	 * @brief           Serialize configuration to string
 	 *
 	 * @return          String representation of configuration
@@ -136,7 +121,7 @@ class Configurable {
 
 		std::string temp = "";
 		temp << *(m_config_doc);
-		char* t = new char[temp.length()];
+		char* t = new char[temp.length() + 1];
 		strcpy (t, temp.c_str());
 		return t;
 
