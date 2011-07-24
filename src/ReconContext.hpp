@@ -127,15 +127,6 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief        @see ReconStrategy::GetConfig(char*)
-		 */
-		void
-		GetConfig        (char* cstr) {
-			m_strategy->GetConfig(cstr);
-		}
-		
-
-		/**
 		 * @brief        @see ReconStrategy::SetRaw(const raw_data*)
 		 *
 		 * @param  r     Complex data sequence

@@ -77,21 +77,21 @@ void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) 
 	
 	int j, k, l;
 	
-	// precompute lin psi
+	/* precompute lin psi */
 	if(np->nfft_flags & PRE_PSI)
 		nfft_precompute_psi(np);
 	
-	// precompute full psi 
+	/* precompute full psi */
 	if(np->nfft_flags & PRE_FULL_PSI)
 		nfft_precompute_full_psi(np);
 	
-	// init some guess 
+	/* init some guess */
 	for(k = 0; k < np->N_total; k++)
 		spc->f_hat_iter[k] = 0.0;
 	
 	double t = nfft_second();
 	
-	// inverse trafo 
+	/* inverse trafo */
 	solver_before_loop_complex(spc);
 	
 	for( l = 0; l < maxiter; l++) {
