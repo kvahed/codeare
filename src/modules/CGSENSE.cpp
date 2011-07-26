@@ -26,21 +26,12 @@ CGSENSE::~CGSENSE () {
 RRSModule::error_code 
 CGSENSE::Finalise () {
 
-	/*	if (m_initialised) {
-#pragma omp parallel default (shared) 
-		{
-			
-			omp_set_num_threads(NTHREADS);
-			int tid      = omp_get_thread_num();
-			
-			nfft::finalize (&m_fplan[tid], &m_iplan[tid]);
-			
-		}
-	}
+	if (m_initialised)
+		for (int i = 0; i < NTHREADS || i < m_Nc; i++)
+			nfft::finalize (&m_fplan[i], &m_iplan[i]);
 
 	delete [] m_N;
 	delete [] m_n;
-	*/
 	return OK;
 
 }
@@ -273,7 +264,7 @@ CGSENSE::Process () {
 		rn = r.norm().real();
 
 		res.push_back(rn/an);
-		
+
 		printf ("  %03i: CG residuum: %.9f\n", i, res.at(i));
 
 		// Convergence ? ----------------------------------------------
