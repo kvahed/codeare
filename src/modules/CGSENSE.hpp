@@ -30,7 +30,7 @@ typedef std::complex<float> raw;
 
 using namespace RRServer;
 
-static const int NTHREADS = 4;
+static const int NTHREADS = 8;
 
 namespace RRStrategy {
 	
@@ -77,6 +77,7 @@ namespace RRStrategy {
 		int                  m_verbose;         /**< Verbose should give back the reconstruction series? */
 		double               m_noise;           /**< Add noise? */
 		int                  m_testcase;        /**< Test case. Generate forward data first. */
+		int                  m_Nc;              /**< # Channels */
 
 		Matrix < raw >       m_sens;            /**< Sensitivity maps                */
 		Matrix < raw >       m_measured;        /**< Measured data                   */
