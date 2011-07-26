@@ -26,7 +26,7 @@ CGSENSE::~CGSENSE () {
 RRSModule::error_code 
 CGSENSE::Finalise () {
 
-	if (m_initialised) {
+	/*	if (m_initialised) {
 #pragma omp parallel default (shared) 
 		{
 			
@@ -40,7 +40,7 @@ CGSENSE::Finalise () {
 
 	delete [] m_N;
 	delete [] m_n;
-
+	*/
 	return OK;
 
 }
@@ -93,12 +93,20 @@ CGSENSE::Init() {
 			return UNSUPPORTED_IMAGE_MATRIX;
 		}
 
-	Attribute("M",         &m_M);
+	Attribute ("M",         &m_M);
 
 	if (m_M == 0) {
 		printf ("Initialising %s with %i mesurement nodes? Check configuration! FAILED: Bailing out!\n", Name(), m_M);
 		return ZERO_NODES;
 	}
+
+	Attribute ("Nc",        &m_Nc);
+
+	if (m_Nc == 0) {
+		printf ("Initialising %s with %i channels? Check configuration! FAILED: Bailing out!\n", Name(), m_M);
+		return CGSENSE_ZERO_CHANNELS;
+	}
+
 	// --------------------------------------
 
 	// Verbosity ----------------------------
@@ -154,7 +162,7 @@ CGSENSE::Init() {
 			m,
 			m_epsilon);
 
-	for (int i = 0; i < NTHREADS; i++)
+	for (int i = 0; i < NTHREADS || i < m_Nc; i++)
 		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 	// --------------------------------------
 
@@ -185,7 +193,7 @@ CGSENSE::Process () {
 	p.Reset();
 	
 	// Set k-space and weights ----------------------------------------
-	for (int i = 0; i < NTHREADS; i++) {
+	for (int i = 0; i < NTHREADS || i < m_Nc; i++) {
 		memcpy (&(m_fplan[i].x[0]), &m_kspace[0], m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
 		memcpy (&(m_iplan[i].w[0]), &m_helper[0],                m_fplan[i].M_total * sizeof(double)) ;
 		nfft::weights (&m_fplan[i], &m_iplan[i]);
