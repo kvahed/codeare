@@ -57,18 +57,19 @@ LapackTests::Process     () {
 	std::cout << "Testing SVD (cgesdd) for raw:    ";
 	std::cout << "INFO: " << m_raw.SVD (true, &rlsv, &rrsv, &dsv)    << std::endl;
 
-	Matrix<short> test;
-	test.Dim(COL) = m_pixel.Dim(LIN);
+	Matrix<double> test;
+	test.Dim(COL) = m_helper.Dim(LIN);
 	test.Dim(LIN) = 3;
 	test.Reset();
 	test.Random();
 
 	std::cout << "Testing mm multiplication (dgemm) for helper:     ";
-	Matrix<short> product = test.prod(m_pixel);
-	
-	std::cout << test;
-	printf ("\n");
-	std::cout << product;
+
+	std::cout << test << std::endl;
+	test.prod (m_helper);
+	std::cout << test << std::endl;
+
+	m_raw.Inv();
 
 	return RRSModule::OK;
 

@@ -170,7 +170,7 @@ RRSModule::error_code
 CGSENSE::Process () {
 
 	RRSModule::error_code error = OK;
-
+	
 	// CG matrices ----------------------------------------------------
 	Matrix<raw> p, q, r;
 

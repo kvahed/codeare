@@ -9,7 +9,7 @@ COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp ..
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la 
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module
@@ -41,5 +41,8 @@ SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 
 LapackTests_la_SOURCES = $(COMMON) LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
+
+SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
+SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
