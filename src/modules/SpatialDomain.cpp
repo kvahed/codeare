@@ -34,7 +34,8 @@ using namespace RRStrategy;
  * @param  result   Achieved result
  * @return          Phase corrected 
  */
-Matrix<raw> PhaseCorrection (Matrix<raw> target, Matrix<raw> result);
+Matrix<raw> 
+PhaseCorrection              (Matrix<raw>* target, Matrix<raw>* result);
 
 /**
  * @brief           Normalised root-means-squared error
@@ -43,7 +44,8 @@ Matrix<raw> PhaseCorrection (Matrix<raw> target, Matrix<raw> result);
  * @param  result   Achieved result
  * @return          NRMSE
  */
-float       NRMSE           (const Matrix<raw> target, const Matrix<raw> result);
+float       
+NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result);
 
 /**
  * @brief           RF limts
@@ -54,7 +56,27 @@ float       NRMSE           (const Matrix<raw> target, const Matrix<raw> result)
  * @param  nc       In:  # Coils
  * @param  limits   Out: limits
  */
-void        RFLimits        (const Matrix<raw> solution, const int* pd, const int nk, const int nc, float* limits);
+void        
+RFLimits                      (const Matrix<raw>* solution, const int* pd, const int nk, const int nc, float* limits);
+
+
+/**
+ * @brief           STA magnetisation
+ *
+ * @param  k        k
+ * @param  r        r
+ * @param  b1       b1 map
+ * @param  b0       b0 map
+ * @param  nc       # of transmit channels
+ * @param  nk       # of kspace positions
+ * @param  ns       # of spatial positions
+ * @param  gd       Gradient duration
+ * @return          magnetisation
+ */
+Matrix<raw>
+Magnetisation           (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
+						 const int             nc, const int            nk, const int          ns, const int            gd);
+
 
 
 
@@ -134,25 +156,13 @@ SpatialDomain::Process        () {
 
 	while (!pulse_amp_ok) {
 
-		Matrix<raw> mxy;
-		mxy.Dim(COL) = m_ns;
-		mxy.Dim(LIN) = m_nc;
-		mxy.Reset();
-		
-		for (int c = 0; c < m_nc; c++) 
-			for (int k = 0; k < m_nk; k++) 
-				for (int s = 0; s < m_ns; s++) 
-					mxy.at (s, c*m_nk+k) = 
-						raw (0, 2.0 * PI * GAMMA * GRAD_RASTER) *         // 2i\pi\gamma\delta t                       
-						m_rhelper.at(c,s) *                               // b1 
-						exp (raw(0, 2.0 * PI * m_gd * m_pixel.at(s))) *   // delta b0
-						exp (raw(0,(m_kspace.at(0,k) * m_helper.at(0,s) + m_kspace.at(1,k) * m_helper.at(1,s) + m_kspace.at (2,k) * m_helper(2,s)))); // kspace encoding
-		
-		Matrix<raw> pinv = mxy.tr();
-		pinv *= mxy;
-		pinv += treg;
-		pinv  = pinv.Inv();	
-		pinv.dotc(mxy);
+		Matrix<raw> m    = Magnetisation (&m_kspace, &m_helper, &m_rhelper, &m_pixel, m_nc, m_nk, m_ns, m_gd);
+		Matrix<raw> minv = m.tr();
+
+		minv *= m;
+		minv += treg;
+		minv  = minv.Inv();	
+		minv.dotc(m);
 		
 		// Valriable exchange method --------------
 
@@ -163,10 +173,10 @@ SpatialDomain::Process        () {
 
 		for (int j = 0; j < m_maxiter; j++) {
 			
-			solution = pinv * m_raw;
-			tmp      = mxy  * solution;
+			solution = minv * m_raw;
+			tmp      = m    * solution;
 
-			res.push_back (NRMSE (m_raw, tmp));
+			res.push_back (NRMSE (&m_raw, &tmp));
 			
 			if (res.at(j) > err) break;
 			if (res.at(j) < 2.5) break;
@@ -174,14 +184,14 @@ SpatialDomain::Process        () {
 			err	     = res.at(j) - 1.0e-3;
 			
 			final    = solution;
-			m_raw    = PhaseCorrection (m_raw, tmp);
+			m_raw    = PhaseCorrection (&m_raw, &tmp);
 			
 		}	
 		
 		printf ("... done. Checking pulse amplitudes ... \n");
 		
 		// Check max pulse amplitude -----------------
-		RFLimits (final, m_pd, m_nk, m_nc, max_rf);
+		RFLimits (&final, m_pd, m_nk, m_nc, max_rf);
 		pulse_amp_ok = true;
 
 		for (int i = 0; i < m_nk; i++) 
@@ -209,15 +219,16 @@ SpatialDomain::Process        () {
 
 
 
-float NRMSE (Matrix<raw> target, Matrix<raw> result) {
+float      
+NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result) {
 
 	float q = 0;
 	float n = 0;
 
-	for (int i = 0; i < target.Size(); i++)
-		q += pow (abs(target[i]) - abs(result[i]), 2.0);
+	for (int i = 0; i < target->Size(); i++)
+		q += pow (abs(target->at(i)) - abs(result->at(i)), 2.0);
 
-	q = sqrt(q)/target.norm().real();
+	q = sqrt(q)/target->norm().real();
 
 	printf ("MRMSE: %.3f\n", q);
 
@@ -227,9 +238,10 @@ float NRMSE (Matrix<raw> target, Matrix<raw> result) {
 
 
 
-Matrix<raw> PhaseCorrection (Matrix<raw> target, Matrix<raw> result) {
+Matrix<raw> 
+PhaseCorrection               (const Matrix<raw>* target, const Matrix<raw>* result) {
 
-	Matrix<raw> tmp = target;
+	Matrix<raw> tmp = *target;
 	
 #pragma omp parallel default (shared) 
 	{
@@ -240,8 +252,8 @@ Matrix<raw> PhaseCorrection (Matrix<raw> target, Matrix<raw> result) {
 #pragma omp for schedule (dynamic, chunk)
 		
 		for (int i = 0; i < tmp.Size(); i++) 
-			if (abs(target[i]) > 0)	
-				tmp[i] = abs (target[i]) * result[i] / abs(result[i]);
+			if (abs(target->at(i)) > 0)	
+				tmp[i] = abs (target->at(i)) * result->at(i) / abs(result->at(i));
 			else				
 				tmp[i] = raw (0.0,0.0);	
 
@@ -252,7 +264,8 @@ Matrix<raw> PhaseCorrection (Matrix<raw> target, Matrix<raw> result) {
 }
 
 
-void RFLimits (Matrix<raw> solution, float* pd, int nk, int nc, float* limits) {
+void 
+RFLimits            (Matrix<raw> solution, float* pd, int nk, int nc, float* limits) {
 	
 	for (int i = 0; i < nk; i++) {
 		
@@ -266,6 +279,31 @@ void RFLimits (Matrix<raw> solution, float* pd, int nk, int nc, float* limits) {
 		
 }
 
+
+Matrix< std::complex<float> >
+Magnetisation (const Matrix<double>* ks, const Matrix<double>* r, const Matrix< std::complex<float> >* b1, const Matrix<short>* b0, int nc, int nk, int ns, int gd) {
+	
+	Matrix< std::complex<float> > mxy;
+	mxy.Dim(COL) = ns;
+	mxy.Dim(LIN) = nc;
+	mxy.Reset();
+	
+	std::complex<float> pgd = std::complex<float> (0, 2.0 * PI * GAMMA * GRAD_RASTER);            // 2* i * \pi * \gamma * \delta t
+	
+	for (int c = 0; c < nc; c++) 
+		for (int k = 0; k < nk; k++) 
+			for (int s = 0; s < ns; s++) {
+				mxy[c*nk + k*ns + s]  = 
+					pgd * b1->at(c*s + s) *                   // b1 (s,c) 
+					exp (raw(0, 2.0 * PI * gd * b0->at(s))) *  // delta b0:        exp (ib0t) 
+					exp (raw(0,(ks->at(0,k) * r->at(0,s) + 
+								ks->at(1,k) * r->at(1,s) + 
+								ks->at(2,k) * r->at(2,s))));   // kspace encoding: exp (ik(t)r)
+			}
+	
+	return mxy;
+
+}
 
 
 // the class factories
