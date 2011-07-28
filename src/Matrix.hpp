@@ -89,6 +89,22 @@ extern "C" {
 	void dgesdd_   (char *jobz, int    *m, int     *n, void     *a, int     *lda, void      *s, void    *u, int  *ldu, 
 				    void   *vt, int *ldvt, void *work, int  *lwork,               int   *iwork, int  *info);
 
+	// Cholesky factorization of a complex Hermitian positive definite matrix
+	void cpotrf_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
+	void dpotrf_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
+
+	// Computes an LU factorization of a general M-by-N matrix A
+	void cgetrf_   (int* m, int    *n, void   *a, int*   lda, int  *ipiv, int  *info);
+	void dgetrf_   (int* m, int    *n, void   *a, int*   lda, int  *ipiv, int  *info);
+
+	// Inverse of a complex Hermitian positive definite matrix using cpotrf/cpptrf
+	void cpotri_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
+	void dpotri_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
+
+	// Genral matrix inversion through cholesky decomposition
+	void cgetri_   (int     *n, void   *a, int*   lda, int   *ipiv, void   *work, int   *lwork, int  *info);
+	void dgetri_   (int     *n, void   *a, int*   lda, int   *ipiv, void   *work, int   *lwork, int  *info);
+
 }
 
 /**
@@ -167,12 +183,12 @@ public:
     
     
     /**
-     * @brief           Construct a new 1^16 matrix initialized with scalar s.
-     *
-     * @param  s        Scalar Value.
-     */
+	 * @brief           Construct 2D matrix
+	 *
+	 * @param  m        Rows & Columns
+	 */
     inline              
-    Matrix              (T s) ;
+    Matrix              (const int n) ;
     
     
     /**
@@ -200,7 +216,24 @@ public:
                           int eco, int phs, int rep, int seg, 
                           int par, int slc, int ida, int idb, 
                           int idc, int idd, int ide, int ave);
-    
+
+
+	/**
+	 * @brief           Construct with dimension array
+	 */
+	inline 
+	Matrix              (const int* dim);
+	
+	
+    /**
+	 * @brief           Construct 2D matrix
+	 *
+	 * @param  m        Rows
+	 * @param  n        Columns
+	 */
+	inline 
+	Matrix              (const int m, const int n);
+	
     
     /**
      * @brief           Delete array containing data.
@@ -580,8 +613,19 @@ public:
 				   ave*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
     }
     
-     /**
-     * @brief           Get the element at position p of the vector, i.e. this(p).
+
+	/**
+	 * @brief           Create nxn identity matrix 
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn identity
+	 */
+	static Matrix<T> 
+	id                  (int n);
+	
+
+	/**
+	 * @brief           Get the element at position p of the vector, i.e. this(p).
      *
      * @param  p        Requested position.
      * @return          Requested scalar value.
@@ -1233,6 +1277,7 @@ public:
     inline void         
 	Random               ();    
 
+
     /**
      * @brief           Matrix multiplication. i.e. this * M.
      *
@@ -1240,12 +1285,50 @@ public:
      */
     Matrix<T>           
     operator*           (Matrix<T> &M);
+
+
+    /**
+     * @brief           Assignment operator. i.e. this = m.
+     *
+     * @param  M        The assigned matrix.
+     */
+    Matrix<T>           
+    operator*=           (Matrix<T> &M);
+    
+    
+    /**
+     * @brief           Assignment operator. i.e. this = m.
+     *
+     * @param  M        The assigned matrix.
+     */
+    Matrix<T>           
+    operator*=           (T s);
+    
+    
+    /**
+     * @brief           Assignment operator. i.e. this = m.
+     *
+     * @param  M        The assigned matrix.
+     */
+    Matrix<T>           
+    operator+=           (Matrix<T> &M);
+    
+    
+    /**
+     * @brief           Assignment operator. i.e. this = m.
+     *
+     * @param  M        The assigned matrix.
+     */
+    Matrix<T>           
+    operator+=           (T s);
+    
     
     /**
      * @brief           Elementwise multiplication with a scalar. i.e. this * m.
      */
     Matrix<T>           
     operator*           (T s);
+
     
     /**
      * @brief           Matrix multiplication. i.e. this * M.
@@ -1254,6 +1337,7 @@ public:
      */
     Matrix<T>           
     operator/           (Matrix<T> &M);
+
     
     /**
      * @brief           Elementwise multiplication with a scalar. i.e. this * m.
@@ -1370,12 +1454,28 @@ public:
     prod                (Matrix<T> &M);
     
     /**
+     * @brief           Matrix Product with transpose / complex conjugate transpose.
+     *
+     * @return          Product of this and M.
+     */
+    Matrix<T>           
+    prodt               (Matrix<T> &M);
+    
+    /**
      * @brief           Transposition.
      *
      * @return          The transposed matrix
      */
     Matrix<T>           
     tr   ()             const;
+    
+    /**
+     * @brief           General inversion.
+     *
+     * @return          success
+     */
+	int 
+    Inv   ()            const;
     
     /**
      * @brief           Euclidean norm.
@@ -1443,10 +1543,13 @@ private:
     /**
      * @brief           Matrix Product with BLAS.
      *
+	 * @param  M        Multiplie with
+	 * @param  transb   Transpose M
+	 *
      * @return          Product of this and M.
      */
     Matrix<T>           
-    GEMM                (Matrix<T> &M);
+    GEMM                (Matrix<T> &M, char transb);
     
 };
 
@@ -1467,17 +1570,37 @@ Matrix<T>::Matrix () {
 
 
 template <class T> 
-Matrix<T>::Matrix (T s) {
+Matrix<T>::Matrix (const int n) {
 
 	nb_alloc = 0;
 
-    for (int i = 0; i < INVALID_DIM; i++)
+	_dim [COL] = n;
+	_dim [LIN] = n;
+
+    for (int i = CHA; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
     _M = (T*) malloc (Size()*sizeof(T));
+
     nb_alloc++;
 
-    _M[0] = s;
+}
+
+
+template <class T> 
+Matrix<T>::Matrix (const int m, const int n) {
+
+	nb_alloc = 0;
+
+	_dim [COL] = n;
+	_dim [LIN] = m;
+
+    for (int i = CHA; i < INVALID_DIM; i++)
+        _dim [i] = 1;
+
+    _M = (T*) malloc (Size()*sizeof(T));
+
+    nb_alloc++;
 
 }
 
@@ -1515,6 +1638,21 @@ Matrix<T>::Matrix (int col, int lin, int cha, int set,
 
 
 template <class T>
+Matrix<T>::Matrix (const int* dim) {
+
+	nb_alloc = 0;
+
+	for (int i = 0; i < INVALID_DIM; i++)
+		_dim[i] = dim[i];
+
+    _M = (T*) malloc (Size() * sizeof (T));
+    nb_alloc++;
+
+
+}
+
+
+template <class T>
 Matrix<T>::Matrix (const Matrix<T> &M)
 {
 
@@ -1532,6 +1670,7 @@ Matrix<T>::Matrix (const Matrix<T> &M)
 
 }
 
+
 template <class T> 
 Matrix<T>::~Matrix() {
     
@@ -1545,60 +1684,6 @@ Matrix<T>::~Matrix() {
         nb_alloc--;
     }
     
-}
-
-
-template <class T> Matrix<T> 
-Matrix<T>::operator*(Matrix<T> &M) {
-
-    Matrix<T> res;
-
-	for (int j = 0; j < INVALID_DIM; j++)
-		res.Dim(j) = _dim[j];
-
-	res.Reset();
-
-#pragma omp parallel default (shared) 
-	{
-
-		int tid      = omp_get_thread_num();
-		int chunk    = Size() / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk)
-		for (int i = 0; i < Size(); i++)
-			res[i] = _M[i] * M[i];
-
-	}
-	
-	return res;
-
-}
-
-
-template <class T> Matrix<T> 
-Matrix<T>::operator* (T s) {
-    
-    Matrix<T> res;
-
-	for (int j = 0; j < INVALID_DIM; j++)
-		res.Dim(j) = _dim[j];
-
-	res.Reset();
-
-#pragma omp parallel default (shared) 
-	{
-
-		int tid      = omp_get_thread_num();
-		int chunk    = Size() / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk)
-	for (int i = 0; i < Size(); i++)
-		res[i] = _M[i] * s;
-	
-	}
-
-	return res;
-
 }
 
 
@@ -1852,29 +1937,33 @@ static T power(T p, int b) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::tr() const {
+Matrix<T> Matrix<T>::id (int n) {
 
-    Matrix<T> res(_dim);
+ 	static Matrix<T> M (n,n);
 
-    for (int i = 0; i < res.height(); i++)
-        for (int j = 0; j < res.width(); j++)
-            res[i * res.width() + j] = _M[j * height() + i];
+ 	for (int i = 0; i < n; i++)
+ 		M[i*n+i] = 1;
 
-    return res;
+ 	return M;
 
 }
 
-/*template <class T>
-T Matrix<T>::nrm2() const {
 
-	T res = (T) 0;
+template <class T>
+Matrix<T> Matrix<T>::tr() const {
 
-	for (int i = 0; i < Size(); i++)
-		res += _M[i]*_M[i];
-
+    Matrix<T> res (_dim);
+	
+    for (int i = 0; i < res.height(); i++)
+        for (int j = 0; j < res.width(); j++)
+			if (typeid (T) == typeid (double))
+				res [i * res.width() + j] = _M[j * height() + i];        // Transpose
+			else
+				res [i * res.width() + j] = conj (_M[j * height() + i]); // Conjugate transpose
+	
     return res;
 
-	}*/
+}
 
 template<>
 inline void Matrix<raw>::Random () {

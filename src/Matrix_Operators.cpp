@@ -591,3 +591,156 @@ Matrix<T> Matrix<T>::operator^(int p) {
 }
 
 
+template <class T> Matrix<T> 
+Matrix<T>::operator*(Matrix<T> &M) {
+
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+#pragma omp parallel default (shared) 
+	{
+
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		for (int i = 0; i < Size(); i++)
+			res[i] = _M[i] * M[i];
+
+	}
+	
+	return res;
+
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::operator* (T s) {
+    
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+#pragma omp parallel default (shared) 
+	{
+
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[i] * s;
+	
+	}
+
+	return res;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::operator += (Matrix<T> &M) {
+    
+    int i;
+
+	for (int i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
+		for (int i = 0; i < Size(); i++)
+			_M[i] += M[i];
+		
+	}
+
+    return *this;
+
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::operator+= (T s) {
+    
+    Matrix<T> res;
+
+	for (int j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+#pragma omp parallel default (shared) 
+	{
+
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+	for (int i = 0; i < Size(); i++)
+		res[i] = _M[i] + s;
+	
+	}
+
+	return res;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::operator *= (Matrix<T> &M) {
+    
+    int i;
+
+	for (int i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
+		for (int i = 0; i < Size(); i++)
+			_M[i] *= M[i];
+		
+	}
+
+    return *this;
+
+}
+
+template <class T>
+Matrix<T> Matrix<T>::operator *= (T s) {
+    
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
+		for (int i = 0; i < Size(); i++)
+			_M[i] *= s;
+		
+	}
+
+    return *this;
+
+}
+
+

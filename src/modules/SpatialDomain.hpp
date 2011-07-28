@@ -84,6 +84,9 @@ namespace RRStrategy {
 
 		double m_lambda; /**< Tikhonov parameter  */
 		double m_rflim;
+		double m_conv;
+		
+		std::string m_orient; /**< Orientation*/ 
 
 	};
 

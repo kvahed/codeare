@@ -51,6 +51,7 @@ bool init (int argc, char** argv);
 bool internaltest (ReconClient* rc); 
 bool cgsensetest (ReconClient* rc);
 bool nuffttest (ReconClient* rc);
+bool sdmtest (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
@@ -64,6 +65,8 @@ int main (int argc, char** argv) {
 			nuffttest (&client);
 		else if (strcmp (test, "CGSENSE") == 0)
 			cgsensetest (&client);
+		else if (strcmp (test, "SDM") == 0)
+			sdmtest (&client);
 		else
 			internaltest (&client);
 			
@@ -193,6 +196,44 @@ bool nuffttest (ReconClient* rc) {
 	
 }
 
+bool sdmtest (ReconClient* rc) {
+
+	Matrix<raw>    target;
+	Matrix<raw>    sens;
+	Matrix<double> r;
+	Matrix<double> k;
+	Matrix<short>  b0;
+	
+	std::string    cf  = std::string (base + std::string(config));
+	std::string    df  = std::string (base + std::string(data));
+	std::string    odf = std::string (base + std::string("/images.h5"));
+
+	rc->ReadConfig (cf.c_str());
+	rc->Init(test);
+
+	target.read    (df, "target");
+	sens.read      (df, "b1");
+	b0.read        (df, "b0");
+	k.read         (df, "k");
+	r.read         (df, "r");
+	
+
+	rc->SetRaw     (target);
+	rc->SetRHelper (sens);
+	rc->SetHelper  (r);
+	rc->SetKSpace  (k);
+	rc->SetPixel   (b0);
+	
+	rc->Process    (test);
+	
+	rc->GetRaw     (target);
+
+	target.dump   (odf.c_str());
+
+	rc->Finalise(test);
+	
+}
+
 bool internaltest (ReconClient* rc) {
 
 	int         i = 0, j = 0, d = 8;
@@ -201,7 +242,7 @@ bool internaltest (ReconClient* rc) {
 	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	
-	r.Random();
+	r.Random(); 
 	h.Random();
 	p.Random();
 	
@@ -233,6 +274,8 @@ bool internaltest (ReconClient* rc) {
 	rc->GetPixel(p);
 	rc->GetHelper(h);
 	rc->GetKSpace(h);
+
+	rc->Finalise (test);
 	
 	cout << "We're good" << endl;
 	
