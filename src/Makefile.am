@@ -21,6 +21,7 @@ SERVER_SIDE =  Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServ
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
+testclt_LDFLAGS = $(BLAS) $(LAPACK) 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp

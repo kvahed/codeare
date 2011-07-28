@@ -104,8 +104,11 @@ SpatialDomain::Init           ()  {
     Attribute ("Ns",      &m_ns);      // # of spatial sites
     Attribute ("Nc",      &m_nc);      // # of transmit channels
     Attribute ("maxiter", &m_maxiter); // Max # of iterations
-    Attribute ("lambda",  &m_lambda);  // # Tikhonov parameter
+    Attribute ("lambda",  &m_lambda);  // # Tikhonov parameter from L-curve learning ca. [0.005...0.05] for human
     Attribute ("rflim",   &m_rflim);   // # RF limit (usualy in [0 1])
+	Attribute ("conv",    &m_conv);    // Convergence limit
+	
+	m_orient = Attribute ("UID");
    
     return e;
 
@@ -139,7 +142,6 @@ SpatialDomain::Process        () {
     // m_raw:    Pulses
     // m_helper: Pulse durations
     // ----------------------------
-    
     Matrix<raw> treg         = Matrix<raw>::id(m_nc * m_nk) * raw (m_lambda, 0);
 
     bool        pulse_amp_ok = false;
@@ -152,15 +154,15 @@ SpatialDomain::Process        () {
     // Start clock ------------------------
     ticks cgstart = getticks();
 
-    while (!pulse_amp_ok) {
+	/*    while (!pulse_amp_ok) {
 
         Matrix<raw> m    = Magnetisation (&m_kspace, &m_helper, &m_rhelper, &m_pixel, m_nc, m_nk, m_ns, m_gd);
         Matrix<raw> minv = m.tr();
 
-        minv *= m;
+        minv.prod(m);
         minv += treg;
         minv  = minv.Inv();    
-        minv.dotc(m);
+        minv.prodt(m);
         
         // Valriable exchange method --------------
 
@@ -176,10 +178,9 @@ SpatialDomain::Process        () {
 
             res.push_back (NRMSE (&m_raw, &tmp));
             
-            if (res.at(j) > err) break;
-            if (res.at(j) < 2.5) break;
+            if (res.at(j) > (res.at(j-1) - 1.0e-3)|| res.at(j) < m_conv) break;
             
-            err         = res.at(j) - 1.0e-3;
+            err         = res.at(j) ;
             
             final    = solution;
             m_raw    = PhaseCorrection (&m_raw, &tmp);
@@ -210,7 +211,7 @@ SpatialDomain::Process        () {
 
     }
 
-    free (max_rf);
+    free (max_rf); */
     return RRSModule::OK;
 
 }

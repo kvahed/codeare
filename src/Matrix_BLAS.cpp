@@ -3,47 +3,31 @@
 
 template <class T>
 Matrix<T> 
-Matrix<T>::prod(Matrix<T> &M) {
-
+Matrix<T>::prodt (Matrix<T> &M) {
+	
     assert(width() == M.height());
-
-	if (typeid(T) == typeid(double) || typeid(T) == typeid(raw)) // Fast BLAS code
-		return GEMM(M);
-
-	else {                                                          // Standard impl
-
-		Matrix<T> res;
-		
-		res.Dim(0)  = M.Dim(COL);//_dim[0];
-		res.Dim(1)  = _dim[LIN];//M.Dim(1);
-		res.Reset();
-		
-		for (int i = 0; i < res.height(); i++)
-			for (int j = 0; j < res.width(); j++)
-				for (int k = 0; k < width(); k++) {
-					res[i * res.width() + j] += _M[i * width() + k] * M[k * M.width() + j];
-					if (res[i * res.width() + j] < 0 || res[i * res.width() + j] > ICE_SHRT_MAX) {
-						res[i * res.width() + j] = ICE_SHRT_MAX;
-						break;
-					}
-				}
-
-
-		
-		return res;
-		
-	}
+	return GEMM(M, 'T');
 	
 }
 
+
+template <class T>
+Matrix<T> 
+Matrix<T>::prod (Matrix<T> &M) {
+	
+    assert(width() == M.height());
+	return GEMM(M, 'N');
+	
+}
+
+
 template<class T>
 Matrix<T> 
-Matrix<T>::GEMM (Matrix<T>& M) {
+Matrix<T>::GEMM (Matrix<T>& M, char transb) {
 	
 	Matrix<T> res;
 
 	char transa = 'N';
-	char transb = 'N';
 
 	int i = 0, j = 0, l = 0;
 

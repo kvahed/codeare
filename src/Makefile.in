@@ -68,6 +68,9 @@ am_testclt_OBJECTS = $(am__objects_1) $(am__objects_3) \
 	testclt.$(OBJEXT)
 testclt_OBJECTS = $(am_testclt_OBJECTS)
 testclt_LDADD = $(LDADD)
+testclt_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(testclt_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -265,6 +268,7 @@ SERVER_SIDE = Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServa
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
+testclt_LDFLAGS = $(BLAS) $(LAPACK) 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
@@ -374,7 +378,7 @@ reconserver$(EXEEXT): $(reconserver_OBJECTS) $(reconserver_DEPENDENCIES)
 	$(reconserver_LINK) $(reconserver_OBJECTS) $(reconserver_LDADD) $(LIBS)
 testclt$(EXEEXT): $(testclt_OBJECTS) $(testclt_DEPENDENCIES) 
 	@rm -f testclt$(EXEEXT)
-	$(CXXLINK) $(testclt_OBJECTS) $(testclt_LDADD) $(LIBS)
+	$(testclt_LINK) $(testclt_OBJECTS) $(testclt_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

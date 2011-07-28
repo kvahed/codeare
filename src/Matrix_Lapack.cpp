@@ -198,7 +198,7 @@ int Matrix<T>::SVD (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double
 	else if (typeid(T) == typeid(double))
 		dgesdd_ (&jobz, &m, &n, a, &lda, sd, u, &ldu, vt, &ldvt, work, &lwork,        iwork, &info);
 	
-	lwork = (int) raw(work[0]).real();
+	lwork = (int) raw (work[0]).real();
 	
 	//std::cout << "xgesdd_ (lwork = " << lwork << ")" << std::endl;
 	
@@ -252,3 +252,60 @@ int Matrix<T>::SVD (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double
 	
 } 
 
+
+template <class T>
+int  Matrix<T>::Inv () const {
+
+	assert (_dim[COL] == _dim[LIN]);
+
+	int  n    = _dim[COL];
+
+	int info  = 0;
+
+	int* ipiv = (int*) malloc (n * sizeof(int));
+	
+	char up = 'U';
+	char lo = 'L';
+
+	// LQ Factorisation -------------------
+
+	if (typeid (T) == typeid (raw)) 
+		cgetrf_ (&n, &n, _M, &n, ipiv, &info);
+	else if (typeid (T) == typeid (double))
+		dgetrf_ (&n, &n, _M, &n, ipiv, &info);
+
+	// ------------------------------------
+
+	if (info != 0)
+		return info;
+
+	T*  work  = (T*) malloc (sizeof(T));
+	int lwork = -1; 
+
+	// Workspace determination ------------
+
+	if (typeid (T) == typeid (raw)) 
+		cgetri_ (&n, _M, &n, ipiv, work, &lwork, &info);
+	else if (typeid (T) == typeid (double))
+		dgetri_ (&n, _M, &n, ipiv, work, &lwork, &info);
+
+	// ------------------------------------
+
+	lwork = (int) raw (work[0]).real();
+	work = (T*) realloc (work, lwork * sizeof(T));
+	
+	// Copy triangular matrix over --------
+
+	if (typeid (T) == typeid (raw)) 
+		cgetri_ (&n, _M, &n, ipiv, work, &lwork, &info);
+	else if (typeid (T) == typeid (double))
+		dgetri_ (&n, _M, &n, ipiv, work, &lwork, &info);
+
+	// ------------------------------------
+	
+	free (ipiv);
+	free (work);
+
+	return info;
+
+} 
