@@ -35,7 +35,7 @@ using namespace RRStrategy;
  * @return          Phase corrected 
  */
 Matrix<raw> 
-PhaseCorrection              (Matrix<raw>* target, Matrix<raw>* result);
+PhaseCorrection     (Matrix<raw>* target, Matrix<raw>* result);
 
 /**
  * @brief           Normalised root-means-squared error
@@ -45,7 +45,7 @@ PhaseCorrection              (Matrix<raw>* target, Matrix<raw>* result);
  * @return          NRMSE
  */
 float       
-NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result);
+NRMSE               (const Matrix<raw>* target, const Matrix<raw>* result);
 
 /**
  * @brief           RF limts
@@ -57,7 +57,7 @@ NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* res
  * @param  limits   Out: limits
  */
 void        
-RFLimits                      (const Matrix<raw>* solution, const int* pd, const int nk, const int nc, float* limits);
+RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, const int nc, float* limits);
 
 
 /**
@@ -74,8 +74,8 @@ RFLimits                      (const Matrix<raw>* solution, const int* pd, const
  * @return          magnetisation
  */
 Matrix<raw>
-Magnetisation           (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
-                         const int             nc, const int            nk, const int          ns, const int            gd);
+Magnetisation       (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
+                    const int             nc, const int            nk, const int          ns, const int            gd);
 
 
 
@@ -83,9 +83,7 @@ Magnetisation           (const Matrix<double>* ks, const Matrix<double>* r, cons
 SpatialDomain::SpatialDomain  () {}
 
 
-SpatialDomain::~SpatialDomain () {
-    
-}
+SpatialDomain::~SpatialDomain () {}
 
 
 RRSModule::error_code
