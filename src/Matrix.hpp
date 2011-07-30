@@ -89,6 +89,12 @@ extern "C" {
 	void dgesdd_   (char *jobz, int    *m, int     *n, void     *a, int     *lda, void      *s, void    *u, int  *ldu, 
 				    void   *vt, int *ldvt, void *work, int  *lwork,               int   *iwork, int  *info);
 
+	// Minimize L2-norm (|b-A*x|) - b = id delivers pinv
+	void cgels_    (char *trans, int     *m, int    *n, int  *nrhs, void     *a, int     *lda, void      *b, int  *ldb,
+					void  *work, int *lwork, int *info);
+	void dgels_    (char *trans, int     *m, int    *n, int  *nrhs, void     *a, int     *lda, void      *b, int  *ldb,
+					void  *work, int *lwork, int *info);
+
 	// Cholesky factorization of a complex Hermitian positive definite matrix
 	void cpotrf_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
 	void dpotrf_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
@@ -820,7 +826,7 @@ public:
      * @return          Number of rows.
      */
     inline int                 
-    height              () const {return _dim[LIN];}
+    height              () const {return _dim[0];}
     
     
     /**
@@ -829,7 +835,7 @@ public:
      * @return          Number of rows.
      */
     inline int&
-    height              () {return _dim[LIN];}
+    height              () {return _dim[0];}
     
     
     /**
@@ -838,7 +844,7 @@ public:
      * @return          Number of columns.
      */
     inline int                 
-    width               () const {return _dim[COL];}
+    width               () const {return _dim[1];}
     
     
     /**
@@ -847,7 +853,7 @@ public:
      * @return          Number of columns.
      */
     inline int&
-    width               ()  {return _dim[COL];}
+    width               ()  {return _dim[1];}
     
     
     /**
@@ -856,7 +862,7 @@ public:
      * @return          Number of rows.
      */
     int                 
-    m                   () const {return _dim[LIN];}
+    m                   () const {return _dim[0];}
 
 
     /**
@@ -865,7 +871,7 @@ public:
      * @return          Number of columns.
      */
     int                 
-    n                   () const {return _dim[COL];}
+    n                   () const {return _dim[1];}
 
 
     /**
@@ -1376,6 +1382,16 @@ public:
 
 
     /**
+     * @brief           Primitive dump column-major to file.
+     * 
+     * @param  fname    File name.
+     * @return          Success.
+     */
+    bool                
+    pdump               (std::string fname);
+    
+
+    /**
      * @brief           Dump binary matrix column-major.
      * 
      * @param  fname    File name.
@@ -1476,6 +1492,14 @@ public:
      */
 	int 
     Inv   ()            const;
+    
+    /**
+     * @brief           Moore-Penrose pseudo-inverse.
+     *
+     * @return          Matrix
+     */
+	Matrix<T> 
+    Pinv   ();
     
     /**
      * @brief           Euclidean norm.
@@ -1592,8 +1616,8 @@ Matrix<T>::Matrix (const int m, const int n) {
 
 	nb_alloc = 0;
 
-	_dim [COL] = n;
-	_dim [LIN] = m;
+	_dim [0] = m;
+	_dim [1] = n;
 
     for (int i = CHA; i < INVALID_DIM; i++)
         _dim [i] = 1;
@@ -1862,7 +1886,7 @@ template <> inline raw
 Matrix<raw>::Max() {
 		
 		raw   max = raw(0.0,0.0);
-		float tmp = 0.0;
+		float tmp =  0.0;
 		
 		for (int i = 0; i < Size(); i++) {
 				float abs = sqrt(_M[0].real()*_M[0].real() + _M[0].imag()*_M[0].imag());
@@ -1960,6 +1984,10 @@ Matrix<T> Matrix<T>::tr() const {
 				res [i * res.width() + j] = _M[j * height() + i];        // Transpose
 			else
 				res [i * res.width() + j] = conj (_M[j * height() + i]); // Conjugate transpose
+
+	long tmp = res.height();
+	res.height() = res.width();
+	res.width()  = tmp;
 	
     return res;
 

@@ -31,7 +31,7 @@ NuFFT_OMP_la_SOURCES = $(COMMON) NuFFT_OMP.hpp NuFFT_OMP.cpp nfftstub.h nfftstub
 NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.hpp DumpToFile.cpp
-DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(HDF5)
+DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) #$(HDF5)
 
 CGSENSE_la_SOURCES = $(COMMON) CGSENSE.hpp CGSENSE.cpp nfftstub.h nfftstub.c Noise.hpp SEM.hpp OMP.hpp
 CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart $(BLAS) $(LAPACK)
@@ -43,6 +43,6 @@ LapackTests_la_SOURCES = $(COMMON) LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 
 SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
-SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) #$(HDF5)
 
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
