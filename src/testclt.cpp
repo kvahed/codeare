@@ -65,7 +65,7 @@ int main (int argc, char** argv) {
 			nuffttest (&client);
 		else if (strcmp (test, "CGSENSE") == 0)
 			cgsensetest (&client);
-		else if (strcmp (test, "SDM") == 0)
+		else if (strcmp (test, "SpatialDomain") == 0)
 			sdmtest (&client);
 		else
 			internaltest (&client);
@@ -199,27 +199,29 @@ bool nuffttest (ReconClient* rc) {
 bool sdmtest (ReconClient* rc) {
 
 	Matrix<raw>    target;
-	Matrix<raw>    sens;
+	Matrix<raw>    b1;
 	Matrix<double> r;
 	Matrix<double> k;
 	Matrix<short>  b0;
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
-	std::string    odf = std::string (base + std::string("/images.h5"));
+	std::string    odf = std::string (base + std::string("/m.h5"));
+	std::string    pdf = std::string (base + std::string("/minv.h5"));
 
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 
 	target.read    (df, "target");
-	sens.read      (df, "b1");
+	b1.read        (df, "b1");
 	b0.read        (df, "b0");
 	k.read         (df, "k");
 	r.read         (df, "r");
-	
+
+	//r.dump (odf, "space.h5");
 
 	rc->SetRaw     (target);
-	rc->SetRHelper (sens);
+	rc->SetRHelper (b1);
 	rc->SetHelper  (r);
 	rc->SetKSpace  (k);
 	rc->SetPixel   (b0);
@@ -227,8 +229,10 @@ bool sdmtest (ReconClient* rc) {
 	rc->Process    (test);
 	
 	rc->GetRaw     (target);
+	rc->GetRHelper (b1);
 
 	target.dump   (odf.c_str());
+	b1.dump       (pdf.c_str());
 
 	rc->Finalise(test);
 	

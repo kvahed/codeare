@@ -255,13 +255,13 @@ CGSENSE::Process () {
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
-	an = p.norm().real();
+	an = pow(p.norm().real(),2.0);
 
 	m_rhelper.Zero();
 
 	for (int i = 0; i < m_cgmaxit; i++, iters++) {
 
-		rn = r.norm().real();
+		rn = pow(r.norm().real(),2.0);
 
 		res.push_back(rn/an);
 
@@ -280,7 +280,7 @@ CGSENSE::Process () {
 		stmp      = stmp * rtmp;
 		m_rhelper = m_rhelper + stmp;
 		r         = - (q * rtmp) + r ;
-		rnewn     = r.norm().real();
+		rnewn     = pow(r.norm().real(),2.0);
 		rtmp      = rnewn/rn;
 		p         = (p * rtmp) + r ;
 

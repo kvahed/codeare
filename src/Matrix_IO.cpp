@@ -63,6 +63,27 @@ operator<<    (std::ostream& os, Matrix<T>& M) {
 
 
 template <class T>
+bool Matrix<T>::pdump (std::string fname) {
+
+	FILE *fp;
+
+	if((fp=fopen(fname.c_str(), "wb"))==NULL) {
+		printf("Cannot open %s file.\n", fname.c_str());
+		return false;
+	}
+	
+	if(fwrite(_M, sizeof(float), Size(), fp) != Size()) {
+		printf("File read error.");
+		return false;
+	}
+	
+	fclose(fp);
+
+	return true;
+
+}
+
+template <class T>
 bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 
 	int i = 0;
@@ -159,7 +180,7 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 				if (dname == "") 
 					dname = "pixel";
 			}
-				
+		
 			DataSet set = group.createDataSet(dname, (*type), space);
 				
 			set.write   (_M, (*type));

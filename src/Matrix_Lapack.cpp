@@ -279,8 +279,8 @@ int  Matrix<T>::Inv () const {
 	if (info != 0)
 		return info;
 
-	T*  work  = (T*) malloc (sizeof(T));
 	int lwork = -1; 
+	T*  work  = (T*) malloc (sizeof(T));
 
 	// Workspace determination ------------
 
@@ -292,7 +292,7 @@ int  Matrix<T>::Inv () const {
 	// ------------------------------------
 
 	lwork = (int) raw (work[0]).real();
-	work = (T*) realloc (work, lwork * sizeof(T));
+	work  = (T*)  realloc (work, lwork * sizeof(T));
 	
 	// Copy triangular matrix over --------
 
@@ -309,3 +309,40 @@ int  Matrix<T>::Inv () const {
 	return info;
 
 } 
+
+
+template<class T>
+Matrix<T> 
+Matrix<T>::Pinv () {
+	
+	char      trans  = 'N';
+
+    int       m      = Dim(0);
+    int       n      = Dim(1);
+    int       nrhs   = m;
+	int       lda    = m;
+	int       ldb    = MAX(m,n);
+	int       lwork  = -1; 
+	int       rank   =  0;
+	int       info   =  0;
+	
+	T*        work   = (T*) malloc (sizeof(float)); 
+
+	Matrix<T> b      =  Matrix<T>::id(ldb);
+
+	if (typeid(T) == typeid(double))
+		dgels_ (&trans, &m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, work, &lwork, &info);
+	else if (typeid(T) == typeid(raw))
+		cgels_ (&trans, &m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, work, &lwork, &info);
+
+	lwork = (int) raw (work[0]).real();
+	work  = (T*)  realloc (work, lwork * sizeof(T));
+	
+	if (typeid(T) == typeid(double))
+		dgels_ (&trans, &m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, work, &lwork, &info);
+	else if (typeid(T) == typeid(raw))
+		cgels_ (&trans, &m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, work, &lwork, &info);
+
+	return b;
+	
+}

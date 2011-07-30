@@ -58,15 +58,16 @@ LapackTests::Process     () {
 	std::cout << "INFO: " << m_raw.SVD (true, &rlsv, &rrsv, &dsv)    << std::endl;
 
 	Matrix<double> test;
-	test.Dim(COL) = m_helper.Dim(LIN);
-	test.Dim(LIN) = 3;
+	test.Dim(0) = 3;
+	test.Dim(1) = m_helper.Dim(0);
 	test.Reset();
 	test.Random();
 
 	std::cout << "Testing mm multiplication (dgemm) for helper:     ";
 
 	std::cout << test << std::endl;
-	test.prod (m_helper);
+	printf ("\n");
+	test = test.prod(m_helper);
 	std::cout << test << std::endl;
 
 	m_raw.Inv();

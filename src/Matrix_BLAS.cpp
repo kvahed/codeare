@@ -5,9 +5,9 @@ template <class T>
 Matrix<T> 
 Matrix<T>::prodt (Matrix<T> &M) {
 	
-    assert(width() == M.height());
-	return GEMM(M, 'T');
-	
+	M = M.tr();
+	return this->prod(M);
+
 }
 
 
@@ -15,7 +15,7 @@ template <class T>
 Matrix<T> 
 Matrix<T>::prod (Matrix<T> &M) {
 	
-    assert(width() == M.height());
+    assert(Dim(1) == M.Dim(0));
 	return GEMM(M, 'N');
 	
 }
@@ -25,60 +25,25 @@ template<class T>
 Matrix<T> 
 Matrix<T>::GEMM (Matrix<T>& M, char transb) {
 	
-	Matrix<T> res;
-
 	char transa = 'N';
 
-	int i = 0, j = 0, l = 0;
+    int  m      =   Dim(0);
+    int  n      = M.Dim(1);
+    int  k      =   Dim(1);
+	int  lda    =   m;
+	int  ldb    =   k;
+	int  ldc    =   m;
 
-	int  m      = _dim[LIN];
-	int  n      = M.Dim(COL);
+	T    alpha  =   T(1.0);
+	T    beta   =   T(0.0);
 
-	int  k      = _dim[COL];
-
-	T    alpha  = T(1);
-
-	T*   a      = new T[Size()];
-	i = 0;
-	for (j = 0; j < _dim[COL]; j++)
-		for (l = 0; l < _dim[LIN]; l++, i++)
-			a[i] = _M[j+l*_dim[COL]];
-
-	int  lda    = _dim[LIN];
-
-	T*   b      = new T[M.Size()];
-	i = 0;
-	for (j = 0; j < M.Dim(COL); j++)
-		for (l = 0; l < M.Dim(LIN); l++, i++)
-			b[i] = M[j+l*M.Dim(COL)];
-
-	int  ldb    = M.Dim(LIN);
-
-	T    beta   = T(0);
-
-
-	res.Dim(0)  = M.Dim(COL);
-	res.Dim(1)  = _dim[LIN];
-	res.Reset();
-	
-
-	T*   c      = new T[res.Size()];
-	int  ldc    = _dim[LIN];
+	Matrix<T> res (m,n);
 
 	if (typeid(T) == typeid(double))
-		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
+		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &at(0), &lda, &M.at(0), &ldb, &beta, &res.at(0), &ldc);
 	else if (typeid(T) == typeid(raw))
-		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
+		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &at(0), &lda, &M.at(0), &ldb, &beta, &res.at(0), &ldc);
 
-	i = 0;
-	for (j = 0; j < res.Dim(COL); j++)
-		for (l = 0; l < res.Dim(LIN); l++, i++)
-			res[j+l*res.Dim(COL)] = c[i];
-
-	delete [] a;
-	delete [] b;
-	delete [] c;
-	
 	return res;
 	
 }
@@ -94,12 +59,15 @@ Matrix<T>::norm () const {
 	int n    = Size();
 	int incx = 1;
 
-	if (typeid(T)      == typeid(raw)) {
-		res = cblas_scnrm2 (n, _M, incx);
-	} else if (typeid(T) == typeid(double))
-		res = cblas_scnrm2 (n, _M, incx);
-
-	return pow(res,2);
+	if      (typeid(T) == typeid(   raw)) res = cblas_scnrm2 (n, _M, incx);
+	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, _M, incx);
+	else {
+		for (int i = 0; i < Size(); i++)
+			res += pow(_M[i],2);
+		sqrt (res);
+	}
+	
+	return res;
 
 }
 
