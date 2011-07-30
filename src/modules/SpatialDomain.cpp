@@ -225,9 +225,9 @@ SpatialDomain::Process        () {
 
 		pulse_amp_ok = true;
 		
-		for (int i = 0; i < m_nk; i++) 
+		/*for (int i = 0; i < m_nk; i++) 
 			if (max_rf[i] > m_rflim)
-				pulse_amp_ok = false;
+			pulse_amp_ok = false;*/
 		
 		// Update Pulse durations if necessary -------
 		if (!pulse_amp_ok) {
