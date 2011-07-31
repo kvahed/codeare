@@ -34,8 +34,8 @@ using namespace RRStrategy;
  * @param  result   Achieved result
  * @return          Phase corrected 
  */
-Matrix<raw>	
-PhaseCorrection(Matrix<raw> target, Matrix<raw> result);
+void
+PhaseCorrection     (Matrix<raw>* target, const Matrix<raw>* result);
 
 /**
  * @brief           Normalised root-means-squared error
@@ -57,7 +57,7 @@ NRMSE               (const Matrix<raw>* target, const Matrix<raw>* result);
  * @param  limits   Out: limits
  */
 void        
-RFLimits            (Matrix<raw> solution, int* pd, int nk, int nc, float* limits);
+RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, const int nc, float* limits);
 
 /**
  * @brief           STA integral
@@ -73,8 +73,8 @@ RFLimits            (Matrix<raw> solution, int* pd, int nk, int nc, float* limit
  * @return          magnetisation
  */
 Matrix<raw>
-STA                 (Matrix<double> ks, Matrix<double> r, Matrix<raw> b1, Matrix<short> b0, 
-					 int             nc, int            nk, int          ns, int            gd);
+STA                 (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
+					 const int             nc, const int            nk, const int          ns, const int            gd);
 
 
 
@@ -96,6 +96,9 @@ SpatialDomain::Init           ()  {
     Attribute ("Nk",      &m_nk);
 	printf ("  # kt-points: %i \n", m_nk);
 
+    m_max_rf = (float*) malloc (m_nk * sizeof(float));
+	for (int i = 0; i < m_nk; i++)
+		m_max_rf [m_nk] = 0.0; 
 	// # of spatial sites --------------------
     Attribute ("Ns",      &m_ns); 
 	printf ("  # spatial sites: %i \n", m_ns);
@@ -103,7 +106,6 @@ SpatialDomain::Init           ()  {
 	// # of transmit channels ----------------
     Attribute ("Nc",      &m_nc);
 	printf ("  # transmitter: %i \n", m_nc);
-
 	
 	// rf pulse durations --------------------
     m_pd = (int*) malloc (m_nk * sizeof(int));
@@ -148,6 +150,7 @@ RRSModule::error_code
 SpatialDomain::Finalise       ()  {
 
     free (m_pd);
+    free (m_max_rf);
 
     return OK;
 
@@ -176,7 +179,6 @@ SpatialDomain::Process        () {
     Matrix<raw> treg         = Matrix<raw>::id(m_nc * m_nk) * raw (m_lambda, 0);
 
     bool        pulse_amp_ok = false;
-    float*      max_rf       = (float*) malloc (m_nk * sizeof(float));
 
     Matrix<raw> solution;
     Matrix<raw> tmp;
@@ -187,7 +189,7 @@ SpatialDomain::Process        () {
 	
 	while (!pulse_amp_ok) {
 		
-        Matrix<raw> m    = STA (m_kspace, m_helper, m_rhelper, m_pixel, m_nc, m_nk, m_ns, m_gd);
+        Matrix<raw> m    = STA (&m_kspace, &m_helper, &m_rhelper, &m_pixel, m_nc, m_nk, m_ns, m_gd);
 		Matrix<raw> minv = m.tr();
 
 		minv  = minv.prod (m);
@@ -212,19 +214,19 @@ SpatialDomain::Process        () {
 			if (res.at(j) < m_conv) break;
             
             final    = solution;
-			m_raw    = PhaseCorrection (m_raw, tmp);
+			PhaseCorrection (&m_raw, &tmp);
 			
 		}
 		
 		printf ("... done. Checking pulse amplitudes ... \n");
 		
 		// Check max pulse amplitude -----------------
-		RFLimits (final, m_pd, m_nk, m_nc, max_rf); 
+		RFLimits (&final, m_pd, m_nk, m_nc, m_max_rf); 
 
 		pulse_amp_ok = true;
 		
 		for (int i = 0; i < m_nk; i++) 
-			if (max_rf[i] > m_rflim)
+			if (m_max_rf[i] > m_rflim)
 				pulse_amp_ok = false;
 		
 		// Update Pulse durations if necessary -------
@@ -233,7 +235,7 @@ SpatialDomain::Process        () {
 			printf ("... done. Pulse amplitudes to high! Updating pulse durations ...\n");
 			
 			for(int i=0; i < m_nk;i++)
-				m_pd[i] = 1 + (int) (max_rf[i] * m_pd[i] / m_rflim);
+				m_pd[i] = 1 + (int) (m_max_rf[i] * m_pd[i] / m_rflim);
 			
 			printf ("... done\n.");
 			
@@ -243,7 +245,7 @@ SpatialDomain::Process        () {
 
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / ClockRate());
 
-	free (max_rf); 
+	m_raw = final;
 
     return RRSModule::OK;
 
@@ -254,20 +256,13 @@ SpatialDomain::Process        () {
 float      
 NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result) {
 
-	float a = 0.0, b = 0.0, q = 0.0, n = 0.0;
-
-	for (int i=0; i < target->Size(); i++) {
-
-		float a = abs(target->at(i));
-		float b = abs(result->at(i));
-
-		q += pow(a - b, 2.0);
-		n += pow(a    , 2.0);
-
-	}
-
-	q = sqrt(q)/sqrt(n);
-
+	float q = 0.0, n = 0.0;
+	
+	for (int i=0; i < target->Size(); i++)
+		q += pow(abs(target->at(i)) - abs(result->at(i)), 2.0);
+	
+	q = sqrt(q)/target->norm().real();
+	
     printf (" %.3f\n", q);
 	
 	return 100.0 * q;
@@ -276,41 +271,38 @@ NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* res
 
 
 
-Matrix<raw>	PhaseCorrection (Matrix<raw> target, Matrix<raw> result) {
-	
-	Matrix<raw> tmp = target;
+void
+PhaseCorrection (Matrix<raw>* target, const Matrix<raw>* result) {
 	
 #pragma omp parallel default (shared) 
 	{
 		
 		int tid      = omp_get_thread_num();
-		int chunk    = tmp.Size() / omp_get_num_threads();
+		int chunk    = target->Size() / omp_get_num_threads();
 		
 #pragma omp for schedule (dynamic, chunk)
-		
-		for (int i=0; i < tmp.Size(); i++) 
-			if (abs(target[i]) > 0)
-				tmp[i] = abs(target[i]) * result[i] / abs(result[i]);
+
+		for (int i=0; i < target->Size(); i++) 
+			if (abs(target->at(i)) > 0)
+				target->at(i) = abs(target->at(i)) * result->at(i) / abs(result->at(i));
 			else				
-				tmp[i] = raw (0,0);	
+				target->at(i) = raw (0,0);	
 		
 	}
-	
-	return tmp;
 	
 }
 
 
 void 
-RFLimits            (Matrix<raw> solution, int* pd, int nk, int nc, float* limits) {
+RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, const int nc, float* limits) {
     
     for (int i = 0; i < nk; i++) {
 
         limits[i] = 0.0;
         
         for (int j = 0; j < nc; j++)
-            if (limits[i] < abs (solution.at(i+nk*j)) / pd[i]) 
-                limits[i] = abs (solution.at(i+nk*j)) / pd[i];
+            if (limits[i] < abs (solution->at(i+nk*j)) / pd[i]) 
+                limits[i] = abs (solution->at(i+nk*j)) / pd[i];
 
     }
         
@@ -318,51 +310,30 @@ RFLimits            (Matrix<raw> solution, int* pd, int nk, int nc, float* limit
 
 
 Matrix<raw>
-STA (Matrix<double> ks, Matrix<double> r, Matrix<raw> b1, Matrix<short> b0, int nc, int nk, int ns, int gd) {
+STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
+	 const int             nc, const int            nk, const int          ns, const int            gd) {
     
-#ifdef DEBUG
-	printf ("  norm(r):  %.9f\n",  r.norm());
-	printf ("  norm(k):  %.9f\n", ks.norm());
-	printf ("  norm(b0): %i\n",   b0.norm());
-	printf ("  norm(b1): %.9f\n", b1.norm().real());
-	printf ("  nc:       %i\n",   nc);
-	printf ("  nk:       %i\n",   nk);
-	printf ("  ns:       %i\n",   ns);
-#endif
+    Matrix<raw> mxy (ns, nk*nc);
+    raw         pgd = raw (0, 2.0 * PI * GAMMA * GRAD_RASTER);            // 2* i * \pi * \gamma * \delta t
 
-    Matrix<raw> mxy;
-    mxy.Dim(COL) = ns;
-    mxy.Dim(LIN) = nk * nc;
-    mxy.Reset();
-
-    raw pgd = raw (0, 2.0 * PI * GAMMA * GRAD_RASTER);            // 2* i * \pi * \gamma * \delta t
-
-#ifdef DEBUG
-	printf ("  pgd:  %.9f + %.9fi\n", pgd.real(), pgd.imag());
-#endif	
-    
-	/*	#pragma omp parallel default (shared) 
+#pragma omp parallel default (shared) 
 	{
 		
 		int tid      = omp_get_thread_num();
 		int chunk    = nc / omp_get_num_threads();
 		
-		#pragma omp for schedule (dynamic, chunk)*/
+#pragma omp for schedule (dynamic, chunk)
 		
 		for (int c = 0; c < nc; c++) 
 			for (int k = 0; k < nk; k++) 
 				for (int s = 0; s < ns; s++) 
 					mxy.at (c*nk*ns + k*ns + s) = 
-						pgd * b1.at(c*ns + s) *                           // b1 (s,c)
-						exp (raw(0, 2.0 * PI * gd * (float) b0.at(s))) *  // off resonance: exp (2i\pidb0dt)  
-						exp (raw(0,(ks.at(k)*r.at(s) + ks.at(k+nk)*r.at(s+ns) + ks.at(k+2*nk)*r.at(s+2*ns)))); // encoding: exp (i k(t) r)
+						pgd * b1->at(c*ns + s) *                           // b1 (s,c)
+						exp (raw(0, 2.0 * PI * gd * (float) b0->at(s))) *  // off resonance: exp (2i\pidb0dt)  
+						exp (raw(0,(ks->at(k)*r->at(s) + ks->at(k+nk)*r->at(s+ns) + ks->at(k+2*nk)*r->at(s+2*ns)))); // encoding: exp (i k(t) r)
 
-		//	}
+	}
 
-#ifdef DEBUG
-	mxy.dump ("mxy.h5");
-#endif
-	
 	return mxy;
 	
 }
