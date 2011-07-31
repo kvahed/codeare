@@ -95,6 +95,16 @@ extern "C" {
 	void dgels_    (char *trans, int     *m, int    *n, int  *nrhs, void     *a, int     *lda, void      *b, int  *ldb,
 					void  *work, int *lwork, int *info);
 
+	void dgelss_(int *m, int *n, int *nrhs,
+				 void *a, int *lda, void *b, int *ldb, void *
+				 s, void *rcond, int *rank, void *work, int *lwork,
+				 int *info);
+
+	void cgelss_(int *m, int *n, int *nrhs,
+				 void *a, int *lda, void *b, int *ldb, void *
+				 s, void *rcond, int *rank, void *work, int *lwork,
+				 void* rwork, int *info);
+
 	// Cholesky factorization of a complex Hermitian positive definite matrix
 	void cpotrf_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
 	void dpotrf_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
@@ -1981,11 +1991,11 @@ Matrix<T> Matrix<T>::tr() const {
     for (int i = 0; i < res.height(); i++)
         for (int j = 0; j < res.width(); j++)
 			if (typeid (T) == typeid (double))
-				res [i * res.width() + j] = _M[j * height() + i];        // Transpose
+				res [i * res.width() + j] =       _M[j * height() + i];  // Transpose
 			else
 				res [i * res.width() + j] = conj (_M[j * height() + i]); // Conjugate transpose
 
-	long tmp = res.height();
+	long tmp     = res.height();
 	res.height() = res.width();
 	res.width()  = tmp;
 	

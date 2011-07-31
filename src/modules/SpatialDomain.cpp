@@ -190,13 +190,10 @@ SpatialDomain::Process        () {
         Matrix<raw> m    = STA (m_kspace, m_helper, m_rhelper, m_pixel, m_nc, m_nk, m_ns, m_gd);
 		Matrix<raw> minv = m.tr();
 
-		minv  =  minv.prod (m);
+		minv  = minv.prod (m);
         minv  = minv + treg;
-		minv.dump ("minv3.h5", "minv3");
 		minv  = minv.Pinv();
-		minv.dump ("minv4.h5", "minv4");
         minv  = minv.prodt (m);
-		minv.dump ("minv.h5", "minv5");
         
         // Valriable exchange method --------------
 
@@ -207,8 +204,9 @@ SpatialDomain::Process        () {
         for (int j = 0; j < m_maxiter; j++) {
 
             solution = minv.prod(m_raw);
-            tmp      = m.tr().prod(solution);
+            tmp      = m.prod(solution);
 
+			printf ("  %03i: ", j);
             res.push_back (NRMSE (&m_raw, &tmp));
 			
 			if (res.at(j) < m_conv) break;
@@ -225,9 +223,9 @@ SpatialDomain::Process        () {
 
 		pulse_amp_ok = true;
 		
-		/*for (int i = 0; i < m_nk; i++) 
+		for (int i = 0; i < m_nk; i++) 
 			if (max_rf[i] > m_rflim)
-			pulse_amp_ok = false;*/
+				pulse_amp_ok = false;
 		
 		// Update Pulse durations if necessary -------
 		if (!pulse_amp_ok) {
@@ -240,8 +238,6 @@ SpatialDomain::Process        () {
 			printf ("... done\n.");
 			
 		}
-
-		m_raw = m;
 		
 	}
 
@@ -272,7 +268,7 @@ NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* res
 
 	q = sqrt(q)/sqrt(n);
 
-    printf ("  MRMSE: %.3f\n", q);
+    printf (" %.3f\n", q);
 	
 	return 100.0 * q;
 
@@ -284,13 +280,13 @@ Matrix<raw>	PhaseCorrection (Matrix<raw> target, Matrix<raw> result) {
 	
 	Matrix<raw> tmp = target;
 	
-	/*#pragma omp parallel default (shared) 
+#pragma omp parallel default (shared) 
 	{
 		
 		int tid      = omp_get_thread_num();
 		int chunk    = tmp.Size() / omp_get_num_threads();
 		
-		#pragma omp for schedule (dynamic, chunk)*/
+#pragma omp for schedule (dynamic, chunk)
 		
 		for (int i=0; i < tmp.Size(); i++) 
 			if (abs(target[i]) > 0)
@@ -298,7 +294,7 @@ Matrix<raw>	PhaseCorrection (Matrix<raw> target, Matrix<raw> result) {
 			else				
 				tmp[i] = raw (0,0);	
 		
-		//}
+	}
 	
 	return tmp;
 	
