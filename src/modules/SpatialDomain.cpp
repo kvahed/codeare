@@ -20,63 +20,7 @@
 
 #include "SpatialDomain.hpp"
 
-const int    GRAD_RASTER = 10;
-const double GAMMA       = 42576000;
-
-
 using namespace RRStrategy;
-
-
-/**
- * @brief           Phase correction from off-resonance
- *
- * @param  target   Target magnetisation
- * @param  result   Achieved result
- * @return          Phase corrected 
- */
-void
-PhaseCorrection     (Matrix<raw>* target, const Matrix<raw>* result);
-
-/**
- * @brief           Normalised root-means-squared error
- *
- * @param  target   Target magnetisation
- * @param  result   Achieved result
- * @return          NRMSE
- */
-float       
-NRMSE               (const Matrix<raw>* target, const Matrix<raw>* result);
-
-/**
- * @brief           RF limts
- *
- * @param  solution In:  Calculated solution
- * @param  pd       In:  Pulse durations
- * @param  nk       In:  # Pulses
- * @param  nc       In:  # Coils
- * @param  limits   Out: limits
- */
-void        
-RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, const int nc, float* limits);
-
-/**
- * @brief           STA integral
- *
- * @param  ks       k
- * @param  r        r
- * @param  b1       b1 map
- * @param  b0       b0 map
- * @param  nc       # of transmit channels
- * @param  nk       # of kspace positions
- * @param  ns       # of spatial positions
- * @param  gd       Gradient duration
- * @return          magnetisation
- */
-Matrix<raw>
-STA                 (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
-					 const int             nc, const int            nk, const int          ns, const int            gd);
-
-
 
 
 SpatialDomain::SpatialDomain  () {}
@@ -176,20 +120,23 @@ SpatialDomain::Process        () {
     // m_raw:    Pulses
     // m_helper: Pulse durations
     // ----------------------------
+    Matrix<raw> solution;
+    Matrix<raw> tmp;
+    Matrix<raw> final;    
     Matrix<raw> treg         = Matrix<raw>::id(m_nc * m_nk) * raw (m_lambda, 0);
 
     bool        pulse_amp_ok = false;
 
-    Matrix<raw> solution;
-    Matrix<raw> tmp;
-    Matrix<raw> final;    
+	float       nrmse = 0.0;
 
     // Start clock ------------------------
     ticks vestart = getticks();
 	
 	while (!pulse_amp_ok) {
 		
-        Matrix<raw> m    = STA (&m_kspace, &m_helper, &m_rhelper, &m_pixel, m_nc, m_nk, m_ns, m_gd);
+		Matrix<raw> m (m_ns, m_nk*m_nc);
+
+		STA (&m_kspace, &m_helper, &m_rhelper, &m_pixel, m_nc, m_nk, m_ns, m_gd, &m);
 		Matrix<raw> minv = m.tr();
 
 		minv  = minv.prod (m);
@@ -209,7 +156,8 @@ SpatialDomain::Process        () {
             tmp      = m.prod(solution);
 
 			printf ("  %03i: ", j);
-            res.push_back (NRMSE (&m_raw, &tmp));
+			NRMSE (&m_raw, &tmp, &nrmse);
+            res.push_back (nrmse);
 			
 			if (res.at(j) < m_conv) break;
             
@@ -249,93 +197,6 @@ SpatialDomain::Process        () {
 
     return RRSModule::OK;
 
-}
-
-
-
-float      
-NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result) {
-
-	float q = 0.0, n = 0.0;
-	
-	for (int i=0; i < target->Size(); i++)
-		q += pow(abs(target->at(i)) - abs(result->at(i)), 2.0);
-	
-	q = sqrt(q)/target->norm().real();
-	
-    printf (" %.3f\n", q);
-	
-	return 100.0 * q;
-
-}
-
-
-
-void
-PhaseCorrection (Matrix<raw>* target, const Matrix<raw>* result) {
-	
-#pragma omp parallel default (shared) 
-	{
-		
-		int tid      = omp_get_thread_num();
-		int chunk    = target->Size() / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk)
-
-		for (int i=0; i < target->Size(); i++) 
-			if (abs(target->at(i)) > 0)
-				target->at(i) = abs(target->at(i)) * result->at(i) / abs(result->at(i));
-			else				
-				target->at(i) = raw (0,0);	
-		
-	}
-	
-}
-
-
-void 
-RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, const int nc, float* limits) {
-    
-    for (int i = 0; i < nk; i++) {
-
-        limits[i] = 0.0;
-        
-        for (int j = 0; j < nc; j++)
-            if (limits[i] < abs (solution->at(i+nk*j)) / pd[i]) 
-                limits[i] = abs (solution->at(i+nk*j)) / pd[i];
-
-    }
-        
-}
-
-
-Matrix<raw>
-STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
-	 const int             nc, const int            nk, const int          ns, const int            gd) {
-    
-    Matrix<raw> mxy (ns, nk*nc);
-    raw         pgd = raw (0, 2.0 * PI * GAMMA * GRAD_RASTER);            // 2* i * \pi * \gamma * \delta t
-
-#pragma omp parallel default (shared) 
-	{
-		
-		int tid      = omp_get_thread_num();
-		int chunk    = nc / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk)
-		
-		for (int c = 0; c < nc; c++) 
-			for (int k = 0; k < nk; k++) 
-				for (int s = 0; s < ns; s++) 
-					mxy.at (c*nk*ns + k*ns + s) = 
-						pgd * b1->at(c*ns + s) *                           // b1 (s,c)
-						exp (raw(0, 2.0 * PI * gd * (float) b0->at(s))) *  // off resonance: exp (2i\pidb0dt)  
-						exp (raw(0,(ks->at(k)*r->at(s) + ks->at(k+nk)*r->at(s+ns) + ks->at(k+2*nk)*r->at(s+2*ns)))); // encoding: exp (i k(t) r)
-
-	}
-
-	return mxy;
-	
 }
 
 
