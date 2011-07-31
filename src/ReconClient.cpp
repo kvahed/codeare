@@ -147,7 +147,6 @@ ReconClient::Process  (const char* name)  {
 error_code
 ReconClient::Finalise (const char* name) {
 
-	std::cout << "Finalising" << std::endl;
 	return m_rrsi->Finalise(m_rstrats.back());
 
 }
