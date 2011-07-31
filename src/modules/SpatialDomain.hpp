@@ -34,66 +34,66 @@ using namespace RRServer;
  */
 namespace RRStrategy {
 
-	/**
-	 * @brief Spatial domain method for RF pulse generation
-	 */
-	class SpatialDomain : public ReconStrategy {
-		
-		
-	public:
-		
-		/**
-		 * @brief Default constructor
-		 */
-		SpatialDomain  ();
-		
-		/**
-		 * @brief Default destructor
-		 */
-		virtual 
-		~SpatialDomain ();
-		
-		
-		/**
-		 * @brief Process
-		 */
-		virtual RRSModule::error_code
-		Process ();
+    /**
+     * @brief Spatial domain method for RF pulse generation
+     */
+    class SpatialDomain : public ReconStrategy {
+        
+        
+    public:
+        
+        /**
+         * @brief Default constructor
+         */
+        SpatialDomain  ();
+        
+        /**
+         * @brief Default destructor
+         */
+        virtual 
+        ~SpatialDomain ();
+        
+        
+        /**
+         * @brief Process
+         */
+        virtual RRSModule::error_code
+        Process ();
 
-		
-		/**
-		 * @brief Initialise
-		 */
-		virtual RRSModule::error_code
-		Init ();
-		
+        
+        /**
+         * @brief Initialise
+         */
+        virtual RRSModule::error_code
+        Init ();
+        
 
-		/**
-		 * @brief Finalise
-		 */
-		virtual RRSModule::error_code
-		Finalise ();
+        /**
+         * @brief Finalise
+         */
+        virtual RRSModule::error_code
+        Finalise ();
 
 
 
-	private:
+    private:
 
-		int    m_nc;     /**<Transmit channels    */
-		int*   m_pd;     /**< Pulse durations     */
-		int    m_gd;     /**< Gradient durations  */
-		int    m_ns;     /**< # Spatial positions */
-		int    m_nk;     /**< # kt-points         */
-		int    m_maxiter; /**< # Variable exchange method iterations */
+        int    m_nc;     /**<Transmit channels    */
+        int*   m_pd;     /**< Pulse durations     */
+        int    m_gd;     /**< Gradient durations  */
+        int    m_ns;     /**< # Spatial positions */
+        int    m_nk;     /**< # kt-points         */
+        int    m_maxiter; /**< # Variable exchange method iterations */
 
-		double m_lambda; /**< Tikhonov parameter  */
-		double m_rflim;
-		double m_conv;
-		
-		float* m_max_rf;
+        double m_lambda; /**< Tikhonov parameter  */
+        double m_rflim;
+        double m_conv;
+        
+        float* m_max_rf;
 
-		std::string m_orient; /**< Orientation*/ 
+        std::string m_orient; /**< Orientation*/ 
 
-	};
+    };
 
 }
 #endif /* __DUMMY_RECON_H__ */
@@ -109,16 +109,16 @@ namespace RRStrategy {
 void
 NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result, float* nrmse) {
 
-	float q = 0.0, n = 0.0;
-	
-	for (int i=0; i < target->Size(); i++)
-		q += pow(abs(target->at(i)) - abs(result->at(i)), 2.0);
-	
-	q = sqrt(q)/target->norm().real();
-	
+    float q = 0.0, n = 0.0;
+    
+    for (int i=0; i < target->Size(); i++)
+        q += pow(abs(target->at(i)) - abs(result->at(i)), 2.0);
+    
+    q = sqrt(q)/target->norm().real();
+    
     printf (" %.3f\n", q);
-	
-	nrmse[0] = 100.0 * q;
+    
+    nrmse[0] = 100.0 * q;
 
 }
 
@@ -132,23 +132,23 @@ NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* res
  */
 void
 PhaseCorrection (Matrix<raw>* target, const Matrix<raw>* result) {
-	
+    
 #pragma omp parallel default (shared) 
-	{
-		
-		int tid      = omp_get_thread_num();
-		int chunk    = target->Size() / omp_get_num_threads();
-		
+    {
+        
+        int tid      = omp_get_thread_num();
+        int chunk    = target->Size() / omp_get_num_threads();
+        
 #pragma omp for schedule (dynamic, chunk)
 
-		for (int i=0; i < target->Size(); i++) 
-			if (abs(target->at(i)) > 0)
-				target->at(i) = abs(target->at(i)) * result->at(i) / abs(result->at(i));
-			else				
-				target->at(i) = raw (0,0);	
-		
-	}
-	
+        for (int i=0; i < target->Size(); i++) 
+            if (abs(target->at(i)) > 0)
+                target->at(i) = abs(target->at(i)) * result->at(i) / abs(result->at(i));
+            else                
+                target->at(i) = raw (0,0);    
+        
+    }
+    
 }
 
 
@@ -192,28 +192,28 @@ RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, c
  */
 void
 STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
-	 const int             nc, const int            nk, const int          ns, const int            gd, Matrix<raw>* m) {
+     const int             nc, const int            nk, const int          ns, const int            gd, Matrix<raw>* m) {
     
     raw         pgd = raw (0, 2.0 * PI * GAMMA * GRAD_RASTER); // 2* i * \pi * \gamma * \delta t
 
 #pragma omp parallel default (shared) 
-	{
-		
-		int tid      = omp_get_thread_num();
-		int chunk    = nc / omp_get_num_threads();
-		
+    {
+        
+        int tid      = omp_get_thread_num();
+        int chunk    = nc / omp_get_num_threads();
+        
 #pragma omp for schedule (dynamic, chunk)
-		
-		for (int c = 0; c < nc; c++) 
-			for (int k = 0; k < nk; k++) 
-				for (int s = 0; s < ns; s++) 
-					m->at (c*nk*ns + k*ns + s) = 
-						pgd * b1->at(c*ns + s) *                           // b1 (s,c)
-						exp (raw(0, 2.0 * PI * gd * (float) b0->at(s))) *  // off resonance: exp (2i\pidb0dt)  
-						exp (raw(0,(ks->at(k)*r->at(s) + ks->at(k+nk)*r->at(s+ns) + ks->at(k+2*nk)*r->at(s+2*ns)))); // encoding: exp (i k(t) r)
-		
-	}
-	
+        
+        for (int c = 0; c < nc; c++) 
+            for (int k = 0; k < nk; k++) 
+                for (int s = 0; s < ns; s++) 
+                    m->at (c*nk*ns + k*ns + s) = 
+                        pgd * b1->at(c*ns + s) *                           // b1 (s,c)
+                        exp (raw(0, 2.0 * PI * gd * (float) b0->at(s))) *  // off resonance: exp (2i\pidb0dt)  
+                        exp (raw(0,(ks->at(k)*r->at(s) + ks->at(k+nk)*r->at(s+ns) + ks->at(k+2*nk)*r->at(s+2*ns)))); // encoding: exp (i k(t) r)
+        
+    }
+    
 }
 
 
