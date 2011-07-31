@@ -35,7 +35,7 @@ using namespace RRServer;
 namespace RRStrategy {
 
 	/**
-	 * @brief Empty recon for test purposes
+	 * @brief Spatial domain method for RF pulse generation
 	 */
 	class SpatialDomain : public ReconStrategy {
 		
