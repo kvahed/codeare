@@ -465,7 +465,7 @@ public:
     inline T            
     at                  (const int col, const int lin) const {
 
-        return _M[col + _dim[LIN]*lin ];
+        return _M[col + _dim[COL]*lin ];
 
     }
 
@@ -481,7 +481,7 @@ public:
     inline T&           
     at                  (int col, int lin) {
 
-        return _M[col + _dim[LIN]*lin ];
+        return _M[col + _dim[COL]*lin ];
 
     }
 

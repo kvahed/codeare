@@ -86,6 +86,8 @@ namespace RRStrategy {
 		double m_rflim;
 		double m_conv;
 		
+		float* m_max_rf;
+
 		std::string m_orient; /**< Orientation*/ 
 
 	};
