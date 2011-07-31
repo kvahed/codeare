@@ -328,20 +328,28 @@ Matrix<T>::Pinv () {
 	
 	T*        work   = (T*) malloc (sizeof(float)); 
 
+	float*    rwork  = (float*) malloc (5*MIN(m,n)*sizeof(float));    
+	float*    s      = (float*) malloc (  MIN(m,n)*sizeof(float));    
+
 	Matrix<T> b      =  Matrix<T>::id(ldb);
 
-	if (typeid(T) == typeid(double))
-		dgels_ (&trans, &m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, work, &lwork, &info);
-	else if (typeid(T) == typeid(raw))
-		cgels_ (&trans, &m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, work, &lwork, &info);
+	float     rcond  = -1.0;
+
+	if (typeid(T) == typeid(raw))
+		cgelss_(&m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
+	else if (typeid(T) == typeid(double))
+		dgelss_(&m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
 
 	lwork = (int) raw (work[0]).real();
 	work  = (T*)  realloc (work, lwork * sizeof(T));
-	
-	if (typeid(T) == typeid(double))
-		dgels_ (&trans, &m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, work, &lwork, &info);
-	else if (typeid(T) == typeid(raw))
-		cgels_ (&trans, &m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, work, &lwork, &info);
+
+	if (typeid(T) == typeid(raw))
+		cgelss_(&m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
+	else if (typeid(T) == typeid(double))
+		dgelss_(&m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
+
+	free (rwork);
+	free (s);
 
 	return b;
 	

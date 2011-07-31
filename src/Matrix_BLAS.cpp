@@ -5,8 +5,15 @@ template <class T>
 Matrix<T> 
 Matrix<T>::prodt (Matrix<T> &M) {
 	
-	M = M.tr();
-	return this->prod(M);
+	Matrix<T> tmp = M.tr();
+	return this->prod(tmp);
+
+	/*assert (Dim(1) == M.Dim(1));
+
+	if (typeid(T) == typeid(raw))
+		return GEMM (M, 'C');
+	else if (typeid(T) == typeid(double))
+	return GEMM (M, 'T');*/
 
 }
 
@@ -15,8 +22,8 @@ template <class T>
 Matrix<T> 
 Matrix<T>::prod (Matrix<T> &M) {
 	
-    assert(Dim(1) == M.Dim(0));
-	return GEMM(M, 'N');
+    assert (Dim(1) == M.Dim(0));
+	return GEMM (M, 'N');
 	
 }
 
@@ -37,7 +44,7 @@ Matrix<T>::GEMM (Matrix<T>& M, char transb) {
 	T    alpha  =   T(1.0);
 	T    beta   =   T(0.0);
 
-	Matrix<T> res (m,n);
+	Matrix<T> res (m, (transb == 'N') ? M.Dim(1) : M.Dim(0));
 
 	if (typeid(T) == typeid(double))
 		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &at(0), &lda, &M.at(0), &ldb, &beta, &res.at(0), &ldc);
