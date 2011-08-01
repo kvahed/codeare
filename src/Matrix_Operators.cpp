@@ -7,7 +7,7 @@ Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
 		
 		if (this->Size() != M.Size()) {
 
-			delete[](_M);
+			free (_M);
 			_M = (T*) malloc (M.Size() * sizeof (T));
 
 		}
@@ -49,7 +49,7 @@ Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
 		
 		if (this->Size() != M.Size()) {
 
-			delete[](_M);
+			free (_M);
 			_M = (T*) malloc (M.Size() * sizeof (T));
 
 		}
