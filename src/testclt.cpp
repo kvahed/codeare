@@ -208,6 +208,7 @@ bool sdmtest (ReconClient* rc) {
 	std::string    df  = std::string (base + std::string(data));
 	std::string    odf = std::string (base + std::string("/pulses.h5"));
 	std::string    pdf = std::string (base + std::string("/result.h5"));
+	std::string    rdf = std::string (base + std::string("/residuals.h5"));
 
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
@@ -228,9 +229,11 @@ bool sdmtest (ReconClient* rc) {
 	
 	rc->GetRaw     (target);
 	rc->GetRHelper (b1);
+	rc->GetHelper  (r);
 
 	target.dump   (odf.c_str());
 	b1.dump       (pdf.c_str());
+	r.dump        (rdf.c_str());
 
 	rc->Finalise(test);
 	
