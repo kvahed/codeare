@@ -43,6 +43,6 @@ LapackTests_la_SOURCES = $(COMMON) LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 
 SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
-SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) #$(HDF5)
+SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) 
 
 CLEANFILES = RRSModule.hh RRSModuleSK.cc

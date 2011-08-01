@@ -40,9 +40,10 @@ SpatialDomain::Init           ()  {
     Attribute ("Nk",      &m_nk);
     printf ("  # kt-points: %i \n", m_nk);
 
-    m_max_rf = (float*) malloc (m_nk * sizeof(float));
+    m_max_rf = (float*) malloc (1000 * sizeof(float));
     for (int i = 0; i < m_nk; i++)
         m_max_rf [m_nk] = 0.0; 
+
     // # of spatial sites --------------------
     Attribute ("Ns",      &m_ns); 
     printf ("  # spatial sites: %i \n", m_ns);
