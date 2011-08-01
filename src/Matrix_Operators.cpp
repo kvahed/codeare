@@ -473,7 +473,7 @@ Matrix<T> Matrix<T>::operator-(T s) {
 }
 
 
-template <class T>
+/*template <class T>
 Matrix<T> Matrix<T>::operator+() {
 
     Matrix<T> res;
@@ -498,11 +498,14 @@ Matrix<T> Matrix<T>::operator+() {
 
     return res;
 
-}
+	}*/
 
 
 template <class T>
 Matrix<T> Matrix<T>::operator+(Matrix<T> &M) {
+
+	for (int i=0; i < INVALID_DIM; i++)
+		assert (Dim(i) == M.Dim(i));
 
     Matrix<T> res;
 

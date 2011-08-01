@@ -641,6 +641,16 @@ public:
 	
 
 	/**
+	 * @brief           Create nxn identity matrix 
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn identity
+	 */
+	void
+	id                  ();
+	
+
+	/**
 	 * @brief           Get the element at position p of the vector, i.e. this(p).
      *
      * @param  p        Requested position.
@@ -1597,6 +1607,10 @@ Matrix<T>::Matrix () {
         _dim [i] = 1;
 
     _M = (T*) malloc (Size()*sizeof(T));
+
+	for (int i = 0; i < Size(); i++)
+		_M[i] = T(0.0);
+
     nb_alloc++;
 
 
@@ -1614,7 +1628,10 @@ Matrix<T>::Matrix (const int n) {
     for (int i = CHA; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    _M = (T*) malloc (Size()*sizeof(T));
+    _M = (T*) malloc (n*n*sizeof(T));
+
+	for (int i = 0; i < Size(); i++)
+		_M[i] = T(0.0);
 
     nb_alloc++;
 
@@ -1633,6 +1650,9 @@ Matrix<T>::Matrix (const int m, const int n) {
         _dim [i] = 1;
 
     _M = (T*) malloc (Size()*sizeof(T));
+
+	for (int i = 0; i < Size(); i++)
+		_M[0] = T(0.0);
 
     nb_alloc++;
 
@@ -1680,8 +1700,11 @@ Matrix<T>::Matrix (const int* dim) {
 		_dim[i] = dim[i];
 
     _M = (T*) malloc (Size() * sizeof (T));
-    nb_alloc++;
 
+	for (int i = 0; i < Size(); i++)
+		_M[0] = T(0.0);
+
+    nb_alloc++;
 
 }
 
@@ -1973,12 +1996,26 @@ static T power(T p, int b) {
 template <class T>
 Matrix<T> Matrix<T>::id (int n) {
 
- 	static Matrix<T> M (n,n);
+ 	static Matrix<T> M (n);
 
  	for (int i = 0; i < n; i++)
- 		M[i*n+i] = 1;
+ 		M[i*n+i] = T(1.0);
 
  	return M;
+
+}
+
+
+template <class T>
+inline void
+Matrix<T>::id () {
+
+ 	assert (Dim(0) == Dim(1));
+
+	int n = Dim(0);
+
+ 	for (int i = 0; i < n; i++)
+ 		_M[i*n+i] = T(1.0);
 
 }
 
@@ -1988,17 +2025,17 @@ Matrix<T> Matrix<T>::tr() const {
 
     Matrix<T> res (_dim);
 	
-    for (int i = 0; i < res.height(); i++)
-        for (int j = 0; j < res.width(); j++)
-			if (typeid (T) == typeid (double))
-				res [i * res.width() + j] =       _M[j * height() + i];  // Transpose
-			else
-				res [i * res.width() + j] = conj (_M[j * height() + i]); // Conjugate transpose
-
-	long tmp     = res.height();
-	res.height() = res.width();
-	res.width()  = tmp;
+	long tmp   = res.Dim(0);
+	res.Dim(0) = res.Dim(1);
+	res.Dim(1) = tmp;
 	
+    for (int i = 0; i < res.Dim(0); i++)
+        for (int j = 0; j < res.Dim(1); j++)
+			if (typeid (T) == typeid (double))
+				res.at(i,j) =      at(j,i);  // Transpose
+			else
+				res.at(i,j) = conj(at(j,i)); // Conjugate transpose
+
     return res;
 
 }
