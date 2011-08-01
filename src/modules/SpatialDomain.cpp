@@ -121,10 +121,11 @@ SpatialDomain::Process        () {
     // m_raw:    Pulses
     // m_helper: Pulse durations
     // ----------------------------
+
     Matrix<raw> solution;
     Matrix<raw> tmp;
     Matrix<raw> final;    
-    Matrix<raw> treg         = Matrix<raw>::id(m_nc * m_nk) * raw (m_lambda, 0);
+    Matrix<raw> treg         =  Matrix<raw>::id(m_nc * m_nk) * raw (m_lambda, 0);
 
     bool        pulse_amp_ok = false;
 
