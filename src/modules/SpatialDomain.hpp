@@ -78,18 +78,18 @@ namespace RRStrategy {
 
     private:
 
-        int    m_nc;     /**<Transmit channels    */
-        int*   m_pd;     /**< Pulse durations     */
-        int    m_gd;     /**< Gradient durations  */
-        int    m_ns;     /**< # Spatial positions */
-        int    m_nk;     /**< # kt-points         */
-        int    m_maxiter; /**< # Variable exchange method iterations */
+        int         m_nc;      /**<Transmit channels    */
+        int*        m_pd;      /**< Pulse durations     */
+        int         m_gd;      /**< Gradient durations  */
+        int         m_ns;      /**< # Spatial positions */
+        int         m_nk;      /**< # kt-points         */
+        int         m_maxiter; /**< # Variable exchange method iterations */
 
-        double m_lambda; /**< Tikhonov parameter  */
-        double m_rflim;
-        double m_conv;
+        double      m_lambda;  /**< Tikhonov parameter  */
+        double      m_rflim;   /**< Maximum rf amplitude */
+        double      m_conv;    /**< Convergence criterium */
         
-        float* m_max_rf;
+        float*      m_max_rf;  /**< Maximum reached RF amps */
 
         std::string m_orient; /**< Orientation*/ 
 
@@ -104,10 +104,11 @@ namespace RRStrategy {
  *
  * @param  target   Target magnetisation
  * @param  result   Achieved result
+ * @param  iter     Iteration
  * @param           NRMSE
  */
 void
-NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result, float* nrmse) {
+NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result, const int iter, float* nrmse) {
 
     float q = 0.0, n = 0.0;
     
@@ -116,8 +117,10 @@ NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* res
     
     q = sqrt(q)/target->norm().real();
     
-    printf (" %.3f\n", q);
-    
+	if (iter % 5 == 0 && iter > 0)
+		printf ("\n");
+    printf ("  %03i %.6f", iter, q);
+
     nrmse[0] = 100.0 * q;
 
 }
@@ -210,7 +213,7 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, c
                     m->at (c*nk*ns + k*ns + s) = 
                         pgd * b1->at(c*ns + s) *                           // b1 (s,c)
                         exp (raw(0, 2.0 * PI * gd * (float) b0->at(s))) *  // off resonance: exp (2i\pidb0dt)  
-                        exp (raw(0,(ks->at(k)*r->at(s) + ks->at(k+nk)*r->at(s+ns) + ks->at(k+2*nk)*r->at(s+2*ns)))); // encoding: exp (i k(t) r)
+                        exp (raw(0,(ks->at(0,k)*r->at(0,s) + ks->at(1,k)*r->at(1,s) + ks->at(2,k)*r->at(2,s)))); // encoding: exp (i k(t) r)
         
     }
     

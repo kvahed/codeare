@@ -326,10 +326,10 @@ Matrix<T>::Pinv () {
 	int       rank   =  0;
 	int       info   =  0;
 	
-	T*        work   = (T*) malloc (10*sizeof(float)); 
+	T*        work   = (T*) malloc (sizeof(float)); 
 
-	float*    rwork  = (float*) malloc (50*MIN(m,n)*sizeof(float));    
-	float*    s      = (float*) malloc (10*  MIN(m,n)*sizeof(float));    
+	float*    rwork  = (float*) malloc (5*MIN(m,n)*sizeof(float));    
+	float*    s      = (float*) malloc (  MIN(m,n)*sizeof(float));    
 
 	Matrix<T> b      =  Matrix<T>::id(ldb);
 

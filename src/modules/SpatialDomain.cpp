@@ -131,6 +131,9 @@ SpatialDomain::Process        () {
 
     float       nrmse = 0.0;
 
+	std::vector<double> res;
+	int         gc    = 0;
+
     // Start clock ------------------------
     ticks vestart = getticks();
     
@@ -148,27 +151,26 @@ SpatialDomain::Process        () {
         
         // Valriable exchange method --------------
 
-        std::vector<double> res;
         
         printf ("  Starting variable exchange method ...\n");
 
-        for (int j = 0; j < m_maxiter; j++) {
+        for (int j = 0; j < m_maxiter; j++, gc++) {
 
             solution = minv.prod(m_raw);
             tmp      = m.prod(solution);
 
-            printf ("  %03i: ", j);
-            NRMSE (&m_raw, &tmp, &nrmse);
+            NRMSE (&m_raw, &tmp, gc, &nrmse);
             res.push_back (nrmse);
             
-            if (res.at(j) < m_conv) break;
+            if (gc > 0 && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
+				break;
             
             final    = solution;
             PhaseCorrection (&m_raw, &tmp);
             
         }
         
-        printf ("... done. Checking pulse amplitudes ... \n");
+        printf ("\n... done. Checking pulse amplitudes ... \n");
         
         // Check max pulse amplitude -----------------
         RFLimits (&final, m_pd, m_nk, m_nc, m_max_rf); 
@@ -195,7 +197,14 @@ SpatialDomain::Process        () {
 
     printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / ClockRate());
 
-    m_raw = final;
+	m_rhelper = final;
+
+	m_helper.Dim(COL) = gc;
+	m_helper.Dim(LIN) = 1;
+	m_helper.Reset();
+
+	for (int i = 0; i < gc; i++)
+		m_helper.at(i) = res.at(i);
 
     return RRSModule::OK;
 

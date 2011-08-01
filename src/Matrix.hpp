@@ -2007,20 +2007,6 @@ Matrix<T> Matrix<T>::id (int n) {
 
 
 template <class T>
-inline void
-Matrix<T>::id () {
-
- 	assert (Dim(0) == Dim(1));
-
-	int n = Dim(0);
-
- 	for (int i = 0; i < n; i++)
- 		_M[i*n+i] = T(1.0);
-
-}
-
-
-template <class T>
 Matrix<T> Matrix<T>::tr() const {
 
     Matrix<T> res (_dim);
