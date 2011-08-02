@@ -1,6 +1,6 @@
 /*
  *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Jülich, Germany
+ *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,9 +20,6 @@
 
 #ifndef __SPATIAL_DOMAIN_HPP__
 #define __SPATIAL_DOMAIN_HPP__
-
-const int    GRAD_RASTER = 10;
-const double GAMMA       = 42576000;
 
 #include "ReconStrategy.hpp"
 
@@ -77,21 +74,22 @@ namespace RRStrategy {
 
 
     private:
+ 
+        int         m_nc;       /**< Transmit channels       */
+        int*        m_pd;       /**< Pulse durations         */
+        int         m_gd;       /**< Gradient durations      */
+        int         m_ns;       /**< # Spatial positions     */
+        int         m_nk;       /**< # kt-points             */
+        int         m_maxiter;  /**< # Variable exchange method iterations */
 
-        int         m_nc;      /**<Transmit channels    */
-        int*        m_pd;      /**< Pulse durations     */
-        int         m_gd;      /**< Gradient durations  */
-        int         m_ns;      /**< # Spatial positions */
-        int         m_nk;      /**< # kt-points         */
-        int         m_maxiter; /**< # Variable exchange method iterations */
-
-        double      m_lambda;  /**< Tikhonov parameter  */
-        double      m_rflim;   /**< Maximum rf amplitude */
-        double      m_conv;    /**< Convergence criterium */
+        double      m_lambda;   /**< Tikhonov parameter      */
+        double      m_rflim;    /**< Maximum rf amplitude    */
+        double      m_conv;     /**< Convergence criterium   */
         
-        float*      m_max_rf;  /**< Maximum reached RF amps */
+        float*      m_max_rf;   /**< Maximum reached RF amps */
 
-        std::string m_orient; /**< Orientation*/ 
+        std::string m_orient;   /**< Orientation             */ 
+		std::string m_ptxfname; /**< PTX file name           */
 
     };
 
@@ -194,11 +192,25 @@ RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, c
  * @param  m        Out: m_xy
  */
 void
-STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
-     const int             nc, const int            nk, const int          ns, const int            gd, Matrix<raw>* m) {
+STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, const int nc, 
+	 const int             nk, const int            ns, const int          gd, const int*           pd, Matrix<raw>* m) {
     
+	float* d = (float*) malloc (nk * sizeof (float));
+	float* t = (float*) malloc (nk * sizeof (float));
+
+	for (int i = 0; i< nk; i++)
+		d[i] = (i==0) ? pd[i] + gd : d[i-1] + pd[i] + gd;
+
+	for (int i = 0; i< nk; i++)		
+		t[i] = d [nk-i-1];
+	
+	for (int i = 0; i < nk-1; i++)
+		d[i] = 1.0e-5 * t[i+1] + 1.0e-5 * pd[i]/2;
+
+	d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
+
 	// 2* i * \pi * \gamma * \delta t
-    raw         pgd = raw (0, 2.0 * PI * GAMMA * GRAD_RASTER); 
+    raw pgd = raw (0, 2.0 * PI * 4.2576e7 * 1.0e-5); 
 
 #pragma omp parallel default (shared) 
     {
@@ -216,11 +228,14 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, c
 						// b1 (s,c)
                         pgd * b1->at(s,c) *
 						// off resonance: exp (2i\pidb0dt)  
-                        exp (raw(0, 2.0 * PI * gd * (float) b0->at(s))) *
+                        exp (raw(0, 2.0 * PI * d[k] * (float) b0->at(s))) *
 						 // encoding: exp (i k(t) r)
                         exp (raw(0,(ks->at(0,k)*r->at(0,s) + ks->at(1,k)*r->at(1,s) + ks->at(2,k)*r->at(2,s))));
         
     }
+
+	free (t);
+	free (d);
     
 }
 
@@ -237,8 +252,9 @@ PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const
 
 	int tpd = 2;  // Start and end
 	// Total excitation duration
-	for (int i = 0; i < nk; i++) 
+	for (int i = 0; i < nk-1; i++) 
 		tpd += (int) (pd[i] + gd);
+	tpd += pd[nk-1];
 	// -----------------------------------
 
 	// Outgoing repository ---------------
@@ -250,7 +266,7 @@ PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const
 	timing->Reset();
 	// -----------------------------------
 	
-	// Timing ----------------------------
+	// RF Timing -------------------------
 
 	for (int rc = 0; rc < nc; rc++) {
 		
@@ -263,45 +279,43 @@ PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const
 				timing->at(i,rc) = conj(rf->at(k + rc*nk)) / (float)pd[k];
 			
 			// Gradient action, no RF
-			for (int g = 0; g < gd; g++, i++)
-				timing->at(i,rc) = raw (0.0, 0.0);
-		}
+			if (k < nk-1)
+				for (int g = 0; g <    gd; g++, i++)
+					timing->at(i,rc) = raw (0.0, 0.0);
 
+		}
+		
 	}
-			
-	// Gradient and slew
+	// -----------------------------------
+	
+	// Gradient and slew -----------------
+	
 	float gr = 0.0;
 	float sr = 0.0;
-
+	
 	for (int gc = 0; gc < 3; gc++) {
 		
 		int i = 1;
 		
-		for (int k = 0; k < nk; k++) {
+		for (int k = 0; k < nk-1; k++) {
 			
 			// RF action, no gradients
 			for (int p = 0; p < pd[k]; p++, i++) 
 				timing->at(i,nc+gc) = 0.0; 
-			
-			// Gradient action
-			for (int g = 0; g < gd; g++, i++)
+
+			if (k < nk-1)
+			for (int g = 0; g <    gd; g++, i++) {
 				
-				if (k+1 < nk) 
-					sr =  ks->at(gc,k+1) - ks->at(gc,k);
-				else 
-					sr =                 - ks->at(gc,i);
-			
-			sr = 4.0 * sr / (2 * PI * GAMMA * gd * gd * GRAD_RASTER * GRAD_RASTER);
-			sr =       sr / 100.0;
-			
-			// Gradient action 
-			for (int g = 0; g < gd; g++, i++) {
+				sr = (k+1 < nk) ? ks->at(gc,k+1) - ks->at(gc,k) : - ks->at(gc,i);
+				sr = 4.0 * sr / (2 * PI * 4.2576e7 * gd * gd * 1.0e-5 * 1.0e-5);
+				sr =       sr / 100.0;
 				
-				if(g < gd/2)                     // ramp up
+				// Gradient action 
+				if(g < gd/2)             // ramp up
 					gr = sr * (0.5 + g);
-				else if (g < gd/2+1)             // flat top
+				else if (g < gd/2+1)     // flat top
 					0;
-				else                             // ramp down
+				else                     // ramp down
 					gr -= sr;
 				
 				timing->at(i,nc+gc) = gr; 
@@ -311,5 +325,6 @@ PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const
 		} 
 		
 	}
+	// ----------------------------------
 	
 }
