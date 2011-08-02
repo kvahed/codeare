@@ -19,6 +19,7 @@
  */
 
 #include "SpatialDomain.hpp"
+#include "PTXINIFile.hpp"
 
 using namespace RRStrategy;
 
@@ -33,21 +34,21 @@ RRSModule::error_code
 SpatialDomain::Init           ()  {
 
     printf ("Intialising SpatialDomain ...\n");
-
+	
     RRSModule::error_code e = OK;
-
+	
     // # kt points ---------------------------
     Attribute ("Nk",      &m_nk);
     printf ("  # kt-points: %i \n", m_nk);
-
+	
     m_max_rf = (float*) malloc (1000 * sizeof(float));
     for (int i = 0; i < m_nk; i++)
         m_max_rf [m_nk] = 0.0; 
-
+	
     // # of spatial sites --------------------
     Attribute ("Ns",      &m_ns); 
     printf ("  # spatial sites: %i \n", m_ns);
-
+	
     // # of transmit channels ----------------
     Attribute ("Nc",      &m_nc);
     printf ("  # transmitter: %i \n", m_nc);
@@ -58,34 +59,40 @@ SpatialDomain::Init           ()  {
     for (int i = 1; i < m_nk; i++)
         m_pd[i] = m_pd[0];
     printf ("  starting pulse durations: %ius \n", m_pd[0]*10);
-
+	
     // gradient pulse duration ----------------
     Attribute ("gd",      &m_gd);      
     printf ("  gradient blip durations: %ius \n", m_gd*10);
-
+	
     // Max # of iterations --------------------
     Attribute ("maxiter", &m_maxiter);
-     printf ("  maximum iterations: %i \n", m_maxiter);
+	printf ("  maximum iterations: %i \n", m_maxiter);
     
     // # Tikhonov parameter from L-curve learning 
     // ca. [0.005...0.05] for human -----------
     Attribute ("lambda",  &m_lambda);  
-     printf ("  tikhonov parameter: %.4f \n", m_lambda);
-
+	printf ("  tikhonov parameter: %.4f \n", m_lambda);
+	
     // # RF limit (usualy in [0 1]) -----------
     Attribute ("rflim",   &m_rflim);  
-     printf ("  RF amplitude limit: %.4f \n", m_rflim);
+	printf ("  RF amplitude limit: %.4f \n", m_rflim);
     
     // Convergence limit ----------------------
     Attribute ("conv",    &m_conv); 
-     printf ("  Convergence criterium: %.4f \n", m_conv);
+	printf ("  Convergence criterium: %.4f \n", m_conv);
     
-    // Pulse orientation ----------------------
-    m_orient = Attribute ("orientation");
-     printf ("  orientation: %s \n", m_orient.c_str());
+	// Pulse orientation ----------------------
+	m_orient = Attribute ("orientation");
+	printf ("  orientation: %s \n", m_orient.c_str());
 
+	// PTX file name --------------------------
+	m_ptxfname = Attribute ("ptxfname");
+	printf ("  ptx file name: %s \n", m_ptxfname.c_str());
+
+	// ----------------------------------------
+	
     printf ("... done.\n\n");
-
+	
     return e;
 
 }
@@ -141,7 +148,7 @@ SpatialDomain::Process        () {
         
         Matrix<raw> m (m_ns, m_nk*m_nc);
 
-        STA (&m_kspace, &m_helper, &m_rhelper, &m_pixel, m_nc, m_nk, m_ns, m_gd, &m);
+        STA (&m_kspace, &m_helper, &m_rhelper, &m_pixel, m_nc, m_nk, m_ns, m_gd, m_pd, &m);
         Matrix<raw> minv = m.tr();
 
         minv  = minv.prod (m);
@@ -196,9 +203,14 @@ SpatialDomain::Process        () {
     }
 
     printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / ClockRate());
-
-	//m_rhelper = final;
+	
+	// Put actual maximum RF amplitude into first cell
+	for (int i = 1; i < m_nk; i++)
+		if (m_max_rf[i] > m_max_rf[0])
+			m_max_rf[0] = m_max_rf[i];
+		
 	PTXTiming (&final, &m_kspace, m_pd, m_gd, m_nk, m_nc, &m_rhelper);
+	PTXWriteSiemensINIFile (&m_rhelper, 3, 3, m_nc, 10, m_max_rf[0], &m_ptxfname);
 
 	m_helper.Dim(COL) = gc;
 	m_helper.Dim(LIN) = 1;
