@@ -26,7 +26,7 @@ namespace nfft {
 		 *
 		 * @return success
 		 */
-		extern const int
+		extern int
 		init                 (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_complex* inp, double epsilon  = 0.0000003);
 
 		/**
@@ -39,7 +39,7 @@ namespace nfft {
 		 *
 		 * @return success
 		 */
-		extern const int
+		extern int
 		ift                  (nfft_plan* np, solver_plan_complex* spc, int maxiter = 3, double epsilon = 3e-7) ;
 		
 		/**
@@ -49,19 +49,19 @@ namespace nfft {
 		 *
 		 * @return success
 		 */
-		extern const int
+		extern int
 		ft                   (nfft_plan* np);
 
 		/**
 		 * @brief            Set weights
 		 */
-		extern const int
+		extern int
 		weights              (nfft_plan* np, solver_plan_complex* spc);
 
 		/**
 		 * @brief            Finalise
 		 */
-		extern const int
+		extern int
 		finalize             (nfft_plan* np, solver_plan_complex* spc);
 
 #ifdef __cplusplus

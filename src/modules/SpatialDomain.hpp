@@ -197,7 +197,8 @@ void
 STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, 
      const int             nc, const int            nk, const int          ns, const int            gd, Matrix<raw>* m) {
     
-    raw         pgd = raw (0, 2.0 * PI * GAMMA * GRAD_RASTER); // 2* i * \pi * \gamma * \delta t
+	// 2* i * \pi * \gamma * \delta t
+    raw         pgd = raw (0, 2.0 * PI * GAMMA * GRAD_RASTER); 
 
 #pragma omp parallel default (shared) 
     {
@@ -207,16 +208,108 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, c
         
 #pragma omp for schedule (dynamic, chunk)
         
+		// pTX STA 
         for (int c = 0; c < nc; c++) 
             for (int k = 0; k < nk; k++) 
                 for (int s = 0; s < ns; s++) 
                     m->at (c*nk*ns + k*ns + s) = 
-                        pgd * b1->at(c*ns + s) *                           // b1 (s,c)
-                        exp (raw(0, 2.0 * PI * gd * (float) b0->at(s))) *  // off resonance: exp (2i\pidb0dt)  
-                        exp (raw(0,(ks->at(0,k)*r->at(0,s) + ks->at(1,k)*r->at(1,s) + ks->at(2,k)*r->at(2,s)))); // encoding: exp (i k(t) r)
+						// b1 (s,c)
+                        pgd * b1->at(s,c) *
+						// off resonance: exp (2i\pidb0dt)  
+                        exp (raw(0, 2.0 * PI * gd * (float) b0->at(s))) *
+						 // encoding: exp (i k(t) r)
+                        exp (raw(0,(ks->at(0,k)*r->at(0,s) + ks->at(1,k)*r->at(1,s) + ks->at(2,k)*r->at(2,s))));
         
     }
     
 }
 
 
+/**
+ * @brief Construct actual pulses
+ *
+ *
+ */
+void
+PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const int gd, const int nk, const int nc, Matrix<raw>* timing) {
+
+	// Total pulse duration --------------
+
+	int tpd = 2;  // Start and end
+	// Total excitation duration
+	for (int i = 0; i < nk; i++) 
+		tpd += (int) (pd[i] + gd);
+	// -----------------------------------
+
+	// Outgoing repository ---------------
+
+	// Time scale
+	timing->Dim(COL) = tpd;    
+	// Nc Channels + 3 gradients
+	timing->Dim(LIN) = nc + 3; 
+	timing->Reset();
+	// -----------------------------------
+	
+	// Timing ----------------------------
+
+	for (int rc = 0; rc < nc; rc++) {
+		
+		int i = 1;
+		
+		for (int k = 0; k < nk; k++) {
+			
+			// RF action
+			for (int p = 0; p < pd[k]; p++, i++) 
+				timing->at(i,rc) = conj(rf->at(k + rc*nk)) / (float)pd[k];
+			
+			// Gradient action, no RF
+			for (int g = 0; g < gd; g++, i++)
+				timing->at(i,rc) = raw (0.0, 0.0);
+		}
+
+	}
+			
+	// Gradient and slew
+	float gr = 0.0;
+	float sr = 0.0;
+
+	for (int gc = 0; gc < 3; gc++) {
+		
+		int i = 1;
+		
+		for (int k = 0; k < nk; k++) {
+			
+			// RF action, no gradients
+			for (int p = 0; p < pd[k]; p++, i++) 
+				timing->at(i,nc+gc) = 0.0; 
+			
+			// Gradient action
+			for (int g = 0; g < gd; g++, i++)
+				
+				if (k+1 < nk) 
+					sr =  ks->at(gc,k+1) - ks->at(gc,k);
+				else 
+					sr =                 - ks->at(gc,i);
+			
+			sr = 4.0 * sr / (2 * PI * GAMMA * gd * gd * GRAD_RASTER * GRAD_RASTER);
+			sr =       sr / 100.0;
+			
+			// Gradient action 
+			for (int g = 0; g < gd; g++, i++) {
+				
+				if(g < gd/2)                     // ramp up
+					gr = sr * (0.5 + g);
+				else if (g < gd/2+1)             // flat top
+					0;
+				else                             // ramp down
+					gr -= sr;
+				
+				timing->at(i,nc+gc) = gr; 
+				
+			}
+			
+		} 
+		
+	}
+	
+}

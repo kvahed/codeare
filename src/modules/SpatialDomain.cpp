@@ -197,7 +197,8 @@ SpatialDomain::Process        () {
 
     printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / ClockRate());
 
-	m_rhelper = final;
+	//m_rhelper = final;
+	PTXTiming (&final, &m_kspace, m_pd, m_gd, m_nk, m_nc, &m_rhelper);
 
 	m_helper.Dim(COL) = gc;
 	m_helper.Dim(LIN) = 1;

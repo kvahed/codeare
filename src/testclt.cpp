@@ -162,6 +162,8 @@ bool cgsensetest (ReconClient* rc) {
 	if (pulses)
 		sens.dump      (opf.c_str());
 	weights.dump   (oif.c_str());
+
+	return true;
 	
 }
 
@@ -193,6 +195,8 @@ bool nuffttest (ReconClient* rc) {
 	rawdata.dump   (odf.c_str());
 
 	rc->Finalise(test);
+
+	return true;
 	
 }
 
@@ -237,6 +241,8 @@ bool sdmtest (ReconClient* rc) {
 
 	rc->Finalise(test);
 	
+	return true;
+
 }
 
 bool internaltest (ReconClient* rc) {
@@ -283,6 +289,8 @@ bool internaltest (ReconClient* rc) {
 	rc->Finalise (test);
 	
 	cout << "We're good" << endl;
+
+	return true;
 	
 }
 
