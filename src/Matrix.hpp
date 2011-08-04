@@ -54,94 +54,39 @@ enum IceDim {
 using namespace H5;
 #endif
 
+
 #define ICE_SHRT_MAX 4095
+
 
 /**
  * @brief raw data
  */
 typedef std::complex<float> raw;
 
-extern "C" {
-
-	// This is all defined only on 2D
-	
-	// Matrix vector multiplication
-	void   dgemv_  (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
-				    void     *y, int *incy);
-	void   cgemv_  (char *trans, int    *m, int *n, void *alpha, void *a, int *lda, void *x, int *incx, void *beta, 
-				    void     *y, int *incy);
-	
-	// Matrix matrix multiplication
-	void dgemm_    (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, 
-				    int     *ldb, void   *beta, void *c, int *ldc);
-	void cgemm_    (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, 
-				    int     *ldb, void   *beta, void *c, int *ldc);
-	
-	// Eigen value computations
-	void cgeev_    (char *jobvl, char *jobvr, int    *n, void    *a, int   *lda, void      *w,             void   *vl,
-				    int   *ldvl, void    *vr, int *ldvr, void *work, int *lwork, float *rwork, int  *info);
-	void dgeev_    (char *jobvl, char *jobvr, int    *n, void    *a, int   *lda, void     *wr, void   *wi, void   *vl, 
-				    int   *ldvl, void    *vr, int *ldvr, void *work, int *lwork,               int  *info);
-
-	// Singular value decomposition 
-	void cgesdd_   (char *jobz, int    *m, int     *n, void     *a, int     *lda, float     *s, void    *u, int  *ldu, 
-				    void   *vt, int *ldvt, void *work, int  *lwork, float *rwork, int   *iwork, int  *info);
-	void dgesdd_   (char *jobz, int    *m, int     *n, void     *a, int     *lda, void      *s, void    *u, int  *ldu, 
-				    void   *vt, int *ldvt, void *work, int  *lwork,               int   *iwork, int  *info);
-
-	// Minimize L2-norm (|b-A*x|) - b = id delivers pinv
-	void cgels_    (char *trans, int     *m, int    *n, int  *nrhs, void     *a, int     *lda, void      *b, int  *ldb,
-					void  *work, int *lwork, int *info);
-	void dgels_    (char *trans, int     *m, int    *n, int  *nrhs, void     *a, int     *lda, void      *b, int  *ldb,
-					void  *work, int *lwork, int *info);
-
-	void dgelss_(int *m, int *n, int *nrhs,
-				 void *a, int *lda, void *b, int *ldb, void *
-				 s, void *rcond, int *rank, void *work, int *lwork,
-				 int *info);
-
-	void cgelss_(int *m, int *n, int *nrhs,
-				 void *a, int *lda, void *b, int *ldb, void *
-				 s, void *rcond, int *rank, void *work, int *lwork,
-				 void* rwork, int *info);
-
-	// Cholesky factorization of a complex Hermitian positive definite matrix
-	void cpotrf_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
-	void dpotrf_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
-
-	// Computes an LU factorization of a general M-by-N matrix A
-	void cgetrf_   (int* m, int    *n, void   *a, int*   lda, int  *ipiv, int  *info);
-	void dgetrf_   (int* m, int    *n, void   *a, int*   lda, int  *ipiv, int  *info);
-
-	// Inverse of a complex Hermitian positive definite matrix using cpotrf/cpptrf
-	void cpotri_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
-	void dpotri_   (char* uplo, int    *n, void   *a, int*   lda, int  *info);
-
-	// Genral matrix inversion through cholesky decomposition
-	void cgetri_   (int     *n, void   *a, int*   lda, int   *ipiv, void   *work, int   *lwork, int  *info);
-	void dgetri_   (int     *n, void   *a, int*   lda, int   *ipiv, void   *work, int   *lwork, int  *info);
-
-}
 
 /**
  * Short test if the matrix is a vector.
  */
 # define VECT(M) assert((M)->width() == 1 || (M)->height() == 1);
 
+ 
 /**
  * Return absolute value.
  */
 # define ABS(A) (A > 0 ? A : -A)
+
 
 /**
  * Return minimum of two numbers
  */
 # define MIN(A,B) (A > B ? A : B)
 
+
 /**
  * Return maximum of two numbers 
  */
 # define MAX(A,B) (A < B ? A : B)
+
 
 /**
  * Return rounded value as in MATLAB.
@@ -151,26 +96,31 @@ extern "C" {
  */
 # define ROUND(A) ( floor(A) + ((A - floor(A) >= 0.5) ? (A>0 ? 1 : 0) : 0))
 
-/**
- * Defined for memory allocation testing.
- */
-
 
 /**
- * Old friend pi.
+ * Some constants
  */
+// PI
 #ifndef PI
     # define PI  3.1415926535897931159979634685441851615906
 #endif
 
+// Gamma in Hz
+#ifndef GAMMA
+    #define GAMMA 4.2576e7
+#endif
 
-
+// Gamma in radians
+#ifndef RGAMMA
+    #define RGAMMA 267.513
+#endif
 
 
 /**
- * @brief   Matrix template
+ * @brief   Matrix template.
  *          This class intends to offer a simple interface for handling
- *          MR data in a simple way. Version 0.3 copes with SIEMENS MRIR.
+ *          MR data in a simple way. As of now it only support Siemens 
+ *          access specifiers for direct input.
  *          The data is organised in a 16 member long array for dimensions
  *          and a template array for the data. The order is column-major.
  * 
@@ -190,7 +140,7 @@ public:
      */
     //@{
     
-
+	
     /**
      * @brief           Contruct a 1^16 type matrix with (T)0.
      */
@@ -199,16 +149,7 @@ public:
     
     
     /**
-	 * @brief           Construct 2D matrix
-	 *
-	 * @param  m        Rows & Columns
-	 */
-    inline              
-    Matrix              (const int n) ;
-    
-    
-    /**
-     * @brief           Constructs a 1^16 matrix matrix with desired dimensions values = 0.
+     * @brief           Constructs a 16-dim matrix matrix with desired of zeros.
      *
      * @param  col      Scan
      * @param  lin      Phase encoding lines
@@ -228,19 +169,30 @@ public:
      * @param  ave      Averages
      */
     inline              
-    Matrix               (int col, int lin, int cha, int set, 
-                          int eco, int phs, int rep, int seg, 
-                          int par, int slc, int ida, int idb, 
-                          int idc, int idd, int ide, int ave);
+    Matrix               (const int col, const int lin, const int cha, const int set, 
+                          const int eco, const int phs, const int rep, const int seg, 
+                          const int par, const int slc, const int ida, const int idb, 
+                          const int idc, const int idd, const int ide, const int ave);
 
 
 	/**
-	 * @brief           Construct with dimension array
+	 * @brief           Construct 16-dim matrix with dimension array
+	 *
+	 * @param  dim      All 16 Dimensions
 	 */
 	inline 
 	Matrix              (const int* dim);
 	
 	
+    /**
+	 * @brief           Construct square 2D matrix
+	 *
+	 * @param  m        Rows & Columns
+	 */
+    inline              
+    Matrix              (const int n) ;
+    
+    
     /**
 	 * @brief           Construct 2D matrix
 	 *
@@ -250,6 +202,30 @@ public:
 	inline 
 	Matrix              (const int m, const int n);
 	
+    
+    /**
+	 * @brief           Construct 3D volume
+	 *
+	 * @param  m        Rows
+	 * @param  n        Columns
+	 * @param  k        Slices
+	 */
+	inline 
+	Matrix              (const int m, const int n, const int k);
+	
+
+    /**
+	 * @brief           Construct 4D volume
+	 *
+	 * @param  m        Rows
+	 * @param  n        Columns
+	 * @param  k        Slices
+	 * @param  t        Reps, time series or whatever
+	 */
+	inline 
+	Matrix              (const int m, const int n, const int k, const int t);
+	
+
     
     /**
      * @brief           Delete array containing data.
@@ -277,39 +253,40 @@ public:
 
     //{@
 
-    // If compiled within IDEA we know of access specifiers.
-	#ifdef PARC_MODULE_NAME
+    // Only if compiled within IDEA we know of access specifiers.
+#ifdef PARC_MODULE_NAME
     
-    /**
-     * @brief           Reset and fill data from IceAs
-     *                   
-     * @param  ias      IceAs containing data
-     * 
-     * @return          Amount of data read
-     */
-    inline long         
-    Import              (IceAs ias);
 
     /**
-     * @brief           Import an amount of data from IceAs
+     * @brief           Reset and import data from IceAs
      *                   
      * @param  ias      IceAs containing data
-     * @param  pos      Import data starting at position pos own repository
-     * 
      * @return          Amount of data read
      */
     inline long         
-    Import              (IceAs ias, long pos);
+    Import              (const IceAs ias);
+
+
+    /**
+     * @brief           Continue import from IceAs
+     *                   
+     * @param  ias      IceAs containing data
+     * @param  pos      Import data starting at position pos of own repository
+     * @return          Amount of data read
+     */
+    inline long         
+    Import              (const IceAs ias, const long pos);
+
 
     /**
      * @brief           Export data to ias
      *                   
      * @param  ias      IceAs for data export
-     * 
      * @return          Amount of data exported
      */
     inline long         
-    Export              (IceAs ias);
+    Export              (IceAs* ias);
+
 
     /**
      * @brief           Partially export data to ias 
@@ -318,7 +295,7 @@ public:
      * @param  pos      Export data starting at position pos of our repository
      */
     inline long         
-    Export              (IceAs ias, long pos);
+    Export              (IceAs* ias, const long pos);
  
 	#endif
 
@@ -340,7 +317,7 @@ public:
      * @return          Value at _M[p].
      */
     T                   
-    operator[]          (int p)                             const;
+    operator[]          (const int p)                             const;
     
     
     /**
@@ -350,29 +327,37 @@ public:
      * @return          Reference to _M[p].
      */
     T                   
-    &operator[]         (int p)                              ;
+    &operator[]         (const int p)                              ;
 
     
     /**
-     * @brief            Reference to slice 
+     * @brief            Operates only on inner 3D: Get a slice of data
      *  
      * @param  s         Slice
-     *
-     * @return           Reference to _M[COL*LIN*CHA*pos]
+     * @return           Copy data into new matrix and return
      */
     Matrix <T>           
-    slice                (int s);
+    Slice                (int s);
 
     
     /**
-     * @brief            Reference to channel
+     * @brief            Operates only on inner 2D: Get a Row of data
      *  
-     * @param  c         Channel
-     *
-     * @return           Reference to _M[COL*LIN*pos]
+     * @param  r         Row
+     * @return           Copy data into new vector
      */
     Matrix <T>           
-    channel              (int c);
+    Row                  (int r);
+
+    
+    /**
+     * @brief            Operates only on inner 2D: Get a Row of data
+     *  
+     * @param  c         Column
+     * @return           Copy data into new vector
+     */
+    Matrix <T>           
+    Column               (int c);
 
     
     /**
@@ -381,7 +366,7 @@ public:
      * @return          Data 
      */
     inline T*            
-    data                ()  const {
+    Data                ()  const {
         return _M;
     }
 
@@ -394,7 +379,7 @@ public:
      * @return          Value at _M[pos]
      */
     inline T            
-    at                  (const int pos)  const {
+    At                  (const int pos)  const {
         return _M[pos];
     }
 
@@ -407,7 +392,7 @@ public:
      * @return           Reference to _M[pos]
      */
     inline T&           
-    at                  (const int pos) {
+    At                  (const int pos) {
         return _M[pos];
     }
 
@@ -421,7 +406,7 @@ public:
      * @return           Reference to _M[pos]
      */
     inline T&           
-	at                  (const IceDim dim, const int pos) {
+	At                  (const IceDim dim, const int pos) {
 
 		int n = 1;
 
@@ -442,7 +427,7 @@ public:
      * @return           Reference to _M[pos]
      */
     inline T           
-	at                  (const IceDim dim, const int pos) const {
+	At                  (const IceDim dim, const int pos) const {
 
 		int n = 1;
 
@@ -463,7 +448,7 @@ public:
      * @return          Value at _M[col + _dim[LIN]*lin]
      */
     inline T            
-    at                  (const int col, const int lin) const {
+    At                  (const int col, const int lin) const {
 
         return _M[col + _dim[COL]*lin ];
 
@@ -479,7 +464,7 @@ public:
      * @return           Reference to _M[col + _dim[LIN]*lin]
      */
     inline T&           
-    at                  (int col, int lin) {
+    At                  (int col, int lin) {
 
         return _M[col + _dim[COL]*lin ];
 
@@ -495,7 +480,7 @@ public:
      * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T            
-    at                   (int col, int lin, int slc)  const {
+    At                   (int col, int lin, int slc)  const {
 
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
 
@@ -511,7 +496,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&            
-    at                   (int col, int lin, int slc) {
+    At                   (int col, int lin, int slc) {
 
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
 
@@ -540,7 +525,7 @@ public:
      * @return           Value at position
      */
     inline T            
-    at                   (const int col, 
+    At                   (const int col, 
 						  const int lin, 
 						  const int cha,
 						  const int set,
@@ -596,7 +581,7 @@ public:
      * @return           Reference to position
      */
 	inline T&            
-    at                   (const int col, 
+    At                   (const int col, 
 						  const int lin, 
 						  const int cha,
 						  const int set,
@@ -637,17 +622,47 @@ public:
 	 * @return          nxn identity
 	 */
 	static Matrix<T> 
-	id                  (int n);
+	Id                  (const int n);
 	
 
 	/**
-	 * @brief           Create nxn identity matrix 
+	 * @brief           Create nxn matrix initialised with T(1.0)
 	 *
 	 * @param  n        Side length of matrix
-	 * @return          nxn identity
+	 * @return          nxn ones
 	 */
-	void
-	id                  ();
+	static Matrix<T> 
+	Ones                (const int n);
+	
+
+	/**
+	 * @brief           Create nxn matrix initialised with T(1.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn ones
+	 */
+	static Matrix<T> 
+	Ones                (const int n, const int m);
+	
+
+	/**
+	 * @brief           Create nxn matrix initialised with T(0.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Zeros               (const int n);
+	
+
+	/**
+	 * @brief           Create nxn matrix initialised with T(0.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Zeros               (const int n, const int m);
 	
 
 	/**
@@ -784,28 +799,6 @@ public:
     col                 (Matrix<int> col)                     const;
 
 
-    /**
-     * @brief           Get a slice from the matrix
-     *                  NOT IMPLEMETED YET
-     *
-     * @param  slc      Requested line.
-     * @return          Matrix copied from slice
-     */
-    Matrix<T>          
-    slc                 (const int slc)                             const;
-    
-    
-    /**
-     * @brief           Get a matrix as a copy of lines l[i] of this matrix, i.e. this(l,:);
-     *                  NOT IMPLEMETED YET
-     *
-     * @param  slc      Requested rows.
-     * @return          Matrix copied from slices 
-     */
-    Matrix<T>           
-    slc                 (Matrix<int> slc)                     const;
-    
-    
     /**
 	 * @brief           Get one or more elements of a vector, i.e. this(p).
 	 *                  NOT IMPLEMENTED YET
@@ -1646,7 +1639,52 @@ Matrix<T>::Matrix (const int m, const int n) {
 	_dim [0] = m;
 	_dim [1] = n;
 
-    for (int i = CHA; i < INVALID_DIM; i++)
+    for (int i = 2; i < INVALID_DIM; i++)
+        _dim [i] = 1;
+
+    _M = (T*) malloc (Size()*sizeof(T));
+
+	for (int i = 0; i < Size(); i++)
+		_M[0] = T(0.0);
+
+    nb_alloc++;
+
+}
+
+
+template <class T> 
+Matrix<T>::Matrix (const int m, const int n, const int k) {
+
+	nb_alloc = 0;
+
+	_dim [0] = m;
+	_dim [1] = n;
+	_dim [2] = k;
+
+    for (int i = 3; i < INVALID_DIM; i++)
+        _dim [i] = 1;
+
+    _M = (T*) malloc (Size()*sizeof(T));
+
+	for (int i = 0; i < Size(); i++)
+		_M[0] = T(0.0);
+
+    nb_alloc++;
+
+}
+
+
+template <class T> 
+Matrix<T>::Matrix (const int m, const int n, const int k, const int l) {
+
+	nb_alloc = 0;
+
+	_dim [0] = m;
+	_dim [1] = n;
+	_dim [2] = k;
+	_dim [3] = l;
+	
+    for (int i = 4; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
     _M = (T*) malloc (Size()*sizeof(T));
@@ -1660,10 +1698,10 @@ Matrix<T>::Matrix (const int m, const int n) {
 
 
 template <class T>
-Matrix<T>::Matrix (int col, int lin, int cha, int set, 
-                   int eco, int phs, int rep, int seg, 
-                   int par, int slc, int ida, int idb, 
-                   int idc, int idd, int ide, int ave) {
+Matrix<T>::Matrix (const int col, const int lin, const int cha, const int set, 
+                   const int eco, const int phs, const int rep, const int seg, 
+                   const int par, const int slc, const int ida, const int idb, 
+                   const int idc, const int idd, const int ide, const int ave) {
 
 	nb_alloc = 0;
 
@@ -1685,6 +1723,10 @@ Matrix<T>::Matrix (int col, int lin, int cha, int set,
     _dim[AVE] = ave;
 
     _M = (T*) malloc (Size() * sizeof (T));
+
+	for (int i = 0; i < Size(); i++)
+		_M[0] = T(0.0);
+
     nb_alloc++;
 
 
@@ -1745,25 +1787,7 @@ Matrix<T>::~Matrix() {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::channel (int c) {
-    
-    Matrix<T> res;
-
-	for (int j = 0; j < CHA; j++)
-		res.Dim(j) = _dim[j];
-
-	res.Reset();
-
-	for (int i = 0; i < Size(); i++)
-		res[i] = _M[c*_dim[COL]*_dim[LIN] + i];
-
-	return res;
-
-}
-
-
-template <class T> Matrix<T> 
-Matrix<T>::slice (int s) {
+Matrix<T>::Slice (int s) {
     
     Matrix<T> res;
 
@@ -1772,8 +1796,38 @@ Matrix<T>::slice (int s) {
 
 	res.Reset();
 
-	for (int i = 0; i < Size(); i++)
-		res[i] = _M[s*_dim[COL]*_dim[LIN]*_dim[CHA] + i];
+	memcpy (&res[0], &_M[s * _dim[0]*_dim[1]], _dim[0]*_dim[1]*sizeof(T));
+
+	return res;
+
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::Row (int r) {
+    
+    Matrix<T> res;
+
+	res.Dim(0) = _dim[1];
+	res.Reset();
+
+	for (int i = 0; i < _dim[1]; i++)
+		res[i] = _M[r + i*_dim[0]];
+
+	return res;
+
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::Column (int c) {
+    
+    Matrix<T> res;
+
+	res.Dim(0) = _dim[0];
+	res.Reset();
+
+	memcpy (&res[0], _M[c*_dim[0]], _dim[0] * sizeof(T));
 
 	return res;
 
@@ -1840,7 +1894,7 @@ Matrix<T>::SizeInRAM() const {
 
 
 template <class T> T           
-Matrix<T>::operator[]  (int p) const {
+Matrix<T>::operator[]  (const int p) const {
     
     assert(p >= 0);
     assert(p <  Size());
@@ -1851,7 +1905,7 @@ Matrix<T>::operator[]  (int p) const {
 
 
 template <class T> T           
-&Matrix<T>::operator[] (int p) {
+&Matrix<T>::operator[] (const int p) {
     
     assert(p >= 0);
     assert(p <  Size());
@@ -1994,7 +2048,7 @@ static T power(T p, int b) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::id (int n) {
+Matrix<T> Matrix<T>::Id (const int n) {
 
  	static Matrix<T> M (n);
 
@@ -2002,6 +2056,48 @@ Matrix<T> Matrix<T>::id (int n) {
  		M[i*n+i] = T(1.0);
 
  	return M;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::Ones (const int m, const int n) {
+
+ 	static Matrix<T> M (m,n);
+
+ 	for (int i = 0; i < Size(); i++)
+ 		M[i] = T(1.0);
+
+ 	return M;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::Ones (const int n) {
+
+ 	return Ones(n,n);
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::Zeros (const int n, const int m) {
+
+ 	static Matrix<T> M (m,n);
+
+ 	for (int i = 0; i < Size(); i++)
+ 		M[i] = T(0.0);
+
+ 	return M;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::Zeros (const int n) {
+
+ 	return Zeros(n,n);
 
 }
 
@@ -2018,9 +2114,9 @@ Matrix<T> Matrix<T>::tr() const {
     for (int i = 0; i < res.Dim(0); i++)
         for (int j = 0; j < res.Dim(1); j++)
 			if (typeid (T) == typeid (double))
-				res.at(i,j) =      at(j,i);  // Transpose
+				res.At(i,j) =      At(j,i);  // Transpose
 			else
-				res.at(i,j) = conj(at(j,i)); // Conjugate transpose
+				res.At(i,j) = conj(At(j,i)); // Conjugate transpose
 
     return res;
 

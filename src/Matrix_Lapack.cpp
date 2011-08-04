@@ -18,6 +18,8 @@
  *  02110-1301  USA
  */
 
+#include "Lapack.hpp"
+
 template <class T>
 int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* rev) {
 
@@ -35,9 +37,9 @@ int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* 
 	char    jobvr = (cv) ? 'V' : 'N';
 	
 	int     n     = _dim[COL];
-
+	
 	T*      a     = new T[Size()];
-
+	
 	int     i = 0, j = 0, k = 0;
 
 	for (j = 0; j < _dim[COL]; j++)
@@ -93,11 +95,11 @@ int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* 
 	
 	if (typeid(T) == typeid(raw))
 		for (i = 0; i < n; i++)
-			ev->at(i) = w[i];
+			ev->At(i) = w[i];
 
 	else if (typeid(T) == typeid(double))
 		for (i = 0; i < n; i++)
-			ev->at(i) = raw(raw(w[i]).real(),raw(wi[i]).real());
+			ev->At(i) = raw(raw(w[i]).real(),raw(wi[i]).real());
 
 	if (cv) {
 
@@ -108,7 +110,7 @@ int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* 
 		i = 0;
 		for (j = 0; j < ldvl; j++)
 			for (k = 0; k < ldvl; k++, i++)
-				lev->at(i) = vl[j+k*ldvl];
+				lev->At(i) = vl[j+k*ldvl];
 		
 		rev->Dim(0) = ldvr;
 		rev->Dim(1) = ldvr;
@@ -117,7 +119,7 @@ int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* 
 		i = 0;
 		for (j = 0; j < ldvr; j++)
 			for (k = 0; k < ldvr; k++, i++)
-				rev->at(i) = vl[j+k*ldvr];
+				rev->At(i) = vl[j+k*ldvr];
 		
 	}
 		
@@ -218,20 +220,20 @@ int Matrix<T>::SVD (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double
 		int i = 0;
 		for (j = 0; j < ldu; j++)
 			for (k = 0; k < ldu; k++, i++)
-				lsv->at(i) = u[k*ldu+j];
+				lsv->At(i) = u[k*ldu+j];
 		
 		rsv->Dim(0) = ldvt;
 		rsv->Dim(1) = ldvt;
 		rsv->Reset();
 		for (i = 0; i < ldvt*ldvt; i++)
-			rsv->at(i) = vt[i];
+			rsv->At(i) = vt[i];
 		
 	}
 	
 	sv->Dim(0) = MIN(_dim[0],_dim[1]);
 	sv->Reset();
 	for (i = 0; i < MIN(_dim[0],_dim[1]); i++)
-		sv->at(i) = (typeid(T) == typeid(raw)) ? sf[i] : sd[i];
+		sv->At(i) = (typeid(T) == typeid(raw)) ? sf[i] : sd[i];
 	
 	delete [] a;
 	delete [] sf;
@@ -331,22 +333,22 @@ Matrix<T>::Pinv () {
 	float*    rwork  = (float*) malloc (5*MIN(m,n)*sizeof(float));    
 	float*    s      = (float*) malloc (  MIN(m,n)*sizeof(float));    
 
-	Matrix<T> b      =  Matrix<T>::id(ldb);
+	Matrix<T> b      =  Matrix<T>::Id(ldb);
 
 	float     rcond  = -1.0;
 
 	if (typeid(T) == typeid(raw))
-		cgelss_ (&m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
+		cgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgelss_ (&m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
+		dgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
 
 	lwork = (int) raw (work[0]).real();
 	work  = (T*)  realloc (work, lwork * sizeof(T));
 
 	if (typeid(T) == typeid(raw))
-		cgelss_(&m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
+		cgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgelss_(&m, &n, &nrhs, &at(0), &lda, &b.at(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
+		dgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
 
 	free (rwork);
 	free (s);

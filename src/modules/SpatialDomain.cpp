@@ -125,14 +125,24 @@ SpatialDomain::Process        () {
 
     // On exit --------------------
     // 
-    // m_raw:    Pulses
-    // m_helper: Pulse durations
+    // m_raw:    Excitation profile
+    // m_helper: RF and gradient pulses
     // ----------------------------
 
     Matrix<raw> solution;
     Matrix<raw> tmp;
     Matrix<raw> final;    
-    Matrix<raw> treg         =  Matrix<raw>::id(m_nc * m_nk) * raw (m_lambda, 0);
+    Matrix<raw> treg         =  Matrix<raw>::Id(m_nc * m_nk) * raw (m_lambda, 0);
+	Matrix<raw> ve;
+	Matrix<raw> vp;
+
+	if (m_verbose) {
+	    ve  = Matrix<raw>(m_ns,      m_maxiter);
+		vp  = Matrix<raw>(m_nk*m_nc, m_maxiter);
+	} else {
+	    ve  = Matrix<raw>(m_ns,     1);
+		vp  = Matrix<raw>(m_nk*m_nc,1);
+	}
 
     bool        pulse_amp_ok = false;
 
@@ -169,13 +179,16 @@ SpatialDomain::Process        () {
             NRMSE (&m_raw, &tmp, gc, &nrmse);
             res.push_back (nrmse);
             
+			if (m_verbose)
+				memcpy (&ve.At(0,gc), &tmp.At(0), tmp.Size() * sizeof(raw)); 
+
             if (gc > 0 && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
 				break;
             
             final    = solution;
             PhaseCorrection (&m_raw, &tmp);
             
-        }
+        } 
         
         printf ("\n... done. Checking pulse amplitudes ... \n");
         
@@ -198,27 +211,51 @@ SpatialDomain::Process        () {
             
             printf ("... done\n.");
             
-        }
+        } 
         
-    }
+    } // End of pulse duration loop
 
     printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / ClockRate());
 	
 	// Put actual maximum RF amplitude into first cell
+
 	for (int i = 1; i < m_nk; i++)
 		if (m_max_rf[i] > m_max_rf[0])
 			m_max_rf[0] = m_max_rf[i];
-		
-	PTXTiming (&final, &m_kspace, m_pd, m_gd, m_nk, m_nc, &m_rhelper);
+	// -----------------------------------
+
+	// Assemble gradient and RF timing ---
+
+	PTXTiming              (&final, &m_kspace, m_pd, m_gd, m_nk, m_nc, &m_rhelper);
+	// -----------------------------------
+	
+
+	// Write pulse file for Siemens sequences
+
 	PTXWriteSiemensINIFile (&m_rhelper, 3, 3, m_nc, 10, m_max_rf[0], &m_ptxfname);
+	// -----------------------------------
+
+	// Return NRMSE down the road --------
 
 	m_helper.Dim(COL) = gc;
 	m_helper.Dim(LIN) = 1;
 	m_helper.Reset();
-
 	for (int i = 0; i < gc; i++)
-		m_helper.at(i) = res.at(i);
+		m_helper.At(i) = res.at(i);
+	// -----------------------------------
 
+	// Excitation profile ----------------
+	if (m_verbose) {
+			
+		m_raw.Dim(1) = gc; 
+		m_raw.Reset();
+		memcpy (&m_raw.At(0), &ve.At(0), gc * m_raw.Dim(0) * sizeof(raw));
+
+	} else
+		
+		m_raw = tmp;
+	// ----------------------------------
+	
     return RRSModule::OK;
 
 }

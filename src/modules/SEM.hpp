@@ -38,7 +38,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
 
 			// Copy data to FT
 			for (int i = 0; i < imgsize; i++) {
-				tmp = sm->at(ipos + i) * in->at(i);
+				tmp = sm->At(ipos + i) * in->At(i);
 				np[tid].f_hat[i][0] = tmp.real();
 				np[tid].f_hat[i][1] = tmp.imag();
 			}
@@ -48,7 +48,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
 			
 			// Copy FTed data back
 			for (int i = 0; i < nsamples; i++)
-				out->at(i+spos) = raw(np[tid].f[i][0], np[tid].f[i][1]);
+				out->At(i+spos) = raw(np[tid].f[i][0], np[tid].f[i][1]);
 			
 		}
 		
@@ -101,8 +101,8 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 			
 			// Copy to iFT
 			for (int i = 0; i < nsamples; i++) {
-				spc[tid].y[i][0] = (in->at(spos + i)).real();
-				spc[tid].y[i][1] = (in->at(spos + i)).imag();
+				spc[tid].y[i][0] = (in->At(spos + i)).real();
+				spc[tid].y[i][1] = (in->At(spos + i)).imag();
 			}
 			
 			// Inverse FT
@@ -120,8 +120,8 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 		for (int i = 0; i < imgsize; i++) 
 			for (int j = 0; j < ncoils; j++) {
 				int    ipos   = j * imgsize;
-				sens        = sm->at(ipos + i);
-				out->at(i) += raw(ftout[ipos + i][0], ftout[ipos + i][1]) * conj(sens);
+				sens        = sm->At(ipos + i);
+				out->At(i) += raw(ftout[ipos + i][0], ftout[ipos + i][1]) * conj(sens);
 			}
 
 	}

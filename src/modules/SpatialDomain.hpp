@@ -81,6 +81,7 @@ namespace RRStrategy {
         int         m_ns;       /**< # Spatial positions     */
         int         m_nk;       /**< # kt-points             */
         int         m_maxiter;  /**< # Variable exchange method iterations */
+		int         m_verbose;  /**< Verbose output. All intermediate results. */
 
         double      m_lambda;   /**< Tikhonov parameter      */
         double      m_rflim;    /**< Maximum rf amplitude    */
@@ -111,7 +112,7 @@ NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* res
     float q = 0.0, n = 0.0;
     
     for (int i=0; i < target->Size(); i++)
-        q += pow(abs(target->at(i)) - abs(result->at(i)), 2.0);
+        q += pow(abs(target->At(i)) - abs(result->At(i)), 2.0);
     
     q = sqrt(q)/target->norm().real();
     
@@ -143,10 +144,10 @@ PhaseCorrection (Matrix<raw>* target, const Matrix<raw>* result) {
 #pragma omp for schedule (dynamic, chunk)
 
         for (int i=0; i < target->Size(); i++) 
-            if (abs(target->at(i)) > 0)
-                target->at(i) = abs(target->at(i)) * result->at(i) / abs(result->at(i));
+            if (abs(target->At(i)) > 0)
+                target->At(i) = abs(target->At(i)) * result->At(i) / abs(result->At(i));
             else                
-                target->at(i) = raw (0,0);    
+                target->At(i) = raw (0,0);    
         
     }
     
@@ -170,8 +171,8 @@ RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, c
         limits[i] = 0.0;
         
         for (int j = 0; j < nc; j++)
-            if (limits[i] < abs (solution->at(i+nk*j)) / pd[i]) 
-                limits[i] = abs (solution->at(i+nk*j)) / pd[i];
+            if (limits[i] < abs (solution->At(i+nk*j)) / pd[i]) 
+                limits[i] = abs (solution->At(i+nk*j)) / pd[i];
 
     }
         
@@ -209,7 +210,6 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, c
 
 	d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
 
-	// 2* i * \pi * \gamma * \delta t
     raw pgd = raw (0, 2.0 * PI * 4.2576e7 * 1.0e-5); 
 
 #pragma omp parallel default (shared) 
@@ -224,16 +224,16 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, c
         for (int c = 0; c < nc; c++) 
             for (int k = 0; k < nk; k++) 
                 for (int s = 0; s < ns; s++) 
-                    m->at (c*nk*ns + k*ns + s) = 
+                    m->At (c*nk*ns + k*ns + s) = 
 						// b1 (s,c)
-                        pgd * b1->at(s,c) *
+                        pgd * b1->At(s,c) *
 						// off resonance: exp (2i\pidb0dt)  
-                        exp (raw(0, 2.0 * PI * d[k] * (float) b0->at(s))) *
-						 // encoding: exp (i k(t) r)
-                        exp (raw(0,(ks->at(0,k)*r->at(0,s) + ks->at(1,k)*r->at(1,s) + ks->at(2,k)*r->at(2,s))));
+                        exp (raw(0, 2.0 * PI * d[k] * (float) b0->At(s))) *
+						// encoding: exp (i k(t) r)
+                        exp (raw(0,(ks->At(0,k)*r->At(0,s) + ks->At(1,k)*r->At(1,s) + ks->At(2,k)*r->At(2,s))));
         
     }
-
+	
 	free (t);
 	free (d);
     
@@ -276,12 +276,12 @@ PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const
 			
 			// RF action
 			for (int p = 0; p < pd[k]; p++, i++) 
-				timing->at(i,rc) = conj(rf->at(k + rc*nk)) / (float)pd[k];
+				timing->At(i,rc) = conj(rf->At(k + rc*nk)) / (float)pd[k];
 			
 			// Gradient action, no RF
 			if (k < nk-1)
 				for (int g = 0; g <    gd; g++, i++)
-					timing->at(i,rc) = raw (0.0, 0.0);
+					timing->At(i,rc) = raw (0.0, 0.0);
 
 		}
 		
@@ -301,12 +301,12 @@ PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const
 			
 			// RF action, no gradients
 			for (int p = 0; p < pd[k]; p++, i++) 
-				timing->at(i,nc+gc) = 0.0; 
+				timing->At(i,nc+gc) = 0.0; 
 
 			if (k < nk-1)
 			for (int g = 0; g <    gd; g++, i++) {
 				
-				sr = (k+1 < nk) ? ks->at(gc,k+1) - ks->at(gc,k) : - ks->at(gc,i);
+				sr = (k+1 < nk) ? ks->At(gc,k+1) - ks->At(gc,k) : - ks->At(gc,i);
 				sr = 4.0 * sr / (2 * PI * 4.2576e7 * gd * gd * 1.0e-5 * 1.0e-5);
 				sr =       sr / 100.0;
 				
@@ -318,7 +318,7 @@ PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const
 				else                     // ramp down
 					gr -= sr;
 				
-				timing->at(i,nc+gc) = gr; 
+				timing->At(i,nc+gc) = gr; 
 				
 			}
 			
