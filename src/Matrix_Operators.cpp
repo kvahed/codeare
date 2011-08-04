@@ -87,9 +87,19 @@ Matrix<bool> Matrix<T>::operator==(T s)    {
 
     Matrix<bool> res(_dim);
 
-    for (int i = 0; i < Size(); i++)
-        res[i] = (_M[i] == s);
-
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk)
+		
+		for (int i = 0; i < Size(); i++)
+			res[i] = (_M[i] == s);
+		
+	}
+	
     return res;
 
 }

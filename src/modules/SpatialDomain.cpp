@@ -161,10 +161,10 @@ SpatialDomain::Process        () {
         STA (&m_kspace, &m_helper, &m_rhelper, &m_pixel, m_nc, m_nk, m_ns, m_gd, m_pd, &m);
         Matrix<raw> minv = m.tr();
 
-        minv  = minv.prod (m);
+        minv  = minv->*(m);
         minv  = minv + treg;
         minv  = minv.Pinv();
-        minv  = minv.prodt (m);
+        minv  = minv.prodt(m);
         
         // Valriable exchange method --------------
 
@@ -173,8 +173,8 @@ SpatialDomain::Process        () {
 
         for (int j = 0; j < m_maxiter; j++, gc++) {
 
-            solution = minv.prod(m_raw);
-            tmp      = m.prod(solution);
+            solution = minv->*(m_raw);
+            tmp      = m->*(solution);
 
             NRMSE (&m_raw, &tmp, gc, &nrmse);
             res.push_back (nrmse);
