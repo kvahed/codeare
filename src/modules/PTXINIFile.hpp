@@ -115,7 +115,7 @@ PTXWriteSiemensINIFile (const Matrix<raw>* pt, int dimrf, int dimgr, int nc, int
 		fprintf (fp, "\n");
 		
 		for (int i = 0; i < nt; i++)
-			fprintf (fp, "RF[%i]= %.5f	 %.5f\n", i, abs(pt->At(i,j)), pt->At(i,j));
+			fprintf (fp, "RF[%i]= %.5f	 %.5f\n", i, abs(pt->At(i,j)), arg(pt->At(i,j)));
 		
 	}
     

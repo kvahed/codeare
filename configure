@@ -10681,7 +10681,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"293:303M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"293:304M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -15360,12 +15360,28 @@ if test x"$with_matlabroot" != x"no" ; then
 
     MATLAB_ROOT="$with_matlabroot"
     MATLAB_LIB_PATH="${MATLAB_ROOT}/bin"
+	CXXFLAGS="${CXXFLAGS} -I${MATLAB_ROOT}/extern/include"
+	CPPFLAGS="${CPPFLAGS} -I${MATLAB_ROOT}/extern/include"
+
+	for ac_header in mat.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "mat.h" "ac_cv_header_mat_h" "$ac_includes_default"
+if test "x$ac_cv_header_mat_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_MAT_H 1
+_ACEOF
+
+else
+  as_fn_error "cannot find mat.h, bailing out" "$LINENO" 5
+fi
+
+done
+
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MATFile in -lmat -lmx" >&5
 $as_echo_n "checking for MATFile in -lmat -lmx... " >&6; }
 
 	OLD_LIBS=$LIBS
-	CXXFLAGS="${CXXFLAGS} -I${MATLAB_ROOT}/extern/include"
 
     case $host in
         *darwin*)
@@ -15376,7 +15392,7 @@ $as_echo_n "checking for MATFile in -lmat -lmx... " >&6; }
 		;;
     esac
 
-	LIBS="${LIBS} -L${MATLAB_LIB_PATH} -Wl,-rpath,${MATLAB_LIB_PATH} -lmat -lmx"
+	LIBS="${LIBS} -L${MATLAB_LIB_PATH} -lmat -lmx -Wl,-rpath,${MATLAB_LIB_PATH}"
 
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
