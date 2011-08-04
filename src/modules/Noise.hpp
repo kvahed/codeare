@@ -60,7 +60,7 @@ AddPseudoRandomNoise (Matrix<raw>* m, float max) {
 	SetSeed();
 
 	for (int i = 0; i < m->Size(); i++)
-		m->at(i) = m->at(i) + max*WhiteNoise();
+		m->At(i) = m->At(i) + max * WhiteNoise();
 	
 	return OK;
 

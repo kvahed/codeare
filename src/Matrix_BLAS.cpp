@@ -18,6 +18,7 @@
  *  02110-1301  USA
  */
 
+#include "BLAS.hpp"
 #include <cstdlib>
 #include <cblas.h>
 

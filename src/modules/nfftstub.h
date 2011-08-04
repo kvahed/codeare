@@ -1,8 +1,6 @@
 #ifndef __NFFT_STUB_H__
 #define __NFFT_STUB_H__
 
-#define GAMMA 3.7381360905825
-
 #include "nfft3util.h"
 #include "nfft3.h"
 

@@ -78,7 +78,7 @@ RRSModule::error_code MedianFilter_OMP::Process () {
 #pragma omp for schedule(dynamic,chunk)
 		for (x=0; x<iw; ++x)
 			for (y=0; y<ih; ++y)
-					input_image[x][y]  = m_pixel.at(x,y);
+					input_image[x][y]  = m_pixel.At(x,y);
 
 		int** array = CreateImage<int>(ww,wh); //local to each thread !
 
@@ -89,7 +89,7 @@ RRSModule::error_code MedianFilter_OMP::Process () {
 					for (fy=0; fy<wh; ++fy)
 						array[fx][fy] = input_image[x+fx-ex][y+fy-ey]; 
 				qsort(array[0], ww*wh, sizeof(int), t_compare_ints);
-				m_pixel.at(x,y) = array[ww/2][wh/2];
+				m_pixel.At(x,y) = array[ww/2][wh/2];
 			}
 
 		DeleteImage(array);
