@@ -52,6 +52,7 @@ bool internaltest (ReconClient* rc);
 bool cgsensetest (ReconClient* rc);
 bool nuffttest (ReconClient* rc);
 bool sdmtest (ReconClient* rc);
+bool mxtest (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
@@ -67,6 +68,8 @@ int main (int argc, char** argv) {
 			cgsensetest (&client);
 		else if (strcmp (test, "SpatialDomain") == 0)
 			sdmtest (&client);
+		else if (strcmp (test, "mxtest") == 0)
+			mxtest (&client);
 		else
 			internaltest (&client);
 			
@@ -294,6 +297,27 @@ bool internaltest (ReconClient* rc) {
 	
 }
 
+bool mxtest (ReconClient* rc) {
+
+	//Matrix<double> m = Matrix<double>::Id(4);
+	//m.mxdump(std::string("test.mat"), std::string("imat"), std::string(""));
+
+	Matrix<raw> r1 (4,8);
+	r1.Random ();
+
+	std::cout << r1 << std::endl << std::endl;
+
+
+	r1.mxdump (std::string("rtest.mat"), std::string("rmat"), std::string(""));
+
+	Matrix<raw> r2;
+	r2.mxread (std::string("rtest.mat"), std::string("rmat"), std::string(""));
+	
+	std::cout << r2 << std::endl << std::endl;
+
+	return true;
+
+}
 
 bool init (int argc, char** argv) {
 	

@@ -1377,7 +1377,7 @@ public:
      * @return          Success.
      */
     bool                
-    dump                (std::string fname, std::string dname = "", std::string dloc = "/");
+    h5dump                (std::string fname, std::string dname = "", std::string dloc = "/");
     
 
     /**
@@ -1389,7 +1389,53 @@ public:
      * @return          Success.
      */
     bool                
-    read                (std::string fname, std::string dname = "", std::string dloc = "/");
+    h5read              (std::string fname, std::string dname = "", std::string dloc = "/");
+    
+    /**
+     * @brief           Dump to MATLAB file.
+     * 
+     * @param  fname    File name.
+	 * @param  dname    Dataset name.
+	 * @param  dloc     Dataset location.
+     * @return          Success.
+     */
+    bool                
+    mxdump              (std::string fname, std::string dname = "", std::string dloc = "/");
+    
+
+    /**
+     * @brief           Read from MATLAB file.
+     *
+     * @param  fname    File name.
+	 * @param  dname    Dataset name.
+	 * @param  dloc     Dataset location.
+     * @return          Success.
+     */
+    bool                
+    mxread              (std::string fname, std::string dname = "", std::string dloc = "/");
+    
+    /**
+     * @brief           Dump to HDF5 file.
+     * 
+     * @param  fname    File name.
+	 * @param  dname    Dataset name.
+	 * @param  dloc     Dataset location.
+     * @return          Success.
+     */
+    bool                
+    dump                (std::string fname, std::string dname = "", std::string dloc = "/", std::string fmt = "h5");
+    
+
+    /**
+     * @brief           Read from HDF5 file.
+     *
+     * @param  fname    File name.
+	 * @param  dname    Dataset name.
+	 * @param  dloc     Dataset location.
+     * @return          Success.
+     */
+    bool                
+    read                (std::string fname, std::string dname = "", std::string dloc = "/", std::string fmt = "h5");
     
     //@}
     

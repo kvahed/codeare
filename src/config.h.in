@@ -48,9 +48,6 @@
 /* Define to 1 if you have the `fftw' library (-lfftw). */
 #undef HAVE_LIBFFTW
 
-/* Define to 1 if you have the `mat' library (-lmat). */
-#undef HAVE_LIBMAT
-
 /* Define to 1 if you have the `nfft3' library (-lnfft3). */
 #undef HAVE_LIBNFFT3
 
@@ -71,6 +68,9 @@
 
 /* Define to 1 if you have the <mach/mach_time.h> header file. */
 #undef HAVE_MACH_MACH_TIME_H
+
+/* Define to 1 if you have the <mat.h> header file. */
+#undef HAVE_MAT_H
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H

@@ -84,7 +84,18 @@ bool Matrix<T>::pdump (std::string fname) {
 }
 
 template <class T>
-bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
+bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc, std::string fmt) {
+
+	if (fmt.compare("mx"))
+		return mxdump (fname, dname, dloc);
+	else
+		return h5dump (fname, dname, dloc);
+
+}
+
+
+template <class T>
+bool Matrix<T>::h5dump (std::string fname, std::string dname, std::string dloc) {
 
 	int i = 0;
 
@@ -221,8 +232,19 @@ bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc) {
 	
 }
 
+
 template <class T>
-bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
+bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc, std::string fmt) {
+
+	if (fmt.compare("mx"))
+		return mxread (fname, dname, dloc);
+	else
+		return h5read (fname, dname, dloc);
+}
+
+
+template <class T>
+bool Matrix<T>::h5read (std::string fname, std::string dname, std::string dloc) {
 	
     if (fname != "") {
 		
@@ -314,3 +336,109 @@ bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc) {
 }
 
 	
+#ifdef HAVE_MAT_H
+
+#include "mat.h"
+
+template <class T>
+bool Matrix<T>::mxread (std::string fname, std::string dname, std::string dloc) {
+
+	
+	// Open file ---------------------------------
+	
+	MATFile*  mf = matOpen (fname.c_str(), "r");
+	
+	if (mf == NULL) {
+		printf ("Error opening file %s\n", fname.c_str());
+		return false;
+	}
+	// -------------------------------------------
+	
+	// Get dimensions ----------------------------
+
+	mxArray*       mxa = matGetVariable(mf, dname.c_str());
+	int           ndim = (int) mxGetNumberOfDimensions(mxa);
+	const mwSize*  dim = mxGetDimensions(mxa);
+
+	for (int i = 0; i < ndim; i++)
+		_dim[i] = (int)dim[i];
+
+	for (int i = ndim; i < INVALID_DIM; i++)
+		_dim[i] = 1;
+
+	Reset();
+	// -------------------------------------------
+
+	// Copy from memory block ----------------------
+
+	memcpy(_M, mxGetPr(mxa), Size() * sizeof(T));
+	// -------------------------------------------
+	
+	// Clean up and close file -------------------
+
+	mxDestroyArray(mxa);
+	
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n",fname.c_str());
+		return false;
+	}
+	// -------------------------------------------
+	
+}
+
+
+template <class T>
+bool Matrix<T>::mxdump (std::string fname, std::string dname, std::string dloc) {
+
+	// Open file ---------------------------------
+
+	MATFile*  mf = matOpen (fname.c_str(), "w");
+
+	if (mf == NULL) {
+		printf ("Error creating file %s\n", fname.c_str());
+		return false;
+	}
+	// -------------------------------------------
+
+	// Declare dimensions and allocate array -----
+
+	mwSize   dim[INVALID_DIM];
+	
+	for (int i = 0; i < INVALID_DIM; i++)
+		dim[i] = (mwSize)_dim[i];
+	
+	mxArray*  mxa;
+
+	if      (typeid(T) == typeid(double))
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
+	else if (typeid(T) == typeid(raw))
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
+	else if (typeid(T) == typeid(short))
+		mxa = mxCreateNumericArray (INVALID_DIM, dim,   mxINT8_CLASS,    mxREAL);
+	// -------------------------------------------
+	
+	
+	// Copy to memory block ----------------------
+
+	memcpy(mxGetPr(mxa), _M, Size() * sizeof(T));
+	// -------------------------------------------
+	
+	// Write data --------------------------------
+	//printf (dname.c_str());
+	int status = matPutVariable(mf, dname.c_str(), mxa);
+	// -------------------------------------------
+
+
+	// Clean up and close file -------------------
+
+	mxDestroyArray(mxa);
+
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n",fname.c_str());
+		return false;
+	}
+	// -------------------------------------------
+	
+}
+
+#endif

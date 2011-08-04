@@ -122,11 +122,14 @@ if test x"$with_matlabroot" != x"no" ; then
 
     MATLAB_ROOT="$with_matlabroot"
     MATLAB_LIB_PATH="${MATLAB_ROOT}/bin"
+	CXXFLAGS="${CXXFLAGS} -I${MATLAB_ROOT}/extern/include"
+	CPPFLAGS="${CPPFLAGS} -I${MATLAB_ROOT}/extern/include"
+
+	AC_CHECK_HEADERS([mat.h],         [], [AC_MSG_ERROR([cannot find mat.h, bailing out])])
 
 	AC_MSG_CHECKING([for MATFile in -lmat -lmx])
 
 	OLD_LIBS=$LIBS
-	CXXFLAGS="${CXXFLAGS} -I${MATLAB_ROOT}/extern/include"
 
     case $host in
         *darwin*)
@@ -137,7 +140,7 @@ if test x"$with_matlabroot" != x"no" ; then
 		;;
     esac
 
-	LIBS="${LIBS} -L${MATLAB_LIB_PATH} -Wl,-rpath,${MATLAB_LIB_PATH} -lmat -lmx"
+	LIBS="${LIBS} -L${MATLAB_LIB_PATH} -lmat -lmx -Wl,-rpath,${MATLAB_LIB_PATH}"
 
 	AC_TRY_LINK([#include "mat.h"],
         [MATFile *pmat;],
