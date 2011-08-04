@@ -10681,7 +10681,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"293:299M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"293:303M\"" >>confdefs.h
 
 
 # Produce first version of idl derivates
@@ -15355,6 +15355,7 @@ else
   with_matlabroot=no
 fi
 
+
 if test x"$with_matlabroot" != x"no" ; then
 
     MATLAB_ROOT="$with_matlabroot"
@@ -15371,7 +15372,7 @@ $as_echo_n "checking for MATFile in -lmat -lmx... " >&6; }
             MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/maci64"
         ;;
 		*x86_64*linux*)
-		    MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/gnlx64"
+		    MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/glnxa64"
 		;;
     esac
 

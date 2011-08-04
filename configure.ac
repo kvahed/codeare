@@ -133,7 +133,7 @@ if test x"$with_matlabroot" != x"no" ; then
             MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/maci64"
         ;;
 		*x86_64*linux*)
-		    MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/gnlxa64"
+		    MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/glnxa64"
 		;;
     esac
 
