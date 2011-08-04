@@ -331,36 +331,6 @@ public:
 
     
     /**
-     * @brief            Operates only on inner 3D: Get a slice of data
-     *  
-     * @param  s         Slice
-     * @return           Copy data into new matrix and return
-     */
-    Matrix <T>           
-    Slice                (int s);
-
-    
-    /**
-     * @brief            Operates only on inner 2D: Get a Row of data
-     *  
-     * @param  r         Row
-     * @return           Copy data into new vector
-     */
-    Matrix <T>           
-    Row                  (int r);
-
-    
-    /**
-     * @brief            Operates only on inner 2D: Get a Row of data
-     *  
-     * @param  c         Column
-     * @return           Copy data into new vector
-     */
-    Matrix <T>           
-    Column               (int c);
-
-    
-    /**
      * @brief           Get pointer to data
      *  
      * @return          Data 
@@ -375,7 +345,6 @@ public:
      * @brief           Get element at position 
      *  
      * @param  pos      Position
-     *
      * @return          Value at _M[pos]
      */
     inline T            
@@ -388,7 +357,6 @@ public:
      * @brief            Reference to value at position
      *  
      * @param  pos       Position
-     *
      * @return           Reference to _M[pos]
      */
     inline T&           
@@ -402,7 +370,6 @@ public:
      *  
      * @param  dim       Dimension
 	 * @param  pos       Position
-     *
      * @return           Reference to _M[pos]
      */
     inline T&           
@@ -423,7 +390,6 @@ public:
      *  
      * @param  dim       Dimension
 	 * @param  pos       Position
-     *
      * @return           Reference to _M[pos]
      */
     inline T           
@@ -444,7 +410,6 @@ public:
      *  
      * @param  col      Column
      * @param  lin      Line
-     *
      * @return          Value at _M[col + _dim[LIN]*lin]
      */
     inline T            
@@ -460,7 +425,6 @@ public:
      *  
      * @param  col       Column
      * @param  lin       Line
-     *
      * @return           Reference to _M[col + _dim[LIN]*lin]
      */
     inline T&           
@@ -614,7 +578,7 @@ public:
 				   ave*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
     }
     
-
+	
 	/**
 	 * @brief           Create nxn identity matrix 
 	 *
@@ -624,7 +588,7 @@ public:
 	static Matrix<T> 
 	Id                  (const int n);
 	
-
+	
 	/**
 	 * @brief           Create nxn matrix initialised with T(1.0)
 	 *
@@ -634,7 +598,7 @@ public:
 	static Matrix<T> 
 	Ones                (const int n);
 	
-
+	
 	/**
 	 * @brief           Create nxn matrix initialised with T(1.0)
 	 *
@@ -644,7 +608,7 @@ public:
 	static Matrix<T> 
 	Ones                (const int n, const int m);
 	
-
+	
 	/**
 	 * @brief           Create nxn matrix initialised with T(0.0)
 	 *
@@ -654,7 +618,7 @@ public:
 	static Matrix<T> 
 	Zeros               (const int n);
 	
-
+	
 	/**
 	 * @brief           Create nxn matrix initialised with T(0.0)
 	 *
@@ -664,7 +628,7 @@ public:
 	static Matrix<T> 
 	Zeros               (const int n, const int m);
 	
-
+	
 	/**
 	 * @brief           Get the element at position p of the vector, i.e. this(p).
      *
@@ -690,7 +654,6 @@ public:
 	 *
 	 * @param  col      Column
 	 * @param  lin      Line
-	 *
 	 * @return          Value at _M[col + _dim[LIN]*lin]
 	 */
     T
@@ -704,7 +667,6 @@ public:
 	 *
 	 * @param  col      Column
 	 * @param  lin      Line
-	 *
 	 * @return          Reference to _M[col + _dim[LIN]*lin]
 	 */
     T&                  
@@ -719,7 +681,6 @@ public:
      * @param  col       Column
      * @param  lin       Line
      * @param  slc       Slice
-     *
      * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     T                  
@@ -749,80 +710,40 @@ public:
 
 
     /**
-     * @name            Partial access functions.
+     * @name            Partial copy functions.
      *                  Functions for access to parts of data.
      */
     
     //@{
     
     /**
-     * @brief           Get a vector with as copy of line l of this Matrix, i.e. this(l,:).
-     *                  NOT IMPLEMETED YET
-     *
-     * @param  lin      Requested line.
-     * @return          Vector copied from requested row.
+     * @brief            Operates only on inner 2D: Get a Row of data
+     *  
+     * @param  r         Row
+     * @return           Copy data into new vector
      */
-    Matrix<T>          
-    lin                 (const int lin)                             const;
-    
+    Matrix <T>           
+    Row                  (int r);
+	
     
     /**
-     * @brief           Get a matrix as a copy of lines l[i] of this matrix, i.e. this(l,:);
-     *                  NOT IMPLEMETED YET
-     *
-     * @param  lin      Requested rows.
-     * @return          Matrix copied from requested rows.
+     * @brief            Operates only on inner 2D: Get a Row of data
+     *  
+     * @param  c         Column
+     * @return           Copy data into new vector
      */
-    Matrix<T>           
-    lin                 (Matrix<int> lin)                     const;
-    
-    
+    Matrix <T>           
+    Column               (int c);
+	
     /**
-     * @brief           Get a vector with as copy of column c of this Matrix, i.e. this(:,c).
-	 *                  NOT IMPLEMETED YET
-     *
-     * @param  col      Requested column.
-     * @return          Vector copied from requested column.
+     * @brief            Operates only on inner 3D: Get a slice of data
+     *  
+     * @param  s         Slice
+     * @return           Copy data into new matrix and return
      */
-    Matrix<T>           
-    col                 (const int col)                             const;
-    
-    
-    /**
-     * @brief           Get a matrix as a copy of columns c[i] of this matrix, i.e. this(:,c);
-     *                  NOT IMPLEMETED YET
-     *
-     * @param  col      Requested rows.
-     * @return          Matrix copied from requested columns.
-     */
-    Matrix<T>           
-    col                 (Matrix<int> col)                     const;
-
-
-    /**
-	 * @brief           Get one or more elements of a vector, i.e. this(p).
-	 *                  NOT IMPLEMENTED YET
-	 *
-	 * @param  p        Requested positions
-	 * @return          Vector of requested elements.
-	 */
-	Matrix<T>
-	operator()          (Matrix<int> &p)                    const;
-
-
-	/**
-	 * @brief           Get one or more elements of a matri, i.e. this=[1 2 3;4 5 6;7 8 9],
-	 *                  m1=[2], m2=[1 3], returns [2 8]. NOT IMPLEMENTED YET.
-	 *
-	 * @param  col      Requested columns.
-	 * @param  lin      Requested lines.
-	 * @return          matrix of requested elements.
-	 */
-	Matrix<T>
-	operator()          (Matrix<int> &col, Matrix<int> &lin)  const;
-
-
-
+    Matrix <T>           
+    Slice                (int s);
+	
 
 	//@}
     
@@ -843,7 +764,7 @@ public:
     
     
     /**
-     * @brief           Get number of rows, i.e. tmp = size(this); tmp(1).
+     * @brief           Get refernce to number of rows, i.e. tmp = size(this); tmp(1).
      *
      * @return          Number of rows.
      */
@@ -861,7 +782,7 @@ public:
     
     
     /**
-     * @brief           Get number of columns, i.e. tmp = size(this); tmp(2).
+     * @brief           Get reference number of columns, i.e. tmp = size(this); tmp(2).
      *
      * @return          Number of columns.
      */
@@ -897,7 +818,7 @@ public:
     
     
     /**
-     * @brief           Get size a given dimension.
+     * @brief           Get reference to size a given dimension.
      *
      * @return          Number of rows.
      */
@@ -906,18 +827,18 @@ public:
     
     
     /**
-     * @brief           Get size a given dimension.
+     * @brief           Get dimension array
      *
-     * @return          Number of rows.
+     * @return          All dimensions
      */
     inline const int*   
     Dim                 ()                                     const {return _dim;}
     
 
     /**
-     * @brief           Get size a given dimension.
-     *
-     * @return          Number of rows.
+     * @brief           Reset all dimensions to values in dim
+	 *
+	 * @param  dim      New dimensions
      */
     inline void         
     Dim                 (const int* dim)                                     const {
@@ -927,7 +848,9 @@ public:
     
     
     /**
-     * @brief           Resize to dims, reallocate and zero repository
+     * @brief           Resize to dims, reallocate and zero repository. 
+	 *                  Needs to becalled after any resize operation on dimensios. 
+	 *                  (i.e. M.Dim(2) = 10; Reset();)
      *
      * @param  dim      New dimensions
      */
@@ -982,8 +905,7 @@ public:
 		_M = (T*) malloc (Size() * sizeof (T));
         nb_alloc++;
 
-		for (int i = 0; i < Size(); i++)
-			_M[i] = (T) 0;
+		Zero();
 
     }
     
@@ -1025,6 +947,15 @@ public:
      */
     bool                
     Is3D                ()                                    const;
+    
+    
+    /**
+     * @brief           Check if we are 4D (i.e. COL, LIN, SLC)
+     *
+     * @return          3D matrix?
+     */
+    bool                
+    Is4D                ()                                    const;
     
     
     /**
@@ -1094,7 +1025,9 @@ public:
     
     
     /**
-     * @brief           Substruct from 0. i.e. 0 - this.
+     * @brief           Negate or substruct from 0. i.e. 0 - this.
+	 *
+	 * @return          Negation
      */
     Matrix<T>           
     operator-           ();
@@ -1120,6 +1053,8 @@ public:
     
     /**
      * @brief           Add to 0
+	 *
+	 * @return          M+0;
      */
     Matrix<T>           
     operator+           ();
@@ -1127,6 +1062,8 @@ public:
     
     /**
      * @brief           Transposition / Complex conjugation. i.e. this'.
+	 *
+	 * @return          Matrix::tr()
      */
     Matrix<T>           
     operator!           () const;
@@ -1134,6 +1071,9 @@ public:
     
     /**
      * @brief           Return a matrix with result[i] = (m[i] ? this[i] : 0).
+	 *
+	 * @param           The operand
+	 * @return          Cross-section or zero
      */
     Matrix<T>           
     operator&           (Matrix<bool> &M);
@@ -1143,7 +1083,7 @@ public:
      * @brief           Scalar equality. result[i] = (this[i] == m).
      *
      * @param  s        Comparing scalar.
-     * @return          True if and only if all elements of the matrix equal s.
+     * @return          Matrix of true where elements are equal s and false else.
      */
     Matrix<bool>        
     operator==          (T s);
@@ -1153,6 +1093,7 @@ public:
      * @brief           Scalar inequality. result[i] = (this[i] != m). i.e. this ~= m
      *
      * @param  s        Comparing scalar.
+	 * @param           Matrix of false where elements are equal s and true else.
      */
     Matrix<bool>        
     operator!=          (T s);
@@ -1162,6 +1103,7 @@ public:
      * @brief           Scalar greater comaprison, result[i] = (this[i] > m). i.e. this > m
      *
      * @param  s        Comparing scalar.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator>           (T s);
@@ -1171,6 +1113,7 @@ public:
      * @brief           Scalar greater or equal comparison. result[i] = (this[i] >= m). i.e. this >= m
      *
      * @param  s        Comparing scalar.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator>=          (T s);
@@ -1180,6 +1123,7 @@ public:
      * @brief           Scalar minor or equal comparison. result[i] = (this[i] <= m). i.e. this <= m
      *
      * @param  s        Comparing scalar.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator<=          (T s);
@@ -1189,6 +1133,7 @@ public:
      * @brief           Scalar minor or equal comparison. result[i] = (this[i] < m). i.e. this < m
      *
      * @param  s        Comparing scalar.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator<           (T s);
@@ -1198,6 +1143,7 @@ public:
      * @brief           Elementwise equality, result[i] = (this[i] == m[i]). i.e. this == m
      *
      * @param  M        Comparing matrix.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator==          (Matrix<T> M);
@@ -1207,6 +1153,7 @@ public:
      * @brief           Elementwise equality, result[i] = (this[i] != m[i]). i.e. this ~= m
      *
      * @param  M        Comparing matrix.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator!=          (Matrix<T> M);
@@ -1216,6 +1163,7 @@ public:
      * @brief           Matrix comparison, result[i] = (this[i] >= m[i]). i.e. this >= m
      *
      * @param  M        Comparing matrix.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator>=          (Matrix<T> M);
@@ -1224,6 +1172,8 @@ public:
     /**
      * @brief           Matrix comparison, result[i] = (this[i] <= m[i]). i.e. this <= m.
      *
+     * @param  M        Comparing matrix.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator<=          (Matrix<T> M);
@@ -1233,6 +1183,7 @@ public:
      * @brief           Matrix comparison, result[i] = (this[i] > m[i]). i.e. this > m.
      *
      * @param  M        Comparing matrix.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator>           (Matrix<T> M);
@@ -1242,6 +1193,7 @@ public:
      * @brief           Matrix comparison, result[i] = (this[i] < m[i]). i.e. this < m.
      *
      * @param  M        Comparing matrix.
+	 * @return          Hit list
      */
     Matrix<bool>        
     operator<           (Matrix<T> M);
@@ -1251,6 +1203,7 @@ public:
      * @brief           Matrix comparison, tel que result[i] = (m[i] || this[i] ? 1 : 0). i.e. this | m.
      *
      * @param  M        Comparing matrix.
+	 * @return          Hit list
      */
     Matrix<T>           
     operator||          (Matrix<T> M);
@@ -1260,6 +1213,7 @@ public:
      * @brief           Matrix comparison, tel que result[i] = (m[i] && this[i] ? 1 : 0). i.e. this & m.
      *
      * @param  M        Comparing matrix.
+	 * @return          Hit list
      */
     Matrix<T>           
     operator&&          (Matrix<T> &M);
@@ -1268,7 +1222,8 @@ public:
     /**
      * @brief           Elementwise raise of power. i.e. this .^ p.
      *
-     * @param  p        Exponent.
+     * @param  M        Comparing matrix.
+	 * @return          Hit list
      */
     Matrix<T>           
     operator^           (int p);
@@ -1290,53 +1245,55 @@ public:
     /**
      * @brief           Fill with random data
      */
-    /**
-     * @brief           Resize to dim and zero
-     */
     inline void         
 	Random               ();    
 
 
     /**
-     * @brief           Matrix multiplication. i.e. this * M.
+     * @brief           Elementwise multiplication. i.e. this .* M.
      *
-     * @param  M        The factor.
+     * @param  M        Factor matrix.
+	 * @retrun          Result
      */
     Matrix<T>           
     operator*           (Matrix<T> &M);
 
 
     /**
-     * @brief           Assignment operator. i.e. this = m.
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
      *
-     * @param  M        The assigned matrix.
+     * @param  M        Factor matrix.
+	 * @retrun          Result
      */
     Matrix<T>           
     operator*=           (Matrix<T> &M);
     
     
     /**
-     * @brief           Assignment operator. i.e. this = m.
+     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
      *
-     * @param  M        The assigned matrix.
+     * @param  s        Factor scalar.
+	 * @retrun          Result
      */
     Matrix<T>           
     operator*=           (T s);
     
     
     /**
-     * @brief           Assignment operator. i.e. this = m.
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
      *
-     * @param  M        The assigned matrix.
+     * @param  M        Added matrix.
+	 * @retrun          Result
      */
     Matrix<T>           
     operator+=           (Matrix<T> &M);
     
     
     /**
-     * @brief           Assignment operator. i.e. this = m.
+     * @brief           ELementwise addition with scalar and assignment operator. i.e. this = m.
      *
-     * @param  M        The assigned matrix.
+     * @param  s        Added scalar.
+	 * @retrun          Result
      */
     Matrix<T>           
     operator+=           (T s);
@@ -1344,22 +1301,29 @@ public:
     
     /**
      * @brief           Elementwise multiplication with a scalar. i.e. this * m.
+	 *
+	 * @param  s        Factor scalar
+	 * @return          Result
      */
     Matrix<T>           
     operator*           (T s);
 
     
     /**
-     * @brief           Matrix multiplication. i.e. this * M.
+     * @brief           Elelemtwise division by M.
      *
-     * @param  M        The factor.
+     * @param  M        The divisor.
+	 * @return          Result
      */
     Matrix<T>           
     operator/           (Matrix<T> &M);
 
     
     /**
-     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
+     * @brief           Elementwise division by scalar. i.e. this * m.
+	 *
+     * @param  s        The divisor.
+	 * @return          Result
      */
     Matrix<T>           
     operator/           (T s);
@@ -1405,7 +1369,7 @@ public:
     
 
     /**
-     * @brief           Dump binary matrix column-major.
+     * @brief           Dump to HDF5 file.
      * 
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
@@ -1417,7 +1381,7 @@ public:
     
 
     /**
-     * @brief           Read in binary matrix column-major.
+     * @brief           Read from HDF5 file.
      *
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
@@ -1752,21 +1716,19 @@ Matrix<T>::Matrix (const int* dim) {
 
 
 template <class T>
-Matrix<T>::Matrix (const Matrix<T> &M)
-{
-
+Matrix<T>::Matrix (const Matrix<T> &M) {
+	
 	nb_alloc = 0;
-
+	
 	for (int i = 0; i < INVALID_DIM; i++) 
 		_dim[i] = M.Dim(i);
-
+	
 	_M = (T*) malloc (Size() * sizeof (T));
-
-	for (int k = 0; k < M.Size(); k++)
-		_M[k] = M[k];
+	
+	memcpy (_M, M.Data(), Size() * sizeof(T));
 	
 	nb_alloc++;
-
+	
 }
 
 
@@ -1912,35 +1874,6 @@ template <class T> T
     
     return _M[p];
     
-}
-
-
-template <class T> Matrix<T>   
-Matrix<T>::operator()(Matrix<int> &m) const {
-    
-    VECT(&m);
-    
-    Matrix<T> res(1, m.Size());
-    
-    for (int i = 0; i < res.Size(); i++)
-        res[i] = (*this)[m[i]];
-    
-    return res;
-
-}
-
-
-template <class T> Matrix<T> 
-Matrix<T>::operator() (Matrix<int> &m1, Matrix<int> &m2) const {
-
-    Matrix<T> res(m1.Size(),  m2.Size());
-    
-    for (int i = 0; i < m1.Size(); i++)
-        for (int j = 0; j < m2.Size(); j++)
-            res[i * m2.Size() + j] = _M[m1[i] * _dim[LIN] + m2[j]];
-    
-    return res;
-	
 }
 
 

@@ -1,5 +1,5 @@
 AC_PREREQ([1.10])
-AC_INIT([jrrs], [0.9], [k.vahedipour@fz-juelich.cd])
+AC_INIT([jrrs], [0.9], [k.vahedipour@fz-juelich.de])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([config])
@@ -113,6 +113,41 @@ AC_TRY_LINK([#include "src/RRSModule.hh"],
 if test -z $omniORB4_found; then
     LIBS="${LIBS} -lomniORB4"
 fi
+
+
+AC_ARG_WITH(matlabroot,[  --with-matlabroot       path to MATLAB install dir], 
+        [], [with_matlabroot=no])
+
+if test x"$with_matlabroot" != x"no" ; then
+
+    MATLAB_ROOT="$with_matlabroot"
+    MATLAB_LIB_PATH="${MATLAB_ROOT}/bin"
+
+	AC_MSG_CHECKING([for MATFile in -lmat -lmx])
+
+	OLD_LIBS=$LIBS
+	CXXFLAGS="${CXXFLAGS} -I${MATLAB_ROOT}/extern/include"
+
+    case $host in
+        *darwin*)
+            MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/maci64"
+        ;;
+		*x86_64*linux*)
+		    MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/gnlx64"
+		;;
+    esac
+
+	LIBS="${LIBS} -L${MATLAB_LIB_PATH} -Wl,-rpath,${MATLAB_LIB_PATH} -lmat -lmx"
+
+	AC_TRY_LINK([#include "mat.h"],
+        [MATFile *pmat;],
+   		[AC_MSG_RESULT([yes])]
+   		matlab_found=yes,
+   		[LIBS=$OLD_LIBS]
+   		[AC_MSG_ERROR([no. cannot link to libmat, bailing out])])
+
+fi
+
 
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
 case $withval in
