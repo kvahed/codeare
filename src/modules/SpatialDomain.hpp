@@ -114,7 +114,7 @@ NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* res
     for (int i=0; i < target->Size(); i++)
         q += pow(abs(target->At(i)) - abs(result->At(i)), 2.0);
     
-    q = sqrt(q)/target->norm().real();
+    q = sqrt(q)/target->Norm().real();
     
 	if (iter % 5 == 0 && iter > 0)
 		printf ("\n");

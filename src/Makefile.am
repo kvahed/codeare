@@ -6,7 +6,7 @@
 	omniidl -bcxx $<
 
 # Binaries 
-bin_PROGRAMS = testclt reconserver
+bin_PROGRAMS = testclt reconserver test
 
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
@@ -22,6 +22,9 @@ SERVER_SIDE =  Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServ
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
 testclt_LDFLAGS = $(BLAS) $(LAPACK) 
+
+test_SOURCES = $(COMMON) $(CLIENT_SIDE) test.cpp
+test_LDFLAGS = $(BLAS) $(LAPACK) 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp

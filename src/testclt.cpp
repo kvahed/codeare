@@ -53,6 +53,7 @@ bool cgsensetest (ReconClient* rc);
 bool nuffttest (ReconClient* rc);
 bool sdmtest (ReconClient* rc);
 bool mxtest (ReconClient* rc);
+bool fftwtest (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
@@ -70,6 +71,8 @@ int main (int argc, char** argv) {
 			sdmtest (&client);
 		else if (strcmp (test, "mxtest") == 0)
 			mxtest (&client);
+		else if (strcmp (test, "fftwtest") == 0)
+			fftwtest (&client);
 		else
 			internaltest (&client);
 			
@@ -297,10 +300,36 @@ bool internaltest (ReconClient* rc) {
 	
 }
 
+bool fftwtest (ReconClient* rc) {
+
+	std::string in  = std::string (base + std::string ("/infft.h5"));
+	std::string out = std::string (base + std::string ("/outfft.h5"));
+	
+	Matrix<raw> m;
+
+	m.read (in, "img");
+	m = m.fft();
+	m = m.ifft();
+	m.dump (out, "img");
+
+	return true;
+
+}
+
 bool mxtest (ReconClient* rc) {
 
-	//Matrix<double> m = Matrix<double>::Id(4);
-	//m.mxdump(std::string("test.mat"), std::string("imat"), std::string(""));
+	Matrix<double> in (3,5);
+	in.Random ();
+
+	std::cout << in << std::endl << std::endl;
+
+	in.mxdump(std::string("test.mat"), std::string("imat"), std::string(""));
+
+	Matrix<double> out;
+	out.mxread(std::string("test.mat"), std::string("imat"), std::string(""));
+
+	std::cout << out << std::endl << std::endl;
+
 
 	Matrix<raw> r1 (4,8);
 	r1.Random ();
@@ -309,7 +338,7 @@ bool mxtest (ReconClient* rc) {
 
 
 	r1.mxdump (std::string("rtest.mat"), std::string("rmat"), std::string(""));
-
+	
 	Matrix<raw> r2;
 	r2.mxread (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	

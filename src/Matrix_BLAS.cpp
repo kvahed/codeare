@@ -73,7 +73,7 @@ Matrix<T>::GEMM (Matrix<T>& M, char transb) {
 
 template<class T>
 T
-Matrix<T>::norm () const {
+Matrix<T>::Norm () const {
 	
 	T   res   = T(0.0);
 	
