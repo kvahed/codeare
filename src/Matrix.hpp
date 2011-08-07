@@ -28,11 +28,9 @@
   #include     "MrServers/MrVista/include/Parc/Trace/IceTrace.h"
 
 #else
-
 enum IceDim {
     COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE, INVALID_DIM
 };
-
 #endif
 
 #include "modules/OMP.hpp"
@@ -46,7 +44,7 @@ enum IceDim {
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <config.h>
+#include "config.h"
 #include <limits.h>
 
 #ifdef HAVE_H5CPP_H
@@ -115,6 +113,9 @@ typedef std::complex<float> raw;
     #define RGAMMA 267.513
 #endif
 
+#define KB 1024.0;
+#define MB 1024.0 * 1024.0;
+#define GB 1024.0 * 1024.0 * 1024.0;
 
 /**
  * @brief   Matrix template.
@@ -707,8 +708,6 @@ public:
     
 
 
-
-
     /**
      * @name            Partial copy functions.
      *                  Functions for access to parts of data.
@@ -868,14 +867,13 @@ public:
         _M = (T*) malloc (Size()*sizeof(T));
         nb_alloc++;
 
-		for (int i = 0; i < Size(); i++)
-			_M[i] = (T) 0;
+		Zero();
 
     }
     
 
     /**
-     * @brief           Clear matrix. Purge data.
+     * @brief           Purge data and free RAM.
      */
     inline void         
     Clear               ()                                      {
@@ -929,6 +927,15 @@ public:
      */
     long                
     Size                ()                                    const;
+    
+    
+    /**
+     * @brief           Check if we are 2D (i.e. COL, LIN)
+     *
+     * @return          2D matrix?
+     */
+    bool                
+    Is1D                ()                                    const;
     
     
     /**
@@ -1200,7 +1207,7 @@ public:
     
     
     /**
-     * @brief           Matrix comparison, tel que result[i] = (m[i] || this[i] ? 1 : 0). i.e. this | m.
+     * @brief           Matrix comparison, result[i] = (m[i] || this[i] ? 1 : 0). i.e. this | m.
      *
      * @param  M        Comparing matrix.
 	 * @return          Hit list
@@ -1210,7 +1217,7 @@ public:
     
     
     /**
-     * @brief           Matrix comparison, tel que result[i] = (m[i] && this[i] ? 1 : 0). i.e. this & m.
+     * @brief           Matrix comparison, result[i] = (m[i] && this[i] ? 1 : 0). i.e. this & m.
      *
      * @param  M        Comparing matrix.
 	 * @return          Hit list
@@ -1226,7 +1233,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<T>           
-    operator^           (int p);
+    operator^           (float p);
     
 	//friend Matrix<T> operator+(Matrix<T> &a, Matrix<T> &b){return a+b;};
     //@}
@@ -1437,6 +1444,28 @@ public:
     bool                
     read                (std::string fname, std::string dname = "", std::string dloc = "/", std::string fmt = "h5");
     
+	/**
+	 * @brief 
+	 */
+	bool
+	rawread             (const std::string fname, const std::string version);
+
+	/**
+	 * @brief 
+	 */
+	bool
+	rsadjust            (const std::string fname);
+
+	/**
+	 * @brief           Skip lines in file
+	 *
+	 * @param  file     Position pointer in stream
+	 * @param  lines    Lines to skip
+	 * @return          New position
+	 */
+	std::fstream&
+	SkipLines           (const std::ifstream& file, const unsigned int num);
+
     //@}
     
     
@@ -1509,6 +1538,22 @@ public:
     tr   ()             const;
     
     /**
+     * @brief           Fourier transform over all dimensions.
+     *
+     * @return          Fourier transform.
+     */
+    Matrix<T>           
+    fft   ()            const;
+    
+    /**
+     * @brief           Inverse Fourier transform over all dimensions
+     *
+     * @return          Inverse Fourier transform.
+     */
+    Matrix<T>           
+    ifft   ()            const;
+    
+    /**
      * @brief           General inversion.
      *
      * @return          success
@@ -1530,7 +1575,7 @@ public:
      * @return          Norm
      */
 	T
-    norm ()             const;
+    Norm ()             const;
     
     /**
      * @brief           Dot product, complex, conjugate first vector
@@ -1601,199 +1646,6 @@ private:
 };
 
 
-template <class T> 
-Matrix<T>::Matrix () {
-
-	nb_alloc = 0;
-
-    for (int i = 0; i < INVALID_DIM; i++)
-        _dim [i] = 1;
-
-    _M = (T*) malloc (Size()*sizeof(T));
-
-	for (int i = 0; i < Size(); i++)
-		_M[i] = T(0.0);
-
-    nb_alloc++;
-
-
-}
-
-
-template <class T> 
-Matrix<T>::Matrix (const int n) {
-
-	nb_alloc = 0;
-
-	_dim [COL] = n;
-	_dim [LIN] = n;
-
-    for (int i = CHA; i < INVALID_DIM; i++)
-        _dim [i] = 1;
-
-    _M = (T*) malloc (n*n*sizeof(T));
-
-	for (int i = 0; i < Size(); i++)
-		_M[i] = T(0.0);
-
-    nb_alloc++;
-
-}
-
-
-template <class T> 
-Matrix<T>::Matrix (const int m, const int n) {
-
-	nb_alloc = 0;
-
-	_dim [0] = m;
-	_dim [1] = n;
-
-    for (int i = 2; i < INVALID_DIM; i++)
-        _dim [i] = 1;
-
-    _M = (T*) malloc (Size()*sizeof(T));
-
-	for (int i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
-
-    nb_alloc++;
-
-}
-
-
-template <class T> 
-Matrix<T>::Matrix (const int m, const int n, const int k) {
-
-	nb_alloc = 0;
-
-	_dim [0] = m;
-	_dim [1] = n;
-	_dim [2] = k;
-
-    for (int i = 3; i < INVALID_DIM; i++)
-        _dim [i] = 1;
-
-    _M = (T*) malloc (Size()*sizeof(T));
-
-	for (int i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
-
-    nb_alloc++;
-
-}
-
-
-template <class T> 
-Matrix<T>::Matrix (const int m, const int n, const int k, const int l) {
-
-	nb_alloc = 0;
-
-	_dim [0] = m;
-	_dim [1] = n;
-	_dim [2] = k;
-	_dim [3] = l;
-	
-    for (int i = 4; i < INVALID_DIM; i++)
-        _dim [i] = 1;
-
-    _M = (T*) malloc (Size()*sizeof(T));
-
-	for (int i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
-
-    nb_alloc++;
-
-}
-
-
-template <class T>
-Matrix<T>::Matrix (const int col, const int lin, const int cha, const int set, 
-                   const int eco, const int phs, const int rep, const int seg, 
-                   const int par, const int slc, const int ida, const int idb, 
-                   const int idc, const int idd, const int ide, const int ave) {
-
-	nb_alloc = 0;
-
-    _dim[COL] = col;
-    _dim[LIN] = lin;
-    _dim[CHA] = cha;
-    _dim[SET] = set;
-    _dim[ECO] = eco;
-    _dim[PHS] = phs;
-    _dim[REP] = rep;
-    _dim[SEG] = seg;
-    _dim[PAR] = par;
-    _dim[SLC] = slc;
-    _dim[IDA] = ida;
-    _dim[IDB] = idb;
-    _dim[IDC] = idc;
-    _dim[IDD] = idd;
-    _dim[IDE] = ide;
-    _dim[AVE] = ave;
-
-    _M = (T*) malloc (Size() * sizeof (T));
-
-	for (int i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
-
-    nb_alloc++;
-
-
-}
-
-
-template <class T>
-Matrix<T>::Matrix (const int* dim) {
-
-	nb_alloc = 0;
-
-	for (int i = 0; i < INVALID_DIM; i++)
-		_dim[i] = dim[i];
-
-    _M = (T*) malloc (Size() * sizeof (T));
-
-	for (int i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
-
-    nb_alloc++;
-
-}
-
-
-template <class T>
-Matrix<T>::Matrix (const Matrix<T> &M) {
-	
-	nb_alloc = 0;
-	
-	for (int i = 0; i < INVALID_DIM; i++) 
-		_dim[i] = M.Dim(i);
-	
-	_M = (T*) malloc (Size() * sizeof (T));
-	
-	memcpy (_M, M.Data(), Size() * sizeof(T));
-	
-	nb_alloc++;
-	
-}
-
-
-template <class T> 
-Matrix<T>::~Matrix() {
-    
-#ifdef PARC_MODULE_NAME
-    ICE_SET_FN ("Matrix<T>::~Matrix()")
-    ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
-#endif
-
-    if (nb_alloc) {
-    	free (_M);
-        nb_alloc--;
-    }
-    
-}
-
-
 template <class T> Matrix<T> 
 Matrix<T>::Slice (int s) {
     
@@ -1842,44 +1694,6 @@ Matrix<T>::Column (int c) {
 }
 
 
-template <class T> Matrix<T> 
-Matrix<T>::operator/(Matrix<T> &M) {
-
-    Matrix<T> res;
-
-	for (int j = 0; j < INVALID_DIM; j++)
-		res.Dim(j) = _dim[j];
-
-	res.Reset();
-
-	for (int i = 0; i < Size(); i++)
-		(M[i] != (T)0) ? res[i] = _M[i] / M[i] : 0;
-
-	return res;
-
-}
-
-
-template <class T> Matrix<T> 
-Matrix<T>::operator/ (T s) {
-    
-	assert (s != (T)0);
-
-    Matrix<T> res;
-
-	for (int j = 0; j < INVALID_DIM; j++)
-		res.Dim(j) = _dim[j];
-
-	res.Reset();
-
-	for (int i = 0; i < Size(); i++)
-		res[i] = _M[i] * s;
-
-	return res;
-
-}
-
-
 template <class T> long 
 Matrix<T>::Size() const {
     
@@ -1898,39 +1712,6 @@ Matrix<T>::SizeInRAM() const {
     
     return Size() * sizeof(T);
     
-}
-
-
-template <class T> T           
-Matrix<T>::operator[]  (const int p) const {
-    
-    assert(p >= 0);
-    assert(p <  Size());
-    
-    return _M[p];
-    
-}
-
-
-template <class T> T           
-&Matrix<T>::operator[] (const int p) {
-    
-    assert(p >= 0);
-    assert(p <  Size());
-    
-    return _M[p];
-    
-}
-
-
-template <class T>
-T Matrix<T>::operator() (int a) const {
-
-    assert(a >= 0);
-    assert(a <  Size());
-
-    return _M[a];
-
 }
 
 
@@ -2008,80 +1789,6 @@ T  Matrix<T>::Minabs() {
 }
 
 template <class T>
-static T power(T p, int b) {
-
-    assert(b > 0);
-
-    T res = p;
-
-    b--;
-
-    while (b > 0) {
-        res *= p;
-        b--;
-    }
-
-    return res;
-
-}
-
-
-template <class T>
-Matrix<T> Matrix<T>::Id (const int n) {
-
- 	static Matrix<T> M (n);
-
- 	for (int i = 0; i < n; i++)
- 		M[i*n+i] = T(1.0);
-
- 	return M;
-
-}
-
-
-template <class T>
-Matrix<T> Matrix<T>::Ones (const int m, const int n) {
-
- 	static Matrix<T> M (m,n);
-
- 	for (int i = 0; i < Size(); i++)
- 		M[i] = T(1.0);
-
- 	return M;
-
-}
-
-
-template <class T>
-Matrix<T> Matrix<T>::Ones (const int n) {
-
- 	return Ones(n,n);
-
-}
-
-
-template <class T>
-Matrix<T> Matrix<T>::Zeros (const int n, const int m) {
-
- 	static Matrix<T> M (m,n);
-
- 	for (int i = 0; i < Size(); i++)
- 		M[i] = T(0.0);
-
- 	return M;
-
-}
-
-
-template <class T>
-Matrix<T> Matrix<T>::Zeros (const int n) {
-
- 	return Zeros(n,n);
-
-}
-
-
-template <class T>
 Matrix<T> Matrix<T>::tr() const {
 
     Matrix<T> res (_dim);
@@ -2133,6 +1840,17 @@ inline void Matrix<short>::Random () {
 
     
 template <class T> 
+inline bool Matrix<T>::Is1D () const {
+	
+	for (int i = 1; i < INVALID_DIM; i++)
+		if (_dim[i] != 1) 
+			return false;
+
+	return true;
+
+}
+
+template <class T> 
 inline bool Matrix<T>::Is2D () const {
 	
 	for (int i = 2; i < INVALID_DIM; i++)
@@ -2146,22 +1864,31 @@ inline bool Matrix<T>::Is2D () const {
 template <class T> 
 inline bool Matrix<T>::Is3D () const {
 	
-	for (int i = 2;       i < SLC;         i++)
+	for (int i = 3; i < INVALID_DIM; i++)
 		if (_dim[i] != 1) 
 			return false;
-
-	for (int j = SLC + 1; j < INVALID_DIM; j++)
-		if (_dim[j] != 1) 
-			return false;
-
+	
 	return true;
 
 }
 
+template <class T> 
+inline bool Matrix<T>::Is4D () const {
+	
+	for (int i = 4; i < INVALID_DIM; i++)
+		if (_dim[i] != 1) 
+			return false;
+	
+	return true;
+
+}
+
+#include "Matrix_Constructors.hpp"
 #include "Matrix_IO.cpp"
 #include "Matrix_Lapack.cpp"
 #include "Matrix_Operators.cpp"
 #include "Matrix_BLAS.cpp"
 #include "Matrix_ICE.cpp"
+#include "Matrix_FFT.hpp"
 
 #endif // __MATRIX_H__

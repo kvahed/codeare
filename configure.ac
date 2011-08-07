@@ -1,14 +1,21 @@
 AC_PREREQ([1.10])
 AC_INIT([jrrs], [0.9], [k.vahedipour@fz-juelich.de])
 AC_CONFIG_SRCDIR([src])
-AC_CONFIG_AUX_DIR(config)
+
+# m4 macros
 AC_CONFIG_MACRO_DIR([config])
+
+# where to put auxilliary files
+AC_CONFIG_AUX_DIR([config])
+
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([foreign])
 LT_INIT([dlopen])
 # Revision string
 define([svnversion], esyscmd([sh -c "svnversion|tr -d '\n'"]))dnl
 AC_DEFINE(SVN_REVISION, "svnversion", [SVN Revision])
+# copyright notice
+AC_COPYRIGHT([2010, 2011, Kaveh Vahedipour])
 
 # Produce first version of idl derivates
 esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
@@ -27,17 +34,36 @@ AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_SIZE_T
 
-AC_CHECK_FUNCS([isnan])
+# canonical host system type string
+AC_CANONICAL_HOST
+
+# enable "const" keyword                                                                                                                              
+AC_C_CONST
+
+# enable "restrict" keyword                                                                                                                           
+AC_C_RESTRICT
+
+# enable "inline" keyword                                                                                                                             
+AC_C_INLINE
+
+# Compiler vendor (Courtesy fftw)  
+AX_COMPILER_VENDOR
+
+#
+AC_CHECK_FUNCS([isnan isinf])
 
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
 AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
-AC_CHECK_HEADERS([ctype.h],          [], [AC_MSG_ERROR([cannot find ctype, bailing out])])
+AC_CHECK_HEADERS([ctype.h],          [], [AC_MSG_ERROR([cannot find ctype.h, bailing out])])
+AC_CHECK_HEADERS([typeinfo],         [], [AC_MSG_ERROR([cannot find typeinfo, bailing out])])
+
 AC_CHECK_HEADERS([fstream],          [], [AC_MSG_ERROR([cannot find fstream, bailing out])])
 AC_CHECK_HEADERS([iostream],         [], [AC_MSG_ERROR([cannot find iostream, bailing out])])
 AC_CHECK_HEADERS([limits.h],         [], [AC_MSG_ERROR([cannot find limits.h, bailing out])])
-AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find cstdlib, bailing out])])
-AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find ctime, bailing out])])
+AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdio.h, bailing out])])
+AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdlib.h, bailing out])])
+AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find string.h, bailing out])])
 AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
 AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/CORBA.h, bailing out])])
 AC_CHECK_HEADERS([nfft3.h],          [], [AC_MSG_RESULT([cannot find nfft3.h, NuFFT/CGSENSE unavailable!])])
@@ -51,7 +77,8 @@ AC_CHECK_LIB([omnithread],   [read],        [], [AC_MSG_ERROR([cannot find libom
 AC_CHECK_LIB([omniDynamic4], [main],        [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
 AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libz, bailing out])])
-AC_CHECK_LIB([fftw],         [fftw_create_plan], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+#AC_CHECK_LIB([fftw],         [fftw_create_plan], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+AC_CHECK_LIB([fftw3f],        [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftwf, bailing out])])
 case "$host" in
   *darwin*)
 #AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libsz, bailing out])])
@@ -150,7 +177,6 @@ if test x"$with_matlabroot" != x"no" ; then
    		[AC_MSG_ERROR([no. cannot link to libmat, bailing out])])
 
 fi
-
 
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
 case $withval in
