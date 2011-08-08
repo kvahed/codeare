@@ -10690,7 +10690,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"293:305M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"293:307M\"" >>confdefs.h
 
 # copyright notice
 
@@ -16246,7 +16246,7 @@ LIBS=$SAVE_LIBS
 
 
 # Checks for library functions.
-ac_config_files="$ac_config_files Makefile doc/Makefile src/Makefile src/modules/Makefile src/Loader.hpp"
+ac_config_files="$ac_config_files src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -17320,11 +17320,12 @@ do
     "src/config.h") CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
+    "src/Loader.hpp") CONFIG_FILES="$CONFIG_FILES src/Loader.hpp" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/modules/Makefile") CONFIG_FILES="$CONFIG_FILES src/modules/Makefile" ;;
-    "src/Loader.hpp") CONFIG_FILES="$CONFIG_FILES src/Loader.hpp" ;;
+    "src/tinyxml/Makefile") CONFIG_FILES="$CONFIG_FILES src/tinyxml/Makefile" ;;
 
   *) as_fn_error "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

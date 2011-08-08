@@ -7,10 +7,11 @@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la RelativeSensitivities.la
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la RelativeSensitivities.la 
 
+COMMON = ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp
 # Common linker flags
-COMMON_la_LDFLAGS = ../tinyxml/libtinyxml.la -ltinyxml -module
+COMMON_la_LDFLAGS = -module
 
 # Libraries
 DummyRecon_la_SOURCES = $(COMMON) DummyRecon.hpp DummyRecon.cpp

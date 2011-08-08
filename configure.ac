@@ -307,6 +307,6 @@ LIBS=$SAVE_LIBS
 
 
 # Checks for library functions.
-AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile src/modules/Makefile src/Loader.hpp])
+AC_CONFIG_FILES([src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile])
 AC_OUTPUT
 

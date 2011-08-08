@@ -73,55 +73,57 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 CGSENSE_la_LIBADD =
-am_CGSENSE_la_OBJECTS = CGSENSE.lo nfftstub.lo
+am__objects_1 = tinystr.lo tinyxml.lo tinyxmlerror.lo tinyxmlparser.lo
+am_CGSENSE_la_OBJECTS = $(am__objects_1) CGSENSE.lo nfftstub.lo
 CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
 CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
 DummyRecon_la_LIBADD =
-am_DummyRecon_la_OBJECTS = DummyRecon.lo
+am_DummyRecon_la_OBJECTS = $(am__objects_1) DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
 DummyRecon_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DummyRecon_la_LDFLAGS) $(LDFLAGS) -o $@
 DumpToFile_la_LIBADD =
-am_DumpToFile_la_OBJECTS = DumpToFile.lo
+am_DumpToFile_la_OBJECTS = $(am__objects_1) DumpToFile.lo
 DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
 DumpToFile_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) -o $@
 GenericRegrid_la_LIBADD =
-am_GenericRegrid_la_OBJECTS = GenericRegrid.lo
+am_GenericRegrid_la_OBJECTS = $(am__objects_1) GenericRegrid.lo
 GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
 GenericRegrid_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) $(LDFLAGS) -o $@
 LapackTests_la_LIBADD =
-am_LapackTests_la_OBJECTS = LapackTests.lo
+am_LapackTests_la_OBJECTS = $(am__objects_1) LapackTests.lo
 LapackTests_la_OBJECTS = $(am_LapackTests_la_OBJECTS)
 LapackTests_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(LapackTests_la_LDFLAGS) $(LDFLAGS) -o $@
 MedianFilter_OMP_la_LIBADD =
-am_MedianFilter_OMP_la_OBJECTS = MedianFilter_OMP.lo
+am_MedianFilter_OMP_la_OBJECTS = $(am__objects_1) MedianFilter_OMP.lo
 MedianFilter_OMP_la_OBJECTS = $(am_MedianFilter_OMP_la_OBJECTS)
 MedianFilter_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(MedianFilter_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
 NuFFT_la_LIBADD =
-am_NuFFT_la_OBJECTS = NuFFT.lo nfftstub.lo
+am_NuFFT_la_OBJECTS = $(am__objects_1) NuFFT.lo nfftstub.lo
 NuFFT_la_OBJECTS = $(am_NuFFT_la_OBJECTS)
 NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
 NuFFT_OMP_la_LIBADD =
-am_NuFFT_OMP_la_OBJECTS = NuFFT_OMP.lo nfftstub.lo
+am_NuFFT_OMP_la_OBJECTS = $(am__objects_1) NuFFT_OMP.lo nfftstub.lo
 NuFFT_OMP_la_OBJECTS = $(am_NuFFT_OMP_la_OBJECTS)
 NuFFT_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
 RelativeSensitivities_la_LIBADD =
-am_RelativeSensitivities_la_OBJECTS = RelativeSensitivities.lo
+am_RelativeSensitivities_la_OBJECTS = $(am__objects_1) \
+	RelativeSensitivities.lo
 RelativeSensitivities_la_OBJECTS =  \
 	$(am_RelativeSensitivities_la_OBJECTS)
 RelativeSensitivities_la_LINK = $(LIBTOOL) --tag=CXX \
@@ -129,13 +131,13 @@ RelativeSensitivities_la_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_CXXFLAGS) $(CXXFLAGS) $(RelativeSensitivities_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SpatialDomain_la_LIBADD =
-am_SpatialDomain_la_OBJECTS = SpatialDomain.lo
+am_SpatialDomain_la_OBJECTS = $(am__objects_1) SpatialDomain.lo
 SpatialDomain_la_OBJECTS = $(am_SpatialDomain_la_OBJECTS)
 SpatialDomain_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(SpatialDomain_la_LDFLAGS) $(LDFLAGS) -o $@
 SystemCmd_la_LIBADD =
-am_SystemCmd_la_OBJECTS = SystemCmd.lo
+am_SystemCmd_la_OBJECTS = $(am__objects_1) SystemCmd.lo
 SystemCmd_la_OBJECTS = $(am_SystemCmd_la_OBJECTS)
 SystemCmd_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -299,10 +301,10 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la RelativeSensitivities.la
-
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la RelativeSensitivities.la 
+COMMON = ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp
 # Common linker flags
-COMMON_la_LDFLAGS = ../tinyxml/libtinyxml.la -ltinyxml -module
+COMMON_la_LDFLAGS = -module
 
 # Libraries
 DummyRecon_la_SOURCES = $(COMMON) DummyRecon.hpp DummyRecon.cpp
@@ -434,6 +436,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpatialDomain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nfftstub.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinystr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxml.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlerror.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlparser.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -476,6 +482,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+tinystr.lo: ../tinyxml/tinystr.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinystr.lo -MD -MP -MF $(DEPDIR)/tinystr.Tpo -c -o tinystr.lo `test -f '../tinyxml/tinystr.cpp' || echo '$(srcdir)/'`../tinyxml/tinystr.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinystr.Tpo $(DEPDIR)/tinystr.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/tinystr.cpp' object='tinystr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinystr.lo `test -f '../tinyxml/tinystr.cpp' || echo '$(srcdir)/'`../tinyxml/tinystr.cpp
+
+tinyxml.lo: ../tinyxml/tinyxml.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxml.lo -MD -MP -MF $(DEPDIR)/tinyxml.Tpo -c -o tinyxml.lo `test -f '../tinyxml/tinyxml.cpp' || echo '$(srcdir)/'`../tinyxml/tinyxml.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxml.Tpo $(DEPDIR)/tinyxml.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/tinyxml.cpp' object='tinyxml.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxml.lo `test -f '../tinyxml/tinyxml.cpp' || echo '$(srcdir)/'`../tinyxml/tinyxml.cpp
+
+tinyxmlerror.lo: ../tinyxml/tinyxmlerror.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxmlerror.lo -MD -MP -MF $(DEPDIR)/tinyxmlerror.Tpo -c -o tinyxmlerror.lo `test -f '../tinyxml/tinyxmlerror.cpp' || echo '$(srcdir)/'`../tinyxml/tinyxmlerror.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxmlerror.Tpo $(DEPDIR)/tinyxmlerror.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/tinyxmlerror.cpp' object='tinyxmlerror.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlerror.lo `test -f '../tinyxml/tinyxmlerror.cpp' || echo '$(srcdir)/'`../tinyxml/tinyxmlerror.cpp
+
+tinyxmlparser.lo: ../tinyxml/tinyxmlparser.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxmlparser.lo -MD -MP -MF $(DEPDIR)/tinyxmlparser.Tpo -c -o tinyxmlparser.lo `test -f '../tinyxml/tinyxmlparser.cpp' || echo '$(srcdir)/'`../tinyxml/tinyxmlparser.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxmlparser.Tpo $(DEPDIR)/tinyxmlparser.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/tinyxmlparser.cpp' object='tinyxmlparser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlparser.lo `test -f '../tinyxml/tinyxmlparser.cpp' || echo '$(srcdir)/'`../tinyxml/tinyxmlparser.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
