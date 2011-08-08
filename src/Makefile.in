@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = testclt$(EXEEXT) reconserver$(EXEEXT) test$(EXEEXT)
+bin_PROGRAMS = testclt$(EXEEXT) reconserver$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Loader.hpp.in $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in
@@ -54,8 +54,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = options.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
-	tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
-	tinyxmlparser.$(OBJEXT) Toolbox.$(OBJEXT)
+	Toolbox.$(OBJEXT)
 am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	reconserver.$(OBJEXT)
@@ -65,12 +64,6 @@ reconserver_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(reconserver_LDFLAGS) $(LDFLAGS) -o $@
 am__objects_3 = ReconClient.$(OBJEXT) ReconContext.$(OBJEXT)
-am_test_OBJECTS = $(am__objects_1) $(am__objects_3) test.$(OBJEXT)
-test_OBJECTS = $(am_test_OBJECTS)
-test_LDADD = $(LDADD)
-test_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
-	$(test_LDFLAGS) $(LDFLAGS) -o $@
 am_testclt_OBJECTS = $(am__objects_1) $(am__objects_3) \
 	testclt.$(OBJEXT)
 testclt_OBJECTS = $(am_testclt_OBJECTS)
@@ -100,9 +93,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(reconserver_SOURCES) $(test_SOURCES) $(testclt_SOURCES)
-DIST_SOURCES = $(reconserver_SOURCES) $(test_SOURCES) \
-	$(testclt_SOURCES)
+SOURCES = $(reconserver_SOURCES) $(testclt_SOURCES)
+DIST_SOURCES = $(reconserver_SOURCES) $(testclt_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -266,7 +258,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp Toolbox.cpp
+COMMON = RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc Toolbox.cpp
 
 # Client side stuff
 CLIENT_SIDE = ReconClient.h ReconClient.cpp ReconContext.h ReconContext.cpp  ReconStrategy.hpp
@@ -276,16 +268,14 @@ SERVER_SIDE = Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServa
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
-testclt_LDFLAGS = $(BLAS) $(LAPACK) 
-test_SOURCES = $(COMMON) $(CLIENT_SIDE) test.cpp
-test_LDFLAGS = $(BLAS) $(LAPACK) 
+testclt_LDFLAGS = tinyxml/.libs/libtinyxml.a $(BLAS) $(LAPACK) 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
-reconserver_LDFLAGS = $(HDF5) -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
+reconserver_LDFLAGS = tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o $(HDF5) -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
-SUBDIRS = modules
+SUBDIRS = modules tinyxml
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -386,9 +376,6 @@ clean-binPROGRAMS:
 reconserver$(EXEEXT): $(reconserver_OBJECTS) $(reconserver_DEPENDENCIES) 
 	@rm -f reconserver$(EXEEXT)
 	$(reconserver_LINK) $(reconserver_OBJECTS) $(reconserver_LDADD) $(LIBS)
-test$(EXEEXT): $(test_OBJECTS) $(test_DEPENDENCIES) 
-	@rm -f test$(EXEEXT)
-	$(test_LINK) $(test_OBJECTS) $(test_LDADD) $(LIBS)
 testclt$(EXEEXT): $(testclt_OBJECTS) $(testclt_DEPENDENCIES) 
 	@rm -f testclt$(EXEEXT)
 	$(testclt_LINK) $(testclt_OBJECTS) $(testclt_LDADD) $(LIBS)
@@ -406,11 +393,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxml.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlerror.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlparser.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

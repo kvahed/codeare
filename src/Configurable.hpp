@@ -1,7 +1,7 @@
 #ifndef __CONFIGURABLE_HPP__
 #define __CONFIGURABLE_HPP__
 
-#include "tinyxml.h"
+#include "tinyxml/tinyxml.h"
 
 
 /**
