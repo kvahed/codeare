@@ -323,6 +323,8 @@ bool fftwtest (ReconClient* rc) {
 
 bool mxtest (ReconClient* rc) {
 
+#ifdef HAVE_MAT_H
+
 	Matrix<double> in (3,5);
 	in.Random ();
 
@@ -348,6 +350,12 @@ bool mxtest (ReconClient* rc) {
 	r2.mxread (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	
 	std::cout << r2 << std::endl << std::endl;
+
+#else
+
+	std::cout << "MATLAB root not set during configuration (--with-matlabroot).\n Test skipped." << std::endl;
+
+#endif
 
 	return true;
 

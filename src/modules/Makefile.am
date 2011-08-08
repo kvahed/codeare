@@ -4,15 +4,13 @@
 ../%SK.cc: ../%.idl
 	omniidl -bcxx $<
 
-COMMON = ../tinyxml.h ../tinyxml.cpp ../tinyxmlerror.cpp ../tinyxmlparser.cpp ../Toolbox.hpp ../Toolbox.cpp
-
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la RelativeSensitivities.la
 
 # Common linker flags
-COMMON_la_LDFLAGS = -module
+COMMON_la_LDFLAGS = ../tinyxml/libtinyxml.la -ltinyxml -module
 
 # Libraries
 DummyRecon_la_SOURCES = $(COMMON) DummyRecon.hpp DummyRecon.cpp
