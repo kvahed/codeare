@@ -11,7 +11,7 @@ bin_PROGRAMS = testclt reconserver
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON =  RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc Toolbox.cpp
+COMMON =  RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc Toolbox.cpp tinyxml/tinystr.cpp tinyxml/tinystr.h tinyxml/tinyxml.cpp tinyxml/tinyxml.h tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp 
 
 # Client side stuff
 CLIENT_SIDE =  ReconClient.h ReconClient.cpp ReconContext.h ReconContext.cpp  ReconStrategy.hpp
@@ -21,11 +21,11 @@ SERVER_SIDE =  Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServ
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
-testclt_LDFLAGS = tinyxml/.libs/libtinyxml.a $(BLAS) $(LAPACK) 
+testclt_LDFLAGS = $(BLAS) $(LAPACK) 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
-reconserver_LDFLAGS = tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o $(HDF5) -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
+reconserver_LDFLAGS = $(HDF5) -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc

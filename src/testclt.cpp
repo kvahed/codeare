@@ -54,6 +54,7 @@ bool nuffttest (ReconClient* rc);
 bool sdmtest (ReconClient* rc);
 bool mxtest (ReconClient* rc);
 bool fftwtest (ReconClient* rc);
+bool resetest (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
@@ -73,6 +74,8 @@ int main (int argc, char** argv) {
 			mxtest (&client);
 		else if (strcmp (test, "fftwtest") == 0)
 			fftwtest (&client);
+		else if (strcmp (test, "RelativeSensitivities") == 0)
+			resetest (&client);
 		else
 			internaltest (&client);
 			
@@ -317,6 +320,31 @@ bool fftwtest (ReconClient* rc) {
 	m = m.ifft();
 	m.dump (out, "img");
 
+	return true;
+
+}
+
+bool resetest (ReconClient* rc) {
+
+	Matrix< std::complex<float> > meas;
+
+	std::string cf = std::string (base + std::string (config));
+	std::string df = std::string (base + std::string   (data));
+	std::string of = std::string (df + ".h5");
+
+	meas.rawread (df, std::string("VB15"));
+
+	rc->ReadConfig (cf.c_str());
+	rc->Init(test);
+
+	rc->SetRaw (meas);
+	rc->Process(test);
+	rc->GetRaw (meas);
+	
+	rc->Finalise(test);
+
+	//	meas.dump (of);
+	
 	return true;
 
 }

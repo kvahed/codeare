@@ -54,7 +54,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = options.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
-	Toolbox.$(OBJEXT)
+	Toolbox.$(OBJEXT) tinystr.$(OBJEXT) tinyxml.$(OBJEXT) \
+	tinyxmlerror.$(OBJEXT) tinyxmlparser.$(OBJEXT)
 am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	reconserver.$(OBJEXT)
@@ -258,7 +259,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc Toolbox.cpp
+COMMON = RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc Toolbox.cpp tinyxml/tinystr.cpp tinyxml/tinystr.h tinyxml/tinyxml.cpp tinyxml/tinyxml.h tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp 
 
 # Client side stuff
 CLIENT_SIDE = ReconClient.h ReconClient.cpp ReconContext.h ReconContext.cpp  ReconStrategy.hpp
@@ -268,11 +269,11 @@ SERVER_SIDE = Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServa
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
-testclt_LDFLAGS = tinyxml/.libs/libtinyxml.a $(BLAS) $(LAPACK) 
+testclt_LDFLAGS = $(BLAS) $(LAPACK) 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
-reconserver_LDFLAGS = tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o $(HDF5) -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
+reconserver_LDFLAGS = $(HDF5) -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
 SUBDIRS = modules tinyxml
@@ -394,6 +395,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinystr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxml.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlerror.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlparser.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -415,6 +420,62 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+tinystr.o: tinyxml/tinystr.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinystr.o -MD -MP -MF $(DEPDIR)/tinystr.Tpo -c -o tinystr.o `test -f 'tinyxml/tinystr.cpp' || echo '$(srcdir)/'`tinyxml/tinystr.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinystr.Tpo $(DEPDIR)/tinystr.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tinyxml/tinystr.cpp' object='tinystr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinystr.o `test -f 'tinyxml/tinystr.cpp' || echo '$(srcdir)/'`tinyxml/tinystr.cpp
+
+tinystr.obj: tinyxml/tinystr.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinystr.obj -MD -MP -MF $(DEPDIR)/tinystr.Tpo -c -o tinystr.obj `if test -f 'tinyxml/tinystr.cpp'; then $(CYGPATH_W) 'tinyxml/tinystr.cpp'; else $(CYGPATH_W) '$(srcdir)/tinyxml/tinystr.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinystr.Tpo $(DEPDIR)/tinystr.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tinyxml/tinystr.cpp' object='tinystr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinystr.obj `if test -f 'tinyxml/tinystr.cpp'; then $(CYGPATH_W) 'tinyxml/tinystr.cpp'; else $(CYGPATH_W) '$(srcdir)/tinyxml/tinystr.cpp'; fi`
+
+tinyxml.o: tinyxml/tinyxml.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxml.o -MD -MP -MF $(DEPDIR)/tinyxml.Tpo -c -o tinyxml.o `test -f 'tinyxml/tinyxml.cpp' || echo '$(srcdir)/'`tinyxml/tinyxml.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxml.Tpo $(DEPDIR)/tinyxml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tinyxml/tinyxml.cpp' object='tinyxml.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxml.o `test -f 'tinyxml/tinyxml.cpp' || echo '$(srcdir)/'`tinyxml/tinyxml.cpp
+
+tinyxml.obj: tinyxml/tinyxml.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxml.obj -MD -MP -MF $(DEPDIR)/tinyxml.Tpo -c -o tinyxml.obj `if test -f 'tinyxml/tinyxml.cpp'; then $(CYGPATH_W) 'tinyxml/tinyxml.cpp'; else $(CYGPATH_W) '$(srcdir)/tinyxml/tinyxml.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxml.Tpo $(DEPDIR)/tinyxml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tinyxml/tinyxml.cpp' object='tinyxml.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxml.obj `if test -f 'tinyxml/tinyxml.cpp'; then $(CYGPATH_W) 'tinyxml/tinyxml.cpp'; else $(CYGPATH_W) '$(srcdir)/tinyxml/tinyxml.cpp'; fi`
+
+tinyxmlerror.o: tinyxml/tinyxmlerror.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxmlerror.o -MD -MP -MF $(DEPDIR)/tinyxmlerror.Tpo -c -o tinyxmlerror.o `test -f 'tinyxml/tinyxmlerror.cpp' || echo '$(srcdir)/'`tinyxml/tinyxmlerror.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxmlerror.Tpo $(DEPDIR)/tinyxmlerror.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tinyxml/tinyxmlerror.cpp' object='tinyxmlerror.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlerror.o `test -f 'tinyxml/tinyxmlerror.cpp' || echo '$(srcdir)/'`tinyxml/tinyxmlerror.cpp
+
+tinyxmlerror.obj: tinyxml/tinyxmlerror.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxmlerror.obj -MD -MP -MF $(DEPDIR)/tinyxmlerror.Tpo -c -o tinyxmlerror.obj `if test -f 'tinyxml/tinyxmlerror.cpp'; then $(CYGPATH_W) 'tinyxml/tinyxmlerror.cpp'; else $(CYGPATH_W) '$(srcdir)/tinyxml/tinyxmlerror.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxmlerror.Tpo $(DEPDIR)/tinyxmlerror.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tinyxml/tinyxmlerror.cpp' object='tinyxmlerror.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlerror.obj `if test -f 'tinyxml/tinyxmlerror.cpp'; then $(CYGPATH_W) 'tinyxml/tinyxmlerror.cpp'; else $(CYGPATH_W) '$(srcdir)/tinyxml/tinyxmlerror.cpp'; fi`
+
+tinyxmlparser.o: tinyxml/tinyxmlparser.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxmlparser.o -MD -MP -MF $(DEPDIR)/tinyxmlparser.Tpo -c -o tinyxmlparser.o `test -f 'tinyxml/tinyxmlparser.cpp' || echo '$(srcdir)/'`tinyxml/tinyxmlparser.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxmlparser.Tpo $(DEPDIR)/tinyxmlparser.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tinyxml/tinyxmlparser.cpp' object='tinyxmlparser.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlparser.o `test -f 'tinyxml/tinyxmlparser.cpp' || echo '$(srcdir)/'`tinyxml/tinyxmlparser.cpp
+
+tinyxmlparser.obj: tinyxml/tinyxmlparser.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinyxmlparser.obj -MD -MP -MF $(DEPDIR)/tinyxmlparser.Tpo -c -o tinyxmlparser.obj `if test -f 'tinyxml/tinyxmlparser.cpp'; then $(CYGPATH_W) 'tinyxml/tinyxmlparser.cpp'; else $(CYGPATH_W) '$(srcdir)/tinyxml/tinyxmlparser.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinyxmlparser.Tpo $(DEPDIR)/tinyxmlparser.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tinyxml/tinyxmlparser.cpp' object='tinyxmlparser.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlparser.obj `if test -f 'tinyxml/tinyxmlparser.cpp'; then $(CYGPATH_W) 'tinyxml/tinyxmlparser.cpp'; else $(CYGPATH_W) '$(srcdir)/tinyxml/tinyxmlparser.cpp'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
