@@ -253,7 +253,7 @@ bool sdmtest (ReconClient* rc) {
 
 bool internaltest (ReconClient* rc) {
 
-	int         i = 0, j = 0, d = 8;
+	int         i = 0, j = 0, d = 5;
 	
 	Matrix<raw>    r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -263,6 +263,9 @@ bool internaltest (ReconClient* rc) {
 	h.Random();
 	p.Random();
 	
+	r = r.fftshift(0);
+	r = r.ifftshift(0);
+
 	std::cout << r << std::endl;
 	std::cout << h << std::endl;
 	std::cout << p << std::endl;
@@ -309,6 +312,8 @@ bool fftwtest (ReconClient* rc) {
 
 	m.read (in, "img");
 	m = m.fft();
+	m = m.fftshift();
+	m = m.ifftshift();
 	m = m.ifft();
 	m.dump (out, "img");
 

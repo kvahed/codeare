@@ -274,14 +274,15 @@ bool Matrix<T>::rsadjust (std::string fname) {
 
 	// Dimensions in XProtocol
 	std::map < std::string, int > dims;
-	dims["RawCol"] =  0; dims["RawLin"] =  1; dims["RawCha"] =  2; dims["RawSet"] =  3;
-	dims["RawEco"] =  4; dims["RawPhs"] =  5; dims["RawRep"] =  6; dims["RawSeg"] =  7;
-	dims["RawPar"] =  8; dims["RawSlc"] =  9; dims["RawIda"] = 10; dims["RawIdb"] = 11;
-	dims["RawIdc"] = 12; dims["RawIdd"] = 13; dims["RawIde"] = 14; dims["RawAve"] = 15;
+	dims["RawCol"] =  0; dims["RawLin"] =  1; dims["RawSlc"] =  2; dims["RawPar"] =  3;
+	dims["RawEco"] =  4; dims["RawPhs"] =  5; dims["RawRep"] =  6; dims["RawSet"] =  7;
+	dims["RawSeg"] =  8; dims["RawCha"] =  9; dims["RawIda"] = 10; dims["RawIdb"] = 11;
+	dims["RawIdc"] = 12; dims["RawIdd"] = 13; dims["RawIde"] = 14; dims["RawAve"] = 15; 
 
 	// Create XML output from XProt
-	cmd << "convert.pl ";
+	cmd << "/usr/local/bin/convert.pl ";
 	cmd << fname;
+	printf ("%s\n", cmd.str().c_str());
 	system (cmd.str().c_str());
 
 	// Output filename
@@ -291,15 +292,16 @@ bool Matrix<T>::rsadjust (std::string fname) {
 	// Read XML and go to rawobjectprovider for dimensions
 	doc->LoadFile (xmlf.str().c_str());
 	meta = doc->RootElement();
-	vol  = meta->FirstChild ("XProtocol");
-	vol  = vol->FirstChild ("ParamMap");
-	vol  = vol->FirstChild ("ParamMap");
-	fix  = vol->FirstChild ("Pipe");
-	vol  = fix->FirstChild ("PipeService");
+	
+	vol  = meta->FirstChild     ("XProtocol");
+	vol  = vol->FirstChild      ("ParamMap");
+	vol  = vol->FirstChild      ("ParamMap");
+	fix  = vol->FirstChild      ("Pipe");
+	vol  = fix->FirstChild      ("PipeService");
 	vol  = fix->IterateChildren ("PipeService", vol);
 	vol  = fix->IterateChildren ("PipeService", vol);
 	fix  = fix->IterateChildren ("PipeService", vol);
-	fix  = fix->FirstChild ("ParamFunctor");
+	fix  = fix->FirstChild      ("ParamFunctor");
 
 	// Dimensions
 	vol  = fix->FirstChild ("ParamLong");
@@ -317,8 +319,8 @@ bool Matrix<T>::rsadjust (std::string fname) {
 	} while ((vol = fix->IterateChildren ("ParamLong", vol))!=NULL);
 
 	Reset();
+	
 	delete doc;
-
 	return true;
 
 }
@@ -328,15 +330,20 @@ bool Matrix<T>::rsadjust (std::string fname) {
 template <class T>
 bool Matrix<T>::rawread (std::string fname, std::string version) {
 	
+	// Get size information from XProtocol and resize 
+	rsadjust(fname);
+
+	printf ("         Col  Lin  Slc  Par  Ech  Pha  Rep  Set  Seg  Cha  Ida  Idb  Idc  Idd  Ide  Ave\n");
+	printf ("Matrix: % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i\n\n",
+			_dim[ 0], _dim[ 1], _dim[ 2], _dim[ 3], _dim[ 4], _dim[ 5], _dim[ 6], _dim[ 7],
+			_dim[ 8], _dim[ 9], _dim[10], _dim[11], _dim[12], _dim[13], _dim[14], _dim[15]);
+
 	FILE*         f;
 	sMDH*         mdh;
 	unsigned      l      = 0;
 	unsigned long nscans = (Size() / _dim[COL]);
 	unsigned      start;
 	unsigned      size;
-
-	// Get size information from XProtocol and resize 
-	rsadjust(fname);
 
 	// Assess data size
 	f = fopen (fname.c_str(), "rb");
@@ -352,12 +359,24 @@ bool Matrix<T>::rawread (std::string fname, std::string version) {
 
 	// Headers
 	mdh  = (sMDH*) malloc (nscans * sizeof(sMDH));
+	int n = 0.0;
 
 	for (int i = 0; i < nscans; i++) {
+
 		fread (&mdh[i], sizeof(sMDH), 1, f);
-		fread (&_M[i * _dim[0]], sizeof (std::complex<float>), _dim[0], f);
-		//if (i % 257 == 0)
-		//printf ("%i\n", mdh[i].ushChannelId);
+
+		n = mdh[i].sLC.ushLine       * _dim[0] +
+			mdh[i].sLC.ushSlice      * _dim[0] * _dim[1] +
+			mdh[i].sLC.ushPartition  * _dim[0] * _dim[1] * _dim[2] +
+			mdh[i].sLC.ushEcho       * _dim[0] * _dim[1] * _dim[2] * _dim[3] +
+			mdh[i].sLC.ushPhase      * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] +
+			mdh[i].sLC.ushRepetition * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] +
+			mdh[i].sLC.ushSet        * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] +
+			mdh[i].sLC.ushSeg        * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] * _dim[7] +
+			mdh[i].ushChannelId      * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] * _dim[7] * _dim[8];
+
+		fread (&_M[n], sizeof (std::complex<float>), _dim[0], f);
+
 	}
 
 	fclose (f);

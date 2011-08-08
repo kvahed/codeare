@@ -743,6 +743,15 @@ public:
     Matrix <T>           
     Slice                (int s);
 	
+    /**
+     * @brief            Operates only on inner 3D: Get a slice of data
+     *  
+     * @param  s         
+     * @return           Copy data into new matrix and return
+     */
+    Matrix <T>           
+    Volume               (int v);
+	
 
 	//@}
     
@@ -927,6 +936,16 @@ public:
      */
     long                
     Size                ()                                    const;
+    
+    
+    /**
+     * @brief           Check if we are XD (i.e. X dimensions > 1)
+     *
+	 * @param  d        Dimensions
+     * @return          XD matrix?
+     */
+    bool                
+    IsXD                (const int d)                         const;
     
     
     /**
@@ -1554,6 +1573,24 @@ public:
     ifft   ()            const;
     
     /**
+     * @brief           MATLAB-like fftshift; 
+	 *                  i.e. shift zero component to centre of volume for viewing
+     *
+     * @return          FFT shift.
+     */
+    Matrix<T>           
+    fftshift            (const int d = 0)            const;
+    
+    /**
+     * @brief           MATLAB-like fftshift; 
+	 *                  i.e. shift zero component to centre of volume for viewing
+     *
+     * @return          FFT shift.
+     */
+    Matrix<T>           
+    ifftshift           (const int d = 0)            const;
+    
+    /**
      * @brief           General inversion.
      *
      * @return          success
@@ -1840,46 +1877,42 @@ inline void Matrix<short>::Random () {
 
     
 template <class T> 
+inline bool Matrix<T>::IsXD (const int d) const {
+
+	int l = 0;
+
+	for (int i = 0; i < INVALID_DIM; i++)
+		if (_dim[i] > 1) l++;
+
+	return (l == d);
+
+}
+
+template <class T> 
 inline bool Matrix<T>::Is1D () const {
 	
-	for (int i = 1; i < INVALID_DIM; i++)
-		if (_dim[i] != 1) 
-			return false;
-
-	return true;
+	return IsXD(1);
 
 }
 
 template <class T> 
 inline bool Matrix<T>::Is2D () const {
 	
-	for (int i = 2; i < INVALID_DIM; i++)
-		if (_dim[i] != 1) 
-			return false;
-
-	return true;
+	return IsXD(2);
 
 }
 
 template <class T> 
 inline bool Matrix<T>::Is3D () const {
 	
-	for (int i = 3; i < INVALID_DIM; i++)
-		if (_dim[i] != 1) 
-			return false;
-	
-	return true;
+	return IsXD(3);
 
 }
 
 template <class T> 
 inline bool Matrix<T>::Is4D () const {
 	
-	for (int i = 4; i < INVALID_DIM; i++)
-		if (_dim[i] != 1) 
-			return false;
-	
-	return true;
+	return IsXD(4);
 
 }
 
