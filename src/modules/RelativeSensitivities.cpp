@@ -25,46 +25,36 @@ using namespace RRStrategy;
 RRSModule::error_code
 RelativeSensitivities::Process     () { 
 
-	std::vector<long> rdim;
-	short             found = 0;
-
 	// Introductive output --------------------
 	printf ("  Processing map generation ...\n");
+	m_raw.Squeeze();
+
 	printf ("  Dimensions: ");
 	for (int i = 0; i < INVALID_DIM; i++)
-		if (m_raw.Dim(i) > 1) {
-			rdim.push_back(m_raw.Dim(i));
-			printf (" %i",  m_raw.Dim(i));
-			found++;
-		}
+		printf (" %i",  m_raw.Dim(i));
 	printf ("\n");
+	
 	// ----------------------------------------
 
-	ticks start = getticks();
-	long  imsize  = rdim.at(0) * rdim.at(1) * rdim.at(2);
-	int   vols    = m_raw.Size() / (imsize);
+	ticks start  = getticks();
+	long  imsize = m_raw.Dim(0) * m_raw.Dim(1) * m_raw.Dim(2);
+	int   vols   = m_raw.Size() / (imsize);
 
 	// Fourier transform ----------------------
-	printf ("  Fourier transforming %i volumes of %li ...\n", vols, imsize);
+	printf ("  Fourier transforming %i volumes of %lix%lix%li ...\n", vols, m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2));
 	
-	int threads;
+	int threads  = 0;
 
 #pragma omp parallel default (shared) 
-
 	{
-		threads = omp_get_num_threads();
+		threads  = omp_get_num_threads();
 	}
 	
-	Matrix<raw>* mr = new Matrix<raw>[threads];
-
-	for (int i = 0; i < threads; i++) {
-		mr[i] = Matrix<raw>(rdim.at(0),rdim.at(1),rdim.at(2));
-		//		mr[i].Dim(0) = rdim.at(0);
-		//mr[i].Dim(1) = rdim.at(1);
-		//mr[i].Dim(2) = rdim.at(2);
-		//mr[i].Reset();
-	}	
-
+	Matrix<raw> mr[threads];
+	
+	for (int i = 0; i < threads; i++)
+		mr[i] = Matrix<raw>(m_raw.Dim(0),m_raw.Dim(1),m_raw.Dim(2));
+	
 #pragma omp parallel default (shared)
 	{
 		
@@ -75,18 +65,19 @@ RelativeSensitivities::Process     () {
 		
 		for (int i = 0; i < vols; i++) {
 			memcpy (&mr[tid][0], &m_raw[i*imsize], imsize * sizeof(raw));
-			mr[tid] = mr[tid].fftshift();
-			mr[tid] = mr[tid].ifft();
-			mr[tid] = mr[tid].ifftshift();
+			mr[tid] = mr[tid].FFTShift();
+			mr[tid] = mr[tid].IFFT();
+			mr[tid] = mr[tid].IFFTShift();
 			memcpy (&m_raw[i*imsize], &mr[tid][0], imsize * sizeof(raw));
 		}
-
+		
 	}
 	
-	for (int i = 0; i < threads; i++)
-		mr[i].~Matrix<raw>();
+	/*for (int i = 0; i < threads; i++)
+	  mr[i].~Matrix<raw>();*/
+	
+	m_raw = m_raw.SOS(0);
 
-	//delete mr;
 	printf ("  ... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / ClockRate());
 	// -----------------------------------------
 
