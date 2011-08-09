@@ -33,6 +33,7 @@ enum IceDim {
 };
 #endif
 
+#include "config.h"
 #include "modules/OMP.hpp"
 
 #include <complex>
@@ -44,7 +45,6 @@ enum IceDim {
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "config.h"
 #include <limits.h>
 
 #ifdef HAVE_H5CPP_H
