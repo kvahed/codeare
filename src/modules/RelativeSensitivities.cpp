@@ -50,26 +50,42 @@ RelativeSensitivities::Process     () {
 		threads  = omp_get_num_threads();
 	}
 	
+	/*
 	Matrix<raw> mr[threads];
 	
 	for (int i = 0; i < threads; i++)
 		mr[i] = Matrix<raw>(m_raw.Dim(0),m_raw.Dim(1),m_raw.Dim(2));
-	
-#pragma omp parallel default (shared)
+	*/
+
+	Matrix<raw>* mr;
+
+#pragma omp parallel default (shared) private (mr)
 	{
 		
 		int tid      = omp_get_thread_num();
 		int chunk    = vols / omp_get_num_threads();
+
+		mr = new Matrix<raw>(m_raw.Dim(0),m_raw.Dim(1),m_raw.Dim(2));
 		
 #pragma omp for schedule (dynamic, chunk)
 		
-		for (int i = 0; i < vols; i++) {
+		/*		for (int i = 0; i < vols; i++) {
 			memcpy (&mr[tid][0], &m_raw[i*imsize], imsize * sizeof(raw));
 			mr[tid] = mr[tid].FFTShift();
 			mr[tid] = mr[tid].IFFT();
 			mr[tid] = mr[tid].IFFTShift();
 			memcpy (&m_raw[i*imsize], &mr[tid][0], imsize * sizeof(raw));
+			}*/
+
+		for (int i = 0; i < vols; i++) {
+			memcpy (&mr->At(0), &m_raw[i*imsize], imsize * sizeof(raw));
+			mr[tid] = mr->FFTShift();
+			mr[tid] = mr->IFFT();
+			mr[tid] = mr->IFFTShift();
+			memcpy (&m_raw[i*imsize], &mr->At(0), imsize * sizeof(raw));
 		}
+		
+		delete mr;
 		
 	}
 	
