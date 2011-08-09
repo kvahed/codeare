@@ -266,9 +266,6 @@ bool internaltest (ReconClient* rc) {
 	h.Random();
 	p.Random();
 	
-	r = r.fftshift(0);
-	r = r.ifftshift(0);
-
 	std::cout << r << std::endl;
 	std::cout << h << std::endl;
 	std::cout << p << std::endl;
@@ -314,10 +311,10 @@ bool fftwtest (ReconClient* rc) {
 	Matrix<raw> m;
 
 	m.read (in, "img");
-	m = m.fft();
-	m = m.fftshift();
-	m = m.ifftshift();
-	m = m.ifft();
+	m = m.FFT();
+	m = m.FFTShift();
+	m = m.IFFTShift();
+	m = m.IFFT();
 	m.dump (out, "img");
 
 	return true;
@@ -343,7 +340,7 @@ bool resetest (ReconClient* rc) {
 	
 	rc->Finalise(test);
 
-	//	meas.dump (of);
+	meas.dump (of);
 	
 	return true;
 

@@ -1562,7 +1562,7 @@ public:
      * @return          Fourier transform.
      */
     Matrix<T>           
-    fft   ()            const;
+    FFT                 ()            const;
     
     /**
      * @brief           Inverse Fourier transform over all dimensions
@@ -1570,7 +1570,7 @@ public:
      * @return          Inverse Fourier transform.
      */
     Matrix<T>           
-    ifft   ()            const;
+    IFFT                ()            const;
     
     /**
      * @brief           MATLAB-like fftshift; 
@@ -1579,7 +1579,7 @@ public:
      * @return          FFT shift.
      */
     Matrix<T>           
-    fftshift            (const int d = 0)            const;
+    FFTShift            (const int d = 0)            const;
     
     /**
      * @brief           MATLAB-like fftshift; 
@@ -1588,8 +1588,53 @@ public:
      * @return          FFT shift.
      */
     Matrix<T>           
-    ifftshift           (const int d = 0)            const;
+    IFFTShift           (const int d = 0)            const;
     
+
+    /**
+     * @brief           ND Hann window
+     *
+     * @return          FFT shift.
+     */
+    Matrix<T>           
+    HannWindow          (const int d = 0)            const;
+    
+
+    /**
+     * @brief           Sum of squares. 
+     *
+	 * @param  d        Dimension to eliminate. If not given, it is done over the outermost
+     * @return          FFT shift.
+     */
+	Matrix<T>
+    SOS                 (const int d = 0)           const;
+    
+
+    /**
+     * @brief           Squeeze dimensions
+     */
+	void
+    Squeeze             ();
+    
+
+	/**
+	 * @brief           Highest occupied dimension
+	 *
+	 * @return 
+	 */
+	unsigned short
+	HDim                () const;
+
+
+	/**
+	 * @brief           Print dimension to std out
+	 *
+	 * @retutn 
+	 */
+	void
+	PrintDims           () const;
+
+
     /**
      * @brief           General inversion.
      *
