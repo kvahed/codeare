@@ -50,7 +50,10 @@ RelativeSensitivities::Process     () {
 		threads  = omp_get_num_threads();
 	}
 	
-	Matrix<raw> mr = new (Matrix<raw>(m_raw.Dim(0),m_raw.Dim(1),m_raw.Dim(2)))[4];
+	Matrix<raw> mr[threads];
+	
+	for (int i = 0; i < threads; i++)
+		mr[i] = Matrix<raw>(m_raw.Dim(0),m_raw.Dim(1),m_raw.Dim(2));
 	
 #pragma omp parallel default (shared)
 	{
