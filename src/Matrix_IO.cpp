@@ -38,7 +38,7 @@ Matrix<short>::Print     (std::ostream &os) const {
 	
 	for (int i = 0; i < _dim[COL]; i++) {
 		for(int j = 0; j < _dim[LIN]; j++)
-			printf ("%+.4f ", _M [i + j * _dim[COL]]);
+			printf ("%i ", _M [i + j * _dim[COL]]);
 		printf("\n");
 	}
 	
