@@ -50,51 +50,45 @@ RelativeSensitivities::Process     () {
 		threads  = omp_get_num_threads();
 	}
 	
-	/*
 	Matrix<raw> mr[threads];
-	
-	for (int i = 0; i < threads; i++)
-		mr[i] = Matrix<raw>(m_raw.Dim(0),m_raw.Dim(1),m_raw.Dim(2));
-	*/
 
-	Matrix<raw>* mr;
+	fftwf_plan 	     p[threads];
+	fftwf_complex*  in[threads];	
+	fftwf_complex*  ot[threads];	
 
-#pragma omp parallel default (shared) private (mr)
+	for (int i = 0; i < threads; i++) {
+
+		mr[i] = Matrix<raw>(m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2));
+		p[i]  = fftwf_plan_dft_3d (m_raw.Dim(2), m_raw.Dim(1), m_raw.Dim(0), (fftwf_complex*)&mr[i][0], (fftwf_complex*)&mr[i][0], FFTW_BACKWARD, FFTW_ESTIMATE);
+
+	}
+
+
+#pragma omp parallel default (shared)
 	{
 		
 		int tid      = omp_get_thread_num();
 		int chunk    = vols / omp_get_num_threads();
-
-		mr = new Matrix<raw>(m_raw.Dim(0),m_raw.Dim(1),m_raw.Dim(2));
 		
 #pragma omp for schedule (dynamic, chunk)
 		
-		/*		for (int i = 0; i < vols; i++) {
+		for (int i = 0; i < vols; i++) {
 			memcpy (&mr[tid][0], &m_raw[i*imsize], imsize * sizeof(raw));
 			mr[tid] = mr[tid].FFTShift();
-			mr[tid] = mr[tid].IFFT();
+			fftwf_execute(p[tid]);
 			mr[tid] = mr[tid].IFFTShift();
 			memcpy (&m_raw[i*imsize], &mr[tid][0], imsize * sizeof(raw));
-			}*/
-
-		for (int i = 0; i < vols; i++) {
-			memcpy (&mr->At(0), &m_raw[i*imsize], imsize * sizeof(raw));
-			mr[tid] = mr->FFTShift();
-			mr[tid] = mr->IFFT();
-			mr[tid] = mr->IFFTShift();
-			memcpy (&m_raw[i*imsize], &mr->At(0), imsize * sizeof(raw));
 		}
-		
-		delete mr;
 		
 	}
 	
-	/*for (int i = 0; i < threads; i++)
-	  mr[i].~Matrix<raw>();*/
-	
-	m_raw = m_raw.SOS(0);
+	for (int i = 0; i < threads; i++)
+		fftwf_destroy_plan(p[i]);
 
 	printf ("  ... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / ClockRate());
+	
+	m_raw = m_raw.SOS(0);
+	
 	// -----------------------------------------
 
 	return RRSModule::OK;
