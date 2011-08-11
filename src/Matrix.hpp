@@ -1868,20 +1868,20 @@ public:
      * @return          Feedback from Lapack operation
      */
     inline int
-	EIG                 (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* rev);
+	EIG                 (const bool cv, Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* rev);
     
 
     /**
      * @brief           Compute singular value decomposition with lapack.
      *
-	 * @param  cm       Compute left and right matrices U and V**T
+	 * @param  jobz     @see http://www.netlib.org/lapack/double/<x>gesdd.f
 	 * @param  lsv      Left hand singular vectors.
 	 * @param  rsv      Right hand singular vectors.
 	 * @param  sv       Sorted singular values.
      * @return          Info from Lapack operation.
      */
     inline int
-	SVD                 (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<T>* sv);
+	SVD                 (const char jobz, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<T>* sv);
     
 	
     //@}

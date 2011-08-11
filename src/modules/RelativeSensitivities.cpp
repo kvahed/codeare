@@ -76,7 +76,7 @@ FTVolumes (Matrix<raw>* r) {
 	for (int i = 0; i < threads; i++)
 		fftwf_destroy_plan(p[i]);
 
-	printf ("done.\n");
+	printf ("done. - ");
 	
 	return RRSModule::OK;
 	
@@ -114,6 +114,8 @@ SVDCalibrate (const Matrix<raw>* imgs, Matrix<raw>* rxm, Matrix<raw>* txm, Matri
 	int         vols = imgs->Size() / volsize / 2; // division by 2 (Echoes)
 	int         rtms = imgs->Size() / rtmsiz / 2;  // division by 2 (Echoes)
 
+	printf ("  SVDing %i matrices of %lix%li ... ", rtms, nrxc, ntxc);
+	
 	// Permute dimensions on imgs for contiguous RAM access
 	Matrix<raw> vxlm (nrxc, ntxc, imgs->Dim(0), imgs->Dim(1), imgs->Dim(2));
 
@@ -157,7 +159,7 @@ SVDCalibrate (const Matrix<raw>* imgs, Matrix<raw>* rxm, Matrix<raw>* txm, Matri
 			
 			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(raw));
 			
-			m[tid].SVD (true, &u[tid], &v[tid], &s[tid]);
+			m[tid].SVD ('A', &u[tid], &v[tid], &s[tid]);
 			
 			// U 
 			for (int r = 0; r < nrxc; r++) rxm->At(r*volsize + i) = u[tid][r];
@@ -175,6 +177,8 @@ SVDCalibrate (const Matrix<raw>* imgs, Matrix<raw>* rxm, Matrix<raw>* txm, Matri
 	txm->dump("txm.h5");
 	OptSNR.dump("osnr.h5");
 
+	printf ("done. - ");
+	
 	return RRSModule::OK;
 
 }
@@ -200,7 +204,7 @@ RelativeSensitivities::Process     () {
 
 	FTVolumes (&m_raw);
 
-	printf ("  FFT took %.4f seconds.\n", elapsed(getticks(), tic) / ClockRate());
+	printf ("  FFT time: %.4f seconds.\n", elapsed(getticks(), tic) / ClockRate());
 	// -----------------------------------------
 
 	
@@ -221,7 +225,7 @@ RelativeSensitivities::Process     () {
 	
 	SVDCalibrate (&m_raw, &rxm, &txm, &shim, false);
 	
-	printf ("  SVDs took: %.4f seconds.\n", elapsed(getticks(), tic) / ClockRate());
+	printf ("  SVDs time: %.4f seconds.\n", elapsed(getticks(), tic) / ClockRate());
 	// -----------------------------------------
 
 	return RRSModule::OK;
