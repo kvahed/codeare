@@ -21,185 +21,104 @@
 #include "Lapack.hpp"
 
 template <class T>
-int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* rev) {
+int  Matrix<T>::EIG (const bool cv, Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* rev) {
 
 	// 2D square matrix.
-
 	if (!Is2D())
 		return -2;
-
 	if (_dim[COL] != _dim[LIN])
 		return -3;
 	
-#ifdef HAVE_LAPACK
-
-	char    jobvl = (cv) ? 'V' : 'N';
-	char    jobvr = (cv) ? 'V' : 'N';
+	char   jobvl = (cv) ? 'V' : 'N';
+	char   jobvr = (cv) ? 'V' : 'N';
 	
-	int     n     = _dim[COL];
+	int    n     = _dim[COL];
+	int    lda   = n;
+    int    ldvl  =  (cv) ? n : 1;
+    int    ldvr  =  (cv) ? n : 1;
+	int    info  =  0;
+	int    lwork = -1;
 	
-	T*      a     = new T[Size()];
-	
-	int     i = 0, j = 0, k = 0;
+	T*     wi    = (T*)     malloc (  n * sizeof(T));
+	T*     work  = (T*)     malloc (  1 * sizeof(T));
+	float* rwork = (float*) malloc (2*n * sizeof(float));
 
-	for (j = 0; j < _dim[COL]; j++)
-		for (k = 0; k < _dim[LIN]; k++, i++)
-			a[i] = _M[j+k*_dim[LIN]];
-
-	int     lda   = n;
-	
-	T*       w    = new T[n];
-
-	T*       wi;
-	if (typeid(T) == typeid(double))
-		wi        = new T[n];
-	else 
-		wi        = new T[1];
-
-    int     ldvl  =  (cv) ? n : 1;
-    int     ldvr  =  (cv) ? n : 1;
-	
-	T*       vl   = new T[ldvl*ldvl];
-	T*       vr   = new T[ldvr*ldvr];
-
-	T*      work  = new T[1];
-
-	int     info  =  0;
-	int     lwork = -1;
-
-	float*  rwork;
+	// Workspace query
 	if (typeid(T) == typeid(raw))
-		rwork = new float[2*n];
-	else 
-		rwork = new float[1];
-
-	if (typeid(T) == typeid(raw))
-		cgeev_ (&jobvl, &jobvr, &n, a, &lda, w,     vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
+		cgeev_ (&jobvl, &jobvr, &n, &this->At(0), &lda, &ev->At(0),     &lev->At(0), &ldvl, &rev->At(0), &ldvr, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgeev_ (&jobvl, &jobvr, &n, a, &lda, w, wi, vl, &ldvl, vr, &ldvr, work, &lwork,        &info);
+		dgeev_ (&jobvl, &jobvr, &n, &this->At(0), &lda, &ev->At(0), wi, &lev->At(0), &ldvl, &rev->At(0), &ldvr, work, &lwork,        &info);
 	
+	// Intialise work space
 	lwork = (int) (raw(work[0]).real());
+	free (work); work = (T*) malloc (lwork*sizeof(T));
 
-	//std::cout << "xgeev_ (lwork = " << lwork << ")" << std::endl;
-
-	delete [] work;
-	work = new T[lwork];
-
+	// Actual eigen value comp
 	if (typeid(T) == typeid(raw))
-		cgeev_ (&jobvl, &jobvr, &n, a, &lda, w,     vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
+		cgeev_ (&jobvl, &jobvr, &n, &this->At(0), &lda, &ev->At(0),     &lev->At(0), &ldvl, &rev->At(0), &ldvr, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgeev_ (&jobvl, &jobvr, &n, a, &lda, w, wi, vl, &ldvl, vr, &ldvr, work, &lwork,        &info);
-
-	ev->Dim(COL) = n;
-	ev->Reset();
+		dgeev_ (&jobvl, &jobvr, &n, &this->At(0), &lda, &ev->At(0), wi, &lev->At(0), &ldvl, &rev->At(0), &ldvr, work, &lwork,        &info);
 	
-	if (typeid(T) == typeid(raw))
-		for (i = 0; i < n; i++)
-			ev->At(i) = w[i];
-
-	else if (typeid(T) == typeid(double))
-		for (i = 0; i < n; i++)
-			ev->At(i) = raw(raw(w[i]).real(),raw(wi[i]).real());
-
-	if (cv) {
-
-		lev->Dim(0) = ldvl;
-		lev->Dim(1) = ldvl;
-		lev->Reset();
-		
-		i = 0;
-		for (j = 0; j < ldvl; j++)
-			for (k = 0; k < ldvl; k++, i++)
-				lev->At(i) = vl[j+k*ldvl];
-		
-		rev->Dim(0) = ldvr;
-		rev->Dim(1) = ldvr;
-		rev->Reset();
-
-		i = 0;
-		for (j = 0; j < ldvr; j++)
-			for (k = 0; k < ldvr; k++, i++)
-				rev->At(i) = vl[j+k*ldvr];
-		
-	}
-		
-	delete [] a;
-	delete [] w;
-	delete [] wi;
-	delete [] vl;
-	delete [] vr;
-	delete [] work;
-	delete [] rwork;
+	// Clean up
+	free (wi);
+	free (work);
+	free (rwork);
 
 	return info;
-
-#else
-
-	return -1;
-
-#endif
 
 }
 
 
 template<class T>
-int Matrix<T>::SVD (const bool cm, Matrix<T>* u, Matrix<T>* v, Matrix<T>* s) {
+int Matrix<T>::SVD (const char jobz, Matrix<T>* u, Matrix<T>* v, Matrix<T>* s) {
 
+	// SVD only defined on 2D data
 	if (!Is2D())
 		return -2;
-
-#ifndef HAVE_LAPACK
-
-	char    jobz = (cm) ? 'A' : 'N';
 	
-	int     m    = _dim[COL];
-	int     n    = _dim[LIN];
+	bool    cm   = true;
+
+	int    m     = _dim[COL];
+	int    n     = _dim[LIN];
 	int    lwork = -1;
-	int     info = 0;
-
-
-	int     lda  = _dim[COL];
-	int     ldu  = (cm) ? ((m >= n) ? m : n) : 1;
-	int     ldvt = (cm) ? ((m >= n) ? n : m) : 1;
-
-	int i = 0, j = 0, k = 0;
-
-	T*      work =     (T*) malloc (sizeof(T));
+	int    info  = 0;
+	int    lda   = _dim[COL];
+	int    ldu   = (cm) ? ((m >= n) ? m : n) : 1;
+	int    ldvt  = (cm) ? ((m >= n) ? n : m) : 1;
+	
+	T*     work  =     (T*) malloc (sizeof(T));
 	float* rwork = (float*) malloc (sizeof(float));
 	int*   iwork =   (int*) malloc (8 * MIN(_dim[0],_dim[1]) * sizeof(int));
 	
+	// Only needed for complex data
 	if (typeid(T) == typeid(raw)) {
 		free (rwork);
 		rwork = (float*) malloc (MIN(m,n) * MAX(5*MIN(m,n)+7,2*MAX(m,n)+2*MIN(m,n)+1) * sizeof(float));
 	}
+	
+	// Workspace query
 	if (typeid(T) == typeid(raw))
 		cgesdd_ (&jobz, &m, &n, &this->At(0), &lda, (float*)&s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgesdd_ (&jobz, &m, &n, &this->At(0), &lda,         &s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork,        iwork, &info);
 	
+	// Resize work according to ws query
 	lwork = (int) raw (work[0]).real();
-#ifdef DEBUG
-	printf ("xgesdd_ (lwork = %i, info = 0)\n", lwork, info) ;
-#endif
 	free(work); work = (T*) malloc (lwork * sizeof(T));
 	
+	//SVD
 	if (typeid(T) == typeid(raw))
 		cgesdd_ (&jobz, &m, &n, &this->At(0), &lda, (float*)&s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgesdd_ (&jobz, &m, &n, &this->At(0), &lda,         &s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork,        iwork, &info);
-
+	
+	// Clean up
 	free (work);
 	free (rwork);
 	free (iwork);
 	
 	return info;
 
-#else //  HAVE_LAPACK
-	
-	return -1;
-
-#endif // HAVE_LAPACK
-	
 } 
 
 
