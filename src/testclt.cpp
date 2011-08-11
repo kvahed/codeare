@@ -340,7 +340,7 @@ bool resetest (ReconClient* rc) {
 	
 	rc->Finalise(test);
 
-	meas.dump (of);
+	//meas.dump (of);
 	
 	return true;
 

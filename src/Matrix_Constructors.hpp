@@ -81,29 +81,6 @@ Matrix<T>::Matrix (const int m, const int n, const int k) {
 }
 
 
-template <class T> 
-Matrix<T>::Matrix (const int m, const int n, const int k, const int l) {
-
-	nb_alloc = 0;
-
-	_dim [0] = m;
-	_dim [1] = n;
-	_dim [2] = k;
-	_dim [3] = l;
-	
-    for (int i = 4; i < INVALID_DIM; i++)
-        _dim [i] = 1;
-
-    _M = (T*) malloc (Size()*sizeof(T));
-
-	for (int i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
-
-    nb_alloc++;
-
-}
-
-
 template <class T>
 Matrix<T>::Matrix (const int col, const int lin, const int cha, const int set, 
                    const int eco, const int phs, const int rep, const int seg, 
@@ -205,11 +182,24 @@ Matrix<T> Matrix<T>::Id (const int n) {
 
 
 template <class T>
+Matrix<T> Matrix<T>::Ones (const int m, const int n, const int l) {
+
+ 	static Matrix<T> M (m,n,l);
+
+ 	for (int i = 0; i < M.Size(); i++)
+ 		M[i] = T(1.0);
+
+ 	return M;
+
+}
+
+
+template <class T>
 Matrix<T> Matrix<T>::Ones (const int m, const int n) {
 
  	static Matrix<T> M (m,n);
 
- 	for (int i = 0; i < Size(); i++)
+ 	for (int i = 0; i < M.Size(); i++)
  		M[i] = T(1.0);
 
  	return M;
@@ -226,11 +216,24 @@ Matrix<T> Matrix<T>::Ones (const int n) {
 
 
 template <class T>
+Matrix<T> Matrix<T>::Zeros (const int n, const int m, const int l) {
+
+ 	static Matrix<T> M (m,n,l);
+
+ 	for (int i = 0; i < M.Size(); i++)
+ 		M[i] = T(0.0);
+
+ 	return M;
+
+}
+
+
+template <class T>
 Matrix<T> Matrix<T>::Zeros (const int n, const int m) {
 
  	static Matrix<T> M (m,n);
 
- 	for (int i = 0; i < Size(); i++)
+ 	for (int i = 0; i < M.Size(); i++)
  		M[i] = T(0.0);
 
  	return M;

@@ -143,106 +143,54 @@ int  Matrix<T>::EIG (const bool cv, Matrix<raw>* ev, Matrix<T>* lev, Matrix<T>* 
 
 
 template<class T>
-int Matrix<T>::SVD (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double>* sv) {
-
-	// Are we 2D?
+int Matrix<T>::SVD (const bool cm, Matrix<T>* u, Matrix<T>* v, Matrix<T>* s) {
 
 	if (!Is2D())
 		return -2;
 
-#ifdef HAVE_LAPACK
+#ifndef HAVE_LAPACK
 
 	char    jobz = (cm) ? 'A' : 'N';
 	
 	int     m    = _dim[COL];
 	int     n    = _dim[LIN];
+	int    lwork = -1;
+	int     info = 0;
+
 
 	int     lda  = _dim[COL];
 	int     ldu  = (cm) ? ((m >= n) ? m : n) : 1;
 	int     ldvt = (cm) ? ((m >= n) ? n : m) : 1;
 
-	T*      a    = new T[Size()];
-	
 	int i = 0, j = 0, k = 0;
 
-	for (j = 0; j < _dim[COL]; j++)
-		for (k = 0; k < _dim[LIN]; k++, i++)
-			a[i] = _M[j+k*_dim[LIN]];
-
-	float*  sf = new float[1];
-	double* sd = new double[1];
+	T*      work =     (T*) malloc (sizeof(T));
+	float* rwork = (float*) malloc (sizeof(float));
+	int*   iwork =   (int*) malloc (8 * MIN(_dim[0],_dim[1]) * sizeof(int));
 	
 	if (typeid(T) == typeid(raw)) {
-		delete [] sf;
-		sf = new float [MIN(_dim[0],_dim[1])];
-	} else if (typeid(T) == typeid(double)) {
-		delete [] sd;
-		sd = new double[MIN(_dim[0],_dim[1])];
+		free (rwork);
+		rwork = (float*) malloc (MIN(m,n) * MAX(5*MIN(m,n)+7,2*MAX(m,n)+2*MIN(m,n)+1) * sizeof(float));
 	}
-
-	T*      u    = new T[ldu*ldu];
-	T*      vt   = new T[ldvt*ldvt];
-	T*      work = new T[1];
-	
-	float* rwork = new float[1];
-	
-	if (typeid(T) == typeid(raw)) {
-		delete [] rwork;
-		rwork = new float[MIN(m,n)*MAX(5*MIN(m,n)+7,2*MAX(m,n)+2*MIN(m,n)+1)];
-	}
-
-	int    lwork = -1;
-	int*   iwork = new int[8 * MIN(_dim[0],_dim[1])];
-	int     info = 0;
-
 	if (typeid(T) == typeid(raw))
-		cgesdd_ (&jobz, &m, &n, a, &lda, sf, u, &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
+		cgesdd_ (&jobz, &m, &n, &this->At(0), &lda, (float*)&s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgesdd_ (&jobz, &m, &n, a, &lda, sd, u, &ldu, vt, &ldvt, work, &lwork,        iwork, &info);
+		dgesdd_ (&jobz, &m, &n, &this->At(0), &lda,         &s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork,        iwork, &info);
 	
 	lwork = (int) raw (work[0]).real();
-	
-	//std::cout << "xgesdd_ (lwork = " << lwork << ")" << std::endl;
-	
-	delete [] work;
-	work = new T[lwork];
+#ifdef DEBUG
+	printf ("xgesdd_ (lwork = %i, info = 0)\n", lwork, info) ;
+#endif
+	free(work); work = (T*) malloc (lwork * sizeof(T));
 	
 	if (typeid(T) == typeid(raw))
-		cgesdd_ (&jobz, &m, &n, a, &lda, sf, u, &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
+		cgesdd_ (&jobz, &m, &n, &this->At(0), &lda, (float*)&s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgesdd_ (&jobz, &m, &n, a, &lda, sd, u, &ldu, vt, &ldvt, work, &lwork,        iwork, &info);
-	
-	if (cm) {
+		dgesdd_ (&jobz, &m, &n, &this->At(0), &lda,         &s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork,        iwork, &info);
 
-		lsv->Dim(0) = ldu;
-		lsv->Dim(1) = ldu;
-		lsv->Reset();
-		int i = 0;
-		for (j = 0; j < ldu; j++)
-			for (k = 0; k < ldu; k++, i++)
-				lsv->At(i) = u[k*ldu+j];
-		
-		rsv->Dim(0) = ldvt;
-		rsv->Dim(1) = ldvt;
-		rsv->Reset();
-		for (i = 0; i < ldvt*ldvt; i++)
-			rsv->At(i) = vt[i];
-		
-	}
-	
-	sv->Dim(0) = MIN(_dim[0],_dim[1]);
-	sv->Reset();
-	for (i = 0; i < MIN(_dim[0],_dim[1]); i++)
-		sv->At(i) = (typeid(T) == typeid(raw)) ? sf[i] : sd[i];
-	
-	delete [] a;
-	delete [] sf;
-	delete [] sd;
-	delete [] u;
-	delete [] vt;
-	delete [] work;
-	delete [] rwork;
-	delete [] iwork;
+	free (work);
+	free (rwork);
+	free (iwork);
 	
 	return info;
 
