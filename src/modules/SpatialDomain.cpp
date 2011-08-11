@@ -89,6 +89,10 @@ SpatialDomain::Init           ()  {
 	m_ptxfname = Attribute ("ptxfname");
 	printf ("  ptx file name: %s \n", m_ptxfname.c_str());
 
+	// PTX file name --------------------------
+	Attribute ("verbose", &m_verbose);
+	printf ("  verbosity: %i \n", m_verbose);
+
 	// ----------------------------------------
 	
     printf ("... done.\n\n");
@@ -182,7 +186,7 @@ SpatialDomain::Process        () {
 			if (m_verbose)
 				memcpy (&ve.At(0,gc), &tmp.At(0), tmp.Size() * sizeof(raw)); 
 
-            if (/*gc > 0 && (res.at(gc) > res.at(gc-1) ||*/ res.at(gc) < m_conv/*)*/) 
+            if (gc > 0 && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
 				break;
             
             final    = solution;

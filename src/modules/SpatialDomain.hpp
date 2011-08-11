@@ -218,7 +218,7 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, c
         int tid      = omp_get_thread_num();
         int chunk    = nc / omp_get_num_threads();
         
-#pragma omp for schedule (dynamic, chunk)
+#pragma omp for// schedule (dynamic, chunk)
         
 		// pTX STA 
         for (int c = 0; c < nc; c++) 

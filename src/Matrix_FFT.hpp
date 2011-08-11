@@ -94,16 +94,43 @@ Matrix<T> Matrix<T>::IFFTShift (const int d) const {
 
 
 template <class T>
-Matrix<T> Matrix<T>::HannWindow (const int d) const {
+Matrix<T> Matrix<T>::HannWindow (const int dim) const {
 	
 	assert (Is1D() || Is2D() || Is3D());
 	
-	Matrix<T> res (_dim);
+	Matrix<T> res;
+	float     h, d;
+	float     m[3];
 	
-	//for ()
+	if (Is1D()) {
+		
+		m[0] = 0.5 * (float)_dim[0];
+		m[1] = 0.0;
+		m[2] = 0.0;
+		
+	} else if (Is2D()) {
+		
+		m[0] = 0.5 * (float)_dim[0];
+		m[1] = 0.5 * (float)_dim[1];
+		m[2] = 0.0;
+		
+	} else {
+
+		m[0] = 0.5 * (float)_dim[0];
+		m[1] = 0.5 * (float)_dim[1];
+		m[2] = 0.5 * (float)_dim[2];
+
+	}
 	
-	//x = (0:m-1)'/(n-1);
-	//w = 0.5 - 0.5*cos(2*pi*x);
+	res = this->Squeeze();
+	
+	for (int s = 0; s < _dim[2]; s++)
+		for (int r = 0; r < _dim[1]; r++)
+			for (int c = 0; c < _dim[0]; c++) {
+				d = pow( pow(((float)c-m[0])/m[0],2.0) + pow(((float)r-m[1])/m[1],2.0) + pow(((float)s-m[2])/m[2],2.0) , 0.5); 
+				h = (d < 1) ? (0.5 + 0.5 * cos (PI * d)) : 0.0;
+				res(c,r,s) = this->At(c,r,s) * h;
+			}
 	
 	return res;
 	
@@ -159,6 +186,16 @@ Matrix<T>::Squeeze () {
 }
 
 
+template <class T> Matrix<T>
+Matrix<T>::Squeeze () const {
+	
+	Matrix<T> res = (*this);
+	res.Squeeze();
+	return res;
+	
+}
+
+
 template <class T> unsigned short
 Matrix<T>::HDim () const {
 	
@@ -184,3 +221,4 @@ Matrix<T>::PrintDims () const {
 	printf ("\n");
 	
 }
+

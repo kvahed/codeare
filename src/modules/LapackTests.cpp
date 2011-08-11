@@ -53,9 +53,10 @@ LapackTests::Process     () {
 
 	Matrix<raw>    rlsv;
 	Matrix<raw>    rrsv;
+	Matrix<raw>     rsv;
 
 	std::cout << "Testing SVD (cgesdd) for raw:    ";
-	std::cout << "INFO: " << m_raw.SVD (true, &rlsv, &rrsv, &dsv)    << std::endl;
+	std::cout << "INFO: " << m_raw.SVD (true, &rlsv, &rrsv, &rsv)    << std::endl;
 
 	Matrix<double> test;
 	test.Dim(0) = 3;

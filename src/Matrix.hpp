@@ -149,33 +149,6 @@ public:
     Matrix              ();
     
     
-    /**
-     * @brief           Constructs a 16-dim matrix matrix with desired of zeros.
-     *
-     * @param  col      Scan
-     * @param  lin      Phase encoding lines
-     * @param  cha      Channels
-     * @param  set      Sets
-     * @param  eco      Echoes
-     * @param  phs      Phases
-     * @param  rep      Repetitions
-     * @param  seg      Segments
-     * @param  par      Partitions
-     * @param  slc      Slices
-     * @param  ida      IDA
-     * @param  idb      IDB
-     * @param  idc      IDC
-     * @param  idd      IDD
-     * @param  ide      IDE
-     * @param  ave      Averages
-     */
-    inline              
-    Matrix               (const int col, const int lin, const int cha, const int set, 
-                          const int eco, const int phs, const int rep, const int seg, 
-                          const int par, const int slc, const int ida, const int idb, 
-                          const int idc, const int idd, const int ide, const int ave);
-
-
 	/**
 	 * @brief           Construct 16-dim matrix with dimension array
 	 *
@@ -218,13 +191,40 @@ public:
     /**
 	 * @brief           Construct 4D volume
 	 *
-	 * @param  m        Rows
-	 * @param  n        Columns
-	 * @param  k        Slices
-	 * @param  t        Reps, time series or whatever
+     * @param  col      Scan
+     * @param  lin      Phase encoding lines
+     * @param  cha      Channels
+     * @param  set      Sets
+     * @param  eco      Echoes
+     * @param  phs      Phases
+     * @param  rep      Repetitions
+     * @param  seg      Segments
+     * @param  par      Partitions
+     * @param  slc      Slices
+     * @param  ida      IDA
+     * @param  idb      IDB
+     * @param  idc      IDC
+     * @param  idd      IDD
+     * @param  ide      IDE
+     * @param  ave      Averages
 	 */
 	inline 
-	Matrix              (const int m, const int n, const int k, const int t);
+	Matrix              (const int col, 
+						 const int lin, 
+						 const int cha,
+						 const int set,
+						 const int eco = 1,
+						 const int phs = 1,
+						 const int rep = 1,
+						 const int seg = 1,
+						 const int par = 1,
+						 const int slc = 1,
+						 const int ida = 1,
+						 const int idb = 1,
+						 const int idc = 1,
+						 const int idd = 1,
+						 const int ide = 1,
+						 const int ave = 1);
 	
 
     
@@ -367,46 +367,6 @@ public:
 
     
     /**
-     * @brief            Reference to value at position
-     *  
-     * @param  dim       Dimension
-	 * @param  pos       Position
-     * @return           Reference to _M[pos]
-     */
-    inline T&           
-	At                  (const IceDim dim, const int pos) {
-
-		int n = 1;
-
-		for (int i = 0; i < dim; i++)
-			n *= _dim[i];
-			
-        return _M[pos*n-1];
-
-    }
-
-    
-    /**
-     * @brief            Reference to value at position
-     *  
-     * @param  dim       Dimension
-	 * @param  pos       Position
-     * @return           Reference to _M[pos]
-     */
-    inline T           
-	At                  (const IceDim dim, const int pos) const {
-
-		int n = 1;
-
-		for (int i = 0; i < dim; i++)
-			n *= _dim[i];
-			
-        return _M[pos*n-1];
-
-    }
-
-    
-    /**
      * @brief           Get value in slice
      *  
      * @param  col      Column
@@ -495,32 +455,34 @@ public:
 						  const int cha,
 						  const int set,
 						  const int eco,
-						  const int phs,
-						  const int rep,
-						  const int seg,
-						  const int par,
-						  const int slc,
-						  const int ida,
-						  const int idb,
-						  const int idc,
-						  const int idd,
-						  const int ide,
-						  const int ave) const {
-        return _M [col+
+						  const int phs = 0,
+						  const int rep = 0,
+						  const int seg = 0,
+						  const int par = 0,
+						  const int slc = 0,
+						  const int ida = 0,
+						  const int idb = 0,
+						  const int idc = 0,
+						  const int idd = 0,
+						  const int ide = 0,
+						  const int ave = 0) const {
+		return _M [col+
 				   lin*_dim[COL]+
 				   cha*_dim[COL]*_dim[LIN]+
-				   eco*_dim[COL]*_dim[LIN]*lin*_dim[CHA]+
-				   phs*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]+
-				   rep*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]+
-				   seg*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]+
-				   par*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
-				   slc*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
-				   ida*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
-				   idb*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
-				   idc*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
-				   idd*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
-				   ide*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
-				   ave*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+				   set*_dim[COL]*_dim[LIN]*_dim[CHA]+
+				   eco*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]+
+				   phs*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]+
+				   rep*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]+
+				   seg*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]+
+				   par*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
+				   slc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
+				   ida*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
+				   idb*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
+				   idc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
+				   idd*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
+				   ide*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
+				   ave*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+
     }
     
     
@@ -550,33 +512,35 @@ public:
 						  const int lin, 
 						  const int cha,
 						  const int set,
-						  const int eco,
-						  const int phs,
-						  const int rep,
-						  const int seg,
-						  const int par,
-						  const int slc,
-						  const int ida,
-						  const int idb,
-						  const int idc,
-						  const int idd,
-						  const int ide,
-						  const int ave) {
-        return _M [col+
+						  const int eco = 0,
+						  const int phs = 0,
+						  const int rep = 0,
+						  const int seg = 0,
+						  const int par = 0,
+						  const int slc = 0,
+						  const int ida = 0,
+						  const int idb = 0,
+						  const int idc = 0,
+						  const int idd = 0,
+						  const int ide = 0,
+						  const int ave = 0) {
+		return _M [col+
 				   lin*_dim[COL]+
 				   cha*_dim[COL]*_dim[LIN]+
-				   eco*_dim[COL]*_dim[LIN]*lin*_dim[CHA]+
-				   phs*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]+
-				   rep*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]+
-				   seg*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]+
-				   par*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
-				   slc*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
-				   ida*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
-				   idb*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
-				   idc*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
-				   idd*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
-				   ide*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
-				   ave*_dim[COL]*_dim[LIN]*lin*_dim[CHA]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+				   set*_dim[COL]*_dim[LIN]*_dim[CHA]+
+				   eco*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]+
+				   phs*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]+
+				   rep*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]+
+				   seg*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]+
+				   par*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
+				   slc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
+				   ida*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
+				   idb*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
+				   idc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
+				   idd*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
+				   ide*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
+				   ave*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+
     }
     
 	
@@ -611,6 +575,16 @@ public:
 	
 	
 	/**
+	 * @brief           Create nxn matrix initialised with T(1.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn ones
+	 */
+	static Matrix<T> 
+	Ones                (const int n, const int m, const int l);
+	
+	
+	/**
 	 * @brief           Create nxn matrix initialised with T(0.0)
 	 *
 	 * @param  n        Side length of matrix
@@ -630,6 +604,129 @@ public:
 	Zeros               (const int n, const int m);
 	
 	
+	/**
+	 * @brief           Create nxn matrix initialised with T(0.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Zeros               (const int n, const int m, const int l);
+
+	
+	/**
+	 * @brief           Reshape (MATLAB-like reshape). 
+	 *                  All dims beyond lin are optional.
+	 *
+     * @param  col      Column
+     * @param  lin      Line
+	 * @param  cha      Channel
+	 * @param  set      Set
+	 * @param  eco      Echo
+	 * @param  phs      Phase
+	 * @param  rep      Repetition
+	 * @param  seg      Segment
+	 * @param  par      Partition
+	 * @param  slc      Slice
+	 * @param  ida      Free index A
+	 * @param  idb      Free index B
+	 * @param  idc      Free index C
+	 * @param  idd      Free index D
+	 * @param  ide      Free index E
+     * @param  ave      Average
+     * @return          Reference to position
+	 */
+	Matrix <T>
+	Reshape             (const int col, 
+						 const int lin, 
+						 const int cha = 1,
+						 const int set = 1,
+						 const int eco = 1,
+						 const int phs = 1,
+						 const int rep = 1,
+						 const int seg = 1,
+						 const int par = 1,
+						 const int slc = 1,
+						 const int ida = 1,
+						 const int idb = 1,
+						 const int idc = 1,
+						 const int idd = 1,
+						 const int ide = 1,
+						 const int ave = 1) const {
+		
+		Matrix<T> res = (*this);
+		res.reshape (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
+		return res;
+		
+	}
+	
+
+	/**
+	 * @brief           Reshape (MATLAB-like reshape). 
+	 *                  All dims beyond lin are optional.
+	 *
+     * @param  col      Column
+     * @param  lin      Line
+	 * @param  cha      Channel
+	 * @param  set      Set
+	 * @param  eco      Echo
+	 * @param  phs      Phase
+	 * @param  rep      Repetition
+	 * @param  seg      Segment
+	 * @param  par      Partition
+	 * @param  slc      Slice
+	 * @param  ida      Free index A
+	 * @param  idb      Free index B
+	 * @param  idc      Free index C
+	 * @param  idd      Free index D
+	 * @param  ide      Free index E
+     * @param  ave      Average
+     * @return          Reference to position
+	 */
+	void
+	Reshape             (const int col, 
+						 const int lin, 
+						 const int cha = 1,
+						 const int set = 1,
+						 const int eco = 1,
+						 const int phs = 1,
+						 const int rep = 1,
+						 const int seg = 1,
+						 const int par = 1,
+						 const int slc = 1,
+						 const int ida = 1,
+						 const int idb = 1,
+						 const int idc = 1,
+						 const int idd = 1,
+						 const int ide = 1,
+						 const int ave = 1) {
+		
+		int new_size = col * lin * cha * set * eco * phs * rep * 
+			seg * par * slc * ida * idb * idc * idd * ide * ave;
+
+		// Can't allow change of #elements
+		assert (new_size == Size());
+
+		_dim[COL] = col;
+		_dim[LIN] = lin;
+		_dim[CHA] = cha;
+		_dim[SET] = set;
+		_dim[ECO] = eco;
+		_dim[PHS] = phs;
+		_dim[REP] = rep;
+		_dim[SEG] = seg;
+		_dim[PAR] = par;
+		_dim[SLC] = slc;
+		_dim[IDA] = ida;
+		_dim[IDB] = idb;
+		_dim[IDC] = idc;
+		_dim[IDD] = idd;
+		_dim[IDE] = ide;
+		_dim[AVE] = ave;
+
+	}
+	
+
 	/**
 	 * @brief           Get the element at position p of the vector, i.e. this(p).
      *
@@ -704,6 +801,81 @@ public:
            return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
     }
     
+
+	T&                 
+    operator()           (const int col, 
+						  const int lin, 
+						  const int cha,
+						  const int set,
+						  const int eco = 0,
+						  const int phs = 0,
+						  const int rep = 0,
+						  const int seg = 0,
+						  const int par = 0,
+						  const int slc = 0,
+						  const int ida = 0,
+						  const int idb = 0,
+						  const int idc = 0,
+						  const int idd = 0,
+						  const int ide = 0,
+						  const int ave = 0) { 
+
+		return _M [col+
+				   lin*_dim[COL]+
+				   cha*_dim[COL]*_dim[LIN]+
+				   set*_dim[COL]*_dim[LIN]*_dim[CHA]+
+				   eco*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]+
+				   phs*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]+
+				   rep*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]+
+				   seg*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]+
+				   par*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
+				   slc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
+				   ida*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
+				   idb*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
+				   idc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
+				   idd*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
+				   ide*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
+				   ave*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+		
+	}
+
+	T
+    operator()           (const int col, 
+						  const int lin, 
+						  const int cha,
+						  const int set,
+						  const int eco = 0,
+						  const int phs = 0,
+						  const int rep = 0,
+						  const int seg = 0,
+						  const int par = 0,
+						  const int slc = 0,
+						  const int ida = 0,
+						  const int idb = 0,
+						  const int idc = 0,
+						  const int idd = 0,
+						  const int ide = 0,
+						  const int ave = 0) const { 
+		
+		return _M [col+
+				   lin*_dim[COL]+
+				   cha*_dim[COL]*_dim[LIN]+
+				   set*_dim[COL]*_dim[LIN]*_dim[CHA]+
+				   eco*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]+
+				   phs*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]+
+				   rep*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]+
+				   seg*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]+
+				   par*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
+				   slc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
+				   ida*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
+				   idb*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
+				   idc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
+				   idd*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
+				   ide*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
+				   ave*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+
+	}
+
     //@}
     
 
@@ -715,6 +887,7 @@ public:
     
     //@{
     
+
     /**
      * @brief            Operates only on inner 2D: Get a Row of data
      *  
@@ -722,7 +895,7 @@ public:
      * @return           Copy data into new vector
      */
     Matrix <T>           
-    Row                  (int r);
+    Row                  (int r) const;
 	
     
     /**
@@ -732,7 +905,7 @@ public:
      * @return           Copy data into new vector
      */
     Matrix <T>           
-    Column               (int c);
+    Column               (int c) const;
 	
     /**
      * @brief            Operates only on inner 3D: Get a slice of data
@@ -741,7 +914,7 @@ public:
      * @return           Copy data into new matrix and return
      */
     Matrix <T>           
-    Slice                (int s);
+    Slice                (int s) const;
 	
     /**
      * @brief            Operates only on inner 3D: Get a slice of data
@@ -750,7 +923,7 @@ public:
      * @return           Copy data into new matrix and return
      */
     Matrix <T>           
-    Volume               (int v);
+    Volume               (int v) const;
 	
 
 	//@}
@@ -1617,6 +1790,13 @@ public:
     Squeeze             ();
     
 
+    /**
+     * @brief           Squeeze dimensions
+     */
+	Matrix<T>
+    Squeeze             () const ;
+    
+
 	/**
 	 * @brief           Highest occupied dimension
 	 *
@@ -1701,7 +1881,7 @@ public:
      * @return          Info from Lapack operation.
      */
     inline int
-	SVD                 (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<double>* sv);
+	SVD                 (const bool cm, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<T>* sv);
     
 	
     //@}
@@ -1729,16 +1909,20 @@ private:
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Slice (int s) {
+Matrix<T>::Volume (int s) const {
+    
+	assert (Is4D());
     
     Matrix<T> res;
 
-	for (int j = 0; j < SLC; j++)
+	for (int j = 0; j < 3; j++)
 		res.Dim(j) = _dim[j];
 
 	res.Reset();
 
-	memcpy (&res[0], &_M[s * _dim[0]*_dim[1]], _dim[0]*_dim[1]*sizeof(T));
+	int nc = _dim[0]*_dim[1]*_dim[2];
+
+	memcpy (&res[0], &_M[s * nc], nc * sizeof(T));
 
 	return res;
 
@@ -1746,7 +1930,30 @@ Matrix<T>::Slice (int s) {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Row (int r) {
+Matrix<T>::Slice (int s) const {
+    
+	assert (Is3D());
+    
+    Matrix<T> res;
+
+	for (int j = 0; j < 2; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+	int nc = _dim[0]*_dim[1];
+
+	memcpy (&res[0], &_M[s * nc], nc*sizeof(T));
+
+	return res;
+
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::Row (int r)  const {
+
+	assert (Is2D());
     
     Matrix<T> res;
 
@@ -1762,7 +1969,7 @@ Matrix<T>::Row (int r) {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Column (int c) {
+Matrix<T>::Column (int c) const {
     
     Matrix<T> res;
 
