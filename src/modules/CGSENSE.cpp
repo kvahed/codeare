@@ -6,20 +6,6 @@
 
 #include <vector>
 
-
-#ifdef ISNAN_IN_NAMESPACE_STD
-inline bool isnan (double x) {
-	return std::isnan(x);
-}
-#elif ISNAN_IN_NAMESPACE_GNU_CXX
-
-#else 
-inline bool isnan (double x) {
-	volatile double d  = x;
-    return          d != d;
-}
-#endif
-
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
 using namespace RRStrategy;
@@ -275,7 +261,7 @@ CGSENSE::Process () {
 		printf ("  %03i: CG residuum: %.9f\n", i, res.at(i));
 
 		// Convergence ? ----------------------------------------------
-		if (isnan(res.at(i)) || res.at(i) <= m_cgeps)
+		if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps)
 			break;
 		
 		// CG step ----------------------------------------------------
@@ -297,7 +283,7 @@ CGSENSE::Process () {
 			memcpy (&sstore[i * m_rhelper.Size()], &m_rhelper[0], m_rhelper.Size() * sizeof(double));
 		}
 
-		if (isnan(res.at(i)))
+		if (std::isnan(res.at(i)))
 			break;
 
 	}
