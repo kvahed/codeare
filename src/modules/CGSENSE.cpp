@@ -6,7 +6,14 @@
 
 #include <vector>
 
-#ifndef HAVE_ISNAN
+
+#ifdef ISNAN_IN_NAMESPACE_STD
+inline bool isnan (double x) {
+	return std::isnan(x);
+}
+#elif ISNAN_IN_NAMESPACE_GNU_CXX
+
+#else 
 inline bool isnan (double x) {
 	volatile double d  = x;
     return          d != d;

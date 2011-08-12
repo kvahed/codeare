@@ -50,7 +50,45 @@ AC_C_INLINE
 AX_COMPILER_VENDOR
 
 #
-AC_CHECK_FUNCS([isnan isinf])
+#AC_CHECK_FUNCS([isnan isinf])
+AC_DEFUN([AC_CXX_NAMESPACES],
+	 [AC_MSG_CHECKING([whether C++ namespaces are supported])
+	  AC_LANG_PUSH([C++])
+	  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[namespace Outer { namespace Inner { int i = 0; }}]], [[using namespace Outer::Inner; return i;]])],[ac_cv_cxx_namespaces=yes],[ac_cv_cxx_namespaces=no])
+          AC_LANG_POP
+	  AC_MSG_RESULT($ac_cv_cxx_namespaces)
+	  if test "$ac_cv_cxx_namespaces" = yes; then
+		AC_DEFINE(HAVE_NAMESPACES,,[define if the compiler implements namespaces])
+          fi])
+			      
+AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_STD],
+	[AC_REQUIRE([AC_CXX_NAMESPACES])
+	AC_MSG_CHECKING([whether isnan is in namespace std])
+	 AC_LANG_PUSH([C++])
+	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <cmath>
+	   namespace lemur { int isnan(float x){ return std::isnan(x); } };]], [[
+	   using namespace lemur; float x = 1.0; lemur::isnan(x); return 0;]])],[ac_cv_cxx_isnan_std=yes],[ac_cv_cxx_isnan_std=no])
+         AC_LANG_POP
+ 	  AC_MSG_RESULT($ac_cv_cxx_isnan_std)
+         if test "$ac_cv_cxx_isnan_std" = yes; then
+	    AC_DEFINE(ISNAN_IN_NAMESPACE_STD,,[define if the compiler has isnan function in namespace std])
+	 fi])
+
+AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX],
+	[AC_REQUIRE([AC_CXX_NAMESPACES])
+	AC_MSG_CHECKING([whether isnan is in namespace __gnu_cxx])
+	 AC_LANG_PUSH([C++])
+	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <cmath>
+	   namespace lemur { int isnan(float x){ return __gnu_cxx::isnan(x); } };]], [[
+	   using namespace lemur; float x = 1.0; lemur::isnan(x); return 0;]])],[ac_cv_cxx_isnan_gnu_cxx=yes],[ac_cv_cxx_isnan_gnu_cxx=no])
+         AC_LANG_POP
+ 	  AC_MSG_RESULT($ac_cv_cxx_isnan_gnu_cxx)
+         if test "$ac_cv_cxx_isnan_gnu_cxx" = yes; then
+	    AC_DEFINE(ISNAN_IN_NAMESPACE_GNU_CXX,,[define if the compiler has isnan function in namespace __gnu_cxx])
+	 fi])
+
+AC_CXX_ISNAN_IN_NAMESPACE_STD	       
+AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX
 
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])

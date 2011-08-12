@@ -39,12 +39,6 @@
 /* Define to 1 if you have the <iostream> header file. */
 #undef HAVE_IOSTREAM
 
-/* Define to 1 if you have the `isinf' function. */
-#undef HAVE_ISINF
-
-/* Define to 1 if you have the `isnan' function. */
-#undef HAVE_ISNAN
-
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
@@ -77,6 +71,9 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
+
+/* define if the compiler implements namespaces */
+#undef HAVE_NAMESPACES
 
 /* Define to 1 if you have the <nfft3util.h> header file. */
 #undef HAVE_NFFT3UTIL_H
@@ -131,6 +128,12 @@
 
 /* Define if you have the UNICOS _rtc() intrinsic. */
 #undef HAVE__RTC
+
+/* define if the compiler has isnan function in namespace __gnu_cxx */
+#undef ISNAN_IN_NAMESPACE_GNU_CXX
+
+/* define if the compiler has isnan function in namespace std */
+#undef ISNAN_IN_NAMESPACE_STD
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
