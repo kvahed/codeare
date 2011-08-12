@@ -6,12 +6,12 @@
 
 #include <vector>
 
-//#ifndef HAVE_ISNAN
+#ifndef HAVE_ISNAN
 inline bool isnan (double x) {
 	volatile double d  = x;
     return          d != d;
 }
-//#endif
+#endif
 
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 

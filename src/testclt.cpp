@@ -371,10 +371,10 @@ bool mxtest (ReconClient* rc) {
 
 	r1.mxdump (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	
-	Matrix<raw> r2;
+	/*Matrix<raw> r2;
 	r2.mxread (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	
-	std::cout << r2 << std::endl << std::endl;
+	std::cout << r2 << std::endl << std::endl;*/
 
 #else
 

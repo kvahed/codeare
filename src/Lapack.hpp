@@ -23,9 +23,9 @@ extern "C" {
 				    int   *ldvl, void    *vr, int *ldvr, void *work, int *lwork,               int  *info);
 	
 	// Singular value decomposition 
-	void cgesdd_   (char *jobz, int    *m, int     *n, void     *a, int     *lda, float     *s, void    *u, int  *ldu, 
+	void cgesdd_   (const char *jobz, int    *m, int     *n, void     *a, int     *lda, float     *s, void    *u, int  *ldu, 
 				    void   *vt, int *ldvt, void *work, int  *lwork, float *rwork, int   *iwork, int  *info);
-	void dgesdd_   (char *jobz, int    *m, int     *n, void     *a, int     *lda, void      *s, void    *u, int  *ldu, 
+	void dgesdd_   (const char *jobz, int    *m, int     *n, void     *a, int     *lda, void      *s, void    *u, int  *ldu, 
 				    void   *vt, int *ldvt, void *work, int  *lwork,               int   *iwork, int  *info);
 
 	// Minimize L2-norm (|b-A*x|) - b = id delivers pinv
