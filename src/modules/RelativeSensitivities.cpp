@@ -29,6 +29,7 @@ FTVolumes (Matrix<raw>* r) {
 	int         vols    = r->Size() / (imsize);
 	int         threads = 1;
 	Matrix<raw> hann    = Matrix<raw>::Ones(r->Dim(0), r->Dim(1), r->Dim(2)).HannWindow();
+	ticks       tic     = getticks();
 	
 	printf ("  Fourier transforming %i volumes of %lix%lix%li ... ", vols, r->Dim(0), r->Dim(1), r->Dim(2));
 	
@@ -77,6 +78,8 @@ FTVolumes (Matrix<raw>* r) {
 		fftwf_destroy_plan(p[i]);
 
 	printf ("done. - ");
+	printf ("  FFT time: %.4f seconds.\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+
 	
 	return RRSModule::OK;
 	
@@ -86,26 +89,32 @@ FTVolumes (Matrix<raw>* r) {
 RRSModule::error_code 
 RemoveOS (Matrix<raw>* imgs) {
 
+	printf ("  Removing RO oversampling ... ");
+	
+	ticks tic    = getticks();
 	Matrix<raw> tmp = (*imgs);
 	
 	imgs->Dim(0) = imgs->Dim(0) / 2;
 	imgs->Reset();
 
-	int ossiz  = tmp.Dim(0);
-	int nssiz  = imgs->Dim(0);
-	int nscans = tmp.Size() / ossiz;
-	int offset = floor ( (float)(tmp.Dim(0)-imgs->Dim(0))/2.0 ); 
+	int   ossiz  = tmp.Dim(0);
+	int   nssiz  = imgs->Dim(0);
+	int   nscans = tmp.Size() / ossiz;
+	int   offset = floor ( (float)(tmp.Dim(0)-imgs->Dim(0))/2.0 ); 
 
 	for (int i = 0; i < nscans; i++)
 		memcpy (&imgs->At(i*nssiz), &tmp.At(i*ossiz+offset), nssiz * sizeof(raw));
 
+	printf ("done. - ");
+	printf ("  Remove RO-oversampling time: %.4f seconds.\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	
 	return RRSModule::OK;
 
 }
 
 
 RRSModule::error_code
-SVDCalibrate (const Matrix<raw>* imgs, Matrix<raw>* rxm, Matrix<raw>* txm, Matrix<raw>* shim, const bool normalise) {
+SVDCalibrate (const Matrix<raw>* imgs, Matrix<raw>* rxm, Matrix<raw>* txm, Matrix<double>* snro, Matrix<raw>* shim, const bool normalise) {
 
 	int         nrxc = rxm->Dim(3);
 	int         ntxc = txm->Dim(3);
@@ -113,12 +122,13 @@ SVDCalibrate (const Matrix<raw>* imgs, Matrix<raw>* rxm, Matrix<raw>* txm, Matri
 	int       rtmsiz = nrxc * ntxc;
 	int         vols = imgs->Size() / volsize / 2; // division by 2 (Echoes)
 	int         rtms = imgs->Size() / rtmsiz / 2;  // division by 2 (Echoes)
-
+	ticks        tic = getticks();
+	
 	printf ("  SVDing %i matrices of %lix%li ... ", rtms, nrxc, ntxc);
 	
 	// Permute dimensions on imgs for contiguous RAM access
 	Matrix<raw> vxlm (nrxc, ntxc, imgs->Dim(0), imgs->Dim(1), imgs->Dim(2));
-
+	
 	for (int s = 0; s < imgs->Dim(2); s++)
 		for (int l = 0; l < imgs->Dim(1); l++)
 			for (int c = 0; c < imgs->Dim(0); c++)
@@ -126,10 +136,10 @@ SVDCalibrate (const Matrix<raw>* imgs, Matrix<raw>* rxm, Matrix<raw>* txm, Matri
 					for (int r = 0; r < nrxc; r++)
 						// multiplication with 2 (Need only 1st echo)
 						vxlm (r, t, c, l, s) = imgs->At(c, l, s, 0, t, r); 
-
+	
 	Matrix<raw> OptSNR (imgs->Dim(0), imgs->Dim(1), imgs->Dim(2));
 	int         threads = 1;
-
+	
 #pragma omp parallel default (shared) 
 	{
 		threads  = omp_get_num_threads();
@@ -173,12 +183,21 @@ SVDCalibrate (const Matrix<raw>* imgs, Matrix<raw>* rxm, Matrix<raw>* txm, Matri
 		
 	}
 
-	rxm->dump("rxm.h5");
-	txm->dump("txm.h5");
-	OptSNR.dump("osnr.h5");
-
 	printf ("done. - ");
+	printf ("  SVDs time: %.4f seconds.\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
+	return RRSModule::OK;
+
+}
+
+
+RRSModule::error_code
+B0Map (const Matrix<raw>* imgs, Matrix<double>* b0, const float TE) {
+
+	Matrix<raw> tmp = imgs->Mean(4);
+	tmp.Squeeze();
+	tmp.dump("mean.h5");
+
 	return RRSModule::OK;
 
 }
@@ -200,33 +219,38 @@ RelativeSensitivities::Process     () {
 
 	// Fourier transform ----------------------
 
-	ticks       tic   = getticks();
-
 	FTVolumes (&m_raw);
-
-	printf ("  FFT time: %.4f seconds.\n", elapsed(getticks(), tic) / ClockRate());
 	// -----------------------------------------
 
 	
 	// Remove readout oversampling -------------
 
 	RemoveOS (&m_raw);
-
 	// -----------------------------------------
 
 
 	// SVD calibration -------------------------
 	
-	tic = getticks();
+	Matrix<raw>    shim (m_raw.Dim(4), 1);                                        // Shim coefficients
+	Matrix<raw>    txm  (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2), m_raw.Dim(4)); // TX maps
+	Matrix<raw>    rxm  (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2), m_raw.Dim(5)); // RX maps
+	Matrix<double> snro (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2));               // SNR optimal image
+	
+	SVDCalibrate (&m_raw, &rxm, &txm, &snro, &shim, false);
+   	// -----------------------------------------
 
-	Matrix<raw> shim (m_raw.Dim(4), 1);                                        // Shim coefficients
-	Matrix<raw> txm  (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2), m_raw.Dim(4)); // TX maps
-	Matrix<raw> rxm  (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2), m_raw.Dim(5)); // RX maps
-	
-	SVDCalibrate (&m_raw, &rxm, &txm, &shim, false);
-	
-	printf ("  SVDs time: %.4f seconds.\n", elapsed(getticks(), tic) / ClockRate());
+	// B0 calculation --------------------------
+
+	Matrix<double> b0 (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2));
+	float TE = 1.5e-3;
+
+	B0Map (&m_raw, &b0, TE);
 	// -----------------------------------------
+
+	m_raw     = txm;
+	m_rhelper = rxm;
+	m_helper  = snro;
+	m_kspace  = b0;
 
 	return RRSModule::OK;
 

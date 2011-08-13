@@ -159,8 +159,7 @@ bool Matrix<T>::h5dump (std::string fname, std::string dname, std::string dloc) 
 
 				std::vector<std::string> sv;
 
-				Toolbox tb;
-				tb.split(sv, dloc, "/");
+				Toolbox::Instance()->Split (sv, dloc, "/");
 
 				for (int i = 0; i < sv.size(); i++) {
 					
@@ -344,10 +343,11 @@ bool Matrix<T>::rawread (std::string fname, std::string version) {
 	unsigned long nscans = (Size() / _dim[COL]);
 	unsigned      start;
 	unsigned      size;
+	size_t        read;
 
 	// Assess data size
 	f = fopen (fname.c_str(), "rb");
-	fread (&l, sizeof(unsigned), 1, f);
+	read = fread (&l, sizeof(unsigned), 1, f);
 	fseek (f,     l, SEEK_SET);
 	start = ftell(f);
 	fseek (f,    -1, SEEK_END);
@@ -363,7 +363,7 @@ bool Matrix<T>::rawread (std::string fname, std::string version) {
 
 	for (int i = 0; i < nscans; i++) {
 
-		fread (&mdh[i], sizeof(sMDH), 1, f);
+		read = fread (&mdh[i], sizeof(sMDH), 1, f);
 
 		n = mdh[i].sLC.ushLine       * _dim[0] +
 			mdh[i].sLC.ushSlice      * _dim[0] * _dim[1] +
@@ -375,7 +375,7 @@ bool Matrix<T>::rawread (std::string fname, std::string version) {
 			mdh[i].sLC.ushSeg        * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] * _dim[7] +
 			mdh[i].ushChannelId      * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] * _dim[7] * _dim[8];
 
-		fread (&_M[n], sizeof (std::complex<float>), _dim[0], f);
+		read = fread (&_M[n], sizeof (std::complex<float>), _dim[0], f);
 
 	}
 

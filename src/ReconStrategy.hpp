@@ -49,8 +49,7 @@ namespace RRServer {
 	 *        Derive hereof to expand the reconstruction toolbox
 	 *
 	 */
-	class ReconStrategy : 
-		public Configurable {
+	class ReconStrategy : public Configurable {
 		
 		
 	public:
@@ -96,50 +95,6 @@ namespace RRServer {
 		Finalise        () = 0;
 		
 
-		/**
-		 * @brief       CPU clock rate (Used in a humble abuse of FFTW cycle for timing information)
-		 *
-		 * @return      clock rate
-		 */
-		double 
-		ClockRate () {
-			
-#if defined(HAVE_MACH_ABSOLUTE_TIME)
-			
-			// OSX
-			
-			uint64_t freq = 0;
-			size_t   size = sizeof(freq);
-			
-			if (sysctlbyname("hw.tbfrequency", &freq, &size, NULL, 0) < 0)
-				perror("sysctl");
-			
-			return freq;
-			
-#else
-			
-			// LINUX
-			
-			FILE* scf;
-			std::string fname = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq";
-			int   freq = 1;
-			
-			scf = fopen(fname.c_str(), "rb");
-			
-			if (scf != NULL) {
-				int read = fscanf(scf,"%i",&freq);
-#ifdef VERBOSE
-				printf ("Read %i from %s\n", read, fname.c_str());
-#endif
-				fclose(scf);
-			}
-			
-			return 1000.0 * freq;
-			
-#endif
-		}
-		
-		
 		/**
 		 * @brief        Get data from recon (Remote access)
 		 *
@@ -519,10 +474,9 @@ namespace RRServer {
 	};
 	
 
-	
+}
 #endif /* __RECON_STRATEGY_HPP__ */
 	
-}
 
 
 /**
@@ -535,4 +489,5 @@ typedef RRServer::ReconStrategy* create_t  ();
  *@brief               Dynamic destructor
  */
 typedef void           destroy_t (RRServer::ReconStrategy*);
+
 
