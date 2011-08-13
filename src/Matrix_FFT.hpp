@@ -196,6 +196,83 @@ Matrix<T>::Squeeze () const {
 }
 
 
+template <class T> void
+Matrix<T>::Mean (const int d) {
+
+	float quot = (float) d;
+
+	this->Sum (d);
+	
+	for (int i = 0; i < Size(); i++)
+		_M[i] = _M[i] / quot;
+	
+}
+
+
+template <class T> Matrix<T>
+Matrix<T>::Mean (const int d) const {
+	
+	Matrix<T> res = (*this);
+	res.Mean(d);
+	return res;
+	
+}
+
+
+template <class T> void
+Matrix<T>::Sum (const int d) {
+
+	assert (d>=0 && d < INVALID_DIM);
+   
+	// No meaningful sum over particular dimension
+	if (_dim[d] == 1)
+		return;
+
+	// No RAM allocation 
+	if (!nb_alloc)
+		return;
+
+	// Save old data and resize matrix 
+	T* tmp = (T*) malloc (Size() * sizeof (T));
+	memcpy (tmp, _M, Size() * sizeof (T));
+	free (_M);
+	_M       = (T*) malloc ((Size() / _dim[d]) * sizeof(T));
+
+	// Inner size 
+	int insize = 1;
+	for (int i = 0; i < d; i++)
+		insize *= _dim[i];
+	
+	// Outer size
+	int outsize = 1;
+	for (int i = d+1; i < INVALID_DIM; i++)
+		outsize *= _dim[i];
+	
+	// Sum
+	for (int i = 0; i < outsize; i++)
+		for (int j = 0; j < insize; j++) {
+			_M[j+i*insize] = 0;
+			for (int k = 0; k < _dim[d]; k++)
+				_M[j+i*insize] += tmp[j+i*insize*_dim[d]+k*insize];
+		}
+
+	// Adjust dminesions and clear tmp
+	_dim[d] = 1;
+	free (tmp);
+
+}
+
+
+template <class T> Matrix<T>
+Matrix<T>::Sum (const int d) const {
+	
+	Matrix<T> res = (*this);
+	res.Sum(d);
+	return res;
+	
+}
+
+
 template <class T> unsigned short
 Matrix<T>::HDim () const {
 	

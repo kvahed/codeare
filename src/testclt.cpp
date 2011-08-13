@@ -323,24 +323,41 @@ bool fftwtest (ReconClient* rc) {
 
 bool resetest (ReconClient* rc) {
 
-	Matrix< std::complex<float> > meas;
+	Matrix<raw> meas;
+	Matrix<raw> txm;
+	Matrix<raw> rxm;
+	Matrix<double> b0;
+	Matrix<double> osnr;
 
-	std::string cf = std::string (base + std::string (config));
-	std::string df = std::string (base + std::string   (data));
-	std::string of = std::string (df + ".h5");
-
+	// IN
+	std::string cf    = std::string (base + std::string (config));
+	std::string df    = std::string (base + std::string   (data));
+	
+	// OUT
+	std::string txmf  = std::string (base + std::string ("txm.h5"));
+	std::string rxmf  = std::string (base + std::string ("rxm.h5"));
+	std::string osnrf = std::string (base + std::string ("osnr.h5"));
+	std::string b0f   = std::string (base + std::string ("b0.h5"));
+	
 	meas.rawread (df, std::string("VB15"));
-
+	
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
-
+	
 	rc->SetRaw (meas);
+	
 	rc->Process(test);
-	rc->GetRaw (meas);
+	
+	rc->GetRaw (txm);
+	rc->GetRHelper(rxm);
+	rc->GetHelper(osnr);
+	rc->GetKSpace(b0);
 	
 	rc->Finalise(test);
-
-	//meas.dump (of);
+	
+	txm.dump (txmf);
+	rxm.dump (rxmf);
+	osnr.dump (osnrf);
 	
 	return true;
 

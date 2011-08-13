@@ -1777,10 +1777,50 @@ public:
      * @brief           Sum of squares. 
      *
 	 * @param  d        Dimension to eliminate. If not given, it is done over the outermost
-     * @return          FFT shift.
+     * @return          Sum of squares
      */
 	Matrix<T>
     SOS                 (const int d = 0)           const;
+    
+
+    /**
+     * @brief           Mean along any dimension 
+     *
+	 * @param  d        Dimension to eliminate. If not given, done over the outermost
+     * @return          Mean
+     */
+	Matrix<T>
+    Mean                (const int d = 0)           const;
+    
+
+    /**
+     * @brief           Mean of this along any dimension  
+     *
+	 * @param  d        Dimension to eliminate. If not given, done over the outermost
+     * @return          Mean
+     */
+	void
+    Mean                (const int d = 0);
+    
+
+    /**
+     * @brief           Mean along any dimension 
+     *
+	 * @param  d        Dimension to eliminate. If not given, done over the outermost
+     * @return          Mean
+     */
+	Matrix<T>
+    Sum                 (const int d = 0)           const;
+    
+
+    /**
+     * @brief           Mean of this along any dimension  
+     *
+	 * @param  d        Dimension to eliminate. If not given, done over the outermost
+     * @return          Mean
+     */
+	void
+    Sum                 (const int d = 0);
     
 
     /**

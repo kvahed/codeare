@@ -289,7 +289,7 @@ CGSENSE::Process () {
 	}
 
 	// Report timimng -------------------------------------------------
-	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), cgstart) / ClockRate());
+	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	// Verbose output needs to 
 	if (m_verbose) {

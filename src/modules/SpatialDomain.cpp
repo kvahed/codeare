@@ -219,7 +219,7 @@ SpatialDomain::Process        () {
         
     } // End of pulse duration loop
 
-    printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / ClockRate());
+    printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / Toolbox::Instance()->ClockRate());
 	
 	// Put actual maximum RF amplitude into first cell
 
