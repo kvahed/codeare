@@ -249,17 +249,28 @@ Matrix<T>::Sum (const int d) {
 		outsize *= _dim[i];
 	
 	// Sum
-	for (int i = 0; i < outsize; i++)
-		for (int j = 0; j < insize; j++) {
-			_M[j+i*insize] = 0;
-			for (int k = 0; k < _dim[d]; k++)
-				_M[j+i*insize] += tmp[j+i*insize*_dim[d]+k*insize];
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		
+		for (int i = 0; i < outsize; i++) {
+			
+#pragma omp for
+
+			for (int j = 0; j < insize; j++) {
+				_M[j+i*insize] = 0;
+				for (int k = 0; k < _dim[d]; k++)
+					_M[j+i*insize] += tmp[j+i*insize*_dim[d]+k*insize];
+			}
+			
 		}
 
+	}
 	// Adjust dminesions and clear tmp
 	_dim[d] = 1;
 	free (tmp);
-
+	
 }
 
 

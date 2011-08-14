@@ -358,6 +358,7 @@ bool resetest (ReconClient* rc) {
 	txm.dump (txmf);
 	rxm.dump (rxmf);
 	osnr.dump (osnrf);
+	b0.dump (b0f);
 	
 	return true;
 
