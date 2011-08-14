@@ -1,12 +1,23 @@
 #include "Toolbox.hpp"
+#include "config.h"
+
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
 
 
 Toolbox* Toolbox::m_instance = 0;
 
 
+Toolbox::~Toolbox  () {
+     
+	m_instance=0;
+
+}
+
+
 Toolbox* 
-Toolbox::Instance() {
+Toolbox::Instance  () {
 
     if (m_instance == 0)
         m_instance = new Toolbox();
@@ -16,15 +27,8 @@ Toolbox::Instance() {
 }
 
 
-Toolbox::~Toolbox () {
-     
-	m_instance=0;
-
-}
-
-
 void 
-Toolbox::Split (std::vector<std::string>& sv, const std::string& str, const std::string& dlm) const {
+Toolbox::Split     (std::vector<std::string>& sv, const std::string& str, const std::string& dlm) const {
 	
 	assert (dlm.size() > 0);
 	
@@ -39,6 +43,7 @@ Toolbox::Split (std::vector<std::string>& sv, const std::string& str, const std:
 		
 		// If at end, use start=maxSize.  Else use start=end+delimiter.
 		start = ((end > (std::string::npos - dlm.size())) ? std::string::npos : end + dlm.size());
+
 	}
 
 }

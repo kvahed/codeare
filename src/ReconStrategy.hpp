@@ -35,8 +35,6 @@
 #include <cstdlib>
 #include <complex>
 #include <stdint.h>
-#include <sys/types.h>
-#include <sys/sysctl.h>
 
 #include "cycle.h"            // FFTW cycle implementation
 
