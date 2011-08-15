@@ -530,9 +530,9 @@ bool Matrix<T>::mxread (std::string fname, std::string dname, std::string dloc) 
 	
 	// Copy from memory block ----------------------
 	
-	if (typeid(T) != typeid(short))
+	if (typeid(T) != typeid(double))
 		memcpy(_M, mxGetPr(mxa), Size() * sizeof(T));
-	else 
+	else
 		for (int i = 0; i < Size(); i++)
 			_M[i] = ((T*)mxGetPr(mxa))[i];
 	// -------------------------------------------
@@ -575,7 +575,7 @@ bool Matrix<T>::mxdump (std::string fname, std::string dname, std::string dloc) 
 	if      (typeid(T) == typeid(double))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
 	else if (typeid(T) == typeid(raw))
-		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS, mxCOMPLEX);
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
 	else if (typeid(T) == typeid(short))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim,   mxINT8_CLASS,    mxREAL);
 	// -------------------------------------------
@@ -583,8 +583,10 @@ bool Matrix<T>::mxdump (std::string fname, std::string dname, std::string dloc) 
 	
 	// Copy to memory block ----------------------
 	
-	if (typeid(T) != typeid(short))
-		memcpy(mxGetPr(mxa), _M, Size() * sizeof(T));
+	if (typeid(T) == typeid(raw))
+		memcpy(mxGetPr(mxa), _M, Size() * 2 * sizeof(float));
+	else if (typeid(T) == typeid(double))
+		memcpy(mxGetPr(mxa), _M, Size() * sizeof(double));
 	else
 		for (int i = 0; i < Size(); i++)
 			((T*)mxGetPr(mxa))[i] = _M[i];
