@@ -379,15 +379,13 @@ bool mxtest (ReconClient* rc) {
 	out.mxread(std::string("test.mat"), std::string("imat"), std::string(""));
 
 	std::cout << out << std::endl << std::endl;
-
-
-	/*	Matrix<raw> r1 (4,8);
+	Matrix<raw> r1 (4,8);
 	r1.Random ();
 
 	std::cout << r1 << std::endl << std::endl;
 
 
-	r1.mxdump (std::string("rtest.mat"), std::string("rmat"), std::string(""));*/
+	r1.mxdump (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	
 	Matrix<raw> r2;
 	r2.mxread (std::string("rtest.mat"), std::string("rmat"), std::string(""));
