@@ -2,22 +2,10 @@
 #include "tinyxml/tinyxml.h"
 #include "mdhVB15.h"
 
+#include <nifti1_io.h>
+
 #include <limits>
 #include <map>
-
-
-template <class T>
-std::fstream& 
-Matrix<T>::SkipLines (const std::ifstream& file, const unsigned int num) {
-	
-    file.seekg (std::ios::beg);
-	
-    for(int i=0; i < num - 1; ++i)
-        file.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
-	
-    return file;
-	
-}
 
 
 inline bool 
@@ -85,7 +73,7 @@ operator<<    (std::ostream& os, Matrix<T>& M) {
 
 
 template <class T>
-bool Matrix<T>::pdump (std::string fname) {
+bool Matrix<T>::PRDump (std::string fname) {
 	
 	FILE *fp;
 	
@@ -106,18 +94,22 @@ bool Matrix<T>::pdump (std::string fname) {
 }
 
 template <class T>
-bool Matrix<T>::dump (std::string fname, std::string dname, std::string dloc, std::string fmt) {
+bool Matrix<T>::Dump (std::string fname, std::string dname, std::string dloc, io_strategy ios) {
 
-	/*if (fmt.compare("mx"))
-	  return mxdump (fname, dname, dloc);
-	  else*/
-	return h5dump (fname, dname, dloc);
+	if      (ios == MATLAB)
+		return MXDump (fname, dname, dloc);
+	else if (ios == HDF5)
+		return H5Dump (fname, dname, dloc);
+	else if (ios == NIFTI)
+		return NIDump (fname);
+	else
+		return PRDump (fname);
 
 }
 
 
 template <class T>
-bool Matrix<T>::h5dump (std::string fname, std::string dname, std::string dloc) {
+bool Matrix<T>::H5Dump (std::string fname, std::string dname, std::string dloc) {
 
 	int i = 0;
 
@@ -256,7 +248,7 @@ bool Matrix<T>::h5dump (std::string fname, std::string dname, std::string dloc) 
 
 
 template <class T>
-bool Matrix<T>::rsadjust (std::string fname) {
+bool Matrix<T>::RSAdjust (std::string fname) {
 
 	int  dimk;
 	long dimv;
@@ -327,10 +319,10 @@ bool Matrix<T>::rsadjust (std::string fname) {
 
 
 template <class T>
-bool Matrix<T>::rawread (std::string fname, std::string version) {
+bool Matrix<T>::RAWRead (std::string fname, std::string version) {
 	
 	// Get size information from XProtocol and resize 
-	rsadjust(fname);
+	RSAdjust(fname);
 
 	printf ("         Col  Lin  Slc  Par  Ech  Pha  Rep  Set  Seg  Cha  Ida  Idb  Idc  Idd  Ide  Ave\n");
 	printf ("Matrix: % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i\n\n",
@@ -387,17 +379,20 @@ bool Matrix<T>::rawread (std::string fname, std::string version) {
 }
 
 template <class T>
-bool Matrix<T>::read (std::string fname, std::string dname, std::string dloc, std::string fmt) {
+bool Matrix<T>::Read (std::string fname, std::string dname, std::string dloc, io_strategy ios) {
 
-	//if (std::strcomp("mx", fmt.c_str()))
-	//	return mxread (fname, dname, dloc);
-	//else
-		return h5read (fname, dname, dloc);
+	if (     ios == HDF5)
+		return H5Read (fname, dname, dloc);
+	else if (ios == MATLAB)
+		return MXRead (fname, dname, dloc);
+	else if (ios == NIFTI)
+		return NIRead (fname);
+
 }
 
 
 template <class T>
-bool Matrix<T>::h5read (std::string fname, std::string dname, std::string dloc) {
+bool Matrix<T>::H5Read (std::string fname, std::string dname, std::string dloc) {
 	
     if (fname != "") {
 		
@@ -494,7 +489,7 @@ bool Matrix<T>::h5read (std::string fname, std::string dname, std::string dloc) 
 #include "mat.h"
 
 template <class T>
-bool Matrix<T>::mxread (std::string fname, std::string dname, std::string dloc) {
+bool Matrix<T>::MXRead (std::string fname, std::string dname, std::string dloc) {
 
 	
 	// Open file ---------------------------------
@@ -530,8 +525,13 @@ bool Matrix<T>::mxread (std::string fname, std::string dname, std::string dloc) 
 	
 	// Copy from memory block ----------------------
 	
-	if (typeid(T) != typeid(double))
+	if (typeid(T) == typeid(double))
 		memcpy(_M, mxGetPr(mxa), Size() * sizeof(T));
+	else if (typeid(T) == typeid(raw))
+		for (int i = 0; i < Size(); i++) {
+			float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
+			memcpy(&_M[i], f, 2 * sizeof(float));
+		}
 	else
 		for (int i = 0; i < Size(); i++)
 			_M[i] = ((T*)mxGetPr(mxa))[i];
@@ -551,7 +551,7 @@ bool Matrix<T>::mxread (std::string fname, std::string dname, std::string dloc) 
 
 
 template <class T>
-bool Matrix<T>::mxdump (std::string fname, std::string dname, std::string dloc) {
+bool Matrix<T>::MXDump (std::string fname, std::string dname, std::string dloc) {
 
 	// Open file ---------------------------------
 
@@ -575,7 +575,7 @@ bool Matrix<T>::mxdump (std::string fname, std::string dname, std::string dloc) 
 	if      (typeid(T) == typeid(double))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
 	else if (typeid(T) == typeid(raw))
-		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS, mxCOMPLEX);
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
 	else if (typeid(T) == typeid(short))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim,   mxINT8_CLASS,    mxREAL);
 	// -------------------------------------------
@@ -583,8 +583,13 @@ bool Matrix<T>::mxdump (std::string fname, std::string dname, std::string dloc) 
 	
 	// Copy to memory block ----------------------
 	
-	if (typeid(T) != typeid(short))
+	if (typeid(T) == typeid(double))
 		memcpy(mxGetPr(mxa), _M, Size() * sizeof(T));
+	else if (typeid(T) == typeid(raw))
+		for (int i = 0; i < Size(); i++) {
+			((float*)mxGetPr(mxa))[i] = ((float*)_M)[2*i+0]; // Template compilation workaround
+			((float*)mxGetPi(mxa))[i] = ((float*)_M)[2*i+1]; // Can't use .imag() .real(). Consider double/short 
+		}
 	else
 		for (int i = 0; i < Size(); i++)
 			((T*)mxGetPr(mxa))[i] = _M[i];
@@ -614,3 +619,49 @@ bool Matrix<T>::mxdump (std::string fname, std::string dname, std::string dloc) 
 }
 
 #endif
+
+
+template <class T>
+bool Matrix<T>::NIDump (std::string fname) {
+}
+
+template <class T>
+bool Matrix<T>::NIRead (std::string fname) {
+	
+	nifti_image* ni = nifti_image_read (fname.c_str(), 1);
+	
+	for (int i = 0; i < ni->dim[0]; i++)
+		if (ni->dim[i+1] > 1)
+			_dim[i] = ni->dim[i+1];
+	
+	Reset();
+	
+	printf ("  Dimensions: ");
+	for (int i = 0; i < INVALID_DIM; i++)
+		if (_dim[i] > 1)
+			printf (" %i", _dim[i]);
+	printf ("\n");
+	
+	if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
+		if (ni->datatype == 64)
+			memcpy (_M, ni->data, Size()*sizeof(T));
+		else 
+			for (int i = 0; i < Size(); i++ )
+				_M[i] = ((float*)ni->data)[i];
+	} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(raw)) {
+		if (ni->datatype == 32)
+			memcpy (_M, ni->data, Size()*sizeof(T));
+		else 
+			for (int i = 0; i < Size(); i++) {
+				float f[2] = {((double*)ni->data)[2*i], ((double*)ni->data)[2*i+1]};
+				memcpy(&_M[i], f, 2 * sizeof(float));
+			}
+	} else if (ni->datatype == 256 && typeid(T) == typeid(short)) {
+		if (ni->datatype == 256)
+			memcpy (_M, ni->data, Size()*sizeof(T));
+	} else {
+		printf ("Unsupported data type %i", ni->datatype);
+	}
+			
+
+}

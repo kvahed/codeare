@@ -24,7 +24,7 @@
 /**
  * Returned error codes 
  */
-enum      error_code   {
+enum error_code   {
 	
 	OK,
 	ERROR_GENERAL,
@@ -40,6 +40,5 @@ enum      error_code   {
 	FILE_ACCESS_FAILED
 
 };
-
 
 #endif //__COMMON_H__
