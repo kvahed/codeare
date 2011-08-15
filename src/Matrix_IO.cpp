@@ -536,7 +536,7 @@ bool Matrix<T>::mxread (std::string fname, std::string dname, std::string dloc) 
 		for (int i = 0; i < Size(); i++)
 			_M[i] = ((T*)mxGetPr(mxa))[i];
 	// -------------------------------------------
-	
+
 	// Clean up and close file -------------------
 	if (mxa != NULL)
 		mxDestroyArray(mxa);
@@ -583,10 +583,8 @@ bool Matrix<T>::mxdump (std::string fname, std::string dname, std::string dloc) 
 	
 	// Copy to memory block ----------------------
 	
-	if (typeid(T) == typeid(raw))
-		memcpy(mxGetPr(mxa), _M, Size() * 2 * sizeof(float));
-	else if (typeid(T) == typeid(double))
-		memcpy(mxGetPr(mxa), _M, Size() * sizeof(double));
+	if (typeid(T) != typeid(short))
+		memcpy(mxGetPr(mxa), _M, Size() * sizeof(T));
 	else
 		for (int i = 0; i < Size(); i++)
 			((T*)mxGetPr(mxa))[i] = _M[i];
