@@ -623,16 +623,63 @@ bool Matrix<T>::MXDump (std::string fname, std::string dname, std::string dloc) 
 
 template <class T>
 bool Matrix<T>::NIDump (std::string fname) {
+	
+	Matrix<T>    tmp;
+	nifti_image* ni;
+	int          l = 0;
+
+	//ni->nifti_type = 1;
+	//l = fname.length();
+	
+	// Single nii.gz file
+
+	/*	ni->fname = (char*) calloc(1,l); 
+	strcpy(ni->fname,fname.c_str());
+	ni->iname = (char*) calloc(1,l); 
+	strcpy(ni->iname,fname.c_str());
+	
+	tmp.Squeeze();
+
+	if (tmp.HDim() > 5) {
+		printf ("Cannot dump more than 5 dimensions to NIFTI FILE\n.");
+		return false;
+	}
+
+	ni->dim[0] = tmp.HDim() + 1;
+
+	for (int i = 0; i < 5; i++) {
+		ni->dim[i+1]    = tmp.Dim(i);
+		ni->pixdim[i+1] = tmp.Res(i);
+	}
+
+	if      (typeid(T) == typeid(raw))
+		ni->datatype = 16;
+	else if (typeid(T) == typeid(double))
+		ni->datatype = 64;
+	else if (typeid(T) == typeid(short))
+		ni->datatype = 256;
+
+	ni->data = (void*) malloc (Size() * sizeof (T));
+	memcpy (ni->data, _M, Size() * sizeof (T));
+
+	nifti_image_write (ni);
+	nifti_image_free (ni); */
+
 }
 
 template <class T>
 bool Matrix<T>::NIRead (std::string fname) {
 	
 	nifti_image* ni = nifti_image_read (fname.c_str(), 1);
+
+	if (ni == NULL) 
+		return false;
 	
 	for (int i = 0; i < ni->dim[0]; i++)
-		if (ni->dim[i+1] > 1)
+		if (ni->dim[i+1] > 1) {
 			_dim[i] = ni->dim[i+1];
+			_res[i] = ni->pixdim[i+1];
+		}
 	
 	Reset();
 	
@@ -661,7 +708,11 @@ bool Matrix<T>::NIRead (std::string fname) {
 			memcpy (_M, ni->data, Size()*sizeof(T));
 	} else {
 		printf ("Unsupported data type %i", ni->datatype);
+		return false;
 	}
-			
+	
+	nifti_image_free (ni);
+
+	return true;
 
 }

@@ -408,11 +408,13 @@ bool nitest (ReconClient* rc) {
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
-	std::string    odf = std::string (base + std::string("betted.mat"));
+	std::string    mat = std::string (base + std::string("betted.mat"));
+	std::string    nii = std::string (base + std::string("betted.mat"));
 	
 	Matrix<double> d;
 	d.NIRead (df);
-	d.MXDump (odf, std::string("betted"), std::string(""));
+	d.MXDump (mat, std::string("betted"), std::string(""));
+	d.NIDump (nii);
 
 #else
 
