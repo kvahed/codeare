@@ -28,6 +28,9 @@ Matrix<T>::Matrix (const int n) {
     for (int i = CHA; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
+    for (int i = 0; i < INVALID_DIM; i++)
+        _res [i] = 1.0;
+
     _M = (T*) malloc (n*n*sizeof(T));
 
 	for (int i = 0; i < Size(); i++)
@@ -48,6 +51,9 @@ Matrix<T>::Matrix (const int m, const int n) {
 
     for (int i = 2; i < INVALID_DIM; i++)
         _dim [i] = 1;
+
+    for (int i = 0; i < INVALID_DIM; i++)
+        _res [i] = 1.0;
 
     _M = (T*) malloc (Size()*sizeof(T));
 
@@ -70,6 +76,9 @@ Matrix<T>::Matrix (const int m, const int n, const int k) {
 
     for (int i = 3; i < INVALID_DIM; i++)
         _dim [i] = 1;
+
+    for (int i = 0; i < INVALID_DIM; i++)
+        _res [i] = 1.0;
 
     _M = (T*) malloc (Size()*sizeof(T));
 
@@ -106,6 +115,9 @@ Matrix<T>::Matrix (const int col, const int lin, const int cha, const int set,
     _dim[IDE] = ide;
     _dim[AVE] = ave;
 
+    for (int i = 0; i < INVALID_DIM; i++)
+        _res [i] = 1.0;
+
     _M = (T*) malloc (Size() * sizeof (T));
 
 	for (int i = 0; i < Size(); i++)
@@ -125,6 +137,9 @@ Matrix<T>::Matrix (const int* dim) {
 	for (int i = 0; i < INVALID_DIM; i++)
 		_dim[i] = dim[i];
 
+    for (int i = 0; i < INVALID_DIM; i++)
+        _res [i] = 1.0;
+
     _M = (T*) malloc (Size() * sizeof (T));
 
 	for (int i = 0; i < Size(); i++)
@@ -143,6 +158,9 @@ Matrix<T>::Matrix (const Matrix<T> &M) {
 	for (int i = 0; i < INVALID_DIM; i++) 
 		_dim[i] = M.Dim(i);
 	
+    for (int i = 0; i < INVALID_DIM; i++)
+        _res [i] = 1.0;
+
 	_M = (T*) malloc (Size() * sizeof (T));
 	
 	memcpy (_M, M.Data(), Size() * sizeof(T));

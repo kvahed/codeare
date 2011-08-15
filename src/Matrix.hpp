@@ -1006,6 +1006,24 @@ public:
      *
      * @return          Number of rows.
      */
+    inline float          
+    Res                 (const int i)                                const {return _res[i];}
+    
+    
+    /**
+     * @brief           Get reference to size a given dimension.
+     *
+     * @return          Number of rows.
+     */
+    inline float&          
+    Res                 (const int i)                                 {return _res[i];}
+    
+    
+    /**
+     * @brief           Get size a given dimension.
+     *
+     * @return          Number of rows.
+     */
     inline int          
     Dim                 (const int i)                                const {return _dim[i];}
     
@@ -1962,7 +1980,8 @@ public:
 
 private:
     
-    int                 _dim[INVALID_DIM]; /// Dimnesions
+    int                 _dim[INVALID_DIM]; /// Dimensions
+    float               _res[INVALID_DIM]; /// Resolutions
     T*                  _M;                /// Data repository
 	int                 nb_alloc;
 
