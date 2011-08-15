@@ -107,6 +107,7 @@ AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/COR
 AC_CHECK_HEADERS([nfft3.h],          [], [AC_MSG_RESULT([cannot find nfft3.h, NuFFT/CGSENSE unavailable!])])
 AC_CHECK_HEADERS([nfft3util.h],      [], [AC_MSG_RESULT([cannot find nfft3util.h, NuFFT/CGSENSE unavailable!])])
 AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
+AC_CHECK_HEADERS([nifti1_io.h],      [], [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
 
 
@@ -116,7 +117,7 @@ AC_CHECK_LIB([omniDynamic4], [main],        [], [AC_MSG_ERROR([cannot find libom
 AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libz, bailing out])])
 #AC_CHECK_LIB([fftw],         [fftw_create_plan], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
-AC_CHECK_LIB([fftw3f],        [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftwf, bailing out])])
+AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftwf, bailing out])])
 case "$host" in
   *darwin*)
 #AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libsz, bailing out])])
@@ -157,6 +158,24 @@ AC_TRY_LINK([#include <H5Cpp.h>],
    hdf5_found=yes,
    [LIBS=$OLD_LIBS]
    [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
+
+if test -z $hdf5_found; then
+    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+fi
+
+
+AC_MSG_CHECKING([for nifti_image_read in -lniftiio])
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -lniftiio -lznz"
+
+AC_TRY_LINK([#include <nifti1_io.h>],
+   [
+	 const char* fname; nifti_image* ni = nifti_image_read (fname, 1);
+   ],
+   [AC_MSG_RESULT([yes])]
+   niftiio_found=yes,
+   [LIBS=$OLD_LIBS]
+   [AC_MSG_RESULT([no. Cannot find libniftiio, NIFTI dump/read not available.])])
 
 if test -z $hdf5_found; then
     LIBS="${LIBS} -lhdf5_cpp -lhdf5"

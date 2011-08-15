@@ -53,6 +53,7 @@ bool cgsensetest (ReconClient* rc);
 bool nuffttest (ReconClient* rc);
 bool sdmtest (ReconClient* rc);
 bool mxtest (ReconClient* rc);
+bool nitest (ReconClient* rc);
 bool fftwtest (ReconClient* rc);
 bool resetest (ReconClient* rc);
 
@@ -72,6 +73,8 @@ int main (int argc, char** argv) {
 			sdmtest (&client);
 		else if (strcmp (test, "mxtest") == 0)
 			mxtest (&client);
+		else if (strcmp (test, "nitest") == 0)
+			nitest (&client);
 		else if (strcmp (test, "fftwtest") == 0)
 			fftwtest (&client);
 		else if (strcmp (test, "RelativeSensitivities") == 0)
@@ -100,10 +103,10 @@ bool cgsensetest (ReconClient* rc) {
 	std::string    opf = std::string (base + std::string("/pulses.h5"));
 	std::string    oif = std::string (base + std::string("/iters.h5"));
 
-	weights.read   (df, "weights");
-	rawdata.read   (df, "data");
-	kspace.read    (df, "kspace");
-	sens.read      (df, "sensitivities");
+	weights.Read   (df, "weights");
+	rawdata.Read   (df, "data");
+	kspace.Read    (df, "kspace");
+	sens.Read      (df, "sensitivities");
 
 	if (remote) {
 	
@@ -167,10 +170,10 @@ bool cgsensetest (ReconClient* rc) {
 			
 	}
 		
-	rawdata.dump   (odf.c_str());
+	rawdata.Dump   (odf.c_str());
 	if (pulses)
-		sens.dump      (opf.c_str());
-	weights.dump   (oif.c_str());
+		sens.Dump      (opf.c_str());
+	weights.Dump   (oif.c_str());
 
 	return true;
 	
@@ -189,9 +192,9 @@ bool nuffttest (ReconClient* rc) {
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 
-	weights.read   (df, "weights");
-	rawdata.read   (df, "data");
-	kspace.read    (df, "kspace");
+	weights.Read   (df, "weights");
+	rawdata.Read   (df, "data");
+	kspace.Read    (df, "kspace");
 
 	rc->SetRaw     (rawdata);
 	rc->SetHelper  (weights);
@@ -201,7 +204,7 @@ bool nuffttest (ReconClient* rc) {
 	
 	rc->GetRaw     (rawdata);
 
-	rawdata.dump   (odf.c_str());
+	rawdata.Dump   (odf.c_str());
 
 	rc->Finalise(test);
 
@@ -226,11 +229,11 @@ bool sdmtest (ReconClient* rc) {
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 
-	target.read    (df, "target");
-	b1.read        (df, "b1");
-	b0.read        (df, "b0");
-	k.read         (df, "k");
-	r.read         (df, "r");
+	target.Read    (df, "target");
+	b1.Read        (df, "b1");
+	b0.Read        (df, "b0");
+	k.Read         (df, "k");
+	r.Read         (df, "r");
 
 	rc->SetRaw     (target);
 	rc->SetRHelper (b1);
@@ -244,9 +247,9 @@ bool sdmtest (ReconClient* rc) {
 	rc->GetRHelper (b1);
 	rc->GetHelper  (r);
 
-	target.dump   (odf.c_str());
-	b1.dump       (pdf.c_str());
-	r.dump        (rdf.c_str());
+	target.Dump   (odf.c_str());
+	b1.Dump       (pdf.c_str());
+	r.Dump        (rdf.c_str());
 
 	rc->Finalise(test);
 	
@@ -310,12 +313,12 @@ bool fftwtest (ReconClient* rc) {
 	
 	Matrix<raw> m;
 
-	m.read (in, "img");
+	m.Read (in, "img");
 	m = m.FFT();
 	m = m.FFTShift();
 	m = m.IFFTShift();
 	m = m.IFFT();
-	m.dump (out, "img");
+	m.Dump (out, "img");
 
 	return true;
 
@@ -339,7 +342,7 @@ bool resetest (ReconClient* rc) {
 	std::string osnrf = std::string (base + std::string ("osnr.h5"));
 	std::string b0f   = std::string (base + std::string ("b0.h5"));
 	
-	meas.rawread (df, std::string("VB15"));
+	meas.RAWRead (df, std::string("VB15"));
 	
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
@@ -355,10 +358,10 @@ bool resetest (ReconClient* rc) {
 	
 	rc->Finalise(test);
 	
-	txm.dump (txmf);
-	rxm.dump (rxmf);
-	osnr.dump (osnrf);
-	b0.dump (b0f);
+	txm.Dump (txmf);
+	rxm.Dump (rxmf);
+	osnr.Dump (osnrf);
+	b0.Dump (b0f);
 	
 	return true;
 
@@ -373,25 +376,47 @@ bool mxtest (ReconClient* rc) {
 
 	std::cout << in << std::endl << std::endl;
 
-	in.mxdump(std::string("test.mat"), std::string("imat"), std::string(""));
+	in.MXDump(std::string("test.mat"), std::string("imat"), std::string(""));
 
 	Matrix<double> out;
-	out.mxread(std::string("test.mat"), std::string("imat"), std::string(""));
+	out.MXRead(std::string("test.mat"), std::string("imat"), std::string(""));
 
 	std::cout << out << std::endl << std::endl;
 
 	Matrix<raw> r1 (4,8);
 	r1.Random ();
-	r1.mxdump (std::string("rtest.mat"), std::string("rmat"), std::string(""));
+	r1.MXDump (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	std::cout << r1 << std::endl << std::endl;
 	
 	Matrix<raw> r2;
-	r2.mxread (std::string("rtest.mat"), std::string("rmat"), std::string(""));
+	r2.MXRead (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	std::cout << r2 << std::endl << std::endl;
 
 #else
 
 	std::cout << "MATLAB root not set during configuration (--with-matlabroot).\n Test skipped." << std::endl;
+
+#endif
+
+	return true;
+
+}
+
+bool nitest (ReconClient* rc) {
+
+#ifdef HAVE_NIFTI1_IO_H
+	
+	std::string    cf  = std::string (base + std::string(config));
+	std::string    df  = std::string (base + std::string(data));
+	std::string    odf = std::string (base + std::string("betted.mat"));
+	
+	Matrix<double> d;
+	d.NIRead (df);
+	d.MXDump (odf, std::string("betted"), std::string(""));
+
+#else
+
+	std::cout << "No nifti support compiled in. Bailing out." << std::endl;
 
 #endif
 

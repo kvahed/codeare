@@ -117,6 +117,18 @@ typedef std::complex<float> raw;
 #define MB 1024.0 * 1024.0;
 #define GB 1024.0 * 1024.0 * 1024.0;
 
+
+enum io_strategy {
+
+	HDF5,
+	MATLAB,
+	NIFTI,
+	SYNGO,
+	PRIMITIVE
+
+};
+
+
 /**
  * @brief   Matrix template.
  *          This class intends to offer a simple interface for handling
@@ -1564,7 +1576,7 @@ public:
      * @return          Success.
      */
     bool                
-    pdump               (std::string fname);
+    PRDump              (std::string fname);
     
 
     /**
@@ -1576,7 +1588,7 @@ public:
      * @return          Success.
      */
     bool                
-    h5dump                (std::string fname, std::string dname = "", std::string dloc = "/");
+    H5Dump                (std::string fname, std::string dname = "", std::string dloc = "/");
     
 
     /**
@@ -1588,8 +1600,29 @@ public:
      * @return          Success.
      */
     bool                
-    h5read              (std::string fname, std::string dname = "", std::string dloc = "/");
+    H5Read              (std::string fname, std::string dname = "", std::string dloc = "/");
     
+
+    /**
+     * @brief           Dump to NIFTI file.
+     * 
+     * @param  fname    File name.
+     * @return          Success.
+     */
+    bool                
+    NIDump              (std::string fname);
+    
+
+    /**
+     * @brief           Read from NIFTI file.
+     *
+     * @param  fname    File name.
+     * @return          Success.
+     */
+    bool                
+    NIRead              (std::string fname);
+    
+
     /**
      * @brief           Dump to MATLAB file.
      * 
@@ -1599,7 +1632,7 @@ public:
      * @return          Success.
      */
     bool                
-    mxdump              (std::string fname, std::string dname = "", std::string dloc = "/");
+    MXDump              (std::string fname, std::string dname = "", std::string dloc = "/");
     
 
     /**
@@ -1611,8 +1644,9 @@ public:
      * @return          Success.
      */
     bool                
-    mxread              (std::string fname, std::string dname = "", std::string dloc = "/");
+    MXRead              (std::string fname, std::string dname = "", std::string dloc = "/");
     
+
     /**
      * @brief           Dump to HDF5 file.
      * 
@@ -1622,7 +1656,7 @@ public:
      * @return          Success.
      */
     bool                
-    dump                (std::string fname, std::string dname = "", std::string dloc = "/", std::string fmt = "h5");
+    Dump                (std::string fname, std::string dname = "", std::string dloc = "/", io_strategy ios = HDF5);
     
 
     /**
@@ -1634,29 +1668,27 @@ public:
      * @return          Success.
      */
     bool                
-    read                (std::string fname, std::string dname = "", std::string dloc = "/", std::string fmt = "h5");
+    Read                (std::string fname, std::string dname = "", std::string dloc = "/", io_strategy ios = HDF5);
+
     
 	/**
-	 * @brief 
-	 */
-	bool
-	rawread             (const std::string fname, const std::string version);
-
-	/**
-	 * @brief 
-	 */
-	bool
-	rsadjust            (const std::string fname);
-
-	/**
-	 * @brief           Skip lines in file
+	 * @brief           Read from Syngo MR meas file
 	 *
-	 * @param  file     Position pointer in stream
-	 * @param  lines    Lines to skip
-	 * @return          New position
+	 * @param  fname    File name
+	 * @param  version  File version
+	 * @return          Success
 	 */
-	std::fstream&
-	SkipLines           (const std::ifstream& file, const unsigned int num);
+	bool
+	RAWRead             (const std::string fname, const std::string version);
+
+	/**
+	 * @brief           Adjust and resize for Syngo read
+	 *
+	 * @param  fname    Syngo MR meas file name
+	 * @return          Success
+	 */
+	bool
+	RSAdjust            (const std::string fname);
 
     //@}
     

@@ -10690,7 +10690,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"321M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"321:329M\"" >>confdefs.h
 
 # copyright notice
 
@@ -15291,6 +15291,21 @@ fi
 
 done
 
+for ac_header in nifti1_io.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "nifti1_io.h" "ac_cv_header_nifti1_io_h" "$ac_includes_default"
+if test "x$ac_cv_header_nifti1_io_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_NIFTI1_IO_H 1
+_ACEOF
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!" >&5
+$as_echo "cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!" >&6; }
+fi
+
+done
+
 for ac_header in sys/time.h c_asm.h intrinsics.h mach/mach_time.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
@@ -15677,6 +15692,41 @@ else
   LIBS=$OLD_LIBS
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no. Cannot find libhdf5_cpp, hdf5 dump/read not available." >&5
 $as_echo "no. Cannot find libhdf5_cpp, hdf5 dump/read not available." >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+if test -z $hdf5_found; then
+    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for nifti_image_read in -lniftiio" >&5
+$as_echo_n "checking for nifti_image_read in -lniftiio... " >&6; }
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -lniftiio -lznz"
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <nifti1_io.h>
+int
+main ()
+{
+
+	 const char* fname; nifti_image* ni = nifti_image_read (fname, 1);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+   niftiio_found=yes
+else
+  LIBS=$OLD_LIBS
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no. Cannot find libniftiio, NIFTI dump/read not available." >&5
+$as_echo "no. Cannot find libniftiio, NIFTI dump/read not available." >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext

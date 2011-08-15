@@ -40,9 +40,9 @@ DumpToFile::Process () {
 
 	fname << uid << "_data.h5";
 
-	m_raw.dump    (fname.str().c_str());
-	m_helper.dump (fname.str().c_str());
-	m_pixel.dump  (fname.str().c_str());
+	m_raw.Dump    (fname.str().c_str());
+	m_helper.Dump (fname.str().c_str());
+	m_pixel.Dump  (fname.str().c_str());
 
 	printf ("... done\n");
 
