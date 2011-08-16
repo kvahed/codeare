@@ -266,4 +266,102 @@ Matrix<T> Matrix<T>::Zeros (const int n) {
 
 }
 
+template <class T>
+Matrix<T> Matrix<T>::Circle (const float* p, const int n) {
+
+	static Matrix<T> res = Matrix<T>::Zeros(n);
+	
+	return res;
+
+}
+
+template <class T>
+Matrix<T> Matrix<T>::Sphere (const float* p, const int n) {
+
+	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
+
+	return res;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::Ellipse (const float* p, const int n) {
+
+	static Matrix<T> res = Matrix<T>::Zeros(n);
+
+	float m[2];
+	float a[2];
+
+	a[0] = p[0] * float(n) / 2.0;
+	a[1] = p[1] * float(n) / 2.0;
+
+	m[0] = (1.0 - p[2]) * float(n) / 2.0;
+	m[1] = (1.0 - p[3]) * float(n) / 2.0;
+
+	float cosp = cos(p[4]);
+	float sinp = sin(p[4]);
+	
+	for (int r = 0; r < res.Dim(1); r++)
+		for (int c = 0; c < res.Dim(0); c++)
+			res(c,r) = (pow( (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1], 2.0 ) + pow( (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0], 2.0) <= 1.0) ? T(1.0) : T(0.0);
+	return res;
+
+}
+
+template <class T>
+Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n) {
+
+	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
+
+	return res;
+
+}
+
+
+template <class T>
+Matrix<T> Matrix<T>::Phantom2D (const int n) {
+
+	const int ne = 10; // Number of ellipses
+	const int np = 5;  // Number of geometrical parameters
+
+	float p[ne][np] = {
+		{ 0.6900, 0.9200,  0.00,  0.0000,  0.0  },
+		{ 0.6624, 0.8740,  0.00, -0.0184,  0.0  },
+        { 0.1100, 0.3100, -0.22,  0.0000, -0.3  },
+		{ 0.1600, 0.4100,  0.22,  0.0000,  0.3  },
+		{ 0.2100, 0.2500,  0.00,  0.3500,  0.0  },
+		{ 0.0460, 0.0460,  0.00,  0.1000,  0.0  },
+		{ 0.0460, 0.0460,  0.00, -0.1000,  0.0  },
+		{ 0.0460, 0.0230,  0.08, -0.6050,  0.0  },
+		{ 0.0230, 0.0230,  0.00, -0.6060,  0.0  },
+		{ 0.0230, 0.0460, -0.06, -0.6050,  0.0  }
+	};
+ 
+	// Intensities
+	T v[ne] = {T(1.0), T(-0.8), T(-0.2), T(-0.2), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1)};
+
+	// Empty matrix
+	static Matrix<T> res = Matrix<T>::Zeros(n);
+	
+	for (int i = 0; i < ne; i++) {
+		Matrix<T> e = Matrix<T>::Ellipse (p[i], n);
+		e   = e * v[i];
+		res = res + e;
+	}
+
+	return res;
+
+}
+
+template <class T>
+Matrix<T> Matrix<T>::Phantom3D (const int n) {
+
+	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
+
+	return res;
+
+}
+
+
 
