@@ -90,7 +90,7 @@ SVDCalibrate (const Matrix<raw>* imgs, Matrix<raw>* rxm, Matrix<raw>* txm, Matri
 	int         rtms = imgs->Size() / rtmsiz / 2;  // division by 2 (Echoes)
 	ticks        tic = getticks();
 	
-	printf ("  SVDing %i matrices of %lix%li ... ", rtms, nrxc, ntxc);
+	printf ("  SVDing %i matrices of %ix%i ... ", rtms, nrxc, ntxc);
 	
 	// Permute dimensions on imgs for contiguous RAM access
 	Matrix<raw> vxlm (nrxc, ntxc, imgs->Dim(0), imgs->Dim(1), imgs->Dim(2));
@@ -165,7 +165,7 @@ FTVolumes (Matrix<raw>* r) {
 	Matrix<raw> hann    = Matrix<raw>::Ones(r->Dim(0), r->Dim(1), r->Dim(2)).HannWindow();
 	ticks       tic     = getticks();
 	
-	printf ("  Fourier transforming %i volumes of %lix%lix%li ... ", vols, r->Dim(0), r->Dim(1), r->Dim(2));
+	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", vols, r->Dim(0), r->Dim(1), r->Dim(2));
 	
 #pragma omp parallel default (shared) 
 	{
