@@ -283,7 +283,7 @@ bool Matrix<T>::RSAdjust (std::string fname) {
 	cmd << "/usr/local/bin/convert.pl ";
 	cmd << fname;
 	printf ("%s\n", cmd.str().c_str());
-	system (cmd.str().c_str());
+	int ec = system (cmd.str().c_str());
 
 	// Output filename
 	xmlf << fname;
