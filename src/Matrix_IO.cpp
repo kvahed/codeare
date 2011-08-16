@@ -2,10 +2,19 @@
 #include "tinyxml/tinyxml.h"
 #include "mdhVB15.h"
 
+#ifdef HAVE_NIFTI1_IO_H
 #include <nifti1_io.h>
+#endif
+
+#ifdef HAVE_H5CPP_H
+#include <H5Cpp.h>
+using namespace H5;
+#endif
+
 
 #include <limits>
 #include <map>
+
 
 
 inline bool 
@@ -624,96 +633,131 @@ bool Matrix<T>::MXDump (std::string fname, std::string dname, std::string dloc) 
 template <class T>
 bool Matrix<T>::NIDump (std::string fname) {
 	
-	Matrix<T>      tmp = (*this);
-	tmp.Squeeze();
+	if (fname != "") {
+		
+#ifdef HAVE_NIFTI1_IO_H
 
-	int            l   = fname.length();
+		Matrix<T>      tmp = (*this);
+		tmp.Squeeze();
+		
+		int            l   = fname.length();
+		
+		nifti_1_header header;
+		header.sizeof_hdr  = 348;
+		header.dim[0] = tmp.HDim() + 1;
+		
+		if (tmp.HDim() > 7) {
+			printf ("Cannot dump more than 8 dimensions to NIFTI FILE\n.");
+			return false;
+		}
+		
+		for (int i = 0; i < 7; i++) {
+			header.dim   [i+1] = tmp.Dim(i);
+			header.pixdim[i+1] = tmp.Res(i);
+		}
+		
+		if      (typeid(T) == typeid(raw))
+			header.datatype = 16;
+		else if (typeid(T) == typeid(double))
+			header.datatype = 64;
+		else if (typeid(T) == typeid(short))
+			header.datatype = 256;
+		
+		nifti_image* ni = nifti_convert_nhdr2nim(header, NULL);
+		
+		ni->nifti_type = 1;
+		
+		// Single nii.gz file
+		ni->fname = (char*) calloc(1,l); 
+		strcpy(ni->fname,fname.c_str());
+		ni->iname = (char*) calloc(1,l); 
+		strcpy(ni->iname,fname.c_str());
+		
+		ni->data = (void*) malloc (Size() * sizeof (T));
+		memcpy (ni->data, _M, Size() * sizeof (T));
+		
+		nifti_image_write (ni);
+		nifti_image_free (ni); 
+		
+	} else {
 
-	nifti_1_header header;
-    header.sizeof_hdr  = 348;
-	header.dim[0] = tmp.HDim() + 1;
-
-	if (tmp.HDim() > 7) {
-		printf ("Cannot dump more than 8 dimensions to NIFTI FILE\n.");
 		return false;
+
 	}
 
-	for (int i = 0; i < 7; i++) {
-		header.dim   [i+1] = tmp.Dim(i);
-		header.pixdim[i+1] = tmp.Res(i);
-	}
+	return true;
 
-	if      (typeid(T) == typeid(raw))
-		header.datatype = 16;
-	else if (typeid(T) == typeid(double))
-		header.datatype = 64;
-	else if (typeid(T) == typeid(short))
-		header.datatype = 256;
+#else 
 
-    nifti_image* ni = nifti_convert_nhdr2nim(header, NULL);
+	return false;
 
-	ni->nifti_type = 1;
+#endif
 
-	// Single nii.gz file
-	ni->fname = (char*) calloc(1,l); 
-	strcpy(ni->fname,fname.c_str());
-	ni->iname = (char*) calloc(1,l); 
-	strcpy(ni->iname,fname.c_str());
-	
-	ni->data = (void*) malloc (Size() * sizeof (T));
-	memcpy (ni->data, _M, Size() * sizeof (T));
-
-	nifti_image_write (ni);
-	nifti_image_free (ni); 
 
 }
 
 template <class T>
 bool Matrix<T>::NIRead (std::string fname) {
 	
-	nifti_image* ni = nifti_image_read (fname.c_str(), 1);
-
-	if (ni == NULL) 
-		return false;
-	
-	for (int i = 0; i < ni->dim[0]; i++)
-		if (ni->dim[i+1] > 1) {
-			_dim[i] = ni->dim[i+1];
-			_res[i] = ni->pixdim[i+1];
-		}
-	
-	Reset();
-	
-	printf ("  Dimensions: ");
-	for (int i = 0; i < INVALID_DIM; i++)
-		if (_dim[i] > 1)
-			printf (" %i", _dim[i]);
-	printf ("\n");
-	
-	if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
-		if (ni->datatype == 64)
-			memcpy (_M, ni->data, Size()*sizeof(T));
-		else 
-			for (int i = 0; i < Size(); i++ )
-				_M[i] = ((float*)ni->data)[i];
-	} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(raw)) {
-		if (ni->datatype == 32)
-			memcpy (_M, ni->data, Size()*sizeof(T));
-		else 
-			for (int i = 0; i < Size(); i++) {
-				float f[2] = {((double*)ni->data)[2*i], ((double*)ni->data)[2*i+1]};
-				memcpy(&_M[i], f, 2 * sizeof(float));
+	if (fname != "") {
+		
+#ifdef HAVE_NIFTI1_IO_H
+		
+		nifti_image* ni = nifti_image_read (fname.c_str(), 1);
+		
+		if (ni == NULL) 
+			return false;
+		
+		for (int i = 0; i < ni->dim[0]; i++)
+			if (ni->dim[i+1] > 1) {
+				_dim[i] = ni->dim[i+1];
+				_res[i] = ni->pixdim[i+1];
 			}
-	} else if (ni->datatype == 256 && typeid(T) == typeid(short)) {
-		if (ni->datatype == 256)
-			memcpy (_M, ni->data, Size()*sizeof(T));
+		
+		Reset();
+		
+		printf ("  Dimensions: ");
+		for (int i = 0; i < INVALID_DIM; i++)
+			if (_dim[i] > 1)
+				printf (" %i", _dim[i]);
+		printf ("\n");
+		
+		if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
+			if (ni->datatype == 64)
+				memcpy (_M, ni->data, Size()*sizeof(T));
+			else 
+				for (int i = 0; i < Size(); i++ )
+					_M[i] = ((float*)ni->data)[i];
+		} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(raw)) {
+			if (ni->datatype == 32)
+				memcpy (_M, ni->data, Size()*sizeof(T));
+			else 
+				for (int i = 0; i < Size(); i++) {
+					float f[2] = {((double*)ni->data)[2*i], ((double*)ni->data)[2*i+1]};
+					memcpy(&_M[i], f, 2 * sizeof(float));
+				}
+		} else if (ni->datatype == 256 && typeid(T) == typeid(short)) {
+			if (ni->datatype == 256)
+				memcpy (_M, ni->data, Size()*sizeof(T));
+		} else {
+			printf ("Unsupported data type %i", ni->datatype);
+			return false;
+		}
+		
+		nifti_image_free (ni);
+		
 	} else {
-		printf ("Unsupported data type %i", ni->datatype);
+
 		return false;
+
 	}
-	
-	nifti_image_free (ni);
 
 	return true;
+
+#else 
+	
+	return false;
+	
+#endif
 
 }
