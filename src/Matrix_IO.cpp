@@ -679,22 +679,22 @@ bool Matrix<T>::NIDump (std::string fname) {
 		nifti_image_write (ni);
 		nifti_image_free (ni); 
 		
-	} else {
-
-		return false;
-
-	}
-
 	return true;
-
+	
 #else 
-
+	
 	return false;
-
+	
 #endif
 
-
+	} else {
+		
+		return false;
+		
+	}
+	
 }
+
 
 template <class T>
 bool Matrix<T>::NIRead (std::string fname) {
@@ -746,18 +746,18 @@ bool Matrix<T>::NIRead (std::string fname) {
 		
 		nifti_image_free (ni);
 		
-	} else {
-
-		return false;
-
-	}
-
-	return true;
+		return true;
 
 #else 
-	
-	return false;
+		
+		return false;
 	
 #endif
 
+	} else {
+		
+		return false;
+		
+	}
+	
 }
