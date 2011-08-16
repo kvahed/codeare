@@ -607,6 +607,72 @@ public:
 	
 	
 	/**
+	 * @brief           Create 2D nxn Shepp-Logan phantom.
+	 *                  Shepp et al. The Fourier reconstruction of a head section. IEEE TNS. 1974; 21: 21-43
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Phantom2D           (const int n);
+	
+	
+	/**
+	 * @brief           Create 3D nxn Shepp-Logan phantom.
+	 *                  Koay et al. Three dimensional analytical magnetic resonance imaging phantom in the Fourier domain. MRM. 2007; 58: 430-436
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Phantom3D           (const int n);
+	
+	
+	/**
+	 * @brief           Create circle of ones in 2D square Matrix
+	 *
+	 * @param   p       Parameter array. Must hold r, x0, y0, intensity.
+	 * @param   n       Size of square
+	 * @return          Matrix including ellipsoid
+	 */
+	static Matrix<T> 
+	Circle              (const float* p, const int n);
+	
+	
+	/**
+	 * @brief           Create sphere of ones in 3D cubic Matrix
+	 *
+	 * @param   p       Parameter array. Must hold r, x0, y0, z0, intensity.
+	 * @param   n       Size of cube
+	 * @return          Matrix including ellipsoid
+	 */
+	static Matrix<T> 
+	Sphere              (const float* p, const int n);
+	
+	
+	/**
+	 * @brief           Create ellipsoid of ones in 3D cubic matrix
+	 *
+	 * @param   p       Parameter array. Must hold a, b, c, x0, y0, z0, phi, psi, theta, intensity.
+	 * @param   n       Size of cube
+	 * @return          Matrix including ellipsoid
+	 */
+	static Matrix<T> 
+	Ellipsoid           (const float* p, const int n);
+	
+	
+	/**
+	 * @brief           Create ellipse of ones in 2D square matrix
+	 *
+	 * @param  p        Parameter array. Must hold a, b, x0, y0, phi, intensity.
+	 * @param  n        Size of square
+	 * @return          Matrix including ellipsoid
+	 */
+	static Matrix<T> 
+	Ellipse             (const float* p, const int n);
+	
+	
+	/**
 	 * @brief           Create nxn matrix initialised with T(0.0)
 	 *
 	 * @param  n        Side length of matrix
