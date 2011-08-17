@@ -19,6 +19,7 @@
  */
 
 #include "ReconServant.hpp"
+#include "ReconContext.hpp"
 
 using namespace RRServer;
 

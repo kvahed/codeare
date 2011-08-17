@@ -21,15 +21,13 @@
 #ifndef __RECON_SERVANT_HPP__
 #define __RECON_SERVANT_HPP__
 
-#include "Matrix.hpp"
-#include "ReconContext.hpp"
-
 #ifdef __WIN32__ 
     #include "RRSModule.h"
 #else
     #include "RRSModule.hh"
 #endif
 
+#include <vector>
 
 using namespace RRSModule;
 
@@ -38,6 +36,7 @@ using namespace RRSModule;
  */
 namespace RRServer {
 	
+	class ReconContext;
 
 	/**
 	 * @brief Servant implementation 

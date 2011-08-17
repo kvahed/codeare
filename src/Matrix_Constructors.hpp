@@ -17,6 +17,7 @@ Matrix<T>::Matrix () {
 }
 
 
+
 template <class T> 
 Matrix<T>::Matrix (const int n) {
 
@@ -39,6 +40,7 @@ Matrix<T>::Matrix (const int n) {
     nb_alloc++;
 
 }
+
 
 
 template <class T> 
@@ -65,6 +67,7 @@ Matrix<T>::Matrix (const int m, const int n) {
 }
 
 
+
 template <class T> 
 Matrix<T>::Matrix (const int m, const int n, const int k) {
 
@@ -88,6 +91,7 @@ Matrix<T>::Matrix (const int m, const int n, const int k) {
     nb_alloc++;
 
 }
+
 
 
 template <class T>
@@ -129,6 +133,7 @@ Matrix<T>::Matrix (const int col, const int lin, const int cha, const int set,
 }
 
 
+
 template <class T>
 Matrix<T>::Matrix (const int* dim) {
 
@@ -148,6 +153,7 @@ Matrix<T>::Matrix (const int* dim) {
     nb_alloc++;
 
 }
+
 
 
 template <class T>
@@ -170,6 +176,7 @@ Matrix<T>::Matrix (const Matrix<T> &M) {
 }
 
 
+
 template <class T> 
 Matrix<T>::~Matrix() {
     
@@ -186,6 +193,7 @@ Matrix<T>::~Matrix() {
 }
 
 
+
 template <class T>
 Matrix<T> Matrix<T>::Id (const int n) {
 
@@ -197,6 +205,7 @@ Matrix<T> Matrix<T>::Id (const int n) {
  	return M;
 
 }
+
 
 
 template <class T>
@@ -212,6 +221,7 @@ Matrix<T> Matrix<T>::Ones (const int m, const int n, const int l) {
 }
 
 
+
 template <class T>
 Matrix<T> Matrix<T>::Ones (const int m, const int n) {
 
@@ -225,12 +235,14 @@ Matrix<T> Matrix<T>::Ones (const int m, const int n) {
 }
 
 
+
 template <class T>
 Matrix<T> Matrix<T>::Ones (const int n) {
 
  	return Ones(n,n);
 
 }
+
 
 
 template <class T>
@@ -246,6 +258,7 @@ Matrix<T> Matrix<T>::Zeros (const int n, const int m, const int l) {
 }
 
 
+
 template <class T>
 Matrix<T> Matrix<T>::Zeros (const int n, const int m) {
 
@@ -259,6 +272,7 @@ Matrix<T> Matrix<T>::Zeros (const int n, const int m) {
 }
 
 
+
 template <class T>
 Matrix<T> Matrix<T>::Zeros (const int n) {
 
@@ -266,23 +280,54 @@ Matrix<T> Matrix<T>::Zeros (const int n) {
 
 }
 
+
+
 template <class T>
 Matrix<T> Matrix<T>::Circle (const float* p, const int n) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n);
-	
+
+	float m[2];
+	float rad;
+
+	rad = p[0] * float(n) / 2.0;
+
+	m[0] = (1.0 - p[1]) * float(n) / 2.0;
+	m[1] = (1.0 - p[2]) * float(n) / 2.0;
+
+	for (int r = 0; r < res.Dim(1); r++)
+		for (int c = 0; c < res.Dim(0); c++)
+			res(c,r) = ( pow(((float)c-m[0])/rad, 2.0 ) + pow(((float)r-m[0])/rad, 2.0) <= 1.0) ? T(1.0) : T(0.0);
+
 	return res;
 
 }
+
+
 
 template <class T>
 Matrix<T> Matrix<T>::Sphere (const float* p, const int n) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
 
+	float m[3];
+	float rad;
+
+	rad = p[0] * float(n) / 2.0;
+
+	m[0] = (1.0 - p[1]) * float(n) / 2.0;
+	m[1] = (1.0 - p[2]) * float(n) / 2.0;
+	m[2] = (1.0 - p[3]) * float(n) / 2.0;
+
+	for (int s = 0; s < res.Dim(2); s++)
+		for (int r = 0; r < res.Dim(1); r++)
+			for (int c = 0; c < res.Dim(0); c++)
+				res(c,r) = ( pow (((float)c-m[0])/rad, 2.0) + pow (((float)r-m[1])/rad, 2.0) + pow (((float)s-m[2])/rad, 2.0) <= 1.0) ? T(1.0) : T(0.0);
+
 	return res;
 
 }
+
 
 
 template <class T>
@@ -305,9 +350,12 @@ Matrix<T> Matrix<T>::Ellipse (const float* p, const int n) {
 	for (int r = 0; r < res.Dim(1); r++)
 		for (int c = 0; c < res.Dim(0); c++)
 			res(c,r) = (pow( (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1], 2.0 ) + pow( (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0], 2.0) <= 1.0) ? T(1.0) : T(0.0);
+
 	return res;
 
 }
+
+
 
 template <class T>
 Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n) {
@@ -317,6 +365,7 @@ Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n) {
 	return res;
 
 }
+
 
 
 template <class T>
@@ -354,6 +403,8 @@ Matrix<T> Matrix<T>::Phantom2D (const int n) {
 
 }
 
+
+
 template <class T>
 Matrix<T> Matrix<T>::Phantom3D (const int n) {
 
@@ -364,4 +415,47 @@ Matrix<T> Matrix<T>::Phantom3D (const int n) {
 }
 
 
+/*template<>
+Matrix<double> Matrix<raw>::Real () const {
 
+	Matrix<double> res (_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for 
+		
+		for (int i = 0; i < Size(); i++)
+			res[i] = _M[i].real();
+
+	}		
+		
+	return res;
+
+	}*/
+    
+/*template<>
+Matrix<double> Matrix<raw>::Imag () const {
+
+	Matrix<double> res (_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for 
+		
+		for (int i = 0; i < Size(); i++)
+			res[i] = _M[i].imag();
+
+	}		
+		
+	return res;
+
+	}*/
+    
