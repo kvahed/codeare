@@ -21,9 +21,8 @@
 #ifndef __RECONCONTEXT_HPP__
 #define __RECONCONTEXT_HPP__
 
-#include <vector>
-
 #include "ReconStrategy.hpp"
+#include <vector>
 
 namespace RRServer {
 
@@ -41,7 +40,7 @@ namespace RRServer {
 		/**
 		 * @brief        Default Constructor.
 		 */
-		ReconContext     () {}
+		ReconContext     ();
 		
 		
 		/**
@@ -66,9 +65,7 @@ namespace RRServer {
 		 * @return       Algorithm
 		 */
 		inline ReconStrategy*
-		Strategy         () {
-			return m_strategy;
-		}
+		Strategy         ();
 		
 
 		/**
@@ -77,9 +74,7 @@ namespace RRServer {
 		 * @return       Success
 		 */
 		RRSModule::error_code
-		Process          () {
-			return m_strategy->Process();
-		}
+		Process          ();
 		
 		
 		/**
@@ -88,9 +83,7 @@ namespace RRServer {
 		 * @return       Success
 		 */
 		RRSModule::error_code
-		Init             () {
-			return m_strategy->Init();
-		}
+		Init             ();
 		
 		
 		/**
@@ -99,9 +92,7 @@ namespace RRServer {
 		 * @return       Success
 		 */
 		RRSModule::error_code
-			Finalise     () {
-			return m_strategy->Finalise();
-		}
+		Finalise     ();
 		
 
 		/**
@@ -110,9 +101,7 @@ namespace RRServer {
 		 * @param  cstr  Serialised XML configuration
 		 */
 		void
-		SetConfig        (const char* cstr) {
-			m_strategy->SetConfig(cstr);
-		}
+		SetConfig        (const char* cstr);
 		
 		
 		/**
@@ -121,9 +110,7 @@ namespace RRServer {
 		 * @param  fname File name
 		 */
 		void
-		ReadConfig       (const char* fname) {
-			m_strategy->ReadConfig(fname);
-		}
+		ReadConfig       (const char* fname);
 		
 
 		/**
@@ -132,9 +119,7 @@ namespace RRServer {
 		 * @param  r     Complex data sequence
 		 */
 		void
-		SetRaw          (const raw_data* r) {
-			m_strategy->SetRaw(r);
-		}
+		SetRaw          (const raw_data* r);
 		
 
 		/**
@@ -143,9 +128,7 @@ namespace RRServer {
 		 * @param  r    Complex data matrix
 		 */
 		void
-		SetRaw          (const Matrix<raw>* r) {
-			m_strategy->SetRaw(r);
-		}
+		SetRaw          (const Matrix<raw>* r);
 		
 
 		/**
@@ -154,9 +137,7 @@ namespace RRServer {
 		 * @param  r    Complex data sequence
 		 */
 		void
-		GetRaw          (raw_data* r) {
-			m_strategy->GetRaw(r);
-		}
+		GetRaw          (raw_data* r);
 		
 
 		/**
@@ -165,9 +146,7 @@ namespace RRServer {
 		 * @param  r    Complex data matrix
 		 */
 		void
-		GetRaw          (Matrix<raw>* r) {
-			m_strategy->GetRaw(r);
-		}
+		GetRaw          (Matrix<raw>* r);
 		
 
 		/**
@@ -176,9 +155,7 @@ namespace RRServer {
 		 * @param  r    Complex data sequence
 		 */
 		void
-		SetRHelper (const raw_data* r) {
-			m_strategy->SetRHelper(r);
-		}
+		SetRHelper (const raw_data* r);
 		
 
 		/**
@@ -187,9 +164,7 @@ namespace RRServer {
 		 * @param  r    Complex data matrix
 		 */
 		void
-		SetRHelper (const Matrix<raw>* r) {
-			m_strategy->SetRHelper(r);
-		}
+		SetRHelper (const Matrix<raw>* r);
 		
 
 		/**
@@ -198,9 +173,7 @@ namespace RRServer {
 		 * @param  r    Complex data sequence
 		 */
 		void
-		GetRHelper (raw_data* r) {
-			m_strategy->GetRHelper(r);
-		}
+		GetRHelper (raw_data* r);
 		
 
 		/**
@@ -209,9 +182,7 @@ namespace RRServer {
 		 * @param  r    Complex data matrix
 		 */
 		void
-		GetRHelper (Matrix<raw>* r) {
-			m_strategy->GetRHelper(r);
-		}
+		GetRHelper (Matrix<raw>* r);
 		
 
 		/**
@@ -220,9 +191,7 @@ namespace RRServer {
 		 * @param  r    Real data sequence
 		 */
 		void
-		SetHelper (const helper_data* r) {
-			m_strategy->SetHelper(r);
-		}
+		SetHelper (const helper_data* r);
 		
 
 		/**
@@ -231,9 +200,7 @@ namespace RRServer {
 		 * @param  r    Real data matrix
 		 */
 		void
-		SetHelper (const Matrix<double>* r) {
-			m_strategy->SetHelper(r);
-		}
+		SetHelper (const Matrix<double>* r);
 		
 
 		/**
@@ -242,9 +209,7 @@ namespace RRServer {
 		 * @param  r    Real data matrix
 		 */
 		void
-		GetHelper (Matrix<double>* r) {
-			m_strategy->GetHelper(r);
-		}
+		GetHelper (Matrix<double>* r);
 		
 
 		/**
@@ -253,9 +218,7 @@ namespace RRServer {
 		 * @param  r    Real data sequence
 		 */
 		void
-		GetHelper (helper_data* r) {
-			m_strategy->GetHelper(r);
-		}
+		GetHelper (helper_data* r);
 		
 
 		/**
@@ -264,9 +227,7 @@ namespace RRServer {
 		 * @param  r    Real data sequence
 		 */
 		void
-		SetKSpace (const helper_data* r) {
-			m_strategy->SetKSpace(r);
-		}
+		SetKSpace (const helper_data* r);
 		
 
 		/**
@@ -275,9 +236,7 @@ namespace RRServer {
 		 * @param  r    Real data matrix
 		 */
 		void
-		SetKSpace (const Matrix<double>* r) {
-			m_strategy->SetKSpace(r);
-		}
+		SetKSpace (const Matrix<double>* r);
 		
 
 		/**
@@ -286,9 +245,7 @@ namespace RRServer {
 		 * @param  r    Real data sequence
 		 */
 		void
-		GetKSpace (Matrix<double>* r) {
-			m_strategy->GetKSpace(r);
-		}
+		GetKSpace (Matrix<double>* r);
 		
 
 		/**
@@ -297,9 +254,7 @@ namespace RRServer {
 		 * @param  r    Real data sequence
 		 */
 		void
-		GetKSpace (helper_data* r) {
-			m_strategy->GetKSpace(r);
-		}
+		GetKSpace (helper_data* r);
 		
 
 		/**
@@ -308,9 +263,7 @@ namespace RRServer {
 		 * @param  r    Pixel data sequence
 		 */
 		void
-		SetPixel (const pixel_data* r) {
-			m_strategy->SetPixel(r);
-		}
+		SetPixel (const pixel_data* r);
 		
 
 		/**
@@ -319,9 +272,7 @@ namespace RRServer {
 		 * @param  r    Pixel data matrix
 		 */
 		void
-		SetPixel (const Matrix<short>* r) {
-			m_strategy->SetPixel(r);
-		}
+		SetPixel (const Matrix<short>* r);
 		
 
 		/**
@@ -330,9 +281,7 @@ namespace RRServer {
 		 * @param  r    Pixel data matrix
 		 */
 		void
-		GetPixel (Matrix<short>* r) {
-			m_strategy->GetPixel(r);
-		}
+		GetPixel (Matrix<short>* r);
 		
 
 		/**
@@ -341,9 +290,7 @@ namespace RRServer {
 		 * @param  r    Pixel data sequence
 		 */
 		void
-		GetPixel (pixel_data* r) {
-			m_strategy->GetPixel(r);
-		}
+		GetPixel (pixel_data* r);
 		
 
  		/**
@@ -351,9 +298,7 @@ namespace RRServer {
 		 *
 		 * @param name  Name
 		 */
-		void Name (const char* name) { 
-			m_strategy->Name(name);
-		}
+		void Name (const char* name);
 		
 		
  		/**
@@ -361,8 +306,7 @@ namespace RRServer {
 		 *
 		 * @return      Name
 		 */
-		const char* Name () {return m_strategy->Name();}
-		
+		const char* Name ();
 
 
 	private:

@@ -20,6 +20,7 @@
 
 #include "ReconClient.hpp"
 #include "CorbaExceptions.hpp"
+#include "Matrix.hpp"
 
 using namespace RRClient;
 

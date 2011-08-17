@@ -22,8 +22,7 @@
 #define __RECON_CLIENT_H__
 
 #include <complex>
-
-#include "Matrix.hpp"
+#include <vector>
 #include "Configurable.hpp"
 
 
@@ -32,6 +31,9 @@
 #else
     #include "RRSModule.hh"
 #endif
+
+
+template <class T> class Matrix;
 
 using namespace RRSModule;
 

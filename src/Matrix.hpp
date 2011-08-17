@@ -47,12 +47,6 @@ enum IceDim {
 #include <time.h>
 #include <limits.h>
 
-#ifdef HAVE_H5CPP_H
-#include <H5Cpp.h>
-using namespace H5;
-#endif
-
-
 #define ICE_SHRT_MAX 4095
 
 
@@ -1804,6 +1798,52 @@ public:
     Min                 ();
     
     
+	/**
+	 * @brief           Absolute values matrix
+	 *
+	 * @return          Absolute values
+	 */
+	Matrix<T>
+	Abs                 () const {
+		
+		Matrix<T> res(_dim);
+		
+#pragma omp parallel default (shared) 
+		{
+			
+			int tid      = omp_get_thread_num();
+			int chunk    = Size() / omp_get_num_threads();
+			
+#pragma omp for 
+			
+			for (int i = 0; i < Size(); i++)
+				res[i] = abs(_M[i]);
+
+		}		
+
+		return res;
+		
+	}
+	
+
+	/**
+	 * @brief           Real values matrix
+	 *
+	 * @return          Imaginary values
+	 */
+	//Matrix<double>
+	//Real                () const;
+	
+
+	/**
+	 * @brief           Imaginary values matrix
+	 *
+	 * @return          Imaginary values
+	 */
+	//Matrix<double>
+	//Imag                () const;
+	
+
     /**
      * @brief           Get maximum absolute value in the matrix
      *
