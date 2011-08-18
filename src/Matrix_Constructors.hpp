@@ -331,7 +331,7 @@ Matrix<T> Matrix<T>::Sphere (const float* p, const int n) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Ellipse (const float* p, const int n) {
+Matrix<T> Matrix<T>::Ellipse (const float* p, const int n, const T v) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n);
 
@@ -357,7 +357,8 @@ Matrix<T> Matrix<T>::Ellipse (const float* p, const int n) {
 		
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
-			res(c,r) = (pow( (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1], 2.0 ) + pow( (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0], 2.0) <= 1.0) ? T(1.0) : T(0.0);
+			res(c,r) = (pow( (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1], 2.0 ) + 
+						pow( (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0], 2.0) <= 1.0) ? v : T(0.0);
 
 	}
 
@@ -368,7 +369,7 @@ Matrix<T> Matrix<T>::Ellipse (const float* p, const int n) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n) {
+Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n, const T v) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
 
@@ -400,9 +401,7 @@ Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n) {
 				for (int c = 0; c < n; c++)
 					res(c,r,s) = ( pow( (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1], 2.0) + 
 								   pow( (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0], 2.0) +
-								   //pow (((float)c-m[1])/a[1], 2.0) + 
-								   //pow (((float)r-m[0])/a[0], 2.0) + 
-								   pow (((float)s-m[2])/a[2], 2.0) <= 1.0) ? T(1.0) : T(0.0);
+								   pow( ((float)s-m[2])/a[2], 2.0) <= 1.0) ? v : T(0.0);
 		
 	}
 
@@ -439,8 +438,7 @@ Matrix<T> Matrix<T>::Phantom2D (const int n) {
 	Matrix<T>        e;
 
 	for (int i = 0; i < ne; i++) {
-		e    = Matrix<T>::Ellipse (p[i], n);
-		e   *= v[i];
+		e    = Matrix<T>::Ellipse (p[i], n, v[i]);
 		res += e;
 	}
 
@@ -454,19 +452,19 @@ template <class T>
 Matrix<T> Matrix<T>::Phantom3D (const int n) {
 
 	const int ne = 10; // Number of ellipses
-	const int np = 9;  // Number of geometrical parameters
+	const int np =  9; // Number of geometrical parameters
 
 	float p[ne][np] = {
-		{ 0.690, 0.920, 0.900,  0.00,  0.000,  0.000,  0.0, 0.0, 0.0},
-        { 0.662, 0.874, 0.880,  0.00,  0.000,  0.000,  0.0, 0.0, 0.0},
-        { 0.110, 0.310, 0.220, -0.22,  0.000, -0.250, -0.3, 0.0, 0.0},
-        { 0.160, 0.410, 0.210,  0.22,  0.000, -0.250,  0.3, 0.0, 0.0},
-        { 0.210, 0.250, 0.500,  0.00,  0.350, -0.250,  0.0, 0.0, 0.0},
-        { 0.046, 0.046, 0.046,  0.00,  0.100, -0.250,  0.0, 0.0, 0.0},
-        { 0.046, 0.023, 0.020,  0.08, -0.650, -0.250,  0.0, 0.0, 0.0},
-        { 0.046, 0.023, 0.020,  0.06, -0.650, -0.250,  0.0, 0.0, 0.0},
-        { 0.056, 0.040, 0.100, -0.06, -0.105,  0.625,  0.0, 0.0, 0.0},
-        { 0.056, 0.056, 0.100,  0.00,  0.100,  0.625,  0.0, 0.0, 0.0}
+		{ 0.690, 0.920, 0.900,  0.00,  0.000,  0.000,  0.0, 0.0, 0.0 },
+        { 0.662, 0.874, 0.880,  0.00,  0.000,  0.000,  0.0, 0.0, 0.0 },
+        { 0.110, 0.310, 0.220, -0.22,  0.000, -0.250, -0.3, 0.0, 0.0 },
+        { 0.160, 0.410, 0.210,  0.22,  0.000, -0.250,  0.3, 0.0, 0.0 },
+        { 0.210, 0.250, 0.500,  0.00,  0.350, -0.250,  0.0, 0.0, 0.0 },
+        { 0.046, 0.046, 0.046,  0.00,  0.100, -0.250,  0.0, 0.0, 0.0 },
+        { 0.046, 0.023, 0.020,  0.08, -0.650, -0.250,  0.0, 0.0, 0.0 },
+        { 0.046, 0.023, 0.020,  0.06, -0.650, -0.250,  0.0, 0.0, 0.0 },
+        { 0.056, 0.040, 0.100, -0.06, -0.105,  0.625,  0.0, 0.0, 0.0 },
+        { 0.056, 0.056, 0.100,  0.00,  0.100,  0.625,  0.0, 0.0, 0.0 }
 	};
 
 	T v[ne] = {2.0, -0.8, -0.2, -0.2, 0.2, 0.2, 0.1, 0.1, 0.2, -0.2};
@@ -475,8 +473,7 @@ Matrix<T> Matrix<T>::Phantom3D (const int n) {
 	Matrix<T> e;
 	
 	for (int i = 0; i < ne; i++) {
-		e    = Matrix<T>::Ellipsoid (p[i], n);
-		e   *= v[i];
+		e    = Matrix<T>::Ellipsoid (p[i], n, v[i]);
 		res += e;
 	}
 
