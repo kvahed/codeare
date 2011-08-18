@@ -716,12 +716,6 @@ bool Matrix<T>::NIRead (std::string fname) {
 		
 		Reset();
 		
-		printf ("  Dimensions: ");
-		for (int i = 0; i < INVALID_DIM; i++)
-			if (_dim[i] > 1)
-				printf (" %i", _dim[i]);
-		printf ("\n");
-		
 		if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
 			if (ni->datatype == 64)
 				memcpy (_M, ni->data, Size()*sizeof(T));
