@@ -652,7 +652,7 @@ public:
 	 * @return          Matrix including ellipsoid
 	 */
 	static Matrix<T> 
-	Ellipsoid           (const float* p, const int n);
+	Ellipsoid           (const float* p, const int n, const T v = T(1.0));
 	
 	
 	/**
@@ -663,7 +663,7 @@ public:
 	 * @return          Matrix including ellipsoid
 	 */
 	static Matrix<T> 
-	Ellipse             (const float* p, const int n);
+	Ellipse             (const float* p, const int n, const T v = T(1.0));
 	
 	
 	/**
