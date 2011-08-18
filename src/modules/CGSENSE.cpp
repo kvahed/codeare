@@ -270,7 +270,7 @@ CGSENSE::Process () {
 
 		rtmp      = (rn / (p.dotc(q)));
 		m_raw     = (p * rtmp) + m_raw;
-		stmp      = stmp * rtmp;
+		stmp     *= rtmp;
 		m_rhelper = m_rhelper + stmp;
 		r         = - (q * rtmp) + r ;
 		rnewn     = pow(r.Norm().real(),2.0);

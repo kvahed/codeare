@@ -411,9 +411,9 @@ bool nitest (ReconClient* rc) {
 	std::string    mat = std::string (base + std::string("betted.mat"));
 	std::string    nii = std::string (base + std::string("betted2.nii.gz"));
 	
-	Matrix<double> d;
-	d.NIRead (df);
-	d.MXDump (mat, std::string("betted"), std::string(""));
+	//Matrix<double> d;
+	//d.NIRead (df);
+	//d.MXDump (mat, std::string("betted"), std::string(""));
 	//d.NIDump (nii);
 
 	Matrix<raw> slp = Matrix<raw>::Phantom3D(256); 
