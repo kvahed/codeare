@@ -362,6 +362,36 @@ Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
 
+	float m[3];
+	float a[3];
+	float d;
+
+	a[0] = p[0] * float(n) / 2.0;
+	a[1] = p[1] * float(n) / 2.0;
+	a[2] = p[2] * float(n) / 2.0;
+
+	m[0] = (1.0 - p[3]) * float(n) / 2.0;
+	m[1] = (1.0 - p[4]) * float(n) / 2.0;
+	m[2] = (1.0 - p[5]) * float(n) / 2.0;
+
+	
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		int chunk    = n / omp_get_num_threads();
+		
+#pragma omp for schedule (dynamic, chunk) 
+		
+		for (int s = 0; s < n; s++)
+			for (int r = 0; r < n; r++)
+				for (int c = 0; c < n; c++)
+					res(c,r,s) = ( pow (((float)c-m[1])/a[1], 2.0) + 
+								   pow (((float)r-m[0])/a[0], 2.0) + 
+								   pow (((float)s-m[2])/a[2], 2.0) <= 1.0) ? T(1.0) : T(0.0);
+
+	}
+
 	return res;
 
 }
@@ -392,11 +422,12 @@ Matrix<T> Matrix<T>::Phantom2D (const int n) {
 
 	// Empty matrix
 	static Matrix<T> res = Matrix<T>::Zeros(n);
-	
+	Matrix<T> e;
+
 	for (int i = 0; i < ne; i++) {
-		Matrix<T> e = Matrix<T>::Ellipse (p[i], n);
-		e   = e * v[i];
-		res = res + e;
+		e    = Matrix<T>::Ellipse (p[i], n);
+		e   *= v[i];
+		res += e;
 	}
 
 	return res;
@@ -408,7 +439,32 @@ Matrix<T> Matrix<T>::Phantom2D (const int n) {
 template <class T>
 Matrix<T> Matrix<T>::Phantom3D (const int n) {
 
+	const int ne = 10; // Number of ellipses
+	const int np = 9;  // Number of geometrical parameters
+
+	float p[ne][np] = {
+		{ 0.690, 0.920, 0.900,  0.00,  0.000,  0.000, 0.0, 0.0, 0.0},
+        { 0.662, 0.874, 0.880,  0.00,  0.000,  0.000, 0.0, 0.0, 0.0},
+        { 0.110, 0.310, 0.220,  0.22,  0.000, -0.250, 0.0, 0.0, 0.0},
+        { 0.160, 0.410, 0.210, -0.22,  0.000, -0.250, 0.0, 0.0, 0.0},
+        { 0.210, 0.250, 0.500,  0.00,  0.350, -0.250, 0.0, 0.0, 0.0},
+        { 0.046, 0.046, 0.046,  0.00,  0.100, -0.250, 0.0, 0.0, 0.0},
+        { 0.046, 0.023, 0.020, -0.08, -0.650, -0.250, 0.0, 0.0, 0.0},
+        { 0.046, 0.023, 0.020,  0.06, -0.650, -0.250, 0.0, 0.0, 0.0},
+        { 0.056, 0.040, 0.100,  0.06, -0.105,  0.625, 0.0, 0.0, 0.0},
+        { 0.056, 0.056, 0.100,  0.00,  0.100,  0.625, 0.0, 0.0, 0.0}
+	};
+
+	T v[ne] = {2.0, -0.8, -0.2, -0.2, 0.2, 0.2, 0.1, 0.1, 0.2, -0.2};
+
 	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
+	Matrix<T> e;
+	
+	for (int i = 0; i < ne; i++) {
+		e    = Matrix<T>::Ellipsoid (p[i], n);
+		e   *= v[i];
+		res += e;
+	}
 
 	return res;
 

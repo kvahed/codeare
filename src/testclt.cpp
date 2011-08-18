@@ -416,7 +416,7 @@ bool nitest (ReconClient* rc) {
 	d.MXDump (mat, std::string("betted"), std::string(""));
 	//d.NIDump (nii);
 
-	Matrix<raw> slp = Matrix<raw>::Phantom2D(256); 
+	Matrix<raw> slp = Matrix<raw>::Phantom3D(256); 
 	slp.NIDump (nii);
 	slp.MXDump (mat, std::string("betted"), std::string(""));
 
