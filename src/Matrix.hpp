@@ -1403,7 +1403,7 @@ public:
      * @brief           Scalar inequality. result[i] = (this[i] != m). i.e. this ~= m
      *
      * @param  s        Comparing scalar.
-	 * @param           Matrix of false where elements are equal s and true else.
+	 * @return          Matrix of false where elements are equal s and true else.
      */
     Matrix<bool>        
     operator!=          (T s);
@@ -1563,7 +1563,7 @@ public:
      * @brief           Elementwise multiplication. i.e. this .* M.
      *
      * @param  M        Factor matrix.
-	 * @retrun          Result
+	 * @return          Result
      */
     Matrix<T>           
     operator*           (Matrix<T> &M);
@@ -1573,7 +1573,7 @@ public:
      * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
      *
      * @param  M        Factor matrix.
-	 * @retrun          Result
+	 * @return          Result
      */
     Matrix<T>           
     operator*=           (Matrix<T> &M);
@@ -1583,7 +1583,7 @@ public:
      * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
      *
      * @param  s        Factor scalar.
-	 * @retrun          Result
+	 * @return          Result
      */
     Matrix<T>           
     operator*=           (T s);
@@ -1593,7 +1593,7 @@ public:
      * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
      *
      * @param  M        Added matrix.
-	 * @retrun          Result
+	 * @return          Result
      */
     Matrix<T>           
     operator+=           (Matrix<T> &M);
@@ -1603,7 +1603,7 @@ public:
      * @brief           ELementwise addition with scalar and assignment operator. i.e. this = m.
      *
      * @param  s        Added scalar.
-	 * @retrun          Result
+	 * @return          Result
      */
     Matrix<T>           
     operator+=           (T s);
