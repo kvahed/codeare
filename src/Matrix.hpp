@@ -1382,7 +1382,7 @@ public:
     /**
      * @brief           Return a matrix with result[i] = (m[i] ? this[i] : 0).
 	 *
-	 * @param           The operand
+	 * @param  M        The operand
 	 * @return          Cross-section or zero
      */
     Matrix<T>           
