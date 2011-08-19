@@ -337,7 +337,7 @@ public:
 	
 	
 	/**
-	 * @brief           Create 3D nxn Shepp-Logan phantom.
+	 * @brief           Create 3D nxn Shepp-Logan phantom.<br/>
 	 *                  Koay et al. Three dimensional analytical magnetic resonance imaging phantom in the Fourier domain. MRM. 2007; 58: 430-436
 	 *
 	 * @param  n        Side length of matrix
@@ -398,8 +398,8 @@ public:
 
 
     /**
-     * @name            Import export functions for ICE access specifiers.
-     *                  Ice access specifiers can be handled in one of the following ways.
+     * @name            Import export functions for ICE access specifiers.<br/>
+     *                  Ice access specifiers can be handled in one of the following ways.<br/>
      *                  It is crucial to understand that the
      */
 
@@ -708,7 +708,7 @@ public:
 
 	
 	/**
-	 * @brief           Reshape (MATLAB-like reshape). 
+	 * @brief           Reshape (MATLAB-like reshape).<br/>
 	 *                  All dims beyond lin are optional.
 	 *
      * @param  col      Column
@@ -755,7 +755,7 @@ public:
 	
 
 	/**
-	 * @brief           Reshape (MATLAB-like reshape). 
+	 * @brief           Reshape (MATLAB-like reshape).<br/> 
 	 *                  All dims beyond lin are optional.
 	 *
      * @param  col      Column
@@ -1925,7 +1925,7 @@ public:
     IFFT                ()            const;
     
     /**
-     * @brief           MATLAB-like fftshift; 
+     * @brief           MATLAB-like fftshift.<br/> 
 	 *                  i.e. shift zero component to centre of volume for viewing
      *
      * @return          FFT shift.
@@ -1934,7 +1934,7 @@ public:
     FFTShift            (const int d = 0)            const;
     
     /**
-     * @brief           MATLAB-like fftshift; 
+     * @brief           MATLAB-like fftshift.<br/>
 	 *                  i.e. shift zero component to centre of volume for viewing
      *
      * @return          FFT shift.
@@ -1955,7 +1955,7 @@ public:
     /**
      * @brief           Sum of squares. 
      *
-	 * @param  d        Dimension to eliminate. If not given, it is done over the outermost
+	 * @param  d        Dimension to eliminate. <br/>If not given, it is done over the outermost
      * @return          Sum of squares
      */
 	Matrix<T>
