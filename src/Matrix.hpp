@@ -167,7 +167,7 @@ public:
     /**
 	 * @brief           Construct square 2D matrix
 	 *
-	 * @param  m        Rows & Columns
+	 * @param  n        Rows & Columns
 	 */
     inline              
     Matrix              (const int n) ;
@@ -270,23 +270,26 @@ public:
 	
 	
 	/**
-	 * @brief           Create nxn matrix initialised with T(1.0)
+	 * @brief           Create mxn matrix initialised with T(1.0)
 	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn ones
+	 * @param  m        Rows
+	 * @param  n        Cols
+	 * @return          mxn ones
 	 */
 	static Matrix<T> 
-	Ones                (const int n, const int m);
+	Ones                (const int m, const int n);
 	
 	
 	/**
-	 * @brief           Create nxn matrix initialised with T(1.0)
+	 * @brief           Create mxnxl matrix initialised with T(1.0)
 	 *
-	 * @param  n        Side length of matrix
+	 * @param  m        Rows
+	 * @param  n        Cols
+	 * @param  l        Slices
 	 * @return          nxn ones
 	 */
 	static Matrix<T> 
-	Ones                (const int n, const int m, const int l);
+	Ones                (const int m, const int n, const int l);
 	
 	
 	/**
@@ -300,23 +303,26 @@ public:
 	
 	
 	/**
-	 * @brief           Create nxn matrix initialised with T(0.0)
+	 * @brief           Create mxn matrix initialised with T(0.0)
 	 *
-	 * @param  n        Side length of matrix
+	 * @param  m        Rows
+	 * @param  n        Cols
 	 * @return          nxn zeros
 	 */
 	static Matrix<T> 
-	Zeros               (const int n, const int m);
+	Zeros               (const int m, const int n);
 	
 	
 	/**
 	 * @brief           Create nxn matrix initialised with T(0.0)
 	 *
-	 * @param  n        Side length of matrix
+	 * @param  m        Rows
+	 * @param  n        Cols
+	 * @param  l        Slices
 	 * @return          nxn zeros
 	 */
 	static Matrix<T> 
-	Zeros               (const int n, const int m, const int l);
+	Zeros               (const int m, const int n, const int l);
 
 	
 	/**
@@ -368,6 +374,7 @@ public:
 	 *
 	 * @param   p       Parameter array. Must hold a, b, c, x0, y0, z0, phi, psi, theta, intensity.
 	 * @param   n       Size of cube
+	 * @param   v       Value of voxels inside, default: 1
 	 * @return          Matrix including ellipsoid
 	 */
 	static Matrix<T> 
@@ -379,6 +386,7 @@ public:
 	 *
 	 * @param  p        Parameter array. Must hold a, b, x0, y0, phi, intensity.
 	 * @param  n        Size of square
+	 * @param  v        Value of voxels inside, default: 1
 	 * @return          Matrix including ellipsoid
 	 */
 	static Matrix<T> 
@@ -1744,6 +1752,7 @@ public:
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
 	 * @param  dloc     Dataset location.
+	 * @param  ios      IO strategy (HDF5, MATLAB, NIFTI, primitive)
      * @return          Success.
      */
     bool                
@@ -1756,6 +1765,7 @@ public:
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
 	 * @param  dloc     Dataset location.
+	 * @param  ios      IO strategy (HDF5, MATLAB, NIFTI, SYNGO)
      * @return          Success.
      */
     bool                

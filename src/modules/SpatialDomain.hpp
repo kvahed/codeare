@@ -104,7 +104,7 @@ namespace RRStrategy {
  * @param  target   Target magnetisation
  * @param  result   Achieved result
  * @param  iter     Iteration
- * @param           NRMSE
+ * @param  nrmse    Returned NRMSE
  */
 void
 NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result, const int iter, float* nrmse) {
@@ -190,6 +190,7 @@ RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, c
  * @param  nk       # of kspace positions
  * @param  ns       # of spatial positions
  * @param  gd       Gradient duration
+ * @param  pd       Pulse durations
  * @param  m        Out: m_xy
  */
 void
