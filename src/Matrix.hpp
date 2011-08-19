@@ -1532,8 +1532,8 @@ public:
     /**
      * @brief           Elementwise raise of power. i.e. this .^ p.
      *
-     * @param  M        Comparing matrix.
-	 * @return          Hit list
+     * @param  p        Power.
+	 * @return          Result
      */
     Matrix<T>           
     operator^           (float p);
