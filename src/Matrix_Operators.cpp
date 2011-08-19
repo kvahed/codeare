@@ -1,27 +1,27 @@
-template <class T>
+/*template <class T>
 Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
     
     int i;
-
+	
     if (nb_alloc) {
 		
 		if (this->Size() != M.Size()) {
-
+			
 			free (_M);
 			_M = (T*) malloc (M.Size() * sizeof (T));
-
+			
 		}
 		
 	} else {
-
+		
 		_M = (T*) malloc (M.Size() * sizeof (T));
 		nb_alloc = 1;
-
+		
 	}
-
+	
 	for (int i = 0; i < INVALID_DIM; i++)
 		_dim[i] = M.Dim()[i];
-		
+	
 #pragma omp parallel default (shared) 
 	{
 		
@@ -34,10 +34,10 @@ Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
 			_M[i] = M[i];
 		
 	}
-
+	
     return *this;
 
-}
+	}*/
 
 
 template <class T>

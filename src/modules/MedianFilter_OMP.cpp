@@ -55,8 +55,8 @@ RRSModule::error_code MedianFilter_OMP::Process () {
 	const int ww = 25;
 	const int wh = 25;
 
-	int iw = m_pixel.width(); //image width 
-	int ih = m_pixel.height(); //image height
+	int iw = m_pixel.Width(); //image width 
+	int ih = m_pixel.Height(); //image height
 
 	int ex = (ww / 2), ey = (wh / 2);
 	int array[ww*wh];
