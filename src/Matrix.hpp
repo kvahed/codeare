@@ -124,10 +124,10 @@ enum io_strategy {
 
 
 /**
- * @brief   Matrix template.
+ * @brief   Matrix template.<br/>
  *          This class intends to offer a simple interface for handling
  *          MR data in a simple way. As of now it only support Siemens 
- *          access specifiers for direct input.
+ *          access specifiers for direct input.<br/>
  *          The data is organised in a 16 member long array for dimensions
  *          and a template array for the data. The order is column-major.
  * 
