@@ -1012,7 +1012,7 @@ public:
     /**
      * @brief            Operates only on inner 3D: Get a slice of data
      *  
-     * @param  s         
+     * @param  v         Volume         
      * @return           Copy data into new matrix and return
      */
     Matrix <T>           
@@ -2028,7 +2028,7 @@ public:
 	/**
 	 * @brief           Print dimension to std out
 	 *
-	 * @retutn 
+	 * @return
 	 */
 	void
 	PrintDims           () const;
@@ -2093,7 +2093,7 @@ public:
     /**
      * @brief           Compute singular value decomposition with lapack.
      *
-	 * @param  jobz     @see http://www.netlib.org/lapack/double/<x>gesdd.f
+	 * @param  jobz     @see http://www.netlib.org/lapack/double/xgesdd.f
 	 * @param  lsv      Left hand singular vectors.
 	 * @param  rsv      Right hand singular vectors.
 	 * @param  sv       Sorted singular values.
