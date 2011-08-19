@@ -248,6 +248,143 @@ public:
 	inline 
 	Matrix              (const Matrix<T> &M);
 
+
+	/**
+	 * @brief           Create nxn identity matrix 
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn identity
+	 */
+	static Matrix<T> 
+	Id                  (const int n);
+	
+	
+	/**
+	 * @brief           Create nxn matrix initialised with T(1.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn ones
+	 */
+	static Matrix<T> 
+	Ones                (const int n);
+	
+	
+	/**
+	 * @brief           Create nxn matrix initialised with T(1.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn ones
+	 */
+	static Matrix<T> 
+	Ones                (const int n, const int m);
+	
+	
+	/**
+	 * @brief           Create nxn matrix initialised with T(1.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn ones
+	 */
+	static Matrix<T> 
+	Ones                (const int n, const int m, const int l);
+	
+	
+	/**
+	 * @brief           Create nxn matrix initialised with T(0.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Zeros               (const int n);
+	
+	
+	/**
+	 * @brief           Create nxn matrix initialised with T(0.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Zeros               (const int n, const int m);
+	
+	
+	/**
+	 * @brief           Create nxn matrix initialised with T(0.0)
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Zeros               (const int n, const int m, const int l);
+
+	
+	/**
+	 * @brief           Create 2D nxn Shepp-Logan phantom.
+	 *                  Shepp et al. The Fourier reconstruction of a head section. IEEE TNS. 1974; 21: 21-43
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Phantom2D           (const int n);
+	
+	
+	/**
+	 * @brief           Create 3D nxn Shepp-Logan phantom.
+	 *                  Koay et al. Three dimensional analytical magnetic resonance imaging phantom in the Fourier domain. MRM. 2007; 58: 430-436
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Phantom3D           (const int n);
+	
+	
+	/**
+	 * @brief           Create circle of ones in 2D square Matrix
+	 *
+	 * @param   p       Parameter array. Must hold r, x0, y0, intensity.
+	 * @param   n       Size of square
+	 * @return          Matrix including ellipsoid
+	 */
+	static Matrix<T> 
+	Circle              (const float* p, const int n);
+	
+	
+	/**
+	 * @brief           Create sphere of ones in 3D cubic Matrix
+	 *
+	 * @param   p       Parameter array. Must hold r, x0, y0, z0, intensity.
+	 * @param   n       Size of cube
+	 * @return          Matrix including ellipsoid
+	 */
+	static Matrix<T> 
+	Sphere              (const float* p, const int n);
+	
+	
+	/**
+	 * @brief           Create ellipsoid of ones in 3D cubic matrix
+	 *
+	 * @param   p       Parameter array. Must hold a, b, c, x0, y0, z0, phi, psi, theta, intensity.
+	 * @param   n       Size of cube
+	 * @return          Matrix including ellipsoid
+	 */
+	static Matrix<T> 
+	Ellipsoid           (const float* p, const int n, const T v = T(1.0));
+	
+	
+	/**
+	 * @brief           Create ellipse of ones in 2D square matrix
+	 *
+	 * @param  p        Parameter array. Must hold a, b, x0, y0, phi, intensity.
+	 * @param  n        Size of square
+	 * @return          Matrix including ellipsoid
+	 */
+	static Matrix<T> 
+	Ellipse             (const float* p, const int n, const T v = T(1.0));
+	
+	
     //@}
 
 
@@ -270,7 +407,7 @@ public:
      * @param  ias      IceAs containing data
      * @return          Amount of data read
      */
-    inline long         
+    inline const long         
     Import              (const IceAs ias);
 
 
@@ -281,7 +418,7 @@ public:
      * @param  pos      Import data starting at position pos of own repository
      * @return          Amount of data read
      */
-    inline long         
+    inline const long         
     Import              (const IceAs ias, const long pos);
 
 
@@ -291,7 +428,7 @@ public:
      * @param  ias      IceAs for data export
      * @return          Amount of data exported
      */
-    inline long         
+    inline const long         
     Export              (IceAs* ias);
 
 
@@ -301,7 +438,7 @@ public:
      * @param  ias      IceAs for data export
      * @param  pos      Export data starting at position pos of our repository
      */
-    inline long         
+    inline const long         
     Export              (IceAs* ias, const long pos);
  
 	#endif
@@ -356,10 +493,13 @@ public:
      */
     inline T            
     At                  (const int pos)  const {
+
         return _M[pos];
+
     }
 
     
+
     /**
      * @brief            Reference to value at position
      *  
@@ -368,8 +508,11 @@ public:
      */
     inline T&           
     At                  (const int pos) {
+
         return _M[pos];
+
     }
+
 
     
     /**
@@ -387,6 +530,7 @@ public:
     }
 
     
+
     /**
      * @brief            Reference to value in slice
      *  
@@ -402,6 +546,7 @@ public:
     }
 
     
+
     /**
      * @brief            Get value in volume
      *  
@@ -418,6 +563,7 @@ public:
     }
     
     
+
     /**
      * @brief            Reference to value in volume
      *  
@@ -434,6 +580,7 @@ public:
     }
     
     
+
     /**
      * @brief            Get value in store
      *  
@@ -530,6 +677,7 @@ public:
 						  const int idd = 0,
 						  const int ide = 0,
 						  const int ave = 0) {
+
 		return _M [col+
 				   lin*_dim[COL]+
 				   cha*_dim[COL]*_dim[LIN]+
@@ -549,141 +697,6 @@ public:
 
     }
     
-	
-	/**
-	 * @brief           Create nxn identity matrix 
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn identity
-	 */
-	static Matrix<T> 
-	Id                  (const int n);
-	
-	
-	/**
-	 * @brief           Create nxn matrix initialised with T(1.0)
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn ones
-	 */
-	static Matrix<T> 
-	Ones                (const int n);
-	
-	
-	/**
-	 * @brief           Create nxn matrix initialised with T(1.0)
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn ones
-	 */
-	static Matrix<T> 
-	Ones                (const int n, const int m);
-	
-	
-	/**
-	 * @brief           Create nxn matrix initialised with T(1.0)
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn ones
-	 */
-	static Matrix<T> 
-	Ones                (const int n, const int m, const int l);
-	
-	
-	/**
-	 * @brief           Create nxn matrix initialised with T(0.0)
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Zeros               (const int n);
-	
-	
-	/**
-	 * @brief           Create 2D nxn Shepp-Logan phantom.
-	 *                  Shepp et al. The Fourier reconstruction of a head section. IEEE TNS. 1974; 21: 21-43
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Phantom2D           (const int n);
-	
-	
-	/**
-	 * @brief           Create 3D nxn Shepp-Logan phantom.
-	 *                  Koay et al. Three dimensional analytical magnetic resonance imaging phantom in the Fourier domain. MRM. 2007; 58: 430-436
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Phantom3D           (const int n);
-	
-	
-	/**
-	 * @brief           Create circle of ones in 2D square Matrix
-	 *
-	 * @param   p       Parameter array. Must hold r, x0, y0, intensity.
-	 * @param   n       Size of square
-	 * @return          Matrix including ellipsoid
-	 */
-	static Matrix<T> 
-	Circle              (const float* p, const int n);
-	
-	
-	/**
-	 * @brief           Create sphere of ones in 3D cubic Matrix
-	 *
-	 * @param   p       Parameter array. Must hold r, x0, y0, z0, intensity.
-	 * @param   n       Size of cube
-	 * @return          Matrix including ellipsoid
-	 */
-	static Matrix<T> 
-	Sphere              (const float* p, const int n);
-	
-	
-	/**
-	 * @brief           Create ellipsoid of ones in 3D cubic matrix
-	 *
-	 * @param   p       Parameter array. Must hold a, b, c, x0, y0, z0, phi, psi, theta, intensity.
-	 * @param   n       Size of cube
-	 * @return          Matrix including ellipsoid
-	 */
-	static Matrix<T> 
-	Ellipsoid           (const float* p, const int n, const T v = T(1.0));
-	
-	
-	/**
-	 * @brief           Create ellipse of ones in 2D square matrix
-	 *
-	 * @param  p        Parameter array. Must hold a, b, x0, y0, phi, intensity.
-	 * @param  n        Size of square
-	 * @return          Matrix including ellipsoid
-	 */
-	static Matrix<T> 
-	Ellipse             (const float* p, const int n, const T v = T(1.0));
-	
-	
-	/**
-	 * @brief           Create nxn matrix initialised with T(0.0)
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Zeros               (const int n, const int m);
-	
-	
-	/**
-	 * @brief           Create nxn matrix initialised with T(0.0)
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Zeros               (const int n, const int m, const int l);
 
 	
 	/**
@@ -967,7 +980,7 @@ public:
      * @return           Copy data into new vector
      */
     Matrix <T>           
-    Row                  (int r) const;
+    Row                  (const int r) const;
 	
     
     /**
@@ -977,7 +990,7 @@ public:
      * @return           Copy data into new vector
      */
     Matrix <T>           
-    Column               (int c) const;
+    Column               (const int c) const;
 	
     /**
      * @brief            Operates only on inner 3D: Get a slice of data
@@ -986,7 +999,7 @@ public:
      * @return           Copy data into new matrix and return
      */
     Matrix <T>           
-    Slice                (int s) const;
+    Slice                (const int s) const;
 	
     /**
      * @brief            Operates only on inner 3D: Get a slice of data
@@ -995,7 +1008,7 @@ public:
      * @return           Copy data into new matrix and return
      */
     Matrix <T>           
-    Volume               (int v) const;
+    Volume               (const int v) const;
 	
 
 	//@}
@@ -1013,7 +1026,7 @@ public:
      * @return          Number of rows.
      */
     inline int                 
-    height              () const {return _dim[0];}
+    Height              () const {return _dim[0];}
     
     
     /**
@@ -1022,7 +1035,7 @@ public:
      * @return          Number of rows.
      */
     inline int&
-    height              () {return _dim[0];}
+    Height              () {return _dim[0];}
     
     
     /**
@@ -1031,7 +1044,7 @@ public:
      * @return          Number of columns.
      */
     inline int                 
-    width               () const {return _dim[1];}
+    Width               () const {return _dim[1];}
     
     
     /**
@@ -1040,7 +1053,7 @@ public:
      * @return          Number of columns.
      */
     inline int&
-    width               ()  {return _dim[1];}
+    Width               ()  {return _dim[1];}
     
     
     /**
@@ -1197,7 +1210,7 @@ public:
      *
      * @return          Number of cells.
      */
-    long                
+    const long                
     Size                ()                                    const;
     
     
@@ -1207,7 +1220,7 @@ public:
 	 * @param  d        Dimensions
      * @return          XD matrix?
      */
-    bool                
+    const bool                
     IsXD                (const int d)                         const;
     
     
@@ -1216,7 +1229,7 @@ public:
      *
      * @return          2D matrix?
      */
-    bool                
+    const bool                
     Is1D                ()                                    const;
     
     
@@ -1225,7 +1238,7 @@ public:
      *
      * @return          2D matrix?
      */
-    bool                
+    const bool                
     Is2D                ()                                    const;
     
     
@@ -1234,7 +1247,7 @@ public:
      *
      * @return          3D matrix?
      */
-    bool                
+    const bool                
     Is3D                ()                                    const;
     
     
@@ -1243,7 +1256,7 @@ public:
      *
      * @return          3D matrix?
      */
-    bool                
+    const bool 
     Is4D                ()                                    const;
     
     
@@ -1252,7 +1265,7 @@ public:
      *
      * @return          Size in RAM in bytes.
      */
-    int                 
+    const int                  
     SizeInRAM           ()                                    const;
 
     //@}
@@ -1273,8 +1286,8 @@ public:
      *
      * @param  M        The assigned matrix.
      */
-    Matrix<T>           
-    operator=           (Matrix<T> &M);
+    //Matrix<T>           
+    //operator=           (Matrix<T> &M);
     
     
     /**
@@ -1310,7 +1323,7 @@ public:
      * @param  s        Scalar substruent.
      */
     Matrix<T>           
-    operator-           (T s);
+    operator-           (const T s);
     
     
     /**
@@ -2106,7 +2119,7 @@ private:
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Volume (int s) const {
+Matrix<T>::Volume (const int s) const {
     
 	assert (Is4D());
     
@@ -2127,7 +2140,7 @@ Matrix<T>::Volume (int s) const {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Slice (int s) const {
+Matrix<T>::Slice (const int s) const {
     
 	assert (Is3D());
     
@@ -2148,7 +2161,7 @@ Matrix<T>::Slice (int s) const {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Row (int r)  const {
+Matrix<T>::Row (const int r)  const {
 
 	assert (Is2D());
     
@@ -2166,7 +2179,7 @@ Matrix<T>::Row (int r)  const {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Column (int c) const {
+Matrix<T>::Column (const int c) const {
     
     Matrix<T> res;
 
@@ -2180,7 +2193,7 @@ Matrix<T>::Column (int c) const {
 }
 
 
-template <class T> long 
+template <class T> const long 
 Matrix<T>::Size() const {
     
     long size = 1;
@@ -2193,7 +2206,7 @@ Matrix<T>::Size() const {
 }
 
 
-template <class T> inline int 
+template <class T> inline const int 
 Matrix<T>::SizeInRAM() const {
     
     return Size() * sizeof(T);
@@ -2326,7 +2339,7 @@ inline void Matrix<short>::Random () {
 
     
 template <class T> 
-inline bool Matrix<T>::IsXD (const int d) const {
+inline const bool Matrix<T>::IsXD (const int d) const {
 
 	int l = 0;
 
@@ -2338,28 +2351,28 @@ inline bool Matrix<T>::IsXD (const int d) const {
 }
 
 template <class T> 
-inline bool Matrix<T>::Is1D () const {
+inline const bool Matrix<T>::Is1D () const {
 	
 	return IsXD(1);
 
 }
 
 template <class T> 
-inline bool Matrix<T>::Is2D () const {
+inline const bool Matrix<T>::Is2D () const {
 	
 	return IsXD(2);
 
 }
 
 template <class T> 
-inline bool Matrix<T>::Is3D () const {
+inline const bool Matrix<T>::Is3D () const {
 	
 	return IsXD(3);
 
 }
 
 template <class T> 
-inline bool Matrix<T>::Is4D () const {
+inline const bool Matrix<T>::Is4D () const {
 	
 	return IsXD(4);
 
