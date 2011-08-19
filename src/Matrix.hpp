@@ -326,7 +326,7 @@ public:
 
 	
 	/**
-	 * @brief           Create 2D nxn Shepp-Logan phantom.
+	 * @brief           Create 2D nxn Shepp-Logan phantom.<br/>
 	 *                  Shepp et al. The Fourier reconstruction of a head section. IEEE TNS. 1974; 21: 21-43
 	 *
 	 * @param  n        Side length of matrix
