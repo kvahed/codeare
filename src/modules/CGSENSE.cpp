@@ -23,8 +23,6 @@ CGSENSE::Finalise () {
 		for (int i = 0; i < NTHREADS || i < m_Nc; i++)
 			nfft::finalize (&m_fplan[i], &m_iplan[i]);
 
-	delete [] m_N;
-	delete [] m_n;
 	return OK;
 
 }
@@ -39,13 +37,7 @@ CGSENSE::Init() {
 
 	m_initialised = false;
 
-	// Image space dimensions ----------------
-	m_N   = new int[3];
-
-	// Oversampling --------------------------
-	m_n   = new int[3];
-
-	// Some defaults
+	// Some defaults ------------------------
 	for (int i = 0; i < 3; i++) {
 		m_N[i] = 1; 
 		m_n[i] = 0;
@@ -289,7 +281,7 @@ CGSENSE::Process () {
 	}
 
 	// Report timimng -------------------------------------------------
-	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	// Verbose output needs to 
 	if (m_verbose) {

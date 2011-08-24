@@ -56,6 +56,7 @@ bool mxtest (ReconClient* rc);
 bool nitest (ReconClient* rc);
 bool fftwtest (ReconClient* rc);
 bool resetest (ReconClient* rc);
+bool grappatest (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
@@ -69,6 +70,8 @@ int main (int argc, char** argv) {
 			nuffttest (&client);
 		else if (strcmp (test, "CGSENSE") == 0)
 			cgsensetest (&client);
+		else if (strcmp (test, "GRAPPA") == 0)
+			grappatest (&client);
 		else if (strcmp (test, "SpatialDomain") == 0)
 			sdmtest (&client);
 		else if (strcmp (test, "mxtest") == 0)
@@ -87,6 +90,25 @@ int main (int argc, char** argv) {
 	} else
 		
 		return 1;
+
+}
+
+bool grappatest (ReconClient* rc) {
+
+	Matrix<raw>    rawdata;
+
+	std::string    cf  = std::string (base + std::string(config));
+	std::string    df  = std::string (base + std::string(data));
+
+	rawdata.Read   (df, "data");
+	rc->ReadConfig (cf.c_str());
+
+	rc->Init (test);
+	rc->SetRaw (rawdata); // Measurement data
+	rc->Process (test);
+	rc->Finalise (test);
+	
+	return true;
 
 }
 
@@ -337,10 +359,10 @@ bool resetest (ReconClient* rc) {
 	std::string df    = std::string (base + std::string   (data));
 	
 	// OUT
-	std::string txmf  = std::string (base + std::string ("txm.h5"));
-	std::string rxmf  = std::string (base + std::string ("rxm.h5"));
-	std::string osnrf = std::string (base + std::string ("osnr.h5"));
-	std::string b0f   = std::string (base + std::string ("b0.h5"));
+	std::string txmf  = std::string (base + std::string ("txm.mat"));
+	std::string rxmf  = std::string (base + std::string ("rxm.mat"));
+	std::string osnrf = std::string (base + std::string ("osnr.mat"));
+	std::string b0f   = std::string (base + std::string ("b0.mat"));
 	
 	meas.RAWRead (df, std::string("VB15"));
 	
@@ -358,10 +380,10 @@ bool resetest (ReconClient* rc) {
 	
 	rc->Finalise(test);
 	
-	txm.Dump (txmf);
-	rxm.Dump (rxmf);
-	osnr.Dump (osnrf);
-	b0.Dump (b0f);
+	txm.Dump  (txmf,  "txm",  "", MATLAB);
+	rxm.Dump  (rxmf,  "rxm",  "", MATLAB);
+	osnr.Dump (osnrf, "isnr", "", MATLAB);
+	b0.Dump   (b0f,   "b0",   "", MATLAB);
 	
 	return true;
 

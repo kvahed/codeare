@@ -20,7 +20,7 @@
  * @brief         Load module
  *
  * @param  name   Module name
- * @param  mode   Loader mode
+ * @return        RAM address
  */ 
 void* 
 LoadModule        (char* name) {

@@ -35,7 +35,7 @@ static const int NTHREADS = 8;
 namespace RRStrategy {
 	
 	/**
-	 * @brief Non uniform FFT
+	 * @brief Conjugate gradient Non-Cartesian SENSE 
 	 */
 	class CGSENSE : public ReconStrategy {
 		
@@ -91,8 +91,8 @@ namespace RRStrategy {
 		double               m_cgeps;           /**< CG SENSE convergence criterium  */
 		int                  m_cgmaxit;         /**< Maximum number of CG iterations */
 		
-		int*                 m_N;               /**< Size of image matrix.           */
-		int*                 m_n;               /**< Oversampling                    */ 
+		int                  m_N[3];            /**< Size of image matrix.           */
+		int                  m_n[3];            /**< Oversampling                    */ 
 		int                  m_M;               /**< Measurement points              */
 		int                  m_dim;             /**< Dimensions of image space (2D/3D) */
 

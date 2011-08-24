@@ -32,7 +32,7 @@ using namespace RRServer;
 namespace RRStrategy {
 
 	/**
-	 * @brief Empty recon for test purposes
+	 * @brief b0 abd Relative b1 maps from 2SPGREs 
 	 */
 	class RelativeSensitivities : public ReconStrategy {
 		

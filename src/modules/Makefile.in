@@ -91,6 +91,12 @@ DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
 DumpToFile_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) -o $@
+GRAPPA_la_LIBADD =
+am_GRAPPA_la_OBJECTS = $(am__objects_1) GRAPPA.lo
+GRAPPA_la_OBJECTS = $(am_GRAPPA_la_OBJECTS)
+GRAPPA_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(GRAPPA_la_LDFLAGS) $(LDFLAGS) -o $@
 GenericRegrid_la_LIBADD =
 am_GenericRegrid_la_OBJECTS = $(am__objects_1) GenericRegrid.lo
 GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
@@ -165,16 +171,16 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
-	$(DumpToFile_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES) $(NuFFT_OMP_la_SOURCES) \
-	$(RelativeSensitivities_la_SOURCES) \
+	$(DumpToFile_la_SOURCES) $(GRAPPA_la_SOURCES) \
+	$(GenericRegrid_la_SOURCES) $(LapackTests_la_SOURCES) \
+	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
+	$(NuFFT_OMP_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
 	$(SpatialDomain_la_SOURCES) $(SystemCmd_la_SOURCES)
 DIST_SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
-	$(DumpToFile_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES) $(NuFFT_OMP_la_SOURCES) \
-	$(RelativeSensitivities_la_SOURCES) \
+	$(DumpToFile_la_SOURCES) $(GRAPPA_la_SOURCES) \
+	$(GenericRegrid_la_SOURCES) $(LapackTests_la_SOURCES) \
+	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
+	$(NuFFT_OMP_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
 	$(SpatialDomain_la_SOURCES) $(SystemCmd_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -239,6 +245,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PYTHON = @PYTHON@
+PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
+PYTHON_INCLUDES = @PYTHON_INCLUDES@
+PYTHON_LDFLAGS = @PYTHON_LDFLAGS@
+PYTHON_PLATFORM = @PYTHON_PLATFORM@
+PYTHON_PREFIX = @PYTHON_PREFIX@
+PYTHON_VERSION = @PYTHON_VERSION@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -287,9 +300,13 @@ mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
+pkgpyexecdir = @pkgpyexecdir@
+pkgpythondir = @pkgpythondir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+pyexecdir = @pyexecdir@
+pythondir = @pythondir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -301,7 +318,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la RelativeSensitivities.la 
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la RelativeSensitivities.la GRAPPA.la 
 COMMON = ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp
 # Common linker flags
 COMMON_la_LDFLAGS = -module
@@ -320,11 +337,13 @@ NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.hpp DumpToFile.cpp
 DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) #$(HDF5)
 CGSENSE_la_SOURCES = $(COMMON) CGSENSE.hpp CGSENSE.cpp nfftstub.h nfftstub.c Noise.hpp SEM.hpp OMP.hpp
-CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart $(BLAS) $(LAPACK) -Wl,-rpath,/Applications/MATLAB_R2011a.app/bin/maci64
+CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart $(BLAS) $(LAPACK) #-Wl,-rpath,/Applications/MATLAB_R2011a.app/bin/maci64
 SystemCmd_la_SOURCES = $(COMMON) SystemCmd.hpp SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 LapackTests_la_SOURCES = $(COMMON) LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
+GRAPPA_la_SOURCES = $(COMMON) GRAPPA.hpp GRAPPA.cpp
+GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(PYTHON_LDFLAGS) -lpython
 SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
 SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) 
 RelativeSensitivities_la_SOURCES = $(COMMON) RelativeSensitivities.hpp RelativeSensitivities.cpp
@@ -401,6 +420,8 @@ DummyRecon.la: $(DummyRecon_la_OBJECTS) $(DummyRecon_la_DEPENDENCIES)
 	$(DummyRecon_la_LINK) -rpath $(libdir) $(DummyRecon_la_OBJECTS) $(DummyRecon_la_LIBADD) $(LIBS)
 DumpToFile.la: $(DumpToFile_la_OBJECTS) $(DumpToFile_la_DEPENDENCIES) 
 	$(DumpToFile_la_LINK) -rpath $(libdir) $(DumpToFile_la_OBJECTS) $(DumpToFile_la_LIBADD) $(LIBS)
+GRAPPA.la: $(GRAPPA_la_OBJECTS) $(GRAPPA_la_DEPENDENCIES) 
+	$(GRAPPA_la_LINK) -rpath $(libdir) $(GRAPPA_la_OBJECTS) $(GRAPPA_la_LIBADD) $(LIBS)
 GenericRegrid.la: $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_DEPENDENCIES) 
 	$(GenericRegrid_la_LINK) -rpath $(libdir) $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_LIBADD) $(LIBS)
 LapackTests.la: $(LapackTests_la_OBJECTS) $(LapackTests_la_DEPENDENCIES) 
@@ -427,6 +448,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CGSENSE.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GRAPPA.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GenericRegrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LapackTests.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
