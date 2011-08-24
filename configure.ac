@@ -28,6 +28,67 @@ AC_PROG_LIBTOOL
 AC_LANG([C++])
 AC_OPENMP
 
+# Check for Python
+m4_define([_AM_PYTHON_INTERPRETER_LIST], [python python3 python3.1])
+AC_ARG_WITH([pythonpath],
+AC_HELP_STRING([--with-pythonpath=PATH],
+  [specify an absolute path to python executable when automatic version check (incorrectly) fails]),
+  [python_path="$withval"], [python_path="auto"])
+if test "$python_path" = auto; then
+	AM_PATH_PYTHON([3.1])
+else
+	# Older versions of automake can't handle python3 well.  This is an
+	# in-house workaround for them.
+	PYTHON=$python_path
+	AC_SUBST(PYTHON)
+	PYTHON_PREFIX='${prefix}'
+	AC_SUBST(PYTHON_PREFIX)
+	PYTHON_EXEC_PREFIX='$(exec_prefix)'
+	AC_SUBST(PYTHON_EXEC_PREFIX)
+	PYTHON_VERSION=[`$PYTHON -c "import sys; sys.stdout.write(sys.version[:3])"`]
+	if test `echo "$PYTHON_VERSION >= 2.7" | bc` != 1 ; then
+		AC_MSG_ERROR(["Python version too old: $PYTHON_VERSION, need 2.7 or higher"])
+	fi
+	AC_SUBST(PYTHON_VERSION)
+	PYTHON_PLATFORM=`$PYTHON -c "import sys; print(sys.platform)"`
+	AC_SUBST(PYTHON_PLATFORM)
+	pythondir='${prefix}/lib/python'$PYTHON_VERSION'/site-packages'
+	AC_SUBST(pythondir)
+	pkgpythondir='${pythondir}/'$PACKAGE
+	AC_SUBST(pkgpythondir)
+	pyexecdir='${exec_prefix}/lib/python'$PYTHON_VERSION'/site-packages'
+	AC_SUBST(pyexecdir)
+	pkgpyexecdir='${pyexecdir}/'$PACKAGE
+	AC_SUBST(pkgpyexecdir)
+fi
+
+# Check for python development environments
+if test -x ${PYTHON}-config; then
+	PYTHON_INCLUDES=`${PYTHON}-config --includes`
+
+	for flag in `${PYTHON}-config --ldflags`; do
+		# add any '-L..." flags to PYTHON_LDFLAGS
+		flag=`echo $flag | sed -ne 's/^\(\-L.*\)$/\1/p'`
+		if test "X${flag}" != X; then
+			PYTHON_LDFLAGS="$PYTHON_LDFLAGS ${flag}"
+		fi
+	done
+	# on some platforms, ${PYTHON}-config --ldflags doesn't provide a -L
+	# option while having the library under a non trivial directory.
+	# as a workaround we try the "lib" sub directory under the common
+	# prefix for this python.
+	if test -z "${PYTHON_LDFLAGS}"; then
+		PYTHON_LDFLAGS="-L`${PYTHON}-config --prefix`/lib"
+	fi
+else
+	if test "X$PYTHON_INCLUDES" = X -o "X$PYTHON_LDFLAGS" = X; then
+		AC_MSG_WARN([${PYTHON}-config does not exist or is not executable, so we could not detect python development environment.  Your system may require an additional package (e.g. "python3-dev").  Alternatively, if you are sure you have python headers and libraries, define PYTHON_INCLUDES and PYTHON_LDFLAGS and run this script.])
+	fi
+fi
+AC_SUBST(PYTHON_INCLUDES)
+AC_SUBST(PYTHON_LDFLAGS)
+CXXFLAGS="${CXXFLAGS} ${PYTHON_INCLUDES}"
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
 AC_HEADER_STDBOOL

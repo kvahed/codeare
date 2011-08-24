@@ -4,6 +4,9 @@
 #include "nfft3util.h"
 #include "nfft3.h"
 
+/**
+ * @brief Interface to <a href="http://www-user.tu-chemnitz.de/~potts/nfft/" target="NFFT">NFFT 3 library</a>
+ */
 namespace nfft {
 
 #ifdef __cplusplus

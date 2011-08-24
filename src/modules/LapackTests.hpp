@@ -32,7 +32,7 @@ using namespace RRServer;
 namespace RRStrategy {
 
 	/**
-	 * @brief Empty recon for test purposes
+	 * @brief TEST: Lapack functions
 	 */
 	class LapackTests : public ReconStrategy {
 		

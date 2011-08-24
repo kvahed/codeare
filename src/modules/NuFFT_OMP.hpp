@@ -32,7 +32,7 @@ using namespace RRServer;
 namespace RRStrategy {
 	
 	/**
-	 * @brief Non uniform FFT
+	 * @brief Non uniform FFT (SMP implementation)
 	 */
 	class NuFFT_OMP : public ReconStrategy {
 		

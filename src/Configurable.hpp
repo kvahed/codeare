@@ -19,12 +19,9 @@ class Configurable {
 	 */
 	Configurable() {
 
-		m_config_doc  = new TiXmlDocument();
-		m_config_decl = new TiXmlDeclaration ("1.0", "", "");
-		m_config      = new TiXmlElement     ("Config");
-
-		m_config_doc->LinkEndChild( m_config_decl );
-		m_config_doc->LinkEndChild( m_config );
+		m_config_doc             = new TiXmlDocument();
+		m_config_doc->LinkEndChild(new TiXmlDeclaration ("1.0", "", ""));
+		m_config_doc->LinkEndChild(new TiXmlElement     ("Config"));
 		
 	}
 
@@ -45,7 +42,7 @@ class Configurable {
 	 */
 	inline void
 	SetAttribute        (const char* name, const char* value) {
-		m_config->SetAttribute (name, value);
+		m_config_doc->RootElement()->SetAttribute (name, value);
 	}
 
 	
@@ -57,7 +54,7 @@ class Configurable {
 	 */
 	inline void
 	SetAttribute        (const char* name, int value) {
-		m_config->SetAttribute (name, value);
+		m_config_doc->RootElement()->SetAttribute (name, value);
 	}
 
 	
@@ -69,7 +66,7 @@ class Configurable {
 	 */
 	inline void 
 	SetAttribute        (const char* name, double value) {
-		m_config->SetDoubleAttribute (name, value);
+		m_config_doc->RootElement()->SetDoubleAttribute (name, value);
 	}
 
 
@@ -81,7 +78,7 @@ class Configurable {
 	 */
 	inline const char*
 	Attribute           (const char* name) const {
-		return m_config->Attribute (name);
+		return m_config_doc->RootElement()->Attribute (name);
 	}
 	
 
@@ -92,9 +89,9 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	inline const char*
+	inline int
 	Attribute           (const char* name, int* value) const {
-		return m_config->Attribute (name, value);
+		return m_config_doc->RootElement()->QueryIntAttribute (name, value);
 	}
 
 	
@@ -105,9 +102,9 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	inline const char*
+	inline int
 	Attribute           (const char* name, double* value) const {
-		return m_config->Attribute (name, value);
+		return m_config_doc->RootElement()->QueryDoubleAttribute (name, value);
 	}
 
 
@@ -119,8 +116,9 @@ class Configurable {
 	inline const char*
 	GetConfig           ()             {
 
-		std::string temp = "";
-		temp << *(m_config_doc);
+		TiXmlPrinter printer;
+		m_config_doc->Accept( &printer );
+		std::string temp  = printer.CStr();
 		char* t = new char[temp.length() + 1];
 		strcpy (t, temp.c_str());
 		return t;
@@ -136,10 +134,8 @@ class Configurable {
 	inline void 
 	SetConfig          (const char* cstr) {
 
-		m_config_doc->Clear();
+		m_config_doc = new TiXmlDocument();
 		m_config_doc->Parse(cstr);
-		m_config = m_config_doc->RootElement();
-
 
 	}
 
@@ -151,9 +147,7 @@ class Configurable {
 	 */
 	TiXmlElement* 
 	Configuration      () {
-		
-		return m_config;
-		
+		return m_config_doc->RootElement();
 	}
 
 
@@ -191,12 +185,9 @@ class Configurable {
 	
 
 
- protected:
+ private:
 	
-
-	TiXmlElement*       m_config;      /**< Flat Configuration XML element.      */ 
 	TiXmlDocument*      m_config_doc;  /**< Containing XML document              */ 
-	TiXmlDeclaration*   m_config_decl; /**< Declaration                          */
 
 };
 
