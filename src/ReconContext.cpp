@@ -81,122 +81,74 @@ ReconContext::ReadConfig       (const char* fname) {
 		
 
 void
-ReconContext::SetRaw          (const raw_data* r) {
-	m_strategy->SetRaw(r);
+ReconContext::SetCplx          (const std::string name, const cplx_data* r) {
+	m_strategy->SetCplx(name, r);
 }
 		
 
 void
-ReconContext::SetRaw          (const Matrix<raw>* r) {
-	m_strategy->SetRaw(r);
+ReconContext::SetCplx          (const std::string name, Matrix<cplx>* r) {
+	m_strategy->SetCplx(name, r);
 }
 		
 
 void
-ReconContext::GetRaw          (raw_data* r) {
-	m_strategy->GetRaw(r);
+ReconContext::GetCplx          (const std::string name, cplx_data* r) {
+	m_strategy->GetCplx(name, r);
 }
 		
 
 void
-ReconContext::GetRaw          (Matrix<raw>* r) {
-	m_strategy->GetRaw(r);
+ReconContext::GetCplx          (const std::string name, Matrix<cplx>* r) {
+	m_strategy->GetCplx(name, r);
 }
 		
 
 void
-ReconContext::SetRHelper (const raw_data* r) {
-	m_strategy->SetRHelper(r);
+ReconContext::SetReal (const std::string name, const real_data* r) {
+	m_strategy->SetReal(name, r);
 }
 		
 
 void
-ReconContext::SetRHelper (const Matrix<raw>* r) {
-	m_strategy->SetRHelper(r);
+ReconContext::SetReal (const std::string name, Matrix<double>* r) {
+	m_strategy->SetReal(name, r);
 }
 		
 
 void
-ReconContext::GetRHelper (raw_data* r) {
-	m_strategy->GetRHelper(r);
+ReconContext::GetReal (const std::string name, Matrix<double>* r) {
+	m_strategy->GetReal(name, r);
 }
 		
 
 void
-ReconContext::GetRHelper (Matrix<raw>* r) {
-	m_strategy->GetRHelper(r);
+ReconContext::GetReal (const std::string name, real_data* r) {
+	m_strategy->GetReal(name, r);
 }
 		
 
 void
-ReconContext::SetHelper (const helper_data* r) {
-	m_strategy->SetHelper(r);
+ReconContext::SetPixel (const std::string name, const pixel_data* r) {
+	m_strategy->SetPixel(name, r);
 }
 		
 
 void
-ReconContext::SetHelper (const Matrix<double>* r) {
-	m_strategy->SetHelper(r);
+ReconContext::SetPixel (const std::string name, Matrix<short>* r) {
+	m_strategy->SetPixel(name, r);
 }
 		
 
 void
-ReconContext::GetHelper (Matrix<double>* r) {
-	m_strategy->GetHelper(r);
+ReconContext::GetPixel (const std::string name, Matrix<short>* r) {
+	m_strategy->GetPixel(name, r);
 }
 		
 
 void
-ReconContext::GetHelper (helper_data* r) {
-	m_strategy->GetHelper(r);
-}
-		
-
-void
-ReconContext::SetKSpace (const helper_data* r) {
-	m_strategy->SetKSpace(r);
-}
-		
-
-void
-ReconContext::SetKSpace (const Matrix<double>* r) {
-	m_strategy->SetKSpace(r);
-}
-		
-
-void
-ReconContext::GetKSpace (Matrix<double>* r) {
-	m_strategy->GetKSpace(r);
-}
-		
-
-void
-ReconContext::GetKSpace (helper_data* r) {
-	m_strategy->GetKSpace(r);
-}
-		
-
-void
-ReconContext::SetPixel (const pixel_data* r) {
-	m_strategy->SetPixel(r);
-}
-		
-
-void
-ReconContext::SetPixel (const Matrix<short>* r) {
-	m_strategy->SetPixel(r);
-}
-		
-
-void
-ReconContext::GetPixel (Matrix<short>* r) {
-	m_strategy->GetPixel(r);
-}
-		
-
-void
-ReconContext::GetPixel (pixel_data* r) {
-	m_strategy->GetPixel(r);
+ReconContext::GetPixel (const std::string name, pixel_data* r) {
+	m_strategy->GetPixel(name, r);
 }
 		
 

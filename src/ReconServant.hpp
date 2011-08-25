@@ -27,6 +27,7 @@
     #include "RRSModule.hh"
 #endif
 
+#include <string>
 #include <vector>
 
 using namespace RRSModule;
@@ -98,8 +99,8 @@ namespace RRServer {
 		 *
 		 * @return    Pointer to data
 		 */
-		raw_data* 
-		raw           ();
+		cplx_data* 
+		get_cplx      (const char* name);
 		
 
 		/**
@@ -108,70 +109,34 @@ namespace RRServer {
 		 * @param r   Complex measurement data
 		 */
 		void 
-		raw           (const raw_data& r);
+		set_cplx      (const char* name, const cplx_data& r);
 
 		
-		/**
-		 * @brief     Get complex helper data from recon
-		 *
-		 * @return    Pointer to data
-		 */
-		raw_data* 
-		rhelper       ();
-		
-
-		/**
-		 * @brief     Set complex helper data for recon
-		 *
-		 * @param r   Complex helper data (f.e. sensitivities)
-		 */
-		void 
-		rhelper       (const raw_data& r);
-		
-
 		/**
 		 * @brief     Get real helper data from recon
 		 *
 		 * @return    Pointer to real data
 		 */
-		helper_data* 
-		helper        ();
+		real_data* 
+		get_real      (const char* name);
 		
 
 		/**
-		 * @brief     Set real helper data for recon
+		 * @brief     Set real data
 		 *
 		 * @param r   Real helper data
 		 */
 		void 
-		helper        (const helper_data& r);
+		set_real      (const char* name, const real_data& r);
 		
 
-		/**
-		 * @brief     Get real helper data from recon
-		 *
-		 * @return    Pointer to real helper data
-		 */
-		helper_data* 
-		kspace        ();
-
-		
-		/**
-		 * @brief     Set kspace for recon
-		 *
-		 * @param k   Kspace 
-		 */
-		void 
-		kspace        (const helper_data& k);
-
-		
 		/**
 		 * @brief     Get pixel data from recon
 		 *
 		 * @return    Pointer to pixel data
 		 */
 		pixel_data* 
-		pixel         ();
+		get_pixel     (const char* name);
 		
 
 		/**
@@ -180,7 +145,7 @@ namespace RRServer {
 		 * @param p   Pixel data
 		 */
 		void 
-		pixel         (const pixel_data& p);
+		set_pixel     (const char* name, const pixel_data& p);
 		
 
 		/**

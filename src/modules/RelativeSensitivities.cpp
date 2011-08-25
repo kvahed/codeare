@@ -35,54 +35,52 @@ RelativeSensitivities::Init        () {
 RRSModule::error_code
 RelativeSensitivities::Process     () { 
 
-	// Introductive output --------------------
+	Matrix<cplx>*   data = m_cplx["data"];
+	Matrix<cplx>*   shim = m_cplx["shim"];
+	Matrix<cplx>*   rxm  = m_cplx["rxm"];
+	Matrix<cplx>*   txm  = m_cplx["txm"];
+	Matrix<double>* snro = m_real["snro"];
+	Matrix<double>* b0   = m_real["b0"];
 
 	printf ("  Processing map generation ...\n");
-	m_raw.Squeeze();
 
-	printf ("  Dimensions: ");
-	for (int i = 0; i < INVALID_DIM; i++)
-		if (m_raw.Dim(i) > 1)
-			printf (" %i",  m_raw.Dim(i));
-	printf ("\n");
-	// ----------------------------------------
+	// Squeeze matrix ---------------------------
+
+	data->Squeeze();
+	printf ("  Dimensions: %s \n", data->DimsToCString());
+	// -----------------------------------------
 
 
-	// Fourier transform ----------------------
+	// Fourier transform -----------------------
 
-	FTVolumes (&m_raw);
+	FTVolumes (data);
 	// -----------------------------------------
 	
 
 	// Remove readout oversampling -------------
 
-	RemoveOS (&m_raw);
+	RemoveOS (data);
 	// -----------------------------------------
 
 
 	// SVD calibration -------------------------
 	
-	Matrix<raw>    shim (m_raw.Dim(4), 1);                                        // Shim coefficients
-	Matrix<raw>    txm  (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2), m_raw.Dim(4)); // TX maps
-	Matrix<raw>    rxm  (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2), m_raw.Dim(5)); // RX maps
-	Matrix<double> snro (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2));               // SNR optimal image
+	shim  = new Matrix<cplx>   (data->Dim(4), 1);                                        // Shim coefficients
+	txm   = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(4)); // TX maps
+	rxm   = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(5)); // RX maps
+	snro  = new Matrix<double> (data->Dim(0), data->Dim(1), data->Dim(2));               // SNR optimal image
 	
-	SVDCalibrate (&m_raw, &rxm, &txm, &snro, &shim, false);
+	SVDCalibrate (data, rxm, txm, snro, shim, false);
    	// -----------------------------------------
 
 
 	// B0 calculation --------------------------
 
-	Matrix<double> b0 (m_raw.Dim(0), m_raw.Dim(1), m_raw.Dim(2));
-	float          TE = 1.5e-3;
+	b0       = new Matrix<double> (data->Dim(0), data->Dim(1), data->Dim(2));
+	float TE = 1.5e-3;
 
-	B0Map (&m_raw, &b0, TE);
+	B0Map (data, b0, TE);
 	// -----------------------------------------
-
-	m_raw     = txm;
-	m_rhelper = rxm;
-	m_helper  = snro;
-	m_kspace  = b0;
 
 	return RRSModule::OK;
 

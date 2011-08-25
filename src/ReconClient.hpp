@@ -99,7 +99,7 @@ namespace RRClient {
 		 * @param  M        Complex data
 		 */
 		void 
-		SetRaw              (Matrix< std::complex<float> >& M);
+		SetCplx             (const std::string name, Matrix< std::complex<float> >& M);
 		
 		
 		/**
@@ -108,25 +108,7 @@ namespace RRClient {
 		 * @param  M        Receive storage
 		 */
 		void 
-		GetRaw              (Matrix< std::complex<float> >& M);
-		
-		
-		/**
-		 * @brief           Transmit complex helper data (f.e. sensitivity maps)
-		 *
-		 * @param  M        Complex data
-		 */
-		void 
-		SetRHelper          (Matrix< std::complex<float> >& M);
-		
-		
-		/**
-		 * @brief           Get complex helper data (f.e. 2nd set of images)
-		 *
-		 * @param  M        Receive storage
-		 */
-		void 
-		GetRHelper          (Matrix< std::complex<float> >& M);
+		GetCplx             (const std::string name, Matrix< std::complex<float> >& M);
 		
 		
 		/**
@@ -135,7 +117,7 @@ namespace RRClient {
 		 * @param  M        Real data
 		 */
 		void
-		SetHelper           (Matrix< double >& M);
+		SetReal             (const std::string name, Matrix< double >& M);
 		
 		
 		/**
@@ -144,25 +126,7 @@ namespace RRClient {
 		 * @param  M        Receive storage
 		 */
 		void
-		GetHelper           (Matrix< double >& M);
-		
-		
-		/**
-		 * @brief           Transmit k-space data to storage
-		 *
-		 * @param  M        Real data
-		 */
-		void
-		SetKSpace           (Matrix< double >& M);
-		
-		
-		/**
-		 * @brief           Get k-space data after manipulation?
-		 *
-		 * @param  M        Real data
-		 */
-		void
-		GetKSpace           (Matrix< double >& M);
+		GetReal             (const std::string name, Matrix< double >& M);
 		
 		
 		/**
@@ -171,7 +135,7 @@ namespace RRClient {
 		 * @param  M        Short int data
 		 */
 		void 
-		SetPixel            (Matrix<short>& M);
+		SetPixel            (const std::string name, Matrix<short>& M);
 		
 		
 		/**
@@ -180,7 +144,7 @@ namespace RRClient {
 		 * @param  M        Short int storage
 		 */
 		void 
-		GetPixel            (Matrix<short>& M);
+		GetPixel            (const std::string name, Matrix<short>& M);
 		
 		
 	private:

@@ -34,14 +34,14 @@ LapackTests::Process     () {
 	Matrix<double> hrev;
 	
 	std::cout << "Testing EIG (dgeev) for helper:  ";
-	std::cout << "INFO: " << m_helper.EIG (true, &hev, &hlev, &hrev) << std::endl;
+	std::cout << "INFO: " << m_real.begin()->second->EIG (true, &hev, &hlev, &hrev) << std::endl;
 
-	Matrix<raw> rev;
-	Matrix<raw> rlev;
-	Matrix<raw> rrev;
+	Matrix<cplx> rev;
+	Matrix<cplx> rlev;
+	Matrix<cplx> rrev;
 
 	std::cout << "Testing EIG (cgeev) for raw:     ";
-	std::cout << "INFO: " << m_raw.EIG (true, &rev, &rlev, &rrev)    << std::endl;
+	std::cout << "INFO: " << m_cplx.begin()->second->EIG (true, &rev, &rlev, &rrev)    << std::endl;
 
 	// SEIG, DEIG, CEIG: Eigen value computation
 
@@ -50,18 +50,18 @@ LapackTests::Process     () {
 	Matrix<double> dsv;
 
 	std::cout << "Testing SVD (dgesdd) for helper: ";
-	std::cout << "INFO: " << m_helper.SVD ('A', &dlsv, &drsv, &dsv) << std::endl;
+	std::cout << "INFO: " << m_real.begin()->second->SVD ('A', &dlsv, &drsv, &dsv) << std::endl;
 
-	Matrix<raw>    rlsv;
-	Matrix<raw>    rrsv;
-	Matrix<raw>     rsv;
+	Matrix<cplx>    rlsv;
+	Matrix<cplx>    rrsv;
+	Matrix<cplx>     rsv;
 
 	std::cout << "Testing SVD (cgesdd) for raw:    ";
-	std::cout << "INFO: " << m_raw.SVD ('N', &rlsv, &rrsv, &rsv)    << std::endl;
+	std::cout << "INFO: " << m_cplx.begin()->second->SVD ('N', &rlsv, &rrsv, &rsv)    << std::endl;
 
 	Matrix<double> test;
 	test.Dim(0) = 3;
-	test.Dim(1) = m_helper.Dim(0);
+	test.Dim(1) = m_real.begin()->second->Dim(0);
 	test.Reset();
 	test.Random();
 
@@ -69,10 +69,10 @@ LapackTests::Process     () {
 
 	std::cout << test << std::endl;
 	printf ("\n");
-	test = test.prod(m_helper);
+	test = test.prod((*m_real.begin()->second));
 	std::cout << test << std::endl;
 
-	m_raw.Inv();
+	m_cplx.begin()->second->Inv();
 
 	return RRSModule::OK;
 

@@ -14,6 +14,7 @@ using namespace H5;
 
 #include <limits>
 #include <map>
+#include <sstream>
 
 
 
@@ -59,7 +60,7 @@ Matrix<double>::Print     (std::ostream &os) const {
 
 
 template<> inline std::ostream&  
-Matrix<raw>::Print       (std::ostream& os) const {
+Matrix<cplx>::Print       (std::ostream& os) const {
 	
 	for (int i = 0; i < _dim[COL]; i++) {
 		for(int j = 0; j < _dim[LIN]; j++)
@@ -68,6 +69,27 @@ Matrix<raw>::Print       (std::ostream& os) const {
 	}
 	
 	return os;
+	
+}
+
+
+template <class T> 
+const std::string Matrix<T>::DimsToString () const {
+
+	std::stringstream ss;
+	
+	for (int i=0; i < INVALID_DIM; i++)
+		ss << _dim[i] << " ";
+
+	return ss.str();
+	
+}
+
+
+template <class T> 
+const char* Matrix<T>::DimsToCString () const {
+
+	return this->DimsToString().c_str();
 	
 }
 
@@ -186,13 +208,13 @@ bool Matrix<T>::H5Dump (std::string fname, std::string dname, std::string dloc) 
 			}
 			
 			// One more field for complex numbers
-			int tmpdim = (typeid(T) == typeid(raw)) ? INVALID_DIM+1 : INVALID_DIM;
+			int tmpdim = (typeid(T) == typeid(cplx)) ? INVALID_DIM+1 : INVALID_DIM;
 			hsize_t* dims = new hsize_t[tmpdim];
 
 			for (i = 0; i < INVALID_DIM; i++)
 				dims[i] = _dim[INVALID_DIM-1-i];
 			
-			if (typeid(T) == typeid(raw))
+			if (typeid(T) == typeid(cplx))
 				dims[INVALID_DIM] = 2;
 
 			DataSpace space (tmpdim, dims);
@@ -200,10 +222,10 @@ bool Matrix<T>::H5Dump (std::string fname, std::string dname, std::string dloc) 
 			
 			delete [] dims;
 
-			if (typeid(T) == typeid(raw)) {
+			if (typeid(T) == typeid(cplx)) {
 				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
 				if (dname == "") 
-					dname = "raw";
+					dname = "cplx";
 			} else if (typeid(T) == typeid(double)) {
 				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
 				if (dname == "") 
@@ -421,7 +443,7 @@ bool Matrix<T>::H5Read (std::string fname, std::string dname, std::string dloc) 
 			hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
 			int       ndim    = space.getSimpleExtentDims(dims, NULL);
 
-			if (typeid(T) == typeid(raw)) 
+			if (typeid(T) == typeid(cplx)) 
 				ndim--;
 
 			for (int i = 0; i < ndim; i++)
@@ -448,7 +470,7 @@ bool Matrix<T>::H5Read (std::string fname, std::string dname, std::string dloc) 
 			
 			PredType*  type;
 			
-			if (typeid(T) == typeid(raw))
+			if (typeid(T) == typeid(cplx))
 				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
 			else if (typeid(T) == typeid(double))
 				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
@@ -536,7 +558,7 @@ bool Matrix<T>::MXRead (std::string fname, std::string dname, std::string dloc) 
 	
 	if (typeid(T) == typeid(double))
 		memcpy(_M, mxGetPr(mxa), Size() * sizeof(T));
-	else if (typeid(T) == typeid(raw))
+	else if (typeid(T) == typeid(cplx))
 		for (int i = 0; i < Size(); i++) {
 			float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
 			memcpy(&_M[i], f, 2 * sizeof(float));
@@ -583,7 +605,7 @@ bool Matrix<T>::MXDump (std::string fname, std::string dname, std::string dloc) 
 
 	if      (typeid(T) == typeid(double))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
-	else if (typeid(T) == typeid(raw))
+	else if (typeid(T) == typeid(cplx))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
 	else if (typeid(T) == typeid(short))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim,   mxINT8_CLASS,    mxREAL);
@@ -594,7 +616,7 @@ bool Matrix<T>::MXDump (std::string fname, std::string dname, std::string dloc) 
 	
 	if (typeid(T) == typeid(double))
 		memcpy(mxGetPr(mxa), _M, Size() * sizeof(T));
-	else if (typeid(T) == typeid(raw))
+	else if (typeid(T) == typeid(cplx))
 		for (int i = 0; i < Size(); i++) {
 			((float*)mxGetPr(mxa))[i] = ((float*)_M)[2*i+0]; // Template compilation workaround
 			((float*)mxGetPi(mxa))[i] = ((float*)_M)[2*i+1]; // Can't use .imag() .real(). Consider double/short 
@@ -656,7 +678,7 @@ bool Matrix<T>::NIDump (std::string fname) {
 			header.pixdim[i+1] = tmp.Res(i);
 		}
 		
-		if      (typeid(T) == typeid(raw))
+		if      (typeid(T) == typeid(cplx))
 			header.datatype = 16;
 		else if (typeid(T) == typeid(double))
 			header.datatype = 64;
@@ -722,7 +744,7 @@ bool Matrix<T>::NIRead (std::string fname) {
 			else 
 				for (int i = 0; i < Size(); i++ )
 					_M[i] = ((float*)ni->data)[i];
-		} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(raw)) {
+		} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(cplx)) {
 			if (ni->datatype == 32)
 				memcpy (_M, ni->data, Size()*sizeof(T));
 			else 

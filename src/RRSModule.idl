@@ -36,11 +36,10 @@ module RRSModule {
 
 
 	/**
-	 * @brief Raw data
+	 * @brief Complex data
 	 */
-	struct    raw_data          {
+	struct    cplx_data         {
 		
-		// Complex
 		floats dreal;  /**< Data abs      */
 		floats dimag;  /**< Data argument */
 		longs  dims;   /**< Dimesions     */
@@ -49,12 +48,12 @@ module RRSModule {
 
 
 	/**
-	 * @brief Helper data
+	 * @brief Real data
 	 */
-	struct     helper_data       {
+	struct     real_data       {
 
-		doubles vals;  /**< Data     */
-		longs   dims;  /**< Dimesions     */
+		doubles vals;  /**< Data      */
+		longs   dims;  /**< Dimesions */
 
 	};
 
@@ -65,7 +64,7 @@ module RRSModule {
 	struct     pixel_data       {
 
 		shorts vals;  /**< Data      */
-		longs  dims;  /**< Dimesions     */
+		longs  dims;  /**< Dimesions */
 
 	};
 
@@ -100,32 +99,44 @@ module RRSModule {
 		 * @param  name   Name of recontruction method
 		 * @return        Status
 		 */
-		short               Init (in string name);
+		short             Init (in string name);
+		
+
+		/**
+		 * @brief          
+		 */ 
+		cplx_data         get_cplx (in string name);
+
 		
 		/**
-		 * @brief         Declare CORBA attribute raw
-		 */
-		attribute         raw_data     raw;
+		 * @brief          
+		 */ 
+		void              set_cplx (in string name, in cplx_data data);
+
 		
 		/**
-		 * @brief         Declare CORBA attribute rhelper
-		 */
-		attribute         raw_data     rhelper;
+		 * @brief          
+		 */ 
+		real_data         get_real (in string name);
+
 		
 		/**
-		 * @brief         Declare CORBA attribute helper
-		 */
-		attribute         helper_data  helper;
+		 * @brief          
+		 */ 
+		void              set_real (in string name, in real_data data);
+
 		
 		/**
-		 * @brief         Declare CORBA attribute helper
-		 */
-		attribute         helper_data  kspace;
+		 * @brief          
+		 */ 
+		pixel_data        get_pixel (in string name);
+
 		
 		/**
-		 * @brief         Declare CORBA attribute helper
-		 */
-		attribute         pixel_data   pixel;
+		 * @brief         
+		 */ 
+		void              set_pixel (in string name, in pixel_data data);
+
 		
 		/**
 		 * @brief         Declare attributes labels and values.

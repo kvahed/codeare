@@ -99,20 +99,25 @@ namespace RRServer {
 		 * @param  r     Raw data storage 
 		 */
 		void
-		GetRaw           (raw_data* r)   {
+		GetCplx       (const std::string name, cplx_data* c)   {
+			
+			if (m_cplx.find (name) == m_cplx.end())
+				return;
+			
+			Matrix<cplx>* tmp = m_cplx[name];
 			
 			for (int j = 0; j < INVALID_DIM; j++)
-				r->dims[j] = m_raw.Dim(j);
+				c->dims[j] = tmp->Dim(j);
 			
-			r->dreal.length(m_raw.Size()); 
-			r->dimag.length(m_raw.Size());
+			c->dreal.length(tmp->Size()); 
+			c->dimag.length(tmp->Size());
 			
-			for (int i = 0; i < m_raw.Size(); i++) {
-				r->dreal[i] = m_raw[i].real();
-				r->dimag[i] = m_raw[i].imag(); 
+			for (int i = 0; i < tmp->Size(); i++) {
+				c->dreal[i] = tmp->At(i).real();
+				c->dimag[i] = tmp->At(i).imag(); 
 			}
 			
-			m_raw.Clear();
+			tmp->Clear();
 			
 		}
 		
@@ -120,18 +125,26 @@ namespace RRServer {
 		/**
 		 * @brief        Set data for recon (Remote access)
 		 *
-		 * @param r      Raw data
+		 * @param name   Name
+		 * @param r      Cplx data
 		 */
 		void 
-		SetRaw           (const raw_data* r)   {
+		SetCplx       (const std::string name, const cplx_data* c)   {
+
+			Matrix<cplx>* tmp;
+				
+			if (m_cplx.find (name) == m_cplx.end())
+				m_cplx.insert (std::pair<std::string, Matrix<cplx>*> (name, tmp = new Matrix<cplx>()));
+			else
+			    tmp = m_cplx[name];
 			
 			for (int i = 0; i < INVALID_DIM; i++)
-				m_raw.Dim(i) = r->dims[i];
+				tmp->Dim(i) = c->dims[i];
 			
-			m_raw.Reset ();
+			tmp->Reset ();
 			
-			for (int j = 0; j < m_raw.Size(); j++)
-				m_raw[j] =  std::complex<float> (r->dreal[j], r->dimag[j]);
+			for (int j = 0; j < tmp->Size(); j++)
+				tmp->At(j) =  std::complex<float> (c->dreal[j], c->dimag[j]);
 			
 		}
 		
@@ -139,13 +152,15 @@ namespace RRServer {
 		/**
 		 * @brief        Get data from recon (Local access)
 		 *
-		 * @param  m     Raw data storage 
+		 * @param  m     Cplx data storage 
 		 */
 		void
-		GetRaw           (Matrix<raw>* m)   {
+		GetCplx       (const std::string name, Matrix<cplx>* m)   {
+
+			if (m_cplx.find (name) == m_cplx.end())
+				return;
 			
-			(*m) = m_raw;
-			m_raw.Clear();
+			m = m_cplx[name];
 			
 		}
 		
@@ -156,78 +171,12 @@ namespace RRServer {
 		 * @param m      Raw data
 		 */
 		void 
-		SetRaw           (const Matrix<raw>* m)   {
+		SetCplx       (const std::string name, Matrix<cplx>* m)   {
 			
-			m_raw = (*m);
+			if (m_cplx.find (name) == m_cplx.end())
+				m_cplx.insert (std::pair<std::string, Matrix<cplx>*> (name, new Matrix<cplx>()));
 			
-		}
-		
-
-		/**
-		 * @brief        Get data from recon (Remote access)
-		 *
-		 * @param  rhelper Raw data storage
-		 */
-		void 
-		GetRHelper       (raw_data* rhelper)   {
-			
-			for (int j = 0; j < INVALID_DIM; j++)
-				rhelper->dims[j] = m_rhelper.Dim(j);
-			
-			rhelper->dreal.length(m_rhelper.Size()); 
-			rhelper->dimag.length(m_rhelper.Size());
-			
-			for (int i = 0; i < m_rhelper.Size(); i++) {
-				rhelper->dreal[i] = m_rhelper[i].real();
-				rhelper->dimag[i] = m_rhelper[i].imag(); 
-			}
-			
-			m_rhelper.Clear();
-			
-		}
-		
-
-		/**
-		 * @brief        Set data for recon (Remote access)
-		 *
-		 * @param  rhelper Raw data
-		 */
-		void 
-		SetRHelper       (const raw_data* rhelper)   {
-			
-			for (int i = 0; i < INVALID_DIM; i++)
-				m_rhelper.Dim(i) = rhelper->dims[i];
-			
-			m_rhelper.Reset ();
-			
-			for (int j = 0; j < m_rhelper.Size(); j++)
-				m_rhelper[j] =  std::complex<float> (rhelper->dreal[j], rhelper->dimag[j]);
-			
-		}
-		
-		
-		/**
-		 * @brief        Get data from recon (Local access)
-		 *
-		 * @param  m     Raw data storage
-		 */
-		void
-		GetRHelper       (Matrix<raw>* m)   {
-			
-			m = &m_rhelper;
-			
-		}
-		
-		
-		/**
-		 * @brief        Set data for recon (Local access)
-		 * 
-		 * @param  m     Raw data
-		 */
-		void 
-		SetRHelper       (const Matrix<raw>* m)   {
-			
-			m_rhelper = (*m);
+			m_cplx[name] = m;
 			
 		}
 		
@@ -238,17 +187,22 @@ namespace RRServer {
 		 * @param  helper Raw data storage
 		 */
 		void 
-		GetHelper        (helper_data* helper)   {
+		GetReal        (const std::string name, real_data* r)   {
+			
+			if (m_real.find (name) == m_real.end())
+				return;
+			
+			Matrix<double>* tmp = m_real[name];
 			
 			for (int j = 0; j < INVALID_DIM; j++)
-				helper->dims[j] = m_helper.Dim(j);
+				r->dims[j] = tmp->Dim(j);
 			
-			helper->vals.length(m_helper.Size()); 
+			r->vals.length(tmp->Size()); 
 			
-			for (int i = 0; i < m_helper.Size(); i++)
-				helper->vals[i] = m_helper[i];
+			for (int i = 0; i < tmp->Size(); i++)
+				r->vals[i] = tmp->At(i);
 			
-			m_helper.Clear();
+			tmp->Clear();
 			
 		}
 		
@@ -259,15 +213,22 @@ namespace RRServer {
 		 * @param  helper Real data
 		 */
 		void 
-		SetHelper         (const helper_data* helper)   {
+		SetReal        (const std::string name, const real_data* r)   {
+			
+			Matrix<double>* tmp;
+
+			if (m_real.find (name) == m_real.end())
+				m_real.insert (std::pair<std::string, Matrix<double>*> (name, tmp = new Matrix<double>()));
+			else
+				tmp = m_real[name];
 			
 			for (int i = 0; i < INVALID_DIM; i++)
-				m_helper.Dim(i) = helper->dims[i];
+				tmp->Dim(i) = r->dims[i];
 			
-			m_helper.Reset ();
+			tmp->Reset ();
 			
-			for (int j = 0; j < m_helper.Size(); j++)
-				m_helper[j] =  helper->vals[j];
+			for (int j = 0; j < tmp->Size(); j++)
+				tmp->At(j) =  r->vals[j];
 			
 		}
 		
@@ -278,9 +239,12 @@ namespace RRServer {
 		 * @param  m      Real data
 		 */
 		void
-		GetHelper         (Matrix<double>* m)   {
+		GetReal         (const std::string name, Matrix<double>* m)   {
 			
-			m = &m_helper;
+			if (m_real.find (name) == m_real.end())
+				return;
+			
+			m = m_real[name];
 			
 		}
 		
@@ -292,96 +256,38 @@ namespace RRServer {
 		 * @param  m      Real data storage
 		 */
 		void 
-		SetHelper         (const Matrix<double>* m)   {
+		SetReal         (const std::string name, Matrix<double>* m)   {
 			
-			m_helper = (*m);
+			if (m_real.find (name) == m_real.end())
+				m_real.insert (std::pair<std::string, Matrix<double>*> (name, new Matrix<double>()));
+			
+			m_real[name] = m;
 			
 		}
 		
 
-		/**
-		 * @brief         Get data from recon
-		 *
-		 * @param  kspace Real data storage
-		 */
-		void 
-		GetKSpace         (helper_data* kspace)   {
-			
-			for (int j = 0; j < INVALID_DIM; j++)
-				kspace->dims[j] = m_kspace.Dim(j);
-			
-			kspace->vals.length(m_kspace.Size()); 
-			
-			for (int i = 0; i < m_kspace.Size(); i++)
-				kspace->vals[i] = m_kspace[i];
-			
-			m_kspace.Clear();
-			
-		}
-		
-		
-		/**
-		 * @brief         Set data for recon
-		 *
-		 * @param  kspace Real data
-		 */
-		void 
-		SetKSpace         (const helper_data* kspace)   {
-			
-			for (int i = 0; i < INVALID_DIM; i++)
-				m_kspace.Dim(i) = kspace->dims[i];
-			
-			m_kspace.Reset ();
-			
-			for (int j = 0; j < m_kspace.Size(); j++)
-				m_kspace[j] =  kspace->vals[j];
-			
-		}
-		
-		
-		/**
-		 * @brief         Get data from recon
-		 *
-		 * @param  m      Real data storage
-		 */
-		void
-		GetKSpace         (Matrix<double>* m)   {
-			
-			m = &m_kspace;
-			
-		}
-		
-		
-		/**
-		 * @brief         Set data for recon
-		 *
-		 * @param  m      Real data
-		 */
-		void 
-		SetKSpace         (const Matrix<double>* m)   {
-			
-			m_kspace = (*m);
-			
-		}
-
-		
 		/**
 		 * @brief         Get data from recon
 		 *
 		 * @param  pixel  Pixel data storage
 		 */
 		void 
-		GetPixel          (pixel_data* pixel)   {
+		GetPixel          (const std::string name, pixel_data* p)   {
 			
+			if (m_pixel.find (name) == m_pixel.end())
+				return;
+			
+			Matrix<short>* tmp = m_pixel[name];
+
 			for (int j = 0; j < INVALID_DIM; j++)
-				pixel->dims[j] = m_pixel.Dim(j);
+				p->dims[j] = tmp->Dim(j);
 			
-			pixel->vals.length(m_pixel.Size()); 
+			p->vals.length(tmp->Size()); 
 			
-			for (int i = 0; i < m_pixel.Size(); i++)
-				pixel->vals[i] = m_pixel[i];
+			for (int i = 0; i < tmp->Size(); i++)
+				p->vals[i] = tmp->At(i);
 			
-			m_pixel.Clear();
+			tmp->Clear();
 			
 		}
 		
@@ -392,15 +298,22 @@ namespace RRServer {
 		 * @param  pixel Pixel data
 		 */
 		void 
-		SetPixel         (const pixel_data* pixel)   {
+		SetPixel         (const std::string name, const pixel_data* p)   {
 			
+			Matrix<short>* tmp;
+
+			if (m_pixel.find (name) == m_pixel.end())
+				m_pixel.insert (std::pair<std::string, Matrix<short>*> (name, tmp = new Matrix<short>()));
+			else
+				tmp = m_pixel[name];
+
 			for (int i = 0; i < INVALID_DIM; i++)
-				m_pixel.Dim(i) = pixel->dims[i];
+				tmp->Dim(i) = p->dims[i];
 			
-			m_pixel.Reset ();
+			tmp->Reset ();
 			
-			for (int j = 0; j < m_pixel.Size(); j++) 
-				m_pixel[j] =  pixel->vals[j];
+			for (int j = 0; j < tmp->Size(); j++) 
+				tmp->At(j) =  p->vals[j];
 			
 		}
 
@@ -411,9 +324,12 @@ namespace RRServer {
 		 * @param  m     Pixel data storage
 		 */
 		void
-		GetPixel         (Matrix<short>* m)   {
+		GetPixel         (const std::string name, Matrix<short>* m)   {
 			
-			m = &m_pixel;
+			if (m_pixel.find (name) == m_pixel.end())
+				return;
+			
+			 m = m_pixel[name];
 			
 		}
 
@@ -424,9 +340,12 @@ namespace RRServer {
 		 * @param  m     Pixel data
 		 */
 		void 
-		SetPixel         (const Matrix<short>* m)   {
+		SetPixel         (const std::string name, Matrix<short>* m)   {
 			
-			m_pixel = (*m);
+			if (m_pixel.find (name) == m_pixel.end())
+				m_pixel.insert (std::pair<std::string, Matrix<short>*> (name, new Matrix<short>()));
+			
+			m_pixel[name] = m;
 			
 		}
 	
@@ -458,12 +377,9 @@ namespace RRServer {
 	
 	protected:
 		
-		
-		Matrix<raw>     m_raw;         /*!< raw data matrix                    */
-		Matrix<raw>     m_rhelper;     /*!< raw helper matrix                  */
-		Matrix<double>  m_helper;      /*!< helper matrix                      */
-		Matrix<double>  m_kspace;      /*!< kspace matrix                      */
-		Matrix<short>   m_pixel;       /*!< pixel data matrix                  */
+		std::map < std::string, Matrix< std::complex<float> >* >   m_cplx;
+		std::map < std::string, Matrix<double>* >                  m_real;
+		std::map < std::string, Matrix<short>* >                   m_pixel;
 		
 		std::string     m_name;        /*!< Name                               */
 		

@@ -114,183 +114,111 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief        @see ReconStrategy::SetRaw(const raw_data*)
+		 * @brief        @see ReconStrategy::SetCplx(const std::string name, const cplx_data*)
 		 *
 		 * @param  r     Complex data sequence
 		 */
 		void
-		SetRaw          (const raw_data* r);
+		SetCplx          (const std::string name, const cplx_data* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetRaw(const Matrix<raw>*)
+		 * @brief       @see ReconStrategy::SetCplx(const std::string name, const Matrix<cplx>*)
 		 *
 		 * @param  r    Complex data matrix
 		 */
 		void
-		SetRaw          (const Matrix<raw>* r);
+		SetCplx          (const std::string name, Matrix<cplx>* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetRaw(raw_data*)
+		 * @brief       @see ReconStrategy::GetCplx(const std::string name, cplx_data*)
 		 *
 		 * @param  r    Complex data sequence
 		 */
 		void
-		GetRaw          (raw_data* r);
+		GetCplx          (const std::string name, cplx_data* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetRaw(Matrix<raw>*)
+		 * @brief       @see ReconStrategy::GetCplx(const std::string name, Matrix<cplx>*)
 		 *
 		 * @param  r    Complex data matrix
 		 */
 		void
-		GetRaw          (Matrix<raw>* r);
+		GetCplx          (const std::string name, Matrix<cplx>* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetRHelper(const raw_data*)
-		 *
-		 * @param  r    Complex data sequence
-		 */
-		void
-		SetRHelper (const raw_data* r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::SetRHelper(const Matrix<raw>*)
-		 *
-		 * @param  r    Complex data matrix
-		 */
-		void
-		SetRHelper (const Matrix<raw>* r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::GetRHelper(raw_data*)
-		 *
-		 * @param  r    Complex data sequence
-		 */
-		void
-		GetRHelper (raw_data* r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::GetRHelper(Matrix<raw>*)
-		 *
-		 * @param  r    Complex data matrix
-		 */
-		void
-		GetRHelper (Matrix<raw>* r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::SetHelper(const helper_data*)
+		 * @brief       @see ReconStrategy::SetReal(const std::string name, const real_data*)
 		 *
 		 * @param  r    Real data sequence
 		 */
 		void
-		SetHelper (const helper_data* r);
+		SetReal (const std::string name, const real_data* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetHelper(const Matrix<double>*)
+		 * @brief       @see ReconStrategy::SetReal(const std::string name, const Matrix<double>*)
 		 *
 		 * @param  r    Real data matrix
 		 */
 		void
-		SetHelper (const Matrix<double>* r);
+		SetReal (const std::string name, Matrix<double>* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetHelper(const Matrix<double>*)
+		 * @brief       @see ReconStrategy::SetReal(const std::string name, const Matrix<double>*)
 		 *
 		 * @param  r    Real data matrix
 		 */
 		void
-		GetHelper (Matrix<double>* r);
+		GetReal (const std::string name, Matrix<double>* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetHelper(helper_data*)
+		 * @brief       @see ReconStrategy::GetReal(const std::string name, real_data*)
 		 *
 		 * @param  r    Real data sequence
 		 */
 		void
-		GetHelper (helper_data* r);
+		GetReal (const std::string name, real_data* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetKSpace(helper_data*)
-		 *
-		 * @param  r    Real data sequence
-		 */
-		void
-		SetKSpace (const helper_data* r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::SetKSpace(const Matrix<double>*)
-		 *
-		 * @param  r    Real data matrix
-		 */
-		void
-		SetKSpace (const Matrix<double>* r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::GetKSPace(Matrix<double>*)
-		 *
-		 * @param  r    Real data sequence
-		 */
-		void
-		GetKSpace (Matrix<double>* r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::GetKSpace(helper_data*)
-		 *
-		 * @param  r    Real data sequence
-		 */
-		void
-		GetKSpace (helper_data* r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::SetPixel(const pixel_data*)
+		 * @brief       @see ReconStrategy::SetPixel(const std::string name, const pixel_data*)
 		 *
 		 * @param  r    Pixel data sequence
 		 */
 		void
-		SetPixel (const pixel_data* r);
+		SetPixel (const std::string name, const pixel_data* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetPixel(const Matrix<short>*)
+		 * @brief       @see ReconStrategy::SetPixel(const std::string name, const Matrix<short>*)
 		 *
 		 * @param  r    Pixel data matrix
 		 */
 		void
-		SetPixel (const Matrix<short>* r);
+		SetPixel (const std::string name, Matrix<short>* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetPixel(Matrix<short>*)
+		 * @brief       @see ReconStrategy::GetPixel(const std::string name, Matrix<short>*)
 		 *
 		 * @param  r    Pixel data matrix
 		 */
 		void
-		GetPixel (Matrix<short>* r);
+		GetPixel (const std::string name, Matrix<short>* r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetPixel(pixel_data*)
+		 * @brief       @see ReconStrategy::GetPixel(const std::string name, pixel_data*)
 		 *
 		 * @param  r    Pixel data sequence
 		 */
 		void
-		GetPixel (pixel_data* r);
+		GetPixel (const std::string name, pixel_data* r);
 		
 
  		/**

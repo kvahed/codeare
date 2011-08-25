@@ -133,19 +133,25 @@ SpatialDomain::Process        () {
     // m_helper: RF and gradient pulses
     // ----------------------------
 
-    Matrix<raw> solution;
-    Matrix<raw> tmp;
-    Matrix<raw> final;    
-    Matrix<raw> treg         =  Matrix<raw>::Id(m_nc * m_nk) * raw (m_lambda, 0);
-	Matrix<raw> ve;
-	Matrix<raw> vp;
+    Matrix<cplx>    solution;
+    Matrix<cplx>    tmp;
+    Matrix<cplx>    final;    
+    Matrix<cplx>    treg   =  Matrix<cplx>::Id(m_nc * m_nk) * cplx (m_lambda, 0);
+	Matrix<cplx>    ve;
+	Matrix<cplx>    vp;
+
+	Matrix<double>* k      = m_real ["k"];
+	Matrix<double>* r      = m_real ["r"];
+	Matrix<cplx>*   b1     = m_cplx ["b1"];
+	Matrix<short>*  b0     = m_pixel["b0"];
+	Matrix<cplx>*   target = m_cplx ["target"];
 
 	if (m_verbose) {
-	    ve  = Matrix<raw>(m_ns,      m_maxiter);
-		vp  = Matrix<raw>(m_nk*m_nc, m_maxiter);
+	    ve  = Matrix<cplx>(m_ns,      m_maxiter);
+		vp  = Matrix<cplx>(m_nk*m_nc, m_maxiter);
 	} else {
-	    ve  = Matrix<raw>(m_ns,     1);
-		vp  = Matrix<raw>(m_nk*m_nc,1);
+	    ve  = Matrix<cplx>(m_ns,     1);
+		vp  = Matrix<cplx>(m_nk*m_nc,1);
 	}
 
     bool        pulse_amp_ok = false;
@@ -160,10 +166,10 @@ SpatialDomain::Process        () {
     
     while (!pulse_amp_ok) {
         
-        Matrix<raw> m (m_ns, m_nk*m_nc);
+        Matrix<cplx> m (m_ns, m_nk*m_nc);
 
-        STA (&m_kspace, &m_helper, &m_rhelper, &m_pixel, m_nc, m_nk, m_ns, m_gd, m_pd, &m);
-        Matrix<raw> minv = m.tr();
+        STA (k, r, b1, b0, m_nc, m_nk, m_ns, m_gd, m_pd, &m);
+        Matrix<cplx> minv = m.tr();
 
         minv  = minv->*(m);
         minv  = minv + treg;
@@ -177,20 +183,20 @@ SpatialDomain::Process        () {
 
         for (int j = 0; j < m_maxiter; j++, gc++) {
 
-            solution = minv->*(m_raw);
+            solution = minv->*(*target);
             tmp      = m->*(solution);
 
-            NRMSE (&m_raw, &tmp, gc, &nrmse);
+            NRMSE (target, &tmp, gc, &nrmse);
             res.push_back (nrmse);
             
 			if (m_verbose)
-				memcpy (&ve.At(0,gc), &tmp.At(0), tmp.Size() * sizeof(raw)); 
+				memcpy (&ve.At(0,gc), &tmp.At(0), tmp.Size() * sizeof(cplx)); 
 
             if (gc > 0 && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
 				break;
             
             final    = solution;
-            PhaseCorrection (&m_raw, &tmp);
+            PhaseCorrection (target, &tmp);
             
         } 
         
@@ -230,34 +236,34 @@ SpatialDomain::Process        () {
 
 	// Assemble gradient and RF timing ---
 
-	PTXTiming              (&final, &m_kspace, m_pd, m_gd, m_nk, m_nc, &m_rhelper);
+	PTXTiming              (&final, k, m_pd, m_gd, m_nk, m_nc, b1);
 	// -----------------------------------
 	
 
 	// Write pulse file for Siemens sequences
 
-	PTXWriteSiemensINIFile (&m_rhelper, 3, 3, m_nc, 10, m_max_rf[0], &m_ptxfname);
+	PTXWriteSiemensINIFile (b1, 3, 3, m_nc, 10, m_max_rf[0], &m_ptxfname);
 	// -----------------------------------
 
 	// Return NRMSE down the road --------
 
-	m_helper.Dim(COL) = gc;
-	m_helper.Dim(LIN) = 1;
-	m_helper.Reset();
+	r->Dim(COL) = gc;
+	r->Dim(LIN) = 1;
+	r->Reset();
 	for (int i = 0; i < gc; i++)
-		m_helper.At(i) = res.at(i);
+		r->At(i) = res.at(i);
 	// -----------------------------------
 
 	// Excitation profile ----------------
 	if (m_verbose) {
 			
-		m_raw.Dim(1) = gc; 
-		m_raw.Reset();
-		memcpy (&m_raw.At(0), &ve.At(0), gc * m_raw.Dim(0) * sizeof(raw));
+		target->Dim(1) = gc; 
+	    target->Reset();
+		memcpy (&target->At(0), &ve.At(0), gc * target->Dim(0) * sizeof(cplx));
 
 	} else
 		
-		m_raw = tmp;
+		(*target) = tmp;
 	// ----------------------------------
 	
     return RRSModule::OK;

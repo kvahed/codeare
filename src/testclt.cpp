@@ -95,17 +95,25 @@ int main (int argc, char** argv) {
 
 bool grappatest (ReconClient* rc) {
 
-	Matrix<raw>    rawdata;
-
+	Matrix<cplx>    sig;
+	Matrix<cplx>    sens;
+	Matrix<cplx>    acs;
+	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
 
-	rawdata.Read   (df, "data");
+	sig.MXRead  (df, "data", "");
+	sens.MXRead (df, "sensitivities", "");
+	acs.MXRead  (df, "acs", "");
+
 	rc->ReadConfig (cf.c_str());
 
 	rc->Init (test);
-	rc->SetRaw (rawdata); // Measurement data
+	rc->SetCplx  ("data", sig); // Measurement data
+	rc->SetCplx  ("sens", sens);
+	rc->SetCplx  ("acs",  acs);
 	rc->Process (test);
+	rc->GetCplx  ("data", sig);
 	rc->Finalise (test);
 	
 	return true;
@@ -114,16 +122,16 @@ bool grappatest (ReconClient* rc) {
 
 bool cgsensetest (ReconClient* rc) {
 
-	Matrix<raw>    rawdata;
+	Matrix<cplx> rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
-	Matrix<raw>    sens;
+	Matrix<cplx> sens;
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
-	std::string    odf = std::string (base + std::string("/images.h5"));
-	std::string    opf = std::string (base + std::string("/pulses.h5"));
-	std::string    oif = std::string (base + std::string("/iters.h5"));
+	std::string    odf = std::string (base + std::string("/images.mat"));
+	std::string    opf = std::string (base + std::string("/pulses.mat"));
+	std::string    oif = std::string (base + std::string("/iters.mat"));
 
 	weights.Read   (df, "weights");
 	rawdata.Read   (df, "data");
@@ -141,14 +149,10 @@ bool cgsensetest (ReconClient* rc) {
 		
 		// Outgoing -------------
 		
-		rc->SetRaw     (rawdata); // Measurement data
-		rawdata.Clear();
-		rc->SetRHelper (sens);    // Sensitivities
-		sens.Clear();
-		rc->SetHelper  (weights); // Weights
-		weights.Clear();
-		rc->SetKSpace  (kspace);  // K-space
-		kspace.Clear();
+		rc->SetCplx ("data", rawdata); // Measurement data
+		rc->SetCplx ("sens", sens);    // Sensitivities
+		rc->SetReal ("weights", weights); // Weights
+		rc->SetReal ("kspace", kspace);  // K-space
 
 		// ---------------------
 
@@ -156,10 +160,10 @@ bool cgsensetest (ReconClient* rc) {
 		
 		// Incoming -------------
 
-		rc->GetRaw     (rawdata);  // Images
+		rc->GetCplx     ("data", rawdata);  // Images
 		if (pulses)
-			rc->GetRHelper (sens); // Pulses (Excitation)
-		rc->GetHelper  (weights);  // CG residuals
+			rc->GetCplx ("sens", sens);     // Pulses (Excitation)
+		rc->GetReal  ("weights", weights);  // CG residuals
 
 		// ---------------------
 
@@ -167,35 +171,35 @@ bool cgsensetest (ReconClient* rc) {
 
 	} else {
 
-		RRServer::ReconContext* rx = new RRServer::ReconContext(test);
+		/*	RRServer::ReconContext* rx = new RRServer::ReconContext(test);
 
 		rx->ReadConfig(cf.c_str());
 
-		rx->SetRaw     (&rawdata);
+		rx->SetCplx     (&rawdata);
 		rawdata.Clear();
 
-		rx->SetRHelper (&sens);
+		rx->SetCplx (&sens);
 		sens.Clear();
 
-		rx->SetHelper  (&weights);
+		rx->SetReal  (&weights);
 		weights.Clear();
 
-		rx->SetKSpace  (&kspace);
+		rx->SetReal  (&kspace);
 		kspace.Clear();
 
 		rx->Init();
 		rx->Process    ();
 		
-		rx->GetRaw     (&rawdata);
-		rx->GetRHelper (&sens);
-		rx->GetHelper  (&weights);
-			
+		rx->GetCplx     (&rawdata);
+		rx->GetCplx (&sens);
+		rx->GetReal  (&weights);
+		*/			
 	}
 		
-	rawdata.Dump   (odf.c_str());
+	rawdata.MXDump   (odf.c_str(), "images");
 	if (pulses)
-		sens.Dump      (opf.c_str());
-	weights.Dump   (oif.c_str());
+		sens.MXDump  (opf.c_str(), "pulses");
+	weights.MXDump   (oif.c_str(), "residuals");
 
 	return true;
 	
@@ -203,13 +207,13 @@ bool cgsensetest (ReconClient* rc) {
 
 bool nuffttest (ReconClient* rc) {
 
-	Matrix<raw>    rawdata;
+	Matrix<cplx>    rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
-	std::string    odf = std::string (base + std::string("/images.h5"));
+	std::string    odf = std::string (base + std::string("/images.mat"));
 
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
@@ -218,15 +222,15 @@ bool nuffttest (ReconClient* rc) {
 	rawdata.Read   (df, "data");
 	kspace.Read    (df, "kspace");
 
-	rc->SetRaw     (rawdata);
-	rc->SetHelper  (weights);
-	rc->SetKSpace  (kspace);
+	rc->SetCplx    ("data",    rawdata);
+	rc->SetReal    ("weights", weights);
+	rc->SetReal    ("kspace",  kspace);
 	
 	rc->Process    (test);
 	
-	rc->GetRaw     (rawdata);
+	rc->GetCplx    ("data", rawdata);
 
-	rawdata.Dump   (odf.c_str());
+	rawdata.MXDump   (odf.c_str(), "image");
 
 	rc->Finalise(test);
 
@@ -234,10 +238,11 @@ bool nuffttest (ReconClient* rc) {
 	
 }
 
+
 bool sdmtest (ReconClient* rc) {
 
-	Matrix<raw>    target;
-	Matrix<raw>    b1;
+	Matrix<cplx>    target;
+	Matrix<cplx>    b1;
 	Matrix<double> r;
 	Matrix<double> k;
 	Matrix<short>  b0;
@@ -257,17 +262,17 @@ bool sdmtest (ReconClient* rc) {
 	k.Read         (df, "k");
 	r.Read         (df, "r");
 
-	rc->SetRaw     (target);
-	rc->SetRHelper (b1);
-	rc->SetHelper  (r);
-	rc->SetKSpace  (k);
-	rc->SetPixel   (b0);
+	rc->SetCplx    ("target", target);
+	rc->SetCplx    ("b1",     b1);
+	rc->SetReal    ("r",      r);
+	rc->SetReal    ("k",      k);
+	rc->SetPixel   ("b0",     b0);
 	
 	rc->Process    (test);
 	
-	rc->GetRaw     (target);
-	rc->GetRHelper (b1);
-	rc->GetHelper  (r);
+	rc->GetCplx    ("target", target);
+	rc->GetCplx    ("b1",     b1);
+	rc->GetReal    ("r",      r);
 
 	target.Dump   (odf.c_str());
 	b1.Dump       (pdf.c_str());
@@ -283,7 +288,7 @@ bool internaltest (ReconClient* rc) {
 
 	int         i = 0, j = 0, d = 5;
 	
-	Matrix<raw>    r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<cplx>    r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	
@@ -297,11 +302,9 @@ bool internaltest (ReconClient* rc) {
 	
 	rc->Init(test);
 
-	rc->SetRaw(r);
-	rc->SetRHelper(r);
-	rc->SetPixel(p);
-	rc->SetHelper(h);
-	rc->SetKSpace(h);
+	rc->SetCplx("r", r);
+	rc->SetPixel("p", p);
+	rc->SetReal("h", h);
 	
 	time_t seconds = time (NULL);
 	char   uid[16];
@@ -314,11 +317,9 @@ bool internaltest (ReconClient* rc) {
 	
 	rc->Process(test);
 	
-	rc->GetRaw(r);
-	rc->GetRHelper(r);
-	rc->GetPixel(p);
-	rc->GetHelper(h);
-	rc->GetKSpace(h);
+	rc->GetCplx("r", r);
+	rc->GetPixel("p", p);
+	rc->GetReal("h", h);
 
 	rc->Finalise (test);
 	
@@ -333,7 +334,7 @@ bool fftwtest (ReconClient* rc) {
 	std::string in  = std::string (base + std::string ("/infft.h5"));
 	std::string out = std::string (base + std::string ("/outfft.h5"));
 	
-	Matrix<raw> m;
+	Matrix<cplx> m;
 
 	m.Read (in, "img");
 	m = m.FFT();
@@ -348,9 +349,9 @@ bool fftwtest (ReconClient* rc) {
 
 bool resetest (ReconClient* rc) {
 
-	Matrix<raw> meas;
-	Matrix<raw> txm;
-	Matrix<raw> rxm;
+	Matrix<cplx> meas;
+	Matrix<cplx> txm;
+	Matrix<cplx> rxm;
 	Matrix<double> b0;
 	Matrix<double> osnr;
 
@@ -369,14 +370,14 @@ bool resetest (ReconClient* rc) {
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 	
-	rc->SetRaw (meas);
+	rc->SetCplx ("meas", meas);
 	
 	rc->Process(test);
 	
-	rc->GetRaw (txm);
-	rc->GetRHelper(rxm);
-	rc->GetHelper(osnr);
-	rc->GetKSpace(b0);
+	rc->GetCplx ("txm", txm);
+	rc->GetCplx("rxm", rxm);
+	rc->GetReal("osnr", osnr);
+	rc->GetReal("b0", b0);
 	
 	rc->Finalise(test);
 	
@@ -405,12 +406,12 @@ bool mxtest (ReconClient* rc) {
 
 	std::cout << out << std::endl << std::endl;
 
-	Matrix<raw> r1 (4,8);
+	Matrix<cplx> r1 (4,8);
 	r1.Random ();
 	r1.MXDump (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	std::cout << r1 << std::endl << std::endl;
 	
-	Matrix<raw> r2;
+	Matrix<cplx> r2;
 	r2.MXRead (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	std::cout << r2 << std::endl << std::endl;
 
@@ -438,7 +439,7 @@ bool nitest (ReconClient* rc) {
 	d.MXDump (mat, std::string("betted"), std::string(""));
 	d.NIDump (nii);
 
-	Matrix<raw> slp = Matrix<raw>::Phantom3D(196); 
+	Matrix<cplx> slp = Matrix<cplx>::Phantom3D(196); 
 	slp.NIDump (nii);
 	slp.MXDump (mat, std::string("betted"), std::string(""));
 
