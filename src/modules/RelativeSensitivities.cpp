@@ -26,7 +26,7 @@ RRSModule::error_code
 RelativeSensitivities::Init        () {
 
 	Attribute ("echo_shift", &m_echo_shift);
-
+	
 	return RRSModule::OK;
 
 }
@@ -35,14 +35,11 @@ RelativeSensitivities::Init        () {
 RRSModule::error_code
 RelativeSensitivities::Process     () { 
 
-	Matrix<cplx>*   data = m_cplx["data"];
-	Matrix<cplx>*   shim = m_cplx["shim"];
-	Matrix<cplx>*   rxm  = m_cplx["rxm"];
-	Matrix<cplx>*   txm  = m_cplx["txm"];
-	Matrix<double>* snro = m_real["snro"];
-	Matrix<double>* b0   = m_real["b0"];
+	Matrix<cplx>*   data = m_cplx["meas"];
 
 	printf ("  Processing map generation ...\n");
+	ticks start = getticks();
+
 
 	// Squeeze matrix ---------------------------
 
@@ -64,23 +61,30 @@ RelativeSensitivities::Process     () {
 
 
 	// SVD calibration -------------------------
-	
-	shim  = new Matrix<cplx>   (data->Dim(4), 1);                                        // Shim coefficients
-	txm   = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(4)); // TX maps
-	rxm   = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(5)); // RX maps
-	snro  = new Matrix<double> (data->Dim(0), data->Dim(1), data->Dim(2));               // SNR optimal image
-	
+
+	Matrix<cplx>*   rxm;
+	Matrix<cplx>*   txm;
+	Matrix<cplx>*   shim;
+	Matrix<double>* snro;
+	AddCplx ("rxm",  rxm  = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(5)));
+	AddCplx ("txm",  txm  = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(4)));
+	AddCplx ("shim", shim = new Matrix<cplx>   (data->Dim(4), 1));
+	AddReal ("snro", snro = new Matrix<double> (data->Dim(0), data->Dim(1), data->Dim(2)));
+
 	SVDCalibrate (data, rxm, txm, snro, shim, false);
    	// -----------------------------------------
 
 
 	// B0 calculation --------------------------
 
-	b0       = new Matrix<double> (data->Dim(0), data->Dim(1), data->Dim(2));
-	float TE = 1.5e-3;
+	Matrix<double>* b0;
+	AddReal ("b0", b0 = new Matrix<double> (data->Dim(0), data->Dim(1), data->Dim(2)));
 
-	B0Map (data, b0, TE);
+	B0Map (data, b0, m_echo_shift);
 	// -----------------------------------------
+
+
+	printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 
 	return RRSModule::OK;
 
