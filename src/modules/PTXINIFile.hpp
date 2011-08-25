@@ -19,7 +19,7 @@
  */
 
 RRSModule::error_code
-PTXWriteSiemensINIFile (const Matrix<raw>* pt, int dimrf, int dimgr, int nc, int sampint, float max_rf, std::string* fname) {
+PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, int sampint, float max_rf, std::string* fname) {
 	
 	FILE* fp = fopen (fname->c_str(), "wb");
 

@@ -40,9 +40,20 @@ DumpToFile::Process () {
 
 	fname << uid << "_data.h5";
 
-	m_raw.Dump    (fname.str().c_str());
-	m_helper.Dump (fname.str().c_str());
-	m_pixel.Dump  (fname.str().c_str());
+	while (!m_cplx.empty()) {
+
+		std::stringstream fn;
+		
+		fn << fname << m_cplx.begin()->first << "_cplx_" << uid << ".h5";
+		std::cout << "dumping " << fn.str().c_str() << std::endl;
+		m_cplx.begin()->second->Dump(fn.str().c_str());
+		m_cplx.erase(m_cplx.begin());
+
+	}
+
+	//m_raw.Dump    (fname.str().c_str());
+	//m_helper.Dump (fname.str().c_str());
+	//m_pixel.Dump  (fname.str().c_str());
 
 	printf ("... done\n");
 

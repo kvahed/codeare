@@ -55,8 +55,8 @@ RRSModule::error_code MedianFilter_OMP::Process () {
 	const int ww = 25;
 	const int wh = 25;
 
-	int iw = m_pixel.Width(); //image width 
-	int ih = m_pixel.Height(); //image height
+	int iw = m_pixel.begin()->second->Width(); //image width 
+	int ih = m_pixel.begin()->second->Height(); //image height
 
 	int ex = (ww / 2), ey = (wh / 2);
 	int array[ww*wh];
@@ -78,7 +78,7 @@ RRSModule::error_code MedianFilter_OMP::Process () {
 #pragma omp for schedule(dynamic,chunk)
 		for (x=0; x<iw; ++x)
 			for (y=0; y<ih; ++y)
-					input_image[x][y]  = m_pixel.At(x,y);
+					input_image[x][y]  = m_pixel.begin()->second->At(x,y);
 
 		int** array = CreateImage<int>(ww,wh); //local to each thread !
 
@@ -89,7 +89,7 @@ RRSModule::error_code MedianFilter_OMP::Process () {
 					for (fy=0; fy<wh; ++fy)
 						array[fx][fy] = input_image[x+fx-ex][y+fy-ey]; 
 				qsort(array[0], ww*wh, sizeof(int), t_compare_ints);
-				m_pixel.At(x,y) = array[ww/2][wh/2];
+				m_pixel.begin()->second->At(x,y) = array[ww/2][wh/2];
 			}
 
 		DeleteImage(array);

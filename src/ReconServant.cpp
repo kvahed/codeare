@@ -1,6 +1,6 @@
 /*
  *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Jülich, Germany
+ *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -104,105 +104,62 @@ ReconServant::Process  (const short s)       {
 
 /**************************************************************************************************/
 void
-ReconServant::raw          (const raw_data& d)   {
-	
-	m_contexts.at(0)->SetRaw(&d);
-	
+ReconServant::set_cplx  (const char* name, const cplx_data& d)   {
+
+	m_contexts.at(0)->SetCplx(name, &d);
 
 }
 
 
 /**************************************************************************************************/
-raw_data*
-ReconServant::raw          ()                    {
+cplx_data*
+ReconServant::get_cplx         (const char* name)                    {
 
-	raw_data tmp;      
+	cplx_data tmp;      
 	tmp.dims.length(INVALID_DIM);
-	m_contexts.at(0)->GetRaw(&tmp);
-	return new raw_data (tmp);
+	m_contexts.at(0)->GetCplx(name, &tmp);
+	return new cplx_data (tmp);
 
 }
 
 
 /**************************************************************************************************/
 void
-ReconServant::rhelper          (const raw_data& d)   {
+ReconServant::set_real       (const char* name, const real_data& d)   {
 
-	m_contexts.at(0)->SetRHelper(&d);
+	m_contexts.at(0)->SetReal(name, &d);
 
 }
 
 
 /**************************************************************************************************/
-raw_data*
-ReconServant::rhelper          ()                    {
+real_data*
+ReconServant::get_real       (const char* name)                    {
 
-	raw_data tmp;      
+	real_data tmp;      
 	tmp.dims.length(INVALID_DIM);
-	m_contexts.at(0)->GetRHelper(&tmp);
-	return new raw_data (tmp);
+	m_contexts.at(0)->GetReal(name, &tmp);
+	return new real_data (tmp);
 
 }
 
 
 /**************************************************************************************************/
 void
-ReconServant::helper       (const helper_data& d)   {
+ReconServant::set_pixel        (const char* name, const pixel_data& d) {
 
-	m_contexts.at(0)->SetHelper(&d);
-
-}
-
-
-/**************************************************************************************************/
-helper_data*
-ReconServant::helper       ()                    {
-
-	helper_data tmp;      
-	tmp.dims.length(INVALID_DIM);
-	m_contexts.at(0)->GetHelper(&tmp);
-	return new helper_data (tmp);
-
-}
-
-
-/**************************************************************************************************/
-void
-ReconServant::kspace       (const helper_data& d)   {
-
-	m_contexts.at(0)->SetKSpace(&d);
-
-}
-
-
-/**************************************************************************************************/
-helper_data*
-ReconServant::kspace       ()                    {
-
-	helper_data tmp;      
-	tmp.dims.length(INVALID_DIM);
-	m_contexts.at(0)->GetKSpace(&tmp);
-	return new helper_data (tmp);
-
-}
-
-
-/**************************************************************************************************/
-void
-ReconServant::pixel        (const pixel_data& d) {
-
-	m_contexts.at(0)->SetPixel(&d);
+	m_contexts.at(0)->SetPixel(name, &d);
 
 }
 
 
 /**************************************************************************************************/
 pixel_data*
-ReconServant::pixel        ()                    {
+ReconServant::get_pixel        (const char* name)                    {
 
 	pixel_data tmp;      
 	tmp.dims.length(INVALID_DIM);
-	m_contexts.at(0)->GetPixel(&tmp);
+	m_contexts.at(0)->GetPixel(name, &tmp);
 	return new pixel_data (tmp);
 
 }

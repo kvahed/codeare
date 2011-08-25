@@ -483,7 +483,7 @@ Matrix<T> Matrix<T>::Phantom3D (const int n) {
 
 
 /*template<>
-Matrix<double> Matrix<raw>::Real () const {
+Matrix<double> Matrix<cplx>::Real () const {
 
 	Matrix<double> res (_dim);
 
@@ -505,7 +505,7 @@ Matrix<double> Matrix<raw>::Real () const {
 	}*/
     
 /*template<>
-Matrix<double> Matrix<raw>::Imag () const {
+Matrix<double> Matrix<cplx>::Imag () const {
 
 	Matrix<double> res (_dim);
 

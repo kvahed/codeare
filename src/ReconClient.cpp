@@ -28,7 +28,7 @@ using namespace RRClient;
 #include <complex>
 
 
-/**************************************************************************************************/
+
 ReconClient::ReconClient          (const char* name, const char* debug) {
 
     try {
@@ -99,7 +99,7 @@ ReconClient::ReconClient          (const char* name, const char* debug) {
 }
 
 
-/**************************************************************************************************/
+
 ReconClient::~ReconClient         ()            {
 
 	m_orb->destroy();
@@ -107,7 +107,7 @@ ReconClient::~ReconClient         ()            {
 }
 
 
-/**************************************************************************************************/
+
 error_code
 ReconClient::Init (const char* name) {
 
@@ -129,7 +129,7 @@ ReconClient::Init (const char* name) {
 }
 
 
-/**************************************************************************************************/
+
 error_code 
 ReconClient::Process  (const char* name)  {
     
@@ -144,7 +144,7 @@ ReconClient::Process  (const char* name)  {
 }
 
 
-/**************************************************************************************************/
+
 error_code
 ReconClient::Finalise (const char* name) {
 
@@ -153,7 +153,7 @@ ReconClient::Finalise (const char* name) {
 }
 
 
-/**************************************************************************************************/
+
 long 
 ReconClient::GetSize (longs dims) {
 
@@ -167,11 +167,11 @@ ReconClient::GetSize (longs dims) {
 }
 
 
-/**************************************************************************************************/
+
 void 
-ReconClient::SetRaw (Matrix< std::complex<float> >& M) {
+ReconClient::SetCplx (const std::string name, Matrix< std::complex<float> >& M) {
 	
-	raw_data r; 
+	cplx_data r; 
 	
 	r.dims.length(INVALID_DIM);
 	
@@ -186,174 +186,96 @@ ReconClient::SetRaw (Matrix< std::complex<float> >& M) {
 		r.dimag[i] = M[i].imag(); 
 	}
 	
-	m_rrsi->raw(r);
+	m_rrsi->set_cplx(name.c_str(), r);
 	
 }
 		    
 
-/**************************************************************************************************/
 void 
-ReconClient::GetRaw (Matrix< std::complex<float> >& M) {
+ReconClient::GetCplx (const std::string name, Matrix< std::complex<float> >& m) {
 	
-	raw_data* rp = m_rrsi->raw();
+	cplx_data* rp = m_rrsi->get_cplx(name.c_str());
 	
 	for (int j = 0; j < INVALID_DIM; j++)
-		M.Dim(j) = rp->dims[j];
+		m.Dim(j) = rp->dims[j];
 	
-	M.Reset();
+	m.Reset();
 	
 	for (int i = 0; i < GetSize(rp->dims); i++)
-		M[i] = std::complex<float>(rp->dreal[i],rp->dimag[i]);
+		m[i] = std::complex<float>(rp->dreal[i],rp->dimag[i]);
 	
 }
-
-
-/**************************************************************************************************/
-void 
-ReconClient::SetRHelper (Matrix< std::complex<float> >& M) {
-	
-	raw_data r; 
-	
-	r.dims.length(INVALID_DIM);
-	
-	for (int j = 0; j < INVALID_DIM; j++)
-		r.dims[j] = M.Dim(j);
-	
-	r.dreal.length(M.Size()); 
-	r.dimag.length(M.Size());
-	
-	for (int i = 0; i < M.Size(); i++) {
-		r.dreal[i] = M[i].real();
-		r.dimag[i] = M[i].imag(); 
-	}
-	
-	m_rrsi->rhelper(r);
-	
-}
-		    
-
-/**************************************************************************************************/
-void 
-ReconClient::GetRHelper (Matrix< std::complex<float> >& M) {
-	
-	raw_data* rp = m_rrsi->rhelper();
-	
-	for (int j = 0; j < INVALID_DIM; j++)
-		M.Dim(j) = rp->dims[j];
-	
-	M.Reset();
-	
-	for (int i = 0; i < GetSize(rp->dims); i++)
-		M[i] = std::complex<float>(rp->dreal[i],rp->dimag[i]);
-	
-}
-
 
 
 void
-ReconClient::SetHelper              (Matrix< double >& M) {
+ReconClient::SetReal              (const std::string name, Matrix< double >& m) {
 	
-	helper_data h;
+	real_data r;
 	
-	h.dims.length(INVALID_DIM);
+	r.dims.length(INVALID_DIM);
 	
 	for (int j = 0; j < INVALID_DIM; j++)
-		h.dims[j] = M.Dim(j);
+		r.dims[j] = m.Dim(j);
 	
-	h.vals.length(M.Size());
+	r.vals.length(m.Size());
 	
-	for (int i = 0; i < M.Size(); i++)
-		h.vals[i] = M[i];
+	for (int i = 0; i < m.Size(); i++)
+		r.vals[i] = m[i];
 	
-	m_rrsi->helper(h);
+	m_rrsi->set_real(name.c_str(), r);
 	
 }
 		
 
 void
-ReconClient::GetHelper              (Matrix< double >& M) {
+ReconClient::GetReal            (const std::string name, Matrix<double>& m) {
 	
-	helper_data* hp = m_rrsi->helper();
-	
+	real_data* r = m_rrsi->get_real(name.c_str());
+
 	for (int j = 0; j < INVALID_DIM; j++)
-		M.Dim(j) = hp->dims[j];
+		m.Dim(j) = r->dims[j];
 	
-	M.Reset();
+	m.Reset();
 	
-	for (int i = 0; i < GetSize(hp->dims); i++)
-		M[i] = hp->vals[i];
+	for (int i = 0; i < GetSize(r->dims); i++)
+		m[i] = r->vals[i];
 	
 }
 
 
-void
-ReconClient::SetKSpace              (Matrix< double >& M) {
-	
-	helper_data h;
-	
-	h.dims.length(INVALID_DIM);
-	
-	for (int j = 0; j < INVALID_DIM; j++)
-		h.dims[j] = M.Dim(j);
-	
-	h.vals.length(M.Size());
-	
-	for (int i = 0; i < M.Size(); i++)
-		h.vals[i] = M[i];
-	
-	m_rrsi->kspace(h);
-	
-}
-
 
 void
-ReconClient::GetKSpace              (Matrix< double >& M) {
-			
-	helper_data* hp = m_rrsi->kspace();
-
-	for (int j = 0; j < INVALID_DIM; j++)
-				M.Dim(j) = hp->dims[j];
-	
-	M.Reset();
-	
-	for (int i = 0; i < GetSize(hp->dims); i++)
-		M[i] = hp->vals[i];
-	
-}
-
-
-void
-ReconClient::SetPixel            (Matrix<short>& M) {
+ReconClient::SetPixel            (const std::string name, Matrix<short>& m) {
 			
 	pixel_data p;
 	
 	p.dims.length(INVALID_DIM);
 	
 	for (int j = 0; j < INVALID_DIM; j++)
-		p.dims[j] = M.Dim(j);
+		p.dims[j] = m.Dim(j);
 	
-	p.vals.length(M.Size()); 
+	p.vals.length(m.Size()); 
 	
-	for (int i = 0; i < M.Size(); i++)
-		p.vals[i] = M[i];
+	for (int i = 0; i < m.Size(); i++)
+		p.vals[i] = m[i];
 	
-	m_rrsi->pixel(p);
+	m_rrsi->set_pixel(name.c_str(), p);
 	
 }
 
 
 void
-ReconClient::GetPixel            (Matrix<short>& M) {
+ReconClient::GetPixel            (const std::string name, Matrix<short>& m) {
 	
-	pixel_data* pp = m_rrsi->pixel();
+	pixel_data* p = m_rrsi->get_pixel(name.c_str());
 
 	for (int j = 0; j < INVALID_DIM; j++)
-		M.Dim(j) = pp->dims[j];
+		m.Dim(j) = p->dims[j];
 	
-	M.Reset();
+	m.Reset();
 	
-	for (int i = 0; i < GetSize(pp->dims); i++)
-		M[i] = pp->vals[i];
+	for (int i = 0; i < GetSize(p->dims); i++)
+		m[i] = p->vals[i];
 	
 }
 

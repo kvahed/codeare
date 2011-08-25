@@ -62,7 +62,7 @@ Matrix<T>::GEMM (Matrix<T>& M, char transb) {
 	
 	if (typeid(T) == typeid(double))
 		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
-	else if (typeid(T) == typeid(raw))
+	else if (typeid(T) == typeid(cplx))
 		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
 	
 	return res;
@@ -80,7 +80,7 @@ Matrix<T>::Norm () const {
 	int n    = Size();
 	int incx = 1;
 	
-	if      (typeid(T) == typeid(   raw)) res = cblas_scnrm2 (n, _M, incx);
+	if      (typeid(T) == typeid(   cplx)) res = cblas_scnrm2 (n, _M, incx);
 	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, _M, incx);
 	
 	else {
@@ -103,7 +103,7 @@ Matrix<T>::dotc (Matrix<T>& M) const {
 	int n    = Size();
 	int incx = 1;
 	
-	if (typeid(T) == typeid(raw))
+	if (typeid(T) == typeid(cplx))
 		cblas_cdotc_sub (n, &_M[0], incx, &M[0], incx, &res);
 	
 	return res;

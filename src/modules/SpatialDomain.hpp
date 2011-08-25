@@ -107,7 +107,7 @@ namespace RRStrategy {
  * @param  nrmse    Returned NRMSE
  */
 void
-NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* result, const int iter, float* nrmse) {
+NRMSE                         (const Matrix<cplx>* target, const Matrix<cplx>* result, const int iter, float* nrmse) {
 
     float q = 0.0, n = 0.0;
     
@@ -133,7 +133,7 @@ NRMSE                         (const Matrix<raw>* target, const Matrix<raw>* res
  * @return          Phase corrected 
  */
 void
-PhaseCorrection (Matrix<raw>* target, const Matrix<raw>* result) {
+PhaseCorrection (Matrix<cplx>* target, const Matrix<cplx>* result) {
     
 #pragma omp parallel default (shared) 
     {
@@ -147,7 +147,7 @@ PhaseCorrection (Matrix<raw>* target, const Matrix<raw>* result) {
             if (abs(target->At(i)) > 0)
                 target->At(i) = abs(target->At(i)) * result->At(i) / abs(result->At(i));
             else                
-                target->At(i) = raw (0,0);    
+                target->At(i) = cplx(0,0);    
         
     }
     
@@ -164,7 +164,7 @@ PhaseCorrection (Matrix<raw>* target, const Matrix<raw>* result) {
  * @param  limits   Out: limits
  */
 void 
-RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, const int nc, float* limits) {
+RFLimits            (const Matrix<cplx>* solution, const int* pd, const int nk, const int nc, float* limits) {
     
     for (int i = 0; i < nk; i++) {
 
@@ -194,8 +194,8 @@ RFLimits            (const Matrix<raw>* solution, const int* pd, const int nk, c
  * @param  m        Out: m_xy
  */
 void
-STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, const Matrix<short>* b0, const int nc, 
-	 const int             nk, const int            ns, const int          gd, const int*           pd, Matrix<raw>* m) {
+STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<cplx>* b1, const Matrix<short>* b0, const int nc, 
+	 const int             nk, const int            ns, const int          gd, const int*           pd, Matrix<cplx>* m) {
     
 	float* d = (float*) malloc (nk * sizeof (float));
 	float* t = (float*) malloc (nk * sizeof (float));
@@ -211,7 +211,7 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, c
 
 	d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
 
-    raw pgd = raw (0, 2.0 * PI * 4.2576e7 * 1.0e-5); 
+    cplx pgd = cplx (0, 2.0 * PI * 4.2576e7 * 1.0e-5); 
 
 #pragma omp parallel default (shared) 
     {
@@ -229,9 +229,9 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, c
 						// b1 (s,c)
                         pgd * b1->At(s,c) *
 						// off resonance: exp (2i\pidb0dt)  
-                        exp (raw(0, 2.0 * PI * d[k] * (float) b0->At(s))) *
+                        exp (cplx(0, 2.0 * PI * d[k] * (float) b0->At(s))) *
 						// encoding: exp (i k(t) r)
-                        exp (raw(0,(ks->At(0,k)*r->At(0,s) + ks->At(1,k)*r->At(1,s) + ks->At(2,k)*r->At(2,s))));
+                        exp (cplx(0,(ks->At(0,k)*r->At(0,s) + ks->At(1,k)*r->At(1,s) + ks->At(2,k)*r->At(2,s))));
         
     }
 	
@@ -247,7 +247,7 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<raw>* b1, c
  *
  */
 void
-PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const int gd, const int nk, const int nc, Matrix<raw>* timing) {
+PTXTiming (const Matrix<cplx>* rf, const Matrix<double>* ks, const int* pd, const int gd, const int nk, const int nc, Matrix<cplx>* timing) {
 
 	// Total pulse duration --------------
 
@@ -282,7 +282,7 @@ PTXTiming (const Matrix<raw>* rf, const Matrix<double>* ks, const int* pd, const
 			// Gradient action, no RF
 			if (k < nk-1)
 				for (int g = 0; g <    gd; g++, i++)
-					timing->At(i,rc) = raw (0.0, 0.0);
+					timing->At(i,rc) = cplx (0.0, 0.0);
 
 		}
 		

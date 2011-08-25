@@ -53,7 +53,7 @@ enum IceDim {
 /**
  * @brief raw data
  */
-typedef std::complex<float> raw;
+typedef std::complex<float> cplx;
 
 
 /**
@@ -1669,6 +1669,24 @@ public:
 
 
     /**
+     * @brief           Print dimensions to STL string.
+     *
+     * @return          Dimension string
+     */
+    const std::string       
+    DimsToString        () const;
+    
+
+    /**
+     * @brief           Print dimensions to C string.
+     *
+     * @return          Dimension string
+     */
+    const char*
+    DimsToCString        () const;
+    
+
+    /**
      * @brief           Primitive dump column-major to file.
      * 
      * @param  fname    File name.
@@ -2238,10 +2256,10 @@ Matrix<short>::Max() {
 }
 
 
-template <> inline raw
-Matrix<raw>::Max() {
+template <> inline cplx
+Matrix<cplx>::Max() {
 		
-		raw   max = raw(0.0,0.0);
+		cplx   max = cplx(0.0,0.0);
 		float tmp =  0.0;
 		
 		for (int i = 0; i < Size(); i++) {
@@ -2318,12 +2336,12 @@ Matrix<T> Matrix<T>::tr() const {
 }
 
 template<>
-inline void Matrix<raw>::Random () {
+inline void Matrix<cplx>::Random () {
 	
 	srand (time(NULL));
 
 	for (int i = 0; i < Size(); i++)
-		_M[i] = raw ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
+		_M[i] = cplx ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
 	
 }
     
