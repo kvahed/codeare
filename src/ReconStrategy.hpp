@@ -92,6 +92,65 @@ namespace RRServer {
 		virtual error_code
 		Finalise        () = 0;
 		
+		
+		/**
+		 * @brief       Add a complex matrix to complex matrix container
+		 *
+		 * @param  name Name
+		 * @param  m    The added matrix
+		 * @return      Success
+		 */
+		bool
+		AddCplx         (const std::string name, Matrix<cplx>* m) {
+
+			if (m_cplx.find (name) == m_cplx.end())
+				m_cplx.insert (std::pair<std::string, Matrix<cplx>*> (name, m));
+			else 
+				return false;
+
+			return true;
+			
+		}
+
+
+		/**
+		 * @brief       Add a real matrix to real matrix container
+		 *
+		 * @param  name Name
+		 * @param  m    The added matrix
+		 * @return      Success
+		 */
+		bool
+		AddReal         (const std::string name, Matrix<double>* m) {
+
+			if (m_real.find (name) == m_real.end())
+				m_real.insert (std::pair<std::string, Matrix<double>*> (name, m));
+			else 
+				return false;
+
+			return true;
+			
+		}
+
+
+		/**
+		 * @brief       Add a pixel matrix to pixel matrix container
+		 *
+		 * @param  name Name
+		 * @param  m    The added matrix
+		 * @return      Success
+		 */
+		bool
+		AddPixel        (const std::string name, Matrix<short>* m) {
+
+			if (m_pixel.find (name) == m_pixel.end())
+				m_pixel.insert (std::pair<std::string, Matrix<short>*> (name, m));
+			else 
+				return false;
+
+			return true;
+			
+		}
 
 		/**
 		 * @brief        Get data from recon (Remote access)

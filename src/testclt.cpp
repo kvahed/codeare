@@ -353,7 +353,7 @@ bool resetest (ReconClient* rc) {
 	Matrix<cplx> txm;
 	Matrix<cplx> rxm;
 	Matrix<double> b0;
-	Matrix<double> osnr;
+	Matrix<double> snro;
 
 	// IN
 	std::string cf    = std::string (base + std::string (config));
@@ -362,7 +362,7 @@ bool resetest (ReconClient* rc) {
 	// OUT
 	std::string txmf  = std::string (base + std::string ("txm.mat"));
 	std::string rxmf  = std::string (base + std::string ("rxm.mat"));
-	std::string osnrf = std::string (base + std::string ("osnr.mat"));
+	std::string snrof = std::string (base + std::string ("snro.mat"));
 	std::string b0f   = std::string (base + std::string ("b0.mat"));
 	
 	meas.RAWRead (df, std::string("VB15"));
@@ -374,16 +374,16 @@ bool resetest (ReconClient* rc) {
 	
 	rc->Process(test);
 	
-	rc->GetCplx ("txm", txm);
-	rc->GetCplx("rxm", rxm);
-	rc->GetReal("osnr", osnr);
-	rc->GetReal("b0", b0);
+	rc->GetCplx ("txm",  txm);
+	rc->GetCplx ("rxm",  rxm);
+	rc->GetReal ("snro", snro);
+	rc->GetReal ("b0",   b0);
 	
 	rc->Finalise(test);
 	
 	txm.Dump  (txmf,  "txm",  "", MATLAB);
 	rxm.Dump  (rxmf,  "rxm",  "", MATLAB);
-	osnr.Dump (osnrf, "isnr", "", MATLAB);
+	snro.Dump (snrof, "snro", "", MATLAB);
 	b0.Dump   (b0f,   "b0",   "", MATLAB);
 	
 	return true;
