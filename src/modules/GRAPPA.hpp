@@ -115,6 +115,19 @@ namespace RRStrategy {
 
 			int c = 0;
 
+
+			
+			Matrix<cplx>    patch  (m_kern_dim[0],(m_kern_dim[1]-1)*m_R[1]+1,m_nc);
+			printf ("  patch size in ACS: %s", pat.DimsToCString());
+
+			for (int i = 0; i < m_kern_dim[1]; i++)
+				pat ()
+			
+			memcpy (&inds[0], &i[0], sizeof(size_t) * inds.Size());
+			subs = pat.Ind2Sub2D(inds);
+			std::cout << subs << std::endl;
+
+
 			//yind=1:nyacs-(srcy-1)*af
 			/*
 			for (int i = d[0]; i < acs_dim[0] - d[0]; i++)

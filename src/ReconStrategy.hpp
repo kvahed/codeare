@@ -38,7 +38,9 @@
 
 #include "cycle.h"            // FFTW cycle implementation
 
+
 using namespace RRSModule;
+using namespace std;
 
 namespace RRServer {
 
@@ -108,17 +110,17 @@ namespace RRServer {
 		Finalise        () {
 
 			while (!m_cplx.empty()) {
-				std::cout << "Clearing RAM of " <<  m_cplx.begin()->first.c_str() << std::endl;
+				cout << "Clearing RAM of " <<  m_cplx.begin()->first.c_str() << endl;
 				m_cplx.erase(m_cplx.begin());
 			}
 
 			while (!m_real.empty()) {
-				std::cout << "Clearing RAM of " <<  m_real.begin()->first.c_str() << std::endl;
+				cout << "Clearing RAM of " <<  m_real.begin()->first.c_str() << endl;
 				m_real.erase(m_real.begin());
 			}
 
 			while (!m_pixel.empty()) {
-				std::cout << "Clearing RAM of " <<  m_pixel.begin()->first.c_str() << std::endl;
+				cout << "Clearing RAM of " <<  m_pixel.begin()->first.c_str() << endl;
 				m_pixel.erase(m_pixel.begin());
 			}
 
@@ -134,10 +136,10 @@ namespace RRServer {
 		 * @return      Success
 		 */
 		bool
-		AddCplx         (const std::string name, Matrix<cplx>* m) {
+		AddCplx         (const string name, Matrix<cplx>* m) {
 
 			if (m_cplx.find (name) == m_cplx.end())
-				m_cplx.insert (std::pair<std::string, Matrix<cplx>*> (name, m));
+				m_cplx.insert (pair<string, Matrix<cplx>*> (name, m));
 			else 
 				return false;
 
@@ -145,6 +147,27 @@ namespace RRServer {
 			
 		}
 
+
+		/**
+		 * @brief       Remove a complex matrix from complex container
+		 *
+		 * @param       Name
+		 * @return      Success
+		 */
+		bool 
+		FreeCplx        (const string name) {
+			
+			map<string,Matrix<cplx>*>::iterator it = m_cplx.find (name);
+
+			if (it == m_cplx.end())
+				return false;
+
+			m_cplx.erase(it);
+
+			return true;
+			
+		}
+		
 
 		/**
 		 * @brief       Add a real matrix to real matrix container
@@ -154,10 +177,10 @@ namespace RRServer {
 		 * @return      Success
 		 */
 		bool
-		AddReal         (const std::string name, Matrix<double>* m) {
+		AddReal         (const string name, Matrix<double>* m) {
 
 			if (m_real.find (name) == m_real.end())
-				m_real.insert (std::pair<std::string, Matrix<double>*> (name, m));
+				m_real.insert (pair<string, Matrix<double>*> (name, m));
 			else 
 				return false;
 
@@ -165,6 +188,27 @@ namespace RRServer {
 			
 		}
 
+
+		/**
+		 * @brief       Remove a real matrix from real container
+		 *
+		 * @param       Name
+		 * @return      Success
+		 */
+		bool 
+		FreeReal        (const string name) {
+			
+			map<string,Matrix<double>*>::iterator it = m_real.find (name);
+
+			if (it == m_real.end())
+				return false;
+
+			m_real.erase(it);
+
+			return true;
+			
+		}
+		
 
 		/**
 		 * @brief       Add a pixel matrix to pixel matrix container
@@ -174,16 +218,38 @@ namespace RRServer {
 		 * @return      Success
 		 */
 		bool
-		AddPixel        (const std::string name, Matrix<short>* m) {
+		AddPixel        (const string name, Matrix<short>* m) {
 
 			if (m_pixel.find (name) == m_pixel.end())
-				m_pixel.insert (std::pair<std::string, Matrix<short>*> (name, m));
+				m_pixel.insert (pair<string, Matrix<short>*> (name, m));
 			else 
 				return false;
 
 			return true;
 			
 		}
+
+
+		/**
+		 * @brief       Remove a pixel matrix from pixel container
+		 *
+		 * @param       Name
+		 * @return      Success
+		 */
+		bool 
+		FreePixel        (const string name) {
+			
+			map<string,Matrix<short>*>::iterator it = m_pixel.find (name);
+
+			if (it == m_pixel.end())
+				return false;
+
+			m_pixel.erase(it);
+
+			return true;
+			
+		}
+		
 
 		/**
 		 * @brief        Get data from recon (Remote access)
@@ -192,7 +258,7 @@ namespace RRServer {
 		 * @param  c     Raw data storage 
 		 */
 		void
-		GetCplx       (const std::string name, cplx_data* c)   {
+		GetCplx       (const string name, cplx_data* c)   {
 			
 			if (m_cplx.find (name) == m_cplx.end())
 				return;
@@ -222,12 +288,12 @@ namespace RRServer {
 		 * @param c      Cplx data
 		 */
 		void 
-		SetCplx       (const std::string name, const cplx_data* c)   {
+		SetCplx       (const string name, const cplx_data* c)   {
 
 			Matrix<cplx>* tmp;
 				
 			if (m_cplx.find (name) == m_cplx.end())
-				m_cplx.insert (std::pair<std::string, Matrix<cplx>*> (name, tmp = new Matrix<cplx>()));
+				m_cplx.insert (pair<string, Matrix<cplx>*> (name, tmp = new Matrix<cplx>()));
 			else
 			    tmp = m_cplx[name];
 			
@@ -237,7 +303,7 @@ namespace RRServer {
 			tmp->Reset ();
 			
 			for (int j = 0; j < tmp->Size(); j++)
-				tmp->At(j) =  std::complex<float> (c->dreal[j], c->dimag[j]);
+				tmp->At(j) =  complex<float> (c->dreal[j], c->dimag[j]);
 			
 		}
 		
@@ -249,7 +315,7 @@ namespace RRServer {
 		 * @param  m     Cplx data storage 
 		 */
 		void
-		GetCplx       (const std::string name, Matrix<cplx>* m)   {
+		GetCplx       (const string name, Matrix<cplx>* m)   {
 
 			if (m_cplx.find (name) == m_cplx.end())
 				return;
@@ -266,10 +332,10 @@ namespace RRServer {
 		 * @param m      Complex data
 		 */
 		void 
-		SetCplx       (const std::string name, Matrix<cplx>* m)   {
+		SetCplx       (const string name, Matrix<cplx>* m)   {
 			
 			if (m_cplx.find (name) == m_cplx.end())
-				m_cplx.insert (std::pair<std::string, Matrix<cplx>*> (name, new Matrix<cplx>()));
+				m_cplx.insert (pair<string, Matrix<cplx>*> (name, new Matrix<cplx>()));
 			
 			m_cplx[name] = m;
 			
@@ -283,7 +349,7 @@ namespace RRServer {
 		 * @param  r     Real data storage
 		 */
 		void 
-		GetReal        (const std::string name, real_data* r)   {
+		GetReal        (const string name, real_data* r)   {
 			
 			if (m_real.find (name) == m_real.end())
 				return;
@@ -310,12 +376,12 @@ namespace RRServer {
 		 * @param  r     Real data
 		 */
 		void 
-		SetReal        (const std::string name, const real_data* r)   {
+		SetReal        (const string name, const real_data* r)   {
 			
 			Matrix<double>* tmp;
 
 			if (m_real.find (name) == m_real.end())
-				m_real.insert (std::pair<std::string, Matrix<double>*> (name, tmp = new Matrix<double>()));
+				m_real.insert (pair<string, Matrix<double>*> (name, tmp = new Matrix<double>()));
 			else
 				tmp = m_real[name];
 			
@@ -337,7 +403,7 @@ namespace RRServer {
 		 * @param  m      Real data
 		 */
 		void
-		GetReal         (const std::string name, Matrix<double>* m)   {
+		GetReal         (const string name, Matrix<double>* m)   {
 			
 			if (m_real.find (name) == m_real.end())
 				return;
@@ -355,10 +421,10 @@ namespace RRServer {
 		 * @param  m      Real data storage
 		 */
 		void 
-		SetReal         (const std::string name, Matrix<double>* m)   {
+		SetReal         (const string name, Matrix<double>* m)   {
 			
 			if (m_real.find (name) == m_real.end())
-				m_real.insert (std::pair<std::string, Matrix<double>*> (name, new Matrix<double>()));
+				m_real.insert (pair<string, Matrix<double>*> (name, new Matrix<double>()));
 			
 			m_real[name] = m;
 			
@@ -372,7 +438,7 @@ namespace RRServer {
 		 * @param  p     Pixel data storage
 		 */
 		void 
-		GetPixel          (const std::string name, pixel_data* p)   {
+		GetPixel          (const string name, pixel_data* p)   {
 			
 			if (m_pixel.find (name) == m_pixel.end())
 				return;
@@ -399,12 +465,12 @@ namespace RRServer {
 		 * @param  p     Pixel data
 		 */
 		void 
-		SetPixel         (const std::string name, const pixel_data* p)   {
+		SetPixel         (const string name, const pixel_data* p)   {
 			
 			Matrix<short>* tmp;
 
 			if (m_pixel.find (name) == m_pixel.end())
-				m_pixel.insert (std::pair<std::string, Matrix<short>*> (name, tmp = new Matrix<short>()));
+				m_pixel.insert (pair<string, Matrix<short>*> (name, tmp = new Matrix<short>()));
 			else
 				tmp = m_pixel[name];
 
@@ -426,7 +492,7 @@ namespace RRServer {
 		 * @param  m     Pixel data storage
 		 */
 		void
-		GetPixel         (const std::string name, Matrix<short>* m)   {
+		GetPixel         (const string name, Matrix<short>* m)   {
 			
 			if (m_pixel.find (name) == m_pixel.end())
 				return;
@@ -443,10 +509,10 @@ namespace RRServer {
 		 * @param  m     Pixel data
 		 */
 		void 
-		SetPixel         (const std::string name, Matrix<short>* m)   {
+		SetPixel         (const string name, Matrix<short>* m)   {
 			
 			if (m_pixel.find (name) == m_pixel.end())
-				m_pixel.insert (std::pair<std::string, Matrix<short>*> (name, new Matrix<short>()));
+				m_pixel.insert (pair<string, Matrix<short>*> (name, new Matrix<short>()));
 			
 			m_pixel[name] = m;
 			
@@ -460,7 +526,7 @@ namespace RRServer {
 		 */
 		void Name (const char* name) { 
 
-			m_name = std::string(name);
+			m_name = string(name);
 		
 		}
 
@@ -480,11 +546,11 @@ namespace RRServer {
 	
 	protected:
 		
-		std::map < std::string, Matrix< std::complex<float> >* >   m_cplx;
-		std::map < std::string, Matrix<double>* >                  m_real;
-		std::map < std::string, Matrix<short>* >                   m_pixel;
+		map < string, Matrix< complex<float> >* >   m_cplx;
+		map < string, Matrix<double>* >                  m_real;
+		map < string, Matrix<short>* >                   m_pixel;
 		
-		std::string     m_name;        /*!< Name                               */
+		string     m_name;        /*!< Name                               */
 		
 		bool            m_initialised; /*!< Reco is initialised                */
 		
