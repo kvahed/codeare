@@ -79,7 +79,7 @@ CGSENSE::Init() {
 	Attribute ("Nc",        &m_Nc);
 
 	if (m_Nc == 0) {
-		printf ("Initialising %s with %i channels? Check configuration! FAILED: Bailing out!\n", Name(), m_M);
+		printf ("Initialising %s with %i channels? Check configuration! FAILED: Bailing out!\n", Name(), m_Nc);
 		return CGSENSE_ZERO_CHANNELS;
 	}
 
@@ -111,7 +111,7 @@ CGSENSE::Init() {
 	// --------------------------------------
 
 	// iNFFT convergence and break criteria -
-
+	
 	Attribute ("maxit",   &m_maxit);
 	Attribute ("epsilon", &m_epsilon);
 	// --------------------------------------

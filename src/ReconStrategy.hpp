@@ -63,7 +63,11 @@ namespace RRServer {
 		 * @brief       Default destructor
 		 */ 
 		virtual
-		~ReconStrategy  () {};
+		~ReconStrategy  () {
+
+			Finalise();
+
+		};
 		
 		
 		/**
@@ -96,12 +100,30 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       Mandatory implementation of finaliser
+		 * @brief       Free RAM
 		 *
 		 * @return      Success
 		 */ 
 		virtual error_code
-		Finalise        () = 0;
+		Finalise        () {
+
+			while (!m_cplx.empty()) {
+				std::cout << "Clearing RAM of " <<  m_cplx.begin()->first.c_str() << std::endl;
+				m_cplx.erase(m_cplx.begin());
+			}
+
+			while (!m_real.empty()) {
+				std::cout << "Clearing RAM of " <<  m_real.begin()->first.c_str() << std::endl;
+				m_real.erase(m_real.begin());
+			}
+
+			while (!m_pixel.empty()) {
+				std::cout << "Clearing RAM of " <<  m_pixel.begin()->first.c_str() << std::endl;
+				m_pixel.erase(m_pixel.begin());
+			}
+
+
+		};
 		
 		
 		/**
