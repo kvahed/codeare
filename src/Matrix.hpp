@@ -532,7 +532,7 @@ public:
      *  
      * @param  col      Column
      * @param  lin      Line
-     * @return          Value at _M[col + _dim[LIN]*lin]
+     * @return          Value at _M[col + _dim[COL]*lin]
      */
     inline T            
     At                  (const size_t col, const size_t lin) const {
@@ -548,7 +548,7 @@ public:
      *  
      * @param  col       Column
      * @param  lin       Line
-     * @return           Reference to _M[col + _dim[LIN]*lin]
+     * @return           Reference to _M[col + _dim[COL]*lin]
      */
     inline T&           
     At                  (size_t col, size_t lin) {
@@ -849,11 +849,11 @@ public:
 	 *
 	 * @param  col      Column
 	 * @param  lin      Line
-	 * @return          Value at _M[col + _dim[LIN]*lin]
+	 * @return          Value at _M[col + _dim[COL]*lin]
 	 */
     T
     operator()          (const size_t col, const size_t lin) const {
-        return _M[col + _dim[LIN]*lin ];
+        return _M[col + _dim[COL]*lin ];
     }
     
 
@@ -862,11 +862,11 @@ public:
 	 *
 	 * @param  col      Column
 	 * @param  lin      Line
-	 * @return          Reference to _M[col + _dim[LIN]*lin]
+	 * @return          Reference to _M[col + _dim[COL]*lin]
 	 */
     T&                  
     operator()           (const size_t col, const size_t lin) {
-        return _M[col + _dim[LIN]*lin ];
+        return _M[col + _dim[COL]*lin ];
     }
     
     
@@ -1860,17 +1860,45 @@ public:
 
 	/**
 	 * @brief           Multiple subscripts from linear index (MATLAB like)
+	 *
+	 * @param  sub      Subscripts
+	 * @return          Indices
 	 */
 	Matrix<size_t>
-	Sub2Ind             (const Matrix<size_t>) const;
+	Sub2Ind             (const Matrix<size_t> sub) const;
 
 
 
 	/**
 	 * @brief           Multiple subscripts from linear index (MATLAB like)
+	 *
+	 * @pararm ind      Indices
+	 * @return          Subscripts
 	 */
 	Matrix<size_t>
-	Ind2Sub             (const Matrix<size_t>) const;
+	Ind2Sub             (const Matrix<size_t> ind) const;
+
+
+
+	/**
+	 * @brief           Multiple subscripts from linear index (MATLAB like) (faster for 2D)
+	 *
+	 * @param  ind      Indices
+	 * @return          Subscripts
+	 */
+	Matrix<size_t>
+	Ind2Sub2D           (const Matrix<size_t> ind) const;
+
+
+
+	/**
+	 * @brief           Multiple subscripts from linear index (MATLAB like) (faster for 3D)
+	 *
+	 * @param  ind      Indices
+	 * @return          Subscripts
+	 */
+	Matrix<size_t>
+	Ind2Sub3D           (const Matrix<size_t> ind) const;
 
 
 
@@ -2130,8 +2158,8 @@ public:
 	 * @param  ind      Index
 	 * @return          Subs
 	 */ 
-	const inline size_t 
-	Ind2x               (const size_t& ind) const;
+	inline const size_t 
+	Ind2x               (const size_t& ind, const size_t& dim) const;
 
 
 	/**

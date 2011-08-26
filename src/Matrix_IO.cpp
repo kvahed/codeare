@@ -32,6 +32,20 @@ fexists (const char* fname) {
 
 
 template<> inline std::ostream&  
+Matrix<size_t>::Print (std::ostream &os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%i ", (int)_M [i + j * _dim[COL]]);
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+template<> inline std::ostream&  
 Matrix<short>::Print (std::ostream &os) const {
 	
 	for (size_t i = 0; i < _dim[COL]; i++) {

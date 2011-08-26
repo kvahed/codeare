@@ -113,13 +113,15 @@ GRAPPA::Init () {
 RRSModule::error_code
 GRAPPA::Prepare     () { 
 
-	printf ("  Configuring GRAPPA ...\n");
+	printf ("  Preparing %s ...\n", Name());
 
+	Matrix<cplx>* acs  = m_cplx["acs"];
+	printf ("  acs dims:  %s\n", acs->DimsToCString());
 	ComputeWeights (m_acs_dim, m_kern_dim, m_d, m_R, m_cplx["acs"], m_weights);
-
+	
 	printf ("... done.\n\n");
 	return RRSModule::OK;
-
+	
 
 }
 
@@ -137,18 +139,14 @@ GRAPPA::Prepare     () {
 RRSModule::error_code
 GRAPPA::Process     () { 
 
-	printf ("  Processing GRAPPA ...\n");
-
-	Matrix<cplx>* data = m_cplx["data"];
-	Matrix<cplx>* acs  = m_cplx["acs"];
-
-	printf ("data: %s\n", data->DimsToCString());
-	printf ("acs:  %s\n", acs->DimsToCString());
-
 	ticks cgstart = getticks();
 
-	//ExecPyCode ("from time import time,ctime\nprint  ' ',ctime(time())\n");
-	//CallFunction();
+	printf ("  Processing GRAPPA ...\n");
+
+	Matrix<cplx>* acs  = m_cplx["acs"];
+	Matrix<cplx>* data = m_cplx["data"];
+
+	printf ("  data dims: %s\n", data->DimsToCString());
 
 	printf ("... done.. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
