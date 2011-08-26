@@ -70,7 +70,9 @@ namespace RRStrategy {
 		 */
 		virtual RRSModule::error_code
 		Finalise () {
+
 			return OK;
+
 		}
 		
 	};

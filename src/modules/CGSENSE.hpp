@@ -83,8 +83,8 @@ namespace RRStrategy {
 		Matrix < raw >       m_measured;        /**< Measured data                   */
 		Matrix < double >    m_weights;         /**< K-space weights                 */
 		
-		nfft_plan           m_fplan[NTHREADS];           /**< NuFFT plan                      */
-		solver_plan_complex m_iplan[NTHREADS];           /**< iNuFFT plan                     */
+		nfft_plan           m_fplan[NTHREADS];  /**< NuFFT plan                      */
+		solver_plan_complex m_iplan[NTHREADS];  /**< iNuFFT plan                     */
 		
 		double               m_epsilon;         /**< NuFFT convergence criterium     */
 		int                  m_maxit;           /**< Maximum number of NuFFT solver iterations */
