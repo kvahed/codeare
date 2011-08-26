@@ -2090,8 +2090,8 @@ public:
 	 * @param  ind      Index
 	 * @return          Subs
 	 */ 
-	static inline size_t 
-	Ind2i               (const size_t& ind);
+	const inline size_t 
+	Ind2i               (const size_t& ind) const;
 
 
 	/**
@@ -2100,8 +2100,8 @@ public:
 	 * @param  ind      Index
 	 * @return          Subs
 	 */ 
-	static inline size_t 
-	Ind2j               (const size_t& ind);
+	const inline size_t 
+	Ind2j               (const size_t& ind) const;
 
 
 	/**
@@ -2110,8 +2110,8 @@ public:
 	 * @param  ind      Index
 	 * @return          Subs
 	 */ 
-	static inline size_t 
-	Ind2k               (const size_t& ind);
+	const inline size_t 
+	Ind2k               (const size_t& ind) const;
 
 
 	/**
@@ -2120,8 +2120,8 @@ public:
 	 * @param  ind      Index
 	 * @return          Subs
 	 */ 
-	static inline size_t 
-	Ind2l               (const size_t& ind);
+	const inline size_t 
+	Ind2l               (const size_t& ind) const;
 
 
 	/**
@@ -2130,8 +2130,8 @@ public:
 	 * @param  ind      Index
 	 * @return          Subs
 	 */ 
-	static inline size_t 
-	Ind2x               (const size_t& ind);
+	const inline size_t 
+	Ind2x               (const size_t& ind) const;
 
 
 	/**
@@ -2513,5 +2513,6 @@ inline const bool Matrix<T>::Is4D () const {
 #include "Matrix_BLAS.cpp"
 #include "Matrix_ICE.cpp"
 #include "Matrix_FFT.hpp"
+#include "Matrix_Algorithms.hpp"
 
 #endif // __MATRIX_H__
