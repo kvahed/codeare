@@ -93,6 +93,15 @@ module RRSModule {
 		error_code        Finalise (in short s);
 		
 		/**
+		 * @brief         Finalise
+		 *                Clear data. Unload library.
+		 *
+		 * @param  s      Id of initialised reconstruction algorithm
+		 * @return        Status
+		 */
+		error_code        Prepare (in short s);
+		
+		/**
 		 * @brief         Intialise
 		 *                Initilise process library
 		 *

@@ -87,6 +87,15 @@ namespace RRServer {
 		
 		
 		/**
+		 * @brief        Prepare. @see ReconStrategy::Prepare()
+		 *
+		 * @return       Success
+		 */
+		RRSModule::error_code
+		Prepare          ();
+		
+		
+		/**
 		 * @brief        Finalise. @see ReconStrategy::Finalise()
 		 *
 		 * @return       Success

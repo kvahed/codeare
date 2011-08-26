@@ -32,10 +32,10 @@ fexists (const char* fname) {
 
 
 template<> inline std::ostream&  
-Matrix<short>::Print     (std::ostream &os) const {
+Matrix<short>::Print (std::ostream &os) const {
 	
-	for (int i = 0; i < _dim[COL]; i++) {
-		for(int j = 0; j < _dim[LIN]; j++)
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
 			printf ("%i ", _M [i + j * _dim[COL]]);
 		printf("\n");
 	}
@@ -46,10 +46,10 @@ Matrix<short>::Print     (std::ostream &os) const {
 
 
 template<> inline std::ostream&  
-Matrix<double>::Print     (std::ostream &os) const {
+Matrix<double>::Print (std::ostream &os) const {
 	
-	for (int i = 0; i < _dim[COL]; i++) {
-		for(int j = 0; j < _dim[LIN]; j++)
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
 			printf ("%+.4f ", _M [i + j * _dim[COL]]);
 		printf("\n");
 	}
@@ -60,10 +60,10 @@ Matrix<double>::Print     (std::ostream &os) const {
 
 
 template<> inline std::ostream&  
-Matrix<cplx>::Print       (std::ostream& os) const {
+Matrix<cplx>::Print (std::ostream& os) const {
 	
-	for (int i = 0; i < _dim[COL]; i++) {
-		for(int j = 0; j < _dim[LIN]; j++)
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
 			printf ("%+.4f+%+.4fi ", _M [i + j * _dim[COL]].real(), _M [i + j * _dim[COL]].imag());
 		printf("\n");
 	}
@@ -78,8 +78,8 @@ const std::string Matrix<T>::DimsToString () const {
 
 	std::stringstream ss;
 	
-	for (int i=0; i < INVALID_DIM; i++)
-		ss << _dim[i] << " ";
+	for (size_t i=0; i < INVALID_DIM; i++)
+		ss << (int)_dim[i] << " ";
 
 	return ss.str();
 	
@@ -95,7 +95,7 @@ const char* Matrix<T>::DimsToCString () const {
 
 
 template <class T> std::ostream& 
-operator<<    (std::ostream& os, Matrix<T>& M) {
+operator<< (std::ostream& os, Matrix<T>& M) {
 	
 	M.Print(os);
 	return os;
@@ -104,16 +104,16 @@ operator<<    (std::ostream& os, Matrix<T>& M) {
 
 
 template <class T>
-bool Matrix<T>::PRDump (std::string fname) {
+bool Matrix<T>::PRDump (const std::string fname) const {
 	
 	FILE *fp;
 	
-	if((fp=fopen(fname.c_str(), "wb"))==NULL) {
+	if ((fp=fopen(fname.c_str(), "wb"))==NULL) {
 		printf("Cannot open %s file.\n", fname.c_str());
 		return false;
 	}
 	
-	if(fwrite(_M, sizeof(float), Size(), fp) != Size()) {
+	if (fwrite(_M, sizeof(float), Size(), fp) != Size()) {
 		printf("File read error.");
 		return false;
 	}
@@ -121,12 +121,13 @@ bool Matrix<T>::PRDump (std::string fname) {
 	fclose(fp);
 	
 	return true;
-
+	
 }
 
-template <class T>
-bool Matrix<T>::Dump (std::string fname, std::string dname, std::string dloc, io_strategy ios) {
 
+template <class T>
+bool Matrix<T>::Dump (const std::string fname, const std::string dname, const std::string dloc, const io_strategy ios) const {
+	
 	if      (ios == MATLAB)
 		return MXDump (fname, dname, dloc);
 	else if (ios == HDF5)
@@ -135,15 +136,15 @@ bool Matrix<T>::Dump (std::string fname, std::string dname, std::string dloc, io
 		return NIDump (fname);
 	else
 		return PRDump (fname);
-
+	
 }
 
 
 template <class T>
-bool Matrix<T>::H5Dump (std::string fname, std::string dname, std::string dloc) {
-
-	int i = 0;
-
+bool Matrix<T>::H5Dump (const std::string fname, const std::string dname, const std::string dloc) const {
+	
+	size_t i = 0;
+	
 	if (fname != "") {
 		
 #ifdef HAVE_H5CPP_H
@@ -178,13 +179,13 @@ bool Matrix<T>::H5Dump (std::string fname, std::string dname, std::string dloc) 
 				
 			} catch (Exception e) {
 				
-				int    depth   = 0;
+				size_t    depth   = 0;
 
 				std::vector<std::string> sv;
 
 				Toolbox::Instance()->Split (sv, dloc, "/");
 
-				for (int i = 0; i < sv.size(); i++) {
+				for (size_t i = 0; i < sv.size(); i++) {
 					
 					try {
 						if (depth)
@@ -208,7 +209,7 @@ bool Matrix<T>::H5Dump (std::string fname, std::string dname, std::string dloc) 
 			}
 			
 			// One more field for complex numbers
-			int tmpdim = (typeid(T) == typeid(cplx)) ? INVALID_DIM+1 : INVALID_DIM;
+			size_t tmpdim = (typeid(T) == typeid(cplx)) ? INVALID_DIM+1 : INVALID_DIM;
 			hsize_t* dims = new hsize_t[tmpdim];
 
 			for (i = 0; i < INVALID_DIM; i++)
@@ -222,21 +223,23 @@ bool Matrix<T>::H5Dump (std::string fname, std::string dname, std::string dloc) 
 			
 			delete [] dims;
 
+			std::string _dname = dname;
+
 			if (typeid(T) == typeid(cplx)) {
 				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
 				if (dname == "") 
-					dname = "cplx";
+					_dname = "cplx";
 			} else if (typeid(T) == typeid(double)) {
 				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
 				if (dname == "") 
-					dname = "double";
+					_dname = "double";
 			} else {
 				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
 				if (dname == "") 
-					dname = "pixel";
+					_dname = "pixel";
 			}
 		
-			DataSet set = group.createDataSet(dname, (*type), space);
+			DataSet set = group.createDataSet(_dname, (*type), space);
 				
 			set.write   (_M, (*type));
 			set.close   ();
@@ -279,10 +282,10 @@ bool Matrix<T>::H5Dump (std::string fname, std::string dname, std::string dloc) 
 
 
 template <class T>
-bool Matrix<T>::RSAdjust (std::string fname) {
+bool Matrix<T>::RSAdjust (const std::string fname) {
 
-	int  dimk;
-	long dimv;
+	size_t dimk;
+	size_t dimv;
 
 	// XML file name, run cmd and repository
 	std::stringstream    xmlf;
@@ -295,7 +298,7 @@ bool Matrix<T>::RSAdjust (std::string fname) {
 	TiXmlNode*           vol;
 
 	// Dimensions in XProtocol
-	std::map < std::string, int > dims;
+	std::map < std::string, size_t > dims;
 	dims["RawCol"] =  0; dims["RawLin"] =  1; dims["RawSlc"] =  2; dims["RawPar"] =  3;
 	dims["RawEco"] =  4; dims["RawPhs"] =  5; dims["RawRep"] =  6; dims["RawSet"] =  7;
 	dims["RawSeg"] =  8; dims["RawCha"] =  9; dims["RawIda"] = 10; dims["RawIdb"] = 11;
@@ -305,7 +308,7 @@ bool Matrix<T>::RSAdjust (std::string fname) {
 	cmd << "/usr/local/bin/convert.pl ";
 	cmd << fname;
 	printf ("%s\n", cmd.str().c_str());
-	int ec = system (cmd.str().c_str());
+	size_t ec = system (cmd.str().c_str());
 
 	// Output filename
 	xmlf << fname;
@@ -350,7 +353,7 @@ bool Matrix<T>::RSAdjust (std::string fname) {
 
 
 template <class T>
-bool Matrix<T>::RAWRead (std::string fname, std::string version) {
+bool Matrix<T>::RAWRead (const std::string fname, const std::string version) {
 	
 	// Get size information from XProtocol and resize 
 	RSAdjust(fname);
@@ -363,7 +366,7 @@ bool Matrix<T>::RAWRead (std::string fname, std::string version) {
 	FILE*         f;
 	sMDH*         mdh;
 	unsigned      l      = 0;
-	unsigned long nscans = (Size() / _dim[COL]);
+	size_t        nscans = (Size() / _dim[COL]);
 	unsigned      start;
 	unsigned      size;
 	size_t        read;
@@ -382,9 +385,9 @@ bool Matrix<T>::RAWRead (std::string fname, std::string version) {
 
 	// Headers
 	mdh  = (sMDH*) malloc (nscans * sizeof(sMDH));
-	int n = 0.0;
+	size_t n = 0.0;
 
-	for (int i = 0; i < nscans; i++) {
+	for (size_t i = 0; i < nscans; i++) {
 
 		read = fread (&mdh[i], sizeof(sMDH), 1, f);
 
@@ -410,7 +413,7 @@ bool Matrix<T>::RAWRead (std::string fname, std::string version) {
 }
 
 template <class T>
-bool Matrix<T>::Read (std::string fname, std::string dname, std::string dloc, io_strategy ios) {
+bool Matrix<T>::Read (const std::string fname, const std::string dname, const std::string dloc, const io_strategy ios) {
 
 	if (     ios == HDF5)
 		return H5Read (fname, dname, dloc);
@@ -423,7 +426,7 @@ bool Matrix<T>::Read (std::string fname, std::string dname, std::string dloc, io
 
 
 template <class T>
-bool Matrix<T>::H5Read (std::string fname, std::string dname, std::string dloc) {
+bool Matrix<T>::H5Read (const std::string fname, const std::string dname, const std::string dloc) {
 	
     if (fname != "") {
 		
@@ -441,15 +444,15 @@ bool Matrix<T>::H5Read (std::string fname, std::string dname, std::string dloc) 
 			DataSpace space   = dataset.getSpace();
 			
 			hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
-			int       ndim    = space.getSimpleExtentDims(dims, NULL);
+			size_t    ndim    = space.getSimpleExtentDims(dims, NULL);
 
 			if (typeid(T) == typeid(cplx)) 
 				ndim--;
 
-			for (int i = 0; i < ndim; i++)
+			for (size_t i = 0; i < ndim; i++)
 				_dim[i] = dims[ndim-i-1];
 			
-			for (int i = ndim; i < INVALID_DIM; i++)
+			for (size_t i = ndim; i < INVALID_DIM; i++)
 				_dim[i] = 1;
 			
 			if (nb_alloc)
@@ -459,7 +462,7 @@ bool Matrix<T>::H5Read (std::string fname, std::string dname, std::string dloc) 
 			
 
 			std::cout << "rank: " << ndim << ", dimensions: ";
-			for (int i = 0; i < ndim; i++) {
+			for (size_t i = 0; i < ndim; i++) {
 				std::cout << (unsigned long)(dims[i]);
 				if (i == ndim - 1)
 					std::cout << std::endl;
@@ -501,7 +504,7 @@ bool Matrix<T>::H5Read (std::string fname, std::string dname, std::string dloc) 
 		
 		std::ifstream fin  (fname.c_str() , std::ios::in | std::ios::binary);
 		
-		for (int i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); i++)
 			fin.read  ((char*)(&(_M[i])), sizeof(T));
 		
 		fin.close();
@@ -517,10 +520,8 @@ bool Matrix<T>::H5Read (std::string fname, std::string dname, std::string dloc) 
 	
 #ifdef HAVE_MAT_H
 
-#include "mat.h"
-
 template <class T>
-bool Matrix<T>::MXRead (std::string fname, std::string dname, std::string dloc) {
+bool Matrix<T>::MXRead (const std::string fname, const std::string dname, const std::string dloc) {
 
 	
 	// Open file ---------------------------------
@@ -545,10 +546,10 @@ bool Matrix<T>::MXRead (std::string fname, std::string dname, std::string dloc) 
 	mwSize        ndim = mxGetNumberOfDimensions(mxa);
 	const mwSize*  dim = mxGetDimensions(mxa);
 	
-	for (int i = 0; i < ndim; i++)
-		_dim[i] = (int)dim[i];
+	for (size_t i = 0; i < ndim; i++)
+		_dim[i] = (size_t)dim[i];
 	
-	for (int i = ndim; i < INVALID_DIM; i++)
+	for (size_t i = ndim; i < INVALID_DIM; i++)
 		_dim[i] = 1;
 	
 	Reset();
@@ -559,12 +560,12 @@ bool Matrix<T>::MXRead (std::string fname, std::string dname, std::string dloc) 
 	if (typeid(T) == typeid(double))
 		memcpy(_M, mxGetPr(mxa), Size() * sizeof(T));
 	else if (typeid(T) == typeid(cplx))
-		for (int i = 0; i < Size(); i++) {
+		for (size_t i = 0; i < Size(); i++) {
 			float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
 			memcpy(&_M[i], f, 2 * sizeof(float));
 		}
 	else
-		for (int i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); i++)
 			_M[i] = ((T*)mxGetPr(mxa))[i];
 	// -------------------------------------------
 
@@ -582,7 +583,11 @@ bool Matrix<T>::MXRead (std::string fname, std::string dname, std::string dloc) 
 
 
 template <class T>
-bool Matrix<T>::MXDump (std::string fname, std::string dname, std::string dloc) {
+bool Matrix<T>::MXDump (const MATFile* file, const std::string dname, const std::string dloc) const {
+}
+
+template <class T>
+bool Matrix<T>::MXDump (const std::string fname, const std::string dname, const std::string dloc) const {
 
 	// Open file ---------------------------------
 
@@ -598,7 +603,7 @@ bool Matrix<T>::MXDump (std::string fname, std::string dname, std::string dloc) 
 
 	mwSize   dim[INVALID_DIM];
 	
-	for (int i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; i++)
 		dim[i] = (mwSize)_dim[i];
 	
 	mxArray*  mxa;
@@ -617,12 +622,12 @@ bool Matrix<T>::MXDump (std::string fname, std::string dname, std::string dloc) 
 	if (typeid(T) == typeid(double))
 		memcpy(mxGetPr(mxa), _M, Size() * sizeof(T));
 	else if (typeid(T) == typeid(cplx))
-		for (int i = 0; i < Size(); i++) {
+		for (size_t i = 0; i < Size(); i++) {
 			((float*)mxGetPr(mxa))[i] = ((float*)_M)[2*i+0]; // Template compilation workaround
 			((float*)mxGetPi(mxa))[i] = ((float*)_M)[2*i+1]; // Can't use .imag() .real(). Consider double/short 
 		}
 	else
-		for (int i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); i++)
 			((T*)mxGetPr(mxa))[i] = _M[i];
 	// -------------------------------------------
 	
@@ -653,7 +658,7 @@ bool Matrix<T>::MXDump (std::string fname, std::string dname, std::string dloc) 
 
 
 template <class T>
-bool Matrix<T>::NIDump (std::string fname) {
+bool Matrix<T>::NIDump (const std::string fname) const {
 	
 	if (fname != "") {
 		
@@ -662,7 +667,7 @@ bool Matrix<T>::NIDump (std::string fname) {
 		Matrix<T>      tmp = (*this);
 		tmp.Squeeze();
 		
-		int            l   = fname.length();
+		size_t            l   = fname.length();
 		
 		nifti_1_header header;
 		header.sizeof_hdr  = 348;
@@ -673,7 +678,7 @@ bool Matrix<T>::NIDump (std::string fname) {
 			return false;
 		}
 		
-		for (int i = 0; i < 7; i++) {
+		for (size_t i = 0; i < 7; i++) {
 			header.dim   [i+1] = tmp.Dim(i);
 			header.pixdim[i+1] = tmp.Res(i);
 		}
@@ -719,7 +724,7 @@ bool Matrix<T>::NIDump (std::string fname) {
 
 
 template <class T>
-bool Matrix<T>::NIRead (std::string fname) {
+bool Matrix<T>::NIRead (const std::string fname) {
 	
 	if (fname != "") {
 		
@@ -730,7 +735,7 @@ bool Matrix<T>::NIRead (std::string fname) {
 		if (ni == NULL) 
 			return false;
 		
-		for (int i = 0; i < ni->dim[0]; i++)
+		for (size_t i = 0; i < ni->dim[0]; i++)
 			if (ni->dim[i+1] > 1) {
 				_dim[i] = ni->dim[i+1];
 				_res[i] = ni->pixdim[i+1];
@@ -742,13 +747,13 @@ bool Matrix<T>::NIRead (std::string fname) {
 			if (ni->datatype == 64)
 				memcpy (_M, ni->data, Size()*sizeof(T));
 			else 
-				for (int i = 0; i < Size(); i++ )
+				for (size_t i = 0; i < Size(); i++ )
 					_M[i] = ((float*)ni->data)[i];
 		} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(cplx)) {
 			if (ni->datatype == 32)
 				memcpy (_M, ni->data, Size()*sizeof(T));
 			else 
-				for (int i = 0; i < Size(); i++) {
+				for (size_t i = 0; i < Size(); i++) {
 					float f[2] = {((double*)ni->data)[2*i], ((double*)ni->data)[2*i+1]};
 					memcpy(&_M[i], f, 2 * sizeof(float));
 				}

@@ -63,6 +63,12 @@ ReconContext::Init             () {
 		
 		
 RRSModule::error_code
+ReconContext::Prepare             () {
+	return m_strategy->Prepare();
+}
+
+
+RRSModule::error_code
 ReconContext::Finalise     () {
 	return m_strategy->Finalise();
 }
@@ -72,7 +78,7 @@ void
 ReconContext::SetConfig        (const char* cstr) {
 	m_strategy->SetConfig(cstr);
 }
-		
+
 		
 void
 ReconContext::ReadConfig       (const char* fname) {

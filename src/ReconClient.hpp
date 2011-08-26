@@ -74,6 +74,16 @@ namespace RRClient {
 		
 
  		/**
+		 * @brief           Prepare backend
+		 *
+		 * @param  name     Recon method
+		 * @return          Error code
+		 */ 
+		error_code              
+		Prepare             (const char* name);
+		
+
+ 		/**
 		 * @brief           Initialise remote service
 		 *
 		 * @param  name     Recon method

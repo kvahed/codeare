@@ -95,23 +95,21 @@ int main (int argc, char** argv) {
 
 bool grappatest (ReconClient* rc) {
 
-	Matrix<cplx>    sig;
-	Matrix<cplx>    sens;
-	Matrix<cplx>    acs;
+	Matrix<cplx> sig;
+	Matrix<cplx> acs;
 	
-	std::string    cf  = std::string (base + std::string(config));
-	std::string    df  = std::string (base + std::string(data));
+	std::string cf = std::string (base + std::string(config));
+	std::string df = std::string (base + std::string(data));
 
 	sig.MXRead  (df, "data", "");
-	sens.MXRead (df, "sensitivities", "");
-	acs.MXRead  (df, "acs", "");
+	acs.MXRead  (df, "acs",  "");
 
 	rc->ReadConfig (cf.c_str());
-
+	
 	rc->Init (test);
-	rc->SetCplx  ("data", sig); // Measurement data
-	rc->SetCplx  ("sens", sens);
 	rc->SetCplx  ("acs",  acs);
+	rc->Prepare (test);
+	rc->SetCplx  ("data", sig); // Measurement data
 	rc->Process (test);
 	rc->GetCplx  ("data", sig);
 	rc->Finalise (test);

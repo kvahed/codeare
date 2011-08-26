@@ -131,15 +131,18 @@ ReconClient::Init (const char* name) {
 
 
 error_code 
+ReconClient::Prepare  (const char* name)  {
+    
+    return m_rrsi->Prepare (m_rstrats.back());
+    
+}
+
+
+
+error_code 
 ReconClient::Process  (const char* name)  {
     
-    error_code  result  = OK;
-
-	// Actually process data
-    result    = m_rrsi->Process (m_rstrats.back());
-	SetConfig (m_rrsi->config());
-
-    return result;
+    return  m_rrsi->Process (m_rstrats.back());
     
 }
 

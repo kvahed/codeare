@@ -23,14 +23,12 @@
 
 using namespace RRServer;
 
-/**************************************************************************************************/
 ReconServant::ReconServant  () : 
 	m_config (new char) {
 
 }
 
 
-/**************************************************************************************************/
 ReconServant::~ReconServant ()               {
 
 	this->Finalise (-1);
@@ -39,7 +37,6 @@ ReconServant::~ReconServant ()               {
 }
 
 
-/**************************************************************************************************/
 short
 ReconServant::Init (const char* name) {
 
@@ -66,7 +63,6 @@ ReconServant::Init (const char* name) {
 }
 
 
-/**************************************************************************************************/
 error_code
 ReconServant::Finalise (const short s) {
 
@@ -89,7 +85,6 @@ ReconServant::Finalise (const short s) {
 }
 
 
-/**************************************************************************************************/
 error_code
 ReconServant::Process  (const short s)       {
 
@@ -102,7 +97,18 @@ ReconServant::Process  (const short s)       {
 }
 
 
-/**************************************************************************************************/
+error_code
+ReconServant::Prepare  (const short s)       {
+	
+	std::cout << "Preparing ... " << std::endl;
+	error_code e = m_contexts.at(s)->Prepare();
+	std::cout << "... done. " << std::endl;
+	
+	return e;
+	
+}
+
+
 void
 ReconServant::set_cplx  (const char* name, const cplx_data& d)   {
 
@@ -111,7 +117,6 @@ ReconServant::set_cplx  (const char* name, const cplx_data& d)   {
 }
 
 
-/**************************************************************************************************/
 cplx_data*
 ReconServant::get_cplx         (const char* name)                    {
 
@@ -123,7 +128,6 @@ ReconServant::get_cplx         (const char* name)                    {
 }
 
 
-/**************************************************************************************************/
 void
 ReconServant::set_real       (const char* name, const real_data& d)   {
 
@@ -132,7 +136,6 @@ ReconServant::set_real       (const char* name, const real_data& d)   {
 }
 
 
-/**************************************************************************************************/
 real_data*
 ReconServant::get_real       (const char* name)                    {
 
@@ -144,7 +147,6 @@ ReconServant::get_real       (const char* name)                    {
 }
 
 
-/**************************************************************************************************/
 void
 ReconServant::set_pixel        (const char* name, const pixel_data& d) {
 
@@ -153,7 +155,6 @@ ReconServant::set_pixel        (const char* name, const pixel_data& d) {
 }
 
 
-/**************************************************************************************************/
 pixel_data*
 ReconServant::get_pixel        (const char* name)                    {
 
@@ -165,7 +166,6 @@ ReconServant::get_pixel        (const char* name)                    {
 }
 
 
-/**************************************************************************************************/
 void 
 ReconServant::config       (const char* d)    {
 
@@ -178,7 +178,6 @@ ReconServant::config       (const char* d)    {
 }
 
 
-/**************************************************************************************************/
 char* 
 ReconServant::config       ()                    {
 
