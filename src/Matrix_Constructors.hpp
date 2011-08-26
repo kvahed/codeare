@@ -3,12 +3,12 @@ Matrix<T>::Matrix () {
 
 	nb_alloc = 0;
 
-    for (int i = 0; i < INVALID_DIM; i++)
+    for (size_t i = 0; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
     _M = (T*) malloc (Size()*sizeof(T));
 
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[i] = T(0.0);
 
     nb_alloc++;
@@ -19,22 +19,22 @@ Matrix<T>::Matrix () {
 
 
 template <class T> 
-Matrix<T>::Matrix (const int n) {
+Matrix<T>::Matrix (const size_t n) {
 
 	nb_alloc = 0;
 
 	_dim [COL] = n;
 	_dim [LIN] = n;
 
-    for (int i = CHA; i < INVALID_DIM; i++)
+    for (size_t i = CHA; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    for (int i = 0; i < INVALID_DIM; i++)
+    for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
     _M = (T*) malloc (n*n*sizeof(T));
 
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[i] = T(0.0);
 
     nb_alloc++;
@@ -44,22 +44,22 @@ Matrix<T>::Matrix (const int n) {
 
 
 template <class T> 
-Matrix<T>::Matrix (const int m, const int n) {
+Matrix<T>::Matrix (const size_t m, const size_t n) {
 
 	nb_alloc = 0;
 
 	_dim [0] = m;
 	_dim [1] = n;
 
-    for (int i = 2; i < INVALID_DIM; i++)
+    for (size_t i = 2; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    for (int i = 0; i < INVALID_DIM; i++)
+    for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
     _M = (T*) malloc (Size()*sizeof(T));
 
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
 
     nb_alloc++;
@@ -69,7 +69,7 @@ Matrix<T>::Matrix (const int m, const int n) {
 
 
 template <class T> 
-Matrix<T>::Matrix (const int m, const int n, const int k) {
+Matrix<T>::Matrix (const size_t m, const size_t n, const size_t k) {
 
 	nb_alloc = 0;
 
@@ -77,15 +77,15 @@ Matrix<T>::Matrix (const int m, const int n, const int k) {
 	_dim [1] = n;
 	_dim [2] = k;
 
-    for (int i = 3; i < INVALID_DIM; i++)
+    for (size_t i = 3; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    for (int i = 0; i < INVALID_DIM; i++)
+    for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
     _M = (T*) malloc (Size()*sizeof(T));
 
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
 
     nb_alloc++;
@@ -95,10 +95,10 @@ Matrix<T>::Matrix (const int m, const int n, const int k) {
 
 
 template <class T>
-Matrix<T>::Matrix (const int col, const int lin, const int cha, const int set, 
-                   const int eco, const int phs, const int rep, const int seg, 
-                   const int par, const int slc, const int ida, const int idb, 
-                   const int idc, const int idd, const int ide, const int ave) {
+Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const size_t set, 
+                   const size_t eco, const size_t phs, const size_t rep, const size_t seg, 
+                   const size_t par, const size_t slc, const size_t ida, const size_t idb, 
+                   const size_t idc, const size_t idd, const size_t ide, const size_t ave) {
 
 	nb_alloc = 0;
 
@@ -119,12 +119,12 @@ Matrix<T>::Matrix (const int col, const int lin, const int cha, const int set,
     _dim[IDE] = ide;
     _dim[AVE] = ave;
 
-    for (int i = 0; i < INVALID_DIM; i++)
+    for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
     _M = (T*) malloc (Size() * sizeof (T));
 
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
 
     nb_alloc++;
@@ -135,19 +135,19 @@ Matrix<T>::Matrix (const int col, const int lin, const int cha, const int set,
 
 
 template <class T>
-Matrix<T>::Matrix (const int* dim) {
+Matrix<T>::Matrix (const size_t* dim) {
 
 	nb_alloc = 0;
 
-	for (int i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; i++)
 		_dim[i] = dim[i];
 
-    for (int i = 0; i < INVALID_DIM; i++)
+    for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
     _M = (T*) malloc (Size() * sizeof (T));
 
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
 
     nb_alloc++;
@@ -161,10 +161,10 @@ Matrix<T>::Matrix (const Matrix<T> &M) {
 	
 	nb_alloc = 0;
 	
-	for (int i = 0; i < INVALID_DIM; i++) 
+	for (size_t i = 0; i < INVALID_DIM; i++) 
 		_dim[i] = M.Dim(i);
 	
-    for (int i = 0; i < INVALID_DIM; i++)
+    for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
 	_M = (T*) malloc (Size() * sizeof (T));
@@ -195,11 +195,11 @@ Matrix<T>::~Matrix() {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Id (const int n) {
+Matrix<T> Matrix<T>::Id (const size_t n) {
 
  	static Matrix<T> M (n);
 
- 	for (int i = 0; i < n; i++)
+ 	for (size_t i = 0; i < n; i++)
  		M[i*n+i] = T(1.0);
 
  	return M;
@@ -209,11 +209,11 @@ Matrix<T> Matrix<T>::Id (const int n) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Ones (const int m, const int n, const int l) {
+Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n, const size_t l) {
 
  	static Matrix<T> M (m,n,l);
 
- 	for (int i = 0; i < M.Size(); i++)
+ 	for (size_t i = 0; i < M.Size(); i++)
  		M[i] = T(1.0);
 
  	return M;
@@ -223,11 +223,11 @@ Matrix<T> Matrix<T>::Ones (const int m, const int n, const int l) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Ones (const int m, const int n) {
+Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n) {
 
  	static Matrix<T> M (m,n);
 
- 	for (int i = 0; i < M.Size(); i++)
+ 	for (size_t i = 0; i < M.Size(); i++)
  		M[i] = T(1.0);
 
  	return M;
@@ -237,7 +237,7 @@ Matrix<T> Matrix<T>::Ones (const int m, const int n) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Ones (const int n) {
+Matrix<T> Matrix<T>::Ones (const size_t n) {
 
  	return Ones(n,n);
 
@@ -246,11 +246,11 @@ Matrix<T> Matrix<T>::Ones (const int n) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Zeros (const int n, const int m, const int l) {
+Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m, const size_t l) {
 
  	static Matrix<T> M (m,n,l);
 
- 	for (int i = 0; i < M.Size(); i++)
+ 	for (size_t i = 0; i < M.Size(); i++)
  		M[i] = T(0.0);
 
  	return M;
@@ -260,11 +260,11 @@ Matrix<T> Matrix<T>::Zeros (const int n, const int m, const int l) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Zeros (const int n, const int m) {
+Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m) {
 
  	static Matrix<T> M (m,n);
 
- 	for (int i = 0; i < M.Size(); i++)
+ 	for (size_t i = 0; i < M.Size(); i++)
  		M[i] = T(0.0);
 
  	return M;
@@ -274,7 +274,7 @@ Matrix<T> Matrix<T>::Zeros (const int n, const int m) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Zeros (const int n) {
+Matrix<T> Matrix<T>::Zeros (const size_t n) {
 
  	return Zeros(n,n);
 
@@ -283,7 +283,7 @@ Matrix<T> Matrix<T>::Zeros (const int n) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Circle (const float* p, const int n) {
+Matrix<T> Matrix<T>::Circle (const float* p, const size_t n) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n);
 
@@ -295,8 +295,8 @@ Matrix<T> Matrix<T>::Circle (const float* p, const int n) {
 	m[0] = (1.0 - p[1]) * float(n) / 2.0;
 	m[1] = (1.0 - p[2]) * float(n) / 2.0;
 
-	for (int r = 0; r < res.Dim(1); r++)
-		for (int c = 0; c < res.Dim(0); c++)
+	for (size_t r = 0; r < res.Dim(1); r++)
+		for (size_t c = 0; c < res.Dim(0); c++)
 			res(c,r) = ( pow(((float)c-m[0])/rad, 2.0 ) + pow(((float)r-m[0])/rad, 2.0) <= 1.0) ? T(1.0) : T(0.0);
 
 	return res;
@@ -306,7 +306,7 @@ Matrix<T> Matrix<T>::Circle (const float* p, const int n) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Sphere (const float* p, const int n) {
+Matrix<T> Matrix<T>::Sphere (const float* p, const size_t n) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
 
@@ -319,9 +319,9 @@ Matrix<T> Matrix<T>::Sphere (const float* p, const int n) {
 	m[1] = (1.0 - p[2]) * float(n) / 2.0;
 	m[2] = (1.0 - p[3]) * float(n) / 2.0;
 
-	for (int s = 0; s < res.Dim(2); s++)
-		for (int r = 0; r < res.Dim(1); r++)
-			for (int c = 0; c < res.Dim(0); c++)
+	for (size_t s = 0; s < res.Dim(2); s++)
+		for (size_t r = 0; r < res.Dim(1); r++)
+			for (size_t c = 0; c < res.Dim(0); c++)
 				res(c,r) = ( pow (((float)c-m[0])/rad, 2.0) + pow (((float)r-m[1])/rad, 2.0) + pow (((float)s-m[2])/rad, 2.0) <= 1.0) ? T(1.0) : T(0.0);
 
 	return res;
@@ -331,7 +331,7 @@ Matrix<T> Matrix<T>::Sphere (const float* p, const int n) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Ellipse (const float* p, const int n, const T v) {
+Matrix<T> Matrix<T>::Ellipse (const float* p, const size_t n, const T v) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n);
 
@@ -350,13 +350,13 @@ Matrix<T> Matrix<T>::Ellipse (const float* p, const int n, const T v) {
 #pragma omp parallel default (shared) 
 	{
 		
-		int tid      = omp_get_thread_num();
-		int chunk    = n / omp_get_num_threads();
+		size_t tid      = omp_get_thread_num();
+		size_t chunk    = n / omp_get_num_threads();
 		
 #pragma omp for schedule (dynamic, chunk) 
 		
-	for (int r = 0; r < n; r++)
-		for (int c = 0; c < n; c++)
+	for (size_t r = 0; r < n; r++)
+		for (size_t c = 0; c < n; c++)
 			res(c,r) = (pow( (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1], 2.0 ) + 
 						pow( (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0], 2.0) <= 1.0) ? v : T(0.0);
 
@@ -369,7 +369,7 @@ Matrix<T> Matrix<T>::Ellipse (const float* p, const int n, const T v) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n, const T v) {
+Matrix<T> Matrix<T>::Ellipsoid (const float* p, const size_t n, const T v) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
 
@@ -391,14 +391,14 @@ Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n, const T v) {
 #pragma omp parallel default (shared) 
 	{
 		
-		int tid      = omp_get_thread_num();
-		int chunk    = n / omp_get_num_threads();
+		size_t tid      = omp_get_thread_num();
+		size_t chunk    = n / omp_get_num_threads();
 		
 #pragma omp for schedule (dynamic, chunk) 
 		
-		for (int s = 0; s < n; s++)
-			for (int r = 0; r < n; r++)
-				for (int c = 0; c < n; c++)
+		for (size_t s = 0; s < n; s++)
+			for (size_t r = 0; r < n; r++)
+				for (size_t c = 0; c < n; c++)
 					res(c,r,s) = ( pow( (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1], 2.0) + 
 								   pow( (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0], 2.0) +
 								   pow( ((float)s-m[2])/a[2], 2.0) <= 1.0) ? v : T(0.0);
@@ -412,10 +412,10 @@ Matrix<T> Matrix<T>::Ellipsoid (const float* p, const int n, const T v) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Phantom2D (const int n) {
+Matrix<T> Matrix<T>::Phantom2D (const size_t n) {
 
-	const int ne = 10; // Number of ellipses
-	const int np = 5;  // Number of geometrical parameters
+	const size_t ne = 10; // Number of ellipses
+	const size_t np = 5;  // Number of geometrical parameters
 
 	float p[ne][np] = {
 		{ 0.6900, 0.9200,  0.00,  0.0000,  0.0 },
@@ -430,14 +430,14 @@ Matrix<T> Matrix<T>::Phantom2D (const int n) {
 		{ 0.0230, 0.0460, -0.06, -0.6050,  0.0 }
 	};
 
-	// Intensities
+	// Size_Tensities
 	T v[ne] = {T(1.0), T(-0.8), T(-0.2), T(-0.2), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1)};
 
 	// Empty matrix
 	static Matrix<T> res = Matrix<T>::Zeros(n);
 	Matrix<T>        e;
 
-	for (int i = 0; i < ne; i++) {
+	for (size_t i = 0; i < ne; i++) {
 		e    = Matrix<T>::Ellipse (p[i], n, v[i]);
 		res += e;
 	}
@@ -449,10 +449,10 @@ Matrix<T> Matrix<T>::Phantom2D (const int n) {
 
 
 template <class T>
-Matrix<T> Matrix<T>::Phantom3D (const int n) {
+Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
 
-	const int ne = 10; // Number of ellipses
-	const int np =  9; // Number of geometrical parameters
+	const size_t ne = 10; // Number of ellipses
+	const size_t np =  9; // Number of geometrical parameters
 
 	float p[ne][np] = {
 		{ 0.690, 0.920, 0.900,  0.00,  0.000,  0.000,  0.0, 0.0, 0.0 },
@@ -472,7 +472,7 @@ Matrix<T> Matrix<T>::Phantom3D (const int n) {
 	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
 	Matrix<T> e;
 	
-	for (int i = 0; i < ne; i++) {
+	for (size_t i = 0; i < ne; i++) {
 		e    = Matrix<T>::Ellipsoid (p[i], n, v[i]);
 		res += e;
 	}
@@ -490,12 +490,12 @@ Matrix<double> Matrix<cplx>::Real () const {
 #pragma omp parallel default (shared) 
 	{
 		
-		int tid      = omp_get_thread_num();
-		int chunk    = Size() / omp_get_num_threads();
+		size_t tid      = omp_get_thread_num();
+		size_t chunk    = Size() / omp_get_num_threads();
 		
 #pragma omp for 
 		
-		for (int i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); i++)
 			res[i] = _M[i].real();
 
 	}		
@@ -512,12 +512,12 @@ Matrix<double> Matrix<cplx>::Imag () const {
 #pragma omp parallel default (shared) 
 	{
 		
-		int tid      = omp_get_thread_num();
-		int chunk    = Size() / omp_get_num_threads();
+		size_t tid      = omp_get_thread_num();
+		size_t chunk    = Size() / omp_get_num_threads();
 		
 #pragma omp for 
 		
-		for (int i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); i++)
 			res[i] = _M[i].imag();
 
 	}		

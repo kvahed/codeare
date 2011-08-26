@@ -76,6 +76,16 @@ namespace RRServer {
 
 		
 		/**
+		 * @brief      Prepare startegy (Needs initialisation @see Init)
+		 *
+		 * @param s    sth Initialised strategy
+		 * @return     Sucess
+		 */
+		virtual error_code
+		Prepare        (const short s);
+
+		
+		/**
 		 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
 		 * 
 		 * @param name Name of processing library

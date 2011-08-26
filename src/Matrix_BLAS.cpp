@@ -48,15 +48,15 @@ Matrix<T>::GEMM (Matrix<T>& M, char transb) {
 	
 	char transa = 'N';
 	
-    int  m      =   Dim(0);
-    int  n      = M.Dim(1);
-    int  k      =   Dim(1);
-	int  lda    =   m;
-	int  ldb    =   k;
-	int  ldc    =   m;
+    int  m      = (int)   Dim(0);
+    int  n      = (int )M.Dim(1);
+    int  k      = (int)   Dim(1);
+	int  lda    = (int)   m;
+	int  ldb    = (int)   k;
+	int  ldc    = (int)   m;
 	
-	T    alpha  =   T(1.0);
-	T    beta   =   T(0.0);
+	T    alpha  =         T(1.0);
+	T    beta   =         T(0.0);
 	
 	Matrix<T> res (m, (transb == 'N') ? M.Dim(1) : M.Dim(0));
 	
@@ -77,7 +77,7 @@ Matrix<T>::Norm () const {
 	
 	T   res   = T(0.0);
 	
-	int n    = Size();
+	int n    = (int) Size();
 	int incx = 1;
 	
 	if      (typeid(T) == typeid(   cplx)) res = cblas_scnrm2 (n, _M, incx);
@@ -94,13 +94,13 @@ Matrix<T>::Norm () const {
 }
 
 
-template<class T>
+template<class T> 
 T 
 Matrix<T>::dotc (Matrix<T>& M) const {
 	
 	T   res  = T(0.0);
 	
-	int n    = Size();
+	int n    = (int) Size();
 	int incx = 1;
 	
 	if (typeid(T) == typeid(cplx))

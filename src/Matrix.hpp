@@ -50,6 +50,10 @@ enum IceDim {
 #define ICE_SHRT_MAX 4095
 
 
+#ifdef HAVE_MAT_H
+#include "mat.h"
+#endif
+
 /**
  * @brief raw data
  */
@@ -161,7 +165,7 @@ public:
 	 * @param  dim      All 16 Dimensions
 	 */
 	inline 
-	Matrix              (const int* dim);
+	Matrix              (const size_t* dim);
 	
 	
     /**
@@ -170,7 +174,7 @@ public:
 	 * @param  n        Rows & Columns
 	 */
     inline              
-    Matrix              (const int n) ;
+    Matrix              (const size_t n) ;
     
     
     /**
@@ -180,7 +184,7 @@ public:
 	 * @param  n        Columns
 	 */
 	inline 
-	Matrix              (const int m, const int n);
+	Matrix              (const size_t m, const size_t n);
 	
     
     /**
@@ -191,7 +195,7 @@ public:
 	 * @param  k        Slices
 	 */
 	inline 
-	Matrix              (const int m, const int n, const int k);
+	Matrix              (const size_t m, const size_t n, const size_t k);
 	
 
     /**
@@ -215,22 +219,22 @@ public:
      * @param  ave      Averages
 	 */
 	inline 
-	Matrix              (const int col, 
-						 const int lin, 
-						 const int cha,
-						 const int set,
-						 const int eco = 1,
-						 const int phs = 1,
-						 const int rep = 1,
-						 const int seg = 1,
-						 const int par = 1,
-						 const int slc = 1,
-						 const int ida = 1,
-						 const int idb = 1,
-						 const int idc = 1,
-						 const int idd = 1,
-						 const int ide = 1,
-						 const int ave = 1);
+	Matrix              (const size_t col, 
+						 const size_t lin, 
+						 const size_t cha,
+						 const size_t set,
+						 const size_t eco = 1,
+						 const size_t phs = 1,
+						 const size_t rep = 1,
+						 const size_t seg = 1,
+						 const size_t par = 1,
+						 const size_t slc = 1,
+						 const size_t ida = 1,
+						 const size_t idb = 1,
+						 const size_t idc = 1,
+						 const size_t idd = 1,
+						 const size_t ide = 1,
+						 const size_t ave = 1);
 	
 
     
@@ -256,7 +260,7 @@ public:
 	 * @return          nxn identity
 	 */
 	static Matrix<T> 
-	Id                  (const int n);
+	Id                  (const size_t n);
 	
 	
 	/**
@@ -266,7 +270,7 @@ public:
 	 * @return          nxn ones
 	 */
 	static Matrix<T> 
-	Ones                (const int n);
+	Ones                (const size_t n);
 	
 	
 	/**
@@ -277,7 +281,7 @@ public:
 	 * @return          mxn ones
 	 */
 	static Matrix<T> 
-	Ones                (const int m, const int n);
+	Ones                (const size_t m, const size_t n);
 	
 	
 	/**
@@ -289,7 +293,7 @@ public:
 	 * @return          nxn ones
 	 */
 	static Matrix<T> 
-	Ones                (const int m, const int n, const int l);
+	Ones                (const size_t m, const size_t n, const size_t l);
 	
 	
 	/**
@@ -299,7 +303,7 @@ public:
 	 * @return          nxn zeros
 	 */
 	static Matrix<T> 
-	Zeros               (const int n);
+	Zeros               (const size_t n);
 	
 	
 	/**
@@ -310,7 +314,7 @@ public:
 	 * @return          nxn zeros
 	 */
 	static Matrix<T> 
-	Zeros               (const int m, const int n);
+	Zeros               (const size_t m, const size_t n);
 	
 	
 	/**
@@ -322,7 +326,7 @@ public:
 	 * @return          nxn zeros
 	 */
 	static Matrix<T> 
-	Zeros               (const int m, const int n, const int l);
+	Zeros               (const size_t m, const size_t n, const size_t l);
 
 	
 	/**
@@ -333,7 +337,7 @@ public:
 	 * @return          nxn zeros
 	 */
 	static Matrix<T> 
-	Phantom2D           (const int n);
+	Phantom2D           (const size_t n);
 	
 	
 	/**
@@ -344,7 +348,7 @@ public:
 	 * @return          nxn zeros
 	 */
 	static Matrix<T> 
-	Phantom3D           (const int n);
+	Phantom3D           (const size_t n);
 	
 	
 	/**
@@ -355,18 +359,18 @@ public:
 	 * @return          Matrix including ellipsoid
 	 */
 	static Matrix<T> 
-	Circle              (const float* p, const int n);
+	Circle              (const float* p, const size_t n);
 	
 	
 	/**
 	 * @brief           Create sphere of ones in 3D cubic Matrix
 	 *
-	 * @param   p       Parameter array. Must hold r, x0, y0, z0, intensity.
+	 * @param   p       Parameter array. Must hold r, x0, y0, z0, size_tensity.
 	 * @param   n       Size of cube
 	 * @return          Matrix including ellipsoid
 	 */
 	static Matrix<T> 
-	Sphere              (const float* p, const int n);
+	Sphere              (const float* p, const size_t n);
 	
 	
 	/**
@@ -378,7 +382,7 @@ public:
 	 * @return          Matrix including ellipsoid
 	 */
 	static Matrix<T> 
-	Ellipsoid           (const float* p, const int n, const T v = T(1.0));
+	Ellipsoid           (const float* p, const size_t n, const T v = T(1.0));
 	
 	
 	/**
@@ -390,7 +394,7 @@ public:
 	 * @return          Matrix including ellipsoid
 	 */
 	static Matrix<T> 
-	Ellipse             (const float* p, const int n, const T v = T(1.0));
+	Ellipse             (const float* p, const size_t n, const T v = T(1.0));
 	
 	
     //@}
@@ -469,7 +473,7 @@ public:
      * @return          Value at _M[p].
      */
     T                   
-    operator[]          (const int p)                             const;
+    operator[]          (const size_t p)                             const;
     
     
     /**
@@ -479,7 +483,7 @@ public:
      * @return          Reference to _M[p].
      */
     T                   
-    &operator[]         (const int p)                              ;
+    &operator[]         (const size_t p)                              ;
 
     
     /**
@@ -500,7 +504,7 @@ public:
      * @return          Value at _M[pos]
      */
     inline T            
-    At                  (const int pos)  const {
+    At                  (const size_t pos)  const {
 
         return _M[pos];
 
@@ -515,7 +519,7 @@ public:
      * @return           Reference to _M[pos]
      */
     inline T&           
-    At                  (const int pos) {
+    At                  (const size_t pos) {
 
         return _M[pos];
 
@@ -531,7 +535,7 @@ public:
      * @return          Value at _M[col + _dim[LIN]*lin]
      */
     inline T            
-    At                  (const int col, const int lin) const {
+    At                  (const size_t col, const size_t lin) const {
 
         return _M[col + _dim[COL]*lin ];
 
@@ -547,7 +551,7 @@ public:
      * @return           Reference to _M[col + _dim[LIN]*lin]
      */
     inline T&           
-    At                  (int col, int lin) {
+    At                  (size_t col, size_t lin) {
 
         return _M[col + _dim[COL]*lin ];
 
@@ -564,7 +568,7 @@ public:
      * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T            
-    At                   (int col, int lin, int slc)  const {
+    At                   (size_t col, size_t lin, size_t slc)  const {
 
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
 
@@ -581,7 +585,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&            
-    At                   (int col, int lin, int slc) {
+    At                   (size_t col, size_t lin, size_t slc) {
 
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
 
@@ -611,22 +615,22 @@ public:
      * @return           Value at position
      */
     inline T            
-    At                   (const int col, 
-						  const int lin, 
-						  const int cha,
-						  const int set,
-						  const int eco,
-						  const int phs = 0,
-						  const int rep = 0,
-						  const int seg = 0,
-						  const int par = 0,
-						  const int slc = 0,
-						  const int ida = 0,
-						  const int idb = 0,
-						  const int idc = 0,
-						  const int idd = 0,
-						  const int ide = 0,
-						  const int ave = 0) const {
+    At                   (const size_t col, 
+						  const size_t lin, 
+						  const size_t cha,
+						  const size_t set,
+						  const size_t eco,
+						  const size_t phs = 0,
+						  const size_t rep = 0,
+						  const size_t seg = 0,
+						  const size_t par = 0,
+						  const size_t slc = 0,
+						  const size_t ida = 0,
+						  const size_t idb = 0,
+						  const size_t idc = 0,
+						  const size_t idd = 0,
+						  const size_t ide = 0,
+						  const size_t ave = 0) const {
 		return _M [col+
 				   lin*_dim[COL]+
 				   cha*_dim[COL]*_dim[LIN]+
@@ -669,22 +673,22 @@ public:
      * @return           Reference to position
      */
 	inline T&            
-    At                   (const int col, 
-						  const int lin, 
-						  const int cha,
-						  const int set,
-						  const int eco = 0,
-						  const int phs = 0,
-						  const int rep = 0,
-						  const int seg = 0,
-						  const int par = 0,
-						  const int slc = 0,
-						  const int ida = 0,
-						  const int idb = 0,
-						  const int idc = 0,
-						  const int idd = 0,
-						  const int ide = 0,
-						  const int ave = 0) {
+    At                   (const size_t col, 
+						  const size_t lin, 
+						  const size_t cha,
+						  const size_t set,
+						  const size_t eco = 0,
+						  const size_t phs = 0,
+						  const size_t rep = 0,
+						  const size_t seg = 0,
+						  const size_t par = 0,
+						  const size_t slc = 0,
+						  const size_t ida = 0,
+						  const size_t idb = 0,
+						  const size_t idc = 0,
+						  const size_t idd = 0,
+						  const size_t ide = 0,
+						  const size_t ave = 0) {
 
 		return _M [col+
 				   lin*_dim[COL]+
@@ -730,22 +734,22 @@ public:
      * @return          Reference to position
 	 */
 	Matrix <T>
-	Reshape             (const int col, 
-						 const int lin, 
-						 const int cha = 1,
-						 const int set = 1,
-						 const int eco = 1,
-						 const int phs = 1,
-						 const int rep = 1,
-						 const int seg = 1,
-						 const int par = 1,
-						 const int slc = 1,
-						 const int ida = 1,
-						 const int idb = 1,
-						 const int idc = 1,
-						 const int idd = 1,
-						 const int ide = 1,
-						 const int ave = 1) const {
+	Reshape             (const size_t col, 
+						 const size_t lin, 
+						 const size_t cha = 1,
+						 const size_t set = 1,
+						 const size_t eco = 1,
+						 const size_t phs = 1,
+						 const size_t rep = 1,
+						 const size_t seg = 1,
+						 const size_t par = 1,
+						 const size_t slc = 1,
+						 const size_t ida = 1,
+						 const size_t idb = 1,
+						 const size_t idc = 1,
+						 const size_t idd = 1,
+						 const size_t ide = 1,
+						 const size_t ave = 1) const {
 		
 		Matrix<T> res = (*this);
 		res.reshape (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
@@ -777,24 +781,24 @@ public:
      * @return          Reference to position
 	 */
 	void
-	Reshape             (const int col, 
-						 const int lin, 
-						 const int cha = 1,
-						 const int set = 1,
-						 const int eco = 1,
-						 const int phs = 1,
-						 const int rep = 1,
-						 const int seg = 1,
-						 const int par = 1,
-						 const int slc = 1,
-						 const int ida = 1,
-						 const int idb = 1,
-						 const int idc = 1,
-						 const int idd = 1,
-						 const int ide = 1,
-						 const int ave = 1) {
+	Reshape             (const size_t col, 
+						 const size_t lin, 
+						 const size_t cha = 1,
+						 const size_t set = 1,
+						 const size_t eco = 1,
+						 const size_t phs = 1,
+						 const size_t rep = 1,
+						 const size_t seg = 1,
+						 const size_t par = 1,
+						 const size_t slc = 1,
+						 const size_t ida = 1,
+						 const size_t idb = 1,
+						 const size_t idc = 1,
+						 const size_t idd = 1,
+						 const size_t ide = 1,
+						 const size_t ave = 1) {
 		
-		int new_size = col * lin * cha * set * eco * phs * rep * 
+		size_t new_size = col * lin * cha * set * eco * phs * rep * 
 			seg * par * slc * ida * idb * idc * idd * ide * ave;
 
 		// Can't allow change of #elements
@@ -827,7 +831,7 @@ public:
      * @return          Requested scalar value.
      */
     T                  
-    operator()          (const int p) const;
+    operator()          (const size_t p) const;
 
     
     /**
@@ -837,7 +841,7 @@ public:
      * @return          Requested scalar value.
      */
     T&                 
-    operator()          (const int p) ;
+    operator()          (const size_t p) ;
 
     
     /**
@@ -848,7 +852,7 @@ public:
 	 * @return          Value at _M[col + _dim[LIN]*lin]
 	 */
     T
-    operator()          (const int col, const int lin) const {
+    operator()          (const size_t col, const size_t lin) const {
         return _M[col + _dim[LIN]*lin ];
     }
     
@@ -861,7 +865,7 @@ public:
 	 * @return          Reference to _M[col + _dim[LIN]*lin]
 	 */
     T&                  
-    operator()           (const int col, const int lin) {
+    operator()           (const size_t col, const size_t lin) {
         return _M[col + _dim[LIN]*lin ];
     }
     
@@ -875,7 +879,7 @@ public:
      * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     T                  
-    operator()           (const int col, const int lin, const int slc) const {
+    operator()           (const size_t col, const size_t lin, const size_t slc) const {
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
     }
     
@@ -890,28 +894,28 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     T&                 
-    operator()           (const int col, const int lin, const int slc) {
+    operator()           (const size_t col, const size_t lin, const size_t slc) {
            return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
     }
     
 
 	T&                 
-    operator()           (const int col, 
-						  const int lin, 
-						  const int cha,
-						  const int set,
-						  const int eco = 0,
-						  const int phs = 0,
-						  const int rep = 0,
-						  const int seg = 0,
-						  const int par = 0,
-						  const int slc = 0,
-						  const int ida = 0,
-						  const int idb = 0,
-						  const int idc = 0,
-						  const int idd = 0,
-						  const int ide = 0,
-						  const int ave = 0) { 
+    operator()           (const size_t col, 
+						  const size_t lin, 
+						  const size_t cha,
+						  const size_t set,
+						  const size_t eco = 0,
+						  const size_t phs = 0,
+						  const size_t rep = 0,
+						  const size_t seg = 0,
+						  const size_t par = 0,
+						  const size_t slc = 0,
+						  const size_t ida = 0,
+						  const size_t idb = 0,
+						  const size_t idc = 0,
+						  const size_t idd = 0,
+						  const size_t ide = 0,
+						  const size_t ave = 0) { 
 
 		return _M [col+
 				   lin*_dim[COL]+
@@ -933,22 +937,22 @@ public:
 	}
 
 	T
-    operator()           (const int col, 
-						  const int lin, 
-						  const int cha,
-						  const int set,
-						  const int eco = 0,
-						  const int phs = 0,
-						  const int rep = 0,
-						  const int seg = 0,
-						  const int par = 0,
-						  const int slc = 0,
-						  const int ida = 0,
-						  const int idb = 0,
-						  const int idc = 0,
-						  const int idd = 0,
-						  const int ide = 0,
-						  const int ave = 0) const { 
+    operator()           (const size_t col, 
+						  const size_t lin, 
+						  const size_t cha,
+						  const size_t set,
+						  const size_t eco = 0,
+						  const size_t phs = 0,
+						  const size_t rep = 0,
+						  const size_t seg = 0,
+						  const size_t par = 0,
+						  const size_t slc = 0,
+						  const size_t ida = 0,
+						  const size_t idb = 0,
+						  const size_t idc = 0,
+						  const size_t idd = 0,
+						  const size_t ide = 0,
+						  const size_t ave = 0) const { 
 		
 		return _M [col+
 				   lin*_dim[COL]+
@@ -988,7 +992,7 @@ public:
      * @return           Copy data into new vector
      */
     Matrix <T>           
-    Row                  (const int r) const;
+    Row                  (const size_t r) const;
 	
     
     /**
@@ -998,7 +1002,7 @@ public:
      * @return           Copy data into new vector
      */
     Matrix <T>           
-    Column               (const int c) const;
+    Column               (const size_t c) const;
 	
     /**
      * @brief            Operates only on inner 3D: Get a slice of data
@@ -1007,7 +1011,7 @@ public:
      * @return           Copy data into new matrix and return
      */
     Matrix <T>           
-    Slice                (const int s) const;
+    Slice                (const size_t s) const;
 	
     /**
      * @brief            Operates only on inner 3D: Get a slice of data
@@ -1016,7 +1020,7 @@ public:
      * @return           Copy data into new matrix and return
      */
     Matrix <T>           
-    Volume               (const int v) const;
+    Volume               (const size_t v) const;
 	
 
 	//@}
@@ -1033,7 +1037,7 @@ public:
      *
      * @return          Number of rows.
      */
-    inline int                 
+    inline size_t                 
     Height              () const {return _dim[0];}
     
     
@@ -1042,7 +1046,7 @@ public:
      *
      * @return          Number of rows.
      */
-    inline int&
+    inline size_t&
     Height              () {return _dim[0];}
     
     
@@ -1051,7 +1055,7 @@ public:
      *
      * @return          Number of columns.
      */
-    inline int                 
+    inline size_t                 
     Width               () const {return _dim[1];}
     
     
@@ -1060,7 +1064,7 @@ public:
      *
      * @return          Number of columns.
      */
-    inline int&
+    inline size_t&
     Width               ()  {return _dim[1];}
     
     
@@ -1069,7 +1073,7 @@ public:
      *
      * @return          Number of rows.
      */
-    int                 
+    size_t                 
     m                   () const {return _dim[0];}
 
 
@@ -1078,7 +1082,7 @@ public:
      *
      * @return          Number of columns.
      */
-    int                 
+    size_t                 
     n                   () const {return _dim[1];}
 
 
@@ -1088,7 +1092,7 @@ public:
      * @return          Number of rows.
      */
     inline float          
-    Res                 (const int i)                                const {return _res[i];}
+    Res                 (const size_t i)                                const {return _res[i];}
     
     
     /**
@@ -1097,7 +1101,7 @@ public:
      * @return          Number of rows.
      */
     inline float&          
-    Res                 (const int i)                                 {return _res[i];}
+    Res                 (const size_t i)                                 {return _res[i];}
     
     
     /**
@@ -1105,7 +1109,34 @@ public:
      *
      * @return          Number of rows.
      */
-    inline int          
+    inline size_t          
+    Dim                 (const size_t i)                                const {return _dim[i];}
+    
+    
+    /**
+     * @brief           Get reference to size a given dimension.
+     *
+     * @return          Number of rows.
+     */
+    inline size_t&          
+    Dim                 (const size_t i)                                 {return _dim[i];}
+    
+    
+    /**
+     * @brief           Get dimension array
+     *
+     * @return          All dimensions
+     */
+    inline const size_t*   
+    Dim                 ()                                     const {return _dim;}
+    
+
+    /**
+     * @brief           Get size a given dimension.
+     *
+     * @return          Number of rows.
+     */
+    inline size_t          
     Dim                 (const int i)                                const {return _dim[i];}
     
     
@@ -1114,27 +1145,18 @@ public:
      *
      * @return          Number of rows.
      */
-    inline int&          
+    inline size_t&          
     Dim                 (const int i)                                 {return _dim[i];}
     
     
-    /**
-     * @brief           Get dimension array
-     *
-     * @return          All dimensions
-     */
-    inline const int*   
-    Dim                 ()                                     const {return _dim;}
-    
-
     /**
      * @brief           Reset all dimensions to values in dim
 	 *
 	 * @param  dim      New dimensions
      */
     inline void         
-    Dim                 (const int* dim)                                     const {
-        for (int i = 0; i<INVALID_DIM; i++)
+    Dim                 (const size_t* dim)                                     const {
+        for (size_t i = 0; i<INVALID_DIM; i++)
             _dim[i] = dim[i];
     }
     
@@ -1147,9 +1169,9 @@ public:
      * @param  dim      New dimensions
      */
     inline void         
-    Reset               (const int* dim)                                      {
+    Reset               (const size_t* dim)                                      {
 
-    	for (int i = 0; i < INVALID_DIM; i++)
+    	for (size_t i = 0; i < INVALID_DIM; i++)
             _dim[i] = dim[i];
 
         if (nb_alloc) {
@@ -1171,7 +1193,7 @@ public:
     inline void         
     Clear               ()                                      {
 
-    	for (int i = 0; i < INVALID_DIM; i++)
+    	for (size_t i = 0; i < INVALID_DIM; i++)
             _dim[i] = 1;
 
         if (nb_alloc) {
@@ -1207,7 +1229,7 @@ public:
     inline void         
     Zero               ()                                      {
 
-		for (int i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); i++)
 			_M[i] = (T) 0;
 
     }
@@ -1229,7 +1251,7 @@ public:
      * @return          XD matrix?
      */
     const bool                
-    IsXD                (const int d)                         const;
+    IsXD                (const size_t d)                         const;
     
     
     /**
@@ -1273,7 +1295,7 @@ public:
      *
      * @return          Size in RAM in bytes.
      */
-    const int                  
+    const size_t                  
     SizeInRAM           ()                                    const;
 
     //@}
@@ -1693,7 +1715,7 @@ public:
      * @return          Success.
      */
     bool                
-    PRDump              (std::string fname);
+    PRDump              (const std::string fname) const;
     
 
     /**
@@ -1705,7 +1727,7 @@ public:
      * @return          Success.
      */
     bool                
-    H5Dump                (std::string fname, std::string dname = "", std::string dloc = "/");
+    H5Dump              (const std::string fname, const std::string dname = "", const std::string dloc = "/") const;
     
 
     /**
@@ -1717,7 +1739,7 @@ public:
      * @return          Success.
      */
     bool                
-    H5Read              (std::string fname, std::string dname = "", std::string dloc = "/");
+    H5Read              (const std::string fname, const std::string dname = "", const std::string dloc = "/");
     
 
     /**
@@ -1727,7 +1749,7 @@ public:
      * @return          Success.
      */
     bool                
-    NIDump              (std::string fname);
+    NIDump              (const std::string fname) const;
     
 
     /**
@@ -1737,7 +1759,21 @@ public:
      * @return          Success.
      */
     bool                
-    NIRead              (std::string fname);
+    NIRead              (const std::string fname);
+    
+
+#ifdef HAVE_MAT_H
+
+    /**
+     * @brief           Dump to MATLAB file.
+     * 
+     * @param  fname    File name.
+	 * @param  dname    Dataset name.
+	 * @param  dloc     Dataset location.
+     * @return          Success.
+     */
+    bool                
+    MXDump              (const MATFile* file, const std::string dname = "", const std::string dloc = "/") const;
     
 
     /**
@@ -1749,7 +1785,7 @@ public:
      * @return          Success.
      */
     bool                
-    MXDump              (std::string fname, std::string dname = "", std::string dloc = "/");
+    MXDump              (const std::string fname, const std::string dname = "", const std::string dloc = "/") const;
     
 
     /**
@@ -1761,8 +1797,9 @@ public:
      * @return          Success.
      */
     bool                
-    MXRead              (std::string fname, std::string dname = "", std::string dloc = "/");
-    
+    MXRead              (const std::string fname, const std::string dname = "", const std::string dloc = "/");
+
+#endif    
 
     /**
      * @brief           Dump to HDF5 file.
@@ -1774,7 +1811,7 @@ public:
      * @return          Success.
      */
     bool                
-    Dump                (std::string fname, std::string dname = "", std::string dloc = "/", io_strategy ios = HDF5);
+    Dump                (const std::string fname, const std::string dname = "", const std::string dloc = "/", const io_strategy ios = HDF5) const ;
     
 
     /**
@@ -1787,7 +1824,7 @@ public:
      * @return          Success.
      */
     bool                
-    Read                (std::string fname, std::string dname = "", std::string dloc = "/", io_strategy ios = HDF5);
+    Read                (const std::string fname, const std::string dname = "", const std::string dloc = "/", const io_strategy ios = HDF5);
 
     
 	/**
@@ -1820,7 +1857,23 @@ public:
     
     //@{
     
-    
+
+	/**
+	 * @brief           Multiple subscripts from linear index (MATLAB like)
+	 */
+	Matrix<size_t>
+	Sub2Ind             (const Matrix<size_t>) const;
+
+
+
+	/**
+	 * @brief           Multiple subscripts from linear index (MATLAB like)
+	 */
+	Matrix<size_t>
+	Ind2Sub             (const Matrix<size_t>) const;
+
+
+
     /**
      * @brief           Greatest element of the matrix. i.e. max(M0).
      *
@@ -1852,12 +1905,9 @@ public:
 #pragma omp parallel default (shared) 
 		{
 			
-			int tid      = omp_get_thread_num();
-			int chunk    = Size() / omp_get_num_threads();
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
 			
-#pragma omp for 
-			
-			for (int i = 0; i < Size(); i++)
+			for (size_t i = 0; i < Size(); i++)
 				res[i] = abs(_M[i]);
 
 		}		
@@ -1949,7 +1999,7 @@ public:
      * @return          FFT shift.
      */
     Matrix<T>           
-    FFTShift            (const int d = 0)            const;
+    FFTShift            (const size_t d = 0)            const;
     
     /**
      * @brief           MATLAB-like fftshift.<br/>
@@ -1958,7 +2008,7 @@ public:
      * @return          FFT shift.
      */
     Matrix<T>           
-    IFFTShift           (const int d = 0)            const;
+    IFFTShift           (const size_t d = 0)            const;
     
 
     /**
@@ -1967,7 +2017,7 @@ public:
      * @return          FFT shift.
      */
     Matrix<T>           
-    HannWindow          (const int d = 0)            const;
+    HannWindow          (const size_t d = 0)            const;
     
 
     /**
@@ -1977,7 +2027,7 @@ public:
      * @return          Sum of squares
      */
 	Matrix<T>
-    SOS                 (const int d = 0)           const;
+    SOS                 (const size_t d = 0)           const;
     
 
     /**
@@ -1987,7 +2037,7 @@ public:
      * @return          Mean
      */
 	Matrix<T>
-    Mean                (const int d = 0)           const;
+    Mean                (const size_t d = 0)           const;
     
 
     /**
@@ -1997,7 +2047,7 @@ public:
      * @return          Mean
      */
 	void
-    Mean                (const int d = 0);
+    Mean                (const size_t d = 0);
     
 
     /**
@@ -2007,7 +2057,7 @@ public:
      * @return          Mean
      */
 	Matrix<T>
-    Sum                 (const int d = 0)           const;
+    Sum                 (const size_t d = 0)           const;
     
 
     /**
@@ -2017,7 +2067,7 @@ public:
      * @return          Mean
      */
 	void
-    Sum                 (const int d = 0);
+    Sum                 (const size_t d = 0);
     
 
     /**
@@ -2033,6 +2083,56 @@ public:
 	Matrix<T>
     Squeeze             () const ;
     
+
+	/**
+	 * @brief           Subscript of 1st dimension from index
+	 *
+	 * @param  ind      Index
+	 * @return          Subs
+	 */ 
+	static inline size_t 
+	Ind2i               (const size_t& ind);
+
+
+	/**
+	 * @brief           Subscript of 2nd dimension from index
+	 *
+	 * @param  ind      Index
+	 * @return          Subs
+	 */ 
+	static inline size_t 
+	Ind2j               (const size_t& ind);
+
+
+	/**
+	 * @brief           Subscript of 3rd dimension from index
+	 *
+	 * @param  ind      Index
+	 * @return          Subs
+	 */ 
+	static inline size_t 
+	Ind2k               (const size_t& ind);
+
+
+	/**
+	 * @brief           Subscript of 4th dimension from index
+	 *
+	 * @param  ind      Index
+	 * @return          Subs
+	 */ 
+	static inline size_t 
+	Ind2l               (const size_t& ind);
+
+
+	/**
+	 * @brief           Subscript of xth dimension from index
+	 *
+	 * @param  ind      Index
+	 * @return          Subs
+	 */ 
+	static inline size_t 
+	Ind2x               (const size_t& ind);
+
 
 	/**
 	 * @brief           Highest occupied dimension
@@ -2127,7 +2227,7 @@ public:
 
 private:
     
-    int                 _dim[INVALID_DIM]; /// Dimensions
+    size_t              _dim[INVALID_DIM]; /// Dimensions
     float               _res[INVALID_DIM]; /// Resolutions
     T*                  _M;                /// Data repository
 	int                 nb_alloc;
@@ -2147,18 +2247,18 @@ private:
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Volume (const int s) const {
+Matrix<T>::Volume (const size_t s) const {
     
 	assert (Is4D());
     
     Matrix<T> res;
 
-	for (int j = 0; j < 3; j++)
+	for (size_t j = 0; j < 3; j++)
 		res.Dim(j) = _dim[j];
 
 	res.Reset();
 
-	int nc = _dim[0]*_dim[1]*_dim[2];
+	size_t nc = _dim[0]*_dim[1]*_dim[2];
 
 	memcpy (&res[0], &_M[s * nc], nc * sizeof(T));
 
@@ -2168,18 +2268,18 @@ Matrix<T>::Volume (const int s) const {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Slice (const int s) const {
+Matrix<T>::Slice (const size_t s) const {
     
 	assert (Is3D());
     
     Matrix<T> res;
 
-	for (int j = 0; j < 2; j++)
+	for (size_t j = 0; j < 2; j++)
 		res.Dim(j) = _dim[j];
 
 	res.Reset();
 
-	int nc = _dim[0]*_dim[1];
+	size_t nc = _dim[0]*_dim[1];
 
 	memcpy (&res[0], &_M[s * nc], nc*sizeof(T));
 
@@ -2189,7 +2289,7 @@ Matrix<T>::Slice (const int s) const {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Row (const int r)  const {
+Matrix<T>::Row (const size_t r)  const {
 
 	assert (Is2D());
     
@@ -2198,7 +2298,7 @@ Matrix<T>::Row (const int r)  const {
 	res.Dim(0) = _dim[1];
 	res.Reset();
 
-	for (int i = 0; i < _dim[1]; i++)
+	for (size_t i = 0; i < _dim[1]; i++)
 		res[i] = _M[r + i*_dim[0]];
 
 	return res;
@@ -2207,7 +2307,7 @@ Matrix<T>::Row (const int r)  const {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::Column (const int c) const {
+Matrix<T>::Column (const size_t c) const {
     
     Matrix<T> res;
 
@@ -2226,7 +2326,7 @@ Matrix<T>::Size() const {
     
     long size = 1;
     
-    for (int i = 0; i < INVALID_DIM; i++)
+    for (size_t i = 0; i < INVALID_DIM; i++)
         size *= _dim[i];
     
     return size;
@@ -2234,7 +2334,7 @@ Matrix<T>::Size() const {
 }
 
 
-template <class T> inline const int 
+template <class T> inline const size_t 
 Matrix<T>::SizeInRAM() const {
     
     return Size() * sizeof(T);
@@ -2247,7 +2347,7 @@ Matrix<short>::Max() {
 	
     short max = _M[0];
 	
-    for (int i = 0; i < Size(); i++)
+    for (size_t i = 0; i < Size(); i++)
         if (_M[i] > max)
             max = _M[i];
 	
@@ -2262,7 +2362,7 @@ Matrix<cplx>::Max() {
 		cplx   max = cplx(0.0,0.0);
 		float tmp =  0.0;
 		
-		for (int i = 0; i < Size(); i++) {
+		for (size_t i = 0; i < Size(); i++) {
 				float abs = sqrt(_M[0].real()*_M[0].real() + _M[0].imag()*_M[0].imag());
 				if (abs > tmp) {
 						tmp = abs;
@@ -2279,7 +2379,7 @@ T  Matrix<T>::Maxabs() {
 
     T max = fabs(_M[0]);
 
-    for (int i = 0; i < Size(); i++)
+    for (size_t i = 0; i < Size(); i++)
         if (fabs(_M[i]) > max)
             max = fabs(_M[i]);
 
@@ -2293,7 +2393,7 @@ T Matrix<T>::Min() {
 
     T min = _M[0];
 
-    for (int i = 0; i < Size(); i++)
+    for (size_t i = 0; i < Size(); i++)
         if (_M[i] < min)
             min = _M[i];
 
@@ -2307,7 +2407,7 @@ T  Matrix<T>::Minabs() {
 
     T old = fabs(_M[0]);
 
-    for (int i = 0; i < Size(); i++)
+    for (size_t i = 0; i < Size(); i++)
         if (fabs(_M[i]) < old)
             old = fabs(_M[i]);
 
@@ -2324,8 +2424,8 @@ Matrix<T> Matrix<T>::tr() const {
 	res.Dim(0) = res.Dim(1);
 	res.Dim(1) = tmp;
 	
-    for (int i = 0; i < res.Dim(0); i++)
-        for (int j = 0; j < res.Dim(1); j++)
+    for (size_t i = 0; i < res.Dim(0); i++)
+        for (size_t j = 0; j < res.Dim(1); j++)
 			if (typeid (T) == typeid (double))
 				res.At(i,j) =      At(j,i);  // Transpose
 			else
@@ -2340,7 +2440,7 @@ inline void Matrix<cplx>::Random () {
 	
 	srand (time(NULL));
 
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[i] = cplx ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
 	
 }
@@ -2350,7 +2450,7 @@ inline void Matrix<double>::Random () {
 
 	srand (time(NULL));
 
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[i] = (double) rand() / (double) RAND_MAX*2-1;
 
 }
@@ -2360,18 +2460,18 @@ inline void Matrix<short>::Random () {
 
 	srand (time(NULL));
 
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[i] = (short) 12 * (double)rand() / (double)RAND_MAX*2-1;
 
 }
 
     
 template <class T> 
-inline const bool Matrix<T>::IsXD (const int d) const {
+inline const bool Matrix<T>::IsXD (const size_t d) const {
 
-	int l = 0;
+	size_t l = 0;
 
-	for (int i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; i++)
 		if (_dim[i] > 1) l++;
 
 	return (l == d);

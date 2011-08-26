@@ -82,24 +82,24 @@ namespace RRStrategy {
 RRSModule::error_code
 SVDCalibrate (const Matrix<cplx>* imgs, Matrix<cplx>* rxm, Matrix<cplx>* txm, Matrix<double>* snro, Matrix<cplx>* shim, const bool normalise) {
 
-	int         nrxc = rxm->Dim(3);
-	int         ntxc = txm->Dim(3);
-	int      volsize = imgs->Dim(0) * imgs->Dim(1) * imgs->Dim(2);
-	int       rtmsiz = nrxc * ntxc;
-	int         vols = imgs->Size() / volsize / 2; // division by 2 (Echoes)
-	int         rtms = imgs->Size() / rtmsiz / 2;  // division by 2 (Echoes)
-	ticks        tic = getticks();
+	size_t    nrxc = rxm->Dim(3);
+	size_t    ntxc = txm->Dim(3);
+	size_t volsize = imgs->Dim(0) * imgs->Dim(1) * imgs->Dim(2);
+	size_t  rtmsiz = nrxc * ntxc;
+	size_t    vols = imgs->Size() / volsize / 2; // division by 2 (Echoes)
+	size_t    rtms = imgs->Size() / rtmsiz / 2;  // division by 2 (Echoes)
+	ticks      tic = getticks();
 	
 	printf ("  SVDing %i matrices of %ix%i ... ", rtms, nrxc, ntxc);
 	
 	// Permute dimensions on imgs for contiguous RAM access
 	Matrix<cplx> vxlm (nrxc, ntxc, imgs->Dim(0), imgs->Dim(1), imgs->Dim(2));
 	
-	for (int s = 0; s < imgs->Dim(2); s++)
-		for (int l = 0; l < imgs->Dim(1); l++)
-			for (int c = 0; c < imgs->Dim(0); c++)
-				for (int t = 0; t < ntxc; t++)
-					for (int r = 0; r < nrxc; r++)
+	for (size_t s = 0; s < imgs->Dim(2); s++)
+		for (size_t l = 0; l < imgs->Dim(1); l++)
+			for (size_t c = 0; c < imgs->Dim(0); c++)
+				for (size_t t = 0; t < ntxc; t++)
+					for (size_t r = 0; r < nrxc; r++)
 						// multiplication with 2 (Need only 1st echo)
 						vxlm (r, t, c, l, s) = imgs->At(c, l, s, 0, t, r); 
 	
@@ -126,22 +126,21 @@ SVDCalibrate (const Matrix<cplx>* imgs, Matrix<cplx>* rxm, Matrix<cplx>* txm, Ma
 #pragma omp parallel default (shared) 
 	{
 		
-		int tid      = omp_get_thread_num();
-		int chunk    = rtms / omp_get_num_threads();
+		int tid = omp_get_thread_num();
+
+#pragma omp for schedule (dynamic, rtms / omp_get_num_threads())
 		
-#pragma omp for schedule (dynamic, chunk)
-		
-		for (int i = 0; i < rtms; i++) {
+		for (size_t i = 0; i < rtms; i++) {
 			
 			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cplx));
 			
 			m[tid].SVD ('A', &u[tid], &v[tid], &s[tid]);
 			
 			// U 
-			for (int r = 0; r < nrxc; r++) rxm->At(r*volsize + i) = u[tid][r];
+			for (size_t r = 0; r < nrxc; r++) rxm->At(r*volsize + i) = u[tid][r];
 
 			// V is transposed!!! ------------------------------------------v
-			for (int t = 0; t < nrxc; t++) txm->At(t*volsize + i) = v[tid][t*v[0].Dim(0)];
+			for (size_t t = 0; t < nrxc; t++) txm->At(t*volsize + i) = v[tid][t*v[0].Dim(0)];
 			  
 			OptSNR[i] = real(s[tid][0]);
 			
@@ -160,7 +159,7 @@ RRSModule::error_code
 FTVolumes (Matrix<cplx>* r) {
 	
 	long        imsize  = r->Dim(0) * r->Dim(1) * r->Dim(2);
-	int         vols    = r->Size() / (imsize);
+	size_t         vols    = r->Size() / (imsize);
 	int         threads = 1;
 	Matrix<cplx> hann    = Matrix<cplx>::Ones(r->Dim(0), r->Dim(1), r->Dim(2)).HannWindow();
 	ticks       tic     = getticks();
@@ -180,7 +179,7 @@ FTVolumes (Matrix<cplx>* r) {
 	fftwf_plan 	 p[threads];
 	
 	for (int i = 0; i < threads; i++) {
-		mr[i] = Matrix<cplx>       (r->Dim(0), r->Dim(1), r->Dim(2));
+		mr[i] = Matrix<cplx>      (r->Dim(0), r->Dim(1), r->Dim(2));
 		p[i]  = fftwf_plan_dft_3d (r->Dim(2), r->Dim(1), r->Dim(0), 
 								   (fftwf_complex*)&mr[i][0], (fftwf_complex*)&mr[i][0], 
 								   FFTW_BACKWARD, FFTW_ESTIMATE);
@@ -188,16 +187,14 @@ FTVolumes (Matrix<cplx>* r) {
 	// ------------------------------------
 	
 	
-	// ifftshift(ifftn(hann(fftshift(data))))
 #pragma omp parallel default (shared)
 	{
 		
-		int tid      = omp_get_thread_num();
-		int chunk    = vols / omp_get_num_threads();
+		int tid = omp_get_thread_num();
+
+#pragma omp for schedule (dynamic, vols / omp_get_num_threads())
 		
-#pragma omp for schedule (dynamic, chunk)
-		
-		for (int i = 0; i < vols; i++) {
+		for (size_t i = 0; i < vols; i++) {
 			memcpy (&mr[tid][0], &r->At(i*imsize), imsize * sizeof(cplx));
 			mr[tid] = mr[tid].FFTShift();
 			mr[tid] = mr[tid] * hann;
@@ -230,12 +227,12 @@ RemoveOS (Matrix<cplx>* imgs) {
 	imgs->Dim(0) = imgs->Dim(0) / 2;
 	imgs->Reset();
 
-	int   ossiz  = tmp.Dim(0);
-	int   nssiz  = imgs->Dim(0);
-	int   nscans = tmp.Size() / ossiz;
-	int   offset = floor ( (float)(tmp.Dim(0)-imgs->Dim(0))/2.0 ); 
+	size_t   ossiz  = tmp.Dim(0);
+	size_t   nssiz  = imgs->Dim(0);
+	size_t   nscans = tmp.Size() / ossiz;
+	size_t   offset = floor ( (float)(tmp.Dim(0)-imgs->Dim(0))/2.0 ); 
 
-	for (int i = 0; i < nscans; i++)
+	for (size_t i = 0; i < nscans; i++)
 		memcpy (&imgs->At(i*nssiz), &tmp.At(i*ossiz+offset), nssiz * sizeof(cplx));
 
 	printf ("done.                      (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
@@ -256,18 +253,15 @@ B0Map (const Matrix<cplx>* imgs, Matrix<double>* b0, const float TE) {
 	tmp = imgs->Mean(4);
 	tmp.Squeeze();
 
-	int nc = tmp.Dim(4);                           // Number of channels
-	int np = tmp.Dim(0) * tmp.Dim(1) * tmp.Dim(2); // Number of pixels
+	size_t nc = tmp.Dim(4);                           // Number of channels
+	size_t np = tmp.Dim(0) * tmp.Dim(1) * tmp.Dim(2); // Number of pixels
 
 	cplx r;
 
 #pragma omp parallel default (shared) private (r)
 	{
 		
-		int tid      = omp_get_thread_num();
-		int chunk    = np / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk)
+#pragma omp for schedule (dynamic, np / omp_get_num_threads())
 		
 		for (int i = 0; i < np; i++) {
 			r = cplx (0.0,0.0);

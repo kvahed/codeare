@@ -85,6 +85,17 @@ namespace RRServer {
 		
 
 		/**
+		 * @brief       Additional preparation?
+		 *
+		 * @return      Success
+		 */ 
+		virtual error_code
+		Prepare         () { 
+			return RRSModule::OK; 
+		};
+		
+
+		/**
 		 * @brief       Mandatory implementation of finaliser
 		 *
 		 * @return      Success

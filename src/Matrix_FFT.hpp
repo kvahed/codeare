@@ -68,16 +68,16 @@ Matrix<T> Matrix<T>::IFFT() const {
 
 
 template <class T>
-Matrix<T> Matrix<T>::FFTShift (const int d) const {
+Matrix<T> Matrix<T>::FFTShift (const size_t d) const {
 	
 	assert (Is1D() || Is2D() || Is3D());
 	assert (typeid(T) == typeid(cplx));
 	
 	Matrix<T> res (_dim);
 	
-	for (int s = 0; s < _dim[2]; s++)
-		for (int l = 0; l < _dim[1]; l++)
-			for (int c = 0; c < _dim[0]; c++)
+	for (size_t s = 0; s < _dim[2]; s++)
+		for (size_t l = 0; l < _dim[1]; l++)
+			for (size_t c = 0; c < _dim[0]; c++)
 				res.At (c,l,s) = this->At(c,l,s) * (float) pow ((float)-1.0, (float)(s+l+c));
 	
 	return res;
@@ -86,7 +86,7 @@ Matrix<T> Matrix<T>::FFTShift (const int d) const {
 
 
 template <class T>
-Matrix<T> Matrix<T>::IFFTShift (const int d) const {
+Matrix<T> Matrix<T>::IFFTShift (const size_t d) const {
 	
 	return FFTShift(d);
 	
@@ -94,7 +94,7 @@ Matrix<T> Matrix<T>::IFFTShift (const int d) const {
 
 
 template <class T>
-Matrix<T> Matrix<T>::HannWindow (const int dim) const {
+Matrix<T> Matrix<T>::HannWindow (const size_t dim) const {
 	
 	assert (Is1D() || Is2D() || Is3D());
 	
@@ -124,9 +124,9 @@ Matrix<T> Matrix<T>::HannWindow (const int dim) const {
 	
 	res = this->Squeeze();
 	
-	for (int s = 0; s < _dim[2]; s++)
-		for (int r = 0; r < _dim[1]; r++)
-			for (int c = 0; c < _dim[0]; c++) {
+	for (size_t s = 0; s < _dim[2]; s++)
+		for (size_t r = 0; r < _dim[1]; r++)
+			for (size_t c = 0; c < _dim[0]; c++) {
 				d = pow( pow(((float)c-m[0])/m[0],2.0) + pow(((float)r-m[1])/m[1],2.0) + pow(((float)s-m[2])/m[2],2.0) , 0.5); 
 				h = (d < 1) ? (0.5 + 0.5 * cos (PI * d)) : 0.0;
 				res(c,r,s) = this->At(c,r,s) * h;
@@ -138,14 +138,14 @@ Matrix<T> Matrix<T>::HannWindow (const int dim) const {
 
 
 template <class T>
-Matrix<T> Matrix<T>::SOS (const int d) const {
+Matrix<T> Matrix<T>::SOS (const size_t d) const {
 	
 	assert (_dim[d] > 1);
 	
 	unsigned short nd = this->HDim();
-	int dim [INVALID_DIM];
+	size_t dim [INVALID_DIM];
 	
-	for (int i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; i++)
 		dim[i] = (i != nd) ? _dim[i] : 1;
 	
 	Matrix<T> res (dim);
@@ -153,13 +153,13 @@ Matrix<T> Matrix<T>::SOS (const int d) const {
 #pragma omp parallel default (shared) 
 	{
 		
-		int tid      = omp_get_thread_num();
-		int chunk    = Size() / omp_get_num_threads();
+		size_t tid      = omp_get_thread_num();
+		size_t chunk    = Size() / omp_get_num_threads();
 		
 #pragma omp for schedule (dynamic, chunk)
 		
-		for (int i = 0; i < res.Size(); i++) {
-			for (int j = 0; j < _dim[nd]; j++)
+		for (size_t i = 0; i < res.Size(); i++) {
+			for (size_t j = 0; j < _dim[nd]; j++)
 				res [i] = pow (_M[i + j * res.Size()], 2.0);
 			pow (res[i],0.5);
 		}
@@ -174,13 +174,13 @@ Matrix<T> Matrix<T>::SOS (const int d) const {
 template <class T> void
 Matrix<T>::Squeeze () {
 	
-	int found = 0;
+	size_t found = 0;
 	
-	for (int i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; i++)
 		if (_dim[i] > 1)
 			_dim[found++] = _dim[i];
 	
-	for (int i = found; i < INVALID_DIM; i++)
+	for (size_t i = found; i < INVALID_DIM; i++)
 		_dim[i] = 1;
 	
 }
@@ -197,20 +197,20 @@ Matrix<T>::Squeeze () const {
 
 
 template <class T> void
-Matrix<T>::Mean (const int d) {
+Matrix<T>::Mean (const size_t d) {
 
 	float quot = (float) d;
 
 	this->Sum (d);
 	
-	for (int i = 0; i < Size(); i++)
+	for (size_t i = 0; i < Size(); i++)
 		_M[i] = _M[i] / quot;
 	
 }
 
 
 template <class T> Matrix<T>
-Matrix<T>::Mean (const int d) const {
+Matrix<T>::Mean (const size_t d) const {
 	
 	Matrix<T> res = (*this);
 	res.Mean(d);
@@ -220,7 +220,7 @@ Matrix<T>::Mean (const int d) const {
 
 
 template <class T> void
-Matrix<T>::Sum (const int d) {
+Matrix<T>::Sum (const size_t d) {
 
 	assert (d>=0 && d < INVALID_DIM);
    
@@ -239,28 +239,28 @@ Matrix<T>::Sum (const int d) {
 	_M       = (T*) malloc ((Size() / _dim[d]) * sizeof(T));
 
 	// Inner size 
-	int insize = 1;
-	for (int i = 0; i < d; i++)
+	size_t insize = 1;
+	for (size_t i = 0; i < d; i++)
 		insize *= _dim[i];
 	
 	// Outer size
-	int outsize = 1;
-	for (int i = d+1; i < INVALID_DIM; i++)
+	size_t outsize = 1;
+	for (size_t i = d+1; i < INVALID_DIM; i++)
 		outsize *= _dim[i];
 	
 	// Sum
 #pragma omp parallel default (shared) 
 	{
 		
-		int tid      = omp_get_thread_num();
+		size_t tid      = omp_get_thread_num();
 		
-		for (int i = 0; i < outsize; i++) {
+		for (size_t i = 0; i < outsize; i++) {
 			
 #pragma omp for
 
-			for (int j = 0; j < insize; j++) {
+			for (size_t j = 0; j < insize; j++) {
 				_M[j+i*insize] = 0;
-				for (int k = 0; k < _dim[d]; k++)
+				for (size_t k = 0; k < _dim[d]; k++)
 					_M[j+i*insize] += tmp[j+i*insize*_dim[d]+k*insize];
 			}
 			
@@ -275,7 +275,7 @@ Matrix<T>::Sum (const int d) {
 
 
 template <class T> Matrix<T>
-Matrix<T>::Sum (const int d) const {
+Matrix<T>::Sum (const size_t d) const {
 	
 	Matrix<T> res = (*this);
 	res.Sum(d);
@@ -289,7 +289,7 @@ Matrix<T>::HDim () const {
 	
 	unsigned short nd = 0;
 	
-	for (int i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; i++)
 		nd  = (_dim[i] > 1) ? i : nd;
 	
 	return nd;
@@ -302,8 +302,7 @@ Matrix<T>::PrintDims () const {
 
 	printf ("Dimensions: ");
 	
-	for (int i = 0; i < INVALID_DIM; i++)
-
+	for (size_t i = 0; i < INVALID_DIM; i++)
 		printf ("%i ", _dim[i]);
 	
 	printf ("\n");
