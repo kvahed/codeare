@@ -97,7 +97,7 @@ namespace RRClient {
 		 * @brief           Finalise remote service
 		 *
 		 * @param  name     Recon method
-		 * @return          Error code
+		 * @return          Error error
 		 */ 
 		error_code              
 		Finalise            (const char* name);
@@ -106,55 +106,61 @@ namespace RRClient {
 		/**
 		 * @brief           Transmit measurement data to remote service
 		 *
-		 * @param  M        Complex data
+		 * @param  name     Name
+		 * @param  m        Complex data
 		 */
 		void 
-		SetCplx             (const std::string name, Matrix< std::complex<float> >& M);
+		SetCplx             (const std::string name, Matrix<cplx>& m);
 		
 		
 		/**
 		 * @brief           Retrieve manipulated data from remote service
 		 *
-		 * @param  M        Receive storage
+		 * @param  name     Name
+		 * @param  m        Receive storage
 		 */
 		void 
-		GetCplx             (const std::string name, Matrix< std::complex<float> >& M);
+		GetCplx             (const std::string name, Matrix<cplx>& m);
 		
 		
 		/**
 		 * @brief           Transmit real data to service (f.e. k-space weights)
 		 *
-		 * @param  M        Real data
+		 * @param  name     Name
+		 * @param  m        Real data
 		 */
 		void
-		SetReal             (const std::string name, Matrix< double >& M);
+		SetReal             (const std::string name, Matrix< double >& m);
 		
 		
 		/**
 		 * @brief           Get helper data after recon to ...
 		 *
-		 * @param  M        Receive storage
+		 * @param  name     Name
+		 * @param  m        Receive storage
 		 */
 		void
-		GetReal             (const std::string name, Matrix< double >& M);
+		GetReal             (const std::string name, Matrix< double >& m);
 		
 		
 		/**
 		 * @brief           Transmit gray-scale images to remote service
 		 * 
-		 * @param  M        Short int data
+		 * @param  name     Name
+		 * @param  m        Short int data
 		 */
 		void 
-		SetPixel            (const std::string name, Matrix<short>& M);
+		SetPixel            (const std::string name, Matrix<short>& m);
 		
 		
 		/**
 		 * @brief           Get gray-scale data after recon
 		 * 
-		 * @param  M        Short int storage
+		 * @param  name     Name
+		 * @param  m        Short int storage
 		 */
 		void 
-		GetPixel            (const std::string name, Matrix<short>& M);
+		GetPixel            (const std::string name, Matrix<short>& m);
 		
 		
 	private:

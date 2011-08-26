@@ -419,8 +419,8 @@ public:
      * @param  ias      IceAs containing data
      * @return          Amount of data read
      */
-    inline const long         
-    Import              (const IceAs ias);
+    const size_t       
+    Import              (const IceAs* ias);
 
 
     /**
@@ -430,8 +430,8 @@ public:
      * @param  pos      Import data starting at position pos of own repository
      * @return          Amount of data read
      */
-    inline const long         
-    Import              (const IceAs ias, const long pos);
+    const size_t       
+    Import              (const IceAs* ias, const size_t pos);
 
 
     /**
@@ -440,8 +440,8 @@ public:
      * @param  ias      IceAs for data export
      * @return          Amount of data exported
      */
-    inline const long         
-    Export              (IceAs* ias);
+    const size_t         
+    Export              (IceAs* ias) const;
 
 
     /**
@@ -450,8 +450,8 @@ public:
      * @param  ias      IceAs for data export
      * @param  pos      Export data starting at position pos of our repository
      */
-    inline const long         
-    Export              (IceAs* ias, const long pos);
+    const size_t
+    Export              (IceAs* ias, const size_t pos) const;
  
 	#endif
 
