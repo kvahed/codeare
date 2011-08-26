@@ -125,6 +125,7 @@ namespace RRServer {
 		/**
 		 * @brief        @see ReconStrategy::SetCplx(const std::string name, const cplx_data*)
 		 *
+		 * @param  name  Name
 		 * @param  r     Complex data sequence
 		 */
 		void
@@ -134,6 +135,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::SetCplx(const std::string name, const Matrix<cplx>*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Complex data matrix
 		 */
 		void
@@ -143,6 +145,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::GetCplx(const std::string name, cplx_data*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Complex data sequence
 		 */
 		void
@@ -152,6 +155,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::GetCplx(const std::string name, Matrix<cplx>*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Complex data matrix
 		 */
 		void
@@ -161,6 +165,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::SetReal(const std::string name, const real_data*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Real data sequence
 		 */
 		void
@@ -170,6 +175,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::SetReal(const std::string name, const Matrix<double>*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Real data matrix
 		 */
 		void
@@ -179,6 +185,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::SetReal(const std::string name, const Matrix<double>*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Real data matrix
 		 */
 		void
@@ -188,6 +195,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::GetReal(const std::string name, real_data*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Real data sequence
 		 */
 		void
@@ -197,6 +205,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::SetPixel(const std::string name, const pixel_data*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Pixel data sequence
 		 */
 		void
@@ -206,6 +215,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::SetPixel(const std::string name, const Matrix<short>*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Pixel data matrix
 		 */
 		void
@@ -215,6 +225,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::GetPixel(const std::string name, Matrix<short>*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Pixel data matrix
 		 */
 		void
@@ -224,6 +235,7 @@ namespace RRServer {
 		/**
 		 * @brief       @see ReconStrategy::GetPixel(const std::string name, pixel_data*)
 		 *
+		 * @param  name  Name
 		 * @param  r    Pixel data sequence
 		 */
 		void

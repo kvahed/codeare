@@ -1,7 +1,7 @@
 #ifdef PARC_MODULE_NAME
 
 template <class T> long 
-Matrix<T>::Import     (IceAs ias, long pos) {
+Matrix<T>::Import     (const IceAs* ias, const size_t pos) {
     
     ICE_SET_FN("Matrix<T>::Import(IceAs, long)")
         
@@ -9,9 +9,9 @@ Matrix<T>::Import     (IceAs ias, long pos) {
     long size = 1;
     
     for (i = 0; i < INVALID_DIM; i++)
-        size *= (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
+        size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
     
-    T* data = (T*) ias.calcSplObjStartAddr() ;
+    T* data = (T*) ias->calcSplObjStartAddr() ;
     
     for (i = 0; i < size; i++, data++)
         _M[i+pos] = *data;
@@ -22,19 +22,19 @@ Matrix<T>::Import     (IceAs ias, long pos) {
 
 
 template <class T> long 
-Matrix<T>::Import(IceAs ias) {
+Matrix<T>::Import(const IceAs* ias) {
     
     ICE_SET_FN("Matrix<T>::Import(IceAs)")
         
     int i;
     
     for (i = 0; i < INVALID_DIM; i++)
-        _dim[i] = (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
+        _dim[i] = (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
     
     _M = new T[Size()]();
     nb_alloc = 1;
     
-    T* data = (T*) ias.calcSplObjStartAddr() ;
+    T* data = (T*) ias->calcSplObjStartAddr() ;
     
     for (i = 0; i < Size(); i++, data++)
         _M[i] = *data;
@@ -45,11 +45,11 @@ Matrix<T>::Import(IceAs ias) {
 
 
 template <class T> long 
-Matrix<T>::Export(IceAs ias) {
+Matrix<T>::Export (IceAs* ias) const {
     
     ICE_SET_FN("Matrix<T>::Export(IceAs)")
-        
-    T* data = (T*) ias.calcSplObjStartAddr() ;
+		
+    T* data = (T*) ias->calcSplObjStartAddr() ;
     
     for (int i = 0; i < Size(); i++, data++)
         *data = _M[i];
@@ -60,7 +60,7 @@ Matrix<T>::Export(IceAs ias) {
 
 
 template <class T> long
-Matrix<T>::Export(IceAs ias, long pos) {
+Matrix<T>::Export (IceAs* ias, const size_t pos) const {
 
     ICE_SET_FN("Matrix<T>::Export(IceAs, long)")
         
@@ -68,10 +68,10 @@ Matrix<T>::Export(IceAs ias, long pos) {
     long size = 1;
     
     for (i = 0; i < INVALID_DIM; i++) {
-        size *= (ias.getLen(IceDim(i)) <= 1) ? 1 : ias.getLen(IceDim(i));
+        size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
     }
     
-    T* data = (T*) ias.calcSplObjStartAddr() ;
+    T* data = (T*) ias->calcSplObjStartAddr() ;
     
     for (i = 0; i < size; i++, data++)
         *data = _M[i+pos];

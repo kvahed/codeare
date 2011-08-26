@@ -107,6 +107,7 @@ namespace RRServer {
 		/**
 		 * @brief     Retreive measurement data
 		 *
+		 * @param  name  Name
 		 * @return    Pointer to data
 		 */
 		cplx_data* 
@@ -116,15 +117,17 @@ namespace RRServer {
 		/**
 		 * @brief     Set measurement data
 		 *
-		 * @param r   Complex measurement data
+		 * @param  name  Name
+		 * @param c   Complex measurement data
 		 */
 		void 
-		set_cplx      (const char* name, const cplx_data& r);
+		set_cplx      (const char* name, const cplx_data& c);
 
 		
 		/**
 		 * @brief     Get real helper data from recon
 		 *
+		 * @param  name  Name
 		 * @return    Pointer to real data
 		 */
 		real_data* 
@@ -134,6 +137,7 @@ namespace RRServer {
 		/**
 		 * @brief     Set real data
 		 *
+		 * @param  name  Name
 		 * @param r   Real helper data
 		 */
 		void 
@@ -143,6 +147,7 @@ namespace RRServer {
 		/**
 		 * @brief     Get pixel data from recon
 		 *
+		 * @param  name  Name
 		 * @return    Pointer to pixel data
 		 */
 		pixel_data* 
@@ -152,6 +157,7 @@ namespace RRServer {
 		/**
 		 * @brief     Set pixel data for recon
 		 *
+		 * @param  name  Name
 		 * @param p   Pixel data
 		 */
 		void 

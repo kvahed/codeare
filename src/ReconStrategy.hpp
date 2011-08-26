@@ -166,7 +166,8 @@ namespace RRServer {
 		/**
 		 * @brief        Get data from recon (Remote access)
 		 *
-		 * @param  r     Raw data storage 
+		 * @param  name  Name
+		 * @param  c     Raw data storage 
 		 */
 		void
 		GetCplx       (const std::string name, cplx_data* c)   {
@@ -196,7 +197,7 @@ namespace RRServer {
 		 * @brief        Set data for recon (Remote access)
 		 *
 		 * @param name   Name
-		 * @param r      Cplx data
+		 * @param c      Cplx data
 		 */
 		void 
 		SetCplx       (const std::string name, const cplx_data* c)   {
@@ -222,6 +223,7 @@ namespace RRServer {
 		/**
 		 * @brief        Get data from recon (Local access)
 		 *
+		 * @param  name  Name
 		 * @param  m     Cplx data storage 
 		 */
 		void
@@ -238,7 +240,8 @@ namespace RRServer {
 		/**
 		 * @brief        Set data for recon (Local access)
 		 *
-		 * @param m      Raw data
+		 * @param  name  Name
+		 * @param m      Complex data
 		 */
 		void 
 		SetCplx       (const std::string name, Matrix<cplx>* m)   {
@@ -254,7 +257,8 @@ namespace RRServer {
 		/**
 		 * @brief        Get data from recon (Remote access)
 		 *
-		 * @param  helper Raw data storage
+		 * @param  name  Name
+		 * @param  r     Real data storage
 		 */
 		void 
 		GetReal        (const std::string name, real_data* r)   {
@@ -280,7 +284,8 @@ namespace RRServer {
 		/**
 		 * @brief         Set data for recon (Local access)
 		 * 
-		 * @param  helper Real data
+		 * @param  name  Name
+		 * @param  r     Real data
 		 */
 		void 
 		SetReal        (const std::string name, const real_data* r)   {
@@ -306,6 +311,7 @@ namespace RRServer {
 		/**
 		 * @brief         Get data from recon
 		 *
+		 * @param  name  Name
 		 * @param  m      Real data
 		 */
 		void
@@ -323,6 +329,7 @@ namespace RRServer {
 		/**
 		 * @brief         Set data for recon
 		 *
+		 * @param  name  Name
 		 * @param  m      Real data storage
 		 */
 		void 
@@ -339,7 +346,8 @@ namespace RRServer {
 		/**
 		 * @brief         Get data from recon
 		 *
-		 * @param  pixel  Pixel data storage
+		 * @param  name  Name
+		 * @param  p     Pixel data storage
 		 */
 		void 
 		GetPixel          (const std::string name, pixel_data* p)   {
@@ -365,7 +373,8 @@ namespace RRServer {
 		/**
 		 * @brief        Set data for recon
 		 *
-		 * @param  pixel Pixel data
+		 * @param  name  Name
+		 * @param  p     Pixel data
 		 */
 		void 
 		SetPixel         (const std::string name, const pixel_data* p)   {
@@ -391,6 +400,7 @@ namespace RRServer {
 		/**
 		 * @brief        Get data from recon
 		 *
+		 * @param  name  Name
 		 * @param  m     Pixel data storage
 		 */
 		void
@@ -407,6 +417,7 @@ namespace RRServer {
 		/**
 		 * @brief        Set data for recon
 		 *
+		 * @param  name  Name
 		 * @param  m     Pixel data
 		 */
 		void 
