@@ -197,6 +197,8 @@ Matrix<T>::Pinv () {
 	
 	T*        work   = (T*) malloc (sizeof(float)); 
 
+	int*      iwork  = (int*) malloc (sizeof(int)); 
+
 	float*    rwork  = (float*) malloc (5*MIN(m,n)*sizeof(float));    
 	float*    s      = (float*) malloc (  MIN(m,n)*sizeof(float));    
 
@@ -205,20 +207,27 @@ Matrix<T>::Pinv () {
 	float     rcond  = -1.0;
 
 	if (typeid(T) == typeid(cplx))
-		cgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
+		cgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
+	//cgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
+
+	rwork = (float*) realloc (rwork, (int)rwork[0]*sizeof(float));
+	iwork = (int*)   realloc (iwork,      iwork[0]*sizeof(int));
 
 	lwork = (int) cplx (work[0]).real();
 	work  = (T*)  realloc (work, lwork * sizeof(T));
 
 	if (typeid(T) == typeid(cplx))
-		cgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
+		cgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
+	//cgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
 
-	free (rwork);
 	free (s);
+	free (work);
+	free (rwork);
+	free (iwork);
 
 	return b;
 	
