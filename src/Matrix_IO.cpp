@@ -92,7 +92,7 @@ const std::string Matrix<T>::DimsToString () const {
 
 	std::stringstream ss;
 	
-	for (size_t i=0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i <= HDim(); i++)
 		ss << (int)_dim[i] << " ";
 
 	return ss.str();
