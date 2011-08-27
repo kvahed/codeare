@@ -195,12 +195,10 @@ Matrix<T>::Pinv () {
 	int       rank   =  0;
 	int       info   =  0;
 	
-	T*        work   = (T*) malloc (sizeof(float)); 
-
-	int*      iwork  = (int*) malloc (sizeof(int)); 
-
-	float*    rwork  = (float*) malloc (5*MIN(m,n)*sizeof(float));    
-	float*    s      = (float*) malloc (  MIN(m,n)*sizeof(float));    
+	T*        work   = (T*)     malloc (         sizeof(T)); 
+	int*      iwork  = (int*)   malloc (         sizeof(int)); 
+	float*    rwork  = (float*) malloc (         sizeof(float));    
+	float*    s      = (float*) malloc (MIN(m,n)*sizeof(float));    
 
 	Matrix<T> b      =  Matrix<T>::Id(ldb);
 
@@ -208,21 +206,27 @@ Matrix<T>::Pinv () {
 
 	if (typeid(T) == typeid(cplx))
 		cgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
-	//cgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
+		dgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);
 
-	rwork = (float*) realloc (rwork, (int)rwork[0]*sizeof(float));
-	iwork = (int*)   realloc (iwork,      iwork[0]*sizeof(int));
+	//cgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
+	//dgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
 
+	if (typeid(T) == typeid(cplx))
+		rwork = (float*) realloc (rwork, (int)rwork[0]*sizeof(float));
+
+	iwork = (int*) realloc (iwork, iwork[0]*sizeof(int));
 	lwork = (int) cplx (work[0]).real();
-	work  = (T*)  realloc (work, lwork * sizeof(T));
+	work  = (T*) realloc (work, lwork * sizeof(T));
 
 	if (typeid(T) == typeid(cplx))
 		cgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
-	//cgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
+		dgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);
+
+	//cgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
+	//dgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
+
 
 	free (s);
 	free (work);

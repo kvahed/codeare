@@ -34,10 +34,10 @@ extern "C" {
 	void dgels_  (char *trans, int     *m, int    *n, int  *nrhs, void     *a, int     *lda, void      *b, int  *ldb,
 				  void  *work, int *lwork, int *info);
 	
-	void dgelss_ (int *m, int *n, int *nrhs, void *a, int *lda, void *b, int *ldb, void *s, void *rcond, int *rank, void *work, int *lwork, int *info);
+	void dgelss_ (int *m, int *n, int *nrhs, void *a, int *lda, void *b, int *ldb, void *s, void *rcond, int *rank, void *work, int *lwork,              int *info);
 	void cgelss_ (int *m, int *n, int *nrhs, void *a, int *lda, void *b, int *ldb, void *s, void *rcond, int *rank, void *work, int *lwork, void* rwork, int *info);
 	
-	void dgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void* iwork, int* info);
+	void dgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
 	void cgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
 	
 }
