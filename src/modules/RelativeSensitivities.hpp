@@ -134,7 +134,7 @@ SVDCalibrate (const Matrix<cplx>* imgs, Matrix<cplx>* rxm, Matrix<cplx>* txm, Ma
 			
 			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cplx));
 			
-			m[tid].SVD ('A', &u[tid], &v[tid], &s[tid]);
+			m[tid].SVD ('S', &u[tid], &v[tid], &s[tid]);
 			
 			// U 
 			for (size_t r = 0; r < nrxc; r++) rxm->At(r*volsize + i) = u[tid][r];
