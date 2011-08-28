@@ -1767,13 +1767,13 @@ public:
     /**
      * @brief           Dump to MATLAB file.
      * 
-     * @param  fname    File name.
+     * @param  file     File name.
 	 * @param  dname    Dataset name.
 	 * @param  dloc     Dataset location.
      * @return          Success.
      */
     bool                
-    MXDump              (const MATFile* file, const std::string dname = "", const std::string dloc = "/") const;
+    MXDump              (MATFile* file, const std::string dname = "", const std::string dloc = "/") const;
     
 
     /**
@@ -2116,7 +2116,7 @@ public:
 	 * @brief           Subscript of 1st dimension from index
 	 *
 	 * @param  ind      Index
-	 * @return          Subs
+	 * @return          Subscript of 1st dimension
 	 */ 
 	const inline size_t 
 	Ind2i               (const size_t& ind) const;
@@ -2126,7 +2126,7 @@ public:
 	 * @brief           Subscript of 2nd dimension from index
 	 *
 	 * @param  ind      Index
-	 * @return          Subs
+	 * @return          Subscript of 2nd dimension
 	 */ 
 	const inline size_t 
 	Ind2j               (const size_t& ind) const;
@@ -2136,7 +2136,7 @@ public:
 	 * @brief           Subscript of 3rd dimension from index
 	 *
 	 * @param  ind      Index
-	 * @return          Subs
+	 * @return          Subscript of 3rd dimension
 	 */ 
 	const inline size_t 
 	Ind2k               (const size_t& ind) const;
@@ -2146,17 +2146,18 @@ public:
 	 * @brief           Subscript of 4th dimension from index
 	 *
 	 * @param  ind      Index
-	 * @return          Subs
+	 * @return          Subscript of 4th dimension
 	 */ 
 	const inline size_t 
 	Ind2l               (const size_t& ind) const;
 
 
 	/**
-	 * @brief           Subscript of xth dimension from index
+	 * @brief           Subscript of x-th dimension from index
 	 *
 	 * @param  ind      Index
-	 * @return          Subs
+	 * @param  dim      Dimension
+	 * @return          Subscipt of x-th dimension
 	 */ 
 	inline const size_t 
 	Ind2x               (const size_t& ind, const size_t& dim) const;

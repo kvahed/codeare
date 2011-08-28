@@ -358,6 +358,7 @@ bool resetest (ReconClient* rc) {
 	std::string df    = std::string (base + std::string   (data));
 	
 	// OUT
+	std::string fname = std::string (base + std::string ("out.mat"));
 	std::string txmf  = std::string (base + std::string ("txm.mat"));
 	std::string rxmf  = std::string (base + std::string ("rxm.mat"));
 	std::string snrof = std::string (base + std::string ("snro.mat"));
@@ -378,12 +379,19 @@ bool resetest (ReconClient* rc) {
 	rc->GetReal ("b0",   b0);
 	
 	rc->Finalise(test);
-	
-	txm.Dump  (txmf,  "txm",  "", MATLAB);
-	rxm.Dump  (rxmf,  "rxm",  "", MATLAB);
-	snro.Dump (snrof, "snro", "", MATLAB);
-	b0.Dump   (b0f,   "b0",   "", MATLAB);
-	
+
+	MATFile* mf = matOpen (fname.c_str(), "w");
+
+	txm.MXDump  (mf,  "txm", "");
+	rxm.MXDump  (mf,  "rxm", "");
+	snro.MXDump (mf, "snro", "");
+	b0.MXDump   (mf,   "b0", "");
+
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n",fname.c_str());
+		return false;
+	}
+
 	return true;
 
 }

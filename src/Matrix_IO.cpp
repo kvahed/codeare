@@ -597,24 +597,10 @@ bool Matrix<T>::MXRead (const std::string fname, const std::string dname, const 
 
 
 template <class T>
-bool Matrix<T>::MXDump (const MATFile* file, const std::string dname, const std::string dloc) const {
-}
-
-template <class T>
-bool Matrix<T>::MXDump (const std::string fname, const std::string dname, const std::string dloc) const {
-
-	// Open file ---------------------------------
-
-	MATFile*  mf = matOpen (fname.c_str(), "w");
-
-	if (mf == NULL) {
-		printf ("Error creating file %s\n", fname.c_str());
-		return false;
-	}
-	// -------------------------------------------
-
+bool Matrix<T>::MXDump (MATFile* mf, const std::string dname, const std::string dloc) const {
+	
 	// Declare dimensions and allocate array -----
-
+	
 	mwSize   dim[INVALID_DIM];
 	
 	for (size_t i = 0; i < INVALID_DIM; i++)
@@ -653,12 +639,34 @@ bool Matrix<T>::MXDump (const std::string fname, const std::string dname, const 
 		return false;
     }
 	// -------------------------------------------
-	
-	
-	// Clean up and close file -------------------
-	
+
+
+	// Clean up RAM ------------------------------
+
 	if (mxa != NULL)
 		mxDestroyArray(mxa);
+	// -------------------------------------------
+	
+}
+
+template <class T>
+bool Matrix<T>::MXDump (const std::string fname, const std::string dname, const std::string dloc) const {
+
+	// Open file ---------------------------------
+
+	MATFile*  mf = matOpen (fname.c_str(), "w");
+
+	if (mf == NULL) {
+		printf ("Error creating file %s\n", fname.c_str());
+		return false;
+	}
+	// -------------------------------------------
+
+
+	MXDump (mf, dname, dloc);	
+
+
+	// Close file --------------------------------
 	
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n",fname.c_str());
