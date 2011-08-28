@@ -2181,21 +2181,25 @@ public:
 
 
     /**
-     * @brief           General inversion.
+     * @brief           Inversion of positive definite matrix.<br/>
+	 *                  Wrapper to LAPACK drivers (xGETRI & xGERTF).
      *
      * @return          success
      */
 	int 
     Inv   ()            const;
     
+
     /**
-     * @brief           Moore-Penrose pseudo-inverse.
+     * @brief           Moore-Penrose general inverse.<br/>
+	 *                  Wrapper to LAPACK routines (xGELSD).
      *
      * @return          Matrix
      */
 	Matrix<T> 
     Pinv   ();
     
+
     /**
      * @brief           Euclidean norm.
      *
@@ -2204,6 +2208,7 @@ public:
 	T
     Norm ()             const;
     
+
     /**
      * @brief           Dot product, complex, conjugate first vector
      *

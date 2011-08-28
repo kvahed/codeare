@@ -209,9 +209,6 @@ Matrix<T>::Pinv () {
 	else if (typeid(T) == typeid(double))
 		dgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);
 
-	//cgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
-	//dgelss_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
-
 	if (typeid(T) == typeid(cplx))
 		rwork = (float*) realloc (rwork, (int)rwork[0]*sizeof(float));
 
@@ -223,10 +220,6 @@ Matrix<T>::Pinv () {
 		cgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);
-
-	//cgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, &info);
-	//dgelss_(&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, &info);
-
 
 	free (s);
 	free (work);
