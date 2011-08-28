@@ -267,7 +267,7 @@ B0Map (const Matrix<cplx>* imgs, Matrix<double>* b0, const float TE) {
 			r = cplx (0.0,0.0);
 			for (int j = 0; j < nc; j++)
 				r += tmp[i + 2*j*np] * conj(tmp[i + (2*j+1)*np]);
-			b0->At(i) = arg(r);// atan2 (r.imag(),r.real());
+			b0->At(i) = arg(r);
 		}
 	
 	}
