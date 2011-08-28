@@ -151,7 +151,7 @@ namespace RRServer {
 		/**
 		 * @brief       Remove a complex matrix from complex container
 		 *
-		 * @param       Name
+		 * @param  name Name
 		 * @return      Success
 		 */
 		bool 
@@ -192,7 +192,7 @@ namespace RRServer {
 		/**
 		 * @brief       Remove a real matrix from real container
 		 *
-		 * @param       Name
+		 * @param  name Name
 		 * @return      Success
 		 */
 		bool 
@@ -233,7 +233,7 @@ namespace RRServer {
 		/**
 		 * @brief       Remove a pixel matrix from pixel container
 		 *
-		 * @param       Name
+		 * @param  name Name
 		 * @return      Success
 		 */
 		bool 
