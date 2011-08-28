@@ -347,39 +347,54 @@ bool fftwtest (ReconClient* rc) {
 
 bool resetest (ReconClient* rc) {
 
-	Matrix<cplx> meas;
-	Matrix<cplx> txm;
-	Matrix<cplx> rxm;
-	Matrix<double> b0;
-	Matrix<double> snro;
+	// OUT:
+	Matrix<cplx>   meas; // measurement
 
-	// IN
-	std::string cf    = std::string (base + std::string (config));
-	std::string df    = std::string (base + std::string   (data));
-	
-	// OUT
-	std::string fname = std::string (base + std::string ("out.mat"));
-	std::string txmf  = std::string (base + std::string ("txm.mat"));
-	std::string rxmf  = std::string (base + std::string ("rxm.mat"));
-	std::string snrof = std::string (base + std::string ("snro.mat"));
-	std::string b0f   = std::string (base + std::string ("b0.mat"));
-	
-	meas.RAWRead (df, std::string("VB15"));
-	
+	// IN: 
+	Matrix<cplx>   txm;  // Transmit maps
+	Matrix<cplx>   rxm;  // Receive maps
+
+	Matrix<double> b0;   // B0 map
+	Matrix<double> snro; // SNR optimal image
+
+	// Read configuration file and initialise backend ------------
+
+	std::string    cf = std::string (base + std::string (config));
 	rc->ReadConfig (cf.c_str());
+
 	rc->Init(test);
-	
+	// -----------------------------------------------------------
+
+	// Read binary data and transmit to backend ------------------ 
+
+	std::string    df = std::string (base + std::string   (data));
+	meas.RAWRead (df, std::string("VB15"));
+
 	rc->SetCplx ("meas", meas);
-	
+	// -----------------------------------------------------------
+
+	// Process data on backend -----------------------------------
+
 	rc->Process(test);
+	// -----------------------------------------------------------
 	
+	// Get back reconstructed data from backend ------------------
+
 	rc->GetCplx ("txm",  txm);
 	rc->GetCplx ("rxm",  rxm);
 	rc->GetReal ("snro", snro);
 	rc->GetReal ("b0",   b0);
-	
-	rc->Finalise(test);
+	// -----------------------------------------------------------
 
+	// Clear RAM and hangup --------------------------------------
+
+	rc->Finalise(test);
+	// -----------------------------------------------------------
+
+	// Write data to a single matlab disk ------------------------
+	
+	std::string fname = std::string (base + std::string ("out.mat"));
+	
 	MATFile* mf = matOpen (fname.c_str(), "w");
 
 	txm.MXDump  (mf,  "txm", "");
@@ -391,6 +406,7 @@ bool resetest (ReconClient* rc) {
 		printf ("Error closing file %s\n",fname.c_str());
 		return false;
 	}
+	// -----------------------------------------------------------
 
 	return true;
 

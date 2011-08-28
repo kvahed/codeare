@@ -84,8 +84,13 @@ RelativeSensitivities::Process     () {
 	// -----------------------------------------
 
 
-	printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+	// Remove original data --------------------
 
+    FreeCplx ("meas");
+	// -----------------------------------------
+
+	
+	printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 	return RRSModule::OK;
 
 }
