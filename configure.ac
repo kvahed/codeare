@@ -178,7 +178,6 @@ AC_CHECK_LIB([omnithread],   [read],        [], [AC_MSG_ERROR([cannot find libom
 AC_CHECK_LIB([omniDynamic4], [main],        [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
 AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libz, bailing out])])
-#AC_CHECK_LIB([fftw],         [fftw_create_plan], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftwf, bailing out])])
 AC_CHECK_LIB([cdf],          [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf dump / read functionality unavailable!])])
 case "$host" in
@@ -186,7 +185,7 @@ case "$host" in
 #AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libsz, bailing out])])
 ;;
 esac
-AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [], [AC_MSG_ERROR([cannot find libnfft3, bailing out])])
+AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
 # Checks for C++ libraries with name spaces
 
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[
