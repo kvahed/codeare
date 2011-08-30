@@ -25,7 +25,10 @@ testclt_LDFLAGS = $(BLAS) $(LAPACK)
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
-reconserver_LDFLAGS = $(HDF5) -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la -dlopen modules/NuFFT_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la
+reconserver_LDFLAGS = $(HDF5) -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la
+if USE_NFFT3
+    reconserver_LDFLAGS += -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la -dlopen modules/NuFFT_OMP.la 
+endif
 
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc

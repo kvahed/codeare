@@ -134,7 +134,7 @@ namespace RRStrategy {
 		for (int i = 1; i < nc; i++) 
 			memcpy (&p[i*p.Width()*p.Height()], &p[0], p.Width()*p.Height()*sizeof(p[0]));
 						
-		p.MXDump ("pat.mat", "pat");
+		//p.MXDump ("pat.mat", "pat");
 						
 		//memcpy (&inds[0], &i[0], sizeof(size_t) * inds.Size());
 		//subs = pat.Ind2Sub2D(inds);

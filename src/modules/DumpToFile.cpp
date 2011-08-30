@@ -40,6 +40,7 @@ DumpToFile::Process () {
 
 	fname << uid << "_data.mat";
 
+#ifdef HAVE_MAT_H
 	MATFile* mf = matOpen (fname.str().c_str(), "w");
 
 	if (mf == NULL) {
@@ -69,7 +70,7 @@ DumpToFile::Process () {
 		printf ("Error closing file %s\n",fname.str().c_str());
 		return RRSModule::FILE_ACCESS_FAILED;
 	}
-
+#endif
 	printf ("... done\n");
 
 	return RRSModule::OK;

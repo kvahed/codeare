@@ -51,9 +51,6 @@
 /* Define to 1 if you have the `fftw3f' library (-lfftw3f). */
 #undef HAVE_LIBFFTW3F
 
-/* Define to 1 if you have the `nfft3' library (-lnfft3). */
-#undef HAVE_LIBNFFT3
-
 /* Define to 1 if you have the `omniDynamic4' library (-lomniDynamic4). */
 #undef HAVE_LIBOMNIDYNAMIC4
 
