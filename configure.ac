@@ -222,7 +222,7 @@ AC_TRY_LINK([#include <H5Cpp.h>],
    [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
 
 if test -z $hdf5_found; then
-    LIBS="${OLD_LIBS}"
+    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
 fi
 
 
