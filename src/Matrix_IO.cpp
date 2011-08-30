@@ -78,6 +78,20 @@ Matrix<double>::Print (std::ostream &os) const {
 
 
 template<> inline std::ostream&  
+Matrix<float>::Print (std::ostream &os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%+.4f ", _M [i + j * _dim[COL]]);
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+template<> inline std::ostream&  
 Matrix<cplx>::Print (std::ostream& os) const {
 	
 	for (size_t i = 0; i < _dim[COL]; i++) {
@@ -131,7 +145,7 @@ bool Matrix<T>::PRDump (const std::string fname) const {
 		return false;
 	}
 	
-	if (fwrite(_M, sizeof(float), Size(), fp) != Size()) {
+	if (fwrite(&_M[0], sizeof(float), Size(), fp) != Size()) {
 		printf("File read error.");
 		return false;
 	}
@@ -259,7 +273,7 @@ bool Matrix<T>::H5Dump (const std::string fname, const std::string dname, const 
 		
 			DataSet set = group.createDataSet(_dname, (*type), space);
 				
-			set.write   (_M, (*type));
+			set.write   (&_M[0], (*type));
 			set.close   ();
 			space.close ();
 			file.close  ();
@@ -473,10 +487,11 @@ bool Matrix<T>::H5Read (const std::string fname, const std::string dname, const 
 			for (size_t i = ndim; i < INVALID_DIM; i++)
 				_dim[i] = 1;
 			
-			if (nb_alloc)
-				free (_M);
+			//if (nb_alloc)
+			//free (_M);
+			_M.resize(Size());
 
-			_M = (T*) malloc (Size() * sizeof (T));
+			//_M = (T*) malloc (Size() * sizeof (T));
 			
 
 			std::cout << "rank: " << ndim << ", dimensions: ";
@@ -498,7 +513,7 @@ bool Matrix<T>::H5Read (const std::string fname, const std::string dname, const 
 			else
 				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
 				
-			dataset.read (_M, (*type));
+			dataset.read (&_M[0], (*type));
 			
 			space.close();
 			dataset.close();
@@ -576,7 +591,7 @@ bool Matrix<T>::MXRead (const std::string fname, const std::string dname, const 
 	// Copy from memory block ----------------------
 	
 	if (typeid(T) == typeid(double))
-		memcpy(_M, mxGetPr(mxa), Size() * sizeof(T));
+		memcpy(&_M[0], mxGetPr(mxa), Size() * sizeof(T));
 	else if (typeid(T) == typeid(cplx))
 		for (size_t i = 0; i < Size(); i++) {
 			float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
@@ -624,11 +639,11 @@ bool Matrix<T>::MXDump (MATFile* mf, const std::string dname, const std::string 
 	// Copy to memory block ----------------------
 	
 	if (typeid(T) == typeid(double))
-		memcpy(mxGetPr(mxa), _M, Size() * sizeof(T));
+		memcpy(mxGetPr(mxa), &_M[0], Size() * sizeof(T));
 	else if (typeid(T) == typeid(cplx))
 		for (size_t i = 0; i < Size(); i++) {
-			((float*)mxGetPr(mxa))[i] = ((float*)_M)[2*i+0]; // Template compilation workaround
-			((float*)mxGetPi(mxa))[i] = ((float*)_M)[2*i+1]; // Can't use .imag() .real(). Consider double/short 
+			((float*)mxGetPr(mxa))[i] = ((float*)&_M[0])[2*i+0]; // Template compilation workaround
+			((float*)mxGetPi(mxa))[i] = ((float*)&_M[0])[2*i+1]; // Can't use .imag() .real(). Consider double/short 
 		}
 	else
 		for (size_t i = 0; i < Size(); i++)
@@ -727,7 +742,7 @@ bool Matrix<T>::NIDump (const std::string fname) const {
 		strcpy(ni->iname,fname.c_str());
 		
 		ni->data = (void*) malloc (Size() * sizeof (T));
-		memcpy (ni->data, _M, Size() * sizeof (T));
+		memcpy (ni->data, &_M[0], Size() * sizeof (T));
 		
 		nifti_image_write (ni);
 		nifti_image_free (ni); 
@@ -771,13 +786,13 @@ bool Matrix<T>::NIRead (const std::string fname) {
 		
 		if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
 			if (ni->datatype == 64)
-				memcpy (_M, ni->data, Size()*sizeof(T));
+				memcpy (&_M[0], ni->data, Size()*sizeof(T));
 			else 
 				for (size_t i = 0; i < Size(); i++ )
 					_M[i] = ((float*)ni->data)[i];
 		} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(cplx)) {
 			if (ni->datatype == 32)
-				memcpy (_M, ni->data, Size()*sizeof(T));
+				memcpy (&_M[0], ni->data, Size()*sizeof(T));
 			else 
 				for (size_t i = 0; i < Size(); i++) {
 					float f[2] = {((double*)ni->data)[2*i], ((double*)ni->data)[2*i+1]};
@@ -785,7 +800,7 @@ bool Matrix<T>::NIRead (const std::string fname) {
 				}
 		} else if (ni->datatype == 256 && typeid(T) == typeid(short)) {
 			if (ni->datatype == 256)
-				memcpy (_M, ni->data, Size()*sizeof(T));
+				memcpy (&_M[0], ni->data, Size()*sizeof(T));
 		} else {
 			printf ("Unsupported data type %i", ni->datatype);
 			return false;

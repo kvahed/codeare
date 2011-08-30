@@ -1,17 +1,13 @@
 template <class T> 
 Matrix<T>::Matrix () {
 
-	nb_alloc = 0;
-
     for (size_t i = 0; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    _M = (T*) malloc (Size()*sizeof(T));
+	_M.resize(Size());
 
 	for (size_t i = 0; i < Size(); i++)
 		_M[i] = T(0.0);
-
-    nb_alloc++;
 
 
 }
@@ -20,8 +16,6 @@ Matrix<T>::Matrix () {
 
 template <class T> 
 Matrix<T>::Matrix (const size_t n) {
-
-	nb_alloc = 0;
 
 	_dim [COL] = n;
 	_dim [LIN] = n;
@@ -32,12 +26,10 @@ Matrix<T>::Matrix (const size_t n) {
     for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
-    _M = (T*) malloc (n*n*sizeof(T));
+	_M.resize(n*n);
 
 	for (size_t i = 0; i < Size(); i++)
 		_M[i] = T(0.0);
-
-    nb_alloc++;
 
 }
 
@@ -45,8 +37,6 @@ Matrix<T>::Matrix (const size_t n) {
 
 template <class T> 
 Matrix<T>::Matrix (const size_t m, const size_t n) {
-
-	nb_alloc = 0;
 
 	_dim [0] = m;
 	_dim [1] = n;
@@ -57,12 +47,10 @@ Matrix<T>::Matrix (const size_t m, const size_t n) {
     for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
-    _M = (T*) malloc (Size()*sizeof(T));
+	_M.resize(m*n);
 
 	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
-
-    nb_alloc++;
 
 }
 
@@ -70,8 +58,6 @@ Matrix<T>::Matrix (const size_t m, const size_t n) {
 
 template <class T> 
 Matrix<T>::Matrix (const size_t m, const size_t n, const size_t k) {
-
-	nb_alloc = 0;
 
 	_dim [0] = m;
 	_dim [1] = n;
@@ -83,12 +69,10 @@ Matrix<T>::Matrix (const size_t m, const size_t n, const size_t k) {
     for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
-    _M = (T*) malloc (Size()*sizeof(T));
+	_M.resize(m*n*k);
 
 	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
-
-    nb_alloc++;
 
 }
 
@@ -99,8 +83,6 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
                    const size_t eco, const size_t phs, const size_t rep, const size_t seg, 
                    const size_t par, const size_t slc, const size_t ida, const size_t idb, 
                    const size_t idc, const size_t idd, const size_t ide, const size_t ave) {
-
-	nb_alloc = 0;
 
     _dim[COL] = col;
     _dim[LIN] = lin;
@@ -122,13 +104,10 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
     for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
-    _M = (T*) malloc (Size() * sizeof (T));
+	_M.resize(Size());
 
 	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
-
-    nb_alloc++;
-
 
 }
 
@@ -137,20 +116,16 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
 template <class T>
 Matrix<T>::Matrix (const size_t* dim) {
 
-	nb_alloc = 0;
-
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		_dim[i] = dim[i];
 
     for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
-    _M = (T*) malloc (Size() * sizeof (T));
+	_M.resize(Size());
 
 	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
-
-    nb_alloc++;
 
 }
 
@@ -159,19 +134,15 @@ Matrix<T>::Matrix (const size_t* dim) {
 template <class T>
 Matrix<T>::Matrix (const Matrix<T> &M) {
 	
-	nb_alloc = 0;
-	
 	for (size_t i = 0; i < INVALID_DIM; i++) 
 		_dim[i] = M.Dim(i);
 	
     for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
-	_M = (T*) malloc (Size() * sizeof (T));
+	_M.resize(Size());
 	
-	memcpy (_M, M.Data(), Size() * sizeof(T));
-	
-	nb_alloc++;
+	memcpy (&_M[0], M.Data(), Size() * sizeof(T));
 	
 }
 
@@ -185,10 +156,7 @@ Matrix<T>::~Matrix() {
     ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
 #endif
 
-    if (nb_alloc) {
-    	free (_M);
-        nb_alloc--;
-    }
+	_M.clear();
     
 }
 
@@ -482,8 +450,8 @@ Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
 }
 
 
-/*template<>
-Matrix<double> Matrix<cplx>::Real () const {
+template<>
+inline Matrix<double> Matrix<cplx>::Real () const {
 
 	Matrix<double> res (_dim);
 
@@ -502,10 +470,10 @@ Matrix<double> Matrix<cplx>::Real () const {
 		
 	return res;
 
-	}*/
+}
     
-/*template<>
-Matrix<double> Matrix<cplx>::Imag () const {
+template<>
+inline Matrix<double> Matrix<cplx>::Imag () const {
 
 	Matrix<double> res (_dim);
 
@@ -524,5 +492,5 @@ Matrix<double> Matrix<cplx>::Imag () const {
 		
 	return res;
 
-	}*/
+}
     

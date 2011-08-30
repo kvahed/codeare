@@ -20,11 +20,11 @@ Matrix<T> Matrix<T>::FFT() const {
 	
 	// Data is column-major (inverse order of indices)
 	if (Is1D())
-		p = fftwf_plan_dft_1d(_dim[0],                   reinterpret_cast<fftwf_complex*>(&_M[0]), reinterpret_cast<fftwf_complex*>(&res[0]), FFTW_FORWARD, FFTW_ESTIMATE);
+		p = fftwf_plan_dft_1d(_dim[0],                   (fftwf_complex*)&_M[0], (fftwf_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
 	else if (Is2D())
-		p = fftwf_plan_dft_2d(_dim[1], _dim[0],          reinterpret_cast<fftwf_complex*>(&_M[0]), reinterpret_cast<fftwf_complex*>(&res[0]), FFTW_FORWARD, FFTW_ESTIMATE);
+		p = fftwf_plan_dft_2d(_dim[1], _dim[0],          (fftwf_complex*)&_M[0], (fftwf_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
 	else if (Is3D())
-		p = fftwf_plan_dft_3d(_dim[2], _dim[1], _dim[0], reinterpret_cast<fftwf_complex*>(&_M[0]), reinterpret_cast<fftwf_complex*>(&res[0]), FFTW_FORWARD, FFTW_ESTIMATE);
+		p = fftwf_plan_dft_3d(_dim[2], _dim[1], _dim[0], (fftwf_complex*)&_M[0], (fftwf_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
 	
 	fftwf_execute(p);
 	fftwf_destroy_plan(p);
@@ -53,11 +53,11 @@ Matrix<T> Matrix<T>::IFFT() const {
 	
 	// Data is column-major (inverse order of indices)
 	if (Is1D())
-		p = fftwf_plan_dft_1d(_dim[0],                   reinterpret_cast<fftwf_complex*>(&_M[0]), reinterpret_cast<fftwf_complex*>(&res[0]), FFTW_BACKWARD, FFTW_ESTIMATE);
+		p = fftwf_plan_dft_1d(_dim[0],                   (fftwf_complex*)(&_M[0]), (fftwf_complex*)(&res[0]), FFTW_BACKWARD, FFTW_ESTIMATE);
 	else if (Is2D())
-		p = fftwf_plan_dft_2d(_dim[1], _dim[0],          reinterpret_cast<fftwf_complex*>(&_M[0]), reinterpret_cast<fftwf_complex*>(&res[0]), FFTW_BACKWARD, FFTW_ESTIMATE);
+		p = fftwf_plan_dft_2d(_dim[1], _dim[0],          (fftwf_complex*)(&_M[0]), (fftwf_complex*)(&res[0]), FFTW_BACKWARD, FFTW_ESTIMATE);
 	else if (Is3D())
-		p = fftwf_plan_dft_3d(_dim[2], _dim[1], _dim[0], reinterpret_cast<fftwf_complex*>(&_M[0]), reinterpret_cast<fftwf_complex*>(&res[0]), FFTW_BACKWARD, FFTW_ESTIMATE);
+		p = fftwf_plan_dft_3d(_dim[2], _dim[1], _dim[0], (fftwf_complex*)(&_M[0]), (fftwf_complex*)(&res[0]), FFTW_BACKWARD, FFTW_ESTIMATE);
 
 	fftwf_execute(p);
 	fftwf_destroy_plan(p);
@@ -228,15 +228,14 @@ Matrix<T>::Sum (const size_t d) {
 	if (_dim[d] == 1)
 		return;
 
-	// No RAM allocation 
-	if (!nb_alloc)
+	// Empty? allocation 
+	if (Empty() || _dim[d] == 1)
 		return;
 
 	// Save old data and resize matrix 
 	T* tmp = (T*) malloc (Size() * sizeof (T));
-	memcpy (tmp, _M, Size() * sizeof (T));
-	free (_M);
-	_M       = (T*) malloc ((Size() / _dim[d]) * sizeof(T));
+	memcpy (tmp, &_M[0], Size() * sizeof (T));
+	_M.resize(Size()/_dim[d]);
 
 	// Inner size 
 	size_t insize = 1;
@@ -267,6 +266,7 @@ Matrix<T>::Sum (const size_t d) {
 		}
 
 	}
+
 	// Adjust dminesions and clear tmp
 	_dim[d] = 1;
 	free (tmp);

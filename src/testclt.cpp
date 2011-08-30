@@ -298,6 +298,8 @@ bool internaltest (ReconClient* rc) {
 	std::cout << h << std::endl;
 	std::cout << p << std::endl;
 	
+	Matrix<std::complex<double> >  f = (Matrix<std::complex<double> >) r;
+
 	rc->ReadConfig("test.xml");
 	rc->Init(test);
 

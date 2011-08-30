@@ -37,6 +37,10 @@ Matrix<T>
 Matrix<T>::prod (Matrix<T> &M) {
 	
     assert (Dim(1) == M.Dim(0));
+	
+	/*if (M.Is1D())
+	  return this->GEMV (M);*/
+	//else
 	return this->GEMM (M);
 	
 }
@@ -70,6 +74,29 @@ Matrix<T>::GEMM (Matrix<T>& M, char transb) {
 }
 
 
+/*
+template<class T>
+Matrix<T> 
+Matrix<T>::GEMV (Matrix<T>& M, char trans) {
+
+    int  m      = (int)   Dim(0);
+    int  n      = (int )M.Dim(1);
+	int  lda    = (int)   m;
+	
+	T    alpha  =         T(1.0);
+	T    beta   =         T(0.0);
+	
+	Matrix<T> res (m, (transb == 'N') ? M.Dim(1) : M.Dim(0));
+	
+	if (typeid(T) == typeid(double))
+		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
+	else if (typeid(T) == typeid(cplx))
+		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
+	
+	return res;
+	
+}
+*/
 
 template<class T>
 T
@@ -80,8 +107,8 @@ Matrix<T>::Norm () const {
 	int n    = (int) Size();
 	int incx = 1;
 	
-	if      (typeid(T) == typeid(   cplx)) res = cblas_scnrm2 (n, _M, incx);
-	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, _M, incx);
+	if      (typeid(T) == typeid(   cplx)) res = cblas_scnrm2 (n, &_M[0], incx);
+	else if (typeid(T) == typeid(double))  res = cblas_dnrm2  (n, &_M[0], incx);
 	
 	else {
 		for (int i = 0; i < Size(); i++)
