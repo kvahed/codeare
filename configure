@@ -10704,7 +10704,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"321:370M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"321:371M\"" >>confdefs.h
 
 # copyright notice
 
@@ -16065,7 +16065,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
 if test -z $hdf5_found; then
-    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+    LIBS="${OLD_LIBS}"
 fi
 
 
@@ -16100,7 +16100,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
 if test -z $hdf5_found; then
-    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+    LIBS="${LIBS} -lniftiio -lznz"
 fi
 
 
