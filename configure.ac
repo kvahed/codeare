@@ -222,7 +222,7 @@ AC_TRY_LINK([#include <H5Cpp.h>],
    [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
 
 if test -z $hdf5_found; then
-    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+    LIBS="${OLD_LIBS}"
 fi
 
 
@@ -240,7 +240,7 @@ AC_TRY_LINK([#include <nifti1_io.h>],
    [AC_MSG_RESULT([no. Cannot find libniftiio, NIFTI dump/read not available.])])
 
 if test -z $hdf5_found; then
-    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+    LIBS="${LIBS} -lniftiio -lznz"
 fi
 
 
