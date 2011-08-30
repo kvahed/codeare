@@ -35,7 +35,7 @@ AC_HELP_STRING([--with-pythonpath=PATH],
   [specify an absolute path to python executable when automatic version check (incorrectly) fails]),
   [python_path="$withval"], [python_path="auto"])
 if test "$python_path" = auto; then
-	AM_PATH_PYTHON([3.1])
+	AM_PATH_PYTHON([2.7])
 else
 	# Older versions of automake can't handle python3 well.  This is an
 	# in-house workaround for them.
