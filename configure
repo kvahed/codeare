@@ -10704,7 +10704,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"321:366M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"321:369\"" >>confdefs.h
 
 # copyright notice
 
@@ -15825,7 +15825,6 @@ else
   as_fn_error "cannot find libz, bailing out" "$LINENO" 5
 fi
 
-#AC_CHECK_LIB([fftw],         [fftw_create_plan], [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftwf_execute in -lfftw3f" >&5
 $as_echo_n "checking for fftwf_execute in -lfftw3f... " >&6; }
 if test "${ac_cv_lib_fftw3f_fftwf_execute+set}" = set; then :
@@ -15970,7 +15969,8 @@ _ACEOF
   LIBS="-lnfft3 $LIBS"
 
 else
-  as_fn_error "cannot find libnfft3, bailing out" "$LINENO" 5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&5
+$as_echo "cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&6; }
 fi
 
 # Checks for C++ libraries with name spaces
