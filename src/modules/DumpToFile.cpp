@@ -1,6 +1,6 @@
 /*
  *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Jülich, Germany
+ *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,22 +38,37 @@ DumpToFile::Process () {
 
 	fname.str("");
 
-	fname << uid << "_data.h5";
+	fname << uid << "_data.mat";
 
-	while (!m_cplx.empty()) {
+	MATFile* mf = matOpen (fname.str().c_str(), "w");
 
-		std::stringstream fn;
-		
-		fn << fname << m_cplx.begin()->first << "_cplx_" << uid << ".h5";
-		std::cout << "dumping " << fn.str().c_str() << std::endl;
-		m_cplx.begin()->second->Dump(fn.str().c_str());
-		m_cplx.erase(m_cplx.begin());
-
+	if (mf == NULL) {
+		printf ("Error creating file %s\n", fname.str().c_str());
+		return RRSModule::FILE_ACCESS_FAILED;
 	}
 
-	//m_raw.Dump    (fname.str().c_str());
-	//m_helper.Dump (fname.str().c_str());
-	//m_pixel.Dump  (fname.str().c_str());
+	map<string,Matrix<cplx>*>::iterator cit = m_cplx.begin();
+	for (cit = m_cplx.begin() ; cit != m_cplx.end(); cit++) {
+		cout << "Dumping " << cit->first.c_str() << endl;
+		cit->second->MXDump(mf, cit->first.c_str());
+	}
+	
+	map<string,Matrix<double>*>::iterator rit = m_real.begin();
+	for (rit = m_real.begin(); rit != m_real.end(); rit++) {
+		cout << "Dumping " <<  rit->first.c_str() << endl;
+		rit->second->MXDump(mf, rit->first.c_str());
+	}
+	
+	map<string,Matrix<short>*>::iterator pit = m_pixel.begin();
+	for (pit = m_pixel.begin(); pit != m_pixel.end(); pit++) {
+		cout << "Dumping " <<  pit->first.c_str() << endl;
+		pit->second->MXDump(mf, pit->first.c_str());
+	}
+	
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n",fname.str().c_str());
+		return RRSModule::FILE_ACCESS_FAILED;
+	}
 
 	printf ("... done\n");
 

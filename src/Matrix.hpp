@@ -122,6 +122,7 @@ enum io_strategy {
 	MATLAB,
 	NIFTI,
 	SYNGO,
+	CDF,
 	PRIMITIVE
 
 };
@@ -432,6 +433,17 @@ public:
      */
     const size_t       
     Import              (const IceAs* ias, const size_t pos);
+
+
+    /**
+     * @brief           Import with MDH
+     *                   
+     * @param  ias      IceAs containing data
+     * @param  mdh      Measurement data header      
+     * @return          Amount of data read
+     */
+    const size_t       
+    Import              (const IceAs* ias, sMDH* mdh);
 
 
     /**
@@ -1719,7 +1731,7 @@ public:
     
 
     /**
-     * @brief           Dump to HDF5 file.
+     * @brief           Dump to <a href="http://www.hdfgroup.org/HDF5/" target="io">HDF5</a> file.
      * 
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
@@ -1731,7 +1743,7 @@ public:
     
 
     /**
-     * @brief           Read from HDF5 file.
+     * @brief           Read from <a href="http://www.hdfgroup.org/HDF5/" target="io">HDF5</a> file.
      *
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
@@ -1743,7 +1755,31 @@ public:
     
 
     /**
-     * @brief           Dump to NIFTI file.
+     * @brief           Dump to <a href="http://cdf.gsfc.nasa.gov/" target="io">CDF</a> file.
+     * 
+     * @param  fname    File name.
+	 * @param  dname    Dataset name.
+	 * @param  dloc     Dataset location.
+     * @return          Success.
+     */
+    bool                
+    CDFDump             (const std::string fname, const std::string dname = "", const std::string dloc = "/") const;
+    
+
+    /**
+     * @brief           Read from <a href="http://cdf.gsfc.nasa.gov/" target="io">CDF</a> file.
+     *
+     * @param  fname    File name.
+	 * @param  dname    Dataset name.
+	 * @param  dloc     Dataset location.
+     * @return          Success.
+     */
+    bool                
+    CDFRead             (const std::string fname, const std::string dname = "", const std::string dloc = "/");
+    
+
+    /**
+     * @brief           Dump to <a href="http://nifti.nimh.nih.gov/">NIFTI</a> file.
      * 
      * @param  fname    File name.
      * @return          Success.
@@ -1753,7 +1789,7 @@ public:
     
 
     /**
-     * @brief           Read from NIFTI file.
+     * @brief           Read from <a href="http://nifti.nimh.nih.gov/">NIFTI</a> file.
      *
      * @param  fname    File name.
      * @return          Success.
@@ -1765,9 +1801,9 @@ public:
 #ifdef HAVE_MAT_H
 
     /**
-     * @brief           Dump to MATLAB file.
+     * @brief           Dump to <a href="http://www.mathworks.com">MATLAB</a> file.
      * 
-     * @param  file     File name.
+     * @param  file     File handle.
 	 * @param  dname    Dataset name.
 	 * @param  dloc     Dataset location.
      * @return          Success.
@@ -1777,7 +1813,7 @@ public:
     
 
     /**
-     * @brief           Dump to MATLAB file.
+     * @brief           Dump to <a href="http://www.mathworks.com">MATLAB</a> file.
      * 
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
@@ -1789,7 +1825,7 @@ public:
     
 
     /**
-     * @brief           Read from MATLAB file.
+     * @brief           Read from <a href="http://www.mathworks.com">MATLAB</a> file.
      *
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
@@ -1802,7 +1838,7 @@ public:
 #endif    
 
     /**
-     * @brief           Dump to HDF5 file.
+     * @brief           Dump matrix to file.
      * 
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
@@ -1815,7 +1851,7 @@ public:
     
 
     /**
-     * @brief           Read from HDF5 file.
+     * @brief           Read matrix from file.
      *
      * @param  fname    File name.
 	 * @param  dname    Dataset name.
@@ -1828,7 +1864,7 @@ public:
 
     
 	/**
-	 * @brief           Read from Syngo MR meas file
+	 * @brief           Read from <a href="http://www.medical.siemens.com/">Syngo MR</a> meas file
 	 *
 	 * @param  fname    File name
 	 * @param  version  File version
@@ -1836,15 +1872,6 @@ public:
 	 */
 	bool
 	RAWRead             (const std::string fname, const std::string version);
-
-	/**
-	 * @brief           Adjust and resize for Syngo read
-	 *
-	 * @param  fname    Syngo MR meas file name
-	 * @return          Success
-	 */
-	bool
-	RSAdjust            (const std::string fname);
 
     //@}
     
@@ -1872,7 +1899,7 @@ public:
 	/**
 	 * @brief           Multiple subscripts from linear index (MATLAB like)
 	 *
-	 * @pararm ind      Indices
+	 * @param  ind      Indices
 	 * @return          Subscripts
 	 */
 	Matrix<size_t>
@@ -2005,7 +2032,7 @@ public:
     tr   ()             const;
     
     /**
-     * @brief           Fourier transform over all dimensions.
+     * @brief           Fourier transform (<a href="fftw.org" target="fftw">FFTW</a>) over all dimensions.
      *
      * @return          Fourier transform.
      */
@@ -2013,7 +2040,7 @@ public:
     FFT                 ()            const;
     
     /**
-     * @brief           Inverse Fourier transform over all dimensions
+     * @brief           Inverse Fourier transform <a href="fftw.org" target="fftw">FFTW</a> over all dimensions
      *
      * @return          Inverse Fourier transform.
      */
@@ -2030,8 +2057,8 @@ public:
     FFTShift            (const size_t d = 0)            const;
     
     /**
-     * @brief           MATLAB-like fftshift.<br/>
-	 *                  i.e. shift zero component to centre of volume for viewing
+     * @brief           MATLAB-like ifftshift.<br/>
+	 *                  i.e. shift zero component to centre of volume for viewing. WORKS ONLY ON EVEN 
      *
      * @return          FFT shift.
      */
@@ -2182,27 +2209,38 @@ public:
 
 
     /**
-     * @brief           Inversion of positive definite matrix.<br/>
-	 *                  Wrapper to LAPACK drivers (xGETRI & xGERTF).
+     * @brief           Inversion of positive definite matrix through LU factorisation.<br/>
+	 *                  Wrapper to <a href="http://www.netlib.org/lapack/">LAPACK</a> drivers (xGETRI & xGERTF).
      *
-     * @return          success
+     * @return          Inverse
      */
-	int 
+	Matrix<T>
     Inv   ()            const;
     
 
     /**
      * @brief           Moore-Penrose general inverse.<br/>
-	 *                  Wrapper to LAPACK routines (xGELSD).
+	 *                  Wrapper to <a href="http://www.netlib.org/lapack/">LAPACK</a> routines (xGELSD).
      *
-     * @return          Matrix
+     * @return          Pseudo-inverse
      */
 	Matrix<T> 
     Pinv   ();
     
 
     /**
-     * @brief           Euclidean norm.
+     * @brief           Cholesky factorisation of a positive definite matrix.<br/>
+	 *                  Wrapper to <a href="http://www.netlib.org/lapack/">LAPACK</a> routines (xPOTRF).
+	 * 
+     * @param  uplo     Store upper or lower triangular matrix {'U','L'}
+     * @return          Factorisation
+     */
+	Matrix<T> 
+    Cholesky (const char uplo);
+    
+
+    /**
+     * @brief           Euclidean norm using <a href="http://www.netlib.org/blas/">BLAS</a> routines xNRM2.
      *
      * @return          Norm
      */
@@ -2211,9 +2249,9 @@ public:
     
 
     /**
-     * @brief           Dot product, complex, conjugate first vector
+     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines CDOTU and DDOT
      *
-     * @param  M        Factor      
+     * @param  M        Factor
      */
 	T
     dotc (Matrix<T>& M) const;
@@ -2230,7 +2268,7 @@ public:
     
 
     /**
-     * @brief           Compute eigen values with Lapack
+     * @brief           Compute eigen values with <a href="http://www.netlib.org/lapack/">LAPACK</a> routines xGEEV.
      *
 	 * @param  ev       Vector containing the computed eigenvalues
 	 * @param  cv       Compute also left hand eigen vectors
@@ -2239,20 +2277,20 @@ public:
      * @return          Feedback from Lapack operation
      */
     inline int
-	EIG                 (const bool cv, Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* rev);
+	EIG                 (Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* rev, const bool cv = true);
     
 
     /**
-     * @brief           Compute singular value decomposition with lapack.
+     * @brief           Compute singular value decomposition with <a href="http://www.netlib.org/lapack/">LAPACK</a> routines xGESDD.
      *
-	 * @param  jobz     @see http://www.netlib.org/lapack/double/xgesdd.f
 	 * @param  lsv      Left hand singular vectors.
 	 * @param  rsv      Right hand singular vectors.
 	 * @param  sv       Sorted singular values.
+	 * @param  jobz     @see http://www.netlib.org/lapack/double/dgesdd.f @see http://www.netlib.org/lapack/double/cgesdd.f
      * @return          Info from Lapack operation.
      */
     inline int
-	SVD                 (const char jobz, Matrix<T>* lsv, Matrix<T>* rsv, Matrix<T>* sv);
+	SVD                 (Matrix<T>* lsv, Matrix<T>* rsv, Matrix<T>* sv, const char jobz = 'A');
     
 	
     //@}
@@ -2266,6 +2304,7 @@ private:
     T*                  _M;                /// Data repository
 	int                 nb_alloc;
 
+
     /**
      * @brief           Matrix Product with BLAS.
      *
@@ -2275,7 +2314,17 @@ private:
      * @return          Product of this and M.
      */
     Matrix<T>           
-    GEMM                (Matrix<T> &M, char transb);
+    GEMM                (Matrix<T> &M, const char transb = 'N');
+
+
+	/**
+	 * @brief           Adjust and resize for Syngo read
+	 *
+	 * @param  fname    Syngo MR meas file name
+	 * @return          Success
+	 */
+	bool
+	RSAdjust            (const std::string fname);
     
 };
 

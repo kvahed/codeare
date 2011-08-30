@@ -3,6 +3,9 @@
 /* Define to 1 if you have the <assert.h> header file. */
 #undef HAVE_ASSERT_H
 
+/* Define to 1 if you have the <cdf.h> header file. */
+#undef HAVE_CDF_H
+
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 
@@ -38,6 +41,9 @@
 
 /* Define to 1 if you have the <iostream> header file. */
 #undef HAVE_IOSTREAM
+
+/* Define to 1 if you have the `cdf' library (-lcdf). */
+#undef HAVE_LIBCDF
 
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
