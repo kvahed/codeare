@@ -111,7 +111,7 @@ SVDCalibrate (const Matrix<cplx>* imgs, Matrix<cplx>* rxm, Matrix<cplx>* txm, Ma
 		threads  = omp_get_num_threads();
 	}
 	
-	Matrix<cplx> m[threads]; // Combination
+	Matrix<cplx> m[(const int)threads]; // Combination
 	Matrix<cplx> u[threads]; // Left-side and  O(NRX x NRX)
 	Matrix<cplx> v[threads]; // Right-side singular vectors O(NTX, NTX)
 	Matrix<cplx> s[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
