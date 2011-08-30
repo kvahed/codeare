@@ -21,7 +21,7 @@
 #include "Lapack.hpp"
 
 template <class T>
-int  Matrix<T>::EIG (const bool cv, Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* rev) {
+int  Matrix<T>::EIG (Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* rev, const bool cv) {
 
 	// 2D square matrix.
 	if (!Is2D())
@@ -70,7 +70,7 @@ int  Matrix<T>::EIG (const bool cv, Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* re
 
 
 template<class T>
-int Matrix<T>::SVD (const char jobz, Matrix<T>* u, Matrix<T>* v, Matrix<T>* s) {
+int Matrix<T>::SVD (Matrix<T>* u, Matrix<T>* v, Matrix<T>* s, const char jobz) {
 
 	// SVD only defined on 2D data
 	if (!Is2D())
@@ -123,7 +123,9 @@ int Matrix<T>::SVD (const char jobz, Matrix<T>* u, Matrix<T>* v, Matrix<T>* s) {
 
 
 template <class T>
-int  Matrix<T>::Inv () const {
+Matrix<T>  Matrix<T>::Inv () const {
+
+	Matrix<T> tmp = (*this);
 
 	assert (_dim[COL] == _dim[LIN]);
 
@@ -139,14 +141,11 @@ int  Matrix<T>::Inv () const {
 	// LQ Factorisation -------------------
 
 	if (typeid (T) == typeid (cplx)) 
-		cgetrf_ (&n, &n, _M, &n, ipiv, &info);
+		cgetrf_ (&n, &n, &tmp[0], &n, ipiv, &info);
 	else if (typeid (T) == typeid (double))
-		dgetrf_ (&n, &n, _M, &n, ipiv, &info);
+		dgetrf_ (&n, &n, &tmp[0], &n, ipiv, &info);
 
 	// ------------------------------------
-
-	if (info != 0)
-		return info;
 
 	int lwork = -1; 
 	T*  work  = (T*) malloc (sizeof(T));
@@ -154,9 +153,9 @@ int  Matrix<T>::Inv () const {
 	// Workspace determination ------------
 
 	if (typeid (T) == typeid (cplx)) 
-		cgetri_ (&n, _M, &n, ipiv, work, &lwork, &info);
+		cgetri_ (&n, &tmp[0], &n, ipiv, work, &lwork, &info);
 	else if (typeid (T) == typeid (double))
-		dgetri_ (&n, _M, &n, ipiv, work, &lwork, &info);
+		dgetri_ (&n, &tmp[0], &n, ipiv, work, &lwork, &info);
 
 	// ------------------------------------
 
@@ -166,16 +165,16 @@ int  Matrix<T>::Inv () const {
 	// Copy triangular matrix over --------
 
 	if (typeid (T) == typeid (cplx)) 
-		cgetri_ (&n, _M, &n, ipiv, work, &lwork, &info);
+		cgetri_ (&n, &tmp[0], &n, ipiv, work, &lwork, &info);
 	else if (typeid (T) == typeid (double))
-		dgetri_ (&n, _M, &n, ipiv, work, &lwork, &info);
+		dgetri_ (&n, &tmp[0], &n, ipiv, work, &lwork, &info);
 
 	// ------------------------------------
 	
 	free (ipiv);
 	free (work);
 
-	return info;
+	return tmp;
 
 } 
 
@@ -228,4 +227,19 @@ Matrix<T>::Pinv () {
 
 	return b;
 	
+}
+
+
+
+template<class T>
+Matrix<T> 
+Matrix<T>::Cholesky (const char uplo) {
+
+	Matrix<T> tmp = (*this);
+	int       info = 0;
+
+	dpotrf_ ( &uplo, &tmp.Width(), &tmp[0], &tmp.Height(), &info);
+	
+	return tmp;
+
 }

@@ -284,9 +284,9 @@ bool sdmtest (ReconClient* rc) {
 
 bool internaltest (ReconClient* rc) {
 
-	int         i = 0, j = 0, d = 5;
+	int            i = 0, j = 0, d = 5;
 	
-	Matrix<cplx>    r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<cplx>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	
@@ -298,26 +298,26 @@ bool internaltest (ReconClient* rc) {
 	std::cout << h << std::endl;
 	std::cout << p << std::endl;
 	
+	rc->ReadConfig("test.xml");
 	rc->Init(test);
 
-	rc->SetCplx("r", r);
+	rc->SetCplx ("r", r);
 	rc->SetPixel("p", p);
-	rc->SetReal("h", h);
+	rc->SetReal ("h", h);
 	
 	time_t seconds = time (NULL);
 	char   uid[16];
 	sprintf(uid,"%ld",seconds);
 	
-	rc->ReadConfig("test.xml");
 	rc->SetAttribute("UID", uid);
 	rc->SetAttribute("Pi", 3.14156);
 	rc->SetAttribute("Dim", d);
 	
 	rc->Process(test);
 	
-	rc->GetCplx("r", r);
+	rc->GetCplx ("r", r);
 	rc->GetPixel("p", p);
-	rc->GetReal("h", h);
+	rc->GetReal ("h", h);
 
 	rc->Finalise (test);
 	
@@ -396,6 +396,11 @@ bool resetest (ReconClient* rc) {
 	std::string fname = std::string (base + std::string ("out.mat"));
 	
 	MATFile* mf = matOpen (fname.c_str(), "w");
+
+	if (mf == NULL) {
+		printf ("Error creating file %s\n", fname.c_str());
+		return false;
+	}
 
 	txm.MXDump  (mf,  "txm", "");
 	rxm.MXDump  (mf,  "rxm", "");

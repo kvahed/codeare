@@ -37,7 +37,7 @@ Matrix<T>
 Matrix<T>::prod (Matrix<T> &M) {
 	
     assert (Dim(1) == M.Dim(0));
-	return GEMM (M, 'N');
+	return this->GEMM (M);
 	
 }
 

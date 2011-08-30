@@ -11,6 +11,10 @@
 using namespace H5;
 #endif
 
+#ifdef HAVE_CDF_H
+#include <cdf.h>
+#endif
+
 
 #include <limits>
 #include <map>
@@ -804,3 +808,62 @@ bool Matrix<T>::NIRead (const std::string fname) {
 	}
 	
 }
+
+// Function not finished yet. Do not use.
+template <class T> bool 
+Matrix<T>::CDFDump (const std::string fname, const std::string dname, const std::string dloc) const {
+
+	CDFid     id;                // CDF identifier.
+	CDFstatus status;            // CDF completion status.
+
+	FILE*     fp;
+
+	long cType;                 // Compression type
+	long cParms[CDF_MAX_PARMS]; // Compression parameters
+
+	status = CDFcreateCDF (fname.c_str(), &id);
+
+	if (status != CDF_OK) 
+		return false;
+
+	long dims [HDim()];
+	long dimv [HDim()];
+	
+	for (int i = 0; i < HDim(); i++) {
+		dims[i] = _dim[i];
+		dimv[i] = VARY;
+	}
+
+	long imvn;
+	
+	status = CDFcreatezVar (id, dname.c_str(), CDF_FLOAT, 1L, (long)HDim(), dims, VARY, dimv, &imvn);
+
+	if (status != CDF_OK) 
+		return false;
+	
+	cType = GZIP_COMPRESSION;
+	cParms[0] = 5;             /* GZIP compression level */
+	status = CDFsetzVarCompression (id, imvn, cType, cParms);
+
+	if (status != CDF_OK) 
+		return false;
+
+	status = CDFcloseCDF (id);
+	
+	if (status != CDF_OK) 
+		return false;
+	
+	return true;
+
+}
+
+
+// Function not finished yet. Do not use.
+template <class T> bool
+Matrix<T>::CDFRead (const std::string fname, const std::string dname, const std::string dloc) {
+	
+
+	return true;
+
+}
+
