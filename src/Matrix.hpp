@@ -46,6 +46,7 @@ enum IceDim {
 #include <stdlib.h>
 #include <time.h>
 #include <limits.h>
+#include <vector>
 
 #define ICE_SHRT_MAX 4095
 
@@ -503,9 +504,9 @@ public:
      *  
      * @return          Data 
      */
-    inline T*            
+    inline const T*            
     Data                ()  const {
-        return _M;
+        return &_M[0];
     }
 
     
@@ -835,6 +836,14 @@ public:
 
 	}
 	
+
+	/**
+	 * @brief          Cast operator
+	 *
+	 * @return         Cast if possible
+	 */
+	template<class S> operator Matrix<S> () const;
+
 
 	/**
 	 * @brief           Get the element at position p of the vector, i.e. this(p).
@@ -1186,13 +1195,7 @@ public:
     	for (size_t i = 0; i < INVALID_DIM; i++)
             _dim[i] = dim[i];
 
-        if (nb_alloc) {
-            free (_M);
-            nb_alloc--;
-        }
-
-        _M = (T*) malloc (Size()*sizeof(T));
-        nb_alloc++;
+		_M.resize(Size());
 
 		Zero();
 
@@ -1208,10 +1211,7 @@ public:
     	for (size_t i = 0; i < INVALID_DIM; i++)
             _dim[i] = 1;
 
-        if (nb_alloc) {
-            free (_M);
-            nb_alloc--;
-        }
+		_M.clear();
 
     }
     
@@ -1222,13 +1222,7 @@ public:
     inline void         
     Reset               ()                                      {
 
-        if (nb_alloc) {
-            free (_M);
-            nb_alloc--;
-        }
-		
-		_M = (T*) malloc (Size() * sizeof (T));
-        nb_alloc++;
+		_M.resize(Size());
 
 		Zero();
 
@@ -1301,6 +1295,15 @@ public:
     const bool 
     Is4D                ()                                    const;
     
+
+	/**
+	 * @brief           Check if empty
+	 *
+	 * @return          Empty: true;
+	 */
+	const bool 
+	Empty               ()                                    const ;
+
     
     /**
      * @brief           Get the number of matrix cells, i.e. Size * sizeof(T).
@@ -1322,15 +1325,6 @@ public:
     //@{
     
 
-    
-    /**
-     * @brief           Assignment operator. i.e. this = m.
-     *
-     * @param  M        The assigned matrix.
-     */
-    //Matrix<T>           
-    //operator=           (Matrix<T> &M);
-    
     
     /**
      * @brief           Assignment operator. i.e. this = m.
@@ -1977,8 +1971,8 @@ public:
 	 *
 	 * @return          Imaginary values
 	 */
-	//Matrix<double>
-	//Real                () const;
+	Matrix<double>
+	Real                () const;
 	
 
 	/**
@@ -1986,8 +1980,8 @@ public:
 	 *
 	 * @return          Imaginary values
 	 */
-	//Matrix<double>
-	//Imag                () const;
+	Matrix<double>
+	Imag                () const;
 	
 
     /**
@@ -2301,12 +2295,10 @@ private:
     
     size_t              _dim[INVALID_DIM]; /// Dimensions
     float               _res[INVALID_DIM]; /// Resolutions
-    T*                  _M;                /// Data repository
-	int                 nb_alloc;
-
+	std::vector<T>      _M;
 
     /**
-     * @brief           Matrix Product with BLAS.
+     * @brief           Matrix matrix product with BLAS.
      *
 	 * @param  M        Multiplie with
 	 * @param  transb   Transpose M
@@ -2315,6 +2307,18 @@ private:
      */
     Matrix<T>           
     GEMM                (Matrix<T> &M, const char transb = 'N');
+
+
+    /**
+     * @brief           Matrix vector product with BLAS.
+     *
+	 * @param  M        Multiplie with
+	 * @param  transb   Transpose M
+	 *
+     * @return          Product of this and M.
+     */
+	// Matrix<T>           
+    // GEMV                (Matrix<T> &M, const char transa = 'N');
 
 
 	/**
@@ -2549,46 +2553,6 @@ inline void Matrix<short>::Random () {
 }
 
     
-template <class T> 
-inline const bool Matrix<T>::IsXD (const size_t d) const {
-
-	size_t l = 0;
-
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		if (_dim[i] > 1) l++;
-
-	return (l == d);
-
-}
-
-template <class T> 
-inline const bool Matrix<T>::Is1D () const {
-	
-	return IsXD(1);
-
-}
-
-template <class T> 
-inline const bool Matrix<T>::Is2D () const {
-	
-	return IsXD(2);
-
-}
-
-template <class T> 
-inline const bool Matrix<T>::Is3D () const {
-	
-	return IsXD(3);
-
-}
-
-template <class T> 
-inline const bool Matrix<T>::Is4D () const {
-	
-	return IsXD(4);
-
-}
-
 #include "Matrix_Constructors.hpp"
 #include "Matrix_IO.cpp"
 #include "Matrix_Lapack.cpp"

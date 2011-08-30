@@ -1,78 +1,26 @@
-/*template <class T>
-Matrix<T> Matrix<T>::operator=(Matrix<T> &M) {
-    
-    size_t i;
-	
-    if (nb_alloc) {
-		
-		if (this->Size() != M.Size()) {
-			
-			free (_M);
-			_M = (T*) malloc (M.Size() * sizeof (T));
-			
-		}
-		
-	} else {
-		
-		_M = (T*) malloc (M.Size() * sizeof (T));
-		nb_alloc = 1;
-		
-	}
-	
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		_dim[i] = M.Dim()[i];
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
-		
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] = M[i];
-		
-	}
-	
-    return *this;
-
-	}*/
-
-
 template <class T>
 Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
     
     size_t i;
 
-    if (nb_alloc) {
-		
-		if (this->Size() != M.Size()) {
-
-			free (_M);
-			_M = (T*) malloc (M.Size() * sizeof (T));
-
-		}
-		
-	} else {
-
-		_M = (T*) malloc (M.Size() * sizeof (T));
-		nb_alloc = 1;
-
-	}
-
+	if (this->Size() != M.Size())
+		_M.resize(M.Size());
+	
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		_dim[i] = M.Dim()[i];
-		
+	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
-
+		
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] = M[i];
-
+		
 	}
 	
     return *this;
-
+	
 }
 
 
@@ -745,4 +693,23 @@ T Matrix<T>::operator() (const size_t a) const {
 
 }
 
+
+template<class T> template<class S>
+Matrix<T>::operator Matrix<S> () const {
+
+	Matrix<S> m (_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+		
+	for (int i = 0; i < this->Size(); i++)
+		m[i] = (S)_M[i];
+
+	}
+
+	return m;
+
+}
 

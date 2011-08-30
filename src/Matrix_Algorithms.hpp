@@ -41,7 +41,7 @@ Matrix<T>::Ind2x (const size_t& ind, const size_t& dim) const {
 }
 
 
-template <class T> Matrix<size_t>
+template <class T> Matrix<size_t> inline
 Matrix<T>::Ind2Sub2D  (const Matrix<size_t> inds) const {
 	
 	Matrix<T>      tmp = this->Squeeze();
@@ -56,7 +56,7 @@ Matrix<T>::Ind2Sub2D  (const Matrix<size_t> inds) const {
 }
 
 
-template <class T> Matrix<size_t>
+template <class T> inline Matrix<size_t>
 Matrix<T>::Ind2Sub3D  (const Matrix<size_t> inds) const {
 	
 	assert(Is2D());
@@ -72,20 +72,69 @@ Matrix<T>::Ind2Sub3D  (const Matrix<size_t> inds) const {
 }
 
 
-/*
-template <class T> Matrix<int>
-Sub2Ind  (const Matrix<int>) const {
-	matrix < ptrdiff_t > inds(ofMatrixSize(1, subs.width()));
-    
-	for(size_t i=0; i < subs.width() ; i++) {
-		inds(i) = subs(i,subs.height()-1) 
-			for(ptrdiff_t j=subs.height()-2 ; j >= 0; j--)
-				{
-					inds(i) = inds(i)+subs(i, j)*dim(j+1); 
-				}
-	}
+template <class T> Matrix<size_t> inline
+Matrix<T>::Sub2Ind  (const Matrix<size_t> subs) const {
+
+	int n = subs.Dim(0);
+
+	Matrix<size_t> inds (n);
+
+	/*for (int i = 0; i < n; i++)
+	  inds[i] = */
+
 	return subs; 
-	} */                                                        
+}
 
 
+template<class T> 
+inline const bool Matrix<T>::Empty () const {
+
+	_M.size() == 0;
+
+}
+
+
+template <class T> 
+inline const bool Matrix<T>::IsXD (const size_t d) const {
+
+	size_t l = 0;
+
+	for (size_t i = 0; i < INVALID_DIM; i++)
+		if (_dim[i] > 1) l++;
+
+	return (l == d);
+
+}
+
+
+template <class T> 
+inline const bool Matrix<T>::Is1D () const {
+	
+	return IsXD(1);
+
+}
+
+
+template <class T> 
+inline const bool Matrix<T>::Is2D () const {
+	
+	return IsXD(2);
+
+}
+
+
+template <class T> 
+inline const bool Matrix<T>::Is3D () const {
+	
+	return IsXD(3);
+
+}
+
+
+template <class T> 
+inline const bool Matrix<T>::Is4D () const {
+	
+	return IsXD(4);
+
+}
 
