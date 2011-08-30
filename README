@@ -7,7 +7,7 @@ TODO:
 
 TESTS:
     testclt -b ~/svn/jrrs/share/grappa/  -c config.xml -n medmac44 -r -t LapackTests
-	testclt -b ~/svn/jrrs/share/cgsense/ -d exc.h5 -c config_exc.xml -n medmac44 -r -t CGSENSE medmac44.log
+	testclt -b ~/svn/jrrs/share/cgsense/ -d exc.h5 -c config_exc.xml -n medmac44 -r -t CGSENSE
 	testclt -b ~/svn/jrrs/share/spatialdomain/ -d homogen.h5 -c config_homogen.xml -n medmac44 -r -t SpatialDomain
 	testclt -b ~/svn/jrrs/share/nufft/ -d data2.h5 -c config.xml -n medmac44 -r -t NuFFT_OMP
 	testclt -b ~/svn/jrrs/share/nufft/ -d data2.h5 -c config.xml -n medmac44 -r -t NuFFT

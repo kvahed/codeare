@@ -395,8 +395,8 @@ bool Matrix<T>::RAWRead (const std::string fname, const std::string version) {
 
 	printf ("         Col  Lin  Slc  Par  Ech  Pha  Rep  Set  Seg  Cha  Ida  Idb  Idc  Idd  Ide  Ave\n");
 	printf ("Matrix: % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i\n\n",
-			_dim[ 0], _dim[ 1], _dim[ 2], _dim[ 3], _dim[ 4], _dim[ 5], _dim[ 6], _dim[ 7],
-			_dim[ 8], _dim[ 9], _dim[10], _dim[11], _dim[12], _dim[13], _dim[14], _dim[15]);
+			(int)_dim[ 0], (int)_dim[ 1], (int)_dim[ 2], (int)_dim[ 3], (int)_dim[ 4], (int)_dim[ 5], (int)_dim[ 6], (int)_dim[ 7],
+			(int)_dim[ 8], (int)_dim[ 9], (int)_dim[10], (int)_dim[11], (int)_dim[12], (int)_dim[13], (int)_dim[14], (int)_dim[15]);
 
 	FILE*         f;
 	sMDH*         mdh;
