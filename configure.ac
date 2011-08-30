@@ -239,7 +239,7 @@ AC_TRY_LINK([#include <nifti1_io.h>],
    [LIBS=$OLD_LIBS]
    [AC_MSG_RESULT([no. Cannot find libniftiio, NIFTI dump/read not available.])])
 
-if test -z $hdf5_found; then
+if test -z $niftiio_found; then
     LIBS="${LIBS} -lniftiio -lznz"
 fi
 
