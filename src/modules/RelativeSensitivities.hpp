@@ -111,10 +111,10 @@ SVDCalibrate (const Matrix<cplx>* imgs, Matrix<cplx>* rxm, Matrix<cplx>* txm, Ma
 		threads  = omp_get_num_threads();
 	}
 	
-	Matrix<cplx> m[(const int)threads]; // Combination
-	Matrix<cplx> u[threads]; // Left-side and  O(NRX x NRX)
-	Matrix<cplx> v[threads]; // Right-side singular vectors O(NTX, NTX)
-	Matrix<cplx> s[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
+	Matrix<cplx>* m = new Matrix<cplx>[threads]; // Combination
+	Matrix<cplx>* u = new Matrix<cplx>[threads]; // Left-side and  O(NRX x NRX)
+	Matrix<cplx>* v = new Matrix<cplx>[threads]; // Right-side singular vectors O(NTX, NTX)
+	Matrix<cplx>* s = new Matrix<cplx>[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
 	
 	for (int i = 0; i < threads; i++) {
 		m[i] = Matrix<cplx>     (nrxc, ntxc);
@@ -147,6 +147,11 @@ SVDCalibrate (const Matrix<cplx>* imgs, Matrix<cplx>* rxm, Matrix<cplx>* txm, Ma
 		}
 		
 	}
+
+	delete m;
+	delete u;
+	delete v;
+	delete s;
 
 	printf ("done.                 (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
