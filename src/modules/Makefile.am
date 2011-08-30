@@ -7,9 +7,13 @@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la RelativeSensitivities.la GRAPPA.la 
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la SpatialDomain.la RelativeSensitivities.la GRAPPA.la 
 
-COMMON = ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp
+if USE_NFFT3
+    lib_LTLIBRARIES += NuFFT_OMP.la NuFFT.la CGSENSE.la 
+endif
+
+COMMON = ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../Toolbox.hpp ../Toolbox.cpp
 # Common linker flags
 COMMON_la_LDFLAGS = -module
 
@@ -30,10 +34,10 @@ NuFFT_OMP_la_SOURCES = $(COMMON) NuFFT_OMP.hpp NuFFT_OMP.cpp nfftstub.h nfftstub
 NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.hpp DumpToFile.cpp
-DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) #$(HDF5)
+DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 
 CGSENSE_la_SOURCES = $(COMMON) CGSENSE.hpp CGSENSE.cpp nfftstub.h nfftstub.c Noise.hpp SEM.hpp OMP.hpp
-CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart $(BLAS) $(LAPACK) #-Wl,-rpath,/Applications/MATLAB_R2011a.app/bin/maci64
+CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart $(BLAS) $(LAPACK)
 
 SystemCmd_la_SOURCES = $(COMMON) SystemCmd.hpp SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
@@ -42,7 +46,7 @@ LapackTests_la_SOURCES = $(COMMON) LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 
 GRAPPA_la_SOURCES = $(COMMON) GRAPPA.hpp GRAPPA.cpp
-GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(PYTHON_LDFLAGS) -lpython
+GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 
 SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
 SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) 

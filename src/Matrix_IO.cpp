@@ -160,10 +160,13 @@ bool Matrix<T>::PRDump (const std::string fname) const {
 template <class T>
 bool Matrix<T>::Dump (const std::string fname, const std::string dname, const std::string dloc, const io_strategy ios) const {
 	
-	if      (ios == MATLAB)
-		return MXDump (fname, dname, dloc);
-	else if (ios == HDF5)
+	
+	if      (ios == HDF5)
 		return H5Dump (fname, dname, dloc);
+#ifdef HAVE_MAT_H
+	else if (ios == MATLAB)
+		return MXDump (fname, dname, dloc);
+#endif
 	else if (ios == NIFTI)
 		return NIDump (fname);
 	else
@@ -449,8 +452,10 @@ bool Matrix<T>::Read (const std::string fname, const std::string dname, const st
 
 	if (     ios == HDF5)
 		return H5Read (fname, dname, dloc);
+#ifdef HAVE_MAT_H
 	else if (ios == MATLAB)
 		return MXRead (fname, dname, dloc);
+#endif
 	else if (ios == NIFTI)
 		return NIRead (fname);
 
@@ -828,6 +833,8 @@ bool Matrix<T>::NIRead (const std::string fname) {
 template <class T> bool 
 Matrix<T>::CDFDump (const std::string fname, const std::string dname, const std::string dloc) const {
 
+#ifdef HAVE_CDF_H
+
 	CDFid     id;                // CDF identifier.
 	CDFstatus status;            // CDF completion status.
 
@@ -869,6 +876,12 @@ Matrix<T>::CDFDump (const std::string fname, const std::string dname, const std:
 		return false;
 	
 	return true;
+
+#else 
+
+	return false;
+
+#endif
 
 }
 

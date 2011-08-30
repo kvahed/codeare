@@ -34,6 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@USE_NFFT3_TRUE@am__append_1 = NuFFT_OMP.la NuFFT.la CGSENSE.la 
 subdir = src/modules
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -73,12 +74,14 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 CGSENSE_la_LIBADD =
-am__objects_1 = tinystr.lo tinyxml.lo tinyxmlerror.lo tinyxmlparser.lo
+am__objects_1 = tinystr.lo tinyxml.lo tinyxmlerror.lo tinyxmlparser.lo \
+	Toolbox.lo
 am_CGSENSE_la_OBJECTS = $(am__objects_1) CGSENSE.lo nfftstub.lo
 CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
 CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
+@USE_NFFT3_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
 DummyRecon_la_LIBADD =
 am_DummyRecon_la_OBJECTS = $(am__objects_1) DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
@@ -121,12 +124,14 @@ NuFFT_la_OBJECTS = $(am_NuFFT_la_OBJECTS)
 NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
+@USE_NFFT3_TRUE@am_NuFFT_la_rpath = -rpath $(libdir)
 NuFFT_OMP_la_LIBADD =
 am_NuFFT_OMP_la_OBJECTS = $(am__objects_1) NuFFT_OMP.lo nfftstub.lo
 NuFFT_OMP_la_OBJECTS = $(am_NuFFT_OMP_la_OBJECTS)
 NuFFT_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
+@USE_NFFT3_TRUE@am_NuFFT_OMP_la_rpath = -rpath $(libdir)
 RelativeSensitivities_la_LIBADD =
 am_RelativeSensitivities_la_OBJECTS = $(am__objects_1) \
 	RelativeSensitivities.lo
@@ -318,8 +323,11 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS)
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la NuFFT_OMP.la NuFFT.la CGSENSE.la SpatialDomain.la RelativeSensitivities.la GRAPPA.la 
-COMMON = ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
+	MedianFilter_OMP.la SystemCmd.la LapackTests.la \
+	SpatialDomain.la RelativeSensitivities.la GRAPPA.la \
+	$(am__append_1)
+COMMON = ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../Toolbox.hpp ../Toolbox.cpp
 # Common linker flags
 COMMON_la_LDFLAGS = -module
 
@@ -335,15 +343,15 @@ NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 NuFFT_OMP_la_SOURCES = $(COMMON) NuFFT_OMP.hpp NuFFT_OMP.cpp nfftstub.h nfftstub.c OMP.hpp
 NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart
 DumpToFile_la_SOURCES = $(COMMON) DumpToFile.hpp DumpToFile.cpp
-DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS) #$(HDF5)
+DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 CGSENSE_la_SOURCES = $(COMMON) CGSENSE.hpp CGSENSE.cpp nfftstub.h nfftstub.c Noise.hpp SEM.hpp OMP.hpp
-CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart $(BLAS) $(LAPACK) #-Wl,-rpath,/Applications/MATLAB_R2011a.app/bin/maci64
+CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnoncart $(BLAS) $(LAPACK)
 SystemCmd_la_SOURCES = $(COMMON) SystemCmd.hpp SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 LapackTests_la_SOURCES = $(COMMON) LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 GRAPPA_la_SOURCES = $(COMMON) GRAPPA.hpp GRAPPA.cpp
-GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(PYTHON_LDFLAGS) -lpython
+GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
 SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) 
 RelativeSensitivities_la_SOURCES = $(COMMON) RelativeSensitivities.hpp RelativeSensitivities.cpp
@@ -415,7 +423,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 CGSENSE.la: $(CGSENSE_la_OBJECTS) $(CGSENSE_la_DEPENDENCIES) 
-	$(CGSENSE_la_LINK) -rpath $(libdir) $(CGSENSE_la_OBJECTS) $(CGSENSE_la_LIBADD) $(LIBS)
+	$(CGSENSE_la_LINK) $(am_CGSENSE_la_rpath) $(CGSENSE_la_OBJECTS) $(CGSENSE_la_LIBADD) $(LIBS)
 DummyRecon.la: $(DummyRecon_la_OBJECTS) $(DummyRecon_la_DEPENDENCIES) 
 	$(DummyRecon_la_LINK) -rpath $(libdir) $(DummyRecon_la_OBJECTS) $(DummyRecon_la_LIBADD) $(LIBS)
 DumpToFile.la: $(DumpToFile_la_OBJECTS) $(DumpToFile_la_DEPENDENCIES) 
@@ -429,9 +437,9 @@ LapackTests.la: $(LapackTests_la_OBJECTS) $(LapackTests_la_DEPENDENCIES)
 MedianFilter_OMP.la: $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_DEPENDENCIES) 
 	$(MedianFilter_OMP_la_LINK) -rpath $(libdir) $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_LIBADD) $(LIBS)
 NuFFT.la: $(NuFFT_la_OBJECTS) $(NuFFT_la_DEPENDENCIES) 
-	$(NuFFT_la_LINK) -rpath $(libdir) $(NuFFT_la_OBJECTS) $(NuFFT_la_LIBADD) $(LIBS)
+	$(NuFFT_la_LINK) $(am_NuFFT_la_rpath) $(NuFFT_la_OBJECTS) $(NuFFT_la_LIBADD) $(LIBS)
 NuFFT_OMP.la: $(NuFFT_OMP_la_OBJECTS) $(NuFFT_OMP_la_DEPENDENCIES) 
-	$(NuFFT_OMP_la_LINK) -rpath $(libdir) $(NuFFT_OMP_la_OBJECTS) $(NuFFT_OMP_la_LIBADD) $(LIBS)
+	$(NuFFT_OMP_la_LINK) $(am_NuFFT_OMP_la_rpath) $(NuFFT_OMP_la_OBJECTS) $(NuFFT_OMP_la_LIBADD) $(LIBS)
 RelativeSensitivities.la: $(RelativeSensitivities_la_OBJECTS) $(RelativeSensitivities_la_DEPENDENCIES) 
 	$(RelativeSensitivities_la_LINK) -rpath $(libdir) $(RelativeSensitivities_la_OBJECTS) $(RelativeSensitivities_la_LIBADD) $(LIBS)
 SpatialDomain.la: $(SpatialDomain_la_OBJECTS) $(SpatialDomain_la_DEPENDENCIES) 
@@ -457,6 +465,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RelativeSensitivities.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpatialDomain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nfftstub.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinystr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxml.Plo@am__quote@
@@ -532,6 +541,13 @@ tinyxmlparser.lo: ../tinyxml/tinyxmlparser.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/tinyxmlparser.cpp' object='tinyxmlparser.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlparser.lo `test -f '../tinyxml/tinyxmlparser.cpp' || echo '$(srcdir)/'`../tinyxml/tinyxmlparser.cpp
+
+Toolbox.lo: ../Toolbox.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Toolbox.lo -MD -MP -MF $(DEPDIR)/Toolbox.Tpo -c -o Toolbox.lo `test -f '../Toolbox.cpp' || echo '$(srcdir)/'`../Toolbox.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Toolbox.Tpo $(DEPDIR)/Toolbox.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../Toolbox.cpp' object='Toolbox.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Toolbox.lo `test -f '../Toolbox.cpp' || echo '$(srcdir)/'`../Toolbox.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

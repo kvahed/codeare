@@ -185,7 +185,10 @@ case "$host" in
 #AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libsz, bailing out])])
 ;;
 esac
-AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
+
+AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
+AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
+
 # Checks for C++ libraries with name spaces
 
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[
@@ -222,7 +225,7 @@ AC_TRY_LINK([#include <H5Cpp.h>],
    [AC_MSG_RESULT([no. Cannot find libhdf5_cpp, hdf5 dump/read not available.])])
 
 if test -z $hdf5_found; then
-    LIBS="${LIBS} -lhdf5_cpp -lhdf5"
+    LIBS=$OLD_LIBS
 fi
 
 
@@ -240,7 +243,7 @@ AC_TRY_LINK([#include <nifti1_io.h>],
    [AC_MSG_RESULT([no. Cannot find libniftiio, NIFTI dump/read not available.])])
 
 if test -z $niftiio_found; then
-    LIBS="${LIBS} -lniftiio -lznz"
+    LIBS=$OLD_LIBS
 fi
 
 
@@ -257,7 +260,7 @@ AC_TRY_LINK([#include "src/RRSModule.hh"],
    [LIBS=$OLD_LIBS]
    [AC_MSG_ERROR([no. cannot find libomniORB4, bailing out])])
 if test -z $omniORB4_found; then
-    LIBS="${LIBS} -lomniORB4"
+    LIBS=$OLD_LIBS
 fi
 
 

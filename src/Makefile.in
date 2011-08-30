@@ -35,6 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = testclt$(EXEEXT) reconserver$(EXEEXT)
+@USE_NFFT3_TRUE@am__append_1 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la -dlopen modules/NuFFT_OMP.la 
 subdir = src
 DIST_COMMON = $(srcdir)/Loader.hpp.in $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in
@@ -284,7 +285,12 @@ testclt_LDFLAGS = $(BLAS) $(LAPACK)
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
-reconserver_LDFLAGS = $(HDF5) -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la -dlopen modules/NuFFT_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la
+reconserver_LDFLAGS = $(HDF5) -dlopen modules/DummyRecon.la -dlopen \
+	modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen \
+	modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la \
+	-dlopen modules/SpatialDomain.la -dlopen \
+	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
+	$(am__append_1)
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
 SUBDIRS = modules tinyxml

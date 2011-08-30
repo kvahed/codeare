@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <sys/sysctl.h>
-
+#include <stdio.h>
 
 Toolbox* Toolbox::m_instance = 0;
 

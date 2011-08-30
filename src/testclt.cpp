@@ -101,8 +101,10 @@ bool grappatest (ReconClient* rc) {
 	std::string cf = std::string (base + std::string(config));
 	std::string df = std::string (base + std::string(data));
 
+#ifdef HAVE_MAT_H
 	sig.MXRead  (df, "data", "");
 	acs.MXRead  (df, "acs",  "");
+#endif
 
 	rc->ReadConfig (cf.c_str());
 	
@@ -193,11 +195,13 @@ bool cgsensetest (ReconClient* rc) {
 		rx->GetReal  (&weights);
 		*/			
 	}
-		
+	
+#ifdef HAVE_MAT_H	
 	rawdata.MXDump   (odf.c_str(), "images");
 	if (pulses)
 		sens.MXDump  (opf.c_str(), "pulses");
 	weights.MXDump   (oif.c_str(), "residuals");
+#endif
 
 	return true;
 	
@@ -228,8 +232,9 @@ bool nuffttest (ReconClient* rc) {
 	
 	rc->GetCplx    ("data", rawdata);
 
+#ifdef HAVE_MAT_H	
 	rawdata.MXDump   (odf.c_str(), "image");
-
+#endif
 	rc->Finalise(test);
 
 	return true;
@@ -397,6 +402,7 @@ bool resetest (ReconClient* rc) {
 	
 	std::string fname = std::string (base + std::string ("out.mat"));
 	
+#ifdef HAVE_MAT_H	
 	MATFile* mf = matOpen (fname.c_str(), "w");
 
 	if (mf == NULL) {
@@ -413,6 +419,7 @@ bool resetest (ReconClient* rc) {
 		printf ("Error closing file %s\n",fname.c_str());
 		return false;
 	}
+#endif
 	// -----------------------------------------------------------
 
 	return true;
