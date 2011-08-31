@@ -10706,7 +10706,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"376:377M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"376:379M\"" >>confdefs.h
 
 # copyright notice
 
@@ -15827,6 +15827,53 @@ else
   as_fn_error "cannot find libz, bailing out" "$LINENO" 5
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw_execute in -lfftw3" >&5
+$as_echo_n "checking for fftw_execute in -lfftw3... " >&6; }
+if test "${ac_cv_lib_fftw3_fftw_execute+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lfftw3  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char fftw_execute ();
+int
+main ()
+{
+return fftw_execute ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_fftw3_fftw_execute=yes
+else
+  ac_cv_lib_fftw3_fftw_execute=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_fftw_execute" >&5
+$as_echo "$ac_cv_lib_fftw3_fftw_execute" >&6; }
+if test "x$ac_cv_lib_fftw3_fftw_execute" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBFFTW3 1
+_ACEOF
+
+  LIBS="-lfftw3 $LIBS"
+
+else
+  as_fn_error "cannot find libfftw, bailing out" "$LINENO" 5
+fi
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftwf_execute in -lfftw3f" >&5
 $as_echo_n "checking for fftwf_execute in -lfftw3f... " >&6; }
 if test "${ac_cv_lib_fftw3f_fftwf_execute+set}" = set; then :
@@ -15871,7 +15918,7 @@ _ACEOF
   LIBS="-lfftw3f $LIBS"
 
 else
-  as_fn_error "cannot find libfftwf, bailing out" "$LINENO" 5
+  as_fn_error "cannot find libfftw3f, bailing out" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CDFcreatezVar in -lcdf" >&5
@@ -15921,12 +15968,6 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libcdf, cdf dump / read functionality unavailable!" >&5
 $as_echo "cannot find libcdf, cdf dump / read functionality unavailable!" >&6; }
 fi
-
-case "$host" in
-  *darwin*)
-#AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libsz, bailing out])])
-;;
-esac
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nfft_precompute_psi in -lnfft3" >&5
 $as_echo_n "checking for nfft_precompute_psi in -lnfft3... " >&6; }
@@ -16259,6 +16300,18 @@ DGEEV_SYMBOL=cgeev_
 SAVE_LIBS=$LIBS
 LIBS="$LIBS $CLIBS $FLIBS"
 
+# If we're on configuring in OSX
+if test -z "$BLAS"; then
+case $host in
+  *darwin*)
+    BLAS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -lcblas -llapack -framework vecLib"
+    AUTOAPPLE="yes"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: Mac OSX: Assuming vecLib is available!" >&5
+$as_echo "Mac OSX: Assuming vecLib is available!" >&6; }
+    ;;
+esac
+fi
+
 # If we're using the Intel compilers, we prefer MKL as well
 if test -z "$BLAS"; then
   if test $CC = icc -o $CXX = icpc; then
@@ -16543,17 +16596,6 @@ eval as_val=\$$as_ac_Lib
   BLAS="-lmkl"
 fi
 
-fi
-
-if test -z "$BLAS"; then
-case $host in
-  *darwin*)
-    BLAS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -lcblas -llapack -framework vecLib"
-    AUTOAPPLE="yes"
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: No BLAS specified and vendor is Apple: Assuming vecLib is available!" >&5
-$as_echo "No BLAS specified and vendor is Apple: Assuming vecLib is available!" >&6; }
-    ;;
-esac
 fi
 
 if test -z "$BLAS"; then

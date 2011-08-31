@@ -182,9 +182,12 @@ CGSENSE::Process () {
 		nfft::weights (&m_fplan[i], &m_iplan[i]);
 	}
 
+	// Don't need these anymore
+	FreeReal("weights");
+	FreeReal("kspace");
+
 	// Copying sensitivities. Will use helper for Pulses --------------
-	//m_sens    = m_rhelper;
-	Matrix<cplx> m_rhelper = (*data);
+	Matrix<cplx> s = (*data);
 
 	// Out going images -----------------------------------------------
 	Matrix<cplx> istore;
@@ -197,22 +200,16 @@ CGSENSE::Process () {
 	istore.Reset();
 
 	// Temporary signal repository ------------------------------------ 
-	Matrix<cplx> stmp;
-	stmp.Dim (COL) = m_M;
-	stmp.Dim (LIN) = 8;
-	stmp.Reset();
+	Matrix<cplx> stmp (m_M, m_Nc);
 
 	// Out going signals ----------------------------------------------
-	Matrix<cplx> sstore = stmp;
-	if (m_verbose == 1) 
-		sstore.Dim (CHA) = m_cgmaxit;
-	sstore.Reset();
+	Matrix<cplx> sstore (m_M, m_Nc, (m_verbose == 1) ? m_cgmaxit : 1);
 
 	// Create test data (Incoming data is image space) ----------------
 	if (m_testcase) {
-		E  (&m_rhelper, sens, m_fplan, &stmp, m_dim);
-		m_rhelper = stmp;
-		(*data)   = stmp;
+		E  (&s, sens, m_fplan, &stmp, m_dim);
+		s = stmp;
+		(*data) = stmp;
 	}
 
 
@@ -225,8 +222,8 @@ CGSENSE::Process () {
 	r = p;
 	q = p;
 
-	// Out going image ------------------------------------------------
-	// Resize m_raw for output
+	// Out going image (Resize for output) ----------------------------
+	// Resize data for output
 	for (int i = 0; i < INVALID_DIM; i++)
 		data->Dim(i) = 1;
 	for (int i = 0; i < m_dim; i++)
@@ -249,7 +246,7 @@ CGSENSE::Process () {
 
 	an = pow(p.Norm().real(),2.0);
 
-	m_rhelper.Zero();
+	s.Zero();
 
 	for (int i = 0; i < m_cgmaxit; i++, iters++) {
 
@@ -267,23 +264,20 @@ CGSENSE::Process () {
 		E  (&p,    sens, m_fplan,                              &stmp, m_dim);
 		EH (&stmp, sens, m_fplan, m_iplan, m_epsilon, m_maxit, &q   , m_dim);
 
-		rtmp      = (rn / (p.dotc(q)));
-		(*data)   = (p * rtmp) + (*data);
-		stmp     *= rtmp;
-		m_rhelper = m_rhelper + stmp;
-		r         = - (q * rtmp) + r ;
-		rnewn     = pow(r.Norm().real(),2.0);
-		rtmp      = rnewn/rn;
-		p         = (p * rtmp) + r ;
+		rtmp     = (rn / (p.dotc(q)));
+		(*data)  = (p * rtmp) + (*data);
+		stmp    *= rtmp;
+		s       += stmp;
+		r        = - (q * rtmp) + r ;
+		rnewn    = pow(r.Norm().real(),2.0);
+		rtmp     = rnewn/rn;
+		p        = (p * rtmp) + r ;
 
 		// Verbose out put keeps all intermediate steps ---------------
 		if (m_verbose) {
-			memcpy (&istore[i *     data->Size()],  &data->At(0),     data->Size() * sizeof(double));
-			memcpy (&sstore[i * m_rhelper.Size()], &m_rhelper[0], m_rhelper.Size() * sizeof(double));
+			memcpy (&istore[i * data->Size()],  &data->At(0),     data->Size() * sizeof(double));
+			memcpy (&sstore[i *     s.Size()],         &s[0],         s.Size() * sizeof(double));
 		}
-
-		if (std::isnan(res.at(i)))
-			break;
 
 	}
 
@@ -299,9 +293,9 @@ CGSENSE::Process () {
 		memcpy (    &data->At(0), &istore[0],     data->Size() * sizeof(double));
 
 		// Pulses (Excitation) ----------
-		m_rhelper.Dim(CHA) = iters;
-		m_rhelper.Reset();
-		memcpy (&m_rhelper[0], &sstore[0], m_rhelper.Size() * sizeof(double));
+		s.Dim(CHA) = iters;
+		s.Reset();
+		memcpy (&s[0], &sstore[0], s.Size() * sizeof(double));
 
 		// CG residuals ------------------
 		weights->Dim(COL) = iters;

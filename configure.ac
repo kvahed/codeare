@@ -174,19 +174,14 @@ AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
 
 
 # Checks for C libraries.
-AC_CHECK_LIB([omnithread],   [read],        [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
-AC_CHECK_LIB([omniDynamic4], [main],        [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
-AC_CHECK_LIB([dl],           [dlopen],      [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
-AC_CHECK_LIB([z],            [deflate],     [], [AC_MSG_ERROR([cannot find libz, bailing out])])
-AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftwf, bailing out])])
-AC_CHECK_LIB([cdf],          [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf dump / read functionality unavailable!])])
-case "$host" in
-  *darwin*)
-#AC_CHECK_LIB([sz],           [SZ_Compress], [], [AC_MSG_ERROR([cannot find libsz, bailing out])])
-;;
-esac
-
-AC_CHECK_LIB([nfft3],         [nfft_precompute_psi],    [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
+AC_CHECK_LIB([omnithread],   [read],          [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
+AC_CHECK_LIB([omniDynamic4], [main],          [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
+AC_CHECK_LIB([dl],           [dlopen],        [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
+AC_CHECK_LIB([z],            [deflate],       [], [AC_MSG_ERROR([cannot find libz, bailing out])])
+AC_CHECK_LIB([fftw3],        [fftw_execute],  [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
+AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
+AC_CHECK_LIB([cdf], [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf dump / read functionality unavailable!])])
+AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
 AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
 # Checks for C++ libraries with name spaces
@@ -334,6 +329,17 @@ DGEEV_SYMBOL=cgeev_
 SAVE_LIBS=$LIBS
 LIBS="$LIBS $CLIBS $FLIBS"
 
+# If we're on configuring in OSX
+if test -z "$BLAS"; then
+case $host in
+  *darwin*)
+    BLAS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -lcblas -llapack -framework vecLib"
+    AUTOAPPLE="yes"
+    AC_MSG_RESULT([Mac OSX: Assuming vecLib is available!])
+    ;;
+esac
+fi
+
 # If we're using the Intel compilers, we prefer MKL as well                                                                                 
 if test -z "$BLAS"; then
   if test $CC = icc -o $CXX = icpc; then
@@ -366,16 +372,6 @@ fi
 
 if test -z "$BLAS"; then
   AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
-fi
-
-if test -z "$BLAS"; then
-case $host in
-  *darwin*)
-    BLAS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -lcblas -llapack -framework vecLib"
-    AUTOAPPLE="yes"
-    AC_MSG_RESULT([No BLAS specified and vendor is Apple: Assuming vecLib is available!])
-    ;;
-esac
 fi
 
 if test -z "$BLAS"; then
