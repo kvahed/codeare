@@ -48,6 +48,9 @@
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
+/* Define to 1 if you have the `fftw3' library (-lfftw3). */
+#undef HAVE_LIBFFTW3
+
 /* Define to 1 if you have the `fftw3f' library (-lfftw3f). */
 #undef HAVE_LIBFFTW3F
 
