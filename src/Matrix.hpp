@@ -33,8 +33,17 @@ enum IceDim {
 };
 #endif
 
+/**
+ * @brief Interpolation methods
+ */
+enum Interpolation {
+	LINEAR, CUBIC, SPLINE
+};
+
 #include "config.h"
 #include "modules/OMP.hpp"
+
+#include "cycle.h"            // FFTW cycle implementation
 
 #include <complex>
 #include <assert.h>
@@ -1960,6 +1969,30 @@ public:
     
     
 	/**
+	 * @brief           Resample up to 3D to
+	 *
+	 * @param  f        Resampling factor
+	 * @param  i        Interpolation method @see Interpolation
+	 */
+	Matrix<T>
+	Resample            (float f, Interpolation i);
+
+
+	/**
+	 * @brief           MeshGrid
+	 *
+	 * @param  dims     Grid indices (i.e. m(0,0)=minx m(0,1)=maxx, etc)
+	 * @return          Mesh grid.<br/> [X,Y,Z] = meshgrid (.,.,.) corresponds to:<br/> 
+	 *                  Matrix<size_t> dims (3,2); <br/>
+	 *                  dims (0,0)=0; dims(0,1)=2; dims(1,0)=0; dims(1,1)=3; dims(2,0)=0; dims(2,1)=4;
+	 *                  Matrix<size_t> mg = Matrix<T>::MeshGrid(dims);<br/>
+	 *                  Delivers mg O(3,4,5,3). Highest dimension is [X,Y,Z];
+	 */
+	static Matrix<size_t>
+	MeshGrid            (Matrix<size_t>& dims);
+
+
+	/**
 	 * @brief           Absolute values matrix
 	 *
 	 * @return          Absolute values
@@ -2345,8 +2378,8 @@ private:
 	 *
      * @return          Product of this and M.
      */
-	// Matrix<T>           
-    // GEMV                (Matrix<T> &M, const char transa = 'N');
+	Matrix<T>           
+    GEMV                (Matrix<T> &M, const char transa = 'N');
 
 
 	/**
