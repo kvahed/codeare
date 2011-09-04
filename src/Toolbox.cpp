@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #include <stdio.h>
+#include <iostream>
+#include <iomanip>
 
 Toolbox* Toolbox::m_instance = 0;
 
@@ -89,3 +91,15 @@ Toolbox::ClockRate () const {
 }
 
 	
+inline void 
+Toolbox::ProgressBar (const std::string& pre, const std::string& post, const short& p) const {
+	
+	assert (p >=  0);
+	assert (p <=100);
+	
+	std::cout << "\r";
+	std::cout << pre.c_str();
+	std::cout << " | "; 
+	std::cout << bars.substr(0, p/2) << " " <<  blancs.substr(0, 50-p/2) << "| " << std::setw(3) << std::setfill(' ') << p << "% done";
+	
+}

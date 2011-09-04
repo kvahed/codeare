@@ -4,6 +4,12 @@
 #include <vector>
 #include <string>
 
+static std::string bars   = "***************************************************";
+static std::string blancs = "                                                   ";
+
+/**
+ * @brief  A toolbox for some static stuff
+ */
 class Toolbox {
 
 public:
@@ -42,6 +48,18 @@ public:
 	ClockRate       () const ;	
 
 
+	
+	/**
+	 * @brief       Command line progress bar to cout
+	 *
+	 * @param  pre  Text before bar
+	 * @param  post Test after bar
+	 * @param  p    Percent
+	 */ 
+	void 
+	ProgressBar    (const std::string& pre, const std::string& post, const short& p) const;
+
+		
 private:
 
 
@@ -50,7 +68,7 @@ private:
 	 */
 	Toolbox   () {};
 
-	static Toolbox* m_instance;           /**< @brief Single instance */
+	static Toolbox*    m_instance;           /**< @brief Single instance */
 
 };
 

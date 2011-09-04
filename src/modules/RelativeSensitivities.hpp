@@ -91,6 +91,7 @@ namespace RRStrategy {
 		ticks      tic = getticks();
 		
 		printf ("  SVDing %i matrices of %ix%i ... ", (int)rtms, (int)nrxc, (int)ntxc);
+		fflush(stdout);
 		
 		// Permute dimensions on imgs for contiguous RAM access
 		Matrix<cplx> vxlm (nrxc, ntxc, imgs->Dim(0), imgs->Dim(1), imgs->Dim(2));
@@ -147,7 +148,7 @@ namespace RRStrategy {
 			
 		}
 		
-		printf ("done.                 (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 		
 		return RRSModule::OK;
 		
@@ -170,7 +171,8 @@ namespace RRStrategy {
 		ticks        tic     = getticks();
 		
 		printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r->Dim(0), (int)r->Dim(1), (int)r->Dim(2));
-		
+		fflush(stdout);
+
 #pragma omp parallel default (shared) 
 		{
 			threads  = omp_get_num_threads();
@@ -226,6 +228,7 @@ namespace RRStrategy {
 	RemoveOS (Matrix<cplx>* imgs) {
 		
 		printf ("  Removing RO oversampling ... ");
+		fflush(stdout);
 	
 		ticks tic    = getticks();
 		Matrix<cplx> tmp = (*imgs);
@@ -241,7 +244,7 @@ namespace RRStrategy {
 		for (size_t i = 0; i < nscans; i++)
 			memcpy (&imgs->At(i*nssiz), &tmp.At(i*ossiz+offset), nssiz * sizeof(cplx));
 		
-		printf ("done.                      (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 		
 		return RRSModule::OK;
 		
@@ -253,6 +256,7 @@ namespace RRStrategy {
 	B0Map (const Matrix<cplx>* imgs, Matrix<double>* b0, const float TE) {
 		
 		printf ("  Computing b0 maps ... ");
+		fflush(stdout);
 		
 		ticks  tic = getticks();
 		Matrix<cplx> tmp;
@@ -279,7 +283,7 @@ namespace RRStrategy {
 			
 		}
 		
-		printf ("done.                             (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 		
 		return RRSModule::OK;
 		
@@ -294,6 +298,11 @@ namespace RRStrategy {
 	 */ 
 	int SegmentBrain (Matrix<double>* img) {
 		
+		printf ("  Brain segmentation with FSL(bet2) ... ");
+		fflush(stdout);
+
+		ticks  tic = getticks();
+
 		std::string orig = "orig.nii.gz";
 		std::string mask = "mask_mask.nii.gz";
 		std::string cmd  = "/usr/local/bin/mask.sh";
@@ -303,9 +312,12 @@ namespace RRStrategy {
 		if (!std::system(NULL))
 			return FATAL_SYSTEM_CALL;
 
+		// Call bet
 		system (cmd.c_str());
 
 		img->NIRead(mask);
+
+		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 		return RRSModule::OK;
 

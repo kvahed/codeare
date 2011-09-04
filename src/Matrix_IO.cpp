@@ -20,6 +20,7 @@ using namespace H5;
 #include <limits>
 #include <map>
 #include <sstream>
+#include <iomanip>
 
 using namespace TinyXPath;
 using namespace std;
@@ -438,6 +439,20 @@ static inline void dec2bin (unsigned& i, char* r) {
 }
 
 
+inline void 
+ProgressBar (const std::string& pre, const std::string& post, const short& p) {
+	
+	assert (p >=   0);
+	assert (p <= 100);
+	
+	std::cout << "\r";
+	std::cout << pre.c_str();
+	std::cout << " | "; 
+	std::cout << bars.substr(0, p/2) << " " <<  blancs.substr(0, 50-p/2) << "| " << std::setw(3) << std::setfill(' ') << p << "% done";
+	
+}
+
+
 template <class T>
 bool Matrix<T>::RAWRead (const string fname, const string version) {
 	
@@ -464,25 +479,37 @@ bool Matrix<T>::RAWRead (const string fname, const string version) {
 	fseek (f, start, SEEK_SET);
 	
 	//printf ("Found %.1f MB of header and data.\n", (float)size / MB);
-	printf ("  Reading data from offset %i on ...\n", l );
+	stringstream pre;
+
+	float bsize = (float) size / (1024.0*1024.0);
+	pre << "  Reading " << bsize << "MB ... ";
 
 	// Headers
 	mdh  = (sMDH*) malloc (nscans * sizeof(sMDH));
-	size_t n = 0.0;
-	char mask[8];
+	size_t n    = 0.0;
+	char   mask[8];
+	bool   done = false;
 
-	for (size_t i = 0; i < nscans; i++) {
+	const std::string post = "";
 
+	size_t i   = 0;
+	ticks  tic = getticks();
+
+	for (i = 0; i < nscans; i++) {
+
+		if (i % 250 == 0 || i == nscans-1)
+			ProgressBar (pre.str(), post, (short)round((float)(i+1)/(float)nscans*100.0));
+		
 		read = fread (&mdh[i], sizeof(sMDH), 1, f);
-		//dec2bin(mdh[i].aulEvalInfoMask[0], &mask[0]);
-
+		
 		long m = 0;
 		memcpy (&m, mdh[i].aulEvalInfoMask, 2 * sizeof (unsigned));
 		if (m == 0x00000001) {
-			printf ("  Hit ACQ_END. Found %i records.\n", i);
+			ProgressBar (pre.str(), post, 100);
+			done = true;
 			break;
 		}
-			
+		
 		n = mdh[i].sLC.ushLine       * _dim[0] +
 			mdh[i].sLC.ushSlice      * _dim[0] * _dim[1] +
 			mdh[i].sLC.ushPartition  * _dim[0] * _dim[1] * _dim[2] +
@@ -492,15 +519,16 @@ bool Matrix<T>::RAWRead (const string fname, const string version) {
 			mdh[i].sLC.ushSet        * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] +
 			mdh[i].sLC.ushSeg        * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] * _dim[7] +
 			mdh[i].ushChannelId      * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] * _dim[7] * _dim[8];
-
+		
 		read = fread (&_M[n], sizeof (complex<float>), _dim[0], f);
-
+		
 	}
 
 	fclose (f);
+	long e = (elapsed(getticks(),start) / Toolbox::Instance()->ClockRate());
+	printf ("\n  done. Loaded %i records (%f MB/s).\n", (int)i, bsize / (float)e);
 
 	return true;
-
 
 }
 
