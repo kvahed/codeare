@@ -116,8 +116,7 @@ GRAPPA::Prepare     () {
 	printf ("  Preparing %s ...\n", Name());
 
 	Matrix<cplx>* acs  = m_cplx["acs"];
-	printf ("  acs dims:  %s\n", acs->DimsToCString());
-	ComputeWeights (m_nc, m_acs_dim, m_kern_dim, m_d, m_R, m_cplx["acs"], m_weights);
+	ComputeWeights (m_nc, m_acs_dim, m_kern_dim, m_d, m_R, acs, m_weights);
 	
 	printf ("... done.\n\n");
 	return RRSModule::OK;

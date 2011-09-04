@@ -177,10 +177,13 @@ ReconClient::SetCplx (const std::string name, Matrix< std::complex<float> >& M) 
 	cplx_data r; 
 	
 	r.dims.length(INVALID_DIM);
+	r.res.length(INVALID_DIM);
 	
-	for (int j = 0; j < INVALID_DIM; j++)
+	for (int j = 0; j < INVALID_DIM; j++) {
 		r.dims[j] = M.Dim(j);
-	
+		r.res[j]  = M.Res(j);
+	}
+
 	r.dreal.length(M.Size()); 
 	r.dimag.length(M.Size());
 	
@@ -199,9 +202,11 @@ ReconClient::GetCplx (const std::string name, Matrix< std::complex<float> >& m) 
 	
 	cplx_data* rp = m_rrsi->get_cplx(name.c_str());
 	
-	for (int j = 0; j < INVALID_DIM; j++)
+	for (int j = 0; j < INVALID_DIM; j++) {
 		m.Dim(j) = rp->dims[j];
-	
+		m.Res(j) = rp->res[j];
+	}
+
 	m.Reset();
 	
 	for (int i = 0; i < GetSize(rp->dims); i++)
@@ -216,9 +221,12 @@ ReconClient::SetReal              (const std::string name, Matrix< double >& m) 
 	real_data r;
 	
 	r.dims.length(INVALID_DIM);
+	r.res.length(INVALID_DIM);
 	
-	for (int j = 0; j < INVALID_DIM; j++)
+	for (int j = 0; j < INVALID_DIM; j++) {
 		r.dims[j] = m.Dim(j);
+		r.res[j]  = m.Res(j);
+	}
 	
 	r.vals.length(m.Size());
 	
@@ -234,9 +242,11 @@ void
 ReconClient::GetReal            (const std::string name, Matrix<double>& m) {
 	
 	real_data* r = m_rrsi->get_real(name.c_str());
-
-	for (int j = 0; j < INVALID_DIM; j++)
+	
+	for (int j = 0; j < INVALID_DIM; j++) {
 		m.Dim(j) = r->dims[j];
+		m.Res(j) = r->res[j];
+	}
 	
 	m.Reset();
 	
@@ -253,9 +263,12 @@ ReconClient::SetPixel            (const std::string name, Matrix<short>& m) {
 	pixel_data p;
 	
 	p.dims.length(INVALID_DIM);
+	p.res.length(INVALID_DIM);
 	
-	for (int j = 0; j < INVALID_DIM; j++)
+	for (int j = 0; j < INVALID_DIM; j++) {
 		p.dims[j] = m.Dim(j);
+		p.res[j]  = m.Res(j);
+	}
 	
 	p.vals.length(m.Size()); 
 	
@@ -272,8 +285,10 @@ ReconClient::GetPixel            (const std::string name, Matrix<short>& m) {
 	
 	pixel_data* p = m_rrsi->get_pixel(name.c_str());
 
-	for (int j = 0; j < INVALID_DIM; j++)
+	for (int j = 0; j < INVALID_DIM; j++) {
 		m.Dim(j) = p->dims[j];
+		m.Res(j) = p->res[j];
+	}
 	
 	m.Reset();
 	

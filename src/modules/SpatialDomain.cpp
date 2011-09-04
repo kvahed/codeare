@@ -93,6 +93,10 @@ SpatialDomain::Init           ()  {
 	Attribute ("verbose", &m_verbose);
 	printf ("  verbosity: %i \n", m_verbose);
 
+	// Break loop early --------------------------
+	Attribute ("breakearly", &m_breakearly);
+	printf ("  verbosity: %i \n", m_breakearly);
+
 	// ----------------------------------------
 	
     printf ("... done.\n\n");
@@ -146,6 +150,8 @@ SpatialDomain::Process        () {
 	Matrix<short>*  b0     = m_pixel["b0"];
 	Matrix<cplx>*   target = m_cplx ["target"];
 
+	std::cout << (*k) << std::endl;
+
 	if (m_verbose) {
 	    ve  = Matrix<cplx>(m_ns,      m_maxiter);
 		vp  = Matrix<cplx>(m_nk*m_nc, m_maxiter);
@@ -192,7 +198,7 @@ SpatialDomain::Process        () {
 			if (m_verbose)
 				memcpy (&ve.At(0,gc), &tmp.At(0), tmp.Size() * sizeof(cplx)); 
 
-            if (gc > 0 && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
+            if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
 				break;
             
             final    = solution;

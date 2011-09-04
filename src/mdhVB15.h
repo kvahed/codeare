@@ -65,11 +65,11 @@ typedef struct
 typedef struct
 {
   unsigned int  ulDMALength;                  // DMA length [bytes] must be                         4 byte                                               // first parameter                        
-  int           lMeasUID;                     // measurement user ID                                4     
-  unsigned int  ulScanCounter;                // scan counter [1...]                                4
-  unsigned int  ulTimeStamp;                  // time stamp [2.5 ms ticks since 00:00]              4
-  unsigned int  ulPMUTimeStamp;               // PMU time stamp [2.5 ms ticks since last trigger]   4
-  unsigned int  aulEvalInfoMask[2];           // evaluation info mask field                         8
+  int            lMeasUID;                     // measurement user ID                                4     
+  unsigned int   ulScanCounter;                // scan counter [1...]                                4
+  unsigned int   ulTimeStamp;                  // time stamp [2.5 ms ticks since 00:00]              4
+  unsigned int   ulPMUTimeStamp;               // PMU time stamp [2.5 ms ticks since last trigger]   4
+  unsigned int   aulEvalInfoMask[2];           // evaluation info mask field                         8
   unsigned short ushSamplesInScan;             // # of samples acquired in scan                     2
   unsigned short ushUsedChannels;              // # of channels used in scan                        2   =32
   sLoopCounter   sLC;                          // loop counters                                    28   =60

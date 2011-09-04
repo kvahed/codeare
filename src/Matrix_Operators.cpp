@@ -704,11 +704,11 @@ Matrix<T>::operator Matrix<S> () const {
 		
 #pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
 		
-	for (int i = 0; i < this->Size(); i++)
-		m[i] = (S)_M[i];
-
+		for (int i = 0; i < this->Size(); i++)
+			m[i] = (S)_M[i];
+		
 	}
-
+	
 	return m;
 
 }

@@ -116,8 +116,57 @@ namespace RRStrategy {
 		
 		int c = 0;
 		
-		// Grappa pattern for standard kernel 5x4
+
+		//Grappa pattern for standard kernel 5x4
 		Matrix<double> p = Matrix<double>::Zeros ((kern_dim[1]-1)*R[1]+1, kern_dim[0], nc);
+		printf ("  patch size in ACS: %s\n", p.DimsToCString());
+		
+		// Source points
+		for (int lin = 0; lin < kern_dim[1]; lin++)
+			for (int col = 0; col < kern_dim[0]; col++)
+				p (col,lin*R[1],0) = 1.0;
+
+		// Target points
+		size_t lins = 1 + (ceil(kern_dim[1]/2)-1) * R[1];
+		for (int lin = lins; lin < lins + R[1] -1; lin++)
+			p(ceil(p.Dim(0)/2), lin) = -1.0;
+			
+
+		printf ("  source matrix size %s\n", s.DimsToCString());
+
+		int ni  = acs_dim[0] - d[0];
+		int nj  = acs_dim[1] - (kern_dim[1]-1) * R[1];
+ 
+		for (int i = d[0]; i < ni; i++) 
+			for (int j = 0, pos = 0; j < nj; j++, c++) 
+				for (int col = 0; col < kern_dim[0]; col++)
+					for (int lin = 0; lin < kern_dim[1]; lin++)
+						for (int ch = 0; ch < nc; ch++, pos++)
+							s.At(pos + c*s.Dim(0)) = acs->At(i+col,j+lin,ch);
+		
+		s.MXDump ("s.mat", "s", "");
+		p.MXDump ("p.mat", "p", "");
+		//acs->MXDump ("acs.mat", "acs", "");
+
+		
+		//s = s.Pinv();
+		  
+		/*
+		  weights = t->*s;
+		*/
+		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+			
+		}
+		
+
+	
+}
+#endif /* __GRAPPA_H__ */
+
+
+
+		// Grappa pattern for standard kernel 5x4
+		/*Matrix<double> p = Matrix<double>::Zeros ((kern_dim[1]-1)*R[1]+1, kern_dim[0], nc);
 		printf ("  patch size in ACS: %s", p.DimsToCString());
 		
 		// Source points
@@ -133,26 +182,8 @@ namespace RRStrategy {
 
 		for (int i = 1; i < nc; i++) 
 			memcpy (&p[i*p.Width()*p.Height()], &p[0], p.Width()*p.Height()*sizeof(p[0]));
-						
-		//p.MXDump ("pat.mat", "pat");
-						
-		//memcpy (&inds[0], &i[0], sizeof(size_t) * inds.Size());
-		//subs = pat.Ind2Sub2D(inds);
-		//std::cout << subs << std::endl;
-		
-		
-		//yind=1:nyacs-(srcy-1)*af
-		
-		/*
-		  s = s.Pinv();
-		  weights = t->*s;
-		*/
-		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-			
-		}
-		
-
-	
-}
-#endif /* __GRAPPA_H__ */
+		*/			
+		// Construct source point matrix for inversion ----
+		// for (points along column)
+		// dor (column)
 

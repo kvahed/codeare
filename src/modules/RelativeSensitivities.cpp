@@ -36,29 +36,30 @@ RRSModule::error_code
 RelativeSensitivities::Process     () { 
 
 	Matrix<cplx>*   data = m_cplx["meas"];
+	Matrix<cplx>*   mask = m_cplx["mask"];
 
 	printf ("  Processing map generation ...\n");
 	ticks start = getticks();
 
 
-	// Squeeze matrix ---------------------------
+	// Squeeze matrices ---------------------------
 
 	data->Squeeze();
-	printf ("  Dimensions: %s \n", data->DimsToCString());
-	// -----------------------------------------
+	mask->Squeeze();
 
+	printf ("  Data:\n");
+	printf ("    Dimensions: %s \n", data->DimsToCString());
+	printf ("    Reolutions: %s \n", data->ResToCString());
+	printf ("  Mask:\n");
+	printf ("    Dimensions: %s \n", mask->DimsToCString());
+	printf ("    Reolutions: %s \n", mask->ResToCString());
+	// -----------------------------------------
 
 	// Fourier transform -----------------------
 
 	FTVolumes (data);
-	// -----------------------------------------
-	
-
-	// Remove readout oversampling -------------
-
 	RemoveOS (data);
 	// -----------------------------------------
-
 
 	// SVD calibration -------------------------
 
@@ -66,6 +67,7 @@ RelativeSensitivities::Process     () {
 	Matrix<cplx>*   txm;
 	Matrix<cplx>*   shim;
 	Matrix<double>* snro;
+
 	AddCplx ("rxm",  rxm  = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(5)));
 	AddCplx ("txm",  txm  = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(4)));
 	AddCplx ("shim", shim = new Matrix<cplx>   (data->Dim(4), 1));
@@ -74,6 +76,22 @@ RelativeSensitivities::Process     () {
 	SVDCalibrate (data, rxm, txm, snro, shim, false);
    	// -----------------------------------------
 
+	// Do we have GRE for segmentation? --------
+
+	FTVolumes (mask);
+	RemoveOS  (mask);
+	mask->SOS (mask->HDim());
+
+	Matrix<double>* bet;
+	AddReal ("bet", bet = new Matrix<double> (mask->Dim()));
+	double tmp;
+	for (int i = 0; i < mask->Size(); i++) {
+		tmp = log(abs(mask->At(i)));
+		bet->At(i) = (tmp < -2.5) ? 0.0 : tmp + 2.5;
+	}
+		
+	SegmentBrain(bet);
+	// -----------------------------------------
 
 	// B0 calculation --------------------------
 

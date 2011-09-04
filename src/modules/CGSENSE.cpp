@@ -182,8 +182,7 @@ CGSENSE::Process () {
 		nfft::weights (&m_fplan[i], &m_iplan[i]);
 	}
 
-	// Don't need these anymore
-	FreeReal("weights");
+	// Don't need this anymore
 	FreeReal("kspace");
 
 	// Copying sensitivities. Will use helper for Pulses --------------
