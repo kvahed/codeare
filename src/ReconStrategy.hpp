@@ -265,8 +265,10 @@ namespace RRServer {
 			
 			Matrix<cplx>* tmp = m_cplx[name];
 			
-			for (int j = 0; j < INVALID_DIM; j++)
+			for (int j = 0; j < INVALID_DIM; j++) {
 				c->dims[j] = tmp->Dim(j);
+				c->res[j]  = tmp->Res(j);
+			}
 			
 			c->dreal.length(tmp->Size()); 
 			c->dimag.length(tmp->Size());
@@ -297,8 +299,10 @@ namespace RRServer {
 			else
 			    tmp = m_cplx[name];
 			
-			for (int i = 0; i < INVALID_DIM; i++)
+			for (int i = 0; i < INVALID_DIM; i++) {
 				tmp->Dim(i) = c->dims[i];
+				tmp->Res(i) = c->res[i];
+			}
 			
 			tmp->Reset ();
 			
@@ -356,8 +360,10 @@ namespace RRServer {
 			
 			Matrix<double>* tmp = m_real[name];
 			
-			for (int j = 0; j < INVALID_DIM; j++)
+			for (int j = 0; j < INVALID_DIM; j++) {
 				r->dims[j] = tmp->Dim(j);
+				r->res[j]  = tmp->Res(j);
+			}
 			
 			r->vals.length(tmp->Size()); 
 			
@@ -385,8 +391,10 @@ namespace RRServer {
 			else
 				tmp = m_real[name];
 			
-			for (int i = 0; i < INVALID_DIM; i++)
+			for (int i = 0; i < INVALID_DIM; i++) {
 				tmp->Dim(i) = r->dims[i];
+				tmp->Res(i) = r->res[i];
+			}
 			
 			tmp->Reset ();
 			
@@ -445,8 +453,10 @@ namespace RRServer {
 			
 			Matrix<short>* tmp = m_pixel[name];
 
-			for (int j = 0; j < INVALID_DIM; j++)
+			for (int j = 0; j < INVALID_DIM; j++) {
 				p->dims[j] = tmp->Dim(j);
+				p->res[j]  = tmp->Res(j);
+			}
 			
 			p->vals.length(tmp->Size()); 
 			
@@ -474,8 +484,10 @@ namespace RRServer {
 			else
 				tmp = m_pixel[name];
 
-			for (int i = 0; i < INVALID_DIM; i++)
+			for (int i = 0; i < INVALID_DIM; i++) {
 				tmp->Dim(i) = p->dims[i];
+				tmp->Res(i) = p->res[i];
+			}
 			
 			tmp->Reset ();
 			

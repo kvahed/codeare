@@ -43,6 +43,7 @@ module RRSModule {
 		floats dreal;  /**< Data abs      */
 		floats dimag;  /**< Data argument */
 		longs  dims;   /**< Dimesions     */
+		floats res;
 
 	};
 
@@ -54,6 +55,7 @@ module RRSModule {
 
 		doubles vals;  /**< Data      */
 		longs   dims;  /**< Dimesions */
+		floats  res;
 
 	};
 
@@ -65,6 +67,7 @@ module RRSModule {
 
 		shorts vals;  /**< Data      */
 		longs  dims;  /**< Dimesions */
+		floats res;
 
 	};
 

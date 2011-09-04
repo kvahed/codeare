@@ -122,6 +122,7 @@ ReconServant::get_cplx         (const char* name)                    {
 
 	cplx_data tmp;      
 	tmp.dims.length(INVALID_DIM);
+	tmp.res.length(INVALID_DIM);
 	m_contexts.at(0)->GetCplx(name, &tmp);
 	return new cplx_data (tmp);
 
@@ -141,6 +142,7 @@ ReconServant::get_real       (const char* name)                    {
 
 	real_data tmp;      
 	tmp.dims.length(INVALID_DIM);
+	tmp.res.length(INVALID_DIM);
 	m_contexts.at(0)->GetReal(name, &tmp);
 	return new real_data (tmp);
 
@@ -160,6 +162,7 @@ ReconServant::get_pixel        (const char* name)                    {
 
 	pixel_data tmp;      
 	tmp.dims.length(INVALID_DIM);
+	tmp.res.length(INVALID_DIM);
 	m_contexts.at(0)->GetPixel(name, &tmp);
 	return new pixel_data (tmp);
 

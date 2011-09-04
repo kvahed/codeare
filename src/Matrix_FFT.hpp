@@ -153,10 +153,7 @@ Matrix<T> Matrix<T>::SOS (const size_t d) const {
 #pragma omp parallel default (shared) 
 	{
 		
-		size_t tid      = omp_get_thread_num();
-		size_t chunk    = Size() / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk)
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
 		
 		for (size_t i = 0; i < res.Size(); i++) {
 			for (size_t j = 0; j < _dim[nd]; j++)
@@ -172,16 +169,40 @@ Matrix<T> Matrix<T>::SOS (const size_t d) const {
 
 
 template <class T> void
+Matrix<T>::SOS (const size_t d) {
+	
+	assert (_dim[d] > 1);
+
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+		
+		for (int i = 0; i < Size(); i++)
+			_M[i] *= _M[i];
+
+	}
+
+	this->Sum(d);
+
+}
+
+
+template <class T> void
 Matrix<T>::Squeeze () {
 	
 	size_t found = 0;
 	
 	for (size_t i = 0; i < INVALID_DIM; i++)
-		if (_dim[i] > 1)
+		if (_dim[i] > 1) {
+			_res[found]   = _res[i];
 			_dim[found++] = _dim[i];
+		}
 	
-	for (size_t i = found; i < INVALID_DIM; i++)
+	for (size_t i = found; i < INVALID_DIM; i++) {
 		_dim[i] = 1;
+		_res[i] = 1.0;
+	}
 	
 }
 

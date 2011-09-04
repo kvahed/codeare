@@ -183,8 +183,6 @@ template<class T>
 Matrix<T> 
 Matrix<T>::Pinv () {
 	
-	char      trans  = 'N';
-
     int       m      = Dim(0);
     int       n      = Dim(1);
     int       nrhs   = m;

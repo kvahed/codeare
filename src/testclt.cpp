@@ -244,26 +244,26 @@ bool nuffttest (ReconClient* rc) {
 
 bool sdmtest (ReconClient* rc) {
 
-	Matrix<cplx>    target;
-	Matrix<cplx>    b1;
+	Matrix<cplx>   target;
+	Matrix<cplx>   b1;
 	Matrix<double> r;
 	Matrix<double> k;
 	Matrix<short>  b0;
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
-	std::string    odf = std::string (base + std::string("/pulses.h5"));
-	std::string    pdf = std::string (base + std::string("/result.h5"));
-	std::string    rdf = std::string (base + std::string("/residuals.h5"));
+	std::string    odf = std::string (base + std::string("sdmout.mat"));
+	std::string    pdf = std::string (base + std::string("result.h5"));
+	std::string    rdf = std::string (base + std::string("residuals.h5"));
 
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 
-	target.Read    (df, "target");
-	b1.Read        (df, "b1");
-	b0.Read        (df, "b0");
-	k.Read         (df, "k");
-	r.Read         (df, "r");
+	target.Read  (df, "target");
+	b1.Read      (df, "b1");
+	b0.Read      (df, "b0");
+	k.Read       (df, "k");
+	r.Read       (df, "r");
 
 	rc->SetCplx    ("target", target);
 	rc->SetCplx    ("b1",     b1);
@@ -277,12 +277,27 @@ bool sdmtest (ReconClient* rc) {
 	rc->GetCplx    ("b1",     b1);
 	rc->GetReal    ("r",      r);
 
-	target.Dump   (odf.c_str());
-	b1.Dump       (pdf.c_str());
-	r.Dump        (rdf.c_str());
-
 	rc->Finalise(test);
 	
+	std::string fname = std::string (base + std::string ("sdout.mat"));
+	
+#ifdef HAVE_MAT_H	
+	MATFile* mf = matOpen (fname.c_str(), "w");
+
+	if (mf == NULL) {
+		printf ("Error creating file %s\n", fname.c_str());
+		return false;
+	}
+
+	target.MXDump (mf, "pattern", "");
+	b1.MXDump     (mf, "ptx", "");
+	r.MXDump      (mf, "nrmse", "");
+
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n",fname.c_str());
+		return false;
+	}
+#endif
 	return true;
 
 }
@@ -356,6 +371,7 @@ bool resetest (ReconClient* rc) {
 
 	// OUT:
 	Matrix<cplx>   meas; // measurement
+	Matrix<cplx>   mask; // measurement
 
 	// IN: 
 	Matrix<cplx>   txm;  // Transmit maps
@@ -363,21 +379,35 @@ bool resetest (ReconClient* rc) {
 
 	Matrix<double> b0;   // B0 map
 	Matrix<double> snro; // SNR optimal image
+	Matrix<double> bet;  // GRE mask
 
 	// Read configuration file and initialise backend ------------
 
-	std::string    cf = std::string (base + std::string (config));
+	std::string    cf  = std::string (base + std::string (config));
 	rc->ReadConfig (cf.c_str());
+	rc->DumpConfig ("con.xml");
+	
+	stringstream ss;
+	string mef, maf;
+
+	ss << base << rc->Attribute("meas");
+	mef = ss.str();
+	ss.str("");
+	ss << base << rc->Attribute("mask");
+	maf = ss.str();
 
 	rc->Init(test);
 	// -----------------------------------------------------------
 
 	// Read binary data and transmit to backend ------------------ 
 
-	std::string    df = std::string (base + std::string   (data));
-	meas.RAWRead (df, std::string("VB15"));
+	//sprintf ("--- %s ---\n", mef.c_str());
+
+	meas.RAWRead (mef, std::string("VB15"));
+	mask.RAWRead (maf, std::string("VB15"));
 
 	rc->SetCplx ("meas", meas);
+	rc->SetCplx ("mask", mask);
 	// -----------------------------------------------------------
 
 	// Process data on backend -----------------------------------
@@ -389,8 +419,10 @@ bool resetest (ReconClient* rc) {
 
 	rc->GetCplx ("txm",  txm);
 	rc->GetCplx ("rxm",  rxm);
+	rc->GetCplx ("mask", mask);
 	rc->GetReal ("snro", snro);
 	rc->GetReal ("b0",   b0);
+	rc->GetReal ("bet",  bet);
 	// -----------------------------------------------------------
 
 	// Clear RAM and hangup --------------------------------------
@@ -400,7 +432,7 @@ bool resetest (ReconClient* rc) {
 
 	// Write data to a single matlab disk ------------------------
 	
-	std::string fname = std::string (base + std::string ("out.mat"));
+	std::string fname = std::string (base + std::string ("maps.mat"));
 	
 #ifdef HAVE_MAT_H	
 	MATFile* mf = matOpen (fname.c_str(), "w");
@@ -414,6 +446,8 @@ bool resetest (ReconClient* rc) {
 	rxm.MXDump  (mf,  "rxm", "");
 	snro.MXDump (mf, "snro", "");
 	b0.MXDump   (mf,   "b0", "");
+	bet.MXDump  (mf,  "bet", "");
+	mask.MXDump (mf, "mask", "");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n",fname.c_str());

@@ -1,5 +1,6 @@
 #include "Toolbox.hpp"
 #include "tinyxml/tinyxml.h"
+#include "tinyxml/xpath_static.h"
 #include "mdhVB15.h"
 
 #ifdef HAVE_NIFTI1_IO_H
@@ -20,12 +21,13 @@ using namespace H5;
 #include <map>
 #include <sstream>
 
-
+using namespace TinyXPath;
+using namespace std;
 
 inline bool 
 fexists (const char* fname) {
 	
-	std::ifstream fs (fname);
+	ifstream fs (fname);
 	
 	if (fs)
 		return true;
@@ -35,8 +37,8 @@ fexists (const char* fname) {
 }
 
 
-template<> inline std::ostream&  
-Matrix<size_t>::Print (std::ostream &os) const {
+template<> inline ostream&  
+Matrix<size_t>::Print (ostream &os) const {
 	
 	for (size_t i = 0; i < _dim[COL]; i++) {
 		for(size_t j = 0; j < _dim[LIN]; j++)
@@ -49,8 +51,8 @@ Matrix<size_t>::Print (std::ostream &os) const {
 }
 
 
-template<> inline std::ostream&  
-Matrix<short>::Print (std::ostream &os) const {
+template<> inline ostream&  
+Matrix<short>::Print (ostream &os) const {
 	
 	for (size_t i = 0; i < _dim[COL]; i++) {
 		for(size_t j = 0; j < _dim[LIN]; j++)
@@ -63,8 +65,8 @@ Matrix<short>::Print (std::ostream &os) const {
 }
 
 
-template<> inline std::ostream&  
-Matrix<double>::Print (std::ostream &os) const {
+template<> inline ostream&  
+Matrix<double>::Print (ostream &os) const {
 	
 	for (size_t i = 0; i < _dim[COL]; i++) {
 		for(size_t j = 0; j < _dim[LIN]; j++)
@@ -77,8 +79,8 @@ Matrix<double>::Print (std::ostream &os) const {
 }
 
 
-template<> inline std::ostream&  
-Matrix<float>::Print (std::ostream &os) const {
+template<> inline ostream&  
+Matrix<float>::Print (ostream &os) const {
 	
 	for (size_t i = 0; i < _dim[COL]; i++) {
 		for(size_t j = 0; j < _dim[LIN]; j++)
@@ -91,8 +93,8 @@ Matrix<float>::Print (std::ostream &os) const {
 }
 
 
-template<> inline std::ostream&  
-Matrix<cplx>::Print (std::ostream& os) const {
+template<> inline ostream&  
+Matrix<cplx>::Print (ostream& os) const {
 	
 	for (size_t i = 0; i < _dim[COL]; i++) {
 		for(size_t j = 0; j < _dim[LIN]; j++)
@@ -106,9 +108,9 @@ Matrix<cplx>::Print (std::ostream& os) const {
 
 
 template <class T> 
-const std::string Matrix<T>::DimsToString () const {
+const string Matrix<T>::DimsToString () const {
 
-	std::stringstream ss;
+	stringstream ss;
 	
 	for (size_t i = 0; i <= HDim(); i++)
 		ss << (int)_dim[i] << " ";
@@ -126,8 +128,29 @@ const char* Matrix<T>::DimsToCString () const {
 }
 
 
-template <class T> std::ostream& 
-operator<< (std::ostream& os, Matrix<T>& M) {
+template <class T> 
+const string Matrix<T>::ResToString () const {
+
+	stringstream ss;
+	
+	for (size_t i = 0; i <= HDim(); i++)
+		ss << _res[i] << " ";
+
+	return ss.str();
+	
+}
+
+
+template <class T> 
+const char* Matrix<T>::ResToCString () const {
+
+	return this->ResToString().c_str();
+	
+}
+
+
+template <class T> ostream& 
+operator<< (ostream& os, Matrix<T>& M) {
 	
 	M.Print(os);
 	return os;
@@ -136,7 +159,7 @@ operator<< (std::ostream& os, Matrix<T>& M) {
 
 
 template <class T>
-bool Matrix<T>::PRDump (const std::string fname) const {
+bool Matrix<T>::PRDump (const string fname) const {
 	
 	FILE *fp;
 	
@@ -158,7 +181,7 @@ bool Matrix<T>::PRDump (const std::string fname) const {
 
 
 template <class T>
-bool Matrix<T>::Dump (const std::string fname, const std::string dname, const std::string dloc, const io_strategy ios) const {
+bool Matrix<T>::Dump (const string fname, const string dname, const string dloc, const io_strategy ios) const {
 	
 	
 	if      (ios == HDF5)
@@ -176,7 +199,7 @@ bool Matrix<T>::Dump (const std::string fname, const std::string dname, const st
 
 
 template <class T>
-bool Matrix<T>::H5Dump (const std::string fname, const std::string dname, const std::string dloc) const {
+bool Matrix<T>::H5Dump (const string fname, const string dname, const string dloc) const {
 	
 	size_t i = 0;
 	
@@ -216,7 +239,7 @@ bool Matrix<T>::H5Dump (const std::string fname, const std::string dname, const 
 				
 				size_t    depth   = 0;
 
-				std::vector<std::string> sv;
+				vector<string> sv;
 
 				Toolbox::Instance()->Split (sv, dloc, "/");
 
@@ -258,7 +281,7 @@ bool Matrix<T>::H5Dump (const std::string fname, const std::string dname, const 
 			
 			delete [] dims;
 
-			std::string _dname = dname;
+			string _dname = dname;
 
 			if (typeid(T) == typeid(cplx)) {
 				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
@@ -297,10 +320,10 @@ bool Matrix<T>::H5Dump (const std::string fname, const std::string dname, const 
 		
 #else // HAVE_H5CPP_H
 		
-		std::ofstream fout(fname.c_str() , std::ios::out | std::ios::binary);
+		ofstream fout(fname.c_str() , ios::out | ios::binary);
 		
 		for (i = 0; i < Size(); i++) {
-			std::cout << _M[i] << std::endl;
+			cout << _M[i] << endl;
 			fout.write ((char*)(&(_M[i])), sizeof(double));
 		}
 		
@@ -317,32 +340,35 @@ bool Matrix<T>::H5Dump (const std::string fname, const std::string dname, const 
 
 
 template <class T>
-bool Matrix<T>::RSAdjust (const std::string fname) {
+bool Matrix<T>::RSAdjust (const string fname) {
 
 	size_t dimk;
 	size_t dimv;
 
 	// XML file name, run cmd and repository
-	std::stringstream    xmlf;
-	std::stringstream    cmd;
+	stringstream    xmlf;
+	stringstream    cmd;
 
 	// XML objects
 	TiXmlDocument*       doc = new TiXmlDocument();
 	TiXmlElement*       meta;
-	TiXmlNode*           fix;
 	TiXmlNode*           vol;
 
 	// Dimensions in XProtocol
-	std::map < std::string, size_t > dims;
-	dims["RawCol"] =  0; dims["RawLin"] =  1; dims["RawSlc"] =  2; dims["RawPar"] =  3;
-	dims["RawEco"] =  4; dims["RawPhs"] =  5; dims["RawRep"] =  6; dims["RawSet"] =  7;
-	dims["RawSeg"] =  8; dims["RawCha"] =  9; dims["RawIda"] = 10; dims["RawIdb"] = 11;
-	dims["RawIdc"] = 12; dims["RawIdd"] = 13; dims["RawIde"] = 14; dims["RawAve"] = 15; 
+
+	map < string, size_t > dims;
+	dims["NImageCols"] =  0; dims["NLinMeas"] =  1; dims["NSlcMeas"] =  2; dims["NParMeas"] =  3;
+	dims[  "NEcoMeas"] =  4; dims["NPhsMeas"] =  5; dims["NRepMeas"] =  6; dims["NSetMeas"] =  7;
+	dims[  "NSegMeas"] =  8; dims[  "RawCha"] =  9; dims["NIdaMeas"] = 10; dims["NIdbMeas"] = 11;
+	dims[  "NIdcMeas"] = 12; dims["NIddMeas"] = 13; dims["NIdeMeas"] = 14; dims["NAveMeas"] = 15; 
+
+	string channels  = "RawCha";
+	string doublevals [2] = {"RoFOV", "PeFOV"};
+	string slcthickn = "SliceThickness";
 
 	// Create XML output from XProt
 	cmd << "/usr/local/bin/convert.pl ";
 	cmd << fname;
-	printf ("%s\n", cmd.str().c_str());
 	size_t ec = system (cmd.str().c_str());
 
 	// Output filename
@@ -352,51 +378,73 @@ bool Matrix<T>::RSAdjust (const std::string fname) {
 	// Read XML and go to rawobjectprovider for dimensions
 	doc->LoadFile (xmlf.str().c_str());
 	meta = doc->RootElement();
-	
-	vol  = meta->FirstChild     ("XProtocol");
-	vol  = vol->FirstChild      ("ParamMap");
-	vol  = vol->FirstChild      ("ParamMap");
-	fix  = vol->FirstChild      ("Pipe");
-	vol  = fix->FirstChild      ("PipeService");
-	vol  = fix->IterateChildren ("PipeService", vol);
-	vol  = fix->IterateChildren ("PipeService", vol);
-	fix  = fix->IterateChildren ("PipeService", vol);
-	fix  = fix->FirstChild      ("ParamFunctor");
+
+	TiXmlNode* rootfunctor    = TinyXPath::XNp_xpath_node 
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']");
 
 	// Dimensions
-	vol  = fix->FirstChild ("ParamLong");
-
+	vol  = rootfunctor->FirstChild ("ParamLong");
+	map < string, size_t >::iterator it;
+	string key;
+		
 	do {
-
-		dimk = dims[((TiXmlElement*)vol)->Attribute( "name")];
-		dimv = atoi(((TiXmlElement*)vol)->Attribute("value"));
-
-		if (dimk == 0) dimv *= 2;
-		if (dimv == 0) break;
-
-		_dim[dimk] = dimv;
-
-	} while ((vol = fix->IterateChildren ("ParamLong", vol))!=NULL);
+		
+		key = ((TiXmlElement*)vol)->Attribute("name");
+		it = dims.find (key);
+		
+		if (it != dims.end()) {
+			
+			dimk = dims[key];
+			dimv = atoi( ((TiXmlElement*)vol)->Attribute("value"));
+			
+			if (dimk == 0) dimv *= 2;
+			if (dimv == 0) dimv = 1;
+			
+			_dim[dimk] = dimv;
+			
+		}
+		
+	} while ((vol = rootfunctor->IterateChildren ("ParamLong", vol))!=NULL);
+	
+	_res[0] = (float)TinyXPath::d_xpath_double
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='RoFOV']/@value") / _dim[0] * 2;
+	_res[1] = (float)TinyXPath::d_xpath_double 
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='PeFOV']/@value") / _dim[1];
+	_res[3] = (float)TinyXPath::d_xpath_double
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamArray[@name='SliceThickness']/ParamDouble[1]/Precision[1]/@value") / _dim[3];
+	
+	_dim[9] = i_xpath_int 
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online2']/ParamFunctor[@name='rawobjprovider']/ParamLong[@name='RawCha']/@value"); 
 
 	Reset();
 	
 	delete doc;
 	return true;
+	
+}
 
+static inline void dec2bin (unsigned& i, char* r) {
+
+	char* e = r; 
+
+	for (int j = 0; j < 2*sizeof(i); j++) {
+		(i & 0x1) ? (*r++='1') : (*r++='0'); 
+		i >>= 1; 
+	}
+	
+	while( r-- != e ) 
+		printf("%c",*r);
+	printf(" ");
 }
 
 
-
 template <class T>
-bool Matrix<T>::RAWRead (const std::string fname, const std::string version) {
+bool Matrix<T>::RAWRead (const string fname, const string version) {
 	
 	// Get size information from XProtocol and resize 
 	RSAdjust(fname);
 
-	printf ("         Col  Lin  Slc  Par  Ech  Pha  Rep  Set  Seg  Cha  Ida  Idb  Idc  Idd  Ide  Ave\n");
-	printf ("Matrix: % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i % 4i\n\n",
-			(int)_dim[ 0], (int)_dim[ 1], (int)_dim[ 2], (int)_dim[ 3], (int)_dim[ 4], (int)_dim[ 5], (int)_dim[ 6], (int)_dim[ 7],
-			(int)_dim[ 8], (int)_dim[ 9], (int)_dim[10], (int)_dim[11], (int)_dim[12], (int)_dim[13], (int)_dim[14], (int)_dim[15]);
+	printf ("%s: %s\n", fname.c_str(), this->DimsToCString());
 
 	FILE*         f;
 	sMDH*         mdh;
@@ -415,17 +463,26 @@ bool Matrix<T>::RAWRead (const std::string fname, const std::string version) {
 	size  = ftell(f);
 	fseek (f, start, SEEK_SET);
 	
-	//	printf ("Found %.1f MB of header and data.\n", (float) size / MB);
-	printf ("Reading data from offset %i on ...\n", l );
+	//printf ("Found %.1f MB of header and data.\n", (float)size / MB);
+	printf ("  Reading data from offset %i on ...\n", l );
 
 	// Headers
 	mdh  = (sMDH*) malloc (nscans * sizeof(sMDH));
 	size_t n = 0.0;
+	char mask[8];
 
 	for (size_t i = 0; i < nscans; i++) {
 
 		read = fread (&mdh[i], sizeof(sMDH), 1, f);
+		//dec2bin(mdh[i].aulEvalInfoMask[0], &mask[0]);
 
+		long m = 0;
+		memcpy (&m, mdh[i].aulEvalInfoMask, 2 * sizeof (unsigned));
+		if (m == 0x00000001) {
+			printf ("  Hit ACQ_END. Found %i records.\n", i);
+			break;
+		}
+			
 		n = mdh[i].sLC.ushLine       * _dim[0] +
 			mdh[i].sLC.ushSlice      * _dim[0] * _dim[1] +
 			mdh[i].sLC.ushPartition  * _dim[0] * _dim[1] * _dim[2] +
@@ -436,7 +493,7 @@ bool Matrix<T>::RAWRead (const std::string fname, const std::string version) {
 			mdh[i].sLC.ushSeg        * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] * _dim[7] +
 			mdh[i].ushChannelId      * _dim[0] * _dim[1] * _dim[2] * _dim[3] * _dim[4] * _dim[5] * _dim[6] * _dim[7] * _dim[8];
 
-		read = fread (&_M[n], sizeof (std::complex<float>), _dim[0], f);
+		read = fread (&_M[n], sizeof (complex<float>), _dim[0], f);
 
 	}
 
@@ -448,7 +505,7 @@ bool Matrix<T>::RAWRead (const std::string fname, const std::string version) {
 }
 
 template <class T>
-bool Matrix<T>::Read (const std::string fname, const std::string dname, const std::string dloc, const io_strategy ios) {
+bool Matrix<T>::Read (const string fname, const string dname, const string dloc, const io_strategy ios) {
 
 	if (     ios == HDF5)
 		return H5Read (fname, dname, dloc);
@@ -463,7 +520,7 @@ bool Matrix<T>::Read (const std::string fname, const std::string dname, const st
 
 
 template <class T>
-bool Matrix<T>::H5Read (const std::string fname, const std::string dname, const std::string dloc) {
+bool Matrix<T>::H5Read (const string fname, const string dname, const string dloc) {
 	
     if (fname != "") {
 		
@@ -499,13 +556,13 @@ bool Matrix<T>::H5Read (const std::string fname, const std::string dname, const 
 			//_M = (T*) malloc (Size() * sizeof (T));
 			
 
-			std::cout << "rank: " << ndim << ", dimensions: ";
+			cout << "rank: " << ndim << ", dimensions: ";
 			for (size_t i = 0; i < ndim; i++) {
-				std::cout << (unsigned long)(dims[i]);
+				cout << (unsigned long)(dims[i]);
 				if (i == ndim - 1)
-					std::cout << std::endl;
+					cout << endl;
 				else
-					std::cout << " x ";
+					cout << " x ";
 			}
 
 			
@@ -540,7 +597,7 @@ bool Matrix<T>::H5Read (const std::string fname, const std::string dname, const 
 		
 #else // HAVE_H5CPP_H
 		
-		std::ifstream fin  (fname.c_str() , std::ios::in | std::ios::binary);
+		ifstream fin  (fname.c_str() , ios::in | ios::binary);
 		
 		for (size_t i = 0; i < Size(); i++)
 			fin.read  ((char*)(&(_M[i])), sizeof(T));
@@ -559,7 +616,7 @@ bool Matrix<T>::H5Read (const std::string fname, const std::string dname, const 
 #ifdef HAVE_MAT_H
 
 template <class T>
-bool Matrix<T>::MXRead (const std::string fname, const std::string dname, const std::string dloc) {
+bool Matrix<T>::MXRead (const string fname, const string dname, const string dloc) {
 
 	
 	// Open file ---------------------------------
@@ -621,7 +678,7 @@ bool Matrix<T>::MXRead (const std::string fname, const std::string dname, const 
 
 
 template <class T>
-bool Matrix<T>::MXDump (MATFile* mf, const std::string dname, const std::string dloc) const {
+bool Matrix<T>::MXDump (MATFile* mf, const string dname, const string dloc) const {
 	
 	// Declare dimensions and allocate array -----
 	
@@ -674,7 +731,7 @@ bool Matrix<T>::MXDump (MATFile* mf, const std::string dname, const std::string 
 }
 
 template <class T>
-bool Matrix<T>::MXDump (const std::string fname, const std::string dname, const std::string dloc) const {
+bool Matrix<T>::MXDump (const string fname, const string dname, const string dloc) const {
 
 	// Open file ---------------------------------
 
@@ -704,7 +761,7 @@ bool Matrix<T>::MXDump (const std::string fname, const std::string dname, const 
 
 
 template <class T>
-bool Matrix<T>::NIDump (const std::string fname) const {
+bool Matrix<T>::NIDump (const string fname) const {
 	
 	if (fname != "") {
 		
@@ -718,6 +775,7 @@ bool Matrix<T>::NIDump (const std::string fname) const {
 		nifti_1_header header;
 		header.sizeof_hdr  = 348;
 		header.dim[0] = tmp.HDim() + 1;
+		header.pixdim[0] = tmp.HDim() + 1;
 		
 		if (tmp.HDim() > 7) {
 			printf ("Cannot dump more than 8 dimensions to NIFTI FILE\n.");
@@ -730,7 +788,7 @@ bool Matrix<T>::NIDump (const std::string fname) const {
 		}
 		
 		if      (typeid(T) == typeid(cplx))
-			header.datatype = 16;
+			header.datatype = 32;
 		else if (typeid(T) == typeid(double))
 			header.datatype = 64;
 		else if (typeid(T) == typeid(short))
@@ -747,7 +805,7 @@ bool Matrix<T>::NIDump (const std::string fname) const {
 		strcpy(ni->iname,fname.c_str());
 		
 		ni->data = (void*) malloc (Size() * sizeof (T));
-		memcpy (ni->data, &_M[0], Size() * sizeof (T));
+		memcpy (ni->data, &_M[0],  Size() * sizeof (T));
 		
 		nifti_image_write (ni);
 		nifti_image_free (ni); 
@@ -770,7 +828,7 @@ bool Matrix<T>::NIDump (const std::string fname) const {
 
 
 template <class T>
-bool Matrix<T>::NIRead (const std::string fname) {
+bool Matrix<T>::NIRead (const string fname) {
 	
 	if (fname != "") {
 		
@@ -831,7 +889,7 @@ bool Matrix<T>::NIRead (const std::string fname) {
 
 // Function not finished yet. Do not use.
 template <class T> bool 
-Matrix<T>::CDFDump (const std::string fname, const std::string dname, const std::string dloc) const {
+Matrix<T>::CDFDump (const string fname, const string dname, const string dloc) const {
 
 #ifdef HAVE_CDF_H
 
@@ -888,7 +946,7 @@ Matrix<T>::CDFDump (const std::string fname, const std::string dname, const std:
 
 // Function not finished yet. Do not use.
 template <class T> bool
-Matrix<T>::CDFRead (const std::string fname, const std::string dname, const std::string dloc) {
+Matrix<T>::CDFRead (const string fname, const string dname, const string dloc) {
 	
 
 	return true;

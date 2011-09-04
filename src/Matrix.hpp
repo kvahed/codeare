@@ -1715,6 +1715,24 @@ public:
     
 
     /**
+     * @brief           Print resolutions to STL string.
+     *
+     * @return          Dimension string
+     */
+    const std::string       
+    ResToString        () const;
+    
+
+    /**
+     * @brief           Print resolutionss to C string.
+     *
+     * @return          Dimension string
+     */
+    const char*
+    ResToCString        () const;
+    
+
+    /**
      * @brief           Primitive dump column-major to file.
      * 
      * @param  fname    File name.
@@ -2077,6 +2095,16 @@ public:
      */
 	Matrix<T>
     SOS                 (const size_t d = 0)           const;
+    
+
+    /**
+     * @brief           Sum of squares on itself. 
+     *
+	 * @param  d        Dimension to eliminate. <br/>If not given, it is done over the outermost
+     * @return          Sum of squares
+     */
+	void
+    SOS                 (const size_t d = 0);
     
 
     /**

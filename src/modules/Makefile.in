@@ -74,8 +74,11 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 CGSENSE_la_LIBADD =
-am__objects_1 = tinystr.lo tinyxml.lo tinyxmlerror.lo tinyxmlparser.lo \
-	Toolbox.lo
+am__objects_1 = Toolbox.lo tinystr.lo tinyxml.lo tinyxmlerror.lo \
+	tinyxmlparser.lo xpath_processor.lo xpath_expression.lo \
+	xpath_static.lo action_store.lo xpath_stack.lo lex_util.lo \
+	xpath_stream.lo node_set.lo xml_util.lo xpath_syntax.lo \
+	tokenlist.lo
 am_CGSENSE_la_OBJECTS = $(am__objects_1) CGSENSE.lo nfftstub.lo
 CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
 CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -327,7 +330,7 @@ lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	MedianFilter_OMP.la SystemCmd.la LapackTests.la \
 	SpatialDomain.la RelativeSensitivities.la GRAPPA.la \
 	$(am__append_1)
-COMMON = ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../Toolbox.hpp ../Toolbox.cpp
+COMMON = ../Toolbox.hpp ../Toolbox.cpp ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../tinyxml/xpath_processor.h ../tinyxml/xpath_processor.cpp ../tinyxml/xpath_expression.cpp ../tinyxml/xpath_expression.h ../tinyxml/xpath_static.cpp ../tinyxml/xpath_static.h ../tinyxml/action_store.cpp ../tinyxml/action_store.h ../tinyxml/xpath_stack.cpp ../tinyxml/xpath_stack.h ../tinyxml/lex_util.cpp ../tinyxml/lex_util.h ../tinyxml/xpath_stream.cpp ../tinyxml/xpath_stream.h ../tinyxml/node_set.cpp ../tinyxml/node_set.h ../tinyxml/xml_util.cpp ../tinyxml/xml_util.h ../tinyxml/xpath_syntax.cpp ../tinyxml/xpath_syntax.h ../tinyxml/tokenlist.cpp ../tinyxml/tokenlist.h 
 # Common linker flags
 COMMON_la_LDFLAGS = -module
 
@@ -466,11 +469,22 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpatialDomain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/action_store.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lex_util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nfftstub.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/node_set.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinystr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxml.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlerror.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlparser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tokenlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xml_util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpath_expression.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpath_processor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpath_stack.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpath_static.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpath_stream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpath_syntax.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -514,6 +528,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
+Toolbox.lo: ../Toolbox.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Toolbox.lo -MD -MP -MF $(DEPDIR)/Toolbox.Tpo -c -o Toolbox.lo `test -f '../Toolbox.cpp' || echo '$(srcdir)/'`../Toolbox.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Toolbox.Tpo $(DEPDIR)/Toolbox.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../Toolbox.cpp' object='Toolbox.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Toolbox.lo `test -f '../Toolbox.cpp' || echo '$(srcdir)/'`../Toolbox.cpp
+
 tinystr.lo: ../tinyxml/tinystr.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tinystr.lo -MD -MP -MF $(DEPDIR)/tinystr.Tpo -c -o tinystr.lo `test -f '../tinyxml/tinystr.cpp' || echo '$(srcdir)/'`../tinyxml/tinystr.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tinystr.Tpo $(DEPDIR)/tinystr.Plo
@@ -542,12 +563,82 @@ tinyxmlparser.lo: ../tinyxml/tinyxmlparser.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlparser.lo `test -f '../tinyxml/tinyxmlparser.cpp' || echo '$(srcdir)/'`../tinyxml/tinyxmlparser.cpp
 
-Toolbox.lo: ../Toolbox.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Toolbox.lo -MD -MP -MF $(DEPDIR)/Toolbox.Tpo -c -o Toolbox.lo `test -f '../Toolbox.cpp' || echo '$(srcdir)/'`../Toolbox.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Toolbox.Tpo $(DEPDIR)/Toolbox.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../Toolbox.cpp' object='Toolbox.lo' libtool=yes @AMDEPBACKSLASH@
+xpath_processor.lo: ../tinyxml/xpath_processor.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xpath_processor.lo -MD -MP -MF $(DEPDIR)/xpath_processor.Tpo -c -o xpath_processor.lo `test -f '../tinyxml/xpath_processor.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_processor.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/xpath_processor.Tpo $(DEPDIR)/xpath_processor.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/xpath_processor.cpp' object='xpath_processor.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Toolbox.lo `test -f '../Toolbox.cpp' || echo '$(srcdir)/'`../Toolbox.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xpath_processor.lo `test -f '../tinyxml/xpath_processor.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_processor.cpp
+
+xpath_expression.lo: ../tinyxml/xpath_expression.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xpath_expression.lo -MD -MP -MF $(DEPDIR)/xpath_expression.Tpo -c -o xpath_expression.lo `test -f '../tinyxml/xpath_expression.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_expression.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/xpath_expression.Tpo $(DEPDIR)/xpath_expression.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/xpath_expression.cpp' object='xpath_expression.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xpath_expression.lo `test -f '../tinyxml/xpath_expression.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_expression.cpp
+
+xpath_static.lo: ../tinyxml/xpath_static.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xpath_static.lo -MD -MP -MF $(DEPDIR)/xpath_static.Tpo -c -o xpath_static.lo `test -f '../tinyxml/xpath_static.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_static.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/xpath_static.Tpo $(DEPDIR)/xpath_static.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/xpath_static.cpp' object='xpath_static.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xpath_static.lo `test -f '../tinyxml/xpath_static.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_static.cpp
+
+action_store.lo: ../tinyxml/action_store.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT action_store.lo -MD -MP -MF $(DEPDIR)/action_store.Tpo -c -o action_store.lo `test -f '../tinyxml/action_store.cpp' || echo '$(srcdir)/'`../tinyxml/action_store.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/action_store.Tpo $(DEPDIR)/action_store.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/action_store.cpp' object='action_store.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o action_store.lo `test -f '../tinyxml/action_store.cpp' || echo '$(srcdir)/'`../tinyxml/action_store.cpp
+
+xpath_stack.lo: ../tinyxml/xpath_stack.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xpath_stack.lo -MD -MP -MF $(DEPDIR)/xpath_stack.Tpo -c -o xpath_stack.lo `test -f '../tinyxml/xpath_stack.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_stack.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/xpath_stack.Tpo $(DEPDIR)/xpath_stack.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/xpath_stack.cpp' object='xpath_stack.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xpath_stack.lo `test -f '../tinyxml/xpath_stack.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_stack.cpp
+
+lex_util.lo: ../tinyxml/lex_util.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lex_util.lo -MD -MP -MF $(DEPDIR)/lex_util.Tpo -c -o lex_util.lo `test -f '../tinyxml/lex_util.cpp' || echo '$(srcdir)/'`../tinyxml/lex_util.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lex_util.Tpo $(DEPDIR)/lex_util.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/lex_util.cpp' object='lex_util.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lex_util.lo `test -f '../tinyxml/lex_util.cpp' || echo '$(srcdir)/'`../tinyxml/lex_util.cpp
+
+xpath_stream.lo: ../tinyxml/xpath_stream.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xpath_stream.lo -MD -MP -MF $(DEPDIR)/xpath_stream.Tpo -c -o xpath_stream.lo `test -f '../tinyxml/xpath_stream.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_stream.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/xpath_stream.Tpo $(DEPDIR)/xpath_stream.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/xpath_stream.cpp' object='xpath_stream.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xpath_stream.lo `test -f '../tinyxml/xpath_stream.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_stream.cpp
+
+node_set.lo: ../tinyxml/node_set.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT node_set.lo -MD -MP -MF $(DEPDIR)/node_set.Tpo -c -o node_set.lo `test -f '../tinyxml/node_set.cpp' || echo '$(srcdir)/'`../tinyxml/node_set.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/node_set.Tpo $(DEPDIR)/node_set.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/node_set.cpp' object='node_set.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o node_set.lo `test -f '../tinyxml/node_set.cpp' || echo '$(srcdir)/'`../tinyxml/node_set.cpp
+
+xml_util.lo: ../tinyxml/xml_util.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xml_util.lo -MD -MP -MF $(DEPDIR)/xml_util.Tpo -c -o xml_util.lo `test -f '../tinyxml/xml_util.cpp' || echo '$(srcdir)/'`../tinyxml/xml_util.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/xml_util.Tpo $(DEPDIR)/xml_util.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/xml_util.cpp' object='xml_util.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xml_util.lo `test -f '../tinyxml/xml_util.cpp' || echo '$(srcdir)/'`../tinyxml/xml_util.cpp
+
+xpath_syntax.lo: ../tinyxml/xpath_syntax.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xpath_syntax.lo -MD -MP -MF $(DEPDIR)/xpath_syntax.Tpo -c -o xpath_syntax.lo `test -f '../tinyxml/xpath_syntax.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_syntax.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/xpath_syntax.Tpo $(DEPDIR)/xpath_syntax.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/xpath_syntax.cpp' object='xpath_syntax.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xpath_syntax.lo `test -f '../tinyxml/xpath_syntax.cpp' || echo '$(srcdir)/'`../tinyxml/xpath_syntax.cpp
+
+tokenlist.lo: ../tinyxml/tokenlist.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tokenlist.lo -MD -MP -MF $(DEPDIR)/tokenlist.Tpo -c -o tokenlist.lo `test -f '../tinyxml/tokenlist.cpp' || echo '$(srcdir)/'`../tinyxml/tokenlist.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tokenlist.Tpo $(DEPDIR)/tokenlist.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/tokenlist.cpp' object='tokenlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tokenlist.lo `test -f '../tinyxml/tokenlist.cpp' || echo '$(srcdir)/'`../tinyxml/tokenlist.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

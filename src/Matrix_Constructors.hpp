@@ -1,8 +1,10 @@
 template <class T> 
 Matrix<T>::Matrix () {
 
-    for (size_t i = 0; i < INVALID_DIM; i++)
+    for (size_t i = 0; i < INVALID_DIM; i++) {
         _dim [i] = 1;
+        _res [i] = 1.0;
+	}
 
 	_M.resize(Size());
 
@@ -20,14 +22,14 @@ Matrix<T>::Matrix (const size_t n) {
 	_dim [COL] = n;
 	_dim [LIN] = n;
 
-    for (size_t i = CHA; i < INVALID_DIM; i++)
+    for (size_t i = 2; i < INVALID_DIM; i++)
         _dim [i] = 1;
 
-    for (size_t i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
-
+	
 	_M.resize(n*n);
-
+	
 	for (size_t i = 0; i < Size(); i++)
 		_M[i] = T(0.0);
 
@@ -41,10 +43,10 @@ Matrix<T>::Matrix (const size_t m, const size_t n) {
 	_dim [0] = m;
 	_dim [1] = n;
 
-    for (size_t i = 2; i < INVALID_DIM; i++)
+    for (size_t i = 2; i < INVALID_DIM; i++) 
         _dim [i] = 1;
-
-    for (size_t i = 0; i < INVALID_DIM; i++)
+	
+	for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
 	_M.resize(m*n);
@@ -62,18 +64,18 @@ Matrix<T>::Matrix (const size_t m, const size_t n, const size_t k) {
 	_dim [0] = m;
 	_dim [1] = n;
 	_dim [2] = k;
-
+	
     for (size_t i = 3; i < INVALID_DIM; i++)
         _dim [i] = 1;
-
-    for (size_t i = 0; i < INVALID_DIM; i++)
+	
+	for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
-
+	
 	_M.resize(m*n*k);
-
+	
 	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
-
+	
 }
 
 
@@ -83,7 +85,7 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
                    const size_t eco, const size_t phs, const size_t rep, const size_t seg, 
                    const size_t par, const size_t slc, const size_t ida, const size_t idb, 
                    const size_t idc, const size_t idd, const size_t ide, const size_t ave) {
-
+	
     _dim[COL] = col;
     _dim[LIN] = lin;
     _dim[CHA] = cha;
@@ -100,12 +102,12 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
     _dim[IDD] = idd;
     _dim[IDE] = ide;
     _dim[AVE] = ave;
-
+	
     for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
-
+	
 	_M.resize(Size());
-
+	
 	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
 
@@ -115,18 +117,17 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
 
 template <class T>
 Matrix<T>::Matrix (const size_t* dim) {
-
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	
+	for (size_t i = 0; i < INVALID_DIM; i++) {
 		_dim[i] = dim[i];
-
-    for (size_t i = 0; i < INVALID_DIM; i++)
-        _res [i] = 1.0;
-
+        _res[i] = 1.0;
+	}
+	
 	_M.resize(Size());
-
+	
 	for (size_t i = 0; i < Size(); i++)
 		_M[0] = T(0.0);
-
+	
 }
 
 
@@ -134,12 +135,11 @@ Matrix<T>::Matrix (const size_t* dim) {
 template <class T>
 Matrix<T>::Matrix (const Matrix<T> &M) {
 	
-	for (size_t i = 0; i < INVALID_DIM; i++) 
+	for (size_t i = 0; i < INVALID_DIM; i++) {
 		_dim[i] = M.Dim(i);
-	
-    for (size_t i = 0; i < INVALID_DIM; i++)
-        _res [i] = 1.0;
-
+		_res[i] = M.Res(i);
+	}
+	   
 	_M.resize(Size());
 	
 	memcpy (&_M[0], M.Data(), Size() * sizeof(T));
