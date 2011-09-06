@@ -1,7 +1,7 @@
 #include <fftw3.h>
 
-template <class T>
-Matrix<T> Matrix<T>::FFT() const {
+template <class T> inline Matrix<T> 
+Matrix<T>::FFT() const {
 	
 	assert (Is1D() || Is2D() || Is3D());
 	assert (typeid(T) == typeid(cplx));
@@ -33,8 +33,9 @@ Matrix<T> Matrix<T>::FFT() const {
 	
 }
 
-template <class T>
-Matrix<T> Matrix<T>::IFFT() const {
+
+template <class T> inline Matrix<T> 
+Matrix<T>::IFFT() const {
 	
 	assert (Is1D() || Is2D() || Is3D());
 	assert (typeid(T) == typeid(cplx));
@@ -67,8 +68,8 @@ Matrix<T> Matrix<T>::IFFT() const {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::FFTShift (const size_t d) const {
+template <class T> inline Matrix<T> 
+Matrix<T>::FFTShift (const size_t d) const {
 	
 	assert (Is1D() || Is2D() || Is3D());
 	assert (typeid(T) == typeid(cplx));
@@ -85,16 +86,16 @@ Matrix<T> Matrix<T>::FFTShift (const size_t d) const {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::IFFTShift (const size_t d) const {
+template <class T> inline Matrix<T> 
+Matrix<T>::IFFTShift (const size_t d) const {
 	
 	return FFTShift(d);
 	
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::HannWindow (const size_t dim) const {
+template <class T> inline Matrix<T> 
+Matrix<T>::HannWindow (const size_t dim) const {
 	
 	assert (Is1D() || Is2D() || Is3D());
 	
@@ -137,8 +138,8 @@ Matrix<T> Matrix<T>::HannWindow (const size_t dim) const {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::SOS (const size_t d) const {
+template <class T> inline Matrix<T> 
+Matrix<T>::SOS (const size_t d) const {
 	
 	assert (_dim[d] > 1);
 	
@@ -168,7 +169,7 @@ Matrix<T> Matrix<T>::SOS (const size_t d) const {
 }
 
 
-template <class T> void
+template <class T> inline void 
 Matrix<T>::SOS (const size_t d) {
 	
 	assert (_dim[d] > 1);
@@ -188,7 +189,7 @@ Matrix<T>::SOS (const size_t d) {
 }
 
 
-template <class T> void
+template <class T> inline void
 Matrix<T>::Squeeze () {
 	
 	size_t found = 0;
@@ -207,7 +208,7 @@ Matrix<T>::Squeeze () {
 }
 
 
-template <class T> Matrix<T>
+template <class T> inline Matrix<T>
 Matrix<T>::Squeeze () const {
 	
 	Matrix<T> res = (*this);
@@ -217,7 +218,7 @@ Matrix<T>::Squeeze () const {
 }
 
 
-template <class T> void
+template <class T> inline void
 Matrix<T>::Mean (const size_t d) {
 
 	float quot = (float) d;
@@ -230,7 +231,7 @@ Matrix<T>::Mean (const size_t d) {
 }
 
 
-template <class T> Matrix<T>
+template <class T> inline Matrix<T>
 Matrix<T>::Mean (const size_t d) const {
 	
 	Matrix<T> res = (*this);
@@ -240,7 +241,7 @@ Matrix<T>::Mean (const size_t d) const {
 }
 
 
-template <class T> void
+template <class T> inline void
 Matrix<T>::Sum (const size_t d) {
 
 	assert (d>=0 && d < INVALID_DIM);
@@ -295,7 +296,7 @@ Matrix<T>::Sum (const size_t d) {
 }
 
 
-template <class T> Matrix<T>
+template <class T> inline Matrix<T>
 Matrix<T>::Sum (const size_t d) const {
 	
 	Matrix<T> res = (*this);
@@ -305,10 +306,10 @@ Matrix<T>::Sum (const size_t d) const {
 }
 
 
-template <class T> unsigned short
+template <class T> inline size_t
 Matrix<T>::HDim () const {
 	
-	unsigned short nd = 0;
+	size_t nd = 0;
 	
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		nd  = (_dim[i] > 1) ? i : nd;
@@ -318,7 +319,7 @@ Matrix<T>::HDim () const {
 }
 
 
-template <class T> void
+template <class T> inline void
 Matrix<T>::PrintDims () const {
 
 	printf ("Dimensions: ");

@@ -78,6 +78,7 @@ RelativeSensitivities::Process     () {
 
 	// Do we have GRE for segmentation? --------
 
+	/*
 	FTVolumes (mask);
 	RemoveOS  (mask);
 	mask->SOS (mask->HDim());
@@ -91,6 +92,7 @@ RelativeSensitivities::Process     () {
 	}
 		
 	SegmentBrain(bet);
+	*/
 	// -----------------------------------------
 
 	// B0 calculation --------------------------

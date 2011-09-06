@@ -163,8 +163,7 @@ namespace RRStrategy {
 		int          threads = 1;
 		
 		Matrix<cplx> hann (r->Dim(0), r->Dim(1), r->Dim(2));
-		for (int i = 0; i < hann.Size(); i++)
-			hann[i] = cplx(1.0);
+		hann = cplx(1.0,0.0);
 		hann = hann.HannWindow();
 						   
 

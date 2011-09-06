@@ -25,7 +25,6 @@ Matrix<T>::Ind2l  (const size_t& ind) const {
 }
 
 
-
 template<class T> inline const size_t
 Matrix<T>::Ind2x (const size_t& ind, const size_t& dim) const { 
 	
@@ -41,8 +40,8 @@ Matrix<T>::Ind2x (const size_t& ind, const size_t& dim) const {
 }
 
 
-template <class T> Matrix<size_t> inline
-Matrix<T>::Ind2Sub2D  (const Matrix<size_t> inds) const {
+template<class T> inline Matrix<size_t>
+Matrix<T>::Ind2Sub2D (const Matrix<size_t> inds) const {
 	
 	Matrix<T>      tmp = this->Squeeze();
 	Matrix<size_t> subs (inds.Size(), 2);
@@ -57,7 +56,7 @@ Matrix<T>::Ind2Sub2D  (const Matrix<size_t> inds) const {
 
 
 template <class T> inline Matrix<size_t>
-Matrix<T>::Ind2Sub3D  (const Matrix<size_t> inds) const {
+Matrix<T>::Ind2Sub3D (const Matrix<size_t> inds) const {
 	
 	assert(Is2D());
 
@@ -72,7 +71,7 @@ Matrix<T>::Ind2Sub3D  (const Matrix<size_t> inds) const {
 }
 
 
-template <class T> Matrix<size_t> inline
+template <class T> inline Matrix<size_t>
 Matrix<T>::Sub2Ind  (const Matrix<size_t> subs) const {
 
 	int n = subs.Dim(0);
@@ -86,16 +85,16 @@ Matrix<T>::Sub2Ind  (const Matrix<size_t> subs) const {
 }
 
 
-template<class T> 
-inline const bool Matrix<T>::Empty () const {
+template<class T> inline const bool 
+Matrix<T>::Empty () const {
 
 	_M.size() == 0;
 
 }
 
 
-template <class T> 
-inline const bool Matrix<T>::IsXD (const size_t d) const {
+template <class T> inline const bool 
+Matrix<T>::IsXD (const size_t d) const {
 
 	size_t l = 0;
 
@@ -107,34 +106,48 @@ inline const bool Matrix<T>::IsXD (const size_t d) const {
 }
 
 
-template <class T> 
-inline const bool Matrix<T>::Is1D () const {
+template <class T> inline const bool 
+Matrix<T>::Is1D () const {
 	
 	return IsXD(1);
 
 }
 
 
-template <class T> 
-inline const bool Matrix<T>::Is2D () const {
+template <class T> inline const bool 
+Matrix<T>::Is2D () const {
 	
 	return IsXD(2);
 
 }
 
 
-template <class T> 
-inline const bool Matrix<T>::Is3D () const {
+template <class T> inline const bool 
+Matrix<T>::Is3D () const {
 	
 	return IsXD(3);
 
 }
 
 
-template <class T> 
-inline const bool Matrix<T>::Is4D () const {
+template <class T> inline const bool 
+Matrix<T>::Is4D () const {
 	
 	return IsXD(4);
 
 }
 
+
+
+template<class T> Matrix<T>
+Matrix<T>::Resample (float f, Interpolation i) {
+
+	// We handle only isotropic resampling.
+	assert ((float)(_dim[0] / (size_t)f) == (float)_dim[0] / f);
+
+	Matrix<T> res(this->Dim(0)/f, this->Dim(1)/f, this->Dim(2)/f);
+	
+
+	return res;
+
+}

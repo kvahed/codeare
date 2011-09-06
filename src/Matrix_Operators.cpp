@@ -1,8 +1,6 @@
-template <class T>
-Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator=(const Matrix<T> &M) {
     
-    size_t i;
-
 	if (this->Size() != M.Size())
 		_M.resize(M.Size());
 	
@@ -24,8 +22,26 @@ Matrix<T> Matrix<T>::operator=(const Matrix<T> &M) {
 }
 
 
-template <class T>
-Matrix<bool> Matrix<T>::operator==(T s)    {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator=(const T& s) {
+    
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+		
+		for (size_t i = 0; i < this->Size(); i++)
+			_M[i] = s;
+		
+	}
+	
+    return *this;
+	
+}
+
+
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator==(T s)    {
 
     Matrix<bool> res(_dim);
 
@@ -44,8 +60,8 @@ Matrix<bool> Matrix<T>::operator==(T s)    {
 }
 
 
-template <class T>
-Matrix<bool> Matrix<T>::operator>=(T s) {
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator>=(T s) {
 
     Matrix<bool> res(_dim);
     
@@ -57,8 +73,8 @@ Matrix<bool> Matrix<T>::operator>=(T s) {
 }
 
 
-template <class T>
-Matrix<bool> Matrix<T>::operator<=(T s) {
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator<=(T s) {
 
     Matrix<bool> res(_dim);
 
@@ -70,8 +86,8 @@ Matrix<bool> Matrix<T>::operator<=(T s) {
 }
 
 
-template <class T>
-Matrix<bool> Matrix<T>::operator!=(T s) {
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator!=(T s) {
 
     Matrix<bool> res(_dim);
 
@@ -83,8 +99,8 @@ Matrix<bool> Matrix<T>::operator!=(T s) {
 }
 
 
-template <class T>
-Matrix<bool> Matrix<T>::operator<(T s)    {
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator<(T s)    {
 
     Matrix<bool> res(_dim);
 
@@ -96,8 +112,8 @@ Matrix<bool> Matrix<T>::operator<(T s)    {
 }
 
 
-template <class T>
-Matrix<bool> Matrix<T>::operator>(T s) {
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator>(T s) {
 
     Matrix<bool> res(_dim);
 
@@ -109,22 +125,24 @@ Matrix<bool> Matrix<T>::operator>(T s) {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator->*(Matrix<T> &M) {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator->*(Matrix<T> &M) {
 
     return this->prod(M);
 
 }
 
-template <class T>
-Matrix<T> Matrix<T>::operator!() const {
+
+template <class T> inline Matrix<T> 
+Matrix<T>::operator!() const {
 
     return this->tr();
 
 }
 
-template <class T>
-Matrix<T> Matrix<T>::operator&(Matrix<bool> &M)    {
+
+template <class T> inline Matrix<T> 
+Matrix<T>::operator&(Matrix<bool> &M)    {
 
     for (size_t i = 0; i < INVALID_DIM; i++) 
         assert (_dim[i] == M.Dim()[i]);
@@ -148,8 +166,9 @@ Matrix<T> Matrix<T>::operator&(Matrix<bool> &M)    {
 
 }
 
-template <class T>
-Matrix<T> Matrix<T>::operator&&(Matrix<T> &M) {
+
+template <class T> inline Matrix<T> 
+Matrix<T>::operator&&(Matrix<T> &M) {
 
     assert(M.Size() == Size());
 
@@ -162,8 +181,9 @@ Matrix<T> Matrix<T>::operator&&(Matrix<T> &M) {
 
 }
 
-template <class T>
-Matrix<T> Matrix<T>::operator||(Matrix<T> M) {
+
+template <class T> inline Matrix<T> 
+Matrix<T>::operator||(Matrix<T> M) {
 
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
@@ -184,8 +204,9 @@ Matrix<T> Matrix<T>::operator||(Matrix<T> M) {
 
 }
 
-template <class T>
-Matrix<bool> Matrix<T>::operator==(Matrix<T> M) {
+
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator==(Matrix<T> M) {
 
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
@@ -206,8 +227,9 @@ Matrix<bool> Matrix<T>::operator==(Matrix<T> M) {
 
 }
 
-template <class T>
-Matrix<bool> Matrix<T>::operator>=(Matrix<T> M) {
+
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator>=(Matrix<T> M) {
 
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
@@ -228,8 +250,9 @@ Matrix<bool> Matrix<T>::operator>=(Matrix<T> M) {
 
 }
 
-template <class T>
-Matrix<bool> Matrix<T>::operator<= (Matrix<T> M) {
+
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator<= (Matrix<T> M) {
 
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
@@ -250,8 +273,9 @@ Matrix<bool> Matrix<T>::operator<= (Matrix<T> M) {
 
 }
 
-template <class T>
-Matrix<bool> Matrix<T>::operator!=(Matrix<T> M) {
+
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator!=(Matrix<T> M) {
 
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
@@ -272,8 +296,9 @@ Matrix<bool> Matrix<T>::operator!=(Matrix<T> M) {
 
 }
 
-template <class T>
-Matrix<bool> Matrix<T>::operator> (Matrix<T> M) {
+
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator> (Matrix<T> M) {
 	
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
@@ -294,8 +319,9 @@ Matrix<bool> Matrix<T>::operator> (Matrix<T> M) {
 
 }
 
-template <class T>
-Matrix<bool> Matrix<T>::operator< (Matrix<T> M) {
+
+template <class T> inline Matrix<bool> 
+Matrix<T>::operator< (Matrix<T> M) {
 
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
@@ -317,8 +343,8 @@ Matrix<bool> Matrix<T>::operator< (Matrix<T> M) {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator- () {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator- () {
 
     Matrix<T> res;
 
@@ -342,8 +368,8 @@ Matrix<T> Matrix<T>::operator- () {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator-(Matrix<T> &M) {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator-(Matrix<T> &M) {
 
     Matrix<T> res;
 
@@ -367,8 +393,8 @@ Matrix<T> Matrix<T>::operator-(Matrix<T> &M) {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator-(T s) {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator-(T s) {
 
     Matrix<T> res;
 
@@ -392,8 +418,8 @@ Matrix<T> Matrix<T>::operator-(T s) {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator+(Matrix<T> &M) {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator+(Matrix<T> &M) {
 
 	for (size_t i=0; i < INVALID_DIM; i++)
 		assert (Dim(i) == M.Dim(i));
@@ -420,8 +446,8 @@ Matrix<T> Matrix<T>::operator+(Matrix<T> &M) {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator+(T s) {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator+(T s) {
 
     Matrix<T> res;
 
@@ -445,8 +471,8 @@ Matrix<T> Matrix<T>::operator+(T s) {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator^(float p) {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator^(float p) {
     
 	Matrix<T> res;
     
@@ -474,7 +500,7 @@ Matrix<T> Matrix<T>::operator^(float p) {
 }
 
 
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T> 
 Matrix<T>::operator*(Matrix<T> &M) {
 
     Matrix<T> res;
@@ -498,7 +524,7 @@ Matrix<T>::operator*(Matrix<T> &M) {
 }
 
 
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T> 
 Matrix<T>::operator* (T s) {
     
     Matrix<T> res;
@@ -522,8 +548,8 @@ Matrix<T>::operator* (T s) {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator += (Matrix<T> &M) {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator += (Matrix<T> &M) {
     
     size_t i;
 
@@ -545,7 +571,7 @@ Matrix<T> Matrix<T>::operator += (Matrix<T> &M) {
 }
 
 
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T>
 Matrix<T>::operator+= (T s) {
     
     Matrix<T> res;
@@ -569,8 +595,8 @@ Matrix<T>::operator+= (T s) {
 }
 
 
-template <class T>
-Matrix<T> Matrix<T>::operator *= (Matrix<T> &M) {
+template <class T> inline Matrix<T> 
+Matrix<T>::operator *= (Matrix<T> &M) {
     
     size_t i;
 
@@ -591,8 +617,9 @@ Matrix<T> Matrix<T>::operator *= (Matrix<T> &M) {
 
 }
 
-template <class T>
-Matrix<T> Matrix<T>::operator *= (T s) {
+
+template <class T> inline Matrix<T>
+Matrix<T>::operator *= (T s) {
     
 #pragma omp parallel default (shared) 
 	{
@@ -609,7 +636,7 @@ Matrix<T> Matrix<T>::operator *= (T s) {
 }
 
 
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T> 
 Matrix<T>::operator/(Matrix<T> &M) {
 
     Matrix<T> res;
@@ -634,7 +661,7 @@ Matrix<T>::operator/(Matrix<T> &M) {
 }
 
 
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T> 
 Matrix<T>::operator/ (T s) {
     
 	assert (s != (T)0);
@@ -661,7 +688,7 @@ Matrix<T>::operator/ (T s) {
 }
 
 
-template <class T> T           
+template <class T> inline T 
 Matrix<T>::operator[]  (const size_t p) const {
     
     assert(p >= 0);
@@ -672,8 +699,8 @@ Matrix<T>::operator[]  (const size_t p) const {
 }
 
 
-template <class T> T           
-&Matrix<T>::operator[] (const size_t p) {
+template <class T> inline T&
+Matrix<T>::operator[] (const size_t p) {
     
     assert(p >= 0);
     assert(p <  Size());
@@ -683,8 +710,8 @@ template <class T> T
 }
 
 
-template <class T>
-T Matrix<T>::operator() (const size_t a) const {
+template <class T> inline T 
+Matrix<T>::operator() (const size_t a) const {
 
     assert(a >= 0);
     assert(a <  Size());
@@ -694,7 +721,7 @@ T Matrix<T>::operator() (const size_t a) const {
 }
 
 
-template<class T> template<class S>
+template<class T> template<class S> inline
 Matrix<T>::operator Matrix<S> () const {
 
 	Matrix<S> m (_dim);

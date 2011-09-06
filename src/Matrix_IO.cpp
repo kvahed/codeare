@@ -108,8 +108,8 @@ Matrix<cplx>::Print (ostream& os) const {
 }
 
 
-template <class T> 
-const string Matrix<T>::DimsToString () const {
+template <class T> inline const string 
+Matrix<T>::DimsToString () const {
 
 	stringstream ss;
 	
@@ -121,16 +121,16 @@ const string Matrix<T>::DimsToString () const {
 }
 
 
-template <class T> 
-const char* Matrix<T>::DimsToCString () const {
+template <class T> inline const char* 
+Matrix<T>::DimsToCString () const {
 
 	return this->DimsToString().c_str();
 	
 }
 
 
-template <class T> 
-const string Matrix<T>::ResToString () const {
+template <class T> inline const string 
+Matrix<T>::ResToString () const {
 
 	stringstream ss;
 	
@@ -142,8 +142,8 @@ const string Matrix<T>::ResToString () const {
 }
 
 
-template <class T> 
-const char* Matrix<T>::ResToCString () const {
+template <class T> inline const char* 
+Matrix<T>::ResToCString () const {
 
 	return this->ResToString().c_str();
 	
@@ -159,8 +159,8 @@ operator<< (ostream& os, Matrix<T>& M) {
 }
 
 
-template <class T>
-bool Matrix<T>::PRDump (const string fname) const {
+template <class T> inline bool
+Matrix<T>::PRDump (const string fname) const {
 	
 	FILE *fp;
 	
@@ -181,8 +181,8 @@ bool Matrix<T>::PRDump (const string fname) const {
 }
 
 
-template <class T>
-bool Matrix<T>::Dump (const string fname, const string dname, const string dloc, const io_strategy ios) const {
+template <class T> inline bool 
+Matrix<T>::Dump (const string fname, const string dname, const string dloc, const io_strategy ios) const {
 	
 	
 	if      (ios == HDF5)
@@ -199,8 +199,8 @@ bool Matrix<T>::Dump (const string fname, const string dname, const string dloc,
 }
 
 
-template <class T>
-bool Matrix<T>::H5Dump (const string fname, const string dname, const string dloc) const {
+template <class T> bool 
+Matrix<T>::H5Dump (const string fname, const string dname, const string dloc) const {
 	
 	size_t i = 0;
 	
@@ -453,8 +453,8 @@ ProgressBar (const std::string& pre, const std::string& post, const short& p) {
 }
 
 
-template <class T>
-bool Matrix<T>::RAWRead (const string fname, const string version) {
+template <class T> bool 
+Matrix<T>::RAWRead (const string fname, const string version) {
 	
 	// Get size information from XProtocol and resize 
 	RSAdjust(fname);
@@ -526,14 +526,14 @@ bool Matrix<T>::RAWRead (const string fname, const string version) {
 
 	fclose (f);
 	long e = (elapsed(getticks(),start) / Toolbox::Instance()->ClockRate());
-	printf ("\n  done. Loaded %i records (%f MB/s).\n", (int)i, bsize / (float)e);
+	printf ("\n  done. Loaded %i records (%f MB/s).\n", (int)i, bsize / (float)e * 100000.0);
 
 	return true;
 
 }
 
-template <class T>
-bool Matrix<T>::Read (const string fname, const string dname, const string dloc, const io_strategy ios) {
+template <class T> inline bool 
+Matrix<T>::Read (const string fname, const string dname, const string dloc, const io_strategy ios) {
 
 	if (     ios == HDF5)
 		return H5Read (fname, dname, dloc);
@@ -547,8 +547,8 @@ bool Matrix<T>::Read (const string fname, const string dname, const string dloc,
 }
 
 
-template <class T>
-bool Matrix<T>::H5Read (const string fname, const string dname, const string dloc) {
+template <class T> bool 
+Matrix<T>::H5Read (const string fname, const string dname, const string dloc) {
 	
     if (fname != "") {
 		
