@@ -38,6 +38,7 @@ NuFFT_OMP::Init () {
 	{
 	m_nthreads = omp_get_num_threads();
 	}
+	printf ("  #procs: %i\n", m_nthreads);
 
 	m_initialised = false;
 
@@ -49,9 +50,10 @@ NuFFT_OMP::Init () {
 		m_n[i] = 0;
 	}
 
-	// Dimensions ---------------------------
+	// Dimensions image and kspace ----------
 
 	Attribute("dim",       &m_dim);
+	printf ("  dimensions: %iD \n", m_dim);
 
 	for (int i = 0; i < m_dim; i++)
 		Attribute (sides[i].c_str(),       &m_N[i]);
@@ -59,6 +61,7 @@ NuFFT_OMP::Init () {
 
 	Attribute("M",         &m_M);
 	Attribute("shots",     &m_shots);
+	printf ("  kspace: %i shots with %i samples.\n", m_shots, m_M);
 
 	// --------------------------------------
 
@@ -94,12 +97,7 @@ NuFFT_OMP::Init () {
 	// --------------------------------------
 
 	printf ("  intialising nfft::init (%i, {%i, %i, %i}, %i, {%i, %i, %i}, %i, *, *, %.9f)\n", 
-			m_dim, 
-			m_N[0], m_N[1], m_N[2],
-			m_M,
-			m_n[0], m_n[1], m_n[2],
-			m,
-			m_epsilon);
+			m_dim, m_N[0], m_N[1], m_N[2], m_M, m_n[0], m_n[1], m_n[2],	m, m_epsilon);
 
 	m_initialised = true;
 
@@ -136,11 +134,9 @@ NuFFT_OMP::Process () {
 #pragma omp parallel default (shared) 
 	{
 		
-		//omp_set_num_threads(m_nthreads);
 		int tid      = omp_get_thread_num();
 		
 #pragma omp for
-
 		for (int j = 0; j < m_nthreads; j++) {
 			
 			int     os         = j * m_M;
@@ -161,9 +157,7 @@ NuFFT_OMP::Process () {
 
 		}
 
-
-#pragma omp for schedule (dynamic, imgsize/m_nthreads)
-
+#pragma omp for schedule (guided, imgsize/m_nthreads/2)
 	for (int i = 0; i < imgsize; i++)
 		for (int j = 0; j < m_nthreads; j++) {
 			if (m_verbose)
