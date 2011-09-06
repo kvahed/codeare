@@ -40,7 +40,7 @@ NuFFT_OMP::Init () {
 	m_n   = new int[3];
 
 	for (int i = 0; i < 3; i++) {
-		m_N[i] = 0; 
+		m_N[i] = 1; 
 		m_n[i] = 0;
 	}
 
@@ -52,13 +52,18 @@ NuFFT_OMP::Init () {
 		Attribute (sides[i].c_str(),       &m_N[i]);
 
 
-	Attribute("M",       &m_M);
+	Attribute("M",         &m_M);
 	Attribute("shots",     &m_shots);
 
 	// --------------------------------------
 
 	Attribute("maxit",   &m_maxit);
 	Attribute("epsilon", &m_epsilon);
+
+	// Verbosity ----------------------------
+
+	Attribute ("verbose",   &m_verbose);
+	printf ("  verbose feedback: %i \n", m_verbose);
 
 	// Oversampling -------------------------
 
@@ -74,9 +79,17 @@ NuFFT_OMP::Init () {
 	// Initialise FT plans ------------------
 	
 	for (int i = 0; i < NTHREADS; i++)
-		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
+		nfft::init (m_dim, m_N, m_M*m_shots/NTHREADS, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 
 	// --------------------------------------
+
+	printf ("  intialising nfft::init (%i, {%i, %i, %i}, %i, {%i, %i, %i}, %i, *, *, %.9f)\n", 
+			m_dim, 
+			m_N[0], m_N[1], m_N[2],
+			m_M * m_shots/NTHREADS,
+			m_n[0], m_n[1], m_n[2],
+			m,
+			m_epsilon);
 
 	m_initialised = true;
 
@@ -93,9 +106,11 @@ NuFFT_OMP::Process () {
 	printf ("Processing NuFFT_OMP ...\n");
 	ticks start = getticks();
 
-	int imgsize = 1;
-	for (int i = 0; i < m_dim; i++)
-		imgsize *= m_N[i];
+	Matrix<cplx>*   data    = m_cplx["data"];
+	Matrix<double>* kspace  = m_real["kspace"];
+	Matrix<double>* weights = m_real["weights"];
+
+	int imgsize = m_N[0] * m_N[1] * m_N[2];
 
 	Matrix <cplx> tmp;
 
@@ -104,7 +119,7 @@ NuFFT_OMP::Process () {
 
 	// Store all arms separately?
 	if (m_verbose)
-		tmp.Dim(m_dim) = m_shots + 1;
+		tmp.Dim(m_dim) = NTHREADS + 1;
 
 	tmp.Reset();
 
@@ -116,39 +131,43 @@ NuFFT_OMP::Process () {
 		
 #pragma omp for
 
-		for (int j = 0; j < m_shots; j++) {
+		for (int j = 0; j < NTHREADS; j++) {
 			
-			int     os         = j * m_M;
+			int     os         = j * m_M * m_shots / NTHREADS;
 
 			// Copy data from incoming matrix to the nufft input array
-			for (int i = 0; i < m_M; i++) {
-				(m_iplan[tid].y[i])[0] = (m_cplx["data"]->At(i + os)).real();
-				(m_iplan[tid].y[i])[1] = (m_cplx["data"]->At(i + os)).imag();
+			for (int i = 0; i < m_M*m_shots/NTHREADS; i++) {
+				(m_iplan[tid].y[i])[0] = (data->At(i + os)).real();
+				(m_iplan[tid].y[i])[1] = (data->At(i + os)).imag();
 			}
 
 			// Copy k-space and weights to allocated memory
-			memcpy (&(m_fplan[tid].x[0]), &m_real["kspace"]->At(os * m_dim), m_M * m_dim * sizeof(double));
-			memcpy (&(m_iplan[tid].w[0]), &m_real["weights"]->At(0)         , m_M *         sizeof(double));
+			memcpy (&(m_fplan[tid].x[0]),  &kspace->At(os * m_dim), m_dim * m_M * m_shots / NTHREADS * sizeof(double));
+			memcpy (&(m_iplan[tid].w[0]), &weights->At(         0),         m_M * m_shots / NTHREADS * sizeof(double));
 
-			// Precompute PSI
+			// Precompute PSI & IFT
 			nfft::weights (&m_fplan[tid], &m_iplan[tid]);
-			
 			nfft::ift     (&m_fplan[tid], &m_iplan[tid], m_maxit, m_epsilon);
 
-			if (m_verbose)
-				for (int i = 0; i < imgsize; i++) {
-   				tmp[(j+1) * imgsize + i] = cplx(m_iplan[tid].f_hat_iter[i][0], m_iplan[tid].f_hat_iter[i][1]);
-					tmp[i] += tmp[(j+1) * imgsize + i];
-				}
-			
-			
 		}
 
-	}
 
+#pragma omp for schedule (dynamic, imgsize/NTHREADS)
+
+	for (int i = 0; i < imgsize; i++)
+		for (int j = 0; j < NTHREADS; j++) {
+			if (m_verbose)
+				tmp[(j+1) * imgsize + i] = cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
+			tmp[i] += cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
+		}
+	
+
+
+	}
+			
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 
-	(*m_cplx.begin()->second) = tmp;
+	(*data) = tmp;
 	return error;
 
 }

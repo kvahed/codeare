@@ -107,7 +107,7 @@ namespace RRStrategy {
  * @param  iter     Iteration
  * @param  nrmse    Returned NRMSE
  */
-void
+inline void
 NRMSE                         (const Matrix<cplx>* target, const Matrix<cplx>* result, const int iter, float* nrmse) {
 
     float q = 0.0, n = 0.0;
@@ -133,7 +133,7 @@ NRMSE                         (const Matrix<cplx>* target, const Matrix<cplx>* r
  * @param  result   Achieved result
  * @return          Phase corrected 
  */
-void
+inline void
 PhaseCorrection (Matrix<cplx>* target, const Matrix<cplx>* result) {
     
 #pragma omp parallel default (shared) 
@@ -164,7 +164,7 @@ PhaseCorrection (Matrix<cplx>* target, const Matrix<cplx>* result) {
  * @param  nc       In:  # Coils
  * @param  limits   Out: limits
  */
-void 
+inline void 
 RFLimits            (const Matrix<cplx>* solution, const int* pd, const int nk, const int nc, float* limits) {
     
     for (int i = 0; i < nk; i++) {
@@ -247,7 +247,7 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<cplx>* b1, 
  *
  *
  */
-void
+inline void
 PTXTiming (const Matrix<cplx>* rf, const Matrix<double>* ks, const int* pd, const int gd, const int nk, const int nc, Matrix<cplx>* timing) {
 
 	// Total pulse duration --------------

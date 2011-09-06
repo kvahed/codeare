@@ -1,4 +1,4 @@
-template <class T> 
+template <class T> inline 
 Matrix<T>::Matrix () {
 
     for (size_t i = 0; i < INVALID_DIM; i++) {
@@ -16,7 +16,7 @@ Matrix<T>::Matrix () {
 
 
 
-template <class T> 
+template <class T> inline 
 Matrix<T>::Matrix (const size_t n) {
 
 	_dim [COL] = n;
@@ -37,7 +37,7 @@ Matrix<T>::Matrix (const size_t n) {
 
 
 
-template <class T> 
+template <class T> inline 
 Matrix<T>::Matrix (const size_t m, const size_t n) {
 
 	_dim [0] = m;
@@ -58,7 +58,7 @@ Matrix<T>::Matrix (const size_t m, const size_t n) {
 
 
 
-template <class T> 
+template <class T> inline 
 Matrix<T>::Matrix (const size_t m, const size_t n, const size_t k) {
 
 	_dim [0] = m;
@@ -80,7 +80,7 @@ Matrix<T>::Matrix (const size_t m, const size_t n, const size_t k) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const size_t set, 
                    const size_t eco, const size_t phs, const size_t rep, const size_t seg, 
                    const size_t par, const size_t slc, const size_t ida, const size_t idb, 
@@ -115,7 +115,7 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T>::Matrix (const size_t* dim) {
 	
 	for (size_t i = 0; i < INVALID_DIM; i++) {
@@ -132,7 +132,7 @@ Matrix<T>::Matrix (const size_t* dim) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T>::Matrix (const Matrix<T> &M) {
 	
 	for (size_t i = 0; i < INVALID_DIM; i++) {
@@ -148,7 +148,7 @@ Matrix<T>::Matrix (const Matrix<T> &M) {
 
 
 
-template <class T> 
+template <class T> inline 
 Matrix<T>::~Matrix() {
     
 #ifdef PARC_MODULE_NAME
@@ -162,7 +162,7 @@ Matrix<T>::~Matrix() {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Id (const size_t n) {
 
  	static Matrix<T> M (n);
@@ -176,7 +176,7 @@ Matrix<T> Matrix<T>::Id (const size_t n) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n, const size_t l) {
 
  	static Matrix<T> M (m,n,l);
@@ -190,7 +190,7 @@ Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n, const size_t l) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n) {
 
  	static Matrix<T> M (m,n);
@@ -204,7 +204,7 @@ Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Ones (const size_t n) {
 
  	return Ones(n,n);
@@ -213,7 +213,7 @@ Matrix<T> Matrix<T>::Ones (const size_t n) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m, const size_t l) {
 
  	static Matrix<T> M (m,n,l);
@@ -227,7 +227,7 @@ Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m, const size_t l) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m) {
 
  	static Matrix<T> M (m,n);
@@ -241,7 +241,7 @@ Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Zeros (const size_t n) {
 
  	return Zeros(n,n);
@@ -250,7 +250,7 @@ Matrix<T> Matrix<T>::Zeros (const size_t n) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Circle (const float* p, const size_t n) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n);
@@ -273,7 +273,7 @@ Matrix<T> Matrix<T>::Circle (const float* p, const size_t n) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Sphere (const float* p, const size_t n) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
@@ -298,7 +298,7 @@ Matrix<T> Matrix<T>::Sphere (const float* p, const size_t n) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Ellipse (const float* p, const size_t n, const T v) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n);
@@ -336,7 +336,7 @@ Matrix<T> Matrix<T>::Ellipse (const float* p, const size_t n, const T v) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Ellipsoid (const float* p, const size_t n, const T v) {
 
 	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
@@ -379,7 +379,7 @@ Matrix<T> Matrix<T>::Ellipsoid (const float* p, const size_t n, const T v) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Phantom2D (const size_t n) {
 
 	const size_t ne = 10; // Number of ellipses
@@ -416,7 +416,7 @@ Matrix<T> Matrix<T>::Phantom2D (const size_t n) {
 
 
 
-template <class T>
+template <class T> inline 
 Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
 
 	const size_t ne = 10; // Number of ellipses
@@ -450,8 +450,8 @@ Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
 }
 
 
-template<>
-inline Matrix<double> Matrix<cplx>::Real () const {
+template<> inline Matrix<double> 
+Matrix<cplx>::Real () const {
 
 	Matrix<double> res (_dim);
 
@@ -472,8 +472,9 @@ inline Matrix<double> Matrix<cplx>::Real () const {
 
 }
     
-template<>
-inline Matrix<double> Matrix<cplx>::Imag () const {
+
+template<> inline Matrix<double> 
+Matrix<cplx>::Imag () const {
 
 	Matrix<double> res (_dim);
 

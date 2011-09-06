@@ -150,8 +150,6 @@ SpatialDomain::Process        () {
 	Matrix<short>*  b0     = m_pixel["b0"];
 	Matrix<cplx>*   target = m_cplx ["target"];
 
-	std::cout << (*k) << std::endl;
-
 	if (m_verbose) {
 	    ve  = Matrix<cplx>(m_ns,      m_maxiter);
 		vp  = Matrix<cplx>(m_nk*m_nc, m_maxiter);
@@ -248,7 +246,7 @@ SpatialDomain::Process        () {
 
 	// Write pulse file for Siemens sequences
 
-	PTXWriteSiemensINIFile (b1, 3, 3, m_nc, 10, m_max_rf[0], &m_ptxfname);
+	PTXWriteSiemensINIFile (b1, 2, 3, m_nc, 10, m_max_rf[0], &m_ptxfname);
 	// -----------------------------------
 
 	// Return NRMSE down the road --------

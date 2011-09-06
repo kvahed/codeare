@@ -755,7 +755,7 @@ public:
      * @param  ave      Average
      * @return          Reference to position
 	 */
-	Matrix <T>
+	inline Matrix <T>
 	Reshape             (const size_t col, 
 						 const size_t lin, 
 						 const size_t cha = 1,
@@ -802,7 +802,7 @@ public:
      * @param  ave      Average
      * @return          Reference to position
 	 */
-	void
+	inline void
 	Reshape             (const size_t col, 
 						 const size_t lin, 
 						 const size_t cha = 1,
@@ -882,7 +882,7 @@ public:
 	 * @return          Value at _M[col + _dim[COL]*lin]
 	 */
     T
-    operator()          (const size_t col, const size_t lin) const {
+    inline operator()          (const size_t col, const size_t lin) const {
         return _M[col + _dim[COL]*lin ];
     }
     
@@ -894,7 +894,7 @@ public:
 	 * @param  lin      Line
 	 * @return          Reference to _M[col + _dim[COL]*lin]
 	 */
-    T&                  
+    inline T&                  
     operator()           (const size_t col, const size_t lin) {
         return _M[col + _dim[COL]*lin ];
     }
@@ -908,7 +908,7 @@ public:
      * @param  slc       Slice
      * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
-    T                  
+    inline T                  
     operator()           (const size_t col, const size_t lin, const size_t slc) const {
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
     }
@@ -923,13 +923,34 @@ public:
      *
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
-    T&                 
+    inline T&                 
     operator()           (const size_t col, const size_t lin, const size_t slc) {
            return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
     }
     
-
-	T&                 
+	
+	/** 
+	 * @brief            Reference to element
+	 *
+     * @param  col      Column
+     * @param  lin      Line
+	 * @param  cha      Channel
+	 * @param  set      Set
+	 * @param  eco      Echo
+	 * @param  phs      Phase
+	 * @param  rep      Repetition
+	 * @param  seg      Segment
+	 * @param  par      Partition
+	 * @param  slc      Slice
+	 * @param  ida      Free index A
+	 * @param  idb      Free index B
+	 * @param  idc      Free index C
+	 * @param  idd      Free index D
+	 * @param  ide      Free index E
+     * @param  ave      Average
+     * @return          Reference to position
+	 */
+	inline T&                 
     operator()           (const size_t col, 
 						  const size_t lin, 
 						  const size_t cha,
@@ -966,7 +987,28 @@ public:
 		
 	}
 
-	T
+	/** 
+	 * @brief            Value at ...
+	 *
+     * @param  col      Column
+     * @param  lin      Line
+	 * @param  cha      Channel
+	 * @param  set      Set
+	 * @param  eco      Echo
+	 * @param  phs      Phase
+	 * @param  rep      Repetition
+	 * @param  seg      Segment
+	 * @param  par      Partition
+	 * @param  slc      Slice
+	 * @param  ida      Free index A
+	 * @param  idb      Free index B
+	 * @param  idc      Free index C
+	 * @param  idd      Free index D
+	 * @param  ide      Free index E
+     * @param  ave      Average
+     * @return          Value
+	 */
+	inline T
     operator()           (const size_t col, 
 						  const size_t lin, 
 						  const size_t cha,
@@ -1103,7 +1145,7 @@ public:
      *
      * @return          Number of rows.
      */
-    size_t                 
+    inline size_t                 
     m                   () const {return _dim[0];}
 
 
@@ -1112,23 +1154,25 @@ public:
      *
      * @return          Number of columns.
      */
-    size_t                 
+    inline size_t                 
     n                   () const {return _dim[1];}
 
 
     /**
-     * @brief           Get size a given dimension.
+     * @brief           Get resolution a given dimension.
      *
-     * @return          Number of rows.
+	 * @param   i       Dimension
+     * @return          Resolution .
      */
     inline float          
     Res                 (const size_t i)                                const {return _res[i];}
     
     
     /**
-     * @brief           Get reference to size a given dimension.
+     * @brief           Rresolution a given dimension.
      *
-     * @return          Number of rows.
+	 * @param   i       Dimension
+     * @return          Resolution
      */
     inline float&          
     Res                 (const size_t i)                                 {return _res[i];}
@@ -1137,7 +1181,8 @@ public:
     /**
      * @brief           Get size a given dimension.
      *
-     * @return          Number of rows.
+	 * @param   i       Dimension
+     * @return          Dimension
      */
     inline size_t          
     Dim                 (const size_t i)                                const {return _dim[i];}
@@ -1341,7 +1386,16 @@ public:
      * @param  M        The assigned matrix.
      */
     Matrix<T>           
-    operator=           (const Matrix<T> &M);
+    operator=           (const Matrix<T>& M);
+    
+    
+    /**
+     * @brief           Assignment operator. Sets all elements s.
+     *
+     * @param  s        The assigned scalar.
+     */
+    Matrix<T>           
+    operator=           (const T& s);
     
     
     /**
@@ -1350,7 +1404,7 @@ public:
      * @param  M        The factor.
      */
     Matrix<T>           
-    operator->*         (Matrix<T> &M);
+    operator->*         (Matrix<T>& M);
     
     
     /**
@@ -2200,7 +2254,7 @@ public:
 	 * @param  ind      Index
 	 * @return          Subscript of 1st dimension
 	 */ 
-	const inline size_t 
+	const size_t 
 	Ind2i               (const size_t& ind) const;
 
 
@@ -2210,7 +2264,7 @@ public:
 	 * @param  ind      Index
 	 * @return          Subscript of 2nd dimension
 	 */ 
-	const inline size_t 
+	const size_t 
 	Ind2j               (const size_t& ind) const;
 
 
@@ -2220,7 +2274,7 @@ public:
 	 * @param  ind      Index
 	 * @return          Subscript of 3rd dimension
 	 */ 
-	const inline size_t 
+	const size_t 
 	Ind2k               (const size_t& ind) const;
 
 
@@ -2230,7 +2284,7 @@ public:
 	 * @param  ind      Index
 	 * @return          Subscript of 4th dimension
 	 */ 
-	const inline size_t 
+	const size_t 
 	Ind2l               (const size_t& ind) const;
 
 
@@ -2241,7 +2295,7 @@ public:
 	 * @param  dim      Dimension
 	 * @return          Subscipt of x-th dimension
 	 */ 
-	inline const size_t 
+	const size_t 
 	Ind2x               (const size_t& ind, const size_t& dim) const;
 
 
@@ -2250,7 +2304,7 @@ public:
 	 *
 	 * @return 
 	 */
-	unsigned short
+	size_t
 	HDim                () const;
 
 
@@ -2394,7 +2448,7 @@ private:
 };
 
 
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T> 
 Matrix<T>::Volume (const size_t s) const {
     
 	assert (Is4D());
@@ -2415,7 +2469,7 @@ Matrix<T>::Volume (const size_t s) const {
 }
 
 
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T> 
 Matrix<T>::Slice (const size_t s) const {
     
 	assert (Is3D());
@@ -2436,7 +2490,7 @@ Matrix<T>::Slice (const size_t s) const {
 }
 
 
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T> 
 Matrix<T>::Row (const size_t r)  const {
 
 	assert (Is2D());
@@ -2454,7 +2508,7 @@ Matrix<T>::Row (const size_t r)  const {
 }
 
 
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T> 
 Matrix<T>::Column (const size_t c) const {
     
     Matrix<T> res;
@@ -2469,7 +2523,7 @@ Matrix<T>::Column (const size_t c) const {
 }
 
 
-template <class T> const long 
+template <class T> inline const long 
 Matrix<T>::Size() const {
     
     long size = 1;
@@ -2522,8 +2576,8 @@ Matrix<cplx>::Max() {
 }
 
 
-template <class T>
-T  Matrix<T>::Maxabs() {
+template <class T> inline T
+Matrix<T>::Maxabs() {
 
     T max = fabs(_M[0]);
 
@@ -2536,8 +2590,8 @@ T  Matrix<T>::Maxabs() {
 }
 
 
-template <class T>
-T Matrix<T>::Min() {
+template <class T> inline T
+Matrix<T>::Min() {
 
     T min = _M[0];
 
@@ -2550,8 +2604,8 @@ T Matrix<T>::Min() {
 }
 
 
-template <class T>
-T  Matrix<T>::Minabs() {
+template <class T> inline T  
+Matrix<T>::Minabs() {
 
     T old = fabs(_M[0]);
 
@@ -2563,8 +2617,8 @@ T  Matrix<T>::Minabs() {
 
 }
 
-template <class T>
-Matrix<T> Matrix<T>::tr() const {
+template <class T> inline Matrix<T> 
+Matrix<T>::tr() const {
 
     Matrix<T> res (_dim);
 	
@@ -2583,8 +2637,8 @@ Matrix<T> Matrix<T>::tr() const {
 
 }
 
-template<>
-inline void Matrix<cplx>::Random () {
+template<> inline void 
+Matrix<cplx>::Random () {
 	
 	srand (time(NULL));
 
@@ -2593,8 +2647,8 @@ inline void Matrix<cplx>::Random () {
 	
 }
     
-template<>
-inline void Matrix<double>::Random () {
+template<> inline void 
+Matrix<double>::Random () {
 
 	srand (time(NULL));
 
@@ -2603,8 +2657,8 @@ inline void Matrix<double>::Random () {
 
 }
     
-template<>
-inline void Matrix<short>::Random () {
+template<> inline void 
+Matrix<short>::Random () {
 
 	srand (time(NULL));
 

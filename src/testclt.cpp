@@ -209,7 +209,7 @@ bool cgsensetest (ReconClient* rc) {
 
 bool nuffttest (ReconClient* rc) {
 
-	Matrix<cplx>    rawdata;
+	Matrix<cplx>   rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
 	
@@ -220,9 +220,9 @@ bool nuffttest (ReconClient* rc) {
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 
-	weights.Read   (df, "weights");
-	rawdata.Read   (df, "data");
-	kspace.Read    (df, "kspace");
+	weights.MXRead   (df, "weights");
+	rawdata.MXRead   (df, "data");
+	kspace.MXRead    (df, "kspace");
 
 	rc->SetCplx    ("data",    rawdata);
 	rc->SetReal    ("weights", weights);
@@ -232,10 +232,11 @@ bool nuffttest (ReconClient* rc) {
 	
 	rc->GetCplx    ("data", rawdata);
 
+	rc->Finalise(test);
+
 #ifdef HAVE_MAT_H	
 	rawdata.MXDump   (odf.c_str(), "image");
 #endif
-	rc->Finalise(test);
 
 	return true;
 	
@@ -404,7 +405,7 @@ bool resetest (ReconClient* rc) {
 	//sprintf ("--- %s ---\n", mef.c_str());
 
 	meas.RAWRead (mef, std::string("VB15"));
-	mask.RAWRead (maf, std::string("VB15"));
+	//mask.RAWRead (maf, std::string("VB15"));
 
 	rc->SetCplx ("meas", meas);
 	rc->SetCplx ("mask", mask);
@@ -419,10 +420,10 @@ bool resetest (ReconClient* rc) {
 
 	rc->GetCplx ("txm",  txm);
 	rc->GetCplx ("rxm",  rxm);
-	rc->GetCplx ("mask", mask);
+	//rc->GetCplx ("mask", mask);
 	rc->GetReal ("snro", snro);
 	rc->GetReal ("b0",   b0);
-	rc->GetReal ("bet",  bet);
+	//rc->GetReal ("bet",  bet);
 	// -----------------------------------------------------------
 
 	// Clear RAM and hangup --------------------------------------
