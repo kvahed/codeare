@@ -19,7 +19,7 @@ RRSModule::error_code
 NuFFT_OMP::Finalise () {
 
 	if(m_initialised)	
-		for (int i = 0; i < NTHREADS; i++)
+		for (int i = 0; i < m_nthreads; i++)
 			nfft::finalize (&m_fplan[i], &m_iplan[i]);
 
 	delete [] m_N;
@@ -32,7 +32,12 @@ NuFFT_OMP::Finalise () {
 RRSModule::error_code
 NuFFT_OMP::Init () {
 
-	RRSModule::error_code error = OK; 
+	RRSModule::error_code error = OK;
+
+#pragma omp parallel default (shared) 
+	{
+	m_nthreads = omp_get_num_threads();
+	}
 
 	m_initialised = false;
 
@@ -77,16 +82,21 @@ NuFFT_OMP::Init () {
 		m_n[i] = ceil (m_N[i]*alpha);
 
 	// Initialise FT plans ------------------
+
+	m_fplan = new nfft_plan[m_nthreads];
+	m_iplan = new solver_plan_complex[m_nthreads];
 	
-	for (int i = 0; i < NTHREADS; i++)
-		nfft::init (m_dim, m_N, m_M*m_shots/NTHREADS, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
+	m_M = m_M*m_shots/m_nthreads;
+
+	for (int i = 0; i < m_nthreads; i++)
+		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
 
 	// --------------------------------------
 
 	printf ("  intialising nfft::init (%i, {%i, %i, %i}, %i, {%i, %i, %i}, %i, *, *, %.9f)\n", 
 			m_dim, 
 			m_N[0], m_N[1], m_N[2],
-			m_M * m_shots/NTHREADS,
+			m_M,
 			m_n[0], m_n[1], m_n[2],
 			m,
 			m_epsilon);
@@ -119,31 +129,31 @@ NuFFT_OMP::Process () {
 
 	// Store all arms separately?
 	if (m_verbose)
-		tmp.Dim(m_dim) = NTHREADS + 1;
+		tmp.Dim(m_dim) = m_nthreads + 1;
 
 	tmp.Reset();
 
 #pragma omp parallel default (shared) 
 	{
 		
-		omp_set_num_threads(NTHREADS);
+		//omp_set_num_threads(m_nthreads);
 		int tid      = omp_get_thread_num();
 		
 #pragma omp for
 
-		for (int j = 0; j < NTHREADS; j++) {
+		for (int j = 0; j < m_nthreads; j++) {
 			
-			int     os         = j * m_M * m_shots / NTHREADS;
+			int     os         = j * m_M;
 
 			// Copy data from incoming matrix to the nufft input array
-			for (int i = 0; i < m_M*m_shots/NTHREADS; i++) {
+			for (int i = 0; i < m_M; i++) {
 				(m_iplan[tid].y[i])[0] = (data->At(i + os)).real();
 				(m_iplan[tid].y[i])[1] = (data->At(i + os)).imag();
 			}
 
 			// Copy k-space and weights to allocated memory
-			memcpy (&(m_fplan[tid].x[0]),  &kspace->At(os * m_dim), m_dim * m_M * m_shots / NTHREADS * sizeof(double));
-			memcpy (&(m_iplan[tid].w[0]), &weights->At(         0),         m_M * m_shots / NTHREADS * sizeof(double));
+			memcpy (&(m_fplan[tid].x[0]),  &kspace->At(os * m_dim), m_dim * m_M * sizeof(double));
+			memcpy (&(m_iplan[tid].w[0]), &weights->At(         0),         m_M * sizeof(double));
 
 			// Precompute PSI & IFT
 			nfft::weights (&m_fplan[tid], &m_iplan[tid]);
@@ -152,10 +162,10 @@ NuFFT_OMP::Process () {
 		}
 
 
-#pragma omp for schedule (dynamic, imgsize/NTHREADS)
+#pragma omp for schedule (dynamic, imgsize/m_nthreads)
 
 	for (int i = 0; i < imgsize; i++)
-		for (int j = 0; j < NTHREADS; j++) {
+		for (int j = 0; j < m_nthreads; j++) {
 			if (m_verbose)
 				tmp[(j+1) * imgsize + i] = cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
 			tmp[i] += cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);

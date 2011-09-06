@@ -25,8 +25,6 @@
 
 #include "ReconStrategy.hpp"
 
-static const int NTHREADS = 4;
-
 using namespace RRServer;
 
 namespace RRStrategy {
@@ -73,17 +71,18 @@ namespace RRStrategy {
 		int m_dim;
 		
 		// Some more stuff
-		int*      m_N;                          /**< @brief Image matrix side length */
-		int*      m_n;                          /**< @brief Oversampling */
-		int       m_M;                          /**< @brief Number of k-space knots */
-		int       m_maxit;                      /**< @brief Number of Recon iterations (NFFT 3) */
-		int       m_shots;                      /**< @brief Number of shots */
-		int       m_verbose;                    /**< @brief Store all shots separately? */
+		int*      m_N;                  /**< @brief Image matrix side length */
+		int*      m_n;                  /**< @brief Oversampling */
+		int       m_M;                  /**< @brief Number of k-space knots */
+		int       m_maxit;              /**< @brief Number of Recon iterations (NFFT 3) */
+		int       m_shots;              /**< @brief Number of shots */
+		int       m_verbose;            /**< @brief Store all shots separately? */
+		int       m_nthreads;
 
-		double    m_epsilon;                    /**< @brief Convergence criterium */
+		double               m_epsilon; /**< @brief Convergence criterium */
 
-		nfft_plan           m_fplan[NTHREADS];  /**< NuFFT plan                      */
-		solver_plan_complex m_iplan[NTHREADS];  /**< iNuFFT plan                     */
+		nfft_plan*           m_fplan;   /**< NuFFT plan                      */
+		solver_plan_complex* m_iplan;   /**< iNuFFT plan                     */
 		
 	};
 	
