@@ -74,25 +74,31 @@ RelativeSensitivities::Process     () {
 	AddReal ("snro", snro = new Matrix<double> (data->Dim(0), data->Dim(1), data->Dim(2)));
 
 	SVDCalibrate (data, rxm, txm, snro, shim, false);
+
    	// -----------------------------------------
 
 	// Do we have GRE for segmentation? --------
 
-	/*
 	FTVolumes (mask);
 	RemoveOS  (mask);
 	mask->SOS (mask->HDim());
+	
+	Matrix<double> bet(mask->Dim());
 
-	Matrix<double>* bet;
-	AddReal ("bet", bet = new Matrix<double> (mask->Dim()));
+	Matrix<short>* bets;
+	AddPixel ("bets", bets = new Matrix<short> (mask->Dim()));
+	
 	double tmp;
 	for (int i = 0; i < mask->Size(); i++) {
 		tmp = log(abs(mask->At(i)));
-		bet->At(i) = (tmp < -2.5) ? 0.0 : tmp + 2.5;
+		bet.At(i) = (tmp < -2.5) ? 0.0 : tmp + 2.5;
 	}
-		
-	SegmentBrain(bet);
-	*/
+	
+	SegmentBrain(&bet, bets);
+	
+	(*txm) /= txm->Maxabs();
+	(*rxm) /= rxm->Maxabs();
+
 	// -----------------------------------------
 
 	// B0 calculation --------------------------

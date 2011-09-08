@@ -36,7 +36,6 @@
 #include <complex>
 #include <stdint.h>
 
-#include "cycle.h"            // FFTW cycle implementation
 
 
 using namespace RRSModule;

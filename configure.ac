@@ -184,6 +184,33 @@ AC_CHECK_LIB([cdf], [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
 AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
+
+
+AC_MSG_CHECKING([for Magick::InitializeMagick(char*) in -lMagick++])
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -llcms -lfreetype -ljpeg -lfontconfig -lXext -lSM -lICE -lX11 -lz -lpthread -lm -lpthread `Magick++-config --ldflags`"
+AC_TRY_LINK([#include <Magick++.h>],
+   [int argc = 0; char** argv = 0; Magick::InitializeMagick(*argv);],
+   [AC_MSG_RESULT([yes])]
+   magick_found=yes,
+   [LIBS=$OLD_LIBS]
+   [AC_MSG_RESULT([no. cannot find libMagick++, a shame. Won't have a lot of functions for the matrix.])])
+if test -z $magick_found; then
+    LIBS=$OLD_LIBS
+fi
+
+
+if test "x$magick_found" = "xyes"; then
+    AC_CHECK_PROG(MAGICKPP_CONFIG, Magick++-config, yes, no)
+    if test "x$MAGICKPP_CONFIG" = "xyes"; then
+        IMAGEMAGICK_LIBS=`Magick++-config --libs`
+        IMAGEMAGICK_LDFLAGS=`Magick++-config --ldflags`
+        AC_SUBST(IMAGEMAGICK_LIBS)
+        AC_SUBST(IMAGEMAGICK_LDFLAGS)
+        AC_DEFINE(WITH_IMAGE_MAGICK,1,[Image Magick++ support for bitmap effects])
+    fi
+fi
+
 # Checks for C++ libraries with name spaces
 
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[

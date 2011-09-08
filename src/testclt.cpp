@@ -314,6 +314,19 @@ bool internaltest (ReconClient* rc) {
 	r.Random(); 
 	h.Random();
 	p.Random();
+
+	Matrix<size_t> m (3,2);
+	m (0,0) = 1;
+	m (0,1) = 3;
+	m (1,0) = 1;
+	m (1,1) = 4;
+	m (2,0) = 1;
+	m (2,1) = 5;
+
+	std::cout << m << std::endl;
+	
+	Matrix<size_t> mg = Matrix<size_t>::MeshGrid(m);
+	mg.MXDump("mg.mat", "mg");
 	
 	std::cout << r << std::endl;
 	std::cout << h << std::endl;
@@ -380,8 +393,9 @@ bool resetest (ReconClient* rc) {
 
 	Matrix<double> b0;   // B0 map
 	Matrix<double> snro; // SNR optimal image
-	Matrix<double> bet;  // GRE mask
+	Matrix<double> bet;  // GRE image mask
 
+	Matrix<short> bets;  // BET mask
 	// Read configuration file and initialise backend ------------
 
 	std::string    cf  = std::string (base + std::string (config));
@@ -405,7 +419,7 @@ bool resetest (ReconClient* rc) {
 	//sprintf ("--- %s ---\n", mef.c_str());
 
 	meas.RAWRead (mef, std::string("VB15"));
-	//mask.RAWRead (maf, std::string("VB15"));
+	mask.RAWRead (maf, std::string("VB15"));
 
 	rc->SetCplx ("meas", meas);
 	rc->SetCplx ("mask", mask);
@@ -420,10 +434,11 @@ bool resetest (ReconClient* rc) {
 
 	rc->GetCplx ("txm",  txm);
 	rc->GetCplx ("rxm",  rxm);
-	//rc->GetCplx ("mask", mask);
+	rc->GetCplx ("mask", mask);
 	rc->GetReal ("snro", snro);
 	rc->GetReal ("b0",   b0);
-	//rc->GetReal ("bet",  bet);
+	rc->GetPixel("bets", bets);
+
 	// -----------------------------------------------------------
 
 	// Clear RAM and hangup --------------------------------------
@@ -447,7 +462,7 @@ bool resetest (ReconClient* rc) {
 	rxm.MXDump  (mf,  "rxm", "");
 	snro.MXDump (mf, "snro", "");
 	b0.MXDump   (mf,   "b0", "");
-	bet.MXDump  (mf,  "bet", "");
+	bets.MXDump (mf, "bets", "");
 	mask.MXDump (mf, "mask", "");
 
 	if (matClose(mf) != 0) {
