@@ -530,8 +530,9 @@ Matrix<T>::RAWRead (const string fname, const string version) {
 	}
 
 	fclose (f);
-	long e = (elapsed(getticks(),tic) / Toolbox::Instance()->ClockRate());
-	printf ("\n  done. Loaded %i records (%f MB/s) in %li.\n", (int)i, bsize, e);
+
+	float e = ((float)elapsed(getticks(),tic) / (float)Toolbox::Instance()->ClockRate());
+	printf ("\n  done. Loaded %i records (%f MB/s) in %f.\n", (int)i, bsize, e);
 
 	return true;
 
