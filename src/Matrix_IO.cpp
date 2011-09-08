@@ -229,11 +229,15 @@ Matrix<T>::H5Dump (const string fname, const string dname, const string dloc) co
 			
 			Group group, *tmp;
 			
+			std::string dloctmp = dloc;
+			if (dloctmp.length() == 0)
+				dloctmp = "/";
+
 			try {
 				
-				group = file.openGroup(dloc);
+				group = file.openGroup(dloctmp);
 #ifdef VERBOSE
-				printf ("Group %s opened for writing\n", dloc.c_str()) ;
+				printf ("Group %s opened for writing\n", dloctmp.c_str()) ;
 #endif
 				
 			} catch (Exception e) {
@@ -242,7 +246,7 @@ Matrix<T>::H5Dump (const string fname, const string dname, const string dloc) co
 
 				vector<string> sv;
 
-				Toolbox::Instance()->Split (sv, dloc, "/");
+				Toolbox::Instance()->Split (sv, dloctmp, "/");
 
 				for (size_t i = 0; i < sv.size(); i++) {
 					
@@ -292,7 +296,7 @@ Matrix<T>::H5Dump (const string fname, const string dname, const string dloc) co
 				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
 				if (dname == "") 
 					_dname = "double";
-			} else {
+			} else if (typeid(T) == typeid(short)){
 				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
 				if (dname == "") 
 					_dname = "pixel";
@@ -457,6 +461,8 @@ template <class T> bool
 Matrix<T>::RAWRead (const string fname, const string version) {
 	
 	// Get size information from XProtocol and resize 
+	ticks  tic = getticks();
+
 	RSAdjust(fname);
 
 	printf ("%s: %s\n", fname.c_str(), this->DimsToCString());
@@ -493,7 +499,6 @@ Matrix<T>::RAWRead (const string fname, const string version) {
 	const std::string post = "";
 
 	size_t i   = 0;
-	ticks  tic = getticks();
 
 	for (i = 0; i < nscans; i++) {
 
@@ -525,8 +530,8 @@ Matrix<T>::RAWRead (const string fname, const string version) {
 	}
 
 	fclose (f);
-	long e = (elapsed(getticks(),start) / Toolbox::Instance()->ClockRate());
-	printf ("\n  done. Loaded %i records (%f MB/s).\n", (int)i, bsize / (float)e * 100000.0);
+	long e = (elapsed(getticks(),tic) / Toolbox::Instance()->ClockRate());
+	printf ("\n  done. Loaded %i records (%f MB/s) in %li.\n", (int)i, bsize, e);
 
 	return true;
 
@@ -722,22 +727,20 @@ bool Matrix<T>::MXDump (MATFile* mf, const string dname, const string dloc) cons
 	else if (typeid(T) == typeid(cplx))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
 	else if (typeid(T) == typeid(short))
-		mxa = mxCreateNumericArray (INVALID_DIM, dim,   mxINT8_CLASS,    mxREAL);
+		mxa = mxCreateNumericArray (INVALID_DIM, dim,  mxINT16_CLASS,    mxREAL);
 	// -------------------------------------------
 	
 	
 	// Copy to memory block ----------------------
 	
-	if (typeid(T) == typeid(double))
-		memcpy(mxGetPr(mxa), &_M[0], Size() * sizeof(T));
-	else if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cplx))
 		for (size_t i = 0; i < Size(); i++) {
 			((float*)mxGetPr(mxa))[i] = ((float*)&_M[0])[2*i+0]; // Template compilation workaround
 			((float*)mxGetPi(mxa))[i] = ((float*)&_M[0])[2*i+1]; // Can't use .imag() .real(). Consider double/short 
 		}
-	else
-		for (size_t i = 0; i < Size(); i++)
-			((T*)mxGetPr(mxa))[i] = _M[i];
+	else 
+		memcpy(mxGetPr(mxa), &_M[0], Size() * sizeof(T));
+
 	// -------------------------------------------
 	
 	// Write data --------------------------------
@@ -874,7 +877,7 @@ bool Matrix<T>::NIRead (const string fname) {
 			}
 		
 		Reset();
-		
+
 		if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
 			if (ni->datatype == 64)
 				memcpy (&_M[0], ni->data, Size()*sizeof(T));
@@ -889,9 +892,10 @@ bool Matrix<T>::NIRead (const string fname) {
 					float f[2] = {((double*)ni->data)[2*i], ((double*)ni->data)[2*i+1]};
 					memcpy(&_M[i], f, 2 * sizeof(float));
 				}
-		} else if (ni->datatype == 256 && typeid(T) == typeid(short)) {
-			if (ni->datatype == 256)
-				memcpy (&_M[0], ni->data, Size()*sizeof(T));
+		} else if ((ni->datatype == 256 || ni->datatype == 4) && typeid(T) == typeid(short)) {
+			if (ni->datatype == 256 || ni->datatype == 4)
+				memcpy (&_M[0], ni->data, SizeInRAM());
+				
 		} else {
 			printf ("Unsupported data type %i", ni->datatype);
 			return false;

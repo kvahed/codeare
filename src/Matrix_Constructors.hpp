@@ -495,3 +495,28 @@ Matrix<cplx>::Imag () const {
 
 }
     
+
+template<class T> Matrix<size_t>
+Matrix<T>::MeshGrid (const Matrix<size_t>& d) {
+
+	size_t side [3];
+
+	side[0] = d(0,1) - d(0,0) + 1;
+	side[1] = d(1,1) - d(1,0) + 1;
+	side[2] = d(2,1) - d(2,0) + 1;
+
+    Matrix<size_t> mg (side[1], side[0], side[2], 3);
+
+	std::cout << mg.DimsToCString() << std::endl;
+
+	for (size_t s = 0; s < side[2]; s++)
+		for (size_t l = 0; l < side[0]; l++)
+			for (size_t c = 0; c < side[1]; c++) {
+				mg(c,l,s,0) = l + d(0,0);
+				mg(c,l,s,1) = c + d(0,1);
+				mg(c,l,s,2) = s + d(0,2);
+			}
+	
+	return mg;
+
+}

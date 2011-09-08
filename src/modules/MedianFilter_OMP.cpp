@@ -22,13 +22,6 @@
 
 using namespace RRStrategy;
 
-#ifdef _OPENMP
-#include <omp.h>
-#else
-inline int omp_get_thread_num() { return 0;}
-inline int omp_get_num_threads() { return 1;}
-#endif
-
 template <class T> T** CreateImage(int n,int m){
 	T** pp = new T* [n];
 	pp[0] = new T [n*m];

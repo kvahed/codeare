@@ -637,6 +637,47 @@ Matrix<T>::operator *= (T s) {
 
 
 template <class T> inline Matrix<T> 
+Matrix<T>::operator /= (Matrix<T> &M) {
+    
+    size_t i;
+
+	for (size_t i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
+
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+		
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] /= M[i];
+		
+	}
+
+    return *this;
+
+}
+
+
+template <class T> inline Matrix<T>
+Matrix<T>::operator /= (T s) {
+    
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+		
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] /= s;
+		
+	}
+
+    return *this;
+
+}
+
+
+template <class T> inline Matrix<T> 
 Matrix<T>::operator/(Matrix<T> &M) {
 
     Matrix<T> res;

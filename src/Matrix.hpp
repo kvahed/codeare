@@ -1671,13 +1671,33 @@ public:
     
     
     /**
-     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
+     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this *= s.
      *
      * @param  s        Factor scalar.
 	 * @return          Result
      */
     Matrix<T>           
     operator*=           (T s);
+    
+    
+    /**
+     * @brief           ELementwise division and assignment operator. i.e. this = this ./ M.
+     *
+     * @param  M        Divisor matrix.
+	 * @return          Result
+     */
+    Matrix<T>           
+    operator/=           (Matrix<T> &M);
+    
+    
+    /**
+     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
+     *
+     * @param  s        Divisor scalar.
+	 * @return          Result
+     */
+    Matrix<T>           
+    operator/=           (T s);
     
     
     /**
@@ -2043,7 +2063,7 @@ public:
 	 *                  Delivers mg O(3,4,5,3). Highest dimension is [X,Y,Z];
 	 */
 	static Matrix<size_t>
-	MeshGrid            (Matrix<size_t>& dims);
+	MeshGrid            (const Matrix<size_t>& dims);
 
 
 	/**
@@ -2579,13 +2599,13 @@ Matrix<cplx>::Max() {
 template <class T> inline T
 Matrix<T>::Maxabs() {
 
-    T max = fabs(_M[0]);
+    T max = abs(_M[0]);
 
     for (size_t i = 0; i < Size(); i++)
-        if (fabs(_M[i]) > max)
-            max = fabs(_M[i]);
+        if (abs(_M[i]) > abs(max))
+            max = abs(_M[i]);
 
-    return max;
+    return abs(max);
 
 }
 

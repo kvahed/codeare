@@ -136,11 +136,8 @@ namespace RRStrategy {
 				
 				m[tid].SVD (&u[tid], &v[tid], &s[tid], 'S');
 				
-				// U 
-				for (size_t r = 0; r < nrxc; r++) rxm->At(r*volsize + i) = u[tid][r];
-				
-				// V is transposed!!! ------------------------------------------v
-				for (size_t t = 0; t < nrxc; t++) txm->At(t*volsize + i) = v[tid][t*v[0].Dim(0)];
+				for (size_t r = 0; r < nrxc; r++) rxm->At(r*volsize + i) = u[tid][r]             * exp(cplx(0.0,1.0)*arg(u[tid][0]));             // U 
+				for (size_t t = 0; t < nrxc; t++) txm->At(t*volsize + i) = v[tid][t*v[0].Dim(0)] * exp(cplx(0.0,1.0)*arg(v[tid][0])); // V is transposed!!!
 				
 				snro->At(i) = real(s[tid][0]);
 				
@@ -295,7 +292,7 @@ namespace RRStrategy {
 	 *
 	 * @brief In-out Images/mask
 	 */ 
-	int SegmentBrain (Matrix<double>* img) {
+	int SegmentBrain (Matrix<double>* img, Matrix<short>* msk) {
 		
 		printf ("  Brain segmentation with FSL(bet2) ... ");
 		fflush(stdout);
@@ -314,7 +311,7 @@ namespace RRStrategy {
 		// Call bet
 		system (cmd.c_str());
 
-		img->NIRead(mask);
+		msk->NIRead(mask);
 
 		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
