@@ -76,10 +76,10 @@ int Matrix<T>::SVD (Matrix<T>* u, Matrix<T>* v, Matrix<T>* s, const char jobz) {
 	if (!Is2D())
 		return -2;
 	
-	bool    cm   = true;
+	bool   cm    = true;
 
-	int    m     = _dim[COL];
-	int    n     = _dim[LIN];
+	int    m     = _dim[LIN];
+	int    n     = _dim[COL];
 	int    lwork = -1;
 	int    info  = 0;
 	int    lda   = _dim[COL];

@@ -1,5 +1,6 @@
 /*
  *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
+ *                               Daniel Brenner
  *                               Forschungszentrum Jülich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,6 +31,8 @@ using namespace RRServer;
  * @brief Reconstruction startegies
  */
 namespace RRStrategy {
+
+const static float GAMMA_1_PER_UT_MS = 2.675222099;
 
 	/**
 	 * @brief b0 abd Relative b1 maps from 2SPGREs 
@@ -274,7 +277,8 @@ namespace RRStrategy {
 				r = cplx (0.0,0.0);
 				for (int j = 0; j < nc; j++)
 					r += tmp[i + 2*j*np] * conj(tmp[i + (2*j+1)*np]);
-				b0->At(i) = arg(r);
+				b0->At(i) = arg(r) / GAMMA_1_PER_UT_MS / TE; 
+;
 			}
 			
 		}

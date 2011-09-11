@@ -4,13 +4,13 @@ AC_CONFIG_SRCDIR([src])
 
 # m4 macros
 AC_CONFIG_MACRO_DIR([config])
-
 # where to put auxilliary files
 AC_CONFIG_AUX_DIR([config])
 
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([foreign])
 LT_INIT([dlopen])
+
 # Revision string
 define([svnversion], esyscmd([sh -c "svnversion|tr -d '\n'"]))dnl
 AC_DEFINE(SVN_REVISION, "svnversion", [SVN Revision])
@@ -21,12 +21,24 @@ AC_COPYRIGHT([2010, 2011, Kaveh Vahedipour])
 esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 
 # Checks for programs.
+AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 
 # Set programming language
 AC_LANG([C++])
+
+# Check SMP capabilities
 AC_OPENMP
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_TIME
+AC_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+# canonical host system type string
+AC_CANONICAL_HOST
 
 # Check for Python
 m4_define([_AM_PYTHON_INTERPRETER_LIST], [python python3 python3.1])
@@ -89,63 +101,53 @@ AC_SUBST(PYTHON_INCLUDES)
 AC_SUBST(PYTHON_LDFLAGS)
 CXXFLAGS="${CXXFLAGS} ${PYTHON_INCLUDES}"
 
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_TIME
-AC_HEADER_STDBOOL
-AC_C_INLINE
-AC_TYPE_SIZE_T
-
-# canonical host system type string
-AC_CANONICAL_HOST
-
-# enable "const" keyword                                                                                                                              
+# enable "const" keyword
 AC_C_CONST
 
-# enable "restrict" keyword                                                                                                                           
+# enable "restrict" keyword
 AC_C_RESTRICT
 
-# enable "inline" keyword                                                                                                                             
+# enable "inline" keyword
 AC_C_INLINE
 
-# Compiler vendor (Courtesy fftw)  
+# Compiler vendor (Courtesy fftw)
 AX_COMPILER_VENDOR
 
-#
 #AC_CHECK_FUNCS([isnan isinf])
 AC_DEFUN([AC_CXX_NAMESPACES],
-	 [AC_MSG_CHECKING([whether C++ namespaces are supported])
-	  AC_LANG_PUSH([C++])
-	  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[namespace Outer { namespace Inner { int i = 0; }}]], [[using namespace Outer::Inner; return i;]])],[ac_cv_cxx_namespaces=yes],[ac_cv_cxx_namespaces=no])
-          AC_LANG_POP
-	  AC_MSG_RESULT($ac_cv_cxx_namespaces)
-	  if test "$ac_cv_cxx_namespaces" = yes; then
-		AC_DEFINE(HAVE_NAMESPACES,,[define if the compiler implements namespaces])
-          fi])
+	[AC_MSG_CHECKING([whether C++ namespaces are supported])
+	 AC_LANG_PUSH([C++])
+	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[namespace Outer { namespace Inner { int i = 0; }}]], [[using namespace Outer::Inner; return i;]])],[ac_cv_cxx_namespaces=yes],[ac_cv_cxx_namespaces=no])
+     AC_LANG_POP
+	 AC_MSG_RESULT($ac_cv_cxx_namespaces)
+	 if test "$ac_cv_cxx_namespaces" = yes; then
+	     AC_DEFINE(HAVE_NAMESPACES,,[define if the compiler implements namespaces])
+     fi])
 			      
 AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_STD],
 	[AC_REQUIRE([AC_CXX_NAMESPACES])
-	AC_MSG_CHECKING([whether isnan is in namespace std])
+	 AC_MSG_CHECKING([whether isnan is in namespace std])
 	 AC_LANG_PUSH([C++])
 	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <cmath>
 	   namespace lemur { int isnan(float x){ return std::isnan(x); } };]], [[
 	   using namespace lemur; float x = 1.0; lemur::isnan(x); return 0;]])],[ac_cv_cxx_isnan_std=yes],[ac_cv_cxx_isnan_std=no])
-         AC_LANG_POP
- 	  AC_MSG_RESULT($ac_cv_cxx_isnan_std)
-         if test "$ac_cv_cxx_isnan_std" = yes; then
-	    AC_DEFINE(ISNAN_IN_NAMESPACE_STD,,[define if the compiler has isnan function in namespace std])
+     AC_LANG_POP
+ 	 AC_MSG_RESULT($ac_cv_cxx_isnan_std)
+     if test "$ac_cv_cxx_isnan_std" = yes; then
+	     AC_DEFINE(ISNAN_IN_NAMESPACE_STD,,[define if the compiler has isnan function in namespace std])
 	 fi])
 
 AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX],
 	[AC_REQUIRE([AC_CXX_NAMESPACES])
-	AC_MSG_CHECKING([whether isnan is in namespace __gnu_cxx])
+	 AC_MSG_CHECKING([whether isnan is in namespace __gnu_cxx])
 	 AC_LANG_PUSH([C++])
 	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <cmath>
 	   namespace lemur { int isnan(float x){ return __gnu_cxx::isnan(x); } };]], [[
 	   using namespace lemur; float x = 1.0; lemur::isnan(x); return 0;]])],[ac_cv_cxx_isnan_gnu_cxx=yes],[ac_cv_cxx_isnan_gnu_cxx=no])
-         AC_LANG_POP
- 	  AC_MSG_RESULT($ac_cv_cxx_isnan_gnu_cxx)
-         if test "$ac_cv_cxx_isnan_gnu_cxx" = yes; then
-	    AC_DEFINE(ISNAN_IN_NAMESPACE_GNU_CXX,,[define if the compiler has isnan function in namespace __gnu_cxx])
+     AC_LANG_POP
+ 	 AC_MSG_RESULT($ac_cv_cxx_isnan_gnu_cxx)
+     if test "$ac_cv_cxx_isnan_gnu_cxx" = yes; then
+	     AC_DEFINE(ISNAN_IN_NAMESPACE_GNU_CXX,,[define if the compiler has isnan function in namespace __gnu_cxx])
 	 fi])
 
 AC_CXX_ISNAN_IN_NAMESPACE_STD	       
@@ -156,7 +158,6 @@ AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, ba
 AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
 AC_CHECK_HEADERS([ctype.h],          [], [AC_MSG_ERROR([cannot find ctype.h, bailing out])])
 AC_CHECK_HEADERS([typeinfo],         [], [AC_MSG_ERROR([cannot find typeinfo, bailing out])])
-
 AC_CHECK_HEADERS([fstream],          [], [AC_MSG_ERROR([cannot find fstream, bailing out])])
 AC_CHECK_HEADERS([iostream],         [], [AC_MSG_ERROR([cannot find iostream, bailing out])])
 AC_CHECK_HEADERS([limits.h],         [], [AC_MSG_ERROR([cannot find limits.h, bailing out])])
@@ -170,8 +171,8 @@ AC_CHECK_HEADERS([nfft3util.h],      [], [AC_MSG_RESULT([cannot find nfft3util.h
 AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([cdf.h],            [], [AC_MSG_RESULT([cannot find cdf.h, cdf dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([nifti1_io.h],      [], [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
+AC_CHECK_HEADERS([itkImage.h],       [], [AC_MSG_RESULT([cannot find itkImage.h, itk operations will now be available!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
-
 
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read],          [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
@@ -184,8 +185,9 @@ AC_CHECK_LIB([cdf], [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
 AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
+# Checks for C++ libraries with name spaces
 
-
+# Magick++
 AC_MSG_CHECKING([for Magick::InitializeMagick(char*) in -lMagick++])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -llcms -lfreetype -ljpeg -lfontconfig -lXext -lSM -lICE -lX11 -lz -lpthread -lm -lpthread `Magick++-config --ldflags`"
@@ -198,8 +200,6 @@ AC_TRY_LINK([#include <Magick++.h>],
 if test -z $magick_found; then
     LIBS=$OLD_LIBS
 fi
-
-
 if test "x$magick_found" = "xyes"; then
     AC_CHECK_PROG(MAGICKPP_CONFIG, Magick++-config, yes, no)
     if test "x$MAGICKPP_CONFIG" = "xyes"; then
@@ -211,8 +211,7 @@ if test "x$magick_found" = "xyes"; then
     fi
 fi
 
-# Checks for C++ libraries with name spaces
-
+# Time & Co for FFTW cycle
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
@@ -229,6 +228,7 @@ AC_TRY_LINK([
 ], [_rtc()], [AC_DEFINE(HAVE__RTC,1,[Define if you have the UNICOS _rtc() intrinsic.])], [rtc_ok=no])
 AC_MSG_RESULT($rtc_ok)
 
+# HDF5
 AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -lhdf5_cpp -lhdf5"
@@ -250,7 +250,7 @@ if test -z $hdf5_found; then
     LIBS=$OLD_LIBS
 fi
 
-
+# NIFTI
 AC_MSG_CHECKING([for nifti_image_read in -lniftiio])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -lniftiio -lznz"
@@ -268,7 +268,58 @@ if test -z $niftiio_found; then
     LIBS=$OLD_LIBS
 fi
 
+# ITK
+AC_ARG_WITH(matlabroot,[AC_HELP_STRING([--with-itklibpath=PATH],
+  [specify an absolute path to the ITK libraries]),
+  [itklib_path="$withval"], [itklib_path="auto"])], [], [with_itkroot=no])
 
+if test -a "$itklib_path/ITKConfig.cmake"; then
+	INC_INSIGHT_H="`cat $dir/ITKConfig.cmake | grep 'SET(ITK_INCLUDE_DIRS' | sed 's/SET(ITK_INCLUDE_DIRS \"/;/' | sed 's/\")//' | sed 's/;/ -I/g'`" 
+    insight_libs_dir="`cat $dir/ITKConfig.cmake | grep 'SET(ITK_LIBRARY_DIRS' | sed 's/SET(ITK_LIBRARY_DIRS \"/;/' | sed 's/\")//' | sed 's/;//g'`"
+	INSIGHT_LIB_DIR_FLAG="$LDRUN_PREFIX$insight_libs_dir -L$insight_libs_dir"	
+	INSIGHT_LIB_FLAG="-lITKFEM -lITKIO -lITKMetaIO -lITKAlgorithms -lITKStatistics -lITKBasicFilters -lITKCommon  -litkvnl -litkvnl_algo -litknetlib -litksys -litkjpeg -lITKDICOMParser -lz"
+	echo "have png is $HAVE_PNG"
+
+	if ! test "$HAVE_PNG" = "yes"; then
+	   echo "note: using libitkpng"	
+	   INSIGHT_LIB_FLAG="$INSIGHT_LIB_FLAG -litkpng"
+	fi
+
+    DEF_INSIGHT="#define HAVE_INSIGHT"
+    HAVE_INSIGHT="yes"
+
+    AC_MSG_RESULT($dir)
+else
+    AC_MSG_RESULT(not found.)
+fi
+
+AC_MSG_CHECKING([for itk::Image in -lITKCommon])
+OLD_LIBS=$LIBS
+LIBS="${LIBS} ${INSIGHT_LIB_FLAG}"
+
+AC_TRY_LINK([#include "itkImage.h"],
+   [
+	 typedef itk::Image< unsigned short, 3 > ImageType; ImageType::Pointer image = ImageType::New();
+   ],
+   [AC_MSG_RESULT([yes])]
+   itk_found=yes,
+   [LIBS=$OLD_LIBS]
+   [AC_MSG_RESULT([no. Cannot find libITKCommon, ITK operations not available.])])
+
+if test -z $itk_found; then
+    LIBS=$OLD_LIBS
+fi
+
+AC_SUBST(ITK_LIB_FLAG)
+AC_SUBST(ITK_LIB_DIR_FLAG)
+AC_SUBST(INC_ITK_H)
+AC_SUBST(HAVE_INSIGHT)
+AC_SUBST(INSIGHT_LIB_FLAG)
+AC_SUBST(INSIGHT_LIB_DIR_FLAG)
+AC_SUBST(INC_INSIGHT_H)
+AC_SUBST(DEF_INSIGHT)
+
+# OMNIORB
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
 OLD_LIBS=$LIBS
 LIBS="${LIBS} -lomniORB4"
@@ -285,7 +336,7 @@ if test -z $omniORB4_found; then
     LIBS=$OLD_LIBS
 fi
 
-
+# MATLAB IO LIBRARIES
 AC_ARG_WITH(matlabroot,[  --with-matlabroot       path to MATLAB install dir], 
         [], [with_matlabroot=no])
 
@@ -322,6 +373,7 @@ if test x"$with_matlabroot" != x"no" ; then
 
 fi
 
+# BLAS and LAPACK
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
 case $withval in
   yes)
@@ -450,8 +502,7 @@ AC_SUBST(LAPACK)
 #AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
-
-# Checks for library functions.
+# Generate files
 AC_CONFIG_FILES([src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile])
 AC_OUTPUT
 
