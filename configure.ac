@@ -9,6 +9,7 @@ AC_CONFIG_AUX_DIR([config])
 
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([foreign])
+LT_PREREQ([2.2])
 LT_INIT([dlopen])
 
 # Revision string
@@ -24,6 +25,7 @@ esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
+AC_PROG_RANLIB
 
 # Set programming language
 AC_LANG([C++])
@@ -35,7 +37,10 @@ AC_OPENMP
 AC_HEADER_TIME
 AC_HEADER_STDBOOL
 AC_C_INLINE
+
 AC_TYPE_SIZE_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
 
 # canonical host system type string
 AC_CANONICAL_HOST
@@ -113,6 +118,8 @@ AC_C_INLINE
 # Compiler vendor (Courtesy fftw)
 AX_COMPILER_VENDOR
 
+AC_CHECK_TYPES([ptrdiff_t])
+
 #AC_CHECK_FUNCS([isnan isinf])
 AC_DEFUN([AC_CXX_NAMESPACES],
 	[AC_MSG_CHECKING([whether C++ namespaces are supported])
@@ -153,6 +160,8 @@ AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX],
 AC_CXX_ISNAN_IN_NAMESPACE_STD	       
 AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX
 
+
+AC_HEADER_MAJOR
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
 AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
@@ -173,6 +182,8 @@ AC_CHECK_HEADERS([cdf.h],            [], [AC_MSG_RESULT([cannot find cdf.h, cdf 
 AC_CHECK_HEADERS([nifti1_io.h],      [], [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([itkImage.h],       [], [AC_MSG_RESULT([cannot find itkImage.h, itk operations will now be available!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+AC_CHECK_HEADERS([fcntl.h],          [], [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
+AC_CHECK_HEADERS([stddef.h],         [], [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
 
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read],          [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
@@ -501,6 +512,21 @@ fi
 AC_SUBST(LAPACK)
 #AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
+
+AC_CHECK_FUNCS([floor])
+AC_CHECK_FUNCS([getpagesize])
+AC_CHECK_FUNCS([memmove])
+AC_CHECK_FUNCS([memset])
+AC_CHECK_FUNCS([pow])
+AC_CHECK_FUNCS([setenv])
+AC_CHECK_FUNCS([sqrt])
+AC_CHECK_FUNCS([strchr])
+AC_CHECK_FUNCS([strstr])
+AC_FUNC_ERROR_AT_LINE
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_FUNC_MMAP
+
 
 # Generate files
 AC_CONFIG_FILES([src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile])
