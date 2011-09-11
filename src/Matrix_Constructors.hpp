@@ -165,7 +165,7 @@ Matrix<T>::~Matrix() {
 template <class T> inline 
 Matrix<T> Matrix<T>::Id (const size_t n) {
 
- 	static Matrix<T> M (n);
+ 	Matrix<T> M (n);
 
  	for (size_t i = 0; i < n; i++)
  		M[i*n+i] = T(1.0);
@@ -179,7 +179,7 @@ Matrix<T> Matrix<T>::Id (const size_t n) {
 template <class T> inline 
 Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n, const size_t l) {
 
- 	static Matrix<T> M (m,n,l);
+ 	Matrix<T> M (m,n,l);
 
  	for (size_t i = 0; i < M.Size(); i++)
  		M[i] = T(1.0);
@@ -193,7 +193,7 @@ Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n, const size_t l) {
 template <class T> inline 
 Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n) {
 
- 	static Matrix<T> M (m,n);
+ 	Matrix<T> M (m,n);
 
  	for (size_t i = 0; i < M.Size(); i++)
  		M[i] = T(1.0);
@@ -216,7 +216,7 @@ Matrix<T> Matrix<T>::Ones (const size_t n) {
 template <class T> inline 
 Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m, const size_t l) {
 
- 	static Matrix<T> M (m,n,l);
+ 	Matrix<T> M (m,n,l);
 
  	for (size_t i = 0; i < M.Size(); i++)
  		M[i] = T(0.0);
@@ -230,7 +230,7 @@ Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m, const size_t l) {
 template <class T> inline 
 Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m) {
 
- 	static Matrix<T> M (m,n);
+ 	Matrix<T> M (m,n);
 
  	for (size_t i = 0; i < M.Size(); i++)
  		M[i] = T(0.0);
@@ -253,7 +253,7 @@ Matrix<T> Matrix<T>::Zeros (const size_t n) {
 template <class T> inline 
 Matrix<T> Matrix<T>::Circle (const float* p, const size_t n) {
 
-	static Matrix<T> res = Matrix<T>::Zeros(n);
+	Matrix<T> res = Matrix<T>::Zeros(n);
 
 	float m[2];
 	float rad;
@@ -276,7 +276,7 @@ Matrix<T> Matrix<T>::Circle (const float* p, const size_t n) {
 template <class T> inline 
 Matrix<T> Matrix<T>::Sphere (const float* p, const size_t n) {
 
-	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
+	Matrix<T> res = Matrix<T>::Zeros(n,n,n);
 
 	float m[3];
 	float rad;
@@ -301,7 +301,7 @@ Matrix<T> Matrix<T>::Sphere (const float* p, const size_t n) {
 template <class T> inline 
 Matrix<T> Matrix<T>::Ellipse (const float* p, const size_t n, const T v) {
 
-	static Matrix<T> res = Matrix<T>::Zeros(n);
+	Matrix<T> res = Matrix<T>::Zeros(n);
 
 	float m[2];
 	float a[2];
@@ -339,7 +339,7 @@ Matrix<T> Matrix<T>::Ellipse (const float* p, const size_t n, const T v) {
 template <class T> inline 
 Matrix<T> Matrix<T>::Ellipsoid (const float* p, const size_t n, const T v) {
 
-	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
+	Matrix<T> res = Matrix<T>::Zeros(n,n,n);
 
 	float m[3];
 	float a[3];
@@ -402,7 +402,7 @@ Matrix<T> Matrix<T>::Phantom2D (const size_t n) {
 	T v[ne] = {T(1.0), T(-0.8), T(-0.2), T(-0.2), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1)};
 
 	// Empty matrix
-	static Matrix<T> res = Matrix<T>::Zeros(n);
+	Matrix<T> res = Matrix<T>::Zeros(n);
 	Matrix<T>        e;
 
 	for (size_t i = 0; i < ne; i++) {
@@ -437,7 +437,7 @@ Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
 
 	T v[ne] = {2.0, -0.8, -0.2, -0.2, 0.2, 0.2, 0.1, 0.1, 0.2, -0.2};
 
-	static Matrix<T> res = Matrix<T>::Zeros(n,n,n);
+	Matrix<T> res = Matrix<T>::Zeros(n,n,n);
 	Matrix<T> e;
 	
 	for (size_t i = 0; i < ne; i++) {

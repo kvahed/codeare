@@ -175,6 +175,8 @@ RFLimits            (const Matrix<cplx>* solution, const int* pd, const int nk, 
             if (limits[i] < abs (solution->At(i+nk*j)) / pd[i]) 
                 limits[i] = abs (solution->At(i+nk*j)) / pd[i];
 
+		limits[i] *= 1000.0;
+
     }
         
 }

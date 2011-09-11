@@ -137,18 +137,22 @@ SpatialDomain::Process        () {
     // m_helper: RF and gradient pulses
     // ----------------------------
 
+	Matrix<double>* k      = m_real ["k"];
+	Matrix<double>* r      = m_real ["r"];
+	Matrix<cplx>*   b1     = m_cplx ["b1"];
+	Matrix<short>*  b0     = m_pixel["b0"];
+	Matrix<cplx>*   target = m_cplx ["target"];
+
+	m_ns = r->Dim(1);
+	m_nk = k->Dim(1);
+	m_nc = b1->Dim(1);
+
     Matrix<cplx>    solution;
     Matrix<cplx>    tmp;
     Matrix<cplx>    final;    
     Matrix<cplx>    treg   =  Matrix<cplx>::Id(m_nc * m_nk) * cplx (m_lambda, 0);
 	Matrix<cplx>    ve;
 	Matrix<cplx>    vp;
-
-	Matrix<double>* k      = m_real ["k"];
-	Matrix<double>* r      = m_real ["r"];
-	Matrix<cplx>*   b1     = m_cplx ["b1"];
-	Matrix<short>*  b0     = m_pixel["b0"];
-	Matrix<cplx>*   target = m_cplx ["target"];
 
 	if (m_verbose) {
 	    ve  = Matrix<cplx>(m_ns,      m_maxiter);
@@ -211,9 +215,10 @@ SpatialDomain::Process        () {
 
         pulse_amp_ok = true;
         
-        for (int i = 0; i < m_nk; i++) 
+        for (int i = 0; i < m_nk; i++)  {
             if (m_max_rf[i] > m_rflim)
                 pulse_amp_ok = false;
+		}
         
         // Update Pulse durations if necessary -------
         if (!pulse_amp_ok) {
