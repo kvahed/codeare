@@ -9,9 +9,6 @@
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 
-/* Define to 1 if you have the <Common/itkImage.h> header file. */
-#undef HAVE_COMMON_ITKIMAGE_H
-
 /* Define to 1 if you have the <complex> header file. */
 #undef HAVE_COMPLEX
 

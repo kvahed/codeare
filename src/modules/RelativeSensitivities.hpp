@@ -24,6 +24,13 @@
 
 #include "ReconStrategy.hpp"
 
+#include "itkImage.h"
+#include "itkMinimumMaximumImageFilter.h"
+#include "itkOrientedImage.h"
+#include "itkIdentityTransform.h"
+#include "itkLinearInterpolateImageFunction.h"
+#include "itkResampleImageFilter.h"
+
 using namespace RRServer;
 
 
@@ -317,13 +324,11 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 
 		msk->NIRead(mask);
 
-		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+ 		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 		return RRSModule::OK;
 
 	}
-
-
 
 
 }

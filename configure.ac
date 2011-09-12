@@ -325,10 +325,10 @@ AC_TRY_LINK([#include "itkImage.h"],
    [LIBS=$OLD_LIBS]
    [AC_MSG_RESULT([no. Cannot find libITKCommon, ITK operations not available.])])
 
-if test -z $itk_found; then
+#if test -z $itk_found; then
     LIBS=$OLD_LIBS
 	CXXFLAGS=$OLD_CXXFLAGS
-fi
+#fi
 
 
 # OMNIORB

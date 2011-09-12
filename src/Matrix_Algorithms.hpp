@@ -139,15 +139,3 @@ Matrix<T>::Is4D () const {
 
 
 
-template<class T> Matrix<T>
-Matrix<T>::Resample (float f, Interpolation i) {
-
-	// We handle only isotropic resampling.
-	assert ((float)(_dim[0] / (size_t)f) == (float)_dim[0] / f);
-
-	Matrix<T> res(this->Dim(0)/f, this->Dim(1)/f, this->Dim(2)/f);
-	
-
-	return res;
-
-}
