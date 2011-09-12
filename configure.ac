@@ -180,7 +180,6 @@ AC_CHECK_HEADERS([nfft3util.h],      [], [AC_MSG_RESULT([cannot find nfft3util.h
 AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([cdf.h],            [], [AC_MSG_RESULT([cannot find cdf.h, cdf dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([nifti1_io.h],      [], [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
-AC_CHECK_HEADERS([itkImage.h],       [], [AC_MSG_RESULT([cannot find itkImage.h, itk operations will now be available!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
 AC_CHECK_HEADERS([fcntl.h],          [], [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
 AC_CHECK_HEADERS([stddef.h],         [], [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
@@ -280,33 +279,42 @@ if test -z $niftiio_found; then
 fi
 
 # ITK
-AC_ARG_WITH(matlabroot,[AC_HELP_STRING([--with-itklibpath=PATH],
-  [specify an absolute path to the ITK libraries]),
-  [itklib_path="$withval"], [itklib_path="auto"])], [], [with_itkroot=no])
-
-if test -a "$itklib_path/ITKConfig.cmake"; then
-	INC_INSIGHT_H="`cat $dir/ITKConfig.cmake | grep 'SET(ITK_INCLUDE_DIRS' | sed 's/SET(ITK_INCLUDE_DIRS \"/;/' | sed 's/\")//' | sed 's/;/ -I/g'`" 
-    insight_libs_dir="`cat $dir/ITKConfig.cmake | grep 'SET(ITK_LIBRARY_DIRS' | sed 's/SET(ITK_LIBRARY_DIRS \"/;/' | sed 's/\")//' | sed 's/;//g'`"
-	INSIGHT_LIB_DIR_FLAG="$LDRUN_PREFIX$insight_libs_dir -L$insight_libs_dir"	
-	INSIGHT_LIB_FLAG="-lITKFEM -lITKIO -lITKMetaIO -lITKAlgorithms -lITKStatistics -lITKBasicFilters -lITKCommon  -litkvnl -litkvnl_algo -litknetlib -litksys -litkjpeg -lITKDICOMParser -lz"
-	echo "have png is $HAVE_PNG"
-
+AC_MSG_CHECKING([for InsightToolkit])
+AC_ARG_WITH(itkroot,[  --with-itkroot       path to ITK install dir], [], [with_itkroot=no])
+ITK_INSTALL_PREFIX=${with_itkroot}
+itklib_path="${with_itkroot}/lib/InsightToolkit"
+itkconfig_cmake="${itklib_path}/ITKConfig.cmake"
+if test -a "$itkconfig_cmake"; then
+	INC_INSIGHT_H="`cat $itkconfig_cmake | grep 'SET(ITK_INCLUDE_DIRS' | sed 's/SET(ITK_INCLUDE_DIRS \"/;/' | sed 's/\")//' | sed 's/;/ -I/g' | sed -e 's/\${ITK_INSTALL_PREFIX}/\/usr\/local/g'`" 
+    insight_libs_dir="`cat $itkconfig_cmake | grep 'SET(ITK_LIBRARY_DIRS' | sed 's/SET(ITK_LIBRARY_DIRS \"/;/' | sed 's/\")//' | sed 's/;//g' | sed -e 's/\${ITK_INSTALL_PREFIX}/\/usr\/local/g'`"
+	INSIGHT_LIB_DIR_FLAG="-L$insight_libs_dir"	
+	INSIGHT_LIB_FLAG="-lITKFEM -lITKIO -lITKMetaIO -lITKAlgorithms -lITKStatistics -lITKBasicFilters -lITKCommon  -litkvnl -litkvnl_algo -litksys -lITKDICOMParser -lz"
 	if ! test "$HAVE_PNG" = "yes"; then
-	   echo "note: using libitkpng"	
 	   INSIGHT_LIB_FLAG="$INSIGHT_LIB_FLAG -litkpng"
 	fi
 
     DEF_INSIGHT="#define HAVE_INSIGHT"
     HAVE_INSIGHT="yes"
 
-    AC_MSG_RESULT($dir)
+    AC_MSG_RESULT([found.])
 else
-    AC_MSG_RESULT(not found.)
+    AC_MSG_RESULT([not found.])
 fi
+         
+AC_SUBST(ITK_INSTALL_PREFIX)
+AC_SUBST(ITK_LIB_FLAG)
+AC_SUBST(ITK_LIB_DIR_FLAG)
+AC_SUBST(HAVE_INSIGHT)
+AC_SUBST(INSIGHT_LIB_FLAG)
+AC_SUBST(INSIGHT_LIB_DIR_FLAG)
+AC_SUBST(INC_INSIGHT_H)
+AC_SUBST(DEF_INSIGHT)
 
-AC_MSG_CHECKING([for itk::Image in -lITKCommon])
+AC_MSG_CHECKING([for itk::Image in ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}])
 OLD_LIBS=$LIBS
-LIBS="${LIBS} ${INSIGHT_LIB_FLAG}"
+OLD_CXXFLAGS=$CXXFLAGS
+LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
+CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
 
 AC_TRY_LINK([#include "itkImage.h"],
    [
@@ -319,16 +327,9 @@ AC_TRY_LINK([#include "itkImage.h"],
 
 if test -z $itk_found; then
     LIBS=$OLD_LIBS
+	CXXFLAGS=$OLD_CXXFLAGS
 fi
 
-AC_SUBST(ITK_LIB_FLAG)
-AC_SUBST(ITK_LIB_DIR_FLAG)
-AC_SUBST(INC_ITK_H)
-AC_SUBST(HAVE_INSIGHT)
-AC_SUBST(INSIGHT_LIB_FLAG)
-AC_SUBST(INSIGHT_LIB_DIR_FLAG)
-AC_SUBST(INC_INSIGHT_H)
-AC_SUBST(DEF_INSIGHT)
 
 # OMNIORB
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
@@ -523,8 +524,6 @@ AC_CHECK_FUNCS([sqrt])
 AC_CHECK_FUNCS([strchr])
 AC_CHECK_FUNCS([strstr])
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
 AC_FUNC_MMAP
 
 
