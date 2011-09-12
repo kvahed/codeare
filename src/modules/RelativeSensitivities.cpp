@@ -20,7 +20,9 @@
 
 #include "RelativeSensitivities.hpp"
 
+
 using namespace RRStrategy;
+
 
 RRSModule::error_code
 RelativeSensitivities::Init        () {
@@ -87,7 +89,7 @@ RelativeSensitivities::Process     () {
 
 	Matrix<short>* bets;
 	AddPixel ("bets", bets = new Matrix<short> (mask->Dim()));
-	
+
 	double tmp;
 	for (int i = 0; i < mask->Size(); i++) {
 		tmp = log(abs(mask->At(i)));
@@ -95,9 +97,7 @@ RelativeSensitivities::Process     () {
 	}
 	
 	SegmentBrain(&bet, bets);
-	
-	(*txm) /= txm->Maxabs();
-	(*rxm) /= rxm->Maxabs();
+	bets->Resample(0.5, LINEAR);
 
 	// -----------------------------------------
 
@@ -109,7 +109,17 @@ RelativeSensitivities::Process     () {
 	B0Map (data, b0, m_echo_shift);
 	// -----------------------------------------
 
-
+	for (int ch = 0; ch < txm->Dim(3); ch++)
+		for (int i = 0; i < bets->Size(); i++)
+			txm->At(ch*bets->Size() + i) *= (double)bets->At(i);
+	
+	for (int ch = 0; ch < rxm->Dim(3); ch++)
+		for (int i = 0; i < bets->Size(); i++)
+			rxm->At(ch*bets->Size() + i) *= (double)bets->At(i);
+	
+	for (int i = 0; i < bets->Size(); i++)
+		b0->At(i) *= (double)bets->At(i);
+	
 	// Remove original data --------------------
 
     FreeCplx ("meas");

@@ -36,8 +36,8 @@ enum IceDim {
 /**
  * @brief Interpolation methods
  */
-enum Interpolation {
-	LINEAR, CUBIC, SPLINE
+enum InterpMethod {
+	LINEAR, BSPLINE
 };
 
 #include "config.h"
@@ -2043,13 +2043,43 @@ public:
     
     
 	/**
-	 * @brief           Resample up to 3D to
+	 * @brief           Isotropic resampling up to 3D to
 	 *
-	 * @param  f        Resampling factor
-	 * @param  i        Interpolation method @see Interpolation
+	 * @param  f        Resampling factor (i.e. 0.5 = each dimension halved)
+	 * @param  i        Interpolation method @see InterpMethod
+	 */
+	void
+	Resample            (const Matrix<double>& f, const InterpMethod& i);
+
+
+	/**
+	 * @brief           Isotropic resampling up to 3D to
+	 *
+	 * @param  f        Resampling factor (i.e. 0.5 = each dimension halved)
+	 * @param  i        Interpolation method @see InterpMethod
 	 */
 	Matrix<T>
-	Resample            (float f, Interpolation i);
+	Resample            (const Matrix<double>& f, const InterpMethod& i) const;
+
+
+	/**
+	 * @brief           Resampling up to 3D to
+	 *
+	 * @param  f        Resampling factors <1 reduction >1 expansion
+	 * @param  i        Interpolation method @see InterpMethod
+	 */
+	void
+	Resample            (const double& f, const InterpMethod& im);
+
+
+	/**
+	 * @brief           Resampling up to 3D to
+	 *
+	 * @param  f        Resampling factors <1 reduction >1 expansion
+	 * @param  i        Interpolation method @see InterpMethod
+	 */
+	Matrix<T>
+	Resample            (const double& f, const InterpMethod& im) const;
 
 
 	/**
@@ -2696,5 +2726,6 @@ Matrix<short>::Random () {
 #include "Matrix_ICE.cpp"
 #include "Matrix_FFT.hpp"
 #include "Matrix_Algorithms.hpp"
+#include "Matrix_ITK.cpp"
 
 #endif // __MATRIX_H__
