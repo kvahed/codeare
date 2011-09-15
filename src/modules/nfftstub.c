@@ -82,8 +82,8 @@ void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) 
 		nfft_precompute_psi(np);
 	
 	/* precompute full psi */
-	if(np->nfft_flags & PRE_FULL_PSI)
-		nfft_precompute_full_psi(np);
+	//if(np->nfft_flags & PRE_FULL_PSI)
+	//nfft_precompute_full_psi(np);
 	
 	/* init some guess */
 	for(k = 0; k < np->N_total; k++)
@@ -92,7 +92,8 @@ void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) 
 	double t = nfft_second();
 	
 	/* inverse trafo */
-	solver_before_loop_complex(spc);
+	nfft_adjoint(np);
+	/*solver_before_loop_complex(spc);
 	
 	for( l = 0; l < maxiter; l++) {
 		
@@ -104,8 +105,8 @@ void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) 
 #ifdef NVERBOSE		
 		fprintf( stderr, "%e,  %i of %i\n", sqrt(spc->dot_r_iter), l+1, maxiter);
 #endif		
-		
-	}
+	
+}*/
 
 	t = nfft_second()-t;
 	
