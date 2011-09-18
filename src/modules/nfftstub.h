@@ -60,6 +60,14 @@ namespace nfft {
 		weights              (nfft_plan* np, solver_plan_complex* spc);
 
 		/**
+		 * @brief            Precompute PSI
+		 *
+		 * @param  np        NFFT plan
+		 */
+		extern int
+		psi                  (nfft_plan* np);
+
+		/**
 		 * @brief            Finalise
 		 */
 		extern int

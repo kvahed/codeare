@@ -805,7 +805,7 @@ bool Matrix<T>::NIDump (const string fname) const {
 		size_t            l   = fname.length();
 		
 		nifti_1_header header;
-		header.sizeof_hdr  = 348;
+		header.sizeof_hdr = 348;
 		header.dim[0] = tmp.HDim() + 1;
 		header.pixdim[0] = tmp.HDim() + 1;
 		
@@ -838,7 +838,7 @@ bool Matrix<T>::NIDump (const string fname) const {
 		
 		ni->data = (void*) malloc (Size() * sizeof (T));
 		memcpy (ni->data, &_M[0],  Size() * sizeof (T));
-		
+			
 		nifti_image_write (ni);
 		nifti_image_free (ni); 
 		

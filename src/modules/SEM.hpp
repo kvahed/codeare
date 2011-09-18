@@ -107,8 +107,8 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 			
 			// Inverse FT
 			nfft::ift (&np[tid], &spc[tid], maxit, epsilon);
-			//memcpy (&ftout[imgsize * j], &spc[tid].f_hat_iter[0][0], imgsize * sizeof (fftw_complex));
-			memcpy (&ftout[imgsize * j], &np[tid].f_hat[0][0], imgsize * sizeof (fftw_complex));
+			memcpy (&ftout[imgsize * j], &spc[tid].f_hat_iter[0][0], imgsize * sizeof (fftw_complex));
+			//memcpy (&ftout[imgsize * j], &np[tid].f_hat[0][0], imgsize * sizeof (fftw_complex));
 			
 		}
 

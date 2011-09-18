@@ -61,7 +61,7 @@ am__objects_1 = options.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
 	xpath_static.$(OBJEXT) action_store.$(OBJEXT) \
 	xpath_stack.$(OBJEXT) lex_util.$(OBJEXT) \
 	xpath_stream.$(OBJEXT) node_set.$(OBJEXT) xml_util.$(OBJEXT) \
-	xpath_syntax.$(OBJEXT) tokenlist.$(OBJEXT)
+	xpath_syntax.$(OBJEXT) tokenlist.$(OBJEXT) FFT.$(OBJEXT)
 am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	reconserver.$(OBJEXT)
@@ -162,7 +162,6 @@ CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
-DEF_INSIGHT = @DEF_INSIGHT@
 DEPDIR = @DEPDIR@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
@@ -174,8 +173,6 @@ EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
 HAVE_INSIGHT = @HAVE_INSIGHT@
-IMAGEMAGICK_LDFLAGS = @IMAGEMAGICK_LDFLAGS@
-IMAGEMAGICK_LIBS = @IMAGEMAGICK_LIBS@
 INC_INSIGHT_H = @INC_INSIGHT_H@
 INSIGHT_LIB_DIR_FLAG = @INSIGHT_LIB_DIR_FLAG@
 INSIGHT_LIB_FLAG = @INSIGHT_LIB_FLAG@
@@ -185,8 +182,6 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 ITK_INSTALL_PREFIX = @ITK_INSTALL_PREFIX@
-ITK_LIB_DIR_FLAG = @ITK_LIB_DIR_FLAG@
-ITK_LIB_FLAG = @ITK_LIB_FLAG@
 LAPACK = @LAPACK@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
@@ -196,7 +191,6 @@ LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
-MAGICKPP_CONFIG = @MAGICKPP_CONFIG@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
@@ -286,7 +280,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 
 # Common sources
-COMMON = RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc Toolbox.cpp tinyxml/tinystr.cpp tinyxml/tinystr.h tinyxml/tinyxml.cpp tinyxml/tinyxml.h tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp tinyxml/xpath_processor.h tinyxml/xpath_processor.cpp tinyxml/xpath_expression.cpp tinyxml/xpath_expression.h tinyxml/xpath_static.cpp tinyxml/xpath_static.h tinyxml/action_store.cpp tinyxml/action_store.h tinyxml/xpath_stack.cpp tinyxml/xpath_stack.h tinyxml/lex_util.cpp tinyxml/lex_util.h tinyxml/xpath_stream.cpp tinyxml/xpath_stream.h tinyxml/node_set.cpp tinyxml/node_set.h tinyxml/xml_util.cpp tinyxml/xml_util.h tinyxml/xpath_syntax.cpp tinyxml/xpath_syntax.h tinyxml/tokenlist.cpp tinyxml/tokenlist.h
+COMMON = RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc Toolbox.cpp tinyxml/tinystr.cpp tinyxml/tinystr.h tinyxml/tinyxml.cpp tinyxml/tinyxml.h tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp tinyxml/xpath_processor.h tinyxml/xpath_processor.cpp tinyxml/xpath_expression.cpp tinyxml/xpath_expression.h tinyxml/xpath_static.cpp tinyxml/xpath_static.h tinyxml/action_store.cpp tinyxml/action_store.h tinyxml/xpath_stack.cpp tinyxml/xpath_stack.h tinyxml/lex_util.cpp tinyxml/lex_util.h tinyxml/xpath_stream.cpp tinyxml/xpath_stream.h tinyxml/node_set.cpp tinyxml/node_set.h tinyxml/xml_util.cpp tinyxml/xml_util.h tinyxml/xpath_syntax.cpp tinyxml/xpath_syntax.h tinyxml/tokenlist.cpp tinyxml/tokenlist.h FFT.hpp FFT.cpp
 
 # Client side stuff
 CLIENT_SIDE = ReconClient.h ReconClient.cpp ReconContext.h ReconContext.cpp  ReconStrategy.hpp
@@ -419,6 +413,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FFT.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RRSModuleSK.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@

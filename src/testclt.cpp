@@ -21,6 +21,7 @@
 #include "options.h"
 #include "ReconClient.hpp"
 #include "ReconContext.hpp"
+#include "FFT.hpp"
 
 #ifndef __WIN32__
     #include "config.h"
@@ -237,6 +238,9 @@ bool nuffttest (ReconClient* rc) {
 #ifdef HAVE_MAT_H	
 	rawdata.MXDump   (odf.c_str(), "image");
 #endif
+#ifdef HAVE_NIFTI1_IO_H
+	rawdata.NIDump   ("image.nii.gz");
+#endif
 
 	return true;
 	
@@ -371,10 +375,10 @@ bool fftwtest (ReconClient* rc) {
 	Matrix<cplx> m;
 
 	m.Read (in, "img");
-	m = m.FFT();
+	m = FFT::Forward(m);
 	m = m.FFTShift();
 	m = m.IFFTShift();
-	m = m.IFFT();
+	m = FFT::Backward(m);
 	m.Dump (out, "img");
 
 	return true;

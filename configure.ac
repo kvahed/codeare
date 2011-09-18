@@ -195,32 +195,6 @@ AC_CHECK_LIB([cdf], [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
 AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
-# Checks for C++ libraries with name spaces
-
-# Magick++
-AC_MSG_CHECKING([for Magick::InitializeMagick(char*) in -lMagick++])
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -llcms -lfreetype -ljpeg -lfontconfig -lXext -lSM -lICE -lX11 -lz -lpthread -lm -lpthread `Magick++-config --ldflags`"
-AC_TRY_LINK([#include <Magick++.h>],
-   [int argc = 0; char** argv = 0; Magick::InitializeMagick(*argv);],
-   [AC_MSG_RESULT([yes])]
-   magick_found=yes,
-   [LIBS=$OLD_LIBS]
-   [AC_MSG_RESULT([no. cannot find libMagick++, a shame. Won't have a lot of functions for the matrix.])])
-if test -z $magick_found; then
-    LIBS=$OLD_LIBS
-fi
-if test "x$magick_found" = "xyes"; then
-    AC_CHECK_PROG(MAGICKPP_CONFIG, Magick++-config, yes, no)
-    if test "x$MAGICKPP_CONFIG" = "xyes"; then
-        IMAGEMAGICK_LIBS=`Magick++-config --libs`
-        IMAGEMAGICK_LDFLAGS=`Magick++-config --ldflags`
-        AC_SUBST(IMAGEMAGICK_LIBS)
-        AC_SUBST(IMAGEMAGICK_LDFLAGS)
-        AC_DEFINE(WITH_IMAGE_MAGICK,1,[Image Magick++ support for bitmap effects])
-    fi
-fi
-
 # Time & Co for FFTW cycle
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[
 #if HAVE_SYS_TIME_H
@@ -237,6 +211,9 @@ AC_TRY_LINK([
 #endif
 ], [_rtc()], [AC_DEFINE(HAVE__RTC,1,[Define if you have the UNICOS _rtc() intrinsic.])], [rtc_ok=no])
 AC_MSG_RESULT($rtc_ok)
+
+
+# Checks for C++ libraries with name spaces
 
 # HDF5
 AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
@@ -302,15 +279,12 @@ else
 fi
          
 AC_SUBST(ITK_INSTALL_PREFIX)
-AC_SUBST(ITK_LIB_FLAG)
-AC_SUBST(ITK_LIB_DIR_FLAG)
 AC_SUBST(HAVE_INSIGHT)
 AC_SUBST(INSIGHT_LIB_FLAG)
 AC_SUBST(INSIGHT_LIB_DIR_FLAG)
 AC_SUBST(INC_INSIGHT_H)
-AC_SUBST(DEF_INSIGHT)
 
-AC_MSG_CHECKING([for itk::Image in ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}])
+AC_MSG_CHECKING([for itk::Image in ITK])
 OLD_LIBS=$LIBS
 OLD_CXXFLAGS=$CXXFLAGS
 LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
