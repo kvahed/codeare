@@ -118,6 +118,11 @@ NuFFT_OMP::Process () {
 	Matrix<double>* kspace  = m_real["kspace"];
 	Matrix<double>* weights = m_real["weights"];
 
+	printf ("  Incoming dimensions:\n");
+	printf ("    Data:    %s \n", data->DimsToCString());
+	printf ("    K-Space: %s \n", kspace->DimsToCString());
+	printf ("    Weights: %s \n", weights->DimsToCString());
+
 	int imgsize = m_N[0] * m_N[1] * m_N[2];
 
 	Matrix <cplx> tmp;
@@ -137,43 +142,41 @@ NuFFT_OMP::Process () {
 		int tid      = omp_get_thread_num();
 		
 #pragma omp for
+		
 		for (int j = 0; j < m_nthreads; j++) {
 			
 			int     os         = j * m_M;
-
+			
 			// Copy data from incoming matrix to the nufft input array
 			for (int i = 0; i < m_M; i++) {
 				(m_iplan[tid].y[i])[0] = (data->At(i + os)).real();
 				(m_iplan[tid].y[i])[1] = (data->At(i + os)).imag();
 			}
-
+			
 			// Copy k-space and weights to allocated memory
 			memcpy (&(m_fplan[tid].x[0]),  &kspace->At(os * m_dim), m_dim * m_M * sizeof(double));
 			memcpy (&(m_iplan[tid].w[0]), &weights->At(         0),         m_M * sizeof(double));
-
-			// Precompute PSI & IFT
-			nfft::weights (&m_fplan[tid], &m_iplan[tid]);
-			nfft::ift     (&m_fplan[tid], &m_iplan[tid], m_maxit, m_epsilon);
-
-		}
-
-#pragma omp for schedule (guided, imgsize/m_nthreads/2)
-	for (int i = 0; i < imgsize; i++)
-		for (int j = 0; j < m_nthreads; j++) {
-			if (m_verbose)
-				tmp[(j+1) * imgsize + i] = cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
-			tmp[i] += cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
-		}
-	
-
-
-	}
 			
-	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
-
+			// Assign weights, Precompute PSI and IFT
+			nfft::weights (&m_fplan[tid], &m_iplan[tid]);
+			nfft::psi (&m_fplan[tid]);
+			nfft::ift (&m_fplan[tid], &m_iplan[tid], m_maxit, m_epsilon);
+			
+		}
+		
+#pragma omp for schedule (guided, imgsize/m_nthreads/2)
+		for (int i = 0; i < imgsize; i++)
+			for (int j = 0; j < m_nthreads; j++) {
+				if (m_verbose)
+					tmp[(j+1) * imgsize + i] = cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
+				tmp[i] += cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
+			}
+	}
+	
+	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 	(*data) = tmp;
 	return error;
-
+	
 }
 
 // the class factories

@@ -78,7 +78,7 @@ am__objects_1 = Toolbox.lo tinystr.lo tinyxml.lo tinyxmlerror.lo \
 	tinyxmlparser.lo xpath_processor.lo xpath_expression.lo \
 	xpath_static.lo action_store.lo xpath_stack.lo lex_util.lo \
 	xpath_stream.lo node_set.lo xml_util.lo xpath_syntax.lo \
-	tokenlist.lo
+	tokenlist.lo FFT.lo
 am_CGSENSE_la_OBJECTS = $(am__objects_1) CGSENSE.lo nfftstub.lo
 CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
 CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -212,7 +212,6 @@ CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
-DEF_INSIGHT = @DEF_INSIGHT@
 DEPDIR = @DEPDIR@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
@@ -224,8 +223,6 @@ EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
 HAVE_INSIGHT = @HAVE_INSIGHT@
-IMAGEMAGICK_LDFLAGS = @IMAGEMAGICK_LDFLAGS@
-IMAGEMAGICK_LIBS = @IMAGEMAGICK_LIBS@
 INC_INSIGHT_H = @INC_INSIGHT_H@
 INSIGHT_LIB_DIR_FLAG = @INSIGHT_LIB_DIR_FLAG@
 INSIGHT_LIB_FLAG = @INSIGHT_LIB_FLAG@
@@ -235,8 +232,6 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 ITK_INSTALL_PREFIX = @ITK_INSTALL_PREFIX@
-ITK_LIB_DIR_FLAG = @ITK_LIB_DIR_FLAG@
-ITK_LIB_FLAG = @ITK_LIB_FLAG@
 LAPACK = @LAPACK@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
@@ -246,7 +241,6 @@ LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
-MAGICKPP_CONFIG = @MAGICKPP_CONFIG@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
@@ -340,7 +334,7 @@ lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	MedianFilter_OMP.la SystemCmd.la LapackTests.la \
 	SpatialDomain.la RelativeSensitivities.la GRAPPA.la \
 	$(am__append_1)
-COMMON = ../Toolbox.hpp ../Toolbox.cpp ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../tinyxml/xpath_processor.h ../tinyxml/xpath_processor.cpp ../tinyxml/xpath_expression.cpp ../tinyxml/xpath_expression.h ../tinyxml/xpath_static.cpp ../tinyxml/xpath_static.h ../tinyxml/action_store.cpp ../tinyxml/action_store.h ../tinyxml/xpath_stack.cpp ../tinyxml/xpath_stack.h ../tinyxml/lex_util.cpp ../tinyxml/lex_util.h ../tinyxml/xpath_stream.cpp ../tinyxml/xpath_stream.h ../tinyxml/node_set.cpp ../tinyxml/node_set.h ../tinyxml/xml_util.cpp ../tinyxml/xml_util.h ../tinyxml/xpath_syntax.cpp ../tinyxml/xpath_syntax.h ../tinyxml/tokenlist.cpp ../tinyxml/tokenlist.h 
+COMMON = ../Toolbox.hpp ../Toolbox.cpp ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../tinyxml/xpath_processor.h ../tinyxml/xpath_processor.cpp ../tinyxml/xpath_expression.cpp ../tinyxml/xpath_expression.h ../tinyxml/xpath_static.cpp ../tinyxml/xpath_static.h ../tinyxml/action_store.cpp ../tinyxml/action_store.h ../tinyxml/xpath_stack.cpp ../tinyxml/xpath_stack.h ../tinyxml/lex_util.cpp ../tinyxml/lex_util.h ../tinyxml/xpath_stream.cpp ../tinyxml/xpath_stream.h ../tinyxml/node_set.cpp ../tinyxml/node_set.h ../tinyxml/xml_util.cpp ../tinyxml/xml_util.h ../tinyxml/xpath_syntax.cpp ../tinyxml/xpath_syntax.h ../tinyxml/tokenlist.cpp ../tinyxml/tokenlist.h ../FFT.hpp ../FFT.cpp
 # Common linker flags
 COMMON_la_LDFLAGS = -module
 
@@ -469,6 +463,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CGSENSE.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FFT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GRAPPA.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GenericRegrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LapackTests.Plo@am__quote@
@@ -649,6 +644,13 @@ tokenlist.lo: ../tinyxml/tokenlist.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../tinyxml/tokenlist.cpp' object='tokenlist.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tokenlist.lo `test -f '../tinyxml/tokenlist.cpp' || echo '$(srcdir)/'`../tinyxml/tokenlist.cpp
+
+FFT.lo: ../FFT.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT FFT.lo -MD -MP -MF $(DEPDIR)/FFT.Tpo -c -o FFT.lo `test -f '../FFT.cpp' || echo '$(srcdir)/'`../FFT.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/FFT.Tpo $(DEPDIR)/FFT.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../FFT.cpp' object='FFT.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o FFT.lo `test -f '../FFT.cpp' || echo '$(srcdir)/'`../FFT.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

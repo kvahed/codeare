@@ -41,7 +41,7 @@ SpatialDomain::Init           ()  {
     Attribute ("Nk",      &m_nk);
     printf ("  # kt-points: %i \n", m_nk);
 	
-    m_max_rf = (float*) malloc (1000 * sizeof(float));
+    m_max_rf = (float*) malloc (100 * sizeof(float));
     for (int i = 0; i < m_nk; i++)
         m_max_rf [m_nk] = 0.0; 
 	
@@ -54,7 +54,7 @@ SpatialDomain::Init           ()  {
     printf ("  # transmitter: %i \n", m_nc);
     
     // rf pulse durations --------------------
-    m_pd = (int*) malloc (m_nk * sizeof(int));
+    m_pd = (int*) malloc (100 * sizeof(int));
     Attribute ("pd",      &m_pd[0]);   
     for (int i = 1; i < m_nk; i++)
         m_pd[i] = m_pd[0];

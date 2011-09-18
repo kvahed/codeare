@@ -35,7 +35,7 @@ PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, in
 	fprintf (fp, "NUsedChannels    = %i\n",             nc);
 	fprintf (fp, "DimRF            = %i\n",          dimrf);
 	fprintf (fp, "DimGradient      = %i\n",          dimgr);
-	fprintf (fp, "MaxAbsRF         = %3.3f\n",      max_rf);		 // scaling for RF amplitude
+	fprintf (fp, "MaxAbsRF         = %3.3f\n",       100.0);		 // scaling for RF amplitude
 	fprintf (fp, "InitialPhase     = %i\n",            0  );
 	fprintf (fp, "Asymmetry        = %1.1f\n",         0.5);
 	fprintf (fp, "\n"                                    );
@@ -105,7 +105,7 @@ PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, in
 	fprintf (fp, "\n"                                   );
 
 	for (int i = 0; i < nt; i++)
-		fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt->At(i,nc+0)), real(pt->At(i,nc+1)), real(pt->At(i,nc+2)));
+		fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt->At(i,nc+0))/maxg, real(pt->At(i,nc+1))/maxg, real(pt->At(i,nc+2))/maxg);
 
 	for (int j = 0; j < nc; j++) {
 		
@@ -115,7 +115,7 @@ PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, in
 		fprintf (fp, "\n");
 		
 		for (int i = 0; i < nt; i++)
-			fprintf (fp, "RF[%i]= %.5f	 %.5f\n", i, abs(pt->At(i,j))*10.0, (arg(pt->At(i,j)) >= 0.0) ? arg(pt->At(i,j)) : 6.28318 + arg(pt->At(i,j)));
+			fprintf (fp, "RF[%i]= %.5f	 %.5f\n", i, abs(pt->At(i,j))*100.0, (arg(pt->At(i,j)) >= 0.0) ? arg(pt->At(i,j)) : 6.28318 + arg(pt->At(i,j)));
 		
 	}
     

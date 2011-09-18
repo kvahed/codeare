@@ -108,11 +108,12 @@ NuFFT::Process () {
 	}
 
 	// Copy k-space and weights to allocated memory
-	memcpy (&(m_fplan.x[0]), &kspace->At(0),  kspace->Size()*sizeof(double));
+	memcpy (&(m_fplan.x[0]),  &kspace->At(0),  kspace->Size()*sizeof(double));
 	memcpy (&(m_iplan.w[0]), &weights->At(0), weights->Size()*sizeof(double));
 
-	// Precompute PSI
+	// Assign weights and precompute PSI
 	nfft::weights (&m_fplan, &m_iplan);
+	nfft::psi (&m_fplan);
 
 	// Inverse FT
 	nfft::ift     (&m_fplan, &m_iplan, m_maxit, m_epsilon);

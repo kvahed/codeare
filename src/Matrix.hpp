@@ -2611,17 +2611,17 @@ Matrix<short>::Max() {
 template <> inline cplx
 Matrix<cplx>::Max() {
 		
-		cplx   max = cplx(0.0,0.0);
-		float tmp =  0.0;
-		
-		for (size_t i = 0; i < Size(); i++) {
-				float abs = sqrt(_M[0].real()*_M[0].real() + _M[0].imag()*_M[0].imag());
-				if (abs > tmp) {
-						tmp = abs;
-						max = _M[i];
-				}
+	cplx   max = cplx(0.0,0.0);
+	float tmp =  0.0;
+	
+	for (size_t i = 0; i < Size(); i++) {
+		float abs = sqrt(_M[0].real()*_M[0].real() + _M[0].imag()*_M[0].imag());
+		if (abs > tmp) {
+			tmp = abs;
+			max = _M[i];
 		}
-		return max;
+	}
+	return max;
 	
 }
 

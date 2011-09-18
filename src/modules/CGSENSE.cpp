@@ -180,6 +180,7 @@ CGSENSE::Process () {
 		memcpy (&(m_fplan[i].x[0]),  &kspace->At(0), m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
 		memcpy (&(m_iplan[i].w[0]), &weights->At(0),                m_fplan[i].M_total * sizeof(double)) ;
 		nfft::weights (&m_fplan[i], &m_iplan[i]);
+		nfft::psi (&m_fplan[i]);
 	}
 
 	// Don't need this anymore
