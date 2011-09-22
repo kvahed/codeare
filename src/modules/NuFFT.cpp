@@ -116,7 +116,7 @@ NuFFT::Process () {
 	nfft::psi (&m_fplan);
 
 	// Inverse FT
-	nfft::ift     (&m_fplan, &m_iplan, m_maxit, m_epsilon);
+	nfft::ift (&m_fplan, &m_iplan, m_maxit, m_epsilon);
 
 	// Resize data for output
 	for (int i = 0; i < INVALID_DIM; i++)

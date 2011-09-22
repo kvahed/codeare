@@ -58,6 +58,7 @@ bool nitest (ReconClient* rc);
 bool fftwtest (ReconClient* rc);
 bool resetest (ReconClient* rc);
 bool grappatest (ReconClient* rc);
+bool cstest (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
@@ -75,6 +76,8 @@ int main (int argc, char** argv) {
 			grappatest (&client);
 		else if (strcmp (test, "SpatialDomain") == 0)
 			sdmtest (&client);
+		else if (strcmp (test, "CompressedSensing") == 0)
+			cstest (&client);
 		else if (strcmp (test, "mxtest") == 0)
 			mxtest (&client);
 		else if (strcmp (test, "nitest") == 0)
@@ -204,6 +207,68 @@ bool cgsensetest (ReconClient* rc) {
 	weights.MXDump   (oif.c_str(), "residuals");
 #endif
 
+	return true;
+	
+}
+
+bool cstest (ReconClient* rc) {
+
+	Matrix<cplx> indata;
+	Matrix<cplx> im_dc;
+	Matrix<double> mask;
+	Matrix<double> pdf;
+	
+	std::string cf  = std::string (base + std::string(config));
+	std::string df  = std::string (base + std::string(data));
+	std::string odf = std::string (base + std::string("/csout.mat"));
+
+	indata.MXRead (df, "data");
+	pdf.MXRead (df, "pdf");
+	mask.MXRead (df, "mask");
+
+	rc->ReadConfig (cf.c_str());
+	
+	if (rc->Init (test) != OK) {
+		printf ("Intialising failed ... bailing out!"); 
+		return false;
+	}
+	
+	// Outgoing -------------
+	
+	rc->SetCplx  ("data", indata); // Measurement data
+	rc->SetReal  ("pdf",  pdf);  // Sensitivities
+	rc->SetReal  ("mask", mask); // Weights
+	
+	// ---------------------
+	
+	rc->Process (test);
+	
+	// Incoming -------------
+	
+	rc->GetCplx ("data", indata);  // Images
+	rc->GetCplx ("im_dc", im_dc);  // Images
+	
+	// ---------------------
+	
+	rc->Finalise   (test);
+	
+#ifdef HAVE_MAT_H	
+	MATFile* mf = matOpen (odf.c_str(), "w");
+
+	if (mf == NULL) {
+		printf ("Error creating file %s\n", odf.c_str());
+		return false;
+	}
+
+	indata.MXDump (mf, "img");
+	im_dc.MXDump (mf, "wvt");
+
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n", odf.c_str());
+		return false;
+	}
+#endif
+	
 	return true;
 	
 }

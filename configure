@@ -10972,7 +10972,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"395M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"395:396M\"" >>confdefs.h
 
 # copyright notice
 
@@ -16739,6 +16739,54 @@ else
 $as_echo "cannot find libcdf, cdf dump / read functionality unavailable!" >&6; }
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gsl_wavelet_alloc in -lgsl" >&5
+$as_echo_n "checking for gsl_wavelet_alloc in -lgsl... " >&6; }
+if ${ac_cv_lib_gsl_gsl_wavelet_alloc+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgsl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gsl_wavelet_alloc ();
+int
+main ()
+{
+return gsl_wavelet_alloc ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_gsl_gsl_wavelet_alloc=yes
+else
+  ac_cv_lib_gsl_gsl_wavelet_alloc=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gsl_gsl_wavelet_alloc" >&5
+$as_echo "$ac_cv_lib_gsl_gsl_wavelet_alloc" >&6; }
+if test "x$ac_cv_lib_gsl_gsl_wavelet_alloc" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGSL 1
+_ACEOF
+
+  LIBS="-lgsl $LIBS"
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libgsl, Compressed sensing reconstruction unavailable!" >&5
+$as_echo "cannot find libgsl, Compressed sensing reconstruction unavailable!" >&6; }
+fi
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nfft_precompute_psi in -lnfft3" >&5
 $as_echo_n "checking for nfft_precompute_psi in -lnfft3... " >&6; }
 if ${ac_cv_lib_nfft3_nfft_precompute_psi+:} false; then :
@@ -16887,6 +16935,27 @@ rm -f core conftest.err conftest.$ac_objext \
 if test -z $hdf5_found; then
     LIBS=$OLD_LIBS
 fi
+
+
+# Blitzwave
+#AC_MSG_CHECKING([for getOrder in -lblitzwave -lblitz])
+#OLD_LIBS=$LIBS
+#LIBS="${LIBS} -lblitzwave -lblitz"
+
+#AC_TRY_LINK([#include <Wavelet.h>],
+#   [
+#   bwave::Wavelet bw;
+#   ],
+#   [AC_MSG_RESULT([yes])]
+#   blitzwave_found=yes,
+#   [LIBS=$OLD_LIBS]
+#   [AC_MSG_RESULT([no. Cannot find libwaveblitz, CompressedSensing reconstruction not available!])])
+#
+#if test -z $blitzwave_found; then
+#    LIBS=$OLD_LIBS
+#fi
+
+
 
 # NIFTI
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nifti_image_read in -lniftiio" >&5

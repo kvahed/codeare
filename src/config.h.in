@@ -63,6 +63,9 @@
 /* Define to 1 if you have the `fftw3f' library (-lfftw3f). */
 #undef HAVE_LIBFFTW3F
 
+/* Define to 1 if you have the `gsl' library (-lgsl). */
+#undef HAVE_LIBGSL
+
 /* Define to 1 if you have the `omniDynamic4' library (-lomniDynamic4). */
 #undef HAVE_LIBOMNIDYNAMIC4
 

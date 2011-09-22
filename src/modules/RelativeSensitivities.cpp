@@ -28,6 +28,7 @@ RRSModule::error_code
 RelativeSensitivities::Init        () {
 
 	Attribute ("echo_shift", &m_echo_shift);
+	Attribute ("cutoff", &m_cutoff);
 	
 	return RRSModule::OK;
 
@@ -93,11 +94,11 @@ RelativeSensitivities::Process     () {
 	double tmp;
 	for (int i = 0; i < mask->Size(); i++) {
 		tmp = log(abs(mask->At(i)));
-		bet.At(i) = (tmp < -2.5) ? 0.0 : tmp + 2.5;
+		bet.At(i) = (tmp < m_cutoff) ? 0.0 : tmp - m_cutoff;
 	}
 	
-	SegmentBrain(&bet, bets);
-	bets->Resample(0.5, LINEAR);
+	SegmentBrain (&bet, bets);
+	bets->Resample (0.5, LINEAR);
 
 	// -----------------------------------------
 
@@ -109,7 +110,7 @@ RelativeSensitivities::Process     () {
 	B0Map (data, b0, m_echo_shift);
 	// -----------------------------------------
 
-	for (int ch = 0; ch < txm->Dim(3); ch++)
+	/*for (int ch = 0; ch < txm->Dim(3); ch++)
 		for (int i = 0; i < bets->Size(); i++)
 			txm->At(ch*bets->Size() + i) *= (double)bets->At(i);
 	
@@ -118,7 +119,7 @@ RelativeSensitivities::Process     () {
 			rxm->At(ch*bets->Size() + i) *= (double)bets->At(i);
 	
 	for (int i = 0; i < bets->Size(); i++)
-		b0->At(i) *= (double)bets->At(i);
+	b0->At(i) *= (double)bets->At(i);*/
 	
 	// Remove original data --------------------
 
