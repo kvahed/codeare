@@ -85,6 +85,13 @@ CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
+CompressedSensing_la_LIBADD =
+am_CompressedSensing_la_OBJECTS = $(am__objects_1) \
+	CompressedSensing.lo
+CompressedSensing_la_OBJECTS = $(am_CompressedSensing_la_OBJECTS)
+CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
 DummyRecon_la_LIBADD =
 am_DummyRecon_la_OBJECTS = $(am__objects_1) DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
@@ -178,17 +185,19 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
-	$(DumpToFile_la_SOURCES) $(GRAPPA_la_SOURCES) \
-	$(GenericRegrid_la_SOURCES) $(LapackTests_la_SOURCES) \
-	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
-	$(NuFFT_OMP_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
+SOURCES = $(CGSENSE_la_SOURCES) $(CompressedSensing_la_SOURCES) \
+	$(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
+	$(GRAPPA_la_SOURCES) $(GenericRegrid_la_SOURCES) \
+	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
+	$(NuFFT_la_SOURCES) $(NuFFT_OMP_la_SOURCES) \
+	$(RelativeSensitivities_la_SOURCES) \
 	$(SpatialDomain_la_SOURCES) $(SystemCmd_la_SOURCES)
-DIST_SOURCES = $(CGSENSE_la_SOURCES) $(DummyRecon_la_SOURCES) \
-	$(DumpToFile_la_SOURCES) $(GRAPPA_la_SOURCES) \
-	$(GenericRegrid_la_SOURCES) $(LapackTests_la_SOURCES) \
-	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
-	$(NuFFT_OMP_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
+DIST_SOURCES = $(CGSENSE_la_SOURCES) $(CompressedSensing_la_SOURCES) \
+	$(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
+	$(GRAPPA_la_SOURCES) $(GenericRegrid_la_SOURCES) \
+	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
+	$(NuFFT_la_SOURCES) $(NuFFT_OMP_la_SOURCES) \
+	$(RelativeSensitivities_la_SOURCES) \
 	$(SpatialDomain_la_SOURCES) $(SystemCmd_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -333,7 +342,7 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	MedianFilter_OMP.la SystemCmd.la LapackTests.la \
 	SpatialDomain.la RelativeSensitivities.la GRAPPA.la \
-	$(am__append_1)
+	CompressedSensing.la $(am__append_1)
 COMMON = ../Toolbox.hpp ../Toolbox.cpp ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../tinyxml/xpath_processor.h ../tinyxml/xpath_processor.cpp ../tinyxml/xpath_expression.cpp ../tinyxml/xpath_expression.h ../tinyxml/xpath_static.cpp ../tinyxml/xpath_static.h ../tinyxml/action_store.cpp ../tinyxml/action_store.h ../tinyxml/xpath_stack.cpp ../tinyxml/xpath_stack.h ../tinyxml/lex_util.cpp ../tinyxml/lex_util.h ../tinyxml/xpath_stream.cpp ../tinyxml/xpath_stream.h ../tinyxml/node_set.cpp ../tinyxml/node_set.h ../tinyxml/xml_util.cpp ../tinyxml/xml_util.h ../tinyxml/xpath_syntax.cpp ../tinyxml/xpath_syntax.h ../tinyxml/tokenlist.cpp ../tinyxml/tokenlist.h ../FFT.hpp ../FFT.cpp
 # Common linker flags
 COMMON_la_LDFLAGS = -module
@@ -363,6 +372,8 @@ SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
 SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 RelativeSensitivities_la_SOURCES = $(COMMON) RelativeSensitivities.hpp RelativeSensitivities.cpp
 RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
+CompressedSensing_la_SOURCES = $(COMMON) CompressedSensing.hpp CompressedSensing.cpp
+CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 all: all-am
 
@@ -431,6 +442,8 @@ clean-libLTLIBRARIES:
 	done
 CGSENSE.la: $(CGSENSE_la_OBJECTS) $(CGSENSE_la_DEPENDENCIES) 
 	$(CGSENSE_la_LINK) $(am_CGSENSE_la_rpath) $(CGSENSE_la_OBJECTS) $(CGSENSE_la_LIBADD) $(LIBS)
+CompressedSensing.la: $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_DEPENDENCIES) 
+	$(CompressedSensing_la_LINK) -rpath $(libdir) $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_LIBADD) $(LIBS)
 DummyRecon.la: $(DummyRecon_la_OBJECTS) $(DummyRecon_la_DEPENDENCIES) 
 	$(DummyRecon_la_LINK) -rpath $(libdir) $(DummyRecon_la_OBJECTS) $(DummyRecon_la_LIBADD) $(LIBS)
 DumpToFile.la: $(DumpToFile_la_OBJECTS) $(DumpToFile_la_DEPENDENCIES) 
@@ -461,6 +474,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CGSENSE.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CompressedSensing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FFT.Plo@am__quote@

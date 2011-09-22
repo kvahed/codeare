@@ -85,6 +85,8 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 
 		
 		double m_echo_shift;
+		double m_cutoff;
+		double m_betf;
 		
 		
 	};
