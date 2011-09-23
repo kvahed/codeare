@@ -31,6 +31,24 @@ using namespace RRServer;
  */
 namespace RRStrategy {
 
+
+	struct CGParam {
+		
+		int    fft;
+		int    pnorm;
+		int    lsiter;
+		int    lsto ;
+		int    cgiter;
+		
+		double tvw;
+		double xfmw;
+		double cgconv;
+		double l1smooth;
+		double lsa;
+		double lsb;
+		
+	};
+
 	/**
 	 * @brief CS reconstruction based on Sparse MRI v0.2 by Michael Lustig
 	 */
@@ -72,18 +90,20 @@ namespace RRStrategy {
 
 	private:
 		
-		int            m_dim;  /**< Image recon dim */
-		int            m_N[3]; /**< Data side lengths */
-		int            m_fft;  /**< FFT mode: 0 - Cartesian, 1 - Non Cartesian */
-		int            m_maxiter; /**< Maximum # iterations */
+		int            m_dim;    /**< Image recon dim */
+		int            m_N[3];   /**< Data side lengths */
+		int            m_csiter; /**< # global iterations */
 
-		double         m_tvw;  /**< Total variation weights */
-		double         m_xfmw; /**< Transform l1 penalty */
+		CGParam        m_cgparam;
 
-		//bwave::Wavelet m_wl;   /**< Wavelet */
-		
-		
 	};
+
+
+	void NLCG (Matrix<cplx>* img, const CGParam* cgp) {
+
+		
+
+	}
 
 }
 #endif /* __COMPRESSED_SENSING_H__ */

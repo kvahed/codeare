@@ -1,6 +1,8 @@
 #include "CompressedSensing.hpp"
+#include "FFT.hpp"
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_wavelet2d.h>
+
 using namespace RRStrategy;
 
 
@@ -21,14 +23,11 @@ CompressedSensing::Init () {
 	Attribute ("Nz",      &m_N[2]);
     printf ("  Geometry: %iD (%i,%i,%i)\n", m_dim, m_N[0], m_N[1], m_N[2]);
 	
-	Attribute ("tvw",     &m_tvw);
-	Attribute ("xfmw",    &m_xfmw);
-    printf ("  Weights: TV(%.4f) L1(%.4f)\n", m_tvw, m_xfmw);
+	Attribute ("tvw",     &m_cgparam.tvw);
+	Attribute ("xfmw",    &m_cgparam.xfmw);
+    printf ("  Weights: TV(%.4f) L1(%.4f)\n", m_cgparam.tvw, m_cgparam.xfmw);
 	
-	Attribute ("maxiter", &m_maxiter);
-    printf ("  Max # iterations: %i\n", m_maxiter);
-
-	Attribute ("fft",     &m_fft);
+	Attribute ("fft",     &m_cgparam.fft);
 	printf ("  FFT class: ");
 	switch (m_fft) 
 		{
@@ -37,6 +36,13 @@ CompressedSensing::Init () {
 		default: printf ("%s", "Cartesian"); m_fft = 0; break;
 		}
 	printf ("\n");
+
+	Attribute ("cgconv", &m_cgparam.cgconv);
+	Attribute ("cgiter", &m_cgparam.cgiter);
+	printf ("  Maximum %i NLCG iterations or convergence to m_cgconv", m_cgparam.cgiter, m_cgparam.cgconv);	
+
+	
+
 	m_initialised = true;
 	printf ("... done.\n\n");
 
@@ -48,33 +54,23 @@ CompressedSensing::Init () {
 RRSModule::error_code
 CompressedSensing::Process () {
 
-	//using namespace blitz;
-    //using namespace bwave;
-	
 	Matrix<cplx>*   data  = m_cplx["data"];
 	Matrix<double>* pdf   = m_real["pdf"];
-	Matrix<double>* mask  = m_real["mask"];
+
 	Matrix<cplx>*   im_dc;
 	AddCplx ("im_dc", im_dc  = new Matrix<cplx> (data->Dim()));
 
-	Matrix<cplx> hann (data->Dim(0), data->Dim(1));
-	hann = cplx(1.0,0.0);
-	hann = hann.HannWindow();
-	
 	ticks tic = getticks();
 
 	printf ("Fourier transforming ... "); fflush(stdout);
 	
-	for (int i = 0; i < data->Size(); i++) {
-		data->At(i) *= mask->At(i);
+	for (int i = 0; i < data->Size(); i++)
 		data->At(i) /= pdf->At(i);
-	}
 	
-	(*data)  = (*data).FFTShift();
-	(*data)  = (*data).IFFT(); // Hann filter first?
-	(*data)  = (*data).IFFTShift();
-	
+	(*data) = FFT::Backward(*data);
+
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+
 	tic = getticks();
 
 	cplx ma = data->Maxabs();
@@ -113,32 +109,15 @@ CompressedSensing::Process () {
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	tic = getticks();
 
-	// Wavelet transform 
-	
-	// XFM = Wavelet('Daubechies',4,4);	% Wavelet
-	
-	// % initialize Parameters for reconstruction
-	// param = init;
-	// param.FT = FT;
-	// param.XFM = XFM;
-	// param.TV = TVOP;
-	// param.data = data;
-	// param.TVWeight =TVWeight;     % TV penalty 
-	// param.xfmWeight = xfmWeight;  % L1 wavelet penalty
-	// param.Itnlim = Itnlim;
-	
-	// figure(100), imshow(abs(im_dc),[]);drawnow;
-	
-	// res = XFM*im_dc;
-	
-	// % do iterations
-	// tic
-	// for n=1:5
-	// 	res = fnlCg(res,param);
-	// 	im_res = XFM'*res;
-	// 	figure(100), imshow(abs(im_res),[]), drawnow
-	// end
-	// toc
+	for (int i = 0; i < m_csiter; i++) {
+		
+		NLCG (im_dc, &m_cgparam);
+		
+		// 	res = fnlCg(res,param);
+		// 	im_res = XFM'*res;
+		// 	figure(100), imshow(abs(im_res),[]), drawnow
+
+	}
 	
 	return OK;
 
