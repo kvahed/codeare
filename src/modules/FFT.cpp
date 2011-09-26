@@ -2,7 +2,7 @@
 #include <fftw3.h>
 
 Matrix<cplx> 
-FFT::Forward (Matrix<cplx>& m)  {
+FFT::Forward (const Matrix<cplx>& m)  {
 	
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
 	
@@ -28,7 +28,7 @@ FFT::Forward (Matrix<cplx>& m)  {
 }
 
 Matrix<cplx>
-FFT::Backward (Matrix<cplx>& m) {
+FFT::Backward (const Matrix<cplx>& m) {
 
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
 	
@@ -55,7 +55,7 @@ FFT::Backward (Matrix<cplx>& m) {
 
 
 Matrix<cplx>
-FFT::Shift (Matrix<cplx>& m) {
+FFT::Shift (const Matrix<cplx>& m) {
 	
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
 	

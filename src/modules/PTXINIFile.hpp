@@ -19,7 +19,7 @@
  */
 
 RRSModule::error_code
-PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, int sampint, float max_rf, std::string* fname) {
+PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, int sampint, float max_rf, std::string* fname, std::string* orientation) {
 	
 	FILE* fp = fopen (fname->c_str(), "wb");
 
@@ -105,7 +105,10 @@ PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, in
 	fprintf (fp, "\n"                                   );
 
 	for (int i = 0; i < nt; i++)
-		fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt->At(i,nc+0))/maxg, real(pt->At(i,nc+1))/maxg, real(pt->At(i,nc+2))/maxg);
+		if (orientation->compare("transversal") == 0)
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt->At(i,nc+0))/maxg, real(pt->At(i,nc+1))/maxg, real(pt->At(i,nc+2))/maxg);
+		else if (orientation->compare("sagittal") == 0)
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt->At(i,nc+2))/maxg, real(pt->At(i,nc+1))/maxg, real(pt->At(i,nc+0))/maxg);
 
 	for (int j = 0; j < nc; j++) {
 		

@@ -1,7 +1,4 @@
 #include "CompressedSensing.hpp"
-#include "FFT.hpp"
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_wavelet2d.h>
 
 using namespace RRStrategy;
 
@@ -54,6 +51,9 @@ CompressedSensing::Init () {
 RRSModule::error_code
 CompressedSensing::Process () {
 
+	printf ("Processing CompressedSensing ...\n");
+	ticks csstart = getticks();
+
 	Matrix<cplx>*   data  = m_cplx["data"];
 	Matrix<double>* pdf   = m_real["pdf"];
 
@@ -62,7 +62,7 @@ CompressedSensing::Process () {
 
 	ticks tic = getticks();
 
-	printf ("Fourier transforming ... "); fflush(stdout);
+	printf ("  Fourier transforming ... "); fflush(stdout);
 	
 	for (int i = 0; i < data->Size(); i++)
 		data->At(i) /= pdf->At(i);
@@ -76,49 +76,26 @@ CompressedSensing::Process () {
 	cplx ma = data->Maxabs();
 	(*data)  /= ma;
 
-	printf ("Wavelet transforming ... "); fflush(stdout);
+	printf ("  Wavelet transforming ... "); fflush(stdout);
 
-	gsl_wavelet           *w    = gsl_wavelet_alloc (gsl_wavelet_daubechies, 4);
-	gsl_wavelet_workspace *work = gsl_wavelet_workspace_alloc (data->Size());
+	(*im_dc) = DWT::Forward (*data);
 
-	double* re = (double*) malloc (data->Size()*sizeof(double));
-	double* im = (double*) malloc (data->Size()*sizeof(double));
-	size_t  l  = data->Dim(0); // Needs to be power of 2 and quadratic
-
-	for (size_t j = 0; j < l; j++)
-		for (size_t i = 0; i < l; i++) {
-			re [i*l+j] = data->At(j*l+i).real();
-			im [i*l+j] = data->At(j*l+i).imag();
-		}
-
-	if (!(gsl_wavelet2d_nstransform_forward (w, re, l, l, l, work) == GSL_SUCCESS))
-		printf ("Wavelet transfor for real part failed\n.");
-
-	if (!(gsl_wavelet2d_nstransform_forward (w, im, l, l, l, work) == GSL_SUCCESS))
-		printf ("Wavelet transfor for imaginary part failed\n.");
-
-	for (size_t j = 0; j < l; j++)
-		for (size_t i = 0; i < l; i++) {
-			im_dc->At(j*l+i) = cplx(re[i*l+j],im [i*l+j]);
-		}
-
-	free (re);
-	free (im);
-	gsl_wavelet_workspace_free (work);
-	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+
 	tic = getticks();
+
+	printf ("  Running CG ... "); fflush(stdout);
 
 	for (int i = 0; i < m_csiter; i++) {
 		
-		NLCG (im_dc, &m_cgparam);
+		NLCG ((*im_dc), (*data), m_cgparam);
 		
-		// 	res = fnlCg(res,param);
-		// 	im_res = XFM'*res;
-		// 	figure(100), imshow(abs(im_res),[]), drawnow
-
 	}
 	
+	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+
+	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), csstart) / Toolbox::Instance()->ClockRate());
+
 	return OK;
 
 }

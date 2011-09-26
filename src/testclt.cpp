@@ -21,7 +21,7 @@
 #include "options.h"
 #include "ReconClient.hpp"
 #include "ReconContext.hpp"
-#include "FFT.hpp"
+#include "modules/FFT.hpp"
 
 #ifndef __WIN32__
     #include "config.h"
@@ -469,8 +469,10 @@ bool resetest (ReconClient* rc) {
 
 	std::string    cf  = std::string (base + std::string (config));
 	rc->ReadConfig (cf.c_str());
-	rc->DumpConfig ("con.xml");
-	
+
+	int use_bet = 0;
+	rc->Attribute ("use_bet", &use_bet);
+
 	stringstream ss;
 	string mef, maf;
 
@@ -488,7 +490,8 @@ bool resetest (ReconClient* rc) {
 	//sprintf ("--- %s ---\n", mef.c_str());
 
 	meas.RAWRead (mef, std::string("VB15"));
-	mask.RAWRead (maf, std::string("VB15"));
+	if (use_bet==1)
+		mask.RAWRead (maf, std::string("VB15"));
 
 	rc->SetCplx ("meas", meas);
 	rc->SetCplx ("mask", mask);
