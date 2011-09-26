@@ -15,7 +15,7 @@ public:
 	 * @return  Transform
 	 */
 	static Matrix<cplx> 
-	Forward     (Matrix<cplx>& m);
+	Forward     (const Matrix<cplx>& m);
 	
 
 	/**
@@ -25,7 +25,7 @@ public:
 	 * @return  Transform
 	 */
 	static Matrix<cplx> 
-	Backward    (Matrix<cplx>& m);
+	Backward    (const Matrix<cplx>& m);
 	
 
 	/**
@@ -35,7 +35,7 @@ public:
 	 * @return  Shifted
 	 */
 	static Matrix<cplx> 
-	Shift    (Matrix<cplx>& m);
+	Shift    (const Matrix<cplx>& m);
 	
 
 private:

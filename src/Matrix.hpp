@@ -1627,7 +1627,16 @@ public:
 	 * @return          Result
      */
     Matrix<T>           
-    operator^           (float p);
+    operator^           (const float p);
+    
+    /**
+     * @brief           Elementwise raise of power. i.e. this .^ p.
+     *
+     * @param  p        Power.
+	 * @return          Result
+     */
+    Matrix<T>           
+    operator^=          (const float p);
     
 	//friend Matrix<T> operator+(Matrix<T> &a, Matrix<T> &b){return a+b;};
     //@}
@@ -1657,7 +1666,7 @@ public:
 	 * @return          Result
      */
     Matrix<T>           
-    operator*           (Matrix<T> &M);
+    operator*           (const Matrix<T> &M);
 
 
     /**
@@ -1667,7 +1676,7 @@ public:
 	 * @return          Result
      */
     Matrix<T>           
-    operator*=           (Matrix<T> &M);
+    operator*=           (const Matrix<T> &M);
     
     
     /**
@@ -1677,7 +1686,7 @@ public:
 	 * @return          Result
      */
     Matrix<T>           
-    operator*=           (T s);
+    operator*=           (const T s);
     
     
     /**
@@ -1687,7 +1696,7 @@ public:
 	 * @return          Result
      */
     Matrix<T>           
-    operator/=           (Matrix<T> &M);
+    operator/=           (const Matrix<T> &M);
     
     
     /**
@@ -1707,7 +1716,7 @@ public:
 	 * @return          Result
      */
     Matrix<T>           
-    operator+=           (Matrix<T> &M);
+    operator+=           (const Matrix<T> &M);
     
     
     /**
@@ -1718,6 +1727,26 @@ public:
      */
     Matrix<T>           
     operator+=           (T s);
+    
+    
+    /**
+     * @brief           ELementwise substraction and assignment operator. i.e. this = m.
+     *
+     * @param  M        Added matrix.
+	 * @return          Result
+     */
+    Matrix<T>           
+    operator-=           (const Matrix<T> &M);
+    
+    
+    /**
+     * @brief           ELementwise substration with scalar and assignment operator. i.e. this = m.
+     *
+     * @param  s        Added scalar.
+	 * @return          Result
+     */
+    Matrix<T>           
+    operator-=           (const T s);
     
     
     /**

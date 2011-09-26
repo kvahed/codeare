@@ -251,7 +251,7 @@ SpatialDomain::Process        () {
 
 	// Write pulse file for Siemens sequences
 
-	PTXWriteSiemensINIFile (b1, 2, 3, m_nc, 10, m_max_rf[0], &m_ptxfname);
+	PTXWriteSiemensINIFile (b1, 2, 3, m_nc, 10, m_max_rf[0], &m_ptxfname, &m_orient);
 	// -----------------------------------
 
 	// Return NRMSE down the road --------

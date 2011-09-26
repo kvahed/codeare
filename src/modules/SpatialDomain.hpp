@@ -228,7 +228,7 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<cplx>* b1, 
         for (int c = 0; c < nc; c++) 
             for (int k = 0; k < nk; k++) 
                 for (int s = 0; s < ns; s++) 
-                    m->At (c*nk*ns + k*ns + s) = 
+                    m->At (s, c*nk + k) = 
 						// b1 (s,c)
                         pgd * b1->At(s,c) *
 						// off resonance: exp (2i\pidb0dt)  
@@ -238,6 +238,9 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<cplx>* b1, 
         
     }
 	
+	m->MXDump ("m.mat", "m");
+	b1->MXDump ("b1.mat", "b1");
+
 	free (t);
 	free (d);
     

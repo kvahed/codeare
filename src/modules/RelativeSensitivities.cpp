@@ -28,7 +28,9 @@ RRSModule::error_code
 RelativeSensitivities::Init        () {
 
 	Attribute ("echo_shift", &m_echo_shift);
-	Attribute ("cutoff", &m_cutoff);
+	Attribute ("cutoff",     &m_cutoff);
+	Attribute ("use_bet",    &m_use_bet);
+	Attribute ("log_mask",   &m_log_mask);
 	
 	return RRSModule::OK;
 
@@ -82,23 +84,36 @@ RelativeSensitivities::Process     () {
 
 	// Do we have GRE for segmentation? --------
 
-	FTVolumes (mask);
-	RemoveOS  (mask);
-	mask->SOS (mask->HDim());
-	
-	Matrix<double> bet(mask->Dim());
-
 	Matrix<short>* bets;
 	AddPixel ("bets", bets = new Matrix<short> (mask->Dim()));
-
-	double tmp;
-	for (int i = 0; i < mask->Size(); i++) {
-		tmp = log(abs(mask->At(i)));
-		bet.At(i) = (tmp < m_cutoff) ? 0.0 : tmp - m_cutoff;
-	}
 	
-	SegmentBrain (&bet, bets);
-	bets->Resample (0.5, LINEAR);
+	if (m_use_bet == 1) { // Better test? / Replace with SNRO?
+		
+		FTVolumes (mask);
+		RemoveOS  (mask);
+		mask->SOS (mask->HDim());
+		
+		Matrix<double> bet(mask->Dim());
+		double         tmp = 0.0;
+
+		for (int i = 0; i < mask->Size(); i++) {
+			tmp = log(abs(mask->At(i)));
+			bet.At(i) = (tmp < m_cutoff) ? 0.0 : tmp - m_cutoff;
+		}
+		
+		SegmentBrain (&bet, bets);
+		bets->Resample (0.5, LINEAR);
+
+	} else if (m_use_bet == 2) {
+
+		LogMask ((*snro), m_cutoff);
+
+	} else {
+
+		for (size_t i = 0; i < bets->Size(); i++)
+			bets->At(i) = 1;
+
+	}
 
 	// -----------------------------------------
 
@@ -110,6 +125,8 @@ RelativeSensitivities::Process     () {
 	B0Map (data, b0, m_echo_shift);
 	// -----------------------------------------
 
+	// Weighing with masks ---------------------
+
 	/*for (int ch = 0; ch < txm->Dim(3); ch++)
 		for (int i = 0; i < bets->Size(); i++)
 			txm->At(ch*bets->Size() + i) *= (double)bets->At(i);
@@ -120,12 +137,12 @@ RelativeSensitivities::Process     () {
 	
 	for (int i = 0; i < bets->Size(); i++)
 	b0->At(i) *= (double)bets->At(i);*/
-	
-	// Remove original data --------------------
+	// -----------------------------------------
+
+	// Remove original data from RAM -----------
 
     FreeCplx ("meas");
 	// -----------------------------------------
-
 	
 	printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 	return RRSModule::OK;

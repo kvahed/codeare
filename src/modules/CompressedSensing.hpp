@@ -22,6 +22,8 @@
 #define __COMPRESSED_SENSING_HPP__
 
 #include "ReconStrategy.hpp"
+#include "FFT.hpp"
+#include "DWT.hpp"
 
 using namespace RRServer;
 
@@ -99,11 +101,58 @@ namespace RRStrategy {
 	};
 
 
-	void NLCG (Matrix<cplx>* img, const CGParam* cgp) {
+	void GradObj   (const Matrix<cplx>& x, const Matrix<cplx>& data, const CGParam& cgp, Matrix<cplx>& grad) {
 
-		
+		grad  = DWT::Backward (x);
+		grad  = FFT::Forward  (x);
+		grad -= data;
+		grad  = FFT::Backward (x);
+		grad  = DWT::Forward  (x);
+		grad *= cplx(2.0,0.0);
 
 	}
+
+	void GradXFM   (const Matrix<cplx>& x, const Matrix<cplx>& data, const CGParam& cgp, Matrix<cplx>& grad) {
+		
+		Matrix<cplx> xtr = x.tr();
+
+		grad  = x;
+		grad *= xtr;
+		grad += cplx(cgp.l1smooth,0.0);
+		grad  = grad ^ (((float)cgp.pnorm)/2.0-1.0);
+		grad *= x;
+
+	}
+
+	void GradTV    (const Matrix<cplx>& x, const Matrix<cplx>& data, const CGParam& cgp, Matrix<cplx>& grad) {
+
+		// Dx = params.TV*(params.XFM'*x);
+		// G = params.pNorm*Dx.*(Dx.*conj(Dx) + params.l1Smooth).^(params.pNorm/2-1);
+		// grad = params.XFM*(params.TV'*G);
+
+	}
+
+	void WGradient          (const Matrix<cplx>& x, const Matrix<cplx>& data, const CGParam& cgp, Matrix<cplx>& grad) {
+
+		GradObj (x, data, cgp, grad);
+		GradXFM (x, data, cgp, grad);
+		GradTV  (x, data, cgp, grad);
+
+		//grad = (gradObj +  params.xfmWeight.*gradXFM + params.TVWeight.*gradTV);
+
+	} 
+
+
+	void NLCG               (Matrix<cplx>& x, Matrix<cplx>& data, const CGParam& cgp) {
+
+		int k = 0;
+		int t = 1;
+
+		Matrix<cplx> grad (data.Dim());
+		WGradient (x, data, cgp, grad);
+
+	}
+
 
 }
 #endif /* __COMPRESSED_SENSING_H__ */

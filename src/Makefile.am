@@ -20,7 +20,7 @@ CLIENT_SIDE =  ReconClient.h ReconClient.cpp ReconContext.h ReconContext.cpp  Re
 SERVER_SIDE =  Loader.h ReconContext.h ReconContext.cpp ReconServant.h ReconServant.cpp ReconStrategy.hpp
 
 # Rules for testclt
-testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) testclt.cpp
+testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) modules/FFT.hpp modules/FFT.cpp testclt.cpp
 testclt_LDFLAGS = $(BLAS) $(LAPACK) 
 
 # Rules for reconserver

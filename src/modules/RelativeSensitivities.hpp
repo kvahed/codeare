@@ -86,7 +86,10 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 		
 		double m_echo_shift;
 		double m_cutoff;
-		double m_betf;
+
+		int m_use_bet;
+		int m_log_mask;
+		
 		
 		
 	};
@@ -286,8 +289,8 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 				r = cplx (0.0,0.0);
 				for (int j = 0; j < nc; j++)
 					r += tmp[i + 2*j*np] * conj(tmp[i + (2*j+1)*np]);
-				b0->At(i) = arg(r) / GAMMA_1_PER_UT_MS / TE; 
-;
+				b0->At(i) = arg(r) / GAMMA_1_PER_UT_MS / TE / 2; 
+
 			}
 			
 		}
@@ -329,6 +332,19 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
  		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 		return RRSModule::OK;
+
+	}
+
+
+
+	void LogMask (Matrix<double>& m, const double& m_cutoff) {
+
+		double tmp = 0.0;
+
+		m.MXDump ("snro.mat", "snro");
+
+		for (int i = 0; i < m.Size(); i++)
+			m[i] = (log(abs(m[i])) < m_cutoff) ? 0.0 : 1.0;
 
 	}
 

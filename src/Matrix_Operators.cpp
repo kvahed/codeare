@@ -472,7 +472,7 @@ Matrix<T>::operator+(T s) {
 
 
 template <class T> inline Matrix<T> 
-Matrix<T>::operator^(float p) {
+Matrix<T>::operator^(const float p) {
     
 	Matrix<T> res;
     
@@ -487,11 +487,11 @@ Matrix<T>::operator^(float p) {
 #pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
 		
 	for (size_t i = 0; i < Size(); i++)
+
         if (p == 0)
             res[i] = 1;
         else
 			res[i] = pow(_M[i],  p);
-
 
 	}
 
@@ -500,8 +500,30 @@ Matrix<T>::operator^(float p) {
 }
 
 
+template <class T> inline Matrix<T>
+Matrix<T>::operator ^= (const float p) {
+    
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+		
+	for (size_t i = 0; i < Size(); i++)
+		
+        if (p == 0)
+            _M[i] = 1;
+        else
+			_M[i] = pow(_M[i],  p);
+	
+	}
+
+    return *this;
+
+}
+
+
 template <class T> inline Matrix<T> 
-Matrix<T>::operator*(Matrix<T> &M) {
+Matrix<T>::operator*(const Matrix<T> &M) {
 
     Matrix<T> res;
 
@@ -549,7 +571,7 @@ Matrix<T>::operator* (T s) {
 
 
 template <class T> inline Matrix<T> 
-Matrix<T>::operator += (Matrix<T> &M) {
+Matrix<T>::operator += (const Matrix<T> &M) {
     
     size_t i;
 
@@ -596,7 +618,54 @@ Matrix<T>::operator+= (T s) {
 
 
 template <class T> inline Matrix<T> 
-Matrix<T>::operator *= (Matrix<T> &M) {
+Matrix<T>::operator -= (const Matrix<T> &M) {
+    
+    size_t i;
+
+	for (size_t i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
+
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+		
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] -= M[i];
+		
+	}
+
+    return *this;
+
+}
+
+
+template <class T> inline Matrix<T>
+Matrix<T>::operator-= (T s) {
+    
+    Matrix<T> res;
+
+	for (size_t j = 0; j < INVALID_DIM; j++)
+		res.Dim(j) = _dim[j];
+
+	res.Reset();
+
+#pragma omp parallel default (shared) 
+	{
+
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+	for (size_t i = 0; i < Size(); i++)
+		res[i] = _M[i] - s;
+	
+	}
+
+	return res;
+
+}
+
+
+template <class T> inline Matrix<T> 
+Matrix<T>::operator *= (const Matrix<T> &M) {
     
     size_t i;
 
@@ -619,7 +688,7 @@ Matrix<T>::operator *= (Matrix<T> &M) {
 
 
 template <class T> inline Matrix<T>
-Matrix<T>::operator *= (T s) {
+Matrix<T>::operator *= (const T s) {
     
 #pragma omp parallel default (shared) 
 	{
@@ -637,7 +706,7 @@ Matrix<T>::operator *= (T s) {
 
 
 template <class T> inline Matrix<T> 
-Matrix<T>::operator /= (Matrix<T> &M) {
+Matrix<T>::operator /= (const Matrix<T> &M) {
     
     size_t i;
 
