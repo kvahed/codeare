@@ -3,26 +3,29 @@
 
 #include "Matrix.hpp"
 
+/**
+ * @brief 2D Discrete wavelet transform for Matrix template<br/>(Daubechies wavelets)
+ */
 class DWT {
 	
 
 public:
 
 	/**
-	 * @brief   Forward transform
+	 * @brief    Forward transform
 	 *
-	 * @param   To transform
-	 * @return  Transform
+	 * @param  m To transform
+	 * @return   Transform
 	 */
 	static Matrix<cplx> 
 	Forward     (const Matrix<cplx>& m);
 	
 
 	/**
-	 * @brief   Backward transform
+	 * @brief    Backward transform
 	 *
-	 * @param   To transform
-	 * @return  Transform
+	 * @param  m To transform
+	 * @return   Transform
 	 */
 	static Matrix<cplx> 
 	Backward    (const Matrix<cplx>& m);
@@ -30,14 +33,20 @@ public:
 
 private:
 	
+	/**
+	 * Static class
+	 */
 	DWT()  {};
-	~DWT() {};
 
+	/**
+	 * Static class
+	 */
+	~DWT() {};
 
 	/**
 	 * @brief   Transform
 	 *
-	 * @param       To transform
+	 * @param   m   To transform
 	 * @param   bw  Backward: true, Forward: false
 	 * @return      Transform
 	 */

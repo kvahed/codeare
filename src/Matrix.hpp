@@ -64,6 +64,8 @@ enum InterpMethod {
 #include "mat.h"
 #endif
 
+#include "Ptr.h"
+
 /**
  * @brief raw data
  */
@@ -150,7 +152,7 @@ enum io_strategy {
  * @date    Mar 2010
  */
 template <class T>
-class Matrix {
+class Matrix  : public SmartObject {
     
 
 public:
@@ -2008,6 +2010,13 @@ public:
     
     //@{
     
+	/**
+	 * @brief           Who are we?
+	 *
+	 * @return          Class name
+	 */ 
+	const char* GetClassName() const { return "CSomeClass"; }
+
 
 	/**
 	 * @brief           Multiple subscripts from linear index (MATLAB like)
@@ -2095,7 +2104,7 @@ public:
 	 * @brief           Resampling up to 3D to
 	 *
 	 * @param  f        Resampling factors <1 reduction >1 expansion
-	 * @param  i        Interpolation method @see InterpMethod
+	 * @param  im       Interpolation method @see InterpMethod
 	 */
 	void
 	Resample            (const double& f, const InterpMethod& im);
@@ -2105,7 +2114,7 @@ public:
 	 * @brief           Resampling up to 3D to
 	 *
 	 * @param  f        Resampling factors <1 reduction >1 expansion
-	 * @param  i        Interpolation method @see InterpMethod
+	 * @param  im       Interpolation method @see InterpMethod
 	 */
 	Matrix<T>
 	Resample            (const double& f, const InterpMethod& im) const;
@@ -2507,7 +2516,7 @@ private:
      * @brief           Matrix vector product with BLAS.
      *
 	 * @param  M        Multiplie with
-	 * @param  transb   Transpose M
+	 * @param  transa   Transpose M
 	 *
      * @return          Product of this and M.
      */

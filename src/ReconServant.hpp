@@ -39,15 +39,15 @@ namespace RRServer {
 	
 	class ReconContext;
 
+
 	/**
 	 * @brief Servant implementation 
 	 *        Perform duties on remote server
 	 */
 	class ReconServant : 
-		public POA_RRSModule::RRSInterface , 
+		public POA_RRSModule::RRSInterface, 
 		public PortableServer::RefCountServantBase {
 		
-
 
 	public:
 
