@@ -134,15 +134,12 @@ namespace RRServer {
 		 * @param  m    The added matrix
 		 * @return      Success
 		 */
-		bool
+		Matrix<cplx>&
 		AddCplx         (const string name, Matrix<cplx>* m) {
 
-			if (m_cplx.find (name) == m_cplx.end())
-				m_cplx.insert (pair<string, Matrix<cplx>*> (name, m));
-			else 
-				return false;
-
-			return true;
+			assert (m_cplx.find (name) == m_cplx.end());
+			m_cplx.insert (pair<string, Matrix<cplx>*> (name, m));
+			return *m_cplx[name];
 			
 		}
 
@@ -173,17 +170,14 @@ namespace RRServer {
 		 *
 		 * @param  name Name
 		 * @param  m    The added matrix
-		 * @return      Success
+		 * @return      Reference to 
 		 */
-		bool
+		Matrix<double>&
 		AddReal         (const string name, Matrix<double>* m) {
 
-			if (m_real.find (name) == m_real.end())
-				m_real.insert (pair<string, Matrix<double>*> (name, m));
-			else 
-				return false;
-
-			return true;
+			assert(m_real.find (name) == m_real.end());
+			m_real.insert (pair<string, Matrix<double>*> (name, m));
+			return *m_real[name];
 			
 		}
 
@@ -216,15 +210,12 @@ namespace RRServer {
 		 * @param  m    The added matrix
 		 * @return      Success
 		 */
-		bool
+		Matrix<short>&
 		AddPixel        (const string name, Matrix<short>* m) {
 
-			if (m_pixel.find (name) == m_pixel.end())
-				m_pixel.insert (pair<string, Matrix<short>*> (name, m));
-			else 
-				return false;
-
-			return true;
+			assert (m_pixel.find (name) == m_pixel.end());
+			m_pixel.insert (pair<string, Matrix<short>*> (name, m));
+			return *m_pixel[name];
 			
 		}
 
