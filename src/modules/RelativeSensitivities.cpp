@@ -40,8 +40,8 @@ RelativeSensitivities::Init        () {
 RRSModule::error_code
 RelativeSensitivities::Process     () { 
 
-    Matrix<cplx>*   data = m_cplx["meas"];
-    Matrix<cplx>*   mask = m_cplx["mask"];
+    Matrix<cplx>& data = *(m_cplx["meas"]);
+    Matrix<cplx>& mask = *(m_cplx["mask"]);
 
     printf ("  Processing map generation ...\n");
     ticks start = getticks();
@@ -49,15 +49,15 @@ RelativeSensitivities::Process     () {
 
     // Squeeze matrices ---------------------------
 
-    data->Squeeze();
-    mask->Squeeze();
+    data.Squeeze();
+    mask.Squeeze();
 
     printf ("  Data:\n");
-    printf ("    Dimensions: %s \n", data->DimsToCString());
-    printf ("    Reolutions: %s \n", data->ResToCString());
+    printf ("    Dimensions: %s \n", data.DimsToCString());
+    printf ("    Reolutions: %s \n", data.ResToCString());
     printf ("  Mask:\n");
-    printf ("    Dimensions: %s \n", mask->DimsToCString());
-    printf ("    Reolutions: %s \n", mask->ResToCString());
+    printf ("    Dimensions: %s \n", mask.DimsToCString());
+    printf ("    Reolutions: %s \n", mask.ResToCString());
     // -----------------------------------------
 
     // Fourier transform -----------------------
@@ -67,51 +67,50 @@ RelativeSensitivities::Process     () {
     // -----------------------------------------
 
     // SVD calibration -------------------------
+    AddCplx ("rxm",  new Matrix<cplx>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5)));
+    AddCplx ("txm",  new Matrix<cplx>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4)));
+    AddCplx ("shim", new Matrix<cplx>   (data.Dim(4), 1));
+    AddReal ("snro", new Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2)));
 
-    Matrix<cplx>*   rxm;
-    Matrix<cplx>*   txm;
-    Matrix<cplx>*   shim;
-    Matrix<double>* snro;
-
-    AddCplx ("rxm",  rxm  = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(5)));
-    AddCplx ("txm",  txm  = new Matrix<cplx>   (data->Dim(0), data->Dim(1), data->Dim(2), data->Dim(4)));
-    AddCplx ("shim", shim = new Matrix<cplx>   (data->Dim(4), 1));
-    AddReal ("snro", snro = new Matrix<double> (data->Dim(0), data->Dim(1), data->Dim(2)));
+    Matrix<cplx>&   rxm  = *(m_cplx["rxm"]);
+    Matrix<cplx>&   txm  = *(m_cplx["txm"]);
+    Matrix<cplx>&   shim = *(m_cplx["shim"]);
+    Matrix<double>& snro = *(m_real["snro"]);
 
     SVDCalibrate (data, rxm, txm, snro, shim, false);
 
-       // -----------------------------------------
+	// -----------------------------------------
 
     // Do we have GRE for segmentation? --------
 
-    Matrix<short>* bets;
-    AddPixel ("bets", bets = new Matrix<short> (mask->Dim()));
-    
+    AddPixel ("bets", new Matrix<short> (mask.Dim()));
+	Matrix<short>& bets = *(m_pixel["bets"]);
+
     if (m_use_bet == 1) { // Better test? / Replace with SNRO?
       
         FTVolumes (mask);
         RemoveOS  (mask);
-        mask->SOS (mask->HDim());
+        mask.SOS (mask.HDim());
         
-        Matrix<double> bet(mask->Dim());
+        Matrix<double> bet(mask.Dim());
         double         tmp = 0.0;
 
-        for (int i = 0; i < mask->Size(); i++) {
-            tmp = log(abs(mask->At(i)));
-            bet.At(i) = (tmp < m_cutoff) ? 0.0 : tmp - m_cutoff;
+        for (int i = 0; i < mask.Size(); i++) {
+            tmp = log(abs(mask[i]));
+            bet[i] = (tmp < m_cutoff) ? 0.0 : tmp - m_cutoff;
         }
         
-        SegmentBrain (&bet, bets);
-        bets->Resample (0.5, LINEAR);
+        SegmentBrain (bet, bets);
+        bets.Resample (0.5, LINEAR);
 
     } else if (m_use_bet == 2) {
-
-        LogMask ((*snro), m_cutoff);
-
+		
+        LogMask (snro, m_cutoff);
+		
     } else {
 
-        for (size_t i = 0; i < bets->Size(); i++)
-            bets->At(i) = 1;
+        for (size_t i = 0; i < bets.Size(); i++)
+            bets[i] = 1;
 
     }
 
@@ -119,24 +118,23 @@ RelativeSensitivities::Process     () {
 
     // B0 calculation --------------------------
 
-    Matrix<double>* b0;
-    AddReal ("b0", b0 = new Matrix<double> (data->Dim(0), data->Dim(1), data->Dim(2)));
+    AddReal ("b0", new Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2)));
+	Matrix<double>& b0 = *(m_real["b0"]);
 
     B0Map (data, b0, m_echo_shift);
     // -----------------------------------------
 
     // Weighing with masks ---------------------
-
-    /*for (int ch = 0; ch < txm->Dim(3); ch++)
-        for (int i = 0; i < bets->Size(); i++)
-            txm->At(ch*bets->Size() + i) *= (double)bets->At(i);
+    for (int ch = 0; ch < txm.Dim(3); ch++)
+        for (int i = 0; i < bets.Size(); i++)
+            txm[ch*bets.Size() + i] *= (double)bets[i];
     
-    for (int ch = 0; ch < rxm->Dim(3); ch++)
-        for (int i = 0; i < bets->Size(); i++)
-            rxm->At(ch*bets->Size() + i) *= (double)bets->At(i);
+    for (int ch = 0; ch < rxm.Dim(3); ch++)
+        for (int i = 0; i < bets.Size(); i++)
+            rxm[ch*bets.Size() + i] *= (double)bets[i];
     
-    for (int i = 0; i < bets->Size(); i++)
-    b0->At(i) *= (double)bets->At(i);*/
+    for (int i = 0; i < bets.Size(); i++)
+		b0[i] *= (double)bets[i];
     // -----------------------------------------
 
     // Remove original data from RAM -----------
@@ -156,6 +154,7 @@ RelativeSensitivities::Finalise    () {
     return RRSModule::OK;
 
 }
+
 
 // the class factories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {

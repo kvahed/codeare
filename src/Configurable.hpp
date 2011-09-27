@@ -2,7 +2,7 @@
 #define __CONFIGURABLE_HPP__
 
 #include "tinyxml/tinyxml.h"
-
+#include <string>
 
 /**
  * @brief Skeleton of an XML configurable class

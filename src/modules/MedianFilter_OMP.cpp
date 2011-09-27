@@ -22,48 +22,64 @@
 
 using namespace RRStrategy;
 
-template <class T> T** CreateImage(int n,int m){
+template <class T> T** CreateImage (int n, int m) {
+
 	T** pp = new T* [n];
-	pp[0] = new T [n*m];
-	for (int i = 1; i < n; ++i) pp[i] = pp[i-1] + m;
+	pp[0]  = new T [n*m];
+
+	for (int i = 1; i < n; ++i) 
+		pp[i] = pp[i-1] + m;
+
 	return pp;
+
 }
 
-int t_compare_ints( const void* a, const void* b ) {
+int t_compare_ints 
+(const void* a, const void* b) {
+
 	int* arg1 = (int*) a;
 	int* arg2 = (int*) b;
-	if( *arg1 < *arg2 ) return -1;
-	else if( *arg1 == *arg2 ) return 0;
-	else return 1;
+
+	if ( *arg1 < *arg2 ) 
+		return -1;
+	else if( *arg1 == *arg2 ) 
+		return 0;
+	else 
+		return 1;
+
 }
 
-template <class T> void DeleteImage(T** pp){
+template <class T> void 
+DeleteImage (T** pp) {
+
 	delete [] pp[0];
 	delete [] pp;
+
 }
 
 
-RRSModule::error_code MedianFilter_OMP::Process () {
+RRSModule::error_code 
+MedianFilter_OMP::Process () {
 	
 	const int ww = 25;
 	const int wh = 25;
-
+	
 	int iw = m_pixel.begin()->second->Width(); //image width 
 	int ih = m_pixel.begin()->second->Height(); //image height
-
+	
 	int ex = (ww / 2), ey = (wh / 2);
 	int array[ww*wh];
 	
 	int x,y,fx,fy;
 	int** input_image  = CreateImage<int>(iw,ih);
-
-
+	
+	
 #pragma omp parallel default(shared)  private(y,fx,fy)
 	{
 		int tid      = omp_get_thread_num();
 		int nthreads = omp_get_num_threads();
 		int chunk    = iw/nthreads; //chunk-size for loop splitting
-
+		
 		if (tid==0) 
 			std::cout << "MedianFilter_OMP::Process() running on " << iw << "x" << ih 
 					  << " image with " << nthreads << " threads" << std::endl; 

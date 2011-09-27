@@ -10972,7 +10972,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"395:396M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"401M\"" >>confdefs.h
 
 # copyright notice
 
