@@ -114,14 +114,14 @@ NuFFT_OMP::Process () {
 	printf ("Processing NuFFT_OMP ...\n");
 	ticks start = getticks();
 
-	Matrix<cplx>*   data    = m_cplx["data"];
-	Matrix<double>* kspace  = m_real["kspace"];
-	Matrix<double>* weights = m_real["weights"];
+	Matrix<cplx>&   data    = *(m_cplx["data"]);
+	Matrix<double>& kspace  = *(m_real["kspace"]);
+	Matrix<double>& weights = *(m_real["weights"]);
 
 	printf ("  Incoming dimensions:\n");
-	printf ("    Data:    %s \n", data->DimsToCString());
-	printf ("    K-Space: %s \n", kspace->DimsToCString());
-	printf ("    Weights: %s \n", weights->DimsToCString());
+	printf ("    Data:    %s \n", data.DimsToCString());
+	printf ("    K-Space: %s \n", kspace.DimsToCString());
+	printf ("    Weights: %s \n", weights.DimsToCString());
 
 	int imgsize = m_N[0] * m_N[1] * m_N[2];
 
@@ -149,13 +149,13 @@ NuFFT_OMP::Process () {
 			
 			// Copy data from incoming matrix to the nufft input array
 			for (int i = 0; i < m_M; i++) {
-				(m_iplan[tid].y[i])[0] = (data->At(i + os)).real();
-				(m_iplan[tid].y[i])[1] = (data->At(i + os)).imag();
+				(m_iplan[tid].y[i])[0] = (data[i + os]).real();
+				(m_iplan[tid].y[i])[1] = (data[i + os]).imag();
 			}
 			
 			// Copy k-space and weights to allocated memory
-			memcpy (&(m_fplan[tid].x[0]),  &kspace->At(os * m_dim), m_dim * m_M * sizeof(double));
-			memcpy (&(m_iplan[tid].w[0]), &weights->At(         0),         m_M * sizeof(double));
+			memcpy (&(m_fplan[tid].x[0]),  &kspace[os * m_dim], m_dim * m_M * sizeof(double));
+			memcpy (&(m_iplan[tid].w[0]), &weights[         0],         m_M * sizeof(double));
 			
 			// Assign weights, Precompute PSI and IFT
 			nfft::weights (&m_fplan[tid], &m_iplan[tid]);
@@ -174,7 +174,7 @@ NuFFT_OMP::Process () {
 	}
 	
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
-	(*data) = tmp;
+	data = tmp;
 	return error;
 	
 }
