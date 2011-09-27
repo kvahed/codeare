@@ -55,12 +55,12 @@ WhiteNoise () {
 
 
 RRSModule::error_code
-AddPseudoRandomNoise (Matrix<raw>* m, float max) {
+AddPseudoRandomNoise (Matrix<raw>& m, const float& max) {
 
 	SetSeed();
 
-	for (int i = 0; i < m->Size(); i++)
-		m->At(i) = m->At(i) + max * WhiteNoise();
+	for (int i = 0; i < m.Size(); i++)
+		m[i] = m[i] + max * WhiteNoise();
 	
 	return OK;
 

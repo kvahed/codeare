@@ -19,11 +19,11 @@
  */
 
 RRSModule::error_code
-PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, int sampint, float max_rf, std::string* fname, std::string* orientation) {
+PTXWriteSiemensINIFile (const Matrix<cplx>& pt, int dimrf, int dimgr, int nc, int sampint, float max_rf, std::string* fname, std::string* orientation) {
 	
 	FILE* fp = fopen (fname->c_str(), "wb");
 
-	int nt = pt->Dim(COL);
+	int nt = pt.Dim(COL);
 
 
 	if (fp == NULL)
@@ -96,7 +96,7 @@ PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, in
 
 	for (int i = 0; i < nt; i++)
 		for (int j = nc; j < nc+3; j++)
-			maxg = (maxg > abs(pt->At(i,j))) ? maxg : abs(pt->At(i,j));
+			maxg = (maxg > abs(pt(i,j))) ? maxg : abs(pt(i,j));
 
 	fprintf (fp, "[Gradient]\n"                           );
 	fprintf (fp, "\n"                                     );
@@ -107,11 +107,11 @@ PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, in
 
 	for (int i = 0; i < nt; i++)
 		if (orientation->compare("transversal") == 0 || orientation->compare("t") == 0)
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt->At(i,nc+0))/maxg, real(pt->At(i,nc+1))/maxg, real(pt->At(i,nc+2))/maxg);
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+2))/maxg);
 		else if (orientation->compare("sagittal") == 0 || orientation->compare("s") == 0)
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt->At(i,nc+2))/maxg, real(pt->At(i,nc+1))/maxg, real(pt->At(i,nc+0))/maxg);
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+2))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+0))/maxg);
 		else //transversal
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt->At(i,nc+0))/maxg, real(pt->At(i,nc+1))/maxg, real(pt->At(i,nc+2))/maxg);
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+2))/maxg);
 
 	for (int j = 0; j < nc; j++) {
 		
@@ -121,7 +121,7 @@ PTXWriteSiemensINIFile (const Matrix<cplx>* pt, int dimrf, int dimgr, int nc, in
 		fprintf (fp, "\n");
 		
 		for (int i = 0; i < nt; i++)
-			fprintf (fp, "RF[%i]= %.5f	 %.5f\n", i, abs(pt->At(i,j))*100.0, (arg(pt->At(i,j)) >= 0.0) ? arg(pt->At(i,j)) : 6.28318 + arg(pt->At(i,j)));
+			fprintf (fp, "RF[%i]= %.5f	 %.5f\n", i, abs(pt(i,j))*100.0, (arg(pt(i,j)) >= 0.0) ? arg(pt(i,j)) : 6.28318 + arg(pt(i,j)));
 		
 	}
     

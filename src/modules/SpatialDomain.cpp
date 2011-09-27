@@ -137,15 +137,15 @@ SpatialDomain::Process        () {
     // m_helper: RF and gradient pulses
     // ----------------------------
 
-	Matrix<double>* k      = m_real ["k"];
-	Matrix<double>* r      = m_real ["r"];
-	Matrix<cplx>*   b1     = m_cplx ["b1"];
-	Matrix<short>*  b0     = m_pixel["b0"];
-	Matrix<cplx>*   target = m_cplx ["target"];
+	Matrix<double>& k      = *(m_real ["k"]);
+	Matrix<double>& r      = *(m_real ["r"]);
+	Matrix<cplx>&   b1     = *(m_cplx ["b1"]);
+	Matrix<short>&  b0     = *(m_pixel["b0"]);
+	Matrix<cplx>&   target = *(m_cplx ["target"]);
 
-	m_ns = r->Dim(1);
-	m_nk = k->Dim(1);
-	m_nc = b1->Dim(1);
+	m_ns = r.Dim(1);
+	m_nk = k.Dim(1);
+	m_nc = b1.Dim(1);
 
     Matrix<cplx>    solution;
     Matrix<cplx>    tmp;
@@ -176,7 +176,7 @@ SpatialDomain::Process        () {
         
         Matrix<cplx> m (m_ns, m_nk*m_nc);
 
-        STA (k, r, b1, b0, m_nc, m_nk, m_ns, m_gd, m_pd, &m);
+        STA (k, r, b1, b0, m_nc, m_nk, m_ns, m_gd, m_pd, m);
         Matrix<cplx> minv = m.tr();
 
         minv  = minv->*(m);
@@ -191,27 +191,27 @@ SpatialDomain::Process        () {
 
         for (int j = 0; j < m_maxiter; j++, gc++) {
 
-            solution = minv->*(*target);
+            solution = minv->*(target);
             tmp      = m->*(solution);
 
-            NRMSE (target, &tmp, gc, &nrmse);
+            NRMSE ((target), tmp, gc, nrmse);
             res.push_back (nrmse);
             
 			if (m_verbose)
-				memcpy (&ve.At(0,gc), &tmp.At(0), tmp.Size() * sizeof(cplx)); 
+				memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cplx)); 
 
             if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
 				break;
             
             final    = solution;
-            PhaseCorrection (target, &tmp);
+            PhaseCorrection ((target), tmp);
             
         } 
         
-        printf ("\n... done. Checking pulse amplitudes ... \n");
+        printf ("\n  ... done. Checking pulse amplitudes ... \n");
         
         // Check max pulse amplitude -----------------
-        RFLimits (&final, m_pd, m_nk, m_nc, m_max_rf); 
+        RFLimits (final, m_pd, m_nk, m_nc, m_max_rf); 
 
         pulse_amp_ok = true;
         
@@ -245,7 +245,7 @@ SpatialDomain::Process        () {
 
 	// Assemble gradient and RF timing ---
 
-	PTXTiming              (&final, k, m_pd, m_gd, m_nk, m_nc, b1);
+	PTXTiming              (final, k, m_pd, m_gd, m_nk, m_nc, b1);
 	// -----------------------------------
 	
 
@@ -256,23 +256,23 @@ SpatialDomain::Process        () {
 
 	// Return NRMSE down the road --------
 
-	r->Dim(COL) = gc;
-	r->Dim(LIN) = 1;
-	r->Reset();
+	r.Dim(COL) = gc;
+	r.Dim(LIN) = 1;
+	r.Reset();
 	for (int i = 0; i < gc; i++)
-		r->At(i) = res.at(i);
+		r[i] = res[i];
 	// -----------------------------------
 
 	// Excitation profile ----------------
 	if (m_verbose) {
 			
-		target->Dim(1) = gc; 
-	    target->Reset();
-		memcpy (&target->At(0), &ve.At(0), gc * target->Dim(0) * sizeof(cplx));
+		target.Dim(1) = gc; 
+	    target.Reset();
+		memcpy (&target[0], &ve[0], gc * target.Dim(0) * sizeof(cplx));
 
 	} else
 		
-		(*target) = tmp;
+		target = tmp;
 	// ----------------------------------
 	
     return RRSModule::OK;

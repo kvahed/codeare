@@ -108,20 +108,20 @@ namespace RRStrategy {
  * @param  nrmse    Returned NRMSE
  */
 inline void
-NRMSE                         (const Matrix<cplx>* target, const Matrix<cplx>* result, const int iter, float* nrmse) {
+NRMSE                         (const Matrix<cplx>& target, const Matrix<cplx>& result, const int& iter, float& nrmse) {
 
-    float q = 0.0, n = 0.0;
+    float q = 0.0;
     
-    for (int i=0; i < target->Size(); i++)
-        q += pow(abs(target->At(i)) - abs(result->At(i)), 2.0);
+    for (int i=0; i < target.Size(); i++)
+        q += pow(abs(target[i]) - abs(result[i]), 2.0);
     
-    q = sqrt(q)/target->Norm().real();
+    q = sqrt(q)/target.Norm().real();
     
 	if (iter % 5 == 0 && iter > 0)
 		printf ("\n");
-    printf ("  %03i %.6f", iter, q);
+    printf ("    %03i %.6f", iter, q);
 
-    nrmse[0] = 100.0 * q;
+    nrmse = 100.0 * q;
 
 }
 
@@ -134,21 +134,20 @@ NRMSE                         (const Matrix<cplx>* target, const Matrix<cplx>* r
  * @return          Phase corrected 
  */
 inline void
-PhaseCorrection (Matrix<cplx>* target, const Matrix<cplx>* result) {
+PhaseCorrection (Matrix<cplx>& target, const Matrix<cplx>& result) {
     
+	size_t n = target.Size();
+
 #pragma omp parallel default (shared) 
     {
         
         int tid      = omp_get_thread_num();
-        int chunk    = target->Size() / omp_get_num_threads();
+        int chunk    = n / omp_get_num_threads();
         
 #pragma omp for schedule (dynamic, chunk)
 
-        for (int i=0; i < target->Size(); i++) 
-            if (abs(target->At(i)) > 0)
-                target->At(i) = abs(target->At(i)) * result->At(i) / abs(result->At(i));
-            else                
-                target->At(i) = cplx(0,0);    
+        for (size_t i = 0; i < n; i++) 
+            target[i] = (abs(target[i]) > 0) ? abs(target[i]) * result[i] / abs(result[i]) :  cplx(0,0);    
         
     }
     
@@ -165,15 +164,15 @@ PhaseCorrection (Matrix<cplx>* target, const Matrix<cplx>* result) {
  * @param  limits   Out: limits
  */
 inline void 
-RFLimits            (const Matrix<cplx>* solution, const int* pd, const int nk, const int nc, float* limits) {
+RFLimits            (const Matrix<cplx>& solution, const int* pd, const int& nk, const int& nc, float* limits) {
     
     for (int i = 0; i < nk; i++) {
 
         limits[i] = 0.0;
         
         for (int j = 0; j < nc; j++)
-            if (limits[i] < abs (solution->At(i+nk*j)) / pd[i]) 
-                limits[i] = abs (solution->At(i+nk*j)) / pd[i];
+            if (limits[i] < abs (solution[i+nk*j]) / pd[i]) 
+                limits[i] = abs (solution[i+nk*j]) / pd[i];
 
 		limits[i] *= 1000.0;
 
@@ -197,8 +196,8 @@ RFLimits            (const Matrix<cplx>* solution, const int* pd, const int nk, 
  * @param  m        Out: m_xy
  */
 void
-STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<cplx>* b1, const Matrix<short>* b0, const int nc, 
-	 const int             nk, const int            ns, const int          gd, const int*           pd, Matrix<cplx>* m) {
+STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cplx>& b1, const Matrix<short>& b0, 
+	 const int& nc, const int& nk, const int& ns, const int gd, const int* pd, Matrix<cplx>& m) {
     
 	float* d = (float*) malloc (nk * sizeof (float));
 	float* t = (float*) malloc (nk * sizeof (float));
@@ -228,19 +227,16 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<cplx>* b1, 
         for (int c = 0; c < nc; c++) 
             for (int k = 0; k < nk; k++) 
                 for (int s = 0; s < ns; s++) 
-                    m->At (s, c*nk + k) = 
+                    m(s, c*nk + k) = 
 						// b1 (s,c)
-                        pgd * b1->At(s,c) *
+                        pgd * b1(s,c) *
 						// off resonance: exp (2i\pidb0dt)  
-                        exp (cplx(0, 2.0 * PI * d[k] * (float) b0->At(s))) *
+                        exp (cplx(0, 2.0 * PI * d[k] * (float) b0(s))) *
 						// encoding: exp (i k(t) r)
-                        exp (cplx(0,(ks->At(0,k)*r->At(0,s) + ks->At(1,k)*r->At(1,s) + ks->At(2,k)*r->At(2,s))));
+                        exp (cplx(0,(ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s))));
         
     }
 	
-	m->MXDump ("m.mat", "m");
-	b1->MXDump ("b1.mat", "b1");
-
 	free (t);
 	free (d);
     
@@ -253,7 +249,7 @@ STA (const Matrix<double>* ks, const Matrix<double>* r, const Matrix<cplx>* b1, 
  *
  */
 inline void
-PTXTiming (const Matrix<cplx>* rf, const Matrix<double>* ks, const int* pd, const int gd, const int nk, const int nc, Matrix<cplx>* timing) {
+PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, const int& gd, const int& nk, const int& nc, Matrix<cplx>& timing) {
 
 	// Total pulse duration --------------
 
@@ -267,10 +263,10 @@ PTXTiming (const Matrix<cplx>* rf, const Matrix<double>* ks, const int* pd, cons
 	// Outgoing repository ---------------
 
 	// Time scale
-	timing->Dim(COL) = tpd;    
+	timing.Dim(COL) = tpd;    
 	// Nc Channels + 3 gradients
-	timing->Dim(LIN) = nc + 3; 
-	timing->Reset();
+	timing.Dim(LIN) = nc + 3; 
+	timing.Reset();
 	// -----------------------------------
 	
 	// RF Timing -------------------------
@@ -283,12 +279,12 @@ PTXTiming (const Matrix<cplx>* rf, const Matrix<double>* ks, const int* pd, cons
 			
 			// RF action
 			for (int p = 0; p < pd[k]; p++, i++) 
-				timing->At(i,rc) = conj(rf->At(k + rc*nk)) / (float)pd[k] * cplx(1000.0,0.0);
+				timing(i,rc) = conj(rf(k + rc*nk)) / (float)pd[k] * cplx(1000.0,0.0);
 
 			// Gradient action, no RF
 			if (k < nk-1)
 				for (int g = 0; g <    gd; g++, i++)
-					timing->At(i,rc) = cplx (0.0, 0.0);
+					timing(i,rc) = cplx (0.0, 0.0);
 
 		}
 		
@@ -308,12 +304,12 @@ PTXTiming (const Matrix<cplx>* rf, const Matrix<double>* ks, const int* pd, cons
 			
 			// RF action, no gradients
 			for (int p = 0; p < pd[k]; p++, i++) 
-				timing->At(i,nc+gc) = 0.0; 
+				timing(i,nc+gc) = 0.0; 
 
 			if (k < nk-1)
 			for (int g = 0; g <    gd; g++, i++) {
 				
-				sr = (k+1 < nk) ? ks->At(gc,k+1) - ks->At(gc,k) : - ks->At(gc,i);
+				sr = (k+1 < nk) ? ks(gc,k+1) - ks(gc,k) : - ks(gc,i);
 				sr = 4.0 * sr / (2 * PI * 4.2576e7 * gd * gd * 1.0e-5 * 1.0e-5);
 				sr =       sr / 100.0;
 				
@@ -325,7 +321,7 @@ PTXTiming (const Matrix<cplx>* rf, const Matrix<double>* ks, const int* pd, cons
 				else                     // ramp down
 					gr -= sr;
 				
-				timing->At(i,nc+gc) = gr; 
+				timing(i,nc+gc) = gr; 
 				
 			}
 			
