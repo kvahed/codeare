@@ -284,7 +284,7 @@ PTXTiming (const Matrix<cplx>* rf, const Matrix<double>* ks, const int* pd, cons
 			// RF action
 			for (int p = 0; p < pd[k]; p++, i++) 
 				timing->At(i,rc) = conj(rf->At(k + rc*nk)) / (float)pd[k] * cplx(1000.0,0.0);
-			
+
 			// Gradient action, no RF
 			if (k < nk-1)
 				for (int g = 0; g <    gd; g++, i++)
