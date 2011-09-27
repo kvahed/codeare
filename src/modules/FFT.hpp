@@ -3,36 +3,38 @@
 
 #include "Matrix.hpp"
 
+/**
+ * @brief 1-3D Discrete Cartesian Fourier transform for Matrix template
+ */
 class FFT {
-	
 
 public:
 
 	/**
-	 * @brief   Forward transform
+	 * @brief    Forward transform
 	 *
-	 * @param   To transform
-	 * @return  Transform
+	 * @param  m To transform
+	 * @return   Transform
 	 */
 	static Matrix<cplx> 
 	Forward     (const Matrix<cplx>& m);
 	
 
 	/**
-	 * @brief   Backward transform
+	 * @brief    Backward transform
 	 *
-	 * @param   To transform
-	 * @return  Transform
+	 * @param  m To transform
+	 * @return   Transform
 	 */
 	static Matrix<cplx> 
 	Backward    (const Matrix<cplx>& m);
 	
 
 	/**
-	 * @brief   FFT shift
+	 * @brief    FFT shift
 	 *
-	 * @param   To shift
-	 * @return  Shifted
+	 * @param  m To shift
+	 * @return   Shifted
 	 */
 	static Matrix<cplx> 
 	Shift    (const Matrix<cplx>& m);
@@ -40,7 +42,15 @@ public:
 
 private:
 	
+	/**
+	 * Static class
+	 */
 	FFT()  {};
+
+
+	/**
+	 * Static class
+	 */
 	~FFT() {};
 	
 };
