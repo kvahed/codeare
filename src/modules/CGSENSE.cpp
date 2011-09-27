@@ -156,10 +156,10 @@ CGSENSE::Process () {
 
 	RRSModule::error_code error = OK;
 
-	Matrix<cplx>*   data    = m_cplx["data"];
-	Matrix<cplx>*   sens    = m_cplx["sens"];
-	Matrix<double>* weights = m_real["weights"];
-	Matrix<double>* kspace  = m_real["kspace"];
+	Matrix<cplx>&   data    = *(m_cplx["data"]);
+	Matrix<cplx>&   sens    = *(m_cplx["sens"]);
+	Matrix<double>& weights = *(m_real["weights"]);
+	Matrix<double>& kspace  = *(m_real["kspace"]);
 	
 	int err = 0;
 
@@ -177,17 +177,20 @@ CGSENSE::Process () {
 	
 	// Set k-space and weights ----------------------------------------
 	for (int i = 0; i < NTHREADS || i < m_Nc; i++) {
-		memcpy (&(m_fplan[i].x[0]),  &kspace->At(0), m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
-		memcpy (&(m_iplan[i].w[0]), &weights->At(0),                m_fplan[i].M_total * sizeof(double)) ;
+
+		memcpy (&(m_fplan[i].x[0]), &kspace[0], m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
+		memcpy (&(m_iplan[i].w[0]), &weights[0], m_fplan[i].M_total * sizeof(double)) ;
+
 		nfft::weights (&m_fplan[i], &m_iplan[i]);
 		nfft::psi (&m_fplan[i]);
+
 	}
 
 	// Don't need this anymore
 	FreeReal("kspace");
 
 	// Copying sensitivities. Will use helper for Pulses --------------
-	Matrix<cplx> s = (*data);
+	Matrix<cplx> s = data;
 
 	// Out going images -----------------------------------------------
 	Matrix<cplx> istore;
@@ -207,9 +210,9 @@ CGSENSE::Process () {
 
 	// Create test data (Incoming data is image space) ----------------
 	if (m_testcase) {
-		E  (&s, sens, m_fplan, &stmp, m_dim);
+		E  (s, sens, m_fplan, stmp, m_dim);
 		s = stmp;
-		(*data) = stmp;
+		data = stmp;
 	}
 
 
@@ -217,7 +220,7 @@ CGSENSE::Process () {
 	ticks cgstart = getticks();
 
 	// First left side action -----------------------------------------
-	EH (data, sens, m_fplan, m_iplan, m_epsilon, m_maxit, &p, m_dim);
+	EH (data, sens, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim);
 
 	r = p;
 	q = p;
@@ -225,18 +228,17 @@ CGSENSE::Process () {
 	// Out going image (Resize for output) ----------------------------
 	// Resize data for output
 	for (int i = 0; i < INVALID_DIM; i++)
-		data->Dim(i) = 1;
+		data.Dim(i) = 1;
 	for (int i = 0; i < m_dim; i++)
-		data->Dim(i) = m_N[i];
+		data.Dim(i) = m_N[i];
 
-	data->Reset();
+	data.Reset();
 	
 	// CG residuals storage and helper variables ----------------------
 	std::vector<double> res;
 
 	float       rn    = 0.0;
 	float       an    = 0.0;
-	float       rnewn = 0.0;
 	raw         rtmp  = raw(0.0,0.0);
 	int         iters = 0;
 
@@ -261,22 +263,20 @@ CGSENSE::Process () {
 			break;
 		
 		// CG step ----------------------------------------------------
-		E  (&p,    sens, m_fplan,                              &stmp, m_dim);
-		EH (&stmp, sens, m_fplan, m_iplan, m_epsilon, m_maxit, &q   , m_dim);
+		E  (p,    sens, m_fplan,                              stmp, m_dim);
+		EH (stmp, sens, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim);
 
-		rtmp     = (rn / (p.dotc(q)));
-		(*data)  = (p * rtmp) + (*data);
-		stmp    *= rtmp;
-		s       += stmp;
-		r        = - (q * rtmp) + r ;
-		rnewn    = pow(r.Norm().real(),2.0);
-		rtmp     = rnewn/rn;
-		p        = (p * rtmp) + r ;
+		rtmp  = (rn / (p.dotc(q)));
+		data += (p    * rtmp);
+		s    += (stmp * rtmp);
+		r    -= (q    * rtmp);
+		p    *= cplx(pow(r.Norm().real(),2.0)/rn);
+		p    += r;
 
 		// Verbose out put keeps all intermediate steps ---------------
 		if (m_verbose) {
-			memcpy (&istore[i * data->Size()],  &data->At(0),     data->Size() * sizeof(double));
-			memcpy (&sstore[i *     s.Size()],         &s[0],         s.Size() * sizeof(double));
+			memcpy (&istore[i * data.Size()], &data[0],     data.Size() * sizeof(double));
+			memcpy (&sstore[i *    s.Size()],    &s[0],        s.Size() * sizeof(double));
 		}
 
 	}
@@ -288,9 +288,9 @@ CGSENSE::Process () {
 	if (m_verbose) {
 
 		// All intermediate images ------
-		data->Dim(m_dim) = iters;
-		data->Reset();
-		memcpy (    &data->At(0), &istore[0],     data->Size() * sizeof(double));
+		data.Dim(m_dim) = iters;
+		data.Reset();
+		memcpy (&data[0], &istore[0], data.Size() * sizeof(double));
 
 		// Pulses (Excitation) ----------
 		s.Dim(CHA) = iters;
@@ -298,13 +298,13 @@ CGSENSE::Process () {
 		memcpy (&s[0], &sstore[0], s.Size() * sizeof(double));
 
 		// CG residuals ------------------
-		weights->Dim(COL) = iters;
+		weights.Dim(COL) = iters;
 		for (int i = 1; i < INVALID_DIM; i++)
-			weights->Dim(i) = 1;
-		weights->Reset();
+			weights.Dim(i) = 1;
+		weights.Reset();
 
 		for (int i = 0; i < iters; i++)
-			weights->At(i) = res.at(i);
+			weights[i] = res[i];
 
 	}
 

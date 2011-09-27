@@ -11,24 +11,24 @@
  * @param  dim          FT dimensions
  */
 RRSModule::error_code 
-E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) {
+E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& out, const int& dim) {
 
 	// Clear output container
-	out->Zero();
+	out.Zero();
 	
 	// Some dimensions
-	int        ncoils   = sm->Dim(dim);
-	int        nsamples = out->Size() / ncoils;
-	int        imgsize  = in->Size();
+	int ncoils   = sm.Dim(dim);
+	int nsamples = out.Size() / ncoils;
+	int imgsize  = in.Size();
 
 	// Loop over coils, Elementwise multiplication of maps with in (s.*in), ft and store in out
 	
 #pragma omp parallel default (shared) 
 	{
-		
+
 		omp_set_num_threads(NTHREADS);
 		int tid      = omp_get_thread_num();
-		
+
 #pragma omp for
 		for (int j = 0; j < ncoils; j++) {
 			
@@ -38,7 +38,7 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
 
 			// Copy data to FT
 			for (int i = 0; i < imgsize; i++) {
-				tmp = sm->At(ipos + i) * in->At(i);
+				tmp = sm[ipos + i] * in[i];
 				np[tid].f_hat[i][0] = tmp.real();
 				np[tid].f_hat[i][1] = tmp.imag();
 			}
@@ -48,13 +48,12 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
 			
 			// Copy FTed data back
 			for (int i = 0; i < nsamples; i++)
-				out->At(i+spos) = raw(np[tid].f[i][0], np[tid].f[i][1]);
+				out[i+spos] = raw(np[tid].f[i][0], np[tid].f[i][1]);
 			
 		}
 		
 	}
 	
-	// Return success
 	return OK;
 	
 }
@@ -72,15 +71,16 @@ E  (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, Matrix<raw>* out, int dim) 
  * @param  dim          FT dimensions
  */
 RRSModule::error_code
-EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, double epsilon, int maxit, Matrix<raw>* out, int dim) {
+EH (const Matrix<raw>& in, Matrix<raw>& sm, nfft_plan* np, solver_plan_complex* spc, 
+	const double& epsilon, const int& maxit, Matrix<raw>& out, const int dim) {
 
 	// Clear outgoing container
-	out->Zero();
+	out.Zero();
 
 	// Some dimensions
-	int           ncoils   = sm->Dim(dim);
-	int           nsamples = in->Size() / ncoils;
-	int           imgsize  = out->Size();
+	int           ncoils   = sm.Dim(dim);
+	int           nsamples = in.Size() / ncoils;
+	int           imgsize  = out.Size();
 
 	fftw_complex* ftout    = (fftw_complex*) malloc (imgsize * ncoils * sizeof (fftw_complex)); 
 
@@ -93,7 +93,6 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 		int tid      = omp_get_thread_num();
 		
 #pragma omp for
-
 		for (int j = 0; j < ncoils; j++) {
 			
 			int    spos   = j * nsamples;
@@ -101,27 +100,25 @@ EH (Matrix<raw>* in, Matrix<raw>* sm, nfft_plan* np, solver_plan_complex* spc, d
 			
 			// Copy to iFT
 			for (int i = 0; i < nsamples; i++) {
-				spc[tid].y[i][0] = (in->At(spos + i)).real();
-				spc[tid].y[i][1] = (in->At(spos + i)).imag();
+				spc[tid].y[i][0] = (in[spos + i]).real();
+				spc[tid].y[i][1] = (in[spos + i]).imag();
 			}
 			
 			// Inverse FT
 			nfft::ift (&np[tid], &spc[tid], maxit, epsilon);
-			memcpy (&ftout[imgsize * j], &spc[tid].f_hat_iter[0][0], imgsize * sizeof (fftw_complex));
+			memcpy (&ftout[ipos], &spc[tid].f_hat_iter[0][0], imgsize*sizeof (fftw_complex));
 			//memcpy (&ftout[imgsize * j], &np[tid].f_hat[0][0], imgsize * sizeof (fftw_complex));
 			
 		}
 
 		raw sens  = raw(0.0,0.0);
-		int chunk = imgsize / NTHREADS;
-
-#pragma omp for schedule (dynamic, chunk)
+#pragma omp for schedule (dynamic, imgsize / NTHREADS)
 
 		for (int i = 0; i < imgsize; i++) 
 			for (int j = 0; j < ncoils; j++) {
-				int    ipos   = j * imgsize;
-				sens        = sm->At(ipos + i);
-				out->At(i) += raw(ftout[ipos + i][0], ftout[ipos + i][1]) * conj(sens);
+				int pos = j * imgsize + i;
+				sens = sm[pos];
+				out[i] += raw(ftout[pos][0], ftout[pos][1]) * conj(sens);
 			}
 
 	}
