@@ -24,13 +24,6 @@
 
 #include "ReconStrategy.hpp"
 
-#include "itkImage.h"
-#include "itkMinimumMaximumImageFilter.h"
-#include "itkOrientedImage.h"
-#include "itkIdentityTransform.h"
-#include "itkLinearInterpolateImageFunction.h"
-#include "itkResampleImageFilter.h"
-
 using namespace RRServer;
 
 
