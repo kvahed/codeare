@@ -94,22 +94,22 @@ NuFFT::Process () {
 	// Some variables
 	RRSModule::error_code error = OK;
 
-	Matrix<cplx>*   data    = m_cplx["data"];
-	Matrix<double>* kspace  = m_real["kspace"];
-	Matrix<double>* weights = m_real["weights"];
+	Matrix<cplx>&   data    = *m_cplx["data"];
+	Matrix<double>& kspace  = *m_real["kspace"];
+	Matrix<double>& weights = *m_real["weights"];
 
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
 
 	// Copy data from incoming matrix to the nufft input array
-	for (int i = 0; i < data->Size(); i++) {
-		m_iplan.y[i][0] = data->At(i).real();
-		m_iplan.y[i][1] = data->At(i).imag();
+	for (int i = 0; i < data.Size(); i++) {
+		m_iplan.y[i][0] = data[i].real();
+		m_iplan.y[i][1] = data[i].imag();
 	}
 
 	// Copy k-space and weights to allocated memory
-	memcpy (&(m_fplan.x[0]),  &kspace->At(0),  kspace->Size()*sizeof(double));
-	memcpy (&(m_iplan.w[0]), &weights->At(0), weights->Size()*sizeof(double));
+	memcpy (&(m_fplan.x[0]),  &kspace[0],  kspace.Size()*sizeof(double));
+	memcpy (&(m_iplan.w[0]), &weights[0], weights.Size()*sizeof(double));
 
 	// Assign weights and precompute PSI
 	nfft::weights (&m_fplan, &m_iplan);
@@ -120,14 +120,14 @@ NuFFT::Process () {
 
 	// Resize data for output
 	for (int i = 0; i < INVALID_DIM; i++)
-		data->Dim(i) = 1;
+		data.Dim(i) = 1;
 	for (int i = 0; i < m_dim; i++)
-		data->Dim(i) = m_N[i];
-	data->Reset();
+		data.Dim(i) = m_N[i];
+	data.Reset();
 
 	// Copy back reconstructed image to outgoing matrix
-	for (int i = 0; i < data->Size(); i++)
-		data->At(i) = cplx (m_iplan.f_hat_iter[i][0], m_iplan.f_hat_iter[i][1]);
+	for (int i = 0; i < data.Size(); i++)
+		data[i] = cplx (m_iplan.f_hat_iter[i][0], m_iplan.f_hat_iter[i][1]);
 	
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 	

@@ -1,3 +1,5 @@
+#ifdef HAVE_INSIGHT
+
 #include "itkImage.h"
 #include "itkMinimumMaximumImageFilter.h"
 #include "itkOrientedImage.h"
@@ -129,4 +131,4 @@ Matrix<T>::Resample (const double& f, const InterpMethod& im) const {
 
 }
 
-
+#endif
