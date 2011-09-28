@@ -36,6 +36,9 @@
 /* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
 
+/* Define to 1 if you have the <gsl/gsl_wavelet2d.h> header file. */
+#undef HAVE_GSL_GSL_WAVELET2D_H
+
 /* Define to 1 if you have the <H5Cpp.h> header file. */
 #undef HAVE_H5CPP_H
 

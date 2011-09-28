@@ -180,6 +180,7 @@ AC_CHECK_HEADERS([nfft3util.h],      [], [AC_MSG_RESULT([cannot find nfft3util.h
 AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([cdf.h],            [], [AC_MSG_RESULT([cannot find cdf.h, cdf dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([nifti1_io.h],      [], [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
+AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
 AC_CHECK_HEADERS([fcntl.h],          [], [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
 AC_CHECK_HEADERS([stddef.h],         [], [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
@@ -191,10 +192,12 @@ AC_CHECK_LIB([dl],           [dlopen],        [], [AC_MSG_ERROR([cannot find lib
 AC_CHECK_LIB([z],            [deflate],       [], [AC_MSG_ERROR([cannot find libz, bailing out])])
 AC_CHECK_LIB([fftw3],        [fftw_execute],  [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
-AC_CHECK_LIB([cdf], [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf dump / read functionality unavailable!])])
-AC_CHECK_LIB([gsl], [gsl_wavelet_alloc], [], [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
+AC_CHECK_LIB([cdf],          [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf dump / read functionality unavailable!])])
+AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
-AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
+
+AM_CONDITIONAL([USE_NFFT3],  [test "$HAVE_NFFT3" -eq 1])
+AM_CONDITIONAL([USE_GSL],    [test "$HAVE_GSL" -eq 1])
 
 # Time & Co for FFTW cycle
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[
@@ -237,26 +240,6 @@ AC_TRY_LINK([#include <H5Cpp.h>],
 if test -z $hdf5_found; then
     LIBS=$OLD_LIBS
 fi
-
-
-# Blitzwave
-#AC_MSG_CHECKING([for getOrder in -lblitzwave -lblitz])
-#OLD_LIBS=$LIBS
-#LIBS="${LIBS} -lblitzwave -lblitz"
-
-#AC_TRY_LINK([#include <Wavelet.h>],
-#   [
-#   bwave::Wavelet bw;
-#   ],
-#   [AC_MSG_RESULT([yes])]
-#   blitzwave_found=yes,
-#   [LIBS=$OLD_LIBS]
-#   [AC_MSG_RESULT([no. Cannot find libwaveblitz, CompressedSensing reconstruction not available!])])
-#
-#if test -z $blitzwave_found; then
-#    LIBS=$OLD_LIBS
-#fi
-
 
 
 # NIFTI
