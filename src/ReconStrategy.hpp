@@ -281,9 +281,9 @@ namespace RRServer {
 		 */
 		void 
 		SetCplx       (const string name, const cplx_data* c)   {
-
+			
 			Matrix<cplx>* tmp;
-				
+			
 			if (m_cplx.find (name) == m_cplx.end())
 				m_cplx.insert (pair<string, Matrix<cplx>*> (name, tmp = new Matrix<cplx>()));
 			else

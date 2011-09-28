@@ -45,6 +45,9 @@
 /* Define to 1 if hrtime_t is defined in <sys/time.h> */
 #undef HAVE_HRTIME_T
 
+/* Define to 1 if you have the <itkImage.h> header file. */
+#undef HAVE_INSIGHT
+
 /* Define to 1 if you have the <intrinsics.h> header file. */
 #undef HAVE_INTRINSICS_H
 

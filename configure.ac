@@ -25,7 +25,6 @@ esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
-AC_PROG_RANLIB
 
 # Set programming language
 AC_LANG([C++])
@@ -261,21 +260,26 @@ if test -z $niftiio_found; then
 fi
 
 # ITK
+AH_TEMPLATE([HAVE_INSIGHT], [Define to 1 if you have the <itkImage.h> header file.])
+
 AC_MSG_CHECKING([for InsightToolkit])
 AC_ARG_WITH(itkroot,[  --with-itkroot       path to ITK install dir], [], [with_itkroot=no])
 ITK_INSTALL_PREFIX=${with_itkroot}
+ITK_INSTALL_PREFIX=`echo $ITK_INSTALL_PREFIX | sed -e 's|/|\\\/|g'`
 itklib_path="${with_itkroot}/lib/InsightToolkit"
 itkconfig_cmake="${itklib_path}/ITKConfig.cmake"
 if test -a "$itkconfig_cmake"; then
-	INC_INSIGHT_H="`cat $itkconfig_cmake | grep 'SET(ITK_INCLUDE_DIRS' | sed 's/SET(ITK_INCLUDE_DIRS \"/;/' | sed 's/\")//' | sed 's/;/ -I/g' | sed -e 's/\${ITK_INSTALL_PREFIX}/\/usr\/local/g'`" 
+	INC_INSIGHT_H="`cat $itkconfig_cmake | grep 'SET(ITK_INCLUDE_DIRS' | sed 's/SET(ITK_INCLUDE_DIRS \"/;/' | sed 's/\")//' | sed 's/;/ -I/g'`"
+	INC_INSIGHT_H="`echo $INC_INSIGHT_H | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" | sed -e 's|\${||g' | sed -e 's|}||g'`"
     insight_libs_dir="`cat $itkconfig_cmake | grep 'SET(ITK_LIBRARY_DIRS' | sed 's/SET(ITK_LIBRARY_DIRS \"/;/' | sed 's/\")//' | sed 's/;//g' | sed -e 's/\${ITK_INSTALL_PREFIX}/\/usr\/local/g'`"
 	INSIGHT_LIB_DIR_FLAG="-L$insight_libs_dir"	
+	INSIGHT_LIB_DIR_FLAG="`echo $INSIGHT_LIB_DIR_FLAG | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" | sed -e 's|\${||g' | sed -e 's|}||g'`"
 	INSIGHT_LIB_FLAG="-lITKFEM -lITKIO -lITKMetaIO -lITKAlgorithms -lITKStatistics -lITKBasicFilters -lITKCommon  -litkvnl -litkvnl_algo -litksys -lITKDICOMParser -lz"
 	if ! test "$HAVE_PNG" = "yes"; then
 	   INSIGHT_LIB_FLAG="$INSIGHT_LIB_FLAG -litkpng"
 	fi
-
     DEF_INSIGHT="#define HAVE_INSIGHT"
+	AC_DEFINE(HAVE_INSIGHT, "1")
     HAVE_INSIGHT="yes"
 
     AC_MSG_RESULT([found.])

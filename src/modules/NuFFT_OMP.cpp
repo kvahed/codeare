@@ -154,8 +154,8 @@ NuFFT_OMP::Process () {
 			}
 			
 			// Copy k-space and weights to allocated memory
-			memcpy (&(m_fplan[tid].x[0]),  &kspace[os * m_dim], m_dim * m_M * sizeof(double));
-			memcpy (&(m_iplan[tid].w[0]), &weights[         0],         m_M * sizeof(double));
+			memcpy (&(m_fplan[tid].x[0]),  &kspace[os*m_dim], m_dim * m_M * sizeof(double));
+			memcpy (&(m_iplan[tid].w[0]), &weights[       0],         m_M * sizeof(double));
 			
 			// Assign weights, Precompute PSI and IFT
 			nfft::weights (&m_fplan[tid], &m_iplan[tid]);
