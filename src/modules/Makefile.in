@@ -35,6 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @USE_NFFT3_TRUE@am__append_1 = NuFFT_OMP.la NuFFT.la CGSENSE.la 
+@USE_GSL_TRUE@am__append_2 = CompressedSensing.la
 subdir = src/modules
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -92,6 +93,7 @@ CompressedSensing_la_OBJECTS = $(am_CompressedSensing_la_OBJECTS)
 CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
+@USE_GSL_TRUE@am_CompressedSensing_la_rpath = -rpath $(libdir)
 DummyRecon_la_LIBADD =
 am_DummyRecon_la_OBJECTS = $(am__objects_1) DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
@@ -342,7 +344,7 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	MedianFilter_OMP.la SystemCmd.la LapackTests.la \
 	SpatialDomain.la RelativeSensitivities.la GRAPPA.la \
-	CompressedSensing.la $(am__append_1)
+	$(am__append_1) $(am__append_2)
 COMMON = ../Toolbox.hpp ../Toolbox.cpp ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../tinyxml/xpath_processor.h ../tinyxml/xpath_processor.cpp ../tinyxml/xpath_expression.cpp ../tinyxml/xpath_expression.h ../tinyxml/xpath_static.cpp ../tinyxml/xpath_static.h ../tinyxml/action_store.cpp ../tinyxml/action_store.h ../tinyxml/xpath_stack.cpp ../tinyxml/xpath_stack.h ../tinyxml/lex_util.cpp ../tinyxml/lex_util.h ../tinyxml/xpath_stream.cpp ../tinyxml/xpath_stream.h ../tinyxml/node_set.cpp ../tinyxml/node_set.h ../tinyxml/xml_util.cpp ../tinyxml/xml_util.h ../tinyxml/xpath_syntax.cpp ../tinyxml/xpath_syntax.h ../tinyxml/tokenlist.cpp ../tinyxml/tokenlist.h FFT.hpp FFT.cpp
 # Common linker flags
 COMMON_la_LDFLAGS = -module
@@ -443,7 +445,7 @@ clean-libLTLIBRARIES:
 CGSENSE.la: $(CGSENSE_la_OBJECTS) $(CGSENSE_la_DEPENDENCIES) 
 	$(CGSENSE_la_LINK) $(am_CGSENSE_la_rpath) $(CGSENSE_la_OBJECTS) $(CGSENSE_la_LIBADD) $(LIBS)
 CompressedSensing.la: $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_DEPENDENCIES) 
-	$(CompressedSensing_la_LINK) -rpath $(libdir) $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_LIBADD) $(LIBS)
+	$(CompressedSensing_la_LINK) $(am_CompressedSensing_la_rpath) $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_LIBADD) $(LIBS)
 DummyRecon.la: $(DummyRecon_la_OBJECTS) $(DummyRecon_la_DEPENDENCIES) 
 	$(DummyRecon_la_LINK) -rpath $(libdir) $(DummyRecon_la_OBJECTS) $(DummyRecon_la_LIBADD) $(LIBS)
 DumpToFile.la: $(DumpToFile_la_OBJECTS) $(DumpToFile_la_DEPENDENCIES) 
