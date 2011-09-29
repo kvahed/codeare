@@ -82,7 +82,7 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 
 		int m_use_bet;
 		int m_log_mask;
-		
+		int m_weigh_maps;
 		
 		
 	};
@@ -247,6 +247,7 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 		
 	}
 
+
 	RRSModule::error_code
 	B0Map (const Matrix<cplx>& imgs, Matrix<double>& b0, const float& TE) {
 		
@@ -292,8 +293,7 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 	 */
 	int SegmentBrain (const Matrix<double>& img, Matrix<short>& msk) {
 		
-		printf ("  Brain segmentation with FSL(bet2) ... ");
-		fflush(stdout);
+		printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
 
 		ticks  tic = getticks();
 
@@ -302,13 +302,17 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 		std::string cmd  = "/usr/local/bin/mask.sh";
 
 		img.NIDump(orig);
+		printf (" dumping ..."); fflush(stdout);
+		
 
 		if (!std::system(NULL))
 			return FATAL_SYSTEM_CALL;
 
 		// Call bet
+		printf (" bet2ing ..."); fflush(stdout);
 		system (cmd.c_str());
 
+		printf (" reading in ..."); fflush(stdout);
 		msk.NIRead(mask);
 
  		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());

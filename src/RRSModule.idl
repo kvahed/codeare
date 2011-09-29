@@ -120,7 +120,7 @@ module RRSModule {
 		 * @param  name   its name
 		 * @return        Data matrix
 		 */ 
-		cplx_data         get_cplx (in string name);
+		void              get_cplx (in string name, inout cplx_data data);
 
 		
 		/**
@@ -138,7 +138,7 @@ module RRSModule {
 		 * @param  name   its name
 		 * @return        Data matrix
 		 */ 
-		real_data         get_real (in string name);
+		void              get_real (in string name, inout real_data data);
 
 		
 		/**
@@ -156,7 +156,7 @@ module RRSModule {
 		 * @param  name   its name
 		 * @return        Data matrix
 		 */ 
-		pixel_data        get_pixel (in string name);
+		void              get_pixel (in string name, inout pixel_data data);
 
 		
 		/**

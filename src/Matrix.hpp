@@ -1267,7 +1267,7 @@ public:
     	for (size_t i = 0; i < INVALID_DIM; i++)
             _dim[i] = 1;
 
-		_M.clear();
+		_M.resize(0);
 
     }
     
@@ -2015,7 +2015,8 @@ public:
 	 *
 	 * @return          Class name
 	 */ 
-	const char* GetClassName() const { return "CSomeClass"; }
+	const char* 
+	GetClassName() const { return "CSomeClass"; }
 
 
 	/**

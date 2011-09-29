@@ -156,7 +156,7 @@ Matrix<T>::~Matrix() {
     ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
 #endif
 
-	_M.clear();
+	_M.resize(0);
     
 }
 

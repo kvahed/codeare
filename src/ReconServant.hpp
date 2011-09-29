@@ -110,8 +110,8 @@ namespace RRServer {
 		 * @param  name  Name
 		 * @return    Pointer to data
 		 */
-		cplx_data* 
-		get_cplx      (const char* name);
+		void
+		get_cplx      (const char* name, cplx_data&);
 		
 
 		/**
@@ -130,8 +130,8 @@ namespace RRServer {
 		 * @param  name  Name
 		 * @return    Pointer to real data
 		 */
-		real_data* 
-		get_real      (const char* name);
+		void
+		get_real      (const char* name, real_data& r);
 		
 
 		/**
@@ -150,8 +150,8 @@ namespace RRServer {
 		 * @param  name  Name
 		 * @return    Pointer to pixel data
 		 */
-		pixel_data* 
-		get_pixel     (const char* name);
+		void
+		get_pixel     (const char* name, pixel_data& p);
 		
 
 		/**

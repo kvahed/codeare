@@ -31,6 +31,7 @@ RelativeSensitivities::Init        () {
     Attribute ("cutoff",     &m_cutoff);
     Attribute ("use_bet",    &m_use_bet);
     Attribute ("log_mask",   &m_log_mask);
+	Attribute ("weigh_maps", &m_weigh_maps);
     
     return RRSModule::OK;
 
@@ -118,17 +119,20 @@ RelativeSensitivities::Process     () {
     // -----------------------------------------
 
     // Weighing with masks ---------------------
-    for (int ch = 0; ch < txm.Dim(3); ch++)
-        for (int i = 0; i < bets.Size(); i++)
-            txm[ch*bets.Size() + i] *= (double)bets[i];
-    
-    for (int ch = 0; ch < rxm.Dim(3); ch++)
-        for (int i = 0; i < bets.Size(); i++)
-            rxm[ch*bets.Size() + i] *= (double)bets[i];
-    
-    for (int i = 0; i < bets.Size(); i++)
-		b0[i] *= (double)bets[i];
-    // -----------------------------------------
+
+	if (m_weigh_maps) {
+		for (int ch = 0; ch < txm.Dim(3); ch++)
+			for (int i = 0; i < bets.Size(); i++)
+				txm[ch*bets.Size() + i] *= (double)bets[i];
+		
+		for (int ch = 0; ch < rxm.Dim(3); ch++)
+			for (int i = 0; i < bets.Size(); i++)
+				rxm[ch*bets.Size() + i] *= (double)bets[i];
+		
+		for (int i = 0; i < bets.Size(); i++)
+			b0[i] *= (double)bets[i];
+	}
+	// -----------------------------------------
 
     // Remove original data from RAM -----------
 
