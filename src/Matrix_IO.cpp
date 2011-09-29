@@ -876,6 +876,10 @@ bool Matrix<T>::NIRead (const string fname) {
 				_dim[i] = ni->dim[i+1];
 				_res[i] = ni->pixdim[i+1];
 			}
+		for (size_t i = ni->dim[0]; i < INVALID_DIM; i++) {
+			_dim[i] = 1;
+			_res[i] = 0.0;
+		}
 		
 		Reset();
 
@@ -898,7 +902,7 @@ bool Matrix<T>::NIRead (const string fname) {
 				memcpy (&_M[0], ni->data, SizeInRAM());
 				
 		} else {
-			printf ("Unsupported data type %i", ni->datatype);
+			printf (" Unsupported data type %i!", ni->datatype);
 			return false;
 		}
 		

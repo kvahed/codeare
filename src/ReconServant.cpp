@@ -110,61 +110,55 @@ ReconServant::Prepare  (const short s)       {
 
 
 void
-ReconServant::set_cplx  (const char* name, const cplx_data& d)   {
+ReconServant::set_cplx  (const char* name, const cplx_data& c) {
 
-	m_contexts.at(0)->SetCplx(name, &d);
-
-}
-
-
-cplx_data*
-ReconServant::get_cplx         (const char* name)                    {
-
-	cplx_data tmp;      
-	tmp.dims.length(INVALID_DIM);
-	tmp.res.length(INVALID_DIM);
-	m_contexts.at(0)->GetCplx(name, &tmp);
-	return new cplx_data (tmp);
+	m_contexts.at(0)->SetCplx(name, &c);
 
 }
 
 
 void
-ReconServant::set_real       (const char* name, const real_data& d)   {
+ReconServant::get_cplx (const char* name, cplx_data& c) {
 
-	m_contexts.at(0)->SetReal(name, &d);
-
-}
-
-
-real_data*
-ReconServant::get_real       (const char* name)                    {
-
-	real_data tmp;      
-	tmp.dims.length(INVALID_DIM);
-	tmp.res.length(INVALID_DIM);
-	m_contexts.at(0)->GetReal(name, &tmp);
-	return new real_data (tmp);
+	c.dims.length(INVALID_DIM);
+	c.res.length(INVALID_DIM);
+	m_contexts.at(0)->GetCplx(name, &c);
 
 }
 
 
 void
-ReconServant::set_pixel        (const char* name, const pixel_data& d) {
+ReconServant::set_real       (const char* name, const real_data& r)   {
 
-	m_contexts.at(0)->SetPixel(name, &d);
+	m_contexts.at(0)->SetReal(name, &r);
 
 }
 
 
-pixel_data*
-ReconServant::get_pixel        (const char* name)                    {
+void
+ReconServant::get_real       (const char* name, real_data& r) {
 
-	pixel_data tmp;      
-	tmp.dims.length(INVALID_DIM);
-	tmp.res.length(INVALID_DIM);
-	m_contexts.at(0)->GetPixel(name, &tmp);
-	return new pixel_data (tmp);
+	r.dims.length(INVALID_DIM);
+	r.res.length(INVALID_DIM);
+	m_contexts.at(0)->GetReal(name, &r);
+
+}
+
+
+void
+ReconServant::set_pixel        (const char* name, const pixel_data& p) {
+
+	m_contexts.at(0)->SetPixel(name, &p);
+
+}
+
+
+void
+ReconServant::get_pixel        (const char* name, pixel_data& p) {
+
+	p.dims.length(INVALID_DIM);
+	p.res.length(INVALID_DIM);
+	m_contexts.at(0)->GetPixel(name, &p);
 
 }
 

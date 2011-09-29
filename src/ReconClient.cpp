@@ -200,17 +200,18 @@ ReconClient::SetCplx (const std::string name, Matrix< std::complex<float> >& M) 
 void 
 ReconClient::GetCplx (const std::string name, Matrix< std::complex<float> >& m) {
 	
-	cplx_data* rp = m_rrsi->get_cplx(name.c_str());
+	cplx_data rp; 
+	m_rrsi->get_cplx(name.c_str(), rp);
 	
 	for (int j = 0; j < INVALID_DIM; j++) {
-		m.Dim(j) = rp->dims[j];
-		m.Res(j) = rp->res[j];
+		m.Dim(j) = rp.dims[j];
+		m.Res(j) = rp.res[j];
 	}
 
 	m.Reset();
 	
-	for (int i = 0; i < GetSize(rp->dims); i++)
-		m[i] = std::complex<float>(rp->dreal[i],rp->dimag[i]);
+	for (int i = 0; i < GetSize(rp.dims); i++)
+		m[i] = std::complex<float>(rp.dreal[i],rp.dimag[i]);
 	
 }
 
@@ -241,17 +242,18 @@ ReconClient::SetReal              (const std::string name, Matrix< double >& m) 
 void
 ReconClient::GetReal            (const std::string name, Matrix<double>& m) {
 	
-	real_data* r = m_rrsi->get_real(name.c_str());
+	real_data r; 
+	m_rrsi->get_real(name.c_str(), r);
 	
 	for (int j = 0; j < INVALID_DIM; j++) {
-		m.Dim(j) = r->dims[j];
-		m.Res(j) = r->res[j];
+		m.Dim(j) = r.dims[j];
+		m.Res(j) = r.res[j];
 	}
 	
 	m.Reset();
 	
-	for (int i = 0; i < GetSize(r->dims); i++)
-		m[i] = r->vals[i];
+	for (int i = 0; i < GetSize(r.dims); i++)
+		m[i] = r.vals[i];
 	
 }
 
@@ -283,17 +285,18 @@ ReconClient::SetPixel            (const std::string name, Matrix<short>& m) {
 void
 ReconClient::GetPixel            (const std::string name, Matrix<short>& m) {
 	
-	pixel_data* p = m_rrsi->get_pixel(name.c_str());
+	pixel_data p;
+	m_rrsi->get_pixel(name.c_str(), p);
 
 	for (int j = 0; j < INVALID_DIM; j++) {
-		m.Dim(j) = p->dims[j];
-		m.Res(j) = p->res[j];
+		m.Dim(j) = p.dims[j];
+		m.Res(j) = p.res[j];
 	}
 	
 	m.Reset();
 	
-	for (int i = 0; i < GetSize(p->dims); i++)
-		m[i] = p->vals[i];
+	for (int i = 0; i < GetSize(p.dims); i++)
+		m[i] = p.vals[i];
 	
 }
 

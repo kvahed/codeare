@@ -110,16 +110,19 @@ namespace RRServer {
 
 			while (!m_cplx.empty()) {
 				cout << "Clearing RAM of " <<  m_cplx.begin()->first.c_str() << endl;
+				m_cplx.begin()->second->Clear();
 				m_cplx.erase(m_cplx.begin());
 			}
 
 			while (!m_real.empty()) {
 				cout << "Clearing RAM of " <<  m_real.begin()->first.c_str() << endl;
+				m_real.begin()->second->Clear();
 				m_real.erase(m_real.begin());
 			}
 
 			while (!m_pixel.empty()) {
 				cout << "Clearing RAM of " <<  m_pixel.begin()->first.c_str() << endl;
+				m_pixel.begin()->second->Clear();
 				m_pixel.erase(m_pixel.begin());
 			}
 
@@ -158,6 +161,7 @@ namespace RRServer {
 			if (it == m_cplx.end())
 				return false;
 
+			it->second->Clear();
 			m_cplx.erase(it);
 
 			return true;
@@ -196,6 +200,7 @@ namespace RRServer {
 			if (it == m_real.end())
 				return false;
 
+			it->second->Clear();
 			m_real.erase(it);
 
 			return true;
@@ -234,6 +239,7 @@ namespace RRServer {
 			if (it == m_pixel.end())
 				return false;
 
+			it->second->Clear();
 			m_pixel.erase(it);
 
 			return true;
