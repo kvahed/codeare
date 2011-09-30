@@ -50,15 +50,15 @@ bool   pulses;
 bool init (int argc, char** argv);
 
 bool internaltest (ReconClient* rc); 
-bool cgsensetest (ReconClient* rc);
-bool nuffttest (ReconClient* rc);
-bool sdmtest (ReconClient* rc);
-bool mxtest (ReconClient* rc);
-bool nitest (ReconClient* rc);
-bool fftwtest (ReconClient* rc);
-bool resetest (ReconClient* rc);
-bool grappatest (ReconClient* rc);
-bool cstest (ReconClient* rc);
+bool cgsensetest  (ReconClient* rc);
+bool nuffttest    (ReconClient* rc);
+bool sdmtest      (ReconClient* rc);
+bool mxtest       (ReconClient* rc);
+bool nitest       (ReconClient* rc);
+bool fftwtest     (ReconClient* rc);
+bool resetest     (ReconClient* rc);
+bool grappatest   (ReconClient* rc);
+bool cstest       (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	

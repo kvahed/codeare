@@ -129,7 +129,7 @@ namespace RRServer {
 		 * @param  r     Complex data sequence
 		 */
 		void
-		SetCplx          (const std::string name, const cplx_data* r);
+		SetCplx          (const std::string name, const cplx_data& r);
 		
 
 		/**
@@ -139,17 +139,17 @@ namespace RRServer {
 		 * @param  r    Complex data matrix
 		 */
 		void
-		SetCplx          (const std::string name, Matrix<cplx>* r);
+		SetCplx          (const std::string name, Matrix<cplx>& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetCplx(const std::string name, cplx_data*)
+		 * @brief       @see ReconStrategy::GetCplx(const std::string name, cplx_data&)
 		 *
 		 * @param  name  Name
 		 * @param  r    Complex data sequence
 		 */
 		void
-		GetCplx          (const std::string name, cplx_data* r);
+		GetCplx          (const std::string name, cplx_data& r);
 		
 
 		/**
@@ -159,7 +159,7 @@ namespace RRServer {
 		 * @param  r    Complex data matrix
 		 */
 		void
-		GetCplx          (const std::string name, Matrix<cplx>* r);
+		GetCplx          (const std::string name, Matrix<cplx>& r);
 		
 
 		/**
@@ -169,7 +169,7 @@ namespace RRServer {
 		 * @param  r    Real data sequence
 		 */
 		void
-		SetReal (const std::string name, const real_data* r);
+		SetReal (const std::string name, const real_data& r);
 		
 
 		/**
@@ -179,7 +179,7 @@ namespace RRServer {
 		 * @param  r    Real data matrix
 		 */
 		void
-		SetReal (const std::string name, Matrix<double>* r);
+		SetReal (const std::string name, Matrix<double>& r);
 		
 
 		/**
@@ -189,7 +189,7 @@ namespace RRServer {
 		 * @param  r    Real data matrix
 		 */
 		void
-		GetReal (const std::string name, Matrix<double>* r);
+		GetReal (const std::string name, Matrix<double>& r);
 		
 
 		/**
@@ -199,7 +199,7 @@ namespace RRServer {
 		 * @param  r    Real data sequence
 		 */
 		void
-		GetReal (const std::string name, real_data* r);
+		GetReal (const std::string name, real_data& r);
 		
 
 		/**
@@ -209,7 +209,7 @@ namespace RRServer {
 		 * @param  r    Pixel data sequence
 		 */
 		void
-		SetPixel (const std::string name, const pixel_data* r);
+		SetPixel (const std::string name, const pixel_data& r);
 		
 
 		/**
@@ -219,7 +219,7 @@ namespace RRServer {
 		 * @param  r    Pixel data matrix
 		 */
 		void
-		SetPixel (const std::string name, Matrix<short>* r);
+		SetPixel (const std::string name, Matrix<short>& r);
 		
 
 		/**
@@ -229,7 +229,7 @@ namespace RRServer {
 		 * @param  r    Pixel data matrix
 		 */
 		void
-		GetPixel (const std::string name, Matrix<short>* r);
+		GetPixel (const std::string name, Matrix<short>& r);
 		
 
 		/**
@@ -239,7 +239,7 @@ namespace RRServer {
 		 * @param  r    Pixel data sequence
 		 */
 		void
-		GetPixel (const std::string name, pixel_data* r);
+		GetPixel (const std::string name, pixel_data& r);
 		
 
  		/**

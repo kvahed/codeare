@@ -302,17 +302,16 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 		std::string cmd  = "/usr/local/bin/mask.sh";
 
 		img.NIDump(orig);
-		printf (" dumping ..."); fflush(stdout);
+		printf ("exporting ... "); fflush(stdout);
 		
-
 		if (!std::system(NULL))
 			return FATAL_SYSTEM_CALL;
 
 		// Call bet
-		printf (" bet2ing ..."); fflush(stdout);
+		printf ("bet2ing ... "); fflush(stdout);
 		system (cmd.c_str());
 
-		printf (" reading in ..."); fflush(stdout);
+		printf ("importing ... "); fflush(stdout);
 		msk.NIRead(mask);
 
  		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());

@@ -88,73 +88,73 @@ ReconContext::ReadConfig       (const char* fname) {
 		
 
 void
-ReconContext::SetCplx          (const std::string name, const cplx_data* r) {
+ReconContext::SetCplx          (const std::string name, const cplx_data& r) {
 	m_strategy->SetCplx(name, r);
 }
 		
 
 void
-ReconContext::SetCplx          (const std::string name, Matrix<cplx>* r) {
+ReconContext::SetCplx          (const std::string name, Matrix<cplx>& r) {
 	m_strategy->SetCplx(name, r);
 }
 		
 
 void
-ReconContext::GetCplx          (const std::string name, cplx_data* r) {
+ReconContext::GetCplx          (const std::string name, cplx_data& r) {
 	m_strategy->GetCplx(name, r);
 }
 		
 
 void
-ReconContext::GetCplx          (const std::string name, Matrix<cplx>* r) {
+ReconContext::GetCplx          (const std::string name, Matrix<cplx>& r) {
 	m_strategy->GetCplx(name, r);
 }
 		
 
 void
-ReconContext::SetReal (const std::string name, const real_data* r) {
+ReconContext::SetReal (const std::string name, const real_data& r) {
 	m_strategy->SetReal(name, r);
 }
 		
 
 void
-ReconContext::SetReal (const std::string name, Matrix<double>* r) {
+ReconContext::SetReal (const std::string name, Matrix<double>& r) {
 	m_strategy->SetReal(name, r);
 }
 		
 
 void
-ReconContext::GetReal (const std::string name, Matrix<double>* r) {
+ReconContext::GetReal (const std::string name, Matrix<double>& r) {
 	m_strategy->GetReal(name, r);
 }
 		
 
 void
-ReconContext::GetReal (const std::string name, real_data* r) {
+ReconContext::GetReal (const std::string name, real_data& r) {
 	m_strategy->GetReal(name, r);
 }
 		
 
 void
-ReconContext::SetPixel (const std::string name, const pixel_data* r) {
+ReconContext::SetPixel (const std::string name, const pixel_data& r) {
 	m_strategy->SetPixel(name, r);
 }
 		
 
 void
-ReconContext::SetPixel (const std::string name, Matrix<short>* r) {
+ReconContext::SetPixel (const std::string name, Matrix<short>& r) {
 	m_strategy->SetPixel(name, r);
 }
 		
 
 void
-ReconContext::GetPixel (const std::string name, Matrix<short>* r) {
+ReconContext::GetPixel (const std::string name, Matrix<short>& r) {
 	m_strategy->GetPixel(name, r);
 }
 		
 
 void
-ReconContext::GetPixel (const std::string name, pixel_data* r) {
+ReconContext::GetPixel (const std::string name, pixel_data& r) {
 	m_strategy->GetPixel(name, r);
 }
 		
