@@ -184,13 +184,9 @@ ReconClient::SetCplx (const std::string name, Matrix< std::complex<float> >& M) 
 		r.res[j]  = M.Res(j);
 	}
 
-	r.dreal.length(M.Size()); 
-	r.dimag.length(M.Size());
+	r.vals.length(2 * M.Size());
 	
-	for (int i = 0; i < M.Size(); i++) {
-		r.dreal[i] = M[i].real();
-		r.dimag[i] = M[i].imag(); 
-	}
+	memcpy (&r.vals[0], &M[0], r.vals.length() * sizeof(float));
 	
 	m_rrsi->set_cplx(name.c_str(), r);
 	
@@ -210,8 +206,7 @@ ReconClient::GetCplx (const std::string name, Matrix< std::complex<float> >& m) 
 
 	m.Reset();
 	
-	for (int i = 0; i < GetSize(rp.dims); i++)
-		m[i] = std::complex<float>(rp.dreal[i],rp.dimag[i]);
+	memcpy (&m[0], &rp.vals[0], rp.vals.length() * sizeof(float));
 	
 }
 

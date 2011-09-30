@@ -48,19 +48,19 @@ DumpToFile::Process () {
 		return RRSModule::FILE_ACCESS_FAILED;
 	}
 
-	map<string,Matrix<cplx>*>::iterator cit = m_cplx.begin();
+	map<string,Ptr< Matrix<cplx> > >::iterator cit = m_cplx.begin();
 	for (cit = m_cplx.begin() ; cit != m_cplx.end(); cit++) {
 		cout << "Dumping " << cit->first.c_str() << endl;
 		cit->second->MXDump(mf, cit->first.c_str());
 	}
 	
-	map<string,Matrix<double>*>::iterator rit = m_real.begin();
+	map<string,Ptr< Matrix<double> > >::iterator rit = m_real.begin();
 	for (rit = m_real.begin(); rit != m_real.end(); rit++) {
 		cout << "Dumping " <<  rit->first.c_str() << endl;
 		rit->second->MXDump(mf, rit->first.c_str());
 	}
 	
-	map<string,Matrix<short>*>::iterator pit = m_pixel.begin();
+	map<string,Ptr< Matrix<short> > >::iterator pit = m_pixel.begin();
 	for (pit = m_pixel.begin(); pit != m_pixel.end(); pit++) {
 		cout << "Dumping " <<  pit->first.c_str() << endl;
 		pit->second->MXDump(mf, pit->first.c_str());

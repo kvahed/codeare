@@ -156,13 +156,12 @@ CGSENSE::Process () {
 
 	RRSModule::error_code error = OK;
 
-	Matrix<cplx>&   data    = *(m_cplx["data"]);
-	Matrix<cplx>&   sens    = *(m_cplx["sens"]);
-	Matrix<double>& weights = *(m_real["weights"]);
-	Matrix<double>& kspace  = *(m_real["kspace"]);
+	Matrix<cplx>&   data    = GetCplx("data");
+	Matrix<cplx>&   sens    = GetCplx("sens");
+	Matrix<double>& weights = GetReal("weights");
+	Matrix<double>& kspace  = GetReal("kspace");
 	
 	int err = 0;
-
 	// CG matrices ----------------------------------------------------
 	Matrix<cplx> p, q, r;
 
@@ -178,11 +177,11 @@ CGSENSE::Process () {
 	// Set k-space and weights ----------------------------------------
 	for (int i = 0; i < NTHREADS || i < m_Nc; i++) {
 
-		memcpy (&(m_fplan[i].x[0]), &kspace[0], m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
-		memcpy (&(m_iplan[i].w[0]), &weights[0], m_fplan[i].M_total * sizeof(double)) ;
+		memcpy (&(m_fplan[i].x[0]),  &kspace[0], m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
+		memcpy (&(m_iplan[i].w[0]), &weights[0],                m_fplan[i].M_total * sizeof(double));
 
 		nfft::weights (&m_fplan[i], &m_iplan[i]);
-		nfft::psi (&m_fplan[i]);
+		nfft::psi     (&m_fplan[i]);
 
 	}
 

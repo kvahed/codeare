@@ -40,8 +40,8 @@ module RRSModule {
 	 */
 	struct    cplx_data         {
 		
-		floats dreal;  /**< Data abs      */
-		floats dimag;  /**< Data argument */
+		floats vals;  /**< Data chain of real/imag */
+		//floats dimag;  /**< Data argument */
 		longs  dims;   /**< Dimesions     */
 		floats res;
 
