@@ -68,10 +68,10 @@ RelativeSensitivities::Process     () {
     // -----------------------------------------
 
     // SVD calibration -------------------------
-    Matrix<cplx>&   rxm  = AddCplx ("rxm",  new Matrix<cplx>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5)));
-    Matrix<cplx>&   txm  = AddCplx ("txm",  new Matrix<cplx>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4)));
-    Matrix<cplx>&   shim = AddCplx ("shim", new Matrix<cplx>   (data.Dim(4), 1));
-    Matrix<double>& snro = AddReal ("snro", new Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2)));
+    Matrix<cplx>&   rxm  = AddCplx ("rxm",  NEW (Matrix<cplx>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
+    Matrix<cplx>&   txm  = AddCplx ("txm",  NEW (Matrix<cplx>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
+    Matrix<cplx>&   shim = AddCplx ("shim", NEW (Matrix<cplx>   (data.Dim(4), 1)));
+    Matrix<double>& snro = AddReal ("snro", NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
 
     SVDCalibrate (data, rxm, txm, snro, shim, false);
 
@@ -79,7 +79,7 @@ RelativeSensitivities::Process     () {
 
     // Do we have GRE for segmentation? --------
 
-    Matrix<short>& bets = AddPixel ("bets", new Matrix<short> (mask.Dim()));
+    Matrix<short>& bets = AddPixel ("bets", NEW (Matrix<short> (mask.Dim())));
 
     if (m_use_bet == 1) { // Better test? / Replace with SNRO?
       
@@ -113,7 +113,7 @@ RelativeSensitivities::Process     () {
 
     // B0 calculation --------------------------
 
-    Matrix<double>& b0 = AddReal ("b0", new Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2)));
+    Matrix<double>& b0 = AddReal ("b0", NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
 
     B0Map (data, b0, m_echo_shift);
     // -----------------------------------------

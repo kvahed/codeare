@@ -54,31 +54,30 @@ CompressedSensing::Process () {
 	printf ("Processing CompressedSensing ...\n");
 	ticks csstart = getticks();
 
-	Matrix<cplx>*   data  = m_cplx["data"];
-	Matrix<double>* pdf   = m_real["pdf"];
+	Matrix<cplx>&   data  = GetCplx("data");
+	Matrix<double>& pdf   = GetReal("pdf");
 
-	Matrix<cplx>*   im_dc;
-	AddCplx ("im_dc", im_dc  = new Matrix<cplx> (data->Dim()));
+	Matrix<cplx>&   im_dc = AddCplx ("im_dc", new Matrix<cplx> (data.Dim()));
 
 	ticks tic = getticks();
 
 	printf ("  Fourier transforming ... "); fflush(stdout);
 	
-	for (int i = 0; i < data->Size(); i++)
-		data->At(i) /= pdf->At(i);
+	for (int i = 0; i < data.Size(); i++)
+		data[i] /= pdf[i];
 	
-	(*data) = FFT::Backward(*data);
+	data = FFT::Backward(data);
 
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	tic = getticks();
 
-	cplx ma = data->Maxabs();
-	(*data)  /= ma;
+	cplx ma = data.Maxabs();
+	data  /= ma;
 
 	printf ("  Wavelet transforming ... "); fflush(stdout);
 
-	(*im_dc) = DWT::Forward (*data);
+	im_dc = DWT::Forward (data);
 
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
@@ -88,7 +87,7 @@ CompressedSensing::Process () {
 
 	for (int i = 0; i < m_csiter; i++) {
 		
-		NLCG ((*im_dc), (*data), m_cgparam);
+		NLCG (im_dc, data, m_cgparam);
 		
 	}
 	

@@ -103,23 +103,23 @@ namespace RRServer {
 		 */ 
 		virtual error_code
 		Finalise        () {
-
+			
 			while (!m_cplx.empty()) {
 				cout << "Clearing RAM of " <<  m_cplx.begin()->first.c_str() << endl;
 				FreeCplx(m_cplx.begin()->first.c_str());
 			}
-
+			
 			while (!m_real.empty()) {
 				cout << "Clearing RAM of " <<  m_real.begin()->first.c_str() << endl;
 				FreeReal(m_real.begin()->first.c_str());
 			}
-
+			
 			while (!m_pixel.empty()) {
 				cout << "Clearing RAM of " <<  m_pixel.begin()->first.c_str() << endl;
 				FreePixel(m_pixel.begin()->first.c_str());
 			}
-
-
+			
+			
 		}
 		
 		
@@ -131,14 +131,56 @@ namespace RRServer {
 		 * @return      Success
 		 */
 		Matrix<cplx>&
-		AddCplx         (const string name, Matrix<cplx>* m) {
-
+		AddCplx         (const string name, Ptr< Matrix<cplx> > m) {
+			
 			assert (m_cplx.find (name) == m_cplx.end());
-			m_cplx.insert (pair<string, Matrix<cplx>*> (name, m));
+			m_cplx.insert (pair< string, Ptr < Matrix<cplx> > >(name, m));
 			return *m_cplx[name];
 			
 		}
-
+		
+		
+		/**
+		 * @brief       Get reference to complex data by name
+		 * 
+		 * @param  name Name
+		 * @return      Reference to data if existent
+		 */
+		Matrix<cplx>&
+		GetCplx         (const string name) {
+			
+			return *m_cplx[name];
+			
+		}
+		
+		
+		/**
+		 * @brief       Get reference to complex data by name
+		 * 
+		 * @param  name Name
+		 * @return      Reference to data if existent
+		 */
+		Matrix<double>&
+		GetReal          (const string name) {
+			
+			return *m_real[name];
+			
+		}
+		
+		
+		/**
+		 * @brief       Get reference to complex data by name
+		 * 
+		 * @param  name Name
+		 * @return      Reference to data if existent
+		 */
+		Matrix<short>&
+		GetPixel          (const string name) {
+			
+			return *m_pixel[name];
+			
+		}
+		
 
 		/**
 		 * @brief       Remove a complex matrix from complex container
@@ -149,19 +191,19 @@ namespace RRServer {
 		bool 
 		FreeCplx        (const string name) {
 			
-			map<string,Matrix<cplx>*>::iterator it = m_cplx.find (name);
-
+			map<string, Ptr< Matrix<cplx> > >::iterator it = m_cplx.find (name);
+			
 			if (it == m_cplx.end())
 				return false;
-
+			
 			delete it->second;
 			m_cplx.erase(it);
-
+			
 			return true;
 			
 		}
 		
-
+		
 		/**
 		 * @brief       Add a real matrix to real matrix container
 		 *
@@ -170,14 +212,14 @@ namespace RRServer {
 		 * @return      Reference to 
 		 */
 		Matrix<double>&
-		AddReal         (const string name, Matrix<double>* m) {
-
+		AddReal         (const string name, Ptr< Matrix<double> > m) {
+			
 			assert(m_real.find (name) == m_real.end());
-			m_real.insert (pair<string, Matrix<double>*> (name, m));
+			m_real.insert (pair< string, Ptr < Matrix<double> > >(name, m));
 			return *m_real[name];
 			
 		}
-
+		
 
 		/**
 		 * @brief       Remove a real matrix from real container
@@ -188,7 +230,7 @@ namespace RRServer {
 		bool 
 		FreeReal        (const string name) {
 			
-			map<string,Matrix<double>*>::iterator it = m_real.find (name);
+			map<string, Ptr< Matrix<double> > >::iterator it = m_real.find (name);
 
 			if (it == m_real.end())
 				return false;
@@ -209,10 +251,10 @@ namespace RRServer {
 		 * @return      Success
 		 */
 		Matrix<short>&
-		AddPixel        (const string name, Matrix<short>* m) {
+		AddPixel        (const string name, Ptr< Matrix<short> > m) {
 
 			assert (m_pixel.find (name) == m_pixel.end());
-			m_pixel.insert (pair<string, Matrix<short>*> (name, m));
+			m_pixel.insert (pair<string, Ptr< Matrix<short> > > (name, m));
 			return *m_pixel[name];
 			
 		}
@@ -227,7 +269,7 @@ namespace RRServer {
 		bool 
 		FreePixel        (const string name) {
 			
-			map<string,Matrix<short>*>::iterator it = m_pixel.find (name);
+			map<string, Ptr< Matrix<short> > >::iterator it = m_pixel.find (name);
 
 			if (it == m_pixel.end())
 				return false;
@@ -252,21 +294,17 @@ namespace RRServer {
 			if (m_cplx.find (name) == m_cplx.end())
 				return;
 			
-			Matrix<cplx>* tmp = m_cplx[name];
+			Ptr< Matrix<cplx> > tmp = m_cplx[name];
 			
 			for (int j = 0; j < INVALID_DIM; j++) {
 				c.dims[j] = tmp->Dim(j);
 				c.res[j]  = tmp->Res(j);
 			}
 			
-			c.dreal.length(tmp->Size()); 
-			c.dimag.length(tmp->Size());
-			
-			for (int i = 0; i < tmp->Size(); i++) {
-				c.dreal[i] = tmp->At(i).real();
-				c.dimag[i] = tmp->At(i).imag(); 
-			}
-			
+			c.vals.length(2 * tmp->Size()); 
+
+			memcpy (&c.vals[0], &tmp->At(0), c.vals.length() * sizeof(float));
+
 			FreeCplx(name);
 			
 		}
@@ -281,10 +319,10 @@ namespace RRServer {
 		void 
 		SetCplx       (const string name, const cplx_data& c)   {
 			
-			Matrix<cplx>* tmp;
+			Ptr< Matrix<cplx> > tmp;
 			
 			if (m_cplx.find (name) == m_cplx.end())
-				m_cplx.insert (pair<string, Matrix<cplx>*> (name, tmp = new Matrix<cplx>()));
+				m_cplx.insert (pair<string, Ptr< Matrix<cplx> > > (name, tmp = NEW (Matrix<cplx>())));
 			else
 			    tmp = m_cplx[name];
 			
@@ -295,9 +333,8 @@ namespace RRServer {
 			
 			tmp->Reset ();
 			
-			for (int j = 0; j < tmp->Size(); j++)
-				tmp->At(j) =  complex<float> (c.dreal[j], c.dimag[j]);
-			
+			memcpy (&tmp->At(0), &c.vals[0], c.vals.length() * sizeof(float));
+
 		}
 		
 
@@ -328,7 +365,7 @@ namespace RRServer {
 		SetCplx       (const string name, Matrix<cplx>& m)   {
 			
 			if (m_cplx.find (name) == m_cplx.end())
-				m_cplx.insert (pair<string, Matrix<cplx>*> (name, new Matrix<cplx>()));
+				m_cplx.insert (pair<string, Ptr< Matrix<cplx> > > (name, NEW (Matrix<cplx>())));
 			
 			m_cplx[name] = &m;
 			
@@ -347,7 +384,7 @@ namespace RRServer {
 			if (m_real.find (name) == m_real.end())
 				return;
 			
-			Matrix<double>* tmp = m_real[name];
+			Ptr< Matrix<double> > tmp = m_real[name];
 			
 			for (int j = 0; j < INVALID_DIM; j++) {
 				r.dims[j] = tmp->Dim(j);
@@ -356,9 +393,8 @@ namespace RRServer {
 			
 			r.vals.length(tmp->Size()); 
 			
-			for (int i = 0; i < tmp->Size(); i++)
-				r.vals[i] = tmp->At(i);
-			
+			memcpy (&r.vals[0], &tmp->At(0), tmp->Size() * sizeof(double));
+
 			FreeReal(name);
 			
 		}
@@ -373,10 +409,10 @@ namespace RRServer {
 		void 
 		SetReal        (const string name, const real_data& r)   {
 			
-			Matrix<double>* tmp;
+			Ptr< Matrix<double> > tmp;
 
 			if (m_real.find (name) == m_real.end())
-				m_real.insert (pair<string, Matrix<double>*> (name, tmp = new Matrix<double>()));
+				m_real.insert (pair<string, Ptr< Matrix<double> > > (name, tmp = NEW( Matrix<double>())));
 			else
 				tmp = m_real[name];
 			
@@ -387,9 +423,8 @@ namespace RRServer {
 			
 			tmp->Reset ();
 			
-			for (int j = 0; j < tmp->Size(); j++)
-				tmp->At(j) =  r.vals[j];
-			
+			memcpy (&tmp->At(0), &r.vals[0], tmp->Size() * sizeof(double));
+
 		}
 		
 		
@@ -421,7 +456,7 @@ namespace RRServer {
 		SetReal         (const string name, Matrix<double>& m)   {
 			
 			if (m_real.find (name) == m_real.end())
-				m_real.insert (pair<string, Matrix<double>*> (name, new Matrix<double>()));
+				m_real.insert (pair<string, Ptr< Matrix<double> > > (name, NEW( Matrix<double>())));
 			
 			m_real[name] = &m;
 			
@@ -440,7 +475,7 @@ namespace RRServer {
 			if (m_pixel.find (name) == m_pixel.end())
 				return;
 			
-			Matrix<short>* tmp = m_pixel[name];
+			Ptr< Matrix<short> > tmp = m_pixel[name];
 
 			for (int j = 0; j < INVALID_DIM; j++) {
 				p.dims[j] = tmp->Dim(j);
@@ -449,9 +484,8 @@ namespace RRServer {
 			
 			p.vals.length(tmp->Size()); 
 			
-			for (int i = 0; i < tmp->Size(); i++)
-				p.vals[i] = tmp->At(i);
-			
+			memcpy (&p.vals[0], &tmp->At(0), tmp->Size() * sizeof(short));
+
 			FreePixel(name);
 			
 		}
@@ -466,10 +500,10 @@ namespace RRServer {
 		void 
 		SetPixel         (const string name, const pixel_data& p)   {
 			
-			Matrix<short>* tmp;
+			Ptr< Matrix<short> > tmp;
 
 			if (m_pixel.find (name) == m_pixel.end())
-				m_pixel.insert (pair<string, Matrix<short>*> (name, tmp = new Matrix<short>()));
+				m_pixel.insert (pair<string, Ptr< Matrix<short> > > (name, tmp = NEW (Matrix<short>())));
 			else
 				tmp = m_pixel[name];
 
@@ -480,9 +514,8 @@ namespace RRServer {
 			
 			tmp->Reset ();
 			
-			for (int j = 0; j < tmp->Size(); j++) 
-				tmp->At(j) =  p.vals[j];
-			
+			memcpy (&tmp->At(0), &p.vals[0], tmp->Size() * sizeof(short));
+
 		}
 
 		
@@ -513,7 +546,7 @@ namespace RRServer {
 		SetPixel         (const string name, Matrix<short>& m)   {
 			
 			if (m_pixel.find (name) == m_pixel.end())
-				m_pixel.insert (pair<string, Matrix<short>*> (name, new Matrix<short>()));
+				m_pixel.insert (pair<string, Ptr< Matrix<short> > > (name, NEW (Matrix<short>())));
 			
 			m_pixel[name] = &m;
 			
@@ -547,9 +580,9 @@ namespace RRServer {
 	
 	protected:
 		
-		map < string, Matrix<cplx>*   > m_cplx;         /*!< Complex data        */
-		map < string, Matrix<double>* > m_real;         /*!< Real data           */
-		map < string, Matrix<short>*  > m_pixel;        /*!< Short data          */
+		map < string, Ptr< Matrix<cplx>   > > m_cplx;   /*!< Complex data        */
+		map < string, Ptr< Matrix<double> > > m_real;   /*!< Real data           */
+		map < string, Ptr< Matrix<short>  > > m_pixel;  /*!< Short data          */
 		
 		string                          m_name;         /*!< Name                */
 		bool                            m_initialised;  /*!< Reco is initialised */
