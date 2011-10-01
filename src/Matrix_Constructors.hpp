@@ -11,6 +11,7 @@ Matrix<T>::Matrix () {
 	for (size_t i = 0; i < Size(); i++)
 		_M[i] = T(0.0);
 
+	_name = "Matrix<T>";
 
 }
 

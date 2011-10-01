@@ -175,29 +175,25 @@ bool cgsensetest (ReconClient* rc) {
 
 	} else {
 
-		/*	RRServer::ReconContext* rx = new RRServer::ReconContext(test);
+		RRServer::ReconContext* rx = new RRServer::ReconContext(test);
 
 		rx->ReadConfig(cf.c_str());
-
-		rx->SetCplx     (&rawdata);
-		rawdata.Clear();
-
-		rx->SetCplx (&sens);
-		sens.Clear();
-
-		rx->SetReal  (&weights);
-		weights.Clear();
-
-		rx->SetReal  (&kspace);
-		kspace.Clear();
-
 		rx->Init();
-		rx->Process    ();
+
+		rx->SetCplx ("data",     rawdata);
+		rx->SetCplx ("sens",     sens);
+		rx->SetReal ("weights",  weights);
+		rx->SetReal ("kspace",   kspace);
+
+		rx->Process ();
 		
-		rx->GetCplx     (&rawdata);
-		rx->GetCplx (&sens);
-		rx->GetReal  (&weights);
-		*/			
+		rx->GetCplx ("data",     rawdata); // Images
+		if (pulses)
+			rx->GetCplx ("sens", sens);    // Pulses (Excitation)
+		rx->GetReal ("weights",  weights); // CG residuals
+
+		rx->Finalise ();
+
 	}
 	
 #ifdef HAVE_MAT_H	

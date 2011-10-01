@@ -367,7 +367,7 @@ namespace RRServer {
 			if (m_cplx.find (name) == m_cplx.end())
 				m_cplx.insert (pair<string, Ptr< Matrix<cplx> > > (name, NEW (Matrix<cplx>())));
 			
-			m_cplx[name] = &m;
+			*m_cplx[name] = m;
 			
 		}
 		
@@ -458,7 +458,7 @@ namespace RRServer {
 			if (m_real.find (name) == m_real.end())
 				m_real.insert (pair<string, Ptr< Matrix<double> > > (name, NEW( Matrix<double>())));
 			
-			m_real[name] = &m;
+			*m_real[name] = m;
 			
 		}
 		
@@ -548,7 +548,7 @@ namespace RRServer {
 			if (m_pixel.find (name) == m_pixel.end())
 				m_pixel.insert (pair<string, Ptr< Matrix<short> > > (name, NEW (Matrix<short>())));
 			
-			m_pixel[name] = &m;
+			*m_pixel[name] = m;
 			
 		}
 	
@@ -580,12 +580,12 @@ namespace RRServer {
 	
 	protected:
 		
-		map < string, Ptr< Matrix<cplx>   > > m_cplx;   /*!< Complex data        */
-		map < string, Ptr< Matrix<double> > > m_real;   /*!< Real data           */
-		map < string, Ptr< Matrix<short>  > > m_pixel;  /*!< Short data          */
+		map < string, Ptr< Matrix<cplx>   > > m_cplx;   /*!< @brief Complex data repository   */
+		map < string, Ptr< Matrix<double> > > m_real;   /*!< @brief Real data repository      */
+		map < string, Ptr< Matrix<short>  > > m_pixel;  /*!< @brief Integer data respository  */
 		
-		string                          m_name;         /*!< Name                */
-		bool                            m_initialised;  /*!< Reco is initialised */
+		string                          m_name;         /*!< @brief Name                      */
+		bool                            m_initialised;  /*!< @brief Reco is initialised       */
 		
 	};
 	
