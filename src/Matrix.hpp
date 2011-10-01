@@ -2010,13 +2010,23 @@ public:
     
     //@{
     
+
 	/**
 	 * @brief           Who are we?
 	 *
 	 * @return          Class name
 	 */ 
 	const char* 
-	GetClassName() const { return "CSomeClass"; }
+	GetClassName        () const { return _name.c_str(); }
+
+
+	/**
+	 * @brief           Who are we?
+	 *
+	 * @return          Class name
+	 */ 
+	void 
+	SetClassName        (const char* name) { _name = name; }
 
 
 	/**
@@ -2500,6 +2510,7 @@ private:
     size_t              _dim[INVALID_DIM]; /// Dimensions
     float               _res[INVALID_DIM]; /// Resolutions
 	std::vector<T>      _M;
+	std::string         _name; 
 
     /**
      * @brief           Matrix matrix product with BLAS.

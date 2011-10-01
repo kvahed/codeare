@@ -41,9 +41,8 @@ module RRSModule {
 	struct    cplx_data         {
 		
 		floats vals;  /**< Data chain of real/imag */
-		//floats dimag;  /**< Data argument */
-		longs  dims;   /**< Dimesions     */
-		floats res;
+		longs  dims;  /**< Dimesions     */
+		floats res;   /**< Resolution     */
 
 	};
 
@@ -55,7 +54,7 @@ module RRSModule {
 
 		doubles vals;  /**< Data      */
 		longs   dims;  /**< Dimesions */
-		floats  res;
+		floats  res;   /**< Resolution     */
 
 	};
 
@@ -67,7 +66,7 @@ module RRSModule {
 
 		shorts vals;  /**< Data      */
 		longs  dims;  /**< Dimesions */
-		floats res;
+		floats res;   /**< Resolution     */
 
 	};
 
