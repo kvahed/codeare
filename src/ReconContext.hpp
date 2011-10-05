@@ -22,6 +22,7 @@
 #define __RECONCONTEXT_HPP__
 
 #include "ReconStrategy.hpp"
+#include "Connector.hpp"
 #include <vector>
 
 namespace RRServer {
@@ -30,17 +31,11 @@ namespace RRServer {
 	/**
 	 * @brief Context of a reconstruction method. Abstraction layer to algorithm backends. 
 	 */
-	class ReconContext {
+	class ReconContext : public Connector {
 		
 		
 		
 	public:
-		
-		
-		/**
-		 * @brief        Default Constructor.
-		 */
-		ReconContext     ();
 		
 		
 		/**
@@ -263,6 +258,13 @@ namespace RRServer {
 		
 		ReconStrategy*  m_strategy;   /**< Active strategy           */
 		void*           m_dlib;       /**< Handle on startegy module */
+		
+
+		/**
+		 * @brief        Default Constructor.
+		 */
+		ReconContext     ();
+		
 		
 	};
 	
