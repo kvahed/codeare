@@ -22,6 +22,7 @@
 #define __RECON_CLIENT_H__
 
 #include "Configurable.hpp"
+#include "Connector.hpp"
 #include "Matrix.hpp"
 
 
@@ -46,7 +47,8 @@ namespace RRClient {
 	 * @brief               Remote reconstruction client 
 	 */
 	class ReconClient :
-	public Configurable {
+		public Configurable, 
+		public Connector {
 		
 		
 	public:

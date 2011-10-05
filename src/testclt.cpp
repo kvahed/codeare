@@ -65,7 +65,7 @@ int main (int argc, char** argv) {
 	if (init (argc, argv)) {
 		
 		ReconClient client (name, verbose);
-
+		
 		if (strcmp (test, "NuFFT")   == 0)
 			nuffttest (&client);
 		else if (strcmp (test, "NuFFT_OMP")   == 0)
