@@ -254,6 +254,7 @@ public:
     /**
      * @brief           Delete array containing data.
      */
+    virtual
     ~Matrix             ();
 
 

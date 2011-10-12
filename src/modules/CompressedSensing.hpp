@@ -87,7 +87,9 @@ namespace RRStrategy {
 		 * @brief Do nothing 
 		 */
 		virtual RRSModule::error_code
-		Finalise () {};
+		Finalise () {
+			return RRSModule::OK;
+		};
 
 
 	private:

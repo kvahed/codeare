@@ -119,7 +119,8 @@ namespace RRServer {
 				FreePixel(m_pixel.begin()->first.c_str());
 			}
 			
-			
+			return RRSModule::OK;
+
 		}
 		
 		

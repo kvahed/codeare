@@ -1171,7 +1171,6 @@ AC_SUBST([am__tar])
 AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
-m4_include([config/ax_compiler_vendor.m4])
 m4_include([config/libtool.m4])
 m4_include([config/ltoptions.m4])
 m4_include([config/ltsugar.m4])

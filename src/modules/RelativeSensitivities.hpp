@@ -1,7 +1,7 @@
 /*
  *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Daniel Brenner
- *                               Forschungszentrum Jülich, Germany
+ *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -295,7 +295,8 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 	 *
 	 * @brief In-out Images/mask
 	 */
-	int SegmentBrain (const Matrix<double>& img, Matrix<short>& msk) {
+	RRSModule::error_code
+	SegmentBrain (const Matrix<double>& img, Matrix<short>& msk) {
 		
 		printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
 
