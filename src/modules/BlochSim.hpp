@@ -35,7 +35,7 @@ enum coords {
  */
 void RotationMatrix (const Matrix<double>& n, Matrix<double>& r) {
 	
-	double ar, ai, br, bi, hp, cp, sp, arar, aiai, arai2, brbr, 
+	double ar, ai, br, bi, hp, cp, sp, aiai, arai2, brbr,
 		bibi, brbi2, arbi2, aibr2, arbr2, aibi2, phi;
 
 	phi = sqrt(n[X]*n[X] + n[Y]*n[Y] + n[Z]*n[Z]);
@@ -56,9 +56,9 @@ void RotationMatrix (const Matrix<double>& n, Matrix<double>& r) {
 	
 		 	/* Make auxiliary variables to speed this up	*/
 
-		arar  =   ar*ar;
-		aiai  =   ai*ai;
-		arai2 = 2*ar*ai;
+		double arar  =   ar*ar;
+		double aiai  =   ai*ai;
+		double arai2 = 2*ar*ai;
 		brbr  =   br*br;
 		bibi  =   bi*bi;
 		brbi2 = 2*br*bi;

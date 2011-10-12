@@ -1397,7 +1397,7 @@ public:
      *
      * @param  M        The assigned matrix.
      */
-    Matrix<T>           
+    Matrix<T>&
     operator=           (const Matrix<T>& M);
     
     
@@ -2005,7 +2005,7 @@ public:
      * @return          Success.
      */
     bool                
-    Read                (const std::string fname, const std::string dname = "", const std::string dloc = "/", const io_strategy ios = HDF5);
+    Read                (const std::string& fname, const std::string& dname = "", const std::string& dloc = "/", const io_strategy& ios = HDF5);
 
     
 	/**
@@ -2016,7 +2016,7 @@ public:
 	 * @return          Success
 	 */
 	bool
-	RAWRead             (const std::string fname, const std::string version);
+	RAWRead             (const std::string& fname, const std::string& version);
 
     //@}
     
@@ -2055,7 +2055,7 @@ public:
 	 * @return          Indices
 	 */
 	Matrix<size_t>
-	Sub2Ind             (const Matrix<size_t> sub) const;
+	Sub2Ind             (const Matrix<size_t>& sub) const;
 
 
 
@@ -2066,7 +2066,7 @@ public:
 	 * @return          Subscripts
 	 */
 	Matrix<size_t>
-	Ind2Sub             (const Matrix<size_t> ind) const;
+	Ind2Sub             (const Matrix<size_t>& ind) const;
 
 
 
@@ -2077,7 +2077,7 @@ public:
 	 * @return          Subscripts
 	 */
 	Matrix<size_t>
-	Ind2Sub2D           (const Matrix<size_t> ind) const;
+	Ind2Sub2D           (const Matrix<size_t>& ind) const;
 
 
 
@@ -2088,7 +2088,7 @@ public:
 	 * @return          Subscripts
 	 */
 	Matrix<size_t>
-	Ind2Sub3D           (const Matrix<size_t> ind) const;
+	Ind2Sub3D           (const Matrix<size_t>& ind) const;
 
 
 
@@ -2578,7 +2578,7 @@ private:
 	 * @return          Success
 	 */
 	bool
-	RSAdjust            (const std::string fname);
+	RSAdjust            (const std::string& fname);
     
 };
 
@@ -2764,9 +2764,9 @@ Matrix<T>::tr() const {
     for (size_t i = 0; i < res.Dim(0); i++)
         for (size_t j = 0; j < res.Dim(1); j++)
 			if (typeid (T) == typeid (double))
-				res.At(i,j) =      At(j,i);  // Transpose
+				res.At(i,j) =           At(j,i);  // Transpose
 			else
-				res.At(i,j) = conj(At(j,i)); // Conjugate transpose
+				res.At(i,j) = std::conj(At(j,i)); // Conjugate transpose
 
     return res;
 

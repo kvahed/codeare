@@ -18,8 +18,8 @@
  *  02110-1301  USA
  */
 
-template <class T> inline Matrix<T> 
-Matrix<T>::operator=(const Matrix<T> &M) {
+template <class T> inline Matrix<T>&
+Matrix<T>::operator=(const Matrix<T>& M) {
     
 	if (this->Size() != M.Size())
 		_M.resize(M.Size());
