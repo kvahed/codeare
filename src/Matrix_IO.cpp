@@ -191,6 +191,7 @@ Matrix<T>::PRDump (const string fname) const {
 	
 	if (fwrite(&_M[0], sizeof(float), Size(), fp) != Size()) {
 		printf("File read error.");
+		fclose(fp);
 		return false;
 	}
 	
@@ -448,32 +449,18 @@ bool Matrix<T>::RSAdjust (const string fname) {
 	
 }
 
-static inline void dec2bin (unsigned& i, char* r) {
 
-	char* e = r; 
-
-	for (int j = 0; j < 2*sizeof(i); j++) {
-		(i & 0x1) ? (*r++='1') : (*r++='0'); 
-		i >>= 1; 
-	}
-	
-	while( r-- != e ) 
-		printf("%c",*r);
-	printf(" ");
-}
-
-
-inline void 
+inline void
 ProgressBar (const std::string& pre, const std::string& post, const short& p) {
-	
+
 	assert (p >=   0);
 	assert (p <= 100);
-	
+
 	std::cout << "\r";
 	std::cout << pre.c_str();
-	std::cout << " | "; 
+	std::cout << " | ";
 	std::cout << bars.substr(0, p/2) << " " <<  blancs.substr(0, 50-p/2) << "| " << std::setw(3) << std::setfill(' ') << p << "% done";
-	
+
 }
 
 
