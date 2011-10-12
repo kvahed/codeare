@@ -48,7 +48,7 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& ou
 			
 			// Copy FTed data back
 			for (int i = 0; i < nsamples; i++)
-				out[i+spos] = raw(np[tid].f[i][0], np[tid].f[i][1]);
+				out[i+spos] = (raw(np[tid].f[i][0], np[tid].f[i][1]));
 			
 		}
 		
@@ -72,7 +72,7 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& ou
  */
 RRSModule::error_code
 EH (const Matrix<raw>& in, Matrix<raw>& sm, nfft_plan* np, solver_plan_complex* spc, 
-	const double& epsilon, const int& maxit, Matrix<raw>& out, const int dim) {
+	const double& epsilon, const int& maxit, Matrix<raw>& out, const int& dim, const bool& adjoint) {
 
 	// Clear outgoing container
 	out.Zero();
@@ -104,10 +104,14 @@ EH (const Matrix<raw>& in, Matrix<raw>& sm, nfft_plan* np, solver_plan_complex* 
 				spc[tid].y[i][1] = (in[spos + i]).imag();
 			}
 			
-			// Inverse FT
-			nfft::ift (&np[tid], &spc[tid], maxit, epsilon);
-			memcpy (&ftout[ipos], &spc[tid].f_hat_iter[0][0], imgsize*sizeof (fftw_complex));
-			//memcpy (&ftout[imgsize * j], &np[tid].f_hat[0][0], imgsize * sizeof (fftw_complex));
+			// Inverse FT or adjoint
+			if (adjoint) {
+				nfft::adjoint (&np[tid]);
+				memcpy (&ftout[ipos], &np[tid].f_hat[0][0], imgsize*sizeof (fftw_complex));
+			} else {
+				nfft::ift (&np[tid], &spc[tid], maxit, epsilon);
+				memcpy (&ftout[ipos], &spc[tid].f_hat_iter[0][0], imgsize*sizeof (fftw_complex));
+			}
 			
 		}
 
@@ -118,9 +122,9 @@ EH (const Matrix<raw>& in, Matrix<raw>& sm, nfft_plan* np, solver_plan_complex* 
 			for (int j = 0; j < ncoils; j++) {
 				int pos = j * imgsize + i;
 				sens = sm[pos];
-				out[i] += raw(ftout[pos][0], ftout[pos][1]) * conj(sens);
+				out[i] += (raw(ftout[pos][0], ftout[pos][1]) * conj(sens));
 			}
-
+		
 	}
 	
 	free (ftout);

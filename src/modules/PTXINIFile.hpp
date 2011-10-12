@@ -107,11 +107,11 @@ PTXWriteSiemensINIFile (const Matrix<cplx>& pt, int dimrf, int dimgr, int nc, in
 
 	for (int i = 0; i < nt; i++)
 		if (orientation->compare("transversal") == 0 || orientation->compare("t") == 0)
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+2))/maxg);
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i,  real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+2))/maxg);
 		else if (orientation->compare("sagittal") == 0 || orientation->compare("s") == 0)
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+2))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+0))/maxg);
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, -real(pt(i,nc+2))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+0))/maxg);
 		else //transversal
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+2))/maxg);
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i,  real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+2))/maxg);
 
 	for (int j = 0; j < nc; j++) {
 		

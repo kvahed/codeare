@@ -78,7 +78,7 @@ void RotationMatrix (const Matrix<double>& n, Matrix<double>& r) {
  */
 void SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, const Matrix<double>& r, const Matrix<double>& m0, 
 				   const Matrix<double>& b0m, const double&         dt, const bool&           v, const size_t&        pos, 
-				   Matrix<double>&       res) {
+				   Matrix<cplx>&         res) { 
 
 	assert (rxm.HDim() <= 3);
 
@@ -115,7 +115,7 @@ void SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, const Ma
 
 			res(X,t,c) = ls(c).real() * m(X);
 			res(Y,t,c) = ls(c).imag() * m(Y);
-			res(Z,t,c) =               m(Z);
+			res(Z,t,c) =                m(Z);
 
 		}
 
@@ -185,32 +185,37 @@ void SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>& rf, const Matr
 /**
  * @brief Piece-wise constant bloch simulation
  *
- * @param  txm  Transmit sensitivity (Nr  x Ntxc)
- * @param  rxm  Receive sensitivity  (Nr  x Nrxc) 
- * @param  rf   RF field             (Nt  x Nt  )
- * @param  gr   Gradient             (1-3 x Nt  )
- * @param  r    Spatial positions    (1-3 x Nr  )
- * @param  b0m  B0 map               (Nr        )
- * @param  v    Verbose              (Scalar: false = only end, true = all time points)
- * @param  np   # parallel processes (scalar)
- * @param  res  Result of simulation (Nr x 3 (x Nt))
+ * @param  txm  Transmit sensitivity    (Nr  x Ntxc)
+ * @param  rxm  Receive sensitivity     (Nr  x Nrxc) 
+ * @param  rf   RF field                (Nt  x Nt  )
+ * @param  gr   Gradient                (1-3 x Nt  )
+ * @param  r    Spatial positions       (1-3 x Nr  )
+ * @param  m0   Starting magnetisation  (3   x Nr  )
+ * @param  b0m  B0 map                  (Nr        )
+ * @param  v    Verbose                 (Scalar: false = only end, true = all time points)
+ * @param  np   # parallel processes    (scalar)
+ * 
+ * @param  res  Result of simulation    (Nr  x 3 (x Nt))
+ * @param  m    Resulting magnetisation (3   x Nt)
  */
-void Simulate (const Matrix<cplx>& txm, const Matrix<cplx>& rxm, const Matrix<cplx>& rf, 
-			   const Matrix<double>& gr, const Matrix<double>& r, const Matrix<double>& m0, 
-			   const Matrix<double>& b0m, const double& dt, const bool& v, const size_t& np, Matrix<double>& res) {
+void Simulate (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, const Matrix<cplx>&   rf, 
+			   const Matrix<double>&  gr, const Matrix<double>&   r, const Matrix<double>& m0, 
+			   const Matrix<double>& b0m, const double&          dt, const bool           exc, 
+			   const bool&             v, const size_t&          np,
+			   Matrix<cplx>&         res,       Matrix<double>&   m) {
 
 	size_t nr   =   r.Dim(1);
 	size_t ntxc = txm.Dim(1);
 	size_t nrxc = rxm.Dim(1);
 	size_t nt   =  gr.Dim(1);
 
-	bool   exc  = false;
+	// Anything to do?
+	if (gr.Size() < 1 || r.Size() < 1) return;
 
-	if (rf.Size() > 1) {
-		assert (rf.Dim(1) == gr.Dim(1));
-		exc = true;
-	}
-	
+	// Excitation?
+	if (exc)
+		assert(rf.Dim(1) == gr.Dim(1));
+
 #pragma omp parallel default (shared) 
 	{
 		
@@ -218,12 +223,20 @@ void Simulate (const Matrix<cplx>& txm, const Matrix<cplx>& rxm, const Matrix<cp
 		int tid = omp_get_thread_num();
 		
 		if (exc) {
+
+			res.Dim(0) = nt;
+			res.Dim(1) = nrxc;
+			res.Reset();
 			
 #pragma omp for
 			for (size_t i = 0; i < nr; i++) 
-				SimulateExc (txm, rf, gr, r, b0m, dt, v, i, res);
+				SimulateExc (txm, rf, gr, r, b0m, dt, v, i, m);
 			
 		} else {
+
+			m.Dim(0) = 3;
+			m.Dim(1) = nr;
+			m.Reset();
 			
 #pragma omp for
 			for (size_t i = 0; i < nr; i++) 

@@ -857,6 +857,15 @@ public:
 
 
 	/**
+	 * @brief          Multiplication operator with different class
+	 * 
+	 * 
+	 */
+	
+	template<class S> Matrix<T>
+	operator*          (const Matrix<S>& M);
+
+	/**
 	 * @brief           Get the element at position p of the vector, i.e. this(p).
      *
      * @param  p        Requested position.
@@ -1407,6 +1416,15 @@ public:
      */
     Matrix<T>           
     operator->*         (Matrix<T>& M);
+    
+    
+    /**
+     * @brief           Matrix product. i.e. this * M.
+     *
+     * @param  M        The factor.
+     */
+    template<class S> Matrix<T>           
+    operator->*         (Matrix<S>& M);
     
     
     /**
@@ -2092,7 +2110,23 @@ public:
     
     
 	/**
-	 * @brief           Isotropic resampling up to 3D to
+	 * @brief           Conjugation w/o transposing
+	 *
+	 * @return          Conjugated
+	 */
+	Matrix<T>
+	Conj                () const ;
+
+
+	/**
+	 * @brief           In-place conjugation w/o transposing
+	 */
+	void
+	Conj                ();
+
+
+	/**
+	 * @brief           In-place Isotropic resampling up to 3D to
 	 *
 	 * @param  f        Resampling factor (i.e. 0.5 = each dimension halved)
 	 * @param  i        Interpolation method @see InterpMethod
@@ -2767,7 +2801,6 @@ Matrix<short>::Random () {
 
 }
 
-    
 #include "Matrix_Constructors.hpp"
 #include "Matrix_IO.cpp"
 #include "Matrix_Lapack.cpp"

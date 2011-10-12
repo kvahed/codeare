@@ -4,8 +4,10 @@
 #include <vector>
 #include <string>
 
-static std::string bars   = "***************************************************";
-static std::string blancs = "                                                   ";
+//static std::string bars   = "***************************************************";
+static std::string bars   = "===================================================";
+static std::string blancs = "                                                  ";
+static std::string spear  = ">";
 
 /**
  * @brief  A toolbox for some static stuff

@@ -32,7 +32,7 @@ using namespace RRServer;
  */
 namespace RRStrategy {
 
-const static float GAMMA_1_PER_UT_MS = 2.675222099;
+const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
 	/**
 	 * @brief b0 abd Relative b1 maps from 2SPGREs 
@@ -249,7 +249,7 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 
 
 	RRSModule::error_code
-	B0Map (const Matrix<cplx>& imgs, Matrix<double>& b0, const float& TE) {
+	B0Map (const Matrix<cplx>& imgs, Matrix<double>& b0, const float& dTE) {
 		
 		printf ("  Computing b0 maps ... "); fflush(stdout);
 		
@@ -273,7 +273,11 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099;
 				r = cplx (0.0,0.0);
 				for (int j = 0; j < nc; j++)
 					r += tmp[i + 2*j*np] * conj(tmp[i + (2*j+1)*np]);
-				b0[i] = arg(r) / GAMMA_1_PER_UT_MS / TE / 2; 
+				b0[i]  = arg(r); 
+				b0[i] *= GAMMA_1_PER_UT_MS;
+				b0[i] *= 1e6;
+				b0[i] /= dTE;
+				b0[i] /= (2*PI) ; 
 
 			}
 			
