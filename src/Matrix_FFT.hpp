@@ -148,7 +148,7 @@ Matrix<T>::HannWindow (const size_t dim) const {
 	for (size_t s = 0; s < _dim[2]; s++)
 		for (size_t r = 0; r < _dim[1]; r++)
 			for (size_t c = 0; c < _dim[0]; c++) {
-				d = pow( pow(((float)c-m[0])/m[0],2.0) + pow(((float)r-m[1])/m[1],2.0) + pow(((float)s-m[2])/m[2],2.0) , 0.5); 
+				d = pow( (float)pow(((float)c-m[0])/m[0],2) + pow(((float)r-m[1])/m[1],2) + pow(((float)s-m[2])/m[2],2) , (float)0.5);
 				h = (d < 1) ? (0.5 + 0.5 * cos (PI * d)) : 0.0;
 				res(c,r,s) = this->At(c,r,s) * h;
 			}

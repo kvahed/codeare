@@ -336,6 +336,7 @@ bool token_syntax_decoder::o_recognize (
                   return false;
                if (o_final)
                   v_action (xpath_node_test, xpath_node_test_name_test);
+               break;
          }
          break;
 
@@ -477,6 +478,7 @@ bool token_syntax_decoder::o_recognize (
             default :
                if (! o_recognize (xpath_xml_q_name, o_final))
                   return false;
+               break;
          }
          if (! ltp_get (0) || ltp_get (0) -> lex_get_value () != lex_oparen)
             return false;

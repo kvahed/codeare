@@ -43,7 +43,10 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		DirectMethod  () {};
+		DirectMethod  () :
+			m_np(1),
+			m_verbose(true),
+			m_dt(1.0) {};
 		
 
 		/**

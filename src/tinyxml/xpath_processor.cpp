@@ -163,19 +163,19 @@ expression_result xpath_processor::er_compute_xpath ()
          e_error = e_error_stack;
       }
    }
-   catch (syntax_error)
+   catch (syntax_error&)
    {
       expression_result er_null (NULL);
       er_result = er_null;
       e_error = e_error_syntax;
    }
-   catch (syntax_overflow)
+   catch (syntax_overflow&)
    {
       expression_result er_null (NULL);
       er_result = er_null;
       e_error = e_error_overflow;
    }
-   catch (execution_error)
+   catch (execution_error&)
    {
       expression_result er_null (NULL);
       er_result = er_null;
@@ -323,7 +323,7 @@ void xpath_processor::v_execute_one (
                      v_function_or (erpp_arg);
                   }
                }
-               catch (execution_error)
+               catch (execution_error&)
                {
                   o_error = true;
                }
@@ -362,7 +362,7 @@ void xpath_processor::v_execute_one (
 				         v_function_or (erpp_arg);
 			         }
 		         }
-		         catch (execution_error)
+		         catch (execution_error&)
 		         {
 			         o_error = true;
 		         }
@@ -409,57 +409,7 @@ void xpath_processor::v_execute_one (
                      v_function_and (erpp_arg);
                   }
                }
-               catch (execution_error)
-               {
-                  o_error = true;
-               }
-               if (erpp_arg)
-               {
-                  for (u_arg = 0; u_arg < 2; u_arg++)
-                  {
-                     if (erpp_arg [u_arg])
-                        delete erpp_arg [u_arg];
-                  }
-                  delete [] erpp_arg;
-               }
-               if (o_error)
-                  throw execution_error (4);
-               break;
-         }
-         break;
-
-      case xpath_equality_expr :
-         switch (u_sub)
-         {
-            case xpath_equality_expr_simple :
-               v_execute_one (xpath_relational_expr, o_skip_only);
-               break;
-            case xpath_equality_expr_equal : 
-            case xpath_equality_expr_not_equal :
-               o_error = false;
-               erpp_arg = NULL;
-               try
-               {
-                  v_execute_one (xpath_relational_expr, o_skip_only);
-                  if (! o_skip_only)
-                  {
-                     erpp_arg = new expression_result * [2];
-                     memset (erpp_arg, 0, 2 * sizeof (expression_result *));
-                     erpp_arg [1] = new expression_result (* xs_stack . erp_top ());
-                     xs_stack . v_pop ();
-                  }
-                  v_execute_one (xpath_relational_expr, o_skip_only); // this is buggy. should be xpath_equality_expr
-                  if (! o_skip_only)
-                  {
-                     erpp_arg [0] = new expression_result (* xs_stack . erp_top ());
-                     xs_stack . v_pop ();
-                     if (u_sub == xpath_equality_expr_equal)
-                        v_function_equal (erpp_arg);
-                     else
-                        v_function_not_equal (erpp_arg);
-                  }
-               }
-               catch (execution_error)
+               catch (execution_error&)
                {
                   o_error = true;
                }
@@ -508,7 +458,7 @@ void xpath_processor::v_execute_one (
                      v_function_relational (erpp_arg, u_sub);
                   }
                }
-               catch (execution_error)
+               catch (execution_error&)
                {
                   o_error = true;
                }
@@ -526,6 +476,7 @@ void xpath_processor::v_execute_one (
                break;
             default :
                assert (false);
+               break;
          }
          break;
 
@@ -560,7 +511,7 @@ void xpath_processor::v_execute_one (
                         v_function_minus (erpp_arg);
                   }
                }
-               catch (execution_error)
+               catch (execution_error&)
                {
                   o_error = true;
                }
@@ -604,7 +555,7 @@ void xpath_processor::v_execute_one (
                         v_function_minus (erpp_arg);
                   }
                }
-               catch (execution_error)
+               catch (execution_error&)
                {
                   o_error = true;
                }
@@ -652,7 +603,7 @@ void xpath_processor::v_execute_one (
                      v_function_mult (erpp_arg, u_sub);
                   }
                }
-               catch (execution_error)
+               catch (execution_error&)
                {
                   o_error = true;
                }
@@ -801,7 +752,7 @@ void xpath_processor::v_execute_one (
                v_execute_function (S_name, u_variable, erpp_arg);
             }
          }
-         catch (execution_error)
+         catch (execution_error&)
          {
             o_error = true;
          }
@@ -2057,6 +2008,8 @@ void xpath_processor::v_function_relational (expression_result ** erpp_arg, unsi
             break;
          default :
             assert (false);
+            break;
+
       }
    }
    else
@@ -2081,6 +2034,7 @@ void xpath_processor::v_function_relational (expression_result ** erpp_arg, unsi
             break;
          default :
             assert (false);
+            break;
       }
    }
    v_push_bool (o_res);
@@ -2114,6 +2068,7 @@ void xpath_processor::v_function_mult (expression_result ** erpp_arg, unsigned u
             break;
          default :
             assert (false);
+            break;
       }
       v_push_double (d_res);
    }
@@ -2133,6 +2088,7 @@ void xpath_processor::v_function_mult (expression_result ** erpp_arg, unsigned u
             break;
          default :
             assert (false);
+            break;
       }
       v_push_int (i_res, "*");
    }

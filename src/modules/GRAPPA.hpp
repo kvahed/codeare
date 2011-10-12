@@ -42,7 +42,16 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		GRAPPA  () {};
+		GRAPPA  () :
+			m_nc(0),
+			m_testcase(0),
+			m_verbose(0),
+			m_noise(0),
+			m_acsinc(0),
+			m_nt(0),
+			m_nr(0),
+			m_ns(0)
+		{};
 		
 		/**
 		 * @brief Default destructor
