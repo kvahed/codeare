@@ -264,13 +264,13 @@ CGSENSE::Process () {
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
-	an = pow(p.Norm().real(),2.0);
+	an = pow(p.Norm().real(), 2);
 
 	s.Zero();
 
 	for (int i = 0; i < m_cgmaxit; i++, iters++) {
 
-		rn = pow(r.Norm().real(),2.0);
+		rn = pow(r.Norm().real(), 2);
 
 		res.push_back(rn/an);
 
@@ -288,7 +288,7 @@ CGSENSE::Process () {
 		data += (p    * rtmp);
 		s    += (stmp * rtmp);
 		r    -= (q    * rtmp);
-		p    *= cplx(pow(r.Norm().real(),2.0)/rn);
+		p    *= cplx(pow(r.Norm().real(), 2)/rn);
 		p    += r;
 
 		// Verbose out put keeps all intermediate steps ---------------

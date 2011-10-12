@@ -107,8 +107,9 @@ CloseModule       (void* handle) {
 		const char* err = dlerror();
 		if (err) 
 			std::cerr << "Cannot unload: " << err << std::endl;
-
     #endif
+    
+    return true;
 
 }
 

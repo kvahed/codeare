@@ -113,7 +113,7 @@ NRMSE                         (const Matrix<cplx>& target, const Matrix<cplx>& r
     float q = 0.0;
     
     for (int i=0; i < target.Size(); i++)
-        q += pow(abs(target[i]) - abs(result[i]), 2.0);
+        q += pow(abs(target[i]) - abs(result[i]), 2);
     
     q = sqrt(q)/target.Norm().real();
     
