@@ -134,8 +134,6 @@ bool cgsensetest (ReconClient* rc) {
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
 	std::string    odf = std::string (base + std::string("/images.mat"));
-	std::string    opf = std::string (base + std::string("/pulses.mat"));
-	std::string    oif = std::string (base + std::string("/iters.mat"));
 
 	weights.Read   (df, "weights");
 	rawdata.Read   (df, "data");
@@ -150,6 +148,8 @@ bool cgsensetest (ReconClient* rc) {
 			printf ("Intialising failed ... bailing out!"); 
 			return false;
 		}
+
+		rc->Attribute ("pulses", (int*)&pulses);
 		
 		// Outgoing -------------
 		
@@ -197,10 +197,22 @@ bool cgsensetest (ReconClient* rc) {
 	}
 	
 #ifdef HAVE_MAT_H	
-	rawdata.MXDump   (odf.c_str(), "images");
+	MATFile* mf = matOpen (odf.c_str(), "w");
+	
+	if (mf == NULL) {
+		printf ("Error creating file %s\n", odf.c_str());
+		return false;
+	}
+	
+	rawdata.MXDump   (mf, "images");
 	if (pulses)
-		sens.MXDump  (opf.c_str(), "pulses");
-	weights.MXDump   (oif.c_str(), "residuals");
+		sens.MXDump  (mf, "pulses");
+	weights.MXDump   (mf, "residuals");
+	
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n", odf.c_str());
+		return false;
+	}
 #endif
 
 	return true;

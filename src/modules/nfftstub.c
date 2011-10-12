@@ -63,11 +63,15 @@ int weights (nfft_plan* np, solver_plan_complex* spc) {
 
 int ft (nfft_plan* np) {
 
-	//if (np->nfft_flags & PRE_PSI)
-	//nfft_precompute_one_psi (np);
-	
 	nfft_trafo (np);
+	return 0;
 
+}
+
+
+int adjoint (nfft_plan* np) {
+
+	nfft_adjoint (np);
 	return 0;
 
 }
@@ -88,14 +92,6 @@ void psi (nfft_plan* np) {
 void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) {
 	
 	int j, k, l;
-	
-	/* precompute lin psi */
-	//if(np->nfft_flags & PRE_PSI)
-	//	nfft_precompute_one_psi(np);
-	
-	/* precompute full psi */
-	//if(np->nfft_flags & PRE_FULL_PSI)
-	//	nfft_precompute_full_psi(np);
 	
 	/* init some guess */
 	for(k = 0; k < np->N_total; k++)

@@ -139,3 +139,35 @@ Matrix<T>::Is4D () const {
 
 
 
+template<> inline Matrix<cplx>
+Matrix<cplx>::Conj () const {
+
+	Matrix<cplx> res = (*this); 
+
+#pragma omp parallel default (shared) 
+	{
+#pragma omp for schedule (dynamic, res.Size() / omp_get_num_threads())
+		
+		for (size_t i = 0; i < Size(); i++)
+			res[i] = conj(_M[i]);
+		
+	}
+
+	return res;
+	
+}
+
+template<> inline void
+Matrix<cplx>::Conj () {
+
+#pragma omp parallel default (shared) 
+	{
+#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] = conj(_M[i]);
+	}		
+}
+    
+
+

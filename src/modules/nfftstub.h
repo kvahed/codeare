@@ -54,6 +54,16 @@ namespace nfft {
 		ft                   (nfft_plan* np);
 
 		/**
+		 * @brief            Adjoint FT
+		 *
+		 * @param  np        NFFT plan
+		 *
+		 * @return success
+		 */
+		extern int
+		adjoint              (nfft_plan* np);
+
+		/**
 		 * @brief            Set weights
 		 */
 		extern int

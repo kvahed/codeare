@@ -161,7 +161,6 @@ CGSENSE::Process () {
 	Matrix<double>& weights = GetReal("weights");
 	Matrix<double>& kspace  = GetReal("kspace");
 	
-	int err = 0;
 	// CG matrices ----------------------------------------------------
 	Matrix<cplx> p, q, r;
 
@@ -219,7 +218,7 @@ CGSENSE::Process () {
 	ticks cgstart = getticks();
 
 	// First left side action -----------------------------------------
-	EH (data, sens, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim);
+	EH (data, sens, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim, false);
 
 	r = p;
 	q = p;
@@ -263,7 +262,7 @@ CGSENSE::Process () {
 		
 		// CG step ----------------------------------------------------
 		E  (p,    sens, m_fplan,                              stmp, m_dim);
-		EH (stmp, sens, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim);
+		EH (stmp, sens, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim, false);
 
 		rtmp  = (rn / (p.dotc(q)));
 		data += (p    * rtmp);
@@ -306,6 +305,8 @@ CGSENSE::Process () {
 			weights[i] = res[i];
 
 	}
+
+	sens = s;
 
 	return error;
 

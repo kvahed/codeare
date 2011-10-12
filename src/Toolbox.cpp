@@ -100,6 +100,6 @@ Toolbox::ProgressBar (const std::string& pre, const std::string& post, const sho
 	std::cout << "\r";
 	std::cout << pre.c_str();
 	std::cout << " | "; 
-	std::cout << bars.substr(0, p/2) << " " <<  blancs.substr(0, 50-p/2) << "| " << std::setw(3) << std::setfill(' ') << p << "% done";
+	std::cout << bars.substr(0, p/2) << "> " <<  blancs.substr(0, 50-p/2) << "| " << std::setw(3) << std::setfill(' ') << p << "% done";
 	
 }
