@@ -316,8 +316,6 @@ PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, cons
 				// Gradient action 
 				if(g < gd/2)             // ramp up
 					gr = sr * (0.5 + g);
-				else if (g < gd/2+1)     // flat top
-					0;
 				else                     // ramp down
 					gr -= sr;
 				

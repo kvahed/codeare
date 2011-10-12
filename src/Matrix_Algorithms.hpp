@@ -61,7 +61,7 @@ Matrix<T>::Ind2x (const size_t& ind, const size_t& dim) const {
 
 
 template<class T> inline Matrix<size_t>
-Matrix<T>::Ind2Sub2D (const Matrix<size_t> inds) const {
+Matrix<T>::Ind2Sub2D (const Matrix<size_t>& inds) const {
 	
 	Matrix<T>      tmp = this->Squeeze();
 	Matrix<size_t> subs (inds.Size(), 2);
@@ -76,7 +76,7 @@ Matrix<T>::Ind2Sub2D (const Matrix<size_t> inds) const {
 
 
 template <class T> inline Matrix<size_t>
-Matrix<T>::Ind2Sub3D (const Matrix<size_t> inds) const {
+Matrix<T>::Ind2Sub3D (const Matrix<size_t>& inds) const {
 	
 	assert(Is2D());
 
@@ -92,7 +92,7 @@ Matrix<T>::Ind2Sub3D (const Matrix<size_t> inds) const {
 
 
 template <class T> inline Matrix<size_t>
-Matrix<T>::Sub2Ind  (const Matrix<size_t> subs) const {
+Matrix<T>::Sub2Ind  (const Matrix<size_t>& subs) const {
 
 	int n = subs.Dim(0);
 

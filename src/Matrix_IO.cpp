@@ -366,7 +366,7 @@ Matrix<T>::H5Dump (const string fname, const string dname, const string dloc) co
 
 
 template <class T>
-bool Matrix<T>::RSAdjust (const string fname) {
+bool Matrix<T>::RSAdjust (const std::string& fname) {
 
 	size_t dimk;
 	size_t dimv;
@@ -465,7 +465,7 @@ ProgressBar (const std::string& pre, const std::string& post, const short& p) {
 
 
 template <class T> bool 
-Matrix<T>::RAWRead (const string fname, const string version) {
+Matrix<T>::RAWRead (const std::string& fname, const std::string& version) {
 	
 	// Get size information from XProtocol and resize 
 	ticks  tic = getticks();
@@ -479,8 +479,7 @@ Matrix<T>::RAWRead (const string fname, const string version) {
 	unsigned      l      = 0;
 	size_t        nscans = (Size() / _dim[COL]);
 	unsigned      start;
-	unsigned      size;
-	size_t        read;
+	unsigned      size, read;
 
 	// Assess data size
 	f = fopen (fname.c_str(), "rb");
@@ -546,7 +545,7 @@ Matrix<T>::RAWRead (const string fname, const string version) {
 }
 
 template <class T> inline bool 
-Matrix<T>::Read (const string fname, const string dname, const string dloc, const io_strategy ios) {
+Matrix<T>::Read (const std::string& fname, const std::string& dname, const std::string& dloc, const io_strategy& ios) {
 
 	if (     ios == HDF5)
 		return H5Read (fname, dname, dloc);
