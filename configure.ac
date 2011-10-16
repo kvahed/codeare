@@ -275,9 +275,6 @@ if test -a "$itkconfig_cmake"; then
 	INSIGHT_LIB_DIR_FLAG="-L$insight_libs_dir"	
 	INSIGHT_LIB_DIR_FLAG="`echo $INSIGHT_LIB_DIR_FLAG | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" | sed -e 's|\${||g' | sed -e 's|}||g'`"
 	INSIGHT_LIB_FLAG="-lITKFEM -lITKIO -lITKMetaIO -lITKAlgorithms -lITKStatistics -lITKBasicFilters -lITKCommon  -litkvnl -litkvnl_algo -litksys -lITKDICOMParser -lz"
-	if ! test "$HAVE_PNG" = "yes"; then
-	   INSIGHT_LIB_FLAG="$INSIGHT_LIB_FLAG -litkpng"
-	fi
     DEF_INSIGHT="#define HAVE_INSIGHT"
 	AC_DEFINE(HAVE_INSIGHT, "1")
     HAVE_INSIGHT="yes"
