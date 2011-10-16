@@ -230,9 +230,11 @@ bool cstest (ReconClient* rc) {
 	std::string df  = std::string (base + std::string(data));
 	std::string odf = std::string (base + std::string("/csout.mat"));
 
+#ifdef HAVE_MAT_H	
 	indata.MXRead (df, "data");
 	pdf.MXRead (df, "pdf");
 	mask.MXRead (df, "mask");
+#endif
 
 	rc->ReadConfig (cf.c_str());
 	
@@ -294,9 +296,11 @@ bool nuffttest (ReconClient* rc) {
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 
+#ifdef HAVE_MAT_H	
 	weights.MXRead   (df, "weights");
 	rawdata.MXRead   (df, "data");
 	kspace.MXRead    (df, "kspace");
+#endif
 
 	rc->SetCplx    ("data",    rawdata);
 	rc->SetReal    ("weights", weights);
@@ -403,7 +407,9 @@ bool internaltest (ReconClient* rc) {
 	std::cout << m << std::endl;
 	
 	Matrix<size_t> mg = Matrix<size_t>::MeshGrid(m);
+#ifdef HAVE_MAT_H	
 	mg.MXDump("mg.mat", "mg");
+#endif
 	
 	std::cout << r << std::endl;
 	std::cout << h << std::endl;
@@ -602,12 +608,16 @@ bool nitest (ReconClient* rc) {
 	
 	Matrix<double> d;
 	d.NIRead (df);
+#ifdef HAVE_MAT_H	
 	d.MXDump (mat, std::string("betted"), std::string(""));
+#endif
 	d.NIDump (nii);
 
 	Matrix<cplx> slp = Matrix<cplx>::Phantom3D(196); 
 	slp.NIDump (nii);
+#ifdef HAVE_MAT_H	
 	slp.MXDump (mat, std::string("betted"), std::string(""));
+#endif
 
 #else
 

@@ -153,8 +153,8 @@ namespace RRStrategy {
 						for (int ch = 0; ch < nc; ch++, pos++)
 							s.At(pos + c*s.Dim(0)) = acs->At(i+col,j+lin,ch);
 		
-		s.MXDump ("s.mat", "s", "");
-		p.MXDump ("p.mat", "p", "");
+		//s.MXDump ("s.mat", "s", "");
+		//p.MXDump ("p.mat", "p", "");
 		//acs->MXDump ("acs.mat", "acs", "");
 
 		
