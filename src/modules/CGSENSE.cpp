@@ -60,7 +60,7 @@ CGSENSE::Init() {
 	// Some defaults ------------------------
 	for (int i = 0; i < 3; i++) {
 		m_N[i] = 1; 
-		m_n[i] = 0;
+		m_n[i] = 1;
 	}
 
 	m_testcase = 0;
@@ -68,6 +68,7 @@ CGSENSE::Init() {
 	m_noise    = 0;
 	m_dim      = 1;
 	m_M        = 0;
+	m_lambda   = 5.0e-2;
 
 	// Dimensions ---------------------------
 
@@ -103,6 +104,11 @@ CGSENSE::Init() {
 		return CGSENSE_ZERO_CHANNELS;
 	}
 
+	// --------------------------------------
+
+	// Tikhonov ----------------------------
+
+	Attribute ("lambda",  &m_lambda);
 	// --------------------------------------
 
 	// Verbosity ----------------------------
@@ -182,110 +188,91 @@ CGSENSE::Process () {
 	Matrix<double>& kspace  = GetReal("kspace");
 	
 	// CG matrices ----------------------------------------------------
-	Matrix<cplx> p, q, r;
+	Matrix <cplx> p = Matrix<cplx> (m_N[0],m_N[1],m_N[2]), q, r;
 
 	// Add white noise? (Only for testing) ----------------------------
 	if (m_noise > 0.0)
 		AddPseudoRandomNoise (data, (float)m_noise);
-
-	// ----------------------------------------------------------------
-	for (int i = 0; i < m_dim      ; i++)
-		p.Dim(i) = m_N[i];
-	p.Reset();
 	
-	// Set k-space and weights ----------------------------------------
+	// Set k-space and weights in FT plans and clear RAM --------------
 	for (int i = 0; i < NTHREADS || i < m_Nc; i++) {
 
 		memcpy (&(m_fplan[i].x[0]),  &kspace[0], m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
 		memcpy (&(m_iplan[i].w[0]), &weights[0],                m_fplan[i].M_total * sizeof(double));
-
 		nfft::weights (&m_fplan[i], &m_iplan[i]);
 		nfft::psi     (&m_fplan[i]);
 
 	}
 
-	// Don't need this anymore
-	FreeReal("kspace");
+	FreeReal ("kspace");
+	FreeReal ("weights");
 
-	// Copying sensitivities. Will use helper for Pulses --------------
-	Matrix<cplx> s = data;
-
-	// Out going images -----------------------------------------------
-	Matrix<cplx> istore;
-
-	if (m_verbose == 1) 
-		for (int i = 0; i < m_dim; i++)
-			istore.Dim(i) = m_N[i];
-
-	istore.Dim(m_dim) = m_cgmaxit;
-	istore.Reset();
-
-	// Temporary signal repository ------------------------------------ 
+	// Create test data if testcase (Incoming data is image space) ----
 	Matrix<cplx> stmp (m_M, m_Nc);
+	if (m_testcase) 
+		E  (data, sens, m_fplan, stmp, m_dim);
+	else 
+		stmp = data;
+
+	FreeCplx("data");
+	
+	// Out going images -----------------------------------------------
+	Matrix<cplx>&   image = AddCplx (  "image", NEW (Matrix<cplx>(m_N[0], m_N[1], m_N[2])));
 
 	// Out going signals ----------------------------------------------
-	Matrix<cplx> sstore (m_M, m_Nc, (m_verbose == 1) ? m_cgmaxit : 1);
-
-	// Create test data (Incoming data is image space) ----------------
-	if (m_testcase) {
-		E  (s, sens, m_fplan, stmp, m_dim);
-		s = stmp;
-		data = stmp;
-	}
-
+	Matrix<cplx>& signals = AddCplx ("signals", NEW (Matrix<cplx>(m_M, m_Nc)));
 
 	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
 
 	// First left side action -----------------------------------------
-	EH (data, sens, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim, false);
-
+	EH (stmp, sens, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim, false);
 	r = p;
 	q = p;
 
-	// Out going image (Resize for output) ----------------------------
-	// Resize data for output
-	for (int i = 0; i < INVALID_DIM; i++)
-		data.Dim(i) = 1;
-	for (int i = 0; i < m_dim; i++)
-		data.Dim(i) = m_N[i];
+	int         iters = 0;
 
-	data.Reset();
-	
+	if (m_verbose) {
+		memcpy (  &image[iters*   p.Size()],    &p[0],    p.Size() * sizeof(cplx));
+		memcpy (&signals[iters*stmp.Size()], &stmp[0], stmp.Size() * sizeof(cplx));
+	}
+
 	// CG residuals storage and helper variables ----------------------
 	std::vector<double> res;
 
 	float       rn    = 0.0;
 	float       an    = 0.0;
 	raw         rtmp  = raw(0.0,0.0);
-	int         iters = 0;
+
+    Matrix<cplx> treg = Matrix<cplx>::Id(m_N[0]) * cplx (m_lambda, 0);
 
 	printf ("Processing CG-SENSE ...\n");
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
 	an = pow(p.Norm().real(), 2);
+	Matrix<cplx> a(m_N[0], m_N[1], m_N[2]);
+	Matrix<cplx> s(m_M, m_Nc);
 
-	s.Zero();
 
-	for (int i = 0; i < m_cgmaxit; i++, iters++) {
+	for (iters = 0; iters < m_cgmaxit; iters++) {
 
 		rn = pow(r.Norm().real(), 2);
 
 		res.push_back(rn/an);
 
-		printf ("  %03i: CG residuum: %.9f\n", i, res.at(i));
+		printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
 
 		// Convergence ? ----------------------------------------------
-		if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps)
+		if (std::isnan(res.at(iters)) || res.at(iters) <= m_cgeps)
 			break;
-		
+
 		// CG step ----------------------------------------------------
 		E  (p,    sens, m_fplan,                              stmp, m_dim);
 		EH (stmp, sens, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim, false);
 
 		rtmp  = (rn / (p.dotc(q)));
-		data += (p    * rtmp);
+		a    += (p    * rtmp);
 		s    += (stmp * rtmp);
 		r    -= (q    * rtmp);
 		p    *= cplx(pow(r.Norm().real(), 2)/rn);
@@ -293,41 +280,33 @@ CGSENSE::Process () {
 
 		// Verbose out put keeps all intermediate steps ---------------
 		if (m_verbose) {
-			memcpy (&istore[i * data.Size()], &data[0],     data.Size() * sizeof(double));
-			memcpy (&sstore[i *    s.Size()],    &s[0],        s.Size() * sizeof(double));
+			image.Expand(m_dim); 
+			signals.Expand(2);
+			memcpy (  &image[(iters+1)*a.Size()], &a[0], a.Size()*sizeof(cplx));
+			memcpy (&signals[(iters+1)*s.Size()], &s[0], s.Size()*sizeof(cplx));
 		}
-
+		
 	}
-
+	
+	FreeCplx ("sens");	
+	
 	// Report timimng -------------------------------------------------
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	// Verbose output needs to 
 	if (m_verbose) {
-
-		// All intermediate images ------
-		data.Dim(m_dim) = iters;
-		data.Reset();
-		memcpy (&data[0], &istore[0], data.Size() * sizeof(double));
-
-		// Pulses (Excitation) ----------
-		s.Dim(CHA) = iters;
-		s.Reset();
-		memcpy (&s[0], &sstore[0], s.Size() * sizeof(double));
-
+		
 		// CG residuals ------------------
-		weights.Dim(COL) = iters;
-		for (int i = 1; i < INVALID_DIM; i++)
-			weights.Dim(i) = 1;
-		weights.Reset();
+		Matrix<double>& nrmse = AddReal ("nrmse", NEW (Matrix<double> (iters,1)));
+		memcpy (&nrmse[0], &res[0], iters * sizeof(double));
+		
+	} else {
 
-		for (int i = 0; i < iters; i++)
-			weights[i] = res[i];
+		image   = a;
+		signals = s;
 
 	}
-
-	sens = s;
-
+	
 	return error;
 
 }

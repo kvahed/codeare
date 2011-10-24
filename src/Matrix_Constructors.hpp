@@ -27,9 +27,9 @@ Matrix<T>::Matrix () {
 	}
 
 	_M.resize(Size());
+		
+		Zero();
 
-	for (size_t i = 0; i < Size(); i++)
-		_M[i] = T(0.0);
 
 	_name = "Matrix<T>";
 
@@ -49,11 +49,8 @@ Matrix<T>::Matrix (const size_t n) {
 	for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 	
-	_M.resize(n*n);
+	_M.resize(n*n, T(0));
 	
-	for (size_t i = 0; i < Size(); i++)
-		_M[i] = T(0.0);
-
 }
 
 
@@ -70,10 +67,7 @@ Matrix<T>::Matrix (const size_t m, const size_t n) {
 	for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 
-	_M.resize(m*n);
-
-	for (size_t i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
+	_M.resize(m*n, T(0));
 
 }
 
@@ -92,10 +86,7 @@ Matrix<T>::Matrix (const size_t m, const size_t n, const size_t k) {
 	for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 	
-	_M.resize(m*n*k);
-	
-	for (size_t i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
+	_M.resize(m*n*k, T(0));
 	
 }
 
@@ -128,10 +119,10 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
         _res [i] = 1.0;
 	
 	_M.resize(Size());
-	
-	for (size_t i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
+		
+	Zero();
 
+	
 }
 
 
@@ -145,9 +136,9 @@ Matrix<T>::Matrix (const size_t* dim) {
 	}
 	
 	_M.resize(Size());
-	
-	for (size_t i = 0; i < Size(); i++)
-		_M[0] = T(0.0);
+		
+	Zero();
+
 	
 }
 

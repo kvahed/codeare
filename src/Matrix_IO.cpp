@@ -589,12 +589,7 @@ Matrix<T>::H5Read (const string fname, const string dname, const string dloc) {
 			for (size_t i = ndim; i < INVALID_DIM; i++)
 				_dim[i] = 1;
 			
-			//if (nb_alloc)
-			//free (_M);
 			_M.resize(Size());
-
-			//_M = (T*) malloc (Size() * sizeof (T));
-			
 
 			cout << "rank: " << ndim << ", dimensions: ";
 			for (size_t i = 0; i < ndim; i++) {

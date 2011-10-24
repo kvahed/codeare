@@ -326,6 +326,8 @@ namespace RRServer {
 				m_cplx.insert (pair<string, Ptr< Matrix<cplx> > > (name, tmp = NEW (Matrix<cplx>())));
 			else
 			    tmp = m_cplx[name];
+
+			tmp->SetClassName(name.c_str());
 			
 			for (int i = 0; i < INVALID_DIM; i++) {
 				tmp->Dim(i) = c.dims[i];
@@ -368,6 +370,8 @@ namespace RRServer {
 			if (m_cplx.find (name) == m_cplx.end())
 				m_cplx.insert (pair<string, Ptr< Matrix<cplx> > > (name, NEW (Matrix<cplx>())));
 			
+			m.SetClassName(name.c_str());
+
 			*m_cplx[name] = m;
 			
 		}
@@ -417,6 +421,8 @@ namespace RRServer {
 			else
 				tmp = m_real[name];
 			
+			tmp->SetClassName(name.c_str());
+
 			for (int i = 0; i < INVALID_DIM; i++) {
 				tmp->Dim(i) = r.dims[i];
 				tmp->Res(i) = r.res[i];
@@ -459,6 +465,8 @@ namespace RRServer {
 			if (m_real.find (name) == m_real.end())
 				m_real.insert (pair<string, Ptr< Matrix<double> > > (name, NEW( Matrix<double>())));
 			
+			m.SetClassName(name.c_str());
+
 			*m_real[name] = m;
 			
 		}
@@ -508,6 +516,8 @@ namespace RRServer {
 			else
 				tmp = m_pixel[name];
 
+			tmp->SetClassName(name.c_str());
+			
 			for (int i = 0; i < INVALID_DIM; i++) {
 				tmp->Dim(i) = p.dims[i];
 				tmp->Res(i) = p.res[i];
@@ -548,6 +558,8 @@ namespace RRServer {
 			
 			if (m_pixel.find (name) == m_pixel.end())
 				m_pixel.insert (pair<string, Ptr< Matrix<short> > > (name, NEW (Matrix<short>())));
+
+			m.SetClassName(name.c_str());
 			
 			*m_pixel[name] = m;
 			

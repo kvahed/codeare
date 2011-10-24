@@ -91,8 +91,8 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& ou
  * @param  dim          FT dimensions
  */
 RRSModule::error_code
-EH (const Matrix<raw>& in, Matrix<raw>& sm, nfft_plan* np, solver_plan_complex* spc, 
-	const double& epsilon, const int& maxit, Matrix<raw>& out, const int& dim, const bool& adjoint) {
+EH (const Matrix<raw>& in, const Matrix<raw>&  sm, nfft_plan*  np, solver_plan_complex* spc, const double& epsilon, 
+	const int&      maxit,       Matrix<raw>& out, const int& dim, const bool&      adjoint) {
 
 	// Clear outgoing container
 	out.Zero();
@@ -144,7 +144,7 @@ EH (const Matrix<raw>& in, Matrix<raw>& sm, nfft_plan* np, solver_plan_complex* 
 				sens = sm[pos];
 				out[i] += (raw(ftout[pos][0], ftout[pos][1]) * conj(sens));
 			}
-		
+
 	}
 	
 	free (ftout);

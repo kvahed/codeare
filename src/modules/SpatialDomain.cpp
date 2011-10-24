@@ -208,7 +208,7 @@ SpatialDomain::Process        () {
             
         } 
         
-        printf ("\n  ... done. Checking pulse amplitudes ... \n");
+        printf ("\n  ... done.\n  Checking pulse amplitudes: "); fflush(stdout);
         
         // Check max pulse amplitude -----------------
         RFLimits (final, m_pd, m_nk, m_nc, m_max_rf); 
@@ -223,14 +223,16 @@ SpatialDomain::Process        () {
         // Update Pulse durations if necessary -------
         if (!pulse_amp_ok) {
             
-            printf ("... done. Pulse amplitudes to high! Updating pulse durations ...\n");
+            printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
             
-            for(int i=0; i < m_nk;i++)
-                m_pd[i] = 1 + (int) (m_max_rf[i] * m_pd[i] / m_rflim);
+            for(int i=0; i < m_nk;i++) {
+                m_pd[i] = 1 + (int) (m_max_rf[i] * m_pd[i] / m_rflim); 
+				printf ("%i ", 10*m_pd[i]); fflush(stdout);
+			}
             
-            printf ("... done\n.");
-            
-        } 
+            printf ("[us] ... done.\n");
+        } else 
+			printf ("OK\n");
         
     } // End of pulse duration loop
 

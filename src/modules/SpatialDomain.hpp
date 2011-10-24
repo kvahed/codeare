@@ -171,13 +171,13 @@ RFLimits            (const Matrix<cplx>& solution, const int* pd, const int& nk,
         limits[i] = 0.0;
         
         for (int j = 0; j < nc; j++)
-            if (limits[i] < abs (solution[i+nk*j]) / pd[i]) 
-                limits[i] = abs (solution[i+nk*j]) / pd[i];
+            if (limits[i] < abs (solution[i+nk*j]) / (float)(10.0*pd[i])) 
+                limits[i] = abs (solution[i+nk*j]) / (float)(10.0*pd[i]);
 
-		limits[i] *= 1000.0;
+		limits[i] *= 100.0;
 
     }
-        
+
 }
 
 
@@ -260,7 +260,7 @@ PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, cons
 	tpd += pd[nk-1];
 	// -----------------------------------
 
-	// Outgoing repository ---------------
+	// Outgoing brepository ---------------
 
 	// Time scale
 	timing.Dim(COL) = tpd;    
@@ -316,6 +316,8 @@ PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, cons
 				// Gradient action 
 				if(g < gd/2)             // ramp up
 					gr = sr * (0.5 + g);
+				else if (g < gd/2+1)     // flat top
+					0;
 				else                     // ramp down
 					gr -= sr;
 				
@@ -327,5 +329,5 @@ PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, cons
 		
 	}
 	// ----------------------------------
-	
+
 }
