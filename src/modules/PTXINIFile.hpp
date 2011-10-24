@@ -19,12 +19,13 @@
  */
 
 RRSModule::error_code
-PTXWriteSiemensINIFile (const Matrix<cplx>& pt, int dimrf, int dimgr, int nc, int sampint, float max_rf, std::string* fname, std::string* orientation) {
+PTXWriteSiemensINIFile (Matrix<cplx>& pt, int dimrf, int dimgr, int nc, int sampint, float max_rf, std::string* fname, std::string* orientation) {
 	
 	FILE* fp = fopen (fname->c_str(), "wb");
 
 	int nt = pt.Dim(COL);
 
+	size_t ci[8] = {1, 2, 3, 4, 5, 6, 7, 0};
 
 	if (fp == NULL)
 		return RRSModule::FILE_ACCESS_FAILED;
@@ -36,7 +37,7 @@ PTXWriteSiemensINIFile (const Matrix<cplx>& pt, int dimrf, int dimgr, int nc, in
 	fprintf (fp, "NUsedChannels    = %i\n",             nc);
 	fprintf (fp, "DimRF            = %i\n",          dimrf);
 	fprintf (fp, "DimGradient      = %i\n",          dimgr);
-	fprintf (fp, "MaxAbsRF         = %3.3f\n"      ,max_rf*100.0);		 // scaling for RF amplitude
+	fprintf (fp, "MaxAbsRF         = %3.3f\n",       100.0); // scaling for RF amplitude
 	fprintf (fp, "InitialPhase     = %i\n",            0  );
 	fprintf (fp, "Asymmetry        = %1.1f\n",         0.5);
 	fprintf (fp, "\n"                                    );
@@ -104,20 +105,18 @@ PTXWriteSiemensINIFile (const Matrix<cplx>& pt, int dimrf, int dimgr, int nc, in
 	fprintf (fp, "GradientSamples   = %i\n",            nt);
 	fprintf (fp, "MaxAbsGradient[0] = %1.5f %1.5f %1.5f\n", maxg, maxg, maxg);
 	fprintf (fp, "\n"                                   );
-
+	
 	for (int i = 0; i < nt; i++)
 		if (orientation->compare("transversal") == 0 || orientation->compare("t") == 0)
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i,  real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+2))/maxg);
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg,  real(pt(i,nc+2))/maxg);
 		else if (orientation->compare("sagittal") == 0 || orientation->compare("s") == 0)
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, -real(pt(i,nc+2))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+0))/maxg);
-		else //transversal
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i,  real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg, real(pt(i,nc+2))/maxg);
-
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+2))/maxg, real(pt(i,nc+1))/maxg, -real(pt(i,nc+0))/maxg);
+	
 	for (int j = 0; j < nc; j++) {
 		
 		fprintf (fp, "\n");
 		fprintf (fp, "\n");
-		fprintf (fp, "[pTXPulse_ch%i]\n", j);
+		fprintf (fp, "[pTXPulse_ch%i]\n", ci[j]);
 		fprintf (fp, "\n");
 		
 		for (int i = 0; i < nt; i++)
@@ -128,5 +127,5 @@ PTXWriteSiemensINIFile (const Matrix<cplx>& pt, int dimrf, int dimgr, int nc, in
 	fclose (fp);
 	
 	return RRSModule::OK;
-
+	
 }

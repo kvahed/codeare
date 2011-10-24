@@ -264,6 +264,8 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 		
 		cplx   r;
 		
+		double f = GAMMA_1_PER_UT_MS * 2.5e6 / (2*PI);
+
 #pragma omp parallel default (shared) private (r)
 		{
 			
@@ -273,12 +275,7 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 				r = cplx (0.0,0.0);
 				for (int j = 0; j < nc; j++)
 					r += tmp[i + 2*j*np] * conj(tmp[i + (2*j+1)*np]);
-				b0[i]  = arg(r); 
-				b0[i] *= GAMMA_1_PER_UT_MS;
-				b0[i] *= 1e6;
-				b0[i] /= dTE;
-				b0[i] /= (2*PI) ; 
-
+				b0[i]  = arg(r) * f; 
 			}
 			
 		}

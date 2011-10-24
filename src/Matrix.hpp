@@ -1247,6 +1247,20 @@ public:
             _dim[i] = dim[i];
     }
     
+
+	/**
+	 * @brief           Expand matrix by increasing highest dimension (Concatenation)
+	 *
+	 * @param  n        Expand by n x current size (default 1)
+	 */
+	inline void
+	Expand              (const size_t dim, const size_t& n = 1)                      {
+
+		_dim[dim] += n;
+		_M.resize(Size());
+		
+	}
+
     
     /**
      * @brief           Resize to dims, reallocate and zero repository. 
@@ -1262,7 +1276,7 @@ public:
             _dim[i] = dim[i];
 
 		_M.resize(Size());
-
+		
 		Zero();
 
     }
@@ -1289,8 +1303,9 @@ public:
     Reset               ()                                      {
 
 		_M.resize(Size());
-
+		
 		Zero();
+
 
     }
     
@@ -1312,7 +1327,7 @@ public:
      *
      * @return          Number of cells.
      */
-    const long                
+    const size_t
     Size                ()                                    const;
     
     
@@ -2658,7 +2673,7 @@ Matrix<T>::Column (const size_t c) const {
 }
 
 
-template <class T> inline const long 
+template <class T> inline const size_t
 Matrix<T>::Size() const {
     
     long size = 1;

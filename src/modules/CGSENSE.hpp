@@ -78,6 +78,7 @@ namespace RRStrategy {
 		double               m_noise;           /**< Add noise? */
 		int                  m_testcase;        /**< Test case. Generate forward data first. */
 		int                  m_Nc;              /**< # Channels */
+		double               m_lambda;          /**< Tikhonov factor*/
 
 		Matrix < raw >       m_sens;            /**< Sensitivity maps                */
 		Matrix < raw >       m_measured;        /**< Measured data                   */

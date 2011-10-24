@@ -59,6 +59,7 @@ bool fftwtest     (ReconClient* rc);
 bool resetest     (ReconClient* rc);
 bool grappatest   (ReconClient* rc);
 bool cstest       (ReconClient* rc);
+bool dmtest       (ReconClient* rc);
 
 int main (int argc, char** argv) {
 	
@@ -86,6 +87,8 @@ int main (int argc, char** argv) {
 			fftwtest (&client);
 		else if (strcmp (test, "RelativeSensitivities") == 0)
 			resetest (&client);
+		else if (strcmp (test, "DirectMethod") == 0)
+			dmtest (&client);
 		else
 			internaltest (&client);
 			
@@ -126,10 +129,18 @@ bool grappatest (ReconClient* rc) {
 
 bool cgsensetest (ReconClient* rc) {
 
-	Matrix<cplx> rawdata;
+	// Incoming
+	Matrix<cplx>   rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
-	Matrix<cplx> sens;
+	Matrix<cplx>   sens;
+
+	// Outgoing
+	Matrix<double> nrmse;
+	Matrix<cplx>   image;
+	Matrix<cplx>   signals;
+
+	
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
@@ -153,10 +164,10 @@ bool cgsensetest (ReconClient* rc) {
 		
 		// Outgoing -------------
 		
-		rc->SetCplx ("data", rawdata); // Measurement data
-		rc->SetCplx ("sens", sens);    // Sensitivities
+		rc->SetCplx (   "data", rawdata); // Measurement data
+		rc->SetCplx (   "sens", sens);    // Sensitivities
 		rc->SetReal ("weights", weights); // Weights
-		rc->SetReal ("kspace", kspace);  // K-space
+		rc->SetReal ( "kspace", kspace);  // K-space
 
 		// ---------------------
 
@@ -164,15 +175,15 @@ bool cgsensetest (ReconClient* rc) {
 		
 		// Incoming -------------
 
-		rc->GetCplx     ("data", rawdata);  // Images
+		rc->GetCplx     (  "image", image);  // Images
 		if (pulses)
-			rc->GetCplx ("sens", sens);     // Pulses (Excitation)
-		rc->GetReal  ("weights", weights);  // CG residuals
+			rc->GetCplx ("signals", signals);     // Pulses (Excitation)
+		rc->GetReal     (  "nrmse", nrmse);  // CG residuals
 
 		// ---------------------
-
+		
 		rc->Finalise   (test);
-
+		
 	} else {
 
 		RRServer::ReconContext* rx = new RRServer::ReconContext(test);
@@ -204,10 +215,11 @@ bool cgsensetest (ReconClient* rc) {
 		return false;
 	}
 	
-	rawdata.MXDump   (mf, "images");
+	image.MXDump       (mf, "image");
 	if (pulses)
-		sens.MXDump  (mf, "pulses");
-	weights.MXDump   (mf, "residuals");
+		signals.MXDump (mf, "signals");
+	if (nrmse.Size() > 1)
+		nrmse.MXDump   (mf, "nrmse");
 	
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());
@@ -279,6 +291,78 @@ bool cstest (ReconClient* rc) {
 	}
 #endif
 	
+	return true;
+	
+}
+
+bool dmtest (ReconClient* rc) {
+
+	Matrix<cplx>   b1;  
+	Matrix<cplx>   signals;
+
+	Matrix<double> k;   
+	Matrix<double> r;   
+	Matrix<double> b0;  
+	Matrix<double> target;
+	
+	std::string cf  = std::string (base + std::string(config));
+	std::string df  = std::string (base + std::string(data));
+	std::string odf = std::string (base + std::string("/simout.mat"));
+
+#ifdef HAVE_MAT_H	
+	k.MXRead      (df, "g");
+	r.MXRead      (df, "r");
+	b0.MXRead     (df, "b0");
+
+	if (!b1.MXRead     (df, "b1")) {
+		printf ("Assuming uniform b1\n");
+		b1 = Matrix<cplx>::Ones(r.Dim(1), 1);
+	}
+
+	target.MXRead (df, "target");
+#endif
+
+	rc->ReadConfig (cf.c_str());
+	
+	if (rc->Init (test) != OK) {
+		printf ("Intialising failed ... bailing out!"); 
+		return false;
+	}
+
+	// Outgoing -------------
+	
+	rc->SetCplx  (    "b1", b1);
+	rc->SetReal  (     "k", k);
+	rc->SetReal  (     "r", r);
+	rc->SetReal  (    "b0", b0);
+	rc->SetReal  ("target", target);
+	// ---------------------
+	
+	rc->Process (test);
+	
+	// Incoming -------------
+	
+	rc->GetCplx ("signals", signals);  
+	// ---------------------
+	
+	rc->Finalise   (test);
+	
+#ifdef HAVE_MAT_H	
+	MATFile* mf = matOpen (odf.c_str(), "w");
+
+	if (mf == NULL) {
+		printf ("Error creating file %s\n", odf.c_str());
+		return false;
+	}
+
+	signals.MXDump (mf, "signals");
+
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n", odf.c_str());
+		return false;
+	}
+#endif
+
 	return true;
 	
 }
