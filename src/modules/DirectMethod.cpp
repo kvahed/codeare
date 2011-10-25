@@ -26,7 +26,7 @@ using namespace RRStrategy;
 RRSModule::error_code 
 DirectMethod::Init () {
 
-    printf ("Intialising DirectMethod ...\n");
+    printf ("\nIntialising DirectMethod ...\n");
 	
 	m_verbose     = false;                  // verbose?
 	m_np          = omp_get_num_threads();  // # procs
@@ -43,44 +43,73 @@ DirectMethod::Init () {
 
 	m_initialised = true;
 
-    printf ("... done.\n\n");
+    printf ("... done.\n");
 	
 	return RRSModule::OK;
 
 }
 
 
+RRSModule::error_code
+DirectMethod::Finalise() {
+
+	FreeCplx("b1p");
+	FreeCplx("b1m");
+	FreeReal("ag");
+	FreeReal("r");
+	FreeReal("b0");
+	FreeReal("target");
+	FreeReal("sample");
+	FreeReal("sb0");
+	FreeReal("sr");
+	FreeReal("j");
+
+	return RRSModule::OK;
+
+}
+
 
 RRSModule::error_code
 DirectMethod::Process     () { 
 
-	// Nomen est omen
-	Matrix<cplx>&   b1     = GetCplx("b1");
+    printf ("Processing DirectMethod ...\n");
+	ticks start = getticks();
 
-	Matrix<double>& k      = GetReal("k");
+	// Nomen est omen
+	Matrix<cplx>&   b1m    = GetCplx("b1m");
+	Matrix<cplx>&   b1p    = GetCplx("b1p");
+
+	Matrix<double>& ag     = GetReal("ag");
 	Matrix<double>& r      = GetReal("r");
 	Matrix<double>& b0     = GetReal("b0");
 	Matrix<double>& target = GetReal("target");
 
-	// Dummy: We want to use the complex conjugated transmit maps as receive maps 
-	Matrix<cplx>    b1p(1);
-	Matrix<cplx>    rf(1);
-	Matrix<double>  m(1);
+	Matrix<double>& sample = GetReal("sample");
+	Matrix<double>& sr     = GetReal("sr");
+	Matrix<double>& sb0    = GetReal("sb0");
+	Matrix<double>& j      = GetReal("j");
+	
+    Matrix<cplx>&   res    = AddCplx ("signals", NEW (Matrix<cplx>  (ag.Dim(1),b1p.Dim(1))));
+    Matrix<cplx>&   rf     = AddCplx ("rf",      NEW (Matrix<cplx>  (ag.Dim(1),b1p.Dim(1))));
+	Matrix<double>& m      = AddReal ("magn",    NEW (Matrix<double>(        3, sr.Dim(1))));
 
-	// Resulting signal
-    Matrix<cplx>&   res    = AddCplx ("signals",  NEW (Matrix<cplx>(k.Dim(1),b1.Dim(1))));
+	Matrix <double> eg(ag.Dim(0),ag.Dim(1));
 
+	for (size_t i = 0; i < ag.Dim(1); i++) {
+		eg(0,i) = -ag(0,ag.Dim(1)-1-i); eg(1,i) = -ag(1,ag.Dim(1)-1-i); eg(2,i) = -ag(2,ag.Dim(1)-1-i);
+	}
+	
 	// Simulate Bloch receive mode
-	Simulate (b1p, b1, rf,  k, r, target, b0, m_dt, false, m_verbose, m_np, res, m);
+	Simulate (b1p, b1m,  rf, ag ,  r, target,  b0, m_dt, false, m_verbose, m_np, res, m);
 
+	for (size_t i = 0; i < ag.Dim(1); i++)
+		for (size_t c = 0; c < b1p.Dim(1); c++)
+			rf(i,c)  = (res(ag.Dim(1)-1-i,c)*(float)j[ag.Dim(1)-1-i]);
+			
 	// Simulate Bloch transmit mode
-	//Simulate (b1, b1p, res, k, r, target, b0, m_dt, false, m_verbose, m_np, res, m);
+	Simulate (b1p, b1m, rf, eg, sr, sample, sb0, m_dt,  true, m_verbose, m_np, res, m);
 
-	FreeCplx("b1");
-	FreeReal("k");
-	FreeReal("r");
-	FreeReal("b0");
-	FreeReal("target");
+	printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 
 	return RRSModule::OK;
 

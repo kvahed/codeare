@@ -78,18 +78,18 @@ RelativeSensitivities::Process     () {
 	// -----------------------------------------
 
     // Do we have GRE for segmentation? --------
-
+	
     Matrix<short>& bets = AddPixel ("bets", NEW (Matrix<short> (mask.Dim())));
-
+	
     if (m_use_bet == 1) { // Better test? / Replace with SNRO?
-      
+		
         FTVolumes (mask);
         RemoveOS  (mask);
         mask.SOS (mask.HDim());
         
         Matrix<double> bet(mask.Dim());
         double         tmp = 0.0;
-
+		
         for (int i = 0; i < mask.Size(); i++) {
             tmp = log(abs(mask[i]));
             bet[i] = (tmp < m_cutoff) ? 0.0 : tmp - m_cutoff;
@@ -97,30 +97,31 @@ RelativeSensitivities::Process     () {
         
         SegmentBrain (bet, bets);
         bets.Resample (0.5, LINEAR);
-
+		
     } else if (m_use_bet == 2) {
 		
-        LogMask (snro, m_cutoff);
+	    LogMask (snro, m_cutoff);
 		
     } else {
-
+		
         for (size_t i = 0; i < bets.Size(); i++)
             bets[i] = 1;
-
+		
     }
-
+	
     // -----------------------------------------
 
     // B0 calculation --------------------------
-
+	
     Matrix<double>& b0 = AddReal ("b0", NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
-
+	
     B0Map (data, b0, m_echo_shift);
     // -----------------------------------------
 
     // Weighing with masks ---------------------
 
 	if (m_weigh_maps) {
+
 		for (int ch = 0; ch < txm.Dim(3); ch++)
 			for (int i = 0; i < bets.Size(); i++)
 				txm[ch*bets.Size() + i] *= (double)bets[i];
@@ -131,6 +132,7 @@ RelativeSensitivities::Process     () {
 		
 		for (int i = 0; i < bets.Size(); i++)
 			b0[i] *= (double)bets[i];
+
 	}
 	// -----------------------------------------
 

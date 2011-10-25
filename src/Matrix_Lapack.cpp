@@ -78,18 +78,18 @@ int Matrix<T>::SVD (Matrix<T>* u, Matrix<T>* v, Matrix<T>* s, const char jobz) {
 	
 	bool   cm    = true;
 
-	int    m     = _dim[LIN];
-	int    n     = _dim[COL];
+	int    m     = _dim[COL];
+	int    n     = _dim[LIN];
 	int    lwork = -1;
 	int    info  = 0;
-	int    lda   = _dim[COL];
-	int    ldu   = (cm) ? ((m >= n) ? m : n) : 1;
-	int    ldvt  = (cm) ? ((m >= n) ? n : m) : 1;
+	int    lda   = m;
+	int    ldu   = MAX(m,n);//(cm) ? ((m >= n) ? m : n) : 1;
+	int    ldvt  = MIN(m,n);//(cm) ? ((m >= n) ? n : m) : 1;
 	
 	T*     work  =     (T*) malloc (sizeof(T));
 	float* rwork = (float*) malloc (sizeof(float));
-	int*   iwork =   (int*) malloc (8 * MIN(_dim[0],_dim[1]) * sizeof(int));
-	
+	int*   iwork =   (int*) malloc (8 * MIN(m,n) * sizeof(int));
+
 	// Only needed for complex data
 	if (typeid(T) == typeid(cplx)) {
 		free (rwork);
