@@ -34,6 +34,9 @@ using namespace RRServer;
 namespace RRStrategy {
 
 
+	/**
+	 * @brief CG parameters
+	 */
 	struct CGParam {
 		
 		int    fft;
