@@ -83,7 +83,7 @@ void RotationMatrix (const Matrix<double>& n, Matrix<double>& r) {
 
 /**
  * @brief       Simulate single shot excitation of a single isochromat of r matrix along gradient trajectory<br/>
- *              (i.e. inverse Fourier transform incl. effect of Receive and b0 maps)</br>
+ *              (i.e. inverse Fourier transform incl. effect of Receive and b0 maps)<br/>
  *              Expects res to carry the correct size and dimensions
  *
  * @param  txm  Receive sensitivities
@@ -91,8 +91,10 @@ void RotationMatrix (const Matrix<double>& n, Matrix<double>& r) {
  * @param  gr   Gradient trajectory
  * @param  r    Positions
  * @param  b0m  B0 map
+ * @param  dt   Timestep
  * @param  v    Verbose
- * @param  n    Position of isochromat in r
+ * @param  pos  Position of isochromat in r
+ * @param  tid  Thread id
  * @param  m    Resulting magntisation (output)
  */
 void SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&  rf, const Matrix<double>& gr, const Matrix<double>& r, 
@@ -163,9 +165,11 @@ void SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&  rf, const Mat
  * @param  r    Positions
  * @param  m0   Initial magnetisation state
  * @param  b0m  B0 map
+ * @param  dt   Timestep
  * @param  v    Verbose
  * @param  pos  Position of isochromat in r
- * @param  sig  Resulting signal (output) 
+ * @param  tid  Thread ID
+ * @param  res  Resulting signal (output) 
  */
 void SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, const Matrix<double>& r, const Matrix<double>& m0, 
 				   const Matrix<double>& b0m, const double&         dt, const bool&           v, const size_t&        pos, 
@@ -228,6 +232,8 @@ void SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, const Ma
  * @param  r    Spatial positions       (1-3 x Nr  )
  * @param  m0   Starting magnetisation  (3   x Nr  )
  * @param  b0m  B0 map                  (Nr        )
+ * @param  dt   time step
+ * @param  exc  Exciting or receiving  
  * @param  v    Verbose                 (Scalar: false = only end, true = all time points)
  * @param  np   # parallel processes    (scalar)
  * 

@@ -1251,6 +1251,7 @@ public:
 	/**
 	 * @brief           Expand matrix by increasing highest dimension (Concatenation)
 	 *
+	 * @param  dim      Dimension to be expanded
 	 * @param  n        Expand by n x current size (default 1)
 	 */
 	inline void

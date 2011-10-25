@@ -89,6 +89,7 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& ou
  * @param  maxit        Maximum number of solver iterations (default 3)
  * @param  out          Returned product                 O (Nx x Ny x Nz)
  * @param  dim          FT dimensions
+ * @param  adjoint      Use adjoint?
  */
 RRSModule::error_code
 EH (const Matrix<raw>& in, const Matrix<raw>&  sm, nfft_plan*  np, solver_plan_complex* spc, const double& epsilon, 

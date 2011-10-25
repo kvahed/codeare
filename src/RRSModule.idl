@@ -117,7 +117,7 @@ module RRSModule {
 		 * @brief         Transport complex matrix from backend identified by ...
 		 *
 		 * @param  name   its name
-		 * @return        Data matrix
+		 * @param  data   Data matrix
 		 */ 
 		void              get_cplx (in string name, inout cplx_data data);
 
@@ -135,7 +135,7 @@ module RRSModule {
 		 * @brief         Transport real matrix from backend identified by ...
 		 *
 		 * @param  name   its name
-		 * @return        Data matrix
+		 * @param  data   Data matrix
 		 */ 
 		void              get_real (in string name, inout real_data data);
 
@@ -153,7 +153,7 @@ module RRSModule {
 		 * @brief         Transport pixel matrix from backend identified by ...
 		 *
 		 * @param  name   its name
-		 * @return        Data matrix
+		 * @param  data   Data matrix
 		 */ 
 		void              get_pixel (in string name, inout pixel_data data);
 
