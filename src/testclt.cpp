@@ -297,29 +297,53 @@ bool cstest (ReconClient* rc) {
 
 bool dmtest (ReconClient* rc) {
 
-	Matrix<cplx>   b1;  
+	Matrix<cplx>   b1m;  
+	Matrix<cplx>   b1p;  
 	Matrix<cplx>   signals;
+	Matrix<cplx>   rf;
+	Matrix<double> m;
 
-	Matrix<double> k;   
+	Matrix<double> ag;   
 	Matrix<double> r;   
 	Matrix<double> b0;  
 	Matrix<double> target;
+
+	Matrix<double> sample;
+	Matrix<double> sr;
+	Matrix<double> sb0;
+	Matrix<double> j;
 	
 	std::string cf  = std::string (base + std::string(config));
 	std::string df  = std::string (base + std::string(data));
 	std::string odf = std::string (base + std::string("/simout.mat"));
 
 #ifdef HAVE_MAT_H	
-	k.MXRead      (df, "g");
+	ag.MXRead      (df, "g");
 	r.MXRead      (df, "r");
 	b0.MXRead     (df, "b0");
 
-	if (!b1.MXRead     (df, "b1")) {
-		printf ("Assuming uniform b1\n");
-		b1 = Matrix<cplx>::Ones(r.Dim(1), 1);
+	if (!b1m.MXRead (df, "b1m")) {
+		printf ("Assuming uniform receive b1\n");
+		b1m = Matrix<cplx>::Ones(r.Dim(1), 1);
 	}
 
 	target.MXRead (df, "target");
+
+	if (sample.MXRead (df,"sample"))
+		printf ("No sample for excitation simulation\n");
+	else {
+
+		sr.MXRead(df, "sr");
+	
+		if (!b1p.MXRead (df, "b1p")) {
+			printf ("Assuming uniform transmit b1\n");
+			b1p = Matrix<cplx>::Ones(sr.Dim(1), 1);
+		}
+
+		sb0.MXRead(df, "sb0");
+		j.MXRead(df, "j");
+	}
+
 #endif
 
 	rc->ReadConfig (cf.c_str());
@@ -331,11 +355,16 @@ bool dmtest (ReconClient* rc) {
 
 	// Outgoing -------------
 	
-	rc->SetCplx  (    "b1", b1);
-	rc->SetReal  (     "k", k);
+	rc->SetCplx  (   "b1m", b1m);
+	rc->SetCplx  (   "b1p", b1p);
+	rc->SetReal  (    "ag", ag);
 	rc->SetReal  (     "r", r);
 	rc->SetReal  (    "b0", b0);
 	rc->SetReal  ("target", target);
+	rc->SetReal  ("sample", sample);
+	rc->SetReal  (    "sr", sr);
+	rc->SetReal  (   "sb0", sb0);
+	rc->SetReal  (     "j", j);
 	// ---------------------
 	
 	rc->Process (test);
@@ -343,6 +372,8 @@ bool dmtest (ReconClient* rc) {
 	// Incoming -------------
 	
 	rc->GetCplx ("signals", signals);  
+	rc->GetReal ("magn", m);
+	rc->GetCplx ("rf", rf);
 	// ---------------------
 	
 	rc->Finalise   (test);
@@ -356,6 +387,8 @@ bool dmtest (ReconClient* rc) {
 	}
 
 	signals.MXDump (mf, "signals");
+	m.MXDump       (mf, "magn");
+	rf.MXDump       (mf, "rf");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());

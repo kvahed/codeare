@@ -87,13 +87,13 @@ typedef std::complex<float> cplx;
 /**
  * Return minimum of two numbers
  */
-# define MIN(A,B) (A > B ? A : B)
+# define MAX(A,B) (A > B ? A : B)
 
 
 /**
  * Return maximum of two numbers 
  */
-# define MAX(A,B) (A < B ? A : B)
+# define MIN(A,B) (A < B ? A : B)
 
 
 /**

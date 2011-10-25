@@ -112,12 +112,12 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 							vxlm(r, t, c, l, s) = imgs(c, l, s, 0, t, r); 
 		
 		int         threads = 1;
-		
+
 #pragma omp parallel default (shared) 
 		{
 			threads  = omp_get_num_threads();
 		}
-		
+
 		Matrix<cplx> m[threads]; // Combination
 		Matrix<cplx> u[threads]; // Left-side and  O(NRX x NRX)
 		Matrix<cplx> v[threads]; // Right-side singular vectors O(NTX, NTX)
@@ -125,7 +125,7 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 		
 		for (int i = 0; i < threads; i++) {
 			m[i] = Matrix<cplx>     (nrxc, ntxc);
-			u[i] = Matrix<cplx>     (nrxc, nrxc);
+			u[i] = Matrix<cplx>     (nrxc, ntxc);
 			v[i] = Matrix<cplx>     (ntxc, ntxc);
 			s[i] = Matrix<cplx> (MIN(ntxc, nrxc), 1);
 		}
@@ -135,17 +135,16 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 			
 			int tid = omp_get_thread_num();
 			
-#pragma omp for schedule (dynamic, rtms / omp_get_num_threads())
+#pragma omp for schedule (guided, 96)
 			
 			for (size_t i = 0; i < rtms; i++) {
-				
+
 				memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cplx));
-				
+
 				m[tid].SVD (&u[tid], &v[tid], &s[tid], 'S');
-				
-				for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r]             * exp(cplx(0.0,1.0)*arg(u[tid][0]));             // U 
-				for (size_t t = 0; t < nrxc; t++) txm[t*volsize + i] = v[tid][t*v[0].Dim(0)] * exp(cplx(0.0,1.0)*arg(v[tid][0])); // V is transposed!!!
-				
+
+				for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r]             * exp(cplx(0.0,1.0)*arg(u[tid][0])); // U 
+				for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t*v[0].Dim(0)] * exp(cplx(0.0,1.0)*arg(v[tid][0])); // V is transposed!!!
 				snro[i] = real(s[tid][0]);
 				
 			}
