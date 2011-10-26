@@ -329,19 +329,20 @@ bool dmtest (ReconClient* rc) {
 
 	target.MXRead (df, "target");
 
-	if (sample.MXRead (df,"sample"))
+	if (!sample.MXRead (df,"sample"))
 		printf ("No sample for excitation simulation\n");
 	else {
 
 		sr.MXRead(df, "sr");
-	
+		
 		if (!b1p.MXRead (df, "b1p")) {
 			printf ("Assuming uniform transmit b1\n");
 			b1p = Matrix<cplx>::Ones(sr.Dim(1), 1);
 		}
-
+		
 		sb0.MXRead(df, "sb0");
 		j.MXRead(df, "j");
+
 	}
 
 #endif

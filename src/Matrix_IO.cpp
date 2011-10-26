@@ -708,7 +708,9 @@ bool Matrix<T>::MXRead (const string fname, const string dname, const string dlo
 		return false;
 	}
 	// -------------------------------------------
-	
+
+	return true;
+
 }
 
 
