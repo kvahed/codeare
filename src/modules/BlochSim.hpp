@@ -276,6 +276,9 @@ void Simulate (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, const Matri
     //
 	int              err; 
 	cl_context       context; 
+	cl_platform_id platform;
+	cl_uint platforms, devices;
+
 	cl_device_id     device_id;
 	cl_command_queue commands;          // compute command queue
     cl_program       program;                 // compute program
@@ -294,11 +297,20 @@ void Simulate (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, const Matri
     for(i = 0; i < count; i++)
         data[i] = rand() / (float)RAND_MAX;
     
-    err = clGetDeviceIDs(NULL, gpu ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU, 1, &device_id, NULL);
+	err=clGetPlatformIDs(1, &platform, &platforms);
+    if (err != CL_SUCCESS) {
+        printf("OpenCL Error: Failed to create a plattform!\n"); 
+		return;
+	} 
+	cout << platforms << endl;
+	cout << platform << endl;
+	
+	err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device_id, &devices);
     if (err != CL_SUCCESS) {
         printf("OpenCL Error: Failed to create a device group!\n"); 
 		return;
 	}
+	cout << devices << endl;
 
 	if (!(context = clCreateContext(0, 1, &device_id, NULL, NULL, &err))) {
 		printf("Error: Failed to create a compute context!\n");
@@ -423,9 +435,6 @@ void Simulate (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, const Matri
     clReleaseKernel(kernel);
     clReleaseCommandQueue(commands);
     clReleaseContext(context);
- 
-    return;
-
  
 printf ("  Simulaing: %s on %04i isochromats ... ", (exc) ? "         excitation" : " signal acquisition", (int)nr); fflush(stdout);
 
