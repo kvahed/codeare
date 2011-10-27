@@ -19,7 +19,12 @@
  */
 
 #include "OMP.hpp"
-#include <OpenCL/opencl.h>
+
+#if defined HAVE_CL_CL_H
+    #include <CL/cl.h>
+#elif defined HAVE_OPENCL_CL_H
+    #include <OpenCL/opencl.h>
+#endif
 
 #define GAMMARAD 2.6753e3
 #define TWOPI	 6.283185
