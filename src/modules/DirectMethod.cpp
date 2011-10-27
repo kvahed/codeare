@@ -19,14 +19,9 @@
  */
 
 #include "DirectMethod.hpp"
-#include "BlochSim.hpp"
+#include "CGNR.hpp"
 
 using namespace RRStrategy;
-
-enum mode {
-	ACQUIRE, 
-	EXCITE
-};
 
 RRSModule::error_code 
 DirectMethod::Init () {
@@ -98,11 +93,10 @@ DirectMethod::Process     () {
 	Matrix<double>& j      = GetReal("j");
 	
 	// Outgoing
-    Matrix<cplx>&   res    = AddCplx ("signals", NEW (Matrix<cplx>  (ag.Dim(1),b1p.Dim(1))));
-    Matrix<cplx>&   rf     = AddCplx ("rf",      NEW (Matrix<cplx>  (ag.Dim(1),b1p.Dim(1))));
-	Matrix<double>& m      = AddReal ("magn",    NEW (Matrix<double>(        3, sr.Dim(1))));
-
-	Matrix <double> eg (ag.Dim(0),ag.Dim(1));
+    Matrix<cplx>    res    = Matrix<cplx>  (ag.Dim(1),b1p.Dim(1));
+    Matrix<cplx>&    rf    = AddCplx ("rf",      NEW (Matrix<cplx>  (ag.Dim(1),b1p.Dim(1))));
+	Matrix<double>&   m    = AddReal ("magn",    NEW (Matrix<double>(        3, sr.Dim(1))));
+	Matrix<double>   eg    = ag; 
 
 	// Intensity correction (Vahedipour et al. MRM 2011)
 	if (m_ic)

@@ -10974,7 +10974,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"418M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"422M\"" >>confdefs.h
 
 # copyright notice
 
@@ -16338,6 +16338,102 @@ fi
 
 done
 
+
+for ac_header in CL/cl.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "CL/cl.h" "ac_cv_header_CL_cl_h" "$ac_includes_default"
+if test "x$ac_cv_header_CL_cl_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_CL_CL_H 1
+_ACEOF
+
+else
+
+    for ac_header in OpenCL/cl.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "OpenCL/cl.h" "ac_cv_header_OpenCL_cl_h" "$ac_includes_default"
+if test "x$ac_cv_header_OpenCL_cl_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OPENCL_CL_H 1
+_ACEOF
+
+else
+
+        echo "OpenCL header files not found in your system"
+        exit -1
+
+fi
+
+done
+
+
+fi
+
+done
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether host is Mac OS" >&5
+$as_echo_n "checking whether host is Mac OS... " >&6; }
+case $host in
+    *darwin*)
+        LDFLAGS="$LDFLAGS -framework OpenCL"
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+    ;;
+    *)
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for clGetPlatformIDs in -lOpenCL" >&5
+$as_echo_n "checking for clGetPlatformIDs in -lOpenCL... " >&6; }
+if ${ac_cv_lib_OpenCL_clGetPlatformIDs+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lOpenCL  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char clGetPlatformIDs ();
+int
+main ()
+{
+return clGetPlatformIDs ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_OpenCL_clGetPlatformIDs=yes
+else
+  ac_cv_lib_OpenCL_clGetPlatformIDs=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_OpenCL_clGetPlatformIDs" >&5
+$as_echo "$ac_cv_lib_OpenCL_clGetPlatformIDs" >&6; }
+if test "x$ac_cv_lib_OpenCL_clGetPlatformIDs" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOPENCL 1
+_ACEOF
+
+  LIBS="-lOpenCL $LIBS"
+
+else
+
+            echo "OpenCL library not found in your system"
+            exit -1
+
+fi
+
+esac
 
 # Checks for C libraries.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for read in -lomnithread" >&5
