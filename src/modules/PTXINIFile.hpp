@@ -116,7 +116,7 @@ PTXWriteSiemensINIFile (Matrix<cplx>& pt, int dimrf, int dimgr, int nc, int samp
 		
 		fprintf (fp, "\n");
 		fprintf (fp, "\n");
-		fprintf (fp, "[pTXPulse_ch%i]\n", ci[j]);
+		fprintf (fp, "[pTXPulse_ch%i]\n", (int)ci[j]);
 		fprintf (fp, "\n");
 		
 		for (int i = 0; i < nt; i++)

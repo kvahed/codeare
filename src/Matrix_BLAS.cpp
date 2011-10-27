@@ -107,8 +107,8 @@ Matrix<T>::Norm () const {
 	int n    = (int) Size();
 	int incx = 1;
 	
-	if      (typeid(T) == typeid(   cplx)) res = cblas_scnrm2 (n, &_M[0], incx);
-	else if (typeid(T) == typeid(double))  res = cblas_dnrm2  (n, &_M[0], incx);
+	if      (typeid(T) == typeid(  cplx)) res = cblas_scnrm2 (n, &_M[0], incx);
+	else if (typeid(T) == typeid(double))  res = cblas_dnrm2 (n, &_M[0], incx);
 	
 	else {
 		for (int i = 0; i < Size(); i++)
