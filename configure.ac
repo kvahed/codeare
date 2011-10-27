@@ -184,6 +184,27 @@ AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
 AC_CHECK_HEADERS([fcntl.h],          [], [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
 AC_CHECK_HEADERS([stddef.h],         [], [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
 
+AC_CHECK_HEADERS(CL/cl.h, [], [
+    AC_CHECK_HEADERS(OpenCL/cl.h, [], [
+        echo "OpenCL header files not found in your system"
+        exit -1
+    ])
+])
+
+AC_MSG_CHECKING(whether host is Mac OS)
+case $host in
+    *darwin*)
+        LDFLAGS="$LDFLAGS -framework OpenCL"
+        AC_MSG_RESULT(yes)
+    ;;
+    *)
+        AC_MSG_RESULT(no)
+        AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [],[ 
+            echo "OpenCL library not found in your system"
+            exit -1
+        ])
+esac
+
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read],          [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
 AC_CHECK_LIB([omniDynamic4], [main],          [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])

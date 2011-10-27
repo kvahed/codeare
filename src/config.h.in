@@ -9,6 +9,9 @@
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 
+/* Define to 1 if you have the <CL/cl.h> header file. */
+#undef HAVE_CL_CL_H
+
 /* Define to 1 if you have the <complex> header file. */
 #undef HAVE_COMPLEX
 
@@ -78,6 +81,9 @@
 /* Define to 1 if you have the `omnithread' library (-lomnithread). */
 #undef HAVE_LIBOMNITHREAD
 
+/* Define to 1 if you have the `OpenCL' library (-lOpenCL). */
+#undef HAVE_LIBOPENCL
+
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
 
@@ -119,6 +125,9 @@
 
 /* Define to 1 if you have the <omniORB4/CORBA.h> header file. */
 #undef HAVE_OMNIORB4_CORBA_H
+
+/* Define to 1 if you have the <OpenCL/cl.h> header file. */
+#undef HAVE_OPENCL_CL_H
 
 /* Define to 1 if you have the `pow' function. */
 #undef HAVE_POW
