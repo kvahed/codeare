@@ -43,23 +43,27 @@ GPUSimulator::GPUSimulator () {
  
 
 void 
-GPUSimulator::ReadAndBuild (std::string ksrc) {
+GPUSimulator::BuildProgram (std::string ksrc) {
 	
 	int ksize = ksrc.size();
-
+	
 	printf("kernel size: %d\n", ksize);
 	
 	try {
+
 		cl::Program::Sources cps (1, std::make_pair(ksrc.c_str(), ksize));
 		m_prg = cl::Program(m_ctxt, cps);
+	
 	} catch (cl::Error cle) {
 		printf("ERROR: %s(%s)\n", cle.what(), ErrorString (cle.err()));
 	}
 	
 	printf("build program\n");
-
+	
 	try {
+
 		m_error = m_prg.build(m_devs);
+	
 	} catch (cl::Error er) {
 		printf("m_prg.build: %s\n", ErrorString (er.err()));
 	}
@@ -107,6 +111,23 @@ GPUSimulator::Simulate     (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm
 	
 	printf (" done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
+}
+
+
+void 
+GPUSimulator::Prepare() {
+
+    printf ("    Preparing kernel and transfering data ...");  fflush(stdout);
+	
+	// Initialise kernel from program
+    try {
+        m_kernel = cl::Kernel(m_prg, "GPUSimulator", &m_error);
+    } catch (cl::Error cle) {
+        printf("ERROR: %s(%d)\n", cle.what(), cle.err());
+    }
+	
+	printf ("done.\n");
+
 }
 
 
