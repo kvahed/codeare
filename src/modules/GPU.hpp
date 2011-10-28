@@ -4,7 +4,7 @@
     #include <OpenCL/opencl.h>
 #endif
 
-bool HaveGPU() {
+bool HaveGPU () {
 
 	int              e;         // return states
 	cl_context       ctxt;      // context

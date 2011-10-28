@@ -1,6 +1,19 @@
 #include "GPUSimulator.hpp"
 
+
 using namespace RRStrategy;
+
+GPUSimulator::GPUSimulator () : m_cpi (NULL),
+								m_devs (0),
+								m_devids (NULL),
+								m_err (CL_SUCCESS) {
+
+#ifdef NVIDIA
+    m_err = clGetPlatformIDs (&m_cpi);
+#endif
+
+}
+ 
 
 void 
 GPUSimulator::SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&   rf, 

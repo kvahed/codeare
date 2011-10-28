@@ -22,9 +22,21 @@
 #define __GPU_SIMULATOR_HPP__
 
 #include "SimulationStrategy.hpp"
+#include "../config.h"
+
+#if defined HAVE_CL_CL_H
+    #include <CL/cl.h>
+    #define NVIDIA
+#elif defined HAVE_OPENCL_CL_H
+    #include <OpenCL/opencl.h>
+    #define APPLE
+#endif
 
 namespace RRStrategy {
 	
+	const unsigned int MAX_GPU_COUNT = 8;
+
+
 	/**
 	 * @brief Base class for simulation stratgies used by direct method
  	 */
@@ -44,7 +56,7 @@ namespace RRStrategy {
 		/**
 		 * @brief       Default constructor
 		 */
-		GPUSimulator  () {};
+		GPUSimulator  ();
 
 
 		/**
@@ -64,6 +76,14 @@ namespace RRStrategy {
 		
 	private:
 		
+
+		cl_context       m_ctxt;
+		cl_kernel        m_simkern[MAX_GPU_COUNT];
+		cl_command_queue m_cq[MAX_GPU_COUNT];
+		cl_platform_id   m_cpi;
+		cl_uint          m_devs;
+		cl_device_id*    m_devids;
+		cl_int           m_err;
 
 		/**
 		 * @brief       Simulate single shot reception of freely precessing isochromat along gradient trajectory<br/>
