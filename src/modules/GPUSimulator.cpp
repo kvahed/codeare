@@ -1,5 +1,5 @@
 #include "GPUSimulator.hpp"
-
+#include "OpenCLUtil.hpp"
 
 using namespace RRStrategy;
 
@@ -8,29 +8,12 @@ GPUSimulator::GPUSimulator () : m_cpi (NULL),
 								m_devids (NULL),
 								m_err (CL_SUCCESS) {
 
-#ifdef NVIDIA
-    m_err = clGetPlatformIDs (&m_cpi);
-#endif
+    std::vector<cl::Platform> platforms;
+	m_err = cl::Platform::get(&platforms);
+
 
 }
  
-
-void 
-GPUSimulator::SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&   rf, 
-							const Matrix<double>&  gr, const Matrix<double>&  r, 
-							const Matrix<double>& b0m, const double&         dt, 
-							const bool&             v, const size_t&        pos, 
-							const int&            tid,       Matrix<double>&  m) {}
-
-
-void 
-GPUSimulator::SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, 
-							const Matrix<double>&   r, const Matrix<double>& m0, 
-							const Matrix<double>& b0m, const double&         dt, 
-							const bool&             v, const size_t&        pos, 
-							const int&            tid,       Matrix<cplx>&  res) {}
-
-
 
 void
 GPUSimulator::Simulate     (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 

@@ -77,62 +77,6 @@ namespace RRStrategy {
 				         Matrix<cplx>&   res, Matrix<double>&         m) = 0;
 		
 		
-	private:
-		
-
-		/**
-		 * @brief       Simulate single shot reception of freely precessing isochromat along gradient trajectory<br/>
-		 *              (i.e. forward Fourier transform incl. effect of Receive and b0 maps)<br/>
-		 *              Expects res to carry the correct size and dimensions
-		 *
-		 * INPUT:
-		 * @param  rxm  Receive sensitivities
-		 * @param  gr   Gradient trajectory
-		 * @param  r    Positions
-		 * @param  m0   Initial magnetisation state
-		 * @param  b0m  B0 map
-		 * @param  dt   Timestep
-		 * @param  v    Verbose
-		 * @param  pos  Position of isochromat in r
-		 * @param  tid  Thread ID
-		 *
-		 * OUTPUT:
-		 * @param  res  Resulting signal (output) 
-		 */
-		virtual void
-		SimulateRecv   (const Matrix<cplx>&   rxm, const Matrix<double>& gr, 
-						const Matrix<double>&   r, const Matrix<double>& m0, 
-						const Matrix<double>& b0m, const double&         dt, 
-						const bool&             v, const size_t&        pos, 
-						const int&            tid,       Matrix<cplx>&  res) = 0;
-		
-		/**
-		 * @brief       Simulate single shot excitation of a single isochromat of r matrix along gradient trajectory<br/>
-		 *              (i.e. inverse Fourier transform incl. effect of Receive and b0 maps)<br/>
-		 *              Expects res to carry the correct size and dimensions
-		 *
-		 * INPUT:
-		 * @param  txm  Receive sensitivities
-		 * @param  rf   Complex RF field
-		 * @param  gr   Gradient trajectory
-		 * @param  r    Positions
-		 * @param  b0m  B0 map
-		 * @param  dt   Timestep
-		 * @param  v    Verbose
-		 * @param  pos  Position of isochromat in r
-		 * @param  tid  Thread id
-		 *
-		 * OUTPUT:
-		 * @param  m    Resulting magntisation (output)
-		 */
-		virtual void
-		SimulateExc    (const Matrix<cplx>&   txm, const Matrix<cplx>&   rf, 
-						const Matrix<double>&  gr, const Matrix<double>&  r, 
-						const Matrix<double>& b0m, const double&         dt, 
-						const bool&            v,  const size_t&        pos, 
-						const int&            tid,       Matrix<double>&  m) = 0;
-		
-		
 	};
 		
 
