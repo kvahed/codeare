@@ -61,7 +61,6 @@ namespace RRStrategy {
 		 * @param  exc  Exciting or receiving  
 		 * @param  v    Verbose                 (Scalar: false = only end, true = all time points)
 		 * @param  np   # parallel processes    (scalar)
-		 * @param  gpu  Use OpenCL implementation 
 		 *
 		 * OUTPUT:
 		 * @param  res  Result of simulation    (Nr  x 3 (x Nt))

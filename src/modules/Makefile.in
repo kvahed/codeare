@@ -96,7 +96,7 @@ CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @USE_GSL_TRUE@am_CompressedSensing_la_rpath = -rpath $(libdir)
 DirectMethod_la_LIBADD =
 am_DirectMethod_la_OBJECTS = $(am__objects_1) DirectMethod.lo \
-	CPUSimulator.lo GPUSimulator.lo OpenCLUtil.lo
+	CPUSimulator.lo GPUSimulator.lo
 DirectMethod_la_OBJECTS = $(am_DirectMethod_la_OBJECTS)
 DirectMethod_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -385,7 +385,7 @@ RelativeSensitivities_la_SOURCES = $(COMMON) RelativeSensitivities.hpp RelativeS
 RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
 CompressedSensing_la_SOURCES = $(COMMON) DWT.cpp DWT.hpp CompressedSensing.hpp CompressedSensing.cpp
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
-DirectMethod_la_SOURCES = $(COMMON) DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp OpenCLUtil.cpp OpenCLUtil.hpp
+DirectMethod_la_SOURCES = $(COMMON) DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp 
 DirectMethod_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 all: all-am
@@ -503,7 +503,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT_OMP.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OpenCLUtil.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RelativeSensitivities.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpatialDomain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@

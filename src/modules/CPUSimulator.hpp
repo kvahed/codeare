@@ -26,7 +26,7 @@
 namespace RRStrategy {
 	
 	/**
-	 * @brief Base class for simulation stratgies used by direct method
+	 * @brief Simple time equidistant bloch simulator 
  	 */
 	class CPUSimulator : public SimulationStrategy {
 		

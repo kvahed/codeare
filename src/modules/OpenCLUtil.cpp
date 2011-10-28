@@ -4,30 +4,31 @@
 #include <string>
 #include <string.h>
 
-
 #include "OpenCLUtil.hpp"
 #include "GPUSimulator.hpp"
 
-char *file_contents(const char *filename, int *length)
-{
-    FILE *f = fopen(filename, "r");
-    void *buffer;
+char *file_contents(const char *fname, int *length) {
+
+    FILE *f = fopen(fname, "r");
+
+    void *buf;
 
     if (!f) {
-        fprintf(stderr, "Unable to open %s for reading\n", filename);
+        fprintf(stderr, "Unable to open %s for reading\n", fname);
         return NULL;
     }
 
-    fseek(f, 0, SEEK_END);
-    *length = ftell(f);
-    fseek(f, 0, SEEK_SET);
+    fseek (f, 0, SEEK_END);
+    *size = ftell (f);
+    fseek (f, 0, SEEK_SET);
 
-    buffer = malloc(*length+1);
-    *length = fread(buffer, 1, *length, f);
-    fclose(f);
-    ((char*)buffer)[*length] = '\0';
+    buf = malloc (*size+1);
+    *length = fread (buf, 1, *size, f);
+    fclose (f);
+    ((char*)buf)[*size] = '\0';
 
-    return (char*)buffer;
+    return (char*)buf;
+
 }
 
 
@@ -35,9 +36,8 @@ char *file_contents(const char *filename, int *length)
 
 // Helper function to get error string
 // *********************************************************************
-/*
-const char* oclErrorString(cl_int error)
-{
+const char* oclErrorString (cl_int error) {
+
     static const char* errorString[] = {
         "CL_SUCCESS",
         "CL_DEVICE_NOT_FOUND",
@@ -106,8 +106,8 @@ const char* oclErrorString(cl_int error)
     };
 
     const int errorCount = sizeof(errorString) / sizeof(errorString[0]);
-
+	
     const int index = -error;
 
     return (index >= 0 && index < errorCount) ? errorString[index] : "";
-	}*/
+}

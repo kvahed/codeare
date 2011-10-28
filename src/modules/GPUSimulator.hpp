@@ -32,18 +32,15 @@
 #define APPLE
 #endif
 
-#include "cl.hpp"
-
 #define __CL_ENABLE_EXCEPTIONS
 
+#include "cl.hpp"
 
 namespace RRStrategy {
 	
-	const unsigned int MAX_GPU_COUNT = 8;
-
 
 	/**
-	 * @brief Base class for simulation stratgies used by direct method
+	 * @brief Simple time equidistant bloch simulator for OpenCL 
  	 */
 	class GPUSimulator : public SimulationStrategy {
 		
@@ -82,16 +79,30 @@ namespace RRStrategy {
 	private:
 		
 
-		cl_context       m_ctxt;
-		cl_kernel        m_simkern[MAX_GPU_COUNT];
-		cl_command_queue m_cq[MAX_GPU_COUNT];
-		cl_platform_id   m_cpi;
-		cl_uint          m_devs;
-		cl_device_id*    m_devids;
-		cl_int           m_err;
+		const char*	ErrorString (cl_int error);		
+
+
+		char* ReadSource (const char* fname, int* size);		/**
+		 *  Read OpenCL code and compile program
+		 *
+		 * 
+		 */
+		void ReadAndBuild (std::string ksrc);
+		
+        unsigned int            m_dev;   /**!<   */
+		std::vector<cl::Device> m_devs;  /**!<   */
+        cl::Context             m_ctxt;  /**!<   */
+        cl::CommandQueue        m_cmdq;  /**!<   */
+        cl::Program             m_prg;   /**!<   */
+        cl_int                  m_error; /**!<   */
+        cl::Event               m_event; /**!<   */
+
 
 	};
-		
+
+	
+	
+	
 }
 
 #endif // __GPU_SIMULATOR_HPP__
