@@ -39,7 +39,9 @@ namespace RRStrategy {
 		 * @brief Constructor<br/>Check if we have GPU support or not and choose apporiate strategy
 		 */
 		SimulationContext () {
-			m_strategy    =  (HaveGPU()) ? (SimulationStrategy*) new GPUSimulator () : (SimulationStrategy*)new CPUSimulator ();
+			m_strategy    = (SimulationStrategy*) (HaveGPU()) ? 
+				(SimulationStrategy*) new GPUSimulator (): 
+				(SimulationStrategy*) new CPUSimulator ();
 		}
 
 
