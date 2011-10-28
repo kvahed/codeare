@@ -48,17 +48,13 @@ bool HaveGPU() {
 	}
 
     if (!(cq = clCreateCommandQueue (ctxt, did, 0, &e))) {
-        printf("OpenCL: Failed to create a command! No GPU computing.\n");
+        printf("OpenCL: Failed to create a command! Releasing context. No GPU computing.\n");
+		clReleaseContext      (ctxt);
         return false;
     }
 
-    cp = clCreateProgramWithSource (ctxt, 1, (const char **) & KernelSource, NULL, &e);
-
-	if (!cp) {
-        printf("OpenCL: Failed to create compute program! No GPU computing\n");
-        return false;
-    }
- 
+    clReleaseCommandQueue (cq);
+	
 	return true;
 
 }
