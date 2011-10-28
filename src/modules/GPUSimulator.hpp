@@ -24,13 +24,18 @@
 #include "SimulationStrategy.hpp"
 #include "../config.h"
 
+#include <vector>
+
 #if defined HAVE_CL_CL_H
-    #include <CL/cl.h>
-    #define NVIDIA
+#define NVIDIA
 #elif defined HAVE_OPENCL_CL_H
-    #include <OpenCL/opencl.h>
-    #define APPLE
+#define APPLE
 #endif
+
+#include "cl.hpp"
+
+#define __CL_ENABLE_EXCEPTIONS
+
 
 namespace RRStrategy {
 	
@@ -85,35 +90,6 @@ namespace RRStrategy {
 		cl_device_id*    m_devids;
 		cl_int           m_err;
 
-		/**
-		 * @brief       Simulate single shot reception of freely precessing isochromat along gradient trajectory<br/>
-		 *              (i.e. forward Fourier transform incl. effect of Receive and b0 maps)<br/>
-		 *              Expects res to carry the correct size and dimensions
-		 *
-		 * @see         SimulationStrategy::Simulate()
-		 */
-		virtual void
-		SimulateRecv   (const Matrix<cplx>&   rxm, const Matrix<double>& gr, 
-						const Matrix<double>&   r, const Matrix<double>& m0, 
-						const Matrix<double>& b0m, const double&         dt, 
-						const bool&             v, const size_t&        pos, 
-						const int&            tid,       Matrix<cplx>&  res);
-		
-		/**
-		 * @brief       Simulate single shot excitation of a single isochromat of r matrix along gradient trajectory<br/>
-		 *              (i.e. inverse Fourier transform incl. effect of Receive and b0 maps)<br/>
-		 *              Expects res to carry the correct size and dimensions
-		 *
-		 * @see         SimulationStrategy::Simulate()
-		 */
-		virtual void
-		SimulateExc    (const Matrix<cplx>&   txm, const Matrix<cplx>&   rf, 
-						const Matrix<double>&  gr, const Matrix<double>&  r, 
-						const Matrix<double>& b0m, const double&         dt, 
-						const bool&            v,  const size_t&        pos, 
-						const int&            tid,       Matrix<double>&  m);
-		
-		
 	};
 		
 }

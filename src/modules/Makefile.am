@@ -62,7 +62,7 @@ RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSI
 CompressedSensing_la_SOURCES = $(COMMON) DWT.cpp DWT.hpp CompressedSensing.hpp CompressedSensing.cpp
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
 
-DirectMethod_la_SOURCES = $(COMMON) DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp
+DirectMethod_la_SOURCES = $(COMMON) DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp OpenCLUtil.cpp OpenCLUtil.hpp
 DirectMethod_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
