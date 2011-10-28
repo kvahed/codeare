@@ -49,53 +49,81 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       Default destructor
+		 * @brief        Default destructor
 		 */
 		virtual 
-		~GPUSimulator () {};
+		~GPUSimulator   () {};
 		
 		
 		/**
-		 * @brief       Default constructor
+		 * @brief        Default constructor
 		 */
-		GPUSimulator  ();
+		GPUSimulator    ();
 
 
 		/**
-		 * @brief       Piece-wise constant bloch simulation
+		 * @brief        Piece-wise constant bloch simulation
 		 *
-		 * @see         SimulationStrategy::Simulate()
+		 * @see          SimulationStrategy::Simulate()
 		 */
 		virtual void 
-		Simulate  (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 
-				   const Matrix<cplx>&    rf, const Matrix<double>&  gr, 
-				   const Matrix<double>&   r, const Matrix<double>&  m0, 
-				   const Matrix<double>& b0m, const double&          dt, 
-				   const bool&           exc, const bool&             v, 
-				   const size_t&          np, 
-				         Matrix<cplx>&   res, Matrix<double>&         m);
+		Simulate        (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 
+						 const Matrix<cplx>&    rf, const Matrix<double>&  gr, 
+						 const Matrix<double>&   r, const Matrix<double>&  m0, 
+						 const Matrix<double>& b0m, const double&          dt, 
+						 const bool&           exc, const bool&             v, 
+						 const size_t&          np, 
+				               Matrix<cplx>&   res, Matrix<double>&         m);
 		
 		
 	private:
 		
 
-		const char*	ErrorString (cl_int error);		
-
-
-		char* ReadSource (const char* fname, int* size);		/**
-		 *  Read OpenCL code and compile program
-		 *
-		 * 
+		/**
+		 * @brief        Prepare GPU processing<br/>(i.e. Load kernel & transfer data to GPU memory)
 		 */
-		void ReadAndBuild (std::string ksrc);
+		void
+		Prepare         ();		
 		
-        unsigned int            m_dev;   /**!<   */
-		std::vector<cl::Device> m_devs;  /**!<   */
-        cl::Context             m_ctxt;  /**!<   */
-        cl::CommandQueue        m_cmdq;  /**!<   */
-        cl::Program             m_prg;   /**!<   */
-        cl_int                  m_error; /**!<   */
-        cl::Event               m_event; /**!<   */
+
+		/**
+		 * @brief        Convenience for human readable error
+		 *
+		 * @param   e    Error code
+		 * @return       Human readable error string
+		 */
+		const char*	
+		ErrorString     (cl_int e);		
+
+
+		/**
+		 * @brief        Read OpenCL program source from file
+		 *
+		 * @param  fname File name
+		 * @param  size  File size
+		 * @return       File content
+		 */
+		char* 
+		ReadSource      (const char* fname, int* size);		
+
+
+		/**
+		 *  @brief       Build OpenCL program
+		 *
+		 *  @param  ksrc Kernel source
+		 */
+		void 
+		BuildProgram    (std::string ksrc);
+		
+
+        unsigned int            m_dev;    /**!<   */
+		std::vector<cl::Device> m_devs;   /**!<   */
+        cl::Context             m_ctxt;   /**!<   */
+        cl::CommandQueue        m_cmdq;   /**!<   */
+        cl::Program             m_prg;    /**!<   */
+        cl_int                  m_error;  /**!<   */
+        cl::Event               m_event;  /**!<   */
+        cl::Kernel              m_kernel; /**!<   */
 
 
 	};
