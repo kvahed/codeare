@@ -5,8 +5,8 @@
 #include <string.h>
 
 
+#include "OpenCLUtil.hpp"
 #include "GPUSimulator.hpp"
-#include "util.h"
 
 char *file_contents(const char *filename, int *length)
 {
@@ -35,6 +35,7 @@ char *file_contents(const char *filename, int *length)
 
 // Helper function to get error string
 // *********************************************************************
+/*
 const char* oclErrorString(cl_int error)
 {
     static const char* errorString[] = {
@@ -109,5 +110,4 @@ const char* oclErrorString(cl_int error)
     const int index = -error;
 
     return (index >= 0 && index < errorCount) ? errorString[index] : "";
-
-}
+	}*/
