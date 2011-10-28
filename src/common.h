@@ -41,4 +41,15 @@ enum error_code   {
 
 };
 
+enum coords {
+	X,
+	Y,
+	Z
+};
+
+enum sim_mode {
+	ACQUIRE,
+	EXCITE
+};
+
 #endif //__COMMON_H__

@@ -300,7 +300,7 @@ reconserver_LDFLAGS = $(HDF5) -dlopen modules/DummyRecon.la -dlopen \
 	modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la \
 	-dlopen modules/SpatialDomain.la -dlopen \
 	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
-	$(am__append_1)
+	modules/DirectMethod.la $(am__append_1)
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
 SUBDIRS = modules tinyxml

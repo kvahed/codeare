@@ -19,9 +19,48 @@
  */
 
 #include "DirectMethod.hpp"
-#include "CGNR.hpp"
 
 using namespace RRStrategy;
+
+/**
+ * @brief         Time reversal for RF 
+ *
+ * @param  signal Acquired signal
+ * @param  jac    Jacobian determinant j(k) i.e. density compensation
+ * @param  pulse  Excitation pulse(s)
+ */
+void TimeReverseRF (const Matrix<cplx>& signal, const Matrix<double>& jac, Matrix<cplx>& pulse) {
+	
+	size_t nt = signal.Dim(0);
+	size_t nc = signal.Dim(1);
+	
+	for (size_t i = 0; i < nt; i++)
+		for (size_t c = 0; c < nc; c++)
+			pulse(i,c) = (signal(nt-1-i,c)*(float)jac[nt-1-i]);
+	
+}
+
+
+/**
+ * @brief         Time reversal for gradient trajectory
+ * 
+ * @param  acqgr  Acquisition gradients
+ * @param  excgr  Excitation gradients
+ */
+void TimeReverseGR (const Matrix<double>& acqgr, Matrix<double>& excgr) {
+	
+	size_t nt = acqgr.Dim(1);
+	
+	for (size_t i = 0; i < nt; i++) {
+		
+		excgr(0,i) = -acqgr(0,nt-1-i); 
+		excgr(1,i) = -acqgr(1,nt-1-i); 
+		excgr(2,i) = -acqgr(2,nt-1-i);
+		
+	}
+	
+}
+
 
 RRSModule::error_code 
 DirectMethod::Init () {
@@ -44,6 +83,8 @@ DirectMethod::Init () {
 	Attribute ("ic", &m_ic);
     printf ("  intensity correction: %s \n", (m_ic) ? "true": "false");
 
+	m_sim = new SimulationContext ();
+
 	m_initialised = true;
 
     printf ("... done.\n");
@@ -56,6 +97,8 @@ DirectMethod::Init () {
 RRSModule::error_code
 DirectMethod::Finalise() {
 
+	delete m_sim;
+	
 	FreeCplx("b1p");
 	FreeCplx("b1m");
 	FreeReal("ag");
@@ -98,19 +141,21 @@ DirectMethod::Process     () {
 	Matrix<double>&   m    = AddReal ("magn",    NEW (Matrix<double>(        3, sr.Dim(1))));
 	Matrix<double>   eg    = ag; 
 
+	
+
 	// Intensity correction (Vahedipour et al. MRM 2011)
 	if (m_ic)
 		IntensityCorrection (b1m, target);
 
 	// Simulate Bloch receive mode
-	Simulate (b1p, b1m, rf, ag,  r, target,  b0, m_dt, ACQUIRE, m_verbose, m_np, res, m);
+	m_sim->Simulate (b1p, b1m, rf, ag,  r, target,  b0, m_dt, ACQUIRE, m_verbose, m_np, res, m);
 
 	// Time reversal
 	TimeReverseRF (res, j, rf);
 	TimeReverseGR (ag, eg);
 
 	// Simulate Bloch transmit mode
-	Simulate (b1p, b1m, rf, eg, sr, sample, sb0, m_dt,  EXCITE, m_verbose, m_np, res, m);
+	m_sim->Simulate (b1p, b1m, rf, eg, sr, sample, sb0, m_dt,  EXCITE, m_verbose, m_np, res, m);
 
 	printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 

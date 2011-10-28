@@ -44,9 +44,10 @@ void TimeReverseGR (const Matrix<double>& acqgr, Matrix<double>& excgr) {
  * @brief Simulation mode
  */
 enum sim_mode {
-	ACQUIRE, 
-	EXCITE
+	ACQUIRE, /**< Acquisition mode (i.e. no b1) */
+	EXCITE   /**< Excitation mode */
 };
+
 
 /**
  * @brief          CG NR algorithm
