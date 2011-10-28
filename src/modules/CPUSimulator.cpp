@@ -1,33 +1,13 @@
-/*
- *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Juelich, Germany
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
- *  02110-1301  USA
- */
+#include "CPUSimulator.hpp"
 
-#include "OMP.hpp"
-#include "GPU.hpp"
-
-#define GAMMARAD 2.6753e3
-#define TWOPI	 6.283185
-#define DATA_SIZE (1024)
+using namespace RRStrategy;
 
 enum coords {
 	X, Y, Z
 };
+
+#define GAMMARAD 2.6753e3
+#define TWOPI	 6.283185
 
 
 /**
@@ -36,7 +16,8 @@ enum coords {
  * @param  n    Rotation axis
  * @param  r    Rotation matrix (output)
  */
-void RotationMatrix (const Matrix<double>& n, Matrix<double>& r) {
+void 
+Rotate (const Matrix<double>& n, Matrix<double>& r) {
 	
 	double phi = sqrt(n[X]*n[X] + n[Y]*n[Y] + n[Z]*n[Z]);
 
@@ -82,26 +63,10 @@ void RotationMatrix (const Matrix<double>& n, Matrix<double>& r) {
 
 
 
-
-/**
- * @brief       Simulate single shot excitation of a single isochromat of r matrix along gradient trajectory<br/>
- *              (i.e. inverse Fourier transform incl. effect of Receive and b0 maps)<br/>
- *              Expects res to carry the correct size and dimensions
- *
- * @param  txm  Receive sensitivities
- * @param  rf   Complex RF field
- * @param  gr   Gradient trajectory
- * @param  r    Positions
- * @param  b0m  B0 map
- * @param  dt   Timestep
- * @param  v    Verbose
- * @param  pos  Position of isochromat in r
- * @param  tid  Thread id
- * @param  m    Resulting magntisation (output)
- */
-void SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&  rf, const Matrix<double>& gr, const Matrix<double>& r, 
-				   const Matrix<double>& b0m, const double&        dt, const bool&            v, const size_t&       pos, 
-				   const int&            tid,       Matrix<double>& m) {
+void 
+CPUSimulator::SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&  rf, const Matrix<double>& gr, const Matrix<double>& r, 
+							const Matrix<double>& b0m, const double&        dt, const bool&            v, const size_t&       pos, 
+							const int&            tid,       Matrix<double>& m) {
 
 	
 	assert (gr.Dim(1) == rf.Dim(0));
@@ -138,7 +103,7 @@ void SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&  rf, const Mat
 		n[1] = gdt *  rfs.imag();
 		n[2] = gdt * (gr(X,t) * lr[X] + gr(Y,t) * lr[Y] + gr(Z,t) * lr[Z] + b0m[pos] * TWOPI);
 
-		RotationMatrix (n, rot);
+		Rotate (n, rot);
 		
 		tmp[X] = rot[0]*ml[X] + rot[3]*ml[Y] + rot[6]*ml[Z];
 		tmp[Y] = rot[1]*ml[X] + rot[4]*ml[Y] + rot[7]*ml[Z];
@@ -157,25 +122,10 @@ void SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&  rf, const Mat
 }
 
 
-/**
- * @brief       Simulate single shot reception of freely precessing isochromat along gradient trajectory<br/>
- *              (i.e. forward Fourier transform incl. effect of Receive and b0 maps)<br/>
- *              Expects res to carry the correct size and dimensions
- *
- * @param  rxm  Receive sensitivities
- * @param  gr   Gradient trajectory
- * @param  r    Positions
- * @param  m0   Initial magnetisation state
- * @param  b0m  B0 map
- * @param  dt   Timestep
- * @param  v    Verbose
- * @param  pos  Position of isochromat in r
- * @param  tid  Thread ID
- * @param  res  Resulting signal (output) 
- */
-void SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, const Matrix<double>& r, const Matrix<double>& m0, 
-				   const Matrix<double>& b0m, const double&         dt, const bool&           v, const size_t&        pos, 
-				   const int&            tid,       Matrix<cplx>&  res) { 
+void 
+CPUSimulator::SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, const Matrix<double>& r, const Matrix<double>& m0, 
+			  const Matrix<double>& b0m, const double&         dt, const bool&           v, const size_t&        pos, 
+			  const int&            tid,       Matrix<cplx>&  res) { 
 
 	using namespace std;
 
@@ -204,7 +154,7 @@ void SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, const Ma
 		// Rotate magnetisation (only gradients)
 		n[2] = gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] + b0m[pos]*TWOPI);
 		
-		RotationMatrix (n, rot);
+		Rotate (n, rot);
 		
 		tmp[0] = rot[0]*m[X] + rot[3]*m[Y] + rot[6]*m[Z];
 		tmp[1] = rot[1]*m[X] + rot[4]*m[Y] + rot[7]*m[Z];
@@ -224,38 +174,22 @@ void SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, const Ma
 
 
 
-/**
- * @brief Piece-wise constant bloch simulation
- *
- * @param  txm  Transmit sensitivity    (Nr  x Ntxc)
- * @param  rxm  Receive sensitivity     (Nr  x Nrxc) 
- * @param  rf   RF field                (Nt  x Nt  )
- * @param  gr   Gradient                (1-3 x Nt  )
- * @param  r    Spatial positions       (1-3 x Nr  )
- * @param  m0   Starting magnetisation  (3   x Nr  )
- * @param  b0m  B0 map                  (Nr        )
- * @param  dt   time step
- * @param  exc  Exciting or receiving  
- * @param  v    Verbose                 (Scalar: false = only end, true = all time points)
- * @param  np   # parallel processes    (scalar)
- * @param  gpu  Use OpenCL implementation 
- * 
- * @param  res  Result of simulation    (Nr  x 3 (x Nt))
- * @param  m    Resulting magnetisation (3   x Nt)
- */
-void Simulate (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, const Matrix<cplx>&   rf, 
-			   const Matrix<double>&  gr, const Matrix<double>&   r, const Matrix<double>& m0, 
-			   const Matrix<double>& b0m, const double&          dt, const bool&          exc, 
-			   const bool&             v, const size_t&          np, const bool&          gpu,
-			   Matrix<cplx>&         res,       Matrix<double>&   m) {
-
+void
+CPUSimulator::Simulate (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 
+						const Matrix<cplx>&    rf, const Matrix<double>&  gr, 
+						const Matrix<double>&   r, const Matrix<double>&  m0, 
+						const Matrix<double>& b0m, const double&          dt, 
+						const bool&           exc, const bool&             v, 
+						const size_t&          np, 
+						      Matrix<cplx>&   res, Matrix<double>&         m) {
+	
 	ticks            tic  = getticks();
 	
 	size_t           nr   =   r.Dim(1);
 	size_t           ntxc = txm.Dim(1);
 	size_t           nrxc = rxm.Dim(1);
 	size_t           nt   =  gr.Dim(1);
-
+	
 	printf ("  Simulaing: %s on %04i isochromats ... ", (exc) ? "         excitation" : " signal acquisition", (int)nr); fflush(stdout);
 
 	// Anything to do? ----------------
@@ -297,5 +231,4 @@ void Simulate (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, const Matri
 	printf (" done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 }
-
 

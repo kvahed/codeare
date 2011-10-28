@@ -22,6 +22,7 @@
 #define __DIRECT_METHOD_HPP__
 
 #include "ReconStrategy.hpp"
+#include "SimulationContext.hpp"
 
 using namespace RRServer;
 
@@ -82,10 +83,11 @@ namespace RRStrategy {
 
 	private: 
 		
-		double           m_dt;       /*!< @brief Simulation time steps                                        */
-		bool             m_verbose;  /*!< @brief Verbose (Store magnetisation for every dt. HANDLE WITH CARE) */ 
-		int              m_np;       /*!< @brief Number of OMP threads */
-		int              m_ic;       /*!< @brief Perform intensity correction */
+		double             m_dt;       /*!< @brief Simulation time steps                                        */
+		bool               m_verbose;  /*!< @brief Verbose (Store magnetisation for every dt. HANDLE WITH CARE) */ 
+		int                m_np;       /*!< @brief Number of OMP threads */
+		int                m_ic;       /*!< @brief Perform intensity correction */
+		SimulationContext* m_sim;      /*!< Abstraction layer for CPU/GPU computation */
 
 	};
 
@@ -101,9 +103,6 @@ namespace RRStrategy {
 		size_t nr = target.Dim(1);
 		size_t nc = b1maps.Dim(1);
 		float   a;
-
-		cout << target.DimsToCString() << endl;
-		cout << b1maps.DimsToCString() << endl;
 
 		for (size_t i = 0; i < nr; i++) {
 

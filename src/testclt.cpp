@@ -299,7 +299,6 @@ bool dmtest (ReconClient* rc) {
 
 	Matrix<cplx>   b1m;  
 	Matrix<cplx>   b1p;  
-	Matrix<cplx>   signals;
 	Matrix<cplx>   rf;
 	Matrix<double> m;
 
@@ -318,7 +317,7 @@ bool dmtest (ReconClient* rc) {
 	std::string odf = std::string (base + std::string("/simout.mat"));
 
 #ifdef HAVE_MAT_H	
-	ag.MXRead      (df, "g");
+	ag.MXRead     (df, "g");
 	r.MXRead      (df, "r");
 	b0.MXRead     (df, "b0");
 
@@ -372,7 +371,6 @@ bool dmtest (ReconClient* rc) {
 	
 	// Incoming -------------
 	
-	rc->GetCplx ("signals", signals);  
 	rc->GetReal ("magn", m);
 	rc->GetCplx ("rf", rf);
 	// ---------------------
@@ -387,7 +385,6 @@ bool dmtest (ReconClient* rc) {
 		return false;
 	}
 
-	signals.MXDump (mf, "signals");
 	m.MXDump       (mf, "magn");
 	rf.MXDump       (mf, "rf");
 
