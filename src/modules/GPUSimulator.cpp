@@ -67,7 +67,7 @@ GPUSimulator::BuildProgram (std::string ksrc) {
 	} catch (cl::Error er) {
 		printf("m_prg.build: %s\n", ErrorString (er.err()));
 	}
-
+	
 	printf("done building program\n");
 
 	std::cout << "Build Status: "   << m_prg.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(m_devs[0])  << std::endl;
