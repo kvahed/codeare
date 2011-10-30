@@ -21,10 +21,74 @@
 #ifndef __SIMULATION_STRATEGY_HPP__
 #define __SIMULATION_STRATEGY_HPP__
 
+#include "../common.h"
 #include "Matrix.hpp"
 
 namespace RRStrategy {
 	
+	struct SimulationBundle {
+
+		// Incoming
+		Ptr< Matrix<cplx> >   tb1;  /**<! b1                   (target)   */ 
+		Ptr< Matrix<cplx> >   sb1;  /**<!                      (sample)   */ 
+		
+		Ptr< Matrix<double> > agr;  /**<! Acquisition gradients           */ 
+		Ptr< Matrix<double> > egr;  /**<! Excitation gradients            */ 
+		
+		Ptr< Matrix<double> > tr;   /**<! spatial vectors        (target) */ 
+		Ptr< Matrix<double> > sr;   /**<! */ 
+
+		Ptr< Matrix<double> > tb0;  /**<! b0 maps                (target) */ 
+		Ptr< Matrix<double> > sb0;  /**<!                        (sample) */ 
+
+		Ptr< Matrix<double> > tm;   /**<! starting magnetisation (target) */
+		Ptr< Matrix<double> > sm;   /**<!                        (sample) */
+
+		Ptr< Matrix<double> > jac;  /**<! jacobian j(k(t))                */
+
+		int                   np;   /**<! # threads                       */
+		int                   mode; /**<! mode                            */
+
+		double                dt;   /**<! time step                       */
+		
+		bool                  v;    /**<! verbose                         */
+		
+		// Outgoing
+		Ptr< Matrix<cplx> >   rf;   /**<! RF pulses                       */
+		Ptr< Matrix<double> > magn; /**<! Excited magnetisation           */
+
+		bool Dump (std::string odf) {
+			
+#ifdef HAVE_MAT_H	
+			
+			MATFile* mf = matOpen (odf.c_str(), "w");
+			
+			if (mf == NULL) {
+				printf ("Error creating file %s\n", odf.c_str());
+				return false;
+			}
+			
+			sb1->MXDump (mf, "sb1");	
+			tb1->MXDump (mf, "tb1");
+			tr->MXDump (mf, "tr");
+			sr->MXDump (mf, "sr");
+			tb0->MXDump (mf, "tb0");
+			sb0->MXDump (mf, "sb0");
+			tm->MXDump (mf, "tm");
+			sm->MXDump (mf, "sm");
+			jac->MXDump (mf, "jac");
+			rf->MXDump (mf, "rf");
+			magn->MXDump (mf, "magn");
+			
+			if (matClose(mf) != 0) {
+				printf ("Error closing file %s\n", odf.c_str());
+				return false;
+			}
+#endif
+		}
+		
+	};
+
 	/**
 	 * @brief Base class for simulation stratgies used by direct method
  	 */
@@ -34,16 +98,15 @@ namespace RRStrategy {
 		
 
 		/**
+		 * @brief       Construct with bundle
+		 */
+		SimulationStrategy  (SimulationBundle& sb) {m_sb = sb;}
+
+		/**
 		 * @brief       Default destructor
 		 */
 		virtual 
-		~SimulationStrategy () {};
-
-
-		/**
-		 * @brief       Default constructor
-		 */
-		SimulationStrategy  () {};
+		~SimulationStrategy ()                    {};
 
 
 		/**
@@ -67,17 +130,19 @@ namespace RRStrategy {
 		 * @param  m    Resulting magnetisation (3   x Nt)
 		 */
 		virtual void 
-		Simulate  (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 
-				   const Matrix<cplx>&    rf, const Matrix<double>&  gr, 
-				   const Matrix<double>&   r, const Matrix<double>&  m0, 
-				   const Matrix<double>& b0m, const double&          dt, 
-				   const bool&           exc, const bool&             v, 
-				   const size_t&          np, 
-				         Matrix<cplx>&   res, Matrix<double>&         m) = 0;
+		Simulate  () = 0;
+
 		
+	protected: 
 		
+		SimulationStrategy  ()                    {};
+
+		SimulationBundle m_sb;
+
 	};
 		
+
+
 
 
 }

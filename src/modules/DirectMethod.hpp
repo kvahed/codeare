@@ -87,7 +87,7 @@ namespace RRStrategy {
 		bool               m_verbose;  /*!< @brief Verbose (Store magnetisation for every dt. HANDLE WITH CARE) */ 
 		int                m_np;       /*!< @brief Number of OMP threads */
 		int                m_ic;       /*!< @brief Perform intensity correction */
-		SimulationContext* m_sim;      /*!< Abstraction layer for CPU/GPU computation */
+		int                m_mode;      /*!< Single run: 0, Iterative: 1 */
 
 	};
 

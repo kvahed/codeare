@@ -49,16 +49,16 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief        Default destructor
+		 * @brief       Default destructor
 		 */
 		virtual 
-		~GPUSimulator   () {};
+		~GPUSimulator  () {};
 		
 		
 		/**
-		 * @brief        Default constructor
+		 * @brief       Default constructor
 		 */
-		GPUSimulator    ();
+		GPUSimulator   (SimulationBundle& sb);
 
 
 		/**
@@ -67,16 +67,10 @@ namespace RRStrategy {
 		 * @see          SimulationStrategy::Simulate()
 		 */
 		virtual void 
-		Simulate        (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 
-						 const Matrix<cplx>&    rf, const Matrix<double>&  gr, 
-						 const Matrix<double>&   r, const Matrix<double>&  m0, 
-						 const Matrix<double>& b0m, const double&          dt, 
-						 const bool&           exc, const bool&             v, 
-						 const size_t&          np, 
-				               Matrix<cplx>&   res, Matrix<double>&         m);
+		Simulate        ();
 		
 		
-	private:
+	protected:
 		
 
 		/**
@@ -125,6 +119,20 @@ namespace RRStrategy {
         cl::Event               m_event;  /**!<   */
         cl::Kernel              m_kernel; /**!<   */
 
+		// RO device
+		cl::Buffer              ocl_txm;
+		cl::Buffer              ocl_rxm;
+		cl::Buffer              ocl_gr;
+		cl::Buffer              ocl_tm0;
+		cl::Buffer              ocl_sm0;
+		cl::Buffer              ocl_tb0;
+		cl::Buffer              ocl_sb0;
+		cl::Buffer              ocl_rr;
+		cl::Buffer              ocl_sr;
+
+		// RW on device
+		cl::Buffer              ocl_rf;
+		cl::Buffer              ocl_m;
 
 	};
 

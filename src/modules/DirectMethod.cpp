@@ -22,46 +22,6 @@
 
 using namespace RRStrategy;
 
-/**
- * @brief         Time reversal for RF 
- *
- * @param  signal Acquired signal
- * @param  jac    Jacobian determinant j(k) i.e. density compensation
- * @param  pulse  Excitation pulse(s)
- */
-void TimeReverseRF (const Matrix<cplx>& signal, const Matrix<double>& jac, Matrix<cplx>& pulse) {
-	
-	size_t nt = signal.Dim(0);
-	size_t nc = signal.Dim(1);
-	
-	for (size_t i = 0; i < nt; i++)
-		for (size_t c = 0; c < nc; c++)
-			pulse(i,c) = (signal(nt-1-i,c)*(float)jac[nt-1-i]);
-	
-}
-
-
-/**
- * @brief         Time reversal for gradient trajectory
- * 
- * @param  acqgr  Acquisition gradients
- * @param  excgr  Excitation gradients
- */
-void TimeReverseGR (const Matrix<double>& acqgr, Matrix<double>& excgr) {
-	
-	size_t nt = acqgr.Dim(1);
-	
-	for (size_t i = 0; i < nt; i++) {
-		
-		excgr(0,i) = -acqgr(0,nt-1-i); 
-		excgr(1,i) = -acqgr(1,nt-1-i); 
-		excgr(2,i) = -acqgr(2,nt-1-i);
-		
-	}
-	
-}
-
-
 RRSModule::error_code 
 DirectMethod::Init () {
 
@@ -83,8 +43,6 @@ DirectMethod::Init () {
 	Attribute ("ic", &m_ic);
     printf ("  intensity correction: %s \n", (m_ic) ? "true": "false");
 
-	m_sim = new SimulationContext ();
-
 	m_initialised = true;
 
     printf ("... done.\n");
@@ -97,8 +55,6 @@ DirectMethod::Init () {
 RRSModule::error_code
 DirectMethod::Finalise() {
 
-	delete m_sim;
-	
 	FreeCplx("b1p");
 	FreeCplx("b1m");
 	FreeReal("ag");
@@ -119,43 +75,46 @@ RRSModule::error_code
 DirectMethod::Process     () { 
 
     printf ("Processing DirectMethod ...\n");
-	ticks start = getticks();
 
-	// Incoming
-	Matrix<cplx>&   b1m    = GetCplx("b1m");
-	Matrix<cplx>&   b1p    = GetCplx("b1p");
+	SimulationBundle sb;
 
-	Matrix<double>& ag     = GetReal("ag");
-	Matrix<double>& r      = GetReal("r");
-	Matrix<double>& b0     = GetReal("b0");
-	Matrix<double>& target = GetReal("target");
+	ticks           start  = getticks();
 
-	Matrix<double>& sample = GetReal("sample");
-	Matrix<double>& sr     = GetReal("sr");
-	Matrix<double>& sb0    = GetReal("sb0");
-	Matrix<double>& j      = GetReal("j");
-	
-	// Outgoing
-    Matrix<cplx>    res    = Matrix<cplx>  (ag.Dim(1),b1p.Dim(1));
-    Matrix<cplx>&    rf    = AddCplx ("rf",      NEW (Matrix<cplx>  (ag.Dim(1),b1p.Dim(1))));
-	Matrix<double>&   m    = AddReal ("magn",    NEW (Matrix<double>(        3, sr.Dim(1))));
-	Matrix<double>   eg    = ag; 
-
-	
-
-	// Intensity correction (Vahedipour et al. MRM 2011)
+	// Intensity correction for single run
 	if (m_ic)
-		IntensityCorrection (b1m, target);
+		IntensityCorrection (GetCplx("b1m"), GetReal("target"));
 
-	// Simulate Bloch receive mode
-	m_sim->Simulate (b1p, b1m, rf, ag,  r, target,  b0, m_dt, ACQUIRE, m_verbose, m_np, res, m);
+	sb.tb1  = m_cplx["b1p"];
+	sb.sb1  = m_cplx["b1m"];
 
-	// Time reversal
-	TimeReverseRF (res, j, rf);
-	TimeReverseGR (ag, eg);
+	sb.agr  = m_real[ "ag"];
 
-	// Simulate Bloch transmit mode
-	m_sim->Simulate (b1p, b1m, rf, eg, sr, sample, sb0, m_dt,  EXCITE, m_verbose, m_np, res, m);
+	sb.tm   = m_real["target"];
+	sb.sm   = m_real["sample"];
+
+	sb.tb0  = m_real["b0"];
+	sb.sb0  = m_real["sb0"];
+
+	sb.tr   = m_real[  "r"];
+	sb.sr   = m_real[ "sr"];
+
+	sb.jac  = m_real["j"];
+
+	sb.np   = m_np;
+	sb.mode = m_mode;
+	sb.dt   = m_dt;
+	sb.v    = m_verbose;
+		
+	// Outgoing
+    AddCplx (  "rf", sb.rf   = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));
+	AddReal (  "eg", sb.egr  = NEW (Matrix<double>(             3, sb.agr->Dim(1))));
+	AddReal ("magn", sb.magn = NEW (Matrix<double>(             3, sb.sr->Dim(1))));
+
+	// Initialise CPU/GPU simulator
+	SimulationContext sc (sb);
+
+	// Simulate
+	sc.Simulate();
 
 	printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 

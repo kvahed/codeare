@@ -2,7 +2,9 @@
 using namespace RRStrategy;
 
 
-GPUSimulator::GPUSimulator () {
+GPUSimulator::GPUSimulator (SimulationBundle& sb) {
+
+	m_sb = sb;
 
 	printf ("  Intialising GPU device & context ...\n");
 
@@ -79,14 +81,9 @@ GPUSimulator::BuildProgram (std::string ksrc) {
 
 
 void
-GPUSimulator::Simulate     (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 
-							const Matrix<cplx>&    rf, const Matrix<double>&  gr, 
-							const Matrix<double>&   r, const Matrix<double>&  m0, 
-							const Matrix<double>& b0m, const double&          dt, 
-							const bool&           exc, const bool&             v, 
-							const size_t&          np, 
-						          Matrix<cplx>&   res, Matrix<double>&         m) {
+GPUSimulator::Simulate     () {
 
+	/*
 	ticks            tic  = getticks();
 
 	size_t           nr   =   r.Dim(1);
@@ -94,8 +91,20 @@ GPUSimulator::Simulate     (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm
 	size_t           nrxc = rxm.Dim(1);
 	size_t           nt   =  gr.Dim(1);
 	
-	printf ("  Simulaing: %s on %04i isochromats ... ", (exc) ? "         excitation" : " signal acquisition", (int)nr); fflush(stdout);
+	printf ("    Allocating device RAM ... "); fflush(stdout);
 	
+    //cl_txm    = cl::Buffer(context, CL_MEM_READ_ONLY, txm.Size(), NULL, &m_error);
+    //cl_rxm    = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
+    //cl_m0     = cl::Buffer(context, CL_MEM_READ_ONLY,  m0.Size(), NULL, &m_error);
+    //cl_sample = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
+    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
+    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
+    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
+    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
+    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
+
+
+
 	// Anything to do? ----------------
 	
 	if (gr.Size() < 1 || r.Size() < 1) {
@@ -110,6 +119,7 @@ GPUSimulator::Simulate     (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm
 		mres = Matrix<cplx> (res.Dim(0), res.Dim(1), np);
 	
 	printf (" done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	*/
 	
 }
 
@@ -117,7 +127,7 @@ GPUSimulator::Simulate     (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm
 void 
 GPUSimulator::Prepare() {
 
-    printf ("    Preparing kernel and transfering data ...");  fflush(stdout);
+    printf ("    Preparing kernel ... ");  fflush(stdout);
 	
 	// Initialise kernel from program
     try {
@@ -126,7 +136,7 @@ GPUSimulator::Prepare() {
         printf("ERROR: %s(%d)\n", cle.what(), cle.err());
     }
 	
-	printf ("done.\n");
+	printf ("done.\n"); fflush(stdout);
 
 }
 
