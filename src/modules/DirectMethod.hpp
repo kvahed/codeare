@@ -32,98 +32,98 @@ using namespace RRServer;
  */
 namespace RRStrategy {
 
-	/**
-	 * @brief Empty recon for test purposes
-	 */
-	class DirectMethod : public ReconStrategy {
-		
-		
-	public:
-		
+    /**
+     * @brief Empty recon for test purposes
+     */
+    class DirectMethod : public ReconStrategy {
+        
+        
+    public:
+        
 
-		/**
-		 * @brief Default constructor
-		 */
-		DirectMethod  () :
-			m_np (1),
-			m_verbose (true),
-			m_dt (1.0),
-			m_mode (0),
-			m_ic (0)       
-		{};
-		
+        /**
+         * @brief Default constructor
+         */
+        DirectMethod  () :
+            m_np (1),
+            m_verbose (true),
+            m_dt (1.0),
+            m_mode (0),
+            m_ic (0)       
+        {};
+        
 
-		/**
-		 * @brief Default destructor
-		 */
-		virtual 
-		~DirectMethod () {
+        /**
+         * @brief Default destructor
+         */
+        virtual 
+        ~DirectMethod () {
 
-			this->Finalise();
+            this->Finalise();
 
-		}
-		
-		
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual RRSModule::error_code
-		Process ();
-		
+        }
+        
+        
+        /**
+         * @brief Do nothing 
+         */
+        virtual RRSModule::error_code
+        Process ();
+        
 
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual RRSModule::error_code
-		Init ();
-		
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual RRSModule::error_code
-		Finalise ();
-		
+        /**
+         * @brief Do nothing 
+         */
+        virtual RRSModule::error_code
+        Init ();
+        
+        /**
+         * @brief Do nothing 
+         */
+        virtual RRSModule::error_code
+        Finalise ();
+        
 
-	private: 
-		
-		double             m_dt;       /*!< @brief Simulation time steps                                        */
-		bool               m_verbose;  /*!< @brief Verbose (Store magnetisation for every dt. HANDLE WITH CARE) */ 
-		int                m_np;       /*!< @brief Number of OMP threads */
-		int                m_ic;       /*!< @brief Perform intensity correction */
-		int                m_mode;      /*!< Single run: 0, Iterative: 1 */
+    private: 
+        
+        double             m_dt;       /*!< @brief Simulation time steps                                        */
+        bool               m_verbose;  /*!< @brief Verbose (Store magnetisation for every dt. HANDLE WITH CARE) */ 
+        int                m_np;       /*!< @brief Number of OMP threads */
+        int                m_ic;       /*!< @brief Perform intensity correction */
+        int                m_mode;      /*!< Single run: 0, Iterative: 1 */
 
-	};
+    };
 
 
-	/**
-	 * @brief          Intensity correction
-	 * 
-	 * @param  b1maps  B1 maps
-	 * @param  target  Target pattern
-	 */
-	void IntensityCorrection (const Matrix<cplx>& b1maps, Matrix<double>& target) {
+    /**
+     * @brief          Intensity correction
+     * 
+     * @param  b1maps  B1 maps
+     * @param  target  Target pattern
+     */
+    void IntensityCorrection (const Matrix<cplx>& b1maps, Matrix<double>& target) {
 
-		size_t nr = target.Dim(1);
-		size_t nc = b1maps.Dim(1);
-		float   a;
+        size_t nr = target.Dim(1);
+        size_t nc = b1maps.Dim(1);
+        float   a;
 
-		for (size_t i = 0; i < nr; i++) {
+        for (size_t i = 0; i < nr; i++) {
 
-			a = 0.0;
+            a = 0.0;
 
-			for (size_t j = 0; j < nc; j++)
-				a += pow(abs(b1maps(i,j)),2);
+            for (size_t j = 0; j < nc; j++)
+                a += pow(abs(b1maps(i,j)),2);
 
-			target(0,i) /= a;
-			target(1,i) /= a;
-			target(2,i) /= a;
+            target(0,i) /= a;
+            target(1,i) /= a;
+            target(2,i) /= a;
 
-		}
+        }
 
-		target.MXDump("target.mat", "target");
+        target.MXDump("target.mat", "target");
 
-	}
-	
+    }
+    
 }
 #endif /* __DIRECT_METHOD_H__ */
 

@@ -26,28 +26,28 @@ RRSModule::error_code
 DirectMethod::Init () {
 
     printf ("\nIntialising DirectMethod ...\n");
-	
-	m_verbose     = false;                  // verbose?
-	m_np          = omp_get_num_threads();  // # procs
-	m_dt          = 1e-6;                   // seconds 
+    
+    m_verbose     = false;                  // verbose?
+    m_np          = omp_get_num_threads();  // # procs
+    m_dt          = 1e-6;                   // seconds 
 
-	Attribute ("dt",      &m_dt);
+    Attribute ("dt",      &m_dt);
     printf ("  delta t: %.6f \n", m_dt);
 
-	Attribute ("verbose", (int*)&m_verbose);
+    Attribute ("verbose", (int*)&m_verbose);
     printf ("  verbose: %s \n", (m_verbose) ? "true" : "false");
 
-	Attribute ("threads", &m_np);
+    Attribute ("threads", &m_np);
     printf ("  # threads: %.i \n", m_np);
 
-	Attribute ("ic", &m_ic);
+    Attribute ("ic", &m_ic);
     printf ("  intensity correction: %s \n", (m_ic) ? "true": "false");
 
-	m_initialised = true;
+    m_initialised = true;
 
     printf ("... done.\n");
-	
-	return RRSModule::OK;
+    
+    return RRSModule::OK;
 
 }
 
@@ -55,18 +55,18 @@ DirectMethod::Init () {
 RRSModule::error_code
 DirectMethod::Finalise() {
 
-	FreeCplx("b1p");
-	FreeCplx("b1m");
-	FreeReal("ag");
-	FreeReal("r");
-	FreeReal("b0");
-	FreeReal("target");
-	FreeReal("sample");
-	FreeReal("sb0");
-	FreeReal("sr");
-	FreeReal("j");
+    FreeCplx("b1p");
+    FreeCplx("b1m");
+    FreeReal("ag");
+    FreeReal("r");
+    FreeReal("b0");
+    FreeReal("target");
+    FreeReal("sample");
+    FreeReal("sb0");
+    FreeReal("sr");
+    FreeReal("j");
 
-	return RRSModule::OK;
+    return RRSModule::OK;
 
 }
 
@@ -76,48 +76,48 @@ DirectMethod::Process     () {
 
     printf ("Processing DirectMethod ...\n");
 
-	SimulationBundle sb;
+    SimulationBundle sb;
 
-	ticks           start  = getticks();
+    ticks           start  = getticks();
 
-	// Intensity correction for single run
-	if (m_ic)
-		IntensityCorrection (GetCplx("b1m"), GetReal("target"));
+    // Intensity correction for single run
+    if (m_ic)
+        IntensityCorrection (GetCplx("b1m"), GetReal("target"));
 
-	sb.tb1  = m_cplx["b1m"];
-	sb.sb1  = m_cplx["b1p"];
+    sb.tb1  = m_cplx["b1m"];
+    sb.sb1  = m_cplx["b1p"];
 
-	sb.agr  = m_real["ag"];
+    sb.agr  = m_real["ag"];
 
-	sb.tm   = m_real["target"];
-	sb.sm   = m_real["sample"];
+    sb.tm   = m_real["target"];
+    sb.sm   = m_real["sample"];
 
-	sb.tb0  = m_real["b0"];
-	sb.sb0  = m_real["sb0"];
+    sb.tb0  = m_real["b0"];
+    sb.sb0  = m_real["sb0"];
 
-	sb.tr   = m_real["r"];
-	sb.sr   = m_real["sr"];
+    sb.tr   = m_real["r"];
+    sb.sr   = m_real["sr"];
 
-	sb.jac  = m_real["j"];
+    sb.jac  = m_real["j"];
 
-	sb.np   = m_np;
-	sb.mode = m_mode;
-	sb.dt   = m_dt;
-	sb.v    = m_verbose;
-		
-	// Outgoing
+    sb.np   = m_np;
+    sb.mode = m_mode;
+    sb.dt   = m_dt;
+    sb.v    = m_verbose;
+        
+    // Outgoing
     AddCplx (  "rf", sb.rf   = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));
-	AddReal ("magn", sb.magn = NEW (Matrix<double>(             3, sb.sr->Dim(1))));
+    AddReal ("magn", sb.magn = NEW (Matrix<double>(             3, sb.sr->Dim(1))));
 
-	// Initialise CPU/GPU simulator
-	SimulationContext sc (sb);
+    // Initialise CPU/GPU simulator
+    SimulationContext sc (sb);
 
-	// Simulate
-	sc.Simulate();
+    // Simulate
+    sc.Simulate();
 
-	printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+    printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 
-	return RRSModule::OK;
+    return RRSModule::OK;
 
 }
 
@@ -132,6 +132,6 @@ extern "C" DLLEXPORT ReconStrategy* create  ()                 {
 
 extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
 
-	delete p;
+    delete p;
 
 }
