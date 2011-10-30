@@ -62,6 +62,7 @@ CPUSimulator::CPUSimulator (SimulationBundle& sb) {
 	
 	m_sb  = sb;
 	m_sig = NEW (Matrix<cplx> (sb.rf->Dim(0), sb.rf->Dim(0), sb.np));
+	m_gdt = GAMMARAD * m_sb.dt;
 
 }
 
@@ -71,7 +72,7 @@ void
 CPUSimulator::SimulateExc  (const size_t& pos) {
 
 	
-	size_t nt = m_sb.egr->Dim(1);
+	size_t nt = m_sb.agr->Dim(1);
 	assert (nt == m_sb.rf->Dim(0));
 	size_t nc = m_sb.sb1->Dim(1); // # channels
 	
@@ -83,16 +84,13 @@ CPUSimulator::SimulateExc  (const size_t& pos) {
 	Matrix<double> lr  (3,1);    // Local spatial vector
 	Matrix<cplx>   ls  (nc,1);   // Local sensitivity
 
-	for (size_t i = 0; i <  3; i++)
-		lr[i] = m_sb.sr->At(i,pos);
-	for (size_t i = 0; i < nc; i++)
-		ls[i] = m_sb.sb1->At(pos,i);
+	for (size_t i = 0; i <  3; i++)	lr[i] = m_sb.sr-> At(i,pos);
+	for (size_t i = 0; i < nc; i++)	ls[i] = m_sb.sb1->At(pos,i);
 
+	// Start with equilibrium
 	ml[Z] = 1.0;
 
-	double gdt = GAMMARAD * m_sb.dt;
-	
-	// Run over time points
+	// Time points
 	for (size_t t = 0; t < nt; t++) {
 		
 		size_t rt = nt-1-t;
@@ -102,11 +100,9 @@ CPUSimulator::SimulateExc  (const size_t& pos) {
 		for (size_t i = 0; i < nc; i++)
 			rfs += m_sb.rf->At(rt,i)*ls[i];
 
-		rfs *= m_sb.jac->At(rt);
-
-		n[0] = gdt * -rfs.real();
-		n[1] = gdt *  rfs.imag();
-		n[2] = gdt * (m_sb.egr->At(X,rt) * lr[X] + m_sb.egr->At(Y,rt) * lr[Y] + m_sb.egr->At(Z,rt) * lr[Z] + m_sb.sb0->At(pos) * TWOPI);
+		n[0] = m_gdt * -rfs.real();
+		n[1] = m_gdt *  rfs.imag();
+		n[2] = m_gdt * (- m_sb.agr->At(X,rt) * lr[X] - m_sb.agr->At(Y,rt) * lr[Y] - m_sb.agr->At(Z,rt) * lr[Z] + m_sb.sb0->At(pos) * TWOPI);
 
 		Rotate (n, rot);
 		
@@ -144,18 +140,16 @@ CPUSimulator::SimulateRecv (const size_t& pos, const int& tid) {
 	Matrix<cplx>   ls  (nc,1);  // Local sensitivity
 
 	for (size_t c = 0; c < nc; c++) ls[c] = conj(m_sb.tb1->At(pos,c));
-	for (size_t i = 0; i <  3; i++) lr[i] =      m_sb.tr->At(i,pos) ;
+	for (size_t i = 0; i <  3; i++) lr[i] =      m_sb.tr-> At(i,pos) ;
 
 	// Starting magnetisation
 	m[0] = m_sb.tm->At(X,pos), m[1] = m_sb.tm->At(Y,pos); m[2] = m_sb.tm->At(Z,pos);
-
-	double gdt = GAMMARAD * m_sb.dt;
 
 	// Run over time points
 	for (size_t t = 0; t < nt; t++) {
 
 		// Rotate magnetisation (only gradients)
-		n[2] = gdt * (m_sb.agr->At(X,t)*lr[X] + m_sb.agr->At(Y,t)*lr[Y] + m_sb.agr->At(Z,t)*lr[Z] + m_sb.tb0->At(pos)*TWOPI);
+		n[2] = m_gdt * (m_sb.agr->At(X,t)*lr[X] + m_sb.agr->At(Y,t)*lr[Y] + m_sb.agr->At(Z,t)*lr[Z] + m_sb.tb0->At(pos)*TWOPI);
 		
 		Rotate (n, rot);
 		
@@ -182,14 +176,13 @@ CPUSimulator::Simulate () {
 
 	this->Simulate (ACQUIRE);
 
-	m_sb.Dump("sb.mat");
-
 	for (size_t i = 0; i < m_sb.rf->Dim(0); i++)
 		for (size_t j = 0; j < m_sb.rf->Dim(1); j++)
 			m_sb.rf->At(i,j) *= m_sb.jac->At(i);
 
+	this->Simulate (EXCITE);
 
-	//this->Simulate (EXCITE);
+	m_sb.Dump("sb.mat");
 
 }
 
@@ -221,7 +214,6 @@ CPUSimulator::Simulate (const bool& mode) {
 	{
 		
 		omp_set_num_threads(m_sb.np);
-		int tid = omp_get_thread_num();
 		
 		if (mode) {
 #pragma omp for schedule (guided, 10)
@@ -230,11 +222,11 @@ CPUSimulator::Simulate (const bool& mode) {
 		} else {
 #pragma omp for  schedule (guided, 10)
 			for (size_t i = 0; i < nr; i++)
-				SimulateRecv (i, tid);
+				SimulateRecv (i, omp_get_thread_num());
 #pragma omp for  schedule (guided, 10)
 			for (size_t i = 0; i < ns; i++) {
 				m_sb.rf->At(i) = cplx(0.0,0.0);
-				for (int p = 1; p < m_sb.np; p++)
+				for (int p = 0; p < m_sb.np; p++)
 					m_sb.rf->At(i) += m_sig->At(p*ns+i);
 				m_sb.rf->At(i) /= (float)nr;
 			}
