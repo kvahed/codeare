@@ -87,7 +87,7 @@ DirectMethod::Process     () {
 	sb.tb1  = m_cplx["b1m"];
 	sb.sb1  = m_cplx["b1p"];
 
-	sb.agr  = m_real[ "ag"];
+	sb.agr  = m_real["ag"];
 
 	sb.tm   = m_real["target"];
 	sb.sm   = m_real["sample"];
@@ -95,8 +95,8 @@ DirectMethod::Process     () {
 	sb.tb0  = m_real["b0"];
 	sb.sb0  = m_real["sb0"];
 
-	sb.tr   = m_real[  "r"];
-	sb.sr   = m_real[ "sr"];
+	sb.tr   = m_real["r"];
+	sb.sr   = m_real["sr"];
 
 	sb.jac  = m_real["j"];
 
