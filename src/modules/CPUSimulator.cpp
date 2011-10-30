@@ -63,18 +63,22 @@ CPUSimulator::CPUSimulator (SimulationBundle& sb) {
 	m_sb  = sb;
 	m_sig = NEW (Matrix<cplx> (sb.rf->Dim(0), sb.rf->Dim(0), sb.np));
 	m_gdt = GAMMARAD * m_sb.dt;
+	m_nt = m_sb.agr->Dim(1);      // Time points
+	m_nc = m_sb.tb1->Dim(1);     // # channels
+
 
 }
 
 
 
+CPUSimulator::~CPUSimulator () {
+	delete m_sig;
+}
+
+
 void 
 CPUSimulator::SimulateExc  (const size_t& pos) {
 
-	
-	size_t nt = m_sb.agr->Dim(1);
-	assert (nt == m_sb.rf->Dim(0));
-	size_t nc = m_sb.sb1->Dim(1); // # channels
 	
 	Matrix<double> n   ( 3,1);  // Rotation axis
 	Matrix<double> rot ( 3,3);  // Rotation matrix
@@ -82,22 +86,22 @@ CPUSimulator::SimulateExc  (const size_t& pos) {
 	Matrix<double> tmp ( 3,1);  // Local magnetisation
 
 	Matrix<double> lr  (3,1);    // Local spatial vector
-	Matrix<cplx>   ls  (nc,1);   // Local sensitivity
+	Matrix<cplx>   ls  (m_nc,1);   // Local sensitivity
 
-	for (size_t i = 0; i <  3; i++)	lr[i] = m_sb.sr-> At(i,pos);
-	for (size_t i = 0; i < nc; i++)	ls[i] = m_sb.sb1->At(pos,i);
+	for (size_t i = 0; i <    3; i++) lr[i] = m_sb.sr-> At(i,pos);
+	for (size_t i = 0; i < m_nc; i++) ls[i] = m_sb.sb1->At(pos,i);
 
 	// Start with equilibrium
 	ml[Z] = 1.0;
 
 	// Time points
-	for (size_t t = 0; t < nt; t++) {
+	for (size_t t = 0; t < m_nt; t++) {
 		
-		size_t rt = nt-1-t;
+		size_t rt = m_nt-1-t;
 
 		cplx rfs = cplx (0.0,0.0);
 
-		for (size_t i = 0; i < nc; i++)
+		for (size_t i = 0; i < m_nc; i++)
 			rfs += m_sb.rf->At(rt,i)*ls[i];
 
 		n[0] = m_gdt * -rfs.real();
@@ -128,42 +132,41 @@ CPUSimulator::SimulateRecv (const size_t& pos, const int& tid) {
 
 	using namespace std;
 
-	size_t nt = m_sb.agr->Dim(1);      // Time points
-	size_t nc = m_sb.tb1->Dim(1);     // # channels
-
 	Matrix<double> n   (3,1);   // Rotation axis
 	Matrix<double> rot (3,3);   // Rotation matrix
-	Matrix<double> m   (3,1);   // Magnetisation
+	Matrix<double> lm  (3,1);   // Magnetisation
 	Matrix<double> tmp (3,1);   // Temporary magnetisation
 
 	Matrix<double> lr  (3,1);   // Local spatial vector
-	Matrix<cplx>   ls  (nc,1);  // Local sensitivity
+	Matrix<cplx>   ls  (m_nc,1);  // Local sensitivity
 
-	for (size_t c = 0; c < nc; c++) ls[c] = conj(m_sb.tb1->At(pos,c));
-	for (size_t i = 0; i <  3; i++) lr[i] =      m_sb.tr-> At(i,pos) ;
+	for (size_t c = 0; c < m_nc; c++) 
+		ls[c] = conj(m_sb.tb1->At(pos,c));
 
-	// Starting magnetisation
-	m[0] = m_sb.tm->At(X,pos), m[1] = m_sb.tm->At(Y,pos); m[2] = m_sb.tm->At(Z,pos);
+	for (size_t i = 0; i <  3; i++) {
+		lr[i] =      m_sb.tr->At(i,pos);
+		lm[i] =      m_sb.tm->At(i,pos); 
+	}
 
 	// Run over time points
-	for (size_t t = 0; t < nt; t++) {
+	for (size_t t = 0; t < m_nt; t++) {
 
 		// Rotate magnetisation (only gradients)
 		n[2] = m_gdt * (m_sb.agr->At(X,t)*lr[X] + m_sb.agr->At(Y,t)*lr[Y] + m_sb.agr->At(Z,t)*lr[Z] + m_sb.tb0->At(pos)*TWOPI);
 		
 		Rotate (n, rot);
 		
-		tmp[0] = rot[0]*m[X] + rot[3]*m[Y] + rot[6]*m[Z];
-		tmp[1] = rot[1]*m[X] + rot[4]*m[Y] + rot[7]*m[Z];
-		tmp[2] = rot[2]*m[X] + rot[5]*m[Y] + rot[8]*m[Z];
+		tmp[0] = rot[0]*lm[X] + rot[3]*lm[Y] + rot[6]*lm[Z];
+		tmp[1] = rot[1]*lm[X] + rot[4]*lm[Y] + rot[7]*lm[Z];
+		tmp[2] = rot[2]*lm[X] + rot[5]*lm[Y] + rot[8]*lm[Z];
 		
-		m[0]   = tmp[0];
-		m[1]   = tmp[1];
-		m[2]   = tmp[2];
+		lm[0]   = tmp[0];
+		lm[1]   = tmp[1];
+		lm[2]   = tmp[2];
 		
 		// Weighted contribution to all coils
-		for (size_t c = 0; c < nc; c++)
-			m_sig->At(t,c,tid) += cplx(ls[c].real()*m[X], ls[c].imag()*m[Y]);
+		for (size_t c = 0; c < m_nc; c++)
+			m_sig->At(t,c,tid) += cplx(ls[c].real()*lm[X], ls[c].imag()*lm[Y]);
 		
 	}
 
@@ -190,22 +193,18 @@ CPUSimulator::Simulate () {
 void
 CPUSimulator::Simulate (const bool& mode) {
 	
-	ticks            tic  = getticks();       // Start timing
-	size_t           nr   = (mode) ? m_sb.sr->Dim(1) : m_sb.tr->Dim(1);  // Spatial vectors (target)
-	size_t           ntxc = m_sb.sb1->Dim(1); // transmit channels
-	size_t           nrxc = m_sb.tb1->Dim(1); // receive channels
-	size_t           nt   = m_sb.agr->Dim(1); // time points
-	size_t           ns   = m_sb.rf->Size();  // signals samples
+	ticks            tic  = getticks();                                 // Start timing
+	size_t           nr   = (mode) ? m_sb.sr->Dim(1) : m_sb.tr->Dim(1); // Spatial vectors (target)
 	
 	// Expect same #ch
-	assert (ntxc == nrxc);
+	assert (m_sb.tb1->Dim(1) == m_sb.sb1->Dim(1));
 
-	printf ("  Simulating: %02ich %s on %04i isochromats ... ", (int)ntxc, (mode) ? "         excitation" : " signal acquisition", (int)nr); fflush(stdout);
+	printf ("  Simulating: %02ich %s on %04i isochromats ... ", (int)m_nc, (mode) ? "         excitation" : " signal acquisition", (int)nr); fflush(stdout);
 
 	// Anything to do? ----------------
 
-	if (nt < 1 || nr < 1) {
-		printf ("    %i Gradient step for %i isochromats? I don't think so!\n", nt, nr);
+	if (m_nt < 1 || nr < 1) {
+		printf ("    %i Gradient step for %i isochromats? I don't think so!\n", m_nt, nr);
 		return;
 	}
 	// --------------------------------
@@ -224,10 +223,10 @@ CPUSimulator::Simulate (const bool& mode) {
 			for (size_t i = 0; i < nr; i++)
 				SimulateRecv (i, omp_get_thread_num());
 #pragma omp for  schedule (guided, 10)
-			for (size_t i = 0; i < ns; i++) {
+			for (size_t i = 0; i < m_nt; i++) {
 				m_sb.rf->At(i) = cplx(0.0,0.0);
 				for (int p = 0; p < m_sb.np; p++)
-					m_sb.rf->At(i) += m_sig->At(p*ns+i);
+					m_sb.rf->At(i) += m_sig->At(p*m_nt+i);
 				m_sb.rf->At(i) /= (float)nr;
 			}
 		}

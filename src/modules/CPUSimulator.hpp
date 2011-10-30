@@ -35,10 +35,10 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       Default destructor
+		 * @brief       Clean up and destroy
 		 */
 		virtual 
-		~CPUSimulator () {};
+		~CPUSimulator ();
 		
 		
 		/**
@@ -100,6 +100,8 @@ namespace RRStrategy {
 
 		Ptr< Matrix<cplx> > m_sig;
 		double              m_gdt;
+		size_t              m_nt;
+		size_t              m_nc;
 		
 	};
 		
