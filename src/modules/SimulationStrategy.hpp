@@ -33,7 +33,6 @@ namespace RRStrategy {
 		Ptr< Matrix<cplx> >   sb1;  /**<!                      (sample)   */ 
 		
 		Ptr< Matrix<double> > agr;  /**<! Acquisition gradients           */ 
-		Ptr< Matrix<double> > egr;  /**<! Excitation gradients            */ 
 		
 		Ptr< Matrix<double> > tr;   /**<! spatial vectors        (target) */ 
 		Ptr< Matrix<double> > sr;   /**<! */ 

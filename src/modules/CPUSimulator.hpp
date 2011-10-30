@@ -99,6 +99,7 @@ namespace RRStrategy {
 
 
 		Ptr< Matrix<cplx> > m_sig;
+		double              m_gdt;
 		
 	};
 		

@@ -84,8 +84,8 @@ DirectMethod::Process     () {
 	if (m_ic)
 		IntensityCorrection (GetCplx("b1m"), GetReal("target"));
 
-	sb.tb1  = m_cplx["b1p"];
-	sb.sb1  = m_cplx["b1m"];
+	sb.tb1  = m_cplx["b1m"];
+	sb.sb1  = m_cplx["b1p"];
 
 	sb.agr  = m_real[ "ag"];
 
@@ -107,7 +107,6 @@ DirectMethod::Process     () {
 		
 	// Outgoing
     AddCplx (  "rf", sb.rf   = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));
-	AddReal (  "eg", sb.egr  = NEW (Matrix<double>(             3, sb.agr->Dim(1))));
 	AddReal ("magn", sb.magn = NEW (Matrix<double>(             3, sb.sr->Dim(1))));
 
 	// Initialise CPU/GPU simulator
