@@ -44,7 +44,7 @@ namespace RRStrategy {
 		/**
 		 * @brief       Default constructor
 		 */
-		CPUSimulator  () {};
+		CPUSimulator  (SimulationBundle &sb);
 
 
 		/**
@@ -68,70 +68,37 @@ namespace RRStrategy {
 		 * @param  m    Resulting magnetisation (3   x Nt)
 		 */
 		virtual void 
-		Simulate  (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 
-				   const Matrix<cplx>&    rf, const Matrix<double>&  gr, 
-				   const Matrix<double>&   r, const Matrix<double>&  m0, 
-				   const Matrix<double>& b0m, const double&          dt, 
-				   const bool&           exc, const bool&             v, 
-				   const size_t&          np, 
-				         Matrix<cplx>&   res, Matrix<double>&         m);
-		
-		
-	private:
+		Simulate  ();
+
+		virtual void 
+		Simulate  (const bool& mode);
 		
 
+	protected:
+		
 		/**
 		 * @brief       Simulate single shot reception of freely precessing isochromat along gradient trajectory<br/>
 		 *              (i.e. forward Fourier transform incl. effect of Receive and b0 maps)<br/>
 		 *              Expects res to carry the correct size and dimensions
 		 *
-		 * INPUT:
-		 * @param  rxm  Receive sensitivities
-		 * @param  gr   Gradient trajectory
-		 * @param  r    Positions
-		 * @param  m0   Initial magnetisation state
-		 * @param  b0m  B0 map
-		 * @param  dt   Timestep
-		 * @param  v    Verbose
-		 * @param  pos  Position of isochromat in r
-		 * @param  tid  Thread ID
-		 *
-		 * OUTPUT:
-		 * @param  res  Resulting signal (output) 
+		 * @param       Specific isochromat
+		 * @param       Thread number
 		 */
 		virtual void
-		SimulateRecv   (const Matrix<cplx>&   rxm, const Matrix<double>& gr, 
-						const Matrix<double>&   r, const Matrix<double>& m0, 
-						const Matrix<double>& b0m, const double&         dt, 
-						const bool&             v, const size_t&        pos, 
-						const int&            tid,       Matrix<cplx>&  res);
+		SimulateRecv   (const size_t& pos, const int& tid);
 		
 		/**
 		 * @brief       Simulate single shot excitation of a single isochromat of r matrix along gradient trajectory<br/>
 		 *              (i.e. inverse Fourier transform incl. effect of Receive and b0 maps)<br/>
 		 *              Expects res to carry the correct size and dimensions
 		 *
-		 * INPUT:
-		 * @param  txm  Receive sensitivities
-		 * @param  rf   Complex RF field
-		 * @param  gr   Gradient trajectory
-		 * @param  r    Positions
-		 * @param  b0m  B0 map
-		 * @param  dt   Timestep
-		 * @param  v    Verbose
-		 * @param  pos  Position of isochromat in r
-		 * @param  tid  Thread id
-		 *
-		 * OUTPUT:
-		 * @param  m    Resulting magntisation (output)
+		 * @param  pos  Specific isochromat
 		 */
 		virtual void
-		SimulateExc    (const Matrix<cplx>&   txm, const Matrix<cplx>&   rf, 
-						const Matrix<double>&  gr, const Matrix<double>&  r, 
-						const Matrix<double>& b0m, const double&         dt, 
-						const bool&            v,  const size_t&        pos, 
-						const int&            tid,       Matrix<double>&  m);
-		
+		SimulateExc    (const size_t& pos);
+
+
+		Ptr< Matrix<cplx> > m_sig;
 		
 	};
 		

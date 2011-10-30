@@ -38,10 +38,10 @@ namespace RRStrategy {
 		/**
 		 * @brief Constructor<br/>Check if we have GPU support or not and choose apporiate strategy
 		 */
-		SimulationContext () {
+		SimulationContext (SimulationBundle bundle) {
 			m_strategy    = (SimulationStrategy*) (HaveGPU()) ? 
-				(SimulationStrategy*) new GPUSimulator (): 
-				(SimulationStrategy*) new CPUSimulator ();
+				(SimulationStrategy*) new GPUSimulator (bundle): 
+				(SimulationStrategy*) new CPUSimulator (bundle);
 		}
 
 
@@ -60,24 +60,18 @@ namespace RRStrategy {
 		 * @see         SimulationStrategy::Simulate
 		 */
 		virtual void 
-		Simulate  (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 
-				   const Matrix<cplx>&    rf, const Matrix<double>&  gr, 
-				   const Matrix<double>&   r, const Matrix<double>&  m0, 
-				   const Matrix<double>& b0m, const double&          dt, 
-				   const bool&           exc, const bool&             v, 
-				   const size_t&          np, 
-				         Matrix<cplx>&   res, Matrix<double>&         m) {
-
-			m_strategy->Simulate (txm, rxm, rf, gr, r, m0, b0m, dt, exc, v, np, res, m);
-			
+		Simulate  () {
+			m_strategy->Simulate ();
 		}
 	
-
 
 	private: 
 		
 		SimulationStrategy* m_strategy;
 		
+		
+		SimulationContext ();
+
 	};
 
 }

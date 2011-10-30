@@ -2,10 +2,6 @@
 
 using namespace RRStrategy;
 
-enum coords {
-	X, Y, Z
-};
-
 #define GAMMARAD 2.6753e3
 #define TWOPI	 6.283185
 
@@ -62,17 +58,22 @@ Rotate (const Matrix<double>& n, Matrix<double>& r) {
 }
 
 
+CPUSimulator::CPUSimulator (SimulationBundle& sb) {
+	
+	m_sb  = sb;
+	m_sig = NEW (Matrix<cplx> (sb.rf->Dim(0), sb.rf->Dim(0), sb.np));
+
+}
+
+
 
 void 
-CPUSimulator::SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&  rf, const Matrix<double>& gr, const Matrix<double>& r, 
-							const Matrix<double>& b0m, const double&        dt, const bool&            v, const size_t&       pos, 
-							const int&            tid,       Matrix<double>& m) {
+CPUSimulator::SimulateExc  (const size_t& pos) {
 
 	
-	assert (gr.Dim(1) == rf.Dim(0));
-	
-	size_t nt = gr.Dim(1);  // Time points
-	size_t nc = txm.Dim(1); // # channels
+	size_t nt = m_sb.egr->Dim(1);
+	assert (nt == m_sb.rf->Dim(0));
+	size_t nc = m_sb.sb1->Dim(1); // # channels
 	
 	Matrix<double> n   ( 3,1);  // Rotation axis
 	Matrix<double> rot ( 3,3);  // Rotation matrix
@@ -83,25 +84,29 @@ CPUSimulator::SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&  rf, 
 	Matrix<cplx>   ls  (nc,1);   // Local sensitivity
 
 	for (size_t i = 0; i <  3; i++)
-		lr[i] = r   (i,pos);
+		lr[i] = m_sb.sr->At(i,pos);
 	for (size_t i = 0; i < nc; i++)
-		ls[i] = txm(pos,i);
+		ls[i] = m_sb.sb1->At(pos,i);
 
 	ml[Z] = 1.0;
 
-	double gdt = GAMMARAD * dt;
+	double gdt = GAMMARAD * m_sb.dt;
 	
 	// Run over time points
 	for (size_t t = 0; t < nt; t++) {
 		
+		size_t rt = nt-1-t;
+
 		cplx rfs = cplx (0.0,0.0);
 
 		for (size_t i = 0; i < nc; i++)
-			rfs += rf(t,i)*ls[i];
+			rfs += m_sb.rf->At(rt,i)*ls[i];
+
+		rfs *= m_sb.jac->At(rt);
 
 		n[0] = gdt * -rfs.real();
 		n[1] = gdt *  rfs.imag();
-		n[2] = gdt * (gr(X,t) * lr[X] + gr(Y,t) * lr[Y] + gr(Z,t) * lr[Z] + b0m[pos] * TWOPI);
+		n[2] = gdt * (m_sb.egr->At(X,rt) * lr[X] + m_sb.egr->At(Y,rt) * lr[Y] + m_sb.egr->At(Z,rt) * lr[Z] + m_sb.sb0->At(pos) * TWOPI);
 
 		Rotate (n, rot);
 		
@@ -115,22 +120,20 @@ CPUSimulator::SimulateExc  (const Matrix<cplx>&   txm, const Matrix<cplx>&  rf, 
 
 	}
 
-	m(X,pos) = ml[X]; 
-	m(Y,pos) = ml[Y]; 
-	m(Z,pos) = ml[Z]; 
+	m_sb.magn->At(X,pos) = ml[X];
+	m_sb.magn->At(Y,pos) = ml[Y];
+	m_sb.magn->At(Z,pos) = ml[Z]; 
 
 }
 
 
 void 
-CPUSimulator::SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr, const Matrix<double>& r, const Matrix<double>& m0, 
-			  const Matrix<double>& b0m, const double&         dt, const bool&           v, const size_t&        pos, 
-			  const int&            tid,       Matrix<cplx>&  res) { 
+CPUSimulator::SimulateRecv (const size_t& pos, const int& tid) { 
 
 	using namespace std;
 
-	size_t nt = gr.Dim(1);      // Time points
-	size_t nc = rxm.Dim(1);     // # channels
+	size_t nt = m_sb.agr->Dim(1);      // Time points
+	size_t nc = m_sb.tb1->Dim(1);     // # channels
 
 	Matrix<double> n   (3,1);   // Rotation axis
 	Matrix<double> rot (3,3);   // Rotation matrix
@@ -140,19 +143,19 @@ CPUSimulator::SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr,
 	Matrix<double> lr  (3,1);   // Local spatial vector
 	Matrix<cplx>   ls  (nc,1);  // Local sensitivity
 
-	for (size_t c = 0; c < nc; c++) ls[c] = conj(rxm (pos,c));
-	for (size_t i = 0; i <  3; i++) lr[i] =      r   (i,pos) ;
+	for (size_t c = 0; c < nc; c++) ls[c] = conj(m_sb.tb1->At(pos,c));
+	for (size_t i = 0; i <  3; i++) lr[i] =      m_sb.tr->At(i,pos) ;
 
 	// Starting magnetisation
-	m[0] = m0(X,pos), m[1] = m0(Y,pos); m[2] = m0(Z,pos);
+	m[0] = m_sb.tm->At(X,pos), m[1] = m_sb.tm->At(Y,pos); m[2] = m_sb.tm->At(Z,pos);
 
-	double gdt = GAMMARAD * dt;
+	double gdt = GAMMARAD * m_sb.dt;
 
 	// Run over time points
 	for (size_t t = 0; t < nt; t++) {
 
 		// Rotate magnetisation (only gradients)
-		n[2] = gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] + b0m[pos]*TWOPI);
+		n[2] = gdt * (m_sb.agr->At(X,t)*lr[X] + m_sb.agr->At(Y,t)*lr[Y] + m_sb.agr->At(Z,t)*lr[Z] + m_sb.tb0->At(pos)*TWOPI);
 		
 		Rotate (n, rot);
 		
@@ -166,7 +169,7 @@ CPUSimulator::SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr,
 		
 		// Weighted contribution to all coils
 		for (size_t c = 0; c < nc; c++)
-			res(t,c,tid) += cplx(ls[c].real()*m[X], ls[c].imag()*m[Y]);
+			m_sig->At(t,c,tid) += cplx(ls[c].real()*m[X], ls[c].imag()*m[Y]);
 		
 	}
 
@@ -174,56 +177,66 @@ CPUSimulator::SimulateRecv (const Matrix<cplx>&   rxm, const Matrix<double>& gr,
 
 
 
+void 
+CPUSimulator::Simulate () {
+
+	this->Simulate (ACQUIRE);
+
+	m_sb.Dump("sb.mat");
+
+	for (size_t i = 0; i < m_sb.rf->Dim(0); i++)
+		for (size_t j = 0; j < m_sb.rf->Dim(1); j++)
+			m_sb.rf->At(i,j) *= m_sb.jac->At(i);
+
+
+	//this->Simulate (EXCITE);
+
+}
+
+
 void
-CPUSimulator::Simulate (const Matrix<cplx>&   txm, const Matrix<cplx>&   rxm, 
-						const Matrix<cplx>&    rf, const Matrix<double>&  gr, 
-						const Matrix<double>&   r, const Matrix<double>&  m0, 
-						const Matrix<double>& b0m, const double&          dt, 
-						const bool&           exc, const bool&             v, 
-						const size_t&          np, 
-						      Matrix<cplx>&   res, Matrix<double>&         m) {
+CPUSimulator::Simulate (const bool& mode) {
 	
-	ticks            tic  = getticks();
+	ticks            tic  = getticks();       // Start timing
+	size_t           nr   = (mode) ? m_sb.sr->Dim(1) : m_sb.tr->Dim(1);  // Spatial vectors (target)
+	size_t           ntxc = m_sb.sb1->Dim(1); // transmit channels
+	size_t           nrxc = m_sb.tb1->Dim(1); // receive channels
+	size_t           nt   = m_sb.agr->Dim(1); // time points
+	size_t           ns   = m_sb.rf->Size();  // signals samples
 	
-	size_t           nr   =   r.Dim(1);
-	size_t           ntxc = txm.Dim(1);
-	size_t           nrxc = rxm.Dim(1);
-	size_t           nt   =  gr.Dim(1);
-	
-	printf ("  Simulaing: %s on %04i isochromats ... ", (exc) ? "         excitation" : " signal acquisition", (int)nr); fflush(stdout);
+	// Expect same #ch
+	assert (ntxc == nrxc);
+
+	printf ("  Simulating: %02ich %s on %04i isochromats ... ", (int)ntxc, (mode) ? "         excitation" : " signal acquisition", (int)nr); fflush(stdout);
 
 	// Anything to do? ----------------
 
-	if (gr.Size() < 1 || r.Size() < 1) {
-		std::cout << "  Bailing out: %i Gradient step for %i isochromats? I don't think so!\n" << std::endl;
+	if (nt < 1 || nr < 1) {
+		printf ("    %i Gradient step for %i isochromats? I don't think so!\n", nt, nr);
 		return;
 	}
 	// --------------------------------
 
-	Matrix<cplx> mres;
-
-	if (!exc)
-		mres = Matrix<cplx> (res.Dim(0), res.Dim(1), np);
-
 #pragma omp parallel default (shared) 
 	{
 		
-		omp_set_num_threads((int)np);
+		omp_set_num_threads(m_sb.np);
 		int tid = omp_get_thread_num();
 		
-		if (exc) {
+		if (mode) {
 #pragma omp for schedule (guided, 10)
 			for (size_t i = 0; i < nr; i++)
-				SimulateExc (txm, rf, gr,  r, b0m, dt, v, i, tid, m);
+				SimulateExc (i);
 		} else {
 #pragma omp for  schedule (guided, 10)
 			for (size_t i = 0; i < nr; i++)
-				SimulateRecv (rxm, gr, r, m0, b0m, dt, v, i, tid, mres);
+				SimulateRecv (i, tid);
 #pragma omp for  schedule (guided, 10)
-			for (size_t i = 0; i < res.Size(); i++) {
-				for (int p = 0; p < (int)np; p++)
-					res[i] += mres[p*res.Size()+i];
-				res[i] /= (float)nr;
+			for (size_t i = 0; i < ns; i++) {
+				m_sb.rf->At(i) = cplx(0.0,0.0);
+				for (int p = 1; p < m_sb.np; p++)
+					m_sb.rf->At(i) += m_sig->At(p*ns+i);
+				m_sb.rf->At(i) /= (float)nr;
 			}
 		}
 	}
