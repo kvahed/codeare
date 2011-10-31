@@ -2,7 +2,7 @@
 using namespace RRStrategy;
 
 
-GPUSimulator::GPUSimulator (SimulationBundle& sb) {
+GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 
 	m_sb = sb;
 

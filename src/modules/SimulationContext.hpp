@@ -38,10 +38,10 @@ namespace RRStrategy {
 		/**
 		 * @brief Constructor<br/>Check if we have GPU support or not and choose apporiate strategy
 		 */
-		SimulationContext (SimulationBundle bundle) {
+		SimulationContext (SimulationBundle* sb) {
 			m_strategy    = (SimulationStrategy*) (HaveGPU()) ? 
-				(SimulationStrategy*) new GPUSimulator (bundle): 
-				(SimulationStrategy*) new CPUSimulator (bundle);
+				(SimulationStrategy*) new GPUSimulator (sb): 
+				(SimulationStrategy*) new CPUSimulator (sb);
 		}
 
 
@@ -51,6 +51,8 @@ namespace RRStrategy {
 		virtual
 		~SimulationContext () {
 			delete m_strategy;
+			printf ("    Shutting down simualtor\n");
+
 		}
 
 

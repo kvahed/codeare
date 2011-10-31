@@ -44,7 +44,7 @@ namespace RRStrategy {
 		/**
 		 * @brief       Default constructor
 		 */
-		CPUSimulator  (SimulationBundle &sb);
+		CPUSimulator  (SimulationBundle* sb);
 
 
 		/**
@@ -76,32 +76,10 @@ namespace RRStrategy {
 
 	protected:
 		
-		/**
-		 * @brief       Simulate single shot reception of freely precessing isochromat along gradient trajectory<br/>
-		 *              (i.e. forward Fourier transform incl. effect of Receive and b0 maps)<br/>
-		 *              Expects res to carry the correct size and dimensions
-		 *
-		 * @param       Specific isochromat
-		 * @param       Thread number
-		 */
-		virtual void
-		SimulateRecv   (const size_t& pos, const int& tid);
-		
-		/**
-		 * @brief       Simulate single shot excitation of a single isochromat of r matrix along gradient trajectory<br/>
-		 *              (i.e. inverse Fourier transform incl. effect of Receive and b0 maps)<br/>
-		 *              Expects res to carry the correct size and dimensions
-		 *
-		 * @param  pos  Specific isochromat
-		 */
-		virtual void
-		SimulateExc    (const size_t& pos);
-
-
-		Ptr< Matrix<cplx> > m_sig;
-		double              m_gdt;
-		size_t              m_nt;
-		size_t              m_nc;
+		Matrix<cplx> m_sig;
+		double       m_gdt;
+		size_t       m_nt;
+		size_t       m_nc;
 		
 	};
 		

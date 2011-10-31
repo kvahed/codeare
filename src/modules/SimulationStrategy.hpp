@@ -99,13 +99,13 @@ namespace RRStrategy {
 		/**
 		 * @brief       Construct with bundle
 		 */
-		SimulationStrategy  (SimulationBundle& sb) {m_sb = sb;}
+		SimulationStrategy  (SimulationBundle* sb) {m_sb = sb;}
 
 		/**
 		 * @brief       Default destructor
 		 */
 		virtual 
-		~SimulationStrategy ()                    {};
+		~SimulationStrategy ()                    { 	printf ("    SimulationStrategy: Cleaned up.\n"); };
 
 
 		/**
@@ -136,7 +136,7 @@ namespace RRStrategy {
 		
 		SimulationStrategy  ()                    {};
 
-		SimulationBundle m_sb;
+		SimulationBundle* m_sb;
 
 	};
 		

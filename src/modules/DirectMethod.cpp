@@ -55,16 +55,9 @@ DirectMethod::Init () {
 RRSModule::error_code
 DirectMethod::Finalise() {
 
-    FreeCplx("b1p");
-    FreeCplx("b1m");
-    FreeReal("ag");
-    FreeReal("r");
-    FreeReal("b0");
-    FreeReal("target");
-    FreeReal("sample");
-    FreeReal("sb0");
-    FreeReal("sr");
-    FreeReal("j");
+	printf ("    Finalising DirectMethod ... "); fflush (stdout);
+	ReconStrategy::Finalise();
+	printf (" done.\n");
 
     return RRSModule::OK;
 
@@ -110,7 +103,7 @@ DirectMethod::Process     () {
     AddReal ("magn", sb.magn = NEW (Matrix<double>(             3, sb.sr->Dim(1))));
 
     // Initialise CPU/GPU simulator
-    SimulationContext sc (sb);
+    SimulationContext sc (&sb);
 
     // Simulate
     sc.Simulate();
