@@ -12,9 +12,6 @@
 /* Define to 1 if you have the <CL/cl.h> header file. */
 #undef HAVE_CL_CL_H
 
-/* Define to 1 if you have the <complex> header file. */
-#undef HAVE_COMPLEX
-
 /* Define to 1 if you have the <ctype.h> header file. */
 #undef HAVE_CTYPE_H
 

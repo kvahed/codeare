@@ -10858,7 +10858,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"424M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"426M\"" >>confdefs.h
 
 # copyright notice
 
@@ -16291,20 +16291,7 @@ fi
 
 done
 
-for ac_header in complex
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "complex" "ac_cv_header_complex" "$ac_includes_default"
-if test "x$ac_cv_header_complex" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_COMPLEX 1
-_ACEOF
-
-else
-  as_fn_error $? "cannot find complex, bailing out" "$LINENO" 5
-fi
-
-done
-
+#AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
 for ac_header in ctype.h
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "ctype.h" "ac_cv_header_ctype_h" "$ac_includes_default"

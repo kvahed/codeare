@@ -163,7 +163,7 @@ AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX
 AC_HEADER_MAJOR
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
-AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
+#AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
 AC_CHECK_HEADERS([ctype.h],          [], [AC_MSG_ERROR([cannot find ctype.h, bailing out])])
 AC_CHECK_HEADERS([typeinfo],         [], [AC_MSG_ERROR([cannot find typeinfo, bailing out])])
 AC_CHECK_HEADERS([fstream],          [], [AC_MSG_ERROR([cannot find fstream, bailing out])])
