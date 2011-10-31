@@ -58,7 +58,7 @@ namespace RRStrategy {
 		/**
 		 * @brief       Default constructor
 		 */
-		GPUSimulator   (SimulationBundle& sb);
+		GPUSimulator   (SimulationBundle* sb);
 
 
 		/**
