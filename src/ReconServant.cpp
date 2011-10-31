@@ -146,6 +146,24 @@ ReconServant::get_real       (const char* name, real_data& r) {
 
 
 void
+ReconServant::set_float       (const char* name, const float_data& r)   {
+
+	m_contexts.at(0)->SetFloat(name, r);
+
+}
+
+
+void
+ReconServant::get_float       (const char* name, float_data& r) {
+
+	r.dims.length(INVALID_DIM);
+	r.res.length(INVALID_DIM);
+	m_contexts.at(0)->GetFloat(name, r);
+
+}
+
+
+void
 ReconServant::set_pixel        (const char* name, const pixel_data& p) {
 
 	m_contexts.at(0)->SetPixel(name, p);

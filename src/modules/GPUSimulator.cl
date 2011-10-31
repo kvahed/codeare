@@ -63,10 +63,15 @@ void SimulateExc  (const float* txm, const float* rf, const float* gr, const flo
 
 __kernel void Simulate     (__global const float* rxm, __global const float* txm, 
 							__global const float*  gr, __global const float*  tr, 
-							__global const float*  sr, __global const float*  tm,
-							__global const float*  sm, __global const float* tb0, 
-							__global const float* sb0, __global const float*  dt,
+							__global const float*  sr, __global const float* tb0, 
+							__global const float* sb0, __global const float*  tm,
+							__global const float*  sm, __global const float* jac, 
+							__global const float* gdt, __global const   int*  nt,
+							__global const int*    nc, 
 							__global       float*  rf, __global       float*   m) 
 {
+
+    m_cmdq.finish();
+
 }
 

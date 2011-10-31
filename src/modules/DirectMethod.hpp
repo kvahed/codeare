@@ -87,10 +87,10 @@ namespace RRStrategy {
     private: 
         
         double             m_dt;       /*!< @brief Simulation time steps                                        */
-        bool               m_verbose;  /*!< @brief Verbose (Store magnetisation for every dt. HANDLE WITH CARE) */ 
+        bool               m_verbose;  /*!< @brief Verbose (Store magnetisation for every dt. HANDLE WITH CARE) */  // ignored
         int                m_np;       /*!< @brief Number of OMP threads */
         int                m_ic;       /*!< @brief Perform intensity correction */
-        int                m_mode;      /*!< Single run: 0, Iterative: 1 */
+        int                m_mode;     /*!< Single run: 0, Iterative: 1 */
 
     };
 
@@ -101,7 +101,7 @@ namespace RRStrategy {
      * @param  b1maps  B1 maps
      * @param  target  Target pattern
      */
-    void IntensityCorrection (const Matrix<cplx>& b1maps, Matrix<double>& target) {
+    void IntensityCorrection (const Matrix<cplx>& b1maps, Matrix<float>& target) {
 
         size_t nr = target.Dim(1);
         size_t nc = b1maps.Dim(1);
@@ -119,8 +119,6 @@ namespace RRStrategy {
             target(2,i) /= a;
 
         }
-
-        target.MXDump("target.mat", "target");
 
     }
     

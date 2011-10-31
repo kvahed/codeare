@@ -136,6 +136,30 @@ ReconContext::GetReal (const std::string name, real_data& r) {
 		
 
 void
+ReconContext::SetFloat (const std::string name, const float_data& r) {
+	m_strategy->SetFloat(name, r);
+}
+		
+
+void
+ReconContext::SetFloat (const std::string name, Matrix<float>& r) {
+	m_strategy->SetFloat(name, r);
+}
+		
+
+void
+ReconContext::GetFloat (const std::string name, Matrix<float>& r) {
+	m_strategy->GetFloat(name, r);
+}
+		
+
+void
+ReconContext::GetFloat (const std::string name, float_data& r) {
+	m_strategy->GetFloat(name, r);
+}
+		
+
+void
 ReconContext::SetPixel (const std::string name, const pixel_data& r) {
 	m_strategy->SetPixel(name, r);
 }

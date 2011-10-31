@@ -145,6 +145,26 @@ namespace RRServer {
 		
 
 		/**
+		 * @brief     Get real helper data from recon
+		 *
+		 * @param  name  Name
+		 * @param  r    Data
+		 */
+		void
+		get_float      (const char* name, float_data& r);
+		
+
+		/**
+		 * @brief     Set real data
+		 *
+		 * @param  name  Name
+		 * @param r   Float data
+		 */
+		void 
+		set_float      (const char* name, const float_data& r);
+		
+
+		/**
 		 * @brief     Get pixel data from recon
 		 *
 		 * @param  name  Name

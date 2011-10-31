@@ -114,6 +114,11 @@ namespace RRServer {
 				FreeReal(m_real.begin()->first.c_str());
 			}
 			
+			while (!m_float.empty()) {
+				cout << "Clearing RAM of " <<  m_float.begin()->first.c_str() << endl;
+				FreeFloat(m_float.begin()->first.c_str());
+			}
+			
 			while (!m_pixel.empty()) {
 				cout << "Clearing RAM of " <<  m_pixel.begin()->first.c_str() << endl;
 				FreePixel(m_pixel.begin()->first.c_str());
@@ -165,6 +170,20 @@ namespace RRServer {
 		GetReal          (const string name) {
 			
 			return *m_real[name];
+			
+		}
+		
+		
+		/**
+		 * @brief       Get reference to complex data by name
+		 * 
+		 * @param  name Name
+		 * @return      Reference to data if existent
+		 */
+		Matrix<float>&
+		GetFloat          (const string name) {
+			
+			return *m_float[name];
 			
 		}
 		
@@ -238,6 +257,45 @@ namespace RRServer {
 
 			delete it->second;
 			m_real.erase(it);
+
+			return true;
+			
+		}
+		
+
+		/**
+		 * @brief       Add a real matrix to real matrix container
+		 *
+		 * @param  name Name
+		 * @param  m    The added matrix
+		 * @return      Reference to 
+		 */
+		Matrix<float>&
+		AddFloat         (const string name, Ptr< Matrix<float> > m) {
+			
+			assert(m_float.find (name) == m_float.end());
+			m_float.insert (pair< string, Ptr < Matrix<float> > >(name, m));
+			return *m_float[name];
+			
+		}
+		
+
+		/**
+		 * @brief       Remove a real matrix from real container
+		 *
+		 * @param  name Name
+		 * @return      Success
+		 */
+		bool 
+		FreeFloat        (const string name) {
+			
+			map<string, Ptr< Matrix<float> > >::iterator it = m_float.find (name);
+
+			if (it == m_float.end())
+				return false;
+
+			delete it->second;
+			m_float.erase(it);
 
 			return true;
 			
@@ -567,6 +625,101 @@ namespace RRServer {
 	
 		
 		/**
+		 * @brief        Get data from recon (Remote access)
+		 *
+		 * @param  name  Name
+		 * @param  r     Real data storage
+		 */
+		void 
+		GetFloat        (const string name, float_data& r)   {
+			
+			if (m_float.find (name) == m_float.end())
+				return;
+			
+			Ptr< Matrix<float> > tmp = m_float[name];
+			
+			for (int j = 0; j < INVALID_DIM; j++) {
+				r.dims[j] = tmp->Dim(j);
+				r.res[j]  = tmp->Res(j);
+			}
+			
+			r.vals.length(tmp->Size()); 
+			
+			memcpy (&r.vals[0], &tmp->At(0), tmp->Size() * sizeof(float));
+
+			FreeFloat(name);
+			
+		}
+		
+
+		/**
+		 * @brief         Set data for recon (Local access)
+		 * 
+		 * @param  name  Name
+		 * @param  r     Real data
+		 */
+		void 
+		SetFloat        (const string name, const float_data& r)   {
+			
+			Ptr< Matrix<float> > tmp;
+
+			if (m_float.find (name) == m_float.end())
+				m_float.insert (pair<string, Ptr< Matrix<float> > > (name, tmp = NEW( Matrix<float>())));
+			else
+				tmp = m_float[name];
+			
+			tmp->SetClassName(name.c_str());
+
+			for (int i = 0; i < INVALID_DIM; i++) {
+				tmp->Dim(i) = r.dims[i];
+				tmp->Res(i) = r.res[i];
+			}
+			
+			tmp->Reset ();
+			
+			memcpy (&tmp->At(0), &r.vals[0], tmp->Size() * sizeof(float));
+
+		}
+		
+		
+		/**
+		 * @brief         Get data from recon
+		 *
+		 * @param  name  Name
+		 * @param  m      Real data
+		 */
+		void
+		GetFloat         (const string name, Matrix<float>& m)   {
+			
+			if (m_float.find (name) == m_float.end())
+				return;
+			
+			m = *m_float[name];
+			
+		}
+		
+	
+
+		/**
+		 * @brief         Set data for recon
+		 *
+		 * @param  name  Name
+		 * @param  m      Real data storage
+		 */
+		void 
+		SetFloat         (const string name, Matrix<float>& m)   {
+			
+			if (m_float.find (name) == m_float.end())
+				m_float.insert (pair<string, Ptr< Matrix<float> > > (name, NEW( Matrix<float>())));
+			
+			m.SetClassName(name.c_str());
+
+			*m_float[name] = m;
+			
+		}
+		
+
+		/**
 		 * @brief          Attach a name to the algorithm
 		 *
 		 * @param  name    Name
@@ -593,12 +746,13 @@ namespace RRServer {
 	
 	protected:
 		
-		map < string, Ptr< Matrix<cplx>   > > m_cplx;   /*!< @brief Complex data repository   */
-		map < string, Ptr< Matrix<double> > > m_real;   /*!< @brief Real data repository      */
-		map < string, Ptr< Matrix<short>  > > m_pixel;  /*!< @brief Integer data respository  */
+		map < string, Ptr< Matrix<cplx>   > > m_cplx;   /*!< @brief Complex data repository     */
+		map < string, Ptr< Matrix<double> > > m_real;   /*!< @brief Real double data repository */
+		map < string, Ptr< Matrix<float> > >  m_float;  /*!< @brief Real float data repository  */
+		map < string, Ptr< Matrix<short>  > > m_pixel;  /*!< @brief Integer data respository    */
 		
-		string                          m_name;         /*!< @brief Name                      */
-		bool                            m_initialised;  /*!< @brief Reco is initialised       */
+		string                          m_name;         /*!< @brief Name                        */
+		bool                            m_initialised;  /*!< @brief Reco is initialised         */
 		
 	};
 	
