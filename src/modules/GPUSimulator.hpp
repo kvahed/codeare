@@ -78,8 +78,8 @@ namespace RRStrategy {
 		/**
 		 * @brief        Prepare GPU processing<br/>(i.e. Load kernel & transfer data to GPU memory)
 		 */
-		void
-		Prepare         ();		
+		bool
+		PrepareKernel   ();		
 		
 
 		/**
@@ -108,7 +108,7 @@ namespace RRStrategy {
 		 *
 		 *  @param  ksrc Kernel source
 		 */
-		void 
+		bool
 		BuildProgram    (std::string ksrc);
 		
 
@@ -136,7 +136,7 @@ namespace RRStrategy {
         unsigned int              m_dev;    /**!<   */
 		std::vector<cl::Device>   m_devs;   /**!<   */
         cl::Context               m_ctxt;   /**!<   */
-        cl::CommandQueue          m_cmdq[MAXDEVS];   /**!<   */
+        cl::CommandQueue          m_cmdq;   /**!<   */
         cl::Program               m_prg;    /**!<   */
         cl_int                    m_error;  /**!<   */
         cl::Event                 m_event;  /**!<   */

@@ -347,6 +347,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
+EXTRA_DIST = GPUSimulator.cl
 
 # Rules for recon strategies
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \

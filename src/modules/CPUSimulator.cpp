@@ -2,10 +2,6 @@
 
 using namespace RRStrategy;
 
-#define GAMMARAD 2.6753e3
-#define TWOPI	 6.283185
-
-
 /**
  * @brief       Rotation matrix around vector n
  *
@@ -174,8 +170,6 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
 
 
 CPUSimulator::~CPUSimulator () {
-
-	printf ("    CPUSimulator: Cleaned up.\n");
 
 }
 
