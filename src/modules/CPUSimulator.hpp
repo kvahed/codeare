@@ -77,7 +77,7 @@ namespace RRStrategy {
 	protected:
 		
 		Matrix<cplx> m_sig;
-		double       m_gdt;
+		float        m_gdt;
 		size_t       m_nt;
 		size_t       m_nc;
 		

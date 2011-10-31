@@ -72,41 +72,41 @@ DirectMethod::Process     () {
 
     // Intensity correction for single run
     if (m_ic)
-        IntensityCorrection (GetCplx("b1m"), GetReal("target"));
+        IntensityCorrection (GetCplx("b1m"), GetFloat("target"));
 
     sb.tb1  = m_cplx["b1m"];
     sb.sb1  = m_cplx["b1p"];
 
-    sb.agr  = m_real["ag"];
+    sb.agr  = m_float["ag"];
 
-    sb.tm   = m_real["target"];
-    sb.sm   = m_real["sample"];
+    sb.tm   = m_float["target"];
+    sb.sm   = m_float["sample"];
 
-    sb.tb0  = m_real["b0"];
-    sb.sb0  = m_real["sb0"];
+    sb.tb0  = m_float["b0"];
+    sb.sb0  = m_float["sb0"];
 
-    sb.tr   = m_real["r"];
-    sb.sr   = m_real["sr"];
+    sb.tr   = m_float["r"];
+    sb.sr   = m_float["sr"];
 
-    sb.jac  = m_real["j"];
+    sb.jac  = m_float["j"];
 
     sb.np   = m_np;
     sb.mode = m_mode;
     sb.dt   = m_dt;
     sb.v    = m_verbose;
-        
+	
+
     // Outgoing
-    AddCplx (  "rf", sb.rf   = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));
-    AddReal ("magn", sb.magn = NEW (Matrix<double>(             3, sb.sr->Dim(1))));
+    AddCplx  (  "rf", sb.rf   = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));
+    AddFloat ("magn", sb.magn = NEW (Matrix<float> (             3, sb.sr->Dim(1))));
 
     // Initialise CPU/GPU simulator
     SimulationContext sc (&sb);
 
     // Simulate
     sc.Simulate();
-
     printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
-
+	
     return RRSModule::OK;
 
 }

@@ -35,29 +35,29 @@ namespace RRStrategy {
 		Ptr< Matrix<cplx> >   tb1;  /**<! b1                   (target)   */ 
 		Ptr< Matrix<cplx> >   sb1;  /**<!                      (sample)   */ 
 		
-		Ptr< Matrix<double> > agr;  /**<! Acquisition gradients           */ 
+		Ptr< Matrix<float> > agr;  /**<! Acquisition gradients           */ 
 		
-		Ptr< Matrix<double> > tr;   /**<! spatial vectors        (target) */ 
-		Ptr< Matrix<double> > sr;   /**<! */ 
+		Ptr< Matrix<float> > tr;   /**<! spatial vectors        (target) */ 
+		Ptr< Matrix<float> > sr;   /**<! */ 
 
-		Ptr< Matrix<double> > tb0;  /**<! b0 maps                (target) */ 
-		Ptr< Matrix<double> > sb0;  /**<!                        (sample) */ 
+		Ptr< Matrix<float> > tb0;  /**<! b0 maps                (target) */ 
+		Ptr< Matrix<float> > sb0;  /**<!                        (sample) */ 
 
-		Ptr< Matrix<double> > tm;   /**<! starting magnetisation (target) */
-		Ptr< Matrix<double> > sm;   /**<!                        (sample) */
+		Ptr< Matrix<float> > tm;   /**<! starting magnetisation (target) */
+		Ptr< Matrix<float> > sm;   /**<!                        (sample) */
 
-		Ptr< Matrix<double> > jac;  /**<! jacobian j(k(t))                */
+		Ptr< Matrix<float> > jac;  /**<! jacobian j(k(t))                */
 
 		int                   np;   /**<! # threads                       */
 		int                   mode; /**<! mode                            */
 
-		double                dt;   /**<! time step                       */
+		float                dt;   /**<! time step                       */
 		
 		bool                  v;    /**<! verbose                         */
 		
 		// Outgoing
 		Ptr< Matrix<cplx> >   rf;   /**<! RF pulses                       */
-		Ptr< Matrix<double> > magn; /**<! Excited magnetisation           */
+		Ptr< Matrix<float> > magn; /**<! Excited magnetisation           */
 
 		bool Dump (std::string odf) {
 			

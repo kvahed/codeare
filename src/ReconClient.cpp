@@ -158,7 +158,7 @@ ReconClient::Finalise (const char* name) {
 
 
 long 
-ReconClient::GetSize (longs dims) {
+ReconClient::GetSize (const longs dims) const {
 
     long size = 1;
 
@@ -172,7 +172,7 @@ ReconClient::GetSize (longs dims) {
 
 
 void 
-ReconClient::SetCplx (const std::string name, Matrix< std::complex<float> >& M) {
+ReconClient::SetCplx (const std::string& name, Matrix< std::complex<float> >& M) const {
 	
 	cplx_data r; 
 	
@@ -194,7 +194,7 @@ ReconClient::SetCplx (const std::string name, Matrix< std::complex<float> >& M) 
 		    
 
 void 
-ReconClient::GetCplx (const std::string name, Matrix< std::complex<float> >& m) {
+ReconClient::GetCplx (const std::string& name, Matrix< std::complex<float> >& m) const {
 	
 	cplx_data rp; 
 	m_rrsi->get_cplx(name.c_str(), rp);
@@ -212,7 +212,7 @@ ReconClient::GetCplx (const std::string name, Matrix< std::complex<float> >& m) 
 
 
 void
-ReconClient::SetReal              (const std::string name, Matrix< double >& m) {
+ReconClient::SetReal              (const std::string& name, Matrix<double>& m) const {
 	
 	real_data r;
 	
@@ -235,7 +235,7 @@ ReconClient::SetReal              (const std::string name, Matrix< double >& m) 
 		
 
 void
-ReconClient::GetReal            (const std::string name, Matrix<double>& m) {
+ReconClient::GetReal            (const std::string& name, Matrix<double>& m) const {
 	
 	real_data r; 
 	m_rrsi->get_real(name.c_str(), r);
@@ -255,7 +255,50 @@ ReconClient::GetReal            (const std::string name, Matrix<double>& m) {
 
 
 void
-ReconClient::SetPixel            (const std::string name, Matrix<short>& m) {
+ReconClient::SetFloat              (const std::string& name, Matrix<float>& m) const {
+	
+	float_data r;
+	
+	r.dims.length(INVALID_DIM);
+	r.res.length(INVALID_DIM);
+	
+	for (int j = 0; j < INVALID_DIM; j++) {
+		r.dims[j] = m.Dim(j);
+		r.res[j]  = m.Res(j);
+	}
+	
+	r.vals.length(m.Size());
+	
+	for (int i = 0; i < m.Size(); i++)
+		r.vals[i] = m[i];
+	
+	m_rrsi->set_float(name.c_str(), r);
+	
+}
+		
+
+void
+ReconClient::GetFloat           (const std::string& name, Matrix<float>& m) const {
+	
+	float_data r; 
+	m_rrsi->get_float(name.c_str(), r);
+	
+	for (int j = 0; j < INVALID_DIM; j++) {
+		m.Dim(j) = r.dims[j];
+		m.Res(j) = r.res[j];
+	}
+	
+	m.Reset();
+	
+	for (int i = 0; i < GetSize(r.dims); i++)
+		m[i] = r.vals[i];
+	
+}
+
+
+
+void
+ReconClient::SetPixel            (const std::string& name, Matrix<short>& m) const {
 			
 	pixel_data p;
 	
@@ -278,7 +321,7 @@ ReconClient::SetPixel            (const std::string name, Matrix<short>& m) {
 
 
 void
-ReconClient::GetPixel            (const std::string name, Matrix<short>& m) {
+ReconClient::GetPixel            (const std::string& name, Matrix<short>& m) const {
 	
 	pixel_data p;
 	m_rrsi->get_pixel(name.c_str(), p);

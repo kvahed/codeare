@@ -4,7 +4,7 @@ using namespace RRStrategy;
 
 
 
-std::pair<const char*, unsigned> ReadClFromFile (std::string fname) {
+std::pair<const char*, unsigned> ReadCLFromFile (std::string fname) {
 
 	std::string str, src;
 	std::ifstream in;
@@ -39,6 +39,7 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 	m_gdt = GAMMARAD * m_sb->dt;
 	m_nt  = m_sb->agr->Dim(1);      // Time points
 	m_nc  = m_sb->tb1->Dim(1);     // # channels
+	m_nr  = m_sb->sr->Dim(1); 
 
 	printf ("  Intialising GPU device & context ...\n");
 
@@ -81,7 +82,7 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 bool
 GPUSimulator::BuildProgram (std::string ksrc) {
 	
-	std::pair<const char*, unsigned> kpair = ReadClFromFile (ksrc);
+	std::pair<const char*, unsigned> kpair = ReadCLFromFile (ksrc);
 
 	printf("    OpenCL kernel size: %d\n    Assembling program ... ", (int) kpair.second); fflush (stdout);
 	
@@ -147,46 +148,60 @@ GPUSimulator::SetDeviceData () {
 
     printf("  Creating device arrays ... ");  fflush(stdout);
 
-	ocl_tb1 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) * m_sb->tb1->Size(), NULL, &m_error);
-	ocl_sb1 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) * m_sb->sb1->Size(), NULL, &m_error);
-	ocl_agr = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) * m_sb->agr->Size(), NULL, &m_error);
-	ocl_tr  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->tr->Size(), NULL, &m_error);
-	ocl_sr  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->sr->Size(), NULL, &m_error);
-	ocl_tb0 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) * m_sb->tb0->Size(), NULL, &m_error);
-	ocl_sb0 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) * m_sb->sb0->Size(), NULL, &m_error);
-	ocl_tm  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->tm->Size(), NULL, &m_error);
-	ocl_sm  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->sm->Size(), NULL, &m_error);
-	ocl_jac = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) * m_sb->jac->Size(), NULL, &m_error);
-	ocl_gdt = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float)                    , NULL, &m_error);
-	ocl_nt  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(  int)                    , NULL, &m_error);
-	ocl_nc  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(  int)                    , NULL, &m_error);
-	ocl_rf  = cl::Buffer(m_ctxt, CL_MEM_WRITE_ONLY, 2 * sizeof(float) *       m_nc * m_nt, NULL, &m_error);
-    ocl_m   = cl::Buffer(m_ctxt, CL_MEM_WRITE_ONLY,     sizeof(float) *  m_sb->sm->Size(), NULL, &m_error);
+	ocl_tb1 = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) *  m_sb->tb1->Size(), NULL, &m_error);
+	ocl_sb1 = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) *  m_sb->sb1->Size(), NULL, &m_error);
+	ocl_agr = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->agr->Size(), NULL, &m_error);
+	ocl_tr  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *   m_sb->tr->Size(), NULL, &m_error);
+	ocl_sr  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *   m_sb->sr->Size(), NULL, &m_error);
+	ocl_tb0 = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->tb0->Size(), NULL, &m_error);
+	ocl_sb0 = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->sb0->Size(), NULL, &m_error);
+	ocl_tm  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *   m_sb->tm->Size(), NULL, &m_error);
+	ocl_sm  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *   m_sb->sm->Size(), NULL, &m_error);
+	ocl_jac = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->jac->Size(), NULL, &m_error);
+	ocl_gdt = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float)                     , NULL, &m_error);
+	ocl_nt  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(  int)                     , NULL, &m_error);
+	ocl_nc  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(  int)                     , NULL, &m_error);
+	ocl_rf  = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY, 2 * sizeof(float) *   m_sb->rf->Size(), NULL, &m_error);
+    ocl_m   = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY,     sizeof(float) * m_sb->magn->Size(), NULL, &m_error);
 
 	printf("done.\n  Pushing data to device ... ");  fflush(stdout);
 
 	Matrix<float> tmp;
 
 	
-    m_error = m_cmdq.enqueueWriteBuffer(ocl_tb1, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->tb1->Size(), &m_sb->tb1->At(0),  NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer(ocl_sb1, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->sb1->Size(), &m_sb->sb1->At(0),  NULL, &m_event);
-	
-	tmp = (Matrix<float>) (*(m_sb->agr));
-    m_error = m_cmdq.enqueueWriteBuffer(ocl_agr, CL_TRUE, 0,     sizeof(float) *  m_sb->agr->Size(),          &tmp[0],  NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (ocl_tb1, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->tb1->Size(),  &m_sb->tb1->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (ocl_sb1, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->sb1->Size(),  &m_sb->sb1->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (ocl_agr, CL_TRUE, 0,     sizeof(float) *  m_sb->agr->Size(),  &m_sb->agr->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer ( ocl_tr, CL_TRUE, 0,     sizeof(float) *   m_sb->tr->Size(),   &m_sb->tr->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer ( ocl_sr, CL_TRUE, 0,     sizeof(float) *   m_sb->sr->Size(),   &m_sb->sr->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (ocl_tb0, CL_TRUE, 0,     sizeof(float) *  m_sb->tb0->Size(),  &m_sb->tb0->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (ocl_sb0, CL_TRUE, 0,     sizeof(float) *  m_sb->sb0->Size(),  &m_sb->sb0->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer ( ocl_tm, CL_TRUE, 0,     sizeof(float) *   m_sb->tm->Size(),   &m_sb->tm->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer ( ocl_sm, CL_TRUE, 0,     sizeof(float) *   m_sb->sm->Size(),   &m_sb->sm->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (ocl_jac, CL_TRUE, 0,     sizeof(float) *  m_sb->jac->Size(),  &m_sb->jac->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (ocl_gdt, CL_TRUE, 0,     sizeof(float)                     ,             &m_gdt, NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer ( ocl_nt, CL_TRUE, 0,     sizeof(int)                       ,              &m_nt, NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer ( ocl_nc, CL_TRUE, 0,     sizeof(int)                       ,              &m_nc, NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer ( ocl_rf, CL_TRUE, 0, 2 * sizeof(float) *   m_sb->rf->Size(),   &m_sb->rf->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (  ocl_m, CL_TRUE, 0,     sizeof(float) * m_sb->magn->Size(), &m_sb->magn->At(0), NULL, &m_event);
 
-	tmp = (Matrix<float>) (*(m_sb->tr));
-    m_error = m_cmdq.enqueueWriteBuffer( ocl_tr, CL_TRUE, 0,     sizeof(float) *   m_sb->tr->Size(),          &tmp[0],   NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer( ocl_sr, CL_TRUE, 0,     sizeof(float) *   m_sb->sr->Size(), &m_sb->sr->At(0),   NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer(ocl_tb0, CL_TRUE, 0,     sizeof(float) *  m_sb->tb0->Size(), &m_sb->tb0->At(0),  NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer(ocl_sb0, CL_TRUE, 0,     sizeof(float) *  m_sb->sb0->Size(), &m_sb->sb0->At(0),  NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer( ocl_tm, CL_TRUE, 0,     sizeof(float) *   m_sb->tm->Size(), &m_sb->tm->At(0),   NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer( ocl_sm, CL_TRUE, 0,     sizeof(float) *   m_sb->sm->Size(), &m_sb->sm->At(0),   NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer(ocl_jac, CL_TRUE, 0,     sizeof(float) *  m_sb->jac->Size(), &m_sb->jac->At(0),  NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer(ocl_gdt, CL_TRUE, 0,     sizeof(float)                     , &m_gdt,             NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer( ocl_nt, CL_TRUE, 0,     sizeof(int)                       , &m_nt,              NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer( ocl_nt, CL_TRUE, 0,     sizeof(int)                       , &m_nc,              NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer( ocl_rf, CL_TRUE, 0, 2 * sizeof(float) *   m_sb->rf->Size(), &m_sb->rf->At(0),   NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer(  ocl_m, CL_TRUE, 0,     sizeof(float) * m_sb->magn->Size(), &m_sb->magn->At(0), NULL, &m_event);
+	m_error = m_kernel.setArg( 0, ocl_tb1);
+	m_error = m_kernel.setArg( 1, ocl_sb1);
+	m_error = m_kernel.setArg( 2, ocl_agr);
+	m_error = m_kernel.setArg( 3, ocl_tr );
+	m_error = m_kernel.setArg( 4, ocl_sr );
+	m_error = m_kernel.setArg( 5, ocl_tb0);
+	m_error = m_kernel.setArg( 6, ocl_sb0);
+	m_error = m_kernel.setArg( 7, ocl_tm );
+	m_error = m_kernel.setArg( 8, ocl_sm );
+	m_error = m_kernel.setArg( 9, ocl_jac);
+	m_error = m_kernel.setArg(10, ocl_gdt);
+	m_error = m_kernel.setArg(11, ocl_nt );
+	m_error = m_kernel.setArg(12, ocl_nc );
+	m_error = m_kernel.setArg(13, ocl_rf );
+	m_error = m_kernel.setArg(14, ocl_m  );
+
+    m_cmdq.finish();
 
 	printf ("done.\n");
 
@@ -196,7 +211,8 @@ GPUSimulator::SetDeviceData () {
 void 
 GPUSimulator::GetDeviceData () {
 
-	
+    m_error = m_cmdq.enqueueReadBuffer(ocl_rf, CL_TRUE, 0, 2 * sizeof(float) * m_sb->rf->Size(), &m_sb->rf->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueReadBuffer(ocl_rf, CL_TRUE, 0,     sizeof(float) * m_sb->rf->Size(), &m_sb->magn->At(0), NULL, &m_event);
 
 }
 
@@ -204,8 +220,15 @@ GPUSimulator::GetDeviceData () {
 void 
 GPUSimulator::RunKernel () {
 
+	printf("  Running kernel ... \n"); fflush (stdout);
 	
-
+    m_error = m_cmdq.enqueueNDRangeKernel (m_kernel, cl::NullRange, cl::NDRange(m_nr), cl::NullRange, NULL, &m_event); 
+    printf("[clEnqueueNDRangeKernel: %s]", ErrorString(m_error));
+	
+    m_cmdq.finish();
+	
+	printf ("... done.\n");
+	
 }
 
 

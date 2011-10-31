@@ -112,7 +112,7 @@ namespace RRClient {
 		 * @param  m        Complex data
 		 */
 		void 
-		SetCplx             (const std::string name, Matrix<cplx>& m);
+		SetCplx             (const std::string& name, Matrix<cplx>& m) const;
 		
 		
 		/**
@@ -122,7 +122,7 @@ namespace RRClient {
 		 * @param  m        Receive storage
 		 */
 		void 
-		GetCplx             (const std::string name, Matrix<cplx>& m);
+		GetCplx             (const std::string& name, Matrix<cplx>& m) const;
 		
 		
 		/**
@@ -132,7 +132,7 @@ namespace RRClient {
 		 * @param  m        Real data
 		 */
 		void
-		SetReal             (const std::string name, Matrix< double >& m);
+		SetReal             (const std::string& name, Matrix<double>& m) const;
 		
 		
 		/**
@@ -142,7 +142,27 @@ namespace RRClient {
 		 * @param  m        Receive storage
 		 */
 		void
-		GetReal             (const std::string name, Matrix< double >& m);
+		GetReal             (const std::string& name, Matrix<double>& m) const;
+		
+		
+		/**
+		 * @brief           Transmit real data to service (f.e. k-space weights)
+		 *
+		 * @param  name     Name
+		 * @param  m        Real data
+		 */
+		void
+		SetFloat            (const std::string& name, Matrix<float>& m) const ;
+		
+		
+		/**
+		 * @brief           Get helper data after recon to ...
+		 *
+		 * @param  name     Name
+		 * @param  m        Receive storage
+		 */
+		void
+		GetFloat            (const std::string& name, Matrix<float>& m) const;
 		
 		
 		/**
@@ -152,7 +172,7 @@ namespace RRClient {
 		 * @param  m        Short int data
 		 */
 		void 
-		SetPixel            (const std::string name, Matrix<short>& m);
+		SetPixel            (const std::string& name, Matrix<short>& m) const;
 		
 		
 		/**
@@ -162,7 +182,7 @@ namespace RRClient {
 		 * @param  m        Short int storage
 		 */
 		void 
-		GetPixel            (const std::string name, Matrix<short>& m);
+		GetPixel            (const std::string& name, Matrix<short>& m) const;
 		
 		
 	private:
@@ -178,7 +198,7 @@ namespace RRClient {
 		 * @return          Size
 		 */
 		long
-		GetSize             (longs dims);
+		GetSize             (const longs dims) const;
 		
 		
 	};

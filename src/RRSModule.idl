@@ -60,6 +60,18 @@ module RRSModule {
 
 
 	/**
+	 * @brief Float data
+	 */
+	struct     float_data       {
+
+		floats  vals;  /**< Data      */
+		longs   dims;  /**< Dimesions */
+		floats   res;   /**< Resolution     */
+
+	};
+
+
+	/**
 	 * @brief Pixel data
 	 */
 	struct     pixel_data       {
@@ -147,6 +159,24 @@ module RRSModule {
 		 * @param  data   Data matrix
 		 */ 
 		void              set_real (in string name, in real_data data);
+
+		
+		/**
+		 * @brief         Transport real matrix from backend identified by ...
+		 *
+		 * @param  name   its name
+		 * @param  data   Data matrix
+		 */ 
+		void              get_float (in string name, inout float_data data);
+
+		
+		/**
+		 * @brief         Transport and announce real matrix to backend
+		 *
+		 * @param  name   Name
+		 * @param  data   Data matrix
+		 */ 
+		void              set_float (in string name, in float_data data);
 
 		
 		/**

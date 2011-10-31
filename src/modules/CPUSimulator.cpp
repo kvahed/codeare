@@ -9,35 +9,35 @@ using namespace RRStrategy;
  * @param  r    Rotation matrix (output)
  */
 void 
-Rotate (const Matrix<double>& n, Matrix<double>& r) {
+Rotate (const Matrix<float>& n, Matrix<float>& r) {
 	
-	double phi = sqrt(n[X]*n[X] + n[Y]*n[Y] + n[Z]*n[Z]);
+	float phi = sqrt(n[X]*n[X] + n[Y]*n[Y] + n[Z]*n[Z]);
 
 	// Identity
 	if (!phi)
-		r = Matrix<double>::Id(3);
+		r = Matrix<float>::Id(3);
 	
 	else {
 
 		// Cayley-Klein parameters
-		double hp    =  phi/2;		
-		double cp    =  cos(hp);
-		double sp    =  sin(hp)/phi; /* /phi because n is unit length in defs. */
-		double ar    =  cp;
-		double ai    = -n[Z]*sp;
-		double br    =  n[Y]*sp;
-		double bi    = -n[X]*sp;
+		float hp    =  phi/2;		
+		float cp    =  cos(hp);
+		float sp    =  sin(hp)/phi; /* /phi because n is unit length in defs. */
+		float ar    =  cp;
+		float ai    = -n[Z]*sp;
+		float br    =  n[Y]*sp;
+		float bi    = -n[X]*sp;
 	
-		double arar  =   ar*ar;
-		double aiai  =   ai*ai;
-		double arai2 = 2*ar*ai;
-		double brbr  =   br*br;
-		double bibi  =   bi*bi;
-		double brbi2 = 2*br*bi;
-		double arbi2 = 2*ar*bi;
-		double aibr2 = 2*ai*br;
-		double arbr2 = 2*ar*br;
-		double aibi2 = 2*ai*bi;
+		float arar  =   ar*ar;
+		float aiai  =   ai*ai;
+		float arai2 = 2*ar*ai;
+		float brbr  =   br*br;
+		float bibi  =   bi*bi;
+		float brbi2 = 2*br*bi;
+		float arbi2 = 2*ar*bi;
+		float aibr2 = 2*ai*br;
+		float arbr2 = 2*ar*br;
+		float aibi2 = 2*ai*bi;
 		
 		r[0] =  arar  - aiai - brbr + bibi;
 		r[1] = -arai2 - brbi2;
@@ -56,17 +56,17 @@ Rotate (const Matrix<double>& n, Matrix<double>& r) {
 
 
 void 
-SimulateAcq (const Matrix<cplx>& b1, const Matrix<double>& gr, const Matrix<double>& r, 
-			 const Matrix<double>& b0, const Matrix<double>& m0, const size_t& pos, const int& tid, 
-			 const double& dt, const bool& v, const size_t& nc, const size_t& nt, const double& gdt, 
+SimulateAcq (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix<float>& r, 
+			 const Matrix<float>& b0, const Matrix<float>& m0, const size_t& pos, const int& tid, 
+			 const float& dt, const bool& v, const size_t& nc, const size_t& nt, const float& gdt, 
 			 Matrix<cplx>& sig) {
 
-	Matrix<double> n   ( 3,1);  // Rotation axis
-	Matrix<double> rot ( 3,3);  // Rotation matrix
-	Matrix<double> lm  ( 3,1);  // Magnetisation
-	Matrix<double> tmp ( 3,1);  // Temporary magnetisation
+	Matrix<float> n   ( 3,1);  // Rotation axis
+	Matrix<float> rot ( 3,3);  // Rotation matrix
+	Matrix<float> lm  ( 3,1);  // Magnetisation
+	Matrix<float> tmp ( 3,1);  // Temporary magnetisation
 	
-	Matrix<double> lr  ( 3,1);  // Local spatial vector
+	Matrix<float> lr  ( 3,1);  // Local spatial vector
 	Matrix<cplx>   ls  (nc,1);  // Local sensitivity
 	
 	for (size_t c = 0; c < nc; c++) 
@@ -105,17 +105,17 @@ SimulateAcq (const Matrix<cplx>& b1, const Matrix<double>& gr, const Matrix<doub
 
 
 void 
-SimulateExc  (const Matrix<cplx>& b1, const Matrix<double>& gr, const Matrix<cplx>& rf, 
-			  const Matrix<double>& r, const Matrix<double>& b0, const Matrix<double>& m0, 
-			  const size_t& pos, const double& dt, const bool& v, const size_t& nc, 
-			  const size_t& nt, const double& gdt, Matrix<double>& m) {
+SimulateExc  (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix<cplx>& rf, 
+			  const Matrix<float>& r, const Matrix<float>& b0, const Matrix<float>& m0, 
+			  const size_t& pos, const float& dt, const bool& v, const size_t& nc, 
+			  const size_t& nt, const float& gdt, Matrix<float>& m) {
 	
-	Matrix<double> n   ( 3,1);  // Rotation axis
-	Matrix<double> rot ( 3,3);  // Rotation matrix
-	Matrix<double> ml  ( 3,1);  // Local magnetisation
-	Matrix<double> tmp ( 3,1);  // Local magnetisation
+	Matrix<float> n   ( 3,1);  // Rotation axis
+	Matrix<float> rot ( 3,3);  // Rotation matrix
+	Matrix<float> ml  ( 3,1);  // Local magnetisation
+	Matrix<float> tmp ( 3,1);  // Local magnetisation
 	
-	Matrix<double> lr  ( 3,1);    // Local spatial vector
+	Matrix<float> lr  ( 3,1);    // Local spatial vector
 	Matrix<cplx>   ls  (nc,1);   // Local sensitivity
 
 	for (size_t i = 0; i <  3; i++) lr[i] = r  (i,pos);
@@ -197,16 +197,15 @@ CPUSimulator::Simulate (const bool& mode) {
 	// Expect same #ch
 	assert (m_sb->tb1->Dim(1) == m_sb->sb1->Dim(1));
 
-	printf ("  Simulating: %02ich %s on %04i isochromats ... with %i pthreads", 
-			(int)m_nc, (mode) ? "         excitation" : " signal acquisition", (int)nr, m_sb->np); fflush(stdout);
+	printf ("  Simulating: %02ich %s on %04i isochromats with %i pthreads ...", 
+			(int)m_nc, (mode) ? "         excitation" : " signal acquisition", 
+			(int)nr, m_sb->np); fflush(stdout);
 
-	// Anything to do? ----------------
-
+	// We don't have anything to do
 	if (m_nt < 1 || nr < 1) {
 		printf ("    %i Gradient step for %i isochromats? I don't think so!\n", (int)m_nt, (int)nr);
 		return;
 	}
-	// --------------------------------
 
 #pragma omp parallel
 	{

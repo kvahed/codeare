@@ -300,17 +300,17 @@ bool dmtest (ReconClient* rc) {
 	Matrix<cplx>   b1m;  
 	Matrix<cplx>   b1p;  
 	Matrix<cplx>   rf;
-	Matrix<double> m;
+	Matrix<float> m;
 
-	Matrix<double> ag;   
-	Matrix<double> r;   
-	Matrix<double> b0;  
-	Matrix<double> target;
+	Matrix<float> ag;   
+	Matrix<float> r;   
+	Matrix<float> b0;  
+	Matrix<float> target;
 
-	Matrix<double> sample;
-	Matrix<double> sr;
-	Matrix<double> sb0;
-	Matrix<double> j;
+	Matrix<float> sample;
+	Matrix<float> sr;
+	Matrix<float> sb0;
+	Matrix<float> j;
 	
 	std::string cf  = std::string (base + std::string(config));
 	std::string df  = std::string (base + std::string(data));
@@ -357,21 +357,21 @@ bool dmtest (ReconClient* rc) {
 	
 	rc->SetCplx  (   "b1m", b1m);
 	rc->SetCplx  (   "b1p", b1p);
-	rc->SetReal  (    "ag", ag);
-	rc->SetReal  (     "r", r);
-	rc->SetReal  (    "b0", b0);
-	rc->SetReal  ("target", target);
-	rc->SetReal  ("sample", sample);
-	rc->SetReal  (    "sr", sr);
-	rc->SetReal  (   "sb0", sb0);
-	rc->SetReal  (     "j", j);
+	rc->SetFloat  (    "ag", ag);
+	rc->SetFloat  (     "r", r);
+	rc->SetFloat  (    "b0", b0);
+	rc->SetFloat  ("target", target);
+	rc->SetFloat  ("sample", sample);
+	rc->SetFloat  (    "sr", sr);
+	rc->SetFloat  (   "sb0", sb0);
+	rc->SetFloat  (     "j", j);
 	// ---------------------
 	
 	rc->Process (test);
 	
 	// Incoming -------------
 	
-	rc->GetReal ("magn", m);
+	rc->GetFloat ("magn", m);
 	rc->GetCplx ("rf", rf);
 	// ---------------------
 	

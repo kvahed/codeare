@@ -198,6 +198,46 @@ namespace RRServer {
 		
 
 		/**
+		 * @brief       @see ReconStrategy::SetFloat(const std::string name, const float_data*)
+		 *
+		 * @param  name  Name
+		 * @param  f    Float data sequence
+		 */
+		void
+		SetFloat (const std::string name, const float_data& f);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::SetFloat(const std::string name, const Matrix<float>*)
+		 *
+		 * @param  name  Name
+		 * @param  f     Float data matrix
+		 */
+		void
+		SetFloat (const std::string name, Matrix<float>& f);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::SetFloat(const std::string name, const Matrix<float>*)
+		 *
+		 * @param  name  Name
+		 * @param  f     Float data matrix
+		 */
+		void
+		GetFloat (const std::string name, Matrix<float>& f);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::GetFloat(const std::string name, float_data*)
+		 *
+		 * @param  name  Name
+		 * @param  f    Float data sequence
+		 */
+		void
+		GetFloat (const std::string name, float_data& f);
+		
+
+		/**
 		 * @brief       @see ReconStrategy::SetPixel(const std::string name, const pixel_data*)
 		 *
 		 * @param  name  Name
