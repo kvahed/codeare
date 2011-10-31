@@ -56,10 +56,11 @@ Rotate (const Matrix<float>& n, Matrix<float>& r) {
 
 
 void 
-SimulateAcq (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix<float>& r, 
-			 const Matrix<float>& b0, const Matrix<float>& m0, const size_t& pos, const int& tid, 
-			 const float& dt, const bool& v, const size_t& nc, const size_t& nt, const float& gdt, 
-			 Matrix<cplx>& sig) {
+SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>& gr, const Matrix<float>& r, 
+			 const Matrix<float>& b0, const Matrix<float>& m0, const size_t&      pos, 
+			 const int&          tid, const float&         dt, const bool&          v, 
+			 const size_t&        nc, const size_t&        nt, const float&       gdt, 
+			       Matrix<cplx>& sig) {
 
 	Matrix<float> n   ( 3,1);  // Rotation axis
 	Matrix<float> rot ( 3,3);  // Rotation matrix
@@ -67,7 +68,7 @@ SimulateAcq (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix<float
 	Matrix<float> tmp ( 3,1);  // Temporary magnetisation
 	
 	Matrix<float> lr  ( 3,1);  // Local spatial vector
-	Matrix<cplx>   ls  (nc,1);  // Local sensitivity
+	Matrix<cplx>  ls  (nc,1);  // Local sensitivity
 	
 	for (size_t c = 0; c < nc; c++) 
 		ls[c] = conj(b1.At(pos,c));
@@ -76,7 +77,6 @@ SimulateAcq (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix<float
 		lr[i] =      r.At(i,pos);
 		lm[i] =      m0.At(i,pos); 
 	}
-
 
 	// Run over time points
 	for (size_t t = 0; t < nt; t++) {
@@ -105,18 +105,19 @@ SimulateAcq (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix<float
 
 
 void 
-SimulateExc  (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix<cplx>& rf, 
+SimulateExc  (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix< cplx>& rf, 
 			  const Matrix<float>& r, const Matrix<float>& b0, const Matrix<float>& m0, 
-			  const size_t& pos, const float& dt, const bool& v, const size_t& nc, 
-			  const size_t& nt, const float& gdt, Matrix<float>& m) {
+			  const size_t&      pos, const float&         dt, const bool&           v, 
+			  const size_t&       nc, const size_t&        nt, const float&        gdt, 
+			        Matrix<float>& m) {
 	
 	Matrix<float> n   ( 3,1);  // Rotation axis
 	Matrix<float> rot ( 3,3);  // Rotation matrix
 	Matrix<float> ml  ( 3,1);  // Local magnetisation
 	Matrix<float> tmp ( 3,1);  // Local magnetisation
 	
-	Matrix<float> lr  ( 3,1);    // Local spatial vector
-	Matrix<cplx>   ls  (nc,1);   // Local sensitivity
+	Matrix<float> lr  ( 3,1);  // Local spatial vector
+	Matrix<cplx>  ls  (nc,1);  // Local sensitivity
 
 	for (size_t i = 0; i <  3; i++) lr[i] = r  (i,pos);
 	for (size_t i = 0; i < nc; i++) ls[i] = b1 (pos,i);

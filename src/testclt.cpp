@@ -372,7 +372,7 @@ bool dmtest (ReconClient* rc) {
 	// Incoming -------------
 	
 	rc->GetFloat ("magn", m);
-	rc->GetCplx ("rf", rf);
+	rc->GetCplx  ("rf", rf);
 	// ---------------------
 	
 	rc->Finalise   (test);
