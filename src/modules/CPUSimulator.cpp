@@ -161,7 +161,7 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
     
     m_sb  = sb;
 
-    m_sig = Matrix<cplx> (m_sb->rf->Dim(0), m_sb->rf->Dim(0), m_sb->np);
+    m_sig = Matrix<cplx> (m_sb->rf->Dim(0), m_sb->rf->Dim(1), m_sb->np);
     m_gdt = GAMMARAD * m_sb->dt;
     m_nt  = m_sb->agr->Dim(1);      // Time points
     m_nc  = m_sb->tb1->Dim(1);     // # channels
