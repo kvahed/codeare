@@ -209,7 +209,7 @@ CPUSimulator::Simulate (const bool& mode) {
 	// Anything to do? ----------------
 
 	if (m_nt < 1 || nr < 1) {
-		printf ("    %i Gradient step for %i isochromats? I don't think so!\n", m_nt, nr);
+		printf ("    %i Gradient step for %i isochromats? I don't think so!\n", (int)m_nt, (int)nr);
 		return;
 	}
 	// --------------------------------

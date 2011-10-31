@@ -183,8 +183,8 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 		// Note: FFTW plans should be created by 
 		// one thread only!
 		Matrix<cplx> mr[threads];
-		fftwf_plan 	  p[threads];
-		
+		fftwf_plan	  p[threads];
+
 		for (int i = 0; i < threads; i++) {
 			mr[i] = Matrix<cplx>      (r.Dim(0), r.Dim(1), r.Dim(2));
 			p[i]  = fftwf_plan_dft_3d (r.Dim(2), r.Dim(1), r.Dim(0), 
@@ -193,14 +193,12 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 		}
 		// ------------------------------------
 		
-		
 #pragma omp parallel default (shared)
 		{
 			
 			int tid = omp_get_thread_num();
 			
 #pragma omp for schedule (dynamic, vols / omp_get_num_threads())
-			
 			for (size_t i = 0; i < vols; i++) {
 				memcpy (&mr[tid][0], &r[i*imsize], imsize * sizeof(cplx));
 				mr[tid]  = mr[tid].FFTShift();
@@ -310,14 +308,12 @@ const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
 		// Call bet
 		printf ("bet2ing ... "); fflush(stdout);
-		system (cmd.c_str());
+		int i = system (cmd.c_str());
 
 		printf ("importing ... "); fflush(stdout);
 		msk.NIRead(mask);
 
  		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-
-		return RRSModule::OK;
 
 	}
 

@@ -1,10 +1,44 @@
 #include "GPUSimulator.hpp"
+
 using namespace RRStrategy;
+
+
+
+std::pair<const char*, unsigned> ReadClFromFile (std::string fname) {
+
+	std::string str, src;
+	std::ifstream in;
+	
+	if(!in)
+		std::cerr << "File not found??" << std::endl;
+	
+	in.open (fname.c_str());
+	std::getline (in, str);
+	
+	while (in) {
+		
+		src += str + "\n";
+		std::getline (in, str);
+		
+	}
+	
+	in.close();
+	
+	//std::cout << src << std::endl;
+	//std::cout << "Size is " << src.length() << std::endl;
+	
+	return std::make_pair(src.c_str(), src.length());
+
+}
 
 
 GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 
 	m_sb = sb;
+
+	m_gdt = GAMMARAD * m_sb->dt;
+	m_nt  = m_sb->agr->Dim(1);      // Time points
+	m_nc  = m_sb->tb1->Dim(1);     // # channels
 
 	printf ("  Intialising GPU device & context ...\n");
 
@@ -13,12 +47,10 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
     std::vector<cl::Platform> pfs;
 	m_error = cl::Platform::get(&pfs);
 	
-    printf("    number of platforms: %d\n", pfs.size());
+    printf("    number of platforms: %d\n", (int) pfs.size());
 	// --------------------------------
 
 	// Use first available device -----
-
-	m_dev = 0;
 
 	cl_context_properties properties[] = 
         {CL_CONTEXT_PLATFORM, (cl_context_properties)(pfs[0])(), 0};
@@ -29,17 +61,20 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
     m_ctxt  = cl::Context(CL_DEVICE_TYPE_GPU, properties);
     m_devs  = m_ctxt.getInfo<CL_CONTEXT_DEVICES>();
 
-    printf("    number of devices %d\n", m_devs.size());
+    printf("    number of devices %d\n", (int) m_devs.size());
 	// --------------------------------
 
 	// Command queue used for OpenCL commands
 
 	try {
-        m_cmdq = cl::CommandQueue(m_ctxt, m_devs[m_dev], 0, &m_error);
+		for (size_t i = 0; i < m_devs.size() && i < MAXDEVS; i++)
+			m_cmdq[i] = cl::CommandQueue(m_ctxt, m_devs[i], 0, &m_error);
     } catch (cl::Error cle) {
         printf("  ERROR: %s(%d)\n", cle.what(), cle.err());
     }
 	// --------------------------------
+
+	BuildProgram ("/usr/local/lib/GPUSimulator.cl");
 
 }
  
@@ -47,41 +82,102 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 void 
 GPUSimulator::BuildProgram (std::string ksrc) {
 	
-	int ksize = ksrc.size();
-	
-	printf("kernel size: %d\n", ksize);
+
+	std::pair<const char*, unsigned> kpair = ReadClFromFile (ksrc);
+
+	printf("    OpenCL kernel size: %d\n    Assembling program ... ", (int) kpair.second); fflush (stdout);
 	
 	try {
 
-		cl::Program::Sources cps (1, std::make_pair(ksrc.c_str(), ksize));
+		cl::Program::Sources cps (1, kpair);
 		m_prg = cl::Program(m_ctxt, cps);
 	
 	} catch (cl::Error cle) {
 		printf("ERROR: %s(%s)\n", cle.what(), ErrorString (cle.err()));
 	}
-	
-	printf("build program\n");
+
+	printf ("done.\n    Builing program ... "); fflush (stdout);
 	
 	try {
 
 		m_error = m_prg.build(m_devs);
 	
-	} catch (cl::Error er) {
-		printf("m_prg.build: %s\n", ErrorString (er.err()));
+	} catch (cl::Error cle) {
+
+		printf("     FAILED. Check logfile!\n");
+
+		std::cout << "Build Status: "   << m_prg.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(m_devs[0])  << std::endl;
+		std::cout << "Build Options:\t" << m_prg.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS>(m_devs[0]) << std::endl;
+		std::cout << "Build Log:\t "    << m_prg.getBuildInfo<CL_PROGRAM_BUILD_LOG>(m_devs[0])     << std::endl;
+
 	}
 	
-	printf("done building program\n");
-
-	std::cout << "Build Status: "   << m_prg.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(m_devs[0])  << std::endl;
-	std::cout << "Build Options:\t" << m_prg.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS>(m_devs[0]) << std::endl;
-	std::cout << "Build Log:\t "    << m_prg.getBuildInfo<CL_PROGRAM_BUILD_LOG>(m_devs[0])     << std::endl;
+	printf("done.\n");
 	
+    printf ("    Making kernel ... ");  fflush(stdout);
+	
+	// Initialise kernel from program
+    try {
+        m_kernel = cl::Kernel(m_prg, "GPUSimulator", &m_error);
+    } catch (cl::Error cle) {
+        printf("ERROR: %s(%s)\n", cle.what(), ErrorString (cle.err()));
+    }
+	
+	printf ("done.\n"); fflush(stdout);
+
 }
 
 
 
 void
 GPUSimulator::Simulate     () {
+
+	SetDeviceData ();
+	RunKernel ();
+	GetDeviceData ();
+
+}
+
+
+
+void 
+GPUSimulator::SetDeviceData () {
+
+	ocl_tb1 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) * m_sb->tb1->Size(), NULL, &m_error);
+	ocl_sb1 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) * m_sb->sb1->Size(), NULL, &m_error);
+	ocl_agr = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) * m_sb->agr->Size(), NULL, &m_error);
+	ocl_tr  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->tr->Size(), NULL, &m_error);
+	ocl_sr  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->sr->Size(), NULL, &m_error);
+	ocl_tb0 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) * m_sb->tb0->Size(), NULL, &m_error);
+	ocl_sb0 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) * m_sb->sb0->Size(), NULL, &m_error);
+	ocl_tm  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->tm->Size(), NULL, &m_error);
+	ocl_sm  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->sm->Size(), NULL, &m_error);
+	ocl_jac = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) * m_sb->jac->Size(), NULL, &m_error);
+	ocl_gdt = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float)                    , NULL, &m_error);
+	ocl_nt  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(  int)                    , NULL, &m_error);
+	ocl_nc  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(  int)                    , NULL, &m_error);
+	ocl_rf  = cl::Buffer(m_ctxt, CL_MEM_WRITE_ONLY, 2 * sizeof(float) *       m_nc * m_nt, NULL, &m_error);
+    ocl_m   = cl::Buffer(m_ctxt, CL_MEM_WRITE_ONLY,     sizeof(float) *  m_sb->sm->Size(), NULL, &m_error);
+
+}
+
+
+void 
+GPUSimulator::GetDeviceData () {
+
+	
+
+}
+
+
+void 
+GPUSimulator::RunKernel () {
+
+	
+
+}
+
+
 
 	/*
 	ticks            tic  = getticks();
@@ -121,22 +217,10 @@ GPUSimulator::Simulate     () {
 	printf (" done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	*/
 	
-}
 
 
 void 
 GPUSimulator::Prepare() {
-
-    printf ("    Preparing kernel ... ");  fflush(stdout);
-	
-	// Initialise kernel from program
-    try {
-        m_kernel = cl::Kernel(m_prg, "GPUSimulator", &m_error);
-    } catch (cl::Error cle) {
-        printf("ERROR: %s(%d)\n", cle.what(), cle.err());
-    }
-	
-	printf ("done.\n"); fflush(stdout);
 
 }
 

@@ -21,6 +21,9 @@
 #ifndef __SIMULATION_STRATEGY_HPP__
 #define __SIMULATION_STRATEGY_HPP__
 
+#define GAMMARAD 2.6753e3
+#define TWOPI	 6.283185
+
 #include "../common.h"
 #include "Matrix.hpp"
 

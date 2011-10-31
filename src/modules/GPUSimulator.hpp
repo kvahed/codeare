@@ -36,6 +36,8 @@
 
 #include "cl.hpp"
 
+#define MAXDEVS 1
+
 namespace RRStrategy {
 	
 
@@ -110,29 +112,59 @@ namespace RRStrategy {
 		BuildProgram    (std::string ksrc);
 		
 
-        unsigned int            m_dev;    /**!<   */
-		std::vector<cl::Device> m_devs;   /**!<   */
-        cl::Context             m_ctxt;   /**!<   */
-        cl::CommandQueue        m_cmdq;   /**!<   */
-        cl::Program             m_prg;    /**!<   */
-        cl_int                  m_error;  /**!<   */
-        cl::Event               m_event;  /**!<   */
-        cl::Kernel              m_kernel; /**!<   */
+		/**
+		 *  @brief       Allocate memory on device and copy data
+		 */
+		void 
+		SetDeviceData   ();
+		
+
+		/**
+		 *  @brief       Run kernel
+		 */
+		void 
+		RunKernel       ();
+		
+
+		/**
+		 *  @brief       Get data back from device and clean up
+		 */
+		void 
+		GetDeviceData   ();
+		
+
+        unsigned int              m_dev;    /**!<   */
+		std::vector<cl::Device>   m_devs;   /**!<   */
+        cl::Context               m_ctxt;   /**!<   */
+        cl::CommandQueue          m_cmdq[MAXDEVS];   /**!<   */
+        cl::Program               m_prg;    /**!<   */
+        cl_int                    m_error;  /**!<   */
+        cl::Event                 m_event;  /**!<   */
+        cl::Kernel                m_kernel; /**!<   */
 
 		// RO device
-		cl::Buffer              ocl_txm;
-		cl::Buffer              ocl_rxm;
-		cl::Buffer              ocl_gr;
-		cl::Buffer              ocl_tm0;
-		cl::Buffer              ocl_sm0;
-		cl::Buffer              ocl_tb0;
-		cl::Buffer              ocl_sb0;
-		cl::Buffer              ocl_rr;
-		cl::Buffer              ocl_sr;
+		cl::Buffer                ocl_tb1;
+		cl::Buffer                ocl_sb1;
+		cl::Buffer                ocl_agr;
+		cl::Buffer                ocl_tr;
+		cl::Buffer                ocl_sr;
+		cl::Buffer                ocl_tb0;
+		cl::Buffer                ocl_sb0;
+		cl::Buffer                ocl_tm;
+		cl::Buffer                ocl_sm;
+		cl::Buffer                ocl_jac;
+		cl::Buffer                ocl_gdt;
+		cl::Buffer                ocl_nt;
+		cl::Buffer                ocl_nc;
 
 		// RW on device
-		cl::Buffer              ocl_rf;
-		cl::Buffer              ocl_m;
+		cl::Buffer                ocl_rf;
+		cl::Buffer                ocl_m;
+
+		float                     m_gdt;
+		size_t                    m_nt;
+		size_t                    m_nc;
+
 
 	};
 

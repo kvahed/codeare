@@ -140,11 +140,8 @@ PhaseCorrection (Matrix<cplx>& target, const Matrix<cplx>& result) {
 
 #pragma omp parallel default (shared) 
     {
-        
-        int tid      = omp_get_thread_num();
-        int chunk    = n / omp_get_num_threads();
-        
-#pragma omp for schedule (dynamic, chunk)
+
+#pragma omp for schedule (guided, 100)
 
         for (size_t i = 0; i < n; i++) 
             target[i] = (abs(target[i]) > 0) ? abs(target[i]) * result[i] / abs(result[i]) :  cplx(0,0);    
@@ -215,15 +212,11 @@ STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cplx>& b1, 
 
     cplx pgd = cplx (0, 2.0 * PI * 4.2576e7 * 1.0e-5); 
 
+	// pTX STA 
 #pragma omp parallel default (shared) 
     {
-        
-        int tid      = omp_get_thread_num();
-        int chunk    = nc / omp_get_num_threads();
-        
-#pragma omp for// schedule (dynamic, chunk)
-        
-		// pTX STA 
+
+#pragma omp for schedule (guided, 1)
         for (int c = 0; c < nc; c++) 
             for (int k = 0; k < nk; k++) 
                 for (int s = 0; s < ns; s++) 
