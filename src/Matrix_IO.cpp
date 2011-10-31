@@ -728,6 +728,8 @@ bool Matrix<T>::MXDump (MATFile* mf, const string dname, const string dloc) cons
 
 	if      (typeid(T) == typeid(double))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
+	else if (typeid(T) == typeid(float))
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS,    mxREAL);
 	else if (typeid(T) == typeid(cplx))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
 	else if (typeid(T) == typeid(short))
