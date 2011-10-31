@@ -51,8 +51,6 @@ namespace RRStrategy {
 		virtual
 		~SimulationContext () {
 			delete m_strategy;
-			printf ("    Shutting down simualtor\n");
-
 		}
 
 

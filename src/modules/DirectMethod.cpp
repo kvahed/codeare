@@ -55,10 +55,7 @@ DirectMethod::Init () {
 RRSModule::error_code
 DirectMethod::Finalise() {
 
-	printf ("    Finalising DirectMethod ... "); fflush (stdout);
 	ReconStrategy::Finalise();
-	printf (" done.\n");
-
     return RRSModule::OK;
 
 }

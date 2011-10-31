@@ -67,8 +67,7 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 	// Command queue used for OpenCL commands
 
 	try {
-		for (size_t i = 0; i < m_devs.size() && i < MAXDEVS; i++)
-			m_cmdq[i] = cl::CommandQueue(m_ctxt, m_devs[i], 0, &m_error);
+		m_cmdq = cl::CommandQueue(m_ctxt, m_devs[0], 0, &m_error);
     } catch (cl::Error cle) {
         printf("  ERROR: %s(%d)\n", cle.what(), cle.err());
     }
@@ -79,52 +78,36 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 }
  
 
-void 
+bool
 GPUSimulator::BuildProgram (std::string ksrc) {
 	
-
 	std::pair<const char*, unsigned> kpair = ReadClFromFile (ksrc);
 
 	printf("    OpenCL kernel size: %d\n    Assembling program ... ", (int) kpair.second); fflush (stdout);
 	
 	try {
-
 		cl::Program::Sources cps (1, kpair);
 		m_prg = cl::Program(m_ctxt, cps);
-	
 	} catch (cl::Error cle) {
-		printf("ERROR: %s(%s)\n", cle.what(), ErrorString (cle.err()));
+		printf("FAILED: %s(%s)\n", cle.what(), ErrorString (cle.err()));
+		return false;
 	}
 
 	printf ("done.\n    Builing program ... "); fflush (stdout);
 	
 	try {
-
 		m_error = m_prg.build(m_devs);
-	
+		printf("done.\n");
 	} catch (cl::Error cle) {
-
-		printf("     FAILED. Check logfile!\n");
-
+		printf("FAILED. Check logfile!\n");
 		std::cout << "Build Status: "   << m_prg.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(m_devs[0])  << std::endl;
 		std::cout << "Build Options:\t" << m_prg.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS>(m_devs[0]) << std::endl;
 		std::cout << "Build Log:\t "    << m_prg.getBuildInfo<CL_PROGRAM_BUILD_LOG>(m_devs[0])     << std::endl;
-
+		return false;
 	}
 	
-	printf("done.\n");
+	return true;
 	
-    printf ("    Making kernel ... ");  fflush(stdout);
-	
-	// Initialise kernel from program
-    try {
-        m_kernel = cl::Kernel(m_prg, "GPUSimulator", &m_error);
-    } catch (cl::Error cle) {
-        printf("ERROR: %s(%s)\n", cle.what(), ErrorString (cle.err()));
-    }
-	
-	printf ("done.\n"); fflush(stdout);
-
 }
 
 
@@ -132,6 +115,7 @@ GPUSimulator::BuildProgram (std::string ksrc) {
 void
 GPUSimulator::Simulate     () {
 
+	PrepareKernel();
 	SetDeviceData ();
 	RunKernel ();
 	GetDeviceData ();
@@ -140,8 +124,28 @@ GPUSimulator::Simulate     () {
 
 
 
+bool
+GPUSimulator::PrepareKernel () {
+	
+    printf ("    Forming kernel ... ");  fflush(stdout);
+	
+    try {
+        m_kernel = cl::Kernel(m_prg, "Simulate", &m_error);
+		printf ("done.\n"); fflush(stdout);
+    } catch (cl::Error cle) {
+        printf("FAILED: %s(%s)\n", cle.what(), ErrorString (cle.err()));
+		return false;
+    }
+
+	return true;	
+
+}
+
+
 void 
 GPUSimulator::SetDeviceData () {
+
+    printf("  Creating device arrays ... ");  fflush(stdout);
 
 	ocl_tb1 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) * m_sb->tb1->Size(), NULL, &m_error);
 	ocl_sb1 = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) * m_sb->sb1->Size(), NULL, &m_error);
@@ -158,6 +162,33 @@ GPUSimulator::SetDeviceData () {
 	ocl_nc  = cl::Buffer(m_ctxt,  CL_MEM_READ_ONLY,     sizeof(  int)                    , NULL, &m_error);
 	ocl_rf  = cl::Buffer(m_ctxt, CL_MEM_WRITE_ONLY, 2 * sizeof(float) *       m_nc * m_nt, NULL, &m_error);
     ocl_m   = cl::Buffer(m_ctxt, CL_MEM_WRITE_ONLY,     sizeof(float) *  m_sb->sm->Size(), NULL, &m_error);
+
+	printf("done.\n  Pushing data to device ... ");  fflush(stdout);
+
+	Matrix<float> tmp;
+
+	
+    m_error = m_cmdq.enqueueWriteBuffer(ocl_tb1, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->tb1->Size(), &m_sb->tb1->At(0),  NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer(ocl_sb1, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->sb1->Size(), &m_sb->sb1->At(0),  NULL, &m_event);
+	
+	tmp = (Matrix<float>) (*(m_sb->agr));
+    m_error = m_cmdq.enqueueWriteBuffer(ocl_agr, CL_TRUE, 0,     sizeof(float) *  m_sb->agr->Size(),          &tmp[0],  NULL, &m_event);
+
+	tmp = (Matrix<float>) (*(m_sb->tr));
+    m_error = m_cmdq.enqueueWriteBuffer( ocl_tr, CL_TRUE, 0,     sizeof(float) *   m_sb->tr->Size(),          &tmp[0],   NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer( ocl_sr, CL_TRUE, 0,     sizeof(float) *   m_sb->sr->Size(), &m_sb->sr->At(0),   NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer(ocl_tb0, CL_TRUE, 0,     sizeof(float) *  m_sb->tb0->Size(), &m_sb->tb0->At(0),  NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer(ocl_sb0, CL_TRUE, 0,     sizeof(float) *  m_sb->sb0->Size(), &m_sb->sb0->At(0),  NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer( ocl_tm, CL_TRUE, 0,     sizeof(float) *   m_sb->tm->Size(), &m_sb->tm->At(0),   NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer( ocl_sm, CL_TRUE, 0,     sizeof(float) *   m_sb->sm->Size(), &m_sb->sm->At(0),   NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer(ocl_jac, CL_TRUE, 0,     sizeof(float) *  m_sb->jac->Size(), &m_sb->jac->At(0),  NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer(ocl_gdt, CL_TRUE, 0,     sizeof(float)                     , &m_gdt,             NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer( ocl_nt, CL_TRUE, 0,     sizeof(int)                       , &m_nt,              NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer( ocl_nt, CL_TRUE, 0,     sizeof(int)                       , &m_nc,              NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer( ocl_rf, CL_TRUE, 0, 2 * sizeof(float) *   m_sb->rf->Size(), &m_sb->rf->At(0),   NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer(  ocl_m, CL_TRUE, 0,     sizeof(float) * m_sb->magn->Size(), &m_sb->magn->At(0), NULL, &m_event);
+
+	printf ("done.\n");
 
 }
 
@@ -177,52 +208,6 @@ GPUSimulator::RunKernel () {
 
 }
 
-
-
-	/*
-	ticks            tic  = getticks();
-
-	size_t           nr   =   r.Dim(1);
-	size_t           ntxc = txm.Dim(1);
-	size_t           nrxc = rxm.Dim(1);
-	size_t           nt   =  gr.Dim(1);
-	
-	printf ("    Allocating device RAM ... "); fflush(stdout);
-	
-    //cl_txm    = cl::Buffer(context, CL_MEM_READ_ONLY, txm.Size(), NULL, &m_error);
-    //cl_rxm    = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
-    //cl_m0     = cl::Buffer(context, CL_MEM_READ_ONLY,  m0.Size(), NULL, &m_error);
-    //cl_sample = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
-    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
-    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
-    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
-    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
-    //cl_rxm = cl::Buffer(context, CL_MEM_READ_ONLY, rxm.Size(), NULL, &m_error);
-
-
-
-	// Anything to do? ----------------
-	
-	if (gr.Size() < 1 || r.Size() < 1) {
-		std::cout << "  Bailing out: %i Gradient step for %i isochromats? I don't think so!\n" << std::endl;
-		return;
-	}
-	// --------------------------------
-	
-	Matrix<cplx> mres;
-	
-	if (!exc)
-		mres = Matrix<cplx> (res.Dim(0), res.Dim(1), np);
-	
-	printf (" done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-	*/
-	
-
-
-void 
-GPUSimulator::Prepare() {
-
-}
 
 
 char* 
