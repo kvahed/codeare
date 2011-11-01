@@ -24,9 +24,6 @@ std::pair<const char*, unsigned> ReadCLFromFile (std::string fname) {
 	
 	in.close();
 	
-	//std::cout << src << std::endl;
-	//std::cout << "Size is " << src.length() << std::endl;
-	
 	return std::make_pair(src.c_str(), src.length());
 
 }
@@ -39,7 +36,9 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 	m_gdt = GAMMARAD * m_sb->dt;
 	m_nt  = m_sb->agr->Dim(1);      // Time points
 	m_nc  = m_sb->tb1->Dim(1);     // # channels
-	m_nr  = m_sb->sr->Dim(1); 
+	m_ne  = m_sb->sr->Dim(1); 
+	m_na  = m_sb->tr->Dim(1);
+	m_nl  = 16;
 
 	printf ("  Intialising GPU device & context ...\n");
 
@@ -159,8 +158,7 @@ GPUSimulator::SetDeviceData () {
 	ocl_sm  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *   m_sb->sm->Size(), NULL, &m_error);
 	ocl_jac = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->jac->Size(), NULL, &m_error);
 	ocl_gdt = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float)                     , NULL, &m_error);
-	ocl_nt  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(  int)                     , NULL, &m_error);
-	ocl_nc  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(  int)                     , NULL, &m_error);
+	ocl_n  = cl::Buffer  (m_ctxt,  CL_MEM_READ_ONLY, 4 * sizeof(  int)                     , NULL, &m_error);
 	ocl_rf  = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY, 2 * sizeof(float) *   m_sb->rf->Size(), NULL, &m_error);
     ocl_m   = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY,     sizeof(float) * m_sb->magn->Size(), NULL, &m_error);
 
@@ -180,8 +178,10 @@ GPUSimulator::SetDeviceData () {
     m_error = m_cmdq.enqueueWriteBuffer ( ocl_sm, CL_TRUE, 0,     sizeof(float) *   m_sb->sm->Size(),   &m_sb->sm->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer (ocl_jac, CL_TRUE, 0,     sizeof(float) *  m_sb->jac->Size(),  &m_sb->jac->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer (ocl_gdt, CL_TRUE, 0,     sizeof(float)                     ,             &m_gdt, NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer ( ocl_nt, CL_TRUE, 0,     sizeof(int)                       ,              &m_nt, NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer ( ocl_nc, CL_TRUE, 0,     sizeof(int)                       ,              &m_nc, NULL, &m_event);
+	
+	unsigned n[4] = {m_nt, m_nc, m_na, m_ne};
+    m_error = m_cmdq.enqueueWriteBuffer (  ocl_n, CL_TRUE, 0,     sizeof(int)                       ,              &n[0], NULL, &m_event);
+
     m_error = m_cmdq.enqueueWriteBuffer ( ocl_rf, CL_TRUE, 0, 2 * sizeof(float) *   m_sb->rf->Size(),   &m_sb->rf->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer (  ocl_m, CL_TRUE, 0,     sizeof(float) * m_sb->magn->Size(), &m_sb->magn->At(0), NULL, &m_event);
 
@@ -196,10 +196,9 @@ GPUSimulator::SetDeviceData () {
 	m_error = m_kernel.setArg( 8, ocl_sm );
 	m_error = m_kernel.setArg( 9, ocl_jac);
 	m_error = m_kernel.setArg(10, ocl_gdt);
-	m_error = m_kernel.setArg(11, ocl_nt );
-	m_error = m_kernel.setArg(12, ocl_nc );
-	m_error = m_kernel.setArg(13, ocl_rf );
-	m_error = m_kernel.setArg(14, ocl_m  );
+	m_error = m_kernel.setArg(11, ocl_n );
+	m_error = m_kernel.setArg(12, ocl_rf );
+	m_error = m_kernel.setArg(13, ocl_m  );
 
     m_cmdq.finish();
 
@@ -222,7 +221,7 @@ GPUSimulator::RunKernel () {
 
 	printf("  Running kernel ... \n"); fflush (stdout);
 	
-    m_error = m_cmdq.enqueueNDRangeKernel (m_kernel, cl::NullRange, cl::NDRange(m_nr), cl::NDRange(m_nl), NULL, &m_event); 
+    m_error = m_cmdq.enqueueNDRangeKernel (m_kernel, cl::NullRange, cl::NDRange(m_ne), cl::NDRange(m_nl), NULL, &m_event); 
     printf("[clEnqueueNDRangeKernel: %s]", ErrorString(m_error));
 	
     m_cmdq.finish();

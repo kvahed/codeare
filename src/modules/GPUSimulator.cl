@@ -50,6 +50,8 @@ void Rotate (const float* n, float* r)  {
 }
 
 
+
+
 void SimulateAcq (const float* rxm, const float*  gr, const float* r, 
 				  const float*   m, const float* b0m, const float* dt, 
 				  const int*   pos,       float* sig) {
@@ -106,14 +108,17 @@ void SimulateAcq (const float* rxm, const float*  gr, const float* r,
 
 }
 
+
+
+
 void SimulateExc  (const float* txm, const float*  gr, const float* rf, 
 				   const float*   r, const float* b0m, const float* dt, 
 				   const int*   pos,       float*   m) {
 
+	uint nd = 3;
+
 	uint nt = n[0]; /* time points */
 	uint nc = n[1]; /* channels    */
-	uint nr = n[3]; /* Exc sites   */
-	uint nd = 3;
 
     float nv [nd];    /* Rotation axis        */
 	float rm [nd*nd]; /* Rotation matrix      */
@@ -171,8 +176,7 @@ void SimulateExc  (const float* txm, const float*  gr, const float* rf,
 
 
 
-void ReduceSignals (const float* data, volatile float* rdata) {
-}
+void ReduceSignals (const float* data, volatile float* rdata) { }
 
 
 __kernel void Simulate     (__global const float* rxm, __global const    float* txm, 
@@ -181,8 +185,6 @@ __kernel void Simulate     (__global const float* rxm, __global const    float* 
 							__global const float* sb0, __global const    float*  tm,
 							__global const float*  sm, __global const    float* jac, 
 							__global const float* gdt, __global const      int*   n,
-							__global const int*    nc, __global const      int*  nr,
-							__global const int*    
 							__global       float*  rf, __global          float*   m) 
 {
 
@@ -190,17 +192,22 @@ __kernel void Simulate     (__global const float* rxm, __global const    float* 
 	uint igr = get_group_id (0);
 	uint ilc = get_local_id (0);
 
+	uint nt = n[3]; /* # timepoints  */
+	uint nc = n[3]; /* # channels    */
+	uint na = n[3]; /* # Acq sites   */
+	uint ne = n[3]; /* # Exc sites   */
+
 	__local float[nt*nc] sig;
 
 	SimulateAcq (rxm, gr, tr, tm, tb0, gdt, igl, n, sig);
 	
 	barrier(CLK_LOCAL_MEM_FENCE);
 
-	ReduceSignals();
+	//ReduceSignals();
 
-	barrier(CLK_LOCAL_MEM_FENCE); 
+	//barrier(CLK_LOCAL_MEM_FENCE); 
 
-	SimulateExc (txm, gr, rf, sr, sb0, gdt, igl, n, m);
+	//SimulateExc (txm, gr, rf, sr, sb0, gdt, igl, n, m);
 
 }
 
