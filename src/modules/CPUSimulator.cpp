@@ -71,18 +71,18 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>& gr, const Matrix<floa
     Matrix<cplx>  ls  (nc,1);  // Local sensitivity
     
     for (size_t c = 0; c < nc; c++) 
-        ls[c] = conj(b1.At(pos,c));
+        ls[c] = conj(b1(pos,c));
     
     for (size_t i = 0; i <  3; i++) {
-        lr[i] =      r.At(i,pos);
-        lm[i] =      m0.At(i,pos); 
+        lr[i] = r(i,pos);
+        lm[i] = m0(i,pos); 
     }
 
     // Run over time points
     for (size_t t = 0; t < nt; t++) {
 
         // Rotate magnetisation (only gradients)
-        n[2] = gdt * (gr.At(X,t)*lr[X] + gr.At(Y,t)*lr[Y] + gr.At(Z,t)*lr[Z] + b0.At(pos)*TWOPI);
+        n[2] = gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] + b0.At(pos)*TWOPI);
         
         Rotate (n, rot);
         
@@ -95,9 +95,11 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>& gr, const Matrix<floa
         lm[2]  = tmp[2];
         
         // Weighted contribution to all coils
+		cplx mxy = cplx(lm[X],lm[Y]); 
+
         for (size_t c = 0; c < nc; c++)
-            sig.At(t,c,tid) += cplx(ls[c].real()*lm[X], ls[c].imag()*lm[Y]);
-        
+            sig.At(t,c,tid) += ls[c]*mxy;
+
     }
 
 }
@@ -132,7 +134,7 @@ SimulateExc  (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix< cpl
         
         cplx rfs = cplx (0.0,0.0);
         
-        for (size_t i = 0; i < nc; i++)    rfs += rf(rt,i)*ls[i];
+        for (size_t i = 0; i < nc; i++) rfs += rf(rt,i)*ls[i];
         
         n[0] = gdt * -rfs.real();
         n[1] = gdt *  rfs.imag();
@@ -162,6 +164,7 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
     m_sb  = sb;
 
     m_sig = Matrix<cplx> (m_sb->rf->Dim(0), m_sb->rf->Dim(1), m_sb->np);
+
     m_gdt = GAMMARAD * m_sb->dt;
     m_nt  = m_sb->agr->Dim(1);      // Time points
     m_nc  = m_sb->tb1->Dim(1);     // # channels
@@ -228,10 +231,10 @@ CPUSimulator::Simulate (const bool& mode) {
                              i, omp_get_thread_num(), m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, m_sig);
 
 #pragma omp for  schedule (guided)
-            for (size_t i = 0; i < m_nt; i++) {
+            for (size_t i = 0; i < m_nt*m_nc; i++) {
                 m_sb->rf->At(i) = cplx(0.0,0.0);
                 for (int p = 0; p < m_sb->np; p++)
-                    m_sb->rf->At(i) += m_sig[p*m_nt+i];
+                    m_sb->rf->At(i) += m_sig[p*m_nt*m_nc+i];
                 m_sb->rf->At(i) /= (float)nr;
             }
 

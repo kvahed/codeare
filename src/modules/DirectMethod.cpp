@@ -70,7 +70,8 @@ DirectMethod::Process     () {
     ticks           start  = getticks();
 
     // Intensity correction for single run
-    if (m_ic) IntensityCorrection (GetCplx("b1m"), GetFloat("target"));
+    if (m_ic) 
+		IntensityCorrection (GetCplx("b1m"), GetFloat("target"));
 
     sb.tb1  = m_cplx["b1m"];
     sb.sb1  = m_cplx["b1p"];
