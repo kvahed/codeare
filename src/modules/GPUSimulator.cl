@@ -50,14 +50,14 @@ void Rotate (const float* n, float* r)  {
 }
 
 
-void SimulateRecv (const float* rxm, const float*  gr, const float* r, 
-				   const float*   m, const float* b0m, const float* dt, 
-				   const int*   pos,       float* sig) {
+void SimulateAcq (const float* rxm, const float*  gr, const float* r, 
+				  const float*   m, const float* b0m, const float* dt, 
+				  const int*   pos,       float* sig) {
+
+	uint nd = 3;
 
 	uint nt = n[0]; /* time points */
 	uint nc = n[1]; /* channels    */
-	uint nr = n[2]; /* Acq sites   */
-	uint nd = 3;
 
 	float nv [nd];
 	float rm [nd*nd];
@@ -81,20 +81,22 @@ void SimulateRecv (const float* rxm, const float*  gr, const float* r,
 
     for (size_t t = 0; t < nt; t++) {
 
-        // Rotate magnetisation (only gradients)
+        /* Acquisition: only gradients! */
         nv[2] = gdt * (gr[nd*t+0]*lr[0] + gr[nd*t+1]*lr[1] + gr[nd*t+2]*lr[2] + b0[pos]*TWOPI);
         
-        Rotate (n, rm);
+		/* Calculate rotation */
+        Rotate (nv, rm);
         
+		/* Update m */
         tmp[0] = rm[0]*lm[0] + rm[3]*lm[1] + rm[6]*lm[2];
         tmp[1] = rm[1]*lm[0] + rm[4]*lm[1] + rm[7]*lm[2];
         tmp[2] = rm[2]*lm[0] + rm[5]*lm[1] + rm[8]*lm[2];
         
-        lm[0]  = tmp[0];
-        lm[1]  = tmp[1];
-        lm[2]  = tmp[2];
+        lm [0] = tmp[0];
+        lm [1] = tmp[1];
+        lm [2] = tmp[2];
         
-        // Weighted contribution to all coils
+        /* Weighted signal */
         for (size_t c = 0; c < nc; c++) {
             sig[t + 2*nc*c    ] += ls[c][0]*lm[0];
 			sig[t + 2*nc*c + 1] += ls[c][1]*lm[1]
@@ -113,13 +115,13 @@ void SimulateExc  (const float* txm, const float*  gr, const float* rf,
 	uint nr = n[3]; /* Exc sites   */
 	uint nd = 3;
 
-    float nv [nd];    // Rotation axis
-    float rm [nd*nd]; // Rotation matrix
-    float ml [nd];    // Local magnetisation
-    float tmp[3];     // Local magnetisation
-    float lr [3];     // Local spatial vector
-    float ls [nc][2]; // Local sensitivity
-	float rfs[2];
+    float nv [nd];    /* Rotation axis        */
+	float rm [nd*nd]; /* Rotation matrix      */
+    float ml [nd];    /* Local magnetisation  */
+    float tmp[3];     /* Temp magnetisation   */
+    float lr [3];     /* Local spatial vector */
+    float ls [nc][2]; /* Local sensitivities  */
+	float rfs[2];     /* Local composite RF   */
 
     for (uint i = 0; i < nd; i++) lr[i] = r  (i,pos);
 
@@ -141,23 +143,19 @@ void SimulateExc  (const float* txm, const float*  gr, const float* rf,
 		rfs[1] = 0.0;
         
         for (size_t i = 0; i < nc; i++) {
-			a = rf[rt + i*nt*2  ];
-			b = rf[rt + i*nt*2+1];
-			c = ls[c][0];
-			d = ls[c][1];
-			rfs[0] += rf[rt + i*nt*2  ] * ;
-			rfs[1] += rf[rt + i*nt*2+1];
+			rfs[0] += (rf[rt + i*nt*2  ] * ls[c][0] - rf[rt + i*nt*2+1] * ls[c][1]);
+			rfs[1] += (rf[rt + i*nt*2+1] * ls[c][0] + rf[rt + i*nt*2  ] * ls[c][1]);
 		}
 
-        n[0] = gdt * -rfs.real();
-        n[1] = gdt *  rfs.imag();
-        n[2] = gdt * (- gr(X,rt) * lr[X] - gr(Y,rt) * lr[Y] - gr(Z,rt) * lr[Z] + b0(pos)*TWOPI);
+        n[0] = gdt * -rfs[0];
+        n[1] = gdt *  rfs[1];
+        n[2] = gdt * (- gr(rt*nd+0) * lr[0] - gr(rt*nd+1) * lr[1] - gr(rt*nd+2) * lr[2] + b0[pos]*TWOPI);
         
-        Rotate (n, rot);
+        Rotate (nv, rm);
         
-        tmp[X] = rot[0]*ml[X] + rot[3]*ml[Y] + rot[6]*ml[Z];
-        tmp[Y] = rot[1]*ml[X] + rot[4]*ml[Y] + rot[7]*ml[Z];
-        tmp[Z] = rot[2]*ml[X] + rot[5]*ml[Y] + rot[8]*ml[Z];
+        tmp[0] = rm[0]*ml[0] + rm[3]*ml[1] + rm[6]*ml[2];
+        tmp[1] = rm[1]*ml[0] + rm[4]*ml[1] + rm[7]*ml[2];
+        tmp[2] = rm[2]*ml[0] + rm[5]*ml[1] + rm[8]*ml[2];
         
         ml[X]  = tmp[0];
         ml[Y]  = tmp[1];
@@ -165,21 +163,12 @@ void SimulateExc  (const float* txm, const float*  gr, const float* rf,
         
     }
     
-    m(X,pos) = ml[X];
-    m(Y,pos) = ml[Y];
-    m(Z,pos) = ml[Z]; 
-    
-
-	uint nc = n[1]; /* channels    */
-	uint nr = n[3]; /* Exc sites   */
-
-
-for (uint i = 0; i <  3; i++) lr[i] = r  [i + pos*nd];
-    for (uint i = 0; i < nc; i++) ls[i] = b1 [i + pos*nc];
-
-    ml[Z] = 1.0;
+    m[pos*nd  ] = ml[0];
+    m[pos*nd+1] = ml[1];
+    m[pos*nd+2] = ml[2]; 
 
 }
+
 
 
 void ReduceSignals (const float* data, volatile float* rdata) {

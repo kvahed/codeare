@@ -82,7 +82,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>& gr, const Matrix<floa
     for (size_t t = 0; t < nt; t++) {
 
         // Rotate magnetisation (only gradients)
-        n[2] = gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] + b0.At(pos)*TWOPI);
+        n[2] = gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] + b0[pos]*TWOPI);
         
         Rotate (n, rot);
         
@@ -138,7 +138,7 @@ SimulateExc  (const Matrix<cplx>& b1, const Matrix<float>& gr, const Matrix< cpl
         
         n[0] = gdt * -rfs.real();
         n[1] = gdt *  rfs.imag();
-        n[2] = gdt * (- gr(X,rt) * lr[X] - gr(Y,rt) * lr[Y] - gr(Z,rt) * lr[Z] + b0(pos)*TWOPI);
+        n[2] = gdt * (- gr(X,rt) * lr[X] - gr(Y,rt) * lr[Y] - gr(Z,rt) * lr[Z] + b0[pos]*TWOPI);
         
         Rotate (n, rot);
         
