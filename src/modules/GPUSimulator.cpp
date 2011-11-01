@@ -222,7 +222,7 @@ GPUSimulator::RunKernel () {
 
 	printf("  Running kernel ... \n"); fflush (stdout);
 	
-    m_error = m_cmdq.enqueueNDRangeKernel (m_kernel, cl::NullRange, cl::NDRange(m_nr), cl::NullRange, NULL, &m_event); 
+    m_error = m_cmdq.enqueueNDRangeKernel (m_kernel, cl::NullRange, cl::NDRange(m_nr), cl::NDRange(m_nl), NULL, &m_event); 
     printf("[clEnqueueNDRangeKernel: %s]", ErrorString(m_error));
 	
     m_cmdq.finish();
