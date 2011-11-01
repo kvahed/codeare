@@ -52,30 +52,30 @@ void Rotate (const float* n, float* r)  {
 
 
 
-void SimulateAcq (const float* rxm, const float*  gr, const float* r, 
-				  const float*   m, const float* b0m, const float* dt, 
-				  const int*   pos,       float* sig) {
-
-	uint nd = 3;
+void SimulateAcq (__global const float* rxm, __global const float*  gr, __global const float*   r, 
+				  __global const float*   m, __global const float*  b0, const float  gdt, 
+				  const uint   pos, __global const uint*    n, __local float* sig) {
 
 	uint nt = n[0]; /* time points */
 	uint nc = n[1]; /* channels    */
 
-	float nv [nd];
-	float rm [nd*nd];
-	float ml [nd];
-	float tmp[nd];
-	float lr [nd];
-	float ls [nc][2];
+	float TWOPI = 6.283185307;
+
+	float nv [3];
+	float rm [3*3];
+	float lm [3];
+	float tmp[3];
+	float lr [3];
+	float ls [8][2];
 
     for (uint c = 0; c < nc; c++)  {
         ls[c][0] = rxm[2*pos*nc + c];
         ls[c][1] = rxm[2*pos*nc + c + 1];
 	}
     
-    for (size_t i = 0; i <  nd; i++) {
-        lr[i] = r[i + pos*nd];
-        lm[i] = m[i + pos*nd]; 
+    for (size_t i = 0; i <  3; i++) {
+        lr[i] = r[i + pos*3];
+        lm[i] = m[i + pos*3]; 
     }
 
 	nv[0] = 0.0;
@@ -84,7 +84,7 @@ void SimulateAcq (const float* rxm, const float*  gr, const float* r,
     for (size_t t = 0; t < nt; t++) {
 
         /* Acquisition: only gradients! */
-        nv[2] = gdt * (gr[nd*t+0]*lr[0] + gr[nd*t+1]*lr[1] + gr[nd*t+2]*lr[2] + b0[pos]*TWOPI);
+        nv[2] = gdt * (gr[3*t+0]*lr[0] + gr[3*t+1]*lr[1] + gr[3*t+2]*lr[2] + b0[pos]*TWOPI);
         
 		/* Calculate rotation */
         Rotate (nv, rm);
@@ -101,7 +101,7 @@ void SimulateAcq (const float* rxm, const float*  gr, const float* r,
         /* Weighted signal */
         for (size_t c = 0; c < nc; c++) {
             sig[t + 2*nc*c    ] += ls[c][0]*lm[0];
-			sig[t + 2*nc*c + 1] += ls[c][1]*lm[1]
+			sig[t + 2*nc*c + 1] += ls[c][1]*lm[1];
 		}
         
     }
@@ -112,33 +112,33 @@ void SimulateAcq (const float* rxm, const float*  gr, const float* r,
 
 
 void SimulateExc  (const float* txm, const float*  gr, const float* rf, 
-				   const float*   r, const float* b0m, const float* dt, 
-				   const int*   pos,       float*   m) {
-
-	uint nd = 3;
+				   const float*   r, const float*  b0, const float gdt, 
+				   const uint   pos, const uint*    n,      float*   m) {
 
 	uint nt = n[0]; /* time points */
 	uint nc = n[1]; /* channels    */
 
-    float nv [nd];    /* Rotation axis        */
-	float rm [nd*nd]; /* Rotation matrix      */
-    float ml [nd];    /* Local magnetisation  */
+	float TWOPI = 6.283185307;
+
+    float nv [3];    /* Rotation axis        */
+	float rm [3*3]; /* Rotation matrix      */
+    float lm [3];    /* Local magnetisation  */
     float tmp[3];     /* Temp magnetisation   */
     float lr [3];     /* Local spatial vector */
-    float ls [nc][2]; /* Local sensitivities  */
+    float ls [8][2]; /* Local sensitivities  */
 	float rfs[2];     /* Local composite RF   */
 
-    for (uint i = 0; i < nd; i++) lr[i] = r  (i,pos);
+    for (uint i = 0; i < 3; i++) lr[i] = r[i+pos*3];
 
     for (uint i = 0; i < nc; i++) {
-		ls[c][0] = txm[2*pos*nc + c];
-        ls[c][1] = txm[2*pos*nc + c + 1];
+		ls[i][0] = txm[2*pos*nc + i];
+        ls[i][1] = txm[2*pos*nc + i + 1];
 	}
 
 	/* Equilibrium */
-	ml[0] = 0.0;
-	ml[1] = 0.0;
-    ml[2] = 1.0;
+	lm[0] = 0.0;
+	lm[1] = 0.0;
+    lm[2] = 1.0;
     
     for (size_t t = 0; t < nt; t++) {
         
@@ -148,29 +148,29 @@ void SimulateExc  (const float* txm, const float*  gr, const float* rf,
 		rfs[1] = 0.0;
         
         for (size_t i = 0; i < nc; i++) {
-			rfs[0] += (rf[rt + i*nt*2  ] * ls[c][0] - rf[rt + i*nt*2+1] * ls[c][1]);
-			rfs[1] += (rf[rt + i*nt*2+1] * ls[c][0] + rf[rt + i*nt*2  ] * ls[c][1]);
+			rfs[0] += (rf[rt + i*nt*2  ] * ls[i][0] - rf[rt + i*nt*2+1] * ls[i][1]);
+			rfs[1] += (rf[rt + i*nt*2+1] * ls[i][0] + rf[rt + i*nt*2  ] * ls[i][1]);
 		}
 
-        n[0] = gdt * -rfs[0];
-        n[1] = gdt *  rfs[1];
-        n[2] = gdt * (- gr(rt*nd+0) * lr[0] - gr(rt*nd+1) * lr[1] - gr(rt*nd+2) * lr[2] + b0[pos]*TWOPI);
+        nv[0] = gdt * -rfs[0];
+        nv[1] = gdt *  rfs[1];
+        nv[2] = gdt * (- gr[rt*3+0] * lr[0] - gr[rt*3+1] * lr[1] - gr[rt*3+2] * lr[2] + b0[pos]*TWOPI);
         
         Rotate (nv, rm);
         
-        tmp[0] = rm[0]*ml[0] + rm[3]*ml[1] + rm[6]*ml[2];
-        tmp[1] = rm[1]*ml[0] + rm[4]*ml[1] + rm[7]*ml[2];
-        tmp[2] = rm[2]*ml[0] + rm[5]*ml[1] + rm[8]*ml[2];
+        tmp[0] = rm[0]*lm[0] + rm[3]*lm[1] + rm[6]*lm[2];
+        tmp[1] = rm[1]*lm[0] + rm[4]*lm[1] + rm[7]*lm[2];
+        tmp[2] = rm[2]*lm[0] + rm[5]*lm[1] + rm[8]*lm[2];
         
-        ml[X]  = tmp[0];
-        ml[Y]  = tmp[1];
-        ml[Z]  = tmp[2];
+        lm[0]  = tmp[0];
+        lm[1]  = tmp[1];
+        lm[2]  = tmp[2];
         
     }
     
-    m[pos*nd  ] = ml[0];
-    m[pos*nd+1] = ml[1];
-    m[pos*nd+2] = ml[2]; 
+    m[pos*3  ] = lm[0];
+    m[pos*3+1] = lm[1];
+    m[pos*3+2] = lm[2]; 
 
 }
 
@@ -179,13 +179,13 @@ void SimulateExc  (const float* txm, const float*  gr, const float* rf,
 void ReduceSignals (const float* data, volatile float* rdata) { }
 
 
-__kernel void Simulate     (__global const float* rxm, __global const    float* txm, 
-							__global const float*  gr, __global const    float*  tr, 
-							__global const float*  sr, __global const    float* tb0, 
-							__global const float* sb0, __global const    float*  tm,
-							__global const float*  sm, __global const    float* jac, 
-							__global const float* gdt, __global const      int*   n,
-							__global       float*  rf, __global          float*   m) 
+__kernel void Simulate     (__global const float* rxm, __global const float* txm, 
+							__global const float*  gr, __global const float*  tr, 
+							__global const float*  sr, __global const float* tb0, 
+							__global const float* sb0, __global const float*  tm,
+							__global const float*  sm, __global const float* jac, 
+							__global const float* gdt, __global const  uint*   n,
+							__global       float*  rf, __global       float*   m) 
 {
 
 	uint igl = get_global_id(0);
@@ -197,17 +197,14 @@ __kernel void Simulate     (__global const float* rxm, __global const    float* 
 	uint na = n[3]; /* # Acq sites   */
 	uint ne = n[3]; /* # Exc sites   */
 
-	__local float[nt*nc] sig;
+	__local float sig[3172];
 
-	SimulateAcq (rxm, gr, tr, tm, tb0, gdt, igl, n, sig);
-	
+	SimulateAcq (rxm, gr, tr, tm, tb0, gdt[0], igl, n, sig);
 	barrier(CLK_LOCAL_MEM_FENCE);
 
-	//ReduceSignals();
-
-	//barrier(CLK_LOCAL_MEM_FENCE); 
-
-	//SimulateExc (txm, gr, rf, sr, sb0, gdt, igl, n, m);
+	/*ReduceSignals();*/
+	/*barrier(CLK_LOCAL_MEM_FENCE);*/
+	/*SimulateExc (txm, gr, rf, sr, sb0, gdt, igl, n, m);*/
 
 }
 

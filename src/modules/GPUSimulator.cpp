@@ -73,8 +73,6 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
     }
 	// --------------------------------
 
-	BuildProgram ("/usr/local/lib/GPUSimulator.cl");
-
 }
  
 
@@ -115,7 +113,12 @@ GPUSimulator::BuildProgram (std::string ksrc) {
 void
 GPUSimulator::Simulate     () {
 
-	PrepareKernel();
+	if (!BuildProgram ("/usr/local/lib/GPUSimulator.cl")) 
+		return;
+
+	if (!PrepareKernel())
+		return;
+
 	SetDeviceData ();
 	RunKernel ();
 	GetDeviceData ();
@@ -158,7 +161,7 @@ GPUSimulator::SetDeviceData () {
 	ocl_sm  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *   m_sb->sm->Size(), NULL, &m_error);
 	ocl_jac = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->jac->Size(), NULL, &m_error);
 	ocl_gdt = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float)                     , NULL, &m_error);
-	ocl_n  = cl::Buffer  (m_ctxt,  CL_MEM_READ_ONLY, 4 * sizeof(  int)                     , NULL, &m_error);
+	ocl_n   = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY, 4 * sizeof(  int)                     , NULL, &m_error);
 	ocl_rf  = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY, 2 * sizeof(float) *   m_sb->rf->Size(), NULL, &m_error);
     ocl_m   = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY,     sizeof(float) * m_sb->magn->Size(), NULL, &m_error);
 
@@ -219,10 +222,10 @@ GPUSimulator::GetDeviceData () {
 void 
 GPUSimulator::RunKernel () {
 
-	printf("  Running kernel ... \n"); fflush (stdout);
+	printf("  Running kernel ... "); fflush (stdout);
 	
-    m_error = m_cmdq.enqueueNDRangeKernel (m_kernel, cl::NullRange, cl::NDRange(m_ne), cl::NDRange(m_nl), NULL, &m_event); 
-    printf("[clEnqueueNDRangeKernel: %s]", ErrorString(m_error));
+    m_error = m_cmdq.enqueueNDRangeKernel (m_kernel, cl::NullRange, cl::NDRange(m_na), cl::NullRange, NULL, &m_event); 
+    printf("FAILED: [clEnqueueNDRangeKernel: %s]", ErrorString(m_error));  fflush (stdout);
 	
     m_cmdq.finish();
 	
