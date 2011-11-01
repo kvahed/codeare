@@ -102,24 +102,31 @@ namespace RRStrategy {
      * @param  target  Target pattern
      */
     void IntensityCorrection (const Matrix<cplx>& b1maps, Matrix<float>& target) {
-
+		
         size_t nr = target.Dim(1);
         size_t nc = b1maps.Dim(1);
+		
+#pragma omp parallel
+		{		
+
         float   a;
-
-        for (size_t i = 0; i < nr; i++) {
-
-            a = 0.0;
-
-            for (size_t j = 0; j < nc; j++)
-                a += pow(abs(b1maps(i,j)),2);
-
-            target(0,i) /= a;
-            target(1,i) /= a;
-            target(2,i) /= a;
-
-        }
-
+			
+#pragma omp for schedule (guided, 64)
+			for (size_t i = 0; i < nr; i++) {
+				
+				a = 0.0;
+				
+				for (size_t j = 0; j < nc; j++)
+					a += (b1maps(i,j)*conj(b1maps(i,j))).real();
+				
+				target(0,i) /= a;
+				target(1,i) /= a;
+				target(2,i) /= a;
+				
+			}
+			
+		}
+		
     }
     
 }
