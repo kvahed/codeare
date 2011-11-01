@@ -154,8 +154,7 @@ namespace RRStrategy {
 		cl::Buffer                ocl_sm;
 		cl::Buffer                ocl_jac;
 		cl::Buffer                ocl_gdt;
-		cl::Buffer                ocl_nt;
-		cl::Buffer                ocl_nc;
+		cl::Buffer                ocl_n;
 
 		// RW on device
 		cl::Buffer                ocl_rf;
@@ -164,7 +163,9 @@ namespace RRStrategy {
 		float                     m_gdt;
 		size_t                    m_nt;
 		size_t                    m_nc;
-		size_t                    m_nr;
+		size_t                    m_na;
+		size_t                    m_ne;
+		size_t                    m_nl;
 
 
 	};
