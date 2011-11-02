@@ -148,8 +148,10 @@ GPUSimulator::PrepareKernel () {
 void 
 GPUSimulator::SetDeviceData () {
 
-    printf("  Creating device arrays ... ");  fflush(stdout);
+	unsigned n[4] = {m_nt, m_nc, m_na, m_ne};
 
+	
+    printf("  Creating device arrays ... ");  fflush(stdout);
 	ocl_tb1 = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) *  m_sb->tb1->Size(), NULL, &m_error);
 	ocl_sb1 = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) *  m_sb->sb1->Size(), NULL, &m_error);
 	ocl_agr = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *  m_sb->agr->Size(), NULL, &m_error);
@@ -163,13 +165,10 @@ GPUSimulator::SetDeviceData () {
 	ocl_gdt = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float)                     , NULL, &m_error);
 	ocl_n   = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY, 4 * sizeof(  int)                     , NULL, &m_error);
 	ocl_rf  = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY, 2 * sizeof(float) *   m_sb->rf->Size(), NULL, &m_error);
-    ocl_m   = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY,     sizeof(float) * m_sb->magn->Size(), NULL, &m_error);
+    ocl_mxy = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY, 2 * sizeof(float) *  m_sb->mxy->Size(), NULL, &m_error);
+    ocl_mz  = cl::Buffer (m_ctxt, CL_MEM_WRITE_ONLY,     sizeof(float) *   m_sb->mz->Size(), NULL, &m_error);
 
 	printf("done.\n  Pushing data to device ... ");  fflush(stdout);
-
-	Matrix<float> tmp;
-
-	
     m_error = m_cmdq.enqueueWriteBuffer (ocl_tb1, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->tb1->Size(),  &m_sb->tb1->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer (ocl_sb1, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->sb1->Size(),  &m_sb->sb1->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer (ocl_agr, CL_TRUE, 0,     sizeof(float) *  m_sb->agr->Size(),  &m_sb->agr->At(0), NULL, &m_event);
@@ -181,13 +180,12 @@ GPUSimulator::SetDeviceData () {
     m_error = m_cmdq.enqueueWriteBuffer ( ocl_sm, CL_TRUE, 0,     sizeof(float) *   m_sb->sm->Size(),   &m_sb->sm->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer (ocl_jac, CL_TRUE, 0,     sizeof(float) *  m_sb->jac->Size(),  &m_sb->jac->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer (ocl_gdt, CL_TRUE, 0,     sizeof(float)                     ,             &m_gdt, NULL, &m_event);
-	
-	unsigned n[4] = {m_nt, m_nc, m_na, m_ne};
-    m_error = m_cmdq.enqueueWriteBuffer (  ocl_n, CL_TRUE, 0,     sizeof(int)                       ,              &n[0], NULL, &m_event);
-
+    m_error = m_cmdq.enqueueWriteBuffer (  ocl_n, CL_TRUE, 0, 4 * sizeof(int)                       ,              &n[0], NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer ( ocl_rf, CL_TRUE, 0, 2 * sizeof(float) *   m_sb->rf->Size(),   &m_sb->rf->At(0), NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer (  ocl_m, CL_TRUE, 0,     sizeof(float) * m_sb->magn->Size(), &m_sb->magn->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (ocl_mxy, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->mxy->Size(),  &m_sb->mxy->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer ( ocl_mz, CL_TRUE, 0,     sizeof(float) *   m_sb->mz->Size(),   &m_sb->mz->At(0), NULL, &m_event);
 
+	printf("done.\n  Assigning arguments to kernel ... ");  fflush(stdout);
 	m_error = m_kernel.setArg( 0, ocl_tb1);
 	m_error = m_kernel.setArg( 1, ocl_sb1);
 	m_error = m_kernel.setArg( 2, ocl_agr);
@@ -199,13 +197,13 @@ GPUSimulator::SetDeviceData () {
 	m_error = m_kernel.setArg( 8, ocl_sm );
 	m_error = m_kernel.setArg( 9, ocl_jac);
 	m_error = m_kernel.setArg(10, ocl_gdt);
-	m_error = m_kernel.setArg(11, ocl_n );
+	m_error = m_kernel.setArg(11, ocl_n  );
 	m_error = m_kernel.setArg(12, ocl_rf );
-	m_error = m_kernel.setArg(13, ocl_m  );
-
-    m_cmdq.finish();
+	m_error = m_kernel.setArg(13, ocl_mxy);
+	m_error = m_kernel.setArg(14, ocl_mz );
 
 	printf ("done.\n");
+    m_cmdq.finish();
 
 }
 
@@ -213,8 +211,11 @@ GPUSimulator::SetDeviceData () {
 void 
 GPUSimulator::GetDeviceData () {
 
-    m_error = m_cmdq.enqueueReadBuffer(ocl_rf, CL_TRUE, 0, 2 * sizeof(float) * m_sb->rf->Size(), &m_sb->rf->At(0), NULL, &m_event);
-    m_error = m_cmdq.enqueueReadBuffer(ocl_rf, CL_TRUE, 0,     sizeof(float) * m_sb->rf->Size(), &m_sb->magn->At(0), NULL, &m_event);
+	printf("  Getting results back from kernel ... ");  fflush(stdout);
+    m_error = m_cmdq.enqueueReadBuffer(ocl_rf, CL_TRUE, 0, 2 * sizeof(float) *  m_sb->rf->Size(),  &m_sb->rf->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueReadBuffer(ocl_rf, CL_TRUE, 0, 2 * sizeof(float) * m_sb->mxy->Size(), &m_sb->mxy->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueReadBuffer(ocl_rf, CL_TRUE, 0,     sizeof(float) *  m_sb->mz->Size(),  &m_sb->mz->At(0), NULL, &m_event);
+	printf("done\n");  
 
 }
 

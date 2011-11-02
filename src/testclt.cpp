@@ -297,11 +297,12 @@ bool cstest (ReconClient* rc) {
 
 bool dmtest (ReconClient* rc) {
 
-	Matrix<cplx>   b1m;  
-	Matrix<cplx>   b1p;  
-	Matrix<cplx>   rf;
-	Matrix<float> m;
+	Matrix<cplx>  b1m;  
+	Matrix<cplx>  b1p;  
+	Matrix<cplx>  rf;
+	Matrix<cplx>  mxy;
 
+	Matrix<float> mz;   
 	Matrix<float> ag;   
 	Matrix<float> r;   
 	Matrix<float> b0;  
@@ -355,24 +356,25 @@ bool dmtest (ReconClient* rc) {
 
 	// Outgoing -------------
 	
-	rc->SetCplx  (   "b1m", b1m);
-	rc->SetCplx  (   "b1p", b1p);
-	rc->SetFloat  (    "ag", ag);
-	rc->SetFloat  (     "r", r);
-	rc->SetFloat  (    "b0", b0);
-	rc->SetFloat  ("target", target);
-	rc->SetFloat  ("sample", sample);
-	rc->SetFloat  (    "sr", sr);
-	rc->SetFloat  (   "sb0", sb0);
-	rc->SetFloat  (     "j", j);
+	rc->SetCplx  (   "b1m", b1m   );
+	rc->SetCplx  (   "b1p", b1p   );
+	rc->SetFloat (    "ag", ag    );
+	rc->SetFloat (     "r", r     );
+	rc->SetFloat (    "b0", b0    );
+	rc->SetFloat ("target", target);
+	rc->SetFloat ("sample", sample);
+	rc->SetFloat (    "sr", sr    );
+	rc->SetFloat (   "sb0", sb0   );
+	rc->SetFloat (     "j", j     );
 	// ---------------------
 	
 	rc->Process (test);
 	
 	// Incoming -------------
 	
-	rc->GetFloat ("magn", m);
-	rc->GetCplx  ("rf", rf);
+	rc->GetCplx  ("mxy", mxy);
+	rc->GetCplx  ( "rf", rf);
+	rc->GetFloat ( "mz", mz);
 	// ---------------------
 	
 	rc->Finalise   (test);
@@ -385,8 +387,9 @@ bool dmtest (ReconClient* rc) {
 		return false;
 	}
 
-	m.MXDump       (mf, "magn");
-	rf.MXDump       (mf, "rf");
+	mxy.MXDump (mf, "mxy");
+	mz.MXDump  (mf, "mz");
+	rf.MXDump  (mf, "rf");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());
@@ -412,9 +415,9 @@ bool nuffttest (ReconClient* rc) {
 	rc->Init(test);
 
 #ifdef HAVE_MAT_H	
-	weights.MXRead   (df, "weights");
-	rawdata.MXRead   (df, "data");
-	kspace.MXRead    (df, "kspace");
+	weights.MXRead (df, "weights");
+	rawdata.MXRead (df, "data");
+	kspace.MXRead  (df, "kspace");
 #endif
 
 	rc->SetCplx    ("data",    rawdata);

@@ -29,35 +29,40 @@
 
 namespace RRStrategy {
 	
+	/*
+	 * @brief  Simulation package structure
+	 */
 	struct SimulationBundle {
 
 		// Incoming
-		Ptr< Matrix<cplx> >   tb1;  /**<! b1                   (target)   */ 
-		Ptr< Matrix<cplx> >   sb1;  /**<!                      (sample)   */ 
+		Ptr< Matrix<cplx> >   tb1;  /**<! b1                   (target)    */ 
+		Ptr< Matrix<cplx> >   sb1;  /**<!                      (sample)    */ 
 		
-		Ptr< Matrix<float> > agr;  /**<! Acquisition gradients           */ 
+		Ptr< Matrix<float> > agr;   /**<! Acquisition gradients            */ 
 		
-		Ptr< Matrix<float> > tr;   /**<! spatial vectors        (target) */ 
-		Ptr< Matrix<float> > sr;   /**<! */ 
+		Ptr< Matrix<float> > tr;    /**<! spatial vectors        (target)  */ 
+		Ptr< Matrix<float> > sr;    /**<! */ 
 
-		Ptr< Matrix<float> > tb0;  /**<! b0 maps                (target) */ 
-		Ptr< Matrix<float> > sb0;  /**<!                        (sample) */ 
+		Ptr< Matrix<float> > tb0;   /**<! b0 maps                (target)  */ 
+		Ptr< Matrix<float> > sb0;   /**<!                        (sample)  */ 
 
-		Ptr< Matrix<float> > tm;   /**<! starting magnetisation (target) */
-		Ptr< Matrix<float> > sm;   /**<!                        (sample) */
+		Ptr< Matrix<float> > tm;    /**<! starting magnetisation (target)  */
+		Ptr< Matrix<float> > sm;    /**<!                        (sample)  */
 
-		Ptr< Matrix<float> > jac;  /**<! jacobian j(k(t))                */
+		Ptr< Matrix<float> > jac;   /**<! jacobian j(k(t))                 */
 
-		int                   np;   /**<! # threads                       */
-		int                   mode; /**<! mode                            */
+		int                  np;    /**<! # threads                        */
+		int                  mode;  /**<! mode (0:single run, 1:iterative) */
 
-		float                dt;   /**<! time step                       */
+		float                dt;    /**<! time step                        */
+		float                eps;   /**<! CGNR convergence criterium       */
 		
-		bool                  v;    /**<! verbose                         */
+		bool                 v;     /**<! verbose                          */
 		
 		// Outgoing
-		Ptr< Matrix<cplx> >   rf;   /**<! RF pulses                       */
-		Ptr< Matrix<float> > magn; /**<! Excited magnetisation           */
+		Ptr< Matrix<cplx> >  rf;   /**<! RF pulses                         */
+		Ptr< Matrix<cplx> >  mxy;  /**<! Excited transverse magnetisation  */
+		Ptr< Matrix<float> > mz;   /**<! Longitudinal magnetisation        */
 
 		bool Dump (std::string odf) {
 			
@@ -72,15 +77,16 @@ namespace RRStrategy {
 			
 			sb1->MXDump (mf, "sb1");	
 			tb1->MXDump (mf, "tb1");
-			tr->MXDump (mf, "tr");
-			sr->MXDump (mf, "sr");
+			tr->MXDump  (mf, "tr" );
+			sr->MXDump  (mf, "sr" );
 			tb0->MXDump (mf, "tb0");
 			sb0->MXDump (mf, "sb0");
-			tm->MXDump (mf, "tm");
-			sm->MXDump (mf, "sm");
+			tm->MXDump  (mf, "tm" );
+			sm->MXDump  (mf, "sm" );
 			jac->MXDump (mf, "jac");
-			rf->MXDump (mf, "rf");
-			magn->MXDump (mf, "magn");
+			rf->MXDump  (mf, "rf" );
+			mxy->MXDump (mf, "mxy");
+			mz->MXDump  (mf, "mz" );
 			
 			if (matClose(mf) != 0) {
 				printf ("Error closing file %s\n", odf.c_str());
@@ -113,23 +119,6 @@ namespace RRStrategy {
 
 		/**
 		 * @brief       Piece-wise constant bloch simulation
-		 *
-		 * INPUT:
-		 * @param  txm  Transmit sensitivity    (Nr  x Ntxc)
-		 * @param  rxm  Receive sensitivity     (Nr  x Nrxc) 
-		 * @param  rf   RF field                (Nt  x Nt  )
-		 * @param  gr   Gradient                (1-3 x Nt  )
-		 * @param  r    Spatial positions       (1-3 x Nr  )
-		 * @param  m0   Starting magnetisation  (3   x Nr  )
-		 * @param  b0m  B0 map                  (Nr        )
-		 * @param  dt   time step
-		 * @param  exc  Exciting or receiving  
-		 * @param  v    Verbose                 (Scalar: false = only end, true = all time points)
-		 * @param  np   # parallel processes    (scalar)
-		 *
-		 * OUTPUT:
-		 * @param  res  Result of simulation    (Nr  x 3 (x Nt))
-		 * @param  m    Resulting magnetisation (3   x Nt)
 		 */
 		virtual void 
 		Simulate  () = 0;
