@@ -158,7 +158,8 @@ namespace RRStrategy {
 
 		// RW on device
 		cl::Buffer                ocl_rf;
-		cl::Buffer                ocl_m;
+		cl::Buffer                ocl_mxy;
+		cl::Buffer                ocl_mz;
 
 		float                     m_gdt;
 		size_t                    m_nt;

@@ -43,6 +43,9 @@ DirectMethod::Init () {
     Attribute ("ic", &m_ic);
     printf ("  intensity correction: %s \n", (m_ic) ? "true": "false");
 
+    Attribute ("mode", &m_mode);
+    printf ("  mode: %s \n", (m_mode) ? "true": "false");
+
     m_initialised = true;
 
     printf ("... done.\n");
@@ -91,8 +94,9 @@ DirectMethod::Process     () {
     sb.v    = m_verbose;
 
     // Outgoing
-    AddCplx  (  "rf", sb.rf   = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));
-    AddFloat ("magn", sb.magn = NEW (Matrix<float> (             3,  sb.sr->Dim(1))));
+    AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));
+    AddCplx  ("mxy", sb.mxy = NEW (Matrix<cplx>  (             1,  sb.sr->Dim(1))));
+    AddFloat ( "mz", sb.mz  = NEW (Matrix<float> (             1,  sb.sr->Dim(1))));
 
     // Initialise CPU/GPU simulator
     SimulationContext sc (&sb);

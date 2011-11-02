@@ -38,49 +38,33 @@ namespace RRStrategy {
 		 * @brief       Clean up and destroy
 		 */
 		virtual 
-		~CPUSimulator ();
+		~CPUSimulator  ();
 		
 		
 		/**
-		 * @brief       Default constructor
+		 * @brief       Construct with bundle
+		 *
+		 * @param  sb   Sumulation bundle
 		 */
-		CPUSimulator  (SimulationBundle* sb);
+		CPUSimulator   (SimulationBundle* sb);
 
 
 		/**
 		 * @brief       Piece-wise constant bloch simulation
-		 *
-		 * INPUT:
-		 * @param  txm  Transmit sensitivity    (Nr  x Ntxc)
-		 * @param  rxm  Receive sensitivity     (Nr  x Nrxc) 
-		 * @param  rf   RF field                (Nt  x Nt  )
-		 * @param  gr   Gradient                (1-3 x Nt  )
-		 * @param  r    Spatial positions       (1-3 x Nr  )
-		 * @param  m0   Starting magnetisation  (3   x Nr  )
-		 * @param  b0m  B0 map                  (Nr        )
-		 * @param  dt   time step
-		 * @param  exc  Exciting or receiving  
-		 * @param  v    Verbose                 (Scalar: false = only end, true = all time points)
-		 * @param  np   # parallel processes    (scalar)
-		 *
-		 * OUTPUT:
-		 * @param  res  Result of simulation    (Nr  x 3 (x Nt))
-		 * @param  m    Resulting magnetisation (3   x Nt)
 		 */
 		virtual void 
-		Simulate  ();
+		Simulate       ();
 
-		virtual void 
-		Simulate  (const bool& mode);
-		
+
 
 	protected:
 		
-		Matrix<cplx> m_sig;
-		float        m_gdt;
-		size_t       m_nt;
-		size_t       m_nc;
-		
+
+		float          m_gdt; /*<! \gamma*dt          */
+		size_t         m_nt;  /*<! # timepoints       */
+		size_t         m_nc;  /*<! # channels         */
+
+
 	};
 		
 }
