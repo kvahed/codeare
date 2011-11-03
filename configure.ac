@@ -184,10 +184,9 @@ AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
 AC_CHECK_HEADERS([fcntl.h],          [], [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
 AC_CHECK_HEADERS([stddef.h],         [], [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
 
-AC_CHECK_HEADERS(CL/cl.h, [], [
-    AC_CHECK_HEADERS(OpenCL/cl.h, [], [
-        echo "OpenCL header files not found in your system"
-        exit -1
+AC_CHECK_HEADERS(CL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
+    AC_CHECK_HEADERS(OpenCL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
+        echo "cannot file cl.h, GPU bloch simulator unavailable"
     ])
 ])
 

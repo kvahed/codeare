@@ -74,14 +74,16 @@ DirectMethod::Process     () {
 
     // Intensity correction for single run
     if (m_ic) 
-		IntensityCorrection (GetCplx("b1m"), GetFloat("target"));
+		IntensityCorrection (GetCplx("b1m"), GetCplx("tmxy"), GetFloat("tmz"));
 
     sb.tb1  = m_cplx["b1m"];
     sb.sb1  = m_cplx["b1p"];
+    sb.tmxy = m_cplx["tmxy"];
+    sb.smxy = m_cplx["smxy"];
 
     sb.agr  = m_float["ag"];
-    sb.tm   = m_float["target"];
-    sb.sm   = m_float["sample"];
+    sb.tmz  = m_float["tmz"];
+    sb.smz  = m_float["smz"];
     sb.tb0  = m_float["b0"];
     sb.sb0  = m_float["sb0"];
     sb.tr   = m_float["r"];

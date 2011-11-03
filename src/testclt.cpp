@@ -298,19 +298,18 @@ bool cstest (ReconClient* rc) {
 bool dmtest (ReconClient* rc) {
 
 	Matrix<cplx>  b1m;  
-	Matrix<cplx>  b1p;  
-	Matrix<cplx>  rf;
-	Matrix<cplx>  mxy;
-
-	Matrix<float> mz;   
-	Matrix<float> ag;   
+	Matrix<cplx>  tmxy;
+	Matrix<float> tmz;  
 	Matrix<float> r;   
 	Matrix<float> b0;  
-	Matrix<float> target;
-
-	Matrix<float> sample;
+	
+	Matrix<cplx>  b1p;  
+	Matrix<cplx>  smxy;
+	Matrix<float> smz;
 	Matrix<float> sr;
 	Matrix<float> sb0;
+
+	Matrix<float> ag;   
 	Matrix<float> j;
 	
 	std::string cf  = std::string (base + std::string(config));
@@ -327,12 +326,14 @@ bool dmtest (ReconClient* rc) {
 		b1m = Matrix<cplx>::Ones(r.Dim(1), 1);
 	}
 
-	target.MXRead (df, "target");
+	tmxy.MXRead (df, "tmxy");
+	tmz.MXRead (df, "tmz");
 
-	if (!sample.MXRead (df,"sample"))
+	if (!smxy.MXRead (df,"smxy"))
 		printf ("No sample for excitation simulation\n");
 	else {
 
+		smz.MXRead (df, "smz");
 		sr.MXRead(df, "sr");
 		
 		if (!b1p.MXRead (df, "b1p")) {
@@ -356,25 +357,34 @@ bool dmtest (ReconClient* rc) {
 
 	// Outgoing -------------
 	
-	rc->SetCplx  (   "b1m", b1m   );
-	rc->SetCplx  (   "b1p", b1p   );
-	rc->SetFloat (    "ag", ag    );
-	rc->SetFloat (     "r", r     );
-	rc->SetFloat (    "b0", b0    );
-	rc->SetFloat ("target", target);
-	rc->SetFloat ("sample", sample);
-	rc->SetFloat (    "sr", sr    );
-	rc->SetFloat (   "sb0", sb0   );
-	rc->SetFloat (     "j", j     );
+	rc->SetCplx  ( "b1m", b1m );
+	rc->SetCplx  ( "b1p", b1p );
+	rc->SetFloat (  "ag", ag  );
+	rc->SetFloat (   "r", r   );
+	rc->SetFloat (  "b0", b0  );
+	rc->SetCplx  ("tmxy", tmxy);
+	rc->SetFloat ( "tmz", tmz );
+	rc->SetCplx  ("smxy", smxy);
+	rc->SetFloat ( "smz", smz );
+	rc->SetFloat (  "sr", sr  );
+	rc->SetFloat ( "sb0", sb0 );
+	rc->SetFloat (   "j", j   );
 	// ---------------------
 	
 	rc->Process (test);
 	
 	// Incoming -------------
 	
-	rc->GetCplx  ("mxy", mxy);
-	rc->GetCplx  ( "rf", rf);
-	rc->GetFloat ( "mz", mz);
+	Matrix<cplx>  rf;
+	Matrix<cplx>  mxy;
+	Matrix<float> mz;   
+
+	rc->GetCplx  ( "mxy", mxy);
+	rc->GetFloat (  "mz", mz);	
+	rc->GetCplx  ("tmxy", tmxy);
+	rc->GetFloat ( "tmz", tmz);	
+	rc->GetCplx  (  "rf", rf);
+
 	// ---------------------
 	
 	rc->Finalise   (test);
@@ -389,6 +399,8 @@ bool dmtest (ReconClient* rc) {
 
 	mxy.MXDump (mf, "mxy");
 	mz.MXDump  (mf, "mz");
+	tmxy.MXDump (mf, "tmxy");
+	tmz.MXDump  (mf, "tmz");
 	rf.MXDump  (mf, "rf");
 
 	if (matClose(mf) != 0) {

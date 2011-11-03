@@ -10858,7 +10858,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"444M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"453:454M\"" >>confdefs.h
 
 # copyright notice
 
@@ -16572,6 +16572,8 @@ if test "x$ac_cv_header_CL_cl_h" = xyes; then :
 #define HAVE_CL_CL_H 1
 _ACEOF
 
+$as_echo "#define HAVE_OPENCL_HEADERS 1" >>confdefs.h
+
 else
 
     for ac_header in OpenCL/cl.h
@@ -16582,10 +16584,11 @@ if test "x$ac_cv_header_OpenCL_cl_h" = xyes; then :
 #define HAVE_OPENCL_CL_H 1
 _ACEOF
 
+$as_echo "#define HAVE_OPENCL_HEADERS 1" >>confdefs.h
+
 else
 
-        echo "OpenCL header files not found in your system"
-        exit -1
+        echo "cannot file cl.h, GPU bloch simulator unavailable"
 
 fi
 

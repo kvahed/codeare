@@ -653,7 +653,6 @@ Matrix<T>::H5Read (const string fname, const string dname, const string dloc) {
 template <class T>
 bool Matrix<T>::MXRead (const string fname, const string dname, const string dloc) {
 
-	
 	// Open file ---------------------------------
 	
 	MATFile*  mf = matOpen (fname.c_str(), "r");
@@ -666,12 +665,14 @@ bool Matrix<T>::MXRead (const string fname, const string dname, const string dlo
 	
 	// Get dimensions ----------------------------
 	
-	mxArray* mxa = matGetVariable (mf, dname.c_str());
-	
+	mxArray*      mxa = matGetVariable (mf, dname.c_str());
+
 	if (mxa == NULL) {
 		printf ("Error opening variable %s\n", dname.c_str());
 		return false;
 	}
+	
+	mxClassID     mcid = mxGetClassID(mxa);
 	
 	mwSize        ndim = mxGetNumberOfDimensions(mxa);
 	const mwSize*  dim = mxGetDimensions(mxa);
@@ -684,19 +685,29 @@ bool Matrix<T>::MXRead (const string fname, const string dname, const string dlo
 	
 	Reset();
 	// -------------------------------------------
-	
+
 	// Copy from memory block ----------------------
-	
-	if (typeid(T) == typeid(double))
+
+	printf ("  Reading %s: %s ... ", dname.c_str(), DimsToCString()); fflush(stdout);
+
+	if (typeid(T) == typeid(double) || typeid(T) == typeid(double)) {
 		memcpy(&_M[0], mxGetPr(mxa), Size() * sizeof(T));
-	else if (typeid(T) == typeid(cplx))
-		for (size_t i = 0; i < Size(); i++) {
-			float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
-			memcpy(&_M[i], f, 2 * sizeof(float));
-		}
-	else
+	} else if (typeid(T) == typeid(cplx)) {
+		if (mxGetPi(mxa) != NULL)
+			for (size_t i = 0; i < Size(); i++) {
+				float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
+				memcpy(&_M[i], f, 2 * sizeof(float));
+			}
+		else
+			for (size_t i = 0; i < Size(); i++) {
+				float f[2] = {((float*)mxGetPr(mxa))[i], 0.0}; 
+				memcpy(&_M[i], f, 2 * sizeof(float));
+			}
+	} else
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] = ((T*)mxGetPr(mxa))[i];
+
+	printf ("done\n");
 	// -------------------------------------------
 
 	// Clean up and close file -------------------
