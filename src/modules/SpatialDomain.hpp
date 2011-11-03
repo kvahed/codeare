@@ -192,7 +192,7 @@ RFLimits            (const Matrix<cplx>& solution, const int* pd, const int& nk,
  * @param  pd       Pulse durations
  * @param  m        Out: m_xy
  */
-void
+inline void
 STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cplx>& b1, const Matrix<short>& b0, 
 	 const int& nc, const int& nk, const int& ns, const int gd, const int* pd, Matrix<cplx>& m) {
     
@@ -255,11 +255,7 @@ PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, cons
 
 	// Outgoing brepository ---------------
 
-	// Time scale
-	timing.Dim(COL) = tpd;    
-	// Nc Channels + 3 gradients
-	timing.Dim(LIN) = nc + 3; 
-	timing.Reset();
+	timing = Matrix<cplx> (tpd, nc+3);
 	// -----------------------------------
 	
 	// RF Timing -------------------------
@@ -272,7 +268,6 @@ PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, cons
 			
 			// RF action
 			for (int p = 0; p < pd[k]; p++, i++) 
-				//timing(i,rc) = conj(rf(k + rc*nk)) / (float)pd[k] * cplx(1000.0,0.0);
 				timing(i,rc) = rf(k + rc*nk) / (float)pd[k] * cplx(1000.0,0.0);
 
 			// Gradient action, no RF

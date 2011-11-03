@@ -46,8 +46,10 @@ namespace RRStrategy {
 		Ptr< Matrix<float> > tb0;   /**<! b0 maps                (target)  */ 
 		Ptr< Matrix<float> > sb0;   /**<!                        (sample)  */ 
 
-		Ptr< Matrix<float> > tm;    /**<! starting magnetisation (target)  */
-		Ptr< Matrix<float> > sm;    /**<!                        (sample)  */
+		Ptr< Matrix<cplx> >  tmxy;  /**<! starting magnetisation (target)  */
+		Ptr< Matrix<float> > tmz;
+		Ptr< Matrix<cplx> >  smxy;  /**<!                        (sample)  */
+		Ptr< Matrix<float> > smz;
 
 		Ptr< Matrix<float> > jac;   /**<! jacobian j(k(t))                 */
 
@@ -75,18 +77,20 @@ namespace RRStrategy {
 				return false;
 			}
 			
-			sb1->MXDump (mf, "sb1");	
-			tb1->MXDump (mf, "tb1");
-			tr->MXDump  (mf, "tr" );
-			sr->MXDump  (mf, "sr" );
-			tb0->MXDump (mf, "tb0");
-			sb0->MXDump (mf, "sb0");
-			tm->MXDump  (mf, "tm" );
-			sm->MXDump  (mf, "sm" );
-			jac->MXDump (mf, "jac");
-			rf->MXDump  (mf, "rf" );
-			mxy->MXDump (mf, "mxy");
-			mz->MXDump  (mf, "mz" );
+			sb1->MXDump  (mf, "sb1" );	
+			tb1->MXDump  (mf, "tb1" );
+			tr->MXDump   (mf, "tr"  );
+			sr->MXDump   (mf, "sr"  );
+			tb0->MXDump  (mf, "tb0" );
+			sb0->MXDump  (mf, "sb0" );
+			tmxy->MXDump (mf, "tmxy");
+			tmz->MXDump  (mf, "tmz" );
+			smxy->MXDump (mf, "smxy");
+			smz->MXDump  (mf, "smz" );
+			jac->MXDump  (mf, "jac" );
+			rf->MXDump   (mf, "rf"  );
+			mxy->MXDump  (mf, "mxy" );
+			mz->MXDump   (mf, "mz"  );
 			
 			if (matClose(mf) != 0) {
 				printf ("Error closing file %s\n", odf.c_str());

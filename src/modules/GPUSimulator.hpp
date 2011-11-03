@@ -150,8 +150,10 @@ namespace RRStrategy {
 		cl::Buffer                ocl_sr;
 		cl::Buffer                ocl_tb0;
 		cl::Buffer                ocl_sb0;
-		cl::Buffer                ocl_tm;
-		cl::Buffer                ocl_sm;
+		cl::Buffer                ocl_tmxy;
+		cl::Buffer                ocl_tmz;
+		cl::Buffer                ocl_smxy;
+		cl::Buffer                ocl_smz;
 		cl::Buffer                ocl_jac;
 		cl::Buffer                ocl_gdt;
 		cl::Buffer                ocl_n;

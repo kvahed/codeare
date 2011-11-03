@@ -158,7 +158,7 @@
 #include <OpenCL/opencl.h>
 #else
 #include <GL/gl.h>
-#include <CL/opencl.h>
+#include <CL/cl.h>
 #endif // !__APPLE__
 
 #if !defined(CL_CALLBACK)

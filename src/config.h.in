@@ -126,6 +126,9 @@
 /* Define to 1 if you have the <OpenCL/cl.h> header file. */
 #undef HAVE_OPENCL_CL_H
 
+/* Open CL headers */
+#undef HAVE_OPENCL_HEADERS
+
 /* Define to 1 if you have the `pow' function. */
 #undef HAVE_POW
 
