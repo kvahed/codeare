@@ -4,12 +4,13 @@ reconstruction software. It was started on Siemens VB15 line.
 
 TODO:
     Cient stubs for more MRI hardware vendors.
-
+                                                                                                          Macbook Pro 13 2.7GHz Core i7
 TESTS:
     testclt -b ~/svn/jrrs/share/grappa/  -c config.xml -n medmac44 -r -t LapackTests
-    testclt -b ~/svn/jrrs/share/cgsense/ -d exc.h5 -c config_exc.xml -n medmac44 -r -t CGSENSE
-    testclt -b ~/svn/jrrs/share/spatialdomain/ -d homogen.h5 -c config_homogen.xml -n medmac44 -r -t SpatialDomain
-    testclt -b ~/svn/jrrs/share/nufft/ -d data2.h5 -c config.xml -n medmac44 -r -t NuFFT_OMP
+    testclt -b ~/svn/jrrs/share/cgsense/ -d exc.h5 -c config_exc.xml -n medmac44 -r -t CGSENSE # (0.196s) 
+    testclt -b ~/svn/jrrs/share/cgsense/ -d human.h5 -c human_exc.xml -n medmac44 -r -t CGSENSE # (3.660s) 
+    testclt -b ~/svn/jrrs/share/spatialdomain/ -d homogen.h5 -c config_homogen.xml -n medmac44 -r -t SpatialDomain # (0.4219s)
+    Testclt -b ~/svn/jrrs/share/nufft/ -d data2.h5 -c config.xml -n medmac44 -r -t NuFFT_OMP
     testclt -b ~/svn/jrrs/share/nufft/ -d data2.h5 -c config.xml -n medmac44 -r -t NuFFT
     testclt -b ~/svn/jrrs/share/grappa/ -d data.mat -c config.xml -n medmac44 -r -t GRAPPA
     testclt -b ~/svn/jrrs/share/compressedsensing/ -d brain512.mat -c config_brain512.xml -n medmac44 -r -t CompressedSensing

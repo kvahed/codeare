@@ -57,7 +57,9 @@ namespace RRStrategy {
 		int                  mode;  /**<! mode (0:single run, 1:iterative) */
 
 		float                dt;    /**<! time step                        */
-		float                eps;   /**<! CGNR convergence criterium       */
+		float                cgeps; /**<! CGNR convergence criterium       */
+		int                  cgit;  /**<! CGNR convergence criterium       */
+
 		
 		bool                 v;     /**<! verbose                          */
 		
