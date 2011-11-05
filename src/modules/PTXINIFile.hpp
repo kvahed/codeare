@@ -25,7 +25,7 @@ PTXWriteSiemensINIFile (Matrix<cplx>& pt, int dimrf, int dimgr, int nc, int samp
 
 	int nt = pt.Dim(COL);
 
-	size_t ci[8] = {1, 2, 3, 4, 5, 6, 7, 0};
+	size_t ci[8] = {0, 1, 2, 3, 4, 5, 6, 7};
 
 	if (fp == NULL)
 		return RRSModule::FILE_ACCESS_FAILED;

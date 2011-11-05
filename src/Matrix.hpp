@@ -866,6 +866,7 @@ public:
 	template<class S> Matrix<T>
 	operator*          (const Matrix<S>& M);
 
+	
 	/**
 	 * @brief           Get the element at position p of the vector, i.e. this(p).
      *
@@ -1059,6 +1060,159 @@ public:
 
     //@}
     
+
+
+    /**
+     * @name            Friend operators
+     *                  Friend oprators
+     */
+    
+    //@{
+    
+	/**
+	 * @brief           Elementwise addition with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          m + t
+	 */
+	friend Matrix<T>    
+	operator+  (T s, Matrix<T> &m) {
+		return   m + s;
+	}
+
+
+	/**
+	 * @brief           Elementwise subtraction from scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          -(m - s)
+	 */
+	friend Matrix<T>    
+	operator-  (T s, Matrix<T> &m) {
+		return -(m - s);
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          m * s
+	 */
+	friend Matrix<T>    
+	operator*  (T s, Matrix<T> &m) { 
+		return   m * s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication of inverse with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          s * m.Inv()
+	 */
+	friend Matrix<T>    
+	operator/  (T s, Matrix<T> &m) {
+		return   s * m.Inv();
+	}
+
+
+	/**
+	 * @brief           Elementwise equality with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          m == s
+	 */
+	friend Matrix<bool> 
+	operator== (T s, Matrix<T> m) {
+		return   m == s;
+	}
+
+
+	/**
+	 * @brief           Elementwise >= with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          m <= t
+	 */
+	friend Matrix<bool> 
+	operator>= (T s, Matrix<T> m) {
+		return   m <= s;
+	}
+
+
+	/**
+	 * @brief           Elementwise <= with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          T<=M
+	 */
+	friend Matrix<bool> 
+	operator<= (T s, Matrix<T> m) {
+		return   m >= s;
+	}
+
+
+	/**
+	 * @brief           Elementwise unequality with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          T!=M
+	 */
+	friend Matrix<bool> 
+	operator!= (T s, Matrix<T> m) {
+		return   m != s;
+	}
+
+
+	/**
+	 * @brief           Elementwise equality with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          T+M
+	 */
+	friend Matrix<bool> 
+	operator>  (T s, Matrix<T> m) {
+		return   m <  s;
+	}
+
+
+	/**
+	 * @brief           Elementwise < with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          T+M
+	 */
+	friend Matrix<bool> 
+	operator<  (T s, Matrix<T> m) {
+		return   m >  s;
+	}
+
+
+	/**
+	 * @brief           Elementwise equality with scalar (lhs)
+	 *
+	 * @param  T        Scalar lhs
+	 * @param  M        Matrix rhs
+	 * @return          T+M
+	 */
+	friend Matrix<T>    
+	operator&  (Matrix<bool>& mb, Matrix<T>& m) {
+		return   m &  mb;
+	}
+
+//@}
+
 
 
     /**
@@ -2222,11 +2376,19 @@ public:
 	
 
 	/**
+	 * @brief           Arguments matrix
+	 *
+	 * @return          Arguments
+	 */
+    template<class S> Matrix<S>           
+	Arg                 () const;
+		
+	/**
 	 * @brief           Real values matrix
 	 *
-	 * @return          Imaginary values
+	 * @return          Real values
 	 */
-	Matrix<double>
+    template<class S> Matrix<S>           
 	Real                () const;
 	
 
@@ -2235,7 +2397,7 @@ public:
 	 *
 	 * @return          Imaginary values
 	 */
-	Matrix<double>
+    template<class S> Matrix<S>           
 	Imag                () const;
 	
 

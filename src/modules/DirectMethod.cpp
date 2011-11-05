@@ -34,6 +34,12 @@ DirectMethod::Init () {
     Attribute ("dt",      &m_dt);
     printf ("  delta t: %.6f \n", m_dt);
 
+    Attribute ("cgeps",      &m_cgeps);
+    printf ("  CG eps: %.6f \n", m_cgeps);
+
+    Attribute ("cgiter",      &m_cgiter);
+    printf ("  CG iters: %.6f \n", m_cgiter);
+
     Attribute ("verbose", (int*)&m_verbose);
     printf ("  verbose: %s \n", (m_verbose) ? "true" : "false");
 
@@ -94,6 +100,8 @@ DirectMethod::Process     () {
     sb.mode = m_mode;
     sb.dt   = m_dt;
     sb.v    = m_verbose;
+	sb.cgeps = m_cgeps;
+	sb.cgit = m_cgiter;
 
     // Outgoing
     AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));

@@ -462,8 +462,35 @@ Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
 }
 
 
-template<> inline Matrix<double> 
-Matrix<cplx>::Real () const {
+
+//template <class T> inline 
+//Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
+
+template<> template<class S>
+Matrix<float> Matrix<cplx>::Real() const {
+
+	Matrix<float> res (_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		size_t tid      = omp_get_thread_num();
+		size_t chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for 
+		
+		for (size_t i = 0; i < Size(); i++)
+			res[i] = _M[i].real();
+
+	}		
+		
+	return res;
+
+}
+    
+
+template<> template<class S>
+Matrix<double> Matrix< std::complex<double> >::Real () const {
 
 	Matrix<double> res (_dim);
 
@@ -485,8 +512,31 @@ Matrix<cplx>::Real () const {
 }
     
 
-template<> inline Matrix<double> 
-Matrix<cplx>::Imag () const {
+template<> template<class S>
+Matrix<float> Matrix<cplx>::Imag() const {
+
+	Matrix<float> res (_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		size_t tid      = omp_get_thread_num();
+		size_t chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for 
+		
+		for (size_t i = 0; i < Size(); i++)
+			res[i] = _M[i].imag();
+
+	}		
+		
+	return res;
+
+}
+    
+
+template<> template<class S>
+Matrix<double> Matrix< std::complex<double> >::Imag () const {
 
 	Matrix<double> res (_dim);
 
@@ -507,6 +557,53 @@ Matrix<cplx>::Imag () const {
 
 }
     
+
+template<> template<class S>
+Matrix< float > Matrix< cplx >::Arg () const {
+
+	Matrix<float> res (_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		size_t tid      = omp_get_thread_num();
+		size_t chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for 
+		
+		for (size_t i = 0; i < Size(); i++)
+			res[i] = arg(_M[i]);
+
+	}		
+		
+	return res;
+
+}
+    
+
+template<> template<class S>
+Matrix<double> Matrix< std::complex<double> >::Arg () const {
+
+	Matrix<double> res (_dim);
+
+#pragma omp parallel default (shared) 
+	{
+		
+		size_t tid      = omp_get_thread_num();
+		size_t chunk    = Size() / omp_get_num_threads();
+		
+#pragma omp for 
+		
+		for (size_t i = 0; i < Size(); i++)
+			res[i] = arg(_M[i]);
+
+	}		
+		
+	return res;
+
+}
+    
+
 
 template<class T> Matrix<size_t>
 Matrix<T>::MeshGrid (const Matrix<size_t>& d) {

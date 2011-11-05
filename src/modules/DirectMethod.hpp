@@ -91,6 +91,8 @@ namespace RRStrategy {
         int                m_np;       /*!< @brief Number of OMP threads */
         int                m_ic;       /*!< @brief Perform intensity correction */
         int                m_mode;     /*!< Single run: 0, Iterative: 1 */
+		double             m_cgeps;
+		int                m_cgiter;
 
     };
 

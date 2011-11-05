@@ -87,7 +87,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		
 		for (size_t pos = 0; pos < nr; pos++) {
 			
-			for (size_t c = 0; c < nc; c++) ls[c] = conj(b1(pos,c));
+			for (size_t c = 0; c < nc; c++) ls[c] = b1(pos,c);
 			for (size_t i = 0; i <  3; i++) lr[i] =       r(i,pos);
 
 			lm[X] = mt0[pos].real(); 
@@ -98,7 +98,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 			for (size_t t = 0; t < nt; t++) {
 				
 				// Rotate magnetisation (only gradients)
-				n[2] = - gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] + b0[pos]*TWOPI);
+				n[2] = - gdt * (gr(X, t)*lr[X] + gr(Y, t)*lr[Y] + gr(Z, t)*lr[Z] + b0[pos]*TWOPI);
 				
 				Rotate (n, rot);
 				
@@ -125,7 +125,8 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 			rf[i] = cplx(0.0,0.0);
 			for (int p = 0; p < np; p++)
 				rf[i] += sig[p*nt*nc+i];
-			rf[i] /= (float)nr;
+			rf[i] /= nr;
+			rf[i] *= 37.3814;
 		}
 		
 	}
@@ -184,8 +185,8 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 					rfs += rf(rt,i)*ls[i];
 				rfs *= jac[rt];
 				
-				n[0] = gdt * -rfs.real();
-				n[1] = gdt *  rfs.imag();
+				n[0] = gdt * -rfs.imag();
+				n[1] = gdt *  rfs.real();
 				n[2] = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - b0[pos]*TWOPI) ;
 
 				Rotate (n, rot);
@@ -258,8 +259,6 @@ CPUSimulator::Simulate () {
 		q = p;
 		r = p;
 		
-		a = Matrix<cplx>(p.Dim(0),p.Dim(1));
-
 		vector<float> res;
 		
 		an = pow(p.Norm().real(), 2);
@@ -267,14 +266,14 @@ CPUSimulator::Simulate () {
 		char buffer [7];
 		std::string s;
 		// CGNR loop
-		for (iters = 0; iters < 1; iters++) {
+		for (iters = 0; iters < m_sb->cgit; iters++) {
 			
 			rn = pow(r.Norm().real(), 2);
 			res.push_back(rn/an);
 			printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
 			
 			// Convergence ? ----------------------------------------------
-			if (res.at(iters) <= m_sb->eps) break;
+			if (res.at(iters) <= m_sb->cgeps) break;
 
 			sprintf(buffer, "q%02i.mat", iters);
 			s = std::string (buffer);
@@ -290,7 +289,10 @@ CPUSimulator::Simulate () {
 						 p, *(m_sb->mz));
 
 			rtmp  = (rn / (p.dotc(q)));
-			a    += (p    * rtmp);
+			if (iters == 0)
+				a     = (p    * rtmp);
+			else
+				a    += (p    * rtmp);
 			r    -= (q    * rtmp);
 			p    *= cplx(pow(r.Norm().real(), 2)/rn);
 			p    += r;
