@@ -159,6 +159,18 @@ Matrix<T>::Is4D () const {
 
 
 
+template <class T> inline const bool 
+Matrix<T>::IsZero () const {
+	
+	for (size_t i = 0; i < Size(); i++)
+		if (_M[i] != T(0)) return false;
+
+	return true;
+
+}
+
+
+
 template<> inline Matrix<cplx>
 Matrix<cplx>::Conj () const {
 

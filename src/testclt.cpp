@@ -316,6 +316,8 @@ bool dmtest (ReconClient* rc) {
 	std::string df  = std::string (base + std::string(data));
 	std::string odf = std::string (base + std::string("/simout.mat"));
 
+	bool excite = false;
+
 #ifdef HAVE_MAT_H	
 	ag.MXRead     (df, "g");
 	r.MXRead      (df, "r");
@@ -330,8 +332,12 @@ bool dmtest (ReconClient* rc) {
 	tmz.MXRead (df, "tmz");
 
 	if (!smxy.MXRead (df,"smxy"))
+
 		printf ("No sample for excitation simulation\n");
+
 	else {
+
+		excite = true;
 
 		smz.MXRead (df, "smz");
 		sr.MXRead(df, "sr");
@@ -349,7 +355,7 @@ bool dmtest (ReconClient* rc) {
 #endif
 
 	rc->ReadConfig (cf.c_str());
-	
+	rc->SetAttribute ("excite", excite);
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;

@@ -1072,8 +1072,8 @@ public:
 	/**
 	 * @brief           Elementwise addition with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          m + t
 	 */
 	friend Matrix<T>    
@@ -1085,8 +1085,8 @@ public:
 	/**
 	 * @brief           Elementwise subtraction from scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          -(m - s)
 	 */
 	friend Matrix<T>    
@@ -1098,8 +1098,8 @@ public:
 	/**
 	 * @brief           Elementwise multiplication with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          m * s
 	 */
 	friend Matrix<T>    
@@ -1111,8 +1111,8 @@ public:
 	/**
 	 * @brief           Elementwise multiplication of inverse with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          s * m.Inv()
 	 */
 	friend Matrix<T>    
@@ -1124,8 +1124,8 @@ public:
 	/**
 	 * @brief           Elementwise equality with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          m == s
 	 */
 	friend Matrix<bool> 
@@ -1137,8 +1137,8 @@ public:
 	/**
 	 * @brief           Elementwise >= with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          m <= t
 	 */
 	friend Matrix<bool> 
@@ -1150,8 +1150,8 @@ public:
 	/**
 	 * @brief           Elementwise <= with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          T<=M
 	 */
 	friend Matrix<bool> 
@@ -1163,8 +1163,8 @@ public:
 	/**
 	 * @brief           Elementwise unequality with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          T!=M
 	 */
 	friend Matrix<bool> 
@@ -1176,8 +1176,8 @@ public:
 	/**
 	 * @brief           Elementwise equality with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          T+M
 	 */
 	friend Matrix<bool> 
@@ -1189,8 +1189,8 @@ public:
 	/**
 	 * @brief           Elementwise < with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          T+M
 	 */
 	friend Matrix<bool> 
@@ -1202,8 +1202,8 @@ public:
 	/**
 	 * @brief           Elementwise equality with scalar (lhs)
 	 *
-	 * @param  T        Scalar lhs
-	 * @param  M        Matrix rhs
+	 * @param  mb       Scalar lhs
+	 * @param  m        Matrix rhs
 	 * @return          T+M
 	 */
 	friend Matrix<T>    
@@ -1512,6 +1512,15 @@ public:
      */
     const bool                
     Is2D                ()                                    const;
+    
+    
+    /**
+     * @brief           Check if we are 2D (i.e. COL, LIN)
+     *
+     * @return          2D matrix?
+     */
+    const bool                
+    IsZero                ()                                    const;
     
     
     /**

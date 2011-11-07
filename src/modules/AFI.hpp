@@ -43,15 +43,13 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		AFI  () : 
-			m_use_real (true),
-			m_retain_phase (true) {};
+		AFI  ();
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-		~AFI () {};
+		~AFI ();
 		
 		
 		/**
@@ -77,10 +75,80 @@ namespace RRStrategy {
 
 	private:
 
-		bool m_use_real;
-		bool m_retain_phase;
+		bool   m_use_real;
+		bool   m_retain_phase;
 		
 	};
+
+
+
+	void PhaseCombine (const Matrix<cplx>& img, Matrix<float>& pc) {
+		
+		size_t nc = img.HDim();
+
+		if (pc.IsZero())
+			return;
+
+	}
+
+
+	void PhasePreset (const Matrix<cplx>& afid, const bool& use_real, Matrix<float>& phase) {
+		
+		if (afid.Dim(4) > 1) {
+			
+			if (use_real) {
+				
+				for (size_t z = 0; z < afid.Dim(2); z++)
+					for (size_t y = 0; y < afid.Dim(1); y++)
+						for (size_t x = 0; x < afid.Dim(0); x++)
+							phase (x, y, z) = arg(afid(x, y, z, 0, 0));
+
+				Matrix<float> pc (afid.Dim(0), afid.Dim(1), afid.Dim(2));
+				PhaseCombine (afid, pc);
+
+				afid.SOS(4);
+				
+				for (size_t z = 0; z < afid.Dim(2); z++)
+					for (size_t y = 0; y < afid.Dim(1); y++)
+						for (size_t x = 0; x < afid.Dim(0); x++)
+							afid (x, y, z, 1) *= exp (cplx (0.0, pc(x, y, z)));		
+
+			} else {
+				
+				afid.SOS(4);
+				
+			}
+
+		} else {
+
+			for (size_t z = 0; z < afid.Dim(2); z++)
+				for (size_t y = 0; y < afid.Dim(1); y++)
+					for (size_t x = 0; x < afid.Dim(0); x++)
+						phase (x,y,z) = arg(afid(x,y,z,0,0));
+
+		}
+		
+	}
+
+
+			/*
+    % Multi coil data set
+    if ndims(images) > 4   % Means we have a multicoil data set
+       if use_real
+             phase               = angle(images(:,:,:,1,1));
+           ph              = phase_combine(images);
+           images          = ssq_rec(images);
+           images(:,:,:,2) = images(:,:,:,2).*exp(1i*ph);
+       else
+           images          = ssq_rec(images);
+       end
+       
+     
+    else
+       phase               = angle(images(:,:,:,1)); 
+    end
+	*/
+
 
 }
 #endif /* __AFI_H__ */

@@ -52,6 +52,9 @@ DirectMethod::Init () {
     Attribute ("mode", &m_mode);
     printf ("  mode: %s \n", (m_mode) ? "true": "false");
 
+    Attribute ("excite", &m_excite);
+    printf ("  excite: %s \n", (m_excite) ? "true": "false");
+
     m_initialised = true;
 
     printf ("... done.\n");
@@ -82,26 +85,27 @@ DirectMethod::Process     () {
     if (m_ic) 
 		IntensityCorrection (GetCplx("b1m"), GetCplx("tmxy"), GetFloat("tmz"));
 
-    sb.tb1  = m_cplx["b1m"];
-    sb.sb1  = m_cplx["b1p"];
-    sb.tmxy = m_cplx["tmxy"];
-    sb.smxy = m_cplx["smxy"];
+    sb.tb1   = m_cplx ["b1m"];
+    sb.sb1   = m_cplx ["b1p"];
+    sb.tmxy  = m_cplx ["tmxy"];
+    sb.smxy  = m_cplx ["smxy"];
 
-    sb.agr  = m_float["ag"];
-    sb.tmz  = m_float["tmz"];
-    sb.smz  = m_float["smz"];
-    sb.tb0  = m_float["b0"];
-    sb.sb0  = m_float["sb0"];
-    sb.tr   = m_float["r"];
-    sb.sr   = m_float["sr"];
-    sb.jac  = m_float["j"];
+    sb.agr   = m_float["ag"];
+    sb.tmz   = m_float["tmz"];
+    sb.smz   = m_float["smz"];
+    sb.tb0   = m_float["b0"];
+    sb.sb0   = m_float["sb0"];
+    sb.tr    = m_float["r"];
+    sb.sr    = m_float["sr"];
+    sb.jac   = m_float["j"];
 
-    sb.np   = m_np;
-    sb.mode = m_mode;
-    sb.dt   = m_dt;
-    sb.v    = m_verbose;
+    sb.np    = m_np;
+    sb.mode  = m_mode;
+    sb.dt    = m_dt;
+    sb.v     = m_verbose;
 	sb.cgeps = m_cgeps;
-	sb.cgit = m_cgiter;
+	sb.cgit  = m_cgiter;
+	sb.exc   = m_excite; 
 
     // Outgoing
     AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));

@@ -558,7 +558,7 @@ Matrix<double> Matrix< std::complex<double> >::Imag () const {
 }
     
 
-template<> template<class S>
+template<> template<> inline
 Matrix< float > Matrix< cplx >::Arg () const {
 
 	Matrix<float> res (_dim);
@@ -581,7 +581,7 @@ Matrix< float > Matrix< cplx >::Arg () const {
 }
     
 
-template<> template<class S>
+template<> template<> inline
 Matrix<double> Matrix< std::complex<double> >::Arg () const {
 
 	Matrix<double> res (_dim);
