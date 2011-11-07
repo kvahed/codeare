@@ -93,6 +93,7 @@ namespace RRStrategy {
         int                m_mode;     /*!< Single run: 0, Iterative: 1 */
 		double             m_cgeps;
 		int                m_cgiter;
+		bool               m_excite;  
 
     };
 

@@ -59,8 +59,8 @@ namespace RRStrategy {
 		float                dt;    /**<! time step                        */
 		float                cgeps; /**<! CGNR convergence criterium       */
 		int                  cgit;  /**<! CGNR convergence criterium       */
-
 		
+		bool                 exc;   /**<! Excite?                          */
 		bool                 v;     /**<! verbose                          */
 		
 		// Outgoing

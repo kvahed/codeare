@@ -240,6 +240,8 @@ CPUSimulator::Simulate () {
 				 *(m_sb->tmxy), *(m_sb->tmz), m_sb->np, m_sb->dt, m_sb->v, 
 				 m_nc, m_nt, m_gdt, *(m_sb->rf));
 
+	if (!m_sb->exc) return;
+
 	SimulateExc (*(m_sb->sb1), *(m_sb->agr), *(m_sb->rf), *(m_sb->sr), 
 				 *(m_sb->sb0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
 				 m_sb->np, m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, 

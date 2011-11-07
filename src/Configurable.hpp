@@ -79,6 +79,30 @@ class Configurable {
 
 	
 	/**
+	 * @brief           Set a bool type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline void
+	SetAttribute        (const char* name, bool value) {
+		m_config_doc->RootElement()->SetAttribute (name, (int)value);
+	}
+
+	
+	/**
+	 * @brief           Set a size type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline void
+	SetAttribute        (const char* name, size_t value) {
+		m_config_doc->RootElement()->SetAttribute (name, (int)value);
+	}
+
+	
+	/**
 	 * @brief           Set a float type attribute
 	 *
 	 * @param  name     Attribute name 
@@ -103,7 +127,7 @@ class Configurable {
 	
 
 	/**
-	 * @brief           Set a integer type attribute
+	 * @brief           Set an integer type attribute
 	 *
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
@@ -116,7 +140,33 @@ class Configurable {
 
 	
 	/**
-	 * @brief           Set a float type attribute
+	 * @brief           Set a bool type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 * @return          Status
+	 */
+	inline int
+	Attribute           (const char* name, size_t* value) const {
+		return m_config_doc->RootElement()->QueryIntAttribute (name, (int*)value);
+	}
+
+	
+	/**
+	 * @brief           Set a bool type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 * @return          Status
+	 */
+	inline int
+	Attribute           (const char* name, bool* value) const {
+		return m_config_doc->RootElement()->QueryIntAttribute (name, (int*)value);
+	}
+
+	
+	/**
+	 * @brief           Set a double type attribute
 	 *
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
@@ -125,6 +175,19 @@ class Configurable {
 	inline int
 	Attribute           (const char* name, double* value) const {
 		return m_config_doc->RootElement()->QueryDoubleAttribute (name, value);
+	}
+
+
+	/**
+	 * @brief           Set a float type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 * @return          Status
+	 */
+	inline int
+	Attribute           (const char* name, float* value) const {
+		return m_config_doc->RootElement()->QueryDoubleAttribute (name, (double*)value);
 	}
 
 

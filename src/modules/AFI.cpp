@@ -23,9 +23,29 @@
 using namespace RRStrategy;
 
 
+
+AFI::AFI() : m_use_real(true), 
+			 m_retain_phase (true) {
+
+
+
+}
+
+
+AFI::~AFI() {
+
+	this->Finalise();
+
+}
+
+
 RRSModule::error_code
 AFI::Init () {
 
+	Attribute ("use_real",     &m_use_real);
+	Attribute ("retain_phase", &m_retain_phase);
+
+	m_initialised = true;
 	return RRSModule::OK;
 
 }
@@ -33,8 +53,8 @@ AFI::Init () {
 
 RRSModule::error_code
 AFI::Finalise () {
-	
-	return RRSModule::OK;
+
+	return ReconStrategy::Finalise();
 	
 }
 
@@ -42,6 +62,11 @@ AFI::Finalise () {
 RRSModule::error_code
 AFI::Process     () { 
 
+	Matrix<cplx>& afid = GetCplx("meas");
+	
+	Matrix<float> ph1 (afid.Dim(0), afid.Dim(1), afid.Dim(2));
+	PhasePreset (afid, m_use_real, ph1);
+	
 	return RRSModule::OK;
 	
 }
