@@ -67,6 +67,18 @@ class Configurable {
 
 	
 	/**
+	 * @brief           Set a string type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline void
+	SetAttribute        (const char* name, const std::string value) {
+		m_config_doc->RootElement()->SetAttribute (name, value.c_str());
+	}
+
+	
+	/**
 	 * @brief           Set a integer type attribute
 	 *
 	 * @param  name     Attribute name 
@@ -115,7 +127,7 @@ class Configurable {
 
 
 	/**
-	 * @brief           Set a string type attribute
+	 * @brief           Get a string type attribute
 	 *
 	 * @param  name     Attribute name 
 	 * @return          String representation of value
@@ -123,6 +135,20 @@ class Configurable {
 	inline const char*
 	Attribute           (const char* name) const {
 		return m_config_doc->RootElement()->Attribute (name);
+	}
+	
+
+	/**
+	 * @brief           Get a string type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 * @return          Length
+	 */
+	inline int
+	Attribute           (const char* name, std::string* value) const {
+		value = new std::string (m_config_doc->RootElement()->Attribute (name));
+		return value->length();
 	}
 	
 

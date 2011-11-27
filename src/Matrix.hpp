@@ -29,8 +29,12 @@
 
 #else
 enum IceDim {
-    COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE, INVALID_DIM
+    COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE
 };
+#endif
+
+#ifndef INVALID_DIM
+    #define INVALID_DIM 16
 #endif
 
 /**
@@ -1520,7 +1524,7 @@ public:
      * @return          2D matrix?
      */
     const bool                
-    IsZero                ()                                    const;
+    IsZero              ()                                    const;
     
     
     /**

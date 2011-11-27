@@ -30,6 +30,7 @@ DirectMethod::Init () {
     m_verbose     = false;                  // verbose?
     m_np          = omp_get_num_threads();  // # procs
     m_dt          = 1e-6;                   // seconds 
+	m_np          = 8;
 
     Attribute ("dt",      &m_dt);
     printf ("  delta t: %.6f \n", m_dt);
@@ -38,9 +39,9 @@ DirectMethod::Init () {
     printf ("  CG eps: %.6f \n", m_cgeps);
 
     Attribute ("cgiter",      &m_cgiter);
-    printf ("  CG iters: %.6f \n", m_cgiter);
+    printf ("  CG iters: %.i \n", m_cgiter);
 
-    Attribute ("verbose", (int*)&m_verbose);
+    Attribute ("verbose", &m_verbose);
     printf ("  verbose: %s \n", (m_verbose) ? "true" : "false");
 
     Attribute ("threads", &m_np);
