@@ -82,6 +82,61 @@ namespace RRStrategy {
 
 
 
+
+	/**
+	 * @brief              Noise prewhitening
+	 * 
+	 * @param  data    Data
+	 * @param  ncov    Noise covariance matrix
+	 * 
+	 */
+	void PreWhite (const Matrix<cplx>& in, const Matrix<cplx>& ncov, Matrix<cplx>& od, const size_t& out = -1) {
+
+		//assert (idx <= in.HDim());
+
+		
+
+
+	} 
+
+		/*
+
+imsz = size(data);
+
+if imsz(channel_idx) == 1
+    error([TAG 'Only single channel data?']);
+end
+
+% If just variances are given transform to diagonal matrix
+if isvector(noise_covar)  
+    noise_covar = diag(noise_covar);
+end
+
+if ~ndims(noise_covar) == 2 || (size(noise_covar,1) ~= size(noise_covar,2))
+     error([TAG 'Invalid size of the covariance matrix! Has to be Nch x Nch!']);
+end
+
+if size(noise_covar,1) ~= imsz(channel_idx)
+    error([TAG 'Invalid size of the covariance matrix! Has to be Nch x Nch!']);
+end
+
+
+%Make channel first index
+old_order = 1:ndims(data);
+new_order = [channel_idx old_order(old_order ~= channel_idx)]; 
+data = permute(data, new_order); 
+sz = size(data);
+
+%Prewhite the data
+R = (sqrtm(noise_covar));
+whitened = R\data(:,:);
+whitened = reshape(whitened,sz);
+
+%Bring back to original shape
+whitened = ipermute(whitened,new_order);
+		*/
+
+
 	void PhaseCombine (const Matrix<cplx>& img, Matrix<float>& pc) {
 		
 		size_t nc = img.HDim();
@@ -90,6 +145,7 @@ namespace RRStrategy {
 			return;
 
 	}
+
 
 
 	void PhasePreset (const Matrix<cplx>& afid, const bool& use_real, Matrix<float>& phase) {
@@ -129,26 +185,6 @@ namespace RRStrategy {
 		}
 		
 	}
-
-
-			/*
-    % Multi coil data set
-    if ndims(images) > 4   % Means we have a multicoil data set
-       if use_real
-             phase               = angle(images(:,:,:,1,1));
-           ph              = phase_combine(images);
-           images          = ssq_rec(images);
-           images(:,:,:,2) = images(:,:,:,2).*exp(1i*ph);
-       else
-           images          = ssq_rec(images);
-       end
-       
-     
-    else
-       phase               = angle(images(:,:,:,1)); 
-    end
-	*/
-
 
 }
 #endif /* __AFI_H__ */

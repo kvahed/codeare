@@ -53,20 +53,20 @@ void Rotate (const float* n, float* r)  {
 
 
 void SimulateAcq (__global const float* rxm, __global const float*  gr, __global const float*   r, 
-				  __global const float*   m, __global const float*  b0, const float  gdt, 
-				  const uint   pos, __global const uint*    n, __local float* sig) {
+				  __global const float*   m, __global const float*  b0,          const float  gdt, 
+				           const uint   pos, __global const uint*    n, __global       float* sig) {
 
 	uint nt = n[0]; /* time points */
 	uint nc = n[1]; /* channels    */
 
 	float TWOPI = 6.283185307;
 
-	float nv [3];
-	float rm [3*3];
-	float lm [3];
-	float tmp[3];
-	float lr [3];
-	float ls [8][2];
+	float nv [3];    /* Rotation normal         */
+	float rm [3*3];  /* Rotation matrix         */
+	float lm [3];    /* Local magnetisation     */
+	float tmp[3];    /* Temporary magnetisation */
+	float lr [3];    /* Local position vector   */
+	float ls [8][2]; /* Local sensitivities     */
 
     for (uint c = 0; c < nc; c++)  {
         ls[c][0] = rxm[2*pos*nc + c];
@@ -111,9 +111,9 @@ void SimulateAcq (__global const float* rxm, __global const float*  gr, __global
 
 
 
-void SimulateExc  (const float* txm, const float*  gr, const float* rf, 
-				   const float*   r, const float*  b0, const float gdt, 
-				   const uint   pos, const uint*    n,      float*   m) {
+void SimulateExc  (__global const float* txm, __global const float*  gr, __global const float* rf, 
+				   __global const float*   r, __global const float*  b0, __global const float gdt, 
+				            const uint   pos,          const uint*    n, __global       float*   m) {
 
 	uint nt = n[0]; /* time points */
 	uint nc = n[1]; /* channels    */
@@ -121,12 +121,12 @@ void SimulateExc  (const float* txm, const float*  gr, const float* rf,
 	float TWOPI = 6.283185307;
 
     float nv [3];    /* Rotation axis        */
-	float rm [3*3]; /* Rotation matrix      */
+	float rm [3*3];  /* Rotation matrix      */
     float lm [3];    /* Local magnetisation  */
-    float tmp[3];     /* Temp magnetisation   */
-    float lr [3];     /* Local spatial vector */
+    float tmp[3];    /* Temp magnetisation   */
+    float lr [3];    /* Local spatial vector */
     float ls [8][2]; /* Local sensitivities  */
-	float rfs[2];     /* Local composite RF   */
+	float rfs[2];    /* Local composite RF   */
 
     for (uint i = 0; i < 3; i++) lr[i] = r[i+pos*3];
 
@@ -176,7 +176,46 @@ void SimulateExc  (const float* txm, const float*  gr, const float* rf,
 
 
 
-void ReduceSignals (const float* data, volatile float* rdata) { }
+void CollectSignals (__global T *g_idata, __global T *g_odata, unsigned int n, __local volatile T* sdata) {
+
+
+    // perform first level of reduction,
+    // reading from global memory, writing to shared memory
+    unsigned int tid = get_local_id(0);
+    unsigned int i   = get_group_id(0)*(get_local_size(0)*2) + get_local_id(0);
+
+    sdata[tid] = (i < n) ? g_idata[i] : 0;
+    if (i + get_local_size(0) < n) 
+        sdata[tid] += g_idata[i+get_local_size(0)];  
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // do reduction in shared mem
+    #pragma unroll 1
+    for(unsigned int s=get_local_size(0)/2; s>32; s>>=1) 
+    {
+        if (tid < s) 
+        {
+            sdata[tid] += sdata[tid + s];
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
+
+    if (tid < 32)
+    {
+        if (blockSize >=  64) { sdata[tid] += sdata[tid + 32]; }
+        if (blockSize >=  32) { sdata[tid] += sdata[tid + 16]; }
+        if (blockSize >=  16) { sdata[tid] += sdata[tid +  8]; }
+        if (blockSize >=   8) { sdata[tid] += sdata[tid +  4]; }
+        if (blockSize >=   4) { sdata[tid] += sdata[tid +  2]; }
+        if (blockSize >=   2) { sdata[tid] += sdata[tid +  1]; }
+    }
+
+    // write result for this block to global mem 
+    if (tid == 0) g_odata[get_group_id(0)] = sdata[0];
+
+}
+
 
 
 __kernel void Simulate     (__global const float* rxm, __global const float* txm, 
@@ -197,14 +236,16 @@ __kernel void Simulate     (__global const float* rxm, __global const float* txm
 	uint na = n[3]; /* # Acq sites   */
 	uint ne = n[3]; /* # Exc sites   */
 
-	__local float sig[3172];
+	__global float sig[2 * nt * nc];
 
 	SimulateAcq (rxm, gr, tr, tm, tb0, gdt[0], igl, n, sig);
 	barrier(CLK_LOCAL_MEM_FENCE);
 
-	/*ReduceSignals();*/
-	/*barrier(CLK_LOCAL_MEM_FENCE);*/
-	/*SimulateExc (txm, gr, rf, sr, sb0, gdt, igl, n, m);*/
+	CollectSignals();
+	barrier(CLK_LOCAL_MEM_FENCE);
+
+	SimulateExc (txm, gr, rf, sr, sb0, gdt, igl, n, m);
+	barrier(CLK_LOCAL_MEM_FENCE);
 
 }
 

@@ -251,9 +251,16 @@ SpatialDomain::Process        () {
 	// -----------------------------------
 	
 
-	// Write pulse file for Siemens sequences
+	// Write pulse file for Siemens sequences 
+	// Assuming (Sagittal/Transversal A>>P) 
 
-	PTXWriteSiemensINIFile (b1, 2, 3, m_nc, 10, m_max_rf[0], &m_ptxfname, &m_orient);
+	stringstream ofname;
+	
+	ofname << m_ptxfname << ".sag_ap";
+	PTXWriteSiemensINIFile (b1, 2, 3, m_nc, 10, m_max_rf[0], ofname.str(), "s");
+	ofname.str("");
+	ofname << m_ptxfname << ".tra_ap";
+	PTXWriteSiemensINIFile (b1, 2, 3, m_nc, 10, m_max_rf[0], ofname.str(), "t");
 	// -----------------------------------
 
 	// Return NRMSE down the road --------

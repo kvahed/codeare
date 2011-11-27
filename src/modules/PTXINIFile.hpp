@@ -19,13 +19,12 @@
  */
 
 RRSModule::error_code
-PTXWriteSiemensINIFile (Matrix<cplx>& pt, int dimrf, int dimgr, int nc, int sampint, float max_rf, std::string* fname, std::string* orientation) {
-	
-	FILE* fp = fopen (fname->c_str(), "wb");
+PTXWriteSiemensINIFile (const Matrix<cplx>& pt, const int& dimrf, const int& dimgr, const int& nc, const int& sampint, 
+						const float& max_rf, const std::string& fname, const std::string& orientation) {	
 
-	int nt = pt.Dim(COL);
-
-	size_t ci[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+	FILE*  fp    = fopen (fname.c_str(), "wb");
+	int    nt    = pt.Dim(COL);
+	size_t ci[8] = {0, 1, 2, 3, 4, 5, 6, 7}; // Order of coils
 
 	if (fp == NULL)
 		return RRSModule::FILE_ACCESS_FAILED;
@@ -105,11 +104,11 @@ PTXWriteSiemensINIFile (Matrix<cplx>& pt, int dimrf, int dimgr, int nc, int samp
 	fprintf (fp, "GradientSamples   = %i\n",            nt);
 	fprintf (fp, "MaxAbsGradient[0] = %1.5f %1.5f %1.5f\n", maxg, maxg, maxg);
 	fprintf (fp, "\n"                                   );
-	
+
 	for (int i = 0; i < nt; i++)
-		if (orientation->compare("transversal") == 0 || orientation->compare("t") == 0)
+		if (orientation.compare("transversal") == 0 || orientation.compare("t") == 0)
 			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+0))/maxg, real(pt(i,nc+1))/maxg,  real(pt(i,nc+2))/maxg);
-		else if (orientation->compare("sagittal") == 0 || orientation->compare("s") == 0)
+		else if (orientation.compare("sagittal") == 0 || orientation.compare("s") == 0)
 			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, real(pt(i,nc+2))/maxg, real(pt(i,nc+1))/maxg, -real(pt(i,nc+0))/maxg);
 	
 	for (int j = 0; j < nc; j++) {
