@@ -84,20 +84,17 @@ DirectMethod::Process     () {
 
     // Intensity correction for single run
     if (m_ic) 
-		IntensityCorrection (GetCplx("b1m"), GetCplx("tmxy"), GetFloat("tmz"));
+		IntensityCorrection (GetCplx("b1"), GetCplx("tmxy"), GetFloat("tmz"));
 
-    sb.tb1   = m_cplx ["b1m"];
-    sb.sb1   = m_cplx ["b1p"];
+    sb.b1    = m_cplx ["b1"];
     sb.tmxy  = m_cplx ["tmxy"];
     sb.smxy  = m_cplx ["smxy"];
 
     sb.agr   = m_float["ag"];
     sb.tmz   = m_float["tmz"];
     sb.smz   = m_float["smz"];
-    sb.tb0   = m_float["b0"];
-    sb.sb0   = m_float["sb0"];
-    sb.tr    = m_float["r"];
-    sb.sr    = m_float["sr"];
+    sb.b0    = m_float["b0"];
+    sb.r     = m_float["r"];
     sb.jac   = m_float["j"];
 
     sb.np    = m_np;
@@ -109,9 +106,9 @@ DirectMethod::Process     () {
 	sb.exc   = m_excite; 
 
     // Outgoing
-    AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.tb1->Dim(1))));
-    AddCplx  ("mxy", sb.mxy = NEW (Matrix<cplx>  (             1,  sb.sr->Dim(1))));
-    AddFloat ( "mz", sb.mz  = NEW (Matrix<float> (             1,  sb.sr->Dim(1))));
+    AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.b1->Dim(1))));
+    AddCplx  ("mxy", sb.mxy = NEW (Matrix<cplx>  (             1, sb.r->Dim(1))));
+    AddFloat ( "mz", sb.mz  = NEW (Matrix<float> (             1, sb.r->Dim(1))));
 
     // Initialise CPU/GPU simulator
     SimulationContext sc (&sb);

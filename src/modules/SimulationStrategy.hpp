@@ -35,16 +35,13 @@ namespace RRStrategy {
 	struct SimulationBundle {
 
 		// Incoming
-		Ptr< Matrix<cplx> >   tb1;  /**<! b1                   (target)    */ 
-		Ptr< Matrix<cplx> >   sb1;  /**<!                      (sample)    */ 
+		Ptr< Matrix<cplx> >  b1;    /**<! b1                               */ 
 		
 		Ptr< Matrix<float> > agr;   /**<! Acquisition gradients            */ 
 		
-		Ptr< Matrix<float> > tr;    /**<! spatial vectors        (target)  */ 
-		Ptr< Matrix<float> > sr;    /**<! */ 
+		Ptr< Matrix<float> > r;     /**<! spatial vectors                  */ 
 
-		Ptr< Matrix<float> > tb0;   /**<! b0 maps                (target)  */ 
-		Ptr< Matrix<float> > sb0;   /**<!                        (sample)  */ 
+		Ptr< Matrix<float> > b0;    /**<! b0 maps                          */ 
 
 		Ptr< Matrix<cplx> >  tmxy;  /**<! starting magnetisation (target)  */
 		Ptr< Matrix<float> > tmz;
@@ -79,12 +76,9 @@ namespace RRStrategy {
 				return false;
 			}
 			
-			sb1->MXDump  (mf, "sb1" );	
-			tb1->MXDump  (mf, "tb1" );
-			tr->MXDump   (mf, "tr"  );
-			sr->MXDump   (mf, "sr"  );
-			tb0->MXDump  (mf, "tb0" );
-			sb0->MXDump  (mf, "sb0" );
+			b1->MXDump   (mf, "b1" );
+			r->MXDump    (mf, "r"  );
+			b0->MXDump   (mf, "b0" );
 			tmxy->MXDump (mf, "tmxy");
 			tmz->MXDump  (mf, "tmz" );
 			smxy->MXDump (mf, "smxy");

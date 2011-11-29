@@ -107,7 +107,7 @@ namespace RRStrategy {
     inline void 
 	IntensityCorrection (const Matrix<cplx>& b1maps, Matrix<cplx>& targetmxy, Matrix<float>& targetmz) {
 		
-        size_t nr = targetmxy.Dim(1);
+        size_t nr = targetmxy.Dim(0);
         size_t nc = b1maps.Dim(1);
 		
         float   a;
@@ -115,7 +115,7 @@ namespace RRStrategy {
 #pragma omp parallel default (shared) private (a)
 		{		
 
-#pragma omp for schedule (guided, 64)
+#pragma omp for schedule (guided)
 			for (size_t i = 0; i < nr; i++) {
 				
 				a = 0.0;
@@ -123,8 +123,8 @@ namespace RRStrategy {
 				for (size_t j = 0; j < nc; j++)
 					a += (b1maps(i,j)*conj(b1maps(i,j))).real();
 				
-				targetmxy[i] /= sqrt(a);
-				targetmz[i]  /= sqrt(a);
+				targetmxy[i] = targetmxy[i] / a;//sqrt(a);
+				targetmz[i]  = targetmz[i]  / a;//sqrt(a);
 				
 			}
 			
