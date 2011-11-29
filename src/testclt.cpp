@@ -297,17 +297,14 @@ bool cstest (ReconClient* rc) {
 
 bool dmtest (ReconClient* rc) {
 
-	Matrix<cplx>  b1m;  
+	Matrix<cplx>  b1;  
 	Matrix<cplx>  tmxy;
 	Matrix<float> tmz;  
 	Matrix<float> r;   
 	Matrix<float> b0;  
 	
-	Matrix<cplx>  b1p;  
 	Matrix<cplx>  smxy;
 	Matrix<float> smz;
-	Matrix<float> sr;
-	Matrix<float> sb0;
 
 	Matrix<float> ag;   
 	Matrix<float> j;
@@ -323,9 +320,9 @@ bool dmtest (ReconClient* rc) {
 	r.MXRead      (df, "r");
 	b0.MXRead     (df, "b0");
 
-	if (!b1m.MXRead (df, "b1m")) {
+	if (!b1.MXRead (df, "b1")) {
 		printf ("Assuming uniform receive b1\n");
-		b1m = Matrix<cplx>::Ones(r.Dim(1), 1);
+		b1 = Matrix<cplx>::Ones(r.Dim(1), 1);
 	}
 
 	tmxy.MXRead (df, "tmxy");
@@ -340,14 +337,6 @@ bool dmtest (ReconClient* rc) {
 		excite = true;
 
 		smz.MXRead (df, "smz");
-		sr.MXRead(df, "sr");
-		
-		if (!b1p.MXRead (df, "b1p")) {
-			printf ("Assuming uniform transmit b1\n");
-			b1p = Matrix<cplx>::Ones(sr.Dim(1), 1);
-		}
-		
-		sb0.MXRead(df, "sb0");
 		j.MXRead(df, "j");
 
 	}
@@ -363,8 +352,7 @@ bool dmtest (ReconClient* rc) {
 
 	// Outgoing -------------
 	
-	rc->SetCplx  ( "b1m", b1m );
-	rc->SetCplx  ( "b1p", b1p );
+	rc->SetCplx  (  "b1", b1  );
 	rc->SetFloat (  "ag", ag  );
 	rc->SetFloat (   "r", r   );
 	rc->SetFloat (  "b0", b0  );
@@ -372,8 +360,6 @@ bool dmtest (ReconClient* rc) {
 	rc->SetFloat ( "tmz", tmz );
 	rc->SetCplx  ("smxy", smxy);
 	rc->SetFloat ( "smz", smz );
-	rc->SetFloat (  "sr", sr  );
-	rc->SetFloat ( "sb0", sb0 );
 	rc->SetFloat (   "j", j   );
 	// ---------------------
 	

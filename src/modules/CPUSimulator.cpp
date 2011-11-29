@@ -105,37 +105,41 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 #pragma omp for schedule (guided) 
 		
 		for (size_t pos = 0; pos < nr; pos++) {
-			
-			for (size_t c = 0; c < nc; c++) ls[c] = b1(pos,c);
-			for (size_t i = 0; i <  3; i++) lr[i] =  r(i,pos);
 
 			lm[X] = mt0[pos].real(); 
 			lm[Y] = mt0[pos].imag(); 
 			lm[Z] = ml0[pos];
 			
-			// Run over time points
-			for (size_t t = 0; t < nt; t++) {
-				
-				tmp[0] = lm[0];
-				tmp[1] = lm[1];
-				tmp[2] = lm[2];
+			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
 
-				// Rotate axis (only gradients)
-				n[2] = - gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] + b0[pos]*TWOPI);
+				for (size_t c = 0; c < nc; c++) ls[c] = conj(b1(pos,c));
+				for (size_t i = 0; i <  3; i++) lr[i] =       r(i,pos);
 				
-				Rotate (n, lm);
+				// Run over time points
+				for (size_t t = 0; t < nt; t++) {
+					
+					tmp[0] = lm[0];
+					tmp[1] = lm[1];
+					tmp[2] = lm[2];
+					
+					// Rotate axis (only gradients)
+					n[2] = - gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] + b0[pos]*TWOPI);
+					
+					Rotate (n, lm);
+					
+					// Weighted contribution to all coils
+					cplx mxy  = cplx((lm[X]+tmp[X])/2,(lm[Y]+tmp[Y])/2); 
+					cplx scon = 0.0;
+					
+					for (size_t c = 0; c < nc; c++)
+						sig.At(t,c,omp_get_thread_num()) += ls[c]*mxy;
+					
+				}
 				
-				// Weighted contribution to all coils
-				cplx mxy  = cplx((lm[X]+tmp[X])/2,(lm[Y]+tmp[Y])/2); 
-				cplx scon = 0.0;
-
-				for (size_t c = 0; c < nc; c++)
-					sig.At(t,c,omp_get_thread_num()) += ls[c]*mxy;
-
 			}
 			
-	  }
-		
+		}
+
 #pragma omp for  schedule (guided) 
 		for (size_t i = 0; i < nt*nc; i++) {
 			rf[i] = cplx(0.0,0.0);
@@ -181,39 +185,43 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 	
 		for (size_t pos = 0; pos < nr; pos++) {
 			
-			for (size_t i = 0; i <  3; i++) lr[i] = r  (i,pos);
-			for (size_t i = 0; i < nc; i++) ls[i] = b1 (pos,i);
-		
 			// Start with equilibrium
-			lm[X] = 0.0;
-			lm[Y] = 0.0;
-			lm[Z] = 1.0;
+			lm[X] = mt0[pos].real();
+			lm[Y] = mt0[pos].imag();
+			lm[Z] = ml0[pos];
 			
-			// Time points
-			for (size_t t = 0; t < nt; t++) {
+			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
 				
-				size_t rt = nt-1-t;
+				for (size_t i = 0; i <  3; i++) lr[i] = r  (i,pos);
+				for (size_t i = 0; i < nc; i++) ls[i] = b1 (pos,i);
 				
-				cplx rfs = cplx (0.0,0.0);
-				for (size_t i = 0; i < nc; i++) 
-					rfs += rf(rt,i)*ls[i];
-				rfs *= jac[rt];
+				// Time points
+				for (size_t t = 0; t < nt; t++) {
+					
+					size_t rt = nt-1-t;
+					
+					cplx rfs = cplx (0.0,0.0);
+					for (size_t i = 0; i < nc; i++) 
+						rfs += rf(rt,i)*ls[i];
+					rfs *= jac[rt];
+					
+					n[0] = gdt * -rfs.imag();
+					n[1] = gdt *  rfs.real();
+					n[2] = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - b0[pos]*TWOPI) ;
+					
+					Rotate (n, lm);
+					
+				}
 				
-				n[0] = gdt * -rfs.imag();
-				n[1] = gdt *  rfs.real();
-				n[2] = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - b0[pos]*TWOPI) ;
-
-				Rotate (n, lm);
+				mxy [pos] = cplx (lm[X], lm[Y]);
+				mz  [pos] = lm[Z]; 
 				
 			}
 			
-			mxy [pos] = cplx (lm[X], lm[Y]);
-			mz  [pos] = lm[Z]; 
-			
 		}
-
+		
 	}
-
+	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 }
@@ -226,9 +234,9 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
 
     m_gdt = GAMMARAD * m_sb->dt;
     m_nt  = m_sb->agr->Dim(1);      // Time points
-    m_nc  = m_sb->tb1->Dim(1);     // # channels
-
-    assert (m_sb->tb1->Dim(1) == m_sb->sb1->Dim(1));
+    m_nc  = m_sb->b1->Dim(1);     // # channels
+	
+	m_sb->Dump("sb.mat");
 
 }
 
@@ -242,14 +250,13 @@ CPUSimulator::Simulate () {
 
     ticks            tic  = getticks();                                 // Start timing
 	
-	SimulateAcq (*(m_sb->tb1), *(m_sb->agr), *(m_sb->tr), *(m_sb->tb0), 
+	SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
 				 *(m_sb->tmxy), *(m_sb->tmz), m_sb->np, m_sb->dt, m_sb->v, 
 				 m_nc, m_nt, m_gdt, *(m_sb->rf));
-
 	if (!m_sb->exc) return;
 
-	SimulateExc (*(m_sb->sb1), *(m_sb->agr), *(m_sb->rf), *(m_sb->sr), 
-				 *(m_sb->sb0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
+	SimulateExc (*(m_sb->b1), *(m_sb->agr), *(m_sb->rf), *(m_sb->r), 
+				 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
 				 m_sb->np, m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, 
 				 *(m_sb->mxy), *(m_sb->mz));
 
@@ -287,12 +294,12 @@ CPUSimulator::Simulate () {
 			s = std::string (buffer);
 			q.MXDump(s.c_str(), "q");
 
-			SimulateAcq (*(m_sb->tb1), *(m_sb->agr), *(m_sb->tr), *(m_sb->tb0), 
+			SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
 						 q, *(m_sb->tmz), m_sb->np, m_sb->dt, m_sb->v, 
 						 m_nc, m_nt, m_gdt, *(m_sb->rf));
 			
-			SimulateExc (*(m_sb->sb1), *(m_sb->agr), *(m_sb->rf), *(m_sb->sr), 
-						 *(m_sb->sb0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
+			SimulateExc (*(m_sb->b1), *(m_sb->agr), *(m_sb->rf), *(m_sb->r), 
+						 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
 						 m_sb->np, m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, 
 						 p, *(m_sb->mz));
 

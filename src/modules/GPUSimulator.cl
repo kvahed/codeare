@@ -218,12 +218,9 @@ void CollectSignals (__global T *g_idata, __global T *g_odata, unsigned int n, _
 
 
 
-__kernel void Simulate     (__global const float* rxm, __global const float* txm, 
-							__global const float*  gr, __global const float*  tr, 
-							__global const float*  sr, __global const float* tb0, 
-							__global const float* sb0, __global const float*  tm,
-							__global const float*  sm, __global const float* jac, 
-							__global const float* gdt, __global const  uint*   n,
+__kernel void Simulate     (__global const float*  b1, __global const float*  gr, __global const float*  sr, 
+							__global const float*  b0, __global const float*  tm, __global const float*  sm, 
+							__global const float* jac, __global const float* gdt, __global const  uint*   n,
 							__global       float*  rf, __global       float*   m) 
 {
 
@@ -231,20 +228,19 @@ __kernel void Simulate     (__global const float* rxm, __global const float* txm
 	uint igr = get_group_id (0);
 	uint ilc = get_local_id (0);
 
-	uint nt = n[3]; /* # timepoints  */
-	uint nc = n[3]; /* # channels    */
-	uint na = n[3]; /* # Acq sites   */
-	uint ne = n[3]; /* # Exc sites   */
+	uint nt = n[0]; /* # timepoints  */
+	uint nc = n[1]; /* # channels    */
+	uint nr = n[2]; /* # Sites   */
 
 	__global float sig[2 * nt * nc];
 
-	SimulateAcq (rxm, gr, tr, tm, tb0, gdt[0], igl, n, sig);
+	SimulateAcq (b1, gr, r, tm, b0, gdt[0], igl, n, sig);
 	barrier(CLK_LOCAL_MEM_FENCE);
 
 	CollectSignals();
 	barrier(CLK_LOCAL_MEM_FENCE);
 
-	SimulateExc (txm, gr, rf, sr, sb0, gdt, igl, n, m);
+	SimulateExc (b1, gr, rf, r, b0, gdt[0], igl, n, m);
 	barrier(CLK_LOCAL_MEM_FENCE);
 
 }

@@ -143,13 +143,10 @@ namespace RRStrategy {
         cl::Kernel                m_kernel; /**!<   */
 
 		// RO device
-		cl::Buffer                ocl_tb1;
-		cl::Buffer                ocl_sb1;
+		cl::Buffer                ocl_b1;
 		cl::Buffer                ocl_agr;
-		cl::Buffer                ocl_tr;
-		cl::Buffer                ocl_sr;
-		cl::Buffer                ocl_tb0;
-		cl::Buffer                ocl_sb0;
+		cl::Buffer                ocl_r;
+		cl::Buffer                ocl_b0;
 		cl::Buffer                ocl_tmxy;
 		cl::Buffer                ocl_tmz;
 		cl::Buffer                ocl_smxy;
@@ -166,8 +163,7 @@ namespace RRStrategy {
 		float                     m_gdt;
 		size_t                    m_nt;
 		size_t                    m_nc;
-		size_t                    m_na;
-		size_t                    m_ne;
+		size_t                    m_nr;
 		size_t                    m_nl;
 
 
