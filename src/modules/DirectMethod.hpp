@@ -124,8 +124,8 @@ namespace RRStrategy {
 				for (size_t j = 0; j < nc; j++)
 					a += (b1maps(i,j)*conj(b1maps(i,j))).real();
 				
-				targetmxy[i] = targetmxy[i] / a;//sqrt(a);
-				targetmz[i]  = targetmz[i]  / a;//sqrt(a);
+				targetmxy[i] /= a;
+				targetmz[i]  /= a;
 				
 			}
 			
