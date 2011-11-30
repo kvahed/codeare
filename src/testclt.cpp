@@ -313,10 +313,10 @@ bool dmtest (ReconClient* rc) {
 	std::string df  = std::string (base + std::string(data));
 	std::string odf = std::string (base + std::string("/simout.mat"));
 
-	bool excite = false;
+	rc->ReadConfig (cf.c_str());
 
 #ifdef HAVE_MAT_H	
-	ag.MXRead     (df, "g");
+	ag.MXRead     (df, rc->Attribute("g"));
 	r.MXRead      (df, "r");
 	b0.MXRead     (df, "b0");
 
@@ -326,7 +326,7 @@ bool dmtest (ReconClient* rc) {
 	}
 
 	tmxy.MXRead (df, "tmxy");
-	tmz.MXRead (df, "tmz");
+	tmz.MXRead  (df, "tmz");
 
 	if (!smxy.MXRead (df,"smxy"))
 
@@ -334,17 +334,13 @@ bool dmtest (ReconClient* rc) {
 
 	else {
 
-		excite = true;
-
 		smz.MXRead (df, "smz");
-		j.MXRead(df, "j");
+		j.MXRead   (df, rc->Attribute("j"));
 
 	}
 
 #endif
 
-	rc->ReadConfig (cf.c_str());
-	rc->SetAttribute ("excite", excite);
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;

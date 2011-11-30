@@ -24,6 +24,12 @@
 #define GAMMARAD 2.6753e3
 #define TWOPI	 6.283185
 
+enum SIM_MODE {
+	AO,  // Acquisition only
+	AE,  // Acquire and excite
+	CG   // CG ATA
+};
+
 #include "../common.h"
 #include "Matrix.hpp"
 
@@ -54,10 +60,10 @@ namespace RRStrategy {
 		int                  mode;  /**<! mode (0:single run, 1:iterative) */
 
 		float                dt;    /**<! time step                        */
+		float                rfsc;  /**<! RF excitation scale              */
 		float                cgeps; /**<! CGNR convergence criterium       */
 		int                  cgit;  /**<! CGNR convergence criterium       */
 		
-		bool                 exc;   /**<! Excite?                          */
 		bool                 v;     /**<! verbose                          */
 		
 		// Outgoing
