@@ -35,6 +35,9 @@ DirectMethod::Init () {
     Attribute ("dt",      &m_dt);
     printf ("  delta t: %.6f \n", m_dt);
 
+    Attribute ("rfsc",      &m_rfsc);
+    printf ("  rf scaling factor: %.6f \n", m_rfsc);
+
     Attribute ("cgeps",      &m_cgeps);
     printf ("  CG eps: %.6f \n", m_cgeps);
 
@@ -52,9 +55,6 @@ DirectMethod::Init () {
 
     Attribute ("mode", &m_mode);
     printf ("  mode: %s \n", (m_mode) ? "true": "false");
-
-    Attribute ("excite", &m_excite);
-    printf ("  excite: %s \n", (m_excite) ? "true": "false");
 
     m_initialised = true;
 
@@ -100,10 +100,10 @@ DirectMethod::Process     () {
     sb.np    = m_np;
     sb.mode  = m_mode;
     sb.dt    = m_dt;
+    sb.rfsc  = m_rfsc;
     sb.v     = m_verbose;
 	sb.cgeps = m_cgeps;
 	sb.cgit  = m_cgiter;
-	sb.exc   = m_excite; 
 
     // Outgoing
     AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.b1->Dim(1))));

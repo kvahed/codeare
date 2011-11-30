@@ -87,6 +87,7 @@ namespace RRStrategy {
     private: 
         
         double             m_dt;       /*!< @brief Simulation time steps                                        */
+        double             m_rfsc;     /*!< @brief Simulation time steps                                        */
         bool               m_verbose;  /*!< @brief Verbose (Store magnetisation for every dt. HANDLE WITH CARE) */  // ignored
         int                m_np;       /*!< @brief Number of OMP threads */
         int                m_ic;       /*!< @brief Perform intensity correction */

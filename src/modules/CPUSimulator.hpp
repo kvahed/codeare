@@ -61,6 +61,7 @@ namespace RRStrategy {
 		
 
 		float          m_gdt; /*<! \gamma*dt          */
+		float          m_rfsc; /*<! RF scale */
 		size_t         m_nt;  /*<! # timepoints       */
 		size_t         m_nc;  /*<! # channels         */
 

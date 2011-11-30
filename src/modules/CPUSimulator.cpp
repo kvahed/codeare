@@ -146,7 +146,6 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 			for (int p = 0; p < np; p++)
 				rf[i] += sig[p*nt*nc+i];
 			rf[i] /= nr;
-			//rf[i] *= 37.3814;
 		}
 		
 	}
@@ -162,7 +161,7 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
               const Matrix<float>&   r, const Matrix<float>&  b0, const Matrix<cplx>& mt0, 
 			  const Matrix<float>& ml0, const Matrix<float>& jac, const size_t&        np, 
 			  const float&          dt, const bool&            v, const size_t&        nc, 
-			  const size_t&         nt, const float&         gdt,       
+			  const size_t&         nt, const float&         gdt, const float&       rfsc,
 			        Matrix<cplx>&  mxy,       Matrix<float>&  mz) {
     
 	size_t            nr   = r.Dim(1);
@@ -204,6 +203,7 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 					for (size_t i = 0; i < nc; i++) 
 						rfs += rf(rt,i)*ls[i];
 					rfs *= jac[rt];
+					rfs *= rfsc;
 					
 					n[0] = gdt * -rfs.imag();
 					n[1] = gdt *  rfs.real();
@@ -233,7 +233,8 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
     m_sb  = sb;
 
     m_gdt = GAMMARAD * m_sb->dt;
-    m_nt  = m_sb->agr->Dim(1);      // Time points
+    m_rfsc = m_sb->rfsc;
+    m_nt  = m_sb->agr->Dim(1);    // Time points
     m_nc  = m_sb->b1->Dim(1);     // # channels
 	
 	m_sb->Dump("sb.mat");
@@ -253,14 +254,15 @@ CPUSimulator::Simulate () {
 	SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
 				 *(m_sb->tmxy), *(m_sb->tmz), m_sb->np, m_sb->dt, m_sb->v, 
 				 m_nc, m_nt, m_gdt, *(m_sb->rf));
-	if (!m_sb->exc) return;
+
+	if (!m_sb->mode) return;
 
 	SimulateExc (*(m_sb->b1), *(m_sb->agr), *(m_sb->rf), *(m_sb->r), 
 				 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
-				 m_sb->np, m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, 
+				 m_sb->np, m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, m_rfsc, 
 				 *(m_sb->mxy), *(m_sb->mz));
 
-	if (m_sb->mode) {
+	if (m_sb->mode == CG) {
 
 		int   iters = 0;
 		
@@ -294,13 +296,15 @@ CPUSimulator::Simulate () {
 			s = std::string (buffer);
 			q.MXDump(s.c_str(), "q");
 
+			
+
 			SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
 						 q, *(m_sb->tmz), m_sb->np, m_sb->dt, m_sb->v, 
 						 m_nc, m_nt, m_gdt, *(m_sb->rf));
 			
 			SimulateExc (*(m_sb->b1), *(m_sb->agr), *(m_sb->rf), *(m_sb->r), 
 						 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
-						 m_sb->np, m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, 
+						 m_sb->np, m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, m_rfsc,
 						 p, *(m_sb->mz));
 
 			rtmp  = (rn / (p.dotc(q)));
