@@ -93,6 +93,7 @@ DirectMethod::Process     () {
     sb.agr   = m_float["ag"];
     sb.tmz   = m_float["tmz"];
     sb.smz   = m_float["smz"];
+    sb.roi   = m_float["roi"];
     sb.b0    = m_float["b0"];
     sb.r     = m_float["r"];
     sb.jac   = m_float["j"];
