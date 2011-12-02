@@ -53,6 +53,7 @@ namespace RRStrategy {
 		Ptr< Matrix<float> > tmz;
 		Ptr< Matrix<cplx> >  smxy;  /**<!                        (sample)  */
 		Ptr< Matrix<float> > smz;
+		Ptr< Matrix<float> > roi;
 
 		Ptr< Matrix<float> > jac;   /**<! jacobian j(k(t))                 */
 

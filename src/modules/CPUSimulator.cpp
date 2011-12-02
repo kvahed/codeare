@@ -86,7 +86,6 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 	size_t            nr   = r.Dim(1);
 
     ticks             tic  = getticks();
-	printf ("    %02i-ch acquisition of %i isochromats ... ", nc, nr); fflush(stdout);
 
 	Matrix<cplx>   sig (nt,nc,np); /*<! Signal repository  */
 	
@@ -123,14 +122,12 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 					tmp[2] = lm[2];
 					
 					// Rotate axis (only gradients)
-					n[2] = - gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] + b0[pos]*TWOPI);
+					n[2] = - gdt * (gr(X,t)*lr[X] + gr(Y,t)*lr[Y] + gr(Z,t)*lr[Z] - b0[pos]*TWOPI);
 					
 					Rotate (n, lm);
 					
 					// Weighted contribution to all coils
-					cplx mxy  = cplx((lm[X]+tmp[X])/2,(lm[Y]+tmp[Y])/2); 
-					cplx scon = 0.0;
-					
+					cplx mxy ((lm[X]+tmp[X])/2,(lm[Y]+tmp[Y])/2); 
 					for (size_t c = 0; c < nc; c++)
 						sig.At(t,c,omp_get_thread_num()) += ls[c]*mxy;
 					
@@ -150,7 +147,8 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		
 	}
 
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	if (v)
+		printf ("(a: %.4fs)", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate()); fflush(stdout);
 
 }
 
@@ -167,8 +165,6 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 	size_t            nr   = r.Dim(1);
 	
     ticks             tic  = getticks();
-
-	printf ("    %02i-ch excitation of %i isochromats ... ", nc, nr); fflush(stdout);
 
 #pragma omp parallel default(shared)
 	{
@@ -221,8 +217,9 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 		}
 		
 	}
-	
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+
+	if (v)
+		printf ("(e: %.4fs)", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate()); fflush(stdout);
 
 }
 
@@ -252,17 +249,10 @@ CPUSimulator::Simulate () {
     ticks            tic  = getticks();                                 // Start timing
 	
 	SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
-				 *(m_sb->tmxy), *(m_sb->tmz), m_sb->np, m_sb->dt, m_sb->v, 
+				 *(m_sb->tmxy), *(m_sb->tmz), m_sb->np, m_sb->dt, false, 
 				 m_nc, m_nt, m_gdt, *(m_sb->rf));
 
-	if (!m_sb->mode) return;
-
-	SimulateExc (*(m_sb->b1), *(m_sb->agr), *(m_sb->rf), *(m_sb->r), 
-				 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
-				 m_sb->np, m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, m_rfsc, 
-				 *(m_sb->mxy), *(m_sb->mz));
-
-	if (m_sb->mode == CG) {
+	if (m_sb->mode) {
 
 		int   iters = 0;
 		
@@ -272,7 +262,7 @@ CPUSimulator::Simulate () {
 		
 		Matrix<cplx> p, r, q, a;
 
-		p = *(m_sb->mxy);
+		p = *(m_sb->rf);
 		q = p;
 		r = p;
 		
@@ -287,41 +277,42 @@ CPUSimulator::Simulate () {
 			
 			rn = pow(r.Norm().real(), 2);
 			res.push_back(rn/an);
-			printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
+			if (iters > 0)
+				printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
 			
 			// Convergence ? ----------------------------------------------
 			if (res.at(iters) <= m_sb->cgeps) break;
 
-			sprintf(buffer, "q%02i.mat", iters);
-			s = std::string (buffer);
-			q.MXDump(s.c_str(), "q");
+			// f_B
+			SimulateExc (*(m_sb->b1), *(m_sb->agr), p, *(m_sb->r), 
+						 *(m_sb->b0), *(m_sb->smxy), *(m_sb->roi), *(m_sb->jac), 
+						 m_sb->np, m_sb->dt, true, m_nc, m_nt, m_gdt, m_rfsc, 
+						 *(m_sb->mxy), *(m_sb->mz));
 
-			
-
+			//f_{B^H}
 			SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
-						 q, *(m_sb->tmz), m_sb->np, m_sb->dt, m_sb->v, 
-						 m_nc, m_nt, m_gdt, *(m_sb->rf));
+						 *(m_sb->mxy), *(m_sb->mz), m_sb->np, m_sb->dt, true, 
+						 m_nc, m_nt, m_gdt, q);
 			
-			SimulateExc (*(m_sb->b1), *(m_sb->agr), *(m_sb->rf), *(m_sb->r), 
-						 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
-						 m_sb->np, m_sb->dt, m_sb->v, m_nc, m_nt, m_gdt, m_rfsc,
-						 p, *(m_sb->mz));
-
 			rtmp  = (rn / (p.dotc(q)));
+			//rtmp /=1.1;
+
 			if (iters == 0)
-				a     = (p    * rtmp);
+				a  = (p    * rtmp);
 			else
-				a    += (p    * rtmp);
+				a += (p    * rtmp);
+
 			r    -= (q    * rtmp);
 			p    *= cplx(pow(r.Norm().real(), 2)/rn);
 			p    += r;
 			
-			sprintf(buffer, "a%02i.mat", iters);
-			s  = std::string(buffer);
-			a.MXDump(s.c_str(), "a");
-
 		}
 
+		SimulateExc (*(m_sb->b1), *(m_sb->agr), a, *(m_sb->r), 
+					 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
+					 m_sb->np, m_sb->dt, false, m_nc, m_nt, m_gdt, m_rfsc, 
+					 *(m_sb->mxy), *(m_sb->mz));
+		
 	}
 
 }

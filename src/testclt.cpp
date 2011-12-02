@@ -305,6 +305,7 @@ bool dmtest (ReconClient* rc) {
 	
 	Matrix<cplx>  smxy;
 	Matrix<float> smz;
+	Matrix<float> roi;
 
 	Matrix<float> ag;   
 	Matrix<float> j;
@@ -335,6 +336,7 @@ bool dmtest (ReconClient* rc) {
 	else {
 
 		smz.MXRead (df, "smz");
+		roi.MXRead (df, "roi");
 		j.MXRead   (df, rc->Attribute("j"));
 
 	}
@@ -357,6 +359,7 @@ bool dmtest (ReconClient* rc) {
 	rc->SetCplx  ("smxy", smxy);
 	rc->SetFloat ( "smz", smz );
 	rc->SetFloat (   "j", j   );
+	rc->SetFloat ( "roi", roi );
 	// ---------------------
 	
 	rc->Process (test);
