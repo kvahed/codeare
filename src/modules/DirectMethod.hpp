@@ -105,6 +105,7 @@ namespace RRStrategy {
      * @param  b1maps  B1 maps
      * @param  target  Target pattern
      */
+	/*
     inline void 
 	IntensityCorrection (const Matrix<cplx>& b1maps, Matrix<cplx>& targetmxy, Matrix<float>& targetmz) {
 		
@@ -132,7 +133,7 @@ namespace RRStrategy {
 		}
 		
     }
-    
+	*/    
 }
 #endif /* __DIRECT_METHOD_H__ */
 
