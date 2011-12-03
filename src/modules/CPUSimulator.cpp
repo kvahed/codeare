@@ -3,6 +3,31 @@
 using namespace RRStrategy;
 
 /**
+ * @brief          Intensity correction
+ * 
+ * @param  b1maps  B1 maps
+ * @param  target  Target pattern
+ */
+inline void 
+IntensityMap (const Matrix<cplx>& b1maps, Matrix<float>& I) {
+	
+	size_t nr = b1maps.Dim(0);
+	size_t nc = b1maps.Dim(1);
+
+#pragma omp parallel default (shared)
+	{		
+			
+#pragma omp for schedule (guided)
+		for (size_t i = 0; i < nr; i++)
+			for (size_t j = 0; j < nc; j++)
+				I[i] += (b1maps(i,j)*conj(b1maps(i,j))).real();
+
+	}
+	
+}
+
+
+/**
  * @brief       Rotate magnetisation around rotation axis
  *
  * @param  n    Rotation axis
@@ -78,6 +103,7 @@ Rotate (const Matrix<float>& n, Matrix<float>& lm) {
 void 
 SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<float>&   r, 
              const Matrix<float>& b0, const Matrix<cplx>&  mt0, const Matrix<float>& ml0,
+			 const Matrix<float>& ic,
 			 const int&           np, const float&          dt, const bool&            v, 
 			 const size_t&        nc, const size_t&         nt, const float&         gdt,        
 			       Matrix<cplx>&  rf) {
@@ -105,9 +131,9 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		
 		for (size_t pos = 0; pos < nr; pos++) {
 
-			lm[X] = mt0[pos].real(); 
-			lm[Y] = mt0[pos].imag(); 
-			lm[Z] = ml0[pos];
+			lm[X] = mt0[pos].real()/ic[pos]; 
+			lm[Y] = mt0[pos].imag()/ic[pos]; 
+			lm[Z] = ml0[pos]/ic[pos];
 			
 			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
 
@@ -137,12 +163,14 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 			
 		}
 
+		float fnr  = (float)nr;
+
 #pragma omp for  schedule (guided) 
 		for (size_t i = 0; i < nt*nc; i++) {
 			rf[i] = cplx(0.0,0.0);
 			for (int p = 0; p < np; p++)
 				rf[i] += sig[p*nt*nc+i];
-			rf[i] /= nr;
+			rf[i] /= fnr;
 		}
 		
 	}
@@ -157,7 +185,8 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 void 
 SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< cplx>& rf, 
               const Matrix<float>&   r, const Matrix<float>&  b0, const Matrix<cplx>& mt0, 
-			  const Matrix<float>& ml0, const Matrix<float>& jac, const size_t&        np, 
+			  const Matrix<float>& ml0, const Matrix<float>& jac, const Matrix<float>& ic,
+			  const size_t&        np, 
 			  const float&          dt, const bool&            v, const size_t&        nc, 
 			  const size_t&         nt, const float&         gdt, const float&       rfsc,
 			        Matrix<cplx>&  mxy,       Matrix<float>&  mz) {
@@ -181,12 +210,12 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 		for (size_t pos = 0; pos < nr; pos++) {
 			
 			// Start with equilibrium
-			lm[X] = mt0[pos].real();
-			lm[Y] = mt0[pos].imag();
-			lm[Z] = ml0[pos];
+			lm[X] = mt0[pos].real()/ic[pos];
+			lm[Y] = mt0[pos].imag()/ic[pos];
+			lm[Z] = ml0[pos]/ic[pos];
 			
 			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
-				
+
 				for (size_t i = 0; i <  3; i++) lr[i] = r  (i,pos);
 				for (size_t i = 0; i < nc; i++) ls[i] = b1 (pos,i);
 				
@@ -229,12 +258,15 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
     
     m_sb  = sb;
 
-    m_gdt = GAMMARAD * m_sb->dt;
+    m_gdt  = GAMMARAD * m_sb->dt;
     m_rfsc = m_sb->rfsc;
-    m_nt  = m_sb->agr->Dim(1);    // Time points
-    m_nc  = m_sb->b1->Dim(1);     // # channels
+    m_nt   = m_sb->agr->Dim(1);    // Time points
+    m_nc   = m_sb->b1->Dim(1);     // # channels
+	m_nr   = m_sb->r->Dim(1);      // # spatial positions
 	
-	m_sb->Dump("sb.mat");
+	m_ic = Matrix<float>::Zeros (m_nr,1);
+	IntensityMap (*(m_sb->b1), m_ic);
+	m_ic.MXDump("ic.mat", "ic");
 
 }
 
@@ -249,7 +281,7 @@ CPUSimulator::Simulate () {
     ticks            tic  = getticks();                                 // Start timing
 	
 	SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
-				 *(m_sb->tmxy), *(m_sb->tmz), m_sb->np, m_sb->dt, false, 
+				 *(m_sb->tmxy), *(m_sb->tmz), m_ic, m_sb->np, m_sb->dt, false, 
 				 m_nc, m_nt, m_gdt, *(m_sb->rf));
 
 	if (m_sb->mode) {
@@ -285,17 +317,16 @@ CPUSimulator::Simulate () {
 
 			// f_B
 			SimulateExc (*(m_sb->b1), *(m_sb->agr), p, *(m_sb->r), 
-						 *(m_sb->b0), *(m_sb->smxy), *(m_sb->roi), *(m_sb->jac), 
+						 *(m_sb->b0), *(m_sb->smxy), *(m_sb->roi), *(m_sb->jac), m_ic,
 						 m_sb->np, m_sb->dt, true, m_nc, m_nt, m_gdt, m_rfsc, 
 						 *(m_sb->mxy), *(m_sb->mz));
 
 			//f_{B^H}
 			SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
-						 *(m_sb->mxy), *(m_sb->mz), m_sb->np, m_sb->dt, true, 
+						 *(m_sb->mxy), *(m_sb->mz), m_ic, m_sb->np, m_sb->dt, true, 
 						 m_nc, m_nt, m_gdt, q);
 			
 			rtmp  = (rn / (p.dotc(q)));
-			//rtmp /=1.1;
 
 			if (iters == 0)
 				a  = (p    * rtmp);
@@ -309,7 +340,7 @@ CPUSimulator::Simulate () {
 		}
 
 		SimulateExc (*(m_sb->b1), *(m_sb->agr), a, *(m_sb->r), 
-					 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), 
+					 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), m_ic,
 					 m_sb->np, m_sb->dt, false, m_nc, m_nt, m_gdt, m_rfsc, 
 					 *(m_sb->mxy), *(m_sb->mz));
 		

@@ -64,6 +64,9 @@ namespace RRStrategy {
 		float          m_rfsc; /*<! RF scale */
 		size_t         m_nt;  /*<! # timepoints       */
 		size_t         m_nc;  /*<! # channels         */
+		size_t         m_nr;
+		
+		Matrix<float>  m_ic;
 
 
 	};
