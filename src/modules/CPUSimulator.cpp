@@ -58,29 +58,31 @@ Rotate (const Matrix<float>& n, Matrix<float>& lm) {
 
         // Cayley-Klein parameters
         float hp    =  phi/2;        
-        float cp    =  cos(hp);
         float sp    =  sin(hp)/phi; /* /phi because n is unit length in defs. */
-        float ar    =  cp;
+        float ar    =  cos(hp);
         float ai    = -n[Z]*sp;
         float br    =  n[Y]*sp;
         float bi    = -n[X]*sp;
     
-        float arar  =   ar*ar;
-        float aiai  =   ai*ai;
-        float arai2 = 2*ar*ai;
-        float brbr  =   br*br;
-        float bibi  =   bi*bi;
-        float brbi2 = 2*br*bi;
-        float arbi2 = 2*ar*bi;
-        float aibr2 = 2*ai*br;
-        float arbr2 = 2*ar*br;
-        float aibi2 = 2*ai*bi;
+        float arar  = ar*ar;
+        float aiai  = ai*ai;
+        float arai2 = ar*ai*2.0;
+        float brbr  = br*br;
+        float bibi  = bi*bi;
+        float brbi2 = br*bi*2.0;
+        float arbi2 = ar*bi*2.0;
+        float aibr2 = ai*br*2.0;
+        float arbr2 = ar*br*2.0;
+        float aibi2 = ai*bi*2.0;
         
-        r[0] =  arar  - aiai - brbr + bibi;
+		float h1    = arar - aiai;
+		float h2    = bibi - brbr;
+
+        r[0] =  h1    + h2;
         r[1] = -arai2 - brbi2;
         r[2] = -arbr2 + aibi2;
         r[3] =  arai2 - brbi2; 
-        r[4] =  arar  - aiai + brbr - bibi;
+        r[4] =  h1    - h2;
         r[5] = -aibr2 - arbi2;
         r[6] =  arbr2 + aibi2;
         r[7] =  arbi2 - aibr2;
@@ -131,14 +133,18 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		
 		for (size_t pos = 0; pos < nr; pos++) {
 
-			lm[X] = mt0[pos].real()/ic[pos]; 
-			lm[Y] = mt0[pos].imag()/ic[pos]; 
-			lm[Z] = ml0[pos]/ic[pos];
-			
+			lm[X] = mt0[pos].real();//ic[pos]; 
+			lm[Y] = mt0[pos].imag();//ic[pos]; 
+			lm[Z] = ml0[pos]       ;//ic[pos];
+
 			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
 
+				lr[0] = r[pos*3];
+				lr[1] = r[pos*3+1];
+				lr[2] = r[pos*3+2];
+
+				//memcpy (&lr[0], &r[pos*3], 3*sizeof(float));
 				for (size_t c = 0; c < nc; c++) ls[c] = conj(b1(pos,c));
-				for (size_t i = 0; i <  3; i++) lr[i] =       r(i,pos);
 				
 				// Run over time points
 				for (size_t t = 0; t < nt; t++) {
@@ -175,8 +181,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		
 	}
 
-	if (v)
-		printf ("(a: %.4fs)", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate()); fflush(stdout);
+	if (v) printf ("(a: %.4fs)", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate()); fflush(stdout);
 
 }
 
@@ -185,11 +190,10 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 void 
 SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< cplx>& rf, 
               const Matrix<float>&   r, const Matrix<float>&  b0, const Matrix<cplx>& mt0, 
-			  const Matrix<float>& ml0, const Matrix<float>& jac, const Matrix<float>& ic,
-			  const size_t&        np, 
-			  const float&          dt, const bool&            v, const size_t&        nc, 
-			  const size_t&         nt, const float&         gdt, const float&       rfsc,
-			        Matrix<cplx>&  mxy,       Matrix<float>&  mz) {
+			  const Matrix<float>& ml0, const Matrix<float>& jac, /*const Matrix<float>& ic,*/
+			  const size_t&         np, const float&          dt, const bool&           v, 
+			  const size_t&         nc, const size_t&         nt, const float&        gdt, 
+			        Matrix<cplx>&  mxy,       Matrix<float>& mz) {
     
 	size_t            nr   = r.Dim(1);
 	
@@ -210,13 +214,16 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 		for (size_t pos = 0; pos < nr; pos++) {
 			
 			// Start with equilibrium
-			lm[X] = mt0[pos].real()/ic[pos];
-			lm[Y] = mt0[pos].imag()/ic[pos];
-			lm[Z] = ml0[pos]/ic[pos];
+			lm[X] = mt0[pos].real();
+			lm[Y] = mt0[pos].imag();
+			lm[Z] = ml0[pos]       ;
 			
 			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
 
-				for (size_t i = 0; i <  3; i++) lr[i] = r  (i,pos);
+				lr[0] = r[pos*3  ];
+				lr[1] = r[pos*3+1];
+				lr[2] = r[pos*3+2];
+
 				for (size_t i = 0; i < nc; i++) ls[i] = b1 (pos,i);
 				
 				// Time points
@@ -228,11 +235,12 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 					for (size_t i = 0; i < nc; i++) 
 						rfs += rf(rt,i)*ls[i];
 					rfs *= jac[rt];
-					rfs *= rfsc;
 					
-					n[0] = gdt * -rfs.imag();
-					n[1] = gdt *  rfs.real();
-					n[2] = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - b0[pos]*TWOPI) ;
+					n[0]  = gdt * -rfs.imag();
+					n[1]  = gdt *  rfs.real();
+					n[0] /=1000.0;
+					n[1] /=1000.0;
+					n[2]  = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - b0[pos]*TWOPI) ;
 					
 					Rotate (n, lm);
 					
@@ -247,8 +255,7 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 		
 	}
 
-	if (v)
-		printf ("(e: %.4fs)", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate()); fflush(stdout);
+	if (v) printf ("(e: %.4fs)", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate()); fflush(stdout);
 
 }
 
@@ -259,14 +266,15 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
     m_sb  = sb;
 
     m_gdt  = GAMMARAD * m_sb->dt;
-    m_rfsc = m_sb->rfsc;
-    m_nt   = m_sb->agr->Dim(1);    // Time points
+    m_nt   = m_sb->g->Dim(1);    // Time points
     m_nc   = m_sb->b1->Dim(1);     // # channels
 	m_nr   = m_sb->r->Dim(1);      // # spatial positions
 	
-	m_ic = Matrix<float>::Zeros (m_nr,1);
+	m_ic = Matrix<float>::Zeros (m_nr,1); // Intesity correction
 	IntensityMap (*(m_sb->b1), m_ic);
-	m_ic.MXDump("ic.mat", "ic");
+
+	if (m_sb->roi->Size() == 1)
+		m_sb->roi = m_sb->smz;
 
 }
 
@@ -278,71 +286,62 @@ CPUSimulator::~CPUSimulator () {}
 void 
 CPUSimulator::Simulate () {
 
-    ticks            tic  = getticks();                                 // Start timing
-	
-	SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
-				 *(m_sb->tmxy), *(m_sb->tmz), m_ic, m_sb->np, m_sb->dt, false, 
-				 m_nc, m_nt, m_gdt, *(m_sb->rf));
+    ticks          tic = getticks();                                 // Start timing
 
-	if (m_sb->mode) {
+	Matrix<cplx>&   b1 = *(m_sb->b1);
+	Matrix<float>&   g = *(m_sb->g);
+	Matrix<float>&  rv = *(m_sb->r);
+	Matrix<float>&  b0 = *(m_sb->b0);
+	Matrix<cplx>& tmxy = *(m_sb->tmxy);
+	Matrix<float>& tmz = *(m_sb->tmz);
+	Matrix<cplx>&   rf = *(m_sb->rf);
+	Matrix<cplx>& smxy = *(m_sb->smxy);
+	Matrix<float>& smz = *(m_sb->smz);
+	Matrix<float>& roi = *(m_sb->roi);
+	Matrix<float>& jac = *(m_sb->jac);
+	Matrix<cplx>&  mxy = *(m_sb->mxy);
+	Matrix<float>&  mz = *(m_sb->mz);
+	
+	int             np = m_sb->np;
+	float           dt = m_sb->dt;
+	vector<float>  res;	
+	
+	SimulateAcq (b1, g, rv, b0, tmxy, tmz, m_ic, np, dt, false, m_nc, m_nt, m_gdt, rf);
+
+	if (m_sb->mode) {                                   // Optimise
 
 		int   iters = 0;
-		
-		float rn    = 0.0;
-		float an    = 0.0;
-		cplx  rtmp  = cplx(0.0,0.0);
-		
+		float rn = 0.0, an = 0.0;
+		cplx rtmp = cplx(0.0,0.0);
 		Matrix<cplx> p, r, q, a;
 
-		p = *(m_sb->rf);
-		q = p;
-		r = p;
-		
-		vector<float> res;
-		
+		p = rf; q = p; r = p;
 		an = pow(p.Norm().real(), 2);
 		
-		char buffer [7];
-		std::string s;
-		// CGNR loop
-		for (iters = 0; iters < m_sb->cgit; iters++) {
+		for (iters = 0; iters < m_sb->cgit; iters++) { 	// CG loop
 			
 			rn = pow(r.Norm().real(), 2);
 			res.push_back(rn/an);
-			if (iters > 0)
-				printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
-			
-			// Convergence ? ----------------------------------------------
-			if (res.at(iters) <= m_sb->cgeps) break;
 
-			// f_B
-			SimulateExc (*(m_sb->b1), *(m_sb->agr), p, *(m_sb->r), 
-						 *(m_sb->b0), *(m_sb->smxy), *(m_sb->roi), *(m_sb->jac), m_ic,
-						 m_sb->np, m_sb->dt, true, m_nc, m_nt, m_gdt, m_rfsc, 
-						 *(m_sb->mxy), *(m_sb->mz));
+			if (iters) printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
+			if (res.at(iters) <= m_sb->cgeps) break;    // Convergence?
 
-			//f_{B^H}
-			SimulateAcq (*(m_sb->b1), *(m_sb->agr), *(m_sb->r), *(m_sb->b0), 
-						 *(m_sb->mxy), *(m_sb->mz), m_ic, m_sb->np, m_sb->dt, true, 
-						 m_nc, m_nt, m_gdt, q);
+			SimulateExc (b1, g, p, rv, b0, smxy, roi,  jac, np, dt, true, m_nc, m_nt, m_gdt, mxy, mz); // E^H
+			SimulateAcq (b1, g,    rv, b0,  mxy,  mz, m_ic, np, dt, true, m_nc, m_nt, m_gdt,       q); // E
 			
 			rtmp  = (rn / (p.dotc(q)));
 
-			if (iters == 0)
-				a  = (p    * rtmp);
-			else
-				a += (p    * rtmp);
+			if (!iters) a  = (p * rtmp);
+			else        a += (p * rtmp);
 
-			r    -= (q    * rtmp);
-			p    *= cplx(pow(r.Norm().real(), 2)/rn);
+			r    -= (q * rtmp);
+			p    *= cplx (pow(r.Norm().real(), 2)/rn);
 			p    += r;
 			
 		}
 
-		SimulateExc (*(m_sb->b1), *(m_sb->agr), a, *(m_sb->r), 
-					 *(m_sb->b0), *(m_sb->smxy), *(m_sb->smz), *(m_sb->jac), m_ic,
-					 m_sb->np, m_sb->dt, false, m_nc, m_nt, m_gdt, m_rfsc, 
-					 *(m_sb->mxy), *(m_sb->mz));
+		rf = a; // Final pulses
+		SimulateExc (b1, g, rf, rv, b0, smxy, smz, jac, np, dt, false, m_nc, m_nt, m_gdt, mxy, mz); // Excitation 
 		
 	}
 

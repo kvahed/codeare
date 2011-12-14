@@ -307,7 +307,7 @@ bool dmtest (ReconClient* rc) {
 	Matrix<float> smz;
 	Matrix<float> roi;
 
-	Matrix<float> ag;   
+	Matrix<float> g;   
 	Matrix<float> j;
 	
 	std::string cf  = std::string (base + std::string(config));
@@ -315,30 +315,28 @@ bool dmtest (ReconClient* rc) {
 	std::string odf = std::string (base + std::string("/simout.mat"));
 
 	rc->ReadConfig (cf.c_str());
+	
+	std::string gf = std::string(base + std::string(rc->Attribute("gf"))); // gradient trajectories
+	std::string pf = std::string(base + std::string(rc->Attribute("pf"))); // patterns
+
+	// Gradients
+	g.MXRead    (gf, rc->Attribute("g"));
+	j.MXRead    (df, rc->Attribute("j"));
+
+	// Target excitation, ROI, sample
+	r.MXRead    (pf, "r");
+	tmxy.MXRead (pf, rc->Attribute("p"));
+	tmz  = Matrix<float>::Zeros (r.Dim(1), 1);
+	smxy = Matrix<cplx>::Zeros  (r.Dim(1), 1);
+	smz.MXRead (pf, rc->Attribute("s"));
+	roi.MXRead (pf, rc->Attribute("roi"));
 
 #ifdef HAVE_MAT_H	
-	ag.MXRead     (df, rc->Attribute("g"));
-	r.MXRead      (df, "r");
 	b0.MXRead     (df, "b0");
 
 	if (!b1.MXRead (df, "b1")) {
 		printf ("Assuming uniform receive b1\n");
 		b1 = Matrix<cplx>::Ones(r.Dim(1), 1);
-	}
-
-	tmxy.MXRead (df, "tmxy");
-	tmz.MXRead  (df, "tmz");
-
-	if (!smxy.MXRead (df,"smxy"))
-
-		printf ("No sample for excitation simulation\n");
-
-	else {
-
-		smz.MXRead (df, "smz");
-		roi.MXRead (df, "roi");
-		j.MXRead   (df, rc->Attribute("j"));
-
 	}
 
 #endif
@@ -351,7 +349,7 @@ bool dmtest (ReconClient* rc) {
 	// Outgoing -------------
 	
 	rc->SetCplx  (  "b1", b1  );
-	rc->SetFloat (  "ag", ag  );
+	rc->SetFloat (   "g", g  );
 	rc->SetFloat (   "r", r   );
 	rc->SetFloat (  "b0", b0  );
 	rc->SetCplx  ("tmxy", tmxy);

@@ -35,9 +35,6 @@ DirectMethod::Init () {
     Attribute ("dt",      &m_dt);
     printf ("  delta t: %.6f \n", m_dt);
 
-    Attribute ("rfsc",      &m_rfsc);
-    printf ("  rf scaling factor: %.6f \n", m_rfsc);
-
     Attribute ("cgeps",      &m_cgeps);
     printf ("  CG eps: %.6f \n", m_cgeps);
 
@@ -49,9 +46,6 @@ DirectMethod::Init () {
 
     Attribute ("threads", &m_np);
     printf ("  # threads: %.i \n", m_np);
-
-    Attribute ("ic", &m_ic);
-    printf ("  intensity correction: %s \n", (m_ic) ? "true": "false");
 
     Attribute ("mode", &m_mode);
     printf ("  mode: %s \n", (m_mode) ? "true": "false");
@@ -82,17 +76,11 @@ DirectMethod::Process     () {
     SimulationBundle sb;
     ticks           start  = getticks();
 
-    // Intensity correction for single run
-	/*
-    if (m_ic) 
-		IntensityCorrection (GetCplx("b1"), GetCplx("tmxy"), GetFloat("tmz"));
-	*/
-
     sb.b1    = m_cplx ["b1"];
     sb.tmxy  = m_cplx ["tmxy"];
     sb.smxy  = m_cplx ["smxy"];
 
-    sb.agr   = m_float["ag"];
+    sb.g     = m_float["g"];
     sb.tmz   = m_float["tmz"];
     sb.smz   = m_float["smz"];
     sb.roi   = m_float["roi"];
@@ -103,15 +91,14 @@ DirectMethod::Process     () {
     sb.np    = m_np;
     sb.mode  = m_mode;
     sb.dt    = m_dt;
-    sb.rfsc  = m_rfsc;
     sb.v     = m_verbose;
 	sb.cgeps = m_cgeps;
 	sb.cgit  = m_cgiter;
 
     // Outgoing
-    AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.agr->Dim(1), sb.b1->Dim(1))));
-    AddCplx  ("mxy", sb.mxy = NEW (Matrix<cplx>  (             1, sb.r->Dim(1))));
-    AddFloat ( "mz", sb.mz  = NEW (Matrix<float> (             1, sb.r->Dim(1))));
+    AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.g->Dim(1), sb.b1->Dim(1))));
+    AddCplx  ("mxy", sb.mxy = NEW (Matrix<cplx>  (           1, sb.r->Dim(1))));
+    AddFloat ( "mz", sb.mz  = NEW (Matrix<float> (           1, sb.r->Dim(1))));
 
     // Initialise CPU/GPU simulator
     SimulationContext sc (&sb);

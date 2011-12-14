@@ -21,7 +21,7 @@
 #ifndef __SIMULATION_STRATEGY_HPP__
 #define __SIMULATION_STRATEGY_HPP__
 
-#define GAMMARAD 2.6753e3
+#define GAMMARAD 2.6753e8
 #define TWOPI	 6.283185
 
 enum SIM_MODE {
@@ -41,36 +41,35 @@ namespace RRStrategy {
 	struct SimulationBundle {
 
 		// Incoming
-		Ptr< Matrix<cplx> >  b1;    /**<! b1                               */ 
+		Ptr< Matrix<cplx> >    b1;  /**<! b1                               */ 
 		
-		Ptr< Matrix<float> > agr;   /**<! Acquisition gradients            */ 
+		Ptr< Matrix<float> >    g;  /**<! Acquisition gradients            */ 
 		
-		Ptr< Matrix<float> > r;     /**<! spatial vectors                  */ 
+		Ptr< Matrix<float> >    r;  /**<! spatial vectors                  */ 
 
-		Ptr< Matrix<float> > b0;    /**<! b0 maps                          */ 
+		Ptr< Matrix<float> >   b0;  /**<! b0 maps                          */ 
 
 		Ptr< Matrix<cplx> >  tmxy;  /**<! starting magnetisation (target)  */
-		Ptr< Matrix<float> > tmz;
+		Ptr< Matrix<float> >  tmz;
 		Ptr< Matrix<cplx> >  smxy;  /**<!                        (sample)  */
-		Ptr< Matrix<float> > smz;
-		Ptr< Matrix<float> > roi;
+		Ptr< Matrix<float> >  smz;  
+		Ptr< Matrix<float> >  roi;  /**<! ROI                    (sample)  */
 
-		Ptr< Matrix<float> > jac;   /**<! jacobian j(k(t))                 */
+		Ptr< Matrix<float> >  jac;  /**<! jacobian j(k(t))                 */
 
-		int                  np;    /**<! # threads                        */
+		int                    np;  /**<! # threads                        */
 		int                  mode;  /**<! mode (0:single run, 1:iterative) */
 
-		float                dt;    /**<! time step                        */
-		float                rfsc;  /**<! RF excitation scale              */
+		float                  dt;  /**<! time step                        */
 		float                cgeps; /**<! CGNR convergence criterium       */
 		int                  cgit;  /**<! CGNR convergence criterium       */
 		
-		bool                 v;     /**<! verbose                          */
+		bool                    v;  /**<! verbose                          */
 		
 		// Outgoing
-		Ptr< Matrix<cplx> >  rf;   /**<! RF pulses                         */
-		Ptr< Matrix<cplx> >  mxy;  /**<! Excited transverse magnetisation  */
-		Ptr< Matrix<float> > mz;   /**<! Longitudinal magnetisation        */
+		Ptr< Matrix<cplx> >    rf;  /**<! RF pulses                         */
+		Ptr< Matrix<cplx> >   mxy;  /**<! Excited transverse magnetisation  */
+		Ptr< Matrix<float> >   mz;  /**<! Longitudinal magnetisation        */
 
 		bool Dump (std::string odf) {
 			
@@ -83,9 +82,10 @@ namespace RRStrategy {
 				return false;
 			}
 			
-			b1->MXDump   (mf, "b1" );
-			r->MXDump    (mf, "r"  );
-			b0->MXDump   (mf, "b0" );
+			b1->MXDump   (mf, "b1"  );
+			r->MXDump    (mf, "r"   );
+			b0->MXDump   (mf, "b0"  );
+			g->MXDump    (mf, "g"   );
 			tmxy->MXDump (mf, "tmxy");
 			tmz->MXDump  (mf, "tmz" );
 			smxy->MXDump (mf, "smxy");
