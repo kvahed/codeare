@@ -144,7 +144,7 @@ namespace RRStrategy {
 
 		// RO device
 		cl::Buffer                ocl_b1;
-		cl::Buffer                ocl_agr;
+		cl::Buffer                ocl_g;
 		cl::Buffer                ocl_r;
 		cl::Buffer                ocl_b0;
 		cl::Buffer                ocl_tmxy;

@@ -34,7 +34,7 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 	m_sb = sb;
 
 	m_gdt = GAMMARAD * m_sb->dt;
-	m_nt  = m_sb->agr->Dim(1);      // Time points
+	m_nt  = m_sb->g->Dim(1);      // Time points
 	m_nc  = m_sb->b1->Dim(1);       // # channels
 	m_nr  = m_sb->r->Dim(1); 
 	m_nl  = 16;
@@ -152,7 +152,7 @@ GPUSimulator::SetDeviceData () {
 	
     printf("  Creating device arrays ... ");  fflush(stdout);
 	ocl_b1   = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) *    m_sb->b1->Size(), NULL, &m_error);
-	ocl_agr  = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *   m_sb->agr->Size(), NULL, &m_error);
+	ocl_g    = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *     m_sb->g->Size(), NULL, &m_error);
 	ocl_r    = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *     m_sb->r->Size(), NULL, &m_error);
 	ocl_b0   = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY,     sizeof(float) *    m_sb->b0->Size(), NULL, &m_error);
 	ocl_tmxy = cl::Buffer (m_ctxt,  CL_MEM_READ_ONLY, 2 * sizeof(float) *  m_sb->tmxy->Size(), NULL, &m_error);
@@ -168,7 +168,7 @@ GPUSimulator::SetDeviceData () {
 
 	printf("done.\n  Pushing data to device ... ");  fflush(stdout);
     m_error = m_cmdq.enqueueWriteBuffer (  ocl_b1, CL_TRUE, 0, 2 * sizeof(float) *   m_sb->b1->Size(),   &m_sb->b1->At(0), NULL, &m_event);
-    m_error = m_cmdq.enqueueWriteBuffer ( ocl_agr, CL_TRUE, 0,     sizeof(float) *  m_sb->agr->Size(),  &m_sb->agr->At(0), NULL, &m_event);
+    m_error = m_cmdq.enqueueWriteBuffer (   ocl_g, CL_TRUE, 0,     sizeof(float) *    m_sb->g->Size(),    &m_sb->g->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer (   ocl_r, CL_TRUE, 0,     sizeof(float) *    m_sb->r->Size(),    &m_sb->r->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer ( ocl_b0,  CL_TRUE, 0,     sizeof(float) *   m_sb->b0->Size(),   &m_sb->b0->At(0), NULL, &m_event);
     m_error = m_cmdq.enqueueWriteBuffer (ocl_tmxy, CL_TRUE, 0, 2 * sizeof(float) * m_sb->tmxy->Size(), &m_sb->tmxy->At(0), NULL, &m_event);
@@ -184,7 +184,7 @@ GPUSimulator::SetDeviceData () {
 
 	printf("done.\n  Assigning arguments to kernel ... ");  fflush(stdout);
 	m_error = m_kernel.setArg( 0, ocl_b1  );
-	m_error = m_kernel.setArg( 1, ocl_agr );
+	m_error = m_kernel.setArg( 1, ocl_g   );
 	m_error = m_kernel.setArg( 2, ocl_r   );
 	m_error = m_kernel.setArg( 3, ocl_b0  );
 	m_error = m_kernel.setArg( 4, ocl_tmxy);
