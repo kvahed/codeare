@@ -44,6 +44,9 @@ DirectMethod::Init () {
     Attribute ("verbose", &m_verbose);
     printf ("  verbose: %s \n", (m_verbose) ? "true" : "false");
 
+    Attribute ("cb0", &m_cb0);
+    printf ("  cb0: %s \n", (m_cb0) ? "true" : "false");
+
     Attribute ("threads", &m_np);
     printf ("  # threads: %.i \n", m_np);
 
@@ -94,6 +97,7 @@ DirectMethod::Process     () {
     sb.v     = m_verbose;
 	sb.cgeps = m_cgeps;
 	sb.cgit  = m_cgiter;
+	sb.cb0   = m_cb0;
 
     // Outgoing
     AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.g->Dim(1), sb.b1->Dim(1))));

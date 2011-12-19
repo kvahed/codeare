@@ -65,6 +65,7 @@ namespace RRStrategy {
 		int                  cgit;  /**<! CGNR convergence criterium       */
 		
 		bool                    v;  /**<! verbose                          */
+		bool                  cb0;  /**<! correct b0?                      */
 		
 		// Outgoing
 		Ptr< Matrix<cplx> >    rf;  /**<! RF pulses                         */

@@ -311,17 +311,17 @@ bool dmtest (ReconClient* rc) {
 	Matrix<float> j;
 	
 	std::string cf  = std::string (base + std::string(config));
-	std::string df  = std::string (base + std::string(data));
 	std::string odf = std::string (base + std::string("/simout.mat"));
 
 	rc->ReadConfig (cf.c_str());
 	
 	std::string gf = std::string(base + std::string(rc->Attribute("gf"))); // gradient trajectories
 	std::string pf = std::string(base + std::string(rc->Attribute("pf"))); // patterns
+	std::string mf = std::string(base + std::string(rc->Attribute("mf"))); // maps
 
 	// Gradients
 	g.MXRead    (gf, rc->Attribute("g"));
-	j.MXRead    (df, rc->Attribute("j"));
+	j.MXRead    (gf, rc->Attribute("j"));
 
 	// Target excitation, ROI, sample
 	r.MXRead    (pf, "r");
@@ -331,16 +331,10 @@ bool dmtest (ReconClient* rc) {
 	smz.MXRead (pf, rc->Attribute("s"));
 	roi.MXRead (pf, rc->Attribute("roi"));
 
-#ifdef HAVE_MAT_H	
-	b0.MXRead     (df, "b0");
-
-	if (!b1.MXRead (df, "b1")) {
-		printf ("Assuming uniform receive b1\n");
-		b1 = Matrix<cplx>::Ones(r.Dim(1), 1);
-	}
-
-#endif
-
+	// Maps
+	b1.MXRead (mf, rc->Attribute("b1"));
+	b0.MXRead (mf, rc->Attribute("b0"));
+	
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
@@ -379,20 +373,20 @@ bool dmtest (ReconClient* rc) {
 	rc->Finalise   (test);
 	
 #ifdef HAVE_MAT_H	
-	MATFile* mf = matOpen (odf.c_str(), "w");
+	MATFile* od = matOpen (odf.c_str(), "w");
 
-	if (mf == NULL) {
+	if (od == NULL) {
 		printf ("Error creating file %s\n", odf.c_str());
 		return false;
 	}
 
-	mxy.MXDump (mf, "mxy");
-	mz.MXDump  (mf, "mz");
-	tmxy.MXDump (mf, "tmxy");
-	tmz.MXDump  (mf, "tmz");
-	rf.MXDump  (mf, "rf");
+	mxy.MXDump  (od, "mxy");
+	mz.MXDump   (od, "mz");
+	tmxy.MXDump (od, "tmxy");
+	tmz.MXDump  (od, "tmz");
+	rf.MXDump   (od, "rf");
 
-	if (matClose(mf) != 0) {
+	if (matClose(od) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());
 		return false;
 	}
