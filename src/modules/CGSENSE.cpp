@@ -219,9 +219,6 @@ CGSENSE::Process () {
 	// Out going images -----------------------------------------------
 	Matrix<cplx>&   image = AddCplx (  "image", NEW (Matrix<cplx>(m_N[0], m_N[1], m_N[2])));
 
-	// Out going signals ----------------------------------------------
-	Matrix<cplx>& signals = AddCplx ("signals", NEW (Matrix<cplx>(m_M, m_Nc)));
-
 	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
 
@@ -232,10 +229,8 @@ CGSENSE::Process () {
 
 	int         iters = 0;
 
-	if (m_verbose) {
+	if (m_verbose)
 		memcpy (  &image[iters*   p.Size()],    &p[0],    p.Size() * sizeof(cplx));
-		memcpy (&signals[iters*stmp.Size()], &stmp[0], stmp.Size() * sizeof(cplx));
-	}
 
 	// CG residuals storage and helper variables ----------------------
 	std::vector<double> res;
@@ -252,8 +247,6 @@ CGSENSE::Process () {
 
 	an = pow(p.Norm().real(), 2);
 	Matrix<cplx> a(m_N[0], m_N[1], m_N[2]);
-	Matrix<cplx> s(m_M, m_Nc);
-
 
 	for (iters = 0; iters < m_cgmaxit; iters++) {
 
@@ -273,7 +266,6 @@ CGSENSE::Process () {
 
 		rtmp  = (rn / (p.dotc(q)));
 		a    += (p    * rtmp);
-		s    += (stmp * rtmp);
 		r    -= (q    * rtmp);
 		p    *= cplx(pow(r.Norm().real(), 2)/rn);
 		p    += r;
@@ -281,9 +273,7 @@ CGSENSE::Process () {
 		// Verbose out put keeps all intermediate steps ---------------
 		if (m_verbose) {
 			image.Expand(m_dim); 
-			signals.Expand(2);
 			memcpy (  &image[(iters+1)*a.Size()], &a[0], a.Size()*sizeof(cplx));
-			memcpy (&signals[(iters+1)*s.Size()], &s[0], s.Size()*sizeof(cplx));
 		}
 		
 	}
@@ -300,13 +290,10 @@ CGSENSE::Process () {
 		Matrix<double>& nrmse = AddReal ("nrmse", NEW (Matrix<double> (iters,1)));
 		memcpy (&nrmse[0], &res[0], iters * sizeof(double));
 		
-	} else {
+	} else
 
 		image   = a;
-		signals = s;
 
-	}
-	
 	return error;
 
 }
