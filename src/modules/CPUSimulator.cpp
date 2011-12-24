@@ -20,7 +20,7 @@ IntensityMap (const Matrix<cplx>& b1maps, Matrix<float>& I) {
 #pragma omp for schedule (guided)
 		for (size_t i = 0; i < nr; i++)
 			for (size_t j = 0; j < nc; j++)
-				I[i] += (b1maps(i,j)*conj(b1maps(i,j))).real();
+				I[i] += sqrt((b1maps(i,j)*conj(b1maps(i,j))).real()) + 1.0e-10;
 
 	}
 	
@@ -106,7 +106,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 
 
 	size_t            nr   = r.Dim(1);
-	float             nrs  = (float)nr*nr;
+	float             nrs  = (float)nr;
 
     ticks             tic  = getticks();
 
@@ -129,9 +129,9 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		
 		for (size_t pos = 0; pos < nr; pos++) {
 
-			lm[X] = mt0[pos].real();//ic[pos]; 
-			lm[Y] = mt0[pos].imag();//ic[pos]; 
-			lm[Z] = ml0[pos]       ;//ic[pos];
+			lm[X] = mt0[pos].real()/ic[pos]; 
+			lm[Y] = mt0[pos].imag()/ic[pos]; 
+			lm[Z] = ml0[pos]       /ic[pos];
 
 			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
 
@@ -236,8 +236,8 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 						rfs += rf(rt,i)*ls[i];
 					rfs *= jac[rt];
 					
-					n[0]  = gdt * -rfs.imag();
-					n[1]  = gdt *  rfs.real();
+					n[0]  = gdt * -rfs.imag() * 1.0e-6;
+					n[1]  = gdt *  rfs.real() * 1.0e-6;
 					n[2]  = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - lb0) ;
 					
 					Rotate (n, lm);
@@ -305,7 +305,8 @@ CPUSimulator::Simulate () {
 	vector<float>  res;	
 
 	bool           cb0 = m_sb->cb0;
-	
+	bool             v = m_sb->v;
+
 	SimulateAcq (b1, g, rv, (cb0)?b0:Matrix<float>::Zeros(m_nr,1), tmxy, tmz, m_ic, np, dt, false, m_nc, m_nt, m_gdt, rf);
 
 	if (m_sb->mode) {                                   // Optimise
@@ -331,8 +332,18 @@ CPUSimulator::Simulate () {
 			
 			rtmp  = (rn / (p.dotc(q)));
 
-			if (!iters) a  = (p * rtmp);
-			else        a += (p * rtmp);
+			if (!iters) {
+				a  = (p * rtmp);
+				if (v) {
+					a.MXDump ("a.mat", "a");
+					Matrix<cplx> txy(mxy);
+					Matrix<float> tz(mz);
+					SimulateExc (b1, g, a, rv, b0, smxy, smz, jac, np, dt, false, m_nc, m_nt, m_gdt, txy, tz); // Excitation 
+					txy.MXDump ("mxy.mat", "m_xy");
+					tz.MXDump ("mz.mat", "m_z");
+				}
+			} else        
+				a += (p * rtmp);
 
 			r    -= (q * rtmp);
 			p    *= cplx (pow(r.Norm().real(), 2)/rn);
