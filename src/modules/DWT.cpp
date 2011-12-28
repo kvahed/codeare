@@ -73,9 +73,8 @@ DWT::Transform (const Matrix<cplx>& m, const bool bw) {
 	}
 		
 	for (size_t j = 0; j < l; j++)
-		for (size_t i = 0; i < l; i++) {
+		for (size_t i = 0; i < l; i++) 
 			res.At(j*l+i) = cplx(re[i*l+j],im [i*l+j]);
-		}
 	
 	free (re);
 	free (im);
