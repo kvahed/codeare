@@ -114,6 +114,7 @@ CGSENSE::Init() {
 	// Verbosity ----------------------------
 
 	Attribute ("testcase",  &m_testcase);
+	printf ("  test case: %i \n", m_testcase);
 	// --------------------------------------
 
 	// Verbosity ----------------------------
@@ -193,7 +194,7 @@ CGSENSE::Process () {
 	m_intcor                = Matrix<double>::Ones (m_N[0],m_N[1],m_N[2]);
 
 	// Add white noise? (Only for testing) ----------------------------
-	if (m_noise > 0.0)
+	if (m_testcase && m_noise > 0.0)
 		AddPseudoRandomNoise (data, (float) m_noise);
 	
 	// Set k-space and weights in FT plans and clear RAM --------------
@@ -216,12 +217,15 @@ CGSENSE::Process () {
 	else 
 		stmp = data;
 
+	stmp.MXDump ("stmp.mat", "stmp");
+	
+
 	FreeCplx("data");
 	
 	IntensityCorrection (sens, m_intcor);
 	
 	// Out going images -----------------------------------------------
-	Matrix<cplx>&   image = AddCplx ("image", NEW (Matrix<cplx>(m_N[0], m_N[1], m_N[2])));
+	Matrix<cplx>& image = AddCplx ("image", NEW (Matrix<cplx>(m_N[0], m_N[1], m_N[2])));
 
 	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
