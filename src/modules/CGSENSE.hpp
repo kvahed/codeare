@@ -83,6 +83,7 @@ namespace RRStrategy {
 		Matrix < raw >       m_sens;            /**< Sensitivity maps                */
 		Matrix < raw >       m_measured;        /**< Measured data                   */
 		Matrix < double >    m_weights;         /**< K-space weights                 */
+		Matrix < double >    m_intcor;          /**< Intensity correction            */
 		
 		nfft_plan           m_fplan[NTHREADS];  /**< NuFFT plan                      */
 		solver_plan_complex m_iplan[NTHREADS];  /**< iNuFFT plan                     */
@@ -103,6 +104,34 @@ namespace RRStrategy {
 		double*              kmax;              /**< Maximum k-space vector          */
 
 	};
-	
+
+
+	void IntensityCorrection (const Matrix<cplx>& sens, Matrix<double>& intcor) {
+
+
+		size_t nc = sens.Dim(sens.HDim());
+		size_t nr = intcor.Size();
+
+#pragma omp parallel default (shared)
+		{		
+			
+#pragma omp for schedule (guided)
+			for (size_t i = 0; i < nr; i++) {
+				
+				intcor[i] = 0.0;
+				
+				for (size_t j = 0; j < nc; j++)
+					intcor[i] += (sens(i+j*nr) * conj(sens(i+j*nr))).real();
+			
+				intcor[i] = 1.0 / (sqrt (intcor[i]) + 1.0e-10);
+				
+			}
+			
+		}
+		
+		intcor.MXDump("intcor.mat", "intcor");
+		
+	}
+
 }
 #endif /* __CGSENSE_H__ */

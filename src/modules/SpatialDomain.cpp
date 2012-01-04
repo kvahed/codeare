@@ -194,7 +194,7 @@ SpatialDomain::Process        () {
             solution = minv->*(target);
             tmp      = m->*(solution);
 
-            NRMSE ((target), tmp, gc, nrmse);
+            NRMSE (target, tmp, gc, nrmse);
             res.push_back (nrmse);
             
 			if (m_verbose)

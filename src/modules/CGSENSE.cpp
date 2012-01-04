@@ -188,11 +188,13 @@ CGSENSE::Process () {
 	Matrix<double>& kspace  = GetReal("kspace");
 	
 	// CG matrices ----------------------------------------------------
-	Matrix <cplx> p = Matrix<cplx> (m_N[0],m_N[1],m_N[2]), q, r;
+	Matrix <cplx>   p       = Matrix<cplx>   (m_N[0],m_N[1],m_N[2]), q, r;
+	// Intensity Correction -------------------------------------------
+	m_intcor                = Matrix<double>::Ones (m_N[0],m_N[1],m_N[2]);
 
 	// Add white noise? (Only for testing) ----------------------------
 	if (m_noise > 0.0)
-		AddPseudoRandomNoise (data, (float)m_noise);
+		AddPseudoRandomNoise (data, (float) m_noise);
 	
 	// Set k-space and weights in FT plans and clear RAM --------------
 	for (int i = 0; i < NTHREADS || i < m_Nc; i++) {
@@ -210,27 +212,29 @@ CGSENSE::Process () {
 	// Create test data if testcase (Incoming data is image space) ----
 	Matrix<cplx> stmp (m_M, m_Nc);
 	if (m_testcase) 
-		E  (data, sens, m_fplan, stmp, m_dim);
+		E  (Matrix<cplx>::Phantom2D(m_N[0]), sens, m_intcor, m_fplan, stmp, m_dim);
 	else 
 		stmp = data;
 
 	FreeCplx("data");
 	
+	IntensityCorrection (sens, m_intcor);
+	
 	// Out going images -----------------------------------------------
-	Matrix<cplx>&   image = AddCplx (  "image", NEW (Matrix<cplx>(m_N[0], m_N[1], m_N[2])));
+	Matrix<cplx>&   image = AddCplx ("image", NEW (Matrix<cplx>(m_N[0], m_N[1], m_N[2])));
 
 	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
 
 	// First left side action -----------------------------------------
-	EH (stmp, sens, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim, false);
+	EH (stmp, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim, false);
 	r = p;
 	q = p;
 
 	int         iters = 0;
 
 	if (m_verbose)
-		memcpy (  &image[iters*   p.Size()],    &p[0],    p.Size() * sizeof(cplx));
+		memcpy (&image[iters*p.Size()], &p[0], p.Size() * sizeof(cplx));
 
 	// CG residuals storage and helper variables ----------------------
 	std::vector<double> res;
@@ -251,18 +255,16 @@ CGSENSE::Process () {
 	for (iters = 0; iters < m_cgmaxit; iters++) {
 
 		rn = pow(r.Norm().real(), 2);
-
 		res.push_back(rn/an);
 
 		printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
 
 		// Convergence ? ----------------------------------------------
-		if (std::isnan(res.at(iters)) || res.at(iters) <= m_cgeps)
-			break;
+		if (std::isnan(res.at(iters)) || res.at(iters) <= m_cgeps) break;
 
 		// CG step ----------------------------------------------------
-		E  (p,    sens, m_fplan,                              stmp, m_dim);
-		EH (stmp, sens, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim, false);
+		E  (p,    sens, m_intcor, m_fplan,                              stmp, m_dim);
+		EH (stmp, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim, false);
 
 		rtmp  = (rn / (p.dotc(q)));
 		a    += (p    * rtmp);
@@ -290,9 +292,13 @@ CGSENSE::Process () {
 		Matrix<double>& nrmse = AddReal ("nrmse", NEW (Matrix<double> (iters,1)));
 		memcpy (&nrmse[0], &res[0], iters * sizeof(double));
 		
-	} else
+	} else {
 
-		image   = a;
+		image = a;
+		for (int i = 0; i < image.Size(); i++)
+			image[i] *= m_intcor[i];
+
+	}
 
 	return error;
 
