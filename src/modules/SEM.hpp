@@ -31,7 +31,7 @@
  * @param  dim          FT dimensions
  */
 RRSModule::error_code 
-E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& out, const int& dim) {
+E  (const Matrix<raw>& in, const Matrix<raw>& sm, const Matrix<double>& intcor, nfft_plan* np, Matrix<raw>& out, const int& dim) {
 
 	// Clear output container
 	out.Zero();
@@ -41,6 +41,7 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& ou
 	int nsamples = out.Size() / ncoils;
 	int imgsize  = in.Size();
 
+
 	// Loop over coils, Elementwise multiplication of maps with in (s.*in), ft and store in out
 	
 #pragma omp parallel default (shared) 
@@ -49,6 +50,10 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& ou
 		omp_set_num_threads(NTHREADS);
 		int tid      = omp_get_thread_num();
 
+#pragma omp for 
+		for (int i = 0; i < intcor.Size(); i++)
+			in[i] *= intcor[i]; 
+		
 #pragma omp for
 		for (int j = 0; j < ncoils; j++) {
 			
@@ -58,9 +63,12 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& ou
 
 			// Copy data to FT
 			for (int i = 0; i < imgsize; i++) {
-				tmp = sm[ipos + i] * in[i];
+
+				tmp = sm[ipos + i] * in[i] ;
+
 				np[tid].f_hat[i][0] = tmp.real();
 				np[tid].f_hat[i][1] = tmp.imag();
+
 			}
 
 			// Forward ft
@@ -92,8 +100,9 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, nfft_plan* np, Matrix<raw>& ou
  * @param  adjoint      Use adjoint?
  */
 RRSModule::error_code
-EH (const Matrix<raw>& in, const Matrix<raw>&  sm, nfft_plan*  np, solver_plan_complex* spc, const double& epsilon, 
-	const int&      maxit,       Matrix<raw>& out, const int& dim, const bool&      adjoint) {
+EH (const Matrix<raw>& in, const Matrix<raw>&  sm, const Matrix<double>& intcor, 
+	nfft_plan* np, solver_plan_complex* spc, const double& epsilon, const int& maxit,
+	Matrix<raw>& out, const int& dim, const bool& adjoint) {
 
 	// Clear outgoing container
 	out.Zero();
@@ -128,26 +137,30 @@ EH (const Matrix<raw>& in, const Matrix<raw>&  sm, nfft_plan*  np, solver_plan_c
 			// Inverse FT or adjoint
 			if (adjoint) {
 				nfft::adjoint (&np[tid]);
-				memcpy (&ftout[ipos], &np[tid].f_hat[0][0], imgsize*sizeof (fftw_complex));
+				memcpy (&ftout[ipos],       &np[tid].f_hat[0][0], imgsize*sizeof (fftw_complex));
 			} else {
-				nfft::ift (&np[tid], &spc[tid], maxit, epsilon);
+				nfft::ift (&np[tid],  &spc[tid], maxit, epsilon);
 				memcpy (&ftout[ipos], &spc[tid].f_hat_iter[0][0], imgsize*sizeof (fftw_complex));
 			}
 			
 		}
 
 		raw sens  = raw(0.0,0.0);
-#pragma omp for schedule (dynamic, imgsize / NTHREADS)
 
-		for (int i = 0; i < imgsize; i++) 
+#pragma omp for schedule (guided, 1024)
+		for (int i = 0; i < imgsize; i++) {
+
 			for (int j = 0; j < ncoils; j++) {
 				int pos = j * imgsize + i;
-				sens = sm[pos];
-				out[i] += (raw(ftout[pos][0], ftout[pos][1]) * conj(sens));
+				out[i] += (raw(ftout[pos][0], ftout[pos][1]) * conj(sm[pos]));
 			}
 
+			out[i] *= intcor[i];
+
+		}
 	}
 	
+
 	free (ftout);
 
 	return OK;

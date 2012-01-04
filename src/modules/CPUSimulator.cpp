@@ -16,14 +16,16 @@ IntensityMap (const Matrix<cplx>& b1maps, Matrix<float>& I) {
 
 #pragma omp parallel default (shared)
 	{		
-			
+		
 #pragma omp for schedule (guided)
-		for (size_t i = 0; i < nr; i++)
+		for (size_t i = 0; i < nr; i++) {
 			for (size_t j = 0; j < nc; j++)
-				I[i] += sqrt((b1maps(i,j)*conj(b1maps(i,j))).real()) + 1.0e-10;
+				I[i] += (b1maps(i,j)*conj(b1maps(i,j))).real();
+			I[i] = 1.0 / (sqrt (I[i]) + 1.0e-10);
+		}
 
 	}
-	
+
 }
 
 
@@ -129,9 +131,9 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		
 		for (size_t pos = 0; pos < nr; pos++) {
 
-			lm[X] = mt0[pos].real()/ic[pos]; 
-			lm[Y] = mt0[pos].imag()/ic[pos]; 
-			lm[Z] = ml0[pos]       /ic[pos];
+			lm[X] = mt0[pos].real()*ic[pos]; 
+			lm[Y] = mt0[pos].imag()*ic[pos]; 
+			lm[Z] = ml0[pos]       *ic[pos];
 
 			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
 

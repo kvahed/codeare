@@ -60,16 +60,16 @@ DWT::Transform (const Matrix<cplx>& m, const bool bw) {
 	if (bw) {
 
 		if (!(gsl_wavelet2d_nstransform_inverse (w, re, l, l, l, work) == GSL_SUCCESS))
-			printf ("Wavelet transfor for real part failed\n.");
+			printf ("Wavelet transform for real part failed\n.");
 		if (!(gsl_wavelet2d_nstransform_inverse (w, im, l, l, l, work) == GSL_SUCCESS))
-			printf ("Wavelet transfor for imaginary part failed\n.");
+			printf ("Wavelet transform for imaginary part failed\n.");
 
 	} else {
 
 		if (!(gsl_wavelet2d_nstransform_forward (w, re, l, l, l, work) == GSL_SUCCESS))
-			printf ("Wavelet transfor for real part failed\n.");
+			printf ("Wavelet transform for real part failed\n.");
 		if (!(gsl_wavelet2d_nstransform_forward (w, im, l, l, l, work) == GSL_SUCCESS))
-			printf ("Wavelet transfor for imaginary part failed\n.");
+			printf ("Wavelet transform for imaginary part failed\n.");
 	}
 		
 	for (size_t j = 0; j < l; j++)
