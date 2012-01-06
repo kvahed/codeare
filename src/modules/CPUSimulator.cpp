@@ -21,7 +21,7 @@ IntensityMap (const Matrix<cplx>& b1maps, Matrix<float>& I) {
 		for (size_t i = 0; i < nr; i++) {
 			for (size_t j = 0; j < nc; j++)
 				I[i] += (b1maps(i,j)*conj(b1maps(i,j))).real();
-			I[i] = 1.0 / (sqrt (I[i]) + 1.0e-10);
+			I[i] = 1.0 / (I[i] + 1.0e-10);
 		}
 
 	}
@@ -108,7 +108,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 
 
 	size_t            nr   = r.Dim(1);
-	float             nrs  = (float)nr;
+	float             nrs  = (float) nr;
 
     ticks             tic  = getticks();
 
@@ -187,7 +187,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 void 
 SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< cplx>& rf, 
               const Matrix<float>&   r, const Matrix<float>&  b0, const Matrix<cplx>& mt0, 
-			  const Matrix<float>& ml0, const Matrix<float>& jac, /*const Matrix<float>& ic,*/
+			  const Matrix<float>& ml0, const Matrix<float>& jac, 
 			  const size_t&         np, const float&          dt, const bool&           v, 
 			  const size_t&         nc, const size_t&         nt, const float&        gdt, 
 			        Matrix<cplx>&  mxy,       Matrix<float>& mz) {
@@ -333,19 +333,12 @@ CPUSimulator::Simulate () {
 			SimulateAcq (b1, g,    rv, b0,  mxy,  mz, m_ic, np, dt, true, m_nc, m_nt, m_gdt,       q); // E
 			
 			rtmp  = (rn / (p.dotc(q)));
+			rtmp *= .7;
 
-			if (!iters) {
-				a  = (p * rtmp);
-				if (v) {
-					a.MXDump ("a.mat", "a");
-					Matrix<cplx> txy(mxy);
-					Matrix<float> tz(mz);
-					SimulateExc (b1, g, a, rv, b0, smxy, smz, jac, np, dt, false, m_nc, m_nt, m_gdt, txy, tz); // Excitation 
-					txy.MXDump ("mxy.mat", "m_xy");
-					tz.MXDump ("mz.mat", "m_z");
-				}
-			} else        
-				a += (p * rtmp);
+			if (!iters) 
+				a  = rtmp * p;
+			else        
+				a += rtmp * p;
 
 			r    -= (q * rtmp);
 			p    *= cplx (pow(r.Norm().real(), 2)/rn);

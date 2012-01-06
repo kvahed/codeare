@@ -11630,7 +11630,7 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"454:467M\"" >>confdefs.h
+$as_echo "#define SVN_REVISION \"exported\"" >>confdefs.h
 
 # copyright notice
 
@@ -17162,6 +17162,20 @@ _ACEOF
 
 else
   as_fn_error $? "cannot find stddef.h, bailing out" "$LINENO" 5
+fi
+
+done
+
+for ac_header in cblas.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "cblas.h" "ac_cv_header_cblas_h" "$ac_includes_default"
+if test "x$ac_cv_header_cblas_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_CBLAS_H 1
+_ACEOF
+
+else
+  as_fn_error $? "cannot find cblas.h, bailing out" "$LINENO" 5
 fi
 
 done

@@ -18,8 +18,8 @@
  *  02110-1301  USA
  */
 
-#ifndef __SPATIAL_DOMAIN_HPP__
-#define __SPATIAL_DOMAIN_HPP__
+#ifndef __KT_POINTS_HPP__
+#define __KT_POINTS_HPP__
 
 #include "ReconStrategy.hpp"
 
@@ -34,7 +34,7 @@ namespace RRStrategy {
     /**
      * @brief Spatial domain method for RF pulse generation
      */
-    class SpatialDomain : public ReconStrategy {
+    class KTPoints : public ReconStrategy {
         
         
     public:
@@ -42,13 +42,13 @@ namespace RRStrategy {
         /**
          * @brief Default constructor
          */
-        SpatialDomain  ();
+        KTPoints  ();
         
         /**
          * @brief Default destructor
          */
         virtual 
-        ~SpatialDomain ();
+        ~KTPoints ();
         
         
         /**

@@ -9,7 +9,7 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 EXTRA_DIST=GPUSimulator.cl
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la SpatialDomain.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la SpatialDomain.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la KTPoints.la
 
 if USE_NFFT3
     lib_LTLIBRARIES += NuFFT_OMP.la NuFFT.la CGSENSE.la 
@@ -57,6 +57,9 @@ GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 
 SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
 SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
+
+KTPoints_la_SOURCES = $(COMMON) KTPoints.hpp KTPoints.cpp
+KTPoints_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 
 RelativeSensitivities_la_SOURCES = $(COMMON) RelativeSensitivities.hpp RelativeSensitivities.cpp
 RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 

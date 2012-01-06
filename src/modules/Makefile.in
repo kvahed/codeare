@@ -137,6 +137,12 @@ GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
 GenericRegrid_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) $(LDFLAGS) -o $@
+KTPoints_la_LIBADD =
+am_KTPoints_la_OBJECTS = $(am__objects_1) KTPoints.lo
+KTPoints_la_OBJECTS = $(am_KTPoints_la_OBJECTS)
+KTPoints_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(KTPoints_la_LDFLAGS) $(LDFLAGS) -o $@
 LapackTests_la_LIBADD =
 am_LapackTests_la_OBJECTS = $(am__objects_1) LapackTests.lo
 LapackTests_la_OBJECTS = $(am_LapackTests_la_OBJECTS)
@@ -210,17 +216,17 @@ SOURCES = $(AFI_la_SOURCES) $(CGSENSE_la_SOURCES) \
 	$(CompressedSensing_la_SOURCES) $(DirectMethod_la_SOURCES) \
 	$(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
 	$(GRAPPA_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES) $(NuFFT_OMP_la_SOURCES) \
-	$(RelativeSensitivities_la_SOURCES) \
+	$(KTPoints_la_SOURCES) $(LapackTests_la_SOURCES) \
+	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
+	$(NuFFT_OMP_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
 	$(SpatialDomain_la_SOURCES) $(SystemCmd_la_SOURCES)
 DIST_SOURCES = $(AFI_la_SOURCES) $(CGSENSE_la_SOURCES) \
 	$(CompressedSensing_la_SOURCES) $(DirectMethod_la_SOURCES) \
 	$(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
 	$(GRAPPA_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES) $(NuFFT_OMP_la_SOURCES) \
-	$(RelativeSensitivities_la_SOURCES) \
+	$(KTPoints_la_SOURCES) $(LapackTests_la_SOURCES) \
+	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
+	$(NuFFT_OMP_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
 	$(SpatialDomain_la_SOURCES) $(SystemCmd_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -369,7 +375,8 @@ EXTRA_DIST = GPUSimulator.cl
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	MedianFilter_OMP.la SystemCmd.la LapackTests.la \
 	SpatialDomain.la RelativeSensitivities.la GRAPPA.la \
-	DirectMethod.la AFI.la $(am__append_1) $(am__append_2)
+	DirectMethod.la AFI.la KTPoints.la $(am__append_1) \
+	$(am__append_2)
 COMMON = ../Toolbox.hpp ../Toolbox.cpp ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../tinyxml/xpath_processor.h ../tinyxml/xpath_processor.cpp ../tinyxml/xpath_expression.cpp ../tinyxml/xpath_expression.h ../tinyxml/xpath_static.cpp ../tinyxml/xpath_static.h ../tinyxml/action_store.cpp ../tinyxml/action_store.h ../tinyxml/xpath_stack.cpp ../tinyxml/xpath_stack.h ../tinyxml/lex_util.cpp ../tinyxml/lex_util.h ../tinyxml/xpath_stream.cpp ../tinyxml/xpath_stream.h ../tinyxml/node_set.cpp ../tinyxml/node_set.h ../tinyxml/xml_util.cpp ../tinyxml/xml_util.h ../tinyxml/xpath_syntax.cpp ../tinyxml/xpath_syntax.h ../tinyxml/tokenlist.cpp ../tinyxml/tokenlist.h FFT.hpp FFT.cpp
 
 # Common linker flags
@@ -398,6 +405,8 @@ GRAPPA_la_SOURCES = $(COMMON) GRAPPA.hpp GRAPPA.cpp
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
 SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
+KTPoints_la_SOURCES = $(COMMON) KTPoints.hpp KTPoints.cpp
+KTPoints_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 RelativeSensitivities_la_SOURCES = $(COMMON) RelativeSensitivities.hpp RelativeSensitivities.cpp
 RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
 AFI_la_SOURCES = $(COMMON) AFI.hpp AFI.cpp
@@ -488,6 +497,8 @@ GRAPPA.la: $(GRAPPA_la_OBJECTS) $(GRAPPA_la_DEPENDENCIES)
 	$(GRAPPA_la_LINK) -rpath $(libdir) $(GRAPPA_la_OBJECTS) $(GRAPPA_la_LIBADD) $(LIBS)
 GenericRegrid.la: $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_DEPENDENCIES) 
 	$(GenericRegrid_la_LINK) -rpath $(libdir) $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_LIBADD) $(LIBS)
+KTPoints.la: $(KTPoints_la_OBJECTS) $(KTPoints_la_DEPENDENCIES) 
+	$(KTPoints_la_LINK) -rpath $(libdir) $(KTPoints_la_OBJECTS) $(KTPoints_la_LIBADD) $(LIBS)
 LapackTests.la: $(LapackTests_la_OBJECTS) $(LapackTests_la_DEPENDENCIES) 
 	$(LapackTests_la_LINK) -rpath $(libdir) $(LapackTests_la_OBJECTS) $(LapackTests_la_LIBADD) $(LIBS)
 MedianFilter_OMP.la: $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_DEPENDENCIES) 
@@ -521,6 +532,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GPUSimulator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GRAPPA.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GenericRegrid.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KTPoints.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LapackTests.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT.Plo@am__quote@

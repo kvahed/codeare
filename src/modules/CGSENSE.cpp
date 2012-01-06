@@ -190,13 +190,10 @@ CGSENSE::Process () {
 	
 	// CG matrices ----------------------------------------------------
 	Matrix <cplx>   p       = Matrix<cplx>   (m_N[0],m_N[1],m_N[2]), q, r;
+
 	// Intensity Correction -------------------------------------------
 	m_intcor                = Matrix<double>::Ones (m_N[0],m_N[1],m_N[2]);
 
-	// Add white noise? (Only for testing) ----------------------------
-	if (m_testcase && m_noise > 0.0)
-		AddPseudoRandomNoise (data, (float) m_noise);
-	
 	// Set k-space and weights in FT plans and clear RAM --------------
 	for (int i = 0; i < NTHREADS || i < m_Nc; i++) {
 
@@ -211,17 +208,12 @@ CGSENSE::Process () {
 	FreeReal ("weights");
 
 	// Create test data if testcase (Incoming data is image space) ----
-	Matrix<cplx> stmp (m_M, m_Nc);
-	if (m_testcase) 
-		E  (Matrix<cplx>::Phantom2D(m_N[0]), sens, m_intcor, m_fplan, stmp, m_dim);
-	else 
-		stmp = data;
+	if (m_testcase) {
+		E  (Matrix<cplx>::Phantom2D(m_N[0]), sens, m_intcor, m_fplan, data, m_dim);
+		if (m_noise > 0.0)
+			AddPseudoRandomNoise (data, (float) m_noise);
+	} 
 
-	stmp.MXDump ("stmp.mat", "stmp");
-	
-
-	FreeCplx("data");
-	
 	IntensityCorrection (sens, m_intcor);
 	
 	// Out going images -----------------------------------------------
@@ -231,7 +223,7 @@ CGSENSE::Process () {
 	ticks cgstart = getticks();
 
 	// First left side action -----------------------------------------
-	EH (stmp, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim, false);
+	EH (data, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim, false);
 	r = p;
 	q = p;
 
@@ -266,20 +258,25 @@ CGSENSE::Process () {
 		// Convergence ? ----------------------------------------------
 		if (std::isnan(res.at(iters)) || res.at(iters) <= m_cgeps) break;
 
-		// CG step ----------------------------------------------------
-		E  (p,    sens, m_intcor, m_fplan,                              stmp, m_dim);
-		EH (stmp, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim, false);
+		// EHE --------------------------------------------------------
+		E  (p,    sens, m_intcor, m_fplan,                              data, m_dim);
+		EH (data, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim, false);
 
+		// Guess new gradient -----------------------------------------
 		rtmp  = (rn / (p.dotc(q)));
-		a    += (p    * rtmp);
-		r    -= (q    * rtmp);
+		a    += (p * rtmp);
+		r    -= (q * rtmp);
 		p    *= cplx(pow(r.Norm().real(), 2)/rn);
 		p    += r;
 
 		// Verbose out put keeps all intermediate steps ---------------
 		if (m_verbose) {
-			image.Expand(m_dim); 
-			memcpy (  &image[(iters+1)*a.Size()], &a[0], a.Size()*sizeof(cplx));
+
+			if (iters)
+				image.Expand(m_dim); 
+
+			memcpy (&image[iters*a.Size()], &a[0], a.Size()*sizeof(cplx));
+
 		}
 		
 	}
@@ -299,6 +296,7 @@ CGSENSE::Process () {
 	} else {
 
 		image = a;
+
 		for (int i = 0; i < image.Size(); i++)
 			image[i] *= m_intcor[i];
 
