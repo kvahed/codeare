@@ -183,6 +183,7 @@ AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], [AC_MSG_RESULT([cannot fin
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
 AC_CHECK_HEADERS([fcntl.h],          [], [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
 AC_CHECK_HEADERS([stddef.h],         [], [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
+AC_CHECK_HEADERS([cblas.h],          [], [AC_MSG_ERROR([cannot find cblas.h, bailing out])])
 
 AC_CHECK_HEADERS(CL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
     AC_CHECK_HEADERS(OpenCL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [

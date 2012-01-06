@@ -62,9 +62,11 @@ WhiteNoise () {
 	float fac, r, v1, v2;
 
 	do {
+
 		v1 = (2.0 * Uniform()) - 1.0;
 		v2 = (2.0 * Uniform()) - 1.0;
-		r = (v1*v1) + (v2*v2);
+		r  = (v1*v1) + (v2*v2);
+
 	} while (r >= 1.0);
 
 	fac = sqrt(-2.0 * log(r) / r);
@@ -79,9 +81,15 @@ AddPseudoRandomNoise (Matrix<raw>& m, const float& max) {
 
 	SetSeed();
 
+#pragma omp parallel default (shared)
+	{
+
+#pragma omp for schedule (guided)
 	for (int i = 0; i < m.Size(); i++)
 		m[i] = m[i] + max * WhiteNoise();
 	
+	}
+
 	return OK;
 
 }

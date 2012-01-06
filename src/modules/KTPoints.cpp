@@ -18,22 +18,22 @@
  *  02110-1301  USA
  */
 
-#include "SpatialDomain.hpp"
+#include "KTPoints.hpp"
 #include "PTXINIFile.hpp"
 
 using namespace RRStrategy;
 
 
-SpatialDomain::SpatialDomain  () {}
+KTPoints::KTPoints  () {}
 
 
-SpatialDomain::~SpatialDomain () {}
+KTPoints::~KTPoints () {}
 
 
 RRSModule::error_code
-SpatialDomain::Init           ()  {
+KTPoints::Init           ()  {
 
-    printf ("Intialising SpatialDomain ...\n");
+    printf ("Intialising KTPoints ...\n");
 	
     RRSModule::error_code e = OK;
 	
@@ -107,7 +107,7 @@ SpatialDomain::Init           ()  {
 
 
 RRSModule::error_code
-SpatialDomain::Finalise       ()  {
+KTPoints::Finalise       ()  {
 
     free (m_pd);
     free (m_max_rf);
@@ -118,9 +118,9 @@ SpatialDomain::Finalise       ()  {
 
 
 RRSModule::error_code
-SpatialDomain::Process        () { 
+KTPoints::Process        () { 
 
-    printf ("Processing SpatialDomain ...\n");
+    printf ("Processing KTPoints ...\n");
 
     // On entry -------------------
     //
@@ -292,7 +292,7 @@ SpatialDomain::Process        () {
 // the class factories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {
 
-    return new SpatialDomain;
+    return new KTPoints;
 
 }
 
