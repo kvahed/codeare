@@ -320,6 +320,7 @@ bool dmtest (ReconClient* rc) {
 	std::string mf = std::string(base + std::string(rc->Attribute("mf"))); // maps
 
 	// Gradients
+#ifdef HAVE_MAT_H
 	g.MXRead    (gf, rc->Attribute("g"));
 	j.MXRead    (gf, rc->Attribute("j"));
 
@@ -334,7 +335,7 @@ bool dmtest (ReconClient* rc) {
 	// Maps
 	b1.MXRead (mf, rc->Attribute("b1"));
 	b0.MXRead (mf, rc->Attribute("b0"));
-	
+#endif	
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;

@@ -1,9 +1,10 @@
 AC_PREREQ([1.10])
-AC_INIT([jrrs], [0.9], [k.vahedipour@fz-juelich.de])
+AC_INIT([codeare], [0.10], [k.vahedipour@fz-juelich.de])
 AC_CONFIG_SRCDIR([src])
 
 # m4 macros
 AC_CONFIG_MACRO_DIR([config])
+
 # where to put auxilliary files
 AC_CONFIG_AUX_DIR([config])
 
@@ -201,7 +202,7 @@ case $host in
         AC_MSG_RESULT(no)
         AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [],[ 
             echo "OpenCL library not found in your system"
-            exit -1
+            #exit -1
         ])
 esac
 
