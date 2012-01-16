@@ -53,7 +53,7 @@ bool init (int argc, char** argv);
 bool internaltest (ReconClient* rc); 
 bool cgsensetest  (ReconClient* rc);
 bool nuffttest    (ReconClient* rc);
-bool sdmtest      (ReconClient* rc);
+bool ktptest      (ReconClient* rc);
 bool mxtest       (ReconClient* rc);
 bool nitest       (ReconClient* rc);
 bool fftwtest     (ReconClient* rc);
@@ -76,8 +76,8 @@ int main (int argc, char** argv) {
 			cgsensetest (&client);
 		else if (strcmp (test, "GRAPPA") == 0)
 			grappatest (&client);
-		else if (strcmp (test, "SpatialDomain") == 0)
-			sdmtest (&client);
+		else if (strcmp (test, "KTPoints") == 0)
+			ktptest (&client);
 		else if (strcmp (test, "CompressedSensing") == 0)
 			cstest (&client);
 		else if (strcmp (test, "mxtest") == 0)
@@ -437,7 +437,7 @@ bool nuffttest (ReconClient* rc) {
 }
 
 
-bool sdmtest (ReconClient* rc) {
+bool ktptest (ReconClient* rc) {
 
 	Matrix<cplx>   target;
 	Matrix<cplx>   b1;
@@ -466,7 +466,7 @@ bool sdmtest (ReconClient* rc) {
 	rc->SetReal    ("k",      k);
 	rc->SetPixel   ("b0",     b0);
 	
-	rc->Process    ("KTPoints");
+	rc->Process    (test);
 	
 	rc->GetCplx    ("target", target);
 	rc->GetCplx    ("b1",     b1);
