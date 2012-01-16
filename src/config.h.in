@@ -12,6 +12,9 @@
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 
+/* Define to 1 if you have the <CL/cl_gl.h> header file. */
+#undef HAVE_CL_CL_GL_H
+
 /* Define to 1 if you have the <CL/cl.h> header file. */
 #undef HAVE_CL_CL_H
 
@@ -72,9 +75,6 @@
 /* Define to 1 if you have the `fftw3f' library (-lfftw3f). */
 #undef HAVE_LIBFFTW3F
 
-/* Define to 1 if you have the `fftw3f_threads' library (-lfftw3f_threads). */
-#undef HAVE_LIBFFTW3F_THREADS
-
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL
 
@@ -128,6 +128,9 @@
 
 /* Define to 1 if you have the <omniORB4/CORBA.h> header file. */
 #undef HAVE_OMNIORB4_CORBA_H
+
+/* Define to 1 if you have the <OpenCL/cl_gl.h> header file. */
+#undef HAVE_OPENCL_CL_GL_H
 
 /* Define to 1 if you have the <OpenCL/cl.h> header file. */
 #undef HAVE_OPENCL_CL_H

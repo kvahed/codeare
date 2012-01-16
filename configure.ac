@@ -192,6 +192,12 @@ AC_CHECK_HEADERS(CL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])]
     ])
 ])
 
+AC_CHECK_HEADERS(CL/cl_gl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
+    AC_CHECK_HEADERS(OpenCL/cl_gl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
+        echo "cannot file cl_gl.h, GPU bloch simulator unavailable"
+    ])
+])
+
 AC_MSG_CHECKING(whether host is Mac OS)
 case $host in
     *darwin*)
