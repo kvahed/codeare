@@ -129,8 +129,6 @@ namespace RRStrategy {
 			
 		}
 		
-		intcor.MXDump("intcor.mat", "intcor");
-		
 	}
 
 }

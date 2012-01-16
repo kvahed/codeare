@@ -34,6 +34,7 @@
 
 #define __CL_ENABLE_EXCEPTIONS
 
+#include "CL/cl_gl.h"
 #include "cl.hpp"
 
 #define MAXDEVS 1
