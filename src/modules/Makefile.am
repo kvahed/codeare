@@ -9,7 +9,7 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 EXTRA_DIST=GPUSimulator.cl
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la SpatialDomain.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la KTPoints.la
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la SpatialDomain.la KTPoints.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la
 
 if USE_NFFT3
     lib_LTLIBRARIES += NuFFT_OMP.la NuFFT.la CGSENSE.la 
