@@ -201,8 +201,9 @@ namespace RRServer {
 		void 
 		config        (const char* c);
 
-		
-		
+		virtual double 
+		fun           (const double, float&) {};
+
 	private:
 		
 		char*                      m_config;   /**< Serialised XML document  */

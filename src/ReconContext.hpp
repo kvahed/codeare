@@ -128,7 +128,7 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetCplx(const std::string name, const Matrix<cplx>*)
+		 * @brief       @see ReconStrategy::SetCplx(const std::string name, const Matrix<cplx>&)
 		 *
 		 * @param  name  Name
 		 * @param  r    Complex data matrix

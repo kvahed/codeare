@@ -22,6 +22,7 @@
 #include "ReconClient.hpp"
 #include "ReconContext.hpp"
 #include "modules/FFT.hpp"
+#include "MatrixOperations.hpp"
 
 #ifndef __WIN32__
     #include "config.h"
@@ -139,8 +140,6 @@ bool cgsensetest (ReconClient* rc) {
 	Matrix<double> nrmse;
 	Matrix<cplx>   image;
 	Matrix<cplx>   signals;
-
-	
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
@@ -466,7 +465,7 @@ bool sdmtest (ReconClient* rc) {
 	rc->SetReal    ("k",      k);
 	rc->SetPixel   ("b0",     b0);
 	
-	rc->Process    (test);
+	rc->Process    ("KTPoints");
 	
 	rc->GetCplx    ("target", target);
 	rc->GetCplx    ("b1",     b1);
@@ -568,8 +567,6 @@ bool fftwtest (ReconClient* rc) {
 
 	m.Read (in, "img");
 	m = FFT::Forward(m);
-	m = m.FFTShift();
-	m = m.IFFTShift();
 	m = FFT::Backward(m);
 	m.Dump (out, "img");
 

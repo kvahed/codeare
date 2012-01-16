@@ -41,13 +41,14 @@ FFT::Forward (const Matrix<cplx>& m)  {
 	fftwf_execute(p);
 	fftwf_destroy_plan(p);
 
-	Shift(res);
+	res = Shift(res);
 
     return res / res.Size();
 	
 }
 
-Matrix<cplx>
+/*
+inline Matrix<cplx>
 FFT::Backward (const Matrix<cplx>& m) {
 
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
@@ -72,7 +73,7 @@ FFT::Backward (const Matrix<cplx>& m) {
 	return res;
 	
 }
-
+*/
 
 Matrix<cplx>
 FFT::Shift (const Matrix<cplx>& m) {
