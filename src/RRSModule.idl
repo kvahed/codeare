@@ -201,6 +201,8 @@ module RRSModule {
 		 * @brief         Declare attributes labels and values.
 		 */
 		attribute         string       config;
+
+		double            fun (in double d, inout float f);
 		
 		
 	};

@@ -23,6 +23,7 @@
 #define __RELATIVE_SENSITIVITIES_HPP__
 
 #include "ReconStrategy.hpp"
+#include "FFT.hpp"
 
 using namespace RRServer;
 
@@ -146,6 +147,7 @@ SVDCalibrate (const Matrix<cplx>& imgs, Matrix<cplx>& rxm, Matrix<cplx>& txm, Ma
 			
 			for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r]             * exp(cplx(0.0,1.0)*arg(u[tid][0])); // U 
 			for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t*v[0].Dim(0)] * exp(cplx(0.0,1.0)*arg(v[tid][0])); // V is transposed!!!
+
 			snro[i] = real(s[tid][0]);
 			
 		}
@@ -159,20 +161,21 @@ SVDCalibrate (const Matrix<cplx>& imgs, Matrix<cplx>& rxm, Matrix<cplx>& txm, Ma
 }
 
 	
+
 RRSModule::error_code
 FTVolumes (Matrix<cplx>& r) {
+	
+	ticks        tic     = getticks();
 	
 	long         imsize  = r.Dim(0) * r.Dim(1) * r.Dim(2);
 	size_t       vols    = r.Size() / (imsize);
 	int          threads = 1;
 	
-	Matrix<cplx> hann (r.Dim(0), r.Dim(1), r.Dim(2));
-	hann = cplx(1.0,0.0);
-	hann = hann.HannWindow();
-	
-	ticks        tic     = getticks();
+	// Hann window for iFFT
+	Matrix<cplx> hann    = Matrix<cplx>::Ones (r.Dim(0), r.Dim(1), r.Dim(2)).HannWindow();
 	
 	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r.Dim(0), (int)r.Dim(1), (int)r.Dim(2)); fflush(stdout);
+
 	
 #pragma omp parallel default (shared) 
 	{
@@ -180,18 +183,17 @@ FTVolumes (Matrix<cplx>& r) {
 	}
 	
 	// # threads plans and matrices ------
-	//
-	// Note: FFTW plans should be created by 
-	// one thread only!
+
 	Matrix<cplx> mr[threads];
-	fftwf_plan	  p[threads];
+	fftwf_plan	  p[threads]; // Thread safety of plans
 	
 	for (int i = 0; i < threads; i++) {
 		mr[i] = Matrix<cplx>      (r.Dim(0), r.Dim(1), r.Dim(2));
-		p[i]  = fftwf_plan_dft_3d (r.Dim(2), r.Dim(1), r.Dim(0), 
+		p [i] = fftwf_plan_dft_3d (r.Dim(2), r.Dim(1), r.Dim(0), 
 								   (fftwf_complex*)&mr[i][0], (fftwf_complex*)&mr[i][0], 
-								   FFTW_BACKWARD, FFTW_ESTIMATE);
+								   FFTW_BACKWARD, FFTW_MEASURE);
 	}
+
 	// ------------------------------------
 	
 #pragma omp parallel default (shared)
@@ -200,13 +202,17 @@ FTVolumes (Matrix<cplx>& r) {
 		int tid = omp_get_thread_num();
 		
 #pragma omp for schedule (dynamic, vols / omp_get_num_threads())
+
 		for (size_t i = 0; i < vols; i++) {
+
 			memcpy (&mr[tid][0], &r[i*imsize], imsize * sizeof(cplx));
-			mr[tid]  = mr[tid].FFTShift();
-			mr[tid]  = mr[tid] * hann;
+
+			mr[tid]  = FFT::Shift(mr[tid]) * hann;
 			fftwf_execute(p[tid]);
-			mr[tid] = mr[tid].IFFTShift();
+			mr[tid]  = FFT::Shift(mr[tid]);
+
 			memcpy (&r[i*imsize], &mr[tid][0], imsize * sizeof(cplx));
+
 		}
 		
 	}
@@ -219,6 +225,8 @@ FTVolumes (Matrix<cplx>& r) {
 	return RRSModule::OK;
 	
 }
+
+
 
 RRSModule::error_code 
 RemoveOS (Matrix<cplx>& imgs) {
@@ -244,6 +252,7 @@ RemoveOS (Matrix<cplx>& imgs) {
 	return RRSModule::OK;
 		
 }
+
 
 
 RRSModule::error_code
@@ -283,6 +292,7 @@ B0Map (const Matrix<cplx>& imgs, Matrix<double>& b0, const float& dTE) {
 	return RRSModule::OK;
 	
 }
+
 
 
 /**
@@ -330,4 +340,5 @@ void LogMask (Matrix<double>& m, const double& m_cutoff) {
 
 
 #endif /* __RELATIVE_SENSITIVITIES_H__ */
+
 

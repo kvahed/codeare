@@ -1,5 +1,5 @@
 AC_PREREQ([1.10])
-AC_INIT([jrrs], [0.9], [k.vahedipour@fz-juelich.de])
+AC_INIT([codeare], [1.0], [k.vahedipour@fz-juelich.de])
 AC_CONFIG_SRCDIR([src])
 
 # m4 macros
@@ -212,6 +212,7 @@ AC_CHECK_LIB([dl],           [dlopen],        [], [AC_MSG_ERROR([cannot find lib
 AC_CHECK_LIB([z],            [deflate],       [], [AC_MSG_ERROR([cannot find libz, bailing out])])
 AC_CHECK_LIB([fftw3],        [fftw_execute],  [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
+AC_CHECK_LIB([fftw3f_threads], [fftwf_plan_with_nthreads], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
 AC_CHECK_LIB([cdf],          [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf dump / read functionality unavailable!])])
 AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
