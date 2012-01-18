@@ -744,11 +744,11 @@ bool init (int argc, char** argv) {
 	
 	cout << endl;
 #ifdef VERSION
-	cout << "jrrs "         << VERSION                                        << endl;
+	cout << "codeare "         << VERSION                                        << endl;
 #else
-	cout << "jrrs "         << endl;
+	cout << "codeare "         << endl;
 #endif
-	cout << "juelich remote reconstruction service "                          << endl;
+	cout << "common data exchange and reconstruction environment "            << endl;
 #ifdef SVN_REVISION
 	cout << "Test client "  << " [build " << SVN_REVISION << "]"              << endl;
 #else
