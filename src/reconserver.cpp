@@ -147,11 +147,11 @@ bool init (int argc, char** argv) {
 
 	cout << endl;
 #ifdef VERSION
-	cout << "jrrs "         << VERSION                                        << endl;
+	cout << "codeare "         << VERSION                                     << endl;
 #else
-	cout << "jrrs "         << endl;
+	cout << "codeare "         << endl;
 #endif
-	cout << "juelich remote reconstruction service "                          << endl;
+	cout << "common data exchange and reconstruction environment"             << endl;
 	cout << "Reconstruction server "  << " [build " << SVN_REVISION << "]"    << endl;
     cout << "Copyright (C) 2010	Kaveh Vahedipour<k.vahedipour@fz-jeulich.de>" << endl;
 	cout << "Kaveh Vahedipour -  k.vahedipour@fz-juelich.de"                  << endl;
