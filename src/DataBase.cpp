@@ -2,7 +2,6 @@
 
 DataBase* DataBase::m_inst = NULL; 
 
-/*
 DataBase::~DataBase () { 
 	
 	Finalise();
@@ -20,13 +19,14 @@ DataBase::Instance ()  {
     return m_inst;
 		
 }
-*/
 	
 const error_code
 DataBase::Finalise () {
 	
-	while (!m_cxfl.empty()) 
+	while (!m_cxfl.empty()) {
+		cout << "Clearing RAM of " <<  m_cxfl.begin()->first.c_str() << endl;
 		FreeCXFL(m_cxfl.begin()->first.c_str());
+	}
 	
 	while (!m_cxdb.empty()) 
 		FreeCXDB(m_cxdb.begin()->first.c_str());

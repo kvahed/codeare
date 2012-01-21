@@ -149,6 +149,14 @@ module RRSModule {
 		error_code        Init (in string name);
 
 		/**
+		 * @brief         Clear RAM
+		 *                Clean up any left over objects and leave.
+		 *
+		 * @return        Status
+		 */
+		error_code        CleanUp ();
+
+		/**
 		 * @brief         Transport complex matrix from backend identified by ...
 		 *
 		 * @param  name   its name

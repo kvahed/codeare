@@ -25,25 +25,14 @@ class DataBase {
 	/**
 	 * @brief        Clean up
 	 */
-	virtual ~DataBase        () { 
-		
-		m_inst = 0; 
-
-	}
+	virtual ~DataBase        ();
 
 
 	/**
 	 * @brief        Get pointer to database instance
 	 */
 	static DataBase* 
-	Instance         () {
-
-		if (m_inst == 0) 
-			m_inst = new DataBase ();
-		
-		return m_inst;
-		
-	}
+	Instance         () ;
 	
 
 	/**

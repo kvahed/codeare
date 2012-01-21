@@ -31,11 +31,18 @@ ReconServant::ReconServant  () :
 
 ReconServant::~ReconServant ()               {
 
-	this->Finalise (NULL);
-	delete m_config;
+	this->CleanUp();
 
 }
 
+
+error_code
+ReconServant::CleanUp () {
+
+	this->Finalise();
+	delete m_config;
+
+}
 
 error_code
 ReconServant::Init (const char* name) {
@@ -45,18 +52,12 @@ ReconServant::Init (const char* name) {
 	
 	m_contexts.insert (pair< std::string, ReconContext* > (std::string(name), rc = new ReconContext(name)));
 
-//sprintf ("Configuring %s ... \n", name);
     rc->SetConfig (m_config);
 
-//	sprintf ("... done. Initialising algorithm ... \n");
-
 	if ((e = rc->Init()) != OK) {
-		Finalise(NULL);
-		//sprintf ("... FAILED!!! Bailing out.\n");
+		Finalise();
 		return CONTEXT_CONFIGURATION_FAILED;
 	}
-
-//sprintf ("... done. Handling back control to client ... \n");
 
 	return e;
 
@@ -68,45 +69,42 @@ ReconServant::Finalise (const char* name) {
 
 	error_code e = OK;
 
-	map<string, ReconContext*>::iterator it = m_contexts.find (name);
-	
-	if (name == NULL) {
+	if (!name) {
 
 		DataBase::Instance()->Finalise();
-		// Clean map
-
-	} else if (it == m_contexts.end()) {
-
-		e = CONTEXT_NOT_FOUND;
 
 	} else {
-
-		delete it->second;
-		m_contexts.erase(it);
-
+		
+		map<string, ReconContext*>::iterator it = m_contexts.find (name);
+		
+		if (it == m_contexts.end()) {
+			e = CONTEXT_NOT_FOUND;
+		} else {
+			delete it->second;
+			m_contexts.erase(it);
+		}
 	}
-
 
 	return e;
 
 }
-
+	
 
 error_code
 ReconServant::Process  (const char* name)       {
-
+	
 	error_code e = OK;
-
+	
 	map<string, ReconContext*>::iterator it = m_contexts.find (name);
 	
 	if (it == m_contexts.end()) 
 		e = CONTEXT_NOT_FOUND;
 	else {
-		std::cout << "Processing ... " << std::endl;
+		std::cout << "Processing ... " << name;
 		error_code e = it->second->Process();
-		std::cout << "... done. " << std::endl;
+		std::cout << " ... done. " << std::endl;
 	}
-
+	
 	return e;
 	
 }
@@ -116,7 +114,7 @@ error_code
 ReconServant::Prepare  (const char* name)       {
 	
 	error_code e = OK;
-
+	
 	map<string, ReconContext*>::iterator it = m_contexts.find (name);
 	
 	if (it == m_contexts.end()) 
@@ -134,69 +132,69 @@ ReconServant::Prepare  (const char* name)       {
 
 void
 ReconServant::set_cxfl  (const char* name, const cxfl_data& c) {
-
+	
 	DataBase::Instance()->SetCXFL(name, c);
-
+	
 }
 
 
 void
 ReconServant::get_cxfl (const char* name, cxfl_data& c) {
-
+	
 	c.dims.length(INVALID_DIM);
-	c.res.length(INVALID_DIM);
+	c.res.length (INVALID_DIM);
 	DataBase::Instance()->GetCXFL(name, c);
-
+	
 }
 
 
 void
 ReconServant::set_cxdb  (const char* name, const cxdb_data& c) {
-
+	
 	DataBase::Instance()->SetCXDB(name, c);
-
+	
 }
 
 
 void
 ReconServant::get_cxdb (const char* name, cxdb_data& c) {
-
+	
 	c.dims.length(INVALID_DIM);
-	c.res.length(INVALID_DIM);
+	c.res.length (INVALID_DIM);
 	DataBase::Instance()->GetCXDB(name, c);
-
+	
 }
 
 
 void
 ReconServant::set_rldb       (const char* name, const rldb_data& r)   {
-
+	
 	DataBase::Instance()->SetRLDB(name, r);
-
+	
 }
 
 
 void
 ReconServant::get_rldb       (const char* name, rldb_data& r) {
-
+	
 	r.dims.length(INVALID_DIM);
-	r.res.length(INVALID_DIM);
+	r.res.length (INVALID_DIM);
 	DataBase::Instance()->GetRLDB(name, r);
-
+	
 }
 
 
 void
 ReconServant::set_rlfl       (const char* name, const rlfl_data& r)   {
-
+	
 	DataBase::Instance()->SetRLFL(name, r);
-
+	
 }
 
 
 void
 ReconServant::get_rlfl       (const char* name, rlfl_data& r) {
-
+	
 	r.dims.length(INVALID_DIM);
 	r.res.length(INVALID_DIM);
 	DataBase::Instance()->GetRLFL(name, r);
