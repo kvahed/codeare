@@ -1,4 +1,4 @@
-This is the Juelich Remote Reconstruction Suite (jrrs).
+This is the COmmon Data Exchange and Rconstruction Engine (codeare).
 This software is a framework for live communication with MRI sequence and 
 reconstruction software. It was started on Siemens VB15 line. 
 
