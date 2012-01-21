@@ -115,7 +115,7 @@ GRAPPA::Prepare     () {
 
 	printf ("  Preparing %s ...\n", Name());
 
-	Matrix<cplx>* acs  = m_cplx["acs"];
+	Matrix<cplx>& acs  = GetCXFL("acs");
 	ComputeWeights (m_nc, m_acs_dim, m_kern_dim, m_d, m_R, acs, m_weights);
 	
 	printf ("... done.\n\n");
@@ -142,10 +142,10 @@ GRAPPA::Process     () {
 
 	printf ("  Processing GRAPPA ...\n");
 
-	Matrix<cplx>* acs  = m_cplx["acs"];
-	Matrix<cplx>* data = m_cplx["data"];
+	Matrix<cplx>& acs  = GetCXFL("acs");
+	Matrix<cplx>& data = GetCXFL("data");
 
-	printf ("  data dims: %s\n", data->DimsToCString());
+	printf ("  data dims: %s\n", data.DimsToCString());
 
 	printf ("... done.. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 

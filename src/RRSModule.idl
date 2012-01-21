@@ -36,21 +36,45 @@ module RRSModule {
 
 
 	/**
-	 * @brief Complex data
+	 * @brief   Complex data
 	 */
-	struct    cplx_data         {
+	struct      cxfl_data         {
 		
-		floats vals;  /**< Data chain of real/imag */
-		longs  dims;  /**< Dimesions     */
-		floats res;   /**< Resolution     */
+		floats  vals;  /**< Data chain of real/imag */
+		longs   dims;  /**< Dimesions     */
+		floats  res;   /**< Resolution     */
 
 	};
 
 
 	/**
-	 * @brief Real data
+	 * @brief   Complex double data
 	 */
-	struct     real_data       {
+	struct      cxdb_data         {
+		
+		doubles vals;  /**< Data chain of real/imag */
+		longs   dims;  /**< Dimesions     */
+		floats  res;   /**< Resolution     */
+
+	};
+
+
+	/**
+	 * @brief   Real single data
+	 */
+	struct      rlfl_data       {
+
+		floats  vals;  /**< Data      */
+		longs   dims;  /**< Dimesions */
+		floats  res;   /**< Resolution     */
+
+	};
+
+
+	/**
+	 * @brief   Real double data
+	 */
+	struct      rldb_data       {
 
 		doubles vals;  /**< Data      */
 		longs   dims;  /**< Dimesions */
@@ -60,25 +84,25 @@ module RRSModule {
 
 
 	/**
-	 * @brief Float data
+	 * @brief   Short integer data
 	 */
-	struct     float_data       {
+	struct      shrt_data       {
 
-		floats  vals;  /**< Data      */
+		shorts  vals;  /**< Data      */
 		longs   dims;  /**< Dimesions */
-		floats   res;   /**< Resolution     */
+		floats  res;   /**< Resolution     */
 
 	};
 
 
 	/**
-	 * @brief Pixel data
+	 * @brief   Long integer data
 	 */
-	struct     pixel_data       {
+	struct      long_data       {
 
-		shorts vals;  /**< Data      */
-		longs  dims;  /**< Dimesions */
-		floats res;   /**< Resolution     */
+		longs   vals;  /**< Data      */
+		longs   dims;  /**< Dimesions */
+		floats  res;   /**< Resolution     */
 
 	};
 
@@ -95,7 +119,7 @@ module RRSModule {
 		 * @param  s      Id of initialised reconstruction algorithm
 		 * @return        Status
 		 */
-		error_code        Process (in short s);
+		error_code        Process (in string name);
 		
 		/**
 		 * @brief         Finalise
@@ -104,7 +128,7 @@ module RRSModule {
 		 * @param  s      Id of initialised reconstruction algorithm
 		 * @return        Status
 		 */
-		error_code        Finalise (in short s);
+		error_code        Finalise (in string name);
 		
 		/**
 		 * @brief         Finalise
@@ -113,7 +137,7 @@ module RRSModule {
 		 * @param  s      Id of initialised reconstruction algorithm
 		 * @return        Status
 		 */
-		error_code        Prepare (in short s);
+		error_code        Prepare (in string name);
 		
 		/**
 		 * @brief         Intialise
@@ -122,8 +146,7 @@ module RRSModule {
 		 * @param  name   Name of recontruction method
 		 * @return        Status
 		 */
-		short             Init (in string name);
-		
+		error_code        Init (in string name);
 
 		/**
 		 * @brief         Transport complex matrix from backend identified by ...
@@ -131,7 +154,7 @@ module RRSModule {
 		 * @param  name   its name
 		 * @param  data   Data matrix
 		 */ 
-		void              get_cplx (in string name, inout cplx_data data);
+		void              get_cxfl (in string name, inout cxfl_data data);
 
 		
 		/**
@@ -140,7 +163,25 @@ module RRSModule {
 		 * @param  name   Name
 		 * @param  data   Data matrix
 		 */ 
-		void              set_cplx (in string name, in cplx_data data);
+		void              set_cxfl (in string name, in cxfl_data data);
+
+		
+		/**
+		 * @brief         Transport complex matrix from backend identified by ...
+		 *
+		 * @param  name   its name
+		 * @param  data   Data matrix
+		 */ 
+		void              get_cxdb (in string name, inout cxdb_data data);
+
+		
+		/**
+		 * @brief         Transport and announce complex matrix to backend
+		 *
+		 * @param  name   Name
+		 * @param  data   Data matrix
+		 */ 
+		void              set_cxdb (in string name, in cxdb_data data);
 
 		
 		/**
@@ -149,7 +190,7 @@ module RRSModule {
 		 * @param  name   its name
 		 * @param  data   Data matrix
 		 */ 
-		void              get_real (in string name, inout real_data data);
+		void              get_rldb (in string name, inout rldb_data data);
 
 		
 		/**
@@ -158,7 +199,7 @@ module RRSModule {
 		 * @param  name   Name
 		 * @param  data   Data matrix
 		 */ 
-		void              set_real (in string name, in real_data data);
+		void              set_rldb (in string name, in rldb_data data);
 
 		
 		/**
@@ -167,7 +208,7 @@ module RRSModule {
 		 * @param  name   its name
 		 * @param  data   Data matrix
 		 */ 
-		void              get_float (in string name, inout float_data data);
+		void              get_rlfl (in string name, inout rlfl_data data);
 
 		
 		/**
@@ -176,25 +217,43 @@ module RRSModule {
 		 * @param  name   Name
 		 * @param  data   Data matrix
 		 */ 
-		void              set_float (in string name, in float_data data);
+		void              set_rlfl (in string name, in rlfl_data data);
 
 		
 		/**
-		 * @brief         Transport pixel matrix from backend identified by ...
+		 * @brief         Transport short integer matrix from backend identified by ...
 		 *
 		 * @param  name   its name
 		 * @param  data   Data matrix
 		 */ 
-		void              get_pixel (in string name, inout pixel_data data);
+		void              get_shrt (in string name, inout shrt_data data);
 
 		
 		/**
-		 * @brief         Transport and announce pixel matrix to backend
+		 * @brief         Transport and announce short integer matrix to backend
 		 *
 		 * @param  name   Name
 		 * @param  data   Data matrix
 		 */ 
-		void              set_pixel (in string name, in pixel_data data);
+		void              set_shrt (in string name, in shrt_data data);
+
+		
+		/**
+		 * @brief         Transport short integer long from backend identified by ...
+		 *
+		 * @param  name   its name
+		 * @param  data   Data matrix
+		 */ 
+		void              get_long (in string name, inout long_data data);
+
+		
+		/**
+		 * @brief         Transport and announce long integer matrix to backend
+		 *
+		 * @param  name   Name
+		 * @param  data   Data matrix
+		 */ 
+		void              set_long (in string name, in long_data data);
 
 		
 		/**
@@ -202,8 +261,6 @@ module RRSModule {
 		 */
 		attribute         string       config;
 
-		double            fun (in double d, inout float f);
-		
 		
 	};
 	

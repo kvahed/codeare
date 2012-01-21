@@ -134,9 +134,9 @@ NuFFT_OMP::Process () {
 	printf ("Processing NuFFT_OMP ...\n");
 	ticks start = getticks();
 
-	Matrix<cplx>&   data    = *(m_cplx["data"]);
-	Matrix<double>& kspace  = *(m_real["kspace"]);
-	Matrix<double>& weights = *(m_real["weights"]);
+	Matrix<cplx>&   data    = GetCXFL("data");
+	Matrix<double>& kspace  = GetRLDB("kspace");
+	Matrix<double>& weights = GetRLDB("weights");
 
 	printf ("  Incoming dimensions:\n");
 	printf ("    Data:    %s \n", data.DimsToCString());

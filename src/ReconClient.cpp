@@ -22,320 +22,327 @@
 #include "CorbaExceptions.hpp"
 #include "Matrix.hpp"
 
-using namespace RRClient;
 
 #include <assert.h>
 #include <complex>
 
+namespace RRClient {
 
-
-ReconClient::ReconClient          (const char* name, const char* debug) {
-
-    try {
-        
-        // Initialise ORB
-        int         i            = 0;
-        char**      c            = 0;
-        const char* options[][2] = { { (char*)"traceLevel", debug }, { 0, 0 } };
-
-        m_orb = CORBA::ORB_init(i, c, "omniORB4", options);
-        
-        // Bind ORB object to name service object
-        CORBA::Object_var obj = m_orb->resolve_initial_references("NameService");
-        assert (!CORBA::is_nil(obj.in()));
-        
-        // Narrow this to the naming context
-        CosNaming::NamingContext_var context  = CosNaming::NamingContext::_narrow(obj.in());
-        assert (!CORBA::is_nil(context.in()));
-                                                                                
-        // Bind to the name server and lookup 
-        CosNaming::Name m_name;
-        m_name.length(1);
-        m_name[0].id = CORBA::string_dup(name);
-        
-        // Resolve object reference.
-        CORBA::Object_var orid = context->resolve(m_name);
-        assert(!CORBA::is_nil(orid.in()));
-        
-        m_rrsi       = RRSInterface::_narrow(orid.in());
-        if (CORBA::is_nil(m_rrsi.in()))
-        std::cerr << "IOR is not an SA object reference." << std::endl;
-
-    } catch (CORBA::COMM_FAILURE&)        {
-
-        std::cerr << "Caught system exception COMM_FAILURE -- unable to contact the object.\n" << std::endl;
-        throw DS_ServerConnectionException();
-        return;
-        
-    } catch (CORBA::SystemException&)     {
-        
-        std::cerr << "Caught a CORBA::SystemException." << std::endl;
-        throw DS_SystemException();
-        return;
-        
-    } catch (CORBA::Exception&)           {
-        
-        std::cerr << "Caught CORBA::Exception." << std::endl;
-        throw DS_Exception();
-        return;
-        
-    } catch (omniORB::fatalException& fe) {
-
-        std::cerr << "Caught omniORB::fatalException:" << std::endl;
-        std::cerr << "  file: " << fe.file() << std::endl;
-        std::cerr << "  line: " << fe.line() << std::endl;
-        std::cerr << "  mesg: " << fe.errmsg() << std::endl;
-        throw DS_FatalException();
-        return;
-        
-    } catch(...) {
-        
-        std::cerr << "Caught unknown exception." << std::endl;
-        throw DS_Exception();
-        return;
-        
-    }
-    
-}
-
-
-
-ReconClient::~ReconClient         ()            {
-
-	m_orb->destroy();
-    
-}
-
-
-
-error_code
-ReconClient::Init (const char* name) {
-
-    error_code  result  = OK;
-
-	// Prepare configuration for the journey
-	std::stringstream  temp;
-	temp << GetConfig();
-	m_rrsi->config  (temp.str().c_str());
-
-	// Initialise back end
-    m_rstrats.push_back (m_rrsi->Init (name));
-    
-	if (m_rstrats.back() == -1)
-		result = CANNOT_LOAD_LIBRARY;
-
-	return result;
-
-}
-
-
-
-error_code 
-ReconClient::Prepare  (const char* name)  {
-    
-    return m_rrsi->Prepare (m_rstrats.back());
-    
-}
-
-
-
-error_code 
-ReconClient::Process  (const char* name)  {
-    
-    return  m_rrsi->Process (m_rstrats.back());
-    
-}
-
-
-
-error_code
-ReconClient::Finalise (const char* name) {
-
-	return m_rrsi->Finalise(m_rstrats.back());
-
-}
-
-
-
-long 
-ReconClient::GetSize (const longs dims) const {
-
-    long size = 1;
-
-	for (int i = 0; i < INVALID_DIM; i++)
-		size *= dims[i];
-
-    return size;
-    
-}
-
-
-
-void 
-ReconClient::SetCplx (const std::string& name, Matrix< std::complex<float> >& M) const {
-	
-	cplx_data r; 
-	
-	r.dims.length(INVALID_DIM);
-	r.res.length(INVALID_DIM);
-	
-	for (int j = 0; j < INVALID_DIM; j++) {
-		r.dims[j] = M.Dim(j);
-		r.res[j]  = M.Res(j);
-	}
-
-	r.vals.length(2 * M.Size());
-	
-	memcpy (&r.vals[0], &M[0], r.vals.length() * sizeof(float));
-	
-	m_rrsi->set_cplx(name.c_str(), r);
-	
-}
-		    
-
-void 
-ReconClient::GetCplx (const std::string& name, Matrix< std::complex<float> >& m) const {
-	
-	cplx_data rp; 
-	m_rrsi->get_cplx(name.c_str(), rp);
-	
-	for (int j = 0; j < INVALID_DIM; j++) {
-		m.Dim(j) = rp.dims[j];
-		m.Res(j) = rp.res[j];
-	}
-
-	m.Reset();
-	
-	memcpy (&m[0], &rp.vals[0], rp.vals.length() * sizeof(float));
-	
-}
-
-
-void
-ReconClient::SetReal              (const std::string& name, Matrix<double>& m) const {
-	
-	real_data r;
-	
-	r.dims.length(INVALID_DIM);
-	r.res.length(INVALID_DIM);
-	
-	for (int j = 0; j < INVALID_DIM; j++) {
-		r.dims[j] = m.Dim(j);
-		r.res[j]  = m.Res(j);
-	}
-	
-	r.vals.length(m.Size());
-	
-	for (int i = 0; i < m.Size(); i++)
-		r.vals[i] = m[i];
-	
-	m_rrsi->set_real(name.c_str(), r);
-	
-}
+	ReconClient::ReconClient          (const char* name, const char* debug) {
 		
-
-void
-ReconClient::GetReal            (const std::string& name, Matrix<double>& m) const {
-	
-	real_data r; 
-	m_rrsi->get_real(name.c_str(), r);
-	
-	for (int j = 0; j < INVALID_DIM; j++) {
-		m.Dim(j) = r.dims[j];
-		m.Res(j) = r.res[j];
-	}
-	
-	m.Reset();
-	
-	for (int i = 0; i < GetSize(r.dims); i++)
-		m[i] = r.vals[i];
-	
-}
-
-
-
-void
-ReconClient::SetFloat              (const std::string& name, Matrix<float>& m) const {
-	
-	float_data r;
-	
-	r.dims.length(INVALID_DIM);
-	r.res.length(INVALID_DIM);
-	
-	for (int j = 0; j < INVALID_DIM; j++) {
-		r.dims[j] = m.Dim(j);
-		r.res[j]  = m.Res(j);
-	}
-	
-	r.vals.length(m.Size());
-	
-	for (int i = 0; i < m.Size(); i++)
-		r.vals[i] = m[i];
-	
-	m_rrsi->set_float(name.c_str(), r);
-	
-}
-		
-
-void
-ReconClient::GetFloat           (const std::string& name, Matrix<float>& m) const {
-	
-	float_data r; 
-	m_rrsi->get_float(name.c_str(), r);
-	
-	for (int j = 0; j < INVALID_DIM; j++) {
-		m.Dim(j) = r.dims[j];
-		m.Res(j) = r.res[j];
-	}
-	
-	m.Reset();
-	
-	for (int i = 0; i < GetSize(r.dims); i++)
-		m[i] = r.vals[i];
-	
-}
-
-
-
-void
-ReconClient::SetPixel            (const std::string& name, Matrix<short>& m) const {
+		try {
 			
-	pixel_data p;
-	
-	p.dims.length(INVALID_DIM);
-	p.res.length(INVALID_DIM);
-	
-	for (int j = 0; j < INVALID_DIM; j++) {
-		p.dims[j] = m.Dim(j);
-		p.res[j]  = m.Res(j);
+			// Initialise ORB
+			int         i            = 0;
+			char**      c            = 0;
+			const char* options[][2] = { { (char*)"traceLevel", debug }, { 0, 0 } };
+			
+			m_orb = CORBA::ORB_init(i, c, "omniORB4", options);
+			
+			// Bind ORB object to name service object
+			CORBA::Object_var obj = m_orb->resolve_initial_references("NameService");
+			assert (!CORBA::is_nil(obj.in()));
+			
+			// Narrow this to the naming context
+			CosNaming::NamingContext_var context  = CosNaming::NamingContext::_narrow(obj.in());
+			assert (!CORBA::is_nil(context.in()));
+			
+			// Bind to the name server and lookup 
+			CosNaming::Name m_name;
+			m_name.length(1);
+			m_name[0].id = CORBA::string_dup(name);
+			
+			// Resolve object reference.
+			CORBA::Object_var orid = context->resolve(m_name);
+			assert(!CORBA::is_nil(orid.in()));
+			
+			m_rrsi       = RRSInterface::_narrow(orid.in());
+			if (CORBA::is_nil(m_rrsi.in()))
+				std::cerr << "IOR is not an SA object reference." << std::endl;
+			
+		} catch (CORBA::COMM_FAILURE&)        {
+			
+			std::cerr << "Caught system exception COMM_FAILURE -- unable to contact the object.\n" << std::endl;
+			throw DS_ServerConnectionException();
+			return;
+			
+		} catch (CORBA::SystemException&)     {
+			
+			std::cerr << "Caught a CORBA::SystemException." << std::endl;
+			throw DS_SystemException();
+			return;
+			
+		} catch (CORBA::Exception&)           {
+			
+			std::cerr << "Caught CORBA::Exception." << std::endl;
+			throw DS_Exception();
+			return;
+			
+		} catch (omniORB::fatalException& fe) {
+			
+			std::cerr << "Caught omniORB::fatalException:" << std::endl;
+			std::cerr << "  file: " << fe.file() << std::endl;
+			std::cerr << "  line: " << fe.line() << std::endl;
+			std::cerr << "  mesg: " << fe.errmsg() << std::endl;
+			throw DS_FatalException();
+			return;
+			
+		} catch(...) {
+			
+			std::cerr << "Caught unknown exception." << std::endl;
+			throw DS_Exception();
+			return;
+			
+		}
+		
 	}
 	
-	p.vals.length(m.Size()); 
 	
-	for (int i = 0; i < m.Size(); i++)
-		p.vals[i] = m[i];
 	
-	m_rrsi->set_pixel(name.c_str(), p);
-	
-}
-
-
-void
-ReconClient::GetPixel            (const std::string& name, Matrix<short>& m) const {
-	
-	pixel_data p;
-	m_rrsi->get_pixel(name.c_str(), p);
-
-	for (int j = 0; j < INVALID_DIM; j++) {
-		m.Dim(j) = p.dims[j];
-		m.Res(j) = p.res[j];
+	ReconClient::~ReconClient         ()            {
+		
+		m_orb->destroy();
+		
 	}
 	
-	m.Reset();
 	
-	for (int i = 0; i < GetSize(p.dims); i++)
-		m[i] = p.vals[i];
 	
+	error_code
+	ReconClient::Init (const char* name) {
+		
+		error_code  result  = OK;
+		
+		// Prepare configuration for the journey
+		std::stringstream  temp;
+		temp << GetConfig();
+		m_rrsi->config  (temp.str().c_str());
+		
+		// Initialise back end
+		m_rstrats.push_back (m_rrsi->Init (name));
+		
+		if (m_rstrats.back() == -1)
+			result = CANNOT_LOAD_LIBRARY;
+		
+		return result;
+		
+	}
+	
+	
+	
+	error_code 
+	ReconClient::Prepare  (const char* name)  {
+		
+		return m_rrsi->Prepare (name);
+		
+	}
+	
+	
+	
+	error_code 
+	ReconClient::Process  (const char* name)  {
+		
+		return  m_rrsi->Process (name);
+		
+	}
+	
+	
+	
+	error_code
+	ReconClient::Finalise (const char* name) {
+		
+		return m_rrsi->Finalise(name);
+		
+	}
+
+	
+	
+	long 
+	ReconClient::GetSize (const longs dims) const {
+		
+		long size = 1;
+		
+		for (int i = 0; i < INVALID_DIM; i++)
+			size *= dims[i];
+		
+		return size;
+		
+	}
+	
+	
+	
+	template<> void 
+	ReconClient::SetMatrix (const std::string& name, Matrix< std::complex<float> >& M) const {
+		
+		cxfl_data r; 
+		
+		r.dims.length(INVALID_DIM);
+		r.res.length(INVALID_DIM);
+		
+		for (int j = 0; j < INVALID_DIM; j++) {
+			r.dims[j] = M.Dim(j);
+			r.res[j]  = M.Res(j);
+		}
+		
+		r.vals.length(2 * M.Size());
+		
+		memcpy (&r.vals[0], &M[0], r.vals.length() * sizeof(float));
+		
+		m_rrsi->set_cxfl(name.c_str(), r);
+		
+	}
+	
+	
+	template<> void 
+	ReconClient::GetMatrix (const std::string& name, Matrix< std::complex<float> >& m) const {
+		
+		cxfl_data rp; m_rrsi->get_cxfl(name.c_str(), rp);
+		
+		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = rp.dims[j];
+			m.Res(j) = rp.res[j]; }
+		
+		m.Reset();
+		
+		memcpy (&m[0], &rp.vals[0], rp.vals.length() * sizeof(float));
+		
+	}
+	
+
+	template<> void 
+	ReconClient::SetMatrix (const std::string& name, Matrix<double>& m) const {
+		
+		rldb_data r;
+		
+		r.dims.length(INVALID_DIM); r.res.length(INVALID_DIM);
+		
+		for (int j = 0; j < INVALID_DIM; j++) { r.dims[j] = m.Dim(j);
+			r.res[j] = m.Res(j); }
+		
+		r.vals.length(m.Size());
+		
+		for (int i = 0; i < m.Size(); i++) r.vals[i] = m[i];
+		
+		m_rrsi->set_rldb(name.c_str(), r);
+		
+	}
+	
+	
+	template<> void 
+	ReconClient::GetMatrix (const std::string& name, Matrix<double>& m) const {
+		
+		rldb_data r; m_rrsi->get_rldb(name.c_str(), r);
+		
+		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = r.dims[j];
+			m.Res(j) = r.res[j]; }
+		
+		m.Reset();
+		
+		for (int i = 0; i < GetSize(r.dims); i++) m[i] = r.vals[i];
+		
+	}
+	
+	
+	
+	template<> void 
+	ReconClient::SetMatrix (const std::string& name, Matrix<float>& m) const {
+		
+		rlfl_data r;
+		
+		r.dims.length(INVALID_DIM); r.res.length(INVALID_DIM);
+		
+		for (int j = 0; j < INVALID_DIM; j++) { r.dims[j] = m.Dim(j);
+			r.res[j] = m.Res(j); }
+		
+		r.vals.length(m.Size());
+		
+		for (int i = 0; i < m.Size(); i++) r.vals[i] = m[i];
+		
+		m_rrsi->set_rlfl(name.c_str(), r);
+		
+	}
+	
+
+	template<> void 
+	ReconClient::GetMatrix (const std::string& name, Matrix<float>& m) const {
+		
+		rlfl_data r; m_rrsi->get_rlfl(name.c_str(), r);
+		
+		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = r.dims[j];
+			m.Res(j) = r.res[j]; }
+		
+		m.Reset();
+		
+		for (int i = 0; i < GetSize(r.dims); i++) m[i] = r.vals[i];
+		
+	}
+	
+	
+	
+	template<> void 
+	ReconClient::SetMatrix (const std::string& name, Matrix<short>& m) const {
+		
+		shrt_data p;
+		
+		p.dims.length(INVALID_DIM); p.res.length(INVALID_DIM);
+		
+		for (int j = 0; j < INVALID_DIM; j++) { p.dims[j] = m.Dim(j);
+			p.res[j] = m.Res(j); }
+		
+		p.vals.length(m.Size());
+		
+		for (int i = 0; i < m.Size(); i++) p.vals[i] = m[i];
+		
+		m_rrsi->set_shrt(name.c_str(), p);
+		
+	}
+	
+	
+	template<> void 
+	ReconClient::GetMatrix (const std::string& name, Matrix<short>& m) const {
+		
+		shrt_data p; m_rrsi->get_shrt(name.c_str(), p);
+		
+		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = p.dims[j];
+			m.Res(j) = p.res[j]; }
+		
+		m.Reset();
+		
+		for (int i = 0; i < GetSize(p.dims); i++) m[i] = p.vals[i];
+		
+	}
+
+
+	template<> void 
+	ReconClient::SetMatrix (const std::string& name, Matrix<long>& m) const {
+		
+		long_data p;
+		
+		p.dims.length(INVALID_DIM); p.res.length(INVALID_DIM);
+		
+		for (int j = 0; j < INVALID_DIM; j++) { p.dims[j] = m.Dim(j);
+			p.res[j] = m.Res(j); }
+		
+		p.vals.length(m.Size());
+		
+		for (int i = 0; i < m.Size(); i++) p.vals[i] = m[i];
+		
+		m_rrsi->set_long(name.c_str(), p);
+		
+	}
+	
+	
+	template<> void 
+	ReconClient::GetMatrix (const std::string& name, Matrix<long>& m) const {
+		
+		long_data p; m_rrsi->get_long(name.c_str(), p);
+		
+		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = p.dims[j];
+			m.Res(j) = p.res[j]; }
+		
+		m.Reset();
+		
+		for (int i = 0; i < GetSize(p.dims); i++) m[i] = p.vals[i];
+		
+	}
+
+
 }
-
-

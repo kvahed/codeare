@@ -110,7 +110,7 @@ namespace RRStrategy {
 
 
 
-	void ComputeWeights (const int& nc, const int* acs_dim, const int* kern_dim, const int* d, const float* R, const Matrix<cplx>* acs, Matrix<cplx>& weights) {
+	void ComputeWeights (const int& nc, const int* acs_dim, const int* kern_dim, const int* d, const float* R, const Matrix<cplx>& acs, Matrix<cplx>& weights) {
 		
 		ticks       tic     = getticks();
 		printf ("  (Re-)Computing weights \n");
@@ -151,7 +151,7 @@ namespace RRStrategy {
 				for (int col = 0; col < kern_dim[0]; col++)
 					for (int lin = 0; lin < kern_dim[1]; lin++)
 						for (int ch = 0; ch < nc; ch++, pos++)
-							s.At(pos + c*s.Dim(0)) = acs->At(i+col,j+lin,ch);
+							s.At(pos + c*s.Dim(0)) = acs(i+col,j+lin,ch);
 		
 		//s.MXDump ("s.mat", "s", "");
 		//p.MXDump ("p.mat", "p", "");

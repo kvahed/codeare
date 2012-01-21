@@ -111,8 +111,8 @@ namespace RRClient {
 		 * @param  name     Name
 		 * @param  m        Complex data
 		 */
-		void 
-		SetCplx             (const std::string& name, Matrix<cplx>& m) const;
+		template <class T> void 
+		SetMatrix           (const std::string& name, Matrix<T>& m) const;
 		
 		
 		/**
@@ -121,68 +121,9 @@ namespace RRClient {
 		 * @param  name     Name
 		 * @param  m        Receive storage
 		 */
-		void 
-		GetCplx             (const std::string& name, Matrix<cplx>& m) const;
+		template <class T> void 
+		GetMatrix           (const std::string& name, Matrix<T>& m) const;
 		
-		
-		/**
-		 * @brief           Transmit real data to service (f.e. k-space weights)
-		 *
-		 * @param  name     Name
-		 * @param  m        Real data
-		 */
-		void
-		SetReal             (const std::string& name, Matrix<double>& m) const;
-		
-		
-		/**
-		 * @brief           Get helper data after recon to ...
-		 *
-		 * @param  name     Name
-		 * @param  m        Receive storage
-		 */
-		void
-		GetReal             (const std::string& name, Matrix<double>& m) const;
-		
-		
-		/**
-		 * @brief           Transmit real data to service (f.e. k-space weights)
-		 *
-		 * @param  name     Name
-		 * @param  m        Real data
-		 */
-		void
-		SetFloat            (const std::string& name, Matrix<float>& m) const ;
-		
-		
-		/**
-		 * @brief           Get helper data after recon to ...
-		 *
-		 * @param  name     Name
-		 * @param  m        Receive storage
-		 */
-		void
-		GetFloat            (const std::string& name, Matrix<float>& m) const;
-		
-		
-		/**
-		 * @brief           Transmit gray-scale images to remote service
-		 * 
-		 * @param  name     Name
-		 * @param  m        Short int data
-		 */
-		void 
-		SetPixel            (const std::string& name, Matrix<short>& m) const;
-		
-		
-		/**
-		 * @brief           Get gray-scale data after recon
-		 * 
-		 * @param  name     Name
-		 * @param  m        Short int storage
-		 */
-		void 
-		GetPixel            (const std::string& name, Matrix<short>& m) const;
 		
 		
 	private:

@@ -28,9 +28,10 @@
 #endif
 
 #include <string>
-#include <vector>
+#include <map>
 
 using namespace RRSModule;
+using namespace std;
 
 /**
  * @brief Remote recon server
@@ -72,7 +73,7 @@ namespace RRServer {
 		 * @return     Sucess
 		 */
 		virtual error_code
-		Process        (const short s);
+		Process        (const char* name);
 
 		
 		/**
@@ -82,16 +83,16 @@ namespace RRServer {
 		 * @return     Sucess
 		 */
 		virtual error_code
-		Prepare        (const short s);
+		Prepare        (const char* name);
 
 		
 		/**
 		 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
 		 * 
 		 * @param name Name of processing library
-		 * @return     Id of 
+		 * @return     success
 		 */
-		virtual short int
+		virtual error_code
 		Init          (const char* name);
 		
 
@@ -101,7 +102,7 @@ namespace RRServer {
 		 * @param s   sth Intialised startegy
 		 */
 		virtual error_code
-		Finalise      (const short s);
+		Finalise      (const char* name);
 		
 
 		/**
@@ -111,7 +112,7 @@ namespace RRServer {
 		 * @param  c    Data respository
 		 */
 		void
-		get_cplx      (const char* name, cplx_data& c);
+		get_cxfl      (const char* name, cxfl_data& c);
 		
 
 		/**
@@ -121,7 +122,27 @@ namespace RRServer {
 		 * @param c   Complex measurement data
 		 */
 		void 
-		set_cplx      (const char* name, const cplx_data& c);
+		set_cxfl      (const char* name, const cxfl_data& c);
+
+		
+		/**
+		 * @brief       Retreive measurement data
+		 *
+		 * @param  name Name
+		 * @param  c    Data respository
+		 */
+		void
+		get_cxdb      (const char* name, cxdb_data& c);
+		
+
+		/**
+		 * @brief     Set measurement data
+		 *
+		 * @param  name  Name
+		 * @param c   Complex measurement data
+		 */
+		void 
+		set_cxdb      (const char* name, const cxdb_data& c);
 
 		
 		/**
@@ -131,7 +152,7 @@ namespace RRServer {
 		 * @param  r    Data
 		 */
 		void
-		get_real      (const char* name, real_data& r);
+		get_rldb      (const char* name, rldb_data& r);
 		
 
 		/**
@@ -141,7 +162,7 @@ namespace RRServer {
 		 * @param r   Real helper data
 		 */
 		void 
-		set_real      (const char* name, const real_data& r);
+		set_rldb      (const char* name, const rldb_data& r);
 		
 
 		/**
@@ -151,37 +172,57 @@ namespace RRServer {
 		 * @param  r    Data
 		 */
 		void
-		get_float      (const char* name, float_data& r);
+		get_rlfl      (const char* name, rlfl_data& r);
 		
 
 		/**
 		 * @brief     Set real data
 		 *
 		 * @param  name  Name
-		 * @param r   Float data
+		 * @param r   Rlfl data
 		 */
 		void 
-		set_float      (const char* name, const float_data& r);
+		set_rlfl      (const char* name, const rlfl_data& r);
 		
 
 		/**
-		 * @brief     Get pixel data from recon
+		 * @brief     Get shrt data from recon
 		 *
 		 * @param  name  Name
 		 * @param  p     Data
 		 */
 		void
-		get_pixel     (const char* name, pixel_data& p);
+		get_shrt     (const char* name, shrt_data& p);
 		
 
 		/**
-		 * @brief     Set pixel data for recon
+		 * @brief     Set shrt data for recon
 		 *
 		 * @param  name  Name
-		 * @param p   Pixel data
+		 * @param p   Shrt data
 		 */
 		void 
-		set_pixel     (const char* name, const pixel_data& p);
+		set_shrt     (const char* name, const shrt_data& p);
+		
+
+		/**
+		 * @brief     Get long data from recon
+		 *
+		 * @param  name  Name
+		 * @param  p     Data
+		 */
+		void
+		get_long     (const char* name, long_data& p);
+		
+
+		/**
+		 * @brief     Set long data for recon
+		 *
+		 * @param  name  Name
+		 * @param p   Long data
+		 */
+		void 
+		set_long     (const char* name, const long_data& p);
 		
 
 		/**
@@ -201,13 +242,11 @@ namespace RRServer {
 		void 
 		config        (const char* c);
 
-		virtual double 
-		fun           (const double, float&) {};
 
 	private:
 		
-		char*                      m_config;   /**< Serialised XML document  */
-		std::vector<ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
+		char*                                m_config;   /**< Serialised XML document  */
+		std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
 	};
 

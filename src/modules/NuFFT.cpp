@@ -116,9 +116,9 @@ NuFFT::Process () {
 	// Some variables
 	RRSModule::error_code error = OK;
 
-	Matrix<cplx>&   data    = GetCplx("data");
-	Matrix<double>& kspace  = GetReal("kspace");
-	Matrix<double>& weights = GetReal("weights");
+	Matrix<cplx>&   data    = GetCXFL("data");
+	Matrix<double>& kspace  = GetRLDB("kspace");
+	Matrix<double>& weights = GetRLDB("weights");
 
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();

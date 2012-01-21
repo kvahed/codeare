@@ -74,10 +74,10 @@ CompressedSensing::Process () {
 	printf ("Processing CompressedSensing ...\n");
 	ticks csstart = getticks();
 
-	Matrix<cplx>&   data  = GetCplx("data");
-	Matrix<double>& pdf   = GetReal("pdf");
+	Matrix<cplx>&   data  = GetCXFL("data");
+	Matrix<double>& pdf   = GetRLDB("pdf");
 
-	Matrix<cplx>&   im_dc = AddCplx ("im_dc", new Matrix<cplx> (data.Dim()));
+	Matrix<cplx>&   im_dc = AddCXFL ("im_dc", new Matrix<cplx> (data.Dim()));
 
 	ticks tic = getticks();
 
@@ -118,9 +118,6 @@ CompressedSensing::Process () {
 	return OK;
 
 }
-
-
-
 
 
 // the class factories

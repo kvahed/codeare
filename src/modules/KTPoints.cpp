@@ -137,11 +137,11 @@ KTPoints::Process        () {
     // m_helper: RF and gradient pulses
     // ----------------------------
 
-	Matrix<double>& k      = *(m_real ["k"]);
-	Matrix<double>& r      = *(m_real ["r"]);
-	Matrix<cplx>&   b1     = *(m_cplx ["b1"]);
-	Matrix<short>&  b0     = *(m_pixel["b0"]);
-	Matrix<cplx>&   target = *(m_cplx ["target"]);
+	Matrix<double>& k      = GetRLDB("k");
+	Matrix<double>& r      = GetRLDB("r");
+	Matrix<cplx>&   b1     = GetCXFL("b1");
+	Matrix<short>&  b0     = GetSHRT("b0");
+	Matrix<cplx>&   target = GetCXFL("target");
 
 	m_ns = r.Dim(1);
 	m_nk = k.Dim(1);
