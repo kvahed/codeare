@@ -103,8 +103,8 @@ int main (int argc, char** argv) {
 
 bool grappatest (ReconClient* rc) {
 
-	Matrix<cplx> sig;
-	Matrix<cplx> acs;
+	Matrix<cxfl> sig;
+	Matrix<cxfl> acs;
 	
 	std::string cf = std::string (base + std::string(config));
 	std::string df = std::string (base + std::string(data));
@@ -131,15 +131,15 @@ bool grappatest (ReconClient* rc) {
 bool cgsensetest (ReconClient* rc) {
 
 	// Incoming
-	Matrix<cplx>   rawdata;
+	Matrix<cxfl>   rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
-	Matrix<cplx>   sens;
+	Matrix<cxfl>   sens;
 
 	// Outgoing
 	Matrix<double> nrmse;
-	Matrix<cplx>   image;
-	Matrix<cplx>   signals;
+	Matrix<cxfl>   image;
+	Matrix<cxfl>   signals;
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
@@ -232,8 +232,8 @@ bool cgsensetest (ReconClient* rc) {
 
 bool cstest (ReconClient* rc) {
 
-	Matrix<cplx> indata;
-	Matrix<cplx> im_dc;
+	Matrix<cxfl> indata;
+	Matrix<cxfl> im_dc;
 	Matrix<double> mask;
 	Matrix<double> pdf;
 	
@@ -296,13 +296,13 @@ bool cstest (ReconClient* rc) {
 
 bool dmtest (ReconClient* rc) {
 
-	Matrix<cplx>  b1;  
-	Matrix<cplx>  tmxy;
+	Matrix<cxfl>  b1;  
+	Matrix<cxfl>  tmxy;
 	Matrix<float> tmz;  
 	Matrix<float> r;   
 	Matrix<float> b0;  
 	
-	Matrix<cplx>  smxy;
+	Matrix<cxfl>  smxy;
 	Matrix<float> smz;
 	Matrix<float> roi;
 
@@ -327,7 +327,7 @@ bool dmtest (ReconClient* rc) {
 	r.MXRead    (pf, "r");
 	tmxy.MXRead (pf, rc->Attribute("p"));
 	tmz  = Matrix<float>::Zeros (r.Dim(1), 1);
-	smxy = Matrix<cplx>::Zeros  (r.Dim(1), 1);
+	smxy = Matrix<cxfl>::Zeros  (r.Dim(1), 1);
 	smz.MXRead (pf, rc->Attribute("s"));
 	roi.MXRead (pf, rc->Attribute("roi"));
 
@@ -358,8 +358,8 @@ bool dmtest (ReconClient* rc) {
 	
 	// Incoming -------------
 	
-	Matrix<cplx>  rf;
-	Matrix<cplx>  mxy;
+	Matrix<cxfl>  rf;
+	Matrix<cxfl>  mxy;
 	Matrix<float> mz;   
 
 	rc->GetMatrix  ( "mxy", mxy);
@@ -398,7 +398,7 @@ bool dmtest (ReconClient* rc) {
 
 bool nuffttest (ReconClient* rc) {
 
-	Matrix<cplx>   rawdata;
+	Matrix<cxfl>   rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
 	
@@ -439,8 +439,8 @@ bool nuffttest (ReconClient* rc) {
 
 bool ktptest (ReconClient* rc) {
 
-	Matrix<cplx>   target;
-	Matrix<cplx>   b1;
+	Matrix<cxfl>   target;
+	Matrix<cxfl>   b1;
 	Matrix<double> r;
 	Matrix<double> k;
 	Matrix<short>  b0;
@@ -501,7 +501,7 @@ bool internaltest (ReconClient* rc) {
 
 	int            i = 0, j = 0, d = 5;
 	
-	Matrix<cplx>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<cxfl>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	
@@ -564,7 +564,7 @@ bool fftwtest (ReconClient* rc) {
 	std::string in  = std::string (base + std::string ("/infft.h5"));
 	std::string out = std::string (base + std::string ("/outfft.h5"));
 	
-	Matrix<cplx> m;
+	Matrix<cxfl> m;
 
 	m.Read (in, "img");
 	m = FFT::Forward(m);
@@ -578,12 +578,12 @@ bool fftwtest (ReconClient* rc) {
 bool resetest (ReconClient* rc) {
 
 	// OUT:
-	Matrix<cplx>   meas; // measurement
-	Matrix<cplx>   mask; // measurement
+	Matrix<cxfl>   meas; // measurement
+	Matrix<cxfl>   mask; // measurement
 
 	// IN: 
-	Matrix<cplx>   txm;  // Transmit maps
-	Matrix<cplx>   rxm;  // Receive maps
+	Matrix<cxfl>   txm;  // Transmit maps
+	Matrix<cxfl>   rxm;  // Receive maps
 
 	Matrix<double> b0;   // B0 map
 	Matrix<double> snro; // SNR optimal image
@@ -689,12 +689,12 @@ bool mxtest (ReconClient* rc) {
 
 	std::cout << out << std::endl << std::endl;
 
-	Matrix<cplx> r1 (4,8);
+	Matrix<cxfl> r1 (4,8);
 	r1.Random ();
 	r1.MXDump (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	std::cout << r1 << std::endl << std::endl;
 	
-	Matrix<cplx> r2;
+	Matrix<cxfl> r2;
 	r2.MXRead (std::string("rtest.mat"), std::string("rmat"), std::string(""));
 	std::cout << r2 << std::endl << std::endl;
 
@@ -724,7 +724,7 @@ bool nitest (ReconClient* rc) {
 #endif
 	d.NIDump (nii);
 
-	Matrix<cplx> slp = Matrix<cplx>::Phantom3D(196); 
+	Matrix<cxfl> slp = Matrix<cxfl>::Phantom3D(196); 
 	slp.NIDump (nii);
 #ifdef HAVE_MAT_H	
 	slp.MXDump (mat, std::string("betted"), std::string(""));
