@@ -115,7 +115,7 @@ Matrix<float>::Print (ostream &os) const {
 
 
 template<> inline ostream&  
-Matrix<cplx>::Print (ostream& os) const {
+Matrix<cxfl>::Print (ostream& os) const {
 	
 	for (size_t i = 0; i < _dim[COL]; i++) {
 		for(size_t j = 0; j < _dim[LIN]; j++)
@@ -293,13 +293,13 @@ Matrix<T>::H5Dump (const string fname, const string dname, const string dloc) co
 			}
 			
 			// One more field for complex numbers
-			size_t tmpdim = (typeid(T) == typeid(cplx)) ? INVALID_DIM+1 : INVALID_DIM;
+			size_t tmpdim = (typeid(T) == typeid(cxfl)) ? INVALID_DIM+1 : INVALID_DIM;
 			hsize_t* dims = new hsize_t[tmpdim];
 
 			for (i = 0; i < INVALID_DIM; i++)
 				dims[i] = _dim[INVALID_DIM-1-i];
 			
-			if (typeid(T) == typeid(cplx))
+			if (typeid(T) == typeid(cxfl))
 				dims[INVALID_DIM] = 2;
 
 			DataSpace space (tmpdim, dims);
@@ -309,10 +309,10 @@ Matrix<T>::H5Dump (const string fname, const string dname, const string dloc) co
 
 			string _dname = dname;
 
-			if (typeid(T) == typeid(cplx)) {
+			if (typeid(T) == typeid(cxfl)) {
 				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
 				if (dname == "") 
-					_dname = "cplx";
+					_dname = "cxfl";
 			} else if (typeid(T) == typeid(double)) {
 				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
 				if (dname == "") 
@@ -580,7 +580,7 @@ Matrix<T>::H5Read (const string fname, const string dname, const string dloc) {
 			hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
 			size_t    ndim    = space.getSimpleExtentDims(dims, NULL);
 
-			if (typeid(T) == typeid(cplx)) 
+			if (typeid(T) == typeid(cxfl)) 
 				ndim--;
 
 			for (size_t i = 0; i < ndim; i++)
@@ -603,7 +603,7 @@ Matrix<T>::H5Read (const string fname, const string dname, const string dloc) {
 			
 			PredType*  type;
 			
-			if (typeid(T) == typeid(cplx))
+			if (typeid(T) == typeid(cxfl))
 				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
 			else if (typeid(T) == typeid(double))
 				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
@@ -692,7 +692,7 @@ bool Matrix<T>::MXRead (const string fname, const string dname, const string dlo
 
 	if (typeid(T) == typeid(double) || typeid(T) == typeid(double)) {
 		memcpy(&_M[0], mxGetPr(mxa), Size() * sizeof(T));
-	} else if (typeid(T) == typeid(cplx)) {
+	} else if (typeid(T) == typeid(cxfl)) {
 		if (mxGetPi(mxa) != NULL)
 			for (size_t i = 0; i < Size(); i++) {
 				float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
@@ -741,7 +741,7 @@ bool Matrix<T>::MXDump (MATFile* mf, const string dname, const string dloc) cons
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
 	else if (typeid(T) == typeid(float))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS,    mxREAL);
-	else if (typeid(T) == typeid(cplx))
+	else if (typeid(T) == typeid(cxfl))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
 	else if (typeid(T) == typeid(short))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim,  mxINT16_CLASS,    mxREAL);
@@ -750,7 +750,7 @@ bool Matrix<T>::MXDump (MATFile* mf, const string dname, const string dloc) cons
 	
 	// Copy to memory block ----------------------
 	
-	if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cxfl))
 		for (size_t i = 0; i < Size(); i++) {
 			((float*)mxGetPr(mxa))[i] = ((float*)&_M[0])[2*i+0]; // Template compilation workaround
 			((float*)mxGetPi(mxa))[i] = ((float*)&_M[0])[2*i+1]; // Can't use .imag() .real(). Consider double/short 
@@ -835,7 +835,7 @@ bool Matrix<T>::NIDump (const string fname) const {
 			header.pixdim[i+1] = tmp.Res(i);
 		}
 		
-		if      (typeid(T) == typeid(cplx))
+		if      (typeid(T) == typeid(cxfl))
 			header.datatype = 32;
 		else if (typeid(T) == typeid(double))
 			header.datatype = 64;
@@ -905,7 +905,7 @@ bool Matrix<T>::NIRead (const string fname) {
 			else 
 				for (size_t i = 0; i < Size(); i++ )
 					_M[i] = ((float*)ni->data)[i];
-		} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(cplx)) {
+		} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(cxfl)) {
 			if (ni->datatype == 32)
 				memcpy (&_M[0], ni->data, Size()*sizeof(T));
 			else 

@@ -116,7 +116,7 @@ NuFFT::Process () {
 	// Some variables
 	RRSModule::error_code error = OK;
 
-	Matrix<cplx>&   data    = GetCXFL("data");
+	Matrix<cxfl>&   data    = GetCXFL("data");
 	Matrix<double>& kspace  = GetRLDB("kspace");
 	Matrix<double>& weights = GetRLDB("weights");
 
@@ -149,7 +149,7 @@ NuFFT::Process () {
 
 	// Copy back reconstructed image to outgoing matrix
 	for (int i = 0; i < data.Size(); i++)
-		data[i] = cplx (m_iplan.f_hat_iter[i][0], m_iplan.f_hat_iter[i][1]);
+		data[i] = cxfl (m_iplan.f_hat_iter[i][0], m_iplan.f_hat_iter[i][1]);
 	
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 	

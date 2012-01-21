@@ -90,7 +90,7 @@ namespace RRStrategy {
 	 * @param  ncov    Noise covariance matrix
 	 * 
 	 */
-	void PreWhite (const Matrix<cplx>& in, const Matrix<cplx>& ncov, Matrix<cplx>& od, const size_t& out = -1) {
+	void PreWhite (const Matrix<cxfl>& in, const Matrix<cxfl>& ncov, Matrix<cxfl>& od, const size_t& out = -1) {
 
 		//assert (idx <= in.HDim());
 
@@ -137,7 +137,7 @@ whitened = ipermute(whitened,new_order);
 		*/
 
 
-	void PhaseCombine (const Matrix<cplx>& img, Matrix<float>& pc) {
+	void PhaseCombine (const Matrix<cxfl>& img, Matrix<float>& pc) {
 		
 		size_t nc = img.HDim();
 
@@ -148,7 +148,7 @@ whitened = ipermute(whitened,new_order);
 
 
 
-	void PhasePreset (const Matrix<cplx>& afid, const bool& use_real, Matrix<float>& phase) {
+	void PhasePreset (const Matrix<cxfl>& afid, const bool& use_real, Matrix<float>& phase) {
 		
 		if (afid.Dim(4) > 1) {
 			
@@ -167,7 +167,7 @@ whitened = ipermute(whitened,new_order);
 				for (size_t z = 0; z < afid.Dim(2); z++)
 					for (size_t y = 0; y < afid.Dim(1); y++)
 						for (size_t x = 0; x < afid.Dim(0); x++)
-							afid (x, y, z, 1) *= exp (cplx (0.0, pc(x, y, z)));		
+							afid (x, y, z, 1) *= exp (cxfl (0.0, pc(x, y, z)));		
 
 			} else {
 				

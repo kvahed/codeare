@@ -23,26 +23,26 @@
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_wavelet2d.h>
 
-Matrix<cplx> 
-DWT::Forward (const Matrix<cplx>& m) {
+Matrix<cxfl> 
+DWT::Forward (const Matrix<cxfl>& m) {
 
 	return Transform (m, false);
 
 }
 
 
-Matrix<cplx> 
-DWT::Backward (const Matrix<cplx>& m) {
+Matrix<cxfl> 
+DWT::Backward (const Matrix<cxfl>& m) {
 
 	return Transform (m, true);
 
 }
 
 
-Matrix<cplx> 
-DWT::Transform (const Matrix<cplx>& m, const bool bw) {
+Matrix<cxfl> 
+DWT::Transform (const Matrix<cxfl>& m, const bool bw) {
 
-	Matrix<cplx> res = m;
+	Matrix<cxfl> res = m;
 
 	gsl_wavelet           *w    = gsl_wavelet_alloc (gsl_wavelet_daubechies, 4);
 	gsl_wavelet_workspace *work = gsl_wavelet_workspace_alloc (res.Size());
@@ -74,7 +74,7 @@ DWT::Transform (const Matrix<cplx>& m, const bool bw) {
 		
 	for (size_t j = 0; j < l; j++)
 		for (size_t i = 0; i < l; i++) 
-			res.At(j*l+i) = cplx(re[i*l+j],im [i*l+j]);
+			res.At(j*l+i) = cxfl(re[i*l+j],im [i*l+j]);
 	
 	free (re);
 	free (im);

@@ -21,12 +21,12 @@
 #include "FFT.hpp"
 #include <fftw3.h>
 
-Matrix<cplx> 
-FFT::Forward (const Matrix<cplx>& m)  {
+Matrix<cxfl> 
+FFT::Forward (const Matrix<cxfl>& m)  {
 	
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
 	
-    Matrix<cplx> res = m;
+    Matrix<cxfl> res = m;
 	fftwf_plan   p;
 
 	Shift(res);
@@ -48,12 +48,12 @@ FFT::Forward (const Matrix<cplx>& m)  {
 }
 
 /*
-inline Matrix<cplx>
-FFT::Backward (const Matrix<cplx>& m) {
+inline Matrix<cxfl>
+FFT::Backward (const Matrix<cxfl>& m) {
 
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
 	
-    Matrix<cplx> res = m;
+    Matrix<cxfl> res = m;
 	fftwf_plan   p; 
 	
 	res = Shift(res);
@@ -75,12 +75,12 @@ FFT::Backward (const Matrix<cplx>& m) {
 }
 */
 
-Matrix<cplx>
-FFT::Shift (const Matrix<cplx>& m) {
+Matrix<cxfl>
+FFT::Shift (const Matrix<cxfl>& m) {
 	
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
 	
-	Matrix<cplx> res  = m;
+	Matrix<cxfl> res  = m;
 	
 	for (size_t s = 0; s < m.Dim(2); s++)
 		for (size_t l = 0; l < m.Dim(1); l++)

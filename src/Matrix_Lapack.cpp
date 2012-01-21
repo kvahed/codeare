@@ -44,17 +44,17 @@ int  Matrix<T>::EIG (Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* rev, const bool c
 	float* rwork = (float*) malloc (2*n * sizeof(float));
 
 	// Workspace query
-	if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cxfl))
 		cgeev_ (&jobvl, &jobvr, &n, &this->At(0), &lda, &ev->At(0),     &lev->At(0), &ldvl, &rev->At(0), &ldvr, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgeev_ (&jobvl, &jobvr, &n, &this->At(0), &lda, &ev->At(0), wi, &lev->At(0), &ldvl, &rev->At(0), &ldvr, work, &lwork,        &info);
 	
 	// Intialise work space
-	lwork = (int) (cplx(work[0]).real());
+	lwork = (int) (cxfl(work[0]).real());
 	free (work); work = (T*) malloc (lwork*sizeof(T));
 
 	// Actual eigen value comp
-	if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cxfl))
 		cgeev_ (&jobvl, &jobvr, &n, &this->At(0), &lda, &ev->At(0),     &lev->At(0), &ldvl, &rev->At(0), &ldvr, work, &lwork, rwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgeev_ (&jobvl, &jobvr, &n, &this->At(0), &lda, &ev->At(0), wi, &lev->At(0), &ldvl, &rev->At(0), &ldvr, work, &lwork,        &info);
@@ -91,23 +91,23 @@ int Matrix<T>::SVD (Matrix<T>* u, Matrix<T>* v, Matrix<T>* s, const char jobz) {
 	int*   iwork =   (int*) malloc (8 * MIN(m,n) * sizeof(int));
 
 	// Only needed for complex data
-	if (typeid(T) == typeid(cplx)) {
+	if (typeid(T) == typeid(cxfl)) {
 		free (rwork);
 		rwork = (float*) malloc (MIN(m,n) * MAX(5*MIN(m,n)+7,2*MAX(m,n)+2*MIN(m,n)+1) * sizeof(float));
 	}
 	
 	// Workspace query
-	if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cxfl))
 		cgesdd_ (&jobz, &m, &n, &this->At(0), &lda, (float*)&s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgesdd_ (&jobz, &m, &n, &this->At(0), &lda,         &s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork,        iwork, &info);
 	
 	// Resize work according to ws query
-	lwork = (int) cplx (work[0]).real();
+	lwork = (int) cxfl (work[0]).real();
 	free(work); work = (T*) malloc (lwork * sizeof(T));
 	
 	//SVD
-	if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cxfl))
 		cgesdd_ (&jobz, &m, &n, &this->At(0), &lda, (float*)&s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgesdd_ (&jobz, &m, &n, &this->At(0), &lda,         &s->At(0), &u->At(0), &ldu, &v->At(0), &ldvt, work, &lwork,        iwork, &info);
@@ -140,7 +140,7 @@ Matrix<T>  Matrix<T>::Inv () const {
 
 	// LQ Factorisation -------------------
 
-	if (typeid (T) == typeid (cplx)) 
+	if (typeid (T) == typeid (cxfl)) 
 		cgetrf_ (&n, &n, &tmp[0], &n, ipiv, &info);
 	else if (typeid (T) == typeid (double))
 		dgetrf_ (&n, &n, &tmp[0], &n, ipiv, &info);
@@ -152,19 +152,19 @@ Matrix<T>  Matrix<T>::Inv () const {
 
 	// Workspace determination ------------
 
-	if (typeid (T) == typeid (cplx)) 
+	if (typeid (T) == typeid (cxfl)) 
 		cgetri_ (&n, &tmp[0], &n, ipiv, work, &lwork, &info);
 	else if (typeid (T) == typeid (double))
 		dgetri_ (&n, &tmp[0], &n, ipiv, work, &lwork, &info);
 
 	// ------------------------------------
 
-	lwork = (int) cplx (work[0]).real();
+	lwork = (int) cxfl (work[0]).real();
 	work  = (T*)  realloc (work, lwork * sizeof(T));
 	
 	// Copy triangular matrix over --------
 
-	if (typeid (T) == typeid (cplx)) 
+	if (typeid (T) == typeid (cxfl)) 
 		cgetri_ (&n, &tmp[0], &n, ipiv, work, &lwork, &info);
 	else if (typeid (T) == typeid (double))
 		dgetri_ (&n, &tmp[0], &n, ipiv, work, &lwork, &info);
@@ -201,19 +201,19 @@ Matrix<T>::Pinv () {
 
 	float     rcond  = -1.0;
 
-	if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cxfl))
 		cgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);
 
-	if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cxfl))
 		rwork = (float*) realloc (rwork, (int)rwork[0]*sizeof(float));
 
 	iwork = (int*) realloc (iwork, iwork[0]*sizeof(int));
-	lwork = (int) cplx (work[0]).real();
+	lwork = (int) cxfl (work[0]).real();
 	work  = (T*) realloc (work, lwork * sizeof(T));
 
-	if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cxfl))
 		cgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
 		dgelsd_ (&m, &n, &nrhs, &At(0), &lda, &b.At(0), &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);

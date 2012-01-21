@@ -19,7 +19,7 @@
  */
 
 RRSModule::error_code
-PTXWriteSiemensINIFile (const Matrix<cplx>& pt, const int& dimrf, const int& dimgr, const int& nc, const int& sampint, 
+PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const int& dimrf, const int& dimgr, const int& nc, const int& sampint, 
 						const float& max_rf, const std::string& fname, const std::string& orientation) {	
 
 	FILE*  fp    = fopen (fname.c_str(), "wb");

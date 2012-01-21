@@ -90,7 +90,7 @@ namespace RRStrategy {
 }
 
 RRSModule::error_code
-SVDCalibrate (const Matrix<cplx>& imgs, Matrix<cplx>& rxm, Matrix<cplx>& txm, Matrix<double>& snro, Matrix<cplx>& shim, const bool& normalise) {
+SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Matrix<double>& snro, Matrix<cxfl>& shim, const bool& normalise) {
 	
 	size_t    nrxc = rxm.Dim(3);
 	size_t    ntxc = txm.Dim(3);
@@ -103,7 +103,7 @@ SVDCalibrate (const Matrix<cplx>& imgs, Matrix<cplx>& rxm, Matrix<cplx>& txm, Ma
 	printf ("  SVDing %i matrices of %ix%i ... ", (int)rtms, (int)nrxc, (int)ntxc); fflush(stdout);
 	
 	// Permute dimensions on imgs for contiguous RAM access
-	Matrix<cplx> vxlm (nrxc, ntxc, imgs.Dim(0), imgs.Dim(1), imgs.Dim(2));
+	Matrix<cxfl> vxlm (nrxc, ntxc, imgs.Dim(0), imgs.Dim(1), imgs.Dim(2));
 	
 	for (size_t s = 0; s < imgs.Dim(2); s++)
 		for (size_t l = 0; l < imgs.Dim(1); l++)
@@ -120,16 +120,16 @@ SVDCalibrate (const Matrix<cplx>& imgs, Matrix<cplx>& rxm, Matrix<cplx>& txm, Ma
 		threads  = omp_get_num_threads();
 	}
 	
-	Matrix<cplx> m[threads]; // Combination
-	Matrix<cplx> u[threads]; // Left-side and  O(NRX x NRX)
-	Matrix<cplx> v[threads]; // Right-side singular vectors O(NTX, NTX)
-	Matrix<cplx> s[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
+	Matrix<cxfl> m[threads]; // Combination
+	Matrix<cxfl> u[threads]; // Left-side and  O(NRX x NRX)
+	Matrix<cxfl> v[threads]; // Right-side singular vectors O(NTX, NTX)
+	Matrix<cxfl> s[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
 	
 	for (int i = 0; i < threads; i++) {
-		m[i] = Matrix<cplx>     (nrxc, ntxc);
-		u[i] = Matrix<cplx>     (nrxc, ntxc);
-		v[i] = Matrix<cplx>     (ntxc, ntxc);
-		s[i] = Matrix<cplx> (MIN(ntxc, nrxc), 1);
+		m[i] = Matrix<cxfl>     (nrxc, ntxc);
+		u[i] = Matrix<cxfl>     (nrxc, ntxc);
+		v[i] = Matrix<cxfl>     (ntxc, ntxc);
+		s[i] = Matrix<cxfl> (MIN(ntxc, nrxc), 1);
 	}
 	
 #pragma omp parallel default (shared) 
@@ -141,12 +141,12 @@ SVDCalibrate (const Matrix<cplx>& imgs, Matrix<cplx>& rxm, Matrix<cplx>& txm, Ma
 		
 		for (size_t i = 0; i < rtms; i++) {
 			
-			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cplx));
+			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cxfl));
 			
 			m[tid].SVD (&u[tid], &v[tid], &s[tid], 'S');
 			
-			for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r]             * exp(cplx(0.0,1.0)*arg(u[tid][0])); // U 
-			for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t*v[0].Dim(0)] * exp(cplx(0.0,1.0)*arg(v[tid][0])); // V is transposed!!!
+			for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r]             * exp(cxfl(0.0,1.0)*arg(u[tid][0])); // U 
+			for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t*v[0].Dim(0)] * exp(cxfl(0.0,1.0)*arg(v[tid][0])); // V is transposed!!!
 
 			snro[i] = real(s[tid][0]);
 			
@@ -163,7 +163,7 @@ SVDCalibrate (const Matrix<cplx>& imgs, Matrix<cplx>& rxm, Matrix<cplx>& txm, Ma
 	
 
 RRSModule::error_code
-FTVolumes (Matrix<cplx>& r) {
+FTVolumes (Matrix<cxfl>& r) {
 	
 	ticks        tic     = getticks();
 	
@@ -172,7 +172,7 @@ FTVolumes (Matrix<cplx>& r) {
 	int          threads = 1;
 	
 	// Hann window for iFFT
-	Matrix<cplx> hann    = Matrix<cplx>::Ones (r.Dim(0), r.Dim(1), r.Dim(2)).HannWindow();
+	Matrix<cxfl> hann    = Matrix<cxfl>::Ones (r.Dim(0), r.Dim(1), r.Dim(2)).HannWindow();
 	
 	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r.Dim(0), (int)r.Dim(1), (int)r.Dim(2)); fflush(stdout);
 
@@ -184,11 +184,11 @@ FTVolumes (Matrix<cplx>& r) {
 	
 	// # threads plans and matrices ------
 
-	Matrix<cplx> mr[threads];
+	Matrix<cxfl> mr[threads];
 	fftwf_plan	  p[threads]; // Thread safety of plans
 	
 	for (int i = 0; i < threads; i++) {
-		mr[i] = Matrix<cplx>      (r.Dim(0), r.Dim(1), r.Dim(2));
+		mr[i] = Matrix<cxfl>      (r.Dim(0), r.Dim(1), r.Dim(2));
 		p [i] = fftwf_plan_dft_3d (r.Dim(2), r.Dim(1), r.Dim(0), 
 								   (fftwf_complex*)&mr[i][0], (fftwf_complex*)&mr[i][0], 
 								   FFTW_BACKWARD, FFTW_MEASURE);
@@ -205,13 +205,13 @@ FTVolumes (Matrix<cplx>& r) {
 
 		for (size_t i = 0; i < vols; i++) {
 
-			memcpy (&mr[tid][0], &r[i*imsize], imsize * sizeof(cplx));
+			memcpy (&mr[tid][0], &r[i*imsize], imsize * sizeof(cxfl));
 
 			mr[tid]  = FFT::Shift(mr[tid]) * hann;
 			fftwf_execute(p[tid]);
 			mr[tid]  = FFT::Shift(mr[tid]);
 
-			memcpy (&r[i*imsize], &mr[tid][0], imsize * sizeof(cplx));
+			memcpy (&r[i*imsize], &mr[tid][0], imsize * sizeof(cxfl));
 
 		}
 		
@@ -229,12 +229,12 @@ FTVolumes (Matrix<cplx>& r) {
 
 
 RRSModule::error_code 
-RemoveOS (Matrix<cplx>& imgs) {
+RemoveOS (Matrix<cxfl>& imgs) {
 	
 	printf ("  Removing RO oversampling ... "); fflush(stdout);
 	
 	ticks tic = getticks();
-	Matrix<cplx> tmp = imgs;
+	Matrix<cxfl> tmp = imgs;
 	
 	imgs.Dim(0) = imgs.Dim(0) / 2;
 	imgs.Reset();
@@ -245,7 +245,7 @@ RemoveOS (Matrix<cplx>& imgs) {
 	size_t   offset = floor ( (float)(tmp.Dim(0)-imgs.Dim(0))/2.0 ); 
 	
 	for (size_t i = 0; i < nscans; i++)
-		memcpy (&imgs[i*nssiz], &tmp[i*ossiz+offset], nssiz * sizeof(cplx));
+		memcpy (&imgs[i*nssiz], &tmp[i*ossiz+offset], nssiz * sizeof(cxfl));
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
@@ -256,12 +256,12 @@ RemoveOS (Matrix<cplx>& imgs) {
 
 
 RRSModule::error_code
-B0Map (const Matrix<cplx>& imgs, Matrix<double>& b0, const float& dTE) {
+B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	
 	printf ("  Computing b0 maps ... "); fflush(stdout);
 	
 	ticks  tic = getticks();
-	Matrix<cplx> tmp;
+	Matrix<cxfl> tmp;
 	
 	tmp = imgs.Mean(4);
 	tmp.Squeeze();
@@ -269,7 +269,7 @@ B0Map (const Matrix<cplx>& imgs, Matrix<double>& b0, const float& dTE) {
 	size_t nc = tmp.Dim(4);                           // Number of channels
 	size_t np = tmp.Dim(0) * tmp.Dim(1) * tmp.Dim(2); // Number of pixels
 	
-	cplx   r;
+	cxfl   r;
 	
 	double f = GAMMA_1_PER_UT_MS * 2.5e6 / (2*PI);
 	
@@ -279,7 +279,7 @@ B0Map (const Matrix<cplx>& imgs, Matrix<double>& b0, const float& dTE) {
 #pragma omp for schedule (dynamic, np / omp_get_num_threads())
 		
 		for (int i = 0; i < np; i++) {
-			r = cplx (0.0,0.0);
+			r = cxfl (0.0,0.0);
 			for (int j = 0; j < nc; j++)
 				r += tmp[i + 2*j*np] * conj(tmp[i + (2*j+1)*np]);
 			b0[i]  = arg(r) * f; 

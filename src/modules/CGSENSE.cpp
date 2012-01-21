@@ -183,13 +183,13 @@ CGSENSE::Process () {
 
 	RRSModule::error_code error = OK;
 
-	Matrix<cplx>&   data    = GetCXFL("data");
-	Matrix<cplx>&   sens    = GetCXFL("sens");
+	Matrix<cxfl>&   data    = GetCXFL("data");
+	Matrix<cxfl>&   sens    = GetCXFL("sens");
 	Matrix<double>& weights = GetRLDB("weights");
 	Matrix<double>& kspace  = GetRLDB("kspace");
 	
 	// CG matrices ----------------------------------------------------
-	Matrix <cplx>   p       = Matrix<cplx>   (m_N[0],m_N[1],m_N[2]), q, r;
+	Matrix <cxfl>   p       = Matrix<cxfl>   (m_N[0],m_N[1],m_N[2]), q, r;
 
 	// Intensity Correction -------------------------------------------
 	m_intcor                = Matrix<double>::Ones (m_N[0],m_N[1],m_N[2]);
@@ -209,7 +209,7 @@ CGSENSE::Process () {
 
 	// Create test data if testcase (Incoming data is image space) ----
 	if (m_testcase) {
-		E  (Matrix<cplx>::Phantom2D(m_N[0]), sens, m_intcor, m_fplan, data, m_dim);
+		E  (Matrix<cxfl>::Phantom2D(m_N[0]), sens, m_intcor, m_fplan, data, m_dim);
 		if (m_noise > 0.0)
 			AddPseudoRandomNoise (data, (float) m_noise);
 	} 
@@ -217,7 +217,7 @@ CGSENSE::Process () {
 	IntensityCorrection (sens, m_intcor);
 	
 	// Out going images -----------------------------------------------
-	Matrix<cplx>& image = AddCXFL ("image", NEW (Matrix<cplx>(m_N[0], m_N[1], m_N[2])));
+	Matrix<cxfl>& image = AddCXFL ("image", NEW (Matrix<cxfl>(m_N[0], m_N[1], m_N[2])));
 
 	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
@@ -230,7 +230,7 @@ CGSENSE::Process () {
 	int         iters = 0;
 
 	if (m_verbose)
-		memcpy (&image[iters*p.Size()], &p[0], p.Size() * sizeof(cplx));
+		memcpy (&image[iters*p.Size()], &p[0], p.Size() * sizeof(cxfl));
 
 	// CG residuals storage and helper variables ----------------------
 	std::vector<double> res;
@@ -239,14 +239,14 @@ CGSENSE::Process () {
 	float       an    = 0.0;
 	raw         rtmp  = raw(0.0,0.0);
 
-    Matrix<cplx> treg = Matrix<cplx>::Id(m_N[0]) * cplx (m_lambda, 0);
+    Matrix<cxfl> treg = Matrix<cxfl>::Id(m_N[0]) * cxfl (m_lambda, 0);
 
 	printf ("Processing CG-SENSE ...\n");
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
 	an = pow(p.Norm().real(), 2);
-	Matrix<cplx> a(m_N[0], m_N[1], m_N[2]);
+	Matrix<cxfl> a(m_N[0], m_N[1], m_N[2]);
 
 	for (iters = 0; iters < m_cgmaxit; iters++) {
 
@@ -266,7 +266,7 @@ CGSENSE::Process () {
 		rtmp  = (rn / (p.dotc(q)));
 		a    += (p * rtmp);
 		r    -= (q * rtmp);
-		p    *= cplx(pow(r.Norm().real(), 2)/rn);
+		p    *= cxfl(pow(r.Norm().real(), 2)/rn);
 		p    += r;
 
 		// Verbose out put keeps all intermediate steps ---------------
@@ -275,7 +275,7 @@ CGSENSE::Process () {
 			if (iters)
 				image.Expand(m_dim); 
 
-			memcpy (&image[iters*a.Size()], &a[0], a.Size()*sizeof(cplx));
+			memcpy (&image[iters*a.Size()], &a[0], a.Size()*sizeof(cxfl));
 
 		}
 		
