@@ -66,7 +66,7 @@ Matrix<T>::GEMM (Matrix<T>& M, char transb) {
 	
 	if (typeid(T) == typeid(double))
 		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
-	else if (typeid(T) == typeid(cplx))
+	else if (typeid(T) == typeid(cxfl))
 		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
 	
 	return res;
@@ -90,7 +90,7 @@ Matrix<T>::GEMV (Matrix<T>& M, char trans) {
 	
 	if (typeid(T) == typeid(double))
 		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
-	else if (typeid(T) == typeid(cplx))
+	else if (typeid(T) == typeid(cxfl))
 		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
 	
 	return res;
@@ -107,7 +107,7 @@ Matrix<T>::Norm () const {
 	int n    = (int) Size();
 	int incx = 1;
 	
-	if      (typeid(T) == typeid(  cplx)) res = cblas_scnrm2 (n, &_M[0], incx);
+	if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, &_M[0], incx);
 	else if (typeid(T) == typeid(double))  res = cblas_dnrm2 (n, &_M[0], incx);
 	
 	else {
@@ -130,7 +130,7 @@ Matrix<T>::dotc (Matrix<T>& M) const {
 	int n    = (int) Size();
 	int incx = 1;
 	
-	if (typeid(T) == typeid(cplx))
+	if (typeid(T) == typeid(cxfl))
 		cblas_cdotc_sub (n, &_M[0], incx, &M[0], incx, &res);
 	
 	return res;

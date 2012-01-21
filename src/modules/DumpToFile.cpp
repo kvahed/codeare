@@ -28,7 +28,7 @@ DumpToFile::Process () {
 	std::stringstream fname;
 	const char* uid = Attribute ("UID");
 
-	map<string,Ptr< Matrix<cplx> > >&  cfm = DataBase::Instance()->CXFLMap();
+	map<string,Ptr< Matrix<cxfl> > >&  cfm = DataBase::Instance()->CXFLMap();
 	map<string,Ptr< Matrix<double> > >&  rdm = DataBase::Instance()->RLDBMap();
 	map<string,Ptr< Matrix<short> > >& sim = DataBase::Instance()->SHRTMap();
 
@@ -53,7 +53,7 @@ DumpToFile::Process () {
 		return RRSModule::FILE_ACCESS_FAILED;
 	}
 
-	map<string,Ptr< Matrix<cplx> > >::iterator cit = cfm.begin();
+	map<string,Ptr< Matrix<cxfl> > >::iterator cit = cfm.begin();
 	for (cit = cfm.begin() ; cit != cfm.end(); cit++) {
 		cout << "Dumping " << cit->first.c_str() << endl;
 		cit->second->MXDump(mf, cit->first.c_str());

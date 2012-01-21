@@ -467,7 +467,7 @@ Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
 //Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
 
 template<> template<class S>
-Matrix<float> Matrix<cplx>::Real() const {
+Matrix<float> Matrix<cxfl>::Real() const {
 
 	Matrix<float> res (_dim);
 
@@ -513,7 +513,7 @@ Matrix<double> Matrix< std::complex<double> >::Real () const {
     
 
 template<> template<class S>
-Matrix<float> Matrix<cplx>::Imag() const {
+Matrix<float> Matrix<cxfl>::Imag() const {
 
 	Matrix<float> res (_dim);
 
@@ -559,7 +559,7 @@ Matrix<double> Matrix< std::complex<double> >::Imag () const {
     
 
 template<> template<> inline
-Matrix< float > Matrix< cplx >::Arg () const {
+Matrix< float > Matrix< cxfl >::Arg () const {
 
 	Matrix<float> res (_dim);
 

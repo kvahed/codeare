@@ -41,8 +41,8 @@ RelativeSensitivities::Init        () {
 RRSModule::error_code
 RelativeSensitivities::Process     () { 
 
-    Matrix<cplx>& data = GetCXFL("meas");
-    Matrix<cplx>& mask = GetCXFL("mask");
+    Matrix<cxfl>& data = GetCXFL("meas");
+    Matrix<cxfl>& mask = GetCXFL("mask");
 
     printf ("  Processing map generation ...\n");
     ticks start = getticks();
@@ -68,9 +68,9 @@ RelativeSensitivities::Process     () {
     // -----------------------------------------
 
     // SVD calibration -------------------------
-    Matrix<cplx>&   rxm  = AddCXFL ("rxm",  NEW (Matrix<cplx>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
-    Matrix<cplx>&   txm  = AddCXFL ("txm",  NEW (Matrix<cplx>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
-    Matrix<cplx>&   shim = AddCXFL ("shim", NEW (Matrix<cplx>   (data.Dim(4), 1)));
+    Matrix<cxfl>&   rxm  = AddCXFL ("rxm",  NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
+    Matrix<cxfl>&   txm  = AddCXFL ("txm",  NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
+    Matrix<cxfl>&   shim = AddCXFL ("shim", NEW (Matrix<cxfl>   (data.Dim(4), 1)));
     Matrix<double>& snro = AddRLDB ("snro", NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
 
     SVDCalibrate (data, rxm, txm, snro, shim, false);

@@ -104,13 +104,13 @@ namespace RRStrategy {
 
 		float         m_R[3];        /**< Acceleration factor in each dim     */
 
-		Matrix<cplx>  m_weights;  /**< Weights                                */
+		Matrix<cxfl>  m_weights;  /**< Weights                                */
 	  
 	};
 
 
 
-	void ComputeWeights (const int& nc, const int* acs_dim, const int* kern_dim, const int* d, const float* R, const Matrix<cplx>& acs, Matrix<cplx>& weights) {
+	void ComputeWeights (const int& nc, const int* acs_dim, const int* kern_dim, const int* d, const float* R, const Matrix<cxfl>& acs, Matrix<cxfl>& weights) {
 		
 		ticks       tic     = getticks();
 		printf ("  (Re-)Computing weights \n");
@@ -120,8 +120,8 @@ namespace RRStrategy {
 		int ns = nc * kern_dim[0] * kern_dim[1]; // # Source points
 		int nt = nc * (R[1]-1);      // # Target points
 		
-		Matrix<cplx> s (ns, nr);          // Source 
-		Matrix<cplx> t (nt, nr);          // Target
+		Matrix<cxfl> s (ns, nr);          // Source 
+		Matrix<cxfl> t (nt, nr);          // Target
 		
 		int c = 0;
 		

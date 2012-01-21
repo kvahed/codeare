@@ -36,8 +36,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	static Matrix<cplx> 
-	Forward      (const Matrix<cplx>& m);
+	static Matrix<cxfl> 
+	Forward      (const Matrix<cxfl>& m);
 	
 	
 	/**
@@ -46,12 +46,12 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline static Matrix<cplx> 
-	Backward     (const Matrix<cplx>& m) {
+	inline static Matrix<cxfl> 
+	Backward     (const Matrix<cxfl>& m) {
 
 		assert (m.Is1D() || m.Is2D() || m.Is3D());
 		
-		Matrix<cplx> res = m;
+		Matrix<cxfl> res = m;
 		fftwf_plan   p; 
 	
 		res = Shift(res);
@@ -79,8 +79,8 @@ public:
 	 * @param  m To shift
 	 * @return   Shifted
 	 */
-	static Matrix<cplx> 
-	Shift        (const Matrix<cplx>& m);
+	static Matrix<cxfl> 
+	Shift        (const Matrix<cxfl>& m);
 	
 	
 private:

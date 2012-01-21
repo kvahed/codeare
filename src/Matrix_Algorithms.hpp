@@ -171,10 +171,10 @@ Matrix<T>::IsZero () const {
 
 
 
-template<> inline Matrix<cplx>
-Matrix<cplx>::Conj () const {
+template<> inline Matrix<cxfl>
+Matrix<cxfl>::Conj () const {
 
-	Matrix<cplx> res = (*this); 
+	Matrix<cxfl> res = (*this); 
 
 #pragma omp parallel default (shared) 
 	{
@@ -190,7 +190,7 @@ Matrix<cplx>::Conj () const {
 }
 
 template<> inline void
-Matrix<cplx>::Conj () {
+Matrix<cxfl>::Conj () {
 
 #pragma omp parallel default (shared) 
 	{

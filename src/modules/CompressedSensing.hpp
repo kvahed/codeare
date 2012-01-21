@@ -106,30 +106,30 @@ namespace RRStrategy {
 	};
 
 
-	void GradObj   (const Matrix<cplx>& x, const Matrix<cplx>& data, const CGParam& cgp, Matrix<cplx>& grad) {
+	void GradObj   (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp, Matrix<cxfl>& grad) {
 
 		grad  = DWT::Backward (x);
 		grad  = FFT::Forward  (x);
 		grad -= data;
 		grad  = FFT::Backward (x);
 		grad  = DWT::Forward  (x);
-		grad *= cplx(2.0,0.0);
+		grad *= cxfl(2.0,0.0);
 
 	}
 
-	void GradXFM   (const Matrix<cplx>& x, const Matrix<cplx>& data, const CGParam& cgp, Matrix<cplx>& grad) {
+	void GradXFM   (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp, Matrix<cxfl>& grad) {
 		
-		Matrix<cplx> xtr = x.tr();
+		Matrix<cxfl> xtr = x.tr();
 
 		grad  = x;
 		grad *= xtr;
-		grad += cplx(cgp.l1smooth,0.0);
+		grad += cxfl(cgp.l1smooth,0.0);
 		grad  = grad ^ (((float)cgp.pnorm)/2.0-1.0);
 		grad *= x;
 
 	}
 
-	void GradTV    (const Matrix<cplx>& x, const Matrix<cplx>& data, const CGParam& cgp, Matrix<cplx>& grad) {
+	void GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp, Matrix<cxfl>& grad) {
 
 		// Dx = params.TV*(params.XFM'*x);
 		// G = params.pNorm*Dx.*(Dx.*conj(Dx) + params.l1Smooth).^(params.pNorm/2-1);
@@ -137,7 +137,7 @@ namespace RRStrategy {
 
 	}
 
-	void WGradient          (const Matrix<cplx>& x, const Matrix<cplx>& data, const CGParam& cgp, Matrix<cplx>& grad) {
+	void WGradient          (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp, Matrix<cxfl>& grad) {
 
 		GradObj (x, data, cgp, grad);
 		GradXFM (x, data, cgp, grad);
@@ -148,12 +148,12 @@ namespace RRStrategy {
 	} 
 
 
-	void NLCG               (Matrix<cplx>& x, Matrix<cplx>& data, const CGParam& cgp) {
+	void NLCG               (Matrix<cxfl>& x, Matrix<cxfl>& data, const CGParam& cgp) {
 
 		int k = 0;
 		int t = 1;
 
-		Matrix<cplx> grad (data.Dim());
+		Matrix<cxfl> grad (data.Dim());
 		WGradient (x, data, cgp, grad);
 
 	}

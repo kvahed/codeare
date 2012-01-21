@@ -139,27 +139,27 @@ KTPoints::Process        () {
 
 	Matrix<double>& k      = GetRLDB("k");
 	Matrix<double>& r      = GetRLDB("r");
-	Matrix<cplx>&   b1     = GetCXFL("b1");
+	Matrix<cxfl>&   b1     = GetCXFL("b1");
 	Matrix<short>&  b0     = GetSHRT("b0");
-	Matrix<cplx>&   target = GetCXFL("target");
+	Matrix<cxfl>&   target = GetCXFL("target");
 
 	m_ns = r.Dim(1);
 	m_nk = k.Dim(1);
 	m_nc = b1.Dim(1);
 
-    Matrix<cplx>    solution;
-    Matrix<cplx>    tmp;
-    Matrix<cplx>    final;    
-    Matrix<cplx>    treg   =  Matrix<cplx>::Id(m_nc * m_nk) * cplx (m_lambda, 0);
-	Matrix<cplx>    ve;
-	Matrix<cplx>    vp;
+    Matrix<cxfl>    solution;
+    Matrix<cxfl>    tmp;
+    Matrix<cxfl>    final;    
+    Matrix<cxfl>    treg   =  Matrix<cxfl>::Id(m_nc * m_nk) * cxfl (m_lambda, 0);
+	Matrix<cxfl>    ve;
+	Matrix<cxfl>    vp;
 
 	if (m_verbose) {
-	    ve  = Matrix<cplx>(m_ns,      m_maxiter);
-		vp  = Matrix<cplx>(m_nk*m_nc, m_maxiter);
+	    ve  = Matrix<cxfl>(m_ns,      m_maxiter);
+		vp  = Matrix<cxfl>(m_nk*m_nc, m_maxiter);
 	} else {
-	    ve  = Matrix<cplx>(m_ns,     1);
-		vp  = Matrix<cplx>(m_nk*m_nc,1);
+	    ve  = Matrix<cxfl>(m_ns,     1);
+		vp  = Matrix<cxfl>(m_nk*m_nc,1);
 	}
 
     bool        pulse_amp_ok = false;
@@ -174,10 +174,10 @@ KTPoints::Process        () {
     
     while (!pulse_amp_ok) {
         
-        Matrix<cplx> m (m_ns, m_nk*m_nc);
+        Matrix<cxfl> m (m_ns, m_nk*m_nc);
 
         STA (k, r, b1, b0, m_nc, m_nk, m_ns, m_gd, m_pd, m);
-        Matrix<cplx> minv = m.tr();
+        Matrix<cxfl> minv = m.tr();
 
         minv  = minv->*(m);
         minv  = minv + treg;
@@ -198,7 +198,7 @@ KTPoints::Process        () {
             res.push_back (nrmse);
             
 			if (m_verbose)
-				memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cplx)); 
+				memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cxfl)); 
 
             if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
 				break;
@@ -277,7 +277,7 @@ KTPoints::Process        () {
 			
 		target.Dim(1) = gc; 
 	    target.Reset();
-		memcpy (&target[0], &ve[0], gc * target.Dim(0) * sizeof(cplx));
+		memcpy (&target[0], &ve[0], gc * target.Dim(0) * sizeof(cxfl));
 
 	} else
 		

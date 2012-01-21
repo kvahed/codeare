@@ -108,7 +108,7 @@ namespace RRStrategy {
  * @param  nrmse    Returned NRMSE
  */
 inline void
-NRMSE                         (const Matrix<cplx>& target, const Matrix<cplx>& result, const int& iter, float& nrmse) {
+NRMSE                         (const Matrix<cxfl>& target, const Matrix<cxfl>& result, const int& iter, float& nrmse) {
 
     float q = 0.0;
     
@@ -134,7 +134,7 @@ NRMSE                         (const Matrix<cplx>& target, const Matrix<cplx>& r
  * @return          Phase corrected 
  */
 inline void
-PhaseCorrection (Matrix<cplx>& target, const Matrix<cplx>& result) {
+PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
     
 	size_t n = target.Size();
 
@@ -144,7 +144,7 @@ PhaseCorrection (Matrix<cplx>& target, const Matrix<cplx>& result) {
 #pragma omp for schedule (guided, 100)
 
         for (size_t i = 0; i < n; i++) 
-            target[i] = (abs(target[i]) > 0) ? abs(target[i]) * result[i] / abs(result[i]) :  cplx(0,0);    
+            target[i] = (abs(target[i]) > 0) ? abs(target[i]) * result[i] / abs(result[i]) :  cxfl(0,0);    
         
     }
     
@@ -161,7 +161,7 @@ PhaseCorrection (Matrix<cplx>& target, const Matrix<cplx>& result) {
  * @param  limits   Out: limits
  */
 inline void 
-RFLimits            (const Matrix<cplx>& solution, const int* pd, const int& nk, const int& nc, float* limits) {
+RFLimits            (const Matrix<cxfl>& solution, const int* pd, const int& nk, const int& nc, float* limits) {
     
     for (int i = 0; i < nk; i++) {
 
@@ -193,8 +193,8 @@ RFLimits            (const Matrix<cplx>& solution, const int* pd, const int& nk,
  * @param  m        Out: m_xy
  */
 inline void
-STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cplx>& b1, const Matrix<short>& b0, 
-	 const int& nc, const int& nk, const int& ns, const int gd, const int* pd, Matrix<cplx>& m) {
+STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cxfl>& b1, const Matrix<short>& b0, 
+	 const int& nc, const int& nk, const int& ns, const int gd, const int* pd, Matrix<cxfl>& m) {
     
 	float* d = (float*) malloc (nk * sizeof (float));
 	float* t = (float*) malloc (nk * sizeof (float));
@@ -210,7 +210,7 @@ STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cplx>& b1, 
 
 	d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
 
-    cplx pgd = cplx (0, 2.0 * PI * 4.2576e7 * 1.0e-5); 
+    cxfl pgd = cxfl (0, 2.0 * PI * 4.2576e7 * 1.0e-5); 
 
 	// pTX STA 
 #pragma omp parallel default (shared) 
@@ -224,9 +224,9 @@ STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cplx>& b1, 
 						// b1 (s,c)
                         pgd * b1(s,c) *
 						// off resonance: exp (2i\pidb0dt)  
-                        exp (cplx(0, 2.0 * PI * d[k] * (float) b0(s))) *
+                        exp (cxfl(0, 2.0 * PI * d[k] * (float) b0(s))) *
 						// encoding: exp (i k(t) r)
-                        exp (cplx(0,(ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s))));
+                        exp (cxfl(0,(ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s))));
         
     }
 	
@@ -242,7 +242,7 @@ STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cplx>& b1, 
  *
  */
 inline void
-PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, const int& gd, const int& nk, const int& nc, Matrix<cplx>& timing) {
+PTXTiming (const Matrix<cxfl>& rf, const Matrix<double>& ks, const int* pd, const int& gd, const int& nk, const int& nc, Matrix<cxfl>& timing) {
 
 	// Total pulse duration --------------
 
@@ -255,7 +255,7 @@ PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, cons
 
 	// Outgoing brepository ---------------
 
-	timing = Matrix<cplx> (tpd, nc+3);
+	timing = Matrix<cxfl> (tpd, nc+3);
 	// -----------------------------------
 	
 	// RF Timing -------------------------
@@ -268,12 +268,12 @@ PTXTiming (const Matrix<cplx>& rf, const Matrix<double>& ks, const int* pd, cons
 			
 			// RF action
 			for (int p = 0; p < pd[k]; p++, i++) 
-				timing(i,rc) = conj(rf(k + rc*nk)) / (float)pd[k] * cplx(1000.0,0.0);
+				timing(i,rc) = conj(rf(k + rc*nk)) / (float)pd[k] * cxfl(1000.0,0.0);
 
 			// Gradient action, no RF
 			if (k < nk-1)
 				for (int g = 0; g <    gd; g++, i++)
-					timing(i,rc) = cplx (0.0, 0.0);
+					timing(i,rc) = cxfl (0.0, 0.0);
 
 		}
 		

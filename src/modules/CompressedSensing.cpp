@@ -74,10 +74,10 @@ CompressedSensing::Process () {
 	printf ("Processing CompressedSensing ...\n");
 	ticks csstart = getticks();
 
-	Matrix<cplx>&   data  = GetCXFL("data");
+	Matrix<cxfl>&   data  = GetCXFL("data");
 	Matrix<double>& pdf   = GetRLDB("pdf");
 
-	Matrix<cplx>&   im_dc = AddCXFL ("im_dc", new Matrix<cplx> (data.Dim()));
+	Matrix<cxfl>&   im_dc = AddCXFL ("im_dc", new Matrix<cxfl> (data.Dim()));
 
 	ticks tic = getticks();
 
@@ -92,7 +92,7 @@ CompressedSensing::Process () {
 
 	tic = getticks();
 
-	cplx ma = data.Maxabs();
+	cxfl ma = data.Maxabs();
 	data  /= ma;
 
 	printf ("  Wavelet transforming ... "); fflush(stdout);

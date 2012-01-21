@@ -73,7 +73,8 @@ enum InterpMethod {
 /**
  * @brief raw data
  */
-typedef std::complex<float> cplx;
+typedef std::complex<float>  cxfl;
+typedef std::complex<double> cxdb;
 
 
 /**
@@ -2884,10 +2885,10 @@ Matrix<short>::Max() {
 }
 
 
-template <> inline cplx
-Matrix<cplx>::Max() {
+template <> inline cxfl
+Matrix<cxfl>::Max() {
 		
-	cplx   max = cplx(0.0,0.0);
+	cxfl   max = cxfl(0.0,0.0);
 	float tmp =  0.0;
 	
 	for (size_t i = 0; i < Size(); i++) {
@@ -2964,12 +2965,12 @@ Matrix<T>::tr() const {
 }
 
 template<> inline void 
-Matrix<cplx>::Random () {
+Matrix<cxfl>::Random () {
 	
 	srand (time(NULL));
 
 	for (size_t i = 0; i < Size(); i++)
-		_M[i] = cplx ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
+		_M[i] = cxfl ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
 	
 }
     

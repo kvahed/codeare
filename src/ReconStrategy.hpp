@@ -139,8 +139,8 @@ namespace RRServer {
 		 * @param  m    The added matrix
 		 * @return      Success
 		 */
-		Matrix<cplx>& 
-		AddCXFL         (const string name, Ptr< Matrix<cplx> > m) const {
+		Matrix<cxfl>& 
+		AddCXFL         (const string name, Ptr< Matrix<cxfl> > m) const {
 			return DataBase::Instance()->AddCXFL(name, m);
 		}
 		
@@ -151,7 +151,7 @@ namespace RRServer {
 		 * @param  name Name
 		 * @return      Reference to data if existent
 		 */
-		Matrix<cplx>& 
+		Matrix<cxfl>& 
 		GetCXFL         (const string name) const {
 			return DataBase::Instance()->GetCXFL(name);
 		}

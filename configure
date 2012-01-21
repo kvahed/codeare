@@ -673,6 +673,7 @@ SED
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
+am__nodep
 AMDEPBACKSLASH
 AMDEP_FALSE
 AMDEP_TRUE
@@ -786,7 +787,8 @@ CPP
 CXX
 CXXFLAGS
 CCC
-CXXCPP'
+CXXCPP
+PYTHON'
 
 
 # Initialize some variables set by options.
@@ -1443,6 +1445,7 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
+  PYTHON      the Python interpreter
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -3334,6 +3337,7 @@ fi
 if test "x$enable_dependency_tracking" != xno; then
   am_depcomp="$ac_aux_dir/depcomp"
   AMDEPBACKSLASH='\'
+  am__nodep='_no'
 fi
  if test "x$enable_dependency_tracking" != xno; then
   AMDEP_TRUE=
@@ -4147,6 +4151,7 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
+  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -4206,7 +4211,7 @@ else
 	break
       fi
       ;;
-    msvisualcpp | msvcmsys)
+    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -12188,6 +12193,7 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
+  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -12247,7 +12253,7 @@ else
 	break
       fi
       ;;
-    msvisualcpp | msvcmsys)
+    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -12572,6 +12578,7 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
+  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -12631,7 +12638,7 @@ else
 	break
       fi
       ;;
-    msvisualcpp | msvcmsys)
+    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -16193,6 +16200,8 @@ if test "$python_path" = auto; then
 
 
 
+
+
         if test -n "$PYTHON"; then
       # If the user set $PYTHON, use it and don't search something else.
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $PYTHON version >= 2.7" >&5
@@ -17209,6 +17218,42 @@ fi
 done
 
 
+for ac_header in CL/cl_gl.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "CL/cl_gl.h" "ac_cv_header_CL_cl_gl_h" "$ac_includes_default"
+if test "x$ac_cv_header_CL_cl_gl_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_CL_CL_GL_H 1
+_ACEOF
+
+$as_echo "#define HAVE_OPENCL_HEADERS 1" >>confdefs.h
+
+else
+
+    for ac_header in OpenCL/cl_gl.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "OpenCL/cl_gl.h" "ac_cv_header_OpenCL_cl_gl_h" "$ac_includes_default"
+if test "x$ac_cv_header_OpenCL_cl_gl_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OPENCL_CL_GL_H 1
+_ACEOF
+
+$as_echo "#define HAVE_OPENCL_HEADERS 1" >>confdefs.h
+
+else
+
+        echo "cannot file cl_gl.h, GPU bloch simulator unavailable"
+
+fi
+
+done
+
+
+fi
+
+done
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether host is Mac OS" >&5
 $as_echo_n "checking whether host is Mac OS... " >&6; }
 case $host in
@@ -17544,53 +17589,6 @@ if test "x$ac_cv_lib_fftw3f_fftwf_execute" = xyes; then :
 _ACEOF
 
   LIBS="-lfftw3f $LIBS"
-
-else
-  as_fn_error $? "cannot find libfftw3f, bailing out" "$LINENO" 5
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftwf_plan_with_nthreads in -lfftw3f_threads" >&5
-$as_echo_n "checking for fftwf_plan_with_nthreads in -lfftw3f_threads... " >&6; }
-if ${ac_cv_lib_fftw3f_threads_fftwf_plan_with_nthreads+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lfftw3f_threads  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char fftwf_plan_with_nthreads ();
-int
-main ()
-{
-return fftwf_plan_with_nthreads ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_fftw3f_threads_fftwf_plan_with_nthreads=yes
-else
-  ac_cv_lib_fftw3f_threads_fftwf_plan_with_nthreads=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3f_threads_fftwf_plan_with_nthreads" >&5
-$as_echo "$ac_cv_lib_fftw3f_threads_fftwf_plan_with_nthreads" >&6; }
-if test "x$ac_cv_lib_fftw3f_threads_fftwf_plan_with_nthreads" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBFFTW3F_THREADS 1
-_ACEOF
-
-  LIBS="-lfftw3f_threads $LIBS"
 
 else
   as_fn_error $? "cannot find libfftw3f, bailing out" "$LINENO" 5

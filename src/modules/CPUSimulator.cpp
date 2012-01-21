@@ -9,7 +9,7 @@ using namespace RRStrategy;
  * @param  target  Target pattern
  */
 inline void 
-IntensityMap (const Matrix<cplx>& b1maps, Matrix<float>& I) {
+IntensityMap (const Matrix<cxfl>& b1maps, Matrix<float>& I) {
 	
 	size_t nr = b1maps.Dim(0);
 	size_t nc = b1maps.Dim(1);
@@ -99,12 +99,12 @@ Rotate (const Matrix<float>& n, Matrix<float>& lm) {
 
 
 void 
-SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<float>&   r, 
-             const Matrix<float>& b0, const Matrix<cplx>&  mt0, const Matrix<float>& ml0,
+SimulateAcq (const Matrix<cxfl>&  b1, const Matrix<float>&  gr, const Matrix<float>&   r, 
+             const Matrix<float>& b0, const Matrix<cxfl>&  mt0, const Matrix<float>& ml0,
 			 const Matrix<float>& ic,
 			 const int&           np, const float&          dt, const bool&            v, 
 			 const size_t&        nc, const size_t&         nt, const float&         gdt,        
-			       Matrix<cplx>&  rf) {
+			       Matrix<cxfl>&  rf) {
 
 
 	size_t            nr   = r.Dim(1);
@@ -112,7 +112,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 
     ticks             tic  = getticks();
 
-	Matrix<cplx>      sig (nt,nc,np); /*<! Signal repository  */
+	Matrix<cxfl>      sig (nt,nc,np); /*<! Signal repository  */
 	
 #pragma omp parallel
     {
@@ -122,7 +122,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		Matrix<float> tmp ( 3,1);  // Temporary magnetisation
 		
 		Matrix<float> lr  ( 3,1);  // Local spatial vector
-		Matrix<cplx>  ls  (nc,1);  // Local sensitivity
+		Matrix<cxfl>  ls  (nc,1);  // Local sensitivity
 		float         lb0;
 		
         omp_set_num_threads(np);
@@ -158,7 +158,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 					Rotate (n, lm);
 					
 					// Weighted contribution to all coils
-					cplx mxy ((lm[X]+tmp[X])/2,(lm[Y]+tmp[Y])/2); 
+					cxfl mxy ((lm[X]+tmp[X])/2,(lm[Y]+tmp[Y])/2); 
 					for (size_t c = 0; c < nc; c++)
 						sig.At(t,c,omp_get_thread_num()) += ls[c]*mxy;
 					
@@ -170,7 +170,7 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 
 #pragma omp for  schedule (guided) 
 		for (size_t i = 0; i < nt*nc; i++) {
-			rf[i] = cplx(0.0,0.0);
+			rf[i] = cxfl(0.0,0.0);
 			for (int p = 0; p < np; p++)
 				rf[i] += sig[p*nt*nc+i];
 			rf[i] /= nrs;
@@ -185,12 +185,12 @@ SimulateAcq (const Matrix<cplx>&  b1, const Matrix<float>&  gr, const Matrix<flo
 
 
 void 
-SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< cplx>& rf, 
-              const Matrix<float>&   r, const Matrix<float>&  b0, const Matrix<cplx>& mt0, 
+SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< cxfl>& rf, 
+              const Matrix<float>&   r, const Matrix<float>&  b0, const Matrix<cxfl>& mt0, 
 			  const Matrix<float>& ml0, const Matrix<float>& jac, 
 			  const size_t&         np, const float&          dt, const bool&           v, 
 			  const size_t&         nc, const size_t&         nt, const float&        gdt, 
-			        Matrix<cplx>&  mxy,       Matrix<float>& mz) {
+			        Matrix<cxfl>&  mxy,       Matrix<float>& mz) {
     
 	size_t            nr   = r.Dim(1);
 	
@@ -202,7 +202,7 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 		Matrix<float> n   ( 3,1);  // Rotation axis
 		Matrix<float> lm  ( 3,1);  // Magnetisation
 		Matrix<float> lr  ( 3,1);  // Local spatial vector
-		Matrix<cplx>  ls  (nc,1);  // Local sensitivity
+		Matrix<cxfl>  ls  (nc,1);  // Local sensitivity
 		float         lb0;
 		size_t        rt;
 		
@@ -233,7 +233,7 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 					lb0   = b0[pos]*TWOPI;
 					rt    = nt-1-t;
 					
-					cplx rfs = cplx (0.0,0.0);
+					cxfl rfs = cxfl (0.0,0.0);
 					for (size_t i = 0; i < nc; i++) 
 						rfs += rf(rt,i)*ls[i];
 					rfs *= jac[rt];
@@ -246,7 +246,7 @@ SimulateExc  (const Matrix<cplx>&   b1, const Matrix<float>&  gr, const Matrix< 
 					
 				}
 				
-				mxy [pos] = cplx (lm[X], lm[Y]);
+				mxy [pos] = cxfl (lm[X], lm[Y]);
 				mz  [pos] = lm[Z]; 
 				
 			}
@@ -288,18 +288,18 @@ CPUSimulator::Simulate () {
 
     ticks          tic = getticks();                                 // Start timing
 
-	Matrix<cplx>&   b1 = *(m_sb->b1);
+	Matrix<cxfl>&   b1 = *(m_sb->b1);
 	Matrix<float>&   g = *(m_sb->g);
 	Matrix<float>&  rv = *(m_sb->r);
 	Matrix<float>&  b0 = *(m_sb->b0);
-	Matrix<cplx>& tmxy = *(m_sb->tmxy);
+	Matrix<cxfl>& tmxy = *(m_sb->tmxy);
 	Matrix<float>& tmz = *(m_sb->tmz);
-	Matrix<cplx>&   rf = *(m_sb->rf);
-	Matrix<cplx>& smxy = *(m_sb->smxy);
+	Matrix<cxfl>&   rf = *(m_sb->rf);
+	Matrix<cxfl>& smxy = *(m_sb->smxy);
 	Matrix<float>& smz = *(m_sb->smz);
 	Matrix<float>& roi = *(m_sb->roi);
 	Matrix<float>& jac = *(m_sb->jac);
-	Matrix<cplx>&  mxy = *(m_sb->mxy);
+	Matrix<cxfl>&  mxy = *(m_sb->mxy);
 	Matrix<float>&  mz = *(m_sb->mz);
 	
 	int             np = m_sb->np;
@@ -315,8 +315,8 @@ CPUSimulator::Simulate () {
 
 		int   iters = 0;
 		float rn = 0.0, an = 0.0;
-		cplx rtmp = cplx(0.0,0.0);
-		Matrix<cplx> p, r, q, a;
+		cxfl rtmp = cxfl(0.0,0.0);
+		Matrix<cxfl> p, r, q, a;
 
 		p = rf; q = p; r = p;
 		an = pow(p.Norm().real(), 2);
@@ -341,7 +341,7 @@ CPUSimulator::Simulate () {
 				a += rtmp * p;
 
 			r    -= (q * rtmp);
-			p    *= cplx (pow(r.Norm().real(), 2)/rn);
+			p    *= cxfl (pow(r.Norm().real(), 2)/rn);
 			p    += r;
 			
 		}

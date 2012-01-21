@@ -41,7 +41,7 @@ namespace RRStrategy {
 	struct SimulationBundle {
 
 		// Incoming
-		Ptr< Matrix<cplx> >    b1;  /**<! b1                               */ 
+		Ptr< Matrix<cxfl> >    b1;  /**<! b1                               */ 
 		
 		Ptr< Matrix<float> >    g;  /**<! Acquisition gradients            */ 
 		
@@ -49,9 +49,9 @@ namespace RRStrategy {
 
 		Ptr< Matrix<float> >   b0;  /**<! b0 maps                          */ 
 
-		Ptr< Matrix<cplx> >  tmxy;  /**<! starting magnetisation (target)  */
+		Ptr< Matrix<cxfl> >  tmxy;  /**<! starting magnetisation (target)  */
 		Ptr< Matrix<float> >  tmz;
-		Ptr< Matrix<cplx> >  smxy;  /**<!                        (sample)  */
+		Ptr< Matrix<cxfl> >  smxy;  /**<!                        (sample)  */
 		Ptr< Matrix<float> >  smz;  
 		Ptr< Matrix<float> >  roi;  /**<! ROI                    (sample)  */
 
@@ -68,8 +68,8 @@ namespace RRStrategy {
 		bool                  cb0;  /**<! correct b0?                      */
 		
 		// Outgoing
-		Ptr< Matrix<cplx> >    rf;  /**<! RF pulses                         */
-		Ptr< Matrix<cplx> >   mxy;  /**<! Excited transverse magnetisation  */
+		Ptr< Matrix<cxfl> >    rf;  /**<! RF pulses                         */
+		Ptr< Matrix<cxfl> >   mxy;  /**<! Excited transverse magnetisation  */
 		Ptr< Matrix<float> >   mz;  /**<! Longitudinal magnetisation        */
 
 		bool Dump (std::string odf) {

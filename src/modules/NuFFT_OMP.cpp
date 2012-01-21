@@ -134,7 +134,7 @@ NuFFT_OMP::Process () {
 	printf ("Processing NuFFT_OMP ...\n");
 	ticks start = getticks();
 
-	Matrix<cplx>&   data    = GetCXFL("data");
+	Matrix<cxfl>&   data    = GetCXFL("data");
 	Matrix<double>& kspace  = GetRLDB("kspace");
 	Matrix<double>& weights = GetRLDB("weights");
 
@@ -145,7 +145,7 @@ NuFFT_OMP::Process () {
 
 	int imgsize = m_N[0] * m_N[1] * m_N[2];
 
-	Matrix <cplx> tmp;
+	Matrix <cxfl> tmp;
 
 	for (int i = 0; i < m_dim; i++)
 		tmp.Dim(i) = m_N[i];
@@ -188,8 +188,8 @@ NuFFT_OMP::Process () {
 		for (int i = 0; i < imgsize; i++)
 			for (int j = 0; j < m_nthreads; j++) {
 				if (m_verbose)
-					tmp[(j+1) * imgsize + i] = cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
-				tmp[i] += cplx(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
+					tmp[(j+1) * imgsize + i] = cxfl(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
+				tmp[i] += cxfl(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
 			}
 	}
 	

@@ -24,7 +24,7 @@ template <class T> inline Matrix<T>
 Matrix<T>::FFT() const {
 	
 	assert (Is1D() || Is2D() || Is3D());
-	assert (typeid(T) == typeid(cplx));
+	assert (typeid(T) == typeid(cxfl));
 	
     Matrix<T>  res (_dim);
 	fftwf_plan p; 
@@ -58,7 +58,7 @@ template <class T> inline Matrix<T>
 Matrix<T>::IFFT() const {
 	
 	assert (Is1D() || Is2D() || Is3D());
-	assert (typeid(T) == typeid(cplx));
+	assert (typeid(T) == typeid(cxfl));
 	
     Matrix<T>  res (_dim);
 	fftwf_plan p; 
@@ -92,7 +92,7 @@ template <class T> inline Matrix<T>
 Matrix<T>::FFTShift (const size_t d) const {
 	
 	assert (Is1D() || Is2D() || Is3D());
-	assert (typeid(T) == typeid(cplx));
+	assert (typeid(T) == typeid(cxfl));
 	
 	Matrix<T> res (_dim);
 	

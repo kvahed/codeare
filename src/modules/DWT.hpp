@@ -37,8 +37,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	static Matrix<cplx> 
-	Forward     (const Matrix<cplx>& m);
+	static Matrix<cxfl> 
+	Forward     (const Matrix<cxfl>& m);
 	
 
 	/**
@@ -47,8 +47,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	static Matrix<cplx> 
-	Backward    (const Matrix<cplx>& m);
+	static Matrix<cxfl> 
+	Backward    (const Matrix<cxfl>& m);
 	
 
 private:
@@ -70,8 +70,8 @@ private:
 	 * @param   bw  Backward: true, Forward: false
 	 * @return      Transform
 	 */
-	static Matrix<cplx> 
-	Transform    (const Matrix<cplx>& m, bool bw);
+	static Matrix<cxfl> 
+	Transform    (const Matrix<cxfl>& m, bool bw);
 
 	
 };

@@ -1,16 +1,25 @@
 #include "DataBase.hpp"
 
+DataBase* DataBase::m_inst = NULL; 
 
-/*DataBase::~DataBase () { 
+/*
+DataBase::~DataBase () { 
 	
 	Finalise();
 	m_inst = 0; 
 	
-	}*/
+}
 
-/*
+
 DataBase* 
-DataBase::Instance () 
+DataBase::Instance ()  {
+
+    if (m_inst == 0) 
+        m_inst = new DataBase ();
+
+    return m_inst;
+		
+}
 */
 	
 const error_code
