@@ -21,6 +21,7 @@
 #include "Loader.hpp"
 #include "ReconContext.hpp"
 #include "Matrix.hpp"
+#include "DataBase.hpp"
 
 using namespace RRServer;
 
@@ -77,7 +78,7 @@ ReconContext::Finalise     () {
 
 void
 ReconContext::SetConfig        (const char* cstr) {
-	m_strategy->SetConfig(cstr);
+	return m_strategy->SetConfig(cstr);
 }
 
 		
@@ -88,98 +89,146 @@ ReconContext::ReadConfig       (const char* fname) {
 		
 
 void
-ReconContext::SetCplx          (const std::string name, const cplx_data& r) {
-	m_strategy->SetCplx(name, r);
+ReconContext::SetCXFL          (const std::string name, const cxfl_data& r) {
+	DataBase::Instance()->SetCXFL(name, r);
 }
 		
 
 void
-ReconContext::SetCplx          (const std::string name, Matrix<cplx>& r) {
-	m_strategy->SetCplx(name, r);
+ReconContext::SetCXFL          (const std::string name, Matrix<cxfl>& r) {
+	DataBase::Instance()->SetCXFL(name, r);
 }
 		
 
 void
-ReconContext::GetCplx          (const std::string name, cplx_data& r) {
-	m_strategy->GetCplx(name, r);
+ReconContext::GetCXFL          (const std::string name, cxfl_data& r) {
+	DataBase::Instance()->GetCXFL(name, r);
 }
 		
 
 void
-ReconContext::GetCplx          (const std::string name, Matrix<cplx>& r) {
-	m_strategy->GetCplx(name, r);
+ReconContext::GetCXFL          (const std::string name, Matrix<cxfl>& r) {
+	DataBase::Instance()->GetCXFL(name, r);
 }
 		
 
 void
-ReconContext::SetReal (const std::string name, const real_data& r) {
-	m_strategy->SetReal(name, r);
+ReconContext::SetCXDB          (const std::string name, const cxdb_data& r) {
+	DataBase::Instance()->SetCXDB(name, r);
 }
 		
 
 void
-ReconContext::SetReal (const std::string name, Matrix<double>& r) {
-	m_strategy->SetReal(name, r);
+ReconContext::SetCXDB          (const std::string name, Matrix<cxdb>& r) {
+	DataBase::Instance()->SetCXDB(name, r);
 }
 		
 
 void
-ReconContext::GetReal (const std::string name, Matrix<double>& r) {
-	m_strategy->GetReal(name, r);
+ReconContext::GetCXDB          (const std::string name, cxdb_data& r) {
+	DataBase::Instance()->GetCXDB(name, r);
 }
 		
 
 void
-ReconContext::GetReal (const std::string name, real_data& r) {
-	m_strategy->GetReal(name, r);
+ReconContext::GetCXDB          (const std::string name, Matrix<cxdb>& r) {
+	DataBase::Instance()->GetCXDB(name, r);
 }
 		
 
 void
-ReconContext::SetFloat (const std::string name, const float_data& r) {
-	m_strategy->SetFloat(name, r);
+ReconContext::SetRLDB (const std::string name, const rldb_data& r) {
+	DataBase::Instance()->SetRLDB(name, r);
 }
 		
 
 void
-ReconContext::SetFloat (const std::string name, Matrix<float>& r) {
-	m_strategy->SetFloat(name, r);
+ReconContext::SetRLDB (const std::string name, Matrix<double>& r) {
+	DataBase::Instance()->SetRLDB(name, r);
 }
 		
 
 void
-ReconContext::GetFloat (const std::string name, Matrix<float>& r) {
-	m_strategy->GetFloat(name, r);
+ReconContext::GetRLDB (const std::string name, Matrix<double>& r) {
+	DataBase::Instance()->GetRLDB(name, r);
 }
 		
 
 void
-ReconContext::GetFloat (const std::string name, float_data& r) {
-	m_strategy->GetFloat(name, r);
+ReconContext::GetRLDB (const std::string name, rldb_data& r) {
+	DataBase::Instance()->GetRLDB(name, r);
 }
 		
 
 void
-ReconContext::SetPixel (const std::string name, const pixel_data& r) {
-	m_strategy->SetPixel(name, r);
+ReconContext::SetRLFL (const std::string name, const rlfl_data& r) {
+	DataBase::Instance()->SetRLFL(name, r);
 }
 		
 
 void
-ReconContext::SetPixel (const std::string name, Matrix<short>& r) {
-	m_strategy->SetPixel(name, r);
+ReconContext::SetRLFL (const std::string name, Matrix<float>& r) {
+	DataBase::Instance()->SetRLFL(name, r);
 }
 		
 
 void
-ReconContext::GetPixel (const std::string name, Matrix<short>& r) {
-	m_strategy->GetPixel(name, r);
+ReconContext::GetRLFL (const std::string name, Matrix<float>& r) {
+	DataBase::Instance()->GetRLFL(name, r);
 }
 		
 
 void
-ReconContext::GetPixel (const std::string name, pixel_data& r) {
-	m_strategy->GetPixel(name, r);
+ReconContext::GetRLFL (const std::string name, rlfl_data& r) {
+	DataBase::Instance()->GetRLFL(name, r);
+}
+		
+
+void
+ReconContext::SetSHRT (const std::string name, const shrt_data& r) {
+	DataBase::Instance()->SetSHRT(name, r);
+}
+		
+
+void
+ReconContext::SetSHRT (const std::string name, Matrix<short>& r) {
+	DataBase::Instance()->SetSHRT(name, r);
+}
+		
+
+void
+ReconContext::GetSHRT (const std::string name, Matrix<short>& r) {
+	DataBase::Instance()->GetSHRT(name, r);
+}
+		
+
+void
+ReconContext::GetSHRT (const std::string name, shrt_data& r) {
+	DataBase::Instance()->GetSHRT(name, r);
+}
+		
+
+void
+ReconContext::SetLONG (const std::string name, const long_data& r) {
+	DataBase::Instance()->SetLONG(name, r);
+}
+		
+
+void
+ReconContext::SetLONG (const std::string name, Matrix<long>& r) {
+	DataBase::Instance()->SetLONG(name, r);
+}
+		
+
+void
+ReconContext::GetLONG (const std::string name, Matrix<long>& r) {
+	DataBase::Instance()->GetLONG(name, r);
+}
+		
+
+void
+ReconContext::GetLONG (const std::string name, long_data& r) {
+	DataBase::Instance()->GetLONG(name, r);
 }
 		
 

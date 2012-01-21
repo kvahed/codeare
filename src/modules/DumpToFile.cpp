@@ -28,6 +28,11 @@ DumpToFile::Process () {
 	std::stringstream fname;
 	const char* uid = Attribute ("UID");
 
+	map<string,Ptr< Matrix<cplx> > >&  cfm = DataBase::Instance()->CXFLMap();
+	map<string,Ptr< Matrix<double> > >&  rdm = DataBase::Instance()->RLDBMap();
+	map<string,Ptr< Matrix<short> > >& sim = DataBase::Instance()->SHRTMap();
+
+
 	printf ("Dumping ...\n");
 
 	if (uid == 0  ||  uid == "")
@@ -48,20 +53,20 @@ DumpToFile::Process () {
 		return RRSModule::FILE_ACCESS_FAILED;
 	}
 
-	map<string,Ptr< Matrix<cplx> > >::iterator cit = m_cplx.begin();
-	for (cit = m_cplx.begin() ; cit != m_cplx.end(); cit++) {
+	map<string,Ptr< Matrix<cplx> > >::iterator cit = cfm.begin();
+	for (cit = cfm.begin() ; cit != cfm.end(); cit++) {
 		cout << "Dumping " << cit->first.c_str() << endl;
 		cit->second->MXDump(mf, cit->first.c_str());
 	}
 	
-	map<string,Ptr< Matrix<double> > >::iterator rit = m_real.begin();
-	for (rit = m_real.begin(); rit != m_real.end(); rit++) {
+	map<string,Ptr< Matrix<double> > >::iterator rit = rdm.begin();
+	for (rit = rdm.begin(); rit != rdm.end(); rit++) {
 		cout << "Dumping " <<  rit->first.c_str() << endl;
 		rit->second->MXDump(mf, rit->first.c_str());
 	}
 	
-	map<string,Ptr< Matrix<short> > >::iterator pit = m_pixel.begin();
-	for (pit = m_pixel.begin(); pit != m_pixel.end(); pit++) {
+	map<string,Ptr< Matrix<short> > >::iterator pit = sim.begin();
+	for (pit = sim.begin(); pit != sim.end(); pit++) {
 		cout << "Dumping " <<  pit->first.c_str() << endl;
 		pit->second->MXDump(mf, pit->first.c_str());
 	}

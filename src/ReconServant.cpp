@@ -31,32 +31,32 @@ ReconServant::ReconServant  () :
 
 ReconServant::~ReconServant ()               {
 
-	this->Finalise (-1);
+	this->Finalise (NULL);
 	delete m_config;
 
 }
 
 
-short
+error_code
 ReconServant::Init (const char* name) {
 
+	ReconContext* rc;
 	error_code e = OK;
 	
-	m_contexts.push_back(new ReconContext(name));
+	m_contexts.insert (pair< std::string, ReconContext* > (std::string(name), rc = new ReconContext(name)));
 
-	std::cout << "Configuring " << m_contexts.at(0)->Name() << " ... " << std::endl;
+//sprintf ("Configuring %s ... \n", name);
+    rc->SetConfig (m_config);
 
-	m_contexts.at(0)->SetConfig (m_config);
+//	sprintf ("... done. Initialising algorithm ... \n");
 
-	std::cout << "... done. Initialising algorithm ... " << std::endl;
-
-	if ((e = m_contexts.at(0)->Init()) != OK) {
-		Finalise(-1);
-		std::cout << "... FAILED!!! Bailing out." << std::endl;
-		return -1;
+	if ((e = rc->Init()) != OK) {
+		Finalise(NULL);
+		//sprintf ("... FAILED!!! Bailing out.\n");
+		return CONTEXT_CONFIGURATION_FAILED;
 	}
 
-	std::cout << "... done. Handling back control to client ... " << std::endl;
+//sprintf ("... done. Handling back control to client ... \n");
 
 	return e;
 
@@ -64,45 +64,68 @@ ReconServant::Init (const char* name) {
 
 
 error_code
-ReconServant::Finalise (const short s) {
+ReconServant::Finalise (const char* name) {
 
 	error_code e = OK;
 
-	if (s == -1)
-		for (int i = 0; i < m_contexts.size(); i++) {
-			delete m_contexts.back();
-			m_contexts.pop_back();
-		}
+	map<string, ReconContext*>::iterator it = m_contexts.find (name);
+	
+	if (name == NULL) {
+
+		DataBase::Instance()->Finalise();
+		// Clean map
+
+	} else if (it == m_contexts.end()) {
+
+		e = CONTEXT_NOT_FOUND;
+
+	} else {
+
+		delete it->second;
+		m_contexts.erase(it);
+
+	}
+
+
+	return e;
+
+}
+
+
+error_code
+ReconServant::Process  (const char* name)       {
+
+	error_code e = OK;
+
+	map<string, ReconContext*>::iterator it = m_contexts.find (name);
+	
+	if (it == m_contexts.end()) 
+		e = CONTEXT_NOT_FOUND;
 	else {
-		
-		delete m_contexts.at(s);
-		m_contexts.erase (m_contexts.begin()+s);
-		
+		std::cout << "Processing ... " << std::endl;
+		error_code e = it->second->Process();
+		std::cout << "... done. " << std::endl;
 	}
 
 	return e;
-
-}
-
-
-error_code
-ReconServant::Process  (const short s)       {
-
-	std::cout << "Processing ... " << std::endl;
-	error_code e = m_contexts.at(s)->Process();
-	std::cout << "... done. " << std::endl;
-	
-	return e;
 	
 }
 
 
 error_code
-ReconServant::Prepare  (const short s)       {
+ReconServant::Prepare  (const char* name)       {
 	
-	std::cout << "Preparing ... " << std::endl;
-	error_code e = m_contexts.at(s)->Prepare();
-	std::cout << "... done. " << std::endl;
+	error_code e = OK;
+
+	map<string, ReconContext*>::iterator it = m_contexts.find (name);
+	
+	if (it == m_contexts.end()) 
+		e = CONTEXT_NOT_FOUND;
+	else {
+		std::cout << "Preparing ... " << std::endl;
+		error_code e = it->second->Prepare();
+		std::cout << "... done. " << std::endl;
+	}
 	
 	return e;
 	
@@ -110,73 +133,109 @@ ReconServant::Prepare  (const short s)       {
 
 
 void
-ReconServant::set_cplx  (const char* name, const cplx_data& c) {
+ReconServant::set_cxfl  (const char* name, const cxfl_data& c) {
 
-	m_contexts.at(0)->SetCplx(name, c);
+	DataBase::Instance()->SetCXFL(name, c);
 
 }
 
 
 void
-ReconServant::get_cplx (const char* name, cplx_data& c) {
+ReconServant::get_cxfl (const char* name, cxfl_data& c) {
 
 	c.dims.length(INVALID_DIM);
 	c.res.length(INVALID_DIM);
-	m_contexts.at(0)->GetCplx(name, c);
+	DataBase::Instance()->GetCXFL(name, c);
 
 }
 
 
 void
-ReconServant::set_real       (const char* name, const real_data& r)   {
+ReconServant::set_cxdb  (const char* name, const cxdb_data& c) {
 
-	m_contexts.at(0)->SetReal(name, r);
+	DataBase::Instance()->SetCXDB(name, c);
 
 }
 
 
 void
-ReconServant::get_real       (const char* name, real_data& r) {
+ReconServant::get_cxdb (const char* name, cxdb_data& c) {
+
+	c.dims.length(INVALID_DIM);
+	c.res.length(INVALID_DIM);
+	DataBase::Instance()->GetCXDB(name, c);
+
+}
+
+
+void
+ReconServant::set_rldb       (const char* name, const rldb_data& r)   {
+
+	DataBase::Instance()->SetRLDB(name, r);
+
+}
+
+
+void
+ReconServant::get_rldb       (const char* name, rldb_data& r) {
 
 	r.dims.length(INVALID_DIM);
 	r.res.length(INVALID_DIM);
-	m_contexts.at(0)->GetReal(name, r);
+	DataBase::Instance()->GetRLDB(name, r);
 
 }
 
 
 void
-ReconServant::set_float       (const char* name, const float_data& r)   {
+ReconServant::set_rlfl       (const char* name, const rlfl_data& r)   {
 
-	m_contexts.at(0)->SetFloat(name, r);
+	DataBase::Instance()->SetRLFL(name, r);
 
 }
 
 
 void
-ReconServant::get_float       (const char* name, float_data& r) {
+ReconServant::get_rlfl       (const char* name, rlfl_data& r) {
 
 	r.dims.length(INVALID_DIM);
 	r.res.length(INVALID_DIM);
-	m_contexts.at(0)->GetFloat(name, r);
+	DataBase::Instance()->GetRLFL(name, r);
 
 }
 
 
 void
-ReconServant::set_pixel        (const char* name, const pixel_data& p) {
+ReconServant::set_shrt        (const char* name, const shrt_data& p) {
 
-	m_contexts.at(0)->SetPixel(name, p);
+	DataBase::Instance()->SetSHRT(name, p);
 
 }
 
 
 void
-ReconServant::get_pixel        (const char* name, pixel_data& p) {
+ReconServant::get_shrt        (const char* name, shrt_data& p) {
 
 	p.dims.length(INVALID_DIM);
 	p.res.length(INVALID_DIM);
-	m_contexts.at(0)->GetPixel(name, p);
+	DataBase::Instance()->GetSHRT(name, p);
+
+}
+
+
+void
+ReconServant::set_long        (const char* name, const long_data& p) {
+
+	DataBase::Instance()->SetLONG(name, p);
+
+}
+
+
+void
+ReconServant::get_long        (const char* name, long_data& p) {
+
+	p.dims.length(INVALID_DIM);
+	p.res.length(INVALID_DIM);
+	DataBase::Instance()->GetLONG(name, p);
 
 }
 

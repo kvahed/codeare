@@ -18,12 +18,12 @@
  *  02110-1301  USA
  */
 
-#include "DummyRecon.hpp"
+#include "SpatialDomain.hpp"
 
 using namespace RRStrategy;
 
 RRSModule::error_code
-DummyRecon::Process     () { 
+SpatialDomain::Process     () { 
 
 	return RRSModule::OK;
 
@@ -32,7 +32,7 @@ DummyRecon::Process     () {
 // the class factories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {
 
-    return new DummyRecon;
+    return new SpatialDomain;
 
 }
 

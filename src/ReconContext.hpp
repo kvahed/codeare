@@ -118,163 +118,243 @@ namespace RRServer {
 		
 
 		/**
-		 * @brief        @see ReconStrategy::SetCplx(const std::string name, const cplx_data*)
+		 * @brief        @see ReconStrategy::SetCXFL(const std::string name, const cxfl_data&)
 		 *
 		 * @param  name  Name
 		 * @param  r     Complex data sequence
 		 */
 		void
-		SetCplx          (const std::string name, const cplx_data& r);
+		SetCXFL          (const std::string name, const cxfl_data& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetCplx(const std::string name, const Matrix<cplx>&)
+		 * @brief       @see ReconStrategy::SetCXFL(const std::string name, const Matrix<cxfl>&)
 		 *
 		 * @param  name  Name
 		 * @param  r    Complex data matrix
 		 */
 		void
-		SetCplx          (const std::string name, Matrix<cplx>& r);
+		SetCXFL          (const std::string name, Matrix<cxfl>& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetCplx(const std::string name, cplx_data&)
+		 * @brief       @see ReconStrategy::GetCXFL(const std::string name, cxfl_data&)
 		 *
 		 * @param  name  Name
 		 * @param  r    Complex data sequence
 		 */
 		void
-		GetCplx          (const std::string name, cplx_data& r);
+		GetCXFL          (const std::string name, cxfl_data& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetCplx(const std::string name, Matrix<cplx>*)
+		 * @brief       @see ReconStrategy::GetCXFL(const std::string name, Matrix<cxfl>*)
 		 *
 		 * @param  name  Name
 		 * @param  r    Complex data matrix
 		 */
 		void
-		GetCplx          (const std::string name, Matrix<cplx>& r);
+		GetCXFL          (const std::string name, Matrix<cxfl>& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetReal(const std::string name, const real_data*)
+		 * @brief        @see ReconStrategy::SetCXDB(const std::string name, const cxdb_data&)
+		 *
+		 * @param  name  Name
+		 * @param  r     Complex data sequence
+		 */
+		void
+		SetCXDB          (const std::string name, const cxdb_data& r);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::SetCXDB(const std::string name, const Matrix<cxdb>&)
+		 *
+		 * @param  name  Name
+		 * @param  r    Complex data matrix
+		 */
+		void
+		SetCXDB          (const std::string name, Matrix<cxdb>& r);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::GetCXDB(const std::string name, cxdb_data&)
+		 *
+		 * @param  name  Name
+		 * @param  r    Complex data sequence
+		 */
+		void
+		GetCXDB          (const std::string name, cxdb_data& r);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::GetCXDB(const std::string name, Matrix<cxdb>*)
+		 *
+		 * @param  name  Name
+		 * @param  r    Complex data matrix
+		 */
+		void
+		GetCXDB          (const std::string name, Matrix<cxdb>& r);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::SetRLDB(const std::string name, const rldb_data*)
 		 *
 		 * @param  name  Name
 		 * @param  r    Real data sequence
 		 */
 		void
-		SetReal (const std::string name, const real_data& r);
+		SetRLDB (const std::string name, const rldb_data& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetReal(const std::string name, const Matrix<double>*)
+		 * @brief       @see ReconStrategy::SetRLDB(const std::string name, const Matrix<double>*)
 		 *
 		 * @param  name  Name
 		 * @param  r    Real data matrix
 		 */
 		void
-		SetReal (const std::string name, Matrix<double>& r);
+		SetRLDB (const std::string name, Matrix<double>& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetReal(const std::string name, const Matrix<double>*)
+		 * @brief       @see ReconStrategy::SetRLDB(const std::string name, const Matrix<double>*)
 		 *
 		 * @param  name  Name
 		 * @param  r    Real data matrix
 		 */
 		void
-		GetReal (const std::string name, Matrix<double>& r);
+		GetRLDB (const std::string name, Matrix<double>& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetReal(const std::string name, real_data*)
+		 * @brief       @see ReconStrategy::GetRLDB(const std::string name, rldb_data*)
 		 *
 		 * @param  name  Name
 		 * @param  r    Real data sequence
 		 */
 		void
-		GetReal (const std::string name, real_data& r);
+		GetRLDB (const std::string name, rldb_data& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetFloat(const std::string name, const float_data*)
+		 * @brief       @see ReconStrategy::SetRLFL(const std::string name, const rlfl_data*)
 		 *
 		 * @param  name  Name
 		 * @param  f    Float data sequence
 		 */
 		void
-		SetFloat (const std::string name, const float_data& f);
+		SetRLFL (const std::string name, const rlfl_data& f);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetFloat(const std::string name, const Matrix<float>*)
+		 * @brief       @see ReconStrategy::SetRLFL(const std::string name, const Matrix<float>*)
 		 *
 		 * @param  name  Name
 		 * @param  f     Float data matrix
 		 */
 		void
-		SetFloat (const std::string name, Matrix<float>& f);
+		SetRLFL (const std::string name, Matrix<float>& f);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetFloat(const std::string name, const Matrix<float>*)
+		 * @brief       @see ReconStrategy::SetRLFL(const std::string name, const Matrix<float>*)
 		 *
 		 * @param  name  Name
 		 * @param  f     Float data matrix
 		 */
 		void
-		GetFloat (const std::string name, Matrix<float>& f);
+		GetRLFL (const std::string name, Matrix<float>& f);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetFloat(const std::string name, float_data*)
+		 * @brief       @see ReconStrategy::GetRLFL(const std::string name, rlfl_data*)
 		 *
 		 * @param  name  Name
 		 * @param  f    Float data sequence
 		 */
 		void
-		GetFloat (const std::string name, float_data& f);
+		GetRLFL (const std::string name, rlfl_data& f);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetPixel(const std::string name, const pixel_data*)
+		 * @brief       @see ReconStrategy::SetSHRT(const std::string name, const shrt_data*)
 		 *
 		 * @param  name  Name
-		 * @param  r    Pixel data sequence
+		 * @param  r    Short int data sequence
 		 */
 		void
-		SetPixel (const std::string name, const pixel_data& r);
+		SetSHRT (const std::string name, const shrt_data& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::SetPixel(const std::string name, const Matrix<short>*)
+		 * @brief       @see ReconStrategy::SetSHRT(const std::string name, const Matrix<short>*)
 		 *
 		 * @param  name  Name
-		 * @param  r    Pixel data matrix
+		 * @param  r    Short int data matrix
 		 */
 		void
-		SetPixel (const std::string name, Matrix<short>& r);
+		SetSHRT (const std::string name, Matrix<short>& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetPixel(const std::string name, Matrix<short>*)
+		 * @brief       @see ReconStrategy::GetSHRT(const std::string name, Matrix<short>*)
 		 *
 		 * @param  name  Name
-		 * @param  r    Pixel data matrix
+		 * @param  r    Short int data matrix
 		 */
 		void
-		GetPixel (const std::string name, Matrix<short>& r);
+		GetSHRT (const std::string name, Matrix<short>& r);
 		
 
 		/**
-		 * @brief       @see ReconStrategy::GetPixel(const std::string name, pixel_data*)
+		 * @brief       @see ReconStrategy::GetSHRT(const std::string name, shrt_data*)
 		 *
 		 * @param  name  Name
-		 * @param  r    Pixel data sequence
+		 * @param  r    Short int data sequence
 		 */
 		void
-		GetPixel (const std::string name, pixel_data& r);
+		GetSHRT (const std::string name, shrt_data& r);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::SetLONG(const std::string name, const long_data*)
+		 *
+		 * @param  name  Name
+		 * @param  r    Long int data sequence
+		 */
+		void
+		SetLONG (const std::string name, const long_data& r);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::SetLONG(const std::string name, const Matrix<long>*)
+		 *
+		 * @param  name  Name
+		 * @param  r    Long int data matrix
+		 */
+		void
+		SetLONG (const std::string name, Matrix<long>& r);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::GetLONG(const std::string name, Matrix<long>*)
+		 *
+		 * @param  name  Name
+		 * @param  r    Long int data matrix
+		 */
+		void
+		GetLONG (const std::string name, Matrix<long>& r);
+		
+
+		/**
+		 * @brief       @see ReconStrategy::GetLONG(const std::string name, long_data*)
+		 *
+		 * @param  name  Name
+		 * @param  r    Long int data sequence
+		 */
+		void
+		GetLONG (const std::string name, long_data& r);
 		
 
  		/**

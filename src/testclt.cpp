@@ -20,7 +20,7 @@
 
 #include "options.h"
 #include "ReconClient.hpp"
-#include "ReconContext.hpp"
+//#include "ReconContext.hpp"
 #include "modules/FFT.hpp"
 #include "MatrixOperations.hpp"
 
@@ -117,11 +117,11 @@ bool grappatest (ReconClient* rc) {
 	rc->ReadConfig (cf.c_str());
 	
 	rc->Init (test);
-	rc->SetCplx  ("acs",  acs);
+	rc->SetMatrix  ("acs",  acs);
 	rc->Prepare (test);
-	rc->SetCplx  ("data", sig); // Measurement data
+	rc->SetMatrix  ("data", sig); // Measurement data
 	rc->Process (test);
-	rc->GetCplx  ("data", sig);
+	rc->GetMatrix  ("data", sig);
 	rc->Finalise (test);
 	
 	return true;
@@ -163,10 +163,10 @@ bool cgsensetest (ReconClient* rc) {
 		
 		// Outgoing -------------
 		
-		rc->SetCplx (   "data", rawdata); // Measurement data
-		rc->SetCplx (   "sens", sens);    // Sensitivities
-		rc->SetReal ("weights", weights); // Weights
-		rc->SetReal ( "kspace", kspace);  // K-space
+		rc->SetMatrix (   "data", rawdata); // Measurement data
+		rc->SetMatrix (   "sens", sens);    // Sensitivities
+		rc->SetMatrix ("weights", weights); // Weights
+		rc->SetMatrix ( "kspace", kspace);  // K-space
 
 		// ---------------------
 
@@ -174,36 +174,36 @@ bool cgsensetest (ReconClient* rc) {
 		
 		// Incoming -------------
 
-		rc->GetCplx     (  "image", image);  // Images
+		rc->GetMatrix     (  "image", image);  // Images
 		if (pulses)
-			rc->GetCplx ("signals", signals);     // Pulses (Excitation)
-		rc->GetReal     (  "nrmse", nrmse);  // CG residuals
+			rc->GetMatrix ("signals", signals);     // Pulses (Excitation)
+		rc->GetMatrix     (  "nrmse", nrmse);  // CG residuals
 
 		// ---------------------
 		
 		rc->Finalise   (test);
 		
 	} else {
-
+		/*
 		RRServer::ReconContext* rx = new RRServer::ReconContext(test);
 
 		rx->ReadConfig(cf.c_str());
 		rx->Init();
 
-		rx->SetCplx ("data",     rawdata);
-		rx->SetCplx ("sens",     sens);
-		rx->SetReal ("weights",  weights);
-		rx->SetReal ("kspace",   kspace);
+		rx->SetMatrix ("data",     rawdata);
+		rx->SetMatrix ("sens",     sens);
+		rx->SetMatrix ("weights",  weights);
+		rx->SetMatrix ("kspace",   kspace);
 
 		rx->Process ();
 		
-		rx->GetCplx ("data",     rawdata); // Images
+		rx->GetMatrix ("data",     rawdata); // Images
 		if (pulses)
-			rx->GetCplx ("sens", sens);    // Pulses (Excitation)
-		rx->GetReal ("weights",  weights); // CG residuals
+			rx->GetMatrix ("sens", sens);    // Pulses (Excitation)
+		rx->GetMatrix ("weights",  weights); // CG residuals
 
 		rx->Finalise ();
-
+		*/
 	}
 	
 #ifdef HAVE_MAT_H	
@@ -256,9 +256,9 @@ bool cstest (ReconClient* rc) {
 	
 	// Outgoing -------------
 	
-	rc->SetCplx  ("data", indata); // Measurement data
-	rc->SetReal  ("pdf",  pdf);  // Sensitivities
-	rc->SetReal  ("mask", mask); // Weights
+	rc->SetMatrix  ("data", indata); // Measurement data
+	rc->SetMatrix  ("pdf",  pdf);  // Sensitivities
+	rc->SetMatrix  ("mask", mask); // Weights
 	
 	// ---------------------
 	
@@ -266,8 +266,8 @@ bool cstest (ReconClient* rc) {
 	
 	// Incoming -------------
 	
-	rc->GetCplx ("data", indata);  // Images
-	rc->GetCplx ("im_dc", im_dc);  // Images
+	rc->GetMatrix ("data", indata);  // Images
+	rc->GetMatrix ("im_dc", im_dc);  // Images
 	
 	// ---------------------
 	
@@ -342,16 +342,16 @@ bool dmtest (ReconClient* rc) {
 
 	// Outgoing -------------
 	
-	rc->SetCplx  (  "b1", b1  );
-	rc->SetFloat (   "g", g  );
-	rc->SetFloat (   "r", r   );
-	rc->SetFloat (  "b0", b0  );
-	rc->SetCplx  ("tmxy", tmxy);
-	rc->SetFloat ( "tmz", tmz );
-	rc->SetCplx  ("smxy", smxy);
-	rc->SetFloat ( "smz", smz );
-	rc->SetFloat (   "j", j   );
-	rc->SetFloat ( "roi", roi );
+	rc->SetMatrix  (  "b1", b1  );
+	rc->SetMatrix (   "g", g  );
+	rc->SetMatrix (   "r", r   );
+	rc->SetMatrix (  "b0", b0  );
+	rc->SetMatrix  ("tmxy", tmxy);
+	rc->SetMatrix ( "tmz", tmz );
+	rc->SetMatrix  ("smxy", smxy);
+	rc->SetMatrix ( "smz", smz );
+	rc->SetMatrix (   "j", j   );
+	rc->SetMatrix ( "roi", roi );
 	// ---------------------
 	
 	rc->Process (test);
@@ -362,11 +362,11 @@ bool dmtest (ReconClient* rc) {
 	Matrix<cplx>  mxy;
 	Matrix<float> mz;   
 
-	rc->GetCplx  ( "mxy", mxy);
-	rc->GetFloat (  "mz", mz);	
-	rc->GetCplx  ("tmxy", tmxy);
-	rc->GetFloat ( "tmz", tmz);	
-	rc->GetCplx  (  "rf", rf);
+	rc->GetMatrix  ( "mxy", mxy);
+	rc->GetMatrix (  "mz", mz);	
+	rc->GetMatrix  ("tmxy", tmxy);
+	rc->GetMatrix ( "tmz", tmz);	
+	rc->GetMatrix  (  "rf", rf);
 
 	// ---------------------
 	
@@ -415,13 +415,13 @@ bool nuffttest (ReconClient* rc) {
 	kspace.MXRead  (df, "kspace");
 #endif
 
-	rc->SetCplx    ("data",    rawdata);
-	rc->SetReal    ("weights", weights);
-	rc->SetReal    ("kspace",  kspace);
+	rc->SetMatrix    ("data",    rawdata);
+	rc->SetMatrix    ("weights", weights);
+	rc->SetMatrix    ("kspace",  kspace);
 	
 	rc->Process    (test);
 	
-	rc->GetCplx    ("data", rawdata);
+	rc->GetMatrix    ("data", rawdata);
 
 	rc->Finalise(test);
 
@@ -460,17 +460,17 @@ bool ktptest (ReconClient* rc) {
 	k.Read       (df, "k");
 	r.Read       (df, "r");
 
-	rc->SetCplx    ("target", target);
-	rc->SetCplx    ("b1",     b1);
-	rc->SetReal    ("r",      r);
-	rc->SetReal    ("k",      k);
-	rc->SetPixel   ("b0",     b0);
+	rc->SetMatrix    ("target", target);
+	rc->SetMatrix    ("b1",     b1);
+	rc->SetMatrix    ("r",      r);
+	rc->SetMatrix    ("k",      k);
+	rc->SetMatrix   ("b0",     b0);
 	
 	rc->Process    (test);
 	
-	rc->GetCplx    ("target", target);
-	rc->GetCplx    ("b1",     b1);
-	rc->GetReal    ("r",      r);
+	rc->GetMatrix    ("target", target);
+	rc->GetMatrix    ("b1",     b1);
+	rc->GetMatrix    ("r",      r);
 
 	rc->Finalise(test);
 	
@@ -533,9 +533,9 @@ bool internaltest (ReconClient* rc) {
 	rc->ReadConfig("test.xml");
 	rc->Init(test);
 
-	rc->SetCplx ("r", r);
-	rc->SetPixel("p", p);
-	rc->SetReal ("h", h);
+	rc->SetMatrix ("r", r);
+	rc->SetMatrix ("p", p);
+	rc->SetMatrix ("h", h);
 	
 	time_t seconds = time (NULL);
 	char   uid[16];
@@ -547,9 +547,9 @@ bool internaltest (ReconClient* rc) {
 	
 	rc->Process(test);
 	
-	rc->GetCplx ("r", r);
-	rc->GetPixel("p", p);
-	rc->GetReal ("h", h);
+	rc->GetMatrix ("r", r);
+	rc->GetMatrix("p", p);
+	rc->GetMatrix ("h", h);
 
 	rc->Finalise (test);
 	
@@ -618,8 +618,8 @@ bool resetest (ReconClient* rc) {
 	if (use_bet==1)
 		mask.RAWRead (maf, std::string("VB15"));
 
-	rc->SetCplx ("meas", meas);
-	rc->SetCplx ("mask", mask);
+	rc->SetMatrix ("meas", meas);
+	rc->SetMatrix ("mask", mask);
 	// -----------------------------------------------------------
 
 	// Process data on backend -----------------------------------
@@ -629,12 +629,12 @@ bool resetest (ReconClient* rc) {
 	
 	// Get back reconstructed data from backend ------------------
 
-	rc->GetCplx ("txm",  txm);
-	rc->GetCplx ("rxm",  rxm);
-	rc->GetCplx ("mask", mask);
-	rc->GetReal ("snro", snro);
-	rc->GetReal ("b0",   b0);
-	rc->GetPixel("bets", bets);
+	rc->GetMatrix ("txm",  txm);
+	rc->GetMatrix ("rxm",  rxm);
+	rc->GetMatrix ("mask", mask);
+	rc->GetMatrix ("snro", snro);
+	rc->GetMatrix ("b0",   b0);
+	rc->GetMatrix("bets", bets);
 
 	// -----------------------------------------------------------
 
@@ -744,11 +744,11 @@ bool init (int argc, char** argv) {
 	
 	cout << endl;
 #ifdef VERSION
-	cout << "codeare "         << VERSION                                        << endl;
+	cout << "jrrs "         << VERSION                                        << endl;
 #else
-	cout << "codeare "         << endl;
+	cout << "jrrs "         << endl;
 #endif
-	cout << "common data exchange and reconstruction environment "            << endl;
+	cout << "juelich remote reconstruction service "                          << endl;
 #ifdef SVN_REVISION
 	cout << "Test client "  << " [build " << SVN_REVISION << "]"              << endl;
 #else

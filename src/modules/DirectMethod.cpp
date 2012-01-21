@@ -79,17 +79,17 @@ DirectMethod::Process     () {
     SimulationBundle sb;
     ticks           start  = getticks();
 
-    sb.b1    = m_cplx ["b1"];
-    sb.tmxy  = m_cplx ["tmxy"];
-    sb.smxy  = m_cplx ["smxy"];
+    sb.b1    = &GetCXFL ("b1");
+    sb.tmxy  = &GetCXFL ("tmxy");
+    sb.smxy  = &GetCXFL ("smxy");
 
-    sb.g     = m_float["g"];
-    sb.tmz   = m_float["tmz"];
-    sb.smz   = m_float["smz"];
-    sb.roi   = m_float["roi"];
-    sb.b0    = m_float["b0"];
-    sb.r     = m_float["r"];
-    sb.jac   = m_float["j"];
+    sb.g     = &GetRLFL ("g");
+    sb.tmz   = &GetRLFL ("tmz");
+    sb.smz   = &GetRLFL ("smz");
+    sb.roi   = &GetRLFL ("roi");
+    sb.b0    = &GetRLFL ("b0");
+    sb.r     = &GetRLFL ("r");
+    sb.jac   = &GetRLFL ("j");
 
     sb.np    = m_np;
     sb.mode  = m_mode;
@@ -100,9 +100,9 @@ DirectMethod::Process     () {
 	sb.cb0   = m_cb0;
 
     // Outgoing
-    AddCplx  ( "rf", sb.rf  = NEW (Matrix<cplx>  (sb.g->Dim(1), sb.b1->Dim(1))));
-    AddCplx  ("mxy", sb.mxy = NEW (Matrix<cplx>  (           1, sb.r->Dim(1))));
-    AddFloat ( "mz", sb.mz  = NEW (Matrix<float> (           1, sb.r->Dim(1))));
+    AddCXFL ( "rf", sb.rf  = NEW (Matrix<cxfl>  (sb.g->Dim(1), sb.b1->Dim(1))));
+    AddCXFL ("mxy", sb.mxy = NEW (Matrix<cxfl>  (           1, sb.r->Dim(1))));
+    AddRLFL ( "mz", sb.mz  = NEW (Matrix<float> (           1, sb.r->Dim(1))));
 
     // Initialise CPU/GPU simulator
     SimulationContext sc (&sb);

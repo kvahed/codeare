@@ -183,10 +183,10 @@ CGSENSE::Process () {
 
 	RRSModule::error_code error = OK;
 
-	Matrix<cplx>&   data    = GetCplx("data");
-	Matrix<cplx>&   sens    = GetCplx("sens");
-	Matrix<double>& weights = GetReal("weights");
-	Matrix<double>& kspace  = GetReal("kspace");
+	Matrix<cplx>&   data    = GetCXFL("data");
+	Matrix<cplx>&   sens    = GetCXFL("sens");
+	Matrix<double>& weights = GetRLDB("weights");
+	Matrix<double>& kspace  = GetRLDB("kspace");
 	
 	// CG matrices ----------------------------------------------------
 	Matrix <cplx>   p       = Matrix<cplx>   (m_N[0],m_N[1],m_N[2]), q, r;
@@ -204,8 +204,8 @@ CGSENSE::Process () {
 
 	}
 
-	FreeReal ("kspace");
-	FreeReal ("weights");
+	FreeRLDB ("kspace");
+	FreeRLDB ("weights");
 
 	// Create test data if testcase (Incoming data is image space) ----
 	if (m_testcase) {
@@ -217,7 +217,7 @@ CGSENSE::Process () {
 	IntensityCorrection (sens, m_intcor);
 	
 	// Out going images -----------------------------------------------
-	Matrix<cplx>& image = AddCplx ("image", NEW (Matrix<cplx>(m_N[0], m_N[1], m_N[2])));
+	Matrix<cplx>& image = AddCXFL ("image", NEW (Matrix<cplx>(m_N[0], m_N[1], m_N[2])));
 
 	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
@@ -281,7 +281,7 @@ CGSENSE::Process () {
 		
 	}
 	
-	FreeCplx ("sens");	
+	FreeCXFL ("sens");	
 	
 	// Report timimng -------------------------------------------------
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
@@ -290,7 +290,7 @@ CGSENSE::Process () {
 	if (m_verbose) {
 		
 		// CG residuals ------------------
-		Matrix<double>& nrmse = AddReal ("nrmse", NEW (Matrix<double> (iters,1)));
+		Matrix<double>& nrmse = AddRLDB ("nrmse", NEW (Matrix<double> (iters,1)));
 		memcpy (&nrmse[0], &res[0], iters * sizeof(double));
 		
 	} else {
