@@ -102,7 +102,16 @@ namespace RRServer {
 		 * @param s   sth Intialised startegy
 		 */
 		virtual error_code
-		Finalise      (const char* name);
+		Finalise      (const char* name = 0);
+		
+
+		/**
+		 * @brief     Clean up left over objects
+		 *
+		 * @return    Success
+		 */
+		virtual error_code
+		CleanUp       ();
 		
 
 		/**

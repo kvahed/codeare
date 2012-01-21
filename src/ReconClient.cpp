@@ -101,6 +101,7 @@ namespace RRClient {
 	
 	ReconClient::~ReconClient         ()            {
 		
+		m_rrsi->CleanUp();
 		m_orb->destroy();
 		
 	}
