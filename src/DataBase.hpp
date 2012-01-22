@@ -72,14 +72,34 @@ class DataBase {
 	
 	
 	/**
+	 * @brief        Get data from recon (Remote access)
+	 *
+	 * @param  name  Name
+	 * @param  c     Raw data storage 
+	 */
+	template <class T> void
+	GetMatrix        (const string name, T& t);
+	
+	
+	/**
+	 * @brief        Set data for recon (Remote access)
+	 *
+	 * @param name   Name
+	 * @param c      CXFL data
+	 */
+	template <class T> void 
+	SetMatrix        (const string name, const T& t);
+	
+	
+	/**
 	 * @brief        Add a complex matrix to complex matrix container
 	 *
 	 * @param  name  Name
 	 * @param  m     The added matrix
 	 * @return       Success
 	 */
-	Matrix<cxfl>& 
-	AddCXFL          (const string name, Ptr< Matrix<cxfl> > m);
+	template <class T> Matrix<T>& 
+	AddMatrix        (const string name, Ptr< Matrix<T> > m);
 	
 	
 	/**
@@ -103,37 +123,6 @@ class DataBase {
 	
 	
 	/**
-	 * @brief        Get data from recon (Remote access)
-	 *
-	 * @param  name  Name
-	 * @param  c     Raw data storage 
-	 */
-	void
-	GetCXFL          (const string name, cxfl_data& c);
-	
-	
-	/**
-	 * @brief        Set data for recon (Remote access)
-	 *
-	 * @param name   Name
-	 * @param c      CXFL data
-	 */
-	void 
-	SetCXFL          (const string name, const cxfl_data& c);
-	
-	
-	/*
-	 * @brief        Add a complex matrix to complex matrix container
-	 *
-	 * @param  name  Name
-	 * @param  m     The added matrix
-	 * @return       Success
-	 */
-	Matrix<cxdb>& 
-	AddCXDB          (const string name, Ptr< Matrix<cxdb> > m);
-	
-	
-	/**
 	 * @brief        Remove a complex matrix from complex container
 	 *
 	 * @param  name  Name
@@ -151,37 +140,6 @@ class DataBase {
 	 */
 	Matrix<cxdb>& 
 	GetCXDB          (const string name);
-	
-	
-	/**
-	 * @brief        Get data from recon (Remote access)
-	 *
-	 * @param  name  Name
-	 * @param  c     Raw data storage 
-	 */
-	void
-	GetCXDB          (const string name, cxdb_data& c);
-	
-	
-	/**
-	 * @brief        Set data for recon (Remote access)
-	 *
-	 * @param name   Name
-	 * @param c      CXDB data
-	 */
-	void 
-	SetCXDB          (const string name, const cxdb_data& c);
-	
-	
-	/**
-	 * @brief        Add a real matrix to real matrix container
-	 *
-	 * @param  name  Name
-	 * @param  m     The added matrix
-	 * @return       Reference to 
-	 */
-	Matrix<float>&
-	AddRLFL          (const string name, Ptr< Matrix<float> > m) ;
 	
 	
 	/**
@@ -205,37 +163,6 @@ class DataBase {
 		
 		
 	/**
-	 * @brief        Get data from recon (Remote access)
-	 *
-	 * @param  name  Name
-	 * @param  r     RLDB data storage
-	 */
-	void 
-	GetRLFL          (const string name, rlfl_data& r);
-		
-
-	/**
-	 * @brief        Set data for recon (Local access)
-	 * 
-	 * @param  name  Name
-	 * @param  r     RLDB data
-	 */
-	void 
-	SetRLFL          (const string name, const rlfl_data& r);
-		
-	
-	/**
-	 * @brief        Add a real matrix to real matrix container
-	 *
-	 * @param  name  Name
-	 * @param  m     The added matrix
-	 * @return       Reference to 
-	 */
-	Matrix<double>&
-	AddRLDB          (const string name, Ptr< Matrix<double> > m) ;
-	
-	
-	/**
 	 * @brief        Remove a real matrix from real container
 	 *
 	 * @param  name  Name
@@ -255,37 +182,6 @@ class DataBase {
 	GetRLDB         (const string name);
 		
 		
-	/**
-	 * @brief        Get data from recon (Remote access)
-	 *
-	 * @param  name  Name
-	 * @param  r     RLDB data storage
-	 */
-	void 
-	GetRLDB          (const string name, rldb_data& r);
-		
-
-	/**
-	 * @brief        Set data for recon (Local access)
-	 * 
-	 * @param  name  Name
-	 * @param  r     RLDB data
-	 */
-	void 
-	SetRLDB          (const string name, const rldb_data& r);
-		
-	
-	/**
-	 * @brief        Add a short matrix to short matrix container
-	 *
-	 * @param  name  Name
-	 * @param  m     The added matrix
-	 * @return       Success
-	 */
-	Matrix<short>&
-	AddSHRT          (const string name, Ptr< Matrix<short> > m);
-
-	
 	/**
 	 * @brief        Remove a short matrix from short container
 	 *
@@ -307,37 +203,6 @@ class DataBase {
 	
 
 	/**
-	 * @brief        Get data from recon
-	 *
-	 * @param  name  Name
-	 * @param  p     Short data storage
-	 */
-	void 
-	GetSHRT          (const string name, shrt_data& p);
-	
-	
-	/**
-	 * @brief        Set data for recon
-	 *
-	 * @param  name  Name
-	 * @param  p     Short data
-	 */
-	void 
-	SetSHRT          (const string name, const shrt_data& p);
-	
-	
-	/**
-	 * @brief        Add a long matrix to long matrix container
-	 *
-	 * @param  name  Name
-	 * @param  m     The added matrix
-	 * @return       Success
-	 */
-	Matrix<long>&
-	AddLONG          (const string name, Ptr< Matrix<long> > m);
-
-	
-	/**
 	 * @brief        Remove a long matrix from long container
 	 *
 	 * @param  name  Name
@@ -357,26 +222,6 @@ class DataBase {
 	GetLONG          (const string name);
 	
 
-	/**
-	 * @brief        Get data from recon
-	 *
-	 * @param  name  Name
-	 * @param  p     Long data storage
-	 */
-	void 
-	GetLONG          (const string name, long_data& p);
-	
-	
-	/**
-	 * @brief        Set data for recon
-	 *
-	 * @param  name  Name
-	 * @param  p     Long data
-	 */
-	void 
-	SetLONG          (const string name, const long_data& p);
-	
-	
 	/**
 	 * @brief        Reference to complex single store
 	 *

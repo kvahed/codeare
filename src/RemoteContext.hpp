@@ -123,8 +123,12 @@ namespace RRServer {
 		 * @param  name  Name
 		 * @param  r     Complex data sequence
 		 */
-		void
-		SetCXFL          (const std::string name, const cxfl_data& r);
+		template <class T> void
+		SetMatrix          (const std::string name, const T& t) {
+
+			DataBase::Instance()->SetMatrix(name, t);
+
+		}
 		
 		
 		/**
@@ -133,108 +137,12 @@ namespace RRServer {
 		 * @param  name  Name
 		 * @param  r    Complex data sequence
 		 */
-		void
-		GetCXFL          (const std::string name, cxfl_data& r);
-		
-		
-		/**
-		 * @brief        @see ReconStrategy::SetCXDB(const std::string name, const cxdb_data&)
-		 *
-		 * @param  name  Name
-		 * @param  r     Complex data sequence
-		 */
-		void
-		SetCXDB          (const std::string name, const cxdb_data& r);
-		
-		
-		/**
-		 * @brief       @see ReconStrategy::GetCXDB(const std::string name, cxdb_data&)
-		 *
-		 * @param  name  Name
-		 * @param  r    Complex data sequence
-		 */
-		void
-		GetCXDB          (const std::string name, cxdb_data& r);
-		
-		
-		/**
-		 * @brief       @see ReconStrategy::SetRLDB(const std::string name, const rldb_data*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Real data sequence
-		 */
-		void
-		SetRLDB (const std::string name, const rldb_data& r);
-		
-		
-		/**
-		 * @brief       @see ReconStrategy::SetRLDB(const std::string name, const Matrix<double>*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Real data matrix
-		 */
-		void
-		GetRLDB (const std::string name, rldb_data& r);
-		
-		
-		/**
-		 * @brief       @see ReconStrategy::SetRLFL(const std::string name, const rlfl_data*)
-		 *
-		 * @param  name  Name
-		 * @param  f    Float data sequence
-		 */
-		void
-		SetRLFL (const std::string name, const rlfl_data& f);
-		
-		
-		/**
-		 * @brief       @see ReconStrategy::SetRLFL(const std::string name, const Matrix<float>*)
-		 *
-		 * @param  name  Name
-		 * @param  f     Float data matrix
-		 */
-		void
-		GetRLFL (const std::string name, rlfl_data& f);
-		
-		
-		/**
-		 * @brief       @see ReconStrategy::SetSHRT(const std::string name, const shrt_data*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Short int data sequence
-		 */
-		void
-		SetSHRT (const std::string name, const shrt_data& r);
-		
-		
-		/**
-		 * @brief       @see ReconStrategy::GetSHRT(const std::string name, shrt_data*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Short int data sequence
-		 */
-		void
-		GetSHRT (const std::string name, shrt_data& r);
-		
-		
-		/**
-		 * @brief       @see ReconStrategy::SetLONG(const std::string name, const long_data*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Long int data sequence
-		 */
-		void
-		SetLONG (const std::string name, const long_data& r);
-		
-		
-		/**
-		 * @brief       @see ReconStrategy::GetLONG(const std::string name, long_data*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Long int data sequence
-		 */
-		void
-		GetLONG (const std::string name, long_data& r);
+		template <class T> void
+		GetMatrix          (const std::string name, T& t) {
+
+			DataBase::Instance()->SetMatrix(name, t);
+
+		}
 		
 		
  		/**

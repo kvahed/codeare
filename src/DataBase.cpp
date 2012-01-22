@@ -50,8 +50,8 @@ DataBase::Finalise () {
 }
 
 
-Matrix<cxfl>& 
-DataBase::AddCXFL (const string name, Ptr< Matrix<cxfl> > m) {
+template<> Matrix<cxfl>& 
+DataBase::AddMatrix (const string name, Ptr< Matrix<cxfl> > m) {
 	
 	assert (m_cxfl.find (name) == m_cxfl.end());
 	m_cxfl.insert (pair< string, Ptr < Matrix<cxfl> > >(name, m));
@@ -84,8 +84,8 @@ DataBase::GetCXFL (const string name) {
 }
 	
 
-void
-DataBase::GetCXFL (const string name, cxfl_data& c) {
+template<> void
+DataBase::GetMatrix (const string name, cxfl_data& c) {
 	
 	if (m_cxfl.find (name) == m_cxfl.end())
 		return;
@@ -115,8 +115,8 @@ DataBase::GetMatrix (const string name, Matrix<cxfl>& m) {
 }
 
 
-void 
-DataBase::SetCXFL (const string name, const cxfl_data& c)   {
+template<> void 
+DataBase::SetMatrix (const string name, const cxfl_data& c)   {
 	
 	Ptr< Matrix<cxfl> > tmp;
 	
@@ -152,8 +152,8 @@ DataBase::SetMatrix (const string name, Matrix<cxfl>& m)   {
 }
 
 
-Matrix<cxdb>& 
-DataBase::AddCXDB (const string name, Ptr< Matrix<cxdb> > m) {
+template<> Matrix<cxdb>& 
+DataBase::AddMatrix (const string name, Ptr< Matrix<cxdb> > m) {
 	
 	assert (m_cxdb.find (name) == m_cxdb.end());
 	m_cxdb.insert (pair< string, Ptr < Matrix<cxdb> > >(name, m));
@@ -186,8 +186,8 @@ DataBase::GetCXDB (const string name) {
 }
 	
 
-void
-DataBase::GetCXDB (const string name, cxdb_data& c) {
+template<> void
+DataBase::GetMatrix (const string name, cxdb_data& c) {
 	
 	if (m_cxdb.find (name) == m_cxdb.end())
 		return;
@@ -217,8 +217,8 @@ DataBase::GetMatrix (const string name, Matrix<cxdb>& m) {
 }
 
 
-void 
-DataBase::SetCXDB (const string name, const cxdb_data& c)   {
+template<> void 
+DataBase::SetMatrix (const string name, const cxdb_data& c)   {
 	
 	Ptr< Matrix<cxdb> > tmp;
 	
@@ -254,8 +254,8 @@ DataBase::SetMatrix (const string name, Matrix<cxdb>& m)   {
 }
 
 
-Matrix<float>&
-DataBase::AddRLFL         (const string name, Ptr< Matrix<float> > m) {
+template<> Matrix<float>&
+DataBase::AddMatrix         (const string name, Ptr< Matrix<float> > m) {
 	
 	assert(m_rlfl.find (name) == m_rlfl.end());
 	m_rlfl.insert (pair< string, Ptr < Matrix<float> > >(name, m));
@@ -288,8 +288,8 @@ DataBase::GetRLFL (const string name) {
 }
 
 		
-void 
-DataBase::GetRLFL        (const string name, rlfl_data& r) {
+template<> void 
+DataBase::GetMatrix        (const string name, rlfl_data& r) {
 	
 	if (m_rlfl.find (name) == m_rlfl.end())
 		return;
@@ -319,8 +319,8 @@ DataBase::GetMatrix         (const string name, Matrix<float>& m) {
 }
 		
 	
-void 
-DataBase::SetRLFL        (const string name, const rlfl_data& r)   {
+template<> void
+DataBase::SetMatrix        (const string name, const rlfl_data& r)   {
 	
 	Ptr< Matrix<float> > tmp;
 	
@@ -356,8 +356,8 @@ DataBase::SetMatrix         (const string name, Matrix<float>& m)   {
 }
 		
 
-Matrix<double>&
-DataBase::AddRLDB         (const string name, Ptr< Matrix<double> > m) {
+template<> Matrix<double>&
+DataBase::AddMatrix         (const string name, Ptr< Matrix<double> > m) {
 	
 	assert(m_rldb.find (name) == m_rldb.end());
 	m_rldb.insert (pair< string, Ptr < Matrix<double> > >(name, m));
@@ -390,8 +390,8 @@ DataBase::GetRLDB (const string name) {
 }
 
 		
-void 
-DataBase::GetRLDB        (const string name, rldb_data& r) {
+template<> void 
+DataBase::GetMatrix        (const string name, rldb_data& r) {
 	
 	if (m_rldb.find (name) == m_rldb.end())
 		return;
@@ -421,8 +421,8 @@ DataBase::GetMatrix         (const string name, Matrix<double>& m) {
 }
 		
 	
-void 
-DataBase::SetRLDB        (const string name, const rldb_data& r)   {
+template<> void 
+DataBase::SetMatrix        (const string name, const rldb_data& r)   {
 	
 	Ptr< Matrix<double> > tmp;
 	
@@ -458,8 +458,8 @@ DataBase::SetMatrix         (const string name, Matrix<double>& m)   {
 }
 	
 
-Matrix<short>&
-DataBase::AddSHRT        (const string name, Ptr< Matrix<short> > m) {
+template<> Matrix<short>&
+DataBase::AddMatrix        (const string name, Ptr< Matrix<short> > m) {
 	
 	assert (m_shrt.find (name) == m_shrt.end());
 	m_shrt.insert (pair<string, Ptr< Matrix<short> > > (name, m));
@@ -492,8 +492,8 @@ DataBase::GetSHRT         (const string name) {
 }
 
 
-void 
-DataBase::GetSHRT          (const string name, shrt_data& p) {
+template<> void 
+DataBase::GetMatrix          (const string name, shrt_data& p) {
 	
 	if (m_shrt.find (name) == m_shrt.end())
 		return;
@@ -525,8 +525,8 @@ DataBase::GetMatrix         (const string name, Matrix<short>& m) {
 }
 
 		
-void 
-DataBase::SetSHRT         (const string name, const shrt_data& p)   {
+template<> void 
+DataBase::SetMatrix         (const string name, const shrt_data& p)   {
 	
 	Ptr< Matrix<short> > tmp;
 	
@@ -562,8 +562,8 @@ DataBase::SetMatrix         (const string name, Matrix<short>& m)   {
 }
 
 		
-Matrix<long>&
-DataBase::AddLONG        (const string name, Ptr< Matrix<long> > m) {
+template<> Matrix<long>&
+DataBase::AddMatrix        (const string name, Ptr< Matrix<long> > m) {
 	
 	assert (m_long.find (name) == m_long.end());
 	m_long.insert (pair<string, Ptr< Matrix<long> > > (name, m));
@@ -596,8 +596,8 @@ DataBase::GetLONG         (const string name) {
 }
 
 
-void 
-DataBase::GetLONG          (const string name, long_data& p) {
+template<> void 
+DataBase::GetMatrix          (const string name, long_data& p) {
 	
 	if (m_long.find (name) == m_long.end())
 		return;
@@ -629,8 +629,8 @@ DataBase::GetMatrix         (const string name, Matrix<long>& m) {
 }
 
 		
-void 
-DataBase::SetLONG         (const string name, const long_data& p)   {
+template<> void 
+DataBase::SetMatrix         (const string name, const long_data& p)   {
 	
 	Ptr< Matrix<long> > tmp;
 	

@@ -139,9 +139,9 @@ namespace RRServer {
 		 * @param  m    The added matrix
 		 * @return      Success
 		 */
-		Matrix<cxfl>& 
-		AddCXFL         (const string name, Ptr< Matrix<cxfl> > m) const {
-			return DataBase::Instance()->AddCXFL(name, m);
+		template <class T> Matrix<T>& 
+		AddMatrix         (const string name, Ptr< Matrix<T> > p) const {
+			return DataBase::Instance()->AddMatrix(name, p);
 		}
 		
 		
@@ -170,19 +170,6 @@ namespace RRServer {
 
 
 		/**
-		 * @brief       Add a complex matrix to complex double matrix database
-		 *
-		 * @param  name Name
-		 * @param  m    The added matrix
-		 * @return      Success
-		 */
-		Matrix<cxdb>& 
-		AddCXDB         (const string name, Ptr< Matrix<cxdb> > m) const {
-			return DataBase::Instance()->AddCXDB(name, m);
-		}
-		
-		
-		/**
 		 * @brief       Get reference to complex double data by name from database
 		 * 
 		 * @param  name Name
@@ -206,19 +193,6 @@ namespace RRServer {
 		}
 
 
-		/**
-		 * @brief       Add a complex matrix to complex single matrix database
-		 *
-		 * @param  name Name
-		 * @param  m    The added matrix
-		 * @return      Success
-		 */
-		Matrix<float>& 
-		AddRLFL         (const string name, Ptr< Matrix<float> > m) const {
-			return DataBase::Instance()->AddRLFL(name, m);
-		}
-		
-		
 		/**
 		 * @brief       Get reference to complex single data by name from database
 		 * 
@@ -244,19 +218,6 @@ namespace RRServer {
 
 
 		/**
-		 * @brief       Add a complex matrix to complex double matrix database
-		 *
-		 * @param  name Name
-		 * @param  m    The added matrix
-		 * @return      Success
-		 */
-		Matrix<double>& 
-		AddRLDB         (const string name, Ptr< Matrix<double> > m) const {
-			return DataBase::Instance()->AddRLDB(name, m);
-		}
-		
-		
-		/**
 		 * @brief       Get reference to complex double data by name from database
 		 * 
 		 * @param  name Name
@@ -281,19 +242,6 @@ namespace RRServer {
 
 
 		/**
-		 * @brief       Add a complex matrix to complex double matrix database
-		 *
-		 * @param  name Name
-		 * @param  m    The added matrix
-		 * @return      Success
-		 */
-		Matrix<short>& 
-		AddSHRT         (const string name, Ptr< Matrix<short> > m) const {
-			return DataBase::Instance()->AddSHRT(name, m);
-		}
-		
-		
-		/**
 		 * @brief       Get reference to complex double data by name from database
 		 * 
 		 * @param  name Name
@@ -317,19 +265,6 @@ namespace RRServer {
 		}
 
 
-		/**
-		 * @brief       Add a complex matrix to complex double matrix database
-		 *
-		 * @param  name Name
-		 * @param  m    The added matrix
-		 * @return      Success
-		 */
-		Matrix<long>& 
-		AddLONG         (const string name, Ptr< Matrix<long> > m) const {
-			return DataBase::Instance()->AddLONG(name, m);
-		}
-		
-		
 		/**
 		 * @brief       Get reference to complex double data by name from database
 		 * 
