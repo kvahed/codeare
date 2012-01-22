@@ -77,7 +77,7 @@ CompressedSensing::Process () {
 	Matrix<cxfl>&   data  = GetCXFL("data");
 	Matrix<double>& pdf   = GetRLDB("pdf");
 
-	Matrix<cxfl>&   im_dc = AddCXFL ("im_dc", new Matrix<cxfl> (data.Dim()));
+	Matrix<cxfl>&   im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
 
 	ticks tic = getticks();
 

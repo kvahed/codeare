@@ -217,7 +217,7 @@ CGSENSE::Process () {
 	IntensityCorrection (sens, m_intcor);
 	
 	// Out going images -----------------------------------------------
-	Matrix<cxfl>& image = AddCXFL ("image", NEW (Matrix<cxfl>(m_N[0], m_N[1], m_N[2])));
+	Matrix<cxfl>& image = AddMatrix ("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(m_N[0], m_N[1], m_N[2])));
 
 	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
@@ -290,7 +290,7 @@ CGSENSE::Process () {
 	if (m_verbose) {
 		
 		// CG residuals ------------------
-		Matrix<double>& nrmse = AddRLDB ("nrmse", NEW (Matrix<double> (iters,1)));
+		Matrix<double>& nrmse = AddMatrix ("nrmse", (Ptr<Matrix<double> >) NEW (Matrix<double> (iters,1)));
 		memcpy (&nrmse[0], &res[0], iters * sizeof(double));
 		
 	} else {

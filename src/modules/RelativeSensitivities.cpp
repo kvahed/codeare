@@ -68,10 +68,10 @@ RelativeSensitivities::Process     () {
     // -----------------------------------------
 
     // SVD calibration -------------------------
-    Matrix<cxfl>&   rxm  = AddCXFL ("rxm",  NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
-    Matrix<cxfl>&   txm  = AddCXFL ("txm",  NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
-    Matrix<cxfl>&   shim = AddCXFL ("shim", NEW (Matrix<cxfl>   (data.Dim(4), 1)));
-    Matrix<double>& snro = AddRLDB ("snro", NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
+    Matrix<cxfl>&   rxm  = AddMatrix ("rxm",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
+    Matrix<cxfl>&   txm  = AddMatrix ("txm",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
+    Matrix<cxfl>&   shim = AddMatrix ("shim", (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (data.Dim(4), 1)));
+    Matrix<double>& snro = AddMatrix ("snro", (Ptr<Matrix<double> >) NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
 
     SVDCalibrate (data, rxm, txm, snro, shim, false);
 
@@ -79,7 +79,7 @@ RelativeSensitivities::Process     () {
 
     // Do we have GRE for segmentation? --------
 	
-    Matrix<short>& bets = AddSHRT ("bets", NEW (Matrix<short> (mask.Dim())));
+    Matrix<short>& bets = AddMatrix ("bets", (Ptr<Matrix<short> >) NEW (Matrix<short> (mask.Dim())));
 	
     if (m_use_bet == 1) { // Better test? / Replace with SNRO?
 		
@@ -113,7 +113,7 @@ RelativeSensitivities::Process     () {
 
     // B0 calculation --------------------------
 	
-    Matrix<double>& b0 = AddRLDB ("b0", NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
+    Matrix<double>& b0 = AddMatrix ("b0", (Ptr<Matrix<double> >) NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
 	
     B0Map (data, b0, m_echo_shift);
     // -----------------------------------------

@@ -23,7 +23,8 @@
 #include "Matrix.hpp"
 #include "DataBase.hpp"
 
-using namespace RRServer;
+namespace RRServer {
+
 
 RemoteContext::~RemoteContext () {
 	
@@ -88,78 +89,6 @@ RemoteContext::ReadConfig       (const char* fname) {
 }
 
 
-void
-RemoteContext::SetCXFL          (const std::string name, const cxfl_data& r) {
-	DataBase::Instance()->SetCXFL(name, r);
-}
-
-
-void
-RemoteContext::GetCXFL          (const std::string name, cxfl_data& r) {
-	DataBase::Instance()->GetCXFL(name, r);
-}
-
-
-void
-RemoteContext::SetCXDB          (const std::string name, const cxdb_data& r) {
-	DataBase::Instance()->SetCXDB(name, r);
-}
-
-
-void
-RemoteContext::GetCXDB          (const std::string name, cxdb_data& r) {
-	DataBase::Instance()->GetCXDB(name, r);
-}
-
-
-void
-RemoteContext::SetRLDB (const std::string name, const rldb_data& r) {
-	DataBase::Instance()->SetRLDB(name, r);
-}
-
-
-void
-RemoteContext::GetRLDB (const std::string name, rldb_data& r) {
-	DataBase::Instance()->GetRLDB(name, r);
-}
-
-
-void
-RemoteContext::SetRLFL (const std::string name, const rlfl_data& r) {
-	DataBase::Instance()->SetRLFL(name, r);
-}
-
-
-void
-RemoteContext::GetRLFL (const std::string name, rlfl_data& r) {
-	DataBase::Instance()->GetRLFL(name, r);
-}
-
-
-void
-RemoteContext::SetSHRT (const std::string name, const shrt_data& r) {
-	DataBase::Instance()->SetSHRT(name, r);
-}
-
-
-void
-RemoteContext::GetSHRT (const std::string name, shrt_data& r) {
-	DataBase::Instance()->GetSHRT(name, r);
-}
-
-
-void
-RemoteContext::SetLONG (const std::string name, const long_data& r) {
-	DataBase::Instance()->SetLONG(name, r);
-}
-
-
-void
-RemoteContext::GetLONG (const std::string name, long_data& r) {
-	DataBase::Instance()->GetLONG(name, r);
-}
-
-
 void 
 RemoteContext::Name (const char* name) { 
 	m_strategy->Name(name);
@@ -170,5 +99,5 @@ const char*
 RemoteContext::Name () {return m_strategy->Name();}
 
 
-
+}
 

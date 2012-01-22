@@ -100,9 +100,9 @@ DirectMethod::Process     () {
 	sb.cb0   = m_cb0;
 
     // Outgoing
-    AddCXFL ( "rf", sb.rf  = NEW (Matrix<cxfl>  (sb.g->Dim(1), sb.b1->Dim(1))));
-    AddCXFL ("mxy", sb.mxy = NEW (Matrix<cxfl>  (           1, sb.r->Dim(1))));
-    AddRLFL ( "mz", sb.mz  = NEW (Matrix<float> (           1, sb.r->Dim(1))));
+    AddMatrix ( "rf", sb.rf  = NEW (Matrix<cxfl>  (sb.g->Dim(1), sb.b1->Dim(1))));
+    AddMatrix ("mxy", sb.mxy = NEW (Matrix<cxfl>  (           1, sb.r->Dim(1))));
+    AddMatrix ( "mz", sb.mz  = NEW (Matrix<float> (           1, sb.r->Dim(1))));
 
     // Initialise CPU/GPU simulator
     SimulationContext sc (&sb);

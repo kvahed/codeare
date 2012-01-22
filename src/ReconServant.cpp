@@ -132,7 +132,7 @@ ReconServant::Prepare  (const char* name)       {
 void
 ReconServant::set_cxfl  (const char* name, const cxfl_data& c) {
 	
-	DataBase::Instance()->SetCXFL(name, c);
+	DataBase::Instance()->SetMatrix(name, c);
 	
 }
 
@@ -142,7 +142,7 @@ ReconServant::get_cxfl (const char* name, cxfl_data& c) {
 	
 	c.dims.length(INVALID_DIM);
 	c.res.length (INVALID_DIM);
-	DataBase::Instance()->GetCXFL(name, c);
+	DataBase::Instance()->GetMatrix(name, c);
 	
 }
 
@@ -150,7 +150,7 @@ ReconServant::get_cxfl (const char* name, cxfl_data& c) {
 void
 ReconServant::set_cxdb  (const char* name, const cxdb_data& c) {
 	
-	DataBase::Instance()->SetCXDB(name, c);
+	DataBase::Instance()->SetMatrix(name, c);
 	
 }
 
@@ -160,7 +160,7 @@ ReconServant::get_cxdb (const char* name, cxdb_data& c) {
 	
 	c.dims.length(INVALID_DIM);
 	c.res.length (INVALID_DIM);
-	DataBase::Instance()->GetCXDB(name, c);
+	DataBase::Instance()->GetMatrix(name, c);
 	
 }
 
@@ -168,7 +168,7 @@ ReconServant::get_cxdb (const char* name, cxdb_data& c) {
 void
 ReconServant::set_rldb       (const char* name, const rldb_data& r)   {
 	
-	DataBase::Instance()->SetRLDB(name, r);
+	DataBase::Instance()->SetMatrix(name, r);
 	
 }
 
@@ -178,7 +178,7 @@ ReconServant::get_rldb       (const char* name, rldb_data& r) {
 	
 	r.dims.length(INVALID_DIM);
 	r.res.length (INVALID_DIM);
-	DataBase::Instance()->GetRLDB(name, r);
+	DataBase::Instance()->GetMatrix(name, r);
 	
 }
 
@@ -186,7 +186,7 @@ ReconServant::get_rldb       (const char* name, rldb_data& r) {
 void
 ReconServant::set_rlfl       (const char* name, const rlfl_data& r)   {
 	
-	DataBase::Instance()->SetRLFL(name, r);
+	DataBase::Instance()->SetMatrix(name, r);
 	
 }
 
@@ -196,7 +196,7 @@ ReconServant::get_rlfl       (const char* name, rlfl_data& r) {
 	
 	r.dims.length(INVALID_DIM);
 	r.res.length(INVALID_DIM);
-	DataBase::Instance()->GetRLFL(name, r);
+	DataBase::Instance()->GetMatrix(name, r);
 	
 }
 
@@ -204,7 +204,7 @@ ReconServant::get_rlfl       (const char* name, rlfl_data& r) {
 void
 ReconServant::set_shrt        (const char* name, const shrt_data& p) {
 	
-	DataBase::Instance()->SetSHRT(name, p);
+	DataBase::Instance()->SetMatrix(name, p);
 	
 }
 
@@ -214,7 +214,7 @@ ReconServant::get_shrt        (const char* name, shrt_data& p) {
 	
 	p.dims.length(INVALID_DIM);
 	p.res.length(INVALID_DIM);
-	DataBase::Instance()->GetSHRT(name, p);
+	DataBase::Instance()->GetMatrix(name, p);
 	
 }
 
@@ -222,7 +222,7 @@ ReconServant::get_shrt        (const char* name, shrt_data& p) {
 void
 ReconServant::set_long        (const char* name, const long_data& p) {
 	
-	DataBase::Instance()->SetLONG(name, p);
+	DataBase::Instance()->SetMatrix(name, p);
 	
 }
 
@@ -232,7 +232,7 @@ ReconServant::get_long        (const char* name, long_data& p) {
 	
 	p.dims.length(INVALID_DIM);
 	p.res.length(INVALID_DIM);
-	DataBase::Instance()->GetLONG(name, p);
+	DataBase::Instance()->GetMatrix(name, p);
 	
 }
 
