@@ -159,11 +159,6 @@ bool cgsensetest (ReconClient& rc) {
 			return false;
 		}
 
-		if (rc.Init ("LapackTests") != OK) {
-			printf ("Intialising failed ... bailing out!"); 
-			return false;
-		}
-
 		rc.Attribute ("pulses", (int*)&pulses);
 		
 		// Outgoing -------------
@@ -186,7 +181,7 @@ bool cgsensetest (ReconClient& rc) {
 
 		// ---------------------
 		
-		rc.Finalise   (test);
+		//rc.Finalise   (test);
 		
 	} else {
 		/*

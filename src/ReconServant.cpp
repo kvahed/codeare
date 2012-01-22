@@ -19,83 +19,82 @@
  */
 
 #include "ReconServant.hpp"
-#include "ReconContext.hpp"
+#include "RemoteContext.hpp"
 
 using namespace RRServer;
 
 ReconServant::ReconServant  () : 
-	m_config (new char) {
 
+	m_config (new char) {
+	
 }
 
 
 ReconServant::~ReconServant ()               {
-
-	this->CleanUp();
-
+	
+	this->Finalise();
+	
 }
 
 
 error_code
 ReconServant::CleanUp () {
-
+	
 	this->Finalise();
-	delete m_config;
-
+	
 }
 
 error_code
 ReconServant::Init (const char* name) {
-
-	ReconContext* rc;
+	
+	RemoteContext* rc;
 	error_code e = OK;
 	
-	m_contexts.insert (pair< std::string, ReconContext* > (std::string(name), rc = new ReconContext(name)));
-
+	m_contexts.insert (pair< std::string, RemoteContext* > (std::string(name), rc = new RemoteContext(name)));
+	
     rc->SetConfig (m_config);
-
+	
 	if ((e = rc->Init()) != OK) {
-		Finalise();
+		this->Finalise();
 		return CONTEXT_CONFIGURATION_FAILED;
 	}
-
+	
 	return e;
-
+	
 }
 
 
 error_code
 ReconServant::Finalise (const char* name) {
-
-	error_code e = OK;
-
+	
 	if (!name) {
-
+		
 		DataBase::Instance()->Finalise();
-
+		
 	} else {
 		
-		map<string, ReconContext*>::iterator it = m_contexts.find (name);
+		map<string, RemoteContext*>::iterator it = m_contexts.find (name);
 		
 		if (it == m_contexts.end()) {
-			e = CONTEXT_NOT_FOUND;
+			Finalise ();
+			return CONTEXT_NOT_FOUND;
 		} else {
 			delete it->second;
 			m_contexts.erase(it);
 		}
 	}
-
-	return e;
-
-}
 	
+	return OK;
+	
+}
+
 
 error_code
 ReconServant::Process  (const char* name)       {
 	
 	error_code e = OK;
 	
-	map<string, ReconContext*>::iterator it = m_contexts.find (name);
+	map<string, RemoteContext*>::iterator it = m_contexts.find (name);
 	
 	if (it == m_contexts.end()) 
 		e = CONTEXT_NOT_FOUND;
@@ -115,7 +114,7 @@ ReconServant::Prepare  (const char* name)       {
 	
 	error_code e = OK;
 	
-	map<string, ReconContext*>::iterator it = m_contexts.find (name);
+	map<string, RemoteContext*>::iterator it = m_contexts.find (name);
 	
 	if (it == m_contexts.end()) 
 		e = CONTEXT_NOT_FOUND;
@@ -198,66 +197,66 @@ ReconServant::get_rlfl       (const char* name, rlfl_data& r) {
 	r.dims.length(INVALID_DIM);
 	r.res.length(INVALID_DIM);
 	DataBase::Instance()->GetRLFL(name, r);
-
+	
 }
 
 
 void
 ReconServant::set_shrt        (const char* name, const shrt_data& p) {
-
+	
 	DataBase::Instance()->SetSHRT(name, p);
-
+	
 }
 
 
 void
 ReconServant::get_shrt        (const char* name, shrt_data& p) {
-
+	
 	p.dims.length(INVALID_DIM);
 	p.res.length(INVALID_DIM);
 	DataBase::Instance()->GetSHRT(name, p);
-
+	
 }
 
 
 void
 ReconServant::set_long        (const char* name, const long_data& p) {
-
+	
 	DataBase::Instance()->SetLONG(name, p);
-
+	
 }
 
 
 void
 ReconServant::get_long        (const char* name, long_data& p) {
-
+	
 	p.dims.length(INVALID_DIM);
 	p.res.length(INVALID_DIM);
 	DataBase::Instance()->GetLONG(name, p);
-
+	
 }
 
 
 void 
 ReconServant::config       (const char* d)    {
-
+	
 	std::stringstream tmp;
-
+	
 	tmp << d;
 	m_config = new char[tmp.str().length() + 1];
 	strcpy (m_config, tmp.str().c_str());
-
+	
 }
 
 
 char* 
 ReconServant::config       ()                    {
-
+	
 	std::stringstream tmp;
-
+	
 	tmp << m_config;
-
+	
 	return CORBA::string_dup(tmp.str().c_str());
-
+	
 }
 
