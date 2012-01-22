@@ -18,8 +18,8 @@
  *  02110-1301  USA
  */
 
-#ifndef __RECONCONTEXT_HPP__
-#define __RECONCONTEXT_HPP__
+#ifndef __REMOTE_CONTEXT_HPP__
+#define __REMOTE_CONTEXT_HPP__
 
 #include "ReconStrategy.hpp"
 #include "Connector.hpp"
@@ -31,7 +31,7 @@ namespace RRServer {
 	/**
 	 * @brief Context of a reconstruction method. Abstraction layer to algorithm backends. 
 	 */
-	class ReconContext : public Connector {
+	class RemoteContext : public Connector {
 		
 		
 		
@@ -41,7 +41,7 @@ namespace RRServer {
 		/**
 		 * @brief        Unload library and destruct.
 		 */ 
-		~ReconContext    ();
+		~RemoteContext    ();
 		
 		
 		/**
@@ -51,7 +51,7 @@ namespace RRServer {
 		 *
 		 * @name         Name of algorithm
 		 */
-		ReconContext     (const char* name);
+		RemoteContext     (const char* name);
 		
 		
 		/**
@@ -62,7 +62,7 @@ namespace RRServer {
 		inline ReconStrategy*
 		Strategy         ();
 		
-
+		
 		/**
 		 * @brief        Process. @see ReconStrategy::Process()
 		 *
@@ -98,7 +98,7 @@ namespace RRServer {
 		RRSModule::error_code
 		Finalise     ();
 		
-
+		
 		/**
 		 * @brief        @see Reconstrategy::SetConfig(const char*)
 		 *
@@ -116,7 +116,7 @@ namespace RRServer {
 		void
 		ReadConfig       (const char* fname);
 		
-
+		
 		/**
 		 * @brief        @see ReconStrategy::SetCXFL(const std::string name, const cxfl_data&)
 		 *
@@ -126,17 +126,7 @@ namespace RRServer {
 		void
 		SetCXFL          (const std::string name, const cxfl_data& r);
 		
-
-		/**
-		 * @brief       @see ReconStrategy::SetCXFL(const std::string name, const Matrix<cxfl>&)
-		 *
-		 * @param  name  Name
-		 * @param  r    Complex data matrix
-		 */
-		void
-		SetCXFL          (const std::string name, Matrix<cxfl>& r);
 		
-
 		/**
 		 * @brief       @see ReconStrategy::GetCXFL(const std::string name, cxfl_data&)
 		 *
@@ -146,17 +136,7 @@ namespace RRServer {
 		void
 		GetCXFL          (const std::string name, cxfl_data& r);
 		
-
-		/**
-		 * @brief       @see ReconStrategy::GetCXFL(const std::string name, Matrix<cxfl>*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Complex data matrix
-		 */
-		void
-		GetCXFL          (const std::string name, Matrix<cxfl>& r);
 		
-
 		/**
 		 * @brief        @see ReconStrategy::SetCXDB(const std::string name, const cxdb_data&)
 		 *
@@ -166,17 +146,7 @@ namespace RRServer {
 		void
 		SetCXDB          (const std::string name, const cxdb_data& r);
 		
-
-		/**
-		 * @brief       @see ReconStrategy::SetCXDB(const std::string name, const Matrix<cxdb>&)
-		 *
-		 * @param  name  Name
-		 * @param  r    Complex data matrix
-		 */
-		void
-		SetCXDB          (const std::string name, Matrix<cxdb>& r);
 		
-
 		/**
 		 * @brief       @see ReconStrategy::GetCXDB(const std::string name, cxdb_data&)
 		 *
@@ -186,17 +156,7 @@ namespace RRServer {
 		void
 		GetCXDB          (const std::string name, cxdb_data& r);
 		
-
-		/**
-		 * @brief       @see ReconStrategy::GetCXDB(const std::string name, Matrix<cxdb>*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Complex data matrix
-		 */
-		void
-		GetCXDB          (const std::string name, Matrix<cxdb>& r);
 		
-
 		/**
 		 * @brief       @see ReconStrategy::SetRLDB(const std::string name, const rldb_data*)
 		 *
@@ -206,37 +166,17 @@ namespace RRServer {
 		void
 		SetRLDB (const std::string name, const rldb_data& r);
 		
-
+		
 		/**
 		 * @brief       @see ReconStrategy::SetRLDB(const std::string name, const Matrix<double>*)
 		 *
 		 * @param  name  Name
 		 * @param  r    Real data matrix
-		 */
-		void
-		SetRLDB (const std::string name, Matrix<double>& r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::SetRLDB(const std::string name, const Matrix<double>*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Real data matrix
-		 */
-		void
-		GetRLDB (const std::string name, Matrix<double>& r);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::GetRLDB(const std::string name, rldb_data*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Real data sequence
 		 */
 		void
 		GetRLDB (const std::string name, rldb_data& r);
 		
-
+		
 		/**
 		 * @brief       @see ReconStrategy::SetRLFL(const std::string name, const rlfl_data*)
 		 *
@@ -246,37 +186,17 @@ namespace RRServer {
 		void
 		SetRLFL (const std::string name, const rlfl_data& f);
 		
-
+		
 		/**
 		 * @brief       @see ReconStrategy::SetRLFL(const std::string name, const Matrix<float>*)
 		 *
 		 * @param  name  Name
 		 * @param  f     Float data matrix
-		 */
-		void
-		SetRLFL (const std::string name, Matrix<float>& f);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::SetRLFL(const std::string name, const Matrix<float>*)
-		 *
-		 * @param  name  Name
-		 * @param  f     Float data matrix
-		 */
-		void
-		GetRLFL (const std::string name, Matrix<float>& f);
-		
-
-		/**
-		 * @brief       @see ReconStrategy::GetRLFL(const std::string name, rlfl_data*)
-		 *
-		 * @param  name  Name
-		 * @param  f    Float data sequence
 		 */
 		void
 		GetRLFL (const std::string name, rlfl_data& f);
 		
-
+		
 		/**
 		 * @brief       @see ReconStrategy::SetSHRT(const std::string name, const shrt_data*)
 		 *
@@ -286,27 +206,7 @@ namespace RRServer {
 		void
 		SetSHRT (const std::string name, const shrt_data& r);
 		
-
-		/**
-		 * @brief       @see ReconStrategy::SetSHRT(const std::string name, const Matrix<short>*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Short int data matrix
-		 */
-		void
-		SetSHRT (const std::string name, Matrix<short>& r);
 		
-
-		/**
-		 * @brief       @see ReconStrategy::GetSHRT(const std::string name, Matrix<short>*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Short int data matrix
-		 */
-		void
-		GetSHRT (const std::string name, Matrix<short>& r);
-		
-
 		/**
 		 * @brief       @see ReconStrategy::GetSHRT(const std::string name, shrt_data*)
 		 *
@@ -316,7 +216,7 @@ namespace RRServer {
 		void
 		GetSHRT (const std::string name, shrt_data& r);
 		
-
+		
 		/**
 		 * @brief       @see ReconStrategy::SetLONG(const std::string name, const long_data*)
 		 *
@@ -326,27 +226,7 @@ namespace RRServer {
 		void
 		SetLONG (const std::string name, const long_data& r);
 		
-
-		/**
-		 * @brief       @see ReconStrategy::SetLONG(const std::string name, const Matrix<long>*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Long int data matrix
-		 */
-		void
-		SetLONG (const std::string name, Matrix<long>& r);
 		
-
-		/**
-		 * @brief       @see ReconStrategy::GetLONG(const std::string name, Matrix<long>*)
-		 *
-		 * @param  name  Name
-		 * @param  r    Long int data matrix
-		 */
-		void
-		GetLONG (const std::string name, Matrix<long>& r);
-		
-
 		/**
 		 * @brief       @see ReconStrategy::GetLONG(const std::string name, long_data*)
 		 *
@@ -356,7 +236,7 @@ namespace RRServer {
 		void
 		GetLONG (const std::string name, long_data& r);
 		
-
+		
  		/**
 		 * @brief       @see ReconStrategy::Name(const char*)
 		 *
@@ -371,19 +251,19 @@ namespace RRServer {
 		 * @return      Name
 		 */
 		const char* Name ();
-
+		
 
 	private:
-
+		
 		
 		ReconStrategy*  m_strategy;   /**< Active strategy           */
 		void*           m_dlib;       /**< Handle on startegy module */
 		
-
+		
 		/**
 		 * @brief        Default Constructor.
 		 */
-		ReconContext     ();
+		RemoteContext     ();
 		
 		
 	};

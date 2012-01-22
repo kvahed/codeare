@@ -38,7 +38,7 @@ using namespace std;
  */
 namespace RRServer {
 	
-	class ReconContext;
+	class RemoteContext;
 
 
 	/**
@@ -254,8 +254,8 @@ namespace RRServer {
 
 	private:
 		
-		char*                                m_config;   /**< Serialised XML document  */
-		std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
+		char*                                 m_config;   /**< Serialised XML document  */
+		std::map<std::string, RemoteContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
 	};
 

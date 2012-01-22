@@ -24,6 +24,8 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
 static std::string bars   = "***************************************************";
 static std::string blancs = "                                                   ";
 static std::string spear  = ">";
