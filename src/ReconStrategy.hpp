@@ -40,7 +40,7 @@
 using namespace RRSModule;
 using namespace std;
 
-namespace RRServer {
+namespace RRStrategy {
 
 	/**
 	 * @brief Strategy for reconstruction strategies
@@ -304,12 +304,12 @@ namespace RRServer {
 /**
  * @brief              Dynamic constructor
  */
-typedef RRServer::ReconStrategy* create_t  ();
+typedef RRStrategy::ReconStrategy* create_t  ();
 
 
 /**
  *@brief               Dynamic destructor
  */
-typedef void           destroy_t (RRServer::ReconStrategy*);
+typedef void           destroy_t (RRStrategy::ReconStrategy*);
 
 

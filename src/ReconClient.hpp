@@ -46,17 +46,16 @@ namespace RRClient {
 	/**
 	 * @brief               Remote reconstruction client 
 	 */
-	class ReconClient :
-		public Configurable, 
-		public Connector {
+	class ReconClient : public Configurable {
 		
 		
 	public:
 		
+		
 		/**
 		 * @brief           Construct and initialise remote interface
 		 */
-		ReconClient         (const char* name, const char* tracelevel);
+		ReconClient         (const char*& name, const char*& tracelevel);
 		
 		
 		/**
@@ -71,7 +70,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
-		error_code              
+		virtual error_code              
 		Process             (const char* name);
 		
 
@@ -81,7 +80,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
-		error_code              
+		virtual error_code              
 		Prepare             (const char* name);
 		
 
@@ -91,7 +90,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
-		error_code              
+		virtual error_code              
 		Init                (const char* name);
 		
 
@@ -101,7 +100,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error error
 		 */ 
-		error_code              
+		virtual error_code              
 		Finalise            (const char* name);
 		
 

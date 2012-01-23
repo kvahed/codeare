@@ -22,16 +22,16 @@
 #define __REMOTE_CONTEXT_HPP__
 
 #include "ReconStrategy.hpp"
-#include "Connector.hpp"
 #include <vector>
 
-namespace RRServer {
+
+namespace RRStrategy {
 
 
 	/**
 	 * @brief Context of a reconstruction method. Abstraction layer to algorithm backends. 
 	 */
-	class RemoteContext : public Connector {
+	class ReconContext {
 		
 		
 		
@@ -41,7 +41,7 @@ namespace RRServer {
 		/**
 		 * @brief        Unload library and destruct.
 		 */ 
-		~RemoteContext    ();
+		~ReconContext    ();
 		
 		
 		/**
@@ -51,7 +51,7 @@ namespace RRServer {
 		 *
 		 * @name         Name of algorithm
 		 */
-		RemoteContext     (const char* name);
+		ReconContext     (const char* name);
 		
 		
 		/**
@@ -138,11 +138,7 @@ namespace RRServer {
 		 * @param  r    Complex data sequence
 		 */
 		template <class T> void
-		GetMatrix          (const std::string name, T& t) {
-
-			DataBase::Instance()->SetMatrix(name, t);
-
-		}
+		GetMatrix          (const std::string name, T& t);
 		
 		
  		/**
@@ -171,7 +167,7 @@ namespace RRServer {
 		/**
 		 * @brief        Default Constructor.
 		 */
-		RemoteContext     ();
+		ReconContext     ();
 		
 		
 	};

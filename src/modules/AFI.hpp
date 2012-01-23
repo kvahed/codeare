@@ -24,9 +24,6 @@
 
 #include "ReconStrategy.hpp"
 
-using namespace RRServer;
-
-
 /**
  * @brief Reconstruction startegies
  */

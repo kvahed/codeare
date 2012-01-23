@@ -19,14 +19,14 @@
  */
 
 #include "Loader.hpp"
-#include "RemoteContext.hpp"
+#include "ReconContext.hpp"
 #include "Matrix.hpp"
 #include "DataBase.hpp"
 
-namespace RRServer {
+namespace RRStrategy {
 
 
-RemoteContext::~RemoteContext () {
+ReconContext::~ReconContext () {
 	
 	std::cout << "Deleting context " << m_strategy->Name() << " ..." << std::endl;
 
@@ -39,7 +39,7 @@ RemoteContext::~RemoteContext () {
 }
 
 
-RemoteContext::RemoteContext (const char* name) {
+ReconContext::ReconContext (const char* name) {
 
 	m_dlib = LoadModule ((char*)name);
 	create_t* create = (create_t*) GetFunction (m_dlib, (char*)"create");
@@ -50,53 +50,53 @@ RemoteContext::RemoteContext (const char* name) {
 
 
 
-RemoteContext::RemoteContext     () {}
+ReconContext::ReconContext     () {}
 		
 		
 RRSModule::error_code
-RemoteContext::Process          () {
+ReconContext::Process          () {
 	return m_strategy->Process();
 }
 
 
 RRSModule::error_code
-RemoteContext::Init             () {
+ReconContext::Init             () {
 	return m_strategy->Init();
 }
 
 
 RRSModule::error_code
-RemoteContext::Prepare             () {
+ReconContext::Prepare             () {
 	return m_strategy->Prepare();
 }
 
 
 RRSModule::error_code
-RemoteContext::Finalise     () {
+ReconContext::Finalise     () {
 	return m_strategy->Finalise();
 }
 
 
 void
-RemoteContext::SetConfig        (const char* cstr) {
+ReconContext::SetConfig        (const char* cstr) {
 	return m_strategy->SetConfig(cstr);
 }
 
 
 void
-RemoteContext::ReadConfig       (const char* fname) {
+ReconContext::ReadConfig       (const char* fname) {
 	m_strategy->ReadConfig(fname);
 }
 
 
 void 
-RemoteContext::Name (const char* name) { 
+ReconContext::Name (const char* name) { 
 	m_strategy->Name(name);
 }
 
 
 const char* 
-RemoteContext::Name () {return m_strategy->Name();}
+ReconContext::Name () {return m_strategy->Name();}
 
 
 }

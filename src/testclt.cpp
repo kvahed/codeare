@@ -20,7 +20,7 @@
 
 #include "options.h"
 #include "ReconClient.hpp"
-//#include "ReconContext.hpp"
+#include "LocalConnector.hpp"
 #include "modules/FFT.hpp"
 #include "MatrixOperations.hpp"
 
@@ -50,58 +50,130 @@ bool   pulses;
 
 bool init (int argc, char** argv);
 
-bool internaltest (ReconClient& rc); 
-bool cgsensetest  (ReconClient& rc);
-bool nuffttest    (ReconClient& rc);
-bool ktptest      (ReconClient& rc);
-bool mxtest       (ReconClient& rc);
-bool nitest       (ReconClient& rc);
-bool fftwtest     (ReconClient& rc);
-bool resetest     (ReconClient& rc);
-bool grappatest   (ReconClient& rc);
-bool cstest       (ReconClient& rc);
-bool dmtest       (ReconClient& rc);
+template <class T> bool 
+internaltest (Connector<T>& rc); 
 
+template <class T> bool 
+cgsensetest  (Connector<T>& rc);
+/*
+bool nuffttest    (Connector* rc);
+bool ktptest      (Connector* rc);
+bool mxtest       (Connector* rc);
+bool nitest       (Connector* rc);
+bool fftwtest     (Connector* rc);
+bool resetest     (Connector* rc);
+bool grappatest   (Connector* rc);
+bool cstest       (Connector* rc);
+bool dmtest       (Connector* rc);
+*/
 int main (int argc, char** argv) {
 	
+	//Connector* conn;
+	//ReconClient 
 	if (init (argc, argv)) {
 		
-		ReconClient client (name, verbose);
-		
-		if (strcmp (test, "NuFFT")   == 0)
-			nuffttest (client);
+		//if (remote)
+		Connector<ReconClient> conn (name, verbose);
+			//else 
+			//conn = (Connector*) new LocalConnector();
+
+		if (strcmp (test, "CGSENSE") == 0)
+			cgsensetest (conn);/*
+		else if (strcmp      (test, "NuFFT")   == 0)
+			nuffttest (conn);
 		else if (strcmp (test, "NuFFT_OMP")   == 0)
-			nuffttest (client);
-		else if (strcmp (test, "CGSENSE") == 0)
-			cgsensetest (client);
+			nuffttest (conn);
 		else if (strcmp (test, "GRAPPA") == 0)
-			grappatest (client);
+			grappatest (conn);
 		else if (strcmp (test, "KTPoints") == 0)
-			ktptest (client);
+			ktptest (conn);
 		else if (strcmp (test, "CompressedSensing") == 0)
-			cstest (client);
+			cstest (conn);
 		else if (strcmp (test, "mxtest") == 0)
-			mxtest (client);
+			mxtest (conn);
 		else if (strcmp (test, "nitest") == 0)
-			nitest (client);
+			nitest (conn);
 		else if (strcmp (test, "fftwtest") == 0)
-			fftwtest (client);
+			fftwtest (conn);
 		else if (strcmp (test, "RelativeSensitivities") == 0)
-			resetest (client);
+			resetest (conn);
 		else if (strcmp (test, "DirectMethod") == 0)
-			dmtest (client);
+		dmtest (conn);*/
 		else
-			internaltest (client);
-			
+			internaltest (conn);
 		return 0;
 
 	} else
-		
+
 		return 1;
 
 }
 
-bool grappatest (ReconClient& rc) {
+template <class T> bool 
+internaltest (Connector<T>& rc) {
+
+	int            i = 0, j = 0, d = 5;
+	
+	Matrix<cxfl>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	
+	r.Random(); 
+	h.Random();
+	p.Random();
+
+	Matrix<size_t> m (3,2);
+	m (0,0) = 1;
+	m (0,1) = 3;
+	m (1,0) = 1;
+	m (1,1) = 4;
+	m (2,0) = 1;
+	m (2,1) = 5;
+
+	std::cout << m << std::endl;
+	
+	Matrix<size_t> mg = Matrix<size_t>::MeshGrid(m);
+#ifdef HAVE_MAT_H	
+	mg.MXDump("mg.mat", "mg");
+#endif
+	
+	std::cout << r << std::endl;
+	std::cout << h << std::endl;
+	std::cout << p << std::endl;
+	
+	Matrix<std::complex<double> >  f = (Matrix<std::complex<double> >) r;
+
+	rc.ReadConfig("test.xml");
+	rc.Init(test);
+
+	rc.SetMatrix ("r", r);
+	rc.SetMatrix ("p", p);
+	rc.SetMatrix ("h", h);
+	
+	time_t seconds = time (NULL);
+	char   uid[16];
+	sprintf(uid,"%ld",seconds);
+	
+	rc.SetAttribute("UID", uid);
+	rc.SetAttribute("Pi", 3.14156);
+	rc.SetAttribute("Dim", d);
+	
+	rc.Process(test);
+	
+	rc.GetMatrix ("r", r);
+	rc.GetMatrix("p", p);
+	rc.GetMatrix ("h", h);
+
+	rc.Finalise (test);
+	
+	cout << "We're good" << endl;
+
+	return true;
+	
+}
+
+/*
+bool grappatest (Connector* rc) {
 
 	Matrix<cxfl> sig;
 	Matrix<cxfl> acs;
@@ -114,21 +186,23 @@ bool grappatest (ReconClient& rc) {
 	acs.MXRead  (df, "acs",  "");
 #endif
 
-	rc.ReadConfig (cf.c_str());
+	rc->ReadConfig (cf.c_str());
 	
-	rc.Init (test);
-	rc.SetMatrix  ("acs",  acs);
-	rc.Prepare (test);
-	rc.SetMatrix  ("data", sig); // Measurement data
-	rc.Process (test);
-	rc.GetMatrix  ("data", sig);
-	rc.Finalise (test);
+	rc->Init (test);
+	rc->SetMatrix  ("acs",  acs);
+	rc->Prepare (test);
+	rc->SetMatrix  ("data", sig); // Measurement data
+	rc->Process (test);
+	rc->GetMatrix  ("data", sig);
+	rc->Finalise (test);
 	
 	return true;
 
 }
+*/
 
-bool cgsensetest (ReconClient& rc) {
+template <class T> bool 
+cgsensetest (Connector<T>& rc) {
 
 	// Incoming
 	Matrix<cxfl>   rawdata;
@@ -229,8 +303,8 @@ bool cgsensetest (ReconClient& rc) {
 	return true;
 	
 }
-
-bool cstest (ReconClient& rc) {
+/*
+bool cstest (Connector* rc) {
 
 	Matrix<cxfl> indata;
 	Matrix<cxfl> im_dc;
@@ -249,29 +323,29 @@ bool cstest (ReconClient& rc) {
 
 	rc.ReadConfig (cf.c_str());
 	
-	if (rc.Init (test) != OK) {
+	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}
 	
 	// Outgoing -------------
 	
-	rc.SetMatrix  ("data", indata); // Measurement data
-	rc.SetMatrix  ("pdf",  pdf);  // Sensitivities
-	rc.SetMatrix  ("mask", mask); // Weights
+	rc->SetMatrix  ("data", indata); // Measurement data
+	rc->SetMatrix  ("pdf",  pdf);  // Sensitivities
+	rc->SetMatrix  ("mask", mask); // Weights
 	
 	// ---------------------
 	
-	rc.Process (test);
+	rc->Process (test);
 	
 	// Incoming -------------
 	
-	rc.GetMatrix ("data", indata);  // Images
-	rc.GetMatrix ("im_dc", im_dc);  // Images
+	rc->GetMatrix ("data", indata);  // Images
+	rc->GetMatrix ("im_dc", im_dc);  // Images
 	
 	// ---------------------
 	
-	rc.Finalise   (test);
+	rc->Finalise   (test);
 	
 #ifdef HAVE_MAT_H	
 	MATFile* mf = matOpen (odf.c_str(), "w");
@@ -294,7 +368,7 @@ bool cstest (ReconClient& rc) {
 	
 }
 
-bool dmtest (ReconClient& rc) {
+bool dmtest (Connector* rc) {
 
 	Matrix<cxfl>  b1;  
 	Matrix<cxfl>  tmxy;
@@ -312,49 +386,49 @@ bool dmtest (ReconClient& rc) {
 	std::string cf  = std::string (base + std::string(config));
 	std::string odf = std::string (base + std::string("/simout.mat"));
 
-	rc.ReadConfig (cf.c_str());
+	rc->ReadConfig (cf.c_str());
 	
-	std::string gf = std::string(base + std::string(rc.Attribute("gf"))); // gradient trajectories
-	std::string pf = std::string(base + std::string(rc.Attribute("pf"))); // patterns
-	std::string mf = std::string(base + std::string(rc.Attribute("mf"))); // maps
+	std::string gf = std::string(base + std::string(rc->Attribute("gf"))); // gradient trajectories
+	std::string pf = std::string(base + std::string(rc->Attribute("pf"))); // patterns
+	std::string mf = std::string(base + std::string(rc->Attribute("mf"))); // maps
 
 	// Gradients
 #ifdef HAVE_MAT_H
-	g.MXRead    (gf, rc.Attribute("g"));
-	j.MXRead    (gf, rc.Attribute("j"));
+	g.MXRead    (gf, rc->Attribute("g"));
+	j.MXRead    (gf, rc->Attribute("j"));
 
 	// Target excitation, ROI, sample
 	r.MXRead    (pf, "r");
-	tmxy.MXRead (pf, rc.Attribute("p"));
+	tmxy.MXRead (pf, rc->Attribute("p"));
 	tmz  = Matrix<float>::Zeros (r.Dim(1), 1);
 	smxy = Matrix<cxfl>::Zeros  (r.Dim(1), 1);
-	smz.MXRead (pf, rc.Attribute("s"));
-	roi.MXRead (pf, rc.Attribute("roi"));
+	smz.MXRead (pf, rc->Attribute("s"));
+	roi.MXRead (pf, rc->Attribute("roi"));
 
 	// Maps
-	b1.MXRead (mf, rc.Attribute("b1"));
-	b0.MXRead (mf, rc.Attribute("b0"));
+	b1.MXRead (mf, rc->Attribute("b1"));
+	b0.MXRead (mf, rc->Attribute("b0"));
 #endif	
-	if (rc.Init (test) != OK) {
+	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}
 
 	// Outgoing -------------
 	
-	rc.SetMatrix  (  "b1", b1  );
-	rc.SetMatrix (   "g", g  );
-	rc.SetMatrix (   "r", r   );
-	rc.SetMatrix (  "b0", b0  );
-	rc.SetMatrix  ("tmxy", tmxy);
-	rc.SetMatrix ( "tmz", tmz );
-	rc.SetMatrix  ("smxy", smxy);
-	rc.SetMatrix ( "smz", smz );
-	rc.SetMatrix (   "j", j   );
-	rc.SetMatrix ( "roi", roi );
+	rc->SetMatrix  (  "b1", b1  );
+	rc->SetMatrix (   "g", g  );
+	rc->SetMatrix (   "r", r   );
+	rc->SetMatrix (  "b0", b0  );
+	rc->SetMatrix  ("tmxy", tmxy);
+	rc->SetMatrix ( "tmz", tmz );
+	rc->SetMatrix  ("smxy", smxy);
+	rc->SetMatrix ( "smz", smz );
+	rc->SetMatrix (   "j", j   );
+	rc->SetMatrix ( "roi", roi );
 	// ---------------------
 	
-	rc.Process (test);
+	rc->Process (test);
 	
 	// Incoming -------------
 	
@@ -362,15 +436,15 @@ bool dmtest (ReconClient& rc) {
 	Matrix<cxfl>  mxy;
 	Matrix<float> mz;   
 
-	rc.GetMatrix  ( "mxy", mxy);
-	rc.GetMatrix (  "mz", mz);	
-	rc.GetMatrix  ("tmxy", tmxy);
-	rc.GetMatrix ( "tmz", tmz);	
-	rc.GetMatrix  (  "rf", rf);
+	rc->GetMatrix  ( "mxy", mxy);
+	rc->GetMatrix (  "mz", mz);	
+	rc->GetMatrix  ("tmxy", tmxy);
+	rc->GetMatrix ( "tmz", tmz);	
+	rc->GetMatrix  (  "rf", rf);
 
 	// ---------------------
 	
-	rc.Finalise   (test);
+	rc->Finalise   (test);
 	
 #ifdef HAVE_MAT_H	
 	MATFile* od = matOpen (odf.c_str(), "w");
@@ -396,7 +470,7 @@ bool dmtest (ReconClient& rc) {
 	
 }
 
-bool nuffttest (ReconClient& rc) {
+bool nuffttest (Connector* rc) {
 
 	Matrix<cxfl>   rawdata;
 	Matrix<double> weights;
@@ -406,8 +480,8 @@ bool nuffttest (ReconClient& rc) {
 	std::string    df  = std::string (base + std::string(data));
 	std::string    odf = std::string (base + std::string("/images.mat"));
 
-	rc.ReadConfig (cf.c_str());
-	rc.Init(test);
+	rc->ReadConfig (cf.c_str());
+	rc->Init(test);
 
 #ifdef HAVE_MAT_H	
 	weights.MXRead (df, "weights");
@@ -415,15 +489,15 @@ bool nuffttest (ReconClient& rc) {
 	kspace.MXRead  (df, "kspace");
 #endif
 
-	rc.SetMatrix    ("data",    rawdata);
-	rc.SetMatrix    ("weights", weights);
-	rc.SetMatrix    ("kspace",  kspace);
+	rc->SetMatrix    ("data",    rawdata);
+	rc->SetMatrix    ("weights", weights);
+	rc->SetMatrix    ("kspace",  kspace);
 	
-	rc.Process    (test);
+	rc->Process    (test);
 	
-	rc.GetMatrix    ("data", rawdata);
+	rc->GetMatrix    ("data", rawdata);
 
-	rc.Finalise(test);
+	rc->Finalise(test);
 
 #ifdef HAVE_MAT_H	
 	rawdata.MXDump   (odf.c_str(), "image");
@@ -437,7 +511,7 @@ bool nuffttest (ReconClient& rc) {
 }
 
 
-bool ktptest (ReconClient& rc) {
+bool ktptest (Connector* rc) {
 
 	Matrix<cxfl>   target;
 	Matrix<cxfl>   b1;
@@ -451,8 +525,8 @@ bool ktptest (ReconClient& rc) {
 	std::string    pdf = std::string (base + std::string("result.h5"));
 	std::string    rdf = std::string (base + std::string("residuals.h5"));
 
-	rc.ReadConfig (cf.c_str());
-	rc.Init(test);
+	rc->ReadConfig (cf.c_str());
+	rc->Init(test);
 
 	target.Read  (df, "target");
 	b1.Read      (df, "b1");
@@ -460,19 +534,19 @@ bool ktptest (ReconClient& rc) {
 	k.Read       (df, "k");
 	r.Read       (df, "r");
 
-	rc.SetMatrix    ("target", target);
-	rc.SetMatrix    ("b1",     b1);
-	rc.SetMatrix    ("r",      r);
-	rc.SetMatrix    ("k",      k);
-	rc.SetMatrix   ("b0",     b0);
+	rc->SetMatrix    ("target", target);
+	rc->SetMatrix    ("b1",     b1);
+	rc->SetMatrix    ("r",      r);
+	rc->SetMatrix    ("k",      k);
+	rc->SetMatrix   ("b0",     b0);
 	
-	rc.Process    (test);
+	rc->Process    (test);
 	
-	rc.GetMatrix    ("target", target);
-	rc.GetMatrix    ("b1",     b1);
-	rc.GetMatrix    ("r",      r);
+	rc->GetMatrix    ("target", target);
+	rc->GetMatrix    ("b1",     b1);
+	rc->GetMatrix    ("r",      r);
 
-	rc.Finalise(test);
+	rc->Finalise(test);
 	
 	std::string fname = std::string (base + std::string ("sdout.mat"));
 	
@@ -497,69 +571,7 @@ bool ktptest (ReconClient& rc) {
 
 }
 
-bool internaltest (ReconClient& rc) {
-
-	int            i = 0, j = 0, d = 5;
-	
-	Matrix<cxfl>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	
-	r.Random(); 
-	h.Random();
-	p.Random();
-
-	Matrix<size_t> m (3,2);
-	m (0,0) = 1;
-	m (0,1) = 3;
-	m (1,0) = 1;
-	m (1,1) = 4;
-	m (2,0) = 1;
-	m (2,1) = 5;
-
-	std::cout << m << std::endl;
-	
-	Matrix<size_t> mg = Matrix<size_t>::MeshGrid(m);
-#ifdef HAVE_MAT_H	
-	mg.MXDump("mg.mat", "mg");
-#endif
-	
-	std::cout << r << std::endl;
-	std::cout << h << std::endl;
-	std::cout << p << std::endl;
-	
-	Matrix<std::complex<double> >  f = (Matrix<std::complex<double> >) r;
-
-	rc.ReadConfig("test.xml");
-	rc.Init(test);
-
-	rc.SetMatrix ("r", r);
-	rc.SetMatrix ("p", p);
-	rc.SetMatrix ("h", h);
-	
-	time_t seconds = time (NULL);
-	char   uid[16];
-	sprintf(uid,"%ld",seconds);
-	
-	rc.SetAttribute("UID", uid);
-	rc.SetAttribute("Pi", 3.14156);
-	rc.SetAttribute("Dim", d);
-	
-	rc.Process(test);
-	
-	rc.GetMatrix ("r", r);
-	rc.GetMatrix("p", p);
-	rc.GetMatrix ("h", h);
-
-	rc.Finalise (test);
-	
-	cout << "We're good" << endl;
-
-	return true;
-	
-}
-
-bool fftwtest (ReconClient& rc) {
+bool fftwtest (Connector* rc) {
 
 	std::string in  = std::string (base + std::string ("/infft.h5"));
 	std::string out = std::string (base + std::string ("/outfft.h5"));
@@ -575,7 +587,7 @@ bool fftwtest (ReconClient& rc) {
 
 }
 
-bool resetest (ReconClient& rc) {
+bool resetest (Connector* rc) {
 
 	// OUT:
 	Matrix<cxfl>   meas; // measurement
@@ -593,21 +605,21 @@ bool resetest (ReconClient& rc) {
 	// Read configuration file and initialise backend ------------
 
 	std::string    cf  = std::string (base + std::string (config));
-	rc.ReadConfig (cf.c_str());
+	rc->ReadConfig (cf.c_str());
 
 	int use_bet = 0;
-	rc.Attribute ("use_bet", &use_bet);
+	rc->Attribute ("use_bet", &use_bet);
 
 	stringstream ss;
 	string mef, maf;
 
-	ss << base << rc.Attribute("meas");
+	ss << base << rc->Attribute("meas");
 	mef = ss.str();
 	ss.str("");
-	ss << base << rc.Attribute("mask");
+	ss << base << rc->Attribute("mask");
 	maf = ss.str();
 
-	rc.Init(test);
+	rc->Init(test);
 	// -----------------------------------------------------------
 
 	// Read binary data and transmit to backend ------------------ 
@@ -618,29 +630,29 @@ bool resetest (ReconClient& rc) {
 	if (use_bet==1)
 		mask.RAWRead (maf, std::string("VB15"));
 
-	rc.SetMatrix ("meas", meas);
-	rc.SetMatrix ("mask", mask);
+	rc->SetMatrix ("meas", meas);
+	rc->SetMatrix ("mask", mask);
 	// -----------------------------------------------------------
 
 	// Process data on backend -----------------------------------
 
-	rc.Process(test);
+	rc->Process(test);
 	// -----------------------------------------------------------
 	
 	// Get back reconstructed data from backend ------------------
 
-	rc.GetMatrix ("txm",  txm);
-	rc.GetMatrix ("rxm",  rxm);
-	rc.GetMatrix ("mask", mask);
-	rc.GetMatrix ("snro", snro);
-	rc.GetMatrix ("b0",   b0);
-	rc.GetMatrix("bets", bets);
+	rc->GetMatrix ("txm",  txm);
+	rc->GetMatrix ("rxm",  rxm);
+	rc->GetMatrix ("mask", mask);
+	rc->GetMatrix ("snro", snro);
+	rc->GetMatrix ("b0",   b0);
+	rc->GetMatrix("bets", bets);
 
 	// -----------------------------------------------------------
 
 	// Clear RAM and hangup --------------------------------------
 
-	rc.Finalise(test);
+	rc->Finalise(test);
 	// -----------------------------------------------------------
 
 	// Write data to a single matlab disk ------------------------
@@ -673,7 +685,7 @@ bool resetest (ReconClient& rc) {
 
 }
 
-bool mxtest (ReconClient& rc) {
+bool mxtest (Connector* rc) {
 
 #ifdef HAVE_MAT_H
 
@@ -708,7 +720,7 @@ bool mxtest (ReconClient& rc) {
 
 }
 
-bool nitest (ReconClient& rc) {
+bool nitest (Connector* rc) {
 
 #ifdef HAVE_NIFTI1_IO_H
 	
@@ -739,6 +751,7 @@ bool nitest (ReconClient& rc) {
 	return true;
 
 }
+*/
 
 bool init (int argc, char** argv) {
 	

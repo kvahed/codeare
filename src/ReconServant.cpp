@@ -19,9 +19,10 @@
  */
 
 #include "ReconServant.hpp"
-#include "RemoteContext.hpp"
 
-using namespace RRServer;
+using namespace RRStrategy;
+
+namespace RRServer {
 
 ReconServant::ReconServant  () : 
 
@@ -47,10 +48,10 @@ ReconServant::CleanUp () {
 error_code
 ReconServant::Init (const char* name) {
 	
-	RemoteContext* rc;
+	ReconContext* rc;
 	error_code e = OK;
 	
-	m_contexts.insert (pair< std::string, RemoteContext* > (std::string(name), rc = new RemoteContext(name)));
+	m_contexts.insert (pair< std::string, ReconContext* > (std::string(name), rc = new ReconContext(name)));
 	
     rc->SetConfig (m_config);
 	
@@ -73,7 +74,7 @@ ReconServant::Finalise (const char* name) {
 		
 	} else {
 		
-		map<string, RemoteContext*>::iterator it = m_contexts.find (name);
+		map<string, ReconContext*>::iterator it = m_contexts.find (name);
 		
 		if (it == m_contexts.end()) {
 			Finalise ();
@@ -94,7 +95,7 @@ ReconServant::Process  (const char* name)       {
 	
 	error_code e = OK;
 	
-	map<string, RemoteContext*>::iterator it = m_contexts.find (name);
+	map<string, ReconContext*>::iterator it = m_contexts.find (name);
 	
 	if (it == m_contexts.end()) 
 		e = CONTEXT_NOT_FOUND;
@@ -114,7 +115,7 @@ ReconServant::Prepare  (const char* name)       {
 	
 	error_code e = OK;
 	
-	map<string, RemoteContext*>::iterator it = m_contexts.find (name);
+	map<string, ReconContext*>::iterator it = m_contexts.find (name);
 	
 	if (it == m_contexts.end()) 
 		e = CONTEXT_NOT_FOUND;
@@ -260,3 +261,4 @@ ReconServant::config       ()                    {
 	
 }
 
+};

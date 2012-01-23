@@ -28,7 +28,7 @@
 
 namespace RRClient {
 
-	ReconClient::ReconClient          (const char* name, const char* debug) {
+	ReconClient::ReconClient          (const char*& name, const char*& debug) {
 		
 		try {
 			

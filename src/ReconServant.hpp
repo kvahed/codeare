@@ -29,18 +29,19 @@
 
 #include <string>
 #include <map>
+#include "ReconContext.hpp"
 
 using namespace RRSModule;
+using namespace RRStrategy;
 using namespace std;
 
 /**
  * @brief Remote recon server
  */
+
+
 namespace RRServer {
 	
-	class RemoteContext;
-
-
 	/**
 	 * @brief Servant implementation 
 	 *        Perform duties on remote server
@@ -49,16 +50,16 @@ namespace RRServer {
 		public POA_RRSModule::RRSInterface, 
 		public PortableServer::RefCountServantBase {
 		
-
+		
 	public:
-
+		
 		
 		/**
 		 * @brief     Construct and prepare configuration document
 		 */
 		ReconServant  ();
 		
-
+		
 		/**
 		 * @brief     Default destructor
 		 */
@@ -254,8 +255,8 @@ namespace RRServer {
 
 	private:
 		
-		char*                                 m_config;   /**< Serialised XML document  */
-		std::map<std::string, RemoteContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
+		char*                                m_config;   /**< Serialised XML document  */
+		std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
 	};
 
