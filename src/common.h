@@ -54,4 +54,9 @@ enum sim_mode {
 	EXCITE
 };
 
+enum connection_type {
+	CON_LOCAL,
+	CON_REMOTE
+};
+
 #endif //__COMMON_H__

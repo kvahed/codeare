@@ -25,8 +25,6 @@
 #include "ReconStrategy.hpp"
 #include "FFT.hpp"
 
-using namespace RRServer;
-
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
 /**

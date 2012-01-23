@@ -25,8 +25,6 @@
 
 #include "ReconStrategy.hpp"
 
-using namespace RRServer;
-
 namespace RRStrategy {
 	
 	/**

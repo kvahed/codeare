@@ -25,8 +25,6 @@
 #include "FFT.hpp"
 #include "DWT.hpp"
 
-using namespace RRServer;
-
 
 /**
  * @brief Reconstruction startegies
