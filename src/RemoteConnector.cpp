@@ -19,9 +19,7 @@
  */
 
 #include "RemoteConnector.hpp"
-#include "LocalConnector.hpp"
 #include "CorbaExceptions.hpp"
-#include "Matrix.hpp"
 
 
 #include <assert.h>
@@ -29,11 +27,6 @@
 
 namespace RRClient {
 
-
-	RemoteConnector::RemoteConnector (const LocalConnector& lc) {};
-	RemoteConnector::RemoteConnector (const LocalConnector*& plc) {};
-	RemoteConnector::RemoteConnector (LocalConnector& lc) {};
-	RemoteConnector::RemoteConnector (LocalConnector*& plc) {};
 
 	RemoteConnector::RemoteConnector          (const char* name, const char* debug) {
 		

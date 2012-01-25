@@ -30,8 +30,6 @@
 using namespace RRSModule;
 
 #include "Matrix.hpp"
-#include "RemoteConnector.hpp"
-#include "LocalConnector.hpp"
 
 namespace RRClient {
 
@@ -84,23 +82,7 @@ public:
 	inline void 
 	Connect() {
 
-		m_conn  = (Configurable*) new T (m_name.c_str(), m_debug.c_str());
-
-	}
-
-
-	/**
-	 * @brief          Cast operator
-	 *
-	 * @return         Cast
-	 */
-	template<class S> inline 
-	operator Connector<S> () const {
-
-		printf ("%s %s\n", m_name.c_str(), m_debug.c_str());
-		std::cout << m_conn << std::endl;
-		delete m_conn;
-		return Connector<S> (m_name.c_str(), m_debug.c_str());
+		m_conn  = new T (m_name.c_str(), m_debug.c_str());
 
 	}
 
@@ -113,7 +95,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Process             (const char* name) {
-		((T*)m_conn)->Process(name);
+		m_conn->Process(name);
 	}
 	
 	
@@ -125,7 +107,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Prepare             (const char* name) {
-		((T*)m_conn)->Prepare(name);
+		m_conn->Prepare(name);
 	}
 	
 	
@@ -137,7 +119,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Init                (const char* name) {
-		((T*)m_conn)->Init(name);
+		m_conn->Init(name);
 	}
 	
 	
@@ -149,7 +131,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Finalise            (const char* name) {
-		((T*)m_conn)->Finalise(name);
+		m_conn->Finalise(name);
 	}
 	
 	
@@ -161,7 +143,7 @@ public:
 	 */
 	template <class S> inline void 
 	SetMatrix           (const std::string& name, Matrix<S>& m) const {
-		((T*)m_conn)->SetMatrix (name, m);
+		m_conn->SetMatrix (name, m);
 	}
 	
 	
@@ -173,7 +155,7 @@ public:
 	 */
 	template <class S> inline void 
 	GetMatrix           (const std::string& name, Matrix<S>& m) const {
-		((T*)m_conn)->GetMatrix (name, m);
+		m_conn->GetMatrix (name, m);
 	}
 		
 		
@@ -184,7 +166,7 @@ public:
 	 */
 	template <class S> inline void 
 	ReadConfig        (S config) {
-		((T*)m_conn)->ReadConfig (config);
+		m_conn->ReadConfig (config);
 	}
 	
 
@@ -196,7 +178,7 @@ public:
 	 */
 	template <class S> inline void
 	SetAttribute        (const char* name, S value) {
-		((T*)m_conn)->SetAttribute (name, value);
+		m_conn->SetAttribute (name, value);
 	}
 
 	
@@ -208,7 +190,7 @@ public:
 	 */
 	template <class S> inline void
 	Attribute        (const char* name, S* value) {
-		((T*)m_conn)->SetAttribute (name, value);
+		m_conn->SetAttribute (name, value);
 	}
 
 	
@@ -216,9 +198,9 @@ public:
 private:
 	
 	
-	Configurable* m_conn; /**< Actual connection */
-	std::string   m_name;
-	std::string   m_debug;
+	T*          m_conn; /**< Actual connection */
+	std::string m_name;
+	std::string m_debug;
 	
 };
 	

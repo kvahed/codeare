@@ -30,6 +30,7 @@
 #include <string>
 #include <map>
 #include "ReconContext.hpp"
+#include "FunctorContainer.hpp"
 
 using namespace RRSModule;
 using namespace RRStrategy;
@@ -48,7 +49,8 @@ namespace RRServer {
 	 */
 	class ReconServant : 
 		public POA_RRSModule::RRSInterface, 
-		public PortableServer::RefCountServantBase {
+		public PortableServer::RefCountServantBase,
+		public FunctorContainer {
 		
 		
 	public:
@@ -252,11 +254,6 @@ namespace RRServer {
 		void 
 		config        (const char* c);
 
-
-	private:
-		
-		char*                                m_config;   /**< Serialised XML document  */
-		std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
 	};
 
