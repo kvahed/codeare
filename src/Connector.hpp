@@ -30,6 +30,8 @@
 using namespace RRSModule;
 
 #include "Matrix.hpp"
+#include "RemoteConnector.hpp"
+#include "LocalConnector.hpp"
 
 namespace RRClient {
 
@@ -58,7 +60,14 @@ public:
 	 * @param name  Service name
 	 * @param debug Trace level
 	 */
-	Connector       (const char* name, const char* debug);
+	Connector       (const char* name, const char* debug) {
+
+		m_name  = name;
+		m_debug = debug;
+
+		Connect ();
+
+	}
 	
 	
 	/**
@@ -66,7 +75,33 @@ public:
 	 */
 	virtual 
 	~Connector () {
-		
+		delete m_conn;
+	}
+
+
+	
+
+	inline void 
+	Connect() {
+
+		m_conn  = (Configurable*) new T (m_name.c_str(), m_debug.c_str());
+
+	}
+
+
+	/**
+	 * @brief          Cast operator
+	 *
+	 * @return         Cast
+	 */
+	template<class S> inline 
+	operator Connector<S> () const {
+
+		printf ("%s %s\n", m_name.c_str(), m_debug.c_str());
+		std::cout << m_conn << std::endl;
+		delete m_conn;
+		return Connector<S> (m_name.c_str(), m_debug.c_str());
+
 	}
 
 
@@ -76,9 +111,9 @@ public:
 	 * @param  name     Recon method
 	 * @return          Error code
 	 */ 
-	virtual error_code              
+	virtual inline error_code              
 	Process             (const char* name) {
-		m_conn->Process(name);
+		((T*)m_conn)->Process(name);
 	}
 	
 	
@@ -88,9 +123,9 @@ public:
 	 * @param  name     Recon method
 	 * @return          Error code
 	 */ 
-	virtual error_code              
+	virtual inline error_code              
 	Prepare             (const char* name) {
-		m_conn->Prepare(name);
+		((T*)m_conn)->Prepare(name);
 	}
 	
 	
@@ -100,9 +135,9 @@ public:
 	 * @param  name     Recon method
 	 * @return          Error code
 	 */ 
-	virtual error_code              
+	virtual inline error_code              
 	Init                (const char* name) {
-		m_conn->Init(name);
+		((T*)m_conn)->Init(name);
 	}
 	
 	
@@ -112,9 +147,9 @@ public:
 	 * @param  name     Recon method
 	 * @return          Error error
 	 */ 
-	virtual error_code              
+	virtual inline error_code              
 	Finalise            (const char* name) {
-		m_conn->Finalise(name);
+		((T*)m_conn)->Finalise(name);
 	}
 	
 	
@@ -124,9 +159,9 @@ public:
 	 * @param  name     Name
 	 * @param  m        Complex data
 	 */
-	template <class S> void 
+	template <class S> inline void 
 	SetMatrix           (const std::string& name, Matrix<S>& m) const {
-		m_conn->SetMatrix (name, m);
+		((T*)m_conn)->SetMatrix (name, m);
 	}
 	
 	
@@ -136,9 +171,9 @@ public:
 	 * @param  name     Name
 	 * @param  m        Receive storage
 	 */
-	template <class S> void 
+	template <class S> inline void 
 	GetMatrix           (const std::string& name, Matrix<S>& m) const {
-		m_conn->GetMatrix (name, m);
+		((T*)m_conn)->GetMatrix (name, m);
 	}
 		
 		
@@ -147,9 +182,9 @@ public:
 	 *
 	 * @param  fname   Name of input file
 	 */
-	template <class S> void 
+	template <class S> inline void 
 	ReadConfig        (S config) {
-		m_conn->ReadConfig (config);
+		((T*)m_conn)->ReadConfig (config);
 	}
 	
 
@@ -161,7 +196,7 @@ public:
 	 */
 	template <class S> inline void
 	SetAttribute        (const char* name, S value) {
-		m_conn->SetAttribute (name, value);
+		((T*)m_conn)->SetAttribute (name, value);
 	}
 
 	
@@ -173,17 +208,17 @@ public:
 	 */
 	template <class S> inline void
 	Attribute        (const char* name, S* value) {
-		m_conn->SetAttribute (name, value);
+		((T*)m_conn)->SetAttribute (name, value);
 	}
 
 	
 
-
-	
-protected:
+private:
 	
 	
-	T* m_conn;
+	Configurable* m_conn; /**< Actual connection */
+	std::string   m_name;
+	std::string   m_debug;
 	
 };
 	

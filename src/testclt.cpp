@@ -19,7 +19,7 @@
  */
 
 #include "options.h"
-#include "ReconClient.hpp"
+#include "RemoteConnector.hpp"
 #include "LocalConnector.hpp"
 #include "modules/FFT.hpp"
 #include "MatrixOperations.hpp"
@@ -51,10 +51,10 @@ bool   pulses;
 bool init (int argc, char** argv);
 
 template <class T> bool 
-internaltest (Connector<T>& rc); 
+internaltest (Connector<T>* rc); 
 
 template <class T> bool 
-cgsensetest  (Connector<T>& rc);
+cgsensetest  (Connector<T>* rc);
 /*
 bool nuffttest    (Connector* rc);
 bool ktptest      (Connector* rc);
@@ -66,51 +66,66 @@ bool grappatest   (Connector* rc);
 bool cstest       (Connector* rc);
 bool dmtest       (Connector* rc);
 */
+
+/*
+void selector ()
+{
+   float result = pt2Func(a, b);    // call using function pointer
+
+   cout << "Switch replaced by function pointer: 2-5=";  // display result
+   cout << result << endl;
+}
+*/
 int main (int argc, char** argv) {
 	
-	//Connector* conn;
-	//ReconClient 
 	if (init (argc, argv)) {
 		
-		//if (remote)
-		Connector<ReconClient> conn (name, verbose);
-			//else 
-			//conn = (Connector*) new LocalConnector();
-
+		Connector<LocalConnector>*  lc;
+		Connector<RemoteConnector>* rc;
+		
+		if (remote) rc = new Connector<RemoteConnector> (name, verbose);
+		else        lc = new Connector<LocalConnector>  (name, verbose);
+						
+		
 		if (strcmp (test, "CGSENSE") == 0)
-			cgsensetest (conn);/*
-		else if (strcmp      (test, "NuFFT")   == 0)
-			nuffttest (conn);
-		else if (strcmp (test, "NuFFT_OMP")   == 0)
-			nuffttest (conn);
-		else if (strcmp (test, "GRAPPA") == 0)
-			grappatest (conn);
-		else if (strcmp (test, "KTPoints") == 0)
-			ktptest (conn);
-		else if (strcmp (test, "CompressedSensing") == 0)
-			cstest (conn);
-		else if (strcmp (test, "mxtest") == 0)
-			mxtest (conn);
-		else if (strcmp (test, "nitest") == 0)
-			nitest (conn);
-		else if (strcmp (test, "fftwtest") == 0)
-			fftwtest (conn);
-		else if (strcmp (test, "RelativeSensitivities") == 0)
-			resetest (conn);
-		else if (strcmp (test, "DirectMethod") == 0)
-		dmtest (conn);*/
+			(remote) ? cgsensetest (rc) : cgsensetest (lc);/*
+								 else if (strcmp      (test, "NuFFT")   == 0)
+								 nuffttest (conn);
+								 else if (strcmp (test, "NuFFT_OMP")   == 0)
+								 nuffttest (conn);
+								 else if (strcmp (test, "GRAPPA") == 0)
+								 grappatest (conn);
+								 else if (strcmp (test, "KTPoints") == 0)
+								 ktptest (conn);
+								 else if (strcmp (test, "CompressedSensing") == 0)
+								 cstest (conn);
+								 else if (strcmp (test, "mxtest") == 0)
+								 mxtest (conn);
+								 else if (strcmp (test, "nitest") == 0)
+								 nitest (conn);
+								 else if (strcmp (test, "fftwtest") == 0)
+								 fftwtest (conn);
+								 else if (strcmp (test, "RelativeSensitivities") == 0)
+								 resetest (conn);
+								 else if (strcmp (test, "DirectMethod") == 0)
+								 dmtest (conn);*/
 		else
-			internaltest (conn);
+			(remote) ? internaltest (rc) : internaltest (lc);
+
+
+		if (remote) delete rc;
+		else        delete lc;
+
+
 		return 0;
-
+		
 	} else
-
-		return 1;
-
+		
+		return 1;	
 }
 
 template <class T> bool 
-internaltest (Connector<T>& rc) {
+internaltest (Connector<T>* rc) {
 
 	int            i = 0, j = 0, d = 5;
 	
@@ -143,28 +158,28 @@ internaltest (Connector<T>& rc) {
 	
 	Matrix<std::complex<double> >  f = (Matrix<std::complex<double> >) r;
 
-	rc.ReadConfig("test.xml");
-	rc.Init(test);
+	rc->ReadConfig("test.xml");
+	rc->Init(test);
 
-	rc.SetMatrix ("r", r);
-	rc.SetMatrix ("p", p);
-	rc.SetMatrix ("h", h);
+	rc->SetMatrix ("r", r);
+	rc->SetMatrix ("p", p);
+	rc->SetMatrix ("h", h);
 	
 	time_t seconds = time (NULL);
 	char   uid[16];
 	sprintf(uid,"%ld",seconds);
 	
-	rc.SetAttribute("UID", uid);
-	rc.SetAttribute("Pi", 3.14156);
-	rc.SetAttribute("Dim", d);
+	rc->SetAttribute("UID", uid);
+	rc->SetAttribute("Pi", 3.14156);
+	rc->SetAttribute("Dim", d);
 	
-	rc.Process(test);
+	rc->Process(test);
 	
-	rc.GetMatrix ("r", r);
-	rc.GetMatrix("p", p);
-	rc.GetMatrix ("h", h);
+	rc->GetMatrix ("r", r);
+	rc->GetMatrix("p", p);
+	rc->GetMatrix ("h", h);
 
-	rc.Finalise (test);
+	rc->Finalise (test);
 	
 	cout << "We're good" << endl;
 
@@ -202,7 +217,7 @@ bool grappatest (Connector* rc) {
 */
 
 template <class T> bool 
-cgsensetest (Connector<T>& rc) {
+cgsensetest (Connector<T>* rc) {
 
 	// Incoming
 	Matrix<cxfl>   rawdata;
@@ -226,36 +241,36 @@ cgsensetest (Connector<T>& rc) {
 
 	if (remote) {
 	
-		rc.ReadConfig (cf.c_str());
+		rc->ReadConfig (cf.c_str());
 
-		if (rc.Init (test) != OK) {
+		if (rc->Init (test) != OK) {
 			printf ("Intialising failed ... bailing out!"); 
 			return false;
 		}
 
-		rc.Attribute ("pulses", (int*)&pulses);
+		rc->Attribute ("pulses", (int*)&pulses);
 		
 		// Outgoing -------------
 		
-		rc.SetMatrix (   "data", rawdata); // Measurement data
-		rc.SetMatrix (   "sens", sens);    // Sensitivities
-		rc.SetMatrix ("weights", weights); // Weights
-		rc.SetMatrix ( "kspace", kspace);  // K-space
+		rc->SetMatrix (   "data", rawdata); // Measurement data
+		rc->SetMatrix (   "sens", sens);    // Sensitivities
+		rc->SetMatrix ("weights", weights); // Weights
+		rc->SetMatrix ( "kspace", kspace);  // K-space
 
 		// ---------------------
 
-		rc.Process    (test);
+		rc->Process    (test);
 		
 		// Incoming -------------
 
-		rc.GetMatrix     (  "image", image);  // Images
+		rc->GetMatrix     (  "image", image);  // Images
 		if (pulses)
-			rc.GetMatrix ("signals", signals);     // Pulses (Excitation)
-		rc.GetMatrix     (  "nrmse", nrmse);  // CG residuals
+			rc->GetMatrix ("signals", signals);     // Pulses (Excitation)
+		rc->GetMatrix     (  "nrmse", nrmse);  // CG residuals
 
 		// ---------------------
 		
-		//rc.Finalise   (test);
+		//rc->Finalise   (test);
 		
 	} else {
 		/*
@@ -321,7 +336,7 @@ bool cstest (Connector* rc) {
 	mask.MXRead (df, "mask");
 #endif
 
-	rc.ReadConfig (cf.c_str());
+	rc->ReadConfig (cf.c_str());
 	
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
