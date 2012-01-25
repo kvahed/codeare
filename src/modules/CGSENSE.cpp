@@ -26,7 +26,7 @@
 
 #include <vector>
 
-std::string sides[3] = {"Nx", "Ny", "Nz"};
+std::string sides[3] = {"nx", "ny", "nz"};
 
 using namespace RRStrategy;
 

@@ -41,7 +41,7 @@ class Configurable {
 
 		m_config_doc             = new TiXmlDocument    ();
 		m_config_doc->LinkEndChild(new TiXmlDeclaration ("1.0", "", ""));
-		m_config_doc->LinkEndChild(new TiXmlElement     ("Config"));
+		m_config_doc->LinkEndChild(new TiXmlElement     ("config"));
 		
 	}
 
@@ -51,7 +51,7 @@ class Configurable {
 	 */
 	virtual ~Configurable() {
 		delete m_config_doc;
-	};
+	}
 
 	
 	/**

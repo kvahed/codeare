@@ -23,6 +23,7 @@
 #include "LocalConnector.hpp"
 #include "modules/FFT.hpp"
 #include "MatrixOperations.hpp"
+//#include "tests/cgsense.hpp"
 
 #ifndef __WIN32__
     #include "config.h"
@@ -54,18 +55,7 @@ template <class T> bool
 internaltest (Connector<T>* rc); 
 
 template <class T> bool 
-cgsensetest  (Connector<T>* rc);
-/*
-bool nuffttest    (Connector* rc);
-bool ktptest      (Connector* rc);
-bool mxtest       (Connector* rc);
-bool nitest       (Connector* rc);
-bool fftwtest     (Connector* rc);
-bool resetest     (Connector* rc);
-bool grappatest   (Connector* rc);
-bool cstest       (Connector* rc);
-bool dmtest       (Connector* rc);
-*/
+cgsensetest (Connector<T>* rc); 
 
 /*
 void selector ()
@@ -76,155 +66,69 @@ void selector ()
    cout << result << endl;
 }
 */
+
 int main (int argc, char** argv) {
 	
 	if (init (argc, argv)) {
+
 		
-		Connector<LocalConnector>*  lc;
-		Connector<RemoteConnector>* rc;
+		Connector<RemoteConnector>* rcon; 
+		Connector<LocalConnector>*  lcon;
+
+		if (remote) 
+			rcon = new Connector<RemoteConnector> (name, verbose);
+		else 
+			lcon = new Connector<LocalConnector> (name, verbose);
 		
-		if (remote) rc = new Connector<RemoteConnector> (name, verbose);
-		else        lc = new Connector<LocalConnector>  (name, verbose);
-						
+		if (strcmp      (test, "CGSENSE")   == 0)
+			(remote) ? cgsensetest (rcon) : cgsensetest (lcon);
+		/*
+		  else if (strcmp      (test, "NuFFT")   == 0)
+		  nuffttest (conn);
+		  else if (strcmp (test, "NuFFT_OMP")   == 0)
+		  nuffttest (conn);
+		  else if (strcmp (test, "GRAPPA") == 0)
+		  grappatest (conn);
+		  else if (strcmp (test, "KTPoints") == 0)
+		  ktptest (conn);
+		  else if (strcmp (test, "CompressedSensing") == 0)
+		  cstest (conn);
+		  else if (strcmp (test, "mxtest") == 0)
+		  mxtest (conn);
+		  else if (strcmp (test, "nitest") == 0)
+		  nitest (conn);
+		  else if (strcmp (test, "fftwtest") == 0)
+		  fftwtest (conn);
+		  else if (strcmp (test, "RelativeSensitivities") == 0)
+		  resetest (conn);
+		  else if (strcmp (test, "DirectMethod") == 0)
+		  dmtest (conn);
+		  else
+		  (remote) ? internaltest (rc) : internaltest (lc);
+		*/
 		
-		if (strcmp (test, "CGSENSE") == 0)
-			(remote) ? cgsensetest (rc) : cgsensetest (lc);/*
-								 else if (strcmp      (test, "NuFFT")   == 0)
-								 nuffttest (conn);
-								 else if (strcmp (test, "NuFFT_OMP")   == 0)
-								 nuffttest (conn);
-								 else if (strcmp (test, "GRAPPA") == 0)
-								 grappatest (conn);
-								 else if (strcmp (test, "KTPoints") == 0)
-								 ktptest (conn);
-								 else if (strcmp (test, "CompressedSensing") == 0)
-								 cstest (conn);
-								 else if (strcmp (test, "mxtest") == 0)
-								 mxtest (conn);
-								 else if (strcmp (test, "nitest") == 0)
-								 nitest (conn);
-								 else if (strcmp (test, "fftwtest") == 0)
-								 fftwtest (conn);
-								 else if (strcmp (test, "RelativeSensitivities") == 0)
-								 resetest (conn);
-								 else if (strcmp (test, "DirectMethod") == 0)
-								 dmtest (conn);*/
-		else
-			(remote) ? internaltest (rc) : internaltest (lc);
-
-
-		if (remote) delete rc;
-		else        delete lc;
-
-
 		return 0;
+
+		if (remote) 
+			delete rcon;
+		else 
+			delete lcon;
 		
 	} else
 		
 		return 1;	
+
 }
 
 template <class T> bool 
-internaltest (Connector<T>* rc) {
-
-	int            i = 0, j = 0, d = 5;
-	
-	Matrix<cxfl>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	
-	r.Random(); 
-	h.Random();
-	p.Random();
-
-	Matrix<size_t> m (3,2);
-	m (0,0) = 1;
-	m (0,1) = 3;
-	m (1,0) = 1;
-	m (1,1) = 4;
-	m (2,0) = 1;
-	m (2,1) = 5;
-
-	std::cout << m << std::endl;
-	
-	Matrix<size_t> mg = Matrix<size_t>::MeshGrid(m);
-#ifdef HAVE_MAT_H	
-	mg.MXDump("mg.mat", "mg");
-#endif
-	
-	std::cout << r << std::endl;
-	std::cout << h << std::endl;
-	std::cout << p << std::endl;
-	
-	Matrix<std::complex<double> >  f = (Matrix<std::complex<double> >) r;
-
-	rc->ReadConfig("test.xml");
-	rc->Init(test);
-
-	rc->SetMatrix ("r", r);
-	rc->SetMatrix ("p", p);
-	rc->SetMatrix ("h", h);
-	
-	time_t seconds = time (NULL);
-	char   uid[16];
-	sprintf(uid,"%ld",seconds);
-	
-	rc->SetAttribute("UID", uid);
-	rc->SetAttribute("Pi", 3.14156);
-	rc->SetAttribute("Dim", d);
-	
-	rc->Process(test);
-	
-	rc->GetMatrix ("r", r);
-	rc->GetMatrix("p", p);
-	rc->GetMatrix ("h", h);
-
-	rc->Finalise (test);
-	
-	cout << "We're good" << endl;
-
-	return true;
-	
-}
-
-/*
-bool grappatest (Connector* rc) {
-
-	Matrix<cxfl> sig;
-	Matrix<cxfl> acs;
-	
-	std::string cf = std::string (base + std::string(config));
-	std::string df = std::string (base + std::string(data));
-
-#ifdef HAVE_MAT_H
-	sig.MXRead  (df, "data", "");
-	acs.MXRead  (df, "acs",  "");
-#endif
-
-	rc->ReadConfig (cf.c_str());
-	
-	rc->Init (test);
-	rc->SetMatrix  ("acs",  acs);
-	rc->Prepare (test);
-	rc->SetMatrix  ("data", sig); // Measurement data
-	rc->Process (test);
-	rc->GetMatrix  ("data", sig);
-	rc->Finalise (test);
-	
-	return true;
-
-}
-*/
-
-template <class T> bool 
-cgsensetest (Connector<T>* rc) {
+cgsensetest (RRClient::Connector<T>* rc) {
 
 	// Incoming
 	Matrix<cxfl>   rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
 	Matrix<cxfl>   sens;
-
+	
 	// Outgoing
 	Matrix<double> nrmse;
 	Matrix<cxfl>   image;
@@ -233,67 +137,42 @@ cgsensetest (Connector<T>* rc) {
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
 	std::string    odf = std::string (base + std::string("/images.mat"));
-
+	
 	weights.Read   (df, "weights");
 	rawdata.Read   (df, "data");
 	kspace.Read    (df, "kspace");
 	sens.Read      (df, "sensitivities");
-
-	if (remote) {
 	
-		rc->ReadConfig (cf.c_str());
-
-		if (rc->Init (test) != OK) {
-			printf ("Intialising failed ... bailing out!"); 
-			return false;
-		}
-
-		rc->Attribute ("pulses", (int*)&pulses);
-		
-		// Outgoing -------------
-		
-		rc->SetMatrix (   "data", rawdata); // Measurement data
-		rc->SetMatrix (   "sens", sens);    // Sensitivities
-		rc->SetMatrix ("weights", weights); // Weights
-		rc->SetMatrix ( "kspace", kspace);  // K-space
-
-		// ---------------------
-
-		rc->Process    (test);
-		
-		// Incoming -------------
-
-		rc->GetMatrix     (  "image", image);  // Images
-		if (pulses)
-			rc->GetMatrix ("signals", signals);     // Pulses (Excitation)
-		rc->GetMatrix     (  "nrmse", nrmse);  // CG residuals
-
-		// ---------------------
-		
-		//rc->Finalise   (test);
-		
-	} else {
-		/*
-		RRServer::ReconContext* rx = new RRServer::ReconContext(test);
-
-		rx->ReadConfig(cf.c_str());
-		rx->Init();
-
-		rx->SetMatrix ("data",     rawdata);
-		rx->SetMatrix ("sens",     sens);
-		rx->SetMatrix ("weights",  weights);
-		rx->SetMatrix ("kspace",   kspace);
-
-		rx->Process ();
-		
-		rx->GetMatrix ("data",     rawdata); // Images
-		if (pulses)
-			rx->GetMatrix ("sens", sens);    // Pulses (Excitation)
-		rx->GetMatrix ("weights",  weights); // CG residuals
-
-		rx->Finalise ();
-		*/
+	rc->ReadConfig (cf.c_str());
+	
+	if (rc->Init (test) != OK) {
+		printf ("Intialising failed ... bailing out!\n"); 
+		return false;
 	}
+	
+	rc->Attribute ("pulses", (int*)&pulses);
+	
+	// Outgoing -------------
+	
+	rc->SetMatrix (   "data", rawdata); // Measurement data
+	rc->SetMatrix (   "sens", sens);    // Sensitivities
+	rc->SetMatrix ("weights", weights); // Weights
+	rc->SetMatrix ( "kspace", kspace);  // K-space
+	
+	// ---------------------
+	
+	rc->Process    (test);
+	
+	// Incoming -------------
+	
+	rc->GetMatrix     (  "image", image);  // Images
+	if (pulses)
+		rc->GetMatrix ("signals", signals);     // Pulses (Excitation)
+	rc->GetMatrix     (  "nrmse", nrmse);  // CG residuals
+	
+	// ---------------------
+	
+	rc->Finalise   (test);
 	
 #ifdef HAVE_MAT_H	
 	MATFile* mf = matOpen (odf.c_str(), "w");
@@ -318,173 +197,8 @@ cgsensetest (Connector<T>* rc) {
 	return true;
 	
 }
+
 /*
-bool cstest (Connector* rc) {
-
-	Matrix<cxfl> indata;
-	Matrix<cxfl> im_dc;
-	Matrix<double> mask;
-	Matrix<double> pdf;
-	
-	std::string cf  = std::string (base + std::string(config));
-	std::string df  = std::string (base + std::string(data));
-	std::string odf = std::string (base + std::string("/csout.mat"));
-
-#ifdef HAVE_MAT_H	
-	indata.MXRead (df, "data");
-	pdf.MXRead (df, "pdf");
-	mask.MXRead (df, "mask");
-#endif
-
-	rc->ReadConfig (cf.c_str());
-	
-	if (rc->Init (test) != OK) {
-		printf ("Intialising failed ... bailing out!"); 
-		return false;
-	}
-	
-	// Outgoing -------------
-	
-	rc->SetMatrix  ("data", indata); // Measurement data
-	rc->SetMatrix  ("pdf",  pdf);  // Sensitivities
-	rc->SetMatrix  ("mask", mask); // Weights
-	
-	// ---------------------
-	
-	rc->Process (test);
-	
-	// Incoming -------------
-	
-	rc->GetMatrix ("data", indata);  // Images
-	rc->GetMatrix ("im_dc", im_dc);  // Images
-	
-	// ---------------------
-	
-	rc->Finalise   (test);
-	
-#ifdef HAVE_MAT_H	
-	MATFile* mf = matOpen (odf.c_str(), "w");
-
-	if (mf == NULL) {
-		printf ("Error creating file %s\n", odf.c_str());
-		return false;
-	}
-
-	indata.MXDump (mf, "img");
-	im_dc.MXDump (mf, "wvt");
-
-	if (matClose(mf) != 0) {
-		printf ("Error closing file %s\n", odf.c_str());
-		return false;
-	}
-#endif
-	
-	return true;
-	
-}
-
-bool dmtest (Connector* rc) {
-
-	Matrix<cxfl>  b1;  
-	Matrix<cxfl>  tmxy;
-	Matrix<float> tmz;  
-	Matrix<float> r;   
-	Matrix<float> b0;  
-	
-	Matrix<cxfl>  smxy;
-	Matrix<float> smz;
-	Matrix<float> roi;
-
-	Matrix<float> g;   
-	Matrix<float> j;
-	
-	std::string cf  = std::string (base + std::string(config));
-	std::string odf = std::string (base + std::string("/simout.mat"));
-
-	rc->ReadConfig (cf.c_str());
-	
-	std::string gf = std::string(base + std::string(rc->Attribute("gf"))); // gradient trajectories
-	std::string pf = std::string(base + std::string(rc->Attribute("pf"))); // patterns
-	std::string mf = std::string(base + std::string(rc->Attribute("mf"))); // maps
-
-	// Gradients
-#ifdef HAVE_MAT_H
-	g.MXRead    (gf, rc->Attribute("g"));
-	j.MXRead    (gf, rc->Attribute("j"));
-
-	// Target excitation, ROI, sample
-	r.MXRead    (pf, "r");
-	tmxy.MXRead (pf, rc->Attribute("p"));
-	tmz  = Matrix<float>::Zeros (r.Dim(1), 1);
-	smxy = Matrix<cxfl>::Zeros  (r.Dim(1), 1);
-	smz.MXRead (pf, rc->Attribute("s"));
-	roi.MXRead (pf, rc->Attribute("roi"));
-
-	// Maps
-	b1.MXRead (mf, rc->Attribute("b1"));
-	b0.MXRead (mf, rc->Attribute("b0"));
-#endif	
-	if (rc->Init (test) != OK) {
-		printf ("Intialising failed ... bailing out!"); 
-		return false;
-	}
-
-	// Outgoing -------------
-	
-	rc->SetMatrix  (  "b1", b1  );
-	rc->SetMatrix (   "g", g  );
-	rc->SetMatrix (   "r", r   );
-	rc->SetMatrix (  "b0", b0  );
-	rc->SetMatrix  ("tmxy", tmxy);
-	rc->SetMatrix ( "tmz", tmz );
-	rc->SetMatrix  ("smxy", smxy);
-	rc->SetMatrix ( "smz", smz );
-	rc->SetMatrix (   "j", j   );
-	rc->SetMatrix ( "roi", roi );
-	// ---------------------
-	
-	rc->Process (test);
-	
-	// Incoming -------------
-	
-	Matrix<cxfl>  rf;
-	Matrix<cxfl>  mxy;
-	Matrix<float> mz;   
-
-	rc->GetMatrix  ( "mxy", mxy);
-	rc->GetMatrix (  "mz", mz);	
-	rc->GetMatrix  ("tmxy", tmxy);
-	rc->GetMatrix ( "tmz", tmz);	
-	rc->GetMatrix  (  "rf", rf);
-
-	// ---------------------
-	
-	rc->Finalise   (test);
-	
-#ifdef HAVE_MAT_H	
-	MATFile* od = matOpen (odf.c_str(), "w");
-
-	if (od == NULL) {
-		printf ("Error creating file %s\n", odf.c_str());
-		return false;
-	}
-
-	mxy.MXDump  (od, "mxy");
-	mz.MXDump   (od, "mz");
-	tmxy.MXDump (od, "tmxy");
-	tmz.MXDump  (od, "tmz");
-	rf.MXDump   (od, "rf");
-
-	if (matClose(od) != 0) {
-		printf ("Error closing file %s\n", odf.c_str());
-		return false;
-	}
-#endif
-
-	return true;
-	
-}
-
 bool nuffttest (Connector* rc) {
 
 	Matrix<cxfl>   rawdata;
