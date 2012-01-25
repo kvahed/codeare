@@ -18,13 +18,12 @@
  *  02110-1301  USA
  */
 
-#ifndef __RECON_CLIENT_H__
-#define __RECON_CLIENT_H__
+#ifndef __REMOTE_CONNECTOR_H__
+#define __REMOTE_CONNECTOR_H__
 
 #include "Configurable.hpp"
 #include "Connector.hpp"
 #include "Matrix.hpp"
-
 
 #ifdef __WIN32__ 
     #include "RRSModule.h"
@@ -43,10 +42,12 @@ using namespace RRSModule;
  */
 namespace RRClient {
 	
+class LocalConnector;
+
 	/**
 	 * @brief               Remote reconstruction client 
 	 */
-	class ReconClient : public Configurable {
+	class RemoteConnector : public Configurable {
 		
 		
 	public:
@@ -55,13 +56,17 @@ namespace RRClient {
 		/**
 		 * @brief           Construct and initialise remote interface
 		 */
-		ReconClient         (const char*& name, const char*& tracelevel);
+		RemoteConnector         (const char* name, const char* tracelevel);
+		RemoteConnector         (const RRClient::LocalConnector&) ;
+		RemoteConnector         (const RRClient::LocalConnector*&) ;
+		RemoteConnector         (RRClient::LocalConnector&) ;
+		RemoteConnector         (RRClient::LocalConnector*&) ;
 		
 		
 		/**
 		 * @brief           Destroy ORB
 		 */
-		~ReconClient        ();
+		~RemoteConnector        ();
 		
 		
  		/**
@@ -146,4 +151,4 @@ namespace RRClient {
 }
 
 
-#endif // __RECON_CLIENT_H__
+#endif // __REMOTE_CONNECTOR_H__

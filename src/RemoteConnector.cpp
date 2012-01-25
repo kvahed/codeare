@@ -18,7 +18,8 @@
  *  02110-1301  USA
  */
 
-#include "ReconClient.hpp"
+#include "RemoteConnector.hpp"
+#include "LocalConnector.hpp"
 #include "CorbaExceptions.hpp"
 #include "Matrix.hpp"
 
@@ -28,7 +29,13 @@
 
 namespace RRClient {
 
-	ReconClient::ReconClient          (const char*& name, const char*& debug) {
+
+	RemoteConnector::RemoteConnector (const LocalConnector& lc) {};
+	RemoteConnector::RemoteConnector (const LocalConnector*& plc) {};
+	RemoteConnector::RemoteConnector (LocalConnector& lc) {};
+	RemoteConnector::RemoteConnector (LocalConnector*& plc) {};
+
+	RemoteConnector::RemoteConnector          (const char* name, const char* debug) {
 		
 		try {
 			
@@ -99,7 +106,7 @@ namespace RRClient {
 	
 	
 	
-	ReconClient::~ReconClient         ()            {
+	RemoteConnector::~RemoteConnector         ()            {
 		
 		m_rrsi->CleanUp();
 		m_orb->destroy();
@@ -109,7 +116,7 @@ namespace RRClient {
 	
 	
 	error_code
-	ReconClient::Init (const char* name) {
+	RemoteConnector::Init (const char* name) {
 		
 		error_code  result  = OK;
 		
@@ -131,7 +138,7 @@ namespace RRClient {
 	
 	
 	error_code 
-	ReconClient::Prepare  (const char* name)  {
+	RemoteConnector::Prepare  (const char* name)  {
 		
 		return m_rrsi->Prepare (name);
 		
@@ -140,7 +147,7 @@ namespace RRClient {
 	
 	
 	error_code 
-	ReconClient::Process  (const char* name)  {
+	RemoteConnector::Process  (const char* name)  {
 		
 		return  m_rrsi->Process (name);
 		
@@ -149,7 +156,7 @@ namespace RRClient {
 	
 	
 	error_code
-	ReconClient::Finalise (const char* name) {
+	RemoteConnector::Finalise (const char* name) {
 		
 		return m_rrsi->Finalise(name);
 		
@@ -158,7 +165,7 @@ namespace RRClient {
 	
 	
 	long 
-	ReconClient::GetSize (const longs dims) const {
+	RemoteConnector::GetSize (const longs dims) const {
 		
 		long size = 1;
 		
@@ -172,7 +179,7 @@ namespace RRClient {
 	
 	
 	template<> void 
-	ReconClient::SetMatrix (const std::string& name, Matrix< std::complex<float> >& M) const {
+	RemoteConnector::SetMatrix (const std::string& name, Matrix< std::complex<float> >& M) const {
 		
 		cxfl_data r; 
 		
@@ -194,7 +201,7 @@ namespace RRClient {
 	
 	
 	template<> void 
-	ReconClient::GetMatrix (const std::string& name, Matrix< std::complex<float> >& m) const {
+	RemoteConnector::GetMatrix (const std::string& name, Matrix< std::complex<float> >& m) const {
 		
 		cxfl_data rp; m_rrsi->get_cxfl(name.c_str(), rp);
 		
@@ -209,7 +216,7 @@ namespace RRClient {
 	
 
 	template<> void 
-	ReconClient::SetMatrix (const std::string& name, Matrix<double>& m) const {
+	RemoteConnector::SetMatrix (const std::string& name, Matrix<double>& m) const {
 		
 		rldb_data r;
 		
@@ -228,7 +235,7 @@ namespace RRClient {
 	
 	
 	template<> void 
-	ReconClient::GetMatrix (const std::string& name, Matrix<double>& m) const {
+	RemoteConnector::GetMatrix (const std::string& name, Matrix<double>& m) const {
 		
 		rldb_data r; m_rrsi->get_rldb(name.c_str(), r);
 		
@@ -244,7 +251,7 @@ namespace RRClient {
 	
 	
 	template<> void 
-	ReconClient::SetMatrix (const std::string& name, Matrix<float>& m) const {
+	RemoteConnector::SetMatrix (const std::string& name, Matrix<float>& m) const {
 		
 		rlfl_data r;
 		
@@ -263,7 +270,7 @@ namespace RRClient {
 	
 
 	template<> void 
-	ReconClient::GetMatrix (const std::string& name, Matrix<float>& m) const {
+	RemoteConnector::GetMatrix (const std::string& name, Matrix<float>& m) const {
 		
 		rlfl_data r; m_rrsi->get_rlfl(name.c_str(), r);
 		
@@ -279,7 +286,7 @@ namespace RRClient {
 	
 	
 	template<> void 
-	ReconClient::SetMatrix (const std::string& name, Matrix<short>& m) const {
+	RemoteConnector::SetMatrix (const std::string& name, Matrix<short>& m) const {
 		
 		shrt_data p;
 		
@@ -298,7 +305,7 @@ namespace RRClient {
 	
 	
 	template<> void 
-	ReconClient::GetMatrix (const std::string& name, Matrix<short>& m) const {
+	RemoteConnector::GetMatrix (const std::string& name, Matrix<short>& m) const {
 		
 		shrt_data p; m_rrsi->get_shrt(name.c_str(), p);
 		
@@ -313,7 +320,7 @@ namespace RRClient {
 
 
 	template<> void 
-	ReconClient::SetMatrix (const std::string& name, Matrix<long>& m) const {
+	RemoteConnector::SetMatrix (const std::string& name, Matrix<long>& m) const {
 		
 		long_data p;
 		
@@ -332,7 +339,7 @@ namespace RRClient {
 	
 	
 	template<> void 
-	ReconClient::GetMatrix (const std::string& name, Matrix<long>& m) const {
+	RemoteConnector::GetMatrix (const std::string& name, Matrix<long>& m) const {
 		
 		long_data p; m_rrsi->get_long(name.c_str(), p);
 		
