@@ -24,187 +24,179 @@ using namespace RRStrategy;
 
 namespace RRServer {
 
-ReconServant::ReconServant  () {
+	ReconServant::ReconServant  () {}
 	
-}
+	
+	ReconServant::~ReconServant () {}
+	
+	
+	error_code
+	ReconServant::CleanUp () {
+		
+		return FunctorContainer::CleanUp();
+		
+	}
+	
+	
+	error_code
+	ReconServant::Init (const char* name) {
+		
+		return FunctorContainer::Init (name);
+		
+	}
+	
+	
+	error_code
+	ReconServant::Finalise (const char* name) {
+		
+		return FunctorContainer::Finalise (name);
+		
+	}
+	
+	
+	error_code
+	ReconServant::Process  (const char* name)       {
+		
+		return FunctorContainer::Process (name);
+		
+	}
+	
+	
+	error_code
+	ReconServant::Prepare  (const char* name)       {
+	
+		return FunctorContainer::Prepare (name);
+		
+	}
+	
+	
+	void
+	ReconServant::set_cxfl  (const char* name, const cxfl_data& c) {
+		
+		DataBase::Instance()->SetMatrix(name, c);
+		
+	}
+	
+	
+	void
+	ReconServant::get_cxfl (const char* name, cxfl_data& c) {
+		
+		c.dims.length(INVALID_DIM);
+		c.res.length (INVALID_DIM);
+		DataBase::Instance()->GetMatrix(name, c);
+		
+	}
+	
 
-
-ReconServant::~ReconServant ()               {
+	void
+	ReconServant::set_cxdb  (const char* name, const cxdb_data& c) {
+		
+		DataBase::Instance()->SetMatrix(name, c);
+		
+	}
 	
-	FunctorContainer::Finalise ();
 	
-}
-
-
-error_code
-ReconServant::CleanUp () {
+	void
+	ReconServant::get_cxdb (const char* name, cxdb_data& c) {
+		
+		c.dims.length(INVALID_DIM);
+		c.res.length (INVALID_DIM);
+		DataBase::Instance()->GetMatrix(name, c);
+		
+	}
 	
-	FunctorContainer::Finalise ();
 	
-}
-
-
-error_code
-ReconServant::Init (const char* name) {
+	void
+	ReconServant::set_rldb       (const char* name, const rldb_data& r)   {
+		
+		DataBase::Instance()->SetMatrix(name, r);
+		
+	}
 	
-	return FunctorContainer::Init (name);
-
-}
-
-
-error_code
-ReconServant::Finalise (const char* name) {
 	
-	return FunctorContainer::Finalise (name);
+	void
+	ReconServant::get_rldb       (const char* name, rldb_data& r) {
+		
+		r.dims.length(INVALID_DIM);
+		r.res.length (INVALID_DIM);
+		DataBase::Instance()->GetMatrix(name, r);
+		
+	}
 	
-}
-
-
-error_code
-ReconServant::Process  (const char* name)       {
 	
-	return FunctorContainer::Process (name);
+	void
+	ReconServant::set_rlfl       (const char* name, const rlfl_data& r)   {
+		
+		DataBase::Instance()->SetMatrix(name, r);
+		
+	}
 	
-}
-
-
-error_code
-ReconServant::Prepare  (const char* name)       {
 	
-	return FunctorContainer::Prepare (name);
+	void
+	ReconServant::get_rlfl       (const char* name, rlfl_data& r) {
+		
+		r.dims.length(INVALID_DIM);
+		r.res.length(INVALID_DIM);
+		DataBase::Instance()->GetMatrix(name, r);
+		
+	}
 	
-}
-
-
-void
-ReconServant::set_cxfl  (const char* name, const cxfl_data& c) {
 	
-	DataBase::Instance()->SetMatrix(name, c);
+	void
+	ReconServant::set_shrt        (const char* name, const shrt_data& p) {
+		
+		DataBase::Instance()->SetMatrix(name, p);
+		
+	}
 	
-}
-
-
-void
-ReconServant::get_cxfl (const char* name, cxfl_data& c) {
 	
-	c.dims.length(INVALID_DIM);
-	c.res.length (INVALID_DIM);
-	DataBase::Instance()->GetMatrix(name, c);
+	void
+	ReconServant::get_shrt        (const char* name, shrt_data& p) {
+		
+		p.dims.length(INVALID_DIM);
+		p.res.length(INVALID_DIM);
+		DataBase::Instance()->GetMatrix(name, p);
+		
+	}
 	
-}
-
-
-void
-ReconServant::set_cxdb  (const char* name, const cxdb_data& c) {
 	
-	DataBase::Instance()->SetMatrix(name, c);
+	void
+	ReconServant::set_long        (const char* name, const long_data& p) {
+		
+		DataBase::Instance()->SetMatrix(name, p);
+		
+	}
 	
-}
-
-
-void
-ReconServant::get_cxdb (const char* name, cxdb_data& c) {
 	
-	c.dims.length(INVALID_DIM);
-	c.res.length (INVALID_DIM);
-	DataBase::Instance()->GetMatrix(name, c);
+	void
+	ReconServant::get_long        (const char* name, long_data& p) {
+		
+		p.dims.length(INVALID_DIM);
+		p.res.length(INVALID_DIM);
+		DataBase::Instance()->GetMatrix(name, p);
+		
+	}
 	
-}
-
-
-void
-ReconServant::set_rldb       (const char* name, const rldb_data& r)   {
 	
-	DataBase::Instance()->SetMatrix(name, r);
+	void 
+	ReconServant::config       (const char* d)    {
+		
+		std::stringstream tmp;
+		
+		tmp << d;
+		m_config = new char[tmp.str().length() + 1];
+		strcpy (m_config, tmp.str().c_str());
+		
+	}
 	
-}
-
-
-void
-ReconServant::get_rldb       (const char* name, rldb_data& r) {
 	
-	r.dims.length(INVALID_DIM);
-	r.res.length (INVALID_DIM);
-	DataBase::Instance()->GetMatrix(name, r);
+	char* 
+	ReconServant::config       ()                    {
+		
+		std::stringstream tmp;
+		tmp << m_config;
+		return CORBA::string_dup(tmp.str().c_str());
+		
+	}
 	
-}
-
-
-void
-ReconServant::set_rlfl       (const char* name, const rlfl_data& r)   {
-	
-	DataBase::Instance()->SetMatrix(name, r);
-	
-}
-
-
-void
-ReconServant::get_rlfl       (const char* name, rlfl_data& r) {
-	
-	r.dims.length(INVALID_DIM);
-	r.res.length(INVALID_DIM);
-	DataBase::Instance()->GetMatrix(name, r);
-	
-}
-
-
-void
-ReconServant::set_shrt        (const char* name, const shrt_data& p) {
-	
-	DataBase::Instance()->SetMatrix(name, p);
-	
-}
-
-
-void
-ReconServant::get_shrt        (const char* name, shrt_data& p) {
-	
-	p.dims.length(INVALID_DIM);
-	p.res.length(INVALID_DIM);
-	DataBase::Instance()->GetMatrix(name, p);
-	
-}
-
-
-void
-ReconServant::set_long        (const char* name, const long_data& p) {
-	
-	DataBase::Instance()->SetMatrix(name, p);
-	
-}
-
-
-void
-ReconServant::get_long        (const char* name, long_data& p) {
-	
-	p.dims.length(INVALID_DIM);
-	p.res.length(INVALID_DIM);
-	DataBase::Instance()->GetMatrix(name, p);
-	
-}
-
-
-void 
-ReconServant::config       (const char* d)    {
-	
-	std::stringstream tmp;
-	
-	tmp << d;
-	m_config = new char[tmp.str().length() + 1];
-	strcpy (m_config, tmp.str().c_str());
-	
-}
-
-
-char* 
-ReconServant::config       ()                    {
-	
-	std::stringstream tmp;
-	
-	tmp << m_config;
-	
-	return CORBA::string_dup(tmp.str().c_str());
-	
-}
-
 };

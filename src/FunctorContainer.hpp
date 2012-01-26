@@ -32,10 +32,17 @@ class FunctorContainer {
 public:
 
 
-
+	
+	/**
+	 * @brief      Default constructor
+	 */
 	FunctorContainer () {}
 
 
+	/**
+	 * @brief      Destructor
+	 */
+	virtual
 	~FunctorContainer ();
 
 	
@@ -87,7 +94,10 @@ public:
 	CleanUp       ();
 	
 	
+	virtual void 
+	config       (const char* d);
 	
+
 	
 protected:
 

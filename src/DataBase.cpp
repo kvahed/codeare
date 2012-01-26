@@ -86,7 +86,7 @@ DataBase::GetCXFL (const string name) {
 
 template<> void
 DataBase::GetMatrix (const string name, cxfl_data& c) {
-	
+
 	if (m_cxfl.find (name) == m_cxfl.end())
 		return;
 		
@@ -574,7 +574,7 @@ DataBase::AddMatrix        (const string name, Ptr< Matrix<long> > m) {
 
 bool 
 DataBase::FreeLONG        (const string name) {
-		
+	
 	map<string, Ptr< Matrix<long> > >::iterator it = m_long.find (name);
 	
 	if (it == m_long.end())

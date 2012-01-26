@@ -194,6 +194,18 @@ public:
 	}
 
 	
+	/**
+	 * @brief           Set a string type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline const char*
+	Attribute        (const char* name) {
+		return m_conn->Attribute (name);
+	}
+
+	
 
 private:
 	
