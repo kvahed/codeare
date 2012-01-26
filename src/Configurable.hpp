@@ -294,7 +294,7 @@ class Configurable {
 	
 
 
- private:
+ protected:
 	
 	TiXmlDocument*      m_config_doc;  /**< Containing XML document              */ 
 

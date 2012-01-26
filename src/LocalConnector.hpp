@@ -33,6 +33,7 @@
 #include "Configurable.hpp"
 #include "ReconContext.hpp"
 #include "FunctorContainer.hpp"
+#include "DataBase.hpp"
 
 using namespace RRSModule;
 using namespace RRStrategy;
@@ -118,7 +119,11 @@ class RemoteConnector;
 		 * @param  m        Complex data
 		 */
 		template <class T> void 
-		SetMatrix           (const std::string& name, Matrix<T>& m) const {};
+		SetMatrix           (const std::string& name, Matrix<T>& m) const {
+
+			DataBase::Instance()->SetMatrix(name, m);
+			
+		}
 		
 		
 		/**
@@ -128,7 +133,11 @@ class RemoteConnector;
 		 * @param  m        Receive storage
 		 */
 		template <class T> void 
-		GetMatrix           (const std::string& name, Matrix<T>& m) const {};
+		GetMatrix           (const std::string& name, Matrix<T>& m) const {
+			
+			DataBase::Instance()->GetMatrix(name, m);
+			
+		}
 		
 		
 		

@@ -18,7 +18,11 @@ LocalConnector::CleanUp () {
 
 error_code
 LocalConnector::Init (const char* name) {
-	
+
+	std::stringstream  temp;
+	temp << GetConfig();
+	FunctorContainer::config  (temp.str().c_str());
+		
 	return FunctorContainer::Init (name);
 
 }
