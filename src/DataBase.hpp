@@ -14,6 +14,8 @@ using namespace RRSModule;
 
 /**
  * @brief Central database for all shared matrices
+ *        Central data storage for matrices. 
+ *        Matrix smart pointers are stored in individual (type) maps along with string identifier and retrieved by their names.
  */
 class DataBase {
 
@@ -52,7 +54,7 @@ class DataBase {
 	
 	
 	/**
-	 * @brief        Get data from recon (Local access)
+	 * @brief        Get data from recon (Local connector)
 	 *
 	 * @param  name  Name
 	 * @param  m     CXFL data storage 
@@ -62,7 +64,7 @@ class DataBase {
 	
 	
 	/**
-	 * @brief        Get data from recon (Local access)
+	 * @brief        Get data from recon (Local connector)
 	 *
 	 * @param  name  Name
 	 * @param  m     CXFL data storage 
@@ -72,27 +74,27 @@ class DataBase {
 	
 	
 	/**
-	 * @brief        Get data from recon (Remote access)
+	 * @brief        Get data from recon (Remote connector)
 	 *
 	 * @param  name  Name
-	 * @param  c     Raw data storage 
+	 * @param  t     Raw data storage type
 	 */
 	template <class T> void
 	GetMatrix        (const string name, T& t);
 	
 	
 	/**
-	 * @brief        Set data for recon (Remote access)
+	 * @brief        Set data for recon (Remote connector)
 	 *
 	 * @param name   Name
-	 * @param c      CXFL data
+	 * @param t      Raw data storage type
 	 */
 	template <class T> void 
 	SetMatrix        (const string name, const T& t);
 	
 	
 	/**
-	 * @brief        Add a complex matrix to complex matrix container
+	 * @brief        Add a matrix to according container
 	 *
 	 * @param  name  Name
 	 * @param  m     The added matrix
@@ -103,7 +105,7 @@ class DataBase {
 	
 	
 	/**
-	 * @brief        Remove a complex matrix from complex container
+	 * @brief        Remove a complex single matrix
 	 *
 	 * @param  name  Name
 	 * @return       Success
@@ -113,7 +115,7 @@ class DataBase {
 	
 	
 	/**
-	 * @brief        Get reference to complex data by name
+	 * @brief        Get reference to a complex single matrix
 	 * 
 	 * @param  name  Name
 	 * @return       Reference to data if existent
@@ -123,7 +125,7 @@ class DataBase {
 	
 	
 	/**
-	 * @brief        Remove a complex matrix from complex container
+	 * @brief        Remove a complex double matrix
 	 *
 	 * @param  name  Name
 	 * @return       Success
@@ -133,7 +135,7 @@ class DataBase {
 	
 	
 	/**
-	 * @brief        Get reference to complex data by name
+	 * @brief        Get reference to a complex double matrix
 	 * 
 	 * @param  name  Name
 	 * @return       Reference to data if existent
@@ -143,7 +145,7 @@ class DataBase {
 	
 	
 	/**
-	 * @brief        Remove a real matrix from real container
+	 * @brief        Remove a real single matrix
 	 *
 	 * @param  name  Name
 	 * @return       Success
@@ -153,7 +155,7 @@ class DataBase {
 		
 	
 	/**
-	 * @brief        Get reference to complex data by name
+	 * @brief        Get reference to a real single matrix
 	 * 
 	 * @param  name  Name
 	 * @return       Reference to data if existent
@@ -163,7 +165,7 @@ class DataBase {
 		
 		
 	/**
-	 * @brief        Remove a real matrix from real container
+	 * @brief        Remove a real double matrix
 	 *
 	 * @param  name  Name
 	 * @return       Success
@@ -173,7 +175,7 @@ class DataBase {
 		
 	
 	/**
-	 * @brief       Get reference to complex data by name
+	 * @brief       Get reference to real double matrix
 	 * 
 	 * @param  name Name
 	 * @return      Reference to data if existent
@@ -183,7 +185,7 @@ class DataBase {
 		
 		
 	/**
-	 * @brief        Remove a short matrix from short container
+	 * @brief        Remove a short int matrix
 	 *
 	 * @param  name  Name
 	 * @return       Success
@@ -193,7 +195,7 @@ class DataBase {
 	
 
 	/**
-	 * @brief        Get reference to complex data by name
+	 * @brief        Get reference to a short int matrix
 	 * 
 	 * @param  name  Name
 	 * @return       Reference to data if existent
@@ -203,7 +205,7 @@ class DataBase {
 	
 
 	/**
-	 * @brief        Remove a long matrix from long container
+	 * @brief        Remove a long int matrix 
 	 *
 	 * @param  name  Name
 	 * @return       Success
@@ -213,7 +215,7 @@ class DataBase {
 	
 
 	/**
-	 * @brief        Get reference to complex data by name
+	 * @brief        Get reference to a long int matrix
 	 * 
 	 * @param  name  Name
 	 * @return       Reference to data if existent
@@ -223,7 +225,7 @@ class DataBase {
 	
 
 	/**
-	 * @brief        Reference to complex single store
+	 * @brief        Get reference to complex single store
 	 *
 	 * @return       Reference to complex single store
 	 */
@@ -232,7 +234,7 @@ class DataBase {
 		
 
 	/**
-	 * @brief        Reference to complex single store
+	 * @brief        Get reference to complex single store
 	 *
 	 * @return       Reference to complex single store
 	 */
@@ -241,7 +243,7 @@ class DataBase {
 		
 
 	/**
-	 * @brief        Reference to complex double store
+	 * @brief        Get reference to complex double store
 	 *
 	 * @return       Reference to complex double store
 	 */
@@ -250,7 +252,7 @@ class DataBase {
 		
 
 	/**
-	 * @brief        Reference to real single store
+	 * @brief        Get reference to real single store
 	 *
 	 * @return       Reference to real single store
 	 */
@@ -259,7 +261,7 @@ class DataBase {
 		
 
 	/**
-	 * @brief        Reference to short int store
+	 * @brief        Get reference to short int store
 	 *
 	 * @return       Reference to short int store
 	 */
@@ -268,7 +270,7 @@ class DataBase {
 
 
 	/**
-	 * @brief        Reference to long int store
+	 * @brief        Get reference to long int store
 	 *
 	 * @return       Reference to long int store
 	 */
@@ -278,7 +280,8 @@ class DataBase {
  private:
 
 	/** 
-	 * @brief Private constructor. Use Instance
+	 * @brief Private constructor (access Instance()). 
+	 *        Singleton object for data storage. Access through Instance().
 	 */
     DataBase() {}; 
 

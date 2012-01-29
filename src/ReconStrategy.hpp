@@ -1,6 +1,6 @@
 /*
  *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Jülich, Germany
+ *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ namespace RRStrategy {
 		
 
 		/**
-		 * @brief       Default destructor
+		 * @brief       Default virtul destructor
 		 */ 
 		virtual
 		~ReconStrategy  () {}
@@ -85,7 +85,7 @@ namespace RRStrategy {
 		
 
 		/**
-		 * @brief       Additional preparation?
+		 * @brief       Mandatory implementation of preparation hooks
 		 *
 		 * @return      Success
 		 */ 
@@ -126,6 +126,9 @@ namespace RRStrategy {
 		Finalise        () {};
 	
 	
+		/**
+		 * @brief       Reference to Database singleton
+		 */
 		DataBase&
 		DB              () const {
 			return *(DataBase::Instance());
@@ -133,11 +136,11 @@ namespace RRStrategy {
 
 
 		/**
-		 * @brief       Add a complex matrix to complex single matrix database
+		 * @brief       Add a matrix to database map
 		 *
-		 * @param  name Name
-		 * @param  m    The added matrix
-		 * @return      Success
+		 * @param  name Name in map
+		 * @param  p    Smart pointer to the matrix
+		 * @return      Reference to matrix
 		 */
 		template <class T> Matrix<T>& 
 		AddMatrix         (const string name, Ptr< Matrix<T> > p) const {
@@ -146,10 +149,11 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       Get reference to complex single data by name from database
+		 * @brief       Get reference to complex single matrix by name from database 
+		 *              @see DataBase::GetCXFL(const string)
 		 * 
 		 * @param  name Name
-		 * @return      Reference to data if existent
+		 * @return      Reference to data 
 		 */
 		Matrix<cxfl>& 
 		GetCXFL         (const string name) const {
@@ -158,7 +162,8 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       Clear database of complex single data by name
+		 * @brief       Clear database of complex single matrix by name
+		 *              @see DataBase::FreeCXFL(const string)
 		 * 
 		 * @param  name Name
 		 * @return      Reference to data if existent
@@ -170,7 +175,8 @@ namespace RRStrategy {
 
 
 		/**
-		 * @brief       Get reference to complex double data by name from database
+		 * @brief       Get reference to complex double matrix by name from database
+		 *              @see DataBase::GetCXDB(const string)
 		 * 
 		 * @param  name Name
 		 * @return      Reference to data if existent
@@ -182,7 +188,8 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       Clear database of complex double data by name
+		 * @brief       Clear database of complex double matrix by name
+		 *              @see DataBase::FreeCXDB(const string)
 		 * 
 		 * @param  name Name
 		 * @return      Reference to data if existent
@@ -194,10 +201,11 @@ namespace RRStrategy {
 
 
 		/**
-		 * @brief       Get reference to complex single data by name from database
+		 * @brief       Get reference to single matrix by name from database
+		 *              @see DataBase::GetRLFL(const string)
 		 * 
 		 * @param  name Name
-		 * @return      Reference to data if existent
+		 * @return      Reference to matrix if existent
 		 */
 		Matrix<float>& 
 		GetRLFL         (const string name) const {
@@ -206,10 +214,11 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       Clear database of complex single data by name
+		 * @brief       Clear database of single matrix by name
+		 *              @see DataBase::FreeRLFL(const string)
 		 * 
 		 * @param  name Name
-		 * @return      Reference to data if existent
+		 * @return      Reference to matrix if existent
 		 */
 		bool 
 		FreeRLFL        (const string name) const {
@@ -218,10 +227,11 @@ namespace RRStrategy {
 
 
 		/**
-		 * @brief       Get reference to complex double data by name from database
+		 * @brief       Get reference to double matrix by name from database
+		 *              @see DataBase::GetRLDB(const string)
 		 * 
 		 * @param  name Name
-		 * @return      Reference to data if existent
+		 * @return      Reference to matrix if existent
 		 */
 		Matrix<double>& 
 		GetRLDB         (const string name) const {
@@ -230,10 +240,11 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       Clear database of complex double data by name
+		 * @brief       Clear database of double matrix by name
+		 *              @see DataBase::FreeRLDB(const string)
 		 * 
 		 * @param  name Name
-		 * @return      Reference to data if existent
+		 * @return      Reference to matrix if existent
 		 */
 		bool 
 		FreeRLDB        (const string name) const {
@@ -242,10 +253,11 @@ namespace RRStrategy {
 
 
 		/**
-		 * @brief       Get reference to complex double data by name from database
+		 * @brief       Get reference to short int matrix by name from database
+		 *              @see DataBase::GetSHRT(const string)
 		 * 
 		 * @param  name Name
-		 * @return      Reference to data if existent
+		 * @return      Reference to matrix if existent
 		 */
 		Matrix<short>& 
 		GetSHRT         (const string name) const {
@@ -254,10 +266,11 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       Clear database of complex double data by name
+		 * @brief       Clear database of short int matrix by name
+		 *              @see DataBase::FreeSHRT(const string)
 		 * 
 		 * @param  name Name
-		 * @return      Reference to data if existent
+		 * @return      Reference to matrix if existent
 		 */
 		bool 
 		FreeSHRT        (const string name) const {
@@ -266,10 +279,11 @@ namespace RRStrategy {
 
 
 		/**
-		 * @brief       Get reference to complex double data by name from database
+		 * @brief       Get reference to long int matrix by name from database
+		 *              @see DataBase::GetLONG(const string)
 		 * 
 		 * @param  name Name
-		 * @return      Reference to data if existent
+		 * @return      Reference to matrix if existent
 		 */
 		Matrix<long>& 
 		GetLONG         (const string name) const {
@@ -278,10 +292,11 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       Clear database of complex double data by name
+		 * @brief       Clear database of long int matrix by name
+		 *              @see DataBase::FreeLONG(const string)
 		 * 
 		 * @param  name Name
-		 * @return      Reference to data if existent
+		 * @return      Reference to matrix if existent
 		 */
 		bool 
 		FreeLONG        (const string name) const {

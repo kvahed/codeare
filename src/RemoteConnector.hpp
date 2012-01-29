@@ -134,7 +134,6 @@ class LocalConnector;
 		
 		RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
 		CORBA::ORB_var      m_orb;        /**< Orb                                  */
-		std::vector<short>  m_rstrats;    /**< Remote reconstruction strategies    */
 		
 		/**
 		 * @brief           Get size from dimensions (Needed internally)

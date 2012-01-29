@@ -67,7 +67,7 @@ class RemoteConnector;
 		/**
 		 * @brief      Process startegy (Needs initialisation @see Init)
 		 *
-		 * @param s    sth Initialised strategy
+		 * @param name Name of processing library
 		 * @return     Sucess
 		 */
 		virtual error_code
@@ -77,7 +77,7 @@ class RemoteConnector;
 		/**
 		 * @brief      Prepare startegy (Needs initialisation @see Init)
 		 *
-		 * @param s    sth Initialised strategy
+		 * @param name Name of processing library
 		 * @return     Sucess
 		 */
 		virtual error_code
@@ -91,25 +91,25 @@ class RemoteConnector;
 		 * @return     success
 		 */
 		virtual error_code
-		Init          (const char* name);
+		Init           (const char* name);
 		
 
 		/**
-		 * @brief     Finalise algorithm
+		 * @brief      Finalise algorithm
 		 *
-		 * @param s   sth Intialised startegy
+		 * @param name Name of processing library
 		 */
 		virtual error_code
-		Finalise      (const char* name = 0);
+		Finalise       (const char* name = 0);
 		
 
 		/**
-		 * @brief     Clean up left over objects
+		 * @brief      Clean up left over objects
 		 *
-		 * @return    Success
+		 * @return     Success
 		 */
 		virtual error_code
-		CleanUp       ();
+		CleanUp        ();
 		
 
 		/**

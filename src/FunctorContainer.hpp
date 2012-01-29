@@ -25,6 +25,10 @@
 
 using namespace RRStrategy;
 
+
+/**
+ * @brief Container for data and reconstructions
+ */
 class FunctorContainer {
 
 
@@ -49,7 +53,7 @@ public:
 	/**
 	 * @brief      Process startegy (Needs initialisation @see Init)
 	 *
-	 * @param s    sth Initialised strategy
+	 * @param name Name of library
 	 * @return     Sucess
 	 */
 	virtual error_code
@@ -59,7 +63,7 @@ public:
 	/**
 	 * @brief      Prepare startegy (Needs initialisation @see Init)
 	 *
-	 * @param s    sth Initialised strategy
+	 * @param name Name of library
 	 * @return     Sucess
 	 */
 	virtual error_code
@@ -77,25 +81,30 @@ public:
 	
 	
 	/**
-	 * @brief     Finalise algorithm
+	 * @brief      Finalise algorithm
 	 *
-	 * @param s   sth Intialised startegy
+	 * @param name Name of processing library
 	 */
 	virtual error_code
-	Finalise      (const char* name = 0);
+	Finalise       (const char* name = 0);
 	
 	
 	/**
-	 * @brief     Clean up left over objects
+	 * @brief      Clean up left over objects
 	 *
-	 * @return    Success
+	 * @return     Success
 	 */
 	virtual error_code
-	CleanUp       ();
+	CleanUp        ();
 	
-	
+
+	/**
+	 * @brief      Set configuration
+	 *
+	 * @param c    Configuration string
+	 */
 	virtual void 
-	config       (const char* d);
+	config         (const char* c);
 	
 
 	
