@@ -111,20 +111,16 @@ namespace RRClient {
 	error_code
 	RemoteConnector::Init (const char* name) {
 		
-		error_code  result  = OK;
-		
 		// Prepare configuration for the journey
 		std::stringstream  temp;
 		temp << GetConfig();
 		m_rrsi->config  (temp.str().c_str());
 		
 		// Initialise back end
-		m_rstrats.push_back (m_rrsi->Init (name));
+		if (m_rrsi->Init (name) != OK)
+			return CANNOT_LOAD_LIBRARY;
 		
-		if (m_rstrats.back() == -1)
-			result = CANNOT_LOAD_LIBRARY;
-		
-		return result;
+		return OK;
 		
 	}
 	

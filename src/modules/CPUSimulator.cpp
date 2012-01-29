@@ -6,7 +6,7 @@ using namespace RRStrategy;
  * @brief          Intensity correction
  * 
  * @param  b1maps  B1 maps
- * @param  target  Target pattern
+ * @param  I       Intensity correction
  */
 inline void 
 IntensityMap (const Matrix<cxfl>& b1maps, Matrix<float>& I) {
@@ -33,7 +33,8 @@ IntensityMap (const Matrix<cxfl>& b1maps, Matrix<float>& I) {
  * @brief       Rotate magnetisation around rotation axis
  *
  * @param  n    Rotation axis
- * @param  r    Magnetisation vector to be rotated
+ * @param  lm   On entry magnetisation vector to be rotated.<br/>
+ *              On exit rotated magnetisation vector.
  */
 inline void 
 Rotate (const Matrix<float>& n, Matrix<float>& lm) {

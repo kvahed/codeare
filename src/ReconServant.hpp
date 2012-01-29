@@ -72,7 +72,7 @@ namespace RRServer {
 		/**
 		 * @brief      Process startegy (Needs initialisation @see Init)
 		 *
-		 * @param s    sth Initialised strategy
+		 * @param name Name of library
 		 * @return     Sucess
 		 */
 		virtual error_code
@@ -82,7 +82,7 @@ namespace RRServer {
 		/**
 		 * @brief      Prepare startegy (Needs initialisation @see Init)
 		 *
-		 * @param s    sth Initialised strategy
+		 * @param name Name of library
 		 * @return     Sucess
 		 */
 		virtual error_code
@@ -102,7 +102,7 @@ namespace RRServer {
 		/**
 		 * @brief     Finalise algorithm
 		 *
-		 * @param s   sth Intialised startegy
+		 * @param name Name of library
 		 */
 		virtual error_code
 		Finalise      (const char* name = 0);

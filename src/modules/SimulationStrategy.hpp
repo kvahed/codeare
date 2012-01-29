@@ -35,7 +35,7 @@ enum SIM_MODE {
 
 namespace RRStrategy {
 	
-	/*
+	/**
 	 * @brief  Simulation package structure
 	 */
 	struct SimulationBundle {

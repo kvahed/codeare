@@ -121,10 +121,10 @@ namespace RRStrategy {
 		 * @brief        @see ReconStrategy::SetCXFL(const std::string name, const cxfl_data&)
 		 *
 		 * @param  name  Name
-		 * @param  r     Complex data sequence
+		 * @param  t     Complex data sequence
 		 */
 		template <class T> void
-		SetMatrix          (const std::string name, const T& t) {
+		SetMatrix        (const std::string name, const T& t) {
 
 			DataBase::Instance()->SetMatrix(name, t);
 
@@ -132,13 +132,13 @@ namespace RRStrategy {
 		
 		
 		/**
-		 * @brief       @see ReconStrategy::GetCXFL(const std::string name, cxfl_data&)
+		 * @brief        @see ReconStrategy::GetCXFL(const std::string name, cxfl_data&)
 		 *
 		 * @param  name  Name
-		 * @param  r    Complex data sequence
+		 * @param  t     Complex data sequence
 		 */
 		template <class T> void
-		GetMatrix          (const std::string name, T& t);
+		GetMatrix        (const std::string name, T& t);
 		
 		
  		/**

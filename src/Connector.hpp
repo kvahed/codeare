@@ -160,9 +160,9 @@ public:
 		
 		
 	/**
-	 * @brief          Read configuration from XML file
+	 * @brief          Read configuration 
 	 *
-	 * @param  fname   Name of input file
+	 * @param config   Name of input file or file access pointer
 	 */
 	template <class S> inline void 
 	ReadConfig        (S config) {
@@ -195,10 +195,9 @@ public:
 
 	
 	/**
-	 * @brief           Set a string type attribute
+	 * @brief           Get a string type attribute
 	 *
 	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
 	 */
 	inline const char*
 	Attribute        (const char* name) {

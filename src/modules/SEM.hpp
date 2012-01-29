@@ -26,12 +26,13 @@
  * 
  * @param  in           Original discretised sample O (Nx x Ny x Nz)
  * @param  sm           Sensitivity maps            O (Nx x Ny x Nz x Nc)
+ * @param  ic           Intesity correction map
  * @param  np           Non-Cartesian strategy for non uniform ft
  * @param  out          Result                      O (Nk x Nc)
  * @param  dim          FT dimensions
  */
 RRSModule::error_code 
-E  (const Matrix<raw>& in, const Matrix<raw>& sm, const Matrix<double>& intcor, nfft_plan* np, Matrix<raw>& out, const int& dim) {
+E  (const Matrix<raw>& in, const Matrix<raw>& sm, const Matrix<double>& ic, nfft_plan* np, Matrix<raw>& out, const int& dim) {
 
 	// Clear output container
 	out.Zero();
@@ -51,8 +52,8 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, const Matrix<double>& intcor, 
 		int tid      = omp_get_thread_num();
 
 #pragma omp for 
-		for (int i = 0; i < intcor.Size(); i++)
-			in[i] *= intcor[i]; 
+		for (int i = 0; i < ic.Size(); i++)
+			in[i] *= ic[i]; 
 		
 #pragma omp for
 		for (int j = 0; j < ncoils; j++) {
@@ -91,6 +92,7 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, const Matrix<double>& intcor, 
  *
  * @param  in           K-space samples along trajectory O (Nk x Nc)
  * @param  sm           Sensitivity maps                 O (Nx x Ny x Nz x Nc)
+ * @param  ic           Intesity correction map
  * @param  np           NuFFT plan
  * @param  spc          Solver plan
  * @param  epsilon      Convergence criterium for ift (default 3e-7)
@@ -100,7 +102,7 @@ E  (const Matrix<raw>& in, const Matrix<raw>& sm, const Matrix<double>& intcor, 
  * @param  adjoint      Use adjoint?
  */
 RRSModule::error_code
-EH (const Matrix<raw>& in, const Matrix<raw>&  sm, const Matrix<double>& intcor, 
+EH (const Matrix<raw>& in, const Matrix<raw>&  sm, const Matrix<double>& ic, 
 	nfft_plan* np, solver_plan_complex* spc, const double& epsilon, const int& maxit,
 	Matrix<raw>& out, const int& dim, const bool& adjoint) {
 
@@ -155,7 +157,7 @@ EH (const Matrix<raw>& in, const Matrix<raw>&  sm, const Matrix<double>& intcor,
 				out[i] += (raw(ftout[pos][0], ftout[pos][1]) * conj(sm[pos]));
 			}
 
-			out[i] *= intcor[i];
+			out[i] *= ic[i];
 
 		}
 	}

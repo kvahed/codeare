@@ -81,11 +81,12 @@ namespace RRStrategy {
 
 
 	/**
-	 * @brief              Noise prewhitening
+	 * @brief          Noise prewhitening
 	 * 
-	 * @param  data    Data
+	 * @param  in      Data
 	 * @param  ncov    Noise covariance matrix
-	 * 
+	 * @param  od      Out data
+	 * @param  out     size
 	 */
 	void PreWhite (const Matrix<cxfl>& in, const Matrix<cxfl>& ncov, Matrix<cxfl>& od, const size_t& out = -1) {
 
