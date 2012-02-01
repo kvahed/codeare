@@ -619,6 +619,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+USE_GSL_FALSE
+USE_GSL_TRUE
 LAPACK
 BLAS
 INC_INSIGHT_H
@@ -626,8 +628,6 @@ INSIGHT_LIB_DIR_FLAG
 INSIGHT_LIB_FLAG
 HAVE_INSIGHT
 ITK_INSTALL_PREFIX
-USE_GSL_FALSE
-USE_GSL_TRUE
 USE_NFFT3_FALSE
 USE_NFFT3_TRUE
 PYTHON_LDFLAGS
@@ -673,7 +673,6 @@ SED
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
-am__nodep
 AMDEPBACKSLASH
 AMDEP_FALSE
 AMDEP_TRUE
@@ -787,8 +786,7 @@ CPP
 CXX
 CXXFLAGS
 CCC
-CXXCPP
-PYTHON'
+CXXCPP'
 
 
 # Initialize some variables set by options.
@@ -1445,7 +1443,6 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
-  PYTHON      the Python interpreter
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -3337,7 +3334,6 @@ fi
 if test "x$enable_dependency_tracking" != xno; then
   am_depcomp="$ac_aux_dir/depcomp"
   AMDEPBACKSLASH='\'
-  am__nodep='_no'
 fi
  if test "x$enable_dependency_tracking" != xno; then
   AMDEP_TRUE=
@@ -4151,7 +4147,6 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
-  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -4211,7 +4206,7 @@ else
 	break
       fi
       ;;
-    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
+    msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -5428,7 +5423,7 @@ linux* | k*bsd*-gnu | kopensolaris*-gnu)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-netbsd*)
+netbsd* | netbsdelf*-gnu)
   if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
     lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
   else
@@ -8769,6 +8764,9 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
   openbsd*)
     with_gnu_ld=no
     ;;
+  linux* | k*bsd*-gnu | gnu*)
+    link_all_deplibs=no
+    ;;
   esac
 
   ld_shlibs=yes
@@ -8991,7 +8989,7 @@ _LT_EOF
       fi
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -9168,6 +9166,7 @@ _LT_EOF
 	if test "$aix_use_runtimelinking" = yes; then
 	  shared_flag="$shared_flag "'${wl}-G'
 	fi
+	link_all_deplibs=no
       else
 	# not using gcc
 	if test "$host_cpu" = ia64; then
@@ -9624,7 +9623,7 @@ $as_echo "$lt_cv_irix_exported_symbol" >&6; }
       link_all_deplibs=yes
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -10477,6 +10476,7 @@ gnu*)
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
   soname_spec='${libname}${release}${shared_ext}$major'
   shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
   hardcode_into_libs=yes
   ;;
 
@@ -10658,6 +10658,18 @@ fi
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
+  ;;
+
+netbsdelf*-gnu)
+  version_type=linux
+  need_lib_prefix=no
+  need_version=no
+  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+  soname_spec='${libname}${release}${shared_ext}$major'
+  shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
+  hardcode_into_libs=yes
+  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -12193,7 +12205,6 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
-  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -12253,7 +12264,7 @@ else
 	break
       fi
       ;;
-    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
+    msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -12578,7 +12589,6 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
-  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -12638,7 +12648,7 @@ else
 	break
       fi
       ;;
-    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
+    msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -14589,7 +14599,7 @@ lt_prog_compiler_static_CXX=
 	    ;;
 	esac
 	;;
-      netbsd*)
+      netbsd* | netbsdelf*-gnu)
 	;;
       *qnx* | *nto*)
         # QNX uses GNU C++, but need to define -shared option too, otherwise
@@ -14957,6 +14967,9 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
       exclude_expsyms_CXX='[_]+GLOBAL_OFFSET_TABLE_|[_]+GLOBAL__[FID]_.*|[_]+head_[A-Za-z0-9_]+_dll|[A-Za-z0-9_]+_dll_iname'
       ;;
     esac
+    ;;
+  linux* | k*bsd*-gnu | gnu*)
+    link_all_deplibs_CXX=no
     ;;
   *)
     export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED '\''s/.* //'\'' | sort | uniq > $export_symbols'
@@ -15405,6 +15418,7 @@ gnu*)
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
   soname_spec='${libname}${release}${shared_ext}$major'
   shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
   hardcode_into_libs=yes
   ;;
 
@@ -15586,6 +15600,18 @@ fi
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
+  ;;
+
+netbsdelf*-gnu)
+  version_type=linux
+  need_lib_prefix=no
+  need_version=no
+  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+  soname_spec='${libname}${release}${shared_ext}$major'
+  shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
+  hardcode_into_libs=yes
+  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -16196,8 +16222,6 @@ else
 fi
 
 if test "$python_path" = auto; then
-
-
 
 
 
@@ -17642,54 +17666,6 @@ else
 $as_echo "cannot find libcdf, cdf dump / read functionality unavailable!" >&6; }
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gsl_wavelet_alloc in -lgsl" >&5
-$as_echo_n "checking for gsl_wavelet_alloc in -lgsl... " >&6; }
-if ${ac_cv_lib_gsl_gsl_wavelet_alloc+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgsl  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char gsl_wavelet_alloc ();
-int
-main ()
-{
-return gsl_wavelet_alloc ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_gsl_gsl_wavelet_alloc=yes
-else
-  ac_cv_lib_gsl_gsl_wavelet_alloc=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gsl_gsl_wavelet_alloc" >&5
-$as_echo "$ac_cv_lib_gsl_gsl_wavelet_alloc" >&6; }
-if test "x$ac_cv_lib_gsl_gsl_wavelet_alloc" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBGSL 1
-_ACEOF
-
-  LIBS="-lgsl $LIBS"
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libgsl, Compressed sensing reconstruction unavailable!" >&5
-$as_echo "cannot find libgsl, Compressed sensing reconstruction unavailable!" >&6; }
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nfft_precompute_psi in -lnfft3" >&5
 $as_echo_n "checking for nfft_precompute_psi in -lnfft3... " >&6; }
 if ${ac_cv_lib_nfft3_nfft_precompute_psi+:} false; then :
@@ -17740,14 +17716,6 @@ fi
 else
   USE_NFFT3_TRUE='#'
   USE_NFFT3_FALSE=
-fi
-
- if test "$HAVE_GSL" -eq 1; then
-  USE_GSL_TRUE=
-  USE_GSL_FALSE='#'
-else
-  USE_GSL_TRUE='#'
-  USE_GSL_FALSE=
 fi
 
 
@@ -18628,6 +18596,111 @@ fi
 #AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cblas_dasum in -lcblas" >&5
+$as_echo_n "checking for cblas_dasum in -lcblas... " >&6; }
+if ${ac_cv_lib_cblas_cblas_dasum+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcblas  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cblas_dasum ();
+int
+main ()
+{
+return cblas_dasum ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_cblas_cblas_dasum=yes
+else
+  ac_cv_lib_cblas_cblas_dasum=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cblas_cblas_dasum" >&5
+$as_echo "$ac_cv_lib_cblas_cblas_dasum" >&6; }
+if test "x$ac_cv_lib_cblas_cblas_dasum" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBCBLAS 1
+_ACEOF
+
+  LIBS="-lcblas $LIBS"
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libcblas, Compressed sensing reconstruction unavailable!" >&5
+$as_echo "cannot find libcblas, Compressed sensing reconstruction unavailable!" >&6; }
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gsl_wavelet_alloc in -lgsl" >&5
+$as_echo_n "checking for gsl_wavelet_alloc in -lgsl... " >&6; }
+if ${ac_cv_lib_gsl_gsl_wavelet_alloc+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgsl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gsl_wavelet_alloc ();
+int
+main ()
+{
+return gsl_wavelet_alloc ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_gsl_gsl_wavelet_alloc=yes
+else
+  ac_cv_lib_gsl_gsl_wavelet_alloc=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gsl_gsl_wavelet_alloc" >&5
+$as_echo "$ac_cv_lib_gsl_gsl_wavelet_alloc" >&6; }
+if test "x$ac_cv_lib_gsl_gsl_wavelet_alloc" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGSL 1
+_ACEOF
+
+  LIBS="-lgsl $LIBS"
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libgsl, Compressed sensing reconstruction unavailable!" >&5
+$as_echo "cannot find libgsl, Compressed sensing reconstruction unavailable!" >&6; }
+fi
+
+ if test "$HAVE_GSL" -eq 1; then
+  USE_GSL_TRUE=
+  USE_GSL_FALSE='#'
+else
+  USE_GSL_TRUE='#'
+  USE_GSL_FALSE=
+fi
+
+
 for ac_func in floor
 do :
   ac_fn_cxx_check_func "$LINENO" "floor" "ac_cv_func_floor"
@@ -18726,6 +18799,7 @@ _ACEOF
 
 fi
 done
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for error_at_line" >&5
 $as_echo_n "checking for error_at_line... " >&6; }
@@ -18962,7 +19036,6 @@ $as_echo "#define HAVE_MMAP 1" >>confdefs.h
 
 fi
 rm -f conftest.mmap conftest.txt
-
 
 
 # Generate files
