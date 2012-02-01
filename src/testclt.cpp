@@ -20,18 +20,34 @@
 
 #include "testclt.hpp"
 
+
+template <class T> Connector<T>*
+contype (bool& remot) {
+
+	if (remot)
+		return new Connector<RemoteConnector> (name, verbose);
+	else
+		return new Connector<LocalConnector> (name, verbose);
+
+}
+
+
 int main (int argc, char** argv) {
 	
 	if (init (argc, argv)) {
 
-		
+		//void (*foo)(bool&);
+		//foo = &contype;
+
+		//contype(remote);
+
 		Connector<RemoteConnector>* rc; 
 		Connector<LocalConnector>*  lc;
 
 		if (remote) 
 			rc = new Connector<RemoteConnector> (name, verbose);
 		else 
-			lc = new Connector<LocalConnector> (name, verbose);
+			lc = new Connector<LocalConnector>  (name, verbose);
 		
 		if      (!strcmp (test, "CGSENSE")              ) (remote) ?  cgsensetest (rc) :  cgsensetest (lc);
 		else if (!strcmp (test, "DirectMethod")         ) (remote) ?       dmtest (rc) :       dmtest (lc);
