@@ -35,8 +35,10 @@
 #define __CL_ENABLE_EXCEPTIONS
 
 #if defined HAVE_CL_CL_GL_H
+#include "CL/cl_ext.h"
 #include "CL/cl_gl.h"
 #elif defined HAVE_CL_GL_H
+#include "cl_ext.h"
 #include "cl_gl.h"
 #endif
 

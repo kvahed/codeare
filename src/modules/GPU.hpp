@@ -1,4 +1,5 @@
 #if defined HAVE_CL_CL_H
+    #include <CL/cl_ext.h>
     #include <CL/cl.h>
 #elif defined HAVE_OPENCL_CL_H
     #include <OpenCL/opencl.h>

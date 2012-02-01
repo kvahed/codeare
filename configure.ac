@@ -220,11 +220,9 @@ AC_CHECK_LIB([z],            [deflate],       [], [AC_MSG_ERROR([cannot find lib
 AC_CHECK_LIB([fftw3],        [fftw_execute],  [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
 AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
 AC_CHECK_LIB([cdf],          [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf dump / read functionality unavailable!])])
-AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
 
 AM_CONDITIONAL([USE_NFFT3],  [test "$HAVE_NFFT3" -eq 1])
-AM_CONDITIONAL([USE_GSL],    [test "$HAVE_GSL" -eq 1])
 
 # Time & Co for FFTW cycle
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[
@@ -522,6 +520,10 @@ AC_SUBST(LAPACK)
 #AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
+AC_CHECK_LIB([cblas],  [cblas_dasum], [], [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
+AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
+AM_CONDITIONAL([USE_GSL],    [test "$HAVE_GSL" -eq 1])
+
 AC_CHECK_FUNCS([floor])
 AC_CHECK_FUNCS([getpagesize])
 AC_CHECK_FUNCS([memmove])
@@ -531,9 +533,9 @@ AC_CHECK_FUNCS([setenv])
 AC_CHECK_FUNCS([sqrt])
 AC_CHECK_FUNCS([strchr])
 AC_CHECK_FUNCS([strstr])
+
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
-
 
 # Generate files
 AC_CONFIG_FILES([src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile])
