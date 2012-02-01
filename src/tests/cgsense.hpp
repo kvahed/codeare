@@ -22,19 +22,19 @@ template <class T> bool
 cgsensetest (RRClient::Connector<T>* rc) {
 
 	// Incoming
-	Matrix<cxfl>   rawdata;
-	Matrix<double> weights;
-	Matrix<double> kspace;
-	Matrix<cxfl>   sens;
+	Matrix<cxfl>   rawdata; // Measurement data O(Nkx,Nky,Nkz)
+	Matrix<double> weights; // NUFFT weights   
+	Matrix<double> kspace;  // Kspace positions O(Nkx,Nky,Nkz)
+	Matrix<cxfl>   sens;    // Sensitivity maps O(Nx, Ny, Nz)
 	
 	// Outgoing
-	Matrix<double> nrmse;
+	Matrix<double> nrmse;   // Residues of the CG process
 	Matrix<cxfl>   image;
 	Matrix<cxfl>   signals;
 	
-	std::string    cf  = std::string (base + std::string(config));
-	std::string    df  = std::string (base + std::string(data));
-	std::string    odf = std::string (base + std::string("/images.mat"));
+	std::string    cf  = std::string (base + std::string(config));        // Configuration file (f.e. share/cgsense/config_human.xml)
+	std::string    df  = std::string (base + std::string(data));          // Binary data file 
+	std::string    odf = std::string (base + std::string("/images.mat")); // Binary Ouput (images etc)
 	
 	weights.Read   (df, "weights");
 	rawdata.Read   (df, "data");
@@ -48,8 +48,9 @@ cgsensetest (RRClient::Connector<T>* rc) {
 		return false;
 	}
 	
-	rc->Attribute ("pulses", (int*)&pulses);
-	
+
+	//weights = FFT::Forward(weights);
+
 	// Outgoing -------------
 	
 	rc->SetMatrix (   "data", rawdata); // Measurement data

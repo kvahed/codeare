@@ -187,7 +187,7 @@ CGSENSE::Process () {
 	Matrix<cxfl>&   sens    = GetCXFL("sens");
 	Matrix<double>& weights = GetRLDB("weights");
 	Matrix<double>& kspace  = GetRLDB("kspace");
-	
+
 	// CG matrices ----------------------------------------------------
 	Matrix <cxfl>   p       = Matrix<cxfl>   (m_N[0],m_N[1],m_N[2]), q, r;
 

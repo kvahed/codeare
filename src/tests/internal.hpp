@@ -1,6 +1,6 @@
 template <class T> bool 
 internaltest (Connector<T>* rc) {
-
+	
 	int            i = 0, j = 0, d = 5;
 	
 	Matrix<cxfl>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -23,7 +23,7 @@ internaltest (Connector<T>* rc) {
 	
 	Matrix<size_t> mg = Matrix<size_t>::MeshGrid(m);
 #ifdef HAVE_MAT_H	
-	mg.MXDump("mg.mat", "mg");
+	//mg.MXDump("mg.mat", "mg");
 #endif
 	
 	std::cout << r << std::endl;
@@ -31,10 +31,10 @@ internaltest (Connector<T>* rc) {
 	std::cout << p << std::endl;
 	
 	Matrix<std::complex<double> >  f = (Matrix<std::complex<double> >) r;
-
+	
 	rc->ReadConfig("test.xml");
 	rc->Init(test);
-
+	
 	rc->SetMatrix ("r", r);
 	rc->SetMatrix ("p", p);
 	rc->SetMatrix ("h", h);
