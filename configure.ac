@@ -216,7 +216,7 @@ case $host in
     *darwin*)
         PLUGIN_LDFLAGS="-fPIC -module -avoid-version";;
     *)
-        PLUGIN_LDFLAGS="-fPIC -export-dynamic -avoid-version";;
+        PLUGIN_LDFLAGS="-fPIC -Wl,-export-dynamic -avoid-version";;
 esac
 AC_SUBST(PLUGIN_LDFLAGS)
 
