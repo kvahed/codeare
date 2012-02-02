@@ -212,6 +212,14 @@ case $host in
         ])
 esac
 
+case $host in
+    *darwin*)
+        PLUGIN_LDFLAGS="-fPIC -module -avoid-version";;
+    *)
+        PLUGIN_LDFLAGS="-fPIC -export-dynamic -avoid-version";;
+esac
+AC_SUBST(PLUGIN_LDFLAGS)
+
 # Checks for C libraries.
 AC_CHECK_LIB([omnithread],   [read],          [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
 AC_CHECK_LIB([omniDynamic4], [main],          [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])

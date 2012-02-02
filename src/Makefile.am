@@ -21,7 +21,7 @@ SERVER_SIDE =  Loader.hpp ReconContext.hpp ReconContext.cpp ReconServant.hpp Rec
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) modules/FFT.hpp modules/FFT.cpp testclt.cpp
-testclt_LDFLAGS = $(BLAS) $(LAPACK) -fPIC -Wl,--export-dynamic
+testclt_LDFLAGS = $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
