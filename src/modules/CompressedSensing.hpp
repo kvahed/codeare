@@ -24,7 +24,7 @@
 #include "ReconStrategy.hpp"
 #include "FFT.hpp"
 #include "DWT.hpp"
-
+#include "TVOP.hpp"
 
 /**
  * @brief Reconstruction startegies
@@ -46,7 +46,7 @@ namespace RRStrategy {
 		double tvw;
 		double xfmw;
 		double cgconv;
-		double l1smooth;
+		double l1;
 		double lsa;
 		double lsb;
 		
@@ -104,55 +104,166 @@ namespace RRStrategy {
 	};
 
 
-	void GradObj   (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp, Matrix<cxfl>& grad) {
 
-		grad  = DWT::Backward (x);
-		grad  = FFT::Forward  (x);
-		grad -= data;
-		grad  = FFT::Backward (x);
-		grad  = DWT::Forward  (x);
-		grad *= cxfl(2.0,0.0);
-
-	}
-
-	void GradXFM   (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp, Matrix<cxfl>& grad) {
+	float Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, const Matrix<cxfl>& ttdbx, 
+					 const Matrix<cxfl>& ttdbg, const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
+					 const Matrix<cxfl>&  data, const cxfl&             t, const CGParam&        cgp) {
 		
-		Matrix<cxfl> xtr = x.tr();
+		float        obj = 0.0, tv = 0.0, xfm = 0.0;
+		Matrix<cxfl> objm;
+		float        p = (float)cgp.pnorm/2.0;
 
-		grad  = x;
-		grad *= xtr;
-		grad += cxfl(cgp.l1smooth,0.0);
-		grad  = grad ^ (((float)cgp.pnorm)/2.0-1.0);
-		grad *= x;
+		objm  = ffdbx;
+		//objm += (t * ffdbg);
+		objm -= data;
+		obj   = pow(objm.Norm().real(), 2);
+
+		
+		if (cgp.tvw) {
+
+			Matrix<cxfl> tvm;
+			
+			tvm  = ttdbx;
+			//	tvm += (ttdbg * t);
+			
+			for (size_t i = 0; i < tvm.Size(); i++)
+				tvm[i] *= conj(tvm[i]);
+			
+			tvm += cxfl(cgp.l1);
+			tvm ^= p;
+			
+			tv   = 0.0;
+			
+			for (size_t i = 0; i < tvm.Size(); i++)
+				tv += tvm[i].real();
+			
+		} 
+		
+		if (cgp.xfmw) {
+			
+			Matrix<cxfl> xfmm;
+			
+			xfmm  = x;
+			//xfmm += (g * t);
+			
+			for (size_t i = 0; i < xfmm.Size(); i++)
+				xfmm[i] *= conj(xfmm[i]);
+			
+			xfmm += cxfl(cgp.l1);
+			xfmm ^= p;
+			
+			xfm  = 0.0;
+			
+			for (size_t i = 0; i < xfmm.Size(); i++)
+				xfm += xfmm[i].real();
+			
+		} 
+
+		//float nrms = obj / pow(data.Norm().real(), 2);
+		//printf (" RMS: %.9f\n", res.at(iters));
+
+		return (obj + tv + xfm);
 
 	}
 
-	void GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp, Matrix<cxfl>& grad) {
+	/**
+	 * @brief Compute gradient of the data consistency
+	 */
+	Matrix<cxfl> GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
+		
+		Matrix<cxfl> g;
+		
+		g  = DWT::Backward (x);
+		g  = FFT::Forward  (g);
 
-		// Dx = params.TV*(params.XFM'*x);
-		// G = params.pNorm*Dx.*(Dx.*conj(Dx) + params.l1Smooth).^(params.pNorm/2-1);
-		// grad = params.XFM*(params.TV'*G);
+		g -= data;
+
+		g  = FFT::Backward (g);
+		g  = DWT::Forward  (g);
+
+		return g * cxfl(2.0,0.0);
 
 	}
 
-	void WGradient          (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp, Matrix<cxfl>& grad) {
 
-		GradObj (x, data, cgp, grad);
-		GradXFM (x, data, cgp, grad);
-		GradTV  (x, data, cgp, grad);
+	/**
+	 * @brief Compute gradient of L1-transform operator
+	 */
+	Matrix<cxfl> GradXFM   (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
+		
+		Matrix<cxfl> g = x;
 
-		//grad = (gradObj +  params.xfmWeight.*gradXFM + params.TVWeight.*gradTV);
+		for (int i = 0; i < g.Size(); i++)
+			g[i] *= conj(g[i]); 
+
+		g += cxfl(cgp.l1);
+		g ^= (((float)cgp.pnorm)/2.0-1.0);
+		g *= x;
+
+		return g * cxfl(cgp.xfmw);
+
+	}
+
+
+	/**
+	 * @brief Compute gradient of the total variation operator
+	 */
+	Matrix<cxfl> GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
+
+		Matrix<cxfl> dx = TVOP::Transform(DWT::Backward(x));
+		Matrix<cxfl> g = dx;
+
+		for (int i = 0; i < g.Size(); i++)
+			g[i] *= conj(g[i]); 
+
+		g += cxfl(cgp.l1);
+		g ^= (((float)cgp.pnorm)/2.0-1.0);
+
+		for (int i = 0; i < g.Size(); i++)
+			g[i] *= dx[i]; 
+
+		g *= cxfl(cgp.pnorm);
+		g  = TVOP::Adjoint (g);
+
+		return g * cxfl(cgp.xfmw * cgp.tvw);
+
+	}
+
+
+	Matrix<cxfl> Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
+
+		Matrix<cxfl> g = GradObj (x, data, cgp);
+		
+		if (cgp.xfmw)
+			g += GradXFM (x, data, cgp);
+		
+		if (cgp.tvw)
+			g += GradTV  (x, data, cgp);
+
+		return g;
 
 	} 
 
 
-	void NLCG               (Matrix<cxfl>& x, Matrix<cxfl>& data, const CGParam& cgp) {
+	Matrix<cxfl> NLCG     (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
 
 		int k = 0;
 		int t = 1;
 
-		Matrix<cxfl> grad (data.Dim());
-		WGradient (x, data, cgp, grad);
+		Matrix<cxfl> g0, dx, ffdbx, ffdbg, ttdbx, ttdbg;
+
+		g0 = Gradient (x, data, cgp);
+		dx = -g0;
+ 
+		ffdbx = FFT::Forward (DWT::Backward ( x));
+		ffdbg = FFT::Forward (DWT::Backward (dx));
+		
+		if (cgp.tvw) {
+			ttdbx = TVOP::Transform(DWT::Backward( x));
+			ttdbx = TVOP::Transform(DWT::Backward( x));
+		}
+
+		return g0;
 
 	}
 
