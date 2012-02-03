@@ -1,2 +1,2 @@
-noinst_LIBRARIES = libnfftstub.a 
-libnfftstub_a_SOURCES = nfftstub.h nfftstub.c
+noinst_LTLIBRARIES = libnfftstub.la 
+libnfftstub_la_SOURCES = nfftstub.h nfftstub.c

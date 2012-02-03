@@ -8,7 +8,7 @@
 # Binaries 
 bin_PROGRAMS = reconserver testclt 
 
-AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
+AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 
 # Common sources
 COMMON =  RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc DataBase.hpp DataBase.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp
@@ -20,8 +20,9 @@ CLIENT_SIDE = RemoteConnector.hpp RemoteConnector.cpp Connector.hpp LocalConnect
 SERVER_SIDE = ReconServant.hpp ReconServant.cpp
 
 # Rules for testclt
-testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)  testclt.cpp
-testclt_LDFLAGS = $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ tinyxml/libtinyxml.a matrix/libmatrix.a
+testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)  testclt.cpp 
+testclt_LDFLAGS = $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@
+testclt_LDADD = tinyxml/libtinyxml.la matrix/libmatrix.la 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
@@ -33,4 +34,4 @@ endif
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
 
-SUBDIRS = modules tinyxml matrix nfft
+SUBDIRS = tinyxml matrix nfft modules

@@ -21,7 +21,7 @@
 #ifndef __CONFIGURABLE_HPP__
 #define __CONFIGURABLE_HPP__
 
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 #include <string>
 
 /**
@@ -38,6 +38,8 @@ class Configurable {
 	 * @brief           Construct and initialise configuration DOM
 	 */
 	Configurable() {
+
+		std::cout << "We are never called?" << std::endl;
 
 		m_config_doc             = new TiXmlDocument    ();
 		m_config_doc->LinkEndChild(new TiXmlDeclaration ("1.0", "", ""));
@@ -225,6 +227,7 @@ class Configurable {
 	inline const char*
 	GetConfig           ()             {
 
+		int err = 0;
 		TiXmlPrinter printer;
 		m_config_doc->Accept( &printer );
 		std::string temp  = printer.CStr();

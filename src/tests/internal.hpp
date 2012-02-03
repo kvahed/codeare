@@ -31,10 +31,11 @@ internaltest (Connector<T>* rc) {
 	std::cout << p << std::endl;
 	
 	Matrix<std::complex<double> >  f = (Matrix<std::complex<double> >) r;
-	
+
 	rc->ReadConfig("test.xml");
+
 	rc->Init(test);
-	
+
 	rc->SetMatrix ("r", r);
 	rc->SetMatrix ("p", p);
 	rc->SetMatrix ("h", h);
@@ -54,7 +55,7 @@ internaltest (Connector<T>* rc) {
 	rc->GetMatrix ("h", h);
 
 	rc->Finalise (test);
-	
+
 	cout << "We're good" << endl;
 
 	return true;
