@@ -82,7 +82,7 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 AFI_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_1 = ../Toolbox.lo ../tinyxml/tinystr.lo \
+am__objects_1 = ../matrix/Toolbox.lo ../tinyxml/tinystr.lo \
 	../tinyxml/tinyxml.lo ../tinyxml/tinyxmlerror.lo \
 	../tinyxml/tinyxmlparser.lo ../tinyxml/xpath_processor.lo \
 	../tinyxml/xpath_expression.lo ../tinyxml/xpath_static.lo \
@@ -384,7 +384,7 @@ lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	SpatialDomain.la KTPoints.la RelativeSensitivities.la \
 	GRAPPA.la DirectMethod.la AFI.la $(am__append_1) \
 	$(am__append_2)
-COMMON = ../Toolbox.hpp ../Toolbox.cpp ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../tinyxml/xpath_processor.h ../tinyxml/xpath_processor.cpp ../tinyxml/xpath_expression.cpp ../tinyxml/xpath_expression.h ../tinyxml/xpath_static.cpp ../tinyxml/xpath_static.h ../tinyxml/action_store.cpp ../tinyxml/action_store.h ../tinyxml/xpath_stack.cpp ../tinyxml/xpath_stack.h ../tinyxml/lex_util.cpp ../tinyxml/lex_util.h ../tinyxml/xpath_stream.cpp ../tinyxml/xpath_stream.h ../tinyxml/node_set.cpp ../tinyxml/node_set.h ../tinyxml/xml_util.cpp ../tinyxml/xml_util.h ../tinyxml/xpath_syntax.cpp ../tinyxml/xpath_syntax.h ../tinyxml/tokenlist.cpp ../tinyxml/tokenlist.h ../matrix/FFT.hpp ../matrix/FFT.cpp
+COMMON = ../matrix/Toolbox.hpp ../matrix/Toolbox.cpp ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../tinyxml/xpath_processor.h ../tinyxml/xpath_processor.cpp ../tinyxml/xpath_expression.cpp ../tinyxml/xpath_expression.h ../tinyxml/xpath_static.cpp ../tinyxml/xpath_static.h ../tinyxml/action_store.cpp ../tinyxml/action_store.h ../tinyxml/xpath_stack.cpp ../tinyxml/xpath_stack.h ../tinyxml/lex_util.cpp ../tinyxml/lex_util.h ../tinyxml/xpath_stream.cpp ../tinyxml/xpath_stream.h ../tinyxml/node_set.cpp ../tinyxml/node_set.h ../tinyxml/xml_util.cpp ../tinyxml/xml_util.h ../tinyxml/xpath_syntax.cpp ../tinyxml/xpath_syntax.h ../tinyxml/tokenlist.cpp ../tinyxml/tokenlist.h ../matrix/FFT.hpp ../matrix/FFT.cpp
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
@@ -488,13 +488,14 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-../$(am__dirstamp):
-	@$(MKDIR_P) ..
-	@: > ../$(am__dirstamp)
-../$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../$(DEPDIR)
-	@: > ../$(DEPDIR)/$(am__dirstamp)
-../Toolbox.lo: ../$(am__dirstamp) ../$(DEPDIR)/$(am__dirstamp)
+../matrix/$(am__dirstamp):
+	@$(MKDIR_P) ../matrix
+	@: > ../matrix/$(am__dirstamp)
+../matrix/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../matrix/$(DEPDIR)
+	@: > ../matrix/$(DEPDIR)/$(am__dirstamp)
+../matrix/Toolbox.lo: ../matrix/$(am__dirstamp) \
+	../matrix/$(DEPDIR)/$(am__dirstamp)
 ../tinyxml/$(am__dirstamp):
 	@$(MKDIR_P) ../tinyxml
 	@: > ../tinyxml/$(am__dirstamp)
@@ -531,12 +532,6 @@ clean-libLTLIBRARIES:
 	../tinyxml/$(DEPDIR)/$(am__dirstamp)
 ../tinyxml/tokenlist.lo: ../tinyxml/$(am__dirstamp) \
 	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../matrix/$(am__dirstamp):
-	@$(MKDIR_P) ../matrix
-	@: > ../matrix/$(am__dirstamp)
-../matrix/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../matrix/$(DEPDIR)
-	@: > ../matrix/$(DEPDIR)/$(am__dirstamp)
 ../matrix/FFT.lo: ../matrix/$(am__dirstamp) \
 	../matrix/$(DEPDIR)/$(am__dirstamp)
 AFI.la: $(AFI_la_OBJECTS) $(AFI_la_DEPENDENCIES) 
@@ -574,10 +569,10 @@ SystemCmd.la: $(SystemCmd_la_OBJECTS) $(SystemCmd_la_DEPENDENCIES)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ../Toolbox.$(OBJEXT)
-	-rm -f ../Toolbox.lo
 	-rm -f ../matrix/FFT.$(OBJEXT)
 	-rm -f ../matrix/FFT.lo
+	-rm -f ../matrix/Toolbox.$(OBJEXT)
+	-rm -f ../matrix/Toolbox.lo
 	-rm -f ../tinyxml/action_store.$(OBJEXT)
 	-rm -f ../tinyxml/action_store.lo
 	-rm -f ../tinyxml/lex_util.$(OBJEXT)
@@ -612,8 +607,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/Toolbox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../matrix/$(DEPDIR)/FFT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../matrix/$(DEPDIR)/Toolbox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/action_store.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/lex_util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/node_set.Plo@am__quote@
@@ -703,7 +698,6 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf ../.libs ../_libs
 	-rm -rf ../matrix/.libs ../matrix/_libs
 	-rm -rf ../tinyxml/.libs ../tinyxml/_libs
 
@@ -823,8 +817,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f ../$(DEPDIR)/$(am__dirstamp)
-	-rm -f ../$(am__dirstamp)
 	-rm -f ../matrix/$(DEPDIR)/$(am__dirstamp)
 	-rm -f ../matrix/$(am__dirstamp)
 	-rm -f ../tinyxml/$(DEPDIR)/$(am__dirstamp)
@@ -839,7 +831,7 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ../$(DEPDIR) ../matrix/$(DEPDIR) ../tinyxml/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../matrix/$(DEPDIR) ../tinyxml/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -885,7 +877,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ../$(DEPDIR) ../matrix/$(DEPDIR) ../tinyxml/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../matrix/$(DEPDIR) ../tinyxml/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
