@@ -54,19 +54,10 @@ CONFIG_CLEAN_FILES = Loader.hpp
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = options.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
-	matrix/Toolbox.$(OBJEXT) DataBase.$(OBJEXT) \
-	tinyxml/tinystr.$(OBJEXT) tinyxml/tinyxml.$(OBJEXT) \
-	tinyxml/tinyxmlerror.$(OBJEXT) tinyxml/tinyxmlparser.$(OBJEXT) \
-	tinyxml/xpath_processor.$(OBJEXT) \
-	tinyxml/xpath_expression.$(OBJEXT) \
-	tinyxml/xpath_static.$(OBJEXT) tinyxml/action_store.$(OBJEXT) \
-	tinyxml/xpath_stack.$(OBJEXT) tinyxml/lex_util.$(OBJEXT) \
-	tinyxml/xpath_stream.$(OBJEXT) tinyxml/node_set.$(OBJEXT) \
-	tinyxml/xml_util.$(OBJEXT) tinyxml/xpath_syntax.$(OBJEXT) \
-	tinyxml/tokenlist.$(OBJEXT) FunctorContainer.$(OBJEXT)
-am__objects_2 = ReconContext.$(OBJEXT) ReconServant.$(OBJEXT)
+	DataBase.$(OBJEXT) FunctorContainer.$(OBJEXT) \
+	ReconContext.$(OBJEXT)
+am__objects_2 = ReconServant.$(OBJEXT)
 am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	reconserver.$(OBJEXT)
 reconserver_OBJECTS = $(am_reconserver_OBJECTS)
@@ -74,10 +65,9 @@ reconserver_LDADD = $(LDADD)
 reconserver_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(reconserver_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_3 = RemoteConnector.$(OBJEXT) ReconContext.$(OBJEXT) \
-	LocalConnector.$(OBJEXT)
+am__objects_3 = RemoteConnector.$(OBJEXT) LocalConnector.$(OBJEXT)
 am_testclt_OBJECTS = $(am__objects_1) $(am__objects_3) \
-	modules/FFT.$(OBJEXT) testclt.$(OBJEXT)
+	testclt.$(OBJEXT)
 testclt_OBJECTS = $(am_testclt_OBJECTS)
 testclt_LDADD = $(LDADD)
 testclt_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -286,20 +276,20 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
+AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 
 # Common sources
-COMMON = RRSModule.idl common.h Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc matrix/Toolbox.cpp matrix/Toolbox.hpp DataBase.hpp DataBase.cpp tinyxml/tinystr.cpp tinyxml/tinystr.h tinyxml/tinyxml.cpp tinyxml/tinyxml.h tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp tinyxml/xpath_processor.h tinyxml/xpath_processor.cpp tinyxml/xpath_expression.cpp tinyxml/xpath_expression.h tinyxml/xpath_static.cpp tinyxml/xpath_static.h tinyxml/action_store.cpp tinyxml/action_store.h tinyxml/xpath_stack.cpp tinyxml/xpath_stack.h tinyxml/lex_util.cpp tinyxml/lex_util.h tinyxml/xpath_stream.cpp tinyxml/xpath_stream.h tinyxml/node_set.cpp tinyxml/node_set.h tinyxml/xml_util.cpp tinyxml/xml_util.h tinyxml/xpath_syntax.cpp tinyxml/xpath_syntax.h tinyxml/tokenlist.cpp tinyxml/tokenlist.h FunctorContainer.hpp FunctorContainer.cpp
+COMMON = RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc DataBase.hpp DataBase.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp
 
 # Client side stuff
-CLIENT_SIDE = Loader.hpp RemoteConnector.hpp RemoteConnector.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Connector.hpp LocalConnector.hpp LocalConnector.cpp
+CLIENT_SIDE = RemoteConnector.hpp RemoteConnector.cpp Connector.hpp LocalConnector.hpp LocalConnector.cpp
 
 # Reconstruction strategies & server side stuff
-SERVER_SIDE = Loader.hpp ReconContext.hpp ReconContext.cpp ReconServant.hpp ReconServant.cpp ReconStrategy.hpp
+SERVER_SIDE = ReconServant.hpp ReconServant.cpp
 
 # Rules for testclt
-testclt_SOURCES = $(COMMON) $(CLIENT_SIDE) modules/FFT.hpp modules/FFT.cpp testclt.cpp
-testclt_LDFLAGS = $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@
+testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)  testclt.cpp
+testclt_LDFLAGS = $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ tinyxml/libtinyxml.a matrix/libmatrix.a
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
@@ -309,10 +299,11 @@ reconserver_LDFLAGS = $(HDF5) @PLUGIN_LDFLAGS@ -dlopen \
 	modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la \
 	-dlopen modules/KTPoints.la -dlopen \
 	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
-	-dlopen modules/DirectMethod.la $(am__append_1)
+	-dlopen modules/DirectMethod.la tinyxml/libtinyxml.a \
+	$(am__append_1)
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
-SUBDIRS = modules tinyxml matrix
+SUBDIRS = modules tinyxml matrix nfft
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -408,84 +399,15 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-matrix/$(am__dirstamp):
-	@$(MKDIR_P) matrix
-	@: > matrix/$(am__dirstamp)
-matrix/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) matrix/$(DEPDIR)
-	@: > matrix/$(DEPDIR)/$(am__dirstamp)
-matrix/Toolbox.$(OBJEXT): matrix/$(am__dirstamp) \
-	matrix/$(DEPDIR)/$(am__dirstamp)
-tinyxml/$(am__dirstamp):
-	@$(MKDIR_P) tinyxml
-	@: > tinyxml/$(am__dirstamp)
-tinyxml/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) tinyxml/$(DEPDIR)
-	@: > tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/tinystr.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/tinyxml.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/tinyxmlerror.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/tinyxmlparser.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/xpath_processor.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/xpath_expression.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/xpath_static.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/action_store.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/xpath_stack.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/lex_util.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/xpath_stream.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/node_set.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/xml_util.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/xpath_syntax.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
-tinyxml/tokenlist.$(OBJEXT): tinyxml/$(am__dirstamp) \
-	tinyxml/$(DEPDIR)/$(am__dirstamp)
 reconserver$(EXEEXT): $(reconserver_OBJECTS) $(reconserver_DEPENDENCIES) 
 	@rm -f reconserver$(EXEEXT)
 	$(reconserver_LINK) $(reconserver_OBJECTS) $(reconserver_LDADD) $(LIBS)
-modules/$(am__dirstamp):
-	@$(MKDIR_P) modules
-	@: > modules/$(am__dirstamp)
-modules/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) modules/$(DEPDIR)
-	@: > modules/$(DEPDIR)/$(am__dirstamp)
-modules/FFT.$(OBJEXT): modules/$(am__dirstamp) \
-	modules/$(DEPDIR)/$(am__dirstamp)
 testclt$(EXEEXT): $(testclt_OBJECTS) $(testclt_DEPENDENCIES) 
 	@rm -f testclt$(EXEEXT)
 	$(testclt_LINK) $(testclt_OBJECTS) $(testclt_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f matrix/Toolbox.$(OBJEXT)
-	-rm -f modules/FFT.$(OBJEXT)
-	-rm -f tinyxml/action_store.$(OBJEXT)
-	-rm -f tinyxml/lex_util.$(OBJEXT)
-	-rm -f tinyxml/node_set.$(OBJEXT)
-	-rm -f tinyxml/tinystr.$(OBJEXT)
-	-rm -f tinyxml/tinyxml.$(OBJEXT)
-	-rm -f tinyxml/tinyxmlerror.$(OBJEXT)
-	-rm -f tinyxml/tinyxmlparser.$(OBJEXT)
-	-rm -f tinyxml/tokenlist.$(OBJEXT)
-	-rm -f tinyxml/xml_util.$(OBJEXT)
-	-rm -f tinyxml/xpath_expression.$(OBJEXT)
-	-rm -f tinyxml/xpath_processor.$(OBJEXT)
-	-rm -f tinyxml/xpath_stack.$(OBJEXT)
-	-rm -f tinyxml/xpath_static.$(OBJEXT)
-	-rm -f tinyxml/xpath_stream.$(OBJEXT)
-	-rm -f tinyxml/xpath_syntax.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -500,23 +422,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@matrix/$(DEPDIR)/Toolbox.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/FFT.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/action_store.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/lex_util.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/node_set.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/tinystr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/tinyxml.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/tinyxmlerror.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/tinyxmlparser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/tokenlist.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/xml_util.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/xpath_expression.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/xpath_processor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/xpath_stack.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/xpath_static.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/xpath_stream.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/xpath_syntax.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -800,12 +705,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f matrix/$(DEPDIR)/$(am__dirstamp)
-	-rm -f matrix/$(am__dirstamp)
-	-rm -f modules/$(DEPDIR)/$(am__dirstamp)
-	-rm -f modules/$(am__dirstamp)
-	-rm -f tinyxml/$(DEPDIR)/$(am__dirstamp)
-	-rm -f tinyxml/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -815,7 +714,7 @@ clean: clean-recursive
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ./$(DEPDIR) matrix/$(DEPDIR) modules/$(DEPDIR) tinyxml/$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
@@ -861,7 +760,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ./$(DEPDIR) matrix/$(DEPDIR) modules/$(DEPDIR) tinyxml/$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

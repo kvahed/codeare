@@ -547,6 +547,6 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 
 # Generate files
-AC_CONFIG_FILES([src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile src/matrix/Makefile])
+AC_CONFIG_FILES([src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile src/matrix/Makefile src/nfft/Makefile])
 AC_OUTPUT
 
