@@ -81,102 +81,90 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 AFI_la_LIBADD =
-am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_1 = ../matrix/Toolbox.lo ../tinyxml/tinystr.lo \
-	../tinyxml/tinyxml.lo ../tinyxml/tinyxmlerror.lo \
-	../tinyxml/tinyxmlparser.lo ../tinyxml/xpath_processor.lo \
-	../tinyxml/xpath_expression.lo ../tinyxml/xpath_static.lo \
-	../tinyxml/action_store.lo ../tinyxml/xpath_stack.lo \
-	../tinyxml/lex_util.lo ../tinyxml/xpath_stream.lo \
-	../tinyxml/node_set.lo ../tinyxml/xml_util.lo \
-	../tinyxml/xpath_syntax.lo ../tinyxml/tokenlist.lo \
-	../matrix/FFT.lo
-am_AFI_la_OBJECTS = $(am__objects_1) AFI.lo
+am_AFI_la_OBJECTS = AFI.lo
 AFI_la_OBJECTS = $(am_AFI_la_OBJECTS)
 AFI_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AFI_la_LDFLAGS) $(LDFLAGS) -o $@
 CGSENSE_la_LIBADD =
-am_CGSENSE_la_OBJECTS = $(am__objects_1) CGSENSE.lo nfftstub.lo
+am_CGSENSE_la_OBJECTS = CGSENSE.lo
 CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
 CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
 CompressedSensing_la_LIBADD =
-am_CompressedSensing_la_OBJECTS = $(am__objects_1) DWT.lo \
-	CompressedSensing.lo
+am_CompressedSensing_la_OBJECTS = CompressedSensing.lo
 CompressedSensing_la_OBJECTS = $(am_CompressedSensing_la_OBJECTS)
 CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_GSL_TRUE@am_CompressedSensing_la_rpath = -rpath $(libdir)
 DirectMethod_la_LIBADD =
-am_DirectMethod_la_OBJECTS = $(am__objects_1) DirectMethod.lo \
-	CPUSimulator.lo GPUSimulator.lo
+am_DirectMethod_la_OBJECTS = DirectMethod.lo CPUSimulator.lo \
+	GPUSimulator.lo
 DirectMethod_la_OBJECTS = $(am_DirectMethod_la_OBJECTS)
 DirectMethod_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DirectMethod_la_LDFLAGS) $(LDFLAGS) -o $@
 DummyRecon_la_LIBADD =
-am_DummyRecon_la_OBJECTS = $(am__objects_1) DummyRecon.lo
+am_DummyRecon_la_OBJECTS = DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
 DummyRecon_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DummyRecon_la_LDFLAGS) $(LDFLAGS) -o $@
 DumpToFile_la_LIBADD =
-am_DumpToFile_la_OBJECTS = $(am__objects_1) DumpToFile.lo
+am_DumpToFile_la_OBJECTS = DumpToFile.lo
 DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
 DumpToFile_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) -o $@
 GRAPPA_la_LIBADD =
-am_GRAPPA_la_OBJECTS = $(am__objects_1) GRAPPA.lo
+am_GRAPPA_la_OBJECTS = GRAPPA.lo
 GRAPPA_la_OBJECTS = $(am_GRAPPA_la_OBJECTS)
 GRAPPA_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GRAPPA_la_LDFLAGS) $(LDFLAGS) -o $@
 GenericRegrid_la_LIBADD =
-am_GenericRegrid_la_OBJECTS = $(am__objects_1) GenericRegrid.lo
+am_GenericRegrid_la_OBJECTS = GenericRegrid.lo
 GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
 GenericRegrid_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) $(LDFLAGS) -o $@
 KTPoints_la_LIBADD =
-am_KTPoints_la_OBJECTS = $(am__objects_1) KTPoints.lo
+am_KTPoints_la_OBJECTS = KTPoints.lo
 KTPoints_la_OBJECTS = $(am_KTPoints_la_OBJECTS)
 KTPoints_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(KTPoints_la_LDFLAGS) $(LDFLAGS) -o $@
 LapackTests_la_LIBADD =
-am_LapackTests_la_OBJECTS = $(am__objects_1) LapackTests.lo
+am_LapackTests_la_OBJECTS = LapackTests.lo
 LapackTests_la_OBJECTS = $(am_LapackTests_la_OBJECTS)
 LapackTests_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(LapackTests_la_LDFLAGS) $(LDFLAGS) -o $@
 MedianFilter_OMP_la_LIBADD =
-am_MedianFilter_OMP_la_OBJECTS = $(am__objects_1) MedianFilter_OMP.lo
+am_MedianFilter_OMP_la_OBJECTS = MedianFilter_OMP.lo
 MedianFilter_OMP_la_OBJECTS = $(am_MedianFilter_OMP_la_OBJECTS)
 MedianFilter_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(MedianFilter_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
 NuFFT_la_LIBADD =
-am_NuFFT_la_OBJECTS = $(am__objects_1) NuFFT.lo nfftstub.lo
+am_NuFFT_la_OBJECTS = NuFFT.lo
 NuFFT_la_OBJECTS = $(am_NuFFT_la_OBJECTS)
 NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_NuFFT_la_rpath = -rpath $(libdir)
 NuFFT_OMP_la_LIBADD =
-am_NuFFT_OMP_la_OBJECTS = $(am__objects_1) NuFFT_OMP.lo nfftstub.lo
+am_NuFFT_OMP_la_OBJECTS = NuFFT_OMP.lo
 NuFFT_OMP_la_OBJECTS = $(am_NuFFT_OMP_la_OBJECTS)
 NuFFT_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_NuFFT_OMP_la_rpath = -rpath $(libdir)
 RelativeSensitivities_la_LIBADD =
-am_RelativeSensitivities_la_OBJECTS = $(am__objects_1) \
-	RelativeSensitivities.lo
+am_RelativeSensitivities_la_OBJECTS = RelativeSensitivities.lo
 RelativeSensitivities_la_OBJECTS =  \
 	$(am_RelativeSensitivities_la_OBJECTS)
 RelativeSensitivities_la_LINK = $(LIBTOOL) --tag=CXX \
@@ -184,13 +172,13 @@ RelativeSensitivities_la_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_CXXFLAGS) $(CXXFLAGS) $(RelativeSensitivities_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SpatialDomain_la_LIBADD =
-am_SpatialDomain_la_OBJECTS = $(am__objects_1) SpatialDomain.lo
+am_SpatialDomain_la_OBJECTS = SpatialDomain.lo
 SpatialDomain_la_OBJECTS = $(am_SpatialDomain_la_OBJECTS)
 SpatialDomain_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(SpatialDomain_la_LDFLAGS) $(LDFLAGS) -o $@
 SystemCmd_la_LIBADD =
-am_SystemCmd_la_OBJECTS = $(am__objects_1) SystemCmd.lo
+am_SystemCmd_la_OBJECTS = SystemCmd.lo
 SystemCmd_la_OBJECTS = $(am_SystemCmd_la_OBJECTS)
 SystemCmd_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -199,15 +187,6 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -216,6 +195,15 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(AFI_la_SOURCES) $(CGSENSE_la_SOURCES) \
 	$(CompressedSensing_la_SOURCES) $(DirectMethod_la_SOURCES) \
@@ -374,8 +362,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H) 
-AUTOMAKE_OPTIONS = subdir-objects
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H) -I../matrix -I../nfft
 EXTRA_DIST = GPUSimulator.cl
 
 # Rules for recon strategies
@@ -384,49 +371,48 @@ lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	SpatialDomain.la KTPoints.la RelativeSensitivities.la \
 	GRAPPA.la DirectMethod.la AFI.la $(am__append_1) \
 	$(am__append_2)
-COMMON = ../matrix/Toolbox.hpp ../matrix/Toolbox.cpp ../tinyxml/tinystr.cpp ../tinyxml/tinystr.h ../tinyxml/tinyxml.cpp ../tinyxml/tinyxml.h ../tinyxml/tinyxmlerror.cpp ../tinyxml/tinyxmlparser.cpp ../tinyxml/xpath_processor.h ../tinyxml/xpath_processor.cpp ../tinyxml/xpath_expression.cpp ../tinyxml/xpath_expression.h ../tinyxml/xpath_static.cpp ../tinyxml/xpath_static.h ../tinyxml/action_store.cpp ../tinyxml/action_store.h ../tinyxml/xpath_stack.cpp ../tinyxml/xpath_stack.h ../tinyxml/lex_util.cpp ../tinyxml/lex_util.h ../tinyxml/xpath_stream.cpp ../tinyxml/xpath_stream.h ../tinyxml/node_set.cpp ../tinyxml/node_set.h ../tinyxml/xml_util.cpp ../tinyxml/xml_util.h ../tinyxml/xpath_syntax.cpp ../tinyxml/xpath_syntax.h ../tinyxml/tokenlist.cpp ../tinyxml/tokenlist.h ../matrix/FFT.hpp ../matrix/FFT.cpp
 
 # Common linker flags
-COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
+COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@ ../tinyxml/libtinyxml.a ../matrix/libmatrix.a
 
 # Libraries
-DummyRecon_la_SOURCES = $(COMMON) DummyRecon.hpp DummyRecon.cpp
+DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp
 DummyRecon_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-GenericRegrid_la_SOURCES = $(COMMON) GenericRegrid.hpp GenericRegrid.cpp
+GenericRegrid_la_SOURCES = GenericRegrid.hpp GenericRegrid.cpp
 GenericRegrid_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-MedianFilter_OMP_la_SOURCES = $(COMMON) MedianFilter_OMP.hpp MedianFilter_OMP.cpp
+MedianFilter_OMP_la_SOURCES = MedianFilter_OMP.hpp MedianFilter_OMP.cpp
 MedianFilter_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-NuFFT_la_SOURCES = $(COMMON) NuFFT.hpp NuFFT.cpp nfftstub.h nfftstub.c
-NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3
-NuFFT_OMP_la_SOURCES = $(COMMON) NuFFT_OMP.hpp NuFFT_OMP.cpp nfftstub.h nfftstub.c OMP.hpp
-NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3
-DumpToFile_la_SOURCES = $(COMMON) DumpToFile.hpp DumpToFile.cpp
+NuFFT_la_SOURCES = NuFFT.hpp NuFFT.cpp
+NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 ../nfft/libnfftstub.a
+NuFFT_OMP_la_SOURCES = NuFFT_OMP.hpp NuFFT_OMP.cpp OMP.hpp
+NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 ../nfft/libnfftstub.a
+DumpToFile_la_SOURCES = DumpToFile.hpp DumpToFile.cpp
 DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-CGSENSE_la_SOURCES = $(COMMON) CGSENSE.hpp CGSENSE.cpp nfftstub.h nfftstub.c Noise.hpp SEM.hpp OMP.hpp
-CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK)
-SystemCmd_la_SOURCES = $(COMMON) SystemCmd.hpp SystemCmd.cpp
+CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp SEM.hpp OMP.hpp
+CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK) ../nfft/libnfftstub.a
+SystemCmd_la_SOURCES = SystemCmd.hpp SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-LapackTests_la_SOURCES = $(COMMON) LapackTests.hpp LapackTests.cpp
+LapackTests_la_SOURCES = LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-GRAPPA_la_SOURCES = $(COMMON) GRAPPA.hpp GRAPPA.cpp
+GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-SpatialDomain_la_SOURCES = $(COMMON) SpatialDomain.hpp SpatialDomain.cpp
+SpatialDomain_la_SOURCES = SpatialDomain.hpp SpatialDomain.cpp
 SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-KTPoints_la_SOURCES = $(COMMON) KTPoints.hpp KTPoints.cpp
+KTPoints_la_SOURCES = KTPoints.hpp KTPoints.cpp
 KTPoints_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-RelativeSensitivities_la_SOURCES = $(COMMON) RelativeSensitivities.hpp RelativeSensitivities.cpp
+RelativeSensitivities_la_SOURCES = RelativeSensitivities.hpp RelativeSensitivities.cpp
 RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
-AFI_la_SOURCES = $(COMMON) AFI.hpp AFI.cpp
+AFI_la_SOURCES = AFI.hpp AFI.cpp
 AFI_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-CompressedSensing_la_SOURCES = $(COMMON) DWT.cpp DWT.hpp CompressedSensing.hpp CompressedSensing.cpp
+CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
-DirectMethod_la_SOURCES = $(COMMON) DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp 
+DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp 
 DirectMethod_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .lo .o .obj
+.SUFFIXES: .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -488,52 +474,6 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-../matrix/$(am__dirstamp):
-	@$(MKDIR_P) ../matrix
-	@: > ../matrix/$(am__dirstamp)
-../matrix/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../matrix/$(DEPDIR)
-	@: > ../matrix/$(DEPDIR)/$(am__dirstamp)
-../matrix/Toolbox.lo: ../matrix/$(am__dirstamp) \
-	../matrix/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/$(am__dirstamp):
-	@$(MKDIR_P) ../tinyxml
-	@: > ../tinyxml/$(am__dirstamp)
-../tinyxml/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../tinyxml/$(DEPDIR)
-	@: > ../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/tinystr.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/tinyxml.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/tinyxmlerror.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/tinyxmlparser.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/xpath_processor.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/xpath_expression.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/xpath_static.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/action_store.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/xpath_stack.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/lex_util.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/xpath_stream.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/node_set.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/xml_util.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/xpath_syntax.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../tinyxml/tokenlist.lo: ../tinyxml/$(am__dirstamp) \
-	../tinyxml/$(DEPDIR)/$(am__dirstamp)
-../matrix/FFT.lo: ../matrix/$(am__dirstamp) \
-	../matrix/$(DEPDIR)/$(am__dirstamp)
 AFI.la: $(AFI_la_OBJECTS) $(AFI_la_DEPENDENCIES) 
 	$(AFI_la_LINK) -rpath $(libdir) $(AFI_la_OBJECTS) $(AFI_la_LIBADD) $(LIBS)
 CGSENSE.la: $(CGSENSE_la_OBJECTS) $(CGSENSE_la_DEPENDENCIES) 
@@ -569,66 +509,14 @@ SystemCmd.la: $(SystemCmd_la_OBJECTS) $(SystemCmd_la_DEPENDENCIES)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ../matrix/FFT.$(OBJEXT)
-	-rm -f ../matrix/FFT.lo
-	-rm -f ../matrix/Toolbox.$(OBJEXT)
-	-rm -f ../matrix/Toolbox.lo
-	-rm -f ../tinyxml/action_store.$(OBJEXT)
-	-rm -f ../tinyxml/action_store.lo
-	-rm -f ../tinyxml/lex_util.$(OBJEXT)
-	-rm -f ../tinyxml/lex_util.lo
-	-rm -f ../tinyxml/node_set.$(OBJEXT)
-	-rm -f ../tinyxml/node_set.lo
-	-rm -f ../tinyxml/tinystr.$(OBJEXT)
-	-rm -f ../tinyxml/tinystr.lo
-	-rm -f ../tinyxml/tinyxml.$(OBJEXT)
-	-rm -f ../tinyxml/tinyxml.lo
-	-rm -f ../tinyxml/tinyxmlerror.$(OBJEXT)
-	-rm -f ../tinyxml/tinyxmlerror.lo
-	-rm -f ../tinyxml/tinyxmlparser.$(OBJEXT)
-	-rm -f ../tinyxml/tinyxmlparser.lo
-	-rm -f ../tinyxml/tokenlist.$(OBJEXT)
-	-rm -f ../tinyxml/tokenlist.lo
-	-rm -f ../tinyxml/xml_util.$(OBJEXT)
-	-rm -f ../tinyxml/xml_util.lo
-	-rm -f ../tinyxml/xpath_expression.$(OBJEXT)
-	-rm -f ../tinyxml/xpath_expression.lo
-	-rm -f ../tinyxml/xpath_processor.$(OBJEXT)
-	-rm -f ../tinyxml/xpath_processor.lo
-	-rm -f ../tinyxml/xpath_stack.$(OBJEXT)
-	-rm -f ../tinyxml/xpath_stack.lo
-	-rm -f ../tinyxml/xpath_static.$(OBJEXT)
-	-rm -f ../tinyxml/xpath_static.lo
-	-rm -f ../tinyxml/xpath_stream.$(OBJEXT)
-	-rm -f ../tinyxml/xpath_stream.lo
-	-rm -f ../tinyxml/xpath_syntax.$(OBJEXT)
-	-rm -f ../tinyxml/xpath_syntax.lo
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@../matrix/$(DEPDIR)/FFT.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../matrix/$(DEPDIR)/Toolbox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/action_store.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/lex_util.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/node_set.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/tinystr.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/tinyxml.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/tinyxmlerror.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/tinyxmlparser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/tokenlist.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/xml_util.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/xpath_expression.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/xpath_processor.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/xpath_stack.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/xpath_static.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/xpath_stream.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../tinyxml/$(DEPDIR)/xpath_syntax.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AFI.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CGSENSE.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CPUSimulator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CompressedSensing.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DWT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DirectMethod.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
@@ -643,31 +531,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RelativeSensitivities.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpatialDomain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nfftstub.Plo@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -698,8 +561,6 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf ../matrix/.libs ../matrix/_libs
-	-rm -rf ../tinyxml/.libs ../tinyxml/_libs
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -817,10 +678,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f ../matrix/$(DEPDIR)/$(am__dirstamp)
-	-rm -f ../matrix/$(am__dirstamp)
-	-rm -f ../tinyxml/$(DEPDIR)/$(am__dirstamp)
-	-rm -f ../tinyxml/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -831,7 +688,7 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ../matrix/$(DEPDIR) ../tinyxml/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -877,7 +734,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ../matrix/$(DEPDIR) ../tinyxml/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
