@@ -56,9 +56,9 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = options.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
-	Toolbox.$(OBJEXT) DataBase.$(OBJEXT) tinyxml/tinystr.$(OBJEXT) \
-	tinyxml/tinyxml.$(OBJEXT) tinyxml/tinyxmlerror.$(OBJEXT) \
-	tinyxml/tinyxmlparser.$(OBJEXT) \
+	matrix/Toolbox.$(OBJEXT) DataBase.$(OBJEXT) \
+	tinyxml/tinystr.$(OBJEXT) tinyxml/tinyxml.$(OBJEXT) \
+	tinyxml/tinyxmlerror.$(OBJEXT) tinyxml/tinyxmlparser.$(OBJEXT) \
 	tinyxml/xpath_processor.$(OBJEXT) \
 	tinyxml/xpath_expression.$(OBJEXT) \
 	tinyxml/xpath_static.$(OBJEXT) tinyxml/action_store.$(OBJEXT) \
@@ -289,7 +289,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 
 # Common sources
-COMMON = RRSModule.idl common.h Configurable.h DllExport.h Matrix.h options.h options.cpp RRSModule.hh RRSModuleSK.cc Toolbox.cpp Toolbox.hpp DataBase.hpp DataBase.cpp tinyxml/tinystr.cpp tinyxml/tinystr.h tinyxml/tinyxml.cpp tinyxml/tinyxml.h tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp tinyxml/xpath_processor.h tinyxml/xpath_processor.cpp tinyxml/xpath_expression.cpp tinyxml/xpath_expression.h tinyxml/xpath_static.cpp tinyxml/xpath_static.h tinyxml/action_store.cpp tinyxml/action_store.h tinyxml/xpath_stack.cpp tinyxml/xpath_stack.h tinyxml/lex_util.cpp tinyxml/lex_util.h tinyxml/xpath_stream.cpp tinyxml/xpath_stream.h tinyxml/node_set.cpp tinyxml/node_set.h tinyxml/xml_util.cpp tinyxml/xml_util.h tinyxml/xpath_syntax.cpp tinyxml/xpath_syntax.h tinyxml/tokenlist.cpp tinyxml/tokenlist.h FunctorContainer.hpp FunctorContainer.cpp
+COMMON = RRSModule.idl common.h Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc matrix/Toolbox.cpp matrix/Toolbox.hpp DataBase.hpp DataBase.cpp tinyxml/tinystr.cpp tinyxml/tinystr.h tinyxml/tinyxml.cpp tinyxml/tinyxml.h tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp tinyxml/xpath_processor.h tinyxml/xpath_processor.cpp tinyxml/xpath_expression.cpp tinyxml/xpath_expression.h tinyxml/xpath_static.cpp tinyxml/xpath_static.h tinyxml/action_store.cpp tinyxml/action_store.h tinyxml/xpath_stack.cpp tinyxml/xpath_stack.h tinyxml/lex_util.cpp tinyxml/lex_util.h tinyxml/xpath_stream.cpp tinyxml/xpath_stream.h tinyxml/node_set.cpp tinyxml/node_set.h tinyxml/xml_util.cpp tinyxml/xml_util.h tinyxml/xpath_syntax.cpp tinyxml/xpath_syntax.h tinyxml/tokenlist.cpp tinyxml/tokenlist.h FunctorContainer.hpp FunctorContainer.cpp
 
 # Client side stuff
 CLIENT_SIDE = Loader.hpp RemoteConnector.hpp RemoteConnector.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Connector.hpp LocalConnector.hpp LocalConnector.cpp
@@ -408,6 +408,14 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+matrix/$(am__dirstamp):
+	@$(MKDIR_P) matrix
+	@: > matrix/$(am__dirstamp)
+matrix/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) matrix/$(DEPDIR)
+	@: > matrix/$(DEPDIR)/$(am__dirstamp)
+matrix/Toolbox.$(OBJEXT): matrix/$(am__dirstamp) \
+	matrix/$(DEPDIR)/$(am__dirstamp)
 tinyxml/$(am__dirstamp):
 	@$(MKDIR_P) tinyxml
 	@: > tinyxml/$(am__dirstamp)
@@ -461,6 +469,7 @@ testclt$(EXEEXT): $(testclt_OBJECTS) $(testclt_DEPENDENCIES)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f matrix/Toolbox.$(OBJEXT)
 	-rm -f modules/FFT.$(OBJEXT)
 	-rm -f tinyxml/action_store.$(OBJEXT)
 	-rm -f tinyxml/lex_util.$(OBJEXT)
@@ -488,10 +497,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconServant.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RemoteConnector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@matrix/$(DEPDIR)/Toolbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/FFT.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/action_store.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tinyxml/$(DEPDIR)/lex_util.Po@am__quote@
@@ -791,6 +800,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f matrix/$(DEPDIR)/$(am__dirstamp)
+	-rm -f matrix/$(am__dirstamp)
 	-rm -f modules/$(DEPDIR)/$(am__dirstamp)
 	-rm -f modules/$(am__dirstamp)
 	-rm -f tinyxml/$(DEPDIR)/$(am__dirstamp)
@@ -804,7 +815,7 @@ clean: clean-recursive
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ./$(DEPDIR) modules/$(DEPDIR) tinyxml/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) matrix/$(DEPDIR) modules/$(DEPDIR) tinyxml/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
@@ -850,7 +861,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ./$(DEPDIR) modules/$(DEPDIR) tinyxml/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) matrix/$(DEPDIR) modules/$(DEPDIR) tinyxml/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
