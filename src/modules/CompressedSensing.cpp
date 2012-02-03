@@ -19,6 +19,7 @@
  */
 
 #include "CompressedSensing.hpp"
+#include "TVOP.hpp"
 
 using namespace RRStrategy;
 
@@ -42,7 +43,9 @@ CompressedSensing::Init () {
 	
 	Attribute ("tvw",     &m_cgparam.tvw);
 	Attribute ("xfmw",    &m_cgparam.xfmw);
-    printf ("  Weights: TV(%.4f) L1(%.4f)\n", m_cgparam.tvw, m_cgparam.xfmw);
+	Attribute ("l1",      &m_cgparam.l1);
+	Attribute ("pnorm",   &m_cgparam.pnorm);
+    printf ("  Weights: TV(%.4f) XF(%.4f)\n", m_cgparam.tvw, m_cgparam.xfmw);
 	
 	Attribute ("fft",     &m_cgparam.fft);
 	printf ("  FFT class: ");
@@ -54,6 +57,7 @@ CompressedSensing::Init () {
 		}
 	printf ("\n");
 
+	Attribute ("csiter", &m_csiter);
 	Attribute ("cgconv", &m_cgparam.cgconv);
 	Attribute ("cgiter", &m_cgparam.cgiter);
 	printf ("  Maximum %i NLCG iterations or convergence to m_cgconv", m_cgparam.cgiter, m_cgparam.cgconv);	
@@ -86,30 +90,32 @@ CompressedSensing::Process () {
 	for (int i = 0; i < data.Size(); i++)
 		data[i] /= pdf[i];
 	
-	data = FFT::Backward(data);
+	im_dc = FFT::Backward(data);
 
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	tic = getticks();
 
-	cxfl ma = data.Maxabs();
-	data  /= ma;
+	cxfl ma = im_dc.Maxabs();
+	im_dc  /= ma;
 
 	printf ("  Wavelet transforming ... "); fflush(stdout);
 
-	im_dc = DWT::Forward (data);
+	im_dc = DWT::Forward (im_dc);
 
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	tic = getticks();
 
-	printf ("  Running CG ... "); fflush(stdout);
+	printf ("  Running %i NLCG iterations ... ", m_csiter); fflush(stdout);
 
-	for (int i = 0; i < m_csiter; i++) {
+	//for (int i = 0; i < m_csiter; i++) {
 		
-		NLCG (im_dc, data, m_cgparam);
+		im_dc = NLCG (im_dc, data, m_cgparam);
 		
-	}
+		//}
+
+	im_dc = DWT::Backward (im_dc);
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 

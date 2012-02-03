@@ -9,7 +9,8 @@ AC_CONFIG_MACRO_DIR([config])
 AC_CONFIG_AUX_DIR([config])
 
 AC_CONFIG_HEADERS([src/config.h])
-AM_INIT_AUTOMAKE#([foreign])
+AM_INIT_AUTOMAKE([subdir-objects])
+
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
 
@@ -546,6 +547,6 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 
 # Generate files
-AC_CONFIG_FILES([src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile])
+AC_CONFIG_FILES([src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile src/matrix/Makefile])
 AC_OUTPUT
 

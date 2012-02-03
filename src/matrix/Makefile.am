@@ -1,0 +1,3 @@
+lib_LTLIBRARIES = libmatrix.la 
+
+libtinyxml_la_SOURCES = FFT.hpp FFT.cpp
