@@ -80,90 +80,90 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-AFI_la_LIBADD =
+AFI_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_AFI_la_OBJECTS = AFI.lo
 AFI_la_OBJECTS = $(am_AFI_la_OBJECTS)
 AFI_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AFI_la_LDFLAGS) $(LDFLAGS) -o $@
-CGSENSE_la_LIBADD =
+CGSENSE_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_CGSENSE_la_OBJECTS = CGSENSE.lo
 CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
 CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
-CompressedSensing_la_LIBADD =
+CompressedSensing_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_CompressedSensing_la_OBJECTS = CompressedSensing.lo
 CompressedSensing_la_OBJECTS = $(am_CompressedSensing_la_OBJECTS)
 CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_GSL_TRUE@am_CompressedSensing_la_rpath = -rpath $(libdir)
-DirectMethod_la_LIBADD =
+DirectMethod_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_DirectMethod_la_OBJECTS = DirectMethod.lo CPUSimulator.lo \
 	GPUSimulator.lo
 DirectMethod_la_OBJECTS = $(am_DirectMethod_la_OBJECTS)
 DirectMethod_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DirectMethod_la_LDFLAGS) $(LDFLAGS) -o $@
-DummyRecon_la_LIBADD =
+DummyRecon_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_DummyRecon_la_OBJECTS = DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
 DummyRecon_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DummyRecon_la_LDFLAGS) $(LDFLAGS) -o $@
-DumpToFile_la_LIBADD =
+DumpToFile_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_DumpToFile_la_OBJECTS = DumpToFile.lo
 DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
 DumpToFile_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) -o $@
-GRAPPA_la_LIBADD =
+GRAPPA_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_GRAPPA_la_OBJECTS = GRAPPA.lo
 GRAPPA_la_OBJECTS = $(am_GRAPPA_la_OBJECTS)
 GRAPPA_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GRAPPA_la_LDFLAGS) $(LDFLAGS) -o $@
-GenericRegrid_la_LIBADD =
+GenericRegrid_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_GenericRegrid_la_OBJECTS = GenericRegrid.lo
 GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
 GenericRegrid_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) $(LDFLAGS) -o $@
-KTPoints_la_LIBADD =
+KTPoints_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_KTPoints_la_OBJECTS = KTPoints.lo
 KTPoints_la_OBJECTS = $(am_KTPoints_la_OBJECTS)
 KTPoints_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(KTPoints_la_LDFLAGS) $(LDFLAGS) -o $@
-LapackTests_la_LIBADD =
+LapackTests_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_LapackTests_la_OBJECTS = LapackTests.lo
 LapackTests_la_OBJECTS = $(am_LapackTests_la_OBJECTS)
 LapackTests_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(LapackTests_la_LDFLAGS) $(LDFLAGS) -o $@
-MedianFilter_OMP_la_LIBADD =
+MedianFilter_OMP_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_MedianFilter_OMP_la_OBJECTS = MedianFilter_OMP.lo
 MedianFilter_OMP_la_OBJECTS = $(am_MedianFilter_OMP_la_OBJECTS)
 MedianFilter_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(MedianFilter_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
-NuFFT_la_LIBADD =
+NuFFT_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_NuFFT_la_OBJECTS = NuFFT.lo
 NuFFT_la_OBJECTS = $(am_NuFFT_la_OBJECTS)
 NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_NuFFT_la_rpath = -rpath $(libdir)
-NuFFT_OMP_la_LIBADD =
+NuFFT_OMP_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_NuFFT_OMP_la_OBJECTS = NuFFT_OMP.lo
 NuFFT_OMP_la_OBJECTS = $(am_NuFFT_OMP_la_OBJECTS)
 NuFFT_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_NuFFT_OMP_la_rpath = -rpath $(libdir)
-RelativeSensitivities_la_LIBADD =
+RelativeSensitivities_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_RelativeSensitivities_la_OBJECTS = RelativeSensitivities.lo
 RelativeSensitivities_la_OBJECTS =  \
 	$(am_RelativeSensitivities_la_OBJECTS)
@@ -171,13 +171,13 @@ RelativeSensitivities_la_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(AM_CXXFLAGS) $(CXXFLAGS) $(RelativeSensitivities_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SpatialDomain_la_LIBADD =
+SpatialDomain_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_SpatialDomain_la_OBJECTS = SpatialDomain.lo
 SpatialDomain_la_OBJECTS = $(am_SpatialDomain_la_OBJECTS)
 SpatialDomain_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(SpatialDomain_la_LDFLAGS) $(LDFLAGS) -o $@
-SystemCmd_la_LIBADD =
+SystemCmd_la_DEPENDENCIES = $(COMMON_la_LIBADD)
 am_SystemCmd_la_OBJECTS = SystemCmd.lo
 SystemCmd_la_OBJECTS = $(am_SystemCmd_la_OBJECTS)
 SystemCmd_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -362,7 +362,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H) -I../matrix -I../nfft
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H) -I../matrix -I../nfft -I../tinyxml
 EXTRA_DIST = GPUSimulator.cl
 
 # Rules for recon strategies
@@ -373,41 +373,58 @@ lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	$(am__append_2)
 
 # Common linker flags
-COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@ ../tinyxml/libtinyxml.a ../matrix/libmatrix.a
+COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
+COMMON_la_LIBADD = ../matrix/libmatrix.la
 
 # Libraries
 DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp
 DummyRecon_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+DummyRecon_la_LIBADD = $(COMMON_la_LIBADD)
 GenericRegrid_la_SOURCES = GenericRegrid.hpp GenericRegrid.cpp
 GenericRegrid_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+GenericRegrid_la_LIBADD = $(COMMON_la_LIBADD)
 MedianFilter_OMP_la_SOURCES = MedianFilter_OMP.hpp MedianFilter_OMP.cpp
 MedianFilter_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+MedianFilter_OMP_la_LIBADD = $(COMMON_la_LIBADD)
 NuFFT_la_SOURCES = NuFFT.hpp NuFFT.cpp
-NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 ../nfft/libnfftstub.a
+NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 ../nfft/libnfftstub.la
+NuFFT_la_LIBADD = $(COMMON_la_LIBADD)
 NuFFT_OMP_la_SOURCES = NuFFT_OMP.hpp NuFFT_OMP.cpp OMP.hpp
-NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 ../nfft/libnfftstub.a
+NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 ../nfft/libnfftstub.la
+NuFFT_OMP_la_LIBADD = $(COMMON_la_LIBADD)
 DumpToFile_la_SOURCES = DumpToFile.hpp DumpToFile.cpp
 DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+DumpToFile_la_LIBADD = $(COMMON_la_LIBADD)
 CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp SEM.hpp OMP.hpp
-CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK) ../nfft/libnfftstub.a
+CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK) ../nfft/libnfftstub.la
+CGSENSE_la_LIBADD = $(COMMON_la_LIBADD)
 SystemCmd_la_SOURCES = SystemCmd.hpp SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+SystemCmd_la_LIBADD = $(COMMON_la_LIBADD)
 LapackTests_la_SOURCES = LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
+LapackTests_la_LIBADD = $(COMMON_la_LIBADD)
 GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
+GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)
 SpatialDomain_la_SOURCES = SpatialDomain.hpp SpatialDomain.cpp
 SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
+SpatialDomain_la_LIBADD = $(COMMON_la_LIBADD)
 KTPoints_la_SOURCES = KTPoints.hpp KTPoints.cpp
 KTPoints_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
+KTPoints_la_LIBADD = $(COMMON_la_LIBADD)
 RelativeSensitivities_la_SOURCES = RelativeSensitivities.hpp RelativeSensitivities.cpp
 RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
+RelativeSensitivities_la_LIBADD = $(COMMON_la_LIBADD)
 AFI_la_SOURCES = AFI.hpp AFI.cpp
 AFI_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+AFI_la_LIBADD = $(COMMON_la_LIBADD)
 CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
+CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD)
 DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp 
 DirectMethod_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
+DirectMethod_la_LIBADD = $(COMMON_la_LIBADD)
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 all: all-am
 

@@ -69,7 +69,7 @@ am__objects_3 = RemoteConnector.$(OBJEXT) LocalConnector.$(OBJEXT)
 am_testclt_OBJECTS = $(am__objects_1) $(am__objects_3) \
 	testclt.$(OBJEXT)
 testclt_OBJECTS = $(am_testclt_OBJECTS)
-testclt_LDADD = $(LDADD)
+testclt_DEPENDENCIES = tinyxml/libtinyxml.la matrix/libmatrix.la
 testclt_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(testclt_LDFLAGS) $(LDFLAGS) -o $@
@@ -276,7 +276,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
+AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 
 # Common sources
 COMMON = RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc DataBase.hpp DataBase.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp
@@ -288,8 +288,9 @@ CLIENT_SIDE = RemoteConnector.hpp RemoteConnector.cpp Connector.hpp LocalConnect
 SERVER_SIDE = ReconServant.hpp ReconServant.cpp
 
 # Rules for testclt
-testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)  testclt.cpp
-testclt_LDFLAGS = $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ tinyxml/libtinyxml.a matrix/libmatrix.a
+testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)  testclt.cpp 
+testclt_LDFLAGS = $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@
+testclt_LDADD = tinyxml/libtinyxml.la matrix/libmatrix.la 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
@@ -303,7 +304,7 @@ reconserver_LDFLAGS = $(HDF5) @PLUGIN_LDFLAGS@ -dlopen \
 	$(am__append_1)
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
-SUBDIRS = modules tinyxml matrix nfft
+SUBDIRS = tinyxml matrix nfft modules
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
