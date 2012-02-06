@@ -3,13 +3,13 @@ internaltest (Connector<T>* rc) {
 	
 	int            i = 0, j = 0, d = 5;
 	
-	Matrix<cxfl>   r (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	Matrix<double> h (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	Matrix<short>  p (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<cxfl>   cf (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<double> rd (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<short>  si (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	
-	r.Random(); 
-	h.Random();
-	p.Random();
+	cf.Random(); 
+	rd.Random();
+	si.Random();
 
 	Matrix<size_t> m (3,2);
 	m (0,0) = 1;
@@ -26,33 +26,34 @@ internaltest (Connector<T>* rc) {
 	//mg.MXDump("mg.mat", "mg");
 #endif
 	
-	std::cout << r << std::endl;
-	std::cout << h << std::endl;
-	std::cout << p << std::endl;
+	std::cout << cf << std::endl;
+	std::cout << rd << std::endl;
+	std::cout << si << std::endl;
 	
-	Matrix<std::complex<double> >  f = (Matrix<std::complex<double> >) r;
+	// Test casting
+	Matrix<cxdb> cd = (Matrix<cxdb>) cf;
 
-	rc->ReadConfig("test.xml");
+	rc->ReadConfig ("test.xml");
 
-	rc->Init(test);
+	rc->Init (test);
 
-	rc->SetMatrix ("r", r);
-	rc->SetMatrix ("p", p);
-	rc->SetMatrix ("h", h);
+	rc->SetMatrix ("cf", cf);
+	rc->SetMatrix ("si", si);
+	rc->SetMatrix ("rd", rd);
 	
 	time_t seconds = time (NULL);
 	char   uid[16];
 	sprintf(uid,"%ld",seconds);
 	
-	rc->SetAttribute("UID", uid);
-	rc->SetAttribute("Pi", 3.14156);
-	rc->SetAttribute("Dim", d);
+	rc->SetAttribute ("UID", uid);
+	rc->SetAttribute ("Pi", 3.14156);
+	rc->SetAttribute ("Dim", d);
 	
-	rc->Process(test);
+	rc->Process (test);
 	
-	rc->GetMatrix ("r", r);
-	rc->GetMatrix("p", p);
-	rc->GetMatrix ("h", h);
+	rc->GetMatrix ("cf", cf);
+	rc->GetMatrix ("rd", rd);
+	rc->GetMatrix ("si", si);
 
 	rc->Finalise (test);
 

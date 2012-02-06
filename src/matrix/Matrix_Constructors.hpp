@@ -427,6 +427,29 @@ Matrix<T> Matrix<T>::Phantom2D (const size_t n) {
 }
 
 
+template <class T> inline 
+Matrix<T> Matrix<T>::Random2D (const size_t n) {
+
+	Matrix<T> res (n);
+	res.Random();
+
+	return res;
+
+}
+
+
+
+template <class T> inline 
+Matrix<T> Matrix<T>::Random3D (const size_t n) {
+
+	Matrix<T> res (n, n, n);
+	res.Random();
+
+	return res;
+
+}
+
+
 
 template <class T> inline 
 Matrix<T> Matrix<T>::Phantom3D (const size_t n) {

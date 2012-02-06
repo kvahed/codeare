@@ -24,6 +24,7 @@
 
 #include "ReconStrategy.hpp"
 #include "FFT.hpp"
+#include "Lapack.hpp"
 
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
@@ -78,9 +79,9 @@ namespace RRStrategy {
 		double m_echo_shift;
 		double m_cutoff;
 
-		int m_use_bet;
-		int m_log_mask;
-		int m_weigh_maps;
+		int    m_use_bet;
+		int    m_log_mask;
+		int    m_weigh_maps;
 		
 		
 	};
@@ -141,10 +142,10 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 			
 			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cxfl));
 			
-			m[tid].SVD (&u[tid], &v[tid], &s[tid], 'S');
+			Lapack::SVD (m[tid], s[tid], u[tid], v[tid], 'S');
 			
-			for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r]             * exp(cxfl(0.0,1.0)*arg(u[tid][0])); // U 
-			for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t*v[0].Dim(0)] * exp(cxfl(0.0,1.0)*arg(v[tid][0])); // V is transposed!!!
+			for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r] * exp(cxfl(0.0,1.0)*arg(u[tid][0])); // U 
+			for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t] * exp(cxfl(0.0,1.0)*arg(v[tid][0])); // V 
 
 			snro[i] = real(s[tid][0]);
 			
@@ -170,7 +171,7 @@ FTVolumes (Matrix<cxfl>& r) {
 	int          threads = 1;
 	
 	// Hann window for iFFT
-	Matrix<cxfl> hann    = Matrix<cxfl>::Ones (r.Dim(0), r.Dim(1), r.Dim(2)).HannWindow();
+	//Matrix<cxfl> hann    = Matrix<cxfl>::Ones (r.Dim(0), r.Dim(1), r.Dim(2)).HannWindow();
 	
 	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r.Dim(0), (int)r.Dim(1), (int)r.Dim(2)); fflush(stdout);
 
@@ -205,7 +206,7 @@ FTVolumes (Matrix<cxfl>& r) {
 
 			memcpy (&mr[tid][0], &r[i*imsize], imsize * sizeof(cxfl));
 
-			mr[tid]  = FFT::Shift(mr[tid]) * hann;
+			mr[tid]  = FFT::Shift(mr[tid]);// * hann;
 			fftwf_execute(p[tid]);
 			mr[tid]  = FFT::Shift(mr[tid]);
 

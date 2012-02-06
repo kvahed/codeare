@@ -145,6 +145,23 @@ enum io_strategy {
 };
 
 
+inline double conjugate (double d) {
+	return d;
+}
+
+inline float conjugate (float f) {
+	return f;
+}
+
+inline cxdb conjugate (cxdb cd) {
+	return std::conj(cd);
+}
+
+inline cxfl conjugate (cxfl cf) {
+	return std::conj(cf);
+}
+
+
 /**
  * @brief   Matrix template.<br/>
  *          This class intends to offer a simple interface for handling
@@ -368,6 +385,26 @@ public:
 	 */
 	static Matrix<T> 
 	Phantom3D           (const size_t n);
+	
+	
+	/**
+	 * @brief           Create 2D nxn random matrix.<br/>
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Random2D            (const size_t n);
+	
+	
+	/**
+	 * @brief           Create 2D nxn random matrix.<br/>
+	 *
+	 * @param  n        Side length of matrix
+	 * @return          nxn zeros
+	 */
+	static Matrix<T> 
+	Random3D            (const size_t n);
 	
 	
 	/**
@@ -2457,48 +2494,12 @@ public:
     tr   ()             const;
     
     /**
-     * @brief           Fourier transform (<a href="fftw.org" target="fftw">FFTW</a>) over all dimensions.
-     *
-     * @return          Fourier transform.
-     */
-    Matrix<T>           
-    FFT                 ()            const;
-    
-    /**
-     * @brief           Inverse Fourier transform <a href="fftw.org" target="fftw">FFTW</a> over all dimensions
-     *
-     * @return          Inverse Fourier transform.
-     */
-    Matrix<T>           
-    IFFT                ()            const;
-    
-    /**
-     * @brief           MATLAB-like fftshift.<br/> 
-	 *                  i.e. shift zero component to centre of volume for viewing
-     *
-     * @return          FFT shift.
-     */
-    Matrix<T>           
-    FFTShift            (const size_t d = 0)            const;
-    
-    /**
-     * @brief           MATLAB-like ifftshift.<br/>
-	 *                  i.e. shift zero component to centre of volume for viewing. WORKS ONLY ON EVEN 
-     *
-     * @return          FFT shift.
-     */
-    Matrix<T>           
-    IFFTShift           (const size_t d = 0)            const;
-    
-
-    /**
      * @brief           ND Hann window
      *
      * @return          FFT shift.
      */
     Matrix<T>           
     HannWindow          (const size_t d = 0)            const;
-    
 
     /**
      * @brief           Sum of squares. 
@@ -2955,11 +2956,8 @@ Matrix<T>::tr() const {
 	
     for (size_t i = 0; i < res.Dim(0); i++)
         for (size_t j = 0; j < res.Dim(1); j++)
-			if (typeid (T) == typeid (double))
-				res.At(i,j) =           At(j,i);  // Transpose
-			else
-				res.At(i,j) = std::conj(At(j,i)); // Conjugate transpose
-
+			res.At(i,j) = conjugate(At(j,i)); // Conjugate transpose
+	
     return res;
 
 }
@@ -2971,6 +2969,16 @@ Matrix<cxfl>::Random () {
 
 	for (size_t i = 0; i < Size(); i++)
 		_M[i] = cxfl ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
+	
+}
+    
+template<> inline void 
+Matrix<cxdb>::Random () {
+	
+	srand (time(NULL));
+
+	for (size_t i = 0; i < Size(); i++)
+		_M[i] = cxdb ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
 	
 }
     
@@ -2996,7 +3004,7 @@ Matrix<short>::Random () {
 
 #include "Matrix_Constructors.hpp"
 #include "Matrix_IO.cpp"
-#include "Matrix_Lapack.cpp"
+//#include "Matrix_Lapack.cpp"
 #include "Matrix_Operators.cpp"
 #include "Matrix_BLAS.cpp"
 #include "Matrix_ICE.cpp"

@@ -18,7 +18,7 @@
  *  02110-1301  USA
  */
 
-#include "Lapack.hpp"
+#include "TLapack.hpp"
 
 template <class T>
 int  Matrix<T>::EIG (Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* rev, const bool cv) {

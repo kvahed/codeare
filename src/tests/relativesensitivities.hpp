@@ -19,7 +19,7 @@ resetest (Connector<T>* rc) {
     std::string    cf  = std::string (base + std::string (config));
     rc->ReadConfig (cf.c_str());
 
-    int use_bet = 0;
+    int use_bet;
     rc->Attribute ("use_bet", &use_bet);
 
     stringstream ss;

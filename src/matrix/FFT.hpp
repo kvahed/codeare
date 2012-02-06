@@ -21,6 +21,7 @@
 #ifndef __FFT_HPP__
 #define __FFT_HPP__
 
+#include <fftw3.h>
 #include "Matrix.hpp"
 
 /**
