@@ -46,17 +46,15 @@ enum InterpMethod {
 
 #include "config.h"
 #include "modules/OMP.hpp"
+#include "Complex.hpp"
 
 #include "cycle.h"            // FFTW cycle implementation
 
-#include <complex>
 #include <assert.h>
-
 #include <iostream>
 #include <fstream>
 #include <typeinfo>
 #include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 #include <limits.h>
 #include <vector>
@@ -69,12 +67,6 @@ enum InterpMethod {
 #endif
 
 #include "Ptr.h"
-
-/**
- * @brief raw data
- */
-typedef std::complex<float>  cxfl;
-typedef std::complex<double> cxdb;
 
 
 /**
@@ -143,23 +135,6 @@ enum io_strategy {
 	PRIMITIVE
 
 };
-
-
-inline double conjugate (double d) {
-	return d;
-}
-
-inline float conjugate (float f) {
-	return f;
-}
-
-inline cxdb conjugate (cxdb cd) {
-	return std::conj(cd);
-}
-
-inline cxfl conjugate (cxfl cf) {
-	return std::conj(cf);
-}
 
 
 /**
@@ -2401,57 +2376,6 @@ public:
 	MeshGrid            (const Matrix<size_t>& dims);
 
 
-	/**
-	 * @brief           Absolute values matrix
-	 *
-	 * @return          Absolute values
-	 */
-	Matrix<T>
-	Abs                 () const {
-		
-		Matrix<T> res(_dim);
-		
-#pragma omp parallel default (shared) 
-		{
-			
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
-			
-			for (size_t i = 0; i < Size(); i++)
-				res[i] = abs(_M[i]);
-
-		}		
-
-		return res;
-		
-	}
-	
-
-	/**
-	 * @brief           Arguments matrix
-	 *
-	 * @return          Arguments
-	 */
-    template<class S> Matrix<S>           
-	Arg                 () const;
-		
-	/**
-	 * @brief           Real values matrix
-	 *
-	 * @return          Real values
-	 */
-    template<class S> Matrix<S>           
-	Real                () const;
-	
-
-	/**
-	 * @brief           Imaginary values matrix
-	 *
-	 * @return          Imaginary values
-	 */
-    template<class S> Matrix<S>           
-	Imag                () const;
-	
-
     /**
      * @brief           Get maximum absolute value in the matrix
      *
@@ -2956,7 +2880,7 @@ Matrix<T>::tr() const {
 	
     for (size_t i = 0; i < res.Dim(0); i++)
         for (size_t j = 0; j < res.Dim(1); j++)
-			res.At(i,j) = conjugate(At(j,i)); // Conjugate transpose
+			res.At(i,j) = cconj(At(j,i)); // Conjugate transpose
 	
     return res;
 
