@@ -128,6 +128,20 @@ Matrix<cxfl>::Print (ostream& os) const {
 }
 
 
+template<> inline ostream&  
+Matrix<cxdb>::Print (ostream& os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%+.4f+%+.4fi ", _M [i + j * _dim[COL]].real(), _M [i + j * _dim[COL]].imag());
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
 template <class T> inline const string 
 Matrix<T>::DimsToString () const {
 

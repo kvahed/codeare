@@ -19,7 +19,7 @@
  */
 
 #include "LapackTests.hpp"
-
+#include "Lapack.hpp"
 
 using namespace RRStrategy;
 
@@ -27,47 +27,90 @@ using namespace RRStrategy;
 RRSModule::error_code
 LapackTests::Process     () { 
 
-	// SGEEV, DGEEV, CGEEV: Eigen value computation
+	// SGEEV, DGEEV, CGEEV, ZGEEV: Eigen value computation
 
-	Matrix<cxfl>& cf = GetCXFL ("cf");
+	Matrix<cxfl>&   cf = GetCXFL ("cf");
 	Matrix<double>& rd = GetRLDB ("rd");
 
-	Matrix<double> hev;
-	Matrix<double> hlev;
-	Matrix<double> hrev;
+	std::cout << "Testing EIG (cgeev) ----------- \n";
+
+	Matrix<cxdb>   hev (rd.Dim(0), 1);
+	Matrix<double> hlev(rd.Dim(0));
+	Matrix<double> hrev(rd.Dim(0));
+	Matrix<double> dtmp = rd;
 	
-	std::cout << "Testing EIG (dgeev) for helper:  ";
-	std::cout << "INFO: " << rd.EIG (&hev, &hlev, &hrev) << std::endl;
+	std::cout << "RLDB IN: \n";
+	std::cout << rd << std::endl;
 
-	Matrix<cxfl> rev;
-	Matrix<cxfl> rlev;
-	Matrix<cxfl> rrev;
+	Lapack::EIG (dtmp, hev, hlev, hrev, 'V', 'V');
+	
+	std::cout << "OUT: \n" <<  hev;
+	std::cout << "------------------------------- \n\n";
 
-	std::cout << "Testing EIG (cgeev) for raw:     ";
-	std::cout << "INFO: " << cf.EIG (&rev, &rlev, &rrev)    << std::endl;
 
-	// SEIG, DEIG, CEIG: Eigen value computation
+	std::cout << "Testing EIG (cgeev) ----------- \n";
 
-	Matrix<double> dlsv;
-	Matrix<double> drsv;
-	Matrix<double> dsv;
+	Matrix<cxfl> rev  (cf.Dim(0), 1);
+	Matrix<cxfl> rlev (cf.Dim(0));
+	Matrix<cxfl> rrev (cf.Dim(0));
+	Matrix<cxfl> rtmp = rd;
 
-	std::cout << "Testing SVD (dgesdd) for helper: ";
-	std::cout << "INFO: " << rd.SVD (&dlsv, &drsv, &dsv) << std::endl;
+	std::cout << "CXFL IN: \n";
+	std::cout << cf << std::endl;
 
-	Matrix<cxfl>    rlsv;
-	Matrix<cxfl>    rrsv;
-	Matrix<cxfl>     rsv;
+	Lapack::EIG (rtmp, rev, rlev, rrev);
 
-	std::cout << "Testing SVD (cgesdd) for raw:    ";
-	std::cout << "INFO: " << cf.SVD (&rlsv, &rrsv, &rsv)    << std::endl;
+	std::cout << "OUT: \n" <<  rev;
+	std::cout << "------------------------------- \n\n";
 
-	Matrix<double> test;
-	test.Dim(0) = 3;
-	test.Dim(1) = rd.Dim(0);
-	test.Reset();
-	test.Random();
+	std::cout << "Testing SVD (dgesdd) ---------- \n";
 
+	Matrix<double> du (MIN(rd.Height(),rd.Width()));
+	Matrix<double> dv (MAX(rd.Height(),rd.Width()));
+	Matrix<double> ds (MIN(rd.Height(),rd.Width()), 1);
+
+	std::cout << "RLDB IN: \n";
+	std::cout << rd << std::endl;
+	std::cout << "INFO: " << Lapack::SVD (rd, ds, du, dv, 'A') << "\n" << std::endl;
+	std::cout << "OUT s:\n" <<  ds  << std::endl;
+	std::cout << "OUT u:\n" <<  du  << std::endl;
+	std::cout << "OUT v:\n" <<  dv;
+	std::cout << "------------------------------- \n\n";
+	
+	std::cout << "Testing SVD (dgesdd) ---------- \n";
+
+	Matrix<cxfl>  cu (MIN(cf.Height(),cf.Width()));
+	Matrix<cxfl>  cv (MAX(cf.Height(),cf.Width()));
+	Matrix<float> cs (MIN(cf.Height(),cf.Width()), 1);
+
+	std::cout << "RLDB IN: \n";
+	std::cout << cf << std::endl;
+	std::cout << "INFO: " << Lapack::SVD (cf, cs, cu, cv, 'A') << "\n" << std::endl;
+	std::cout << "OUT s:\n" <<  cs  << std::endl;
+	std::cout << "OUT u:\n" <<  cu  << std::endl;
+	std::cout << "OUT v:\n" <<  cv;
+	std::cout << "------------------------------- \n\n";
+
+	std::cout << "Testing Inv (dgetri / dgetrf) - \n";
+
+	dtmp = Matrix<double>::Random2D (5);
+	std::cout << "RLDB IN: \n";
+	std::cout << dtmp << std::endl;
+	dtmp = Lapack::Inv(dtmp);
+	std::cout << "OUT:\n" <<  dtmp;
+	std::cout << "------------------------------- \n\n";
+	
+	std::cout << "Testing Inv (dgetri / dgetrf) - \n";
+
+	Matrix<cxdb>ctmp = Matrix<cxdb>::Random2D (5);
+	std::cout << "CXFL IN: \n";
+	std::cout << ctmp << std::endl;
+	ctmp = Lapack::Inv(ctmp);
+	std::cout << "OUT:\n" <<  ctmp;
+	std::cout << "------------------------------- \n\n";
+	
+
+	/*
 	std::cout << "Testing mm multiplication (dgemm) for helper:     ";
 
 	std::cout << test << std::endl;
@@ -76,7 +119,7 @@ LapackTests::Process     () {
 	std::cout << test << std::endl;
 
 	cf.Inv();
-
+	*/
 	return RRSModule::OK;
 
 }

@@ -39,8 +39,6 @@ class Configurable {
 	 */
 	Configurable() {
 
-		std::cout << "We are never called?" << std::endl;
-
 		m_config_doc             = new TiXmlDocument    ();
 		m_config_doc->LinkEndChild(new TiXmlDeclaration ("1.0", "", ""));
 		m_config_doc->LinkEndChild(new TiXmlElement     ("config"));
@@ -155,7 +153,7 @@ class Configurable {
 	
 
 	/**
-	 * @brief           Set an integer type attribute
+	 * @brief           Get an integer type attribute
 	 *
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
