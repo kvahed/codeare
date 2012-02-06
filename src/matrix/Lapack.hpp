@@ -18,6 +18,9 @@
  *  02110-1301  USA
  */
 
+#ifndef __LAPACK_HPP__
+#define __LAPACK_HPP__
+
 extern "C" {
 
 	// Cholesky factorization of a complex Hermitian positive definite matrix
@@ -380,3 +383,6 @@ class Lapack {
 	}
 	
 };
+
+
+#endif // __LAPACK_HPP__

@@ -20,6 +20,7 @@
 
 #include "LapackTests.hpp"
 #include "Lapack.hpp"
+#include "CX.hpp"
 
 using namespace RRStrategy;
 
@@ -28,6 +29,7 @@ RRSModule::error_code
 LapackTests::Process     () { 
 
 	// SGEEV, DGEEV, CGEEV, ZGEEV: Eigen value computation
+
 
 	Matrix<cxfl>&   cf = GetCXFL ("cf");
 	Matrix<double>& rd = GetRLDB ("rd");

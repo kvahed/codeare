@@ -171,7 +171,7 @@ FTVolumes (Matrix<cxfl>& r) {
 	int          threads = 1;
 	
 	// Hann window for iFFT
-	//Matrix<cxfl> hann    = Matrix<cxfl>::Ones (r.Dim(0), r.Dim(1), r.Dim(2)).HannWindow();
+	Matrix<cxfl> hann    = Matrix<cxfl>::Ones (r.Dim(0), r.Dim(1), r.Dim(2)).HannWindow();
 	
 	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r.Dim(0), (int)r.Dim(1), (int)r.Dim(2)); fflush(stdout);
 
@@ -206,7 +206,7 @@ FTVolumes (Matrix<cxfl>& r) {
 
 			memcpy (&mr[tid][0], &r[i*imsize], imsize * sizeof(cxfl));
 
-			mr[tid]  = FFT::Shift(mr[tid]);// * hann;
+			mr[tid]  = FFT::Shift(mr[tid]) * hann;
 			fftwf_execute(p[tid]);
 			mr[tid]  = FFT::Shift(mr[tid]);
 
