@@ -139,7 +139,7 @@ LapackTests::Process     () {
 
 	std::cout << "Testing mm multipl. (dgemm) --- \n";
 
-	Matrix<cxfl> dc (3,4) ;
+	Matrix<cxfl> dc (3,8) ;
 	dc.Random();
 	
 	std::cout << "A = [\n";
@@ -165,8 +165,45 @@ LapackTests::Process     () {
 	std::cout << "A*(B').' :\n" <<  dd;
 	std::cout << "------------------------------- \n\n";
 
-	Matrix<cxfl> x (dc.Width(),1);
+	Matrix<double> de (3,800) ;
+	de.Random();
+	Matrix<double> x (de.Width(),1);
 	x.Random();
+
+	//de = !de;
+	//std::cout << "A  :\n" <<  de;
+	//std::cout << "x' :\n" <<  x;
+
+	ticks tic = getticks();
+
+	Matrix<double> y  = Lapack::GEMV (de, x);
+	printf ("GEMV. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+
+	//std::cout << "y' :\n" <<  y;
+
+	Matrix<double> y2 = Lapack::GEMM (de, x);
+	printf ("GEMM. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+
+	//std::cout << "y' :\n" <<  y2;
+
+	/*
+	Matrix<cxfl> rx (dc.Width(),1);
+	rx.Random();
+
+	dc = !dc;
+	std::cout << "A  :\n" <<  dc;
+	std::cout << "x' :\n" <<  x;
+
+	Matrix<cxfl> y  = Lapack::GEMV (dc, x, 'C');
+
+	std::cout << "y' :\n" <<  y;
+
+	Matrix<cxfl> y2 = Lapack::GEMM (dc, x, 'C');
+
+	std::cout << "y' :\n" <<  y2;
+	/*
+	Matrix<double> rx (dc.Width(),1);
+	rx.Random();
 
 	dc = !dc;
 	std::cout << "A  :\n" <<  dc;
@@ -175,8 +212,7 @@ LapackTests::Process     () {
 	Matrix<cxfl> y = Lapack::GEMV (dc, x, 'C');
 
 	std::cout << "y' :\n" <<  y;
-
-
+	*/
 
 	return RRSModule::OK;
 
