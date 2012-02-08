@@ -20,6 +20,7 @@
 
 #include "LapackTests.hpp"
 #include "Lapack.hpp"
+#include "MCGLS.hpp"
 #include "CX.hpp"
 
 using namespace RRStrategy;
@@ -112,16 +113,71 @@ LapackTests::Process     () {
 	std::cout << "------------------------------- \n\n";
 	
 
-	/*
-	std::cout << "Testing mm multiplication (dgemm) for helper:     ";
+	std::cout << "Testing Pinv (dgelsd) ---------- \n";
 
-	std::cout << test << std::endl;
+	Matrix<double> da (5,3);
+	da.Random();
+
+	std::cout << "RLDB IN: \n";
+	std::cout << da << std::endl;
+	da = Lapack::Pinv (da);
+
+	std::cout << "OUT inv:\n" <<  da;
+	std::cout << "------------------------------- \n\n";
+
+	std::cout << "Testing Pinv (zgelsd) ---------- \n";
+
+	Matrix<cxfl> db (3,5);
+	db.Random();
+
+	std::cout << "CXDB IN: \n";
+	std::cout << db << std::endl;
+	db = Lapack::Pinv (db);
+
+	std::cout << "OUT inv:\n" <<  db;
+	std::cout << "------------------------------- \n\n";
+
+	std::cout << "Testing mm multipl. (dgemm) --- \n";
+
+	Matrix<cxfl> dc (3,4) ;
+	dc.Random();
+	
+	std::cout << "A = [\n";
+	std::cout << db;
+	std::cout << "];" << std::endl;
+	std::cout << "B = [\n";
+	std::cout << dc;
+	std::cout << "];" << std::endl;
+
 	printf ("\n");
-	test = test.prod(rd);
-	std::cout << test << std::endl;
+	Matrix<cxfl> dd = Lapack::GEMM (db, dc);
+	std::cout << "A*B:\n" <<  dd;
+	dd = Lapack::GEMM (dc, db, 'T', 'T');
+	std::cout << "B.'*A.' :\n" <<  dd;
+	dd = Lapack::GEMM (dc, db, 'C', 'C');
+	std::cout << "B'*A' :\n" <<  dd;
+	db = !db;
 
-	cf.Inv();
-	*/
+	std::cout << "A  :\n" <<  db;
+	std::cout << "B' :\n" <<  dc;
+
+	dd = Lapack::GEMM (db, dc, 'C', 'N');
+	std::cout << "A*(B').' :\n" <<  dd;
+	std::cout << "------------------------------- \n\n";
+
+	Matrix<cxfl> x (dc.Width(),1);
+	x.Random();
+
+	dc = !dc;
+	std::cout << "A  :\n" <<  dc;
+	std::cout << "x' :\n" <<  x;
+
+	Matrix<cxfl> y = Lapack::GEMV (dc, x, 'C');
+
+	std::cout << "y' :\n" <<  y;
+
+
+
 	return RRSModule::OK;
 
 }

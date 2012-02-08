@@ -1442,6 +1442,27 @@ public:
      * @param  dim      New dimensions
      */
     inline void         
+    Resize              (const size_t& m, const size_t& n)                                      {
+
+		_dim[0] = m;
+		_dim[1] = n;
+
+		for (size_t i = 2; i < INVALID_DIM; i++)
+			_dim[i] = 1;
+
+		_M.resize(Size(), T(0));
+
+    }
+    
+
+    /**
+     * @brief           Resize to dims, reallocate and zero repository. 
+	 *                  Needs to becalled after any resize operation on dimensios. 
+	 *                  (i.e. M.Dim(2) = 10; Reset();)
+     *
+     * @param  dim      New dimensions
+     */
+    inline void         
     Reset               (const size_t* dim)                                      {
 
     	for (size_t i = 0; i < INVALID_DIM; i++)
@@ -2307,22 +2328,6 @@ public:
     
     
 	/**
-	 * @brief           Conjugation w/o transposing
-	 *
-	 * @return          Conjugated
-	 */
-	Matrix<T>
-	Conj                () const ;
-
-
-	/**
-	 * @brief           In-place conjugation w/o transposing
-	 */
-	void
-	Conj                ();
-
-
-	/**
 	 * @brief           In-place Isotropic resampling up to 3D to
 	 *
 	 * @param  f        Resampling factor (i.e. 0.5 = each dimension halved)
@@ -2569,37 +2574,6 @@ public:
 
 
     /**
-     * @brief           Inversion of positive definite matrix through LU factorisation.<br/>
-	 *                  Wrapper to <a href="http://www.netlib.org/lapack/">LAPACK</a> drivers (xGETRI & xGERTF).
-     *
-     * @return          Inverse
-     */
-	Matrix<T>
-    Inv   ()            const;
-    
-
-    /**
-     * @brief           Moore-Penrose general inverse.<br/>
-	 *                  Wrapper to <a href="http://www.netlib.org/lapack/">LAPACK</a> routines (xGELSD).
-     *
-     * @return          Pseudo-inverse
-     */
-	Matrix<T> 
-    Pinv   ();
-    
-
-    /**
-     * @brief           Cholesky factorisation of a positive definite matrix.<br/>
-	 *                  Wrapper to <a href="http://www.netlib.org/lapack/">LAPACK</a> routines (xPOTRF).
-	 * 
-     * @param  uplo     Store upper or lower triangular matrix {'U','L'}
-     * @return          Factorisation
-     */
-	Matrix<T> 
-    Cholesky (const char uplo);
-    
-
-    /**
      * @brief           Euclidean norm using <a href="http://www.netlib.org/blas/">BLAS</a> routines xNRM2.
      *
      * @return          Norm
@@ -2618,44 +2592,6 @@ public:
     
     //@}
 
-
-    /**
-     * @name Lapack functions.
-     *       Only available when lapack detected.
-     */
-    
-    //@{
-    
-
-    /**
-     * @brief           Compute eigen values with <a href="http://www.netlib.org/lapack/">LAPACK</a> routines xGEEV.
-     *
-	 * @param  ev       Vector containing the computed eigenvalues
-	 * @param  cv       Compute also left hand eigen vectors
-	 * @param  lev      Left hand eigen vectors 
-	 * @param  rev      right hand eigen vectors 
-     * @return          Feedback from Lapack operation
-     */
-    inline int
-	EIG                 (Matrix<T>* ev, Matrix<T>* lev, Matrix<T>* rev, const bool cv = true);
-    
-
-    /**
-     * @brief           Compute singular value decomposition with <a href="http://www.netlib.org/lapack/">LAPACK</a> routines xGESDD.
-     *
-	 * @param  lsv      Left hand singular vectors.
-	 * @param  rsv      Right hand singular vectors.
-	 * @param  sv       Sorted singular values.
-	 * @param  jobz     @see http://www.netlib.org/lapack/double/dgesdd.f @see http://www.netlib.org/lapack/double/cgesdd.f
-     * @return          Info from Lapack operation.
-     */
-    inline int
-	SVD                 (Matrix<T>* lsv, Matrix<T>* rsv, Matrix<T>* sv, const char jobz = 'A');
-    
-	
-    //@}
-    
-    
 
 private:
     

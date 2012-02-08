@@ -61,9 +61,21 @@ extern "C" {
 	void dgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
 	void sgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
 
+	// Matrix vector multiplication
+	void sgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
+	void dgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
+	void cgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
+	void zgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
+	
+	// Matrix matrix multiplication
+	void sgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
+	void dgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
+	void cgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
+	void zgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
+	
 }
 
-//#include "Matrix.hpp"
+#include "Matrix.hpp"
 
 class Lapack {
 
@@ -311,53 +323,76 @@ class Lapack {
 	template<class T> static Matrix<T> 
 	Pinv (Matrix<T>& m) {
 		
+		void *s, *rwork;
+		T    *work;
+		int  *iwork;
+		
 		int  M      =  m.Height();
 		int  N      =  m.Width();
+
 		int  nrhs   =  M;
 		int  lda    =  M;
 		int  ldb    =  MAX(M,N);
 		int  lwork  = -1; 
+		int  lrwork =  0;
+		int  liwork =  0;
 		int  rank   =  0;
 		int  info   =  0;
+		int  swork  =  sizeof(T) * MIN(M,N);
 		
-		T*   work   = (T*)   malloc (         sizeof(T)); 
-		int* iwork  = (int*) malloc (         sizeof(int)); 
-		T*   rwork  = (T*)   malloc (         sizeof(float));    
-		T*   s      = (T*)   malloc (MIN(M,N)*sizeof(float));    
-		
+		work   = (T*)   malloc  (sizeof(T)); 
+		iwork  = (int*) malloc  (sizeof(int)); 
+		rwork  =        malloc  (sizeof(T) / 2);    
+
+
+		if (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
+			swork /= 2;
+
+		s      =        malloc (swork);    
+
 		Matrix<T> b =  Matrix<T>::Id(ldb);
 		
-		float     rcond  = -1.0;
+		double drcond  = -1.0;
+		float  frcond  = -1.0;
 		
 		if (typeid(T) == typeid(cxfl))
-			cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
+			cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(cxdb))
-			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
+			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &drcond, &rank, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);
+			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &drcond, &rank, work, &lwork,        iwork, &info);
 		else if (typeid(T) == typeid(float))
-			sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);
+			sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
+		
+		liwork = iwork[0];
+
+		if      (typeid (T) == typeid(cxfl))                                 lrwork = (int) ((float*) rwork)[0];
+		else if (typeid (T) == typeid(cxdb))                                 lrwork = (int) ((double*)rwork)[0];
+
+		if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(float))  lwork  = (int) ((float*) work)[0];
+		else if (typeid (T) == typeid(cxdb) || typeid (T) == typeid(double)) lwork  = (int) ((double*)work)[0];
+
+
+		if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
+			rwork =    malloc ((sizeof(T)/2)*lrwork);
+		
+		iwork = (int*) malloc (liwork*sizeof(int));
+		work  = (T*)   malloc (lwork *sizeof(T));
 		
 		if (typeid(T) == typeid(cxfl))
-			rwork = (float*) realloc (rwork, (int)rwork[0]*sizeof(float));
-		
-		iwork = (int*) realloc (iwork, iwork[0]*sizeof(int));
-
-		if (typeid (T) == typeid(cxfl) || typeid (T) == typeid(float))
-			lwork = (int) ((float*)work)[0];
-		else if (typeid (T) == typeid(cxdb) || typeid (T) == typeid(double))
-			lwork = (int) ((double*)work)[0];
-
-		work  = (T*) realloc (work, lwork * sizeof(T));
-		
-		if (typeid(T) == typeid(cxfl))
-			cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
+			cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(cxdb))
-			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond, &rank, work, &lwork, rwork, iwork, &info);
+			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &drcond, &rank, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);
+			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &drcond, &rank, work, &lwork,        iwork, &info);
 		else if (typeid(T) == typeid(float))
-			sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond, &rank, work, &lwork,        iwork, &info);
+			sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
+
+		if (M > N)
+			for (size_t i = 0; i < M; i++)
+				memcpy (&b[i*N], &b[i*M], N * sizeof(T));
+
+		b.Resize(N,M);
 		
 		free (s);
 		free (work);
@@ -376,9 +411,87 @@ class Lapack {
 		Matrix<T> res = m;
 		int       info = 0;
 		
-		//dpotrf_ ( &uplo, &tmp.Width(), &tmp[0], &tmp.Height(), &info);
+		if (typeid(T) == typeid(cxfl))
+			//dpotrf_ ( &uplo, &tmp.Width(), &tmp[0], &tmp.Height(), &info);
 		
 		return res;
+		
+	}
+	
+
+	template<class T> static Matrix<T> 
+	GEMM (Matrix<T>& a, Matrix<T>& b, char transa = 'N', char transb = 'N') {
+		
+		int aw = (int)a.Width(), ah = (int)a.Height(), bw = (int)b.Width(), bh = (int)b.Height();
+		
+		if      ( transa == 'N'                   &&  transb == 'N'                  ) assert (aw == bh);
+		else if ( transa == 'N'                   && (transb == 'T' || transb == 'C')) assert (aw == bw);
+		else if ((transa == 'T' || transa == 'C') &&  transb == 'N'                  ) assert (ah == bh);
+		else if ((transa == 'T' || transa == 'C') && (transb == 'T' || transb == 'C')) assert (ah == bw);
+		
+		int m, n, k, ldc, cm, cn;
+		
+		if (transa == 'N') {
+			m   = (int) ah;
+			k   = (int) aw;
+		} else if (transa == 'T' || transa == 'C') {
+			m   = (int) aw;
+			k   = (int) ah;
+		}
+
+		if (transb == 'N')
+			n   = (int) bw;
+		else if (transb == 'T' || transb == 'C')
+			n   = (int) bh;
+		
+		ldc = m;
+
+		T    alpha  =       T(1.0);
+		T    beta   =       T(0.0);
+		
+		Matrix<T> c (m, n);
+		
+		if      (typeid(T) == typeid(double))
+			dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &a[0], &ah, &b[0], &bh, &beta, &c[0], &ldc);
+		else if (typeid(T) == typeid(float))
+			sgemm_ (&transa, &transb, &m, &n, &k, &alpha, &a[0], &ah, &b[0], &bh, &beta, &c[0], &ldc);
+		else if (typeid(T) == typeid(cxfl))
+			cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &a[0], &ah, &b[0], &bh, &beta, &c[0], &ldc);
+		else if (typeid(T) == typeid(cxdb))
+			zgemm_ (&transa, &transb, &m, &n, &k, &alpha, &a[0], &ah, &b[0], &bh, &beta, &c[0], &ldc);
+		
+		return c;
+		
+	}
+
+
+
+	template<class T> static Matrix<T> 
+	GEMV (Matrix<T>& A, Matrix<T>& x, char trans = 'N') {
+
+		assert (x.Width() == 1);
+		
+		int m, n, one = 1, ah = (int)A.Height(), aw = (int)A.Width(), xh = (int)x.Height();
+		
+		if (trans == 'N') {
+			assert (aw == xh);
+			m = ah; n = aw;
+		} else if (trans == 'T' || trans == 'C') {
+			assert (ah == xh);
+			m = aw;	n = ah;
+		}
+		
+		T    alpha  = T(1.0);
+		T    beta   = T(0.0);
+		
+		Matrix<T> y (m, 1);
+		
+		if      (typeid(T) == typeid(double)) dgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
+		else if (typeid(T) == typeid(float))  sgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
+		else if (typeid(T) == typeid(cxfl))   cgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
+		else if (typeid(T) == typeid(cxdb))   zgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
+
+		return y;
 		
 	}
 	
