@@ -58,7 +58,7 @@ public:
 			if (std::isnan(res.at(i)) || res.at(i) <= conv) break;
 
 			if (i % 5 == 0 && i > 0)                        printf ("\n");
-			printf ("    %03i %.7f", i, res.at(i));
+			printf ("    %03lu %.7f", i, res.at(i));
 			
 			q = Lapack::GEMM (A, p);
 			q = Lapack::GEMM (A, q, 'C');
