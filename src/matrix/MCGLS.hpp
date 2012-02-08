@@ -18,23 +18,63 @@
  *  02110-1301  USA
  */
 
+#include "Lapack.hpp"
+
 class MCGLS {
 
+public:
 	
 	template<class T> static Matrix<T> 
-	Pinv (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit, const double& conv) {
+	Pinv (Matrix<T>& A, Matrix<T>& b, const size_t& maxit, const double& conv) {
 
-		// Check x vector 
-		// Check A * x valid
-
+		size_t ah = A.Height();
 		size_t aw = A.Width();
+		size_t bh = b.Height();
+		size_t bw = b.Width();
 
-		Matrix<T> AH = !A;
-		Matrix<T> x0 = Lapack::GEMV (A, b);
-		Matrix<T> x  = Matrix<T>::Zeros (x0.Dim()); 
+		assert (bw == 1);  // Column vector x
+		assert (ah == bh); // Check inner dimensions of A'*x. 
 
+		ticks tic = getticks();
+
+		Matrix<T> p = Lapack::GEMM (A, b, 'C');
+		Matrix<T> r = p;
+
+		Matrix<T> x (p.Dim()); 
+		Matrix<T> q;
+
+		T         ts;
+
+		float     rn = 0.0;
+		float     xn = pow(p.Norm().real(), 2);
+
+		std::vector<double> res;
+
+		for (size_t i = 0; i < maxit; i++) {
+			
+			rn  = pow(r.Norm().real(), 2);
+			res.push_back(rn/xn);
+
+			if (std::isnan(res.at(i)) || res.at(i) <= conv) break;
+
+			if (i % 5 == 0 && i > 0)                        printf ("\n");
+			printf ("    %03i %.7f", i, res.at(i));
+			
+			q = Lapack::GEMM (A, p);
+			q = Lapack::GEMM (A, q, 'C');
+			
+			ts  = (rn / (p.dotc(q)));
+			x  += (p * ts);
+			r  -= (q * ts);
+			p  *= cxfl(pow(r.Norm().real(), 2)/rn);
+			p  += r;
+			
+		}
+		
+		printf ("\n  MCGLS time: %.4f s\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+		
 		return x;
-
+		
 	}
 
 };
