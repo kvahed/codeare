@@ -172,7 +172,7 @@ LapackTests::Process     () {
 	b.MXRead("tmp.mat", "PA");
 
 	
-	Matrix<cxfl> x = MCGLS::Pinv(A, b, 130, 1e-6);
+	Matrix<cxfl> x = MCGLS::Pinv(A, b, 300, 1e-9);
 	x.MXDump ("x.mat", "x");
 	
 

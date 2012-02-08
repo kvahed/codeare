@@ -40,7 +40,7 @@ class DataBase {
 	/**
 	 * @brief        Initialise database
 	 */
-	const error_code 
+	error_code 
 	Initialise       ();
 
 
@@ -49,7 +49,7 @@ class DataBase {
 	 *
 	 * @return       Success
 	 */ 
-	const error_code 
+	error_code 
 	Finalise         ();
 	
 	

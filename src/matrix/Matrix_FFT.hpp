@@ -78,7 +78,7 @@ Matrix<T>::SOS (const size_t d) const {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < res.Size(); i++) {
 			for (size_t j = 0; j < _dim[nd]; j++)
@@ -101,7 +101,7 @@ Matrix<T>::SOS (const size_t d) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (int i = 0; i < Size(); i++)
 			_M[i] *= _M[i];
@@ -168,7 +168,7 @@ Matrix<T>::Mean (const size_t d) const {
 template <class T> inline void
 Matrix<T>::Sum (const size_t d) {
 
-	assert (d>=0 && d < INVALID_DIM);
+	assert (d < INVALID_DIM);
    
 	// No meaningful sum over particular dimension
 	if (_dim[d] == 1)

@@ -30,7 +30,7 @@ Matrix<T>::operator=(const Matrix<T>& M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] = M[i];
@@ -48,7 +48,7 @@ Matrix<T>::operator=(const T& s) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < this->Size(); i++)
 			_M[i] = s;
@@ -68,7 +68,7 @@ Matrix<T>::operator==(T s)    {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < Size(); i++)
 			res[i] = (_M[i] == s);
@@ -213,7 +213,7 @@ Matrix<T>::operator||(Matrix<T> M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
     for (size_t i = 0; i < Size(); i++)
         res[i] = (_M[i] || M[i]) ? true : false;
@@ -236,7 +236,7 @@ Matrix<T>::operator==(Matrix<T> M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
     for (size_t i = 0; i < Size(); i++)
         res[i] = (_M[i] == M[i]) ? true : false;
@@ -259,7 +259,7 @@ Matrix<T>::operator>=(Matrix<T> M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
     for (size_t i = 0; i < Size(); i++)
         res[i] = (_M[i] >= M[i]) ? true : false;
@@ -282,7 +282,7 @@ Matrix<T>::operator<= (Matrix<T> M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
     for (size_t i = 0; i < Size(); i++)
         res[i] = (_M[i] <= M[i]) ? true : false;
@@ -305,7 +305,7 @@ Matrix<T>::operator!=(Matrix<T> M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
     for (size_t i = 0; i < Size(); i++)
         res[i] = (_M[i] != M[i]) ? true : false;
@@ -328,7 +328,7 @@ Matrix<T>::operator> (Matrix<T> M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
     for (size_t i = 0; i < Size(); i++)
         res[i] = (_M[i] > M[i]) ? true : false;
@@ -351,7 +351,7 @@ Matrix<T>::operator< (Matrix<T> M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
     for (size_t i = 0; i < Size(); i++)
         res[i] = (_M[i] < M[i]);
@@ -376,7 +376,7 @@ Matrix<T>::operator- () {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
     for (size_t i = 0; i < Size(); i++)
         res[i] =- _M[i];
@@ -401,7 +401,7 @@ Matrix<T>::operator-(Matrix<T> &M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 	for (size_t i = 0; i < Size(); i++)
 		res[i] = _M[i] - M[i];
@@ -426,7 +426,7 @@ Matrix<T>::operator-(T s) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 	for (size_t i = 0; i < Size(); i++)
 		res[i] = _M[i] - s;
@@ -454,7 +454,7 @@ Matrix<T>::operator+(Matrix<T> &M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 	for (size_t i = 0; i < Size(); i++)
 		res[i] = _M[i] + M[i];
@@ -479,7 +479,7 @@ Matrix<T>::operator+(T s) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 	for (size_t i = 0; i < Size(); i++)
 		res[i] = _M[i] + s;
@@ -504,7 +504,7 @@ Matrix<T>::operator^(const float p) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 	for (size_t i = 0; i < Size(); i++)
 
@@ -526,7 +526,7 @@ Matrix<T>::operator ^= (const float p) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 	for (size_t i = 0; i < Size(); i++)
 		
@@ -555,7 +555,7 @@ Matrix<T>::operator*(const Matrix<T> &M) {
 #pragma omp parallel default (shared) 
 	{
 
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		for (size_t i = 0; i < Size(); i++)
 			res[i] = _M[i] * M[i];
 
@@ -579,7 +579,7 @@ Matrix<T>::operator* (T s) {
 #pragma omp parallel default (shared) 
 	{
 
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 	for (size_t i = 0; i < Size(); i++)
 		res[i] = _M[i] * s;
 	
@@ -601,7 +601,7 @@ Matrix<T>::operator += (const Matrix<T> &M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] += M[i];
@@ -626,7 +626,7 @@ Matrix<T>::operator+= (T s) {
 #pragma omp parallel default (shared) 
 	{
 
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 	for (size_t i = 0; i < Size(); i++)
 		res[i] = _M[i] + s;
 	
@@ -648,7 +648,7 @@ Matrix<T>::operator -= (const Matrix<T> &M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] -= M[i];
@@ -673,7 +673,7 @@ Matrix<T>::operator-= (T s) {
 #pragma omp parallel default (shared) 
 	{
 
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 	for (size_t i = 0; i < Size(); i++)
 		res[i] = _M[i] - s;
 	
@@ -695,7 +695,7 @@ Matrix<T>::operator *= (const Matrix<T> &M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] *= M[i];
@@ -713,7 +713,7 @@ Matrix<T>::operator *= (const T s) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] *= s;
@@ -736,7 +736,7 @@ Matrix<T>::operator /= (const Matrix<T> &M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] /= M[i];
@@ -754,7 +754,7 @@ Matrix<T>::operator /= (T s) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] /= s;
@@ -779,7 +779,7 @@ Matrix<T>::operator/(Matrix<T> &M) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 	for (size_t i = 0; i < Size(); i++)
 		(M[i] != (T)0) ? res[i] = _M[i] / M[i] : 0;
@@ -806,7 +806,7 @@ Matrix<T>::operator/ (T s) {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for 
 		
 	for (size_t i = 0; i < Size(); i++)
 		res[i] = _M[i] / s;
@@ -821,7 +821,6 @@ Matrix<T>::operator/ (T s) {
 template <class T> inline T 
 Matrix<T>::operator[]  (const size_t p) const {
     
-    assert(p >= 0);
     assert(p <  Size());
     
     return _M[p];
@@ -832,7 +831,6 @@ Matrix<T>::operator[]  (const size_t p) const {
 template <class T> inline T&
 Matrix<T>::operator[] (const size_t p) {
     
-    assert(p >= 0);
     assert(p <  Size());
     
     return _M[p];
@@ -843,7 +841,6 @@ Matrix<T>::operator[] (const size_t p) {
 template <class T> inline T 
 Matrix<T>::operator() (const size_t a) const {
 
-    assert(a >= 0);
     assert(a <  Size());
 
     return _M[a];
@@ -859,7 +856,7 @@ Matrix<T>::operator Matrix<S> () const {
 #pragma omp parallel default (shared) 
 	{
 		
-#pragma omp for schedule (dynamic, Size() / omp_get_num_threads())
+#pragma omp for
 		
 		for (int i = 0; i < this->Size(); i++)
 			m[i] = (S)_M[i];

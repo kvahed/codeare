@@ -243,16 +243,12 @@ class Lapack {
 	Inv (Matrix<T>& m) {
 		
 		// 2D 
-		if (!m.Is2D()) {
+		if (!m.Is2D())
 			printf ("Inv Error: Parameter m must be 2D");
-			return -2;
-		}
 
 		// Square matrix
-		if (m.Width() != m.Height()){
+		if (m.Width() != m.Height())
 			printf ("Inv Error: Parameter m must be square");
-			return -3;
-		}
 		
 		Matrix<T> res = m;
 		

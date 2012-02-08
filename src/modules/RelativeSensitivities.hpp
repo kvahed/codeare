@@ -324,7 +324,8 @@ SegmentBrain (const Matrix<double>& img, Matrix<short>& msk) {
 	msk.NIRead(mask);
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-	
+
+	return OK;	
 }
 
 

@@ -450,7 +450,7 @@ public:
      * @param  ias      IceAs containing data
      * @return          Amount of data read
      */
-    const size_t       
+    size_t       
     Import              (const IceAs* ias);
 
 
@@ -461,7 +461,7 @@ public:
      * @param  pos      Import data starting at position pos of own repository
      * @return          Amount of data read
      */
-    const size_t       
+    size_t       
     Import              (const IceAs* ias, const size_t pos);
 
 
@@ -472,7 +472,7 @@ public:
      * @param  mdh      Measurement data header      
      * @return          Amount of data read
      */
-    const size_t       
+    size_t       
     Import              (const IceAs* ias, sMDH* mdh);
 
 
@@ -482,7 +482,7 @@ public:
      * @param  ias      IceAs for data export
      * @return          Amount of data exported
      */
-    const size_t         
+    size_t         
     Export              (IceAs* ias) const;
 
 
@@ -492,7 +492,7 @@ public:
      * @param  ias      IceAs for data export
      * @param  pos      Export data starting at position pos of our repository
      */
-    const size_t
+    size_t
     Export              (IceAs* ias, const size_t pos) const;
  
 	#endif
@@ -532,11 +532,11 @@ public:
      * @brief           Get pointer to data
      *  
      * @return          Data 
-     */
-    inline const T*            
+     *//*
+    inline T*            
     Data                ()  const {
-        return &_M[0];
-    }
+        return &(_M.at(0));
+		}*/
 
     
     /**
@@ -1134,7 +1134,7 @@ public:
 	 */
 	friend Matrix<T>    
 	operator/  (T s, Matrix<T> &m) {
-		return   s * m.Inv();
+		return  m;// s * m.Inv();
 	}
 
 
@@ -1520,7 +1520,7 @@ public:
      *
      * @return          Number of cells.
      */
-    const size_t
+    size_t
     Size                ()                                    const;
     
     
@@ -1530,7 +1530,7 @@ public:
 	 * @param  d        Dimensions
      * @return          XD matrix?
      */
-    const bool                
+    bool                
     IsXD                (const size_t d)                         const;
     
     
@@ -1539,7 +1539,7 @@ public:
      *
      * @return          2D matrix?
      */
-    const bool                
+    bool                
     Is1D                ()                                    const;
     
     
@@ -1548,7 +1548,7 @@ public:
      *
      * @return          2D matrix?
      */
-    const bool                
+    bool                
     Is2D                ()                                    const;
     
     
@@ -1557,7 +1557,7 @@ public:
      *
      * @return          2D matrix?
      */
-    const bool                
+    bool                
     IsZero              ()                                    const;
     
     
@@ -1566,7 +1566,7 @@ public:
      *
      * @return          3D matrix?
      */
-    const bool                
+    bool                
     Is3D                ()                                    const;
     
     
@@ -1575,7 +1575,7 @@ public:
      *
      * @return          3D matrix?
      */
-    const bool 
+    bool 
     Is4D                ()                                    const;
     
 
@@ -1584,7 +1584,7 @@ public:
 	 *
 	 * @return          Empty: true;
 	 */
-	const bool 
+	bool 
 	Empty               ()                                    const ;
 
     
@@ -1593,7 +1593,7 @@ public:
      *
      * @return          Size in RAM in bytes.
      */
-    const size_t                  
+    size_t                  
     SizeInRAM           ()                                    const;
 
     //@}
@@ -2051,7 +2051,7 @@ public:
      *
      * @return          Dimension string
      */
-    const std::string       
+    std::string       
     DimsToString        () const;
     
 
@@ -2069,7 +2069,7 @@ public:
      *
      * @return          Dimension string
      */
-    const std::string       
+    std::string       
     ResToString        () const;
     
 
@@ -2510,7 +2510,7 @@ public:
 	 * @param  ind      Index
 	 * @return          Subscript of 1st dimension
 	 */ 
-	const size_t 
+	size_t 
 	Ind2i               (const size_t& ind) const;
 
 
@@ -2520,7 +2520,7 @@ public:
 	 * @param  ind      Index
 	 * @return          Subscript of 2nd dimension
 	 */ 
-	const size_t 
+	size_t 
 	Ind2j               (const size_t& ind) const;
 
 
@@ -2530,7 +2530,7 @@ public:
 	 * @param  ind      Index
 	 * @return          Subscript of 3rd dimension
 	 */ 
-	const size_t 
+	size_t 
 	Ind2k               (const size_t& ind) const;
 
 
@@ -2540,7 +2540,7 @@ public:
 	 * @param  ind      Index
 	 * @return          Subscript of 4th dimension
 	 */ 
-	const size_t 
+	size_t 
 	Ind2l               (const size_t& ind) const;
 
 
@@ -2551,7 +2551,7 @@ public:
 	 * @param  dim      Dimension
 	 * @return          Subscipt of x-th dimension
 	 */ 
-	const size_t 
+	size_t 
 	Ind2x               (const size_t& ind, const size_t& dim) const;
 
 
@@ -2711,7 +2711,7 @@ Matrix<T>::Column (const size_t c) const {
 }
 
 
-template <class T> inline const size_t
+template <class T> inline size_t
 Matrix<T>::Size() const {
     
     long size = 1;
@@ -2724,7 +2724,7 @@ Matrix<T>::Size() const {
 }
 
 
-template <class T> inline const size_t 
+template <class T> inline size_t 
 Matrix<T>::SizeInRAM() const {
     
     return Size() * sizeof(T);

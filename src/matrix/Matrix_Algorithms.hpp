@@ -18,34 +18,34 @@
  *  02110-1301  USA
  */
 
-template<class T> const inline size_t
+template<class T> inline size_t
 Matrix<T>::Ind2i  (const size_t& ind) const { 
 	return (size_t) ind % _dim[0];                 
 }
 
 
 
-template<class T> const inline size_t
+template<class T> inline size_t
 Matrix<T>::Ind2j  (const size_t& ind) const { 
 	return (size_t) floor (ind/_dim[0]) % (_dim[1]-1);
 }
 
 
 
-template<class T> const inline size_t
+template<class T> inline size_t
 Matrix<T>::Ind2k  (const size_t& ind) const { 
 	return (size_t) floor (ind/(_dim[0]*_dim[1])) % (_dim[2]-1);
 }
 
 
 
-template<class T> const inline size_t
+template<class T> inline size_t
 Matrix<T>::Ind2l  (const size_t& ind) const { 
 	return (size_t) floor (ind/(_dim[0]*_dim[1]*_dim[2])) % (_dim[3]-1);
 }
 
 
-template<class T> inline const size_t
+template<class T> inline size_t
 Matrix<T>::Ind2x (const size_t& ind, const size_t& dim) const { 
 	
 	size_t x = 1;
@@ -60,7 +60,7 @@ Matrix<T>::Ind2x (const size_t& ind, const size_t& dim) const {
 }
 
 
-template<class T> inline Matrix<size_t>
+template<class T> Matrix<size_t>
 Matrix<T>::Ind2Sub2D (const Matrix<size_t>& inds) const {
 	
 	Matrix<T>      tmp = this->Squeeze();
@@ -105,15 +105,15 @@ Matrix<T>::Sub2Ind  (const Matrix<size_t>& subs) const {
 }
 
 
-template<class T> inline const bool 
+template<class T> inline bool
 Matrix<T>::Empty () const {
 
-	_M.size() == 0;
+	return (_M.size() == 0);
 
 }
 
 
-template <class T> inline const bool 
+template <class T> inline bool 
 Matrix<T>::IsXD (const size_t d) const {
 
 	size_t l = 0;
@@ -126,7 +126,7 @@ Matrix<T>::IsXD (const size_t d) const {
 }
 
 
-template <class T> inline const bool 
+template <class T> inline bool 
 Matrix<T>::Is1D () const {
 	
 	return IsXD(1);
@@ -134,7 +134,7 @@ Matrix<T>::Is1D () const {
 }
 
 
-template <class T> inline const bool 
+template <class T> inline bool 
 Matrix<T>::Is2D () const {
 	
 	return IsXD(2);
@@ -142,7 +142,7 @@ Matrix<T>::Is2D () const {
 }
 
 
-template <class T> inline const bool 
+template <class T> inline bool 
 Matrix<T>::Is3D () const {
 	
 	return IsXD(3);
@@ -150,7 +150,7 @@ Matrix<T>::Is3D () const {
 }
 
 
-template <class T> inline const bool 
+template <class T> inline bool 
 Matrix<T>::Is4D () const {
 	
 	return IsXD(4);
@@ -159,7 +159,7 @@ Matrix<T>::Is4D () const {
 
 
 
-template <class T> inline const bool 
+template <class T> inline bool 
 Matrix<T>::IsZero () const {
 	
 	for (size_t i = 0; i < Size(); i++)

@@ -32,7 +32,7 @@ namespace RRClient {
 	error_code
 	LocalConnector::CleanUp () {
 		
-		FunctorContainer::Finalise ();
+		return FunctorContainer::Finalise ();
 		
 	}
 	

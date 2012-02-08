@@ -20,7 +20,7 @@ DataBase::Instance ()  {
 		
 }
 	
-const error_code
+error_code
 DataBase::Finalise () {
 	
 	std::cout << "Clearing database instance ... " << std::endl;

@@ -142,7 +142,7 @@ Matrix<cxdb>::Print (ostream& os) const {
 }
 
 
-template <class T> inline const string 
+template <class T> inline string 
 Matrix<T>::DimsToString () const {
 
 	stringstream ss;
@@ -163,7 +163,7 @@ Matrix<T>::DimsToCString () const {
 }
 
 
-template <class T> inline const string 
+template <class T> inline string 
 Matrix<T>::ResToString () const {
 
 	stringstream ss;
@@ -561,7 +561,7 @@ Matrix<T>::RAWRead (const std::string& fname, const std::string& version) {
 template <class T> inline bool 
 Matrix<T>::Read (const std::string& fname, const std::string& dname, const std::string& dloc, const io_strategy& ios) {
 
-	if (     ios == HDF5)
+	if      (ios == HDF5)
 		return H5Read (fname, dname, dloc);
 #ifdef HAVE_MAT_H
 	else if (ios == MATLAB)
@@ -569,6 +569,8 @@ Matrix<T>::Read (const std::string& fname, const std::string& dname, const std::
 #endif
 	else if (ios == NIFTI)
 		return NIRead (fname);
+
+	return true;
 
 }
 
@@ -790,6 +792,8 @@ bool Matrix<T>::MXDump (MATFile* mf, const string dname, const string dloc) cons
 		mxDestroyArray(mxa);
 	// -------------------------------------------
 	
+	return true;
+
 }
 
 template <class T>
@@ -816,6 +820,8 @@ bool Matrix<T>::MXDump (const string fname, const string dname, const string dlo
 		return false;
 	}
 	// -------------------------------------------
+
+	return true;
 
 }
 
