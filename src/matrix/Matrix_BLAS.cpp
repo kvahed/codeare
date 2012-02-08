@@ -53,10 +53,10 @@ Matrix<T>::GEMM (Matrix<T>& M, char transb) {
 	char transa = 'N';
 	
     int  m      = (int)   Dim(0);
-    int  n      = (int )M.Dim(1);
+    int  n      = (int )  Dim(1);
     int  k      = (int)   Dim(1);
 	int  lda    = (int)   m;
-	int  ldb    = (int)   k;
+	int  ldb    = (int)   n;
 	int  ldc    = (int)   m;
 	
 	T    alpha  =         T(1.0);

@@ -20,6 +20,7 @@
 
 #include "KTPoints.hpp"
 #include "PTXINIFile.hpp"
+#include "Lapack.hpp"
 
 using namespace RRStrategy;
 
@@ -95,7 +96,7 @@ KTPoints::Init           ()  {
 
 	// Break loop early --------------------------
 	Attribute ("breakearly", &m_breakearly);
-	printf ("  verbosity: %i \n", m_breakearly);
+	printf ("  break early: %i \n", m_breakearly);
 
 	// ----------------------------------------
 	
@@ -177,12 +178,13 @@ KTPoints::Process        () {
         Matrix<cxfl> m (m_ns, m_nk*m_nc);
 
         STA (k, r, b1, b0, m_nc, m_nk, m_ns, m_gd, m_pd, m);
-        Matrix<cxfl> minv = m.tr();
+		
+        Matrix<cxfl> minv;
 
-        minv  = minv->*(m);
-        minv  = minv + treg;
-        minv  = minv.Pinv();
-        minv  = minv.prodt(m);
+        minv  = Lapack::GEMM(   m, m, 'C', 'N');
+        minv += treg;
+        minv  = Lapack::Pinv(minv);
+        minv  = Lapack::GEMM(minv, m, 'N', 'C');
         
         // Valriable exchange method --------------
 
@@ -191,8 +193,8 @@ KTPoints::Process        () {
 
         for (int j = 0; j < m_maxiter; j++, gc++) {
 
-            solution = minv->*(target);
-            tmp      = m->*(solution);
+            solution = /*minv->*(target);*/ Lapack::GEMM (minv, target);
+            tmp      = /*m->*(solution);*/  Lapack::GEMM (m,  solution);
 
             NRMSE (target, tmp, gc, nrmse);
             res.push_back (nrmse);
@@ -200,11 +202,11 @@ KTPoints::Process        () {
 			if (m_verbose)
 				memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cxfl)); 
 
-            if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
+			if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
 				break;
             
             final    = solution;
-            PhaseCorrection ((target), tmp);
+            PhaseCorrection (target, tmp);
             
         } 
         
@@ -234,7 +236,7 @@ KTPoints::Process        () {
         } else 
 			printf ("OK\n");
         
-    } // End of pulse duration loop
+	} // End of pulse duration loop
 
     printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / Toolbox::Instance()->ClockRate());
 	
