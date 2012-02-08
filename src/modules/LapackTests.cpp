@@ -165,25 +165,31 @@ LapackTests::Process     () {
 	std::cout << "A*(B').' :\n" <<  dd;
 	std::cout << "------------------------------- \n\n";
 
-	Matrix<double> de (3,800) ;
-	de.Random();
-	Matrix<double> x (de.Width(),1);
-	x.Random();
+	Matrix<cxfl> A;
+		//(1867,4312);
+	A.MXRead("tmp.mat", "EM");
+	Matrix<cxfl> b (A.Height(),1);
+	b.MXRead("tmp.mat", "PA");
+
+	
+	Matrix<cxfl> x = MCGLS::Pinv(A, b, 130, 1e-6);
+	x.MXDump ("x.mat", "x");
+	
 
 	//de = !de;
 	//std::cout << "A  :\n" <<  de;
 	//std::cout << "x' :\n" <<  x;
-
+	/*
 	ticks tic = getticks();
 
 	Matrix<double> y  = Lapack::GEMV (de, x);
 	printf ("GEMV. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	//std::cout << "y' :\n" <<  y;
-
+	tic = getticks();
 	Matrix<double> y2 = Lapack::GEMM (de, x);
 	printf ("GEMM. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-
+	*/
 	//std::cout << "y' :\n" <<  y2;
 
 	/*
