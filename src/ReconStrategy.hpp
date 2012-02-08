@@ -123,7 +123,7 @@ namespace RRStrategy {
 		 * @return      Success
 		 */ 
 		virtual error_code 
-		Finalise        () {};
+		Finalise        () { return OK; };
 	
 	
 		/**

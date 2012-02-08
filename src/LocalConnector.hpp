@@ -151,8 +151,8 @@ class RemoteConnector;
 		 * @param  dims     Dimension array from the CORBA types 
 		 * @return          Size
 		 */
-		long
-		GetSize             (const longs dims) const {};
+		//long
+		//GetSize             (const longs dims) const { };
 		
 		char*                                m_config;   /**< Serialised XML document  */
 		std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/

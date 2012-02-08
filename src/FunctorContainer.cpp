@@ -32,6 +32,7 @@ FunctorContainer::CleanUp () {
 
 	
 	this->Finalise();
+	return OK;
 	
 }
 

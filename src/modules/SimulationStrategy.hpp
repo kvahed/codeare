@@ -100,7 +100,12 @@ namespace RRStrategy {
 				printf ("Error closing file %s\n", odf.c_str());
 				return false;
 			}
+
+			return true;
 #endif
+
+			return false;
+
 		}
 		
 	};

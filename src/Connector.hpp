@@ -95,7 +95,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Process             (const char* name) {
-		m_conn->Process(name);
+		return m_conn->Process(name);
 	}
 	
 	
@@ -107,7 +107,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Prepare             (const char* name) {
-		m_conn->Prepare(name);
+		return m_conn->Prepare(name);
 	}
 	
 	
@@ -119,7 +119,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Init                (const char* name) {
-		m_conn->Init(name);
+		return m_conn->Init(name);
 	}
 	
 	
@@ -131,7 +131,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Finalise            (const char* name) {
-		m_conn->Finalise(name);
+		return m_conn->Finalise(name);
 	}
 	
 	

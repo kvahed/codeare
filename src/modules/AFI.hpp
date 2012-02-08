@@ -88,12 +88,9 @@ namespace RRStrategy {
 	 * @param  od      Out data
 	 * @param  out     size
 	 */
-	void PreWhite (const Matrix<cxfl>& in, const Matrix<cxfl>& ncov, Matrix<cxfl>& od, const size_t& out = -1) {
+	void PreWhite (const Matrix<cxfl>& in, const Matrix<cxfl>& ncov, Matrix<cxfl>& od, const size_t& out = 0) {
 
 		//assert (idx <= in.HDim());
-
-		
-
 
 	} 
 

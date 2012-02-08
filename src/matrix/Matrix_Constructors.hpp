@@ -154,7 +154,13 @@ Matrix<T>::Matrix (const Matrix<T> &M) {
 	   
 	_M.resize(Size());
 	
-	memcpy (&_M[0], M.Data(), Size() * sizeof(T));
+#pragma omp parallel default (shared)
+	{
+#pragma omp for
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] = M[i];
+	}
+			//	memcpy (&_M[0], M.Data(), Size() * sizeof(T));
 	
 }
 
