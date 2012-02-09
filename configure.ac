@@ -449,7 +449,7 @@ fi
 # If we're using the Intel compilers, we prefer MKL as well                                                                                 
 if test -z "$BLAS"; then
   if test $CC = icc -o $CXX = icpc; then
-    AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="-lmkl")
+    AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="/opt/intel/mkl/lib/intel64 -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -openmp -lpthread -lm")
   fi
 fi
 

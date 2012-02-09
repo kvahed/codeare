@@ -60,7 +60,7 @@ CompressedSensing::Init () {
 	Attribute ("csiter", &m_csiter);
 	Attribute ("cgconv", &m_cgparam.cgconv);
 	Attribute ("cgiter", &m_cgparam.cgiter);
-	printf ("  Maximum %i NLCG iterations or convergence to m_cgconv", m_cgparam.cgiter, m_cgparam.cgconv);	
+	printf ("  Maximum %i NLCG iterations or convergence to %.9f", m_cgparam.cgiter, m_cgparam.cgconv);	
 
 	
 
