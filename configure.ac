@@ -18,7 +18,7 @@ LT_INIT([dlopen])
 define([svnversion], esyscmd([sh -c "svnversion|tr -d '\n'"]))dnl
 AC_DEFINE(SVN_REVISION, "svnversion", [SVN Revision])
 # copyright notice
-AC_COPYRIGHT([2010, 2011, Kaveh Vahedipour])
+AC_COPYRIGHT([2010, 2011, 2012, Kaveh Vahedipour])
 
 # Produce first version of idl derivates
 esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])

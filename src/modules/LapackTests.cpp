@@ -161,37 +161,38 @@ LapackTests::Process     () {
 	std::cout << "A  :\n" <<  db;
 	std::cout << "B' :\n" <<  dc;
 
-	dd = Lapack::GEMM (db, dc, 'C', 'N');
+	dd = Lapack::GEMM (db, dc, 'C');
 	std::cout << "A*(B').' :\n" <<  dd;
 	std::cout << "------------------------------- \n\n";
 
-	Matrix<cxfl> A;
-		//(1867,4312);
-	A.MXRead("tmp.mat", "EM");
+	Matrix<cxfl> A (3,8); 
+	A.Random();
+
 	Matrix<cxfl> b (A.Height(),1);
-	b.MXRead("tmp.mat", "PA");
-
+	b.Random();
 	
-	Matrix<cxfl> x = MCGLS::Pinv(A, b, 300, 1e-9);
-	x.MXDump ("x.mat", "x");
-	
+	std::cout << "A  :\n" <<  A;
+	std::cout << "x' :\n" <<  b;
 
-	//de = !de;
-	//std::cout << "A  :\n" <<  de;
-	//std::cout << "x' :\n" <<  x;
-	/*
 	ticks tic = getticks();
 
-	Matrix<double> y  = Lapack::GEMV (de, x);
-	printf ("GEMV. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-
-	//std::cout << "y' :\n" <<  y;
 	tic = getticks();
-	Matrix<double> y2 = Lapack::GEMM (de, x);
-	printf ("GEMM. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-	*/
-	//std::cout << "y' :\n" <<  y2;
 
+	Matrix<cxfl> y2 = Lapack::GEMM (A, b, 'C');
+	printf ("GEMM. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	std::cout << "y' :\n" <<  y2;
+
+	Matrix<cxfl> y  = Lapack::GEMV (A, b, 'C');
+	printf ("GEMV. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	std::cout << "y' :\n" <<  y;
+
+
+	A.MXRead("tmp.mat", "EM");
+	b.MXRead("tmp.mat", "PA");
+
+	Matrix<cxfl> x = MCGLS::Pinv(A, b, 300, 1e-6);
+	x.MXDump ("x.mat", "x");
+	
 	/*
 	Matrix<cxfl> rx (dc.Width(),1);
 	rx.Random();
