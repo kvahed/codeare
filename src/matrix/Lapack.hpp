@@ -66,7 +66,7 @@ extern "C" {
 	void dgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
 	void cgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
 	void zgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
-	
+
 	// Matrix matrix multiplication
 	void sgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
 	void dgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
@@ -76,6 +76,7 @@ extern "C" {
 }
 
 #include "Matrix.hpp"
+#include "cblas.h"
 
 class Lapack {
 
@@ -469,20 +470,22 @@ class Lapack {
 
 		assert (x.Width() == 1);
 		
-		int m, n, one = 1, ah = (int)A.Height(), aw = (int)A.Width(), xh = (int)x.Height();
+		int aw = (int) A.Width(), ah = (int) A.Height(), xh = (int) x.Height();
+
+		int m = ah, n = aw, one = 1;
 		
 		if (trans == 'N') {
 			assert (aw == xh);
-			m = ah; n = aw;
+			//m = ah; n = aw;
 		} else if (trans == 'T' || trans == 'C') {
 			assert (ah == xh);
-			m = aw;	n = ah;
+			//	m = aw;	n = ah;
 		}
 		
 		T    alpha  = T(1.0);
 		T    beta   = T(0.0);
 		
-		Matrix<T> y (m, 1);
+		Matrix<T> y ((trans == 'N') ? m : n, 1);
 		
 		if      (typeid(T) == typeid(double)) dgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
 		else if (typeid(T) == typeid(float))  sgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
