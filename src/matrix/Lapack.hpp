@@ -121,7 +121,7 @@ class Lapack {
 
 		int    lda   =  N;
 		int    ldvl  =  (jobvl) ? N : 1;
-		int    ldvr  =  (jobvr) ? N : 1;
+		int    ldvr  =  (jobvr) ? m.Width() : 1;
 		int    info  =  0;
 		int    lwork = -1;
 		
@@ -132,24 +132,26 @@ class Lapack {
 			w  = (T*)     malloc (  N * sizeof(T));
 			wi = (T*)     malloc (  N * sizeof(T));
 		}
-
-		T*     work  = (T*)     malloc (  1 * sizeof(T));
+		
+		T wkopt;
 		float* rwork = (float*) malloc (2*N * sizeof(float));
 		
 		// Workspace query
 		if (typeid(T) == typeid(cxfl))
-			cgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
+			cgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
 		else if (typeid(T) == typeid(cxdb))
-			zgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
+			zgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgeev_ (&jobvl, &jobvr, &N, &m[0], &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
+			dgeev_ (&jobvl, &jobvr, &N, &m[0], &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
 		else if (typeid(T) == typeid(float))
-			sgeev_ (&jobvl, &jobvr, &N, &m[0], &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
+			sgeev_ (&jobvl, &jobvr, &N, &m[0], &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
 		
 		// Intialise work space
-		lwork = (int) (cxfl(work[0]).real());
-		free (work); work = (T*) malloc (lwork*sizeof(T));
+		lwork = (int) creal(wkopt);
 		
+		T*     work  = (T*)     malloc (  lwork * sizeof(T));
+
+
 		// Actual eigen value comp
 		if (typeid(T) == typeid(cxfl)) {
 			cgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
