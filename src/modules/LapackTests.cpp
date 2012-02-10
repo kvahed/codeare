@@ -76,7 +76,7 @@ LapackTests::Process     () {
 
 	std::cout << "RLDB IN: \n";
 	std::cout << Ar << std::endl;
-	Lapack::SVD (Ar, ds, du, dv, 'N');
+	Lapack::SVD (Ar, ds, du, dv, 'S');
 	std::cout << "OUT s:\n" <<  ds  << std::endl;
 	std::cout << "OUT u:\n" <<  du  << std::endl;
 	std::cout << "OUT v:\n" <<  dv;
@@ -84,16 +84,16 @@ LapackTests::Process     () {
 	
 	std::cout << "Testing SVD (dgesdd) ---------- \n";
 
-	Matrix<cxdb> Ac (8,3); 
+	Matrix<cxfl> Ac (8,3); 
 	Ac.Random();
 
-	Matrix<cxdb>  cu;
-	Matrix<cxdb>  cv;
-	Matrix<double> cs;
+	Matrix<cxfl>  cu;
+	Matrix<cxfl>  cv;
+	Matrix<float> cs;
 
-	std::cout << "CXDB IN: \n";
+	std::cout << "CXFL IN: \n";
 	std::cout << Ac << std::endl;
-	Lapack::SVD (Ac, cs, cu, cv, 'N');
+	Lapack::SVD (Ac, cs, cu, cv, 'S');
 	std::cout << "OUT s:\n" <<  cs  << std::endl;
 	std::cout << "OUT u:\n" <<  cu  << std::endl;
 	std::cout << "OUT v:\n" <<  cv;
