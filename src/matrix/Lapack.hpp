@@ -228,9 +228,9 @@ class Lapack {
 		int*   iwork =   (int*) malloc (8 * mn * sizeof(int));
 		
 		// Only needed for complex data
-		if (typeid(T) == typeid(cxfl)) {
-			if (jobz = 'N')	rwork = malloc (mn * 7            * sizeof(T) / 2);
-			else            rwork = malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
+		if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) {
+			if (jobz == 'N') rwork = malloc (mn * 7            * sizeof(T) / 2);
+			else             rwork = malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
 		}
 		
 		// Workspace query
@@ -258,13 +258,13 @@ class Lapack {
 			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
 
 		// Transpose V
-		V = !V;
+		//V = !V;
 
 		// Clean up
-		if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) free (rwork);
+		//if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) free (rwork);
 
-		free (work);
-		free (iwork);
+		//free (work);
+		//free (iwork);
 		
 		if (info > 0)
 			printf ("The updating process of SBDSDC did not converge.\n");
