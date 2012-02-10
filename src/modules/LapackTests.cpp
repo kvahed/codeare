@@ -33,6 +33,7 @@ LapackTests::Process     () {
 
 
 	Matrix<cxfl>&   cf = GetCXFL ("cf");
+	Matrix<cxdb>    cd = (Matrix<cxdb>) cf;
 	Matrix<double>& rd = GetRLDB ("rd");
 
 	std::cout << "Testing EIG (cgeev) ----------- \n";
@@ -68,13 +69,14 @@ LapackTests::Process     () {
 
 	std::cout << "Testing SVD (dgesdd) ---------- \n";
 
-	Matrix<double> du (MIN(rd.Height(),rd.Width()));
-	Matrix<double> dv (MAX(rd.Height(),rd.Width()));
-	Matrix<double> ds (MIN(rd.Height(),rd.Width()), 1);
+	Matrix<double> Ar (8,3); Ar.Random();
+	Matrix<double> du;
+	Matrix<double> dv;
+	Matrix<double> ds;
 
 	std::cout << "RLDB IN: \n";
-	std::cout << rd << std::endl;
-	std::cout << "INFO: " << Lapack::SVD (rd, ds, du, dv, 'A') << "\n" << std::endl;
+	std::cout << Ar << std::endl;
+	Lapack::SVD (Ar, ds, du, dv, 'N');
 	std::cout << "OUT s:\n" <<  ds  << std::endl;
 	std::cout << "OUT u:\n" <<  du  << std::endl;
 	std::cout << "OUT v:\n" <<  dv;
@@ -82,18 +84,21 @@ LapackTests::Process     () {
 	
 	std::cout << "Testing SVD (dgesdd) ---------- \n";
 
-	Matrix<cxfl>  cu (MIN(cf.Height(),cf.Width()));
-	Matrix<cxfl>  cv (MAX(cf.Height(),cf.Width()));
-	Matrix<float> cs (MIN(cf.Height(),cf.Width()), 1);
+	Matrix<cxdb> Ac (8,3); 
+	Ac.Random();
 
-	std::cout << "RLDB IN: \n";
-	std::cout << cf << std::endl;
-	std::cout << "INFO: " << Lapack::SVD (cf, cs, cu, cv, 'A') << "\n" << std::endl;
+	Matrix<cxdb>  cu;
+	Matrix<cxdb>  cv;
+	Matrix<double> cs;
+
+	std::cout << "CXDB IN: \n";
+	std::cout << Ac << std::endl;
+	Lapack::SVD (Ac, cs, cu, cv, 'N');
 	std::cout << "OUT s:\n" <<  cs  << std::endl;
 	std::cout << "OUT u:\n" <<  cu  << std::endl;
 	std::cout << "OUT v:\n" <<  cv;
 	std::cout << "------------------------------- \n\n";
-
+	/*
 	std::cout << "Testing Inv (dgetri / dgetrf) - \n";
 
 	dtmp = Matrix<double>::Random2D (5);
@@ -192,7 +197,7 @@ LapackTests::Process     () {
 
 	Matrix<cxfl> x = MCGLS::Pinv(A, b, 300, 1e-6);
 	x.MXDump ("x.mat", "x");
-	
+	*/
 	/*
 	Matrix<cxfl> rx (dc.Width(),1);
 	rx.Random();
