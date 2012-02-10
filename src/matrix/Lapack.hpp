@@ -280,12 +280,10 @@ class Lapack {
 	Inv (Matrix<T>& m) {
 		
 		// 2D 
-		if (!m.Is2D())
-			printf ("Inv Error: Parameter m must be 2D");
+		if (!m.Is2D())               printf ("Inv Error: Parameter m must be 2D");
 
 		// Square matrix
-		if (m.Width() != m.Height())
-			printf ("Inv Error: Parameter m must be square");
+		if (m.Width() != m.Height()) printf ("Inv Error: Parameter m must be square");
 		
 		Matrix<T> res = m;
 		
@@ -293,55 +291,37 @@ class Lapack {
 		int  info = 0;
 		int *ipiv = (int*) malloc (N * sizeof(int));
 
-		char up = 'U';
-		char lo = 'L';
-		
 		// LQ Factorisation -------------------
-		
-		if (typeid (T) == typeid (cxfl)) 
-			cgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-		else if (typeid (T) == typeid (double))
-			dgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-		else if (typeid (T) == typeid (cxdb)) 
-			zgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-		else if (typeid (T) == typeid (float))
-			sgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-		
+
+		if      (typeid (T) == typeid (cxfl))   cgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
+		else if (typeid (T) == typeid (cxdb))   zgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
+		else if (typeid (T) == typeid (double)) dgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
+		else if (typeid (T) == typeid (float))  sgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
 		// ------------------------------------
 		
 		int lwork = -1; 
-		T*  work  = (T*) malloc (sizeof(T));
+		T   wopt;
 		
 		// Workspace determination ------------
 		
-		if (typeid (T) == typeid (cxfl)) 
-			cgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		else if (typeid (T) == typeid (cxdb)) 
-			zgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		else if (typeid (T) == typeid (double))
-			dgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		else if (typeid (T) == typeid (float))
-			sgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		
+		if      (typeid (T) == typeid (cxfl))   cgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
+		else if (typeid (T) == typeid (cxdb))   zgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
+		else if (typeid (T) == typeid (double)) dgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
+		else if (typeid (T) == typeid (float))  sgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
+		// ------------------------------------
+
 		// Work memory allocation -------------
 	
-		if (typeid (T) == typeid(cxfl) || typeid (T) == typeid(float))
-			lwork = (int) ((float*)work)[0];
-		else if (typeid (T) == typeid(cxdb) || typeid (T) == typeid(double))
-			lwork = (int) ((double*)work)[0];
-
-		work  = (T*)  realloc (work, lwork * sizeof(T));
+		lwork   = (int) creal (wopt);
+		T* work = (T*) malloc (lwork * sizeof(T));
+		// ------------------------------------
 
 		// Inversion --------------------------
 
-		if (typeid (T) == typeid (cxfl)) 
-			cgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		else if (typeid (T) == typeid (cxdb)) 
-			zgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		else if (typeid (T) == typeid (double))
-			dgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		else if (typeid (T) == typeid (float))
-			sgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
+		if      (typeid (T) == typeid (cxfl))   cgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
+		else if (typeid (T) == typeid (cxdb))   zgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
+		else if (typeid (T) == typeid (double)) dgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
+		else if (typeid (T) == typeid (float))  sgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
 		// ------------------------------------
 		
 		free (ipiv);
@@ -354,11 +334,11 @@ class Lapack {
 
 
 	template<class T> static Matrix<T> 
-	Pinv (Matrix<T>& m) {
-		
+	Pinv (Matrix<T>& m, double rcond = 1.0) {
+
 		void *s, *rwork;
-		T    *work;
-		int  *iwork;
+		T    *work, wopt, rwopt;
+		int  *iwork, iwopt;
 		
 		int  M      =  m.Height();
 		int  N      =  m.Width();
@@ -367,57 +347,42 @@ class Lapack {
 		int  lda    =  M;
 		int  ldb    =  MAX(M,N);
 		int  lwork  = -1; 
-		int  lrwork =  0;
-		int  liwork =  0;
 		int  rank   =  0;
 		int  info   =  0;
 		int  swork  =  sizeof(T) * MIN(M,N);
 		
-		work   = (T*)   malloc  (sizeof(T)); 
-		iwork  = (int*) malloc  (sizeof(int)); 
-		rwork  =        malloc  (sizeof(T) / 2);    
-
-
 		if (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
 			swork /= 2;
 
-		s      =        malloc (swork);    
+		s      =        malloc (swork);
 
 		Matrix<T> b =  Matrix<T>::Id(ldb);
 		
-		double drcond  = -1.0;
-		float  frcond  = -1.0;
+		float frcond  = rcond;
 		
-		if (typeid(T) == typeid(cxfl))
-			cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
+		if      (typeid(T) == typeid(cxfl))
+			cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
 		else if (typeid(T) == typeid(cxdb))
-			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &drcond, &rank, work, &lwork, rwork, iwork, &info);
+			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
 		else if (typeid(T) == typeid(double))
-			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &drcond, &rank, work, &lwork,        iwork, &info);
+			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork,         &iwopt, &info);
 		else if (typeid(T) == typeid(float))
-			sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
+			sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork,         &iwopt, &info);
 		
-		liwork = iwork[0];
-
-		if      (typeid (T) == typeid(cxfl))                                 lrwork = (int) ((float*) rwork)[0];
-		else if (typeid (T) == typeid(cxdb))                                 lrwork = (int) ((double*)rwork)[0];
-
-		if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(float))  lwork  = (int) ((float*) work)[0];
-		else if (typeid (T) == typeid(cxdb) || typeid (T) == typeid(double)) lwork  = (int) ((double*)work)[0];
-
+		lwork = (int) creal(wopt);
 
 		if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
-			rwork =    malloc ((sizeof(T)/2)*lrwork);
+			rwork =    malloc ((sizeof(T)/2) * (int) creal(rwopt));
 		
-		iwork = (int*) malloc (liwork*sizeof(int));
-		work  = (T*)   malloc (lwork *sizeof(T));
+		iwork = (int*) malloc (sizeof(int) * iwopt);
+		work  = (T*)   malloc (sizeof(T) * lwork);
 		
 		if (typeid(T) == typeid(cxfl))
 			cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(cxdb))
-			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &drcond, &rank, work, &lwork, rwork, iwork, &info);
+			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &drcond, &rank, work, &lwork,        iwork, &info);
+			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork,        iwork, &info);
 		else if (typeid(T) == typeid(float))
 			sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
 
@@ -427,9 +392,11 @@ class Lapack {
 
 		b.Resize(N,M);
 		
+		if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
+			free (rwork);
+
 		free (s);
 		free (work);
-		free (rwork);
 		free (iwork);
 		
 		return b;

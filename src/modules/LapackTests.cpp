@@ -84,7 +84,7 @@ LapackTests::Process     () {
 	
 	std::cout << "Testing SVD (dgesdd) ---------- \n";
 
-	Matrix<cxfl> Ac (8,3); 
+	Matrix<cxfl> Ac (3,8); 
 	Ac.Random();
 
 	Matrix<cxfl>  cu;
@@ -98,7 +98,7 @@ LapackTests::Process     () {
 	std::cout << "OUT u:\n" <<  cu  << std::endl;
 	std::cout << "OUT v:\n" <<  cv;
 	std::cout << "------------------------------- \n\n";
-	/*
+
 	std::cout << "Testing Inv (dgetri / dgetrf) - \n";
 
 	dtmp = Matrix<double>::Random2D (5);
@@ -117,7 +117,6 @@ LapackTests::Process     () {
 	std::cout << "OUT:\n" <<  ctmp;
 	std::cout << "------------------------------- \n\n";
 	
-
 	std::cout << "Testing Pinv (dgelsd) ---------- \n";
 
 	Matrix<double> da (5,3);
@@ -197,7 +196,7 @@ LapackTests::Process     () {
 
 	Matrix<cxfl> x = MCGLS::Pinv(A, b, 300, 1e-6);
 	x.MXDump ("x.mat", "x");
-	*/
+
 	/*
 	Matrix<cxfl> rx (dc.Width(),1);
 	rx.Random();
