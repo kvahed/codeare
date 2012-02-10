@@ -1,3 +1,4 @@
+
 /*
  *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
@@ -118,7 +119,7 @@ class Lapack {
 			return -3;
 		}
 		
-		int    N     = m.Height();
+		int    N     =  m.Height();
 
 		int    lda   =  N;
 		int    ldvl  =  (jobvl) ? N : 1;
@@ -128,15 +129,16 @@ class Lapack {
 		
 		T*     w;
 		T*     wi;
+		T*     rwork;
 
-		if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {
-			w  = (T*)     malloc (  N * sizeof(T));
-			wi = (T*)     malloc (  N * sizeof(T));
-		}
-		
-		T wkopt;
-		float* rwork = (float*) malloc (2*N * sizeof(float));
-		
+		if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {    // Complex eigen values for real matrices
+			w     = (T*) malloc (N * sizeof(T));
+			wi    = (T*) malloc (N * sizeof(T));
+		} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))  // Real workspace for complex matrices
+			rwork = (T*) malloc (N * sizeof(T));
+	  
+		T  wkopt;
+
 		// Workspace query
 		if (typeid(T) == typeid(cxfl))
 			cgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
@@ -148,10 +150,8 @@ class Lapack {
 			sgeev_ (&jobvl, &jobvr, &N, &m[0], &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
 		
 		// Intialise work space
-		lwork = (int) creal(wkopt);
-		
-		T*     work  = (T*)     malloc (  lwork * sizeof(T));
-
+		lwork    = (int) creal (wkopt);
+		T* work  = (T*) malloc (lwork * sizeof(T));
 
 		// Actual eigen value comp
 		if (typeid(T) == typeid(cxfl)) {
@@ -174,13 +174,13 @@ class Lapack {
 
 		
 		// Clean up
-
 		if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {
 			free (w);
 			free (wi);
-		}
+		} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
+			free (rwork);
 		free (work);
-		free (rwork);
+
 		
 		return info;
 		
@@ -188,54 +188,88 @@ class Lapack {
 	
 
 	template<class T, class S> static int 
-	SVD (Matrix<T>& m, Matrix<S>& s, Matrix<T>& u, Matrix<T>& v, const char jobz = 'N') {
+	SVD (Matrix<T>& A, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
 		
 		// SVD only defined on 2D data
-		if (!m.Is2D())
+		if (!A.Is2D())
 			return -2;
-		
-		bool   cm    = true;
-		
-		int    M     = m.Height();
-		int    N     = m.Width();
-		int    lwork = -1;
-		int    info  = 0;
-		int    lda   = M;
-		int    ldu   = MAX(M,N);
-		int    ldvt  = MIN(M,N);
-		
-		T*     work  =     (T*) malloc (sizeof(T));
-		float* rwork = (float*) malloc (sizeof(float));
-		int*   iwork =   (int*) malloc (8 * MIN(M,N) * sizeof(int));
+
+		int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vcol = 1;
+		T     wopt;
+		void* rwork;
+
+		m     =  A.Height();
+		n     =  A.Width();
+		lwork = -1;
+		info  =  0;
+		lda   =  m;
+		mn    =  MIN(m,n);
+
+		if    (((jobz == 'A' || jobz == 'O') && m < n)) 
+			ucol = m;
+		else if (jobz == 'S')
+			ucol = mn;
+
+		if      (jobz == 'S' || jobz == 'A' || (jobz == 'O' &&  m < n)) 
+			ldu = m;
+
+		if      (jobz == 'A' || (jobz == 'O' && m >= n))
+			ldvt = n;
+		else if (jobz == 'S')
+			ldvt = mn;
+
+		if      (jobz != 'N')
+			vcol = n;
+
+		s.Resize (mn,1);
+		U.Resize (ldu,ucol);
+		V.Resize (ldvt,vcol);
+
+		int*   iwork =   (int*) malloc (8 * mn * sizeof(int));
 		
 		// Only needed for complex data
 		if (typeid(T) == typeid(cxfl)) {
-			free (rwork);
-			rwork = (float*) malloc (MIN(M,N) * MAX(5*MIN(M,N)+7,2*MAX(M,N)+2*MIN(M,N)+1) * sizeof(float));
+			if (jobz = 'N')	rwork = malloc (mn * 7            * sizeof(T) / 2);
+			else            rwork = malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
 		}
 		
 		// Workspace query
-		if (typeid(T) == typeid(cxfl))
-			cgesdd_ (&jobz, &M, &N, &m[0], &lda, (float*)&s[0], &u[0], &ldu, &v[0], &ldvt, work, &lwork, rwork, iwork, &info);
+		if      (typeid(T) == typeid(cxfl))
+			cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+		else if (typeid(T) == typeid(cxdb))
+			zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgesdd_ (&jobz, &M, &N, &m[0], &lda,         &s[0], &u[0], &ldu, &v[0], &ldvt, work, &lwork,        iwork, &info);
+			dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+		else if (typeid(T) == typeid(float))
+			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
 		
 		// Resize work according to ws query
-		lwork = (int) cxfl (work[0]).real();
-		free(work); work = (T*) malloc (lwork * sizeof(T));
+		lwork   = (int) creal (wopt);
+		T* work = (T*) malloc (lwork * sizeof(T));
 		
 		//SVD
-		if (typeid(T) == typeid(cxfl))
-			cgesdd_ (&jobz, &M, &N, &m[0], &lda, (float*)&s[0], &u[0], &ldu, &v[0], &ldvt, work, &lwork, rwork, iwork, &info);
+		if      (typeid(T) == typeid(cxfl))
+			cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+		else if (typeid(T) == typeid(cxdb))
+			zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgesdd_ (&jobz, &M, &N, &m[0], &lda,         &s[0], &u[0], &ldu, &v[0], &ldvt, work, &lwork,        iwork, &info);
+			dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+		else if (typeid(T) == typeid(float))
+			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
 
-		v = v.tr();
+		// Transpose V
+		V = !V;
 
 		// Clean up
+		if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) free (rwork);
+
 		free (work);
-		free (rwork);
 		free (iwork);
+		
+		if (info > 0)
+			printf ("The updating process of SBDSDC did not converge.\n");
+		else if (info < 0)
+			printf ("the %i-th argument had an illegal value.\n", -info); 
 		
 		return info;
 		
@@ -403,7 +437,7 @@ class Lapack {
 	}
 	
 	
-	
+
 	template<class T> static Matrix<T> 
 	Cholesky (Matrix<T>& m, const char uplo) {
 		
@@ -474,13 +508,10 @@ class Lapack {
 
 		int m = ah, n = aw, one = 1;
 		
-		if (trans == 'N') {
+		if (trans == 'N')
 			assert (aw == xh);
-			//m = ah; n = aw;
-		} else if (trans == 'T' || trans == 'C') {
+		else if (trans == 'T' || trans == 'C')
 			assert (ah == xh);
-			//	m = aw;	n = ah;
-		}
 		
 		T    alpha  = T(1.0);
 		T    beta   = T(0.0);
