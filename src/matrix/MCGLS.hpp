@@ -25,7 +25,7 @@ class MCGLS {
 public:
 	
 	template<class T> static Matrix<T> 
-	Pinv (Matrix<T>& A, Matrix<T>& b, const size_t& maxit, const double& conv) {
+	Pinv (Matrix<T>& A, Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
 
 		size_t ah = A.Height();
 		size_t aw = A.Width();
@@ -60,8 +60,9 @@ public:
 			if (i % 5 == 0 && i > 0)                        printf ("\n");
 			printf ("    %03lu %.7f", i, res.at(i));
 			
-			q = Lapack::GEMM (A, p);
-			q = Lapack::GEMM (A, q, 'C');
+			q  = Lapack::GEMM (A, p);
+			q  = Lapack::GEMM (A, q, 'C');
+			q += (T(lambda)*p);
 			
 			ts  = (rn / (p.dotc(q)));
 			x  += (p * ts);

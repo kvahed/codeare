@@ -245,12 +245,12 @@ CGSENSE::Process () {
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
-	an = pow(p.Norm().real(), 2);
+	an = pow(creal(p.Norm()), 2);
 	Matrix<cxfl> a(m_N[0], m_N[1], m_N[2]);
 
 	for (iters = 0; iters < m_cgmaxit; iters++) {
 
-		rn = pow(r.Norm().real(), 2);
+		rn = pow(creal(r.Norm()), 2);
 		res.push_back(rn/an);
 
 		printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
@@ -261,12 +261,13 @@ CGSENSE::Process () {
 		// EHE --------------------------------------------------------
 		E  (p,    sens, m_intcor, m_fplan,                              data, m_dim);
 		EH (data, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim, false);
+		q  += (m_lambda * p);
 
 		// Guess new gradient -----------------------------------------
 		rtmp  = (rn / (p.dotc(q)));
 		a    += (p * rtmp);
 		r    -= (q * rtmp);
-		p    *= cxfl(pow(r.Norm().real(), 2)/rn);
+		p    *= cxfl(pow(creal(r.Norm()), 2)/rn);
 		p    += r;
 
 		// Verbose out put keeps all intermediate steps ---------------

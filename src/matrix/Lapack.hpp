@@ -27,6 +27,8 @@ extern "C" {
 	// Cholesky factorization of a complex Hermitian positive definite matrix
 	void cpotrf_ (char* uplo, int* n, void* a, int* lda, int *info);
 	void dpotrf_ (char* uplo, int* n, void* a, int* lda, int *info);
+	void spotrf_ (char* uplo, int* n, void* a, int* lda, int *info);
+	void zpotrf_ (char* uplo, int* n, void* a, int* lda, int *info);
 	
 	// Computes an LU factorization of a general M-by-N matrix A
 	void cgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
@@ -37,6 +39,8 @@ extern "C" {
 	// Inverse of a complex Hermitian positive definite matrix using cpotrf/cpptrf
 	void cpotri_ (char* uplo, int*n, void *a, int* lda, int*info);
 	void dpotri_ (char* uplo, int*n, void *a, int* lda, int*info);
+	void zpotri_ (char* uplo, int*n, void *a, int* lda, int*info);
+	void spotri_ (char* uplo, int*n, void *a, int* lda, int*info);
 	
 	// Matrix inversion through cholesky decomposition
 	void cgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
@@ -73,6 +77,14 @@ extern "C" {
 	void dgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
 	void cgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
 	void zgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
+	
+	// vector vector scalar multiplication
+	float  sdot_  (int* n, void* x, int* incx, void* y, int* incy);
+	double ddot_  (int* n, void* x, int* incx, void* y, int* incy);
+	cxfl   cdotc_ (int* n, void* x, int* incx, void* y, int* incy);
+	cxfl   cdotu_ (int* n, void* x, int* incx, void* y, int* incy);
+	cxdb   zdotc_ (int* n, void* x, int* incx, void* y, int* incy);
+	cxdb   zdotu_ (int* n, void* x, int* incx, void* y, int* incy);
 	
 }
 
@@ -181,7 +193,11 @@ class Lapack {
 			free (rwork);
 		free (work);
 
-		
+		if (info > 0)
+			printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have been computed;\n elements i+1:N of ev contain eigenvalues which\n have converged.\n\n") ;
+		else if (info < 0)
+			printf ("\nERROR - XGEEV: the %i-th argument had an illegal value.\n\n", -info); 
+
 		return info;
 		
 	}
@@ -257,19 +273,19 @@ class Lapack {
 		else if (typeid(T) == typeid(float))
 			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
 
-		// Transpose V
-		//V = !V;
+		V = !V;
 
 		// Clean up
-		//if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) free (rwork);
+		if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) 
+			free (rwork);
 
-		//free (work);
-		//free (iwork);
+		free (work);
+		free (iwork);
 		
 		if (info > 0)
-			printf ("The updating process of SBDSDC did not converge.\n");
+			printf ("\nERROR - XGESDD: The updating process of SBDSDC did not converge.\n\n");
 		else if (info < 0)
-			printf ("the %i-th argument had an illegal value.\n", -info); 
+			printf ("\nERROR - XGESDD: The %i-th argument had an illegal value.\n\n", -info); 
 		
 		return info;
 		
@@ -298,6 +314,11 @@ class Lapack {
 		else if (typeid (T) == typeid (double)) dgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
 		else if (typeid (T) == typeid (float))  sgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
 		// ------------------------------------
+
+		if (info < 0)
+			printf ("\nERROR - DPOTRI: the %i-th argument had an illegal value.\n\n", -info);
+		else if (info > 1)
+			printf ("\nERROR - DPOTRI: the (%i,%i) element of the factor U or L is\n zero, and the inverse could not be computed.\n\n", info, info);
 		
 		int lwork = -1; 
 		T   wopt;
@@ -326,6 +347,11 @@ class Lapack {
 		
 		free (ipiv);
 		free (work);
+
+		if (info < 0)
+			printf ("\nERROR - XGETRI: The %i-th argument had an illegal value.\n\n", -info);
+		else if (info > 0)
+			printf ("\nERROR - XGETRI: The leading minor of order %i is not\n positive definite, and the factorization could not be\n completed.", info);
 		
 		return res;
 		
@@ -398,21 +424,33 @@ class Lapack {
 		free (s);
 		free (work);
 		free (iwork);
+
+		if (info > 0)
+			printf ("ERROR XGELSD: the algorithm for computing the SVD failed to converge;\n %i off-diagonal elements of an intermediate bidiagonal form\n did not converge to zero.", info);
+		else if (info < 0)
+			printf ("ERROR XGELSD: the %i-th argument had an illegal value.", -info);
 		
 		return b;
 		
 	}
 	
 	
-
+	
 	template<class T> static Matrix<T> 
-	Cholesky (Matrix<T>& m, const char uplo) {
+	Cholesky (Matrix<T>& A, const char uplo = 'U') {
 		
-		Matrix<T> res = m;
-		int       info = 0;
+		Matrix<T> res  = A;
+		int       info = 0, n = A.Height();
 		
-		if (typeid(T) == typeid(cxfl))
-			//dpotrf_ ( &uplo, &tmp.Width(), &tmp[0], &tmp.Height(), &info);
+		if      (typeid(T) == typeid(double)) dpotrf_ (&uplo, &n, &res[0], &n, &info);
+		else if (typeid(T) == typeid(float))  spotrf_ (&uplo, &n, &res[0], &n, &info);
+		else if (typeid(T) == typeid(cxdb))   zpotrf_ (&uplo, &n, &res[0], &n, &info);
+		else if (typeid(T) == typeid(cxfl))   cpotrf_ (&uplo, &n, &res[0], &n, &info);
+		
+		if (info > 0)
+			printf ("\nERROR - XPOTRF: the leading minor of order %i is not\n positive definite, and the factorization could not be\n completed!\n\n", info);
+		else if (info < 0)
+			printf ("\nERROR - XPOTRF: the %i-th argument had an illegal value.\n\n!", -info); 
 		
 		return res;
 		
@@ -494,6 +532,32 @@ class Lapack {
 		
 	}
 	
+
+	template <class T> static T
+	DOT (Matrix<T>& x, Matrix<T>& y, bool cnj = false) {
+
+		T res;
+
+		int nx = x.Size(), ny = y.Size(), one = 1;
+
+		assert (nx == ny);
+
+		if        (typeid(T) == typeid(double)) {
+			res          = ddot_  (&nx, &x[0], &one, &y[0], &one);
+		} else if (typeid(T) == typeid(float))  {
+			res          = sdot_  (&nx, &x[0], &one, &y[0], &one);
+		} else if (typeid(T) == typeid(cxfl))   { 
+			if (cnj) res = cdotu_ (&nx, &x[0], &one, &y[0], &one);
+			else     res = cdotc_ (&nx, &x[0], &one, &y[0], &one);
+		} else if (typeid(T) == typeid(cxdb))   {
+			if (cnj) res = zdotu_ (&nx, &x[0], &one, &y[0], &one);
+			else     res = zdotc_ (&nx, &x[0], &one, &y[0], &one);
+		}
+
+		return res;
+
+	}
+
 };
 
 
