@@ -182,48 +182,33 @@ LapackTests::Process     () {
 
 	tic = getticks();
 
-	Matrix<cxfl> y2 = Lapack::GEMM (A, b, 'C');
-	printf ("GEMM. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-	std::cout << "y' :\n" <<  y2;
+	Matrix<cxfl> y;
 
-	Matrix<cxfl> y  = Lapack::GEMV (A, b, 'C');
+	y = Lapack::GEMM (A, b, 'C');
+	printf ("GEMM. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	std::cout << "y' :\n" <<  y;
+	
+	y  = Lapack::GEMV (A, b, 'C');
 	printf ("GEMV. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	std::cout << "y' :\n" <<  y;
 
 
+	
+	std::cout << "dc  :\n" <<  dc;
+	A = Lapack::GEMM (dc, dc, 'C');
+	std::cout << "A**H A  :\n" <<  A;
+	A = Lapack::Cholesky (A);
+	std::cout << "chol (A**H A) :\n" <<  A;
+
+	//cxfl z = Lapack::DOT (A, A);
+	//std::cout << "sum(A.*A)" <<  z;
+
 	A.MXRead("tmp.mat", "EM");
 	b.MXRead("tmp.mat", "PA");
 
-	Matrix<cxfl> x = MCGLS::Pinv(A, b, 300, 1e-6);
+	Matrix<cxfl> x = MCGLS::Pinv(A, b, 300, 1.0e-6, 1.0);
 	x.MXDump ("x.mat", "x");
 
-	/*
-	Matrix<cxfl> rx (dc.Width(),1);
-	rx.Random();
-
-	dc = !dc;
-	std::cout << "A  :\n" <<  dc;
-	std::cout << "x' :\n" <<  x;
-
-	Matrix<cxfl> y  = Lapack::GEMV (dc, x, 'C');
-
-	std::cout << "y' :\n" <<  y;
-
-	Matrix<cxfl> y2 = Lapack::GEMM (dc, x, 'C');
-
-	std::cout << "y' :\n" <<  y2;
-	/*
-	Matrix<double> rx (dc.Width(),1);
-	rx.Random();
-
-	dc = !dc;
-	std::cout << "A  :\n" <<  dc;
-	std::cout << "x' :\n" <<  x;
-
-	Matrix<cxfl> y = Lapack::GEMV (dc, x, 'C');
-
-	std::cout << "y' :\n" <<  y;
-	*/
 
 	return RRSModule::OK;
 

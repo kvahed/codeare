@@ -18,85 +18,25 @@
  *  02110-1301  USA
  */
 
-#include "BLAS.hpp"
-#include <cstdlib>
-#include <cblas.h>
+#include "Lapack.hpp"
 
 template <class T>
 Matrix<T> 
 Matrix<T>::prodt (Matrix<T> &M) {
 	
-	Matrix<T> tmp = M.tr();
-	return this->prod(tmp);
+	return Lapack::GEMM (*this, M, 'C');
 	
 }
 
 
 template <class T>
 Matrix<T> 
-Matrix<T>::prod (Matrix<T> &M) {
+Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
 	
-    assert (Dim(1) == M.Dim(0));
-	
-	/*if (M.Is1D())
-	  return this->GEMV (M);*/
-	//else
-	return this->GEMM (M);
+	return Lapack::GEMM (*this, M, transa, transb);
 	
 }
 
-
-template<class T>
-Matrix<T> 
-Matrix<T>::GEMM (Matrix<T>& M, char transb) {
-	
-	char transa = 'N';
-	
-    int  m      = (int)   Dim(0);
-    int  n      = (int )  Dim(1);
-    int  k      = (int)   Dim(1);
-	int  lda    = (int)   m;
-	int  ldb    = (int)   n;
-	int  ldc    = (int)   m;
-	
-	T    alpha  =         T(1.0);
-	T    beta   =         T(0.0);
-	
-	Matrix<T> res (m, (transb == 'N') ? M.Dim(1) : M.Dim(0));
-	
-	if (typeid(T) == typeid(double))
-		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
-	else if (typeid(T) == typeid(cxfl))
-		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
-	
-	return res;
-	
-}
-
-
-/*
-template<class T>
-Matrix<T> 
-Matrix<T>::GEMV (Matrix<T>& M, char trans) {
-
-    int  m      = (int)   Dim(0);
-    int  n      = (int )M.Dim(1);
-	int  lda    = (int)   m;
-	
-	T    alpha  =         T(1.0);
-	T    beta   =         T(0.0);
-	
-	Matrix<T> res (m, (transb == 'N') ? M.Dim(1) : M.Dim(0));
-	
-	if (typeid(T) == typeid(double))
-		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
-	else if (typeid(T) == typeid(cxfl))
-		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &_M[0], &lda, &M[0], &ldb, &beta, &res[0], &ldc);
-	
-	return res;
-	
-}
-*/
 
 template<class T>
 T
@@ -108,7 +48,7 @@ Matrix<T>::Norm () const {
 	int incx = 1;
 	
 	if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, &_M[0], incx);
-	else if (typeid(T) == typeid(double))  res = cblas_dnrm2 (n, &_M[0], incx);
+	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, &_M[0], incx);
 	
 	else {
 		for (int i = 0; i < Size(); i++)

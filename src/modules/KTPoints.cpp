@@ -181,10 +181,10 @@ KTPoints::Process        () {
 		
         Matrix<cxfl> minv;
 
-        minv  = Lapack::GEMM(   m, m, 'C', 'N');
+        minv  = m.prodt (m);
         minv += treg;
         minv  = Lapack::Pinv(minv);
-        minv  = Lapack::GEMM(minv, m, 'N', 'C');
+        minv  = minv.prod (m, 'N', 'C');
         
         // Valriable exchange method --------------
 
@@ -193,8 +193,8 @@ KTPoints::Process        () {
 
         for (int j = 0; j < m_maxiter; j++, gc++) {
 
-            solution = /*minv->*(target);*/ Lapack::GEMM (minv, target);
-            tmp      = /*m->*(solution);*/  Lapack::GEMM (m,  solution);
+            solution = minv->*(target);
+            tmp      = m->*(solution);
 
             NRMSE (target, tmp, gc, nrmse);
             res.push_back (nrmse);

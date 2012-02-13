@@ -2401,21 +2401,25 @@ public:
     /**
      * @brief           Matrix Product.
      *
+	 * @param   M       The factor
+	 * @param   transa  Transpose ('T') / Conjugate transpose ('C') the left matrix. Default: No transposition'N'
+	 * @param   transb  Transpose ('T') / Conjugate transpose ('C') the right matrix. Default: No transposition 'N'
      * @return          Product of this and M.
      */
     Matrix<T>           
-    prod                (Matrix<T> &M);
+    prod                (Matrix<T> &M, const char transa = 'N', const char transb = 'N');
     
     /**
-     * @brief           Matrix Product with transpose / complex conjugate transpose.
+     * @brief           Complex conjugate left and multiply with right.
      *
-     * @return          Product of this and M.
+	 * @param   M       Factor
+     * @return          Product of conj(this) and M.
      */
     Matrix<T>           
     prodt               (Matrix<T> &M);
     
     /**
-     * @brief           Transposition.
+     * @brief           Transposition / Complex conjugation and transposition.
      *
      * @return          The transposed matrix
      */
@@ -2599,29 +2603,6 @@ private:
     float               _res[INVALID_DIM]; /// Resolutions
 	std::vector<T>      _M;
 	std::string         _name; 
-
-    /**
-     * @brief           Matrix matrix product with BLAS.
-     *
-	 * @param  M        Multiplie with
-	 * @param  transb   Transpose M
-	 *
-     * @return          Product of this and M.
-     */
-    Matrix<T>           
-    GEMM                (Matrix<T> &M, const char transb = 'N');
-
-
-    /**
-     * @brief           Matrix vector product with BLAS.
-     *
-	 * @param  M        Multiplie with
-	 * @param  transa   Transpose M
-	 *
-     * @return          Product of this and M.
-     */
-	Matrix<T>           
-    GEMV                (Matrix<T> &M, const char transa = 'N');
 
 
 	/**
