@@ -20,8 +20,7 @@
 
 #include "Lapack.hpp"
 
-template <class T>
-Matrix<T> 
+template <class T> Matrix<T> 
 Matrix<T>::prodt (Matrix<T> &M) {
 	
 	return Lapack::GEMM (*this, M, 'C');
@@ -29,8 +28,7 @@ Matrix<T>::prodt (Matrix<T> &M) {
 }
 
 
-template <class T>
-Matrix<T> 
+template <class T> Matrix<T> 
 Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
 	
 	return Lapack::GEMM (*this, M, transa, transb);
@@ -38,8 +36,7 @@ Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
 }
 
 
-template<class T>
-T
+template<class T> T
 Matrix<T>::Norm () const {
 	
 	T   res   = T(0.0);
@@ -61,8 +58,7 @@ Matrix<T>::Norm () const {
 }
 
 
-template<class T> 
-T 
+template<class T>  T 
 Matrix<T>::dotc (Matrix<T>& M) const {
 	
 	T   res  = T(0.0);

@@ -89,6 +89,7 @@ namespace RRStrategy {
 		double             m_cgeps;
 		int                m_cgiter;
 		bool               m_cb0;  
+		float              m_lambda;
 
     };
 

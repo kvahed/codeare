@@ -41,6 +41,10 @@ DirectMethod::Init () {
     Attribute ("cgiter",      &m_cgiter);
     printf ("  CG iters: %.i \n", m_cgiter);
 
+    Attribute ("lambda",      &m_lambda);
+    printf ("  Tikhonov factor: %.i \n", m_lambda);
+	m_lambda = 1.0e-6;
+
     Attribute ("verbose", &m_verbose);
     printf ("  verbose: %s \n", (m_verbose) ? "true" : "false");
 
@@ -97,6 +101,7 @@ DirectMethod::Process     () {
     sb.v     = m_verbose;
 	sb.cgeps = m_cgeps;
 	sb.cgit  = m_cgiter;
+	sb.lambda = m_lambda;
 	sb.cb0   = m_cb0;
 
     // Outgoing

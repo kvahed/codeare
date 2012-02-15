@@ -105,16 +105,17 @@ namespace RRStrategy {
 
 
 
-	float Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, const Matrix<cxfl>& ttdbx, 
-					 const Matrix<cxfl>& ttdbg, const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
-					 const Matrix<cxfl>&  data, const cxfl&             t, const CGParam&        cgp) {
+	float Objective (const Matrix<cxfl>& ffdbx,       Matrix<cxfl>& ffdbg, const Matrix<cxfl>& ttdbx, 
+					       Matrix<cxfl>& ttdbg, const Matrix<cxfl>&     x,       Matrix<cxfl>&     g, 
+					 const Matrix<cxfl>&  data, const cxfl&             t,       float&         rmse,
+					 const CGParam&        cgp) {
 		
 		float        obj = 0.0, tv = 0.0, xfm = 0.0;
 		Matrix<cxfl> objm;
 		float        p = (float)cgp.pnorm/2.0;
 
 		objm  = ffdbx;
-		//objm += (t * ffdbg);
+		objm += (ffdbg * t);
 		objm -= data;
 		obj   = pow(objm.Norm().real(), 2);
 
@@ -124,7 +125,7 @@ namespace RRStrategy {
 			Matrix<cxfl> tvm;
 			
 			tvm  = ttdbx;
-			//	tvm += (ttdbg * t);
+			tvm += (ttdbg * t);
 			
 			for (size_t i = 0; i < tvm.Size(); i++)
 				tvm[i] *= conj(tvm[i]);
@@ -144,7 +145,7 @@ namespace RRStrategy {
 			Matrix<cxfl> xfmm;
 			
 			xfmm  = x;
-			//xfmm += (g * t);
+			xfmm += (g * t);
 			
 			for (size_t i = 0; i < xfmm.Size(); i++)
 				xfmm[i] *= conj(xfmm[i]);
@@ -159,7 +160,7 @@ namespace RRStrategy {
 			
 		} 
 
-		//float nrms = obj / pow(data.Norm().real(), 2);
+		rmse = obj / pow(data.Norm().real(), 2);
 		//printf (" RMS: %.9f\n", res.at(iters));
 
 		return (obj + tv + xfm);
@@ -247,8 +248,10 @@ namespace RRStrategy {
 
 	Matrix<cxfl> NLCG     (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
 
-		int k = 0;
-		int t = 1;
+		int   k  = 0;
+		cxfl t0 = cxfl(1), t = cxfl(1);
+
+		float rmse;
 
 		Matrix<cxfl> g0, dx, ffdbx, ffdbg, ttdbx, ttdbg;
 
@@ -260,8 +263,68 @@ namespace RRStrategy {
 		
 		if (cgp.tvw) {
 			ttdbx = TVOP::Transform(DWT::Backward( x));
-			ttdbx = TVOP::Transform(DWT::Backward( x));
+			ttdbg = TVOP::Transform(DWT::Backward(dx));
 		}
+
+		cxfl cz = cxfl(0.0);
+
+		float f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, cz, rmse, cgp);
+		float f1 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data,  t, rmse, cgp);
+		
+		int i = 0;
+
+		do {
+
+			t *= cxfl(cgp.lsb);
+			f1 = Objective(ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
+			i++;
+
+		} while (/*f1 > f0 - ((cxfl(cgp.lsa) * t) * Abs(g0.prodt(dx)) &&*/ i < cgp.lsiter);
+
+			
+		/*
+lsiter = 0;
+
+	while (f1 > f0 - alpha*t*abs(g0(:)'*dx(:)))^2 & (lsiter<maxlsiter)
+		lsiter = lsiter + 1;
+		t = t * beta;
+		[f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx,x,dx, t, params);
+	end
+
+	if lsiter == maxlsiter
+		disp('Reached max line search,.... not so good... might have a bug in operators. exiting... ');
+		return;
+	end
+
+	% control the number of line searches by adapting the initial step search
+	if lsiter > 2
+		t0 = t0 * beta;
+	end 
+	
+	if lsiter<1
+		t0 = t0 / beta;
+	end
+
+	x = (x + t*dx);
+
+	%--------- uncomment for debug purposes ------------------------	
+	disp(sprintf('%d   , obj: %f, RMS: %f, L-S: %d', k,f1,RMSerr,lsiter));
+
+	%---------------------------------------------------------------
+	
+    %conjugate gradient calculation
+    
+	g1 = wGradient(x,params);
+	bk = g1(:)'*g1(:)/(g0(:)'*g0(:)+eps);
+	g0 = g1;
+	dx =  - g1 + bk* dx;
+	k = k + 1;
+	
+	%TODO: need to "think" of a "better" stopping criteria ;-)
+	if (k > params.Itnlim) | (norm(dx(:)) < gradToll) 
+		break;
+	end
+		*/
 
 		return g0;
 

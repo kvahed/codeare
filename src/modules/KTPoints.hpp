@@ -116,7 +116,7 @@ NRMSE                         (const Matrix<cxfl>& target, const Matrix<cxfl>& r
     
 	if (iter % 5 == 0 && iter > 0)
 		printf ("\n");
-    printf ("    %03i %.6f", iter, q);
+    printf ("    %04i %.6f", iter, q);
 
     nrmse = 100.0 * q;
 
@@ -134,17 +134,17 @@ inline void
 PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
     
 	size_t n = target.Size();
-
+	
 #pragma omp parallel default (shared) 
     {
-
+		
 #pragma omp for schedule (guided, 100)
 
         for (size_t i = 0; i < n; i++) 
-            target[i] = (abs(target[i]) > 0) ? abs(target[i]) * result[i] / abs(result[i]) :  cxfl(0,0);    
-        
+			target[i] = (abs(result[i]) > 0) ? abs(target[i]) * result[i] / abs(result[i]) :  cxfl(0,0);
+
     }
-    
+	
 }
 
 
