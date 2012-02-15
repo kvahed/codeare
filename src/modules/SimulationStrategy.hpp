@@ -61,8 +61,9 @@ namespace RRStrategy {
 		int                  mode;  /**<! mode (0:single run, 1:iterative) */
 
 		float                  dt;  /**<! time step                        */
-		float                cgeps; /**<! CGNR convergence criterium       */
-		int                  cgit;  /**<! CGNR convergence criterium       */
+		float               cgeps;  /**<! CGNR convergence criterium       */
+		float              lambda;  /**<! Tikhonov regularisation factor   */
+		int                  cgit;  /**<! CGNR iterations                  */
 		
 		bool                    v;  /**<! verbose                          */
 		bool                  cb0;  /**<! correct b0?                      */

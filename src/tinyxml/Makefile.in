@@ -526,8 +526,6 @@ uninstall-am:
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
 
-#action_store.cpp tinyxmlparser.cpp xpath_expression.cpp xpath_static.cpp lex_util.cpp tinyxml.cpp tokenlist.cpp xpath_processor.cpp xpath_stream.cpp tinyxmlerror.cpp xml_util.cpp xpath_stack.cpp xpath_syntax.cpp node_set.cpp tinystr.cpp 
-
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

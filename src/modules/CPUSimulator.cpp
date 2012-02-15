@@ -305,6 +305,7 @@ CPUSimulator::Simulate () {
 	
 	int             np = m_sb->np;
 	float           dt = m_sb->dt;
+	float           tl = m_sb->lambda;
 	vector<float>  res;	
 
 	bool           cb0 = m_sb->cb0;
@@ -332,9 +333,10 @@ CPUSimulator::Simulate () {
 
 			SimulateExc (b1, g, p, rv, b0, smxy, roi,  jac, np, dt, true, m_nc, m_nt, m_gdt, mxy, mz); // E^H
 			SimulateAcq (b1, g,    rv, b0,  mxy,  mz, m_ic, np, dt, true, m_nc, m_nt, m_gdt,       q); // E
+			q += (tl * p);
 			
 			rtmp  = (rn / (p.dotc(q)));
-			rtmp *= .7;
+			//rtmp *= .7;
 
 			if (!iters) 
 				a  = rtmp * p;

@@ -57,8 +57,6 @@ KTPoints::Init           ()  {
     // rf pulse durations --------------------
     m_pd = (int*) malloc (100 * sizeof(int));
     Attribute ("pd",      &m_pd[0]);   
-    for (int i = 1; i < m_nk; i++)
-        m_pd[i] = m_pd[0];
     printf ("  starting pulse durations: %ius \n", m_pd[0]*10);
 	
     // gradient pulse duration ----------------
@@ -148,6 +146,9 @@ KTPoints::Process        () {
 	m_nk = k.Dim(1);
 	m_nc = b1.Dim(1);
 
+    for (int i = 1; i < m_nk; i++)
+        m_pd[i] = m_pd[0];
+
     Matrix<cxfl>    solution;
     Matrix<cxfl>    tmp;
     Matrix<cxfl>    final;    
@@ -156,11 +157,11 @@ KTPoints::Process        () {
 	Matrix<cxfl>    vp;
 
 	if (m_verbose) {
-	    ve  = Matrix<cxfl>(m_ns,      m_maxiter);
-		vp  = Matrix<cxfl>(m_nk*m_nc, m_maxiter);
+	    ve  = Matrix<cxfl>(m_ns,        m_maxiter);
+		vp  = Matrix<cxfl>(m_nk * m_nc, m_maxiter);
 	} else {
-	    ve  = Matrix<cxfl>(m_ns,     1);
-		vp  = Matrix<cxfl>(m_nk*m_nc,1);
+	    ve  = Matrix<cxfl>(m_ns,       1);
+		vp  = Matrix<cxfl>(m_nk * m_nc,1);
 	}
 
     bool        pulse_amp_ok = false;
@@ -197,37 +198,36 @@ KTPoints::Process        () {
             tmp      = m->*(solution);
 
             NRMSE (target, tmp, gc, nrmse);
+
             res.push_back (nrmse);
             
-			if (m_verbose)
-				memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cxfl)); 
-
-			if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) 
-				break;
+			if (m_verbose) memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cxfl)); 
+			if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) break;
             
             final    = solution;
-            PhaseCorrection (target, tmp);
+
+			PhaseCorrection (target, tmp);
             
         } 
         
         printf ("\n  ... done.\n  Checking pulse amplitudes: "); fflush(stdout);
         
         // Check max pulse amplitude -----------------
+
         RFLimits (final, m_pd, m_nk, m_nc, m_max_rf); 
 
         pulse_amp_ok = true;
-        
-        for (int i = 0; i < m_nk; i++)  {
-            if (m_max_rf[i] > m_rflim)
-                pulse_amp_ok = false;
-		}
+
+        for (int i = 0; i < m_nk; i++)
+            if (m_max_rf[i] > m_rflim) pulse_amp_ok = false;
         
         // Update Pulse durations if necessary -------
+
         if (!pulse_amp_ok) {
             
             printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
             
-            for(int i=0; i < m_nk;i++) {
+            for (int i = 0; i < m_nk; i++) {
                 m_pd[i] = 1 + (int) (m_max_rf[i] * m_pd[i] / m_rflim); 
 				printf ("%i ", 10*m_pd[i]); fflush(stdout);
 			}
@@ -251,7 +251,6 @@ KTPoints::Process        () {
 
 	PTXTiming              (final, k, m_pd, m_gd, m_nk, m_nc, b1);
 	// -----------------------------------
-	
 
 	// Write pulse file for Siemens sequences 
 	// Assuming (Sagittal/Transversal A>>P) 
@@ -285,7 +284,7 @@ KTPoints::Process        () {
 		
 		target = tmp;
 	// ----------------------------------
-	
+
     return RRSModule::OK;
 
 }

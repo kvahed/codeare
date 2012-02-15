@@ -23,21 +23,31 @@
 class MCGLS {
 
 public:
-	
-	template<class T> static Matrix<T> 
-	Pinv (Matrix<T>& A, Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
 
-		size_t ah = A.Height();
-		size_t aw = A.Width();
-		size_t bh = b.Height();
-		size_t bw = b.Width();
+	/**
+	 * @brief         Tikhonov regulated CGNR least squares solution of ||Ax - b||_2 + l * ||x||_2
+	 *
+	 * @param  A      Matrix A
+	 * @param  b      Vector b
+	 * @param  maxit  Maximum number of CG iterations
+	 * @param  conv   Convergence of residuals
+	 * @param  lambda Tikhonov weight
+	 * @return        Vector x
+	 */
+	template<class T> static Matrix<T> 
+	Solve (Matrix<T>& A, Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
+
+		size_t ah   = A.Height();
+		size_t aw   = A.Width();
+		size_t bh   = b.Height();
+		size_t bw   = b.Width();
 
 		assert (bw == 1);  // Column vector x
 		assert (ah == bh); // Check inner dimensions of A'*x. 
 
-		ticks tic = getticks();
+		ticks tic   = getticks();
 
-		Matrix<T> p = Lapack::GEMM (A, b, 'C');
+		Matrix<T> p = A.prodt(b); //Lapack::GEMM (A, b, 'C');
 		Matrix<T> r = p;
 
 		Matrix<T> x (p.Dim()); 
@@ -57,11 +67,11 @@ public:
 
 			if (std::isnan(res.at(i)) || res.at(i) <= conv) break;
 
-			if (i % 5 == 0 && i > 0)                        printf ("\n");
+			if (i % 5 == 0 && i > 0) printf ("\n");
 			printf ("    %03lu %.7f", i, res.at(i));
 			
-			q  = Lapack::GEMM (A, p);
-			q  = Lapack::GEMM (A, q, 'C');
+			q  = A.prod(p);
+			q  = A.prodt(q);
 			q += (T(lambda)*p);
 			
 			ts  = (rn / (p.dotc(q)));

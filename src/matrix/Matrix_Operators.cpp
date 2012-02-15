@@ -543,7 +543,7 @@ Matrix<T>::operator ^= (const float p) {
 
 
 template <class T> inline Matrix<T> 
-Matrix<T>::operator*(const Matrix<T> &M) {
+Matrix<T>::operator*(Matrix<T> &M) {
 
     Matrix<T> res;
 

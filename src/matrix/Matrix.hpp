@@ -880,8 +880,8 @@ public:
 	 * 
 	 */
 	
-	template<class S> Matrix<T>
-	operator*          (const Matrix<S>& M);
+	//template<class S> Matrix<T>
+	//operator*          (const Matrix<S>& M);
 
 	
 	/**
@@ -1904,7 +1904,7 @@ public:
 	 * @return          Result
      */
     Matrix<T>           
-    operator*           (const Matrix<T> &M);
+    operator*           (Matrix<T> &M);
 
 
     /**
