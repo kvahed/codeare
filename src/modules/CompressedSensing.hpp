@@ -106,99 +106,132 @@ namespace RRStrategy {
 
 
 
-	float Objective (const Matrix<cxfl>& ffdbx,       Matrix<cxfl>& ffdbg, const Matrix<cxfl>& ttdbx, 
-					       Matrix<cxfl>& ttdbg,       Matrix<cxfl>&     x,       Matrix<cxfl>&     g, 
-					 const Matrix<cxfl>&  data, const cxfl&             t,       float&         rmse,
-					 const CGParam&        cgp) {
+	Matrix<cxfl> FFWD (const Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
+
+		return FFT::Forward (data) * mask;
+
+	}
+
+	Matrix<cxfl> FBWD (Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
+
+		return FFT::Backward(data * mask);
+
+	}
+
+	float Obj ( Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& data, float& t) {
+	
+		Matrix<cxfl> om;
+		float        o;
 		
-		float        obj = 0.0, tv = 0.0, xfm = 0.0;
-		Matrix<cxfl> objm;
-		float        p = (float)cgp.pnorm/2.0;
+		om  = ffdbx;
+		if (t > 0.0) 
+			om += t * ffdbg;
+		om -= data;
 
-		objm  =  ffdbx;
-		if (cabs(t) > 0.0)
-			objm += (ffdbg * t);
-		objm -=  data;
-		obj   =  creal(objm.dotc(objm));
+		o = creal(om.dotc(om));
 
-		if (cgp.tvw) {
+		return o;
 
-			Matrix<cxfl> tvm;
-			
-			tvm  =  ttdbx;
-			if (cabs(t) > 0.0)
-				tvm += (ttdbg * t);
-			tvm *=  CX::Conj(tvm);
-			tvm +=  cxfl(cgp.l1);
-			tvm ^=  p;
-			
-			for (size_t i = 0; i < tvm.Size(); i++)
-				tv += tvm[i].real();
-			
-		} 
+	}
 
-		if (cgp.xfmw) {
-			
-			Matrix<cxfl> xfmm;
-			
-			xfmm  =  x;
-			if (cabs(t) > 0.0)
-				xfmm += (g * t);
-			xfmm *=  CX::Conj(xfmm);
-			xfmm +=  cxfl(cgp.l1);
-			xfmm ^=  p;
-			
-			for (size_t i = 0; i < xfmm.Size(); i++)
-				xfm += xfmm[i].real();
-			
-		} 
 
-		float sda = 0.0;
+	float ObjTV (Matrix<cxfl>& ttdbx, Matrix<cxfl>& ttdbg, float t, CGParam& cgp) {
+		
+		Matrix<cxfl> om;
+		float        o, p = (float)cgp.pnorm/2.0;
+		
+		om  = ttdbx + t * ttdbg;
+		om *= CX::Conj(om);
+		om += cgp.l1;
+		om ^= p;
+		
+		for (size_t i = 0; i < om.Size(); i++)
+			o += om[i].real();
+		
+		return o;
+
+	}
+
+	/**
+	 *
+	 */
+	float ObjXFM (Matrix<cxfl>& x, Matrix<cxfl>& g, float& t, CGParam& cgp) {
+		
+		Matrix<cxfl> om;
+		float        o, p = (float)cgp.pnorm/2.0;
+		
+		om  = x + t * g;
+		om *= CX::Conj(om);
+		om += cgp.l1;
+		om ^= p;
+		
+		for (size_t i = 0; i < om.Size(); i++)
+			o += om[i].real();
+		
+		return o;
+		
+	} 
+
+
+	float Objective (Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& ttdbx, 
+					 Matrix<cxfl>& ttdbg, Matrix<cxfl>&     x, Matrix<cxfl>&     g, 
+					 Matrix<cxfl>&  data, float&            t, float&         rmse,
+					 CGParam&        cgp) {
+		
+		float obj = 0.0, sda = 0.0; 
+		
+		obj = Obj (ffdbx, ffdbg, data, t);
+		
+		if (cgp.tvw)
+			obj += cgp.tvw  * ObjTV  (ttdbx, ttdbg, t, cgp);
+		
+		if (cgp.xfmw)
+			obj += cgp.xfmw * ObjXFM (x, g, t, cgp);
 		
 		for (size_t i = 0; i < data.Size(); i++)
-			if (cabs(data[i])>0)
-				sda += cabs(data[i]);
+			if (cabs(data[i]) > 0) sda += cabs(data[i]);
 		
-		rmse = sqrt(obj / sda);
-
-		return (obj + tv + xfm);
+		rmse = sqrt(obj/sda);
+		
+		return obj;
 
 	}
 
 	/**
 	 * @brief Compute gradient of the data consistency
 	 */
-	Matrix<cxfl> GradObj ( Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
+	Matrix<cxfl> GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const Matrix<cxfl>& mask, const CGParam& cgp) {
 		
 		Matrix<cxfl> g = x;
 		
-		g  = FFT::Forward (DWT::Backward (g));
+		g  = FFWD (DWT::Backward (g), mask);
 		g -= data;
-		g  = DWT::Forward (FFT::Backward (g));
-		g *= cxfl(2.0);
+		g  = DWT::Forward (FBWD (g, mask));
 
-		g.MXDump ("gfun.mat", "g");
+		g.MXDump ("gobj.mat", "gobj");
 
-		return g;
+		return (2.0 * g);
 
 	}
 
 
 	/**
 	 * @brief Compute gradient of L1-transform operator
+	 *
+	 *
 	 */
 	Matrix<cxfl> GradXFM   (Matrix<cxfl>& x, const CGParam& cgp) {
 		
 		Matrix<cxfl> g;
 
-		g  = CX::Conj(x) * x;
+		g  = x * CX::Conj(x);
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
-		g *= x * cgp.xfmw;
+		g *= x;
 
 		g.MXDump ("gxfm.mat", "gxfm");
 
-		return g;
+		return (cgp.xfmw * g);
 
 	}
 
@@ -209,7 +242,7 @@ namespace RRStrategy {
 	Matrix<cxfl> GradTV    (const Matrix<cxfl>& x, const CGParam& cgp) {
 
 		Matrix<cxfl> dx = TVOP::Transform(DWT::Backward(x));
-		Matrix<cxfl> g  = CX::Conj(dx) * dx ;
+		Matrix<cxfl> g  = dx * CX::Conj(dx);
 
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
@@ -219,18 +252,19 @@ namespace RRStrategy {
 
 		g *= cxfl(cgp.pnorm);
 		g  = DWT::Forward(TVOP::Adjoint(g));
-		g *= cxfl(cgp.tvw);
 
 		g.MXDump ("gtv.mat", "gtv");
 
-		return g;
+		return (cgp.tvw * g);
 
 	}
 
 
-	Matrix<cxfl> Gradient (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
+	Matrix<cxfl> Gradient (Matrix<cxfl>& x, const Matrix<cxfl>& data, const Matrix<cxfl>& mask, const CGParam& cgp) {
 
-		Matrix<cxfl> g = GradObj (x, data, cgp);
+		Matrix<cxfl> g;
+		
+		g = GradObj (x, data, mask, cgp);
 		
 		if (cgp.xfmw)
 			g += GradXFM (x, cgp);
@@ -243,35 +277,34 @@ namespace RRStrategy {
 	} 
 
 
-	void NLCG     (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
+	void NLCG (Matrix<cxfl>& x, Matrix<cxfl>& data, Matrix<double>& mask, CGParam& cgp) {
 
 		int          k  = 0;
-		cxfl         t0 = cxfl(1), t = cxfl(1);
+		float        t0 = 1.0, t = 1.0;
+		float        z  = 0.0;
 		Matrix<cxfl> x0 = x;
 
 		float rmse, bk;
 
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg;
 
-		g0 = Gradient (x, data, cgp);
+		g0 = Gradient (x, data, mask, cgp);
 		dx = -g0;
 
 		do {
 
 			t = t0;
 
-			ffdbx = FFT::Forward (DWT::Backward ( x));
-			ffdbg = FFT::Forward (DWT::Backward (dx));
+			ffdbx = FFWD (DWT::Backward ( x), mask);
+			ffdbg = FFWD (DWT::Backward (dx), mask);
 			
 			if (cgp.tvw) {
 				ttdbx = TVOP::Transform (DWT::Backward( x));
 				ttdbg = TVOP::Transform (DWT::Backward(dx));
 			}
 			
-			cxfl cz = cxfl(0.0);
-			
-			float f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, cz, rmse, cgp);
-			float f1 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data,  t, rmse, cgp);
+			float f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
+			float f1 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
 			
 			int i = 0;
 			
@@ -282,36 +315,35 @@ namespace RRStrategy {
 				if (f1 <= f0 - (cgp.lsa * cabs(g0.dotc(dx))))
 					break;
 				i++;
-
-
+				
 			} while (i < cgp.lsiter);
 			
-			printf ("%i, obj: %f, RMS: %f, L-S: %i\n", k, f1, rmse, i);
-			
+			//printf ("    %02i - obj: %03.3f, RMS: %1.4f, LS: %i\n", k, f1, rmse, i);
+			printf ("    %02i - rms: %1.4f, l-search: %i\n", k, rmse, i);
+
 			if (i == cgp.lsiter) {
-				printf ("Reached max line search,.... not so good... might have a bug in operators. exiting... \n"); 
-				//return;
+				printf ("Reached max line search, exiting... \n"); 
+				return;
 			}
 			
 			if (i > 2)
 				t0 *= cgp.lsb;
 			else if (i < 1)
 				t0 /= cgp.lsb;
-			
+
+			// Update image
 			x += (dx * t);
 			
-			/* CG computation */
-			
-			g1  =  Gradient (x, data, cgp);
+			// CG computation 
+			g1  =  Gradient (x, data, mask, cgp);
 			bk  =  creal(g1.dotc(g1) / g0.dotc(g0));
 			g0  =  g1;
-			dx  = -g1; 
-			dx += (dx * bk);
+			dx  = -g1 + dx * bk;
 			k++;
 			
 			float dxn = dx.Norm().real();
-
-			if ((k > 8) || dxn < 1e-30) break;
+			
+			if ((k > cgp.cgiter) || dxn < cgp.cgconv) break;
 			
 		} while (true);
 		
@@ -321,22 +353,3 @@ namespace RRStrategy {
 }
 #endif /* __COMPRESSED_SENSING_H__ */
 
-
-/*
-
-#ifdef HAVE_MAT_H	
-			MATFile* mf = matOpen ("preobj.mat", "w");
-			if (mf == NULL) {
-				printf ("Error creating file %s\n", "");
-				return;
-			}
-			x0.MXDump (mf, "x0", ""); ffdbx.MXDump (mf, "ffdbx", ""); ffdbg.MXDump (mf, "ffdbg", ""); 
-			ttdbx.MXDump (mf, "ttdbx", ""); ttdbg.MXDump (mf, "ttdbg", "");	g0.MXDump    (mf, "g0",    "");
-			if (matClose(mf) != 0) {
-				printf ("Error closing file %s\n", "");
-				return;
-			}
-#endif
-			
-			
-*/

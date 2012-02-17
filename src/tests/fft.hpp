@@ -1,3 +1,5 @@
+#include "matrix/FFT.hpp"
+
 template <class T> bool
 fftwtest (Connector<T>* rc) {
 

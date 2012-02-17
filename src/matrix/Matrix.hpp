@@ -1076,6 +1076,7 @@ public:
     
     //@{
     
+
 	/**
 	 * @brief           Elementwise addition with scalar (lhs)
 	 *
@@ -1083,12 +1084,11 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          m + t
 	 */
-	/*
 	template <class S> inline friend Matrix<T>    
-	operator+  (const S s, const Matrix<T> &m) {
+	operator+  (const S s, Matrix<T> &m) {
 		return   m + T(s);
 	}
-	*/
+
 
 	/**
 	 * @brief           Elementwise subtraction from scalar (lhs)
@@ -1097,12 +1097,11 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          -(m - s)
 	 */
-	/*
 	template <class S> inline friend Matrix<T>
-	operator-  (const S s, const Matrix<T> &m) {
+	operator-  (const S s, Matrix<T> &m) {
 		return -(m - T(s));
 	}
-	*/
+
 
 	/**
 	 * @brief           Elementwise multiplication with scalar (lhs)
@@ -1111,25 +1110,11 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          m * s
 	 */
-	/*
 	template <class S> inline friend Matrix<T>    
-	operator*  (const S& s, const Matrix<T> &m) { 
+	operator*  (const S& s, Matrix<T> &m) { 
 		return   m * s;
 	}
-	*/
 
-	/*
-	 * @brief           Elementwise multiplication of inverse with scalar (lhs)
-	 *
-	 * @param  s        Scalar lhs
-	 * @param  m        Matrix rhs
-	 * @return          s * m.Inv()
-
-	template <class S> inline friend Matrix<T>    
-	operator/  (T s, Matrix<T> &m) {
-		return  m;// s * m.Inv();
-	}
-	*/
 
 	/**
 	 * @brief           Elementwise equality with scalar (lhs)
@@ -2401,7 +2386,7 @@ public:
      * @return          Product of this and M.
      */
     Matrix<T>           
-    prod                (const Matrix<T> &M, const char transa = 'N', const char transb = 'N');
+    prod                (Matrix<T> &M, const char transa = 'N', const char transb = 'N');
     
     /**
      * @brief           Complex conjugate left and multiply with right.
@@ -2410,7 +2395,7 @@ public:
      * @return          Product of conj(this) and M.
      */
     Matrix<T>           
-    prodt               (const Matrix<T> &M);
+    prodt               (Matrix<T> &M);
     
     /**
      * @brief           Transposition / Complex conjugation and transposition.

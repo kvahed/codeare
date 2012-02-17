@@ -89,7 +89,7 @@ extern "C" {
     float  cblas_snrm2  (const int N, const void *X, const int incX);
 	double cblas_dnrm2  (const int N, const void *X, const int incX);
 	cxfl   cblas_scnrm2 (const int N, const void *X, const int incX);
-	cxdb   cblas_zcnrm2 (const int N, const void *X, const int incX);
+	cxdb   cblas_dznrm2 (const int N, const void *X, const int incX);
 	
 	void cblas_ddot_sub  (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
 	void cblas_sdot_sub  (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
@@ -469,15 +469,7 @@ class Lapack {
 	
 
 	template<class T> static Matrix<T> 
-	GEMM (Matrix<T>& A, const Matrix<T>& B, char transa, char transb) {
-		
-		GEMM (A, B, transa, transb);
-
-	}
-
-
-	template<class T> static Matrix<T> 
-	GEMM (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = 'N') {
+	GEMM (Matrix<T>& A, Matrix<T>& B, char transa = 'N', char transb = 'N') {
 		
 		int aw = (int)A.Width(), ah = (int)A.Height(), bw = (int)B.Width(), bh = (int)B.Height();
 		
@@ -507,17 +499,15 @@ class Lapack {
 		T    beta   =       T(0.0);
 		
 		Matrix<T> C  (m, n);
-		Matrix<T> Ad = A;
-		Matrix<T> Bd = B;
 		
 		if      (typeid(T) == typeid(double))
-			dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &Ad[0], &ah, &Bd[0], &bh, &beta, &C[0], &ldc);
+			dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
 		else if (typeid(T) == typeid(float))
-			sgemm_ (&transa, &transb, &m, &n, &k, &alpha, &Ad[0], &ah, &Bd[0], &bh, &beta, &C[0], &ldc);
+			sgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
 		else if (typeid(T) == typeid(cxfl))
-			cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &Ad[0], &ah, &Bd[0], &bh, &beta, &C[0], &ldc);
+			cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
 		else if (typeid(T) == typeid(cxdb))
-			zgemm_ (&transa, &transb, &m, &n, &k, &alpha, &Ad[0], &ah, &Bd[0], &bh, &beta, &C[0], &ldc);
+			zgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
 		
 		return C;
 		

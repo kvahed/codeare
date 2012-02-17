@@ -82,13 +82,15 @@ CompressedSensing::Process () {
 	ticks tic; 
 	cxfl  ma;
 
-	Matrix<cxfl>&   data  = GetCXFL("data");
-	Matrix<double>& pdf   = GetRLDB("pdf");
+	Matrix<cxfl>&   data  = GetCXFL   ("data");
+	Matrix<double>& pdf   = GetRLDB   ("pdf" );
+	Matrix<double>& mask  = GetRLDB   ("mask");
 	Matrix<cxfl>&   im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
 
-	data  /= pdf;
+	im_dc  = data;
+	im_dc /= pdf;
 
-	im_dc  = FFT::Backward(data);
+	im_dc  = FFT::Backward(im_dc);
 
 	ma     = im_dc.Maxabs();
 	im_dc /= ma;
@@ -97,14 +99,13 @@ CompressedSensing::Process () {
 	im_dc  = DWT::Forward (im_dc);
 
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
-	tic = getticks();
 
+	tic    = getticks();
 	for (int i = 0; i < m_csiter; i++)
-		NLCG (im_dc, data, m_cgparam);
-
+		NLCG (im_dc, data, mask, m_cgparam);
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
-	im_dc = DWT::Backward (im_dc);
+	im_dc  = DWT::Backward (im_dc);
 
 	return OK;
 
