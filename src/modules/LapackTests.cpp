@@ -175,6 +175,8 @@ LapackTests::Process     () {
 	Matrix<cxfl> b (A.Height(),1);
 	b.Random();
 	
+	std::cout << b.dotc(b) << std::endl;
+
 	std::cout << "A  :\n" <<  A;
 	std::cout << "x' :\n" <<  b;
 

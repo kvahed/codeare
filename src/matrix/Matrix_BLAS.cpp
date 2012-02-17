@@ -21,7 +21,7 @@
 #include "Lapack.hpp"
 
 template <class T> Matrix<T> 
-Matrix<T>::prodt (Matrix<T> &M) {
+Matrix<T>::prodt (const Matrix<T> &M) {
 	
 	return Lapack::GEMM (*this, M, 'C');
 	
@@ -29,7 +29,7 @@ Matrix<T>::prodt (Matrix<T> &M) {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
+Matrix<T>::prod (const Matrix<T> &M, const char transa, const char transb) {
 	
 	return Lapack::GEMM (*this, M, transa, transb);
 	
@@ -45,7 +45,9 @@ Matrix<T>::Norm () const {
 	int incx = 1;
 	
 	if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, &_M[0], incx);
+	else if (typeid(T) == typeid(  cxdb)) res = cblas_zcnrm2 (n, &_M[0], incx);
 	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, &_M[0], incx);
+	else if (typeid(T) == typeid( float)) res = cblas_snrm2  (n, &_M[0], incx);
 	
 	else {
 		for (int i = 0; i < Size(); i++)
@@ -68,7 +70,48 @@ Matrix<T>::dotc (Matrix<T>& M) const {
 	
 	if (typeid(T) == typeid(cxfl))
 		cblas_cdotc_sub (n, &_M[0], incx, &M[0], incx, &res);
+	else if (typeid(T) == typeid(cxdb))
+		cblas_zdotc_sub (n, &_M[0], incx, &M[0], incx, &res);
 	
 	return res;
 	
 }
+
+template<class T>  T 
+Matrix<T>::dotu (Matrix<T>& M) const {
+	
+	T   res  = T(0.0);
+	
+	int n    = (int) Size();
+	int incx = 1;
+	
+	if (typeid(T) == typeid(cxfl))
+		cblas_cdotu_sub (n, &_M[0], incx, &M[0], incx, &res);
+	else if (typeid(T) == typeid(cxdb))
+		cblas_zdotu_sub (n, &_M[0], incx, &M[0], incx, &res);
+	
+	return res;
+	
+}
+
+template<class T>  T 
+Matrix<T>::dot (Matrix<T>& M) const {
+	
+	T   res  = T(0.0);
+	
+	int n    = (int) Size();
+	int incx = 1;
+	
+	if (typeid(T) == typeid(cxfl))
+	  cblas_cdotu_sub (n, &_M[0], incx, &M[0], incx, &res);
+	else if (typeid(T) == typeid(cxdb))
+	  cblas_zdotu_sub (n, &_M[0], incx, &M[0], incx, &res);
+	else if (typeid(T) == typeid(double))
+	  cblas_ddot_sub (n, &_M[0], incx, &M[0], incx, &res);
+	else if (typeid(T) == typeid(float))
+	  cblas_sdot_sub (n, &_M[0], incx, &M[0], incx, &res);
+	
+	return res;
+	
+}
+

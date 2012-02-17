@@ -37,8 +37,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	static Matrix<cxfl> 
-	Forward      (const Matrix<cxfl>& m);
+	template <class T> static Matrix<T> 
+	Forward      (const Matrix<T>& m);
 	
 	
 	/**
@@ -47,8 +47,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	static Matrix<cxfl> 
-	Backward     (const Matrix<cxfl>& m);
+	template <class T> static Matrix<T> 
+	Backward     (const Matrix<T>& m);
 	
 	
 	/**
@@ -57,8 +57,21 @@ public:
 	 * @param  m To shift
 	 * @return   Shifted
 	 */
-	static Matrix<cxfl> 
-	Shift        (const Matrix<cxfl>& m);
+	template <class T> static Matrix<cxfl> 
+	Shift        (const Matrix<T>& m) {
+
+		assert (m.Is1D() || m.Is2D() || m.Is3D());
+		
+		Matrix<T> res  = m;
+		
+		for (size_t s = 0; s < m.Dim(2); s++)
+			for (size_t l = 0; l < m.Dim(1); l++)
+				for (size_t c = 0; c < m.Dim(0); c++)
+					res.At (c,l,s) *= (float) pow ((float)-1.0, (float)(s+l+c));
+		
+		return res;
+
+	}
 	
 	
 private:

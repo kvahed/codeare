@@ -532,11 +532,11 @@ public:
      * @brief           Get pointer to data
      *  
      * @return          Data 
-     *//*
+     */
     inline T*            
-    Data                ()  const {
+    Data                ()  {
         return &(_M.at(0));
-		}*/
+	}
 
     
     /**
@@ -875,16 +875,6 @@ public:
 
 
 	/**
-	 * @brief          Multiplication operator with different class
-	 * 
-	 * 
-	 */
-	
-	//template<class S> Matrix<T>
-	//operator*          (const Matrix<S>& M);
-
-	
-	/**
 	 * @brief           Get the element at position p of the vector, i.e. this(p).
      *
      * @param  p        Requested position.
@@ -1093,9 +1083,9 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          m + t
 	 */
-	friend Matrix<T>    
-	operator+  (T s, Matrix<T> &m) {
-		return   m + s;
+	template <class S> inline friend Matrix<T>    
+	operator+  (const S s, const Matrix<T> &m) {
+		return   m + T(s);
 	}
 
 
@@ -1106,9 +1096,9 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          -(m - s)
 	 */
-	friend Matrix<T>    
-	operator-  (T s, Matrix<T> &m) {
-		return -(m - s);
+	template <class S> inline friend Matrix<T>
+	operator-  (const S s, const Matrix<T> &m) {
+		return -(m - T(s));
 	}
 
 
@@ -1119,24 +1109,24 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          m * s
 	 */
-	friend Matrix<T>    
-	operator*  (T s, Matrix<T> &m) { 
-		return   m * s;
+	template <class S> inline friend Matrix<T>    
+	operator*  (const S s, const Matrix<T> &m) { 
+		return   m * T(s);
 	}
 
 
-	/**
+	/*
 	 * @brief           Elementwise multiplication of inverse with scalar (lhs)
 	 *
 	 * @param  s        Scalar lhs
 	 * @param  m        Matrix rhs
 	 * @return          s * m.Inv()
-	 */
-	friend Matrix<T>    
+
+	template <class S> inline friend Matrix<T>    
 	operator/  (T s, Matrix<T> &m) {
 		return  m;// s * m.Inv();
 	}
-
+	*/
 
 	/**
 	 * @brief           Elementwise equality with scalar (lhs)
@@ -1145,7 +1135,7 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          m == s
 	 */
-	friend Matrix<bool> 
+	inline friend Matrix<bool> 
 	operator== (T s, Matrix<T> m) {
 		return   m == s;
 	}
@@ -1158,7 +1148,7 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          m <= t
 	 */
-	friend Matrix<bool> 
+	inline friend Matrix<bool> 
 	operator>= (T s, Matrix<T> m) {
 		return   m <= s;
 	}
@@ -1171,7 +1161,7 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          T<=M
 	 */
-	friend Matrix<bool> 
+	inline friend Matrix<bool> 
 	operator<= (T s, Matrix<T> m) {
 		return   m >= s;
 	}
@@ -1184,7 +1174,7 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          T!=M
 	 */
-	friend Matrix<bool> 
+	inline friend Matrix<bool> 
 	operator!= (T s, Matrix<T> m) {
 		return   m != s;
 	}
@@ -1197,7 +1187,7 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          T+M
 	 */
-	friend Matrix<bool> 
+	inline friend Matrix<bool> 
 	operator>  (T s, Matrix<T> m) {
 		return   m <  s;
 	}
@@ -1210,7 +1200,7 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          T+M
 	 */
-	friend Matrix<bool> 
+	inline friend Matrix<bool> 
 	operator<  (T s, Matrix<T> m) {
 		return   m >  s;
 	}
@@ -1223,12 +1213,12 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          T+M
 	 */
-	friend Matrix<T>    
+	inline friend Matrix<T>    
 	operator&  (Matrix<bool>& mb, Matrix<T>& m) {
 		return   m &  mb;
 	}
 
-//@}
+	//@}
 
 
 
@@ -1650,8 +1640,8 @@ public:
      *
      * @param  M        Matrix substruent.
      */
-    Matrix<T>           
-    operator-           (Matrix<T> &M);
+    template <class S> Matrix<T>           
+    operator-           (const Matrix<S> &M);
     
     
     /**
@@ -1659,8 +1649,28 @@ public:
      *
      * @param  s        Scalar substruent.
      */
-    Matrix<T>           
-    operator-           (const T s);
+    template <class S> Matrix<T>           
+    operator-           (const S s);
+    
+    
+    /**
+     * @brief           ELementwise substraction and assignment operator. i.e. this = m.
+     *
+     * @param  M        Added matrix.
+	 * @return          Result
+     */
+    template <class S>  Matrix<T>           
+    operator-=          (const Matrix<S> &M);
+    
+    
+    /**
+     * @brief           ELementwise substration with scalar and assignment operator. i.e. this = m.
+     *
+     * @param  s        Added scalar.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator-=         (const S s);
     
     
     /**
@@ -1675,21 +1685,42 @@ public:
     /**
      * @brief           Elementwise addition of two matrices
      *
-     * @param  M        Matrix substruent.
+     * @param  M        Matrix additive.
      */
-    Matrix<T>           
-    operator+           (Matrix<T> &M);
+    template <class S> Matrix<T>           
+    operator+          (const Matrix<S> &M);
     
     
     /**
      * @brief           Elementwise addition iof all elements with a scalar
      *
-     * @param  s        Scalar substruent.
+     * @param  s        Scalar additive.
      */
-    Matrix<T>           
-    operator+           (T s);
+    template <class S> Matrix<T>           
+    operator+           (const S s);
     
     
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
+     *
+     * @param  M        Added matrix.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator+=          (const Matrix<S> &M);
+    
+    
+    /**
+     * @brief           ELementwise addition with scalar and assignment operator. i.e. this = m.
+     *
+     * @param  s        Added scalar.
+	 * @return          Result
+     */
+    template <class S > Matrix<T>           
+    operator+=          (const S s);
+    
+    
+
     /**
      * @brief           Add to 0
 	 *
@@ -1894,7 +1925,7 @@ public:
      * @brief           Fill with random data
      */
     inline void         
-	Random               ();    
+	Random             ();    
 
 
     /**
@@ -1903,18 +1934,28 @@ public:
      * @param  M        Factor matrix.
 	 * @return          Result
      */
-    Matrix<T>           
-    operator*           (Matrix<T> &M);
+    template <class S> Matrix<T>           
+    operator*          (const Matrix<S> &M);
 
 
+    /**
+     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
+	 *
+	 * @param  s        Factor scalar
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator*          (const S& s);
+
+    
     /**
      * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
      *
      * @param  M        Factor matrix.
 	 * @return          Result
      */
-    Matrix<T>           
-    operator*=           (const Matrix<T> &M);
+    template <class S> Matrix<T>           
+    operator*=         (const Matrix<S> &M);
     
     
     /**
@@ -1923,79 +1964,9 @@ public:
      * @param  s        Factor scalar.
 	 * @return          Result
      */
-    Matrix<T>           
-    operator*=           (const T s);
+    template <class S> Matrix<T>
+    operator*=         (const S& s);
     
-    
-    /**
-     * @brief           ELementwise division and assignment operator. i.e. this = this ./ M.
-     *
-     * @param  M        Divisor matrix.
-	 * @return          Result
-     */
-    Matrix<T>           
-    operator/=           (const Matrix<T> &M);
-    
-    
-    /**
-     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Divisor scalar.
-	 * @return          Result
-     */
-    Matrix<T>           
-    operator/=           (T s);
-    
-    
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
-     *
-     * @param  M        Added matrix.
-	 * @return          Result
-     */
-    Matrix<T>           
-    operator+=           (const Matrix<T> &M);
-    
-    
-    /**
-     * @brief           ELementwise addition with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Added scalar.
-	 * @return          Result
-     */
-    Matrix<T>           
-    operator+=           (T s);
-    
-    
-    /**
-     * @brief           ELementwise substraction and assignment operator. i.e. this = m.
-     *
-     * @param  M        Added matrix.
-	 * @return          Result
-     */
-    Matrix<T>           
-    operator-=           (const Matrix<T> &M);
-    
-    
-    /**
-     * @brief           ELementwise substration with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Added scalar.
-	 * @return          Result
-     */
-    Matrix<T>           
-    operator-=           (const T s);
-    
-    
-    /**
-     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
-	 *
-	 * @param  s        Factor scalar
-	 * @return          Result
-     */
-    Matrix<T>           
-    operator*           (T s);
-
     
     /**
      * @brief           Elelemtwise division by M.
@@ -2003,8 +1974,8 @@ public:
      * @param  M        The divisor.
 	 * @return          Result
      */
-    Matrix<T>           
-    operator/           (Matrix<T> &M);
+    template <class S>  Matrix<T>           
+    operator/          (const Matrix<S> &M);
 
     
     /**
@@ -2013,8 +1984,28 @@ public:
      * @param  s        The divisor.
 	 * @return          Result
      */
-    Matrix<T>           
-    operator/           (T s);
+    template <class S> Matrix<T>           
+    operator/           (const S s);
+    
+    /**
+     * @brief           ELementwise division and assignment operator. i.e. this = this ./ M.
+     *
+     * @param  M        Divisor matrix.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator/=         (const Matrix<S> &M);
+    
+    
+    /**
+     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
+     *
+     * @param  s        Divisor scalar.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator/=         (const S s);
+    
     
     //@}
     
@@ -2407,7 +2398,7 @@ public:
      * @return          Product of this and M.
      */
     Matrix<T>           
-    prod                (Matrix<T> &M, const char transa = 'N', const char transb = 'N');
+    prod                (const Matrix<T> &M, const char transa = 'N', const char transb = 'N');
     
     /**
      * @brief           Complex conjugate left and multiply with right.
@@ -2416,7 +2407,7 @@ public:
      * @return          Product of conj(this) and M.
      */
     Matrix<T>           
-    prodt               (Matrix<T> &M);
+    prodt               (const Matrix<T> &M);
     
     /**
      * @brief           Transposition / Complex conjugation and transposition.
@@ -2443,6 +2434,7 @@ public:
 	Matrix<T>
     SOS                 (const size_t d = 0)           const;
     
+	
 
     /**
      * @brief           Sum of squares on itself. 
@@ -2593,6 +2585,12 @@ public:
      */
 	T
     dotc (Matrix<T>& M) const;
+    
+	T
+    dotu (Matrix<T>& M) const;
+    
+	T
+    dot (Matrix<T>& M) const;
     
     //@}
 

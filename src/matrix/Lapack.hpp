@@ -25,10 +25,10 @@
 extern "C" {
 
 	// Cholesky factorization of a complex Hermitian positive definite matrix
-	void cpotrf_ (char* uplo, int* n, void* a, int* lda, int *info);
-	void dpotrf_ (char* uplo, int* n, void* a, int* lda, int *info);
-	void spotrf_ (char* uplo, int* n, void* a, int* lda, int *info);
-	void zpotrf_ (char* uplo, int* n, void* a, int* lda, int *info);
+	void cpotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
+	void dpotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
+	void spotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
+	void zpotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
 	
 	// Computes an LU factorization of a general M-by-N matrix A
 	void cgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
@@ -73,10 +73,10 @@ extern "C" {
 	void zgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
 
 	// Matrix matrix multiplication
-	void sgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
-	void dgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
-	void cgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
-	void zgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, void *a, int *lda, void *b, int *ldb, void *beta, void *c, int *ldc);
+	void sgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
+	void dgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
+	void cgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
+	void zgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
 	
 	// vector vector scalar multiplication
 	float  sdot_  (int* n, void* x, int* incx, void* y, int* incy);
@@ -85,11 +85,22 @@ extern "C" {
 	cxfl   cdotu_ (int* n, void* x, int* incx, void* y, int* incy);
 	cxdb   zdotc_ (int* n, void* x, int* incx, void* y, int* incy);
 	cxdb   zdotu_ (int* n, void* x, int* incx, void* y, int* incy);
+
+    float  cblas_snrm2  (const int N, const void *X, const int incX);
+	double cblas_dnrm2  (const int N, const void *X, const int incX);
+	cxfl   cblas_scnrm2 (const int N, const void *X, const int incX);
+	cxdb   cblas_zcnrm2 (const int N, const void *X, const int incX);
 	
+	void cblas_ddot_sub  (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
+	void cblas_sdot_sub  (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
+	void cblas_cdotu_sub (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
+	void cblas_cdotc_sub (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
+	void cblas_zdotu_sub (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
+	void cblas_zdotc_sub (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
 }
 
 #include "Matrix.hpp"
-#include "cblas.h"
+//#include "cblas.h"
 
 class Lapack {
 
@@ -458,9 +469,17 @@ class Lapack {
 	
 
 	template<class T> static Matrix<T> 
-	GEMM (Matrix<T>& a, Matrix<T>& b, char transa = 'N', char transb = 'N') {
+	GEMM (Matrix<T>& A, const Matrix<T>& B, char transa, char transb) {
 		
-		int aw = (int)a.Width(), ah = (int)a.Height(), bw = (int)b.Width(), bh = (int)b.Height();
+		GEMM (A, B, transa, transb);
+
+	}
+
+
+	template<class T> static Matrix<T> 
+	GEMM (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = 'N') {
+		
+		int aw = (int)A.Width(), ah = (int)A.Height(), bw = (int)B.Width(), bh = (int)B.Height();
 		
 		if      ( transa == 'N'                   &&  transb == 'N'                  ) assert (aw == bh);
 		else if ( transa == 'N'                   && (transb == 'T' || transb == 'C')) assert (aw == bw);
@@ -487,18 +506,20 @@ class Lapack {
 		T    alpha  =       T(1.0);
 		T    beta   =       T(0.0);
 		
-		Matrix<T> c (m, n);
+		Matrix<T> C  (m, n);
+		Matrix<T> Ad = A;
+		Matrix<T> Bd = B;
 		
 		if      (typeid(T) == typeid(double))
-			dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &a[0], &ah, &b[0], &bh, &beta, &c[0], &ldc);
+			dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &Ad[0], &ah, &Bd[0], &bh, &beta, &C[0], &ldc);
 		else if (typeid(T) == typeid(float))
-			sgemm_ (&transa, &transb, &m, &n, &k, &alpha, &a[0], &ah, &b[0], &bh, &beta, &c[0], &ldc);
+			sgemm_ (&transa, &transb, &m, &n, &k, &alpha, &Ad[0], &ah, &Bd[0], &bh, &beta, &C[0], &ldc);
 		else if (typeid(T) == typeid(cxfl))
-			cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &a[0], &ah, &b[0], &bh, &beta, &c[0], &ldc);
+			cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &Ad[0], &ah, &Bd[0], &bh, &beta, &C[0], &ldc);
 		else if (typeid(T) == typeid(cxdb))
-			zgemm_ (&transa, &transb, &m, &n, &k, &alpha, &a[0], &ah, &b[0], &bh, &beta, &c[0], &ldc);
+			zgemm_ (&transa, &transb, &m, &n, &k, &alpha, &Ad[0], &ah, &Bd[0], &bh, &beta, &C[0], &ldc);
 		
-		return c;
+		return C;
 		
 	}
 
