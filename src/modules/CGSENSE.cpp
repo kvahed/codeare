@@ -261,7 +261,7 @@ CGSENSE::Process () {
 		// EHE --------------------------------------------------------
 		E  (p,    sens, m_intcor, m_fplan,                              data, m_dim);
 		EH (data, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim, false);
-		q  += (m_lambda * p);
+		q  += p * m_lambda;
 
 		// Guess new gradient -----------------------------------------
 		rtmp  = (rn / (p.dotc(q)));
