@@ -35,7 +35,7 @@ public:
 	 * @return        Vector x
 	 */
 	template<class T> static Matrix<T> 
-	Solve (Matrix<T>& A, Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
+	Solve (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
 
 		size_t ah   = A.Height();
 		size_t aw   = A.Width();
@@ -47,7 +47,7 @@ public:
 
 		ticks tic   = getticks();
 
-		Matrix<T> p = A.prodt(b); //Lapack::GEMM (A, b, 'C');
+		Matrix<T> p = Lapack::GEMM (A, b, 'C');
 		Matrix<T> r = p;
 
 		Matrix<T> x (p.Dim()); 
@@ -70,9 +70,9 @@ public:
 			if (i % 5 == 0 && i > 0) printf ("\n");
 			printf ("    %03lu %.7f", i, res.at(i));
 			
-			q  = A.prod(p);
-			q  = A.prodt(q);
-			q += (T(lambda)*p);
+			q   = Lapack::GEMM(A, p);
+			q   = Lapack::GEMM(A, q, 'C');
+			//q  += lambda * p;
 			
 			ts  = (rn / (p.dotc(q)));
 			x  += (p * ts);

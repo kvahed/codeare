@@ -206,7 +206,8 @@ FTVolumes (Matrix<cxfl>& r) {
 
 			memcpy (&mr[tid][0], &r[i*imsize], imsize * sizeof(cxfl));
 
-			mr[tid]  = FFT::Shift(mr[tid]) * hann;
+			mr[tid]  = FFT::Shift(mr[tid]);
+			mr[tid] *= hann;
 			fftwf_execute(p[tid]);
 			mr[tid]  = FFT::Shift(mr[tid]);
 

@@ -21,16 +21,17 @@
 #include "FFT.hpp"
 #include <fftw3.h>
 
-Matrix<cxfl> 
+
+template<> Matrix<cxfl> 
 FFT::Forward (const Matrix<cxfl>& m)  {
 	
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
 	
-    Matrix<cxfl> res = m;
+    Matrix<cxfl> res;
 	fftwf_plan   p;
 
-	Shift(res);
-	
+	res = Shift(m);
+
 	if (m.Is1D())
 		p = fftwf_plan_dft_1d (m.Dim(0),                     (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
 	else if (m.Is2D())
@@ -41,22 +42,19 @@ FFT::Forward (const Matrix<cxfl>& m)  {
 	fftwf_execute(p);
 	fftwf_destroy_plan(p);
 
-	res = Shift(res);
-
-    return res / res.Size();
+    return Shift(res/sqrt((float)m.Size()));
 	
 }
 
-Matrix<cxfl>
+
+template<> Matrix<cxfl>
 FFT::Backward (const Matrix<cxfl>& m) {
 
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
 	
-    Matrix<cxfl> res = m;
+    Matrix<cxfl> res = Shift(m);
 	fftwf_plan   p; 
 	
-	res = Shift(res);
-
 	if (m.Is1D())
 		p = fftwf_plan_dft_1d (m.Dim(0),                     (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
 	else if (m.Is2D())
@@ -67,25 +65,59 @@ FFT::Backward (const Matrix<cxfl>& m) {
 	fftwf_execute(p);
 	fftwf_destroy_plan(p);
 
-	res = Shift(res);
-
-	return res;
+	return Shift(res/sqrt((float)m.Size()));
 	
 }
 
 
-Matrix<cxfl>
-FFT::Shift (const Matrix<cxfl>& m) {
+template<> Matrix<cxdb> 
+FFT::Forward (const Matrix<cxdb>& m)  {
 	
 	assert (m.Is1D() || m.Is2D() || m.Is3D());
 	
-	Matrix<cxfl> res  = m;
-	
-	for (size_t s = 0; s < m.Dim(2); s++)
-		for (size_t l = 0; l < m.Dim(1); l++)
-			for (size_t c = 0; c < m.Dim(0); c++)
-				res.At (c,l,s) *= (float) pow ((float)-1.0, (float)(s+l+c));
-	
-	return res;
+    Matrix<cxdb> res;
+	fftw_plan    p;
 
+	res = Shift(m);
+
+	if (m.Is1D())
+		p = fftw_plan_dft_1d (m.Dim(0),                     (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
+	else if (m.Is2D())
+		p = fftw_plan_dft_2d (m.Dim(1), m.Dim(0),           (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
+	else if (m.Is3D())
+		p = fftw_plan_dft_3d (m.Dim(2), m.Dim(1), m.Dim(0), (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
+	
+	fftw_execute(p);
+	fftw_destroy_plan(p);
+
+    return Shift(res / (float)res.Size());
+	
 }
+
+
+template<> Matrix<cxdb>
+FFT::Backward (const Matrix<cxdb>& m) {
+
+	assert (m.Is1D() || m.Is2D() || m.Is3D());
+	
+    Matrix<cxdb> res;
+	fftw_plan    p; 
+	
+	res = Shift(m);
+
+	if (m.Is1D())
+		p = fftw_plan_dft_1d (m.Dim(0),                     (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
+	else if (m.Is2D())
+		p = fftw_plan_dft_2d (m.Dim(1), m.Dim(0),           (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
+	else if (m.Is3D())
+		p = fftw_plan_dft_3d (m.Dim(2), m.Dim(1), m.Dim(0), (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
+	
+	fftw_execute(p);
+	fftw_destroy_plan(p);
+
+	return Shift(res);
+	
+}
+
+
+

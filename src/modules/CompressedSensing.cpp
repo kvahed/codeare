@@ -60,7 +60,10 @@ CompressedSensing::Init () {
 	Attribute ("csiter", &m_csiter);
 	Attribute ("cgconv", &m_cgparam.cgconv);
 	Attribute ("cgiter", &m_cgparam.cgiter);
-	printf ("  Maximum %i NLCG iterations or convergence to %.9f", m_cgparam.cgiter, m_cgparam.cgconv);	
+	Attribute ("lsiter", &m_cgparam.lsiter);
+	Attribute ("lsa",    &m_cgparam.lsa);
+	Attribute ("lsb",    &m_cgparam.lsb);
+	printf ("  Maximum %i NLCG iterations or convergence to %e", m_cgparam.cgiter, m_cgparam.cgconv);	
 
 	
 
@@ -76,50 +79,32 @@ RRSModule::error_code
 CompressedSensing::Process () {
 
 	printf ("Processing CompressedSensing ...\n");
-	ticks csstart = getticks();
+	ticks tic; 
+	cxfl  ma;
 
 	Matrix<cxfl>&   data  = GetCXFL("data");
 	Matrix<double>& pdf   = GetRLDB("pdf");
-
 	Matrix<cxfl>&   im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
 
-	ticks tic = getticks();
+	data  /= pdf;
 
-	printf ("  Fourier transforming ... "); fflush(stdout);
-	
-	for (int i = 0; i < data.Size(); i++)
-		data[i] /= pdf[i];
-	
-	im_dc = FFT::Backward(data);
+	im_dc  = FFT::Backward(data);
 
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	ma     = im_dc.Maxabs();
+	im_dc /= ma;
+	data  /= ma;
 
+	im_dc  = DWT::Forward (im_dc);
+
+	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 	tic = getticks();
 
-	cxfl ma = im_dc.Maxabs();
-	im_dc  /= ma;
+	for (int i = 0; i < m_csiter; i++)
+		NLCG (im_dc, data, m_cgparam);
 
-	printf ("  Wavelet transforming ... "); fflush(stdout);
-
-	im_dc = DWT::Forward (im_dc);
-
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-
-	tic = getticks();
-
-	printf ("  Running %i NLCG iterations ... ", m_csiter); fflush(stdout);
-
-	//for (int i = 0; i < m_csiter; i++) {
-		
-		im_dc = NLCG (im_dc, data, m_cgparam);
-		
-		//}
+	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	im_dc = DWT::Backward (im_dc);
-	
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-
-	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), csstart) / Toolbox::Instance()->ClockRate());
 
 	return OK;
 

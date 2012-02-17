@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_INSIGHT
-
+/*
 #include "itkImage.h"
 #include "itkMinimumMaximumImageFilter.h"
 #include "itkOrientedImage.h"
@@ -27,10 +27,10 @@
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkBSplineInterpolateImageFunction.h"
 #include "itkResampleImageFilter.h"
-
+*/
 template<class T> void
 Matrix<T>::Resample (const Matrix<double>& f, const InterpMethod& im) {
-	
+	/*	
 	typedef typename itk::OrientedImage< T, 3 > InputImageType;
 	typedef typename itk::OrientedImage< T, 3 > OutputImageType;
 	typedef typename itk::IdentityTransform< double, 3 > TransformType;
@@ -109,7 +109,7 @@ Matrix<T>::Resample (const Matrix<double>& f, const InterpMethod& im) {
 				opos[0] = x; opos[1] = y; opos[2] = z;
 				this->At(x,y,z) = output->GetPixel (opos);
 			}
-	
+	*/	
 }
 
 
