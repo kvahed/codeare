@@ -1083,11 +1083,12 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          m + t
 	 */
+	/*
 	template <class S> inline friend Matrix<T>    
 	operator+  (const S s, const Matrix<T> &m) {
 		return   m + T(s);
 	}
-
+	*/
 
 	/**
 	 * @brief           Elementwise subtraction from scalar (lhs)
@@ -1096,11 +1097,12 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          -(m - s)
 	 */
+	/*
 	template <class S> inline friend Matrix<T>
 	operator-  (const S s, const Matrix<T> &m) {
 		return -(m - T(s));
 	}
-
+	*/
 
 	/**
 	 * @brief           Elementwise multiplication with scalar (lhs)
@@ -1109,11 +1111,12 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          m * s
 	 */
+	/*
 	template <class S> inline friend Matrix<T>    
-	operator*  (const S s, const Matrix<T> &m) { 
-		return   m * T(s);
+	operator*  (const S& s, const Matrix<T> &m) { 
+		return   m * s;
 	}
-
+	*/
 
 	/*
 	 * @brief           Elementwise multiplication of inverse with scalar (lhs)

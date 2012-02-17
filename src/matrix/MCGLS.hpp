@@ -72,7 +72,7 @@ public:
 			
 			q   = Lapack::GEMM(A, p);
 			q   = Lapack::GEMM(A, q, 'C');
-			//q  += lambda * p;
+			q  += p * lambda;
 			
 			ts  = (rn / (p.dotc(q)));
 			x  += (p * ts);

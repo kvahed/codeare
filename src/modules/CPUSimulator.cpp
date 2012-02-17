@@ -333,15 +333,15 @@ CPUSimulator::Simulate () {
 
 			SimulateExc (b1, g, p, rv, b0, smxy, roi,  jac, np, dt, true, m_nc, m_nt, m_gdt, mxy, mz); // E^H
 			SimulateAcq (b1, g,    rv, b0,  mxy,  mz, m_ic, np, dt, true, m_nc, m_nt, m_gdt,       q); // E
-			q += (tl * p);
+			q += p * tl;
 			
 			rtmp  = (rn / (p.dotc(q)));
 			//rtmp *= .7;
 
 			if (!iters) 
-				a  = rtmp * p;
+				a  = p * rtmp;
 			else        
-				a += rtmp * p;
+				a += p * rtmp;
 
 			r    -= (q * rtmp);
 			p    *= cxfl (pow(r.Norm().real(), 2)/rn);
