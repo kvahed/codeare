@@ -1,7 +1,6 @@
 #include "options.h"
 #include "RemoteConnector.hpp"
 #include "LocalConnector.hpp"
-#include "FFT.hpp"
 #include "MatrixOperations.hpp"
 
 #ifndef __WIN32__

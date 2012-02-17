@@ -75,7 +75,7 @@ public:
 	 * @return   Transform
 	 */
 	template <class T> static Matrix<T> 
-	Adjoint    (const Matrix<T>& m) {
+	Adjoint    (Matrix<T>& m) {
 
 		size_t M = m.Dim(0);
 		size_t N = m.Dim(1);
@@ -97,7 +97,9 @@ public:
 			resx (i,M-1) = m(i,M-2,1);
 		}
 
-		return resx + resy;
+		resx += resy;
+
+		return resx;
 
 	}
 	

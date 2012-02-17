@@ -21,7 +21,7 @@
 #include "Lapack.hpp"
 
 template <class T> Matrix<T> 
-Matrix<T>::prodt (const Matrix<T> &M) {
+Matrix<T>::prodt (Matrix<T> &M) {
 	
 	return Lapack::GEMM (*this, M, 'C');
 	
@@ -29,7 +29,7 @@ Matrix<T>::prodt (const Matrix<T> &M) {
 
 
 template <class T> Matrix<T> 
-Matrix<T>::prod (const Matrix<T> &M, const char transa, const char transb) {
+Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
 	
 	return Lapack::GEMM (*this, M, transa, transb);
 	
@@ -45,7 +45,7 @@ Matrix<T>::Norm () const {
 	int incx = 1;
 	
 	if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, &_M[0], incx);
-	else if (typeid(T) == typeid(  cxdb)) res = cblas_zcnrm2 (n, &_M[0], incx);
+	else if (typeid(T) == typeid(  cxdb)) res = cblas_dznrm2 (n, &_M[0], incx);
 	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, &_M[0], incx);
 	else if (typeid(T) == typeid( float)) res = cblas_snrm2  (n, &_M[0], incx);
 	

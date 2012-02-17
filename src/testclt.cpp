@@ -42,6 +42,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "mxtest")               ) (remote) ?       mxtest (rc) :       mxtest (lc);
 		else if (!strcmp (test, "nitest")               ) (remote) ?       nitest (rc) :       nitest (lc);
 		else if (!strcmp (test, "fftwtest")             ) (remote) ?     fftwtest (rc) :     fftwtest (lc);
+		else if (!strcmp (test, "dwttest")              ) (remote) ?      dwttest (rc) :      dwttest (lc);
 		else if (!strcmp (test, "RelativeSensitivities")) (remote) ?     resetest (rc) :     resetest (lc);
 		else                                              (remote) ? internaltest (rc) : internaltest (lc);
 

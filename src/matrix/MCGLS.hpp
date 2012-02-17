@@ -35,7 +35,7 @@ public:
 	 * @return        Vector x
 	 */
 	template<class T> static Matrix<T> 
-	Solve (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
+	Solve (Matrix<T>& A, Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
 
 		size_t ah   = A.Height();
 		size_t aw   = A.Width();
@@ -72,7 +72,7 @@ public:
 			
 			q   = Lapack::GEMM(A, p);
 			q   = Lapack::GEMM(A, q, 'C');
-			q  += p * lambda;
+			q  += lambda * p;
 			
 			ts  = (rn / (p.dotc(q)));
 			x  += (p * ts);
