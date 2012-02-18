@@ -27,6 +27,7 @@
 #include "TVOP.hpp"
 #include "CX.hpp"
 
+#include <pthread.h>
 /**
  * @brief Reconstruction startegies
  */
@@ -105,18 +106,19 @@ namespace RRStrategy {
 	};
 
 
-
 	Matrix<cxfl> FFWD (const Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
 
 		return FFT::Forward (data) * mask;
 
 	}
 
+
 	Matrix<cxfl> FBWD (Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
 
 		return FFT::Backward(data * mask);
 
 	}
+
 
 	float Obj ( Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& data, float& t) {
 	
@@ -169,7 +171,7 @@ namespace RRStrategy {
 			o += om[i].real();
 		
 		return o;
-		
+
 	} 
 
 
@@ -208,8 +210,6 @@ namespace RRStrategy {
 		g -= data;
 		g  = DWT::Forward (FBWD (g, mask));
 
-		g.MXDump ("gobj.mat", "gobj");
-
 		return (2.0 * g);
 
 	}
@@ -228,8 +228,6 @@ namespace RRStrategy {
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
 		g *= x;
-
-		g.MXDump ("gxfm.mat", "gxfm");
 
 		return (cgp.xfmw * g);
 
@@ -252,8 +250,6 @@ namespace RRStrategy {
 
 		g *= cxfl(cgp.pnorm);
 		g  = DWT::Forward(TVOP::Adjoint(g));
-
-		g.MXDump ("gtv.mat", "gtv");
 
 		return (cgp.tvw * g);
 
@@ -280,11 +276,9 @@ namespace RRStrategy {
 	void NLCG (Matrix<cxfl>& x, Matrix<cxfl>& data, Matrix<double>& mask, CGParam& cgp) {
 
 		int          k  = 0;
-		float        t0 = 1.0, t = 1.0;
-		float        z  = 0.0;
-		Matrix<cxfl> x0 = x;
+		float        t0 = 1.0, t = 1.0, z = 0.0;
 
-		float rmse, bk;
+		float        rmse, bk;
 
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg;
 
