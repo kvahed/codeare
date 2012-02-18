@@ -18,7 +18,7 @@ LT_INIT([dlopen])
 define([svnversion], esyscmd([sh -c "svnversion|tr -d '\n'"]))dnl
 AC_DEFINE(SVN_REVISION, "svnversion", [SVN Revision])
 # copyright notice
-AC_COPYRIGHT([2010, 2011, 2012, Kaveh Vahedipour])
+AC_COPYRIGHT([2010-2012, Kaveh Vahedipour])
 
 # Produce first version of idl derivates
 esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
@@ -229,8 +229,66 @@ AC_CHECK_LIB([omnithread],   [read],          [], [AC_MSG_ERROR([cannot find lib
 AC_CHECK_LIB([omniDynamic4], [main],          [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
 AC_CHECK_LIB([dl],           [dlopen],        [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],       [], [AC_MSG_ERROR([cannot find libz, bailing out])])
-AC_CHECK_LIB([fftw3],        [fftw_execute],  [], [AC_MSG_ERROR([cannot find libfftw, bailing out])])
-AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
+
+AC_ARG_WITH(fftw,   [  --with-fftw             	     Set directory of FFTW3 library])
+#############################################################
+# FFT routines
+#############################################################
+
+echo "Searching for FFTW library"
+
+if test "$with_fftw" = ""
+then
+  # No path specified
+  FFTPATH=""
+  echo " -> Path not given. Searching for library..."
+else
+  FFTPATH=$with_fftw
+  AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/lib/libfftw3.a $FFTPATH/lib/libfftw3f.a ,, [
+    echo " -> Given path not correct. Finding..."
+    FFTPATH=""
+  ] )
+fi
+
+# Test if FFTW_ROOT is set
+if test "$FFTPATH" = ""
+then
+  if test "$FFTW_ROOT" != ""
+  then
+    AC_CHECK_FILES( $FFTW_ROOT/include/fftw3.h $FFTW_ROOT/lib/libfftw3.a , FFTPATH=$FFTW_ROOT, )
+  fi
+fi
+
+# Try some known paths
+if test "$FFTPATH" = ""
+then
+  AC_CHECK_FILE(/usr/include/fftw3.h, FFTPATH=/usr,
+  AC_CHECK_FILE(/usr/local/include/fftw3.h, FFTPATH=/usr/local,
+  AC_CHECK_FILE(/opt/local/include/fftw3.h, FFTPATH=/opt/local,
+  AC_CHECK_FILE($HOME/local/include/fftw3.h, FFTPATH=$HOME/local,
+  ))))
+
+  if test "$FFTPATH" != ""
+  then
+    # Check for the rest of the files
+
+    # NOTE: AC_CHECK_FILES works here, but AC_CHECK_FILE doesn't (?!)
+    AC_CHECK_FILES( $FFTPATH/lib/libfftw3.a $FFTPATH/lib/libfftw3f.a , , FFTPATH="" )
+    fi
+fi
+
+if test "$FFTPATH" = ""
+then
+  echo "ERROR: FFTW not found."
+  exit
+else
+  echo " -> path $FFTPATH"
+  CXXFLAGS="${CXXFLAGS} -I$FFTPATH/include"
+  LIBS="${LIBS} -L$FFTPATH/lib -lfftw3 -lfftw3f -Wl,-rpath,${FFTPATH}/lib"
+fi
+echo ""
+
+#AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
 AC_CHECK_LIB([cdf],          [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf dump / read functionality unavailable!])])
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
 
@@ -387,12 +445,13 @@ if test x"$with_matlabroot" != x"no" ; then
         *darwin*)
             MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/maci64"
         ;;
-		*x86_64*linux*)
-		    MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/glnxa64"
-		;;
+	*x86_64*linux*)
+	    MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/glnxa64"
+	;;
     esac
 
-	LIBS="${LIBS} -L${MATLAB_LIB_PATH} -lmat -lmx -Wl,-rpath,${MATLAB_LIB_PATH}"
+    LDFLAGS="-L${MATLAB_LIB_PATH} ${LDFLAGS}"
+	LIBS="${LIBS} -lmat -lmx -Wl,-rpath,${MATLAB_LIB_PATH}"
 
 	AC_TRY_LINK([#include "mat.h"],
         [MATFile *pmat;],

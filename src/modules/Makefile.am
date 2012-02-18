@@ -82,7 +82,7 @@ AFI_la_LIBADD = $(COMMON_la_LIBADD)
 
 CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
-CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD)
+CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
 
 DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp
 if USE_OPENCL

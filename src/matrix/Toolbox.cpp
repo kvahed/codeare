@@ -25,8 +25,28 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include <iomanip>
+#include <math.h>
+
+#include <string>
+
+std::string exec(char* cmd) {
+
+  FILE* pipe = popen(cmd, "r");
+  if (!pipe) return "ERROR";
+  char buffer[128];
+  std::string result = "";
+
+  while(!feof(pipe))
+    if(fgets(buffer, 128, pipe) != NULL)
+      result += buffer;
+
+  pclose(pipe);
+  return result;
+
+}
 
 Toolbox* Toolbox::m_instance = 0;
 
@@ -90,23 +110,10 @@ Toolbox::ClockRate () const {
 #else
 	
 	// LINUX
-	
-	FILE* scf;
-	std::string fname = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq";
-	int   freq = 1;
-	
-	scf = fopen(fname.c_str(), "rb");
-	
-	if (scf != NULL) {
-		int read = fscanf(scf,"%i",&freq);
-#ifdef VERBOSE
-		printf ("Read %i from %s\n", read, fname.c_str());
-#endif
-		fclose(scf);
-	}
-	
-	return 1000.0 * freq;
-	
+	std::string mhzstr = exec("lscpu | grep \"CPU MHz\"|awk '{print $3}'");
+	float mhz = atof(mhzstr.c_str());
+	return 1000.0 * mhz;
+
 #endif
 }
 
