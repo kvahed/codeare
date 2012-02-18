@@ -165,7 +165,6 @@ AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX
 AC_HEADER_MAJOR
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
-#AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
 AC_CHECK_HEADERS([ctype.h],          [], [AC_MSG_ERROR([cannot find ctype.h, bailing out])])
 AC_CHECK_HEADERS([typeinfo],         [], [AC_MSG_ERROR([cannot find typeinfo, bailing out])])
 AC_CHECK_HEADERS([fstream],          [], [AC_MSG_ERROR([cannot find fstream, bailing out])])
@@ -199,6 +198,10 @@ AC_CHECK_HEADERS(CL/cl_gl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers
     ])
 ])
 
+AC_CHECK_HEADERS(src/modules/cl.hpp, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
+        echo "cannot file cl.h, GPU bloch simulator unavailable"
+])
+
 AC_MSG_CHECKING(whether host is Mac OS)
 case $host in
     *darwin*)
@@ -209,9 +212,9 @@ case $host in
         AC_MSG_RESULT(no)
         AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [],[ 
             echo "OpenCL library not found in your system"
-            #exit -1
         ])
 esac
+AM_CONDITIONAL([USE_OPENCL],  [test "$HAVE_LIBOPENCL" -eq 1])
 
 case $host in
     *darwin*)
