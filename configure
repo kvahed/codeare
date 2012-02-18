@@ -631,6 +631,8 @@ ITK_INSTALL_PREFIX
 USE_NFFT3_FALSE
 USE_NFFT3_TRUE
 PLUGIN_LDFLAGS
+USE_OPENCL_FALSE
+USE_OPENCL_TRUE
 PYTHON_LDFLAGS
 PYTHON_INCLUDES
 pkgpyexecdir
@@ -674,7 +676,6 @@ SED
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
-am__nodep
 AMDEPBACKSLASH
 AMDEP_FALSE
 AMDEP_TRUE
@@ -788,8 +789,7 @@ CPP
 CXX
 CXXFLAGS
 CCC
-CXXCPP
-PYTHON'
+CXXCPP'
 
 
 # Initialize some variables set by options.
@@ -1446,7 +1446,6 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
-  PYTHON      the Python interpreter
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -3339,7 +3338,6 @@ fi
 if test "x$enable_dependency_tracking" != xno; then
   am_depcomp="$ac_aux_dir/depcomp"
   AMDEPBACKSLASH='\'
-  am__nodep='_no'
 fi
  if test "x$enable_dependency_tracking" != xno; then
   AMDEP_TRUE=
@@ -4153,7 +4151,6 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
-  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -4213,7 +4210,7 @@ else
 	break
       fi
       ;;
-    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
+    msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -12212,7 +12209,6 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
-  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -12272,7 +12268,7 @@ else
 	break
       fi
       ;;
-    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
+    msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -12597,7 +12593,6 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
-  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -12657,7 +12652,7 @@ else
 	break
       fi
       ;;
-    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
+    msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -16235,8 +16230,6 @@ if test "$python_path" = auto; then
 
 
 
-
-
         if test -n "$PYTHON"; then
       # If the user set $PYTHON, use it and don't search something else.
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $PYTHON version >= 2.7" >&5
@@ -16930,7 +16923,6 @@ fi
 
 done
 
-#AC_CHECK_HEADERS([complex],          [], [AC_MSG_ERROR([cannot find complex, bailing out])])
 for ac_header in ctype.h
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "ctype.h" "ac_cv_header_ctype_h" "$ac_includes_default"
@@ -17289,6 +17281,25 @@ fi
 done
 
 
+for ac_header in src/modules/cl.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "src/modules/cl.hpp" "ac_cv_header_src_modules_cl_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_src_modules_cl_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SRC_MODULES_CL_HPP 1
+_ACEOF
+
+$as_echo "#define HAVE_OPENCL_HEADERS 1" >>confdefs.h
+
+else
+
+        echo "cannot file cl.h, GPU bloch simulator unavailable"
+
+fi
+
+done
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether host is Mac OS" >&5
 $as_echo_n "checking whether host is Mac OS... " >&6; }
 case $host in
@@ -17346,11 +17357,18 @@ _ACEOF
 else
 
             echo "OpenCL library not found in your system"
-            #exit -1
 
 fi
 
 esac
+ if test "$HAVE_LIBOPENCL" -eq 1; then
+  USE_OPENCL_TRUE=
+  USE_OPENCL_FALSE='#'
+else
+  USE_OPENCL_TRUE='#'
+  USE_OPENCL_FALSE=
+fi
+
 
 case $host in
     *darwin*)
@@ -19191,6 +19209,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${USE_OPENCL_TRUE}" && test -z "${USE_OPENCL_FALSE}"; then
+  as_fn_error $? "conditional \"USE_OPENCL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_NFFT3_TRUE}" && test -z "${USE_NFFT3_FALSE}"; then

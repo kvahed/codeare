@@ -205,11 +205,13 @@ LapackTests::Process     () {
 	//cxfl z = Lapack::DOT (A, A);
 	//std::cout << "sum(A.*A)" <<  z;
 
+ #ifdef HAVE_MAT_H
 	A.MXRead("tmp.mat", "EM");
 	b.MXRead("tmp.mat", "PA");
 
 	Matrix<cxfl> x = MCGLS::Solve (A, b, 300, 1.0e-6, 1.0);
 	x.MXDump ("x.mat", "x");
+#endif
 
 
 	return RRSModule::OK;

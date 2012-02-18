@@ -159,6 +159,9 @@
 /* Define to 1 if you have the `sqrt' function. */
 #undef HAVE_SQRT
 
+/* Define to 1 if you have the <src/modules/cl.hpp> header file. */
+#undef HAVE_SRC_MODULES_CL_HPP
+
 /* Define to 1 if stdbool.h conforms to C99. */
 #undef HAVE_STDBOOL_H
 
