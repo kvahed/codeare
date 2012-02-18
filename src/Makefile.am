@@ -21,8 +21,8 @@ SERVER_SIDE = ReconServant.hpp ReconServant.cpp
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)  testclt.cpp 
-testclt_LDFLAGS = $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@
-testclt_LDADD = tinyxml/libtinyxml.la matrix/libmatrix.la 
+testclt_LDFLAGS = tinyxml/libtinyxml.la matrix/libmatrix.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ 
+#testclt_LDADD = 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp

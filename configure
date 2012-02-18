@@ -13,7 +13,7 @@
 # This configure script is free software; the Free Software Foundation
 # gives unlimited permission to copy, distribute and modify it.
 #
-# 2010, 2011, 2012, Kaveh Vahedipour
+# 2010-2012, Kaveh Vahedipour
 ## -------------------- ##
 ## M4sh Initialization. ##
 ## -------------------- ##
@@ -772,6 +772,7 @@ with_sysroot
 enable_libtool_lock
 enable_openmp
 with_pythonpath
+with_fftw
 with_itkroot
 with_matlabroot
 with_blas
@@ -1429,6 +1430,7 @@ Optional Packages:
                         (or the compiler's sysroot if not specified).
   --with-pythonpath=PATH  specify an absolute path to python executable when
                           automatic version check (incorrectly) fails
+  --with-fftw             	     Set directory of FFTW3 library
   --with-itkroot       path to ITK install dir
   --with-matlabroot       path to MATLAB install dir
   --with-blas             which blas library to use
@@ -1520,7 +1522,7 @@ Copyright (C) 2010 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-2010, 2011, 2012, Kaveh Vahedipour
+2010-2012, Kaveh Vahedipour
 _ACEOF
   exit
 fi
@@ -17561,100 +17563,331 @@ else
   as_fn_error $? "cannot find libz, bailing out" "$LINENO" 5
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw_execute in -lfftw3" >&5
-$as_echo_n "checking for fftw_execute in -lfftw3... " >&6; }
-if ${ac_cv_lib_fftw3_fftw_execute+:} false; then :
+
+
+# Check whether --with-fftw was given.
+if test "${with_fftw+set}" = set; then :
+  withval=$with_fftw;
+fi
+
+#############################################################
+# FFT routines
+#############################################################
+
+echo "Searching for FFTW library"
+
+if test "$with_fftw" = ""
+then
+  # No path specified
+  FFTPATH=""
+  echo " -> Path not given. Searching for library..."
+else
+  FFTPATH=$with_fftw
+  as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/include/fftw3.h" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/include/fftw3.h" >&5
+$as_echo_n "checking for $FFTPATH/include/fftw3.h... " >&6; }
+if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lfftw3  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char fftw_execute ();
-int
-main ()
-{
-return fftw_execute ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_fftw3_fftw_execute=yes
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$FFTPATH/include/fftw3.h"; then
+  eval "$as_ac_File=yes"
 else
-  ac_cv_lib_fftw3_fftw_execute=no
+  eval "$as_ac_File=no"
 fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_fftw_execute" >&5
-$as_echo "$ac_cv_lib_fftw3_fftw_execute" >&6; }
-if test "x$ac_cv_lib_fftw3_fftw_execute" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBFFTW3 1
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$FFTPATH/include/fftw3.h" | $as_tr_cpp` 1
 _ACEOF
 
-  LIBS="-lfftw3 $LIBS"
-
 else
-  as_fn_error $? "cannot find libfftw, bailing out" "$LINENO" 5
-fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftwf_execute in -lfftw3f" >&5
-$as_echo_n "checking for fftwf_execute in -lfftw3f... " >&6; }
-if ${ac_cv_lib_fftw3f_fftwf_execute+:} false; then :
+    echo " -> Given path not correct. Finding..."
+    FFTPATH=""
+
+fi
+as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/lib/libfftw3.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/lib/libfftw3.a" >&5
+$as_echo_n "checking for $FFTPATH/lib/libfftw3.a... " >&6; }
+if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lfftw3f  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char fftwf_execute ();
-int
-main ()
-{
-return fftwf_execute ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_fftw3f_fftwf_execute=yes
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$FFTPATH/lib/libfftw3.a"; then
+  eval "$as_ac_File=yes"
 else
-  ac_cv_lib_fftw3f_fftwf_execute=no
+  eval "$as_ac_File=no"
 fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3f_fftwf_execute" >&5
-$as_echo "$ac_cv_lib_fftw3f_fftwf_execute" >&6; }
-if test "x$ac_cv_lib_fftw3f_fftwf_execute" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBFFTW3F 1
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$FFTPATH/lib/libfftw3.a" | $as_tr_cpp` 1
 _ACEOF
 
-  LIBS="-lfftw3f $LIBS"
+else
+
+    echo " -> Given path not correct. Finding..."
+    FFTPATH=""
+
+fi
+as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/lib/libfftw3f.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/lib/libfftw3f.a" >&5
+$as_echo_n "checking for $FFTPATH/lib/libfftw3f.a... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$FFTPATH/lib/libfftw3f.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$FFTPATH/lib/libfftw3f.a" | $as_tr_cpp` 1
+_ACEOF
 
 else
-  as_fn_error $? "cannot find libfftw3f, bailing out" "$LINENO" 5
+
+    echo " -> Given path not correct. Finding..."
+    FFTPATH=""
+
 fi
 
+fi
+
+# Test if FFTW_ROOT is set
+if test "$FFTPATH" = ""
+then
+  if test "$FFTW_ROOT" != ""
+  then
+    as_ac_File=`$as_echo "ac_cv_file_$FFTW_ROOT/include/fftw3.h" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTW_ROOT/include/fftw3.h" >&5
+$as_echo_n "checking for $FFTW_ROOT/include/fftw3.h... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$FFTW_ROOT/include/fftw3.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$FFTW_ROOT/include/fftw3.h" | $as_tr_cpp` 1
+_ACEOF
+FFTPATH=$FFTW_ROOT
+fi
+as_ac_File=`$as_echo "ac_cv_file_$FFTW_ROOT/lib/libfftw3.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTW_ROOT/lib/libfftw3.a" >&5
+$as_echo_n "checking for $FFTW_ROOT/lib/libfftw3.a... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$FFTW_ROOT/lib/libfftw3.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$FFTW_ROOT/lib/libfftw3.a" | $as_tr_cpp` 1
+_ACEOF
+FFTPATH=$FFTW_ROOT
+fi
+
+  fi
+fi
+
+# Try some known paths
+if test "$FFTPATH" = ""
+then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/include/fftw3.h" >&5
+$as_echo_n "checking for /usr/include/fftw3.h... " >&6; }
+if ${ac_cv_file__usr_include_fftw3_h+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/include/fftw3.h"; then
+  ac_cv_file__usr_include_fftw3_h=yes
+else
+  ac_cv_file__usr_include_fftw3_h=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_include_fftw3_h" >&5
+$as_echo "$ac_cv_file__usr_include_fftw3_h" >&6; }
+if test "x$ac_cv_file__usr_include_fftw3_h" = xyes; then :
+  FFTPATH=/usr
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/include/fftw3.h" >&5
+$as_echo_n "checking for /usr/local/include/fftw3.h... " >&6; }
+if ${ac_cv_file__usr_local_include_fftw3_h+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/include/fftw3.h"; then
+  ac_cv_file__usr_local_include_fftw3_h=yes
+else
+  ac_cv_file__usr_local_include_fftw3_h=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_include_fftw3_h" >&5
+$as_echo "$ac_cv_file__usr_local_include_fftw3_h" >&6; }
+if test "x$ac_cv_file__usr_local_include_fftw3_h" = xyes; then :
+  FFTPATH=/usr/local
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for /opt/local/include/fftw3.h" >&5
+$as_echo_n "checking for /opt/local/include/fftw3.h... " >&6; }
+if ${ac_cv_file__opt_local_include_fftw3_h+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/opt/local/include/fftw3.h"; then
+  ac_cv_file__opt_local_include_fftw3_h=yes
+else
+  ac_cv_file__opt_local_include_fftw3_h=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__opt_local_include_fftw3_h" >&5
+$as_echo "$ac_cv_file__opt_local_include_fftw3_h" >&6; }
+if test "x$ac_cv_file__opt_local_include_fftw3_h" = xyes; then :
+  FFTPATH=/opt/local
+else
+  as_ac_File=`$as_echo "ac_cv_file_$HOME/local/include/fftw3.h" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $HOME/local/include/fftw3.h" >&5
+$as_echo_n "checking for $HOME/local/include/fftw3.h... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$HOME/local/include/fftw3.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  FFTPATH=$HOME/local
+fi
+
+fi
+
+fi
+
+fi
+
+
+  if test "$FFTPATH" != ""
+  then
+    # Check for the rest of the files
+
+    # NOTE: AC_CHECK_FILES works here, but AC_CHECK_FILE doesn't (?!)
+    as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/lib/libfftw3.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/lib/libfftw3.a" >&5
+$as_echo_n "checking for $FFTPATH/lib/libfftw3.a... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$FFTPATH/lib/libfftw3.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$FFTPATH/lib/libfftw3.a" | $as_tr_cpp` 1
+_ACEOF
+
+else
+  FFTPATH=""
+fi
+as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/lib/libfftw3f.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/lib/libfftw3f.a" >&5
+$as_echo_n "checking for $FFTPATH/lib/libfftw3f.a... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$FFTPATH/lib/libfftw3f.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$FFTPATH/lib/libfftw3f.a" | $as_tr_cpp` 1
+_ACEOF
+
+else
+  FFTPATH=""
+fi
+
+    fi
+fi
+
+if test "$FFTPATH" = ""
+then
+  echo "ERROR: FFTW not found."
+  exit
+else
+  echo " -> path $FFTPATH"
+  CXXFLAGS="${CXXFLAGS} -I$FFTPATH/include"
+  LIBS="${LIBS} -L$FFTPATH/lib -lfftw3 -lfftw3f -Wl,-rpath,${FFTPATH}/lib"
+fi
+echo ""
+
+#AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CDFcreatezVar in -lcdf" >&5
 $as_echo_n "checking for CDFcreatezVar in -lcdf... " >&6; }
 if ${ac_cv_lib_cdf_CDFcreatezVar+:} false; then :
@@ -18043,12 +18276,13 @@ $as_echo_n "checking for MATFile in -lmat -lmx... " >&6; }
         *darwin*)
             MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/maci64"
         ;;
-		*x86_64*linux*)
-		    MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/glnxa64"
-		;;
+	*x86_64*linux*)
+	    MATLAB_LIB_PATH="${MATLAB_LIB_PATH}/glnxa64"
+	;;
     esac
 
-	LIBS="${LIBS} -L${MATLAB_LIB_PATH} -lmat -lmx -Wl,-rpath,${MATLAB_LIB_PATH}"
+    LDFLAGS="-L${MATLAB_LIB_PATH} ${LDFLAGS}"
+	LIBS="${LIBS} -lmat -lmx -Wl,-rpath,${MATLAB_LIB_PATH}"
 
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */

@@ -69,7 +69,7 @@ am__objects_3 = RemoteConnector.$(OBJEXT) LocalConnector.$(OBJEXT)
 am_testclt_OBJECTS = $(am__objects_1) $(am__objects_3) \
 	testclt.$(OBJEXT)
 testclt_OBJECTS = $(am_testclt_OBJECTS)
-testclt_DEPENDENCIES = tinyxml/libtinyxml.la matrix/libmatrix.la
+testclt_LDADD = $(LDADD)
 testclt_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(testclt_LDFLAGS) $(LDFLAGS) -o $@
@@ -289,8 +289,8 @@ SERVER_SIDE = ReconServant.hpp ReconServant.cpp
 
 # Rules for testclt
 testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)  testclt.cpp 
-testclt_LDFLAGS = $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@
-testclt_LDADD = tinyxml/libtinyxml.la matrix/libmatrix.la 
+testclt_LDFLAGS = tinyxml/libtinyxml.la matrix/libmatrix.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ 
+#testclt_LDADD = 
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
