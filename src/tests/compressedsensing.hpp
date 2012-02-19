@@ -57,6 +57,7 @@ cstest (Connector<T>* rc) {
 	
 	rc->GetMatrix ("data", indata);  // Images
 	rc->GetMatrix ("im_dc", im_dc);  // Images
+	rc->GetMatrix ("orig", im_dc);  // Images
 	
 	// ---------------------
 	
@@ -72,6 +73,7 @@ cstest (Connector<T>* rc) {
 
 	indata.MXDump (mf, "img");
 	im_dc.MXDump (mf, "wvt");
+	im_dc.MXDump (mf, "orig");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());

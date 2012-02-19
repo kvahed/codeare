@@ -45,7 +45,8 @@ CompressedSensing::Init () {
 	Attribute ("xfmw",    &m_cgparam.xfmw);
 	Attribute ("l1",      &m_cgparam.l1);
 	Attribute ("pnorm",   &m_cgparam.pnorm);
-    printf ("  Weights: TV(%.4f) XF(%.4f)\n", m_cgparam.tvw, m_cgparam.xfmw);
+    printf ("  Weights: TV(%.4f) XF(%.4f) L1(%.4f)\n", m_cgparam.tvw, m_cgparam.xfmw, m_cgparam.l1);
+    printf ("  Pnorm: %i\n", m_cgparam.pnorm);
 	
 	Attribute ("fft",     &m_cgparam.fft);
 	printf ("  FFT class: ");
@@ -63,7 +64,9 @@ CompressedSensing::Init () {
 	Attribute ("lsiter", &m_cgparam.lsiter);
 	Attribute ("lsa",    &m_cgparam.lsa);
 	Attribute ("lsb",    &m_cgparam.lsb);
-	printf ("  Maximum %i NLCG iterations or convergence to %e", m_cgparam.cgiter, m_cgparam.cgconv);	
+    printf ("  Iterations: CS(%i) CG(%i) LS(%i)\n", m_csiter, m_cgparam.cgiter, m_cgparam.lsiter);
+	printf ("  Conv: CG(%.4f)\n", m_cgparam.cgconv);
+	printf ("  LS brackets: lsa(%.4f) lsb(%.4f)", m_cgparam.lsa, m_cgparam.lsb);
 
 	
 
@@ -101,8 +104,10 @@ CompressedSensing::Process () {
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
 	tic    = getticks();
+
 	for (int i = 0; i < m_csiter; i++)
 		NLCG (im_dc, data, mask, m_cgparam);
+
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	im_dc  = DWT::Backward (im_dc);

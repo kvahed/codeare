@@ -17979,7 +17979,6 @@ else
 $as_echo "cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&6; }
 fi
 
-
  if test "$HAVE_NFFT3" -eq 1; then
   USE_NFFT3_TRUE=
   USE_NFFT3_FALSE='#'
@@ -18113,8 +18112,8 @@ fi
 $as_echo_n "checking for itk::Image in ITK... " >&6; }
 OLD_LIBS=$LIBS
 OLD_CXXFLAGS=$CXXFLAGS
-#LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
-#CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
+LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
+CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
 
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -18141,11 +18140,8 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
-#if test -z $itk_found; then
-    LIBS=$OLD_LIBS
-	CXXFLAGS=$OLD_CXXFLAGS
-#fi
-
+LIBS=${OLD_LIBS}
+CXXFLAGS=${OLD_CXXFLAGS}
 
 # OMNIORB
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CORBA::ORB_init(int, char**) in -lomniORB4" >&5
