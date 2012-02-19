@@ -305,7 +305,6 @@ AC_TRY_LINK([
 AC_MSG_RESULT($rtc_ok)
 
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
-
 AM_CONDITIONAL([USE_NFFT3],  [test "$HAVE_NFFT3" -eq 1])
 
 
@@ -386,8 +385,8 @@ AC_SUBST(INC_INSIGHT_H)
 AC_MSG_CHECKING([for itk::Image in ITK])
 OLD_LIBS=$LIBS
 OLD_CXXFLAGS=$CXXFLAGS
-#LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
-#CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
+LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
+CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
 
 AC_TRY_LINK([#include "itkImage.h"],
    [
@@ -398,11 +397,8 @@ AC_TRY_LINK([#include "itkImage.h"],
    [LIBS=$OLD_LIBS]
    [AC_MSG_RESULT([no. Cannot find libITKCommon, ITK operations not available.])])
 
-#if test -z $itk_found; then
-    LIBS=$OLD_LIBS
-	CXXFLAGS=$OLD_CXXFLAGS
-#fi
-
+LIBS=${OLD_LIBS}
+CXXFLAGS=${OLD_CXXFLAGS}
 
 # OMNIORB
 AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])

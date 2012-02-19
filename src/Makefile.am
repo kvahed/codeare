@@ -8,7 +8,7 @@
 # Binaries 
 bin_PROGRAMS = reconserver testclt 
 
-AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
+AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml $(OPENMP_CXXFLAGS)
 
 # Common sources
 COMMON =  RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc DataBase.hpp DataBase.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp

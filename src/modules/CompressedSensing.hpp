@@ -108,14 +108,14 @@ namespace RRStrategy {
 
 	Matrix<cxfl> FFWD (const Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
 
-		return FFT::Forward (data) * mask;
+		return FFT::Forward (data);// * mask;
 
 	}
 
 
 	Matrix<cxfl> FBWD (Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
 
-		return FFT::Backward(data * mask);
+		return FFT::Backward(data/* * mask*/);
 
 	}
 
@@ -123,7 +123,7 @@ namespace RRStrategy {
 	float Obj ( Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& data, float& t) {
 	
 		Matrix<cxfl> om;
-		float        o;
+		float        o = 0.0;
 		
 		om  = ffdbx;
 		if (t > 0.0) 
@@ -140,17 +140,16 @@ namespace RRStrategy {
 	float ObjTV (Matrix<cxfl>& ttdbx, Matrix<cxfl>& ttdbg, float t, CGParam& cgp) {
 		
 		Matrix<cxfl> om;
-		float        o, p = (float)cgp.pnorm/2.0;
+		float        o = 0.0, p = (float)cgp.pnorm/2.0;
 		
 		om  = ttdbx + t * ttdbg;
 		om *= CX::Conj(om);
 		om += cgp.l1;
 		om ^= p;
 		
-		for (size_t i = 0; i < om.Size(); i++)
-			o += om[i].real();
+		for (size_t i = 0; i < om.Size(); i++) o += om[i].real();
 		
-		return o;
+		return cgp.tvw * o;
 
 	}
 
@@ -160,17 +159,19 @@ namespace RRStrategy {
 	float ObjXFM (Matrix<cxfl>& x, Matrix<cxfl>& g, float& t, CGParam& cgp) {
 		
 		Matrix<cxfl> om;
-		float        o, p = (float)cgp.pnorm/2.0;
+		float        o = 0.0, p = (float)cgp.pnorm/2.0;
+
+		x.MXDump ("x.mat", "x");
+		g.MXDump ("g.mat", "g");
 		
 		om  = x + t * g;
 		om *= CX::Conj(om);
 		om += cgp.l1;
 		om ^= p;
 		
-		for (size_t i = 0; i < om.Size(); i++)
-			o += om[i].real();
+		for (size_t i = 0; i < om.Size(); i++) o += om[i].real();
 		
-		return o;
+		return cgp.xfmw * o;
 
 	} 
 
@@ -180,20 +181,17 @@ namespace RRStrategy {
 					 Matrix<cxfl>&  data, float&            t, float&         rmse,
 					 CGParam&        cgp) {
 		
-		float obj = 0.0, sda = 0.0; 
+		float obj = 0.0;
+		long  sda = 0; 
 		
-		obj = Obj (ffdbx, ffdbg, data, t);
-		
-		if (cgp.tvw)
-			obj += cgp.tvw  * ObjTV  (ttdbx, ttdbg, t, cgp);
-		
-		if (cgp.xfmw)
-			obj += cgp.xfmw * ObjXFM (x, g, t, cgp);
+		obj  =              Obj    (ffdbx, ffdbg, data, t);
+		obj += (cgp.tvw)  ? ObjTV  (ttdbx, ttdbg, t, cgp) : 0.0;
+		obj += (cgp.xfmw) ? ObjXFM (x,     g,     t, cgp) : 0.0;
 		
 		for (size_t i = 0; i < data.Size(); i++)
-			if (cabs(data[i]) > 0) sda += cabs(data[i]);
+			sda += (cabs(data[i]) > 0) ? 1 : 0;
 		
-		rmse = sqrt(obj/sda);
+		rmse = sqrt(obj/(float)sda);
 		
 		return obj;
 
@@ -312,8 +310,7 @@ namespace RRStrategy {
 				
 			} while (i < cgp.lsiter);
 			
-			//printf ("    %02i - obj: %03.3f, RMS: %1.4f, LS: %i\n", k, f1, rmse, i);
-			printf ("    %02i - rms: %1.4f, l-search: %i\n", k, rmse, i);
+			printf ("    %02i - nrms: %1.4f, l-search: %i\n", k, rmse, i);
 
 			if (i == cgp.lsiter) {
 				printf ("Reached max line search, exiting... \n"); 
@@ -335,7 +332,7 @@ namespace RRStrategy {
 			dx  = -g1 + dx * bk;
 			k++;
 			
-			float dxn = dx.Norm().real();
+			float dxn = creal(dx.Norm());
 			
 			if ((k > cgp.cgiter) || dxn < cgp.cgconv) break;
 			
