@@ -2307,46 +2307,6 @@ public:
     
     
 	/**
-	 * @brief           In-place Isotropic resampling up to 3D to
-	 *
-	 * @param  f        Resampling factor (i.e. 0.5 = each dimension halved)
-	 * @param  i        Interpolation method @see InterpMethod
-	 */
-	void
-	Resample            (const Matrix<double>& f, const InterpMethod& i);
-
-
-	/**
-	 * @brief           Isotropic resampling up to 3D to
-	 *
-	 * @param  f        Resampling factor (i.e. 0.5 = each dimension halved)
-	 * @param  i        Interpolation method @see InterpMethod
-	 */
-	Matrix<T>
-	Resample            (const Matrix<double>& f, const InterpMethod& i) const;
-
-
-	/**
-	 * @brief           Resampling up to 3D to
-	 *
-	 * @param  f        Resampling factors <1 reduction >1 expansion
-	 * @param  im       Interpolation method @see InterpMethod
-	 */
-	void
-	Resample            (const double& f, const InterpMethod& im);
-
-
-	/**
-	 * @brief           Resampling up to 3D to
-	 *
-	 * @param  f        Resampling factors <1 reduction >1 expansion
-	 * @param  im       Interpolation method @see InterpMethod
-	 */
-	Matrix<T>
-	Resample            (const double& f, const InterpMethod& im) const;
-
-
-	/**
 	 * @brief           MeshGrid
 	 *
 	 * @param  dims     Grid indices (i.e. m(0,0)=minx m(0,1)=maxx, etc)
@@ -2837,6 +2797,5 @@ Matrix<short>::Random () {
 #include "Matrix_ICE.cpp"
 #include "Matrix_FFT.hpp"
 #include "Matrix_Algorithms.hpp"
-#include "Matrix_ITK.cpp"
 
 #endif // __MATRIX_H__

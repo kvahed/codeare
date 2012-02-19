@@ -4,7 +4,7 @@
 ../%SK.cc: ../%.idl
 	omniidl -bcxx $<
 
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H) -I../matrix -I../nfft -I../tinyxml
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../nfft -I../tinyxml
 
 EXTRA_DIST=GPUSimulator.cl
 
@@ -73,15 +73,16 @@ KTPoints_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 KTPoints_la_LIBADD = $(COMMON_la_LIBADD)
 
 RelativeSensitivities_la_SOURCES = RelativeSensitivities.hpp RelativeSensitivities.cpp
-RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
-RelativeSensitivities_la_LIBADD = $(COMMON_la_LIBADD)
+RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG)
+RelativeSensitivities_la_LIBADD = $(COMMON_la_LIBADD) $(INSIGHT_LIB_FLAG) 
+RelativeSensitivities_la_CXXFLAGS = $(AM_CXXFLAGS) $(INC_INSIGHT_H)
 
 AFI_la_SOURCES = AFI.hpp AFI.cpp
 AFI_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 AFI_la_LIBADD = $(COMMON_la_LIBADD)
 
 CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
-CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) $(INSIGHT_LIB_FLAG) 
+CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
 
 DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp
