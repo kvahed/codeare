@@ -161,8 +161,8 @@ AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX],
 AC_CXX_ISNAN_IN_NAMESPACE_STD	       
 AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX
 
-
 AC_HEADER_MAJOR
+
 # Checks for header files.
 AC_CHECK_HEADERS([assert.h],         [], [AC_MSG_ERROR([cannot find assert.h, bailing out])])
 AC_CHECK_HEADERS([ctype.h],          [], [AC_MSG_ERROR([cannot find ctype.h, bailing out])])
@@ -178,7 +178,6 @@ AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/COR
 AC_CHECK_HEADERS([nfft3.h],          [], [AC_MSG_RESULT([cannot find nfft3.h, NuFFT/CGSENSE unavailable!])])
 AC_CHECK_HEADERS([nfft3util.h],      [], [AC_MSG_RESULT([cannot find nfft3util.h, NuFFT/CGSENSE unavailable!])])
 AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
-AC_CHECK_HEADERS([cdf.h],            [], [AC_MSG_RESULT([cannot find cdf.h, cdf dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([nifti1_io.h],      [], [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
@@ -288,12 +287,6 @@ else
 fi
 echo ""
 
-#AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
-AC_CHECK_LIB([cdf],          [CDFcreatezVar], [], [AC_MSG_RESULT([cannot find libcdf, cdf dump / read functionality unavailable!])])
-AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
-
-AM_CONDITIONAL([USE_NFFT3],  [test "$HAVE_NFFT3" -eq 1])
-
 # Time & Co for FFTW cycle
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[
 #if HAVE_SYS_TIME_H
@@ -310,6 +303,10 @@ AC_TRY_LINK([
 #endif
 ], [_rtc()], [AC_DEFINE(HAVE__RTC,1,[Define if you have the UNICOS _rtc() intrinsic.])], [rtc_ok=no])
 AC_MSG_RESULT($rtc_ok)
+
+AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
+
+AM_CONDITIONAL([USE_NFFT3],  [test "$HAVE_NFFT3" -eq 1])
 
 
 # Checks for C++ libraries with name spaces
@@ -389,8 +386,8 @@ AC_SUBST(INC_INSIGHT_H)
 AC_MSG_CHECKING([for itk::Image in ITK])
 OLD_LIBS=$LIBS
 OLD_CXXFLAGS=$CXXFLAGS
-LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
-CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
+#LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
+#CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
 
 AC_TRY_LINK([#include "itkImage.h"],
    [

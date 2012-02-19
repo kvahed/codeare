@@ -6,9 +6,6 @@
 /* Define to 1 if you have the <cblas.h> header file. */
 #undef HAVE_CBLAS_H
 
-/* Define to 1 if you have the <cdf.h> header file. */
-#undef HAVE_CDF_H
-
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 
@@ -65,9 +62,6 @@
 
 /* Define to 1 if you have the `cblas' library (-lcblas). */
 #undef HAVE_LIBCBLAS
-
-/* Define to 1 if you have the `cdf' library (-lcdf). */
-#undef HAVE_LIBCDF
 
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL

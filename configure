@@ -676,6 +676,7 @@ SED
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
+am__nodep
 AMDEPBACKSLASH
 AMDEP_FALSE
 AMDEP_TRUE
@@ -790,7 +791,8 @@ CPP
 CXX
 CXXFLAGS
 CCC
-CXXCPP'
+CXXCPP
+PYTHON'
 
 
 # Initialize some variables set by options.
@@ -1448,6 +1450,7 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
+  PYTHON      the Python interpreter
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -3340,6 +3343,7 @@ fi
 if test "x$enable_dependency_tracking" != xno; then
   am_depcomp="$ac_aux_dir/depcomp"
   AMDEPBACKSLASH='\'
+  am__nodep='_no'
 fi
  if test "x$enable_dependency_tracking" != xno; then
   AMDEP_TRUE=
@@ -4153,6 +4157,7 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
+  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -4212,7 +4217,7 @@ else
 	break
       fi
       ;;
-    msvisualcpp | msvcmsys)
+    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -12211,6 +12216,7 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
+  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -12270,7 +12276,7 @@ else
 	break
       fi
       ;;
-    msvisualcpp | msvcmsys)
+    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -12595,6 +12601,7 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
+  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -12654,7 +12661,7 @@ else
 	break
       fi
       ;;
-    msvisualcpp | msvcmsys)
+    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -16232,6 +16239,8 @@ if test "$python_path" = auto; then
 
 
 
+
+
         if test -n "$PYTHON"; then
       # If the user set $PYTHON, use it and don't search something else.
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $PYTHON version >= 2.7" >&5
@@ -16859,7 +16868,6 @@ $as_echo "#define ISNAN_IN_NAMESPACE_GNU_CXX /**/" >>confdefs.h
 	 fi
 
 
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether sys/types.h defines makedev" >&5
 $as_echo_n "checking whether sys/types.h defines makedev... " >&6; }
 if ${ac_cv_header_sys_types_h_makedev+:} false; then :
@@ -16909,6 +16917,7 @@ fi
 
   fi
 fi
+
 
 # Checks for header files.
 for ac_header in assert.h
@@ -17106,21 +17115,6 @@ _ACEOF
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!" >&5
 $as_echo "cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!" >&6; }
-fi
-
-done
-
-for ac_header in cdf.h
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "cdf.h" "ac_cv_header_cdf_h" "$ac_includes_default"
-if test "x$ac_cv_header_cdf_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_CDF_H 1
-_ACEOF
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find cdf.h, cdf dump / read functionality unavailable!" >&5
-$as_echo "cannot find cdf.h, cdf dump / read functionality unavailable!" >&6; }
 fi
 
 done
@@ -17887,108 +17881,6 @@ else
 fi
 echo ""
 
-#AC_CHECK_LIB([fftw3f],       [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3f, bailing out])])
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for CDFcreatezVar in -lcdf" >&5
-$as_echo_n "checking for CDFcreatezVar in -lcdf... " >&6; }
-if ${ac_cv_lib_cdf_CDFcreatezVar+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcdf  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char CDFcreatezVar ();
-int
-main ()
-{
-return CDFcreatezVar ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_cdf_CDFcreatezVar=yes
-else
-  ac_cv_lib_cdf_CDFcreatezVar=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cdf_CDFcreatezVar" >&5
-$as_echo "$ac_cv_lib_cdf_CDFcreatezVar" >&6; }
-if test "x$ac_cv_lib_cdf_CDFcreatezVar" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBCDF 1
-_ACEOF
-
-  LIBS="-lcdf $LIBS"
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libcdf, cdf dump / read functionality unavailable!" >&5
-$as_echo "cannot find libcdf, cdf dump / read functionality unavailable!" >&6; }
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for nfft_precompute_psi in -lnfft3" >&5
-$as_echo_n "checking for nfft_precompute_psi in -lnfft3... " >&6; }
-if ${ac_cv_lib_nfft3_nfft_precompute_psi+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lnfft3  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char nfft_precompute_psi ();
-int
-main ()
-{
-return nfft_precompute_psi ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_nfft3_nfft_precompute_psi=yes
-else
-  ac_cv_lib_nfft3_nfft_precompute_psi=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_nfft3_nfft_precompute_psi" >&5
-$as_echo "$ac_cv_lib_nfft3_nfft_precompute_psi" >&6; }
-if test "x$ac_cv_lib_nfft3_nfft_precompute_psi" = xyes; then :
-  HAVE_NFFT3=1
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&5
-$as_echo "cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&6; }
-fi
-
-
- if test "$HAVE_NFFT3" -eq 1; then
-  USE_NFFT3_TRUE=
-  USE_NFFT3_FALSE='#'
-else
-  USE_NFFT3_TRUE='#'
-  USE_NFFT3_FALSE=
-fi
-
-
 # Time & Co for FFTW cycle
 ac_fn_cxx_check_type "$LINENO" "hrtime_t" "ac_cv_type_hrtime_t" "
 #if HAVE_SYS_TIME_H
@@ -18043,6 +17935,59 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $rtc_ok" >&5
 $as_echo "$rtc_ok" >&6; }
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for nfft_precompute_psi in -lnfft3" >&5
+$as_echo_n "checking for nfft_precompute_psi in -lnfft3... " >&6; }
+if ${ac_cv_lib_nfft3_nfft_precompute_psi+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lnfft3  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char nfft_precompute_psi ();
+int
+main ()
+{
+return nfft_precompute_psi ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_nfft3_nfft_precompute_psi=yes
+else
+  ac_cv_lib_nfft3_nfft_precompute_psi=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_nfft3_nfft_precompute_psi" >&5
+$as_echo "$ac_cv_lib_nfft3_nfft_precompute_psi" >&6; }
+if test "x$ac_cv_lib_nfft3_nfft_precompute_psi" = xyes; then :
+  HAVE_NFFT3=1
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&5
+$as_echo "cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&6; }
+fi
+
+
+ if test "$HAVE_NFFT3" -eq 1; then
+  USE_NFFT3_TRUE=
+  USE_NFFT3_FALSE='#'
+else
+  USE_NFFT3_TRUE='#'
+  USE_NFFT3_FALSE=
+fi
+
 
 
 # Checks for C++ libraries with name spaces
@@ -18168,8 +18113,8 @@ fi
 $as_echo_n "checking for itk::Image in ITK... " >&6; }
 OLD_LIBS=$LIBS
 OLD_CXXFLAGS=$CXXFLAGS
-LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
-CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
+#LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
+#CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
 
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
