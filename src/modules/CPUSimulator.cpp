@@ -1,4 +1,5 @@
 #include "CPUSimulator.hpp"
+#include "Lapack.hpp"
 
 using namespace RRStrategy;
 
@@ -302,7 +303,7 @@ CPUSimulator::Simulate () {
 	Matrix<float>& jac = *(m_sb->jac);
 	Matrix<cxfl>&  mxy = *(m_sb->mxy);
 	Matrix<float>&  mz = *(m_sb->mz);
-	
+
 	int             np = m_sb->np;
 	float           dt = m_sb->dt;
 	float           tl = m_sb->lambda;
@@ -316,36 +317,40 @@ CPUSimulator::Simulate () {
 	if (m_sb->mode) {                                   // Optimise
 
 		int   iters = 0;
-		float rn = 0.0, an = 0.0;
-		cxfl rtmp = cxfl(0.0,0.0);
+		float rn = 0.0, rno = 0.0, an = 0.0;
+		cxfl  rtmp = cxfl(0.0,0.0);
 		Matrix<cxfl> p, r, q, a;
 
 		p = rf; q = p; r = p;
-		an = pow(p.Norm().real(), 2);
+
+		an = pow(creal(Lapack::Norm(p)), 2.0);
+		rn = an;
 		
 		for (iters = 0; iters < m_sb->cgit; iters++) { 	// CG loop
 			
-			rn = pow(r.Norm().real(), 2);
 			res.push_back(rn/an);
 
-			if (iters) printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
+			if (iters == 0) printf ("                        "); 
+			printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
 			if (res.at(iters) <= m_sb->cgeps) break;    // Convergence?
 
 			SimulateExc (b1, g, p, rv, b0, smxy, roi,  jac, np, dt, true, m_nc, m_nt, m_gdt, mxy, mz); // E^H
 			SimulateAcq (b1, g,    rv, b0,  mxy,  mz, m_ic, np, dt, true, m_nc, m_nt, m_gdt,       q); // E
-			q += p * tl;
+			q += tl * p; // L_2 penalty on solution
+
+			rtmp   = (rn / p.dotc(q));
 			
-			rtmp  = (rn / (p.dotc(q)));
-			//rtmp *= .7;
-
 			if (!iters) 
-				a  = p * rtmp;
+				a  = rtmp * p;
 			else        
-				a += p * rtmp;
+				a += rtmp * p;
+			
+			r     -= rtmp * q;
+			rno    = rn;
+			rn     = pow(creal(Lapack::Norm(r)),2);
 
-			r    -= (q * rtmp);
-			p    *= cxfl (pow(r.Norm().real(), 2)/rn);
-			p    += r;
+			p     *= rn/rno;
+			p     += r;
 			
 		}
 

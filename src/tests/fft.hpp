@@ -22,9 +22,9 @@ fftwtest (Connector<T>* rc) {
 		return false;
 	}
 
-	m.MXDump (mf, "m", "");
-	k.MXDump (mf, "k", "");
-	i.MXDump (mf, "i", "");
+	IO::MXDump (m, mf, "m", "");
+	IO::MXDump (k, mf, "k", "");
+	IO::MXDump (i, mf, "i", "");
 	
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", "");

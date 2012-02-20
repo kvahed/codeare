@@ -36,9 +36,9 @@ resetest (Connector<T>* rc) {
 
     // Read binary data and transmit to backend ------------------                                                                                              
 
-    meas.RAWRead (mef, std::string("VB15"));
+	IO::RAWRead (meas, mef, std::string("VB15"));
     if (use_bet==1)
-        mask.RAWRead (maf, std::string("VB15"));
+		IO::RAWRead (mask, maf, std::string("VB15"));
 
     rc->SetMatrix ("meas", meas);
     rc->SetMatrix ("mask", mask);
@@ -76,12 +76,12 @@ resetest (Connector<T>* rc) {
         return false;
     }
 
-    txm.MXDump  (mf,  "txm", "");
-    rxm.MXDump  (mf,  "rxm", "");
-    snro.MXDump (mf, "snro", "");
-    b0.MXDump   (mf,   "b0", "");
-    bets.MXDump (mf, "bets", "");
-    mask.MXDump (mf, "mask", "");
+	IO::MXDump  (txm, mf,  "txm", "");
+    IO::MXDump  (rxm, mf,  "rxm", "");
+    IO::MXDump (snro, mf, "snro", "");
+    IO::MXDump   (b0, mf,   "b0", "");
+    IO::MXDump (bets, mf, "bets", "");
+    IO::MXDump (mask, mf, "mask", "");
 
     if (matClose(mf) != 0) {
         printf ("Error closing file %s\n",fname.c_str());

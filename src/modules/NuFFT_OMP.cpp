@@ -20,6 +20,7 @@
 
 #include "NuFFT_OMP.hpp"
 #include "OMP.hpp"
+#include "IO.hpp"
 
 using namespace RRStrategy;
 
@@ -139,9 +140,9 @@ NuFFT_OMP::Process () {
 	Matrix<double>& weights = GetRLDB("weights");
 
 	printf ("  Incoming dimensions:\n");
-	printf ("    Data:    %s \n", data.DimsToCString());
-	printf ("    K-Space: %s \n", kspace.DimsToCString());
-	printf ("    Weights: %s \n", weights.DimsToCString());
+	printf ("    Data:    %s \n", IO::DimsToCString(data));
+	printf ("    K-Space: %s \n", IO::DimsToCString(kspace));
+	printf ("    Weights: %s \n", IO::DimsToCString(weights));
 
 	int imgsize = m_N[0] * m_N[1] * m_N[2];
 

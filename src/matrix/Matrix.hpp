@@ -58,6 +58,7 @@ enum InterpMethod {
 #include <time.h>
 #include <limits.h>
 #include <vector>
+#include <ostream>
 
 #define ICE_SHRT_MAX 4095
 
@@ -1210,52 +1211,6 @@ public:
 
 
 
-    /**
-     * @name            Partial copy functions.
-     *                  Functions for access to parts of data.
-     */
-    
-    //@{
-    
-
-    /**
-     * @brief            Operates only on inner 2D: Get a Row of data
-     *  
-     * @param  r         Row
-     * @return           Copy data into new vector
-     */
-    Matrix <T>           
-    Row                  (const size_t r) const;
-	
-    
-    /**
-     * @brief            Operates only on inner 2D: Get a Row of data
-     *  
-     * @param  c         Column
-     * @return           Copy data into new vector
-     */
-    Matrix <T>           
-    Column               (const size_t c) const;
-	
-    /**
-     * @brief            Operates only on inner 3D: Get a slice of data
-     *  
-     * @param  s         Slice
-     * @return           Copy data into new matrix and return
-     */
-    Matrix <T>           
-    Slice                (const size_t s) const;
-	
-    /**
-     * @brief            Operates only on inner 3D: Get a slice of data
-     *  
-     * @param  v         Volume         
-     * @return           Copy data into new matrix and return
-     */
-    Matrix <T>           
-    Volume               (const size_t v) const;
-	
-
 	//@}
     
 	/**
@@ -1301,24 +1256,6 @@ public:
     Width               ()  {return _dim[1];}
     
     
-    /**
-     * @brief           Get number of rows, i.e. tmp = size(this); tmp(1).
-     *
-     * @return          Number of rows.
-     */
-    inline size_t                 
-    m                   () const {return _dim[0];}
-
-
-    /**
-     * @brief           Get number of columns, i.e. tmp = size(this); tmp(2).
-     *
-     * @return          Number of columns.
-     */
-    inline size_t                 
-    n                   () const {return _dim[1];}
-
-
     /**
      * @brief           Get resolution a given dimension.
      *
@@ -1441,6 +1378,21 @@ public:
      * @param  dim      New dimensions
      */
     inline void         
+    Resize              () {
+
+		_M.resize(Size(), T(0));
+
+    }
+    
+
+    /**
+     * @brief           Resize to dims, reallocate and zero repository. 
+	 *                  Needs to becalled after any resize operation on dimensios. 
+	 *                  (i.e. M.Dim(2) = 10; Reset();)
+     *
+     * @param  dim      New dimensions
+     */
+    inline void         
     Reset               (const size_t* dim)                                      {
 
     	for (size_t i = 0; i < INVALID_DIM; i++)
@@ -1492,87 +1444,6 @@ public:
 
     }
     
-
-    /**
-     * @brief           Get the number of matrix cells, i.e. dim_0*...*dim_16.
-     *
-     * @return          Number of cells.
-     */
-    size_t
-    Size                ()                                    const;
-    
-    
-    /**
-     * @brief           Check if we are XD (i.e. X dimensions > 1)
-     *
-	 * @param  d        Dimensions
-     * @return          XD matrix?
-     */
-    bool                
-    IsXD                (const size_t d)                         const;
-    
-    
-    /**
-     * @brief           Check if we are 2D (i.e. COL, LIN)
-     *
-     * @return          2D matrix?
-     */
-    bool                
-    Is1D                ()                                    const;
-    
-    
-    /**
-     * @brief           Check if we are 2D (i.e. COL, LIN)
-     *
-     * @return          2D matrix?
-     */
-    bool                
-    Is2D                ()                                    const;
-    
-    
-    /**
-     * @brief           Check if we are 2D (i.e. COL, LIN)
-     *
-     * @return          2D matrix?
-     */
-    bool                
-    IsZero              ()                                    const;
-    
-    
-    /**
-     * @brief           Check if we are 3D (i.e. COL, LIN, SLC)
-     *
-     * @return          3D matrix?
-     */
-    bool                
-    Is3D                ()                                    const;
-    
-    
-    /**
-     * @brief           Check if we are 4D (i.e. COL, LIN, SLC)
-     *
-     * @return          3D matrix?
-     */
-    bool 
-    Is4D                ()                                    const;
-    
-
-	/**
-	 * @brief           Check if empty
-	 *
-	 * @return          Empty: true;
-	 */
-	bool 
-	Empty               ()                                    const ;
-
-    
-    /**
-     * @brief           Get the number of matrix cells, i.e. Size * sizeof(T).
-     *
-     * @return          Size in RAM in bytes.
-     */
-    size_t                  
-    SizeInRAM           ()                                    const;
 
     //@}
     
@@ -2025,195 +1896,6 @@ public:
     operator<<          (std::ostream &os);
 
 
-    /**
-     * @brief           Print dimensions to STL string.
-     *
-     * @return          Dimension string
-     */
-    std::string       
-    DimsToString        () const;
-    
-
-    /**
-     * @brief           Print dimensions to C string.
-     *
-     * @return          Dimension string
-     */
-    const char*
-    DimsToCString        () const;
-    
-
-    /**
-     * @brief           Print resolutions to STL string.
-     *
-     * @return          Dimension string
-     */
-    std::string       
-    ResToString        () const;
-    
-
-    /**
-     * @brief           Print resolutionss to C string.
-     *
-     * @return          Dimension string
-     */
-    const char*
-    ResToCString        () const;
-    
-
-    /**
-     * @brief           Primitive dump column-major to file.
-     * 
-     * @param  fname    File name.
-     * @return          Success.
-     */
-    bool                
-    PRDump              (const std::string fname) const;
-    
-
-    /**
-     * @brief           Dump to <a href="http://www.hdfgroup.org/HDF5/" target="io">HDF5</a> file.
-     * 
-     * @param  fname    File name.
-	 * @param  dname    Dataset name.
-	 * @param  dloc     Dataset location.
-     * @return          Success.
-     */
-    bool                
-    H5Dump              (const std::string fname, const std::string dname = "", const std::string dloc = "/") const;
-    
-
-    /**
-     * @brief           Read from <a href="http://www.hdfgroup.org/HDF5/" target="io">HDF5</a> file.
-     *
-     * @param  fname    File name.
-	 * @param  dname    Dataset name.
-	 * @param  dloc     Dataset location.
-     * @return          Success.
-     */
-    bool                
-    H5Read              (const std::string fname, const std::string dname = "", const std::string dloc = "/");
-    
-
-    /**
-     * @brief           Dump to <a href="http://cdf.gsfc.nasa.gov/" target="io">CDF</a> file.
-     * 
-     * @param  fname    File name.
-	 * @param  dname    Dataset name.
-	 * @param  dloc     Dataset location.
-     * @return          Success.
-     */
-    bool                
-    CDFDump             (const std::string fname, const std::string dname = "", const std::string dloc = "/") const;
-    
-
-    /**
-     * @brief           Read from <a href="http://cdf.gsfc.nasa.gov/" target="io">CDF</a> file.
-     *
-     * @param  fname    File name.
-	 * @param  dname    Dataset name.
-	 * @param  dloc     Dataset location.
-     * @return          Success.
-     */
-    bool                
-    CDFRead             (const std::string fname, const std::string dname = "", const std::string dloc = "/");
-    
-
-    /**
-     * @brief           Dump to <a href="http://nifti.nimh.nih.gov/">NIFTI</a> file.
-     * 
-     * @param  fname    File name.
-     * @return          Success.
-     */
-    bool                
-    NIDump              (const std::string fname) const;
-    
-
-    /**
-     * @brief           Read from <a href="http://nifti.nimh.nih.gov/">NIFTI</a> file.
-     *
-     * @param  fname    File name.
-     * @return          Success.
-     */
-    bool                
-    NIRead              (const std::string fname);
-    
-
-#ifdef HAVE_MAT_H
-
-    /**
-     * @brief           Dump to <a href="http://www.mathworks.com">MATLAB</a> file.
-     * 
-     * @param  file     File handle.
-	 * @param  dname    Dataset name.
-	 * @param  dloc     Dataset location.
-     * @return          Success.
-     */
-    bool                
-    MXDump              (MATFile* file, const std::string dname = "", const std::string dloc = "/") const;
-    
-
-    /**
-     * @brief           Dump to <a href="http://www.mathworks.com">MATLAB</a> file.
-     * 
-     * @param  fname    File name.
-	 * @param  dname    Dataset name.
-	 * @param  dloc     Dataset location.
-     * @return          Success.
-     */
-    bool                
-    MXDump              (const std::string fname, const std::string dname = "", const std::string dloc = "/") const;
-    
-
-    /**
-     * @brief           Read from <a href="http://www.mathworks.com">MATLAB</a> file.
-     *
-     * @param  fname    File name.
-	 * @param  dname    Dataset name.
-	 * @param  dloc     Dataset location.
-     * @return          Success.
-     */
-    bool                
-    MXRead              (const std::string fname, const std::string dname = "", const std::string dloc = "/");
-
-#endif    
-
-    /**
-     * @brief           Dump matrix to file.
-     * 
-     * @param  fname    File name.
-	 * @param  dname    Dataset name.
-	 * @param  dloc     Dataset location.
-	 * @param  ios      IO strategy (HDF5, MATLAB, NIFTI, primitive)
-     * @return          Success.
-     */
-    bool                
-    Dump                (const std::string fname, const std::string dname = "", const std::string dloc = "/", const io_strategy ios = HDF5) const ;
-    
-
-    /**
-     * @brief           Read matrix from file.
-     *
-     * @param  fname    File name.
-	 * @param  dname    Dataset name.
-	 * @param  dloc     Dataset location.
-	 * @param  ios      IO strategy (HDF5, MATLAB, NIFTI, SYNGO)
-     * @return          Success.
-     */
-    bool                
-    Read                (const std::string& fname, const std::string& dname = "", const std::string& dloc = "/", const io_strategy& ios = HDF5);
-
-    
-	/**
-	 * @brief           Read from <a href="http://www.medical.siemens.com/">Syngo MR</a> meas file
-	 *
-	 * @param  fname    File name
-	 * @param  version  File version
-	 * @return          Success
-	 */
-	bool
-	RAWRead             (const std::string& fname, const std::string& version);
-
     //@}
     
     
@@ -2337,7 +2019,8 @@ public:
     T                   
     Minabs              ();
     
-    /**
+
+	/**
      * @brief           Matrix Product.
      *
 	 * @param   M       The factor
@@ -2357,6 +2040,21 @@ public:
     Matrix<T>           
     prodt               (Matrix<T> &M);
     
+
+	/**
+     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines CDOTU and DDOT
+     *
+     * @param  M        Factor
+     */
+	T
+    dotc (Matrix<T>& M);
+    
+	T
+    dotu (Matrix<T>& M);
+    
+	T
+    dot (Matrix<T>& M);
+    
     /**
      * @brief           Transposition / Complex conjugation and transposition.
      *
@@ -2365,88 +2063,24 @@ public:
     Matrix<T>           
     tr   ()             const;
     
-    /**
-     * @brief           ND Hann window
-     *
-     * @return          FFT shift.
-     */
-    Matrix<T>           
-    HannWindow          (const size_t d = 0)            const;
 
-    /**
-     * @brief           Sum of squares. 
-     *
-	 * @param  d        Dimension to eliminate. <br/>If not given, it is done over the outermost
-     * @return          Sum of squares
-     */
-	Matrix<T>
-    SOS                 (const size_t d = 0)           const;
-    
-	
+	/**
+	 * @brief           Number of elements
+	 *
+	 * @return          Size
+	 */
+	inline size_t
+	Size() const {
+		
+		long size = 1;
+		
+		for (size_t i = 0; i < INVALID_DIM; i++)
+			size *= _dim[i];
+		
+		return size;
+		
+	}
 
-    /**
-     * @brief           Sum of squares on itself. 
-     *
-	 * @param  d        Dimension to eliminate. <br/>If not given, it is done over the outermost
-     * @return          Sum of squares
-     */
-	void
-    SOS                 (const size_t d = 0);
-    
-
-    /**
-     * @brief           Mean along any dimension 
-     *
-	 * @param  d        Dimension to eliminate. If not given, done over the outermost
-     * @return          Mean
-     */
-	Matrix<T>
-    Mean                (const size_t d = 0)           const;
-    
-
-    /**
-     * @brief           Mean of this along any dimension  
-     *
-	 * @param  d        Dimension to eliminate. If not given, done over the outermost
-     * @return          Mean
-     */
-	void
-    Mean                (const size_t d = 0);
-    
-
-    /**
-     * @brief           Mean along any dimension 
-     *
-	 * @param  d        Dimension to eliminate. If not given, done over the outermost
-     * @return          Mean
-     */
-	Matrix<T>
-    Sum                 (const size_t d = 0)           const;
-    
-
-    /**
-     * @brief           Mean of this along any dimension  
-     *
-	 * @param  d        Dimension to eliminate. If not given, done over the outermost
-     * @return          Mean
-     */
-	void
-    Sum                 (const size_t d = 0);
-    
-
-    /**
-     * @brief           Squeeze dimensions
-     */
-	void
-    Squeeze             ();
-    
-
-    /**
-     * @brief           Squeeze dimensions
-     */
-	Matrix<T>
-    Squeeze             () const ;
-    
 
 	/**
 	 * @brief           Subscript of 1st dimension from index
@@ -2499,47 +2133,6 @@ public:
 	Ind2x               (const size_t& ind, const size_t& dim) const;
 
 
-	/**
-	 * @brief           Highest occupied dimension
-	 *
-	 * @return 
-	 */
-	size_t
-	HDim                () const;
-
-
-	/**
-	 * @brief           Print dimension to std out
-	 *
-	 * @return
-	 */
-	void
-	PrintDims           () const;
-
-
-    /**
-     * @brief           Euclidean norm using <a href="http://www.netlib.org/blas/">BLAS</a> routines xNRM2.
-     *
-     * @return          Norm
-     */
-	T
-    Norm ()             const;
-    
-
-    /**
-     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines CDOTU and DDOT
-     *
-     * @param  M        Factor
-     */
-	T
-    dotc (Matrix<T>& M) const;
-    
-	T
-    dotu (Matrix<T>& M) const;
-    
-	T
-    dot (Matrix<T>& M) const;
-    
     //@}
 
 
@@ -2563,99 +2156,85 @@ private:
 };
 
 
-template <class T> inline Matrix<T> 
-Matrix<T>::Volume (const size_t s) const {
-    
-	assert (Is4D());
-    
-    Matrix<T> res;
+template<class T> inline size_t
+Matrix<T>::Ind2i  (const size_t& ind) const { 
+	return (size_t) ind % _dim[0];                 
+}
 
-	for (size_t j = 0; j < 3; j++)
-		res.Dim(j) = _dim[j];
 
-	res.Reset();
+template<class T> inline size_t
+Matrix<T>::Ind2j  (const size_t& ind) const { 
+	return (size_t) floor (ind/_dim[0]) % (_dim[1]-1);
+}
 
-	size_t nc = _dim[0]*_dim[1]*_dim[2];
 
-	memcpy (&res[0], &_M[s * nc], nc * sizeof(T));
+template<class T> inline size_t
+Matrix<T>::Ind2k  (const size_t& ind) const { 
+	return (size_t) floor (ind/(_dim[0]*_dim[1])) % (_dim[2]-1);
+}
 
-	return res;
+
+template<class T> inline size_t
+Matrix<T>::Ind2l  (const size_t& ind) const { 
+	return (size_t) floor (ind/(_dim[0]*_dim[1]*_dim[2])) % (_dim[3]-1);
+}
+
+
+template<class T> inline size_t
+Matrix<T>::Ind2x (const size_t& ind, const size_t& dim) const { 
+	
+	size_t x = 1;
+
+	for (size_t i = 1; i < dim+1; i++)
+		x *= _dim[i-1]; 
+	
+	x = (size_t) floor((double)ind/(double)x) % (_dim[dim]);
+
+	return (x);
 
 }
 
 
-template <class T> inline Matrix<T> 
-Matrix<T>::Slice (const size_t s) const {
-    
-	assert (Is3D());
-    
-    Matrix<T> res;
+template<class T> Matrix<size_t>
+Matrix<T>::Ind2Sub2D (const Matrix<size_t>& inds) const {
+	
+	Matrix<T>      tmp = this->Squeeze();
+	Matrix<size_t> subs (inds.Size(), 2);
+	
+	for(size_t i=0; i < subs.Width(); i++)
+		for(size_t j=0; j < subs.Height() ; j++)
+			subs(j,i) = Ind2x(inds(j), i);
 
-	for (size_t j = 0; j < 2; j++)
-		res.Dim(j) = _dim[j];
-
-	res.Reset();
-
-	size_t nc = _dim[0]*_dim[1];
-
-	memcpy (&res[0], &_M[s * nc], nc*sizeof(T));
-
-	return res;
+	return subs; 
 
 }
 
 
-template <class T> inline Matrix<T> 
-Matrix<T>::Row (const size_t r)  const {
+template <class T> inline Matrix<size_t>
+Matrix<T>::Ind2Sub3D (const Matrix<size_t>& inds) const {
+	
+	Matrix <size_t> subs (inds.Size(), 3);
+	
+	for(size_t i=0; i < subs.Width(); i++)
+		for(size_t j=0; j < subs.Height() ; j++)
+			subs(j,i) = Ind2x(inds(j), i);
 
-	assert (Is2D());
-    
-    Matrix<T> res;
-
-	res.Dim(0) = _dim[1];
-	res.Reset();
-
-	for (size_t i = 0; i < _dim[1]; i++)
-		res[i] = _M[r + i*_dim[0]];
-
-	return res;
+	return subs; 
 
 }
 
 
-template <class T> inline Matrix<T> 
-Matrix<T>::Column (const size_t c) const {
-    
-    Matrix<T> res;
+template <class T> inline Matrix<size_t>
+Matrix<T>::Sub2Ind  (const Matrix<size_t>& subs) const {
 
-	res.Dim(0) = _dim[0];
-	res.Reset();
+	size_t n = subs.Dim(0);
 
-	memcpy (&res[0], _M[c*_dim[0]], _dim[0] * sizeof(T));
+	Matrix<size_t> inds (n);
 
-	return res;
+	/*for (int i = 0; i < n; i++)
+	  inds[i] = */
 
-}
-
-
-template <class T> inline size_t
-Matrix<T>::Size() const {
-    
-    long size = 1;
-    
-    for (size_t i = 0; i < INVALID_DIM; i++)
-        size *= _dim[i];
-    
-    return size;
-    
-}
-
-
-template <class T> inline size_t 
-Matrix<T>::SizeInRAM() const {
-    
-    return Size() * sizeof(T);
-    
+	return subs; 
 }
 
 
@@ -2789,13 +2368,144 @@ Matrix<short>::Random () {
 
 }
 
+
+#include "Lapack.hpp"
+
+template <class T> Matrix<T> 
+Matrix<T>::prodt (Matrix<T> &M) {
+	
+	return Lapack::GEMM (*this, M, 'C');
+	
+}
+
+
+template <class T> Matrix<T> 
+Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
+	
+	return Lapack::GEMM (*this, M, transa, transb);
+	
+}
+
+
+template<class T>  T 
+Matrix<T>::dotc (Matrix<T>& M)  {
+
+	return Lapack::dotc (*this, M);
+	
+}
+
+template<class T>  T 
+Matrix<T>::dotu (Matrix<T>& M)  {
+
+	return Lapack::dotu (*this, M);
+	
+}
+
+template<class T>  T 
+Matrix<T>::dot (Matrix<T>& M)  {
+	
+	return Lapack::dot  (*this, M);
+	
+}
+
+
+template <class T> std::ostream& 
+operator<< (std::ostream& os, Matrix<T>& M) {
+	
+	M.Print(os);
+	return os;
+	
+}
+
+template<> inline std::ostream&  
+Matrix<size_t>::Print (std::ostream &os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%i ", (int)_M [i + j * _dim[COL]]);
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+template<> inline std::ostream&  
+Matrix<short>::Print (std::ostream &os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%i ", _M [i + j * _dim[COL]]);
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+template<> inline std::ostream&  
+Matrix<double>::Print (std::ostream &os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%+.4f ", _M [i + j * _dim[COL]]);
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+template<> inline std::ostream&  
+Matrix<float>::Print (std::ostream &os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%+.4f ", _M [i + j * _dim[COL]]);
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+template<> inline std::ostream&  
+Matrix<cxfl>::Print (std::ostream& os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%+.4f+%+.4fi ", _M [i + j * _dim[COL]].real(), _M [i + j * _dim[COL]].imag());
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+template<> inline std::ostream&  
+Matrix<cxdb>::Print (std::ostream& os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%+.4f+%+.4fi ", _M [i + j * _dim[COL]].real(), _M [i + j * _dim[COL]].imag());
+		printf("\n");
+	}
+	
+	return os;
+	
+}
+
+
+
+
 #include "Matrix_Constructors.hpp"
-#include "Matrix_IO.cpp"
-//#include "Matrix_Lapack.cpp"
 #include "Matrix_Operators.cpp"
-#include "Matrix_BLAS.cpp"
 #include "Matrix_ICE.cpp"
-#include "Matrix_FFT.hpp"
-#include "Matrix_Algorithms.hpp"
+//#include "Matrix_FFT.hpp"
 
 #endif // __MATRIX_H__

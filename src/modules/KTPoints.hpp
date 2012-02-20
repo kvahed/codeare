@@ -22,6 +22,8 @@
 #define __KT_POINTS_HPP__
 
 #include "ReconStrategy.hpp"
+#include "Lapack.hpp"
+#include "Toolbox.hpp"
 
 /**
  * @brief Reconstruction startegies
@@ -105,14 +107,14 @@ namespace RRStrategy {
  * @param  nrmse    Returned NRMSE
  */
 inline void
-NRMSE                         (const Matrix<cxfl>& target, const Matrix<cxfl>& result, const int& iter, float& nrmse) {
+NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result, const int& iter, float& nrmse) {
 
     float q = 0.0;
     
     for (int i=0; i < target.Size(); i++)
         q += pow(abs(target[i]) - abs(result[i]), 2);
     
-    q = sqrt(q)/target.Norm().real();
+    q = sqrt(q)/creal(Lapack::Norm(target));
     
 	if (iter % 5 == 0 && iter > 0)
 		printf ("\n");

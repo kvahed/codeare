@@ -25,6 +25,8 @@
 #include "ReconStrategy.hpp"
 #include "FFT.hpp"
 #include "Lapack.hpp"
+#include "Toolbox.hpp"
+#include "IO.hpp"
 
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
@@ -171,7 +173,10 @@ FTVolumes (Matrix<cxfl>& r) {
 	int          threads = 1;
 	
 	// Hann window for iFFT
-	Matrix<cxfl> hann    = Matrix<cxfl>::Ones (r.Dim(0), r.Dim(1), r.Dim(2)).HannWindow();
+	Matrix<size_t> size  = Matrix<size_t> (3,1);
+	size[0] = r.Dim(0); size[1] = r.Dim(1); size[2] = r.Dim(2);
+
+	Matrix<cxfl> hann    = FFT::HannWindow (size);
 	
 	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r.Dim(0), (int)r.Dim(1), (int)r.Dim(2)); fflush(stdout);
 
@@ -263,8 +268,8 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	ticks  tic = getticks();
 	Matrix<cxfl> tmp;
 	
-	tmp = imgs.Mean(4);
-	tmp.Squeeze();
+	tmp = Algos::Mean(imgs,4);
+	tmp = Algos::Squeeze(tmp);
 	
 	size_t nc = tmp.Dim(4);                           // Number of channels
 	size_t np = tmp.Dim(0) * tmp.Dim(1) * tmp.Dim(2); // Number of pixels
@@ -301,7 +306,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
  * @brief In-out Images/mask
  */
 RRSModule::error_code
-SegmentBrain (const Matrix<double>& img, Matrix<short>& msk) {
+SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	
 	printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
 	
@@ -311,7 +316,7 @@ SegmentBrain (const Matrix<double>& img, Matrix<short>& msk) {
 	std::string mask = "mask_mask.nii.gz";
 	std::string cmd  = "/usr/local/bin/mask.sh";
 	
-	img.NIDump(orig);
+	IO::NIDump(img, orig);
 	printf ("exporting ... "); fflush(stdout);
 	
 	if (!std::system(NULL))
@@ -322,7 +327,7 @@ SegmentBrain (const Matrix<double>& img, Matrix<short>& msk) {
 	int i = system (cmd.c_str());
 	
 	printf ("importing ... "); fflush(stdout);
-	msk.NIRead(mask);
+	IO::NIRead(msk, mask);
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 

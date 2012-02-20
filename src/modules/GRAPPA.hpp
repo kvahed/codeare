@@ -22,6 +22,8 @@
 #define __GRAPPA_HPP__
 
 #include "ReconStrategy.hpp"
+#include "IO.hpp"
+#include "Toolbox.hpp"
 
 
 /**
@@ -126,7 +128,7 @@ namespace RRStrategy {
 
 		//Grappa pattern for standard kernel 5x4
 		Matrix<double> p = Matrix<double>::Zeros ((kern_dim[1]-1)*R[1]+1, kern_dim[0], nc);
-		printf ("  patch size in ACS: %s\n", p.DimsToCString());
+		printf ("  patch size in ACS: %s\n", IO::DimsToCString(p));
 		
 		// Source points
 		for (int lin = 0; lin < kern_dim[1]; lin++)
@@ -139,7 +141,7 @@ namespace RRStrategy {
 			p(ceil(p.Dim(0)/2), lin) = -1.0;
 			
 
-		printf ("  source matrix size %s\n", s.DimsToCString());
+		printf ("  source matrix size %s\n", IO::DimsToCString(s));
 
 		int ni  = acs_dim[0] - d[0];
 		int nj  = acs_dim[1] - (kern_dim[1]-1) * R[1];

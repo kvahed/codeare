@@ -58,15 +58,15 @@ RelativeSensitivities::Process     () {
 
     // Squeeze matrices ---------------------------
 
-    data.Squeeze();
-    mask.Squeeze();
+	Algos::Squeeze(data);
+	Algos::Squeeze(mask);
 
     printf ("  Data:\n");
-    printf ("    Dimensions: %s \n", data.DimsToCString());
-    printf ("    Reolutions: %s \n", data.ResToCString());
+    printf ("    Dimensions: %s \n", IO::DimsToCString(data));
+    printf ("    Reolutions: %s \n", IO::ResToCString(data));
     printf ("  Mask:\n");
-    printf ("    Dimensions: %s \n", mask.DimsToCString());
-    printf ("    Reolutions: %s \n", mask.ResToCString());
+    printf ("    Dimensions: %s \n", IO::DimsToCString(mask));
+    printf ("    Reolutions: %s \n", IO::ResToCString(mask));
     // -----------------------------------------
 
     // Fourier transform -----------------------
@@ -93,7 +93,8 @@ RelativeSensitivities::Process     () {
 		
         FTVolumes (mask);
         RemoveOS  (mask);
-        mask.SOS (mask.HDim());
+
+		Algos::SOS (mask, Algos::HDim(mask));
         
         Matrix<double> bet(mask.Dim());
         double         tmp = 0.0;

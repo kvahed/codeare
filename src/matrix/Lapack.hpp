@@ -100,7 +100,7 @@ extern "C" {
 }
 
 #include "Matrix.hpp"
-//#include "cblas.h"
+#include "Algos.hpp"
 
 class Lapack {
 
@@ -131,7 +131,7 @@ class Lapack {
 		}
 
 		// 2D 
-		if (!m.Is2D()) {
+		if (!Algos::Is2D(m)) {
 			printf ("EIG Error: Parameter m must be 2D");
 			return -2;
 		}
@@ -218,7 +218,7 @@ class Lapack {
 	SVD (Matrix<T>& A, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
 		
 		// SVD only defined on 2D data
-		if (!A.Is2D())
+		if (!Algos::Is2D(A))
 			return -2;
 
 		int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vcol = 1;
@@ -307,7 +307,7 @@ class Lapack {
 	Inv (Matrix<T>& m) {
 		
 		// 2D 
-		if (!m.Is2D())               printf ("Inv Error: Parameter m must be 2D");
+		if (!Algos::Is2D(m))               printf ("Inv Error: Parameter m must be 2D");
 
 		// Square matrix
 		if (m.Width() != m.Height()) printf ("Inv Error: Parameter m must be square");
@@ -513,6 +513,85 @@ class Lapack {
 		
 	}
 
+
+	template<class T> static T
+	Norm (Matrix<T>& M) {
+		
+		T   res  = T(0);
+		
+		int n    = (int) M.Size();
+		int incx = 1;
+		
+		if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, &M[0], incx);
+		else if (typeid(T) == typeid(  cxdb)) res = cblas_dznrm2 (n, &M[0], incx);
+		else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, &M[0], incx);
+		else if (typeid(T) == typeid( float)) res = cblas_snrm2  (n, &M[0], incx);
+		else {
+			for (int i = 0; i < M.Size(); i++)
+				res += pow(M[i],2.0);
+			sqrt (res);
+		}
+		
+		return res;
+	
+	}
+
+
+
+	template <class T> static T 
+	dotc (Matrix<T>& A, Matrix<T>& B) {
+
+		int n    = (int) A.Size();
+
+		assert (n == B.Size());
+
+		T   res  = T(0.0);
+		int one = 1;
+		
+		if      (typeid(T) == typeid(cxfl)) cblas_cdotc_sub (n, &A[0], one, &B[0], one, &res);
+		else if (typeid(T) == typeid(cxdb)) cblas_zdotc_sub (n, &A[0], one, &B[0], one, &res);
+		
+		return res;
+		
+	}
+
+
+	template <class T> static T 
+	dotu (Matrix<T>& A, Matrix<T>& B) {
+		
+		int n    = (int) A.Size();
+
+		assert (n == B.Size());
+
+		T   res  = T(0.0);
+		int one  = 1;
+		
+		if      (typeid(T) == typeid(cxfl)) cblas_cdotu_sub (n, &A[0], one, &B[0], one, &res);
+		else if (typeid(T) == typeid(cxdb)) cblas_zdotu_sub (n, &A[0], one, &B[0], one, &res);
+		
+		return res;
+
+	}
+
+
+	template <class T> static T 
+	dot  (Matrix<T>& A, Matrix<T>& B) {
+
+		int n    = (int) A.Size();
+
+		assert (n == B.Size());
+
+		T   res  = T(0.0);
+		int one  = 1;
+		
+		if      (typeid(T) == typeid(cxfl))   cblas_cdotu_sub (n, &A[0], one, &B[0], one, &res);
+		else if (typeid(T) == typeid(cxdb))   cblas_zdotu_sub (n, &A[0], one, &B[0], one, &res);
+		else if (typeid(T) == typeid(double)) cblas_ddot_sub  (n, &A[0], one, &B[0], one, &res);
+		else if (typeid(T) == typeid(float))  cblas_sdot_sub  (n, &A[0], one, &B[0], one, &res);
+		
+		return res;
+		
+	}
 
 
 	template<class T> static Matrix<T> 

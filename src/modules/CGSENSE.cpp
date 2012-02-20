@@ -22,7 +22,11 @@
 #include "nfftstub.h"
 #include "Noise.hpp"
 #include "SEM.hpp"
+#include "Toolbox.hpp"
+#include "Lapack.hpp"
+
 #include <math.h>
+
 
 #include <vector>
 
@@ -245,12 +249,12 @@ CGSENSE::Process () {
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
-	an = pow(creal(p.Norm()), 2);
+	an = pow(creal(Lapack::Norm(p)), 2);
 	Matrix<cxfl> a(m_N[0], m_N[1], m_N[2]);
 
 	for (iters = 0; iters < m_cgmaxit; iters++) {
 
-		rn = pow(creal(r.Norm()), 2);
+		rn = pow(creal(Lapack::Norm(r)), 2);
 		res.push_back(rn/an);
 
 		printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
@@ -267,7 +271,7 @@ CGSENSE::Process () {
 		rtmp  = (rn / (p.dotc(q)));
 		a    += (p * rtmp);
 		r    -= (q * rtmp);
-		p    *= cxfl(pow(creal(r.Norm()), 2)/rn);
+		p    *= pow(creal(Lapack::Norm(r)), 2)/rn;
 		p    += r;
 
 		// Verbose out put keeps all intermediate steps ---------------

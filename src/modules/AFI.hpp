@@ -23,6 +23,7 @@
 #define __AFI_HPP__
 
 #include "ReconStrategy.hpp"
+#include "Algos.hpp"
 
 /**
  * @brief Reconstruction startegies
@@ -134,16 +135,16 @@ whitened = ipermute(whitened,new_order);
 
 	void PhaseCombine (const Matrix<cxfl>& img, Matrix<float>& pc) {
 		
-		size_t nc = img.HDim();
+		size_t nc = Algos::HDim(img);
 
-		if (pc.IsZero())
+		if (Algos::IsZero(pc))
 			return;
 
 	}
 
 
 
-	void PhasePreset (const Matrix<cxfl>& afid, const bool& use_real, Matrix<float>& phase) {
+	void PhasePreset (Matrix<cxfl>& afid, const bool& use_real, Matrix<float>& phase) {
 		
 		if (afid.Dim(4) > 1) {
 			
@@ -157,7 +158,7 @@ whitened = ipermute(whitened,new_order);
 				Matrix<float> pc (afid.Dim(0), afid.Dim(1), afid.Dim(2));
 				PhaseCombine (afid, pc);
 
-				afid.SOS(4);
+				Algos::SOS(afid, 4);
 				
 				for (size_t z = 0; z < afid.Dim(2); z++)
 					for (size_t y = 0; y < afid.Dim(1); y++)
@@ -166,7 +167,7 @@ whitened = ipermute(whitened,new_order);
 
 			} else {
 				
-				afid.SOS(4);
+				Algos::SOS(afid, 4);
 				
 			}
 

@@ -81,27 +81,27 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-AFI_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+AFI_la_DEPENDENCIES =
 am_AFI_la_OBJECTS = AFI.lo
 AFI_la_OBJECTS = $(am_AFI_la_OBJECTS)
 AFI_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AFI_la_LDFLAGS) $(LDFLAGS) -o $@
-CGSENSE_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+CGSENSE_la_DEPENDENCIES =
 am_CGSENSE_la_OBJECTS = CGSENSE.lo
 CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
 CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
-CompressedSensing_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+CompressedSensing_la_DEPENDENCIES =
 am_CompressedSensing_la_OBJECTS = CompressedSensing.lo
 CompressedSensing_la_OBJECTS = $(am_CompressedSensing_la_OBJECTS)
 CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_GSL_TRUE@am_CompressedSensing_la_rpath = -rpath $(libdir)
-DirectMethod_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+DirectMethod_la_DEPENDENCIES =
 am__DirectMethod_la_SOURCES_DIST = DirectMethod.hpp DirectMethod.cpp \
 	SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp \
 	CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp
@@ -112,56 +112,56 @@ DirectMethod_la_OBJECTS = $(am_DirectMethod_la_OBJECTS)
 DirectMethod_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DirectMethod_la_LDFLAGS) $(LDFLAGS) -o $@
-DummyRecon_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+DummyRecon_la_DEPENDENCIES =
 am_DummyRecon_la_OBJECTS = DummyRecon.lo
 DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
 DummyRecon_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DummyRecon_la_LDFLAGS) $(LDFLAGS) -o $@
-DumpToFile_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+DumpToFile_la_DEPENDENCIES =
 am_DumpToFile_la_OBJECTS = DumpToFile.lo
 DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
 DumpToFile_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) -o $@
-GRAPPA_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+GRAPPA_la_DEPENDENCIES =
 am_GRAPPA_la_OBJECTS = GRAPPA.lo
 GRAPPA_la_OBJECTS = $(am_GRAPPA_la_OBJECTS)
 GRAPPA_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GRAPPA_la_LDFLAGS) $(LDFLAGS) -o $@
-GenericRegrid_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+GenericRegrid_la_DEPENDENCIES =
 am_GenericRegrid_la_OBJECTS = GenericRegrid.lo
 GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
 GenericRegrid_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) $(LDFLAGS) -o $@
-KTPoints_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+KTPoints_la_DEPENDENCIES =
 am_KTPoints_la_OBJECTS = KTPoints.lo
 KTPoints_la_OBJECTS = $(am_KTPoints_la_OBJECTS)
 KTPoints_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(KTPoints_la_LDFLAGS) $(LDFLAGS) -o $@
-LapackTests_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+LapackTests_la_DEPENDENCIES =
 am_LapackTests_la_OBJECTS = LapackTests.lo
 LapackTests_la_OBJECTS = $(am_LapackTests_la_OBJECTS)
 LapackTests_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(LapackTests_la_LDFLAGS) $(LDFLAGS) -o $@
-MedianFilter_OMP_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+MedianFilter_OMP_la_DEPENDENCIES =
 am_MedianFilter_OMP_la_OBJECTS = MedianFilter_OMP.lo
 MedianFilter_OMP_la_OBJECTS = $(am_MedianFilter_OMP_la_OBJECTS)
 MedianFilter_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(MedianFilter_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
-NuFFT_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+NuFFT_la_DEPENDENCIES =
 am_NuFFT_la_OBJECTS = NuFFT.lo
 NuFFT_la_OBJECTS = $(am_NuFFT_la_OBJECTS)
 NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_NuFFT_la_rpath = -rpath $(libdir)
-NuFFT_OMP_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+NuFFT_OMP_la_DEPENDENCIES =
 am_NuFFT_OMP_la_OBJECTS = NuFFT_OMP.lo
 NuFFT_OMP_la_OBJECTS = $(am_NuFFT_OMP_la_OBJECTS)
 NuFFT_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -169,8 +169,7 @@ NuFFT_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(NuFFT_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_NuFFT_OMP_la_rpath = -rpath $(libdir)
 am__DEPENDENCIES_1 =
-RelativeSensitivities_la_DEPENDENCIES = $(COMMON_la_LIBADD) \
-	$(am__DEPENDENCIES_1)
+RelativeSensitivities_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_RelativeSensitivities_la_OBJECTS =  \
 	RelativeSensitivities_la-RelativeSensitivities.lo
 RelativeSensitivities_la_OBJECTS =  \
@@ -179,13 +178,13 @@ RelativeSensitivities_la_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(RelativeSensitivities_la_CXXFLAGS) $(CXXFLAGS) \
 	$(RelativeSensitivities_la_LDFLAGS) $(LDFLAGS) -o $@
-SpatialDomain_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+SpatialDomain_la_DEPENDENCIES =
 am_SpatialDomain_la_OBJECTS = SpatialDomain.lo
 SpatialDomain_la_OBJECTS = $(am_SpatialDomain_la_OBJECTS)
 SpatialDomain_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(SpatialDomain_la_LDFLAGS) $(LDFLAGS) -o $@
-SystemCmd_la_DEPENDENCIES = $(COMMON_la_LIBADD)
+SystemCmd_la_DEPENDENCIES =
 am_SystemCmd_la_OBJECTS = SystemCmd.lo
 SystemCmd_la_OBJECTS = $(am_SystemCmd_la_OBJECTS)
 SystemCmd_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -383,7 +382,7 @@ lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
-COMMON_la_LIBADD = ../matrix/libmatrix.la
+#COMMON_la_LIBADD = ../matrix/libmatrix.la
 
 # Libraries
 DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp
