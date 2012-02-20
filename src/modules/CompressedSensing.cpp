@@ -90,11 +90,13 @@ CompressedSensing::Process () {
 	Matrix<double>& pdf   = GetRLDB   ("pdf" );
 	Matrix<double>& mask  = GetRLDB   ("mask");
 	Matrix<cxfl>&   im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
+	Matrix<cxfl>   orig;
 
 	im_dc  = data;
 	im_dc /= pdf;
 
-	im_dc  = FFT::Backward(im_dc);
+	im_dc = FFT::Backward(im_dc);
+	orig  = Matrix<cxfl>(im_dc);
 
 	ma     = im_dc.Maxabs();
 	im_dc /= ma;
@@ -112,6 +114,7 @@ CompressedSensing::Process () {
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	im_dc  = DWT::Backward (im_dc);
+	data   = orig;
 
 	return OK;
 

@@ -240,6 +240,7 @@ CGSENSE::Process () {
 	std::vector<double> res;
 
 	float       rn    = 0.0;
+	float       rno   = 0.0;
 	float       an    = 0.0;
 	raw         rtmp  = raw(0.0,0.0);
 
@@ -249,18 +250,19 @@ CGSENSE::Process () {
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
-	an = pow(creal(Lapack::Norm(p)), 2);
+	an = pow(creal(Lapack::Norm(p)), 2); 
+	rn = an;
+
 	Matrix<cxfl> a(m_N[0], m_N[1], m_N[2]);
 
 	for (iters = 0; iters < m_cgmaxit; iters++) {
 
-		rn = pow(creal(Lapack::Norm(r)), 2);
 		res.push_back(rn/an);
 
 		printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
 
 		// Convergence ? ----------------------------------------------
-		if (std::isnan(res.at(iters)) || res.at(iters) <= m_cgeps) break;
+		if (res.at(iters) <= m_cgeps) break;
 
 		// EHE --------------------------------------------------------
 		E  (p,    sens, m_intcor, m_fplan,                              data, m_dim);
@@ -269,9 +271,14 @@ CGSENSE::Process () {
 
 		// Guess new gradient -----------------------------------------
 		rtmp  = (rn / (p.dotc(q)));
-		a    += (p * rtmp);
+
 		r    -= (q * rtmp);
-		p    *= pow(creal(Lapack::Norm(r)), 2)/rn;
+		rno   = rn;
+		rn    = pow(creal(Lapack::Norm(r)), 2);
+		if (std::isnan(rn))	break;
+		
+		a    += (p * rtmp);
+		p    *= rn/rno;
 		p    += r;
 
 		// Verbose out put keeps all intermediate steps ---------------
