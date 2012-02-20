@@ -56,9 +56,8 @@ cstest (Connector<T>* rc) {
 	
 	// Incoming -------------
 	
-	rc->GetMatrix ("data", indata);  // Images
 	rc->GetMatrix ("im_dc", im_dc);  // Images
-	rc->GetMatrix ("orig", im_dc);  // Images
+	rc->GetMatrix ("data", indata);  // Images
 	
 	// ---------------------
 	
