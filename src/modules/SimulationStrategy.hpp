@@ -32,6 +32,7 @@ enum SIM_MODE {
 
 #include "../common.h"
 #include "Matrix.hpp"
+#include "IO.hpp"
 
 namespace RRStrategy {
 	
@@ -84,18 +85,18 @@ namespace RRStrategy {
 				return false;
 			}
 			
-			b1->MXDump   (mf, "b1"  );
-			r->MXDump    (mf, "r"   );
-			b0->MXDump   (mf, "b0"  );
-			g->MXDump    (mf, "g"   );
-			tmxy->MXDump (mf, "tmxy");
-			tmz->MXDump  (mf, "tmz" );
-			smxy->MXDump (mf, "smxy");
-			smz->MXDump  (mf, "smz" );
-			jac->MXDump  (mf, "jac" );
-			rf->MXDump   (mf, "rf"  );
-			mxy->MXDump  (mf, "mxy" );
-			mz->MXDump   (mf, "mz"  );
+			IO::MXDump   (*b1, mf, "b1"  );
+			IO::MXDump    (*r,  mf, "r"   );
+			IO::MXDump   (*b0, mf, "b0"  );
+			IO::MXDump    (*g,  mf, "g"   );
+			IO::MXDump (*tmxy, mf, "tmxy");
+			IO::MXDump  (*tmz, mf, "tmz" );
+			IO::MXDump (*smxy, mf, "smxy");
+			IO::MXDump  (*smz, mf, "smz" );
+			IO::MXDump  (*jac, mf, "jac" );
+			IO::MXDump   (*rf, mf, "rf"  );
+			IO::MXDump  (*mxy, mf, "mxy" );
+			IO::MXDump   (*mz, mf, "mz"  );
 			
 			if (matClose(mf) != 0) {
 				printf ("Error closing file %s\n", odf.c_str());

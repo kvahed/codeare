@@ -108,14 +108,14 @@ namespace RRStrategy {
 
 	Matrix<cxfl> FFWD (const Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
 
-		return FFT::Forward (data);// * mask;
+		return FFT::Forward (data) * mask;
 
 	}
 
 
 	Matrix<cxfl> FBWD (Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
 
-		return FFT::Backward(data/* * mask*/);
+		return FFT::Backward(data * mask);
 
 	}
 
@@ -161,9 +161,6 @@ namespace RRStrategy {
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
 
-		x.MXDump ("x.mat", "x");
-		g.MXDump ("g.mat", "g");
-		
 		om  = x + t * g;
 		om *= CX::Conj(om);
 		om += cgp.l1;
@@ -332,7 +329,7 @@ namespace RRStrategy {
 			dx  = -g1 + dx * bk;
 			k++;
 			
-			float dxn = creal(dx.Norm());
+			float dxn = creal(Lapack::Norm(dx));
 			
 			if ((k > cgp.cgiter) || dxn < cgp.cgconv) break;
 			

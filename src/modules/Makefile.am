@@ -21,7 +21,7 @@ endif
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
-COMMON_la_LIBADD = ../matrix/libmatrix.la
+#COMMON_la_LIBADD = ../matrix/libmatrix.la
 
 # Libraries
 DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp

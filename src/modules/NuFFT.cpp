@@ -19,6 +19,7 @@
  */
 
 #include "NuFFT.hpp"
+//#include "Toolbox.cpp"
 
 using namespace RRStrategy;
 
@@ -151,7 +152,7 @@ NuFFT::Process () {
 	for (int i = 0; i < data.Size(); i++)
 		data[i] = cxfl (m_iplan.f_hat_iter[i][0], m_iplan.f_hat_iter[i][1]);
 	
-	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start));// / Toolbox::Instance()->ClockRate());
 	
 	return error;
 

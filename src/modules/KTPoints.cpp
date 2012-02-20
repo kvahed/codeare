@@ -21,6 +21,7 @@
 #include "KTPoints.hpp"
 #include "PTXINIFile.hpp"
 #include "Lapack.hpp"
+#include "IO.hpp"
 
 using namespace RRStrategy;
 
@@ -141,6 +142,8 @@ KTPoints::Process        () {
 	Matrix<cxfl>&   b1     = GetCXFL("b1");
 	Matrix<short>&  b0     = GetSHRT("b0");
 	Matrix<cxfl>&   target = GetCXFL("target");
+
+	printf ("k: %s\n", IO::DimsToCString(k));
 
 	m_ns = r.Dim(1);
 	m_nk = k.Dim(1);

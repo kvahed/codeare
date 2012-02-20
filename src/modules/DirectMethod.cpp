@@ -42,8 +42,7 @@ DirectMethod::Init () {
     printf ("  CG iters: %.i \n", m_cgiter);
 
     Attribute ("lambda",      &m_lambda);
-    printf ("  Tikhonov factor: %.i \n", m_lambda);
-	m_lambda = 1.0e-6;
+    printf ("  Tikhonov factor: %f \n", m_lambda);
 
     Attribute ("verbose", &m_verbose);
     printf ("  verbose: %s \n", (m_verbose) ? "true" : "false");
@@ -78,7 +77,7 @@ DirectMethod::Finalise() {
 RRSModule::error_code
 DirectMethod::Process     () { 
 
-    printf ("Processing DirectMethod ...\n");
+    printf ("Processing DirectMethod ..."); fflush (stdout);
 
     SimulationBundle sb;
     ticks           start  = getticks();
@@ -95,16 +94,17 @@ DirectMethod::Process     () {
     sb.r     = &GetRLFL ("r");
     sb.jac   = &GetRLFL ("j");
 
-    sb.np    = m_np;
-    sb.mode  = m_mode;
-    sb.dt    = m_dt;
-    sb.v     = m_verbose;
-	sb.cgeps = m_cgeps;
-	sb.cgit  = m_cgiter;
+    sb.np     = m_np;
+    sb.mode   = m_mode;
+    sb.dt     = m_dt;
+    sb.v      = m_verbose;
+	sb.cgeps  = m_cgeps;
+	sb.cgit   = m_cgiter;
 	sb.lambda = m_lambda;
-	sb.cb0   = m_cb0;
+	sb.cb0    = m_cb0;
 
     // Outgoing
+
     AddMatrix ( "rf", sb.rf  = NEW (Matrix<cxfl>  (sb.g->Dim(1), sb.b1->Dim(1))));
     AddMatrix ("mxy", sb.mxy = NEW (Matrix<cxfl>  (           1, sb.r->Dim(1))));
     AddMatrix ( "mz", sb.mz  = NEW (Matrix<float> (           1, sb.r->Dim(1))));
@@ -113,6 +113,7 @@ DirectMethod::Process     () {
     SimulationContext sc (&sb);
 
     // Simulate
+	printf (" simulating ...\n"); fflush(stdout);
     sc.Simulate();
 
     printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());

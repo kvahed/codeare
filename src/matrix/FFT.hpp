@@ -23,6 +23,7 @@
 
 #include <fftw3.h>
 #include "Matrix.hpp"
+#include "Algos.hpp"
 
 /**
  * @brief 1-3D Discrete Cartesian Fourier transform for Matrix template
@@ -60,7 +61,7 @@ public:
 	template <class T> static Matrix<cxfl> 
 	Shift        (const Matrix<T>& m) {
 
-		assert (m.Is1D() || m.Is2D() || m.Is3D());
+		assert (Algos::Is1D(m) || Algos::Is2D(m) || Algos::Is3D(m));
 		
 		Matrix<T> res  = m;
 		
@@ -72,6 +73,10 @@ public:
 		return res;
 
 	}
+
+
+	inline static Matrix<double> 
+	HannWindow (const Matrix<size_t>& size);
 	
 	
 private:

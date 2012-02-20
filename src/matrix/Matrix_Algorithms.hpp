@@ -24,19 +24,16 @@ Matrix<T>::Ind2i  (const size_t& ind) const {
 }
 
 
-
 template<class T> inline size_t
 Matrix<T>::Ind2j  (const size_t& ind) const { 
 	return (size_t) floor (ind/_dim[0]) % (_dim[1]-1);
 }
 
 
-
 template<class T> inline size_t
 Matrix<T>::Ind2k  (const size_t& ind) const { 
 	return (size_t) floor (ind/(_dim[0]*_dim[1])) % (_dim[2]-1);
 }
-
 
 
 template<class T> inline size_t
@@ -78,8 +75,6 @@ Matrix<T>::Ind2Sub2D (const Matrix<size_t>& inds) const {
 template <class T> inline Matrix<size_t>
 Matrix<T>::Ind2Sub3D (const Matrix<size_t>& inds) const {
 	
-	assert(Is2D());
-
 	Matrix <size_t> subs (inds.Size(), 3);
 	
 	for(size_t i=0; i < subs.Width(); i++)
@@ -94,7 +89,7 @@ Matrix<T>::Ind2Sub3D (const Matrix<size_t>& inds) const {
 template <class T> inline Matrix<size_t>
 Matrix<T>::Sub2Ind  (const Matrix<size_t>& subs) const {
 
-	int n = subs.Dim(0);
+	size_t n = subs.Dim(0);
 
 	Matrix<size_t> inds (n);
 
@@ -102,71 +97,6 @@ Matrix<T>::Sub2Ind  (const Matrix<size_t>& subs) const {
 	  inds[i] = */
 
 	return subs; 
-}
-
-
-template<class T> inline bool
-Matrix<T>::Empty () const {
-
-	return (_M.size() == 0);
-
-}
-
-
-template <class T> inline bool 
-Matrix<T>::IsXD (const size_t d) const {
-
-	size_t l = 0;
-
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		if (_dim[i] > 1) l++;
-
-	return (l == d);
-
-}
-
-
-template <class T> inline bool 
-Matrix<T>::Is1D () const {
-	
-	return IsXD(1);
-
-}
-
-
-template <class T> inline bool 
-Matrix<T>::Is2D () const {
-	
-	return IsXD(2);
-
-}
-
-
-template <class T> inline bool 
-Matrix<T>::Is3D () const {
-	
-	return IsXD(3);
-
-}
-
-
-template <class T> inline bool 
-Matrix<T>::Is4D () const {
-	
-	return IsXD(4);
-
-}
-
-
-
-template <class T> inline bool 
-Matrix<T>::IsZero () const {
-	
-	for (size_t i = 0; i < Size(); i++)
-		if (_M[i] != T(0)) return false;
-
-	return true;
-
 }
 
 

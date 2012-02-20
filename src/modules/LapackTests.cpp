@@ -22,6 +22,7 @@
 #include "Lapack.hpp"
 #include "MCGLS.hpp"
 #include "CX.hpp"
+#include "IO.hpp"
 
 using namespace RRStrategy;
 
@@ -206,11 +207,12 @@ LapackTests::Process     () {
 	//std::cout << "sum(A.*A)" <<  z;
 
  #ifdef HAVE_MAT_H
-	A.MXRead("tmp.mat", "EM");
-	b.MXRead("tmp.mat", "PA");
+	
+	IO::MXRead(A, "tmp.mat", "EM");
+	IO::MXRead(b, "tmp.mat", "PA");
 
 	Matrix<cxfl> x = MCGLS::Solve (A, b, 300, 1.0e-6, 1.0);
-	x.MXDump ("x.mat", "x");
+	IO::MXDump(x, "x.mat", "x");
 #endif
 
 

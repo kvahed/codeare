@@ -31,9 +31,10 @@ cstest (Connector<T>* rc) {
 	std::string odf = std::string (base + std::string("/csout.mat"));
 
 #ifdef HAVE_MAT_H	
-	indata.MXRead (df, "data");
-	pdf.MXRead (df, "pdf");
-	mask.MXRead (df, "mask");
+	if (!(IO::MXRead (indata, df, "data") &&
+		  IO::MXRead (pdf,    df, "pdf")  &&
+		  IO::MXRead (mask,   df, "mask")))
+		return false;
 #endif
 
 	rc->ReadConfig (cf.c_str());
@@ -64,6 +65,7 @@ cstest (Connector<T>* rc) {
 	rc->Finalise   (test);
 	
 #ifdef HAVE_MAT_H	
+
 	MATFile* mf = matOpen (odf.c_str(), "w");
 
 	if (mf == NULL) {
@@ -71,14 +73,14 @@ cstest (Connector<T>* rc) {
 		return false;
 	}
 
-	indata.MXDump (mf, "img");
-	im_dc.MXDump (mf, "wvt");
-	im_dc.MXDump (mf, "orig");
+	IO::MXDump (indata, mf, "in");
+	IO::MXDump (im_dc,  mf, "out");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());
 		return false;
 	}
+
 #endif
 	
 	return true;

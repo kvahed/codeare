@@ -19,6 +19,7 @@
  */
 
 #include "CompressedSensing.hpp"
+#include "Toolbox.hpp"
 #include "TVOP.hpp"
 
 using namespace RRStrategy;

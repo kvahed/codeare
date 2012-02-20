@@ -3,6 +3,8 @@
 
 #include "Matrix.hpp"
 
+#include <map>
+
 #ifdef __WIN32__ 
   #include "RRSModule.h"
 #else

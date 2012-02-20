@@ -503,8 +503,6 @@ Matrix<T>::MeshGrid (const Matrix<size_t>& d) {
 
     Matrix<size_t> mg (side[1], side[0], side[2], 3);
 
-	std::cout << mg.DimsToCString() << std::endl;
-
 	for (size_t s = 0; s < side[2]; s++)
 		for (size_t l = 0; l < side[0]; l++)
 			for (size_t c = 0; c < side[1]; c++) {

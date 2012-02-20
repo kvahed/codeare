@@ -19,6 +19,7 @@
  */
 
 #include "Lapack.hpp"
+#include "Toolbox.hpp"
 
 class MCGLS {
 
@@ -56,13 +57,13 @@ public:
 		T         ts;
 
 		float     rn = 0.0;
-		float     xn = pow(p.Norm().real(), 2);
+		float     xn = pow(creal(Lapack::Norm(p)), 2);
 
 		std::vector<double> res;
 
 		for (size_t i = 0; i < maxit; i++) {
 			
-			rn  = pow(r.Norm().real(), 2);
+			rn  = pow(creal(Lapack::Norm(r)), 2);
 			res.push_back(rn/xn);
 
 			if (std::isnan(res.at(i)) || res.at(i) <= conv) break;
@@ -77,7 +78,7 @@ public:
 			ts  = (rn / (p.dotc(q)));
 			x  += (p * ts);
 			r  -= (q * ts);
-			p  *= cxfl(pow(r.Norm().real(), 2)/rn);
+			p  *= pow(creal(Lapack::Norm(r)), 2)/rn;
 			p  += r;
 			
 		}

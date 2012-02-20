@@ -22,6 +22,7 @@
 #define __CGSENSE_HPP__
 
 #include "ReconStrategy.hpp"
+#include "Algos.hpp"
 
 #include "nfft3util.h"
 #include "nfft3.h"
@@ -106,8 +107,7 @@ namespace RRStrategy {
 
 	void IntensityCorrection (const Matrix<cxfl>& sens, Matrix<double>& intcor) {
 
-
-		size_t nc = sens.Dim(sens.HDim());
+		size_t nc = sens.Dim(Algos::HDim(sens));
 		size_t nr = intcor.Size();
 
 #pragma omp parallel default (shared)

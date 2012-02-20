@@ -9,16 +9,16 @@ nitest (Connector<T>* rc) {
 	std::string    nii = std::string (base + std::string("betted2.nii.gz"));
 	
 	Matrix<double> d;
-	d.NIRead (df);
+	IO::NIRead (d, df);
 #ifdef HAVE_MAT_H	
-	d.MXDump (mat, std::string("betted"), std::string(""));
+	IO::MXDump (d, mat, "betted");
 #endif
-	d.NIDump (nii);
+	IO::NIDump (d, nii);
 
 	Matrix<cxfl> slp = Matrix<cxfl>::Phantom3D(196); 
-	slp.NIDump (nii);
+	IO::NIDump (slp, nii);
 #ifdef HAVE_MAT_H	
-	slp.MXDump (mat, std::string("betted"), std::string(""));
+	IO::MXDump (slp, mat, "betted");
 #endif
 
 #else

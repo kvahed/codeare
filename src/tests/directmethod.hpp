@@ -1,3 +1,23 @@
+/*
+ *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
+ *                               Forschungszentrum Juelich, Germany
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but 
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ *  General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+ *  02110-1301  USA
+ */
+
 template <class T> bool 
 dmtest (Connector<T>* rc) {
 
@@ -10,35 +30,36 @@ dmtest (Connector<T>* rc) {
 	Matrix<cxfl>  smxy;
 	Matrix<float> smz;
 	Matrix<float> roi;
-
+	
 	Matrix<float> g;   
 	Matrix<float> j;
 	
 	std::string cf  = std::string (base + std::string(config));
 	std::string odf = std::string (base + std::string("/simout.mat"));
-
+	
 	rc->ReadConfig (cf.c_str());
 	
 	std::string gf = std::string(base + std::string(rc->Attribute("gf"))); // gradient trajectories
 	std::string pf = std::string(base + std::string(rc->Attribute("pf"))); // patterns
 	std::string mf = std::string(base + std::string(rc->Attribute("mf"))); // maps
-
+	
 	// Gradients
 #ifdef HAVE_MAT_H
-	g.MXRead    (gf, rc->Attribute("g"));
-	j.MXRead    (gf, rc->Attribute("j"));
 
+	IO::MXRead    (g, gf, rc->Attribute("g"));
+	IO::MXRead    (j, gf, rc->Attribute("j"));
+	
 	// Target excitation, ROI, sample
-	r.MXRead    (pf, "r");
-	tmxy.MXRead (pf, rc->Attribute("p"));
+	IO::MXRead    (r, pf, "r");
+	IO::MXRead (tmxy, pf, rc->Attribute("p"));
 	tmz  = Matrix<float>::Zeros (r.Dim(1), 1);
 	smxy = Matrix<cxfl>::Zeros  (r.Dim(1), 1);
-	smz.MXRead (pf, rc->Attribute("s"));
-	roi.MXRead (pf, rc->Attribute("roi"));
+	IO::MXRead ( smz, pf, rc->Attribute("s"));
+	IO::MXRead ( roi, pf, rc->Attribute("roi"));
 
 	// Maps
-	b1.MXRead (mf, rc->Attribute("b1"));
-	b0.MXRead (mf, rc->Attribute("b0"));
+	IO::MXRead ( b1, mf, rc->Attribute("b1"));
+	IO::MXRead ( b0, mf, rc->Attribute("b0"));
 #endif	
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
@@ -85,11 +106,11 @@ dmtest (Connector<T>* rc) {
 		return false;
 	}
 
-	mxy.MXDump  (od, "mxy");
-	mz.MXDump   (od, "mz");
-	tmxy.MXDump (od, "tmxy");
-	tmz.MXDump  (od, "tmz");
-	rf.MXDump   (od, "rf");
+	IO::MXDump  (mxy, od, "mxy");
+	IO::MXDump   (mz, od, "mz");
+	IO::MXDump (tmxy, od, "tmxy");
+	IO::MXDump  (tmz, od, "tmz");
+	IO::MXDump   (rf, od, "rf");
 
 	if (matClose(od) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());
