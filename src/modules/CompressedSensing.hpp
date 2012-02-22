@@ -2,6 +2,8 @@
  *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
  *
+ *  Stolen ;) from sparse MRI 0.2 by Michael Lustig
+ *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -40,17 +42,19 @@ namespace RRStrategy {
 	struct CGParam {
 		
 		int    fft;
-		int    pnorm;
 		int    lsiter;
 		int    lsto ;
 		int    cgiter;
 		
+		double pnorm;
 		double tvw;
 		double xfmw;
 		double cgconv;
 		double l1;
 		double lsa;
 		double lsb;
+
+		DWT*   dwt;
 		
 	};
 
@@ -102,6 +106,8 @@ namespace RRStrategy {
 		int            m_csiter; /**< # global iterations */
 
 		CGParam        m_cgparam;
+		int            m_wf;
+		int            m_wm;
 
 	};
 
@@ -142,7 +148,9 @@ namespace RRStrategy {
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
 		
-		om  = ttdbx + t * ttdbg;
+		om  = ttdbx;
+		if (t > 0.0)
+			om += t * ttdbg;
 		om *= CX::Conj(om);
 		om += cgp.l1;
 		om ^= p;
@@ -153,6 +161,7 @@ namespace RRStrategy {
 
 	}
 
+
 	/**
 	 *
 	 */
@@ -161,13 +170,15 @@ namespace RRStrategy {
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
 
-		om  = x + t * g;
+		om  = x;
+		if (t > 0)
+			om += t * g;
 		om *= CX::Conj(om);
 		om += cgp.l1;
 		om ^= p;
 		
 		for (size_t i = 0; i < om.Size(); i++) o += om[i].real();
-		
+
 		return cgp.xfmw * o;
 
 	} 
@@ -179,17 +190,14 @@ namespace RRStrategy {
 					 CGParam&        cgp) {
 		
 		float obj = 0.0;
-		long  sda = 0; 
+		float nnz = (float) Algos::nnz(data); 
 		
 		obj  =              Obj    (ffdbx, ffdbg, data, t);
+		rmse = sqrt(obj/nnz);
+		
 		obj += (cgp.tvw)  ? ObjTV  (ttdbx, ttdbg, t, cgp) : 0.0;
 		obj += (cgp.xfmw) ? ObjXFM (x,     g,     t, cgp) : 0.0;
-		
-		for (size_t i = 0; i < data.Size(); i++)
-			sda += (cabs(data[i]) > 0) ? 1 : 0;
-		
-		rmse = sqrt(obj/(float)sda);
-		
+
 		return obj;
 
 	}
@@ -201,9 +209,9 @@ namespace RRStrategy {
 		
 		Matrix<cxfl> g = x;
 		
-		g  = FFWD (DWT::Backward (g), mask);
+		g  = FFWD (cgp.dwt->Adjoint (g), mask);
 		g -= data;
-		g  = DWT::Forward (FBWD (g, mask));
+		g  = cgp.dwt->Trafo (FBWD (g, mask));
 
 		return (2.0 * g);
 
@@ -234,7 +242,7 @@ namespace RRStrategy {
 	 */
 	Matrix<cxfl> GradTV    (const Matrix<cxfl>& x, const CGParam& cgp) {
 
-		Matrix<cxfl> dx = TVOP::Transform(DWT::Backward(x));
+		Matrix<cxfl> dx = TVOP::Transform(cgp.dwt->Adjoint(x));
 		Matrix<cxfl> g  = dx * CX::Conj(dx);
 
 		g += cxfl(cgp.l1);
@@ -244,7 +252,7 @@ namespace RRStrategy {
 			g[i] *= dx[i]; 
 
 		g *= cxfl(cgp.pnorm);
-		g  = DWT::Forward(TVOP::Adjoint(g));
+		g  = cgp.dwt->Trafo (TVOP::Adjoint(g));
 
 		return (cgp.tvw * g);
 
@@ -272,7 +280,7 @@ namespace RRStrategy {
 
 		int          k  = 0;
 		float        t0 = 1.0, t = 1.0, z = 0.0;
-
+		float        xn = creal(Lapack::Norm(x));
 		float        rmse, bk;
 
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg;
@@ -284,12 +292,12 @@ namespace RRStrategy {
 
 			t = t0;
 
-			ffdbx = FFWD (DWT::Backward ( x), mask);
-			ffdbg = FFWD (DWT::Backward (dx), mask);
+			ffdbx = FFWD (cgp.dwt->Adjoint ( x), mask);
+			ffdbg = FFWD (cgp.dwt->Adjoint (dx), mask);
 			
 			if (cgp.tvw) {
-				ttdbx = TVOP::Transform (DWT::Backward( x));
-				ttdbg = TVOP::Transform (DWT::Backward(dx));
+				ttdbx = TVOP::Transform (cgp.dwt->Adjoint ( x));
+				ttdbg = TVOP::Transform (cgp.dwt->Adjoint (dx));
 			}
 			
 			float f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
@@ -307,7 +315,7 @@ namespace RRStrategy {
 				
 			} while (i < cgp.lsiter);
 			
-			printf ("    %02i - nrms: %1.4f, l-search: %i\n", k, rmse, i);
+			printf ("    %02i - nrms: %1.7f, l-search: %i, ", k, rmse, i); fflush (stdout);
 
 			if (i == cgp.lsiter) {
 				printf ("Reached max line search, exiting... \n"); 
@@ -329,14 +337,16 @@ namespace RRStrategy {
 			dx  = -g1 + dx * bk;
 			k++;
 			
-			float dxn = creal(Lapack::Norm(dx));
+			float dxn = creal(Lapack::Norm(dx))/xn;
 			
+			printf ("dxnrm: %0.4f\n", dxn);
+
 			if ((k > cgp.cgiter) || dxn < cgp.cgconv) break;
 			
 		} while (true);
 		
 	}
-	
+
 	
 }
 #endif /* __COMPRESSED_SENSING_H__ */

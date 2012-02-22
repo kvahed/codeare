@@ -20,11 +20,40 @@
 
 #include "DWT.hpp"
 
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_wavelet2d.h>
+DWT::DWT (const size_t& sl, const wlfamily& wf, const size_t& wm) {
+
+	// Checks missing !!!
+
+	m_wf = wf;
+
+	if (m_wf > ID) {
+
+		m_sl   = sl;
+		m_sz   = sl*sl;
+		
+		m_w    = gsl_wavelet_alloc (gsl_wavelet_daubechies, wm);
+		m_work = gsl_wavelet_workspace_alloc (m_sz);
+		
+		m_re = (double*) malloc (m_sz * sizeof(double));
+		m_im = (double*) malloc (m_sz * sizeof(double));
+
+	}
+
+}
+
+
+DWT::~DWT () {
+
+	free (m_re);
+	free (m_im);
+
+	gsl_wavelet_workspace_free (m_work);
+
+}
+
 
 Matrix<cxfl> 
-DWT::Forward (const Matrix<cxfl>& m) {
+DWT::Trafo (const Matrix<cxfl>& m) const {
 
 	return Transform (m, false);
 
@@ -32,7 +61,7 @@ DWT::Forward (const Matrix<cxfl>& m) {
 
 
 Matrix<cxfl> 
-DWT::Backward (const Matrix<cxfl>& m) {
+DWT::Adjoint (const Matrix<cxfl>& m) const {
 
 	return Transform (m, true);
 
@@ -40,47 +69,43 @@ DWT::Backward (const Matrix<cxfl>& m) {
 
 
 Matrix<cxfl> 
-DWT::Transform (const Matrix<cxfl>& m, const bool bw) {
-
+DWT::Transform (const Matrix<cxfl>& m, const bool& bw) const {
+	
 	Matrix<cxfl> res = m;
-
-	gsl_wavelet           *w    = gsl_wavelet_alloc (gsl_wavelet_daubechies, 4);
-	gsl_wavelet_workspace *work = gsl_wavelet_workspace_alloc (res.Size());
 	
-	double* re = (double*) malloc (res.Size()*sizeof(double));
-	double* im = (double*) malloc (res.Size()*sizeof(double));
-	size_t  l  = res.Dim(0); // Needs to be power of 2 and quadratic
-	
-	for (size_t j = 0; j < l; j++)
-		for (size_t i = 0; i < l; i++) {
-			re [i*l+j] = res.At(j*l+i).real();
-			im [i*l+j] = res.At(j*l+i).imag();
-		}
-	
-	if (bw) {
-
-		if (!(gsl_wavelet2d_nstransform_inverse (w, re, l, l, l, work) == GSL_SUCCESS))
-			printf ("Wavelet transform for real part failed\n.");
-		if (!(gsl_wavelet2d_nstransform_inverse (w, im, l, l, l, work) == GSL_SUCCESS))
-			printf ("Wavelet transform for imaginary part failed\n.");
-
-	} else {
-
-		if (!(gsl_wavelet2d_nstransform_forward (w, re, l, l, l, work) == GSL_SUCCESS))
-			printf ("Wavelet transform for real part failed\n.");
-		if (!(gsl_wavelet2d_nstransform_forward (w, im, l, l, l, work) == GSL_SUCCESS))
-			printf ("Wavelet transform for imaginary part failed\n.");
-	}
+	if (m_wf > ID) {
 		
-	for (size_t j = 0; j < l; j++)
-		for (size_t i = 0; i < l; i++) 
-			res.At(j*l+i) = cxfl(re[i*l+j],im [i*l+j]);
+		// Checks missing !!!
+		
+		for (size_t j = 0; j < m_sl; j++)
+			for (size_t i = 0; i < m_sl; i++) {
+				m_re [i*m_sl+j] = res.At(j*m_sl+i).real();
+				m_im [i*m_sl+j] = res.At(j*m_sl+i).imag();
+			}
+		
+		if (bw) {
+			
+			if (!(gsl_wavelet2d_nstransform_inverse (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+				printf ("Wavelet transform for real part failed\n.");
+			if (!(gsl_wavelet2d_nstransform_inverse (m_w, m_im, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+				printf ("Wavelet transform for imaginary part failed\n.");
+			
+		} else {
+			
+			if (!(gsl_wavelet2d_nstransform_forward (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+				printf ("Wavelet transform for real part failed\n.");
+			if (!(gsl_wavelet2d_nstransform_forward (m_w, m_im, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+				printf ("Wavelet transform for imaginary part failed\n.");
+		}
+		
+		for (size_t j = 0; j < m_sl; j++)
+			for (size_t i = 0; i < m_sl; i++) 
+				res.At(j*m_sl+i) = cxfl(m_re[i*m_sl+j],m_im [i*m_sl+j]);
+		
+	}
 	
-	free (re);
-	free (im);
-
-	gsl_wavelet_workspace_free (work);
-
 	return res;
-
+	
 }
+
+

@@ -22,17 +22,17 @@ ktptest (Connector<T>* rc) {
 	IO::Read       (k, df, "k");
 	IO::Read       (r, df, "r");
 
-	rc->SetMatrix    ("target", target);
-	rc->SetMatrix    ("b1",     b1);
-	rc->SetMatrix    ("r",      r);
-	rc->SetMatrix    ("k",      k);
-	rc->SetMatrix   ("b0",     b0);
+	rc->SetMatrix ("target", target);
+	rc->SetMatrix ("b1",     b1);
+	rc->SetMatrix ("r",      r);
+	rc->SetMatrix ("k",      k);
+	rc->SetMatrix ("b0",     b0);
 	
 	rc->Process    (test);
 	
-	rc->GetMatrix    ("target", target);
-	rc->GetMatrix    ("b1",     b1);
-	rc->GetMatrix    ("r",      r);
+	rc->GetMatrix ("target", target);
+	rc->GetMatrix ("b1",     b1);
+	rc->GetMatrix ("r",      r);
 
 	rc->Finalise(test);
 	
