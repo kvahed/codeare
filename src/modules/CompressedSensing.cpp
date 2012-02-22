@@ -36,18 +36,12 @@ CompressedSensing::Init () {
 	int wli = 0;
 	int m_fft = 0;
 
-	Attribute ("dim",     &m_dim);
-	Attribute ("Nx",      &m_N[0]);
-	Attribute ("Ny",      &m_N[1]);
-	Attribute ("Nz",      &m_N[2]);
-    printf ("  Geometry: %iD (%i,%i,%i)\n", m_dim, m_N[0], m_N[1], m_N[2]);
-	
 	Attribute ("tvw",     &m_cgparam.tvw);
 	Attribute ("xfmw",    &m_cgparam.xfmw);
 	Attribute ("l1",      &m_cgparam.l1);
 	Attribute ("pnorm",   &m_cgparam.pnorm);
     printf ("  Weights: TV(%.4f) XF(%.4f) L1(%.4f)\n", m_cgparam.tvw, m_cgparam.xfmw, m_cgparam.l1);
-    printf ("  Pnorm: %i\n", m_cgparam.pnorm);
+    printf ("  Pnorm: %f\n", m_cgparam.pnorm);
 	
 	Attribute ("fft",     &m_cgparam.fft);
 	printf ("  FFT class: ");
@@ -60,6 +54,13 @@ CompressedSensing::Init () {
 	printf ("\n");
 
 	Attribute ("csiter", &m_csiter);
+	Attribute ("wl_family", &m_wf);
+	Attribute ("wl_member", &m_wm);
+	printf ("  DWT(%i,%i)\n", m_wf, m_wm);
+	
+	if (m_wf < -1 || m_wf > 5)
+		m_wf = -1;
+
 	Attribute ("cgconv", &m_cgparam.cgconv);
 	Attribute ("cgiter", &m_cgparam.cgiter);
 	Attribute ("lsiter", &m_cgparam.lsiter);
@@ -90,7 +91,12 @@ CompressedSensing::Process () {
 	Matrix<double>& pdf   = GetRLDB   ("pdf" );
 	Matrix<double>& mask  = GetRLDB   ("mask");
 	Matrix<cxfl>&   im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
-	Matrix<cxfl>   orig;
+	Matrix<cxfl>    orig;
+
+	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf));
+
+    printf ("  Geometry: %iD (%lu,%lu,%lu)\n", Algos::HDim(data)+1, 
+			data.Dim(0), data.Dim(1), data.Dim(2));
 
 	im_dc  = data;
 	im_dc /= pdf;
@@ -102,7 +108,7 @@ CompressedSensing::Process () {
 	im_dc /= ma;
 	data  /= ma;
 
-	im_dc  = DWT::Forward (im_dc);
+	im_dc  = m_cgparam.dwt->Trafo (im_dc);
 
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
@@ -113,7 +119,7 @@ CompressedSensing::Process () {
 
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
-	im_dc  = DWT::Backward (im_dc);
+	im_dc  = m_cgparam.dwt->Adjoint (im_dc) * ma;
 	data   = orig;
 
 	return OK;

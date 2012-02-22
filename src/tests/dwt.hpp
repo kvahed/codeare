@@ -6,8 +6,10 @@ dwttest (Connector<T>* rc) {
 	Matrix<cxfl> m   = Matrix<cxfl>::Phantom2D(512);
 	Matrix<cxfl> k, i;
 
-	k = DWT::Forward(m);
-	i = DWT::Backward(k);
+	DWT dwt (m.Height(), WL_DAUBECHIES);
+
+	k = dwt.Trafo(m);
+	i = dwt.Adjoint(k);
 
 #ifdef HAVE_MAT_H	
 
