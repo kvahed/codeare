@@ -259,7 +259,7 @@ public:
 			
 #else // HAVE_H5CPP_H
 			
-			printf ("HDF5 ERROR - Didn't dump nothin'")
+			printf ("HDF5 ERROR - Didn't dump nothin'");
 		
 #endif // HAVE_H5CPP_H
 				
@@ -540,7 +540,7 @@ public:
 			
 #else // HAVE_H5CPP_H
 		
-			printf ("HDF5 ERROR - Didn't read nothin'")
+			printf ("HDF5 ERROR - Didn't read nothin'");
 		
 #endif // HAVE_H5CPP_H
 				
