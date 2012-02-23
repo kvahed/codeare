@@ -18,8 +18,8 @@
  *  02110-1301  USA
  */
 
-#ifndef __FFT_HPP__
-#define __FFT_HPP__
+#ifndef __DFT_HPP__
+#define __DFT_HPP__
 
 #include <fftw3.h>
 #include "Matrix.hpp"
@@ -28,9 +28,14 @@
 /**
  * @brief 1-3D Discrete Cartesian Fourier transform for Matrix template
  */
-class FFT {
+class DFT {
 	
 public:
+	
+	DFT         (const Matrix<int> size, const Matrix<double> mask = Matrix<double>(1), const Matrix<double> pc = Matrix<double>(1));
+	
+	virtual 
+	~DFT        ();
 	
 
 	/**
@@ -39,8 +44,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> static Matrix<T> 
-	Forward      (const Matrix<T>& m);
+	template <class T> Matrix<T> 
+	Trafo       (Matrix<T>& m) const ;
 	
 	
 	/**
@@ -49,35 +54,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> static Matrix<T> 
-	Backward     (const Matrix<T>& m);
-	
-	
-	/**
-	 * @brief    FFT shift
-	 *
-	 * @param  m To shift
-	 * @return   Shifted
-	 */
-	template <class T> static Matrix<cxfl> 
-	Shift        (const Matrix<T>& m) {
-
-		assert (Algos::Is1D(m) || Algos::Is2D(m) || Algos::Is3D(m));
-		
-		Matrix<T> res  = m;
-		
-		for (size_t s = 0; s < m.Dim(2); s++)
-			for (size_t l = 0; l < m.Dim(1); l++)
-				for (size_t c = 0; c < m.Dim(0); c++)
-					res.At (c,l,s) *= (float) pow ((float)-1.0, (float)(s+l+c));
-		
-		return res;
-
-	}
-
-
-	inline static Matrix<double> 
-	HannWindow (const Matrix<size_t>& size);
+	template <class T> Matrix<T> 
+	Adjoint     (Matrix<T>& m) const;
 	
 	
 private:
@@ -85,14 +63,27 @@ private:
 	/**
 	 * Static class
 	 */
-	FFT()  {};
+	DFT()  {};
 	
 	
-	/**
-	 * Static class
-	 */
-	~FFT() {};
-	
+	bool m_initialised;
+
+	Matrix<size_t> m_size;
+	Matrix<double> m_mask;
+	Matrix<double> m_pc;
+
+	fftwf_plan     m_fwdplanf;
+	fftwf_plan     m_bwdplanf;
+	fftw_plan      m_fwdplan;
+	fftw_plan      m_bwdplan;
+
+	size_t         m_N;
+
+	bool m_have_mask;
+	bool m_have_pc;
+
+	fftwf_complex* m_in;
+	fftwf_complex* m_out;
 };
 
 #endif
