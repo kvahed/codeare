@@ -33,13 +33,6 @@
     #include "itkResampleImageFilter.h"
 #endif
 
-class MITK {
-	
-public:
-	
-	MITK();
-	
-	virtual ~MITK();
 	
 	template<class T> static Matrix<T> 
 	Resample (const Matrix<T>& M, const Matrix<double>& f, const InterpMethod& im) {
@@ -151,6 +144,5 @@ public:
 		
 	}
 		
-};
 	
 #endif
