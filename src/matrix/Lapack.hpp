@@ -131,7 +131,7 @@ class Lapack {
 		}
 
 		// 2D 
-		if (!Algos::Is2D(m)) {
+		if (!Is2D(m)) {
 			printf ("EIG Error: Parameter m must be 2D");
 			return -2;
 		}
@@ -218,7 +218,7 @@ class Lapack {
 	SVD (Matrix<T>& A, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
 		
 		// SVD only defined on 2D data
-		if (!Algos::Is2D(A))
+		if (!Is2D(A))
 			return -2;
 
 		int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vcol = 1;
@@ -307,7 +307,7 @@ class Lapack {
 	Inv (Matrix<T>& m) {
 		
 		// 2D 
-		if (!Algos::Is2D(m))               printf ("Inv Error: Parameter m must be 2D");
+		if (!Is2D(m))               printf ("Inv Error: Parameter m must be 2D");
 
 		// Square matrix
 		if (m.Width() != m.Height()) printf ("Inv Error: Parameter m must be square");

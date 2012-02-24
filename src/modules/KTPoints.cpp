@@ -143,7 +143,7 @@ KTPoints::Process        () {
 	Matrix<short>&  b0     = GetSHRT("b0");
 	Matrix<cxfl>&   target = GetCXFL("target");
 
-	printf ("k: %s\n", IO::DimsToCString(k));
+	printf ("k: %s\n", DimsToCString(k));
 
 	m_ns = r.Dim(1);
 	m_nk = k.Dim(1);
