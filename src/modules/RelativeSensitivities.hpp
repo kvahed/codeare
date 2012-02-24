@@ -144,7 +144,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 			
 			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cxfl));
 			
-			Lapack::SVD (m[tid], s[tid], u[tid], v[tid], 'S');
+			SVD (m[tid], s[tid], u[tid], v[tid], 'S');
 			
 			for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r] * exp(cxfl(0.0,1.0)*arg(u[tid][0])); // U 
 			for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t] * exp(cxfl(0.0,1.0)*arg(v[tid][0])); // V 
@@ -176,7 +176,7 @@ FTVolumes (Matrix<cxfl>& r) {
 	Matrix<size_t> size  = Matrix<size_t> (3,1);
 	size[0] = r.Dim(0); size[1] = r.Dim(1); size[2] = r.Dim(2);
 
-	Matrix<cxfl> hann    = FFT::HannWindow (size);
+	Matrix<cxfl> hann    = hannwindow (size);
 	
 	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r.Dim(0), (int)r.Dim(1), (int)r.Dim(2)); fflush(stdout);
 
@@ -211,10 +211,10 @@ FTVolumes (Matrix<cxfl>& r) {
 
 			memcpy (&mr[tid][0], &r[i*imsize], imsize * sizeof(cxfl));
 
-			mr[tid]  = FFT::Shift(mr[tid]);
+			mr[tid]  = fftshift(mr[tid]);
 			mr[tid] *= hann;
 			fftwf_execute(p[tid]);
-			mr[tid]  = FFT::Shift(mr[tid]);
+			mr[tid]  = fftshift(mr[tid]);
 
 			memcpy (&r[i*imsize], &mr[tid][0], imsize * sizeof(cxfl));
 

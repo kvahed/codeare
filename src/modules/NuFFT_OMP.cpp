@@ -140,9 +140,9 @@ NuFFT_OMP::Process () {
 	Matrix<double>& weights = GetRLDB("weights");
 
 	printf ("  Incoming dimensions:\n");
-	printf ("    Data:    %s \n", IO::DimsToCString(data));
-	printf ("    K-Space: %s \n", IO::DimsToCString(kspace));
-	printf ("    Weights: %s \n", IO::DimsToCString(weights));
+	printf ("    Data:    %s \n", DimsToCString(data));
+	printf ("    K-Space: %s \n", DimsToCString(kspace));
+	printf ("    Weights: %s \n", DimsToCString(weights));
 
 	int imgsize = m_N[0] * m_N[1] * m_N[2];
 

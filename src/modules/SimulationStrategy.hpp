@@ -85,18 +85,18 @@ namespace RRStrategy {
 				return false;
 			}
 			
-			IO::MXDump   (*b1, mf, "b1"  );
-			IO::MXDump    (*r,  mf, "r"   );
-			IO::MXDump   (*b0, mf, "b0"  );
-			IO::MXDump    (*g,  mf, "g"   );
-			IO::MXDump (*tmxy, mf, "tmxy");
-			IO::MXDump  (*tmz, mf, "tmz" );
-			IO::MXDump (*smxy, mf, "smxy");
-			IO::MXDump  (*smz, mf, "smz" );
-			IO::MXDump  (*jac, mf, "jac" );
-			IO::MXDump   (*rf, mf, "rf"  );
-			IO::MXDump  (*mxy, mf, "mxy" );
-			IO::MXDump   (*mz, mf, "mz"  );
+			MXDump   (*b1, mf, "b1"  );
+			MXDump    (*r,  mf, "r"   );
+			MXDump   (*b0, mf, "b0"  );
+			MXDump    (*g,  mf, "g"   );
+			MXDump (*tmxy, mf, "tmxy");
+			MXDump  (*tmz, mf, "tmz" );
+			MXDump (*smxy, mf, "smxy");
+			MXDump  (*smz, mf, "smz" );
+			MXDump  (*jac, mf, "jac" );
+			MXDump   (*rf, mf, "rf"  );
+			MXDump  (*mxy, mf, "mxy" );
+			MXDump   (*mz, mf, "mz"  );
 			
 			if (matClose(mf) != 0) {
 				printf ("Error closing file %s\n", odf.c_str());

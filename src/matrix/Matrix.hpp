@@ -2402,21 +2402,21 @@ Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
 template<class T>  T 
 Matrix<T>::dotc (Matrix<T>& M)  {
 
-	return dotc (*this, M);
+	return DOTC (*this, M);
 	
 }
 
 template<class T>  T 
 Matrix<T>::dotu (Matrix<T>& M)  {
 
-	return dotu (*this, M);
+	return DOTU (*this, M);
 	
 }
 
 template<class T>  T 
 Matrix<T>::dot (Matrix<T>& M)  {
 	
-	return dot  (*this, M);
+	return DOT  (*this, M);
 	
 }
 

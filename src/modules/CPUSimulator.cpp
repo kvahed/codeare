@@ -323,7 +323,7 @@ CPUSimulator::Simulate () {
 
 		p = rf; q = p; r = p;
 
-		an = pow(creal(Lapack::Norm(p)), 2.0);
+		an = pow(creal(Norm(p)), 2.0);
 		rn = an;
 		
 		for (iters = 0; iters < m_sb->cgit; iters++) { 	// CG loop
@@ -347,7 +347,7 @@ CPUSimulator::Simulate () {
 			
 			r     -= rtmp * q;
 			rno    = rn;
-			rn     = pow(creal(Lapack::Norm(r)),2);
+			rn     = pow(creal(Norm(r)),2);
 
 			p     *= rn/rno;
 			p     += r;

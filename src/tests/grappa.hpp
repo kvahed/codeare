@@ -29,8 +29,8 @@ grappatest (Connector<T>* rc) {
 	std::string df = std::string (base + std::string(data));
 
 #ifdef HAVE_MAT_H
-	IO::MXRead  (sig, df, "data", "");
-	IO::MXRead  (acs, df, "acs",  "");
+	MXRead  (sig, df, "data", "");
+	MXRead  (acs, df, "acs",  "");
 #endif
 
 	rc->ReadConfig (cf.c_str());

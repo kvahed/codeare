@@ -36,10 +36,10 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	std::string    df  = std::string (base + std::string(data));          // Binary data file 
 	std::string    odf = std::string (base + std::string("/images.mat")); // Binary Ouput (images etc)
 	
-	IO::Read (weights, df, "weights");
-	IO::Read (rawdata, df, "data");
-	IO::Read (kspace,  df, "kspace");
-	IO::Read (sens,    df, "sensitivities");
+	Read (weights, df, "weights");
+	Read (rawdata, df, "data");
+	Read (kspace,  df, "kspace");
+	Read (sens,    df, "sensitivities");
 	
 	rc->ReadConfig (cf.c_str());
 	
@@ -78,11 +78,11 @@ cgsensetest (RRClient::Connector<T>* rc) {
 		return false;
 	}
 	
-	IO::MXDump       (image, mf, "image");
+	MXDump       (image, mf, "image");
 	if (pulses)
-		IO::MXDump (signals, mf, "signals");
+		MXDump (signals, mf, "signals");
 	if (nrmse.Size() > 1)
-		IO::MXDump   (nrmse, mf, "nrmse");
+		MXDump   (nrmse, mf, "nrmse");
 	
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());

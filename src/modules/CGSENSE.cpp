@@ -250,7 +250,7 @@ CGSENSE::Process () {
 
 	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
 
-	an = pow(creal(Lapack::Norm(p)), 2); 
+	an = pow(creal(Norm(p)), 2); 
 	rn = an;
 
 	Matrix<cxfl> a(m_N[0], m_N[1], m_N[2]);
@@ -274,7 +274,7 @@ CGSENSE::Process () {
 
 		r    -= (q * rtmp);
 		rno   = rn;
-		rn    = pow(creal(Lapack::Norm(r)), 2);
+		rn    = pow(creal(Norm(r)), 2);
 		if (std::isnan(rn))	break;
 		
 		a    += (p * rtmp);

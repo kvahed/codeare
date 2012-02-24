@@ -1,7 +1,7 @@
 #ifndef __ALGOS_HPP__
 #define __ALGOS_HPP__
 
-template <class T>  inline size_t 
+template <class T> inline size_t 
 nnz (const Matrix<T>& M) {
 	
 	size_t nz   = 0;
@@ -246,7 +246,7 @@ HDim (const Matrix<T>& M) {
 template <class T>  inline size_t
 SizeInRAM          (const Matrix<T>& M) {
 	
-	return Size(M) * sizeof (T);
+	return numel(M) * sizeof (T);
 	
 }
 

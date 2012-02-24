@@ -28,6 +28,7 @@
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
+#include "Algos.hpp"
 
 #include <pthread.h>
 /**
@@ -138,7 +139,7 @@ namespace RRStrategy {
 		om  = ttdbx;
 		if (t > 0.0)
 			om += t * ttdbg;
-		om *= CX::Conj(om);
+		om *= Conj(om);
 		om += cgp.l1;
 		om ^= p;
 		
@@ -160,7 +161,7 @@ namespace RRStrategy {
 		om  = x;
 		if (t > 0)
 			om += t * g;
-		om *= CX::Conj(om);
+		om *= Conj(om);
 		om += cgp.l1;
 		om ^= p;
 		
@@ -177,10 +178,10 @@ namespace RRStrategy {
 					 CGParam&        cgp) {
 		
 		float obj = 0.0;
-		float nnz = (float) Algos::nnz(data); 
+		float nz = (float) nnz (data); 
 		
 		obj  =              Obj    (ffdbx, ffdbg, data, t);
-		rmse = sqrt(obj/nnz);
+		rmse = sqrt(obj/nz);
 		
 		obj += (cgp.tvw)  ? ObjTV  (ttdbx, ttdbg, t, cgp) : 0.0;
 		obj += (cgp.xfmw) ? ObjXFM (x,     g,     t, cgp) : 0.0;
@@ -214,7 +215,7 @@ namespace RRStrategy {
 		
 		Matrix<cxfl> g;
 
-		g  = x * CX::Conj(x);
+		g  = x * Conj(x);
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
 		g *= x;
@@ -230,7 +231,7 @@ namespace RRStrategy {
 	Matrix<cxfl> GradTV    (const Matrix<cxfl>& x, const CGParam& cgp) {
 
 		Matrix<cxfl> dx = TVOP::Transform(cgp.dwt->Adjoint(x));
-		Matrix<cxfl> g  = dx * CX::Conj(dx);
+		Matrix<cxfl> g  = dx * Conj(dx);
 
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
@@ -267,7 +268,7 @@ namespace RRStrategy {
 
 		int          k  = 0;
 		float        t0 = 1.0, t = 1.0, z = 0.0;
-		float        xn = creal(Lapack::Norm(x));
+		float        xn = creal(Norm(x));
 		float        rmse, bk;
 
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg;
@@ -324,7 +325,7 @@ namespace RRStrategy {
 			dx  = -g1 + dx * bk;
 			k++;
 			
-			float dxn = creal(Lapack::Norm(dx))/xn;
+			float dxn = creal(Norm(dx))/xn;
 			
 			printf ("dxnrm: %0.4f\n", dxn);
 

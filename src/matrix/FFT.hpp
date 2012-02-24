@@ -36,7 +36,7 @@
 	 * @param  m To shift
 	 * @return   Shifted
 	 */
-	template <class T> static Matrix<cxfl> 
+	template <class T> inline Matrix<cxfl> 
 	fftshift        (const Matrix<T>& m) {
 
 		assert (Is1D(m) || Is2D(m) || Is3D(m));
@@ -53,7 +53,7 @@
 	}
 
 
-	template <class T> static Matrix<cxfl> 
+	template <class T> inline Matrix<cxfl> 
 	ifftshift        (const Matrix<T>& m) {
 
 		assert (Is1D(m) || Is2D(m) || Is3D(m));
@@ -71,7 +71,7 @@
 
 	
 	
-Matrix<cxfl> 
+inline Matrix<cxfl> 
 fft (const Matrix<cxfl>& m)  {
 	
 	assert (Is1D(m) || Is2D(m) || Is3D(m));
@@ -96,7 +96,7 @@ fft (const Matrix<cxfl>& m)  {
 }
 
 
-Matrix<cxfl>
+inline Matrix<cxfl>
 ifft (const Matrix<cxfl>& m) {
 
 	assert (Is1D(m) || Is2D(m) || Is3D(m));
@@ -119,7 +119,7 @@ ifft (const Matrix<cxfl>& m) {
 }
 
 
-Matrix<cxdb> 
+inline Matrix<cxdb> 
 fft (const Matrix<cxdb>& m)  {
 	
 	assert (Is1D(m) || Is2D(m) || Is3D(m));
@@ -144,7 +144,7 @@ fft (const Matrix<cxdb>& m)  {
 }
 
 
-Matrix<cxdb>
+inline Matrix<cxdb>
 ifft (const Matrix<cxdb>& m) {
 
 	assert (Is1D(m) || Is2D(m) || Is3D(m));

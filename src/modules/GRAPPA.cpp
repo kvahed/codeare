@@ -145,7 +145,7 @@ GRAPPA::Process     () {
 	Matrix<cxfl>& acs  = GetCXFL("acs");
 	Matrix<cxfl>& data = GetCXFL("data");
 
-	printf ("  data dims: %s\n", IO::DimsToCString(data));
+	printf ("  data dims: %s\n", DimsToCString(data));
 
 	printf ("... done.. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
