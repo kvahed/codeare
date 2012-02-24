@@ -1,6 +1,12 @@
 #ifndef __ALGOS_HPP__
 #define __ALGOS_HPP__
 
+/**
+ * @brief    Number of non-zero elements
+ *
+ * @param M  Matrix
+ * @return   Number of non-zero elements of matrix M
+ */
 template <class T> inline size_t 
 nnz (const Matrix<T>& M) {
 	
@@ -16,6 +22,12 @@ nnz (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief    Is matrix 1D?
+ *
+ * @param M  Matrix
+ * @return   1D?
+ */
 template <class T>  inline bool 
 Is1D (const Matrix<T>& M) {
 	
@@ -24,6 +36,12 @@ Is1D (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief    Is matrix 2D?
+ *
+ * @param M  Matrix
+ * @return   2D?
+ */
 template <class T>  inline bool 
 Is2D (const Matrix<T>& M) {
 	
@@ -32,6 +50,12 @@ Is2D (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief    Is matrix 3D?
+ *
+ * @param M  Matrix
+ * @return   3D?
+ */
 template <class T>  inline bool 
 Is3D (const Matrix<T>& M) {
 	
@@ -40,6 +64,13 @@ Is3D (const Matrix<T>& M) {
 }
 
 
+
+/**
+ * @brief    Is matrix 4D?
+ *
+ * @param M  Matrix
+ * @return   4D?
+ */
 template <class T>  inline bool 
 Is4D (const Matrix<T>& M) {
 	
@@ -48,6 +79,13 @@ Is4D (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief     Is matrix X-dimensional?
+ *
+ * @param  M  Matrix
+ * @param  d  Dimension
+ * @return    X-dimensional?
+ */
 template <class T>  inline bool 
 IsXD (const Matrix<T>& M, const size_t d) {
 	
@@ -61,6 +99,12 @@ IsXD (const Matrix<T>& M, const size_t d) {
 }
 
 
+/**
+ * @brief       All elements zero?
+ * 
+ * @param  M    Matrix
+ * @param       All elements zero?
+ */
 template <class T>  inline bool 
 IsZero (const Matrix<T>& M) {
 	
@@ -72,6 +116,12 @@ IsZero (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief       Empty matrix?
+ * 
+ * @param  M    Matrix
+ * @param       Empty?
+ */
 template <class T>  inline bool
 IsEmpty (const Matrix<T>& M) {
 	
@@ -80,6 +130,13 @@ IsEmpty (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief       Sum of squares over a dimension
+ * 
+ * @param  M    Matrix
+ * @param  d    Dimension
+ * @returm      Sum of squares
+ */
 template <class T>  inline Matrix<T> 
 SOS (Matrix<T>& M, const size_t d) {
 	
@@ -134,6 +191,13 @@ SOS (Matrix<T>& M, const size_t d) {
   }
 */
 
+
+/**
+ * @brief          Get rid of unused dimension 
+ *
+ * @param  M       Matrix
+ * @return         Squeezed matrix
+ */
 template <class T> inline  Matrix<T>
 Squeeze (Matrix<T>& M) {
 	
@@ -153,6 +217,13 @@ Squeeze (Matrix<T>& M) {
 }
 
 
+/**
+ * @brief      Mean reducing a dimension
+ *
+ * @param  M   Matrix
+ * @param  d   Dimension
+ * @return     Average of M reducing d matrix
+ */
 template <class T> inline  Matrix<T>
 Mean (const Matrix<T>& M, const size_t d) {
 	
@@ -166,6 +237,13 @@ Mean (const Matrix<T>& M, const size_t d) {
 }
 
 
+/**
+ * @brief     Sum along a dimension
+ *
+ * @param  M  Matrix
+ * @param  d  Dimension
+ * @return    Sum of M along dimension d
+ */
 template <class T> inline  Matrix<T>
 Sum (Matrix<T>& M, const size_t d) {
 	
@@ -224,6 +302,13 @@ Sum (Matrix<T>& M, const size_t d) {
 }
 
 
+
+/**
+ * @brief     Highest dimension unequal 1
+ * 
+ * @param     Matrix
+ * @return    Highest non-one dimension
+ */
 template <class T> inline  size_t
 HDim (const Matrix<T>& M) {
 	
@@ -238,9 +323,9 @@ HDim (const Matrix<T>& M) {
 
 
 /**
- * @brief           Get the number of matrix cells, i.e. Size * sizeof(T).
+ * @brief           RAM occupied
  *
- * @param  M        Matrix in question
+ * @param  M        Matrix
  * @return          Size in RAM in bytes.
  */
 template <class T>  inline size_t
@@ -254,6 +339,7 @@ SizeInRAM          (const Matrix<T>& M) {
 /**
  * @brief           Get the number of matrix cells, i.e. dim_0*...*dim_16.
  *
+ * @param   M       Matrix
  * @return          Number of cells.
  */
 template <class T>  size_t
@@ -270,8 +356,9 @@ numel               (const Matrix<T>& M) {
 
 
 /**
- * @brief           Get the number of matrix cells, i.e. dim_0*...*dim_16.
+ * @brief           Get vector of dimensions
  *
+ * @param   M       Matrix
  * @return          Number of cells.
  */
 template <class T>  Matrix<size_t>
@@ -281,10 +368,10 @@ size               (const Matrix<T>& M) {
 	size_t ones = 0;
     
 	for (size_t i = 0; i < INVALID_DIM; i++) {
-
+		
 		res[i] = M.Dim(i);
 		ones   = (res[i] == 1) ? ones + 1 : ones = 0;
-
+		
 	}
     
 	return res;

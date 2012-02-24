@@ -139,7 +139,7 @@ namespace RRStrategy {
 		om  = ttdbx;
 		if (t > 0.0)
 			om += t * ttdbg;
-		om *= Conj(om);
+		om *= conj(om);
 		om += cgp.l1;
 		om ^= p;
 		
@@ -161,7 +161,7 @@ namespace RRStrategy {
 		om  = x;
 		if (t > 0)
 			om += t * g;
-		om *= Conj(om);
+		om *= conj(om);
 		om += cgp.l1;
 		om ^= p;
 		
@@ -215,7 +215,7 @@ namespace RRStrategy {
 		
 		Matrix<cxfl> g;
 
-		g  = x * Conj(x);
+		g  = x * conj(x);
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
 		g *= x;
@@ -231,7 +231,7 @@ namespace RRStrategy {
 	Matrix<cxfl> GradTV    (const Matrix<cxfl>& x, const CGParam& cgp) {
 
 		Matrix<cxfl> dx = TVOP::Transform(cgp.dwt->Adjoint(x));
-		Matrix<cxfl> g  = dx * Conj(dx);
+		Matrix<cxfl> g  = dx * conj(dx);
 
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
