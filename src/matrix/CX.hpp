@@ -23,158 +23,233 @@
 
 #include "Matrix.hpp"
 
-class CX {
+Matrix<double> 
+Abs (const Matrix<cxdb>& m) {
+
+	Matrix<double> res(m.Dim());
 	
-public: 
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = cabs(m[i]);
+		
+	}		
 	
-	/**
-	 * @brief           Matrix of absolute values  (i.e. |m|)
-	 *
-	 * @param   m       Input matrix
-	 * @return          abs(m)
-	 */
-	static Matrix<float>
-	Abs (const Matrix<cxfl>& m);
+	return res;
 	
-	/**
-	 * @brief           Matrix of absolute values  (i.e. |m|)
-	 *
-	 * @param   m       Input matrix
-	 * @return          abs(m)
-	 */
-	static Matrix<double>
-	Abs (const Matrix<cxdb>& m);
+}
+ 
+
+Matrix<float> 
+Abs (const Matrix<cxfl>& m) {
+
+	Matrix<float> res(m.Dim());
 	
-	/**
-	 * @brief           Matrix of absolute values  (i.e. |m|)
-	 *
-	 * @param   m       Input matrix
-	 * @return          abs(m)
-	 */
-	static Matrix<float>
-	Abs (const Matrix<float>& m);
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = cabs(m[i]);
+		
+	}		
 	
-	/**
-	 * @brief           Matrix of absolute values  (i.e. |m|)
-	 *
-	 * @param   m       Input matrix
-	 * @return          abs(m)
-	 */
-	static Matrix<double>
-	Abs (const Matrix<double>& m);
+	return res;
 	
+}
+
+
+Matrix<float> 
+Abs (const Matrix<float>& m) {
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<float>
-	Arg (const Matrix<cxfl>& m);
+	Matrix<float> res(m);
+	return res;
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<double>
-	Arg (const Matrix<cxdb>& m);
+}
+
+Matrix<double> 
+Abs (const Matrix<double>& m) {
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<float>
-	Arg (const Matrix<float>& m);
+	Matrix<double> res(m);
+	return res;
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<double>
-	Arg (const Matrix<double>& m);
+}
+
+
+Matrix<double> 
+Arg (const Matrix<cxdb>& m) {
+
+	Matrix<double> res(m.Dim());
 	
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = carg(m[i]);
+		
+	}		
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<float>
-	Real (const Matrix<cxfl>& m);
+	return res;
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<double>
-	Real (const Matrix<cxdb>& m);
+}
+ 
+
+Matrix<float> 
+Arg (const Matrix<cxfl>& m) {
+
+	Matrix<float> res(m.Dim());
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<float>
-	Real (const Matrix<float>& m);
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = carg(m[i]);
+		
+	}		
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<double>
-	Real (const Matrix<double>& m);
+	return res;
 	
+}
+
+
+Matrix<float> 
+Arg (const Matrix<float>& m) {
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<float>
-	Imag (const Matrix<cxfl>& m);
+	Matrix<float> res(m);
+	return res;
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<double>
-	Imag (const Matrix<cxdb>& m);
+}
+
+Matrix<double> 
+Arg (const Matrix<double>& m) {
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<float>
-	Imag (const Matrix<float>& m);
+	Matrix<double> res(m);
+	return res;
 	
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	static Matrix<double>
-	Imag (const Matrix<double>& m);
+}
+
+
+Matrix<double> 
+Real (const Matrix<cxdb>& m) {
+
+	Matrix<double> res(m.Dim());
 	
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = creal(m[i]);
+		
+	}		
 	
+	return res;
+	
+}
+ 
+
+Matrix<float> 
+Real (const Matrix<cxfl>& m) {
+
+	Matrix<float> res(m.Dim());
+	
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = creal(m[i]);
+		
+	}		
+	
+	return res;
+	
+}
+
+
+Matrix<float> 
+Real (const Matrix<float>& m) {
+	
+	Matrix<float> res(m);
+	return res;
+	
+}
+
+Matrix<double> 
+Real (const Matrix<double>& m) {
+	
+	Matrix<double> res(m);
+	return res;
+	
+}
+
+
+Matrix<double> 
+Imag (const Matrix<cxdb>& m) {
+
+	Matrix<double> res(m.Dim());
+	
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = cimag(m[i]);
+		
+	}		
+	
+	return res;
+	
+}
+ 
+
+Matrix<float> 
+Imag (const Matrix<cxfl>& m) {
+
+	Matrix<float> res(m.Dim());
+	
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = cimag(m[i]);
+		
+	}		
+	
+	return res;
+	
+}
+
+
+Matrix<float> 
+Imag (const Matrix<float>& m) {
+	
+	Matrix<float> res(m);
+	return res;
+	
+}
+
+Matrix<double> 
+Imag (const Matrix<double>& m) {
+	
+	Matrix<double> res(m);
+	return res;
+	
+}
+
 	/**
 	 * @brief           Matrix of arguments  (i.e. arg(m))
 	 *
@@ -204,7 +279,5 @@ public:
 	
 	}
 	
-};
-
 #endif
 

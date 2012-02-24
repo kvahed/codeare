@@ -30,14 +30,6 @@ using namespace TinyXPath;
 using namespace std;
 
 
-class IO {
-	
-public:
-	
-	IO ();
-
-	virtual ~IO();
-
 	inline static bool
 	FExists (const char* fname) {
 		
@@ -56,7 +48,7 @@ public:
 		
 		std::stringstream ss;
 		
-		for (size_t i = 0; i <= Algos::HDim(M); i++)
+		for (size_t i = 0; i <= HDim(M); i++)
 			ss << (int)M.Dim(i) << " ";
 		
 		return ss.str();
@@ -77,7 +69,7 @@ public:
 		
 		stringstream ss;
 		
-		for (size_t i = 0; i <= Algos::HDim(M); i++)
+		for (size_t i = 0; i <= HDim(M); i++)
 			ss << M.Res(i) << " ";
 		
 		return ss.str();
@@ -724,16 +716,16 @@ public:
 #ifdef HAVE_NIFTI1_IO_H
 			
 			Matrix<T>      tmp = M;
-			Algos::Squeeze(tmp);
+			Squeeze(tmp);
 			
 			size_t            l   = fname.length();
 			
 			nifti_1_header header;
 			header.sizeof_hdr = 348;
-			header.dim[0] = Algos::HDim(tmp) + 1;
-			header.pixdim[0] = Algos::HDim(tmp) + 1;
+			header.dim[0] = HDim(tmp) + 1;
+			header.pixdim[0] = HDim(tmp) + 1;
 			
-			if (Algos::HDim(tmp) > 7) {
+			if (HDim(tmp) > 7) {
 				printf ("Cannot dump more than 8 dimensions to NIFTI FILE\n.");
 				return false;
 			}
@@ -824,7 +816,7 @@ public:
 					}
 			} else if ((ni->datatype == 256 || ni->datatype == 4) && typeid(T) == typeid(short)) {
 				if (ni->datatype == 256 || ni->datatype == 4)
-					memcpy (&M[0], ni->data, Algos::SizeInRAM(M));
+					memcpy (&M[0], ni->data, SizeInRAM(M));
 				
 			} else {
 				printf (" Unsupported data type %i!", ni->datatype);
@@ -869,10 +861,10 @@ public:
 		if (status != CDF_OK) 
 			return false;
 		
-		long dims [Algos::HDim(M)];
-		long dimv [Algos::HDim(M)];
+		long dims [HDim(M)];
+		long dimv [HDim(M)];
 		
-		for (int i = 0; i < Algos::HDim(M); i++) {
+		for (int i = 0; i < HDim(M); i++) {
 			dims[i] = M.Dim(i);
 			dimv[i] = VARY;
 		}
@@ -915,6 +907,5 @@ public:
 		
 	}
 	
-};
 	
 #endif //__IO_HPP__

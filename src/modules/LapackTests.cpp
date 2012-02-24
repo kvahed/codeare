@@ -208,11 +208,11 @@ LapackTests::Process     () {
 
  #ifdef HAVE_MAT_H
 	
-	IO::MXRead(A, "tmp.mat", "EM");
-	IO::MXRead(b, "tmp.mat", "PA");
+	MXRead(A, "tmp.mat", "EM");
+	MXRead(b, "tmp.mat", "PA");
 
 	Matrix<cxfl> x = MCGLS::Solve (A, b, 300, 1.0e-6, 1.0);
-	IO::MXDump(x, "x.mat", "x");
+	MXDump(x, "x.mat", "x");
 #endif
 
 

@@ -43,10 +43,10 @@ DFT::DFT (const size_t rank, const size_t sl, const Matrix<double> mask, const M
 	if (pc.Size() > 1) {
 		m_have_pc = true;
 		m_pc      = pc;
-		m_cpc     = CX::Conj(pc);
+		m_cpc     = Conj(pc);
 
-		IO::MXDump (m_pc, "m_pc.mat", "m_pc");
-		IO::MXDump (m_cpc, "m_cpc.mat", "m_cpc");
+		MXDump (m_pc, "m_pc.mat", "m_pc");
+		MXDump (m_cpc, "m_cpc.mat", "m_cpc");
 	}
 
 	for (size_t i = 0; i < rank; i++)
@@ -81,7 +81,7 @@ DFT::DFT (const Matrix<int> size, const Matrix<double> mask, const Matrix<cxfl> 
 	if (pc.Size() > 1) {
 		m_have_pc = true;
 		m_pc = pc;
-		m_cpc = CX::Conj(pc);
+		m_cpc = Conj(pc);
 	}
 
 	for (size_t i = 0; i < rank; i++) {
@@ -116,7 +116,7 @@ DFT::~DFT () {
 template<> Matrix<cxfl>
 DFT::operator* (const Matrix<cxfl>& m) const {
 
-    Matrix<cxfl> res = FFT::Shift(m);
+    Matrix<cxfl> res = fftshift(m);
 	
 	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
 
@@ -127,7 +127,7 @@ DFT::operator* (const Matrix<cxfl>& m) const {
 	if (m_have_mask)
 		res *= m_mask;
 
-    return FFT::Shift(res/sqrt((float)m.Size()));
+    return fftshift(res/sqrt((float)m.Size()));
 	
 }
 
@@ -135,7 +135,7 @@ DFT::operator* (const Matrix<cxfl>& m) const {
 template<> Matrix<cxfl> 
 DFT::Trafo (const Matrix<cxfl>& m) const {
 	
-    Matrix<cxfl> res = FFT::Shift(m);
+    Matrix<cxfl> res = fftshift(m);
 	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
 	if (m_have_pc)
 		res *= m_pc;
@@ -147,7 +147,7 @@ DFT::Trafo (const Matrix<cxfl>& m) const {
 	if (m_have_mask)
 		res *= m_mask;
 
-    return FFT::Shift(res/sqrt((float)m.Size()));
+    return fftshift(res/sqrt((float)m.Size()));
 	
 }
 
@@ -155,7 +155,7 @@ DFT::Trafo (const Matrix<cxfl>& m) const {
 template<> Matrix<cxfl>
 DFT::Adjoint (const Matrix<cxfl>& m) const {
 
-    Matrix<cxfl> res = FFT::Shift(m);
+    Matrix<cxfl> res = fftshift(m);
 	if (m_have_mask)
 		res *= m_mask;
 	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
@@ -166,7 +166,7 @@ DFT::Adjoint (const Matrix<cxfl>& m) const {
 	if (m_have_pc)
 		res *= m_cpc;
 
-	return FFT::Shift(res/sqrt((float)m.Size()));
+	return fftshift(res/sqrt((float)m.Size()));
 	
 }
 
@@ -174,24 +174,24 @@ DFT::Adjoint (const Matrix<cxfl>& m) const {
 template<> Matrix<cxdb> 
 DFT::Trafo (const Matrix<cxdb>& m) const {
 	
-	assert (Algos::Is1D(m) || Algos::Is2D(m) || Algos::Is3D(m));
+	assert (Is1D(m) || Is2D(m) || Is3D(m));
 	
     Matrix<cxdb> res;
 	fftw_plan    p;
 
-	res = FFT::Shift(m);
+	res = fftshift(m);
 
-	if      (Algos::Is1D(m))
+	if      (Is1D(m))
 		p = fftw_plan_dft_1d (m.Dim(0),                     (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
-	else if (Algos::Is2D(m))
+	else if (Is2D(m))
 		p = fftw_plan_dft_2d (m.Dim(1), m.Dim(0),           (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
-	else if (Algos::Is3D(m))
+	else if (Is3D(m))
 		p = fftw_plan_dft_3d (m.Dim(2), m.Dim(1), m.Dim(0), (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_FORWARD, FFTW_ESTIMATE);
 	
 	fftw_execute(p);
 	fftw_destroy_plan(p);
 
-    return FFT::Shift(res / (float)res.Size());
+    return fftshift(res / (float)res.Size());
 	
 }
 
@@ -199,24 +199,24 @@ DFT::Trafo (const Matrix<cxdb>& m) const {
 template<> Matrix<cxdb>
 DFT::Adjoint (const Matrix<cxdb>& m) const {
 
-	assert (Algos::Is1D(m) || Algos::Is2D(m) || Algos::Is3D(m));
+	assert (Is1D(m) || Is2D(m) || Is3D(m));
 	
     Matrix<cxdb> res;
 	fftw_plan    p; 
 	
-	res = FFT::Shift(m);
+	res = fftshift(m);
 
-	if      (Algos::Is1D(m))
+	if      (Is1D(m))
 		p = fftw_plan_dft_1d (m.Dim(0),                     (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
-	else if (Algos::Is2D(m))
+	else if (Is2D(m))
 		p = fftw_plan_dft_2d (m.Dim(1), m.Dim(0),           (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
-	else if (Algos::Is3D(m))
+	else if (Is3D(m))
 		p = fftw_plan_dft_3d (m.Dim(2), m.Dim(1), m.Dim(0), (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
 	
 	fftw_execute(p);
 	fftw_destroy_plan(p);
 
-	return FFT::Shift(res);
+	return fftshift(res);
 	
 }
 

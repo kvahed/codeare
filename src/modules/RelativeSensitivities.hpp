@@ -268,8 +268,8 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	ticks  tic = getticks();
 	Matrix<cxfl> tmp;
 	
-	tmp = Algos::Mean(imgs,4);
-	tmp = Algos::Squeeze(tmp);
+	tmp = Mean(imgs,4);
+	tmp = Squeeze(tmp);
 	
 	size_t nc = tmp.Dim(4);                           // Number of channels
 	size_t np = tmp.Dim(0) * tmp.Dim(1) * tmp.Dim(2); // Number of pixels
@@ -316,7 +316,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	std::string mask = "mask_mask.nii.gz";
 	std::string cmd  = "/usr/local/bin/mask.sh";
 	
-	IO::NIDump(img, orig);
+	NIDump(img, orig);
 	printf ("exporting ... "); fflush(stdout);
 	
 	if (!std::system(NULL))
@@ -327,7 +327,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	int i = system (cmd.c_str());
 	
 	printf ("importing ... "); fflush(stdout);
-	IO::NIRead(msk, mask);
+	NIRead(msk, mask);
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
