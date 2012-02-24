@@ -135,9 +135,9 @@ whitened = ipermute(whitened,new_order);
 
 	void PhaseCombine (const Matrix<cxfl>& img, Matrix<float>& pc) {
 		
-		size_t nc = Algos::HDim(img);
+		size_t nc = HDim(img);
 
-		if (Algos::IsZero(pc))
+		if (IsZero(pc))
 			return;
 
 	}
@@ -158,7 +158,7 @@ whitened = ipermute(whitened,new_order);
 				Matrix<float> pc (afid.Dim(0), afid.Dim(1), afid.Dim(2));
 				PhaseCombine (afid, pc);
 
-				Algos::SOS(afid, 4);
+				SOS(afid, 4);
 				
 				for (size_t z = 0; z < afid.Dim(2); z++)
 					for (size_t y = 0; y < afid.Dim(1); y++)
@@ -167,7 +167,7 @@ whitened = ipermute(whitened,new_order);
 
 			} else {
 				
-				Algos::SOS(afid, 4);
+				SOS(afid, 4);
 				
 			}
 

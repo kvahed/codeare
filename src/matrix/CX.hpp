@@ -256,7 +256,7 @@ Imag (const Matrix<double>& m) {
 	 * @param   m       Input matrix
 	 * @return          arg(m)
 	 */
-	template<class T> static Matrix<T>
+	template<class T> Matrix<T>
 	Conj (const Matrix<T>& m) {
 
 		Matrix<T> res = m;

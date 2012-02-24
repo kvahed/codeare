@@ -16,11 +16,11 @@ ktptest (Connector<T>* rc) {
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 
-	IO::Read  (target, df, "target");
-	IO::Read      (b1, df, "b1");
-	IO::Read      (b0, df, "b0");
-	IO::Read       (k, df, "k");
-	IO::Read       (r, df, "r");
+	Read  (target, df, "target");
+	Read      (b1, df, "b1");
+	Read      (b0, df, "b0");
+	Read       (k, df, "k");
+	Read       (r, df, "r");
 
 	rc->SetMatrix ("target", target);
 	rc->SetMatrix ("b1",     b1);
@@ -46,9 +46,9 @@ ktptest (Connector<T>* rc) {
 		return false;
 	}
 
-	IO::MXDump (target, mf, "pattern");
-	IO::MXDump     (b1, mf, "ptx");
-	IO::MXDump      (r, mf, "nrmse");
+	MXDump (target, mf, "pattern");
+	MXDump     (b1, mf, "ptx");
+	MXDump      (r, mf, "nrmse");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n",fname.c_str());

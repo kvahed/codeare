@@ -114,7 +114,7 @@ extern "C" {
 	 * @param  jobvr  Compute right vectors ('N'/'V')
 	 * @return        Eigen values
 	 */
-	template <class T, class S> static int
+	template <class T, class S> int
 	EIG (Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, char jobvl = 'N', char jobvr = 'N') {
 
 		if (jobvl != 'N' && jobvl !='V') {
@@ -211,7 +211,7 @@ extern "C" {
 	}
 	
 
-	template<class T, class S> static int 
+	template<class T, class S> int 
 	SVD (Matrix<T>& A, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
 		
 		// SVD only defined on 2D data
@@ -300,7 +300,7 @@ extern "C" {
 	} 
 	
 
-	template <class T> static Matrix<T> 
+	template <class T> Matrix<T> 
 	Inv (Matrix<T>& m) {
 		
 		// 2D 
@@ -367,7 +367,7 @@ extern "C" {
 	
 
 
-	template<class T> static Matrix<T> 
+	template<class T> Matrix<T> 
 	Pinv (Matrix<T>& m, double rcond = 1.0) {
 
 		void *s, *rwork;
@@ -444,7 +444,7 @@ extern "C" {
 	
 	
 	
-	template<class T> static Matrix<T> 
+	template<class T> Matrix<T> 
 	Cholesky (Matrix<T>& A, const char uplo = 'U') {
 		
 		Matrix<T> res  = A;
@@ -465,7 +465,7 @@ extern "C" {
 	}
 	
 
-	template<class T> static Matrix<T> 
+	template<class T> Matrix<T> 
 	GEMM (Matrix<T>& A, Matrix<T>& B, char transa = 'N', char transb = 'N') {
 		
 		int aw = (int)A.Width(), ah = (int)A.Height(), bw = (int)B.Width(), bh = (int)B.Height();
@@ -511,7 +511,7 @@ extern "C" {
 	}
 
 
-	template<class T> static T
+	template<class T> T
 	Norm (Matrix<T>& M) {
 		
 		T   res  = T(0);
@@ -535,8 +535,8 @@ extern "C" {
 
 
 
-	template <class T> static T 
-	dotc (Matrix<T>& A, Matrix<T>& B) {
+	template <class T> T 
+	DOTC (Matrix<T>& A, Matrix<T>& B) {
 
 		int n    = (int) A.Size();
 
@@ -553,8 +553,8 @@ extern "C" {
 	}
 
 
-	template <class T> static T 
-	dotu (Matrix<T>& A, Matrix<T>& B) {
+	template <class T> T 
+	DOTU (Matrix<T>& A, Matrix<T>& B) {
 		
 		int n    = (int) A.Size();
 
@@ -571,8 +571,8 @@ extern "C" {
 	}
 
 
-	template <class T> static T 
-	dot  (Matrix<T>& A, Matrix<T>& B) {
+	template <class T> T 
+	DOT  (Matrix<T>& A, Matrix<T>& B) {
 
 		int n    = (int) A.Size();
 
@@ -591,7 +591,7 @@ extern "C" {
 	}
 
 
-	template<class T> static Matrix<T> 
+	template<class T> Matrix<T> 
 	GEMV (Matrix<T>& A, Matrix<T>& x, char trans = 'N') {
 
 		assert (x.Width() == 1);
@@ -620,7 +620,7 @@ extern "C" {
 	}
 	
 
-	template <class T> static T
+	template <class T> T
 	DOT (Matrix<T>& x, Matrix<T>& y, bool cnj = false) {
 
 		T res;

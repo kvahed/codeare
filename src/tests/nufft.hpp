@@ -13,9 +13,9 @@ nuffttest (Connector<T>* rc) {
 	rc->Init(test);
 
 #ifdef HAVE_MAT_H	
-	IO::MXRead (weights, df, "weights");
-	IO::MXRead (rawdata, df, "data");
-	IO::MXRead  (kspace, df, "kspace");
+	MXRead (weights, df, "weights");
+	MXRead (rawdata, df, "data");
+	MXRead  (kspace, df, "kspace");
 #endif
 
 	rc->SetMatrix    ("data",    rawdata);
@@ -29,10 +29,10 @@ nuffttest (Connector<T>* rc) {
 	rc->Finalise(test);
 
 #ifdef HAVE_MAT_H	
-	IO::MXDump   (rawdata, odf.c_str(), "image");
+	MXDump   (rawdata, odf.c_str(), "image");
 #endif
 #ifdef HAVE_NIFTI1_IO_H
-	IO::NIDump   (rawdata, "image.nii.gz");
+	NIDump   (rawdata, "image.nii.gz");
 #endif
 
 	return true;

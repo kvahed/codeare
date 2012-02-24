@@ -46,20 +46,20 @@ dmtest (Connector<T>* rc) {
 	// Gradients
 #ifdef HAVE_MAT_H
 
-	IO::MXRead    (g, gf, rc->Attribute("g"));
-	IO::MXRead    (j, gf, rc->Attribute("j"));
+	MXRead    (g, gf, rc->Attribute("g"));
+	MXRead    (j, gf, rc->Attribute("j"));
 	
 	// Target excitation, ROI, sample
-	IO::MXRead    (r, pf, "r");
-	IO::MXRead (tmxy, pf, rc->Attribute("p"));
+	MXRead    (r, pf, "r");
+	MXRead (tmxy, pf, rc->Attribute("p"));
 	tmz  = Matrix<float>::Zeros (r.Dim(1), 1);
 	smxy = Matrix<cxfl>::Zeros  (r.Dim(1), 1);
-	IO::MXRead ( smz, pf, rc->Attribute("s"));
-	IO::MXRead ( roi, pf, rc->Attribute("roi"));
+	MXRead ( smz, pf, rc->Attribute("s"));
+	MXRead ( roi, pf, rc->Attribute("roi"));
 
 	// Maps
-	IO::MXRead ( b1, mf, rc->Attribute("b1"));
-	IO::MXRead ( b0, mf, rc->Attribute("b0"));
+	MXRead ( b1, mf, rc->Attribute("b1"));
+	MXRead ( b0, mf, rc->Attribute("b0"));
 #endif	
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
@@ -106,11 +106,11 @@ dmtest (Connector<T>* rc) {
 		return false;
 	}
 
-	IO::MXDump  (mxy, od, "mxy");
-	IO::MXDump   (mz, od, "mz");
-	IO::MXDump (tmxy, od, "tmxy");
-	IO::MXDump  (tmz, od, "tmz");
-	IO::MXDump   (rf, od, "rf");
+	MXDump  (mxy, od, "mxy");
+	MXDump   (mz, od, "mz");
+	MXDump (tmxy, od, "tmxy");
+	MXDump  (tmz, od, "tmz");
+	MXDump   (rf, od, "rf");
 
 	if (matClose(od) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());

@@ -20,9 +20,9 @@ dwttest (Connector<T>* rc) {
 		return false;
 	}
 
-	IO::MXDump (m, mf, "m", "");
-	IO::MXDump (k, mf, "k", "");
-	IO::MXDump (i, mf, "i", "");
+	MXDump (m, mf, "m", "");
+	MXDump (k, mf, "k", "");
+	MXDump (i, mf, "i", "");
 	
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", "");

@@ -11,8 +11,8 @@ fftwtest (Connector<T>* rc) {
 	Matrix<cxfl> m   = Matrix<cxfl>::Phantom2D(512);
 	Matrix<cxfl> k, i, j;
 
-	k = FFT::Forward(m);
-	i = FFT::Backward(k);
+	k = fft (m);
+	i = ifft (k);
 
 	Matrix<double> msk;
 	Matrix<double> pdf;
@@ -20,10 +20,10 @@ fftwtest (Connector<T>* rc) {
 	Matrix<cxfl>   phc;
 	Matrix<cxfl>   tst;
 
-	IO::MXRead (msk, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "mask");
-	IO::MXRead (pdf,  "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "pdf");
-	IO::MXRead (dat, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "data");
-	IO::MXRead (phc, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "ph");
+	MXRead (msk, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "mask");
+	MXRead (pdf,  "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "pdf");
+	MXRead (dat, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "data");
+	MXRead (phc, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "ph");
 
 
 	dat /= pdf;
@@ -43,11 +43,11 @@ fftwtest (Connector<T>* rc) {
 		return false;
 	}
 
-	IO::MXDump (m, mf, "m", "");
-	IO::MXDump (k, mf, "k", "");
-	IO::MXDump (i, mf, "i", "");
-	IO::MXDump (dat, mf, "dat", "");
-	IO::MXDump (tst, mf, "tst", "");
+	MXDump (m, mf, "m", "");
+	MXDump (k, mf, "k", "");
+	MXDump (i, mf, "i", "");
+	MXDump (dat, mf, "dat", "");
+	MXDump (tst, mf, "tst", "");
 	
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", "");

@@ -30,7 +30,7 @@ using namespace TinyXPath;
 using namespace std;
 
 
-	inline static bool
+	inline bool
 	FExists (const char* fname) {
 		
 		ifstream fs (fname);
@@ -43,7 +43,7 @@ using namespace std;
 	}
 	
 	
-	template <class T> inline static std::string 
+	template <class T> inline std::string 
 	DimsToString (const Matrix<T>& M) {
 		
 		std::stringstream ss;
@@ -56,7 +56,7 @@ using namespace std;
 	}
 	
 	
-	template <class T> inline static const char* 
+	template <class T> inline const char* 
 	DimsToCString (const Matrix<T>& M) {
 		
 		return DimsToString(M).c_str();
@@ -64,7 +64,7 @@ using namespace std;
 	}
 	
 	
-	template <class T> inline static std::string 
+	template <class T> inline std::string 
 	ResToString (const Matrix<T>& M) {
 		
 		stringstream ss;
@@ -77,7 +77,7 @@ using namespace std;
 	}
 
 
-	template <class T> inline static const char* 
+	template <class T> inline const char* 
 	ResToCString (const Matrix<T>& M) {
 		
 		return ResToString(M).c_str();
@@ -85,7 +85,7 @@ using namespace std;
 	}
 	
 	
-	template <class T> inline static bool
+	template <class T> inline bool
 	PRDump (const Matrix<T>& M, const string fname) {
 		
 		FILE *fp;
@@ -108,7 +108,7 @@ using namespace std;
 	}
 	
 
-	template <class T> inline static bool 
+	template <class T> inline bool 
 	Dump (const Matrix<T>& M, const string fname, const string dname, const string dloc = "", const io_strategy ios = HDF5) {
 		
 		if      (ios == HDF5)
@@ -263,7 +263,7 @@ using namespace std;
 	
 
 	
-	template <class T> static bool
+	template <class T> bool
 	RSAdjust (Matrix<T>& M, const std::string& fname) {
 		
 		size_t dimk;
@@ -348,7 +348,7 @@ using namespace std;
 	}
 
 
-	inline static void
+	inline void
 	ProgressBar (const std::string& pre, const std::string& post, const short& p) {
 		
 		assert (p >=   0);
@@ -362,7 +362,7 @@ using namespace std;
 	}
 
 
-	template <class T> static bool 
+	template <class T> bool 
 	RAWRead (Matrix<T>& M, const std::string& fname, const std::string& version) {
 	
 		// Get size information from XProtocol and resize 
@@ -442,7 +442,7 @@ using namespace std;
 		
 	}
 	
-	template <class T> inline static bool 
+	template <class T> inline bool 
 	Read (Matrix<T>& M, const std::string& fname, const std::string& dname, const std::string& dloc = "", const io_strategy& ios = HDF5) {
 		
 		if      (ios == HDF5)
@@ -459,7 +459,7 @@ using namespace std;
 	}
 
 
-	template <class T> static bool 
+	template <class T> bool 
 	H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
 		
 		if (fname != "") {
@@ -545,7 +545,7 @@ using namespace std;
 	
 #ifdef HAVE_MAT_H
 	
-	template <class T> static bool
+	template <class T> bool
 	MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
 		
 		// Open file ---------------------------------
@@ -620,7 +620,7 @@ using namespace std;
 	}
 
 	
-	template <class T> static bool
+	template <class T> bool
 	MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 		
 		// Declare dimensions and allocate array -----
@@ -677,7 +677,7 @@ using namespace std;
 	
 
 	
-	template <class T> static bool 
+	template <class T> bool 
 	MXDump (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
 		
 		// Open file ---------------------------------
@@ -708,7 +708,7 @@ using namespace std;
 #endif
 	
 	
-	template <class T> static bool
+	template <class T> bool
 	NIDump (Matrix<T>& M, const string fname) {
 		
 		if (fname != "") {
@@ -775,7 +775,7 @@ using namespace std;
 	}
 	
 	
-	template <class T> static bool
+	template <class T> bool
 	NIRead (Matrix<T>& M, const string fname) {
 		
 		if (fname != "") {
@@ -843,7 +843,7 @@ using namespace std;
 	
 	
 	// Function not finished yet. Do not use.
-	template <class T> static bool 
+	template <class T> bool 
 	CDFDump (const Matrix<T>& M, const string fname, const string dname, const string dloc) {
 		
 #ifdef HAVE_CDF_H
@@ -900,7 +900,7 @@ using namespace std;
 	
 
 	// Function not finished yet. Do not use.
-	template <class T> static bool
+	template <class T> bool
 	CDFRead (Matrix<T>& M, const string fname, const string dname, const string dloc) {
 		
 		return false;

@@ -32,10 +32,10 @@ cstest (Connector<T>* rc) {
 	std::string odf = std::string (base + std::string("/csout.mat"));
 
 #ifdef HAVE_MAT_H	
-	if (!(IO::MXRead (indata, df, "data")))	return false;
-	if (!(IO::MXRead (pdf,    df, "pdf")))	pdf  = Matrix<double>(1);
-	if (!(IO::MXRead (mask,   df, "mask")))	mask = Matrix<double>(1);
-	if (!(IO::MXRead (pc,     df, "ph")))   pc   = Matrix<cxfl>(1);
+	if (!(MXRead (indata, df, "data")))	return false;
+	if (!(MXRead (pdf,    df, "pdf")))	pdf  = Matrix<double>(1);
+	if (!(MXRead (mask,   df, "mask")))	mask = Matrix<double>(1);
+	if (!(MXRead (pc,     df, "ph")))   pc   = Matrix<cxfl>(1);
 #endif
 
 	rc->ReadConfig (cf.c_str());
@@ -74,8 +74,8 @@ cstest (Connector<T>* rc) {
 		return false;
 	}
 
-	IO::MXDump (indata, mf, "in");
-	IO::MXDump (im_dc,  mf, "out");
+	MXDump (indata, mf, "in");
+	MXDump (im_dc,  mf, "out");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());

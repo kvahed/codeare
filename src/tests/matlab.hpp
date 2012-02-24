@@ -8,20 +8,20 @@ mxtest (Connector<T>* rc) {
 
 	std::cout << in << std::endl << std::endl;
 
-	IO::MXDump(in, std::string("test.mat"), std::string("imat"), std::string(""));
+	MXDump(in, "test.mat", "imat", "");
 
 	Matrix<double> out;
-	IO::MXRead(out, std::string("test.mat"), std::string("imat"), std::string(""));
+	MXRead(out, "test.mat", "imat", "");
 
 	std::cout << out << std::endl << std::endl;
 
 	Matrix<cxfl> r1 (4,8);
 	r1.Random ();
-	IO::MXDump (r1, std::string("rtest.mat"), std::string("rmat"), std::string(""));
+	MXDump (r1, "rtest.mat", "rmat", "");
 	std::cout << r1 << std::endl << std::endl;
 	
 	Matrix<cxfl> r2;
-	IO::MXRead (r2, std::string("rtest.mat"), std::string("rmat"), std::string(""));
+	MXRead (r2, "rtest.mat", "rmat", "");
 	std::cout << r2 << std::endl << std::endl;
 
 #else
