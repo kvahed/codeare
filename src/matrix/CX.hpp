@@ -23,8 +23,9 @@
 
 #include "Matrix.hpp"
 
+
 Matrix<double> 
-Abs (const Matrix<cxdb>& m) {
+abs (const Matrix<cxdb>& m) {
 
 	Matrix<double> res(m.Dim());
 	
@@ -44,7 +45,7 @@ Abs (const Matrix<cxdb>& m) {
  
 
 Matrix<float> 
-Abs (const Matrix<cxfl>& m) {
+abs (const Matrix<cxfl>& m) {
 
 	Matrix<float> res(m.Dim());
 	
@@ -64,7 +65,7 @@ Abs (const Matrix<cxfl>& m) {
 
 
 Matrix<float> 
-Abs (const Matrix<float>& m) {
+abs (const Matrix<float>& m) {
 	
 	Matrix<float> res(m);
 	return res;
@@ -72,7 +73,7 @@ Abs (const Matrix<float>& m) {
 }
 
 Matrix<double> 
-Abs (const Matrix<double>& m) {
+abs (const Matrix<double>& m) {
 	
 	Matrix<double> res(m);
 	return res;
@@ -81,7 +82,7 @@ Abs (const Matrix<double>& m) {
 
 
 Matrix<double> 
-Arg (const Matrix<cxdb>& m) {
+arg (const Matrix<cxdb>& m) {
 
 	Matrix<double> res(m.Dim());
 	
@@ -101,7 +102,7 @@ Arg (const Matrix<cxdb>& m) {
  
 
 Matrix<float> 
-Arg (const Matrix<cxfl>& m) {
+arg (const Matrix<cxfl>& m) {
 
 	Matrix<float> res(m.Dim());
 	
@@ -121,7 +122,7 @@ Arg (const Matrix<cxfl>& m) {
 
 
 Matrix<float> 
-Arg (const Matrix<float>& m) {
+arg (const Matrix<float>& m) {
 	
 	Matrix<float> res(m);
 	return res;
@@ -129,7 +130,7 @@ Arg (const Matrix<float>& m) {
 }
 
 Matrix<double> 
-Arg (const Matrix<double>& m) {
+arg (const Matrix<double>& m) {
 	
 	Matrix<double> res(m);
 	return res;
@@ -138,7 +139,7 @@ Arg (const Matrix<double>& m) {
 
 
 Matrix<double> 
-Real (const Matrix<cxdb>& m) {
+real (const Matrix<cxdb>& m) {
 
 	Matrix<double> res(m.Dim());
 	
@@ -158,7 +159,7 @@ Real (const Matrix<cxdb>& m) {
  
 
 Matrix<float> 
-Real (const Matrix<cxfl>& m) {
+real (const Matrix<cxfl>& m) {
 
 	Matrix<float> res(m.Dim());
 	
@@ -178,7 +179,7 @@ Real (const Matrix<cxfl>& m) {
 
 
 Matrix<float> 
-Real (const Matrix<float>& m) {
+real (const Matrix<float>& m) {
 	
 	Matrix<float> res(m);
 	return res;
@@ -186,7 +187,7 @@ Real (const Matrix<float>& m) {
 }
 
 Matrix<double> 
-Real (const Matrix<double>& m) {
+real (const Matrix<double>& m) {
 	
 	Matrix<double> res(m);
 	return res;
@@ -195,7 +196,7 @@ Real (const Matrix<double>& m) {
 
 
 Matrix<double> 
-Imag (const Matrix<cxdb>& m) {
+imag (const Matrix<cxdb>& m) {
 
 	Matrix<double> res(m.Dim());
 	
@@ -215,7 +216,7 @@ Imag (const Matrix<cxdb>& m) {
  
 
 Matrix<float> 
-Imag (const Matrix<cxfl>& m) {
+imag (const Matrix<cxfl>& m) {
 
 	Matrix<float> res(m.Dim());
 	
@@ -235,7 +236,7 @@ Imag (const Matrix<cxfl>& m) {
 
 
 Matrix<float> 
-Imag (const Matrix<float>& m) {
+imag (const Matrix<float>& m) {
 	
 	Matrix<float> res(m);
 	return res;
@@ -243,24 +244,25 @@ Imag (const Matrix<float>& m) {
 }
 
 Matrix<double> 
-Imag (const Matrix<double>& m) {
+imag (const Matrix<double>& m) {
 	
 	Matrix<double> res(m);
 	return res;
 	
 }
 
-	/**
-	 * @brief           Matrix of arguments  (i.e. arg(m))
-	 *
-	 * @param   m       Input matrix
-	 * @return          arg(m)
-	 */
-	template<class T> Matrix<T>
-	Conj (const Matrix<T>& m) {
 
-		Matrix<T> res = m;
-		
+/**
+ * @brief           Matrix of arguments  (i.e. arg(m))
+ *
+ * @param   m       Input matrix
+ * @return          arg(m)
+ */
+template<class T> Matrix<T>
+conj (const Matrix<T>& m) {
+	
+	Matrix<T> res = m;
+	
 		if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) {
 			
 #pragma omp parallel default (shared) 
@@ -272,12 +274,12 @@ Imag (const Matrix<double>& m) {
 					res[i] = cconj(m[i]);
 				
 			}		
-		
+			
 		}
-
+		
 		return res;
-	
-	}
-	
+		
+}
+
 #endif
 

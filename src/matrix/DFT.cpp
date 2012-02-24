@@ -43,7 +43,7 @@ DFT::DFT (const size_t rank, const size_t sl, const Matrix<double> mask, const M
 	if (pc.Size() > 1) {
 		m_have_pc = true;
 		m_pc      = pc;
-		m_cpc     = Conj(pc);
+		m_cpc     = conj(pc);
 
 		MXDump (m_pc, "m_pc.mat", "m_pc");
 		MXDump (m_cpc, "m_cpc.mat", "m_cpc");
@@ -81,7 +81,7 @@ DFT::DFT (const Matrix<int> size, const Matrix<double> mask, const Matrix<cxfl> 
 	if (pc.Size() > 1) {
 		m_have_pc = true;
 		m_pc = pc;
-		m_cpc = Conj(pc);
+		m_cpc = conj(pc);
 	}
 
 	for (size_t i = 0; i < rank; i++) {
