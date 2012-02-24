@@ -32,11 +32,25 @@ class DFT {
 	
 public:
 	
-	DFT         (const Matrix<int> size, const Matrix<double> mask = Matrix<double>(1), const Matrix<double> pc = Matrix<double>(1));
+	DFT         (const Matrix<int> size, const Matrix<double> mask = Matrix<double>(1), const Matrix<cxfl> pc = Matrix<cxfl>(1));
+	
+	DFT         (const size_t rank, const size_t sl, const Matrix<double> mask = Matrix<double>(1), const Matrix<cxfl> pc = Matrix<cxfl>(1));
 	
 	virtual 
 	~DFT        ();
 	
+
+	template <class T> Matrix<T>
+	operator* (const Matrix<T>& m) const;
+
+
+	template <class T> Matrix<T>
+	operator->* (const Matrix<T>& m) const {
+
+		return Trafo (m);
+
+	}
+
 
 	/**
 	 * @brief    Forward transform
@@ -45,7 +59,7 @@ public:
 	 * @return   Transform
 	 */
 	template <class T> Matrix<T> 
-	Trafo       (Matrix<T>& m) const ;
+	Trafo       (const Matrix<T>& m) const ;
 	
 	
 	/**
@@ -55,7 +69,7 @@ public:
 	 * @return   Transform
 	 */
 	template <class T> Matrix<T> 
-	Adjoint     (Matrix<T>& m) const;
+	Adjoint     (const Matrix<T>& m) const;
 	
 	
 private:
@@ -70,7 +84,8 @@ private:
 
 	Matrix<size_t> m_size;
 	Matrix<double> m_mask;
-	Matrix<double> m_pc;
+	Matrix<cxfl>   m_pc;
+	Matrix<cxfl>   m_cpc;
 
 	fftwf_plan     m_fwdplanf;
 	fftwf_plan     m_bwdplanf;

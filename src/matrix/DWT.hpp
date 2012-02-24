@@ -49,6 +49,9 @@ class DWT {
 public:
 
 
+
+	DWT();
+
 	/**
 	 * @brief Construct 2D Wavelet transform with wavelet class and side length
 	 *
@@ -85,9 +88,6 @@ public:
 
 private:
 	
-	DWT();
-
-
 	/**
 	 * @brief   Transform
 	 *

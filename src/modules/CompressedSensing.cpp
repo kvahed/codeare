@@ -21,6 +21,7 @@
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
 #include "TVOP.hpp"
+#include "IO.hpp"
 
 using namespace RRStrategy;
 
@@ -56,7 +57,7 @@ CompressedSensing::Init () {
 	Attribute ("csiter", &m_csiter);
 	Attribute ("wl_family", &m_wf);
 	Attribute ("wl_member", &m_wm);
-	printf ("  DWT(%i,%i)\n", m_wf, m_wm);
+	printf ("  DWT(%i,%i)", m_wf, m_wm);
 	
 	if (m_wf < -1 || m_wf > 5)
 		m_wf = -1;
@@ -90,26 +91,28 @@ CompressedSensing::Process () {
 	Matrix<cxfl>&   data  = GetCXFL   ("data");
 	Matrix<double>& pdf   = GetRLDB   ("pdf" );
 	Matrix<double>& mask  = GetRLDB   ("mask");
+	Matrix<cxfl>&   pc    = GetCXFL   ("pc");
 	Matrix<cxfl>&   im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
 	Matrix<cxfl>    orig;
-
-	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf));
 
     printf ("  Geometry: %iD (%lu,%lu,%lu)\n", Algos::HDim(data)+1, 
 			data.Dim(0), data.Dim(1), data.Dim(2));
 
+	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf));
+	m_cgparam.dft = new DFT (Algos::HDim(data)+1, data.Height(), mask, pc);
+	
 	im_dc  = data;
 	im_dc /= pdf;
-
-	im_dc = FFT::Backward(im_dc);
+	
+	im_dc = m_cgparam.dft->Adjoint(im_dc);
 	orig  = Matrix<cxfl>(im_dc);
-
+	
 	ma     = im_dc.Maxabs();
 	im_dc /= ma;
 	data  /= ma;
-
+	
 	im_dc  = m_cgparam.dwt->Trafo (im_dc);
-
+	
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
 	tic    = getticks();

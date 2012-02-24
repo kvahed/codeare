@@ -24,7 +24,7 @@
 #define __COMPRESSED_SENSING_HPP__
 
 #include "ReconStrategy.hpp"
-#include "FFT.hpp"
+#include "DFT.hpp"
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
@@ -55,6 +55,7 @@ namespace RRStrategy {
 		double lsb;
 
 		DWT*   dwt;
+		DFT*   dft;
 		
 	};
 
@@ -110,20 +111,6 @@ namespace RRStrategy {
 		int            m_wm;
 
 	};
-
-
-	Matrix<cxfl> FFWD (const Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
-
-		return FFT::Forward (data) * mask;
-
-	}
-
-
-	Matrix<cxfl> FBWD (Matrix<cxfl>& data, const Matrix<cxfl>& mask) {
-
-		return FFT::Backward(data * mask);
-
-	}
 
 
 	float Obj ( Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& data, float& t) {
@@ -207,11 +194,11 @@ namespace RRStrategy {
 	 */
 	Matrix<cxfl> GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const Matrix<cxfl>& mask, const CGParam& cgp) {
 		
-		Matrix<cxfl> g = x;
+		Matrix<cxfl> g;
 		
-		g  = FFWD (cgp.dwt->Adjoint (g), mask);
+		g  = cgp.dft->Trafo (cgp.dwt->Adjoint (x));
 		g -= data;
-		g  = cgp.dwt->Trafo (FBWD (g, mask));
+		g  = cgp.dwt->Trafo (cgp.dft->Adjoint (g));
 
 		return (2.0 * g);
 
@@ -292,8 +279,8 @@ namespace RRStrategy {
 
 			t = t0;
 
-			ffdbx = FFWD (cgp.dwt->Adjoint ( x), mask);
-			ffdbg = FFWD (cgp.dwt->Adjoint (dx), mask);
+			ffdbx = cgp.dft->Trafo (cgp.dwt->Adjoint ( x));
+			ffdbg = cgp.dft->Trafo (cgp.dwt->Adjoint (dx));
 			
 			if (cgp.tvw) {
 				ttdbx = TVOP::Transform (cgp.dwt->Adjoint ( x));
@@ -309,7 +296,7 @@ namespace RRStrategy {
 				
 				t *= cgp.lsb;
 				f1 = Objective(ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
-				if (f1 <= f0 - (cgp.lsa * cabs(g0.dotc(dx))))
+				if (f1 <= f0 - (cgp.lsa * t * cabs(g0.dotc(dx))))
 					break;
 				i++;
 				

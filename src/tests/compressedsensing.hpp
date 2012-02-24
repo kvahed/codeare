@@ -25,16 +25,17 @@ cstest (Connector<T>* rc) {
 	Matrix<cxfl> im_dc;
 	Matrix<double> mask;
 	Matrix<double> pdf;
+	Matrix<cxfl> pc;
 	
 	std::string cf  = std::string (base + std::string(config));
 	std::string df  = std::string (base + std::string(data));
 	std::string odf = std::string (base + std::string("/csout.mat"));
 
 #ifdef HAVE_MAT_H	
-	if (!(IO::MXRead (indata, df, "data") &&
-		  IO::MXRead (pdf,    df, "pdf")  &&
-		  IO::MXRead (mask,   df, "mask")))
-		return false;
+	if (!(IO::MXRead (indata, df, "data")))	return false;
+	if (!(IO::MXRead (pdf,    df, "pdf")))	pdf  = Matrix<double>(1);
+	if (!(IO::MXRead (mask,   df, "mask")))	mask = Matrix<double>(1);
+	if (!(IO::MXRead (pc,     df, "ph")))   pc   = Matrix<cxfl>(1);
 #endif
 
 	rc->ReadConfig (cf.c_str());
@@ -47,8 +48,9 @@ cstest (Connector<T>* rc) {
 	// Outgoing -------------
 	
 	rc->SetMatrix  ("data", indata); // Measurement data
-	rc->SetMatrix  ("pdf",  pdf);  // Sensitivities
-	rc->SetMatrix  ("mask", mask); // Weights
+	rc->SetMatrix  ("pdf",  pdf);    // Sensitivities
+	rc->SetMatrix  ("mask", mask);   // Weights
+	rc->SetMatrix  ("pc",   pc);     // Phase correction
 	
 	// ---------------------
 	
@@ -56,8 +58,8 @@ cstest (Connector<T>* rc) {
 	
 	// Incoming -------------
 	
-	rc->GetMatrix ("im_dc", im_dc);  // Images
-	rc->GetMatrix ("data", indata);  // Images
+	rc->GetMatrix ("im_dc", im_dc);  // Recon output
+	rc->GetMatrix ("data",  indata); // Weighted FT of original input
 	
 	// ---------------------
 	
