@@ -4,7 +4,6 @@
 
 #include "Algos.hpp"
 
-class Access {
 
 	
 	template <class T> static inline Matrix<T> 
@@ -81,4 +80,4 @@ class Access {
 		
 	}
 	
-};
+

@@ -2386,7 +2386,7 @@ Matrix<short>::Random () {
 template <class T> Matrix<T> 
 Matrix<T>::prodt (Matrix<T> &M) {
 	
-	return Lapack::GEMM (*this, M, 'C');
+	return GEMM (*this, M, 'C');
 	
 }
 
@@ -2394,7 +2394,7 @@ Matrix<T>::prodt (Matrix<T> &M) {
 template <class T> Matrix<T> 
 Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
 	
-	return Lapack::GEMM (*this, M, transa, transb);
+	return GEMM (*this, M, transa, transb);
 	
 }
 
@@ -2402,21 +2402,21 @@ Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
 template<class T>  T 
 Matrix<T>::dotc (Matrix<T>& M)  {
 
-	return Lapack::dotc (*this, M);
+	return dotc (*this, M);
 	
 }
 
 template<class T>  T 
 Matrix<T>::dotu (Matrix<T>& M)  {
 
-	return Lapack::dotu (*this, M);
+	return dotu (*this, M);
 	
 }
 
 template<class T>  T 
 Matrix<T>::dot (Matrix<T>& M)  {
 	
-	return Lapack::dot  (*this, M);
+	return dot  (*this, M);
 	
 }
 
