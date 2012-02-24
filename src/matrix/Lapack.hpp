@@ -102,9 +102,6 @@ extern "C" {
 #include "Matrix.hpp"
 #include "Algos.hpp"
 
-class Lapack {
-
-	public:
 
 	/**
 	 * @brief         Eigenvalue decomposition
@@ -648,7 +645,6 @@ class Lapack {
 
 	}
 
-};
 
 
 #endif // __LAPACK_HPP__
