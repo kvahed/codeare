@@ -21,14 +21,51 @@
 #include "DFT.hpp"
 #include "FFT.hpp"
 #include "Algos.hpp"
+#include "CX.hpp"
+#include "IO.hpp"
 
 #include <fftw3.h>
 #include <stdio.h>
 #include <string.h>
 
 
+DFT::DFT (const size_t rank, const size_t sl, const Matrix<double> mask, const Matrix<cxfl> pc) :
+	m_have_mask (false),
+	m_have_pc (false) {
+	
+	int n[rank];
+	
+	if (mask.Size() > 1) {
+		m_have_mask = true;
+		m_mask = mask;
+	}
+	
+	if (pc.Size() > 1) {
+		m_have_pc = true;
+		m_pc      = pc;
+		m_cpc     = CX::Conj(pc);
 
-DFT::DFT (const Matrix<int> size, const Matrix<double> mask, const Matrix<double> pc) : m_N(1),
+		IO::MXDump (m_pc, "m_pc.mat", "m_pc");
+		IO::MXDump (m_cpc, "m_cpc.mat", "m_cpc");
+	}
+
+	for (size_t i = 0; i < rank; i++)
+		n[i]  = sl;
+
+	m_N   = pow (sl, rank);
+
+	m_in  = (fftwf_complex*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
+	m_out = (fftwf_complex*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
+
+	m_fwdplanf = fftwf_plan_dft (rank, n, m_in, m_out, FFTW_FORWARD,  FFTW_MEASURE);
+	m_bwdplanf = fftwf_plan_dft (rank, n, m_in, m_out, FFTW_BACKWARD, FFTW_MEASURE);
+
+	m_initialised = true;
+
+}
+
+
+DFT::DFT (const Matrix<int> size, const Matrix<double> mask, const Matrix<cxfl> pc) : m_N(1),
 																						m_have_mask (false),
 																						m_have_pc (false) {
 	
@@ -44,6 +81,7 @@ DFT::DFT (const Matrix<int> size, const Matrix<double> mask, const Matrix<double
 	if (pc.Size() > 1) {
 		m_have_pc = true;
 		m_pc = pc;
+		m_cpc = CX::Conj(pc);
 	}
 
 	for (size_t i = 0; i < rank; i++) {
@@ -75,9 +113,9 @@ DFT::~DFT () {
 }
 
 
-template<> Matrix<cxfl> 
-DFT::Trafo (Matrix<cxfl>& m) const {
-	
+template<> Matrix<cxfl>
+DFT::operator* (const Matrix<cxfl>& m) const {
+
     Matrix<cxfl> res = FFT::Shift(m);
 	
 	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
@@ -94,23 +132,39 @@ DFT::Trafo (Matrix<cxfl>& m) const {
 }
 
 
-template<> Matrix<cxfl>
-DFT::Adjoint (Matrix<cxfl>& m) const {
-
-	assert (Algos::Is1D(m) || Algos::Is2D(m) || Algos::Is3D(m));
+template<> Matrix<cxfl> 
+DFT::Trafo (const Matrix<cxfl>& m) const {
 	
     Matrix<cxfl> res = FFT::Shift(m);
-	fftwf_plan   p; 
+	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
+	if (m_have_pc)
+		res *= m_pc;
+
+
+	fftwf_execute(m_fwdplanf);
+
+	memcpy (&res[0], m_out, sizeof(fftwf_complex) * m_N);
+	if (m_have_mask)
+		res *= m_mask;
+
+    return FFT::Shift(res/sqrt((float)m.Size()));
 	
-	if      (Algos::Is1D(m))
-		p = fftwf_plan_dft_1d (m.Dim(0),                     (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
-	else if (Algos::Is2D(m))
-		p = fftwf_plan_dft_2d (m.Dim(1), m.Dim(0),           (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
-	else if (Algos::Is3D(m))
-		p = fftwf_plan_dft_3d (m.Dim(2), m.Dim(1), m.Dim(0), (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_BACKWARD, FFTW_ESTIMATE);
-	
-	fftwf_execute(p);
-	fftwf_destroy_plan(p);
+}
+
+
+template<> Matrix<cxfl>
+DFT::Adjoint (const Matrix<cxfl>& m) const {
+
+    Matrix<cxfl> res = FFT::Shift(m);
+	if (m_have_mask)
+		res *= m_mask;
+	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
+
+	fftwf_execute(m_bwdplanf);
+
+	memcpy (&res[0], m_out, sizeof(fftwf_complex) * m_N);
+	if (m_have_pc)
+		res *= m_cpc;
 
 	return FFT::Shift(res/sqrt((float)m.Size()));
 	
@@ -118,7 +172,7 @@ DFT::Adjoint (Matrix<cxfl>& m) const {
 
 
 template<> Matrix<cxdb> 
-DFT::Trafo (Matrix<cxdb>& m) const {
+DFT::Trafo (const Matrix<cxdb>& m) const {
 	
 	assert (Algos::Is1D(m) || Algos::Is2D(m) || Algos::Is3D(m));
 	
@@ -143,7 +197,7 @@ DFT::Trafo (Matrix<cxdb>& m) const {
 
 
 template<> Matrix<cxdb>
-DFT::Adjoint (Matrix<cxdb>& m) const {
+DFT::Adjoint (const Matrix<cxdb>& m) const {
 
 	assert (Algos::Is1D(m) || Algos::Is2D(m) || Algos::Is3D(m));
 	

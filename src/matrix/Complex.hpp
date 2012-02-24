@@ -40,8 +40,8 @@ inline float  cimag (float  f) {return 0.0;}
 inline double cimag (cxdb  cd) {return cd.imag();}
 inline float  cimag (cxfl  cf) {return cf.imag();}
 
-inline double cabs  (double d) {return d;}
-inline float  cabs  (float  f) {return f;}
+inline double cabs  (double d) {return fabs(d);}
+inline float  cabs  (float  f) {return fabs(f);}
 inline double cabs  (cxdb  cd) {return std::abs(cd);}
 inline float  cabs  (cxfl  cf) {return std::abs(cf);}
 

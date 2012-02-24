@@ -11,27 +11,28 @@ fftwtest (Connector<T>* rc) {
 	Matrix<cxfl> m   = Matrix<cxfl>::Phantom2D(512);
 	Matrix<cxfl> k, i, j;
 
-	ticks cgstart = getticks();
-	for (size_t n = 0; n < 50; n++)
-		k = FFT::Forward(m);
-	printf ("FFT: %.4f s\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+	k = FFT::Forward(m);
 	i = FFT::Backward(k);
 
-	Matrix<int> size (2,1);
-	size[0] = 512;
-	size[1] = 512;
+	Matrix<double> msk;
+	Matrix<double> pdf;
+	Matrix<cxfl>   dat;
+	Matrix<cxfl>   phc;
+	Matrix<cxfl>   tst;
 
-	Matrix<double> mask;
+	IO::MXRead (msk, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "mask");
+	IO::MXRead (pdf,  "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "pdf");
+	IO::MXRead (dat, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "data");
+	IO::MXRead (phc, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "ph");
 
-	IO::MXRead (mask, "/Users/kvahed/git/codeare/share/compressedsensing/brain512.mat", "mask");
 
-	DFT dft (size, mask);
+	dat /= pdf;
+	DFT dft (2, 256, msk, phc);
 
-	cgstart = getticks();
-	for (size_t n = 0; n < 50; n++)
-		j = dft.Trafo(m);
-	printf ("DFT: %.4f s\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
-
+	dat = dft.Adjoint (dat);
+	tst = dft.Trafo   (dat);
+	tst = dft.Adjoint (tst);
+	tst = dft.Trafo   (tst);
 
 #ifdef HAVE_MAT_H	
 
@@ -45,7 +46,8 @@ fftwtest (Connector<T>* rc) {
 	IO::MXDump (m, mf, "m", "");
 	IO::MXDump (k, mf, "k", "");
 	IO::MXDump (i, mf, "i", "");
-	IO::MXDump (j, mf, "j", "");
+	IO::MXDump (dat, mf, "dat", "");
+	IO::MXDump (tst, mf, "tst", "");
 	
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", "");

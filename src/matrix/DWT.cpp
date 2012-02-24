@@ -20,6 +20,13 @@
 
 #include "DWT.hpp"
 
+DWT::DWT() {
+
+	m_wf = ID;
+	
+}
+
+
 DWT::DWT (const size_t& sl, const wlfamily& wf, const size_t& wm) {
 
 	// Checks missing !!!
@@ -44,10 +51,14 @@ DWT::DWT (const size_t& sl, const wlfamily& wf, const size_t& wm) {
 
 DWT::~DWT () {
 
-	free (m_re);
-	free (m_im);
+	if (m_wf != ID) {
 
-	gsl_wavelet_workspace_free (m_work);
+		free (m_re);
+		free (m_im);
+		
+		gsl_wavelet_workspace_free (m_work);
+
+	}
 
 }
 

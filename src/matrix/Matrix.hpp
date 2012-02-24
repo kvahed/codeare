@@ -429,6 +429,18 @@ public:
 	Ellipse             (const float* p, const size_t n, const T v = T(1.0));
 	
 	
+	/**
+	 * @brief           Create ellipse of ones in 2D square matrix
+	 *
+	 * @param  p        Parameter array. Must hold a, b, x0, y0, phi, intensity.
+	 * @param  n        Size of square
+	 * @param  v        Value of voxels inside, default: 1
+	 * @return          Matrix including ellipsoid
+	 */
+	static Matrix<T> 
+	LinSpace           (const T& start, const T& space, const T& end);
+	
+	
     //@}
 
 
@@ -1976,7 +1988,7 @@ public:
      * @return          The scalar value of the greatest element.
      */
     T                   
-    Max                 ();    
+    Max                 () const ;    
     
     
     /**
@@ -1985,7 +1997,7 @@ public:
      * @return          The scalar value of the smallest element.
      */
     T                   
-    Min                 ();
+    Min                 () const ;
     
     
 	/**
@@ -2008,7 +2020,7 @@ public:
      * @return          Maximum value
      */
     T                   
-    Maxabs              ();
+    Maxabs              () const ;
     
     
     /**
@@ -2017,7 +2029,7 @@ public:
      * @return          Maximum value
      */
     T                   
-    Minabs              ();
+    Minabs              () const ;
     
 
 	/**
@@ -2239,7 +2251,7 @@ Matrix<T>::Sub2Ind  (const Matrix<size_t>& subs) const {
 
 
 template <> inline short 
-Matrix<short>::Max() {
+Matrix<short>::Max() const {
 	
     short max = _M[0];
 	
@@ -2253,7 +2265,7 @@ Matrix<short>::Max() {
 
 
 template <> inline cxfl
-Matrix<cxfl>::Max() {
+Matrix<cxfl>::Max() const {
 		
 	cxfl   max = cxfl(0.0,0.0);
 	float tmp =  0.0;
@@ -2271,7 +2283,7 @@ Matrix<cxfl>::Max() {
 
 
 template <class T> inline T
-Matrix<T>::Maxabs() {
+Matrix<T>::Maxabs() const {
 
     T max = abs(_M[0]);
 
@@ -2279,13 +2291,13 @@ Matrix<T>::Maxabs() {
         if (abs(_M[i]) > abs(max))
             max = abs(_M[i]);
 
-    return abs(max);
+    return cabs(max);
 
 }
 
 
 template <class T> inline T
-Matrix<T>::Min() {
+Matrix<T>::Min() const {
 
     T min = _M[0];
 
@@ -2299,13 +2311,13 @@ Matrix<T>::Min() {
 
 
 template <class T> inline T  
-Matrix<T>::Minabs() {
+Matrix<T>::Minabs() const {
 
     T old = fabs(_M[0]);
 
     for (size_t i = 0; i < Size(); i++)
         if (fabs(_M[i]) < old)
-            old = fabs(_M[i]);
+            old = cabs(_M[i]);
 
     return old;
 
@@ -2500,6 +2512,26 @@ Matrix<cxdb>::Print (std::ostream& os) const {
 	
 }
 
+
+template <class T> Matrix<T>
+Matrix<T>::LinSpace (const T& start, const T& space, const T& end) {
+
+	assert (space != T(0));
+
+	Matrix<T> res;
+	size_t n;
+
+	n   = (size_t) ceil ((end - start) / space);
+	res = Matrix<T>::Zeros (n,1);
+
+	res[0] = start;
+
+	for (int i = 1; i < n; i++)
+		res[i] = res[i-1] + space;
+
+	return res;
+
+}
 
 
 
