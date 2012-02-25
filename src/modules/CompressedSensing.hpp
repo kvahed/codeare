@@ -114,7 +114,7 @@ namespace RRStrategy {
 	};
 
 
-	float Obj ( Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& data, float& t) {
+	float Obj (Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& data, float t) {
 	
 		Matrix<cxfl> om;
 		float        o = 0.0;
@@ -153,7 +153,7 @@ namespace RRStrategy {
 	/**
 	 *
 	 */
-	float ObjXFM (Matrix<cxfl>& x, Matrix<cxfl>& g, float& t, CGParam& cgp) {
+	float ObjXFM (Matrix<cxfl>& x, Matrix<cxfl>& g, float t, CGParam& cgp) {
 		
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
@@ -174,7 +174,7 @@ namespace RRStrategy {
 
 	float Objective (Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& ttdbx, 
 					 Matrix<cxfl>& ttdbg, Matrix<cxfl>&     x, Matrix<cxfl>&     g, 
-					 Matrix<cxfl>&  data, float&            t, float&         rmse,
+					 Matrix<cxfl>&  data, float             t, float&         rmse,
 					 CGParam&        cgp) {
 		
 		float obj = 0.0;
@@ -190,10 +190,12 @@ namespace RRStrategy {
 
 	}
 
+
 	/**
 	 * @brief Compute gradient of the data consistency
 	 */
-	Matrix<cxfl> GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& data, const Matrix<cxfl>& mask, const CGParam& cgp) {
+	Matrix<cxfl> 
+	GradObj (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp) {
 		
 		Matrix<cxfl> g;
 		
@@ -211,11 +213,13 @@ namespace RRStrategy {
 	 *
 	 *
 	 */
-	Matrix<cxfl> GradXFM   (Matrix<cxfl>& x, const CGParam& cgp) {
+	Matrix<cxfl> 
+	GradXFM   (Matrix<cxfl>& x, CGParam& cgp) {
 		
 		Matrix<cxfl> g;
 
-		g  = x * conj(x);
+		g  = x;
+		g *= conj(x);
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
 		g *= x;
@@ -228,17 +232,18 @@ namespace RRStrategy {
 	/**
 	 * @brief Compute gradient of the total variation operator
 	 */
-	Matrix<cxfl> GradTV    (const Matrix<cxfl>& x, const CGParam& cgp) {
+	Matrix<cxfl> 
+	GradTV    (Matrix<cxfl>& x, CGParam& cgp) {
 
-		Matrix<cxfl> dx = TVOP::Transform(cgp.dwt->Adjoint(x));
-		Matrix<cxfl> g  = dx * conj(dx);
+		Matrix<cxfl> dx, g;
 
+		dx = TVOP::Transform(cgp.dwt->Adjoint(x));
+
+		g  = dx;// * conj(dx);
+		g *= conj(dx);
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
-
-		for (int i = 0; i < g.Size(); i++)
-			g[i] *= dx[i]; 
-
+		g *= dx;
 		g *= cxfl(cgp.pnorm);
 		g  = cgp.dwt->Trafo (TVOP::Adjoint(g));
 
@@ -247,15 +252,17 @@ namespace RRStrategy {
 	}
 
 
-	Matrix<cxfl> Gradient (Matrix<cxfl>& x, const Matrix<cxfl>& data, const Matrix<cxfl>& mask, const CGParam& cgp) {
+	Matrix<cxfl> 
+	Gradient (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp) {
 
 		Matrix<cxfl> g;
 		
-		g = GradObj (x, data, mask, cgp);
-		
+		g = GradObj (x, data, cgp);
+
+
 		if (cgp.xfmw)
 			g += GradXFM (x, cgp);
-		
+
 		if (cgp.tvw)
 			g += GradTV  (x, cgp);
 
@@ -264,7 +271,9 @@ namespace RRStrategy {
 	} 
 
 
-	void NLCG (Matrix<cxfl>& x, Matrix<cxfl>& data, Matrix<double>& mask, CGParam& cgp) {
+	void 
+	NLCG (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp) {
+
 
 		int          k  = 0;
 		float        t0 = 1.0, t = 1.0, z = 0.0;
@@ -273,9 +282,9 @@ namespace RRStrategy {
 
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg;
 
-		g0 = Gradient (x, data, mask, cgp);
+		g0 = Gradient (x, data, cgp);
 		dx = -g0;
-
+		
 		do {
 
 			t = t0;
@@ -319,10 +328,12 @@ namespace RRStrategy {
 			x += (dx * t);
 			
 			// CG computation 
-			g1  =  Gradient (x, data, mask, cgp);
+			g1  =  Gradient (x, data, cgp);
 			bk  =  creal(g1.dotc(g1) / g0.dotc(g0));
 			g0  =  g1;
-			dx  = -g1 + dx * bk;
+			dx  = -g1;
+			dx +=  dx * bk;
+
 			k++;
 			
 			float dxn = creal(Norm(dx))/xn;
@@ -332,9 +343,8 @@ namespace RRStrategy {
 			if ((k > cgp.cgiter) || dxn < cgp.cgconv) break;
 			
 		} while (true);
-		
-	}
 
+	}
 	
 }
 #endif /* __COMPRESSED_SENSING_H__ */

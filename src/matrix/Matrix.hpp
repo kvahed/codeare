@@ -430,15 +430,15 @@ public:
 	
 	
 	/**
-	 * @brief           Create ellipse of ones in 2D square matrix
+	 * @brief           MATLAB-like linspace
 	 *
-	 * @param  p        Parameter array. Must hold a, b, x0, y0, phi, intensity.
-	 * @param  n        Size of square
-	 * @param  v        Value of voxels inside, default: 1
-	 * @return          Matrix including ellipsoid
+	 * @param  start    Start of range
+	 * @param  end      End of range
+	 * @param  n        Number of samples
+	 * @return          Vector of values
 	 */
 	static Matrix<T> 
-	LinSpace           (const T& start, const T& space, const T& end);
+	LinSpace           (const T& start, const T& end, const size_t& n);
 	
 	
     //@}
@@ -1098,7 +1098,7 @@ public:
 	 * @return          m + t
 	 */
 	template <class S> inline friend Matrix<T>    
-	operator+  (const S s, Matrix<T> &m) {
+	operator+  (const S s, const Matrix<T> &m) {
 		return   m + T(s);
 	}
 
@@ -1111,7 +1111,7 @@ public:
 	 * @return          -(m - s)
 	 */
 	template <class S> inline friend Matrix<T>
-	operator-  (const S s, Matrix<T> &m) {
+	operator-  (const S s, const Matrix<T> &m) {
 		return -(m - T(s));
 	}
 
@@ -1124,7 +1124,7 @@ public:
 	 * @return          m * s
 	 */
 	template <class S> inline friend Matrix<T>    
-	operator*  (const S& s, Matrix<T> &m) { 
+	operator*  (const S& s, const Matrix<T> &m) { 
 		return   m * s;
 	}
 
@@ -1137,7 +1137,7 @@ public:
 	 * @return          m == s
 	 */
 	inline friend Matrix<bool> 
-	operator== (T s, Matrix<T> m) {
+	operator== (const T& s, const Matrix<T>& m) {
 		return   m == s;
 	}
 
@@ -1150,7 +1150,7 @@ public:
 	 * @return          m <= t
 	 */
 	inline friend Matrix<bool> 
-	operator>= (T s, Matrix<T> m) {
+	operator>= (const T& s, const Matrix<T>& m) {
 		return   m <= s;
 	}
 
@@ -1163,7 +1163,7 @@ public:
 	 * @return          T<=M
 	 */
 	inline friend Matrix<bool> 
-	operator<= (T s, Matrix<T> m) {
+	operator<= (const T& s, const Matrix<T>& m) {
 		return   m >= s;
 	}
 
@@ -1176,7 +1176,7 @@ public:
 	 * @return          T!=M
 	 */
 	inline friend Matrix<bool> 
-	operator!= (T s, Matrix<T> m) {
+	operator!= (const T& s, const Matrix<T>& m) {
 		return   m != s;
 	}
 
@@ -1189,7 +1189,7 @@ public:
 	 * @return          T+M
 	 */
 	inline friend Matrix<bool> 
-	operator>  (T s, Matrix<T> m) {
+	operator>  (const T& s, const Matrix<T>& m) {
 		return   m <  s;
 	}
 
@@ -1202,7 +1202,7 @@ public:
 	 * @return          T+M
 	 */
 	inline friend Matrix<bool> 
-	operator<  (T s, Matrix<T> m) {
+	operator<  (const T& s, const Matrix<T>& m) {
 		return   m >  s;
 	}
 
@@ -1215,8 +1215,8 @@ public:
 	 * @return          T+M
 	 */
 	inline friend Matrix<T>    
-	operator&  (Matrix<bool>& mb, Matrix<T>& m) {
-		return   m &  mb;
+	operator&  (const Matrix<bool>& mb, const Matrix<T>& m) {
+		return   m & mb;
 	}
 
 	//@}
@@ -1362,14 +1362,13 @@ public:
 
     
     /**
-     * @brief           Resize to dims, reallocate and zero repository. 
-	 *                  Needs to becalled after any resize operation on dimensios. 
-	 *                  (i.e. M.Dim(2) = 10; Reset();)
-     *
-     * @param  dim      New dimensions
+     * @brief        Resize to mxn 2D matrix.<br/>Preserving data while shrinking.<br/>Adding zeros when growing.
+	 *               
+     * @param  m     # Rows
+     * @param  n     # Columns
      */
     inline void         
-    Resize              (const size_t& m, const size_t& n)                                      {
+    Resize          (const size_t& m, const size_t& n)                               {
 
 		_dim[0] = m;
 		_dim[1] = n;
@@ -1383,11 +1382,7 @@ public:
     
 
     /**
-     * @brief           Resize to dims, reallocate and zero repository. 
-	 *                  Needs to becalled after any resize operation on dimensios. 
-	 *                  (i.e. M.Dim(2) = 10; Reset();)
-     *
-     * @param  dim      New dimensions
+     * @brief           Resize
      */
     inline void         
     Resize              () {
@@ -1494,7 +1489,7 @@ public:
      * @param  M        The factor.
      */
     Matrix<T>           
-    operator->*         (Matrix<T>& M);
+    operator->*         (const Matrix<T>& M) const;
     
     
     /**
@@ -1503,7 +1498,7 @@ public:
      * @param  M        The factor.
      */
     template<class S> Matrix<T>           
-    operator->*         (Matrix<S>& M);
+    operator->*         (Matrix<S>& M) const ;
     
     
     /**
@@ -1512,7 +1507,7 @@ public:
      * @param  M        Matrix substruent.
      */
     template <class S> Matrix<T>           
-    operator-           (const Matrix<S> &M);
+    operator-           (const Matrix<S>& M) const;
     
     
     /**
@@ -1521,7 +1516,7 @@ public:
      * @param  s        Scalar substruent.
      */
     template <class S> Matrix<T>           
-    operator-           (const S s);
+    operator-           (const S& s) const;
     
     
     /**
@@ -1531,7 +1526,7 @@ public:
 	 * @return          Result
      */
     template <class S>  Matrix<T>           
-    operator-=          (const Matrix<S> &M);
+    operator-=          (const Matrix<S>& M);
     
     
     /**
@@ -1541,16 +1536,25 @@ public:
 	 * @return          Result
      */
     template <class S> Matrix<T>           
-    operator-=         (const S s);
+    operator-=         (const S& s);
     
     
     /**
-     * @brief           Negate or substruct from 0. i.e. 0 - this.
+     * @brief           Unary minus (additive inverse)
 	 *
 	 * @return          Negation
      */
     Matrix<T>           
-    operator-           ();
+    operator-           () const;
+    
+    
+    /**
+     * @brief           Unary plus
+	 *
+	 * @return          Identity
+     */
+    Matrix<T>           
+    operator+           () const;
     
     
     /**
@@ -1559,7 +1563,7 @@ public:
      * @param  M        Matrix additive.
      */
     template <class S> Matrix<T>           
-    operator+          (const Matrix<S> &M);
+    operator+          (const Matrix<S>& M) const;
     
     
     /**
@@ -1568,7 +1572,7 @@ public:
      * @param  s        Scalar additive.
      */
     template <class S> Matrix<T>           
-    operator+           (const S s);
+    operator+           (const S& s) const;
     
     
     /**
@@ -1578,7 +1582,7 @@ public:
 	 * @return          Result
      */
     template <class S> Matrix<T>           
-    operator+=          (const Matrix<S> &M);
+    operator+=          (const Matrix<S>& M);
     
     
     /**
@@ -1588,17 +1592,7 @@ public:
 	 * @return          Result
      */
     template <class S > Matrix<T>           
-    operator+=          (const S s);
-    
-    
-
-    /**
-     * @brief           Add to 0
-	 *
-	 * @return          M+0;
-     */
-    Matrix<T>           
-    operator+           ();
+    operator+=          (const S& s);
     
     
     /**
@@ -1617,7 +1611,7 @@ public:
 	 * @return          Cross-section or zero
      */
     Matrix<T>           
-    operator&           (Matrix<bool> &M);
+    operator&           (const Matrix<bool>& M) const ;
     
     
     /**
@@ -1627,7 +1621,7 @@ public:
      * @return          Matrix of true where elements are equal s and false else.
      */
     Matrix<bool>        
-    operator==          (T s);
+    operator==          (const T& s) const ;
     
     
     /**
@@ -1637,7 +1631,7 @@ public:
 	 * @return          Matrix of false where elements are equal s and true else.
      */
     Matrix<bool>        
-    operator!=          (T s);
+    operator!=          (const T& s) const ;
     
     
     /**
@@ -1647,7 +1641,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator>           (T s);
+    operator>           (const T& s) const ;
     
     
     /**
@@ -1657,7 +1651,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator>=          (T s);
+    operator>=          (const T& s) const;
     
     
     /**
@@ -1667,7 +1661,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator<=          (T s);
+    operator<=          (const T& s) const;
     
     
     /**
@@ -1677,7 +1671,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator<           (T s);
+    operator<           (const T& s) const;
     
     
     /**
@@ -1687,7 +1681,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator==          (Matrix<T> M);
+    operator==          (const Matrix<T>& M) const;
     
     
     /**
@@ -1697,7 +1691,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator!=          (Matrix<T> M);
+    operator!=          (const Matrix<T>& M) const;
     
     
     /**
@@ -1707,7 +1701,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator>=          (Matrix<T> M);
+    operator>=          (const Matrix<T>& M) const;
     
     
     /**
@@ -1717,7 +1711,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator<=          (Matrix<T> M);
+    operator<=          (const Matrix<T>& M) const;
     
     
     /**
@@ -1727,7 +1721,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator>           (Matrix<T> M);
+    operator>           (const Matrix<T>& M) const;
     
     
     /**
@@ -1737,7 +1731,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<bool>        
-    operator<           (Matrix<T> M);
+    operator<           (const Matrix<T>& M) const; 
     
     
     /**
@@ -1747,7 +1741,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<T>           
-    operator||          (Matrix<T> M);
+    operator||          (const Matrix<T>& M) const;
     
     
     /**
@@ -1757,7 +1751,7 @@ public:
 	 * @return          Hit list
      */
     Matrix<T>           
-    operator&&          (Matrix<T> &M);
+    operator&&          (const Matrix<T>& M) const;
 
 
     /**
@@ -1767,7 +1761,7 @@ public:
 	 * @return          Result
      */
     Matrix<T>           
-    operator^           (const float p);
+    operator^           (const float& p) const;
     
     /**
      * @brief           Elementwise raise of power. i.e. this .^ p.
@@ -1776,9 +1770,88 @@ public:
 	 * @return          Result
      */
     Matrix<T>           
-    operator^=          (const float p);
+    operator^=          (const float& p);
     
-	//friend Matrix<T> operator+(Matrix<T> &a, Matrix<T> &b){return a+b;};
+
+    /**
+     * @brief           Elementwise multiplication. i.e. this .* M.
+     *
+     * @param  M        Factor matrix.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator*          (const Matrix<S> &M) const ;
+
+
+    /**
+     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
+	 *
+	 * @param  s        Factor scalar
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator*          (const S& s) const ;
+
+    
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
+     *
+     * @param  M        Factor matrix.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator*=         (const Matrix<S>& M);
+    
+    
+    /**
+     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this *= s.
+     *
+     * @param  s        Factor scalar.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>
+    operator*=         (const S& s);
+    
+    
+    /**
+     * @brief           Elelemtwise division by M.
+     *
+     * @param  M        The divisor.
+	 * @return          Result
+     */
+    template <class S>  Matrix<T>           
+    operator/          (const Matrix<S>& M) const;
+
+    
+    /**
+     * @brief           Elementwise division by scalar. i.e. this * m.
+	 *
+     * @param  s        The divisor.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator/           (const S& s) const;
+    
+    /**
+     * @brief           ELementwise division and assignment operator. i.e. this = this ./ M.
+     *
+     * @param  M        Divisor matrix.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator/=         (const Matrix<S> &M);
+    
+    
+    /**
+     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
+     *
+     * @param  s        Divisor scalar.
+	 * @return          Result
+     */
+    template <class S> Matrix<T>           
+    operator/=         (const S& s);
+    
+    
     //@}
 
 
@@ -1799,85 +1872,6 @@ public:
 	Random             ();    
 
 
-    /**
-     * @brief           Elementwise multiplication. i.e. this .* M.
-     *
-     * @param  M        Factor matrix.
-	 * @return          Result
-     */
-    template <class S> Matrix<T>           
-    operator*          (const Matrix<S> &M);
-
-
-    /**
-     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
-	 *
-	 * @param  s        Factor scalar
-	 * @return          Result
-     */
-    template <class S> Matrix<T>           
-    operator*          (const S& s);
-
-    
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
-     * @param  M        Factor matrix.
-	 * @return          Result
-     */
-    template <class S> Matrix<T>           
-    operator*=         (const Matrix<S> &M);
-    
-    
-    /**
-     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this *= s.
-     *
-     * @param  s        Factor scalar.
-	 * @return          Result
-     */
-    template <class S> Matrix<T>
-    operator*=         (const S& s);
-    
-    
-    /**
-     * @brief           Elelemtwise division by M.
-     *
-     * @param  M        The divisor.
-	 * @return          Result
-     */
-    template <class S>  Matrix<T>           
-    operator/          (const Matrix<S> &M);
-
-    
-    /**
-     * @brief           Elementwise division by scalar. i.e. this * m.
-	 *
-     * @param  s        The divisor.
-	 * @return          Result
-     */
-    template <class S> Matrix<T>           
-    operator/           (const S s);
-    
-    /**
-     * @brief           ELementwise division and assignment operator. i.e. this = this ./ M.
-     *
-     * @param  M        Divisor matrix.
-	 * @return          Result
-     */
-    template <class S> Matrix<T>           
-    operator/=         (const Matrix<S> &M);
-    
-    
-    /**
-     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Divisor scalar.
-	 * @return          Result
-     */
-    template <class S> Matrix<T>           
-    operator/=         (const S s);
-    
-    
     //@}
     
     /**
@@ -2514,23 +2508,24 @@ Matrix<cxdb>::Print (std::ostream& os) const {
 
 
 template <class T> Matrix<T>
-Matrix<T>::LinSpace (const T& start, const T& space, const T& end) {
-
-	assert (space != T(0));
-
+Matrix<T>::LinSpace (const T& start, const T& end, const size_t& n) {
+	
+	assert (n > 1);
+	
 	Matrix<T> res;
-	size_t n;
+	T gap;
 
-	n   = (size_t) ceil ((end - start) / space);
+	gap = T(end-start) / T(n-1);
 	res = Matrix<T>::Zeros (n,1);
-
+	
 	res[0] = start;
-
-	for (int i = 1; i < n; i++)
-		res[i] = res[i-1] + space;
-
+	res[n] = end;
+	
+	for (int i = 1; i < n-1; i++)
+		res[i] = res[i-1] + gap;
+	
 	return res;
-
+	
 }
 
 
@@ -2538,6 +2533,5 @@ Matrix<T>::LinSpace (const T& start, const T& space, const T& end) {
 #include "Matrix_Constructors.hpp"
 #include "Matrix_Operators.cpp"
 #include "Matrix_ICE.cpp"
-//#include "Matrix_FFT.hpp"
 
 #endif // __MATRIX_H__

@@ -118,7 +118,7 @@ CompressedSensing::Process () {
 	tic    = getticks();
 
 	for (int i = 0; i < m_csiter; i++)
-		NLCG (im_dc, data, mask, m_cgparam);
+		NLCG (im_dc, data, m_cgparam);
 
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
