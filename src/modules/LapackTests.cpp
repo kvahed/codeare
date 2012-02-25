@@ -211,7 +211,7 @@ LapackTests::Process     () {
 	MXRead(A, "tmp.mat", "EM");
 	MXRead(b, "tmp.mat", "PA");
 
-	Matrix<cxfl> x = MCGLS::Solve (A, b, 300, 1.0e-6, 1.0);
+	Matrix<cxfl> x = MCGLS (A, b, 300, 1.0e-6, 1.0);
 	MXDump(x, "x.mat", "x");
 #endif
 

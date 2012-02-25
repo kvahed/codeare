@@ -108,6 +108,7 @@ extern "C" {
 	 *                Eigenvalue decomposition with Lapack routines Xgeev
 	 *
 	 * @param  m      Matrix for decomposition
+	 * @param  ev     Eigenvalues
 	 * @param  lv     Left  Eigen-vectors
 	 * @param  rv     Right Eigen-vectors
 	 * @param  jobvl  Compute left vectors ('N'/'V')

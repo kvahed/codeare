@@ -103,7 +103,7 @@ IsXD (const Matrix<T>& M, const size_t d) {
  * @brief       All elements zero?
  * 
  * @param  M    Matrix
- * @param       All elements zero?
+ * @return      All elements zero?
  */
 template <class T>  inline bool 
 IsZero (const Matrix<T>& M) {
@@ -120,7 +120,7 @@ IsZero (const Matrix<T>& M) {
  * @brief       Empty matrix?
  * 
  * @param  M    Matrix
- * @param       Empty?
+ * @return      Empty?
  */
 template <class T>  inline bool
 IsEmpty (const Matrix<T>& M) {
@@ -135,7 +135,7 @@ IsEmpty (const Matrix<T>& M) {
  * 
  * @param  M    Matrix
  * @param  d    Dimension
- * @returm      Sum of squares
+ * @return      Sum of squares
  */
 template <class T>  inline Matrix<T> 
 SOS (Matrix<T>& M, const size_t d) {
@@ -306,7 +306,7 @@ Sum (Matrix<T>& M, const size_t d) {
 /**
  * @brief     Highest dimension unequal 1
  * 
- * @param     Matrix
+ * @param  M  Matrix
  * @return    Highest non-one dimension
  */
 template <class T> inline  size_t

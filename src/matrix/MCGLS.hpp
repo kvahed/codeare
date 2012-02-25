@@ -21,72 +21,68 @@
 #include "Lapack.hpp"
 #include "Toolbox.hpp"
 
-class MCGLS {
 
-public:
-
-	/**
-	 * @brief         Tikhonov regulated CGNR least squares solution of ||Ax - b||_2 + l * ||x||_2
-	 *
-	 * @param  A      Matrix A
-	 * @param  b      Vector b
-	 * @param  maxit  Maximum number of CG iterations
-	 * @param  conv   Convergence of residuals
-	 * @param  lambda Tikhonov weight
-	 * @return        Vector x
-	 */
-	template<class T> static Matrix<T> 
-	Solve (Matrix<T>& A, Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
-
-		size_t ah   = A.Height();
-		size_t aw   = A.Width();
-		size_t bh   = b.Height();
-		size_t bw   = b.Width();
-
-		assert (bw == 1);  // Column vector x
-		assert (ah == bh); // Check inner dimensions of A'*x. 
-
-		ticks tic   = getticks();
-
-		Matrix<T> p = GEMM (A, b, 'C');
-		Matrix<T> r = p;
-
-		Matrix<T> x (p.Dim()); 
-		Matrix<T> q;
-
-		T         ts;
-
-		float     rn = 0.0;
-		float     xn = pow(creal(Norm(p)), 2);
-
-		std::vector<double> res;
-
-		for (size_t i = 0; i < maxit; i++) {
-			
-			rn  = pow(creal(Norm(r)), 2);
-			res.push_back(rn/xn);
-
-			if (std::isnan(res.at(i)) || res.at(i) <= conv) break;
-
-			if (i % 5 == 0 && i > 0) printf ("\n");
-			printf ("    %03lu %.7f", i, res.at(i));
-			
-			q   = GEMM(A, p);
-			q   = GEMM(A, q, 'C');
-			q  += lambda * p;
-			
-			ts  = (rn / (p.dotc(q)));
-			x  += (p * ts);
-			r  -= (q * ts);
-			p  *= pow(creal(Norm(r)), 2)/rn;
-			p  += r;
-			
-		}
+/**
+ * @brief         Tikhonov regulated CGNR least squares solution of ||Ax - b||_2 + l * ||x||_2
+ *
+ * @param  A      Matrix A
+ * @param  b      Vector b
+ * @param  maxit  Maximum number of CG iterations
+ * @param  conv   Convergence of residuals
+ * @param  lambda Tikhonov weight
+ * @return        Vector x
+ */
+template<class T> static Matrix<T> 
+MCGLS (Matrix<T>& A, Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
+	
+	size_t ah   = A.Height();
+	size_t aw   = A.Width();
+	size_t bh   = b.Height();
+	size_t bw   = b.Width();
+	
+	assert (bw == 1);  // Column vector x
+	assert (ah == bh); // Check inner dimensions of A'*x. 
+	
+	ticks tic   = getticks();
+	
+	Matrix<T> p = GEMM (A, b, 'C');
+	Matrix<T> r = p;
+	
+	Matrix<T> x (p.Dim()); 
+	Matrix<T> q;
+	
+	T         ts;
+	
+	float     rn = 0.0;
+	float     xn = pow(creal(Norm(p)), 2);
+	
+	std::vector<double> res;
+	
+	for (size_t i = 0; i < maxit; i++) {
 		
-		printf ("\n  MCGLS time: %.4f s\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+		rn  = pow(creal(Norm(r)), 2);
+		res.push_back(rn/xn);
 		
-		return x;
+		if (std::isnan(res.at(i)) || res.at(i) <= conv) break;
+		
+		if (i % 5 == 0 && i > 0) printf ("\n");
+		printf ("    %03lu %.7f", i, res.at(i));
+		
+		q   = GEMM(A, p);
+		q   = GEMM(A, q, 'C');
+		q  += lambda * p;
+		
+		ts  = (rn / (p.dotc(q)));
+		x  += (p * ts);
+		r  -= (q * ts);
+		p  *= pow(creal(Norm(r)), 2)/rn;
+		p  += r;
 		
 	}
+	
+	printf ("\n  MCGLS time: %.4f s\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	
+	return x;
+	
+}
 
-};
