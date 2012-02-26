@@ -100,30 +100,34 @@ CompressedSensing::Process () {
 
 	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf));
 	m_cgparam.dft = new DFT (HDim(data)+1, data.Height(), mask, pc);
+	m_cgparam.tvt = new TVOP ();
+
+	DFT& dft = *m_cgparam.dft;
+	DWT& dwt = *m_cgparam.dwt;
 	
-	im_dc  = data;
-	im_dc /= pdf;
+	im_dc    = data;
+	im_dc   /= pdf;
 	
-	im_dc = m_cgparam.dft->Adjoint(im_dc);
-	orig  = Matrix<cxfl>(im_dc);
+	im_dc    = dft ->* im_dc;
+	orig     = Matrix<cxfl>(im_dc);
 	
-	ma     = im_dc.Maxabs();
-	im_dc /= ma;
-	data  /= ma;
+	ma       = im_dc.Maxabs();
+	im_dc   /= ma;
+	data    /= ma;
 	
-	im_dc  = m_cgparam.dwt->Trafo (im_dc);
+	im_dc    = dwt * im_dc;
 	
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
-	tic    = getticks();
+	tic      = getticks();
 
 	for (int i = 0; i < m_csiter; i++)
 		NLCG (im_dc, data, m_cgparam);
 
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
-	im_dc  = m_cgparam.dwt->Adjoint (im_dc) * ma;
-	data   = orig;
+	im_dc    = dwt ->* im_dc * ma;
+	data     = orig;
 
 	return OK;
 

@@ -379,4 +379,18 @@ size               (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief           Get vector of dimensions
+ *
+ * @param   M       Matrix
+ * @return          Number of cells.
+ */
+template <class T>  size_t
+size               (const Matrix<T>& M, const size_t& d) {
+	
+	return M.Dim(d);
+	
+}
+
+
 #endif 

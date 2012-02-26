@@ -21,9 +21,12 @@
 #ifndef __DWT_HPP__
 #define __DWT_HPP__
 
+/**
+ * @brief  Supported wavelet families
+ */
 enum wlfamily {
 	
-	ID = -1,
+	ID = -1,                  /**< Identity transform*/
 	WL_DAUBECHIES,
 	WL_DAUBECHIES_CENTERED,
 	WL_HAAR,
@@ -48,9 +51,6 @@ class DWT {
 
 public:
 
-
-
-	DWT();
 
 	/**
 	 * @brief Construct 2D Wavelet transform with wavelet class and side length
@@ -77,13 +77,33 @@ public:
 	
 
 	/**
-	 * @brief    Backward transform
+	 * @brief    Adjoint transform
 	 *
 	 * @param  m To transform
 	 * @return   Transform
 	 */
 	Matrix<cxfl> 
 	Adjoint      (const Matrix<cxfl>& m) const ;
+	
+
+	/**
+	 * @brief    Forward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	template <class T> Matrix<T> 
+	operator*    (const Matrix<T>& m) const ;
+	
+
+	/**
+	 * @brief    Adjoint transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	template <class T> Matrix<T> 
+	operator->* (const Matrix<T>& m) const ;
 	
 
 private:
@@ -98,16 +118,16 @@ private:
 	Matrix<cxfl> 
 	Transform    (const Matrix<cxfl>& m, const bool& bw) const ;
 
-	wlfamily m_wf;
+	wlfamily m_wf;                 /**< @brief wavelet family */
 
-	size_t  m_sz;
-	size_t  m_sl;
+	size_t  m_sz;                  /**< @brief data size */
+	size_t  m_sl;                  /**< @brief side length */
 
-	double* m_re;
-	double* m_im;
+	double* m_re;                  /**< @brief Real store */
+	double* m_im;                  /**< @brief Imag store */
 	
-	gsl_wavelet_workspace* m_work;
-	gsl_wavelet           *m_w;
+	gsl_wavelet_workspace* m_work; /**< @brief Work space */
+	gsl_wavelet           *m_w;    /**< @brief Wavelet    */
 	
 };
 

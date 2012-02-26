@@ -57,6 +57,7 @@ namespace RRStrategy {
 
 		DWT*   dwt;
 		DFT*   dft;
+		TVOP*  tvt;
 		
 	};
 
@@ -197,11 +198,14 @@ namespace RRStrategy {
 	Matrix<cxfl> 
 	GradObj (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp) {
 		
+		DFT& dft = *(cgp.dft);
+		DWT& dwt = *(cgp.dwt);
+
 		Matrix<cxfl> g;
 		
-		g  = cgp.dft->Trafo (cgp.dwt->Adjoint (x));
+		g  = dft * (dwt->*x);
 		g -= data;
-		g  = cgp.dwt->Trafo (cgp.dft->Adjoint (g));
+		g  = dwt * (dft->*g);
 
 		return (2.0 * g);
 
@@ -218,8 +222,7 @@ namespace RRStrategy {
 		
 		Matrix<cxfl> g;
 
-		g  = x;
-		g *= conj(x);
+		g  = x * conj(x);
 		g += cxfl(cgp.l1);
 		g ^= (((float)cgp.pnorm)/2.0-1.0);
 		g *= x;
@@ -235,17 +238,20 @@ namespace RRStrategy {
 	Matrix<cxfl> 
 	GradTV    (Matrix<cxfl>& x, CGParam& cgp) {
 
+		DWT&  dwt = *cgp.dwt;
+		TVOP& tvt = *cgp.tvt;
+		float p   = ((float)cgp.pnorm)/2.0-1.0;
+
 		Matrix<cxfl> dx, g;
 
-		dx = TVOP::Transform(cgp.dwt->Adjoint(x));
+		dx = tvt * (dwt->*x);
 
-		g  = dx;// * conj(dx);
-		g *= conj(dx);
+		g  = dx * conj(dx);
 		g += cxfl(cgp.l1);
-		g ^= (((float)cgp.pnorm)/2.0-1.0);
+		g ^= p;
 		g *= dx;
 		g *= cxfl(cgp.pnorm);
-		g  = cgp.dwt->Trafo (TVOP::Adjoint(g));
+		g  = dwt * (tvt->*g);
 
 		return (cgp.tvw * g);
 
@@ -280,7 +286,11 @@ namespace RRStrategy {
 		float        xn = creal(Norm(x));
 		float        rmse, bk;
 
-		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg;
+		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
+
+		DWT&  dwt = *cgp.dwt;
+		DFT&  dft = *cgp.dft;
+		TVOP& tvt = *cgp.tvt;
 
 		g0 = Gradient (x, data, cgp);
 		dx = -g0;
@@ -289,12 +299,15 @@ namespace RRStrategy {
 
 			t = t0;
 
-			ffdbx = cgp.dft->Trafo (cgp.dwt->Adjoint ( x));
-			ffdbg = cgp.dft->Trafo (cgp.dwt->Adjoint (dx));
+			wx  = dwt->*x;
+			wdx = dwt->*dx;
+
+			ffdbx = dft * wx;
+			ffdbg = dft * wdx;
 			
 			if (cgp.tvw) {
-				ttdbx = TVOP::Transform (cgp.dwt->Adjoint ( x));
-				ttdbg = TVOP::Transform (cgp.dwt->Adjoint (dx));
+				ttdbx = tvt * wx;
+				ttdbg = tvt * wdx;
 			}
 			
 			float f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
@@ -319,10 +332,8 @@ namespace RRStrategy {
 				return;
 			}
 			
-			if (i > 2)
-				t0 *= cgp.lsb;
-			else if (i < 1)
-				t0 /= cgp.lsb;
+			if      (i > 2) t0 *= cgp.lsb;
+			else if (i < 1) t0 /= cgp.lsb;
 
 			// Update image
 			x += (dx * t);

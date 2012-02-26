@@ -29,104 +29,160 @@ using namespace H5;
 using namespace TinyXPath;
 using namespace std;
 
-
-	inline bool
-	FExists (const char* fname) {
+/**
+ * brief          Does a file exist?
+ * 
+ * @param  fname  File name
+ * @return        Does it exist?
+ */
+inline bool
+FExists (const char* fname) {
 		
-		ifstream fs (fname);
-		
-		if (fs)
-			return true;
-		else
-			return false;
-		
-	}
+	ifstream fs (fname);
 	
-	
-	template <class T> inline std::string 
-	DimsToString (const Matrix<T>& M) {
-		
-		std::stringstream ss;
-		
-		for (size_t i = 0; i <= HDim(M); i++)
-			ss << (int)M.Dim(i) << " ";
-		
-		return ss.str();
-		
-	}
-	
-	
-	template <class T> inline const char* 
-	DimsToCString (const Matrix<T>& M) {
-		
-		return DimsToString(M).c_str();
-		
-	}
-	
-	
-	template <class T> inline std::string 
-	ResToString (const Matrix<T>& M) {
-		
-		stringstream ss;
-		
-		for (size_t i = 0; i <= HDim(M); i++)
-			ss << M.Res(i) << " ";
-		
-		return ss.str();
-		
-	}
-
-
-	template <class T> inline const char* 
-	ResToCString (const Matrix<T>& M) {
-		
-		return ResToString(M).c_str();
-		
-	}
-	
-	
-	template <class T> inline bool
-	PRDump (const Matrix<T>& M, const string fname) {
-		
-		FILE *fp;
-		
-		if ((fp=fopen(fname.c_str(), "wb"))==NULL) {
-			printf("Cannot open %s file.\n", fname.c_str());
-			return false;
-		}
-		
-		if (fwrite(&M[0], sizeof(float), M.Size(), fp) != M.Size()) {
-			printf("File read error.");
-			fclose(fp);
-			return false;
-		}
-		
-		fclose(fp);
-		
+	if (fs)
 		return true;
+	else
+		return false;
+	
+}
+
+
+/**
+ * @brief          Print dimensions to string
+ * 
+ * @param  M       Matrix
+ * @return         String of dimensions
+ */
+template <class T> inline std::string 
+DimsToString (const Matrix<T>& M) {
+	
+	std::stringstream ss;
 		
+	for (size_t i = 0; i <= HDim(M); i++)
+		ss << (int)M.Dim(i) << " ";
+	
+	return ss.str();
+		
+}
+	
+	
+/**
+ * @brief          Print dimensions to c string
+ *
+ * @param  M       Matrix
+ * @return         C string of dimensions
+ */
+template <class T> inline const char* 
+DimsToCString (const Matrix<T>& M) {
+	
+	return DimsToString(M).c_str();
+	
+}
+	
+	
+/**
+ * @brief          Print resolutions to string
+ * 
+ * @param  M       Matrix
+ * @return         String of resolutions
+ */
+template <class T> inline std::string 
+ResToString (const Matrix<T>& M) {
+	
+	stringstream ss;
+	
+	for (size_t i = 0; i <= HDim(M); i++)
+		ss << M.Res(i) << " ";
+	
+	return ss.str();
+	
+}
+
+
+
+/**
+ * @brief          Print dimensions to c string
+ * 
+ * @param  M       Matrix
+ * @return         C string of resolutions
+ */
+template <class T> inline const char* 
+ResToCString (const Matrix<T>& M) {
+	
+	return ResToString(M).c_str();
+	
+}
+
+	
+/**
+ * @brief            Primitive dump of data.<br> The data id dumped column major into a file.
+ *
+ * @param   M        Matrix
+ * @param   fname    File name       
+ * @return           Success
+ */
+template <class T> inline bool
+PRDump (const Matrix<T>& M, const string fname) {
+	
+	FILE *fp;
+	
+	if ((fp=fopen(fname.c_str(), "wb"))==NULL) {
+		printf("Cannot open %s file.\n", fname.c_str());
+		return false;
 	}
 	
+	if (fwrite(&M[0], sizeof(float), M.Size(), fp) != M.Size()) {
+		printf("File read error.");
+		fclose(fp);
+		return false;
+	}
+	
+	fclose(fp);
+	
+	return true;
+	
+}
+	
 
-	template <class T> inline bool 
-	Dump (const Matrix<T>& M, const string fname, const string dname, const string dloc = "", const io_strategy ios = HDF5) {
-		
-		if      (ios == HDF5)
-			return H5Dump (M, fname, dname, dloc);
+/**
+ * @brief          Dump data to file.<br> @see H5Dump, @see MXDump, @see NIDump, @see PRDump
+ * 
+ * @param  M       Matrix
+ * @param  fname   File name
+ * @param  dname   Data name in file (MATLAB/HDF5) 
+ * @param  dloc    Data location in file (MATLAB/HDF5)
+ * @param  ios     IO Strategy (HDF5 (default if libraries installed), MATLAB, NIFTI, primitive)
+ * @return         Success
+ */ 
+template <class T> inline bool 
+Dump (const Matrix<T>& M, const string fname, const string dname, const string dloc = "", const io_strategy ios = HDF5) {
+	
+	if      (ios == HDF5)
+		return H5Dump (M, fname, dname, dloc);
 #ifdef HAVE_MAT_H
-		else if (ios == MATLAB)
-			return MXDump (M, fname, dname, dloc);
+	else if (ios == MATLAB)
+		return MXDump (M, fname, dname, dloc);
 #endif
-		else if (ios == NIFTI)
-			return NIDump (M, fname);
-		else
-			return PRDump (M, fname);
+	else if (ios == NIFTI)
+		return NIDump (M, fname);
+	else
+		return PRDump (M, fname);
 	
-	}
+}
 
 
-	template <class T> bool 
-	H5Dump (const Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
+/**
+ * @brief          Dump data to HDF5 file.
+ * 
+ * @param  M       Matrix
+ * @param  fname   File name
+ * @param  dname   Data name 
+ * @param  dloc    Not operational yet!!
+ * @return         Success
+ */
+template <class T> bool 
+H5Dump (const Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
 	
 		size_t i = 0;
 		
@@ -252,6 +308,7 @@ using namespace std;
 #else // HAVE_H5CPP_H
 			
 			printf ("HDF5 ERROR - Didn't dump nothin'");
+			return error;
 		
 #endif // HAVE_H5CPP_H
 				
@@ -262,108 +319,130 @@ using namespace std;
 	}
 	
 
+
+/**
+ * @brief         Prepare matrix for Syngo MR read.
+ *
+ * @param  M      Matrix
+ * @param  fname  File name
+ * @return        Success
+ */
+template <class T> bool
+RSAdjust (Matrix<T>& M, const std::string& fname) {
 	
-	template <class T> bool
-	RSAdjust (Matrix<T>& M, const std::string& fname) {
-		
-		size_t dimk;
-		size_t dimv;
-		
-		// XML file name, run cmd and repository
-		stringstream    xmlf;
-		stringstream    cmd;
-		
-		// XML objects
-		TiXmlDocument*       doc = new TiXmlDocument();
-		TiXmlElement*       meta;
-		TiXmlNode*           vol;
-		
-		// Dimensions in XProtocol
-		
-		map < string, size_t > dims;
-		dims["NImageCols"] =  0; dims["NLinMeas"] =  1; dims["NSlcMeas"] =  2; dims["NParMeas"] =  3;
-		dims[  "NEcoMeas"] =  4; dims["NPhsMeas"] =  5; dims["NRepMeas"] =  6; dims["NSetMeas"] =  7;
-		dims[  "NSegMeas"] =  8; dims[  "RawCha"] =  9; dims["NIdaMeas"] = 10; dims["NIdbMeas"] = 11;
-		dims[  "NIdcMeas"] = 12; dims["NIddMeas"] = 13; dims["NIdeMeas"] = 14; dims["NAveMeas"] = 15; 
-		
-		string channels  = "RawCha";
-		string doublevals [2] = {"RoFOV", "PeFOV"};
-		string slcthickn = "SliceThickness";
-		
-		// Create XML output from XProt
-		cmd << "/usr/local/bin/convert.pl ";
-		cmd << fname;
-		size_t ec = system (cmd.str().c_str());
-
-		// Output filename
-		xmlf << fname;
-		xmlf << ".xml";
-		
-		// Read XML and go to rawobjectprovider for dimensions
-		doc->LoadFile (xmlf.str().c_str());
-		meta = doc->RootElement();
-
-		TiXmlNode* rootfunctor    = TinyXPath::XNp_xpath_node 
-			(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']");
-		
-		// Dimensions
-		vol  = rootfunctor->FirstChild ("ParamLong");
-		map < string, size_t >::iterator it;
-		string key;
-		
-		do {
-			
-			key = ((TiXmlElement*)vol)->Attribute("name");
-			it = dims.find (key);
-			
-			if (it != dims.end()) {
-				
-				dimk = dims[key];
-				dimv = atoi( ((TiXmlElement*)vol)->Attribute("value"));
-				
-				if (dimk == 0) dimv *= 2;
-				if (dimv == 0) dimv = 1;
-				
-				M.Dim(dimk) = dimv;
-				
-			}
-			
-		} while ((vol = rootfunctor->IterateChildren ("ParamLong", vol))!=NULL);
-		
-		M.Res(0) = (float)TinyXPath::d_xpath_double
-			(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='RoFOV']/@value") / M.Dim(0) * 2;
-		M.Res(1) = (float)TinyXPath::d_xpath_double 
-			(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='PeFOV']/@value") / M.Dim(1);
-		M.Res(3) = (float)TinyXPath::d_xpath_double
-			(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamArray[@name='SliceThickness']/ParamDouble[1]/Precision[1]/@value") / M.Dim(3);
-		
-		M.Dim(9) = i_xpath_int 
-			(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online2']/ParamFunctor[@name='rawobjprovider']/ParamLong[@name='RawCha']/@value"); 
-		
-		M.Reset();
+	size_t dimk;
+	size_t dimv;
 	
-		delete doc;
-		return true;
+	// XML file name, run cmd and repository
+	stringstream    xmlf;
+	stringstream    cmd;
+	
+	// XML objects
+	TiXmlDocument*       doc = new TiXmlDocument();
+	TiXmlElement*       meta;
+	TiXmlNode*           vol;
+	
+	// Dimensions in XProtocol
+	
+	map < string, size_t > dims;
+	dims["NImageCols"] =  0; dims["NLinMeas"] =  1; dims["NSlcMeas"] =  2; dims["NParMeas"] =  3;
+	dims[  "NEcoMeas"] =  4; dims["NPhsMeas"] =  5; dims["NRepMeas"] =  6; dims["NSetMeas"] =  7;
+	dims[  "NSegMeas"] =  8; dims[  "RawCha"] =  9; dims["NIdaMeas"] = 10; dims["NIdbMeas"] = 11;
+	dims[  "NIdcMeas"] = 12; dims["NIddMeas"] = 13; dims["NIdeMeas"] = 14; dims["NAveMeas"] = 15; 
+	
+	string channels  = "RawCha";
+	string doublevals [2] = {"RoFOV", "PeFOV"};
+	string slcthickn = "SliceThickness";
+	
+	// Create XML output from XProt
+	cmd << "/usr/local/bin/convert.pl ";
+	cmd << fname;
+	size_t ec = system (cmd.str().c_str());
+	
+	// Output filename
+	xmlf << fname;
+	xmlf << ".xml";
+	
+	// Read XML and go to rawobjectprovider for dimensions
+	doc->LoadFile (xmlf.str().c_str());
+	meta = doc->RootElement();
+	
+	TiXmlNode* rootfunctor    = TinyXPath::XNp_xpath_node 
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']");
+	
+	// Dimensions
+	vol  = rootfunctor->FirstChild ("ParamLong");
+	map < string, size_t >::iterator it;
+	string key;
+	
+	do {
 		
-	}
+		key = ((TiXmlElement*)vol)->Attribute("name");
+		it = dims.find (key);
+		
+		if (it != dims.end()) {
+			
+			dimk = dims[key];
+			dimv = atoi( ((TiXmlElement*)vol)->Attribute("value"));
+			
+			if (dimk == 0) dimv *= 2;
+			if (dimv == 0) dimv = 1;
+			
+			M.Dim(dimk) = dimv;
+			
+		}
+		
+	} while ((vol = rootfunctor->IterateChildren ("ParamLong", vol))!=NULL);
+	
+	M.Res(0) = (float)TinyXPath::d_xpath_double
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='RoFOV']/@value") / M.Dim(0) * 2;
+	M.Res(1) = (float)TinyXPath::d_xpath_double 
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='PeFOV']/@value") / M.Dim(1);
+	M.Res(3) = (float)TinyXPath::d_xpath_double
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamArray[@name='SliceThickness']/ParamDouble[1]/Precision[1]/@value") / M.Dim(3);
+	
+	M.Dim(9) = i_xpath_int 
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online2']/ParamFunctor[@name='rawobjprovider']/ParamLong[@name='RawCha']/@value"); 
+	
+	M.Reset();
+	
+	delete doc;
+	return true;
+	
+}
 
 
-	inline void
-	ProgressBar (const std::string& pre, const std::string& post, const short& p) {
-		
-		assert (p >=   0);
-		assert (p <= 100);
-		
-		std::cout << "\r";
-		std::cout << pre.c_str();
-		std::cout << " | ";
-		std::cout << bars.substr(0, p/2) << " " <<  blancs.substr(0, 50-p/2) << "| " << std::setw(3) << std::setfill(' ') << p << "% done";
-		
-	}
+/**
+ * @brief              Primitive command window progress bar.
+ *
+ * @param   pre        Display before bar.
+ * @param   post       Display after bar.
+ * @param   p          Percent done.
+ */
+inline void
+ProgressBar (const std::string& pre, const std::string& post, const short& p) {
+	
+	assert (p >=   0);
+	assert (p <= 100);
+	
+	std::cout << "\r";
+	std::cout << pre.c_str();
+	std::cout << " | ";
+	std::cout << bars.substr(0, p/2) << " " <<  blancs.substr(0, 50-p/2) << "| " << std::setw(3) << std::setfill(' ') << p << "% done";
+	
+}
 
 
-	template <class T> bool 
-	RAWRead (Matrix<T>& M, const std::string& fname, const std::string& version) {
+/**
+ * @brief          Read from Syngo MR .dat file
+ * 
+ * @param  M       Matrix to hold the data
+ * @param  fname   File name
+ * @param  version Syngo MR version 
+ * @return         Success
+ */
+template <class T> bool 
+RAWRead (Matrix<T>& M, const std::string& fname, const std::string& version) {
 	
 		// Get size information from XProtocol and resize 
 		ticks  tic = getticks();
@@ -442,28 +521,49 @@ using namespace std;
 		
 	}
 	
-	template <class T> inline bool 
-	Read (Matrix<T>& M, const std::string& fname, const std::string& dname, const std::string& dloc = "", const io_strategy& ios = HDF5) {
-		
-		if      (ios == HDF5)
-			return H5Read (M, fname, dname, dloc);
+
+
+/**
+ * @brief          Read matrix from file
+ * 
+ * @param  M       Matrix to hold the data
+ * @param  fname   File name
+ * @param  dname   Data name 
+ * @param  dloc    Data location 
+ * @param  ios     IO Strategy (HDF5 (default if libraries installed), MATLAB, NIFTI, primitive)
+ * @return         Success
+ */
+template <class T> inline bool 
+Read (Matrix<T>& M, const std::string& fname, const std::string& dname, const std::string& dloc = "", const io_strategy& ios = HDF5) {
+	
+	if      (ios == HDF5)
+		return H5Read (M, fname, dname, dloc);
 #ifdef HAVE_MAT_H
-		else if (ios == MATLAB)
-			return MXRead (M, fname, dname, dloc);
+	else if (ios == MATLAB)
+		return MXRead (M, fname, dname, dloc);
 #endif
-		else if (ios == NIFTI)
-			return NIRead (M, fname);
-		
-		return true;
-		
-	}
+	else if (ios == NIFTI)
+		return NIRead (M, fname);
+	
+	return true;
+	
+}
 
 
-	template <class T> bool 
-	H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
+/**
+ * @brief          Read matrix from HDF5 file
+ * 
+ * @param  M       Matrix to hold the data
+ * @param  fname   File name
+ * @param  dname   Data name 
+ * @param  dloc    Data location
+ * @return         Success
+ */
+template <class T> bool 
+H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
+	
+	if (fname != "") {
 		
-		if (fname != "") {
-			
 #ifdef HAVE_H5CPP_H
 			
 #ifndef VERBOSE
@@ -533,6 +633,7 @@ using namespace std;
 #else // HAVE_H5CPP_H
 		
 			printf ("HDF5 ERROR - Didn't read nothin'");
+			return error
 		
 #endif // HAVE_H5CPP_H
 				
@@ -543,369 +644,453 @@ using namespace std;
 	}
 	
 	
+/**
+ * @brief          Read matrix from MATLAB file
+ * 
+ * @param  M       Matrix to hold the data
+ * @param  fname   File name
+ * @param  dname   Data name 
+ * @param  dloc    Data location (not operational yet)
+ * @return         Success
+ */
+template <class T> bool
+MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
+	
 #ifdef HAVE_MAT_H
 	
-	template <class T> bool
-	MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
+	// Open file ---------------------------------
+	
+	MATFile*  mf = matOpen (fname.c_str(), "r");
+	
+	if (mf == NULL) {
+		printf ("Error opening file %s\n", fname.c_str());
+		return false;
+	}
+	// -------------------------------------------
+	
+	// Get dimensions ----------------------------
 		
-		// Open file ---------------------------------
+	mxArray*      mxa = matGetVariable (mf, dname.c_str());
 		
-		MATFile*  mf = matOpen (fname.c_str(), "r");
+	if (mxa == NULL) {
+		printf ("Error opening variable %s\n", dname.c_str());
+		return false;
+	}
 		
-		if (mf == NULL) {
-			printf ("Error opening file %s\n", fname.c_str());
+	mxClassID     mcid = mxGetClassID(mxa);
+	
+	mwSize        ndim = mxGetNumberOfDimensions(mxa);
+	const mwSize*  dim = mxGetDimensions(mxa);
+	
+	for (size_t i = 0; i < ndim; i++)
+		M.Dim(i) = (size_t)dim[i];
+	
+	for (size_t i = ndim; i < INVALID_DIM; i++)
+		M.Dim(i) = 1;
+	
+	M.Reset();
+	// -------------------------------------------
+	
+	// Copy from memory block ----------------------
+	
+	printf ("  Reading %s: (%s) ... ", dname.c_str(), DimsToCString(M)); fflush(stdout);
+	
+	if (typeid(T) == typeid(double) || typeid(T) == typeid(double)) {
+		memcpy(&M[0], mxGetPr(mxa), M.Size() * sizeof(T));
+	} else if (typeid(T) == typeid(cxfl)) {
+		if (mxGetPi(mxa) != NULL)
+			for (size_t i = 0; i < M.Size(); i++) {
+				float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
+				memcpy(&M[i], f, 2 * sizeof(float));
+			}
+		else
+			for (size_t i = 0; i <M.Size(); i++) {
+				float f[2] = {((float*)mxGetPr(mxa))[i], 0.0}; 
+				memcpy(&M[i], f, 2 * sizeof(float));
+			}
+	} else
+		for (size_t i = 0; i <M.Size(); i++)
+			M[i] = ((T*)mxGetPr(mxa))[i];
+	
+	printf ("done\n");
+	// -------------------------------------------
+	
+	// Clean up and close file -------------------
+	if (mxa != NULL)
+		mxDestroyArray(mxa);
+	
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n",fname.c_str());
+		return false;
+	}
+	// -------------------------------------------
+	
+	return true;
+	
+#else 
+	
+	printf ("MATLAB IO ERROR - Didn't read nothin'");
+	return false;
+	
+#endif
+
+}
+
+
+/**
+ * @brief          Dump matrix to MATLAB file
+ * 
+ * @param  M       Matrix
+ * @param  mf      File pointer   
+ * @param  dname   Data name 
+ * @param  dloc    Data location (not operational yet)
+ * @return         Success
+ */
+template <class T> bool
+MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
+		
+#ifdef HAVE_MAT_H
+	// Declare dimensions and allocate array -----
+	
+	mwSize   dim[INVALID_DIM];
+		
+	for (size_t i = 0; i < INVALID_DIM; i++)
+		dim[i] = (mwSize)M.Dim(i);
+	
+	mxArray*  mxa;
+	
+	if      (typeid(T) == typeid(double))
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
+	else if (typeid(T) == typeid(float))
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS,    mxREAL);
+	else if (typeid(T) == typeid(cxfl))
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
+	else if (typeid(T) == typeid(short))
+		mxa = mxCreateNumericArray (INVALID_DIM, dim,  mxINT16_CLASS,    mxREAL);
+	// -------------------------------------------
+	
+	
+	// Copy to memory block ----------------------
+	
+	if (typeid(T) == typeid(cxfl))
+		for (size_t i = 0; i <M.Size(); i++) {
+			((float*)mxGetPr(mxa))[i] = ((float*)&M[0])[2*i+0]; // Template compilation workaround
+			((float*)mxGetPi(mxa))[i] = ((float*)&M[0])[2*i+1]; // Can't use .imag() .real(). Consider double/short 
+		}
+	else 
+		memcpy(mxGetPr(mxa), &M[0],M.Size() * sizeof(T));
+	
+	// -------------------------------------------
+	
+	// Write data --------------------------------
+	int status = matPutVariable(mf, dname.c_str(), mxa);
+	
+	if (status != 0) {
+		printf("%s :  Error using matPutVariable on line %d\n", __FILE__, __LINE__);
+		return false;
+	}
+	// -------------------------------------------
+	
+	
+	// Clean up RAM ------------------------------
+	
+	if (mxa != NULL)
+		mxDestroyArray(mxa);
+	// -------------------------------------------
+	
+	return true;
+
+#else 
+
+	printf ("MATLAB IO ERROR - Didn't dump nothin'");
+	return false;
+
+#endif 
+	
+}
+
+
+	
+/**
+ * @brief          Dump matrix to MATLAB file
+ * 
+ * @param  M       Matrix
+ * @param  fname   File name 
+ * @param  dname   Data name 
+ * @param  dloc    Data location (not operational yet)
+ * @return         Success
+ */
+template <class T> bool 
+MXDump (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
+	
+#ifdef HAVE_MAT_H
+	
+	// Open file ---------------------------------
+	
+	MATFile*  mf = matOpen (fname.c_str(), "w");
+	
+	if (mf == NULL) {
+		printf ("Error creating file %s\n", fname.c_str());
+		return false;
+	}
+	// -------------------------------------------
+	
+	MXDump (M, mf, dname, dloc);	
+	
+	
+	// Close file --------------------------------
+	
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n",fname.c_str());
+		return false;
+	}
+	// -------------------------------------------
+	
+	return true;
+	
+#else 
+	
+	printf ("MATLAB IO ERROR - Didn't dump nothin'");
+	return false;
+	
+#endif 
+	
+}
+	
+	
+	
+/**
+ * @brief          Dump matrix to NIFTI file
+ * 
+ * @param  M       Matrix
+ * @param  fname   File name 
+ * @return         Success
+ */
+template <class T> bool
+NIDump (Matrix<T>& M, const string fname) {
+	
+	if (fname != "") {
+		
+#ifdef HAVE_NIFTI1_IO_H
+		
+		Matrix<T>      tmp = M;
+		Squeeze(tmp);
+		
+		size_t            l   = fname.length();
+		
+		nifti_1_header header;
+		header.sizeof_hdr = 348;
+		header.dim[0] = HDim(tmp) + 1;
+		header.pixdim[0] = HDim(tmp) + 1;
+		
+		if (HDim(tmp) > 7) {
+			printf ("Cannot dump more than 8 dimensions to NIFTI FILE\n.");
 			return false;
 		}
-		// -------------------------------------------
 		
-		// Get dimensions ----------------------------
-		
-		mxArray*      mxa = matGetVariable (mf, dname.c_str());
-		
-		if (mxa == NULL) {
-			printf ("Error opening variable %s\n", dname.c_str());
-			return false;
+		for (size_t i = 0; i < 7; i++) {
+			header.dim   [i+1] = tmp.Dim(i);
+			header.pixdim[i+1] = tmp.Res(i);
 		}
 		
-		mxClassID     mcid = mxGetClassID(mxa);
+		if      (typeid(T) == typeid(cxfl))
+			header.datatype = 32;
+		else if (typeid(T) == typeid(double))
+			header.datatype = 64;
+		else if (typeid(T) == typeid(short))
+			header.datatype = 256;
+			
+		nifti_image* ni = nifti_convert_nhdr2nim(header, NULL);
 		
-		mwSize        ndim = mxGetNumberOfDimensions(mxa);
-		const mwSize*  dim = mxGetDimensions(mxa);
+		ni->nifti_type = 1;
 		
-		for (size_t i = 0; i < ndim; i++)
-			M.Dim(i) = (size_t)dim[i];
+		// Single nii.gz file
+		ni->fname = (char*) calloc(1,l); 
+		strcpy(ni->fname,fname.c_str());
+		ni->iname = (char*) calloc(1,l); 
+		strcpy(ni->iname,fname.c_str());
 		
-		for (size_t i = ndim; i < INVALID_DIM; i++)
+		ni->data = (void*) malloc (M.Size() * sizeof (T));
+		memcpy (ni->data, &M[0], M.Size() * sizeof (T));
+		
+		nifti_image_write (ni);
+		nifti_image_free (ni); 
+		
+		return true;
+		
+#else 
+		
+		printf ("NIFTI IO ERROR - Didn't dump nothin'");
+		return false;
+		
+#endif
+		
+	} else {
+		
+		printf ("NIFTI IO ERROR - Empty file name");
+		return false;
+		
+	}
+	
+}
+	
+
+/**
+ * @brief          Read matrix from NIFTI file
+ * 
+ * @param  M       Matrix
+ * @param  fname   File name 
+ * @return         Success
+ */
+template <class T> bool
+NIRead (Matrix<T>& M, const string fname) {
+	
+	if (fname != "") {
+		
+#ifdef HAVE_NIFTI1_IO_H
+		
+		nifti_image* ni = nifti_image_read (fname.c_str(), 1);
+		
+		if (ni == NULL) 
+			return false;
+		
+		for (size_t i = 0; i < ni->dim[0]; i++)
+			if (ni->dim[i+1] > 1) {
+				M.Dim(i) = ni->dim[i+1];
+				M.Res(i) = ni->pixdim[i+1];
+			}
+		
+		for (size_t i = ni->dim[0]; i < INVALID_DIM; i++) {
 			M.Dim(i) = 1;
+			M.Res(i) = 0.0;
+		}
 		
 		M.Reset();
-		// -------------------------------------------
 		
-		// Copy from memory block ----------------------
-		
-		printf ("  Reading %s: (%s) ... ", dname.c_str(), DimsToCString(M)); fflush(stdout);
-		
-		if (typeid(T) == typeid(double) || typeid(T) == typeid(double)) {
-			memcpy(&M[0], mxGetPr(mxa), M.Size() * sizeof(T));
-		} else if (typeid(T) == typeid(cxfl)) {
-			if (mxGetPi(mxa) != NULL)
-				for (size_t i = 0; i < M.Size(); i++) {
-					float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
-					memcpy(&M[i], f, 2 * sizeof(float));
-				}
-			else
+		if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
+			if (ni->datatype == 64)
+				memcpy (&M[0], ni->data,M.Size()*sizeof(T));
+			else 
+				for (size_t i = 0; i <M.Size(); i++ )
+					M[i] = ((float*)ni->data)[i];
+		} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(cxfl)) {
+			if (ni->datatype == 32)
+				memcpy (&M[0], ni->data,M.Size()*sizeof(T));
+			else 
 				for (size_t i = 0; i <M.Size(); i++) {
-					float f[2] = {((float*)mxGetPr(mxa))[i], 0.0}; 
+					float f[2] = {((double*)ni->data)[2*i], ((double*)ni->data)[2*i+1]};
 					memcpy(&M[i], f, 2 * sizeof(float));
 				}
-		} else
-			for (size_t i = 0; i <M.Size(); i++)
-				M[i] = ((T*)mxGetPr(mxa))[i];
-		
-		printf ("done\n");
-		// -------------------------------------------
-		
-		// Clean up and close file -------------------
-		if (mxa != NULL)
-			mxDestroyArray(mxa);
-		
-		if (matClose(mf) != 0) {
-			printf ("Error closing file %s\n",fname.c_str());
-			return false;
-		}
-		// -------------------------------------------
-		
-		return true;
-		
-	}
-
-	
-	template <class T> bool
-	MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
-		
-		// Declare dimensions and allocate array -----
-		
-		mwSize   dim[INVALID_DIM];
-		
-		for (size_t i = 0; i < INVALID_DIM; i++)
-			dim[i] = (mwSize)M.Dim(i);
-	
-		mxArray*  mxa;
-
-		if      (typeid(T) == typeid(double))
-			mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
-		else if (typeid(T) == typeid(float))
-			mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS,    mxREAL);
-		else if (typeid(T) == typeid(cxfl))
-			mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
-		else if (typeid(T) == typeid(short))
-			mxa = mxCreateNumericArray (INVALID_DIM, dim,  mxINT16_CLASS,    mxREAL);
-		// -------------------------------------------
-		
-		
-		// Copy to memory block ----------------------
-		
-		if (typeid(T) == typeid(cxfl))
-			for (size_t i = 0; i <M.Size(); i++) {
-				((float*)mxGetPr(mxa))[i] = ((float*)&M[0])[2*i+0]; // Template compilation workaround
-				((float*)mxGetPi(mxa))[i] = ((float*)&M[0])[2*i+1]; // Can't use .imag() .real(). Consider double/short 
-			}
-		else 
-			memcpy(mxGetPr(mxa), &M[0],M.Size() * sizeof(T));
-		
-		// -------------------------------------------
-		
-		// Write data --------------------------------
-		int status = matPutVariable(mf, dname.c_str(), mxa);
-		
-		if (status != 0) {
-			printf("%s :  Error using matPutVariable on line %d\n", __FILE__, __LINE__);
-			return false;
-		}
-		// -------------------------------------------
-		
-		
-		// Clean up RAM ------------------------------
-		
-		if (mxa != NULL)
-			mxDestroyArray(mxa);
-		// -------------------------------------------
-		
-		return true;
-		
-	}
-	
-
-	
-	template <class T> bool 
-	MXDump (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
-		
-		// Open file ---------------------------------
-		
-		MATFile*  mf = matOpen (fname.c_str(), "w");
-		
-		if (mf == NULL) {
-			printf ("Error creating file %s\n", fname.c_str());
-			return false;
-		}
-		// -------------------------------------------
-		
-		MXDump (M, mf, dname, dloc);	
-		
-		
-		// Close file --------------------------------
-		
-		if (matClose(mf) != 0) {
-			printf ("Error closing file %s\n",fname.c_str());
-			return false;
-		}
-		// -------------------------------------------
-		
-		return true;
-		
-	}
-	
-#endif
-	
-	
-	template <class T> bool
-	NIDump (Matrix<T>& M, const string fname) {
-		
-		if (fname != "") {
-			
-#ifdef HAVE_NIFTI1_IO_H
-			
-			Matrix<T>      tmp = M;
-			Squeeze(tmp);
-			
-			size_t            l   = fname.length();
-			
-			nifti_1_header header;
-			header.sizeof_hdr = 348;
-			header.dim[0] = HDim(tmp) + 1;
-			header.pixdim[0] = HDim(tmp) + 1;
-			
-			if (HDim(tmp) > 7) {
-				printf ("Cannot dump more than 8 dimensions to NIFTI FILE\n.");
-				return false;
-			}
-			
-			for (size_t i = 0; i < 7; i++) {
-				header.dim   [i+1] = tmp.Dim(i);
-				header.pixdim[i+1] = tmp.Res(i);
-			}
-			
-			if      (typeid(T) == typeid(cxfl))
-				header.datatype = 32;
-			else if (typeid(T) == typeid(double))
-				header.datatype = 64;
-			else if (typeid(T) == typeid(short))
-				header.datatype = 256;
-			
-			nifti_image* ni = nifti_convert_nhdr2nim(header, NULL);
-			
-			ni->nifti_type = 1;
-			
-			// Single nii.gz file
-			ni->fname = (char*) calloc(1,l); 
-			strcpy(ni->fname,fname.c_str());
-			ni->iname = (char*) calloc(1,l); 
-			strcpy(ni->iname,fname.c_str());
-			
-			ni->data = (void*) malloc (M.Size() * sizeof (T));
-			memcpy (ni->data, &M[0], M.Size() * sizeof (T));
-			
-			nifti_image_write (ni);
-			nifti_image_free (ni); 
-			
-			return true;
-			
-#else 
-			
-			return false;
-			
-#endif
+		} else if ((ni->datatype == 256 || ni->datatype == 4) && typeid(T) == typeid(short)) {
+			if (ni->datatype == 256 || ni->datatype == 4)
+				memcpy (&M[0], ni->data, SizeInRAM(M));
 			
 		} else {
-			
+			printf (" Unsupported data type %i!", ni->datatype);
 			return false;
-			
 		}
 		
-	}
-	
-	
-	template <class T> bool
-	NIRead (Matrix<T>& M, const string fname) {
+		nifti_image_free (ni);
+			
+		return true;
 		
-		if (fname != "") {
-			
-#ifdef HAVE_NIFTI1_IO_H
-			
-			nifti_image* ni = nifti_image_read (fname.c_str(), 1);
-			
-			if (ni == NULL) 
-				return false;
-			
-			for (size_t i = 0; i < ni->dim[0]; i++)
-				if (ni->dim[i+1] > 1) {
-					M.Dim(i) = ni->dim[i+1];
-					M.Res(i) = ni->pixdim[i+1];
-			}
-			
-			for (size_t i = ni->dim[0]; i < INVALID_DIM; i++) {
-				M.Dim(i) = 1;
-				M.Res(i) = 0.0;
-			}
-			
-			M.Reset();
-			
-			if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
-				if (ni->datatype == 64)
-					memcpy (&M[0], ni->data,M.Size()*sizeof(T));
-				else 
-					for (size_t i = 0; i <M.Size(); i++ )
-						M[i] = ((float*)ni->data)[i];
-			} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(cxfl)) {
-				if (ni->datatype == 32)
-					memcpy (&M[0], ni->data,M.Size()*sizeof(T));
-				else 
-					for (size_t i = 0; i <M.Size(); i++) {
-						float f[2] = {((double*)ni->data)[2*i], ((double*)ni->data)[2*i+1]};
-						memcpy(&M[i], f, 2 * sizeof(float));
-					}
-			} else if ((ni->datatype == 256 || ni->datatype == 4) && typeid(T) == typeid(short)) {
-				if (ni->datatype == 256 || ni->datatype == 4)
-					memcpy (&M[0], ni->data, SizeInRAM(M));
-				
-			} else {
-				printf (" Unsupported data type %i!", ni->datatype);
-				return false;
-			}
-			
-			nifti_image_free (ni);
-			
-			return true;
-			
 #else 
-			
-			return false;
+
+		printf ("NIFTI IO ERROR - Missing NIFTI libraries/headers");
+		return false;
 			
 #endif
 			
-		} else {
-			
-			return false;
-			
-		}
+	} else {
+		
+		printf ("NIFTI IO ERROR - Empty file name");
+		return false;
 		
 	}
 	
+}
 	
-	// Function not finished yet. Do not use.
-	template <class T> bool 
-	CDFDump (const Matrix<T>& M, const string fname, const string dname, const string dloc) {
-		
+	
+/**
+ * @brief          Read matrix to CDF file.<br/> !!! FUNCTION NOT READY YET !!!
+ * 
+ * @param  M       Matrix
+ * @param  fname   File name 
+ * @param  dname   Data name
+ * @param  dloc    Data location
+ * @return         Success
+ */
+template <class T> bool 
+CDFDump (const Matrix<T>& M, const string fname, const string dname, const string dloc) {
+	
 #ifdef HAVE_CDF_H
 		
-		CDFid     id;                // CDF identifier.
-		CDFstatus status;            // CDF completion status.
+	CDFid     id;                // CDF identifier.
+	CDFstatus status;            // CDF completion status.
+	
+	FILE*     fp;
 		
-		FILE*     fp;
+	long cType;                 // Compression type
+	long cParms[CDF_MAX_PARMS]; // Compression parameters
+	
+	status = CDFcreateCDF (fname.c_str(), &id);
+	
+	if (status != CDF_OK) 
+		return false;
 		
-		long cType;                 // Compression type
-		long cParms[CDF_MAX_PARMS]; // Compression parameters
-		
-		status = CDFcreateCDF (fname.c_str(), &id);
-		
-		if (status != CDF_OK) 
-			return false;
-		
-		long dims [HDim(M)];
-		long dimv [HDim(M)];
-		
-		for (int i = 0; i < HDim(M); i++) {
-			dims[i] = M.Dim(i);
-			dimv[i] = VARY;
-		}
-		
-		long imvn;
-		
-		status = CDFcreatezVar (id, dname.c_str(), CDF_FLOAT, 1L, (long)HDim(), dims, VARY, dimv, &imvn);
-		
-		if (status != CDF_OK) 
-			return false;
-		
-		cType = GZIP_COMPRESSION;
-		cParms[0] = 5;             /* GZIP compression level */
-		status = CDFsetzVarCompression (id, imvn, cType, cParms);
-		
-		if (status != CDF_OK) 
-			return false;
-		
-		status = CDFcloseCDF (id);
-		
-		if (status != CDF_OK) 
-			return false;
-		
-		return true;
-		
+	long dims [HDim(M)];
+	long dimv [HDim(M)];
+	
+	for (int i = 0; i < HDim(M); i++) {
+		dims[i] = M.Dim(i);
+		dimv[i] = VARY;
+	}
+	
+	long imvn;
+	
+	status = CDFcreatezVar (id, dname.c_str(), CDF_FLOAT, 1L, (long)HDim(), dims, VARY, dimv, &imvn);
+	
+	if (status != CDF_OK) 
+		return false;
+	
+	cType = GZIP_COMPRESSION;
+	cParms[0] = 5;             /* GZIP compression level */
+	status = CDFsetzVarCompression (id, imvn, cType, cParms);
+	
+	if (status != CDF_OK) 
+		return false;
+	
+	status = CDFcloseCDF (id);
+	
+	if (status != CDF_OK) 
+		return false;
+	
+	return true;
+	
 #else 
-		
-		return false;
-		
+	
+	return false;
+	
 #endif
-		
-	}
 	
+}
 
-	// Function not finished yet. Do not use.
-	template <class T> bool
-	CDFRead (Matrix<T>& M, const string fname, const string dname, const string dloc) {
-		
-		return false;
-		
-	}
+
+/**
+ * @brief          Read matrix from CDF file.<br/> !!! FUNCTION NOT READY YET !!!
+ * 
+ * @param  M       Matrix
+ * @param  fname   File name 
+ * @param  dname   Data name
+ * @param  dloc    Data location
+ * @return         Success
+ */
+template <class T> bool
+CDFRead (Matrix<T>& M, const string fname, const string dname, const string dloc) {
 	
+	return false;
 	
+}
+
+
 #endif //__IO_HPP__

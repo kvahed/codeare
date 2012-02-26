@@ -1123,8 +1123,73 @@ public:
 	 * @param  m        Matrix rhs
 	 * @return          m * s
 	 */
-	template <class S> inline friend Matrix<T>    
-	operator*  (const S& s, const Matrix<T> &m) { 
+	inline friend Matrix<T>    
+	operator*  (const double& s, const Matrix<T> &m) { 
+		return   m * s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator*  (const float& s, const Matrix<T> &m) { 
+		return   m * s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator*  (const short& s, const Matrix<T> &m) { 
+		return   m * s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator*  (const long& s, const Matrix<T> &m) { 
+		return   m * s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator*  (const cxfl& s, const Matrix<T> &m) { 
+		return   m * s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator*  (const cxdb& s, const Matrix<T> &m) { 
 		return   m * s;
 	}
 

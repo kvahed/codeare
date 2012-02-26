@@ -24,6 +24,12 @@
 #include "Matrix.hpp"
 
 
+/**
+ * @brief    Absolute values 
+ * 
+ * @param  m Input
+ * @return   Absolute values 
+ */
 Matrix<double> 
 abs (const Matrix<cxdb>& m) {
 
@@ -44,6 +50,12 @@ abs (const Matrix<cxdb>& m) {
 }
  
 
+/**
+ * @brief    Absolute values 
+ * 
+ * @param  m Input
+ * @return   Absolute values 
+ */
 Matrix<float> 
 abs (const Matrix<cxfl>& m) {
 
@@ -64,23 +76,64 @@ abs (const Matrix<cxfl>& m) {
 }
 
 
+/**
+ * @brief    Absolute values 
+ * 
+ * @param  m Input
+ * @return   Absolute values 
+ */
 Matrix<float> 
 abs (const Matrix<float>& m) {
 	
-	Matrix<float> res(m);
+	Matrix<float> res(m.Dim());
+	
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = cabs(m[i]);
+		
+	}		
+	
 	return res;
 	
 }
 
+
+/**
+ * @brief    Absolute values 
+ * 
+ * @param  m Input
+ * @return   Absolute values 
+ */
 Matrix<double> 
 abs (const Matrix<double>& m) {
 	
-	Matrix<double> res(m);
+	Matrix<float> res(m.Dim());
+	
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < m.Size(); i++)
+			res[i] = cabs(m[i]);
+		
+	}		
+	
 	return res;
 	
 }
 
 
+/**
+ * @brief    Arguments
+ * 
+ * @param  m Input
+ * @return   Arguments
+ */
 Matrix<double> 
 arg (const Matrix<cxdb>& m) {
 
@@ -101,6 +154,12 @@ arg (const Matrix<cxdb>& m) {
 }
  
 
+/**
+ * @brief    Arguments
+ * 
+ * @param  m Input
+ * @return   Arguments
+ */
 Matrix<float> 
 arg (const Matrix<cxfl>& m) {
 
@@ -121,6 +180,12 @@ arg (const Matrix<cxfl>& m) {
 }
 
 
+/**
+ * @brief    Arguments
+ * 
+ * @param  m Input
+ * @return   Arguments
+ */
 Matrix<float> 
 arg (const Matrix<float>& m) {
 	
@@ -129,6 +194,13 @@ arg (const Matrix<float>& m) {
 	
 }
 
+
+/**
+ * @brief    Arguments
+ * 
+ * @param  m Input
+ * @return   Arguments
+ */
 Matrix<double> 
 arg (const Matrix<double>& m) {
 	
@@ -138,6 +210,12 @@ arg (const Matrix<double>& m) {
 }
 
 
+/**
+ * @brief    Real part
+ * 
+ * @param  m Input
+ * @return   Real part
+ */
 Matrix<double> 
 real (const Matrix<cxdb>& m) {
 
@@ -158,6 +236,12 @@ real (const Matrix<cxdb>& m) {
 }
  
 
+/**
+ * @brief    Real part
+ * 
+ * @param  m Input
+ * @return   Real part
+ */
 Matrix<float> 
 real (const Matrix<cxfl>& m) {
 
@@ -178,6 +262,12 @@ real (const Matrix<cxfl>& m) {
 }
 
 
+/**
+ * @brief    Dummy Real 
+ * 
+ * @param  m Input
+ * @return   Real part
+ */
 Matrix<float> 
 real (const Matrix<float>& m) {
 	
@@ -186,6 +276,13 @@ real (const Matrix<float>& m) {
 	
 }
 
+
+/**
+ * @brief    Dummy real
+ * 
+ * @param  m Input
+ * @return   Real part
+ */
 Matrix<double> 
 real (const Matrix<double>& m) {
 	
@@ -195,6 +292,13 @@ real (const Matrix<double>& m) {
 }
 
 
+
+/**
+ * @brief    Imaginary part
+ * 
+ * @param  m Input
+ * @return   Imaginary part
+ */
 Matrix<double> 
 imag (const Matrix<cxdb>& m) {
 
@@ -215,6 +319,12 @@ imag (const Matrix<cxdb>& m) {
 }
  
 
+/**
+ * @brief    Imaginary part
+ * 
+ * @param  m Input
+ * @return   Imaginary part
+ */
 Matrix<float> 
 imag (const Matrix<cxfl>& m) {
 
@@ -235,6 +345,12 @@ imag (const Matrix<cxfl>& m) {
 }
 
 
+/**
+ * @brief    Dummy for float
+ * 
+ * @param  m Input
+ * @return   Imaginary part
+ */
 Matrix<float> 
 imag (const Matrix<float>& m) {
 	
@@ -243,6 +359,14 @@ imag (const Matrix<float>& m) {
 	
 }
 
+
+
+/**
+ * @brief    Dummy for double
+ * 
+ * @param  m Input
+ * @return   Imaginary part
+ */
 Matrix<double> 
 imag (const Matrix<double>& m) {
 	
@@ -253,10 +377,10 @@ imag (const Matrix<double>& m) {
 
 
 /**
- * @brief           Matrix of arguments  (i.e. arg(m))
+ * @brief           Complex conjugate (no transposition)
  *
- * @param   m       Input matrix
- * @return          arg(m)
+ * @param   m       Input 
+ * @return          Complex conjugate 
  */
 template<class T> Matrix<T>
 conj (const Matrix<T>& m) {
