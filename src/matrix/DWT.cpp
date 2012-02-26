@@ -20,13 +20,6 @@
 
 #include "DWT.hpp"
 
-DWT::DWT() {
-
-	m_wf = ID;
-	
-}
-
-
 DWT::DWT (const size_t& sl, const wlfamily& wf, const size_t& wm) {
 
 	// Checks missing !!!
@@ -119,4 +112,20 @@ DWT::Transform (const Matrix<cxfl>& m, const bool& bw) const {
 	
 }
 
+
+
+template<> Matrix<cxfl> 
+DWT::operator* (const Matrix<cxfl>& m) const {
+
+	return Trafo(m);
+
+}
+
+
+template<> Matrix<cxfl> 
+DWT::operator->* (const Matrix<cxfl>& m) const {
+
+	return Adjoint (m);
+
+}
 

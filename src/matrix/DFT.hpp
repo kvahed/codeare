@@ -32,25 +32,36 @@ class DFT {
 	
 public:
 	
-	DFT         (const Matrix<int> size, const Matrix<double> mask = Matrix<double>(1), const Matrix<cxfl> pc = Matrix<cxfl>(1));
+
+	/**
+	 * @brief        Construct FFTW plans for forward and backward FT with credentials
+	 * 
+	 * @param  size  Matrix of side length of the FT range
+	 * @param  mask  K-Space mask (if left empty no mask is applied)
+	 * @param  pc    Phase correction (or target phase)
+	 */
+	DFT         (const Matrix<int> size, const Matrix<double> mask = Matrix<double>(1), 
+				 const Matrix<cxfl> pc = Matrix<cxfl>(1));
 	
-	DFT         (const size_t rank, const size_t sl, const Matrix<double> mask = Matrix<double>(1), const Matrix<cxfl> pc = Matrix<cxfl>(1));
+
+	/**
+	 * @brief        Construct FFTW plans for forward and backward FT with credentials for FT with identical side lengths
+	 * 
+	 * @param  rank  Rank (i.e. # FT directions)
+	 * @param  sl    Side length of the slice, volume ...
+	 * @param  mask  K-Space mask (if left empty no mask is applied)
+	 * @param  pc    Phase correction (or target phase)
+	 */
+	DFT         (const size_t rank, const size_t sl, const Matrix<double> mask = Matrix<double>(1), 
+				 const Matrix<cxfl> pc = Matrix<cxfl>(1));
 	
+
+	/**
+	 * @brief        Clean up RAM, destroy plans
+	 */
 	virtual 
 	~DFT        ();
 	
-
-	template <class T> Matrix<T>
-	operator* (const Matrix<T>& m) const;
-
-
-	template <class T> Matrix<T>
-	operator->* (const Matrix<T>& m) const {
-
-		return Trafo (m);
-
-	}
-
 
 	/**
 	 * @brief    Forward transform
@@ -72,13 +83,27 @@ public:
 	Adjoint     (const Matrix<T>& m) const;
 	
 	
-private:
+	/**
+	 * @brief    Forward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	template <class T> Matrix<T> 
+	operator*   (const Matrix<T>& m) const ;
+	
 	
 	/**
-	 * Static class
+	 * @brief    Backward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
 	 */
-	DFT()  {};
+	template <class T> Matrix<T> 
+	operator->* (const Matrix<T>& m) const;
 	
+	
+private:
 	
 	bool m_initialised;
 
@@ -86,19 +111,20 @@ private:
 	Matrix<double> m_mask;
 	Matrix<cxfl>   m_pc;
 	Matrix<cxfl>   m_cpc;
-
+	
 	fftwf_plan     m_fwdplanf;
 	fftwf_plan     m_bwdplanf;
 	fftw_plan      m_fwdplan;
 	fftw_plan      m_bwdplan;
-
+	
 	size_t         m_N;
-
-	bool m_have_mask;
-	bool m_have_pc;
-
+	
+	bool           m_have_mask;
+	bool           m_have_pc;
+	
 	fftwf_complex* m_in;
 	fftwf_complex* m_out;
+
 };
 
 #endif

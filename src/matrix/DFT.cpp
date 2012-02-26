@@ -113,25 +113,6 @@ DFT::~DFT () {
 }
 
 
-template<> Matrix<cxfl>
-DFT::operator* (const Matrix<cxfl>& m) const {
-
-    Matrix<cxfl> res = fftshift(m);
-	
-	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
-
-	fftwf_execute(m_fwdplanf);
-
-	memcpy (&res[0], m_out, sizeof(fftwf_complex) * m_N);
-
-	if (m_have_mask)
-		res *= m_mask;
-
-    return fftshift(res/sqrt((float)m.Size()));
-	
-}
-
-
 template<> Matrix<cxfl> 
 DFT::Trafo (const Matrix<cxfl>& m) const {
 	
@@ -139,7 +120,6 @@ DFT::Trafo (const Matrix<cxfl>& m) const {
 	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
 	if (m_have_pc)
 		res *= m_pc;
-
 
 	fftwf_execute(m_fwdplanf);
 
@@ -221,5 +201,19 @@ DFT::Adjoint (const Matrix<cxdb>& m) const {
 }
 
 
+template<> Matrix<cxfl> 
+DFT::operator* (const Matrix<cxfl>& m) const {
+
+	return Trafo(m);
+
+}
+
+
+template<> Matrix<cxfl> 
+DFT::operator->* (const Matrix<cxfl>& m) const {
+
+	return Adjoint (m);
+
+}
 
 

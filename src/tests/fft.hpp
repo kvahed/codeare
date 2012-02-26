@@ -29,10 +29,11 @@ fftwtest (Connector<T>* rc) {
 	dat /= pdf;
 	DFT dft (2, 256, msk, phc);
 
-	dat = dft.Adjoint (dat);
-	tst = dft.Trafo   (dat);
+	//dat = dft.Trafo (dat);
+	dat = dft * dat;
+	tst = dft.Trafo (dat);
 	tst = dft.Adjoint (tst);
-	tst = dft.Trafo   (tst);
+	tst = dft.Trafo (tst);
 
 #ifdef HAVE_MAT_H	
 
