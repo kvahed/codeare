@@ -39,6 +39,10 @@ interp1 (Matrix<double>& x, Matrix<T>& y, const Matrix<double>& xi, const INTERP
 		spline = gsl_spline_alloc (gsl_interp_cspline, nx);
 	else if (intm == INTERP::CSPLINE_PERIODIC)
 		spline = gsl_spline_alloc (gsl_interp_cspline_periodic, nx);
+	else if (intm == INTERP::AKIMA)
+		spline = gsl_spline_alloc (gsl_interp_akima, nx);
+	else if (intm == INTERP::AKIMA_PERIODIC)
+		spline = gsl_spline_alloc (gsl_interp_akima_periodic, nx);
 	
 	gsl_spline_init (spline, &x[0], &y[0], nx);
     
