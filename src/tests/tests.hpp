@@ -10,4 +10,4 @@
 #include "nufft.hpp"
 #include "matlab.hpp"
 #include "relativesensitivities.hpp"
-
+#include "algos.hpp"

@@ -143,6 +143,21 @@ Matrix<T>::Matrix (const size_t* dim) {
 }
 
 
+template <class T> inline 
+Matrix<T>::Matrix (const size_t* d, const float* r) {
+	
+	for (size_t i = 0; i < INVALID_DIM; i++) {
+		_dim[i] = d[i];
+        _res[i] = r[i];
+	}
+	
+	_M.resize(Size());
+		
+	Zero();
+
+	
+}
+
 
 template <class T> inline 
 Matrix<T>::Matrix (const Matrix<T> &M) {

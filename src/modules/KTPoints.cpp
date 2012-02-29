@@ -269,19 +269,16 @@ KTPoints::Process        () {
 
 	// Return NRMSE down the road --------
 
-	r.Dim(COL) = gc;
-	r.Dim(LIN) = 1;
-	r.Reset();
+    Matrix<double>&   nrmsev  = AddMatrix ("nrmse",  (Ptr<Matrix<double> >)   NEW (Matrix<double>   (gc, 1)));
 	for (int i = 0; i < gc; i++)
-		r[i] = res[i];
+		nrmsev[i] = res[i];
 	// -----------------------------------
 
 	// Excitation profile ----------------
 	if (m_verbose) {
-			
-		target.Dim(1) = gc; 
-	    target.Reset();
-		memcpy (&target[0], &ve[0], gc * target.Dim(0) * sizeof(cxfl));
+
+		Matrix<cxfl>& ep = AddMatrix ("ep",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (target.Dim(0), gc)));
+		memcpy (&ep[0], &ve[0], gc * target.Dim(0) * sizeof(cxfl));
 
 	} else
 		

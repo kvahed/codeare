@@ -25,6 +25,9 @@ using namespace H5;
 #include <map>
 #include <sstream>
 #include <iomanip>
+#ifdef HAVE_CXXABI_H
+    #include <cxxabi.h>
+#endif
 
 using namespace TinyXPath;
 using namespace std;
@@ -332,6 +335,9 @@ RSAdjust (Matrix<T>& M, const std::string& fname) {
 	
 	size_t dimk;
 	size_t dimv;
+
+	size_t ndims [INVALID_DIM];
+	float  nress [INVALID_DIM];
 	
 	// XML file name, run cmd and repository
 	stringstream    xmlf;
@@ -388,23 +394,23 @@ RSAdjust (Matrix<T>& M, const std::string& fname) {
 			if (dimk == 0) dimv *= 2;
 			if (dimv == 0) dimv = 1;
 			
-			M.Dim(dimk) = dimv;
+			ndims[dimk] = dimv;
 			
 		}
 		
 	} while ((vol = rootfunctor->IterateChildren ("ParamLong", vol))!=NULL);
 	
-	M.Res(0) = (float)TinyXPath::d_xpath_double
-		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='RoFOV']/@value") / M.Dim(0) * 2;
-	M.Res(1) = (float)TinyXPath::d_xpath_double 
-		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='PeFOV']/@value") / M.Dim(1);
-	M.Res(3) = (float)TinyXPath::d_xpath_double
-		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamArray[@name='SliceThickness']/ParamDouble[1]/Precision[1]/@value") / M.Dim(3);
+	nress[0] = (float)TinyXPath::d_xpath_double
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='RoFOV']/@value") / ndims[0] * 2;
+	nress[1] = (float)TinyXPath::d_xpath_double 
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamDouble[@name='PeFOV']/@value") / ndims[1];
+	nress[3] = (float)TinyXPath::d_xpath_double
+		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online1']/ParamFunctor[@name='root']/ParamArray[@name='SliceThickness']/ParamDouble[1]/Precision[1]/@value") / ndims[3];
 	
-	M.Dim(9) = i_xpath_int 
+	ndims[9] = i_xpath_int 
 		(meta, "/Meta/XProtocol[1]/ParamMap[1]/ParamMap[1]/Pipe[1]/PipeService[@name='Online2']/ParamFunctor[@name='rawobjprovider']/ParamLong[@name='RawCha']/@value"); 
 	
-	M.Reset();
+	M = Matrix<T> (ndims, nress);
 	
 	delete doc;
 	return true;
@@ -579,17 +585,18 @@ H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc 
 				
 				hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
 				size_t    ndim    = space.getSimpleExtentDims(dims, NULL);
+				size_t mdims [INVALID_DIM];
 				
 				if (typeid(T) == typeid(cxfl)) 
 					ndim--;
 				
 				for (size_t i = 0; i < ndim; i++)
-					M.Dim(i) = dims[ndim-i-1];
+					mdims[i] = dims[ndim-i-1];
 				
 				for (size_t i = ndim; i < INVALID_DIM; i++)
-					M.Dim(i) = 1;
+					mdims[i] = 1;
 				
-				M.Reset();
+				M = Matrix<T> (mdims);
 
 				cout << "HDF5 file: rank(" << ndim << "), dimensions(";
 				for (size_t i = 0; i < ndim; i++) {
@@ -644,6 +651,64 @@ H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc 
 	}
 	
 	
+
+inline std::string
+demangle (const char* symbol) {
+
+#ifdef HAVE_CXXABI_H
+
+  size_t size;
+  int    status;
+  char   temp[128];
+  char*  demangled;
+
+  //first, try to demangle a c++ name
+  if (1 == sscanf(symbol, "%*[^(]%*[^_]%127[^)+]", temp)) {
+
+	  if (NULL != (demangled = abi::__cxa_demangle(temp, NULL, &size, &status))) {
+		  std::string result(demangled);
+		  free(demangled);
+		  return result;
+	  }
+  }
+
+  //if that didn't work, try to get a regular c symbol
+  if (1 == sscanf(symbol, "%127s", temp)) {
+	  return temp;
+  }
+  
+#endif 
+ 
+  //if all else fails, just return the symbol
+  return symbol;
+
+}
+
+
+template <class T> bool 
+MXValidateIO  (const Matrix<T>& M, const mxArray* mxa) {
+
+#ifdef HAVE_MAT_H
+	
+	mxClassID     mcid = mxGetClassID(mxa);
+	std::string cplx = (mxIsComplex(mxa)) ? "complex" : "real";
+
+	if ((typeid(T) == typeid(cxfl) || typeid(T) == typeid(float))  && mcid == 7)
+		return true;
+	if ((typeid(T) == typeid(cxdb) || typeid(T) == typeid(double)) && mcid == 6)
+		return true;
+	else {
+		printf ("Matrix is %s, yet Matlab variable is %s %s\n", demangle(typeid(T).name()).c_str(), mxGetClassName(mxa), cplx.c_str());
+		return false;
+	}
+
+	return true;
+	
+#endif
+
+}
+
+
 /**
  * @brief          Read matrix from MATLAB file
  * 
@@ -659,9 +724,8 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 #ifdef HAVE_MAT_H
 	
 	// Open file ---------------------------------
-	
 	MATFile*  mf = matOpen (fname.c_str(), "r");
-	
+
 	if (mf == NULL) {
 		printf ("Error opening file %s\n", fname.c_str());
 		return false;
@@ -678,27 +742,30 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 	}
 		
 	mxClassID     mcid = mxGetClassID(mxa);
-	
+	bool          cplx = mxIsComplex(mxa);
 	mwSize        ndim = mxGetNumberOfDimensions(mxa);
 	const mwSize*  dim = mxGetDimensions(mxa);
+
+	if (!MXValidateIO (M, mxa))
+		return false;
+
+	size_t mdims[INVALID_DIM];
 	
 	for (size_t i = 0; i < ndim; i++)
-		M.Dim(i) = (size_t)dim[i];
+		mdims[i] = (size_t)dim[i];
 	
 	for (size_t i = ndim; i < INVALID_DIM; i++)
-		M.Dim(i) = 1;
+		mdims[i] = 1;
 	
-	M.Reset();
+	M = Matrix<T> (mdims);
 	// -------------------------------------------
 	
 	// Copy from memory block ----------------------
 	
-	printf ("  Reading %s: (%s) ... ", dname.c_str(), DimsToCString(M)); fflush(stdout);
+	printf ("  Reading (type: %i) %s: (%s) ... ", (int)mcid, dname.c_str(), DimsToCString(M)); fflush(stdout);
 	
-	if (typeid(T) == typeid(double) || typeid(T) == typeid(double)) {
-		memcpy(&M[0], mxGetPr(mxa), M.Size() * sizeof(T));
-	} else if (typeid(T) == typeid(cxfl)) {
-		if (mxGetPi(mxa) != NULL)
+	if        (typeid(T) == typeid(cxfl)) {
+		if (mxIsComplex(mxa))
 			for (size_t i = 0; i < M.Size(); i++) {
 				float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
 				memcpy(&M[i], f, 2 * sizeof(float));
@@ -708,9 +775,26 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 				float f[2] = {((float*)mxGetPr(mxa))[i], 0.0}; 
 				memcpy(&M[i], f, 2 * sizeof(float));
 			}
+	} else if (typeid(T) == typeid(cxdb)) {
+		if (mxIsComplex(mxa))
+			for (size_t i = 0; i < M.Size(); i++) {
+				double* tmp = (double*) &M[0];
+				tmp [i*2]   = mxGetPr(mxa)[i];
+				tmp [i*2+1] = mxGetPi(mxa)[i];
+				/*
+				  double f[2] = {((double*)mxGetPr(mxa))[i], ((double*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
+				memcpy(&M[i], f, 2 * sizeof(double));*/
+			}
+		else
+			for (size_t i = 0; i <M.Size(); i++) {
+				double* tmp = (double*) &M[0];
+				tmp [i*2]   = mxGetPr(mxa)[i];
+				/*double f[2] = {((double*)mxGetPr(mxa))[i], 0.0}; 
+				  memcpy(&M[i], f, 2 * sizeof(double));*/
+			}
 	} else
-		for (size_t i = 0; i <M.Size(); i++)
-			M[i] = ((T*)mxGetPr(mxa))[i];
+		memcpy (&M[0], mxGetPr(mxa), M.Size() * sizeof (T));
+
 	
 	printf ("done\n");
 	// -------------------------------------------
@@ -765,6 +849,8 @@ MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS,    mxREAL);
 	else if (typeid(T) == typeid(cxfl))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
+	else if (typeid(T) == typeid(cxdb))
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS, mxCOMPLEX);
 	else if (typeid(T) == typeid(short))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim,  mxINT16_CLASS,    mxREAL);
 	// -------------------------------------------
@@ -772,11 +858,11 @@ MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 	
 	// Copy to memory block ----------------------
 	
-	if (typeid(T) == typeid(cxfl))
+	if      (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))
 		for (size_t i = 0; i <M.Size(); i++) {
-			((float*)mxGetPr(mxa))[i] = ((float*)&M[0])[2*i+0]; // Template compilation workaround
-			((float*)mxGetPi(mxa))[i] = ((float*)&M[0])[2*i+1]; // Can't use .imag() .real(). Consider double/short 
-		}
+			mxGetPr(mxa)[i] = creal(M[i]); 
+			mxGetPi(mxa)[i] = cimag(M[i]); 
+		} 
 	else 
 		memcpy(mxGetPr(mxa), &M[0],M.Size() * sizeof(T));
 	
@@ -945,6 +1031,9 @@ NIDump (Matrix<T>& M, const string fname) {
 template <class T> bool
 NIRead (Matrix<T>& M, const string fname) {
 	
+	size_t ndims [INVALID_DIM];
+	float  nress [INVALID_DIM];
+
 	if (fname != "") {
 		
 #ifdef HAVE_NIFTI1_IO_H
@@ -956,16 +1045,16 @@ NIRead (Matrix<T>& M, const string fname) {
 		
 		for (size_t i = 0; i < ni->dim[0]; i++)
 			if (ni->dim[i+1] > 1) {
-				M.Dim(i) = ni->dim[i+1];
-				M.Res(i) = ni->pixdim[i+1];
+				ndims[i] = ni->dim[i+1];
+				nress[i] = ni->pixdim[i+1];
 			}
 		
 		for (size_t i = ni->dim[0]; i < INVALID_DIM; i++) {
-			M.Dim(i) = 1;
-			M.Res(i) = 0.0;
+			ndims[i] = 1;
+			nress[i] = 0.0;
 		}
 		
-		M.Reset();
+		M = Matrix<T>(ndims, nress);
 		
 		if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
 			if (ni->datatype == 64)

@@ -16934,6 +16934,21 @@ fi
 
 done
 
+for ac_header in cxxabi.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "cxxabi.h" "ac_cv_header_cxxabi_h" "$ac_includes_default"
+if test "x$ac_cv_header_cxxabi_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_CXXABI_H 1
+_ACEOF
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find cxxabi.h, c++ name demangling disabled." >&5
+$as_echo "cannot find cxxabi.h, c++ name demangling disabled." >&6; }
+fi
+
+done
+
 for ac_header in ctype.h
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "ctype.h" "ac_cv_header_ctype_h" "$ac_includes_default"

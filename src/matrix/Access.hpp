@@ -47,7 +47,7 @@ Slice (const Matrix<T>& M, const size_t s) {
  * @brief              Get a row
  * 
  * @param  M           Matrix
- * @param  s           # of row
+ * @param  r           # of row
  * @return             Desired row of M
  */
 template <class T> static inline Matrix<T> 
@@ -67,7 +67,7 @@ Row (const Matrix<T>& M, const size_t r)  {
  * @brief              Get a row
  * 
  * @param  M           Matrix
- * @param  s           # of row
+ * @param  c           # of row
  * @return             Desired row of M
  */
 template <class T> static inline Matrix<T> 

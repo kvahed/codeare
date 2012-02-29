@@ -37,13 +37,6 @@ enum IceDim {
     #define INVALID_DIM 16
 #endif
 
-/**
- * @brief Interpolation methods
- */
-enum InterpMethod {
-	LINEAR, BSPLINE
-};
-
 #include "config.h"
 #include "modules/OMP.hpp"
 #include "Complex.hpp"
@@ -177,6 +170,15 @@ public:
 	 */
 	inline 
 	Matrix              (const size_t* dim);
+	
+	
+	/**
+	 * @brief           Construct 16-dim matrix with dimension and resolution arrays
+	 *
+	 * @param  dim      All 16 Dimensions
+	 */
+	inline 
+	Matrix              (const size_t* d, const float* r);
 	
 	
     /**
@@ -1090,32 +1092,7 @@ public:
     //@{
     
 
-	/**
-	 * @brief           Elementwise addition with scalar (lhs)
-	 *
-	 * @param  s        Scalar lhs
-	 * @param  m        Matrix rhs
-	 * @return          m + t
-	 */
-	template <class S> inline friend Matrix<T>    
-	operator+  (const S s, const Matrix<T> &m) {
-		return   m + T(s);
-	}
-
-
-	/**
-	 * @brief           Elementwise subtraction from scalar (lhs)
-	 *
-	 * @param  s        Scalar lhs
-	 * @param  m        Matrix rhs
-	 * @return          -(m - s)
-	 */
-	template <class S> inline friend Matrix<T>
-	operator-  (const S s, const Matrix<T> &m) {
-		return -(m - T(s));
-	}
-
-
+	//--
 	/**
 	 * @brief           Elementwise multiplication with scalar (lhs)
 	 *
@@ -1191,6 +1168,164 @@ public:
 	inline friend Matrix<T>    
 	operator*  (const cxdb& s, const Matrix<T> &m) { 
 		return   m * s;
+	}
+
+
+	//--
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator+  (const double& s, const Matrix<T> &m) { 
+		return   m + s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator+  (const float& s, const Matrix<T> &m) { 
+		return   m + s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator+  (const short& s, const Matrix<T> &m) { 
+		return   m + s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator+  (const long& s, const Matrix<T> &m) { 
+		return   m + s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator+  (const cxfl& s, const Matrix<T> &m) { 
+		return   m + s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator+  (const cxdb& s, const Matrix<T> &m) { 
+		return   m + s;
+	}
+
+
+	//--
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator-  (const double& s, const Matrix<T> &m) { 
+		return   m - s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator-  (const float& s, const Matrix<T> &m) { 
+		return   m - s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator-  (const short& s, const Matrix<T> &m) { 
+		return   m - s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator-  (const long& s, const Matrix<T> &m) { 
+		return   m - s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator-  (const cxfl& s, const Matrix<T> &m) { 
+		return   m - s;
+	}
+
+
+	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator-  (const cxdb& s, const Matrix<T> &m) { 
+		return   m - s;
 	}
 
 
@@ -1405,9 +1540,13 @@ public:
 	 * @param  dim      New dimensions
      */
     inline void         
-    Dim                 (const size_t* dim)                                     const {
+    Dim                 (const size_t* dim)    {
+
         for (size_t i = 0; i<INVALID_DIM; i++)
             _dim[i] = dim[i];
+
+		Reset();
+
     }
     
 
@@ -1492,20 +1631,6 @@ public:
     
 
     /**
-     * @brief           Reset. i.e. reallocate and set all fields = T(0)
-     */
-    inline void         
-    Reset               ()                                      {
-
-		_M.resize(Size());
-		
-		Zero();
-
-
-    }
-    
-
-    /**
      * @brief           Reset. i.e. Set all fields = T(0)
      */
     inline void         
@@ -1554,16 +1679,15 @@ public:
      * @param  M        The factor.
      */
     Matrix<T>           
-    operator->*         (const Matrix<T>& M) const;
-    
-    
+    operator->*         (Matrix<T>& M);
+   
     /**
      * @brief           Matrix product. i.e. this * M.
      *
      * @param  M        The factor.
      */
-    template<class S> Matrix<T>           
-    operator->*         (Matrix<S>& M) const ;
+    /*template<class S> Matrix<T>           
+	  operator->*         (Matrix<S>& M) const ;*/
     
     
     /**
@@ -2223,6 +2347,21 @@ private:
 	 */
 	bool
 	RSAdjust            (const std::string& fname);
+
+
+    /**
+     * @brief           Reset. i.e. reallocate and set all fields = T(0)
+     */
+    inline void         
+    Reset               ()                                      {
+
+		_M.resize(Size());
+		Zero();
+
+    }
+    
+
+
     
 };
 
@@ -2311,6 +2450,20 @@ Matrix<T>::Sub2Ind  (const Matrix<size_t>& subs) const {
 
 template <> inline short 
 Matrix<short>::Max() const {
+	
+    short max = _M[0];
+	
+    for (size_t i = 0; i < Size(); i++)
+        if (_M[i] > max)
+            max = _M[i];
+	
+    return max;
+	
+}
+
+
+template <> inline double 
+Matrix<double>::Max() const {
 	
     short max = _M[0];
 	
