@@ -11,3 +11,4 @@
 #include "matlab.hpp"
 #include "relativesensitivities.hpp"
 #include "algos.hpp"
+#include "spiral.hpp"
