@@ -45,6 +45,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "dwttest")              ) (remote) ?      dwttest (rc) :      dwttest (lc);
 		else if (!strcmp (test, "algotest")             ) (remote) ?     algotest (rc) :     algotest (lc);
 		else if (!strcmp (test, "RelativeSensitivities")) (remote) ?     resetest (rc) :     resetest (lc);
+		else if (!strcmp (test, "VDSpiral"))              (remote) ? vdspiraltest (rc) : vdspiraltest (lc);
 		else                                              (remote) ? internaltest (rc) : internaltest (lc);
 
 		if (remote) 

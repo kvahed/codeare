@@ -19,7 +19,6 @@
  */
 
 #include "DirectMethod.hpp"
-#include "VDSpiral.hpp"
 
 using namespace RRStrategy;
 
@@ -62,10 +61,6 @@ DirectMethod::Init () {
     printf ("... done.\n");
 
 
-	SpiralParams sp;
-	Spiral spir;
-	spir = VDSpiral (sp);
-    
     return RRSModule::OK;
 
 }

@@ -1,5 +1,6 @@
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_spline.h>
+#include "Algos.hpp"
      
 namespace INTERP {
 
@@ -16,22 +17,33 @@ namespace INTERP {
 
 }
 
+
+
+
 template <class T> Matrix<T>
-interp1 (const Matrix<T>& x, const Matrix<T>& y, const Matrix<double>& xi, const INTERP::Method& intm) {
+interp1 (Matrix<double>& x, Matrix<T>& y, const Matrix<double>& xi, const INTERP::Method& intm) {
 
-	Matrix<T> yi;
+	size_t nx = size(x,0);
+	size_t nxi = size(xi,0);
 
-	gsl_interp_accel *acc 
-		= gsl_interp_accel_alloc ();
-	gsl_spline *spline 
-		= gsl_spline_alloc (gsl_interp_cspline, 10);
+	Matrix<T> yi (nxi,1);
+
+	gsl_interp_accel *acc = gsl_interp_accel_alloc ();
+	gsl_spline *spline;
+
+	if      (intm == INTERP::LINEAR)
+		spline = gsl_spline_alloc (gsl_interp_linear, nx);
+	else if (intm == INTERP::POLYNOMIAL)
+		spline = gsl_spline_alloc (gsl_interp_polynomial, nx);
+	else if (intm == INTERP::CSPLINE)
+		spline = gsl_spline_alloc (gsl_interp_cspline, nx);
+	else if (intm == INTERP::CSPLINE_PERIODIC)
+		spline = gsl_spline_alloc (gsl_interp_cspline_periodic, nx);
 	
-	gsl_spline_init (spline, x, y, 10);
+	gsl_spline_init (spline, &x[0], &y[0], nx);
     
-	for (xi = x[0]; xi < x[9]; xi += 0.01) {
-		yi = gsl_spline_eval (spline, xi, acc);
-		printf ("%g %g\n", xi, yi);
-	}
+	for (size_t i = 0; i < xi.Size(); i++)
+		yi[i] = gsl_spline_eval (spline, xi[i], acc);
 
 	gsl_spline_free (spline);
 	gsl_interp_accel_free (acc);

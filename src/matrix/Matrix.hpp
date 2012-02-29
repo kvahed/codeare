@@ -175,7 +175,8 @@ public:
 	/**
 	 * @brief           Construct 16-dim matrix with dimension and resolution arrays
 	 *
-	 * @param  dim      All 16 Dimensions
+	 * @param  d        All 16 Dimensions
+	 * @param  r        All 16 Resolutions
 	 */
 	inline 
 	Matrix              (const size_t* d, const float* r);
@@ -2467,7 +2468,7 @@ Matrix<double>::Max() const {
 	
     short max = _M[0];
 	
-    for (size_t i = 0; i < Size(); i++)
+    for (size_t i = 1; i < Size(); i++)
         if (_M[i] > max)
             max = _M[i];
 	
@@ -2730,14 +2731,13 @@ Matrix<T>::LinSpace (const T& start, const T& end, const size_t& n) {
 	
 	assert (n > 1);
 	
-	Matrix<T> res;
+	Matrix<T> res (n, 1);
 	T gap;
 
-	gap = T(end-start) / T(n-1);
-	res = Matrix<T>::Zeros (n,1);
+	gap      = T(end-start) / T(n);
 	
-	res[0] = start;
-	res[n] = end;
+	res[0]   = start;
+	res[n-1] = end;
 	
 	for (int i = 1; i < n-1; i++)
 		res[i] = res[i-1] + gap;
