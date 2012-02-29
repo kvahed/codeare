@@ -55,6 +55,12 @@ namespace RRStrategy {
 		 * @brief Dump data to disk
 		 */
 		virtual RRSModule::error_code
+		Prepare ();
+		
+		/**
+		 * @brief Dump data to disk
+		 */
+		virtual RRSModule::error_code
 		Init ();
 		
 		/**

@@ -1,9 +1,10 @@
 template <class T> bool
 nuffttest (Connector<T>* rc) {
 
-	Matrix<cxfl>   rawdata;
+	Matrix<cxdb>   rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
+	Matrix<cxdb>   img;
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
@@ -13,28 +14,36 @@ nuffttest (Connector<T>* rc) {
 	rc->Init(test);
 
 #ifdef HAVE_MAT_H	
-	MXRead (weights, df, "weights");
-	MXRead (rawdata, df, "data");
-	MXRead  (kspace, df, "kspace");
+	if (!(MXRead (weights, df, "weights") && 
+		  MXRead (rawdata, df, "data") && 
+		  MXRead  (kspace, df, "kspace")))
+		return false;
+
+	MXDump (weights, "weights.mat", "weights2");
+	MXDump (rawdata, "rawdata.mat", "rawdata2");
+	MXDump (kspace,  "kspace.mat",  "kspace2");
 #endif
 
 	rc->SetMatrix    ("data",    rawdata);
 	rc->SetMatrix    ("weights", weights);
 	rc->SetMatrix    ("kspace",  kspace);
 	
-	rc->Process    (test);
+	rc->Prepare      (test);
+	rc->Process      (test);
 	
-	rc->GetMatrix    ("data", rawdata);
+	rc->GetMatrix    ("img", img);
 
 	rc->Finalise(test);
 
 #ifdef HAVE_MAT_H	
-	MXDump   (rawdata, odf.c_str(), "image");
-#endif
-#ifdef HAVE_NIFTI1_IO_H
-	NIDump   (rawdata, "image.nii.gz");
+	MXDump   (img, odf.c_str(), "image");
 #endif
 
+	/*
+#ifdef HAVE_NIFTI1_IO_H
+	NIDump   (img, "image.nii.gz");
+#endif
+	*/
 	return true;
 	
 }

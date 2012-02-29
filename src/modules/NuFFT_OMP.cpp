@@ -68,7 +68,7 @@ NuFFT_OMP::Init () {
 
 	for (int i = 0; i < 3; i++) {
 		m_N[i] = 1; 
-		m_n[i] = 0;
+		m_n[i] = 1;
 	}
 
 	// Dimensions image and kspace ----------
@@ -126,36 +126,22 @@ NuFFT_OMP::Init () {
 
 }
 
-RRSModule::error_code
-NuFFT_OMP::Process () {
 
-	// Some variables
+RRSModule::error_code 
+NuFFT_OMP::Prepare () {
+	
 	RRSModule::error_code error = OK;
 
-	printf ("Processing NuFFT_OMP ...\n");
-	ticks start = getticks();
-
-	Matrix<cxfl>&   data    = GetCXFL("data");
 	Matrix<double>& kspace  = GetRLDB("kspace");
 	Matrix<double>& weights = GetRLDB("weights");
 
+	printf ("Preparing NuFFT_OMP ...\n");
 	printf ("  Incoming dimensions:\n");
-	printf ("    Data:    %s \n", DimsToCString(data));
 	printf ("    K-Space: %s \n", DimsToCString(kspace));
 	printf ("    Weights: %s \n", DimsToCString(weights));
 
-	int imgsize = m_N[0] * m_N[1] * m_N[2];
-
-	Matrix <cxfl> tmp;
-
-	for (int i = 0; i < m_dim; i++)
-		tmp.Dim(i) = m_N[i];
-
-	// Store all arms separately?
-	if (m_verbose)
-		tmp.Dim(m_dim) = m_nthreads + 1;
-
-	tmp.Reset();
+	m_imgsize = m_N[0] * m_N[1] * m_N[2];
+	Matrix<cxdb>& img = AddMatrix ("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> (m_N[0], m_N[1], m_N[2], (m_verbose) ? m_nthreads + 1 : 1)));
 
 #pragma omp parallel default (shared) 
 	{
@@ -168,34 +154,61 @@ NuFFT_OMP::Process () {
 			
 			int     os         = j * m_M;
 			
-			// Copy data from incoming matrix to the nufft input array
-			for (int i = 0; i < m_M; i++) {
-				(m_iplan[tid].y[i])[0] = (data[i + os]).real();
-				(m_iplan[tid].y[i])[1] = (data[i + os]).imag();
-			}
-			
-			// Copy k-space and weights to allocated memory
 			memcpy (&(m_fplan[tid].x[0]),  &kspace[os*m_dim], m_dim * m_M * sizeof(double));
 			memcpy (&(m_iplan[tid].w[0]), &weights[       0],         m_M * sizeof(double));
-			
-			// Assign weights, Precompute PSI and IFT
+
 			nfft::weights (&m_fplan[tid], &m_iplan[tid]);
 			nfft::psi (&m_fplan[tid]);
+
+		}
+
+	}
+	
+	return error;
+	
+}
+
+
+RRSModule::error_code
+NuFFT_OMP::Process () {
+	
+	// Some variables
+	RRSModule::error_code error = OK;
+	
+	printf ("Processing NuFFT_OMP ...\n");
+	
+	printf ("  Incoming dimensions:\n");
+	Matrix<cxdb>&   data    = GetCXDB("data");
+	Matrix<cxdb>&   img     = GetCXDB("img");
+	printf ("    Data:    %s \n", DimsToCString(data));
+	
+	ticks start = getticks();
+
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		
+#pragma omp for
+		for (int j = 0; j < m_nthreads; j++) {
+			
+			int     os         = j * m_M;
+			memcpy (&(m_iplan[tid].y[0]),          &data[os],         m_M * sizeof (cxdb));
 			nfft::ift (&m_fplan[tid], &m_iplan[tid], m_maxit, m_epsilon);
 			
 		}
 		
-#pragma omp for schedule (guided, imgsize/m_nthreads/2)
-		for (int i = 0; i < imgsize; i++)
+#pragma omp for
+		for (int i = 0; i < m_imgsize; i++)
 			for (int j = 0; j < m_nthreads; j++) {
 				if (m_verbose)
-					tmp[(j+1) * imgsize + i] = cxfl(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
-				tmp[i] += cxfl(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
+					img[(j+1) * m_imgsize + i] = cxdb(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
+				img[i] += cxdb(m_iplan[j].f_hat_iter[i][0], m_iplan[j].f_hat_iter[i][1]);
 			}
 	}
 	
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
-	data = tmp;
+	
 	return error;
 	
 }

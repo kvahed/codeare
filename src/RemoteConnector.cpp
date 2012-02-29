@@ -194,12 +194,59 @@ namespace RRClient {
 		
 		cxfl_data rp; m_rrsi->get_cxfl(name.c_str(), rp);
 		
-		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = rp.dims[j];
-			m.Res(j) = rp.res[j]; }
+		size_t mdims [INVALID_DIM];
+		float  mress [INVALID_DIM];
 		
-		m.Reset();
+		for (int j = 0; j < INVALID_DIM; j++) { 
+			mdims[j] = rp.dims[j];
+			mress[j] = rp.res[j]; 
+		}
+		
+		m = Matrix<cxfl> (mdims, mress);
 		
 		memcpy (&m[0], &rp.vals[0], rp.vals.length() * sizeof(float));
+		
+	}
+	
+
+	template<> void 
+	RemoteConnector::SetMatrix (const std::string& name, Matrix<cxdb>& M) const {
+		
+		cxdb_data r; 
+		
+		r.dims.length(INVALID_DIM);
+		r.res.length(INVALID_DIM);
+		
+		for (int j = 0; j < INVALID_DIM; j++) {
+			r.dims[j] = M.Dim(j);
+			r.res[j]  = M.Res(j);
+		}
+		
+		r.vals.length(2 * M.Size());
+		
+		memcpy (&r.vals[0], &M[0], r.vals.length() * sizeof(double));
+		
+		m_rrsi->set_cxdb(name.c_str(), r);
+		
+	}
+	
+	
+	template<> void 
+	RemoteConnector::GetMatrix (const std::string& name, Matrix<cxdb>& m) const {
+		
+		cxdb_data rp; m_rrsi->get_cxdb(name.c_str(), rp);
+		
+		size_t mdims [INVALID_DIM];
+		float  mress [INVALID_DIM];
+		
+		for (int j = 0; j < INVALID_DIM; j++) { 
+			mdims[j] = rp.dims[j];
+			mress[j] = rp.res[j]; 
+		}
+		
+		m = Matrix<cxdb> (mdims, mress);
+		
+		memcpy (&m[0], &rp.vals[0], rp.vals.length() * sizeof(double));
 		
 	}
 	
@@ -228,10 +275,15 @@ namespace RRClient {
 		
 		rldb_data r; m_rrsi->get_rldb(name.c_str(), r);
 		
-		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = r.dims[j];
-			m.Res(j) = r.res[j]; }
+		size_t mdims [INVALID_DIM];
+		float  mress [INVALID_DIM];
 		
-		m.Reset();
+		for (int j = 0; j < INVALID_DIM; j++) { 
+			mdims[j] = r.dims[j];
+			mress[j] = r.res[j]; 
+		}
+		
+		m = Matrix<double> (mdims, mress);
 		
 		for (int i = 0; i < GetSize(r.dims); i++) m[i] = r.vals[i];
 		
@@ -263,10 +315,15 @@ namespace RRClient {
 		
 		rlfl_data r; m_rrsi->get_rlfl(name.c_str(), r);
 		
-		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = r.dims[j];
-			m.Res(j) = r.res[j]; }
+		size_t mdims [INVALID_DIM];
+		float  mress [INVALID_DIM];
 		
-		m.Reset();
+		for (int j = 0; j < INVALID_DIM; j++) { 
+			mdims[j] = r.dims[j];
+			mress[j] = r.res[j]; 
+		}
+		
+		m = Matrix<float> (mdims, mress);
 		
 		for (int i = 0; i < GetSize(r.dims); i++) m[i] = r.vals[i];
 		
@@ -298,10 +355,15 @@ namespace RRClient {
 		
 		shrt_data p; m_rrsi->get_shrt(name.c_str(), p);
 		
-		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = p.dims[j];
-			m.Res(j) = p.res[j]; }
+		size_t mdims [INVALID_DIM];
+		float  mress [INVALID_DIM];
 		
-		m.Reset();
+		for (int j = 0; j < INVALID_DIM; j++) { 
+			mdims[j] = p.dims[j];
+			mress[j] = p.res[j]; 
+		}
+		
+		m = Matrix<short> (mdims, mress);
 		
 		for (int i = 0; i < GetSize(p.dims); i++) m[i] = p.vals[i];
 		
@@ -332,11 +394,16 @@ namespace RRClient {
 		
 		long_data p; m_rrsi->get_long(name.c_str(), p);
 		
-		for (int j = 0; j < INVALID_DIM; j++) { m.Dim(j) = p.dims[j];
-			m.Res(j) = p.res[j]; }
+		size_t mdims [INVALID_DIM];
+		float  mress [INVALID_DIM];
 		
-		m.Reset();
+		for (int j = 0; j < INVALID_DIM; j++) { 
+			mdims[j] = p.dims[j];
+			mress[j] = p.res[j]; 
+		}
 		
+		m = Matrix<long> (mdims, mress);		
+
 		for (int i = 0; i < GetSize(p.dims); i++) m[i] = p.vals[i];
 		
 	}

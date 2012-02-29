@@ -240,9 +240,8 @@ RemoveOS (Matrix<cxfl>& imgs) {
 	
 	ticks tic = getticks();
 	Matrix<cxfl> tmp = imgs;
-	
-	imgs.Dim(0) = imgs.Dim(0) / 2;
-	imgs.Reset();
+
+	imgs = Matrix<cxfl> (imgs.Dim(0)/2, imgs.Dim(1), imgs.Dim(2), imgs.Dim(3), imgs.Dim(4), imgs.Dim(5));
 	
 	size_t   ossiz  = tmp.Dim(0);
 	size_t   nssiz  = imgs.Dim(0);

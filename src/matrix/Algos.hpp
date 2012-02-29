@@ -1,6 +1,9 @@
 #ifndef __ALGOS_HPP__
 #define __ALGOS_HPP__
 
+#include "IO.hpp"
+
+
 /**
  * @brief    Number of non-zero elements
  *
@@ -247,32 +250,34 @@ Mean (const Matrix<T>& M, const size_t d) {
 template <class T> inline  Matrix<T>
 Sum (Matrix<T>& M, const size_t d) {
 	
-	Matrix<T> res = M;
-	
+	Matrix<size_t> sz = size(M);
+	size_t dim = M.Dim(d);
+	Matrix<T> res;
+
 	assert (d < INVALID_DIM);
 	
 	// No meaningful sum over particular dimension
-	if (res.Dim(d) == 1) return res;
+	if (M.Dim(d) == 1) return res;
 	
 	// Empty? allocation 
 	if (IsEmpty(M))    return res;
 	
-	// Save old data and resize matrix 
-	T* tmp = (T*) malloc (res.Size() * sizeof (T));
-	memcpy (tmp, &M[0], res.Size() * sizeof (T));
-	
 	// Inner size 
 	size_t insize = 1;
 	for (size_t i = 0; i < d; i++)
-		insize *= res.Dim(i);
+		insize *= M.Dim(i);
 	
 	// Outer size
 	size_t outsize = 1;
 	for (size_t i = d+1; i < INVALID_DIM; i++)
-		outsize *= res.Dim(i);
+		outsize *= M.Dim(i);
 	
-	res.Resize();
-	
+
+	// Adjust size vector and allocate
+	sz [d] = 1;
+
+	res = Matrix<T>((size_t*)&sz[0]);
+
 	// Sum
 #pragma omp parallel default (shared) 
 	{
@@ -284,21 +289,17 @@ Sum (Matrix<T>& M, const size_t d) {
 #pragma omp for
 			
 			for (size_t j = 0; j < insize; j++) {
-				res[j+i*insize] = 0;
-				for (size_t k = 0; k < res.Dim(d); k++)
-					res[j+i*insize] += tmp[j+i*insize*res.Dim(d)+k*insize];
+				res[i*insize + j] = T(0);
+				for (size_t k = 0; k < dim; k++)
+					res[i*insize + j] += M[i*insize*dim + j + k*insize];
 			}
 			
 		}
 			
 	}
 	
-	// Adjust dminesions and clear tmp
-		res.Dim(d) = 1;
-		free (tmp);
-		
-		return res;
-		
+	return res;
+	
 }
 
 
@@ -364,7 +365,7 @@ numel               (const Matrix<T>& M) {
 template <class T>  Matrix<size_t>
 size               (const Matrix<T>& M) {
 	
-	Matrix<size_t> res (INVALID_DIM, 1);
+	Matrix<size_t> res (1,INVALID_DIM);
 	size_t ones = 0;
     
 	for (size_t i = 0; i < INVALID_DIM; i++) {
@@ -373,7 +374,9 @@ size               (const Matrix<T>& M) {
 		ones   = (res[i] == 1) ? ones + 1 : ones = 0;
 		
 	}
-    
+	
+	res.Resize (1,INVALID_DIM-ones);
+
 	return res;
 	
 }
@@ -383,6 +386,7 @@ size               (const Matrix<T>& M) {
  * @brief           Get vector of dimensions
  *
  * @param   M       Matrix
+ * @param   d       Dimension
  * @return          Number of cells.
  */
 template <class T>  size_t

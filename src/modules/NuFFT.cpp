@@ -19,7 +19,7 @@
  */
 
 #include "NuFFT.hpp"
-//#include "Toolbox.cpp"
+#include "IO.hpp"
 
 using namespace RRStrategy;
 
@@ -63,8 +63,8 @@ NuFFT::Init () {
 	m_n   = new int[3];
 
 	for (int i = 0; i < 3; i++) {
-		m_N[i] = 0; 
-		m_n[i] = 0;
+		m_N[i] = 1; 
+		m_n[i] = 1;
 	}
 
 	// Dimensions ---------------------------
@@ -111,48 +111,44 @@ NuFFT::Init () {
 
 }
 
+RRSModule::error_code 
+NuFFT::Prepare () {
+
+	RRSModule::error_code error = OK;
+
+	Matrix<cxdb>& img = AddMatrix ("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> (m_N[0],m_N[1],m_N[2])));
+
+	Matrix<double>& kspace  = GetRLDB ("kspace");
+	Matrix<double>& weights = GetRLDB ("weights");
+
+	memcpy (&(m_fplan.x[0]),  &kspace[0],  kspace.Size()*sizeof(double)); FreeRLDB("kspace");
+	memcpy (&(m_iplan.w[0]), &weights[0], weights.Size()*sizeof(double)); FreeRLDB("weights");
+	
+	nfft::weights (&m_fplan, &m_iplan);
+	nfft::psi     (&m_fplan);
+
+	return error;
+
+}
+
+
 RRSModule::error_code
 NuFFT::Process () {
 
 	// Some variables
 	RRSModule::error_code error = OK;
 
-	Matrix<cxfl>&   data    = GetCXFL("data");
-	Matrix<double>& kspace  = GetRLDB("kspace");
-	Matrix<double>& weights = GetRLDB("weights");
+	Matrix<cxdb>&   data    = GetCXDB ("data");
+	Matrix<cxdb>&   img     = GetCXDB ("img");
 
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
-
-	// Copy data from incoming matrix to the nufft input array
-	for (int i = 0; i < data.Size(); i++) {
-		m_iplan.y[i][0] = data[i].real();
-		m_iplan.y[i][1] = data[i].imag();
-	}
-
-	// Copy k-space and weights to allocated memory
-	memcpy (&(m_fplan.x[0]),  &kspace[0],  kspace.Size()*sizeof(double));
-	memcpy (&(m_iplan.w[0]), &weights[0], weights.Size()*sizeof(double));
-
-	// Assign weights and precompute PSI
-	nfft::weights (&m_fplan, &m_iplan);
-	nfft::psi (&m_fplan);
-
-	// Inverse FT
-	nfft::ift (&m_fplan, &m_iplan, m_maxit, m_epsilon);
-
-	// Resize data for output
-	for (int i = 0; i < INVALID_DIM; i++)
-		data.Dim(i) = 1;
-	for (int i = 0; i < m_dim; i++)
-		data.Dim(i) = m_N[i];
-	data.Reset();
-
-	// Copy back reconstructed image to outgoing matrix
-	for (int i = 0; i < data.Size(); i++)
-		data[i] = cxfl (m_iplan.f_hat_iter[i][0], m_iplan.f_hat_iter[i][1]);
 	
-	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start));// / Toolbox::Instance()->ClockRate());
+	memcpy (&(m_iplan.y[0]),    &data[0],    data.Size()*sizeof  (cxdb)); FreeCXDB("data");
+	nfft::ift     (&m_fplan, &m_iplan, m_maxit, m_epsilon);
+	memcpy (&img[0], m_iplan.f_hat_iter, img.Size() * sizeof(cxdb));
+	
+	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
 	
 	return error;
 

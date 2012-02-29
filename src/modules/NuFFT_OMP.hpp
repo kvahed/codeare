@@ -55,6 +55,12 @@ namespace RRStrategy {
 		 * @brief Dump data to disk
 		 */
 		virtual RRSModule::error_code
+		Prepare ();
+		
+		/**
+		 * @brief Dump data to disk
+		 */
+		virtual RRSModule::error_code
 		Init ();
 		
 		/**
@@ -76,6 +82,7 @@ namespace RRStrategy {
 		int       m_shots;              /**< @brief Number of shots */
 		int       m_verbose;            /**< @brief Store all shots separately? */
 		int       m_nthreads;
+		int       m_imgsize;
 
 		double               m_epsilon; /**< @brief Convergence criterium */
 

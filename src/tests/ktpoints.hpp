@@ -31,8 +31,8 @@ ktptest (Connector<T>* rc) {
 	rc->Process    (test);
 	
 	rc->GetMatrix ("target", target);
-	rc->GetMatrix ("b1",     b1);
-	rc->GetMatrix ("r",      r);
+	rc->GetMatrix ("ep",     b1);
+	rc->GetMatrix ("nrmse",  r);
 
 	rc->Finalise(test);
 	
