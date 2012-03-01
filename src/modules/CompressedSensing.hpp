@@ -311,7 +311,7 @@ namespace RRStrategy {
 			}
 			
 			float f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
-			float f1 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
+			float f1;// = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
 			
 			int i = 0;
 			

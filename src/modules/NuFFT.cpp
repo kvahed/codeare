@@ -103,7 +103,7 @@ NuFFT::Init () {
 			m,
 			m_epsilon);
 
-	nfft::init (m_dim, m_N, m_M*m_shots, m_n, m, &m_fplan, &m_iplan, m_epsilon);
+	nfft::init (m_dim, m_N, m_M*m_shots, m_n, m, &m_fplan, &m_iplan);
 
 	m_initialised = true;
 

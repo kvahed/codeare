@@ -113,7 +113,7 @@ NuFFT_OMP::Init () {
 	m_M = m_M*m_shots/m_nthreads;
 
 	for (int i = 0; i < m_nthreads; i++)
-		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
+		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i]);
 
 	// --------------------------------------
 

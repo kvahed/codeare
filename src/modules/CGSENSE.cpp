@@ -170,7 +170,7 @@ CGSENSE::Init() {
 			m_epsilon);
 
 	for (int i = 0; i < NTHREADS || i < m_Nc; i++)
-		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i], m_epsilon);
+		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i]);
 	// --------------------------------------
 
 	m_initialised = true;

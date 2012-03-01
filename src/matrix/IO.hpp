@@ -838,7 +838,7 @@ MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 	
 	mwSize   dim[INVALID_DIM];
 		
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; i++) 
 		dim[i] = (mwSize)M.Dim(i);
 	
 	mxArray*  mxa;
@@ -858,13 +858,22 @@ MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 	
 	// Copy to memory block ----------------------
 	
-	if      (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))
-		for (size_t i = 0; i <M.Size(); i++) {
-			mxGetPr(mxa)[i] = creal(M[i]); 
-			mxGetPi(mxa)[i] = cimag(M[i]); 
+	if (typeid(T) == typeid(cxfl)) {
+	    float* re = (float*)mxGetData(mxa);
+		float* im = (float*)mxGetImagData(mxa);
+		for (size_t i = 0; i < M.Size(); i++) {
+			re[i] = creal(M[i]); 
+			im[i] = cimag(M[i]); 
 		} 
-	else 
-		memcpy(mxGetPr(mxa), &M[0],M.Size() * sizeof(T));
+	} else if (typeid(T) == typeid(cxdb)) {
+		double* re = mxGetPr(mxa);
+		double* im = mxGetPi(mxa);
+		for (size_t i = 0; i < M.Size(); i++) {
+			re[i] = creal(M[i]); 
+			im[i] = cimag(M[i]); 
+		}
+	} else 
+		memcpy(mxGetData(mxa), &M[0], M.Size() * sizeof(T));
 	
 	// -------------------------------------------
 	
