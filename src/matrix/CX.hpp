@@ -30,7 +30,7 @@
  * @param  m Input
  * @return   Absolute values 
  */
-Matrix<double> 
+inline static Matrix<double> 
 abs (const Matrix<cxdb>& m) {
 
 	Matrix<double> res(m.Dim());
@@ -56,7 +56,7 @@ abs (const Matrix<cxdb>& m) {
  * @param  m Input
  * @return   Absolute values 
  */
-Matrix<float> 
+inline static Matrix<float> 
 abs (const Matrix<cxfl>& m) {
 
 	Matrix<float> res(m.Dim());
@@ -82,7 +82,7 @@ abs (const Matrix<cxfl>& m) {
  * @param  m Input
  * @return   Absolute values 
  */
-Matrix<float> 
+inline static Matrix<float> 
 abs (const Matrix<float>& m) {
 	
 	Matrix<float> res(m.Dim());
@@ -108,7 +108,7 @@ abs (const Matrix<float>& m) {
  * @param  m Input
  * @return   Absolute values 
  */
-Matrix<double> 
+inline static Matrix<double> 
 abs (const Matrix<double>& m) {
 	
 	Matrix<float> res(m.Dim());
@@ -134,7 +134,7 @@ abs (const Matrix<double>& m) {
  * @param  m Input
  * @return   Arguments
  */
-Matrix<double> 
+inline static Matrix<double> 
 arg (const Matrix<cxdb>& m) {
 
 	Matrix<double> res(m.Dim());
@@ -160,7 +160,7 @@ arg (const Matrix<cxdb>& m) {
  * @param  m Input
  * @return   Arguments
  */
-Matrix<float> 
+inline static Matrix<float> 
 arg (const Matrix<cxfl>& m) {
 
 	Matrix<float> res(m.Dim());
@@ -186,7 +186,7 @@ arg (const Matrix<cxfl>& m) {
  * @param  m Input
  * @return   Arguments
  */
-Matrix<float> 
+inline static Matrix<float> 
 arg (const Matrix<float>& m) {
 	
 	Matrix<float> res(m);
@@ -201,7 +201,7 @@ arg (const Matrix<float>& m) {
  * @param  m Input
  * @return   Arguments
  */
-Matrix<double> 
+inline static Matrix<double> 
 arg (const Matrix<double>& m) {
 	
 	Matrix<double> res(m);
@@ -216,7 +216,7 @@ arg (const Matrix<double>& m) {
  * @param  m Input
  * @return   Real part
  */
-Matrix<double> 
+inline static Matrix<double> 
 real (const Matrix<cxdb>& m) {
 
 	Matrix<double> res(m.Dim());
@@ -242,7 +242,7 @@ real (const Matrix<cxdb>& m) {
  * @param  m Input
  * @return   Real part
  */
-Matrix<float> 
+inline static Matrix<float> 
 real (const Matrix<cxfl>& m) {
 
 	Matrix<float> res(m.Dim());
@@ -268,7 +268,7 @@ real (const Matrix<cxfl>& m) {
  * @param  m Input
  * @return   Real part
  */
-Matrix<float> 
+inline static Matrix<float> 
 real (const Matrix<float>& m) {
 	
 	Matrix<float> res(m);
@@ -283,7 +283,7 @@ real (const Matrix<float>& m) {
  * @param  m Input
  * @return   Real part
  */
-Matrix<double> 
+inline static Matrix<double> 
 real (const Matrix<double>& m) {
 	
 	Matrix<double> res(m);
@@ -299,7 +299,7 @@ real (const Matrix<double>& m) {
  * @param  m Input
  * @return   Imaginary part
  */
-Matrix<double> 
+inline static Matrix<double> 
 imag (const Matrix<cxdb>& m) {
 
 	Matrix<double> res(m.Dim());
@@ -325,7 +325,7 @@ imag (const Matrix<cxdb>& m) {
  * @param  m Input
  * @return   Imaginary part
  */
-Matrix<float> 
+inline static Matrix<float> 
 imag (const Matrix<cxfl>& m) {
 
 	Matrix<float> res(m.Dim());
@@ -351,7 +351,7 @@ imag (const Matrix<cxfl>& m) {
  * @param  m Input
  * @return   Imaginary part
  */
-Matrix<float> 
+inline static Matrix<float> 
 imag (const Matrix<float>& m) {
 	
 	Matrix<float> res(m);
@@ -367,7 +367,7 @@ imag (const Matrix<float>& m) {
  * @param  m Input
  * @return   Imaginary part
  */
-Matrix<double> 
+inline static Matrix<double> 
 imag (const Matrix<double>& m) {
 	
 	Matrix<double> res(m);
@@ -382,7 +382,7 @@ imag (const Matrix<double>& m) {
  * @param   m       Input 
  * @return          Complex conjugate 
  */
-template<class T> Matrix<T>
+template<class T> inline static Matrix<T>
 conj (const Matrix<T>& m) {
 	
 	Matrix<T> res = m;
