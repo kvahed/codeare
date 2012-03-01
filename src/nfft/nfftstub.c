@@ -25,9 +25,8 @@
 #include "nfft3util.h"
 #include "nfft3.h"
 
-int init   (int d, int* N, int M, int* n, int m, nfft_plan* np, solver_plan_complex* inp, double epsilon) {
+int init   (int d, int* N, int M, int* n, int m, nfft_plan* np, solver_plan_complex* inp) {
 	
-	int      i, j, k, l;                            /* Some counters       */
 	unsigned infft_flags = CGNR | PRECOMPUTE_DAMP;  /* flags for the infft */
 
 #ifdef VERBOSE
@@ -111,7 +110,7 @@ void psi (nfft_plan* np) {
 
 void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) {
 	
-	int j, k, l;
+	int k, l;
 	
 	/* init some guess */
 	for(k = 0; k < np->N_total; k++)

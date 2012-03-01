@@ -48,7 +48,7 @@ namespace nfft {
 		 * @return success
 		 */
 		extern int
-		init                 (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_complex* inp, double epsilon  = 0.0000003);
+		init                 (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_complex* inp);
 
 		/**
 		 * @brief            Inverse FT
