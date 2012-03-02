@@ -71,14 +71,15 @@ Row (const Matrix<T>& M, const size_t r)  {
  * @return             Desired row of M
  */
 template <class T> static inline Matrix<T> 
-Column (const Matrix<T>& M, const size_t c) {
+Column (Matrix<T>& M, const size_t c) {
 	
-	Matrix<T> res (M.Dim(1),1);
+	Matrix<T> res (M.Dim(0),1);
 	
-	memcpy (&res[0], M[c*M.Dim(0)], M.Dim(0) * sizeof(T));
+	memcpy (&res[0], &M[c*M.Dim(0)], M.Dim(0) * sizeof(T));
 	
 	return res;
 	
 }
 
 
+#endif
