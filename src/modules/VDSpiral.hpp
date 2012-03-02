@@ -70,10 +70,21 @@ struct SDOut {
 
 
 
-SDOut SDMax (SDIn&) {
+SDOut SDMax (SDIn& sdin) {
 
 	SDOut so;
+	size_t ssp;
+
+	Matrix<double> dpp (ssp,1), dpm (ssp,1);
+
+	for (size_t i = 0; i < ssp-1; i++)
+		dpp[i] = sdin.pos[i+1] = sdin.pos[i]; 
+	dpp[ssp-1] = dpp[ssp-2];
+
+	MXDump (dpp, "dpp.mat", "dpp");
+
 	
+
 	return so;
 
 }
