@@ -397,4 +397,43 @@ size               (const Matrix<T>& M, const size_t& d) {
 }
 
 
+/**
+ * @brief           Maximal element
+ *
+ * @param  M        Matrix
+ * @return          Maximum
+ */
+template <class T> static inline T
+max (const Matrix<T>& M) {
+
+	T max = M[0];
+
+	for (size_t i = 0; i < numel(M); i++)
+		if (M[i] > max)
+			max = M[i];
+
+	return max;
+	
+}
+
+
+/**
+ * @brief           Minimal element
+ *
+ * @param  M        Matrix
+ * @return          Minimum
+ */
+template <class T> static inline T
+min (const Matrix<T>& M) {
+
+	T max = M[0];
+
+	for (size_t i = 0; i < numel(M); i++)
+		if (M[i] < max)
+			max = M[i];
+
+	return max;
+	
+}
+
 #endif 
