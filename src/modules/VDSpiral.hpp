@@ -3,15 +3,20 @@
 #include "Math.hpp"
 #include "Interpolate.hpp"
 
+inline bool custom_isnan (double var)
+{
+    volatile double d = var;
+    return d != d;
+}
 
-#define M_GAMMA 4.257
+#define GAMMA_MT_MS 4.2576
 
 struct Solution {
 	
 	Matrix<double> k;
 	Matrix<double> g;
 	Matrix<double> s;
-	double t;
+	Matrix<double> t;
 	
 };
 
@@ -26,28 +31,34 @@ struct GradientParams {
 };
 
 
-inline double RugeKutta (const double& s, const double& ds, const double& st, 
-						 const Matrix<double>& k, const double& smax, const double& L) {
+inline double RungeKutta (const double& s, const double& ds, const double& st, 
+						  const double* k, const double& smax, const double& L, 
+						  const bool& fw) {
 
 	double k1, k2, k3, k4;
-	Matrix<double> ak = abs(k) ^ 2;
+	size_t l, m, n;
+	double pgs = pow(GAMMA_MT_MS*smax,2);
 
-	double pgs = pow(M_GAMMA*smax,2);
+	if (fw) {
+		l = 0; m = 1; n = 2;
+	} else {
+		l = 2; m = 1; n = 0;
+	}
 
-	k1 = ds * sqrt (pgs - ak[0] * pow (st       ,4)) /  st;
-	k2 = ds * sqrt (pgs - ak[1] * pow (st + k1/2,4)) / (st + k1/2);
-	k3 = ds * sqrt (pgs - ak[1] * pow (st + k2/2,4)) / (st + k2/2);
-	k4 = ds * sqrt (pgs - ak[2] * pow (st + k3/2,4)) / (st + k3/2);
-
+	k1 = ds * sqrt (pgs - pow(k[l],2) * pow (st       ,3));
+	k2 = ds * sqrt (pgs - pow(k[m],2) * pow (st + k1/2,3));
+	k3 = ds * sqrt (pgs - pow(k[m],2) * pow (st + k2/2,3));
+	k4 = ds * sqrt (pgs - pow(k[n],2) * pow (st + k3/2,3));
+	
 	return k1/6 + k2/3 + k3/3 + k4/6;
-
+	
 }
 
 
 struct SDIn {
 
 	PolyVal *pkx, *pky, *pkz;
-	Matrix<double> pos, s;
+	Matrix<double> posh, sh;
 	double mgr, msr;
 
 	~SDIn () {
@@ -70,57 +81,71 @@ struct SDOut {
 
 
 
-SDOut SDMax (SDIn& sdin) {
+SDOut SDMax (SDIn& si) {
 
 	SDOut so;
-	size_t ssp;
 
-	Matrix<double> dpp (ssp,1), dpm (ssp,1);
+	Matrix<double>& posh = si.posh;
+	Matrix<double>& sh   = si.sh;
+	PolyVal& pkx         = *(si.pkx);
+	PolyVal& pky         = *(si.pky);
+	PolyVal& pkz         = *(si.pkz);
+
+	size_t ssp = size(posh,0);
+	size_t sss = size(sh  ,0);
+
+	Matrix<double>  dpp (ssp,1);
+	Matrix<double>  dpm (ssp,1);
+	Matrix<double>  dsp (sss,1);
+	Matrix<double>  dsm (sss,1);
+	Matrix<double>  csp (ssp,3);
+	Matrix<double>  csm (ssp,3);
+	Matrix<double>  css (ssp,3);
+	so.k   = Matrix<double> (ssp,1);
+	so.phi = Matrix<double> (ssp,1);
 
 	for (size_t i = 0; i < ssp-1; i++)
-		dpp[i] = sdin.pos[i+1] = sdin.pos[i]; 
+		dpp[i] = posh[i+1] - posh[i]; 
 	dpp[ssp-1] = dpp[ssp-2];
 
-	MXDump (dpp, "dpp.mat", "dpp");
+	for (size_t i = 1; i < ssp;   i++) 
+		dpm[i] = posh[i] - posh[i-1]; 
+	dpp[0] = dpp[1];
 
+	for (size_t i = 0; i < sss-1; i++)
+		dsp[i] = sh[i+1] - sh[i]; 
+	dsp[ssp-1] = dsp[ssp-2];
+
+	for (size_t i = 1; i < sss;   i++) 
+		dsm[i] = sh[i] - sh[i-1]; 
+	dsm[0] = dsm[1];
+
+	for (size_t i = 1; i < ssp-1; i++) {
+		csp(i,0) = (pkx.Lookup (posh[i] + dpp[i]) - pkx.Lookup (posh[i])) / dsp[i];
+		csp(i,1) = (pky.Lookup (posh[i] + dpp[i]) - pky.Lookup (posh[i])) / dsp[i];
+		csp(i,2) = (pkz.Lookup (posh[i] + dpp[i]) - pkz.Lookup (posh[i])) / dsp[i];
+		csm(i,0) = (pkx.Lookup (posh[i]) - pkx.Lookup (posh[i] - dpm[i])) / dsm[i];
+		csm(i,1) = (pky.Lookup (posh[i]) - pky.Lookup (posh[i] - dpm[i])) / dsm[i];
+		csm(i,2) = (pkz.Lookup (posh[i]) - pkz.Lookup (posh[i] - dpm[i])) / dsm[i];
+		css(i,0) = (csp(i,0) - csm(i,0)) / ((dsm[i] + dsp[i]) * 0.5);
+		css(i,1) = (csp(i,1) - csm(i,1)) / ((dsm[i] + dsp[i]) * 0.5);
+		css(i,2) = (csp(i,2) - csm(i,2)) / ((dsm[i] + dsp[i]) * 0.5);
+		so.k[i]  = sqrt (pow(css(i,0),2) + pow(css(i,1),2) + pow(css(i,2),2));
+	}
+
+	so.k[0]     = so.k[1]; 
+	so.k[sss-1] = so.k[sss-2];
 	
+	double mgr = GAMMA_MT_MS * si.mgr;
+	double msr = GAMMA_MT_MS * si.msr;
 
+	for (size_t i = 0; i < ssp; i++) 
+		so.phi[i] = MIN (mgr, sqrt(msr/so.k[i]));
+	
 	return so;
 
 }
-/*
-  function [sdot, k] = sdotMax(PP, p_of_s, s, gmax, smax)
 
-  gamma = 4.257;
-  
-  s = s(:);
-  dp_p = p_of_s([2:end,end]) - p_of_s; , dp_p(end) = dp_p(end-1);
-  dp_m = p_of_s - p_of_s([1,1:end-1]);, dp_m(1) = dp_m(2);
-  ds_p = s([2:end,end]) - s; , ds_p(end) = ds_p(end-1);
-  ds_m = s - s([1,1:end-1]);, ds_m(1) = ds_m(2);
-  
-  Cs_p = (ppval(PP,p_of_s + dp_p) - ppval(PP, p_of_s))./ds_p;
-  Cs_m = (ppval(PP,p_of_s) - ppval(PP, p_of_s-dp_m))./ds_m;
-  Cs = Cs_p/2 + Cs_m/2;
-  Css = (Cs_p - Cs_m)./(ds_m/2+ds_p/2);
-  k = abs(Css);
-  % fix edge numerical problems
-  k(end) = k(end-1);
-  k(1) = k(2);
-  
-  % calc I constraint curve (maximum gradient)
-  sdot1 = gamma*gmax*ones(size(s));
-  
-  % calc II constraint curve (curve curvature dependent)
-  sdot2 = sqrt(gamma*smax ./ (abs(k)+eps));
-  
-  % calc total constraint
-  sdot = min([sdot1, sdot2],[],2);
-*/
-
-
-
-	
 
 
 /**
@@ -134,12 +159,19 @@ Solution ComputeGradient (GradientParams& gp) {
 	Solution s;
 	size_t ups = 100, ts = 0;
 
+	printf ("  Const arc-length parametrization ........... "); fflush(stdout);
+	ticks start = getticks();
+
 	Matrix<double> op, np, sop;
 
-	op = Matrix<double>::LinSpace (0.0, (double)(size(gp.k,0)-1), size(gp.k,0));
-	np = Matrix<double>::LinSpace (0.0, (double)(size(gp.k,0)-1), (size(gp.k,0)-1)*ups + 1);
+	size_t sgpk = size(gp.k,0);
+	size_t ssk  = (sgpk-1)*ups+1;
 
-	s.k = interp1 (op, gp.k, np, INTERP::CSPLINE);
+	op = Matrix<double>::LinSpace (0.0, (double)(size(gp.k,0)-1), sgpk);
+	np = Matrix<double>::LinSpace (0.0, (double)(size(gp.k,0)-1),  ssk);
+
+	s.k = interp1 (op, gp.k, np, INTERP::AKIMA);
+
 	size_t snp = size(s.k,0);
 	s.g = Matrix<double>(snp,3);
 	sop = Matrix<double>(snp,1);
@@ -158,6 +190,7 @@ Solution ComputeGradient (GradientParams& gp) {
 		s.g (i,1) = s.k(i+1,1) - s.k(i,1);
 		s.g (i,2) = s.k(i+1,2) - s.k(i,2);
 	}
+	
 
 	for (size_t i = 0; i < 3; i++)
 		s.g (snp-1,i) = s.g (snp-2,i); 
@@ -171,27 +204,119 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	sop /= (double)ups;
 
-	double st0 = M_GAMMA * gp.msr * gp.dt;
+	double st0 = GAMMA_MT_MS * gp.msr * gp.dt;
 	double ds  = st0 * gp.dt / 3.0;
 	
-	double L = max(sop);
+	double L   = max(sop);
 	ts = ceil(L/ds);
 
-	Matrix<double> sh, sta;
+	Matrix<double> sf, sta, stb, pos;
 
-	sdin.s = Matrix<double>::LinSpace (0.0, L,   ts);
-	sh     = Matrix<double>::LinSpace (0.0, L, 2*ts);
-	sta    = Matrix<double>::Zeros (size(sdin.s,0), 1);
+	sf         = Matrix<double>::LinSpace (0.0, L,   ts);
+	sdin.sh    = Matrix<double>::LinSpace (0.0, L, 2*ts);
+	sta        = Matrix<double>::Zeros (size(sf,0), 1);
+	stb        = Matrix<double>::Zeros (size(sf,0), 1);
+
+	sdin.posh  = interp1 (sop, np, sdin.sh, INTERP::CSPLINE);
+
+	pos        = Matrix<double> (size(sdin.posh,0)/2,1);
+
+	for (size_t i = 0; i < size(pos,0); i++)
+		pos[i] = sdin.posh[i*2];
+
+
+	printf ("done: (%.3f)\n  Computing geometry dependent constraints ... ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate()); 
+	fflush(stdout);
+	start = getticks();
+
+	SDOut sdout = SDMax (sdin);
+	size_t sk = size(sdout.k,0);
+	size_t ss = size(sf,0);
+
+	sdout.k.Resize(sk+2,1);
+	sdout.k[sk]   = sdout.k[sk-1];
+	sdout.k[sk+1] = sdout.k[sk-1];
 
 	sta[0] = 0.0;
 
-	Matrix<double> posh = interp1 (sop, np, sh, INTERP::CSPLINE);
-	Matrix<double> pos  (size(posh,0)/2,1);
+	printf ("done: (%.3f)\n  Solving ODE forward ........................ ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+	fflush(stdout);
+	start = getticks();
 
-	for (size_t i = 0; i < size(pos,1); i++)
-		pos [i] = posh[i*2];
+	for (size_t i = 1; i < ss; i++)
+		sta[i] = MIN (sta[i-1] + RungeKutta (sf[i], ds, sta[i-1], &sdout.k[(i-1)*2], gp.msr, L,  true), sdout.phi[i*2-1]);
 
-	SDOut sdout = SDMax (sdin);
+	stb[ss-1] = sta[ss-1];
+
+	printf ("done: (%.3f)\n  Solving ODE backward ....................... ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate()); 
+	fflush(stdout);
+	start = getticks();
+
+	for (size_t i = ss-2; i > 0; i--)
+		stb[i] = MIN (stb[i+1] + RungeKutta (sf[i], ds, stb[i+1], &sdout.k[(i+2)*2], gp.msr, L, false), sdout.phi[i*2-1]);
+
+	printf ("done: (%.3f)\n  Final interpolations ....................... ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+	fflush(stdout);
+	start = getticks();
+
+	for (size_t i = 0; i < ss; i++)
+		sta[i] = (sta[i] <= stb[i]) ? sta[i] : stb[i];
+
+	Matrix<double> tos, sot, t, pot;
+	double T;
+	size_t Nt;
+
+	tos    = cumsum (ds/sta);	
+	tos.Resize(size(tos,1)-1,size(tos,0));
+	T      = tos [ss-2];
+	Nt     = round(T/gp.dt); 
+	t      = Matrix<double>::LinSpace(0.0, T, Nt);
+
+	sot    = interp1 (tos,  sf,   t, INTERP::CSPLINE);
+	pot    = interp1 ( sf, pos, sot, INTERP::CSPLINE);
+	
+	gp.k   = Matrix<double> (Nt,3);
+
+	for (size_t i = 0; i < Nt; i++) {
+		gp.k(i,0) = (sdin.pkx->Lookup (pot[i]));
+		gp.k(i,1) = (sdin.pky->Lookup (pot[i]));
+		gp.k(i,2) = (sdin.pkz->Lookup (pot[i]));
+	}
+
+	s.g    = Matrix<double> (Nt,3);
+	s.k    = Matrix<double> (Nt,3);
+	s.s    = Matrix<double> (Nt,3);
+	
+	for (size_t i = 0; i < Nt-1; i++) {
+		s.g(i,0) = (gp.k(i+1,0) - gp.k(i,0)) / (GAMMA_MT_MS * gp.dt);
+		s.g(i,1) = (gp.k(i+1,1) - gp.k(i,1)) / (GAMMA_MT_MS * gp.dt);
+		s.g(i,2) = (gp.k(i+1,2) - gp.k(i,2)) / (GAMMA_MT_MS * gp.dt);
+	}
+
+	for (size_t i = 0; i < 3; i++) {
+		s.g(Nt-2,i) = s.g(Nt-3,i)+(s.g(Nt-3,i)-s.g(Nt-4,i));  
+		s.g(Nt-1,i) = s.g(Nt-2,i)+(s.g(Nt-3,i)-s.g(Nt-4,i));  
+		s.k(0,   i) = 0.0;
+	}
+
+	for (size_t i = 1; i < Nt; i++) {
+		s.k(i,0) =  s.k(i-1,0) + s.g(i,0) * (GAMMA_MT_MS * gp.dt);
+		s.k(i,1) =  s.k(i-1,1) + s.g(i,1) * (GAMMA_MT_MS * gp.dt);
+		s.k(i,2) =  s.k(i-1,2) + s.g(i,2) * (GAMMA_MT_MS * gp.dt);
+	}
+
+	for (size_t i = 0; i < Nt-1; i++) {
+		s.s(i,0) = (s.g(i+1,0) - s.g(i,0)) / gp.dt;
+		s.s(i,1) = (s.g(i+1,1) - s.g(i,1)) / gp.dt;
+		s.s(i,2) = (s.g(i+1,2) - s.g(i,2)) / gp.dt;
+	}
+
+	for (size_t i = 0; i < 3; i++)
+		s.s(Nt-1,i) = s.s(Nt-2,i);  
+
+	s.t = t;
+
+	printf ("done: (%.3f)\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 
 	return s;
 	
@@ -203,13 +328,13 @@ Solution ComputeGradient (GradientParams& gp) {
  */
 struct SpiralParams {
 
-	size_t shots;       // # shots
-	double res;         // Maximum resolution
-	Matrix<double>* fov; // FOV vector
-	Matrix<double>* rad; // Corresponding radius vector
+	size_t shots;       /**< @brief # shots */
+	double res;         /**< @brief Maximum resolution */
+	Matrix<double> fov; /**< @brief FOV vector */
+	Matrix<double> rad; /**< @brief Corresponding radius vector */
 	double mgr;         /**< @brief G max */
 	double msr;         /**< @brief Slew max */
-	double dt;          /**< @brief Sampling duration (i.e. delta t)*/
+	double dt;          /**< @brief Sampling duration (i.e. delta t) */
 
 };
 
@@ -227,13 +352,13 @@ struct Spiral {
 };
 
 
-Spiral VDSpiral (const SpiralParams& sp) {
+Spiral VDSpiral (SpiralParams& sp) {
 
 	Spiral spir;
 	GradientParams gp;
 
-	Matrix<double> &fov = *(sp.fov); 
-	Matrix<double> &rad = *(sp.rad); 
+	Matrix<double>& fov = sp.fov; 
+	Matrix<double>& rad = sp.rad; 
 	double k_max, fov_max, dr;
 	Matrix<double> r, theta;
 	long n = 0;
@@ -252,14 +377,14 @@ Spiral VDSpiral (const SpiralParams& sp) {
 	
 	Matrix<double> x = k_max*rad;
 	fov = interp1 (x, fov, r, INTERP::LINEAR);
-	
+
 	dr  = ((double) sp.shots) / (1500.0 * fov_max);
 	n   = ceil (k_max/dr);
 	x   = r;
 	r   = Matrix<double>::LinSpace(0.0, k_max, n);
 
 	fov = interp1 (x, fov, r, INTERP::AKIMA);
-	
+
 	theta = cumsum((2 * PI * dr / sp.shots) * fov);
 
 	gp.k = Matrix<double> (numel(r),3);
@@ -273,10 +398,12 @@ Spiral VDSpiral (const SpiralParams& sp) {
 	gp.msr = sp.msr;
 	gp.dt  = sp.dt;
 	
-	MXDump (r,     "r.mat",   "r");
-	MXDump (theta, "t.mat",   "t");
-
 	Solution s = ComputeGradient (gp);
+	
+	spir.k = s.k;
+	spir.g = s.g;
+	spir.s = s.s;
+	spir.t = s.t;
 
 	return spir;
 
