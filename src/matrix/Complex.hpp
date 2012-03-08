@@ -18,6 +18,8 @@
  *  02110-1301  USA
  */
 
+#ifndef __COMPLEX_HPP__
+#define __COMPLEX_HPP__
 
 #include <stdlib.h>
 #include <complex>
@@ -60,3 +62,4 @@ inline long   carg  (long   l) {return 0;}
 inline double carg  (cxdb  cd) {return std::arg(cd);}
 inline float  carg  (cxfl  cf) {return std::arg(cf);}
 
+#endif

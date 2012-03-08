@@ -24,7 +24,7 @@
 
 #include "ReconStrategy.hpp"
 #include "FFT.hpp"
-#include "Lapack.hpp"
+#include "Statistics.hpp"
 #include "Toolbox.hpp"
 #include "IO.hpp"
 
@@ -267,7 +267,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	ticks  tic = getticks();
 	Matrix<cxfl> tmp;
 	
-	tmp = Mean(imgs,4);
+	tmp = mean(imgs,4);
 	tmp = Squeeze(tmp);
 	
 	size_t nc = tmp.Dim(4);                           // Number of channels

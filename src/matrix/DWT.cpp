@@ -30,8 +30,18 @@ DWT::DWT (const size_t& sl, const wlfamily& wf, const size_t& wm) {
 
 		m_sl   = sl;
 		m_sz   = sl*sl;
-		
-		m_w    = gsl_wavelet_alloc (gsl_wavelet_daubechies, wm);
+
+		switch (wf) 
+			{
+			case WL_DAUBECHIES         : m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies, wm); break;
+			case WL_DAUBECHIES_CENTERED: m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies, wm); break;
+			case WL_HAAR               : m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies, wm); break;
+			case WL_HAAR_CENTERED      : m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies, wm); break;
+			case WL_BSPLINE            : m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies, wm); break;
+			case WL_BSPLINE_CENTERED   : m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies, wm); break;
+			default                    : m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies, wm); break;
+			}
+
 		m_work = gsl_wavelet_workspace_alloc (m_sz);
 		
 		m_re = (double*) malloc (m_sz * sizeof(double));

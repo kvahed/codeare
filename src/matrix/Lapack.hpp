@@ -55,10 +55,10 @@ extern "C" {
 	void sgeev_  (char *jvl, char *jvr, int *n, void *a, int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork,              int *info);
 	
 	// Singular value decomposition 
-	void cgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, void *rwork, int *iwork, int*info);
-	void zgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, void *rwork, int *iwork, int*info);
-	void dgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork,               int *iwork, int*info);
-	void sgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork,               int *iwork, int*info);
+	void cgesdd_ (const char *jobz, int*m, int *n, const void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, void *rwork, int *iwork, int*info);
+	void zgesdd_ (const char *jobz, int*m, int *n, const void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, void *rwork, int *iwork, int*info);
+	void dgesdd_ (const char *jobz, int*m, int *n, const void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork,               int *iwork, int*info);
+	void sgesdd_ (const char *jobz, int*m, int *n, const void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork,               int *iwork, int*info);
 	
 	// Pseudo-inversion 
 	void zgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
@@ -213,8 +213,10 @@ extern "C" {
 	
 
 	template<class T, class S> int 
-	SVD (Matrix<T>& A, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
+	SVD (const Matrix<T>& A, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
 		
+		//Matrix<T> A (IN);
+
 		// SVD only defined on 2D data
 		if (!Is2D(A))
 			return -2;
@@ -258,15 +260,17 @@ extern "C" {
 			else             rwork = malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
 		}
 		
+		const void* test = (const void*) &(A[0]);
+
 		// Workspace query
 		if      (typeid(T) == typeid(cxfl))
-			cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+			cgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(cxdb))
-			zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+			zgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+			dgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
 		else if (typeid(T) == typeid(float))
-			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+			sgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
 		
 		// Resize work according to ws query
 		lwork   = (int) creal (wopt);
@@ -274,13 +278,13 @@ extern "C" {
 		
 		//SVD
 		if      (typeid(T) == typeid(cxfl))
-			cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+			cgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(cxdb))
-			zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+			zgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+			dgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
 		else if (typeid(T) == typeid(float))
-			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+			sgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
 
 		V = !V;
 
@@ -302,7 +306,7 @@ extern "C" {
 	
 
 	template <class T> Matrix<T> 
-	Inv (Matrix<T>& m) {
+	inv (const Matrix<T>& m) {
 		
 		// 2D 
 		if (!Is2D(m))               printf ("Inv Error: Parameter m must be 2D");
@@ -365,7 +369,7 @@ extern "C" {
 		return res;
 		
 	} 
-	
+
 
 
 	template<class T> Matrix<T> 
@@ -444,7 +448,6 @@ extern "C" {
 	}
 	
 	
-	
 	template<class T> Matrix<T> 
 	Cholesky (Matrix<T>& A, const char uplo = 'U') {
 		
@@ -465,6 +468,12 @@ extern "C" {
 		
 	}
 	
+
+template<class T> static Matrix<T> chol (Matrix<T>& A, const char uplo = 'U') {
+	
+	return Cholesky(A, uplo);
+	
+}
 
 	template<class T> Matrix<T> 
 	GEMM (Matrix<T>& A, Matrix<T>& B, char transa = 'N', char transb = 'N') {

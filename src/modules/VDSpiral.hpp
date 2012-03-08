@@ -21,8 +21,6 @@
 
 #include "GradientTiming.hpp"
 
-#define GAMMA_MT_MS 4.2576
-
 /**
  * @brief 2D Spiral parameters
  */
