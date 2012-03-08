@@ -105,7 +105,7 @@ LapackTests::Process     () {
 	dtmp = Matrix<double>::Random2D (5);
 	std::cout << "RLDB IN: \n";
 	std::cout << dtmp << std::endl;
-	dtmp = Inv(dtmp);
+	dtmp = inv(dtmp);
 	std::cout << "OUT:\n" <<  dtmp;
 	std::cout << "------------------------------- \n\n";
 	
@@ -114,7 +114,7 @@ LapackTests::Process     () {
 	Matrix<cxdb>ctmp = Matrix<cxdb>::Random2D (5);
 	std::cout << "CXFL IN: \n";
 	std::cout << ctmp << std::endl;
-	ctmp = Inv(ctmp);
+	ctmp = inv(ctmp);
 	std::cout << "OUT:\n" <<  ctmp;
 	std::cout << "------------------------------- \n\n";
 	

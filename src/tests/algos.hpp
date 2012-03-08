@@ -1,3 +1,5 @@
+#include "Statistics.hpp"
+
 template <class T> bool
 algotest (Connector<T>* rc) {
 
@@ -21,6 +23,13 @@ algotest (Connector<T>* rc) {
 	std::cout << "  numel(C): " << numel(C) << std::endl;
 
 	MXDump (C, std::string (base + std::string("sumb3.mat")), "sumb3");
+
+	C = (Matrix<cxfl>) SOS(B,4);
+	MXDump (C, std::string (base + std::string("sumb3.mat")), "sos3");
+
+	MXRead (B, std::string (base + std::string("covin.mat")), "A");
+	B = inv(B = chol(B = cov(B)));
+	MXDump (B, std::string (base + std::string("covout.mat")), "covA");
 
 	return true;
 	

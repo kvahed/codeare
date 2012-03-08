@@ -38,7 +38,7 @@ Matrix<T>::Matrix () {
 
 
 template <class T> inline 
-Matrix<T>::Matrix (const size_t n) {
+Matrix<T>::Matrix (const size_t& n) {
 
 	_dim [COL] = n;
 	_dim [LIN] = n;
@@ -56,7 +56,7 @@ Matrix<T>::Matrix (const size_t n) {
 
 
 template <class T> inline 
-Matrix<T>::Matrix (const size_t m, const size_t n) {
+Matrix<T>::Matrix (const size_t& m, const size_t& n) {
 
 	_dim [0] = m;
 	_dim [1] = n;
@@ -74,7 +74,7 @@ Matrix<T>::Matrix (const size_t m, const size_t n) {
 
 
 template <class T> inline 
-Matrix<T>::Matrix (const size_t m, const size_t n, const size_t k) {
+Matrix<T>::Matrix (const size_t& m, const size_t& n, const size_t& k) {
 
 	_dim [0] = m;
 	_dim [1] = n;

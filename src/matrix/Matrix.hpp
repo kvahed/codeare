@@ -175,11 +175,11 @@ public:
 	/**
 	 * @brief           Construct 16-dim matrix with dimension and resolution arrays
 	 *
-	 * @param  d        All 16 Dimensions
-	 * @param  r        All 16 Resolutions
+	 * @param  dim      All 16 Dimensions
+	 * @param  res      All 16 Resolutions
 	 */
 	inline 
-	Matrix              (const size_t* d, const float* r);
+	Matrix              (const size_t* dim, const float* res);
 	
 	
     /**
@@ -188,7 +188,7 @@ public:
 	 * @param  n        Rows & Columns
 	 */
     inline              
-    Matrix              (const size_t n) ;
+    Matrix              (const size_t& n) ;
     
     
     /**
@@ -198,7 +198,7 @@ public:
 	 * @param  n        Columns
 	 */
 	inline 
-	Matrix              (const size_t m, const size_t n);
+	Matrix              (const size_t& m, const size_t& n);
 	
     
     /**
@@ -209,7 +209,7 @@ public:
 	 * @param  k        Slices
 	 */
 	inline 
-	Matrix              (const size_t m, const size_t n, const size_t k);
+	Matrix              (const size_t& m, const size_t& n, const size_t& k);
 	
 
     /**
@@ -531,7 +531,7 @@ public:
      * @return          Value at _M[p].
      */
     T                   
-    operator[]          (const size_t p)                             const;
+    operator[]          (const size_t& p) const;
     
     
     /**
@@ -541,7 +541,7 @@ public:
      * @return          Reference to _M[p].
      */
     T                   
-    &operator[]         (const size_t p)                              ;
+    &operator[]         (const size_t& p);
 
     
     /**
@@ -549,9 +549,31 @@ public:
      *  
      * @return          Data 
      */
-    inline T*            
-    Data                ()  {
+    inline const T*            
+    Data                ()  const {
         return &(_M.at(0));
+	}
+
+    
+    /**
+     * @brief           Get pointer to data
+     *  
+     * @return          Data 
+     */
+    inline std::vector<T>&            
+    Dat                 ()  {
+        return _M;
+	}
+
+    
+    /**
+     * @brief           Get pointer to data
+     *  
+     * @return          Data 
+     */
+    inline std::vector<T>            
+    Dat                 ()  const {
+        return _M;
 	}
 
     
@@ -562,7 +584,7 @@ public:
      * @return          Value at _M[pos]
      */
     inline T            
-    At                  (const size_t pos)  const {
+    At                  (const size_t& pos) const {
 
         return _M[pos];
 
@@ -577,7 +599,7 @@ public:
      * @return           Reference to _M[pos]
      */
     inline T&           
-    At                  (const size_t pos) {
+    At                  (const size_t& pos) {
 
         return _M[pos];
 
@@ -593,7 +615,7 @@ public:
      * @return          Value at _M[col + _dim[COL]*lin]
      */
     inline T            
-    At                  (const size_t col, const size_t lin) const {
+    At                  (const size_t& col, const size_t& lin) const {
 
         return _M[col + _dim[COL]*lin ];
 
@@ -609,7 +631,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin]
      */
     inline T&           
-    At                  (size_t col, size_t lin) {
+    At                  (const size_t& col, const size_t& lin) {
 
         return _M[col + _dim[COL]*lin ];
 
@@ -626,7 +648,7 @@ public:
      * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T            
-    At                   (size_t col, size_t lin, size_t slc)  const {
+    At                   (const size_t& col, const size_t& lin, const size_t& slc)  const {
 
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
 
@@ -643,7 +665,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&            
-    At                   (size_t col, size_t lin, size_t slc) {
+    At                   (const size_t& col, const size_t& lin, const size_t& slc) {
 
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
 
@@ -673,22 +695,22 @@ public:
      * @return           Value at position
      */
     inline T            
-    At                   (const size_t col, 
-						  const size_t lin, 
-						  const size_t cha,
-						  const size_t set,
-						  const size_t eco,
-						  const size_t phs = 0,
-						  const size_t rep = 0,
-						  const size_t seg = 0,
-						  const size_t par = 0,
-						  const size_t slc = 0,
-						  const size_t ida = 0,
-						  const size_t idb = 0,
-						  const size_t idc = 0,
-						  const size_t idd = 0,
-						  const size_t ide = 0,
-						  const size_t ave = 0) const {
+    At                   (const size_t& col, 
+						  const size_t& lin, 
+						  const size_t& cha,
+						  const size_t& set,
+						  const size_t& eco,
+						  const size_t& phs = 0,
+						  const size_t& rep = 0,
+						  const size_t& seg = 0,
+						  const size_t& par = 0,
+						  const size_t& slc = 0,
+						  const size_t& ida = 0,
+						  const size_t& idb = 0,
+						  const size_t& idc = 0,
+						  const size_t& idd = 0,
+						  const size_t& ide = 0,
+						  const size_t& ave = 0) const {
 		return _M [col+
 				   lin*_dim[COL]+
 				   cha*_dim[COL]*_dim[LIN]+
@@ -731,22 +753,22 @@ public:
      * @return           Reference to position
      */
 	inline T&            
-    At                   (const size_t col, 
-						  const size_t lin, 
-						  const size_t cha,
-						  const size_t set,
-						  const size_t eco = 0,
-						  const size_t phs = 0,
-						  const size_t rep = 0,
-						  const size_t seg = 0,
-						  const size_t par = 0,
-						  const size_t slc = 0,
-						  const size_t ida = 0,
-						  const size_t idb = 0,
-						  const size_t idc = 0,
-						  const size_t idd = 0,
-						  const size_t ide = 0,
-						  const size_t ave = 0) {
+    At                   (const size_t& col, 
+						  const size_t& lin, 
+						  const size_t& cha,
+						  const size_t& set,
+						  const size_t& eco = 0,
+						  const size_t& phs = 0,
+						  const size_t& rep = 0,
+						  const size_t& seg = 0,
+						  const size_t& par = 0,
+						  const size_t& slc = 0,
+						  const size_t& ida = 0,
+						  const size_t& idb = 0,
+						  const size_t& idc = 0,
+						  const size_t& idd = 0,
+						  const size_t& ide = 0,
+						  const size_t& ave = 0) {
 
 		return _M [col+
 				   lin*_dim[COL]+
@@ -792,22 +814,22 @@ public:
      * @return          Reference to position
 	 */
 	inline Matrix <T>
-	Reshape             (const size_t col, 
-						 const size_t lin, 
-						 const size_t cha = 1,
-						 const size_t set = 1,
-						 const size_t eco = 1,
-						 const size_t phs = 1,
-						 const size_t rep = 1,
-						 const size_t seg = 1,
-						 const size_t par = 1,
-						 const size_t slc = 1,
-						 const size_t ida = 1,
-						 const size_t idb = 1,
-						 const size_t idc = 1,
-						 const size_t idd = 1,
-						 const size_t ide = 1,
-						 const size_t ave = 1) const {
+	Reshape             (const size_t& col, 
+						 const size_t& lin, 
+						 const size_t& cha = 1,
+						 const size_t& set = 1,
+						 const size_t& eco = 1,
+						 const size_t& phs = 1,
+						 const size_t& rep = 1,
+						 const size_t& seg = 1,
+						 const size_t& par = 1,
+						 const size_t& slc = 1,
+						 const size_t& ida = 1,
+						 const size_t& idb = 1,
+						 const size_t& idc = 1,
+						 const size_t& idd = 1,
+						 const size_t& ide = 1,
+						 const size_t& ave = 1) const {
 		
 		Matrix<T> res = (*this);
 		res.reshape (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
@@ -839,22 +861,22 @@ public:
      * @return          Reference to position
 	 */
 	inline void
-	Reshape             (const size_t col, 
-						 const size_t lin, 
-						 const size_t cha = 1,
-						 const size_t set = 1,
-						 const size_t eco = 1,
-						 const size_t phs = 1,
-						 const size_t rep = 1,
-						 const size_t seg = 1,
-						 const size_t par = 1,
-						 const size_t slc = 1,
-						 const size_t ida = 1,
-						 const size_t idb = 1,
-						 const size_t idc = 1,
-						 const size_t idd = 1,
-						 const size_t ide = 1,
-						 const size_t ave = 1) {
+	Reshape             (const size_t& col, 
+						 const size_t& lin, 
+						 const size_t& cha = 1,
+						 const size_t& set = 1,
+						 const size_t& eco = 1,
+						 const size_t& phs = 1,
+						 const size_t& rep = 1,
+						 const size_t& seg = 1,
+						 const size_t& par = 1,
+						 const size_t& slc = 1,
+						 const size_t& ida = 1,
+						 const size_t& idb = 1,
+						 const size_t& idc = 1,
+						 const size_t& idd = 1,
+						 const size_t& ide = 1,
+						 const size_t& ave = 1) {
 		
 		size_t new_size = col * lin * cha * set * eco * phs * rep * 
 			seg * par * slc * ida * idb * idc * idd * ide * ave;
@@ -897,7 +919,7 @@ public:
      * @return          Requested scalar value.
      */
     T                  
-    operator()          (const size_t p) const;
+    operator()          (const size_t& p) const;
 
     
     /**
@@ -907,7 +929,7 @@ public:
      * @return          Requested scalar value.
      */
     T&                 
-    operator()          (const size_t p) ;
+    operator()          (const size_t& p) ;
 
     
     /**
@@ -918,7 +940,8 @@ public:
 	 * @return          Value at _M[col + _dim[COL]*lin]
 	 */
     T
-    inline operator()          (const size_t col, const size_t lin) const {
+    inline 
+	operator()          (const size_t& col, const size_t& lin) const {
         return _M[col + _dim[COL]*lin ];
     }
     
@@ -931,7 +954,7 @@ public:
 	 * @return          Reference to _M[col + _dim[COL]*lin]
 	 */
     inline T&                  
-    operator()           (const size_t col, const size_t lin) {
+    operator()           (const size_t& col, const size_t& lin) {
         return _M[col + _dim[COL]*lin ];
     }
     
@@ -945,7 +968,7 @@ public:
      * @return           Value at _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T                  
-    operator()           (const size_t col, const size_t lin, const size_t slc) const {
+    operator()           (const size_t& col, const size_t& lin, const size_t& slc) const {
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
     }
     
@@ -960,7 +983,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&                 
-    operator()           (const size_t col, const size_t lin, const size_t slc) {
+    operator()           (const size_t& col, const size_t& lin, const size_t& slc) {
            return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
     }
     
@@ -987,22 +1010,22 @@ public:
      * @return          Reference to position
 	 */
 	inline T&                 
-    operator()           (const size_t col, 
-						  const size_t lin, 
-						  const size_t cha,
-						  const size_t set,
-						  const size_t eco = 0,
-						  const size_t phs = 0,
-						  const size_t rep = 0,
-						  const size_t seg = 0,
-						  const size_t par = 0,
-						  const size_t slc = 0,
-						  const size_t ida = 0,
-						  const size_t idb = 0,
-						  const size_t idc = 0,
-						  const size_t idd = 0,
-						  const size_t ide = 0,
-						  const size_t ave = 0) { 
+    operator()           (const size_t& col, 
+						  const size_t& lin, 
+						  const size_t& cha,
+						  const size_t& set,
+						  const size_t& eco = 0,
+						  const size_t& phs = 0,
+						  const size_t& rep = 0,
+						  const size_t& seg = 0,
+						  const size_t& par = 0,
+						  const size_t& slc = 0,
+						  const size_t& ida = 0,
+						  const size_t& idb = 0,
+						  const size_t& idc = 0,
+						  const size_t& idd = 0,
+						  const size_t& ide = 0,
+						  const size_t& ave = 0) { 
 
 		return _M [col+
 				   lin*_dim[COL]+
@@ -1045,22 +1068,22 @@ public:
      * @return          Value
 	 */
 	inline T
-    operator()           (const size_t col, 
-						  const size_t lin, 
-						  const size_t cha,
-						  const size_t set,
-						  const size_t eco = 0,
-						  const size_t phs = 0,
-						  const size_t rep = 0,
-						  const size_t seg = 0,
-						  const size_t par = 0,
-						  const size_t slc = 0,
-						  const size_t ida = 0,
-						  const size_t idb = 0,
-						  const size_t idc = 0,
-						  const size_t idd = 0,
-						  const size_t ide = 0,
-						  const size_t ave = 0) const { 
+    operator()           (const size_t& col, 
+						  const size_t& lin, 
+						  const size_t& cha,
+						  const size_t& set,
+						  const size_t& eco = 0,
+						  const size_t& phs = 0,
+						  const size_t& rep = 0,
+						  const size_t& seg = 0,
+						  const size_t& par = 0,
+						  const size_t& slc = 0,
+						  const size_t& ida = 0,
+						  const size_t& idb = 0,
+						  const size_t& idc = 0,
+						  const size_t& idd = 0,
+						  const size_t& ide = 0,
+						  const size_t& ave = 0) const { 
 		
 		return _M [col+
 				   lin*_dim[COL]+
@@ -1102,7 +1125,7 @@ public:
 	 * @return          m * s
 	 */
 	inline friend Matrix<T>    
-	operator*  (const double& s, const Matrix<T> &m) { 
+	operator*  (const double& s, const Matrix<T>& m) { 
 		return   m * s;
 	}
 
@@ -1496,7 +1519,7 @@ public:
      * @return          Resolution .
      */
     inline float          
-    Res                 (const size_t i)                                const {return _res[i];}
+    Res                 (const size_t& i)                                const {return _res[i];}
     
     
     /**
@@ -1506,7 +1529,7 @@ public:
      * @return          Resolution
      */
     inline float&          
-    Res                 (const size_t i)                                 {return _res[i];}
+    Res                 (const size_t& i)                                 {return _res[i];}
     
     
     /**
@@ -1516,7 +1539,7 @@ public:
      * @return          Dimension
      */
     inline size_t          
-    Dim                 (const size_t i)                                const {return _dim[i];}
+    Dim                 (const size_t& i)                                const {return _dim[i];}
     
     
     /**
@@ -1525,7 +1548,7 @@ public:
      * @return          Number of rows.
      */
     inline size_t&          
-    Dim                 (const size_t i)                                 {return _dim[i];}
+    Dim                 (const size_t& i)                                 {return _dim[i];}
     
     
     /**
@@ -1543,7 +1566,7 @@ public:
      * @return          Number of rows.
      */
     inline size_t          
-    Dim                 (const int i)                                const {return _dim[i];}
+    Dim                 (const int& i)                                const {return _dim[i];}
     
     
     /**
@@ -1552,7 +1575,7 @@ public:
      * @return          Number of rows.
      */
     inline size_t&          
-    Dim                 (const int i)                                 {return _dim[i];}
+    Dim                 (const int& i)                                 {return _dim[i];}
     
     
     /**
@@ -1563,8 +1586,8 @@ public:
     inline void         
     Dim                 (const size_t* dim)    {
 
-        for (size_t i = 0; i<INVALID_DIM; i++)
-            _dim[i] = dim[i];
+		for (size_t i = 0; i < INVALID_DIM; i++)
+			_dim [i] = dim [i];
 
 		Reset();
 
@@ -1627,12 +1650,10 @@ public:
     inline void         
     Reset               (const size_t* dim)                                      {
 
-    	for (size_t i = 0; i < INVALID_DIM; i++)
-            _dim[i] = dim[i];
+		for (size_t i = 0; i < INVALID_DIM; i++)
+			_dim [i] = dim [i];
 
-		_M.resize(Size());
-		
-		Zero();
+		Reset();
 
     }
     
@@ -1657,8 +1678,7 @@ public:
     inline void         
     Zero               ()                                      {
 
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] = (T) 0;
+		_M.assign (Size(), T(0)); 
 
     }
     
@@ -1702,14 +1722,6 @@ public:
     Matrix<T>           
     operator->*         (Matrix<T>& M);
    
-    /**
-     * @brief           Matrix product. i.e. this * M.
-     *
-     * @param  M        The factor.
-     */
-    /*template<class S> Matrix<T>           
-	  operator->*         (Matrix<S>& M) const ;*/
-    
     
     /**
      * @brief           Elementwise substruction of two matrices
@@ -2258,16 +2270,30 @@ public:
     
 
 	/**
-     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines CDOTU and DDOT
+     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTC and XDOT
      *
      * @param  M        Factor
+	 * @return          Scalar product
      */
 	T
     dotc (Matrix<T>& M);
     
+	
+	/**
+     * @brief           Scalar product using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTU and XDOT
+     *
+     * @param  M        Factor
+	 * @return          Scalar product
+     */
 	T
     dotu (Matrix<T>& M);
     
+	/**
+     * @brief           Scalar product using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTU and XDOT
+     *
+     * @param  M        Factor
+	 * @return          Scalar product
+     */
 	T
     dot (Matrix<T>& M);
     

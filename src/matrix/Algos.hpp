@@ -149,7 +149,7 @@ IsZero (const Matrix<T>& M) {
 template <class T>  inline bool
 IsEmpty (const Matrix<T>& M) {
 	
-	return (numel(M) == 0);
+	return (numel(M) == 1);
 	
 }
 
@@ -161,59 +161,15 @@ IsEmpty (const Matrix<T>& M) {
  * @param  d    Dimension
  * @return      Sum of squares
  */
-template <class T>  inline Matrix<T> 
-SOS (Matrix<T>& M, const size_t d) {
+template <class T> inline  Matrix<T> 
+SOS (const Matrix<T>& M, const size_t d) {
 	
 	assert (M.Dim(d) > 1);
 	
-	unsigned short nd = HDim(M);
-	size_t dim [INVALID_DIM];
-		
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		dim[i] = (i != nd) ? M.Dim(i) : 1;
-	
-	Matrix<T> res (dim);
-		
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < res.Size(); i++) {
-			for (size_t j = 0; j < M.Dim(nd); j++)
-				res[i] = pow (M[i + j * res.Size()], 2.0);
-			pow (res[i], 0.5);
-		}
-		
-	}
-	
-	return res;
-	
+	Matrix<T> res = M ^ 2;
+	return Sum (res, d);
+  
 }
-
-
-/*
-  template <class T> inline  Matrix<T> 
-  SOS (const Matrix<T>& M, const size_t d) {
-  
-  Matrix<T> res = M;
-  
-  assert (_dim[d] > 1);
-  
-  #pragma omp parallel default (shared) 
-  {
-  
-  #pragma omp for
-  
-  for (int i = 0; i < Size(); i++)
-  res[i] = M[i]*M[i];
-  
-  }
-  
-  return Sum(res, d);
-  
-  }
-*/
 
 
 /**
@@ -237,26 +193,6 @@ Squeeze (Matrix<T>& M) {
 		M.Dim(i) = 1;
 		M.Res(i) = 1.0;
 	}
-	
-}
-
-
-/**
- * @brief      Mean reducing a dimension
- *
- * @param  M   Matrix
- * @param  d   Dimension
- * @return     Average of M reducing d matrix
- */
-template <class T> inline  Matrix<T>
-Mean (const Matrix<T>& M, const size_t d) {
-	
-	Matrix<T> res  = M;
-	float     quot = (float) res.Dim(d);
-		
-	res = Sum (res, d);
-	
-	return res / quot;
 	
 }
 
@@ -404,7 +340,7 @@ size               (const Matrix<T>& M) {
 
 
 /**
- * @brief           Get vector of dimensions
+ * @brief           Get size of a dimension
  *
  * @param   M       Matrix
  * @param   d       Dimension
@@ -416,6 +352,58 @@ size               (const Matrix<T>& M, const size_t& d) {
 	return M.Dim(d);
 	
 }
+
+
+
+/**
+ * @brief           Get length
+ *
+ * @param   M       Matrix
+ * @return          Length
+ */
+template <class T>  size_t
+length             (const Matrix<T>& M) {
+	
+	size_t l = 1;
+	size_t cd;
+
+	for (size_t i = 0; i < INVALID_DIM; i++) 
+		l = (l > cd = M.Dim(i)) ? l : cd;
+
+	return M.Dim(0);
+	
+}
+
+
+
+/**
+ * @brief           Get Width
+ *
+ * @param   M       Matrix
+ * @return          Width
+ */
+template <class T>  size_t
+width             (const Matrix<T>& M) {
+	
+	return M.Dim(1);
+	
+}
+
+
+
+/**
+ * @brief           Get height
+ *
+ * @param   M       Matrix
+ * @return          Height
+ */
+template <class T>  size_t
+height             (const Matrix<T>& M) {
+	
+	return M.Dim(0);
+	
+}
+
 
 
 /**

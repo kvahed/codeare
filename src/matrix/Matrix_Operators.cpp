@@ -24,19 +24,10 @@ Matrix<T>::operator= (const Matrix<T>& M) {
 	if (this->Size() != M.Size())
 		_M.resize(M.Size());
 	
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		_dim[i] = M.Dim()[i];
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] = M[i];
-		
-	}
-	
+	memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
+
+	_M = M.Dat();
+
     return *this;
 	
 }
@@ -44,17 +35,8 @@ Matrix<T>::operator= (const Matrix<T>& M) {
 
 template <class T> inline Matrix<T> 
 Matrix<T>::operator= (const T& s) {
-    
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < this->Size(); i++)
-			_M[i] = s;
-		
-	}
 	
+	_M.assign (Size(), s);
     return *this;
 	
 }
@@ -85,8 +67,15 @@ Matrix<T>::operator>= (const T& s) const {
 
     Matrix<bool> res(_dim);
     
-    for (size_t i = 0; i < Size(); i++)
-        res[i] = (_M[i] >= s);
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < Size(); i++)
+			res[i] = (_M[i] >= s);
+
+	}
 
     return res;
 
@@ -98,9 +87,17 @@ Matrix<T>::operator<= (const T& s) const {
 
     Matrix<bool> res(_dim);
 
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
     for (size_t i = 0; i < Size(); i++)
         res[i] = (_M[i] <= s);
     
+
+	}
+
     return res;
 
 }
@@ -772,7 +769,7 @@ Matrix<T>::operator/ (const S& s) const {
 
 
 template <class T> inline T 
-Matrix<T>::operator[]  (const size_t p) const {
+Matrix<T>::operator[]  (const size_t& p) const {
     
     assert(p <  Size());
     
@@ -782,7 +779,7 @@ Matrix<T>::operator[]  (const size_t p) const {
 
 
 template <class T> inline T&
-Matrix<T>::operator[] (const size_t p) {
+Matrix<T>::operator[] (const size_t& p) {
     
     assert(p <  Size());
     
@@ -792,7 +789,7 @@ Matrix<T>::operator[] (const size_t p) {
 
 
 template <class T> inline T 
-Matrix<T>::operator() (const size_t a) const {
+Matrix<T>::operator() (const size_t& a) const {
 
     assert(a <  Size());
 

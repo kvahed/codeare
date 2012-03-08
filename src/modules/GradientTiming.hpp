@@ -105,6 +105,7 @@ SDOut SDMax (SDIn& si) {
 
 	Matrix<double>& posh = si.posh;
 	Matrix<double>& sh   = si.sh;
+
 	PolyVal& pkx         = *(si.pkx);
 	PolyVal& pky         = *(si.pky);
 	PolyVal& pkz         = *(si.pkz);
@@ -113,47 +114,69 @@ SDOut SDMax (SDIn& si) {
 	size_t sss = size(sh  ,0);
 
 	Matrix<double>  dpp (ssp,1);
-	Matrix<double>  dpm (ssp,1);
 	Matrix<double>  dsp (sss,1);
-	Matrix<double>  dsm (sss,1);
 	Matrix<double>  csp (ssp,3);
-	Matrix<double>  csm (ssp,3);
-	Matrix<double>  css (ssp,3);
-	so.k   = Matrix<double> (ssp,1);
-	so.phi = Matrix<double> (ssp,1);
 
 	for (size_t i = 0; i < ssp-1; i++)
 		dpp[i] = posh[i+1] - posh[i]; 
 	dpp[ssp-1] = dpp[ssp-2];
 
-	for (size_t i = 1; i < ssp;   i++) 
-		dpm[i] = posh[i] - posh[i-1]; 
-	dpp[0] = dpp[1];
-
 	for (size_t i = 0; i < sss-1; i++)
 		dsp[i] = sh[i+1] - sh[i]; 
 	dsp[ssp-1] = dsp[ssp-2];
+
+	for (size_t i = 1; i < ssp-1; i++) {
+		csp(i,0) = (pkx.Lookup (posh[i] + dpp[i]) - pkx.Lookup (posh[i])) / dsp[i];
+		csp(i,1) = (pky.Lookup (posh[i] + dpp[i]) - pky.Lookup (posh[i])) / dsp[i];
+		csp(i,2) = (pkz.Lookup (posh[i] + dpp[i]) - pkz.Lookup (posh[i])) / dsp[i];
+	}
+
+	dpp.Clear();
+
+	Matrix<double>  dpm (ssp,1);
+	Matrix<double>  dsm (sss,1);
+	Matrix<double>  csm (ssp,3);
+
+	for (size_t i = 1; i < ssp;   i++) 
+		dpm[i] = posh[i] - posh[i-1]; 
+	dpm[0] = dpm[1];
 
 	for (size_t i = 1; i < sss;   i++) 
 		dsm[i] = sh[i] - sh[i-1]; 
 	dsm[0] = dsm[1];
 
 	for (size_t i = 1; i < ssp-1; i++) {
-		csp(i,0) = (pkx.Lookup (posh[i] + dpp[i]) - pkx.Lookup (posh[i])) / dsp[i];
-		csp(i,1) = (pky.Lookup (posh[i] + dpp[i]) - pky.Lookup (posh[i])) / dsp[i];
-		csp(i,2) = (pkz.Lookup (posh[i] + dpp[i]) - pkz.Lookup (posh[i])) / dsp[i];
 		csm(i,0) = (pkx.Lookup (posh[i]) - pkx.Lookup (posh[i] - dpm[i])) / dsm[i];
 		csm(i,1) = (pky.Lookup (posh[i]) - pky.Lookup (posh[i] - dpm[i])) / dsm[i];
 		csm(i,2) = (pkz.Lookup (posh[i]) - pkz.Lookup (posh[i] - dpm[i])) / dsm[i];
+	}
+
+	dpm.Clear();
+	
+	Matrix<double>  css (ssp,3);
+
+	for (size_t i = 1; i < ssp-1; i++) {
 		css(i,0) = (csp(i,0) - csm(i,0)) / ((dsm[i] + dsp[i]) * 0.5);
 		css(i,1) = (csp(i,1) - csm(i,1)) / ((dsm[i] + dsp[i]) * 0.5);
 		css(i,2) = (csp(i,2) - csm(i,2)) / ((dsm[i] + dsp[i]) * 0.5);
-		so.k[i]  = sqrt (pow(css(i,0),2) + pow(css(i,1),2) + pow(css(i,2),2));
 	}
 
+	csp.Clear();
+	csm.Clear();
+	dsp.Clear();
+	dsm.Clear();
+	
+	so.k   = Matrix<double> (ssp,1);
+	so.phi = Matrix<double> (ssp,1);
+
+	for (size_t i = 1; i < ssp-1; i++) 
+		so.k[i]  = sqrt (pow(css(i,0),2) + pow(css(i,1),2) + pow(css(i,2),2));
+	
 	so.k[0]     = so.k[1]; 
 	so.k[sss-1] = so.k[sss-2];
 	
+	css.Clear();
+
 	double mgr = GAMMA_MT_MS * si.mgr;
 	double msr = GAMMA_MT_MS * si.msr;
 
@@ -175,9 +198,9 @@ SDOut SDMax (SDIn& si) {
 Solution ComputeGradient (GradientParams& gp) {
 
 	Solution s;
-	size_t ups = 50, ts = 0;
+	size_t ups = 25, ts = 0;
 
-	printf ("  Const arc-length parametrization ........... "); fflush(stdout);
+	printf ("  Const arc-length parametrization "); fflush(stdout);
 	ticks start = getticks();
 
 	Matrix<double> op, np, sop;
@@ -188,7 +211,11 @@ Solution ComputeGradient (GradientParams& gp) {
 	op = Matrix<double>::LinSpace (0.0, (double)(size(gp.k,0)-1), sgpk);
 	np = Matrix<double>::LinSpace (0.0, (double)(size(gp.k,0)-1),  ssk);
 
+	printf ("..."); fflush (stdout);
+
 	s.k = interp1 (op, gp.k, np, INTERP::AKIMA);
+
+	op.Clear();
 
 	size_t snp = size(s.k,0);
 	s.g = Matrix<double>(snp,3);
@@ -200,6 +227,8 @@ Solution ComputeGradient (GradientParams& gp) {
 	sdin.pky = new PolyVal (np, (double*)&(s.k)[1*snp], INTERP::CSPLINE);
 	sdin.pkz = new PolyVal (np, (double*)&(s.k)[2*snp], INTERP::CSPLINE);
 
+	printf ("..."); fflush (stdout);
+
 	sdin.mgr = gp.mgr;
 	sdin.msr = gp.msr;
 
@@ -209,33 +238,43 @@ Solution ComputeGradient (GradientParams& gp) {
 		s.g (i,2) = s.k(i+1,2) - s.k(i,2);
 	}
 	
+	printf (".."); fflush (stdout);
 
 	for (size_t i = 0; i < 3; i++)
 		s.g (snp-1,i) = s.g (snp-2,i); 
-
+	
 	s.g *= (double)ups;
-
+	
 	sop [0] = 0.0;
-
+	
 	for (size_t i = 0; i < snp-1; i++)
 		sop [i+1] = sop[i] + sqrt (pow(s.g(i,0),2) + pow(s.g(i,1),2) + pow(s.g(i,2),2));
 
 	sop /= (double)ups;
-
+	
+	printf ("."); fflush (stdout);
+	
 	double st0 = GAMMA_MT_MS * gp.msr * gp.dt;
 	double ds  = st0 * gp.dt / 3.0;
 	
 	double L   = max(sop);
 	ts = ceil(L/ds);
-
+	
 	Matrix<double> sf, sta, stb, pos;
-
+	
+	printf ("."); fflush (stdout);
+	
 	sf         = Matrix<double>::LinSpace (0.0, L,   ts);
 	sdin.sh    = Matrix<double>::LinSpace (0.0, L, 2*ts);
 	sta        = Matrix<double>::Zeros (size(sf,0), 1);
 	stb        = Matrix<double>::Zeros (size(sf,0), 1);
 
 	sdin.posh  = interp1 (sop, np, sdin.sh, INTERP::CSPLINE);
+	
+	np.Clear();
+	sop.Clear();
+
+	printf ("."); fflush (stdout);
 
 	pos        = Matrix<double> (size(sdin.posh,0)/2,1);
 
@@ -243,7 +282,7 @@ Solution ComputeGradient (GradientParams& gp) {
 		pos[i] = sdin.posh[i*2];
 
 
-	printf ("done: (%.3f)\n  Computing geometry dependent constraints ... ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate()); 
+	printf (" done: (%.3f)\n  Computing geometry dependent constraints ... ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate()); 
 	fflush(stdout);
 	start = getticks();
 
@@ -292,6 +331,8 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	sot    = interp1 (tos,  sf,   t, INTERP::CSPLINE);
 	pot    = interp1 ( sf, pos, sot, INTERP::CSPLINE);
+
+	pos.Clear();
 	
 	gp.k   = Matrix<double> (Nt,3);
 

@@ -77,7 +77,7 @@ FExists (const char* fname) {
  * @param  M       Matrix
  * @return         String of dimensions
  */
-template <class T> inline std::string 
+template <class T> inline static std::string 
 DimsToString (const Matrix<T>& M) {
 	
 	std::stringstream ss;
@@ -96,7 +96,7 @@ DimsToString (const Matrix<T>& M) {
  * @param  M       Matrix
  * @return         C string of dimensions
  */
-template <class T> inline const char* 
+template <class T> inline static const char* 
 DimsToCString (const Matrix<T>& M) {
 	
 	return DimsToString(M).c_str();
@@ -110,7 +110,7 @@ DimsToCString (const Matrix<T>& M) {
  * @param  M       Matrix
  * @return         String of resolutions
  */
-template <class T> inline std::string 
+template <class T> inline static std::string 
 ResToString (const Matrix<T>& M) {
 	
 	stringstream ss;
@@ -130,7 +130,7 @@ ResToString (const Matrix<T>& M) {
  * @param  M       Matrix
  * @return         C string of resolutions
  */
-template <class T> inline const char* 
+template <class T> inline static const char* 
 ResToCString (const Matrix<T>& M) {
 	
 	return ResToString(M).c_str();
@@ -145,7 +145,7 @@ ResToCString (const Matrix<T>& M) {
  * @param   fname    File name       
  * @return           Success
  */
-template <class T> inline bool
+template <class T> inline static bool
 PRDump (const Matrix<T>& M, const string fname) {
 	
 	FILE *fp;
@@ -178,7 +178,7 @@ PRDump (const Matrix<T>& M, const string fname) {
  * @param  ios     IO Strategy (HDF5 (default if libraries installed), MATLAB, NIFTI, primitive)
  * @return         Success
  */ 
-template <class T> inline bool 
+template <class T> inline static bool 
 Dump (const Matrix<T>& M, const string fname, const string dname, const string dloc = "", const io_strategy ios = HDF5) {
 	
 	if      (ios == HDF5)
@@ -204,142 +204,142 @@ Dump (const Matrix<T>& M, const string fname, const string dname, const string d
  * @param  dloc    Not operational yet!!
  * @return         Success
  */
-template <class T> bool 
+template <class T> static bool 
 H5Dump (const Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
 	
-		size_t i = 0;
+	size_t i = 0;
+	
+	if (fname != "") {
 		
-		if (fname != "") {
-			
 #ifdef HAVE_H5CPP_H
-			try {
-				
-#ifndef VERBOSE
-				Exception::dontPrint();
-#endif
-				
-				H5File        file; 
-				
-				try {
-					file = H5File  (fname, H5F_ACC_TRUNC);
-#ifdef VERBOSE
-					printf ("File %s opened for RW\n", fname.c_str());
-#endif
-				} catch (Exception e) {
-					file = H5File  (fname, H5F_ACC_TRUNC);
-#ifdef VERBOSE
-					printf ("File %s created for RW\n", fname.c_str());
-#endif
-				}
-				
-				Group group, *tmp;
-				
-				std::string dloctmp = dloc;
-				if (dloctmp.length() == 0)
-					dloctmp = "/";
-				
-				try {
-					
-					group = file.openGroup(dloctmp);
-#ifdef VERBOSE
-					printf ("Group %s opened for writing\n", dloctmp.c_str()) ;
-#endif
-					
-				} catch (Exception e) {
-					
-					size_t    depth   = 0;
-					
-					vector<string> sv;
-					
-					Toolbox::Instance()->Split (sv, dloctmp, "/");
-
-					for (size_t i = 0; i < sv.size(); i++) {
-						
-						try {
-							if (depth)
-								group = (*tmp).openGroup(sv.at(i));
-							else
-								group = file.openGroup(sv.at(i));
-						} catch (Exception e) {
-							if (depth)
-								group = (*tmp).createGroup(sv.at(i));
-							else
-								group = file.createGroup(sv.at(i));
-						}
-						
-						tmp = &group;
-						depth++;
-						
-					}
-					
-					group = (*tmp);
-					
-				}
-				
-				// One more field for complex numbers
-				size_t tmpdim = (typeid(T) == typeid(cxfl)) ? INVALID_DIM+1 : INVALID_DIM;
-				hsize_t* dims = new hsize_t[tmpdim];
-
-				for (i = 0; i < INVALID_DIM; i++)
-					dims[i] = M.Dim(INVALID_DIM-1-i);
+		try {
 			
-				if (typeid(T) == typeid(cxfl))
-					dims[INVALID_DIM] = 2;
-				
-				DataSpace space (tmpdim, dims);
-				PredType*  type;
-				
-				delete [] dims;
-
-				string _dname = dname;
-				
-				if (typeid(T) == typeid(cxfl)) {
-					type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
-					if (dname == "") 
-						_dname = "cxfl";
-				} else if (typeid(T) == typeid(double)) {
-					type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
-					if (dname == "") 
-						_dname = "double";
-				} else if (typeid(T) == typeid(short)){
-					type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
-					if (dname == "") 
-						_dname = "pixel";
-				}
-				
-				DataSet set = group.createDataSet(_dname, (*type), space);
-				
-				set.write   (&M[0], (*type));
-				set.close   ();
-				space.close ();
-				file.close  ();
-				
-			} catch(FileIException      e) {
-				e.printError();
-				return false;
-			} catch(DataSetIException   e) {
-				e.printError();
-				return false;
-			} catch(DataSpaceIException e) {
-				e.printError();
-				return false;
-			} catch(DataTypeIException  e) {
-				e.printError();
-				return false;
+#ifndef VERBOSE
+			Exception::dontPrint();
+#endif
+			
+			H5File        file; 
+			
+			try {
+				file = H5File  (fname, H5F_ACC_TRUNC);
+#ifdef VERBOSE
+				printf ("File %s opened for RW\n", fname.c_str());
+#endif
+			} catch (Exception e) {
+				file = H5File  (fname, H5F_ACC_TRUNC);
+#ifdef VERBOSE
+				printf ("File %s created for RW\n", fname.c_str());
+#endif
 			}
 			
-#else // HAVE_H5CPP_H
+			Group group, *tmp;
 			
-			printf ("HDF5 ERROR - Didn't dump nothin'");
-			return error;
+			std::string dloctmp = dloc;
+			if (dloctmp.length() == 0)
+				dloctmp = "/";
+			
+			try {
+				
+				group = file.openGroup(dloctmp);
+#ifdef VERBOSE
+				printf ("Group %s opened for writing\n", dloctmp.c_str()) ;
+#endif
+				
+			} catch (Exception e) {
+				
+				size_t    depth   = 0;
+				
+				vector<string> sv;
+				
+				Toolbox::Instance()->Split (sv, dloctmp, "/");
+				
+				for (size_t i = 0; i < sv.size(); i++) {
+					
+					try {
+						if (depth)
+							group = (*tmp).openGroup(sv.at(i));
+						else
+							group = file.openGroup(sv.at(i));
+					} catch (Exception e) {
+						if (depth)
+							group = (*tmp).createGroup(sv.at(i));
+						else
+							group = file.createGroup(sv.at(i));
+					}
+					
+					tmp = &group;
+					depth++;
+					
+				}
+				
+				group = (*tmp);
+				
+			}
+			
+			// One more field for complex numbers
+			size_t tmpdim = (typeid(T) == typeid(cxfl)) ? INVALID_DIM+1 : INVALID_DIM;
+			hsize_t* dims = new hsize_t[tmpdim];
+			
+			for (i = 0; i < INVALID_DIM; i++)
+				dims[i] = M.Dim(INVALID_DIM-1-i);
+			
+			if (typeid(T) == typeid(cxfl))
+				dims[INVALID_DIM] = 2;
+			
+			DataSpace space (tmpdim, dims);
+			PredType*  type;
+			
+			delete [] dims;
+			
+			string _dname = dname;
+			
+			if (typeid(T) == typeid(cxfl)) {
+				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
+				if (dname == "") 
+					_dname = "cxfl";
+			} else if (typeid(T) == typeid(double)) {
+				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
+				if (dname == "") 
+					_dname = "double";
+			} else if (typeid(T) == typeid(short)){
+				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
+				if (dname == "") 
+					_dname = "pixel";
+			}
+			
+			DataSet set = group.createDataSet(_dname, (*type), space);
+			
+			set.write   (&M[0], (*type));
+			set.close   ();
+			space.close ();
+			file.close  ();
+			
+		} catch(FileIException      e) {
+			e.printError();
+			return false;
+		} catch(DataSetIException   e) {
+			e.printError();
+			return false;
+		} catch(DataSpaceIException e) {
+			e.printError();
+			return false;
+		} catch(DataTypeIException  e) {
+			e.printError();
+			return false;
+		}
+		
+#else // HAVE_H5CPP_H
+		
+		printf ("HDF5 ERROR - Didn't dump nothin'");
+		return error;
 		
 #endif // HAVE_H5CPP_H
-				
-				}
-		
-		return true;
 		
 	}
+	
+	return true;
+	
+}
 	
 
 
@@ -350,12 +350,12 @@ H5Dump (const Matrix<T>& M, const string fname, const string dname, const string
  * @param  fname  File name
  * @return        Success
  */
-template <class T> bool
+template <class T> static bool
 RSAdjust (Matrix<T>& M, const std::string& fname) {
 	
 	size_t dimk;
 	size_t dimv;
-
+	
 	size_t ndims [INVALID_DIM];
 	float  nress [INVALID_DIM];
 	
@@ -445,7 +445,7 @@ RSAdjust (Matrix<T>& M, const std::string& fname) {
  * @param   post       Display after bar.
  * @param   p          Percent done.
  */
-inline void
+inline static void
 ProgressBar (const std::string& pre, const std::string& post, const short& p) {
 	
 	assert (p >=   0);
@@ -467,86 +467,86 @@ ProgressBar (const std::string& pre, const std::string& post, const short& p) {
  * @param  version Syngo MR version 
  * @return         Success
  */
-template <class T> bool 
+template <class T> static bool 
 RAWRead (Matrix<T>& M, const std::string& fname, const std::string& version) {
 	
-		// Get size information from XProtocol and resize 
-		ticks  tic = getticks();
+	// Get size information from XProtocol and resize 
+	ticks  tic = getticks();
+	
+	RSAdjust(M, fname);
+	
+	printf ("%s: %s\n", fname.c_str(), DimsToCString(M));
+	
+	FILE*         f;
+	sMDH*         mdh;
+	unsigned      l      = 0;
+	size_t        nscans = (M.Size() / M.Dim(COL));
+	unsigned      start;
+	unsigned      size, read;
+	
+	// Assess data size
+	f = fopen (fname.c_str(), "rb");
+	read = fread (&l, sizeof(unsigned), 1, f);
+	fseek (f,     l, SEEK_SET);
+	start = ftell(f);
+	fseek (f,    -1, SEEK_END);
+	size  = ftell(f);
+	fseek (f, start, SEEK_SET);
+	
+	//printf ("Found %.1f MB of header and data.\n", (float)size / MB);
+	stringstream pre;
+	
+	float bsize = (float) size / (1024.0*1024.0);
+	pre << "  Reading " << bsize << "MB ... ";
+	
+	// Headers
+	mdh  = (sMDH*) malloc (nscans * sizeof(sMDH));
+	size_t n    = 0.0;
+	char   mask[8];
+	bool   done = false;
+	
+	const std::string post = "";
+	
+	size_t i   = 0;
+	
+	for (i = 0; i < nscans; i++) {
 		
-		RSAdjust(M, fname);
+		if (i % 250 == 0 || i == nscans-1)
+			ProgressBar (pre.str(), post, (short)round((float)(i+1)/(float)nscans*100.0));
 		
-		printf ("%s: %s\n", fname.c_str(), DimsToCString(M));
-
-		FILE*         f;
-		sMDH*         mdh;
-		unsigned      l      = 0;
-		size_t        nscans = (M.Size() / M.Dim(COL));
-		unsigned      start;
-		unsigned      size, read;
+		read = fread (&mdh[i], sizeof(sMDH), 1, f);
 		
-		// Assess data size
-		f = fopen (fname.c_str(), "rb");
-		read = fread (&l, sizeof(unsigned), 1, f);
-		fseek (f,     l, SEEK_SET);
-		start = ftell(f);
-		fseek (f,    -1, SEEK_END);
-		size  = ftell(f);
-		fseek (f, start, SEEK_SET);
-		
-		//printf ("Found %.1f MB of header and data.\n", (float)size / MB);
-		stringstream pre;
-		
-		float bsize = (float) size / (1024.0*1024.0);
-		pre << "  Reading " << bsize << "MB ... ";
-
-		// Headers
-		mdh  = (sMDH*) malloc (nscans * sizeof(sMDH));
-		size_t n    = 0.0;
-		char   mask[8];
-		bool   done = false;
-
-		const std::string post = "";
-		
-		size_t i   = 0;
-		
-		for (i = 0; i < nscans; i++) {
-			
-			if (i % 250 == 0 || i == nscans-1)
-				ProgressBar (pre.str(), post, (short)round((float)(i+1)/(float)nscans*100.0));
-		
-			read = fread (&mdh[i], sizeof(sMDH), 1, f);
-		
-			long m = 0;
-			memcpy (&m, mdh[i].aulEvalInfoMask, 2 * sizeof (unsigned));
-			if (m == 0x00000001) {
-				ProgressBar (pre.str(), post, 100);
-				done = true;
+		long m = 0;
+		memcpy (&m, mdh[i].aulEvalInfoMask, 2 * sizeof (unsigned));
+		if (m == 0x00000001) {
+			ProgressBar (pre.str(), post, 100);
+			done = true;
 				break;
-			}
-			
-			n = mdh[i].sLC.ushLine       * M.Dim(0) +
-				mdh[i].sLC.ushSlice      * M.Dim(0) * M.Dim(1) +
-				mdh[i].sLC.ushPartition  * M.Dim(0) * M.Dim(1) * M.Dim(2) +
-				mdh[i].sLC.ushEcho       * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) +
-				mdh[i].sLC.ushPhase      * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) +
-				mdh[i].sLC.ushRepetition * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) * M.Dim(5) +
-				mdh[i].sLC.ushSet        * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) * M.Dim(5) * M.Dim(6) +
-				mdh[i].sLC.ushSeg        * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) * M.Dim(5) * M.Dim(6) * M.Dim(7) +
-				mdh[i].ushChannelId      * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) * M.Dim(5) * M.Dim(6) * M.Dim(7) * M.Dim(8);
-			
-			read = fread (&M[n], sizeof (complex<float>), M.Dim(0), f);
-			
 		}
 		
-		fclose (f);
+		n = mdh[i].sLC.ushLine       * M.Dim(0) +
+			mdh[i].sLC.ushSlice      * M.Dim(0) * M.Dim(1) +
+			mdh[i].sLC.ushPartition  * M.Dim(0) * M.Dim(1) * M.Dim(2) +
+			mdh[i].sLC.ushEcho       * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) +
+			mdh[i].sLC.ushPhase      * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) +
+			mdh[i].sLC.ushRepetition * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) * M.Dim(5) +
+			mdh[i].sLC.ushSet        * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) * M.Dim(5) * M.Dim(6) +
+			mdh[i].sLC.ushSeg        * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) * M.Dim(5) * M.Dim(6) * M.Dim(7) +
+			mdh[i].ushChannelId      * M.Dim(0) * M.Dim(1) * M.Dim(2) * M.Dim(3) * M.Dim(4) * M.Dim(5) * M.Dim(6) * M.Dim(7) * M.Dim(8);
 		
-		float e = ((float)elapsed(getticks(),tic) / (float)Toolbox::Instance()->ClockRate());
-		printf ("\n  done. Loaded %i records (%f MB/s).\n", (int)i, bsize/e);
-		
-		return true;
+		read = fread (&M[n], sizeof (complex<float>), M.Dim(0), f);
 		
 	}
 	
+	fclose (f);
+	
+	float e = ((float)elapsed(getticks(),tic) / (float)Toolbox::Instance()->ClockRate());
+	printf ("\n  done. Loaded %i records (%f MB/s).\n", (int)i, bsize/e);
+	
+	return true;
+	
+}
+
 
 
 /**
@@ -559,15 +559,13 @@ RAWRead (Matrix<T>& M, const std::string& fname, const std::string& version) {
  * @param  ios     IO Strategy (HDF5 (default if libraries installed), MATLAB, NIFTI, primitive)
  * @return         Success
  */
-template <class T> inline bool 
+template <class T> inline static bool 
 Read (Matrix<T>& M, const std::string& fname, const std::string& dname, const std::string& dloc = "", const io_strategy& ios = HDF5) {
 	
 	if      (ios == HDF5)
 		return H5Read (M, fname, dname, dloc);
-#ifdef HAVE_MAT_H
 	else if (ios == MATLAB)
 		return MXRead (M, fname, dname, dloc);
-#endif
 	else if (ios == NIFTI)
 		return NIRead (M, fname);
 	
@@ -585,134 +583,141 @@ Read (Matrix<T>& M, const std::string& fname, const std::string& dname, const st
  * @param  dloc    Data location
  * @return         Success
  */
-template <class T> bool 
+template <class T> static bool 
 H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
 	
 	if (fname != "") {
 		
 #ifdef HAVE_H5CPP_H
-			
+		
 #ifndef VERBOSE
-			Exception::dontPrint();
+		Exception::dontPrint();
 #endif
+		
+		try {
 			
-			try {
-				
-				
-				H5File    file (fname, H5F_ACC_RDONLY);
-				DataSet   dataset = file.openDataSet(dloc+"/"+dname);
-				DataSpace space   = dataset.getSpace();
-				
-				hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
-				size_t    ndim    = space.getSimpleExtentDims(dims, NULL);
-				size_t mdims [INVALID_DIM];
-				
-				if (typeid(T) == typeid(cxfl)) 
-					ndim--;
-				
-				for (size_t i = 0; i < ndim; i++)
-					mdims[i] = dims[ndim-i-1];
-				
-				for (size_t i = ndim; i < INVALID_DIM; i++)
-					mdims[i] = 1;
-				
-				M = Matrix<T> (mdims);
-
-				cout << "HDF5 file: rank(" << ndim << "), dimensions(";
-				for (size_t i = 0; i < ndim; i++) {
-					cout << (unsigned long)(dims[i]);
-					if (i == ndim - 1)
-						cout << ")" << endl;
-					else
-						cout << " x ";
-				}
-
-				
-				PredType*  type;
-				
-				if (typeid(T) == typeid(cxfl))
-					type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
-				else if (typeid(T) == typeid(double))
-					type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
+			
+			H5File    file (fname, H5F_ACC_RDONLY);
+			DataSet   dataset = file.openDataSet(dloc+"/"+dname);
+			DataSpace space   = dataset.getSpace();
+			
+			hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
+			size_t    ndim    = space.getSimpleExtentDims(dims, NULL);
+			size_t mdims [INVALID_DIM];
+			
+			if (typeid(T) == typeid(cxfl)) 
+				ndim--;
+			
+			for (size_t i = 0; i < ndim; i++)
+				mdims[i] = dims[ndim-i-1];
+			
+			for (size_t i = ndim; i < INVALID_DIM; i++)
+				mdims[i] = 1;
+			
+			M = Matrix<T> (mdims);
+			
+			cout << "HDF5 file: rank(" << ndim << "), dimensions(";
+			for (size_t i = 0; i < ndim; i++) {
+				cout << (unsigned long)(dims[i]);
+				if (i == ndim - 1)
+					cout << ")" << endl;
 				else
-					type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
-				
-				dataset.read (&M[0], (*type));
-				
-				space.close();
-				dataset.close();
-				file.close();
-				
-			} catch(FileIException      e) {
-				e.printError();
-				return false;
-			} catch(DataSetIException   e) {
-				e.printError();
-				return false;
-			} catch(DataSpaceIException e) {
-				e.printError();
-				return false;
-			} catch(DataTypeIException  e) {
-				e.printError();
-				return false;
+					cout << " x ";
 			}
 			
+			
+			PredType*  type;
+			
+			if (typeid(T) == typeid(cxfl))
+				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
+			else if (typeid(T) == typeid(double))
+				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
+			else
+				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
+			
+			dataset.read (&M[0], (*type));
+			
+			space.close();
+			dataset.close();
+			file.close();
+			
+		} catch(FileIException      e) {
+			e.printError();
+			return false;
+		} catch(DataSetIException   e) {
+			e.printError();
+			return false;
+		} catch(DataSpaceIException e) {
+			e.printError();
+			return false;
+		} catch(DataTypeIException  e) {
+			e.printError();
+			return false;
+		}
+		
 #else // HAVE_H5CPP_H
 		
-			printf ("HDF5 ERROR - Didn't read nothin'");
-			return error
-		
+		printf ("HDF5 ERROR - Didn't read nothin'");
+		return error
+			
 #endif // HAVE_H5CPP_H
-				
-				}
+			
+			}
+	
+	return true;
+	
+}
+
+	
+
+static inline std::string
+demangle (const char* symbol) {
+	
+#ifdef HAVE_CXXABI_H
+	
+	size_t size;
+	int    status;
+	char   temp[128];
+	char*  demangled;
+	
+	//first, try to demangle a c++ name
+	if (1 == sscanf(symbol, "%*[^(]%*[^_]%127[^)+]", temp)) {
 		
-		return true;
-		
+		if (NULL != (demangled = abi::__cxa_demangle(temp, NULL, &size, &status))) {
+			std::string result(demangled);
+			free(demangled);
+			return result;
+		}
 	}
 	
+	//if that didn't work, try to get a regular c symbol
+	if (1 == sscanf(symbol, "%127s", temp)) {
+		return temp;
+	}
 	
-
-inline std::string
-demangle (const char* symbol) {
-
-#ifdef HAVE_CXXABI_H
-
-  size_t size;
-  int    status;
-  char   temp[128];
-  char*  demangled;
-
-  //first, try to demangle a c++ name
-  if (1 == sscanf(symbol, "%*[^(]%*[^_]%127[^)+]", temp)) {
-
-	  if (NULL != (demangled = abi::__cxa_demangle(temp, NULL, &size, &status))) {
-		  std::string result(demangled);
-		  free(demangled);
-		  return result;
-	  }
-  }
-
-  //if that didn't work, try to get a regular c symbol
-  if (1 == sscanf(symbol, "%127s", temp)) {
-	  return temp;
-  }
-  
 #endif 
- 
-  //if all else fails, just return the symbol
-  return symbol;
-
+	
+	//if all else fails, just return the symbol
+	return symbol;
+	
 }
 
 
-template <class T> bool 
+/**
+ * @brief       Validate if matrix type and MATLAB data type match
+ *
+ * @param  M    Matrix
+ * @param  mxa  MATLAB data
+ * @return      Match
+ */
+template <class T> inline static bool 
 MXValidateIO  (const Matrix<T>& M, const mxArray* mxa) {
-
+	
 #ifdef HAVE_MAT_H
 	
 	mxClassID     mcid = mxGetClassID(mxa);
 	std::string cplx = (mxIsComplex(mxa)) ? "complex" : "real";
-
+	
 	if ((typeid(T) == typeid(cxfl) || typeid(T) == typeid(float))  && mcid == 7)
 		return true;
 	if ((typeid(T) == typeid(cxdb) || typeid(T) == typeid(double)) && mcid == 6)
@@ -721,11 +726,11 @@ MXValidateIO  (const Matrix<T>& M, const mxArray* mxa) {
 		printf ("Matrix is %s, yet Matlab variable is %s %s\n", demangle(typeid(T).name()).c_str(), mxGetClassName(mxa), cplx.c_str());
 		return false;
 	}
-
+	
 	return true;
 	
 #endif
-
+	
 }
 
 
@@ -738,14 +743,14 @@ MXValidateIO  (const Matrix<T>& M, const mxArray* mxa) {
  * @param  dloc    Data location (not operational yet)
  * @return         Success
  */
-template <class T> bool
+template <class T> static bool
 MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
 	
 #ifdef HAVE_MAT_H
 	
 	// Open file ---------------------------------
 	MATFile*  mf = matOpen (fname.c_str(), "r");
-
+	
 	if (mf == NULL) {
 		printf ("Error opening file %s\n", fname.c_str());
 		return false;
@@ -753,22 +758,22 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 	// -------------------------------------------
 	
 	// Get dimensions ----------------------------
-		
+	
 	mxArray*      mxa = matGetVariable (mf, dname.c_str());
-		
+	
 	if (mxa == NULL) {
 		printf ("Error opening variable %s\n", dname.c_str());
 		return false;
 	}
-		
+	
 	mxClassID     mcid = mxGetClassID(mxa);
 	bool          cplx = mxIsComplex(mxa);
 	mwSize        ndim = mxGetNumberOfDimensions(mxa);
 	const mwSize*  dim = mxGetDimensions(mxa);
-
+	
 	if (!MXValidateIO (M, mxa))
 		return false;
-
+	
 	size_t mdims[INVALID_DIM];
 	
 	for (size_t i = 0; i < ndim; i++)
@@ -801,20 +806,15 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 				double* tmp = (double*) &M[0];
 				tmp [i*2]   = mxGetPr(mxa)[i];
 				tmp [i*2+1] = mxGetPi(mxa)[i];
-				/*
-				  double f[2] = {((double*)mxGetPr(mxa))[i], ((double*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
-				memcpy(&M[i], f, 2 * sizeof(double));*/
 			}
 		else
 			for (size_t i = 0; i <M.Size(); i++) {
 				double* tmp = (double*) &M[0];
 				tmp [i*2]   = mxGetPr(mxa)[i];
-				/*double f[2] = {((double*)mxGetPr(mxa))[i], 0.0}; 
-				  memcpy(&M[i], f, 2 * sizeof(double));*/
 			}
 	} else
 		memcpy (&M[0], mxGetPr(mxa), M.Size() * sizeof (T));
-
+	
 	
 	printf ("done\n");
 	// -------------------------------------------
@@ -837,7 +837,7 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 	return false;
 	
 #endif
-
+	
 }
 
 
@@ -850,14 +850,14 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
  * @param  dloc    Data location (not operational yet)
  * @return         Success
  */
-template <class T> bool
+template <class T> static bool
 MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
-		
+	
 #ifdef HAVE_MAT_H
 	// Declare dimensions and allocate array -----
 	
 	mwSize   dim[INVALID_DIM];
-		
+	
 	for (size_t i = 0; i < INVALID_DIM; i++) 
 		dim[i] = (mwSize)M.Dim(i);
 	
@@ -914,18 +914,18 @@ MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 	// -------------------------------------------
 	
 	return true;
-
+	
 #else 
-
+	
 	printf ("MATLAB IO ERROR - Didn't dump nothin'");
 	return false;
-
+	
 #endif 
 	
 }
 
 
-	
+
 /**
  * @brief          Dump matrix to MATLAB file
  * 
@@ -935,7 +935,7 @@ MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
  * @param  dloc    Data location (not operational yet)
  * @return         Success
  */
-template <class T> bool 
+template <class T> inline static bool 
 MXDump (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
 	
 #ifdef HAVE_MAT_H
@@ -981,7 +981,7 @@ MXDump (Matrix<T>& M, const string fname, const string dname, const string dloc 
  * @param  fname   File name 
  * @return         Success
  */
-template <class T> bool
+template <class T> static bool
 NIDump (Matrix<T>& M, const string fname) {
 	
 	if (fname != "") {
@@ -1057,7 +1057,7 @@ NIDump (Matrix<T>& M, const string fname) {
  * @param  fname   File name 
  * @return         Success
  */
-template <class T> bool
+template <class T> static bool
 NIRead (Matrix<T>& M, const string fname) {
 	
 	size_t ndims [INVALID_DIM];
@@ -1138,7 +1138,7 @@ NIRead (Matrix<T>& M, const string fname) {
  * @param  dloc    Data location
  * @return         Success
  */
-template <class T> bool 
+template <class T> static bool 
 CDFDump (const Matrix<T>& M, const string fname, const string dname, const string dloc) {
 	
 #ifdef HAVE_CDF_H
@@ -1203,7 +1203,7 @@ CDFDump (const Matrix<T>& M, const string fname, const string dname, const strin
  * @param  dloc    Data location
  * @return         Success
  */
-template <class T> bool
+template <class T> inline static bool
 CDFRead (Matrix<T>& M, const string fname, const string dname, const string dloc) {
 	
 	return false;
