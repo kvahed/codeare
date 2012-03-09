@@ -8,14 +8,14 @@ fftwtest (Connector<T>* rc) {
 	std::string iout = std::string (base + std::string ("/iout.mat"));
 	std::string kout = std::string (base + std::string ("/kout.mat"));
 	
-	Matrix<cxfl> m   = Matrix<cxfl>::Phantom2D(512);
-	Matrix<cxfl> k, i, j;
+	Matrix<cxdb> m   = Matrix<cxfl>::Phantom2D(512);
+	Matrix<cxdb> k, i, j;
 
-	k = fft (m);
+	k = fft  (m);
 	i = ifft (k);
 
-	Matrix<double> msk;
-	Matrix<double> pdf;
+	Matrix<float> msk;
+	Matrix<float> pdf;
 	Matrix<cxfl>   dat;
 	Matrix<cxfl>   phc;
 	Matrix<cxfl>   tst;
@@ -25,15 +25,13 @@ fftwtest (Connector<T>* rc) {
 	MXRead (dat, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "data");
 	MXRead (phc, "/Users/kvahed/git/codeare/share/compressedsensing/noisydata.mat", "ph");
 
-
 	dat /= pdf;
-	DFT dft (2, 256, msk, phc);
+	DFT<cxfl> dft (2, 256, msk, phc);
 
-	//dat = dft.Trafo (dat);
 	dat = dft * dat;
-	tst = dft.Trafo (dat);
-	tst = dft.Adjoint (tst);
-	tst = dft.Trafo (tst);
+	tst = dft * dat;
+	tst = dft->*tst;
+	tst = dft * tst;
 
 #ifdef HAVE_MAT_H	
 

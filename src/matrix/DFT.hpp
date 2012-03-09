@@ -26,8 +26,9 @@
 #include "Algos.hpp"
 
 /**
- * @brief 1-3D Discrete Cartesian Fourier transform for Matrix template
+ * @brief Matrix templated 1-3D Discrete Cartesian Fourier transform
  */
+template <class T>
 class DFT {
 	
 public:
@@ -40,8 +41,9 @@ public:
 	 * @param  mask  K-Space mask (if left empty no mask is applied)
 	 * @param  pc    Phase correction (or target phase)
 	 */
-	DFT         (const Matrix<int> size, const Matrix<double> mask = Matrix<double>(1), 
-				 const Matrix<cxfl> pc = Matrix<cxfl>(1));
+	template<class S>
+	DFT         (const Matrix<int> size, const Matrix<S> mask = Matrix<S>(1), 
+				 const Matrix<T> pc = Matrix<T>(1));
 	
 
 	/**
@@ -52,8 +54,9 @@ public:
 	 * @param  mask  K-Space mask (if left empty no mask is applied)
 	 * @param  pc    Phase correction (or target phase)
 	 */
-	DFT         (const size_t rank, const size_t sl, const Matrix<double> mask = Matrix<double>(1), 
-				 const Matrix<cxfl> pc = Matrix<cxfl>(1));
+	template<class S>
+	DFT         (const size_t rank, const size_t sl, const Matrix<S> mask = Matrix<S>(1), 
+				 const Matrix<T> pc = Matrix<T>(1));
 	
 
 	/**
@@ -69,7 +72,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
+	Matrix<T> 
 	Trafo       (const Matrix<T>& m) const ;
 	
 	
@@ -79,7 +82,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
+	Matrix<T> 
 	Adjoint     (const Matrix<T>& m) const;
 	
 	
@@ -89,28 +92,39 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
-	operator*   (const Matrix<T>& m) const ;
+	Matrix<T> 
+	operator*   (const Matrix<T>& m) const {
+
+		return Trafo(m);
+
+	}
 	
-	
+
 	/**
 	 * @brief    Backward transform
 	 *
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
-	operator->* (const Matrix<T>& m) const;
+	Matrix<T> 
+	operator->* (const Matrix<T>& m) const {
+		
+		return Adjoint (m);
+
+	}
 	
-	
+
+	template <class S> 
+	void Mask (const Matrix<S>& m);
+
 private:
 	
 	bool m_initialised;
 
 	Matrix<size_t> m_size;
 	Matrix<double> m_mask;
-	Matrix<cxfl>   m_pc;
-	Matrix<cxfl>   m_cpc;
+	Matrix<T>      m_pc;
+	Matrix<T>      m_cpc;
 	
 	fftwf_plan     m_fwdplanf;
 	fftwf_plan     m_bwdplanf;
@@ -122,8 +136,8 @@ private:
 	bool           m_have_mask;
 	bool           m_have_pc;
 	
-	fftwf_complex* m_in;
-	fftwf_complex* m_out;
+	void*          m_in;
+	void*          m_out;
 
 };
 

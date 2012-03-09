@@ -72,8 +72,12 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<cxfl> 
-	Trafo        (const Matrix<cxfl>& m) const ;
+	template <class T> Matrix<T> 
+	Trafo        (const Matrix<T>& m) const {
+
+		return Transform (m);
+
+	}
 	
 
 	/**
@@ -82,8 +86,12 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<cxfl> 
-	Adjoint      (const Matrix<cxfl>& m) const ;
+	template <class T> Matrix<T> 
+	Adjoint      (const Matrix<T>& m) const {
+
+		return Transform (m, true);
+
+	}
 	
 
 	/**
@@ -93,7 +101,11 @@ public:
 	 * @return   Transform
 	 */
 	template <class T> Matrix<T> 
-	operator*    (const Matrix<T>& m) const ;
+	operator*    (const Matrix<T>& m) const {
+
+		return Trafo(m);
+
+	}
 	
 
 	/**
@@ -103,7 +115,11 @@ public:
 	 * @return   Transform
 	 */
 	template <class T> Matrix<T> 
-	operator->* (const Matrix<T>& m) const ;
+	operator->* (const Matrix<T>& m) const {
+
+		return Adjoint(m);
+
+	}
 	
 
 private:
@@ -115,8 +131,8 @@ private:
 	 * @param   bw  Backward: true, Forward: false
 	 * @return      Transform
 	 */
-	Matrix<cxfl> 
-	Transform    (const Matrix<cxfl>& m, const bool& bw) const ;
+	template <class T> Matrix<T> 
+	Transform    (const Matrix<T>& m, const bool& bw = false) const ;
 
 	wlfamily m_wf;                 /**< @brief wavelet family */
 
