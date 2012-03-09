@@ -42,7 +42,7 @@ public:
 	 * @param  pc    Phase correction (or target phase)
 	 */
 	template<class S>
-	DFT         (const Matrix<int> size, const Matrix<S> mask = Matrix<S>(1), 
+	DFT         (const Matrix<size_t>& size, const Matrix<S> mask = Matrix<S>(1), 
 				 const Matrix<T> pc = Matrix<T>(1));
 	
 
@@ -57,6 +57,16 @@ public:
 	template<class S>
 	DFT         (const size_t rank, const size_t sl, const Matrix<S> mask = Matrix<S>(1), 
 				 const Matrix<T> pc = Matrix<T>(1));
+	
+
+	/**
+	 * @brief        Construct FFTW plans for forward and backward FT with credentials
+	 * 
+	 * @param  size  Matrix of side length of the FT range
+	 * @param  mask  K-Space mask (if left empty no mask is applied)
+	 * @param  pc    Phase correction (or target phase)
+	 */
+	DFT         (const Matrix<size_t>& size);
 	
 
 	/**
@@ -121,7 +131,6 @@ private:
 	
 	bool m_initialised;
 
-	Matrix<size_t> m_size;
 	Matrix<double> m_mask;
 	Matrix<T>      m_pc;
 	Matrix<T>      m_cpc;
@@ -141,4 +150,83 @@ private:
 
 };
 
+template <class T> inline static Matrix<cxfl> 
+fftshift        (const Matrix<T>& m) {
+	
+	assert (Is1D(m) || Is2D(m) || Is3D(m));
+	
+	Matrix<T> res  = m;
+	
+	for (size_t s = 0; s < m.Dim(2); s++)
+		for (size_t l = 0; l < m.Dim(1); l++)
+			for (size_t c = 0; c < m.Dim(0); c++)
+				res.At (c,l,s) *= (float) pow ((float)-1.0, (float)(s+l+c));
+		
+	return res;
+	
+}
+
+
+template <class T> inline static Matrix<cxfl> 
+ifftshift        (const Matrix<T>& m) {
+	
+	return fftshift (m);	
+	
+}
+
+
+inline Matrix<double> 
+hannwindow (const Matrix<size_t>& size) {
+
+	size_t dim = size.Dim(0);
+	
+	assert (dim > 1 && dim < 4);
+	
+	Matrix<double> res;
+	
+	if      (dim == 1) res = Matrix<double> (size[0], 1);
+	else if (dim == 2) res = Matrix<double> (size[0], size[1]);
+	else               res = Matrix<double> (size[0], size[1], size[2]);
+	
+	float          h, d;
+	float          m[3];
+	
+	if (Is1D(res)) {
+		
+		m[0] = 0.5 * size[0];
+		m[1] = 0.0;
+		m[2] = 0.0;
+		
+	} else if (Is2D(res)) {
+		
+		m[0] = 0.5 * size[0];
+		m[1] = 0.5 * size[1];
+		m[2] = 0.0;
+		
+	} else {
+		
+		m[0] = 0.5 * size[0];
+		m[1] = 0.5 * size[1];
+		m[2] = 0.5 * size[2];
+		
+	}
+	
+	res = Squeeze(res);
+	
+	for (size_t s = 0; s < res.Dim(2); s++)
+		for (size_t r = 0; r < res.Dim(1); r++)
+			for (size_t c = 0; c < res.Dim(0); c++) {
+				d = pow( (float)pow(((float)c-m[0])/m[0],2) + pow(((float)r-m[1])/m[1],2) + pow(((float)s-m[2])/m[2],2) , (float)0.5);
+				h = (d < 1) ? (0.5 + 0.5 * cos (PI * d)) : 0.0;
+				res(c,r,s) = h;
+			}
+	
+	return res;
+	
+}
+
 #endif
+
+
+
+

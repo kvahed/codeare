@@ -19,7 +19,6 @@
  */
 
 #include "DFT.hpp"
-#include "FFT.hpp"
 #include "Algos.hpp"
 #include "CX.hpp"
 #include "IO.hpp"
@@ -62,7 +61,7 @@ DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float> mask, co
 }
 
 template<> template<>
-DFT<cxfl>::DFT (const Matrix<int> size, const Matrix<float> mask, const Matrix<cxfl> pc) : m_N(1),
+DFT<cxfl>::DFT (const Matrix<size_t>& size, const Matrix<float> mask, const Matrix<cxfl> pc) : m_N(1),
 																						m_have_mask (false),
 																						m_have_pc (false) {
 
@@ -81,7 +80,31 @@ DFT<cxfl>::DFT (const Matrix<int> size, const Matrix<float> mask, const Matrix<c
 	m_cpc  = conj(pc);
 	
 	for (size_t i = 0; i < rank; i++) {
-		n[i]  = size[rank-1-i];
+		n[i]  = (int)size[rank-1-i];
+		m_N  *= n[i];
+	}
+
+	m_in  = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
+	m_out = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
+
+	m_fwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_FORWARD,  FFTW_MEASURE);
+	m_bwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+	m_initialised = true;
+
+}
+
+
+template<> 
+DFT<cxfl>::DFT (const Matrix<size_t>& size) : m_N(1),
+											 m_have_mask (false),
+											 m_have_pc (false) {
+	
+	int rank = size.Size();
+	int n[rank];
+
+	for (size_t i = 0; i < rank; i++) {
+		n[i]  = (int)size[rank-1-i];
 		m_N  *= n[i];
 	}
 
@@ -130,7 +153,7 @@ DFT<cxdb>::DFT (const size_t rank, const size_t sl, const Matrix<double> mask, c
 }
 
 template<> template<>
-DFT<cxdb>::DFT (const Matrix<int> size, const Matrix<double> mask, const Matrix<cxdb> pc) : m_N(1),
+DFT<cxdb>::DFT (const Matrix<size_t>& size, const Matrix<double> mask, const Matrix<cxdb> pc) : m_N(1),
 																						m_have_mask (false),
 																						m_have_pc (false) {
 
@@ -149,7 +172,7 @@ DFT<cxdb>::DFT (const Matrix<int> size, const Matrix<double> mask, const Matrix<
 	m_cpc  = conj(pc);
 	
 	for (size_t i = 0; i < rank; i++) {
-		n[i]  = size[rank-1-i];
+		n[i]  = (int)size[rank-1-i];
 		m_N  *= n[i];
 	}
 
