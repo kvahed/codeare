@@ -213,9 +213,9 @@ extern "C" {
 	
 
 	template<class T, class S> int 
-	SVD (const Matrix<T>& A, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
+	SVD (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
 		
-		//Matrix<T> A (IN);
+		Matrix<T> A (IN);
 
 		// SVD only defined on 2D data
 		if (!Is2D(A))
@@ -260,17 +260,15 @@ extern "C" {
 			else             rwork = malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
 		}
 		
-		const void* test = (const void*) &(A[0]);
-
 		// Workspace query
 		if      (typeid(T) == typeid(cxfl))
-			cgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+			cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(cxdb))
-			zgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+			zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+			dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
 		else if (typeid(T) == typeid(float))
-			sgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
 		
 		// Resize work according to ws query
 		lwork   = (int) creal (wopt);
@@ -278,13 +276,13 @@ extern "C" {
 		
 		//SVD
 		if      (typeid(T) == typeid(cxfl))
-			cgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+			cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(cxdb))
-			zgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+			zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
 		else if (typeid(T) == typeid(double))
-			dgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+			dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
 		else if (typeid(T) == typeid(float))
-			sgesdd_ (&jobz, &m, &n, test, &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
 
 		V = !V;
 

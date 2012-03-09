@@ -23,8 +23,8 @@ cstest (Connector<T>* rc) {
 
 	Matrix<cxfl> indata;
 	Matrix<cxfl> im_dc;
-	Matrix<double> mask;
-	Matrix<double> pdf;
+	Matrix<float> mask;
+	Matrix<float> pdf;
 	Matrix<cxfl> pc;
 	
 	std::string cf  = std::string (base + std::string(config));
@@ -33,8 +33,8 @@ cstest (Connector<T>* rc) {
 
 #ifdef HAVE_MAT_H	
 	if (!(MXRead (indata, df, "data")))	return false;
-	if (!(MXRead (pdf,    df, "pdf")))	pdf  = Matrix<double>(1);
-	if (!(MXRead (mask,   df, "mask")))	mask = Matrix<double>(1);
+	if (!(MXRead (pdf,    df, "pdf")))	pdf  = Matrix<float>(1);
+	if (!(MXRead (mask,   df, "mask")))	mask = Matrix<float>(1);
 	if (!(MXRead (pc,     df, "ph")))   pc   = Matrix<cxfl>(1);
 #endif
 

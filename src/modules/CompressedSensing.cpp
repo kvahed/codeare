@@ -88,21 +88,21 @@ CompressedSensing::Process () {
 	ticks tic; 
 	cxfl  ma;
 
-	Matrix<cxfl>&   data  = GetCXFL   ("data");
-	Matrix<double>& pdf   = GetRLDB   ("pdf" );
-	Matrix<double>& mask  = GetRLDB   ("mask");
-	Matrix<cxfl>&   pc    = GetCXFL   ("pc");
-	Matrix<cxfl>&   im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
-	Matrix<cxfl>    orig;
+	Matrix<cxfl>&  data  = GetCXFL   ("data");
+	Matrix<float>& pdf   = GetRLFL   ("pdf" );
+	Matrix<float>& mask  = GetRLFL   ("mask");
+	Matrix<cxfl>&  pc    = GetCXFL   ("pc");
+	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
+	Matrix<cxfl>   orig;
 
     printf ("  Geometry: %iD (%lu,%lu,%lu)\n", HDim(data)+1, 
 			data.Dim(0), data.Dim(1), data.Dim(2));
 
 	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf));
-	m_cgparam.dft = new DFT (HDim(data)+1, data.Height(), mask, pc);
+	m_cgparam.dft = new DFT<cxfl> (HDim(data)+1, data.Height(), mask, pc);
 	m_cgparam.tvt = new TVOP ();
 
-	DFT& dft = *m_cgparam.dft;
+	DFT<cxfl>& dft = *m_cgparam.dft;
 	DWT& dwt = *m_cgparam.dwt;
 	
 	im_dc    = data;
