@@ -4,16 +4,15 @@
 template <class T> bool
 fftwtest (Connector<T>* rc) {
 
-	std::string in   = std::string (base + std::string ("/in.mat"));
-	std::string iout = std::string (base + std::string ("/iout.mat"));
-	std::string kout = std::string (base + std::string ("/kout.mat"));
+	Matrix<cxfl> m   = Matrix<cxfl>::Phantom2D(512);
+	Matrix<cxfl> k, i, j;
 	
-	Matrix<cxdb> m   = Matrix<cxfl>::Phantom2D(512);
-	Matrix<cxdb> k, i, j;
+	for (size_t l = 0; l < 100; l++)
+		k = fft  (m);
 
-	k = fft  (m);
-	i = ifft (k);
-
+	for (size_t l = 0; l < 100; l++)
+		i = ifft (k);
+	/*
 	Matrix<float> msk;
 	Matrix<float> pdf;
 	Matrix<cxfl>   dat;
@@ -32,7 +31,7 @@ fftwtest (Connector<T>* rc) {
 	tst = dft * dat;
 	tst = dft->*tst;
 	tst = dft * tst;
-
+	*/
 #ifdef HAVE_MAT_H	
 
 	MATFile* mf = matOpen ("fftout.mat", "w");
@@ -45,9 +44,10 @@ fftwtest (Connector<T>* rc) {
 	MXDump (m, mf, "m", "");
 	MXDump (k, mf, "k", "");
 	MXDump (i, mf, "i", "");
+	/*
 	MXDump (dat, mf, "dat", "");
 	MXDump (tst, mf, "tst", "");
-	
+	*/
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", "");
 		return false;
