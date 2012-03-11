@@ -1,32 +1,40 @@
 #include "../modules/VDSpiral.hpp"
 #include "Statistics.hpp"
+#include "Tokenizer.hpp"
 
 template <class T> bool
 vdspiraltest (Connector<T>* rc) {
 
 	SpiralParams p;
 
+	std::string    cf  = std::string (base + std::string(config));
+	rc->ReadConfig (cf.c_str());
 
-	p.fov = Matrix<double> (4,1);
-	p.rad = Matrix<double> (4,1);
-	p.fov[0] = 35.0; p.rad[0] = 0.0;
-	p.fov[1] = 35.0; p.rad[1] = 0.1;
-	p.fov[2] = 10.0; p.rad[2] = 0.13;
-	p.fov[3] = 10.0; p.rad[3] = 1.0;
+	rc->Attribute ("maxgrad", &(p.mgr));
+	rc->Attribute ("maxslew", &(p.msr));
+	int ss ;
+	rc->Attribute ("shots",   &ss);
+	p.shots = ss;
+	rc->Attribute ("dt",      &(p.dt));
+	rc->Attribute ("res",     &(p.res));
 
-	/*
-	p.fov = Matrix<double> (2,1);
-	p.rad = Matrix<double> (2,1);
-	p.fov[0] = 19.2; p.rad[0] = 0.0;
-	p.fov[1] = 19.2; p.rad[1] = 1.0;
-	*/
-	p.mgr =   4.0;
-	p.msr =  20.0;
-	p.dt  =   2.0e-3;
-	p.shots = 3;
-	p.res =   1.0;
-	
-	printf ("Computing variable density spiral ...\n");
+	std::string rad (rc->GetText("/config/rad"));
+	std::string fov (rc->GetText("/config/fov"));
+	std::vector<std::string> rads = Split (rad, ",");
+	std::vector<std::string> fovs = Split (fov, ",");
+
+   	size_t nr = rads.size();
+	assert (nr == fovs.size());
+
+	p.fov = Matrix<double> (nr,1);
+	p.rad = Matrix<double> (nr,1);
+	for (size_t i = 0; i < nr; i++) {
+		p.fov[i] = atof(fovs[i].c_str()); 
+		p.rad[i] = atof(rads[i].c_str()); 
+	}
+
+	printf ("Computing variable density spiral for ... \n");
+	printf ("    [maxgrad: %.2f, maxslew: %.2f, res: %.2f, dt: %.2e, shots: %li]\n", p.mgr, p.msr, p.res, p.dt, p.shots);
 	ticks start = getticks();
 	Spiral s = VDSpiral (p);
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());

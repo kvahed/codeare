@@ -198,7 +198,7 @@ SDOut SDMax (SDIn& si) {
 Solution ComputeGradient (GradientParams& gp) {
 
 	Solution s;
-	size_t ups = 25, ts = 0;
+	size_t ups = 50, ts = 0;
 
 	printf ("  Const arc-length parametrization "); fflush(stdout);
 	ticks start = getticks();

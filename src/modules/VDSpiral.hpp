@@ -67,9 +67,8 @@ Spiral VDSpiral (SpiralParams& sp) {
 
 	k_max   = 5.0 / sp.res;
 	fov_max = max(fov);
-	printf ("  max(fov) %f\n", fov_max);
 
-	dr  = ((double) sp.shots) / (10.0 * fov_max);
+	dr  = ((double) sp.shots) / (fov_max);
 	n   = ceil (k_max/dr);
 	r   = Matrix<double>::LinSpace(0.0, k_max, n);
 	
