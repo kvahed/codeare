@@ -188,9 +188,9 @@ public:
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
 	 */
-	template <class S> inline void
+	template <class S> inline int
 	Attribute        (const char* name, S* value) {
-		m_conn->SetAttribute (name, value);
+		return m_conn->Attribute (name, value);
 	}
 
 	
@@ -198,10 +198,23 @@ public:
 	 * @brief           Get a string type attribute
 	 *
 	 * @param  name     Attribute name 
+	 * @return          Attribute value
 	 */
 	inline const char*
-	Attribute        (const char* name) {
+	Attribute          (const char* name) {
 		return m_conn->Attribute (name);
+	}
+
+	
+	/**
+	 * @brief           Get a text node of an element
+	 *
+	 * @param  path     X-Path
+	 * @return          Text
+	 */
+	inline const char*
+	GetText            (const char* path) {
+		return m_conn->GetText (path);
 	}
 
 	

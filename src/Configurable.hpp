@@ -22,7 +22,11 @@
 #define __CONFIGURABLE_HPP__
 
 #include "tinyxml.h"
+#include "tinyxml/xpath_static.h"
+
 #include <string>
+
+using namespace TinyXPath;
 
 /**
  * @brief Skeleton of an XML configurable class
@@ -174,7 +178,10 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, size_t* value) const {
-		return m_config_doc->RootElement()->QueryIntAttribute (name, (int*)value);
+		int ival, success;
+		success = m_config_doc->RootElement()->QueryIntAttribute (name, &ival);
+		*value = (size_t) ival;
+		return success;
 	}
 
 	
@@ -187,7 +194,10 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, bool* value) const {
-		return m_config_doc->RootElement()->QueryIntAttribute (name, (int*)value);
+		int ival, success;
+		success = m_config_doc->RootElement()->QueryIntAttribute (name, &ival);
+		*value = (bool) ival;
+		return success;
 	}
 
 	
@@ -218,7 +228,19 @@ class Configurable {
 
 
 	/**
-	 * @brief           Serialize configuration to string
+	 * @brief           Get text of a node
+	 * 
+	 * @param  path     Path to node
+	 * @return          Value
+	 */
+	inline const char* 
+	GetText             (const char* path) {
+		return ((TiXmlElement*) TinyXPath::XNp_xpath_node (m_config_doc->RootElement(), path))->GetText();
+	}
+
+		
+	/**
+	 * @brief Serialize configuration to string
 	 *
 	 * @return          String representation of configuration
 	 */
