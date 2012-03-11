@@ -69,7 +69,7 @@ Spiral VDSpiral (SpiralParams& sp) {
 	fov_max = max(fov);
 
 	dr  = ((double) sp.shots) / (fov_max);
-	n   = ceil (k_max/dr);
+	n   = size(fov,1)*100;
 	r   = Matrix<double>::LinSpace(0.0, k_max, n);
 	
 	Matrix<double> x = k_max*rad;
@@ -81,6 +81,8 @@ Spiral VDSpiral (SpiralParams& sp) {
 	r   = Matrix<double>::LinSpace(0.0, k_max, n);
 
 	fov = interp1 (x, fov, r, INTERP::AKIMA);
+
+	MXDump (fov, "fov.mat", "fov");
 
 	theta = cumsum((2 * PI * dr / sp.shots) * fov);
 
