@@ -44,7 +44,11 @@ DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float> mask, co
 
 	m_pc   = pc;
 	m_cpc  = conj(pc);
-	
+
+	MXDump (m_pc, "m_pc.mat", "m_pc");
+	MXDump (m_cpc, "m_cpc.mat", "m_cpc");
+
+
 	for (size_t i = 0; i < rank; i++)
 		n[i]  = sl;
 
@@ -99,6 +103,7 @@ template<>
 DFT<cxfl>::DFT (const Matrix<size_t>& size) : m_N(1),
 											 m_have_mask (false),
 											 m_have_pc (false) {
+
 	
 	int rank = size.Size();
 	int n[rank];
@@ -112,7 +117,7 @@ DFT<cxfl>::DFT (const Matrix<size_t>& size) : m_N(1),
 	m_out = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
 
 	m_fwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_FORWARD,  FFTW_MEASURE);
-	m_bwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_BACKWARD, FFTW_ESTIMATE);
+	m_bwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_BACKWARD, FFTW_MEASURE);
 
 	m_initialised = true;
 

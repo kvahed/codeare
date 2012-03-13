@@ -23,8 +23,6 @@ DataBase::Instance ()  {
 error_code
 DataBase::Finalise () {
 	
-	std::cout << "Clearing database instance ... " << std::endl;
-
 	while (!m_cxfl.empty())
 		FreeCXFL(m_cxfl.begin()->first.c_str());
 	
@@ -43,8 +41,6 @@ DataBase::Finalise () {
 	while (!m_long.empty())
 		FreeLONG(m_long.begin()->first.c_str());
 	
-	std::cout << "done." << std::endl;
-
 	return OK;
 	
 }

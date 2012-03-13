@@ -51,7 +51,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmatrix_la_LIBADD =
-am_libmatrix_la_OBJECTS = DFT.lo DWT.lo Toolbox.lo
+am_libmatrix_la_OBJECTS = DFT.lo DWT.lo
 libmatrix_la_OBJECTS = $(am_libmatrix_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -220,7 +220,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = $(OPENMP_CXXFLAGS) $(INC_INSIGHT_H)
 noinst_LTLIBRARIES = libmatrix.la 
-libmatrix_la_SOURCES = DFT.hpp DFT.cpp DWT.hpp DWT.cpp Toolbox.hpp Toolbox.cpp
+libmatrix_la_SOURCES = DFT.hpp DFT.cpp DWT.hpp DWT.cpp
 all: all-am
 
 .SUFFIXES:
@@ -275,7 +275,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DFT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DWT.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

@@ -23,10 +23,10 @@
 #define __RELATIVE_SENSITIVITIES_HPP__
 
 #include "ReconStrategy.hpp"
-#include "FFT.hpp"
 #include "Statistics.hpp"
 #include "Toolbox.hpp"
 #include "IO.hpp"
+#include "DFT.hpp"
 
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
