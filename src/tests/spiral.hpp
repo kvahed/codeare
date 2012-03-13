@@ -35,9 +35,12 @@ vdspiraltest (Connector<T>* rc) {
 
 	printf ("Computing variable density spiral for ... \n");
 	printf ("    [maxgrad: %.2f, maxslew: %.2f, res: %.2f, dt: %.2e, shots: %li]\n", p.mgr, p.msr, p.res, p.dt, p.shots);
+	p.res = p.res*.99;
 	ticks start = getticks();
-	Spiral s = VDSpiral (p);
+	Solution s = VDSpiral (p);
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+
+	
 
 #ifdef HAVE_MAT_H	
 	

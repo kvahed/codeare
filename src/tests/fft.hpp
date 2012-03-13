@@ -1,17 +1,18 @@
 #include "matrix/FFT.hpp"
-#include "matrix/DFT.hpp"
 
 template <class T> bool
 fftwtest (Connector<T>* rc) {
 
 	Matrix<cxfl> m   = Matrix<cxfl>::Phantom2D(512);
 	Matrix<cxfl> k, i, j;
+	DFT<cxfl> dft (size(m));
 	
 	for (size_t l = 0; l < 100; l++)
-		k = fft  (m);
+		k = dft * m;
 
 	for (size_t l = 0; l < 100; l++)
-		i = ifft (k);
+		i = dft ->* k;
+
 	/*
 	Matrix<float> msk;
 	Matrix<float> pdf;
@@ -32,6 +33,7 @@ fftwtest (Connector<T>* rc) {
 	tst = dft->*tst;
 	tst = dft * tst;
 	*/
+
 #ifdef HAVE_MAT_H	
 
 	MATFile* mf = matOpen ("fftout.mat", "w");

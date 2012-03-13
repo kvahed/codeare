@@ -37,22 +37,8 @@ struct SpiralParams {
 };
 
 
-/**
- * @brief 2D Spiral parameters
- */
-struct Spiral {
+Solution VDSpiral (SpiralParams& sp) {
 
-	Matrix<double> k;    /**< @brief k-space trajectory */
-	Matrix<double> g;    /**< @brief Gradient amplitudes */
-	Matrix<double> s;    /**< @brief Slew rate */
-	Matrix<double> t;    /**< @brief Time */
-
-};
-
-
-Spiral VDSpiral (SpiralParams& sp) {
-
-	Spiral spir;
 	GradientParams gp;
 
 	Matrix<double>& fov = sp.fov; 
@@ -82,8 +68,6 @@ Spiral VDSpiral (SpiralParams& sp) {
 
 	fov = interp1 (x, fov, r, INTERP::AKIMA);
 
-	MXDump (fov, "fov.mat", "fov");
-
 	theta = cumsum((2 * PI * dr / sp.shots) * fov);
 
 	gp.k = Matrix<double> (numel(r),3);
@@ -99,12 +83,7 @@ Spiral VDSpiral (SpiralParams& sp) {
 	
 	Solution s = ComputeGradient (gp);
 	
-	spir.k = s.k;
-	spir.g = s.g;
-	spir.s = s.s;
-	spir.t = s.t;
-
-	return spir;
+	return s;
 
 }
 

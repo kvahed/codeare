@@ -213,7 +213,7 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	printf ("..."); fflush (stdout);
 
-	s.k = interp1 (op, gp.k, np, INTERP::AKIMA);
+	s.k = interp1 (op, gp.k, np, INTERP::CSPLINE);
 
 	op.Clear();
 
@@ -232,17 +232,16 @@ Solution ComputeGradient (GradientParams& gp) {
 	sdin.mgr = gp.mgr;
 	sdin.msr = gp.msr;
 
-	for (size_t i = 0; i < snp-1; i++) {
-		s.g (i,0) = s.k(i+1,0) - s.k(i,0);
-		s.g (i,1) = s.k(i+1,1) - s.k(i,1);
-		s.g (i,2) = s.k(i+1,2) - s.k(i,2);
+	for (size_t i = 0, j = snp, l = 2*snp; i < snp-1; i++) {
+		s.g[i  ] = s.k[i+1  ] - s.k[i  ];
+		s.g[i+j] = s.k[i+1+j] - s.k[i+j];
+		s.g[i+l] = s.k[i+1+l] - s.k[i+l];
 	}
-	
+
 	printf (".."); fflush (stdout);
 
-	for (size_t i = 0; i < 3; i++)
-		s.g (snp-1,i) = s.g (snp-2,i); 
-	
+	MXDump (s.g, "s.g.mat", "sg");
+
 	s.g *= (double)ups;
 	
 	sop [0] = 0.0;
@@ -334,6 +333,8 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	pos.Clear();
 	
+	Nt = Nt - ceil(Nt*.015);
+	
 	gp.k   = Matrix<double> (Nt,3);
 
 	for (size_t i = 0; i < Nt; i++) {
@@ -353,8 +354,7 @@ Solution ComputeGradient (GradientParams& gp) {
 	}
 
 	for (size_t i = 0; i < 3; i++) {
-		s.g(Nt-2,i) = s.g(Nt-3,i)+(s.g(Nt-3,i)-s.g(Nt-4,i));  
-		s.g(Nt-1,i) = s.g(Nt-2,i)+(s.g(Nt-3,i)-s.g(Nt-4,i));  
+		s.g(Nt-1,i) = s.g(Nt-2,i);  
 		s.k(0,   i) = 0.0;
 	}
 

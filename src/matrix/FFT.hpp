@@ -21,7 +21,6 @@
 #ifndef __FFT_HPP__
 #define __FFT_HPP__
 
-#include <fftw3.h>
 #include "Matrix.hpp"
 #include "Algos.hpp"
 #include "DFT.hpp"
@@ -29,41 +28,109 @@
 /**
  * @brief 1-3D Discrete Cartesian Fourier transform for Matrix template
  */
-
-inline Matrix<cxdb> 
-fft (const Matrix<cxdb>& m, const Matrix<double> mask = Matrix<double>(1), const Matrix<cxdb> pc = Matrix<cxdb>(1))  {
-
-	DFT<cxdb> dft (size(m), mask, pc);
-    return dft * m;
 	
-}
-
-
-inline Matrix<cxdb>
-ifft (const Matrix<cxdb>& m, const Matrix<double> mask = Matrix<double>(1), const Matrix<cxdb> pc = Matrix<cxdb>(1)) {
-	
-	DFT<cxdb> dft (size(m), mask, pc);
-    return dft ->* m;
-	
-}
-
 
 inline Matrix<cxfl> 
 fft (const Matrix<cxfl>& m)  {
 	
-	DFT<cxfl> dft (size(m));
-    return dft * m;
+	assert (Is1D(m) || Is2D(m) || Is3D(m));
+	fftw_import_system_wisdom ();
+	
+    Matrix<cxfl> res;
+	fftwf_plan   p;
+
+	res = fftshift(m);
+
+	if      (Is1D(m))
+		p = fftwf_plan_dft_1d (m.Dim(0),                     (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_FORWARD, FFTW_MEASURE);
+	else if (Is2D(m))
+		p = fftwf_plan_dft_2d (m.Dim(1), m.Dim(0),           (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_FORWARD, FFTW_MEASURE);
+	else if (Is3D(m))
+		p = fftwf_plan_dft_3d (m.Dim(2), m.Dim(1), m.Dim(0), (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_FORWARD, FFTW_MEASURE);
+	
+	fftwf_execute(p);
+	fftwf_destroy_plan(p);
+
+    return fftshift(res/sqrt((float)m.Size()));
 	
 }
 
 
 inline Matrix<cxfl>
 ifft (const Matrix<cxfl>& m) {
+
+	assert (Is1D(m) || Is2D(m) || Is3D(m));
+	fftw_import_system_wisdom ();
 	
-	DFT<cxfl> dft (size(m));
-    return dft ->* m;
+    Matrix<cxfl> res = fftshift(m);
+	fftwf_plan   p; 
+	
+	if      (Is1D(m))
+		p = fftwf_plan_dft_1d (m.Dim(0),                     (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_BACKWARD, FFTW_MEASURE);
+	else if (Is2D(m))
+		p = fftwf_plan_dft_2d (m.Dim(1), m.Dim(0),           (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_BACKWARD, FFTW_MEASURE);
+	else if (Is3D(m))
+		p = fftwf_plan_dft_3d (m.Dim(2), m.Dim(1), m.Dim(0), (fftwf_complex*)&res[0], (fftwf_complex*)&res[0], FFTW_BACKWARD, FFTW_MEASURE);
+	
+	fftwf_execute(p);
+	fftwf_destroy_plan(p);
+
+	return fftshift(res/sqrt((float)m.Size()));
 	
 }
+
+
+inline Matrix<cxdb> 
+fft (const Matrix<cxdb>& m)  {
+	
+	assert (Is1D(m) || Is2D(m) || Is3D(m));
+	
+    Matrix<cxdb> res;
+	fftw_plan    p;
+
+	res = fftshift(m);
+
+	if      (Is1D(m))
+		p = fftw_plan_dft_1d (m.Dim(0),                     (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_FORWARD, FFTW_MEASURE);
+	else if (Is2D(m))
+		p = fftw_plan_dft_2d (m.Dim(1), m.Dim(0),           (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_FORWARD, FFTW_MEASURE);
+	else if (Is3D(m))
+		p = fftw_plan_dft_3d (m.Dim(2), m.Dim(1), m.Dim(0), (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_FORWARD, FFTW_MEASURE);
+	
+	fftw_execute(p);
+	fftw_destroy_plan(p);
+
+    return fftshift(res / (float)res.Size());
+	
+}
+
+
+inline Matrix<cxdb>
+ifft (const Matrix<cxdb>& m) {
+
+	assert (Is1D(m) || Is2D(m) || Is3D(m));
+	
+    Matrix<cxdb> res;
+	fftw_plan    p; 
+	
+	res = fftshift(m);
+
+	if      (Is1D(m))
+		p = fftw_plan_dft_1d (m.Dim(0),                     (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_BACKWARD, FFTW_MEASURE);
+	else if (Is2D(m))
+		p = fftw_plan_dft_2d (m.Dim(1), m.Dim(0),           (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_BACKWARD, FFTW_MEASURE);
+	else if (Is3D(m))
+		p = fftw_plan_dft_3d (m.Dim(2), m.Dim(1), m.Dim(0), (fftw_complex*)&res[0], (fftw_complex*)&res[0], FFTW_BACKWARD, FFTW_MEASURE);
+	
+	fftw_execute(p);
+	fftw_destroy_plan(p);
+
+	return fftshift(res);
+	
+}
+
+
+
 
 
 #endif
