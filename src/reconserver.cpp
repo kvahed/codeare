@@ -146,30 +146,26 @@ int main (int argc, char** argv) {
 bool init (int argc, char** argv) {
 
 	cout << endl;
-#ifdef VERSION
-	cout << "codeare "         << VERSION                                     << endl;
-#else
-	cout << "codeare "         << endl;
+	cout << "codeare service "         << VERSION                                     << endl;
+#ifdef GIT_COMMIT
+	cout << "Commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
 #endif
-	cout << "common data exchange and reconstruction environment"             << endl;
-	cout << "Reconstruction server "  << " [build " << SVN_REVISION << "]"    << endl;
-    cout << "Copyright (C) 2010	Kaveh Vahedipour<k.vahedipour@fz-jeulich.de>" << endl;
-	cout << "Kaveh Vahedipour -  k.vahedipour@fz-juelich.de"                  << endl;
-	cout << "Juelich Research Centre"                                         << endl;
-	cout << "Institute of Neuroscience and Medicine"                          << endl;
-	cout << "Medical Imaging Physics"                                         << endl;
-	cout << endl;
 
 	Options *opt = new Options();
 	
-	opt->addUsage  ("Usage: testclt --name <name> [OPTIONS]");
+    opt->addUsage  ("Copyright (C) 2010-2012");
+	opt->addUsage  ("Kaveh Vahedipour<k.vahedipour@fz-juelich.de>");
+	opt->addUsage  ("Juelich Research Centre");
+	opt->addUsage  ("Medical Imaging Physics");
 	opt->addUsage  ("");
-	opt->addUsage  (" -n, --name    Remote service name (for example RemoteRecon)");
+	opt->addUsage  ("Usage:");
+	opt->addUsage  ("reconserver -n <servicename> [-l <logfile> -d <debuglevel>]");
+	opt->addUsage  ("");
+	opt->addUsage  (" -n, --name    Service name");
 	opt->addUsage  (" -d, --debug   Debug level 0-40 (default: 5)");
 	opt->addUsage  (" -l, --logfile Log file (default: ./reconserver.log)");
 	opt->addUsage  ("");
 	opt->addUsage  (" -h, --help    Print this help screen"); 
-	opt->addUsage  ("");
 	
 	opt->setFlag   ("help"    , 'h');
 
@@ -183,7 +179,7 @@ bool init (int argc, char** argv) {
 		
 		opt->printUsage();
 		delete opt;
-		return true;
+		return false;
 		
 	} 
 	

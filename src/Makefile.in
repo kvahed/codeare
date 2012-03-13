@@ -302,7 +302,8 @@ reconserver_LDFLAGS = $(HDF5) @PLUGIN_LDFLAGS@ -dlopen \
 	-dlopen modules/KTPoints.la -dlopen \
 	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
 	-dlopen modules/DirectMethod.la tinyxml/libtinyxml.la \
-	$(am__append_1)
+	matrix/libmatrix.la $(am__append_1)
+reconserver_DEPENDENCIES = matrix/libmatrix.la
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
 SUBDIRS = tinyxml matrix nfft modules

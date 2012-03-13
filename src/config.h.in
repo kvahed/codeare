@@ -1,5 +1,11 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* git HEAD commit hash */
+#undef GIT_COMMIT
+
+/* git HEAD commit date */
+#undef GIT_COMMIT_DATE
+
 /* Define to 1 if you have the <assert.h> header file. */
 #undef HAVE_ASSERT_H
 
@@ -245,9 +251,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* SVN Revision */
-#undef SVN_REVISION
 
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME

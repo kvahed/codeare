@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-#include <iomanip>
 #include <math.h>
 
 #include <string>
@@ -69,29 +68,6 @@ Toolbox::Instance  () {
 }
 
 
-void 
-Toolbox::Split     (std::vector<std::string>& sv, const std::string& str, const std::string& dlm) const {
-	
-	assert (dlm.size() > 0);
-	
-	size_t  start = 0, end = 0;
-	
-	while (end != std::string::npos) {
-		
-		end = str.find (dlm, start);
-		
-		// If at end, use length=maxLength.  Else use length=end-start.
-		sv.push_back(str.substr(start, (end == std::string::npos) ? std::string::npos : end - start));
-		
-		// If at end, use start=maxSize.  Else use start=end+delimiter.
-		start = ((end > (std::string::npos - dlm.size())) ? std::string::npos : end + dlm.size());
-
-	}
-
-}
-
-
-
 double 
 Toolbox::ClockRate () const {
 	
@@ -118,15 +94,3 @@ Toolbox::ClockRate () const {
 }
 
 	
-inline void 
-Toolbox::ProgressBar (const std::string& pre, const std::string& post, const short& p) const {
-	
-	assert (p >=  0);
-	assert (p <=100);
-	
-	std::cout << "\r";
-	std::cout << pre.c_str();
-	std::cout << " | "; 
-	std::cout << bars.substr(0, p/2) << "> " <<  blancs.substr(0, 50-p/2) << "| " << std::setw(3) << std::setfill(' ') << p << "% done";
-	
-}
