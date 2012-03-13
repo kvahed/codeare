@@ -11654,7 +11654,11 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define SVN_REVISION \"exported\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"76598c53\"" >>confdefs.h
+
+
+$as_echo "#define GIT_COMMIT_DATE \"Tue Mar 13 11:39:14 2012 +0100\"" >>confdefs.h
+
 
 # copyright notice
 

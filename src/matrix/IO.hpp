@@ -22,6 +22,8 @@
 #define __IO_HPP__
 
 #include "Toolbox.hpp"
+#include "Tokenizer.hpp"
+#include "Waitbar.hpp"
 #include "tinyxml/tinyxml.h"
 #include "tinyxml/xpath_static.h"
 #include "mdhVB15.h"
@@ -251,7 +253,7 @@ H5Dump (const Matrix<T>& M, const string fname, const string dname, const string
 				
 				vector<string> sv;
 				
-				Toolbox::Instance()->Split (sv, dloctmp, "/");
+				sv = Split (dloctmp, "/");
 				
 				for (size_t i = 0; i < sv.size(); i++) {
 					
@@ -434,27 +436,6 @@ RSAdjust (Matrix<T>& M, const std::string& fname) {
 	
 	delete doc;
 	return true;
-	
-}
-
-
-/**
- * @brief              Primitive command window progress bar.
- *
- * @param   pre        Display before bar.
- * @param   post       Display after bar.
- * @param   p          Percent done.
- */
-inline static void
-ProgressBar (const std::string& pre, const std::string& post, const short& p) {
-	
-	assert (p >=   0);
-	assert (p <= 100);
-	
-	std::cout << "\r";
-	std::cout << pre.c_str();
-	std::cout << " | ";
-	std::cout << bars.substr(0, p/2) << " " <<  blancs.substr(0, 50-p/2) << "| " << std::setw(3) << std::setfill(' ') << p << "% done";
 	
 }
 

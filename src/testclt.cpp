@@ -66,28 +66,20 @@ int main (int argc, char** argv) {
 bool init (int argc, char** argv) {
 	
 	cout << endl;
-#ifdef VERSION
-	cout << "jrrs "         << VERSION                                        << endl;
-#else
-	cout << "jrrs "         << endl;
+	cout << "codeare client "         << VERSION                                        << endl;
+#ifdef GIT_COMMIT
+	cout << "Commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
 #endif
-	cout << "juelich remote reconstruction service "                          << endl;
-#ifdef SVN_REVISION
-	cout << "Test client "  << " [build " << SVN_REVISION << "]"              << endl;
-#else
-	cout << "Test client "  << endl;
-#endif
-
-    cout << "Copyright (C) 2010-2011"                                         << endl;
-	cout << "Kaveh Vahedipour - k.vahedipour@fz-juelich.de"                   << endl;
-	cout << "Juelich Research Centre"                                         << endl;
-	cout << "Institute of Neuroscience and Medicine"                          << endl;
-	cout << "Medical Imaging Physics"                                         << endl;
-	cout << endl;
 
 	Options *opt = new Options();
 	
-	opt->addUsage  ("Usage: testclt --name <name> [OPTIONS]");
+    opt->addUsage  ("Copyright (C) 2010-2012");
+	opt->addUsage  ("Kaveh Vahedipour<k.vahedipour@fz-juelich.de>");
+	opt->addUsage  ("Juelich Research Centre");
+	opt->addUsage  ("Medical Imaging Physics");
+	opt->addUsage  ("");
+	opt->addUsage  ("Usage:");
+	opt->addUsage  ("testclt -n <servicename> -t <test> [OPTIONS]");
 	opt->addUsage  ("");
 	opt->addUsage  (" -n, --name    Remote service name (for example: ReconService)");
 	opt->addUsage  (" -t, --test    Test case (default: DummyRecon. Just connectivity test)");

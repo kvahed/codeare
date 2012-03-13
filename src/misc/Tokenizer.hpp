@@ -18,56 +18,37 @@
  *  02110-1301  USA
  */
 
-#ifndef __TOOLBOX_HPP__
-#define __TOOLBOX_HPP__
+#ifndef __TOKENIZER_HPP__
+#define __TOKENIZER_HPP__
 
-#include <vector>
+#include <iostream>
+#include <iomanip>
 #include <string>
+#include <vector>
 
-using namespace std;
+static inline std::vector<std::string>
+Split     (const std::string& str, const std::string& dlm) {
 
-/**
- * @brief  A toolbox for some static stuff
- */
-class Toolbox {
+	assert (dlm.size() > 0);
 
-public:
-
-	/**
-	 * @brief       Singleton destructor
-	 */
-	~Toolbox();
-
-
-    /**
-     * @brief       Singleton instance
-     */
-    static Toolbox*  
-    Instance        ();
-
-
-	/**
-	 * @brief       CPU clock rate.
-	 *              Humble abuse of FFTW cycle for timing information.
-	 *
-	 * @return      clock rate
-	 */
-	double 
-	ClockRate       () const ;	
-
-
+	std::vector<std::string> sv;
 	
+	size_t  start = 0, end = 0;
+	
+	while (end != std::string::npos) {
 		
-private:
+		end = str.find (dlm, start);
+		
+		// If at end, use length=maxLength.  Else use length=end-start.
+		sv.push_back(str.substr(start, (end == std::string::npos) ? std::string::npos : end - start));
+		
+		// If at end, use start=maxSize.  Else use start=end+delimiter.
+		start = ((end > (std::string::npos - dlm.size())) ? std::string::npos : end + dlm.size());
 
+	}
 
-	/**
-	 * @brief      Hide constructor for singletons
-	 */
-	Toolbox   () {};
+	return sv;
 
-	static Toolbox*    m_instance;           /**< @brief Single instance */
+}
 
-};
-
-#endif
+#endif 
