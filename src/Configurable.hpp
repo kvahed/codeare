@@ -66,7 +66,7 @@ class Configurable {
 	 */
 	inline void
 	SetAttribute        (const char* name, const char* value) {
-		m_config_doc->RootElement()->SetAttribute (name, value);
+		Configuration()->SetAttribute (name, value);
 	}
 
 	
@@ -78,7 +78,7 @@ class Configurable {
 	 */
 	inline void
 	SetAttribute        (const char* name, const std::string value) {
-		m_config_doc->RootElement()->SetAttribute (name, value.c_str());
+		Configuration()->SetAttribute (name, value.c_str());
 	}
 
 	
@@ -90,7 +90,7 @@ class Configurable {
 	 */
 	inline void
 	SetAttribute        (const char* name, int value) {
-		m_config_doc->RootElement()->SetAttribute (name, value);
+		Configuration()->SetAttribute (name, value);
 	}
 
 	
@@ -102,7 +102,7 @@ class Configurable {
 	 */
 	inline void
 	SetAttribute        (const char* name, bool value) {
-		m_config_doc->RootElement()->SetAttribute (name, (int)value);
+		Configuration()->SetAttribute (name, (int)value);
 	}
 
 	
@@ -114,7 +114,7 @@ class Configurable {
 	 */
 	inline void
 	SetAttribute        (const char* name, size_t value) {
-		m_config_doc->RootElement()->SetAttribute (name, (int)value);
+		Configuration()->SetAttribute (name, (int)value);
 	}
 
 	
@@ -126,7 +126,7 @@ class Configurable {
 	 */
 	inline void 
 	SetAttribute        (const char* name, double value) {
-		m_config_doc->RootElement()->SetDoubleAttribute (name, value);
+		Configuration()->SetDoubleAttribute (name, value);
 	}
 
 
@@ -138,7 +138,7 @@ class Configurable {
 	 */
 	inline const char*
 	Attribute           (const char* name) const {
-		return m_config_doc->RootElement()->Attribute (name);
+		return Configuration()->Attribute (name);
 	}
 	
 
@@ -151,7 +151,7 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, std::string* value) const {
-		value = new std::string (m_config_doc->RootElement()->Attribute (name));
+		value = new std::string (Configuration()->Attribute (name));
 		return value->length();
 	}
 	
@@ -165,7 +165,7 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, int* value) const {
-		return m_config_doc->RootElement()->QueryIntAttribute (name, value);
+		return Configuration()->QueryIntAttribute (name, value);
 	}
 
 	
@@ -179,7 +179,7 @@ class Configurable {
 	inline int
 	Attribute           (const char* name, size_t* value) const {
 		int ival, success;
-		success = m_config_doc->RootElement()->QueryIntAttribute (name, &ival);
+		success = Configuration()->QueryIntAttribute (name, &ival);
 		*value = (size_t) ival;
 		return success;
 	}
@@ -195,7 +195,7 @@ class Configurable {
 	inline int
 	Attribute           (const char* name, bool* value) const {
 		int ival, success;
-		success = m_config_doc->RootElement()->QueryIntAttribute (name, &ival);
+		success = Configuration()->QueryIntAttribute (name, &ival);
 		*value = (bool) ival;
 		return success;
 	}
@@ -210,7 +210,7 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, double* value) const {
-		return m_config_doc->RootElement()->QueryDoubleAttribute (name, value);
+		return Configuration()->QueryDoubleAttribute (name, value);
 	}
 
 
@@ -223,7 +223,7 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, float* value) const {
-		return m_config_doc->RootElement()->QueryDoubleAttribute (name, (double*)value);
+		return Configuration()->QueryDoubleAttribute (name, (double*)value);
 	}
 
 
@@ -234,8 +234,8 @@ class Configurable {
 	 * @return          Value
 	 */
 	inline const char* 
-	GetText             (const char* path) {
-		return ((TiXmlElement*) TinyXPath::XNp_xpath_node (m_config_doc->RootElement(), path))->GetText();
+	GetText             (const char* path) const {
+		return ((TiXmlElement*) TinyXPath::XNp_xpath_node (Configuration(), path))->GetText();
 	}
 
 		
@@ -245,15 +245,18 @@ class Configurable {
 	 * @return          String representation of configuration
 	 */
 	inline const char*
-	GetConfig           ()             {
+	GetConfig           ()       const {
 
-		int err = 0;
 		TiXmlPrinter printer;
+		std::string  tstr;
+		char*        tcstr;
+
 		m_config_doc->Accept( &printer );
-		std::string temp  = printer.CStr();
-		char* t = new char[temp.length() + 1];
-		strcpy (t, temp.c_str());
-		return t;
+		tstr  = printer.CStr();
+		tcstr = new char[tstr.length() + 1];
+		strcpy (tcstr, tstr.c_str());
+
+		return tcstr;
 
 	}
 
@@ -273,12 +276,23 @@ class Configurable {
 
 
 	/**
-	 * @brief          Get configuration element for more elaborate manipulation. (i.e. Adding children etc)
+	 * @brief          Get configuration element for manipulation. (lhs)
 	 *
-	 * @return         Reference to Element "Config"
+	 * @return         Pointer root element "config"
 	 */
 	TiXmlElement* 
 	Configuration      () {
+		return m_config_doc->RootElement();
+	}
+
+
+	/**
+	 * @brief          Get configuration element for reading (rhs)
+	 *
+	 * @return         Const pointer to Element "Config"
+	 */
+	const TiXmlElement* 
+	Configuration      () const {
 		return m_config_doc->RootElement();
 	}
 
@@ -288,7 +302,7 @@ class Configurable {
 	 *
 	 * @param  fname   Name of output file
 	 */
-	void 
+	inline void 
 	DumpConfig        (const char* fname) {
 		m_config_doc->SaveFile (fname);
 	}
@@ -319,7 +333,7 @@ class Configurable {
 
  protected:
 	
-	TiXmlDocument*      m_config_doc;  /**< Containing XML document              */ 
+	TiXmlDocument*      m_config_doc;  /**< @brief DOM docuemnt holding the configuration */ 
 
 };
 

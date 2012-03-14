@@ -19,7 +19,7 @@
  */
 
 template <class T> bool
-cstest (Connector<T>* rc) {
+cstest (Connector<T>* con) {
 
 	Matrix<cxfl> indata;
 	Matrix<cxfl> im_dc;
@@ -38,32 +38,32 @@ cstest (Connector<T>* rc) {
 	if (!(MXRead (pc,     df, "ph")))   pc   = Matrix<cxfl>(1);
 #endif
 
-	rc->ReadConfig (cf.c_str());
+	con->ReadConfig (cf.c_str());
 	
-	if (rc->Init (test) != OK) {
+	if (con->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}
 	
 	// Outgoing -------------
 	
-	rc->SetMatrix  ("data", indata); // Measurement data
-	rc->SetMatrix  ("pdf",  pdf);    // Sensitivities
-	rc->SetMatrix  ("mask", mask);   // Weights
-	rc->SetMatrix  ("pc",   pc);     // Phase correction
+	con->SetMatrix  ("data", indata); // Measurement data
+	con->SetMatrix  ("pdf",  pdf);    // Sensitivities
+	con->SetMatrix  ("mask", mask);   // Weights
+	con->SetMatrix  ("pc",   pc);     // Phase correction
 	
 	// ---------------------
 	
-	rc->Process (test);
+	con->Process (test);
 	
 	// Incoming -------------
 	
-	rc->GetMatrix ("im_dc", im_dc);  // Recon output
-	rc->GetMatrix ("data",  indata); // Weighted FT of original input
+	con->GetMatrix ("im_dc", im_dc);  // Recon output
+	con->GetMatrix ("data",  indata); // Weighted FT of original input
 	
 	// ---------------------
 	
-	rc->Finalise   (test);
+	con->Finalise   (test);
 	
 #ifdef HAVE_MAT_H	
 

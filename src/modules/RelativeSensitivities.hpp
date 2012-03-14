@@ -176,7 +176,7 @@ FTVolumes (Matrix<cxfl>& r) {
 	Matrix<size_t> size  = Matrix<size_t> (3,1);
 	size[0] = r.Dim(0); size[1] = r.Dim(1); size[2] = r.Dim(2);
 
-	Matrix<cxfl> hann    = hannwindow (size);
+	Matrix<cxfl> hann    = hannwindow (size, (float)1.0);
 	
 	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r.Dim(0), (int)r.Dim(1), (int)r.Dim(2)); fflush(stdout);
 

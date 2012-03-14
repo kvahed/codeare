@@ -94,6 +94,7 @@ CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
+CompressedSensing_la_DEPENDENCIES =
 am_CompressedSensing_la_OBJECTS = CompressedSensing.lo
 CompressedSensing_la_OBJECTS = $(am_CompressedSensing_la_OBJECTS)
 CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -381,8 +382,6 @@ lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
-#COMMON_la_DEPENDENCIES = ../matrix/libmatrix.la
-#COMMON_la_LIBADD = ../matrix/libmatrix.la
 
 # Libraries
 DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp
@@ -431,7 +430,6 @@ AFI_la_LIBADD = $(COMMON_la_LIBADD)
 CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
-CompressedSensing_la_DEPENDENCIES = ../matrix/libmatrix.la 
 DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp \
 	SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp \
 	CPUSimulator.hpp $(am__append_3)

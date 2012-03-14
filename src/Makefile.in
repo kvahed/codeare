@@ -15,6 +15,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -34,7 +35,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = reconserver$(EXEEXT) testclt$(EXEEXT)
+bin_PROGRAMS = reconserver$(EXEEXT) lclient$(EXEEXT) rclient$(EXEEXT)
 @USE_NFFT3_TRUE@am__append_1 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la -dlopen modules/NuFFT_OMP.la 
 subdir = src
 DIST_COMMON = $(srcdir)/Loader.hpp.in $(srcdir)/Makefile.am \
@@ -52,27 +53,45 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = Loader.hpp
 CONFIG_CLEAN_VPATH_FILES =
+LTLIBRARIES = $(noinst_LTLIBRARIES)
+liblocal_la_LIBADD =
+am_liblocal_la_OBJECTS = liblocal_la-LocalConnector.lo \
+	liblocal_la-testclt.lo
+liblocal_la_OBJECTS = $(am_liblocal_la_OBJECTS)
+liblocal_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(liblocal_la_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+libremote_la_LIBADD =
+am_libremote_la_OBJECTS = libremote_la-RemoteConnector.lo \
+	libremote_la-testclt.lo
+libremote_la_OBJECTS = $(am_libremote_la_OBJECTS)
+libremote_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libremote_la_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = options.$(OBJEXT) RRSModuleSK.$(OBJEXT) \
 	DataBase.$(OBJEXT) FunctorContainer.$(OBJEXT) \
 	ReconContext.$(OBJEXT) Toolbox.$(OBJEXT)
-am__objects_2 = ReconServant.$(OBJEXT)
-am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2) \
+am_lclient_OBJECTS = $(am__objects_1)
+lclient_OBJECTS = $(am_lclient_OBJECTS)
+lclient_LDADD = $(LDADD)
+lclient_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(lclient_LDFLAGS) $(LDFLAGS) -o $@
+am_rclient_OBJECTS = $(am__objects_1)
+rclient_OBJECTS = $(am_rclient_OBJECTS)
+rclient_LDADD = $(LDADD)
+rclient_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(rclient_LDFLAGS) $(LDFLAGS) -o $@
+am_reconserver_OBJECTS = $(am__objects_1) ReconServant.$(OBJEXT) \
 	reconserver.$(OBJEXT)
 reconserver_OBJECTS = $(am_reconserver_OBJECTS)
 reconserver_LDADD = $(LDADD)
 reconserver_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(reconserver_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_3 = RemoteConnector.$(OBJEXT) LocalConnector.$(OBJEXT)
-am_testclt_OBJECTS = $(am__objects_1) $(am__objects_3) \
-	testclt.$(OBJEXT)
-testclt_OBJECTS = $(am_testclt_OBJECTS)
-testclt_LDADD = $(LDADD)
-testclt_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
-	$(testclt_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -95,8 +114,10 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(reconserver_SOURCES) $(testclt_SOURCES)
-DIST_SOURCES = $(reconserver_SOURCES) $(testclt_SOURCES)
+SOURCES = $(liblocal_la_SOURCES) $(libremote_la_SOURCES) \
+	$(lclient_SOURCES) $(rclient_SOURCES) $(reconserver_SOURCES)
+DIST_SOURCES = $(liblocal_la_SOURCES) $(libremote_la_SOURCES) \
+	$(lclient_SOURCES) $(rclient_SOURCES) $(reconserver_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -279,22 +300,30 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml -Imisc $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc DataBase.hpp DataBase.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp
-
-# Client side stuff
-CLIENT_SIDE = RemoteConnector.hpp RemoteConnector.cpp Connector.hpp LocalConnector.hpp LocalConnector.cpp
+COMMON = RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc DataBase.hpp DataBase.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp
 
 # Reconstruction strategies & server side stuff
-SERVER_SIDE = ReconServant.hpp ReconServant.cpp
+SERVER_SIDE = 
 
-# Rules for testclt
-testclt_SOURCES = $(COMMON) $(CLIENT_SIDE)  testclt.cpp 
-testclt_LDFLAGS = tinyxml/libtinyxml.la matrix/libmatrix.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ 
-testclt_DEPENDENCIES = matrix/libmatrix.la
-#testclt_LDADD = 
+# Rules for clients
+noinst_LTLIBRARIES = libremote.la liblocal.la
+
+# Local client (lclient)
+liblocal_la_SOURCES = LocalConnector.hpp LocalConnector.cpp testclt.cpp
+liblocal_la_CXXFLAGS = $(AM_CXXFLAGS) -DLOCAL
+lclient_SOURCES = $(COMMON)
+lclient_LDFLAGS = liblocal.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ 
+lclient_DEPENDENCIES = liblocal.la
+
+# Remote client (rclient)
+libremote_la_SOURCES = RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
+libremote_la_CXXFLAGS = $(AM_CXXFLAGS) -DREMOTE
+rclient_SOURCES = $(COMMON)
+rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ 
+rclient_DEPENDENCIES = libremote.la
 
 # Rules for reconserver
-reconserver_SOURCES = $(COMMON) $(SERVER_SIDE) reconserver.cpp
+reconserver_SOURCES = $(COMMON) ReconServant.hpp ReconServant.cpp reconserver.cpp
 reconserver_LDFLAGS = $(HDF5) @PLUGIN_LDFLAGS@ -dlopen \
 	modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen \
 	modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen \
@@ -302,11 +331,10 @@ reconserver_LDFLAGS = $(HDF5) @PLUGIN_LDFLAGS@ -dlopen \
 	-dlopen modules/KTPoints.la -dlopen \
 	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
 	-dlopen modules/DirectMethod.la tinyxml/libtinyxml.la \
-	matrix/libmatrix.la $(am__append_1)
-reconserver_DEPENDENCIES = matrix/libmatrix.la
+	$(am__append_1)
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
-SUBDIRS = tinyxml matrix nfft modules
+SUBDIRS = tinyxml nfft modules
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -359,6 +387,19 @@ distclean-hdr:
 	-rm -f config.h stamp-h1
 Loader.hpp: $(top_builddir)/config.status $(srcdir)/Loader.hpp.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+liblocal.la: $(liblocal_la_OBJECTS) $(liblocal_la_DEPENDENCIES) 
+	$(liblocal_la_LINK)  $(liblocal_la_OBJECTS) $(liblocal_la_LIBADD) $(LIBS)
+libremote.la: $(libremote_la_OBJECTS) $(libremote_la_DEPENDENCIES) 
+	$(libremote_la_LINK)  $(libremote_la_OBJECTS) $(libremote_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -402,12 +443,15 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+lclient$(EXEEXT): $(lclient_OBJECTS) $(lclient_DEPENDENCIES) 
+	@rm -f lclient$(EXEEXT)
+	$(lclient_LINK) $(lclient_OBJECTS) $(lclient_LDADD) $(LIBS)
+rclient$(EXEEXT): $(rclient_OBJECTS) $(rclient_DEPENDENCIES) 
+	@rm -f rclient$(EXEEXT)
+	$(rclient_LINK) $(rclient_OBJECTS) $(rclient_LDADD) $(LIBS)
 reconserver$(EXEEXT): $(reconserver_OBJECTS) $(reconserver_DEPENDENCIES) 
 	@rm -f reconserver$(EXEEXT)
 	$(reconserver_LINK) $(reconserver_OBJECTS) $(reconserver_LDADD) $(LIBS)
-testclt$(EXEEXT): $(testclt_OBJECTS) $(testclt_DEPENDENCIES) 
-	@rm -f testclt$(EXEEXT)
-	$(testclt_LINK) $(testclt_OBJECTS) $(testclt_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -417,15 +461,16 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataBase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FunctorContainer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LocalConnector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RRSModuleSK.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconServant.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RemoteConnector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblocal_la-LocalConnector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblocal_la-testclt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libremote_la-RemoteConnector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libremote_la-testclt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclt.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -450,6 +495,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+liblocal_la-LocalConnector.lo: LocalConnector.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblocal_la_CXXFLAGS) $(CXXFLAGS) -MT liblocal_la-LocalConnector.lo -MD -MP -MF $(DEPDIR)/liblocal_la-LocalConnector.Tpo -c -o liblocal_la-LocalConnector.lo `test -f 'LocalConnector.cpp' || echo '$(srcdir)/'`LocalConnector.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/liblocal_la-LocalConnector.Tpo $(DEPDIR)/liblocal_la-LocalConnector.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LocalConnector.cpp' object='liblocal_la-LocalConnector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblocal_la_CXXFLAGS) $(CXXFLAGS) -c -o liblocal_la-LocalConnector.lo `test -f 'LocalConnector.cpp' || echo '$(srcdir)/'`LocalConnector.cpp
+
+liblocal_la-testclt.lo: testclt.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblocal_la_CXXFLAGS) $(CXXFLAGS) -MT liblocal_la-testclt.lo -MD -MP -MF $(DEPDIR)/liblocal_la-testclt.Tpo -c -o liblocal_la-testclt.lo `test -f 'testclt.cpp' || echo '$(srcdir)/'`testclt.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/liblocal_la-testclt.Tpo $(DEPDIR)/liblocal_la-testclt.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='testclt.cpp' object='liblocal_la-testclt.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblocal_la_CXXFLAGS) $(CXXFLAGS) -c -o liblocal_la-testclt.lo `test -f 'testclt.cpp' || echo '$(srcdir)/'`testclt.cpp
+
+libremote_la-RemoteConnector.lo: RemoteConnector.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libremote_la_CXXFLAGS) $(CXXFLAGS) -MT libremote_la-RemoteConnector.lo -MD -MP -MF $(DEPDIR)/libremote_la-RemoteConnector.Tpo -c -o libremote_la-RemoteConnector.lo `test -f 'RemoteConnector.cpp' || echo '$(srcdir)/'`RemoteConnector.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libremote_la-RemoteConnector.Tpo $(DEPDIR)/libremote_la-RemoteConnector.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RemoteConnector.cpp' object='libremote_la-RemoteConnector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libremote_la_CXXFLAGS) $(CXXFLAGS) -c -o libremote_la-RemoteConnector.lo `test -f 'RemoteConnector.cpp' || echo '$(srcdir)/'`RemoteConnector.cpp
+
+libremote_la-testclt.lo: testclt.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libremote_la_CXXFLAGS) $(CXXFLAGS) -MT libremote_la-testclt.lo -MD -MP -MF $(DEPDIR)/libremote_la-testclt.Tpo -c -o libremote_la-testclt.lo `test -f 'testclt.cpp' || echo '$(srcdir)/'`testclt.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libremote_la-testclt.Tpo $(DEPDIR)/libremote_la-testclt.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='testclt.cpp' object='libremote_la-testclt.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libremote_la_CXXFLAGS) $(CXXFLAGS) -c -o libremote_la-testclt.lo `test -f 'testclt.cpp' || echo '$(srcdir)/'`testclt.cpp
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -676,7 +749,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS) config.h
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) config.h
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(bindir)"; do \
@@ -715,7 +788,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstLTLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -rf ./$(DEPDIR)
@@ -788,19 +862,19 @@ uninstall-am: uninstall-binPROGRAMS
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool ctags ctags-recursive distclean \
-	distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
-	uninstall-binPROGRAMS
+	clean-generic clean-libtool clean-noinstLTLIBRARIES ctags \
+	ctags-recursive distclean distclean-compile distclean-generic \
+	distclean-hdr distclean-libtool distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-binPROGRAMS install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-binPROGRAMS
 
 
 # Add idl to dependencies.

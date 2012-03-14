@@ -15,8 +15,7 @@ using namespace std;
 using namespace RRSModule;
 
 /**
- * @brief Central database for all shared matrices
- *        Central data storage for matrices. 
+ * @brief Central database for all shared matrices<br/>
  *        Matrix smart pointers are stored in individual (type) maps along with string identifier and retrieved by their names.
  */
 class DataBase {
