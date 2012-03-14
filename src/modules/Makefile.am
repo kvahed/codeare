@@ -21,8 +21,6 @@ endif
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
-#COMMON_la_DEPENDENCIES = ../matrix/libmatrix.la
-#COMMON_la_LIBADD = ../matrix/libmatrix.la
 
 # Libraries
 DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp
@@ -85,7 +83,6 @@ AFI_la_LIBADD = $(COMMON_la_LIBADD)
 CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
-CompressedSensing_la_DEPENDENCIES = ../matrix/libmatrix.la 
 
 DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp
 if USE_OPENCL

@@ -23,35 +23,45 @@
 int main (int argc, char** argv) {
 	
 	if (init (argc, argv)) {
-
-		Connector<RemoteConnector>* rc; 
-		Connector<LocalConnector>*  lc;
-
-		if (remote) 
-			rc = new Connector<RemoteConnector> (name, verbose);
-		else 
-			lc = new Connector<LocalConnector>  (name, verbose);
 		
-		if      (!strcmp (test, "CGSENSE")              ) (remote) ?  cgsensetest (rc) :  cgsensetest (lc);
-		else if (!strcmp (test, "DirectMethod")         ) (remote) ?       dmtest (rc) :       dmtest (lc);
-		else if (!strcmp (test, "NuFFT")                ) (remote) ?    nuffttest (rc) :    nuffttest (lc); 
-		else if (!strcmp (test, "NuFFT_OMP")            ) (remote) ?    nuffttest (rc) :    nuffttest (lc);
-		else if (!strcmp (test, "GRAPPA")               ) (remote) ?   grappatest (rc) :   grappatest (lc);
-		else if (!strcmp (test, "KTPoints")             ) (remote) ?      ktptest (rc) :      ktptest (lc);
-		else if (!strcmp (test, "CompressedSensing")    ) (remote) ?       cstest (rc) :       cstest (lc);
-		else if (!strcmp (test, "mxtest")               ) (remote) ?       mxtest (rc) :       mxtest (lc);
-		else if (!strcmp (test, "nitest")               ) (remote) ?       nitest (rc) :       nitest (lc);
-		else if (!strcmp (test, "fftwtest")             ) (remote) ?     fftwtest (rc) :     fftwtest (lc);
-		else if (!strcmp (test, "dwttest")              ) (remote) ?      dwttest (rc) :      dwttest (lc);
-		else if (!strcmp (test, "algotest")             ) (remote) ?     algotest (rc) :     algotest (lc);
-		else if (!strcmp (test, "RelativeSensitivities")) (remote) ?     resetest (rc) :     resetest (lc);
-		else if (!strcmp (test, "VDSpiral"))              (remote) ? vdspiraltest (rc) : vdspiraltest (lc);
-		else                                              (remote) ? internaltest (rc) : internaltest (lc);
-
-		if (remote) 
-			delete rc;
-		else 
-			delete lc;
+#ifdef LOCAL
+		Connector<LocalConnector>*  con = new Connector<LocalConnector>  (name, verbose);
+#else 
+		Connector<RemoteConnector>* con = new Connector<RemoteConnector> (name, verbose);
+#endif	
+		
+		if (!strcmp (test, "CGSENSE")) 
+			cgsensetest (con);
+		else if (!strcmp (test, "DirectMethod")) 
+			dmtest (con);
+		else if (!strcmp (test, "NuFFT")) 
+			nuffttest (con); 
+		else if (!strcmp (test, "NuFFT_OMP")) 
+			nuffttest (con);
+		else if (!strcmp (test, "GRAPPA")) 
+			grappatest (con);
+		else if (!strcmp (test, "KTPoints")) 
+			ktptest (con);
+		else if (!strcmp (test, "CompressedSensing")) 
+			cstest (con);
+		else if (!strcmp (test, "mxtest")) 
+			mxtest (con);
+		else if (!strcmp (test, "nitest")) 
+			nitest (con);
+		else if (!strcmp (test, "fftwtest")) 
+			fftwtest (con);
+		else if (!strcmp (test, "dwttest")) 
+			dwttest (con);
+		else if (!strcmp (test, "algotest")) 
+			algotest (con);
+		else if (!strcmp (test, "RelativeSensitivities"))
+			resetest (con);
+		else if (!strcmp (test, "VDSpiral"))
+			vdspiraltest (con);
+		else
+			internaltest (con);
+		
+		delete con;
 		
 		return 0;
 
@@ -63,66 +73,3 @@ int main (int argc, char** argv) {
 
 
 
-bool init (int argc, char** argv) {
-	
-	cout << endl;
-	cout << "codeare client "         << VERSION                                        << endl;
-#ifdef GIT_COMMIT
-	cout << "Commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
-#endif
-
-	Options *opt = new Options();
-	
-    opt->addUsage  ("Copyright (C) 2010-2012");
-	opt->addUsage  ("Kaveh Vahedipour<k.vahedipour@fz-juelich.de>");
-	opt->addUsage  ("Juelich Research Centre");
-	opt->addUsage  ("Medical Imaging Physics");
-	opt->addUsage  ("");
-	opt->addUsage  ("Usage:");
-	opt->addUsage  ("testclt -n <servicename> -t <test> [OPTIONS]");
-	opt->addUsage  ("");
-	opt->addUsage  (" -n, --name    Remote service name (for example: ReconService)");
-	opt->addUsage  (" -t, --test    Test case (default: DummyRecon. Just connectivity test)");
-	opt->addUsage  (" -v, --verbose Debug level 0-40 (default: 0)");
-	opt->addUsage  (" -b, --base    Base directory of approved files.");
-	opt->addUsage  (" -c, --config  Configuration XML (NuFFT, CGSENSE).");
-	opt->addUsage  (" -d, --data    Incoming binary data in HDF5 format.");
-	opt->addUsage  (" -p, --pulses  Pulses (Only excitation).");
-	opt->addUsage  ("");
-	opt->addUsage  (" -h, --help    Print this help screen"); 
-	opt->addUsage  ("");
-	
-	opt->setFlag   ("help"    ,'h');
-	opt->setFlag   ("remote"  ,'r');
-	opt->setFlag   ("pulses"  ,'p');
-
-	opt->setOption ("name"   , 'n');
-	opt->setOption ("test"   , 't');
-	opt->setOption ("verbose", 'v');
-	opt->setOption ("config" , 'c');
-	opt->setOption ("data"   , 'd');
-	opt->setOption ("base"   , 'b');
-	
-	opt->processCommandArgs(argc, argv);
-
-	remote = opt->getFlag("remote");
-	
-	if ( !(opt->hasOptions()) || opt->getFlag("help") ) {
-		
-		opt->printUsage();
-		delete opt;
-		return 0;
-		
-	} 
-	
-	verbose = (opt->getValue("verbose" ) && atoi(opt->getValue("verbose" )) >= 0 && atoi(opt->getValue("verbose" )) <= 40) ?      opt->getValue("verbose" )  : (char*)"0";
-	name    = (opt->getValue("name"  ) &&      opt->getValue("name"  )  != (char*)"")                                ?      opt->getValue("name"  )  : (char*)"ReconService" ;
-	base    = (opt->getValue("base"  ) &&      opt->getValue("base"  )  != (char*)"")                                ?      opt->getValue("base"  )  : (char*)".";
-	data    = (opt->getValue("data"  )     &&      opt->getValue("data"  )  != (char*)"")                                ?      opt->getValue("data"  )  : (char*)".";
-	config  = (opt->getValue("config"  ) &&      opt->getValue("config"  )  != (char*)"")                                ?      opt->getValue("config"  )  : (char*)".";
-	test    = (opt->getValue("test"  ) &&      opt->getValue("test"  )  != (char*)"")                                ?      opt->getValue("test"  )  : (char*)"DummyRecon";
-	delete opt;
-
-	return true;
-
-}

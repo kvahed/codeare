@@ -86,7 +86,7 @@ public:
 
 #pragma omp parallel default (shared)
 		{
-
+			
 #pragma omp for schedule (guided, 100) 
 			for (size_t i = 0; i < M; i++) {
 				resy (0,i) = -m(0,i,0);
