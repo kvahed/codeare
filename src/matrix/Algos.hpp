@@ -179,7 +179,7 @@ SOS (const Matrix<T>& M, const size_t d) {
  * @return         Squeezed matrix
  */
 template <class T> inline  Matrix<T>
-Squeeze (Matrix<T>& M) {
+squeeze (Matrix<T>& M) {
 	
 	size_t found = 0;
 	
@@ -193,6 +193,8 @@ Squeeze (Matrix<T>& M) {
 		M.Dim(i) = 1;
 		M.Res(i) = 1.0;
 	}
+
+	return M;
 	
 }
 

@@ -44,7 +44,7 @@ using namespace std;
 namespace RRServer {
 	
 	/**
-	 * @brief Servant implementation 
+	 * @brief Servant implementation <br/>
 	 *        Perform duties on remote server
 	 */
 	class ReconServant : 
@@ -72,6 +72,8 @@ namespace RRServer {
 		/**
 		 * @brief      Process startegy (Needs initialisation @see Init)
 		 *
+		 * @see        RRStrategy::ReconStrategy::Process()
+		 *
 		 * @param name Name of library
 		 * @return     Sucess
 		 */
@@ -81,6 +83,8 @@ namespace RRServer {
 		
 		/**
 		 * @brief      Prepare startegy (Needs initialisation @see Init)
+		 *
+		 * @see        RRStrategy::ReconStrategy::Prepare()
 		 *
 		 * @param name Name of library
 		 * @return     Sucess
@@ -92,6 +96,8 @@ namespace RRServer {
 		/**
 		 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
 		 * 
+		 * @see        RRStrategy::ReconStrategy::Init()
+		 *
 		 * @param name Name of processing library
 		 * @return     success
 		 */
@@ -101,6 +107,8 @@ namespace RRServer {
 
 		/**
 		 * @brief     Finalise algorithm
+		 *
+		 * @see        RRStrategy::ReconStrategy::Finalise()
 		 *
 		 * @param name Name of library
 		 */

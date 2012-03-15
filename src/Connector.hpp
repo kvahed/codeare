@@ -69,7 +69,7 @@ public:
 	
 	
 	/**
-	 * @brief 
+	 * @brief      Close connection
 	 */
 	virtual 
 	~Connector () {
@@ -77,8 +77,9 @@ public:
 	}
 
 
-	
-
+	/**
+	 * @brief      Connect
+	 */
 	inline void 
 	Connect() {
 
@@ -89,6 +90,8 @@ public:
 
 	/**
 	 * @brief           Request data procession on remote service
+	 *
+	 *                  @see RRStrategy::ReconStrategy::Process()
 	 *
 	 * @param  name     Recon method
 	 * @return          Error code
@@ -102,6 +105,8 @@ public:
 	/**
 	 * @brief           Prepare backend
 	 *
+	 *                  @see RRStrategy::ReconStrategy::Prepare()
+	 *
 	 * @param  name     Recon method
 	 * @return          Error code
 	 */ 
@@ -113,6 +118,8 @@ public:
 	
 	/**
 	 * @brief           Initialise remote service
+	 *
+	 *                  @see RRStrategy::ReconStrategy::Init()
 	 *
 	 * @param  name     Recon method
 	 * @return          Error code
@@ -126,6 +133,8 @@ public:
 	/**
 	 * @brief           Finalise remote service
 	 *
+	 *                  @see RRStrategy::ReconStrategy::Finalise()
+	 *
 	 * @param  name     Recon method
 	 * @return          Error error
 	 */ 
@@ -138,8 +147,10 @@ public:
 	/**
 	 * @brief           Transmit measurement data to remote service
 	 *
+	 *                  @see Database::SetMatrix
+	 *
 	 * @param  name     Name
-	 * @param  m        Complex data
+	 * @param  m        Matrix
 	 */
 	template <class S> inline void 
 	SetMatrix           (const std::string& name, Matrix<S>& m) const {
@@ -149,6 +160,8 @@ public:
 	
 	/**
 	 * @brief           Retrieve manipulated data from remote service
+	 *
+	 *                  @see Database::GetMatrix
 	 *
 	 * @param  name     Name
 	 * @param  m        Receive storage
@@ -162,6 +175,9 @@ public:
 	/**
 	 * @brief          Read configuration 
 	 *
+	 *                 @see Configurable::ReadConfig(const char* fname)
+	 *                 @see Configurable::ReadConfig(FILE* file)
+	 *
 	 * @param config   Name of input file or file access pointer
 	 */
 	template <class S> inline void 
@@ -172,6 +188,8 @@ public:
 
 	/**
 	 * @brief           Set a string type attribute
+	 *
+	 *                  @see Configurable::SetAttribute
 	 *
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
@@ -185,6 +203,8 @@ public:
 	/**
 	 * @brief           Set a string type attribute
 	 *
+	 *                  @see Configurable::Attribute
+	 *
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
 	 */
@@ -197,6 +217,8 @@ public:
 	/**
 	 * @brief           Get a string type attribute
 	 *
+	 *                  @see Configurable::Attribute
+	 *
 	 * @param  name     Attribute name 
 	 * @return          Attribute value
 	 */
@@ -208,6 +230,8 @@ public:
 	
 	/**
 	 * @brief           Get a text node of an element
+	 *
+	 *                  @see Configurable::GetText
 	 *
 	 * @param  path     X-Path
 	 * @return          Text

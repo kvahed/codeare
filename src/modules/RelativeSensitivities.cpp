@@ -29,18 +29,16 @@ RRSModule::error_code
 RelativeSensitivities::Init        () {
 
     Attribute ("echo_shift", &m_echo_shift);
-	printf ("  Echo shift:? %.4f\n", m_echo_shift);
+	printf ("  dTE[ms]: %.4f\n", m_echo_shift);
     Attribute ("cutoff",     &m_cutoff);
-	printf ("  Cut off:? %.4f\n", m_cutoff);
+	printf ("  Cut off threshold: %.4f\n", m_cutoff);
     Attribute ("use_bet",    &m_use_bet);
-	printf ("  use_bet %i\n", m_use_bet);
+	printf ("  Use FSL bet: %i\n", m_use_bet);
     Attribute ("log_mask",   &m_log_mask);
-	printf ("  Log mask %i\n", m_log_mask);
+	printf ("  Log mask: %i\n", m_log_mask);
 	Attribute ("weigh_maps", &m_weigh_maps);
-	printf ("  Weigh mask %i\n", m_weigh_maps);
+	printf ("  Mask maps: %i\n", m_weigh_maps);
     
-	m_use_bet = 2;
-
     return RRSModule::OK;
 
 }
@@ -58,12 +56,12 @@ RelativeSensitivities::Process     () {
 
     // Squeeze matrices ---------------------------
 
-	Squeeze(data);
-	Squeeze(mask);
-
+	data = squeeze(data);
     printf ("  Data:\n");
     printf ("    Dimensions: %s \n", DimsToCString(data));
     printf ("    Reolutions: %s \n", ResToCString(data));
+
+	mask = squeeze(mask);
     printf ("  Mask:\n");
     printf ("    Dimensions: %s \n", DimsToCString(mask));
     printf ("    Reolutions: %s \n", ResToCString(mask));
@@ -110,6 +108,7 @@ RelativeSensitivities::Process     () {
     } else if (m_use_bet == 2) {
 		
 	    LogMask (snro, m_cutoff);
+		bets = (Matrix<short>) snro;
 		
     } else {
 		

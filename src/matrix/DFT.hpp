@@ -63,11 +63,9 @@ public:
 	
 
 	/**
-	 * @brief        Construct FFTW plans for forward and backward FT with credentials
+	 * @brief        Construct FFTW plans for forward and backward FT
 	 * 
 	 * @param  size  Matrix of side length of the FT range
-	 * @param  mask  K-Space mask (if left empty no mask is applied)
-	 * @param  pc    Phase correction (or target phase)
 	 */
 	DFT         (const Matrix<size_t>& size);
 	
@@ -195,8 +193,9 @@ ifftshift        (const Matrix<T>& m) {
 /**
  * @brief         Hann window
  * 
- * @param   m     TO be shifted
- * @return        Shifted
+ * @param   size  Side lengths
+ * @param   t     Scaling factor
+ * @return        Window
  */
 template <class T> inline static Matrix<T> 
 hannwindow (const Matrix<size_t>& size, const T& t) {
@@ -234,7 +233,7 @@ hannwindow (const Matrix<size_t>& size, const T& t) {
 		
 	}
 	
-	res = Squeeze(res);
+	res = squeeze(res);
 	
 	for (size_t s = 0; s < res.Dim(2); s++)
 		for (size_t r = 0; r < res.Dim(1); r++)

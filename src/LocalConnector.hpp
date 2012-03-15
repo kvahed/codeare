@@ -39,13 +39,12 @@ using namespace RRSModule;
 using namespace RRStrategy;
 
 /**
- * @brief Remote recon client
+ * @brief Recon client
  */
 namespace RRClient {
 	
-class RemoteConnector;
 	/**
-	 * @brief               Remote reconstruction client 
+	 * @brief               Locally connected reconstruction client 
 	 */
 	class LocalConnector : public Configurable, 
 						   public FunctorContainer {
@@ -53,13 +52,20 @@ class RemoteConnector;
 		
 	public:
 		
-
+		/**
+		 * @brief       Default constructor
+		 */
 		LocalConnector () {};
+
+
+		/**
+		 * @brief       Default constructor
+		 */
 		LocalConnector (const char* name, const char* debug) {};
 
 
 		/**
-		 * @brief           Destroy ORB
+		 * @brief       Disconnect
 		 */
 		virtual ~LocalConnector     ();
 		
@@ -88,7 +94,7 @@ class RemoteConnector;
 		 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
 		 * 
 		 * @param name Name of processing library
-		 * @return     success
+		 * @return     Success
 		 */
 		virtual error_code
 		Init           (const char* name);
@@ -98,6 +104,7 @@ class RemoteConnector;
 		 * @brief      Finalise algorithm
 		 *
 		 * @param name Name of processing library
+		 * @return     Success
 		 */
 		virtual error_code
 		Finalise       (const char* name = 0);
@@ -116,7 +123,7 @@ class RemoteConnector;
 		 * @brief Transmit measurement data to remote service
 		 *
 		 * @param  name     Name
-		 * @param  m        Complex data
+		 * @param  m        Data
 		 */
 		template <class T> void 
 		SetMatrix           (const std::string& name, Matrix<T>& m) const {
@@ -144,16 +151,6 @@ class RemoteConnector;
 	private:
 		
 		std::vector<short>  m_rstrats;    /**< Remote reconstruction strategies    */
-		
-		/**
-		 * @brief           Get size from dimensions (Needed internally)
-		 *
-		 * @param  dims     Dimension array from the CORBA types 
-		 * @return          Size
-		 */
-		//long
-		//GetSize             (const longs dims) const { };
-		
 		char*                                m_config;   /**< Serialised XML document  */
 		std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
