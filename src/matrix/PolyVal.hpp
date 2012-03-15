@@ -27,30 +27,37 @@
 
 namespace INTERP {
 
+	/**
+	 * @brief  1D interpolation method
+	 */ 
 	enum Method {
 
-		LINEAR,
-		POLYNOMIAL,
-		CSPLINE,
-		CSPLINE_PERIODIC,
-		AKIMA,
-		AKIMA_PERIODIC
+		LINEAR,           /**< @brief linear */
+		POLYNOMIAL,       /**< @brief polynomial */
+		CSPLINE,          /**< @brief cubic spline */
+		CSPLINE_PERIODIC, /**< @brief cubic spline with peridicity constraint at edges */
+		AKIMA,            /**< @brief akima */
+		AKIMA_PERIODIC    /**< @brief akima with peridocity constraint at edges */
 		
 	};
 
 }
 
 /**
- * @brief    Evaluate polynomial
+ * @brief    Evaluate polynomial (GSL interpolation)
  */
+template <class T>
 class PolyVal {
 	
 public:
-
 	
+	
+	/**
+	 * @brief        Default constructor
+	 */
 	PolyVal () : m_initialised (false) {};
-
-
+	
+	
 	/**
 	 * @brief        Construct
 	 * 
@@ -60,31 +67,17 @@ public:
 	 *
 	 * @return       Success
 	 */ 
-	PolyVal (Matrix<double>& x, Matrix<double>& y, const INTERP::Method intm = INTERP::CSPLINE) {
+	PolyVal (const Matrix<double>& x, const Matrix<T>& y, const INTERP::Method intm) {
 		
-		if (!Initialise (&x[0], &y[0], intm, size(x,0)))
+		m_tmp_i = false;
+		m_tmp   = false;
+
+		if (!Initialise (x.Data(), y.Data(), intm, size(x,0)))
 			printf ("  PolyVal construction failed!\n");
 		
 	}
 	
-	
-	/**
-	 * @brief        Construct
-	 * 
-	 * @param  x     Vector of x (Matrix<double>)
-	 * @param  y     Vector of y(x) (Matrix<double>)
-	 * @param  intm  Interpolation Method (linear, polynomial, [periodic] cubic splice, [periodic] akima)
-	 *
-	 * @return       Success
-	 */ 
-	/*PolyVal (Matrix<double>& x, Matrix<cxdb>& y, const INTERP::Method intm = INTERP::CSPLINE) {
-		
-		if (!Initialise (&x[0], &y[0], intm, size(x,0)))
-			printf ("  PolyVal construction failed!\n");
-		
-			}*/
-	
-	
+
 	/**
 	 * @brief        Construct
 	 * 
@@ -94,12 +87,7 @@ public:
 	 *
 	 * @return       Success
 	 */ 
-	PolyVal (Matrix<double>& x,        double* y, const INTERP::Method intm = INTERP::CSPLINE) {
-		
-		if (!Initialise (&x[0], y, intm, size(x,0)))
-			printf ("  PolyVal construction failed!\n");
-
-	}
+	PolyVal (const Matrix<double>& x, const T* y, const INTERP::Method intm = INTERP::CSPLINE);
 
 
 	/**
@@ -113,6 +101,11 @@ public:
 		if (m_allocated)
 			gsl_interp_accel_free (m_acc);
 
+		if (m_btmp)
+			free (m_tmp);
+		
+		if (m_btmp_i)
+			free (m_tmp_i);
 		
 	}
 
@@ -123,11 +116,8 @@ public:
 	 * @param xx  Point
 	 * @return    Value
 	 */
-	inline double Lookup (const double& xx) const {
-
-		return gsl_spline_eval (m_spline, xx, m_acc);
-
-	}
+	T 
+	Lookup        (const double& xx) const;
 
 
 private:
@@ -137,48 +127,187 @@ private:
 	 * @brief        Initialise 
 	 * 
 	 * @param  x     Vector of x
-	 * @param  y     Vector of y(x)
 	 * @param  intm  Interpolation Mmthod (linear, polynomial, [periodic] cubic splice, [periodic] akima)
 	 * @param  n     Size of x/y(x)
 	 *
 	 * @return       Success
 	 */ 
-	inline bool Initialise (const double* x, const double* y, const INTERP::Method intm, const size_t n) {
+	inline bool Initialise (const double* x, const INTERP::Method& intm, const size_t& n) {
 
-		m_allocated   = false;
-		m_initialised = false;
+		bool cx = (typeid(T) == typeid(cxfl)) || (typeid(T) == typeid(cxdb));
+		
+		m_allocated     = false;
+		m_initialised   = false;		
+		m_allocated_i   = false;
+		m_initialised_i = false;
 		
 		m_acc = gsl_interp_accel_alloc ();
+		if (cx)
+			m_acc_i = gsl_interp_accel_alloc ();
 		
-		switch (intm)
-			{
-			case INTERP::LINEAR:           m_spline = gsl_spline_alloc (gsl_interp_linear,            n); break;
-			case INTERP::POLYNOMIAL: 	   m_spline = gsl_spline_alloc (gsl_interp_polynomial,        n); break;
-			case INTERP::CSPLINE:          m_spline = gsl_spline_alloc (gsl_interp_cspline,           n); break;
-			case INTERP::CSPLINE_PERIODIC: m_spline = gsl_spline_alloc (gsl_interp_cspline_periodic,  n); break;
-			case INTERP::AKIMA:            m_spline = gsl_spline_alloc (gsl_interp_akima,             n); break;
-			case INTERP::AKIMA_PERIODIC:   m_spline = gsl_spline_alloc (gsl_interp_akima_periodic,    n); break;
-			default:                       printf ("GSL: INTERP ERROR - Invalid method.\n"); return false; break;
-			}
-		
+		m_spline = gsl_spline_alloc (InterpMethod(intm), n);
+		if (cx) {
+			m_spline_i    = gsl_spline_alloc (InterpMethod(intm), n);
+			m_allocated_i = true;
+		}
 		m_allocated   = true;
-
-		gsl_spline_init (m_spline, x, y, n);
+		
+		if        (typeid(T) == typeid(double) || typeid(T) == typeid(float)) {
+			gsl_spline_init (m_spline, x, m_tmp, n);
+		} else if (typeid(T) == typeid(cxfl)   || typeid(T) == typeid(cxfl) ) {
+			gsl_spline_init (m_spline, x, m_tmp, n);
+			gsl_spline_init (m_spline_i, x, m_tmp_i, n);
+			m_initialised_i = true;
+		}
 		m_initialised = true;
 
 		return true;
-
+		
 	} 
+	
+
+	const gsl_interp_type* 
+	InterpMethod (const INTERP::Method& im) const {
+		
+		switch (im)
+			{
+			case INTERP::LINEAR:           return gsl_interp_linear;           break;
+			case INTERP::POLYNOMIAL: 	   return gsl_interp_polynomial;      break;
+			case INTERP::CSPLINE:          return gsl_interp_cspline;          break;
+			case INTERP::CSPLINE_PERIODIC: return gsl_interp_cspline_periodic; break;
+			case INTERP::AKIMA:            return gsl_interp_akima;            break;
+			case INTERP::AKIMA_PERIODIC:   return gsl_interp_akima_periodic;   break;
+			}
+		
+		return gsl_interp_cspline;
+		
+	}
 
 
-	bool              m_initialised;
-	bool              m_allocated;
+	bool              m_initialised; /**< @brief Initialised */
+	bool              m_initialised_i; /**< @brief Initialised */
+	bool              m_allocated;   /**< @brief GSL workspace allocated */
+	bool              m_allocated_i;   /**< @brief GSL workspace allocated */
+	bool              m_btmp;         /**< @brief Allocated m_tmp */  
+	bool              m_btmp_i;       /**< @brief Allocated m_tmp_i*/  
+	
+	gsl_interp_accel* m_acc;         /**< @brief Accelerator */
+	gsl_interp_accel* m_acc_i;       /**< @brief Accelerator (for imaginary) */
+	gsl_spline*       m_spline  ;    /**< @brief Spline      */
+	gsl_spline*       m_spline_i;    /**< @brief Spline      (for imaginary) */
 
-	gsl_interp_accel* m_acc;      /**< @brief Accelerator */
-	gsl_interp_accel* m_acc_i;    /**< @brief Accelerator (for imaginary) */
-	gsl_spline*       m_spline  ; /**< @brief Spline      */
-	gsl_spline*       m_spline_i; /**< @brief Spline      (for imaginary) */
+	double* m_tmp;                     /**< @brief real of complex y */ 
+	double* m_tmp_i;                   /**< @brief imaginary of complex y */
 	
 };
+
+
+
+template<>
+PolyVal<cxdb>::PolyVal (const Matrix<double>& x, const cxdb* y, const INTERP::Method intm) {
+
+	size_t nx = 0;
+	
+	m_tmp    = (double*) malloc (nx * sizeof (double));
+	m_tmp_i  = (double*) malloc (nx * sizeof (double));
+	
+	m_btmp   = true;
+	m_btmp_i = true;
+
+	for (size_t i = 0; i < nx; i++) {
+		m_tmp  [i] = y[i].real();
+		m_tmp_i[i] = y[i].imag();
+	}
+	
+	if (!Initialise (x.Data(), intm, nx))
+		printf ("  PolyVal construction failed!\n");
+
+}
+
+
+template<>
+PolyVal<cxfl>::PolyVal (const Matrix<double>& x, const cxfl* y, const INTERP::Method intm) {
+
+	size_t nx = 0;
+	
+	m_tmp    = (double*) malloc (nx * sizeof (double));
+	m_tmp_i  = (double*) malloc (nx * sizeof (double));
+	
+	m_btmp   = true;
+	m_btmp_i = true;
+
+	for (size_t i = 0; i < nx; i++) {
+		m_tmp  [i] = y[i].real();
+		m_tmp_i[i] = y[i].imag();
+	}
+
+	if (!Initialise (x.Data(), intm, nx))
+		printf ("  PolyVal construction failed!\n");
+
+}
+
+
+template<>
+PolyVal<float>::PolyVal (const Matrix<double>& x, const float* y, const INTERP::Method intm) {
+
+	size_t nx = sizeof (x,0);
+
+	m_tmp = (double*) malloc  (nx * sizeof (double));
+	m_btmp = true;
+
+	for (size_t i = 0; i < nx; i++) {
+		m_tmp[i] = y[i];
+	}
+
+	if (!Initialise (x.Data(), intm, nx))
+		printf ("  PolyVal construction failed!\n");
+	
+}
+
+
+template<>
+PolyVal<double>::PolyVal (const Matrix<double>& x, const double* y, const INTERP::Method intm) {
+	
+	size_t nx = sizeof (x,0);
+
+	m_tmp = (double*) malloc  (nx * sizeof (double));
+	m_btmp = true;
+
+	memcpy (m_tmp, y, nx);
+
+	if (!Initialise (x.Data(), intm, nx))
+		printf ("  PolyVal construction failed!\n");
+	
+}
+
+
+template<> inline double 
+PolyVal<double>::Lookup (const double& xx) const {
+
+	return gsl_spline_eval (m_spline, xx, m_acc);
+	
+}
+
+template<> inline float 
+PolyVal<float>::Lookup (const double& xx) const {
+
+	return gsl_spline_eval (m_spline, xx, m_acc);
+	
+}
+
+
+template<> inline cxfl
+PolyVal<cxfl>::Lookup (const double& xx) const {
+
+	return cxfl(gsl_spline_eval (m_spline, xx, m_acc), gsl_spline_eval (m_spline_i, xx, m_acc_i));
+	
+}
+
+template<> inline cxdb
+PolyVal<cxdb>::Lookup (const double& xx) const {
+
+	return cxfl(gsl_spline_eval (m_spline, xx, m_acc), gsl_spline_eval (m_spline_i, xx, m_acc_i));
+	
+}
 
 #endif /*__POLY_VAL_HPP__*/
