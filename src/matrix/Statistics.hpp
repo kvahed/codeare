@@ -27,7 +27,7 @@
 /**
  * @brief     Covariance of columns
  *
- * @param     Matrix of measurements (columns)
+ * @param  m  Matrix of measurements (columns)
  * @return    Covariance
  */
 template <class T> static inline Matrix<T> 

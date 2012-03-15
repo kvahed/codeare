@@ -40,6 +40,9 @@
 using namespace RRSModule;
 using namespace std;
 
+/**
+ * @brief Reconstruction / Manipulation modules
+ */
 namespace RRStrategy {
 
 	/**

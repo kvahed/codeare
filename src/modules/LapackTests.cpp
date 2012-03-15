@@ -23,6 +23,7 @@
 #include "MCGLS.hpp"
 #include "CX.hpp"
 #include "IO.hpp"
+#include "Statistics.hpp"
 
 using namespace RRStrategy;
 
@@ -196,20 +197,18 @@ LapackTests::Process     () {
 	std::cout << "y' :\n" <<  y;
 
 
-	
+	A = Matrix<cxfl>(1000,8);
+	A.Random();
 	std::cout << "dc  :\n" <<  dc;
-	A = GEMM (dc, dc, 'C');
-	std::cout << "A**H A  :\n" <<  A;
+	A = cov (A);
+	std::cout << "cov (A)  :\n" <<  A;
 	A = Cholesky (A);
-	std::cout << "chol (A**H A) :\n" <<  A;
-
-	//cxfl z = DOT (A, A);
-	//std::cout << "sum(A.*A)" <<  z;
+	std::cout << "chol(cov(A)) :\n" <<  A;
 
  #ifdef HAVE_MAT_H
 	
-	MXRead(A, "tmp.mat", "EM");
-	MXRead(b, "tmp.mat", "PA");
+	MXRead(A, "share/common/tmp.mat", "EM");
+	MXRead(b, "share/common/tmp.mat", "PA");
 
 	Matrix<cxfl> x = MCGLS (A, b, 300, 1.0e-6, 1.0);
 	MXDump(x, "x.mat", "x");

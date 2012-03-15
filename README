@@ -3,14 +3,12 @@ This software is a framework for live communication with MRI sequence and
 reconstruction software. It was started on Siemens VB15 line. 
 
 TODO:
-    Cient stubs for more MRI hardware vendors.
-                                                                                                          Macbook Pro 13 2.7GHz Core i7
+Cient stubs for more MRI hardware vendors.
+OK: A lot!
+                                                                           
 TESTS:
-    testclt -b share/grappa/  -c config.xml -t LapackTests
-    testclt -b share/cgsense/ -d exc.h5 -c config_exc.xml -t CGSENSE # (0.196s) 
-    testclt -b share/cgsense/ -d human.h5 -c config_human.xml -t CGSENSE # (3.660s) 
-    testclt -b share/spatialdomain/ -d homogen.h5 -c config_homogen.xml -t KTPoints # (0.4219s)
-    Testclt -b share/nufft/ -d data2.h5 -c config.xml -t NuFFT_OMP
-    testclt -b share/nufft/ -d data2.h5 -c config.xml -t NuFFT
-    testclt -b share/grappa/ -d data.mat -c config.xml -t GRAPPA
-    testclt -b share/compressedsensing/ -d brain512.mat -c config_brain512.xml -t CompressedSensing
+lclient -t LapackTests
+lclient -b share/cgsense/ -d human.h5 -c config_human.xml -t CGSENSE 
+lclient -b share/ktpoints/ -d homogen.h5 -c config_homogen.xml -t KTPoints 
+lclient -b share/nufft/ -d data2.h5 -c config.xml -t NuFFT
+lclient -b share/compressedsensing/ -d brain512.mat -c config_brain512.xml -t CompressedSensing
