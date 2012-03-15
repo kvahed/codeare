@@ -75,7 +75,7 @@ inline double RungeKutta (const double& s, const double& ds, const double& st,
 
 struct SDIn {
 
-	PolyVal *pkx, *pky, *pkz;
+	PolyVal<double> *pkx, *pky, *pkz;
 	Matrix<double> posh, sh;
 	double mgr, msr;
 
@@ -106,9 +106,9 @@ SDOut SDMax (SDIn& si) {
 	Matrix<double>& posh = si.posh;
 	Matrix<double>& sh   = si.sh;
 
-	PolyVal& pkx         = *(si.pkx);
-	PolyVal& pky         = *(si.pky);
-	PolyVal& pkz         = *(si.pkz);
+	PolyVal<double>& pkx = *(si.pkx);
+	PolyVal<double>& pky = *(si.pky);
+	PolyVal<double>& pkz = *(si.pkz);
 
 	size_t ssp = size(posh,0);
 	size_t sss = size(sh  ,0);
@@ -223,9 +223,9 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	SDIn sdin;
 
-	sdin.pkx = new PolyVal (np, (double*)&(s.k)[0],     INTERP::CSPLINE);
-	sdin.pky = new PolyVal (np, (double*)&(s.k)[1*snp], INTERP::CSPLINE);
-	sdin.pkz = new PolyVal (np, (double*)&(s.k)[2*snp], INTERP::CSPLINE);
+	sdin.pkx = new PolyVal<double> (np, (double*)&(s.k)[0],     INTERP::CSPLINE);
+	sdin.pky = new PolyVal<double> (np, (double*)&(s.k)[1*snp], INTERP::CSPLINE);
+	sdin.pkz = new PolyVal<double> (np, (double*)&(s.k)[2*snp], INTERP::CSPLINE);
 
 	printf ("..."); fflush (stdout);
 

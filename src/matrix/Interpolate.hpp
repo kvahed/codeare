@@ -5,6 +5,18 @@
 #include "Access.hpp"
 #include "IO.hpp" 
 
+
+/**
+ * @brief        1D interpolation  (Columnwise)
+ *
+ * @see          PolyVal
+ * 
+ * @param  x     Source
+ * @param  y     Values
+ * @param  xi    Target
+ * @param  intm  Interpolation method (default: INTERP::CSPLINE)
+ * @param  
+ */
 template <class T> inline static Matrix<T>
 interp1 (Matrix<double>& x, Matrix<T>& y, const Matrix<double>& xi, const INTERP::Method& intm = INTERP::CSPLINE) {
 
@@ -15,7 +27,7 @@ interp1 (Matrix<double>& x, Matrix<T>& y, const Matrix<double>& xi, const INTERP
 	Matrix<T> yi (nxi,nd);
 	for (size_t j = 0; j < nd; j++) {
 		
-		PolyVal pv = PolyVal (x, (double*)&y[j*nx], intm);
+		PolyVal<double> pv = PolyVal<double> (x, &y[j*nx], intm);
 		
 		for (size_t i = 0; i < nxi; i++)
 			yi [j * nxi + i] = pv.Lookup (xi[i]); 
