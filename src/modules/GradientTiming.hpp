@@ -192,7 +192,7 @@ SDOut SDMax (SDIn& si) {
 /**
  * @brief       Compute real world k-space / gradient solution with hardware limits
  *
- * @param  p    Parameters
+ * @param gp    Parameters
  * @return      Solution
  */
 Solution ComputeGradient (GradientParams& gp) {

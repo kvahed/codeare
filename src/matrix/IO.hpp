@@ -970,7 +970,7 @@ NIDump (Matrix<T>& M, const string fname) {
 #ifdef HAVE_NIFTI1_IO_H
 		
 		Matrix<T>      tmp = M;
-		Squeeze(tmp);
+		tmp = squeeze(tmp);
 		
 		size_t            l   = fname.length();
 		

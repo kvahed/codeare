@@ -268,14 +268,14 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	Matrix<cxfl> tmp;
 	
 	tmp = mean(imgs,4);
-	tmp = Squeeze(tmp);
+	tmp = squeeze(tmp);
 	
 	size_t nc = tmp.Dim(4);                           // Number of channels
 	size_t np = tmp.Dim(0) * tmp.Dim(1) * tmp.Dim(2); // Number of pixels
 	
 	cxfl   r;
 	
-	double f = GAMMA_1_PER_UT_MS * 2.5e6 / (2*PI);
+	double gdt = GAMMA * dTE;
 	
 #pragma omp parallel default (shared) private (r)
 	{
@@ -286,7 +286,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 			r = cxfl (0.0,0.0);
 			for (int j = 0; j < nc; j++)
 				r += tmp[i + 2*j*np] * conj(tmp[i + (2*j+1)*np]);
-			b0[i]  = arg(r) * f; 
+			b0[i]  = arg(r) * gdt; 
 		}
 		
 	}

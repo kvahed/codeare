@@ -70,12 +70,6 @@ enum IceDim {
 
  
 /**
- * Return absolute value.
- */
-# define ABS(A) (A > 0 ? A : -A)
-
-
-/**
  * Return minimum of two numbers
  */
 # define MAX(A,B) (A > B ? A : B)
@@ -106,7 +100,7 @@ enum IceDim {
 
 // Gamma in Hz
 #ifndef GAMMA
-    #define GAMMA 4.2576e7
+    #define GAMMA 42.576
 #endif
 
 // Gamma in radians

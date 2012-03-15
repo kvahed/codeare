@@ -41,11 +41,11 @@ using namespace RRSModule;
  * @brief Remote recon client
  */
 namespace RRClient {
-	
-class LocalConnector;
 
+	class LocalConnector;
+	
 	/**
-	 * @brief               Remote reconstruction client 
+	 * @brief               Remotely connected reconstruction client 
 	 */
 	class RemoteConnector : public Configurable {
 		
@@ -57,14 +57,34 @@ class LocalConnector;
 		 * @brief           Construct and initialise remote interface
 		 */
 		RemoteConnector         (const char* name, const char* tracelevel);
+
+
+		/**
+		 * @brief           Construct from local connector (i.e. implicit cast)
+		 */
 		RemoteConnector         (const RRClient::LocalConnector&) ;
+
+
+		/**
+		 * @brief           Construct from local connector (i.e. implicit cast)
+		 */
 		RemoteConnector         (const RRClient::LocalConnector*&) ;
+
+
+		/**
+		 * @brief           Construct from local connector (i.e. implicit cast)
+		 */
 		RemoteConnector         (RRClient::LocalConnector&) ;
+
+
+		/**
+		 * @brief           Construct from local connector (i.e. implicit cast)
+		 */
 		RemoteConnector         (RRClient::LocalConnector*&) ;
 		
 		
 		/**
-		 * @brief           Destroy ORB
+		 * @brief           Clean up and destroy ORB
 		 */
 		~RemoteConnector        ();
 		
@@ -72,6 +92,7 @@ class LocalConnector;
  		/**
 		 * @brief           Request data procession on remote service
 		 *
+		 * @see             RRStrategy::ReconStrategy::Process
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
@@ -82,6 +103,7 @@ class LocalConnector;
  		/**
 		 * @brief           Prepare backend
 		 *
+		 * @see             RRStrategy::ReconStrategy::Prepare
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
@@ -92,6 +114,7 @@ class LocalConnector;
  		/**
 		 * @brief           Initialise remote service
 		 *
+		 * @see             RRStrategy::ReconStrategy::Init
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
@@ -102,6 +125,7 @@ class LocalConnector;
  		/**
 		 * @brief           Finalise remote service
 		 *
+		 * @see             RRStrategy::ReconStrategy::Finalise
 		 * @param  name     Recon method
 		 * @return          Error error
 		 */ 
@@ -112,6 +136,7 @@ class LocalConnector;
 		/**
 		 * @brief           Transmit measurement data to remote service
 		 *
+		 * @see             DataBase::SetMatrix
 		 * @param  name     Name
 		 * @param  m        Complex data
 		 */
@@ -122,6 +147,7 @@ class LocalConnector;
 		/**
 		 * @brief           Retrieve manipulated data from remote service
 		 *
+		 * @see             DataBase::GetMatrix
 		 * @param  name     Name
 		 * @param  m        Receive storage
 		 */
@@ -132,8 +158,8 @@ class LocalConnector;
 		
 	private:
 		
-		RRSInterface_var    m_rrsi;       /**< Remote Recon interface               */
-		CORBA::ORB_var      m_orb;        /**< Orb                                  */
+		RRSInterface_var    m_rrsi;       /**< @brief Remote Recon interface               */
+		CORBA::ORB_var      m_orb;        /**< @brief Orb                                  */
 		
 		/**
 		 * @brief           Get size from dimensions (Needed internally)
