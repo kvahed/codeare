@@ -529,7 +529,7 @@ fi
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
-  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -latlas")
+  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -latlas -lblas")
   LIBS=$SAVE_LIBS2
 fi
 

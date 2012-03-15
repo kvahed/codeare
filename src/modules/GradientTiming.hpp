@@ -240,8 +240,6 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	printf (".."); fflush (stdout);
 
-	MXDump (s.g, "s.g.mat", "sg");
-
 	s.g *= (double)ups;
 	
 	sop [0] = 0.0;
