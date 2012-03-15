@@ -13,7 +13,6 @@ AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml -Imisc $(OPENMP_CXXFLAGS)
 # Common sources
 COMMON =  RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc DataBase.hpp DataBase.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp
 
-
 # Reconstruction strategies & server side stuff
 SERVER_SIDE = 
 
@@ -21,7 +20,7 @@ SERVER_SIDE =
 noinst_LTLIBRARIES = libremote.la liblocal.la
 
 # Local client (lclient)
-liblocal_la_SOURCES =  LocalConnector.hpp LocalConnector.cpp testclt.cpp
+liblocal_la_SOURCES = LocalConnector.hpp LocalConnector.cpp testclt.cpp
 liblocal_la_CXXFLAGS = $(AM_CXXFLAGS) -DLOCAL
 lclient_SOURCES = $(COMMON)
 lclient_LDFLAGS = liblocal.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ 
@@ -33,7 +32,6 @@ libremote_la_CXXFLAGS = $(AM_CXXFLAGS) -DREMOTE
 rclient_SOURCES = $(COMMON)
 rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ 
 rclient_DEPENDENCIES = libremote.la
-
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) ReconServant.hpp ReconServant.cpp reconserver.cpp
