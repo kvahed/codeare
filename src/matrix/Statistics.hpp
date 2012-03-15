@@ -25,6 +25,27 @@
 #include "Algos.hpp"
 
 /**
+ * @brief      Mean reducing a dimension
+ *
+ * @param  M   Matrix
+ * @param  d   Dimension
+ * @return     Average of M reducing d matrix
+ */
+template <class T> static inline Matrix<T>
+mean (const Matrix<T>& M, const size_t& d) {
+	
+	Matrix<T> res  = M;
+	float     quot = (float) res.Dim(d);
+		
+	res = Sum (res, d);
+	
+	return res / quot;
+	
+}
+
+
+
+/**
  * @brief     Covariance of columns
  *
  * @param  m  Matrix of measurements (columns)
@@ -51,30 +72,9 @@ cov (const Matrix<T>& m) {
 		
 	}	
 
-	return (tmp.prodt(tmp)) / (double)(mm-1);
+	return (GEMM(tmp, tmp, 'C') / (double)(mm-1));
 
 }
-
-
-/**
- * @brief      Mean reducing a dimension
- *
- * @param  M   Matrix
- * @param  d   Dimension
- * @return     Average of M reducing d matrix
- */
-template <class T> static inline Matrix<T>
-mean (const Matrix<T>& M, const size_t& d) {
-	
-	Matrix<T> res  = M;
-	float     quot = (float) res.Dim(d);
-		
-	res = Sum (res, d);
-	
-	return res / quot;
-	
-}
-
 
 
 

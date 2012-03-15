@@ -105,7 +105,8 @@ extern "C" {
 
 	/**
 	 * @brief         Eigenvalue decomposition
-	 *                Eigenvalue decomposition with Lapack routines Xgeev
+	 * 
+	 * @see           LAPACK driver xGEEV
 	 *
 	 * @param  m      Matrix for decomposition
 	 * @param  ev     Eigenvalues
@@ -113,7 +114,7 @@ extern "C" {
 	 * @param  rv     Right Eigen-vectors
 	 * @param  jobvl  Compute left vectors ('N'/'V')
 	 * @param  jobvr  Compute right vectors ('N'/'V')
-	 * @return        Eigen values
+	 * @return        Status of driver
 	 */
 	template <class T, class S> int
 	EIG (Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, char jobvl = 'N', char jobvr = 'N') {
@@ -212,446 +213,520 @@ extern "C" {
 	}
 	
 
-	template<class T, class S> int 
-	SVD (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
-		
-		Matrix<T> A (IN);
+/**
+ * @brief           Singular value decomposition
+ *
+ * @see             LAPACK driver xGESDD
+ * 
+ * @param  IN       Incoming matrix
+ * @param  s        Sorted singular values 
+ * @param  U        Left-side singlar vectors
+ * @param  V        Right-side singular vectors
+ * @param  jobz     Computation mode<br>
+ *                  'A': all m columns of U and all n rows of VT are returned in the arrays u and vt<br/>
+ *                  'S', the first min(m, n) columns of U and the first min(m, n) rows of VT are returned in the arrays u and vt;</br>
+ *                  'O', then<br/>
+ *                  &nbsp;&nbsp;&nbsp;&nbsp;if m >= n, the first n columns of U are overwritten in the array a and all rows of VT are returned in the array vt;<br/>
+ *                  &nbsp;&nbsp;&nbsp;&nbsp;if m < n, all columns of U are returned in the array u and the first m rows of VT are overwritten in the array a;<br/>
+ *                  'N', no columns of U or rows of VT are computed.
+ * @return          Status of the driver
+ */
 
-		// SVD only defined on 2D data
-		if (!Is2D(A))
-			return -2;
-
-		int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vcol = 1;
-		T     wopt;
-		void* rwork;
-
-		m     =  A.Height();
-		n     =  A.Width();
-		lwork = -1;
-		info  =  0;
-		lda   =  m;
-		mn    =  MIN(m,n);
-
-		if    (((jobz == 'A' || jobz == 'O') && m < n)) 
-			ucol = m;
-		else if (jobz == 'S')
-			ucol = mn;
-
-		if      (jobz == 'S' || jobz == 'A' || (jobz == 'O' &&  m < n)) 
-			ldu = m;
-
-		if      (jobz == 'A' || (jobz == 'O' && m >= n))
-			ldvt = n;
-		else if (jobz == 'S')
-			ldvt = mn;
-
-		if      (jobz != 'N')
-			vcol = n;
-
-		s.Resize (mn,1);
-		U.Resize (ldu,ucol);
-		V.Resize (ldvt,vcol);
-
-		int*   iwork =   (int*) malloc (8 * mn * sizeof(int));
-		
-		// Only needed for complex data
-		if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) {
-			if (jobz == 'N') rwork = malloc (mn * 7            * sizeof(T) / 2);
-			else             rwork = malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
-		}
-		
-		// Workspace query
-		if      (typeid(T) == typeid(cxfl))
-			cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
-		else if (typeid(T) == typeid(cxdb))
-			zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
-		else if (typeid(T) == typeid(double))
-			dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
-		else if (typeid(T) == typeid(float))
-			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
-		
-		// Resize work according to ws query
-		lwork   = (int) creal (wopt);
-		T* work = (T*) malloc (lwork * sizeof(T));
-		
-		//SVD
-		if      (typeid(T) == typeid(cxfl))
-			cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
-		else if (typeid(T) == typeid(cxdb))
-			zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
-		else if (typeid(T) == typeid(double))
-			dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
-		else if (typeid(T) == typeid(float))
-			sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
-
-		V = !V;
-
-		// Clean up
-		if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) 
-			free (rwork);
-
-		free (work);
-		free (iwork);
-		
-		if (info > 0)
-			printf ("\nERROR - XGESDD: The updating process of SBDSDC did not converge.\n\n");
-		else if (info < 0)
-			printf ("\nERROR - XGESDD: The %i-th argument had an illegal value.\n\n", -info); 
-		
-		return info;
-		
-	} 
+template<class T, class S> int 
+SVD (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
 	
-
-	template <class T> Matrix<T> 
-	inv (const Matrix<T>& m) {
-		
-		// 2D 
-		if (!Is2D(m))               printf ("Inv Error: Parameter m must be 2D");
-
-		// Square matrix
-		if (m.Width() != m.Height()) printf ("Inv Error: Parameter m must be square");
-		
-		Matrix<T> res = m;
-		
-		int  N    = m.Height();
-		int  info = 0;
-		int *ipiv = (int*) malloc (N * sizeof(int));
-
-		// LQ Factorisation -------------------
-
-		if      (typeid (T) == typeid (cxfl))   cgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-		else if (typeid (T) == typeid (cxdb))   zgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-		else if (typeid (T) == typeid (double)) dgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-		else if (typeid (T) == typeid (float))  sgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-		// ------------------------------------
-
-		if (info < 0)
-			printf ("\nERROR - DPOTRI: the %i-th argument had an illegal value.\n\n", -info);
-		else if (info > 1)
-			printf ("\nERROR - DPOTRI: the (%i,%i) element of the factor U or L is\n zero, and the inverse could not be computed.\n\n", info, info);
-		
-		int lwork = -1; 
-		T   wopt;
-		
-		// Workspace determination ------------
-		
-		if      (typeid (T) == typeid (cxfl))   cgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
-		else if (typeid (T) == typeid (cxdb))   zgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
-		else if (typeid (T) == typeid (double)) dgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
-		else if (typeid (T) == typeid (float))  sgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
-		// ------------------------------------
-
-		// Work memory allocation -------------
+	Matrix<T> A (IN);
 	
-		lwork   = (int) creal (wopt);
-		T* work = (T*) malloc (lwork * sizeof(T));
-		// ------------------------------------
-
-		// Inversion --------------------------
-
-		if      (typeid (T) == typeid (cxfl))   cgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		else if (typeid (T) == typeid (cxdb))   zgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		else if (typeid (T) == typeid (double)) dgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		else if (typeid (T) == typeid (float))  sgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-		// ------------------------------------
-		
-		free (ipiv);
-		free (work);
-
-		if (info < 0)
-			printf ("\nERROR - XGETRI: The %i-th argument had an illegal value.\n\n", -info);
-		else if (info > 0)
-			printf ("\nERROR - XGETRI: The leading minor of order %i is not\n positive definite, and the factorization could not be\n completed.", info);
-		
-		return res;
-		
-	} 
-
-
-
-	template<class T> Matrix<T> 
-	Pinv (Matrix<T>& m, double rcond = 1.0) {
-
-		void *s, *rwork;
-		T    *work, wopt, rwopt;
-		int  *iwork, iwopt;
-		
-		int  M      =  m.Height();
-		int  N      =  m.Width();
-
-		int  nrhs   =  M;
-		int  lda    =  M;
-		int  ldb    =  MAX(M,N);
-		int  lwork  = -1; 
-		int  rank   =  0;
-		int  info   =  0;
-		int  swork  =  sizeof(T) * MIN(M,N);
-		
-		if (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
-			swork /= 2;
-
-		s      =        malloc (swork);
-
-		Matrix<T> b =  Matrix<T>::Id(ldb);
-		
-		float frcond  = rcond;
-		
-		if      (typeid(T) == typeid(cxfl))
-			cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
-		else if (typeid(T) == typeid(cxdb))
-			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
-		else if (typeid(T) == typeid(double))
-			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork,         &iwopt, &info);
-		else if (typeid(T) == typeid(float))
-			sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork,         &iwopt, &info);
-		
-		lwork = (int) creal(wopt);
-
-		if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
-			rwork =    malloc ((sizeof(T)/2) * (int) creal(rwopt));
-		
-		iwork = (int*) malloc (sizeof(int) * iwopt);
-		work  = (T*)   malloc (sizeof(T) * lwork);
-		
-		if (typeid(T) == typeid(cxfl))
-			cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
-		else if (typeid(T) == typeid(cxdb))
-			zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork, rwork, iwork, &info);
-		else if (typeid(T) == typeid(double))
-			dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork,        iwork, &info);
-		else if (typeid(T) == typeid(float))
-			sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
-
-		if (M > N)
-			for (size_t i = 0; i < M; i++)
-				memcpy (&b[i*N], &b[i*M], N * sizeof(T));
-
-		b.Resize(N,M);
-		
-		if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
-			free (rwork);
-
-		free (s);
-		free (work);
-		free (iwork);
-
-		if (info > 0)
-			printf ("ERROR XGELSD: the algorithm for computing the SVD failed to converge;\n %i off-diagonal elements of an intermediate bidiagonal form\n did not converge to zero.", info);
-		else if (info < 0)
-			printf ("ERROR XGELSD: the %i-th argument had an illegal value.", -info);
-		
-		return b;
-		
+	// SVD only defined on 2D data
+	if (!Is2D(A))
+		return -2;
+	
+	int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vcol = 1;
+	T     wopt;
+	void* rwork;
+	
+	m     =  A.Height();
+	n     =  A.Width();
+	lwork = -1;
+	info  =  0;
+	lda   =  m;
+	mn    =  MIN(m,n);
+	
+	if    (((jobz == 'A' || jobz == 'O') && m < n)) 
+		ucol = m;
+	else if (jobz == 'S')
+		ucol = mn;
+	
+	if      (jobz == 'S' || jobz == 'A' || (jobz == 'O' &&  m < n)) 
+		ldu = m;
+	
+	if      (jobz == 'A' || (jobz == 'O' && m >= n))
+		ldvt = n;
+	else if (jobz == 'S')
+		ldvt = mn;
+	
+	if      (jobz != 'N')
+		vcol = n;
+	
+	s.Resize (mn,1);
+	U.Resize (ldu,ucol);
+	V.Resize (ldvt,vcol);
+	
+	int*   iwork =   (int*) malloc (8 * mn * sizeof(int));
+	
+	// Only needed for complex data
+	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) {
+		if (jobz == 'N') rwork = malloc (mn * 7            * sizeof(T) / 2);
+		else             rwork = malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
 	}
 	
+	// Workspace query
+	if      (typeid(T) == typeid(cxfl))
+		cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+	else if (typeid(T) == typeid(cxdb))
+		zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+	else if (typeid(T) == typeid(double))
+		dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+	else if (typeid(T) == typeid(float))
+		sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
 	
-	template<class T> Matrix<T> 
-	Cholesky (Matrix<T>& A, const char uplo = 'U') {
-		
-		Matrix<T> res  = A;
-		int       info = 0, n = A.Height();
-		
-		if      (typeid(T) == typeid(double)) dpotrf_ (&uplo, &n, &res[0], &n, &info);
-		else if (typeid(T) == typeid(float))  spotrf_ (&uplo, &n, &res[0], &n, &info);
-		else if (typeid(T) == typeid(cxdb))   zpotrf_ (&uplo, &n, &res[0], &n, &info);
-		else if (typeid(T) == typeid(cxfl))   cpotrf_ (&uplo, &n, &res[0], &n, &info);
-		
-		if (info > 0)
-			printf ("\nERROR - XPOTRF: the leading minor of order %i is not\n positive definite, and the factorization could not be\n completed!\n\n", info);
-		else if (info < 0)
-			printf ("\nERROR - XPOTRF: the %i-th argument had an illegal value.\n\n!", -info); 
-		
-		return res;
-		
-	}
+	// Resize work according to ws query
+	lwork   = (int) creal (wopt);
+	T* work = (T*) malloc (lwork * sizeof(T));
+	
+	//SVD
+	if      (typeid(T) == typeid(cxfl))
+		cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+	else if (typeid(T) == typeid(cxdb))
+		zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+	else if (typeid(T) == typeid(double))
+		dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+	else if (typeid(T) == typeid(float))
+		sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+	
+	V = !V;
+	
+	// Clean up
+	if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) 
+		free (rwork);
+	
+	free (work);
+	free (iwork);
+	
+	if (info > 0)
+		printf ("\nERROR - XGESDD: The updating process of SBDSDC did not converge.\n\n");
+	else if (info < 0)
+		printf ("\nERROR - XGESDD: The %i-th argument had an illegal value.\n\n", -info); 
+	
+	return info;
+	
+} 
 	
 
+
+/**
+ * @brief                Invert quadratic well conditioned matrix
+ *
+ * @see                  Lapack xGETRF/xGETRI
+ * 
+ * @param  m             Matrix
+ * @return               Inverse
+*/
+template <class T> Matrix<T> 
+inv (const Matrix<T>& m) {
+	
+	// 2D 
+	if (!Is2D(m))               printf ("Inv Error: Parameter m must be 2D");
+	
+	// Square matrix
+	if (m.Width() != m.Height()) printf ("Inv Error: Parameter m must be square");
+	
+	Matrix<T> res = m;
+	
+	int  N    = m.Height();
+	int  info = 0;
+	int *ipiv = (int*) malloc (N * sizeof(int));
+	
+	// LQ Factorisation -------------------
+	
+	if      (typeid (T) == typeid (cxfl))   cgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
+	else if (typeid (T) == typeid (cxdb))   zgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
+	else if (typeid (T) == typeid (double)) dgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
+	else if (typeid (T) == typeid (float))  sgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
+	// ------------------------------------
+	
+	if (info < 0)
+		printf ("\nERROR - DPOTRI: the %i-th argument had an illegal value.\n\n", -info);
+	else if (info > 1)
+		printf ("\nERROR - DPOTRI: the (%i,%i) element of the factor U or L is\n zero, and the inverse could not be computed.\n\n", info, info);
+	
+	int lwork = -1; 
+	T   wopt;
+	
+	// Workspace determination ------------
+	
+	if      (typeid (T) == typeid (cxfl))   cgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
+	else if (typeid (T) == typeid (cxdb))   zgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
+	else if (typeid (T) == typeid (double)) dgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
+	else if (typeid (T) == typeid (float))  sgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
+	// ------------------------------------
+	
+	// Work memory allocation -------------
+	
+	lwork   = (int) creal (wopt);
+	T* work = (T*) malloc (lwork * sizeof(T));
+	// ------------------------------------
+	
+	// Inversion --------------------------
+	
+	if      (typeid (T) == typeid (cxfl))   cgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
+	else if (typeid (T) == typeid (cxdb))   zgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
+	else if (typeid (T) == typeid (double)) dgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
+	else if (typeid (T) == typeid (float))  sgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
+	// ------------------------------------
+	
+	free (ipiv);
+	free (work);
+	
+	if (info < 0)
+		printf ("\nERROR - XGETRI: The %i-th argument had an illegal value.\n\n", -info);
+	else if (info > 0)
+		printf ("\nERROR - XGETRI: The leading minor of order %i is not\n positive definite, and the factorization could not be\n completed.", info);
+	
+	return res;
+	
+} 
+
+
+/**
+ * @brief                Pseudo invert though SVD
+ * 
+ * @see                  LAPACK driver xGELSD
+ * 
+ * @param  m             Matrix
+ * @param  rcond         Condition number
+ * @return               Moore-Penrose pseudoinverse
+*/
+template<class T> Matrix<T> 
+Pinv (Matrix<T>& m, double rcond = 1.0) {
+	
+	void *s, *rwork;
+	T    *work, wopt, rwopt;
+	int  *iwork, iwopt;
+	
+	int  M      =  m.Height();
+	int  N      =  m.Width();
+	
+	int  nrhs   =  M;
+	int  lda    =  M;
+	int  ldb    =  MAX(M,N);
+	int  lwork  = -1; 
+	int  rank   =  0;
+	int  info   =  0;
+	int  swork  =  sizeof(T) * MIN(M,N);
+	
+	if (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
+		swork /= 2;
+	
+	s      =        malloc (swork);
+	
+	Matrix<T> b =  Matrix<T>::Id(ldb);
+	
+	float frcond  = rcond;
+	
+	if      (typeid(T) == typeid(cxfl))
+		cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
+	else if (typeid(T) == typeid(cxdb))
+		zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
+	else if (typeid(T) == typeid(double))
+		dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork,         &iwopt, &info);
+	else if (typeid(T) == typeid(float))
+		sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork,         &iwopt, &info);
+	
+	lwork = (int) creal(wopt);
+	
+	if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
+		rwork =    malloc ((sizeof(T)/2) * (int) creal(rwopt));
+	
+	iwork = (int*) malloc (sizeof(int) * iwopt);
+	work  = (T*)   malloc (sizeof(T) * lwork);
+	
+	if (typeid(T) == typeid(cxfl))
+		cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
+	else if (typeid(T) == typeid(cxdb))
+		zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork, rwork, iwork, &info);
+	else if (typeid(T) == typeid(double))
+		dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork,        iwork, &info);
+	else if (typeid(T) == typeid(float))
+		sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
+	
+	if (M > N)
+		for (size_t i = 0; i < M; i++)
+			memcpy (&b[i*N], &b[i*M], N * sizeof(T));
+	
+	b.Resize(N,M);
+	
+	if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
+		free (rwork);
+	
+	free (s);
+	free (work);
+	free (iwork);
+	
+	if (info > 0)
+		printf ("ERROR XGELSD: the algorithm for computing the SVD failed to converge;\n %i off-diagonal elements of an intermediate bidiagonal form\n did not converge to zero.", info);
+	else if (info < 0)
+		printf ("ERROR XGELSD: the %i-th argument had an illegal value.", -info);
+	
+	return b;
+	
+}
+	
+	
+/**
+ * @brief        Cholesky decomposition of positive definite quadratic matrix
+ *
+ * @see          LAPACK driver xPOTRF
+ * 
+ * @param  A     Incoming matrix
+ * @param  U     Use upper/lower triangle for decomposition ('U': default/'L')
+ * @return       Cholesky decomposition
+ */
+template<class T> Matrix<T> 
+Cholesky (Matrix<T>& A, const char uplo = 'U') {
+	
+	Matrix<T> res  = A;
+	int       info = 0, n = A.Height();
+	
+	if      (typeid(T) == typeid(double)) dpotrf_ (&uplo, &n, &res[0], &n, &info);
+	else if (typeid(T) == typeid(float))  spotrf_ (&uplo, &n, &res[0], &n, &info);
+	else if (typeid(T) == typeid(cxdb))   zpotrf_ (&uplo, &n, &res[0], &n, &info);
+	else if (typeid(T) == typeid(cxfl))   cpotrf_ (&uplo, &n, &res[0], &n, &info);
+	
+	if (info > 0)
+		printf ("\nERROR - XPOTRF: the leading minor of order %i is not\n positive definite, and the factorization could not be\n completed!\n\n", info);
+	else if (info < 0)
+		printf ("\nERROR - XPOTRF: the %i-th argument had an illegal value.\n\n!", -info); 
+	
+	return res;
+	
+}
+
+
+/**
+ * @brief        Cholesky decomposition of positive definite quadratic matrix
+ *
+ * @see          Cholesky
+ */
 template<class T> static Matrix<T> chol (Matrix<T>& A, const char uplo = 'U') {
 	
 	return Cholesky(A, uplo);
 	
 }
 
-	template<class T> Matrix<T> 
-	GEMM (Matrix<T>& A, Matrix<T>& B, char transa = 'N', char transb = 'N') {
-		
-		int aw = (int)A.Width(), ah = (int)A.Height(), bw = (int)B.Width(), bh = (int)B.Height();
-		
-		if      ( transa == 'N'                   &&  transb == 'N'                  ) assert (aw == bh);
-		else if ( transa == 'N'                   && (transb == 'T' || transb == 'C')) assert (aw == bw);
-		else if ((transa == 'T' || transa == 'C') &&  transb == 'N'                  ) assert (ah == bh);
-		else if ((transa == 'T' || transa == 'C') && (transb == 'T' || transb == 'C')) assert (ah == bw);
-		
-		int m, n, k, ldc, cm, cn;
-		
-		if (transa == 'N') {
-			m   = (int) ah;
-			k   = (int) aw;
-		} else if (transa == 'T' || transa == 'C') {
-			m   = (int) aw;
-			k   = (int) ah;
-		}
 
-		if (transb == 'N')
-			n   = (int) bw;
-		else if (transb == 'T' || transb == 'C')
-			n   = (int) bh;
-		
-		ldc = m;
-
-		T    alpha  =       T(1.0);
-		T    beta   =       T(0.0);
-		
-		Matrix<T> C  (m, n);
-		
-		if      (typeid(T) == typeid(double))
-			dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
-		else if (typeid(T) == typeid(float))
-			sgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
-		else if (typeid(T) == typeid(cxfl))
-			cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
-		else if (typeid(T) == typeid(cxdb))
-			zgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
-		
-		return C;
-		
-	}
-
-
-	template<class T> T
-	Norm (Matrix<T>& M) {
-		
-		T   res  = T(0);
-		
-		int n    = (int) M.Size();
-		int incx = 1;
-		
-		if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, &M[0], incx);
-		else if (typeid(T) == typeid(  cxdb)) res = cblas_dznrm2 (n, &M[0], incx);
-		else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, &M[0], incx);
-		else if (typeid(T) == typeid( float)) res = cblas_snrm2  (n, &M[0], incx);
-		else {
-			for (int i = 0; i < M.Size(); i++)
-				res += pow(M[i],2.0);
-			sqrt (res);
-		}
-		
-		return res;
+/**
+ * @brief          Matrix matrix multiplication
+ *
+ * @see            BLAS routine xGEMM
+ *
+ * @param  A       Left factor
+ * @param  B       Right factor
+ * @param  transa  (N: A*... | T: A.'*... | C: A'*...) transpose left factor
+ * @param  transb  (N: ...*B | T: ...*B.' | C: ...*B') transpose right factor
+ * @return         Product
+ */
+template<class T> Matrix<T> 
+GEMM (Matrix<T>& A, Matrix<T>& B, char transa = 'N', char transb = 'N') {
 	
-	}
-
-
-
-	template <class T> T 
-	DOTC (Matrix<T>& A, Matrix<T>& B) {
-
-		int n    = (int) A.Size();
-
-		assert (n == B.Size());
-
-		T   res  = T(0.0);
-		int one = 1;
-		
-		if      (typeid(T) == typeid(cxfl)) cblas_cdotc_sub (n, &A[0], one, &B[0], one, &res);
-		else if (typeid(T) == typeid(cxdb)) cblas_zdotc_sub (n, &A[0], one, &B[0], one, &res);
-		
-		return res;
-		
-	}
-
-
-	template <class T> T 
-	DOTU (Matrix<T>& A, Matrix<T>& B) {
-		
-		int n    = (int) A.Size();
-
-		assert (n == B.Size());
-
-		T   res  = T(0.0);
-		int one  = 1;
-		
-		if      (typeid(T) == typeid(cxfl)) cblas_cdotu_sub (n, &A[0], one, &B[0], one, &res);
-		else if (typeid(T) == typeid(cxdb)) cblas_zdotu_sub (n, &A[0], one, &B[0], one, &res);
-		
-		return res;
-
-	}
-
-
-	template <class T> T 
-	DOT  (Matrix<T>& A, Matrix<T>& B) {
-
-		int n    = (int) A.Size();
-
-		assert (n == B.Size());
-
-		T   res  = T(0.0);
-		int one  = 1;
-		
-		if      (typeid(T) == typeid(cxfl))   cblas_cdotu_sub (n, &A[0], one, &B[0], one, &res);
-		else if (typeid(T) == typeid(cxdb))   cblas_zdotu_sub (n, &A[0], one, &B[0], one, &res);
-		else if (typeid(T) == typeid(double)) cblas_ddot_sub  (n, &A[0], one, &B[0], one, &res);
-		else if (typeid(T) == typeid(float))  cblas_sdot_sub  (n, &A[0], one, &B[0], one, &res);
-		
-		return res;
-		
-	}
-
-
-	template<class T> Matrix<T> 
-	GEMV (Matrix<T>& A, Matrix<T>& x, char trans = 'N') {
-
-		assert (x.Width() == 1);
-		
-		int aw = (int) A.Width(), ah = (int) A.Height(), xh = (int) x.Height();
-
-		int m = ah, n = aw, one = 1;
-		
-		if (trans == 'N')
-			assert (aw == xh);
-		else if (trans == 'T' || trans == 'C')
-			assert (ah == xh);
-		
-		T    alpha  = T(1.0);
-		T    beta   = T(0.0);
-		
-		Matrix<T> y ((trans == 'N') ? m : n, 1);
-		
-		if      (typeid(T) == typeid(double)) dgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
-		else if (typeid(T) == typeid(float))  sgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
-		else if (typeid(T) == typeid(cxfl))   cgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
-		else if (typeid(T) == typeid(cxdb))   zgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
-
-		return y;
-		
+	int aw = (int)A.Width(), ah = (int)A.Height(), bw = (int)B.Width(), bh = (int)B.Height();
+	
+	if      ( transa == 'N'                   &&  transb == 'N'                  ) assert (aw == bh);
+	else if ( transa == 'N'                   && (transb == 'T' || transb == 'C')) assert (aw == bw);
+	else if ((transa == 'T' || transa == 'C') &&  transb == 'N'                  ) assert (ah == bh);
+	else if ((transa == 'T' || transa == 'C') && (transb == 'T' || transb == 'C')) assert (ah == bw);
+	
+	int m, n, k, ldc, cm, cn;
+	
+	if (transa == 'N') {
+		m   = (int) ah;
+		k   = (int) aw;
+	} else if (transa == 'T' || transa == 'C') {
+		m   = (int) aw;
+		k   = (int) ah;
 	}
 	
+	if (transb == 'N')
+		n   = (int) bw;
+	else if (transb == 'T' || transb == 'C')
+		n   = (int) bh;
+	
+	ldc = m;
+	
+	T    alpha  =       T(1.0);
+	T    beta   =       T(0.0);
+	
+	Matrix<T> C  (m, n);
+	
+	if      (typeid(T) == typeid(double))
+		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
+	else if (typeid(T) == typeid(float))
+		sgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
+	else if (typeid(T) == typeid(cxfl))
+		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
+	else if (typeid(T) == typeid(cxdb))
+		zgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
+	
+	return C;
+	
+}
 
-	template <class T> T
-	DOT (Matrix<T>& x, Matrix<T>& y, bool cnj = false) {
 
-		T res;
 
-		int nx = x.Size(), ny = y.Size(), one = 1;
-
-		assert (nx == ny);
-
-		if        (typeid(T) == typeid(double)) {
-			res          = ddot_  (&nx, &x[0], &one, &y[0], &one);
-		} else if (typeid(T) == typeid(float))  {
-			res          = sdot_  (&nx, &x[0], &one, &y[0], &one);
-		} else if (typeid(T) == typeid(cxfl))   { 
-			if (cnj) res = cdotu_ (&nx, &x[0], &one, &y[0], &one);
-			else     res = cdotc_ (&nx, &x[0], &one, &y[0], &one);
-		} else if (typeid(T) == typeid(cxdb))   {
-			if (cnj) res = zdotu_ (&nx, &x[0], &one, &y[0], &one);
-			else     res = zdotc_ (&nx, &x[0], &one, &y[0], &one);
-		}
-
-		return res;
-
+/**
+ * @brief              Eclidean norm
+ *
+ * @param  M           Input
+ * @return             Eclidean norm
+ */
+template<class T> T
+Norm (Matrix<T>& M) {
+	
+	T   res  = T(0);
+	
+	int n    = (int) M.Size();
+	int incx = 1;
+	
+	if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, &M[0], incx);
+	else if (typeid(T) == typeid(  cxdb)) res = cblas_dznrm2 (n, &M[0], incx);
+	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, &M[0], incx);
+	else if (typeid(T) == typeid( float)) res = cblas_snrm2  (n, &M[0], incx);
+	else {
+		for (int i = 0; i < M.Size(); i++)
+			res += pow(M[i],2.0);
+		sqrt (res);
 	}
+	
+	return res;
+	
+}
+
+
+
+/**
+ * @brief              Complex dot product (A'*B) on data vector
+ *
+ * @param  A           Left factor (is conjugated)
+ * @param  B           Right factor 
+ * @return             A'*B
+ */
+template <class T> T 
+DOTC (Matrix<T>& A, Matrix<T>& B) {
+	
+	int n    = (int) A.Size();
+	
+	assert (n == B.Size());
+	
+	T   res  = T(0.0);
+	int one = 1;
+	
+	if      (typeid(T) == typeid(cxfl)) cblas_cdotc_sub (n, &A[0], one, &B[0], one, &res);
+	else if (typeid(T) == typeid(cxdb)) cblas_zdotc_sub (n, &A[0], one, &B[0], one, &res);
+	
+	return res;
+	
+}
+
+
+
+/**
+ * @brief              Complex dot product (A*B) on data vector
+ *
+ * @param  A           Left factor
+ * @param  B           Right factor 
+ * @return             A*B
+ */
+template <class T> T 
+DOTU (Matrix<T>& A, Matrix<T>& B) {
+	
+	int n    = (int) A.Size();
+	
+	assert (n == B.Size());
+	
+	T   res  = T(0.0);
+	int one  = 1;
+	
+	if      (typeid(T) == typeid(cxfl)) cblas_cdotu_sub (n, &A[0], one, &B[0], one, &res);
+	else if (typeid(T) == typeid(cxdb)) cblas_zdotu_sub (n, &A[0], one, &B[0], one, &res);
+	
+	return res;
+	
+}
+
+
+/**
+ * @brief              Dot product (A*B) on data vector
+ *
+ * @param  A           Left factor
+ * @param  B           Right factor 
+ * @return             A*B
+ */
+template <class T> T 
+DOT  (Matrix<T>& A, Matrix<T>& B) {
+	
+	int n    = (int) A.Size();
+	
+	assert (n == B.Size());
+	
+	T   res  = T(0.0);
+	int one  = 1;
+	
+	if      (typeid(T) == typeid(cxfl))   cblas_cdotu_sub (n, &A[0], one, &B[0], one, &res);
+	else if (typeid(T) == typeid(cxdb))   cblas_zdotu_sub (n, &A[0], one, &B[0], one, &res);
+	else if (typeid(T) == typeid(double)) cblas_ddot_sub  (n, &A[0], one, &B[0], one, &res);
+	else if (typeid(T) == typeid(float))  cblas_sdot_sub  (n, &A[0], one, &B[0], one, &res);
+	
+	return res;
+	
+}
+
+
+
+/**
+ * @brief             Matrix vector product A*x
+ *
+ * @param  A          left factor matrix
+ * @param  x          Right factor vector
+ * 
+ * @return            A*x
+ */
+template<class T> Matrix<T> 
+GEMV (Matrix<T>& A, Matrix<T>& x, char trans = 'N') {
+	
+	assert (x.Width() == 1);
+	
+	int aw = (int) A.Width(), ah = (int) A.Height(), xh = (int) x.Height();
+	
+	int m = ah, n = aw, one = 1;
+	
+	if (trans == 'N')
+		assert (aw == xh);
+	else if (trans == 'T' || trans == 'C')
+		assert (ah == xh);
+	
+	T    alpha  = T(1.0);
+	T    beta   = T(0.0);
+	
+	Matrix<T> y ((trans == 'N') ? m : n, 1);
+	
+	if      (typeid(T) == typeid(double)) dgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
+	else if (typeid(T) == typeid(float))  sgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
+	else if (typeid(T) == typeid(cxfl))   cgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
+	else if (typeid(T) == typeid(cxdb))   zgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
+	
+	return y;
+	
+}
 
 
 
