@@ -265,10 +265,6 @@ DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float> mask, co
 	m_pc   = pc;
 	m_cpc  = conj(pc);
 
-	MXDump (m_pc, "m_pc.mat", "m_pc");
-	MXDump (m_cpc, "m_cpc.mat", "m_cpc");
-
-
 	for (size_t i = 0; i < rank; i++)
 		n[i]  = sl;
 
