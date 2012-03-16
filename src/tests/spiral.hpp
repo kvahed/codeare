@@ -38,7 +38,9 @@ vdspiraltest (Connector<T>* rc) {
 	p.res = p.res*.99;
 	ticks start = getticks();
 	Solution s = VDSpiral (p);
-	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());	
+	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+
+	
 
 #ifdef HAVE_MAT_H	
 	
@@ -61,6 +63,6 @@ vdspiraltest (Connector<T>* rc) {
 
 #endif
 	
-	return true;
+
 
 }
