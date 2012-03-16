@@ -213,7 +213,7 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	printf ("..."); fflush (stdout);
 
-	s.k = interp1 (op, gp.k, np, INTERP::CSPLINE);
+	s.k = interp1 (op, gp.k, np, INTERP::CSPLINE_PERIODIC);
 
 	op.Clear();
 
@@ -223,9 +223,9 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	SDIn sdin;
 
-	sdin.pkx = new PolyVal (np, (double*)&(s.k)[0],     INTERP::CSPLINE);
-	sdin.pky = new PolyVal (np, (double*)&(s.k)[1*snp], INTERP::CSPLINE);
-	sdin.pkz = new PolyVal (np, (double*)&(s.k)[2*snp], INTERP::CSPLINE);
+	sdin.pkx = new PolyVal (np, (double*)&(s.k)[0],     INTERP::CSPLINE_PERIODIC);
+	sdin.pky = new PolyVal (np, (double*)&(s.k)[1*snp], INTERP::CSPLINE_PERIODIC);
+	sdin.pkz = new PolyVal (np, (double*)&(s.k)[2*snp], INTERP::CSPLINE_PERIODIC);
 
 	printf ("..."); fflush (stdout);
 
