@@ -544,8 +544,8 @@ public:
      * @return          Data 
      */
     inline const T*            
-    Data                ()  const {
-        return &(_M.at(0));
+    Data                (const size_t pos = 0)  const {
+        return &(_M.at(pos));
 	}
 
     
