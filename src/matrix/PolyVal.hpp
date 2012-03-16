@@ -255,9 +255,8 @@ PolyVal<float>::PolyVal (const Matrix<double>& x, const float* y, const INTERP::
 	m_tmp = (double*) malloc  (nx * sizeof (double));
 	m_btmp = true;
 
-	for (size_t i = 0; i < nx; i++) {
+	for (size_t i = 0; i < nx; i++) 
 		m_tmp[i] = y[i];
-	}
 
 	if (!Initialise (x.Data(), intm, nx))
 		printf ("  PolyVal construction failed!\n");
