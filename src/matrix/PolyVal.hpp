@@ -49,7 +49,7 @@ class PolyVal {
 public:
 
 	
-	PolyVal () : m_initialised (false) {};
+	PolyVal () : m_init (false) {};
 
 
 	/**
@@ -91,11 +91,11 @@ public:
 	 */
 	virtual ~PolyVal () {
 
-		if (m_initialised)
-			gsl_spline_free (m_spline);
+		if (m_init)
+			gsl_spline_free (m_spline[0]);
 	   
-		if (m_allocated)
-			gsl_interp_accel_free (m_acc);
+		if (m_alloc)
+			gsl_interp_accel_free (m_acc[0]);
 
 		
 	}
@@ -109,7 +109,7 @@ public:
 	 */
 	inline T Lookup (const double& xx) const {
 
-		return gsl_spline_eval (m_spline, xx, m_acc);
+		return gsl_spline_eval (m_spline[0], xx, m_acc[0]);
 
 	}
 
@@ -129,39 +129,37 @@ private:
 	 */ 
 	inline bool Initialise (const double* x, const T* y, const INTERP::Method intm, const size_t n) {
 
-		m_allocated   = false;
-		m_initialised = false;
+		m_alloc = false;
+		m_init  = false;
 		
-		m_acc = gsl_interp_accel_alloc ();
+		m_acc[0]   = gsl_interp_accel_alloc ();
 		
 		switch (intm)
 			{
-			case INTERP::LINEAR:           m_spline = gsl_spline_alloc (gsl_interp_linear,            n); break;
-			case INTERP::POLYNOMIAL: 	   m_spline = gsl_spline_alloc (gsl_interp_polynomial,        n); break;
-			case INTERP::CSPLINE:          m_spline = gsl_spline_alloc (gsl_interp_cspline,           n); break;
-			case INTERP::CSPLINE_PERIODIC: m_spline = gsl_spline_alloc (gsl_interp_cspline_periodic,  n); break;
-			case INTERP::AKIMA:            m_spline = gsl_spline_alloc (gsl_interp_akima,             n); break;
-			case INTERP::AKIMA_PERIODIC:   m_spline = gsl_spline_alloc (gsl_interp_akima_periodic,    n); break;
+			case INTERP::LINEAR:           m_spline[0] = gsl_spline_alloc (gsl_interp_linear,            n); break;
+			case INTERP::POLYNOMIAL: 	   m_spline[0] = gsl_spline_alloc (gsl_interp_polynomial,        n); break;
+			case INTERP::CSPLINE:          m_spline[0] = gsl_spline_alloc (gsl_interp_cspline,           n); break;
+			case INTERP::CSPLINE_PERIODIC: m_spline[0] = gsl_spline_alloc (gsl_interp_cspline_periodic,  n); break;
+			case INTERP::AKIMA:            m_spline[0] = gsl_spline_alloc (gsl_interp_akima,             n); break;
+			case INTERP::AKIMA_PERIODIC:   m_spline[0] = gsl_spline_alloc (gsl_interp_akima_periodic,    n); break;
 			default:                       printf ("GSL: INTERP ERROR - Invalid method.\n"); return false; break;
 			}
 		
-		m_allocated   = true;
+		m_alloc   = true;
 
-		gsl_spline_init (m_spline, x, y, n);
-		m_initialised = true;
+		gsl_spline_init (m_spline[0], x, y, n);
+		m_init = true;
 
 		return true;
 
 	} 
 
 
-	bool              m_initialised;
-	bool              m_allocated;
+	bool              m_init;
+	bool              m_alloc;
 
-	gsl_interp_accel* m_acc;      /**< @brief Accelerator */
-	gsl_interp_accel* m_acc_i;    /**< @brief Accelerator (for imaginary) */
-	gsl_spline*       m_spline  ; /**< @brief Spline      */
-	gsl_spline*       m_spline_i; /**< @brief Spline      (for imaginary) */
+	gsl_interp_accel* m_acc[2];      /**< @brief Accelerator */
+	gsl_spline*       m_spline[2]; /**< @brief Spline      */
 	
 };
 
