@@ -49,7 +49,11 @@ class PolyVal {
 public:
 
 	
-	PolyVal () : m_init (false) {};
+	PolyVal () {
+
+		Reset();
+
+	};
 
 
 	/**
@@ -62,6 +66,8 @@ public:
 	 * @return       Success
 	 */ 
 	PolyVal (const Matrix<double>& x, const Matrix<T>& y, const INTERP::Method intm = INTERP::CSPLINE) {
+
+		Reset();
 		
 		if (!Initialise (x.Data(), y.Data(), intm, size(x,0)))
 			printf ("  PolyVal construction failed!\n");
@@ -79,9 +85,21 @@ public:
 	 * @return       Success
 	 */ 
 	PolyVal (const Matrix<double>& x, const T* y, const INTERP::Method intm = INTERP::CSPLINE) {
-		
+	
+		Reset ();
+	
 		if (!Initialise (x.Data(), y, intm, size(x,0)))
 			printf ("  PolyVal construction failed!\n");
+
+	}
+
+
+	inline void Reset () {
+
+		m_alloc[0] = false;
+		m_alloc[1] = false;
+		m_init [0] = false;
+		m_init [1] = false;
 
 	}
 
@@ -91,12 +109,17 @@ public:
 	 */
 	virtual ~PolyVal () {
 
-		if (m_init)
-			gsl_spline_free (m_spline[0]);
-	   
-		if (m_alloc)
-			gsl_interp_accel_free (m_acc[0]);
+		for (int i = 0; i < 2; i++) {
+			
+			if (m_init[i])
+				gsl_spline_free (m_spline[i]);
+			
+			if (m_alloc[i]) {
+				gsl_interp_accel_free (m_acc[i]);
+				free (m_y[i]);
+			}
 
+		}
 		
 	}
 
@@ -107,11 +130,7 @@ public:
 	 * @param xx  Point
 	 * @return    Value
 	 */
-	inline T Lookup (const double& xx) const {
-
-		return gsl_spline_eval (m_spline[0], xx, m_acc[0]);
-
-	}
+	T Lookup (const double& xx) const; 
 
 
 private:
@@ -127,40 +146,150 @@ private:
 	 *
 	 * @return       Success
 	 */ 
-	inline bool Initialise (const double* x, const T* y, const INTERP::Method intm, const size_t n) {
+	bool Initialise (const double* x, const T* y, const INTERP::Method intm, const size_t& n);
 
-		m_alloc = false;
-		m_init  = false;
+
+	inline bool InitGSL (const double* x, const INTERP::Method intm, const size_t& n, const int& p) {
+
+		m_acc   [p] = gsl_interp_accel_alloc ();
+		m_spline[p] = gsl_spline_alloc (IntMeth(intm), n);
+		m_alloc [p] = true;
 		
-		m_acc[0]   = gsl_interp_accel_alloc ();
+		gsl_spline_init (m_spline[p], x, m_y[p], n);
+		m_init  [p] = true;
 		
+		return (m_init [p] && m_alloc [p]);
+
+	}
+
+
+	inline const gsl_interp_type* 
+	IntMeth (const INTERP::Method& intm) const {
+
 		switch (intm)
 			{
-			case INTERP::LINEAR:           m_spline[0] = gsl_spline_alloc (gsl_interp_linear,            n); break;
-			case INTERP::POLYNOMIAL: 	   m_spline[0] = gsl_spline_alloc (gsl_interp_polynomial,        n); break;
-			case INTERP::CSPLINE:          m_spline[0] = gsl_spline_alloc (gsl_interp_cspline,           n); break;
-			case INTERP::CSPLINE_PERIODIC: m_spline[0] = gsl_spline_alloc (gsl_interp_cspline_periodic,  n); break;
-			case INTERP::AKIMA:            m_spline[0] = gsl_spline_alloc (gsl_interp_akima,             n); break;
-			case INTERP::AKIMA_PERIODIC:   m_spline[0] = gsl_spline_alloc (gsl_interp_akima_periodic,    n); break;
-			default:                       printf ("GSL: INTERP ERROR - Invalid method.\n"); return false; break;
+			case INTERP::LINEAR:           return gsl_interp_linear; break;
+			case INTERP::POLYNOMIAL: 	   return gsl_interp_polynomial; break;
+			case INTERP::CSPLINE:          return gsl_interp_cspline; break;
+			case INTERP::CSPLINE_PERIODIC: return gsl_interp_cspline_periodic; break;
+			case INTERP::AKIMA:            return gsl_interp_akima; break;
+			case INTERP::AKIMA_PERIODIC:   return gsl_interp_akima_periodic; break;
 			}
+
+		return gsl_interp_cspline;
+
+	}
 		
-		m_alloc   = true;
+	double*           m_y     [2]; /**< @brief All types but doubles need conversion */
 
-		gsl_spline_init (m_spline[0], x, y, n);
-		m_init = true;
+	
+	
+	bool              m_init  [2]; /**< @brief Real / imaginary interpolation initialised */
+	bool              m_alloc [2]; /**< @brief Real / imaginary interpolation allocated */
 
-		return true;
-
-	} 
-
-
-	bool              m_init;
-	bool              m_alloc;
-
-	gsl_interp_accel* m_acc[2];      /**< @brief Accelerator */
-	gsl_spline*       m_spline[2]; /**< @brief Spline      */
+	gsl_interp_accel* m_acc   [2];    /**< @brief Accelerators for real / imaginary interpolations */
+	gsl_spline*       m_spline[2]; /**< @brief Spline finction for real / imaginary      */
 	
 };
+
+
+template<> inline bool 
+PolyVal<double>::Initialise (const double* x, const double* y, const INTERP::Method intm, const size_t& n) {
+	
+	size_t nn = n * sizeof (double);
+	
+	m_y [0] = (double*) malloc (nn);
+	memcpy (m_y[0], y, nn);
+	
+	return InitGSL (x, intm, n, 0);
+	
+} 
+
+
+template<> inline bool 
+PolyVal<float>::Initialise (const double* x, const float* y, const INTERP::Method intm, const size_t& n) {
+	
+	size_t nn = n * sizeof (double);
+	
+	m_y [0] = (double*) malloc (nn);
+
+	for (size_t i = 0; i < n; i++)
+		m_y[0][i] = y[i];
+	
+	return InitGSL (x, intm, n, 0);
+	
+} 
+
+
+template<> inline bool 
+PolyVal<cxdb>::Initialise (const double* x, const cxdb* y, const INTERP::Method intm, const size_t& n) {
+	
+	size_t nn = n * sizeof (double);
+	
+	m_y [0] = (double*) malloc (nn);
+	m_y [1] = (double*) malloc (nn);
+
+	for (size_t i = 0; i < n; i++) {
+		m_y[0][i] = y[i].real();
+		m_y[1][i] = y[i].imag();
+	}
+	
+	bool ri = InitGSL (x, intm, n, 0);
+	bool ii = InitGSL (x, intm, n, 1);
+	
+	return (ri && ii);
+	
+} 
+
+
+template<> inline bool 
+PolyVal<cxfl>::Initialise (const double* x, const cxfl* y, const INTERP::Method intm, const size_t& n) {
+	
+	size_t nn = n * sizeof (double);
+	
+	m_y [0] = (double*) malloc (nn);
+	m_y [1] = (double*) malloc (nn);
+
+	for (size_t i = 0; i < n; i++) {
+		m_y[0][i] = y[i].real();
+		m_y[1][i] = y[i].imag();
+	}
+	
+	bool ri = InitGSL (x, intm, n, 0);
+	bool ii = InitGSL (x, intm, n, 1);
+	
+	return (ri && ii);
+	
+} 
+
+
+
+template<> inline double 
+PolyVal<double>::Lookup (const double& xx) const {
+	
+	return gsl_spline_eval (m_spline[0], xx, m_acc[0]);
+	
+}
+
+template<> inline float 
+PolyVal<float>::Lookup (const double& xx) const {
+	
+	return (float) gsl_spline_eval (m_spline[0], xx, m_acc[0]);
+	
+}
+
+template<> inline cxfl 
+PolyVal<cxfl>::Lookup (const double& xx) const {
+	
+	return cxfl(gsl_spline_eval (m_spline[0], xx, m_acc[0]), gsl_spline_eval (m_spline[1], xx, m_acc[1]));
+	
+}
+
+template<> inline cxdb 
+PolyVal<cxdb>::Lookup (const double& xx) const {
+	
+	return cxdb(gsl_spline_eval (m_spline[0], xx, m_acc[0]), gsl_spline_eval (m_spline[1], xx, m_acc[1]));
+	
+}
 
 #endif /*__POLY_VAL_HPP__*/

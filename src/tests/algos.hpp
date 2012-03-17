@@ -1,4 +1,5 @@
 #include "Statistics.hpp"
+#include "Interpolate.hpp"
 
 template <class T> bool
 algotest (Connector<T>* rc) {
@@ -30,6 +31,13 @@ algotest (Connector<T>* rc) {
 	MXRead (B, std::string (base + std::string("covin.mat")), "A");
 	B = inv(B = chol(B = cov(B)));
 	MXDump (B, std::string (base + std::string("covout.mat")), "covA");
+
+	Matrix<double> x  = Matrix<double>::LinSpace (0.0, 10.0, 8);
+	Matrix<double> xi = Matrix<double>::LinSpace (0.0, 10.0, 100);
+
+	Matrix<cxdb> Bi = interp1 (x, B, xi);
+
+	MXDump (Bi, std::string (base + std::string("bi.mat")), "bi");
 
 	return true;
 	
