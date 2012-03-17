@@ -5,6 +5,15 @@
 #include "Access.hpp"
 #include "IO.hpp" 
 
+/**
+ * @brief            1D Interpolation 
+ *
+ * @param  x         Original base
+ * @param  y         Original values
+ * @param  xi        Interpolation base
+ * @param  intm      Interpolation method @see INTERP::Method
+ * @return           Interpolation values
+ */
 template <class T> inline static Matrix<T>
 interp1 (const Matrix<double>& x, const Matrix<T>& y, const Matrix<double>& xi, const INTERP::Method& intm = INTERP::CSPLINE) {
 

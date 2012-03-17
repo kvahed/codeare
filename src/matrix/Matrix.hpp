@@ -2774,7 +2774,7 @@ Matrix<T>::LinSpace (const T& start, const T& end, const size_t& n) {
 	Matrix<T> res (n, 1);
 	T gap;
 
-	gap      = T(end-start) / T(n);
+	gap      = T(end-start) / T(n-1);
 	
 	res[0]   = start;
 	res[n-1] = end;
