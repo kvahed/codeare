@@ -43,6 +43,7 @@ namespace INTERP {
 /**
  * @brief    Evaluate polynomial
  */
+template <class T>
 class PolyVal {
 	
 public:
@@ -60,29 +61,12 @@ public:
 	 *
 	 * @return       Success
 	 */ 
-	PolyVal (Matrix<double>& x, Matrix<double>& y, const INTERP::Method intm = INTERP::CSPLINE) {
+	PolyVal (const Matrix<double>& x, const Matrix<T>& y, const INTERP::Method intm = INTERP::CSPLINE) {
 		
-		if (!Initialise (&x[0], &y[0], intm, size(x,0)))
+		if (!Initialise (x.Data(), y.Data(), intm, size(x,0)))
 			printf ("  PolyVal construction failed!\n");
 		
 	}
-	
-	
-	/**
-	 * @brief        Construct
-	 * 
-	 * @param  x     Vector of x (Matrix<double>)
-	 * @param  y     Vector of y(x) (Matrix<double>)
-	 * @param  intm  Interpolation Method (linear, polynomial, [periodic] cubic splice, [periodic] akima)
-	 *
-	 * @return       Success
-	 */ 
-	/*PolyVal (Matrix<double>& x, Matrix<cxdb>& y, const INTERP::Method intm = INTERP::CSPLINE) {
-		
-		if (!Initialise (&x[0], &y[0], intm, size(x,0)))
-			printf ("  PolyVal construction failed!\n");
-		
-			}*/
 	
 	
 	/**
@@ -94,9 +78,9 @@ public:
 	 *
 	 * @return       Success
 	 */ 
-	PolyVal (Matrix<double>& x,        double* y, const INTERP::Method intm = INTERP::CSPLINE) {
+	PolyVal (const Matrix<double>& x, const T* y, const INTERP::Method intm = INTERP::CSPLINE) {
 		
-		if (!Initialise (&x[0], y, intm, size(x,0)))
+		if (!Initialise (x.Data(), y, intm, size(x,0)))
 			printf ("  PolyVal construction failed!\n");
 
 	}
@@ -123,7 +107,7 @@ public:
 	 * @param xx  Point
 	 * @return    Value
 	 */
-	inline double Lookup (const double& xx) const {
+	inline T Lookup (const double& xx) const {
 
 		return gsl_spline_eval (m_spline, xx, m_acc);
 
@@ -143,7 +127,7 @@ private:
 	 *
 	 * @return       Success
 	 */ 
-	inline bool Initialise (const double* x, const double* y, const INTERP::Method intm, const size_t n) {
+	inline bool Initialise (const double* x, const T* y, const INTERP::Method intm, const size_t n) {
 
 		m_allocated   = false;
 		m_initialised = false;
