@@ -35,9 +35,11 @@ algotest (Connector<T>* rc) {
 	Matrix<double> x  = Matrix<double>::LinSpace (0.0, 10.0, 8);
 	Matrix<double> xi = Matrix<double>::LinSpace (0.0, 10.0, 100);
 
-	Matrix<cxdb> Bi = interp1 (x, B, xi);
+	Matrix<cxdb> Bi = interp1 (x, B, xi, INTERP::AKIMA);
 
+	MXDump (x, std::string (base + std::string("x.mat")), "x");
 	MXDump (Bi, std::string (base + std::string("bi.mat")), "bi");
+	MXDump (xi, std::string (base + std::string("xi.mat")), "xi");
 
 	return true;
 	

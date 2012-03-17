@@ -333,8 +333,6 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	pos.Clear();
 	
-	Nt = Nt - ceil(Nt*.015);
-	
 	gp.k   = Matrix<double> (Nt,3);
 
 	for (size_t i = 0; i < Nt; i++) {
