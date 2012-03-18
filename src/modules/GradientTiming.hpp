@@ -213,7 +213,7 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	printf ("..."); fflush (stdout);
 
-	s.k = interp1 (op, gp.k, np, INTERP::CSPLINE_PERIODIC);
+	s.k = interp1 (op, gp.k, np);
 
 	op.Clear();
 
@@ -223,9 +223,9 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	SDIn sdin;
 
-	sdin.pkx = new PolyVal<double> (np, (double*)&(s.k)[0],     INTERP::CSPLINE_PERIODIC);
-	sdin.pky = new PolyVal<double> (np, (double*)&(s.k)[1*snp], INTERP::CSPLINE_PERIODIC);
-	sdin.pkz = new PolyVal<double> (np, (double*)&(s.k)[2*snp], INTERP::CSPLINE_PERIODIC);
+	sdin.pkx = new PolyVal<double> (np, (double*)&(s.k)[0]);
+	sdin.pky = new PolyVal<double> (np, (double*)&(s.k)[1*snp]);
+	sdin.pkz = new PolyVal<double> (np, (double*)&(s.k)[2*snp]);
 
 	printf ("..."); fflush (stdout);
 
@@ -268,7 +268,7 @@ Solution ComputeGradient (GradientParams& gp) {
 	sta        = Matrix<double>::Zeros (size(sf,0), 1);
 	stb        = Matrix<double>::Zeros (size(sf,0), 1);
 
-	sdin.posh  = interp1 (sop, np, sdin.sh, INTERP::CSPLINE);
+	sdin.posh  = interp1 (sop, np, sdin.sh);
 	
 	np.Clear();
 	sop.Clear();
@@ -328,8 +328,8 @@ Solution ComputeGradient (GradientParams& gp) {
 	Nt     = round(T/gp.dt); 
 	t      = Matrix<double>::LinSpace(0.0, T, Nt);
 
-	sot    = interp1 (tos,  sf,   t, INTERP::CSPLINE);
-	pot    = interp1 ( sf, pos, sot, INTERP::CSPLINE);
+	sot    = interp1 (tos,  sf,   t);
+	pot    = interp1 ( sf, pos, sot);
 
 	pos.Clear();
 	
