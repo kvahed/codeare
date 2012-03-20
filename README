@@ -4,7 +4,7 @@ reconstruction software. It was started on Siemens VB15 line.
 
 TODO:
 Cient stubs for more MRI hardware vendors.
-OK: A lot!
+OK, well, ya, ... a lot!
                                                                            
 TESTS:
 lclient -t LapackTests

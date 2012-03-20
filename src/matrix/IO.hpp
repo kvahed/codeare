@@ -333,7 +333,7 @@ H5Dump (const Matrix<T>& M, const string fname, const string dname, const string
 #else // HAVE_H5CPP_H
 		
 		printf ("HDF5 ERROR - Didn't dump nothin'");
-		return error;
+		return false;
 		
 #endif // HAVE_H5CPP_H
 		
@@ -639,7 +639,7 @@ H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc 
 #else // HAVE_H5CPP_H
 		
 		printf ("HDF5 ERROR - Didn't read nothin'");
-		return error
+		return false;
 			
 #endif // HAVE_H5CPP_H
 			
@@ -691,10 +691,11 @@ demangle (const char* symbol) {
  * @param  mxa  MATLAB data
  * @return      Match
  */
+
+#ifdef HAVE_MAT_H
+	
 template <class T> inline static bool 
 MXValidateIO  (const Matrix<T>& M, const mxArray* mxa) {
-	
-#ifdef HAVE_MAT_H
 	
 	mxClassID     mcid = mxGetClassID(mxa);
 	std::string cplx = (mxIsComplex(mxa)) ? "complex" : "real";
@@ -710,10 +711,10 @@ MXValidateIO  (const Matrix<T>& M, const mxArray* mxa) {
 	
 	return true;
 	
-#endif
-	
 }
 
+#endif
+	
 
 /**
  * @brief          Read matrix from MATLAB file
@@ -822,6 +823,8 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 }
 
 
+#ifdef HAVE_MAT_H
+	
 /**
  * @brief          Dump matrix to MATLAB file
  * 
@@ -834,7 +837,6 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 template <class T> static bool
 MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 	
-#ifdef HAVE_MAT_H
 	// Declare dimensions and allocate array -----
 	
 	mwSize   dim[INVALID_DIM];
@@ -896,15 +898,10 @@ MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 	
 	return true;
 	
-#else 
-	
-	printf ("MATLAB IO ERROR - Didn't dump nothin'");
-	return false;
-	
-#endif 
-	
 }
 
+#endif 
+	
 
 
 /**

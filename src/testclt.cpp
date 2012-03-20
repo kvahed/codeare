@@ -54,6 +54,8 @@ int main (int argc, char** argv) {
 			dwttest (con);
 		else if (!strcmp (test, "algotest")) 
 			algotest (con);
+		else if (!strcmp (test, "syngotest")) 
+			syngotest (con);
 		else if (!strcmp (test, "RelativeSensitivities"))
 			resetest (con);
 		else if (!strcmp (test, "VDSpiral"))

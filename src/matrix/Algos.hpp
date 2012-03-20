@@ -447,4 +447,27 @@ min (const Matrix<T>& M) {
 	
 }
 
+
+/**
+ * @brief          FLip up down
+ * 
+ * @param          Matrix
+ * @return         Flipped matrix
+ */
+/*
+template <class T> inline static Matrix<T>
+flipud (const Matrix<T>& M)  {
+
+	size_t scol = size(M,0);
+	size_t ncol = numel (M)/scol;
+
+	Matrix<T> res (M.Dim());
+
+	for (size_t i = 0; i < ncol; i++)
+		reverse_copy (myints, myints+9, myvector.begin());
+
+	return res;
+
+}
+*/
 #endif 
