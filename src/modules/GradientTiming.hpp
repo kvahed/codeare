@@ -49,13 +49,14 @@ struct GradientParams {
 };
 
 
-inline double RungeKutta (const double& s, const double& ds, const double& st, 
-						  const double* k, const double& smax, const double& L, 
-						  const bool& fw) {
+inline static double
+RungeKutta (const double& s, const double&   ds, const double& st, 
+			const double* k, const double& smax, const double&  L, 
+			const bool&  fw) {
 
 	double k1, k2, k3, k4;
-	size_t l, m, n;
-	double pgs = pow(GAMMA_MT_MS*smax,2);
+	size_t l,   m,  n;
+	double pgs = pow (GAMMA_MT_MS*smax,2);
 
 	if (fw) {
 		l = 0; m = 1; n = 2;
@@ -124,12 +125,16 @@ SDOut SDMax (SDIn& si) {
 	for (size_t i = 0; i < sss-1; i++)
 		dsp[i] = sh[i+1] - sh[i]; 
 	dsp[ssp-1] = dsp[ssp-2];
+	
+	printf ("."); fflush (stdout);
 
 	for (size_t i = 1; i < ssp-1; i++) {
 		csp(i,0) = (pkx.Lookup (posh[i] + dpp[i]) - pkx.Lookup (posh[i])) / dsp[i];
 		csp(i,1) = (pky.Lookup (posh[i] + dpp[i]) - pky.Lookup (posh[i])) / dsp[i];
 		csp(i,2) = (pkz.Lookup (posh[i] + dpp[i]) - pkz.Lookup (posh[i])) / dsp[i];
 	}
+
+	printf ("."); fflush (stdout);
 
 	dpp.Clear();
 
@@ -166,6 +171,8 @@ SDOut SDMax (SDIn& si) {
 	dsp.Clear();
 	dsm.Clear();
 	
+	printf (". "); fflush (stdout);
+
 	so.k   = Matrix<double> (ssp,1);
 	so.phi = Matrix<double> (ssp,1);
 
@@ -281,7 +288,7 @@ Solution ComputeGradient (GradientParams& gp) {
 		pos[i] = sdin.posh[i*2];
 
 
-	printf (" done: (%.3f)\n  Computing geometry dependent constraints ... ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate()); 
+	printf (" done: (%.3f)\n  Computing geometry dependent constraints ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate()); 
 	fflush(stdout);
 	start = getticks();
 
