@@ -33,7 +33,7 @@ log (const Matrix<T>& m) {
 	Matrix<T> res = m;
 	
 	for (size_t i = 0; i < res.Size(); i++)
-		res [i] = log (res[i]);
+		res [i] = (res[i] != 0) ? log (res[i]) : 0.0;
 	
 	return res;
 	

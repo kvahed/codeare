@@ -103,7 +103,7 @@ RelativeSensitivities::Process     () {
         }
         
         SegmentBrain (bet, bets);
-		bets = Resample (bets, 0.5, LINEAR);
+		//bets = Resample (bets, 0.5, LINEAR);
 		
     } else if (m_use_bet == 2) {
 		

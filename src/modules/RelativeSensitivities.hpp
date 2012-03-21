@@ -27,6 +27,7 @@
 #include "Toolbox.hpp"
 #include "IO.hpp"
 #include "DFT.hpp"
+#include "Math.hpp"
 
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
@@ -314,8 +315,10 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	std::string orig = "orig.nii.gz";
 	std::string mask = "mask_mask.nii.gz";
 	std::string cmd  = "/usr/local/bin/mask.sh";
+
+	Matrix<double> tmp = log (img);
 	
-	NIDump(img, orig);
+	NIDump(tmp, orig);
 	printf ("exporting ... "); fflush(stdout);
 	
 	if (!std::system(NULL))
