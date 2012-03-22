@@ -12,7 +12,7 @@ EXTRA_DIST=GPUSimulator.cl
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la SpatialDomain.la KTPoints.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la
 
 if USE_NFFT3
-    lib_LTLIBRARIES += NuFFT_OMP.la NuFFT.la CGSENSE.la 
+    lib_LTLIBRARIES += NuFFT.la CGSENSE.la #NuFFT_OMP.la 
 endif
 
 if USE_GSL
@@ -36,11 +36,11 @@ MedianFilter_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 MedianFilter_OMP_la_LIBADD = $(COMMON_la_LIBADD)
 
 NuFFT_la_SOURCES = NuFFT.hpp NuFFT.cpp
-NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 ../nfft/libnfftstub.la
+NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3
 NuFFT_la_LIBADD = $(COMMON_la_LIBADD)
 
 NuFFT_OMP_la_SOURCES = NuFFT_OMP.hpp NuFFT_OMP.cpp OMP.hpp
-NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 ../nfft/libnfftstub.la
+NuFFT_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3
 NuFFT_OMP_la_LIBADD = $(COMMON_la_LIBADD)
 
 DumpToFile_la_SOURCES = DumpToFile.hpp DumpToFile.cpp
@@ -48,7 +48,7 @@ DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 DumpToFile_la_LIBADD = $(COMMON_la_LIBADD)
 
 CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp SEM.hpp OMP.hpp
-CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK) ../nfft/libnfftstub.la
+CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK)
 CGSENSE_la_LIBADD = $(COMMON_la_LIBADD)
 
 SystemCmd_la_SOURCES = SystemCmd.hpp SystemCmd.cpp

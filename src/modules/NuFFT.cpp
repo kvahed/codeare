@@ -41,11 +41,8 @@ NuFFT::~NuFFT () {
 RRSModule::error_code 
 NuFFT::Finalise () {
 
-	if (m_initialised)
-		nfft::finalize (&m_fplan, &m_iplan);
-
-	delete [] m_N;
-	delete [] m_n;
+	//if (m_initialised)
+	//	delete nfft;
 
 	return RRSModule::OK;
 
@@ -59,59 +56,51 @@ NuFFT::Init () {
 	RRSModule::error_code error = OK; 
 	m_initialised               = false;
 
-	m_N   = new int[3];
-	m_n   = new int[3];
+	int shots, M, dim, maxit, m, N[4], n[4];
+	double epsilon, alpha;
+ 
 
-	for (int i = 0; i < 3; i++) {
-		m_N[i] = 1; 
-		m_n[i] = 1;
+	for (int i = 0; i < 4; i++) {
+		N[i] = 1; 
+		n[i] = 1;
 	}
 
 	// Dimensions ---------------------------
 
-	Attribute("dim",       &m_dim);
+	Attribute("dim",       &dim);
 
-	for (int i = 0; i < m_dim; i++)
-		Attribute (sides[i].c_str(),       &m_N[i]);
+	for (int i = 0; i < dim; i++)
+		Attribute (sides[i].c_str(),       &N[i]);
 
-	Attribute("M",         &m_M);
-	Attribute("shots",     &m_shots);
+	Attribute("M",         &M);
+	Attribute("shots",     &shots);
 
 	// --------------------------------------
 
-	Attribute("maxit",   &m_maxit);
-	Attribute("epsilon", &m_epsilon);
+	Attribute("maxit",   &maxit);
+	Attribute("epsilon", &epsilon);
 
 	// Oversampling -------------------------
 
-	int      m           = 1;
-	double   alpha       = 1.0;
+	m           = 1;
+	alpha       = 1.0;
 
 	Attribute ("m",       &m);
 	Attribute ("alpha",   &alpha);
 
-	for (int i = 0; i < m_dim; i++)
-		m_n[i] = ceil (m_N[i]*alpha);
+	for (int i = 0; i < dim; i++)
+		n[i] = ceil (N[i]*alpha);
 
 	// --------------------------------------
 
-	printf ("  intialising nfft::init (%i, {%i, %i, %i}, %i, {%i, %i, %i}, %i, *, *, %.9f)\n", 
-			m_dim, 
-			m_N[0], m_N[1], m_N[2],
-			m_M * m_shots,
-			m_n[0], m_n[1], m_n[2],
-			m,
-			m_epsilon);
+	Matrix<size_t> ms (dim,1);
+	for (size_t i = 0; i < dim; i++)
+		ms[i] = N[i];
 
-	//nfft::init (m_dim, m_N, m_M*m_shots, m_n, m, &m_fplan, &m_iplan);
+	nfft = new NFFT<cxdb> (ms, M * shots, m, alpha);
 
-	Matrix<size_t> ms (m_dim,1);
-	ms[0] = m_N[0];
-	ms[1] = m_N[1];
-
-	size_t nk = m_M*m_shots;
-
-	m_nfft = NFFT<cxdb> (ms, nk);
+	Matrix<cxdb>& img = AddMatrix 
+		("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> (N[0],N[1],N[2])));
 
 	m_initialised = true;
 
@@ -124,19 +113,11 @@ NuFFT::Prepare () {
 
 	RRSModule::error_code error = OK;
 
-	Matrix<cxdb>& img = AddMatrix ("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> (m_N[0],m_N[1],m_N[2])));
+	nfft->KSpace (GetRLDB ("kspace"));
+	nfft->Weights (GetRLDB ("weights"));
 
-	Matrix<double>& kspace  = GetRLDB ("kspace");
-	Matrix<double>& weights = GetRLDB ("weights");
-
-	m_nfft.KSpace (kspace);
-	m_nfft.Weights (weights);
-
-	//memcpy (&(m_fplan.x[0]),  &kspace[0],  kspace.Size()*sizeof(double)); FreeRLDB("kspace");
-	//memcpy (&(m_iplan.w[0]), &weights[0], weights.Size()*sizeof(double)); FreeRLDB("weights");
-	
-	//nfft::weights (&m_fplan, &m_iplan);
-	//nfft::psi     (&m_fplan);
+	FreeRLDB ("kspace");
+	FreeRLDB ("weights");
 
 	return error;
 
@@ -146,24 +127,14 @@ NuFFT::Prepare () {
 RRSModule::error_code
 NuFFT::Process () {
 
-	// Some variables
-	RRSModule::error_code error = OK;
-
-	Matrix<cxdb>&   data    = GetCXDB ("data");
-	Matrix<cxdb>&   img     = GetCXDB ("img");
-
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
 	
-	/*memcpy (m_iplan.y, data.Data(), numel(data) *sizeof (cxdb)); FreeCXDB("data");
-	nfft::ift (&m_fplan, &m_iplan, m_maxit, m_epsilon);
-	memcpy (&img[0], m_iplan.f_hat_iter, numel(img) * sizeof(cxdb));*/
-
-	m_nfft.Adjoint(data);
-
-	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
+	GetCXDB ("img") = nfft->Adjoint(GetCXDB ("data"));
 	
-	return error;
+	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
+
+	return OK;
 
 }
 
