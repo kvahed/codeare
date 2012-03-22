@@ -21,6 +21,7 @@
 #ifndef __IO_HPP__
 #define __IO_HPP__
 
+#include "Matrix.hpp"
 #include "Toolbox.hpp"
 #include "Tokenizer.hpp"
 #include "Waitbar.hpp"

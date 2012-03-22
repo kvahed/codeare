@@ -72,27 +72,8 @@ namespace RRStrategy {
 		
 	private:
 		
-		// We only support 2 dims for the time being
-		int m_dim;
-		
-		// Some more stuff
-		int*      m_N;                          /**< @brief Image matrix side length */
-		int*      m_n;                          /**< @brief Oversampling */
-		int       m_M;                          /**< @brief Number of k-space knots */
-		int       m_maxit;                      /**< @brief Number of Recon iterations (NFFT 3) */
-		double    m_epsilon;                    /**< @brief Convergence criterium */
-		int       m_shots;
+		NFFT<cxdb> *nfft;
 
-		double*   m_ftk;
-		double*   m_ftw;
-		double*   m_ftin;
-		double*   m_ftout;
-
-		NFFT<cxdb> m_nfft;
-
-		nfft_plan           m_fplan;            /**< nfft  plan */
-		solver_plan_complex m_iplan;            /**< infft plan */
-		
 	};
 	
 }

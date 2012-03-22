@@ -9,7 +9,7 @@ OK, well, ya, ... a lot!
 TESTS:
 lclient -t LapackTests
 lclient -b share/gradients/ -c config_vdcs.xml -t VDSpiral 
-lclient -b share/cgsense/ -d human.h5 -c config_human.xml -t CGSENSE 
+lclient -b share/cgsense/ -d brain.h5 -c brain.xml -t CGSENSE 
 lclient -b share/ktpoints/ -d homogen.h5 -c config_homogen.xml -t KTPoints 
 lclient -b share/nufft/ -d data2.h5 -c config.xml -t NuFFT
 lclient -b share/compressedsensing/ -d brain512.mat -c config_brain512.xml -t CompressedSensing

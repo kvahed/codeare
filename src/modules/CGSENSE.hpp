@@ -105,7 +105,8 @@ namespace RRStrategy {
 	};
 
 
-	void IntensityCorrection (const Matrix<cxfl>& sens, Matrix<double>& intcor) {
+	inline static void
+	IntensityCorrection (const Matrix<cxfl>& sens, Matrix<double>& intcor) {
 
 		size_t nc = sens.Dim(HDim(sens));
 		size_t nr = intcor.Size();
