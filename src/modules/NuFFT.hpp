@@ -21,6 +21,7 @@
 #ifndef __NUFFT_HPP__
 #define __NUFFT_HPP__
 
+#include "NFFT.hpp"
 #include "nfftstub.h"
 
 #include "ReconStrategy.hpp"
@@ -86,6 +87,8 @@ namespace RRStrategy {
 		double*   m_ftw;
 		double*   m_ftin;
 		double*   m_ftout;
+
+		NFFT<cxdb> m_nfft;
 
 		nfft_plan           m_fplan;            /**< nfft  plan */
 		solver_plan_complex m_iplan;            /**< infft plan */

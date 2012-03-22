@@ -1,5 +1,5 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
+ *  codeare Copyright (C) 2010-2012 Kaveh Vahedipour
  *                                  Forschungszentrum Juelich, Germany
  *  
  *  Original code stolen from Martijn Cloos

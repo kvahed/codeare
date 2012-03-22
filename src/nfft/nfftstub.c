@@ -50,35 +50,38 @@ int init   (int d, int* N, int M, int* n, int m, nfft_plan* np, solver_plan_comp
 
 
 int weights (nfft_plan* np, solver_plan_complex* spc) {
-
+	
 	int j, k, z, N = np->N[0];
-
+	
 	if (spc->flags & PRECOMPUTE_DAMP) {
 		if (np->d == 3) {
-			for (j = 0; j < N; j++) 
-				for (k = 0; k < N; k++)
+			for (j = 0; j < N; j++) {
+				int    j2 = j - N/2; 
+				for (k = 0; k < N; k++) {
+					int    k2 = k - N/2;
 					for (z = 0; z < N; z++) {
-						int    j2 = j - N/2; 
-						int    k2 = k - N/2;
 						int    z2 = z - N/2;
 						double r  = sqrt(j2*j2+k2*k2+z2*z2);
 						spc->w_hat[z*N*N+j*N+k] = (r > (double) N/2) ? 0.0 : 1.0;
 					}
-		} else {
-			for (j = 0; j < N; j++)
-				for (k = 0; k < N; k++) {
-					    int    j2 = j-N/2;
-						int    k2 = k-N/2;
-						double r  = sqrt(j2*j2+k2*k2);
-						spc->w_hat[j*N+k]       = (r > (double) N/2) ? 0.0 : 1.0;
 				}
+			}
+		} else {
+			for (j = 0; j < N; j++) {
+				int    j2 = j-N/2;
+				for (k = 0; k < N; k++) {
+					int    k2 = k-N/2;
+					double r  = sqrt(j2*j2+k2*k2);
+					spc->w_hat[j*N+k]       = (r > (double) N/2) ? 0.0 : 1.0;
+				}
+			}
 		}
 	}
-	
+
 	return np->M_total;
-
+	
 }
-
+	
 
 int ft (nfft_plan* np) {
 
@@ -110,7 +113,7 @@ void psi (nfft_plan* np) {
 
 void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) {
 	
-	int k, l;
+	int k, l, err = 0;
 	
 	/* init some guess */
 	for(k = 0; k < np->N_total; k++)
@@ -119,7 +122,6 @@ void ift (nfft_plan* np, solver_plan_complex* spc, int maxiter, double epsilon) 
 	double t = nfft_second();
 	
 	/* inverse trafo */
-	//nfft_adjoint(np);
 	solver_before_loop_complex(spc);
 	
 	for (l = 0; l < maxiter; l++) {

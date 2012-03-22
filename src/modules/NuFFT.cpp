@@ -42,7 +42,7 @@ RRSModule::error_code
 NuFFT::Finalise () {
 
 	if (m_initialised)
-	  nfft::finalize (&m_fplan, &m_iplan);
+		nfft::finalize (&m_fplan, &m_iplan);
 
 	delete [] m_N;
 	delete [] m_n;
@@ -103,7 +103,15 @@ NuFFT::Init () {
 			m,
 			m_epsilon);
 
-	nfft::init (m_dim, m_N, m_M*m_shots, m_n, m, &m_fplan, &m_iplan);
+	//nfft::init (m_dim, m_N, m_M*m_shots, m_n, m, &m_fplan, &m_iplan);
+
+	Matrix<size_t> ms (m_dim,1);
+	ms[0] = m_N[0];
+	ms[1] = m_N[1];
+
+	size_t nk = m_M*m_shots;
+
+	m_nfft = NFFT<cxdb> (ms, nk);
 
 	m_initialised = true;
 
@@ -121,11 +129,14 @@ NuFFT::Prepare () {
 	Matrix<double>& kspace  = GetRLDB ("kspace");
 	Matrix<double>& weights = GetRLDB ("weights");
 
-	memcpy (&(m_fplan.x[0]),  &kspace[0],  kspace.Size()*sizeof(double)); FreeRLDB("kspace");
-	memcpy (&(m_iplan.w[0]), &weights[0], weights.Size()*sizeof(double)); FreeRLDB("weights");
+	m_nfft.KSpace (kspace);
+	m_nfft.Weights (weights);
+
+	//memcpy (&(m_fplan.x[0]),  &kspace[0],  kspace.Size()*sizeof(double)); FreeRLDB("kspace");
+	//memcpy (&(m_iplan.w[0]), &weights[0], weights.Size()*sizeof(double)); FreeRLDB("weights");
 	
-	nfft::weights (&m_fplan, &m_iplan);
-	nfft::psi     (&m_fplan);
+	//nfft::weights (&m_fplan, &m_iplan);
+	//nfft::psi     (&m_fplan);
 
 	return error;
 
@@ -144,10 +155,12 @@ NuFFT::Process () {
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
 	
-	memcpy (&(m_iplan.y[0]),    &data[0],    data.Size()*sizeof  (cxdb)); FreeCXDB("data");
-	nfft::ift     (&m_fplan, &m_iplan, m_maxit, m_epsilon);
-	memcpy (&img[0], m_iplan.f_hat_iter, img.Size() * sizeof(cxdb));
-	
+	/*memcpy (m_iplan.y, data.Data(), numel(data) *sizeof (cxdb)); FreeCXDB("data");
+	nfft::ift (&m_fplan, &m_iplan, m_maxit, m_epsilon);
+	memcpy (&img[0], m_iplan.f_hat_iter, numel(img) * sizeof(cxdb));*/
+
+	m_nfft.Adjoint(data);
+
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
 	
 	return error;

@@ -28,11 +28,11 @@
  * @brief Interface to <a href="http://www-user.tu-chemnitz.de/~potts/nfft/" target="NFFT">NFFT 3 library</a>
  */
 namespace nfft {
-
+	
 #ifdef __cplusplus
 	extern "C" {
-#endif /* __cplusplus */
-
+#endif
+		
 		/**
 		 * @brief            Initialise plan
 		 *
@@ -43,11 +43,12 @@ namespace nfft {
 		 * @param  m         Spatial cutoff
 		 * @param  fnp       Forward FT plan
 		 * @param  inp       Inverse FT plan
+		 *
 		 * @return success
 		 */
 		extern int
-		init                 (int d, int* N, int M, int* n, int m, nfft_plan* fnp, solver_plan_complex* inp);
-
+		init                 (const int d, const int* N, const int M, const int* n, const int m, const nfft_plan* fnp, const solver_plan_complex* inp);
+		
 		/**
 		 * @brief            Inverse FT
 		 * 
@@ -55,28 +56,31 @@ namespace nfft {
 		 * @param  spc       iNFFT plan
 		 * @param  maxiter   Maximum NFFT iterations        
 		 * @param  epsilon   Convergence criterium
+		 *
 		 * @return           Success
 		 */
 		extern int
-		ift                  (nfft_plan* np, solver_plan_complex* spc, int maxiter = 3, double epsilon = 3e-7) ;
+		ift                  (const nfft_plan* np, const solver_plan_complex* spc, const int maxiter = 3, const double epsilon = 3e-7) ;
 		
 		/**
 		 * @brief            Forward FT
 		 *
 		 * @param  np        NFFT plan
+		 *
 		 * @return           Success
 		 */
 		extern int
-		ft                   (nfft_plan* np);
+		ft                   (const nfft_plan* np);
 
 		/**
 		 * @brief            Adjoint FT
 		 *
 		 * @param  np        NFFT plan
+
 		 * @return           Success
 		 */
 		extern int
-		adjoint              (nfft_plan* np);
+		adjoint              (const nfft_plan* np);
 
 		/**
 		 * @brief            Set weights
@@ -86,7 +90,7 @@ namespace nfft {
 		 * @return           Success
 		 */
 		extern int
-		weights              (nfft_plan* np, solver_plan_complex* spc);
+		weights              (const nfft_plan* np, const solver_plan_complex* spc);
 
 		/**
 		 * @brief            Precompute PSI
@@ -95,7 +99,7 @@ namespace nfft {
 		 * @return           Success
 		 */
 		extern int
-		psi                  (nfft_plan* np);
+		psi                  (const nfft_plan* np);
 
 		/**
 		 * @brief            Finalise plans
@@ -105,11 +109,12 @@ namespace nfft {
 		 * @return           Success
 		 */
 		extern int
-		finalize             (nfft_plan* np, solver_plan_complex* spc);
+		finalize             (const nfft_plan* np, const solver_plan_complex* spc);
 
 #ifdef __cplusplus
 	}
-#endif /* __cplusplus */
+#endif
 	
 }
+
 #endif //__NFFT_STUB_H__
