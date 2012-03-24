@@ -140,7 +140,18 @@ ResToCString (const Matrix<T>& M) {
 	
 }
 
-	
+
+enum dtype {
+
+	RLFL,
+	RLDB,
+	CXFL,
+	CXDB,
+	LONG,
+	SHRT
+
+};
+
 /**
  * @brief            Primitive dump of data.<br> The data id dumped column major into a file.
  *
@@ -151,20 +162,149 @@ ResToCString (const Matrix<T>& M) {
 template <class T> inline static bool
 PRDump (const Matrix<T>& M, const string fname) {
 	
-	FILE *fp;
+	FILE *f;
+	size_t n = numel(M);
+	int dt;
+	size_t ns;
+
+	if      (typeid(T) == typeid(float))  dt = RLFL;
+	else if (typeid(T) == typeid(double)) dt = RLDB;
+	else if (typeid(T) == typeid(cxfl))   dt = CXFL;
+	else if (typeid(T) == typeid(cxdb))   dt = CXDB;
+	else if (typeid(T) == typeid(long))   dt = LONG;
+	else if (typeid(T) == typeid(short))  dt = SHRT;
 	
-	if ((fp=fopen(fname.c_str(), "wb"))==NULL) {
-		printf("Cannot open %s file.\n", fname.c_str());
+	if ((f = fopen(fname.c_str(), "wb"))==NULL) {
+		printf("Cannot open %s file for writing.\n", fname.c_str());
+		return false;
+	}
+
+	// Dump type
+	if (fwrite(&dt, sizeof(int), 1, f) != sizeof(int)) {
+		printf("File write error.");
+		fclose(f);
+		return false;
+	}		
+	
+	// Dump dimensions
+	if (fwrite(M.Dim(), sizeof(size_t), INVALID_DIM, f) != INVALID_DIM * sizeof(size_t)) {
+		printf("File write error.");
+		fclose(f);
+		return false;
+	}		
+	
+	// Dump resolutions
+	if (fwrite(M.Res(), sizeof(float), INVALID_DIM, f) != INVALID_DIM * sizeof(float)) {
+		printf("File write error.");
+		fclose(f);
+		return false;
+	}		
+	
+	ns = strlen(M.GetClassName());
+	
+	// Dump type
+	if (fwrite(&ns, sizeof(size_t), 1, f) != sizeof(size_t)) {
+		printf("File write error.");
+		fclose(f);
+		return false;
+	}		
+	
+	// Dump name
+	if (fwrite(M.GetClassName(), sizeof(char), ns, f) != ns * sizeof(char)) {
+		printf("File write error.");
+		fclose(f);
+		return false;
+	}		
+	
+	// Dump data
+	if (fwrite(M.Data(), sizeof(T), n, f) != n * sizeof(T)) {
+		printf("File write error.");
+		fclose(f);
 		return false;
 	}
 	
-	if (fwrite(&M[0], sizeof(float), M.Size(), fp) != M.Size()) {
+	fclose(f);
+	
+	return true;
+	
+}
+	
+
+/**
+ * @brief            Primitive dump of data.<br> The data id dumped column major into a file.
+ *
+ * @param   M        Matrix
+ * @param   fname    File name       
+ * @return           Success
+ */
+template <class T> inline static bool
+PRRead (Matrix<T>& M, const string fname) {
+	
+	FILE *f;
+	int dt;
+	size_t dims[INVALID_DIM];
+	float res[INVALID_DIM];
+	size_t ns, n;
+	char* name;
+	
+	if ((f = fopen(fname.c_str(), "rb"))==NULL) {
+		printf("Cannot open %s file for reading.\n", fname.c_str());
+		return false;
+	}
+
+
+	// Read type
+	if (fread (&dt, sizeof(int), 1, f) != sizeof (int)) {
 		printf("File read error.");
-		fclose(fp);
+		fclose(f);
+		return false;
+	}		
+	
+
+	// Read dimensions
+	if (fread (dims, sizeof(size_t), INVALID_DIM, f) != INVALID_DIM * sizeof(size_t)) {
+		printf("File read error.");
+		fclose(f);
+		return false;
+	}		
+	
+	M.Reset(dims);
+	n = numel(M);
+
+	// Read resolutions
+	if (fread(res, sizeof(float), INVALID_DIM, f) != INVALID_DIM * sizeof(float)) {
+		printf("File read error.");
+		fclose(f);
+		return false;
+	}		
+	
+	for (size_t i = 0; i < INVALID_DIM; i++)
+		M.Res(i) = res[i];
+
+	// Name length
+	if (fread (&ns, sizeof(size_t), 1, f) != sizeof (size_t)) {
+		printf("File read error.");
+		fclose(f);
+		return false;
+	}		
+
+	name = new char [ns];
+
+	// Dump name
+	if (fwrite(name, sizeof(char), ns, f) != ns * sizeof(char)) {
+		printf("File read error.");
+		fclose(f);
+		return false;
+	}		
+	
+	// Dump data
+	if (fwrite(&M[0], sizeof(T), n, f) != n * sizeof(T)) {
+		printf("File write error.");
+		fclose(f);
 		return false;
 	}
 	
-	fclose(fp);
+	fclose(f);
 	
 	return true;
 	

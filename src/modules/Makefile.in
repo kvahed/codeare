@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@USE_NFFT3_TRUE@am__append_1 = NuFFT.la CGSENSE.la #NuFFT_OMP.la 
+@USE_NFFT3_TRUE@am__append_1 = NuFFT.la CGSENSE.la NuFFT_OMP.la 
 @USE_GSL_TRUE@am__append_2 = CompressedSensing.la
 @USE_OPENCL_TRUE@am__append_3 = GPUSimulator.cpp GPUSimulator.hpp
 subdir = src/modules
@@ -161,6 +161,13 @@ NuFFT_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_NuFFT_la_rpath = -rpath $(libdir)
+NuFFT_OMP_la_DEPENDENCIES =
+am_NuFFT_OMP_la_OBJECTS = NuFFT_OMP.lo
+NuFFT_OMP_la_OBJECTS = $(am_NuFFT_OMP_la_OBJECTS)
+NuFFT_OMP_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(NuFFT_OMP_la_LDFLAGS) $(LDFLAGS) -o $@
+@USE_NFFT3_TRUE@am_NuFFT_OMP_la_rpath = -rpath $(libdir)
 am__DEPENDENCIES_1 =
 RelativeSensitivities_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_RelativeSensitivities_la_OBJECTS =  \
@@ -211,7 +218,7 @@ SOURCES = $(AFI_la_SOURCES) $(CGSENSE_la_SOURCES) \
 	$(GRAPPA_la_SOURCES) $(GenericRegrid_la_SOURCES) \
 	$(KTPoints_la_SOURCES) $(LapackTests_la_SOURCES) \
 	$(MedianFilter_OMP_la_SOURCES) $(NuFFT_la_SOURCES) \
-	$(RelativeSensitivities_la_SOURCES) \
+	$(NuFFT_OMP_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
 	$(SpatialDomain_la_SOURCES) $(SystemCmd_la_SOURCES)
 DIST_SOURCES = $(AFI_la_SOURCES) $(CGSENSE_la_SOURCES) \
 	$(CompressedSensing_la_SOURCES) \
@@ -219,7 +226,8 @@ DIST_SOURCES = $(AFI_la_SOURCES) $(CGSENSE_la_SOURCES) \
 	$(DumpToFile_la_SOURCES) $(GRAPPA_la_SOURCES) \
 	$(GenericRegrid_la_SOURCES) $(KTPoints_la_SOURCES) \
 	$(LapackTests_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
+	$(NuFFT_la_SOURCES) $(NuFFT_OMP_la_SOURCES) \
+	$(RelativeSensitivities_la_SOURCES) \
 	$(SpatialDomain_la_SOURCES) $(SystemCmd_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -517,6 +525,8 @@ MedianFilter_OMP.la: $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_DEPEND
 	$(MedianFilter_OMP_la_LINK) -rpath $(libdir) $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_LIBADD) $(LIBS)
 NuFFT.la: $(NuFFT_la_OBJECTS) $(NuFFT_la_DEPENDENCIES) 
 	$(NuFFT_la_LINK) $(am_NuFFT_la_rpath) $(NuFFT_la_OBJECTS) $(NuFFT_la_LIBADD) $(LIBS)
+NuFFT_OMP.la: $(NuFFT_OMP_la_OBJECTS) $(NuFFT_OMP_la_DEPENDENCIES) 
+	$(NuFFT_OMP_la_LINK) $(am_NuFFT_OMP_la_rpath) $(NuFFT_OMP_la_OBJECTS) $(NuFFT_OMP_la_LIBADD) $(LIBS)
 RelativeSensitivities.la: $(RelativeSensitivities_la_OBJECTS) $(RelativeSensitivities_la_DEPENDENCIES) 
 	$(RelativeSensitivities_la_LINK) -rpath $(libdir) $(RelativeSensitivities_la_OBJECTS) $(RelativeSensitivities_la_LIBADD) $(LIBS)
 SpatialDomain.la: $(SpatialDomain_la_OBJECTS) $(SpatialDomain_la_DEPENDENCIES) 
@@ -544,6 +554,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LapackTests.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT_OMP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RelativeSensitivities_la-RelativeSensitivities.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpatialDomain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@
