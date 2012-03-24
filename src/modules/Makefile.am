@@ -12,7 +12,7 @@ EXTRA_DIST=GPUSimulator.cl
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la SpatialDomain.la KTPoints.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la
 
 if USE_NFFT3
-    lib_LTLIBRARIES += NuFFT.la CGSENSE.la #NuFFT_OMP.la 
+    lib_LTLIBRARIES += NuFFT.la CGSENSE.la NuFFT_OMP.la 
 endif
 
 if USE_GSL

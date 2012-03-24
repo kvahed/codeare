@@ -1,5 +1,5 @@
 AC_PREREQ([1.10])
-AC_INIT([codeare], [0.10], [k.vahedipour@fz-juelich.de])
+AC_INIT([codeare], [1.0b], [k.vahedipour@fz-juelich.de])
 AC_CONFIG_SRCDIR([src])
 
 # m4 macros
