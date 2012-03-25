@@ -165,7 +165,7 @@ PRDump (const Matrix<T>& M, const string fname) {
 	FILE *f;
 	size_t n = numel(M);
 	int dt;
-	size_t ns;
+	size_t ns, l;
 
 	if      (typeid(T) == typeid(float))  dt = RLFL;
 	else if (typeid(T) == typeid(double)) dt = RLDB;
@@ -180,22 +180,22 @@ PRDump (const Matrix<T>& M, const string fname) {
 	}
 
 	// Dump type
-	if (fwrite(&dt, sizeof(int), 1, f) != sizeof(int)) {
-		printf("File write error.");
+	if (fwrite(&dt, sizeof(int), 1, f) != 1) {
+		printf("File write error - data type: %li != %li", l, sizeof (int));
 		fclose(f);
 		return false;
 	}		
 	
 	// Dump dimensions
-	if (fwrite(M.Dim(), sizeof(size_t), INVALID_DIM, f) != INVALID_DIM * sizeof(size_t)) {
-		printf("File write error.");
+	if (fwrite(M.Dim(), sizeof(size_t), INVALID_DIM, f) != INVALID_DIM) {
+		printf("File write error: dimensions.");
 		fclose(f);
 		return false;
 	}		
 	
 	// Dump resolutions
-	if (fwrite(M.Res(), sizeof(float), INVALID_DIM, f) != INVALID_DIM * sizeof(float)) {
-		printf("File write error.");
+	if (fwrite(M.Res(), sizeof(float), INVALID_DIM, f) != INVALID_DIM) {
+		printf("File write error: resolutions.");
 		fclose(f);
 		return false;
 	}		
@@ -203,22 +203,22 @@ PRDump (const Matrix<T>& M, const string fname) {
 	ns = strlen(M.GetClassName());
 	
 	// Dump type
-	if (fwrite(&ns, sizeof(size_t), 1, f) != sizeof(size_t)) {
-		printf("File write error.");
+	if (fwrite(&ns, sizeof(size_t), 1, f) != 1) {
+		printf("File write error: name length.");
 		fclose(f);
 		return false;
 	}		
 	
 	// Dump name
-	if (fwrite(M.GetClassName(), sizeof(char), ns, f) != ns * sizeof(char)) {
-		printf("File write error.");
+	if (fwrite(M.GetClassName(), sizeof(char), ns, f) != ns) {
+		printf("File write error: name.");
 		fclose(f);
 		return false;
 	}		
 	
 	// Dump data
-	if (fwrite(M.Data(), sizeof(T), n, f) != n * sizeof(T)) {
-		printf("File write error.");
+	if (fwrite(M.Data(), sizeof(T), n, f) != n) {
+		printf("File write error: data.");
 		fclose(f);
 		return false;
 	}
@@ -254,7 +254,7 @@ PRRead (Matrix<T>& M, const string fname) {
 
 
 	// Read type
-	if (fread (&dt, sizeof(int), 1, f) != sizeof (int)) {
+	if (fread (&dt, sizeof(int), 1, f) != 1) {
 		printf("File read error.");
 		fclose(f);
 		return false;
@@ -262,7 +262,7 @@ PRRead (Matrix<T>& M, const string fname) {
 	
 
 	// Read dimensions
-	if (fread (dims, sizeof(size_t), INVALID_DIM, f) != INVALID_DIM * sizeof(size_t)) {
+	if (fread (dims, sizeof(size_t), INVALID_DIM, f) != INVALID_DIM) {
 		printf("File read error.");
 		fclose(f);
 		return false;
@@ -272,7 +272,7 @@ PRRead (Matrix<T>& M, const string fname) {
 	n = numel(M);
 
 	// Read resolutions
-	if (fread(res, sizeof(float), INVALID_DIM, f) != INVALID_DIM * sizeof(float)) {
+	if (fread(res, sizeof(float), INVALID_DIM, f) != INVALID_DIM) {
 		printf("File read error.");
 		fclose(f);
 		return false;
@@ -282,7 +282,7 @@ PRRead (Matrix<T>& M, const string fname) {
 		M.Res(i) = res[i];
 
 	// Name length
-	if (fread (&ns, sizeof(size_t), 1, f) != sizeof (size_t)) {
+	if (fread (&ns, sizeof(size_t), 1, f) != 1) {
 		printf("File read error.");
 		fclose(f);
 		return false;
@@ -291,15 +291,15 @@ PRRead (Matrix<T>& M, const string fname) {
 	name = new char [ns];
 
 	// Dump name
-	if (fwrite(name, sizeof(char), ns, f) != ns * sizeof(char)) {
+	if (fread (name, sizeof(char), ns, f) != ns) {
 		printf("File read error.");
 		fclose(f);
 		return false;
 	}		
 	
 	// Dump data
-	if (fwrite(&M[0], sizeof(T), n, f) != n * sizeof(T)) {
-		printf("File write error.");
+	if (fread (&M[0], sizeof(T), n, f) != n) {
+		printf("File read error.");
 		fclose(f);
 		return false;
 	}
