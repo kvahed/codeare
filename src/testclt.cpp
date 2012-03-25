@@ -48,6 +48,8 @@ int main (int argc, char** argv) {
 			mxtest (con);
 		else if (!strcmp (test, "nitest")) 
 			nitest (con);
+		else if (!strcmp (test, "iotest")) 
+			iotest (con);
 		else if (!strcmp (test, "fftwtest")) 
 			fftwtest (con);
 		else if (!strcmp (test, "dwttest")) 

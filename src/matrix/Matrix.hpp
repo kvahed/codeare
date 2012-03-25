@@ -1525,6 +1525,19 @@ public:
     inline float&          
     Res                 (const size_t& i)                                 {return _res[i];}
     
+
+
+	/**
+	 * @brief           Resolution array
+	 *
+	 * @return          All resolutions
+	 */
+	const float*
+	Res                 () const {
+		return &_res[0];
+	};
+	
+
     
     /**
      * @brief           Get size a given dimension.
