@@ -5,6 +5,7 @@ iotest (Connector<T>* rc) {
 	d.Random();
 
 	Matrix<cxfl> c (100,300);
+	c.SetClassName ("ComlexSingle");
 	c.Random();
 
 	PRDump (d, "d.cod");
