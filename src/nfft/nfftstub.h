@@ -32,10 +32,7 @@
  * @brief Interface to <a href="http://www-user.tu-chemnitz.de/~potts/nfft/" target="NFFT">NFFT 3 library</a>
  */
 namespace nfft {
-	
-#ifdef __cplusplus
-	extern "C" {
-#endif
+
 		
 		/**
 		 * @brief            Initialise plan
@@ -50,7 +47,7 @@ namespace nfft {
 		 *
 		 * @return success
 		 */
-		extern int
+		 int
 		init                 (const int d, int* N, const int M, int* n, const int m, 
 							  nfft_plan* np, solver_plan_complex* inp) {
 			
@@ -77,7 +74,7 @@ namespace nfft {
 		 *
 		 * @return           Success
 		 */
-		extern int
+		 int
 		ift                  (nfft_plan* np, solver_plan_complex* spc, const int maxiter = 3, const double epsilon = 3e-7) {
 
 			int k, l, err = 0;
@@ -123,7 +120,7 @@ namespace nfft {
 		 *
 		 * @return           Success
 		 */
-		extern int
+		 int
 		ft                   (nfft_plan* np) {
 
 			nfft_trafo (np);
@@ -139,7 +136,7 @@ namespace nfft {
 
 		 * @return           Success
 		 */
-		extern int
+		 int
 		adjoint              (nfft_plan* np) {
 
 			nfft_adjoint (np);
@@ -155,7 +152,7 @@ namespace nfft {
 		 * @param  spc       Solver plan
 		 * @return           Success
 		 */
-		extern int
+		 int
 		weights              (const nfft_plan* np, const solver_plan_complex* spc) {
 
 			int j, k, z, N = np->N[0];
@@ -196,7 +193,7 @@ namespace nfft {
 		 * @param  np        NFFT plan
 		 * @return           Success
 		 */
-		extern int
+		 int
 		psi                  (nfft_plan* np) {
 
 			/* precompute full psi */
@@ -217,7 +214,7 @@ namespace nfft {
 		 * @param  spc       Solver plan
 		 * @return           Success
 		 */
-		extern int
+		 int
 		finalize             (nfft_plan* np, solver_plan_complex* spc) {
 
 			solver_finalize_complex(spc);
@@ -227,9 +224,6 @@ namespace nfft {
 			
 		}
 
-#ifdef __cplusplus
-	}
-#endif
 	
 }
 

@@ -22,6 +22,7 @@
 #include "Toolbox.hpp"
 #include "TVOP.hpp"
 #include "IO.hpp"
+#include "DFT.hpp"
 
 using namespace RRStrategy;
 
@@ -99,11 +100,11 @@ CompressedSensing::Process () {
 			data.Dim(0), data.Dim(1), data.Dim(2));
 
 	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf));
-	m_cgparam.dft = new DFT<cxfl> (HDim(data)+1, data.Height(), mask, pc);
+	m_cgparam.ft  = (FT<cxfl>*) new DFT<cxfl> (HDim(data)+1, data.Height(), mask, pc);
 	m_cgparam.tvt = new TVOP ();
 
-	DFT<cxfl>& dft = *m_cgparam.dft;
-	DWT& dwt = *m_cgparam.dwt;
+	FT<cxfl>& dft = *m_cgparam.ft;
+	DWT& dwt      = *m_cgparam.dwt;
 	
 	im_dc    = data;
 	im_dc   /= pdf;
@@ -121,7 +122,7 @@ CompressedSensing::Process () {
 
 	tic      = getticks();
 
-	for (int i = 0; i < m_csiter; i++)
+	for (size_t i = 0; i < m_csiter; i++)
 		NLCG (im_dc, data, m_cgparam);
 
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
