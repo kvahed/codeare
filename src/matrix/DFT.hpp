@@ -24,15 +24,15 @@
 #include <fftw3.h>
 #include "Matrix.hpp"
 #include "Algos.hpp"
-#include "CX.hpp"
 #include "IO.hpp"
+#include "FT.hpp"
 
 
 /**
  * @brief Matrix templated 1-3D Discrete Cartesian Fourier transform
  */
 template <class T>
-class DFT {
+class DFT : public FT<T> {
 	
 public:
 	
@@ -83,7 +83,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<T> 
+	virtual Matrix<T> 
 	Trafo       (const Matrix<T>& m) const ;
 	
 	
@@ -93,39 +93,10 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<T> 
+	virtual Matrix<T> 
 	Adjoint     (const Matrix<T>& m) const;
 	
 	
-	/**
-	 * @brief    Forward transform
-	 *
-	 * @param  m To transform
-	 * @return   Transform
-	 */
-	Matrix<T> 
-	operator*   (const Matrix<T>& m) const {
-
-		return Trafo(m);
-
-	}
-	
-
-	/**
-	 * @brief    Backward transform
-	 *
-	 * @param  m To transform
-	 * @return   Transform
-	 */
-	Matrix<T> 
-	operator->* (const Matrix<T>& m) const {
-		
-		return Adjoint (m);
-
-	}
-	
-
-
 private:
 	
 	bool           m_initialised;  /**< @brief Memory allocated / Plans, well, planned! :)*/

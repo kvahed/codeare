@@ -24,7 +24,7 @@
 #define __COMPRESSED_SENSING_HPP__
 
 #include "ReconStrategy.hpp"
-#include "DFT.hpp"
+#include "FT.hpp"
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
@@ -56,7 +56,7 @@ namespace RRStrategy {
 		double lsb;
 
 		DWT*       dwt;
-		DFT<cxfl>* dft;
+		FT<cxfl>*  ft;
 		TVOP*      tvt;
 		
 	};
@@ -198,14 +198,14 @@ namespace RRStrategy {
 	Matrix<cxfl> 
 	GradObj (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp) {
 		
-		DFT<cxfl>& dft = *(cgp.dft);
+		FT<cxfl>& ft = *(cgp.ft);
 		DWT& dwt = *(cgp.dwt);
 
 		Matrix<cxfl> g;
 		
-		g  = dft * (dwt->*x);
+		g  = ft * (dwt->*x);
 		g -= data;
-		g  = dwt * (dft->*g);
+		g  = dwt * (ft->*g);
 
 		return (2.0 * g);
 
@@ -288,9 +288,9 @@ namespace RRStrategy {
 
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
 
-		DWT&  dwt = *cgp.dwt;
-		DFT<cxfl>&  dft = *cgp.dft;
-		TVOP& tvt = *cgp.tvt;
+		DWT&      dwt = *cgp.dwt;
+		FT<cxfl>& ft = *cgp.ft;
+		TVOP&     tvt = *cgp.tvt;
 
 		g0 = Gradient (x, data, cgp);
 		dx = -g0;
@@ -302,8 +302,8 @@ namespace RRStrategy {
 			wx  = dwt->*x;
 			wdx = dwt->*dx;
 
-			ffdbx = dft * wx;
-			ffdbg = dft * wdx;
+			ffdbx = ft * wx;
+			ffdbg = ft * wdx;
 			
 			if (cgp.tvw) {
 				ttdbx = tvt * wx;
