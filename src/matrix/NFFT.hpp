@@ -116,6 +116,31 @@ public:
 	Matrix<T> 
 	Adjoint     (const Matrix<T>& m) const ;
 	
+
+	
+	/**
+	 * @brief     NFFT plan
+	 *
+	 * @return    Plan
+	 */
+	nfft_plan*
+	FPlan         () {
+
+		return &m_fplan;
+
+	}
+	
+	/**
+	 * @brief     NFFT plan
+	 *
+	 * @return    Plan
+	 */
+	solver_plan_complex*
+	IPlan         () {
+		
+		return &m_fplan;
+		
+	}
 	
 private:
 	

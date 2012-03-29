@@ -24,6 +24,7 @@
 #include "nfftstub.h"
 #include "NFFT.hpp"
 #include "CX.hpp"
+#include "SEM.hpp"
 
 /**
  * @brief Matrix templated ND non-equidistand Fourier transform with NCSENSE 3 (TU Chemnitz)
@@ -83,7 +84,7 @@ public:
 
 #pragma omp parallel 
 		{
-			
+#pragma omp for	
 			for (size_t i = 0; i < omp_get_num_threads (); i++)
 				m_nffts[i]->KSpace(k);
 			
@@ -102,15 +103,15 @@ public:
 		
 #pragma omp parallel 
 		{
-			
+#pragma omp for	
 			for (size_t i = 0; i < omp_get_num_threads (); i++)
 				m_nffts[i]->Weights(w);
 			
 		}
 		
 	}
-
-
+	
+	
 	/**
 	 * @brief    Forward transform
 	 *
@@ -118,7 +119,7 @@ public:
 	 * @return   Transform
 	 */
 	Matrix<T> 
-	Trafo       (const Matrix<T>& m) const {};
+	Trafo       (const Matrix<T>& m) const;
 	
 	
 	/**
@@ -133,40 +134,63 @@ public:
 	
 private:
 
-	NFFT<T>** m_nffts;
-	bool      m_initialised;
-
+	bool           m_initialised; /**< @brief Initialised? */
+	NFFT<T>**      m_nffts;       /**< @brief Non-uniform FFT */
+	Matrix<T>      m_sm;          /**< @brief Sensitivity maps */
+	Matrix<double> m_ic;          /**< @brief Intensity correction */
+	size_t         m_nc;          /**< @brief # receive channels */
+	size_t         m_dim;         
 
 };
 
 
+const Matrix<raw>& in, const Matrix<raw>& sm, const Matrix<double>& ic, nfft_plan* np, Matrix<raw>& out, const int& dim
+
 template<>
 NCSENSE<cxdb>::NCSENSE (const Matrix<cxdb> sens, const size_t& nk, const size_t m, 
 						const double alpha, const Matrix<double> b0, const Matrix<cxdb> pc, 
-						const double eps, const size_t maxit) : m_initialised (false) {
+						const double eps, const size_t maxit) : 
+	m_initialised (false) {
 
-	size_t dim = (size(sens,2) == 1) ? 3 : 2;
+	m_dim = (size(sens,3) == 1) ? 2 : 3;
+	
 	Matrix<size_t> ms (dim,1);
+
 	for (size_t i = 0; i < dim; i++)
 		ms[i] = size(sens,i);
 	
 	int np = 1;
-
+	
 #pragma omp parallel default (shared)
 	{
 		np = omp_get_num_threads ();
 	}	
-
+	
 	m_nffts = new NFFT<cxdb>* [np];
 	
 	for (size_t i = 0; i < np; i++)
 		m_nffts[i] = new NFFT<cxdb> (ms, nk, m, alpha);
 	
 	m_initialised = true;
-
+	
 }
 
 
+template<> Matrix<T>
+NCSENSE<cxdb>::Trafo (const Matrix<T>& m) const {
+
+	Matrix<T> res (size(sm,0), size(sm,1), size(sm,2));
+
+	E  (m, sens, m_intcor, m_nffts, res, m_dim);
+	
+	return res;
+}
+
+
+template<> Matrix<T>
+NCSENSE<cxdb>::Adjoint (const Matrix<T>& m) const {
+
+}
 
 
 #endif

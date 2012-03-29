@@ -31,6 +31,74 @@
  * @param  out          Result                      O (Nk x Nc)
  * @param  dim          FT dimensions
  */
+/*
+static RRSModule::error_code 
+E  (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, const Matrix<double>& ic, NFFT<cxdb>** np, Matrix<cxdb>& out, const int& dim) {
+
+	// Some dimensions
+	int ncoils   = size(sm, dim);
+	int nsamples = numel(out) / ncoils;
+	int imgsize  = numel(in);
+
+
+	// Loop over coils, Elementwise multiplication of maps with in (s.*in), ft and store in out
+	
+#pragma omp parallel default (shared) 
+	{
+		
+		int tid      = omp_get_thread_num();
+		
+#pragma omp for 
+		for (int i = 0; i < numel(ic); i++)
+			in[i] *= ic[i]; 
+		
+#pragma omp for
+		for (int j = 0; j < ncoils; j++) {
+			
+			int    ipos   = j * imgsize;
+			int    spos   = j * nsamples;
+			raw    tmp    = cxdb (0.0, 0.0);
+
+			// Copy data to FT
+			for (int i = 0; i < imgsize; i++) {
+
+				tmp = sm[ipos + i] * in[i];
+
+				np[tid]->FPlan->f_hat[i][0] = tmp.real();
+				np[tid]->FPlan->f_hat[i][1] = tmp.imag();
+
+			}
+
+			// Forward ft
+			nfft::ft (&np[tid]);
+			
+			// Copy FTed data back
+			for (int i = 0; i < nsamples; i++)
+				out[i+spos] = (raw(np[tid].f[i][0], np[tid].f[i][1]));
+			
+		}
+		
+	}
+	
+	return OK;
+	
+}
+
+*/
+
+
+
+/**
+ * @brief               Compute left hand side (i.e. Multiply E with spatial (image) data)
+ *                      Forward NFFT in and elementwise multiply with spatial sensitivity of every channel 
+ * 
+ * @param  in           Original discretised sample O (Nx x Ny x Nz)
+ * @param  sm           Sensitivity maps            O (Nx x Ny x Nz x Nc)
+ * @param  ic           Intesity correction map
+ * @param  np           Non-Cartesian strategy for non uniform ft
+ * @param  out          Result                      O (Nk x Nc)
+ * @param  dim          FT dimensions
+ */
 RRSModule::error_code 
 E  (const Matrix<raw>& in, const Matrix<raw>& sm, const Matrix<double>& ic, nfft_plan* np, Matrix<raw>& out, const int& dim) {
 

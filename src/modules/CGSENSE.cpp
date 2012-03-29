@@ -21,9 +21,9 @@
 #include "CGSENSE.hpp"
 #include "nfftstub.h"
 #include "Noise.hpp"
-#include "SEM.hpp"
 #include "Toolbox.hpp"
 #include "Lapack.hpp"
+#include "SEM.hpp"
 
 #include <math.h>
 
@@ -193,7 +193,7 @@ CGSENSE::Process () {
 	Matrix<double>& kspace  = GetRLDB("kspace");
 
 	Matrix<cxdb> tsens = (Matrix<cxdb>) sens;
-	NCSENSE<cxdb> ns (tsens, m_M);
+	//NCSENSE<cxdb> ns (tsens, m_M);
 
 	// CG matrices ----------------------------------------------------
 	Matrix <cxfl>   p       = Matrix<cxfl>   (m_N[0],m_N[1],m_N[2]), q, r;
