@@ -41,10 +41,10 @@ struct Solution {
 
 struct GradientParams {
 	
-	Matrix<double> k;  // K-Space trajectory [1/cm]
-	double         mgr;  // Maximum allowed gradient
-	double         msr;  // Maximum allowed slewrate
-	double         dt;   // Sampling interval
+	Matrix<double> k;    /**< K-Space trajectory [1/cm] */
+	double         mgr;  /**< Maximum allowed gradient */
+	double         msr;  /**< Maximum allowed slewrate */
+	double         dt;   /**< Sampling interval */
 	
 };
 
@@ -199,7 +199,7 @@ SDOut SDMax (SDIn& si) {
 /**
  * @brief       Compute real world k-space / gradient solution with hardware limits
  *
- * @param  p    Parameters
+ * @param  gp   Parameters
  * @return      Solution
  */
 Solution ComputeGradient (GradientParams& gp) {
