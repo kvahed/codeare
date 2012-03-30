@@ -1,3 +1,5 @@
+#include "matrix/Creators.hpp"
+
 template <class T> bool
 nitest (Connector<T>* rc) {
 
@@ -15,7 +17,7 @@ nitest (Connector<T>* rc) {
 #endif
 	NIDump (d, nii);
 
-	Matrix<cxfl> slp = Matrix<cxfl>::Phantom3D(196); 
+	Matrix<cxfl> slp = phantom3D<cxfl>(196); 
 	NIDump (slp, nii);
 #ifdef HAVE_MAT_H	
 	MXDump (slp, mat, "betted");
