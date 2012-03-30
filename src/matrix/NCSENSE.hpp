@@ -24,6 +24,7 @@
 #include "nfftstub.h"
 #include "NFFT.hpp"
 #include "CX.hpp"
+#include "SEM.hpp"
 
 /**
  * @brief Matrix templated ND non-equidistand Fourier transform with NCSENSE 3 (TU Chemnitz)
@@ -68,7 +69,7 @@ public:
 
 	if (m_initialised)
 		for (size_t i = 0; i < np; i++)
-			delete m_nffts[i];
+			delete m_fts[i];
 
 	}
 	
@@ -85,7 +86,7 @@ public:
 		{
 			
 			for (size_t i = 0; i < omp_get_num_threads (); i++)
-				m_nffts[i]->KSpace(k);
+				m_fts[i]->KSpace(k);
 			
 		}
 		
@@ -104,7 +105,7 @@ public:
 		{
 			
 			for (size_t i = 0; i < omp_get_num_threads (); i++)
-				m_nffts[i]->Weights(w);
+				m_fts[i]->Weights(w);
 			
 		}
 		
@@ -118,7 +119,7 @@ public:
 	 * @return   Transform
 	 */
 	Matrix<T> 
-	Trafo       (const Matrix<T>& m) const {};
+	Trafo       (const Matrix<T>& m) const;
 	
 	
 	/**
@@ -128,14 +129,21 @@ public:
 	 * @return   Transform
 	 */
 	Matrix<T> 
-	Adjoint     (const Matrix<T>& m) const {};
+	Adjoint     (const Matrix<T>& m) const;
 	
 	
 private:
 
-	NFFT<T>** m_nffts;
+	NFFT<T>** m_fts;
 	bool      m_initialised;
 
+	Matrix<T> m_sm;
+	Matrix<double> m_ic;
+
+	size_t m_dim;
+	size_t m_nr;
+	size_t m_nk;
+	size_t m_nc;
 
 };
 
@@ -157,16 +165,34 @@ NCSENSE<cxdb>::NCSENSE (const Matrix<cxdb> sens, const size_t& nk, const size_t 
 		np = omp_get_num_threads ();
 	}	
 
-	m_nffts = new NFFT<cxdb>* [np];
+	m_fts = new NFFT<cxdb>* [np];
 	
 	for (size_t i = 0; i < np; i++)
-		m_nffts[i] = new NFFT<cxdb> (ms, nk, m, alpha);
+		m_fts[i] = new NFFT<cxdb> (ms, nk, m, alpha);
 	
 	m_initialised = true;
 
 }
 
 
+template<> Matrix<cxdb>
+NCSENSE<cxdb>::Trafo (const Matrix<cxdb>& m) const {
+
+	Matrix<cxdb> tmp = m * m_ic;
+
+	return E (tmp, m_sm, (NFFT<cxdb>**) m_fts, m_dim);
+
+}
+
+
+template<> Matrix<cxdb>
+NCSENSE<cxdb>::Adjoint (const Matrix<cxdb>& m) const {
+
+	Matrix<cxdb> tmp = m * m_ic;
+
+	return E (tmp, m_sm, (NFFT<cxdb>**) m_fts, m_dim);
+
+}
 
 
 #endif

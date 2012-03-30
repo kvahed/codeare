@@ -16,7 +16,7 @@ Volume (const Matrix<T>& M, const size_t s) {
 	Matrix<T> res (size(M,0), size(M,1), size(M,2));
 	size_t nc = M.Dim(0)*M.Dim(1)*M.Dim(2);
 	
-	memcpy (&res[0], &M[s * nc], nc * sizeof(T));
+	memcpy (&res[0], M.Data(s*nc), nc * sizeof(T));
 	
 	return res;
 	
@@ -36,7 +36,7 @@ Slice (const Matrix<T>& M, const size_t s) {
 	Matrix<T> res (size(M,0),size(M,1));
 	size_t nc = M.Dim(0)*M.Dim(1);
 	
-	memcpy (&res[0], &M[s * nc], nc*sizeof(T));
+	memcpy (&res[0], M.Data(s*nc), nc*sizeof(T));
 	
 	return res;
 	
@@ -71,7 +71,7 @@ Row (const Matrix<T>& M, const size_t r)  {
  * @return             Desired row of M
  */
 template <class T> static inline Matrix<T> 
-Column (Matrix<T>& M, const size_t c) {
+Column (const Matrix<T>& M, const size_t c) {
 	
 	Matrix<T> res (M.Dim(0),1);
 	
