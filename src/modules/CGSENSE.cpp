@@ -21,7 +21,6 @@
 #include "CGSENSE.hpp"
 #include "nfftstub.h"
 #include "Noise.hpp"
-#include "NCSENSE.hpp"
 #include "Toolbox.hpp"
 #include "Lapack.hpp"
 #include "Creators.hpp"
@@ -184,6 +183,31 @@ CGSENSE::Init() {
 
 
 RRSModule::error_code
+CGSENSE::Prepare () {
+
+	RRSModule::error_code error = OK;
+
+	Matrix<cxfl>&   sens    = GetCXFL("sens");
+	Matrix<double>& weights = GetRLDB("weights");
+	Matrix<double>& kspace  = GetRLDB("kspace");
+
+	m_ncs = new NCSENSE<cxdb> (sens, m_M, 1.0e-6, 20);
+
+	m_ncs->KSpace (GetRLDB ("kspace"));
+	m_ncs->Weights (GetRLDB ("weights"));
+	
+	//FreeRLDB ("kspace");
+	//FreeRLDB ("weights");
+	//FreeCXFL ("sense")
+	
+	return error;
+
+
+
+}
+
+
+RRSModule::error_code
 CGSENSE::Process () {
 
 	RRSModule::error_code error = OK;
@@ -193,10 +217,7 @@ CGSENSE::Process () {
 	Matrix<double>& weights = GetRLDB("weights");
 	Matrix<double>& kspace  = GetRLDB("kspace");
 
-	Matrix<cxdb> tsens = (Matrix<cxdb>) sens;
-	NCSENSE<cxdb> ns (tsens, m_M, 1.0e-6, 20);
-	//ns * sens;
-	//ns ->* sens;
+	//image = ns ->* data;
 
 	// CG matrices ----------------------------------------------------
 	Matrix <cxfl>   p       = Matrix<cxfl>   (m_N[0],m_N[1],m_N[2]), q, r;

@@ -167,7 +167,7 @@ SOS (const Matrix<T>& M, const size_t d) {
 	assert (M.Dim(d) > 1);
 	
 	Matrix<T> res = M ^ 2;
-	return Sum (res, d);
+	return sum (res, d);
   
 }
 
@@ -207,7 +207,7 @@ squeeze (Matrix<T>& M) {
  * @return    Sum of M along dimension d
  */
 template <class T> inline  Matrix<T>
-Sum (Matrix<T>& M, const size_t d) {
+sum (Matrix<T>& M, const size_t d) {
 	
 	Matrix<size_t> sz = size(M);
 	size_t dim = M.Dim(d);
