@@ -18,6 +18,8 @@
  *  02110-1301  USA
  */
 
+#include "matrix/Creators.hpp"
+
 template <class T> bool 
 dmtest (Connector<T>* rc) {
 
@@ -52,8 +54,8 @@ dmtest (Connector<T>* rc) {
 	// Target excitation, ROI, sample
 	MXRead    (r, pf, "r");
 	MXRead (tmxy, pf, rc->Attribute("p"));
-	tmz  = Matrix<float>::Zeros (r.Dim(1), 1);
-	smxy = Matrix<cxfl>::Zeros  (r.Dim(1), 1);
+	tmz  = zeros<float> (r.Dim(1), 1);
+	smxy = zeros<cxfl>  (r.Dim(1), 1);
 	MXRead ( smz, pf, rc->Attribute("s"));
 	MXRead ( roi, pf, rc->Attribute("roi"));
 

@@ -21,9 +21,10 @@
 #include "CGSENSE.hpp"
 #include "nfftstub.h"
 #include "Noise.hpp"
+#include "NCSENSE.hpp"
 #include "Toolbox.hpp"
 #include "Lapack.hpp"
-#include "SEM.hpp"
+#include "Creators.hpp"
 
 #include <math.h>
 
@@ -193,13 +194,15 @@ CGSENSE::Process () {
 	Matrix<double>& kspace  = GetRLDB("kspace");
 
 	Matrix<cxdb> tsens = (Matrix<cxdb>) sens;
-	//NCSENSE<cxdb> ns (tsens, m_M);
+	NCSENSE<cxdb> ns (tsens, m_M, 1.0e-6, 20);
+	//ns * sens;
+	//ns ->* sens;
 
 	// CG matrices ----------------------------------------------------
 	Matrix <cxfl>   p       = Matrix<cxfl>   (m_N[0],m_N[1],m_N[2]), q, r;
 
 	// Intensity Correction -------------------------------------------
-	m_intcor                = Matrix<double>::Ones (m_N[0],m_N[1],m_N[2]);
+	m_intcor                = ones<double> (m_N[0],m_N[1],m_N[2]);
 
 	// Set k-space and weights in FT plans and clear RAM --------------
 	for (int i = 0; i < NTHREADS || i < m_Nc; i++) {
@@ -216,7 +219,7 @@ CGSENSE::Process () {
 
 	// Create test data if testcase (Incoming data is image space) ----
 	if (m_testcase) {
-		E  (Matrix<cxfl>::Phantom2D(m_N[0]), sens, m_intcor, m_fplan, data, m_dim);
+		E  (phantom<cxfl>(m_N[0]), sens, m_intcor, m_fplan, data, m_dim);
 		if (m_noise > 0.0)
 			AddPseudoRandomNoise (data, (float) m_noise);
 	} 
@@ -247,7 +250,7 @@ CGSENSE::Process () {
 	float       an    = 0.0;
 	raw         rtmp  = raw(0.0,0.0);
 
-    Matrix<cxfl> treg = Matrix<cxfl>::Id(m_N[0]) * cxfl (m_lambda, 0);
+    Matrix<cxfl> treg = eye<cxfl>(m_N[0]) * cxfl (m_lambda, 0);
 
 	printf ("Processing CG-SENSE ...\n");
 

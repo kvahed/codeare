@@ -1,10 +1,11 @@
+#include "matrix/Creators.hpp"
+
 template <class T> bool
 mxtest (Connector<T>* rc) {
 
 #ifdef HAVE_MAT_H
 
-	Matrix<double> in (3,5);
-	in.Random ();
+	Matrix<double> in = rand<double>(3,5);
 
 	std::cout << in << std::endl << std::endl;
 
@@ -15,8 +16,8 @@ mxtest (Connector<T>* rc) {
 
 	std::cout << out << std::endl << std::endl;
 
-	Matrix<cxfl> r1 (4,8);
-	r1.Random ();
+	Matrix<cxfl> r1 = rand<cxfl>(4,8);
+
 	MXDump (r1, "rtest.mat", "rmat", "");
 	std::cout << r1 << std::endl << std::endl;
 	

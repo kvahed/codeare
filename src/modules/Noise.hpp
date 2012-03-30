@@ -18,7 +18,6 @@
  *  02110-1301  USA
  */
 
-#define M 714025
 #define IA 1366
 #define IC 150889
 #define LM 2147483647

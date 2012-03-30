@@ -14,11 +14,32 @@ template <class T> static inline Matrix<T>
 Volume (const Matrix<T>& M, const size_t s) {
 	
 	Matrix<T> res (size(M,0), size(M,1), size(M,2));
-	size_t nc = M.Dim(0)*M.Dim(1)*M.Dim(2);
+	size_t nc = numel (res);
 	
-	memcpy (&res[0], &M[s * nc], nc * sizeof(T));
+	memcpy (&res[0], M.Data(s*nc), nc * sizeof(T));
 	
 	return res;
+	
+}
+	
+
+/**
+ * @brief              Set a volume in a matrix
+ * 
+ * @param  M           Matrix to insert to
+ * @param  s           # of volume
+ * @param  A           Matrix to insert
+ */
+template <class T> inline static void
+Volume (Matrix<T>& M, const size_t s, const Matrix<T>& A) {
+	
+	assert (size(M,0) == size(A,0));
+	assert (size(M,1) == size(A,1));
+	assert (size(M,2) == size(A,2));
+
+	size_t nc = size(M,0) * size(M,1) * size(M,2);
+
+	memcpy (&M[s*nc], A.Data(), nc*sizeof(T));
 	
 }
 	
@@ -34,11 +55,31 @@ template <class T> static inline Matrix<T>
 Slice (const Matrix<T>& M, const size_t s) {
 	
 	Matrix<T> res (size(M,0),size(M,1));
-	size_t nc = M.Dim(0)*M.Dim(1);
+	size_t nc = numel (res);
 	
-	memcpy (&res[0], &M[s * nc], nc*sizeof(T));
+	memcpy (&res[0], M.Data(s*nc), nc*sizeof(T));
 	
 	return res;
+	
+}
+
+	
+/**
+ * @brief              Set a slice
+ * 
+ * @param  M           Matrix
+ * @param  s           # of slice
+ * @param  A           New slice
+ */
+template <class T> static inline void
+Slice (Matrix<T>& M, const size_t s, const Matrix<T>& A) {
+	
+	assert (size(M,0) == size(A,0));
+	assert (size(M,1) == size(A,1));
+
+	size_t nc = size(M,0) * size(M,1);
+
+	memcpy (&M[s*nc], A.Data(), nc*sizeof(T));
 	
 }
 
@@ -53,12 +94,30 @@ Slice (const Matrix<T>& M, const size_t s) {
 template <class T> static inline Matrix<T> 
 Row (const Matrix<T>& M, const size_t r)  {
 	
-	Matrix<T> res (M.Dim(1),1);
+	Matrix<T> res (size(M, 1),1);
 	
-	for (size_t i = 0; i < M.Dim(1); i++)
-		res[i] = M[r + i*M.Dim(0)];
+	for (size_t i = 0; i < size(M, 1); i++)
+		res[i] = M[r + i*size(M, 0)];
 	
 	return res;
+	
+}
+	
+	
+/**
+ * @brief              Copy a row (A) into matrix M
+ * 
+ * @param  M           Matrix to copy into
+ * @param  r           # of row
+ * @param  A           Matrix to copy from
+ */
+template <class T> static inline void 
+Row (Matrix<T>& M, const size_t r, const Matrix<T>& A)  {
+	
+	assert (size(M,1) == numel (A));
+	
+	for (size_t i = 0; i < size(M, 1); i++)
+		M[r + i*size(M, 0)] = A[i];
 	
 }
 	
@@ -71,13 +130,31 @@ Row (const Matrix<T>& M, const size_t r)  {
  * @return             Desired row of M
  */
 template <class T> static inline Matrix<T> 
-Column (Matrix<T>& M, const size_t c) {
+Column (const Matrix<T>& M, const size_t c) {
 	
-	Matrix<T> res (M.Dim(0),1);
+	Matrix<T> res (size(M, 0),1);
 	
-	memcpy (&res[0], &M[c*M.Dim(0)], M.Dim(0) * sizeof(T));
+	memcpy (&res[0], &M[c*size(M, 0)], size(M, 0) * sizeof(T));
 	
 	return res;
+	
+}
+
+
+/**
+ * @brief              Get a row
+ * 
+ * @param  M           Matrix
+ * @param  c           # of row
+ * @return             Desired row of M
+ */
+template <class T> static inline Matrix<T> 
+Column (Matrix<T>& M, const size_t c, const Matrix<T>& A) {
+	
+	assert (size(M,0) == size (A,0));
+	size_t nc = size(M,0);
+
+	memcpy (&M[c*nc], &A[0], nc * sizeof(T));
 	
 }
 

@@ -32,8 +32,8 @@ algotest (Connector<T>* rc) {
 	B = inv(B = chol(B = cov(B)));
 	MXDump (B, std::string (base + std::string("covout.mat")), "covA");
 
-	Matrix<double> x  = Matrix<double>::LinSpace (0.0, 10.0, 8);
-	Matrix<double> xi = Matrix<double>::LinSpace (0.0, 10.0, 100);
+	Matrix<double> x  = linspace<double> (0.0, 10.0, 8);
+	Matrix<double> xi = linspace<double> (0.0, 10.0, 100);
 
 	Matrix<cxdb> Bi = interp1 (x, B, xi, INTERP::AKIMA);
 
