@@ -115,6 +115,16 @@ public:
 	 */
 	Matrix<T> 
 	Adjoint     (const Matrix<T>& m) const ;
+
+	nfft_plan*
+	FPlan() {
+		return &m_fplan;
+	} 
+	
+	solver_plan_complex*
+	IPlan() {
+		return &m_iplan;
+	} 
 	
 	
 private:

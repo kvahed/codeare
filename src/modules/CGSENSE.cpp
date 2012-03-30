@@ -21,7 +21,7 @@
 #include "CGSENSE.hpp"
 #include "nfftstub.h"
 #include "Noise.hpp"
-#include "SEM.hpp"
+#include "NCSENSE.hpp"
 #include "Toolbox.hpp"
 #include "Lapack.hpp"
 
