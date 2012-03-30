@@ -21,7 +21,7 @@
 #include "OMP.hpp"
 #include "Access.hpp"
 
-static Matrix<cxdb> 
+inline static Matrix<cxdb> 
 E (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& dim) {
 
 	// Some dimensions
@@ -32,7 +32,7 @@ E (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& 
 	nk = fts[0]->FPlan()->M_total;
 
 	Matrix<cxdb> res (nk,nc);
-
+	
 	// Loop over coils, Elementwise multiplication of maps with in (s.*in), ft and store in out
 	
 #pragma omp parallel default (shared) 
@@ -40,14 +40,14 @@ E (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& 
 
 		NFFT<cxdb>&  ft = *fts[omp_get_thread_num()];
 		Matrix<cxdb> tmp;
-
+		
 #pragma omp for // coils
 		for (int j = 0; j < nc; j++) {
 			
 			tmp  = (dim == 2) ? Slice (sm, j) : Volume (sm, j);
 			tmp *= in;
 			tmp  = ft * tmp;
-
+			
 			memcpy (&res[j*nk], &tmp[0], nk * sizeof(cxdb));
 			
 		}
@@ -60,10 +60,9 @@ E (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& 
 
 
 
-static Matrix<cxdb> 
-EH (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>**, 
-	const int& dim, const double& epsilon = 7.0e-3, const int& maxit = 1, 
-	const bool& adjoint = false) {
+inline static Matrix<cxdb> 
+EH (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& dim, 
+	const double& epsilon = 7.0e-3, const int& maxit = 1, const bool& adjoint = false) {
 
 	// Some dimensions
 	size_t nr, nc, nk;
@@ -72,63 +71,35 @@ EH (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>**,
 	nk = size(in,0);
 	nr = numel(sm)/nc;
 
-	Matrix<cxdb> res (size(sm,0), size(sm,1), (dim == 3) ? size(sm,2) : nc, (dim == 3) ? nc : 1);
-	/*
-	fftw_complex* ftout    = (fftw_complex*) malloc (imgsize * ncoils * sizeof (fftw_complex)); 
+	Matrix<cxdb> res 
+		(size(sm,0), 
+		 size(sm,1),
+		 (dim == 3) ? size(sm,2) : nc, 
+		 (dim == 3) ?         nc :  1);
 
 	// OMP Loop over coils, Inverse FT every signal in *in, 
 	// Sum elementwise mutiplied images with according sensitivity maps 
 #pragma omp parallel default (shared) 
 	{
 		
-		omp_set_num_threads(8);
-		int tid      = omp_get_thread_num();
+		NFFT<cxdb>&  ft = *fts[omp_get_thread_num()];
+		Matrix<cxdb> tmp;
 		
 #pragma omp for
-		for (int j = 0; j < ncoils; j++) {
+		for (int j = 0; j < nc; j++) {
 			
-			int    spos   = j * nsamples;
-			int    ipos   = j * imgsize;
+			int    spos   = j * nk;
+			int    ipos   = j * nr;
 			
-			// Copy to iFT
-			for (int i = 0; i < nsamples; i++) {
-				spc[tid].y[i][0] = (in[spos + i]).real();
-				spc[tid].y[i][1] = (in[spos + i]).imag();
-			}
-			
-			// Inverse FT or adjoint
-			if (adjoint) {
-				nfft::adjoint (&np[tid]);
-				memcpy (&ftout[ipos],       &np[tid].f_hat[0][0], imgsize*sizeof (fftw_complex));
-			} else {
-				nfft::ift (&np[tid],  &spc[tid], maxit, epsilon);
-				memcpy (&ftout[ipos], &spc[tid].f_hat_iter[0][0], imgsize*sizeof (fftw_complex));
-			}
+			if      (dim == 2)  Slice (res, j, ft ->* Column (in, j) *  Slice (sm, j));
+			else if (dim == 3) Volume (res, j, ft ->* Column (in, j) * Volume (sm, j));
 			
 		}
-
-		cxfl sens  = cxfl(0.0,0.0);
-
-#pragma omp for schedule (guided, 1024)
-		for (int i = 0; i < imgsize; i++) {
-
-			for (int j = 0; j < ncoils; j++) {
-				int pos = j * imgsize + i;
-				out[i] += (cxfl(ftout[pos][0], ftout[pos][1]) * conj(sm[pos]));
-			}
-
-			out[i] *= ic[i];
-
-		}
+		
 	}
 	
+	return sum (res, dim);
 
-	free (ftout);
-
-	return OK;
-	*/
-
-	return res;
 }
 
 

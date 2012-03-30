@@ -31,7 +31,7 @@ Volume (const Matrix<T>& M, const size_t s) {
  * @param  A           Matrix to insert
  */
 template <class T> inline static void
-Volume (Matrix<T>& M, const size_t s, const Matrix<T>& A) {
+Volume (Matrix<T>& M, const size_t s, const Matrix<T> A) {
 	
 	assert (size(M,0) == size(A,0));
 	assert (size(M,1) == size(A,1));
@@ -72,7 +72,7 @@ Slice (const Matrix<T>& M, const size_t s) {
  * @param  A           New slice
  */
 template <class T> static inline void
-Slice (Matrix<T>& M, const size_t s, const Matrix<T>& A) {
+Slice (Matrix<T>& M, const size_t s, const Matrix<T> A) {
 	
 	assert (size(M,0) == size(A,0));
 	assert (size(M,1) == size(A,1));
@@ -112,7 +112,7 @@ Row (const Matrix<T>& M, const size_t r)  {
  * @param  A           Matrix to copy from
  */
 template <class T> static inline void 
-Row (Matrix<T>& M, const size_t r, const Matrix<T>& A)  {
+Row (Matrix<T>& M, const size_t r, const Matrix<T> A)  {
 	
 	assert (size(M,1) == numel (A));
 	
@@ -134,7 +134,7 @@ Column (const Matrix<T>& M, const size_t c) {
 	
 	Matrix<T> res (size(M, 0),1);
 	
-	memcpy (&res[0], &M[c*size(M, 0)], size(M, 0) * sizeof(T));
+	memcpy (&res[0], M.Data(c*size(M, 0)), size(M, 0) * sizeof(T));
 	
 	return res;
 	
@@ -149,7 +149,7 @@ Column (const Matrix<T>& M, const size_t c) {
  * @param  A           Vector to copy from
  */
 template <class T> static inline void
-Column (Matrix<T>& M, const size_t c, const Matrix<T>& A) {
+Column (Matrix<T>& M, const size_t c, const Matrix<T> A) {
 	
 	assert (size(M,0) == size (A,0));
 	size_t nc = size(M,0);

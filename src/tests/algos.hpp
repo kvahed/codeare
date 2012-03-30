@@ -18,7 +18,7 @@ algotest (Connector<T>* rc) {
 	std::cout << "  size(A): \n    " << sz ;
 	std::cout << "  numel(B): " << numel(B) << std::endl;
 	
-	C = (Matrix<cxfl>) Sum (B,4);
+	C = (Matrix<cxfl>) sum (B,4);
 	sz = size(C);
 	std::cout << "  size(C): \n    " << sz ;
 	std::cout << "  numel(C): " << numel(C) << std::endl;

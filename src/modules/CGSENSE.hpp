@@ -26,7 +26,7 @@
 
 #include "nfft3util.h"
 #include "nfft3.h"
-//#include "NCSENSE.hpp"
+#include "NCSENSE.hpp"
 
 typedef std::complex<float> raw;
 
@@ -60,18 +60,26 @@ namespace RRStrategy {
 		Process ();
 
 		/**
+		 * @brief Prepare conjugate gradient SENSE
+		 */
+		virtual RRSModule::error_code
+		Prepare ();
+
+		/**
 		 * @brief Initialise NuFFT plans
 		 */
 		virtual RRSModule::error_code
 		Init ();
 		
 		/**
-		 * @brief Initialise NuFFT plans
+		 * @brief Clean up
 		 */
 		virtual RRSModule::error_code
 		Finalise ();
 		
 	private:
+
+		NCSENSE<cxdb>* m_ncs;
 		
 		int                  m_iter;            /**< Maximum number of NuFFT solver iterations */
 		int                  m_verbose;         /**< Verbose should give back the reconstruction series? */

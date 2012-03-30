@@ -177,6 +177,8 @@ NCSENSE<cxdb>::NCSENSE (const Matrix<cxdb> sens, const size_t& nk, const double&
 	m_cgiter = cgiter;
 	m_cgeps  = cgeps;
 	m_lambda = lambda;
+
+	printf ("Initialised NC SENSE: %i %e %e\n", m_cgiter, m_cgeps, m_lambda);
 	
 	m_initialised = true;
 

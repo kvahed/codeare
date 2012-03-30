@@ -37,7 +37,7 @@ mean (const Matrix<T>& M, const size_t& d) {
 	Matrix<T> res  = M;
 	float     quot = (float) res.Dim(d);
 		
-	res = Sum (res, d);
+	res = sum (res, d);
 	
 	return res / quot;
 	
