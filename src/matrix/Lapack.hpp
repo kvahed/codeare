@@ -101,6 +101,7 @@ extern "C" {
 
 #include "Matrix.hpp"
 #include "Algos.hpp"
+#include "Creators.hpp"
 
 
 	/**
@@ -430,7 +431,7 @@ Pinv (Matrix<T>& m, double rcond = 1.0) {
 	
 	s      =        malloc (swork);
 	
-	Matrix<T> b =  Matrix<T>::Id(ldb);
+	Matrix<T> b = eye<T>(ldb);
 	
 	float frcond  = rcond;
 	

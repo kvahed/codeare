@@ -215,8 +215,8 @@ Solution ComputeGradient (GradientParams& gp) {
 	size_t sgpk = size(gp.k,0);
 	size_t ssk  = (sgpk-1)*ups+1;
 
-	op = Matrix<double>::LinSpace (0.0, (double)(size(gp.k,0)-1), sgpk);
-	np = Matrix<double>::LinSpace (0.0, (double)(size(gp.k,0)-1),  ssk);
+	op = linspace<double> (0.0, (double)(size(gp.k,0)-1), sgpk);
+	np = linspace<double> (0.0, (double)(size(gp.k,0)-1),  ssk);
 
 	printf ("..."); fflush (stdout);
 
@@ -270,10 +270,10 @@ Solution ComputeGradient (GradientParams& gp) {
 	
 	printf ("."); fflush (stdout);
 	
-	sf         = Matrix<double>::LinSpace (0.0, L,   ts);
-	sdin.sh    = Matrix<double>::LinSpace (0.0, L, 2*ts);
-	sta        = Matrix<double>::Zeros (size(sf,0), 1);
-	stb        = Matrix<double>::Zeros (size(sf,0), 1);
+	sf         = linspace<double> (0.0, L,   ts);
+	sdin.sh    = linspace<double> (0.0, L, 2*ts);
+	sta        = zeros<double> (size(sf,0), 1);
+	stb        = zeros<double> (size(sf,0), 1);
 
 	sdin.posh  = interp1 (sop, np, sdin.sh);
 	
@@ -332,8 +332,8 @@ Solution ComputeGradient (GradientParams& gp) {
 	tos    = cumsum (ds/sta);	
 	tos.Resize(size(tos,1)-1,size(tos,0));
 	T      = tos [ss-2];
-	Nt     = round(T/gp.dt); 
-	t      = Matrix<double>::LinSpace(0.0, T, Nt);
+	Nt     = round (T/gp.dt); 
+	t      = linspace<double> (0.0, T, Nt);
 
 	sot    = interp1 (tos,  sf,   t);
 	pot    = interp1 ( sf, pos, sot);

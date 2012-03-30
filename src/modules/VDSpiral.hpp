@@ -56,7 +56,7 @@ Solution VDSpiral (SpiralParams& sp) {
 
 	dr  = ((double) sp.shots) / (fov_max);
 	n   = size(fov,1)*100;
-	r   = Matrix<double>::LinSpace(0.0, k_max, n);
+	r   = linspace<double> (0.0, k_max, n);
 	
 	Matrix<double> x = k_max*rad;
 	fov = interp1 (x, fov, r, INTERP::LINEAR);
@@ -64,7 +64,7 @@ Solution VDSpiral (SpiralParams& sp) {
 	dr  = ((double) sp.shots) / (1500.0 * fov_max);
 	n   = ceil (k_max/dr);
 	x   = r;
-	r   = Matrix<double>::LinSpace(0.0, k_max, n);
+	r   = linspace<double> (0.0, k_max, n);
 
 	fov = interp1 (x, fov, r, INTERP::AKIMA);
 

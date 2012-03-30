@@ -1,16 +1,14 @@
+#include "matrix/Creators.hpp"
+
 template <class T> bool 
 internaltest (Connector<T>* rc) {
 	
 	int            i = 0, j = 0, d = 5;
 	
-	Matrix<cxfl>   cf (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	Matrix<double> rd (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	Matrix<short>  si (d, d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix<cxfl>   cf = rand<cxfl>(d, d);
+	Matrix<double> rd = rand<double>(d, d);
+	Matrix<short>  si = rand<short>(d, d);
 	
-	cf.Random(); 
-	rd.Random();
-	si.Random();
-
 	Matrix<size_t> m (3,2);
 	m (0,0) = 1;
 	m (0,1) = 3;
@@ -21,7 +19,7 @@ internaltest (Connector<T>* rc) {
 
 	std::cout << m << std::endl;
 	
-	Matrix<size_t> mg = Matrix<size_t>::MeshGrid(m);
+	//Matrix<size_t> mg = meshgrid (m);
 #ifdef HAVE_MAT_H	
 	//mg.MXDump("mg.mat", "mg");
 #endif

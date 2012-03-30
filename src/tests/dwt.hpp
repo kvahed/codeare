@@ -1,9 +1,10 @@
 #include "matrix/DWT.hpp"
+#include "matrix/Creators.hpp"
 
 template <class T> bool
 dwttest (Connector<T>* rc) {
 
-	Matrix<cxfl> m   = Matrix<cxfl>::Phantom2D(512);
+	Matrix<cxfl> m   = phantom<cxfl> (512);
 	Matrix<cxfl> k, i;
 
 	DWT dwt (m.Height(), WL_DAUBECHIES);

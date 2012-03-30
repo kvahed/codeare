@@ -262,182 +262,6 @@ public:
 	Matrix              (const Matrix<T> &M);
 
 
-	/**
-	 * @brief           Create nxn identity matrix 
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn identity
-	 */
-	static Matrix<T> 
-	Id                  (const size_t n);
-	
-	
-	/**
-	 * @brief           Create nxn matrix initialised with T(1.0)
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn ones
-	 */
-	static Matrix<T> 
-	Ones                (const size_t n);
-	
-	
-	/**
-	 * @brief           Create mxn matrix initialised with T(1.0)
-	 *
-	 * @param  m        Rows
-	 * @param  n        Cols
-	 * @return          mxn ones
-	 */
-	static Matrix<T> 
-	Ones                (const size_t m, const size_t n);
-	
-	
-	/**
-	 * @brief           Create mxnxl matrix initialised with T(1.0)
-	 *
-	 * @param  m        Rows
-	 * @param  n        Cols
-	 * @param  l        Slices
-	 * @return          nxn ones
-	 */
-	static Matrix<T> 
-	Ones                (const size_t m, const size_t n, const size_t l);
-	
-	
-	/**
-	 * @brief           Create nxn matrix initialised with T(0.0)
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Zeros               (const size_t n);
-	
-	
-	/**
-	 * @brief           Create mxn matrix initialised with T(0.0)
-	 *
-	 * @param  m        Rows
-	 * @param  n        Cols
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Zeros               (const size_t m, const size_t n);
-	
-	
-	/**
-	 * @brief           Create nxn matrix initialised with T(0.0)
-	 *
-	 * @param  m        Rows
-	 * @param  n        Cols
-	 * @param  l        Slices
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Zeros               (const size_t m, const size_t n, const size_t l);
-
-	
-	/**
-	 * @brief           Create 2D nxn Shepp-Logan phantom.<br/>
-	 *                  Shepp et al. The Fourier reconstruction of a head section. IEEE TNS. 1974; 21: 21-43
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Phantom2D           (const size_t n);
-	
-	
-	/**
-	 * @brief           Create 3D nxn Shepp-Logan phantom.<br/>
-	 *                  Koay et al. Three dimensional analytical magnetic resonance imaging phantom in the Fourier domain. MRM. 2007; 58: 430-436
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Phantom3D           (const size_t n);
-	
-	
-	/**
-	 * @brief           Create 2D nxn random matrix.<br/>
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Random2D            (const size_t n);
-	
-	
-	/**
-	 * @brief           Create 2D nxn random matrix.<br/>
-	 *
-	 * @param  n        Side length of matrix
-	 * @return          nxn zeros
-	 */
-	static Matrix<T> 
-	Random3D            (const size_t n);
-	
-	
-	/**
-	 * @brief           Create circle of ones in 2D square Matrix
-	 *
-	 * @param   p       Parameter array. Must hold r, x0, y0, intensity.
-	 * @param   n       Size of square
-	 * @return          Matrix including ellipsoid
-	 */
-	static Matrix<T> 
-	Circle              (const float* p, const size_t n);
-	
-	
-	/**
-	 * @brief           Create sphere of ones in 3D cubic Matrix
-	 *
-	 * @param   p       Parameter array. Must hold r, x0, y0, z0, size_tensity.
-	 * @param   n       Size of cube
-	 * @return          Matrix including ellipsoid
-	 */
-	static Matrix<T> 
-	Sphere              (const float* p, const size_t n);
-	
-	
-	/**
-	 * @brief           Create ellipsoid of ones in 3D cubic matrix
-	 *
-	 * @param   p       Parameter array. Must hold a, b, c, x0, y0, z0, phi, psi, theta, intensity.
-	 * @param   n       Size of cube
-	 * @param   v       Value of voxels inside, default: 1
-	 * @return          Matrix including ellipsoid
-	 */
-	static Matrix<T> 
-	Ellipsoid           (const float* p, const size_t n, const T v = T(1.0));
-	
-	
-	/**
-	 * @brief           Create ellipse of ones in 2D square matrix
-	 *
-	 * @param  p        Parameter array. Must hold a, b, x0, y0, phi, intensity.
-	 * @param  n        Size of square
-	 * @param  v        Value of voxels inside, default: 1
-	 * @return          Matrix including ellipsoid
-	 */
-	static Matrix<T> 
-	Ellipse             (const float* p, const size_t n, const T v = T(1.0));
-	
-	
-	/**
-	 * @brief           MATLAB-like linspace
-	 *
-	 * @param  start    Start of range
-	 * @param  end      End of range
-	 * @param  n        Number of samples
-	 * @return          Vector of values
-	 */
-	static Matrix<T> 
-	LinSpace           (const T& start, const T& end, const size_t& n);
-	
-	
     //@}
 
 
@@ -2088,22 +1912,6 @@ public:
 
 
     /**
-     * @name Data manipulation functions.
-     *       Data manipulation functions.
-     */
-    
-    //@{
-    
-    /**
-     * @brief           Fill with random data
-     */
-    inline void         
-	Random             ();    
-
-
-    //@}
-    
-    /**
      * @name Display and IO functions.
      *       Display and IO functions.
      */
@@ -2223,20 +2031,6 @@ public:
     Min                 () const ;
     
     
-	/**
-	 * @brief           MeshGrid
-	 *
-	 * @param  dims     Grid indices (i.e. m(0,0)=minx m(0,1)=maxx, etc)
-	 * @return          Mesh grid.<br/> [X,Y,Z] = meshgrid (.,.,.) corresponds to:<br/> 
-	 *                  Matrix<size_t> dims (3,2); <br/>
-	 *                  dims (0,0)=0; dims(0,1)=2; dims(1,0)=0; dims(1,1)=3; dims(2,0)=0; dims(2,1)=4;
-	 *                  Matrix<size_t> mg = Matrix<T>::MeshGrid(dims);<br/>
-	 *                  Delivers mg O(3,4,5,3). Highest dimension is [X,Y,Z];
-	 */
-	static Matrix<size_t>
-	MeshGrid            (const Matrix<size_t>& dims);
-
-
     /**
      * @brief           Get maximum absolute value in the matrix
      *
@@ -2606,47 +2400,6 @@ Matrix<T>::tr() const {
 
 }
 
-template<> inline void 
-Matrix<cxfl>::Random () {
-	
-	srand (time(NULL));
-
-	for (size_t i = 0; i < Size(); i++)
-		_M[i] = cxfl ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
-	
-}
-    
-template<> inline void 
-Matrix<cxdb>::Random () {
-	
-	srand (time(NULL));
-
-	for (size_t i = 0; i < Size(); i++)
-		_M[i] = cxdb ((float) rand() / (float) RAND_MAX*2-1, (float) rand() / (float) RAND_MAX*2-1);
-	
-}
-    
-template<> inline void 
-Matrix<double>::Random () {
-
-	srand (time(NULL));
-
-	for (size_t i = 0; i < Size(); i++)
-		_M[i] = (double) rand() / (double) RAND_MAX*2-1;
-
-}
-    
-template<> inline void 
-Matrix<short>::Random () {
-
-	srand (time(NULL));
-
-	for (size_t i = 0; i < Size(); i++)
-		_M[i] = (short) 12 * (double)rand() / (double)RAND_MAX*2-1;
-
-}
-
-
 #include "Lapack.hpp"
 
 template <class T> Matrix<T> 
@@ -2719,6 +2472,20 @@ Matrix<short>::Print (std::ostream &os) const {
 	}
 	
 	return os;
+
+}
+
+
+template<> inline std::ostream&  
+Matrix<long>::Print (std::ostream &os) const {
+	
+	for (size_t i = 0; i < _dim[COL]; i++) {
+		for(size_t j = 0; j < _dim[LIN]; j++)
+			printf ("%i ", _M [i + j * _dim[COL]]);
+		printf("\n");
+	}
+	
+	return os;
 	
 }
 
@@ -2779,26 +2546,6 @@ Matrix<cxdb>::Print (std::ostream& os) const {
 }
 
 
-template <class T> Matrix<T>
-Matrix<T>::LinSpace (const T& start, const T& end, const size_t& n) {
-	
-	assert (n > 1);
-	
-	Matrix<T> res (n, 1);
-	T gap;
-
-	gap      = T(end-start) / T(n-1);
-	
-	res[0]   = start;
-	res[n-1] = end;
-	
-	for (int i = 1; i < n-1; i++)
-		res[i] = res[i-1] + gap;
-	
-	return res;
-	
-}
-
 template <class T> inline 
 Matrix<T>::Matrix () {
 
@@ -2809,8 +2556,7 @@ Matrix<T>::Matrix () {
 
 	_M.resize(Size());
 		
-		Zero();
-
+	Zero();
 
 	_name = "Matrix<T>";
 
@@ -2974,342 +2720,6 @@ Matrix<T>::~Matrix() {
     
 }
 
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Id (const size_t n) {
-
- 	Matrix<T> M (n);
-
- 	for (size_t i = 0; i < n; i++)
- 		M[i*n+i] = T(1.0);
-
- 	return M;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n, const size_t l) {
-
- 	Matrix<T> M (m,n,l);
-
- 	for (size_t i = 0; i < M.Size(); i++)
- 		M[i] = T(1.0);
-
- 	return M;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Ones (const size_t m, const size_t n) {
-
- 	Matrix<T> M (m,n);
-
- 	for (size_t i = 0; i < M.Size(); i++)
- 		M[i] = T(1.0);
-
- 	return M;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Ones (const size_t n) {
-
- 	return Ones(n,n);
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m, const size_t l) {
-
- 	Matrix<T> M (m,n,l);
-
- 	for (size_t i = 0; i < M.Size(); i++)
- 		M[i] = T(0.0);
-
- 	return M;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Zeros (const size_t n, const size_t m) {
-
- 	Matrix<T> M (m,n);
-
- 	for (size_t i = 0; i < M.Size(); i++)
- 		M[i] = T(0.0);
-
- 	return M;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Zeros (const size_t n) {
-
- 	return Zeros(n,n);
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Circle (const float* p, const size_t n) {
-
-	Matrix<T> res = Matrix<T>::Zeros(n);
-
-	float m[2];
-	float rad;
-
-	rad = p[0] * float(n) / 2.0;
-
-	m[0] = (1.0 - p[1]) * float(n) / 2.0;
-	m[1] = (1.0 - p[2]) * float(n) / 2.0;
-
-	for (size_t r = 0; r < res.Dim(1); r++)
-		for (size_t c = 0; c < res.Dim(0); c++)
-			res(c,r) = ( pow(((float)c-m[0])/rad, 2.0 ) + pow(((float)r-m[0])/rad, 2.0) <= 1.0) ? T(1.0) : T(0.0);
-
-	return res;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Sphere (const float* p, const size_t n) {
-
-	Matrix<T> res = Matrix<T>::Zeros(n,n,n);
-
-	float m[3];
-	float rad;
-
-	rad = p[0] * float(n) / 2.0;
-
-	m[0] = (1.0 - p[1]) * float(n) / 2.0;
-	m[1] = (1.0 - p[2]) * float(n) / 2.0;
-	m[2] = (1.0 - p[3]) * float(n) / 2.0;
-
-	for (size_t s = 0; s < res.Dim(2); s++)
-		for (size_t r = 0; r < res.Dim(1); r++)
-			for (size_t c = 0; c < res.Dim(0); c++)
-				res(c,r) = ( pow (((float)c-m[0])/rad, 2.0) + pow (((float)r-m[1])/rad, 2.0) + pow (((float)s-m[2])/rad, 2.0) <= 1.0) ? T(1.0) : T(0.0);
-
-	return res;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Ellipse (const float* p, const size_t n, const T v) {
-
-	Matrix<T> res = Matrix<T>::Zeros(n);
-
-	float m[2];
-	float a[2];
-
-	a[0] = p[0] * float(n) / 2.0;
-	a[1] = p[1] * float(n) / 2.0;
-
-	m[0] = (1.0 - p[2]) * float(n) / 2.0;
-	m[1] = (1.0 - p[3]) * float(n) / 2.0;
-
-	float cosp = cos(p[4]);
-	float sinp = sin(p[4]);
-	
-#pragma omp parallel default (shared) 
-	{
-		
-		size_t tid      = omp_get_thread_num();
-		size_t chunk    = n / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk) 
-		
-	for (size_t r = 0; r < n; r++)
-		for (size_t c = 0; c < n; c++)
-			res(c,r) = (pow( (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1], 2.0 ) + 
-						pow( (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0], 2.0) <= 1.0) ? v : T(0.0);
-
-	}
-
-	return res;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Ellipsoid (const float* p, const size_t n, const T v) {
-
-	Matrix<T> res = Matrix<T>::Zeros(n,n,n);
-
-	float m[3];
-	float a[3];
-	float d;
-
-	a[0] = p[0] * float(n) / 2.0;
-	a[1] = p[1] * float(n) / 2.0;
-	a[2] = p[2] * float(n) / 2.0;
-
-	m[0] = (1.0 - p[3]) * float(n) / 2.0;
-	m[1] = (1.0 - p[4]) * float(n) / 2.0;
-	m[2] = (1.0 - p[5]) * float(n) / 2.0;
-
-	float cosp = cos(p[6]);
-	float sinp = sin(p[6]);
-	
-#pragma omp parallel default (shared) 
-	{
-		
-		size_t tid      = omp_get_thread_num();
-		size_t chunk    = n / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk) 
-		
-		for (size_t s = 0; s < n; s++)
-			for (size_t r = 0; r < n; r++)
-				for (size_t c = 0; c < n; c++)
-					res(c,r,s) = ( pow( (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1], 2.0) + 
-								   pow( (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0], 2.0) +
-								   pow( ((float)s-m[2])/a[2], 2.0) <= 1.0) ? v : T(0.0);
-		
-	}
-
-	return res;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Phantom2D (const size_t n) {
-
-	const size_t ne = 10; // Number of ellipses
-	const size_t np = 5;  // Number of geometrical parameters
-
-	float p[ne][np] = {
-		{ 0.6900, 0.9200,  0.00,  0.0000,  0.0 },
-		{ 0.6624, 0.8740,  0.00, -0.0184,  0.0 },
-        { 0.1100, 0.3100, -0.22,  0.0000, -0.3 },
-		{ 0.1600, 0.4100,  0.22,  0.0000,  0.3 },
-		{ 0.2100, 0.2500,  0.00,  0.3500,  0.0 },
-		{ 0.0460, 0.0460,  0.00,  0.1000,  0.0 },
-		{ 0.0460, 0.0460,  0.00, -0.1000,  0.0 },
-		{ 0.0460, 0.0230,  0.08, -0.6050,  0.0 },
-		{ 0.0230, 0.0230,  0.00, -0.6060,  0.0 },
-		{ 0.0230, 0.0460, -0.06, -0.6050,  0.0 }
-	};
-
-	// Size_Tensities
-	T v[ne] = {T(1.0), T(-0.8), T(-0.2), T(-0.2), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1)};
-
-	// Empty matrix
-	Matrix<T> res = Matrix<T>::Zeros(n);
-	Matrix<T>        e;
-
-	for (size_t i = 0; i < ne; i++) {
-		e    = Matrix<T>::Ellipse (p[i], n, v[i]);
-		res += e;
-	}
-
-	return res;
-
-}
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Random2D (const size_t n) {
-
-	Matrix<T> res (n);
-	res.Random();
-
-	return res;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Random3D (const size_t n) {
-
-	Matrix<T> res (n, n, n);
-	res.Random();
-
-	return res;
-
-}
-
-
-
-template <class T> inline 
-Matrix<T> Matrix<T>::Phantom3D (const size_t n) {
-
-	const size_t ne = 10; // Number of ellipses
-	const size_t np =  9; // Number of geometrical parameters
-
-	float p[ne][np] = {
-		{ 0.690, 0.920, 0.900,  0.00,  0.000,  0.000,  0.0, 0.0, 0.0 },
-        { 0.662, 0.874, 0.880,  0.00,  0.000,  0.000,  0.0, 0.0, 0.0 },
-        { 0.110, 0.310, 0.220, -0.22,  0.000, -0.250, -0.3, 0.0, 0.0 },
-        { 0.160, 0.410, 0.210,  0.22,  0.000, -0.250,  0.3, 0.0, 0.0 },
-        { 0.210, 0.250, 0.500,  0.00,  0.350, -0.250,  0.0, 0.0, 0.0 },
-        { 0.046, 0.046, 0.046,  0.00,  0.100, -0.250,  0.0, 0.0, 0.0 },
-        { 0.046, 0.023, 0.020,  0.08, -0.650, -0.250,  0.0, 0.0, 0.0 },
-        { 0.046, 0.023, 0.020,  0.06, -0.650, -0.250,  0.0, 0.0, 0.0 },
-        { 0.056, 0.040, 0.100, -0.06, -0.105,  0.625,  0.0, 0.0, 0.0 },
-        { 0.056, 0.056, 0.100,  0.00,  0.100,  0.625,  0.0, 0.0, 0.0 }
-	};
-
-	T v[ne] = {2.0, -0.8, -0.2, -0.2, 0.2, 0.2, 0.1, 0.1, 0.2, -0.2};
-
-	Matrix<T> res = Matrix<T>::Zeros(n,n,n);
-	Matrix<T> e;
-	
-	for (size_t i = 0; i < ne; i++) {
-		e    = Matrix<T>::Ellipsoid (p[i], n, v[i]);
-		res += e;
-	}
-
-	return res;
-
-}
-
-
-
-template<class T> Matrix<size_t>
-Matrix<T>::MeshGrid (const Matrix<size_t>& d) {
-
-	size_t side [3];
-
-	side[0] = d(0,1) - d(0,0) + 1;
-	side[1] = d(1,1) - d(1,0) + 1;
-	side[2] = d(2,1) - d(2,0) + 1;
-
-    Matrix<size_t> mg (side[1], side[0], side[2], 3);
-
-	for (size_t s = 0; s < side[2]; s++)
-		for (size_t l = 0; l < side[0]; l++)
-			for (size_t c = 0; c < side[1]; c++) {
-				mg(c,l,s,0) = l + d(0,0);
-				mg(c,l,s,1) = c + d(0,1);
-				mg(c,l,s,2) = s + d(0,2);
-			}
-	
-	return mg;
-
-}
 
 
 template <class T> inline Matrix<T>&

@@ -3,7 +3,7 @@
 template <class T> bool
 fftwtest (Connector<T>* rc) {
 
-	Matrix<cxfl> m   = Matrix<cxfl>::Phantom2D(512);
+	Matrix<cxfl> m   = phantom<cxfl> (512);
 	Matrix<cxfl> k, i, j;
 	DFT<cxfl> dft (size(m));
 	

@@ -50,7 +50,7 @@ public:
 	NFFT        (const Matrix<size_t>& imsize, const size_t& nk, const size_t m = 1, 
 				 const double alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1), 
 				 const Matrix<T> pc = Matrix<T>(1), const double eps = 7.0e-4, 
-				 const size_t maxit = 3);
+				 const size_t maxit = 1);
 	
 	
 	/**
@@ -115,9 +115,7 @@ public:
 	 */
 	Matrix<T> 
 	Adjoint     (const Matrix<T>& m) const ;
-	
 
-	
 	/**
 	 * @brief     NFFT plan
 	 *

@@ -24,6 +24,7 @@
 #include "CX.hpp"
 #include "IO.hpp"
 #include "Statistics.hpp"
+#include "Creators.hpp"
 
 using namespace RRStrategy;
 
@@ -71,7 +72,7 @@ LapackTests::Process     () {
 
 	std::cout << "Testing SVD (dgesdd) ---------- \n";
 
-	Matrix<double> Ar (8,3); Ar.Random();
+	Matrix<double> Ar = rand<double> (8,3);
 	Matrix<double> du;
 	Matrix<double> dv;
 	Matrix<double> ds;
@@ -86,8 +87,7 @@ LapackTests::Process     () {
 	
 	std::cout << "Testing SVD (dgesdd) ---------- \n";
 
-	Matrix<cxfl> Ac (3,8); 
-	Ac.Random();
+	Matrix<cxfl> Ac = rand<cxfl> (3,8); 
 
 	Matrix<cxfl>  cu;
 	Matrix<cxfl>  cv;
@@ -103,7 +103,7 @@ LapackTests::Process     () {
 
 	std::cout << "Testing Inv (dgetri / dgetrf) - \n";
 
-	dtmp = Matrix<double>::Random2D (5);
+	dtmp = rand<double> (5,5);
 	std::cout << "RLDB IN: \n";
 	std::cout << dtmp << std::endl;
 	dtmp = inv(dtmp);
@@ -112,7 +112,7 @@ LapackTests::Process     () {
 	
 	std::cout << "Testing Inv (dgetri / dgetrf) - \n";
 
-	Matrix<cxdb>ctmp = Matrix<cxdb>::Random2D (5);
+	Matrix<cxdb>ctmp = rand<cxdb> (5,5);
 	std::cout << "CXFL IN: \n";
 	std::cout << ctmp << std::endl;
 	ctmp = inv(ctmp);
@@ -121,8 +121,7 @@ LapackTests::Process     () {
 	
 	std::cout << "Testing Pinv (dgelsd) ---------- \n";
 
-	Matrix<double> da (5,3);
-	da.Random();
+	Matrix<double> da = rand<double> (5,3);
 
 	std::cout << "RLDB IN: \n";
 	std::cout << da << std::endl;
@@ -133,8 +132,7 @@ LapackTests::Process     () {
 
 	std::cout << "Testing Pinv (zgelsd) ---------- \n";
 
-	Matrix<cxfl> db (3,5);
-	db.Random();
+	Matrix<cxfl> db = rand<cxfl> (3,5);
 
 	std::cout << "CXDB IN: \n";
 	std::cout << db << std::endl;
@@ -145,8 +143,7 @@ LapackTests::Process     () {
 
 	std::cout << "Testing mm multipl. (dgemm) --- \n";
 
-	Matrix<cxfl> dc (3,8) ;
-	dc.Random();
+	Matrix<cxfl> dc = rand<cxfl> (3,8);
 	
 	std::cout << "A = [\n";
 	std::cout << db;
@@ -171,11 +168,9 @@ LapackTests::Process     () {
 	std::cout << "A*(B').' :\n" <<  dd;
 	std::cout << "------------------------------- \n\n";
 
-	Matrix<cxfl> A (3,8); 
-	A.Random();
+	Matrix<cxfl> A = rand<cxfl> (3,8); 
 
-	Matrix<cxfl> b (A.Height(),1);
-	b.Random();
+	Matrix<cxfl> b = rand<cxfl> (A.Height());
 	
 	std::cout << b.dotc(b) << std::endl;
 
@@ -197,8 +192,8 @@ LapackTests::Process     () {
 	std::cout << "y' :\n" <<  y;
 
 
-	A = Matrix<cxfl>(1000,8);
-	A.Random();
+	A = rand<cxfl> (1000,8);
+
 	std::cout << "dc  :\n" <<  dc;
 	A = cov (A);
 	std::cout << "cov (A)  :\n" <<  A;

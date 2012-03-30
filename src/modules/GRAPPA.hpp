@@ -24,7 +24,7 @@
 #include "ReconStrategy.hpp"
 #include "IO.hpp"
 #include "Toolbox.hpp"
-
+#include "Creators.hpp"
 
 /**
  * @brief Reconstruction startegies
@@ -127,7 +127,7 @@ namespace RRStrategy {
 		
 
 		//Grappa pattern for standard kernel 5x4
-		Matrix<double> p = Matrix<double>::Zeros ((kern_dim[1]-1)*R[1]+1, kern_dim[0], nc);
+		Matrix<double> p = zeros<double> ((kern_dim[1]-1)*R[1]+1, kern_dim[0], nc);
 		printf ("  patch size in ACS: %s\n", DimsToCString(p));
 		
 		// Source points

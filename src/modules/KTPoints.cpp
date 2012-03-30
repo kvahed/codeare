@@ -22,6 +22,7 @@
 #include "PTXINIFile.hpp"
 #include "Lapack.hpp"
 #include "IO.hpp"
+#include "Creators.hpp"
 
 using namespace RRStrategy;
 
@@ -153,7 +154,7 @@ KTPoints::Process        () {
     Matrix<cxfl>    solution;
     Matrix<cxfl>    tmp;
     Matrix<cxfl>    final;    
-    Matrix<cxfl>    treg   =  Matrix<cxfl>::Id(m_nc * m_nk) * cxfl (m_lambda, 0);
+    Matrix<cxfl>    treg   =  eye<cxfl> (m_nc * m_nk) * cxfl (m_lambda, 0);
 	Matrix<cxfl>    ve;
 	Matrix<cxfl>    vp;
 

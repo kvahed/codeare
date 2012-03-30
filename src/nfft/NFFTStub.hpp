@@ -48,8 +48,7 @@ namespace nnfft {
 	 * @return success
 	 */
 	inline static int
-	init                 (const int d, int* N, const int M, int* n, const int m, 
-						  nfft_plan& np, solver_plan_complex& inp) {
+	init                 (const int d, int* N, const int M, int* n, const int m, nfft_plan& np, solver_plan_complex& inp) {
 		
 		nfft_init_guru 
 			(&np, d, N, M, n, m,

@@ -49,11 +49,10 @@ public:
 	 * @param  eps     Convergence criterium for inverse transform (default: 1.0e-7)
 	 * @param  maxit   Maximum # NCSENSE iterations (default: 3)
 	 */
-	NCSENSE (const Matrix<T> sens, const size_t& nk, const size_t m = 1, 
-			 const double alpha = 1.0, const Matrix<double> b0 = Matrix<double>(1), 
-			 const Matrix<T> pc = Matrix<T>(1), 
-			 const double eps = 7.0e-4, const size_t maxit = 3);
-	
+	NCSENSE (const Matrix<T> sens, const size_t& nk, const double& cgeps, const size_t& cgiter, 
+			 const double& lambda = 0.0, const size_t& m = 1, const double& alpha = 1.0, 
+			 const Matrix<double>& b0 = Matrix<double>(1), const Matrix<T>& pc = Matrix<T>(1), 
+			 const double& fteps = 7.0e-4, const size_t& ftiter = 1);
 	
 	/**
 	 * @brief        Clean up and destruct
@@ -69,7 +68,7 @@ public:
 
 	if (m_initialised)
 		for (size_t i = 0; i < np; i++)
-			delete m_nffts[i];
+			delete m_fts[i];
 
 	}
 	
@@ -84,9 +83,9 @@ public:
 
 #pragma omp parallel 
 		{
-#pragma omp for	
+			
 			for (size_t i = 0; i < omp_get_num_threads (); i++)
-				m_nffts[i]->KSpace(k);
+				m_fts[i]->KSpace(k);
 			
 		}
 		
@@ -103,15 +102,15 @@ public:
 		
 #pragma omp parallel 
 		{
-#pragma omp for	
+			
 			for (size_t i = 0; i < omp_get_num_threads (); i++)
-				m_nffts[i]->Weights(w);
+				m_fts[i]->Weights(w);
 			
 		}
 		
 	}
-	
-	
+
+
 	/**
 	 * @brief    Forward transform
 	 *
@@ -129,66 +128,113 @@ public:
 	 * @return   Transform
 	 */
 	Matrix<T> 
-	Adjoint     (const Matrix<T>& m) const {};
+	Adjoint     (const Matrix<T>& m) const;
 	
 	
 private:
 
-	bool           m_initialised; /**< @brief Initialised? */
-	NFFT<T>**      m_nffts;       /**< @brief Non-uniform FFT */
-	Matrix<T>      m_sm;          /**< @brief Sensitivity maps */
-	Matrix<double> m_ic;          /**< @brief Intensity correction */
-	size_t         m_nc;          /**< @brief # receive channels */
-	size_t         m_dim;         
+	NFFT<T>** m_fts;
+	bool      m_initialised;
+
+	Matrix<T> m_sm;
+	Matrix<double> m_ic;
+
+	size_t m_dim;
+	size_t m_nr;
+	size_t m_nk;
+	size_t m_nc;
+
+	size_t m_cgiter;
+	double m_cgeps;
+	double m_lambda;
 
 };
 
 
-const Matrix<raw>& in, const Matrix<raw>& sm, const Matrix<double>& ic, nfft_plan* np, Matrix<raw>& out, const int& dim
-
 template<>
-NCSENSE<cxdb>::NCSENSE (const Matrix<cxdb> sens, const size_t& nk, const size_t m, 
-						const double alpha, const Matrix<double> b0, const Matrix<cxdb> pc, 
-						const double eps, const size_t maxit) : 
-	m_initialised (false) {
+NCSENSE<cxdb>::NCSENSE (const Matrix<cxdb> sens, const size_t& nk, const double& cgeps, 
+						const size_t& cgiter, const double& lambda, const size_t& m, 
+						const double& alpha, const Matrix<double>& b0, const Matrix<cxdb>& pc, 
+						const double& fteps, const size_t& ftiter) : m_initialised (false) {
 
-	m_dim = (size(sens,3) == 1) ? 2 : 3;
-	
+	size_t dim = (size(sens,2) == 1) ? 3 : 2;
 	Matrix<size_t> ms (dim,1);
-
 	for (size_t i = 0; i < dim; i++)
 		ms[i] = size(sens,i);
 	
 	int np = 1;
-	
+
 #pragma omp parallel default (shared)
 	{
 		np = omp_get_num_threads ();
 	}	
-	
-	m_nffts = new NFFT<cxdb>* [np];
+
+	m_fts = new NFFT<cxdb>* [np];
 	
 	for (size_t i = 0; i < np; i++)
-		m_nffts[i] = new NFFT<cxdb> (ms, nk, m, alpha);
+		m_fts[i] = new NFFT<cxdb> (ms, nk, m, alpha, b0, pc, fteps, ftiter);
+
+	m_cgiter = cgiter;
+	m_cgeps  = cgeps;
+	m_lambda = lambda;
 	
 	m_initialised = true;
-	
+
 }
 
 
-template<> Matrix<T>
-NCSENSE<cxdb>::Trafo (const Matrix<T>& m) const {
+template<> Matrix<cxdb>
+NCSENSE<cxdb>::Trafo (const Matrix<cxdb>& m) const {
 
-	Matrix<T> res (size(sm,0), size(sm,1), size(sm,2));
+	Matrix<cxdb> tmp = m * m_ic;
 
-	E  (m, sens, m_intcor, m_nffts, res, m_dim);
-	
-	return res;
+	return E (tmp, m_sm, m_fts, m_dim);
+
 }
 
 
-template<> Matrix<T>
-NCSENSE<cxdb>::Adjoint (const Matrix<T>& m) const {
+template<> Matrix<cxdb>
+NCSENSE<cxdb>::Adjoint (const Matrix<cxdb>& m) const {
+
+	cxdb ts;
+	double rn, xn;
+	Matrix<cxdb> p, r, x, q;
+	vector<double> res;
+
+	p = EH (m, m_sm, m_fts, m_dim) * m_ic;
+	r = p;
+	x = zeros<cxdb>(size(p));
+
+	rn = 0.0;
+	xn = pow(creal(Norm(p)), 2);
+	
+	for (size_t i = 0; i < m_cgiter; i++) {
+		
+		rn  = pow(creal(Norm(r)), 2);
+		res.push_back(rn/xn);
+		
+		if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps) break;
+		
+		if (i % 5 == 0 && i > 0) printf ("\n");
+		printf ("    %03lu %.7f", i, res.at(i));
+		
+		p  *= m_ic;
+		q   = E  (p, m_sm, m_fts, m_dim);
+		q   = EH (q, m_sm, m_fts, m_dim);
+		q  *= m_ic;
+
+		if (m_lambda)
+			q  += m_lambda * p;
+		
+		ts  = (rn / (p.dotc(q)));
+		x  += (p * ts);
+		r  -= (q * ts);
+		p  *= pow(creal(Norm(r)), 2)/rn;
+		p  += r;
+		
+	}
+	
+	return x * m_ic;
 
 }
 

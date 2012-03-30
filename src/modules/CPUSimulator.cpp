@@ -1,5 +1,6 @@
 #include "CPUSimulator.hpp"
 #include "Lapack.hpp"
+#include "Creators.hpp"
 
 using namespace RRStrategy;
 
@@ -272,7 +273,7 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
     m_nc   = m_sb->b1->Dim(1);     // # channels
 	m_nr   = m_sb->r->Dim(1);      // # spatial positions
 	
-	m_ic = Matrix<float>::Zeros (m_nr,1); // Intesity correction
+	m_ic = zeros<float> (m_nr,1); // Intesity correction
 	IntensityMap (*(m_sb->b1), m_ic);
 
 	if (m_sb->roi->Size() == 1)
@@ -312,7 +313,7 @@ CPUSimulator::Simulate () {
 	bool           cb0 = m_sb->cb0;
 	bool             v = m_sb->v;
 
-	SimulateAcq (b1, g, rv, (cb0)?b0:Matrix<float>::Zeros(m_nr,1), tmxy, tmz, m_ic, np, dt, false, m_nc, m_nt, m_gdt, rf);
+	SimulateAcq (b1, g, rv, (cb0) ? b0 : zeros<float> (m_nr,1), tmxy, tmz, m_ic, np, dt, false, m_nc, m_nt, m_gdt, rf);
 
 	if (m_sb->mode) {                                   // Optimise
 
