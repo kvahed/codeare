@@ -223,9 +223,9 @@ extern "C" {
  * @param  s        Sorted singular values 
  * @param  U        Left-side singlar vectors
  * @param  V        Right-side singular vectors
- * @param  jobz     Computation mode<br>
+ * @param  jobz     Computation mode<br/>
  *                  'A': all m columns of U and all n rows of VT are returned in the arrays u and vt<br/>
- *                  'S', the first min(m, n) columns of U and the first min(m, n) rows of VT are returned in the arrays u and vt;</br>
+ *                  'S', the first min(m, n) columns of U and the first min(m, n) rows of VT are returned in the arrays u and vt;<br/>
  *                  'O', then<br/>
  *                  &nbsp;&nbsp;&nbsp;&nbsp;if m >= n, the first n columns of U are overwritten in the array a and all rows of VT are returned in the array vt;<br/>
  *                  &nbsp;&nbsp;&nbsp;&nbsp;if m < n, all columns of U are returned in the array u and the first m rows of VT are overwritten in the array a;<br/>
@@ -490,7 +490,7 @@ Pinv (Matrix<T>& m, double rcond = 1.0) {
  * @see          LAPACK driver xPOTRF
  * 
  * @param  A     Incoming matrix
- * @param  U     Use upper/lower triangle for decomposition ('U': default/'L')
+ * @param  uplo  Use upper/lower triangle for decomposition ('U': default/'L')
  * @return       Cholesky decomposition
  */
 template<class T> Matrix<T> 
