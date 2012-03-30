@@ -453,7 +453,7 @@ phantom3D (const size_t& n) {
 
 	T v[ne] = {2.0, -0.8, -0.2, -0.2, 0.2, 0.2, 0.1, 0.1, 0.2, -0.2};
 
-	Matrix<T> res = Matrix<T>::Zeros(n,n,n);
+	Matrix<T> res = zeros<T>(n,n,n);
 	Matrix<T> e;
 	
 	for (size_t i = 0; i < ne; i++) {
