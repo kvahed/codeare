@@ -146,9 +146,9 @@ Column (const Matrix<T>& M, const size_t c) {
  * 
  * @param  M           Matrix
  * @param  c           # of row
- * @return             Desired row of M
+ * @param  A           Vector to copy from
  */
-template <class T> static inline Matrix<T> 
+template <class T> static inline void
 Column (Matrix<T>& M, const size_t c, const Matrix<T>& A) {
 	
 	assert (size(M,0) == size (A,0));

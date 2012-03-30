@@ -41,13 +41,6 @@ KTPoints::Init           ()  {
     RRSModule::error_code e = OK;
 	
     // # kt points ---------------------------
-    Attribute ("Nk",      &m_nk);
-    printf ("  # kt-points: %i \n", m_nk);
-	
-    m_max_rf = (float*) malloc (100 * sizeof(float));
-    for (int i = 0; i < m_nk; i++)
-        m_max_rf [m_nk] = 0.0; 
-	
     // # of spatial sites --------------------
     Attribute ("Ns",      &m_ns); 
     printf ("  # spatial sites: %i \n", m_ns);
@@ -148,6 +141,10 @@ KTPoints::Process        () {
 	m_nk = k.Dim(1);
 	m_nc = b1.Dim(1);
 
+    m_max_rf = (float*) malloc (100 * sizeof(float));
+    for (int i = 0; i < m_nk; i++)
+        m_max_rf [m_nk] = 0.0; 
+	
     for (int i = 1; i < m_nk; i++)
         m_pd[i] = m_pd[0];
 
