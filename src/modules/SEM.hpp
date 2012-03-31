@@ -21,8 +21,8 @@
 #include "OMP.hpp"
 #include "Access.hpp"
 
-inline static Matrix<cxdb> 
-E (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& dim) {
+template <class T> inline static Matrix<T> 
+E (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts, const int& dim) {
 
 	// Some dimensions
 	size_t nc, nr, nk;
@@ -31,15 +31,15 @@ E (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& 
 	nr = numel (in);
 	nk = fts[0]->FPlan()->M_total;
 
-	Matrix<cxdb> res (nk,nc);
+	Matrix<T> res (nk,nc);
 	
 	// Loop over coils, Elementwise multiplication of maps with in (s.*in), ft and store in out
 	
 #pragma omp parallel default (shared) 
 	{
 
-		NFFT<cxdb>&  ft = *fts[omp_get_thread_num()];
-		Matrix<cxdb> tmp;
+		NFFT<T>&  ft = *fts[omp_get_thread_num()];
+		Matrix<T> tmp;
 		
 #pragma omp for // coils
 		for (int j = 0; j < nc; j++) {
@@ -48,7 +48,7 @@ E (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& 
 			tmp *= in;
 			tmp  = ft * tmp;
 			
-			memcpy (&res[j*nk], &tmp[0], nk * sizeof(cxdb));
+			memcpy (&res[j*nk], &tmp[0], nk * sizeof(T));
 			
 		}
 		
@@ -59,9 +59,8 @@ E (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& 
 }
 
 
-
-inline static Matrix<cxdb> 
-EH (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int& dim, 
+template <class T> inline static Matrix<T> 
+EH (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts, const int& dim, 
 	const double& epsilon = 7.0e-3, const int& maxit = 1, const bool& adjoint = false) {
 
 	// Some dimensions
@@ -71,7 +70,7 @@ EH (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int&
 	nk = size(in,0);
 	nr = numel(sm)/nc;
 
-	Matrix<cxdb> res 
+	Matrix<T> res 
 		(size(sm,0), 
 		 size(sm,1),
 		 (dim == 3) ? size(sm,2) : nc, 
@@ -82,8 +81,8 @@ EH (const Matrix<cxdb>& in, const Matrix<cxdb>& sm, NFFT<cxdb>** fts, const int&
 #pragma omp parallel default (shared) 
 	{
 		
-		NFFT<cxdb>&  ft = *fts[omp_get_thread_num()];
-		Matrix<cxdb> tmp;
+		NFFT<T>&  ft = *fts[omp_get_thread_num()];
+		Matrix<T> tmp;
 		
 #pragma omp for
 		for (int j = 0; j < nc; j++) {

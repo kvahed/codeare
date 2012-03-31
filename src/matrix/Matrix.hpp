@@ -1192,6 +1192,26 @@ public:
 
 
 	/**
+	 * @brief           Elementwise multiplication with scalar (lhs)
+	 *
+	 * @param  s        Scalar lhs
+	 * @param  m        Matrix rhs
+	 * @return          m * s
+	 */
+	inline friend Matrix<T>    
+	operator/  (const float& s, const Matrix<T> &m) { 
+
+		Matrix<T> res = m;
+
+		for (size_t i = 0; i < res.Size(); i++)
+			res[i] = (res[i] != 0) ? s/res[i] : 0.0;
+
+		return res;
+
+	}
+
+
+	/**
 	 * @brief           Elementwise equality with scalar (lhs)
 	 *
 	 * @param  s        Scalar lhs
