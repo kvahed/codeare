@@ -48,18 +48,21 @@ cgsensetest (RRClient::Connector<T>* rc) {
 		return false;
 	}
 	
-	// Outgoing -------------
+	// Prepare -------------
 	
-	rc->SetMatrix (   "data", rawdata); // Measurement data
 	rc->SetMatrix (   "sens", sens);    // Sensitivities
 	rc->SetMatrix ("weights", weights); // Weights
 	rc->SetMatrix ( "kspace", kspace);  // K-space
 	
-	// ---------------------
+	rc->Prepare    (test);
+	
+	// Process -------------
+
+	rc->SetMatrix (   "data", rawdata); // Measurement data
 	
 	rc->Process    (test);
 	
-	// Incoming -------------
+	// Receive -------------
 	
 	rc->GetMatrix     (  "image", image);  // Images
 	if (pulses)

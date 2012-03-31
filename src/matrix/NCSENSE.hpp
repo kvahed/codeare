@@ -52,7 +52,34 @@ public:
 	NCSENSE (const Matrix<T> sens, const size_t& nk, const double& cgeps, const size_t& cgiter, 
 			 const double& lambda = 0.0, const size_t& m = 1, const double& alpha = 1.0, 
 			 const Matrix<double>& b0 = Matrix<double>(1), const Matrix<T>& pc = Matrix<T>(1), 
-			 const double& fteps = 7.0e-4, const size_t& ftiter = 1);
+			 const double& fteps = 7.0e-4, const size_t& ftiter = 1) {
+		
+		size_t dim = (size(sens,2) == 1) ? 3 : 2;
+		Matrix<size_t> ms (dim,1);
+		for (size_t i = 0; i < dim; i++)
+			ms[i] = size(sens,i);
+		
+		int np = 1;
+		
+#pragma omp parallel default (shared)
+		{
+			np = omp_get_num_threads ();
+		}	
+		
+		m_fts = new NFFT<T>* [np];
+		
+		for (size_t i = 0; i < np; i++)
+			m_fts[i] = new NFFT<T> (ms, nk, m, alpha, b0, pc, fteps, ftiter);
+		
+		m_cgiter = cgiter;
+		m_cgeps  = cgeps;
+		m_lambda = lambda;
+		
+		printf ("Initialised NC SENSE: %i %e %e\n", m_cgiter, m_cgeps, m_lambda);
+		
+		m_initialised = true;
+		
+	}
 	
 	/**
 	 * @brief        Clean up and destruct
@@ -118,7 +145,50 @@ public:
 	 * @return   Transform
 	 */
 	Matrix<T> 
-	Trafo       (const Matrix<T>& m) const;
+	Trafo       (const Matrix<T>& m) const {
+
+		T ts;
+		double rn, xn;
+		Matrix<T> p, r, x, q;
+		vector<double> res;
+		
+		p = EH (m, m_sm, m_fts, m_dim) * m_ic;
+		r = p;
+		x = zeros<T>(size(p));
+		
+		rn = 0.0;
+		xn = pow(creal(Norm(p)), 2);
+		
+		for (size_t i = 0; i < m_cgiter; i++) {
+			
+			rn  = pow(creal(Norm(r)), 2);
+			res.push_back(rn/xn);
+			
+			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps) break;
+			
+			if (i % 5 == 0 && i > 0) printf ("\n");
+			printf ("    %03lu %.7f", i, res.at(i));
+			
+			p  *= m_ic;
+			q   = E  (p, m_sm, m_fts, m_dim);
+			q   = EH (q, m_sm, m_fts, m_dim);
+			q  *= m_ic;
+			
+			if (m_lambda)
+				q  += m_lambda * p;
+			
+			ts  = rn;
+			ts /= p.dotc(q);
+			x  += (p * ts);
+			r  -= (q * ts);
+			p  *= pow(creal(Norm(r)), 2)/rn;
+			p  += r;
+			
+		}
+		
+		return x * m_ic;
+
+	}
 	
 	
 	/**
@@ -128,7 +198,13 @@ public:
 	 * @return   Transform
 	 */
 	Matrix<T> 
-	Adjoint     (const Matrix<T>& m) const;
+	Adjoint     (const Matrix<T>& m) const {
+
+		Matrix<T> tmp = m * m_ic;
+		return E (tmp, m_sm, m_fts, m_dim);
+
+	}
+	
 	
 	
 private:
@@ -149,96 +225,6 @@ private:
 	double m_lambda;
 
 };
-
-
-template<>
-NCSENSE<cxdb>::NCSENSE (const Matrix<cxdb> sens, const size_t& nk, const double& cgeps, 
-						const size_t& cgiter, const double& lambda, const size_t& m, 
-						const double& alpha, const Matrix<double>& b0, const Matrix<cxdb>& pc, 
-						const double& fteps, const size_t& ftiter) : m_initialised (false) {
-
-	size_t dim = (size(sens,2) == 1) ? 3 : 2;
-	Matrix<size_t> ms (dim,1);
-	for (size_t i = 0; i < dim; i++)
-		ms[i] = size(sens,i);
-	
-	int np = 1;
-
-#pragma omp parallel default (shared)
-	{
-		np = omp_get_num_threads ();
-	}	
-
-	m_fts = new NFFT<cxdb>* [np];
-	
-	for (size_t i = 0; i < np; i++)
-		m_fts[i] = new NFFT<cxdb> (ms, nk, m, alpha, b0, pc, fteps, ftiter);
-
-	m_cgiter = cgiter;
-	m_cgeps  = cgeps;
-	m_lambda = lambda;
-
-	printf ("Initialised NC SENSE: %i %e %e\n", m_cgiter, m_cgeps, m_lambda);
-	
-	m_initialised = true;
-
-}
-
-
-template<> Matrix<cxdb>
-NCSENSE<cxdb>::Trafo (const Matrix<cxdb>& m) const {
-
-	Matrix<cxdb> tmp = m * m_ic;
-
-	return E (tmp, m_sm, m_fts, m_dim);
-
-}
-
-
-template<> Matrix<cxdb>
-NCSENSE<cxdb>::Adjoint (const Matrix<cxdb>& m) const {
-
-	cxdb ts;
-	double rn, xn;
-	Matrix<cxdb> p, r, x, q;
-	vector<double> res;
-
-	p = EH (m, m_sm, m_fts, m_dim) * m_ic;
-	r = p;
-	x = zeros<cxdb>(size(p));
-
-	rn = 0.0;
-	xn = pow(creal(Norm(p)), 2);
-	
-	for (size_t i = 0; i < m_cgiter; i++) {
-		
-		rn  = pow(creal(Norm(r)), 2);
-		res.push_back(rn/xn);
-		
-		if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps) break;
-		
-		if (i % 5 == 0 && i > 0) printf ("\n");
-		printf ("    %03lu %.7f", i, res.at(i));
-		
-		p  *= m_ic;
-		q   = E  (p, m_sm, m_fts, m_dim);
-		q   = EH (q, m_sm, m_fts, m_dim);
-		q  *= m_ic;
-
-		if (m_lambda)
-			q  += m_lambda * p;
-		
-		ts  = (rn / (p.dotc(q)));
-		x  += (p * ts);
-		r  -= (q * ts);
-		p  *= pow(creal(Norm(r)), 2)/rn;
-		p  += r;
-		
-	}
-	
-	return x * m_ic;
-
-}
 
 
 #endif

@@ -97,7 +97,7 @@ NuFFT::Init () {
 	for (size_t i = 0; i < dim; i++)
 		ms[i] = N[i];
 
-	nfft = new NFFT<cxdb> (ms, M * shots, m, alpha);
+	nfft = new NFFT<cxfl> (ms, M * shots, m, alpha);
 
 	Matrix<cxdb>& img = AddMatrix 
 		("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> (N[0],N[1],N[2])));
@@ -130,7 +130,7 @@ NuFFT::Process () {
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
 	
-	GetCXDB ("img") = nfft->Adjoint(GetCXDB ("data"));
+	GetCXDB ("img") = nfft->Adjoint(GetCXFL ("data"));
 	
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
 

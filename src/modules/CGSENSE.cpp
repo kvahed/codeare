@@ -191,7 +191,9 @@ CGSENSE::Prepare () {
 	Matrix<double>& weights = GetRLDB("weights");
 	Matrix<double>& kspace  = GetRLDB("kspace");
 
-	m_ncs = new NCSENSE<cxdb> (sens, m_M, 1.0e-6, 20);
+	m_ncs = new NCSENSE<cxfl> (sens, m_M, 1.0e-6, 20);
+
+	Matrix<cxfl>& image = AddMatrix ("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(m_N[0], m_N[1], m_N[2])));
 
 	m_ncs->KSpace (GetRLDB ("kspace"));
 	m_ncs->Weights (GetRLDB ("weights"));
@@ -213,11 +215,13 @@ CGSENSE::Process () {
 	RRSModule::error_code error = OK;
 
 	Matrix<cxfl>&   data    = GetCXFL("data");
+	Matrix<cxfl>&   image   = GetCXFL("image");
 	Matrix<cxfl>&   sens    = GetCXFL("sens");
 	Matrix<double>& weights = GetRLDB("weights");
 	Matrix<double>& kspace  = GetRLDB("kspace");
-
-	//image = ns ->* data;
+	
+	//NCSENSE<cxfl>&  ncs = *m_ncs;
+	//image = ncs ->* data;
 
 	// CG matrices ----------------------------------------------------
 	Matrix <cxfl>   p       = Matrix<cxfl>   (m_N[0],m_N[1],m_N[2]), q, r;
@@ -248,8 +252,6 @@ CGSENSE::Process () {
 	IntensityCorrection (sens, m_intcor);
 	
 	// Out going images -----------------------------------------------
-	Matrix<cxfl>& image = AddMatrix ("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(m_N[0], m_N[1], m_N[2])));
-
 	// Start CG routine and runtime -----------------------------------
 	ticks cgstart = getticks();
 

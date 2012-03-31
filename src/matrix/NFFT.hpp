@@ -50,7 +50,38 @@ public:
 	NFFT        (const Matrix<size_t>& imsize, const size_t& nk, const size_t m = 1, 
 				 const double alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1), 
 				 const Matrix<T> pc = Matrix<T>(1), const double eps = 7.0e-4, 
-				 const size_t maxit = 1);
+				 const size_t maxit = 1) {
+		
+		m_M = nk;
+		m_imgsz = 1;
+		
+		for (size_t i = 0; i < 4; i++) {
+			m_N[i] = 1; m_n[i] = 1;
+		}
+		
+		int  rank = numel (imsize);
+		
+		for (size_t i = 0; i < rank; i++) {
+			m_N[i] = imsize[i];
+			m_n[i] = ceil (m_N[i]*alpha);
+			m_imgsz *= m_N[i];
+		}
+		
+		m_epsilon = eps;
+		m_maxit   = maxit;
+		
+		nnfft::init (rank, m_N, m_M, m_n, m, m_fplan, m_iplan);
+		
+		if (pc.Size() > 1)
+			m_have_pc = true;
+		
+		m_pc   = pc;
+		m_cpc  = conj(pc);
+		
+		m_initialised = true;
+		
+		
+	}
 	
 	
 	/**
@@ -163,41 +194,6 @@ private:
 };
 
 
-template<>
-NFFT<cxdb>::NFFT (const Matrix<size_t>& imsize, const size_t& nk, const size_t m, const double alpha, 
-				  const Matrix<cxdb> b0, const Matrix<cxdb> pc, const double eps, const size_t maxit)  
-  : m_initialised (false) {
-
-	m_M = nk;
-	m_imgsz = 1;
-
-	for (size_t i = 0; i < 4; i++) {
-		m_N[i] = 1; m_n[i] = 1;
-	}
-	
-	int  rank = numel (imsize);
-	
-	for (size_t i = 0; i < rank; i++) {
-		m_N[i] = imsize[i];
-		m_n[i] = ceil (m_N[i]*alpha);
-		m_imgsz *= m_N[i];
-	}
-	
-	m_epsilon = eps;
-	m_maxit   = maxit;
-	
-	nnfft::init (rank, m_N, m_M, m_n, m, m_fplan, m_iplan);
-
-	if (pc.Size() > 1)
-		m_have_pc = true;
-
-	m_pc   = pc;
-	m_cpc  = conj(pc);
-
-	m_initialised = true;
-
-}
-
 
 template<> inline Matrix<cxdb>
 NFFT<cxdb>::Adjoint (const Matrix<cxdb>& in) const {
@@ -213,6 +209,7 @@ NFFT<cxdb>::Adjoint (const Matrix<cxdb>& in) const {
 	return out;
 
 }
+
 
 
 template<> inline Matrix<cxdb>
@@ -231,10 +228,11 @@ NFFT<cxdb>::Trafo (const Matrix<cxdb>& in) const {
 }
 
 
+
 template<> inline Matrix<cxfl>
 NFFT<cxfl>::Adjoint (const Matrix<cxfl>& in) const {
 
-	Matrix<cxfl> out (m_N[0],m_N[1],m_N[2],m_N[3]);
+	Matrix<cxdb> out (m_N[0], m_N[1], m_N[2], m_N[3]);
 	size_t m = m_M-1, i = m_imgsz-1;  
 
 	while (m--) {

@@ -72,7 +72,7 @@ namespace RRStrategy {
 		
 	private:
 		
-		NFFT<cxdb> *nfft;
+		NFFT<cxfl> *nfft;
 
 	};
 	

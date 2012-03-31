@@ -79,7 +79,7 @@ namespace RRStrategy {
 		
 	private:
 
-		NCSENSE<cxdb>* m_ncs;
+		NCSENSE<cxfl>* m_ncs;
 		
 		int                  m_iter;            /**< Maximum number of NuFFT solver iterations */
 		int                  m_verbose;         /**< Verbose should give back the reconstruction series? */
