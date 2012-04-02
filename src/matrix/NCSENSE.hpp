@@ -270,17 +270,3 @@ private:
 
 #endif
 
-/*
-	printf ("  intialising nfft::init (%i, {%i, %i, %i}, %i, {%i, %i, %i}, %i, *, *, %.9f)\n", 
-			m_dim, 
-			m_N[0], m_N[1], m_N[2],
-			m_M,
-			m_n[0], m_n[1], m_n[2],
-			m,
-			m_fteps);
-
-	for (int i = 0; i < NTHREADS || i < m_Nc; i++)
-		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i]);
-	// --------------------------------------
-
-	*/
