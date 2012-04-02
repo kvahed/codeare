@@ -19,6 +19,7 @@
  */
 
 #include "DirectMethod.hpp"
+#include "Interpolate.hpp"
 
 using namespace RRStrategy;
 
@@ -81,21 +82,39 @@ DirectMethod::Process     () {
     printf ("Processing DirectMethod ..."); fflush (stdout);
 
     SimulationBundle sb;
+	
     ticks           start  = getticks();
+
+    
+    Matrix<float>& t = GetRLFL ("t");
+	
+	float t0, tT;
+	t0 = 0.0;
+	tT = t [numel(t)-1];
+	Matrix<float> nt = linspace(t0, tT, tT/m_dt);
+	
+	Matrix<float> ngx = !GetRLFL ("g");
+	Matrix<float> nj  =  GetRLFL ("j");
+	
+	MXDump (t, "t.mat", "t");
+	MXDump (nt, "nt.mat", "nt");
+	MXDump (nj, "j.mat", "j");
+	ngx = !interp1 (t, ngx, nt, INTERP::LINEAR);
+	nj  = interp1  (t, nj, nt);
+	MXDump (ngx, "ngx.mat", "ngx");
+	MXDump (nj, "nj.mat", "nj");
+	sb.g     = &ngx;
 
     sb.b1    = &GetCXFL ("b1");
     sb.tmxy  = &GetCXFL ("tmxy");
     sb.smxy  = &GetCXFL ("smxy");
-
-    sb.g     = &GetRLFL ("g");
-    sb.t     = &GetRLFL ("t");
 
     sb.tmz   = &GetRLFL ("tmz");
     sb.smz   = &GetRLFL ("smz");
     sb.roi   = &GetRLFL ("roi");
     sb.b0    = &GetRLFL ("b0");
     sb.r     = &GetRLFL ("r");
-    sb.jac   = &GetRLFL ("j");
+    sb.jac   = &nj;
 
     sb.np     = m_np;
     sb.mode   = m_mode;

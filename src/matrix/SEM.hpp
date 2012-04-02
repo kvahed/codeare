@@ -63,7 +63,6 @@ template <class T> inline static Matrix<T>
 EH (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts, const int& dim, 
 	const double& epsilon = 7.0e-3, const int& maxit = 1, const bool& adjoint = false) {
 
-	// Some dimensions
 	size_t nr, nc, nk;
 
 	nc = size(sm,dim);
@@ -74,27 +73,14 @@ EH (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts, const int& dim,
 
 	Matrix<size_t> s = size(res);
 
-	// OMP Loop over coils, Inverse FT every signal in *in, 
-	// Sum elementwise mutiplied images with according sensitivity maps 
 #pragma omp parallel default (shared) 
 	{
 		
 		NFFT<T>&  ft = *fts[omp_get_thread_num()];
-		Matrix<T> tmp;
 		
 #pragma omp for
-		for (int j = 0; j < nc; j++) {
-			
-			int    spos   = j * nk;
-			int    ipos   = j * nr;
-			
-			//Slice (res, j, ft ->* Column (in,j) * Slice (sm, j));
-			
-			tmp = (ft ->* Column (in,j)) * conj(Slice (sm, j));
-			memcpy (&res[ipos], &tmp[0], nr * sizeof(T));
-			
-		}
-		
+		for (int j = 0; j < nc; j++)
+			Slice (res, j, ft ->* Column (in,j) * conj(Slice (sm, j)));
 
 	}
 
