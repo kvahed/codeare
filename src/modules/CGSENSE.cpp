@@ -44,8 +44,7 @@ RRSModule::error_code
 CGSENSE::Finalise () {
 
 	if (m_initialised)
-		for (int i = 0; i < NTHREADS || i < m_Nc; i++)
-			nfft::finalize (&m_fplan[i], &m_iplan[i]);
+		delete m_ncs;
 
 	return OK;
 
@@ -62,51 +61,10 @@ CGSENSE::Init() {
 	m_initialised = false;
 
 	// Some defaults ------------------------
-	for (int i = 0; i < 3; i++) {
-		m_N[i] = 1; 
-		m_n[i] = 1;
-	}
-
 	m_testcase = 0;
 	m_verbose  = 0;
 	m_noise    = 0;
-	m_dim      = 1;
-	m_M        = 0;
 	m_lambda   = 5.0e-2;
-
-	// Dimensions ---------------------------
-
-	Attribute("dim",       &m_dim);
-	printf ("  dimensions: %iD \n", m_dim);
-
-
-	if (m_dim < 2 || m_dim > 3) {
-		printf ("%s only supports 2-3 dimensions. %i was specified.\n", Name(), m_dim);
-		return UNSUPPORTED_DIMENSION;
-	}
-
-	for (int i = 0; i < m_dim; i++)
-		Attribute (sides[i].c_str(),       &m_N[i]);
-
-	for (int i = 0; i < m_dim; i++)
-		if (m_N[i] < 16) {
-			printf ("%s only supports image matrix sides >= 16. (%ix%ix%i) was specified.\n", Name(), m_N[0], m_N[1], m_N[2]);
-			return UNSUPPORTED_IMAGE_MATRIX;
-		}
-
-	Attribute ("M",         &m_M);
-
-	if (m_M == 0) {
-		printf ("Initialising %s with %i mesurement nodes? Check configuration! FAILED: Bailing out!\n", Name(), m_M);
-		return ZERO_NODES;
-	}
-
-	Attribute ("Nc",        &m_Nc);
-
-	if (m_Nc == 0) {
-		printf ("Initialising %s with %i channels? Check configuration! FAILED: Bailing out!\n", Name(), m_Nc);
-		return CGSENSE_ZERO_CHANNELS;
-	}
 
 	// --------------------------------------
 
@@ -143,8 +101,8 @@ CGSENSE::Init() {
 
 	// iNFFT convergence and break criteria -
 	
-	Attribute ("maxit",   &m_maxit);
-	Attribute ("epsilon", &m_epsilon);
+	Attribute ("ftmaxit", &m_ftmaxit);
+	Attribute ("fteps",   &m_fteps);
 	// --------------------------------------
 
 	// Oversampling -------------------------
@@ -154,26 +112,6 @@ CGSENSE::Init() {
 
 	Attribute ("m",       &m);
 	Attribute ("alpha",   &alpha);
-
-	for (int i = 0; i < m_dim; i++)
-		m_n[i] = ceil (m_N[i]*alpha);
-	// --------------------------------------
-
-	// Initialise FT plans ------------------
-	
-	printf ("  intialising nfft::init (%i, {%i, %i, %i}, %i, {%i, %i, %i}, %i, *, *, %.9f)\n", 
-			m_dim, 
-			m_N[0], m_N[1], m_N[2],
-			m_M,
-			m_n[0], m_n[1], m_n[2],
-			m,
-			m_epsilon);
-
-	for (int i = 0; i < NTHREADS || i < m_Nc; i++)
-		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i]);
-	// --------------------------------------
-
-	m_initialised = true;
 
 	printf ("... done.\n\n");
 
@@ -191,20 +129,26 @@ CGSENSE::Prepare () {
 	Matrix<double>& weights = GetRLDB("weights");
 	Matrix<double>& kspace  = GetRLDB("kspace");
 
-	m_ncs = new NCSENSE<cxfl> (sens, m_M, 1.0e-6, 20);
+	size_t nk =  numel(weights);
 
-	Matrix<cxfl>& image = AddMatrix ("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(m_N[0], m_N[1], m_N[2])));
+	m_ncs = new NCSENSE<cxfl> 
+		(sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
 
-	m_ncs->KSpace (GetRLDB ("kspace"));
-	m_ncs->Weights (GetRLDB ("weights"));
+	size_t dim = ndims(sens);
+
+	Matrix<cxfl>& image = AddMatrix 
+		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(size(sens,0), size(sens,1), (dim == 3) ? size(sens,2) : 1)));
+
+	m_ncs->KSpace (kspace);
+	m_ncs->Weights (weights);
 	
-	FreeRLDB ("kspace");
+	FreeCXFL ("sens");
 	FreeRLDB ("weights");
-	FreeCXFL ("sense");
+	FreeRLDB ("kspace");
 	
+	m_initialised = true;
+
 	return error;
-
-
 
 }
 
@@ -220,10 +164,12 @@ CGSENSE::Process () {
 	NCSENSE<cxfl>&  ncs = *m_ncs;
 
 	ticks cgstart = getticks();
+	
+	printf ("Processing CGSENSE ...\n");
 
 	image = ncs ->* data;
-
 	FreeCXFL ("data");
+
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	return error;
