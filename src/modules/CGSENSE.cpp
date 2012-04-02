@@ -200,7 +200,7 @@ CGSENSE::Prepare () {
 	
 	FreeRLDB ("kspace");
 	FreeRLDB ("weights");
-	FreeCXFL ("sense")
+	FreeCXFL ("sense");
 	
 	return error;
 
@@ -216,16 +216,32 @@ CGSENSE::Process () {
 
 	Matrix<cxfl>&   data    = GetCXFL("data");
 	Matrix<cxfl>&   image   = GetCXFL("image");
-	Matrix<cxfl>&   sens    = GetCXFL("sens");
-	Matrix<double>& weights = GetRLDB("weights");
-	Matrix<double>& kspace  = GetRLDB("kspace");
 	
 	NCSENSE<cxfl>&  ncs = *m_ncs;
 
 	ticks cgstart = getticks();
+
 	image = ncs ->* data;
+
 	FreeCXFL ("data");
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+
+	return error;
+
+}
+
+
+// the class factories
+extern "C" DLLEXPORT ReconStrategy* create  ()                 {
+    return new CGSENSE;
+}
+
+extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
+    delete p;
+}
+
+
+
 	/*
 	// CG matrices ----------------------------------------------------
 	Matrix <cxfl>   p       = Matrix<cxfl>   (m_N[0],m_N[1],m_N[2]), q, r;
@@ -345,20 +361,6 @@ CGSENSE::Process () {
 
 	}
 	*/
-	return error;
-
-}
-
-
-// the class factories
-extern "C" DLLEXPORT ReconStrategy* create  ()                 {
-    return new CGSENSE;
-}
-
-extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
-    delete p;
-}
-
 
 
 

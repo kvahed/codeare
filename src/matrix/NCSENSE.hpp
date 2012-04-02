@@ -110,8 +110,6 @@ public:
 		m_sm     = sens;
 		m_ic     = IntensityCorrection (m_sm);
 		
-		printf ("Initialised NC SENSE: %i %e %e\n", m_cgiter, m_cgeps, m_lambda);
-		
 		m_initialised = true;
 		
 	}
@@ -214,28 +212,27 @@ public:
 			rn  = pow(creal(Norm(r)), 2);
 			res.push_back(rn/xn);
 			
-			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps) break;
+			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps) 
+				break;
 			
-			if (i % 5 == 0 && i > 0) printf ("\n");
-			printf ("    %03lu %.7f", i, res.at(i));
+			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 			
-			p  *= m_ic;
-			q   = E  (p, m_sm, m_fts, m_dim);
-			q   = EH (q, m_sm, m_fts, m_dim);
-			q  *= m_ic;
+			q   = E  (p * m_ic, m_sm, m_fts, m_dim);
+			q   = EH (q, m_sm, m_fts, m_dim) * m_ic;
 			
 			if (m_lambda)
 				q  += m_lambda * p;
 			
 			ts  = rn;
 			ts /= p.dotc(q);
-			x  += (p * ts);
-			r  -= (q * ts);
+			x  += ts * p;
+			r  -= ts * q;
 			p  *= pow(creal(Norm(r)), 2)/rn;
 			p  += r;
 			
 		}
 
+		printf ("\n");
 		return x * m_ic;
 
 	}
