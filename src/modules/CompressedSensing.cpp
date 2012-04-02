@@ -96,11 +96,11 @@ CompressedSensing::Process () {
 	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
 	Matrix<cxfl>   orig;
 
-    printf ("  Geometry: %iD (%lu,%lu,%lu)\n", HDim(data)+1, 
+    printf ("  Geometry: %iD (%lu,%lu,%lu)\n", ndims (data)+1, 
 			data.Dim(0), data.Dim(1), data.Dim(2));
 
 	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf));
-	m_cgparam.ft  = (FT<cxfl>*) new DFT<cxfl> (HDim(data)+1, data.Height(), mask, pc);
+	m_cgparam.ft  = (FT<cxfl>*) new DFT<cxfl> (ndims (data)+1, data.Height(), mask, pc);
 	m_cgparam.tvt = new TVOP ();
 
 	FT<cxfl>& dft = *m_cgparam.ft;

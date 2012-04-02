@@ -114,30 +114,5 @@ namespace RRStrategy {
 	};
 
 
-	inline static void
-	IntensityCorrection (const Matrix<cxfl>& sens, Matrix<double>& intcor) {
-
-		size_t nc = sens.Dim(HDim(sens));
-		size_t nr = intcor.Size();
-
-#pragma omp parallel default (shared)
-		{		
-			
-#pragma omp for schedule (guided)
-			for (size_t i = 0; i < nr; i++) {
-				
-				intcor[i] = 0.0;
-				
-				for (size_t j = 0; j < nc; j++)
-					intcor[i] += (sens(i+j*nr) * conj(sens(i+j*nr))).real();
-			
-				intcor[i] = 1.0 / (sqrt (intcor[i]) + 1.0e-10);
-				
-			}
-			
-		}
-		
-	}
-
 }
 #endif /* __CGSENSE_H__ */

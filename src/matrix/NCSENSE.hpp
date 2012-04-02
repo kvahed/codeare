@@ -26,6 +26,38 @@
 #include "CX.hpp"
 #include "SEM.hpp"
 
+
+template <class T> inline static Matrix<double>
+IntensityCorrection (const Matrix<T>& sens) {
+
+	size_t dim = ndims(sens);
+	size_t nc  = size(sens,dim);
+	size_t nr  = numel(sens)/nc;
+	
+	Matrix<size_t> dims = size (sens);
+	dims [dim] = 1;
+
+	Matrix<double> res = zeros<double> (dims);
+	
+#pragma omp parallel default (shared)
+	{		
+		
+#pragma omp for schedule (guided)
+		for (size_t i = 0; i < nr; i++) {
+			
+			for (size_t j = 0; j < nc; j++)
+				res[i] += (sens(i+j*nr) * conj(sens(i+j*nr))).real();
+			
+			res[i] = 1.0 / (sqrt (res[i]) + 1.0e-10);
+			
+		}
+		
+	}
+
+	return res;
+
+}
+
 /**
  * @brief Matrix templated ND non-equidistand Fourier transform with NCSENSE 3 (TU Chemnitz)
  */
@@ -54,9 +86,9 @@ public:
 			 const Matrix<double>& b0 = Matrix<double>(1), const Matrix<T>& pc = Matrix<T>(1), 
 			 const double& fteps = 7.0e-4, const size_t& ftiter = 1) {
 		
-		size_t dim = (size(sens,2) == 1) ? 3 : 2;
-		Matrix<size_t> ms (dim,1);
-		for (size_t i = 0; i < dim; i++)
+		m_dim = ndims(sens);
+		Matrix<size_t> ms (m_dim,1);
+		for (size_t i = 0; i < m_dim; i++)
 			ms[i] = size(sens,i);
 		
 		int np = 1;
@@ -74,6 +106,9 @@ public:
 		m_cgiter = cgiter;
 		m_cgeps  = cgeps;
 		m_lambda = lambda;
+
+		m_sm     = sens;
+		m_ic     = IntensityCorrection (m_sm);
 		
 		printf ("Initialised NC SENSE: %i %e %e\n", m_cgiter, m_cgeps, m_lambda);
 		
@@ -147,11 +182,26 @@ public:
 	Matrix<T> 
 	Trafo       (const Matrix<T>& m) const {
 
+		Matrix<T> tmp = m * m_ic;
+		return E (tmp, m_sm, m_fts, m_dim);
+
+	}
+
+	
+	/**
+	 * @brief    Backward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	Matrix<T> 
+	Adjoint     (const Matrix<T>& m) const {
+
 		T ts;
 		double rn, xn;
 		Matrix<T> p, r, x, q;
 		vector<double> res;
-		
+
 		p = EH (m, m_sm, m_fts, m_dim) * m_ic;
 		r = p;
 		x = zeros<T>(size(p));
@@ -185,25 +235,11 @@ public:
 			p  += r;
 			
 		}
-		
+
 		return x * m_ic;
 
 	}
 	
-	
-	/**
-	 * @brief    Backward transform
-	 *
-	 * @param  m To transform
-	 * @return   Transform
-	 */
-	Matrix<T> 
-	Adjoint     (const Matrix<T>& m) const {
-
-		Matrix<T> tmp = m * m_ic;
-		return E (tmp, m_sm, m_fts, m_dim);
-
-	}
 	
 	
 	

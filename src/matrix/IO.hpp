@@ -85,7 +85,7 @@ DimsToString (const Matrix<T>& M) {
 	
 	std::stringstream ss;
 		
-	for (size_t i = 0; i <= HDim(M); i++)
+	for (size_t i = 0; i <= ndims(M); i++)
 		ss << (int)M.Dim(i) << " ";
 	
 	return ss.str();
@@ -118,7 +118,7 @@ ResToString (const Matrix<T>& M) {
 	
 	stringstream ss;
 	
-	for (size_t i = 0; i <= HDim(M); i++)
+	for (size_t i = 0; i <= ndims(M); i++)
 		ss << M.Res(i) << " ";
 	
 	return ss.str();
@@ -996,7 +996,7 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
  * @return         Success
  */
 template <class T> static bool
-MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
+MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 	
 	// Declare dimensions and allocate array -----
 	
@@ -1037,7 +1037,7 @@ MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
 			im[i] = cimag(M[i]); 
 		}
 	} else 
-		memcpy(mxGetData(mxa), &M[0], M.Size() * sizeof(T));
+		memcpy(mxGetData(mxa), M.Data(), M.Size() * sizeof(T));
 	
 	// -------------------------------------------
 	
@@ -1075,7 +1075,7 @@ MXDump (Matrix<T>& M, MATFile* mf, const string dname, const string dloc = "") {
  * @return         Success
  */
 template <class T> inline static bool 
-MXDump (Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
+MXDump (const Matrix<T>& M, const string fname, const string dname, const string dloc = "") {
 	
 #ifdef HAVE_MAT_H
 	
@@ -1134,10 +1134,10 @@ NIDump (Matrix<T>& M, const string fname) {
 		
 		nifti_1_header header;
 		header.sizeof_hdr = 348;
-		header.dim[0] = HDim(tmp) + 1;
-		header.pixdim[0] = HDim(tmp) + 1;
+		header.dim[0] = ndims(tmp) + 1;
+		header.pixdim[0] = ndims(tmp) + 1;
 		
-		if (HDim(tmp) > 7) {
+		if (ndims(tmp) > 7) {
 			printf ("Cannot dump more than 8 dimensions to NIFTI FILE\n.");
 			return false;
 		}
@@ -1295,17 +1295,17 @@ CDFDump (const Matrix<T>& M, const string fname, const string dname, const strin
 	if (status != CDF_OK) 
 		return false;
 		
-	long dims [HDim(M)];
-	long dimv [HDim(M)];
+	long dims [ndims(M)];
+	long dimv [ndims(M)];
 	
-	for (int i = 0; i < HDim(M); i++) {
+	for (int i = 0; i < ndims(M); i++) {
 		dims[i] = M.Dim(i);
 		dimv[i] = VARY;
 	}
 	
 	long imvn;
 	
-	status = CDFcreatezVar (id, dname.c_str(), CDF_FLOAT, 1L, (long)HDim(), dims, VARY, dimv, &imvn);
+	status = CDFcreatezVar (id, dname.c_str(), CDF_FLOAT, 1L, (long) ndims(M), dims, VARY, dimv, &imvn);
 	
 	if (status != CDF_OK) 
 		return false;
