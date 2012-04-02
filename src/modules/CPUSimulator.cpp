@@ -1,35 +1,9 @@
 #include "CPUSimulator.hpp"
 #include "Lapack.hpp"
 #include "Creators.hpp"
+#include "MRI.hpp"
 
 using namespace RRStrategy;
-
-/**
- * @brief          Intensity correction
- * 
- * @param  b1maps  B1 maps
- * @param  I       Intensity correction
- */
-inline void 
-IntensityMap (const Matrix<cxfl>& b1maps, Matrix<float>& I) {
-	
-	size_t nr = b1maps.Dim(0);
-	size_t nc = b1maps.Dim(1);
-
-#pragma omp parallel default (shared)
-	{		
-		
-#pragma omp for schedule (guided)
-		for (size_t i = 0; i < nr; i++) {
-			for (size_t j = 0; j < nc; j++)
-				I[i] += (b1maps(i,j)*conj(b1maps(i,j))).real();
-			I[i] = 1.0 / (I[i] + 1.0e-10);
-		}
-
-	}
-
-}
-
 
 /**
  * @brief       Rotate magnetisation around rotation axis
@@ -241,8 +215,8 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 						rfs += rf(rt,i)*ls[i];
 					rfs *= jac[rt];
 					
-					n[0]  = gdt * -rfs.imag() * 1.0e-6;
-					n[1]  = gdt *  rfs.real() * 1.0e-6;
+					n[0]  = gdt * -rfs.imag() * 1.0e-3;
+					n[1]  = gdt *  rfs.real() * 1.0e-3;
 					n[2]  = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - lb0) ;
 					
 					Rotate (n, lm);
@@ -268,13 +242,13 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
     
     m_sb  = sb;
 
-    m_gdt  = GAMMARAD * m_sb->dt;
+    m_gdt  = GAMMA * 1.0e3 * m_sb->dt;
     m_nt   = m_sb->g->Dim(1);    // Time points
     m_nc   = m_sb->b1->Dim(1);     // # channels
 	m_nr   = m_sb->r->Dim(1);      // # spatial positions
 	
-	m_ic = zeros<float> (m_nr,1); // Intesity correction
-	IntensityMap (*(m_sb->b1), m_ic);
+	// Intensity map for correction
+	m_ic = IntensityMap (*(m_sb->b1), false);
 
 	if (m_sb->roi->Size() == 1)
 		m_sb->roi = m_sb->smz;

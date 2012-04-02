@@ -21,9 +21,6 @@
 #ifndef __SIMULATION_STRATEGY_HPP__
 #define __SIMULATION_STRATEGY_HPP__
 
-#define GAMMARAD 2.6753e8
-#define TWOPI	 6.283185
-
 enum SIM_MODE {
 	AO,  // Acquisition only
 	AE,  // Acquire and excite
