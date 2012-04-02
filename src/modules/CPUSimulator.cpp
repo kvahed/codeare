@@ -120,7 +120,8 @@ SimulateAcq (const Matrix<cxfl>&  b1, const Matrix<float>&  gr, const Matrix<flo
 				lr[1] = r[pos*3+1];
 				lr[2] = r[pos*3+2];
 
-				for (size_t c = 0; c < nc; c++) ls[c] = conj(b1(pos,c));
+				for (size_t c = 0; c < nc; c++) 
+					ls[c] = conj(b1(pos,c));
 				
 				// Run over time points
 				for (size_t t = 0; t < nt; t++) {
@@ -144,7 +145,7 @@ SimulateAcq (const Matrix<cxfl>&  b1, const Matrix<float>&  gr, const Matrix<flo
 			}
 			
 		}
-
+		
 #pragma omp for  schedule (guided) 
 		for (size_t i = 0; i < nt*nc; i++) {
 			rf[i] = cxfl(0.0,0.0);
@@ -154,9 +155,9 @@ SimulateAcq (const Matrix<cxfl>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		}
 		
 	}
-
+	
 	if (v) printf ("(a: %.4fs)", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate()); fflush(stdout);
-
+	
 }
 
 
@@ -167,12 +168,12 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 			  const Matrix<float>& ml0, const Matrix<float>& jac, 
 			  const size_t&         np, const float&          dt, const bool&           v, 
 			  const size_t&         nc, const size_t&         nt, const float&        gdt, 
-			        Matrix<cxfl>&  mxy,       Matrix<float>& mz) {
+			  Matrix<cxfl>&  mxy,       Matrix<float>& mz) {
     
 	size_t            nr   = r.Dim(1);
 	
     ticks             tic  = getticks();
-
+	
 #pragma omp parallel default(shared)
 	{
 		
@@ -184,9 +185,9 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 		size_t        rt;
 		
 		omp_set_num_threads(np);
-	
+		
 #pragma omp for schedule (guided) 
-	
+		
 		for (size_t pos = 0; pos < nr; pos++) {
 			
 			// Start with equilibrium
@@ -195,19 +196,18 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 			lm[Z] = ml0[pos];
 			
 			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
-
+				
 				lb0 = b0[pos]*TWOPI;
-
+				
 				lr[0] = r[pos*3  ];
 				lr[1] = r[pos*3+1];
 				lr[2] = r[pos*3+2];
-
+				
 				for (size_t i = 0; i < nc; i++) ls[i] = b1 (pos,i);
 				
 				// Time points
 				for (size_t t = 0; t < nt; t++) {
 					
-					lb0   = b0[pos]*TWOPI;
 					rt    = nt-1-t;
 					
 					cxfl rfs = cxfl (0.0,0.0);
@@ -215,8 +215,8 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 						rfs += rf(rt,i)*ls[i];
 					rfs *= jac[rt];
 					
-					n[0]  = gdt * -rfs.imag() * 1.0e-4;
-					n[1]  = gdt *  rfs.real() * 1.0e-4;
+					n[0]  = gdt * -rfs.imag() * 1.0e-3;
+					n[1]  = gdt *  rfs.real() * 1.0e-3;
 					n[2]  = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - lb0) ;
 					
 					Rotate (n, lm);
