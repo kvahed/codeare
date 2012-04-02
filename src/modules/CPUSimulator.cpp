@@ -12,7 +12,7 @@ using namespace RRStrategy;
  * @param  lm   On entry magnetisation vector to be rotated.<br/>
  *              On exit rotated magnetisation vector.
  */
-inline void 
+inline static void 
 Rotate (const Matrix<float>& n, Matrix<float>& lm) {
     
 	float r  [9];
@@ -215,8 +215,8 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 						rfs += rf(rt,i)*ls[i];
 					rfs *= jac[rt];
 					
-					n[0]  = gdt * -rfs.imag() * 1.0e-3;
-					n[1]  = gdt *  rfs.real() * 1.0e-3;
+					n[0]  = gdt * -rfs.imag() * 1.0e-4;
+					n[1]  = gdt *  rfs.real() * 1.0e-4;
 					n[2]  = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - lb0) ;
 					
 					Rotate (n, lm);
@@ -242,7 +242,7 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
     
     m_sb  = sb;
 
-    m_gdt  = GAMMA * 1.0e3 * m_sb->dt;
+    m_gdt  = GAMMA * TWOPI * m_sb->dt;
     m_nt   = m_sb->g->Dim(1);    // Time points
     m_nc   = m_sb->b1->Dim(1);     // # channels
 	m_nr   = m_sb->r->Dim(1);      // # spatial positions
@@ -297,6 +297,7 @@ CPUSimulator::Simulate () {
 		Matrix<cxfl> p, r, q, a;
 
 		p = rf; q = p; r = p;
+		a = zeros<cxfl> (size(rf));
 
 		an = pow(creal(Norm(p)), 2.0);
 		rn = an;
@@ -313,19 +314,14 @@ CPUSimulator::Simulate () {
 			SimulateAcq (b1, g,    rv, b0,  mxy,  mz, m_ic, np, dt, true, m_nc, m_nt, m_gdt,       q); // E
 			q += tl * p; // L_2 penalty on solution
 
-			rtmp   = (rn / p.dotc(q));
+			rtmp = (rn / p.dotc(q));
 			
-			if (!iters) 
-				a  = rtmp * p;
-			else        
-				a += rtmp * p;
-			
-			r     -= rtmp * q;
-			rno    = rn;
-			rn     = pow(creal(Norm(r)),2);
-
-			p     *= rn/rno;
-			p     += r;
+			a   += rtmp * p;
+			r   -= rtmp * q;
+			rno  = rn;
+			rn   = pow(creal(Norm(r)),2);
+			p   *= rn/rno;
+			p   += r;
 			
 		}
 

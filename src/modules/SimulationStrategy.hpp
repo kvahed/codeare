@@ -42,6 +42,8 @@ namespace RRStrategy {
 		Ptr< Matrix<cxfl> >    b1;  /**<! b1                               */ 
 		
 		Ptr< Matrix<float> >    g;  /**<! Acquisition gradients            */ 
+
+		Ptr< Matrix<float> >    t;  /**<! Acquisition gradient timing      */ 
 		
 		Ptr< Matrix<float> >    r;  /**<! spatial vectors                  */ 
 

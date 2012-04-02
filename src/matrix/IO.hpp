@@ -622,7 +622,7 @@ RAWRead (Matrix<T>& M, const std::string& fname, const std::string& version) {
 	FILE*         f;
 	sMDH*         mdh;
 	unsigned      l      = 0;
-	size_t        nscans = (M.Size() / M.Dim(COL));
+	size_t        nscans = (numel(M) / size(M,0));
 	unsigned      start;
 	unsigned      size, read;
 	
@@ -710,10 +710,38 @@ Read (Matrix<T>& M, const std::string& fname, const std::string& dname, const st
 		return MXRead (M, fname, dname, dloc);
 	else if (ios == NIFTI)
 		return NIRead (M, fname);
+	else 
+		return PRRead (M, fname);
 	
-	return true;
+	return false;
 	
 }
+
+
+template <class T> inline static bool
+Read (Matrix<T>&M, const TiXmlElement* e, string uri = "") {
+
+	string dname ((e->Attribute ("dname") != NULL) ? e->Attribute ("dname") : "");
+	string fname ((e->Attribute ("fname") != NULL) ? e->Attribute ("fname") : "");
+	string ftype ((e->Attribute ("ftype") != NULL) ? e->Attribute ("ftype") : "");
+	string dloc  ((e->Attribute ( "dloc") != NULL) ? e->Attribute ( "dloc") : "");
+
+	uri += fname;
+
+	if      (ftype.compare ("HDF5") == 0)
+		return H5Read (M, uri, dname, dloc);
+	else if (ftype.compare ("MATLAB") == 0)
+		return MXRead (M, uri, dname, dloc);
+	else if (ftype.compare ("NIFTI") == 0) 
+		return NIRead (M, uri);
+	else 
+		return PRRead (M, uri);
+
+
+
+}
+	//Matrix<T>& M, const std::string& fname, const std::string& dname, const std::string& dloc = "", const io_strategy& ios = HDF5) {
+
 
 
 /**
@@ -934,29 +962,29 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 	
 	if        (typeid(T) == typeid(cxfl)) {
 		if (mxIsComplex(mxa))
-			for (size_t i = 0; i < M.Size(); i++) {
+			for (size_t i = 0; i < numel(M); i++) {
 				float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
 				memcpy(&M[i], f, 2 * sizeof(float));
 			}
 		else
-			for (size_t i = 0; i <M.Size(); i++) {
+			for (size_t i = 0; i <numel(M); i++) {
 				float f[2] = {((float*)mxGetPr(mxa))[i], 0.0}; 
 				memcpy(&M[i], f, 2 * sizeof(float));
 			}
 	} else if (typeid(T) == typeid(cxdb)) {
 		if (mxIsComplex(mxa))
-			for (size_t i = 0; i < M.Size(); i++) {
+			for (size_t i = 0; i < numel(M); i++) {
 				double* tmp = (double*) &M[0];
 				tmp [i*2]   = mxGetPr(mxa)[i];
 				tmp [i*2+1] = mxGetPi(mxa)[i];
 			}
 		else
-			for (size_t i = 0; i <M.Size(); i++) {
+			for (size_t i = 0; i <numel(M); i++) {
 				double* tmp = (double*) &M[0];
 				tmp [i*2]   = mxGetPr(mxa)[i];
 			}
 	} else
-		memcpy (&M[0], mxGetPr(mxa), M.Size() * sizeof (T));
+		memcpy (&M[0], mxGetPr(mxa), numel(M) * sizeof (T));
 	
 	
 	printf ("done\n");
@@ -1025,19 +1053,19 @@ MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc =
 	if (typeid(T) == typeid(cxfl)) {
 	    float* re = (float*)mxGetData(mxa);
 		float* im = (float*)mxGetImagData(mxa);
-		for (size_t i = 0; i < M.Size(); i++) {
+		for (size_t i = 0; i < numel(M); i++) {
 			re[i] = creal(M[i]); 
 			im[i] = cimag(M[i]); 
 		} 
 	} else if (typeid(T) == typeid(cxdb)) {
 		double* re = mxGetPr(mxa);
 		double* im = mxGetPi(mxa);
-		for (size_t i = 0; i < M.Size(); i++) {
+		for (size_t i = 0; i < numel(M); i++) {
 			re[i] = creal(M[i]); 
 			im[i] = cimag(M[i]); 
 		}
 	} else 
-		memcpy(mxGetData(mxa), M.Data(), M.Size() * sizeof(T));
+		memcpy(mxGetData(mxa), M.Data(), numel(M) * sizeof(T));
 	
 	// -------------------------------------------
 	
@@ -1121,7 +1149,7 @@ MXDump (const Matrix<T>& M, const string fname, const string dname, const string
  * @return         Success
  */
 template <class T> static bool
-NIDump (Matrix<T>& M, const string fname) {
+NIDump (const Matrix<T>& M, const string fname) {
 	
 	if (fname != "") {
 		
@@ -1164,8 +1192,8 @@ NIDump (Matrix<T>& M, const string fname) {
 		ni->iname = (char*) calloc(1,l); 
 		strcpy(ni->iname,fname.c_str());
 		
-		ni->data = (void*) malloc (M.Size() * sizeof (T));
-		memcpy (ni->data, &M[0], M.Size() * sizeof (T));
+		ni->data = (void*) malloc (numel(M) * sizeof (T));
+		memcpy (ni->data, M.Data(), numel(M) * sizeof (T));
 		
 		nifti_image_write (ni);
 		nifti_image_free (ni); 
@@ -1226,15 +1254,15 @@ NIRead (Matrix<T>& M, const string fname) {
 		
 		if ((ni->datatype == 16 || ni->datatype == 64) && typeid(T) == typeid(double)) {
 			if (ni->datatype == 64)
-				memcpy (&M[0], ni->data,M.Size()*sizeof(T));
+				memcpy (&M[0], ni->data,numel(M)*sizeof(T));
 			else 
-				for (size_t i = 0; i <M.Size(); i++ )
+				for (size_t i = 0; i <numel(M); i++ )
 					M[i] = ((float*)ni->data)[i];
 		} else if ((ni->datatype == 32 || ni->datatype == 1792) && typeid(T) == typeid(cxfl)) {
 			if (ni->datatype == 32)
-				memcpy (&M[0], ni->data,M.Size()*sizeof(T));
+				memcpy (&M[0], ni->data,numel(M)*sizeof(T));
 			else 
-				for (size_t i = 0; i <M.Size(); i++) {
+				for (size_t i = 0; i <numel(M); i++) {
 					float f[2] = {((double*)ni->data)[2*i], ((double*)ni->data)[2*i+1]};
 					memcpy(&M[i], f, 2 * sizeof(float));
 				}

@@ -88,6 +88,8 @@ DirectMethod::Process     () {
     sb.smxy  = &GetCXFL ("smxy");
 
     sb.g     = &GetRLFL ("g");
+    sb.t     = &GetRLFL ("t");
+
     sb.tmz   = &GetRLFL ("tmz");
     sb.smz   = &GetRLFL ("smz");
     sb.roi   = &GetRLFL ("roi");
@@ -107,8 +109,8 @@ DirectMethod::Process     () {
     // Outgoing
 
     AddMatrix ( "rf", sb.rf  = NEW (Matrix<cxfl>  (sb.g->Dim(1), sb.b1->Dim(1))));
-    AddMatrix ("mxy", sb.mxy = NEW (Matrix<cxfl>  (           1, sb.r->Dim(1))));
-    AddMatrix ( "mz", sb.mz  = NEW (Matrix<float> (           1, sb.r->Dim(1))));
+    AddMatrix ("mxy", sb.mxy = NEW (Matrix<cxfl>  (sb.r->Dim(1), 1)));
+    AddMatrix ( "mz", sb.mz  = NEW (Matrix<float> (sb.r->Dim(1), 1)));
 
     // Initialise CPU/GPU simulator
     SimulationContext sc (&sb);
