@@ -27,7 +27,7 @@ E (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts, const int& dim) {
 	// Some dimensions
 	size_t nc, nr, nk;
 
-	nc = size  (sm,dim); 
+	nc = size  (sm, dim); 
 	nr = numel (in);
 	nk = fts[0]->FPlan()->M_total;
 
@@ -70,15 +70,9 @@ EH (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts, const int& dim,
 	nk = size(in,0);
 	nr = numel(sm)/nc;
 
-	Matrix<T> res 
-		(size(sm,0), 
-		 size(sm,1),
-		 (dim == 3) ? size(sm,2) : nc, 
-		 (dim == 3) ?         nc :  1);
+	Matrix<T> res = zeros<T> (size(sm));
 
 	Matrix<size_t> s = size(res);
-
-	std::cout << s << std::endl;
 
 	// OMP Loop over coils, Inverse FT every signal in *in, 
 	// Sum elementwise mutiplied images with according sensitivity maps 
@@ -94,16 +88,17 @@ EH (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts, const int& dim,
 			int    spos   = j * nk;
 			int    ipos   = j * nr;
 			
-			/*if      (dim == 2)*/  Slice (res, j, ft ->* Column (in, j) *  Slice (sm, j));/*);*/
-										   //else if (dim == 3) Volume (res, j, ft ->* Column (in, j) * Volume (sm, j));
-										   
-										   }
+			//Slice (res, j, ft ->* Column (in,j) * Slice (sm, j));
+			
+			tmp = (ft ->* Column (in,j)) * conj(Slice (sm, j));
+			memcpy (&res[ipos], &tmp[0], nr * sizeof(T));
 			
 		}
 		
-		
-	
-	return sum (res, dim);
+
+	}
+
+	return sum (res,dim);
 
 }
 
