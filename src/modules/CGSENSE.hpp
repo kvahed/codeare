@@ -85,17 +85,8 @@ namespace RRStrategy {
 		int                  m_verbose;         /**< Verbose should give back the reconstruction series? */
 		double               m_noise;           /**< Add noise? */
 		int                  m_testcase;        /**< Test case. Generate forward data first. */
-		int                  m_Nc;              /**< # Channels */
 		double               m_lambda;          /**< Tikhonov factor*/
 
-		Matrix < raw >       m_sens;            /**< Sensitivity maps                */
-		Matrix < raw >       m_measured;        /**< Measured data                   */
-		Matrix < double >    m_weights;         /**< K-space weights                 */
-		Matrix < double >    m_intcor;          /**< Intensity correction            */
-		
-		nfft_plan           m_fplan[NTHREADS];  /**< NuFFT plan                      */
-		solver_plan_complex m_iplan[NTHREADS];  /**< iNuFFT plan                     */
-		
 		double               m_fteps;         /**< NuFFT convergence criterium     */
 		int                  m_ftmaxit;           /**< Maximum number of NuFFT solver iterations */
 		double               m_cgeps;           /**< CG SENSE convergence criterium  */
