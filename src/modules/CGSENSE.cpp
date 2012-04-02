@@ -36,7 +36,9 @@ using namespace RRStrategy;
 
 
 CGSENSE::~CGSENSE () {
+
 	this->Finalise();
+
 }
 
 
