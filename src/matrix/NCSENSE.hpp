@@ -25,38 +25,8 @@
 #include "NFFT.hpp"
 #include "CX.hpp"
 #include "SEM.hpp"
+#include "MRI.hpp"
 
-
-template <class T> inline static Matrix<double>
-IntensityCorrection (const Matrix<T>& sens) {
-
-	size_t dim = ndims(sens);
-	size_t nc  = size(sens,dim);
-	size_t nr  = numel(sens)/nc;
-	
-	Matrix<size_t> dims = size (sens);
-	dims [dim] = 1;
-
-	Matrix<double> res = zeros<double> (dims);
-	
-#pragma omp parallel default (shared)
-	{		
-		
-#pragma omp for schedule (guided)
-		for (size_t i = 0; i < nr; i++) {
-			
-			for (size_t j = 0; j < nc; j++)
-				res[i] += (sens(i+j*nr) * conj(sens(i+j*nr))).real();
-			
-			res[i] = 1.0 / (sqrt (res[i]) + 1.0e-10);
-			
-		}
-		
-	}
-
-	return res;
-
-}
 
 /**
  * @brief Matrix templated ND non-equidistand Fourier transform with NCSENSE 3 (TU Chemnitz)
@@ -114,7 +84,7 @@ public:
 		m_lambda = lambda;
 
 		m_sm     = sens;
-		m_ic     = IntensityCorrection (m_sm);
+		m_ic     = IntensityMap (m_sm);
 		
 		m_initialised = true;
 		
