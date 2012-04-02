@@ -76,6 +76,10 @@ EH (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts, const int& dim,
 		 (dim == 3) ? size(sm,2) : nc, 
 		 (dim == 3) ?         nc :  1);
 
+	Matrix<size_t> s = size(res);
+
+	std::cout << s << std::endl;
+
 	// OMP Loop over coils, Inverse FT every signal in *in, 
 	// Sum elementwise mutiplied images with according sensitivity maps 
 #pragma omp parallel default (shared) 
@@ -90,12 +94,14 @@ EH (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts, const int& dim,
 			int    spos   = j * nk;
 			int    ipos   = j * nr;
 			
-			if      (dim == 2)  Slice (res, j, ft ->* Column (in, j) *  Slice (sm, j));
-			else if (dim == 3) Volume (res, j, ft ->* Column (in, j) * Volume (sm, j));
+			/*if      (dim == 2)*/  Slice (res, j, ft ->* Column (in, j) *  Slice (sm, j));/*);*/
+										   //else if (dim == 3) Volume (res, j, ft ->* Column (in, j) * Volume (sm, j));
+										   
+										   }
 			
 		}
 		
-	}
+		
 	
 	return sum (res, dim);
 

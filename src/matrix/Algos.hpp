@@ -270,7 +270,7 @@ sum (Matrix<T>& M, const size_t d) {
  * @return    Highest non-one dimension
  */
 template <class T> inline  size_t
-HDim (const Matrix<T>& M) {
+ndims (const Matrix<T>& M) {
 	
 	size_t nd = 0;
 	

@@ -198,9 +198,9 @@ CGSENSE::Prepare () {
 	m_ncs->KSpace (GetRLDB ("kspace"));
 	m_ncs->Weights (GetRLDB ("weights"));
 	
-	//FreeRLDB ("kspace");
-	//FreeRLDB ("weights");
-	//FreeCXFL ("sense")
+	FreeRLDB ("kspace");
+	FreeRLDB ("weights");
+	FreeCXFL ("sense")
 	
 	return error;
 
@@ -220,14 +220,15 @@ CGSENSE::Process () {
 	Matrix<double>& weights = GetRLDB("weights");
 	Matrix<double>& kspace  = GetRLDB("kspace");
 	
-	//NCSENSE<cxfl>&  ncs = *m_ncs;
-	//image = ncs ->* data;
+	NCSENSE<cxfl>&  ncs = *m_ncs;
 
+	ticks cgstart = getticks();
+	image = ncs ->* data;
+	FreeCXFL ("data");
+	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+	/*
 	// CG matrices ----------------------------------------------------
 	Matrix <cxfl>   p       = Matrix<cxfl>   (m_N[0],m_N[1],m_N[2]), q, r;
-
-	// Intensity Correction -------------------------------------------
-	m_intcor                = ones<double> (m_N[0],m_N[1],m_N[2]);
 
 	// Set k-space and weights in FT plans and clear RAM --------------
 	for (int i = 0; i < NTHREADS || i < m_Nc; i++) {
@@ -249,7 +250,9 @@ CGSENSE::Process () {
 			AddPseudoRandomNoise (data, (float) m_noise);
 	} 
 
-	IntensityCorrection (sens, m_intcor);
+	// Intensity Correction -------------------------------------------
+
+	m_intcor = IntensityCorrection (sens);
 	
 	// Out going images -----------------------------------------------
 	// Start CG routine and runtime -----------------------------------
@@ -324,9 +327,8 @@ CGSENSE::Process () {
 	
 	FreeCXFL ("sens");	
 	
-	// Report timimng -------------------------------------------------
-	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
-
+	// Report timimng -------------------------------------------------*/
+	/*
 	// Verbose output needs to 
 	if (m_verbose) {
 		
@@ -342,7 +344,7 @@ CGSENSE::Process () {
 			image[i] *= m_intcor[i];
 
 	}
-
+	*/
 	return error;
 
 }

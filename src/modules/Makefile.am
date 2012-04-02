@@ -47,7 +47,7 @@ DumpToFile_la_SOURCES = DumpToFile.hpp DumpToFile.cpp
 DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 DumpToFile_la_LIBADD = $(COMMON_la_LIBADD)
 
-CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp SEM.hpp OMP.hpp
+CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp ../matrix/NCSENSE.hpp ../matrix/SEM.hpp OMP.hpp
 CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK)
 CGSENSE_la_LIBADD = $(COMMON_la_LIBADD)
 

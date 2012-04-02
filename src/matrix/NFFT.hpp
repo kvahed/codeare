@@ -255,14 +255,14 @@ NFFT<cxfl>::Trafo (const Matrix<cxfl>& in) const {
 
 	Matrix<cxfl> out (m_M,1);
 
-	for (size_t i = 0; i < m_M; i++) {
+	for (size_t i = 0; i < m_imgsz; i++) {
 		m_fplan.f_hat[i][0] = in[i].real();
 		m_fplan.f_hat[i][1] = in[i].imag();
 	}
 
 	nnfft::ft (m_fplan);
 
-	for (size_t i = 0; i < m_imgsz; i++) 
+	for (size_t i = 0; i < m_M; i++) 
 		out [i] = cxfl (m_fplan.f[i][0], m_fplan.f[i][1]);
 			
 	return out;
