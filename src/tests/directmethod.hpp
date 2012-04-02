@@ -19,6 +19,7 @@
  */
 
 #include "matrix/Creators.hpp"
+#include "matrix/Algos.hpp"
 
 template <class T> bool 
 dmtest (Connector<T>* rc) {
@@ -34,6 +35,7 @@ dmtest (Connector<T>* rc) {
 	Matrix<float> roi;
 	
 	Matrix<float> g;   
+	Matrix<float> t;   
 	Matrix<float> j;
 	
 	std::string cf  = std::string (base + std::string(config));
@@ -41,27 +43,25 @@ dmtest (Connector<T>* rc) {
 	
 	rc->ReadConfig (cf.c_str());
 	
-	std::string gf = std::string(base + std::string(rc->Attribute("gf"))); // gradient trajectories
-	std::string pf = std::string(base + std::string(rc->Attribute("pf"))); // patterns
-	std::string mf = std::string(base + std::string(rc->Attribute("mf"))); // maps
-	
-	// Gradients
 #ifdef HAVE_MAT_H
 
-	MXRead    (g, gf, rc->Attribute("g"));
-	MXRead    (j, gf, rc->Attribute("j"));
+	// Gradients
+	Read    (g, rc->GetElement("/config/data/g"),    base);
+	Read    (j, rc->GetElement("/config/data/j"),    base);
+	Read    (t, rc->GetElement("/config/data/t"),    base);
 	
 	// Target excitation, ROI, sample
-	MXRead    (r, pf, "r");
-	MXRead (tmxy, pf, rc->Attribute("p"));
-	tmz  = zeros<float> (r.Dim(1), 1);
-	smxy = zeros<cxfl>  (r.Dim(1), 1);
-	MXRead ( smz, pf, rc->Attribute("s"));
-	MXRead ( roi, pf, rc->Attribute("roi"));
-
+	Read    (r, rc->GetElement("/config/data/r"),    base);
+	Read (tmxy, rc->GetElement("/config/data/tmxy"), base);
+	tmz  = zeros<float> (size(r,1), 1);
+	smxy = zeros<cxfl>  (size(r,1), 1);
+	Read ( smz, rc->GetElement("/config/data/smz"), base);
+	Read ( roi, rc->GetElement("/config/data/roi"), base);
+	
 	// Maps
-	MXRead ( b1, mf, rc->Attribute("b1"));
-	MXRead ( b0, mf, rc->Attribute("b0"));
+	Read ( b1, rc->GetElement("/config/data/b1"),   base);
+	Read ( b0, rc->GetElement("/config/data/b0"),   base);
+
 #endif	
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
@@ -70,8 +70,9 @@ dmtest (Connector<T>* rc) {
 
 	// Outgoing -------------
 	
-	rc->SetMatrix  (  "b1", b1  );
+	rc->SetMatrix  ( "b1", b1  );
 	rc->SetMatrix (   "g", g  );
+	rc->SetMatrix (   "t", t  );
 	rc->SetMatrix (   "r", r   );
 	rc->SetMatrix (  "b0", b0  );
 	rc->SetMatrix  ("tmxy", tmxy);

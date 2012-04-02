@@ -242,6 +242,20 @@ public:
 	}
 
 	
+	/**
+	 * @brief           Get a text node of an element
+	 *
+	 *                  @see Configurable::GetText
+	 *
+	 * @param  path     X-Path
+	 * @return          Text
+	 */
+	inline TiXmlElement*
+	GetElement          (const char* path) {
+		return m_conn->GetElement (path);
+	}
+
+	
 
 private:
 	

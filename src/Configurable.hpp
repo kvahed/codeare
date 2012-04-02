@@ -240,6 +240,18 @@ class Configurable {
 
 		
 	/**
+	 * @brief           Get a particular node
+	 * 
+	 * @param  path     Path to node
+	 * @return          Value
+	 */
+	inline TiXmlElement*
+	GetElement          (const char* path) const {
+		return (TiXmlElement*) TinyXPath::XNp_xpath_node (Configuration(), path);
+	}
+
+		
+	/**
 	 * @brief Serialize configuration to string
 	 *
 	 * @return          String representation of configuration
