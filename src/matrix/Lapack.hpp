@@ -698,6 +698,7 @@ DOT  (Matrix<T>& A, Matrix<T>& B) {
  *
  * @param  A          left factor matrix
  * @param  x          Right factor vector
+ * @param  trans      Transpose A?
  * 
  * @return            A*x
  */

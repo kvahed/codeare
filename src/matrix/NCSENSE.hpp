@@ -82,15 +82,21 @@ public:
 	 * @param  maxit   Maximum # NCSENSE iterations (default: 3)
 	 */
 	NCSENSE (const Matrix<T> sens, const size_t& nk, const double& cgeps, const size_t& cgiter, 
-			 const double& lambda = 0.0, const size_t& m = 1, const double& alpha = 1.0, 
-			 const Matrix<double>& b0 = Matrix<double>(1), const Matrix<T>& pc = Matrix<T>(1), 
-			 const double& fteps = 7.0e-4, const size_t& ftiter = 1) {
+			 const double& lambda = 0.0, const double& fteps = 7.0e-4, const size_t& ftiter = 3, 
+			 const size_t& m = 1, const double& alpha = 1.0, const Matrix<double>& b0 = Matrix<double>(1), 
+			 const Matrix<T>& pc = Matrix<T>(1)) {
 		
+
 		m_dim = ndims(sens);
 		Matrix<size_t> ms (m_dim,1);
 		for (size_t i = 0; i < m_dim; i++)
 			ms[i] = size(sens,i);
 		
+		printf ("  Initialising NCSENSE:\n");
+		printf ("  Signal nodes: %li\n", nk);
+		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", cgeps, cgiter, lambda);
+		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
+
 		int np = 1;
 		
 #pragma omp parallel default (shared)
@@ -112,6 +118,8 @@ public:
 		
 		m_initialised = true;
 		
+		printf ("  ...done.\n\n");
+
 	}
 	
 	/**
@@ -261,3 +269,18 @@ private:
 
 
 #endif
+
+/*
+	printf ("  intialising nfft::init (%i, {%i, %i, %i}, %i, {%i, %i, %i}, %i, *, *, %.9f)\n", 
+			m_dim, 
+			m_N[0], m_N[1], m_N[2],
+			m_M,
+			m_n[0], m_n[1], m_n[2],
+			m,
+			m_fteps);
+
+	for (int i = 0; i < NTHREADS || i < m_Nc; i++)
+		nfft::init (m_dim, m_N, m_M, m_n, m, &m_fplan[i], &m_iplan[i]);
+	// --------------------------------------
+
+	*/

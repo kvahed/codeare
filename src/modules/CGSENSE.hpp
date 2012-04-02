@@ -96,21 +96,11 @@ namespace RRStrategy {
 		nfft_plan           m_fplan[NTHREADS];  /**< NuFFT plan                      */
 		solver_plan_complex m_iplan[NTHREADS];  /**< iNuFFT plan                     */
 		
-		double               m_epsilon;         /**< NuFFT convergence criterium     */
-		int                  m_maxit;           /**< Maximum number of NuFFT solver iterations */
+		double               m_fteps;         /**< NuFFT convergence criterium     */
+		int                  m_ftmaxit;           /**< Maximum number of NuFFT solver iterations */
 		double               m_cgeps;           /**< CG SENSE convergence criterium  */
 		int                  m_cgmaxit;         /**< Maximum number of CG iterations */
 		
-		int                  m_N[3];            /**< Size of image matrix.           */
-		int                  m_n[3];            /**< Oversampling                    */ 
-		int                  m_M;               /**< Measurement points              */
-		int                  m_dim;             /**< Dimensions of image space (2D/3D) */
-
-		double*              m_ftw;             /**< Fourier weights, Jacobian determinant, Density compensation */
-		double*              m_ftk;             /**< K-space points */
-		
-		double*              kmax;              /**< Maximum k-space vector          */
-
 	};
 
 
