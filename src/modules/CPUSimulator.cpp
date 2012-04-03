@@ -101,6 +101,7 @@ SimulateAcq (const Matrix<cxfl>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		Matrix<float> lr  ( 3,1);  // Local spatial vector
 		Matrix<cxfl>  ls  (nc,1);  // Local sensitivity
 		float         lb0;
+		size_t        rt;
 		
         omp_set_num_threads(np);
 		
@@ -124,7 +125,8 @@ SimulateAcq (const Matrix<cxfl>&  b1, const Matrix<float>&  gr, const Matrix<flo
 					ls[c] = conj(b1(pos,c));
 				
 				// Run over time points
-				for (size_t t = 0; t < nt; t++) {
+				size_t t = nt;
+				while (t--) {
 					
 					tmp[0] = lm[0];
 					tmp[1] = lm[1];
@@ -182,7 +184,6 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 		Matrix<float> lr  ( 3,1);  // Local spatial vector
 		Matrix<cxfl>  ls  (nc,1);  // Local sensitivity
 		float         lb0;
-		size_t        rt;
 		
 		omp_set_num_threads(np);
 	
@@ -208,16 +209,14 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 				// Time points
 				for (size_t t = 0; t < nt; t++) {
 					
-					rt    = nt-1-t;
-					
 					cxfl rfs = cxfl (0.0,0.0);
 					for (size_t i = 0; i < nc; i++) 
-						rfs += rf(rt,i)*ls[i];
-					rfs *= jac[rt];
+						rfs += rf(t,i)*ls[i];
+					rfs *= jac[t];
 					
 					n[0]  = gdt * -rfs.imag() * 1.0e-3;
 					n[1]  = gdt *  rfs.real() * 1.0e-3;
-					n[2]  = gdt * (gr(X,rt) * lr[X] + gr(Y,rt) * lr[Y] + gr(Z,rt) * lr[Z] - lb0) ;
+					n[2]  = gdt * (gr(X,t) * lr[X] + gr(Y,t) * lr[Y] + gr(Z,t) * lr[Z] - lb0) ;
 					
 					Rotate (n, lm);
 					
