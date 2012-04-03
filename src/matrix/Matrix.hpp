@@ -1186,12 +1186,13 @@ public:
 	operator/  (const double& s, const Matrix<T> &m) { 
 
 		Matrix<T> res = m;
+		size_t i = res.Size();
 
-		for (size_t i = 0; i < res.Size(); i++)
+		while (i--)
 			res[i] = (res[i] != 0) ? s/res[i] : 0.0;
-
+		
 		return res;
-
+		
 	}
 
 
@@ -1206,8 +1207,9 @@ public:
 	operator/  (const float& s, const Matrix<T> &m) { 
 
 		Matrix<T> res = m;
+		size_t i = res.Size(); 
 
-		for (size_t i = 0; i < res.Size(); i++)
+		while (i--)
 			res[i] = (res[i] != 0) ? s/res[i] : 0.0;
 
 		return res;
@@ -2713,20 +2715,17 @@ Matrix<T>::Matrix (const size_t* d, const float* r) {
 template <class T> inline 
 Matrix<T>::Matrix (const Matrix<T> &M) {
 	
-	for (size_t i = 0; i < INVALID_DIM; i++) {
+	size_t i;
+
+	for (i = 0; i < INVALID_DIM; i++) {
 		_dim[i] = M.Dim(i);
 		_res[i] = M.Res(i);
 	}
-	   
-	_M.resize(Size());
 	
-#pragma omp parallel default (shared)
-	{
-#pragma omp for
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] = M[i];
-	}
-			//	memcpy (&_M[0], M.Data(), Size() * sizeof(T));
+	i = Size();
+	_M.resize(i);
+	
+	memcpy (&_M[0], M.Data(), i * sizeof(T));
 	
 }
 
@@ -2774,16 +2773,10 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator== (const T& s) const   {
 
     Matrix<bool> res(_dim);
+	size_t i = Size();
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			res[i] = (_M[i] == s);
-		
-	}
+	while (i--)
+		res[i] = (_M[i] == s);
 	
     return res;
 
@@ -2794,16 +2787,10 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator>= (const T& s) const {
 
     Matrix<bool> res(_dim);
+	size_t i = Size();
     
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			res[i] = (_M[i] >= s);
-
-	}
+	while (i--)
+		res[i] = (_M[i] >= s);
 
     return res;
 
@@ -2814,17 +2801,10 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator<= (const T& s) const {
 
     Matrix<bool> res(_dim);
-
-#pragma omp parallel default (shared) 
-	{
+	size_t i = Size();
 		
-#pragma omp for
-		
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (_M[i] <= s);
-    
-
-	}
 
     return res;
 
@@ -2835,8 +2815,9 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator!= (const T& s) const {
 
     Matrix<bool> res(_dim);
+	size_t i = Size();
 
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (_M[i] != s);
 
     return res;
@@ -2848,8 +2829,9 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator< (const T& s) const {
 
     Matrix<bool> res(_dim);
+	size_t i = Size();
 
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (_M[i] < s);
 
     return res;
@@ -2861,8 +2843,9 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator> (const T& s) const {
 
     Matrix<bool> res(_dim);
+	size_t i = Size();
 
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (_M[i] > s);
 
     return res;
@@ -2893,20 +2876,23 @@ Matrix<T>::operator& (const Matrix<bool>& M) const {
         assert (_dim[i] == M.Dim()[i]);
 
 
-    size_t k = 0, i;
-    for (i = 0; i < Size(); i++)
+    size_t k = 0, i = Size();
+
+	while (i--)
         if (M[i])
             k++;
     
     Matrix<T> res(k, 1);
     
-    k = 0;
-    for (i = 0; i < Size(); i++)
+    k = 0; 
+	i = Size();
+
+	while (i--)
         if (M[i]) {
             res[k] = i;
             k++;
         }
-
+	
     return res;
 
 }
@@ -2915,35 +2901,35 @@ Matrix<T>::operator& (const Matrix<bool>& M) const {
 template <class T> inline Matrix<T> 
 Matrix<T>::operator&& (const Matrix<T>& M) const {
 
-    assert(M.Size() == Size());
+	size_t i;
+
+	for (i = 0; i < INVALID_DIM; i++)
+		assert (_dim[i] == M.Dim(i));
 
     Matrix<T> res(_dim);
+	i = Size();
 
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (M[i] && _M[i]);
 
     return res;
-
+	
 }
 
 
 template <class T> inline Matrix<T> 
 Matrix<T>::operator|| (const Matrix<T>& M) const {
 
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	size_t i;
+
+	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
     Matrix<bool> res(_dim);
+	i = Size();
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-    for (size_t i = 0; i < Size(); i++)
-        res[i] = (_M[i] || M[i]) ? true : false;
-
-	}
+	while (i--)
+        res[i] = (_M[i] || M[i]);
 
     return res;
 
@@ -2953,20 +2939,16 @@ Matrix<T>::operator|| (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator== (const Matrix<T>& M) const {
 
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	size_t i;
+
+	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
     Matrix<bool> res(_dim);
+	i = Size();
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-    for (size_t i = 0; i < Size(); i++)
-        res[i] = (_M[i] == M[i]) ? true : false;
-	
-	}
+	while (i--)
+        res[i] = (_M[i] == M[i]);
 
     return res;
 
@@ -2976,20 +2958,16 @@ Matrix<T>::operator== (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator>= (const Matrix<T>& M) const {
 
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	size_t i;
+
+	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
     Matrix<bool> res(_dim);
+	i = Size();
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (_M[i] >= M[i]) ? true : false;
-
-	}
 
     return res;
 
@@ -2999,20 +2977,16 @@ Matrix<T>::operator>= (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator<= (const Matrix<T>& M) const {
 
+	size_t i;
+
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
     Matrix<bool> res(_dim);
+	i = Size();
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (_M[i] <= M[i]) ? true : false;
-
-	}
 
     return res;
 
@@ -3022,43 +2996,35 @@ Matrix<T>::operator<= (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator!= (const Matrix<T>& M) const {
 
+	size_t i;
+
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
     Matrix<bool> res(_dim);
+	i = Size();
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (_M[i] != M[i]) ? true : false;
 
-	}
-
     return res;
-
+	
 }
 
 
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator> (const Matrix<T>& M) const {
 	
+	size_t i;
+	
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
-
+	
     Matrix<bool> res(_dim);
+	i = Size();
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (_M[i] > M[i]) ? true : false;
-
-	}
 
     return res;
 
@@ -3068,21 +3034,17 @@ Matrix<T>::operator> (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator< (const Matrix<T>& M) const {
 
+	size_t i;
+
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
     Matrix<bool> res(_dim);
+	i = Size();
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] = (_M[i] < M[i]);
-
-	}
-
+	
     return res;
 
 }
@@ -3091,40 +3053,30 @@ Matrix<T>::operator< (const Matrix<T>& M) const {
 template <class T> inline Matrix<T> 
 Matrix<T>::operator- () const {
 
-    Matrix<T> res (this->Dim());
+	size_t i = Size();
+    Matrix<T> res (_dim);
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-    for (size_t i = 0; i < Size(); i++)
+	while (i--)
         res[i] =- _M[i];
-
-	}
-
+	
     return res;
-
+	
 }
 
 
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator- (const Matrix<S> &M) const {
-
-	for (size_t i=0; i < INVALID_DIM; i++)
+	
+	size_t i;
+	
+	for (i=0; i < INVALID_DIM; i++)
 		assert (Dim(i) == M.Dim(i));
 	
     Matrix<T> res = *this;
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			res[i] -= M[i];
-		
-	}
+	i = Size();
+
+	while (i--)
+		res[i] -= M[i];
 	
 	return res;
 	
@@ -3136,16 +3088,10 @@ Matrix<T>::operator- (const S& s) const {
 	
     Matrix<T> res = *this;
 	T t = T(s);
+	size_t i = Size();
 	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			res[i] -= t;
-		
-	}
+	while (i--)
+		res[i] -= t;
 	
 	return res;
 	
@@ -3155,21 +3101,17 @@ Matrix<T>::operator- (const S& s) const {
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator+ (const Matrix<S> &M) const {
 
-	for (size_t i=0; i < INVALID_DIM; i++)
+	size_t i;
+	
+	for (i=0; i < INVALID_DIM; i++)
 		assert (Dim(i) == M.Dim(i));
 
     Matrix<T> res = *this;
+	i = Size();
 
-#pragma omp parallel default (shared) 
-	{
+	while (i--)
+		res[i] += M[i];
 		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			res[i] += M[i];
-		
-	}
-	
 	return res;
 	
 }
@@ -3180,16 +3122,10 @@ Matrix<T>::operator+ (const S& s) const {
 	
     Matrix<T> res = *this;
 	T t = T(s);
+	size_t i = Size();
 	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			res[i] += t;
-		
-	}
+	while (i--)
+		res[i] += t;
 	
 	return res;
 
@@ -3200,16 +3136,10 @@ template <class T> inline Matrix<T>
 Matrix<T>::operator^ (const float& p) const {
     
 	Matrix<T> res = *this;
-    
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-	for (size_t i = 0; i < Size(); i++)
-        res [i] = (p == 0) ? res[i] = 1 : pow(res[i],  p);
+	size_t i = Size();
 
-	}
+	while (i--)
+        res[i] = (p == 0) ? T(1) : pow(res[i],  p);
 
     return res;
 
@@ -3218,17 +3148,12 @@ Matrix<T>::operator^ (const float& p) const {
 
 template <class T> inline Matrix<T>
 Matrix<T>::operator ^= (const float& p) {
-    
-#pragma omp parallel default (shared) 
-	{
+
+	size_t i = Size();
 		
-#pragma omp for
-		
-	for (size_t i = 0; i < Size(); i++)
+	while (i--)
         _M[i] = (p == 0) ? T(1) : pow(_M[i],  p);
 	
-	}
-
     return *this;
 
 }
@@ -3237,20 +3162,17 @@ Matrix<T>::operator ^= (const float& p) {
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator* (const Matrix<S> &M) const {
 
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	size_t i;
+
+	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
     Matrix<T> res = *this;
+	i = Size();
 
-#pragma omp parallel default (shared) 
-	{
+	while(i--)
+		res[i] *= M[i];
 
-#pragma omp for
-		for (size_t i = 0; i < Size(); i++)
-			res[i] *= M[i];
-
-	}
-	
 	return res;
 
 }
@@ -3261,15 +3183,10 @@ Matrix<T>::operator* (const S& s) const {
     
     Matrix<T> res = *this;
 	T t = T(s);
+	size_t i = Size();
 
-#pragma omp parallel default (shared) 
-	{
-
-#pragma omp for
-	for (size_t i = 0; i < Size(); i++)
+	while (i--)
 		res[i] *= t;
-	
-	}
 
 	return res;
 
@@ -3281,19 +3198,14 @@ Matrix<T>::operator *= (const Matrix<S> &M) {
     
     size_t i;
 
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
-#pragma omp parallel default (shared) 
-	{
+	i = Size();
 		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] *= M[i];
-		
-	}
-
+	while (i--)
+		_M[i] *= M[i];
+	
     return *this;
 
 }
@@ -3303,40 +3215,29 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator *= (const S& s) {
     
 	T t = T(s);
-
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] *= t;
-		
-	}
-
+	size_t i = Size();
+	
+	while (i--)
+		_M[i] *= t;
+	
     return *this;
-
+	
 }
 
 
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator += (const Matrix<S> &M) {
-    
+	
     size_t i;
-
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	
+	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
-#pragma omp parallel default (shared) 
-	{
+	i = Size();
+	
+	while(i--)
+		_M[i] += M[i];
 		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] += M[i];
-		
-	}
-
     return *this;
 
 }
@@ -3346,17 +3247,11 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator+= (const S& s) {
     
 	T t = T(s);
+	size_t i = Size();
 
-#pragma omp parallel default (shared) 
-		{
+	while (i--)
+		_M[i] += t;
 			
-#pragma omp for
-			
-			for (size_t i = 0; i < Size(); i++)
-				_M[i] += t;
-			
-		}
-		
     return *this;
 	
 }
@@ -3367,18 +3262,13 @@ Matrix<T>::operator-= (const Matrix<S>& M) {
 	
     size_t i;
 	
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] -= M[i];
-		
-	}
+	i = Size();
+	
+	while (i--)
+		_M[i] -= M[i];
 	
     return *this;
 	
@@ -3388,18 +3278,11 @@ Matrix<T>::operator-= (const Matrix<S>& M) {
 template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator-= (const S& s) {
     
-    size_t i;
+    size_t i = Size();
 	T t = T(s);
 
-#pragma omp parallel default (shared) 
-		{
-			
-#pragma omp for
-			
-			for (size_t i = 0; i < Size(); i++)
-				_M[i] -= t;
-			
-		}
+	while (i--)
+		_M[i] -= t;
 
     return *this;
 
@@ -3411,18 +3294,13 @@ Matrix<T>::operator /= (const Matrix<S> &M) {
     
     size_t i;
 
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] /= M[i];
-		
-	}
+	i = Size();
+
+	while (i--)
+		_M[i] /= M[i];
 
     return *this;
 
@@ -3433,16 +3311,10 @@ template <class T> template<class S> inline Matrix<T>
 Matrix<T>::operator/= (const S& s) {
     
 	T t = T(s);
-
-#pragma omp parallel default (shared) 
-	{
+	size_t i = Size();
 		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			_M[i] /= s;
-		
-	}
+	while (i--)
+		_M[i] /= s;
 
     return *this;
 
@@ -3452,20 +3324,16 @@ Matrix<T>::operator/= (const S& s) {
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator/ (const Matrix<S>& M) const {
 
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	size_t i;
+
+	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
+	i = Size();
     Matrix<T> res = *this;
 
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < Size(); i++)
-			(M[i] != (T)0) ? res[i] = _M[i] / M[i] : 0;
-
-	}
+	while(i--)
+		res[i] = (M[i] != (T)0) ? _M[i] / M[i] : 0;
 
 	return res;
 
@@ -3478,18 +3346,11 @@ Matrix<T>::operator/ (const S& s) const {
 	assert (cabs(s) != 0.0);
 
 	T t = T(s);
-
+	size_t i = Size();
     Matrix<T> res = *this;
-
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for 
-		
-	for (size_t i = 0; i < Size(); i++)
+	
+	while (i--)
 		res[i] /= t;
-
-	}
 
 	return res;
 
@@ -3530,17 +3391,11 @@ template<class T> template<class S> inline
 Matrix<T>::operator Matrix<S> () const {
 
 	Matrix<S> m (_dim);
+	size_t i = Size();
 
-#pragma omp parallel default (shared) 
-	{
+	while (i--)
+		m[i] = (S)_M[i];
 		
-#pragma omp for
-		
-		for (int i = 0; i < this->Size(); i++)
-			m[i] = (S)_M[i];
-		
-	}
-	
 	return m;
 
 }
