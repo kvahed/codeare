@@ -173,7 +173,7 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 	size_t            nr   = r.Dim(1);
 	
     ticks             tic  = getticks();
-	
+
 #pragma omp parallel default(shared)
 	{
 		
@@ -185,9 +185,9 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 		size_t        rt;
 		
 		omp_set_num_threads(np);
-		
+	
 #pragma omp for schedule (guided) 
-		
+	
 		for (size_t pos = 0; pos < nr; pos++) {
 			
 			// Start with equilibrium
@@ -196,13 +196,13 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 			lm[Z] = ml0[pos];
 			
 			if ((lm[X]+lm[Y]+lm[Z]) > 0.0) {
-				
+
 				lb0 = b0[pos]*TWOPI;
-				
+
 				lr[0] = r[pos*3  ];
 				lr[1] = r[pos*3+1];
 				lr[2] = r[pos*3+2];
-				
+
 				for (size_t i = 0; i < nc; i++) ls[i] = b1 (pos,i);
 				
 				// Time points
