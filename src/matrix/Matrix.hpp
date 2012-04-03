@@ -117,18 +117,6 @@ enum IceDim {
 #define GB 1024.0 * 1024.0 * 1024.0;
 #define TB 1024.0 * 1024.0 * 1024.0 * 1024.0;
 
-enum io_strategy {
-
-	HDF5,
-	MATLAB,
-	NIFTI,
-	SYNGO,
-	CDF,
-	PRIMITIVE
-
-};
-
-
 /**
  * @brief   Matrix template.<br/>
  *          This class intends to offer a simple interface for handling
