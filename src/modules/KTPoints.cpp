@@ -183,7 +183,7 @@ KTPoints::Process        () {
 
         minv  = m.prodt (m);
         minv += treg;
-        minv  = Pinv(minv);
+        minv  = pinv(minv);
         minv  = minv.prod (m, 'N', 'C');
         
         // Valriable exchange method --------------

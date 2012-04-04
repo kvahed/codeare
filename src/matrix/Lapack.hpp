@@ -37,10 +37,10 @@ extern "C" {
 	void sgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
 	
 	// Inverse of a complex Hermitian positive definite matrix using cpotrf/cpptrf
-	void cpotri_ (char* uplo, int*n, void *a, int* lda, int*info);
-	void dpotri_ (char* uplo, int*n, void *a, int* lda, int*info);
-	void zpotri_ (char* uplo, int*n, void *a, int* lda, int*info);
-	void spotri_ (char* uplo, int*n, void *a, int* lda, int*info);
+	void cpotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
+	void dpotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
+	void zpotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
+	void spotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
 	
 	// Matrix inversion through cholesky decomposition
 	void cgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
@@ -49,10 +49,10 @@ extern "C" {
 	void sgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
 	
 	// Eigen value computations
-	void cgeev_  (char *jvl, char *jvr, int *n, void *a, int *lda, void *w ,           void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork, void *rwork, int *info);
-	void zgeev_  (char *jvl, char *jvr, int *n, void *a, int *lda, void *w ,           void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork, void *rwork, int *info);
-	void dgeev_  (char *jvl, char *jvr, int *n, void *a, int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork,              int *info);
-	void sgeev_  (char *jvl, char *jvr, int *n, void *a, int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork,              int *info);
+	void cgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *w ,           void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork, void *rwork, int *info);
+	void zgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *w ,           void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork, void *rwork, int *info);
+	void dgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork,              int *info);
+	void sgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork,              int *info);
 	
 	// Singular value decomposition 
 	void cgesdd_ (const char *jobz, int*m, int *n, const void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, void *rwork, int *iwork, int*info);
@@ -61,30 +61,30 @@ extern "C" {
 	void sgesdd_ (const char *jobz, int*m, int *n, const void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork,               int *iwork, int*info);
 	
 	// Pseudo-inversion 
-	void zgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
-	void cgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
-	void dgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
-	void sgelsd_ (int* m, int* n, int* nrhs, void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
+	void zgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
+	void cgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
+	void dgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
+	void sgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
 
 	// Matrix vector multiplication
-	void sgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
-	void dgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
-	void cgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
-	void zgemv_  (char* trans, int* m, int* n, void* alpha, void *a, int* lda, void *x, int* incx, void* beta, void *y, int* incy);
+	void sgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
+	void dgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
+	void cgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
+	void zgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
 
 	// Matrix matrix multiplication
-	void sgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	void dgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	void cgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	void zgemm_  (char *transa, char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
+	void sgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
+	void dgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
+	void cgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
+	void zgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
 	
 	// vector vector scalar multiplication
-	float  sdot_  (int* n, void* x, int* incx, void* y, int* incy);
-	double ddot_  (int* n, void* x, int* incx, void* y, int* incy);
-	cxfl   cdotc_ (int* n, void* x, int* incx, void* y, int* incy);
-	cxfl   cdotu_ (int* n, void* x, int* incx, void* y, int* incy);
-	cxdb   zdotc_ (int* n, void* x, int* incx, void* y, int* incy);
-	cxdb   zdotu_ (int* n, void* x, int* incx, void* y, int* incy);
+	float  sdot_  (int* n, const void* x, int* incx, const void* y, int* incy);
+	double ddot_  (int* n, const void* x, int* incx, const void* y, int* incy);
+	cxfl   cdotc_ (int* n, const void* x, int* incx, const void* y, int* incy);
+	cxfl   cdotu_ (int* n, const void* x, int* incx, const void* y, int* incy);
+	cxdb   zdotc_ (int* n, const void* x, int* incx, const void* y, int* incy);
+	cxdb   zdotu_ (int* n, const void* x, int* incx, const void* y, int* incy);
 
     float  cblas_snrm2  (const int N, const void *X, const int incX);
 	double cblas_dnrm2  (const int N, const void *X, const int incX);
@@ -104,115 +104,115 @@ extern "C" {
 #include "Creators.hpp"
 
 
-	/**
-	 * @brief         Eigenvalue decomposition
-	 * 
-	 * @see           LAPACK driver xGEEV
-	 *
-	 * @param  m      Matrix for decomposition
-	 * @param  ev     Eigenvalues
-	 * @param  lv     Left  Eigen-vectors
-	 * @param  rv     Right Eigen-vectors
-	 * @param  jobvl  Compute left vectors ('N'/'V')
-	 * @param  jobvr  Compute right vectors ('N'/'V')
-	 * @return        Status of driver
-	 */
-	template <class T, class S> int
-	EIG (Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, char jobvl = 'N', char jobvr = 'N') {
-
-		if (jobvl != 'N' && jobvl !='V') {
-			printf ("EIG Error: Parameter jobvl ('%c' provided) must be 'N' or 'V' \n", jobvl);
-			return -1;
-		}
-
-		if (jobvr != 'N' && jobvr !='V') {
-			printf ("EIG Error: Parameter jobvl ('%c' provided) must be 'N' or 'V' \n", jobvr);
-			return -1;
-		}
-
-		// 2D 
-		if (!Is2D(m)) {
-			printf ("EIG Error: Parameter m must be 2D");
-			return -2;
-		}
-
-		// Square matrix
-		if (m.Width() != m.Height()){
-			printf ("EIG Error: Parameter m must be square");
-			return -3;
-		}
-		
-		int    N     =  m.Height();
-
-		int    lda   =  N;
-		int    ldvl  =  (jobvl) ? N : 1;
-		int    ldvr  =  (jobvr) ? m.Width() : 1;
-		int    info  =  0;
-		int    lwork = -1;
-		
-		T*     w;
-		T*     wi;
-		T*     rwork;
-
-		if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {    // Complex eigen values for real matrices
-			w     = (T*) malloc (N * sizeof(T));
-			wi    = (T*) malloc (N * sizeof(T));
-		} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))  // Real workspace for complex matrices
-			rwork = (T*) malloc (N * sizeof(T));
-	  
-		T  wkopt;
-
-		// Workspace query
-		if (typeid(T) == typeid(cxfl))
-			cgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
-		else if (typeid(T) == typeid(cxdb))
-			zgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
-		else if (typeid(T) == typeid(double))
-			dgeev_ (&jobvl, &jobvr, &N, &m[0], &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
-		else if (typeid(T) == typeid(float))
-			sgeev_ (&jobvl, &jobvr, &N, &m[0], &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
-		
-		// Intialise work space
-		lwork    = (int) creal (wkopt);
-		T* work  = (T*) malloc (lwork * sizeof(T));
-
-		// Actual eigen value comp
-		if (typeid(T) == typeid(cxfl)) {
-			cgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
-		} else if (typeid(T) == typeid(cxdb)) {
-			zgeev_ (&jobvl, &jobvr, &N, &m[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
-		} else if (typeid(T) == typeid(double)) {
-			dgeev_ (&jobvl, &jobvr, &N, &m[0], &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
-			for (size_t i = 0; i < N; i++) {
-				double f[2] = {((double*)w)[i], ((double*)wi)[i]};
-				memcpy(&ev[i], f, 2 * sizeof(double));
-			}
-		} else if (typeid(T) == typeid(float)) {
-			sgeev_ (&jobvl, &jobvr, &N, &m[0], &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
-			for (size_t i = 0; i < N; i++) {
-				float f[2] = {((float*)w)[i], ((float*)wi)[i]};
-				memcpy(&ev[i], f, 2 * sizeof(float));
-			}
-		}
-
-		
-		// Clean up
-		if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {
-			free (w);
-			free (wi);
-		} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
-			free (rwork);
-		free (work);
-
-		if (info > 0)
-			printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have been computed;\n elements i+1:N of ev contain eigenvalues which\n have converged.\n\n") ;
-		else if (info < 0)
-			printf ("\nERROR - XGEEV: the %i-th argument had an illegal value.\n\n", -info); 
-
-		return info;
-		
+/**
+ * @brief         Eigenvalue decomposition
+ * 
+ * @see           LAPACK driver xGEEV
+ *
+ * @param  m      Matrix for decomposition
+ * @param  ev     Eigenvalues
+ * @param  lv     Left  Eigen-vectors
+ * @param  rv     Right Eigen-vectors
+ * @param  jobvl  Compute left vectors ('N'/'V')
+ * @param  jobvr  Compute right vectors ('N'/'V')
+ * @return        Status of driver
+ */
+template <class T, class S> static int
+eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char& jobvl = 'N', const char& jobvr = 'N') {
+	
+	if (jobvl != 'N' && jobvl !='V') {
+		printf ("EIG Error: Parameter jobvl ('%c' provided) must be 'N' or 'V' \n", jobvl);
+		return -1;
 	}
 	
+	if (jobvr != 'N' && jobvr !='V') {
+		printf ("EIG Error: Parameter jobvl ('%c' provided) must be 'N' or 'V' \n", jobvr);
+		return -1;
+	}
+	
+	// 2D 
+	if (!Is2D(m)) {
+		printf ("EIG Error: Parameter m must be 2D");
+		return -2;
+	}
+	
+	// Square matrix
+	if (m.Width() != m.Height()){
+		printf ("EIG Error: Parameter m must be square");
+		return -3;
+	}
+	
+	int    N     =  m.Height();
+	
+	int    lda   =  N;
+	int    ldvl  =  (jobvl) ? N : 1;
+	int    ldvr  =  (jobvr) ? m.Width() : 1;
+	int    info  =  0;
+	int    lwork = -1;
+	
+	T*     w;
+	T*     wi;
+	T*     rwork;
+	
+	if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {    // Complex eigen values for real matrices
+		w     = (T*) malloc (N * sizeof(T));
+		wi    = (T*) malloc (N * sizeof(T));
+	} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))  // Real workspace for complex matrices
+		rwork = (T*) malloc (N * sizeof(T));
+	
+	T  wkopt;
+	
+	// Workspace query
+	if (typeid(T) == typeid(cxfl))
+		cgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
+	else if (typeid(T) == typeid(cxdb))
+		zgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
+	else if (typeid(T) == typeid(double))
+		dgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
+	else if (typeid(T) == typeid(float))
+		sgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
+	
+	// Intialise work space
+	lwork    = (int) creal (wkopt);
+	T* work  = (T*) malloc (lwork * sizeof(T));
+	
+	// Actual eigen value comp
+	if (typeid(T) == typeid(cxfl)) {
+		cgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
+	} else if (typeid(T) == typeid(cxdb)) {
+		zgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
+	} else if (typeid(T) == typeid(double)) {
+		dgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
+		for (size_t i = 0; i < N; i++) {
+			double f[2] = {((double*)w)[i], ((double*)wi)[i]};
+			memcpy(&ev[i], f, 2 * sizeof(double));
+		}
+	} else if (typeid(T) == typeid(float)) {
+		sgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
+		for (size_t i = 0; i < N; i++) {
+			float f[2] = {((float*)w)[i], ((float*)wi)[i]};
+			memcpy(&ev[i], f, 2 * sizeof(float));
+		}
+	}
+	
+	
+	// Clean up
+	if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {
+		free (w);
+		free (wi);
+	} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
+		free (rwork);
+	free (work);
+	
+	if (info > 0)
+		printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have been computed;\n elements i+1:N of ev contain eigenvalues which\n have converged.\n\n") ;
+	else if (info < 0)
+		printf ("\nERROR - XGEEV: the %i-th argument had an illegal value.\n\n", -info); 
+	
+	return info;
+	
+}
+
 
 /**
  * @brief           Singular value decomposition
@@ -233,8 +233,8 @@ extern "C" {
  * @return          Status of the driver
  */
 
-template<class T, class S> int 
-SVD (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char jobz = 'N') {
+template<class T, class S> static int 
+svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& jobz = 'N') {
 	
 	Matrix<T> A (IN);
 	
@@ -283,13 +283,13 @@ SVD (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char j
 	
 	// Workspace query
 	if      (typeid(T) == typeid(cxfl))
-		cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+		cgesdd_ (&jobz, &m, &n, A.Data(), &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(cxdb))
-		zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+		zgesdd_ (&jobz, &m, &n, A.Data(), &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+		dgesdd_ (&jobz, &m, &n, A.Data(), &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
 	else if (typeid(T) == typeid(float))
-		sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+		sgesdd_ (&jobz, &m, &n, A.Data(), &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
 	
 	// Resize work according to ws query
 	lwork   = (int) creal (wopt);
@@ -297,13 +297,13 @@ SVD (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char j
 	
 	//SVD
 	if      (typeid(T) == typeid(cxfl))
-		cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+		cgesdd_ (&jobz, &m, &n, A.Data(), &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(cxdb))
-		zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+		zgesdd_ (&jobz, &m, &n, A.Data(), &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+		dgesdd_ (&jobz, &m, &n, A.Data(), &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
 	else if (typeid(T) == typeid(float))
-		sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+		sgesdd_ (&jobz, &m, &n, A.Data(), &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
 	
 	V = !V;
 	
@@ -333,7 +333,7 @@ SVD (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char j
  * @param  m             Matrix
  * @return               Inverse
 */
-template <class T> Matrix<T> 
+template <class T> static Matrix<T> 
 inv (const Matrix<T>& m) {
 	
 	// 2D 
@@ -408,8 +408,8 @@ inv (const Matrix<T>& m) {
  * @param  rcond         Condition number
  * @return               Moore-Penrose pseudoinverse
 */
-template<class T> Matrix<T> 
-Pinv (Matrix<T>& m, double rcond = 1.0) {
+template<class T> static Matrix<T> 
+pinv (const Matrix<T>& m, double rcond = 1.0) {
 	
 	void *s, *rwork;
 	T    *work, wopt, rwopt;
@@ -436,13 +436,13 @@ Pinv (Matrix<T>& m, double rcond = 1.0) {
 	float frcond  = rcond;
 	
 	if      (typeid(T) == typeid(cxfl))
-		cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
+		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
 	else if (typeid(T) == typeid(cxdb))
-		zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
+		zgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
 	else if (typeid(T) == typeid(double))
-		dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork,         &iwopt, &info);
+		dgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork,         &iwopt, &info);
 	else if (typeid(T) == typeid(float))
-		sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork,         &iwopt, &info);
+		sgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork,         &iwopt, &info);
 	
 	lwork = (int) creal(wopt);
 	
@@ -453,13 +453,13 @@ Pinv (Matrix<T>& m, double rcond = 1.0) {
 	work  = (T*)   malloc (sizeof(T) * lwork);
 	
 	if (typeid(T) == typeid(cxfl))
-		cgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
+		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(cxdb))
-		zgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork, rwork, iwork, &info);
+		zgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(double))
-		dgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork,        iwork, &info);
+		dgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork,        iwork, &info);
 	else if (typeid(T) == typeid(float))
-		sgelsd_ (&M, &N, &nrhs, &m[0], &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
+		sgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
 	
 	if (M > N)
 		for (size_t i = 0; i < M; i++)
@@ -493,8 +493,8 @@ Pinv (Matrix<T>& m, double rcond = 1.0) {
  * @param  uplo  Use upper/lower triangle for decomposition ('U': default/'L')
  * @return       Cholesky decomposition
  */
-template<class T> Matrix<T> 
-Cholesky (Matrix<T>& A, const char uplo = 'U') {
+template<class T> static Matrix<T> 
+chol (const Matrix<T>& A, const char uplo = 'U') {
 	
 	Matrix<T> res  = A;
 	int       info = 0, n = A.Height();
@@ -515,18 +515,6 @@ Cholesky (Matrix<T>& A, const char uplo = 'U') {
 
 
 /**
- * @brief        Cholesky decomposition of positive definite quadratic matrix
- *
- * @see          Cholesky
- */
-template<class T> static Matrix<T> chol (Matrix<T>& A, const char uplo = 'U') {
-	
-	return Cholesky(A, uplo);
-	
-}
-
-
-/**
  * @brief          Matrix matrix multiplication
  *
  * @see            BLAS routine xGEMM
@@ -537,8 +525,8 @@ template<class T> static Matrix<T> chol (Matrix<T>& A, const char uplo = 'U') {
  * @param  transb  (N: ...*B | T: ...*B.' | C: ...*B') transpose right factor
  * @return         Product
  */
-template<class T> Matrix<T> 
-GEMM (Matrix<T>& A, Matrix<T>& B, char transa = 'N', char transb = 'N') {
+template<class T> static Matrix<T> 
+gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = 'N') {
 	
 	int aw = (int)A.Width(), ah = (int)A.Height(), bw = (int)B.Width(), bh = (int)B.Height();
 	
@@ -570,13 +558,13 @@ GEMM (Matrix<T>& A, Matrix<T>& B, char transa = 'N', char transb = 'N') {
 	Matrix<T> C  (m, n);
 	
 	if      (typeid(T) == typeid(double))
-		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
+		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
 	else if (typeid(T) == typeid(float))
-		sgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
+		sgemm_ (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
 	else if (typeid(T) == typeid(cxfl))
-		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
+		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
 	else if (typeid(T) == typeid(cxdb))
-		zgemm_ (&transa, &transb, &m, &n, &k, &alpha, &A[0], &ah, &B[0], &bh, &beta, &C[0], &ldc);
+		zgemm_ (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
 	
 	return C;
 	
@@ -590,18 +578,18 @@ GEMM (Matrix<T>& A, Matrix<T>& B, char transa = 'N', char transb = 'N') {
  * @param  M           Input
  * @return             Eclidean norm
  */
-template<class T> T
-Norm (Matrix<T>& M) {
+template<class T> static T
+norm (const Matrix<T>& M) {
 	
 	T   res  = T(0);
 	
 	int n    = (int) M.Size();
 	int incx = 1;
 	
-	if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, &M[0], incx);
-	else if (typeid(T) == typeid(  cxdb)) res = cblas_dznrm2 (n, &M[0], incx);
-	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, &M[0], incx);
-	else if (typeid(T) == typeid( float)) res = cblas_snrm2  (n, &M[0], incx);
+	if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, M.Data(), incx);
+	else if (typeid(T) == typeid(  cxdb)) res = cblas_dznrm2 (n, M.Data(), incx);
+	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, M.Data(), incx);
+	else if (typeid(T) == typeid( float)) res = cblas_snrm2  (n, M.Data(), incx);
 	else {
 		for (int i = 0; i < M.Size(); i++)
 			res += pow(M[i],2.0);
@@ -621,8 +609,8 @@ Norm (Matrix<T>& M) {
  * @param  B           Right factor 
  * @return             A'*B
  */
-template <class T> T 
-DOTC (Matrix<T>& A, Matrix<T>& B) {
+template <class T> static T 
+DOTC (const Matrix<T>& A, const Matrix<T>& B) {
 	
 	int n    = (int) A.Size();
 	
@@ -631,13 +619,16 @@ DOTC (Matrix<T>& A, Matrix<T>& B) {
 	T   res  = T(0.0);
 	int one = 1;
 	
-	if      (typeid(T) == typeid(cxfl)) cblas_cdotc_sub (n, &A[0], one, &B[0], one, &res);
-	else if (typeid(T) == typeid(cxdb)) cblas_zdotc_sub (n, &A[0], one, &B[0], one, &res);
+	if      (typeid(T) == typeid(cxfl)) cblas_cdotc_sub (n, A.Data(), one, B.Data(), one, &res);
+	else if (typeid(T) == typeid(cxdb)) cblas_zdotc_sub (n, A.Data(), one, B.Data(), one, &res);
 	
 	return res;
 	
 }
-
+template <class T> static T 
+dotc (const Matrix<T>& A, const Matrix<T>& B) {
+	return DOTC (A,B);
+}
 
 
 /**
@@ -647,8 +638,8 @@ DOTC (Matrix<T>& A, Matrix<T>& B) {
  * @param  B           Right factor 
  * @return             A*B
  */
-template <class T> T 
-DOTU (Matrix<T>& A, Matrix<T>& B) {
+template <class T> static T 
+DOTU (const Matrix<T>& A, const Matrix<T>& B) {
 	
 	int n    = (int) A.Size();
 	
@@ -657,11 +648,15 @@ DOTU (Matrix<T>& A, Matrix<T>& B) {
 	T   res  = T(0.0);
 	int one  = 1;
 	
-	if      (typeid(T) == typeid(cxfl)) cblas_cdotu_sub (n, &A[0], one, &B[0], one, &res);
-	else if (typeid(T) == typeid(cxdb)) cblas_zdotu_sub (n, &A[0], one, &B[0], one, &res);
+	if      (typeid(T) == typeid(cxfl)) cblas_cdotu_sub (n, A.Data(), one, B.Data(), one, &res);
+	else if (typeid(T) == typeid(cxdb)) cblas_zdotu_sub (n, A.Data(), one, B.Data(), one, &res);
 	
 	return res;
 	
+}
+template <class T> static T 
+dotu (const Matrix<T>& A, const Matrix<T>& B) {
+	DOTU (A, B);
 }
 
 
@@ -673,7 +668,7 @@ DOTU (Matrix<T>& A, Matrix<T>& B) {
  * @return             A*B
  */
 template <class T> T 
-DOT  (Matrix<T>& A, Matrix<T>& B) {
+DOT  (const Matrix<T>& A, const Matrix<T>& B) {
 	
 	int n    = (int) A.Size();
 	
@@ -682,15 +677,18 @@ DOT  (Matrix<T>& A, Matrix<T>& B) {
 	T   res  = T(0.0);
 	int one  = 1;
 	
-	if      (typeid(T) == typeid(cxfl))   cblas_cdotu_sub (n, &A[0], one, &B[0], one, &res);
-	else if (typeid(T) == typeid(cxdb))   cblas_zdotu_sub (n, &A[0], one, &B[0], one, &res);
-	else if (typeid(T) == typeid(double)) cblas_ddot_sub  (n, &A[0], one, &B[0], one, &res);
-	else if (typeid(T) == typeid(float))  cblas_sdot_sub  (n, &A[0], one, &B[0], one, &res);
+	if      (typeid(T) == typeid(cxfl))   cblas_cdotu_sub (n, A.Data(), one, B.Data(), one, &res);
+	else if (typeid(T) == typeid(cxdb))   cblas_zdotu_sub (n, A.Data(), one, B.Data(), one, &res);
+	else if (typeid(T) == typeid(double)) cblas_ddot_sub  (n, A.Data(), one, B.Data(), one, &res);
+	else if (typeid(T) == typeid(float))  cblas_sdot_sub  (n, A.Data(), one, B.Data(), one, &res);
 	
 	return res;
 	
 }
-
+template <class T> T 
+dot  (const Matrix<T>& A, const Matrix<T>& B) {
+	return DOT (A, B);
+}
 
 
 /**
@@ -703,7 +701,7 @@ DOT  (Matrix<T>& A, Matrix<T>& B) {
  * @return            A*x
  */
 template<class T> Matrix<T> 
-GEMV (Matrix<T>& A, Matrix<T>& x, char trans = 'N') {
+gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
 	
 	assert (x.Width() == 1);
 	
@@ -721,10 +719,10 @@ GEMV (Matrix<T>& A, Matrix<T>& x, char trans = 'N') {
 	
 	Matrix<T> y ((trans == 'N') ? m : n, 1);
 	
-	if      (typeid(T) == typeid(double)) dgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
-	else if (typeid(T) == typeid(float))  sgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
-	else if (typeid(T) == typeid(cxfl))   cgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
-	else if (typeid(T) == typeid(cxdb))   zgemv_ (&trans, &m, &n, &alpha, &A[0], &ah, &x[0], &one, &beta, &y[0], &one);
+	if      (typeid(T) == typeid(double)) dgemv_ (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
+	else if (typeid(T) == typeid(float))  sgemv_ (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
+	else if (typeid(T) == typeid(cxfl))   cgemv_ (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
+	else if (typeid(T) == typeid(cxdb))   zgemv_ (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
 	
 	return y;
 	

@@ -145,7 +145,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 			
 			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cxfl));
 			
-			SVD (m[tid], s[tid], u[tid], v[tid], 'S');
+			svd (m[tid], s[tid], u[tid], v[tid], 'S');
 			
 			for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r] * exp(cxfl(0.0,1.0)*arg(u[tid][0])); // U 
 			for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t] * exp(cxfl(0.0,1.0)*arg(v[tid][0])); // V 

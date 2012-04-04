@@ -281,24 +281,23 @@ namespace RRStrategy {
 	NLCG (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp) {
 
 
-		int          k  = cgp.cgiter + 1;
 		float        t0 = 1.0, t = 1.0, z = 0.0;
-		float        xn = creal(Norm(x));
+		float        xn = creal(norm(x));
 		float        rmse, bk, f0, f1;
 
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
 
 		DWT&      dwt = *cgp.dwt;
-		FT<cxfl>& ft = *cgp.ft;
+		FT<cxfl>& ft  = *cgp.ft;
 		TVOP&     tvt = *cgp.tvt;
 
 		g0 = Gradient (x, data, cgp);
 		dx = -g0;
 		
-		while (k--) {
-
+		for (size_t k = 0; k < cgp.cgiter; k++) {
+			
 			t = t0;
-
+			
 			wx  = dwt->*x;
 			wdx = dwt->*dx;
 
@@ -324,7 +323,7 @@ namespace RRStrategy {
 				
 			} 
 			
-			printf ("    %02i - nrms: %1.7f, l-search: %i, ", cgp.cgiter - k, rmse, i); fflush (stdout);
+			printf ("    %02i - nrms: %1.7f, l-search: %i, ", k, rmse, i); fflush (stdout);
 
 			if (i == cgp.lsiter) {
 				printf ("Reached max line search, exiting... \n"); 
@@ -343,7 +342,7 @@ namespace RRStrategy {
 			g0  =  g1;
 			dx  = -g1 + dx * bk;
 
-			float dxn = creal(Norm(dx))/xn;
+			float dxn = creal(norm(dx))/xn;
 			printf ("dxnrm: %0.4f\n", dxn);
 			if (dxn < cgp.cgconv) 
 				break;
