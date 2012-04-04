@@ -39,7 +39,7 @@ LapackTests::Process     () {
 	Matrix<cxdb>    cd = (Matrix<cxdb>) cf;
 	Matrix<double>& rd = GetRLDB ("rd");
 
-	std::cout << "Testing EIG (cgeev) ----------- \n";
+	std::cout << "Testing eig (cgeev) ----------- \n";
 
 	Matrix<cxdb>   hev (rd.Dim(0), 1);
 	Matrix<double> hlev(rd.Dim(0));
@@ -49,13 +49,13 @@ LapackTests::Process     () {
 	std::cout << "RLDB IN: \n";
 	std::cout << rd << std::endl;
 
-	EIG (dtmp, hev, hlev, hrev, 'V', 'V');
+	eig (dtmp, hev, hlev, hrev, 'V', 'V');
 	
 	std::cout << "OUT: \n" <<  hev;
 	std::cout << "------------------------------- \n\n";
 
 
-	std::cout << "Testing EIG (cgeev) ----------- \n";
+	std::cout << "Testing eig (cgeev) ----------- \n";
 
 	Matrix<cxfl> rev  (cf.Dim(0), 1);
 	Matrix<cxfl> rlev (cf.Dim(0));
@@ -65,12 +65,12 @@ LapackTests::Process     () {
 	std::cout << "CXFL IN: \n";
 	std::cout << cf << std::endl;
 
-	EIG (rtmp, rev, rlev, rrev);
+	eig (rtmp, rev, rlev, rrev);
 
 	std::cout << "OUT: \n" <<  rev;
 	std::cout << "------------------------------- \n\n";
 
-	std::cout << "Testing SVD (dgesdd) ---------- \n";
+	std::cout << "Testing svd (dgesdd) ---------- \n";
 
 	Matrix<double> Ar = rand<double> (8,3);
 	Matrix<double> du;
@@ -79,13 +79,13 @@ LapackTests::Process     () {
 
 	std::cout << "RLDB IN: \n";
 	std::cout << Ar << std::endl;
-	SVD (Ar, ds, du, dv, 'S');
+	svd (Ar, ds, du, dv, 'A');
 	std::cout << "OUT s:\n" <<  ds  << std::endl;
 	std::cout << "OUT u:\n" <<  du  << std::endl;
 	std::cout << "OUT v:\n" <<  dv;
 	std::cout << "------------------------------- \n\n";
 	
-	std::cout << "Testing SVD (dgesdd) ---------- \n";
+	std::cout << "Testing svd (dgesdd) ---------- \n";
 
 	Matrix<cxfl> Ac = rand<cxfl> (3,8); 
 
@@ -95,7 +95,7 @@ LapackTests::Process     () {
 
 	std::cout << "CXFL IN: \n";
 	std::cout << Ac << std::endl;
-	SVD (Ac, cs, cu, cv, 'S');
+	svd (Ac, cs, cu, cv, 'S');
 	std::cout << "OUT s:\n" <<  cs  << std::endl;
 	std::cout << "OUT u:\n" <<  cu  << std::endl;
 	std::cout << "OUT v:\n" <<  cv;
@@ -125,7 +125,7 @@ LapackTests::Process     () {
 
 	std::cout << "RLDB IN: \n";
 	std::cout << da << std::endl;
-	da = Pinv (da);
+	da = pinv (da);
 
 	std::cout << "OUT inv:\n" <<  da;
 	std::cout << "------------------------------- \n\n";
@@ -136,7 +136,7 @@ LapackTests::Process     () {
 
 	std::cout << "CXDB IN: \n";
 	std::cout << db << std::endl;
-	db = Pinv (db);
+	db = pinv (db);
 
 	std::cout << "OUT inv:\n" <<  db;
 	std::cout << "------------------------------- \n\n";
@@ -153,18 +153,18 @@ LapackTests::Process     () {
 	std::cout << "];" << std::endl;
 
 	printf ("\n");
-	Matrix<cxfl> dd = GEMM (db, dc);
+	Matrix<cxfl> dd = gemm (db, dc);
 	std::cout << "A*B:\n" <<  dd;
-	dd = GEMM (dc, db, 'T', 'T');
+	dd = gemm (dc, db, 'T', 'T');
 	std::cout << "B.'*A.' :\n" <<  dd;
-	dd = GEMM (dc, db, 'C', 'C');
+	dd = gemm (dc, db, 'C', 'C');
 	std::cout << "B'*A' :\n" <<  dd;
 	db = !db;
 
 	std::cout << "A  :\n" <<  db;
 	std::cout << "B' :\n" <<  dc;
 
-	dd = GEMM (db, dc, 'C');
+	dd = gemm (db, dc, 'C');
 	std::cout << "A*(B').' :\n" <<  dd;
 	std::cout << "------------------------------- \n\n";
 
@@ -183,12 +183,12 @@ LapackTests::Process     () {
 
 	Matrix<cxfl> y;
 
-	y = GEMM (A, b, 'C');
-	printf ("GEMM. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	y = gemm (A, b, 'C');
+	printf ("gemm. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	std::cout << "y' :\n" <<  y;
 	
-	y  = GEMV (A, b, 'C');
-	printf ("GEMV. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	y  = gemv (A, b, 'C');
+	printf ("gemv. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	std::cout << "y' :\n" <<  y;
 
 
@@ -197,7 +197,7 @@ LapackTests::Process     () {
 	std::cout << "dc  :\n" <<  dc;
 	A = cov (A);
 	std::cout << "cov (A)  :\n" <<  A;
-	A = Cholesky (A);
+	A = chol (A);
 	std::cout << "chol(cov(A)) :\n" <<  A;
 
  #ifdef HAVE_MAT_H

@@ -2072,7 +2072,7 @@ public:
      * @return          Product of this and M.
      */
     Matrix<T>           
-    prod                (Matrix<T> &M, const char transa = 'N', const char transb = 'N');
+    prod                (const Matrix<T> &M, const char& transa = 'N', const char& transb = 'N') const;
     
     /**
      * @brief           Complex conjugate left and multiply with right.
@@ -2081,7 +2081,7 @@ public:
      * @return          Product of conj(this) and M.
      */
     Matrix<T>           
-    prodt               (Matrix<T> &M);
+    prodt               (const Matrix<T> &M) const;
     
 
 	/**
@@ -2091,7 +2091,7 @@ public:
 	 * @return          Scalar product
      */
 	T
-    dotc (Matrix<T>& M);
+    dotc (const Matrix<T>& M) const;
     
 	
 	/**
@@ -2101,7 +2101,7 @@ public:
 	 * @return          Scalar product
      */
 	T
-    dotu (Matrix<T>& M);
+    dotu (const Matrix<T>& M) const;
     
 	/**
      * @brief           Scalar product using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTU and XDOT
@@ -2110,7 +2110,7 @@ public:
 	 * @return          Scalar product
      */
 	T
-    dot (Matrix<T>& M);
+    dot (const Matrix<T>& M) const;
     
     /**
      * @brief           Transposition / Complex conjugation and transposition.
@@ -2417,37 +2417,37 @@ Matrix<T>::tr() const {
 #include "Lapack.hpp"
 
 template <class T> Matrix<T> 
-Matrix<T>::prodt (Matrix<T> &M) {
+Matrix<T>::prodt (const Matrix<T> &M) const {
 	
-	return GEMM (*this, M, 'C');
+	return gemm (*this, M, 'C');
 	
 }
 
 
 template <class T> Matrix<T> 
-Matrix<T>::prod (Matrix<T> &M, const char transa, const char transb) {
+Matrix<T>::prod (const Matrix<T> &M, const char& transa, const char& transb) const {
 	
-	return GEMM (*this, M, transa, transb);
+	return gemm (*this, M, transa, transb);
 	
 }
 
 
-template<class T>  T 
-Matrix<T>::dotc (Matrix<T>& M)  {
+template<class T> T 
+Matrix<T>::dotc (const Matrix<T>& M) const {
 
 	return DOTC (*this, M);
 	
 }
 
 template<class T>  T 
-Matrix<T>::dotu (Matrix<T>& M)  {
+Matrix<T>::dotu (const Matrix<T>& M) const {
 
 	return DOTU (*this, M);
 	
 }
 
 template<class T>  T 
-Matrix<T>::dot (Matrix<T>& M)  {
+Matrix<T>::dot (const Matrix<T>& M) const {
 	
 	return DOT  (*this, M);
 	

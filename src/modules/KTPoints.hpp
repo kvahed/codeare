@@ -118,7 +118,7 @@ NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result,
     for (int i=0; i < target.Size(); i++)
         q += pow(abs(target[i]) - abs(result[i]), 2);
     
-    q = sqrt(q)/creal(Norm(target));
+    q = sqrt(q)/creal(norm(target));
     
 	if (iter % 5 == 0 && iter > 0)
 		printf ("\n");

@@ -183,11 +183,11 @@ public:
 		x = zeros<T>(size(p));
 		
 		rn = 0.0;
-		xn = pow(creal(Norm(p)), 2);
+		xn = pow(creal(norm(p)), 2);
 		
 		for (size_t i = 0; i < m_cgiter; i++) {
 			
-			rn  = pow(creal(Norm(r)), 2);
+			rn  = pow(creal(norm(r)), 2);
 			res.push_back(rn/xn);
 			
 			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps) 
@@ -205,7 +205,7 @@ public:
 			ts /= p.dotc(q);
 			x  += ts * p;
 			r  -= ts * q;
-			p  *= pow(creal(Norm(r)), 2)/rn;
+			p  *= pow(creal(norm(r)), 2)/rn;
 			p  += r;
 			
 		}
