@@ -323,7 +323,7 @@ namespace RRStrategy {
 				
 			} 
 			
-			printf ("    %02i - nrms: %1.7f, l-search: %i, ", k, rmse, i); fflush (stdout);
+			printf ("    %02zu - nrms: %1.7f, l-search: %i, ", k, rmse, i); fflush (stdout);
 
 			if (i == cgp.lsiter) {
 				printf ("Reached max line search, exiting... \n"); 

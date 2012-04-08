@@ -2495,7 +2495,7 @@ Matrix<long>::Print (std::ostream &os) const {
 	
 	for (size_t i = 0; i < _dim[COL]; i++) {
 		for(size_t j = 0; j < _dim[LIN]; j++)
-			printf ("%i ", _M [i + j * _dim[COL]]);
+			printf ("%li ", _M [i + j * _dim[COL]]);
 		printf("\n");
 	}
 	
