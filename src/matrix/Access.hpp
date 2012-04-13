@@ -154,7 +154,7 @@ Column (Matrix<T>& M, const size_t c, const Matrix<T> A) {
 	assert (size(M,0) == size (A,0));
 	size_t nc = size(M,0);
 
-	memcpy (&M[c*nc], &A[0], nc * sizeof(T));
+	memcpy (&M[c*nc], A.Data(), nc * sizeof(T));
 	
 }
 
