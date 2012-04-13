@@ -18,12 +18,8 @@ nuffttest (Connector<T>* rc) {
 		  MXRead (rawdata, df, "data") && 
 		  MXRead  (kspace, df, "kspace")))
 		return false;
-
-	MXDump (weights, "weights.mat", "weights2");
-	MXDump (rawdata, "rawdata.mat", "rawdata2");
-	MXDump (kspace,  "kspace.mat",  "kspace2");
 #endif
-
+	
 	rc->SetMatrix    ("data",    rawdata);
 	rc->SetMatrix    ("weights", weights);
 	rc->SetMatrix    ("kspace",  kspace);

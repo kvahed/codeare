@@ -29,7 +29,8 @@
 
 
 /**
- * @brief Matrix templated ND non-equidistand Fourier transform with NCSENSE 3 (TU Chemnitz)
+ * @brief Non-Cartesian SENSE<br/>
+ *        According Pruessmann et al. (2001). MRM, 46(4), 638-51.
  */
 template <class T>
 class NCSENSE : public FT<T> {
@@ -39,7 +40,7 @@ public:
 	NCSENSE() : m_initialised (false) {};
 
 	/**
-	 * @brief          Construct NCSENSE plans for forward and backward FT with credentials
+	 * @brief          Construct NCSENSE plans for forward and backward transform with credentials
 	 * 
 	 * @param  sens    Sensitivity maps if imsize
 	 * @param  imsize  Matrix of side length of the image space
@@ -112,9 +113,9 @@ public:
 	
 	
 	/**
-	 * @brief      Assign k-space 
+	 * @brief      Assign k-space trajectory
 	 * 
-	 * @param  k   Kspace trajectory
+	 * @param  k   K-space trajectory
 	 */
 	void
 	KSpace (const Matrix<double>& k) {
@@ -131,7 +132,7 @@ public:
 	
 
 	/**
-	 * @brief      Assign k-space weigths (jacobian of trajectory with regards to time) 
+	 * @brief      Assign k-space weigths (jacobian of k in t) 
 	 * 
 	 * @param  w   Weights
 	 */
@@ -159,7 +160,7 @@ public:
 	Trafo       (const Matrix<T>& m) const {
 
 		Matrix<T> tmp = m * m_ic;
-		return E (tmp, m_sm, m_fts, m_dim);
+		return E (tmp, m_sm, m_fts);
 
 	}
 
@@ -178,7 +179,7 @@ public:
 		Matrix<T> p, r, x, q;
 		vector<double> res;
 
-		p = EH (m, m_sm, m_fts, m_dim) * m_ic;
+		p = EH (m, m_sm, m_fts) * m_ic;
 		r = p;
 		x = zeros<T>(size(p));
 		
@@ -195,8 +196,8 @@ public:
 			
 			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 			
-			q   = E  (p * m_ic, m_sm, m_fts, m_dim);
-			q   = EH (q, m_sm, m_fts, m_dim) * m_ic;
+			q   = E  (p * m_ic, m_sm, m_fts);
+			q   = EH (q, m_sm, m_fts) * m_ic;
 			
 			if (m_lambda)
 				q  += m_lambda * p;
@@ -220,20 +221,20 @@ public:
 	
 private:
 
-	NFFT<T>** m_fts;
-	bool      m_initialised;
+	NFFT<T>** m_fts;         /**< Non-Cartesian FT operators (Multi-Core?) */
+	bool      m_initialised; /**< All initialised? */
 
-	Matrix<T> m_sm;
-	Matrix<double> m_ic;
+	Matrix<T> m_sm;          /**< Sensitivities */
+	Matrix<double> m_ic;     /**< Intensity correction I(r) */
 
-	size_t m_dim;
-	size_t m_nr;
-	size_t m_nk;
-	size_t m_nc;
+	size_t m_dim;            /**< Image dimensions \epsilon {2,3} */
+	size_t m_nr;             /**< # spatial image positions */
+	size_t m_nk;             /**< # K-space points */
+	size_t m_nc;             /**< # Receive channels */
 
-	size_t m_cgiter;
-	double m_cgeps;
-	double m_lambda;
+	size_t m_cgiter;         /**< Max # CG iterations */
+	double m_cgeps;          /**< Convergence limit */
+	double m_lambda;         /**< Tikhonov weight */
 
 };
 
