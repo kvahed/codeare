@@ -142,7 +142,7 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 		return -3;
 	}
 	
-	int    N     =  m.Height();
+	int    N     =  size(m, 0);
 	
 	int    lda   =  N;
 	int    ldvl  =  (jobvl) ? N : 1;
@@ -183,15 +183,15 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 		zgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
 	} else if (typeid(T) == typeid(double)) {
 		dgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
-		for (size_t i = 0; i < N; i++) {
-			double f[2] = {((double*)w)[i], ((double*)wi)[i]};
-			memcpy(&ev[i], f, 2 * sizeof(double));
+		while (N--) {
+			double f[2] = {((double*)w)[N], ((double*)wi)[N]};
+			memcpy(&ev[N], f, 2 * sizeof(double));
 		}
 	} else if (typeid(T) == typeid(float)) {
 		sgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
-		for (size_t i = 0; i < N; i++) {
-			float f[2] = {((float*)w)[i], ((float*)wi)[i]};
-			memcpy(&ev[i], f, 2 * sizeof(float));
+		while (N--) {
+			float f[2] = {((float*)w)[N], ((float*)wi)[N]};
+			memcpy(&ev[N], f, 2 * sizeof(float));
 		}
 	}
 	
@@ -202,6 +202,7 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 		free (wi);
 	} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
 		free (rwork);
+
 	free (work);
 	
 	if (info > 0)
@@ -337,14 +338,13 @@ template <class T> static Matrix<T>
 inv (const Matrix<T>& m) {
 	
 	// 2D 
-	if (!Is2D(m))               printf ("Inv Error: Parameter m must be 2D");
+	if (!Is2D(m))       printf ("Inv Error: Parameter m must be 2D");
 	
 	// Square matrix
-	if (m.Width() != m.Height()) printf ("Inv Error: Parameter m must be square");
-	
+	if (size(m,1) != size (m,0)) printf ("Inv Error: Parameter m must be square");
+		
+	int N = (int) size (m,0);	
 	Matrix<T> res = m;
-	
-	int  N    = m.Height();
 	int  info = 0;
 	int *ipiv = (int*) malloc (N * sizeof(int));
 	
@@ -415,8 +415,8 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	T    *work, wopt, rwopt;
 	int  *iwork, iwopt;
 	
-	int  M      =  m.Height();
-	int  N      =  m.Width();
+	int  M      =  size(m, 0);
+	int  N      =  size(m, 1);
 	
 	int  nrhs   =  M;
 	int  lda    =  M;
@@ -462,8 +462,8 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 		sgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
 	
 	if (M > N)
-		for (size_t i = 0; i < M; i++)
-			memcpy (&b[i*N], &b[i*M], N * sizeof(T));
+		while (M--)
+			memcpy (&b[M*N], &b[M*M], N * sizeof(T));
 	
 	b.Resize(N,M);
 	
@@ -528,32 +528,33 @@ chol (const Matrix<T>& A, const char uplo = 'U') {
 template<class T> static Matrix<T> 
 gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = 'N') {
 	
-	int aw = (int)A.Width(), ah = (int)A.Height(), bw = (int)B.Width(), bh = (int)B.Height();
+	int aw, ah, bw, bh, m, n, k, ldc;
+	T   alpha, beta;
+
+	aw = (int)size(A,1); ah = (int)size(A,0), bw = (int)size(B,1), bh = (int)size(B,0);
 	
 	if      ( transa == 'N'                   &&  transb == 'N'                  ) assert (aw == bh);
 	else if ( transa == 'N'                   && (transb == 'T' || transb == 'C')) assert (aw == bw);
 	else if ((transa == 'T' || transa == 'C') &&  transb == 'N'                  ) assert (ah == bh);
 	else if ((transa == 'T' || transa == 'C') && (transb == 'T' || transb == 'C')) assert (ah == bw);
 	
-	int m, n, k, ldc, cm, cn;
-	
 	if (transa == 'N') {
-		m   = (int) ah;
-		k   = (int) aw;
+		m = ah;
+		k = aw;
 	} else if (transa == 'T' || transa == 'C') {
-		m   = (int) aw;
-		k   = (int) ah;
+		m = aw;
+		k = ah;
 	}
 	
 	if (transb == 'N')
-		n   = (int) bw;
+		n = bw;
 	else if (transb == 'T' || transb == 'C')
-		n   = (int) bh;
+		n = bh;
 	
 	ldc = m;
 	
-	T    alpha  =       T(1.0);
-	T    beta   =       T(0.0);
+	alpha =       T(1.0);
+	beta  =       T(0.0);
 	
 	Matrix<T> C  (m, n);
 	
@@ -583,7 +584,7 @@ norm (const Matrix<T>& M) {
 	
 	T   res  = T(0);
 	
-	int n    = (int) M.Size();
+	int n    = (int) numel (M);
 	int incx = 1;
 	
 	if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, M.Data(), incx);
@@ -591,8 +592,8 @@ norm (const Matrix<T>& M) {
 	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, M.Data(), incx);
 	else if (typeid(T) == typeid( float)) res = cblas_snrm2  (n, M.Data(), incx);
 	else {
-		for (int i = 0; i < M.Size(); i++)
-			res += pow(M[i],2.0);
+		while (n--)
+			res += pow(M[n],2.0);
 		sqrt (res);
 	}
 	
@@ -612,12 +613,14 @@ norm (const Matrix<T>& M) {
 template <class T> static T 
 DOTC (const Matrix<T>& A, const Matrix<T>& B) {
 	
-	int n    = (int) A.Size();
+	int n, one;
+	T   res;
+
+	n   = (int) numel(A);
+	assert (n == (int) numel(B));
 	
-	assert (n == B.Size());
-	
-	T   res  = T(0.0);
-	int one = 1;
+	res = T(0.0);
+	one = 1;
 	
 	if      (typeid(T) == typeid(cxfl)) cblas_cdotc_sub (n, A.Data(), one, B.Data(), one, &res);
 	else if (typeid(T) == typeid(cxdb)) cblas_zdotc_sub (n, A.Data(), one, B.Data(), one, &res);
@@ -640,13 +643,15 @@ dotc (const Matrix<T>& A, const Matrix<T>& B) {
  */
 template <class T> static T 
 DOTU (const Matrix<T>& A, const Matrix<T>& B) {
+
+	int n, one;
+	T   res;
+
+	n   = (int) numel(A);
+	assert (n == (int) numel(B));
 	
-	int n    = (int) A.Size();
-	
-	assert (n == B.Size());
-	
-	T   res  = T(0.0);
-	int one  = 1;
+	res = T(0.0);
+	one = 1;
 	
 	if      (typeid(T) == typeid(cxfl)) cblas_cdotu_sub (n, A.Data(), one, B.Data(), one, &res);
 	else if (typeid(T) == typeid(cxdb)) cblas_zdotu_sub (n, A.Data(), one, B.Data(), one, &res);
@@ -670,12 +675,14 @@ dotu (const Matrix<T>& A, const Matrix<T>& B) {
 template <class T> T 
 DOT  (const Matrix<T>& A, const Matrix<T>& B) {
 	
-	int n    = (int) A.Size();
+	int n, one;
+	T   res;
+
+	n   = (int) numel(A);
+	assert (n == (int) numel(B));
 	
-	assert (n == B.Size());
-	
-	T   res  = T(0.0);
-	int one  = 1;
+	res = T(0.0);
+	one = 1;
 	
 	if      (typeid(T) == typeid(cxfl))   cblas_cdotu_sub (n, A.Data(), one, B.Data(), one, &res);
 	else if (typeid(T) == typeid(cxdb))   cblas_zdotu_sub (n, A.Data(), one, B.Data(), one, &res);
@@ -703,19 +710,27 @@ dot  (const Matrix<T>& A, const Matrix<T>& B) {
 template<class T> Matrix<T> 
 gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
 	
-	assert (x.Width() == 1);
+	int aw, ah, xh, m, n, one;
+	T   alpha, beta;
+
+	// Column vector
+	assert (size(x, 1) == 1);
 	
-	int aw = (int) A.Width(), ah = (int) A.Height(), xh = (int) x.Height();
+	aw  = (int) size (A, 1);
+	ah  = (int) size (A, 0);
+	xh  = (int) size (x, 0);
 	
-	int m = ah, n = aw, one = 1;
+	m   = ah;
+	n   = aw; 
+	one = 1;
 	
 	if (trans == 'N')
 		assert (aw == xh);
 	else if (trans == 'T' || trans == 'C')
 		assert (ah == xh);
 	
-	T    alpha  = T(1.0);
-	T    beta   = T(0.0);
+	alpha  = T(1.0);
+	beta   = T(0.0);
 	
 	Matrix<T> y ((trans == 'N') ? m : n, 1);
 	

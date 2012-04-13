@@ -35,10 +35,9 @@
 template<class T> static Matrix<T> 
 MCGLS (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
 	
-	size_t ah   = A.Height();
-	size_t aw   = A.Width();
-	size_t bh   = b.Height();
-	size_t bw   = b.Width();
+	size_t ah   = size(A, 0);
+	size_t bh   = size(b, 0);
+	size_t bw   = size(b, 1);
 	
 	assert (bw == 1);  // Column vector x
 	assert (ah == bh); // Check inner dimensions of A'*x. 
