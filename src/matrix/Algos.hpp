@@ -241,8 +241,6 @@ sum (Matrix<T>& M, const size_t d) {
 #pragma omp parallel default (shared) 
 	{
 		
-		size_t tid      = omp_get_thread_num();
-		
 		for (size_t i = 0; i < outsize; i++) {
 			
 #pragma omp for
@@ -329,7 +327,7 @@ size               (const Matrix<T>& M) {
     
 	for (size_t i = 0; i < INVALID_DIM; i++) {
 		
-		res[i] = M.Dim(i);
+		res[i] = size(M, i);
 		ones   = (res[i] == 1) ? ones + 1 : ones = 0;
 		
 	}

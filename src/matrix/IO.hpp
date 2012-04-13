@@ -949,7 +949,6 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 	}
 	
 	mxClassID     mcid = mxGetClassID(mxa);
-	bool          cplx = mxIsComplex(mxa);
 	mwSize        ndim = mxGetNumberOfDimensions(mxa);
 	const mwSize*  dim = mxGetDimensions(mxa);
 	

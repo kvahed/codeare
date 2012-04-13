@@ -54,25 +54,24 @@ DumpToFile::Process () {
 		return RRSModule::FILE_ACCESS_FAILED;
 	}
 
-	/*
 	map<string,Ptr< Matrix<cxfl> > >::iterator cit = cfm.begin();
 	for (cit = cfm.begin() ; cit != cfm.end(); cit++) {
 		cout << "Dumping " << cit->first.c_str() << endl;
-		IO::MXDump(*(cit->second), mf, cit->first.c_str());
+		MXDump(*(cit->second), mf, cit->first.c_str());
 	}
 	
 	map<string,Ptr< Matrix<double> > >::iterator rit = rdm.begin();
 	for (rit = rdm.begin(); rit != rdm.end(); rit++) {
 		cout << "Dumping " <<  rit->first.c_str() << endl;
-		IO::MXDump(*(rit->second), mf, rit->first.c_str());
+		MXDump(*(rit->second), mf, rit->first.c_str());
 	}
 	
 	map<string,Ptr< Matrix<short> > >::iterator pit = sim.begin();
 	for (pit = sim.begin(); pit != sim.end(); pit++) {
 		cout << "Dumping " <<  pit->first.c_str() << endl;
-		IO::MXDump(*(pit->second), mf, pit->first.c_str());
+		MXDump(*(pit->second), mf, pit->first.c_str());
 	}
-	*/
+
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n",fname.str().c_str());
 		return RRSModule::FILE_ACCESS_FAILED;
