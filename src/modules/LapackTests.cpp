@@ -79,7 +79,7 @@ LapackTests::Process     () {
 
 	std::cout << "RLDB IN: \n";
 	std::cout << Ar << std::endl;
-	svd (Ar, ds, du, dv, 'A');
+	svd (Ar, ds, du, dv, 'O');
 	std::cout << "OUT s:\n" <<  ds  << std::endl;
 	std::cout << "OUT u:\n" <<  du  << std::endl;
 	std::cout << "OUT v:\n" <<  dv;
