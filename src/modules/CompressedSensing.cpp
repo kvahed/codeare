@@ -96,8 +96,8 @@ CompressedSensing::Process () {
 	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
 	Matrix<cxfl>   orig;
 
-    printf ("  Geometry: %iD (%lu,%lu,%lu)\n", ndims (data)+1, 
-			data.Dim(0), data.Dim(1), data.Dim(2));
+	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data)+1, 
+		size(data,0), size(data,1), size(data,2));
 
 	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf));
 
