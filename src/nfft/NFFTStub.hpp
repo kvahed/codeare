@@ -76,7 +76,7 @@ namespace nnfft {
 	inline static int
 	ift                  (nfft_plan& np, solver_plan_complex& spc, const int maxiter = 3, const double epsilon = 3e-7) {
 		
-		int k, l, err = 0;
+		int k, l;
 		
 		/* init some guess */
 		for (k = 0; k < np.N_total; k++) {
@@ -108,6 +108,8 @@ namespace nnfft {
 		//fprintf(stderr,"nfft time: %.4f seconds.\n",t);
 #endif
 		
+		return 0;
+
 	}
 	
 	
@@ -202,6 +204,8 @@ namespace nnfft {
 		/* precompute full psi */
 		if(np.nfft_flags & PRE_FULL_PSI)
 			nfft_precompute_full_psi(&np);
+
+		return 0;
 		
 	}
 	

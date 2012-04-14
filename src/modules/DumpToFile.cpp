@@ -36,7 +36,7 @@ DumpToFile::Process () {
 
 	printf ("Dumping ...\n");
 
-	if (uid == 0  ||  uid == "")
+	if (uid == 0  || uid[0] == '\0')
 		uid = "unspecified";
 
 	fname << uid << "_config.xml";

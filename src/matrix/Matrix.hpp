@@ -3302,7 +3302,7 @@ Matrix<T>::operator/= (const S& s) {
 	size_t i = Size();
 		
 	while (i--)
-		_M[i] /= s;
+		_M[i] /= t;
 
     return *this;
 

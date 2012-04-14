@@ -113,18 +113,19 @@ namespace RRStrategy {
 inline void
 NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result, const int& iter, float& nrmse) {
 
-    float q = 0.0;
+    nrmse = 0.0;
+	size_t i = numel (target);
+
+	while (i--)
+        nrmse += pow(abs(target[i]) - abs(result[i]), 2);
     
-    for (int i=0; i < target.Size(); i++)
-        q += pow(abs(target[i]) - abs(result[i]), 2);
-    
-    q = sqrt(q)/creal(norm(target));
+    nrmse = sqrt(nrmse)/creal(norm(target));
     
 	if (iter % 5 == 0 && iter > 0)
 		printf ("\n");
-    printf ("    %04i %.6f", iter, q);
+    printf ("    %04i %.6f", iter, nrmse);
 
-    nrmse = 100.0 * q;
+    nrmse *= 100.0;
 
 }
 

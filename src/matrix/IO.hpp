@@ -1043,7 +1043,7 @@ MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc =
 	for (size_t i = 0; i < INVALID_DIM; i++) 
 		dim[i] = (mwSize)M.Dim(i);
 	
-	mxArray*  mxa;
+	mxArray*  mxa = 0;
 	
 	if      (typeid(T) == typeid(double))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);

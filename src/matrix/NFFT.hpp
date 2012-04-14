@@ -233,7 +233,7 @@ template<> inline Matrix<cxfl>
 NFFT<cxfl>::Adjoint (const Matrix<cxfl>& in) const {
 
 	Matrix<cxdb> out (m_N[0], m_N[1], m_N[2], m_N[3]);
-	size_t m = m_M-1, i = m_imgsz-1;  
+	size_t m = m_M, i = m_imgsz;  
 
 	while (m--) {
 		m_iplan.y[m][0] = in[m].real();
@@ -254,16 +254,17 @@ template<> inline Matrix<cxfl>
 NFFT<cxfl>::Trafo (const Matrix<cxfl>& in) const {
 
 	Matrix<cxfl> out (m_M,1);
+	size_t m = m_M, i = m_imgsz;  
 
-	for (size_t i = 0; i < m_imgsz; i++) {
+	while (i--) {
 		m_fplan.f_hat[i][0] = in[i].real();
 		m_fplan.f_hat[i][1] = in[i].imag();
 	}
 
 	nnfft::ft (m_fplan);
 
-	for (size_t i = 0; i < m_M; i++) 
-		out [i] = cxfl (m_fplan.f[i][0], m_fplan.f[i][1]);
+	while (m--)
+		out [m] = cxfl (m_fplan.f[m][0], m_fplan.f[m][1]);
 			
 	return out;
 
