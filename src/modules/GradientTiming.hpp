@@ -26,6 +26,7 @@
 #include "CX.hpp"
 #include "Math.hpp"
 #include "Interpolate.hpp"
+#include "IO.hpp"
 
 #define GAMMA_MT_MS 4.2576
 
@@ -328,9 +329,8 @@ Solution ComputeGradient (GradientParams& gp) {
 	Matrix<double> tos, sot, t, pot;
 	double T;
 	size_t Nt;
-
 	tos    = cumsum (ds/sta);	
-	tos.Resize(size(tos,1)-1,size(tos,0));
+	tos.Resize(size(tos,0)-1,1);
 	T      = tos [ss-2];
 	Nt     = round (T/gp.dt); 
 	t      = linspace<double> (0.0, T, Nt);
