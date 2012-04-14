@@ -460,10 +460,11 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 		dgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork,        iwork, &info);
 	else if (typeid(T) == typeid(float))
 		sgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
+
 	
 	if (M > N)
-		while (M--)
-			memcpy (&b[M*N], &b[M*M], N * sizeof(T));
+		for (size_t i = 0; i < M; i++)
+			memcpy (&b[i*N], &b[i*M], N * sizeof(T));
 	
 	b.Resize(N,M);
 	
