@@ -270,7 +270,7 @@ DFT<cxfl>::DFT (const Matrix<size_t>& size, const Matrix<float> mask, const Matr
 	m_pc   = pc;
 	m_cpc  = conj(pc);
 	
-	for (size_t i = 0; i < rank; i++) {
+	for (int i = 0; i < rank; i++) {
 		n[i]  = (int)size[rank-1-i];
 		m_N  *= n[i];
 	}
@@ -295,7 +295,7 @@ DFT<cxfl>::DFT (const Matrix<size_t>& size) : m_N(1),
 	int rank = size.Size();
 	int n[rank];
 
-	for (size_t i = 0; i < rank; i++) {
+	for (int i = 0; i < rank; i++) {
 		n[i]  = (int)size[rank-1-i];
 		m_N  *= n[i];
 	}
@@ -329,7 +329,7 @@ DFT<cxdb>::DFT (const size_t rank, const size_t sl, const Matrix<double> mask, c
 	m_pc   = pc;
 	m_cpc  = conj(pc);
 	
-	for (size_t i = 0; i < rank; i++)
+	for (int i = 0; i < rank; i++)
 		n[i]  = sl;
 
 	m_N   = pow (sl, rank);
@@ -363,7 +363,7 @@ DFT<cxdb>::DFT (const Matrix<size_t>& size, const Matrix<double> mask, const Mat
 	m_pc   = pc;
 	m_cpc  = conj(pc);
 	
-	for (size_t i = 0; i < rank; i++) {
+	for (int i = 0; i < rank; i++) {
 		n[i]  = (int)size[rank-1-i];
 		m_N  *= n[i];
 	}

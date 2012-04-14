@@ -150,9 +150,9 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	int    info  =  0;
 	int    lwork = -1;
 	
-	T*     w;
-	T*     wi;
-	T*     rwork;
+	T*     w     = 0;
+	T*     wi    = 0;
+	T*     rwork = 0;
 	
 	if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {    // Complex eigen values for real matrices
 		w     = (T*) malloc (N * sizeof(T));
@@ -411,9 +411,9 @@ inv (const Matrix<T>& m) {
 template<class T> static Matrix<T> 
 pinv (const Matrix<T>& m, double rcond = 1.0) {
 	
-	void *s, *rwork;
-	T    *work, wopt, rwopt;
-	int  *iwork, iwopt;
+	void *s = 0, *rwork = 0;
+	T    *work = 0, wopt = T(0), rwopt = T(0);
+	int  *iwork = 0, iwopt = 0;
 	
 	int  M      =  size(m, 0);
 	int  N      =  size(m, 1);
@@ -460,10 +460,11 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 		dgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork,        iwork, &info);
 	else if (typeid(T) == typeid(float))
 		sgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
+
 	
 	if (M > N)
-		while (M--)
-			memcpy (&b[M*N], &b[M*M], N * sizeof(T));
+		for (int i = 0; i < M; i++)
+			memcpy (&b[i*N], &b[i*M], N * sizeof(T));
 	
 	b.Resize(N,M);
 	
