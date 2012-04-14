@@ -97,13 +97,13 @@ RelativeSensitivities::Process     () {
         Matrix<double> bet(mask.Dim());
         double         tmp = 0.0;
 		
-        for (int i = 0; i < mask.Size(); i++) {
+        for (size_t i = 0; i < numel(mask); i++) {
             tmp = log(abs(mask[i]));
             bet[i] = (tmp < m_cutoff) ? 0.0 : tmp - m_cutoff;
         }
         
         SegmentBrain (bet, bets);
-		//bets = Resample (bets, 0.5, LINEAR);
+		bets = Resample (bets, 0.5, LINEAR);
 		
     } else if (m_use_bet == 2) {
 		
@@ -130,15 +130,15 @@ RelativeSensitivities::Process     () {
 
 	if (m_weigh_maps) {
 
-		for (int ch = 0; ch < txm.Dim(3); ch++)
-			for (int i = 0; i < bets.Size(); i++)
-				txm[ch*bets.Size() + i] *= (double)bets[i];
+		for (int ch = 0; ch < size(txm,3); ch++)
+			for (int i = 0; i < numel(bets); i++)
+				txm[ch*numel(bets) + i] *= (double)bets[i];
 		
-		for (int ch = 0; ch < rxm.Dim(3); ch++)
-			for (int i = 0; i < bets.Size(); i++)
-				rxm[ch*bets.Size() + i] *= (double)bets[i];
+		for (int ch = 0; ch < size(rxm,3); ch++)
+			for (int i = 0; i < numel(bets); i++)
+				rxm[ch*numel(bets) + i] *= (double)bets[i];
 		
-		for (int i = 0; i < bets.Size(); i++)
+		for (int i = 0; i < numel(bets); i++)
 			b0[i] *= (double)bets[i];
 
 	}
