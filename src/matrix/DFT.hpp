@@ -318,18 +318,18 @@ DFT<cxdb>::DFT (const size_t rank, const size_t sl, const Matrix<double> mask, c
 	
 	int n[rank];
 	
-	if (mask.Size() > 1)
+	if (numel(mask) > 1)
 		m_have_mask = true;
 	
 	m_mask = mask;
 	
-	if (pc.Size() > 1)
+	if (numel(pc) > 1)
 		m_have_pc = true;
 
 	m_pc   = pc;
 	m_cpc  = conj(pc);
 	
-	for (int i = 0; i < rank; i++)
+	for (size_t i = 0; i < rank; i++)
 		n[i]  = sl;
 
 	m_N   = pow (sl, rank);

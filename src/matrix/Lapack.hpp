@@ -245,7 +245,7 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	
 	int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vcol = 1;
 	T     wopt;
-	void* rwork;
+	void* rwork = 0;
 	
 	m     =  A.Height();
 	n     =  A.Width();
