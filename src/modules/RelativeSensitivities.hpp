@@ -98,7 +98,6 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 	size_t    ntxc = txm.Dim(3);
 	size_t volsize = imgs.Dim(0) * imgs.Dim(1) * imgs.Dim(2);
 	size_t  rtmsiz = nrxc * ntxc;
-	size_t    vols = imgs.Size() / volsize / 2; // division by 2 (Echoes)
 	size_t    rtms = imgs.Size() / rtmsiz / 2;  // division by 2 (Echoes)
 	ticks      tic = getticks();
 	
@@ -283,9 +282,9 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 		
 #pragma omp for schedule (dynamic, np / omp_get_num_threads())
 		
-		for (int i = 0; i < np; i++) {
+		for (size_t i = 0; i < np; i++) {
 			r = cxfl (0.0,0.0);
-			for (int j = 0; j < nc; j++)
+			for (size_t j = 0; j < nc; j++)
 				r += tmp[i + 2*j*np] * conj(tmp[i + (2*j+1)*np]);
 			b0[i]  = arg(r) * gdt; 
 		}
@@ -328,7 +327,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	printf ("bet2ing ... "); fflush(stdout);
 	int i = system (cmd.c_str());
 	
-	printf ("importing ... "); fflush(stdout);
+	printf ("exited with %i, importing ... ", i); fflush(stdout);
 	NIRead(msk, mask);
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
@@ -340,7 +339,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 
 void LogMask (Matrix<double>& m, const double& m_cutoff) {
 	
-	for (int i = 0; i < m.Size(); i++)
+	for (size_t i = 0; i < m.Size(); i++)
 		m[i] = (log(abs(m[i])) < m_cutoff) ? 0.0 : 1.0;
 	
 }

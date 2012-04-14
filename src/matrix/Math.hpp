@@ -91,7 +91,7 @@ cumsum (const Matrix<T>& m) {
 
 	Matrix<T> res = m;
 
-	for (int i = 1; i < res.Size(); i++)
+	for (size_t i = 1; i < res.Size(); i++)
 		res [i] += res[i-1];
 
 	return res;

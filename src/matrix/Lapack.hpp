@@ -150,9 +150,9 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	int    info  =  0;
 	int    lwork = -1;
 	
-	T*     w;
-	T*     wi;
-	T*     rwork;
+	T*     w     = 0;
+	T*     wi    = 0;
+	T*     rwork = 0;
 	
 	if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {    // Complex eigen values for real matrices
 		w     = (T*) malloc (N * sizeof(T));
@@ -245,7 +245,7 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	
 	int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vcol = 1;
 	T     wopt;
-	void* rwork;
+	void* rwork = 0;
 	
 	m     =  A.Height();
 	n     =  A.Width();
@@ -411,9 +411,9 @@ inv (const Matrix<T>& m) {
 template<class T> static Matrix<T> 
 pinv (const Matrix<T>& m, double rcond = 1.0) {
 	
-	void *s, *rwork;
-	T    *work, wopt, rwopt;
-	int  *iwork, iwopt;
+	void *s = 0, *rwork = 0;
+	T    *work = 0, wopt = T(0), rwopt = T(0);
+	int  *iwork = 0, iwopt = 0;
 	
 	int  M      =  size(m, 0);
 	int  N      =  size(m, 1);
@@ -463,7 +463,7 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 
 	
 	if (M > N)
-		for (size_t i = 0; i < M; i++)
+		for (int i = 0; i < M; i++)
 			memcpy (&b[i*N], &b[i*M], N * sizeof(T));
 	
 	b.Resize(N,M);

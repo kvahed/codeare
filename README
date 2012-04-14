@@ -14,3 +14,4 @@ lclient -b share/ktpoints/ -d homogen.h5 -c config_homogen.xml -t KTPoints
 lclient -b share/nufft/ -d data2.h5 -c config.xml -t NuFFT
 lclient -b share/compressedsensing/ -d brain512.mat -c config_brain512.xml -t CompressedSensing
 lclient -b share/compressedsensing/ -d phantom256.mat -c config_denoise.xml -t CompressedSensing
+lclient -b share/directmethod/ -c config.xml -t DirectMethod

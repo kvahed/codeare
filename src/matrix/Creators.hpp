@@ -519,7 +519,7 @@ linspace (const T& start, const T& end, const size_t& n) {
 	res[0]   = start;
 	res[n-1] = end;
 	
-	for (int i = 1; i < n-1; i++)
+	for (size_t i = 1; i < n-1; i++)
 		res[i] = res[i-1] + gap;
 	
 	return res;

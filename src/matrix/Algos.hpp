@@ -328,7 +328,11 @@ size               (const Matrix<T>& M) {
 	for (size_t i = 0; i < INVALID_DIM; i++) {
 		
 		res[i] = size(M, i);
-		ones   = (res[i] == 1) ? ones + 1 : ones = 0;
+
+		if (res[i] == 1)
+			ones++;
+		else
+			ones = 0;
 		
 	}
 	

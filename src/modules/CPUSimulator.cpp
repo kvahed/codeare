@@ -101,7 +101,6 @@ SimulateAcq (const Matrix<cxfl>&  b1, const Matrix<float>&  gr, const Matrix<flo
 		Matrix<float> lr  ( 3,1);  // Local spatial vector
 		Matrix<cxfl>  ls  (nc,1);  // Local sensitivity
 		float         lb0;
-		size_t        rt;
 		
         omp_set_num_threads(np);
 		
@@ -262,8 +261,6 @@ CPUSimulator::~CPUSimulator () {}
 void 
 CPUSimulator::Simulate () {
 
-    ticks          tic = getticks();                                 // Start timing
-
 	Matrix<cxfl>&   b1 = *(m_sb->b1);
 	Matrix<float>&   g = *(m_sb->g);
 	Matrix<float>&  rv = *(m_sb->r);
@@ -284,7 +281,6 @@ CPUSimulator::Simulate () {
 	vector<float>  res;	
 
 	bool           cb0 = m_sb->cb0;
-	bool             v = m_sb->v;
 
 	SimulateAcq (b1, g, rv, (cb0) ? b0 : zeros<float> (m_nr,1), tmxy, tmz, m_ic, np, dt, false, m_nc, m_nt, m_gdt, rf);
 

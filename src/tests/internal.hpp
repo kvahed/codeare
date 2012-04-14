@@ -3,7 +3,7 @@
 template <class T> bool 
 internaltest (Connector<T>* rc) {
 	
-	int            i = 0, j = 0, d = 5;
+	int             d = 5;
 	
 	Matrix<cxfl>   cf = rand<cxfl>(d, d);
 	Matrix<double> rd = rand<double>(d, d);
