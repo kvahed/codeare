@@ -47,9 +47,9 @@ Solution VDSpiral (SpiralParams& sp) {
 	Matrix<double> r, theta;
 	long n = 0;
 
-	assert (rad.Size() >= 2);
+	assert (numel(rad) >= 2);
 	assert (Is1D(rad) == Is1D(fov));
-	assert (rad.Size() == fov.Size());
+	assert (numel(rad) == numel(fov));
 
 	k_max   = 5.0 / sp.res;
 	fov_max = max(fov);
