@@ -28,8 +28,6 @@
 #include "Interpolate.hpp"
 #include "IO.hpp"
 
-#define GAMMA_MT_MS 4.2576
-
 struct Solution {
 	
 	Matrix<double> k;
@@ -57,7 +55,7 @@ RungeKutta (const double& s, const double&   ds, const double& st,
 
 	double k1, k2, k3, k4;
 	size_t l,   m,  n;
-	double pgs = pow (GAMMA_MT_MS*smax,2);
+	double pgs = pow (GAMMA / 10.0 * smax, 2);
 
 	if (fw) {
 		l = 0; m = 1; n = 2;
@@ -108,9 +106,9 @@ SDOut SDMax (SDIn& si) {
 	Matrix<double>& posh = si.posh;
 	Matrix<double>& sh   = si.sh;
 
-	PolyVal<double>& pkx         = *(si.pkx);
-	PolyVal<double>& pky         = *(si.pky);
-	PolyVal<double>& pkz         = *(si.pkz);
+	PolyVal<double>& pkx = *(si.pkx);
+	PolyVal<double>& pky = *(si.pky);
+	PolyVal<double>& pkz = *(si.pkz);
 
 	size_t ssp = size(posh,0);
 	size_t sss = size(sh  ,0);
@@ -185,8 +183,8 @@ SDOut SDMax (SDIn& si) {
 	
 	css.Clear();
 
-	double mgr = GAMMA_MT_MS * si.mgr;
-	double msr = GAMMA_MT_MS * si.msr;
+	double mgr = GAMMA / 10.0 * si.mgr;
+	double msr = GAMMA / 10.0 * si.msr;
 
 	for (size_t i = 0; i < ssp; i++) 
 		so.phi[i] = MIN (mgr, sqrt(msr/so.k[i]));
@@ -248,8 +246,6 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	printf (".."); fflush (stdout);
 
-	MXDump (s.g, "s.g.mat", "sg");
-
 	s.g *= (double)ups;
 	
 	sop [0] = 0.0;
@@ -261,7 +257,7 @@ Solution ComputeGradient (GradientParams& gp) {
 	
 	printf ("."); fflush (stdout);
 	
-	double st0 = GAMMA_MT_MS * gp.msr * gp.dt;
+	double st0 = GAMMA / 10.0 * gp.msr * gp.dt;
 	double ds  = st0 * gp.dt / 3.0;
 	
 	double L   = max(sop);
@@ -353,9 +349,9 @@ Solution ComputeGradient (GradientParams& gp) {
 	s.s    = Matrix<double> (Nt,3);
 	
 	for (size_t i = 0; i < Nt-1; i++) {
-		s.g(i,0) = (gp.k(i+1,0) - gp.k(i,0)) / (GAMMA_MT_MS * gp.dt);
-		s.g(i,1) = (gp.k(i+1,1) - gp.k(i,1)) / (GAMMA_MT_MS * gp.dt);
-		s.g(i,2) = (gp.k(i+1,2) - gp.k(i,2)) / (GAMMA_MT_MS * gp.dt);
+		s.g(i,0) = (gp.k(i+1,0) - gp.k(i,0)) / (GAMMA / 10.0 * gp.dt);
+		s.g(i,1) = (gp.k(i+1,1) - gp.k(i,1)) / (GAMMA / 10.0 * gp.dt);
+		s.g(i,2) = (gp.k(i+1,2) - gp.k(i,2)) / (GAMMA / 10.0 * gp.dt);
 	}
 
 	for (size_t i = 0; i < 3; i++) {
@@ -364,9 +360,9 @@ Solution ComputeGradient (GradientParams& gp) {
 	}
 
 	for (size_t i = 1; i < Nt; i++) {
-		s.k(i,0) =  s.k(i-1,0) + s.g(i,0) * (GAMMA_MT_MS * gp.dt);
-		s.k(i,1) =  s.k(i-1,1) + s.g(i,1) * (GAMMA_MT_MS * gp.dt);
-		s.k(i,2) =  s.k(i-1,2) + s.g(i,2) * (GAMMA_MT_MS * gp.dt);
+		s.k(i,0) =  s.k(i-1,0) + s.g(i,0) * (GAMMA / 10.0 * gp.dt);
+		s.k(i,1) =  s.k(i-1,1) + s.g(i,1) * (GAMMA / 10.0 * gp.dt);
+		s.k(i,2) =  s.k(i-1,2) + s.g(i,2) * (GAMMA / 10.0 * gp.dt);
 	}
 
 	for (size_t i = 0; i < Nt-1; i++) {
