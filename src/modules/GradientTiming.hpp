@@ -44,6 +44,8 @@ struct GradientParams {
 	double         mgr;  /**< Maximum allowed gradient */
 	double         msr;  /**< Maximum allowed slewrate */
 	double         dt;   /**< Sampling interval */
+	int            gunits;
+	int            lunits;
 	
 };
 

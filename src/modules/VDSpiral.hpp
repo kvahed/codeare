@@ -33,6 +33,8 @@ struct SpiralParams {
 	double mgr;         /**< @brief G max */
 	double msr;         /**< @brief Slew max */
 	double dt;          /**< @brief Sampling duration (i.e. delta t) */
+	int    gunits;
+	int    lunits;     
 
 };
 
@@ -68,18 +70,20 @@ Solution VDSpiral (SpiralParams& sp) {
 
 	fov = interp1 (x, fov, r, INTERP::AKIMA);
 
-	theta = cumsum((2 * PI * dr / sp.shots) * fov);
+	theta = cumsum ((2 * PI * dr / sp.shots) * fov);
 
-	gp.k = Matrix<double> (numel(r),3);
+	gp.k = Matrix<double> (numel(r), 3);
 
 	for (size_t i = 0; i < numel(r); i++) {
 		gp.k(i,0) = r[i] * cos (theta[i]);
 		gp.k(i,1) = r[i] * sin (theta[i]);
 	}
 
-	gp.mgr = sp.mgr;
-	gp.msr = sp.msr;
-	gp.dt  = sp.dt;
+	gp.mgr     = sp.mgr;
+	gp.msr     = sp.msr;
+	gp.dt      = sp.dt;
+	gp.gunits  = sp.gunits;
+	gp.lunits  = sp.lunits;
 	
 	Solution s = ComputeGradient (gp);
 	

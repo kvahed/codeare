@@ -18,6 +18,9 @@ vdspiraltest (Connector<T>* rc) {
 	rc->Attribute ("dt",      &(p.dt));
 	rc->Attribute ("res",     &(p.res));
 
+	rc->Attribute ("gunits",  &(p.gunits));
+	rc->Attribute ("lunits",  &(p.lunits));
+
 	std::string rad (rc->GetText("/config/rad"));
 	std::string fov (rc->GetText("/config/fov"));
 	std::vector<std::string> rads = Split (rad, ",");
@@ -35,7 +38,7 @@ vdspiraltest (Connector<T>* rc) {
 
 	printf ("Computing variable density spiral for ... \n");
 	printf ("    [maxgrad: %.2f, maxslew: %.2f, res: %.2f, dt: %.2e, shots: %li]\n", p.mgr, p.msr, p.res, p.dt, p.shots);
-	p.res = p.res*.99;
+
 	ticks start = getticks();
 	Solution s = VDSpiral (p);
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
