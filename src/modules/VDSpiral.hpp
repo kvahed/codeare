@@ -84,6 +84,8 @@ Solution VDSpiral (SpiralParams& sp) {
 	gp.dt      = sp.dt;
 	gp.gunits  = sp.gunits;
 	gp.lunits  = sp.lunits;
+
+	MXDump (gp.k, "k.mat", "k");
 	
 	Solution s = ComputeGradient (gp);
 	

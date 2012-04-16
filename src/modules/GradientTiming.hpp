@@ -328,12 +328,19 @@ Solution ComputeGradient (GradientParams& gp) {
 	double T;
 	size_t Nt;
 	tos    = cumsum (ds/sta);	
-	tos.Resize(size(tos,0)-1,1);
-	T      = tos [ss-2];
+	tos.Resize(size(tos,0),1);
+	T      = tos [ss-1];
 	Nt     = round (T/gp.dt); 
 	t      = linspace<double> (0.0, T, Nt);
 
+	MXDump (tos, "tos.mat", "tos");
+	MXDump (sf, "sf.mat", "sf");
+	MXDump (t, "t.mat", "t");
+
 	sot    = interp1 (tos,  sf,   t);
+
+	MXDump (sot, "sot.mat", "sot");
+	MXDump (pos, "pos.mat", "pos");
 	pot    = interp1 ( sf, pos, sot);
 
 	pos.Clear();
