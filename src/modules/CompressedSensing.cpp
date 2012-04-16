@@ -118,7 +118,7 @@ CompressedSensing::Process () {
 	im_dc    = dft ->* im_dc;
 	orig     = Matrix<cxfl>(im_dc);
 	
-	ma       = im_dc.Maxabs();
+	ma       = max(abs(im_dc));
 	im_dc   /= ma;
 	data    /= ma;
 	
