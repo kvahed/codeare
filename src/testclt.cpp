@@ -62,6 +62,8 @@ int main (int argc, char** argv) {
 			resetest (con);
 		else if (!strcmp (test, "VDSpiral"))
 			vdspiraltest (con);
+		else if (!strcmp (test, "KArb"))
+			karbtest (con);
 		else if (!strcmp (test, "Creators"))
 			creatorstest (con);
 		else

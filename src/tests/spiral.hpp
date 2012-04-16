@@ -66,6 +66,6 @@ vdspiraltest (Connector<T>* rc) {
 
 #endif
 	
-
+	return true;
 
 }

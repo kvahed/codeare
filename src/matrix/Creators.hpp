@@ -509,7 +509,7 @@ eye (const size_t n) {
 template <class T> inline static Matrix<T> 
 linspace (const T& start, const T& end, const size_t& n) {
 	
-	assert (n > 1);
+	assert (n >= 1);
 	
 	Matrix<T> res (n, 1);
 	T gap;
