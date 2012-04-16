@@ -15,22 +15,6 @@ karbtest (Connector<T>* rc) {
 
 #endif
 
-	gp.k /= 10.0;
-
-	size_t nn = size(gp.k,0);
-	double nd = (double) nn;
-
-	/*	Matrix<double> xx = linspace<double> (0, nd, nn);
-	Matrix<double> XX = linspace<double> (0, nd, nn*100);
-
-	MXDump (xx, "x.mat", "x");
-	MXDump (XX, "xi.mat", "xi");
-
-
-	gp.k = interp1 (xx, gp.k, XX);
-	
-	MXDump (gp.k, "gpk.mat", "gpk"); /*
-
 	rc->Attribute ("maxgrad", &(gp.mgr));
 	rc->Attribute ("maxslew", &(gp.msr));
 	rc->Attribute ("dt",      &(gp.dt));
@@ -39,7 +23,7 @@ karbtest (Connector<T>* rc) {
 	rc->Attribute ("lunits",  &(gp.lunits));
 	
 	printf ("Computing trajectory for ... \n");
-	printf ("    [maxgrad: %.2f, maxslew: %.2f]\n", gp.mgr, gp.msr);
+	printf ("    [maxgrad: %.2f, maxslew: %.2f, dt: %.5f]\n", gp.mgr, gp.msr, gp.dt);
 	
 	ticks start = getticks();
 	Solution s = ComputeGradient (gp);
