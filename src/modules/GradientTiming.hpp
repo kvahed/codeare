@@ -333,14 +333,7 @@ Solution ComputeGradient (GradientParams& gp) {
 	Nt     = round (T/gp.dt); 
 	t      = linspace<double> (0.0, T, Nt);
 
-	MXDump (tos, "tos.mat", "tos");
-	MXDump (sf, "sf.mat", "sf");
-	MXDump (t, "t.mat", "t");
-
 	sot    = interp1 (tos,  sf,   t);
-
-	MXDump (sot, "sot.mat", "sot");
-	MXDump (pos, "pos.mat", "pos");
 	pot    = interp1 ( sf, pos, sot);
 
 	pos.Clear();
@@ -353,19 +346,14 @@ Solution ComputeGradient (GradientParams& gp) {
 		gp.k(i,2) = (sdin.pkz->Lookup (pot[i]));
 	}
 
-	s.g    = Matrix<double> (Nt,3);
-	s.k    = Matrix<double> (Nt,3);
-	s.s    = Matrix<double> (Nt,3);
+	s.g    = Matrix<double> (Nt-1,3);
+	s.k    = Matrix<double> (Nt-1,3);
+	s.s    = Matrix<double> (Nt-1,3);
 	
 	for (size_t i = 0; i < Nt-1; i++) {
 		s.g(i,0) = (gp.k(i+1,0) - gp.k(i,0)) / (GAMMA / 10.0 * gp.dt);
 		s.g(i,1) = (gp.k(i+1,1) - gp.k(i,1)) / (GAMMA / 10.0 * gp.dt);
 		s.g(i,2) = (gp.k(i+1,2) - gp.k(i,2)) / (GAMMA / 10.0 * gp.dt);
-	}
-
-	for (size_t i = 0; i < 3; i++) {
-		s.g(Nt-1,i) = s.g(Nt-2,i);  
-		s.k(0,   i) = 0.0;
 	}
 
 	for (size_t i = 1; i < Nt; i++) {
@@ -374,6 +362,9 @@ Solution ComputeGradient (GradientParams& gp) {
 		s.k(i,2) =  s.k(i-1,2) + s.g(i,2) * (GAMMA / 10.0 * gp.dt);
 	}
 
+	for (size_t i = 0; i < 3; i++)
+		s.k(0,i) = 0.0;
+
 	for (size_t i = 0; i < Nt-1; i++) {
 		s.s(i,0) = (s.g(i+1,0) - s.g(i,0)) / gp.dt;
 		s.s(i,1) = (s.g(i+1,1) - s.g(i,1)) / gp.dt;
@@ -381,8 +372,9 @@ Solution ComputeGradient (GradientParams& gp) {
 	}
 
 	for (size_t i = 0; i < 3; i++)
-		s.s(Nt-1,i) = s.s(Nt-2,i);  
-
+		s.s(Nt-2,i) = s.s(Nt-3,i);  
+	
+	t.Resize(Nt-1,1);
 	s.t = t;
 
 	printf ("done: (%.3f)\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
