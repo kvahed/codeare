@@ -1565,7 +1565,7 @@ public:
      * @param  M        The factor.
      */
     Matrix<T>           
-    operator->*         (Matrix<T>& M);
+    operator->*         (const Matrix<T>& M) const;
    
     
     /**
@@ -2027,42 +2027,6 @@ public:
 
 
 
-    /**
-     * @brief           Greatest element of the matrix. i.e. max(M0).
-     *
-     * @return          The scalar value of the greatest element.
-     */
-    T                   
-    Max                 () const ;    
-    
-    
-    /**
-     * @brief           Smallest element of the matrix. i.e. min(M0).
-     *
-     * @return          The scalar value of the smallest element.
-     */
-    T                   
-    Min                 () const ;
-    
-    
-    /**
-     * @brief           Get maximum absolute value in the matrix
-     *
-     * @return          Maximum value
-     */
-    T                   
-    Maxabs              () const ;
-    
-    
-    /**
-     * @brief           Get minimum absolute value in the matrix
-     *
-     * @return          Maximum value
-     */
-    T                   
-    Minabs              () const ;
-    
-
 	/**
      * @brief           Matrix Product.
      *
@@ -2074,6 +2038,7 @@ public:
     Matrix<T>           
     prod                (const Matrix<T> &M, const char& transa = 'N', const char& transb = 'N') const;
     
+
     /**
      * @brief           Complex conjugate left and multiply with right.
      *
@@ -2309,93 +2274,6 @@ Matrix<T>::Sub2Ind  (const Matrix<size_t>& subs) const {
 	return subs; 
 }
 
-
-template <> inline short 
-Matrix<short>::Max() const {
-	
-    short max = _M[0];
-	
-    for (size_t i = 0; i < Size(); i++)
-        if (_M[i] > max)
-            max = _M[i];
-	
-    return max;
-	
-}
-
-
-template <> inline double 
-Matrix<double>::Max() const {
-	
-    short max = _M[0];
-	
-    for (size_t i = 1; i < Size(); i++)
-        if (_M[i] > max)
-            max = _M[i];
-	
-    return max;
-	
-}
-
-
-template <> inline cxfl
-Matrix<cxfl>::Max() const {
-		
-	cxfl   max = cxfl(0.0,0.0);
-	float tmp =  0.0;
-	
-	for (size_t i = 0; i < Size(); i++) {
-		float abs = sqrt(_M[0].real()*_M[0].real() + _M[0].imag()*_M[0].imag());
-		if (abs > tmp) {
-			tmp = abs;
-			max = _M[i];
-		}
-	}
-	return max;
-	
-}
-
-
-template <class T> inline T
-Matrix<T>::Maxabs() const {
-
-    T max = abs(_M[0]);
-
-    for (size_t i = 0; i < Size(); i++)
-        if (abs(_M[i]) > abs(max))
-            max = abs(_M[i]);
-
-    return cabs(max);
-
-}
-
-
-template <class T> inline T
-Matrix<T>::Min() const {
-
-    T min = _M[0];
-
-    for (size_t i = 0; i < Size(); i++)
-        if (_M[i] < min)
-            min = _M[i];
-
-    return min;
-
-}
-
-
-template <class T> inline T  
-Matrix<T>::Minabs() const {
-
-    T old = fabs(_M[0]);
-
-    for (size_t i = 0; i < Size(); i++)
-        if (fabs(_M[i]) < old)
-            old = cabs(_M[i]);
-
-    return old;
-
-}
 
 template <class T> inline Matrix<T> 
 Matrix<T>::tr() const {
@@ -2736,12 +2614,23 @@ Matrix<T>::~Matrix() {
 template <class T> inline Matrix<T>&
 Matrix<T>::operator= (const Matrix<T>& M) {
     
-	if (this->Size() != M.Size())
-		_M.resize(M.Size());
-	
-	memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
+	if (this != &M) {
 
-	_M = M.Dat();
+		if (this->Size() != M.Size()) {
+
+			try {
+				_M.resize(M.Size());
+			} catch (...) {
+				printf ("Couldn't allocate %zu elements\n", M.Size()); 
+			}
+			
+		}
+		
+		memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
+		
+		_M = M.Dat();
+		
+	}
 
     return *this;
 	
@@ -2758,7 +2647,7 @@ Matrix<T>::operator= (const T& s) {
 
 
 template <class T> inline Matrix<bool> 
-Matrix<T>::operator== (const T& s) const   {
+Matrix<T>::operator== (const T& s) const {
 
     Matrix<bool> res(_dim);
 	size_t i = Size();
@@ -2842,7 +2731,7 @@ Matrix<T>::operator> (const T& s) const {
 
 
 template <class T> inline Matrix<T> 
-Matrix<T>::operator->* (Matrix<T> &M) {
+Matrix<T>::operator->* (const Matrix<T> &M) const {
 
     return this->prod(M);
 

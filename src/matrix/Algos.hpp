@@ -419,10 +419,10 @@ height             (const Matrix<T>& M) {
 template <class T> static inline T
 max (const Matrix<T>& M) {
 
-	T max = M[0];
+	T max = cabs(M[0]);
 
 	for (size_t i = 0; i < numel(M); i++)
-		if (M[i] > max)
+		if (cabs(M[i]) > max)
 			max = M[i];
 
 	return max;
@@ -439,13 +439,13 @@ max (const Matrix<T>& M) {
 template <class T> static inline T
 min (const Matrix<T>& M) {
 
-	T max = M[0];
+	T min = cabs(M[0]);
 
 	for (size_t i = 0; i < numel(M); i++)
-		if (M[i] < max)
-			max = M[i];
+		if (cabs(M[i]) < min)
+			min = M[i];
 
-	return max;
+	return min;
 	
 }
 
