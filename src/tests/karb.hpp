@@ -27,9 +27,9 @@ karbtest (Connector<T>* rc) {
 	MXDump (XX, "xi.mat", "xi");
 
 
-	gp.k = interp1 (xx, gp.k, XX);*/
+	gp.k = interp1 (xx, gp.k, XX);
 	
-	MXDump (gp.k, "gpk.mat", "gpk");
+	MXDump (gp.k, "gpk.mat", "gpk"); /*
 
 	rc->Attribute ("maxgrad", &(gp.mgr));
 	rc->Attribute ("maxslew", &(gp.msr));
