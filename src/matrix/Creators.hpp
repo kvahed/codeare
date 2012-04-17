@@ -502,6 +502,14 @@ linspace (const T& start, const T& end, const size_t& n) {
 }
 
 
+/**
+ * @brief    MATLAB-like meshgrid. x and y vectors must be specified z may be specified optionally.
+ *
+ * @param x  X-Vector
+ * @param y  Y-Vector
+ * @param z  Z-Vector (default: unused)
+ * @return   Mesh grid O (Ny x Nx x Nz x 3) (if z specified) else O (Ny x Nx x 2)<br/>
+ */
 template <class T> inline static Matrix<T>
 meshgrid (const Matrix<T>& x, const Matrix<T>& y, const Matrix<T>& z = Matrix<T>(1)) {
 
@@ -512,58 +520,23 @@ meshgrid (const Matrix<T>& x, const Matrix<T>& y, const Matrix<T>& z = Matrix<T>
 	assert (nx > 1);
 	assert (ny > 1);
 
-	assert (size(x,0) == nx); // Column vector
-	assert (size(y,0) == ny); // Column vector
+	// Column vectors
+	assert (size(x,0) == nx); 
+	assert (size(y,0) == ny);
 	assert (size(z,0) == nz);
 
 	Matrix<T> res (ny, nx, (nz > 1) ? nz : 2, (nz > 1) ? 3 : 1);
 	
-	for (size_t k = 0; k < nz; k++)
-		for (size_t i = 0; i < ny; i++)
-			for (size_t j = 0; j < nx; j++)
-				res (i,j,k) = x[j];
-
-		for (size_t i = 0; i < nx*nz; i++)
-			memcpy (&res[i*ny + nx*ny*nz], y.Data(), ny * sizeof(T));
-
+	for (size_t i = 0; i < ny * nz; i++) 
+		Row    (res, i          , x);
+	for (size_t i = 0; i < nx * nz; i++) 
+		Column (res, i + nx * nz, y);
+	if (nz > 1)
+		for (size_t i = 0; i < nz; i++)
+			Slice  (res, i +  2 * nz, z[i]);
+	
 	return res;	
 
-	/*
-if nargin == 2 || (nargin == 1 && nargout < 3) % 2-D array case
-    if nargin == 1
-        y = x;
-    end
-    if isempty(x) || isempty(y)
-        xx = zeros(0,class(x));
-        yy = zeros(0,class(y));
-    else
-        xrow = full(x(:)).'; % Make sure x is a full row vector.
-        ycol = full(y(:));   % Make sure y is a full column vector.
-        xx = xrow(ones(size(ycol)),:);
-        yy = ycol(:,ones(size(xrow)));
-    end
-else  % 3-D array case
-    if nargin == 1
-        y = x;
-        z = x;
-    end
-    if isempty(x) || isempty(y) || isempty(z)
-        xx = zeros(0,class(x));
-        yy = zeros(0,class(y));
-        zz = zeros(0,class(z));
-    else
-        nx = numel(x);
-        ny = numel(y);
-        nz = numel(z);
-        xx = reshape(full(x(:)),[1 nx 1]); % Make sure x is a full row vector.
-        yy = reshape(full(y(:)),[ny 1 1]); % Make sure y is a full column vector.
-        zz = reshape(full(z(:)),[1 1 nz]); % Make sure z is a full page vector.
-        xx = xx(ones(ny,1),:,ones(nz,1));
-        yy = yy(:,ones(1,nx),ones(nz,1));
-        zz = zz(ones(ny,1),ones(nx,1),:);
-    end
-end
-	*/
 
 }
 
