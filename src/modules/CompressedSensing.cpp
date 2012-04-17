@@ -87,7 +87,7 @@ CompressedSensing::Process () {
 
 	printf ("Processing CompressedSensing ...\n");
 	ticks tic; 
-	cxfl  ma;
+	float ma;
 
 	Matrix<cxfl>&  data  = GetCXFL   ("data");
 	Matrix<float>& pdf   = GetRLFL   ("pdf" );
