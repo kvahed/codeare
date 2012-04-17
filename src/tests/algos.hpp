@@ -41,6 +41,15 @@ algotest (Connector<T>* rc) {
 	MXDump (Bi, std::string (base + std::string("bi.mat")), "bi");
 	MXDump (xi, std::string (base + std::string("xi.mat")), "xi");
 
+	Matrix<double> y = linspace<double> (-0.2, 0.2, 5);
+	Matrix<double> z = linspace<double> (-1.0,0.0,2);
+
+	Matrix<double> xy = meshgrid<double> (x, y);
+	Matrix<double> xyz = meshgrid<double> (x, y, z);
+
+	MXDump (xy, std::string (base + std::string("xy.mat")), "xy");
+	MXDump (xyz, std::string (base + std::string("xyz.mat")), "xyz");
+
 	return true;
 	
 }
