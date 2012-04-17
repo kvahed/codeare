@@ -72,14 +72,34 @@ Slice (const Matrix<T>& M, const size_t s) {
  * @param  A           New slice
  */
 template <class T> static inline void
-Slice (Matrix<T>& M, const size_t s, const Matrix<T> A) {
+Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
 	
 	assert (size(M,0) == size(A,0));
 	assert (size(M,1) == size(A,1));
 
-	size_t nc = size(M,0) * size(M,1);
+	size_t ns = size(M,0) * size(M,1);
 
-	memcpy (&M[s*nc], A.Data(), nc*sizeof(T));
+	memcpy (&M[s * ns], A.Data(), ns * sizeof(T));
+	
+}
+
+	
+/**
+ * @brief              Set a slice
+ * 
+ * @param  M           Matrix
+ * @param  s           # of slice
+ * @param  v           Scalar value           
+ */
+template <class T> static inline void
+Slice (Matrix<T>& M, const size_t& s, const T& v) {
+	
+	size_t ns = size(M,0) * size(M,1);
+
+	vector<T> vv; 
+	vv.resize(ns, v);
+
+	memcpy (&M[s * ns], &vv[0], ns * sizeof(T));
 	
 }
 
@@ -102,8 +122,8 @@ Row (const Matrix<T>& M, const size_t r)  {
 	return res;
 	
 }
-	
-	
+
+
 /**
  * @brief              Copy a row (A) into matrix M
  * 
@@ -114,10 +134,19 @@ Row (const Matrix<T>& M, const size_t r)  {
 template <class T> static inline void 
 Row (Matrix<T>& M, const size_t r, const Matrix<T> A)  {
 	
+	size_t nc, nr, ns, s, rr;
+
+	nc = size(M,1);
+	nr = size(M,0);
+	ns = nc * nr;
+
 	assert (size(M,1) == numel (A));
 	
-	for (size_t i = 0; i < size(M, 1); i++)
-		M[r + i*size(M, 0)] = A[i];
+	s  = floor (r/nr);
+	rr = r % nr;
+
+	for (size_t i = 0; i < nc; i++)
+		M[rr + i * nr + s * ns] = A[i];
 	
 }
 	
