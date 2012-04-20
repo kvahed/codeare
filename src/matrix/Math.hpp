@@ -81,7 +81,7 @@ cos (const Matrix<T>& m) {
 
 
 /**
- * @brief          Cumulative sum
+ * @brief          Cumulative sum of all elements
  * 
  * @param  m       Vector
  * @return         Vector of cumulative sums

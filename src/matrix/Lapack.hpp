@@ -348,7 +348,7 @@ inv (const Matrix<T>& m) {
 	int  info = 0;
 	int *ipiv = (int*) malloc (N * sizeof(int));
 	
-	// LQ Factorisation -------------------
+	// LU Factorisation -------------------
 	
 	if      (typeid (T) == typeid (cxfl))   cgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
 	else if (typeid (T) == typeid (cxdb))   zgetrf_ (&N, &N, &res[0], &N, ipiv, &info);

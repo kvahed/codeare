@@ -1,4 +1,5 @@
 #include "../modules/GradientTiming.hpp"
+#include "../modules/SimulatedAnnealing.hpp"
 
 template <class T> bool
 karbtest (Connector<T>* rc) {
@@ -14,6 +15,8 @@ karbtest (Connector<T>* rc) {
 	Read    (gp.k, rc->GetElement("/config/data/k"),    base);
 
 #endif
+
+	Matrix<double> tmp = gp.k;
 
 	rc->Attribute ("maxgrad", &(gp.mgr));
 	rc->Attribute ("maxslew", &(gp.msr));
@@ -49,7 +52,25 @@ karbtest (Connector<T>* rc) {
 	}
 	
 #endif
+
+	gp.k = tmp;
+
+	double coolrate, startt, finalt;
+	size_t coolit;
+
+	MXDump (gp.k, "gpk1.mat", "gpk1");
+
+	rc->Attribute ("coolrate", &(coolrate));
+	rc->Attribute ("startt",   &(startt));
+	rc->Attribute ("finalt",   &(finalt));
+	rc->Attribute ("coolit",   &(coolit));
+
+	SimulatedAnnealing sa (gp.k, coolit, startt, finalt, coolrate);
+	sa.Cool();
+	gp.k = sa.GetSolution();
 	
+	MXDump (gp.k, "gpk2.mat", "gpk2");
+
 	return true;
 
 }
