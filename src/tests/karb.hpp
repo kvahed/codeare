@@ -16,17 +16,45 @@ karbtest (Connector<T>* rc) {
 
 #endif
 
-	Matrix<double> tmp = gp.k;
+	bool   simann  = false;
+	size_t hpoints = 1;
+	rc->Attribute ("simann",   &simann);
+	rc->Attribute ("hpoints",  &hpoints);
 
+	if (simann) {
+
+		double coolrate, startt, finalt;
+		size_t coolit;
+		bool   verbose, exchange;
+		
+		rc->Attribute ("coolrate", &coolrate);
+		rc->Attribute ("startt",   &startt);
+		rc->Attribute ("finalt",   &finalt);
+		rc->Attribute ("coolit",   &coolit);
+		rc->Attribute ("verbose",  &verbose);
+		rc->Attribute ("exchange", &exchange);
+		
+		SimulatedAnnealing sa (gp.k, coolit, startt, finalt, coolrate, verbose, exchange);
+		sa.Cool();
+		gp.k = sa.GetSolution();
+		
+	}
+	
 	rc->Attribute ("maxgrad", &(gp.mgr));
 	rc->Attribute ("maxslew", &(gp.msr));
 	rc->Attribute ("dt",      &(gp.dt));
-
+	
 	rc->Attribute ("gunits",  &(gp.gunits));
 	rc->Attribute ("lunits",  &(gp.lunits));
 	
+	
+	Matrix<double> x  = linspace<double> (0.0,1.0,size(gp.k,0));
+	Matrix<double> xi = linspace<double> (0.0,1.0,size(gp.k,0)*hpoints);
+
+	gp.k = interp1 (x, gp.k, xi, INTERP::AKIMA);
+
 	printf ("Computing trajectory for ... \n");
-	printf ("    [maxgrad: %.2f, maxslew: %.2f, dt: %.5f]\n", gp.mgr, gp.msr, gp.dt);
+	printf ("    [maxgrad: %.2f, maxslew: %.2f, dt: %.2e]\n", gp.mgr, gp.msr, gp.dt);
 	
 	ticks start = getticks();
 	Solution s = ComputeGradient (gp);
@@ -53,23 +81,6 @@ karbtest (Connector<T>* rc) {
 	
 #endif
 
-	gp.k = tmp;
-
-	double coolrate, startt, finalt;
-	size_t coolit;
-
-	MXDump (gp.k, "gpk1.mat", "gpk1");
-
-	rc->Attribute ("coolrate", &(coolrate));
-	rc->Attribute ("startt",   &(startt));
-	rc->Attribute ("finalt",   &(finalt));
-	rc->Attribute ("coolit",   &(coolit));
-
-	SimulatedAnnealing sa (gp.k, coolit, startt, finalt, coolrate);
-	sa.Cool();
-	gp.k = sa.GetSolution();
-	
-	MXDump (gp.k, "gpk2.mat", "gpk2");
 
 	return true;
 
