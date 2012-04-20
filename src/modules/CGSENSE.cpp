@@ -244,7 +244,7 @@ extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
 
 	printf ("Processing CG-SENSE ...\n");
 
-	// CG iterations (Pruessmann et al. (2001). MRM, 46(4), 638-51.) --
+	// CG iterations () --
 
 	an = pow(creal(Norm(p)), 2); 
 	rn = an;

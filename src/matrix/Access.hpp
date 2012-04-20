@@ -11,7 +11,7 @@
  * @return             Desired volume of M
  */
 template <class T> static inline Matrix<T> 
-Volume (const Matrix<T>& M, const size_t s) {
+Volume (const Matrix<T>& M, const size_t& s) {
 	
 	Matrix<T> res (size(M,0), size(M,1), size(M,2));
 	size_t nc = numel (res);
@@ -31,7 +31,7 @@ Volume (const Matrix<T>& M, const size_t s) {
  * @param  A           Matrix to insert
  */
 template <class T> inline static void
-Volume (Matrix<T>& M, const size_t s, const Matrix<T> A) {
+Volume (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
 	
 	assert (size(M,0) == size(A,0));
 	assert (size(M,1) == size(A,1));
@@ -52,7 +52,7 @@ Volume (Matrix<T>& M, const size_t s, const Matrix<T> A) {
  * @return             Desired slice of M
  */
 template <class T> static inline Matrix<T> 
-Slice (const Matrix<T>& M, const size_t s) {
+Slice (const Matrix<T>& M, const size_t& s) {
 	
 	Matrix<T> res (size(M,0),size(M,1));
 	size_t nc = numel (res);
@@ -112,12 +112,20 @@ Slice (Matrix<T>& M, const size_t& s, const T& v) {
  * @return             Desired row of M
  */
 template <class T> static inline Matrix<T> 
-Row (const Matrix<T>& M, const size_t r)  {
+Row (const Matrix<T>& M, const size_t& r)  {
 	
-	Matrix<T> res (size(M, 1),1);
-	
-	for (size_t i = 0; i < size(M, 1); i++)
-		res[i] = M[r + i*size(M, 0)];
+	size_t nc, nr, ns, s, rr;
+	Matrix<T> res (1, size(M, 1));
+
+	nc = size(M,1);
+	nr = size(M,0);
+	ns = nc * nr;
+
+	s  = floor (r/nr);
+	rr = r % nr;
+
+	for (size_t i = 0; i < nc; i++)
+		res[i] = M[rr + i * nr + s * ns];
 	
 	return res;
 	
@@ -132,7 +140,7 @@ Row (const Matrix<T>& M, const size_t r)  {
  * @param  A           Matrix to copy from
  */
 template <class T> static inline void 
-Row (Matrix<T>& M, const size_t r, const Matrix<T> A)  {
+Row (Matrix<T>& M, const size_t& r, const Matrix<T> A)  {
 	
 	size_t nc, nr, ns, s, rr;
 
@@ -152,6 +160,31 @@ Row (Matrix<T>& M, const size_t r, const Matrix<T> A)  {
 	
 	
 /**
+ * @brief              Copy a row (A) into matrix M
+ * 
+ * @param  M           Matrix to copy into
+ * @param  r           # of row
+ * @param  v           Scalar value
+ */
+template <class T> static inline void 
+Row (Matrix<T>& M, const size_t& r, const T& v)  {
+	
+	size_t nc, nr, ns, s, rr;
+
+	nc = size(M,1);
+	nr = size(M,0);
+	ns = nc * nr;
+
+	s  = floor (r/nr);
+	rr = r % nr;
+
+	for (size_t i = 0; i < nc; i++)
+		M[rr + i * nr + s * ns] = v;
+	
+}
+	
+	
+/**
  * @brief              Get a row
  * 
  * @param  M           Matrix
@@ -159,7 +192,7 @@ Row (Matrix<T>& M, const size_t r, const Matrix<T> A)  {
  * @return             Desired row of M
  */
 template <class T> static inline Matrix<T> 
-Column (const Matrix<T>& M, const size_t c) {
+Column (const Matrix<T>& M, const size_t& c) {
 	
 	Matrix<T> res (size(M, 0),1);
 	
@@ -178,7 +211,7 @@ Column (const Matrix<T>& M, const size_t c) {
  * @param  A           Vector to copy from
  */
 template <class T> static inline void
-Column (Matrix<T>& M, const size_t c, const Matrix<T> A) {
+Column (Matrix<T>& M, const size_t& c, const Matrix<T> A) {
 	
 	assert (size(M,0) == size (A,0));
 	size_t nc = size(M,0);
