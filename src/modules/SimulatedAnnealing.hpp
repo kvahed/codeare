@@ -28,7 +28,7 @@
 
 
 /**
- * @brief  Travelling k-space-man
+ * @brief  Travelling k-space-man with simulated annealing.
  */
 class SimulatedAnnealing {
 
@@ -45,18 +45,23 @@ public:
 	 * @param  verb     Verbosity
 	 */
 	SimulatedAnnealing (const Matrix<double>& k, const size_t& maxit = 1000, const double& st = 300.0, 
-						const double& ft = 0.0, const double& cr = 0.95, const bool& verb = true) {
+						const double& ft = 0.0, const double& cr = 0.95, const bool& verb = true, 
+						const bool& accworse = false) {
 		
 		m_maxit = maxit;
 		m_st    = st;
 		m_ft    = ft;
 		m_cr    = cr;
 		m_verb  = verb;
+		m_accworse = accworse;
 		m_k     = k;
 
 		gsl_rng_env_setup();
 		m_rng = gsl_rng_alloc (gsl_rng_taus2);
 		gsl_rng_set (m_rng, time(0));
+
+		Initialise ();
+		m_ct = m_st;
 
 		printf ("Simulated annealing set up\n");
 
@@ -77,19 +82,14 @@ public:
 		printf ("  Cooling down ... \n");
 
 		ticks cgstart = getticks();
-
 		double len, rndn, dl, prob;
        	size_t i = 0, j = 0;
-
-		Initialise ();
-
-		m_ct = m_st;
 
 		while (i < m_maxit && m_ct > m_ft) {
 
 			
 			// Swap two sites
-			SwapTwo (m_sol, m_nsol); 
+			SwapRange (m_sol, m_nsol); 
 			len = Lengthiness (m_k, m_nsol);
 			
 			// Shorter than before: keep
@@ -98,18 +98,18 @@ public:
 				m_sol = m_nsol;
 				m_len = len;
 				
-				if (verbose) {
+				if (m_verb) {
 					if (j % 5 == 0 && j > 0)
 						printf ("\n");
 					printf ("    %04i: %02.4f", i, m_len);
 					j++;
 				}
 
-			} else {
+			} else if (m_accworse) {
 				
 				// accept worse solution with some probability
 				dl   = len - m_len;
-				rndn = 10.0 * gsl_rng_uniform (m_rng);
+				rndn = gsl_rng_uniform (m_rng);
 				prob = exp (- abs(dl) / m_ct);
 				
 				//printf ("%.4f > %.4f\n", prob, rndn);
@@ -119,7 +119,7 @@ public:
 					m_sol = m_nsol;
 					m_len = len;
 					
-					if (verbose) {
+					if (m_verb) {
 						if (j % 5 == 0 && j > 0)
 							printf ("\n");
 						printf ("    %04i: %02.4f", i, m_len);
@@ -143,7 +143,8 @@ public:
 		}
 
 		
-		printf ("\n  ... done. Best trip length (%zu): %.4f, WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate(), m_bestn, m_bestlen);
+		printf ("\n  ... done. Best trip length (%zu): %.4f, WTime: %.4f seconds.\n\n", 
+				m_bestn, m_bestlen, elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 
 	}
@@ -225,7 +226,7 @@ public:
 		
 		printf ("    Initial lenth: %.2f\n", m_len);
 		
-		if (verbose) 
+		if (m_verb) 
 			MXDump (GetSolution(), "start.mat", "start");
 
 		printf ("  ... done\n");
@@ -241,13 +242,13 @@ public:
 
 		size_t nr = numel (sol);
 		
-		// insert integers 1..N
-		for (size_t i = 0; i < nr; i++)
+		// insert integers 1..N do not touch start / end (k-space center)
+		for (size_t i = 1; i < nr-1; i++)
 			sol[i]  = i+1;
 		
 		// shuffle
-		for (size_t i = 0; i < nr; i++) {
-			size_t r    = gsl_rng_uniform_int (m_rng, nr);     // int between 1 and N
+		for (size_t i = 1; i < nr-1; i++) {
+			size_t r    = gsl_rng_uniform_int (m_rng, nr - 1) + 1;     // int between 1 and N
 			size_t swap = sol[r];
 			sol[r]      = sol[i];
 			sol[i]      = swap;
@@ -257,8 +258,10 @@ public:
     }
 
 
-
-    void SwapTwo (const Matrix<size_t>& sol, Matrix<size_t>& nsol) {
+	/**
+	 * @brief        Swap a ranges order
+	 */
+    void SwapRange (const Matrix<size_t>& sol, Matrix<size_t>& nsol) {
 		
 		size_t i, x, y, pos, nr = numel(sol);
 		
@@ -308,14 +311,11 @@ private:
 
 	Matrix<double> m_k;  /**< @brief coordinates                  */
 
-    bool           m_verb;  /**< @brief Verbose?                      */
-
+    bool           m_verb;  /**< @brief Verbose                      */
+	bool           m_accworse; /**< @brief Randomly accept worse trip */
 
 	gsl_rng* m_rng;
 	
-    //static final int NEW = 1;   
-    //static final int OLD = 2;
-
 };
 
 
