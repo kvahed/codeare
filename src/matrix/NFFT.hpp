@@ -179,7 +179,7 @@ private:
 	Matrix<T> m_pc;               /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
 	Matrix<T> m_cpc;              /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
 	
-	int       m_N[4];             /**< @brief Image matrix side length (incl. k_\omega)*/
+	int       m_N[4];             /**< @brief Image matrix side length (incl. k_{\\omega})*/
 	int       m_n[4];             /**< @brief Oversampling */
 	int       m_M;                /**< @brief Number of k-space knots */
 	int       m_maxit;            /**< @brief Number of Recon iterations (NFFT 3) */

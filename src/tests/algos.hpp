@@ -52,6 +52,12 @@ algotest (Connector<T>* rc) {
 	MXDump (xy, std::string (base + std::string("xy.mat")), "xy");
 	MXDump (xyz, std::string (base + std::string("xyz.mat")), "xyz");
 
+	Matrix<size_t> nxyz = zeros<size_t> (4,1);
+	nxyz [0] = 1; nxyz [1] = 0; nxyz[2] = 3; nxyz[3] = 2;
+	xyz = permute (xyz, nxyz);
+
+	MXDump (xyz, std::string (base + std::string("pxyz.mat")), "pxyz");
+
 	return true;
 	
 }

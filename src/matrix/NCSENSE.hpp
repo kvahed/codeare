@@ -43,14 +43,16 @@ public:
 	 * @brief          Construct NCSENSE plans for forward and backward transform with credentials
 	 * 
 	 * @param  sens    Sensitivity maps if imsize
-	 * @param  imsize  Matrix of side length of the image space
 	 * @param  nk      # k-space points
-	 * @param  m       Spatial cut-off of FT
-	 * @param  alpha   Oversampling factor
-	 * @param  b0      Off-resonance maps if available
+	 * @param  cgeps   Convergence limit of descent
+	 * @param  cgiter  Maximum # CG iterations
+	 * @param  lambda  Tikhonov regularisation (default 0.0)
+	 * @param  fteps   NFFT convergence criterium (default 7.0e-4)
+	 * @param  ftiter  Maximum # of NFFT gridding iterations (default 3)
+	 * @param  m       Spatial cut-off of FT (default 1)
+	 * @param  alpha   Oversampling factor (default 1.0)
+	 * @param  b0      Off-resonance maps if available (default empty)
 	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
-	 * @param  eps     Convergence criterium for inverse transform (default: 1.0e-7)
-	 * @param  maxit   Maximum # NCSENSE iterations (default: 3)
 	 */
 	NCSENSE (const Matrix<T> sens, const size_t& nk, const double& cgeps, const size_t& cgiter, 
 			 const double& lambda = 0.0, const double& fteps = 7.0e-4, const size_t& ftiter = 3, 
@@ -94,7 +96,7 @@ public:
 	}
 	
 	/**
-	 * @brief        Clean up and destruct
+	 * @brief        Clean up and destruct NFFT plans
 	 */ 
 	~NCSENSE () {
 
@@ -227,7 +229,7 @@ private:
 	Matrix<T> m_sm;          /**< Sensitivities */
 	Matrix<double> m_ic;     /**< Intensity correction I(r) */
 
-	size_t m_dim;            /**< Image dimensions \epsilon {2,3} */
+	size_t m_dim;            /**< Image dimensions {2,3} */
 	size_t m_nr;             /**< # spatial image positions */
 	size_t m_nk;             /**< # K-space points */
 	size_t m_nc;             /**< # Receive channels */
