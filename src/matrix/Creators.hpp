@@ -2,6 +2,7 @@
 #define __CREATORS_HPP__
 
 #include "Matrix.hpp"
+#include "Algos.hpp"
 
 #include <gsl/gsl_rng.h>
 #include <limits>
@@ -172,7 +173,7 @@ rand           (const size_t& col,
 				const size_t& ave = 1) {
 	
 	Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-
+	
 	size_t i = numel(res);
 	
 	const gsl_rng_type* grt;

@@ -38,11 +38,13 @@ public:
 	/**
 	 * @brief           Construct
 	 *
+	 * @param  k        K-Space points
 	 * @param  maxit    Max search iterations
 	 * @param  st       Start temperature
 	 * @param  ft       Final temperature
 	 * @param  cr       Cooling rate 
 	 * @param  verb     Verbosity
+	 * @param  accworse Accept worse solutions with a certain probability
 	 */
 	SimulatedAnnealing (const Matrix<double>& k, const size_t& maxit = 1000, const double& st = 300.0, 
 						const double& ft = 0.0, const double& cr = 0.95, const bool& verb = true, 

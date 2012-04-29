@@ -25,6 +25,7 @@
 #include "IO.hpp"
 
 
+
 /**
  * @brief    Number of non-zero elements
  *
@@ -300,7 +301,7 @@ SizeInRAM          (const Matrix<T>& M) {
  * @param   M       Matrix
  * @return          Number of cells.
  */
-template <class T>  size_t
+template <class T> inline static size_t
 numel               (const Matrix<T>& M) {
 	
 	size_t s = 1;
@@ -317,9 +318,9 @@ numel               (const Matrix<T>& M) {
  * @brief           Get vector of dimensions
  *
  * @param   M       Matrix
- * @return          Number of cells.
+ * @return          Dimension vector.
  */
-template <class T>  Matrix<size_t>
+template <class T>  inline static Matrix<size_t>
 size               (const Matrix<T>& M) {
 	
 	Matrix<size_t> res (1,INVALID_DIM);
@@ -447,6 +448,118 @@ min (const Matrix<T>& M) {
 
 	return min;
 	
+}
+
+
+
+/**
+ * @brief           Minimal element
+ *
+ * @param  M        2D Matrix
+ * @return          Non conjugate transpose
+ */
+template <class T> static inline Matrix<T>
+transpose (const Matrix<T>& M, const bool& conj = false) {
+
+	assert (Is2D(M));
+	size_t m, n, i, j;
+
+	m = size(M,0);
+	n = size(M,1);
+
+	Matrix<T> res (n,m);
+
+	for (j = 0; j < n; j++)
+		for (i = 0; i < m; i++)
+			res (j,i) = M(i,j);
+	
+	return (conj) ? conj(res) : res;
+
+}
+
+
+/**
+ * @brief           Complex conjugate transpose
+ *
+ * @param  M        2D Matrix
+ * @return          Complex conjugate transpose
+ */
+template <class T> static inline Matrix<T>
+ctranspose (const Matrix<T>& M) {
+
+	return transpose (M, true);
+
+}
+
+
+/**
+ * @brief           MATLAB-like permute
+ * 
+ * @param   M       Input matrix 
+ * @param   perm    New permuted dimensions
+ * @return          Permuted matrix
+ */
+#include "Creators.hpp"
+template <class T> static inline Matrix<T>
+permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
+	
+	// Check that perm only includes one number between 0 and INVALID_DIM once
+	size_t ndnew = numel(perm), i, j;
+	size_t ndold = ndims (M) + 1; 
+
+	// Must have same number of dimensions
+	assert (ndnew == ndold);
+
+	// Every number between 0 and ndnew must appear exactly once
+	vector<bool> occupied;
+	occupied.resize(ndnew);
+	for (i = 0; i < ndnew; i++) {
+		assert (!occupied[perm[i]]);
+		occupied [perm[i]] = true;
+	}			
+
+	Matrix<size_t> so = size (M);
+	Matrix<size_t> sn = ones<size_t> (16,1);
+
+	for (i = 0; i < ndnew; i++)
+		sn[i] = so[perm[i]];
+	
+	// Let the party begin
+	Matrix<T> res = zeros<T>(sn);
+
+	size_t d[16];
+	size_t od[16];
+	for (i = 0; i < ndnew; i++)
+		od[i] = perm[i];
+	for (     ; i <    16; i++)
+		od[i] = i;
+	
+	for (d[15] = 0; d[15] < size(res,15); d[15]++)
+		for (d[14] = 0; d[14] < size(res,14); d[14]++)
+			for (d[13] = 0; d[13] < size(res,13); d[13]++)
+				for (d[12] = 0; d[12] < size(res,12); d[12]++)
+					for (d[11] = 0; d[11] < size(res,11); d[11]++)
+						for (d[10] = 0; d[10] < size(res,10); d[10]++)
+							for (d[ 9] = 0; d[ 9] < size(res, 9); d[ 9]++)
+								for (d[ 8] = 0; d[ 8] < size(res, 8); d[ 8]++)
+									for (d[ 7] = 0; d[ 7] < size(res, 7); d[ 7]++)
+										for (d[ 6] = 0; d[ 6] < size(res, 6); d[ 6]++)
+											for (d[ 5] = 0; d[ 5] < size(res, 5); d[ 5]++)
+												for (d[ 4] = 0; d[ 4] < size(res, 4); d[ 4]++)
+													for (d[ 3] = 0; d[ 3] < size(res, 3); d[ 3]++)
+														for (d[ 2] = 0; d[ 2] < size(res, 2); d[ 2]++)
+															for (d[ 1] = 0; d[ 1] < size(res, 1); d[ 1]++)
+																for (d[ 0] = 0; d[ 0] < size(res, 0); d[ 0]++) 
+																	res (d[ 0], d[ 1], d[ 2], d[ 3], d[ 4], d[ 5], d[ 6], d[ 7],
+																		 d[ 8], d[ 9], d[10], d[11], d[12], d[13], d[14], d[15]) =
+																		M (d[od[ 0]], d[od[ 1]], d[od[ 2]], d[od[ 3]], 
+																		   d[od[ 4]], d[od[ 5]], d[od[ 6]], d[od[ 7]], 
+																		   d[od[ 8]], d[od[ 9]], d[od[10]], d[od[11]],
+																		   d[od[12]], d[od[13]], d[od[14]], d[od[15]]);
+
+	return res;
+
+																		
 }
 
 

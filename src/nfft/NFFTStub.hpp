@@ -42,7 +42,7 @@ namespace nnfft {
 	 * @param  M         Number of k-space samples
 	 * @param  n         Oversampled N
 	 * @param  m         Spatial cutoff
-	 * @param  fnp       Forward FT plan
+	 * @param  np        Forward FT plan
 	 * @param  inp       Inverse FT plan
 	 *
 	 * @return success
