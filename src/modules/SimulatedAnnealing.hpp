@@ -103,7 +103,7 @@ public:
 				if (m_verb) {
 					if (j % 5 == 0 && j > 0)
 						printf ("\n");
-					printf ("    %04i: %02.4f", i, m_len);
+					printf ("    %04zu: %02.4f", i, m_len);
 					j++;
 				}
 
@@ -114,8 +114,6 @@ public:
 				rndn = gsl_rng_uniform (m_rng);
 				prob = exp (- abs(dl) / m_ct);
 				
-				//printf ("%.4f > %.4f\n", prob, rndn);
-
 				if (prob > rndn) {
 					
 					m_sol = m_nsol;
@@ -124,7 +122,7 @@ public:
 					if (m_verb) {
 						if (j % 5 == 0 && j > 0)
 							printf ("\n");
-						printf ("    %04i: %02.4f", i, m_len);
+						printf ("    %04zu: %02.4f", i, m_len);
 						j++;
 					}
 					
