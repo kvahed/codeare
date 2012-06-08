@@ -5,6 +5,21 @@
 
 using namespace RRStrategy;
 
+
+/*
+#include "adolc.h"
+
+inline static void 
+DiffRot (const Matrix<float> n, Matrix<float>& lm) {
+
+	adouble n1, n2, n3;
+	adouble in1, in2, in3;
+	adouble out1, out2, out3;
+
+}
+*/
+
+
 /**
  * @brief       Rotate magnetisation around rotation axis
  *

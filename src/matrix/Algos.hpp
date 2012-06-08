@@ -23,7 +23,23 @@
 #define __ALGOS_HPP__
 
 #include "IO.hpp"
+#include "math.h"
+#include "limits.h"
 
+template <bool> struct static_assert;
+template <> struct static_assert<true> { };
+
+template<class T> inline bool 
+is_nan (T const& x) {
+    static_cast<void>(sizeof(static_assert<std::numeric_limits<T>::has_quiet_NaN>));
+    return std::numeric_limits<T>::has_quiet_NaN and (x != x);
+}
+
+template <class T> inline bool 
+is_inf (T const& x) {
+    static_cast<void>(sizeof(static_assert<std::numeric_limits<T>::has_infinity>));
+    return x == std::numeric_limits<T>::infinity() or x == -std::numeric_limits<T>::infinity();
+}
 
 
 /**
@@ -32,7 +48,7 @@
  * @param M  Matrix
  * @return   Number of non-zero elements of matrix M
  */
-template <class T> inline size_t 
+template <class T> inline static size_t 
 nnz (const Matrix<T>& M) {
 	
 	size_t nz   = 0;
@@ -53,7 +69,7 @@ nnz (const Matrix<T>& M) {
  * @param M  Matrix
  * @return   1D?
  */
-template <class T>  inline bool 
+template <class T>  inline static bool 
 Is1D (const Matrix<T>& M) {
 	
 	return IsXD(M, 1);
@@ -67,7 +83,7 @@ Is1D (const Matrix<T>& M) {
  * @param M  Matrix
  * @return   2D?
  */
-template <class T>  inline bool 
+template <class T>  inline static bool 
 Is2D (const Matrix<T>& M) {
 	
 	return IsXD(M, 2);
@@ -81,7 +97,7 @@ Is2D (const Matrix<T>& M) {
  * @param M  Matrix
  * @return   3D?
  */
-template <class T>  inline bool 
+template <class T>  inline static bool 
 Is3D (const Matrix<T>& M) {
 	
 	return IsXD(M, 3);
@@ -96,7 +112,7 @@ Is3D (const Matrix<T>& M) {
  * @param M  Matrix
  * @return   4D?
  */
-template <class T>  inline bool 
+template <class T>  inline static bool 
 Is4D (const Matrix<T>& M) {
 	
 	return IsXD(M, 4);
@@ -111,7 +127,7 @@ Is4D (const Matrix<T>& M) {
  * @param  d  Dimension
  * @return    X-dimensional?
  */
-template <class T>  inline bool 
+template <class T>  inline static bool 
 IsXD (const Matrix<T>& M, const size_t d) {
 	
 	size_t l = 0;
@@ -130,7 +146,7 @@ IsXD (const Matrix<T>& M, const size_t d) {
  * @param  M    Matrix
  * @return      All elements zero?
  */
-template <class T>  inline bool 
+template <class T>  inline static bool 
 IsZero (const Matrix<T>& M) {
 	
 	for (size_t i = 0; i < M.Size(); i++)
@@ -147,11 +163,94 @@ IsZero (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Empty?
  */
-template <class T>  inline bool
+template <class T> inline static bool
 IsEmpty (const Matrix<T>& M) {
 	
 	return (numel(M) == 1);
 	
+}
+
+
+/**
+ * @brief       Which elements are NaN
+ *
+ * @param  M    Matrix
+ * @return      Matrix of booleans true where NaN
+ */
+template <class T> inline static Matrix<bool> 
+isnan (const Matrix<T>& M) {
+
+    Matrix<bool> res (M.Dim());
+	size_t i = numel(M);
+
+	while (i--)
+		res[i] = (std::isinf(creal(M[i]))||std::isinf(cimag(M[i])));
+	
+    return res;
+
+}
+
+
+/**
+ * @brief       Which elements are Inf
+ *
+ * @param  M    Matrix
+ * @return      Matrix of booleans true where inf
+ */
+template <class T> inline static Matrix<bool> 
+isinf (const Matrix<T>& M) {
+
+    Matrix<bool> res (M.Dim());
+	size_t i = numel(M);
+
+	while (i--)
+		res.Dat().at(i) = (std::isinf(creal(M.At(i)))||std::isinf(cimag(M.At(i))));
+	
+    return res;
+
+}
+
+
+/**
+ * @brief       Which elements are Inf
+ *
+ * @param  M    Matrix
+ * @return      Matrix of booleans true where inf
+ */
+template <class T> inline static Matrix<bool> 
+isfinite (const Matrix<T>& M) {
+
+    Matrix<bool> res (M.Dim());
+	size_t i = numel(M);
+
+	while (i--)
+		res.Dat()[i] = true;//is_nan(creal(M[i]));
+			//()(!((bool)isnan(creal(M[i]))) && !isnan(cimag(M[i])) && !std::isinf(creal(M[i])) && !std::isinf(cimag(M[i])));
+	
+    return res;
+
+}
+
+
+/**
+ * @brief       Make non finite elements (default T(0) else specify)
+ *
+ * @param  M    Matrix
+ * @param  v    Optional value to which NaN and Inf elements are set. (default: T(0))
+ * @return      Matrix stripped of NaN and Inf elements 
+ */
+template <class T> inline static Matrix<T> 
+dofinite (const Matrix<T>& M, const T& v = 0) {
+
+    Matrix<T> res (M.Dim());
+	size_t i = numel(M);
+
+	while (i--)
+		res[i] = is_nan(creal(M[i])) ? v : M[i];
+	//(std::isnan(ceal(M[i])) || std::isnan(cimag(M[i])) || std::isinf(creal(M[i])) || std::isinf(cimag(M[i]))) ? v : M[i];
+	
+    return res;
+
 }
 
 
@@ -162,7 +261,7 @@ IsEmpty (const Matrix<T>& M) {
  * @param  d    Dimension
  * @return      Sum of squares
  */
-template <class T> inline  Matrix<T> 
+template <class T> inline static  Matrix<T> 
 SOS (const Matrix<T>& M, const size_t d) {
 	
 	assert (M.Dim(d) > 1);
@@ -179,7 +278,7 @@ SOS (const Matrix<T>& M, const size_t d) {
  * @param  M       Matrix
  * @return         Squeezed matrix
  */
-template <class T> inline  Matrix<T>
+template <class T> inline static Matrix<T>
 squeeze (Matrix<T>& M) {
 	
 	size_t found = 0;
@@ -207,7 +306,7 @@ squeeze (Matrix<T>& M) {
  * @param  d  Dimension
  * @return    Sum of M along dimension d
  */
-template <class T> inline  Matrix<T>
+template <class T> inline static Matrix<T>
 sum (Matrix<T>& M, const size_t d) {
 	
 	Matrix<size_t> sz = size(M);
@@ -268,7 +367,7 @@ sum (Matrix<T>& M, const size_t d) {
  * @param  M  Matrix
  * @return    Highest non-one dimension
  */
-template <class T> inline  size_t
+template <class T> inline static size_t
 ndims (const Matrix<T>& M) {
 	
 	size_t nd = 0;
@@ -287,7 +386,7 @@ ndims (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Size in RAM in bytes.
  */
-template <class T>  inline size_t
+template <class T> inline static size_t
 SizeInRAM          (const Matrix<T>& M) {
 	
 	return numel(M) * sizeof (T);
@@ -366,7 +465,7 @@ size               (const Matrix<T>& M, const size_t& d) {
  * @param   M       Matrix
  * @return          Length
  */
-template <class T>  size_t
+template <class T>  inline static size_t
 length             (const Matrix<T>& M) {
 	
 	size_t l = 1;
@@ -387,7 +486,7 @@ length             (const Matrix<T>& M) {
  * @param   M       Matrix
  * @return          Width
  */
-template <class T>  size_t
+template <class T> inline static size_t
 width             (const Matrix<T>& M) {
 	
 	return M.Dim(1);
@@ -417,7 +516,7 @@ height             (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Maximum
  */
-template <class T> static inline T
+template <class T> inline static T
 max (const Matrix<T>& M) {
 
 	T max = cabs(M[0]);
@@ -437,7 +536,7 @@ max (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Minimum
  */
-template <class T> static inline T
+template <class T> inline static T
 min (const Matrix<T>& M) {
 
 	T min = cabs(M[0]);
@@ -458,7 +557,7 @@ min (const Matrix<T>& M) {
  * @param  M        2D Matrix
  * @return          Non conjugate transpose
  */
-template <class T> static inline Matrix<T>
+template <class T> inline static Matrix<T>
 transpose (const Matrix<T>& M, const bool& conj = false) {
 
 	assert (Is2D(M));
@@ -484,7 +583,7 @@ transpose (const Matrix<T>& M, const bool& conj = false) {
  * @param  M        2D Matrix
  * @return          Complex conjugate transpose
  */
-template <class T> static inline Matrix<T>
+template <class T> inline static Matrix<T>
 ctranspose (const Matrix<T>& M) {
 
 	return transpose (M, true);
@@ -500,7 +599,7 @@ ctranspose (const Matrix<T>& M) {
  * @return          Permuted matrix
  */
 #include "Creators.hpp"
-template <class T> static inline Matrix<T>
+template <class T> inline static Matrix<T>
 permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	
 	// Check that perm only includes one number between 0 and INVALID_DIM once

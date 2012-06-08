@@ -1454,6 +1454,33 @@ public:
 	}
 
     
+	/**
+	 * @brief           Expand matrix by increasing highest dimension (Concatenation)
+	 *
+	 * @param  dim      Dimension to be expanded
+	 * @param  n        Expand by n x current size (default 1)
+	 */
+	inline void
+	PushBack            (const Matrix<T> M)                    {
+
+		size_t nd = 0;
+		size_t os = Size(); // old size 
+		
+		// highest non-singlton dimension
+		for (size_t i = 0; i < INVALID_DIM; i++)
+			nd  = (M.Dim(i) > 1) ? i : nd;
+
+	   
+		
+		_dim[nd] += 1;
+		
+		_M.resize(Size());
+
+		
+		
+	}
+
+    
     /**
      * @brief        Resize to mxn 2D matrix.<br/>Preserving data while shrinking.<br/>Adding zeros when growing.
 	 *               
@@ -1807,7 +1834,7 @@ public:
      * @param  M        Comparing matrix.
 	 * @return          Hit list
      */
-    Matrix<T>           
+    Matrix<bool>           
     operator||          (const Matrix<T>& M) const;
     
     
@@ -1817,7 +1844,7 @@ public:
      * @param  M        Comparing matrix.
 	 * @return          Hit list
      */
-    Matrix<T>           
+    Matrix<bool>           
     operator&&          (const Matrix<T>& M) const;
 
 
@@ -2047,6 +2074,16 @@ public:
      */
     Matrix<T>           
     prodt               (const Matrix<T> &M) const;
+    
+
+    /**
+     * @brief           Complex conjugate right and multiply with right.
+     *
+	 * @param   M       Factor
+     * @return          Product of conj(this) and M.
+     */
+    Matrix<T>           
+    tprod               (const Matrix<T> &M) const;
     
 
 	/**
@@ -2653,7 +2690,7 @@ Matrix<T>::operator== (const T& s) const {
 	size_t i = Size();
 
 	while (i--)
-		res[i] = (_M[i] == s);
+		res.Dat()[i] = (_M[i] == s);
 	
     return res;
 
@@ -2667,7 +2704,7 @@ Matrix<T>::operator>= (const T& s) const {
 	size_t i = Size();
     
 	while (i--)
-		res[i] = (_M[i] >= s);
+		res.Dat()[i] = (_M[i] >= s);
 
     return res;
 
@@ -2681,7 +2718,7 @@ Matrix<T>::operator<= (const T& s) const {
 	size_t i = Size();
 		
 	while (i--)
-        res[i] = (_M[i] <= s);
+        res.Dat()[i] = (_M[i] <= s);
 
     return res;
 
@@ -2695,7 +2732,7 @@ Matrix<T>::operator!= (const T& s) const {
 	size_t i = Size();
 
 	while (i--)
-        res[i] = (_M[i] != s);
+        res.Dat()[i] = (_M[i] != s);
 
     return res;
 
@@ -2709,7 +2746,7 @@ Matrix<T>::operator< (const T& s) const {
 	size_t i = Size();
 
 	while (i--)
-        res[i] = (_M[i] < s);
+        res.Dat()[i] = (_M[i] < s);
 
     return res;
 
@@ -2723,7 +2760,7 @@ Matrix<T>::operator> (const T& s) const {
 	size_t i = Size();
 
 	while (i--)
-        res[i] = (_M[i] > s);
+        res.Dat()[i] = (_M[i] > s);
 
     return res;
 
@@ -2775,7 +2812,7 @@ Matrix<T>::operator& (const Matrix<bool>& M) const {
 }
 
 
-template <class T> inline Matrix<T> 
+template <class T> inline Matrix<bool> 
 Matrix<T>::operator&& (const Matrix<T>& M) const {
 
 	size_t i;
@@ -2794,7 +2831,7 @@ Matrix<T>::operator&& (const Matrix<T>& M) const {
 }
 
 
-template <class T> inline Matrix<T> 
+template <class T> inline Matrix<bool> 
 Matrix<T>::operator|| (const Matrix<T>& M) const {
 
 	size_t i;
@@ -2806,7 +2843,7 @@ Matrix<T>::operator|| (const Matrix<T>& M) const {
 	i = Size();
 
 	while (i--)
-        res[i] = (_M[i] || M[i]);
+        res.Dat()[i] = (_M[i] || M[i]);
 
     return res;
 
@@ -2825,7 +2862,7 @@ Matrix<T>::operator== (const Matrix<T>& M) const {
 	i = Size();
 
 	while (i--)
-        res[i] = (_M[i] == M[i]);
+        res.Dat()[i] = (_M[i] == M[i]);
 
     return res;
 
@@ -2844,7 +2881,7 @@ Matrix<T>::operator>= (const Matrix<T>& M) const {
 	i = Size();
 
 	while (i--)
-        res[i] = (_M[i] >= M[i]) ? true : false;
+        res.Dat()[i] = (_M[i] >= M[i]) ? true : false;
 
     return res;
 
@@ -2863,7 +2900,7 @@ Matrix<T>::operator<= (const Matrix<T>& M) const {
 	i = Size();
 
 	while (i--)
-        res[i] = (_M[i] <= M[i]) ? true : false;
+        res.Dat()[i] = (_M[i] <= M[i]) ? true : false;
 
     return res;
 
@@ -2882,7 +2919,7 @@ Matrix<T>::operator!= (const Matrix<T>& M) const {
 	i = Size();
 
 	while (i--)
-        res[i] = (_M[i] != M[i]) ? true : false;
+        res.Dat()[i] = (_M[i] != M[i]) ? true : false;
 
     return res;
 	
@@ -2901,7 +2938,7 @@ Matrix<T>::operator> (const Matrix<T>& M) const {
 	i = Size();
 
 	while (i--)
-        res[i] = (_M[i] > M[i]) ? true : false;
+        res.Dat()[i] = (_M[i] > M[i]) ? true : false;
 
     return res;
 
@@ -2920,7 +2957,7 @@ Matrix<T>::operator< (const Matrix<T>& M) const {
 	i = Size();
 
 	while (i--)
-        res[i] = (_M[i] < M[i]);
+        res.Dat()[i] = (_M[i] < M[i]);
 	
     return res;
 
