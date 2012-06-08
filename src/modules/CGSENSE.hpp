@@ -81,17 +81,17 @@ namespace RRStrategy {
 
 		NCSENSE<cxfl>* m_ncs;
 		
-		int                  m_iter;            /**< Maximum number of NuFFT solver iterations */
-		int                  m_verbose;         /**< Verbose should give back the reconstruction series? */
-		double               m_noise;           /**< Add noise? */
-		int                  m_testcase;        /**< Test case. Generate forward data first. */
-		double               m_lambda;          /**< Tikhonov factor*/
-
-		double               m_fteps;         /**< NuFFT convergence criterium     */
-		int                  m_ftmaxit;           /**< Maximum number of NuFFT solver iterations */
-		double               m_cgeps;           /**< CG SENSE convergence criterium  */
-		int                  m_cgmaxit;         /**< Maximum number of CG iterations */
+		int            m_iter;      /**< Maximum number of NuFFT solver iterations           */
+		int            m_verbose;   /**< Verbose should give back the reconstruction series? */
+		int            m_testcase;  /**< Test case. Generate forward data first.             */
+		int            m_ftmaxit;   /**< Maximum number of NuFFT solver iterations           */
+		int            m_cgmaxit;   /**< Maximum number of CG iterations                     */
 		
+		double         m_noise;     /**< Add noise?                                          */
+		double         m_lambda;    /**< Tikhonov factor                                     */
+		double         m_fteps;     /**< NuFFT convergence criterium                         */
+		double         m_cgeps;     /**< CG SENSE convergence criterium                      */
+
 	};
 
 

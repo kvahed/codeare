@@ -21,15 +21,15 @@
 template <class T> bool
 cstest (Connector<T>* con) {
 
-	Matrix<cxfl> indata;
-	Matrix<cxfl> im_dc;
+	Matrix<cxfl>  indata;
+	Matrix<cxfl>  im_dc;
 	Matrix<float> mask;
 	Matrix<float> pdf;
-	Matrix<cxfl> pc;
+	Matrix<cxfl>  pc;
 	
-	std::string cf  = std::string (base + std::string(config));
-	std::string df  = std::string (base + std::string(data));
-	std::string odf = std::string (base + std::string("/csout.mat"));
+	std::string   cf  = std::string (base + std::string(config));
+	std::string   df  = std::string (base + std::string(data));
+	std::string   odf = std::string (base + std::string("/csout.mat"));
 
 #ifdef HAVE_MAT_H	
 	if (!(MXRead (indata, df, "data")))	return false;

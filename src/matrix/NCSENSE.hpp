@@ -27,6 +27,43 @@
 #include "SEM.hpp"
 #include "MRI.hpp"
 
+/**
+ * @brief   Convenience structure for construction
+ */
+template<class T>
+struct NCSParams {
+	
+	Matrix<T> sens;
+	Matrix<T> pc;
+
+	Matrix<double> b0; 
+
+	double cgeps;
+	double lambda;
+	double fteps; 
+	double alpha; 
+
+	size_t nk;
+	size_t cgiter; 
+	size_t ftiter; 
+	size_t m; 
+
+	NCSParams () {
+		
+		cgeps  = 1.0e-6;
+		lambda = 2.0e-6;
+		fteps  = 7.0e-4;
+		alpha  = 1.0;
+
+		ftiter = 3;
+		m      = 1;
+		cgiter = 20;
+		nk     = 0;
+		
+	}
+
+};
+		
 
 /**
  * @brief Non-Cartesian SENSE<br/>
@@ -38,6 +75,11 @@ class NCSENSE : public FT<T> {
 public:
 
 	NCSENSE() : m_initialised (false) {};
+
+	NCSENSE (const NCSParams<T>& ncsp) {
+
+	}
+
 
 	/**
 	 * @brief          Construct NCSENSE plans for forward and backward transform with credentials
@@ -54,7 +96,7 @@ public:
 	 * @param  b0      Off-resonance maps if available (default empty)
 	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
 	 */
-	NCSENSE (const Matrix<T> sens, const size_t& nk, const double& cgeps, const size_t& cgiter, 
+	NCSENSE (const Matrix<T>& sens, const size_t& nk, const double& cgeps, const size_t& cgiter, 
 			 const double& lambda = 0.0, const double& fteps = 7.0e-4, const size_t& ftiter = 3, 
 			 const size_t& m = 1, const double& alpha = 1.0, const Matrix<double>& b0 = Matrix<double>(1), 
 			 const Matrix<T>& pc = Matrix<T>(1)) {

@@ -45,8 +45,8 @@ public:
 	 * @param  pc    Phase correction (or target phase)
 	 */
 	template<class S>
-	DFT         (const Matrix<size_t>& size, const Matrix<S> mask = Matrix<S>(1), 
-				 const Matrix<T> pc = Matrix<T>(1));
+	DFT         (const Matrix<size_t>& size, const Matrix<S>& mask = Matrix<S>(1), 
+				 const Matrix<T>& pc = Matrix<T>(1));
 	
 
 	/**
@@ -58,8 +58,8 @@ public:
 	 * @param  pc    Phase correction (or target phase)
 	 */
 	template<class S>
-	DFT         (const size_t rank, const size_t sl, const Matrix<S> mask = Matrix<S>(1), 
-				 const Matrix<T> pc = Matrix<T>(1));
+	DFT         (const size_t rank, const size_t sl, const Matrix<S>& mask = Matrix<S>(1), 
+				 const Matrix<T>& pc = Matrix<T>(1));
 	
 
 	/**
@@ -219,7 +219,7 @@ hannwindow (const Matrix<size_t>& size, const T& t) {
 }
 
 template<> template<>
-DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float> mask, const Matrix<cxfl> pc) :
+DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float>& mask, const Matrix<cxfl>& pc) :
 	m_have_mask (false),
 	m_have_pc (false) {
 	
@@ -252,7 +252,7 @@ DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float> mask, co
 }
 
 template<> template<>
-DFT<cxfl>::DFT (const Matrix<size_t>& size, const Matrix<float> mask, const Matrix<cxfl> pc) : m_N(1),
+DFT<cxfl>::DFT (const Matrix<size_t>& size, const Matrix<float>& mask, const Matrix<cxfl>& pc) : m_N(1),
 																						m_have_mask (false),
 																						m_have_pc (false) {
 
@@ -312,7 +312,7 @@ DFT<cxfl>::DFT (const Matrix<size_t>& size) : m_N(1),
 
 
 template<> template<>
-DFT<cxdb>::DFT (const size_t rank, const size_t sl, const Matrix<double> mask, const Matrix<cxdb> pc) :
+DFT<cxdb>::DFT (const size_t rank, const size_t sl, const Matrix<double>& mask, const Matrix<cxdb>& pc) :
 	m_have_mask (false),
 	m_have_pc (false) {
 	
@@ -345,7 +345,7 @@ DFT<cxdb>::DFT (const size_t rank, const size_t sl, const Matrix<double> mask, c
 }
 
 template<> template<>
-DFT<cxdb>::DFT (const Matrix<size_t>& size, const Matrix<double> mask, const Matrix<cxdb> pc) : m_N(1),
+DFT<cxdb>::DFT (const Matrix<size_t>& size, const Matrix<double>& mask, const Matrix<cxdb>& pc) : m_N(1),
 																						m_have_mask (false),
 																						m_have_pc (false) {
 

@@ -20,6 +20,7 @@
 
 #include "OMP.hpp"
 #include "Access.hpp"
+#include "NFFT.hpp"
 
 /**
  * @brief Right hand side operator E (i.e. forward transform) 
