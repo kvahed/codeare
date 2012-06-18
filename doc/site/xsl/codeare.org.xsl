@@ -43,7 +43,7 @@
 			<li><a href="install.html">install</a></li>
 			<li><a href="userguide.html">user guide</a></li>
 			<li><a href="developerguide.html">developer guide</a></li>
-			<li><a href="api/index.html" target="_api">api annotation</a></li>
+			<li><a href="api/html/index.html" target="_api">api annotation</a></li>
 			<li><a href="contact.html">contact</a></li>
 		  </ul>
 		  <div class="callout">

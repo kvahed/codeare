@@ -1,2 +1,2 @@
 EXTRA_DIST = README.TXT
-SUBDIRS = site
+SUBDIRS = site api
