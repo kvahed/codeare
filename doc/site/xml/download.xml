@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<main>
+  <article>  
+	<![CDATA[
+		
+	<h2>Download</h2>
+	<p>
+	  The package is hosted on <strong>github</strong>
+	  under <a href="https://github.com/kvahed/codeare"
+			   target="_github">
+		<code>https://github.com/kvahed/codeare</code></a>
+	</p>
+	<p>
+	  Download with git:<br/>
+	  <code>git checkout git://github.com/kvahed/codeare.git</code>
+	</p>
+
+    ]]>
+  </article>
+</main> 
+
+

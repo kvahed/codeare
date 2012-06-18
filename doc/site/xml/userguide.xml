@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<main>
+  <article>  
+	<![CDATA[
+
+	<h2>User guide</h2>
+
+	<p>
+	  There are two modes of using <em>codeare</em>: In a stand-alone
+	  and in a client-server fashion. Both interface behave similarly
+	  with the difference that the client-server invocation will
+	  reqiure some additional information.
+	</p>
+
+	<h3>Local interface</h3>
+	  
+	<p>
+	  The local interface is utilised by invocing <code>lclient</code>
+	  command line interface or by using the 
+	  <code>Connector&lt;LocalConnector&gt;</code> from the C++ API.
+
+	  <pre>
+		<code>
+codeare local client 1.0b
+Commit 4ec211cb [Fri Jun 8 22:17:51 2012 +0200]
+
+Usage:
+lclient -t &lt;test&gt; [OPTIONS] package
+
+  -t, --test    Test case (default: DummyRecon. Just connectivity test)
+  -b, --base    Working directory.
+  -d, --data    Binary data (HDF5, SyngoMR, MATLAB, NIFTI)
+  -p, --pulses  Pulses (Only excitation).
+
+  -h, --help    Print this help screen
+		</code>
+	  </pre>
+	</p>
+	
+	<h3>Remote interface</h3>
+
+	<p>
+	  The remote interface is utilised by invocing <code>lclient</code>
+	  command line interface or by using the 
+	  <code>Connector&lt;RemoteConnector&gt;</code> from the C++ API.
+	</p>
+	
+
+    ]]>
+  </article>
+</main> 

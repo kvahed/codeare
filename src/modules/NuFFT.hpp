@@ -47,25 +47,25 @@ namespace RRStrategy {
 		~NuFFT ();
 		
 		/**
-		 * @brief Dump data to disk
+		 * @brief Process
 		 */
 		virtual RRSModule::error_code
 		Process ();
 		
 		/**
-		 * @brief Dump data to disk
+		 * @brief Prepare
 		 */
 		virtual RRSModule::error_code
 		Prepare ();
 		
 		/**
-		 * @brief Dump data to disk
+		 * @brief Initialise
 		 */
 		virtual RRSModule::error_code
 		Init ();
 		
 		/**
-		 * @brief Do nothing 
+		 * @brief Clean up and exit
 		 */
 		virtual RRSModule::error_code
 		Finalise ();
