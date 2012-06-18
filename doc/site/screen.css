@@ -1,0 +1,208 @@
+/* layout ----------------------------------------------- */
+
+*{
+	margin: 0;
+	padding:0;
+	}
+
+body{
+	background: #262113;
+	color: #eee;
+	font: 86% 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
+	}
+
+#topborder{	
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 1.0em;
+	background-color: #f0b790;
+	}
+
+#sidebar{ position:fixed; top: 38px; left:20px;	width: 230px; }
+* html div#sidebar  { top: 38px; left:20px;	width: 230px; position:absolute; }
+
+#content{ margin: 0 10% 5em 280px; padding-top: 38px; max-width: 640px; }
+
+#rightbar { position: fixed; top: 130px; left: 950; right: 0; border: none; z-index: 50; width: 230px;}
+* html div#rightbar  { top: 38px; left:20px;	width: 230px; position:absolute; }
+
+/* typography
+----------------------------------------------- */
+
+p {	line-height: 1.4em;	margin-bottom: 1.0em; font-size: 0.9em;}
+p.lead { font-size: 1.0em; }
+
+ol, ul{ margin: 0.5em 0 1.2em 2em; }	
+ol, ul, dl { line-height: 1.4em; }
+ol li{ margin-bottom: 0.2em; }
+li{ font-size: 0.9em; }
+li strong {color: #999;}
+dl{ margin: 0.5em 0 1.2em 0; }
+dt{
+	xfont-size: 0.9em;
+	font-weight: bold; color: #999;
+	padding-top: 0.4em;
+	}
+dd{	
+	font-size: 0.9em;
+	margin-bottom: 1.0em;
+	padding-bottom: 0.9em;
+	border-bottom: 1px dashed #3d3d33;
+	}
+
+
+h1, h2, h3{ font-family: "Trebuchet MS",Verdana,Sans-Serif;}
+
+h1 { font-size: 2.3em; }
+h1 a { color:#fff; border: none; }
+h1 em{ font-size: 1.25em; color: #f0b69d; font-style: normal; }
+
+h2 {
+	font-size: 1.5em;
+	letter-spacing: 0.4pt;
+	color: #f0b69d;
+	text-transform: uppercase;
+	padding-top: 2.0em;
+	padding-bottom: 1.0em;
+	}
+h3 {
+	font-size: 1.0em;
+	letter-spacing: 0.2pt;
+	color: #f0b69d;
+	text-transform: uppercase;
+	padding-top: 0.5em;
+	}
+
+a, .contact-link{
+	color: #8ad459;
+	text-decoration: none;
+	cursor: hand;
+	}
+
+#content p a:hover,
+#content dd a:hover { border-bottom: 1px dotted #8ad459; }
+a img{ 	border: none;}
+
+small{ font-size: 0.8em; }
+
+pre{
+	display: block;
+	margin: 1em 0;
+	padding: 0.5em;
+	border-left: 6px solid #0d0d09;
+	background-color: #161103;
+	overflow: none;
+	font-size: 0.9em;
+	}
+
+code{
+	font-family: monospace,Verdana,Sans-Serif;
+	color: #ddddc3;
+	padding: 0.3em 0.4em;
+	}
+
+pre code{
+	padding: 0; margin: 0;
+}
+
+kbd{
+	color: #555;
+	background-color: #ddd;
+	border-right: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	font-size: inherit;
+	font-family: inherit;
+	padding: 0 3px 2px 4px;
+	}
+
+fieldset{ border: none; }
+
+/* sidebar
+----------------------------------------------- */
+#sidebar a{
+	color: #fff;
+	}
+
+
+#sidebar h1 a{ font-weight: bold; }
+#sidebar h1 a:hover{  }
+#rightbar h1 a{ font-weight: bold; color: #464133;}
+#rightbar h1 a:hover{  }
+
+#nav{ list-style: none; margin: 3.3em 0 1em 0;}
+#nav li{ padding: 0; margin: 0; }
+#nav a{
+	font-weight: bold;
+	display: block;
+	height: 2.0em;
+	padding: 0.3em 0.2em 0 0.8em;
+	margin-bottom: 1px;
+	color: #eee;
+	background-color: #464133;
+	}
+
+#nav a:hover{
+	color: #1a1a1a;
+	background-color: #f0b790;
+	}	
+
+
+#sidebar .callout{ background-color: #e9d7ba; font-size: 13px; padding: .5em .8em;   }
+#sidebar .callout .date{ font-size: 12px;}
+#sidebar .callout a{ color: #262113; font-weight: bold;}
+#sidebar .callout ul{ margin-top: -.45em; margin-left: 1em; margin-bottom: .4em; }
+
+#rightbar .callout{ background-color: #c9b79a; font-size: 13px; padding: .5em .8em;}
+#rightbar .callout .date{ font-size: 12px;}
+#rightbar .callout a{ color: #262113; font-weight: bold;}
+#rightbar .callout ul{ margin-top: -.45em; margin-left: 1em; margin-bottom: .4em; }
+
+/* content
+----------------------------------------------- */
+#content ul{ margin-left: 4px;}
+#content ul li{
+	list-style: none;
+	padding: 0 0 0 12px;
+	background: url(../images/bullet.gif) no-repeat 0 6px;
+	}
+#content ul ul{ margin-top: 0;}
+
+#content a{
+		color: #c9b79a;
+		font-weight: bold;
+	}
+#content a:hover{
+		color: #f9e7ca;
+		font-weight: bold;
+	}
+#content ul.download li{
+	padding: 0.3em 0;
+	background-image:none;
+	}
+.download img{ padding-right: 0.3em; }
+.download li strong{ font-family: "Trebuchet MS",Verdana,Sans-Serif; font-size: 2.25em; color: #fff;}
+.download li em{ font-style: normal; color: #D0EB6A; }
+
+/* misc
+----------------------------------------------- */
+
+.section{
+	border-top: 4px solid #3d3d33;
+	padding: 1.4em 0 3.2em 0;
+	overflow: auto;
+	width: 100%;
+	}
+.first{ border-top: none; padding-top: 0; }
+
+.thumbnail{
+	padding: 3px 3px 8px 3px;
+	background-color: #222;
+	border: 1px solid #2a2a2a;
+	float: left;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	}	
+
+.caption{ font-size: 0.9em; padding-top: 0.2em ;	}

@@ -35,6 +35,41 @@ AC_LANG([C++])
 # Check SMP capabilities
 AC_OPENMP
 
+AC_ARG_ENABLE([documentation],
+     [  --enable-documentation          turn on documentation C++ library support (default: yes)],
+     [case "${enableval}" in
+       yes) documentation=true ;;
+       no)  documentation=false ;;
+       *) AC_MSG_ERROR([bad value ${enableval} for --enable-documentation]) ;;
+     esac],[documentation=false])
+     AM_CONDITIONAL([DOCUMENTATION], [test x$documentation = xtrue])
+
+# Check for xsltproc & xmllint ()
+if test x$documentation = xtrue; then
+
+build_docs=yes
+
+XSLTPROC=
+AC_CHECK_PROGS([XSLTPROC], [xsltproc])
+if test -z "$XSLTPROC"; then
+  AC_MSG_WARN([xsltproc (from the libxslt source package) not found, not building documentation])
+  build_docs=no
+fi
+
+build_api=yes
+
+DOXYGEN=
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+if test -z "$DOXYGEN"; then
+  AC_MSG_WARN([xsltproc (from the libxslt source package) not found, not building documentation])
+  build_api=no
+fi
+
+fi
+
+AM_CONDITIONAL(BUILD_DOCS, test x$build_docs = xyes)
+AM_CONDITIONAL(BUILD_API,  test x$build_api  = xyes)
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
 AC_HEADER_STDBOOL
@@ -604,6 +639,6 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 
 # Generate files
-AC_CONFIG_FILES([src/Loader.hpp Makefile doc/Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile])
+AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile])
 AC_OUTPUT
 

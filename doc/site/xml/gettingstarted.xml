@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<main>
+  <article>  
+	<![CDATA[
+
+	<h2>Getting started</h2>
+	
+	<p>
+	  In this tutorial we walk through the implementation of
+	  Compressed Sensing for Cartesian data acquisition and its
+	  extension to arbitraty accelerations along arbitrary
+	  trajectories. 
+	</p>
+	
+
+	<h3>Binary input</h3>
+	<ul>
+	  <li>Measurement data (data)</li>
+	  <li>K-Space mask (mask)</li>
+	</ul>
+	<p>
+	Provided in matlab file <code>share/compressedsensing/brain512.mat</code>
+	</p>
+
+	<h3>Parametric input</h3>
+	<ul>
+	  <li>FFT class (<code>fft</code>)</li>
+	  <li>Overall NLCG iterations (<code>csiter</code>)</li>
+	  <li>Weight for total variation penalty (<code>tvw</code>)</li>
+	  <li>Weight for data consistency penalty (<code>xfmw</code>)</li>
+	  <li>Maximum CG internal iterations (<code>cgiter</code>)</li>
+	  <li>CG convergence criterium</li>
+	  <li>L<sub>1</sub> weight (<code>l1</code>)</li>
+	  <li>Maximum # of line search iteration (<code>lsiter</code>)</li>
+	  <li>P-norm (<code>pnorm</code>)</li>
+	  <li>Line search brackets (<code>lsa</code> and <code>lsb</code>)</li>
+	  <li>Wavelet family (<code>wl_family</code>)</li>
+	  <li>Wavelet family member (<code>wl_member</code>)</li>
+	</ul>
+	
+	<h3>
+	  Writing the package XML file
+	</h3>
+
+	<p>
+	  We concentrate the above setup in a package file in
+	  XML <code>brain512.xml:</code>
+
+	  <pre>
+		<code>
+&lt?xml version="1.0" ?&gt;
+
+&lt;!--
+  dim:    Dimension
+  N[x-z]: Side lengths
+  maxint: Maximum optimisation runs
+  tvw:    Total variation penalty weight
+  xfmw:   Data consistency weight
+  ftoper: Fourier transform class
+          0: Cartesian FFT
+          1: Cartesian SENSE
+          2: Cartesian GRAPPA
+          3: Non-Cartesian FFT
+          4: Non-Cartesian SENSE
+  cgiter: Maximum # CG iterations
+  cgconv: CG vonvergence criterium
+  l1:     L1 weight
+  pnorm:  P-Norm 
+  lslim:  Line search lim
+  lsa:    Line search alpha
+  lsb:    Line search beta
+  lsto:   Line search TO
+--&gt;
+
+&ltconfig csiter="2" tvw="0.002" xfmw="0.005" fft="0" cgiter="8"
+    cgconv="5.0e-3" l1="1.0e-15" lsiter="10" pnorm="1" lslim="10"
+    lsa="0.01" lsb="0.6" wl_family="0" wl_member="4"/&gt;
+
+  &ltdata&gt; 
+    &ltdata dname="data" fname="nspirals.mat" dtype="float"
+        ftype="MATLAB"/&gt; 
+    &ltmask dname="mask" fname="nspirals.mat" dtype="float"
+        ftype="MATLAB"/&gt;
+  &lt/data&gt;
+
+&lt/config&gt;
+		</code>
+	  </pre>
+	</p>
+
+	<p>
+	  The file explicitly includes the file locations and the variable
+	  names for the matrices data and mask.
+	</p>
+    ]]>
+  </article>
+</main> 

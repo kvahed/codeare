@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<main>
+  <article>  
+	<![CDATA[
+
+	<h2>Overview</h2>
+	<p class="lead">
+	  <em>codeare</em>, <strong>co</strong>mmon <strong>d</strong>ata 
+	  <strong>e</strong>xchange <strong>a</strong>nd 
+	  <strong>r</strong>econstruction <strong>e</strong>ngine,
+	  is an open-source, comprehensive high performance package
+	  for testing, staging and production of MRI image
+	  reconstruction and sequence runtime interaction. 
+	</p>
+	<p>
+	  It was designed and built to simplify the deployment of
+	  original ideas into the production on MRI scanners, offer
+	  unlimited expansion by allowing the easy integration of code
+	  written in many programming languages,
+	  like <em>Python</em>, <em>Java</em>, <em>Perl</em>, ... and 
+	  meta languages like <em>MATLAB</em>, <em>octave</em>.
+	</p>
+	<p>
+	  The core is built around a C++ matrix template that meets
+	  the requirements of MRI data processing. It includes a
+	  RAM/HD runtime database very much comparable to what we know
+	  as workspace in software like MATLAB, octave, numpy/scipy
+	  etc. 
+	  A comprehensive and extansible toolbox has been programmed
+	  for operations on the matrix objects like ...
+	  <ul>
+		<li>
+		  <strong>Arithmetic (elementwise):</strong> *, *=, /, /=,
+		  +, +=, -, -=, ^, ^=, &gt;, &gt;=, &lt;, &lt;=, ... 
+		</li>
+		<li>
+		  <strong>Lineare algebra:</strong> inv, pinv, svd, chol,
+		  gemm, gemv, dot, dotc, ... 
+		</li>
+		<li>
+		  <strong>Statistics:</strong> cov, mean, sos, norm, std,
+		  tv, ... 
+		</li>
+		<li>
+		  <strong>Signal and image processing:</strong> fft,
+		  nufft, dwt, ... 
+		</li>
+		<li>
+		  <strong>Interpolation:</strong> polynomial, cspline,
+		  akima, ... ND interpolations 
+		</li>
+	  </ul>
+	</p>
+	<p>
+	  Futhermore, IO routines and drivers are provided for
+	  multiple binary formats as ...
+	  <ul>
+		<li><strong>NIFTI</strong></li> 
+		<li><strong>MATLAB</strong></li>
+		<li><strong>HDF5</strong></li>
+		<li><strong>CDF</strong></li> 
+		<li><strong>Syngo MR</strong> &gt;= VB15 (readonly)</li>
+	  </ul>
+	</p>
+	
+    ]]>
+  </article>
+</main> 
