@@ -183,8 +183,7 @@
 	  meta data provided by the package file.
 	</p>
 
-	<pre><code>
-RRSModule::error_code CompressedSensing::Init () {
+	<pre class="sh_cpp">RRSModule::error_code CompressedSensing::Init () {
 
     for (size_t i = 0; i &lt; 3; i++)
         m_N[i] = 1;
@@ -214,8 +213,7 @@ RRSModule::error_code CompressedSensing::Init () {
 
     return RRSModule::OK;
 
-}
-    </code></pre>
+}</pre>
 
 	<h3>Implementation: Prepare</h3>
 
@@ -224,8 +222,7 @@ RRSModule::error_code CompressedSensing::Init () {
 	  probably only at a later stage than the initialisation?
 	</p>
 
-	<pre><code>
-RRSModule::error_code CompressedSensing::Prepare () {
+	<pre class="sh_cpp">RRSModule::error_code CompressedSensing::Prepare () {
 
     /* Declare TVOP, DWT and FT operators */
     m_cgparam.tvt = new TVOP ();
@@ -233,8 +230,7 @@ RRSModule::error_code CompressedSensing::Prepare () {
     m_cgparam.ft  = (FT&lt;cxfl&gt;*) 
         new DFT&lt;cxfl&gt; (ndims (data)+1, data.Height(), mask, pc);
 
-}
-    </code></pre>
+}</pre>
 
 	<h3>Implementation: Process</h3>
 
