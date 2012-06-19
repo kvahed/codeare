@@ -223,10 +223,10 @@ top_builddir = ../..
 top_srcdir = ../..
 
 # Generate local documentation?
-RESOURCES = codeare.css screen.css
+RESOURCES = codeare.css screen.css sh_main.js sh_cpp.js sh_xml.js sh_style.css
 PAGES = $(patsubst xml/%.xml,%.html,$(wildcard xml/*.xml))
 EXTRA_DIST = $(PAGES) $(RESOURCES)
-sitedir = $(datadir)/codeare/doc
+sitedir = $(DESTDIR)$(docdir)
 site_DATA = $(EXTRA_DIST)
 STYLESHEET = xsl/codeare.org.xsl
 all: all-am

@@ -13,6 +13,8 @@
 	</p>
 	
 
+	<h2>Input</h2>
+
 	<h3>Binary input</h3>
 	<ul>
 	  <li>Measurement data (data)</li>
@@ -46,8 +48,7 @@
 	  We concentrate the above setup in a package file in
 	  XML <code>brain512.xml:</code>
 
-	  <pre>
-		<code>
+	  <pre class="sh_xml">
 &lt?xml version="1.0" ?&gt;
 
 &lt;!--
@@ -77,21 +78,234 @@
     lsa="0.01" lsb="0.6" wl_family="0" wl_member="4"/&gt;
 
   &ltdata&gt; 
-    &ltdata dname="data" fname="nspirals.mat" dtype="float"
+    &ltdata dname="data" fname="brain512.mat" dtype="float"
         ftype="MATLAB"/&gt; 
-    &ltmask dname="mask" fname="nspirals.mat" dtype="float"
+    &ltmask dname="mask" fname="brain512.mat" dtype="float"
         ftype="MATLAB"/&gt;
   &lt/data&gt;
 
 &lt/config&gt;
-		</code>
-	  </pre>
+	</pre>
+	</p>
+
+	<h3>
+	  Binary file
+	</h3>
+	<p>
+	  The package file above explicitly includes the file locations
+	  and the variable names for the matrices data and mask. In this
+	  case <code>data</code> and <code>mask</code> reside in
+	  the <em>MATLAB</em> file <code>brain512.mat</code> in the 
+	  same directory as the package file. 
+	</p>
+	<p>
+	  This binary input could be extracted from 
+	  <em>SyngoMR</em>, <em>HDF5</em> and <em>NIFTI</em> files
+	</p>
+
+	<h2>Coding it</h2>
+
+	<p>
+	  <em>codeare</em> was programmed to keep the data handling and
+	  the algorithms on matrices (or ND arrays for that matter) away
+	  from the implementational parts as much as possible.
+	</p>
+	
+	<p>
+	  Thus, we shall start by creating a new <code>ReconStrategy</code> by
+      deriving from the base class. We then only need to implement the
+      algorithm in 4 contextually different
+      functions, 
+	  <ul>
+		<li>
+		  <code>Initialise:</code><br/> Intialise global variables,
+		  allocate memory, etc. Things that are initiallly setup
+		  possible time and memory consuming. For example, allocate the
+		  FT operator if enough information is avalable at this point.
+		</li>
+		<li>
+		  <code>Prepare:</code><br/> Prepare the earlier initialised
+		  functionality and globals. For example, reset the Tikhonov
+		  regularisation weight to a new value before next processing.
+		</li> 
+		<li>
+		  <code>Process:</code><br/> Actually process the algorithm on
+		  the data.
+		</li>
+		<li>
+		  <code>Finalise:</code><br/> Clean up before leaving.
+		</li>
+	  </ul>
 	</p>
 
 	<p>
-	  The file explicitly includes the file locations and the variable
-	  names for the matrices data and mask.
+	  We start by deriving a class <code>CompressedSensing</code> from
+	  <code>ReconStrategy</code>
 	</p>
+	
+	<h3>Declaration</h3>
+	<pre class="sh_cpp">namespace RRStrategy {
+
+    class CompressedSensing : public ReconStrategy {
+		
+      public:
+		
+        CompressedSensing  () {};
+        virtual ~CompressedSensing () {};
+		
+        virtual RRSModule::error_code Process ();
+        virtual RRSModule::error_code Init ();
+        virtual RRSModule::error_code Process ();
+        virtual RRSModule::error_code Finalise ();
+
+
+      private:
+    
+        int            m_dim;     /* Image recon dim               */
+        int            m_N[3];    /* Image side lengths            */
+        int            m_csiter;  /* # global iterations           */
+        CGParam        m_cgparam; /* Structure handed over to NLCG */
+        int            m_wf;      /* Wavelet family                */
+        int            m_wm;      /* Family member                 */
+
+	};
+
+}</pre>
+	<p>
+	  <a href="https://github.com/kvahed/codeare/blob/master/src/modules/CompressedSensing.cpp"
+		 target="code">Download CompressedSensing.hpp</a>
+	</p>
+
+	<h3>Implementation: Init</h3>
+	<p>
+	  The implementation of the <code>Init</code> method consists of
+	  getting initialising the appropriate local variables with the
+	  meta data provided by the package file.
+	</p>
+
+	<pre><code>
+RRSModule::error_code CompressedSensing::Init () {
+
+    for (size_t i = 0; i &lt; 3; i++)
+        m_N[i] = 1;
+
+    int wli   = 0;
+    int m_fft = 0;
+
+    Attribute ("tvw",       &amp;m_cgparam.tvw);
+    Attribute ("xfmw",      &amp;m_cgparam.xfmw);
+    Attribute ("l1",        &amp;m_cgparam.l1);
+    Attribute ("pnorm",     &amp;m_cgparam.pnorm);
+    Attribute ("fft",       &amp;m_cgparam.fft);
+    Attribute ("csiter",    &amp;m_csiter);
+    Attribute ("wl_family", &amp;m_wf);
+    Attribute ("wl_member", &amp;m_wm);
+    
+    if (m_wf &lt; -1 || m_wf &gt; 5)
+        m_wf = -1;
+
+    Attribute ("cgconv", &amp;m_cgparam.cgconv);
+    Attribute ("cgiter", &amp;m_cgparam.cgiter);
+    Attribute ("lsiter", &amp;m_cgparam.lsiter);
+    Attribute ("lsa",    &amp;m_cgparam.lsa);
+    Attribute ("lsb",    &amp;m_cgparam.lsb);
+
+    m_initialised = true;
+
+    return RRSModule::OK;
+
+}
+    </code></pre>
+
+	<h3>Implementation: Prepare</h3>
+
+	<p>
+	  DWT, TVOP and FT operators need only be declared once but
+	  probably only at a later stage than the initialisation?
+	</p>
+
+	<pre><code>
+RRSModule::error_code CompressedSensing::Prepare () {
+
+    /* Declare TVOP, DWT and FT operators */
+    m_cgparam.tvt = new TVOP ();
+    m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf), m_wm);
+    m_cgparam.ft  = (FT&lt;cxfl&gt;*) 
+        new DFT&lt;cxfl&gt; (ndims (data)+1, data.Height(), mask, pc);
+
+}
+    </code></pre>
+
+	<h3>Implementation: Process</h3>
+
+	<p>
+	  To keep things simple, only the non-accelerated single channel
+	  Cartesian code is discussed. 
+	  <a href="https://github.com/kvahed/codeare/blob/master/src/modules/CompressedSensing.cpp"
+		 target="code">The more general code is found here.</a> 
+	</p>
+	<p>
+	  Data matrices are retrieved from the database -
+	  <code>data</code>, <code>pdf</code>, <code>mask</code>
+	  and <code>pc</code>. For convenience references to the prepared
+	  transform operators (in this case on 
+	  <code>std::complex&lt;float&gt;</code> are obtained (<code>dft</code>
+	  and <code>dwt</code>). 
+	</p>
+	<p>
+	  <b>NOTE<b>: The transform operators can be used like
+	  mathematical operators (i.e. <code>mhat = ft * m</code> is the forward
+	  and <code>m = ft ->* mhat</code> is the inverse transform). 
+	<p>
+
+	<pre><code>
+RRSModule::error_code CompressedSensing::Process () {
+
+    float ma; /* max(abs(data)) */
+
+    /* Get scan data, density compensation, k-space mask and phase
+       correction matrices */
+    Matrix&lt;cxfl&gt;&amp;  data = GetCXFL ("data");
+    Matrix&lt;float&gt;&amp; pdf  = GetRLFL ("pdf" );
+    Matrix&lt;float&gt;&amp; mask = GetRLFL ("mask");
+    Matrix&lt;cxfl&gt;&amp;  pc   = GetCXFL ("pc");  
+
+    /* Outgoing images are declared to the database by the name im_dc */
+    Matrix&lt;cxfl&gt;&amp;  im_dc = 
+        AddMatrix ("im_dc", (Ptr&lt;Matrix&lt;cxfl&gt; &gt;) NEW (Matrix&lt;cxfl&gt;  (data.Dim())));
+
+    /* For convenience */
+    FT&lt;cxfl&gt;&amp; dft = *m_cgparam.ft;
+    DWT&amp; dwt      = *m_cgparam.dwt;
+    
+    /* Compensate for k-space coverage density */
+    im_dc    = data;
+    im_dc   /= pdf;
+    
+    /* Reconstruct image with FT operator*/
+    im_dc    = dft -&gt;* im_dc;
+    
+    /* Normalise data magnitude */
+    ma       = max(abs(im_dc));
+    im_dc   /= ma;
+    data    /= ma;
+
+    /* Wavelet transform with DWT operator */    
+    im_dc    = dwt * im_dc;
+    
+    /* NLCG runs */
+    for (size_t i = 0; i < m_csiter; i++)
+        NLCG (im_dc, data, m_cgparam);
+
+    /* Assign outgoing images */
+    im_dc    = dwt -&gt;* im_dc * ma;
+
+    /* Return control to client */
+    return OK;
+
+}
+    </code></pre>
+
     ]]>
   </article>
 </main> 

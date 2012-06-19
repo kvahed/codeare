@@ -8,7 +8,7 @@
 body{
 	background: #262113;
 	color: #eee;
-	font: 86% 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
+	font: 80% 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
 	}
 
 #topborder{	
@@ -25,8 +25,8 @@ body{
 
 #content{ margin: 0 10% 5em 280px; padding-top: 38px; max-width: 640px; }
 
-#rightbar { position: fixed; top: 130px; left: 950; right: 0; border: none; z-index: 50; width: 230px;}
-* html div#rightbar  { top: 38px; left:20px;	width: 230px; position:absolute; }
+#rightbar { position: fixed; top: 120px; left: 950; right: 0; border: none; z-index: 50; width: 230px;}
+* html div#rightbar  { top: 30px; left:20px;	width: 230px; position:absolute; }
 
 /* typography
 ----------------------------------------------- */
@@ -37,7 +37,7 @@ p.lead { font-size: 1.0em; }
 ol, ul{ margin: 0.5em 0 1.2em 2em; }	
 ol, ul, dl { line-height: 1.4em; }
 ol li{ margin-bottom: 0.2em; }
-li{ font-size: 0.9em; }
+li{ padding: 0.3em 0.4em; font-size: 0.9em; }
 li strong {color: #999;}
 dl{ margin: 0.5em 0 1.2em 0; }
 dt{
@@ -90,21 +90,28 @@ small{ font-size: 0.8em; }
 pre{
 	display: block;
 	margin: 1em 0;
-	padding: 0.5em;
-	border-left: 6px solid #0d0d09;
+	padding: 1.1em;
 	background-color: #161103;
 	overflow: none;
-	font-size: 0.9em;
-	}
+}
 
 code{
+	font-size: 1.1em;
 	font-family: monospace,Verdana,Sans-Serif;
 	color: #ddddc3;
-	padding: 0.3em 0.4em;
+	/*padding: 0.3em 0.4em;*/
 	}
 
 pre code{
+	font-size: 0.85em;
 	padding: 0; margin: 0;
+}
+
+pre a{
+	font-size: 1.2em;
+	padding: 4; margin: 0;
+	text-color: #000000;
+	background-color: #666153;
 }
 
 kbd{
