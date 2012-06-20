@@ -13,8 +13,6 @@
 	</p>
 	
 
-	<h2>Input</h2>
-
 	<h3>Binary input</h3>
 	<ul>
 	  <li>Measurement data (data)</li>
@@ -103,7 +101,94 @@
 	  <em>SyngoMR</em>, <em>HDF5</em> and <em>NIFTI</em> files
 	</p>
 
-	<h2>Coding it</h2>
+	<h3>Coding the client</h3>
+	<p>
+	  The package file must be read, binary data digested and
+	  announced to the matrix database.
+	</p>
+
+	<pre class="sh_cpp">
+#include "RemoteConnector.hpp"
+#include "LocalConnector.hpp"
+#include "IO.hpp"
+
+template &lt;class T&gt; bool runcs (Connector&lt;T&gt;&amp; con) {
+  
+    Matrix&lt;cxfl&gt;  indata;
+    Matrix&lt;cxfl&gt;  im_dc;
+    Matrix&lt;float&gt; mask;
+    Matrix&lt;float&gt; pdf;
+    Matrix&lt;cxfl&gt;  pc;
+  
+    /* Read package configuration */
+	con.ReadConfig ("brain512.xml");
+
+    /* Need at least measured data  */
+    if (!Read (pdf, con.GetElement("/config/data/data"),  "") 
+        return false; 
+
+    /* Optionals */
+	Read (mask, con.GetElement("/config/data/mask"), "");
+	Read (pdf,  con.GetElement("/config/data/pdf"),  "");
+	Read (pc,   con.GetElement("/config/data/pc"),   "");
+
+    if (!(MXRead (pdf,  df, "pdf")))  pdf  = Matrix&lt;float&gt;(1);
+    if (!(MXRead (mask, df, "mask"))) mask = Matrix&lt;float&gt;(1);
+    if (!(MXRead (pc,   df, "ph")))   pc   = Matrix&lt;cxfl&gt; (1);
+
+    /* Load shared module, and initialise */
+    if (con.Init ("CompressedSensing") != OK) {
+        printf ("Intialising failed ... bailing out!\n"); 
+        return false;
+    }
+
+    /* Announce binary data matrices to database of con   */
+    con.SetMatrix  ("data", indata); /* Measurement data */
+    con.SetMatrix  ("pdf",  pdf);    /* Sensitivities    */
+    con.SetMatrix  ("mask", mask);   /* Weights          */
+    con.SetMatrix  ("pc",   pc);     /* Phase correction */
+
+    /* Prepare and process */
+    con.Prepare  ("CompressedSensing");     
+    con.Process  ("CompressedSensing");
+
+    /* Retrieve result from database */
+    con.GetMatrix ("im_dc", im_dc);
+
+    /* Clean up module */
+    con.Finalise ("CompressedSensing");
+
+    /* Write output */
+    if (!(MXDump (im_dc, "ph"))) {
+        printf ("Writing output failed ... bailing out!\n")
+        return false;
+    }
+
+    /* :) */
+    return true;
+
+}
+
+int main (int argc, char** argv) {
+
+#ifdef LOCAL
+    /* Locally load the CS module */
+    Connector&lt;LocalConnector&gt;  con ();
+#else 
+    /* Remote call to codeare server loading the CS module.
+       EXAMPLE: codeserv is resolved by CORBA name server debug level 5*/
+    Connector&lt;RemoteConnector&gt; con ("codserv", "5");
+#endif	
+
+    if (runcs (con))
+        return 0;
+    else 
+        return 1;
+
+} </pre>
+
+
+	<h3>Coding the algorithm</h3>
 
 	<p>
 	  <em>codeare</em> was programmed to keep the data handling and
@@ -172,8 +257,8 @@
 
 }</pre>
 	<p>
-	  <a href="https://github.com/kvahed/codeare/blob/master/src/modules/CompressedSensing.cpp"
-		 target="code">Download CompressedSensing.hpp</a>
+	  <a href="https://github.com/kvahed/codeare/blob/master/src/modules/CompressedSensing.hpp"
+		 target="code">Download <code>CompressedSensing.hpp</code></a>
 	</p>
 
 	<h3>Implementation: Init</h3>
@@ -254,8 +339,7 @@
 	  and <code>m = ft ->* mhat</code> is the inverse transform). 
 	<p>
 
-	<pre><code>
-RRSModule::error_code CompressedSensing::Process () {
+	<pre class="sh_cpp">RRSModule::error_code CompressedSensing::Process () {
 
     float ma; /* max(abs(data)) */
 
@@ -299,8 +383,50 @@ RRSModule::error_code CompressedSensing::Process () {
     /* Return control to client */
     return OK;
 
-}
-    </code></pre>
+}</pre>
+
+	<p>
+	  The remaining implementation resides in the NLCG optimisation
+	  which is declared as a global static function
+	  in <code>CompressedSensing.hpp</code>. As an example how coding
+	  the algorithmic part is made easy and intuitive to write and
+	  read. Note, that this is <code>C++</code> and that we do not
+	  have a shell as provided by matlab including lexer and parser.  
+	</p>
+
+	<pre class="sh_cpp">
+Matrix&lt;cxfl&gt; GradTV    (Matrix&lt;cxfl&gt;& x, CGParam& cgp) {
+
+    /* References to the DWT and TVOP operators for convenience */
+    DWT&amp;  dwt = *cgp.dwt;
+    TVOP&amp; tvt = *cgp.tvt;
+
+    float p   = ((float)cgp.pnorm)/2.0-1.0;
+
+    Matrix&amp;lt;cxfl&gt; dx, g;
+
+    /* dx = tvt(idwt(x)) */
+    dx = tvt * (dwt-&gt;*x);
+
+    /* g  = p * dx .* (dx .* dx.' + cgp.l1) .^ (p/2-1); */
+    g  = dx * conj(dx);
+    g += cxfl(cgp.l1);
+    g ^= p;
+    g *= dx;
+    g *= cxfl(cgp.pnorm);
+
+    /* g = dwt(itvt(g)) */
+    g  = dwt * (tvt-&gt;*g);
+
+    return (cgp.tvw * g);
+
+}    </pre>
+
+	<p>
+	  Yippie! We're done. Obviously we need not read / write data from
+	  / to disk, when we are running the module inside the online image
+	  reconstruction software of an MRI scanner. 
+	</p>
 
     ]]>
   </article>

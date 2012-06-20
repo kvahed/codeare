@@ -33,15 +33,15 @@
 template<class T>
 struct NCSParams {
 	
-	Matrix<T> sens;
-	Matrix<T> pc;
+	Matrix< std::complex<T> > sens;
+	Matrix< std::complex<T> > pc;
 
-	Matrix<double> b0; 
+	Matrix<T> b0;
 
-	double cgeps;
-	double lambda;
-	double fteps; 
-	double alpha; 
+	T cgeps;
+	T lambda;
+	T fteps;
+	T alpha;
 
 	size_t nk;
 	size_t cgiter; 
@@ -68,14 +68,22 @@ struct NCSParams {
 /**
  * @brief Non-Cartesian SENSE<br/>
  *        According Pruessmann et al. (2001). MRM, 46(4), 638-51.
+ *
  */
 template <class T>
 class NCSENSE : public FT<T> {
 	
 public:
 
+	/**
+	 * @brief         Default constructor
+	 */
 	NCSENSE() : m_initialised (false) {};
 
+
+	/**
+	 * @brief         Construct with parameters
+	 */
 	NCSENSE (const NCSParams<T>& ncsp) {
 
 	}
@@ -96,10 +104,10 @@ public:
 	 * @param  b0      Off-resonance maps if available (default empty)
 	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
 	 */
-	NCSENSE (const Matrix<T>& sens, const size_t& nk, const double& cgeps, const size_t& cgiter, 
-			 const double& lambda = 0.0, const double& fteps = 7.0e-4, const size_t& ftiter = 3, 
-			 const size_t& m = 1, const double& alpha = 1.0, const Matrix<double>& b0 = Matrix<double>(1), 
-			 const Matrix<T>& pc = Matrix<T>(1)) {
+	NCSENSE (const Matrix< std::complex<T> >& sens, const size_t& nk, const T& cgeps, const size_t& cgiter,
+			 const T& lambda = 0.0, const T& fteps = 7.0e-4, const size_t& ftiter = 3,
+			 const size_t& m = 1, const T& alpha = 1.0, const Matrix<T>& b0 = Matrix<T>(1),
+			 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1)) {
 		
 
 		m_dim = ndims(sens);
@@ -127,32 +135,32 @@ public:
 		m_cgiter = cgiter;
 		m_cgeps  = cgeps;
 		m_lambda = lambda;
-
+		
 		m_sm     = sens;
 		m_ic     = IntensityMap (m_sm);
 		
 		m_initialised = true;
 		
 		printf ("  ...done.\n\n");
-
+		
 	}
 	
 	/**
 	 * @brief        Clean up and destruct NFFT plans
 	 */ 
 	~NCSENSE () {
-
-	int np = 1;
-
+		
+		int np = 1;
+		
 #pragma omp parallel default (shared)
-	{
-		np = omp_get_num_threads ();
-	}	
-
-	if (m_initialised)
-		for (size_t i = 0; i < np; i++)
-			delete m_fts[i];
-
+		{
+			np = omp_get_num_threads ();
+		}	
+		
+		if (m_initialised)
+			for (size_t i = 0; i < np; i++)
+				delete m_fts[i];
+		
 	}
 	
 	
@@ -162,8 +170,8 @@ public:
 	 * @param  k   K-space trajectory
 	 */
 	void
-	KSpace (const Matrix<double>& k) {
-
+	KSpace (const Matrix<T>& k) {
+		
 #pragma omp parallel 
 		{
 			
@@ -181,7 +189,7 @@ public:
 	 * @param  w   Weights
 	 */
 	void
-	Weights (const Matrix<double>& w) {
+	Weights (const Matrix<T>& w) {
 		
 #pragma omp parallel 
 		{
@@ -200,10 +208,10 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<T> 
-	Trafo       (const Matrix<T>& m) const {
+	Matrix< std::complex<T> >
+	Trafo       (const Matrix< std::complex<T> >& m) const {
 
-		Matrix<T> tmp = m * m_ic;
+		Matrix< std::complex<T> > tmp = m * m_ic;
 		return E (tmp, m_sm, m_fts);
 
 	}
@@ -215,17 +223,17 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<T> 
-	Adjoint     (const Matrix<T>& m) const {
+	Matrix< std::complex<T> >
+	Adjoint     (const Matrix< std::complex<T> >& m) const {
 
-		T ts;
-		double rn, xn;
-		Matrix<T> p, r, x, q;
-		vector<double> res;
+		std::complex<T> ts;
+		T rn, xn;
+		Matrix< std::complex<T> > p, r, x, q;
+		vector<T> res;
 
 		p = EH (m, m_sm, m_fts) * m_ic;
 		r = p;
-		x = zeros<T>(size(p));
+		x = zeros< std::complex<T> >(size(p));
 		
 		rn = 0.0;
 		xn = pow(creal(norm(p)), 2);
@@ -268,17 +276,17 @@ private:
 	NFFT<T>** m_fts;         /**< Non-Cartesian FT operators (Multi-Core?) */
 	bool      m_initialised; /**< All initialised? */
 
-	Matrix<T> m_sm;          /**< Sensitivities */
-	Matrix<double> m_ic;     /**< Intensity correction I(r) */
+	Matrix< std::complex<T> > m_sm;          /**< Sensitivities */
+	Matrix<T> m_ic;     /**< Intensity correction I(r) */
 
-	size_t m_dim;            /**< Image dimensions {2,3} */
-	size_t m_nr;             /**< # spatial image positions */
-	size_t m_nk;             /**< # K-space points */
-	size_t m_nc;             /**< # Receive channels */
+	size_t    m_dim;            /**< Image dimensions {2,3} */
+	size_t    m_nr;             /**< # spatial image positions */
+	size_t    m_nk;             /**< # K-space points */
+	size_t    m_nc;             /**< # Receive channels */
 
-	size_t m_cgiter;         /**< Max # CG iterations */
-	double m_cgeps;          /**< Convergence limit */
-	double m_lambda;         /**< Tikhonov weight */
+	size_t    m_cgiter;         /**< Max # CG iterations */
+	double    m_cgeps;          /**< Convergence limit */
+	double    m_lambda;         /**< Tikhonov weight */
 
 };
 

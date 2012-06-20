@@ -8,7 +8,7 @@
 body{
 	background: #262113;
 	color: #eee;
-	font: 80% 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
+	font: 85% 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
 	}
 
 #topborder{	
@@ -20,12 +20,12 @@ body{
 	background-color: #f0b790;
 	}
 
-#sidebar{ position:fixed; top: 38px; left:20px;	width: 230px; }
+#sidebar{ position:fixed; top: 38px; left:2%;	width: 18%; }
 * html div#sidebar  { top: 38px; left:20px;	width: 230px; position:absolute; }
 
-#content{ margin: 0 10% 5em 280px; padding-top: 38px; max-width: 640px; }
+#content{ margin: 0 10% 5em 280px; padding-top: 38px; max-width: 56%; }
 
-#rightbar { position: fixed; top: 120px; left: 950; right: 0; border: none; z-index: 50; width: 230px;}
+#rightbar { position: fixed; top: 120px; left: 80%; right: 0; border: none; z-index: 50; width: 18%;}
 * html div#rightbar  { top: 30px; left:20px;	width: 230px; position:absolute; }
 
 /* typography
@@ -64,15 +64,16 @@ h2 {
 	letter-spacing: 0.4pt;
 	color: #f0b69d;
 	text-transform: uppercase;
-	padding-top: 2.0em;
-	padding-bottom: 1.0em;
+	padding-top: 3.0em;
+	padding-bottom: 1.5em;
 	}
 h3 {
 	font-size: 1.0em;
 	letter-spacing: 0.2pt;
 	color: #f0b69d;
 	text-transform: uppercase;
-	padding-top: 0.5em;
+	padding-top: 1.5em;
+	padding-bottom: 0.75em;
 	}
 
 a, .contact-link{
@@ -93,6 +94,7 @@ pre{
 	padding: 1.1em;
 	background-color: #161103;
 	overflow: none;
+	font-size: 1.1em;
 }
 
 code{

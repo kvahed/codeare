@@ -24,16 +24,22 @@
 #include "CX.hpp"
 
 /**
- * @brief Matrix templated ND non-equidistand Fourier transform with NCSENSE 3 (TU Chemnitz)
+ * @brief  Base class for single and double precision Fourier transforms
  */
 template <class T>
 class FT {
 
 public:
 
+	/**
+	 * @brief    Default constructor
+	 */
 	FT() {};
 
-	~FT() {};
+	/**
+	 * @brief    Default destructor
+	 */
+	virtual ~FT() {};
 
 	/**
 	 * @brief    Forward transform
@@ -41,8 +47,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T> 
-	Trafo       (const Matrix<T>& m) const = 0;
+	virtual Matrix< std::complex<T> >
+	Trafo       (const Matrix< std::complex<T> >& m) const = 0;
 	
 	
 	/**
@@ -51,8 +57,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T> 
-	Adjoint     (const Matrix<T>& m) const = 0;
+	virtual Matrix< std::complex<T> >
+	Adjoint     (const Matrix< std::complex<T> >& m) const = 0;
 	
 	
 	/**
@@ -61,8 +67,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<T> 
-	operator*   (const Matrix<T>& m) const {
+	Matrix< std::complex<T> >
+	operator*   (const Matrix< std::complex<T> >& m) const {
 		return Trafo(m);
 	}
 	
@@ -73,8 +79,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<T> 
-	operator->* (const Matrix<T>& m) const {
+	Matrix< std::complex<T> >
+	operator->* (const Matrix< std::complex<T> >& m) const {
 		return Adjoint (m);
 	}
 	

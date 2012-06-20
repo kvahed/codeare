@@ -24,7 +24,6 @@
 #include "Algos.hpp"
 #include "CX.hpp"
 #include "DFT.hpp"
-#include "SEM.hpp"
 
 /**
  * @brief SENSE: Sensitivity Encoding for Fast MRI<br/>

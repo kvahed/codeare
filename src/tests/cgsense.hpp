@@ -23,12 +23,12 @@ cgsensetest (RRClient::Connector<T>* rc) {
 
 	// Incoming
 	Matrix<cxfl>   rawdata; // Measurement data O(Nkx,Nky,Nkz)
-	Matrix<double> weights; // NUFFT weights   
-	Matrix<double> kspace;  // Kspace positions O(Nkx,Nky,Nkz)
+	Matrix<double>  weights; // NUFFT weights   
+	Matrix<double>  kspace;  // Kspace positions O(Nkx,Nky,Nkz)
 	Matrix<cxfl>   sens;    // Sensitivity maps O(Nx, Ny, Nz)
 	
 	// Outgoing
-	Matrix<double> nrmse;   // Residues of the CG process
+	Matrix<double>  nrmse;   // Residues of the CG process
 	Matrix<cxfl>   image;
 	Matrix<cxfl>   signals;
 	
@@ -54,20 +54,18 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	rc->SetMatrix ("weights", weights); // Weights
 	rc->SetMatrix ( "kspace", kspace);  // K-space
 	
-	rc->Prepare    (test);
+	rc->Prepare   (test);
 	
 	// Process -------------
 
 	rc->SetMatrix (   "data", rawdata); // Measurement data
 	
-	rc->Process    (test);
+	rc->Process   (test);
 	
 	// Receive -------------
 	
-	rc->GetMatrix     (  "image", image);  // Images
-	if (pulses)
-		rc->GetMatrix ("signals", signals);     // Pulses (Excitation)
-	rc->GetMatrix     (  "nrmse", nrmse);  // CG residuals
+	rc->GetMatrix (  "image", image);  // Images
+	rc->GetMatrix (  "nrmse", nrmse);  // CG residuals
 	
 	// ---------------------
 	

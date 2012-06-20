@@ -44,9 +44,8 @@ public:
 	 * @param  mask  K-Space mask (if left empty no mask is applied)
 	 * @param  pc    Phase correction (or target phase)
 	 */
-	template<class S>
-	DFT         (const Matrix<size_t>& size, const Matrix<S>& mask = Matrix<S>(1), 
-				 const Matrix<T>& pc = Matrix<T>(1));
+	DFT         (const Matrix<size_t>& size, const Matrix<T>& mask = Matrix<T>(1),
+				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1));
 	
 
 	/**
@@ -57,9 +56,8 @@ public:
 	 * @param  mask  K-Space mask (if left empty no mask is applied)
 	 * @param  pc    Phase correction (or target phase)
 	 */
-	template<class S>
-	DFT         (const size_t rank, const size_t sl, const Matrix<S>& mask = Matrix<S>(1), 
-				 const Matrix<T>& pc = Matrix<T>(1));
+	DFT         (const size_t rank, const size_t sl, const Matrix<T>& mask = Matrix<T>(1),
+				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1));
 	
 
 	/**
@@ -83,8 +81,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T> 
-	Trafo       (const Matrix<T>& m) const ;
+	virtual Matrix< std::complex<T> >
+	Trafo       (const Matrix< std::complex<T> >& m) const ;
 	
 	
 	/**
@@ -93,19 +91,18 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T> 
-	Adjoint     (const Matrix<T>& m) const;
+	virtual Matrix< std::complex<T> >
+	Adjoint     (const Matrix< std::complex<T> >& m) const;
 	
 	
 private:
 	
 	bool           m_initialised;  /**< @brief Memory allocated / Plans, well, planned! :)*/
 
-	Matrix<double> m_mask;         /**< @brief K-space mask (applied before inverse and after forward transforms) (double precision)*/
-	Matrix<float>  m_maskf;        /**< @brief K-space mask (applied before inverse and after forward transforms) (float precision)*/
+	Matrix<T> m_mask;         /**< @brief K-space mask (applied before inverse and after forward transforms) (double precision)*/
 
-	Matrix<T>      m_pc;           /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
-	Matrix<T>      m_cpc;          /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
+	Matrix< std::complex<T> >      m_pc;           /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
+	Matrix< std::complex<T> >      m_cpc;          /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
 	
 	fftwf_plan     m_fwdplanf;     /**< @brief Forward plan (double precision)*/
 	fftwf_plan     m_bwdplanf;     /**< @brief Backward plan (double precision)*/
@@ -130,17 +127,17 @@ private:
  * @param   m     TO be shifted
  * @return        Shifted
  */
-template <class T> inline static Matrix<cxfl> 
-fftshift        (const Matrix<T>& m) {
+template <class T> inline static Matrix<cxfl>
+fftshift        (const Matrix< std::complex<T> >& m) {
 	
 	assert (Is1D(m) || Is2D(m) || Is3D(m));
 	
-	Matrix<T> res  = m;
+	Matrix< std::complex<T> > res  = m;
 	
 	for (size_t s = 0; s < m.Dim(2); s++)
 		for (size_t l = 0; l < m.Dim(1); l++)
 			for (size_t c = 0; c < m.Dim(0); c++)
-				res.At (c,l,s) *= (float) pow ((float)-1.0, (float)(s+l+c));
+				res.At (c,l,s) *= (T) pow ((T)-1.0, (T)(s+l+c));
 		
 	return res;
 	
@@ -154,7 +151,7 @@ fftshift        (const Matrix<T>& m) {
  * @return        Shifted
  */
 template <class T> inline static Matrix<cxfl> 
-ifftshift        (const Matrix<T>& m) {
+ifftshift        (const Matrix< std::complex<T> >& m) {
 	
 	return fftshift (m);	
 	
@@ -168,7 +165,7 @@ ifftshift        (const Matrix<T>& m) {
  * @param   t     Scaling factor
  * @return        Window
  */
-template <class T> inline static Matrix<T> 
+template <class T> inline static Matrix< std::complex<T> >
 hannwindow (const Matrix<size_t>& size, const T& t) {
 
 	size_t dim = size.Dim(0);
@@ -218,8 +215,8 @@ hannwindow (const Matrix<size_t>& size, const T& t) {
 	
 }
 
-template<> template<>
-DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float>& mask, const Matrix<cxfl>& pc) :
+template<>
+DFT<float>::DFT (const size_t rank, const size_t sl, const Matrix<float>& mask, const Matrix<cxfl>& pc) :
 	m_have_mask (false),
 	m_have_pc (false) {
 	
@@ -228,7 +225,7 @@ DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float>& mask, c
 	if (mask.Size() > 1)
 		m_have_mask = true;
 	
-	m_maskf = mask;
+	m_mask = mask;
 	
 	if (pc.Size() > 1)
 		m_have_pc = true;
@@ -239,7 +236,7 @@ DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float>& mask, c
 	for (size_t i = 0; i < rank; i++)
 		n[i]  = sl;
 
-	m_N   = pow (sl, rank);
+	m_N   = pow ((float)sl, (int)rank);
 
 	m_in  = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
 	m_out = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
@@ -251,10 +248,11 @@ DFT<cxfl>::DFT (const size_t rank, const size_t sl, const Matrix<float>& mask, c
 
 }
 
-template<> template<>
-DFT<cxfl>::DFT (const Matrix<size_t>& size, const Matrix<float>& mask, const Matrix<cxfl>& pc) : m_N(1),
-																						m_have_mask (false),
-																						m_have_pc (false) {
+template<>
+DFT<float>::DFT (const Matrix<size_t>& size, const Matrix<float>& mask,
+				 const Matrix<cxfl>& pc) : m_N(1),
+										   m_have_mask (false),
+									       m_have_pc (false) {
 
 	int rank = size.Size();
 	int n[rank];
@@ -262,7 +260,7 @@ DFT<cxfl>::DFT (const Matrix<size_t>& size, const Matrix<float>& mask, const Mat
 	if (mask.Size() > 1)
 		m_have_mask = true;
 	
-	m_maskf = mask;
+	m_mask = mask;
 	
 	if (pc.Size() > 1)
 		m_have_pc = true;
@@ -287,9 +285,9 @@ DFT<cxfl>::DFT (const Matrix<size_t>& size, const Matrix<float>& mask, const Mat
 
 
 template<> 
-DFT<cxfl>::DFT (const Matrix<size_t>& size) : m_N(1),
-											 m_have_mask (false),
-											 m_have_pc (false) {
+DFT<float>::DFT (const Matrix<size_t>& size) : m_N(1),
+											   m_have_mask (false),
+											   m_have_pc (false) {
 
 	
 	int rank = size.Size();
@@ -311,8 +309,8 @@ DFT<cxfl>::DFT (const Matrix<size_t>& size) : m_N(1),
 }
 
 
-template<> template<>
-DFT<cxdb>::DFT (const size_t rank, const size_t sl, const Matrix<double>& mask, const Matrix<cxdb>& pc) :
+template<>
+DFT<double>::DFT (const size_t rank, const size_t sl, const Matrix<double>& mask, const Matrix<cxdb>& pc) :
 	m_have_mask (false),
 	m_have_pc (false) {
 	
@@ -332,7 +330,7 @@ DFT<cxdb>::DFT (const size_t rank, const size_t sl, const Matrix<double>& mask, 
 	for (size_t i = 0; i < rank; i++)
 		n[i]  = sl;
 
-	m_N   = pow (sl, rank);
+	m_N   = pow ((float)sl, (int)rank);
 
 	m_in  = (void*) fftw_malloc (sizeof(fftw_complex) * m_N);
 	m_out = (void*) fftw_malloc (sizeof(fftw_complex) * m_N);
@@ -344,8 +342,8 @@ DFT<cxdb>::DFT (const size_t rank, const size_t sl, const Matrix<double>& mask, 
 
 }
 
-template<> template<>
-DFT<cxdb>::DFT (const Matrix<size_t>& size, const Matrix<double>& mask, const Matrix<cxdb>& pc) : m_N(1),
+template<>
+DFT<double>::DFT (const Matrix<size_t>& size, const Matrix<double>& mask, const Matrix<cxdb>& pc) : m_N(1),
 																						m_have_mask (false),
 																						m_have_pc (false) {
 
@@ -380,7 +378,7 @@ DFT<cxdb>::DFT (const Matrix<size_t>& size, const Matrix<double>& mask, const Ma
 
 
 template<>
-DFT<cxfl>::~DFT () {
+DFT<float>::~DFT () {
 
 	fftwf_destroy_plan (m_fwdplanf);
 	fftwf_destroy_plan (m_bwdplanf);
@@ -394,7 +392,7 @@ DFT<cxfl>::~DFT () {
 
 
 template<>
-DFT<cxdb>::~DFT () {
+DFT<double>::~DFT () {
 
 	fftw_destroy_plan (m_fwdplan);
 	fftw_destroy_plan (m_bwdplan);
@@ -408,7 +406,7 @@ DFT<cxdb>::~DFT () {
 
 
 template<> Matrix<cxfl> 
-DFT<cxfl>::Trafo (const Matrix<cxfl>& m) const {
+DFT<float>::Trafo (const Matrix<cxfl>& m) const {
 	
     Matrix<cxfl> res = fftshift(m);
 	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
@@ -419,7 +417,7 @@ DFT<cxfl>::Trafo (const Matrix<cxfl>& m) const {
 
 	memcpy (&res[0], m_out, sizeof(fftwf_complex) * m_N);
 	if (m_have_mask)
-		res *= m_maskf;
+		res *= m_mask;
 
     return fftshift(res/sqrt((float)m.Size()));
 	
@@ -427,11 +425,11 @@ DFT<cxfl>::Trafo (const Matrix<cxfl>& m) const {
 
 
 template<> Matrix<cxfl>
-DFT<cxfl>::Adjoint (const Matrix<cxfl>& m) const {
+DFT<float>::Adjoint (const Matrix<cxfl>& m) const {
 
     Matrix<cxfl> res = fftshift(m);
 	if (m_have_mask)
-		res *= m_maskf;
+		res *= m_mask;
 	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
 
 	fftwf_execute(m_bwdplanf);
@@ -446,7 +444,7 @@ DFT<cxfl>::Adjoint (const Matrix<cxfl>& m) const {
 
 
 template<> Matrix<cxdb> 
-DFT<cxdb>::Trafo (const Matrix<cxdb>& m) const {
+DFT<double>::Trafo (const Matrix<cxdb>& m) const {
 	
     Matrix<cxdb> res = fftshift(m);
 	memcpy (m_in, &res[0], sizeof(fftw_complex) * m_N);
@@ -465,7 +463,7 @@ DFT<cxdb>::Trafo (const Matrix<cxdb>& m) const {
 
 
 template<> Matrix<cxdb>
-DFT<cxdb>::Adjoint (const Matrix<cxdb>& m) const {
+DFT<double>::Adjoint (const Matrix<cxdb>& m) const {
 
     Matrix<cxdb> res = fftshift(m);
 	if (m_have_mask)

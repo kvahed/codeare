@@ -30,8 +30,8 @@
  * @param  fts     FT operators
  * @return         K-space 
  */
-template <class T> inline static Matrix<T> 
-E (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts) {
+template <class T> inline static Matrix< std::complex<T> >
+E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm, NFFT<T>** fts) {
 
 	// Leading extends
 	size_t nc, nk, nd;
@@ -40,7 +40,7 @@ E (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts) {
 	nd = fts[0]->FPlan()->d;       // Image space dims
 	nc = size (sm, nd);            // # Receivers
 
-	Matrix<T> out (nk,nc);
+	Matrix< std::complex<T> > out (nk,nc);
 	
 #pragma omp parallel default (shared) 
 	{
@@ -66,8 +66,8 @@ E (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts) {
  * @param  fts     FT operators
  * @return         Image
  */
-template <class T> inline static Matrix<T> 
-EH (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts) {
+template <class T> inline static Matrix< std::complex<T> >
+EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm, NFFT<T>** fts) {
 
 	size_t nc, nk, nd;
 
@@ -75,7 +75,7 @@ EH (const Matrix<T>& in, const Matrix<T>& sm, NFFT<T>** fts) {
 	nd = fts[0]->FPlan()->d;       // Image space dims
 	nc = size (sm, nd);            // # Receivers
 
-	Matrix<T> out = zeros<T> (size(sm));
+	Matrix< std::complex<T> > out = zeros< std::complex<T> > (size(sm));
 
 #pragma omp parallel default (shared) 
 	{

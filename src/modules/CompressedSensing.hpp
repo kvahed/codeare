@@ -56,7 +56,7 @@ namespace RRStrategy {
 		double lsb;
 
 		DWT*       dwt;
-		FT<cxfl>*  ft;
+		FT<float>* ft;
 		TVOP*      tvt;
 		
 	};
@@ -198,7 +198,7 @@ namespace RRStrategy {
 	Matrix<cxfl> 
 	GradObj (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp) {
 		
-		FT<cxfl>& ft = *(cgp.ft);
+		FT<float>& ft = *(cgp.ft);
 		DWT& dwt = *(cgp.dwt);
 
 		Matrix<cxfl> g;
@@ -288,7 +288,7 @@ namespace RRStrategy {
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
 
 		DWT&      dwt = *cgp.dwt;
-		FT<cxfl>& ft  = *cgp.ft;
+		FT<float>& ft  = *cgp.ft;
 		TVOP&     tvt = *cgp.tvt;
 		
 		g0 = Gradient (x, data, cgp);
