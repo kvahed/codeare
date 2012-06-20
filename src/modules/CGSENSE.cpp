@@ -129,11 +129,11 @@ CGSENSE::Prepare () {
 
 	Matrix<cxfl>&   sens    = GetCXFL("sens");
 	Matrix<double>& weights = GetRLDB("weights");
-	Matrix<double>& kspace  = GetRLDB("kspace");
+	Matrix<double>& kspace   = GetRLDB("kspace");
 
-	size_t nk =  numel(weights);
+	size_t nk = numel(weights);
 
-	m_ncs = new NCSENSE<cxfl> 
+	m_ncs = new NCSENSE<float>
 		(sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
 
 	size_t dim = ndims(sens);
@@ -163,7 +163,7 @@ CGSENSE::Process () {
 	Matrix<cxfl>&   data    = GetCXFL("data");
 	Matrix<cxfl>&   image   = GetCXFL("image");
 	
-	NCSENSE<cxfl>&  ncs = *m_ncs;
+	NCSENSE<float>&  ncs = *m_ncs;
 
 	ticks cgstart = getticks();
 	
@@ -189,126 +189,6 @@ extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
 }
 
 
-
-	/*
-	// CG matrices ----------------------------------------------------
-	Matrix <cxfl>   p       = Matrix<cxfl>   (m_N[0],m_N[1],m_N[2]), q, r;
-
-	// Set k-space and weights in FT plans and clear RAM --------------
-	for (int i = 0; i < NTHREADS || i < m_Nc; i++) {
-
-		memcpy (&(m_fplan[i].x[0]),  &kspace[0], m_fplan[i].d * m_fplan[i].M_total * sizeof(double));
-		memcpy (&(m_iplan[i].w[0]), &weights[0],                m_fplan[i].M_total * sizeof(double));
-		nfft::weights (&m_fplan[i], &m_iplan[i]);
-		nfft::psi     (&m_fplan[i]);
-
-	}
-
-	FreeRLDB ("kspace");
-	FreeRLDB ("weights");
-
-	// Create test data if testcase (Incoming data is image space) ----
-	if (m_testcase) {
-		E  (phantom<cxfl>(m_N[0]), sens, m_intcor, m_fplan, data, m_dim);
-		if (m_noise > 0.0)
-			AddPseudoRandomNoise (data, (float) m_noise);
-	} 
-
-	// Intensity Correction -------------------------------------------
-
-	m_intcor = IntensityCorrection (sens);
-	
-	// Out going images -----------------------------------------------
-	// Start CG routine and runtime -----------------------------------
-	ticks cgstart = getticks();
-
-	// First left side action -----------------------------------------
-	EH (data, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, p, m_dim, false);
-	r = p;
-	q = p;
-
-	int         iters = 0;
-
-	if (m_verbose)
-		memcpy (&image[iters*p.Size()], &p[0], p.Size() * sizeof(cxfl));
-
-	// CG residuals storage and helper variables ----------------------
-	std::vector<double> res;
-
-	float       rn    = 0.0;
-	float       rno   = 0.0;
-	float       an    = 0.0;
-	raw         rtmp  = raw(0.0,0.0);
-
-    Matrix<cxfl> treg = eye<cxfl>(m_N[0]) * cxfl (m_lambda, 0);
-
-	printf ("Processing CG-SENSE ...\n");
-
-	// CG iterations () --
-
-	an = pow(creal(Norm(p)), 2); 
-	rn = an;
-
-	Matrix<cxfl> a(m_N[0], m_N[1], m_N[2]);
-
-	for (iters = 0; iters < m_cgmaxit; iters++) {
-
-		res.push_back(rn/an);
-
-		printf ("  %03i: CG residuum: %.9f\n", iters, res.at(iters));
-
-		// Convergence ? ----------------------------------------------
-		if (res.at(iters) <= m_cgeps) break;
-
-		// EHE --------------------------------------------------------
-		E  (p,    sens, m_intcor, m_fplan,                              data, m_dim);
-		EH (data, sens, m_intcor, m_fplan, m_iplan, m_epsilon, m_maxit, q   , m_dim, false);
-		q  += p * m_lambda;
-
-		// Guess new gradient -----------------------------------------
-		rtmp  = (rn / (p.dotc(q)));
-
-		r    -= (q * rtmp);
-		rno   = rn;
-		rn    = pow(creal(Norm(r)), 2);
-		if (std::isnan(rn))	break;
-		
-		a    += (p * rtmp);
-		p    *= rn/rno;
-		p    += r;
-
-		// Verbose out put keeps all intermediate steps ---------------
-		if (m_verbose) {
-
-			if (iters)
-				image.Expand(m_dim); 
-
-			memcpy (&image[iters*a.Size()], &a[0], a.Size()*sizeof(cxfl));
-
-		}
-		
-	}
-	
-	FreeCXFL ("sens");	
-	
-	// Report timimng -------------------------------------------------*/
-	/*
-	// Verbose output needs to 
-	if (m_verbose) {
-		
-		// CG residuals ------------------
-		Matrix<double>& nrmse = AddMatrix ("nrmse", (Ptr<Matrix<double> >) NEW (Matrix<double> (iters,1)));
-		memcpy (&nrmse[0], &res[0], iters * sizeof(double));
-		
-	} else {
-
-		image = a;
-
-		for (int i = 0; i < image.Size(); i++)
-			image[i] *= m_intcor[i];
-
-	}
-	*/
 
 
 

@@ -102,15 +102,15 @@ CompressedSensing::Process () {
 	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf), m_wm);
 
 	/** -----  Which Fourier transform? **/
-	m_cgparam.ft  = (FT<cxfl>*) new DFT<cxfl> (ndims (data)+1, data.Height(), mask, pc);
-	// m_cgparam.ft = (FT<cxfl>*) new NFFT<cxfl> (ms, M * shots, m, alpha);
-	// m_cgparam.ft = (FT<cxfl>*) new NCSENSE<cxfl> (sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
+	m_cgparam.ft  = (FT<float>*) new DFT<float> (ndims (data)+1, data.Height(), mask, pc);
+	// m_cgparam.ft = (FT<float>*) new NFFT<float> (ms, M * shots, m, alpha);
+	// m_cgparam.ft = (FT<float>*) new NCSENSE<float> (sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
 	/*************************************/
 
 	m_cgparam.tvt = new TVOP ();
 
-	FT<cxfl>& dft = *m_cgparam.ft;
-	DWT& dwt      = *m_cgparam.dwt;
+	FT<float>& dft = *m_cgparam.ft;
+	DWT& dwt       = *m_cgparam.dwt;
 	
 	im_dc    = data;
 	im_dc   /= pdf;

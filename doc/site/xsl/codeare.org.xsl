@@ -32,6 +32,7 @@
 		<script type="text/javascript" src="sh_main.js"></script>
 		<script type="text/javascript" src="sh_cpp.js"></script>
 		<script type="text/javascript" src="sh_xml.js"></script>
+		<script type="text/javascript" src="sh_sh.js"></script>
 		
 		<link type="text/css" rel="stylesheet" href="sh_style.css"/>
 

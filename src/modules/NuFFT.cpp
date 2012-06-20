@@ -97,7 +97,7 @@ NuFFT::Init () {
 	for (size_t i = 0; i < dim; i++)
 		ms[i] = N[i];
 
-	nfft = new NFFT<cxfl> (ms, M * shots, m, alpha);
+	nfft = new NFFT<float> (ms, M * shots, m, alpha);
 
 	Matrix<cxdb>& img = AddMatrix 
 		("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> (N[0],N[1],N[2])));

@@ -309,7 +309,7 @@ CPUSimulator::Simulate () {
 		p = rf; q = p; r = p;
 		a = zeros<cxfl> (size(rf));
 
-		an = pow(creal(norm(p)), 2.0);
+		an = pow(creal(norm(p)), (float)2.0);
 		rn = an;
 		
 		for (iters = 0; iters < m_sb->cgit; iters++) { 	// CG loop

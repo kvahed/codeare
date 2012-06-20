@@ -72,7 +72,7 @@ namespace RRStrategy {
 		
 	private:
 		
-		NFFT<cxfl> *nfft;
+		NFFT<float> *nfft;
 
 	};
 	

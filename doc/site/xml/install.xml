@@ -36,7 +36,7 @@
 	  </ul>
 	</p>
 	
-	<h2>Ubuntu / Debian</h2>
+	<h3>Ubuntu / Debian</h3>
 	
 	<p>
 	  You'll need to install 
@@ -56,6 +56,19 @@
 	  </ul>
 	</p>	
 	
+	<h3>Building codeare</h3>
+	
+	<p>
+	  Fairly easy (f.e. ubuntu with MATLAB 2012a at the default location)
+	</p>
+
+    <pre class="sh_sh">
+> CXXFLAGS="-O3" CFLAGS="-O3" ./configure \
+  --with-matlabroot=/opt/MATLAB/R2012a \ 
+  --with-fftw=/usr --with-itkroot=/usr
+> make
+> make check
+> make install</pre>
     ]]>
   </article>
 </main> 

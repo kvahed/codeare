@@ -23,7 +23,6 @@
 
 #include "Matrix.hpp"
 #include "Algos.hpp"
-#include "DFT.hpp"
 
 /**
  * @brief 1-3D Discrete Cartesian Fourier transform for Matrix template

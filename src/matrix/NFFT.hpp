@@ -26,17 +26,21 @@
 #include "CX.hpp"
 
 /**
- * @brief Matrix templated ND non-equidistand Fourier transform with NFFT 3 (TU Chemnitz)
+ * @brief Matrix templated ND non-equidistand Fourier transform with NFFT 3 (TU Chemnitz)<br/>
+ *        Double and single precision
  */
 template <class T>
 class NFFT : public FT<T> {
 	
 public:
 
+	/**
+	 * @brief         Default constructor
+	 */
 	NFFT() : m_initialised (false) {};
 
 	/**
-	 * @brief        Construct NFFT plans for forward and backward FT with credentials
+	 * @brief          Construct NFFT plans for forward and backward FT with credentials
 	 * 
 	 * @param  imsize  Matrix of side length of the image space
 	 * @param  nk      # k-space points
@@ -48,11 +52,11 @@ public:
 	 * @param  maxit   Maximum # NFFT iterations (default: 3)
 	 */
 	NFFT        (const Matrix<size_t>& imsize, const size_t& nk, const size_t m = 1, 
-				 const double alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1), 
-				 const Matrix<T> pc = Matrix<T>(1), const double eps = 7.0e-4, 
-				 const size_t maxit = 1) {
+				 const T alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1),
+				 const Matrix< std::complex<T> > pc = Matrix< std::complex<T> >(1),
+				 const T eps = 7.0e-4, const size_t maxit = 1) {
 		
-		m_M = nk;
+		m_M     = nk;
 		m_imgsz = 1;
 		
 		for (size_t i = 0; i < 4; i++) {
@@ -62,8 +66,8 @@ public:
 		int  rank = numel (imsize);
 		
 		for (size_t i = 0; i < rank; i++) {
-			m_N[i] = imsize[i];
-			m_n[i] = ceil (m_N[i]*alpha);
+			m_N[i]   = imsize[i];
+			m_n[i]   = ceil (m_N[i]*alpha);
 			m_imgsz *= m_N[i];
 		}
 		
@@ -79,7 +83,6 @@ public:
 		m_cpc  = conj(pc);
 		
 		m_initialised = true;
-		
 		
 	}
 	
@@ -105,9 +108,13 @@ public:
 	 * @param  k   Kspace trajectory
 	 */
 	void 
-	KSpace (const Matrix<double>& k) {
+	KSpace (const Matrix<T>& k) {
 		
-		memcpy (m_fplan.x, k.Data(), numel(k) * sizeof(double));
+		if (sizeof(T) == sizeof(double))
+			memcpy (m_fplan.x, k.Data(), numel(k) * sizeof(double));
+		else 
+			for (size_t i = 0; i < numel(k); i++)
+				m_fplan.x[i] = k[i];
 		
 	}
 	
@@ -118,10 +125,14 @@ public:
 	 * @param  w   Weights
 	 */
 	void 
-	Weights (const Matrix<double>& w)  {
+	Weights (const Matrix<T>& w)  {
 		
-		memcpy (m_iplan.w, w.Data(), numel(w) * sizeof(double));
-		
+		if (sizeof(T) == sizeof(double))
+			memcpy (m_iplan.w, w.Data(), numel(w) * sizeof(double));
+		else 
+			for (size_t i = 0; i < numel(w); i++)
+				m_iplan.w[i] = w[i];
+
 		nnfft::weights (m_fplan, m_iplan);
 		nnfft::psi     (m_fplan);
 		
@@ -134,8 +145,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<T> 
-	Trafo       (const Matrix<T>& m) const ;
+	Matrix< std::complex<T> >
+	Trafo       (const Matrix< std::complex<T> >& m) const ;
 	
 	
 	/**
@@ -144,8 +155,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix<T> 
-	Adjoint     (const Matrix<T>& m) const ;
+	Matrix< std::complex<T> >
+	Adjoint     (const Matrix< std::complex<T> >& m) const ;
 
 	/**
 	 * @brief     NFFT plan
@@ -176,14 +187,14 @@ private:
 	bool      m_initialised;      /**< @brief Memory allocated / Plans, well, planned! :)*/
 	bool      m_have_pc;
 
-	Matrix<T> m_pc;               /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
-	Matrix<T> m_cpc;              /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
+	Matrix< std::complex<T> > m_pc;  /**< @brief Phase correction (applied after inverse trafo)*/
+	Matrix< std::complex<T> > m_cpc; /**< @brief Phase correction (applied before forward trafo)*/
 	
 	int       m_N[4];             /**< @brief Image matrix side length (incl. k_{\\omega})*/
 	int       m_n[4];             /**< @brief Oversampling */
 	int       m_M;                /**< @brief Number of k-space knots */
 	int       m_maxit;            /**< @brief Number of Recon iterations (NFFT 3) */
-	double    m_epsilon;          /**< @brief Convergence criterium */
+	T         m_epsilon;          /**< @brief Convergence criterium */
 	size_t    m_imgsz;
 	
 	nfft_plan m_fplan;            /**< nfft  plan */
@@ -196,7 +207,7 @@ private:
 
 
 template<> inline Matrix<cxdb>
-NFFT<cxdb>::Adjoint (const Matrix<cxdb>& in) const {
+NFFT<double>::Adjoint (const Matrix<cxdb>& in) const {
 
 	Matrix<cxdb> out (m_N[0], m_N[1], m_N[2], m_N[3]);
 	
@@ -213,7 +224,7 @@ NFFT<cxdb>::Adjoint (const Matrix<cxdb>& in) const {
 
 
 template<> inline Matrix<cxdb>
-NFFT<cxdb>::Trafo (const Matrix<cxdb>& in) const {
+NFFT<double>::Trafo (const Matrix<cxdb>& in) const {
 
 	Matrix<cxdb> out (m_M,1);
 
@@ -230,7 +241,7 @@ NFFT<cxdb>::Trafo (const Matrix<cxdb>& in) const {
 
 
 template<> inline Matrix<cxfl>
-NFFT<cxfl>::Adjoint (const Matrix<cxfl>& in) const {
+NFFT<float>::Adjoint (const Matrix<cxfl>& in) const {
 
 	Matrix<cxdb> out (m_N[0], m_N[1], m_N[2], m_N[3]);
 	size_t m = m_M, i = m_imgsz;  
@@ -251,7 +262,7 @@ NFFT<cxfl>::Adjoint (const Matrix<cxfl>& in) const {
 
 
 template<> inline Matrix<cxfl>
-NFFT<cxfl>::Trafo (const Matrix<cxfl>& in) const {
+NFFT<float>::Trafo (const Matrix<cxfl>& in) const {
 
 	Matrix<cxfl> out (m_M,1);
 	size_t m = m_M, i = m_imgsz;  
