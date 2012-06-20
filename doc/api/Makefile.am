@@ -5,11 +5,11 @@ DOXY_STAMP = doxygen-build.stamp
 DOXY_FILE = doxy-codeare.conf
 
 EXTRA_DIST = $(static_docs) $(DOXY_FILE).in
-api_DATA = $(EXTRA_DIST) doxygen-build.stamp
-noinst_DATA = doxygen-build.stamp
 
 # Generate local API documentation?
 if BUILD_API
+
+api_DATA = $(EXTRA_DIST) doxygen-build.stamp
 
 doxygen-build.stamp: $(DOXY_FILE) $(top_srcdir)/src/*.hpp $(top_srcdir)/src/matrix/*.hpp $(top_srcdir)/src/misc/*.hpp 
 	doxygen $(DOXY_FILE)
