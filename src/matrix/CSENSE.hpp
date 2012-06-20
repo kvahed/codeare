@@ -154,10 +154,10 @@ private:
 
 };
 
-template<> template<>
-CSENSE<cxfl>::CSENSE (const Matrix<cxfl>& sens, const Matrix<size_t>& af, 
-					  const Matrix<size_t>& size, const Matrix<float>& mask, 
-					  const Matrix<float>& pc) {
+template<>
+CSENSE<float>::CSENSE (const Matrix<cxfl>& sens, const Matrix<size_t>& af,
+					   const Matrix<float>& mask, const Matrix<float>& pc, 
+					   const Matrix<float>& b0) {
 	
 	// We expect 4D sensitivities [X,Y,Z,C]
 	//m_dims = size(sens);
@@ -167,7 +167,7 @@ CSENSE<cxfl>::CSENSE (const Matrix<cxfl>& sens, const Matrix<size_t>& af,
 	for (size_t i = 0; i < m_ndim; i++)
 		ftdims[i] = m_dims[i];
 
-	m_dft  = new DFT<cxfl> (ftdims, mask, pc);
+	m_dft  = new DFT<float> (ftdims, mask, pc);
 	
     //Matrix<bool> isf = isinf (sens);
 
