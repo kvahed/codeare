@@ -1,5 +1,5 @@
 /*
- *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
+ *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -129,7 +129,7 @@ CGSENSE::Prepare () {
 
 	Matrix<cxfl>&   sens    = GetCXFL("sens");
 	Matrix<double>& weights = GetRLDB("weights");
-	Matrix<double>& kspace   = GetRLDB("kspace");
+	Matrix<double>& kspace  = GetRLDB("kspace");
 
 	size_t nk = numel(weights);
 

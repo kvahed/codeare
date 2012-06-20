@@ -1,5 +1,5 @@
 /*
- *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
+ *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify

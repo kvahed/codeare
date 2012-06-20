@@ -1,5 +1,5 @@
 /*
- *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
+ *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Daniel Brenner
  *                               Forschungszentrum Juelich, Germany
  *
