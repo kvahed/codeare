@@ -48,12 +48,13 @@ public:
 	 * 
 	 * @param  sens    Sensitivity maps if imsize
 	 * @param  af      Acceleration factor vector 2/3 elements for 2D/3D 
-	 * @param  b0      Off-resonance maps if available (default empty)
-	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
+	 * @param  mask    K-Space mask
+	 * @param  pc      Off-resonance maps if available (default empty)
+	 * @param  b0      Phase correction applied before forward or after adjoint transforms (default: empty)
 	 */
-	template <class S>
-	CSENSE             (const Matrix<T>& sens, const Matrix<size_t>& af, const Matrix<size_t>& size, 
-						const Matrix<S>& mask = Matrix<S>(1), const Matrix<S>& pc = Matrix<S>(1)) ;
+	CSENSE             (const Matrix< complex<T> >& sens, const Matrix<size_t>& af,
+			            const Matrix<T>& mask = Matrix<T>(1), const Matrix<T>& pc = Matrix<T>(1),	
+						const Matrix<T>& b0 = Matrix<T>(1));
 		
 
 	/**
@@ -138,10 +139,10 @@ private:
 
 	DFT<T>*        m_dft;
 
-	Matrix<double> m_b0;
+	Matrix<T>      m_b0;
 
-	Matrix<T>      m_sens;
-	Matrix<T>      m_pc;
+	Matrix< std::complex<T> > m_sens;
+	Matrix< std::complex<T> > m_pc;
 	
 	Matrix<size_t> m_af;
 	
