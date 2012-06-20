@@ -1,5 +1,5 @@
 /*
- *  jrrs Copyright (C) 2007-2010 Kaveh Vahedipour
+ *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
  *
  *  Stolen ;) from sparse MRI 0.2 by Michael Lustig
