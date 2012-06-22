@@ -738,6 +738,7 @@ Read (Matrix<T>&M, const TiXmlElement* e, string uri = "") {
 	string dloc  ((e->Attribute ( "dloc") != NULL) ? e->Attribute ( "dloc") : "");
 
 	uri += fname;
+	printf ("uri: %s, dname: %s, dloc: %s\n", uri.c_str(), dname.c_str(), dloc.c_str());
 
 	if      (ftype.compare ("HDF5") == 0)
 		return H5Read (M, uri, dname, dloc);
@@ -751,7 +752,7 @@ Read (Matrix<T>&M, const TiXmlElement* e, string uri = "") {
 
 
 }
-	//Matrix<T>& M, const std::string& fname, const std::string& dname, const std::string& dloc = "", const io_strategy& ios = HDF5) {
+
 
 
 

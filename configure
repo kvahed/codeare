@@ -733,7 +733,6 @@ AMTAR
 am__leading_dot
 SET_MAKE
 AWK
-mkdir_p
 MKDIR_P
 INSTALL_STRIP_PROGRAM
 STRIP
@@ -3019,12 +3018,6 @@ fi
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MKDIR_P" >&5
 $as_echo "$MKDIR_P" >&6; }
-
-mkdir_p="$MKDIR_P"
-case $mkdir_p in
-  [\\/$]* | ?:[\\/]*) ;;
-  */*) mkdir_p="\$(top_builddir)/$mkdir_p" ;;
-esac
 
 for ac_prog in gawk mawk nawk awk
 do
@@ -11699,10 +11692,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"59c8fdbd\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"8466248d\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Wed Jun 20 17:17:49 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Wed Jun 20 17:49:15 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
