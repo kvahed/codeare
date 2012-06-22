@@ -184,7 +184,7 @@ SimulateExc  (const Matrix<cxfl>&   b1, const Matrix<float>&  gr, const Matrix< 
 			  const Matrix<float>& ml0, const Matrix<float>& jac, 
 			  const size_t&         np, const float&          dt, const bool&           v, 
 			  const size_t&         nc, const size_t&         nt, const float&        gdt, 
-			  Matrix<cxfl>&  mxy,       Matrix<float>& mz) {
+			        Matrix<cxfl>&  mxy,       Matrix<float>&  mz) {
     
 	size_t            nr   = r.Dim(1);
 	

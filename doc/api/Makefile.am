@@ -1,4 +1,5 @@
 apidir = $(DESTDIR)$(docdir)/api
+resdir = $(apidir)/res
 
 static_docs = res/doxygen.css res/tabs.css
 DOXY_STAMP = doxygen-build.stamp
@@ -17,6 +18,7 @@ doxygen-build.stamp: $(DOXY_FILE) $(top_srcdir)/src/*.hpp $(top_srcdir)/src/matr
 
 install-data-local: doxygen-build.stamp
 	$(mkinstalldirs) $(apidir)
+	$(mkinstalldirs) $(resdir)
 	if test -d api; then \
 	  for dir in api/*; do \
 	    if test -d $$dir; then \
@@ -29,7 +31,7 @@ install-data-local: doxygen-build.stamp
 	      done \
 	    fi \
 	  done \
-	fi
+	fi \
 
 uninstall-local:
 	rm -rf $(apidir)
