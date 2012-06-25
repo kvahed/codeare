@@ -732,13 +732,21 @@ Read (Matrix<T>& M, const std::string& fname, const std::string& dname, const st
 template <class T> inline static bool
 Read (Matrix<T>&M, const TiXmlElement* e, string uri = "") {
 
-	string dname ((e->Attribute ("dname") != NULL) ? e->Attribute ("dname") : "");
-	string fname ((e->Attribute ("fname") != NULL) ? e->Attribute ("fname") : "");
-	string ftype ((e->Attribute ("ftype") != NULL) ? e->Attribute ("ftype") : "");
-	string dloc  ((e->Attribute ( "dloc") != NULL) ? e->Attribute ( "dloc") : "");
+	if (!e) {
+		printf ("Null pointer\n");
+		return false;
+	}
+
+	string dname ((e->Attribute ("dname")) ? e->Attribute ("dname") : "");
+	string fname ((e->Attribute ("fname")) ? e->Attribute ("fname") : "");
+	string ftype ((e->Attribute ("ftype")) ? e->Attribute ("ftype") : "");
+	string dloc  ((e->Attribute ( "dloc")) ? e->Attribute ( "dloc") : "");
 
 	uri += fname;
+
+#ifdef DEBUG
 	printf ("uri: %s, dname: %s, dloc: %s\n", uri.c_str(), dname.c_str(), dloc.c_str());
+#endif
 
 	if      (ftype.compare ("HDF5") == 0)
 		return H5Read (M, uri, dname, dloc);

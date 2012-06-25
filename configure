@@ -11692,10 +11692,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"8466248d\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"c3480b6f\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Wed Jun 20 17:49:15 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Fri Jun 22 09:56:08 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -19454,7 +19454,7 @@ rm -f conftest.mmap conftest.txt
 
 
 # Generate files
-ac_config_files="$ac_config_files src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/Makefile doc/api/doxy-codeare.conf"
+ac_config_files="$ac_config_files src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20600,8 +20600,8 @@ do
     "src/tinyxml/Makefile") CONFIG_FILES="$CONFIG_FILES src/tinyxml/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "doc/site/Makefile") CONFIG_FILES="$CONFIG_FILES doc/site/Makefile" ;;
-    "doc/api/Makefile") CONFIG_FILES="$CONFIG_FILES doc/api/Makefile" ;;
     "doc/api/doxy-codeare.conf") CONFIG_FILES="$CONFIG_FILES doc/api/doxy-codeare.conf" ;;
+    "doc/api/Makefile") CONFIG_FILES="$CONFIG_FILES doc/api/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
