@@ -233,7 +233,7 @@ public:
 
 		p = EH (m, m_sm, m_fts) * m_ic;
 		r = p;
-		x = zeros< std::complex<T> >(size(p));
+		x = p;
 		
 		rn = 0.0;
 		xn = pow(creal(norm(p)), 2);

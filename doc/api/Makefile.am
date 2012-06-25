@@ -6,13 +6,13 @@ DOXY_STAMP = doxygen-build.stamp
 DOXY_FILE = doxy-codeare.conf
 
 EXTRA_DIST = $(static_docs) $(DOXY_FILE).in
+api_DATA = $(EXTRA_DIST) doxygen-build.stamp ../../src/doc/mainpage.ixx
 
 # Generate local API documentation?
 if BUILD_API
 
-api_DATA = $(EXTRA_DIST) doxygen-build.stamp
 
-doxygen-build.stamp: $(DOXY_FILE) $(top_srcdir)/src/*.hpp $(top_srcdir)/src/matrix/*.hpp $(top_srcdir)/src/misc/*.hpp 
+doxygen-build.stamp: $(DOXY_FILE) $(top_srcdir)/src/*.hpp $(top_srcdir)/src/matrix/*.hpp $(top_srcdir)/src/misc/*.hpp ../../src/doc/mainpage.ixx
 	doxygen $(DOXY_FILE)
 	touch doxygen-build.stamp
 
@@ -31,7 +31,7 @@ install-data-local: doxygen-build.stamp
 	      done \
 	    fi \
 	  done \
-	fi \
+	fi; 
 
 uninstall-local:
 	rm -rf $(apidir)

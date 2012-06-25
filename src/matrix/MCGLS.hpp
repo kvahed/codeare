@@ -33,7 +33,7 @@
  * @return        Vector x
  */
 template<class T> static Matrix<T> 
-MCGLS (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit, const double& conv, const double& lambda) {
+MCGLS (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit = 100, const double& conv = 1.0e-6, const double& lambda = 0.0) {
 	
 	size_t ah   = size(A, 0);
 	size_t bh   = size(b, 0);
@@ -47,7 +47,7 @@ MCGLS (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit, const double
 	Matrix<T> p = gemm (A, b, 'C');
 	Matrix<T> r = p;
 	
-	Matrix<T> x (p.Dim()); 
+	Matrix<T> x = p;
 	Matrix<T> q;
 	
 	T         ts;

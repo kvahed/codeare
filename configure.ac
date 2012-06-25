@@ -639,6 +639,6 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 
 # Generate files
-AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/Makefile doc/api/doxy-codeare.conf])
+AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile])
 AC_OUTPUT
 
