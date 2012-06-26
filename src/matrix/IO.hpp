@@ -96,7 +96,7 @@ DimsToString (const Matrix<T>& M) {
 	
 	std::stringstream ss;
 		
-	for (size_t i = 0; i <= ndims(M); i++)
+	for (size_t i = 0; i < ndims(M); i++)
 		ss << (int)M.Dim(i) << " ";
 	
 	return ss.str();
@@ -129,7 +129,7 @@ ResToString (const Matrix<T>& M) {
 	
 	stringstream ss;
 	
-	for (size_t i = 0; i <= ndims(M); i++)
+	for (size_t i = 0; i < ndims(M); i++)
 		ss << M.Res(i) << " ";
 	
 	return ss.str();
@@ -357,10 +357,8 @@ Dump (const Matrix<T>& M, const string fname, const string dname, const string d
 	
 	if      (ios == HDF5)
 		return H5Dump (M, fname, dname, dloc);
-#ifdef HAVE_MAT_H
 	else if (ios == MATLAB)
 		return MXDump (M, fname, dname, dloc);
-#endif
 	else if (ios == NIFTI)
 		return NIDump (M, fname);
 	else
@@ -733,7 +731,9 @@ template <class T> inline static bool
 Read (Matrix<T>&M, const TiXmlElement* e, string uri = "") {
 
 	if (!e) {
+#ifdef DEBUG
 		printf ("Null pointer\n");
+#endif
 		return false;
 	}
 
@@ -1031,8 +1031,6 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 }
 
 
-#ifdef HAVE_MAT_H
-	
 /**
  * @brief          Dump matrix to MATLAB file
  * 
@@ -1047,6 +1045,8 @@ MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc =
 	
 	// Declare dimensions and allocate array -----
 	
+#ifdef HAVE_MAT_H
+
 	mwSize   dim[INVALID_DIM];
 	
 	for (size_t i = 0; i < INVALID_DIM; i++) 
@@ -1106,9 +1106,14 @@ MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc =
 	
 	return true;
 	
+#else 
+	
+	printf ("MATLAB IO ERROR - Didn't dump nothin'");
+	return false;
+	
+#endif
+	
 }
-
-#endif 
 	
 
 
@@ -1181,8 +1186,8 @@ NIDump (const Matrix<T>& M, const string fname) {
 		
 		nifti_1_header header;
 		header.sizeof_hdr = 348;
-		header.dim[0] = ndims(tmp) + 1;
-		header.pixdim[0] = ndims(tmp) + 1;
+		header.dim[0] = ndims(tmp);
+		header.pixdim[0] = ndims(tmp);
 		
 		if (ndims(tmp) > 7) {
 			printf ("Cannot dump more than 8 dimensions to NIFTI FILE\n.");

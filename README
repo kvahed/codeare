@@ -10,7 +10,7 @@ TESTS:
 lclient -t LapackTests
 lclient -b share/gradients/ -c config_vdcs.xml -t VDSpiral 
 lclient -b share/gradients/ -c config_karb.xml -t KArb
-lclient -b share/cgsense/ -d brain.h5 -c brain.xml -t CGSENSE 
+lclient -b share/cgsense/ -c brain.xml -t CGSENSE
 lclient -b share/ktpoints/ -d homogen.h5 -c config_homogen.xml -t KTPoints 
 lclient -b share/nufft/ -d doublepr.mat -c config.xml -t NuFFT
 lclient -b share/nufft/ -d singlepr.mat -c config.xml -t NuFFT

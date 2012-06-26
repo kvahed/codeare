@@ -28,15 +28,7 @@ cstest (Connector<T>* con) {
 	Matrix<cxfl>  pc;
 	
 	std::string   cf  = std::string (base + std::string(config));
-	std::string   df  = std::string (base + std::string(data));
 	std::string   odf = std::string (base + std::string("/csout.mat"));
-
-#ifdef HAVE_MAT_H	
-	if (!(MXRead (indata, df, "data")))	return false;
-	if (!(MXRead (pdf,    df, "pdf")))	pdf  = Matrix<float>(1);
-	if (!(MXRead (mask,   df, "mask")))	mask = Matrix<float>(1);
-	if (!(MXRead (pc,     df, "ph")))   pc   = Matrix<cxfl>(1);
-#endif
 
 	con->ReadConfig (cf.c_str());
 	
@@ -45,6 +37,16 @@ cstest (Connector<T>* con) {
 		return false;
 	}
 	
+	if (!Read (indata, con->GetElement("/config/data/data"), base))
+		return false;
+	if (!Read (pdf,    con->GetElement("/config/data/pdf"),  base))
+		pdf  = Matrix<float>(1);
+	if (!Read (mask,   con->GetElement("/config/data/mask"), base))
+		mask = Matrix<float>(1);
+	if (!Read (pc,     con->GetElement("/config/data/pc"),   base))
+		pc   = Matrix<cxfl> (1);
+
+
 	// Outgoing -------------
 	
 	con->SetMatrix  ("data", indata); // Measurement data

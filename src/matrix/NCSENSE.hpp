@@ -110,7 +110,7 @@ public:
 			 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1)) {
 		
 
-		m_dim = ndims(sens);
+		m_dim = ndims(sens)-1;
 		Matrix<size_t> ms (m_dim,1);
 		for (size_t i = 0; i < m_dim; i++)
 			ms[i] = size(sens,i);
@@ -254,11 +254,10 @@ public:
 			if (m_lambda)
 				q  += m_lambda * p;
 			
-			ts  = rn;
-			ts /= p.dotc(q);
+			ts  = rn / p.dotc(q);
 			x  += ts * p;
 			r  -= ts * q;
-			p  *= pow(creal(norm(r)), 2)/rn;
+			p  *= pow(creal(norm(r)), 2) / rn;
 			p  += r;
 			
 		}

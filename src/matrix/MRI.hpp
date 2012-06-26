@@ -5,7 +5,7 @@
 template <class T> inline static Matrix<T>
 IntensityMap (const Matrix< std::complex <T> >& sens, bool sqroot = true) {
 
-	size_t dim = ndims(sens);
+	size_t dim = ndims(sens)-1;
 	size_t nc  = size(sens,dim);
 	size_t nr  = numel(sens)/nc;
 	
