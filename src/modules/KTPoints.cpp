@@ -50,7 +50,7 @@ KTPoints::Init           ()  {
     printf ("  # transmitter: %i \n", m_nc);
     
     // rf pulse durations --------------------
-    m_pd = (int*) malloc (100 * sizeof(int));
+    m_pd = (int*) malloc (sizeof(int));
     Attribute ("pd",      &m_pd[0]);   
     printf ("  starting pulse durations: %ius \n", m_pd[0]*10);
 	
@@ -141,9 +141,8 @@ KTPoints::Process        () {
 	m_nk = k.Dim(1);
 	m_nc = b1.Dim(1);
 
-    m_max_rf = (float*) malloc (100 * sizeof(float));
-    for (int i = 0; i < m_nk; i++)
-        m_max_rf [m_nk] = 0.0; 
+    m_max_rf = (float*) calloc (m_nk,        sizeof(float));
+	m_pd     = (int*)  realloc (m_pd, m_nk * sizeof(int));
 	
     for (int i = 1; i < m_nk; i++)
         m_pd[i] = m_pd[0];
@@ -151,7 +150,7 @@ KTPoints::Process        () {
     Matrix<cxfl>    solution;
     Matrix<cxfl>    tmp;
     Matrix<cxfl>    final;    
-    Matrix<cxfl>    treg   =  eye<cxfl> (m_nc * m_nk) * cxfl (m_lambda, 0);
+    Matrix<cxfl>    treg   =  m_lambda * eye<cxfl>(m_nc * m_nk);
 	Matrix<cxfl>    ve;
 	Matrix<cxfl>    vp;
 
@@ -164,9 +163,7 @@ KTPoints::Process        () {
 	}
 
     bool        pulse_amp_ok = false;
-
     float       nrmse = 0.0;
-
 	std::vector<double> res;
 	int         gc    = 0;
 
@@ -187,24 +184,23 @@ KTPoints::Process        () {
         minv  = minv.prod (m, 'N', 'C');
         
         // Valriable exchange method --------------
-
         
         printf ("  Starting variable exchange method ...\n");
 
         for (int j = 0; j < m_maxiter; j++, gc++) {
-
+			
             solution = minv->*(target);
             tmp      = m->*(solution);
-
+			
             NRMSE (target, tmp, gc, nrmse);
-
+			
             res.push_back (nrmse);
             
 			if (m_verbose) memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cxfl)); 
 			if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) break;
             
             final    = solution;
-
+			
 			PhaseCorrection (target, tmp);
             
         } 
@@ -212,18 +208,18 @@ KTPoints::Process        () {
         printf ("\n  ... done.\n  Checking pulse amplitudes: "); fflush(stdout);
         
         // Check max pulse amplitude -----------------
-
+		
         RFLimits (final, m_pd, m_nk, m_nc, m_max_rf); 
-
+		
         pulse_amp_ok = true;
-
+		
         for (int i = 0; i < m_nk; i++)
             if (m_max_rf[i] > m_rflim) pulse_amp_ok = false;
         
         // Update Pulse durations if necessary -------
-
+		
         if (!pulse_amp_ok) {
-            
+			
             printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
             
             for (int i = 0; i < m_nk; i++) {
@@ -232,6 +228,7 @@ KTPoints::Process        () {
 			}
             
             printf ("[us] ... done.\n");
+
         } else 
 			printf ("OK\n");
         

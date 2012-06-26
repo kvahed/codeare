@@ -107,6 +107,16 @@ extern "C" {
 /**
  * @brief         Eigenvalue decomposition
  * 
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxfl> m = rand<cxfl> (10,10), lv, rv;
+ *   Matrix<float> ev;
+ * 
+ *   int res = eig (m, ev, lv, rv, 'N', 'N');
+ * @endcode
+ * where m is the complex decomposed matrix, lv and rv are the left hand and right 
+ * hand side eigen vectors and ev is the real eigenvalue vector.
+ *
  * @see           LAPACK driver xGEEV
  *
  * @param  m      Matrix for decomposition
@@ -217,6 +227,16 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 
 /**
  * @brief           Singular value decomposition
+ *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxfl>  m = rand<cxfl> (20,10), u, v;
+ *   Matrix<float> s;
+ * 
+ *   int res = svd (m, s, u, v, 'N');
+ * @endcode
+ * where m is the complex decomposed matrix, u and v are the left hand and right 
+ * hand side singular vectors and s is the vector of real singular values.
  *
  * @see             LAPACK driver xGESDD
  * 
@@ -329,6 +349,13 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 /**
  * @brief                Invert quadratic well conditioned matrix
  *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxfl> m = rand<cxfl> (10,10);
+ *  
+ *   m = inv (m);
+ * @endcode
+ *
  * @see                  Lapack xGETRF/xGETRI
  * 
  * @param  m             Matrix
@@ -402,6 +429,13 @@ inv (const Matrix<T>& m) {
 /**
  * @brief                Pseudo invert though SVD
  * 
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxfl> m = rand<cxfl> (20,10);
+ *
+ *   m = pinv (m);
+ * @endcode
+ *
  * @see                  LAPACK driver xGELSD
  * 
  * @param  m             Matrix
@@ -488,6 +522,14 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 /**
  * @brief        Cholesky decomposition of positive definite quadratic matrix
  *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxfl> m = rand<cxfl> (20,10);
+ *   
+ *   m = m.prodt(m); // m*m' Must be positive definite 
+ *   m = chol (m);
+ * @endcode
+ *
  * @see          LAPACK driver xPOTRF
  * 
  * @param  A     Incoming matrix
@@ -517,6 +559,14 @@ chol (const Matrix<T>& A, const char uplo = 'U') {
 
 /**
  * @brief          Matrix matrix multiplication
+ *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxfl> m = rand<cxfl> (20,10);
+ *   Matrix<cxfl> x = rand<cxfl> (10, 6);
+ *  
+ *   m   = gemm (m, b, 'N', 'C');
+ * @endcode
  *
  * @see            BLAS routine xGEMM
  *
@@ -577,6 +627,12 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
 /**
  * @brief              Eclidean norm
  *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxfl> m = rand<cxfl> (20,10);
+ *   float normm    = creal(norm (m)); // Lapack driver below produces complex variable with real value
+ * @cendode
+ *
  * @param  M           Input
  * @return             Eclidean norm
  */
@@ -604,13 +660,6 @@ norm (const Matrix<T>& M) {
 
 
 
-/**
- * @brief              Complex dot product (A'*B) on data vector
- *
- * @param  A           Left factor (is conjugated)
- * @param  B           Right factor 
- * @return             A'*B
- */
 template <class T> static T 
 DOTC (const Matrix<T>& A, const Matrix<T>& B) {
 	
@@ -629,19 +678,27 @@ DOTC (const Matrix<T>& A, const Matrix<T>& B) {
 	return res;
 	
 }
+
+/**
+ * @brief              Complex dot product (A'*B) on data vector
+ *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxdb> a = rand<cxdb> (20,1);
+ *   Matrix<cxdb> b = rand<cxdb> (20,1);
+ *   double dotpr   = dotc (a, b);
+ * @cendode
+ *
+ * @param  A           Left factor (is conjugated)
+ * @param  B           Right factor 
+ * @return             A'*B
+ */
 template <class T> static T 
 dotc (const Matrix<T>& A, const Matrix<T>& B) {
 	return DOTC (A,B);
 }
 
 
-/**
- * @brief              Complex dot product (A*B) on data vector
- *
- * @param  A           Left factor
- * @param  B           Right factor 
- * @return             A*B
- */
 template <class T> static T 
 DOTU (const Matrix<T>& A, const Matrix<T>& B) {
 
@@ -660,19 +717,27 @@ DOTU (const Matrix<T>& A, const Matrix<T>& B) {
 	return res;
 	
 }
+
+/**
+ * @brief              Complex dot product (A*B) on data vector
+ *
+ * Usage: 
+ * @code{.cpp}
+ *   Matrix<cxdb> a = rand<cxdb> (20,1);
+ *   Matrix<cxdb> b = rand<cxdb> (20,1);
+ *   double dotpr   = dotu (a, b);
+ * @cendode
+ *
+ * @param  A           Left factor
+ * @param  B           Right factor 
+ * @return             A*B
+ */
 template <class T> static T 
 dotu (const Matrix<T>& A, const Matrix<T>& B) {
 	DOTU (A, B);
 }
 
 
-/**
- * @brief              Dot product (A*B) on data vector
- *
- * @param  A           Left factor
- * @param  B           Right factor 
- * @return             A*B
- */
 template <class T> T 
 DOT  (const Matrix<T>& A, const Matrix<T>& B) {
 	
@@ -693,6 +758,22 @@ DOT  (const Matrix<T>& A, const Matrix<T>& B) {
 	return res;
 	
 }
+
+
+/**
+ * @brief              Dot product (A*B) on data vector
+ *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<float> a = rand<float> (20,1);
+ *   Matrix<float> b = rand<float> (20,1);
+ *   double dotpr    = dot (a, b);
+ * @cendode
+ *
+ * @param  A           Left factor
+ * @param  B           Right factor 
+ * @return             A*B
+ */
 template <class T> T 
 dot  (const Matrix<T>& A, const Matrix<T>& B) {
 	return DOT (A, B);
@@ -701,6 +782,13 @@ dot  (const Matrix<T>& A, const Matrix<T>& B) {
 
 /**
  * @brief             Matrix vector product A*x
+ *
+ * Usage: 
+ * @code{.cpp}
+ *   Matrix<cxdb> A  = rand<cxdb> (20,5);
+ *   Matrix<cxdb> x  = rand<cxdb> (20,1);
+ *   double prod     = gemv (A, x, 'C');
+ * @cendode
  *
  * @param  A          left factor matrix
  * @param  x          Right factor vector

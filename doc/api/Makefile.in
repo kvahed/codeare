@@ -474,7 +474,7 @@ uninstall-am: uninstall-apiDATA uninstall-local
 
 # Generate local API documentation?
 
-@BUILD_API_TRUE@doxygen-build.stamp: $(DOXY_FILE) $(top_srcdir)/src/*.hpp $(top_srcdir)/src/matrix/*.hpp $(top_srcdir)/src/misc/*.hpp ../../src/doc/mainpage.ixx
+@BUILD_API_TRUE@doxygen-build.stamp: $(DOXY_FILE) $(top_srcdir)/src/*.hpp $(top_srcdir)/src/matrix/*.hpp $(top_srcdir)/src/misc/*.hpp ../../src/doc/mainpage.ixx ../../src/doc/matrix.ixx
 @BUILD_API_TRUE@	doxygen $(DOXY_FILE)
 @BUILD_API_TRUE@	touch doxygen-build.stamp
 

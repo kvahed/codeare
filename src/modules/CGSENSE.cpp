@@ -136,7 +136,7 @@ CGSENSE::Prepare () {
 	m_ncs = new NCSENSE<float>
 		(sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
 
-	size_t dim = ndims(sens);
+	size_t dim = ndims(sens) - 1;
 
 	Matrix<cxfl>& image = AddMatrix 
 		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(size(sens,0), size(sens,1), (dim == 3) ? size(sens,2) : 1)));

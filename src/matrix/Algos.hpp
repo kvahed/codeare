@@ -45,6 +45,13 @@ is_inf (T const& x) {
 /**
  * @brief    Number of non-zero elements
  *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m = rand<double> (8,4,9,1,4);
+ * 
+ *   size_t nonz = nnz (M); // 1152
+ * @endcode
+ *
  * @param M  Matrix
  * @return   Number of non-zero elements of matrix M
  */
@@ -257,6 +264,12 @@ dofinite (const Matrix<T>& M, const T& v = 0) {
 /**
  * @brief       Sum of squares over a dimension
  * 
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = sos (M,1); // dims (8,6);
+ * @endcode
+ *
  * @param  M    Matrix
  * @param  d    Dimension
  * @return      Sum of squares
@@ -273,7 +286,13 @@ SOS (const Matrix<T>& M, const size_t d) {
 
 
 /**
- * @brief          Get rid of unused dimension 
+ * @brief          Get rid of unused dimensions
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (1,8,7,1,6);
+ *   m = squeeze (m); // dims: (8,7,6); 
+ * @endcode
  *
  * @param  M       Matrix
  * @return         Squeezed matrix
@@ -301,6 +320,12 @@ squeeze (Matrix<T>& M) {
 
 /**
  * @brief     Sum along a dimension
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = sum (m,0); // dims (7,6);
+ * @endcode
  *
  * @param  M  Matrix
  * @param  d  Dimension
@@ -364,6 +389,12 @@ sum (Matrix<T>& M, const size_t d) {
 /**
  * @brief     Highest dimension unequal 1
  * 
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   size_t  nd       = ndims(m); // 2
+ * @endcode
+ *
  * @param  M  Matrix
  * @return    Highest non-one dimension
  */
@@ -375,7 +406,7 @@ ndims (const Matrix<T>& M) {
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		nd  = (M.Dim(i) > 1) ? i : nd;
 	
-	return nd;
+	return (nd + 1);
 	
 }
 
@@ -604,7 +635,7 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	
 	// Check that perm only includes one number between 0 and INVALID_DIM once
 	size_t ndnew = numel(perm), i, j;
-	size_t ndold = ndims (M) + 1; 
+	size_t ndold = ndims (M); 
 
 	// Must have same number of dimensions
 	assert (ndnew == ndold);
