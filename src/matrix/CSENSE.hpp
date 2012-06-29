@@ -108,9 +108,11 @@ public:
 	Matrix< std::complex<T> >
 	Adjoint       (const Matrix< std::complex<T> >& m) const {
 		
-		Matrix< std::complex<T> > res;
-		Matrix< std::complex<T> > s (m_nc, m_af);
-		Matrix< std::complex<T> > rp (m_nc);
+		Matrix< std::complex<T> > res (m_dims[0], m_dims[1]/*, m_dims[2]*/);
+		Matrix< std::complex<T> > s  (m_nc, m_af);
+		Matrix< std::complex<T> > si;
+		Matrix< std::complex<T> > ra (m_nc,1);
+		Matrix< std::complex<T> > rp (m_af,1);
 		Matrix< std::complex<T> > tmp = m;
 
 		// FT individual channels
@@ -132,26 +134,25 @@ public:
 				/*for (size_t z = 0; z < m_dims[2]; z++)*/ {
 
 				for (size_t c = 0; c < m_nc; c++) {
-					rp [c] = m (y, x, c);
+					ra [c] = tmp (x, y, c);
 					for (size_t i = 0; i < m_af; i++) 
 						s (c, i) = m_sens (x, y + m_dims[1]/m_af * i, /*z,*/ c);
 				}
 				
 				//s = inv(s'*s)*s';
-				s = s.prodt(s);
-				s = inv (s);                
-				s = s.prodt(s);
+				si = gemm (s,   s, 'C', 'N');
+				si = inv (si);                
+				si = gemm (si,  s, 'N', 'C');
 				
 				// rp=si*imfold(:,y,x);
-				//rp = s.prodt(rp);
-				/*	
-						for (size_t i = 0; i < m_af; i++)
-						res (y + m_dims[1] * i, x, z) = rp [i]; 
-					*/
-					
-				}
+				rp = gemm (si, ra, 'N', 'N');
 
-		return tmp;
+				for (size_t i = 0; i < m_af; i++)
+					res (x, y + m_dims[1]/m_af * i /*, z*/) = rp [i]; 
+					
+			}
+		
+		return res;
 		
 	}
 
