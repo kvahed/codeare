@@ -118,15 +118,13 @@ public:
 		// FT individual channels
 		for (size_t i = 0; i < m_nc; i++)
 			if (m_ndim == 2)
-				if (m_af % 2)
+				
 					Slice  (tmp, i, *m_dft ->* fftshift(Slice  (tmp, i)));
-				else
-					Slice  (tmp, i, *m_dft ->*          Slice  (tmp, i));
+
 			else
-				if (m_af % 2)
+
 					Volume (tmp, i, *m_dft ->* fftshift(Volume (tmp, i)));
-				else
-					Volume (tmp, i, *m_dft ->*          Volume (tmp, i));
+
 
 		// Antialias
 		for (size_t x = 0; x < m_dims[0]; x++)
