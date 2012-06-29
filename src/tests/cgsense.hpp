@@ -32,10 +32,7 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	Matrix<cxfl>   image;
 	Matrix<cxfl>   signals;
 	
-	std::string    cf  = std::string (base + std::string(config));        // Configuration file (f.e. share/cgsense/config_human.xml)
 	std::string    odf = std::string (base + std::string("/images.mat")); // Binary Ouput (images etc)
-	
-	rc->ReadConfig (cf.c_str());
 	
 	if (!Read (rawdata, rc->GetElement("/config/data/d"), base) ||
 		!Read (kspace,  rc->GetElement("/config/data/k"), base) ||

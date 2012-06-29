@@ -211,7 +211,7 @@ public:
 	Matrix< std::complex<T> >
 	Trafo       (const Matrix< std::complex<T> >& m) const {
 
-		Matrix< std::complex<T> > tmp = m * m_ic;
+		Matrix< std::complex<T> > tmp = m / m_ic;
 		return E (tmp, m_sm, m_fts);
 
 	}
@@ -233,7 +233,7 @@ public:
 
 		p = EH (m, m_sm, m_fts) * m_ic;
 		r = p;
-		x = p;
+		x = zeros<cxfl>(size(p));
 		
 		rn = 0.0;
 		xn = pow(creal(norm(p)), 2);
@@ -247,9 +247,10 @@ public:
 				break;
 			
 			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
-			
-			q   = E  (p * m_ic, m_sm, m_fts);
-			q   = EH (q, m_sm, m_fts) * m_ic;
+
+			//p  *= 
+			q   = EH (E  (p * m_ic, m_sm, m_fts), m_sm, m_fts);
+			q  *= m_ic;
 			
 			if (m_lambda)
 				q  += m_lambda * p;

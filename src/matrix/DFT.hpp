@@ -44,7 +44,7 @@ public:
 	 * @param  mask  K-Space mask (if left empty no mask is applied)
 	 * @param  pc    Phase correction (or target phase)
 	 */
-	DFT         (const Matrix<size_t>& size, const Matrix<T>& mask = Matrix<T>(1),
+	DFT         (const Matrix<size_t>& size, const Matrix<T>& mask,
 				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1));
 	
 
@@ -82,7 +82,28 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix< std::complex<T> >
-	Trafo       (const Matrix< std::complex<T> >& m) const ;
+	Trafo       (const Matrix< std::complex<T> >& m) const {
+
+		size_t cs = sizeof (std::complex<T>) * m_N;
+
+		Matrix<cxfl> res = fftshift(m);
+		
+		memcpy (m_in, &res[0], cs);
+		
+		if (m_have_pc)
+			res *= m_pc;
+		
+		if      (typeid(float)  == typeid(T)) fftwf_execute (m_fwdplanf);
+		else if (typeid(double) == typeid(T)) fftw_execute  (m_fwdplan);
+		
+		memcpy (&res[0], m_out, cs);
+		
+		if (m_have_mask)
+			res *= m_mask;
+		
+		return fftshift(res/sqrt((T)m.Size()));
+
+	}
 	
 	
 	/**
@@ -92,7 +113,28 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix< std::complex<T> >
-	Adjoint     (const Matrix< std::complex<T> >& m) const;
+	Adjoint     (const Matrix< std::complex<T> >& m) const {
+
+		size_t cs = sizeof (std::complex<T>) * m_N;
+		
+		Matrix<cxfl> res = fftshift(m);
+		
+		if (m_have_mask)
+			res *= m_mask;
+		
+		memcpy (m_in,  &res[0], cs);
+		
+		if      (typeid(float)  == typeid(T)) fftwf_execute (m_bwdplanf);
+		else if (typeid(double) == typeid(T)) fftw_execute  (m_bwdplan);
+		
+		memcpy (&res[0], m_out, cs);
+		
+		if (m_have_pc)
+			res *= m_cpc;
+		
+		return fftshift(res/sqrt((T)m.Size()));
+
+	}
 	
 	
 private:
@@ -106,6 +148,7 @@ private:
 	
 	fftwf_plan     m_fwdplanf;     /**< @brief Forward plan (double precision)*/
 	fftwf_plan     m_bwdplanf;     /**< @brief Backward plan (double precision)*/
+
 	fftw_plan      m_fwdplan;      /**< @brief Forward plan (single precision)*/
 	fftw_plan      m_bwdplan;      /**< @brief Forward plan (single precision)*/
 	
@@ -285,16 +328,16 @@ DFT<float>::DFT (const Matrix<size_t>& size, const Matrix<float>& mask,
 
 
 template<> 
-DFT<float>::DFT (const Matrix<size_t>& size) : m_N(1),
+DFT<float>::DFT (const Matrix<size_t>& sl) : m_N(1),
 											   m_have_mask (false),
 											   m_have_pc (false) {
 
-	
-	int rank = size.Size();
+
+	int rank = numel(sl);
 	int n[rank];
 
 	for (int i = 0; i < rank; i++) {
-		n[i]  = (int)size[rank-1-i];
+		n[i]  = (int) sl[rank-1-i];
 		m_N  *= n[i];
 	}
 
@@ -399,8 +442,8 @@ DFT<double>::~DFT () {
 
 	fftw_cleanup ();
 
-	fftw_free(m_in); 
-	fftw_free(m_out);
+	fftw_free (m_in); 
+	fftw_free (m_out);
 
 }
 
@@ -409,36 +452,20 @@ template<> Matrix<cxfl>
 DFT<float>::Trafo (const Matrix<cxfl>& m) const {
 	
     Matrix<cxfl> res = fftshift(m);
+
 	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
+
 	if (m_have_pc)
 		res *= m_pc;
 
 	fftwf_execute(m_fwdplanf);
 
 	memcpy (&res[0], m_out, sizeof(fftwf_complex) * m_N);
+
 	if (m_have_mask)
 		res *= m_mask;
 
     return fftshift(res/sqrt((float)m.Size()));
-	
-}
-
-
-template<> Matrix<cxfl>
-DFT<float>::Adjoint (const Matrix<cxfl>& m) const {
-
-    Matrix<cxfl> res = fftshift(m);
-	if (m_have_mask)
-		res *= m_mask;
-	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
-
-	fftwf_execute(m_bwdplanf);
-
-	memcpy (&res[0], m_out, sizeof(fftwf_complex) * m_N);
-	if (m_have_pc)
-		res *= m_cpc;
-
-	return fftshift(res/sqrt((float)m.Size()));
 	
 }
 
@@ -461,24 +488,6 @@ DFT<double>::Trafo (const Matrix<cxdb>& m) const {
 	
 }
 
-
-template<> Matrix<cxdb>
-DFT<double>::Adjoint (const Matrix<cxdb>& m) const {
-
-    Matrix<cxdb> res = fftshift(m);
-	if (m_have_mask)
-		res *= m_mask;
-	memcpy (m_in, &res[0], sizeof(fftw_complex) * m_N);
-
-	fftw_execute(m_bwdplan);
-
-	memcpy (&res[0], m_out, sizeof(fftw_complex) * m_N);
-	if (m_have_pc)
-		res *= m_cpc;
-
-	return fftshift(res/sqrt((float)m.Size()));
-	
-}
 
 #endif
 

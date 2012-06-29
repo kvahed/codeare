@@ -80,8 +80,12 @@ namespace RRStrategy {
 
 	private:
 
-		CSENSE<cxfl>* m_cst; 
+		CSENSE<float>*  m_cs;      /**< Cartesian sense operators (Multi-Core Reco)*/
 
+		unsigned short m_ncpus;   /**< Number of threads */
+		unsigned short m_af;      /**< Acceleration factor */
+
+		bool           m_compgfm; /**< Compute g-factor map */
 
 	};
 

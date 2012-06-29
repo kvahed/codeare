@@ -24,6 +24,7 @@
 #include "Algos.hpp"
 #include "CX.hpp"
 #include "DFT.hpp"
+#include "Access.hpp"
 
 /**
  * @brief SENSE: Sensitivity Encoding for Fast MRI<br/>
@@ -49,18 +50,52 @@ public:
 	 * @param  sens    Sensitivity maps if imsize
 	 * @param  af      Acceleration factor vector 2/3 elements for 2D/3D 
 	 * @param  mask    K-Space mask
-	 * @param  pc      Off-resonance maps if available (default empty)
-	 * @param  b0      Phase correction applied before forward or after adjoint transforms (default: empty)
+	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
+	 * @param  b0      Off-resonance maps if available (default empty)
 	 */
-	CSENSE             (const Matrix< complex<T> >& sens, const Matrix<size_t>& af,
-			            const Matrix<T>& mask = Matrix<T>(1), const Matrix<T>& pc = Matrix<T>(1),	
-						const Matrix<T>& b0 = Matrix<T>(1));
+	CSENSE             (const Matrix< std::complex<T> >& sens, const unsigned short& af,
+			            const Matrix<T>& mask = Matrix<T>(1), 
+						const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
+						const Matrix<T>& b0 = Matrix<T>(1)) : m_initialised (false) {
 		
+		// Sensitivity maps dictate FT size
+		m_dims = size(sens);
+
+		// We expect sensitivities O (Ch,X,Y[,Z])
+		m_ndim = numel(m_dims)-1;
+		m_nc   = m_dims[m_ndim];
+
+		// Handle only 2D / 3D
+		assert (m_ndim == 2 || m_ndim == 3);
+		
+		// Set up FT
+		Matrix<size_t> ftdims (m_ndim,1);
+		
+		for (size_t i = 0; i < m_ndim; i++)
+			ftdims[i] = m_dims[i];
+
+		ftdims[1] /= af;
+
+		m_dft  = new DFT<T> (ftdims);
+		
+		// Privates
+		m_sens = sens;
+		m_af   = af;
+
+		// We're good
+		m_initialised = true;
+	
+	}
+
 
 	/**
 	 * @brief          Clean up and destruct
 	 */
 	~CSENSE            () {
+
+		if (m_initialised)
+			delete m_dft;
+	
 	}
 
 
@@ -70,64 +105,66 @@ public:
 	 * @param  m       To transform
 	 * @return         Transform
 	 */
-	Matrix<T> 
-	Adjoint            (const Matrix<T>& m) const {
+	Matrix< std::complex<T> >
+	Adjoint       (const Matrix< std::complex<T> >& m) const {
 		
-		Matrix<T> res;
-		Matrix<T> s (m_nc,m_af[1]);
-		Matrix<T> rp;
-		Matrix<T> tmp;
+		Matrix< std::complex<T> > res;
+		Matrix< std::complex<T> > s (m_nc, m_af);
+		Matrix< std::complex<T> > rp (m_nc);
+		Matrix< std::complex<T> > tmp = m;
 
 		// FT individual channels
-		/*
-		for (size_t i = 0; i < m_dims[3]; i++) {
+		for (size_t i = 0; i < m_nc; i++)
+			if (m_ndim == 2)
+				if (m_af % 2)
+					Slice  (tmp, i, *m_dft ->* fftshift(Slice  (tmp, i)));
+				else
+					Slice  (tmp, i, *m_dft ->*          Slice  (tmp, i));
+			else
+				if (m_af % 2)
+					Volume (tmp, i, *m_dft ->* fftshift(Volume (tmp, i)));
+				else
+					Volume (tmp, i, *m_dft ->*          Volume (tmp, i));
 
-			if (m_ndim == 2) tmp = Slice  (m, i);
-			else             tmp = Volume (m, i);
-
-			tmp = m_dft ->* tmp;
-			
-			if (m_ndim == 2) Slice  (m,i,tmp);
-			else             Volume (m,i,tmp);
-
-		}
-		*/
 		// Antialias
 		for (size_t x = 0; x < m_dims[0]; x++)
-			for (size_t y = 0; y < m_dims[1]; y++) 
-				for (size_t z = 0; z < m_dims[2]; z++) {
+			for (size_t y = 0; y < m_dims[1]/m_af; y++) 
+				/*for (size_t z = 0; z < m_dims[2]; z++)*/ {
 
-					for (size_t c = 0; c < m_dims[3]; c++) 
-						for (size_t i = 0; i < m_af[1]; i ++) 
-							s (c, i) = m_sens (c, y + m_dims[1] * i, x, z);
+				for (size_t c = 0; c < m_nc; c++) {
+					rp [c] = m (y, x, c);
+					for (size_t i = 0; i < m_af; i++) 
+						s (c, i) = m_sens (x, y + m_dims[1]/m_af * i, /*z,*/ c);
+				}
+				
+				//s = inv(s'*s)*s';
+				s = s.prodt(s);
+				s = inv (s);                
+				s = s.prodt(s);
+				
+				// rp=si*imfold(:,y,x);
+				//rp = s.prodt(rp);
+				/*	
+						for (size_t i = 0; i < m_af; i++)
+						res (y + m_dims[1] * i, x, z) = rp [i]; 
+					*/
 					
-					// s=inv(s'*s)*s';
-					//s = s.prodt (s);
-					//s = inv (s);                
-					//s = s.prod  (!s);
-					
-					// rp=si*imfold(:,y,x);
-					// rp = m (y + m_dims[1], x);
-
-					//for (size_t i = 0; i < m_af[1]; i++)
-					//	res (y + m_dims[1] * i, x, z) = rp [i]; 
-
 				}
 
-		return res;
+		return tmp;
 		
 	}
 
 	
 	/**
 	 * @brief          Backward transform (SENSE backward trafo? I don't know!)<br/> Bloedsinn!
-	 *                 Why would anyone want to go back to sensitivity weightes undersampled k-space data?
+	 *                 Why would anyone want to go back to sensitivity weighted undersampled k-space data?
 	 *
 	 * @param  m       To transform
 	 * @return         Bummer! (This is not nice, right?)
 	 */
-	Matrix<T> 
-	Trafo             (const Matrix<T>& m) const {
+	Matrix< std::complex<T> > 
+	Trafo             (const Matrix< std::complex<T> >& m) const {
 		
 		assert (false);
 
@@ -144,7 +181,7 @@ private:
 	Matrix< std::complex<T> > m_sens;
 	Matrix< std::complex<T> > m_pc;
 	
-	Matrix<size_t> m_af;
+	unsigned short m_af;
 	
 	size_t         m_ndim;
 	Matrix<size_t> m_dims; /**< Operator dimensionality Valid: [2,3]*/
@@ -154,27 +191,5 @@ private:
 
 };
 
-template<>
-CSENSE<float>::CSENSE (const Matrix<cxfl>& sens, const Matrix<size_t>& af,
-					   const Matrix<float>& mask, const Matrix<float>& pc, 
-					   const Matrix<float>& b0) {
-	
-	// We expect 4D sensitivities [X,Y,Z,C]
-	//m_dims = size(sens);
-	m_ndim = (m_dims[2] == 1) ? 2 : 3;
-
-	Matrix<size_t> ftdims (m_ndim,1);
-	for (size_t i = 0; i < m_ndim; i++)
-		ftdims[i] = m_dims[i];
-
-	m_dft  = new DFT<float> (ftdims, mask, pc);
-	
-    //Matrix<bool> isf = isinf (sens);
-
-	//m_sens = sens;
-	//m_af   = af;
-	//m_pc   = pc;
-	
-}
 
 #endif
