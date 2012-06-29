@@ -1,5 +1,6 @@
 #include "compressedsensing.hpp"
 #include "cgsense.hpp"
+#include "sense.hpp"
 #include "directmethod.hpp"
 #include "dwt.hpp"
 #include "fft.hpp"

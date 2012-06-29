@@ -521,6 +521,7 @@ public:
 						  const size_t& idd = 0,
 						  const size_t& ide = 0,
 						  const size_t& ave = 0) const {
+
 		return _M [col+
 				   lin*_dim[COL]+
 				   cha*_dim[COL]*_dim[LIN]+
@@ -729,7 +730,11 @@ public:
      * @return          Requested scalar value.
      */
     T                  
-    operator()          (const size_t& p) const;
+    operator()          (const size_t& p) const {
+
+		return this->At(p);
+
+	}
 
     
     /**
@@ -739,7 +744,11 @@ public:
      * @return          Requested scalar value.
      */
     T&                 
-    operator()          (const size_t& p) ;
+    operator()          (const size_t& p) {
+
+		return this->At(p);
+
+	}
 
     
     /**
@@ -752,7 +761,9 @@ public:
     T
     inline 
 	operator()          (const size_t& col, const size_t& lin) const {
-        return _M[col + _dim[COL]*lin ];
+
+        return this->At(col, lin);
+
     }
     
 
@@ -765,7 +776,9 @@ public:
 	 */
     inline T&                  
     operator()           (const size_t& col, const size_t& lin) {
-        return _M[col + _dim[COL]*lin ];
+
+        return this->At(col, lin);
+
     }
     
     
@@ -779,7 +792,9 @@ public:
      */
     inline T                  
     operator()           (const size_t& col, const size_t& lin, const size_t& slc) const {
-        return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
+
+        return this->At(col, lin, slc);
+
     }
     
     
@@ -794,7 +809,9 @@ public:
      */
     inline T&                 
     operator()           (const size_t& col, const size_t& lin, const size_t& slc) {
-           return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
+
+		return this->At(col, lin, slc);
+
     }
     
 	
@@ -837,22 +854,7 @@ public:
 						  const size_t& ide = 0,
 						  const size_t& ave = 0) { 
 
-		return _M [col+
-				   lin*_dim[COL]+
-				   cha*_dim[COL]*_dim[LIN]+
-				   set*_dim[COL]*_dim[LIN]*_dim[CHA]+
-				   eco*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]+
-				   phs*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]+
-				   rep*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]+
-				   seg*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]+
-				   par*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
-				   slc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
-				   ida*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
-				   idb*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
-				   idc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
-				   idd*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
-				   ide*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
-				   ave*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+		return this->At (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
 		
 	}
 
@@ -895,22 +897,7 @@ public:
 						  const size_t& ide = 0,
 						  const size_t& ave = 0) const { 
 		
-		return _M [col+
-				   lin*_dim[COL]+
-				   cha*_dim[COL]*_dim[LIN]+
-				   set*_dim[COL]*_dim[LIN]*_dim[CHA]+
-				   eco*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]+
-				   phs*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]+
-				   rep*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]+
-				   seg*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]+
-				   par*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
-				   slc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
-				   ida*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
-				   idb*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
-				   idc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
-				   idd*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
-				   ide*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
-				   ave*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+		return this->At (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
 
 	}
 
@@ -3288,16 +3275,6 @@ Matrix<T>::operator[] (const size_t& p) {
     
     return _M[p];
     
-}
-
-
-template <class T> inline T 
-Matrix<T>::operator() (const size_t& a) const {
-
-    assert(a <  Size());
-
-    return _M[a];
-
 }
 
 

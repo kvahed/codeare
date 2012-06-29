@@ -648,22 +648,23 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 		occupied [perm[i]] = true;
 	}			
 
+	// Old and new sizes
 	Matrix<size_t> so = size (M);
 	Matrix<size_t> sn = ones<size_t> (16,1);
 
 	for (i = 0; i < ndnew; i++)
 		sn[i] = so[perm[i]];
 	
-	// Let the party begin
+	// Allocate new matrix with permuted dimensions
 	Matrix<T> res = zeros<T>(sn);
 
-	size_t d[16];
+	// Relation of old to new indices
+	size_t  d[16];
 	size_t od[16];
-	for (i = 0; i < ndnew; i++)
-		od[i] = perm[i];
-	for (     ; i <    16; i++)
-		od[i] = i;
+	for (i = 0; i < ndnew; i++) od[i] = perm[i];
+	for (     ; i <    16; i++)	od[i] =      i;
 	
+	// Copy data accordingly
 	for (d[15] = 0; d[15] < size(res,15); d[15]++)
 		for (d[14] = 0; d[14] < size(res,14); d[14]++)
 			for (d[13] = 0; d[13] < size(res,13); d[13]++)
@@ -680,12 +681,13 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 														for (d[ 2] = 0; d[ 2] < size(res, 2); d[ 2]++)
 															for (d[ 1] = 0; d[ 1] < size(res, 1); d[ 1]++)
 																for (d[ 0] = 0; d[ 0] < size(res, 0); d[ 0]++) 
-																	res (d[ 0], d[ 1], d[ 2], d[ 3], d[ 4], d[ 5], d[ 6], d[ 7],
-																		 d[ 8], d[ 9], d[10], d[11], d[12], d[13], d[14], d[15]) =
-																		M (d[od[ 0]], d[od[ 1]], d[od[ 2]], d[od[ 3]], 
-																		   d[od[ 4]], d[od[ 5]], d[od[ 6]], d[od[ 7]], 
-																		   d[od[ 8]], d[od[ 9]], d[od[10]], d[od[11]],
-																		   d[od[12]], d[od[13]], d[od[14]], d[od[15]]);
+																	res (d[ 0],d[ 1],d[ 2],d[ 3],d[ 4],d[ 5],
+																		 d[ 6],d[ 7],d[ 8],d[ 9],d[10],d[11],
+																		 d[12],d[13],d[14],d[15]) =
+																	  M (d[od[ 0]],d[od[ 1]],d[od[ 2]],d[od[ 3]], 
+																		 d[od[ 4]],d[od[ 5]],d[od[ 6]],d[od[ 7]], 
+																		 d[od[ 8]],d[od[ 9]],d[od[10]],d[od[11]],
+																		 d[od[12]],d[od[13]],d[od[14]],d[od[15]]);
 
 	return res;
 

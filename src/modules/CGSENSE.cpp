@@ -107,14 +107,6 @@ CGSENSE::Init() {
 	Attribute ("fteps",   &m_fteps);
 	// --------------------------------------
 
-	// Oversampling -------------------------
-
-	int      m           = 1;
-	double   alpha       = 1.0;
-
-	Attribute ("m",       &m);
-	Attribute ("alpha",   &alpha);
-
 	printf ("... done.\n\n");
 
 	return error;
@@ -160,16 +152,11 @@ CGSENSE::Process () {
 
 	RRSModule::error_code error = OK;
 
-	Matrix<cxfl>&   data    = GetCXFL("data");
-	Matrix<cxfl>&   image   = GetCXFL("image");
-	
-	NCSENSE<float>&  ncs = *m_ncs;
-
 	ticks cgstart = getticks();
 	
 	printf ("Processing CGSENSE ...\n");
 
-	image = ncs ->* data;
+	GetCXFL("image") = *m_ncs ->* GetCXFL("data");
 	FreeCXFL ("data");
 
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());

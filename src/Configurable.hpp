@@ -119,6 +119,18 @@ class Configurable {
 
 	
 	/**
+	 * @brief           Set a size type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline void
+	SetAttribute        (const char* name, unsigned short value) {
+		Configuration()->SetAttribute (name, (int)value);
+	}
+
+	
+	/**
 	 * @brief           Set a float type attribute
 	 *
 	 * @param  name     Attribute name 
@@ -170,7 +182,23 @@ class Configurable {
 
 	
 	/**
-	 * @brief           Set a bool type attribute
+	 * @brief           Set an unsigned short type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 * @return          Status
+	 */
+	inline int
+	Attribute           (const char* name, unsigned short* value) const {
+		int ival, success;
+		success = Configuration()->QueryIntAttribute (name, &ival);
+		*value = (unsigned short) ival;
+		return success;
+	}
+
+	
+	/**
+	 * @brief           Set an size_t type attribute
 	 *
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
