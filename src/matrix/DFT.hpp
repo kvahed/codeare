@@ -110,41 +110,50 @@ struct FTTraits<double> {
 };
 
 
+template<class T> inline static Matrix<T> 
+ifftShift (T *out, const T* in, size_t nx, size_t ny) {
+
+    const size_t hlen1 = (ny+1)/2;
+    const size_t hlen2 = ny/2;
+    const size_t shft1 = ((nx+1)/2)*ny + hlen1;
+    const size_t shft2 = (nx/2)*ny + hlen2;
+
+    const T* src = in;
+    for(T* tgt = out; tgt < out + shft1 - hlen1; tgt += ny, src += ny) { // (nx+1)/2 times
+        copy(src, src+hlen1, tgt + shft2);          //1->4
+        copy(src+hlen1, src+ny, tgt+shft2-hlen2); } //2->3
+    src = in;
+    for(T* tgt = out; tgt < out + shft2 - hlen2; tgt += ny, src += ny ){ // nx/2 times
+        copy(src+shft1, src+shft1+hlen2, tgt);         //4->1
+        copy(src+shft1-hlen1, src+shft1, tgt+hlen2); } //3->2
+
+}
+
+
 /**
  * @brief         FFT shift
  * 
  * @param   m     TO be shifted
  * @return        Shifted
  */
-template <class T> inline static Matrix<cxfl>
-fftshift        (const Matrix< std::complex<T> >& m) {
+template<class T> inline static Matrix<T>
+fftshift (const Matrix<T>& m) {
 	
 	assert (Is1D(m) || Is2D(m) || Is3D(m));
 	
-	Matrix< std::complex<T> > res  = m;
+	Matrix<T> res  = m;
 	
 	for (size_t s = 0; s < m.Dim(2); s++)
 		for (size_t l = 0; l < m.Dim(1); l++)
 			for (size_t c = 0; c < m.Dim(0); c++)
-				res.At (c,l,s) *= (T) pow ((T)-1.0, (T)(s+l+c));
+				res (c,l,s) *= (T) pow ((T)-1.0, (T)(s+l+c));
 	
 	return res;
 	
 }
+	
 
 
-/**
- * @brief         FFT shift (Inverse: i.e. Forward - works only for matrices with even side lengths)
- * 
- * @param   m     TO be shifted
- * @return        Shifted
- */
-template <class T> inline static Matrix<cxfl> 
-ifftshift        (const Matrix< std::complex<T> >& m) {
-	
-	return fftshift (m);	
-	
-}
 
 
 /**
@@ -219,7 +228,7 @@ class DFT : public FT<T> {
 	
 public:
 	
-
+	
 	/**
 	 * @brief        Construct FFTW plans for forward and backward FT with credentials
 	 * 
@@ -228,27 +237,28 @@ public:
 	 * @param  pc    Phase correction (or target phase)
 	 * @param  b0    Field distortion
 	 */
-	DFT         (const Matrix<size_t>& size, const Matrix<T>& mask,
+	DFT         (const Matrix<size_t>& sl, const Matrix<T>& mask,
 				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
 				 const Matrix<T>& b0 = Matrix<T>(1)) :
 		m_N(1), m_have_mask (false), m_have_pc (false) {
 		
-		int rank = size.Size();
-		int n[rank];
+		size_t rank = numel(sl);
+
+		int n [rank];
 		
-		if (mask.Size() > 1)
+		if (numel(mask) > 1) {
 			m_have_mask = true;
+			m_mask      = mask;
+		}
 		
-		m_mask = mask;
-		
-		if (pc.Size() > 1)
-			m_have_pc = true;
-	
-		m_pc   = pc;
-		m_cpc  = conj(pc);
+		if (numel(pc)   > 1) {
+			m_have_pc   = true;
+			m_pc        = pc;
+			m_cpc       = conj(pc);
+		}
 		
 		for (int i = 0; i < rank; i++) {
-			n[i]  = (int)size[rank-1-i];
+			n[i]  = (int) sl [rank-1-i];
 			m_N  *= n[i];
 		}
 		
@@ -274,21 +284,21 @@ public:
 
 		int n[rank];
 		
-		if (mask.Size() > 1)
+		if (numel(mask) > 1) {
 			m_have_mask = true;
+			m_mask      = mask;
+		}
 		
-		m_mask = mask;
+		if (pc.Size() > 1) {
+			m_have_pc   = true;
+			m_pc   = pc;
+			m_cpc  = conj(pc);
+		}
 		
-		if (pc.Size() > 1)
-			m_have_pc = true;
-		
-		m_pc   = pc;
-		m_cpc  = conj(pc);
-		
-		for (size_t i = 0; i < rank; i++)
+		for (size_t i = 0; i < rank; i++) {
 			n[i]  = sl;
-		
-		m_N   = pow ((float)sl, (int)rank);
+			m_N  *= n[i];
+		}
 		
 		Allocate (rank, n);
 		
@@ -348,23 +358,23 @@ public:
 	virtual Matrix< std::complex<T> >
 	Trafo       (const Matrix< std::complex<T> >& m) const {
 		
-		size_t cs = sizeof (std::complex<T>) * m_N;
+		Matrix< std::complex<T> > res = fftshift (m);
 		
-		Matrix<cxfl> res = fftshift(m);
-		
-		memcpy (m_in, &res[0], cs);
+		memcpy (m_in, &res[0], m_cs);
 		
 		if (m_have_pc)
 			res *= m_pc;
 		
 		FTTraits<T>::Execute (m_fwplan);
 		
-		memcpy (&res[0], m_out, cs);
+		memcpy (&res[0], m_out, m_cs);
 		
 		if (m_have_mask)
 			res *= m_mask;
+
+		res  = fftshift (res) / m_sn;
 		
-		return fftshift(res/sqrt((T)m.Size()));
+		return res;
 		
 	}
 	
@@ -378,24 +388,24 @@ public:
 	virtual Matrix< std::complex<T> >
 	Adjoint     (const Matrix< std::complex<T> >& m) const {
 		
-		size_t cs = sizeof (std::complex<T>) * m_N;
-		
-		Matrix<cxfl> res = fftshift(m);
+		Matrix< std::complex<T> > res = fftshift (m);
 		
 		if (m_have_mask)
 			res *= m_mask;
 		
-		memcpy (m_in,  &res[0], cs);
+		memcpy (m_in,  &res[0], m_cs);
 		
-		FTTraits<T>::Execute (m_fwplan);
+		FTTraits<T>::Execute (m_bwplan);
 		
-		memcpy (&res[0], m_out, cs);
+		memcpy (&res[0], m_out, m_cs);
 		
 		if (m_have_pc)
 			res *= m_cpc;
 		
-		return fftshift(res/sqrt((T)m.Size()));
-		
+		res  = fftshift (res) / m_sn;
+
+		return res;
+			
 	}
 	
 	
@@ -409,27 +419,36 @@ private:
 		m_fwplan = FTTraits<T>::DFTPlan (rank, n, m_in, m_out, FFTW_FORWARD,  FFTW_MEASURE);
 		m_bwplan = FTTraits<T>::DFTPlan (rank, n, m_in, m_out, FFTW_BACKWARD, FFTW_MEASURE);
 
+		m_cs     = m_N * sizeof(Type);
+		m_sn     = sqrt (m_N);
+
 	}
 
 
-	bool           m_initialised;  /**< @brief Memory allocated / Plans, well, planned! :)*/
+	bool      m_initialised;  /**< @brief Memory allocated / Plans, well, planned! :)*/
 	
 	Matrix<T> m_mask;         /**< @brief K-space mask (applied before inverse and after forward transforms) (double precision)*/
 	
-	Matrix< std::complex<T> >      m_pc;           /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
-	Matrix< std::complex<T> >      m_cpc;          /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
+	Matrix< std::complex<T> > 
+	          m_pc;           /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
+	Matrix< std::complex<T> > 
+	          m_cpc;          /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
 	
-	Plan m_fwplan;     /**< @brief Forward plan (double precision)*/
-	Plan m_bwplan;     /**< @brief Backward plan (double precision)*/
+	Plan      m_fwplan;       /**< @brief Forward plan (double precision)*/
+	Plan      m_bwplan;       /**< @brief Backward plan (double precision)*/
 
-	size_t         m_N;            /**< @brief # Nodes */
+	size_t    m_N;            /**< @brief # Nodes */
+	size_t    m_cs;
+
+	T         m_sn;
+
+	bool      m_have_mask;    /**< @brief Apply mask?*/
+	bool      m_have_pc;      /**< @brief Apply phase correction?*/
+	bool      m_zpad;         /**< @brief Zero padding? (!!!NOT OPERATIONAL YET!!!)*/
 	
-	bool           m_have_mask;    /**< @brief Apply mask?*/
-	bool           m_have_pc;      /**< @brief Apply phase correction?*/
-	bool           m_zpad;         /**< @brief Zero padding? (!!!NOT OPERATIONAL YET!!!)*/
-	
-	Type*          m_in;           /**< @brief Aligned fftw input*/
-	Type*          m_out;          /**< @brief Aligned fftw output*/
+	Type*     m_in;           /**< @brief Aligned fftw input*/
+	Type*     m_out;          /**< @brief Aligned fftw output*/
+
 	
 };
 
