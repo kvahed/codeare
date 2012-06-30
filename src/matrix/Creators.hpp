@@ -235,7 +235,7 @@ circle (const float* p, const size_t n, const T s = T(1)) {
 
 	for (size_t r = 0; r < res.Dim(1); r++)
 		for (size_t c = 0; c < res.Dim(0); c++)
-			res(c,r) = ( pow(((float)c-m[0])/rad, 2.0 ) + pow(((float)r-m[0])/rad, 2.0) <= 1.0) ? s : T(0.0);
+			res(c,r) = ( pow(((float)c-m[0])/rad, (float)2.0 ) + pow(((float)r-m[0])/rad, (float)2.0) <= 1.0) ? s : T(0.0);
 
 	return res;
 
@@ -268,7 +268,7 @@ sphere (const float* p, const size_t n, const T s = T(1)) {
 	for (size_t s = 0; s < res.Dim(2); s++)
 		for (size_t r = 0; r < res.Dim(1); r++)
 			for (size_t c = 0; c < res.Dim(0); c++)
-				res(c,r) = ( pow (((float)c-m[0])/rad, 2.0) + pow (((float)r-m[1])/rad, 2.0) + pow (((float)s-m[2])/rad, 2.0) <= 1.0) ? s : T(0.0);
+				res(c,r) = ( pow (((float)c-m[0])/rad, (float)2.0) + pow (((float)r-m[1])/rad, (float)2.0) + pow (((float)s-m[2])/rad, (float)2.0) <= 1.0) ? s : T(0.0);
 
 	return res;
 

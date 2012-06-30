@@ -259,6 +259,7 @@ CPUSimulator::CPUSimulator (SimulationBundle* sb) {
     m_nt   = m_sb->g->Dim(1);    // Time points
     m_nc   = m_sb->b1->Dim(1);     // # channels
 	m_nr   = m_sb->r->Dim(1);      // # spatial positions
+	m_rfsc = 1.0;
 	
 	// Intensity map for correction
 	m_ic = IntensityMap (*(m_sb->b1), false);

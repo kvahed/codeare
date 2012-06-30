@@ -583,9 +583,11 @@ min (const Matrix<T>& M) {
 
 
 /**
- * @brief           Minimal element
+ * @brief           Transpose
  *
  * @param  M        2D Matrix
+ * @param  conj     Conjugate while transosing
+ *
  * @return          Non conjugate transpose
  */
 template <class T> inline static Matrix<T>
