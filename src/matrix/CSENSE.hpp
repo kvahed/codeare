@@ -29,7 +29,10 @@
 /**
  * @brief SENSE: Sensitivity Encoding for Fast MRI<br/>
  *        MRM (1999): vol. 42 (5) pp. 952-962<br/>
- *        This operator acts of Cartesian k-space data
+ *        This multi-threaded operator acts on Cartesian 
+ *        k-space data 
+ *
+ * 
  */
 template <class T>
 class CSENSE : public FT<T> {
@@ -40,7 +43,16 @@ public:
 	/**
 	 * @brief          Default constructor
 	 */
-	CSENSE() : m_initialised (false) {};
+	CSENSE() {
+
+		// Some initing
+		m_initialised = false;
+		m_af          = 1;
+		m_dft         = 0;
+		m_ndim        = 1;
+		m_nc          = 1;
+
+	}
 
 
 	/**
@@ -57,14 +69,21 @@ public:
 			            const Matrix<T>& mask = Matrix<T>(1), 
 						const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
 						const Matrix<T>& b0 = Matrix<T>(1)) : m_initialised (false) {
-		
+
+		// Some initing
+		m_initialised = false;
+		m_af          = 1;
+		m_dft         = 0;
+		m_ndim        = 1;
+		m_nc          = 1;
+
 		// Sensitivity maps dictate FT size
 		m_dims = size(sens);
 
 		// We expect sensitivities O (Ch,X,Y[,Z])
 		m_ndim = numel(m_dims)-1;
 		m_nc   = m_dims[m_ndim];
-
+		
 		// Handle only 2D / 3D
 		assert (m_ndim == 2 || m_ndim == 3);
 		
@@ -73,18 +92,28 @@ public:
 		
 		for (size_t i = 0; i < m_ndim; i++)
 			ftdims[i] = m_dims[i];
-
+		
 		ftdims[1] /= af;
+		
+		int np;
 
-		m_dft  = new DFT<T> (ftdims);
+#pragma omp parallel default (shared)
+		{
+			np = omp_get_num_threads ();
+		}	
+
+		m_dft = new DFT<T>* [np];
+		
+		for (size_t i = 0; i < np; i++)
+			m_dft[i]  = new DFT<T> (ftdims, mask, pc, b0);
 		
 		// Privates
 		m_sens = sens;
 		m_af   = af;
-
+		
 		// We're good
 		m_initialised = true;
-	
+		
 	}
 
 
@@ -93,8 +122,20 @@ public:
 	 */
 	~CSENSE            () {
 
+		int np;
+		
+
+
+#pragma omp parallel default (shared)
+		{
+			np = omp_get_num_threads ();
+		}	
+		
+
+
 		if (m_initialised)
-			delete m_dft;
+			for (int i = 0; i < np; i++)
+				delete m_dft[i];
 	
 	}
 
@@ -109,51 +150,63 @@ public:
 	Adjoint       (const Matrix< std::complex<T> >& m) const {
 		
 		Matrix< std::complex<T> > res (m_dims[0], m_dims[1]/*, m_dims[2]*/);
-		Matrix< std::complex<T> > s  (m_nc, m_af);
-		Matrix< std::complex<T> > si;
-		Matrix< std::complex<T> > ra (m_nc,1);
-		Matrix< std::complex<T> > rp (m_af,1);
 		Matrix< std::complex<T> > tmp = m;
-
-		// FT individual channels
-		for (size_t i = 0; i < m_nc; i++)
-			if (m_ndim == 2)
-				
-					Slice  (tmp, i, *m_dft ->* fftshift(Slice  (tmp, i)));
-
-			else
-
-					Volume (tmp, i, *m_dft ->* fftshift(Volume (tmp, i)));
-
-
-		// Antialias
-		for (size_t x = 0; x < m_dims[0]; x++)
-			for (size_t y = 0; y < m_dims[1]/m_af; y++) 
-				/*for (size_t z = 0; z < m_dims[2]; z++)*/ {
-
-				for (size_t c = 0; c < m_nc; c++) {
-					ra [c] = tmp (x, y, c);
-					for (size_t i = 0; i < m_af; i++) 
-						s (c, i) = m_sens (x, y + m_dims[1]/m_af * i, /*z,*/ c);
-				}
-				
-				//s = inv(s'*s)*s';
-				si = gemm (s,   s, 'C', 'N');
-				si = inv (si);                
-				si = gemm (si,  s, 'N', 'C');
-				
-				// rp=si*imfold(:,y,x);
-				rp = gemm (si, ra, 'N', 'N');
-
-				for (size_t i = 0; i < m_af; i++)
-					res (x, y + m_dims[1]/m_af * i /*, z*/) = rp [i]; 
+		
+#pragma omp parallel
+		{
+			
+			int tid = omp_get_thread_num ();
+			
+			Matrix< std::complex<T> > s  (m_nc, m_af);
+			Matrix< std::complex<T> > si (m_af, m_af);
+			Matrix< std::complex<T> > ra (m_nc,1);
+			Matrix< std::complex<T> > rp (m_af,1);
+			
+#pragma omp for 
+			
+			// FT individual channels
+			for (size_t i = 0; i < m_nc; i++)
+				if (m_ndim == 2)
+					Slice  (tmp, i, *(m_dft[tid]) ->* fftshift(Slice  (tmp, i)));
+				else
+					Volume (tmp, i, *(m_dft[tid]) ->* fftshift(Volume (tmp, i)));
+			
+			
+#pragma omp for schedule (guided)
+			
+			// Antialias
+			for (size_t x = 0; x < m_dims[0]; x++)
+				for (size_t y = 0; y < m_dims[1]/m_af; y++) 
+					/*for (size_t z = 0; z < m_dims[2]; z++)*/ {
 					
-			}
+					for (size_t c = 0; c < m_nc; c++) {
+						
+						ra [c] = tmp (x, y, c);
+						
+						for (size_t i = 0; i < m_af; i++) 
+							s (c, i) = m_sens (x, y + m_dims[1]/m_af * i, /*z,*/ c);
+						
+					}
+					
+					//s = inv(s'*s)*s';
+					si = gemm (s,   s, 'C', 'N');
+					si = inv  (si);                
+					si = gemm (si,  s, 'N', 'C');
+					
+					// rp=si*imfold(:,y,x);
+					rp = gemm (si, ra, 'N', 'N');
+					
+					for (size_t i = 0; i < m_af; i++)
+						res (x, y + m_dims[1]/m_af * i /*, z*/) = rp [i]; 
+					
+				}
+			
+		}		
 		
 		return res;
 		
 	}
-
+	
 	
 	/**
 	 * @brief          Backward transform (SENSE backward trafo? I don't know!)<br/> Bloedsinn!
@@ -165,7 +218,9 @@ public:
 	Matrix< std::complex<T> > 
 	Trafo             (const Matrix< std::complex<T> >& m) const {
 		
-		assert (false);
+		Matrix < complex<T> > res;
+
+		return res;
 
 
 	}
@@ -173,7 +228,7 @@ public:
 
 private:
 
-	DFT<T>*        m_dft;
+	DFT<T>**       m_dft;
 
 	Matrix<T>      m_b0;
 

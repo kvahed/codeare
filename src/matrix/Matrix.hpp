@@ -601,120 +601,6 @@ public:
     }
     
 
-	
-	/**
-	 * @brief           Reshape (MATLAB-like reshape).<br/>
-	 *                  All dims beyond lin are optional.
-	 *
-     * @param  col      Column
-     * @param  lin      Line
-	 * @param  cha      Channel
-	 * @param  set      Set
-	 * @param  eco      Echo
-	 * @param  phs      Phase
-	 * @param  rep      Repetition
-	 * @param  seg      Segment
-	 * @param  par      Partition
-	 * @param  slc      Slice
-	 * @param  ida      Free index A
-	 * @param  idb      Free index B
-	 * @param  idc      Free index C
-	 * @param  idd      Free index D
-	 * @param  ide      Free index E
-     * @param  ave      Average
-     * @return          Reference to position
-	 */
-	inline Matrix <T>
-	Reshape             (const size_t& col, 
-						 const size_t& lin, 
-						 const size_t& cha = 1,
-						 const size_t& set = 1,
-						 const size_t& eco = 1,
-						 const size_t& phs = 1,
-						 const size_t& rep = 1,
-						 const size_t& seg = 1,
-						 const size_t& par = 1,
-						 const size_t& slc = 1,
-						 const size_t& ida = 1,
-						 const size_t& idb = 1,
-						 const size_t& idc = 1,
-						 const size_t& idd = 1,
-						 const size_t& ide = 1,
-						 const size_t& ave = 1) const {
-		
-		Matrix<T> res = (*this);
-		res.reshape (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-		return res;
-		
-	}
-	
-
-	/**
-	 * @brief           Reshape (MATLAB-like reshape).<br/> 
-	 *                  All dims beyond lin are optional.
-	 *
-     * @param  col      Column
-     * @param  lin      Line
-	 * @param  cha      Channel
-	 * @param  set      Set
-	 * @param  eco      Echo
-	 * @param  phs      Phase
-	 * @param  rep      Repetition
-	 * @param  seg      Segment
-	 * @param  par      Partition
-	 * @param  slc      Slice
-	 * @param  ida      Free index A
-	 * @param  idb      Free index B
-	 * @param  idc      Free index C
-	 * @param  idd      Free index D
-	 * @param  ide      Free index E
-     * @param  ave      Average
-     * @return          Reference to position
-	 */
-	inline void
-	Reshape             (const size_t& col, 
-						 const size_t& lin, 
-						 const size_t& cha = 1,
-						 const size_t& set = 1,
-						 const size_t& eco = 1,
-						 const size_t& phs = 1,
-						 const size_t& rep = 1,
-						 const size_t& seg = 1,
-						 const size_t& par = 1,
-						 const size_t& slc = 1,
-						 const size_t& ida = 1,
-						 const size_t& idb = 1,
-						 const size_t& idc = 1,
-						 const size_t& idd = 1,
-						 const size_t& ide = 1,
-						 const size_t& ave = 1) {
-		
-		size_t new_size = col * lin * cha * set * eco * phs * rep * 
-			seg * par * slc * ida * idb * idc * idd * ide * ave;
-
-		// Can't allow change of #elements
-		assert (new_size == Size());
-
-		_dim[COL] = col;
-		_dim[LIN] = lin;
-		_dim[CHA] = cha;
-		_dim[SET] = set;
-		_dim[ECO] = eco;
-		_dim[PHS] = phs;
-		_dim[REP] = rep;
-		_dim[SEG] = seg;
-		_dim[PAR] = par;
-		_dim[SLC] = slc;
-		_dim[IDA] = ida;
-		_dim[IDB] = idb;
-		_dim[IDC] = idc;
-		_dim[IDD] = idd;
-		_dim[IDE] = ide;
-		_dim[AVE] = ave;
-
-	}
-	
-
 	/**
 	 * @brief          Cast operator
 	 *
@@ -1443,9 +1329,6 @@ public:
     
 	/**
 	 * @brief           Expand matrix by increasing highest dimension (Concatenation)
-	 *
-	 * @param  dim      Dimension to be expanded
-	 * @param  n        Expand by n x current size (default 1)
 	 */
 	inline void
 	PushBack            (const Matrix<T> M)                    {
@@ -1457,8 +1340,6 @@ public:
 		for (size_t i = 0; i < INVALID_DIM; i++)
 			nd  = (M.Dim(i) > 1) ? i : nd;
 
-	   
-		
 		_dim[nd] += 1;
 		
 		_M.resize(Size());
@@ -2259,7 +2140,7 @@ Matrix<T>::Ind2x (const size_t& ind, const size_t& dim) const {
 template<class T> Matrix<size_t>
 Matrix<T>::Ind2Sub2D (const Matrix<size_t>& inds) const {
 	
-	Matrix<T>      tmp = this->Squeeze();
+	Matrix<T>      tmp = squeeze(this);
 	Matrix<size_t> subs (inds.Size(), 2);
 	
 	for(size_t i=0; i < subs.Width(); i++)

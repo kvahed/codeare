@@ -1,4 +1,3 @@
-
 /*
  *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
@@ -631,7 +630,7 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
  * @code{.cpp}
  *   Matrix<cxfl> m = rand<cxfl> (20,10);
  *   float normm    = creal(norm (m)); // Lapack driver below produces complex variable with real value
- * @cendode
+ * @endcode
  *
  * @param  M           Input
  * @return             Eclidean norm
@@ -660,8 +659,22 @@ norm (const Matrix<T>& M) {
 
 
 
+/**
+ * @brief              Complex dot product (A'*B) on data vector
+ *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxdb> a = rand<cxdb> (20,1);
+ *   Matrix<cxdb> b = rand<cxdb> (20,1);
+ *   double dotpr   = dotc (a, b);
+ * @endcode
+ *
+ * @param  A           Left factor (is conjugated)
+ * @param  B           Right factor
+ * @return             A'*B
+ */
 template <class T> static T 
-DOTC (const Matrix<T>& A, const Matrix<T>& B) {
+dotc (const Matrix<T>& A, const Matrix<T>& B) {
 	
 	int n, one;
 	T   res;
@@ -679,28 +692,29 @@ DOTC (const Matrix<T>& A, const Matrix<T>& B) {
 	
 }
 
+
+template <class T> static T 
+DOTC (const Matrix<T>& A, const Matrix<T>& B) {
+	return dotc (A,B);
+}
+
+
 /**
- * @brief              Complex dot product (A'*B) on data vector
+ * @brief              Complex dot product (A*B) on data vector
  *
  * Usage:
  * @code{.cpp}
  *   Matrix<cxdb> a = rand<cxdb> (20,1);
  *   Matrix<cxdb> b = rand<cxdb> (20,1);
- *   double dotpr   = dotc (a, b);
- * @cendode
+ *   double dotpr   = dotu (a, b);
+ * @endcode
  *
- * @param  A           Left factor (is conjugated)
- * @param  B           Right factor 
- * @return             A'*B
+ * @param  A           Left factor
+ * @param  B           Right factor
+ * @return             A*B
  */
 template <class T> static T 
-dotc (const Matrix<T>& A, const Matrix<T>& B) {
-	return DOTC (A,B);
-}
-
-
-template <class T> static T 
-DOTU (const Matrix<T>& A, const Matrix<T>& B) {
+dotu (const Matrix<T>& A, const Matrix<T>& B) {
 
 	int n, one;
 	T   res;
@@ -718,28 +732,29 @@ DOTU (const Matrix<T>& A, const Matrix<T>& B) {
 	
 }
 
-/**
- * @brief              Complex dot product (A*B) on data vector
- *
- * Usage: 
- * @code{.cpp}
- *   Matrix<cxdb> a = rand<cxdb> (20,1);
- *   Matrix<cxdb> b = rand<cxdb> (20,1);
- *   double dotpr   = dotu (a, b);
- * @cendode
- *
- * @param  A           Left factor
- * @param  B           Right factor 
- * @return             A*B
- */
+
 template <class T> static T 
-dotu (const Matrix<T>& A, const Matrix<T>& B) {
-	DOTU (A, B);
+DOTU (const Matrix<T>& A, const Matrix<T>& B) {
+	dotu (A, B);
 }
 
 
+/**
+ * @brief              Dot product (A*B) on data vector
+ *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<float> a = rand<float> (20,1);
+ *   Matrix<float> b = rand<float> (20,1);
+ *   double dotpr    = dot (a, b);
+ * @endcode
+ *
+ * @param  A           Left factor
+ * @param  B           Right factor
+ * @return             A*B
+ */
 template <class T> T 
-DOT  (const Matrix<T>& A, const Matrix<T>& B) {
+dot  (const Matrix<T>& A, const Matrix<T>& B) {
 	
 	int n, one;
 	T   res;
@@ -760,23 +775,10 @@ DOT  (const Matrix<T>& A, const Matrix<T>& B) {
 }
 
 
-/**
- * @brief              Dot product (A*B) on data vector
- *
- * Usage:
- * @code{.cpp}
- *   Matrix<float> a = rand<float> (20,1);
- *   Matrix<float> b = rand<float> (20,1);
- *   double dotpr    = dot (a, b);
- * @cendode
- *
- * @param  A           Left factor
- * @param  B           Right factor 
- * @return             A*B
- */
+
 template <class T> T 
-dot  (const Matrix<T>& A, const Matrix<T>& B) {
-	return DOT (A, B);
+DOT  (const Matrix<T>& A, const Matrix<T>& B) {
+	return dot (A, B);
 }
 
 
@@ -788,7 +790,7 @@ dot  (const Matrix<T>& A, const Matrix<T>& B) {
  *   Matrix<cxdb> A  = rand<cxdb> (20,5);
  *   Matrix<cxdb> x  = rand<cxdb> (20,1);
  *   double prod     = gemv (A, x, 'C');
- * @cendode
+ * @endcode
  *
  * @param  A          left factor matrix
  * @param  x          Right factor vector

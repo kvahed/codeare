@@ -28,138 +28,84 @@
 #include "FT.hpp"
 
 
-/**
- * @brief Matrix templated 1-3D Discrete Cartesian Fourier transform
- */
 template <class T>
-class DFT : public FT<T> {
+struct FTTraits { };
+
+
+template<>
+struct FTTraits<float> {
 	
-public:
+	typedef fftwf_plan    Plan;
+	typedef fftwf_complex Type;
 	
-
-	/**
-	 * @brief        Construct FFTW plans for forward and backward FT with credentials
-	 * 
-	 * @param  size  Matrix of side length of the FT range
-	 * @param  mask  K-Space mask (if left empty no mask is applied)
-	 * @param  pc    Phase correction (or target phase)
-	 */
-	DFT         (const Matrix<size_t>& size, const Matrix<T>& mask,
-				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1));
-	
-
-	/**
-	 * @brief        Construct FFTW plans for forward and backward FT with credentials for FT with identical side lengths
-	 * 
-	 * @param  rank  Rank (i.e. # FT directions)
-	 * @param  sl    Side length of the slice, volume ...
-	 * @param  mask  K-Space mask (if left empty no mask is applied)
-	 * @param  pc    Phase correction (or target phase)
-	 */
-	DFT         (const size_t rank, const size_t sl, const Matrix<T>& mask = Matrix<T>(1),
-				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1));
-	
-
-	/**
-	 * @brief        Construct FFTW plans for forward and backward FT
-	 * 
-	 * @param  size  Matrix of side length of the FT range
-	 */
-	DFT         (const Matrix<size_t>& size);
-	
-
-	/**
-	 * @brief        Clean up RAM, destroy plans
-	 */
-	virtual 
-	~DFT        ();
-	
-
-	/**
-	 * @brief    Forward transform
-	 *
-	 * @param  m To transform
-	 * @return   Transform
-	 */
-	virtual Matrix< std::complex<T> >
-	Trafo       (const Matrix< std::complex<T> >& m) const {
-
-		size_t cs = sizeof (std::complex<T>) * m_N;
-
-		Matrix<cxfl> res = fftshift(m);
-		
-		memcpy (m_in, &res[0], cs);
-		
-		if (m_have_pc)
-			res *= m_pc;
-		
-		if      (typeid(float)  == typeid(T)) fftwf_execute (m_fwdplanf);
-		else if (typeid(double) == typeid(T)) fftw_execute  (m_fwdplan);
-		
-		memcpy (&res[0], m_out, cs);
-		
-		if (m_have_mask)
-			res *= m_mask;
-		
-		return fftshift(res/sqrt((T)m.Size()));
-
+	static inline Plan 
+	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {                    
+	    return fftwf_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
-	
-	/**
-	 * @brief    Backward transform
-	 *
-	 * @param  m To transform
-	 * @return   Transform
-	 */
-	virtual Matrix< std::complex<T> >
-	Adjoint     (const Matrix< std::complex<T> >& m) const {
-
-		size_t cs = sizeof (std::complex<T>) * m_N;
-		
-		Matrix<cxfl> res = fftshift(m);
-		
-		if (m_have_mask)
-			res *= m_mask;
-		
-		memcpy (m_in,  &res[0], cs);
-		
-		if      (typeid(float)  == typeid(T)) fftwf_execute (m_bwdplanf);
-		else if (typeid(double) == typeid(T)) fftw_execute  (m_bwdplan);
-		
-		memcpy (&res[0], m_out, cs);
-		
-		if (m_have_pc)
-			res *= m_cpc;
-		
-		return fftshift(res/sqrt((T)m.Size()));
-
+	static inline Type*
+	Malloc (size_t n) {
+		return fftwf_alloc_complex (n);
 	}
 	
+	static inline void 
+	Free (void* p) {
+		fftwf_free (p);
+	}
 	
-private:
+	static inline void 
+	CleanUp () {
+		fftwf_cleanup ();
+	}
 	
-	bool           m_initialised;  /**< @brief Memory allocated / Plans, well, planned! :)*/
+	static inline void 
+	Destroy (Plan p) { 
+		fftwf_destroy_plan (p); 
+	}
+	
+	static inline void 
+	Execute (Plan p) { 
+		fftwf_execute (p); 
+	}        
+	
+};
 
-	Matrix<T> m_mask;         /**< @brief K-space mask (applied before inverse and after forward transforms) (double precision)*/
 
-	Matrix< std::complex<T> >      m_pc;           /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
-	Matrix< std::complex<T> >      m_cpc;          /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
+template<>
+struct FTTraits<double> {
 	
-	fftwf_plan     m_fwdplanf;     /**< @brief Forward plan (double precision)*/
-	fftwf_plan     m_bwdplanf;     /**< @brief Backward plan (double precision)*/
+	typedef fftw_plan    Plan;
+	typedef fftw_complex Type;
+	
+	static inline Plan 
+	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {                    
+	    return fftw_plan_dft (rank, n, in, out, sign, flags);
+	}
+	
+	static inline Type*
+	Malloc (size_t n) {
+		return fftw_alloc_complex (n);
+	}
+	
+	static inline void 
+	Free (void* p) {
+		fftw_free(p);
+	}
 
-	fftw_plan      m_fwdplan;      /**< @brief Forward plan (single precision)*/
-	fftw_plan      m_bwdplan;      /**< @brief Forward plan (single precision)*/
+	static inline void 
+	CleanUp () {
+		fftw_cleanup ();
+	}
 	
-	size_t         m_N;            /**< @brief # Nodes */
-	
-	bool           m_have_mask;    /**< @brief Apply mask?*/
-	bool           m_have_pc;      /**< @brief Apply phase correction?*/
-	bool           m_zpad;         /**< @brief Zero padding? (!!!NOT OPERATIONAL YET!!!)*/
-	
-	void*          m_in;           /**< @brief Aligned fftw input*/
-	void*          m_out;          /**< @brief Aligned fftw output*/
+	static inline void 
+	Destroy (Plan p) { 
+		fftw_destroy_plan (p); 
+	}
+
+	static inline void 
+	Execute (Plan p) { 
+		fftw_execute (p); 
+	}        
 
 };
 
@@ -181,7 +127,7 @@ fftshift        (const Matrix< std::complex<T> >& m) {
 		for (size_t l = 0; l < m.Dim(1); l++)
 			for (size_t c = 0; c < m.Dim(0); c++)
 				res.At (c,l,s) *= (T) pow ((T)-1.0, (T)(s+l+c));
-		
+	
 	return res;
 	
 }
@@ -210,7 +156,7 @@ ifftshift        (const Matrix< std::complex<T> >& m) {
  */
 template <class T> inline static Matrix< std::complex<T> >
 hannwindow (const Matrix<size_t>& size, const T& t) {
-
+	
 	size_t dim = size.Dim(0);
 	
 	assert (dim > 1 && dim < 4);
@@ -258,235 +204,235 @@ hannwindow (const Matrix<size_t>& size, const T& t) {
 	
 }
 
-template<>
-DFT<float>::DFT (const size_t rank, const size_t sl, const Matrix<float>& mask, const Matrix<cxfl>& pc) :
-	m_have_mask (false),
-	m_have_pc (false) {
+
+/**
+ * @brief Matrix templated 1-3D Discrete Cartesian Fourier transform
+ */
+template <class T>
+class DFT : public FT<T> {
+
+
+	typedef typename FTTraits<T>::Plan Plan;
+	typedef typename FTTraits<T>::Type Type;
+
+
 	
-	int n[rank];
+public:
 	
-	if (mask.Size() > 1)
-		m_have_mask = true;
+
+	/**
+	 * @brief        Construct FFTW plans for forward and backward FT with credentials
+	 * 
+	 * @param  size  Matrix of side length of the FT range
+	 * @param  mask  K-Space mask (if left empty no mask is applied)
+	 * @param  pc    Phase correction (or target phase)
+	 * @param  b0    Field distortion
+	 */
+	DFT         (const Matrix<size_t>& size, const Matrix<T>& mask,
+				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
+				 const Matrix<T>& b0 = Matrix<T>(1)) :
+		m_N(1), m_have_mask (false), m_have_pc (false) {
+		
+		int rank = size.Size();
+		int n[rank];
+		
+		if (mask.Size() > 1)
+			m_have_mask = true;
+		
+		m_mask = mask;
+		
+		if (pc.Size() > 1)
+			m_have_pc = true;
 	
-	m_mask = mask;
-	
-	if (pc.Size() > 1)
-		m_have_pc = true;
+		m_pc   = pc;
+		m_cpc  = conj(pc);
+		
+		for (int i = 0; i < rank; i++) {
+			n[i]  = (int)size[rank-1-i];
+			m_N  *= n[i];
+		}
+		
+		Allocate (rank, n);
+		
+		m_initialised = true;
 
-	m_pc   = pc;
-	m_cpc  = conj(pc);
-
-	for (size_t i = 0; i < rank; i++)
-		n[i]  = sl;
-
-	m_N   = pow ((float)sl, (int)rank);
-
-	m_in  = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
-	m_out = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
-
-	m_fwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_FORWARD,  FFTW_MEASURE);
-	m_bwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_BACKWARD, FFTW_MEASURE);
-
-	m_initialised = true;
-
-}
-
-template<>
-DFT<float>::DFT (const Matrix<size_t>& size, const Matrix<float>& mask,
-				 const Matrix<cxfl>& pc) : m_N(1),
-										   m_have_mask (false),
-									       m_have_pc (false) {
-
-	int rank = size.Size();
-	int n[rank];
-
-	if (mask.Size() > 1)
-		m_have_mask = true;
-	
-	m_mask = mask;
-	
-	if (pc.Size() > 1)
-		m_have_pc = true;
-
-	m_pc   = pc;
-	m_cpc  = conj(pc);
-	
-	for (int i = 0; i < rank; i++) {
-		n[i]  = (int)size[rank-1-i];
-		m_N  *= n[i];
 	}
 
-	m_in  = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
-	m_out = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
+	
+	/**
+	 * @brief        Construct FFTW plans for forward and backward FT with credentials for FT with identical side lengths
+	 * 
+	 * @param  rank  Rank (i.e. # FT directions)
+	 * @param  sl    Side length of the slice, volume ...
+	 * @param  mask  K-Space mask (if left empty no mask is applied)
+	 * @param  pc    Phase correction (or target phase)
+	 */
+	DFT         (const size_t rank, const size_t sl, const Matrix<T>& mask = Matrix<T>(1),
+				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
+				 const Matrix<T>& b0 = Matrix<T>(1)) :
+		m_have_mask (false), m_have_pc (false) {
 
-	m_fwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_FORWARD,  FFTW_MEASURE);
-	m_bwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_BACKWARD, FFTW_ESTIMATE);
+		int n[rank];
+		
+		if (mask.Size() > 1)
+			m_have_mask = true;
+		
+		m_mask = mask;
+		
+		if (pc.Size() > 1)
+			m_have_pc = true;
+		
+		m_pc   = pc;
+		m_cpc  = conj(pc);
+		
+		for (size_t i = 0; i < rank; i++)
+			n[i]  = sl;
+		
+		m_N   = pow ((float)sl, (int)rank);
+		
+		Allocate (rank, n);
+		
+		m_initialised = true;
+	
+	}
+	
+	
+	/**
+	 * @brief        Construct FFTW plans for forward and backward FT
+	 * 
+	 * @param  size  Matrix of side length of the FT range
+	 */
+	DFT         (const Matrix<size_t>& sl) : 
+		m_N(1), m_have_mask (false), m_have_pc (false) {
+		
+		
+		int rank = numel(sl);
+		int n[rank];
+		
+		for (int i = 0; i < rank; i++) {
+			n[i]  = (int) sl[rank-1-i];
+			m_N  *= n[i];
+		}
 
-	m_initialised = true;
+		Allocate (rank, n);
+		
+		m_initialised = true;
+		
+	}
+	
 
-}
+	/**
+	 * @brief        Clean up RAM, destroy plans
+	 */
+	virtual 
+	~DFT        () {
 
+		FTTraits<T>::Destroy (m_fwplan);
+		FTTraits<T>::Destroy (m_bwplan);
+		
+		FTTraits<T>::CleanUp();
+		
+		FTTraits<T>::Free (m_in); 
+		FTTraits<T>::Free (m_out);
+		
+	}
+	
+	
 
-template<> 
-DFT<float>::DFT (const Matrix<size_t>& sl) : m_N(1),
-											   m_have_mask (false),
-											   m_have_pc (false) {
+	/**
+	 * @brief    Forward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	virtual Matrix< std::complex<T> >
+	Trafo       (const Matrix< std::complex<T> >& m) const {
+		
+		size_t cs = sizeof (std::complex<T>) * m_N;
+		
+		Matrix<cxfl> res = fftshift(m);
+		
+		memcpy (m_in, &res[0], cs);
+		
+		if (m_have_pc)
+			res *= m_pc;
+		
+		FTTraits<T>::Execute (m_fwplan);
+		
+		memcpy (&res[0], m_out, cs);
+		
+		if (m_have_mask)
+			res *= m_mask;
+		
+		return fftshift(res/sqrt((T)m.Size()));
+		
+	}
+	
+	
+	/**
+	 * @brief    Backward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	virtual Matrix< std::complex<T> >
+	Adjoint     (const Matrix< std::complex<T> >& m) const {
+		
+		size_t cs = sizeof (std::complex<T>) * m_N;
+		
+		Matrix<cxfl> res = fftshift(m);
+		
+		if (m_have_mask)
+			res *= m_mask;
+		
+		memcpy (m_in,  &res[0], cs);
+		
+		FTTraits<T>::Execute (m_fwplan);
+		
+		memcpy (&res[0], m_out, cs);
+		
+		if (m_have_pc)
+			res *= m_cpc;
+		
+		return fftshift(res/sqrt((T)m.Size()));
+		
+	}
+	
+	
+private:
+	
+	void 
+	Allocate (const int rank, const int* n) {
+		
+		m_in     = FTTraits<T>::Malloc  (m_N);
+		m_out    = FTTraits<T>::Malloc  (m_N);
+		m_fwplan = FTTraits<T>::DFTPlan (rank, n, m_in, m_out, FFTW_FORWARD,  FFTW_MEASURE);
+		m_bwplan = FTTraits<T>::DFTPlan (rank, n, m_in, m_out, FFTW_BACKWARD, FFTW_MEASURE);
 
-
-	int rank = numel(sl);
-	int n[rank];
-
-	for (int i = 0; i < rank; i++) {
-		n[i]  = (int) sl[rank-1-i];
-		m_N  *= n[i];
 	}
 
-	m_in  = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
-	m_out = (void*) fftwf_malloc (sizeof(fftwf_complex) * m_N);
 
-	m_fwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_FORWARD,  FFTW_MEASURE);
-	m_bwdplanf = fftwf_plan_dft (rank, n, (fftwf_complex*)m_in, (fftwf_complex*)m_out, FFTW_BACKWARD, FFTW_MEASURE);
-
-	m_initialised = true;
-
-}
-
-
-template<>
-DFT<double>::DFT (const size_t rank, const size_t sl, const Matrix<double>& mask, const Matrix<cxdb>& pc) :
-	m_have_mask (false),
-	m_have_pc (false) {
+	bool           m_initialised;  /**< @brief Memory allocated / Plans, well, planned! :)*/
 	
-	int n[rank];
+	Matrix<T> m_mask;         /**< @brief K-space mask (applied before inverse and after forward transforms) (double precision)*/
 	
-	if (numel(mask) > 1)
-		m_have_mask = true;
+	Matrix< std::complex<T> >      m_pc;           /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
+	Matrix< std::complex<T> >      m_cpc;          /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
 	
-	m_mask = mask;
+	Plan m_fwplan;     /**< @brief Forward plan (double precision)*/
+	Plan m_bwplan;     /**< @brief Backward plan (double precision)*/
+
+	size_t         m_N;            /**< @brief # Nodes */
 	
-	if (numel(pc) > 1)
-		m_have_pc = true;
-
-	m_pc   = pc;
-	m_cpc  = conj(pc);
+	bool           m_have_mask;    /**< @brief Apply mask?*/
+	bool           m_have_pc;      /**< @brief Apply phase correction?*/
+	bool           m_zpad;         /**< @brief Zero padding? (!!!NOT OPERATIONAL YET!!!)*/
 	
-	for (size_t i = 0; i < rank; i++)
-		n[i]  = sl;
-
-	m_N   = pow ((float)sl, (int)rank);
-
-	m_in  = (void*) fftw_malloc (sizeof(fftw_complex) * m_N);
-	m_out = (void*) fftw_malloc (sizeof(fftw_complex) * m_N);
-
-	m_fwdplan = fftw_plan_dft (rank, n, (fftw_complex*)m_in, (fftw_complex*)m_out, FFTW_FORWARD,  FFTW_MEASURE);
-	m_bwdplan = fftw_plan_dft (rank, n, (fftw_complex*)m_in, (fftw_complex*)m_out, FFTW_BACKWARD, FFTW_MEASURE);
-
-	m_initialised = true;
-
-}
-
-template<>
-DFT<double>::DFT (const Matrix<size_t>& size, const Matrix<double>& mask, const Matrix<cxdb>& pc) : m_N(1),
-																						m_have_mask (false),
-																						m_have_pc (false) {
-
-	int rank = size.Size();
-	int n[rank];
-
-	if (mask.Size() > 1)
-		m_have_mask = true;
+	Type*          m_in;           /**< @brief Aligned fftw input*/
+	Type*          m_out;          /**< @brief Aligned fftw output*/
 	
-	m_mask = mask;
-	
-	if (pc.Size() > 1)
-		m_have_pc = true;
+};
 
-	m_pc   = pc;
-	m_cpc  = conj(pc);
-	
-	for (int i = 0; i < rank; i++) {
-		n[i]  = (int)size[rank-1-i];
-		m_N  *= n[i];
-	}
-
-	m_in  = (void*) fftw_malloc (sizeof(fftw_complex) * m_N);
-	m_out = (void*) fftw_malloc (sizeof(fftw_complex) * m_N);
-
-	m_fwdplan = fftw_plan_dft (rank, n, (fftw_complex*)m_in, (fftw_complex*)m_out, FFTW_FORWARD,  FFTW_MEASURE);
-	m_bwdplan = fftw_plan_dft (rank, n, (fftw_complex*)m_in, (fftw_complex*)m_out, FFTW_BACKWARD, FFTW_ESTIMATE);
-
-	m_initialised = true;
-
-}
-
-
-template<>
-DFT<float>::~DFT () {
-
-	fftwf_destroy_plan (m_fwdplanf);
-	fftwf_destroy_plan (m_bwdplanf);
-
-	fftwf_cleanup ();
-
-	fftwf_free(m_in); 
-	fftwf_free(m_out);
-
-}
-
-
-template<>
-DFT<double>::~DFT () {
-
-	fftw_destroy_plan (m_fwdplan);
-	fftw_destroy_plan (m_bwdplan);
-
-	fftw_cleanup ();
-
-	fftw_free (m_in); 
-	fftw_free (m_out);
-
-}
-
-
-template<> Matrix<cxfl> 
-DFT<float>::Trafo (const Matrix<cxfl>& m) const {
-	
-    Matrix<cxfl> res = fftshift(m);
-
-	memcpy (m_in, &res[0], sizeof(fftwf_complex) * m_N);
-
-	if (m_have_pc)
-		res *= m_pc;
-
-	fftwf_execute(m_fwdplanf);
-
-	memcpy (&res[0], m_out, sizeof(fftwf_complex) * m_N);
-
-	if (m_have_mask)
-		res *= m_mask;
-
-    return fftshift(res/sqrt((float)m.Size()));
-	
-}
-
-
-template<> Matrix<cxdb> 
-DFT<double>::Trafo (const Matrix<cxdb>& m) const {
-	
-    Matrix<cxdb> res = fftshift(m);
-	memcpy (m_in, &res[0], sizeof(fftw_complex) * m_N);
-	if (m_have_pc)
-		res *= m_pc;
-
-	fftw_execute(m_fwdplan);
-
-	memcpy (&res[0], m_out, sizeof(fftw_complex) * m_N);
-	if (m_have_mask)
-		res *= m_mask;
-
-    return fftshift(res/sqrt((float)m.Size()));
-	
-}
 
 
 #endif
