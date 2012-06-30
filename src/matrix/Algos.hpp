@@ -500,12 +500,11 @@ template <class T>  inline static size_t
 length             (const Matrix<T>& M) {
 	
 	size_t l = 1;
-	size_t cd;
 
 	for (size_t i = 0; i < INVALID_DIM; i++) 
-		l = (l > cd = M.Dim(i)) ? l : cd;
+		l = (l > size(M,i)) ? l : size(M,i);
 
-	return M.Dim(0);
+	return l;
 	
 }
 
@@ -520,7 +519,7 @@ length             (const Matrix<T>& M) {
 template <class T> inline static size_t
 width             (const Matrix<T>& M) {
 	
-	return M.Dim(1);
+	return size(M,1);
 	
 }
 
