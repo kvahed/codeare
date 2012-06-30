@@ -102,7 +102,7 @@ CompressedSensing::Process () {
 	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf), m_wm);
 
 	/** -----  Which Fourier transform? **/
-	m_cgparam.ft  = (FT<float>*) new DFT<float> (ndims (data), data.Height(), mask, pc);
+	m_cgparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);
 	// m_cgparam.ft = (FT<float>*) new NFFT<float> (ms, M * shots, m, alpha);
 	// m_cgparam.ft = (FT<float>*) new NCSENSE<float> (sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
 	/*************************************/

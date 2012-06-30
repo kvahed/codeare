@@ -33,14 +33,14 @@
 inline static Matrix<double> 
 abs (const Matrix<cxdb>& m) {
 
-	Matrix<double> res(m.Dim());
+	Matrix<double> res = zeros<double> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = cabs(m[i]);
 		
 	}		
@@ -59,14 +59,14 @@ abs (const Matrix<cxdb>& m) {
 inline static Matrix<float> 
 abs (const Matrix<cxfl>& m) {
 
-	Matrix<float> res(m.Dim());
+	Matrix<float> res = zeros<float> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = cabs(m[i]);
 		
 	}		
@@ -85,14 +85,14 @@ abs (const Matrix<cxfl>& m) {
 inline static Matrix<float> 
 abs (const Matrix<float>& m) {
 	
-	Matrix<float> res(m.Dim());
+	Matrix<float> res = zeros<float> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = cabs(m[i]);
 		
 	}		
@@ -111,14 +111,14 @@ abs (const Matrix<float>& m) {
 inline static Matrix<double> 
 abs (const Matrix<double>& m) {
 	
-	Matrix<float> res(m.Dim());
+	Matrix<double> res = zeros<double> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = cabs(m[i]);
 		
 	}		
@@ -137,14 +137,14 @@ abs (const Matrix<double>& m) {
 inline static Matrix<double> 
 arg (const Matrix<cxdb>& m) {
 
-	Matrix<double> res(m.Dim());
+	Matrix<double> res = zeros<double> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = carg(m[i]);
 		
 	}		
@@ -163,14 +163,14 @@ arg (const Matrix<cxdb>& m) {
 inline static Matrix<float> 
 arg (const Matrix<cxfl>& m) {
 
-	Matrix<float> res(m.Dim());
+	Matrix<float> res = zeros<float> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = carg(m[i]);
 		
 	}		
@@ -189,8 +189,7 @@ arg (const Matrix<cxfl>& m) {
 inline static Matrix<float> 
 arg (const Matrix<float>& m) {
 	
-	Matrix<float> res(m);
-	return res;
+	return 	zeros<float> (size(m));
 	
 }
 
@@ -204,8 +203,7 @@ arg (const Matrix<float>& m) {
 inline static Matrix<double> 
 arg (const Matrix<double>& m) {
 	
-	Matrix<double> res(m);
-	return res;
+	return zeros<double> (size(m));
 	
 }
 
@@ -219,14 +217,14 @@ arg (const Matrix<double>& m) {
 inline static Matrix<double> 
 real (const Matrix<cxdb>& m) {
 
-	Matrix<double> res(m.Dim());
+	Matrix<double> res = zeros<double> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = creal(m[i]);
 		
 	}		
@@ -245,14 +243,14 @@ real (const Matrix<cxdb>& m) {
 inline static Matrix<float> 
 real (const Matrix<cxfl>& m) {
 
-	Matrix<float> res(m.Dim());
+	Matrix<float> res = zeros<float> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = creal(m[i]);
 		
 	}		
@@ -271,8 +269,7 @@ real (const Matrix<cxfl>& m) {
 inline static Matrix<float> 
 real (const Matrix<float>& m) {
 	
-	Matrix<float> res(m);
-	return res;
+	return Matrix<float>(m);
 	
 }
 
@@ -286,8 +283,7 @@ real (const Matrix<float>& m) {
 inline static Matrix<double> 
 real (const Matrix<double>& m) {
 	
-	Matrix<double> res(m);
-	return res;
+	return Matrix<double>(m);
 	
 }
 
@@ -302,14 +298,14 @@ real (const Matrix<double>& m) {
 inline static Matrix<double> 
 imag (const Matrix<cxdb>& m) {
 
-	Matrix<double> res(m.Dim());
+	Matrix<double> res = zeros<double> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = cimag(m[i]);
 		
 	}		
@@ -328,14 +324,14 @@ imag (const Matrix<cxdb>& m) {
 inline static Matrix<float> 
 imag (const Matrix<cxfl>& m) {
 
-	Matrix<float> res(m.Dim());
+	Matrix<float> res = zeros<float> (size(m));
 	
 #pragma omp parallel default (shared) 
 	{
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < m.Size(); i++)
+		for (size_t i = 0; i < numel(m); i++)
 			res[i] = cimag(m[i]);
 		
 	}		
@@ -354,8 +350,7 @@ imag (const Matrix<cxfl>& m) {
 inline static Matrix<float> 
 imag (const Matrix<float>& m) {
 	
-	Matrix<float> res(m);
-	return res;
+	return 	zeros<double>(size(m));
 	
 }
 
@@ -370,8 +365,7 @@ imag (const Matrix<float>& m) {
 inline static Matrix<double> 
 imag (const Matrix<double>& m) {
 	
-	Matrix<double> res(m);
-	return res;
+	return zeros<double>(size(m));
 	
 }
 
@@ -387,22 +381,22 @@ conj (const Matrix<T>& m) {
 	
 	Matrix<T> res = m;
 	
-		if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) {
+	if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) {
+
+#pragma omp parallel default (shared)
+		{
 			
-#pragma omp parallel default (shared) 
-			{
-				
 #pragma omp for
-				
-				for (size_t i = 0; i < m.Size(); i++)
-					res[i] = cconj(m[i]);
-				
-			}		
 			
+			for (size_t i = 0; i < numel(m); i++)
+				res[i] = cconj(res[i]);
+
 		}
 		
-		return res;
-		
+	}
+
+	return res;
+
 }
 
 #endif

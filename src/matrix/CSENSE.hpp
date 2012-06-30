@@ -70,7 +70,7 @@ public:
 						const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
 						const Matrix<T>& b0 = Matrix<T>(1)) : m_initialised (false) {
 
-		// Some initing
+		// Some initializing
 		m_initialised = false;
 		m_af          = 1;
 		m_dft         = 0;
@@ -80,10 +80,13 @@ public:
 		// Sensitivity maps dictate FT size
 		m_dims = size(sens);
 
-		// We expect sensitivities O (Ch,X,Y[,Z])
+		// We expect sensitivities O (X,Y[,Z],CH)
 		m_ndim = numel(m_dims)-1;
 		m_nc   = m_dims[m_ndim];
 		
+		// Need at least 2 channels
+		assert (m_nc > 1);
+
 		// Handle only 2D / 3D
 		assert (m_ndim == 2 || m_ndim == 3);
 		
@@ -93,8 +96,10 @@ public:
 		for (size_t i = 0; i < m_ndim; i++)
 			ftdims[i] = m_dims[i];
 		
+		// FT dimensions needs adjusting
 		ftdims[1] /= af;
 		
+		// Multi-threading
 		int np;
 
 #pragma omp parallel default (shared)
@@ -107,11 +112,11 @@ public:
 		for (size_t i = 0; i < np; i++)
 			m_dft[i]  = new DFT<T> (ftdims, mask, pc, b0);
 		
-		// Privates
+		// Some privates
 		m_sens = sens;
 		m_af   = af;
 		
-		// We're good
+		// Great
 		m_initialised = true;
 		
 	}
@@ -167,14 +172,14 @@ public:
 			// FT individual channels
 			for (size_t i = 0; i < m_nc; i++)
 				if (m_ndim == 2)
-					Slice  (tmp, i, *(m_dft[tid]) ->* fftshift(Slice  (tmp, i)));
+					Slice  (tmp, i, *(m_dft[tid]) ->* Slice  (tmp, i));
 				else
-					Volume (tmp, i, *(m_dft[tid]) ->* fftshift(Volume (tmp, i)));
+					Volume (tmp, i, *(m_dft[tid]) ->* Volume (tmp, i));
 			
 			
 #pragma omp for schedule (guided)
 			
-			// Antialias
+			// Antialiasing
 			for (size_t x = 0; x < m_dims[0]; x++)
 				for (size_t y = 0; y < m_dims[1]/m_af; y++) 
 					/*for (size_t z = 0; z < m_dims[2]; z++)*/ {
@@ -188,12 +193,10 @@ public:
 						
 					}
 					
-					//s = inv(s'*s)*s';
 					si = gemm (s,   s, 'C', 'N');
 					si = inv  (si);                
 					si = gemm (si,  s, 'N', 'C');
 					
-					// rp=si*imfold(:,y,x);
 					rp = gemm (si, ra, 'N', 'N');
 					
 					for (size_t i = 0; i < m_af; i++)

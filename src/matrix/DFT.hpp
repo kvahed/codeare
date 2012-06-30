@@ -110,26 +110,6 @@ struct FTTraits<double> {
 };
 
 
-template<class T> inline static Matrix<T> 
-ifftShift (T *out, const T* in, size_t nx, size_t ny) {
-
-    const size_t hlen1 = (ny+1)/2;
-    const size_t hlen2 = ny/2;
-    const size_t shft1 = ((nx+1)/2)*ny + hlen1;
-    const size_t shft2 = (nx/2)*ny + hlen2;
-
-    const T* src = in;
-    for(T* tgt = out; tgt < out + shft1 - hlen1; tgt += ny, src += ny) { // (nx+1)/2 times
-        copy(src, src+hlen1, tgt + shft2);          //1->4
-        copy(src+hlen1, src+ny, tgt+shft2-hlen2); } //2->3
-    src = in;
-    for(T* tgt = out; tgt < out + shft2 - hlen2; tgt += ny, src += ny ){ // nx/2 times
-        copy(src+shft1, src+shft1+hlen2, tgt);         //4->1
-        copy(src+shft1-hlen1, src+shft1, tgt+hlen2); } //3->2
-
-}
-
-
 /**
  * @brief         FFT shift
  * 
@@ -232,7 +212,7 @@ public:
 	/**
 	 * @brief        Construct FFTW plans for forward and backward FT with credentials
 	 * 
-	 * @param  size  Matrix of side length of the FT range
+	 * @param  sl    Matrix of side length of the FT range
 	 * @param  mask  K-Space mask (if left empty no mask is applied)
 	 * @param  pc    Phase correction (or target phase)
 	 * @param  b0    Field distortion
@@ -276,6 +256,7 @@ public:
 	 * @param  sl    Side length of the slice, volume ...
 	 * @param  mask  K-Space mask (if left empty no mask is applied)
 	 * @param  pc    Phase correction (or target phase)
+	 * @param  b0    Static field distortion
 	 */
 	DFT         (const size_t rank, const size_t sl, const Matrix<T>& mask = Matrix<T>(1),
 				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
@@ -310,7 +291,7 @@ public:
 	/**
 	 * @brief        Construct FFTW plans for forward and backward FT
 	 * 
-	 * @param  size  Matrix of side length of the FT range
+	 * @param  sl    Matrix of side lengths of the FT range
 	 */
 	DFT         (const Matrix<size_t>& sl) : 
 		m_N(1), m_have_mask (false), m_have_pc (false) {
