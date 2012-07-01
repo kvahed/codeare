@@ -7,13 +7,13 @@ Cient stubs for more MRI hardware vendors.
 OK, well, ya, ... a lot!
                                                                            
 TESTS:
-lclient -t LapackTests
+lclient -b  share/common/ -t LapackTests 
 lclient -b share/gradients/ -c config_vdcs.xml -t VDSpiral 
 lclient -b share/gradients/ -c config_karb.xml -t KArb
 lclient -b share/cgsense/ -c brain.xml -t CGSENSE
 lclient -b share/ktpoints/ -d homogen.h5 -c config_homogen.xml -t KTPoints 
-lclient -b share/nufft/ -d doublepr.mat -c config.xml -t NuFFT
 lclient -b share/nufft/ -d singlepr.mat -c config.xml -t NuFFT
-lclient -b share/compressedsensing/ -d brain512.mat -c config_brain512.xml -t CompressedSensing
-lclient -b share/compressedsensing/ -d phantom256.mat -c config_denoise.xml -t CompressedSensing
+lclient -b share/compressedsensing/ -c config_brain512.xml -t CompressedSensing
+lclient -b share/compressedsensing/ -c config_denoise.xml -t CompressedSensing
 lclient -b share/directmethod/ -c config.xml -t DirectMethod
+lclient -b share/sense/ -c 3fold.xml -t SENSE

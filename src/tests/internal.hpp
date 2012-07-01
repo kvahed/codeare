@@ -31,14 +31,19 @@ internaltest (Connector<T>* rc) {
 	// Test casting
 	Matrix<cxdb> cd = (Matrix<cxdb>) cf;
 
-	rc->ReadConfig ("test.xml");
+	std::string    df  = std::string (base + std::string(data));
+
+	Matrix<cxfl> em, pa;
+	MXRead (em, df, "EM");
+	MXRead (pa, df, "PA");
 
 	rc->Init (test);
 
 	rc->SetMatrix ("cf", cf);
-	rc->SetMatrix ("si", si);
 	rc->SetMatrix ("rd", rd);
-	
+	rc->SetMatrix ("EM", em);
+	rc->SetMatrix ("PA", pa);
+
 	time_t seconds = time (NULL);
 	char   uid[16];
 	sprintf(uid,"%ld",seconds);

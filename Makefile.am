@@ -1,3 +1,3 @@
-SUBDIRS = src doc
+SUBDIRS = src doc tests
 ACLOCAL_AMFLAGS = -I config
 EXTRA_DIST = AUTHORS COPYING ChangeLog NEWS README Makefile.win32 INSTALL INSTALL.win32

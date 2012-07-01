@@ -27,7 +27,6 @@ sensetest (RRClient::Connector<T>* rc) {
 	
 	// Outgoing
 	Matrix<cxfl> ufimg;   // Reconstructed unaliased O (RO, PE, PE2)
-	Matrix<cxfl> gfact;   // G-factor map
 
 	// Compute g-factor maps?
 	bool         compgfm = false;
@@ -58,7 +57,6 @@ sensetest (RRClient::Connector<T>* rc) {
 	// Receive -------------
 	
 	rc->GetMatrix ("image", ufimg);  // Images
-	rc->GetMatrix ("gfact", gfact);  // CG residuals
 	
 	// ---------------------
 	
@@ -73,8 +71,6 @@ sensetest (RRClient::Connector<T>* rc) {
 	}
 	
 	MXDump     (ufimg, mf, "ufimg");
-	if (compgfm)
-		MXDump (gfact, mf, "gfact");
 	
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());

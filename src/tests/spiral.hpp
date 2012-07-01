@@ -7,8 +7,7 @@ vdspiraltest (Connector<T>* rc) {
 
 	SpiralParams p;
 
-	std::string    cf  = std::string (base + std::string(config));
-	rc->ReadConfig (cf.c_str());
+	std::string ofname = std::string (base + std::string("spiral.mat"));
 
 	rc->Attribute ("maxgrad", &(p.mgr));
 	rc->Attribute ("maxslew", &(p.msr));
@@ -31,6 +30,7 @@ vdspiraltest (Connector<T>* rc) {
 
 	p.fov = Matrix<double> (nr,1);
 	p.rad = Matrix<double> (nr,1);
+
 	for (size_t i = 0; i < nr; i++) {
 		p.fov[i] = atof(fovs[i].c_str()); 
 		p.rad[i] = atof(rads[i].c_str()); 
@@ -47,7 +47,7 @@ vdspiraltest (Connector<T>* rc) {
 
 #ifdef HAVE_MAT_H	
 	
-	MATFile* mf = matOpen ("spiral.mat", "w");
+	MATFile* mf = matOpen (ofname.c_str(), "w");
 	
 	if (mf == NULL) {
 		printf ("Error creating file %s\n", "");
