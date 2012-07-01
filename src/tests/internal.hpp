@@ -57,6 +57,7 @@ internaltest (Connector<T>* rc) {
 	rc->GetMatrix ("cf", cf);
 	rc->GetMatrix ("rd", rd);
 	rc->GetMatrix ("si", si);
+	rc->GetMatrix ( "x", pa);
 
 	rc->Finalise (test);
 

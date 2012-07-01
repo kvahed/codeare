@@ -204,8 +204,8 @@ LapackTests::Process     () {
 	A = GetCXFL("EM");
 	b = GetCXFL("PA");
 
-	Matrix<cxfl> x = MCGLS (A, b, 100, 1.0e-6, 5.0e-7);
-	MXDump(x, "x.mat", "x");
+	Matrix<cxfl> x = AddMatrix ("x", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (1)));
+	x = MCGLS (A, b, 100, 1.0e-6, 5.0e-7);
 
 	return RRSModule::OK;
 
