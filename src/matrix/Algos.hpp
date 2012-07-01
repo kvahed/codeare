@@ -99,6 +99,20 @@ Is2D (const Matrix<T>& M) {
 
 
 /**
+ * @brief    Is 2D square matrix?
+ *
+ * @param M  Matrix
+ * @return   2D?
+ */
+template <class T>  inline static bool 
+IsSquare (const Matrix<T>& M) {
+	
+	return Is2D(M) && size(M,0) == size(M,1);
+	
+}
+
+
+/**
  * @brief    Is matrix 3D?
  *
  * @param M  Matrix
@@ -298,22 +312,23 @@ SOS (const Matrix<T>& M, const size_t d) {
  * @return         Squeezed matrix
  */
 template <class T> inline static Matrix<T>
-squeeze (Matrix<T>& M) {
+squeeze (const Matrix<T>& M) {
 	
+	Matrix<T> res = M;
 	size_t found = 0;
 	
 	for (size_t i = 0; i < INVALID_DIM; i++)
-		if (M.Dim(i) > 1) {
-			M.Res(found)   = M.Res(i);
-			M.Dim(found++) = M.Dim(i);
+		if (size(res, i) > 1) {
+			res.Res(found)   = M.Res(i);
+			res.Dim(found++) = M.Dim(i);
 		}
 	
 	for (size_t i = found; i < INVALID_DIM; i++) {
-		M.Dim(i) = 1;
-		M.Res(i) = 1.0;
+		res.Dim(i) = 1;
+		res.Res(i) = 1.0;
 	}
-
-	return M;
+	
+	return res;
 	
 }
 
@@ -403,10 +418,43 @@ ndims (const Matrix<T>& M) {
 	
 	size_t nd = 0;
 	
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		nd  = (M.Dim(i) > 1) ? i : nd;
+	for (size_t i = 1; i < INVALID_DIM; i++)
+		if (size(M,i) > 1)
+			nd = i;
 	
 	return (nd + 1);
+	
+}
+
+
+
+
+
+/**
+ * @brief     Diagonal of biggest square matrix from top left
+ * 
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (2,3);
+ *   Matrix<cxfl> d   = diag (m);
+ * @endcode
+ *
+ * @param  M  Matrix
+ * @return    Highest non-one dimension
+ */
+template <class T> inline static Matrix<T>
+diag (const Matrix<T>& M) {
+	
+	assert (Is2D(M));
+
+	size_t sz = MIN(size(M,0),size(M,1));
+
+	Matrix<T> res (sz,1);
+
+	for (size_t i = 0; i < sz; i++)
+		res(i) = M(i,i); 
+
+	return res;
 	
 }
 

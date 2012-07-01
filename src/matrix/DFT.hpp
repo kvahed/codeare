@@ -308,7 +308,7 @@ public:
 				 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
 				 const Matrix<T>& b0 = Matrix<T>(1)) :
 		m_N(1), m_have_mask (false), m_have_pc (false) {
-		
+
 		size_t rank = numel(sl);
 
 		int n [rank];
@@ -479,6 +479,13 @@ public:
 	
 private:
 	
+
+	/**
+	 * @brief       Allocate RAM and plans
+	 *
+	 * @param  rank FT rank
+	 * @param  n    Side lengths
+	 */
 	void 
 	Allocate (const int rank, const int* n) {
 		

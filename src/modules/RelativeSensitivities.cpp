@@ -56,12 +56,12 @@ RelativeSensitivities::Process     () {
 
     // Squeeze matrices ---------------------------
 
-	data = squeeze(data);
+	data = squeeze (data);
     printf ("  Data:\n");
     printf ("    Dimensions: %s \n", DimsToCString(data));
     printf ("    Reolutions: %s \n", ResToCString(data));
 
-	mask = squeeze(mask);
+	mask = squeeze (mask);
     printf ("  Mask:\n");
     printf ("    Dimensions: %s \n", DimsToCString(mask));
     printf ("    Reolutions: %s \n", ResToCString(mask));
