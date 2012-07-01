@@ -1,0 +1,2 @@
+#!/bin/sh
+../src/lclient -b ../share/directmethod/ -c config.xml -t DirectMethod

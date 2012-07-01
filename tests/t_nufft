@@ -1,0 +1,2 @@
+#!/bin/sh
+../src/lclient -b ../share/nufft/ -c config.xml -d singlepr.mat -t NuFFT
