@@ -96,13 +96,8 @@ DirectMethod::Process     () {
 	Matrix<float> ngx = !GetRLFL ("g");
 	Matrix<float> nj  =  GetRLFL ("j");
 	
-	MXDump (t, "t.mat", "t");
-	MXDump (nt, "nt.mat", "nt");
-	MXDump (nj, "j.mat", "j");
 	ngx = !interp1 (t, ngx, nt, INTERP::LINEAR);
 	nj  = interp1  (t, nj, nt);
-	MXDump (ngx, "ngx.mat", "ngx");
-	MXDump (nj, "nj.mat", "nj");
 	sb.g     = &ngx;
 
     sb.b1    = &GetCXFL ("b1");

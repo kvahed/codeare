@@ -493,36 +493,6 @@ numel               (const Matrix<T>& M) {
 
 
 /**
- * @brief           Get vector of dimensions
- *
- * @param   M       Matrix
- * @return          Dimension vector.
- */
-template <class T>  inline static Matrix<size_t>
-size               (const Matrix<T>& M) {
-	
-	Matrix<size_t> res (1,INVALID_DIM);
-	size_t ones = 0;
-    
-	for (size_t i = 0; i < INVALID_DIM; i++) {
-		
-		res[i] = size(M, i);
-
-		if (res[i] == 1)
-			ones++;
-		else
-			ones = 0;
-		
-	}
-	
-	res.Resize (1,INVALID_DIM-ones);
-
-	return res;
-	
-}
-
-
-/**
  * @brief           Get size of a dimension
  *
  * @param   M       Matrix
@@ -741,6 +711,129 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	return res;
 
 																		
+}
+
+
+/**
+ * @brief           Create new vector
+ *                  and copy the data into the new vector. If the target
+ *                  is bigger, the remaining space is set 0. If it is 
+ *                  smaller data is truncted.
+ * 
+ * @param   M       The matrix to resize
+ * @param   sz      New length
+ * @return          Resized vector
+ */
+template <class T> inline static Matrix<T>
+resize (const Matrix<T>& M, const size_t& sz) {
+
+	Matrix<T> res = zeros<T> (sz,1);
+	size_t copysz = MIN(numel(M), sz) * sizeof (T);
+
+	memcpy (&res[0], &(M[0]), copysz);
+
+	return res;
+	
+}
+
+
+
+/**
+ * @brief           Create new matrix with the new dimensions 
+ *                  and copy the data into the new matrix. If the target
+ *                  is bigger, the remaining space is set 0. If it is 
+ *                  smaller data is truncted.
+ * 
+ * @param   M       The matrix to resize
+ * @param   sz      New dimension vector
+ * @return          Resized copy
+ */
+template <class T> inline static Matrix<T>
+resize (const Matrix<T>& M, Matrix<size_t> sz) {
+
+	Matrix<T> res = zeros<T> (sz);
+	size_t copysz = MIN(numel(M), numel(res)) * sizeof (T);
+
+	typename vector<T>::iterator start = M.Dat().begin();
+	typename vector<T>::iterator end   = M.Dat().begin() + copysz;
+	
+	res.Dat().assign (start, end);
+
+	return res;
+	
+}
+
+
+/**
+ * @brief           Create new vector
+ *                  and copy the data into the new vector. If the target
+ *                  is bigger, the remaining space is set 0. If it is 
+ *                  smaller data is truncted.
+ * 
+ * @param   M       The matrix to resize
+ * @param   sc      New height
+ * @param   sl      New width
+ * @return          Resized vector
+ */
+template <class T> inline static Matrix<T>
+resize (const Matrix<T>& M, const size_t& sc, const size_t& sl) {
+
+	Matrix<size_t> sz (2,1);
+	sz[0] = sc; sz[1] = sl;
+
+	return resize (M, sz);
+	
+}
+
+
+/**
+ * @brief           Create new vector
+ *                  and copy the data into the new vector. If the target
+ *                  is bigger, the remaining space is set 0. If it is 
+ *                  smaller data is truncted.
+ * 
+ * @param   M       The matrix to resize
+ * @param   sc      New height
+ * @param   sl      New width
+ * @param   sc      New # of slices
+ * @return          Resized vector
+ */
+template <class T> inline static Matrix<T>
+resize (const Matrix<T>& M, const size_t& sc, const size_t& sl, const size_t& ss) {
+
+	Matrix<size_t> sz (3,1);
+	sz[0] = sc; sz[1] = sl; sz[2] = sc;
+
+	return resize (M, sz);
+	
+}
+
+
+/**
+ * @brief           Get vector of dimensions
+ *
+ * @param   M       Matrix
+ * @return          Dimension vector.
+ */
+template <class T>  inline static Matrix<size_t>
+size               (const Matrix<T>& M) {
+	
+	Matrix<size_t> res (1,INVALID_DIM);
+	size_t ones = 0;
+    
+	for (size_t i = 0; i < INVALID_DIM; i++) {
+		
+		res[i] = size(M, i);
+
+		if (res[i] == 1)
+			ones++;
+		else
+			ones = 0;
+		
+	}
+	
+	return resize (res, 1, INVALID_DIM-ones);
+	
 }
 
 

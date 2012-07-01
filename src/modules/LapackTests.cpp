@@ -34,6 +34,7 @@ LapackTests::Process     () {
 
 	// SGEEV, DGEEV, CGEEV, ZGEEV: Eigen value computation
 
+	std::cout << "General LA tests ----------- \n";
 
 	Matrix<cxfl>&   cf = GetCXFL ("cf");
 	Matrix<cxdb>    cd = (Matrix<cxdb>) cf;
@@ -200,15 +201,11 @@ LapackTests::Process     () {
 	A = chol (A);
 	std::cout << "chol(cov(A)) :\n" <<  A;
 
- #ifdef HAVE_MAT_H
-	
-	MXRead(A, "share/common/tmp.mat", "EM");
-	MXRead(b, "share/common/tmp.mat", "PA");
+	A = GetCXFL("EM");
+	b = GetCXFL("PA");
 
 	Matrix<cxfl> x = MCGLS (A, b, 100, 1.0e-6, 5.0e-7);
 	MXDump(x, "x.mat", "x");
-#endif
-
 
 	return RRSModule::OK;
 
