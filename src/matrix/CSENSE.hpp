@@ -51,6 +51,7 @@ public:
 		m_dft         = 0;
 		m_ndim        = 1;
 		m_nc          = 1;
+		m_compgfm     = false;
 
 	}
 
@@ -65,8 +66,8 @@ public:
 	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
 	 * @param  b0      Off-resonance maps if available (default empty)
 	 */
-	CSENSE             (const Matrix< std::complex<T> >& sens, const unsigned short& af,
-			            const Matrix<T>& mask = Matrix<T>(1), 
+	CSENSE             (const Matrix< std::complex<T> >& sens, const unsigned short& af, 
+						const bool& compgfm = false, const Matrix<T>& mask = Matrix<T>(1), 
 						const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
 						const Matrix<T>& b0 = Matrix<T>(1)) : m_initialised (false) {
 
@@ -76,28 +77,31 @@ public:
 		m_dft         = 0;
 		m_ndim        = 1;
 		m_nc          = 1;
+		m_compgfm     = compgfm;
 
-		// Sensitivity maps dictate FT size
-		m_dims = size(sens);
-
-		// We expect sensitivities O (X,Y[,Z],CH)
-		m_ndim = numel(m_dims)-1;
-		m_nc   = m_dims[m_ndim];
+		// Some privates
+		m_sens = squeeze(sens);
+		m_af   = af;
 		
-		// Need at least 2 channels
-		assert (m_nc > 1);
+		// Sensitivity maps dictate FT size
+		m_nc   = size (m_sens, ndims(m_sens)-1);
+		m_ndim = ndims(m_sens)-1;
 
 		// Handle only 2D / 3D
 		assert (m_ndim == 2 || m_ndim == 3);
 		
+		// Need at least 2 channels
+		assert (m_nc > 1);
+
+		// We expect sensitivities O (X,Y,Z,CH)
+		m_dims = ones<size_t> (3,1);
+
 		// Set up FT
-		Matrix<size_t> ftdims (m_ndim,1);
-		
 		for (size_t i = 0; i < m_ndim; i++)
-			ftdims[i] = m_dims[i];
+			m_dims[i] = size(sens,i);
 		
 		// FT dimensions needs adjusting
-		ftdims[1] /= af;
+		m_dims[1] /= af;
 		
 		// Multi-threading
 		int np;
@@ -107,15 +111,15 @@ public:
 			np = omp_get_num_threads ();
 		}	
 
+		Matrix<size_t> ftdims (m_ndim,1);
+		for (size_t i = 0; i < m_ndim; i++)
+			ftdims[i] = m_dims[i];
+
 		m_dft = new DFT<T>* [np];
 		
 		for (size_t i = 0; i < np; i++)
-			m_dft[i]  = new DFT<T> (ftdims, mask, pc, b0);
-		
-		// Some privates
-		m_sens = sens;
-		m_af   = af;
-		
+			m_dft[i]  = new DFT<T> (m_dims, mask, pc, b0);
+
 		// Great
 		m_initialised = true;
 		
@@ -154,7 +158,8 @@ public:
 	Matrix< std::complex<T> >
 	Adjoint       (const Matrix< std::complex<T> >& m) const {
 		
-		Matrix< std::complex<T> > res (m_dims[0], m_dims[1]/*, m_dims[2]*/);
+		Matrix< std::complex<T> > res (m_dims[0], m_dims[1]*m_af, m_dims[2], (m_compgfm) ? 2 : 1);
+
 		Matrix< std::complex<T> > tmp = m;
 		
 #pragma omp parallel
@@ -166,6 +171,7 @@ public:
 			Matrix< std::complex<T> > si (m_af, m_af);
 			Matrix< std::complex<T> > ra (m_nc,1);
 			Matrix< std::complex<T> > rp (m_af,1);
+			Matrix< std::complex<T> > gf (m_af,1);
 			
 #pragma omp for 
 			
@@ -176,34 +182,47 @@ public:
 				else
 					Volume (tmp, i, *(m_dft[tid]) ->* Volume (tmp, i));
 			
-			
 #pragma omp for schedule (guided)
 			
 			// Antialiasing
 			for (size_t x = 0; x < m_dims[0]; x++)
-				for (size_t y = 0; y < m_dims[1]/m_af; y++) 
-					/*for (size_t z = 0; z < m_dims[2]; z++)*/ {
-					
-					for (size_t c = 0; c < m_nc; c++) {
+				for (size_t y = 0; y < m_dims[1]; y++) 
+					for (size_t z = 0; z < m_dims[2]; z++) {
 						
-						ra [c] = tmp (x, y, c);
+						for (size_t c = 0; c < m_nc; c++) {
+							
+							ra [c] = (m_dims[2]-1) ? tmp (x, y, z, c) : tmp (x, y, c);
+							
+							for (size_t i = 0; i < m_af; i++) 
+								s (c, i) = (m_dims[2]-1) ? m_sens (x, y + m_dims[1] * i, z, c) : m_sens (x, y + m_dims[1] * i, c);
+							
+						}
 						
-						for (size_t i = 0; i < m_af; i++) 
-							s (c, i) = m_sens (x, y + m_dims[1]/m_af * i, /*z,*/ c);
+						si = gemm (s,   s, 'C', 'N');
+
+						if (m_compgfm)
+							gf = diag (si);
+
+						si = inv  (si);
+
+						if (m_compgfm)
+							gf = diag (si) * gf;
+
+						si = gemm (si,  s, 'N', 'C');
 						
+						rp = gemm (si, ra, 'N', 'N');
+						
+						for (size_t i = 0; i < m_af; i++) {
+
+							res (x, y + m_dims[1] * i, z, 0) =          rp [i]; 
+
+							if (m_compgfm)
+								res (x, y + m_dims[1] * i, z, 1) = sqrt(abs(gf [i]));
+
+						}
+
 					}
-					
-					si = gemm (s,   s, 'C', 'N');
-					si = inv  (si);                
-					si = gemm (si,  s, 'N', 'C');
-					
-					rp = gemm (si, ra, 'N', 'N');
-					
-					for (size_t i = 0; i < m_af; i++)
-						res (x, y + m_dims[1]/m_af * i /*, z*/) = rp [i]; 
-					
-				}
-			
+
 		}		
 		
 		return res;
@@ -239,6 +258,7 @@ private:
 	Matrix< std::complex<T> > m_pc;
 	
 	unsigned short m_af;
+	bool           m_compgfm;
 	
 	size_t         m_ndim;
 	Matrix<size_t> m_dims; /**< Operator dimensionality Valid: [2,3]*/

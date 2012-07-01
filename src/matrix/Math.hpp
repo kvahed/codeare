@@ -22,6 +22,26 @@ exp (const Matrix<T>& m) {
 
 
 /**
+ * @brief          Square root
+ * 
+ * @param  m       Matrix
+ * @return         SQRT
+ */ 
+template <class T> inline Matrix<T>
+sqrt (const Matrix<T>& m) {
+	
+	Matrix<T> res = m;
+	
+	for (size_t i = 0; i < res.Size(); i++)
+		res [i] = sqrt (res[i]);
+	
+	return res;
+	
+}
+
+
+
+/**
  * @brief          Logarithm
  * 
  * @param  m       Matrix

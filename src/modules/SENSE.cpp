@@ -37,7 +37,7 @@ SENSE::Prepare () {
 		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(1)));
 
 	printf ("  allocating Cartesian SENSE operator: ... "); fflush(stdout);
-	m_cs = new CSENSE<float> (smaps, m_af);
+	m_cs = new CSENSE<float> (smaps, m_af, m_compgfm);
 	printf ("done\n");
 	printf ("... done.\n\n");
 

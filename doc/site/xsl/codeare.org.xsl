@@ -21,10 +21,10 @@
 		<meta http-equiv="content-language" content="en" />
 		
 		<meta name="description" lang="en" content="" />
-		<meta name="keywords" content="MRI, image reconstruction, image
-									   reconstruction library, codeare, MRI, Compressed sensing,
-									   non-cartesian, SENSE, kt-Points, variable density spiral, k-space
-									   trajectory, GRAPPA, parallel imaging, selective excitation, open-source" /> 
+		<meta name="keywords" content="MRI, image reconstruction, image reconstruction library, codeare,
+									   Compressed sensing, non-cartesian, SENSE, kt-Points, 
+									   variable density spiral, k-space	trajectory, GRAPPA, parallel imaging, 
+									   selective excitation, open-source, Non-Uniform FFT, NUFFT" /> 
 		
 		<link rel="stylesheet" href="screen.css" type="text/css" media="screen" />
 		<link rel="stylesheet" href="codeare.css" type="text/css" media="screen" />
