@@ -1,0 +1,2 @@
+#!/bin/sh
+../src/lclient -b ../share/sense/ -c 3fold.xml -t SENSE

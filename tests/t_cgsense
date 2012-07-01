@@ -1,0 +1,2 @@
+#!/bin/sh
+../src/lclient -b ../share/cgsense/ -c brain.xml -t CGSENSE
