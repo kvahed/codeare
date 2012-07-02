@@ -24,8 +24,6 @@
 #include "ReconStrategy.hpp"
 #include "Algos.hpp"
 
-#include "nfft3util.h"
-#include "nfft3.h"
 #include "NCSENSE.hpp"
 
 typedef std::complex<float> raw;

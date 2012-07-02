@@ -22,7 +22,6 @@
 #define __NUFFT_HPP__
 
 #include "NFFT.hpp"
-#include "nfftstub.h"
 
 #include "ReconStrategy.hpp"
 
