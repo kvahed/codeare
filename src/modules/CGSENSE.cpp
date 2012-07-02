@@ -19,7 +19,6 @@
  */
 
 #include "CGSENSE.hpp"
-#include "nfftstub.h"
 #include "Noise.hpp"
 #include "Toolbox.hpp"
 #include "Lapack.hpp"
