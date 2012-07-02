@@ -21,7 +21,6 @@
 #ifndef __NCSENSE_HPP__
 #define __NCSENSE_HPP__
 
-#include "nfftstub.h"
 #include "NFFT.hpp"
 #include "CX.hpp"
 #include "SEM.hpp"

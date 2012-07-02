@@ -130,7 +130,7 @@ NuFFT::Process () {
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
 	
-	GetCXDB ("img") = nfft->Adjoint(GetCXFL ("data"));
+	GetCXDB ("img") = nfft->Adjoint(GetCXDB ("data"));
 	
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
 

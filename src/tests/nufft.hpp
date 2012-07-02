@@ -1,7 +1,7 @@
 template <class T> bool
 nuffttest (Connector<T>* rc) {
 
-	Matrix<cxfl>   rawdata;
+	Matrix<cxdb>   rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
 	Matrix<cxdb>   img;

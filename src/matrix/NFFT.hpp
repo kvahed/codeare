@@ -21,7 +21,7 @@
 #ifndef __NFFT_HPP__
 #define __NFFT_HPP__
 
-#include "NFFTStub.hpp"
+#include "NFFTTraits.hpp"
 #include "FT.hpp"
 #include "CX.hpp"
 
@@ -31,6 +31,11 @@
  */
 template <class T>
 class NFFT : public FT<T> {
+
+
+	typedef typename NFFTTraits<double>::Plan   Plan;
+	typedef typename NFFTTraits<double>::Solver Solver;
+
 	
 public:
 
@@ -74,7 +79,7 @@ public:
 		m_epsilon = eps;
 		m_maxit   = maxit;
 		
-		nnfft::init (rank, m_N, m_M, m_n, m, m_fplan, m_iplan);
+		NFFTTraits<double>::Init (rank, m_N, m_M, m_n, m, m_fplan, m_iplan);
 		
 		if (pc.Size() > 1)
 			m_have_pc = true;
@@ -94,8 +99,7 @@ public:
 		
 		if (m_initialised) {
 			
-			solver_finalize_complex (&m_iplan);
-			nfft_finalize (&m_fplan);
+			NFFTTraits<double>::Finalize (m_fplan, m_iplan);
 
 		}
 		
@@ -107,7 +111,7 @@ public:
 	 * 
 	 * @param  k   Kspace trajectory
 	 */
-	void 
+	inline void 
 	KSpace (const Matrix<T>& k) {
 		
 		if (sizeof(T) == sizeof(double))
@@ -124,21 +128,21 @@ public:
 	 * 
 	 * @param  w   Weights
 	 */
-	void 
-	Weights (const Matrix<T>& w)  {
+	inline void 
+	Weights (const Matrix<T>& w) {
 		
 		if (sizeof(T) == sizeof(double))
 			memcpy (m_iplan.w, w.Data(), numel(w) * sizeof(double));
 		else 
 			for (size_t i = 0; i < numel(w); i++)
 				m_iplan.w[i] = w[i];
-
-		nnfft::weights (m_fplan, m_iplan);
-		nnfft::psi     (m_fplan);
+		
+		NFFTTraits<double>::Weights (m_fplan, m_iplan);
+		NFFTTraits<double>::Psi     (m_fplan);
 		
 	}
 	
-
+	
 	/**
 	 * @brief    Forward transform
 	 *
@@ -146,7 +150,29 @@ public:
 	 * @return   Transform
 	 */
 	Matrix< std::complex<T> >
-	Trafo       (const Matrix< std::complex<T> >& m) const ;
+	Trafo       (const Matrix< std::complex<T> >& m) const {
+
+		Matrix< std::complex<T> > out (m_M,1);
+		
+		if (sizeof(T) == sizeof(double))
+			memcpy (m_fplan.f_hat, m.Data(), m_imgsz * sizeof (std::complex<T>));
+		else 
+			for (size_t i = 0; i < m_imgsz; i++) {
+				m_fplan.f_hat[i][0] = creal(m[i]);
+				m_fplan.f_hat[i][0] = cimag(m[i]);
+			}
+		
+		NFFTTraits<double>::Trafo (m_fplan);
+		
+		if (sizeof(T) == sizeof(double))
+			memcpy (&out[0], m_fplan.f, m_M * sizeof (std::complex<T>));
+		else 
+			for (size_t i = 0; i < m_M; i++)
+				out[i] = std::complex<T>(m_fplan.f[i][0],m_fplan.f[i][1]);
+		
+		return out;
+
+	}
 	
 	
 	/**
@@ -156,14 +182,37 @@ public:
 	 * @return   Transform
 	 */
 	Matrix< std::complex<T> >
-	Adjoint     (const Matrix< std::complex<T> >& m) const ;
+	Adjoint     (const Matrix< std::complex<T> >& m) const {
+		
+		Matrix< std::complex<T> > out (m_N[0], m_N[1], m_N[2], m_N[3]);
+		
+		if (sizeof(T) == sizeof(double))
+			memcpy (m_iplan.y, m.Data(), m_M * sizeof ( std::complex<T> ));
+		else 
+			for (size_t i = 0; i < m_M; i++) {
+				m_iplan.y[i][0] = creal(m[i]);
+				m_iplan.y[i][1] = cimag(m[i]);
+			}
+		
+		NFFTTraits<double>::ITrafo ((Plan&) m_fplan, (Solver&) m_iplan, m_maxit, m_epsilon);
+		
+		if (sizeof(T) == sizeof(double))
+			memcpy (&out[0], m_iplan.f_hat_iter, m_imgsz*sizeof ( std::complex<T> ));
+		else 
+			for (size_t i = 0; i < m_imgsz; i++)
+				out[i] = std::complex<T>(m_iplan.f_hat_iter[i][0],m_iplan.f_hat_iter[i][1]);
+		
+		return out;
+		
+	}
+
 
 	/**
 	 * @brief     NFFT plan
 	 *
 	 * @return    Plan
 	 */
-	nfft_plan*
+	Plan*
 	FPlan         () {
 
 		return &m_fplan;
@@ -175,7 +224,7 @@ public:
 	 *
 	 * @return    Plan
 	 */
-	solver_plan_complex*
+	Solver*
 	IPlan         () {
 		
 		return &m_fplan;
@@ -197,92 +246,14 @@ private:
 	T         m_epsilon;          /**< @brief Convergence criterium */
 	size_t    m_imgsz;
 	
-	nfft_plan m_fplan;            /**< nfft  plan */
-	solver_plan_complex m_iplan;  /**< infft plan */
+	Plan      m_fplan;            /**< nfft  plan */
+	Solver    m_iplan;            /**< infft plan */
 	
 	bool      m_prepared;
 
 };
 
 
-
-template<> inline Matrix<cxdb>
-NFFT<double>::Adjoint (const Matrix<cxdb>& in) const {
-
-	Matrix<cxdb> out (m_N[0], m_N[1], m_N[2], m_N[3]);
-	
-	memcpy (m_iplan.y, in.Data(), m_M * sizeof (cxdb));
-	
-	nnfft::ift ((nfft_plan&) m_fplan, (solver_plan_complex&) m_iplan, m_maxit, m_epsilon);
-	
-	memcpy (&out[0], m_iplan.f_hat_iter, m_imgsz*sizeof (cxdb));
-	
-	return out;
-
-}
-
-
-
-template<> inline Matrix<cxdb>
-NFFT<double>::Trafo (const Matrix<cxdb>& in) const {
-
-	Matrix<cxdb> out (m_M,1);
-
-	memcpy (m_fplan.f_hat, in.Data(), m_imgsz * sizeof (cxdb));
-
-	nnfft::ft (m_fplan);
-
-	memcpy (&out[0], m_fplan.f, m_M * sizeof (cxdb));
-			
-	return out;
-
-}
-
-
-
-template<> inline Matrix<cxfl>
-NFFT<float>::Adjoint (const Matrix<cxfl>& in) const {
-
-	Matrix<cxdb> out (m_N[0], m_N[1], m_N[2], m_N[3]);
-	size_t m = m_M, i = m_imgsz;  
-
-	while (m--) {
-		m_iplan.y[m][0] = in[m].real();
-		m_iplan.y[m][1] = in[m].imag();
-	}
-
-	nnfft::ift ((nfft_plan&) m_fplan, (solver_plan_complex&) m_iplan, m_maxit, m_epsilon);
-
-	while (i--)
-		out [i] = cxfl (m_iplan.f_hat_iter[i][0], m_iplan.f_hat_iter[i][1]);
-	
-	return out;
-
-}
-
-
-template<> inline Matrix<cxfl>
-NFFT<float>::Trafo (const Matrix<cxfl>& in) const {
-
-	Matrix<cxfl> out (m_M,1);
-	size_t m = m_M, i = m_imgsz;  
-
-	while (i--) {
-		m_fplan.f_hat[i][0] = in[i].real();
-		m_fplan.f_hat[i][1] = in[i].imag();
-	}
-
-	nnfft::ft (m_fplan);
-
-	while (m--)
-		out [m] = cxfl (m_fplan.f[m][0], m_fplan.f[m][1]);
-			
-	return out;
-
-}
-
-
-	
 #endif
 
 

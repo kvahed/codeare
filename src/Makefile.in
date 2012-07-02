@@ -52,8 +52,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = reconserver$(EXEEXT) lclient$(EXEEXT) rclient$(EXEEXT)
-@USE_NFFT3_TRUE@am__append_1 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la -dlopen modules/NuFFT_OMP.la 
-@USE_NFFT3_TRUE@am__append_2 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la -dlopen modules/NuFFT_OMP.la 
+@USE_NFFT3_TRUE@am__append_1 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
+@USE_NFFT3_TRUE@am__append_2 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 subdir = src
 DIST_COMMON = $(srcdir)/Loader.hpp.in $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
