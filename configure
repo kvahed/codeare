@@ -11692,10 +11692,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"d395d7b8\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"68b73932\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Sun Jul 1 23:59:35 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Jul 2 23:38:34 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice

@@ -793,9 +793,9 @@ H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc 
 			
 			hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
 			size_t    ndim    = space.getSimpleExtentDims(dims, NULL);
-			size_t mdims [INVALID_DIM];
+			size_t    mdims [INVALID_DIM];
 			
-			if (typeid(T) == typeid(cxfl)) 
+			if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
 				ndim--;
 			
 			for (size_t i = 0; i < ndim; i++)
@@ -818,14 +818,14 @@ H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc 
 			
 			PredType*  type;
 			
-			if (typeid(T) == typeid(cxfl))
+			if      (typeid(T) == typeid(cxfl) || typeid(T) == typeid(float))
 				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
-			else if (typeid(T) == typeid(double))
+			else if (typeid(T) == typeid(cxdb) || typeid(T) == typeid(double))
 				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
 			else
 				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
 			
-			dataset.read (&M[0], (*type));
+			dataset.read (&M[0], *type);
 			
 			space.close();
 			dataset.close();

@@ -232,7 +232,7 @@ public:
 
 		p = EH (m, m_sm, m_fts) * m_ic;
 		r = p;
-		x = zeros<cxfl>(size(p));
+		x = zeros< std::complex<T> >(size(p));
 		
 		rn = 0.0;
 		xn = pow(creal(norm(p)), 2);
@@ -247,7 +247,6 @@ public:
 			
 			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 
-			//p  *= 
 			q   = EH (E  (p * m_ic, m_sm, m_fts), m_sm, m_fts);
 			q  *= m_ic;
 			

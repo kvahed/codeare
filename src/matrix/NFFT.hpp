@@ -159,7 +159,7 @@ public:
 		else 
 			for (size_t i = 0; i < m_imgsz; i++) {
 				m_fplan.f_hat[i][0] = creal(m[i]);
-				m_fplan.f_hat[i][0] = cimag(m[i]);
+				m_fplan.f_hat[i][1] = cimag(m[i]);
 			}
 		
 		NFFTTraits<double>::Trafo (m_fplan);
