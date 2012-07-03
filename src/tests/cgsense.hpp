@@ -23,16 +23,17 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	
 	// Incoming
 	Matrix<cxfl>   rawdata; // Measurement data O(Nkx,Nky,Nkz)
-	Matrix<double> weights; // NUFFT weights   
-	Matrix<double> kspace;  // Kspace positions O(Nkx,Nky,Nkz)
+	Matrix<float>  weights; // NUFFT weights   
+	Matrix<float>  kspace;  // Kspace positions O(Nkx,Nky,Nkz)
 	Matrix<cxfl>   sens;    // Sensitivity maps O(Nx, Ny, Nz)
 	
 	// Outgoing
-	Matrix<double> nrmse;   // Residues of the CG process
+	Matrix<float>  nrmse;   // Residues of the CG process
 	Matrix<cxfl>   image;
 	Matrix<cxfl>   signals;
 	
 	std::string    odf = std::string (base + std::string("/images.mat")); // Binary Ouput (images etc)
+	std::string    rev = std::string (base + std::string("/rev.mat"));
 	
 	if (!Read (rawdata, rc->GetElement("/config/data/d"), base) ||
 		!Read (kspace,  rc->GetElement("/config/data/k"), base) ||
@@ -40,7 +41,7 @@ cgsensetest (RRClient::Connector<T>* rc) {
 		return false;
 
 	if (!Read (weights, rc->GetElement("/config/data/w"), base))
-		weights = Matrix<double> (1);
+		weights = Matrix<float> (1);
 
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
@@ -52,6 +53,18 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	rc->SetMatrix (   "sens", sens);    // Sensitivities
 	rc->SetMatrix ("weights", weights); // Weights
 	rc->SetMatrix ( "kspace", kspace);  // K-space
+
+#ifdef HAVE_MAT_H	
+	MATFile* mf = matOpen (rev.c_str(), "w");
+	MXDump (weights, mf, "weights");
+	MXDump (sens, mf, "sens");
+	MXDump (kspace, mf, "kspace");
+	MXDump (rawdata, mf, "data");
+	if (matClose(mf) != 0) {
+		printf ("Error closing file %s\n", rev.c_str());
+		return false;
+	}
+#endif	
 	
 	rc->Prepare   (test);
 	
@@ -71,7 +84,7 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	rc->Finalise   (test);
 	
 #ifdef HAVE_MAT_H	
-	MATFile* mf = matOpen (odf.c_str(), "w");
+	mf = matOpen (odf.c_str(), "w");
 	
 	if (mf == NULL) {
 		printf ("Error creating file %s\n", odf.c_str());

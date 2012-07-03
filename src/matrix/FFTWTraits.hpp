@@ -27,7 +27,6 @@
 template <class T>
 struct FTTraits { };
 
-
 /**
  * @brief C++ friendly interface to complex FFTW (single precision)
  */

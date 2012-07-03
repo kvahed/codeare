@@ -111,9 +111,9 @@ public:
 			np = omp_get_num_threads ();
 		}	
 
-		Matrix<size_t> ftdims (m_ndim,1);
-		for (size_t i = 0; i < m_ndim; i++)
-			ftdims[i] = m_dims[i];
+		Matrix<size_t> ftdims = resize(m_dims,m_ndim,1);
+		//for (size_t i = 0; i < m_ndim; i++)
+		//	ftdims[i] = m_dims[i];
 
 		m_dft = new DFT<T>* [np];
 		

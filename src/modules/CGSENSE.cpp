@@ -118,9 +118,9 @@ CGSENSE::Prepare () {
 
 	RRSModule::error_code error = OK;
 
-	Matrix<cxfl>&   sens    = GetCXFL("sens");
-	Matrix<double>& weights = GetRLDB("weights");
-	Matrix<double>& kspace  = GetRLDB("kspace");
+	Matrix<cxfl>&   sens   = GetCXFL("sens");
+	Matrix<float>& weights = GetRLFL("weights");
+	Matrix<float>& kspace  = GetRLFL("kspace");
 
 	size_t nk = numel(weights);
 
@@ -136,8 +136,8 @@ CGSENSE::Prepare () {
 	m_ncs->Weights (weights);
 	
 	FreeCXFL ("sens");
-	FreeRLDB ("weights");
-	FreeRLDB ("kspace");
+	FreeRLFL ("weights");
+	FreeRLFL ("kspace");
 	
 	m_initialised = true;
 

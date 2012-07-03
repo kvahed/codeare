@@ -21,7 +21,6 @@
 #ifndef __DFT_HPP__
 #define __DFT_HPP__
 
-#include <fftw3.h>
 #include "Matrix.hpp"
 #include "Algos.hpp"
 #include "IO.hpp"
