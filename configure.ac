@@ -344,6 +344,28 @@ AC_MSG_RESULT($rtc_ok)
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
 AM_CONDITIONAL([USE_NFFT3],  [test "$HAVE_NFFT3" -eq 1])
 
+# NFFT naming differences starting with 3.2.0
+AC_MSG_CHECKING([for NFFT library naming convention])
+OLD_LIBS=$LIBS
+
+LIBS="${LIBS} -lnfft3"
+AC_TRY_LINK([#include <nfft3.h>],
+   [mv_plan_complex mvp; return 0; ],
+   [AC_MSG_RESULT([nfft3 < 3.2.0])]
+   [HAVE_NFFT3=1],
+   [LIBS=$OLD_LIBS])
+
+if test -z $nfft_32_naming; then
+   LIBS="${LIBS} -lnfft3"
+   AC_TRY_LINK([#include <nfft3.h>],
+       [nfft_mv_plan_complex mvp; return 0; ],
+   	   [AC_MSG_RESULT([nfft3 >= 3.2.0])]
+	   [AC_DEFINE(USE_NFFT_32_NAMING,[1],[Use NFFT 3.2 naming conventions])]
+	   [HAVE_NFFT3=1],
+   	   [LIBS=$OLD_LIBS])
+fi
+
+AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
 # Checks for C++ libraries with name spaces
 

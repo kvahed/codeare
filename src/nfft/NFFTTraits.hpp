@@ -28,9 +28,18 @@
 #include "nfft3util.h"
 #include "nfft3.h"
 
+#include "config.h"
+
+#ifndef USE_NFFT_32_NAMING
+    #define nfft_mv_plan_complex mv_plan_complex
+    #define nfftf_mv_plan_complex mv_plan_complex
+#endif
+
 template <class T>
 struct NFFTTraits { };
 
+
+#ifdef USE_NFFT_32_NAMING
 
 template <>
 struct NFFTTraits<float> {
@@ -223,6 +232,7 @@ struct NFFTTraits<float> {
 	
 };
 
+#endif
 
 
 template <>
