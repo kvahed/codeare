@@ -90,7 +90,7 @@ struct FTTraits<float> {
 	/**
 	 * @brief        Destroy plan
 	 *
-	 * @param  Plan  Plan to be destroyed
+	 * @param  p     Plan to be destroyed
 	 */
 	static inline void 
 	Destroy (Plan p) { 
@@ -101,7 +101,7 @@ struct FTTraits<float> {
 	/**
 	 * @brief        Execute plan
 	 *
-	 * @param  Plan  Plan to be executed
+	 * @param  p     Plan to be executed
 	 */
 	static inline void 
 	Execute (Plan p) { 
@@ -174,7 +174,7 @@ struct FTTraits<double> {
 	/**
 	 * @brief        Destroy plan
 	 *
-	 * @param   Plan Plan to be destroyed
+	 * @param   p    Plan to be destroyed
 	 */
 	static inline void 
 	Destroy (Plan p) { 
@@ -185,7 +185,7 @@ struct FTTraits<double> {
 	/**
 	 * @brief       Execute plan
 	 *
-	 * @param  Plan Plan to be executed
+	 * @param  p    Plan to be executed
 	 */
 	static inline void
 	Execute (Plan p) { 

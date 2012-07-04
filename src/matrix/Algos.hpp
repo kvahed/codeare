@@ -225,7 +225,7 @@ isinf (const Matrix<T>& M) {
 	size_t i = numel(M);
 
 	while (i--)
-		res.Dat().at(i) = (std::isinf(creal(M.At(i)))||std::isinf(cimag(M.At(i))));
+		res.Dat()[i] = (std::isinf(creal(M.At(i)))||std::isinf(cimag(M.At(i))));
 	
     return res;
 
@@ -751,13 +751,11 @@ resize (const Matrix<T>& M, const size_t& sz) {
 template <class T> inline static Matrix<T>
 resize (const Matrix<T>& M, Matrix<size_t> sz) {
 
-	Matrix<T> res = zeros<T> (sz);
-	size_t copysz = MIN(numel(M), numel(res)) * sizeof (T);
+	Matrix<T> res  = zeros<T> (sz);
+	size_t copysz  = MIN(numel(M), numel(res)) * sizeof (T);
+	slice  copyslc (0,copysz,1);
 
-	typename vector<T>::iterator start = M.Dat().begin();
-	typename vector<T>::iterator end   = M.Dat().begin() + copysz;
-	
-	res.Dat().assign (start, end);
+	res.Dat()[copyslc] = M.Dat()[copyslc];
 
 	return res;
 	

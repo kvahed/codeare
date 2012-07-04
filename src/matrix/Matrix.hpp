@@ -50,7 +50,7 @@ enum IceDim {
 #include <stdio.h>
 #include <time.h>
 #include <limits.h>
-#include <vector>
+#include <valarray>
 #include <ostream>
 
 #define ICE_SHRT_MAX 4095
@@ -361,7 +361,7 @@ public:
      */
     inline const T*            
     Data                (const size_t pos = 0)  const {
-        return &(_M.at(pos));
+        return &(_M[pos]);
 	}
 
     
@@ -370,7 +370,7 @@ public:
      *  
      * @return          Data 
      */
-    inline std::vector<T>&            
+    inline std::valarray<T>&            
     Dat                 ()  {
         return _M;
 	}
@@ -381,7 +381,7 @@ public:
      *  
      * @return          Data 
      */
-    inline std::vector<T>            
+    inline std::valarray<T>            
     Dat                 ()  const {
         return _M;
 	}
@@ -1418,7 +1418,7 @@ public:
     inline void         
     Zero               ()                                      {
 
-		_M.assign (Size(), T(0)); 
+		_M = T(0); 
 
     }
     
@@ -2067,7 +2067,7 @@ private:
     
     size_t              _dim[INVALID_DIM]; /// Dimensions
     float               _res[INVALID_DIM]; /// Resolutions
-	std::vector<T>      _M;
+	std::valarray<T>      _M;
 	std::string         _name; 
 
 
@@ -2496,7 +2496,7 @@ Matrix<T>::Matrix (const Matrix<T> &M) {
 	i = Size();
 	_M.resize(i);
 	
-	memcpy (&_M[0], M.Data(), i * sizeof(T));
+	_M = M.Dat();
 	
 }
 
@@ -2545,7 +2545,7 @@ Matrix<T>::operator= (const Matrix<T>& M) {
 template <class T> inline Matrix<T> 
 Matrix<T>::operator= (const T& s) {
 	
-	_M.assign (Size(), s);
+	_M = s;
     return *this;
 	
 }

@@ -733,6 +733,7 @@ AMTAR
 am__leading_dot
 SET_MAKE
 AWK
+mkdir_p
 MKDIR_P
 INSTALL_STRIP_PROGRAM
 STRIP
@@ -3018,6 +3019,12 @@ fi
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MKDIR_P" >&5
 $as_echo "$MKDIR_P" >&6; }
+
+mkdir_p="$MKDIR_P"
+case $mkdir_p in
+  [\\/$]* | ?:[\\/]*) ;;
+  */*) mkdir_p="\$(top_builddir)/$mkdir_p" ;;
+esac
 
 for ac_prog in gawk mawk nawk awk
 do
@@ -11692,10 +11699,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"68b73932\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"b473dcbe\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Mon Jul 2 23:38:34 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Tue Jul 3 18:24:52 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -18191,6 +18198,68 @@ else
 fi
 
 
+# NFFT naming differences starting with 3.2.0
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for NFFT library naming convention" >&5
+$as_echo_n "checking for NFFT library naming convention... " >&6; }
+OLD_LIBS=$LIBS
+
+LIBS="${LIBS} -lnfft3"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <nfft3.h>
+int
+main ()
+{
+mv_plan_complex mvp; return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: nfft3 < 3.2.0" >&5
+$as_echo "nfft3 < 3.2.0" >&6; }
+   HAVE_NFFT3=1
+else
+  LIBS=$OLD_LIBS
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+if test -z $nfft_32_naming; then
+   LIBS="${LIBS} -lnfft3"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <nfft3.h>
+int
+main ()
+{
+nfft_mv_plan_complex mvp; return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: nfft3 >= 3.2.0" >&5
+$as_echo "nfft3 >= 3.2.0" >&6; }
+
+$as_echo "#define USE_NFFT_32_NAMING 1" >>confdefs.h
+
+	   HAVE_NFFT3=1
+else
+  LIBS=$OLD_LIBS
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+
+ if test "$HAVE_NFFT3" -eq 1; then
+  USE_NFFT3_TRUE=
+  USE_NFFT3_FALSE='#'
+else
+  USE_NFFT3_TRUE='#'
+  USE_NFFT3_FALSE=
+fi
+
 
 # Checks for C++ libraries with name spaces
 
@@ -19611,6 +19680,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_OPENCL_TRUE}" && test -z "${USE_OPENCL_FALSE}"; then
   as_fn_error $? "conditional \"USE_OPENCL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${USE_NFFT3_TRUE}" && test -z "${USE_NFFT3_FALSE}"; then
+  as_fn_error $? "conditional \"USE_NFFT3\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_NFFT3_TRUE}" && test -z "${USE_NFFT3_FALSE}"; then
