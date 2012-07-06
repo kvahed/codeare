@@ -1320,24 +1320,6 @@ public:
     
 
     /**
-     * @brief           Resize to dims, reallocate and zero repository. 
-	 *                  Needs to becalled after any resize operation on dimensios. 
-	 *                  (i.e. M.Dim(2) = 10; Reset();)
-     *
-     * @param  dim      New dimensions
-     */
-    inline void         
-    Reset               (const size_t* dim)                                      {
-
-		for (size_t i = 0; i < INVALID_DIM; i++)
-			_dim [i] = dim [i];
-		
-		Reset();
-		
-    }
-    
-	
-    /**
      * @brief           Purge data and free RAM.
      */
     inline void         
@@ -2025,19 +2007,6 @@ private:
 	RSAdjust            (const std::string& fname);
 
 
-    /**
-     * @brief           Reset. i.e. reallocate and set all fields = T(0)
-     */
-    inline void         
-    Reset               ()                                      {
-
-		_M.resize(Size(),T(0));
-
-    }
-    
-
-
-    
 };
 
 
@@ -2388,10 +2357,8 @@ Matrix<T>::Matrix (const size_t* dim) {
 template <class T> inline 
 Matrix<T>::Matrix (const size_t* d, const float* r) {
 	
-	for (size_t i = 0; i < INVALID_DIM; i++) {
-		_dim[i] = d[i];
-        _res[i] = r[i];
-	}
+	memcpy (_dim, d, INVALID_DIM * sizeof(size_t));
+	memcpy (_res, r, INVALID_DIM * sizeof( float));
 	
 	_M.resize(Size(),T(0));
 
@@ -2401,10 +2368,8 @@ Matrix<T>::Matrix (const size_t* d, const float* r) {
 template <class T> inline 
 Matrix<T>::Matrix (const Matrix<T> &M) {
 	
-	for (size_t i = 0; i < INVALID_DIM; i++) {
-		_dim[i] = M.Dim(i);
-		_res[i] = M.Res(i);
-	}
+	memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
+	memcpy (_res, M.Res(), INVALID_DIM * sizeof( float));
 	
 	_M = M.Dat();
 	
@@ -2581,7 +2546,7 @@ Matrix<T>::operator<= (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator!= (const Matrix<T>& M) const {
 
-    Matrix<bool> res(_dim);
+    Matrix<bool> res(_dim,_res);
 	res.Dat() = (_M != M.Dat());
     return res;
 
@@ -2591,7 +2556,7 @@ Matrix<T>::operator!= (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator> (const Matrix<T>& M) const {
 	
-    Matrix<bool> res(_dim);
+    Matrix<bool> res(_dim,_res);
 	res.Dat() = (_M > M.Dat());
     return res;
 
@@ -2601,7 +2566,7 @@ Matrix<T>::operator> (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator< (const Matrix<T>& M) const {
 
-    Matrix<bool> res(_dim);
+    Matrix<bool> res(_dim,_res);
 	res.Dat() = (_M < M.Dat());
     return res;
 
@@ -2611,12 +2576,8 @@ Matrix<T>::operator< (const Matrix<T>& M) const {
 template <class T> inline Matrix<T> 
 Matrix<T>::operator- () const {
 
-	size_t i = Size();
-    Matrix<T> res (_dim);
-
-	while (i--)
-        res[i] =- _M[i];
-
+	Matrix<T> res (_dim,_res);
+	res.Dat() = -_M;
     return res;
 
 }
@@ -2646,11 +2607,7 @@ Matrix<T>::operator- (const S& s) const {
 
     Matrix<T> res = *this;
 	T t = T(s);
-	size_t i = Size();
-
-	while (i--)
-		res[i] -= t;
-
+	res.Dat() -= t;
 	return res;
 
 }
@@ -2680,11 +2637,7 @@ Matrix<T>::operator+ (const S& s) const {
 
     Matrix<T> res = *this;
 	T t = T(s);
-	size_t i = Size();
-
-	while (i--)
-		res[i] += t;
-
+	res.Dat() += t;
 	return res;
 
 }
@@ -2798,11 +2751,7 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator+= (const S& s) {
     
 	T t = T(s);
-	size_t i = Size();
-
-	while (i--)
-		_M[i] += t;
-
+	_M += t;
     return *this;
 
 }
@@ -2829,12 +2778,8 @@ Matrix<T>::operator-= (const Matrix<S>& M) {
 template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator-= (const S& s) {
     
-    size_t i = Size();
 	T t = T(s);
-
-	while (i--)
-		_M[i] -= t;
-
+	_M -= t;
     return *this;
 
 }
@@ -2861,12 +2806,9 @@ Matrix<T>::operator /= (const Matrix<S> &M) {
 template <class T> template<class S> inline Matrix<T>
 Matrix<T>::operator/= (const S& s) {
     
+	assert (s);
 	T t = T(s);
-	size_t i = Size();
-
-	while (i--)
-		_M[i] /= t;
-
+	_M /= t;
     return *this;
 
 }

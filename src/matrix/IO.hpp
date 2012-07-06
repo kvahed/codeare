@@ -309,7 +309,7 @@ PRRead (Matrix<T>& M, const string fname) {
 	
 		// Read dimensions and allocate matrix
 		if (!mread (dims, sizeof(size_t), INVALID_DIM, f, "dimensions")) return false;
-		M.Reset(dims);
+		M = Matrix<T>(dims);
 		n = numel(M);
 		
 		// Read resolutions and assign
