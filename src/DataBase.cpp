@@ -124,10 +124,10 @@ DataBase::SetMatrix (const string name, const cxfl_data& c)   {
 	
 	Ptr< Matrix<cxfl> > tmp;
 	
-	if (m_cxfl.find (name) == m_cxfl.end())
-		m_cxfl.insert (pair<string, Ptr< Matrix<cxfl> > > (name, tmp = NEW (Matrix<cxfl>(mdims, mress))));
-	else
-		tmp = m_cxfl[name];
+	if (m_cxfl.find (name) != m_cxfl.end())
+		FreeCXFL (name);
+
+	m_cxfl.insert (pair<string, Ptr< Matrix<cxfl> > > (name, tmp = NEW (Matrix<cxfl>(mdims, mress))));
 	
 	tmp->SetClassName(name.c_str());
 	
@@ -227,17 +227,12 @@ DataBase::SetMatrix (const string name, const cxdb_data& c)   {
 	
 	Ptr< Matrix<cxdb> > tmp;
 	
-	if (m_cxdb.find (name) == m_cxdb.end())
-		m_cxdb.insert (pair<string, Ptr< Matrix<cxdb> > > (name, tmp = NEW (Matrix<cxdb>(mdims, mress))));
-	else
-		tmp = m_cxdb[name];
-	
+	if (m_cxdb.find (name) != m_cxdb.end())
+		FreeCXDB (name);
+		
+	m_cxdb.insert (pair<string, Ptr< Matrix<cxdb> > > (name, tmp = NEW (Matrix<cxdb>(mdims, mress))));
+
 	tmp->SetClassName(name.c_str());
-	
-	for (int i = 0; i < INVALID_DIM; i++) {
-		tmp->Dim(i) = c.dims[i];
-		tmp->Res(i) = c.res[i];
-	}
 	
 	memcpy (&tmp->At(0), &c.vals[0], c.vals.length() * sizeof(double));
 	
@@ -335,17 +330,12 @@ DataBase::SetMatrix        (const string name, const rlfl_data& r)   {
 	
 	Ptr< Matrix<float> > tmp;
 	
-	if (m_rlfl.find (name) == m_rlfl.end())
-		m_rlfl.insert (pair<string, Ptr< Matrix<float> > > (name, tmp = NEW( Matrix<float>(mdims, mress))));
-	else
-		tmp = m_rlfl[name];
+	if (m_rlfl.find (name) != m_rlfl.end())
+		FreeRLFL (name);
+
+	m_rlfl.insert (pair<string, Ptr< Matrix<float> > > (name, tmp = NEW( Matrix<float>(mdims, mress))));
 	
 	tmp->SetClassName(name.c_str());
-	
-	for (int i = 0; i < INVALID_DIM; i++) {
-		tmp->Dim(i) = r.dims[i];
-		tmp->Res(i) = r.res[i];
-	}
 	
 	memcpy (&tmp->At(0), &r.vals[0], tmp->Size() * sizeof(float));
 	
@@ -443,17 +433,12 @@ DataBase::SetMatrix        (const string name, const rldb_data& r)   {
 	
 	Ptr< Matrix<double> > tmp;
 	
-	if (m_rldb.find (name) == m_rldb.end())
-		m_rldb.insert (pair<string, Ptr< Matrix<double> > > (name, tmp = NEW( Matrix<double>(mdims, mress))));
-	else
-		tmp = m_rldb[name];
+	if (m_rldb.find (name) != m_rldb.end())
+		FreeRLDB (name);
+
+	m_rldb.insert (pair<string, Ptr< Matrix<double> > > (name, tmp = NEW( Matrix<double>(mdims, mress))));
 	
 	tmp->SetClassName(name.c_str());
-	
-	for (int i = 0; i < INVALID_DIM; i++) {
-		tmp->Dim(i) = r.dims[i];
-		tmp->Res(i) = r.res[i];
-	}
 	
 	memcpy (&tmp->At(0), &r.vals[0], tmp->Size() * sizeof(double));
 	
@@ -553,17 +538,12 @@ DataBase::SetMatrix         (const string name, const shrt_data& p)   {
 	
 	Ptr< Matrix<short> > tmp;
 	
-	if (m_shrt.find (name) == m_shrt.end())
-		m_shrt.insert (pair<string, Ptr< Matrix<short> > > (name, tmp = NEW (Matrix<short>(mdims, mress))));
-	else
-		tmp = m_shrt[name];
-	
+	if (m_shrt.find (name) != m_shrt.end())
+		FreeSHRT (name);
+
+	m_shrt.insert (pair<string, Ptr< Matrix<short> > > (name, tmp = NEW (Matrix<short>(mdims, mress))));
+
 	tmp->SetClassName(name.c_str());
-	
-	for (int i = 0; i < INVALID_DIM; i++) {
-		tmp->Dim(i) = p.dims[i];
-		tmp->Res(i) = p.res[i];
-	}
 	
 	memcpy (&tmp->At(0), &p.vals[0], tmp->Size() * sizeof(short));
 	
@@ -663,17 +643,12 @@ DataBase::SetMatrix         (const string name, const long_data& p)   {
 	
 	Ptr< Matrix<long> > tmp;
 	
-	if (m_long.find (name) == m_long.end())
-		m_long.insert (pair<string, Ptr< Matrix<long> > > (name, tmp = NEW (Matrix<long>(mdims, mress))));
-	else
-		tmp = m_long[name];
+	if (m_long.find (name) != m_long.end())
+		FreeLONG (name);
+
+	m_long.insert (pair<string, Ptr< Matrix<long> > > (name, tmp = NEW (Matrix<long>(mdims, mress))));
 	
 	tmp->SetClassName(name.c_str());
-	
-	for (int i = 0; i < INVALID_DIM; i++) {
-		tmp->Dim(i) = p.dims[i];
-		tmp->Res(i) = p.res[i];
-	}
 	
 	memcpy (&tmp->At(0), &p.vals[0], tmp->Size() * sizeof(long));
 	
