@@ -465,8 +465,10 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	s      =        malloc (swork);
 	
 	Matrix<T> b = eye<T>(ldb);
-	
+
 	float frcond  = rcond;
+	printf ("%s\n", DimsToCString(m));
+	
 	
 	if      (typeid(T) == typeid(cxfl))
 		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
@@ -485,7 +487,7 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	iwork = (int*) malloc (sizeof(int) * iwopt);
 	work  = (T*)   malloc (sizeof(T) * lwork);
 	
-	if (typeid(T) == typeid(cxfl))
+	if      (typeid(T) == typeid(cxfl))
 		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
 	else if (typeid(T) == typeid(cxdb))
 		zgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork, rwork, iwork, &info);
@@ -635,28 +637,24 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
  * @param  M           Input
  * @return             Eclidean norm
  */
-template<class T> static T
+template<class T> static double
 norm (const Matrix<T>& M) {
-	
-	T   res  = T(0);
-	
+
 	int n    = (int) numel (M);
 	int incx = 1;
-	
-	if      (typeid(T) == typeid(  cxfl)) res = cblas_scnrm2 (n, M.Data(), incx);
-	else if (typeid(T) == typeid(  cxdb)) res = cblas_dznrm2 (n, M.Data(), incx);
-	else if (typeid(T) == typeid(double)) res = cblas_dnrm2  (n, M.Data(), incx);
-	else if (typeid(T) == typeid( float)) res = cblas_snrm2  (n, M.Data(), incx);
-	else {
-		while (n--)
-			res += pow(M[n],2.0);
-		sqrt (res);
-	}
-	
-	return res;
-	
-}
 
+	if      (typeid(T) == typeid(  cxfl)) 
+		return creal(cblas_scnrm2 (n, M.Data(), incx));
+	else if (typeid(T) == typeid(  cxdb)) 
+		return creal(cblas_dznrm2 (n, M.Data(), incx));
+	else if (typeid(T) == typeid(double)) 
+		return       cblas_dnrm2  (n, M.Data(), incx);
+	else if (typeid(T) == typeid( float)) 
+		return       cblas_snrm2  (n, M.Data(), incx);
+	else 
+		assert (0);
+
+}
 
 
 /**

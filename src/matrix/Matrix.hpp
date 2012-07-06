@@ -50,7 +50,7 @@ enum IceDim {
 #include <stdio.h>
 #include <time.h>
 #include <limits.h>
-#include <vector>
+#include <valarray>
 #include <ostream>
 
 #define ICE_SHRT_MAX 4095
@@ -361,7 +361,10 @@ public:
      */
     inline const T*            
     Data                (const size_t pos = 0)  const {
-        return &(_M.at(pos));
+
+		assert (pos < Size());
+        return &(_M[pos]);
+
 	}
 
     
@@ -370,7 +373,7 @@ public:
      *  
      * @return          Data 
      */
-    inline std::vector<T>&            
+    inline std::valarray<T>&            
     Dat                 ()  {
         return _M;
 	}
@@ -381,7 +384,7 @@ public:
      *  
      * @return          Data 
      */
-    inline std::vector<T>            
+    inline std::valarray<T>            
     Dat                 ()  const {
         return _M;
 	}
@@ -396,6 +399,7 @@ public:
     inline T            
     At                  (const size_t& pos) const {
 
+		assert (pos < Size());
         return _M[pos];
 
     }
@@ -411,6 +415,7 @@ public:
     inline T&           
     At                  (const size_t& pos) {
 
+		assert (pos < Size());
         return _M[pos];
 
     }
@@ -427,7 +432,9 @@ public:
     inline T            
     At                  (const size_t& col, const size_t& lin) const {
 
-        return _M[col + _dim[COL]*lin ];
+		size_t pos = col + _dim[COL]*lin ;
+		assert (pos < Size());
+        return _M[pos];
 
     }
 
@@ -443,6 +450,8 @@ public:
     inline T&           
     At                  (const size_t& col, const size_t& lin) {
 
+		size_t pos = col + _dim[COL]*lin ;
+		assert (pos < Size());
         return _M[col + _dim[COL]*lin ];
 
     }
@@ -460,6 +469,8 @@ public:
     inline T            
     At                   (const size_t& col, const size_t& lin, const size_t& slc)  const {
 
+		size_t pos = col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc ;
+		assert (pos < Size());
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
 
     }
@@ -477,6 +488,8 @@ public:
     inline T&            
     At                   (const size_t& col, const size_t& lin, const size_t& slc) {
 
+		size_t pos = col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc ;
+		assert (pos < Size());
         return _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc];
 
     }
@@ -521,23 +534,25 @@ public:
 						  const size_t& idd = 0,
 						  const size_t& ide = 0,
 						  const size_t& ave = 0) const {
-
-		return _M [col+
-				   lin*_dim[COL]+
-				   cha*_dim[COL]*_dim[LIN]+
-				   set*_dim[COL]*_dim[LIN]*_dim[CHA]+
-				   eco*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]+
-				   phs*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]+
-				   rep*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]+
-				   seg*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]+
-				   par*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
-				   slc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
-				   ida*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
-				   idb*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
-				   idc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
-				   idd*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
-				   ide*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
-				   ave*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+		
+		size_t pos = col+
+			lin*_dim[0]+
+			cha*_dim[0]*_dim[1]+
+			set*_dim[0]*_dim[1]*_dim[2]+
+			eco*_dim[0]*_dim[1]*_dim[2]*_dim[3]+
+			phs*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]+
+			rep*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]+
+			seg*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]+
+			par*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]+
+			slc*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]+
+			ida*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]+
+			idb*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]+
+			idc*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]+
+			idd*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]+
+			ide*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]*_dim[13]+
+			ave*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]*_dim[13]*_dim[14];
+		assert (pos < Size());
+		return _M [pos];
 
     }
     
@@ -581,22 +596,24 @@ public:
 						  const size_t& ide = 0,
 						  const size_t& ave = 0) {
 
-		return _M [col+
-				   lin*_dim[COL]+
-				   cha*_dim[COL]*_dim[LIN]+
-				   set*_dim[COL]*_dim[LIN]*_dim[CHA]+
-				   eco*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]+
-				   phs*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]+
-				   rep*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]+
-				   seg*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]+
-				   par*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]+
-				   slc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]+
-				   ida*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]+
-				   idb*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]+
-				   idc*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]+
-				   idd*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]+
-				   ide*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]+
-				   ave*_dim[COL]*_dim[LIN]*_dim[CHA]*_dim[SET]*_dim[ECO]*_dim[PHS]*_dim[REP]*_dim[SEG]*_dim[PAR]*_dim[SLC]*_dim[IDA]*_dim[IDB]*_dim[IDC]*_dim[IDD]*_dim[IDE]];
+		size_t pos = col+
+			lin*_dim[0]+
+			cha*_dim[0]*_dim[1]+
+			set*_dim[0]*_dim[1]*_dim[2]+
+			eco*_dim[0]*_dim[1]*_dim[2]*_dim[3]+
+			phs*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]+
+			rep*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]+
+			seg*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]+
+			par*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]+
+			slc*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]+
+			ida*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]+
+			idb*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]+
+			idc*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]+
+			idd*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]+
+			ide*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]*_dim[13]+
+			ave*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]*_dim[13]*_dim[14];
+		assert (pos < Size());
+		return _M [pos];
 
     }
     
@@ -1046,11 +1063,13 @@ public:
 	inline friend Matrix<T>    
 	operator/  (const double& s, const Matrix<T> &m) { 
 
-		Matrix<T> res = m;
-		size_t i = res.Size();
+		assert (s);
 
-		while (i--)
-			res[i] = (res[i] != 0) ? s/res[i] : 0.0;
+		if (s == T(1.0))
+			return Matrix<T> (m);
+		
+		Matrix<T> res = m;
+		res.Dat() /= s;
 		
 		return res;
 		
@@ -1067,12 +1086,14 @@ public:
 	inline friend Matrix<T>    
 	operator/  (const float& s, const Matrix<T> &m) { 
 
+		assert (s);
+
+		if (s == T(1.0))
+			return Matrix<T> (m);
+		
 		Matrix<T> res = m;
-		size_t i = res.Size(); 
-
-		while (i--)
-			res[i] = (res[i] != 0) ? s/res[i] : 0.0;
-
+		res.Dat() /= s;
+		
 		return res;
 
 	}
@@ -1187,16 +1208,9 @@ public:
      * @return          Number of rows.
      */
     inline size_t                 
-    Height              () const {return _dim[0];}
-    
-    
-    /**
-     * @brief           Get refernce to number of rows, i.e. tmp = size(this); tmp(1).
-     *
-     * @return          Number of rows.
-     */
-    inline size_t&
-    Height              () {return _dim[0];}
+    Height              () const {
+		return _dim[0];
+	}
     
     
     /**
@@ -1205,16 +1219,9 @@ public:
      * @return          Number of columns.
      */
     inline size_t                 
-    Width               () const {return _dim[1];}
-    
-    
-    /**
-     * @brief           Get reference number of columns, i.e. tmp = size(this); tmp(2).
-     *
-     * @return          Number of columns.
-     */
-    inline size_t&
-    Width               ()  {return _dim[1];}
+    Width               () const {
+		return _dim[1];
+	}
     
     
     /**
@@ -1224,7 +1231,10 @@ public:
      * @return          Resolution .
      */
     inline float          
-    Res                 (const size_t& i)                                const {return _res[i];}
+    Res                 (const size_t& i) const {
+		assert (i < INVALID_DIM);
+		return _res[i];
+	}
     
     
     /**
@@ -1234,7 +1244,10 @@ public:
      * @return          Resolution
      */
     inline float&          
-    Res                 (const size_t& i)                                 {return _res[i];}
+    Res                 (const size_t& i)       {
+		assert (i < INVALID_DIM);
+		return _res[i];
+	}
     
 
 
@@ -1246,7 +1259,7 @@ public:
 	const float*
 	Res                 () const {
 		return &_res[0];
-	};
+	}
 	
 
     
@@ -1257,16 +1270,10 @@ public:
      * @return          Dimension
      */
     inline size_t          
-    Dim                 (const size_t& i)                                const {return _dim[i];}
-    
-    
-    /**
-     * @brief           Get reference to size a given dimension.
-     *
-     * @return          Number of rows.
-     */
-    inline size_t&          
-    Dim                 (const size_t& i)                                 {return _dim[i];}
+    Dim                 (const size_t& i)  const {
+		assert (i < INVALID_DIM);
+		return _dim[i];
+	}
     
     
     /**
@@ -1275,7 +1282,9 @@ public:
      * @return          All dimensions
      */
     inline const size_t*   
-    Dim                 ()                                     const {return _dim;}
+    Dim                 ()                  const {
+		return _dim;
+	}
     
 
     /**
@@ -1284,70 +1293,11 @@ public:
      * @return          Number of rows.
      */
     inline size_t          
-    Dim                 (const int& i)                                const {return _dim[i];}
-    
-    
-    /**
-     * @brief           Get reference to size a given dimension.
-     *
-     * @return          Number of rows.
-     */
-    inline size_t&          
-    Dim                 (const int& i)                                 {return _dim[i];}
-    
-    
-    /**
-     * @brief           Reset all dimensions to values in dim
-	 *
-	 * @param  dim      New dimensions
-     */
-    inline void         
-    Dim                 (const size_t* dim)    {
-
-		for (size_t i = 0; i < INVALID_DIM; i++)
-			_dim [i] = dim [i];
-
-		Reset();
-
-    }
-    
-
-	/**
-	 * @brief           Expand matrix by increasing highest dimension (Concatenation)
-	 *
-	 * @param  dim      Dimension to be expanded
-	 * @param  n        Expand by n x current size (default 1)
-	 */
-	inline void
-	Expand              (const size_t dim, const size_t& n = 1)                      {
-
-		_dim[dim] += n;
-		_M.resize(Size());
-		
+    Dim                 (const int& i)      const {
+		assert (i < INVALID_DIM);
+		return _dim[i];
 	}
-
     
-	/**
-	 * @brief           Expand matrix by increasing highest dimension (Concatenation)
-	 */
-	inline void
-	PushBack            (const Matrix<T> M)                    {
-
-		size_t nd = 0;
-		size_t os = Size(); // old size 
-		
-		// highest non-singlton dimension
-		for (size_t i = 0; i < INVALID_DIM; i++)
-			nd  = (M.Dim(i) > 1) ? i : nd;
-
-		_dim[nd] += 1;
-		
-		_M.resize(Size());
-
-		
-		
-	}
-
     
     /**
      * @brief        Resize to mxn 2D matrix.<br/>Preserving data while shrinking.<br/>Adding zeros when growing.
@@ -1363,17 +1313,6 @@ public:
 
 		for (size_t i = 2; i < INVALID_DIM; i++)
 			_dim[i] = 1;
-
-		_M.resize(Size(), T(0));
-
-    }
-    
-
-    /**
-     * @brief           Resize
-     */
-    inline void         
-    Resize              () {
 
 		_M.resize(Size(), T(0));
 
@@ -1407,7 +1346,7 @@ public:
     	for (size_t i = 0; i < INVALID_DIM; i++)
             _dim[i] = 1;
 
-		_M.resize(0);
+		_M.resize(1);
 
     }
     
@@ -1418,7 +1357,7 @@ public:
     inline void         
     Zero               ()                                      {
 
-		_M.assign (Size(), T(0)); 
+		_M = T(0); 
 
     }
     
@@ -1866,7 +1805,9 @@ public:
 	 * @return          Class name
 	 */ 
 	const char* 
-	GetClassName        () const { return _name.c_str(); }
+	GetClassName        () const { 
+		return _name.c_str(); 
+	}
 
 
 	/**
@@ -1875,7 +1816,9 @@ public:
 	 * @return          Class name
 	 */ 
 	void 
-	SetClassName        (const char* name) { _name = name; }
+	SetClassName        (const char* name) { 
+		_name = name; 
+	}
 
 
 	/**
@@ -1999,6 +1942,7 @@ public:
 	inline size_t
 	Size() const {
 		
+		
 		long size = 1;
 		
 		for (size_t i = 0; i < INVALID_DIM; i++)
@@ -2067,7 +2011,7 @@ private:
     
     size_t              _dim[INVALID_DIM]; /// Dimensions
     float               _res[INVALID_DIM]; /// Resolutions
-	std::vector<T>      _M;
+	std::valarray<T>      _M;
 	std::string         _name; 
 
 
@@ -2087,8 +2031,7 @@ private:
     inline void         
     Reset               ()                                      {
 
-		_M.resize(Size());
-		Zero();
+		_M.resize(Size(),T(0));
 
     }
     
@@ -2179,23 +2122,6 @@ Matrix<T>::Sub2Ind  (const Matrix<size_t>& subs) const {
 	return subs; 
 }
 
-
-template <class T> inline Matrix<T> 
-Matrix<T>::tr() const {
-
-    Matrix<T> res (_dim);
-	
-	long tmp   = res.Dim(0);
-	res.Dim(0) = res.Dim(1);
-	res.Dim(1) = tmp;
-	
-    for (size_t i = 0; i < res.Dim(0); i++)
-        for (size_t j = 0; j < res.Dim(1); j++)
-			res.At(i,j) = cconj(At(j,i)); // Conjugate transpose
-	
-    return res;
-
-}
 
 #include "Lapack.hpp"
 
@@ -2351,9 +2277,7 @@ Matrix<T>::Matrix () {
         _res [i] = 1.0;
 	}
 
-	_M.resize(Size());
-		
-	Zero();
+	_M.resize(Size(),T(0));
 
 	_name = "Matrix<T>";
 
@@ -2442,11 +2366,8 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
     for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 	
-	_M.resize(Size());
+	_M.resize(Size(),T(0));
 		
-	Zero();
-
-	
 }
 
 
@@ -2459,10 +2380,7 @@ Matrix<T>::Matrix (const size_t* dim) {
         _res[i] = 1.0;
 	}
 	
-	_M.resize(Size());
-		
-	Zero();
-
+	_M.resize(Size(),T(0));
 	
 }
 
@@ -2475,10 +2393,7 @@ Matrix<T>::Matrix (const size_t* d, const float* r) {
         _res[i] = r[i];
 	}
 	
-	_M.resize(Size());
-		
-	Zero();
-
+	_M.resize(Size(),T(0));
 	
 }
 
@@ -2496,23 +2411,14 @@ Matrix<T>::Matrix (const Matrix<T> &M) {
 	i = Size();
 	_M.resize(i);
 	
-	memcpy (&_M[0], M.Data(), i * sizeof(T));
+	_M = M.Dat();
 	
 }
 
 
 
 template <class T> inline 
-Matrix<T>::~Matrix() {
-    
-#ifdef PARC_MODULE_NAME
-    ICE_SET_FN ("Matrix<T>::~Matrix()")
-    ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
-#endif
-
-	_M.resize(0);
-    
-}
+Matrix<T>::~Matrix() {}
 
 
 
@@ -2545,7 +2451,7 @@ Matrix<T>::operator= (const Matrix<T>& M) {
 template <class T> inline Matrix<T> 
 Matrix<T>::operator= (const T& s) {
 	
-	_M.assign (Size(), s);
+	_M = s;
     return *this;
 	
 }
@@ -2555,11 +2461,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator== (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-
-	while (i--)
-		res.Dat()[i] = (_M[i] == s);
-	
+	res.Dat() = (_M == s);
     return res;
 
 }
@@ -2569,11 +2471,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator>= (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-    
-	while (i--)
-		res.Dat()[i] = (_M[i] >= s);
-
+	res.Dat() = (_M >= s);
     return res;
 
 }
@@ -2583,11 +2481,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator<= (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-		
-	while (i--)
-        res.Dat()[i] = (_M[i] <= s);
-
+	res.Dat() = (_M <= s);
     return res;
 
 }
@@ -2597,11 +2491,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator!= (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] != s);
-
+	res.Dat() = (_M != s);
     return res;
 
 }
@@ -2611,11 +2501,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator< (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] < s);
-
+	res.Dat() = (_M < s);
     return res;
 
 }
@@ -2625,11 +2511,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator> (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] > s);
-
+	res.Dat() = (_M < s);
     return res;
 
 }
@@ -2646,7 +2528,16 @@ Matrix<T>::operator->* (const Matrix<T> &M) const {
 template <class T> inline Matrix<T> 
 Matrix<T>::operator!() const {
 
-    return this->tr();
+	for (size_t i = 2; i < INVALID_DIM; i++)
+		assert (_dim[i] == 1);
+
+	Matrix<T> res (_dim[1],_dim[0]);
+
+	for (size_t i = 0; i < _dim[1]; i++)
+		for (size_t j = 0; j < _dim[0]; j++)
+			res(i,j) = this->At(j,i);
+
+    return res;
 
 }
 
@@ -2683,36 +2574,18 @@ Matrix<T>::operator& (const Matrix<bool>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator&& (const Matrix<T>& M) const {
 
-	size_t i;
-
-	for (i = 0; i < INVALID_DIM; i++)
-		assert (_dim[i] == M.Dim(i));
-
-    Matrix<T> res(_dim);
-	i = Size();
-
-	while (i--)
-        res[i] = (M[i] && _M[i]);
-
+    Matrix<bool> res(_dim);
+	res.Dat() = (_M && M.Dat());
     return res;
-	
+
 }
 
 
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator|| (const Matrix<T>& M) const {
 
-	size_t i;
-
-	for (i = 0; i < INVALID_DIM; i++)
-		assert (_dim[i] == M.Dim(i));
-
     Matrix<bool> res(_dim);
-	i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] || M[i]);
-
+	res.Dat() = (_M || M.Dat());
     return res;
 
 }
@@ -2721,17 +2594,8 @@ Matrix<T>::operator|| (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator== (const Matrix<T>& M) const {
 
-	size_t i;
-
-	for (i = 0; i < INVALID_DIM; i++)
-		assert (_dim[i] == M.Dim(i));
-
     Matrix<bool> res(_dim);
-	i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] == M[i]);
-
+	res.Dat() = (_M == M.Dat());
     return res;
 
 }
@@ -2740,17 +2604,8 @@ Matrix<T>::operator== (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator>= (const Matrix<T>& M) const {
 
-	size_t i;
-
-	for (i = 0; i < INVALID_DIM; i++)
-		assert (_dim[i] == M.Dim(i));
-
     Matrix<bool> res(_dim);
-	i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] >= M[i]) ? true : false;
-
+	res.Dat() = (_M >= M.Dat());
     return res;
 
 }
@@ -2759,17 +2614,8 @@ Matrix<T>::operator>= (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator<= (const Matrix<T>& M) const {
 
-	size_t i;
-
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		assert (_dim[i] == M.Dim(i));
-
     Matrix<bool> res(_dim);
-	i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] <= M[i]) ? true : false;
-
+	res.Dat() = (_M <= M.Dat());
     return res;
 
 }
@@ -2778,36 +2624,18 @@ Matrix<T>::operator<= (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator!= (const Matrix<T>& M) const {
 
-	size_t i;
-
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		assert (_dim[i] == M.Dim(i));
-
     Matrix<bool> res(_dim);
-	i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] != M[i]) ? true : false;
-
+	res.Dat() = (_M != M.Dat());
     return res;
-	
+
 }
 
 
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator> (const Matrix<T>& M) const {
 	
-	size_t i;
-	
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		assert (_dim[i] == M.Dim(i));
-	
     Matrix<bool> res(_dim);
-	i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] > M[i]) ? true : false;
-
+	res.Dat() = (_M > M.Dat());
     return res;
 
 }
@@ -2816,17 +2644,8 @@ Matrix<T>::operator> (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator< (const Matrix<T>& M) const {
 
-	size_t i;
-
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		assert (_dim[i] == M.Dim(i));
-
     Matrix<bool> res(_dim);
-	i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] < M[i]);
-	
+	res.Dat() = (_M < M.Dat());
     return res;
 
 }
@@ -2840,43 +2659,43 @@ Matrix<T>::operator- () const {
 
 	while (i--)
         res[i] =- _M[i];
-	
+
     return res;
-	
+
 }
 
 
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator- (const Matrix<S> &M) const {
-	
+
 	size_t i;
-	
+
 	for (i=0; i < INVALID_DIM; i++)
 		assert (Dim(i) == M.Dim(i));
-	
+
     Matrix<T> res = *this;
 	i = Size();
 
 	while (i--)
 		res[i] -= M[i];
-	
+
 	return res;
-	
+
 }
 
 
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator- (const S& s) const {
-	
+
     Matrix<T> res = *this;
 	T t = T(s);
 	size_t i = Size();
-	
+
 	while (i--)
 		res[i] -= t;
-	
+
 	return res;
-	
+
 }
 
 
@@ -2884,7 +2703,7 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator+ (const Matrix<S> &M) const {
 
 	size_t i;
-	
+
 	for (i=0; i < INVALID_DIM; i++)
 		assert (Dim(i) == M.Dim(i));
 
@@ -2893,22 +2712,22 @@ Matrix<T>::operator+ (const Matrix<S> &M) const {
 
 	while (i--)
 		res[i] += M[i];
-		
+
 	return res;
-	
+
 }
 
 
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator+ (const S& s) const {
-	
+
     Matrix<T> res = *this;
 	T t = T(s);
 	size_t i = Size();
-	
+
 	while (i--)
 		res[i] += t;
-	
+
 	return res;
 
 }
@@ -2932,10 +2751,10 @@ template <class T> inline Matrix<T>
 Matrix<T>::operator ^= (const float& p) {
 
 	size_t i = Size();
-		
+
 	while (i--)
         _M[i] = (p == 0) ? T(1) : pow(_M[i],  p);
-	
+
     return *this;
 
 }
@@ -2963,14 +2782,11 @@ Matrix<T>::operator* (const Matrix<S> &M) const {
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator* (const S& s) const {
     
-    Matrix<T> res = *this;
-	T t = T(s);
-	size_t i = Size();
+	Matrix<T> res = *this; 
+	T           t = T(s);
 
-	while (i--)
-		res[i] *= t;
-
-	return res;
+	res.Dat() *= t;
+    return res;
 
 }
 
@@ -2984,10 +2800,10 @@ Matrix<T>::operator *= (const Matrix<S> &M) {
 		assert (_dim[i] == M.Dim(i));
 
 	i = Size();
-		
+
 	while (i--)
 		_M[i] *= M[i];
-	
+
     return *this;
 
 }
@@ -2997,29 +2813,25 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator *= (const S& s) {
     
 	T t = T(s);
-	size_t i = Size();
-	
-	while (i--)
-		_M[i] *= t;
-	
+	_M *= t;
     return *this;
-	
+
 }
 
 
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator += (const Matrix<S> &M) {
-	
+
     size_t i;
-	
+
 	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
 
 	i = Size();
-	
+
 	while(i--)
 		_M[i] += M[i];
-		
+
     return *this;
 
 }
@@ -3033,27 +2845,27 @@ Matrix<T>::operator+= (const S& s) {
 
 	while (i--)
 		_M[i] += t;
-			
+
     return *this;
-	
+
 }
 
 
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator-= (const Matrix<S>& M) {
-	
+
     size_t i;
-	
+
 	for (i = 0; i < INVALID_DIM; i++)
 		assert (_dim[i] == M.Dim(i));
-	
+
 	i = Size();
-	
+
 	while (i--)
 		_M[i] -= M[i];
-	
+
     return *this;
-	
+
 }
 
 
@@ -3094,7 +2906,7 @@ Matrix<T>::operator/= (const S& s) {
     
 	T t = T(s);
 	size_t i = Size();
-		
+
 	while (i--)
 		_M[i] /= t;
 
@@ -3130,7 +2942,7 @@ Matrix<T>::operator/ (const S& s) const {
 	T t = T(s);
 	size_t i = Size();
     Matrix<T> res = *this;
-	
+
 	while (i--)
 		res[i] /= t;
 
@@ -3138,12 +2950,10 @@ Matrix<T>::operator/ (const S& s) const {
 
 }
 
-
 template <class T> inline T 
 Matrix<T>::operator[]  (const size_t& p) const {
     
     assert(p <  Size());
-    
     return _M[p];
     
 }
@@ -3153,7 +2963,6 @@ template <class T> inline T&
 Matrix<T>::operator[] (const size_t& p) {
     
     assert(p <  Size());
-    
     return _M[p];
     
 }

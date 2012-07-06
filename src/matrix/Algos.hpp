@@ -225,7 +225,7 @@ isinf (const Matrix<T>& M) {
 	size_t i = numel(M);
 
 	while (i--)
-		res.Dat().at(i) = (std::isinf(creal(M.At(i)))||std::isinf(cimag(M.At(i))));
+		res.Dat()[i] = (std::isinf(creal(M.At(i)))||std::isinf(cimag(M.At(i))));
 	
     return res;
 
@@ -296,40 +296,6 @@ SOS (const Matrix<T>& M, const size_t d) {
 	Matrix<T> res = M ^ 2;
 	return sum (res, d);
   
-}
-
-
-/**
- * @brief          Get rid of unused dimensions
- *
- * Usage:
- * @code
- *   Matrix<cxfl> m   = rand<double> (1,8,7,1,6);
- *   m = squeeze (m); // dims: (8,7,6); 
- * @endcode
- *
- * @param  M       Matrix
- * @return         Squeezed matrix
- */
-template <class T> inline static Matrix<T>
-squeeze (const Matrix<T>& M) {
-	
-	Matrix<T> res = M;
-	size_t found = 0;
-	
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		if (size(res, i) > 1) {
-			res.Res(found)   = M.Res(i);
-			res.Dim(found++) = M.Dim(i);
-		}
-	
-	for (size_t i = found; i < INVALID_DIM; i++) {
-		res.Dim(i) = 1;
-		res.Res(i) = 1.0;
-	}
-	
-	return res;
-	
 }
 
 
@@ -509,6 +475,22 @@ size               (const Matrix<T>& M, const size_t& d) {
 
 
 /**
+ * @brief           Get resolution of a dimension
+ *
+ * @param   M       Matrix
+ * @param   d       Dimension
+ * @return          Resolution
+ */
+template <class T>  size_t
+resol               (const Matrix<T>& M, const size_t& d) {
+	
+	return M.Res(d);
+	
+}
+
+
+
+/**
  * @brief           Get length
  *
  * @param   M       Matrix
@@ -641,6 +623,44 @@ ctranspose (const Matrix<T>& M) {
 }
 
 
+#include "Creators.hpp"
+/**
+ * @brief          Get rid of unused dimensions
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (1,8,7,1,6);
+ *   m = squeeze (m); // dims: (8,7,6); 
+ * @endcode
+ *
+ * @param  M       Matrix
+ * @return         Squeezed matrix
+ */
+template <class T> inline static Matrix<T>
+squeeze (const Matrix<T>& M) {
+	
+	size_t found = 0;
+	Matrix<size_t> dims = ones<size_t> (INVALID_DIM,1);
+	Matrix<float>  resl = ones<float>  (INVALID_DIM,1);
+	
+	for (size_t i = 0; i < INVALID_DIM; i++)
+		if (size(M, i) > 1) {
+			dims[found]   = size (M,i);
+			resl[found++] = resol(M,i);
+		}
+	
+	Matrix<T> res = zeros<T> (dims);
+	
+	for (size_t i = 0; i < INVALID_DIM; i++)
+		res.Res(i) = resl[i];
+
+	res.Dat() = M.Dat();
+	
+	return res;
+	
+}
+
+
 /**
  * @brief           MATLAB-like permute
  * 
@@ -648,7 +668,6 @@ ctranspose (const Matrix<T>& M) {
  * @param   perm    New permuted dimensions
  * @return          Permuted matrix
  */
-#include "Creators.hpp"
 template <class T> inline static Matrix<T>
 permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	
@@ -751,13 +770,11 @@ resize (const Matrix<T>& M, const size_t& sz) {
 template <class T> inline static Matrix<T>
 resize (const Matrix<T>& M, Matrix<size_t> sz) {
 
-	Matrix<T> res = zeros<T> (sz);
-	size_t copysz = MIN(numel(M), numel(res)) * sizeof (T);
+	Matrix<T> res  = zeros<T> (sz);
+	size_t copysz  = MIN(numel(M), numel(res)) * sizeof (T);
+	slice  copyslc (0,copysz,1);
 
-	typename vector<T>::iterator start = M.Dat().begin();
-	typename vector<T>::iterator end   = M.Dat().begin() + copysz;
-	
-	res.Dat().assign (start, end);
+	res.Dat()[copyslc] = M.Dat()[copyslc];
 
 	return res;
 	

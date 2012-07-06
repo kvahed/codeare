@@ -40,15 +40,6 @@ KTPoints::Init           ()  {
 	
     RRSModule::error_code e = OK;
 	
-    // # kt points ---------------------------
-    // # of spatial sites --------------------
-    Attribute ("Ns",      &m_ns); 
-    printf ("  # spatial sites: %i \n", m_ns);
-	
-    // # of transmit channels ----------------
-    Attribute ("Nc",      &m_nc);
-    printf ("  # transmitter: %i \n", m_nc);
-    
     // rf pulse durations --------------------
     m_pd = (int*) malloc (sizeof(int));
     Attribute ("pd",      &m_pd[0]);   
@@ -141,9 +132,12 @@ KTPoints::Process        () {
 	m_nk = k.Dim(1);
 	m_nc = b1.Dim(1);
 
+    printf ("  # spatial sites: %i \n", m_ns);
+    printf ("  # transmitter: %i \n", m_nc);
+
     m_max_rf = (float*) calloc (m_nk,        sizeof(float));
 	m_pd     = (int*)  realloc (m_pd, m_nk * sizeof(int));
-	
+
     for (int i = 1; i < m_nk; i++)
         m_pd[i] = m_pd[0];
 
@@ -180,7 +174,7 @@ KTPoints::Process        () {
 
         minv  = m.prodt (m);
         minv += treg;
-        minv  = pinv(minv);
+        minv  = inv(minv);
         minv  = minv.prod (m, 'N', 'C');
         
         // Valriable exchange method --------------
@@ -191,14 +185,14 @@ KTPoints::Process        () {
 			
             solution = minv->*(target);
             tmp      = m->*(solution);
-			
+
             NRMSE (target, tmp, gc, nrmse);
 			
             res.push_back (nrmse);
             
 			if (m_verbose) memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cxfl)); 
 			if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) break;
-            
+
             final    = solution;
 			
 			PhaseCorrection (target, tmp);
