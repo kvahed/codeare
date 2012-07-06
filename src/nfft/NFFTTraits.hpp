@@ -39,6 +39,8 @@ template <class T>
 struct NFFTTraits { };
 
 
+#ifdef USE_NFFT_32_NAMING
+
 template <>
 struct NFFTTraits<float> {
 
@@ -230,6 +232,7 @@ struct NFFTTraits<float> {
 	
 };
 
+#endif
 
 
 template <>

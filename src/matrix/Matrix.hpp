@@ -361,10 +361,14 @@ public:
      */
     inline const T*            
     Data                (const size_t pos = 0)  const {
+<<<<<<< HEAD
 
 		assert (pos < Size());
         return &(_M[pos]);
 
+=======
+        return &(_M[pos]);
+>>>>>>> a36c14fac25ad64fe92f2f1b74f6a10613824ff2
 	}
 
     
