@@ -104,7 +104,7 @@ public:
 		// FT dimensions needs adjusting
 		m_dims[1] /= af;
 		
-		// Multi-threading
+		// Multi-threading will need multiple FFTW plans
 		int np;
 
 #pragma omp parallel default (shared)
@@ -113,8 +113,6 @@ public:
 		}	
 
 		Matrix<size_t> ftdims = resize(m_dims,m_ndim,1);
-		//for (size_t i = 0; i < m_ndim; i++)
-		//	ftdims[i] = m_dims[i];
 
 		m_dft = new DFT<T>* [np];
 		
