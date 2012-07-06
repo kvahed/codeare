@@ -1246,7 +1246,7 @@ public:
 	const float*
 	Res                 () const {
 		return &_res[0];
-	};
+	}
 	
 
     
@@ -1392,34 +1392,34 @@ public:
 
 		for (size_t i = 0; i < INVALID_DIM; i++)
 			_dim [i] = dim [i];
-
+		
 		Reset();
-
+		
     }
     
-
+	
     /**
      * @brief           Purge data and free RAM.
      */
     inline void         
     Clear               ()                                      {
-
+		
     	for (size_t i = 0; i < INVALID_DIM; i++)
             _dim[i] = 1;
-
+		
 		_M.resize(0);
-
+		
     }
     
-
+	
     /**
      * @brief           Reset. i.e. Set all fields = T(0)
      */
     inline void         
     Zero               ()                                      {
-
+		
 		_M = T(0); 
-
+		
     }
     
 
@@ -2067,7 +2067,7 @@ private:
     
     size_t              _dim[INVALID_DIM]; /// Dimensions
     float               _res[INVALID_DIM]; /// Resolutions
-	std::valarray<T>      _M;
+	std::valarray<T>    _M;
 	std::string         _name; 
 
 
@@ -2351,10 +2351,8 @@ Matrix<T>::Matrix () {
         _res [i] = 1.0;
 	}
 
-	_M.resize(Size());
+	_M.resize(Size(), T(0));
 		
-	Zero();
-
 	_name = "Matrix<T>";
 
 }
@@ -2442,10 +2440,7 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
     for (size_t i = 0; i < INVALID_DIM; i++)
         _res [i] = 1.0;
 	
-	_M.resize(Size());
-		
-	Zero();
-
+	_M.resize(Size(), T(0));
 	
 }
 
@@ -2459,10 +2454,7 @@ Matrix<T>::Matrix (const size_t* dim) {
         _res[i] = 1.0;
 	}
 	
-	_M.resize(Size());
-		
-	Zero();
-
+	_M.resize(Size(),T(0));
 	
 }
 
@@ -2475,26 +2467,18 @@ Matrix<T>::Matrix (const size_t* d, const float* r) {
         _res[i] = r[i];
 	}
 	
-	_M.resize(Size());
-		
-	Zero();
+	_M.resize(Size(),T(0));
 
-	
 }
 
 
 template <class T> inline 
 Matrix<T>::Matrix (const Matrix<T> &M) {
 	
-	size_t i;
-
-	for (i = 0; i < INVALID_DIM; i++) {
+	for (size_t i = 0; i < INVALID_DIM; i++) {
 		_dim[i] = M.Dim(i);
 		_res[i] = M.Res(i);
 	}
-	
-	i = Size();
-	_M.resize(i);
 	
 	_M = M.Dat();
 	
@@ -2503,16 +2487,7 @@ Matrix<T>::Matrix (const Matrix<T> &M) {
 
 
 template <class T> inline 
-Matrix<T>::~Matrix() {
-    
-#ifdef PARC_MODULE_NAME
-    ICE_SET_FN ("Matrix<T>::~Matrix()")
-    ICE_WARN   ("Freeing " << (float)Size() * sizeof(T) / 1024 << " kB of RAM.");
-#endif
-
-	_M.resize(0);
-    
-}
+Matrix<T>::~Matrix() {};
 
 
 
@@ -2521,17 +2496,8 @@ Matrix<T>::operator= (const Matrix<T>& M) {
     
 	if (this != &M) {
 
-		if (this->Size() != M.Size()) {
-
-			try {
-				_M.resize(M.Size());
-			} catch (...) {
-				printf ("Couldn't allocate %zu elements\n", M.Size()); 
-			}
-			
-		}
-		
 		memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
+		memcpy (_res, M.Res(), INVALID_DIM * sizeof( float));
 		
 		_M = M.Dat();
 		
@@ -2555,11 +2521,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator== (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-
-	while (i--)
-		res.Dat()[i] = (_M[i] == s);
-	
+	res.Dat() = (_M == s);
     return res;
 
 }
@@ -2569,11 +2531,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator>= (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-    
-	while (i--)
-		res.Dat()[i] = (_M[i] >= s);
-
+	res.Dat() = (_M >= s);
     return res;
 
 }
@@ -2583,11 +2541,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator<= (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-		
-	while (i--)
-        res.Dat()[i] = (_M[i] <= s);
-
+	res.Dat() = (_M <= s);
     return res;
 
 }
@@ -2597,11 +2551,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator!= (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] != s);
-
+	res.Dat() = (_M != s);
     return res;
 
 }
@@ -2611,11 +2561,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator< (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] < s);
-
+	res.Dat() = (_M < s);
     return res;
 
 }
@@ -2625,11 +2571,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator> (const T& s) const {
 
     Matrix<bool> res(_dim);
-	size_t i = Size();
-
-	while (i--)
-        res.Dat()[i] = (_M[i] > s);
-
+	res.Dat() = (_M > s);
     return res;
 
 }
@@ -2647,35 +2589,6 @@ template <class T> inline Matrix<T>
 Matrix<T>::operator!() const {
 
     return this->tr();
-
-}
-
-
-template <class T> inline Matrix<T> 
-Matrix<T>::operator& (const Matrix<bool>& M) const {
-
-    for (size_t i = 0; i < INVALID_DIM; i++) 
-        assert (_dim[i] == M.Dim()[i]);
-
-
-    size_t k = 0, i = Size();
-
-	while (i--)
-        if (M[i])
-            k++;
-    
-    Matrix<T> res(k, 1);
-    
-    k = 0; 
-	i = Size();
-
-	while (i--)
-        if (M[i]) {
-            res[k] = i;
-            k++;
-        }
-	
-    return res;
 
 }
 

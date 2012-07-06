@@ -226,7 +226,7 @@ public:
 	Adjoint     (const Matrix< std::complex<T> >& m) const {
 
 		std::complex<T> ts;
-		T rn, xn;
+		T rn, rno, xn;
 		Matrix< std::complex<T> > p, r, x, q;
 		vector<T> res;
 
@@ -234,12 +234,11 @@ public:
 		r = p;
 		x = zeros< std::complex<T> >(size(p));
 		
-		rn = 0.0;
-		xn = pow(creal(norm(p)), 2);
+		xn = pow(norm(p), 2.0);
+		rn = xn;
 		
 		for (size_t i = 0; i < m_cgiter; i++) {
 			
-			rn  = pow(creal(norm(r)), 2);
 			res.push_back(rn/xn);
 			
 			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps) 
@@ -256,7 +255,9 @@ public:
 			ts  = rn / p.dotc(q);
 			x  += ts * p;
 			r  -= ts * q;
-			p  *= pow(creal(norm(r)), 2) / rn;
+			rno = rn;
+			rn  = pow(norm(r), 2.0);
+			p  *= rn / rno;
 			p  += r;
 			
 		}
