@@ -2006,8 +2006,33 @@ private:
 	bool
 	RSAdjust            (const std::string& fname);
 
+	void Validate (<T>& t) const {}
 
 };
+
+
+template<> void
+Validate<short>  const {}
+
+
+template<> void
+Validate<long>   const {}
+
+
+template<> void
+Validate<float>  const {}
+
+
+template<> void
+Validate<double> const {}
+
+
+template<> void
+Validate<cxfl>   const {}
+
+
+template<> void
+Validate<cxdb>   const {}
 
 
 template<class T> inline size_t
@@ -2506,6 +2531,9 @@ Matrix<T>::operator&& (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator|| (const Matrix<T>& M) const {
 
+	for (i=0; i < INVALID_DIM; i++)
+		assert (Dim(i) == M.Dim(i));
+
     Matrix<bool> res(_dim);
 	res.Dat() = (_M || M.Dat());
     return res;
@@ -2515,6 +2543,9 @@ Matrix<T>::operator|| (const Matrix<T>& M) const {
 
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator== (const Matrix<T>& M) const {
+
+	for (i=0; i < INVALID_DIM; i++)
+		assert (Dim(i) == M.Dim(i));
 
     Matrix<bool> res(_dim);
 	res.Dat() = (_M == M.Dat());
@@ -2526,6 +2557,9 @@ Matrix<T>::operator== (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator>= (const Matrix<T>& M) const {
 
+	for (i=0; i < INVALID_DIM; i++)
+		assert (Dim(i) == M.Dim(i));
+
     Matrix<bool> res(_dim);
 	res.Dat() = (_M >= M.Dat());
     return res;
@@ -2535,6 +2569,9 @@ Matrix<T>::operator>= (const Matrix<T>& M) const {
 
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator<= (const Matrix<T>& M) const {
+
+	for (i=0; i < INVALID_DIM; i++)
+		assert (Dim(i) == M.Dim(i));
 
     Matrix<bool> res(_dim);
 	res.Dat() = (_M <= M.Dat());
@@ -2546,6 +2583,9 @@ Matrix<T>::operator<= (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator!= (const Matrix<T>& M) const {
 
+	for (i=0; i < INVALID_DIM; i++)
+		assert (Dim(i) == M.Dim(i));
+
     Matrix<bool> res(_dim,_res);
 	res.Dat() = (_M != M.Dat());
     return res;
@@ -2556,6 +2596,9 @@ Matrix<T>::operator!= (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator> (const Matrix<T>& M) const {
 	
+	for (i=0; i < INVALID_DIM; i++)
+		assert (Dim(i) == M.Dim(i));
+
     Matrix<bool> res(_dim,_res);
 	res.Dat() = (_M > M.Dat());
     return res;
@@ -2566,6 +2609,9 @@ Matrix<T>::operator> (const Matrix<T>& M) const {
 template <class T> inline Matrix<bool> 
 Matrix<T>::operator< (const Matrix<T>& M) const {
 
+	for (i=0; i < INVALID_DIM; i++)
+		assert (Dim(i) == M.Dim(i));
+
     Matrix<bool> res(_dim,_res);
 	res.Dat() = (_M < M.Dat());
     return res;
@@ -2575,6 +2621,9 @@ Matrix<T>::operator< (const Matrix<T>& M) const {
 
 template <class T> inline Matrix<T> 
 Matrix<T>::operator- () const {
+
+	for (i=0; i < INVALID_DIM; i++)
+		assert (Dim(i) == M.Dim(i));
 
 	Matrix<T> res (_dim,_res);
 	res.Dat() = -_M;
