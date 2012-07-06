@@ -263,7 +263,7 @@ struct NFFTTraits<double> {
 			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
 		
 		solver_init_advanced_complex 
-			(&inp, (nfft_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
+			(&inp, (mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
 		
 		return 0;
 		
