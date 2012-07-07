@@ -289,9 +289,9 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	if      (jobz != 'N')
 		vcol = n;
 	
-	s.Resize (mn,1);
-	U.Resize (ldu,ucol);
-	V.Resize (ldvt,vcol);
+	s = resize (s,   mn,    1);
+	U = resize (U,  ldu, ucol);
+	V = resize (V, ldvt, vcol);
 	
 	int*   iwork =   (int*) malloc (8 * mn * sizeof(int));
 	
@@ -467,8 +467,6 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	Matrix<T> b = eye<T>(ldb);
 
 	float frcond  = rcond;
-	printf ("%s\n", DimsToCString(m));
-	
 	
 	if      (typeid(T) == typeid(cxfl))
 		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
@@ -481,11 +479,12 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	
 	lwork = (int) creal(wopt);
 	
-	if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
+	if      (typeid(T) == typeid(cxfl) || 
+			 typeid(T) == typeid(cxdb))
 		rwork =    malloc ((sizeof(T)/2) * (int) creal(rwopt));
 	
 	iwork = (int*) malloc (sizeof(int) * iwopt);
-	work  = (T*)   malloc (sizeof(T) * lwork);
+	work  = (T*)   malloc (sizeof(T)   * lwork);
 	
 	if      (typeid(T) == typeid(cxfl))
 		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
@@ -501,7 +500,7 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 		for (int i = 0; i < M; i++)
 			memcpy (&b[i*N], &b[i*M], N * sizeof(T));
 	
-	b.Resize(N,M);
+	b = resize (b, N, M);
 	
 	if      (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
 		free (rwork);

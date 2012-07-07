@@ -72,7 +72,7 @@ cov (const Matrix<T>& m) {
 		
 	}	
 
-	return (gemm(tmp, tmp, 'C') / (double)(mm-1));
+	return gemm(tmp, tmp, 'C') / (double)(mm-1);
 
 }
 
