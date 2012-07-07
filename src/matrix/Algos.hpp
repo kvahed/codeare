@@ -276,98 +276,6 @@ dofinite (const Matrix<T>& M, const T& v = 0) {
 
 
 /**
- * @brief       Sum of squares over a dimension
- * 
- * Usage:
- * @code
- *   Matrix<cxfl> m   = rand<double> (8,7,6);
- *   m = sos (M,1); // dims (8,6);
- * @endcode
- *
- * @param  M    Matrix
- * @param  d    Dimension
- * @return      Sum of squares
- */
-template <class T> inline static  Matrix<T> 
-SOS (const Matrix<T>& M, const size_t d) {
-	
-	assert (M.Dim(d) > 1);
-	
-	Matrix<T> res = M ^ 2;
-	return sum (res, d);
-  
-}
-
-
-/**
- * @brief     Sum along a dimension
- *
- * Usage:
- * @code
- *   Matrix<cxfl> m   = rand<double> (8,7,6);
- *   m = sum (m,0); // dims (7,6);
- * @endcode
- *
- * @param  M  Matrix
- * @param  d  Dimension
- * @return    Sum of M along dimension d
- */
-template <class T> inline static Matrix<T>
-sum (Matrix<T>& M, const size_t d) {
-	
-	Matrix<size_t> sz = size(M);
-	size_t dim = M.Dim(d);
-	Matrix<T> res;
-
-	assert (d < INVALID_DIM);
-	
-	// No meaningful sum over particular dimension
-	if (M.Dim(d) == 1) return res;
-	
-	// Empty? allocation 
-	if (IsEmpty(M))    return res;
-	
-	// Inner size 
-	size_t insize = 1;
-	for (size_t i = 0; i < d; i++)
-		insize *= M.Dim(i);
-	
-	// Outer size
-	size_t outsize = 1;
-	for (size_t i = d+1; i < INVALID_DIM; i++)
-		outsize *= M.Dim(i);
-	
-
-	// Adjust size vector and allocate
-	sz [d] = 1;
-
-	res = Matrix<T>((size_t*)&sz[0]);
-
-	// Sum
-#pragma omp parallel default (shared) 
-	{
-		
-		for (size_t i = 0; i < outsize; i++) {
-			
-#pragma omp for
-			
-			for (size_t j = 0; j < insize; j++) {
-				res[i*insize + j] = T(0);
-				for (size_t k = 0; k < dim; k++)
-					res[i*insize + j] += M[i*insize*dim + j + k*insize];
-			}
-			
-		}
-			
-	}
-	
-	return res;
-	
-}
-
-
-
-/**
  * @brief     Highest dimension unequal 1
  * 
  * Usage:
@@ -624,6 +532,98 @@ ctranspose (const Matrix<T>& M) {
 
 
 #include "Creators.hpp"
+
+/**
+ * @brief     Sum along a dimension
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = sum (m,0); // dims (7,6);
+ * @endcode
+ *
+ * @param  M  Matrix
+ * @param  d  Dimension
+ * @return    Sum of M along dimension d
+ */
+template <class T> inline static Matrix<T>
+sum (Matrix<T>& M, const size_t d) {
+	
+	Matrix<size_t> sz = size(M);
+	size_t        dim = sz[d];
+	Matrix<T>     res;
+
+	assert (d < INVALID_DIM);
+	
+	// No meaningful sum over particular dimension
+	if (dim == 1) 
+		return res;
+	
+	// Empty? allocation 
+	if (IsEmpty(M)) 
+		return res;
+	
+	// Inner size 
+	size_t insize = 1;
+	for (size_t i = 0; i < d; i++)
+		insize *= sz[i];
+	
+	// Outer size
+	size_t outsize = 1;
+	for (size_t i = d+1; i < MIN(INVALID_DIM,numel(sz)); i++)
+		outsize *= sz[i];
+	
+	// Adjust size vector and allocate
+	sz [d] = 1;
+	res = zeros<T>(sz);
+
+	// Sum
+#pragma omp parallel default (shared) 
+	{
+		
+#pragma omp for
+		
+		for (size_t i = 0; i < outsize; i++) {
+			
+			for (size_t j = 0; j < insize; j++) {
+				res[i*insize + j] = T(0);
+				for (size_t k = 0; k < dim; k++)
+					res[i*insize + j] += M[i*insize*dim + j + k*insize];
+			}
+			
+		}
+		
+	}
+
+	return res;
+	
+}
+
+
+/**
+ * @brief       Sum of squares over a dimension
+ * 
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = sos (M,1); // dims (8,6);
+ * @endcode
+ *
+ * @param  M    Matrix
+ * @param  d    Dimension
+ * @return      Sum of squares
+ */
+template <class T> inline static  Matrix<T> 
+SOS (const Matrix<T>& M, const size_t d) {
+	
+	assert (M.Dim(d) > 1);
+	
+	Matrix<T> res = M ^ 2;
+	return sum (res, d);
+  
+}
+
+
 /**
  * @brief          Get rid of unused dimensions
  *
@@ -747,7 +747,7 @@ template <class T> inline static Matrix<T>
 resize (const Matrix<T>& M, const size_t& sz) {
 
 	Matrix<T> res = zeros<T> (sz,1);
-	size_t copysz = MIN(numel(M), sz) * sizeof (T);
+	size_t copysz = MIN(numel(M), sz);
 
 	memcpy (&res[0], &(M[0]), copysz);
 
@@ -771,7 +771,7 @@ template <class T> inline static Matrix<T>
 resize (const Matrix<T>& M, Matrix<size_t> sz) {
 
 	Matrix<T> res  = zeros<T> (sz);
-	size_t copysz  = MIN(numel(M), numel(res)) * sizeof (T);
+	size_t copysz  = MIN(numel(M), numel(res));
 	slice  copyslc (0,copysz,1);
 
 	res.Dat()[copyslc] = M.Dat()[copyslc];

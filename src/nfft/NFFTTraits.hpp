@@ -28,7 +28,7 @@
 #include "nfft3util.h"
 #include "nfft3.h"
 
-#include "config.h"
+#include "../config.h"
 
 #ifndef USE_NFFT_32_NAMING
     #define nfft_mv_plan_complex mv_plan_complex
@@ -263,7 +263,7 @@ struct NFFTTraits<double> {
 			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
 		
 		solver_init_advanced_complex 
-			(&inp, (mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
+			(&inp, (nfft_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
 		
 		return 0;
 		

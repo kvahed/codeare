@@ -53,7 +53,7 @@ LapackTests::Process     () {
 	eig (dtmp, hev, hlev, hrev, 'V', 'V');
 	
 	std::cout << "OUT: \n" <<  hev;
-	std::cout << "------------------------------- \n\n";
+ 	std::cout << "------------------------------- \n\n";
 
 
 	std::cout << "Testing eig (cgeev) ----------- \n";
@@ -195,7 +195,6 @@ LapackTests::Process     () {
 
 	A = rand<cxfl> (1000,8);
 
-	std::cout << "dc  :\n" <<  dc;
 	A = cov (A);
 	std::cout << "cov (A)  :\n" <<  A;
 	A = chol (A);
@@ -205,7 +204,7 @@ LapackTests::Process     () {
 	b = GetCXFL("PA");
 
 	Matrix<cxfl> x = AddMatrix ("x", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (1)));
-	x = MCGLS (A, b, 100, 1.0e-6, 5.0e-7);
+	x = MCGLS (A, b, 100, 5.0e-6, 1.0e-3);
 
 	return RRSModule::OK;
 
