@@ -23,7 +23,7 @@
 
 #include "CPUSimulator.hpp"
 
-#ifdef HAVE_LIBOPENCL
+#ifdef HAVE_OPENCL_HEADERS
     #include "GPU.hpp"
     #include "GPUSimulator.hpp"
 #endif
@@ -42,7 +42,7 @@ namespace RRStrategy {
 		 * @brief Constructor<br/>Check if we have GPU support or not and choose apporiate strategy
 		 */
 		SimulationContext (SimulationBundle* sb) {
-#if defined HAVE_LIBOPENCL
+#if defined HAVE_OPENCL_HEADERS
 			m_strategy    = (SimulationStrategy*) (HaveGPU()) ? 
 				(SimulationStrategy*) new GPUSimulator (sb): 
 				(SimulationStrategy*) new CPUSimulator (sb);
