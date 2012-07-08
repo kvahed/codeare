@@ -63,7 +63,7 @@ struct FTTraits<float> {
 	 */
 	static inline Type*
 	Malloc (size_t n) {
-		return fftwf_alloc_complex (n);
+		return (Type*) fftwf_malloc (n * sizeof(Type));
 	}
 	
 
@@ -147,7 +147,7 @@ struct FTTraits<double> {
 	 */
 	static inline Type*
 	Malloc (size_t n) {
-		return fftw_alloc_complex (n);
+		return (Type*) fftw_malloc (n * sizeof(Type));
 	}
 	
 
