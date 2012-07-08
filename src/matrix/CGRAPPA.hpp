@@ -23,7 +23,7 @@
 
 #include "FT.hpp"
 
-/*
+/**
  * @brief GRAPPA operator<br/>
  *        Griswold et al. MRM 2002, vol. 47 (6) pp. 1202-1210
  */
@@ -36,9 +36,33 @@ public:
 
 
 	/**
-	 * @brief    Default constructor
+	 * @brief          Default constructor
 	 */
-	CGRAPPA() {};
+	CGRAPPA           () {
+		m_dft = 0;
+		m_af  = 1;
+	}
+
+
+	/**
+	 * @brief          Construct with
+	 *
+	 * @param   sl     Side length of full images
+	 * @param   nc     # receive channels
+	 * @param   ksize  GRAPPA kernel size
+	 * @param   nacs   # ACS lines
+	 * @param   af     Acceleration factor
+	 */
+	CGRAPPA           (const Matrix< size_t >& sl, const Matrix<size_t>& ksize,
+				       const size_t& nc, const size_t& nacs, const size_t& af) {
+
+		m_dft    = 0;
+		m_af     = af;
+
+		m_dft    = new DFT<T>*[1];
+		m_dft[0] = new DFT<T> (sl);
+
+	}
 
 
 	/**
@@ -53,21 +77,23 @@ public:
 	 */
 	Matrix< std::complex<T> >
 	Adjoint (Matrix< std::complex<T> >) const {
-		Matrix<T> res;
 
+		Matrix<T> res;
 		return res;
-	};
+
+	}
 
 
 	/**
-	 * @brief    Adjoint transform
+	 * @brief    Forward transform
 	 */
 	Matrix< std::complex<T> >
 	Trafo (Matrix< std::complex<T> >) const {
-		Matrix<T> res;
 
+		Matrix<T> res;
 		return res;
-	};
+
+	}
 
 private:
 
@@ -76,6 +102,8 @@ private:
 	Matrix< std::complex<T> > m_acs;   /**< @brief ACS lines        */
 
 	DFT<T>**                  m_dft;   /**< @brief DFT operator     */
+
+	size_t                    m_af;    /**< @brief Acceleration factor (Currently only in y-direction)*/
 
 };
 

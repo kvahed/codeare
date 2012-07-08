@@ -152,6 +152,115 @@ ResToCString (const Matrix<T>& M) {
 }
 
 
+inline static std::ostream&  
+print (const Matrix<size_t>& M, std::ostream &os) {
+    
+    for (size_t i = 0; i < M.Dim(0); i++) {
+        for(size_t j = 0; j < M.Dim(1); j++)
+			printf ("%zu ", M(i,j));
+        printf("\n");
+    }
+    
+    return os;
+    
+}
+
+
+inline static std::ostream&  
+print (const Matrix<short>& M, std::ostream &os) {
+    
+    for (size_t i = 0; i < M.Dim(0); i++) {
+        for(size_t j = 0; j < M.Dim(1); j++)
+            printf ("%hi ", M(i,j));
+        printf("\n");
+    }
+    
+    return os;
+
+}
+
+
+inline static std::ostream&  
+print (const Matrix<long>& M, std::ostream &os) {
+    
+    for (size_t i = 0; i < M.Dim(0); i++) {
+        for(size_t j = 0; j < M.Dim(1); j++)
+            printf ("%li ", M(i,j));
+        printf("\n");
+    }
+    
+    return os;
+    
+}
+
+
+inline static std::ostream&  
+print (const Matrix<double>& M, std::ostream &os) {
+    
+    for (size_t i = 0; i < M.Dim(0); i++) {
+        for(size_t j = 0; j < M.Dim(1); j++)
+            printf ("%+.4e ", M(i,j));
+        printf("\n");
+    }
+    
+    return os;
+    
+}
+
+
+inline static std::ostream&  
+print (const Matrix<float>& M, std::ostream &os) {
+    
+    for (size_t i = 0; i < M.Dim(0); i++) {
+        for(size_t j = 0; j < M.Dim(1); j++)
+            printf ("%+.4f ", M(i,j));
+        printf("\n");
+    }
+    
+    return os;
+    
+}
+
+
+inline static std::ostream&  
+print (const Matrix<cxfl>& M, std::ostream& os) {
+    
+    for (size_t i = 0; i < M.Dim(0); i++) {
+        for(size_t j = 0; j < M.Dim(1); j++)
+            printf ("%+.4f+%+.4fi ", M(i,j).real(), M(i,j).imag());
+        printf("\n");
+    }
+    
+    return os;
+    
+}
+
+
+inline static std::ostream&  
+print (const Matrix<cxdb>& M, std::ostream& os) {
+    
+    for (size_t i = 0; i < M.Dim(0); i++) {
+        for(size_t j = 0; j < M.Dim(1); j++)
+            printf ("%+.4f+%+.4fi ", M(i,j).real(), M(i,j).imag());
+        printf("\n");
+    }
+    
+    return os;
+    
+}
+
+
+template <class T> std::ostream& 
+operator<< (std::ostream& os, Matrix<T>& M) {
+    
+    print (M, os);
+    return os;
+    
+}
+
+
+
+
 enum dtype {
 
 	RLFL,
