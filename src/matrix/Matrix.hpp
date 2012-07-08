@@ -1160,8 +1160,6 @@ public:
     inline friend Matrix<T>    
     operator/  (const float& s, const Matrix<T> &m) { 
 
-        assert (s);
-
         if (s == T(1.0))
             return Matrix<T> (m);
         
@@ -2612,7 +2610,6 @@ Matrix<T>::operator /= (const Matrix<S> &M) {
 template <class T> template<class S> inline Matrix<T>
 Matrix<T>::operator/= (const S& s) {
     
-    assert (s);
     _M /= T(s);
     return *this;
 
