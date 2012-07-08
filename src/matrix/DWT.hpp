@@ -59,7 +59,7 @@ public:
 	 * @param  wf      Wavelet family (default none, i.e. ID)
 	 * @param  wm      Familty member (default 4)
 	 */
-	DWT (const size_t& sl, const wlfamily& wf = ID, const size_t& = 4);
+	DWT (const size_t& sl, const wlfamily& wf = ID, const size_t& wm = 4);
 
 
 	virtual 

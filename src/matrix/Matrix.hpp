@@ -884,7 +884,7 @@ public:
 
     /**
      * @name            Friend operators
-     *                  Friend oprators
+     *                  Who doesn't need friends
      */
     
     //@{
@@ -1813,40 +1813,6 @@ public:
 
 
 
-
-
-    /**
-     * @name Display and IO functions.
-     *       Display and IO functions.
-     */
-    
-    //@{
-    
-
-    /**
-     * @brief           Print contents to output stream.
-     *
-     * @param  os       The output stream.
-     * @return          The output stream.
-     */
-    std::ostream&       
-    Print               (std::ostream &os) const;
-    
-
-    /**
-     * @brief           Print contents to output stream.
-     *
-     * @param  os       The output stream.
-     * @return          The output stream.
-     */
-    std::ostream&
-    operator<<          (std::ostream &os);
-
-
-    //@}
-    
-    
-    
     /**
      * @name            Other functions.
      *                  Other functions.
@@ -2032,112 +1998,6 @@ template<class T>  T
 Matrix<T>::dot (const Matrix<T>& M) const {
     
     return DOT  (*this, M);
-    
-}
-
-
-template <class T> std::ostream& 
-operator<< (std::ostream& os, Matrix<T>& M) {
-    
-    M.Print(os);
-    return os;
-    
-}
-
-template<> inline std::ostream&  
-Matrix<size_t>::Print (std::ostream &os) const {
-    
-    for (size_t i = 0; i < _dim[COL]; i++) {
-        for(size_t j = 0; j < _dim[LIN]; j++)
-            printf ("%i ", (int)_M [i + j * _dim[COL]]);
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-
-template<> inline std::ostream&  
-Matrix<short>::Print (std::ostream &os) const {
-    
-    for (size_t i = 0; i < _dim[COL]; i++) {
-        for(size_t j = 0; j < _dim[LIN]; j++)
-            printf ("%i ", _M [i + j * _dim[COL]]);
-        printf("\n");
-    }
-    
-    return os;
-
-}
-
-
-template<> inline std::ostream&  
-Matrix<long>::Print (std::ostream &os) const {
-    
-    for (size_t i = 0; i < _dim[COL]; i++) {
-        for(size_t j = 0; j < _dim[LIN]; j++)
-            printf ("%li ", _M [i + j * _dim[COL]]);
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-
-template<> inline std::ostream&  
-Matrix<double>::Print (std::ostream &os) const {
-    
-    for (size_t i = 0; i < _dim[COL]; i++) {
-        for(size_t j = 0; j < _dim[LIN]; j++)
-            printf ("%+.4f ", _M [i + j * _dim[COL]]);
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-
-template<> inline std::ostream&  
-Matrix<float>::Print (std::ostream &os) const {
-    
-    for (size_t i = 0; i < _dim[COL]; i++) {
-        for(size_t j = 0; j < _dim[LIN]; j++)
-            printf ("%+.4f ", _M [i + j * _dim[COL]]);
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-
-template<> inline std::ostream&  
-Matrix<cxfl>::Print (std::ostream& os) const {
-    
-    for (size_t i = 0; i < _dim[COL]; i++) {
-        for(size_t j = 0; j < _dim[LIN]; j++)
-            printf ("%+.4f+%+.4fi ", _M [i + j * _dim[COL]].real(), _M [i + j * _dim[COL]].imag());
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-
-template<> inline std::ostream&  
-Matrix<cxdb>::Print (std::ostream& os) const {
-    
-    for (size_t i = 0; i < _dim[COL]; i++) {
-        for(size_t j = 0; j < _dim[LIN]; j++)
-            printf ("%+.4f+%+.4fi ", _M [i + j * _dim[COL]].real(), _M [i + j * _dim[COL]].imag());
-        printf("\n");
-    }
-    
-    return os;
     
 }
 
