@@ -23,10 +23,10 @@ body{
 #sidebar{ position:fixed; top: 38px; left:2%;	width: 18%; }
 * html div#sidebar  { top: 38px; left:20px;	width: 230px; position:absolute; }
 
-#content{ margin: 0 10% 5em 22%; padding-top: 38px; max-width: 56%; }
+#content{ margin: 0 10% 5em 22%; padding-top: 38px; max-width: 56%; min-height: 400px;}
 
 #rightbar { position: fixed; top: 120px; left: 80%; right: 0; border: none; z-index: 50; width: 18%;}
-* html div#rightbar  { top: 30px; left:20px;	width: 230px; position:absolute; }
+* html div#rightbar  { top: 30px; left:20px;	width: 230px; position:absolute; height: 100%;}
 
 /* typography
 ----------------------------------------------- */
@@ -77,13 +77,13 @@ h3 {
 	}
 
 a, .contact-link{
-	color: #8ad459;
+	color: #f0b69d;
 	text-decoration: none;
 	cursor: hand;
 	}
 
 #content p a:hover,
-#content dd a:hover { border-bottom: 1px dotted #8ad459; }
+#content dd a:hover { border-bottom: 1px dotted #f0b69d; }
 a img{ 	border: none;}
 
 small{ font-size: 0.8em; }
@@ -152,6 +152,11 @@ fieldset{ border: none; }
 	background-color: #464133;
 	}
 
+#nav a.active {
+	color: #1a1a1a;
+	background-color: #b07750;
+}
+
 #nav a:hover{
 	color: #1a1a1a;
 	background-color: #f0b790;
@@ -162,6 +167,11 @@ fieldset{ border: none; }
 #sidebar .callout .date{ font-size: 12px;}
 #sidebar .callout a{ color: #262113; font-weight: bold;}
 #sidebar .callout ul{ margin-top: -.45em; margin-left: 1em; margin-bottom: .4em; }
+
+#sidebar .lastmodified{ position:relative; bottom: -50%; background-color: #262113; font-size: 9px; padding: .5em .8em; }
+#sidebar .lastmodified .date{ font-size: 9px;}
+#sidebar .lastmodified a{ color: #262113; font-weight: bold;}
+#sidebar .lastmodified ul{ vertical-align: bottom; margin-top: 1.0em; margin-left: 1em; margin-bottom: -.4em; }
 
 #rightbar .callout{ background-color: #c9b79a; font-size: 13px; padding: .5em .8em;}
 #rightbar .callout .date{ font-size: 12px;}

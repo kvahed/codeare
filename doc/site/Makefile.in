@@ -243,7 +243,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Generate local documentation?
-@BUILD_DOCS_TRUE@RESOURCES = screen.css sh_style.css sh_main.js sh_cpp.js sh_xml.js sh_sh.js
+@BUILD_DOCS_TRUE@RESOURCES = screen.css sh_style.css sh_main.js sh_cpp.js sh_xml.js sh_sh.js nav.js
 @BUILD_DOCS_TRUE@PAGES = $(patsubst xml/%.xml,%.html,$(wildcard xml/*.xml))
 EXTRA_DIST = $(PAGES) $(RESOURCES)
 sitedir = $(DESTDIR)$(docdir)

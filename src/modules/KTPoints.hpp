@@ -35,7 +35,7 @@ namespace RRStrategy {
     /**
      * @brief Spatial domain method for RF pulse generation with variable exchange method<br/>
 	 *        Cloos MA, Boulant N, Luong M, Ferrand G, Giacomini E, Le Bihan D, Amadon A.<br/>
-	 *        kT -points: short three-dimensional tailored RF pulses for flip-angle homogenization over an extended volume. MRM:2012; 67(1), 72–80.
+	 *        kT-points: short three-dimensional tailored RF pulses for flip-angle homogenization over an extended volume. MRM:2012; 67(1), 72–80.
      */
     class KTPoints : public ReconStrategy {
         
