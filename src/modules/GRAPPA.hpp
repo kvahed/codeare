@@ -108,68 +108,8 @@ namespace RRStrategy {
 	  
 	};
 
-
-
-	void ComputeWeights (const int& nc, const int* acs_dim, const int* kern_dim, const int* d, const float* R, const Matrix<cxfl>& acs, Matrix<cxfl>& weights) {
-		
-		ticks       tic     = getticks();
-		printf ("  (Re-)Computing weights \n");
-		
-		// # Kernel repititios in ACS
-		int nr = (acs_dim[1] - (kern_dim[1]-1) * R[1]) * (acs_dim[0] - (kern_dim[0] - 1));
-		int ns = nc * kern_dim[0] * kern_dim[1]; // # Source points
-		int nt = nc * (R[1]-1);      // # Target points
-		
-		Matrix<cxfl> s (ns, nr);          // Source 
-		Matrix<cxfl> t (nt, nr);          // Target
-		
-		int c = 0;
-		
-
-		//Grappa pattern for standard kernel 5x4
-		Matrix<double> p = zeros<double> ((kern_dim[1]-1)*R[1]+1, kern_dim[0], nc);
-		printf ("  patch size in ACS: %s\n", DimsToCString(p));
-		
-		// Source points
-		for (int lin = 0; lin < kern_dim[1]; lin++)
-			for (int col = 0; col < kern_dim[0]; col++)
-				p (col,lin*R[1],0) = 1.0;
-
-		// Target points
-		size_t lins = 1 + (ceil(kern_dim[1]/2)-1) * R[1];
-		for (int lin = lins; lin < lins + R[1] -1; lin++)
-			p(ceil(p.Dim(0)/2), lin) = -1.0;
-			
-
-		printf ("  source matrix size %s\n", DimsToCString(s));
-
-		int ni  = acs_dim[0] - d[0];
-		int nj  = acs_dim[1] - (kern_dim[1]-1) * R[1];
- 
-		for (int i = d[0]; i < ni; i++) 
-			for (int j = 0, pos = 0; j < nj; j++, c++) 
-				for (int col = 0; col < kern_dim[0]; col++)
-					for (int lin = 0; lin < kern_dim[1]; lin++)
-						for (int ch = 0; ch < nc; ch++, pos++)
-							s.At(pos + c*s.Dim(0)) = acs(i+col,j+lin,ch);
-		
-		//s.MXDump ("s.mat", "s", "");
-		//p.MXDump ("p.mat", "p", "");
-		//acs->MXDump ("acs.mat", "acs", "");
-
-		
-		//s = s.Pinv();
-		  
-		/*
-		  weights = t->*s;
-		*/
-		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-			
-		}
-		
-
-	
 }
+
 #endif /* __GRAPPA_H__ */
 
 

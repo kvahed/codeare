@@ -27,14 +27,28 @@
 using namespace RRStrategy;
 
 
-KTPoints::KTPoints  () {}
+KTPoints::KTPoints  () :
+		m_verbose   (false),
+		m_rflim     (1.0),
+		m_nc        (1),
+		m_conv      (1.0e-6),
+		m_lambda    (1.0e-6),
+		m_breakearly(true),
+		m_pd        (0),
+		m_gd        (1.0e-5),
+		m_nk        (0),
+		m_ns        (0),
+		m_max_rf    (0),
+		m_maxiter   (1000) {
+
+}
 
 
-KTPoints::~KTPoints () {}
+KTPoints::~KTPoints ()     {}
 
 
 RRSModule::error_code
-KTPoints::Init           ()  {
+KTPoints::Init      ()     {
 
     printf ("Intialising KTPoints ...\n");
 	
@@ -92,7 +106,7 @@ KTPoints::Init           ()  {
 
 
 RRSModule::error_code
-KTPoints::Finalise       ()  {
+KTPoints::Finalise  ()     {
 
     free (m_pd);
     free (m_max_rf);
@@ -103,7 +117,7 @@ KTPoints::Finalise       ()  {
 
 
 RRSModule::error_code
-KTPoints::Process        () { 
+KTPoints::Process   ()     {
 
     printf ("Processing KTPoints ...\n");
 
@@ -174,7 +188,7 @@ KTPoints::Process        () {
 
         minv  = m.prodt (m);
         minv += treg;
-        minv  = inv(minv);
+        minv  = pinv(minv);
         minv  = minv.prod (m, 'N', 'C');
         
         // Valriable exchange method --------------
@@ -277,16 +291,18 @@ KTPoints::Process        () {
 }
 
 
-// the class factories
-extern "C" DLLEXPORT ReconStrategy* create  ()                 {
+// Factory
+extern "C" DLLEXPORT ReconStrategy*
+create  ()                 {
 
     return new KTPoints;
 
 }
 
 
-
-extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
+// Trash bin
+extern "C" DLLEXPORT void
+destroy (ReconStrategy* p) {
 
     delete p;
 

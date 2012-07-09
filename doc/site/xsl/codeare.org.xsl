@@ -33,11 +33,12 @@
 		<script type="text/javascript" src="sh_cpp.js"></script>
 		<script type="text/javascript" src="sh_xml.js"></script>
 		<script type="text/javascript" src="sh_sh.js"></script>
+		<script type="text/javascript" src="nav.js"></script>
 		
 		<link type="text/css" rel="stylesheet" href="sh_style.css"/>
 
 	  </head>
-	  <body onload="sh_highlightDocument();">
+	  <body onload="sh_highlightDocument(); navhl();">
 		
 		<div id="topborder"></div>
 		
@@ -45,20 +46,28 @@
 		  <h1><a href="http://codeare.org/">codeare<em>1.0b</em></a></h1>
 		  
 		  <ul id="nav">
-			<li><a href="index.html">home</a></li>
-			<li><a href="download.html">download</a></li>
-			<li><a href="install.html">install</a></li>
-			<li><a href="gettingstarted.html">getting started</a></li>
-			<li><a href="developerguide.html">developer guide</a></li>
-			<li><a href="api/html/index.html" target="_api">api annotation</a></li>
-			<li><a href="contact.html">contact</a></li>
+			<li><a id="index" href="index.html">home</a></li>
+			<li><a id="download" href="download.html">download</a></li>
+			<li><a id="install" href="install.html">install</a></li>
+			<li><a id="gettingstarted" href="gettingstarted.html">getting started</a></li>
+			<li><a id="developerguide" href="developerguide.html">developer guide</a></li>
+			<li><a id="api" href="api/html/index.html" target="_api">api annotation</a></li>
+			<li><a id="contact" href="contact.html">contact</a></li>
 		  </ul>
+		  <script type="text/javascript" language="JavaScript">
+			navhl();
+		  </script>
 		  <div class="callout">
 			<a href="download.html" >v1.0b released<br />
 			<span class="date">on 23 mar 2012</span><br/>by kaveh vahedipour</a>
 		  </div>
 		  <br/>
 
+		  <div class="lastmodified">
+			last modified <script type="text/javascript" language="JavaScript">
+			  document.write(document.lastModified);
+			</script>
+		  </div>
 		</div>
 		
 		<div id="content">
@@ -87,7 +96,7 @@
 			   target="_mriunbound">gagdetron</a>
 			<br/>
 			a comparable project to codeare by <em>michael hansen</em> and
-			<em>thomas sørensen</em>.
+			<em>thomas sorensen</em>.
 			<br/><br/> 
 			<a href="http://www.ismrm.org/mri_unbound/"
 			   target="_mriunbound"> mri unbound</a>
