@@ -1170,8 +1170,6 @@ public:
     inline friend Matrix<T>    
     operator/  (const float& s, const Matrix<T> &m) { 
 
-        assert (s);
-
         if (s == T(1.0))
             return Matrix<T> (m);
         
