@@ -15,8 +15,6 @@
 	<html>
 	  <head>
 		
-		<title>codeare 1</title>
-		
 		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 		<meta http-equiv="content-language" content="en" />
 		
@@ -37,6 +35,8 @@
 		
 		<link type="text/css" rel="stylesheet" href="sh_style.css"/>
 
+		<title>codeare 1 - <xsl:value-of select="title" disable-output-escaping="yes"/></title>
+		
 	  </head>
 	  <body onload="sh_highlightDocument(); navhl();">
 		
@@ -50,7 +50,7 @@
 			<li><a id="download" href="download.html">download</a></li>
 			<li><a id="install" href="install.html">install</a></li>
 			<li><a id="gettingstarted" href="gettingstarted.html">getting started</a></li>
-			<li><a id="developerguide" href="developerguide.html">developer guide</a></li>
+			<li><a id="developerguide" href="developerguide.html">developer's guide</a></li>
 			<li><a id="api" href="api/html/index.html" target="_api">api annotation</a></li>
 			<li><a id="contact" href="contact.html">contact</a></li>
 		  </ul>
@@ -83,14 +83,15 @@
 			mri simulator</a> 
 			<br/>
 			open-source full-featured parallel tx/rx mri sequence and
-			hardware simulator.
+			hardware simulator by <em>tony stoecker, kaveh vahedipour 
+			and daniel pflugfelder</em>.
 			<br/><br/> 
 			<a href="http://www.drcmr.dk/bloch" target="_hansen">bloch
 			  simulator for education in mri and nmr</a> 
 			<br/>
 			free educational mri and nmr sofware. multi- os/platform 
 			without installation of software. remarkable and
-			beautiful effort by lars hanson from drcmr, hvidovre, dk.
+			beautiful effort by <em>lars hanson</em> from drcmr, hvidovre, dk.
 			<br/><br/> 
 			<a href="http://gadgetron.sourceforge.net"
 			   target="_mriunbound">gagdetron</a>
