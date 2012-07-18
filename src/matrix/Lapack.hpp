@@ -83,57 +83,25 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	int    info  =  0;
 	int    lwork = -1;
 	
-	T*     w     = 0;
-	T*     wi    = 0;
 	T*     rwork = 0;
 	
-	if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {    // Complex eigen values for real matrices
-		w     = (T*) malloc (N * sizeof(T));
-		wi    = (T*) malloc (N * sizeof(T));
-	} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))  // Real workspace for complex matrices
+	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))  // Real workspace for complex matrices
 		rwork = (T*) malloc (N * sizeof(T));
 	
 	T  wkopt;
 	
 	// Workspace query
-	if (typeid(T) == typeid(cxfl))
-		cgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
-	else if (typeid(T) == typeid(double))
-		dgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
-	else if (typeid(T) == typeid(float))
-		sgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
+	LapackTraits<T>::geev (&jobvl, &jobvr, N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
 	
 	// Intialise work space
 	lwork    = (int) creal (wkopt);
 	T* work  = (T*) malloc (lwork * sizeof(T));
 	
 	// Actual eigen value comp
-	if (typeid(T) == typeid(cxfl)) {
-		cgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
-	} else if (typeid(T) == typeid(cxdb)) {
-		zgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
-	} else if (typeid(T) == typeid(double)) {
-		dgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
-		while (N--) {
-			double f[2] = {((double*)w)[N], ((double*)wi)[N]};
-			memcpy(&ev[N], f, 2 * sizeof(double));
-		}
-	} else if (typeid(T) == typeid(float)) {
-		sgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
-		while (N--) {
-			float f[2] = {((float*)w)[N], ((float*)wi)[N]};
-			memcpy(&ev[N], f, 2 * sizeof(float));
-		}
-	}
-	
+	LapackTraits<T>::geev (&jobvl, &jobvr, N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
 	
 	// Clean up
-	if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {
-		free (w);
-		free (wi);
-	} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
+	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
 		free (rwork);
 
 	free (work);
@@ -226,28 +194,14 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	}
 	
 	// Workspace query
-	if      (typeid(T) == typeid(cxfl))
-		cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(double))
-		dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
-	else if (typeid(T) == typeid(float))
-		sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+	LapackTraits<T>::gesdd (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 	
 	// Resize work according to ws query
 	lwork   = (int) creal (wopt);
 	T* work = (T*) malloc (lwork * sizeof(T));
 	
 	//SVD
-	if      (typeid(T) == typeid(cxfl))
-		cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(double))
-		dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
-	else if (typeid(T) == typeid(float))
-		sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+	LapackTraits<T>::gesdd (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
 	
 	V = !V;
 	
@@ -381,16 +335,7 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	
 	Matrix<T> b = eye<T>(ldb);
 
-	float frcond  = rcond;
-	
-	if      (typeid(T) == typeid(cxfl))
-		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
-	else if (typeid(T) == typeid(double))
-		dgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork,         &iwopt, &info);
-	else if (typeid(T) == typeid(float))
-		sgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork,         &iwopt, &info);
+	LapackTraits<T>::gelsd (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, rcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
 	
 	lwork = (int) creal(wopt);
 	
@@ -401,15 +346,7 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	iwork = (int*) malloc (sizeof(int) * iwopt);
 	work  = (T*)   malloc (sizeof(T)   * lwork);
 	
-	if      (typeid(T) == typeid(cxfl))
-		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(double))
-		dgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork,        iwork, &info);
-	else if (typeid(T) == typeid(float))
-		sgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
-
+	LapackTraits<T>::gelsd (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, rcond, &rank, work, &lwork,   rwork,  iwork, &info);
 	
 	if (M > N)
 		for (int i = 0; i < M; i++)
@@ -578,8 +515,7 @@ dotc (const Matrix<T>& A, const Matrix<T>& B) {
 	res = T(0.0);
 	one = 1;
 	
-	if      (typeid(T) == typeid(cxfl)) cblas_cdotc_sub (n, A.Data(), one, B.Data(), one, &res);
-	else if (typeid(T) == typeid(cxdb)) cblas_zdotc_sub (n, A.Data(), one, B.Data(), one, &res);
+	LapackTraits<T>::dotc (n, A.Data(), one, B.Data(), one, &res);
 	
 	return res;
 	
