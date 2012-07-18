@@ -34,7 +34,10 @@ public:
 	/**
 	 * @brief    Default constructor
 	 */
-	FT() {};
+	FT() {
+		T t;
+		Validate (t);
+	};
 
 	/**
 	 * @brief    Default destructor
@@ -83,6 +86,12 @@ public:
 	operator->* (const Matrix< std::complex<T> >& m) const {
 		return Adjoint (m);
 	}
+
+	
+protected:
+
+    void Validate (double& t) const {};
+	void Validate (float&  t) const {};
 	
 };
 

@@ -141,7 +141,6 @@ DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
 DumpToFile_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) -o $@
-GRAPPA_la_DEPENDENCIES =
 am_GRAPPA_la_OBJECTS = GRAPPA.lo
 GRAPPA_la_OBJECTS = $(am_GRAPPA_la_OBJECTS)
 GRAPPA_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -433,7 +432,8 @@ SystemCmd_la_LIBADD = $(COMMON_la_LIBADD)
 LapackTests_la_SOURCES = LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 LapackTests_la_LIBADD = $(COMMON_la_LIBADD)
-GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp
+GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp CGRAPPA.hpp
+GRAPPA_la_DEPENDENCIES = 
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)
 SpatialDomain_la_SOURCES = SpatialDomain.hpp SpatialDomain.cpp
