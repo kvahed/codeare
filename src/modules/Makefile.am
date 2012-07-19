@@ -4,7 +4,7 @@
 ../%SK.cc: ../%.idl
 	omniidl -bcxx $<
 
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../nfft -I../tinyxml -I../misc
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../tinyxml -I../misc
 
 EXTRA_DIST = GPUSimulator.cl
 

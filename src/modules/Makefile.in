@@ -391,7 +391,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../nfft -I../tinyxml -I../misc
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../tinyxml -I../misc
 EXTRA_DIST = GPUSimulator.cl
 
 # Rules for recon strategies
