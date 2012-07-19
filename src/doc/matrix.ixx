@@ -17,7 +17,7 @@
 	\li ::pinv Pseudo-Inversion
 	\li ::svd  Singular value decomposition
 
-    \subsection matrixtrafo Transforms
+    \subsection matrixtrafo Transform operators
 	
 	\li DFT Discrete Cartsian FFT
 	\li NFFT non-uniform FFT
@@ -26,6 +26,68 @@
 	\li CGRAPPA Cartesian GRAPPA
 	\li DWT Discrete wavelet transform
 	\li TVOP Total Variation transform
+
+	\subsection matrixelemw Arithmetic operators elementwise
+
+	\li Matrix::operator*  Multiplication with other matrix or scalar
+	\li Matrix::operator*= Multiplication with other matrix or scalar
+	\li Matrix::operator+ Addition with other matrix or scalar
+	\li Matrix::operator+= Addition with other matrix or scalar
+	\li Matrix::operator/ Division of/by other matrix or scalar
+	\li Matrix::operator/= Division of/by other matrix or scalar
+	\li Matrix::operator- Subtraction by/from other matrix or scalar
+	\li Matrix::operator-= Subtraction by/from other matrix or scalar
+	\li Matrix::operator== Equality with other matrix or scalar
+	\li Matrix::operator< Comparison with other matrix or scalar
+	\li Matrix::operator<= Comparison with other matrix or scalar
+	\li Matrix::operator> Comparison with other matrix or scalar
+	\li Matrix::operator>= Comparison with other matrix or scalar
+	\li Matrix::operator^ Raise power
+	\li Matrix::operator! Transposition
+	\li Matrix::operator[] Elementwise access
+
+	\subsection matrixalgos Miscellaneous algorithms
+
+	\li ::abs Absolute values 
+	\li ::real Real part of matrix
+	\li ::imag Imaginary part of matrix
+	\li ::angle Argument of matrix
+	\li ::nnz Number of non-zero elements
+	\li ::size Size of matrix or single dimensions
+	\li ::sum Sum over a dimension
+	\li ::reshape Reshaping of matrices
+	\li ::permute Permute dimensions
+	\li ::isnan Is NaN
+	\li ::isinf Is infinite
+	\li ::isfinite Is finite
+	\li ::ndims Number of dimensions
+	\li ::diag Sum of diagonal elemts
+	\li ::numel Number of elements
+	\li ::length
+	\li ::width
+	\li ::height
+	\li ::min
+	\li ::max
+	\li ::transpose
+	\li ::ctranspose
+
+	\subsection matrixalgos Access
+
+	\li ::Volume Set and get particular volume
+	\li ::Slice Set and get particular slice
+	\li ::Row Set and get particular row
+	\li ::Column Set and get particular col
+	\li ::ind2i Index to first dim
+	\li ::ind2j Index to 2nd dim
+	\li ::ind2k Index to 3rd dim
+	\li ::ind2x Index to arbitrary dimension
+	\li ::sub2ind Subs from index
+
+	\subsection matrixinterp Interpolations
+	
+	\li ::interp1 1D Interpolation
+	\li ::Resample 2D Interpolation
+	\li PolyVal::lookup Polynomial interpolation (CSPLINE, AKIMA, LINEAR, etc)
 
 */
 
