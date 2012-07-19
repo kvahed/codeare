@@ -40,7 +40,7 @@ LapackTests::Process     () {
 	Matrix<cxdb>    cd = (Matrix<cxdb>) cf;
 	Matrix<double>& rd = GetRLDB ("rd");
 
-	std::cout << "Testing eig (cgeev) ----------- \n";
+	std::cout << "Testing eig (dgeev) ----------- \n";
 
 	Matrix<cxdb>   hev (rd.Dim(0), 1);
 	Matrix<double> hlev(rd.Dim(0));
@@ -50,7 +50,7 @@ LapackTests::Process     () {
 	std::cout << "RLDB IN: \n";
 	std::cout << rd << std::endl;
 
-	//eig (dtmp, hev, hlev, hrev, 'V', 'V');
+	eig (dtmp, hev, hlev, hrev, 'V', 'V');
 	
 	std::cout << "OUT: \n" <<  hev;
  	std::cout << "------------------------------- \n\n";
