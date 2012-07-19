@@ -5,10 +5,14 @@
 extern "C" {
 
 	// Cholesky factorization of a complex Hermitian positive definite matrix
-	void cpotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
-	void dpotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
-	void spotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
-	void zpotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
+	void cpotrf_ (const char* uplo, const int* n, void* a, const int* lda, 
+				  int *info);
+	void dpotrf_ (const char* uplo, const int* n, void* a, const int* lda, 
+				  int *info);
+	void spotrf_ (const char* uplo, const int* n, void* a, const int* lda, 
+				  int *info);
+	void zpotrf_ (const char* uplo, const int* n, void* a, const int* lda, 
+				  int *info);
 	
 	// Computes an LU factorization of a general M-by-N matrix A
 	void cgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
@@ -16,47 +20,91 @@ extern "C" {
 	void zgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
 	void sgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
 	
-	// Inverse of a complex Hermitian positive definite matrix using cpotrf/cpptrf
+	// Inverse of a complex Hermitian pos def mat with cpotrf/cpptrf
 	void cpotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
 	void dpotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
 	void zpotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
 	void spotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
 	
 	// Matrix inversion through cholesky decomposition
-	void cgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
-	void dgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
-	void zgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
-	void sgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
+	void cgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, 
+				  int *lwork, int*info);
+	void dgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, 
+				  int *lwork, int*info);
+	void zgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, 
+				  int *lwork, int*info);
+	void sgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, 
+				  int *lwork, int*info);
 	
 	// Eigen value computations
-	void cgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *w ,           void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork, void *rwork, int *info);
-	void zgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *w ,           void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork, void *rwork, int *info);
-	void dgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork,              int *info);
-	void sgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork,              int *info);
+	void cgeev_  (const char *jvl, const char *jvr, int *n, const void *a, 
+				  int *lda, void *w,  void *vl, int *ldvl, void *vr, int *ldvr, 
+				  void *work, int *lwork, void *rwork, int *info);
+	void zgeev_  (const char *jvl, const char *jvr, int *n, const void *a, 
+				  int *lda, void *w,  void *vl, int *ldvl, void *vr, int *ldvr, 
+				  void *work, int *lwork, void *rwork, int *info);
+	void dgeev_  (const char *jvl, const char *jvr, int *n, const void *a, 
+				  int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, 
+				  int *ldvr, void *work, int *lwork, int *info);
+	void sgeev_  (const char *jvl, const char *jvr, int *n, const void *a, 
+				  int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, 
+				  int *ldvr, void *work, int *lwork, int *info);
 	
 	// Singular value decomposition 
-	void cgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, void *rwork, int *iwork, int*info);
-	void zgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, void *rwork, int *iwork, int*info);
-	void dgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork,               int *iwork, int*info);
-	void sgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork,               int *iwork, int*info);
+	void cgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
+				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+				  void *rwork, int *iwork, int*info);
+	void zgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
+				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+				  void *rwork, int *iwork, int*info);
+	void dgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
+				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+				  int *iwork, int*info);
+	void sgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
+				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+				  int *iwork, int*info);
 	
 	// Pseudo-inversion 
-	void zgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
-	void cgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
-	void dgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
-	void sgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
+	void zgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, 
+				  int* ldb, void* s, void* rcond, int* rank, void* work, 
+				  int* lwork, void* rwork, int* iwork, int* info);
+	void cgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, 
+				  int* ldb, void* s, void* rcond, int* rank, void* work, 
+				  int* lwork, void* rwork, int* iwork, int* info);
+	void dgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, 
+				  int* ldb, void *s, void* rcond, int* rank, void* work, 
+				  int* lwork, void* iwork, int* info);
+	void sgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, 
+				  int* ldb, void *s, void* rcond, int* rank, void* work, 
+				  int* lwork, void* iwork, int* info);
 
 	// Matrix vector multiplication
-	void sgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
-	void dgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
-	void cgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
-	void zgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
+	void sgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, 
+				  int* lda, const void *x, int* incx, void* beta, void *y, 
+				  int* incy);
+	void dgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, 
+				  int* lda, const void *x, int* incx, void* beta, void *y, 
+				  int* incy);
+	void cgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, 
+				  int* lda, const void *x, int* incx, void* beta, void *y, 
+				  int* incy);
+	void zgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, 
+				  int* lda, const void *x, int* incx, void* beta, void *y, 
+				  int* incy);
 
 	// Matrix matrix multiplication
-	void sgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	void dgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	void cgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	void zgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
+	void sgemm_  (const char *transa, const char *transb, int *m, int *n, int *k,
+				  void *alpha, const void *a, int *lda, const void *b, int *ldb, 
+				  void *beta, void *c, int *ldc);
+	void dgemm_  (const char *transa, const char *transb, int *m, int *n, int *k, 
+				  void *alpha, const void *a, int *lda, const void *b, int *ldb, 
+				  void *beta, void *c, int *ldc);
+	void cgemm_  (const char *transa, const char *transb, int *m, int *n, int *k, 
+				  void *alpha, const void *a, int *lda, const void *b, int *ldb, 
+				  void *beta, void *c, int *ldc);
+	void zgemm_  (const char *transa, const char *transb, int *m, int *n, int *k, 
+				  void *alpha, const void *a, int *lda, const void *b, int *ldb, 
+				  void *beta, void *c, int *ldc);
 	
 }
 
@@ -130,7 +178,8 @@ struct LapackTraits<float> {
 		Type* dwi = (Type*) malloc (n * sizeof(Type));
 		Type* dw  = (Type*) w;
 		
-		dgeev_  (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, lwork, info);
+		dgeev_ (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, lwork,
+				info);
 		
 		for (size_t i = 0; i < n; i++) {
 			dw[2*i]   = dwr[i];
@@ -146,7 +195,7 @@ struct LapackTraits<float> {
 	gelsd (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, 
 		   int* ldb, void* s, Type rcond, int* rank, void* work, 
 		   int* lwork, void* rwork, int* iwork, int* info) {
-		sgelsd_ (m, n, nrhs, a, lda, b, ldb, s, &rcond, rank, work, lwork, iwork, 
+		sgelsd_ (m, n, nrhs, a, lda, b, ldb, s, &rcond, rank, work, lwork, iwork,
 				 info);
 	}
 
@@ -228,9 +277,9 @@ struct LapackTraits<double> {
 
 		dgeev_ (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, 
 				lwork, info);
-
+		
 		for (size_t i = 0; i < n; i++) {
-			dw[2*i]   = dwr[i];
+			dw[2*i  ] = dwr[i];
 			dw[2*i+1] = dwi[i];
 		}
 
