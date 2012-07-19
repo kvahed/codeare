@@ -90,7 +90,7 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	
 	T  wkopt;
 	
-	// Workspace query
+	// Workspace query 
 	LapackTraits<T>::geev (&jobvl, &jobvr, N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
 	
 	// Intialise work space
@@ -101,9 +101,9 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	LapackTraits<T>::geev (&jobvl, &jobvr, N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
 	
 	// Clean up
-	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
+	if (rwork) 
 		free (rwork);
-
+	
 	free (work);
 	
 	if (info > 0)

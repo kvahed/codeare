@@ -125,20 +125,21 @@ struct LapackTraits<float> {
 	geev (const char *jvl, const char *jvr, int n, const void *a, int *lda, 
 		  void *w, void *vl, int *ldvl, void *vr, int *ldvr, void *work, 
 		  int *lwork, void* rwork, int *info) {
-
-		Type* dw = (Type*) w;
-
-		sgeev_ (jvl, jvr, &n, a, lda, &dw[0], &dw[n], vl, ldvl, vr, ldvr, work, 
-				lwork, info);
-
-		Type* tmp = (Type*) malloc (n * sizeof(Type));
-		memcpy (tmp, dw, n * sizeof (Type));
+		
+		Type* dwr = (Type*) malloc (n * sizeof(Type));
+		Type* dwi = (Type*) malloc (n * sizeof(Type));
+		Type* dw  = (Type*) w;
+		
+		dgeev_  (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, lwork, info);
+		
 		for (size_t i = 0; i < n; i++) {
-			dw[2*i+1] = dw[n+i];
-			dw[2*i]   = tmp[i];
+			dw[2*i]   = dwr[i];
+			dw[2*i+1] = dwi[i];
 		}
-		free (tmp);
-
+		
+		free (dwr);
+		free (dwi);
+		
 	}
 
 	inline static void 
@@ -221,18 +222,20 @@ struct LapackTraits<double> {
 		  void *w, void *vl, int *ldvl, void *vr, int *ldvr, void *work, 
 		  int *lwork, void* rwork, int *info) {
 
-		Type* dw = (Type*) w;
+		Type* dwr = (Type*) malloc (n * sizeof(Type));
+		Type* dwi = (Type*) malloc (n * sizeof(Type));
+		Type* dw  = (Type*) w;
 
-		dgeev_ (jvl, jvr, &n, a, lda, &dw[0], &dw[n], vl, ldvl, vr, ldvr, work, 
+		dgeev_ (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, 
 				lwork, info);
 
-		Type* tmp = (Type*) malloc (n * sizeof(Type));
-		memcpy (tmp, dw, n * sizeof (Type));
 		for (size_t i = 0; i < n; i++) {
-			dw[2*i+1] = dw[n+i];
-			dw[2*i]   = tmp[i];
+			dw[2*i]   = dwr[i];
+			dw[2*i+1] = dwi[i];
 		}
-		free (tmp);
+
+		free (dwr);
+		free (dwi);
 
 	}
 
