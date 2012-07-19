@@ -50,7 +50,7 @@ LapackTests::Process     () {
 	std::cout << "RLDB IN: \n";
 	std::cout << rd << std::endl;
 
-	eig (dtmp, hev, hlev, hrev, 'V', 'V');
+	//eig (dtmp, hev, hlev, hrev, 'V', 'V');
 	
 	std::cout << "OUT: \n" <<  hev;
  	std::cout << "------------------------------- \n\n";
@@ -66,7 +66,7 @@ LapackTests::Process     () {
 	std::cout << "CXFL IN: \n";
 	std::cout << cf << std::endl;
 
-	eig (rtmp, rev, rlev, rrev);
+	//eig (rtmp, rev, rlev, rrev);
 
 	std::cout << "OUT: \n" <<  rev;
 	std::cout << "------------------------------- \n\n";

@@ -15,6 +15,8 @@
 	<html>
 	  <head>
 		
+		<meta name="google-site-verification" content="gOYMZkytTZ8mW9ekuk7pbY67hJf0UkdjSHYKE30z8Jo" />
+
 		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 		<meta http-equiv="content-language" content="en" />
 		
