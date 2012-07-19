@@ -8,8 +8,7 @@
 	
 	\li ::chol Cholesky factorisation
 	\li ::dot  Dot product
-	\li ::dotc Dot product with complex cojugate or conjugate transpose
-	\li ::dotu Dot product
+	\li ::dotc Dot product with complex cojugate transpose
 	\li ::eig  Eigenvalue decomposition
 	\li ::gemm General matrix matrix multiplication
 	\li ::gemv General matrix vector multiplication
@@ -24,7 +23,7 @@
 	\li NFFT non-uniform FFT
 	\li CSENSE Cartesian SENSE
 	\li NCSENSE non-Cartesian SENSE
-	\li GRAPPA GRAPPA
+	\li CGRAPPA Cartesian GRAPPA
 	\li DWT Discrete wavelet transform
 	\li TVOP Total Variation transform
 
