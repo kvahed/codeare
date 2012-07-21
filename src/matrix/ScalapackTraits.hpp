@@ -3,8 +3,33 @@
 #define  MPICH_IGNORE_CXX_SEEK
 #include <mpi.h>
 
+struct grid_dims {
+	
+	int np; /**< @brief # of processes */
+	int rk; /**< @brief my rank        */
+	int ct; /**< @brief context        */
+	int nr; /**< @brief # of proc rows */
+	int nc; /**< @brief # of proc columns */
+	int mr; /**< @brief my row # */
+	int mc; /**< @brief my col # */ 
+	char order; /**< @brief row/col major */
+
+};
+
 extern "C" {
 	
+	// BLACS
+	void Cblacs_pinfo (int* mypnum, int* nprocs);
+	void Cblacs_get (int context, int request, int* value);
+	int  Cblacs_gridinit (int* context, char* order, int np_row, int np_col);
+	void Cblacs_gridinfo (int context, int*  np_row, int* np_col, int*  my_row, int*  my_col);
+	void Cblacs_gridexit (int context);
+	void Cblacs_exit (int error_code);
+	void Cblacs_barrier (int context, char* scope);
+	
+    void Cdgerv2d (int, int, int, double*, int, int, int);
+    void Cdgesd2d (int, int, int, double*, int, int, int);
+
 	// Initialise descriptor vector 
     void descinit_  (int *desc, int *m, int *n, int *mb, int *nb, int *irsrc, 
 					 int *icsrc, int *ictxt, int *lld, int *info); 
@@ -16,11 +41,11 @@ extern "C" {
     int  numroc_    (int *n, int *nb, int *iproc, int *isrcproc, int *nprocs);
 
 	// SVD
-    void pzgesvd_   (char* ju, char* jvt, int* m, int* n, cxdb* A, int* ia, 
+    void pzgesvd_   (char* jbu, char* jbvt, int* m, int* n, cxdb* A, int* ia, 
 					 int* ja, int* descA, double* s, cxdb* U, int* iu, int* ju, 
 					 int* descU, cxdb* VT, int* ivt, int* jvt, int* descVT, 
 					 cxdb* WORK, int* lwork, double* rwork, int* info);
-    void pcgesvd_   (char* ju, char* jvt, int* m, int* n, cxfl* A, int* ia, 
+    void pcgesvd_   (char* jbu, char* jbvt, int* m, int* n, cxfl* A, int* ia, 
 					 int* ja, int* descA, double* s, cxfl* U, int* iu, int* ju, 
 					 int* descU, cxfl* VT, int* ivt, int* jvt, int* descVT, 
 					 cxfl* WORK, int* lwork, double* rwork, int* info);
@@ -72,14 +97,14 @@ extern "C" {
 
 // C++ convenience
 inline int indxl2g (int lidx, int nb, int iproc, int isrcproc, int nprocs) {
-	int fortran_idxloc = idxloc + 1;
+	int fortran_idxloc = lidx + 1;
 	return indxl2g_ (&fortran_idxloc, &nb, &iproc, &isrcproc, &nprocs) - 1;
 }
 
 
 
 
-template<T>
+template<class T>
 struct ScalapackTraits {};
 
 
@@ -106,11 +131,11 @@ struct ScalapackTraits<cxfl> {
 	}
 
     inline static void 
-	gesvd (char* ju, char* jvt, int* m, int* n, cxfl* A, int* ia, int* ja, 
+	gesvd (char* jbu, char* jbvt, int* m, int* n, cxfl* A, int* ia, int* ja, 
 		   int* descA, double* s, cxfl* U, int* iu, int* ju, int* descU, 
 		   cxfl* VT, int* ivt, int* jvt, int* descVT, cxfl* WORK, int* lwork, 
 		   double* rwork, int* info) {
-		pcgesvd_ (ju, jvt, m, n, A, ia, ja, descA, s, U, iu, ju, descU, VT, ivt,
+		pcgesvd_ (jbu, jbvt, m, n, A, ia, ja, descA, s, U, iu, ju, descU, VT, ivt,
 				  jvt, descVT, WORK, lwork, rwork, info);
 	}
 
@@ -147,11 +172,11 @@ struct ScalapackTraits<cxdb> {
 	}
 
     inline static void 
-	gesvd (char* ju, char* jvt, int* m, int* n, cxdb* A, int* ia, int* ja, 
+	gesvd (char* jbu, char* jbvt, int* m, int* n, cxdb* A, int* ia, int* ja, 
 		   int* descA, double* s, cxdb* U, int* iu, int* ju, int* descU, 
 		   cxdb* VT, int* ivt, int* jvt, int* descVT, cxdb* WORK, int* lwork, 
 		   double* rwork, int* info) {
-		pzgesvd_ (ju, jvt, m, n, A, ia, ja, descA, s, U, iu, ju, descU, VT, ivt,
+		pzgesvd_ (jbu, jbvt, m, n, A, ia, ja, descA, s, U, iu, ju, descU, VT, ivt,
 				  jvt, descVT, WORK, lwork, rwork, info);
 	}	
 
