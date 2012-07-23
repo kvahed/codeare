@@ -51,13 +51,16 @@ extern "C" {
 					 cxfl* WORK, int* lwork, double* rwork, int* info);
 	
 	// Print
-    void pzlaprnt_  (int *m, int* n, cxdb* A, int* ia, int* ja, int* descA, 
-					 int* irprnt, int* icprnt, char* cmatnm, int* nout, 
+    void pzlaprnt_  (int *m, int* n, const cxdb* A, int* ia, int* ja, const int* descA, 
+					 int* irprnt, int* icprnt, const char* cmatnm, int* nout, 
 					 cxdb* WORK, int len);
-    void pclaprnt_  (int *m, int* n, cxfl* A, int* ia, int* ja, int* descA, 
-					 int* irprnt, int* icprnt, char* cmatnm, int* nout, 
+    void pclaprnt_  (int *m, int* n, const cxfl* A, int* ia, int* ja, const int* descA, 
+					 int* irprnt, int* icprnt, const char* cmatnm, int* nout, 
 					 cxfl* WORK, int len);
-
+    void pdlaprnt_  (int *m, int* n, const double* A, int* ia, int* ja, const int* descA, 
+					 int* irprnt, int* icprnt, const char* cmatnm, int* nout, 
+					 double* WORK, int len);
+	
 	// File IO
 	void pzlawrite_ (char* fname, int* m, int* n, cxdb* A, int* ia, int* ja, 
 					 int* descA,	int* irwr, int* icwr, cxdb* WORK);
@@ -186,6 +189,24 @@ struct ScalapackTraits<cxdb> {
 		   int* lwork, int* info) {
 		pzgels_ (trans, m, n, nrhs, A, ia, ja, descA, B, ib, jb, descB, WORK,
 				 lwork, info);
+	}
+
+};
+
+
+template<>
+struct ScalapackTraits<double> {
+
+	typedef double Type;
+
+	inline static void 
+	pxlaprnt (int *m, int* n, const double* A, int* ia, int* ja, const int* descA, 
+			  int* irprnt, int* icprnt, const char* cmatnm, int* nout, 
+			  double* WORK, int len) {
+		char scope = 'A';
+		Cblacs_barrier (descA[1], &scope);
+		pdlaprnt_ (m, n, A, ia, ja, descA, irprnt, icprnt, cmatnm, nout, WORK,
+				   len);
 	}
 
 };

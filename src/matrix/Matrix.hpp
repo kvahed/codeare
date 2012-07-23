@@ -1455,6 +1455,15 @@ public:
     
     
     /**
+     * @brief           Assignment operator. i.e. this = m.
+     *
+     * @param  M        The assigned matrix.
+     */
+    Matrix<T>&
+    operator=           (const std::valarray<T>& v);
+    
+    
+    /**
      * @brief           Assignment operator. Sets all elements s.
      *
      * @param  s        The assigned scalar.
@@ -1931,7 +1940,7 @@ public:
      *
      * @return          Size
      */
-    inline size_t
+    virtual inline size_t
     Size() const {
         
         
@@ -1947,14 +1956,14 @@ public:
     //@}
 
 
-private:
-    
+protected:
+	
     size_t              _dim[INVALID_DIM]; /// Dimensions
     float               _res[INVALID_DIM]; /// Resolutions
     std::valarray<T>    _M;
     std::string         _name; 
-
-
+	
+	
     /**
      * @brief           Adjust and resize for Syngo read
      *
@@ -1963,7 +1972,7 @@ private:
      */
     bool
     RSAdjust            (const std::string& fname);
-
+	
     void Validate (short int& t) const {};
     void Validate (long int&  t) const {};
     void Validate (size_t&    t) const {};
@@ -2195,6 +2204,19 @@ Matrix<T>::operator= (const Matrix<T>& M) {
         _M = M.Dat();
         
     }
+
+    return *this;
+    
+}
+
+
+template <class T> inline Matrix<T>&
+Matrix<T>::operator= (const std::valarray<T>& v) {
+    
+	assert (_M.size() == v.size());
+
+    if (&_M != &v)
+        _M = v;
 
     return *this;
     
