@@ -833,6 +833,33 @@ if test x$mpi = xtrue; then
   CXX=$MPICXX
 fi
 
+# -----------------------------
+# scalapack
+#
+AC_ARG_WITH(scalapack, 
+   [AS_HELP_STRING([--with-scalapack],
+       [use scalapack if available (default: yes)])],
+   [if  test "$withval" = "yes" ; then
+      with_scalapack=1
+   else
+      with_scalapack=0
+   fi],
+   [with_scalapack=0])
+# -----------------------------
+
+AC_DEFINE([HAVE_F77_UNDERSCORE], [], [Description])
+
+AC_CHECK_LIB(
+    [scalapack], 
+    [pzgels_], 
+    [AC_DEFINE(HAVE_F77_UNDERSCORE, 0, []) LIBS="${LIBS} -lscalapack"], 
+   [AC_CHECK_LIB(
+	    [scalapack-mpich], 
+		[pzgels_], 
+		[AC_DEFINE(HAVE_F77_UNDERSCORE, 1, []) LIBS="${LIBS} -lscalapack-mpich"],  
+		[AC_MSG_ERROR([cannot find libscalapack-mpich, bailing out])])]
+)
+
 # Generate files
 AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile])
 AC_OUTPUT

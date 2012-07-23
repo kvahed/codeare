@@ -812,6 +812,7 @@ with_matlabroot
 with_blas
 with_lapack
 enable_mpi
+with_scalapack
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1475,6 +1476,7 @@ Optional Packages:
   --with-matlabroot       path to MATLAB install dir
   --with-blas             which blas library to use
   --with-lapack           which lapack library to use
+  --with-scalapack        use scalapack if available (default: yes)
 
 Some influential environment variables:
   CC          C compiler command
@@ -11703,10 +11705,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"00eee14c\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"3a83c650\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Mon Jul 23 18:18:13 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Jul 23 22:11:10 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -19770,6 +19772,114 @@ rm -f conftest.*
 
   CXX=$MPICXX
 fi
+
+# -----------------------------
+# scalapack
+#
+
+# Check whether --with-scalapack was given.
+if test "${with_scalapack+set}" = set; then :
+  withval=$with_scalapack; if  test "$withval" = "yes" ; then
+      with_scalapack=1
+   else
+      with_scalapack=0
+   fi
+else
+  with_scalapack=0
+fi
+
+# -----------------------------
+
+
+$as_echo "#define HAVE_F77_UNDERSCORE /**/" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for pzgels_ in -lscalapack" >&5
+$as_echo_n "checking for pzgels_ in -lscalapack... " >&6; }
+if ${ac_cv_lib_scalapack_pzgels_+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lscalapack  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pzgels_ ();
+int
+main ()
+{
+return pzgels_ ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_scalapack_pzgels_=yes
+else
+  ac_cv_lib_scalapack_pzgels_=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_scalapack_pzgels_" >&5
+$as_echo "$ac_cv_lib_scalapack_pzgels_" >&6; }
+if test "x$ac_cv_lib_scalapack_pzgels_" = xyes; then :
+  $as_echo "#define HAVE_F77_UNDERSCORE 0" >>confdefs.h
+ LIBS="${LIBS} -lscalapack"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for pzgels_ in -lscalapack-mpich" >&5
+$as_echo_n "checking for pzgels_ in -lscalapack-mpich... " >&6; }
+if ${ac_cv_lib_scalapack_mpich_pzgels_+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lscalapack-mpich  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pzgels_ ();
+int
+main ()
+{
+return pzgels_ ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_scalapack_mpich_pzgels_=yes
+else
+  ac_cv_lib_scalapack_mpich_pzgels_=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_scalapack_mpich_pzgels_" >&5
+$as_echo "$ac_cv_lib_scalapack_mpich_pzgels_" >&6; }
+if test "x$ac_cv_lib_scalapack_mpich_pzgels_" = xyes; then :
+  $as_echo "#define HAVE_F77_UNDERSCORE 1" >>confdefs.h
+ LIBS="${LIBS} -lscalapack-mpich"
+else
+  as_fn_error $? "cannot find libscalapack-mpich, bailing out" "$LINENO" 5
+fi
+
+
+fi
+
 
 # Generate files
 ac_config_files="$ac_config_files src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile"

@@ -26,7 +26,7 @@ class PMatrix : public Matrix<T> {
 
 		// Validate
 		T t;
-		Validate (t);
+		PMatrix<T>::Validate (t);
 
 		// Get at home
 		GridInfo();
@@ -41,7 +41,7 @@ class PMatrix : public Matrix<T> {
 
 		// Validate
 		T t;
-		Validate (t);
+		PMatrix<T>::Validate (t);
 
 		int info; 
 
