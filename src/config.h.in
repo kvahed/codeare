@@ -114,6 +114,9 @@
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
 
+/* define that we have mpi */
+#undef HAVE_MPI
+
 /* define that mpi supports threads */
 #undef HAVE_MPI_THREADS
 

@@ -2,6 +2,7 @@
 #include "PMatrix.hpp"
 #include "PIO.hpp"
 
+#ifdef HAVE_MPI
 static void 
 grid_setup (const int& np, int& nc, int& nr) {
 	
@@ -40,22 +41,29 @@ sl_finalise (grid_dims& gd) {
 	Cblacs_exit (0);
 
 }
+#endif 
 
 
-int main (int argc, char** argv) {
+template <class T> bool
+mpitest (Connector<T>* rc) {
 
+#ifdef HAVE_MPI
 	grid_dims gd;
 	gd.order = 'C';
 
 	/* Initialise ScaLAPACK */
 	sl_init (gd);
 
+	/* MPI aware matrix */
 	PMatrix<double> pm (32,40);
 	pm.Val() = 20.0;
 	print (pm);
 
 	/* Finalise ScaLAPACK */
 	sl_finalise (gd);
+#else 
+	printf ("MPI not supported by this build\n");
+#endif
 
 	return 0;
 

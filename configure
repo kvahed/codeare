@@ -11703,10 +11703,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"e1118b6d\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"00eee14c\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Mon Jul 23 17:27:11 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Jul 23 18:18:13 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -19686,6 +19686,9 @@ else
   mpiw=yes
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether MPI library supports threads" >&5
