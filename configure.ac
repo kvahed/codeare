@@ -717,6 +717,7 @@ if test $? -ne 0; then
 else
   mpiw=yes
   AC_MSG_RESULT([yes])
+  AC_DEFINE(HAVE_MPI,1,[define that we have mpi])
 fi
 
 AC_MSG_CHECKING([whether MPI library supports threads])

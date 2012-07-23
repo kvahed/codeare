@@ -53,6 +53,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
 		else if (!strcmp (test, "KArb"))                  karbtest     (con);
 		else if (!strcmp (test, "Creators"))              creatorstest (con);
+		else if (!strcmp (test, "MPI"))                   mpitest      (con);
 		else                                              internaltest (con);
 		
 		delete con;
