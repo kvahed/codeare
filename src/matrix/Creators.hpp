@@ -2,6 +2,7 @@
 #define __CREATORS_HPP__
 
 #include "Matrix.hpp"
+#include "PMatrix.hpp"
 #include "Algos.hpp"
 
 #include <gsl/gsl_rng.h>
@@ -129,6 +130,22 @@ ones            (const size_t& col,
 }
 
 
+/**
+ * @brief        Construct square m x m ScaLAPACK matrix
+ *
+ * @param  m     Side length
+ * @return       Matrix
+ */
+/*
+template <class T> inline static 
+PMatrix<T> pzeros (const size_t& m) {
+
+	PMatrix<T> M (m);
+	M = T(0);
+	return M;
+
+}
+*/
 
 /**
  * @brief       Random matrix

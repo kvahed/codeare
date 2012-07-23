@@ -114,6 +114,9 @@
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
 
+/* define that mpi supports threads */
+#undef HAVE_MPI_THREADS
+
 /* define if the compiler implements namespaces */
 #undef HAVE_NAMESPACES
 

@@ -2,29 +2,48 @@
 #define __P_MATRIX__
 
 #include "ScalapackTraits.hpp"
-
-#include <valarray>
+#include "Matrix.hpp"
 
 static int izero = 0;
 
 /**
  * @brief MPI aware C++ friendly matrix.<br/>
- *        This is now only 2D
+ *        This is now only 2D for Scalapack operations only.<br/>
+ *        Maybe there is more general need for higher dimensions later.
  * 
  */
 template <class T> 
-class PMatrix {
+class PMatrix : public Matrix<T> {
+
+
 
  public: 
 
+	/**
+	 * @brief             Default constructor
+	 */
 	PMatrix () : _bs (16) {
-		
+
+		// Validate
+		T t;
+		Validate (t);
+
 		// Get at home
 		GridInfo();
 		
 	}
 	
+
+	/**
+	 * @brief             Construct with sizes
+	 */
 	PMatrix (const size_t& cols, const size_t& rows) : _bs (16) {
+
+		// Validate
+		T t;
+		Validate (t);
+
+		int info; 
 
 		// Get at home
 		GridInfo();
@@ -40,20 +59,89 @@ class PMatrix {
 		// Allocate
 		_M.resize(Size());
 		
+		// Descriptor 
+		descinit_(_desc, &_gdim[0], &_gdim[1], &_bs, &_bs, &izero, &izero, &_gd.ct, 
+				  _dim, &info);
+		
+#ifdef DESC_DEBUG
+		printf ("info(%d) desc({%d, %d, %4d, %4d, %d, %d, %d, %d, %4d})\n", 
+				info,     _desc[0], _desc[1], _desc[2], _desc[3], 
+				_desc[4], _desc[5], _desc[6], _desc[7], _desc[8]);
+#endif
+
+
 	}
 	
+
+	/**
+	 * @brief          Virtual destructor
+	 */
+	virtual 
+	~PMatrix () {}
+
+
+	/**
+	 * @brief         Get # of elements
+	 *
+	 * @return        # of elements
+	 */
 	inline size_t 
-		Size() const {
-		return _dim[0] * _dim[1];
+	GHeight () const {
+		return _gdim[0];
 	}
 	
 	
- private:
+	/**
+	 * @brief         Get # of elements
+	 *
+	 * @return        # of elements
+	 */
+	inline size_t 
+	GWidth () const {
+		return _gdim[1];
+	}
+	
+	
+	/**
+	 * @brief         Get # of elements
+	 *
+	 * @return        # of elements
+	 */
+	inline size_t 
+	g_m () const {
+		return _gdim[0];
+	}
+	
+	
+	/**
+	 * @brief         Get # of elements
+	 *
+	 * @return        # of elements
+	 */
+	inline size_t 
+	g_n () const {
+		return _gdim[1];
+	}
+	
+	
+	/**
+	 * @brief         Get descriptor vector
+	 *
+	 * @return        Descriptor vector
+	 */
+	inline const int*
+	Desc () const {
+		return _desc;
+	}
+	
+
+ protected:
 
 	/**
 	 * @brief   Who are we and where are we?
 	 */
-	inline void GridInfo () {
+	inline void 
+	GridInfo () {
 
 		// Defaults
 		_gd.rk = 0; 
@@ -68,11 +156,12 @@ class PMatrix {
 		Cblacs_get      (-1, 0, &_gd.ct);
 		Cblacs_gridinfo (_gd.ct, &_gd.nr, &_gd.nc, &_gd.mr, &_gd.mc); 
 
-#ifdef MPI_DEBUG
+#ifdef GINFO_DEBUG
 		printf("id (%d), row(%d), col(%d)\n", _gd.rk, _gd.mr, _gd.mc);
 #endif
 
 	}
+
 
 	// BLACS 
 	grid_dims        _gd;
@@ -80,9 +169,9 @@ class PMatrix {
 	int              _bs;
 	
 	// Data
-	std::valarray<T> _M;      /**< @brief The meat */
-	int              _dim[2]; /**< @brief Local dimensions */
 	int              _gdim[2]; /**< @brief Global dimensions */
+	int              _dim[2];
+	std::valarray<T> _M;
 
 };
 
