@@ -21,7 +21,16 @@
 #ifndef __CGRAPPA_HPP__
 #define __CGRAPPA_HPP__
 
-#include "FT.hpp"
+#include "DFT.hpp"
+
+extern "C" {
+	void d_src_trg_mat_ (const cxdb* aln, const int* asz, const int*  ksz, const int*  msz, 
+						 const int*  dim, const int*  af,       cxdb* src,       cxdb* trg);
+	void s_src_trg_mat_ (const cxfl* aln, const int* asz, const int*  ksz, const int*  msz, 
+						 const int*  dim, const int*  af,       cxfl* src,       cxfl* trg);
+}
+
+
 
 /**
  * @brief GRAPPA operator<br/>
@@ -34,7 +43,7 @@ class CGRAPPA : public FT<T> {
 
 public:
 
-
+	
 	/**
 	 * @brief          Default constructor
 	 */
@@ -54,16 +63,33 @@ public:
 	 * @param   nacs   # ACS lines
 	 * @param   af     Acceleration factors
 	 */
-	CGRAPPA           (const Matrix< size_t >& sl, const Matrix<size_t>& kdims,
+	CGRAPPA           (const Matrix<size_t>& sl, const Matrix<T>& acs, const Matrix<size_t>& kdims,
 				       const size_t& nc, const size_t& nacs, const Matrix<size_t>& af) {
+
+		T type;
+		validate (type);
 
 		m_dft    = 0;
 		m_af     = af;
 		m_nc     = nc;
 		m_kdims  = kdims;
+		
+		Matrix< std::complex<T> > s;
+		Matrix< std::complex<T> > t;
 
 		m_dft    = new DFT<T>*[1];
 		m_dft[0] = new DFT<T> (sl);
+		/*
+		if      (typeid(T) == typeid(double))
+			d_src_trg_mat_ (acs.Data(), asz.Data(), ksz.Data(), acs.Data(), asz.Data(), 
+						  msz.Data(), &m_dim, m_af.Data(), &s[0], ssz.Data(), &t[0], tsz.Data());
+		else if (typeid(T))
+			d_src_trg_mat_ (acs.Data(), asz.Data(), ksz.Data(), acs.Data(), asz.Data(), 
+						  msz.Data(), &m_dim, m_af.Data(), &s[0], ssz.Data(), &t[0], tsz.Data());
+		*/
+		m_weights = t.prod(pinv(s));
+
+		//(nc*sy*sx,(nyacs-(sy-1)*af*(nxacs-(sx-1))))
 
 	}
 

@@ -141,7 +141,6 @@ DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
 DumpToFile_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) -o $@
-GRAPPA_la_DEPENDENCIES =
 am_GRAPPA_la_OBJECTS = GRAPPA.lo
 GRAPPA_la_OBJECTS = $(am_GRAPPA_la_OBJECTS)
 GRAPPA_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -306,6 +305,9 @@ LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
+MPICXX = @MPICXX@
+MPIRUN = @MPIRUN@
+MPIRUN_PROC_OPT = @MPIRUN_PROC_OPT@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -392,7 +394,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../nfft -I../tinyxml -I../misc
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../tinyxml -I../misc
 EXTRA_DIST = GPUSimulator.cl
 
 # Rules for recon strategies
@@ -433,7 +435,8 @@ SystemCmd_la_LIBADD = $(COMMON_la_LIBADD)
 LapackTests_la_SOURCES = LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 LapackTests_la_LIBADD = $(COMMON_la_LIBADD)
-GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp
+GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp CGRAPPA.hpp
+GRAPPA_la_DEPENDENCIES = 
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)
 SpatialDomain_la_SOURCES = SpatialDomain.hpp SpatialDomain.cpp

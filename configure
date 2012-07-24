@@ -638,6 +638,11 @@ ac_header_list=
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+MPIRUN_PROC_OPT
+MPIRUN
+MPICXX
+MPI_FALSE
+MPI_TRUE
 LIBOBJS
 USE_GSL_FALSE
 USE_GSL_TRUE
@@ -806,6 +811,8 @@ with_itkroot
 with_matlabroot
 with_blas
 with_lapack
+enable_mpi
+with_scalapack
 '
       ac_precious_vars='build_alias
 host_alias
@@ -820,7 +827,9 @@ CXX
 CXXFLAGS
 CCC
 CXXCPP
-PYTHON'
+PYTHON
+MPICXX
+MPIRUN'
 
 
 # Initialize some variables set by options.
@@ -1450,6 +1459,7 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --disable-openmp        do not use OpenMP
   --enable-documentation          turn on documentation C++ library support (default: yes)
+  --enable-mpi            turn on parallel jemris (default: yes)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1466,6 +1476,7 @@ Optional Packages:
   --with-matlabroot       path to MATLAB install dir
   --with-blas             which blas library to use
   --with-lapack           which lapack library to use
+  --with-scalapack        use scalapack if available (default: yes)
 
 Some influential environment variables:
   CC          C compiler command
@@ -1480,6 +1491,8 @@ Some influential environment variables:
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
   PYTHON      the Python interpreter
+  MPICXX      MPI C++ compiler command
+  MPIRUN      MPI run command
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -11692,10 +11705,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"d49d1a8b\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"3a83c650\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Sat Jul 7 23:11:48 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Jul 23 22:11:10 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -19515,6 +19528,359 @@ fi
 rm -f conftest.mmap conftest.txt
 
 
+# Check whether --enable-mpi was given.
+if test "${enable_mpi+set}" = set; then :
+  enableval=$enable_mpi; case "${enableval}" in
+       yes) mpi=true ;;
+       no)  mpi=false ;;
+       *) as_fn_error $? "bad value ${enableval} for --enable-mpi" "$LINENO" 5 ;;
+     esac
+else
+  mpi=true
+fi
+
+      if test x$mpi = xtrue; then
+  MPI_TRUE=
+  MPI_FALSE='#'
+else
+  MPI_TRUE='#'
+  MPI_FALSE=
+fi
+
+
+
+
+
+case "$host" in
+  *aix*)
+    cc_list="xlc_r gcc"
+    f77_list="xlf_r"
+    cxx_list="xlC_r g++"
+    f90_list="xlf90_r"
+    mpicc_list="mpcc_r mpicc"
+    mpif77_list="mpxlf_r mpif77"
+    mpicxx_list="mpCC_r mpiCC"
+    gm4_list="gm4 m4"
+    ;;
+  *darwin*)
+    cc_list="gcc"
+    f77_list="xlf"
+    cxx_list="g++"
+    f90_list="xlf90"
+    mpicc_list="mpicc"
+    mpif77_list="mpif77"
+    mpicxx_list="mpicxx"
+    ;;
+  *linux*)
+    cc_list="gcc pgcc icc"
+    f77_list="pgf77 ifort lf95 f95"
+    cxx_list="g++ pgCC icpc"
+    f90_list="pgf90 ifort lf95 f95"
+    mpicc_list="mpicc hcc"
+    mpif77_list="mpif90 mpif77 h77"
+    mpicxx_list="mpicxx mpiCC hCC"
+    gm4_list="gm4 m4"
+    ;;
+  *sun*)
+    cc_list="cc gcc"
+    f77_list="f77"
+    cxx_list="CC g++"
+    f90_list="f90"
+    mpicc_list="mpcc mpicc"
+    mpif77_list="mpf77 mpif77"
+    mpicxx_list="mpCC mpiCC"
+    gm4_list="gm4 m4"
+    ;;
+esac
+
+if test x$mpi = xtrue; then
+
+
+
+
+# find compiler and characteristics
+for ac_prog in $mpicxx_list
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_MPICXX+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$MPICXX"; then
+  ac_cv_prog_MPICXX="$MPICXX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_MPICXX="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+MPICXX=$ac_cv_prog_MPICXX
+if test -n "$MPICXX"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MPICXX" >&5
+$as_echo "$MPICXX" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$MPICXX" && break
+done
+test -n "$MPICXX" || MPICXX="none"
+
+if test x$MPICXX = xnone; then
+  as_fn_error $? "MPI C++ compiler not found" "$LINENO" 5
+fi
+
+# find compiler and characteristics
+#AC_MSG_CHECKING(for mpi.h)
+#  AC_PREPROC_IFELSE(
+#  [AC_LANG_SOURCE([[#include <mpi.h>]])],
+#  [
+#    AC_MSG_RESULT(yes)
+#    AC_DEFINE(HAVE_MPI_H,1,[define that mpi is being used])
+#  ],[AC_MSG_RESULT(no)])
+
+cat >>conftest.cpp <<_ACEOF
+#include <mpi.h>
+int main(int argc, char** argv) {
+  MPI::Init(argc, argv);
+  MPI::COMM_WORLD.Get_size();
+  MPI::Finalize();
+  return 0;
+}
+_ACEOF
+
+cat >>conftest2.cpp <<_ACEOF2
+#include <mpi.h>
+int main(int argc, char** argv) {
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+  MPI::COMM_WORLD.Get_size();
+  MPI::Finalize();
+  return 0;
+}
+_ACEOF2
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the MPI C++ compiler works" >&5
+$as_echo_n "checking whether the MPI C++ compiler works... " >&6; }
+echo "$MPICXX $CXXFLAGS -o conftest conftest.cpp" >&5
+$MPICXX $CXXFLAGS -o conftest conftest.cpp 2>&5
+if test $? -ne 0; then
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "failed!
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  mpiw=yes
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether MPI library supports threads" >&5
+$as_echo_n "checking whether MPI library supports threads... " >&6; }
+echo "$MPICXX $CXXFLAGS -o conftest2 conftest2.cpp" >&5
+$MPICXX $CXXFLAGS -o conftest2 conftest2.cpp 2>&5
+if test $? -ne 0; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_MPI_THREADS 1" >>confdefs.h
+
+fi
+rm -f conftest2.*
+
+ic_mpirun_found=no
+if test x$mpiw = xyes; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI run command" >&5
+$as_echo_n "checking for MPI run command... " >&6; }
+  if test x$ac_cv_env_MPIRUN_value = x; then
+  case "$MPICXX" in
+    *mpCC_r*)
+      mpirun="poe"
+      mpirun_proc_opt="-procs"
+      ;;
+    *mpiCC*)
+      mpirun="mpirun"
+      mpirun_proc_opt="-np"
+      ;;
+    *hCC*)
+      mpirun="mpiexec"
+      mpirun_proc_opt="-n"
+      ;;
+    *mpCC*)
+      mpirun="mprun"
+      mpirun_proc_opt="-np"
+      ;;
+    *mpicxx*)
+      mpirun="mpirun"
+      mpirun_proc_opt="-np"
+      ;;
+    *)
+      as_fn_error $? "unknown MPI C++ compiler" "$LINENO" 5
+      ;;
+  esac
+  else
+	  mpirun=$ac_cv_env_MPIRUN_value
+	  mpirun_proc_opt="-np"
+  fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $mpirun" >&5
+$as_echo "$mpirun" >&6; }
+  MPIRUN=$mpirun
+
+  MPIRUN_PROC_OPT=$mpirun_proc_opt
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the MPI run command works" >&5
+$as_echo_n "checking whether the MPI run command works... " >&6; }
+  if test $mpirun = poe; then
+    mpicmd="$mpirun $PWD/conftest $mpirun_proc_opt 2"
+  else
+    mpicmd="$mpirun $mpirun_proc_opt 2 $PWD/conftest"
+  fi
+  echo $mpicmd >&5
+  $mpicmd 2>&5
+  if test $? -ne 0; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no, will skip MPI and P++ tests" >&5
+$as_echo "no, will skip MPI and P++ tests" >&6; }
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+    ic_mpirun_found=yes
+  fi
+fi
+rm -f conftest.*
+
+  CXX=$MPICXX
+fi
+
+# -----------------------------
+# scalapack
+#
+
+# Check whether --with-scalapack was given.
+if test "${with_scalapack+set}" = set; then :
+  withval=$with_scalapack; if  test "$withval" = "yes" ; then
+      with_scalapack=1
+   else
+      with_scalapack=0
+   fi
+else
+  with_scalapack=0
+fi
+
+# -----------------------------
+
+
+$as_echo "#define HAVE_F77_UNDERSCORE /**/" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for pzgels_ in -lscalapack" >&5
+$as_echo_n "checking for pzgels_ in -lscalapack... " >&6; }
+if ${ac_cv_lib_scalapack_pzgels_+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lscalapack  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pzgels_ ();
+int
+main ()
+{
+return pzgels_ ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_scalapack_pzgels_=yes
+else
+  ac_cv_lib_scalapack_pzgels_=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_scalapack_pzgels_" >&5
+$as_echo "$ac_cv_lib_scalapack_pzgels_" >&6; }
+if test "x$ac_cv_lib_scalapack_pzgels_" = xyes; then :
+  $as_echo "#define HAVE_F77_UNDERSCORE 0" >>confdefs.h
+ LIBS="${LIBS} -lscalapack"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for pzgels_ in -lscalapack-mpich" >&5
+$as_echo_n "checking for pzgels_ in -lscalapack-mpich... " >&6; }
+if ${ac_cv_lib_scalapack_mpich_pzgels_+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lscalapack-mpich  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pzgels_ ();
+int
+main ()
+{
+return pzgels_ ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_scalapack_mpich_pzgels_=yes
+else
+  ac_cv_lib_scalapack_mpich_pzgels_=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_scalapack_mpich_pzgels_" >&5
+$as_echo "$ac_cv_lib_scalapack_mpich_pzgels_" >&6; }
+if test "x$ac_cv_lib_scalapack_mpich_pzgels_" = xyes; then :
+  $as_echo "#define HAVE_F77_UNDERSCORE 1" >>confdefs.h
+ LIBS="${LIBS} -lscalapack-mpich"
+else
+  as_fn_error $? "cannot find libscalapack-mpich, bailing out" "$LINENO" 5
+fi
+
+
+fi
+
+
 # Generate files
 ac_config_files="$ac_config_files src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile"
 
@@ -19685,6 +20051,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_GSL_TRUE}" && test -z "${USE_GSL_FALSE}"; then
   as_fn_error $? "conditional \"USE_GSL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${MPI_TRUE}" && test -z "${MPI_FALSE}"; then
+  as_fn_error $? "conditional \"MPI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

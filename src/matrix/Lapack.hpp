@@ -21,83 +21,7 @@
 #ifndef __LAPACK_HPP__
 #define __LAPACK_HPP__
 
-extern "C" {
-
-	// Cholesky factorization of a complex Hermitian positive definite matrix
-	void cpotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
-	void dpotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
-	void spotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
-	void zpotrf_ (const char* uplo, const int* n, void* a, const int* lda, int *info);
-	
-	// Computes an LU factorization of a general M-by-N matrix A
-	void cgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
-	void dgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
-	void zgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
-	void sgetrf_ (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
-	
-	// Inverse of a complex Hermitian positive definite matrix using cpotrf/cpptrf
-	void cpotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
-	void dpotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
-	void zpotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
-	void spotri_ (const char* uplo, int*n, void *a, int* lda, int*info);
-	
-	// Matrix inversion through cholesky decomposition
-	void cgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
-	void dgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
-	void zgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
-	void sgetri_ (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, int*info);
-	
-	// Eigen value computations
-	void cgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *w ,           void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork, void *rwork, int *info);
-	void zgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *w ,           void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork, void *rwork, int *info);
-	void dgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork,              int *info);
-	void sgeev_  (const char *jvl, const char *jvr, int *n, const void *a, int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, int *ldvr, void *work, int *lwork,              int *info);
-	
-	// Singular value decomposition 
-	void cgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, void *rwork, int *iwork, int*info);
-	void zgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, void *rwork, int *iwork, int*info);
-	void dgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork,               int *iwork, int*info);
-	void sgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork,               int *iwork, int*info);
-	
-	// Pseudo-inversion 
-	void zgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
-	void cgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void* s, void* rcond, int* rank, void* work, int* lwork, void* rwork, int* iwork, int* info);
-	void dgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
-	void sgelsd_ (int* m, int* n, int* nrhs, const void* a, int* lda, void* b, int* ldb, void *s, void* rcond, int* rank, void* work, int* lwork, void*             iwork, int* info);
-
-	// Matrix vector multiplication
-	void sgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
-	void dgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
-	void cgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
-	void zgemv_  (const char* trans, int* m, int* n, void* alpha, const void *a, int* lda, const void *x, int* incx, void* beta, void *y, int* incy);
-
-	// Matrix matrix multiplication
-	void sgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	void dgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	void cgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	void zgemm_  (const char *transa, const char *transb, int  *m, int   *n, int *k, void *alpha, const void *a, int *lda, const void *b, int *ldb, void *beta, void *c, int *ldc);
-	
-	// vector vector scalar multiplication
-	float  sdot_  (int* n, const void* x, int* incx, const void* y, int* incy);
-	double ddot_  (int* n, const void* x, int* incx, const void* y, int* incy);
-	cxfl   cdotc_ (int* n, const void* x, int* incx, const void* y, int* incy);
-	cxfl   cdotu_ (int* n, const void* x, int* incx, const void* y, int* incy);
-	cxdb   zdotc_ (int* n, const void* x, int* incx, const void* y, int* incy);
-	cxdb   zdotu_ (int* n, const void* x, int* incx, const void* y, int* incy);
-
-    float  cblas_snrm2  (const int N, const void *X, const int incX);
-	double cblas_dnrm2  (const int N, const void *X, const int incX);
-	cxfl   cblas_scnrm2 (const int N, const void *X, const int incX);
-	cxdb   cblas_dznrm2 (const int N, const void *X, const int incX);
-	
-	void cblas_ddot_sub  (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
-	void cblas_sdot_sub  (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
-	void cblas_cdotu_sub (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
-	void cblas_cdotc_sub (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
-	void cblas_zdotu_sub (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
-	void cblas_zdotc_sub (const int N, const void *X, const int incX, const void *Y, const int incY, void* res);	
-}
-
+#include "LapackTraits.hpp"
 #include "Matrix.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
@@ -159,59 +83,27 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	int    info  =  0;
 	int    lwork = -1;
 	
-	T*     w     = 0;
-	T*     wi    = 0;
 	T*     rwork = 0;
 	
-	if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {    // Complex eigen values for real matrices
-		w     = (T*) malloc (N * sizeof(T));
-		wi    = (T*) malloc (N * sizeof(T));
-	} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))  // Real workspace for complex matrices
+	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))  // Real workspace for complex matrices
 		rwork = (T*) malloc (N * sizeof(T));
 	
 	T  wkopt;
 	
-	// Workspace query
-	if (typeid(T) == typeid(cxfl))
-		cgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
-	else if (typeid(T) == typeid(double))
-		dgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
-	else if (typeid(T) == typeid(float))
-		sgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork,        &info);
+	// Workspace query 
+	LapackTraits<T>::geev (&jobvl, &jobvr, N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
 	
 	// Intialise work space
 	lwork    = (int) creal (wkopt);
 	T* work  = (T*) malloc (lwork * sizeof(T));
 	
 	// Actual eigen value comp
-	if (typeid(T) == typeid(cxfl)) {
-		cgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
-	} else if (typeid(T) == typeid(cxdb)) {
-		zgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork, rwork, &info);
-	} else if (typeid(T) == typeid(double)) {
-		dgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
-		while (N--) {
-			double f[2] = {((double*)w)[N], ((double*)wi)[N]};
-			memcpy(&ev[N], f, 2 * sizeof(double));
-		}
-	} else if (typeid(T) == typeid(float)) {
-		sgeev_ (&jobvl, &jobvr, &N, m.Data(), &lda,  w, wi, &lv[0], &ldvl, &rv[0], &ldvr, work, &lwork,        &info);
-		while (N--) {
-			float f[2] = {((float*)w)[N], ((float*)wi)[N]};
-			memcpy(&ev[N], f, 2 * sizeof(float));
-		}
-	}
-	
+	LapackTraits<T>::geev (&jobvl, &jobvr, N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
 	
 	// Clean up
-	if (typeid(T) == typeid(float) || typeid(T) == typeid(double)) {
-		free (w);
-		free (wi);
-	} else if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
+	if (rwork) 
 		free (rwork);
-
+	
 	free (work);
 	
 	if (info > 0)
@@ -302,28 +194,14 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	}
 	
 	// Workspace query
-	if      (typeid(T) == typeid(cxfl))
-		cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(double))
-		dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
-	else if (typeid(T) == typeid(float))
-		sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork,        iwork, &info);
+	LapackTraits<T>::gesdd (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 	
 	// Resize work according to ws query
 	lwork   = (int) creal (wopt);
 	T* work = (T*) malloc (lwork * sizeof(T));
 	
 	//SVD
-	if      (typeid(T) == typeid(cxfl))
-		cgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(double))
-		dgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
-	else if (typeid(T) == typeid(float))
-		sgesdd_ (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork,        iwork, &info);
+	LapackTraits<T>::gesdd (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
 	
 	V = !V;
 	
@@ -375,11 +253,8 @@ inv (const Matrix<T>& m) {
 	int *ipiv = (int*) malloc (N * sizeof(int));
 	
 	// LU Factorisation -------------------
-	
-	if      (typeid (T) == typeid (cxfl))   cgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-	else if (typeid (T) == typeid (cxdb))   zgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-	else if (typeid (T) == typeid (double)) dgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
-	else if (typeid (T) == typeid (float))  sgetrf_ (&N, &N, &res[0], &N, ipiv, &info);
+
+	LapackTraits<T>::getrf (&N, &N, &res[0], &N, ipiv, &info);
 	// ------------------------------------
 	
 	if (info < 0)
@@ -392,10 +267,7 @@ inv (const Matrix<T>& m) {
 	
 	// Workspace determination ------------
 	
-	if      (typeid (T) == typeid (cxfl))   cgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
-	else if (typeid (T) == typeid (cxdb))   zgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
-	else if (typeid (T) == typeid (double)) dgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
-	else if (typeid (T) == typeid (float))  sgetri_ (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
+	LapackTraits<T>::getri (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
 	// ------------------------------------
 	
 	// Work memory allocation -------------
@@ -406,10 +278,7 @@ inv (const Matrix<T>& m) {
 	
 	// Inversion --------------------------
 	
-	if      (typeid (T) == typeid (cxfl))   cgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-	else if (typeid (T) == typeid (cxdb))   zgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-	else if (typeid (T) == typeid (double)) dgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
-	else if (typeid (T) == typeid (float))  sgetri_ (&N, &res[0], &N, ipiv, work, &lwork, &info);
+	LapackTraits<T>::getri (&N, &res[0], &N, ipiv, work, &lwork, &info);
 	// ------------------------------------
 	
 	free (ipiv);
@@ -466,16 +335,7 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	
 	Matrix<T> b = eye<T>(ldb);
 
-	float frcond  = rcond;
-	
-	if      (typeid(T) == typeid(cxfl))
-		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
-	else if (typeid(T) == typeid(double))
-		dgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, &wopt, &lwork,         &iwopt, &info);
-	else if (typeid(T) == typeid(float))
-		sgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, &wopt, &lwork,         &iwopt, &info);
+	LapackTraits<T>::gelsd (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, rcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
 	
 	lwork = (int) creal(wopt);
 	
@@ -486,15 +346,7 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	iwork = (int*) malloc (sizeof(int) * iwopt);
 	work  = (T*)   malloc (sizeof(T)   * lwork);
 	
-	if      (typeid(T) == typeid(cxfl))
-		cgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(cxdb))
-		zgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork, rwork, iwork, &info);
-	else if (typeid(T) == typeid(double))
-		dgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &rcond,  &rank, work, &lwork,        iwork, &info);
-	else if (typeid(T) == typeid(float))
-		sgelsd_ (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, &frcond, &rank, work, &lwork,        iwork, &info);
-
+	LapackTraits<T>::gelsd (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, rcond, &rank, work, &lwork,   rwork,  iwork, &info);
 	
 	if (M > N)
 		for (int i = 0; i < M; i++)
@@ -542,10 +394,7 @@ chol (const Matrix<T>& A, const char uplo = 'U') {
 	Matrix<T> res  = A;
 	int       info = 0, n = A.Height();
 	
-	if      (typeid(T) == typeid(double)) dpotrf_ (&uplo, &n, &res[0], &n, &info);
-	else if (typeid(T) == typeid(float))  spotrf_ (&uplo, &n, &res[0], &n, &info);
-	else if (typeid(T) == typeid(cxdb))   zpotrf_ (&uplo, &n, &res[0], &n, &info);
-	else if (typeid(T) == typeid(cxfl))   cpotrf_ (&uplo, &n, &res[0], &n, &info);
+	LapackTraits<T>::potrf (&uplo, &n, &res[0], &n, &info);
 	
 	if (info > 0)
 		printf ("\nERROR - XPOTRF: the leading minor of order %i is not\n positive definite, and the factorization could not be\n completed!\n\n", info);
@@ -609,15 +458,8 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
 	
 	Matrix<T> C  (m, n);
 	
-	if      (typeid(T) == typeid(double))
-		dgemm_ (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
-	else if (typeid(T) == typeid(float))
-		sgemm_ (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
-	else if (typeid(T) == typeid(cxfl))
-		cgemm_ (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
-	else if (typeid(T) == typeid(cxdb))
-		zgemm_ (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
-	
+	LapackTraits<T>::gemm (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
+
 	return C;
 	
 }
@@ -642,16 +484,7 @@ norm (const Matrix<T>& M) {
 	int n    = (int) numel (M);
 	int incx = 1;
 
-	if      (typeid(T) == typeid(  cxfl)) 
-		return creal(cblas_scnrm2 (n, M.Data(), incx));
-	else if (typeid(T) == typeid(  cxdb)) 
-		return creal(cblas_dznrm2 (n, M.Data(), incx));
-	else if (typeid(T) == typeid(double)) 
-		return       cblas_dnrm2  (n, M.Data(), incx);
-	else if (typeid(T) == typeid( float)) 
-		return       cblas_snrm2  (n, M.Data(), incx);
-	else 
-		assert (0);
+	return creal(LapackTraits<T>::nrm2 (n, M.Data(), incx));
 
 }
 
@@ -682,8 +515,7 @@ dotc (const Matrix<T>& A, const Matrix<T>& B) {
 	res = T(0.0);
 	one = 1;
 	
-	if      (typeid(T) == typeid(cxfl)) cblas_cdotc_sub (n, A.Data(), one, B.Data(), one, &res);
-	else if (typeid(T) == typeid(cxdb)) cblas_zdotc_sub (n, A.Data(), one, B.Data(), one, &res);
+	LapackTraits<T>::dotc (n, A.Data(), one, B.Data(), one, &res);
 	
 	return res;
 	
@@ -693,46 +525,6 @@ dotc (const Matrix<T>& A, const Matrix<T>& B) {
 template <class T> static T 
 DOTC (const Matrix<T>& A, const Matrix<T>& B) {
 	return dotc (A,B);
-}
-
-
-/**
- * @brief              Complex dot product (A*B) on data vector
- *
- * Usage:
- * @code{.cpp}
- *   Matrix<cxdb> a = rand<cxdb> (20,1);
- *   Matrix<cxdb> b = rand<cxdb> (20,1);
- *   double dotpr   = dotu (a, b);
- * @endcode
- *
- * @param  A           Left factor
- * @param  B           Right factor
- * @return             A*B
- */
-template <class T> static T 
-dotu (const Matrix<T>& A, const Matrix<T>& B) {
-
-	int n, one;
-	T   res;
-
-	n   = (int) numel(A);
-	assert (n == (int) numel(B));
-	
-	res = T(0.0);
-	one = 1;
-	
-	if      (typeid(T) == typeid(cxfl)) cblas_cdotu_sub (n, A.Data(), one, B.Data(), one, &res);
-	else if (typeid(T) == typeid(cxdb)) cblas_zdotu_sub (n, A.Data(), one, B.Data(), one, &res);
-	
-	return res;
-	
-}
-
-
-template <class T> static T 
-DOTU (const Matrix<T>& A, const Matrix<T>& B) {
-	dotu (A, B);
 }
 
 
@@ -761,11 +553,8 @@ dot  (const Matrix<T>& A, const Matrix<T>& B) {
 	
 	res = T(0.0);
 	one = 1;
-	
-	if      (typeid(T) == typeid(cxfl))   cblas_cdotu_sub (n, A.Data(), one, B.Data(), one, &res);
-	else if (typeid(T) == typeid(cxdb))   cblas_zdotu_sub (n, A.Data(), one, B.Data(), one, &res);
-	else if (typeid(T) == typeid(double)) cblas_ddot_sub  (n, A.Data(), one, B.Data(), one, &res);
-	else if (typeid(T) == typeid(float))  cblas_sdot_sub  (n, A.Data(), one, B.Data(), one, &res);
+
+	LapackTraits<T>::dot (n, A.Data(), one, B.Data(), one, &res);
 	
 	return res;
 	
@@ -821,11 +610,8 @@ gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
 	beta   = T(0.0);
 	
 	Matrix<T> y ((trans == 'N') ? m : n, 1);
-	
-	if      (typeid(T) == typeid(double)) dgemv_ (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
-	else if (typeid(T) == typeid(float))  sgemv_ (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
-	else if (typeid(T) == typeid(cxfl))   cgemv_ (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
-	else if (typeid(T) == typeid(cxdb))   zgemv_ (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
+
+	LapackTraits<T>::gemv (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
 	
 	return y;
 	

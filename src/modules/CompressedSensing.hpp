@@ -196,14 +196,14 @@ namespace RRStrategy {
 	 * @brief Compute gradient of the data consistency
 	 */
 	Matrix<cxfl> 
-	GradObj (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp, Matrix<cxfl>& wx) {
+	GradObj (Matrix<cxfl>& x, Matrix<cxfl>& wx, Matrix<cxfl>& data, CGParam& cgp) {
 		
 		FT<float>& ft = *(cgp.ft);
 		DWT& dwt = *(cgp.dwt);
 
 		Matrix<cxfl> g;
 		
-		g  = ft * wx; //(dwt->*x);
+		g  = ft * wx;
 		g -= data;
 		g  = dwt * (ft->*g);
 
@@ -236,7 +236,7 @@ namespace RRStrategy {
 	 * @brief Compute gradient of the total variation operator
 	 */
 	Matrix<cxfl> 
-	GradTV    (Matrix<cxfl>& x, CGParam& cgp, Matrix<cxfl>& wx) {
+	GradTV    (Matrix<cxfl>& x, Matrix<cxfl>& wx, CGParam& cgp) {
 
 		DWT&  dwt = *cgp.dwt;
 		TVOP& tvt = *cgp.tvt;
@@ -244,7 +244,7 @@ namespace RRStrategy {
 
 		Matrix<cxfl> dx, g;
 
-		dx = tvt * wx; //(dwt->*x);
+		dx = tvt * wx;
 
 		g  = dx * conj(dx);
 		g += cxfl(cgp.l1);
@@ -259,21 +259,17 @@ namespace RRStrategy {
 
 
 	Matrix<cxfl> 
-	Gradient (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp, Matrix<cxfl>& wx) {
+	Gradient (Matrix<cxfl>& x, Matrix<cxfl>& wx, Matrix<cxfl>& data, CGParam& cgp) {
 
 		Matrix<cxfl> g;
-//
-		DWT&  dwt = *cgp.dwt;
-//		wx = dwt->*x;
-//		
-		g = GradObj (x, data, cgp, wx);
-
+		
+		g = GradObj (x, wx, data, cgp);
 
 		if (cgp.xfmw)
 			g += GradXFM (x, cgp);
 
 		if (cgp.tvw)
-			g += GradTV  (x, cgp, wx);
+			g += GradTV  (x, wx, cgp);
 
 		return g;
 
@@ -294,23 +290,17 @@ namespace RRStrategy {
 		FT<float>& ft  = *cgp.ft;
 		TVOP&     tvt = *cgp.tvt;
 		
-//
-  	wx  = dwt->*x;
-//		
-		g0 = Gradient (x, data, cgp, wx);
+		wx  = dwt->*x;
+
+		g0 = Gradient (x, wx, data, cgp);
 		dx = -g0;
 		
-//		
 		wdx = dwt->*dx;
-//
-		
+
 		for (size_t k = 0; k < cgp.cgiter; k++) {
 			
 			t = t0;
 			
-//			wx  = dwt->*x;
-//			wdx = dwt->*dx;
-
 			ffdbx = ft * wx;
 			ffdbg = ft * wdx;
 			
@@ -345,18 +335,15 @@ namespace RRStrategy {
 
 			// Update image
 			x += (dx * t);
-//
 			wx  = dwt->*x;
-//			
+					
 			// CG computation 
-			g1  =  Gradient (x, data, cgp, wx);
+			g1  =  Gradient (x, wx, data, cgp);
 			bk  =  creal(g1.dotc(g1) / g0.dotc(g0));
 			g0  =  g1;
 			dx  = -g1 + dx * bk;
 
-//
 			wdx = dwt->*dx;
-//
 
 			float dxn = creal(norm(dx))/xn;
 			printf ("dxnrm: %0.4f\n", dxn);

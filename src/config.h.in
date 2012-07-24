@@ -33,6 +33,9 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* Description */
+#undef HAVE_F77_UNDERSCORE
+
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
@@ -113,6 +116,12 @@
 
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
+
+/* define that we have mpi */
+#undef HAVE_MPI
+
+/* define that mpi supports threads */
+#undef HAVE_MPI_THREADS
 
 /* define if the compiler implements namespaces */
 #undef HAVE_NAMESPACES

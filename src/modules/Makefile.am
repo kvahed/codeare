@@ -4,7 +4,7 @@
 ../%SK.cc: ../%.idl
 	omniidl -bcxx $<
 
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../nfft -I../tinyxml -I../misc
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../tinyxml -I../misc
 
 EXTRA_DIST = GPUSimulator.cl
 
@@ -59,7 +59,8 @@ LapackTests_la_SOURCES = LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 LapackTests_la_LIBADD = $(COMMON_la_LIBADD)
 
-GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp
+GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp CGRAPPA.hpp
+GRAPPA_la_DEPENDENCIES = 
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)
 

@@ -19,6 +19,7 @@
  */
 
 #include "GRAPPA.hpp"
+//#include "CGRAPPA.hpp"
 using namespace RRStrategy;
 
 RRSModule::error_code
@@ -117,6 +118,8 @@ GRAPPA::Prepare     () {
 
 	Matrix<cxfl>& acs  = GetCXFL("acs");
 	/*ComputeWeights (m_nc, m_acs_dim, m_kern_dim, m_d, m_R, acs, m_weights);*/
+
+	
 	
 	printf ("... done.\n\n");
 	return RRSModule::OK;
