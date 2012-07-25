@@ -55,9 +55,9 @@ namespace RRStrategy {
 		double lsa;
 		double lsb;
 
-		DWT*       dwt;
-		FT<float>* ft;
-		TVOP*      tvt;
+		DWT<cxfl>* dwt;
+		FT<float>*  ft;
+		TVOP*       tvt;
 		
 	};
 
@@ -199,7 +199,7 @@ namespace RRStrategy {
 	GradObj (Matrix<cxfl>& x, Matrix<cxfl>& wx, Matrix<cxfl>& data, CGParam& cgp) {
 		
 		FT<float>& ft = *(cgp.ft);
-		DWT& dwt = *(cgp.dwt);
+		DWT<cxfl>& dwt = *(cgp.dwt);
 
 		Matrix<cxfl> g;
 		
@@ -238,7 +238,7 @@ namespace RRStrategy {
 	Matrix<cxfl> 
 	GradTV    (Matrix<cxfl>& x, Matrix<cxfl>& wx, CGParam& cgp) {
 
-		DWT&  dwt = *cgp.dwt;
+		DWT<cxfl>&  dwt = *cgp.dwt;
 		TVOP& tvt = *cgp.tvt;
 		float p   = ((float)cgp.pnorm)/2.0-1.0;
 
@@ -286,9 +286,9 @@ namespace RRStrategy {
 		
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
 
-		DWT&      dwt = *cgp.dwt;
+		DWT<cxfl>& dwt = *cgp.dwt;
 		FT<float>& ft  = *cgp.ft;
-		TVOP&     tvt = *cgp.tvt;
+		TVOP&      tvt = *cgp.tvt;
 		
 		wx  = dwt->*x;
 
