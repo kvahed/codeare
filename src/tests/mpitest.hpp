@@ -49,15 +49,17 @@ mpitest (Connector<T>* rc) {
 
 #ifdef HAVE_MPI
 	grid_dims gd;
-	gd.order = 'C';
+	gd.order = 'R';
 
 	/* Initialise ScaLAPACK */
 	sl_init (gd);
 
 	/* MPI aware matrix */
-	PMatrix<double> pm (440,4096);
-	pm = gd.rk;
-	print (pm);
+	PMatrix<double> A (262,132);
+	PMatrix<double> B (262,132);
+	A = gd.rk;
+	B = A;
+	print (B);
 
 	/* Finalise ScaLAPACK */
 	sl_finalise (gd);

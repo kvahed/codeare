@@ -99,7 +99,7 @@ CompressedSensing::Process () {
 	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
 		size(data,0), size(data,1), size(data,2));
 
-	m_cgparam.dwt = new DWT (data.Height(), wlfamily(m_wf), m_wm);
+	m_cgparam.dwt = new DWT <cxfl> (data.Height(), wlfamily(m_wf), m_wm);
 
 	/** -----  Which Fourier transform? **/
 	m_cgparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);
@@ -110,7 +110,7 @@ CompressedSensing::Process () {
 	m_cgparam.tvt = new TVOP ();
 
 	FT<float>& dft = *m_cgparam.ft;
-	DWT& dwt       = *m_cgparam.dwt;
+	DWT<cxfl>& dwt = *m_cgparam.dwt;
 	
 	im_dc    = data;
 	im_dc   /= pdf;

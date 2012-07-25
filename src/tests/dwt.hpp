@@ -7,7 +7,7 @@ dwttest (Connector<T>* rc) {
 	Matrix<cxfl> m   = phantom<cxfl> (512);
 	Matrix<cxfl> k, i;
 
-	DWT dwt (m.Height(), WL_DAUBECHIES);
+	DWT<cxfl> dwt (m.Height(), WL_DAUBECHIES);
 
 	k = dwt.Trafo(m);
 	i = dwt.Adjoint(k);
