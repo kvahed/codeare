@@ -63,7 +63,7 @@ struct DWTTraits<double> {
 	// copy matrix data to real / imaginary array
 	static inline
 	void
-	prepare (Matrix<mType> & m, Type* re, Type* im) {
+	Prepare (Matrix<mType> & m, Type* re, Type* im) {
 	  
    	memcpy (re, &m[0], m.Size() * sizeof(Type));
 	  
@@ -73,7 +73,7 @@ struct DWTTraits<double> {
 	// copy DWT data back to matrix
 	static inline
 	void
-	finalize (Matrix<mType> & m, Type* re, Type* im) {
+	Finalize (Matrix<mType> & m, Type* re, Type* im) {
 	
     memcpy (&m[0], re, m.Size() * sizeof(Type));
 	
@@ -83,7 +83,7 @@ struct DWTTraits<double> {
   // DWT non-standard, inverse
   static inline
   int
-  nstransform_inverse_real (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
+  NSTransformInverse (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
   {
   
     if (!im)
@@ -97,7 +97,7 @@ struct DWTTraits<double> {
   // DWT non-standard, forward
   static inline
   int
-  nstransform_forward (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
+  NSTransformForward (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
   {
 		
 		if (!im)
@@ -136,7 +136,7 @@ struct DWTTraits<float> {
 	// copy matrix data to real / imaginary array
 	static inline
 	void
-	prepare (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
+	Prepare (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
 	  
    	for (size_t j = 0; j < sl; j++)
 			for (size_t i = 0; i < sl; i++)
@@ -148,7 +148,7 @@ struct DWTTraits<float> {
 	// copy DWT data back to matrix
 	static inline
 	void
-	finalize (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
+	Finalize (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
 	
  		for (size_t j = 0; j < sl; j++)
 			for (size_t i = 0; i < sl; i++) 
@@ -160,7 +160,7 @@ struct DWTTraits<float> {
   // DWT non-standard, inverse
   static inline
   int
-  nstransform_inverse_real (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
+  NSTransformInverse (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
   {
   
     if (!im)
@@ -174,7 +174,7 @@ struct DWTTraits<float> {
   // DWT non-standard, forward
   static inline
   int
-  nstransform_forward (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
+  NSTransformForward (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
   {
 		
 		if (!im)
@@ -214,7 +214,7 @@ struct DWTTraits<cxdb> {
 	// copy matrix data to real / imaginary array
 	static inline
 	void
-	prepare (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
+	Prepare (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
 	  
  		for (size_t j = 0; j < sl; j++)
 			for (size_t i = 0; i < sl; i++) {
@@ -228,7 +228,7 @@ struct DWTTraits<cxdb> {
 	// copy DWT data back to matrix
 	static inline
 	void
-	finalize (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
+	Finalize (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
 	
 		for (size_t j = 0; j < sl; j++)
 			for (size_t i = 0; i < sl; i++) 
@@ -240,7 +240,7 @@ struct DWTTraits<cxdb> {
   // complex DWT non-standard, inverse
   static inline
   int
-  nstransform_inverse (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
+  NSTransformInverse (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
   {
 
 		return gsl_wavelet2d_nstransform_inverse (w, data, tda, size1, size2, work);
@@ -251,7 +251,7 @@ struct DWTTraits<cxdb> {
   // complex DWT non-standard, forward
   static inline
   int
-  nstransform_forward (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
+  NSTransformForward (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
   {
 		
     return gsl_wavelet2d_nstransform_forward (w, data, tda, size1, size2, work);
@@ -288,7 +288,7 @@ struct DWTTraits<cxfl> {
 	// copy matrix data to real / imaginary array
 	static inline
 	void
-	prepare (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
+	Prepare (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
 	  
  		for (size_t j = 0; j < sl; j++)
 			for (size_t i = 0; i < sl; i++) {
@@ -302,7 +302,7 @@ struct DWTTraits<cxfl> {
 	// copy DWT data back to matrix
 	static inline
 	void
-	finalize (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
+	Finalize (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
 	
 		for (size_t j = 0; j < sl; j++)
 			for (size_t i = 0; i < sl; i++) 
@@ -314,7 +314,7 @@ struct DWTTraits<cxfl> {
   // complex DWT non-standard, inverse
   static inline
   int
-  nstransform_inverse (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
+  NSTransformInverse (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
   {
 
 		return gsl_wavelet2d_nstransform_inverse (w, data, tda, size1, size2, work);
@@ -325,7 +325,7 @@ struct DWTTraits<cxfl> {
   // complex DWT non-standard, forward
   static inline
   int
-  nstransform_forward (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
+  NSTransformForward (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
   {
 		
     return gsl_wavelet2d_nstransform_forward (w, data, tda, size1, size2, work);

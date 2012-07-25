@@ -226,25 +226,25 @@ DWT<T>::Transform (const Matrix<T>& m, const bool& bw) const {
 		
 		// Checks missing !!!
 		
-		DWTTraits<T>::prepare (res, m_re, m_im, m_sl);
+		DWTTraits<T>::Prepare (res, m_re, m_im, m_sl);
 		
 		if (bw) {
 			
-			if (!(DWTTraits<T>::nstransform_inverse (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+			if (!(DWTTraits<T>::NSTransformInverse (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
 				printf ("Wavelet transform for real part failed\n.");
-			if (!(DWTTraits<T>::nstransform_inverse (m_w, m_im, m_sl, m_sl, m_sl, m_work, true) == GSL_SUCCESS))
+			if (!(DWTTraits<T>::NSTransformInverse (m_w, m_im, m_sl, m_sl, m_sl, m_work, true) == GSL_SUCCESS))
 				printf ("Wavelet transform for imaginary part failed\n.");
 			
 		} else {
 			
-			if (!(DWTTraits<T>::nstransform_forward (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+			if (!(DWTTraits<T>::NSTransformForward (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
 				printf ("Wavelet transform for real part failed\n.");
-			if (!(DWTTraits<T>::nstransform_forward (m_w, m_im, m_sl, m_sl, m_sl, m_work, true) == GSL_SUCCESS))
+			if (!(DWTTraits<T>::NSTransformForward (m_w, m_im, m_sl, m_sl, m_sl, m_work, true) == GSL_SUCCESS))
 				printf ("Wavelet transform for imaginary part failed\n.");
 				
 		}
 		
-		DWTTraits<T>::finalize (res, m_re, m_im, m_sl);
+		DWTTraits<T>::Finalize (res, m_re, m_im, m_sl);
 		
 	}
 	
