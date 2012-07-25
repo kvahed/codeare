@@ -853,7 +853,7 @@ AC_CHECK_LIB(
     [scalapack], 
     [pzgels_], 
     [AC_DEFINE(HAVE_F77_UNDERSCORE, 0, []) LIBS="${LIBS} -lscalapack"], 
-   [AC_CHECK_LIB(
+    [AC_CHECK_LIB(
 	    [scalapack-mpich], 
 		[pzgels_], 
 		[AC_DEFINE(HAVE_F77_UNDERSCORE, 1, []) LIBS="${LIBS} -lscalapack-mpich"],  

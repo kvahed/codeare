@@ -142,10 +142,11 @@ print (const PMatrix<T>& PM, const std::string& name = "pmat", int nout = 6) {
     
 	int   m     = PM.g_m();
 	int   n     = PM.g_n();
-	T*    iwork = (T*) malloc (PM.Height() * sizeof(T));
-	int len     = name.length();
+	int   len   = name.length();
 
-	ScalapackTraits<T>::pxlaprnt (&m, &n, PM.Data(), &izero, &izero, PM.Desc(), &izero, &izero, name.c_str(), &nout, iwork, len);
+	T*    iwork = (T*) malloc (PM.Height() * sizeof(T));
+
+	ScalapackTraits<T>::pxlaprnt (&m, &n, PM.Data(), &ione, &ione, PM.Desc(), &izero, &izero, name.c_str(), &nout, iwork, len);
 
 	free (iwork);
     
