@@ -18,8 +18,11 @@
  *  02110-1301  USA
  */
 
-#ifndef __DWT_HPP__
-#define __DWT_HPP__
+
+# ifndef __DWT_HPP__
+
+# define __DWT_HPP__
+
 
 /**
  * @brief  Supported wavelet families
@@ -36,18 +39,28 @@ enum wlfamily {
 
 };
 
-#include "Matrix.hpp"
 
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_wavelet2d.h>
+/********************
+ ** matrix headers **
+ ********************/
+# include "Matrix.hpp"
+
+/****************
+ ** DWT traits **
+ ****************/
+# include "DWTTraits.hpp"
 
 
 
 /**
  * @brief 2D Discrete wavelet transform for Matrix template (from GSL)
  */
+template <class T>
 class DWT {
-	
+
+
+	typedef typename DWTTraits<T>::Type Type;
+
 
 public:
 
@@ -60,8 +73,8 @@ public:
 	 * @param  wm      Familty member (default 4)
 	 */
 	DWT (const size_t& sl, const wlfamily& wf = ID, const size_t& wm = 4);
-
-
+	
+	
 	virtual 
 	~DWT();
 
@@ -72,7 +85,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
+  Matrix<T>
 	Trafo        (const Matrix<T>& m) const {
 
 		return Transform (m);
@@ -86,7 +99,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
+	Matrix<T>
 	Adjoint      (const Matrix<T>& m) const {
 
 		return Transform (m, true);
@@ -100,7 +113,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
+  Matrix<T>
 	operator*    (const Matrix<T>& m) const {
 
 		return Trafo(m);
@@ -114,14 +127,14 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
+  Matrix<T>
 	operator->* (const Matrix<T>& m) const {
 
 		return Adjoint(m);
 
 	}
 	
-
+	
 private:
 	
 	/**
@@ -131,7 +144,7 @@ private:
 	 * @param   bw  Backward: true, Forward: false
 	 * @return      Transform
 	 */
-	template <class T> Matrix<T> 
+	Matrix<T>
 	Transform    (const Matrix<T>& m, const bool& bw = false) const ;
 
 	wlfamily m_wf;                 /**< @brief wavelet family */
@@ -139,15 +152,24 @@ private:
 	size_t  m_sz;                  /**< @brief data size */
 	size_t  m_sl;                  /**< @brief side length */
 
-	double* m_re;                  /**< @brief Real store */
-	double* m_im;                  /**< @brief Imag store */
+	Type * m_re;                   /**< @brief Real store */
+	Type * m_im;                   /**< @brief Imag store */
 	
-	gsl_wavelet_workspace* m_work; /**< @brief Work space */
+	gsl_wavelet_workspace *m_work; /**< @brief Work space */
 	gsl_wavelet           *m_w;    /**< @brief Wavelet    */
+
 	
 };
 
-DWT::DWT (const size_t& sl, const wlfamily& wf, const size_t& wm) {
+
+
+/*****************
+ ** definitions **
+ *****************/
+
+
+template <class T>
+DWT<T>::DWT (const size_t& sl, const wlfamily& wf, const size_t& wm) {
 
 	// Checks missing !!!
 
@@ -171,15 +193,16 @@ DWT::DWT (const size_t& sl, const wlfamily& wf, const size_t& wm) {
 
 		m_work = gsl_wavelet_workspace_alloc (m_sz);
 		
-		m_re = (double*) malloc (m_sz * sizeof(double));
-		m_im = (double*) malloc (m_sz * sizeof(double));
+		m_re = DWTTraits<T>::Malloc (m_sz);
+		m_im = DWTTraits<T>::Malloc (m_sz);
 
 	}
 
 }
 
 
-DWT::~DWT () {
+template <class T>
+DWT<T>::~DWT () {
 
 	if (m_wf != ID) {
 
@@ -193,39 +216,35 @@ DWT::~DWT () {
 }
 
 
-template <> Matrix<cxfl> 
-DWT::Transform (const Matrix<cxfl>& m, const bool& bw) const {
+template <class T>
+Matrix<T>
+DWT<T>::Transform (const Matrix<T>& m, const bool& bw) const {
 	
-	Matrix<cxfl> res = m;
+	Matrix<T> res = m;
 	
 	if (m_wf > ID) {
 		
 		// Checks missing !!!
 		
-		for (size_t j = 0; j < m_sl; j++)
-			for (size_t i = 0; i < m_sl; i++) {
-				m_re [i*m_sl+j] = res.At(j*m_sl+i).real();
-				m_im [i*m_sl+j] = res.At(j*m_sl+i).imag();
-			}
+		DWTTraits<T>::prepare (res, m_re, m_im, m_sl);
 		
 		if (bw) {
 			
-			if (!(gsl_wavelet2d_nstransform_inverse (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+			if (!(DWTTraits<T>::nstransform_inverse (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
 				printf ("Wavelet transform for real part failed\n.");
-			if (!(gsl_wavelet2d_nstransform_inverse (m_w, m_im, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+			if (!(DWTTraits<T>::nstransform_inverse (m_w, m_im, m_sl, m_sl, m_sl, m_work, true) == GSL_SUCCESS))
 				printf ("Wavelet transform for imaginary part failed\n.");
 			
 		} else {
 			
-			if (!(gsl_wavelet2d_nstransform_forward (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+			if (!(DWTTraits<T>::nstransform_forward (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
 				printf ("Wavelet transform for real part failed\n.");
-			if (!(gsl_wavelet2d_nstransform_forward (m_w, m_im, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
+			if (!(DWTTraits<T>::nstransform_forward (m_w, m_im, m_sl, m_sl, m_sl, m_work, true) == GSL_SUCCESS))
 				printf ("Wavelet transform for imaginary part failed\n.");
+				
 		}
 		
-		for (size_t j = 0; j < m_sl; j++)
-			for (size_t i = 0; i < m_sl; i++) 
-				res.At(j*m_sl+i) = cxfl(m_re[i*m_sl+j],m_im [i*m_sl+j]);
+		DWTTraits<T>::finalize (res, m_re, m_im, m_sl);
 		
 	}
 	
@@ -235,108 +254,4 @@ DWT::Transform (const Matrix<cxfl>& m, const bool& bw) const {
 
 
 
-template<> Matrix<cxdb> 
-DWT::Transform (const Matrix<cxdb>& m, const bool& bw) const {
-	
-	Matrix<cxdb> res = m;
-	
-	if (m_wf > ID) {
-		
-		// Checks missing !!!
-		
-		for (size_t j = 0; j < m_sl; j++)
-			for (size_t i = 0; i < m_sl; i++) {
-				m_re [i*m_sl+j] = res.At(j*m_sl+i).real();
-				m_im [i*m_sl+j] = res.At(j*m_sl+i).imag();
-			}
-		
-		if (bw) {
-			
-			if (!(gsl_wavelet2d_nstransform_inverse (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
-				printf ("Wavelet transform for real part failed\n.");
-			if (!(gsl_wavelet2d_nstransform_inverse (m_w, m_im, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
-				printf ("Wavelet transform for imaginary part failed\n.");
-			
-		} else {
-			
-			if (!(gsl_wavelet2d_nstransform_forward (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
-				printf ("Wavelet transform for real part failed\n.");
-			if (!(gsl_wavelet2d_nstransform_forward (m_w, m_im, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
-				printf ("Wavelet transform for imaginary part failed\n.");
-		}
-		
-		for (size_t j = 0; j < m_sl; j++)
-			for (size_t i = 0; i < m_sl; i++) 
-				res.At(j*m_sl+i) = cxfl(m_re[i*m_sl+j],m_im [i*m_sl+j]);
-		
-	}
-	
-	return res;
-	
-}
-
-
-template <> Matrix<double> 
-DWT::Transform (const Matrix<double>& m, const bool& bw) const {
-	
-	Matrix<double> res = m;
-	
-	if (m_wf > ID) {
-		
-		// Checks missing !!!
-		
-		memcpy (m_re, &res[0], res.Size() * sizeof(double));
-		
-		if (bw) {
-			if (!(gsl_wavelet2d_nstransform_inverse (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
-				printf ("Wavelet transform for real part failed\n.");
-		} else  {
-			if (!(gsl_wavelet2d_nstransform_forward (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
-				printf ("Wavelet transform for real part failed\n.");
-		}
-		
-		memcpy (&res[0], m_re, res.Size() * sizeof(double));
-		
-	}
-	
-	return res;
-	
-}
-
-
-template <> Matrix<float> 
-DWT::Transform (const Matrix<float>& m, const bool& bw) const {
-	
-	Matrix<float> res = m;
-	
-	if (m_wf > ID) {
-		
-		// Checks missing !!!
-		
-		for (size_t j = 0; j < m_sl; j++)
-			for (size_t i = 0; i < m_sl; i++)
-				m_re [i*m_sl+j] = res[j*m_sl+i];
-		
-		if (bw) {
-			
-			if (!(gsl_wavelet2d_nstransform_inverse (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
-				printf ("Wavelet transform for real part failed\n.");
-			
-		} else {
-			
-			if (!(gsl_wavelet2d_nstransform_forward (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
-				printf ("Wavelet transform for real part failed\n.");
-
-		}
-		
-		for (size_t j = 0; j < m_sl; j++)
-			for (size_t i = 0; i < m_sl; i++) 
-				res[j*m_sl+i] = m_re[i*m_sl+j];
-		
-	}
-	
-	return res;
-	
-}
-
-#endif
+# endif // __DWT_HPP__

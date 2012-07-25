@@ -5,8 +5,8 @@
 #include "Matrix.hpp"
 
 static int izero = 0;
-static int ione  = 0;
-static int bs    = 4;
+static int ione  = 1;
+static int bs    = 16;
 
 /**
  * @brief MPI aware C++ friendly matrix.<br/>
@@ -146,15 +146,39 @@ class PMatrix : public Matrix<T> {
 	
 
 	/**
-	 * @brief         Assignement operator
+	 * @brief         Assignement operator ()
 	 * 
 	 * @param  t      Scalar
 	 */
 	inline PMatrix<T>
 	operator= (const T& t) {
-		Matrix<T>::_M = t;
+		Matrix<T>::operator=(t);
 		return *this;
 	}
+	
+
+	/**
+	 * @brief         Assignement operator ()
+	 * 
+	 * @param  t      Scalar
+	 */
+	inline PMatrix<T>
+	operator= (const PMatrix& P) {
+
+		/* Don't do anything for A = A */
+		if (this != &P) {
+			
+			Matrix<T>::_M      = P.Dat();
+			
+			Matrix<T>::_dim[0] = P.Dim(0);
+			Matrix<T>::_dim[1] = P.Dim(1);
+
+		}
+
+		return *this;
+
+	}
+	
 
  protected:
 
@@ -193,8 +217,6 @@ class PMatrix : public Matrix<T> {
 	
 	// Data
 	int              _gdim[2]; /**< @brief Global dimensions */
-	//int              _dim[2];
-	//std::valarray<T> _M;
 
 };
 

@@ -55,8 +55,8 @@ namespace RRStrategy {
 		double lsa;
 		double lsb;
 
-		DWT*       dwt;
-		FT<float>* ft;
+		DWT<cxfl>* dwt;
+		FT<float>*  ft;
 		TVOP*      tvt;
 		
 	};
@@ -196,10 +196,10 @@ namespace RRStrategy {
 	 * @brief Compute gradient of the data consistency
 	 */
 	Matrix<cxfl> 
-	GradObj (Matrix<cxfl>& x, Matrix<cxfl>& wx, Matrix<cxfl>& data, CGParam& cgp) {
+	GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CGParam& cgp) {
 		
 		FT<float>& ft = *(cgp.ft);
-		DWT& dwt = *(cgp.dwt);
+		DWT<cxfl>& dwt = *(cgp.dwt);
 
 		Matrix<cxfl> g;
 		
@@ -218,7 +218,7 @@ namespace RRStrategy {
 	 *
 	 */
 	Matrix<cxfl> 
-	GradXFM   (Matrix<cxfl>& x, CGParam& cgp) {
+	GradXFM   (const Matrix<cxfl>& x, const CGParam& cgp) {
 		
 		Matrix<cxfl> g;
 
@@ -236,9 +236,9 @@ namespace RRStrategy {
 	 * @brief Compute gradient of the total variation operator
 	 */
 	Matrix<cxfl> 
-	GradTV    (Matrix<cxfl>& x, Matrix<cxfl>& wx, CGParam& cgp) {
+	GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CGParam& cgp) {
 
-		DWT&  dwt = *cgp.dwt;
+		DWT<cxfl>&  dwt = *cgp.dwt;
 		TVOP& tvt = *cgp.tvt;
 		float p   = ((float)cgp.pnorm)/2.0-1.0;
 
@@ -259,12 +259,11 @@ namespace RRStrategy {
 
 
 	Matrix<cxfl> 
-	Gradient (Matrix<cxfl>& x, Matrix<cxfl>& wx, Matrix<cxfl>& data, CGParam& cgp) {
+	Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CGParam& cgp) {
 
 		Matrix<cxfl> g;
 		
 		g = GradObj (x, wx, data, cgp);
-
 
 		if (cgp.xfmw)
 			g += GradXFM (x, cgp);
@@ -287,9 +286,9 @@ namespace RRStrategy {
 		
 		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
 
-		DWT&      dwt = *cgp.dwt;
+		DWT<cxfl>& dwt = *cgp.dwt;
 		FT<float>& ft  = *cgp.ft;
-		TVOP&     tvt = *cgp.tvt;
+		TVOP&      tvt = *cgp.tvt;
 		
 		wx  = dwt->*x;
 
