@@ -5,6 +5,8 @@
 #include "Matrix.hpp"
 
 static int izero = 0;
+static int ione  = 0;
+static int bs    = 4;
 
 /**
  * @brief MPI aware C++ friendly matrix.<br/>
@@ -22,7 +24,7 @@ class PMatrix : public Matrix<T> {
 	/**
 	 * @brief             Default constructor
 	 */
-	PMatrix () : _bs (16) {
+	PMatrix () : _bs (bs) {
 
 		// Validate
 		T t;
@@ -37,7 +39,7 @@ class PMatrix : public Matrix<T> {
 	/**
 	 * @brief             Construct with sizes
 	 */
-	PMatrix (const size_t& cols, const size_t& rows) : _bs (16) {
+	PMatrix (const size_t& cols, const size_t& rows) : _bs (bs) {
 
 		// Validate
 		T t;
@@ -142,6 +144,17 @@ class PMatrix : public Matrix<T> {
 		return _desc;
 	}
 	
+
+	/**
+	 * @brief         Assignement operator
+	 * 
+	 * @param  t      Scalar
+	 */
+	inline PMatrix<T>
+	operator= (const T& t) {
+		Matrix<T>::_M = t;
+		return *this;
+	}
 
  protected:
 

@@ -22,6 +22,8 @@
 
 int main (int argc, char** argv) {
 	
+	int  rc  = 0;
+
 	if (init (argc, argv)) {
 		
 #ifdef LOCAL
@@ -30,10 +32,10 @@ int main (int argc, char** argv) {
 		Connector<RemoteConnector>* con = new Connector<RemoteConnector> (name, verbose);
 #endif	
 		
-        // Read configuration file (f.e. share/cgsense/config_human.xml)
+		// Read configuration file (f.e. share/cgsense/config_human.xml)
 		std::string cf = std::string (base + std::string(config));
 		con->ReadConfig (cf.c_str()); 
-
+		
 		if      (!strcmp (test, "CGSENSE"))               cgsensetest  (con);
 		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
 		else if (!strcmp (test, "SENSE"))                 sensetest    (con);
@@ -58,11 +60,11 @@ int main (int argc, char** argv) {
 		
 		delete con;
 		
-		return 0;
-
 	} else
 		
-		return 1;	
+		rc = 1;	
+	
+	return rc;
 
 }
 

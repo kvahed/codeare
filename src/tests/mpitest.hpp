@@ -55,8 +55,8 @@ mpitest (Connector<T>* rc) {
 	sl_init (gd);
 
 	/* MPI aware matrix */
-	PMatrix<double> pm (32,40);
-	pm.Dat() = 20.0;
+	PMatrix<double> pm (440,4096);
+	pm = gd.rk;
 	print (pm);
 
 	/* Finalise ScaLAPACK */

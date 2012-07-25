@@ -1,7 +1,6 @@
 #include "Complex.hpp"
 
 #define  MPICH_IGNORE_CXX_SEEK
-#include <mpi.h>
 
 struct grid_dims {
 	
@@ -51,15 +50,18 @@ extern "C" {
 					 cxfl* WORK, int* lwork, double* rwork, int* info);
 	
 	// Print
-    void pzlaprnt_  (int *m, int* n, const cxdb* A, int* ia, int* ja, const int* descA, 
-					 int* irprnt, int* icprnt, const char* cmatnm, int* nout, 
-					 cxdb* WORK, int len);
-    void pclaprnt_  (int *m, int* n, const cxfl* A, int* ia, int* ja, const int* descA, 
-					 int* irprnt, int* icprnt, const char* cmatnm, int* nout, 
-					 cxfl* WORK, int len);
-    void pdlaprnt_  (int *m, int* n, const double* A, int* ia, int* ja, const int* descA, 
-					 int* irprnt, int* icprnt, const char* cmatnm, int* nout, 
-					 double* WORK, int len);
+    void pzlaprnt_  (int *m, int* n, const cxdb* A, int* ia, int* ja, 
+					 const int* descA, int* irprnt, int* icprnt, 
+					 const char* cmatnm, int* nout, cxdb* WORK, int len);
+    void pclaprnt_  (int *m, int* n, const cxfl* A, int* ia, int* ja, 
+					 const int* descA, int* irprnt, int* icprnt, 
+					 const char* cmatnm, int* nout, cxfl* WORK, int len);
+    void pdlaprnt_  (int *m, int* n, const double* A, int* ia, int* ja, 
+					 const int* descA, int* irprnt, int* icprnt, 
+					 const char* cmatnm, int* nout, double* WORK, int len);
+    void pslaprnt_  (int *m, int* n, const float* A, int* ia, int* ja, 
+					 const int* descA, int* irprnt, int* icprnt, 
+					 const char* cmatnm, int* nout, double* WORK, int len);
 	
 	// File IO
 	void pzlawrite_ (char* fname, int* m, int* n, cxdb* A, int* ia, int* ja, 
