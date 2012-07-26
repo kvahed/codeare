@@ -54,12 +54,14 @@ mpitest (Connector<T>* rc) {
 	/* Initialise ScaLAPACK */
 	sl_init (gd);
 
-	/* MPI aware matrix */
+	/* MPI aware matrices */
 	PMatrix<double> A (262,132);
 	PMatrix<double> B (262,132);
-	A = gd.rk;
-	B = A;
-	print (B);
+
+	A = gd.rk; //operator=(const T& t)
+	B = A;     //operator=(const PMatrix<T>& P)
+
+	print (B, "B"); // Print to file
 
 	/* Finalise ScaLAPACK */
 	sl_finalise (gd);
