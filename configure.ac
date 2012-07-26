@@ -3,7 +3,7 @@ AC_INIT([codeare], [1.0], [k.vahedipour@fz-juelich.de])
 AC_CONFIG_SRCDIR([src])
 
 # m4 macros
-AC_CONFIG_MACRO_DIR([config])
+AC_CONFIG_MACRO_DIR([m4])
 
 # where to put auxilliary files
 AC_CONFIG_AUX_DIR([config])
@@ -154,6 +154,23 @@ AC_C_INLINE
 
 # Compiler vendor (Courtesy fftw)
 AX_COMPILER_VENDOR
+
+# If --with-mpi=auto is used, try to find MPI, but use standard C compiler if it is not found.
+# If --with-mpi=yes is used, try to find MPI and fail if it isn't found.
+# If --with-mpi=no is used, use a standard C compiler instead.
+AC_ARG_WITH(mpi, [AS_HELP_STRING([--with-mpi],
+    [compile with MPI (parallelization) support. If none is found,
+    MPI is not used. Default: auto])
+],,[with_mpi=auto])
+
+AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[use_mpi=yes],[
+use_mpi=no
+if test x"$with_mpi" = xyes; then
+    AC_MSG_FAILURE([MPI compiler requested, but couldn't use MPI.])
+else
+    AC_MSG_WARN([No MPI compiler found, won't use MPI.])
+fi
+])
 
 AC_CHECK_TYPES([ptrdiff_t])
 
@@ -670,175 +687,12 @@ AC_ARG_ENABLE([mpi],
      AM_CONDITIONAL([MPI], [test x$mpi = xtrue])
 
 
-AC_DEFUN([AC_PROG_MPICXX], [
-AC_ARG_VAR([MPICXX],  [MPI C++ compiler command])
-AC_ARG_VAR([MPIRUN],  [MPI run command])
-
-# find compiler and characteristics
-AC_CHECK_PROGS([MPICXX], [$1], [none])
-if test x$MPICXX = xnone; then
-  AC_MSG_ERROR([MPI C++ compiler not found])
-fi
-
-# find compiler and characteristics
-#AC_MSG_CHECKING(for mpi.h)
-#  AC_PREPROC_IFELSE(
-#  [AC_LANG_SOURCE([[#include <mpi.h>]])],
-#  [ 
-#    AC_MSG_RESULT(yes)
-#    AC_DEFINE(HAVE_MPI_H,1,[define that mpi is being used])
-#  ],[AC_MSG_RESULT(no)])
-
-cat >>conftest.cpp <<_ACEOF
-#include <mpi.h>
-int main(int argc, char** argv) {
-  MPI::Init(argc, argv);
-  MPI::COMM_WORLD.Get_size();
-  MPI::Finalize();
-  return 0;
-}
-_ACEOF
-
-cat >>conftest2.cpp <<_ACEOF2
-#include <mpi.h>
-int main(int argc, char** argv) {
-  MPI::Init_thread(MPI_THREAD_MULTIPLE);
-  MPI::COMM_WORLD.Get_size();
-  MPI::Finalize();
-  return 0;
-}
-_ACEOF2
-
-AC_MSG_CHECKING([whether the MPI C++ compiler works])
-echo "$MPICXX $CXXFLAGS -o conftest conftest.cpp" >&5
-$MPICXX $CXXFLAGS -o conftest conftest.cpp 2>&5
-if test $? -ne 0; then
-  AC_MSG_FAILURE([failed!])
-else
-  mpiw=yes
-  AC_MSG_RESULT([yes])
-  AC_DEFINE(HAVE_MPI,1,[define that we have mpi])
-fi
-
-AC_MSG_CHECKING([whether MPI library supports threads])
-echo "$MPICXX $CXXFLAGS -o conftest2 conftest2.cpp" >&5
-$MPICXX $CXXFLAGS -o conftest2 conftest2.cpp 2>&5
-if test $? -ne 0; then
-  AC_MSG_RESULT([no])
-else
-  AC_MSG_RESULT([yes])
-  AC_DEFINE(HAVE_MPI_THREADS,1,[define that mpi supports threads])
-fi
-rm -f conftest2.*
-
-ic_mpirun_found=no
-if test x$mpiw = xyes; then
-  AC_MSG_CHECKING([for MPI run command])
-  if test x$ac_cv_env_MPIRUN_value = x; then
-  case "$MPICXX" in
-    *mpCC_r*)
-      mpirun="poe"
-      mpirun_proc_opt="-procs"
-      ;;
-    *mpiCC*)
-      mpirun="mpirun"
-      mpirun_proc_opt="-np"
-      ;;
-    *hCC*)
-      mpirun="mpiexec"
-      mpirun_proc_opt="-n"
-      ;;
-    *mpCC*)
-      mpirun="mprun"
-      mpirun_proc_opt="-np"
-      ;;
-    *mpicxx*)
-      mpirun="mpirun"
-      mpirun_proc_opt="-np"
-      ;;
-    *)
-      AC_MSG_ERROR([unknown MPI C++ compiler])
-      ;;
-  esac
-  else
-	  mpirun=$ac_cv_env_MPIRUN_value
-	  mpirun_proc_opt="-np"
-  fi
-  AC_MSG_RESULT([$mpirun])
-  AC_SUBST(MPIRUN, [$mpirun])
-  AC_SUBST(MPIRUN_PROC_OPT, [$mpirun_proc_opt])
-
-  AC_MSG_CHECKING([whether the MPI run command works])
-  if test $mpirun = poe; then
-    mpicmd="$mpirun $PWD/conftest $mpirun_proc_opt 2"
-  else
-    mpicmd="$mpirun $mpirun_proc_opt 2 $PWD/conftest"
-  fi
-  echo $mpicmd >&5
-  $mpicmd 2>&5
-  if test $? -ne 0; then
-    AC_MSG_RESULT([no, will skip MPI and P++ tests])
-  else
-    AC_MSG_RESULT([yes])
-    ic_mpirun_found=yes
-  fi
-fi
-rm -f conftest.*
-])
-
-case "$host" in 
-  *aix*)
-    cc_list="xlc_r gcc"
-    f77_list="xlf_r"
-    cxx_list="xlC_r g++"
-    f90_list="xlf90_r"
-    mpicc_list="mpcc_r mpicc"
-    mpif77_list="mpxlf_r mpif77"
-    mpicxx_list="mpCC_r mpiCC"
-    gm4_list="gm4 m4"
-    ;;
-  *darwin*)
-    cc_list="gcc"
-    f77_list="xlf"
-    cxx_list="g++"
-    f90_list="xlf90"
-    mpicc_list="mpicc"
-    mpif77_list="mpif77"
-    mpicxx_list="mpicxx"
-    ;;
-  *linux*)
-    cc_list="gcc pgcc icc"
-    f77_list="pgf77 ifort lf95 f95"
-    cxx_list="g++ pgCC icpc"
-    f90_list="pgf90 ifort lf95 f95"
-    mpicc_list="mpicc hcc"
-    mpif77_list="mpif90 mpif77 h77"
-    mpicxx_list="mpicxx mpiCC hCC"
-    gm4_list="gm4 m4"
-    ;;
-  *sun*)
-    cc_list="cc gcc"
-    f77_list="f77"
-    cxx_list="CC g++"
-    f90_list="f90"
-    mpicc_list="mpcc mpicc"
-    mpif77_list="mpf77 mpif77"
-    mpicxx_list="mpCC mpiCC"
-    gm4_list="gm4 m4"
-    ;;
-esac
-
-if test x$mpi = xtrue; then
-  AC_PROG_MPICXX($mpicxx_list)
-  CXX=$MPICXX
-fi
-
 # -----------------------------
 # scalapack
 #
 AC_ARG_WITH(scalapack, 
    [AS_HELP_STRING([--with-scalapack],
-       [use scalapack if available (default: yes)])],
+       [use scalapack if available (default: no)])],
    [if  test "$withval" = "yes" ; then
       with_scalapack=1
    else
