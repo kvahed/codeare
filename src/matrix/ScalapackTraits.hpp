@@ -97,6 +97,34 @@ extern "C" {
 					 cxfl *B, int *ib, int *jb, int * descB, double *beta, 
 					 double *C, int * ic, int * jc, int *descC);
 
+
+	// Cholesky factorisation of an NxN [hermitian] positive definite matrix
+	void pcpotrf_   (const char* uplo, const int& n, cxfl* A, const int& ia, 
+					 const int& ja, const int* descA, int& info);
+	void pzpotrf_   (const char* uplo, const int& n, cxdb* A, const int& ia, 
+					 const int& ja, const int* descA, int& info);
+	void pspotrf_   (const char* uplo, const int& n, float* A, const int& ia, 
+					 const int& ja, const int* descA, int& info);
+	void pdpotrf_   (const char* uplo, const int& n, double* A, const int& ia, 
+					 const int& ja, const int* descA, int& info);
+
+	// LU factorization of a general MxN matrix
+	void psgetrf_ (const int& m, const int& n, float* a, const int* lda, 
+				   int* ipiv, const int& info);
+	void pdgetrf_ (const int& m, const int& n, double* a, const int* lda, 
+				   int* ipiv, const int& info);
+	void pcgetrf_ (const int& m, const int& n, cxfl* a, const int* lda, 
+				   int* ipiv, const int& info);
+	void pzgetrf_ (const int& m, const int& n, cxdb* a, const int* lda, 
+				   int* ipiv, const int& info);
+	
+	// Inverse of a complex Hermitian pos def square mat with cpotrf/cpptrf
+	void pcpotri_ (const char* uplo, const int& n, cxfl *a, const int* lda, int& info);
+	void pdpotri_ (const char* uplo, const int& n, void *a, const int* lda, int& info);
+	void pzpotri_ (const char* uplo, const int& n, void *a, const int* lda, int& info);
+	void pspotri_ (const char* uplo, const int& n, void *a, const int* lda, int& info);
+	
+
 }
 
 
