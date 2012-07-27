@@ -32,6 +32,26 @@ AC_PROG_LIBTOOL
 # Set programming language
 AC_LANG([C++])
 
+# Compiler vendor
+AX_COMPILER_VENDOR
+
+# If --with-mpi=auto is used, try to find MPI, but use standard C compiler if it is not found.
+# If --with-mpi=yes is used, try to find MPI and fail if it isn't found.
+# If --with-mpi=no is used, use a standard C compiler instead.
+AC_ARG_WITH(mpi, [AS_HELP_STRING([--with-mpi],
+    [compile with MPI (parallelization) support. If none is found,
+    MPI is not used. Default: auto])
+],,[with_mpi=auto])
+
+AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[use_mpi=yes],[
+  use_mpi=no
+  if test x"$with_mpi" = xyes; then
+    AC_MSG_FAILURE([MPI compiler requested, but couldn't use MPI.])
+  else
+    AC_MSG_WARN([No MPI compiler found, won't use MPI.])
+  fi
+])
+
 # Check SMP capabilities
 AC_OPENMP
 
@@ -151,26 +171,6 @@ AC_C_RESTRICT
 
 # enable "inline" keyword
 AC_C_INLINE
-
-# Compiler vendor (Courtesy fftw)
-AX_COMPILER_VENDOR
-
-# If --with-mpi=auto is used, try to find MPI, but use standard C compiler if it is not found.
-# If --with-mpi=yes is used, try to find MPI and fail if it isn't found.
-# If --with-mpi=no is used, use a standard C compiler instead.
-AC_ARG_WITH(mpi, [AS_HELP_STRING([--with-mpi],
-    [compile with MPI (parallelization) support. If none is found,
-    MPI is not used. Default: auto])
-],,[with_mpi=auto])
-
-AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[use_mpi=yes],[
-  use_mpi=no
-  if test x"$with_mpi" = xyes; then
-    AC_MSG_FAILURE([MPI compiler requested, but couldn't use MPI.])
-  else
-    AC_MSG_WARN([No MPI compiler found, won't use MPI.])
-  fi
-])
 
 AC_CHECK_TYPES([ptrdiff_t])
 
@@ -677,32 +677,8 @@ AC_CHECK_FUNCS([strstr])
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 
-# -----------------------------
-# scalapack
-#
-AC_ARG_WITH(scalapack, 
-   [AS_HELP_STRING([--with-scalapack],
-       [use scalapack if available (default: no)])],
-   [if  test "$withval" = "yes" ; then
-      with_scalapack=1
-   else
-      with_scalapack=0
-   fi],
-   [with_scalapack=0])
-# -----------------------------
-
-AC_DEFINE([HAVE_F77_UNDERSCORE], [], [Description])
-
-AC_CHECK_LIB(
-    [scalapack], 
-    [pzgels_], 
-    [AC_DEFINE(HAVE_F77_UNDERSCORE, 0, []) LIBS="${LIBS} -lscalapack"], 
-    [AC_CHECK_LIB(
-	    [scalapack-mpich], 
-		[pzgels_], 
-		[AC_DEFINE(HAVE_F77_UNDERSCORE, 1, []) LIBS="${LIBS} -lscalapack-mpich"],  
-		[AC_MSG_ERROR([cannot find libscalapack-mpich, bailing out])])]
-)
+AH_TEMPLATE([HAVE_SCALAPACK], [Define to 1 if we could link against scalapack])
+ACX_SCALAPACK
 
 # Generate files
 AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile])

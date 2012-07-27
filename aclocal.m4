@@ -1188,6 +1188,7 @@ AC_SUBST([am__tar])
 AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
+m4_include([m4/acx_scalapack.m4])
 m4_include([m4/ax_compiler_vendor.m4])
 m4_include([m4/ax_prog_cxx_mpi.m4])
 m4_include([m4/libtool.m4])
