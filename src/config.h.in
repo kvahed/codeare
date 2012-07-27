@@ -33,9 +33,6 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
-/* Description */
-#undef HAVE_F77_UNDERSCORE
-
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
@@ -149,6 +146,9 @@
 
 /* Define to 1 if you have the `read_real_time' function. */
 #undef HAVE_READ_REAL_TIME
+
+/* Define to 1 if we could link against scalapack */
+#undef HAVE_SCALAPACK
 
 /* Define to 1 if you have the `setenv' function. */
 #undef HAVE_SETENV
