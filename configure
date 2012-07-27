@@ -638,8 +638,6 @@ ac_header_list=
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
-MPI_FALSE
-MPI_TRUE
 LIBOBJS
 USE_GSL_FALSE
 USE_GSL_TRUE
@@ -810,7 +808,6 @@ with_itkroot
 with_matlabroot
 with_blas
 with_lapack
-enable_mpi
 with_scalapack
 '
       ac_precious_vars='build_alias
@@ -1457,7 +1454,6 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --disable-openmp        do not use OpenMP
   --enable-documentation          turn on documentation C++ library support (default: yes)
-  --enable-mpi            turn on parallel jemris (default: yes)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -11688,10 +11684,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"009e15bb\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"f9a82a44\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Thu Jul 26 11:03:21 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Fri Jul 27 15:40:19 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -20160,27 +20156,6 @@ fi
 rm -f conftest.mmap conftest.txt
 
 
-# Check whether --enable-mpi was given.
-if test "${enable_mpi+set}" = set; then :
-  enableval=$enable_mpi; case "${enableval}" in
-       yes) mpi=true ;;
-       no)  mpi=false ;;
-       *) as_fn_error $? "bad value ${enableval} for --enable-mpi" "$LINENO" 5 ;;
-     esac
-else
-  mpi=true
-fi
-
-      if test x$mpi = xtrue; then
-  MPI_TRUE=
-  MPI_FALSE='#'
-else
-  MPI_TRUE='#'
-  MPI_FALSE=
-fi
-
-
-
 # -----------------------------
 # scalapack
 #
@@ -20463,10 +20438,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_GSL_TRUE}" && test -z "${USE_GSL_FALSE}"; then
   as_fn_error $? "conditional \"USE_GSL\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${MPI_TRUE}" && test -z "${MPI_FALSE}"; then
-  as_fn_error $? "conditional \"MPI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
