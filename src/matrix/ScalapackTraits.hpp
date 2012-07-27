@@ -99,14 +99,14 @@ extern "C" {
 
 
 	// Cholesky factorisation of an NxN [hermitian] positive definite matrix
-	void pcpotrf_   (const char* uplo, const int& n, cxfl* A, const int& ia, 
-					 const int& ja, const int* descA, int& info);
-	void pzpotrf_   (const char* uplo, const int& n, cxdb* A, const int& ia, 
-					 const int& ja, const int* descA, int& info);
-	void pspotrf_   (const char* uplo, const int& n, float* A, const int& ia, 
-					 const int& ja, const int* descA, int& info);
-	void pdpotrf_   (const char* uplo, const int& n, double* A, const int& ia, 
-					 const int& ja, const int* descA, int& info);
+	void pcpotrf_ (const char* uplo, const int& n, cxfl* A, const int& ia, 
+				   const int& ja, const int* descA, int& info);
+	void pzpotrf_ (const char* uplo, const int& n, cxdb* A, const int& ia, 
+				   const int& ja, const int* descA, int& info);
+	void pspotrf_ (const char* uplo, const int& n, float* A, const int& ia, 
+				   const int& ja, const int* descA, int& info);
+	void pdpotrf_ (const char* uplo, const int& n, double* A, const int& ia, 
+				   const int& ja, const int* descA, int& info);
 
 	// LU factorization of a general MxN matrix
 	void psgetrf_ (const int& m, const int& n, float* a, const int* lda, 
@@ -119,19 +119,22 @@ extern "C" {
 				   int* ipiv, const int& info);
 	
 	// Inverse of a complex Hermitian pos def square mat with cpotrf/cpptrf
-	void pcpotri_ (const char* uplo, const int& n, cxfl *a, const int* lda, int& info);
-	void pdpotri_ (const char* uplo, const int& n, void *a, const int* lda, int& info);
-	void pzpotri_ (const char* uplo, const int& n, void *a, const int* lda, int& info);
-	void pspotri_ (const char* uplo, const int& n, void *a, const int* lda, int& info);
-	
+	void pcpotri_ (const char* uplo, const int& n, cxfl *a, const int* lda, 
+				   int& info);
+	void pdpotri_ (const char* uplo, const int& n, void *a, const int* lda, 
+				   int& info);
+	void pzpotri_ (const char* uplo, const int& n, void *a, const int* lda, 
+				   int& info);
+	void pspotri_ (const char* uplo, const int& n, void *a, const int* lda, 
+				   int& info);
 
 }
 
 
 // C++ convenience
-inline int indxl2g (int lidx, int nb, int iproc, int isrcproc, int nprocs) {
-	int fortran_idxloc = lidx + 1;
-	return indxl2g_ (&fortran_idxloc, &nb, &iproc, &isrcproc, &nprocs) - 1;
+inline int indxl2g (int idl, int nb, int iproc, int isrcproc, int nprocs) {
+	int fortidl = idl + 1;
+	return indxl2g_ (&fortidl, &nb, &iproc, &isrcproc, &nprocs) - 1;
 }
 
 

@@ -146,7 +146,7 @@ class PMatrix : public Matrix<T> {
 	
 
 	/**
-	 * @brief         Assignement operator ()
+	 * @brief         Assignement operator
 	 * 
 	 * @param  t      Scalar
 	 */
@@ -158,25 +158,18 @@ class PMatrix : public Matrix<T> {
 	
 
 	/**
-	 * @brief         Assignement operator ()
+	 * @brief         Assignement operator
 	 * 
-	 * @param  t      Scalar
+	 * @param  P      PMatrix
 	 */
 	inline PMatrix<T>
 	operator= (const PMatrix& P) {
-
-		/* Don't do anything for A = A */
 		if (this != &P) {
-			
 			Matrix<T>::_M      = P.Dat();
-			
 			Matrix<T>::_dim[0] = P.Dim(0);
 			Matrix<T>::_dim[1] = P.Dim(1);
-
 		}
-
 		return *this;
-
 	}
 	
 

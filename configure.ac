@@ -164,12 +164,12 @@ AC_ARG_WITH(mpi, [AS_HELP_STRING([--with-mpi],
 ],,[with_mpi=auto])
 
 AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[use_mpi=yes],[
-use_mpi=no
-if test x"$with_mpi" = xyes; then
+  use_mpi=no
+  if test x"$with_mpi" = xyes; then
     AC_MSG_FAILURE([MPI compiler requested, but couldn't use MPI.])
-else
+  else
     AC_MSG_WARN([No MPI compiler found, won't use MPI.])
-fi
+  fi
 ])
 
 AC_CHECK_TYPES([ptrdiff_t])
@@ -660,7 +660,7 @@ AC_SUBST(LAPACK)
 #AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
-AC_CHECK_LIB([cblas],  [cblas_dasum], [], [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
+AC_CHECK_LIB([cblas],     [cblas_dasum], [], [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
 AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
 AM_CONDITIONAL([USE_GSL],    [test "$HAVE_GSL" -eq 1])
 
