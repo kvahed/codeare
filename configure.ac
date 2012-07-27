@@ -677,16 +677,6 @@ AC_CHECK_FUNCS([strstr])
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 
-AC_ARG_ENABLE([mpi],
-     [  --enable-mpi            turn on parallel jemris (default: yes) ],
-     [case "${enableval}" in
-       yes) mpi=true ;;
-       no)  mpi=false ;;
-       *) AC_MSG_ERROR([bad value ${enableval} for --enable-mpi]) ;;
-     esac],[mpi=true])
-     AM_CONDITIONAL([MPI], [test x$mpi = xtrue])
-
-
 # -----------------------------
 # scalapack
 #
