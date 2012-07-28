@@ -1,13 +1,27 @@
-AC_PREREQ([1.10])
-AC_INIT([codeare], [1.0], [k.vahedipour@fz-juelich.de])
+## Copyright (C) 2009-2012 Kaveh Vahedipor
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2, or (at your option)
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+## 02111-1307, USA.
+##
+## $Id: configure.ac 7840 2011-05-04 15:46:53Z xavier $
+
+AC_PREREQ(2.59)
+AC_INIT([codeare], [1.0], [k.vahedipour@fz-juelich.de], [octopus])
 AC_CONFIG_SRCDIR([src])
-
-# m4 macros
-AC_CONFIG_MACRO_DIR([m4])
-
-# where to put auxilliary files
 AC_CONFIG_AUX_DIR([config])
-
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -38,12 +52,18 @@ AX_COMPILER_VENDOR
 # If --with-mpi=auto is used, try to find MPI, but use standard C compiler if it is not found.
 # If --with-mpi=yes is used, try to find MPI and fail if it isn't found.
 # If --with-mpi=no is used, use a standard C compiler instead.
+AH_TEMPLATE([HAVE_MPI], [Define to 1 if mpi compiler search succeeds])
+
 AC_ARG_WITH(mpi, [AS_HELP_STRING([--with-mpi],
     [compile with MPI (parallelization) support. If none is found,
     MPI is not used. Default: auto])
 ],,[with_mpi=auto])
 
-AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[use_mpi=yes],[
+AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[
+  AC_DEFINE(HAVE_MPI, "1")
+  AC_DEFINE(CXX, "") 
+  use_mpi=yes
+  ],[
   use_mpi=no
   if test x"$with_mpi" = xyes; then
     AC_MSG_FAILURE([MPI compiler requested, but couldn't use MPI.])
