@@ -114,6 +114,9 @@
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
 
+/* Define to 1 if mpi compiler search succeeds */
+#undef HAVE_MPI
+
 /* define if the compiler implements namespaces */
 #undef HAVE_NAMESPACES
 

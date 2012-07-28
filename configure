@@ -11684,10 +11684,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"b5eaa917\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"2e5fe5f5\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Fri Jul 27 18:29:40 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Fri Jul 27 20:16:05 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -16022,6 +16022,8 @@ $as_echo "$ax_cv_cxx_compiler_vendor" >&6; }
 # If --with-mpi=yes is used, try to find MPI and fail if it isn't found.
 # If --with-mpi=no is used, use a standard C compiler instead.
 
+
+
 # Check whether --with-mpi was given.
 if test "${with_mpi+set}" = set; then :
   withval=$with_mpi;
@@ -16639,7 +16641,11 @@ fi
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
 if test x"$_ax_prog_cxx_mpi_mpi_found" = xyes; then :
 
-        use_mpi=yes
+
+  $as_echo "#define HAVE_MPI \"1\"" >>confdefs.h
+
+  use_mpi=yes
+
         :
 
 else
@@ -20203,18 +20209,21 @@ _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
   acx_scalapack_ok=yes
 else
-  SCALAPACK_LIBS=""
+  as_fn_error $? "no. Bailing out!" "$LINENO" 5
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acx_scalapack_ok" >&5
 $as_echo "$acx_scalapack_ok" >&6; }
 	LIBS="$save_LIBS"
+fi
+# restore the libs variable
+#LIBS=$acx_scalapack_save_LIBS
+
+if test "x$SCALAPACK_LIBS" != x; then
     $as_echo "#define HAVE_SCALAPACK \"1\"" >>confdefs.h
 
 fi
-# restore the libs variable
-LIBS=$acx_scalapack_save_LIBS
 
 
 # Generate files

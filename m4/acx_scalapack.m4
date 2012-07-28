@@ -19,11 +19,14 @@ if test "x$SCALAPACK_LIBS" != x; then
 	pdpotrf=pdpotrf_
 	save_LIBS="$LIBS"; LIBS="$SCALAPACK_LIBS $LIBS"
 	AC_MSG_CHECKING([for $pdpotrf in $SCALAPACK_LIBS])
-	AC_TRY_LINK_FUNC($pdpotrf, [acx_scalapack_ok=yes], [SCALAPACK_LIBS=""])
+	AC_TRY_LINK_FUNC($pdpotrf, [acx_scalapack_ok=yes], [AC_MSG_ERROR(no. Bailing out!)])
 	AC_MSG_RESULT($acx_scalapack_ok)
 	LIBS="$save_LIBS"
-    AC_DEFINE(HAVE_SCALAPACK, "1")
 fi
 # restore the libs variable
-LIBS=$acx_scalapack_save_LIBS
+#LIBS=$acx_scalapack_save_LIBS
+
+if test "x$SCALAPACK_LIBS" != x; then
+    AC_DEFINE(HAVE_SCALAPACK, "1")
+fi
 ]) 
