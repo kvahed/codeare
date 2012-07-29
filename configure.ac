@@ -18,7 +18,7 @@
 ## $Id: configure.ac 7840 2011-05-04 15:46:53Z xavier $
 
 AC_PREREQ(2.59)
-AC_INIT([codeare], [1.0], [k.vahedipour@fz-juelich.de], [octopus])
+AC_INIT([codeare], [1.0], [k.vahedipour@fz-juelich.de], [codeare])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
@@ -39,7 +39,10 @@ AC_COPYRIGHT([2010-2012, Kaveh Vahedipour])
 esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
 
 # Checks for programs.
+AH_TEMPLATE([CXX], [c++ compiler])
+
 AC_PROG_CC
+AC_PROG_FC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 
@@ -74,6 +77,9 @@ AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[
 
 # Check SMP capabilities
 AC_OPENMP
+
+# SIMD capabilities
+AX_EXT
 
 AC_ARG_ENABLE([documentation],
      [  --enable-documentation          turn on documentation C++ library support (default: yes)],
