@@ -119,7 +119,7 @@ NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result,
 	while (i--)
         nrmse += pow(abs(target[i]) - abs(result[i]), 2);
     
-    nrmse = sqrt(nrmse)/creal(norm(target));
+    nrmse = sqrt(nrmse)/norm(target);
     
 	if (iter % 5 == 0 && iter > 0)
 		printf ("\n");
@@ -142,16 +142,10 @@ PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
     
 	size_t n = target.Size();
 	
-#pragma omp parallel default (shared) 
-    {
-		
-#pragma omp for schedule (guided, 100)
-
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++) 
 			target[i] = (abs(result[i]) > 0) ? abs(target[i]) * result[i] / abs(result[i]) :  cxfl(0,0);
 
-    }
-	
 }
 
 
@@ -200,8 +194,8 @@ inline void
 STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cxfl>& b1, const Matrix<short>& b0, 
 	 const int& nc, const int& nk, const int& ns, const int gd, const int* pd, Matrix<cxfl>& m) {
     
-	float* d = (float*) malloc (nk * sizeof (float));
-	float* t = (float*) malloc (nk * sizeof (float));
+	vector<float> d (nk);
+	vector<float> t (nk);
 
 	for (int i = 0; i< nk; i++)
 		d[i] = (i==0) ? pd[i] + gd : d[i-1] + pd[i] + gd;
@@ -220,7 +214,7 @@ STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cxfl>& b1, 
 #pragma omp parallel default (shared) 
     {
 
-#pragma omp for schedule (guided, 1)
+#pragma omp for
         for (int c = 0; c < nc; c++) 
             for (int k = 0; k < nk; k++) 
                 for (int s = 0; s < ns; s++) 
@@ -234,9 +228,6 @@ STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cxfl>& b1, 
         
     }
 	
-	free (t);
-	free (d);
-    
 }
 
 

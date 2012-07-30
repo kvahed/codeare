@@ -128,7 +128,10 @@ using MPI::Init;],[MPI::Init;])],
 
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
 AS_IF([test x"$_ax_prog_cxx_mpi_mpi_found" = xyes], [
-        ifelse([$2],,[AC_DEFINE(HAVE_MPI,1,[Define if you have the MPI library.])],[$2])
+        ifelse([$2],,[
+		AC_DEFINE(HAVE_MPI,1,[Define if you have the MPI library.])
+		CXX=mpicxx
+		],[$2])
         :
 ],[
         $3

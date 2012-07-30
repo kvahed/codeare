@@ -1,7 +1,9 @@
 #ifndef __SSE_HPP__
 #define __SSE_HPP__
 
+#include "config.h"
 #include "SSETraits.hpp"
+
 #include <math.h>
 #include <stdio.h>
 
@@ -10,9 +12,9 @@ enum alignment {
 	U
 };
 
-#ifdef HAVE_SSE
-
 namespace SSE {
+
+#ifdef HAVE_SSE
 
 	/**
 	 * @brief  Templated interface to SSE/SSE2 _mm_load
@@ -258,8 +260,9 @@ namespace SSE {
 			store<T>::single (C + i, c);
 		}
 		
-	};
-#endif // namespace sse
+	}; // namespace SSE
+
+#endif // HAVE_SSE
 	
 }
 

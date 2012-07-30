@@ -59,15 +59,12 @@ DIST_COMMON = $(srcdir)/Loader.hpp.in $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/config/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/acx_scalapack.m4 \
 	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
-	$(top_srcdir)/m4/ax_ext.m4 \
-	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
-	$(top_srcdir)/m4/ax_prog_cxx_mpi.m4 $(top_srcdir)/m4/blacs.m4 \
+	$(top_srcdir)/m4/ax_prog_cxx_mpi.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/scalapack.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -216,7 +213,6 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
-FCLIBS = @FCLIBS@
 FGREP = @FGREP@
 GREP = @GREP@
 HAVE_INSIGHT = @HAVE_INSIGHT@
@@ -234,8 +230,6 @@ LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
-LIBS_BLACS = @LIBS_BLACS@
-LIBS_SCALAPACK = @LIBS_SCALAPACK@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -268,10 +262,10 @@ PYTHON_PLATFORM = @PYTHON_PLATFORM@
 PYTHON_PREFIX = @PYTHON_PREFIX@
 PYTHON_VERSION = @PYTHON_VERSION@
 RANLIB = @RANLIB@
+SCALAPACK_LIBS = @SCALAPACK_LIBS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
-SIMD_FLAGS = @SIMD_FLAGS@
 STRIP = @STRIP@
 VERSION = @VERSION@
 XSLTPROC = @XSLTPROC@
@@ -348,21 +342,21 @@ liblocal_la_SOURCES = LocalConnector.hpp LocalConnector.cpp testclt.cpp
 liblocal_la_CXXFLAGS = $(AM_CXXFLAGS) -DLOCAL
 lclient_SOURCES = $(COMMON)
 lclient_LDFLAGS = liblocal.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) \
-	@PLUGIN_LDFLAGS@ -dlopen modules/DummyRecon.la -dlopen \
-	modules/LapackTests.la -dlopen modules/DumpToFile.la -dlopen \
-	modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen \
-	modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la \
-	-dlopen modules/KTPoints.la -dlopen \
-	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
-	-dlopen modules/DirectMethod.la tinyxml/libtinyxml.la \
-	$(am__append_1)
+	$(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -dlopen \
+	modules/DummyRecon.la -dlopen modules/LapackTests.la -dlopen \
+	modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen \
+	modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la \
+	-dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la \
+	-dlopen modules/RelativeSensitivities.la -dlopen \
+	modules/GRAPPA.la -dlopen modules/DirectMethod.la \
+	tinyxml/libtinyxml.la $(am__append_1)
 lclient_DEPENDENCIES = liblocal.la
 
 # Remote client (rclient)
 libremote_la_SOURCES = RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
 libremote_la_CXXFLAGS = $(AM_CXXFLAGS) -DREMOTE
 rclient_SOURCES = $(COMMON)
-rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ 
+rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ 
 rclient_DEPENDENCIES = libremote.la
 
 # Rules for reconserver
