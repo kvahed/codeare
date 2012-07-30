@@ -40,6 +40,7 @@ enum IceDim {
 #include "config.h"
 #include "modules/OMP.hpp"
 #include "Complex.hpp"
+#include "SSE.hpp"
 
 #include "cycle.h"            // FFTW cycle implementation
 

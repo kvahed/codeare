@@ -59,8 +59,4 @@ enum connection_type {
 	CON_REMOTE
 };
 
-enum alignment {
-	A,
-	U
-};
 #endif //__COMMON_H__
