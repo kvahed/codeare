@@ -2,13 +2,15 @@
 
 namespace SSE {
 
+
 	template<class T> 
-	struct SSETraits<T> {};
+	struct SSETraits {};
+
 
 	template<>
 	struct SSETraits<double> {
 		
-		Typedef __m128d Register;         /**< @brief register type */
+		typedef __m128d Register;         /**< @brief register type */
 		static const unsigned int ne = 2; /**< @brief # of processed elements */
 		
 		/**
@@ -30,23 +32,23 @@ namespace SSE {
 		/**
 		 * @brief     SSE2 load packed aligned
 		 */
-		static inline Register 
-		stora (const double* p) {
-			return _mm_store_pd (p); 
+		static inline void
+		stora (double* p, Register a) {
+			_mm_store_pd (p, a); 
 		}
 
 		/**
 		 * @brief     SSE2 load packed unaligned
 		 */
-		static inline Register
-		storu (const double* p) {
-			return _mm_storeu_pd (p); 
+		static inline void
+		storu (double* p, Register a) {
+			_mm_storeu_pd (p, a); 
 		}
 
 		/**
 		 * @brief     SSE2 packed addition
 		 */
-		static inline Register 
+		static inline Register
 		addp (const Register &a, const Register &b) {
 			return _mm_add_pd(a, b);
 		}
@@ -119,8 +121,8 @@ namespace SSE {
 		 * @brief     SSE2 single SQRT
 		 */
 		static inline Register 
-		sqrts (const Register &a) {
-			return _mm_sqrt_sd(a);
+		sqrts (const Register &a, const Register &b) {
+			return _mm_sqrt_sd(a,b);
 		}
 		
 		/**
@@ -157,17 +159,18 @@ namespace SSE {
 		
 	}; // SSETraits<double>
 	
+
 	template<>
 	struct SSETraits<float> {
 		
-		typedef __m128 Register;          /**< @brief register type */
-		static const unsigned int ne = 4; /**< @brief # of elements */
-
+		typedef __m128 Register;         /**< @brief register type */
+		static const unsigned int ne = 4; /**< @brief # of processed elements */
+		
 		/**
 		 * @brief     SSE2 load packed aligned
 		 */
 		static inline Register 
-		load (const float* p) {
+		loada (const float* p) {
 			return _mm_load_ps (p); 
 		}
 
@@ -175,14 +178,30 @@ namespace SSE {
 		 * @brief     SSE2 load packed unaligned
 		 */
 		static inline Register
-		load (const float* p) {
+		loadu (const float* p) {
 			return _mm_loadu_ps (p); 
+		}
+
+		/**
+		 * @brief     SSE2 load packed aligned
+		 */
+		static inline void
+		stora (float* p, Register a) {
+			_mm_store_ps (p, a); 
+		}
+
+		/**
+		 * @brief     SSE2 load packed unaligned
+		 */
+		static inline void
+		storu (float* p, Register a) {
+			_mm_storeu_ps (p, a); 
 		}
 
 		/**
 		 * @brief     SSE2 packed addition
 		 */
-		static inline Register 
+		static inline Register
 		addp (const Register &a, const Register &b) {
 			return _mm_add_ps(a, b);
 		}
@@ -291,6 +310,7 @@ namespace SSE {
 			return _mm_max_ss(a, b);
 		}
 		
-	}; // SSETraits<float>
+	}; // SSETraits<float>	
+
 	
 } // namespace SSE 

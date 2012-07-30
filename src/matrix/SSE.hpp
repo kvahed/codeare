@@ -2,12 +2,18 @@
 #define __SSE_HPP__
 
 #include "SSETraits.hpp"
-#include "config.h"
+#include <math.h>
+#include <stdio.h>
+
+enum alignment {
+	A,
+	U
+};
+
+#ifdef HAVE_SSE
 
 namespace SSE {
 
-#ifdef HAVE_SSE
-	
 	/**
 	 * @brief  Templated interface to SSE/SSE2 _mm_load
 	 */
@@ -42,14 +48,14 @@ namespace SSE {
 		typedef typename SSETraits<T>::Register reg_type;
 		typedef SSETraits<T> sse_type;
 
-		inline static reg_type 
-		packed (const T* p, const reg_type& a) { 
-			return sse_type::stora (p, a); 
+		inline static void
+		packed (T* p, const reg_type& a) { 
+			sse_type::stora (p, a); 
 		}
 
-		inline static reg_type 
-		packed (const T* p, const reg_type& a) { 
-			return sse_type::storu (p, a); 
+		inline static void
+		single (T* p, const reg_type& a) { 
+			sse_type::storu (p, a); 
 		}
 
 	};
@@ -58,7 +64,7 @@ namespace SSE {
 	 * @brief  Templated interface to SSE/SSE2 _mm_add
 	 */
 	template<class T>
-	class add {
+	class add  {
 
 	public:
 
@@ -224,31 +230,36 @@ namespace SSE {
 	 * @param  N  Length of A, B and C
 	 * @param  C  Vector C
 	 */
-	template<class T, Alignment stC, Alignment ldA, Alignment ldB, Op<T> op> void
-	process (const T* A, const T* B, size_t N, const Op<T>& op, T* C) {
+	template<class T, alignment ldA, alignment ldB, alignment stC, class Op> inline static void
+	process (const T* A, const T* B, size_t N, const Op& op, T* C) {
 		
-		size_t   i = 0;
-		size_t   n = floor ((float)N/(float)SSETraits<T>::ne);
+		typedef SSETraits<T>                sse_type;
+		typedef typename sse_type::Register reg_type;
+		
+		size_t   i  = 0;
+		size_t   ne = sse_type::ne;
+		size_t   na = N/ne;
 		load<T>  ld;
 		store<T> st;
-
-		// aligned elements
-		for (; i < n; i+=4) {
-			reg_type a = ld.packed (A + i);
-			reg_type b = ld.packed (B + i);
+		
+		// aligned 
+		for (i=0; i < na; i+=ne) {
+			reg_type a = load<T>::packed (A + i);
+			reg_type b = load<T>::packed (B + i);
 			reg_type c = op.packed (a, b);
-			st.packed (C + i, c);
+			store<T>::packed (C + i, c);
 		}
 		
-		// rest
-		for (; i < N; i++) {
-			reg_type a = ld.single (A + i);
-			reg_type b = ld.single (B + i);
+		// rest 
+		for (i=na*ne; i < N; i+=1) {
+			reg_type a = load<T>::single (A + i);
+			reg_type b = load<T>::single (B + i);
 			reg_type c = op.single (a, b);
-			st.packed (C + i, c);
+			store<T>::single (C + i, c);
 		}
-	}
-#endif // HAVE_SSE
+		
+	};
+#endif // namespace sse
 	
 }
 
