@@ -2436,20 +2436,11 @@ Matrix<T>::operator- () const {
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator- (const Matrix<S> &M) const {
 
-    size_t i;
-
     for (size_t i=0; i < INVALID_DIM; i++)
         assert (Dim(i) == M.Dim(i));
 
     Matrix<T> res = *this;
-
-#pragma omp parallel
-		{
-#pragma omp for
-			for (size_t i = 0; i < Size(); i++)
-				res[i] -= M[i];
-		}
-
+	res.Dat() -= _M;
     return res;
 
 }
@@ -2459,16 +2450,7 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator- (const S& s) const {
 
     Matrix<T> res = *this;
-    T t = T(s);
-
-#pragma omp parallel
-		{
-#pragma omp for
-			for (size_t i = 0; i < Size(); i++)
-				res[i] -= t;
-		}
-
-		//res.Dat() -= t;
+	res.Dat() -= T(s);
     return res;
 
 }
@@ -2477,20 +2459,11 @@ Matrix<T>::operator- (const S& s) const {
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator+ (const Matrix<S> &M) const {
 
-    size_t i;
-
-    for (i=0; i < INVALID_DIM; i++)
+    for (size_t i=0; i < INVALID_DIM; i++)
         assert (Dim(i) == M.Dim(i));
 
     Matrix<T> res = *this;
-
-#pragma omp parallel default (shared) 
-	{
-#pragma omp for
-		for (size_t i = 0; i < Size(); i++)
-			res[i] += M[i];
-	}
-
+	res.Dat() += _M;
     return res;
 
 }
@@ -2500,14 +2473,7 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator+ (const S& s) const {
 
     Matrix<T> res = *this;
-    T t = T(s);
-#pragma omp parallel
-		{
-#pragma omp for
-			for (size_t i = 0; i < Size(); i++)
-				res[i] += t;
-		}
-		//res.Dat() += t;
+	res.Dat() += T(s);
     return res;
 
 }
@@ -2516,8 +2482,7 @@ Matrix<T>::operator+ (const S& s) const {
 template <class T> inline Matrix<T> 
 Matrix<T>::operator^ (const float& p) const {
     
-    Matrix<T> res = *this;
-    size_t i = Size();
+	Matrix<T> res = *this;
 
 #pragma omp parallel default (shared) 
 	{
@@ -2572,16 +2537,7 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator* (const S& s) const {
     
     Matrix<T> res = *this; 
-    T           t = T(s);
-
-#pragma omp parallel
-		{
-#pragma omp for
-			for (size_t i = 0; i < Size(); i++)
-				res[i] *= t;
-		}
-
-		//res.Dat() *= t;
+	res.Dat() *= T(s);
     return res;
 
 }

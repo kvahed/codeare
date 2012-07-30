@@ -28,5 +28,7 @@ fi
 
 if test "x$SCALAPACK_LIBS" != x; then
     AC_DEFINE(HAVE_SCALAPACK, "1")
+	AC_SUBST(SCALAPACK_LIBS)
 fi
+
 ]) 

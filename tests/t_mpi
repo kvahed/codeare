@@ -1,0 +1,2 @@
+#!/bin/sh
+mpiexec -n 4 ../src/lclient -b ../share/common -t MPI > out.txt

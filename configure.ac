@@ -64,7 +64,7 @@ AC_ARG_WITH(mpi, [AS_HELP_STRING([--with-mpi],
 
 AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[
   AC_DEFINE(HAVE_MPI, "1")
-  AC_DEFINE(CXX, "") 
+  CXX=mpicxx
   use_mpi=yes
   ],[
   use_mpi=no
