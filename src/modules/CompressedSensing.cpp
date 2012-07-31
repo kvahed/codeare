@@ -42,8 +42,8 @@ CompressedSensing::Init () {
 	Attribute ("xfmw",    &m_cgparam.xfmw);
 	Attribute ("l1",      &m_cgparam.l1);
 	Attribute ("pnorm",   &m_cgparam.pnorm);
-    printf ("  Weights: TV(%.4f) XF(%.4f) L1(%.4f)\n", m_cgparam.tvw, m_cgparam.xfmw, m_cgparam.l1);
-    printf ("  Pnorm: %f\n", m_cgparam.pnorm);
+    printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_cgparam.tvw, m_cgparam.xfmw, m_cgparam.l1);
+    printf ("  Pnorm: %.2e\n", m_cgparam.pnorm);
 	
 	Attribute ("fft",     &m_cgparam.fft);
 	printf ("  FFT class: ");
@@ -70,7 +70,7 @@ CompressedSensing::Init () {
 	Attribute ("lsb",    &m_cgparam.lsb);
     printf ("  Iterations: CS(%i) CG(%i) LS(%i)\n", m_csiter, m_cgparam.cgiter, m_cgparam.lsiter);
 	printf ("  Conv: CG(%.4f)\n", m_cgparam.cgconv);
-	printf ("  LS brackets: lsa(%.4f) lsb(%.4f)", m_cgparam.lsa, m_cgparam.lsb);
+	printf ("  LS brackets: lsa(%.2e) lsb(%.2e)", m_cgparam.lsa, m_cgparam.lsb);
 
 	
 

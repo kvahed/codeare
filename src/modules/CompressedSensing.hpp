@@ -115,7 +115,7 @@ namespace RRStrategy {
 	};
 
 
-	float Obj (Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& data, float t) {
+	float Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, const Matrix<cxfl>& data, const float& t) {
 	
 		Matrix<cxfl> om;
 		float        o = 0.0;
@@ -132,7 +132,7 @@ namespace RRStrategy {
 	}
 
 
-	float ObjTV (Matrix<cxfl>& ttdbx, Matrix<cxfl>& ttdbg, float t, CGParam& cgp) {
+	float ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, const float& t, const CGParam& cgp) {
 		
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
@@ -144,7 +144,7 @@ namespace RRStrategy {
 		om += cgp.l1;
 		om ^= p;
 		
-		for (size_t i = 0; i < om.Size(); i++) o += om[i].real();
+		for (size_t i = 0; i < om.Size(); i++) o += creal(om[i]);
 		
 		return cgp.tvw * o;
 
@@ -154,13 +154,13 @@ namespace RRStrategy {
 	/**
 	 *
 	 */
-	float ObjXFM (Matrix<cxfl>& x, Matrix<cxfl>& g, float t, CGParam& cgp) {
+	float ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g, const float& t, const CGParam& cgp) {
 		
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
 
 		om  = x;
-		if (t > 0)
+		if (t > 0.0)
 			om += t * g;
 		om *= conj(om);
 		om += cgp.l1;
@@ -173,10 +173,11 @@ namespace RRStrategy {
 	} 
 
 
-	float Objective (Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& ttdbx, 
-					 Matrix<cxfl>& ttdbg, Matrix<cxfl>&     x, Matrix<cxfl>&     g, 
-					 Matrix<cxfl>&  data, float             t, float&         rmse,
-					 CGParam&        cgp) {
+	float Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
+					 const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
+					 const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
+					 const Matrix<cxfl>&  data, const float             t, 
+					       float&         rmse, const CGParam&        cgp) {
 		
 		float obj = 0.0;
 		float nz = (float) nnz (data); 
@@ -277,7 +278,7 @@ namespace RRStrategy {
 
 
 	void 
-	NLCG (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp) {
+	NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
 
 		
 		float     t0  = 1.0, t = 1.0, z = 0.0;
