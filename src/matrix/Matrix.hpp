@@ -38,7 +38,7 @@ enum IceDim {
 #endif
 
 #include "config.h"
-#include "modules/OMP.hpp"
+#include "OMP.hpp"
 #include "Complex.hpp"
 #include "SSE.hpp"
 

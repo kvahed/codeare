@@ -2,6 +2,7 @@
 #define _DATA_BASE_H_
 
 #include "Matrix.hpp"
+#include "Configurable.hpp"
 
 #include <map>
 
@@ -18,8 +19,7 @@ using namespace RRSModule;
  * @brief Central database for all shared matrices<br/>
  *        Matrix smart pointers are stored in individual (type) maps along with string identifier and retrieved by their names.
  */
-class DataBase {
-
+class DataBase : public Configurable {
 
 
  public:
@@ -278,13 +278,22 @@ class DataBase {
 	map < string, Ptr< Matrix<long> > >& 
 	LONGMap          ();
 		
+
  private:
 
 	/** 
 	 * @brief Private constructor (access Instance()). 
 	 *        Singleton object for data storage. Access through Instance().
 	 */
-    DataBase() {}; 
+    DataBase() {
+
+		bool t = true;
+		bool f = false;
+
+		this->SetAttribute("FFTWFThreadsInitialised", &f);
+		this->SetAttribute("FFTWThreadsInitialised", &f);
+
+	}; 
 
 	map < string, Ptr< Matrix<cxfl>   > > m_cxfl; /*!< @brief Complex float data repository  */
 	map < string, Ptr< Matrix<cxdb>   > > m_cxdb; /*!< @brief Complex double data repository */

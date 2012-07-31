@@ -363,7 +363,9 @@ then
 else
   echo " -> path $FFTPATH"
   CXXFLAGS="${CXXFLAGS} -I$FFTPATH/include"
-  LIBS="${LIBS} -L$FFTPATH/lib -lfftw3 -lfftw3f -Wl,-rpath,${FFTPATH}/lib"
+  LIBS="${LIBS} -L$FFTPATH/lib -lfftw3_threads -lfftw3 -lfftw3f_threads -lfftw3f -lm -Wl,-rpath,${FFTPATH}/lib"
+  AC_DEFINE(HAVE_FFTWF_THREADS, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])
+  AC_DEFINE(HAVE_FFTW_THREADS, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])
 fi
 echo ""
 

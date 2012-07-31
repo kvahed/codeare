@@ -21,8 +21,10 @@
 #ifndef __FFTW_TRAITS_HPP__
 #define __FFTW_TRAITS_HPP__
 
-#include <fftw3.h>
+#include "DataBase.hpp"
+#include "OMP.hpp"
 
+#include <fftw3.h>
 
 template <class T>
 struct FTTraits { };
@@ -54,6 +56,56 @@ struct FTTraits<float> {
 	    return fftwf_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
+
+		/**
+	 * @brief         Initialise FFTWF threads (Should only be done once)
+	 *
+	 * @return        Success
+	 */
+	static bool 
+	InitThreads () {
+
+		bool ok = false;
+		int  nt = 1;
+
+		// Already initialised?
+		DataBase::Instance()->Attribute ("FFTWThreadsInitialised", &ok);
+		/*if (ok)
+			return ok;*/
+
+#pragma omp parallel
+		{
+			nt = omp_get_num_threads();
+		}		
+
+		printf ("Initialised FFTW with %d threads ... ", nt);
+		fflush (stdout);
+
+#ifdef HAVE_FFTW_THREADS
+		ok = fftw_init_threads();
+		if (ok) {
+			DataBase::Instance()->SetAttribute("FFTWThreadsInitialised", &ok);
+			PlanWithNThreads (nt);
+		}
+#endif
+
+		printf ("done\n");
+
+		return ok;
+		
+	}
+	
+
+	/**
+	 * @brief        Create plans with N threads
+	 * 
+	 * @param        # of threads
+	 */
+	static void 
+	PlanWithNThreads (const int& nt) { 
+		fftwf_plan_with_nthreads (nt); 
+	}
+
 
 	/**
 	 * @brief        Inlined memory allocation for performance
@@ -138,6 +190,56 @@ struct FTTraits<double> {
 	    return fftw_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
+
+	/**
+	 * @brief         Initialise FFTWF threads (Should only be done once)
+	 *
+	 * @return        Success
+	 */
+	static bool 
+	InitThreads () {
+
+		bool ok = false;
+		int  nt = 1;
+
+		// Already initialised?
+		DataBase::Instance()->Attribute ("FFTWThreadsInitialised", &ok);
+		/*if (ok)
+		  return ok;*/
+
+#pragma omp parallel
+		{
+			nt = omp_get_num_threads();
+		}		
+
+		printf ("Initialised FFTW with %d threads ...", nt);
+		fflush (stdout);
+
+#ifdef HAVE_FFTW_THREADS
+		ok = fftw_init_threads();
+		if (ok) {
+			DataBase::Instance()->SetAttribute("FFTWThreadsInitialised", &ok);
+			PlanWithNThreads (nt);
+		}
+#endif
+
+		printf ("done\n");
+
+		return ok;
+		
+	}
+	
+
+	/**
+	 * @brief        Create plans with N threads
+	 * 
+	 * @param        # of threads
+	 */
+	static void 
+	PlanWithNThreads (const int& nt) { 
+		fftw_plan_with_nthreads (nt); 
+	}
+
 
 	/**
 	 * @brief        Inlined memory allocation for performance
