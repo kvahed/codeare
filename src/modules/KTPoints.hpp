@@ -114,16 +114,15 @@ inline void
 NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result, const int& iter, float& nrmse) {
 
     nrmse = 0.0;
-	size_t i = numel (target);
 
-	while (i--)
-        nrmse += pow(abs(target[i]) - abs(result[i]), 2);
+	for (size_t i = 0; i < numel(target); i++ )
+        nrmse = nrmse + pow(abs(target[i]) - abs(result[i]), 2);
     
     nrmse = sqrt(nrmse)/norm(target);
     
 	if (iter % 5 == 0 && iter > 0)
 		printf ("\n");
-    printf ("    %04i %.6f", iter, nrmse);
+    printf ("    %04i %.6f", iter, nrmse); fflush (stdout);
 
     nrmse *= 100.0;
 

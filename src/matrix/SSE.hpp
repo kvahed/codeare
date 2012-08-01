@@ -8,8 +8,8 @@
 #include <stdio.h>
 
 enum alignment {
-	A,
-	U
+	A, /**< @brief Aligned */ 
+	U  /**< @brief Unaligned */
 };
 
 namespace SSE {
@@ -28,12 +28,12 @@ namespace SSE {
 		typedef SSETraits<T> sse_type;
 
 		inline static reg_type 
-		packed (const T* p) { 
+		aligned (const T* p) { 
 			return sse_type::loada (p); 
 		}
 
 		inline static reg_type 
-		single (const T* p) { 
+		unaligned (const T* p) { 
 			return sse_type::loadu (p); 
 		}
 
@@ -51,12 +51,12 @@ namespace SSE {
 		typedef SSETraits<T> sse_type;
 
 		inline static void
-		packed (T* p, const reg_type& a) { 
+		aligned (T* p, const reg_type& a) { 
 			sse_type::stora (p, a); 
 		}
 
 		inline static void
-		single (T* p, const reg_type& a) { 
+		unaligned (T* p, const reg_type& a) { 
 			sse_type::storu (p, a); 
 		}
 
@@ -232,32 +232,32 @@ namespace SSE {
 	 * @param  N  Length of A, B and C
 	 * @param  C  Vector C
 	 */
-	template<class T, alignment ldA, alignment ldB, alignment stC, class Op> inline static void
-	process (const T* A, const T* B, size_t N, const Op& op, T* C) {
+	template<class T, class Op> inline static void
+	process (const T* A, const T* B, size_t n, const Op& op, T* C) {
 		
 		typedef SSETraits<T>                sse_type;
 		typedef typename sse_type::Register reg_type;
 		
-		size_t   i  = 0;
 		size_t   ne = sse_type::ne;
-		size_t   na = N/ne;
+		size_t   na = floor((float)n/ne);
 		load<T>  ld;
 		store<T> st;
+		reg_type a,b,c;
 		
 		// aligned 
-		for (i=0; i < na; i+=ne) {
-			reg_type a = load<T>::packed (A + i);
-			reg_type b = load<T>::packed (B + i);
-			reg_type c = op.packed (a, b);
-			store<T>::packed (C + i, c);
+		for (size_t i = 0; i < na; i+=ne) {
+			a = load<T>::aligned (A + i);
+			b = load<T>::aligned (B + i);
+			c = op.packed (a, b);
+			store<T>::unaligned (C + i, c);
 		}
 		
 		// rest 
-		for (i=na*ne; i < N; i+=1) {
-			reg_type a = load<T>::single (A + i);
-			reg_type b = load<T>::single (B + i);
-			reg_type c = op.single (a, b);
-			store<T>::single (C + i, c);
+		for (size_t i = na*ne; i < n ; i++) {
+			a = load<T>::aligned (A + i);
+			b = load<T>::aligned (B + i);
+			c = op.single (a, b);
+			store<T>::unaligned (C + i, c);
 		}
 		
 	}; // namespace SSE

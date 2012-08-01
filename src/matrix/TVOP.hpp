@@ -38,7 +38,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> static Matrix<T> 
+	template <class T> inline static Matrix<T> 
 	Trafo (const Matrix<T>& m) {
 		
 		size_t M = m.Dim(0);
@@ -75,7 +75,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> static Matrix<T> 
+	template <class T> inline static Matrix<T> 
 	Adjoint    (const Matrix<T>& m) {
 
 		size_t M = m.Dim(0);

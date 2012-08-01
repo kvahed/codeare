@@ -74,6 +74,8 @@ AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[
     AC_MSG_WARN([No MPI compiler found, won't use MPI.])
   fi
 ])
+AC_CXX_EXCEPTIONS
+AC_CXX_HAVE_NUMERIC_LIMITS
 
 # Check SMP capabilities
 AC_OPENMP
@@ -309,6 +311,8 @@ AC_CHECK_LIB([omniDynamic4], [main],          [], [AC_MSG_ERROR([cannot find lib
 AC_CHECK_LIB([dl],           [dlopen],        [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],       [], [AC_MSG_ERROR([cannot find libz, bailing out])])
 
+AX_PTHREAD([[]])
+
 AC_ARG_WITH(fftw,   [  --with-fftw             	     Set directory of FFTW3 library])
 #############################################################
 # FFT routines
@@ -362,10 +366,17 @@ then
   exit
 else
   echo " -> path $FFTPATH"
-  CXXFLAGS="${CXXFLAGS} -I$FFTPATH/include"
-  LIBS="${LIBS} -L$FFTPATH/lib -lfftw3_threads -lfftw3 -lfftw3f_threads -lfftw3f -lm -Wl,-rpath,${FFTPATH}/lib"
-  AC_DEFINE(HAVE_FFTWF_THREADS, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])
-  AC_DEFINE(HAVE_FFTW_THREADS, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])
+  CXXFLAGS="${CXXFLAGS} -I$FFTPATH/include $PTHREAD_CFLAGS"
+  AC_CHECK_LIB([fftw3],  [fftw_execute],  [], [AC_MSG_ERROR([cannot find libfftw3, bailing out!])])
+  AC_CHECK_LIB([fftw3f], [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3, bailing out!])])
+  AC_CHECK_LIB([fftw3_threads], [fftw_init_threads], [
+    AC_DEFINE(HAVE_FFTW_THREADS, 1, [Double precision threaded fftw])
+    LIBS="-lfftw3_threads ${LIBS}"],[AC_MSG_RESULT([cannot find libfftw3_threads, single threaded double precision FFTs only!])])
+  AC_CHECK_LIB([fftw3f_threads], [fftwf_init_threads], [
+    AC_DEFINE(HAVE_FFTWF_THREADS, 1, [Float precision threaded fftw])
+    LIBS="-lfftw3f_threads ${LIBS}"],[AC_MSG_RESULT([cannot find libfftw3f_threads, single threaded float precision FFTs only!])])
+  AC_CHECK_LIB([m], [sinh], [], [AC_MSG_RESULT([cannot find libm])])
+  LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/lib"
 fi
 echo ""
 

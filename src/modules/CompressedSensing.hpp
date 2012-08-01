@@ -1,6 +1,7 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Juelich, Germany
+ *  codeare Copyright (C) 2007-2012 Kaveh Vahedipour
+ *                                  Daniel Joergens
+ *                                  Forschungszentrum Juelich, Germany
  *
  *  Stolen ;) from sparse MRI 0.2 by Michael Lustig
  *
@@ -115,7 +116,9 @@ namespace RRStrategy {
 	};
 
 
-	float Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, const Matrix<cxfl>& data, const float& t) {
+	static float 
+	Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
+		 const Matrix<cxfl>&  data, const float&            t) {
 	
 		Matrix<cxfl> om;
 		float        o = 0.0;
@@ -132,7 +135,9 @@ namespace RRStrategy {
 	}
 
 
-	float ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, const float& t, const CGParam& cgp) {
+	static float 
+	ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
+		   const float&            t, const CGParam&        cgp) {
 		
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
@@ -144,7 +149,8 @@ namespace RRStrategy {
 		om += cgp.l1;
 		om ^= p;
 		
-		for (size_t i = 0; i < om.Size(); i++) o += creal(om[i]);
+		for (size_t i = 0; i < om.Size(); i++) 
+			o += creal(om[i]);
 		
 		return cgp.tvw * o;
 
@@ -154,7 +160,9 @@ namespace RRStrategy {
 	/**
 	 *
 	 */
-	float ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g, const float& t, const CGParam& cgp) {
+	static float 
+	ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g, 
+			const float&        t, const CGParam&    cgp) {
 		
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
@@ -166,27 +174,32 @@ namespace RRStrategy {
 		om += cgp.l1;
 		om ^= p;
 		
-		for (size_t i = 0; i < om.Size(); i++) o += om[i].real();
+		for (size_t i = 0; i < om.Size(); i++) 
+			o += om[i].real();
 
 		return cgp.xfmw * o;
 
 	} 
 
 
-	float Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
-					 const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
-					 const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
-					 const Matrix<cxfl>&  data, const float             t, 
-					       float&         rmse, const CGParam&        cgp) {
+	static float 
+	Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
+			   const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
+			   const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
+			   const Matrix<cxfl>&  data, const float             t, 
+			   float&         rmse, const CGParam&        cgp) {
 		
 		float obj = 0.0;
 		float nz = (float) nnz (data); 
 		
-		obj  =              Obj    (ffdbx, ffdbg, data, t);
+		obj  = Obj (ffdbx, ffdbg, data, t);
 		rmse = sqrt(obj/nz);
 		
-		obj += (cgp.tvw)  ? ObjTV  (ttdbx, ttdbg, t, cgp) : 0.0;
-		obj += (cgp.xfmw) ? ObjXFM (x,     g,     t, cgp) : 0.0;
+		if (cgp.tvw)
+			obj += ObjTV (ttdbx, ttdbg, t, cgp);
+		
+		if (cgp.xfmw)
+			obj += ObjXFM (x, g, t, cgp);
 
 		return obj;
 
@@ -196,8 +209,9 @@ namespace RRStrategy {
 	/**
 	 * @brief Compute gradient of the data consistency
 	 */
-	Matrix<cxfl> 
-	GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CGParam& cgp) {
+	static Matrix<cxfl> 
+	GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, 
+			 const Matrix<cxfl>& data, const CGParam& cgp) {
 		
 		FT<float>& ft = *(cgp.ft);
 		DWT<cxfl>& dwt = *(cgp.dwt);
@@ -335,7 +349,7 @@ namespace RRStrategy {
 			else if (i < 1) t0 /= cgp.lsb;
 
 			// Update image
-			x += (dx * t);
+			x  += (dx * t);
 			wx  = dwt->*x;
 					
 			// CG computation 
