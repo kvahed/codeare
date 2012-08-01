@@ -772,7 +772,7 @@ resize (const Matrix<T>& M, Matrix<size_t> sz) {
 
 	Matrix<T> res  = zeros<T> (sz);
 	size_t copysz  = MIN(numel(M), numel(res));
-	slice  copyslc (0,copysz,1);
+	std::slice  copyslc (0,copysz,1);
 
 	res.Dat()[copyslc] = M.Dat()[copyslc];
 

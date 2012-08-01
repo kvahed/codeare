@@ -39,13 +39,16 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* define if the compiler supports exceptions */
+#undef HAVE_EXCEPTIONS
+
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
-/* Define to 1 if hrtime_t is defined in <sys/time.h> */
+/* Float precision threaded fftw */
 #undef HAVE_FFTWF_THREADS
 
-/* Define to 1 if hrtime_t is defined in <sys/time.h> */
+/* Double precision threaded fftw */
 #undef HAVE_FFTW_THREADS
 
 /* Define to 1 if you have the `floor' function. */
@@ -87,8 +90,17 @@
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
+/* Define to 1 if you have the `fftw3' library (-lfftw3). */
+#undef HAVE_LIBFFTW3
+
+/* Define to 1 if you have the `fftw3f' library (-lfftw3f). */
+#undef HAVE_LIBFFTW3F
+
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL
+
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
 
 /* Define to 1 if you have the `omniDynamic4' library (-lomniDynamic4). */
 #undef HAVE_LIBOMNIDYNAMIC4
@@ -144,6 +156,9 @@
 /* Define to 1 if you have the <nifti1_io.h> header file. */
 #undef HAVE_NIFTI1_IO_H
 
+/* define if the compiler has numeric_limits<T> */
+#undef HAVE_NUMERIC_LIMITS
+
 /* Define to 1 if you have the <omniORB4/CORBA.h> header file. */
 #undef HAVE_OMNIORB4_CORBA_H
 
@@ -158,6 +173,12 @@
 
 /* Define to 1 if you have the `pow' function. */
 #undef HAVE_POW
+
+/* Define if you have POSIX threads libraries and header files. */
+#undef HAVE_PTHREAD
+
+/* Have PTHREAD_PRIO_INHERIT. */
+#undef HAVE_PTHREAD_PRIO_INHERIT
 
 /* Define to 1 if the system has the type `ptrdiff_t'. */
 #undef HAVE_PTRDIFF_T
@@ -287,6 +308,10 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* Define to necessary symbol if this constant uses a non-standard name on
+   your system. */
+#undef PTHREAD_CREATE_JOINABLE
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

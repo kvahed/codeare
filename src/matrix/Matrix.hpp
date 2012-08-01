@@ -37,6 +37,7 @@ enum IceDim {
     #define INVALID_DIM 16
 #endif
 
+
 #include "config.h"
 #include "OMP.hpp"
 #include "Complex.hpp"
@@ -46,6 +47,7 @@ enum IceDim {
 
 #include <assert.h>
 #include <iostream>
+#include <memory>
 #include <fstream>
 #include <typeinfo>
 #include <stdio.h>
@@ -2462,8 +2464,10 @@ Matrix<T>::operator+ (const Matrix<S> &M) const {
     for (size_t i=0; i < INVALID_DIM; i++)
         assert (Dim(i) == M.Dim(i));
 
-    Matrix<T> res = *this;
+    Matrix<T> res = M;
+	//SSE::process<T> (&_M[0], &res[0], M.Size(), SSE::add<T>(), &res[0]) ;
 	res.Dat() += _M;
+
     return res;
 
 }
@@ -2472,8 +2476,10 @@ Matrix<T>::operator+ (const Matrix<S> &M) const {
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator+ (const S& s) const {
 
-    Matrix<T> res = *this;
-	res.Dat() += T(s);
+    Matrix<T> res = T(s);
+	//SSE::process<T> (&_M[0], &res[0], Size(), SSE::add<T>(), &res[0]) ;
+	res.Dat() += _M;
+
     return res;
 
 }
@@ -2519,14 +2525,9 @@ Matrix<T>::operator* (const Matrix<S> &M) const {
     for (size_t i = 0; i < INVALID_DIM; i++)
         assert (_dim[i] == M.Dim(i));
 
-    Matrix<T> res = *this;
-
-#pragma omp parallel default (shared) 
-	{
-#pragma omp for
-		for (size_t i = 0; i < Size(); i++)
-			res[i] *= M[i];
-	}
+    Matrix<T> res = M;
+	//SSE::process<T> (&_M[0], &res[0], M.Size(), SSE::mul<T>(), &res[0]) ;
+	res.Dat() *= _M;
 
     return res;
 
@@ -2610,7 +2611,7 @@ Matrix<T>::operator-= (const Matrix<S>& M) {
 
     for (size_t i = 0; i < INVALID_DIM; i++)
         assert (_dim[i] == M.Dim(i));
-
+	
 #pragma omp parallel default (shared) 
 	{
 #pragma omp for

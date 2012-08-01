@@ -80,9 +80,8 @@ struct FTTraits<float> {
 
 		printf ("Initialised FFTW with %d threads ... ", nt);
 		fflush (stdout);
-
-#ifdef HAVE_FFTW_THREADS
-		ok = fftw_init_threads();
+#ifdef HAVE_FFTWF_THREADS
+		ok = fftwf_init_threads();
 		if (ok) {
 			DataBase::Instance()->SetAttribute("FFTWThreadsInitialised", &ok);
 			PlanWithNThreads (nt);
