@@ -22,7 +22,6 @@
 
 namespace SSE {
 
-
 	template<class T> 
 	struct SSETraits {};
 
@@ -791,7 +790,7 @@ namespace SSE {
 	struct SSETraits< std::complex<float> > {
 		
 		typedef __m128 Register;         /**< @brief register type */
-		static const unsigned int ne = 2; /**< @brief # of processed elements */
+		static const unsigned int ne = 4; /**< @brief # of processed elements */
 		
 		/**
 		 * @brief     SSE2 load packed aligned
@@ -870,7 +869,7 @@ namespace SSE {
 			x1 = _mm_mul_ps(bb, dc);    //bd bc  
 			return _mm_addsub_ps(x0, x1);  
 		}
-	
+		
 		/**
 		 * @brief     SSE2 single multiplication
 		 */

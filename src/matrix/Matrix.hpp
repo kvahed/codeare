@@ -1150,14 +1150,7 @@ public:
             return Matrix<T> (m);
         
         Matrix<T> res = m;
-        //res.Dat() /= s;
-#pragma omp parallel
-		{
-#pragma omp for
-			for (size_t i = 0; i < res.Size(); i++)
-				res[i] /= s;
-		}
-        
+        res.Dat() /= s;
         return res;
         
     }
@@ -1173,17 +1166,12 @@ public:
     inline friend Matrix<T>    
     operator/  (const float& s, const Matrix<T> &m) { 
 
-        if (s == T(1.0))
-            return Matrix<T> (m);
-        
         Matrix<T> res = m;
-		//        res.Dat() /= s;
-#pragma omp parallel
-		{
-#pragma omp for
-			for (size_t i = 0; i < res.Size(); i++)
-				res[i] /= s;
-		}
+
+        if (s == T(1.0))
+            return res;
+        
+		res.Dat() /= s;
         
         return res;
 
@@ -1405,7 +1393,11 @@ public:
         for (size_t i = 2; i < INVALID_DIM; i++)
             _dim[i] = 1;
 
+		std::valarray<T> tmp = _M;
+
         _M.resize(Size(), T(0));
+
+		memcpy (&_M[0], &tmp[0], MIN(Size(),tmp.size()) * sizeof(T));
 
     }
     

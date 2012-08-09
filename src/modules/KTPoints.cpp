@@ -34,7 +34,6 @@ KTPoints::KTPoints  () :
 		m_conv      (1.0e-6),
 		m_lambda    (1.0e-6),
 		m_breakearly(true),
-		m_pd        (0),
 		m_gd        (1.0e-5),
 		m_nk        (0),
 		m_ns        (0),
@@ -55,10 +54,11 @@ KTPoints::Init      ()     {
     RRSModule::error_code e = OK;
 	
     // rf pulse durations --------------------
+	/*
     m_pd = (int*) malloc (sizeof(int));
     Attribute ("pd",      &m_pd[0]);   
     printf ("  starting pulse durations: %ius \n", m_pd[0]*10);
-	
+	*/
     // gradient pulse duration ----------------
     Attribute ("gd",      &m_gd);      
     printf ("  gradient blip durations: %ius \n", m_gd*10);
@@ -108,7 +108,6 @@ KTPoints::Init      ()     {
 RRSModule::error_code
 KTPoints::Finalise  ()     {
 
-    free (m_pd);
     free (m_max_rf);
 
     return OK;
@@ -136,11 +135,11 @@ KTPoints::Process   ()     {
     // m_helper: RF and gradient pulses
     // ----------------------------
 
-	Matrix<double>& k      = GetRLDB("k");
-	Matrix<double>& r      = GetRLDB("r");
-	Matrix<cxfl>&   b1     = GetCXFL("b1");
-	Matrix<short>&  b0     = GetSHRT("b0");
-	Matrix<cxfl>&   target = GetCXFL("target");
+	Matrix<float>& k      = GetRLFL("k");
+	Matrix<float>& r      = GetRLFL("r");
+	Matrix<cxfl>&  b1     = GetCXFL("b1");
+	Matrix<float>& b0     = GetRLFL("b0");
+	Matrix<cxfl>&  target = GetCXFL("target");
 
 	m_ns = r.Dim(1);
 	m_nk = k.Dim(1);
@@ -148,31 +147,27 @@ KTPoints::Process   ()     {
 
     printf ("  # spatial sites: %i \n", m_ns);
     printf ("  # transmitter: %i \n", m_nc);
+    printf ("  # kt points: %i \n", m_nk);
 
-    m_max_rf = (float*) calloc (m_nk,        sizeof(float));
-	m_pd     = (int*)  realloc (m_pd, m_nk * sizeof(int));
+    Matrix<float> m_max_rf (m_nk,1);
+	Matrix<short> m_pd (m_nk,1);
 
     for (int i = 1; i < m_nk; i++)
         m_pd[i] = m_pd[0];
 
-    Matrix<cxfl>    solution;
+    Matrix<cxfl>   solution;
+	Matrix<cxfl>&   rf     = AddMatrix (  "rf",  (Ptr<Matrix<cxfl> >)  NEW (Matrix<cxfl>  ()));
+	Matrix<float>&  grad   = AddMatrix ("grad",  (Ptr<Matrix<float> >) NEW (Matrix<float> ()));
     Matrix<cxfl>    tmp;
     Matrix<cxfl>    final;    
     Matrix<cxfl>    treg   =  m_lambda * eye<cxfl>(m_nc * m_nk);
 	Matrix<cxfl>    ve;
-	Matrix<cxfl>    vp;
 
-	if (m_verbose) {
-	    ve  = Matrix<cxfl>(m_ns,        m_maxiter);
-		vp  = Matrix<cxfl>(m_nk * m_nc, m_maxiter);
-	} else {
-	    ve  = Matrix<cxfl>(m_ns,       1);
-		vp  = Matrix<cxfl>(m_nk * m_nc,1);
-	}
+	ve  = Matrix<cxfl>(m_ns,(m_verbose) ? m_maxiter: 1);
 
     bool        pulse_amp_ok = false;
     float       nrmse = 0.0;
-	std::vector<double> res;
+	std::vector<float> res;
 	int         gc    = 0;
 
     // Start clock ------------------------
@@ -186,7 +181,7 @@ KTPoints::Process   ()     {
 		
         Matrix<cxfl> minv;
 
-        minv  = m.prodt (m);
+        minv  = m.prodt (m); 
         minv += treg;
         minv  = pinv(minv);
         minv  = minv.prod (m, 'N', 'C');
@@ -207,8 +202,6 @@ KTPoints::Process   ()     {
 			if (m_verbose) memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cxfl)); 
 			if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) break;
 
-            final    = solution;
-			
 			PhaseCorrection (target, tmp);
             
         } 
@@ -217,7 +210,7 @@ KTPoints::Process   ()     {
         
         // Check max pulse amplitude -----------------
 		
-        RFLimits (final, m_pd, m_nk, m_nc, m_max_rf); 
+        RFLimits (solution, m_pd, m_nk, m_nc, m_max_rf); 
 		
         pulse_amp_ok = true;
 		
@@ -242,35 +235,35 @@ KTPoints::Process   ()     {
         
 	} // End of pulse duration loop
 
+	
+
     printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / Toolbox::Instance()->ClockRate());
 	
 	// Put actual maximum RF amplitude into first cell
-
 	for (int i = 1; i < m_nk; i++)
 		if (m_max_rf[i] > m_max_rf[0])
 			m_max_rf[0] = m_max_rf[i];
 	// -----------------------------------
-
 	// Assemble gradient and RF timing ---
 
-	PTXTiming              (final, k, m_pd, m_gd, m_nk, m_nc, b1);
+	PTXTiming              (solution, k, m_pd, m_gd, m_nk, m_nc, rf, grad);
 	// -----------------------------------
 
 	// Write pulse file for Siemens sequences 
 	// Assuming (Sagittal/Transversal A>>P) 
 
 	stringstream ofname;
-	
+
 	ofname << m_ptxfname << ".sag_ap";
-	PTXWriteSiemensINIFile (b1, 2, 3, m_nc, 10, m_max_rf[0], ofname.str(), "s");
+	PTXWriteSiemensINIFile (rf, grad, 2, 3, m_nc, 10, m_max_rf[0], ofname.str(), "s");
 	ofname.str("");
 	ofname << m_ptxfname << ".tra_ap";
-	PTXWriteSiemensINIFile (b1, 2, 3, m_nc, 10, m_max_rf[0], ofname.str(), "t");
+	PTXWriteSiemensINIFile (rf, grad, 2, 3, m_nc, 10, m_max_rf[0], ofname.str(), "t");
 	// -----------------------------------
 
 	// Return NRMSE down the road --------
 
-    Matrix<double>&   nrmsev  = AddMatrix ("nrmse",  (Ptr<Matrix<double> >)   NEW (Matrix<double>   (gc, 1)));
+    Matrix<float>&   nrmsev  = AddMatrix ("nrmse",  (Ptr<Matrix<float> >)   NEW (Matrix<float>   (gc, 1)));
 	for (int i = 0; i < gc; i++)
 		nrmsev[i] = res[i];
 	// -----------------------------------
@@ -285,6 +278,7 @@ KTPoints::Process   ()     {
 		
 		target = tmp;
 	// ----------------------------------
+
 
     return RRSModule::OK;
 
