@@ -1,15 +1,14 @@
 #ifndef __SSE_HPP__
 #define __SSE_HPP__
 
-#include "config.h"
 #include "SSETraits.hpp"
 
 #include <math.h>
 #include <stdio.h>
 
 enum alignment {
-	A, /**< @brief Aligned */ 
-	U  /**< @brief Unaligned */
+	A,
+	U
 };
 
 namespace SSE {
@@ -56,7 +55,7 @@ namespace SSE {
 		}
 
 		inline static void
-		unaligned (T* p, const reg_type& a) { 
+	    unaligned (T* p, const reg_type& a) { 
 			sse_type::storu (p, a); 
 		}
 
@@ -238,28 +237,29 @@ namespace SSE {
 		typedef SSETraits<T>                sse_type;
 		typedef typename sse_type::Register reg_type;
 		
+		size_t   i  = 0;
 		size_t   ne = sse_type::ne;
 		size_t   na = floor((float)n/ne);
 		load<T>  ld;
 		store<T> st;
-		reg_type a,b,c;
+		reg_type a, b, c;
 		
 		// aligned 
 		for (size_t i = 0; i < na; i+=ne) {
 			a = load<T>::aligned (A + i);
 			b = load<T>::aligned (B + i);
 			c = op.packed (a, b);
-			store<T>::unaligned (C + i, c);
+			store<T>::aligned (C + i, c);
 		}
 		
-		// rest 
-		for (size_t i = na*ne; i < n ; i++) {
-			a = load<T>::aligned (A + i);
-			b = load<T>::aligned (B + i);
+		// rest
+		for (size_t i = na*ne; i < n; i++) {
+			a = load<T>::unaligned (A + i);
+			b = load<T>::unaligned (B + i);
 			c = op.single (a, b);
 			store<T>::unaligned (C + i, c);
 		}
-		
+
 	}; // namespace SSE
 
 #endif // HAVE_SSE

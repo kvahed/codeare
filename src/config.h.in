@@ -15,9 +15,6 @@
 /* Support AVX (Advanced Vector Extensions) instructions */
 #undef HAVE_AVX
 
-/* Define to 1 if you have the <cblas.h> header file. */
-#undef HAVE_CBLAS_H
-
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 

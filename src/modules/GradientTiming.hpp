@@ -295,7 +295,7 @@ Solution ComputeGradient (GradientParams& gp) {
 	size_t sk = size(sdout.k,0);
 	size_t ss = size(sf,0);
 
-	sdout.k.Resize(sk+2,1);
+	sdout.k = resize (sdout.k,sk+2,1);
 	sdout.k[sk]   = sdout.k[sk-1];
 	sdout.k[sk+1] = sdout.k[sk-1];
 
@@ -327,10 +327,14 @@ Solution ComputeGradient (GradientParams& gp) {
 	Matrix<double> tos, sot, t, pot;
 	double T;
 	size_t Nt;
-	tos    = cumsum (ds/sta);	
-	tos.Resize(size(tos,0),1);
+	
+	MXDump (sta, "sta.mat", "sta");
+	
+	tos    = cumsum (sta/(ds*size(sta,0)));
+	MXDump (tos, "tos.mat", "tos");
 	T      = tos [ss-1];
 	Nt     = round (T/gp.dt); 
+	printf ("%e, %e, %zu\n", ds, T, Nt);
 	t      = linspace<double> (0.0, T, Nt);
 
 	sot    = interp1 (tos,  sf,   t);
@@ -374,7 +378,7 @@ Solution ComputeGradient (GradientParams& gp) {
 	for (size_t i = 0; i < 3; i++)
 		s.s(Nt-2,i) = s.s(Nt-3,i);  
 	
-	t.Resize(Nt-1,1);
+	t = resize (t, Nt-1, 1);
 	s.t = t;
 
 	printf ("done: (%.3f)\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());

@@ -78,23 +78,23 @@ namespace RRStrategy {
 
     private:
  
-        int         m_nc;       /**< @brief Transmit channels       */
-        int*        m_pd;       /**< @brief Pulse durations         */
-        int         m_gd;       /**< @brief Gradient durations      */
-        int         m_ns;       /**< @brief # Spatial positions     */
-        int         m_nk;       /**< @brief # kt-points             */
-        int         m_maxiter;  /**< @brief # Variable exchange method iterations */
-		int         m_verbose;  /**< @brief Verbose output. All intermediate results. */
-		int         m_breakearly;  /**< @brief Break search with first diverging step */
+        int           m_nc;       /**< @brief Transmit channels       */
+        Matrix<short> m_pd;       /**< @brief Pulse durations         */
+        int           m_gd;       /**< @brief Gradient durations      */
+        int           m_ns;       /**< @brief # Spatial positions     */
+        int           m_nk;       /**< @brief # kt-points             */
+        int           m_maxiter;  /**< @brief # Variable exchange method iterations */
+		int           m_verbose;  /**< @brief Verbose output. All intermediate results. */
+		int           m_breakearly;  /**< @brief Break search with first diverging step */
 
-        double      m_lambda;   /**< @brief Tikhonov parameter      */
-        double      m_rflim;    /**< @brief Maximum rf amplitude    */
-        double      m_conv;     /**< @brief Convergence criterium   */
+        double        m_lambda;   /**< @brief Tikhonov parameter      */
+        double        m_rflim;    /**< @brief Maximum rf amplitude    */
+        double        m_conv;     /**< @brief Convergence criterium   */
         
-        float*      m_max_rf;   /**< @brief Maximum reached RF amps */
+        float*        m_max_rf;   /**< @brief Maximum reached RF amps */
 
-        std::string m_orient;   /**< @brief Orientation             */ 
-		std::string m_ptxfname; /**< @brief PTX file name           */
+        std::string   m_orient;   /**< @brief Orientation             */ 
+		std::string   m_ptxfname; /**< @brief PTX file name           */
 
     };
 
@@ -142,8 +142,8 @@ PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
 	size_t n = target.Size();
 	
 #pragma omp parallel for
-        for (size_t i = 0; i < n; i++) 
-			target[i] = (abs(result[i]) > 0) ? abs(target[i]) * result[i] / abs(result[i]) :  cxfl(0,0);
+	for (size_t i = 0; i < n; i++) 
+		target[i] = abs(target[i]) * result[i] / abs(result[i]);
 
 }
 
@@ -158,7 +158,8 @@ PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
  * @param  limits   Out: limits
  */
 inline void 
-RFLimits            (const Matrix<cxfl>& solution, const int* pd, const int& nk, const int& nc, float* limits) {
+RFLimits            (const Matrix<cxfl>& solution, const Matrix<short>& pd, const int& nk, 
+					 const int& nc, Matrix<float>& limits) {
     
     for (int i = 0; i < nk; i++) {
 
@@ -190,8 +191,8 @@ RFLimits            (const Matrix<cxfl>& solution, const int* pd, const int& nk,
  * @param  m        Out: m_xy
  */
 inline void
-STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cxfl>& b1, const Matrix<short>& b0, 
-	 const int& nc, const int& nk, const int& ns, const int gd, const int* pd, Matrix<cxfl>& m) {
+STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, const Matrix<float>& b0, 
+	 const int& nc, const int& nk, const int& ns, const int gd, const Matrix<short>& pd, Matrix<cxfl>& m) {
     
 	vector<float> d (nk);
 	vector<float> t (nk);
@@ -236,20 +237,21 @@ STA (const Matrix<double>& ks, const Matrix<double>& r, const Matrix<cxfl>& b1, 
  *
  */
 inline void
-PTXTiming (const Matrix<cxfl>& rf, const Matrix<double>& ks, const int* pd, const int& gd, const int& nk, const int& nc, Matrix<cxfl>& timing) {
-
+PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<short>& pd, const int& gd, 
+		   const int& nk, const int& nc, Matrix<cxfl>& rf, Matrix<float>& grad) {
+	
 	// Total pulse duration --------------
-
+	
 	int tpd = 2;  // Start and end
-	// Total excitation duration
 	for (int i = 0; i < nk-1; i++) 
 		tpd += (int) (pd[i] + gd);
 	tpd += pd[nk-1];
 	// -----------------------------------
-
+	
 	// Outgoing brepository ---------------
-
-	timing = Matrix<cxfl> (tpd, nc+3);
+	
+	rf   = Matrix<cxfl>  (tpd, nc);
+	grad = Matrix<float> (tpd, 3);
 	// -----------------------------------
 	
 	// RF Timing -------------------------
@@ -262,12 +264,12 @@ PTXTiming (const Matrix<cxfl>& rf, const Matrix<double>& ks, const int* pd, cons
 			
 			// RF action
 			for (int p = 0; p < pd[k]; p++, i++) 
-				timing(i,rc) = conj(rf(k + rc*nk)) / (float)pd[k] * cxfl(1000.0,0.0);
+				rf (i,rc) = solution(k + rc*nk) / (float) pd[k] * cxfl(1000.0,0.0);
 
 			// Gradient action, no RF
 			if (k < nk-1)
 				for (int g = 0; g <    gd; g++, i++)
-					timing(i,rc) = cxfl (0.0, 0.0);
+					grad (i,0) = 0.0;
 
 		}
 		
@@ -278,7 +280,7 @@ PTXTiming (const Matrix<cxfl>& rf, const Matrix<double>& ks, const int* pd, cons
 	
 	float gr = 0.0;
 	float sr = 0.0;
-	
+
 	for (int gc = 0; gc < 3; gc++) {
 		
 		int i = 1;
@@ -287,30 +289,30 @@ PTXTiming (const Matrix<cxfl>& rf, const Matrix<double>& ks, const int* pd, cons
 			
 			// RF action, no gradients
 			for (int p = 0; p < pd[k]; p++, i++) 
-				timing(i,nc+gc) = 0.0; 
-
-			if (k < nk-1)
-			for (int g = 0; g <    gd; g++, i++) {
+				grad (i,gc) = 0.0; 
+			
+			if (k < nk-1) 
+				for (int g = 0; g <    gd; g++, i++) {
+					
+					sr = (k+1 < nk) ? ks(gc,k+1) - ks(gc,k) : - ks(gc,i);
+					sr = 4.0 * sr / (2 * PI * 4.2576e7 * gd * gd * 1.0e-5 * 1.0e-5);
+					sr =       sr / 100.0;
 				
-				sr = (k+1 < nk) ? ks(gc,k+1) - ks(gc,k) : - ks(gc,i);
-				sr = 4.0 * sr / (2 * PI * 4.2576e7 * gd * gd * 1.0e-5 * 1.0e-5);
-				sr =       sr / 100.0;
-				
-				// Gradient action 
-				if(g < gd/2)             // ramp up
-					gr = sr * (0.5 + g);
-				else if (g < gd/2+1)     // flat top
-					0;
-				else                     // ramp down
-					gr -= sr;
-				
-				timing(i,nc+gc) = gr; 
-				
-			}
+					// Gradient action 
+					if(g < gd/2)             // ramp up
+						gr = sr * (0.5 + g);
+					else if (g < gd/2+1)     // flat top
+						0;
+					else                     // ramp down
+						gr -= sr;
+					
+					grad (i,gc) = gr; 
+					
+				}
 			
 		} 
 		
 	}
 	// ----------------------------------
-
+	
 }

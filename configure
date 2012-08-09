@@ -11776,10 +11776,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"996099fd\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"5005f34e\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Tue Jul 31 16:34:31 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Wed Aug 1 23:27:01 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -21908,20 +21908,6 @@ _ACEOF
 
 else
   as_fn_error $? "cannot find stddef.h, bailing out" "$LINENO" 5
-fi
-
-done
-
-for ac_header in cblas.h
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "cblas.h" "ac_cv_header_cblas_h" "$ac_includes_default"
-if test "x$ac_cv_header_cblas_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_CBLAS_H 1
-_ACEOF
-
-else
-  as_fn_error $? "cannot find cblas.h, bailing out" "$LINENO" 5
 fi
 
 done
