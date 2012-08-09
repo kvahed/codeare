@@ -150,10 +150,7 @@ KTPoints::Process   ()     {
     printf ("  # kt points: %i \n", m_nk);
 
     Matrix<float> m_max_rf (m_nk,1);
-	Matrix<short> m_pd (m_nk,1);
-
-    for (int i = 1; i < m_nk; i++)
-        m_pd[i] = m_pd[0];
+	Matrix<short> m_pd = ones<short>(m_nk,1);
 
     Matrix<cxfl>   solution;
 	Matrix<cxfl>&   rf     = AddMatrix (  "rf",  (Ptr<Matrix<cxfl> >)  NEW (Matrix<cxfl>  ()));
@@ -165,7 +162,7 @@ KTPoints::Process   ()     {
 
 	ve  = Matrix<cxfl>(m_ns,(m_verbose) ? m_maxiter: 1);
 
-    bool        pulse_amp_ok = false;
+    bool        amps_ok = false;
     float       nrmse = 0.0;
 	std::vector<float> res;
 	int         gc    = 0;
@@ -173,7 +170,7 @@ KTPoints::Process   ()     {
     // Start clock ------------------------
     ticks vestart = getticks();
     
-    while (!pulse_amp_ok) {
+    while (!amps_ok) {
         
         Matrix<cxfl> m (m_ns, m_nk*m_nc);
 
@@ -212,14 +209,14 @@ KTPoints::Process   ()     {
 		
         RFLimits (solution, m_pd, m_nk, m_nc, m_max_rf); 
 		
-        pulse_amp_ok = true;
+        amps_ok = true;
 		
         for (int i = 0; i < m_nk; i++)
-            if (m_max_rf[i] > m_rflim) pulse_amp_ok = false;
+            if (m_max_rf[i] > m_rflim) amps_ok = false;
         
         // Update Pulse durations if necessary -------
 		
-        if (!pulse_amp_ok) {
+        if (!amps_ok) {
 			
             printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
             
