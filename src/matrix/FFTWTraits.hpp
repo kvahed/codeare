@@ -78,8 +78,9 @@ struct FTTraits<float> {
 			nt = omp_get_num_threads();
 		}		
 
-		printf ("Initialised FFTW with %d threads ... ", nt);
+		printf ("  Initialising %d-threaded FFT ... ", nt);
 		fflush (stdout);
+
 #ifdef HAVE_FFTWF_THREADS
 		ok = fftwf_init_threads();
 		if (ok) {
@@ -211,7 +212,7 @@ struct FTTraits<double> {
 			nt = omp_get_num_threads();
 		}		
 
-		printf ("Initialised FFTW with %d threads ...", nt);
+		printf ("Initialising %d-threaded FFT ...", nt);
 		fflush (stdout);
 
 #ifdef HAVE_FFTW_THREADS
