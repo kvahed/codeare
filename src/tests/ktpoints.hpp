@@ -32,10 +32,9 @@ ktptest (Connector<T>* rc) {
 
 	Matrix<cxfl>   rf;
 	Matrix<float>  grad;
+	Matrix<float>  nrmse;
 
-	rc->GetMatrix ("target", target);
-	rc->GetMatrix ("ep",     b1);
-	rc->GetMatrix ("nrmse",  r);
+	rc->GetMatrix ("nrmse",  nrmse);
 	rc->GetMatrix ("rf",     rf);
 	rc->GetMatrix ("grad",   grad);
 
@@ -51,11 +50,9 @@ ktptest (Connector<T>* rc) {
 		return false;
 	}
 
-	MXDump (target, mf, "pattern");
-	MXDump     (b1, mf, "ptx");
-	MXDump      (r, mf, "nrmse");
-	MXDump (  grad, mf, "grad");
-	MXDump (    rf, mf, "rf");
+	MXDump (nrmse, mf, "nrmse");
+	MXDump ( grad, mf,  "grad");
+	MXDump (   rf, mf,    "rf");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n",fname.c_str());

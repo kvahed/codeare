@@ -105,8 +105,6 @@ KTPoints::Init      ()     {
 RRSModule::error_code
 KTPoints::Finalise  ()     {
 
-    free (m_max_rf);
-
     return OK;
 
 }
@@ -119,17 +117,17 @@ KTPoints::Process   ()     {
 
     // On entry -------------------
     //
-    // m_raw:     target pattern
-    // m_kspace:  kt points
-    // m_pixel:   b0 (Hz)
-    // m_rhelper: b1+ maps
-    // m_helper:  spatial positions
+    // target: target pattern
+    // k:      kt points
+    // b0:     b0 (Hz)
+    // b1:     b1+ maps
+    // r:      spatial positions
     // ----------------------------
 
     // On exit --------------------
     // 
-    // m_raw:    Excitation profile
-    // m_helper: RF and gradient pulses
+    // rf:     RF pulses
+    // grad:   Gradient pulses
     // ----------------------------
 
     Matrix<float>& k      = GetRLFL("k");
@@ -138,62 +136,43 @@ KTPoints::Process   ()     {
     Matrix<float>& b0     = GetRLFL("b0");
     Matrix<cxfl>&  target = GetCXFL("target");
 
-    size_t ns = size( r,1);
-    size_t nk = size( k,1);
-    size_t nc = size(b1,1);
+    size_t ns = size( r,1); // # of spatial positions
+    size_t nk = size( k,1); // # of kt points
+    size_t nc = size(b1,1); // # of RF channels
 
     printf ("  # spatial sites: %i \n", ns);
     printf ("  # transmitter: %i \n", nc);
     printf ("  # kt points: %i \n", nk);
 
-    Matrix<float> m_max_rf (nk,1);
-    Matrix<short> m_pd = ones<short>(nk,1);
+    Matrix<float> max_rf (nk,1);
+    Matrix<short> pd = ones<short>(nk,1); // Starting with shortest pulses possible 
 
-    Matrix<cxfl>    solution;
-    Matrix<cxfl>    final;
-    Matrix<cxfl>&   rf     = AddMatrix (  "rf",  (Ptr<Matrix<cxfl> >)  NEW (Matrix<cxfl>  ()));
+    Matrix<cxfl>    solution; // Solution for timing calculation
+    Matrix<cxfl>    final;    // Excitation profile
+
+    Matrix<cxfl>&   rf     = AddMatrix (  "rf",  (Ptr<Matrix<cxfl> >)  NEW (Matrix<cxfl>  ())); 
     Matrix<float>&  grad   = AddMatrix ("grad",  (Ptr<Matrix<float> >) NEW (Matrix<float> ()));
-    Matrix<cxfl>    ve;
-    Matrix<cxfl> m (ns, nk*nc);
 
-    ve  = Matrix<cxfl>(ns,(m_verbose) ? m_maxiter: 1);
+    Matrix<cxfl> m (ns, nk*nc); // STA system encoding matrix
 
     bool        amps_ok = false;
-    int         gc    = 0;
+    size_t      gc    = 0;      // Global counter for VE iterations
 
-    // Start clock ------------------------
+	Matrix<float>& res     = AddMatrix ("nrmse",  (Ptr<Matrix<float> >) NEW (Matrix<float> (m_maxiter,1)));
+
     ticks vestart = getticks();
     printf ("Starting KT-Points algorithm ...\n");
     
     while (!amps_ok) {
         
-        STA   (k, r, b1, b0, nc, nk, ns, m_gd, m_pd, m);
-        KTPSolve (m, target, final, solution, m_lambda, m_maxiter, m_conv, m_breakearly);
+		// Compute SEM
+        STA   (k, r, b1, b0, nc, nk, ns, m_gd, pd, m);
+
+		// Solve KTPoints
+        KTPSolve (m, target, final, solution, m_lambda, m_maxiter, m_conv, m_breakearly, gc, res);
     
         // Check max pulse amplitude -----------------        
-        printf ("  Checking pulse amplitudes: "); fflush(stdout);
-
-        RFLimits (solution, m_pd, nk, nc, m_max_rf); 
-        amps_ok = true;
-        
-        for (int i = 0; i < nk; i++)
-            if (m_max_rf[i] > m_rflim) amps_ok = false;
-        
-        // Update Pulse durations if necessary -------
-        
-        if (!amps_ok) {
-            
-            printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
-            
-            for (int i = 0; i < nk; i++) {
-                m_pd[i] = 1 + (int) (m_max_rf[i] * m_pd[i] / m_rflim); 
-                printf ("%i ", 10*m_pd[i]); fflush(stdout);
-            }
-            
-            printf ("[us] ... done.\n\n");
-
-        } else 
-            printf ("OK\n\n");
+		amps_ok = CheckAmps(solution, pd, nk, nc, max_rf, m_rflim);
         
     } // End of pulse duration loop
 
@@ -201,12 +180,12 @@ KTPoints::Process   ()     {
     
     // Put actual maximum RF amplitude into first cell
     for (int i = 1; i < nk; i++)
-        if (m_max_rf[i] > m_max_rf[0])
-            m_max_rf[0] = m_max_rf[i];
+        if (max_rf[i] > max_rf[0])
+            max_rf[0] = max_rf[i];
     // -----------------------------------
     // Assemble gradient and RF timing ---
 
-    PTXTiming (solution, k, m_pd, m_gd, nk, nc, rf, grad);
+    PTXTiming (solution, k, pd, m_gd, nk, nc, rf, grad);
     // -----------------------------------
 
     // Write pulse file for Siemens sequences 
@@ -215,23 +194,11 @@ KTPoints::Process   ()     {
     stringstream ofname;
 
     ofname << m_ptxfname << ".sag_ap";
-    PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, m_max_rf[0], ofname.str(), "s");
+    PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "s");
     ofname.str("");
     ofname << m_ptxfname << ".tra_ap";
-    PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, m_max_rf[0], ofname.str(), "t");
+    PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "t");
     // -----------------------------------
-
-    // Excitation profile ----------------
-    /*    if (m_verbose) {
-
-        Matrix<cxfl>& ep = AddMatrix ("ep",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (target.Dim(0), gc)));
-        memcpy (&ep[0], &ve[0], gc * target.Dim(0) * sizeof(cxfl));
-
-    } else
-        
-    target;*/
-    // ----------------------------------
-
 
     return RRSModule::OK;
 

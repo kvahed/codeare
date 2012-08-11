@@ -111,7 +111,7 @@ namespace RRStrategy {
  * @param  nrmse    Returned NRMSE
  */
 inline float
-NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result, const int& iter) {
+NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
 
     float nrmse = 0.0;
 
@@ -120,11 +120,7 @@ NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result,
     
     nrmse = sqrt(nrmse)/norm(target);
     
-    if (iter % 5 == 0 && iter > 0)
-        printf ("\n");
-    printf ("    %04i %.6f", iter, nrmse); fflush (stdout);
-
-    return nrmse * 100.0;
+    return nrmse;
 
 }
 
@@ -144,34 +140,6 @@ PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
 #pragma omp parallel for
     for (size_t i = 0; i < n; i++) 
         target[i] = abs(target[i]) * result[i] / abs(result[i]);
-
-}
-
-
-/**
- * @brief           RF limts
- *
- * @param  solution In:  Calculated solution
- * @param  pd       In:  Pulse durations
- * @param  nk       In:  # Pulses
- * @param  nc       In:  # Coils
- * @param  limits   Out: limits
- */
-inline static void 
-RFLimits            (const Matrix<cxfl>& solution, const Matrix<short>& pd, const int& nk, 
-                     const int& nc, Matrix<float>& limits) {
-    
-    for (int i = 0; i < nk; i++) {
-
-        limits[i] = 0.0;
-        
-        for (int j = 0; j < nc; j++)
-            if (limits[i] < abs (solution[i+nk*j]) / (float)(10.0*pd[i])) 
-                limits[i] = abs (solution[i+nk*j]) / (float)(10.0*pd[i]);
-
-        limits[i] *= 100.0;
-
-    }
 
 }
 
@@ -329,16 +297,14 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<s
 static inline void
 KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
           Matrix<cxfl>& solution, const double& lambda, const size_t& mxit, 
-          const float& conv, const bool& breakearly) {
+          const float& conv, const bool& breakearly, size_t& gc, 
+		  Matrix<float>& res) {
 
     ticks start = getticks();
     printf ("  Starting variable exchange method ...\n");
     
     Matrix<cxfl> treg = lambda * eye<cxfl>(size(m,1));
     Matrix<cxfl> minv;
-    size_t gc = 0;
-    
-    std::vector<float> res;
     
     minv  = m.prodt (m); 
     minv += treg;
@@ -346,21 +312,73 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
     minv  = minv.prod (m, 'N', 'C');
     
     // Valriable exchange method --------------
-    for (size_t j = 0; j < mxit; j++, gc++) {
-        
+    for (size_t j = 0; gc < mxit; j++, gc++) {
+		
         solution = minv ->* target;
         final    = m    ->* solution;
         
-        res.push_back (NRMSE (target, final, gc));
-        
+        res[gc]  = NRMSE (target, final);
+        PhaseCorrection  (target, final);
+		
+		if (j % 5 == 0 && j > 0)
+			printf ("\n");
+
+		printf ("    %04i %.6f", gc, res[gc]); 
+
+		fflush (stdout);
+
         /*if (m_verbose) memcpy (&ve(0,gc), &final.At(0), tmp.Size() * sizeof(cxfl)); */
-        if (gc && breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < conv)) 
+        if ((gc && j && breakearly && res[gc] > res[gc-1]) || res[gc] < conv) 
             break;
-        
-        PhaseCorrection (target, final);
         
     } 
     
     printf ("\n  ... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
     
+}
+
+
+
+inline static bool 
+CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk, 
+		   const size_t& nc, Matrix<float>& max_rf, const float& rflim) {
+
+	bool amps_ok = true;
+
+	printf ("  Checking pulse amplitudes: "); 
+	fflush(stdout);
+	
+    for (size_t i = 0; i < nk; i++) {
+
+        max_rf[i] = 0.0;
+        
+        for (int j = 0; j < nc; j++)
+            if (max_rf[i] < abs (solution[i+nk*j]) / (float)(10.0*pd[i])) 
+                max_rf[i] = abs (solution[i+nk*j]) / (float)(10.0*pd[i]);
+
+        max_rf[i] *= 100.0;
+
+    }
+    
+	for (int i = 0; i < nk; i++)
+		if (max_rf[i] > rflim) amps_ok = false;
+	
+	// Update Pulse durations if necessary -------
+    
+	if (!amps_ok) {
+		
+		printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
+        
+		for (int i = 0; i < nk; i++) {
+			pd[i] = 1 + (int) (max_rf[i] * pd[i] / rflim); 
+			printf ("%i ", 10*pd[i]); fflush(stdout);
+		}
+        
+		printf ("[us] ... done.\n\n");
+		
+	} else 
+		printf ("OK\n\n");
+
+	return amps_ok;
+	
 }
