@@ -316,11 +316,6 @@ private:
 	void 
 	Allocate (const int rank, const int* n) {
 		
-		if (!FTTraits<T>::InitThreads())
-			printf ("  Single threaded FFTW\n");
-		else 
-			printf ("  Multithreaded FFTW\n");
-
 		m_in     = FTTraits<T>::Malloc  (m_N);
 		m_out    = FTTraits<T>::Malloc  (m_N);
 

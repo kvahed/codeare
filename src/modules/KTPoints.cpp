@@ -28,17 +28,14 @@ using namespace RRStrategy;
 
 
 KTPoints::KTPoints  () :
-		m_verbose   (false),
-		m_rflim     (1.0),
-		m_nc        (1),
-		m_conv      (1.0e-6),
-		m_lambda    (1.0e-6),
-		m_breakearly(true),
-		m_gd        (1.0e-5),
-		m_nk        (0),
-		m_ns        (0),
-		m_max_rf    (0),
-		m_maxiter   (1000) {
+        m_verbose   (false),
+        m_rflim     (1.0),
+        m_conv      (1.0e-6),
+        m_lambda    (1.0e-6),
+        m_breakearly(true),
+        m_gd        (1.0e-5),
+        m_max_rf    (0),
+        m_maxiter   (1000) {
 
 }
 
@@ -50,56 +47,56 @@ RRSModule::error_code
 KTPoints::Init      ()     {
 
     printf ("Intialising KTPoints ...\n");
-	
+    
     RRSModule::error_code e = OK;
-	
+    
     // rf pulse durations --------------------
-	/*
+    /*
     m_pd = (int*) malloc (sizeof(int));
     Attribute ("pd",      &m_pd[0]);   
     printf ("  starting pulse durations: %ius \n", m_pd[0]*10);
-	*/
+    */
     // gradient pulse duration ----------------
     Attribute ("gd",      &m_gd);      
     printf ("  gradient blip durations: %ius \n", m_gd*10);
-	
+    
     // Max # of iterations --------------------
     Attribute ("maxiter", &m_maxiter);
-	printf ("  maximum iterations: %i \n", m_maxiter);
+    printf ("  maximum iterations: %i \n", m_maxiter);
     
     // # Tikhonov parameter from L-curve learning 
     // ca. [0.005...0.05] for human -----------
     Attribute ("lambda",  &m_lambda);  
-	printf ("  tikhonov parameter: %.4f \n", m_lambda);
-	
+    printf ("  tikhonov parameter: %.4f \n", m_lambda);
+    
     // # RF limit (usualy in [0 1]) -----------
     Attribute ("rflim",   &m_rflim);  
-	printf ("  RF amplitude limit: %.4f \n", m_rflim);
+    printf ("  RF amplitude limit: %.4f \n", m_rflim);
     
     // Convergence limit ----------------------
     Attribute ("conv",    &m_conv); 
-	printf ("  Convergence criterium: %.4f \n", m_conv);
+    printf ("  Convergence criterium: %.4f \n", m_conv);
     
-	// Pulse orientation ----------------------
-	m_orient = Attribute ("orientation");
-	printf ("  orientation: %s \n", m_orient.c_str());
+    // Pulse orientation ----------------------
+    m_orient = Attribute ("orientation");
+    printf ("  orientation: %s \n", m_orient.c_str());
 
-	// PTX file name --------------------------
-	m_ptxfname = Attribute ("ptxfname");
-	printf ("  ptx file name: %s \n", m_ptxfname.c_str());
+    // PTX file name --------------------------
+    m_ptxfname = Attribute ("ptxfname");
+    printf ("  ptx file name: %s \n", m_ptxfname.c_str());
 
-	// PTX file name --------------------------
-	Attribute ("verbose", &m_verbose);
-	printf ("  verbosity: %i \n", m_verbose);
+    // PTX file name --------------------------
+    Attribute ("verbose", &m_verbose);
+    printf ("  verbosity: %i \n", m_verbose);
 
-	// Break loop early --------------------------
-	Attribute ("breakearly", &m_breakearly);
-	printf ("  break early: %i \n", m_breakearly);
+    // Break loop early --------------------------
+    Attribute ("breakearly", &m_breakearly);
+    printf ("  break early: %i \n", m_breakearly);
 
-	// ----------------------------------------
-	
+    // ----------------------------------------
+    
     printf ("... done.\n\n");
-	
+    
     return e;
 
 }
@@ -135,146 +132,105 @@ KTPoints::Process   ()     {
     // m_helper: RF and gradient pulses
     // ----------------------------
 
-	Matrix<float>& k      = GetRLFL("k");
-	Matrix<float>& r      = GetRLFL("r");
-	Matrix<cxfl>&  b1     = GetCXFL("b1");
-	Matrix<float>& b0     = GetRLFL("b0");
-	Matrix<cxfl>&  target = GetCXFL("target");
+    Matrix<float>& k      = GetRLFL("k");
+    Matrix<float>& r      = GetRLFL("r");
+    Matrix<cxfl>&  b1     = GetCXFL("b1");
+    Matrix<float>& b0     = GetRLFL("b0");
+    Matrix<cxfl>&  target = GetCXFL("target");
 
-	m_ns = r.Dim(1);
-	m_nk = k.Dim(1);
-	m_nc = b1.Dim(1);
+    size_t ns = size( r,1);
+    size_t nk = size( k,1);
+    size_t nc = size(b1,1);
 
-    printf ("  # spatial sites: %i \n", m_ns);
-    printf ("  # transmitter: %i \n", m_nc);
-    printf ("  # kt points: %i \n", m_nk);
+    printf ("  # spatial sites: %i \n", ns);
+    printf ("  # transmitter: %i \n", nc);
+    printf ("  # kt points: %i \n", nk);
 
-    Matrix<float> m_max_rf (m_nk,1);
-	Matrix<short> m_pd = ones<short>(m_nk,1);
+    Matrix<float> m_max_rf (nk,1);
+    Matrix<short> m_pd = ones<short>(nk,1);
 
-    Matrix<cxfl>   solution;
-	Matrix<cxfl>&   rf     = AddMatrix (  "rf",  (Ptr<Matrix<cxfl> >)  NEW (Matrix<cxfl>  ()));
-	Matrix<float>&  grad   = AddMatrix ("grad",  (Ptr<Matrix<float> >) NEW (Matrix<float> ()));
-    Matrix<cxfl>    tmp;
-    Matrix<cxfl>    final;    
-    Matrix<cxfl>    treg   =  m_lambda * eye<cxfl>(m_nc * m_nk);
-	Matrix<cxfl>    ve;
+    Matrix<cxfl>    solution;
+    Matrix<cxfl>    final;
+    Matrix<cxfl>&   rf     = AddMatrix (  "rf",  (Ptr<Matrix<cxfl> >)  NEW (Matrix<cxfl>  ()));
+    Matrix<float>&  grad   = AddMatrix ("grad",  (Ptr<Matrix<float> >) NEW (Matrix<float> ()));
+    Matrix<cxfl>    ve;
+    Matrix<cxfl> m (ns, nk*nc);
 
-	ve  = Matrix<cxfl>(m_ns,(m_verbose) ? m_maxiter: 1);
+    ve  = Matrix<cxfl>(ns,(m_verbose) ? m_maxiter: 1);
 
     bool        amps_ok = false;
-    float       nrmse = 0.0;
-	std::vector<float> res;
-	int         gc    = 0;
+    int         gc    = 0;
 
     // Start clock ------------------------
     ticks vestart = getticks();
+    printf ("Starting KT-Points algorithm ...\n");
     
     while (!amps_ok) {
         
-        Matrix<cxfl> m (m_ns, m_nk*m_nc);
+        STA   (k, r, b1, b0, nc, nk, ns, m_gd, m_pd, m);
+        KTPSolve (m, target, final, solution, m_lambda, m_maxiter, m_conv, m_breakearly);
+    
+        // Check max pulse amplitude -----------------        
+        printf ("  Checking pulse amplitudes: "); fflush(stdout);
 
-        STA (k, r, b1, b0, m_nc, m_nk, m_ns, m_gd, m_pd, m);
-		
-        Matrix<cxfl> minv;
-
-        minv  = m.prodt (m); 
-        minv += treg;
-        minv  = pinv(minv);
-        minv  = minv.prod (m, 'N', 'C');
-        
-        // Valriable exchange method --------------
-        
-        printf ("  Starting variable exchange method ...\n");
-
-        for (int j = 0; j < m_maxiter; j++, gc++) {
-			
-            solution = minv->*(target);
-            tmp      = m->*(solution);
-
-            NRMSE (target, tmp, gc, nrmse);
-			
-            res.push_back (nrmse);
-            
-			if (m_verbose) memcpy (&ve(0,gc), &tmp.At(0), tmp.Size() * sizeof(cxfl)); 
-			if (gc && m_breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < m_conv)) break;
-
-			PhaseCorrection (target, tmp);
-            
-        } 
-        
-        printf ("\n  ... done.\n  Checking pulse amplitudes: "); fflush(stdout);
-        
-        // Check max pulse amplitude -----------------
-		
-        RFLimits (solution, m_pd, m_nk, m_nc, m_max_rf); 
-		
+        RFLimits (solution, m_pd, nk, nc, m_max_rf); 
         amps_ok = true;
-		
-        for (int i = 0; i < m_nk; i++)
+        
+        for (int i = 0; i < nk; i++)
             if (m_max_rf[i] > m_rflim) amps_ok = false;
         
         // Update Pulse durations if necessary -------
-		
+        
         if (!amps_ok) {
-			
+            
             printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
             
-            for (int i = 0; i < m_nk; i++) {
+            for (int i = 0; i < nk; i++) {
                 m_pd[i] = 1 + (int) (m_max_rf[i] * m_pd[i] / m_rflim); 
-				printf ("%i ", 10*m_pd[i]); fflush(stdout);
-			}
+                printf ("%i ", 10*m_pd[i]); fflush(stdout);
+            }
             
-            printf ("[us] ... done.\n");
+            printf ("[us] ... done.\n\n");
 
         } else 
-			printf ("OK\n");
+            printf ("OK\n\n");
         
-	} // End of pulse duration loop
-
-	
+    } // End of pulse duration loop
 
     printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) / Toolbox::Instance()->ClockRate());
-	
-	// Put actual maximum RF amplitude into first cell
-	for (int i = 1; i < m_nk; i++)
-		if (m_max_rf[i] > m_max_rf[0])
-			m_max_rf[0] = m_max_rf[i];
-	// -----------------------------------
-	// Assemble gradient and RF timing ---
+    
+    // Put actual maximum RF amplitude into first cell
+    for (int i = 1; i < nk; i++)
+        if (m_max_rf[i] > m_max_rf[0])
+            m_max_rf[0] = m_max_rf[i];
+    // -----------------------------------
+    // Assemble gradient and RF timing ---
 
-	PTXTiming              (solution, k, m_pd, m_gd, m_nk, m_nc, rf, grad);
-	// -----------------------------------
+    PTXTiming (solution, k, m_pd, m_gd, nk, nc, rf, grad);
+    // -----------------------------------
 
-	// Write pulse file for Siemens sequences 
-	// Assuming (Sagittal/Transversal A>>P) 
+    // Write pulse file for Siemens sequences 
+    // Assuming (Sagittal/Transversal A>>P) 
 
-	stringstream ofname;
+    stringstream ofname;
 
-	ofname << m_ptxfname << ".sag_ap";
-	PTXWriteSiemensINIFile (rf, grad, 2, 3, m_nc, 10, m_max_rf[0], ofname.str(), "s");
-	ofname.str("");
-	ofname << m_ptxfname << ".tra_ap";
-	PTXWriteSiemensINIFile (rf, grad, 2, 3, m_nc, 10, m_max_rf[0], ofname.str(), "t");
-	// -----------------------------------
+    ofname << m_ptxfname << ".sag_ap";
+    PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, m_max_rf[0], ofname.str(), "s");
+    ofname.str("");
+    ofname << m_ptxfname << ".tra_ap";
+    PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, m_max_rf[0], ofname.str(), "t");
+    // -----------------------------------
 
-	// Return NRMSE down the road --------
+    // Excitation profile ----------------
+    /*    if (m_verbose) {
 
-    Matrix<float>&   nrmsev  = AddMatrix ("nrmse",  (Ptr<Matrix<float> >)   NEW (Matrix<float>   (gc, 1)));
-	for (int i = 0; i < gc; i++)
-		nrmsev[i] = res[i];
-	// -----------------------------------
+        Matrix<cxfl>& ep = AddMatrix ("ep",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (target.Dim(0), gc)));
+        memcpy (&ep[0], &ve[0], gc * target.Dim(0) * sizeof(cxfl));
 
-	// Excitation profile ----------------
-	if (m_verbose) {
-
-		Matrix<cxfl>& ep = AddMatrix ("ep",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (target.Dim(0), gc)));
-		memcpy (&ep[0], &ve[0], gc * target.Dim(0) * sizeof(cxfl));
-
-	} else
-		
-		target = tmp;
-	// ----------------------------------
+    } else
+        
+    target;*/
+    // ----------------------------------
 
 
     return RRSModule::OK;

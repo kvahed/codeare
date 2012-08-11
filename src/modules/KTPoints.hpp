@@ -34,8 +34,8 @@ namespace RRStrategy {
 
     /**
      * @brief Spatial domain method for RF pulse generation with variable exchange method<br/>
-	 *        Cloos MA, Boulant N, Luong M, Ferrand G, Giacomini E, Le Bihan D, Amadon A.<br/>
-	 *        kT-points: short three-dimensional tailored RF pulses for flip-angle homogenization over an extended volume. MRM:2012; 67(1), 72–80.
+     *        Cloos MA, Boulant N, Luong M, Ferrand G, Giacomini E, Le Bihan D, Amadon A.<br/>
+     *        kT-points: short three-dimensional tailored RF pulses for flip-angle homogenization over an extended volume. MRM:2012; 67(1), 72–80.
      */
     class KTPoints : public ReconStrategy {
         
@@ -78,14 +78,14 @@ namespace RRStrategy {
 
     private:
  
-        int           m_nc;       /**< @brief Transmit channels       */
+        int           nc;       /**< @brief Transmit channels       */
         Matrix<short> m_pd;       /**< @brief Pulse durations         */
         int           m_gd;       /**< @brief Gradient durations      */
-        int           m_ns;       /**< @brief # Spatial positions     */
-        int           m_nk;       /**< @brief # kt-points             */
+        int           ns;       /**< @brief # Spatial positions     */
+        int           nk;       /**< @brief # kt-points             */
         int           m_maxiter;  /**< @brief # Variable exchange method iterations */
-		int           m_verbose;  /**< @brief Verbose output. All intermediate results. */
-		int           m_breakearly;  /**< @brief Break search with first diverging step */
+        int           m_verbose;  /**< @brief Verbose output. All intermediate results. */
+        int           m_breakearly;  /**< @brief Break search with first diverging step */
 
         double        m_lambda;   /**< @brief Tikhonov parameter      */
         double        m_rflim;    /**< @brief Maximum rf amplitude    */
@@ -94,7 +94,7 @@ namespace RRStrategy {
         float*        m_max_rf;   /**< @brief Maximum reached RF amps */
 
         std::string   m_orient;   /**< @brief Orientation             */ 
-		std::string   m_ptxfname; /**< @brief PTX file name           */
+        std::string   m_ptxfname; /**< @brief PTX file name           */
 
     };
 
@@ -110,21 +110,21 @@ namespace RRStrategy {
  * @param  iter     Iteration
  * @param  nrmse    Returned NRMSE
  */
-inline void
-NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result, const int& iter, float& nrmse) {
+inline float
+NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result, const int& iter) {
 
-    nrmse = 0.0;
+    float nrmse = 0.0;
 
-	for (size_t i = 0; i < numel(target); i++ )
+    for (size_t i = 0; i < numel(target); i++ )
         nrmse = nrmse + pow(abs(target[i]) - abs(result[i]), 2);
     
     nrmse = sqrt(nrmse)/norm(target);
     
-	if (iter % 5 == 0 && iter > 0)
-		printf ("\n");
+    if (iter % 5 == 0 && iter > 0)
+        printf ("\n");
     printf ("    %04i %.6f", iter, nrmse); fflush (stdout);
 
-    nrmse *= 100.0;
+    return nrmse * 100.0;
 
 }
 
@@ -136,14 +136,14 @@ NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result,
  * @param  result   Achieved result
  * @return          Phase corrected 
  */
-inline void
+inline static void
 PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
     
-	size_t n = target.Size();
-	
+    size_t n = target.Size();
+    
 #pragma omp parallel for
-	for (size_t i = 0; i < n; i++) 
-		target[i] = abs(target[i]) * result[i] / abs(result[i]);
+    for (size_t i = 0; i < n; i++) 
+        target[i] = abs(target[i]) * result[i] / abs(result[i]);
 
 }
 
@@ -157,9 +157,9 @@ PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
  * @param  nc       In:  # Coils
  * @param  limits   Out: limits
  */
-inline void 
+inline static void 
 RFLimits            (const Matrix<cxfl>& solution, const Matrix<short>& pd, const int& nk, 
-					 const int& nc, Matrix<float>& limits) {
+                     const int& nc, Matrix<float>& limits) {
     
     for (int i = 0; i < nk; i++) {
 
@@ -169,7 +169,7 @@ RFLimits            (const Matrix<cxfl>& solution, const Matrix<short>& pd, cons
             if (limits[i] < abs (solution[i+nk*j]) / (float)(10.0*pd[i])) 
                 limits[i] = abs (solution[i+nk*j]) / (float)(10.0*pd[i]);
 
-		limits[i] *= 100.0;
+        limits[i] *= 100.0;
 
     }
 
@@ -190,27 +190,30 @@ RFLimits            (const Matrix<cxfl>& solution, const Matrix<short>& pd, cons
  * @param  pd       Pulse durations
  * @param  m        Out: m_xy
  */
-inline void
+inline static void
 STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, const Matrix<float>& b0, 
-	 const int& nc, const int& nk, const int& ns, const int gd, const Matrix<short>& pd, Matrix<cxfl>& m) {
+     const int& nc, const int& nk, const int& ns, const int gd, const Matrix<short>& pd, Matrix<cxfl>& m) {
+
+    ticks start = getticks();
+    printf ("  Computing STA encoding matrix ..."); 
+    fflush (stdout);
     
-	vector<float> d (nk);
-	vector<float> t (nk);
+    vector<float> d (nk);
+    vector<float> t (nk);
 
-	for (int i = 0; i< nk; i++)
-		d[i] = (i==0) ? pd[i] + gd : d[i-1] + pd[i] + gd;
+    for (int i = 0; i< nk; i++)
+        d[i] = (i==0) ? pd[i] + gd : d[i-1] + pd[i] + gd;
 
-	for (int i = 0; i< nk; i++)		
-		t[i] = d [nk-i-1];
-	
-	for (int i = 0; i < nk-1; i++)
-		d[i] = 1.0e-5 * t[i+1] + 1.0e-5 * pd[i]/2;
+    for (int i = 0; i< nk; i++)        
+        t[i] = d [nk-i-1];
+    
+    for (int i = 0; i < nk-1; i++)
+        d[i] = 1.0e-5 * t[i+1] + 1.0e-5 * pd[i]/2;
 
-	d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
+    d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
 
-    cxfl pgd = cxfl (0, 2.0 * PI * 4.2576e7 * 1.0e-5); 
+    float pgd = 2.0 * PI * 4.2576e7 * 1.0e-5; 
 
-	// pTX STA 
 #pragma omp parallel default (shared) 
     {
 
@@ -219,15 +222,17 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
             for (int k = 0; k < nk; k++) 
                 for (int s = 0; s < ns; s++) 
                     m(s, c*nk + k) = 
-						// b1 (s,c)
+                        // b1 (s,c)
                         pgd * b1(s,c) *
-						// off resonance: exp (2i\pidb0dt)  
+                        // off resonance: exp (2i\pidb0dt)  
                         exp (cxfl(0, 2.0 * PI * d[k] * (float) b0(s))) *
-						// encoding: exp (i k(t) r)
+                        // encoding: exp (i k(t) r)
                         exp (cxfl(0,(ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s))));
         
     }
-	
+
+    printf (" done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+
 }
 
 
@@ -236,83 +241,126 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
  *
  *
  */
-inline void
+static inline void
 PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<short>& pd, const int& gd, 
-		   const int& nk, const int& nc, Matrix<cxfl>& rf, Matrix<float>& grad) {
-	
-	// Total pulse duration --------------
-	
-	int tpd = 2;  // Start and end
-	for (int i = 0; i < nk-1; i++) 
-		tpd += (int) (pd[i] + gd);
-	tpd += pd[nk-1];
-	// -----------------------------------
-	
-	// Outgoing brepository ---------------
-	
-	rf   = Matrix<cxfl>  (tpd, nc);
-	grad = Matrix<float> (tpd, 3);
-	// -----------------------------------
-	
-	// RF Timing -------------------------
+           const int& nk, const int& nc, Matrix<cxfl>& rf, Matrix<float>& grad) {
+    
 
-	for (int rc = 0; rc < nc; rc++) {
-		
-		int i = 1;
-		
-		for (int k = 0; k < nk; k++) {
-			
-			// RF action
-			for (int p = 0; p < pd[k]; p++, i++) 
-				rf (i,rc) = solution(k + rc*nk) / (float) pd[k] * cxfl(1000.0,0.0);
+    // Total pulse duration --------------
+    
+    int tpd = 2;  // Start and end
+    for (int i = 0; i < nk-1; i++) 
+        tpd += (int) (pd[i] + gd);
+    tpd += pd[nk-1];
+    // -----------------------------------
+    
+    // Outgoing brepository ---------------
+    
+    rf   = Matrix<cxfl>  (tpd, nc);
+    grad = Matrix<float> (tpd, 3);
+    // -----------------------------------
+    
+    // RF Timing -------------------------
 
-			// Gradient action, no RF
-			if (k < nk-1)
-				for (int g = 0; g <    gd; g++, i++)
-					grad (i,0) = 0.0;
+    for (int rc = 0; rc < nc; rc++) {
+        
+        int i = 1;
+        
+        for (int k = 0; k < nk; k++) {
+            
+            // RF action
+            for (int p = 0; p < pd[k]; p++, i++) 
+                rf (i,rc) = solution(k + rc*nk) / (float) pd[k] * cxfl(1000.0,0.0);
 
-		}
-		
-	}
-	// -----------------------------------
-	
-	// Gradient and slew -----------------
-	
-	float gr = 0.0;
-	float sr = 0.0;
+            // Gradient action, no RF
+            if (k < nk-1)
+                for (int g = 0; g <    gd; g++, i++)
+                    grad (i,0) = 0.0;
 
-	for (int gc = 0; gc < 3; gc++) {
-		
-		int i = 1;
-		
-		for (int k = 0; k < nk-1; k++) {
-			
-			// RF action, no gradients
-			for (int p = 0; p < pd[k]; p++, i++) 
-				grad (i,gc) = 0.0; 
-			
-			if (k < nk-1) 
-				for (int g = 0; g <    gd; g++, i++) {
-					
-					sr = (k+1 < nk) ? ks(gc,k+1) - ks(gc,k) : - ks(gc,i);
-					sr = 4.0 * sr / (2 * PI * 4.2576e7 * gd * gd * 1.0e-5 * 1.0e-5);
-					sr =       sr / 100.0;
-				
-					// Gradient action 
-					if(g < gd/2)             // ramp up
-						gr = sr * (0.5 + g);
-					else if (g < gd/2+1)     // flat top
-						0;
-					else                     // ramp down
-						gr -= sr;
-					
-					grad (i,gc) = gr; 
-					
-				}
-			
-		} 
-		
-	}
-	// ----------------------------------
-	
+        }
+        
+    }
+    // -----------------------------------
+    
+    // Gradient and slew -----------------
+    
+    float gr = 0.0;
+    float sr = 0.0;
+
+    for (int gc = 0; gc < 3; gc++) {
+        
+        int i = 1;
+        
+        for (int k = 0; k < nk-1; k++) {
+            
+            // RF action, no gradients
+            for (int p = 0; p < pd[k]; p++, i++) 
+                grad (i,gc) = 0.0; 
+            
+            if (k < nk-1) 
+                
+                for (int g = 0; g <    gd; g++, i++) {
+                    
+                    sr = (k+1 < nk) ? ks(gc,k+1) - ks(gc,k) : - ks(gc,i);
+                    sr = 4.0 * sr / (2 * PI * 4.2576e7 * gd * gd * 1.0e-5 * 1.0e-5);
+                    sr =       sr / 100.0;
+                    
+                    // Gradient action 
+                    if(g < gd/2)             // ramp up
+                        gr = sr * (0.5 + g);
+                    else if (g < gd/2+1)     // flat top
+                        0;
+                    else                     // ramp down
+                        gr -= sr;
+                    
+                    grad (i,gc) = gr; 
+                    
+                }
+            
+        } 
+        
+    }
+    // ----------------------------------
+    
+}
+
+
+
+static inline void
+KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
+          Matrix<cxfl>& solution, const double& lambda, const size_t& mxit, 
+          const float& conv, const bool& breakearly) {
+
+    ticks start = getticks();
+    printf ("  Starting variable exchange method ...\n");
+    
+    Matrix<cxfl> treg = lambda * eye<cxfl>(size(m,1));
+    Matrix<cxfl> minv;
+    size_t gc = 0;
+    
+    std::vector<float> res;
+    
+    minv  = m.prodt (m); 
+    minv += treg;
+    minv  = pinv(minv);
+    minv  = minv.prod (m, 'N', 'C');
+    
+    // Valriable exchange method --------------
+    for (size_t j = 0; j < mxit; j++, gc++) {
+        
+        solution = minv ->* target;
+        final    = m    ->* solution;
+        
+        res.push_back (NRMSE (target, final, gc));
+        
+        /*if (m_verbose) memcpy (&ve(0,gc), &final.At(0), tmp.Size() * sizeof(cxfl)); */
+        if (gc && breakearly && (res.at(gc) > res.at(gc-1) || res.at(gc) < conv)) 
+            break;
+        
+        PhaseCorrection (target, final);
+        
+    } 
+    
+    printf ("\n  ... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+    
 }
