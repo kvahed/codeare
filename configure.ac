@@ -286,6 +286,7 @@ AC_MSG_CHECKING(whether host is Mac OS)
 case $host in
     *darwin*)
         LDFLAGS="$LDFLAGS -framework OpenCL"
+		AC_DEFINE(HAVE_LIBOPENCL, 1, [Open CL libraries])
         AC_MSG_RESULT(yes)
     ;;
     *)
@@ -294,7 +295,7 @@ case $host in
             echo "OpenCL library not found in your system"
         ])
 esac
-AM_CONDITIONAL([USE_OPENCL],  [test "$HAVE_LIBOPENCL" -eq 1])
+AM_CONDITIONAL([USE_LIBOPENCL],  [test "$HAVE_LIBOPENCL" -eq 1])
 
 case $host in
     *darwin*)
