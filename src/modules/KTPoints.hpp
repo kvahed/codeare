@@ -327,9 +327,10 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
 
 		fflush (stdout);
 
-        /*if (m_verbose) memcpy (&ve(0,gc), &final.At(0), tmp.Size() * sizeof(cxfl)); */
-        if ((gc && j && breakearly && res[gc] > res[gc-1]) || res[gc] < conv) 
-            break;
+        if ((gc && j && breakearly && res[gc] > res[gc-1]) || res[gc] < conv) {
+			gc++;
+            break; 
+		} 
         
     } 
     

@@ -656,8 +656,8 @@ PTHREAD_LIBS
 PTHREAD_CC
 ax_pthread_config
 PLUGIN_LDFLAGS
-USE_OPENCL_FALSE
-USE_OPENCL_TRUE
+USE_LIBOPENCL_FALSE
+USE_LIBOPENCL_TRUE
 PYTHON_LDFLAGS
 PYTHON_INCLUDES
 pkgpyexecdir
@@ -11776,10 +11776,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"5005f34e\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"3680f113\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Wed Aug 1 23:27:01 2012 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Sat Aug 11 16:14:09 2012 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -22009,6 +22009,9 @@ $as_echo_n "checking whether host is Mac OS... " >&6; }
 case $host in
     *darwin*)
         LDFLAGS="$LDFLAGS -framework OpenCL"
+
+$as_echo "#define HAVE_LIBOPENCL 1" >>confdefs.h
+
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
     ;;
@@ -22065,12 +22068,12 @@ else
 fi
 
 esac
- if test "$HAVE_LIBOPENCL" -eq 1; then
-  USE_OPENCL_TRUE=
-  USE_OPENCL_FALSE='#'
+ if test x$HAVE_LIBOPENCL = x1; then
+  USE_LIBOPENCL_TRUE=
+  USE_LIBOPENCL_FALSE='#'
 else
-  USE_OPENCL_TRUE='#'
-  USE_OPENCL_FALSE=
+  USE_LIBOPENCL_TRUE='#'
+  USE_LIBOPENCL_FALSE=
 fi
 
 
@@ -24877,8 +24880,8 @@ if test -z "${BUILD_API_TRUE}" && test -z "${BUILD_API_FALSE}"; then
   as_fn_error $? "conditional \"BUILD_API\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${USE_OPENCL_TRUE}" && test -z "${USE_OPENCL_FALSE}"; then
-  as_fn_error $? "conditional \"USE_OPENCL\" was never defined.
+if test -z "${USE_LIBOPENCL_TRUE}" && test -z "${USE_LIBOPENCL_FALSE}"; then
+  as_fn_error $? "conditional \"USE_LIBOPENCL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_NFFT3_TRUE}" && test -z "${USE_NFFT3_FALSE}"; then
