@@ -23,6 +23,32 @@
 
 #include "CX.hpp"
 
+template<class T>
+struct FTParams {
+
+	Matrix<T> b0; /**< @brief b0 map */
+	Matrix< std::complex<T> > pc; /**< @brief phase correction */
+	Matrix<T> b1; /**< @brief b1 maps */
+	
+	Matrix<size_t> sl; /**<@brief side length */
+	Matrix<T> mask;    /**<@brief k-space mask */
+
+	size_t rank;  /**< @brief single side length applies to all dimensions */
+
+	size_t nk;   /**< @brief # of k-space points*/
+
+};
+
+template <class T>
+struct FTCGParams {
+
+	size_t iters;  /**< @brief # of iterations */
+	T      lambda; /**< @brief tikhonov weight */
+	T      eps;    /**< @brief convergence residual */
+
+};
+
+
 /**
  * @brief  Base class for single and double precision Fourier transforms
  */
@@ -34,10 +60,16 @@ public:
 	/**
 	 * @brief    Default constructor
 	 */
-	FT() {
+	FT () {
 		T t;
 		Validate (t);
 	};
+
+
+	/**
+	 * @brief     Contstruct with parameters
+	 */
+	FT (FTParams<T> ftp, FTCGParams<T> ftcgp);
 
 	/**
 	 * @brief    Default destructor

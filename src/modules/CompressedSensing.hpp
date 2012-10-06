@@ -41,7 +41,7 @@ namespace RRStrategy {
 	/**
 	 * @brief CG parameters
 	 */
-	struct CGParam {
+	struct CSParam {
 		
 		int    fft;
 		int    lsiter;
@@ -109,7 +109,7 @@ namespace RRStrategy {
 		int            m_N[3];   /**< Data side lengths */
 		int            m_csiter; /**< # global iterations */
 
-		CGParam        m_cgparam;
+		CSParam        m_csparam;
 		int            m_wf;
 		int            m_wm;
 
@@ -137,7 +137,7 @@ namespace RRStrategy {
 
 	static float 
 	ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
-		   const float&            t, const CGParam&        cgp) {
+		   const float&            t, const CSParam&        cgp) {
 		
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
@@ -162,7 +162,7 @@ namespace RRStrategy {
 	 */
 	static float 
 	ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g, 
-			const float&        t, const CGParam&    cgp) {
+			const float&        t, const CSParam&    cgp) {
 		
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
@@ -187,7 +187,7 @@ namespace RRStrategy {
 			   const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
 			   const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
 			   const Matrix<cxfl>&  data, const float             t, 
-			   float&         rmse, const CGParam&        cgp) {
+			   float&         rmse, const CSParam&        cgp) {
 		
 		float obj = 0.0;
 		float nz = (float) nnz (data); 
@@ -211,7 +211,7 @@ namespace RRStrategy {
 	 */
 	static Matrix<cxfl> 
 	GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, 
-			 const Matrix<cxfl>& data, const CGParam& cgp) {
+			 const Matrix<cxfl>& data, const CSParam& cgp) {
 		
 		FT<float>& ft = *(cgp.ft);
 		DWT<cxfl>& dwt = *(cgp.dwt);
@@ -233,7 +233,7 @@ namespace RRStrategy {
 	 *
 	 */
 	Matrix<cxfl> 
-	GradXFM   (const Matrix<cxfl>& x, const CGParam& cgp) {
+	GradXFM   (const Matrix<cxfl>& x, const CSParam& cgp) {
 		
 		Matrix<cxfl> g;
 
@@ -251,7 +251,7 @@ namespace RRStrategy {
 	 * @brief Compute gradient of the total variation operator
 	 */
 	Matrix<cxfl> 
-	GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CGParam& cgp) {
+	GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {
 
 		DWT<cxfl>&  dwt = *cgp.dwt;
 		TVOP& tvt = *cgp.tvt;
@@ -274,7 +274,7 @@ namespace RRStrategy {
 
 
 	Matrix<cxfl> 
-	Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CGParam& cgp) {
+	Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CSParam& cgp) {
 
 		Matrix<cxfl> g;
 		
@@ -292,7 +292,7 @@ namespace RRStrategy {
 
 
 	void 
-	NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CGParam& cgp) {
+	NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
 
 		
 		float     t0  = 1.0, t = 1.0, z = 0.0;

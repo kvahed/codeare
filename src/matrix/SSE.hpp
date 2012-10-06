@@ -229,10 +229,11 @@ namespace SSE {
 	 * @param  A  Vector A
 	 * @param  B  Vector B
 	 * @param  N  Length of A, B and C
+	 * @param  op Operator class
 	 * @param  C  Vector C
 	 */
 	template<class T, class Op> inline static void
-	process (const T* A, const T* B, size_t n, const Op& op, T* C) {
+	process (const T* A, const T* B, const size_t n, const Op& op, T* C) {
 		
 		typedef SSETraits<T>                sse_type;
 		typedef typename sse_type::Register reg_type;
