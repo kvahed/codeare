@@ -853,12 +853,19 @@ AC_CHECK_LIB(
     [scalapack], 
     [pzgels_], 
     [AC_DEFINE(HAVE_F77_UNDERSCORE, 0, []) LIBS="${LIBS} -lscalapack"], 
-   [AC_CHECK_LIB(
+    [AC_CHECK_LIB(
 	    [scalapack-mpich], 
-		[pzgels_], 
-		[AC_DEFINE(HAVE_F77_UNDERSCORE, 1, []) LIBS="${LIBS} -lscalapack-mpich"],  
-		[AC_MSG_ERROR([cannot find libscalapack-mpich, bailing out])])]
+		  [pzgels_], 
+		  [AC_DEFINE(HAVE_F77_UNDERSCORE, 1, []) LIBS="${LIBS} -lscalapack-mpich"],  
+		  [AC_CHECK_LIB(
+		    [scalapack-openmpi],
+		    [pzgels_],
+		    [AC_DEFINE(HAVE_F77_UNDERSCORE, 1, []) LIBS="${LIBS} -lscalapack-openmpi"],  
+        [AC_MSG_ERROR([cannot find libscalapack-openmpi, bailing out])]
+		  )]
+	  )]
 )
+
 
 # Generate files
 AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile])
