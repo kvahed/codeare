@@ -2,7 +2,7 @@
 #include "cgsense.hpp"
 #include "sense.hpp"
 #include "directmethod.hpp"
-#include "dwt.hpp"
+//#include "dwt.hpp"
 #include "fft.hpp"
 #include "grappa.hpp"
 #include "internal.hpp"
@@ -18,3 +18,4 @@
 #include "creators.hpp"
 #include "karb.hpp"
 #include "mpitest.hpp"
+#include "ocltest.hpp"
