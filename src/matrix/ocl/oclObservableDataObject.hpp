@@ -27,8 +27,8 @@
 
       // pure virtual: finish ()
       virtual
-      oclError
-      finish () = 0;
+      oclError &
+      finish (const int num) = 0;
 
 
   };

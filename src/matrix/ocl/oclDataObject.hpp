@@ -15,6 +15,9 @@
   # include "oclSettings.hpp"
   # include "oclConnection.hpp"
 
+  // ViennaCL
+  # include "/usr/include/viennacl/vector.hpp"
+
 
 
   /**************************
@@ -29,20 +32,14 @@
   
       // pure virtual: prepare ()
       virtual
-      oclError
-      prepare             () = 0;
+      oclError &
+      prepare             (const int num) = 0;
 
-      template <class T>
-      T
-      getVCLObject ()
-      const
-      {
-        /* TODO */
-      }
+      template <class T, template <class S = T> class V>
+      V <T>
+      getVCLObject        ()
+      const;
 
-
-    protected:
-      
       // constructor
       oclDataObject       ()
                         : m_gpu_obj_id (id_counter ++)
@@ -53,6 +50,17 @@
         /* TODO */
       }
       
+      // destructor
+      virtual
+      ~oclDataObject      ()
+      {
+        std::cout << "Dtor: \"oclDataObject\"" << std::endl;
+        /* TODO */
+      }
+
+
+    protected:
+      
       const oclObjectID   m_gpu_obj_id;
 
     
@@ -61,12 +69,33 @@
       static oclObjectID  id_counter;
 
 
-  };
+  }; // class oclDataObject
+
 
 
   oclObjectID
   oclDataObject ::
   id_counter              = 0;
+
+
+
+  /**************************
+   ** function definitions **
+   **************************/
+  template <class T, template <class S = T> class V>
+  V <T>
+  oclDataObject ::
+  getVCLObject            ()
+  const
+  {
+  
+    std::cout << "oclDataObject :: getVCLObject" << std::endl;
+  
+    return V <T> ();
+  
+    /* TODO */
+    
+  }
 
 
   
