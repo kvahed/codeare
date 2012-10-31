@@ -2,6 +2,9 @@
 
 
 
+  /************
+   ** makros **
+   ************/
   # define __OCL_OBSERVABLE_DATA_OBJECT_HPP__
   
   
@@ -25,13 +28,15 @@
 
     public:
 
-      // pure virtual: finish ()
+      /**
+       * @brief            pure virtual: finish ()
+       */
       virtual
       oclError &
-      finish (const int num) = 0;
+      finish               () = 0;
 
 
-  };
+  }; // class oclObservableDataObject
 
 
 

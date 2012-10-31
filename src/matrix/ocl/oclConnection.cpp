@@ -71,6 +71,9 @@ oclConnection::
 oclConnection ( const char      * filename,
                 cl_device_type    device_type,
                 bool              verbose )
+              : m_current_ocl_objects (),
+                m_current_buffers (),
+                m_loaded_ocl_objects ()
 {
 
   m_verbose = verbose;

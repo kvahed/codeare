@@ -2,7 +2,12 @@
 
 
 
+
+  /************
+   ** makros **
+   ************/
   # define __OCL_MATRIX_HPP__
+
 
 
 
@@ -18,6 +23,8 @@
   # include "../oclTraits.hpp"
 
 
+
+
   /*********************
    ** class oclMatrix **
    ** (declaration)   **
@@ -27,12 +34,16 @@
   {
 
 
+
     public: 
+
+
       /**
-       * @name Constructors and destructors
-       *       Constructors and destructors
+       * @name          Constructors and destructors
+       *                Constructors and destructors
        */
       //@{
+
   
       /**
        * @brief         Construct with size 1x1
@@ -42,8 +53,10 @@
                       : Matrix <T> (),
                         mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix<T> :: _M [0]), Matrix<T> :: Size()))
       {
+
         T t;
         Validate (t);
+                
         /* -- */
       };
 
@@ -56,11 +69,10 @@
                       : Matrix <T> (mat),
                         mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix<T> :: _M [0]), Matrix<T> :: Size()))
       {
+
         T t;
         Validate (t);   
-        
-        oclConnection * ocl = oclConnection :: Instance ();
-             
+                     
         /* -- */
       }
 
@@ -73,8 +85,10 @@
                       : Matrix <T> ((Matrix<T>) mat),
                         mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix<T> :: _M [0]), Matrix<T> :: Size()))
       {
+
         T t;
         Validate (t);
+
         /* -- */
       }
 
@@ -85,17 +99,51 @@
       virtual
       ~oclMatrix        ()
       {
-        /* -- */
+
+        // delete member oclDataObject (created by oclTraits)
+        delete mp_oclData;
+    
       }
+
 
       //@}
       
       
       /**
-       * @name arithmetic operators
-       *
+       * @brief         assignment operator
+       */
+      inline
+      oclMatrix <T> &
+      operator=         (const oclMatrix <T> & mat)
+      {
+      
+        std::cout << " ** oclMatrix :: operator=" << std::endl;
+      
+        // otherwise: self assignment
+        if (this != &mat)
+        {
+        
+          // copy members of Matrix <T>
+          memcpy (Matrix<T> :: _dim, mat.Dim(), INVALID_DIM * sizeof(size_t));
+          memcpy (Matrix<T> :: _res, mat.Res(), INVALID_DIM * sizeof( float));        
+          Matrix<T> :: _M = mat.Dat();      // uses deep copy of valarray <T>
+          
+          // create new wrapper for gpu memory
+          mp_oclData = oclTraits <T> :: make_GPU_Obj (& (Matrix<T> :: _M [0]), Matrix<T> :: Size ());
+          
+        }
+        
+        // for daisy chaining
+        return *this;
+        
+      }
+
+      
+      /**
+       * @name          arithmetic operators
        */
       //@{
+
       
       /**
        * @brief         Elementwise addition of two matrices.
@@ -105,6 +153,7 @@
       template <class S>
       oclMatrix <T>
       operator+         (const oclMatrix <S> & mat) const;
+
       
       /**
        * @brief         Elementwise subtraction of two matrices.
@@ -114,23 +163,44 @@
       template <class S>
       oclMatrix <T>
       operator-         (const oclMatrix <S> & mat) const;
+
       
       //@}
+      
+      
+      /**
+       * @brief         copy relevant data to CPU
+       */
+      void
+      getData           ();
+
 
 
     private:
-      
+
+
+      /**********************
+       ** member variables **
+       **********************/
+             
       // holds data of matrix for calculations on GPU
       oclDataWrapper <T> * mp_oclData;
       
+      
+      /********************************
+       ** member functions (private) **
+       ********************************/
+       
       // allowed element types for an instance of oclMatrix
       void
       Validate          (float  & t)  const {}
       void
       Validate          (size_t & t)  const {}
-      
 
+
+      
   };
+
 
 
 
@@ -145,13 +215,16 @@
   operator+             (const oclMatrix <S> & mat) const
   {
     
+    // create matrix for result
     oclMatrix <T> sum (Matrix<T> (this -> Dim()));
-    
+      
+    // call operator function of oclTraits
     oclTraits <T> :: ocl_operator_add (this -> mp_oclData, mat.mp_oclData, sum.mp_oclData, this -> Size () );
   
     return sum;
     
   }
+
 
 
 
@@ -162,13 +235,29 @@
   operator-             (const oclMatrix <S> & mat) const
   {
     
+    // create matrix for result
     oclMatrix <T> diff (Matrix<T> (this -> Dim()));
     
+    // call operator function of oclTraits
     oclTraits <T> :: ocl_operator_subtract (this -> mp_oclData, mat.mp_oclData, diff.mp_oclData, this -> Size () );
     
     return ((Matrix <T>) *this - (Matrix <T>) mat);
     
   }
+  
+  
+  
+  template <class T>
+  void
+  oclMatrix <T> ::
+  getData               ()
+  {
+  
+    // load GPU data to CPU
+    this -> mp_oclData -> getData ();
+  
+  }
+
 
 
 

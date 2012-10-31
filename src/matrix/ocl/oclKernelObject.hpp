@@ -2,10 +2,12 @@
 
 
 
+
   /************
    ** makros **
    ************/
   # define __OCL_KERNEL_OBJECT_HPP__
+
 
 
 
@@ -19,15 +21,8 @@
   // ocl
   # include "oclDataObject.hpp"
   # include "oclFunctionObject.hpp"
-  
-  
-  
-  /**************************
-   ** forward declarations **
-   **************************/
-//  class oclDataObject;
-//  void oclDataObject :: run ();
-  
+
+    
   
     
   /****************************
@@ -38,21 +33,30 @@
   {
   
     
+    
     protected:
+    
     
       /**********************
        ** member variables **
        **********************/
+   
       std::string           m_kernel_name;
     
     
+   
     public:
+   
     
       /**
-       * @name      Constructors and destructors.
+       * @name              Constructors and destructors.
        */
       //@{
       
+      
+      /**
+       * @brief             default constructor
+       */
       oclKernelObject       (std::string                    kernel_name,
                              oclDataObject  * const * const pp_args,
                              int                            num_args )
@@ -60,36 +64,60 @@
                             m_kernel_name     (kernel_name)
                             
       {
+      
         std::cout << "Ctor: \"oclKernelObject\"" << std::endl;
+        
         /* TODO */
       }
     
+    
+      /**
+       * @brief             virtual destructor
+       */
       virtual
-      ~oclKernelObject ()
+      ~oclKernelObject      ()
       {
+      
         std::cout << "Dtor: \"oclKernelObject\"" << std::endl;
+
         /* TODO */
       }
+
     
       //@}
-    
+
+
+      /**
+       * @brief             execute kernel
+       *
+       * @see               defined in oclFunctionObject
+       */
       virtual
       void
       run                   ();
       
   
+  
   }; // class oclKernelObject
+  
   
   
   
   /**************************
    ** function definitions **
    **************************/
+
+
+  
+  /**
+   * @brief                 prepare arguments, run kernel, finish arguments
+   */
   void
   oclKernelObject ::
   run                       ()
   {
   
+    // oclConnection for reuse in this function
     oclConnection * oclCon = oclConnection :: Instance ();
   
     std::cout << "oclKernelObject :: run!" << std::endl;
@@ -100,10 +128,14 @@
     // prepare kernel arguments (load to gpu)
     for (int i = 0; i < m_num_args; i++)
     {
-      mpp_args [i] -> prepare (i);
+
+      // prepare argument
+      mpp_args [i] -> prepare ();
+
+      // register argument at kernel
+      oclCon -> setKernelArg (i, mpp_args [i]);
+
     }
-    
-    std::cout << "calculate! (Kernel)" << std::endl;
     
     // run kernel
     cl::NDRange global_dims (512);
@@ -113,10 +145,11 @@
     // get data
     for (int i = 0; i < m_num_args; i++)
     {
-      mpp_args [i] -> finish (i);
+      mpp_args [i] -> finish ();
     }
     
   }
+  
   
   
   

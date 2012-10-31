@@ -72,6 +72,7 @@
       /***************
        ** functions **
        ***************/
+      inline
       static
       oclConnection *
       Instance              ();
@@ -88,7 +89,9 @@
                              const KernelType kernel_type, const SyncType sync_type);
                               
       void
-      addDataObject         (oclDataObject * const ocl_obj, const oclObjectID & obj_id);
+      addDataObject         (oclDataObject * const ocl_obj);
+      void
+      removeDataObject      (const oclDataObject * const ocl_obj);
                           
       void
       run                   (oclFunctionObject * const func_obj) const;
@@ -104,13 +107,56 @@
       /****************************************
        ** functions for OpenCL functionality **
        ****************************************/
+      
+      /**
+       * @brief             load cpu data to GPU and return corresponding buffer
+       *                      
+       */
+      template <class T>
+      void
+      loadToGPU             (       T   * const cpu_arg,
+                             ::size_t           size,
+                             clBuffer   * const buffer);
+      
+      
+      /**
+       * @brief             create buffer for given object id
+       */
+      template <class T>
+      void
+      createBuffer          (                T   * const cpu_arg,
+                             const    ::size_t           size,
+                             const oclObjectID           obj_id);
+      
+      
+      /**
+       * @brief             load data from given buffer to given cpu pointer
+       *
+       * @param             size - ... in bytes
+       */
+      template <class T>
+      void
+      loadToCPU             (const clBuffer * const buffer,
+                                          T * const cpu_arg,
+                             const   size_t         size)
+      {
+      
+        std::cout << "oclConnection :: loadToCPU" << std::endl;
+      
+        // read data from given buffer
+        m_error = m_comqs [0] . enqueueReadBuffer (* buffer, CL_TRUE, 0, size, cpu_arg, NULL, NULL);
+      
+      }
+      
   
       // activate kernel (stays activated until another kernel is activated
-      int activateKernel      (const std::string kernelname);
+      int
+      activateKernel        (const std::string kernelname);
     
       // run kernel with given dimensions
-      int runKernel           (const cl::NDRange & global_dims,
-                               const cl::NDRange & local_dims);
+      int
+      runKernel             (const cl::NDRange & global_dims,
+                             const cl::NDRange & local_dims);
     
     
       // set argument for kernel by pointer, optionally return created buffer
@@ -185,6 +231,14 @@
         m_error = mp_actKernel -> setArg (num, *buf);
 
       }
+      
+      
+      /**
+       * @brief               register kernel argument
+       */
+      cl_int
+      setKernelArg            (int              num,
+                               oclDataObject *  obj_id);
     
     
       // get argument from activated kernel
@@ -215,9 +269,10 @@
       /**********************
        ** member variables **
        **********************/
-      static oclConnection                    * mp_inst;
-      std::map <oclObjectID, oclDataObject *>   m_current_ocl_objects;
-      std::list <oclObjectID>                   m_loaded_ocl_objects;
+      static oclConnection                                * mp_inst;
+      std::map <oclObjectID, oclDataObject * const>   m_current_ocl_objects;
+      std::list <oclObjectID>                               m_loaded_ocl_objects;
+      std::map <clBuffer *, int>                            m_current_buffers;
       
       /********************
        ** OpenCL members **
@@ -228,7 +283,7 @@
       clCommandQueues         m_comqs;      // each command queue is associated with corresponding device from m_devs
       clProgram               m_prog;       // program containing whole source code
       clKernels               m_kernels;    // kernels available in m_prog
-      std::vector<clBuffers>  m_buffers; // vectors of buffers for each kernels arguments
+      std::vector<clBuffers>  m_buffers;    // vectors of buffers for each kernels arguments
       cl_int                  m_error;      // error variable
       bool                    m_verbose;    // verbosity level
       clKernel              * mp_actKernel;
@@ -283,9 +338,13 @@
   
 
   
+  /**
+   * @brief             retrieve instance of oclConnection
+   */
+  inline
   oclConnection *
   oclConnection ::
-  Instance ()
+  Instance              ()
   {
   
     if (mp_inst == NULL)
@@ -296,12 +355,109 @@
   }
   
   
+  
+  /**
+   * @brief               register kernel argument
+   */
+  cl_int
+  oclConnection ::
+  setKernelArg            (int              num,
+                           oclDataObject *  p_arg)
+  {
+ 
+    // register kernel argument
+    m_error = mp_actKernel -> setArg (num, * p_arg -> getBuffer ());
+  
+  }
+  
+  
+  
+  /**
+   * @brief             add oclDataObject to list of existing objects
+   */
   void
   oclConnection ::
-  addDataObject         (oclDataObject * const ocl_obj, const oclObjectID & obj_id)
+  addDataObject         (oclDataObject * const ocl_obj)
   {
-    std::cout << "addDataObject" << std::endl;
-    m_current_ocl_objects.insert (std::pair <oclObjectID, oclDataObject *> (obj_id, ocl_obj));
+  
+    std::cout << "oclConnection :: addDataObject (...)" << std::endl;
+
+    // insert new data object
+    m_current_ocl_objects.insert (std::pair <oclObjectID, oclDataObject * const> (ocl_obj -> getID (), ocl_obj));
+    
+    // in case of existing buffer, update corresponding lists
+    if (ocl_obj -> getMemState ())
+    {
+      
+      std::cout << " *!* existing buffer *!* " << std::endl;
+      
+      // list of loaded (on GPU) oclObjects
+      m_loaded_ocl_objects.push_back (ocl_obj -> getID ());
+      
+      // increase reference count for buffer
+      std::map <clBuffer *, int> :: iterator tmp_it = m_current_buffers.find (ocl_obj -> getBuffer ());
+      
+      if (tmp_it == m_current_buffers.end ())
+      {
+        std::cout << " *!* Caution: Buffer not found *!*" << std::endl;
+        throw new int (-1);
+      }
+
+      // increase
+      tmp_it -> second ++;
+      
+    }
+
+  }
+  
+  
+  
+  /**
+   * @brief             remove given object from
+   *                        1.  list of existing oclObjects
+   *                        2.  list of loaded oclObjects
+   *                    delete buffer, if needed
+   */
+  void
+  oclConnection ::
+  removeDataObject      (const oclDataObject * const ocl_obj)
+  {
+    
+    std::cout << "oclConnection :: removeDataObject (...)" << std::endl;
+    
+    // does ocl_obj has a buffer to be handled?
+    if (ocl_obj -> getMemState ())
+    {
+        
+      // decrease buffer reference count
+      std::map <clBuffer *, int> :: iterator tmp_it =  m_current_buffers.find (ocl_obj -> getBuffer ());
+      
+      if (tmp_it == m_current_buffers.end ())
+      {
+        std::cout << " *!* Caution: Buffer not found *!*" << std::endl;
+        throw new int (-1);
+      }
+    
+      std::cout << " => handle buffer!!! (ref_count: " << tmp_it -> second << ")" << std::endl;
+      
+      // delete buffer object in case of no left references
+      if (-- tmp_it -> second == 0)
+      {
+    
+        std::cout << " *!* delete buffer *!*" << std::endl;
+      
+        m_current_buffers.erase (tmp_it);
+    
+      }
+    
+      // remove from list of loaded oclObjects
+      m_loaded_ocl_objects.remove (ocl_obj -> getID ());
+  
+    }
+    
+    // remove given data object
+    m_current_ocl_objects.erase (ocl_obj -> getID ());
+    
   }
   
   
@@ -344,6 +500,80 @@
 
     return kernel_obj;
     
+  }
+  
+  
+  /**
+   * @brief             create buffer for given object id
+   */
+  template <class T>
+  void
+  oclConnection ::
+  createBuffer          (                T   * const cpu_arg,
+                         const    ::size_t           size,
+                         const oclObjectID           obj_id)
+  {
+    
+    std::cout << " * oclConnection :: createBuffer (id: " << obj_id << ")" << std::endl;
+    
+    // find corresponding data object
+    std::map <oclObjectID, oclDataObject * const> :: iterator tmp_it = m_current_ocl_objects.find (obj_id);
+  
+    // check if object exists
+    if (tmp_it == m_current_ocl_objects.end ())
+    {
+      std::cout << " *!* Caution: oclDataObject (" << obj_id << ") does not exist! *!*" << std::endl;
+      throw int (-1);
+    }
+      
+    // retrieve object
+    oclDataObject * const p_tmp_obj = tmp_it -> second;
+        
+    // check if buffer exists
+    if (p_tmp_obj -> getMemState ())
+    {
+      std::cout << " *!* Caution: oclDataObject (" << obj_id << ") already has a GPU buffer! *!*" << std::endl;
+      throw int (-1);
+    }
+
+    // create buffer object
+    p_tmp_obj -> setBuffer (new clBuffer (m_cont, CL_MEM_READ_WRITE, size * sizeof (T), cpu_arg, &m_error));
+      
+    // add to buffer list
+    m_current_buffers.insert (std::pair <clBuffer *, int> (p_tmp_obj -> getBuffer (), 0));
+        
+    // add data object to list of loaded objects
+    m_loaded_ocl_objects.push_back (obj_id);
+      
+  }
+  
+  
+  /**
+   * @brief             load cpu data to GPU and return corresponding buffer
+   *                      - TODO (just copied from setKernelArg (...)
+   */
+  template <class T>
+  void
+  oclConnection ::
+  loadToGPU             (       T   * const cpu_arg,
+                         ::size_t           size,
+                         clBuffer   * const buffer)
+  {
+    
+    std::cout << " * oclConnection :: loadToGPU" << std::endl;
+    
+    // loop over command queues, write information to device (global memory)
+    for (clCommandQueues::iterator it = m_comqs.begin(); it < m_comqs.end(); ++it)
+    {
+                   
+      try {
+        m_error = it -> enqueueWriteBuffer (*buffer, CL_TRUE, 0, size * sizeof (T), cpu_arg, NULL, NULL);
+      } catch (cl::Error cle) {
+        cout << "error code: " << cle.what() << " -> " << cle.err() << " (" << errorString (cle.err()) << ")" << endl;
+      }
+ 
+    }
+     
   }
 
 

@@ -46,14 +46,15 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "nitest"))                nitest       (con);
 		else if (!strcmp (test, "iotest"))                iotest       (con);
 		else if (!strcmp (test, "fftwtest"))              fftwtest     (con);
-		else if (!strcmp (test, "dwttest"))               dwttest      (con);
+//		else if (!strcmp (test, "dwttest"))               dwttest      (con);
 		else if (!strcmp (test, "algotest"))              algotest     (con);
 		else if (!strcmp (test, "syngotest"))             syngotest    (con);
 		else if (!strcmp (test, "RelativeSensitivities")) resetest     (con);
 		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
 		else if (!strcmp (test, "KArb"))                  karbtest     (con);
 		else if (!strcmp (test, "Creators"))              creatorstest (con);
-		else if (!strcmp (test, "MPI"))                   mpitest      (con);
+//		else if (!strcmp (test, "MPI"))                   mpitest      (con);
+    else if (!strcmp (test, "ocl"))                   oclmatrixtest(con);
 		else                                              internaltest (con);
 		
 		delete con;

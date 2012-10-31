@@ -2,6 +2,7 @@
 
 
 
+
   /************
    ** makros **
    ************/
@@ -9,10 +10,12 @@
 
 
 
+
   /**************************
    ** forward declarations **
    **************************/
   class oclViennaClObject;
+
 
 
 
@@ -26,34 +29,62 @@
   {
 
   
+
     public:
-  
+
+
+      /**
+       * @brief               overloaded operator (functor)
+       */  
       virtual
       void
       operator()              ()
       const
       {
+      
         std::cout << "not implemented" << std::endl;
+        
       }
+    
     
 
     protected:
     
-      // constructor
+    
+      /**
+       * @name                constructors and destructors
+       */
+      //@{
+      
+      
+      /**
+       * @brief               constructor
+       */
       vclAlgoFunctor          (const oclViennaClObject * const p_vclObj)
                             : mp_vclObj (p_vclObj)
       {
+      
         std::cout << "Ctor: \"vclAlgoFunctor\"" << std::endl;
+        
         /* TODO */
       }
       
-      // member variables
+      
+      //@}
+      
+      
+      /**********************
+       ** member variables **
+       **********************/
+      
       const oclViennaClObject * const mp_vclObj;
+
 
 
   }; // class vclAlgoFunctor
   
   
+
   
   /****************************
    ** class: vclSubtractAlgo **
@@ -61,11 +92,21 @@
    ****************************/
   class vclSubtractAlgo : public vclAlgoFunctor
   {
+
   
   
     public:
+
     
-      // constructor
+      /**
+       * @name              constructors and destructors
+       */
+      //@{
+      
+      
+      /**
+       * @brief             constructor
+       */
       vclSubtractAlgo       (const oclViennaClObject * const p_vclObj)
                           : vclAlgoFunctor (p_vclObj)
       {
@@ -76,24 +117,33 @@
 
       }
       
+      
+      //@}
+      
+      
+      /**
+       * @brief             refer to base class
+       */
       virtual
       void
-      operator()       ()
+      operator()            ()
       const
       {
 
         std::cout << "vclSubtractAlgo :: operator() !!! float !!!" << std::endl;
 
-//        viennacl :: vector <float> vclAlgoFunctor :: mp_vclObj -> getVCLArg < viennacl :: vector <float> > (1);
+        viennacl :: vector <float> tmp_vec = vclAlgoFunctor :: mp_vclObj -> getVCLArg <float> (1);
 
         /* TODO */
         
       }
   
   
+  
   }; // class vclSubtractAlgo
   
-    
+  
+  
   
   /**********************
    ** global functions **
@@ -112,6 +162,7 @@
     /* TODO */
     
   }
+  
   
   
   

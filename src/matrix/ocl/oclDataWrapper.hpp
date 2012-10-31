@@ -2,6 +2,9 @@
 
 
 
+  /************
+   ** makros **
+   ************/
   # define __OCL_DATA_WRAPPER_HPP__
   
   
@@ -24,47 +27,171 @@
   {
     
     
+    
     public:
-    
+
+
       /**
-       * @brief         getter to cpu_data
+       * @name              constructors and destructors
        */
-      virtual
-      T * const
-      getData           () const = 0;
-    
-    
-    protected:
-        
-      // constructor
-      oclDataWrapper    (T * const cpu_data, const size_t size)
-                      : oclDataObject (),
-                        mp_cpu_data   (cpu_data),
-                        m_size        (size)
+      //@{
+      
+      
+      /**
+       * @brief             construtor
+       *
+       * @param             cpu_data    data in linear memory in RAM
+       * @param             size        number of elements in cpu_data
+       *
+       */
+      oclDataWrapper        (T * const cpu_data, const size_t size)
+                          : oclDataObject (size * sizeof (T)),
+                            mp_cpu_data   (cpu_data)
       {
       
         std::cout << "Ctor: \"oclDataWrapper\"" << std::endl;
-        
-        /* TODO */
-        
+                        
       }
       
-      // destructor
+      
+      /**
+       * @brief             virtual destructor
+       */
       virtual
-      ~oclDataWrapper   ()
+      ~oclDataWrapper       ()
       {
+      
         std::cout << "Dtor: \"oclDataWrapper\"" << std::endl;
-        /* TODO */
+                
       }
         
-      // pointer to cpu memory
-      T * const mp_cpu_data;
       
-      // size of cpu_data
-      size_t m_size;
+      //@}
     
+    
+      /**
+       * @brief             getter to cpu_data
+       */
+      virtual
+      oclError &
+      getData               () = 0;
+      
+      
+      
+    protected:
+
+      
+      /**
+       * @brief             synchronize data on GPU with CPU
+       *
+       * @see               oclDataObject :: loadToGPU ()
+       */
+      virtual
+      oclError &
+      loadToGPU             ();
+      
+      
+      /**
+       * @brief             synchronize data on CPU with GPU
+       *
+       * @see               oclDataObject :: loadToCPU ()
+       */
+      virtual
+      oclError &
+      loadToCPU             ();
+      
+      
+      /**********************
+       ** member variables **
+       **   (protected)    **
+       **********************/
+      T * const mp_cpu_data;            // pointer to cpu memory
+      
+      
     
   }; // class oclDataWrapper
+  
+  
+  
+  /**************************
+   ** function definitions **
+   **************************/
+
+
+  /**
+   * @brief                 -- refer to class definition --
+   */
+  template <class T>
+  oclError &
+  oclDataWrapper <T> ::
+  loadToGPU                 ()
+  {
+      
+    std::cout << "loadToGPU ()" << std::endl;
+
+    // buffer on GPU exists ?
+    if (! oclDataObject :: getMemState ())
+    {
+        
+      // create buffer object
+      oclConnection :: Instance () -> createBuffer (mp_cpu_data, oclDataObject :: getSize (), oclDataObject :: getID ());
+    
+      // update memory state
+      oclDataObject :: setLoaded ();
+    
+    }
+
+    if (oclDataObject :: mp_modified [CPU])
+    {
+      
+      // update GPU data
+      oclConnection :: Instance () -> loadToGPU (mp_cpu_data, oclDataObject :: getSize (), oclDataObject :: getBuffer ());
+
+      // update states
+      oclDataObject :: setSync ();
+
+    }
+    
+    
+  }
+  
+  
+  
+  /**
+   * @brief                 -- refer to class definition --
+   */
+  template <class T>
+  oclError &
+  oclDataWrapper <T> ::
+  loadToCPU                 ()
+  {
+  
+    std::cout << "loadToCPU ()" << std::endl;
+    
+    // buffer on GPU exists
+    if (oclDataObject :: getMemState ())
+    {
+      
+      if (oclDataObject :: mp_modified [GPU])
+      {
+        
+        // update CPU data
+        oclConnection :: Instance () -> loadToCPU (oclDataObject :: mp_gpu_buffer, mp_cpu_data, oclDataObject :: m_size);
+        
+        // update states
+        oclDataObject :: setSync ();
+        
+      }
+      
+    }
+    else // ERROR if no buffer exists
+    {
+    
+      std::cout << " *!* Error: no buffer on GPU (id:" << oclDataObject :: getID () << ") *!*" << std::endl;
+    
+    }
+  
+  }
   
   
   
