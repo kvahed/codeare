@@ -45,12 +45,26 @@
        *
        */
       oclGPUDataObject        (           T   * const  cpu_data,
-                               const size_t   &        size)
+                               const size_t   &            size)
                             : oclDataWrapper <T> (cpu_data, size)
       {
       
         std::cout << "Ctor: \"oclGPUDataObject\"" << std::endl;
         
+      }
+      
+      
+      /**
+       * @brief               "copy state" constructor
+       */
+      oclGPUDataObject        (                   T     * const cpu_data,
+                               const         size_t     &           size,
+                               const oclDataWrapper <T> &            obj)
+                            : oclDataWrapper <T> (cpu_data, size, obj)
+      {
+      
+        std::cout << "Ctor: \"oclGPUDataObject\" ... copied state" << std::endl;
+            
       }
       
       
@@ -93,7 +107,7 @@
       getData                 ();
 
     
-  
+     
   }; // class oclGPUDataObject
   
   
@@ -141,17 +155,30 @@
 
     std::cout << "oclGPUDataObject::finish" << std::endl;
     
-    std::cout << " -> keep data in GPU memory" << std::endl;
-    
+//    std::cout << " -> keep data in GPU memory" << std::endl;
+
+   // oclConnection :: Instance () -> getKernelArg (0, oclDataWrapper <T> :: mp_cpu_data, oclDataObject :: getSize ());
+ 
+//    oclDataObject :: setGPUModified ();
+
+//    oclDataWrapper <T> :: mp_cpu_data [0] = 1.5;
+//    oclDataWrapper <T> :: mp_cpu_data [1] = 1.5;
+//    oclDataWrapper <T> :: mp_cpu_data [2] = 1.5;
+//    oclDataWrapper <T> :: mp_cpu_data [3] = 1.5;
+
+
     // update data state: available for use
     oclDataObject :: setUnlocked ();
+  
+//    std::cout << " /// getData !! ///" << std::endl;
+//    getData ();
         
   }
   
   
   
   /**
-   * @brief                   copy data to CPU memory, return pointer
+   * @brief                   copy data to CPU memory
    */
   template <class T>
   oclError &

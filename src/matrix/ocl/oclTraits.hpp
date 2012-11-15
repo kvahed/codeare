@@ -54,17 +54,50 @@
     
     
     /**
-     * @brief                       Create oclDataObject
+     * @brief                       Create oclGPUDataObject.
      */
     static inline
     oclDataWrapper <elem_type> *
-    make_GPU_Obj                    (elem_type * const cpu_arg, const size_t & size)
+    make_GPU_Obj                    (elem_type * const cpu_arg, const size_t & num_elems)
     {
     
-      std::cout << "make_GPU_Obj <float>" << std::endl;
+      std::cout << "make_GPU_Obj <float> (create new)" << std::endl;
     
-      return new oclGPUDataObject <elem_type> (cpu_arg, size);
+      return new oclGPUDataObject <elem_type> (cpu_arg, num_elems * sizeof (elem_type));
       
+    }
+    
+    
+    /**
+     * @brief                      Create oclGPUDataObject
+     *                             with same state as given oclDataWrapper.
+     */
+    static inline
+    oclDataWrapper <elem_type> *
+    make_GPU_Obj                   (elem_type * const cpu_arg, const size_t & num_elems, const oclDataWrapper <elem_type> & obj)
+    {
+    
+      std::cout << "make_GPU_Obj <float> (copy obj's state)" << std::endl;
+      
+      /**
+       * local vars
+       */
+      size_t size = num_elems * sizeof (elem_type);
+      
+      // check if sizes fit (for !some! more control (or safety))
+      if (size != obj.getSize ())
+      {
+      
+        return NULL;
+      
+      }
+      else
+      {
+      
+        return new oclGPUDataObject <elem_type> (cpu_arg, size, obj);
+      
+      }
+    
     }
     
     
@@ -90,8 +123,7 @@
       args [0] = arg1;
       args [1] = arg2;
       args [2] = sum;
-      args [3] = new oclGPUDataObject <size_t> (& size, 1);
-
+      args [3] = new oclGPUDataObject <size_t> (& size, 1 * sizeof (size_t));
 
       // create function object
       oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject ("add", args, 4, oclConnection::KERNEL, oclConnection::SYNC);
@@ -103,7 +135,7 @@
       delete op_obj;      
       delete args [3];
       free (args);
-      
+                  
     }
     
     
@@ -122,8 +154,8 @@
       args [0] = arg1;
       args [1] = arg2;
       args [2] = diff;
-      args [3] = new oclGPUDataObject <size_t> (& size, 1);
-      
+      args [3] = new oclGPUDataObject <size_t> (& size, 1 * sizeof (size_t));
+            
       // create function object
       oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject ("subtract", args, 4, oclConnection::VCL, oclConnection::SYNC);
       
@@ -169,12 +201,12 @@
      */
     static inline
     oclDataWrapper <elem_type> *
-    make_GPU_Obj                    (elem_type * const cpu_arg, const size_t & size)
+    make_GPU_Obj                    (elem_type * const cpu_arg, const size_t & num_elems)
     {
     
       std::cout << "make_GPU_Obj <size_t>" << std::endl;
     
-      return new oclGPUDataObject <elem_type> (cpu_arg, size);
+      return new oclGPUDataObject <elem_type> (cpu_arg, num_elems * sizeof (elem_type));
       
     }
     

@@ -41,16 +41,39 @@
        * @brief             construtor
        *
        * @param             cpu_data    data in linear memory in RAM
-       * @param             size        number of elements in cpu_data
+       * @param             size        ... in bytes
        *
        */
       oclDataWrapper        (T * const cpu_data, const size_t size)
-                          : oclDataObject (size * sizeof (T)),
+                          : oclDataObject (size),
                             mp_cpu_data   (cpu_data)
       {
       
         std::cout << "Ctor: \"oclDataWrapper\"" << std::endl;
                         
+      }
+      
+      
+      /**
+       * @brief             "copy state" constructor
+       *
+       */
+      oclDataWrapper        (                   T     * const cpu_data,
+                             const         size_t                 size,
+                             const oclDataWrapper <T> &            obj)
+                          : oclDataObject   (obj),
+                            mp_cpu_data     (cpu_data)
+      {
+      
+        std::cout << "Ctor: \"oclDataWrapper\" ... copied state" << std::endl;
+              
+        if (size != obj.getSize ())
+        {
+        
+          throw " *!* Error: Sizes don't match! *!*";
+        
+        }
+              
       }
       
       
@@ -132,7 +155,7 @@
     // buffer on GPU exists ?
     if (! oclDataObject :: getMemState ())
     {
-        
+
       // create buffer object
       oclConnection :: Instance () -> createBuffer (mp_cpu_data, oclDataObject :: getSize (), oclDataObject :: getID ());
     
@@ -165,16 +188,16 @@
   oclDataWrapper <T> ::
   loadToCPU                 ()
   {
-  
-    std::cout << "loadToCPU ()" << std::endl;
-    
+
     // buffer on GPU exists
     if (oclDataObject :: getMemState ())
     {
-      
+  
+      std::cout << "loadToCPU ()" << std::endl;
+          
       if (oclDataObject :: mp_modified [GPU])
       {
-        
+        std::cout << "copy" << std::endl;
         // update CPU data
         oclConnection :: Instance () -> loadToCPU (oclDataObject :: mp_gpu_buffer, mp_cpu_data, oclDataObject :: m_size);
         

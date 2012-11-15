@@ -34,7 +34,7 @@ __kernel void add (__global float * arg1, __global float * arg2, __global float 
   {
     return;
   }
-  
+ 
   int global_size = get_global_size (0);
   
   int global_inc = global_size;
@@ -45,7 +45,7 @@ __kernel void add (__global float * arg1, __global float * arg2, __global float 
   {
     result [i] = arg1 [i] + arg2 [i];
   }
-  
+ 
 }
 
 

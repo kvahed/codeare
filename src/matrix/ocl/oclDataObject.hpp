@@ -154,9 +154,38 @@
         
       }
       
+      
+      /**
+       * @brief             copy constructor
+       *
+       * @param             pointer oclDataObject to copy
+       */
+      oclDataObject         (const oclDataObject & obj)
+                          : m_gpu_obj_id    (id_counter ++),
+                            mp_gpu_buffer   (obj.mp_gpu_buffer),      // shallow copy (OK!)
+                            m_size          (obj.m_size),
+                            m_on_gpu        (obj.m_on_gpu),
+                            m_lock          (obj.m_lock)
+      {
+      
+        std::cout << "Ctor: \"oclDataObject\" (" << m_gpu_obj_id << ") ... copied state from " << obj.m_gpu_obj_id << std::endl;
+      
+        // deep copy of modification array
+        new (mp_modified) bool [2]; 
+        mp_modified [0] = obj.mp_modified [0];
+        mp_modified [1] = obj.mp_modified [1];
+
+        // register data object at oclConnection
+        oclConnection :: Instance () -> addDataObject (this);
+      
+      }
+      
 
       /**
        * @brief             virtual destructor
+       *
+       *                    important: buffer pointer is being
+       *                               deleted by oclConnection if necessary
        */
       virtual
       ~oclDataObject        ()
@@ -167,9 +196,6 @@
         // unregister data object at oclConnection
         oclConnection :: Instance () -> removeDataObject (this);
         
-        // delete buffer object
-        delete mp_gpu_buffer;
-        
       }
 
       
@@ -178,6 +204,7 @@
       
 
     protected:
+
 
 
       /**
