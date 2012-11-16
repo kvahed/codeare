@@ -132,7 +132,18 @@
 
         std::cout << "vclSubtractAlgo :: operator() !!! float !!!" << std::endl;
 
-        viennacl :: vector <float> tmp_vec = vclAlgoFunctor :: mp_vclObj -> getVCLArg <float> (1);
+        /**
+         * create ViennaCl arguments
+         */
+        viennacl :: vector <float> arg1 = vclAlgoFunctor :: mp_vclObj -> getVCLArg <float> (0);
+        viennacl :: vector <float> arg2 = vclAlgoFunctor :: mp_vclObj -> getVCLArg <float> (1);
+        viennacl :: vector <float> diff = vclAlgoFunctor :: mp_vclObj -> getVCLArg <float> (2);
+        
+        diff = arg1 - arg2;
+        
+//        std::cout << " -------------------\n arg1: \n" << arg1 << "\n -------------------" << std::endl;
+//        std::cout << " -------------------\n arg2: \n" << arg2 << "\n -------------------" << std::endl;
+//        std::cout << " -------------------\n diff: \n" << diff << "\n -------------------" << std::endl;
 
         /* TODO */
         

@@ -63,7 +63,7 @@
     
       std::cout << "make_GPU_Obj <float> (create new)" << std::endl;
     
-      return new oclGPUDataObject <elem_type> (cpu_arg, num_elems * sizeof (elem_type));
+      return new oclGPUDataObject <elem_type> (cpu_arg, num_elems);
       
     }
     
@@ -79,13 +79,8 @@
     
       std::cout << "make_GPU_Obj <float> (copy obj's state)" << std::endl;
       
-      /**
-       * local vars
-       */
-      size_t size = num_elems * sizeof (elem_type);
-      
       // check if sizes fit (for !some! more control (or safety))
-      if (size != obj.getSize ())
+      if (num_elems != obj.getNumElems ())
       {
       
         return NULL;
@@ -94,7 +89,7 @@
       else
       {
       
-        return new oclGPUDataObject <elem_type> (cpu_arg, size, obj);
+        return new oclGPUDataObject <elem_type> (cpu_arg, num_elems, obj);
       
       }
     
@@ -113,7 +108,7 @@
      */
     static inline
     const oclError &
-    ocl_operator_add                (oclDataObject * const arg1, oclDataObject * const arg2, oclDataObject * const sum, size_t size)
+    ocl_operator_add                (oclDataObject * const arg1, oclDataObject * const arg2, oclDataObject * const sum, int num_elems)
     {
       
       std::cout << "oclTraits <float> :: ocl_operator_add" << std::endl;
@@ -123,7 +118,7 @@
       args [0] = arg1;
       args [1] = arg2;
       args [2] = sum;
-      args [3] = new oclGPUDataObject <size_t> (& size, 1 * sizeof (size_t));
+      args [3] = new oclGPUDataObject <int> (& num_elems, 1);
 
       // create function object
       oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject ("add", args, 4, oclConnection::KERNEL, oclConnection::SYNC);
@@ -144,7 +139,7 @@
      */
     static inline
     const oclError &
-    ocl_operator_subtract           (oclDataObject * const arg1, oclDataObject * const arg2, oclDataObject * const diff, size_t size)
+    ocl_operator_subtract           (oclDataObject * const arg1, oclDataObject * const arg2, oclDataObject * const diff, int num_elems)
     {
       
       std::cout << "oclTraits <float> :: ocl_operator_subtract" << std::endl;
@@ -154,13 +149,14 @@
       args [0] = arg1;
       args [1] = arg2;
       args [2] = diff;
-      args [3] = new oclGPUDataObject <size_t> (& size, 1 * sizeof (size_t));
+      args [3] = new oclGPUDataObject <int> (& num_elems, 1);
             
       // create function object
       oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject ("subtract", args, 4, oclConnection::VCL, oclConnection::SYNC);
       
       // execute function object
       op_obj -> run ();
+      std::cout << "Traits after run" << std::endl;
       
       // clear memory
       delete op_obj;

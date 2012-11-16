@@ -95,8 +95,8 @@ oclConnection ( const char      * filename,
   if (m_devs.size() == 0)
     throw "No devices available on this platform";
 
-  // context
-  m_cont = clContext (m_devs);       // same context for all devices
+  // context /** ViennaCL **/ /* TODO */
+  m_cont = clContext ( viennacl::ocl::current_context () . handle () . get ()); //clContext (m_devs);       // same context for all devices
   
   // command queues
   for (clDevices::iterator it = m_devs.begin(); it < m_devs.end(); ++it)  // iterate over all devices and create a command queue for each
@@ -124,6 +124,15 @@ oclConnection ( const char      * filename,
 
   if (m_verbose)
     cout << " ** oclConnection constructed!" << endl;
+    
+  /**
+   * setup ViennaCL
+   */
+  if (m_verbose)
+    cout << " ** setup ViennaCl!" << endl;
+//  viennacl::ocl::setup_context (0, m_cont (), m_devs [0] (), m_comqs [0] ());
+  viennacl :: vector <float> tmp (10);
+  tmp = tmp + tmp;
 
 }
 

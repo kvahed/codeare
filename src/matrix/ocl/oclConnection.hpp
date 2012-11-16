@@ -511,9 +511,9 @@
   // create function object for running an OpenCL kernel
   oclFunctionObject * const
   oclConnection ::
-  makeFunctionObject    (const string & algo_name,
-                         oclDataObject * const * const args, const int & num_args,
-                         const KernelType kernel_type, const SyncType sync_type)
+  makeFunctionObject    (const        string &                 algo_name,
+                               oclDataObject * const * const        args, const      int &  num_args,
+                         const    KernelType                 kernel_type, const SyncType   sync_type)
   {
     
     oclFunctionObject * kernel_obj;

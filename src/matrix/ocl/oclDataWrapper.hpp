@@ -44,8 +44,9 @@
        * @param             size        ... in bytes
        *
        */
-      oclDataWrapper        (T * const cpu_data, const size_t size)
-                          : oclDataObject (size),
+      oclDataWrapper        (        T * const   cpu_data,
+                             const int          num_elems)
+                          : oclDataObject (num_elems, num_elems * sizeof (T)),
                             mp_cpu_data   (cpu_data)
       {
       
@@ -58,8 +59,8 @@
        * @brief             "copy state" constructor
        *
        */
-      oclDataWrapper        (                   T     * const cpu_data,
-                             const         size_t                 size,
+      oclDataWrapper        (                   T     * const  cpu_data,
+                             const            int             num_elems,
                              const oclDataWrapper <T> &            obj)
                           : oclDataObject   (obj),
                             mp_cpu_data     (cpu_data)
@@ -67,10 +68,10 @@
       
         std::cout << "Ctor: \"oclDataWrapper\" ... copied state" << std::endl;
               
-        if (size != obj.getSize ())
+        if (num_elems != obj.getNumElems())
         {
         
-          throw " *!* Error: Sizes don't match! *!*";
+          throw " *!* Error: Sizes or num_elems don't match! *!*";
         
         }
               

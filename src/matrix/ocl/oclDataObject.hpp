@@ -99,6 +99,14 @@
       getBuffer             () const;
       
       
+      /**
+       * @brief             getter for number of elements
+       */
+      inline
+      int
+      getNumElems           () const;
+      
+      
       //@}
       
       
@@ -138,10 +146,11 @@
        *
        * @param             size - ... in bytes
        */
-      oclDataObject         (const size_t size)
+      oclDataObject         (const int num_elems, const size_t size)
                           : m_gpu_obj_id  (id_counter ++),      // init object ID
                             mp_gpu_buffer (NULL),               // init buffer (pointer: NULL)
                             m_size        (size),               // init size
+                            m_num_elems   (num_elems),          // init number of elements
                             m_on_gpu      (false),              // data loaded to GPU on demand
                             mp_modified   ({true, false}),      // ... so data aren't sync
                             m_lock        (false)               // ... and there're no calculations on GPU
@@ -164,6 +173,7 @@
                           : m_gpu_obj_id    (id_counter ++),
                             mp_gpu_buffer   (obj.mp_gpu_buffer),      // shallow copy (OK!)
                             m_size          (obj.m_size),
+                            m_num_elems     (obj.m_num_elems),
                             m_on_gpu        (obj.m_on_gpu),
                             m_lock          (obj.m_lock)
       {
@@ -177,6 +187,9 @@
 
         // register data object at oclConnection
         oclConnection :: Instance () -> addDataObject (this);
+        
+        if (m_on_gpu)
+          std::cout << " -> oclDataObject (" << m_gpu_obj_id << "): on GPU!" << std::endl;
       
       }
       
@@ -297,6 +310,7 @@
              cl::Buffer   * mp_gpu_buffer;    // Buffer representation of data object
       
                  size_t     m_size;           // size of data (in bytes)
+                    int     m_num_elems;      // number of elements
                  
                    bool     m_on_gpu;         // determines wether data is available on GPU
                    bool     mp_modified [2];  // specifies, if data on GPU and CPU are the same
@@ -348,13 +362,13 @@
   
     std::cout << "oclDataObject :: getVCLObject (!!! not yet implemented !!!)" << std::endl;
   
-//    loadToGPU ();
+    loadToGPU ();
   
-//    std::cout << " ** after loadToGPU ()" << std::endl;
+    std::cout << " ** after loadToGPU ()" << std::endl;
   
-//    return viennacl :: vector <S> ((*mp_gpu_buffer)(), m_size);
+    return viennacl :: vector <S> ((*mp_gpu_buffer)(), m_num_elems);
   
-    return viennacl :: vector <S> (1);
+//    return viennacl :: vector <S> (m_size);
   
     /* TODO */
     
@@ -463,6 +477,22 @@
   
   
   
+  /**
+   * @brief               getter for m_num_elems
+   */
+  inline
+  int
+  oclDataObject ::
+  getNumElems             ()
+  const
+  {
+  
+    return m_num_elems;
+  
+  }
+  
+  
+  
         /*************
     --   ** setters **   --
          *************/
@@ -507,6 +537,8 @@
   oclDataObject ::
   setLoaded               ()
   {
+  
+    std::cout << " ---------------------------> loaded (" << getID () << ")" << std::endl;
   
     m_on_gpu = true;
   

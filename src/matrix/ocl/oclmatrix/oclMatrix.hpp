@@ -274,7 +274,7 @@
     // call operator function of oclTraits
     oclTraits <T> :: ocl_operator_subtract (this -> mp_oclData, mat.mp_oclData, diff.mp_oclData, this -> Size ());
     
-    return ((Matrix <T>) *this - (Matrix <T>) mat);
+    return diff;
     
   }
   

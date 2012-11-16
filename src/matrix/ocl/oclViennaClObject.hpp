@@ -179,9 +179,24 @@
   {
     
     std::cout << "oclViennaClObject :: run!" << std::endl;
+
+    // prepare kernel arguments (load to gpu)
+    for (int i = 0; i < m_num_args; i++)
+    {
+
+      // prepare argument
+      mpp_args [i] -> prepare ();
+
+    }
     
     // execute functor
     (*mp_algo_functor) ();
+    
+    // get data
+    for (int i = 0; i < m_num_args; i++)
+    {
+      mpp_args [i] -> finish ();
+    }
     
   }
   

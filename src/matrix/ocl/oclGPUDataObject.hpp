@@ -44,9 +44,9 @@
        * @param               size      @see ocldataWrapper <T>
        *
        */
-      oclGPUDataObject        (           T   * const  cpu_data,
-                               const size_t   &            size)
-                            : oclDataWrapper <T> (cpu_data, size)
+      oclGPUDataObject        (           T   * const   cpu_data,
+                               const    int   &        num_elems)
+                            : oclDataWrapper <T> (cpu_data, num_elems)
       {
       
         std::cout << "Ctor: \"oclGPUDataObject\"" << std::endl;
@@ -57,10 +57,10 @@
       /**
        * @brief               "copy state" constructor
        */
-      oclGPUDataObject        (                   T     * const cpu_data,
-                               const         size_t     &           size,
+      oclGPUDataObject        (                   T     * const  cpu_data,
+                               const            int     &       num_elems,
                                const oclDataWrapper <T> &            obj)
-                            : oclDataWrapper <T> (cpu_data, size, obj)
+                            : oclDataWrapper <T> (cpu_data, num_elems, obj)
       {
       
         std::cout << "Ctor: \"oclGPUDataObject\" ... copied state" << std::endl;
@@ -132,7 +132,7 @@
     // set status: calculating (set available via finish ())
     oclDataObject :: setLocked ();
   
-    std::cout << "oclGPUDataObject::prepare" << std::endl;
+    std::cout << "oclGPUDataObject::prepare (" << oclDataObject :: getID () << ")" << std::endl;
 
     // synchronize GPU data / load to GPU
     oclDataWrapper <T> :: loadToGPU ();
