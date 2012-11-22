@@ -28,18 +28,23 @@ oclmatrixtest (Connector<T>* rc) {
 
   // choose tests
   enum Test_Type {constructors, m_scalar_add, m_mat_add, ocl_mat_add, ocl_mat_sub};
-  bool tests [5] = {      true,         true,      false,        true,       true};
+  bool tests [5] = {      true,         true,     false,        true,        true};
   
   
   std::cout << std::endl;
   std::cout << " * oclmatrixtest " << std::endl << std::endl;
   
   // choose dimensions
-  int dimX = 2000, dimY = 2000;
+  int dimX = 10000, dimY = 2000;
+
+  bool verbose;
+  if (dimX + dimY < 100)
+    verbose = true;
 
   Matrix_type mat_zeros;
-//  std::cout << "mat_zeros" << mat_zeros << std::endl;
-mat_zeros.getData ();
+  if (verbose)
+    std::cout << "mat_zeros" << mat_zeros << std::endl;
+  mat_zeros.getData ();
 
   if (tests [constructors])
   {
@@ -58,9 +63,18 @@ mat_zeros.getData ();
   if (tests [m_scalar_add])
   {
     std::cout << " * scalar addition" << std::endl;
+    mat_zeros.getData (); /* !!! */
     mat_zeros += 3;
   }
-  
+/*
+  Matrix_type mat;
+  std::cout << " !!!!!!! mat_zeros:" << std::endl;
+  std::cout << mat_zeros << std::endl;
+  mat_zeros + mat_zeros;
+  mat = mat_zeros;
+  std::cout << " !!!!!!! mat:" << std::endl;
+  std::cout << mat << std::endl;
+*/  
 /*  if (tests [m_mat_add])
   {
     std::cout << " * Matrix<T> addition" << std::endl;
@@ -81,7 +95,8 @@ mat_zeros.getData ();
   {
     
     Matrix_type mat1 = mat_zeros, mat2 = mat_zeros;
-//    std::cout << "mat_zeros\n" << mat_zeros << std::endl;
+    if (verbose)
+      std::cout << "mat_zeros\n" << mat_zeros << std::endl;
     //////
     std::cout << "------------------------------------------------------------" << std::endl;
     std::cout << " * oclMatrix<T> addition" << std::endl;
@@ -90,13 +105,14 @@ mat_zeros.getData ();
     mat_zeros = mat1 + mat2;
     time_ocl = t.tic (time_default);
 
-//    std::cout << " print \"mat_zeros\": " << std::endl << mat_zeros << std::endl;
+    if (verbose)
+      std::cout << " print \"mat_zeros\": " << std::endl << mat_zeros << std::endl;
 
     t.tic (time_default);
     smat = smat + smat;
     time_s = t.tic (time_default);
 
-    mat_zeros.getData (); // !!! //    
+    mat_zeros.getData (); // !!! //
     Matrix <bool> mat_comp = (smat == mat_zeros);
     result = true;
     for (int i = 0; i < dimX; i++)
@@ -118,10 +134,14 @@ mat_zeros.getData ();
     mat_zeros = mat_zeros - mat_zeros;
     time_ocl = t.tic (time_default);
   
+    if (verbose)
+      std::cout << " print \"mat_zeros\": " << std::endl << mat_zeros << std::endl;
+  
     t.tic (time_default);
     smat = smat - smat;
     time_s = t.tic (time_default);
   
+    mat_zeros.getData (); // !!! //
     mat_comp = (smat == mat_zeros);
     result = true;
     for (int i = 0; i < dimX; i++)

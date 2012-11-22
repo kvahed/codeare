@@ -10,6 +10,18 @@
    ** type definitions **
    **********************/
   typedef int oclObjectID;
+  
+  
+  
+  /****************
+   ** enum types **
+   ****************/
+  enum vclAlgoType
+  {
+      
+    vclSUBTRACT
+  
+  };
 
 
   

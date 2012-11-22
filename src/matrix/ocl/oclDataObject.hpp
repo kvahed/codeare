@@ -33,8 +33,13 @@
 
 
     public:
-
+ 
+ 
+      /***************************
+       ** function declarations **
+       ***************************/
   
+ 
       /**
        * @brief             pure virtual: prepare ()
        *
@@ -43,6 +48,14 @@
       virtual
       oclError &
       prepare               () = 0;
+
+
+      /**
+       * @brief             print object's state to command line
+       */
+      virtual
+      void
+      print                 ();
 
 
       /**
@@ -74,13 +87,21 @@
       size_t
       getSize               () const;
       
-      
+     
       /**
        * @brief             return sync status (GPU <-> CPU memory)
        */
       inline
       bool
       getSyncState          () const;
+      
+      
+      /**
+       * @brief             return flag for device thats data has been modified
+       */
+      inline
+      bool
+      getCPUModified        () const;
       
       
       /**
@@ -105,6 +126,14 @@
       inline
       int
       getNumElems           () const;
+      
+      
+      /**
+       * @brief             is buffer of object copyable ?
+       */
+      inline
+      bool
+      bufferCopyable     () const;
       
       
       //@}
@@ -166,31 +195,48 @@
       
       /**
        * @brief             copy constructor
+       *                      -> keep_buffer  (true): all state vars are copied
+       *                      -> keep_buffer (false): state "not on gpu"
        *
        * @param             pointer oclDataObject to copy
        */
-      oclDataObject         (const oclDataObject & obj)
+      oclDataObject         (const oclDataObject & obj, bool keep_buffer = false)
                           : m_gpu_obj_id    (id_counter ++),
-                            mp_gpu_buffer   (obj.mp_gpu_buffer),      // shallow copy (OK!)
+                            mp_gpu_buffer   (NULL),
                             m_size          (obj.m_size),
                             m_num_elems     (obj.m_num_elems),
-                            m_on_gpu        (obj.m_on_gpu),
+                            m_on_gpu        (false),              // for addDataObject (...) !!!
                             m_lock          (obj.m_lock)
       {
       
         std::cout << "Ctor: \"oclDataObject\" (" << m_gpu_obj_id << ") ... copied state from " << obj.m_gpu_obj_id << std::endl;
-      
-        // deep copy of modification array
-        new (mp_modified) bool [2]; 
-        mp_modified [0] = obj.mp_modified [0];
-        mp_modified [1] = obj.mp_modified [1];
+        
+        /* copy state of obj (if it's going to be copied) */
+        if (keep_buffer && obj.bufferCopyable ())
+        {
+        
+          // deep copy of modification array
+          new (mp_modified) bool [2];
+          mp_modified [CPU] = obj.mp_modified [CPU];
+          mp_modified [GPU] = obj.mp_modified [GPU];
 
-        // register data object at oclConnection
+        }
+        else
+        {
+
+          // sync state
+          new (mp_modified) bool [2];
+          mp_modified [CPU] = true;
+          mp_modified [GPU] = false;
+          
+          // lock state
+          m_lock = false;
+
+        }
+        
+        // register data object at oclConnection (IMPORTANT: after object state has been updated!!!)
         oclConnection :: Instance () -> addDataObject (this);
         
-        if (m_on_gpu)
-          std::cout << " -> oclDataObject (" << m_gpu_obj_id << "): on GPU!" << std::endl;
-      
       }
       
 
@@ -319,17 +365,19 @@
 
 
     private:
-
     
-      static oclObjectID    id_counter;       // global counter to produce unique IDs
-
+    
       /****************
        ** enum types **
        ****************/
       
       // indices of m_modified
-      enum {CPU, GPU};
-      
+      enum device_flag
+      {CPU = 0, GPU = 1, NONE};
+    
+    
+      static oclObjectID    id_counter;       // global counter to produce unique IDs
+            
 
 
   }; // class oclDataObject
@@ -352,6 +400,41 @@
 
 
   /**
+   * @brief             print object's state to command line
+   */
+  void
+  oclDataObject ::
+  print                 ()
+  {
+  
+    std::cout << " *%* oclDataObject (" << getID () << "):" << std::endl;
+    std::cout << " *%*  -> Buffer: ";
+    if (m_on_gpu)
+      std::cout << " yes" << std::endl;
+    else
+      std::cout << " no" << std::endl;
+    std::cout << " *%*  -> GPU: ";
+    if (mp_modified [GPU])
+      std::cout << " yes" << std::endl;
+    else
+      std::cout << " no" << std::endl;
+    std::cout << " *%*  -> CPU: ";
+    if (mp_modified [CPU])
+      std::cout << " yes" << std::endl;
+    else
+      std::cout << " no" << std::endl;
+    std::cout << " *%*  -> locked: ";
+    if (m_lock)
+      std::cout << " yes" << std::endl;
+    else
+      std::cout << " no" << std::endl;
+    std::cout << " *%*  -> size (num_elems): " << m_size << " (" << m_num_elems << ")" << std::endl;
+  
+  }
+  
+
+
+  /**
    *                      -- refer to class definition --
    */
   template <class S>
@@ -360,18 +443,14 @@
   getVCLObject            ()
   {
   
-    std::cout << "oclDataObject :: getVCLObject (!!! not yet implemented !!!)" << std::endl;
-  
+    std::cout << "oclDataObject :: getVCLObject" << std::endl;
+    
+    /* ensure data is available on GPU */
     loadToGPU ();
   
-    std::cout << " ** after loadToGPU ()" << std::endl;
-  
+    /* create (and return) ViennaCl vector */
     return viennacl :: vector <S> ((*mp_gpu_buffer)(), m_num_elems);
-  
-//    return viennacl :: vector <S> (m_size);
-  
-    /* TODO */
-    
+      
   }
 
   
@@ -390,7 +469,7 @@
   getBuffer               ()
   const
   {
-  
+    
     return mp_gpu_buffer;
   
   }
@@ -459,6 +538,21 @@
     
   }
   
+  
+  /**
+   * @brief               return flag for device, that is modified
+   */
+  inline
+  bool
+  oclDataObject ::
+  getCPUModified             ()
+  const
+  {
+  
+    return mp_modified [CPU];
+    
+  }
+  
  
   
   /**
@@ -490,6 +584,25 @@
     return m_num_elems;
   
   }
+  
+  
+  
+  /**
+   * @brief             is buffer of object copyable ?
+   *                    1.) no buffer exists on GPU
+   *                    2.) CPU data is modified, so data on GPU is not up to date
+   */
+  inline
+  bool
+  oclDataObject ::
+  bufferCopyable     ()
+  const
+  {
+  
+    return m_on_gpu && ! mp_modified [CPU];
+  
+  }
+
   
   
   

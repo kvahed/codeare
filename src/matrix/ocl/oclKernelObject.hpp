@@ -138,7 +138,7 @@
     }
     
     // run kernel
-    cl::NDRange global_dims (8);
+    cl::NDRange global_dims (512);
     cl::NDRange local_dims = cl::NullRange;
     oclCon -> runKernel (global_dims, local_dims);
     

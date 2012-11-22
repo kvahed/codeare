@@ -49,6 +49,36 @@ __kernel void add (__global float * arg1, __global float * arg2, __global float 
 }
 
 
+
+__kernel void copy_buffer (__global float * arg1, __global float * arg2, __global int * size)
+{
+
+  int index;
+
+  if (get_work_dim () == 1)
+  {
+    index = get_local_id (0);
+  }
+  else
+  {
+    return;
+  }
+ 
+  int global_size = get_global_size (0);
+  
+  int global_inc = global_size;
+  
+  int local_position = index;
+  
+  for (int i = local_position; i < *size; i += global_inc)
+  {
+    arg1 [i] = arg2 [i];
+  }
+  
+}
+
+
+
 typedef float elem_type;
 
 #pragma OPENCL_EXTENSION cl_amd_printf : enable

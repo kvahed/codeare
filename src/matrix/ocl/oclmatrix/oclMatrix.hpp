@@ -86,7 +86,8 @@
                       : Matrix <T> ((Matrix<T>) mat),
                         mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
                                                                    Matrix <T> :: Size (),
-                                                                   * mat.mp_oclData))
+                                                                   * mat.mp_oclData,
+                                                                   true))
       {
 
         T t;
@@ -165,7 +166,8 @@
        */
       inline
       void
-      getData           ();
+      getData           ()
+      const;
 
 
 
@@ -209,25 +211,32 @@
   operator=            (const oclMatrix <T> & mat)
   {
       
-    std::cout << " ** oclMatrix :: operator=" << std::endl;
-      
     // otherwise: self assignment
     if (this != &mat)
     {
-        
+
       // copy members of Matrix <T>
       memcpy (Matrix<T> :: _dim, mat.Dim(), INVALID_DIM * sizeof(size_t));
-      memcpy (Matrix<T> :: _res, mat.Res(), INVALID_DIM * sizeof( float));        
-      Matrix<T> :: _M = mat.Dat();      // uses deep copy of valarray <T>
-      
+      memcpy (Matrix<T> :: _res, mat.Res(), INVALID_DIM * sizeof( float));
+
       // temporary save current oclDataObject
-      oclDataWrapper <T> * p_tmp_oclData = mp_oclData;
-      
+      oclDataWrapper <T> * p_old_oclData = this -> mp_oclData;
+
       // create new wrapper for gpu memory (and !new! cpu memory, copy object state!!!)
-      mp_oclData = oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]), Matrix <T> :: Size (), * mat.mp_oclData);
+      /* important to copy object before CPU data !!! */
+      this -> mp_oclData = oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]), Matrix <T> :: Size (), * mat.mp_oclData, true);
+      
+      /* if buffer is copied, CPU data need not to be copied */
+      if (! this -> mp_oclData -> bufferCopyable ())
+      {
+
+        // copy data array of Matrix <T>
+        Matrix<T> :: _M = mat.Dat();      // uses deep copy of valarray <T>
+
+      }
       
       // delete old oclDataObject
-      delete p_tmp_oclData;
+      delete p_old_oclData;
       
     }
         
@@ -314,6 +323,7 @@
   void
   oclMatrix <T> ::
   getData               ()
+  const
   {
   
     // load GPU data to CPU

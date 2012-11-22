@@ -31,7 +31,7 @@
    **************************/
   class oclDataObject;
   class oclFunctionObject;
-  class vclAlgoFunctor;
+//  class vclAlgoFunctor;
   
 
 
@@ -83,11 +83,19 @@
       void
       Finalise              ();
       
+      template <class T>
       oclFunctionObject * const
       makeFunctionObject    (const string & kernel_name,
                              oclDataObject * const * const args, const int & num_args,
                              const KernelType kernel_type, const SyncType sync_type);
-                              
+                        
+      template <class T>     
+      oclFunctionObject * const
+      makeFunctionObject    (const vclAlgoType & algo_name,
+                             oclDataObject * const * const args, const int & num_args,
+                             const KernelType kernel_type, const SyncType sync_type);
+                             
+ 
       void
       addDataObject         (oclDataObject * const ocl_obj);
       void
@@ -253,8 +261,8 @@
        * @brief               register kernel argument
        */
       cl_int
-      setKernelArg            (int              num,
-                               oclDataObject *  obj_id);
+      setKernelArg            (      int              num,
+                               const oclDataObject *  obj_id);
     
     
       // get argument from activated kernel
@@ -402,8 +410,8 @@
    */
   cl_int
   oclConnection ::
-  setKernelArg            (int              num,
-                           oclDataObject *  p_arg)
+  setKernelArg            (      int              num,
+                           const oclDataObject *  p_arg)
   {
  
     // register kernel argument
@@ -509,9 +517,10 @@
   
   
   // create function object for running an OpenCL kernel
+  template <class T>
   oclFunctionObject * const
   oclConnection ::
-  makeFunctionObject    (const        string &                 algo_name,
+  makeFunctionObject    (const        string &               kernel_name,
                                oclDataObject * const * const        args, const      int &  num_args,
                          const    KernelType                 kernel_type, const SyncType   sync_type)
   {
@@ -523,7 +532,7 @@
     
       if (sync_type == SYNC)
       {
-        kernel_obj = new oclKernelObject (algo_name, args, num_args);
+        kernel_obj = new oclKernelObject (kernel_name, args, num_args);
       }
       else
       {
@@ -531,12 +540,29 @@
       }
 
     }
-    else
+    
+    return kernel_obj;
+    
+  }
+  
+  
+  // create function object for running an ViennaCL algorithm
+  template <class T>
+  oclFunctionObject * const
+  oclConnection ::
+  makeFunctionObject    (const   vclAlgoType &                 algo,
+                               oclDataObject * const * const        args, const      int &  num_args,
+                         const    KernelType                                   kernel_type, const SyncType   sync_type)
+  {
+  
+    oclFunctionObject * algo_obj;
+    
+    if (kernel_type == VCL)
     {
     
       if (sync_type == SYNC)
       {
-        kernel_obj = new oclViennaClObject (algo_name, args, num_args);
+        algo_obj = new oclViennaClObject <T> (algo, args, num_args);
       }
       else
       {
@@ -545,7 +571,7 @@
     
     }
 
-    return kernel_obj;
+    return algo_obj;
     
   }
   

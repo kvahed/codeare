@@ -10,10 +10,20 @@
 
 
 
+  /**************
+   ** includes **
+   **************/
+   
+  // ocl
+  # include "oclSettings.hpp"
+
+
+
 
   /**************************
    ** forward declarations **
    **************************/
+  template <class T>
   class oclViennaClObject;
 
 
@@ -25,6 +35,7 @@
    **   (still containing   **
    **    dummy functions)   **
    ***************************/
+  template <class T>
   class vclAlgoFunctor
   {
 
@@ -35,7 +46,7 @@
 
       /**
        * @brief               overloaded operator (functor)
-       */  
+       */
       virtual
       void
       operator()              ()
@@ -60,7 +71,7 @@
       /**
        * @brief               constructor
        */
-      vclAlgoFunctor          (const oclViennaClObject * const p_vclObj)
+      vclAlgoFunctor          (const oclViennaClObject <T> * const p_vclObj)
                             : mp_vclObj (p_vclObj)
       {
       
@@ -77,7 +88,7 @@
        ** member variables **
        **********************/
       
-      const oclViennaClObject * const mp_vclObj;
+      const oclViennaClObject <T> * const mp_vclObj;
 
 
 
@@ -90,7 +101,8 @@
    ** class: vclSubtractAlgo **
    **    (derived)           **
    ****************************/
-  class vclSubtractAlgo : public vclAlgoFunctor
+  template <class T>
+  class vclSubtractAlgo : public vclAlgoFunctor <T>
   {
 
   
@@ -107,8 +119,8 @@
       /**
        * @brief             constructor
        */
-      vclSubtractAlgo       (const oclViennaClObject * const p_vclObj)
-                          : vclAlgoFunctor (p_vclObj)
+      vclSubtractAlgo       (const oclViennaClObject <T> * const p_vclObj)
+                          : vclAlgoFunctor <T> (p_vclObj)
       {
 
         std::cout << "Ctor: \"vclSubtractAlgo\"" << std::endl;
@@ -130,14 +142,14 @@
       const
       {
 
-        std::cout << "vclSubtractAlgo :: operator() !!! float !!!" << std::endl;
+        std::cout << "vclSubtractAlgo <T> :: operator()" << std::endl;
 
         /**
          * create ViennaCl arguments
          */
-        viennacl :: vector <float> arg1 = vclAlgoFunctor :: mp_vclObj -> getVCLArg <float> (0);
-        viennacl :: vector <float> arg2 = vclAlgoFunctor :: mp_vclObj -> getVCLArg <float> (1);
-        viennacl :: vector <float> diff = vclAlgoFunctor :: mp_vclObj -> getVCLArg <float> (2);
+        viennacl :: vector <T> arg1 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (0);
+        viennacl :: vector <T> arg2 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (1);
+        viennacl :: vector <T> diff = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (2);
         
         diff = arg1 - arg2;
         
@@ -159,19 +171,27 @@
   /**********************
    ** global functions **
    **********************/
+  template <class T>
   static
-  const vclAlgoFunctor * const
-  get_algo_functor     (const string & algo_name,
-                        const oclViennaClObject * const p_vclObj)
+  const vclAlgoFunctor <T> * const
+  get_algo_functor     (const       vclAlgoType     &           algo,
+                        const oclViennaClObject <T> * const p_vclObj)
   {
-    
+        
     std::cout << " :: get_algo_functor" << std::endl;
-    std::cout << "!! choosing subtraction !!" << std::endl;
+
+    /* choose requested algorithm */
+    switch (algo)
+    {
     
-    return new vclSubtractAlgo (p_vclObj);
+      case vclSUBTRACT:
+        return new vclSubtractAlgo <T> (p_vclObj);
+
+      default:
+        throw "*!* Specified ViennaCL algorithm not available! *!*";
     
-    /* TODO */
-    
+    }
+
   }
   
   

@@ -59,19 +59,46 @@
        * @brief             "copy state" constructor
        *
        */
-      oclDataWrapper        (                   T     * const  cpu_data,
-                             const            int             num_elems,
-                             const oclDataWrapper <T> &            obj)
-                          : oclDataObject   (obj),
+      oclDataWrapper        (                   T     * const    cpu_data,
+                             const            int               num_elems,
+                                   oclDataWrapper <T> &               obj,
+                                             bool             keep_buffer = false)
+                          : oclDataObject   (obj, keep_buffer),
                             mp_cpu_data     (cpu_data)
       {
       
         std::cout << "Ctor: \"oclDataWrapper\" ... copied state" << std::endl;
-              
+
+        /* check if sizes match (copying allowed) */
         if (num_elems != obj.getNumElems())
         {
         
-          throw " *!* Error: Sizes or num_elems don't match! *!*";
+          throw " *!* Error: Num_elems don't match! *!*";
+        
+        }
+        
+        /* copy buffer of obj on GPU */
+        if (keep_buffer && obj.bufferCopyable ())
+        {
+         
+          // create buffer object
+          oclConnection :: Instance () -> createBuffer (mp_cpu_data, oclDataObject :: getSize (), oclDataObject :: getID ());
+    
+          // update memory state
+          oclDataObject :: setLoaded ();
+
+        }
+        else
+        {
+        
+          /* data on GPU is newer than on CPU ? */
+          if (obj.getMemState () && ! obj.getSyncState ())
+          {
+        
+            // copy data of obj to CPU (so that data can be copied by oclMatrix)
+            obj.loadToCPU ();
+
+          }
         
         }
               
@@ -99,6 +126,14 @@
       virtual
       oclError &
       getData               () = 0;
+      
+      
+      /**
+       * @brief             print object's state to command line
+       */
+      virtual
+      void
+      print                 ();
       
       
       
@@ -198,7 +233,7 @@
           
       if (oclDataObject :: mp_modified [GPU])
       {
-        std::cout << "copy" << std::endl;
+        
         // update CPU data
         oclConnection :: Instance () -> loadToCPU (oclDataObject :: mp_gpu_buffer, mp_cpu_data, oclDataObject :: m_size);
         
@@ -217,6 +252,34 @@
   
   }
   
+  
+  
+  /**
+   * @brief             print object's state to command line
+   */
+  template <class T>
+  void
+  oclDataWrapper <T> ::
+  print                 ()
+  {
+  
+    /* call method from super class */
+    oclDataObject :: print ();
+    
+    /* add own state */
+    std::cout << " *%* -oclDataWrapper-" << std::endl;
+    std::cout << " *%*  -> data: ";
+    if (oclDataObject :: getNumElems () > 10)
+      std::cout << " << too large >> " << std::endl;
+    else
+    {
+      for (int i = 0; i < oclDataObject :: getNumElems (); i++)
+        std::cout << mp_cpu_data [i] << " ";
+      std::cout << std::endl;
+    }
+  
+  }
+
   
   
 # endif // __OCL_DATA_WRAPPER_HPP__

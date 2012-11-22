@@ -17,6 +17,8 @@
   
   // ocl
   # include "oclFunctionObject.hpp"
+  # include "oclSettings.hpp"
+
 
 
   
@@ -25,14 +27,17 @@
    **************************/
 
   // classes
+  template <class T>
   class vclAlgoFunctor;
+  template <class T>
   class oclViennaClObject;
 
   // functions
+  template <class T>
   static
-  const vclAlgoFunctor * const
-  get_algo_functor     (const string & algo_name,
-                        const oclViennaClObject * const p_vclObj);
+  const vclAlgoFunctor <T> * const
+  get_algo_functor     (const       vclAlgoType &       algo_name,
+                        const oclViennaClObject <T> * const  p_vclObj);
   
   
   
@@ -41,6 +46,7 @@
    ** class: oclViennaClObject **
    **   (derived)              **
    ******************************/
+  template <class T>
   class oclViennaClObject : public oclFunctionObject
   {
   
@@ -58,11 +64,11 @@
       /**
        * @brief           constructor
        */
-      oclViennaClObject   (const string                         algo_name,
-                                 oclDataObject  * const * const pp_args,
+      oclViennaClObject   (const vclAlgoType                        algo,
+                                 oclDataObject  * const * const  pp_args,
                                  int                            num_args)
                         : oclFunctionObject (pp_args, num_args),
-                          mp_algo_functor   (get_algo_functor (algo_name, this))
+                          mp_algo_functor   (get_algo_functor <T> (algo, this))
       {
       
         std::cout << "Ctor: \"oclViennaClObject\"" << std::endl;
@@ -93,8 +99,8 @@
       /**
        * @brief           retrieve data wrapped by a ViennaCl object
        */
-      template <class T>
-      viennacl :: vector <T>
+      template <class S>
+      viennacl :: vector <S>
       getVCLArg           (const int num)
       const;
       
@@ -106,7 +112,7 @@
       /**********************
        ** member variables **
        **********************/
-      const vclAlgoFunctor * const mp_algo_functor;
+      const vclAlgoFunctor <T> * const mp_algo_functor;
     
     
   
@@ -125,15 +131,16 @@
    * @brief               refer to class definition
    */
   template <class T>
-  viennacl :: vector <T>
-  oclViennaClObject ::
+  template <class S>
+  viennacl :: vector <S>
+  oclViennaClObject <T> ::
   getVCLArg               (const int num)
   const
   {
     
     std::cout << "oclViennaClObject :: getVCLArg" << std::endl;
     
-    return mpp_args [num] -> getVCLObject <T> ();
+    return mpp_args [num] -> getVCLObject <S> ();
     
   }
 
@@ -156,7 +163,8 @@
   /**
    * @brief               virtual destructor
    */
-  oclViennaClObject ::
+  template <class T>
+  oclViennaClObject <T> ::
   ~oclViennaClObject      ()
   {
     
@@ -173,8 +181,9 @@
   /**
    * @brief               refer to class definition
    */
+  template <class T>
   void
-  oclViennaClObject ::
+  oclViennaClObject <T> ::
   run                     ()
   {
     
