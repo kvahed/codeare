@@ -14,6 +14,7 @@
    **************/
   
   // ocl
+  # include "oclSettings.hpp"
   # include "oclDataWrapper.hpp"
   
   
@@ -49,7 +50,7 @@
                             : oclDataWrapper <T> (cpu_data, num_elems)
       {
       
-        std::cout << "Ctor: \"oclGPUDataObject\"" << std::endl;
+        print_optional ("Ctor: \"oclGPUDataObject\"", VERB_HIGH);
         
       }
       
@@ -64,7 +65,7 @@
                             : oclDataWrapper <T> (cpu_data, num_elems, obj, keep_buffer)
       {
       
-        std::cout << "Ctor: \"oclGPUDataObject\" ... copied state" << std::endl;
+        print_optional ("Ctor: \"oclGPUDataObject\" ... copied state", VERB_HIGH);
             
       }
       
@@ -76,7 +77,7 @@
       ~oclGPUDataObject       ()
       {
       
-        std::cout << "Dtor: \"oclGPUDataObject\"" << std::endl;
+        print_optional ("Dtor: \"oclGPUDataObject\"", VERB_HIGH);
 
       }
 
@@ -129,12 +130,12 @@
   oclGPUDataObject <T> ::
   prepare                     ()
   {
+
+    print_optional ("oclGPUDataObject::prepare (%d)", oclDataObject :: getID (), VERB_MIDDLE);
   
     // set status: calculating (set available via finish ())
     oclDataObject :: setLocked ();
-  
-    std::cout << "oclGPUDataObject::prepare (" << oclDataObject :: getID () << ")" << std::endl;
-
+    
     // synchronize GPU data / load to GPU
     oclDataWrapper <T> :: loadToGPU ();
     
@@ -154,11 +155,11 @@
   finish                      ()
   {
 
-    std::cout << "oclGPUDataObject::finish" << std::endl;
+    print_optional ("oclGPUDataObject::finish", VERB_HIGH);
 
     // update data state: available for use
     oclDataObject :: setUnlocked ();
-        
+
   }
   
   
@@ -172,12 +173,13 @@
   getData                     ()
   {
   
-    std::cout << "oclGPUDataObject::getData" << std::endl;
+    print_optional ("oclGPUDataObject::getData", VERB_HIGH);
     
     // check wether data is available or used on GPU
     if (oclDataObject :: getLockState ())
     {
     
+      /* TODO: return error !!! */
       std::cout << " *!* calculating on GPU ... data not available *!* " << std::endl;
     
     }

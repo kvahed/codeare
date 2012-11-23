@@ -14,6 +14,7 @@
    **************/
   
   // ocl
+  # include "oclSettings.hpp"
   # include "oclDataObject.hpp"
   
   
@@ -50,7 +51,7 @@
                             mp_cpu_data   (cpu_data)
       {
       
-        std::cout << "Ctor: \"oclDataWrapper\"" << std::endl;
+        print_optional ("Ctor: \"oclDataWrapper\"", VERB_HIGH);
                         
       }
       
@@ -67,7 +68,7 @@
                             mp_cpu_data     (cpu_data)
       {
       
-        std::cout << "Ctor: \"oclDataWrapper\" ... copied state" << std::endl;
+        print_optional ("Ctor: \"oclDataWrapper\" ... copied state", VERB_HIGH);
 
         /* check if sizes match (copying allowed) */
         if (num_elems != obj.getNumElems())
@@ -112,7 +113,7 @@
       ~oclDataWrapper       ()
       {
       
-        std::cout << "Dtor: \"oclDataWrapper\"" << std::endl;
+        print_optional ("Dtor: \"oclDataWrapper\"", VERB_HIGH);
                 
       }
         
@@ -186,7 +187,7 @@
   loadToGPU                 ()
   {
       
-    std::cout << "loadToGPU ()" << std::endl;
+    print_optional ("oclDataWrapper :: loadToGPU ()", VERB_HIGH);
 
     // buffer on GPU exists ?
     if (! oclDataObject :: getMemState ())
@@ -225,12 +226,12 @@
   loadToCPU                 ()
   {
 
+    print_optional ("oclDataWrapper :: loadToCPU ()", VERB_HIGH);
+
     // buffer on GPU exists
     if (oclDataObject :: getMemState ())
     {
   
-      std::cout << "loadToCPU ()" << std::endl;
-          
       if (oclDataObject :: mp_modified [GPU])
       {
         
@@ -243,7 +244,7 @@
       }
       
     }
-    else // ERROR if no buffer exists
+    else // ERROR if no buffer exists TODO !!!
     {
     
       std::cout << " *!* Error: no buffer on GPU (id:" << oclDataObject :: getID () << ") *!*" << std::endl;
@@ -269,7 +270,7 @@
     /* add own state */
     std::cout << " *%* -oclDataWrapper-" << std::endl;
     std::cout << " *%*  -> data: ";
-    if (oclDataObject :: getNumElems () > 10)
+    if (oclDataObject :: getNumElems () > 16)
       std::cout << " << too large >> " << std::endl;
     else
     {

@@ -14,14 +14,9 @@
    **************/
   
   // ocl
+  # include "oclSettings.hpp"
   # include "oclDataObject.hpp"
   
-  
-  
-  /**************************
-   ** forward declarations **
-   **************************/
-//  class oclDataObject;
   
 
   
@@ -36,22 +31,33 @@
     public:
     
 
-      // constructor
-      oclFunctionObject   (oclDataObject * const * const pp_args,
-                           int                           num_args )
-                        : mpp_args     (pp_args),
-                          m_num_args (num_args)
+      /**
+       * @brief           default constructor
+       */
+      oclFunctionObject   ( oclDataObject * const * const pp_args,
+                            int                           num_args )
+                         : mpp_args    (pp_args),
+                           m_num_args (num_args)
       {
-        std::cout << "Ctor: \"oclFunctionObject\"" << std::endl;
+        
+        print_optional ("Ctor: \"oclFunctionObject\"", VERB_HIGH);
+        
         /* TODO */
+        
       }
 
       
+      /**
+       * @brief           virtual destructor
+       */
       virtual
-      ~oclFunctionObject ()
+      ~oclFunctionObject  ()
       {
-        std::cout << "Dtor: \"oclFunctionObject\"" << std::endl;
+      
+        print_optional ("Dtor: \"oclFunctionObject\"", VERB_HIGH);
+        
         /* TODO */
+        
       }
 
 
@@ -62,7 +68,12 @@
   
     protected:
 
-     // function arguments
+
+      /**
+       * member variables
+       */
+       
+      /* function arguments */
       oclDataObject     * const * const mpp_args;
       int                               m_num_args;
   

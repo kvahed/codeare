@@ -70,7 +70,7 @@ BuildProgram            ()
 oclConnection::
 oclConnection ( const char      * filename,
                 cl_device_type    device_type,
-                bool              verbose )
+                VerbosityLevel    verbose )
               : m_current_ocl_objects (),
                 m_current_buffers (),
                 m_loaded_ocl_objects ()
@@ -81,8 +81,7 @@ oclConnection ( const char      * filename,
   // platform
   clPlatforms tmp_platforms;
   m_error = clPlatform::get (& tmp_platforms);
-  if (m_verbose)
-    cout << " ** # of platforms: " << tmp_platforms.size() << endl;
+  print_optional (" ** # of platforms: %d", tmp_platforms.size(), VERB_LOW);
   if (tmp_platforms.size() > 0)
     m_plat = tmp_platforms [0];    // choose first available device
   else
@@ -90,8 +89,7 @@ oclConnection ( const char      * filename,
 
   // devices
   m_error = m_plat.getDevices (device_type, &m_devs);
-  if (m_verbose)
-    cout << " ** # of devices on platform: " << m_devs.size() << endl;
+  print_optional (" ** # of devices on platform: %d", m_devs.size(), VERB_LOW);
   if (m_devs.size() == 0)
     throw "No devices available on this platform";
 
@@ -122,15 +120,12 @@ oclConnection ( const char      * filename,
   // create buffer vector
   m_buffers = std::vector <clBuffers> (m_kernels.size());
 
-  if (m_verbose)
-    cout << " ** oclConnection constructed!" << endl;
+  print_optional (" ** oclConnection constructed!", m_verbose);
     
   /**
    * setup ViennaCL
    */
-  if (m_verbose)
-    cout << " ** setup ViennaCl!" << endl;
-//  viennacl::ocl::setup_context (0, m_cont (), m_devs [0] (), m_comqs [0] ());
+  print_optional (" ** setup ViennaCl!", m_verbose);
   viennacl :: vector <float> tmp (10);
   tmp = tmp + tmp;
 

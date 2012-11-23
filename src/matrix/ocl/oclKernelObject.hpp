@@ -19,6 +19,7 @@
   # include <string>
 
   // ocl
+  # include "oclSettings.hpp"
   # include "oclDataObject.hpp"
   # include "oclFunctionObject.hpp"
 
@@ -57,17 +58,18 @@
       /**
        * @brief             default constructor
        */
-      oclKernelObject       (std::string                    kernel_name,
-                             oclDataObject  * const * const pp_args,
-                             int                            num_args )
-                          : oclFunctionObject (pp_args, num_args),
-                            m_kernel_name     (kernel_name)
+      oclKernelObject       ( std::string                    kernel_name,
+                              oclDataObject  * const * const pp_args,
+                              int                            num_args )
+                           : oclFunctionObject (pp_args, num_args),
+                             m_kernel_name     (kernel_name)
                             
       {
       
-        std::cout << "Ctor: \"oclKernelObject\"" << std::endl;
+        print_optional ("Ctor: \"oclKernelObject\"", VERB_HIGH);
         
         /* TODO */
+        
       }
     
     
@@ -78,9 +80,10 @@
       ~oclKernelObject      ()
       {
       
-        std::cout << "Dtor: \"oclKernelObject\"" << std::endl;
+        print_optional ("Dtor: \"oclKernelObject\"", VERB_HIGH);
 
         /* TODO */
+        
       }
 
     
@@ -120,7 +123,7 @@
     // oclConnection for reuse in this function
     oclConnection * oclCon = oclConnection :: Instance ();
   
-    std::cout << "oclKernelObject :: run!" << std::endl;
+    print_optional ("oclKernelObject :: run ()", VERB_HIGH);
     
     // activate kernel
     oclCon -> activateKernel (m_kernel_name);
@@ -138,10 +141,10 @@
     }
     
     // run kernel
-    cl::NDRange global_dims (512);
+    cl::NDRange global_dims (256);
     cl::NDRange local_dims = cl::NullRange;
     oclCon -> runKernel (global_dims, local_dims);
-    
+
     // get data
     for (int i = 0; i < m_num_args; i++)
     {

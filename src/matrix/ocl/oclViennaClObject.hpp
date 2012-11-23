@@ -64,14 +64,14 @@
       /**
        * @brief           constructor
        */
-      oclViennaClObject   (const vclAlgoType                        algo,
-                                 oclDataObject  * const * const  pp_args,
-                                 int                            num_args)
-                        : oclFunctionObject (pp_args, num_args),
-                          mp_algo_functor   (get_algo_functor <T> (algo, this))
+      oclViennaClObject   ( const vclAlgoType                        algo,
+                                  oclDataObject  * const * const  pp_args,
+                                  int                            num_args )
+                         : oclFunctionObject (pp_args, num_args),
+                           mp_algo_functor   (get_algo_functor <T> (algo, this))
       {
       
-        std::cout << "Ctor: \"oclViennaClObject\"" << std::endl;
+        print_optional ("Ctor: \"oclViennaClObject\"", VERB_HIGH);
 
         /* TODO */
 
@@ -138,7 +138,7 @@
   const
   {
     
-    std::cout << "oclViennaClObject :: getVCLArg" << std::endl;
+    print_optional ("oclViennaClObject :: getVCLArg ()", VERB_HIGH);
     
     return mpp_args [num] -> getVCLObject <S> ();
     
@@ -168,7 +168,7 @@
   ~oclViennaClObject      ()
   {
     
-    std::cout << "Dtor: \"oclViennaClObject\"" << std::endl;
+    print_optional ("Dtor: \"oclViennaClObject\"", VERB_HIGH);
 
     delete mp_algo_functor;
 
@@ -187,7 +187,7 @@
   run                     ()
   {
     
-    std::cout << "oclViennaClObject :: run!" << std::endl;
+    print_optional ("oclViennaClObject :: run ()", VERB_HIGH);
 
     // prepare kernel arguments (load to gpu)
     for (int i = 0; i < m_num_args; i++)

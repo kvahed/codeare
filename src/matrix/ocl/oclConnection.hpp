@@ -149,7 +149,7 @@
                              const ::size_t         size)
       {
       
-        std::cout << "oclConnection :: loadToCPU" << std::endl;
+        print_optional ("oclConnection :: loadToCPU ()", m_verbose);
         
         try
         {
@@ -157,7 +157,7 @@
           // create new buffer
           clBuffer * p_tmp_buffer = new clBuffer(m_cont, CL_MEM_READ_WRITE, size, cpu_arg, &m_error);
           
-          std::cout << " -- size: " << size << " Bytes" << std::endl;
+          print_optional (" -- size: %d Bytes", size, m_verbose);
           
           // read data from given buffer
           m_error = m_comqs [0] . enqueueReadBuffer (/* * buffer */ *buffer, CL_TRUE, 0, size, cpu_arg, NULL, NULL);
@@ -165,8 +165,8 @@
         }
         catch (cl::Error cle)
         {
-
-          cout << "error: " << errorString (cle.err()) << endl;
+          /* TODO: oclError !!! */
+          std::cout << "error: " << errorString (cle.err()) << std::endl;
 
         }
       
@@ -279,6 +279,7 @@
 
         } catch (cl::Error cle) {
 
+          /* TODO: oclError !!! */
           cout << "error: " << errorString (cle.err()) << endl;
 
         }
@@ -302,6 +303,7 @@
       std::list <oclObjectID>                               m_loaded_ocl_objects;
       std::map <clBuffer *, int>                            m_current_buffers;
       
+      
       /********************
        ** OpenCL members **
        ********************/
@@ -313,7 +315,7 @@
       clKernels               m_kernels;    // kernels available in m_prog
       std::vector<clBuffers>  m_buffers;    // vectors of buffers for each kernels arguments
       cl_int                  m_error;      // error variable
-      bool                    m_verbose;    // verbosity level
+      VerbosityLevel          m_verbose;    // verbosity level
       clKernel              * mp_actKernel;
       int                     num_kernel;
 
@@ -327,7 +329,7 @@
        ******************/
       oclConnection         (const char *,
                              cl_device_type device_type = CL_DEVICE_TYPE_GPU,
-                             bool verbose = false);
+                             VerbosityLevel verbose = VERB_NONE);
       
       oclConnection         (oclConnection &) { /*TODO*/};
         
@@ -366,24 +368,24 @@
   
 
 
-      void
-      oclConnection :: 
-      print_ocl_objects      ()
-      {
+  void
+  oclConnection :: 
+  print_ocl_objects      ()
+  {
       
-        std::cout << " --------------------------------------------------- " << std::endl;
-        std::cout << " oclDataObjects:" << std::endl;
-        std::map <oclObjectID, oclDataObject * const> :: iterator it;
-        for (it = m_current_ocl_objects.begin (); it != m_current_ocl_objects.end (); it++)
-        {
+    std::cout << " --------------------------------------------------- " << std::endl;
+    std::cout << " oclDataObjects:" << std::endl;
+    std::map <oclObjectID, oclDataObject * const> :: iterator it;
+    for (it = m_current_ocl_objects.begin (); it != m_current_ocl_objects.end (); it++)
+    {
         
-          std::cout << " (" << it -> second -> getID () << ")" << std::endl;
+      std::cout << " (" << it -> second -> getID () << ")" << std::endl;
         
-        }
+    }
       
-        std::cout << " --------------------------------------------------- " << std::endl;
+    std::cout << " --------------------------------------------------- " << std::endl;
       
-      }
+  }
 
 
   
@@ -397,7 +399,7 @@
   {
   
     if (mp_inst == NULL)
-      mp_inst = new oclConnection ( "./src/matrix/ocl/test.cl", CL_DEVICE_TYPE_GPU, true );
+      mp_inst = new oclConnection ( "./src/matrix/ocl/test.cl", CL_DEVICE_TYPE_GPU, VERB_MIDDLE );
       
     return mp_inst;
     
@@ -417,7 +419,7 @@
     // register kernel argument
     m_error = mp_actKernel -> setArg (num, * p_arg -> getBuffer ());
     
-    std::cout << " -!-> setKernelArg: " << errorString (m_error) << std::endl;
+    print_optional (" -!-> setKernelArg: ", errorString (m_error), m_verbose);
   
   }
   
@@ -431,7 +433,7 @@
   addDataObject         (oclDataObject * const ocl_obj)
   {
   
-    std::cout << "oclConnection :: addDataObject (...)" << std::endl;
+    print_optional ("oclConnection :: addDataObject (...)", m_verbose);
 
     // insert new data object
     m_current_ocl_objects.insert (std::pair <oclObjectID, oclDataObject * const> (ocl_obj -> getID (), ocl_obj));
@@ -440,7 +442,7 @@
     if (ocl_obj -> getMemState ())
     {
       
-      std::cout << " *!* existing buffer (in addDObj) *!* " << std::endl;
+      print_optional (" *!* existing buffer (in addDObj) *!* ", m_verbose);
       
       // list of loaded (on GPU) oclObjects
       m_loaded_ocl_objects.push_back (ocl_obj -> getID ());
@@ -474,7 +476,7 @@
   removeDataObject      (const oclDataObject * const ocl_obj)
   {
     
-    std::cout << "oclConnection :: removeDataObject (...)" << std::endl;
+    print_optional ("oclConnection :: removeDataObject (...)", m_verbose);
     
     // does ocl_obj has a buffer to be handled?
     if (ocl_obj -> getMemState ())
@@ -489,13 +491,13 @@
         throw new int (-1);
       }
     
-      std::cout << " => handle buffer!!! (ref_count: " << tmp_it -> second << ")" << std::endl;
+      print_optional (" => handle buffer!!! (ref_count: %d)", tmp_it -> second, m_verbose);
       
       // delete buffer object in case of no left references
       if (-- tmp_it -> second == 0)
       {
     
-        std::cout << " *!* delete buffer *!*" << std::endl;
+        print_optional (" *!* delete buffer *!*", m_verbose);
       
         // remove buffer from list
         m_current_buffers.erase (tmp_it);
@@ -589,7 +591,7 @@
                          const oclObjectID           obj_id)
   {
     
-    std::cout << " * oclConnection :: createBuffer (id: " << obj_id << ")" << std::endl;
+    print_optional (" * oclConnection :: createBuffer (id: %d)", obj_id, m_verbose);
     
     // find corresponding data object
     std::map <oclObjectID, oclDataObject * const> :: iterator tmp_it = m_current_ocl_objects.find (obj_id);
@@ -613,7 +615,7 @@
 
     // create buffer object
     p_tmp_obj -> setBuffer (new clBuffer (m_cont, CL_MEM_READ_WRITE, size, cpu_arg, &m_error));
-    std::cout << " -!-> createBuffer: " << errorString (m_error) << std::endl;
+    print_optional (" -!-> createBuffer: ", errorString (m_error), m_verbose);
       
     // add to buffer list
     m_current_buffers.insert (std::pair <clBuffer *, int> (p_tmp_obj -> getBuffer (), 1));
@@ -638,7 +640,7 @@
                          clBuffer   * const buffer)
   {
     
-    std::cout << " * oclConnection :: loadToGPU" << std::endl;
+    print_optional (" * oclConnection :: loadToGPU", m_verbose );
     
     // loop over command queues, write information to device (global memory)
     for (clCommandQueues::iterator it = m_comqs.begin(); it < m_comqs.end(); ++it)

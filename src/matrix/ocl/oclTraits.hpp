@@ -53,6 +53,15 @@
        ** type definitions **
        **********************/
       typedef float elem_type;
+      
+      
+      /*********************
+       ** local variables **
+       *********************/
+      
+      /* verbosity of operators */
+      static
+      const VerbosityLevel op_v_level = VERB_MIDDLE;
 
 
       /**
@@ -85,13 +94,48 @@
 
         // create function object
         oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
-      
+        
         // execute function object
         op_obj -> run ();
 
         // clear memory      
         delete op_obj;      
         delete args [3];
+        free (args);
+    
+      }
+    
+    
+      /**
+       * @brief                      execute specified kernel with 2 arguments
+       */
+      static inline
+      const oclError &
+      ocl_basic_operator_kernel_11              ( const          char * const kernel_name,
+                                                        oclDataObject * const        arg1,
+                                                            elem_type                arg2,
+                                                                  int           num_elems )
+      {
+    
+        // number of kernel arguments
+        const int num_args = 3;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = new oclGPUDataObject <elem_type> (&      arg2, 1);
+        args [2] = new oclGPUDataObject       <int> (& num_elems, 1);
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
+        
+        // execute function object
+        op_obj -> run ();
+
+        // clear memory      
+        delete op_obj;      
+        delete args [1];
+        delete args [2];
         free (args);
     
       }
@@ -125,7 +169,7 @@
 
         // clear memory      
         delete op_obj;      
-        delete args [3];
+        delete args [2];
         free (args);
     
       }
@@ -188,7 +232,7 @@
                                        const    size_t &       num_elems)
       {
     
-        std::cout << "make_GPU_Obj <float> (create new)" << std::endl;
+        print_optional ("make_GPU_Obj <float> (create new)", VERB_HIGH);
     
         return new oclGPUDataObject <elem_type> (cpu_arg, num_elems);
       
@@ -207,7 +251,7 @@
                                                       bool                      keep_buffer = false)
       {
       
-        std::cout << "make_GPU_Obj <float> (copy obj's state)" << std::endl;
+        print_optional ("make_GPU_Obj <float> (copy obj's state)", VERB_HIGH);
       
         // check if sizes fit (for !some! more control (or safety))
         if (num_elems != obj.getNumElems ())
@@ -225,28 +269,8 @@
           /* update GPU buffer with data if possible */
           if (keep_buffer && obj.bufferCopyable ())
           {
-       
-            // number of kernel arguments
-            const int num_args = 3;
-    
-            int tmp_num_elems = num_elems;
-    
-            // create array of function arguments
-            oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
-            args [0] = cp_obj;
-            args [1] = & obj;
-            args [2] = new oclGPUDataObject <int> (& tmp_num_elems, 1);
-
-            // create function object
-            oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> ("copy_buffer", args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
-      
-            // execute function object
-            op_obj -> run ();
-
-            // clear memory      
-            delete op_obj;      
-            delete args [2];
-            free (args);
+  
+            ocl_basic_operator_kernel_2 ("copy_buffer", cp_obj, & obj, num_elems);
   
           }
         
@@ -277,7 +301,7 @@
                                                   int         num_elems )
       {
       
-        std::cout << "oclTraits <float> :: ocl_operator_add" << std::endl;
+        print_optional ("oclTraits <float> :: ocl_operator_add", op_v_level);
       
         ocl_basic_operator_kernel_3 ("add", arg1, arg2, sum, num_elems);
       
@@ -289,15 +313,50 @@
        */
       static inline
       const oclError &
-      ocl_operator_subtract           (oclDataObject * const      arg1,
-                                       oclDataObject * const      arg2,
-                                       oclDataObject * const      diff,
-                                                 int         num_elems)
+      ocl_operator_subtract           ( oclDataObject * const      arg1,
+                                        oclDataObject * const      arg2,
+                                        oclDataObject * const      diff,
+                                                  int         num_elems )
       {
       
-        std::cout << "oclTraits <float> :: ocl_operator_subtract" << std::endl;
+        print_optional ("oclTraits <float> :: ocl_operator_subtract", op_v_level);
       
         ocl_basic_operator_vclAlgo_3 (vclSUBTRACT, arg1, arg2, diff, num_elems);
+      
+      }
+      
+      
+      /**
+       * @brief                       elementwise increment
+       */
+      static inline
+      const oclError &
+      ocl_operator_inc                (       oclDataObject * const      arg1,
+                                                  elem_type               inc,
+                                                        int         num_elems )
+      {
+      
+        print_optional ("oclTraits <float> :: ocl_operator_inc", op_v_level);
+        
+        ocl_basic_operator_kernel_11 ("inc", arg1, inc, num_elems);
+      
+      }
+
+
+      /**
+       * @brief                       elementwise decrement
+       */
+      static inline
+      const oclError &
+      ocl_operator_dec                (       oclDataObject * const      arg1,
+                                                  elem_type               dec,
+                                                        int         num_elems )
+      {
+      
+        print_optional ("oclTraits <float> :: ocl_operator_dec", op_v_level);
+        
+        /* use increment kernel with inverse decrement */
+        ocl_basic_operator_kernel_11 ("inc", arg1, -1 * dec, num_elems);
       
       }
     
@@ -336,7 +395,7 @@
     make_GPU_Obj                    (elem_type * const cpu_arg, const size_t & num_elems)
     {
     
-      std::cout << "make_GPU_Obj <size_t>" << std::endl;
+      print_optional ("make_GPU_Obj <size_t>", VERB_HIGH);
     
       return new oclGPUDataObject <elem_type> (cpu_arg, num_elems * sizeof (elem_type));
       

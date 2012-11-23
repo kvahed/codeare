@@ -19,6 +19,7 @@
   # include "../../Matrix.hpp"
   
   // ocl
+  # include "../oclSettings.hpp"
   # include "../oclConnection.hpp"
   # include "../oclTraits.hpp"
 
@@ -157,6 +158,26 @@
       oclMatrix <T>
       operator+=        (const S & inc);
 
+
+      /**
+       * @brief         Elementwise increment.
+       *
+       * @param inc     Increment.
+       */
+      template <class S>
+      oclMatrix <T>
+      operator+=        (const oclMatrix <S> & inc_mat);
+
+
+      /**
+       * @brief         Elementwise decrement.
+       *
+       * @param dec     Decrement.
+       */
+      template <class S>
+      oclMatrix <T>
+      operator-=        (const S & dec);
+
       
       //@}
       
@@ -180,6 +201,15 @@
              
       // holds data of matrix for calculations on GPU
       oclDataWrapper <T> * mp_oclData;
+      
+      
+      /**********************
+       ** static variables **
+       **********************/
+      
+      // verbosity level for operators
+      static
+      const VerbosityLevel op_v_level = VERB_MIDDLE;
       
       
       /********************************
@@ -222,18 +252,18 @@
       // temporary save current oclDataObject
       oclDataWrapper <T> * p_old_oclData = this -> mp_oclData;
 
-      // create new wrapper for gpu memory (and !new! cpu memory, copy object state!!!)
-      /* important to copy object before CPU data !!! */
-      this -> mp_oclData = oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]), Matrix <T> :: Size (), * mat.mp_oclData, true);
-      
       /* if buffer is copied, CPU data need not to be copied */
-      if (! this -> mp_oclData -> bufferCopyable ())
+      if (! mat.mp_oclData -> bufferCopyable ())
       {
 
         // copy data array of Matrix <T>
         Matrix<T> :: _M = mat.Dat();      // uses deep copy of valarray <T>
 
       }
+      
+      // create new wrapper for gpu memory (and !new! cpu memory, copy object state!!!)
+      /* important to copy object after CPU data (since memory pointer may become invalid) !!! */
+      this -> mp_oclData = oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]), Matrix <T> :: Size (), * mat.mp_oclData, true);
       
       // delete old oclDataObject
       delete p_old_oclData;
@@ -256,6 +286,8 @@
   operator+             (const oclMatrix <S> & mat) const
   {
 
+    print_optional ("oclMatrix :: operator+", op_v_level);
+
     // create matrix for result
     oclMatrix <T> sum (Matrix<T> (this -> Dim()));
     
@@ -277,6 +309,8 @@
   operator-             (const oclMatrix <S> & mat) const
   {
     
+    print_optional ("oclMatrix :: operator-", op_v_level);
+    
     // create matrix for result
     oclMatrix <T> diff (Matrix<T> (this -> Dim()));
     
@@ -289,27 +323,59 @@
   
   
   
+  
+  template <class T>
+  template <class S>
+  inline
+  oclMatrix <T>
+  oclMatrix <T> ::
+  operator-=            (const S & dec)
+  {
+  
+    print_optional ("oclMatrix :: operator-=", op_v_level);
+    
+    // call operator function of oclTraits
+    oclTraits <T> :: ocl_operator_dec (this -> mp_oclData, T (dec), this -> Size ());
+    
+    return *this;
+    
+  }
+  
+  
+  
 
   template <class T>  
   template <class S>
+  inline
   oclMatrix <T>
   oclMatrix <T> ::
   operator+=            (const S & inc)
   {
   
-    std::cout << "oclMatrix <T> :: operator +=" << std::endl;
+    print_optional ("oclMatrix :: operator+=", op_v_level);
+ 
+    // call operator function of oclTraits
+    oclTraits <T> :: ocl_operator_inc (this -> mp_oclData, T (inc), this -> Size ());
   
-    // TODO: since calculation is performed on CPU //
-    getData ();
+    return *this;
   
-    // TODO: perform temporarily on CPU //
-    for (size_t i = 0; i < this -> Size (); i++)
-    {
-      this -> _M [i] += T(inc);
-    }
-    
-    // notify modification of CPU data //
-    this -> mp_oclData -> setCPUModified ();
+  }
+   
+   
+   
+   
+  template <class T>  
+  template <class S>
+  inline
+  oclMatrix <T>
+  oclMatrix <T> ::
+  operator+=            (const oclMatrix <S> & inc_mat)
+  {
+  
+    print_optional ("oclMatrix <T> :: operator+=", op_v_level);
+ 
+    // call operator function of oclTraits
+    oclTraits <T> :: ocl_operator_add (this -> mp_oclData, inc_mat.mp_oclData, this -> mp_oclData, this -> Size ());
   
     return *this;
   

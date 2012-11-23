@@ -185,7 +185,7 @@
                             m_lock        (false)               // ... and there're no calculations on GPU
       {
       
-        std::cout << "Ctor: \"oclDataObject\" (" << m_gpu_obj_id << ")" << std::endl;
+        print_optional ("Ctor: \"oclDataObject\" (%d)", m_gpu_obj_id, VERB_MIDDLE);
         
         // register data object at oclConnection
         oclConnection :: Instance () -> addDataObject (this);
@@ -209,7 +209,7 @@
                             m_lock          (obj.m_lock)
       {
       
-        std::cout << "Ctor: \"oclDataObject\" (" << m_gpu_obj_id << ") ... copied state from " << obj.m_gpu_obj_id << std::endl;
+        print_optional ("Ctor: \"oclDataObject\" (%d) ... copied state from %d", m_gpu_obj_id, obj.m_gpu_obj_id, VERB_MIDDLE);
         
         /* copy state of obj (if it's going to be copied) */
         if (keep_buffer && obj.bufferCopyable ())
@@ -250,7 +250,7 @@
       ~oclDataObject        ()
       {
       
-        std::cout << "Dtor: \"oclDataObject\" (" << m_gpu_obj_id << ")" << std::endl;
+        print_optional ("Dtor: \"oclDataObject\" (%d)", m_gpu_obj_id, VERB_MIDDLE);
         
         // unregister data object at oclConnection
         oclConnection :: Instance () -> removeDataObject (this);
@@ -443,7 +443,7 @@
   getVCLObject            ()
   {
   
-    std::cout << "oclDataObject :: getVCLObject" << std::endl;
+    print_optional ("oclDataObject :: getVCLObject ()", VERB_HIGH);
     
     /* ensure data is available on GPU */
     loadToGPU ();
@@ -651,7 +651,7 @@
   setLoaded               ()
   {
   
-    std::cout << " ---------------------------> loaded (" << getID () << ")" << std::endl;
+    print_optional (" ---------------------------> loaded (%d)", getID (), VERB_MIDDLE);
   
     m_on_gpu = true;
   
@@ -720,7 +720,7 @@
       mp_gpu_buffer = p_gpu_buffer;
     }
     else
-    {
+    { /* TODO: use oclError !!! */
       std::cout << " *!* Caution: Buffer already exists! *!*" << std::endl;
       throw int (-1);
     }

@@ -38,7 +38,7 @@
   template <class T>
   class vclAlgoFunctor
   {
-
+  
   
 
     public:
@@ -71,13 +71,14 @@
       /**
        * @brief               constructor
        */
-      vclAlgoFunctor          (const oclViennaClObject <T> * const p_vclObj)
-                            : mp_vclObj (p_vclObj)
+      vclAlgoFunctor          ( const oclViennaClObject <T> * const p_vclObj )
+                             : mp_vclObj (p_vclObj)
       {
       
-        std::cout << "Ctor: \"vclAlgoFunctor\"" << std::endl;
+        print_optional ("Ctor: \"vclAlgoFunctor\"", VERB_HIGH);
         
         /* TODO */
+        
       }
       
       
@@ -89,6 +90,13 @@
        **********************/
       
       const oclViennaClObject <T> * const mp_vclObj;
+
+
+      /**********************
+       ** static variables **
+       **********************/
+      static
+      const VerbosityLevel op_v_level = VERB_MIDDLE;
 
 
 
@@ -119,11 +127,11 @@
       /**
        * @brief             constructor
        */
-      vclSubtractAlgo       (const oclViennaClObject <T> * const p_vclObj)
-                          : vclAlgoFunctor <T> (p_vclObj)
+      vclSubtractAlgo       ( const oclViennaClObject <T> * const p_vclObj )
+                           : vclAlgoFunctor <T> (p_vclObj)
       {
 
-        std::cout << "Ctor: \"vclSubtractAlgo\"" << std::endl;
+        print_optional ("Ctor: \"vclSubtractAlgo\"", VERB_HIGH);
 
         /* TODO */
 
@@ -142,7 +150,7 @@
       const
       {
 
-        std::cout << "vclSubtractAlgo <T> :: operator()" << std::endl;
+        print_optional ("vclSubtractAlgo <T> :: operator()", vclAlgoFunctor <T> :: op_v_level);
 
         /**
          * create ViennaCl arguments
@@ -178,7 +186,7 @@
                         const oclViennaClObject <T> * const p_vclObj)
   {
         
-    std::cout << " :: get_algo_functor" << std::endl;
+    print_optional (" :: get_algo_functor", VERB_HIGH);
 
     /* choose requested algorithm */
     switch (algo)
