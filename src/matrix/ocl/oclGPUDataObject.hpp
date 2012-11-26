@@ -89,7 +89,7 @@
        * @brief               inherited (oclDataObject)
        */
       virtual
-      oclError &
+      void
       prepare                 ();
       
       
@@ -97,7 +97,7 @@
        * @brief               inherited (oclObservableDataObject)
        */
       virtual
-      oclError &
+      void
       finish                  ();
       
       
@@ -105,8 +105,9 @@
        * @brief               inherited (oclDataWrapper)
        */
       virtual
-      oclError &
-      getData                 ();
+      void
+      getData                 ()
+      throw (oclError);
 
     
      
@@ -126,7 +127,7 @@
    *                          !! precondition: data not in use !!
    */
   template <class T>
-  oclError &
+  void
   oclGPUDataObject <T> ::
   prepare                     ()
   {
@@ -150,7 +151,7 @@
    * @brief                   keep data in GPU memory (since it's a GPU object)
    */
   template <class T>
-  oclError &
+  void
   oclGPUDataObject <T> ::
   finish                      ()
   {
@@ -168,9 +169,10 @@
    * @brief                   copy data to CPU memory
    */
   template <class T>
-  oclError &
+  void
   oclGPUDataObject <T> ::
   getData                     ()
+  throw (oclError)
   {
   
     print_optional ("oclGPUDataObject::getData", VERB_HIGH);
@@ -179,15 +181,26 @@
     if (oclDataObject :: getLockState ())
     {
     
-      /* TODO: return error !!! */
-      std::cout << " *!* calculating on GPU ... data not available *!* " << std::endl;
+      /* throw error */
+      throw oclError ("Calculating on GPU ... data not available!", "oclGPU_DataObject :: getData");
     
     }
     else
     {
     
-      // synchronize CPU data with GPU
-      oclDataWrapper <T> :: loadToCPU ();
+      try
+      {
+
+        // synchronize CPU data with GPU
+        oclDataWrapper <T> :: loadToCPU ();
+
+      }
+      catch (const oclError & err)
+      {
+      
+        print_optional (oclError (err, "oclGPUDataObject :: getData"), VERB_LOW);
+      
+      }
 
     }    
     

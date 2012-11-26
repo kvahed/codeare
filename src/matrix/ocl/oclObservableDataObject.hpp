@@ -32,7 +32,7 @@
        * @brief            pure virtual: finish ()
        */
       virtual
-      oclError &
+      void
       finish               () = 0;
 
 

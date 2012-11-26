@@ -46,7 +46,7 @@
        *                    -- prepare data object for use on gpu --
        */
       virtual
-      oclError &
+      void
       prepare               () = 0;
 
 
@@ -270,7 +270,7 @@
        * @brief             synchronize data on GPU with CPU
        */
       virtual
-      oclError &
+      void
       loadToGPU             () = 0;
 
 
@@ -278,8 +278,9 @@
        * @brief             synchronize data on CPU with GPU
        */
       virtual
-      oclError &
-      loadToCPU             () = 0;
+      void
+      loadToCPU             ()
+      throw (oclError) = 0;
 
 
       /**

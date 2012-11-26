@@ -21,6 +21,21 @@
 
 
 
+  /**************************
+   ** forward declarations **
+   **************************/
+  
+  /* classes */
+  class oclError;
+  
+  /* functions */
+  extern
+  ostream &
+  operator<<        (        ostream &  os,
+                      const oclError & err );
+
+
+
   /**********************
    ** type definitions **
    **********************/
@@ -58,7 +73,7 @@
    ** global vars **
    *****************/
 
-  const VerbosityLevel verbosity = VERB_NONE; //VERB_HIGH;
+  const VerbosityLevel verbosity = VERB_LOW; //VERB_HIGH;
 
   /* buffer for writing verbosity messages */
   char buffer [100];
@@ -85,6 +100,26 @@
     {
     
       std::cout << msg << std::endl;
+    
+    }
+  
+  }
+  
+  
+  /**
+   * @brief               print oclError, if v_level matches
+   */
+  inline
+  void
+  print_optional          ( const       oclError &     err,
+                                  VerbosityLevel   v_level )
+  {
+  
+    /* check verbosity level */
+    if (v_level <= verbosity)
+    {
+    
+      std::cout << err << std::endl;
     
     }
   

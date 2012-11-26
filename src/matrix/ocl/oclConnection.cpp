@@ -71,6 +71,7 @@ oclConnection::
 oclConnection ( const char      * filename,
                 cl_device_type    device_type,
                 VerbosityLevel    verbose )
+throw (oclError)
               : m_current_ocl_objects (),
                 m_current_buffers (),
                 m_loaded_ocl_objects ()
@@ -85,13 +86,13 @@ oclConnection ( const char      * filename,
   if (tmp_platforms.size() > 0)
     m_plat = tmp_platforms [0];    // choose first available device
   else
-    throw "No platform available";
+    throw oclError ("No platform available", "oclConnection :: CTOR");
 
   // devices
   m_error = m_plat.getDevices (device_type, &m_devs);
   print_optional (" ** # of devices on platform: %d", m_devs.size(), VERB_LOW);
   if (m_devs.size() == 0)
-    throw "No devices available on this platform";
+    throw oclError ("No devices available on this platform", "oclConnection :: CTOR");
 
   // context /** ViennaCL **/ /* TODO */
   m_cont = clContext ( viennacl::ocl::current_context () . handle () . get ()); //clContext (m_devs);       // same context for all devices
@@ -137,7 +138,9 @@ oclConnection ( const char      * filename,
 // activate kernel, stays active until another kernel is activated (default: 0)
 int
 oclConnection::
-activateKernel            (const std::string kernelname) {
+activateKernel            (const std::string kernelname)
+throw (oclError)
+{
 
   std::string act_kernelname;
   
@@ -158,8 +161,10 @@ activateKernel            (const std::string kernelname) {
     }
   }
 
-  if (m_verbose)
-    cout << " ** no kernel found (" << kernelname << ")" << endl;
+  /* throw error message */
+  stringstream msg;
+  msg << "No kernel found (" << kernelname << ")";
+  throw oclError (msg.str (), "oclConnection :: activateKernel");
 
   return -1;
 
@@ -173,15 +178,20 @@ int
 oclConnection::
 runKernel             (const cl::NDRange  & global_dims,
                        const cl::NDRange  & local_dims  )
+throw (oclError)
 {
 
   // execute activated kernel on all available devices 
   for (clCommandQueues::iterator it = m_comqs.begin(); it < m_comqs.end(); ++it)
   {
     try {
+    
       m_error = (*it).enqueueNDRangeKernel (*mp_actKernel, cl::NullRange, global_dims, local_dims);
+
     } catch (cl::Error cle) {
-      cout << "error code: " << cle.what() << " -> " << cle.err() << " (" << errorString (cle.err()) << ")" << endl;
+
+      throw oclError (cle.err (), "oclConnection :: runKernel");
+
     }
   }
   

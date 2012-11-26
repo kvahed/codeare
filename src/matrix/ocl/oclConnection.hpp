@@ -23,6 +23,7 @@
 
   // ocl
   # include "oclSettings.hpp"
+  # include "oclError.hpp"
 
 
 
@@ -97,9 +98,12 @@
                              
  
       void
-      addDataObject         (oclDataObject * const ocl_obj);
+      addDataObject         (oclDataObject * const ocl_obj)
+      throw (oclError);
+      
       void
-      removeDataObject      (const oclDataObject * const ocl_obj);
+      removeDataObject      (const oclDataObject * const ocl_obj)
+      throw (oclError);
                           
       void
       run                   (oclFunctionObject * const func_obj) const;
@@ -124,7 +128,8 @@
       void
       loadToGPU             (       T   * const cpu_arg,
                              ::size_t           size,
-                             clBuffer   * const buffer);
+                             clBuffer   * const buffer)
+      throw (oclError);
       
       
       /**
@@ -134,7 +139,8 @@
       void
       createBuffer          (                T   * const cpu_arg,
                              const    ::size_t           size,
-                             const oclObjectID           obj_id);
+                             const oclObjectID           obj_id)
+      throw (oclError);
       
       
       /**
@@ -147,6 +153,7 @@
       loadToCPU             (const clBuffer * const buffer,
                                           T * const cpu_arg,
                              const ::size_t         size)
+      throw (oclError)
       {
       
         print_optional ("oclConnection :: loadToCPU ()", m_verbose);
@@ -160,14 +167,14 @@
           print_optional (" -- size: %d Bytes", size, m_verbose);
           
           // read data from given buffer
-          m_error = m_comqs [0] . enqueueReadBuffer (/* * buffer */ *buffer, CL_TRUE, 0, size, cpu_arg, NULL, NULL);
+          m_error = m_comqs [0] . enqueueReadBuffer (*buffer, CL_TRUE, 0, size, cpu_arg, NULL, NULL);
         
         }
         catch (cl::Error cle)
         {
-          /* TODO: oclError !!! */
-          std::cout << "error: " << errorString (cle.err()) << std::endl;
-
+          
+          throw oclError (cle.err(), "oclConnection :: loadToCPU");
+          
         }
       
       }
@@ -175,12 +182,14 @@
   
       // activate kernel (stays activated until another kernel is activated
       int
-      activateKernel        (const std::string kernelname);
+      activateKernel        (const std::string kernelname)
+      throw (oclError);
     
       // run kernel with given dimensions
       int
       runKernel             (const cl::NDRange & global_dims,
-                             const cl::NDRange & local_dims);
+                             const cl::NDRange & local_dims)
+      throw (oclError);
     
     
       // set argument for kernel by pointer, optionally return created buffer
@@ -271,6 +280,7 @@
       getKernelArg            (int        num,
                                T        * out_argument,
                                ::size_t   size)
+      throw (oclError)
       {
 
         try {
@@ -279,8 +289,7 @@
 
         } catch (cl::Error cle) {
 
-          /* TODO: oclError !!! */
-          cout << "error: " << errorString (cle.err()) << endl;
+          throw oclError (cle.err (), "oclConnection :: getKernelArg");
 
         }
 
@@ -329,7 +338,8 @@
        ******************/
       oclConnection         (const char *,
                              cl_device_type device_type = CL_DEVICE_TYPE_GPU,
-                             VerbosityLevel verbose = VERB_NONE);
+                             VerbosityLevel verbose = VERB_NONE)
+      throw (oclError);
       
       oclConnection         (oclConnection &) { /*TODO*/};
         
@@ -431,6 +441,7 @@
   void
   oclConnection ::
   addDataObject         (oclDataObject * const ocl_obj)
+  throw (oclError)
   {
   
     print_optional ("oclConnection :: addDataObject (...)", m_verbose);
@@ -452,8 +463,9 @@
       
       if (tmp_it == m_current_buffers.end ())
       {
-        std::cout << " *!* Caution: Buffer not found *!*" << std::endl;
-        throw new int (-1);
+      
+        throw oclError ("Buffer not found", "oclConnection :: addDataObject");
+        
       }
 
       // increase
@@ -474,6 +486,7 @@
   void
   oclConnection ::
   removeDataObject      (const oclDataObject * const ocl_obj)
+  throw (oclError)
   {
     
     print_optional ("oclConnection :: removeDataObject (...)", m_verbose);
@@ -487,8 +500,9 @@
       
       if (tmp_it == m_current_buffers.end ())
       {
-        std::cout << " *!* Caution: Buffer not found *!*" << std::endl;
-        throw new int (-1);
+      
+        throw oclError ("Buffer not found!", "oclConnection :: removeDataObject");
+
       }
     
       print_optional (" => handle buffer!!! (ref_count: %d)", tmp_it -> second, m_verbose);
@@ -503,7 +517,7 @@
         m_current_buffers.erase (tmp_it);
         
         // delete buffer object
- //       delete tmp_it -> first;
+        delete tmp_it -> first;
     
       }
     
@@ -589,6 +603,7 @@
   createBuffer          (                T   * const cpu_arg,
                          const    ::size_t           size,
                          const oclObjectID           obj_id)
+  throw (oclError)
   {
     
     print_optional (" * oclConnection :: createBuffer (id: %d)", obj_id, m_verbose);
@@ -599,8 +614,12 @@
     // check if data object exists
     if (tmp_it == m_current_ocl_objects.end ())
     {
-      std::cout << " *!* Caution: oclDataObject (" << obj_id << ") does not exist! *!*" << std::endl;
-      throw int (-1);
+
+      stringstream msg;
+      msg << "oclDataObject (" << obj_id << ") does not exist!";
+
+      throw oclError (msg.str (), "oclConnection :: createBuffer");
+
     }
       
     // retrieve data object
@@ -609,8 +628,12 @@
     // check if buffer exists
     if (p_tmp_obj -> getMemState ())
     {
-      std::cout << " *!* Caution: oclDataObject (" << obj_id << ") already has a GPU buffer! *!*" << std::endl;
-      throw int (-1);
+    
+      stringstream msg;
+      msg << "oclDataObject (" << obj_id << ") already has a GPU buffer!";
+      
+      throw oclError (msg.str (), "oclConnection :: createBuffer");
+ 
     }
 
     // create buffer object
@@ -638,6 +661,7 @@
   loadToGPU             (       T   * const cpu_arg,
                          ::size_t           size,
                          clBuffer   * const buffer)
+  throw (oclError)
   {
     
     print_optional (" * oclConnection :: loadToGPU", m_verbose );
@@ -647,9 +671,13 @@
     {
                    
       try {
+
         m_error = it -> enqueueWriteBuffer (*buffer, CL_TRUE, 0, size, cpu_arg, NULL, NULL);
+
       } catch (cl::Error cle) {
-        cout << "error code: " << cle.what() << " -> " << cle.err() << " (" << errorString (cle.err()) << ")" << endl;
+
+        throw oclError (cle.err (), "oclConnection :: loadToGPU");
+
       }
  
     }

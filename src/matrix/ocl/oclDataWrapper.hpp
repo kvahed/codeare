@@ -17,6 +17,9 @@
   # include "oclSettings.hpp"
   # include "oclDataObject.hpp"
   
+  // std C++ libraries
+  # include <sstream>
+  
   
   
   /***************************
@@ -125,8 +128,9 @@
        * @brief             getter to cpu_data
        */
       virtual
-      oclError &
-      getData               () = 0;
+      void
+      getData               ()
+      throw (oclError) = 0;
       
       
       /**
@@ -147,7 +151,7 @@
        * @see               oclDataObject :: loadToGPU ()
        */
       virtual
-      oclError &
+      void
       loadToGPU             ();
       
       
@@ -157,8 +161,9 @@
        * @see               oclDataObject :: loadToCPU ()
        */
       virtual
-      oclError &
-      loadToCPU             ();
+      void
+      loadToCPU             ()
+      throw (oclError);
       
       
       /**********************
@@ -182,7 +187,7 @@
    * @brief                 -- refer to class definition --
    */
   template <class T>
-  oclError &
+  void
   oclDataWrapper <T> ::
   loadToGPU                 ()
   {
@@ -221,9 +226,10 @@
    * @brief                 -- refer to class definition --
    */
   template <class T>
-  oclError &
+  void
   oclDataWrapper <T> ::
   loadToCPU                 ()
+  throw (oclError)
   {
 
     print_optional ("oclDataWrapper :: loadToCPU ()", VERB_HIGH);
@@ -244,10 +250,13 @@
       }
       
     }
-    else // ERROR if no buffer exists TODO !!!
+    else // ERROR if no buffer exists
     {
     
-      std::cout << " *!* Error: no buffer on GPU (id:" << oclDataObject :: getID () << ") *!*" << std::endl;
+      stringstream tmp;
+      tmp << "No buffer on GPU (id:" << oclDataObject :: getID () << ")";
+      
+      throw oclError (tmp.str (), "oclDataWrapper :: loadToCPU", oclError :: WARNING);
     
     }
   
