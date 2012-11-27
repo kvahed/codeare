@@ -110,7 +110,7 @@
    **    (derived)           **
    ****************************/
   template <class T>
-  class vclSubtractAlgo : public vclAlgoFunctor <T>
+  class vclAddSubAlgo : public vclAlgoFunctor <T>
   {
 
   
@@ -127,11 +127,13 @@
       /**
        * @brief             constructor
        */
-      vclSubtractAlgo       ( const oclViennaClObject <T> * const p_vclObj )
-                           : vclAlgoFunctor <T> (p_vclObj)
+      vclAddSubAlgo       ( const oclViennaClObject <T> * const p_vclObj,
+                            const               int                 sign )
+                           : vclAlgoFunctor <T> (p_vclObj),
+                             m_sign                 (sign)
       {
 
-        print_optional ("Ctor: \"vclSubtractAlgo\"", VERB_HIGH);
+        print_optional ("Ctor: \"vclAddSubAlgo\"", VERB_HIGH);
 
         /* TODO */
 
@@ -150,24 +152,27 @@
       const
       {
 
-        print_optional ("vclSubtractAlgo <T> :: operator()", vclAlgoFunctor <T> :: op_v_level);
+        print_optional ("vclAddSubAlgo <T> :: operator()", vclAlgoFunctor <T> :: op_v_level);
 
         /**
          * create ViennaCl arguments
          */
-        viennacl :: vector <T> arg1 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (0);
-        viennacl :: vector <T> arg2 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (1);
-        viennacl :: vector <T> diff = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (2);
+        viennacl :: vector <T>   arg1 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (0);
+        viennacl :: vector <T>   arg2 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (1);
+        viennacl :: vector <T> result = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (2);
         
-        diff = arg1 - arg2;
-        
-//        std::cout << " -------------------\n arg1: \n" << arg1 << "\n -------------------" << std::endl;
-//        std::cout << " -------------------\n arg2: \n" << arg2 << "\n -------------------" << std::endl;
-//        std::cout << " -------------------\n diff: \n" << diff << "\n -------------------" << std::endl;
-
-        /* TODO */
+        /* perform calculation */
+        if (m_sign < 0)
+          result = arg1 - arg2;
+        else
+          result = arg1 + arg2;
         
       }
+      
+      
+    private:
+    
+      int m_sign;
   
   
   
@@ -193,7 +198,7 @@
     {
     
       case vclSUBTRACT:
-        return new vclSubtractAlgo <T> (p_vclObj);
+        return new vclAddSubAlgo <T> (p_vclObj, -1);
 
       default:
         throw "*!* Specified ViennaCL algorithm not available! *!*";

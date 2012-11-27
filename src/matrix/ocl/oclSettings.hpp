@@ -73,7 +73,7 @@
    ** global vars **
    *****************/
 
-  const VerbosityLevel verbosity = VERB_LOW; //VERB_HIGH;
+  const VerbosityLevel verbosity = VERB_NONE; //VERB_HIGH;
 
   /* buffer for writing verbosity messages */
   char buffer [100];

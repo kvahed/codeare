@@ -2,7 +2,12 @@
 
 
 
+
+  /************
+   ** makros **
+   ************/
   # define __OCL_CREATORS_HPP__
+
   
   
 
@@ -15,6 +20,12 @@
 
 
 
+
+  /**************************
+   ** function definitions **
+   **************************/
+  
+  
 /*  template <class T>
   inline static
   oclMatrix <T>
