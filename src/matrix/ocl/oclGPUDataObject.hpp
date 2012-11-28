@@ -109,10 +109,25 @@
       getData                 ()
       throw (oclError);
 
+
+
+    private:
+    
+      /* private member for verbosity level of class */
+      static const VerbosityLevel v_level;
+    
     
      
   }; // class oclGPUDataObject
   
+
+
+  /*************************************
+   ** initialize static class members **
+   *************************************/
+  template <class T>
+  const VerbosityLevel oclGPUDataObject <T> :: v_level = global_verbosity [OCL_GPU_DATA_OBJECT];
+
   
   
   /**************************
@@ -156,7 +171,7 @@
   finish                      ()
   {
 
-    print_optional ("oclGPUDataObject::finish", VERB_HIGH);
+    print_optional ("oclGPUDataObject::finish", v_level);
 
     // update data state: available for use
     oclDataObject :: setUnlocked ();
@@ -175,7 +190,7 @@
   throw (oclError)
   {
   
-    print_optional ("oclGPUDataObject::getData", VERB_HIGH);
+    print_optional ("oclGPUDataObject::getData", v_level);
     
     // check wether data is available or used on GPU
     if (oclDataObject :: getLockState ())

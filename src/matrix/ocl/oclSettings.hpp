@@ -65,6 +65,28 @@
     VERB_HIGH
   
   };
+  
+  enum oclClassID
+  {
+  
+  /* 1. */     OCL_OBSERVED_DATA_OBJECT = 0,
+  /* 2. */     OCL_DATA_OBJECT,
+  /* 3. */     OCL_DATA_WRAPPER,
+  /* 4. */     OCL_CPU_DATA_OBJECT,
+  /* 5. */     OCL_GPU_DATA_OBJECT,
+  /* 6. */     OCL_TRAITS,
+  /* 7. */     OCL_CONNECTION,
+  /* 8. */     OCL_FUNCTION_OBSERVER,
+  /* 9. */     OCL_FUNCTION_OBJECT,
+  /* 10. */    OCL_VIENNACL_OBJECT,
+  /* 11. */    OCL_KERNEL_OBJECT,
+  /* 12. */    OCL_ASYNC_FUNCTION_OBJECT,
+  /* 13. */    OCL_ASYNC_VCL_OBJECT,
+  /* 14. */    OCL_ASYNC_KERNEL_OBJECT,
+    
+    MAX_ID
+  
+  };
 
 
 
@@ -73,7 +95,27 @@
    ** global vars **
    *****************/
 
-  const VerbosityLevel verbosity = VERB_NONE; //VERB_HIGH;
+  const VerbosityLevel verbosity = VERB_LOW; //VERB_HIGH;
+  
+  static const VerbosityLevel global_verbosity [MAX_ID] =
+  {
+  
+  /* 1. */    VERB_HIGH,
+  /* 2. */    VERB_HIGH,
+  /* 3. */    VERB_HIGH,
+  /* 4. */    VERB_HIGH,
+  /* 5. */    VERB_HIGH,
+  /* 6. */    VERB_HIGH,
+  /* 7. */    VERB_HIGH,
+  /* 8. */    VERB_LOW,
+  /* 9. */    VERB_LOW,
+  /* 10. */   VERB_MIDDLE,
+  /* 11. */   VERB_MIDDLE,
+  /* 12. */   VERB_LOW,
+  /* 13. */   VERB_LOW,
+  /* 14. */   VERB_LOW
+  
+  };
 
   /* buffer for writing verbosity messages */
   char buffer [100];

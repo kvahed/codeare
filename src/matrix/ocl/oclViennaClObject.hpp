@@ -93,7 +93,8 @@
        */
       virtual
       void
-      run                 ();
+      run                 ()
+      const;
       
 
       /**
@@ -185,6 +186,7 @@
   void
   oclViennaClObject <T> ::
   run                     ()
+  const
   {
     
     print_optional ("oclViennaClObject :: run ()", VERB_HIGH);
