@@ -17,8 +17,10 @@
   
   // ocl
   # include "oclFunctionObserver.hpp"
-
   
+  // pthread
+  # include <pthread.h>
+    
   
   
   
@@ -39,6 +41,8 @@
        **********************/
       bool                  m_active;
       oclFunctionObserver   m_observer;
+      pthread_t             m_thread;
+      
     
       
       /**********************
@@ -64,7 +68,7 @@
                                  m_observer ( num_args )
       {
       
-        print_optional ("CTOR: oclAsyncFunctionObject", v_level);
+        print_optional ("Ctor: oclAsyncFunctionObject", v_level);
       
       }
       
@@ -76,29 +80,35 @@
       ~oclAsyncFunctionObject    ( )
       {
       
-        print_optional ("DTOR: oclAsyncFunctionObject", v_level);
+        print_optional ("Dtor: oclAsyncFunctionObject", v_level);
       
       }
       
       
       //@}
       
-    
+  
       virtual
       void
-      run_async           () = 0;
+      run_async           ( ) = 0;
       
       virtual
       void
       activate            () = 0;
-      
+            
       
     public:
     
     
       virtual
       bool
-      isActive            () = 0;
+      isActive            ( )
+      const = 0;
+      
+      virtual
+      void
+      join                ( )
+      const = 0;
 
 
     private:

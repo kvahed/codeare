@@ -53,7 +53,7 @@
                                  m_max_num_args (max_num_args)
       {
       
-        print_optional ("CTOR: oclFunctionObserver", v_level);
+        print_optional ("Ctor: oclFunctionObserver", v_level);
       
       }
       
@@ -65,7 +65,10 @@
       ~oclFunctionObserver      ( )
       {
       
-        print_optional ("DTOR: oclFunctionObserver", v_level);
+        print_optional ("Dtor: oclFunctionObserver", v_level);
+        
+        /* free memory of array for registered objects */
+        free (mpp_args);
       
       }
       
@@ -79,8 +82,7 @@
        * @param  p_obj          Pointer to data object to be registered.
        */
       void
-      register_obj              (oclObservableDataObject * const p_obj)
-      throw (oclError);
+      register_obj              (oclObservableDataObject * const p_obj);
       
       
       /**
@@ -140,7 +142,6 @@
   void
   oclFunctionObserver ::
   register_obj                  (oclObservableDataObject * const p_obj)
-  throw (oclError)
   {
       
     print_optional ("oclObservableDataObject :: register_obj", v_level);
@@ -174,15 +175,15 @@
   
     print_optional ("oclObservableDataObject :: notify", v_level);
       
-    /* loop over stored objects */
+    /* loop over registered objects */
     for (int i = 0; i < m_num_args; i++)
     {
-        
+            
       /* call finish */
       mpp_args [i] -> finish ();
         
     }
-      
+    
   }
   
   

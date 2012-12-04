@@ -35,6 +35,25 @@
     public:
  
  
+ 
+       /***********
+       ** enums **
+       ***********/
+      
+      /**
+       * @brief               specify desired copy mode
+       */
+      enum CopyMode
+      {
+      
+        NO_BUFFER,
+        KEEP_BUFFER,
+        COPY_BUFFER
+      
+      };
+ 
+ 
+ 
       /***************************
        ** function declarations **
        ***************************/
@@ -182,7 +201,8 @@
                             m_num_elems   (num_elems),          // init number of elements
                             m_on_gpu      (false),              // data loaded to GPU on demand
                             mp_modified   ({true, false}),      // ... so data aren't sync
-                            m_lock        (false)               // ... and there're no calculations on GPU
+                            m_lock        (false),              // ... and there're no calculations on GPU
+                            m_release_buffer (false)            // ... and there's no buffer to be released
       {
       
         print_optional ("Ctor: \"oclDataObject\" (%d)", m_gpu_obj_id, VERB_MIDDLE);
@@ -200,19 +220,20 @@
        *
        * @param             pointer oclDataObject to copy
        */
-      oclDataObject         (const oclDataObject & obj, bool keep_buffer = false)
+      oclDataObject         (oclDataObject & obj, CopyMode copy_mode = NO_BUFFER)
                           : m_gpu_obj_id    (id_counter ++),
                             mp_gpu_buffer   (NULL),
                             m_size          (obj.m_size),
                             m_num_elems     (obj.m_num_elems),
                             m_on_gpu        (false),              // for addDataObject (...) !!!
-                            m_lock          (obj.m_lock)
+                            m_lock          (obj.m_lock),
+                            m_release_buffer(obj.m_release_buffer)
       {
       
         print_optional ("Ctor: \"oclDataObject\" (%d) ... copied state from %d", m_gpu_obj_id, obj.m_gpu_obj_id, VERB_MIDDLE);
         
         /* copy state of obj (if it's going to be copied) */
-        if (keep_buffer && obj.bufferCopyable ())
+        if (copy_mode == COPY_BUFFER && obj.bufferCopyable ())
         {
         
           // deep copy of modification array
@@ -220,6 +241,34 @@
           mp_modified [CPU] = obj.mp_modified [CPU];
           mp_modified [GPU] = obj.mp_modified [GPU];
 
+        }
+        else if (copy_mode == KEEP_BUFFER)
+        {
+          
+          if (m_release_buffer != true)
+          {
+          
+            /* grab buffer from obj */
+            this -> mp_gpu_buffer = obj.mp_gpu_buffer;
+            this -> m_on_gpu      = true;
+            
+            /* GPU data is modified (since calculations take place right now) */
+            new (mp_modified) bool [2];
+            mp_modified [CPU] = obj.mp_modified [CPU];
+            mp_modified [GPU] = obj.mp_modified [GPU];
+            
+            /* notify, that obj's buffer was grabbed */
+            obj.m_release_buffer = true;
+            obj.mp_to_notify = this; /* TODO */
+
+          }
+          else
+          {
+            
+            throw oclError (" oclDataObject is not copyable! ", "oclDataObject :: Ctor");
+            
+          }
+          
         }
         else
         {
@@ -250,7 +299,7 @@
       ~oclDataObject        ()
       {
       
-        print_optional ("Dtor: \"oclDataObject\" (%d)", m_gpu_obj_id, VERB_MIDDLE);
+        print_optional ("Dtor: \"oclDataObject\" (%d)", m_gpu_obj_id, VERB_LOW);
         
         // unregister data object at oclConnection
         oclConnection :: Instance () -> removeDataObject (this);
@@ -279,8 +328,14 @@
        */
       virtual
       void
-      loadToCPU             ()
-      throw (oclError) = 0;
+      loadToCPU             () = 0;
+
+
+      /**
+       * @brief             release buffer
+       */
+      void
+      releaseBuffer         ();
 
 
       /**
@@ -341,10 +396,10 @@
       /**
        * @brief             getter for m_busy
        */
-      inline
+public:      inline
       bool
       getLockState          () const;
-      
+protected:
       
       //@}
       
@@ -362,6 +417,9 @@
                    bool     m_on_gpu;         // determines wether data is available on GPU
                    bool     mp_modified [2];  // specifies, if data on GPU and CPU are the same
                    bool     m_lock;           // determines wether data is used on GPU right now
+                   
+                   bool     m_release_buffer; // if set, buffer will be released at next call of finish ()
+          oclDataObject   * mp_to_notify;      // object, the buffer is grabbed from
     
 
 
@@ -429,6 +487,11 @@
       std::cout << " yes" << std::endl;
     else
       std::cout << " no" << std::endl;
+    std::cout << " *%*  -> buffer grabbed: ";
+    if (m_release_buffer)
+      std::cout << " yes" << std::endl;
+    else
+      std::cout << " no" << std::endl;
     std::cout << " *%*  -> size (num_elems): " << m_size << " (" << m_num_elems << ")" << std::endl;
   
   }
@@ -454,6 +517,35 @@
       
   }
 
+  
+  
+  /**
+   *                      -- refer to class definition --
+   */
+  void
+  oclDataObject ::
+  releaseBuffer           ()
+  {
+  
+    /* clear connection to buffer in oclConnection */
+    oclConnection :: Instance () -> releaseBuffer (this);
+
+    /* clear reference to buffer */
+    this -> mp_gpu_buffer = NULL;
+        
+    /* update state */
+    m_release_buffer = false;
+    m_on_gpu         = false;
+    mp_modified [GPU] = false;
+    mp_modified [CPU] = true;
+    
+    mp_to_notify -> setUnlocked ();
+    mp_to_notify = NULL;
+  
+  }
+  
+  
+  
   
   
         /*************
@@ -600,7 +692,7 @@
   const
   {
   
-    return m_on_gpu && ! mp_modified [CPU];
+    return m_on_gpu  &&  ! mp_modified [CPU]  &&  ! m_release_buffer;
   
   }
 

@@ -106,8 +106,7 @@
        */
       virtual
       void
-      getData                 ()
-      throw (oclError);
+      getData                 ();
 
     
      
@@ -175,7 +174,6 @@
   void
   oclCPUDataObject <T> ::
   getData                     ()
-  throw (oclError)
   {
   
     print_optional ("oclCPUDataObject::getData", VERB_HIGH);

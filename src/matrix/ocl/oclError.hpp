@@ -15,6 +15,7 @@
    ** includes **
    **************/
   # include <sstream>
+  # include <exception>
   
   
   
@@ -115,7 +116,7 @@
   /**
    * @brief           wrapper for errors, handling errors
    */
-  class oclError
+  class oclError : public exception
   {
 
 
@@ -146,7 +147,8 @@
       oclError        ( const      char * const    msg,
                         const      char * const source,
                         const ErrorType           type = CUSTOM_ERROR )
-                     : m_msg                                                     (msg),
+                     : exception ( ),
+                       m_msg                                                     (msg),
                        m_source (((std::string ()).append ("\n -> ")).append (source)),
                        m_type                                                   (type)
       {
@@ -163,7 +165,8 @@
       oclError        ( const std::string      msg,
                         const        char * source,
                         const   ErrorType     type = CUSTOM_ERROR )
-                     : m_msg                                                     (msg),
+                     : exception ( ),
+                       m_msg                                                     (msg),
                        m_source (((std::string ()).append ("\n -> ")).append (source)),
                        m_type                                                   (type)
       {
@@ -179,7 +182,8 @@
        */
       oclError        ( const cl_int     code,
                         const   char * source )
-                     : m_msg                                                  (getErrorString (code)),
+                     : exception ( ),
+                       m_msg                                                  (getErrorString (code)),
                        m_source                (((std::string ()).append ("\n -> ")).append (source)),
                        m_type                                                          (OPENCL_ERROR)
       {
@@ -195,7 +199,8 @@
        */
       oclError        ( const oclError & err,
                         const     char * source )
-                     : m_msg                                                           (err.m_msg),
+                     : exception ( ),
+                       m_msg                                                           (err.m_msg),
                        m_source (((std::string (err.m_source)).append ("\n -> ")).append (source)),
                        m_type                                                         (err.m_type)
       {
@@ -203,6 +208,38 @@
         print_optional ("CTOR: \"oclError\"", VERB_HIGH);
         print_optional (" *!* Error: ", m_msg.c_str (), VERB_HIGH);
       
+      }
+      
+      
+      /**
+       * @brief       virtual destructor
+       */
+      virtual
+      ~oclError       ( )
+      throw ( )
+      {
+      
+        print_optional ("Dtor: \"oclError\"", VERB_HIGH);
+      
+      }
+      
+      
+      /**
+       * @brief       inherited from exception
+       */
+      virtual
+      const char *
+      what            ( )
+      const
+      throw ( )
+      {
+      
+        stringstream msg;
+        
+        msg << "\n - \n" << m_msg << " \n " << m_source << "\n - \n";
+        
+        return msg.str ().c_str ();
+        
       }
       
       

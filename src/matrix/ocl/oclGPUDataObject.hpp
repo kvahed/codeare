@@ -30,7 +30,8 @@
     
     
     public:
-      
+    
+    
       
       /**
        * @name                constructors and destructors
@@ -50,7 +51,7 @@
                             : oclDataWrapper <T> (cpu_data, num_elems)
       {
       
-        print_optional ("Ctor: \"oclGPUDataObject\"", VERB_HIGH);
+        print_optional ("Ctor: \"oclGPUDataObject\" (id: %d)", oclDataObject :: getID (), v_level);
         
       }
       
@@ -58,14 +59,15 @@
       /**
        * @brief               "copy state" constructor
        */
-      oclGPUDataObject        (                   T     * const    cpu_data,
-                               const            int     &         num_elems,
-                                     oclDataWrapper <T> &               obj,
-                                               bool             keep_buffer = false)
-                            : oclDataWrapper <T> (cpu_data, num_elems, obj, keep_buffer)
+      oclGPUDataObject        (                              T     * const  cpu_data,
+                               const                       int     &       num_elems,
+                                                oclDataWrapper <T> &             obj,
+                                     oclDataObject :: CopyMode             copy_mode = oclDataObject :: NO_BUFFER)
+                            : oclDataWrapper <T> (cpu_data, num_elems, obj, copy_mode)
       {
       
-        print_optional ("Ctor: \"oclGPUDataObject\" ... copied state", VERB_HIGH);
+        print_optional ("Ctor: \"oclGPUDataObject\" ... copied state (new id: %d)", oclDataObject :: getID (), v_level);
+        print_optional ("old id: %d", obj.getID (), v_level);
             
       }
       
@@ -76,6 +78,9 @@
       virtual
       ~oclGPUDataObject       ()
       {
+      
+        while (oclDataObject :: getLockState ())
+          usleep (5);
       
         print_optional ("Dtor: \"oclGPUDataObject\"", VERB_HIGH);
 
@@ -106,8 +111,7 @@
        */
       virtual
       void
-      getData                 ()
-      throw (oclError);
+      getData                 ();
 
 
 
@@ -147,16 +151,21 @@
   prepare                     ()
   {
 
-    print_optional ("oclGPUDataObject::prepare (%d)", oclDataObject :: getID (), VERB_MIDDLE);
+    print_optional ("oclGPUDataObject::prepare (%d)", oclDataObject :: getID (), v_level);
   
-    // set status: calculating (set available via finish ())
-    oclDataObject :: setLocked ();
+    if (! oclDataObject :: getLockState ( ))
+    {
+  
+      // set status: calculating (set available via finish ())
+      oclDataObject :: setLocked ();
     
-    // synchronize GPU data / load to GPU
-    oclDataWrapper <T> :: loadToGPU ();
+      // synchronize GPU data / load to GPU
+      oclDataWrapper <T> :: loadToGPU ();
     
-    // notify modification of GPU data
-    oclDataObject :: setGPUModified ();
+      // notify modification of GPU data
+      oclDataObject :: setGPUModified ();
+
+    }
 
   }
   
@@ -171,11 +180,25 @@
   finish                      ()
   {
 
-    print_optional ("oclGPUDataObject::finish", v_level);
+    print_optional ("oclGPUDataObject::finish (%d)", oclDataObject :: getID (), v_level);
+
+    /* check if buffer was grabbed */
+    if (oclDataObject :: m_release_buffer)
+    {
+    
+      print_optional (" oclGPUDataObject :: finish -> releaseBuffer", v_level);
+      
+      /* copy data to CPU */
+      oclDataWrapper <T> :: loadToCPU ( );
+      
+      /* release buffer */
+      oclDataObject :: releaseBuffer ( );
+    
+    }
 
     // update data state: available for use
     oclDataObject :: setUnlocked ();
-
+    
   }
   
   
@@ -187,21 +210,24 @@
   void
   oclGPUDataObject <T> ::
   getData                     ()
-  throw (oclError)
   {
   
     print_optional ("oclGPUDataObject::getData", v_level);
-    
+        
     // check wether data is available or used on GPU
     if (oclDataObject :: getLockState ())
     {
-    
+
+      print_optional ("oclGPUDataObject::getData -> locked!", v_level);
+      
       /* throw error */
-      throw oclError ("Calculating on GPU ... data not available!", "oclGPU_DataObject :: getData");
+      throw oclError ("Calculating on GPU ... data not available!", "oclGPUDataObject :: getData");
     
     }
     else
     {
+    
+      print_optional ("oclGPUDataObject::getData -> not locked", v_level);
     
       try
       {

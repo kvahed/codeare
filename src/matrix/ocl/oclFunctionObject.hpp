@@ -63,8 +63,7 @@
 
       virtual
       void
-      run ()
-      const = 0;
+      run () = 0;
 
   
     protected:

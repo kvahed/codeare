@@ -98,12 +98,12 @@
                              
  
       void
-      addDataObject         (oclDataObject * const ocl_obj)
-      throw (oclError);
+      addDataObject         (oclDataObject * const ocl_obj);
       
       void
-      removeDataObject      (const oclDataObject * const ocl_obj)
-      throw (oclError);
+      removeDataObject      (const oclDataObject * const ocl_obj);
+      void
+      releaseBuffer         (const oclDataObject * const ocl_obj);
                           
       void
       run                   (oclFunctionObject * const func_obj) const;
@@ -128,8 +128,7 @@
       void
       loadToGPU             (       T   * const cpu_arg,
                              ::size_t           size,
-                             clBuffer   * const buffer)
-      throw (oclError);
+                             clBuffer   * const buffer);
       
       
       /**
@@ -139,8 +138,7 @@
       void
       createBuffer          (                T   * const cpu_arg,
                              const    ::size_t           size,
-                             const oclObjectID           obj_id)
-      throw (oclError);
+                             const oclObjectID           obj_id);
       
       
       /**
@@ -153,7 +151,6 @@
       loadToCPU             (const clBuffer * const buffer,
                                           T * const cpu_arg,
                              const ::size_t         size)
-      throw (oclError)
       {
       
         print_optional ("oclConnection :: loadToCPU ()", m_verbose);
@@ -182,14 +179,12 @@
   
       // activate kernel (stays activated until another kernel is activated
       int
-      activateKernel        (const std::string kernelname)
-      throw (oclError);
+      activateKernel        (const std::string kernelname);
     
       // run kernel with given dimensions
       int
       runKernel             (const cl::NDRange & global_dims,
-                             const cl::NDRange & local_dims)
-      throw (oclError);
+                             const cl::NDRange & local_dims);
     
     
       // set argument for kernel by pointer, optionally return created buffer
@@ -280,7 +275,6 @@
       getKernelArg            (int        num,
                                T        * out_argument,
                                ::size_t   size)
-      throw (oclError)
       {
 
         try {
@@ -338,8 +332,7 @@
        ******************/
       oclConnection         (const char *,
                              cl_device_type device_type = CL_DEVICE_TYPE_GPU,
-                             VerbosityLevel verbose = VERB_NONE)
-      throw (oclError);
+                             VerbosityLevel verbose = VERB_NONE);
       
       oclConnection         (oclConnection &) { /*TODO*/};
         
@@ -441,7 +434,6 @@
   void
   oclConnection ::
   addDataObject         (oclDataObject * const ocl_obj)
-  throw (oclError)
   {
   
     print_optional ("oclConnection :: addDataObject (...)", m_verbose);
@@ -486,7 +478,6 @@
   void
   oclConnection ::
   removeDataObject      (const oclDataObject * const ocl_obj)
-  throw (oclError)
   {
     
     print_optional ("oclConnection :: removeDataObject (...)", m_verbose);
@@ -532,6 +523,56 @@
   }
   
   
+  /**
+   * @brief             remove given object from
+   *                        1.  list of loaded oclObjects
+   *                    delete buffer, if needed
+   */
+  void
+  oclConnection ::
+  releaseBuffer        (const oclDataObject * const ocl_obj)
+  {
+    
+    print_optional ("oclConnection :: releaseBuffer (...)", m_verbose);
+    
+    // does ocl_obj has a buffer to be handled?
+    if (ocl_obj -> getMemState ())
+    {
+        
+      // decrease buffer reference count
+      std::map <clBuffer *, int> :: iterator tmp_it =  m_current_buffers.find (ocl_obj -> getBuffer ());
+      
+      if (tmp_it == m_current_buffers.end ())
+      {
+      
+        throw oclError ("Buffer not found!", "oclConnection :: releaseBuffer");
+
+      }
+    
+      print_optional (" => handle buffer!!! (ref_count: %d)", tmp_it -> second, m_verbose);
+      
+      // delete buffer object in case of no left references
+      if (-- tmp_it -> second == 0)
+      {
+    
+        print_optional (" *!* delete buffer *!*", m_verbose);
+      
+        // remove buffer from list
+        m_current_buffers.erase (tmp_it);
+        
+        // delete buffer object
+        delete tmp_it -> first;
+    
+      }
+    
+      // remove from list of loaded oclObjects
+      m_loaded_ocl_objects.remove (ocl_obj -> getID ());
+  
+    }
+    
+  }
+  
+  
   // create function object for running an OpenCL kernel
   template <class T>
   oclFunctionObject * const
@@ -552,7 +593,7 @@
       }
       else
       {
-  //      kernel_obj = new oclAsyncKernelObject (kernel_name, args, num_args);
+        kernel_obj = new oclAsyncKernelObject (kernel_name, args, num_args);
       }
 
     }
@@ -603,7 +644,6 @@
   createBuffer          (                T   * const cpu_arg,
                          const    ::size_t           size,
                          const oclObjectID           obj_id)
-  throw (oclError)
   {
     
     print_optional (" * oclConnection :: createBuffer (id: %d)", obj_id, m_verbose);
@@ -661,7 +701,6 @@
   loadToGPU             (       T   * const cpu_arg,
                          ::size_t           size,
                          clBuffer   * const buffer)
-  throw (oclError)
   {
     
     print_optional (" * oclConnection :: loadToGPU", m_verbose );

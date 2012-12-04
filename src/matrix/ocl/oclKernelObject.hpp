@@ -66,7 +66,7 @@
                             
       {
       
-        print_optional ("Ctor: \"oclKernelObject\"", VERB_HIGH);
+        print_optional ("Ctor: \"oclKernelObject\"", v_level);
         
         /* TODO */
         
@@ -80,7 +80,7 @@
       ~oclKernelObject      ()
       {
       
-        print_optional ("Dtor: \"oclKernelObject\"", VERB_HIGH);
+        print_optional ("Dtor: \"oclKernelObject\"", v_level);
 
         /* TODO */
         
@@ -97,13 +97,25 @@
        */
       virtual
       void
-      run                   ()
-      const;
+      run                   ();
+      
+      
+
+    private:
+    
+      /* private member for verbosity level of class */
+      static const VerbosityLevel v_level;
       
   
   
   }; // class oclKernelObject
   
+  
+  
+  /*************************************
+   ** initialize static class members **
+   *************************************/
+  const VerbosityLevel oclKernelObject :: v_level = global_verbosity [OCL_KERNEL_OBJECT];
   
   
   
@@ -119,13 +131,12 @@
   void
   oclKernelObject ::
   run                       ()
-  const
   {
   
     // oclConnection for reuse in this function
     oclConnection * oclCon = oclConnection :: Instance ();
   
-    print_optional ("oclKernelObject :: run ()", VERB_HIGH);
+    print_optional ("oclKernelObject :: run ()", v_level);
     
     // activate kernel
     oclCon -> activateKernel (m_kernel_name);
@@ -158,4 +169,4 @@
   
   
   
-# endif // __OCL_KERNEL_OBJECT_HPP__
+# endif /* __OCL_KERNEL_OBJECT_HPP__ */

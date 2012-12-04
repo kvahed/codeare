@@ -219,10 +219,10 @@
       inline
       oclMatrix           (const oclMatrix <T> & mat)
                         : Matrix <T> ((Matrix<T>) mat),
-                          mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
-                                                                        Matrix <T> :: Size (),
-                                                                             * mat.mp_oclData,
-                                                                                         true))
+                          mp_oclData (oclTraits <T> :: make_GPU_Obj (& (       Matrix <T> :: _M [0]),
+                                                                               Matrix <T> :: Size (),
+                                                                                    * mat.mp_oclData,
+                                                                        oclDataObject :: COPY_BUFFER ))
       {
 
         T t;
@@ -272,21 +272,1064 @@
        *
        * @param  p        Requested position.
        *
-       * @return          Value at p-th position.
+       * @return          Reference to value at p-th position.
        */
       inline
       T &
       operator[]          (const size_t & p);
       
       
+      /**
+       * @brief           Pointer to data starting from p-th (default: 0) element.
+       *
+       * @param  p        Requested position.
+       *
+       * @return          Data pointer.
+       */
+      inline
+      const T *
+      Data                (const size_t p = 0)
+      const;
+      
+      
+      /**
+       * @brief           Get data (lvalue).
+       *
+       * @return          Data.
+       */
+      inline
+      std::valarray <T> &
+      Dat                 ( );
+      
+      
+      /**
+       * @brief           Get data (rvalue).
+       *
+       * @return          Data.
+       */
+      inline
+      std::valarray <T>
+      Dat                 ( )
+      const;
+      
+      
+      /**
+       * @brief           Element at position p (rvalue).
+       *
+       * @param  p        Position.
+       *
+       * @return          Value at p-th position.
+       */
+      inline
+      T
+      At                  (const size_t & p)
+      const;
+      
+      
+      /**
+       * @brief           Element at position p (lvalue).
+       *
+       * @param  p        Position.
+       *
+       * @return          Reference to value at p-th position.
+       */
+      inline
+      T &
+      At                  (const size_t & p);
+      
+      
+      /**
+       * @brief           Element in (first) slice.
+       *
+       * @param  x        Column.
+       * @param  y        Line.
+       *
+       * @return          Requested value. (rvalue)
+       */
+      inline
+      T
+      At                  (const size_t & x,
+                           const size_t & y)
+      const;
+      
+      
+      /**
+       * @brief           Element in (first) slice.
+       *
+       * @param  x        Column.
+       * @param  y        Line.
+       *
+       * @return          Reference to requested value. (lvalue)
+       */
+      inline
+      T &
+      At                  (const size_t & x,
+                           const size_t & y);
+      
+      
+      /**
+       * @brief           Element in volume.
+       *
+       * @param  x        Column.
+       * @param  y        Line.
+       * @param  z        Slice.
+       *
+       * @return          Requested value. (rvalue)
+       */
+      inline
+      T
+      At                  (const size_t & x,
+                           const size_t & y,
+                           const size_t & z)
+      const;
+      
+      
+      /**
+       * @brief           Element in volume.
+       *
+       * @param  x        Column.
+       * @param  y        Line.
+       * @param  z        Slice.
+       *
+       * @return          Reference to requested value. (lvalue)
+       */
+      inline
+      T &
+      At                  (const size_t & x,
+                           const size_t & y,
+                           const size_t & z);
+      
+      
+      /**
+       * @brief           Get value in store.
+       *
+       * @param  col      Column.
+       * @param  lin      Line.
+       * @param  cha      Channel.
+       * @param  set      Set.
+       * @param  eco      Echo.
+       * @param  phs      Phase.
+       * @param  rep      Repetition.
+       * @param  seg      Segment.
+       * @param  par      Partition.
+       * @param  slc      Slice.
+       * @param  ida      Free index A.
+       * @param  idb      Free index B.
+       * @param  idc      Free index C.
+       * @param  idd      Free index D.
+       * @param  ide      Free index E.
+       * @param  ave      Average.
+       *
+       * @return          Value at requested position. (rvalue)
+       */
+      inline
+      T
+      At                  (const size_t & col,
+                           const size_t & lin,
+                           const size_t & cha,
+                           const size_t & set,
+                           const size_t & eco,
+                           const size_t & phs = 0,
+                           const size_t & rep = 0,
+                           const size_t & seg = 0,
+                           const size_t & par = 0,
+                           const size_t & slc = 0,
+                           const size_t & ida = 0,
+                           const size_t & idb = 0,
+                           const size_t & idc = 0,
+                           const size_t & idd = 0,
+                           const size_t & ide = 0,
+                           const size_t & ave = 0)
+      const;
+      
+      
+      /**
+       * @brief           Get value in store.
+       *
+       * @param  col      Column.
+       * @param  lin      Line.
+       * @param  cha      Channel.
+       * @param  set      Set.
+       * @param  eco      Echo.
+       * @param  phs      Phase.
+       * @param  rep      Repetition.
+       * @param  seg      Segment.
+       * @param  par      Partition.
+       * @param  slc      Slice.
+       * @param  ida      Free index A.
+       * @param  idb      Free index B.
+       * @param  idc      Free index C.
+       * @param  idd      Free index D.
+       * @param  ide      Free index E.
+       * @param  ave      Average.
+       *
+       * @return          Value at requested position. (lvalue)
+       */
+      inline
+      T &
+      At                  (const size_t & col,
+                           const size_t & lin,
+                           const size_t & cha,
+                           const size_t & set,
+                           const size_t & eco,
+                           const size_t & phs = 0,
+                           const size_t & rep = 0,
+                           const size_t & seg = 0,
+                           const size_t & par = 0,
+                           const size_t & slc = 0,
+                           const size_t & ida = 0,
+                           const size_t & idb = 0,
+                           const size_t & idc = 0,
+                           const size_t & idd = 0,
+                           const size_t & ide = 0,
+                           const size_t & ave = 0);
+      
+      
+      /**
+       * @brief           Element at position p.
+       *
+       * @param  p        Requested position.
+       *
+       * @return          Value at requested position. (rvalue)
+       */
+      inline
+      T
+      operator()          (const size_t & p)
+      const;
+      
+      
+      /**
+       * @brief           Element at position p.
+       *
+       * @param  p        Requested position.
+       *
+       * @return          Reference to value at requested position. (lvalue)
+       */
+      inline
+      T &
+      operator()          (const size_t & p);
+
+
+      /**
+       * @brief           Element in (first) slice.
+       *
+       * @param  x        Column.
+       * @param  y        Line.
+       *
+       * @return          Requested value. (rvalue)
+       */
+      inline
+      T
+      operator()          (const size_t & x,
+                           const size_t & y)
+      const;
+      
+      
+      /**
+       * @brief           Element in (first) slice.
+       *
+       * @param  x        Column.
+       * @param  y        Line.
+       *
+       * @return          Reference to requested value. (lvalue)
+       */
+      inline
+      T &
+      operator()          (const size_t & x,
+                           const size_t & y);
+      
+      
+      /**
+       * @brief           Element in volume.
+       *
+       * @param  x        Column.
+       * @param  y        Line.
+       * @param  z        Slice.
+       *
+       * @return          Requested value. (rvalue)
+       */
+      inline
+      T
+      operator()          (const size_t & x,
+                           const size_t & y,
+                           const size_t & z)
+      const;
+      
+      
+      /**
+       * @brief           Element in volume.
+       *
+       * @param  x        Column.
+       * @param  y        Line.
+       * @param  z        Slice.
+       *
+       * @return          Reference to requested value. (lvalue)
+       */
+      inline
+      T &
+      operator()          (const size_t & x,
+                           const size_t & y,
+                           const size_t & z);
+      
+      
+      /**
+       * @brief           Get value in store.
+       *
+       * @param  col      Column.
+       * @param  lin      Line.
+       * @param  cha      Channel.
+       * @param  set      Set.
+       * @param  eco      Echo.
+       * @param  phs      Phase.
+       * @param  rep      Repetition.
+       * @param  seg      Segment.
+       * @param  par      Partition.
+       * @param  slc      Slice.
+       * @param  ida      Free index A.
+       * @param  idb      Free index B.
+       * @param  idc      Free index C.
+       * @param  idd      Free index D.
+       * @param  ide      Free index E.
+       * @param  ave      Average.
+       *
+       * @return          Value at requested position. (rvalue)
+       */
+      inline
+      T
+      operator()          (const size_t & col,
+                           const size_t & lin,
+                           const size_t & cha,
+                           const size_t & set,
+                           const size_t & eco,
+                           const size_t & phs = 0,
+                           const size_t & rep = 0,
+                           const size_t & seg = 0,
+                           const size_t & par = 0,
+                           const size_t & slc = 0,
+                           const size_t & ida = 0,
+                           const size_t & idb = 0,
+                           const size_t & idc = 0,
+                           const size_t & idd = 0,
+                           const size_t & ide = 0,
+                           const size_t & ave = 0)
+      const;
+      
+      
+      /**
+       * @brief           Get value in store.
+       *
+       * @param  col      Column.
+       * @param  lin      Line.
+       * @param  cha      Channel.
+       * @param  set      Set.
+       * @param  eco      Echo.
+       * @param  phs      Phase.
+       * @param  rep      Repetition.
+       * @param  seg      Segment.
+       * @param  par      Partition.
+       * @param  slc      Slice.
+       * @param  ida      Free index A.
+       * @param  idb      Free index B.
+       * @param  idc      Free index C.
+       * @param  idd      Free index D.
+       * @param  ide      Free index E.
+       * @param  ave      Average.
+       *
+       * @return          Value at requested position. (lvalue)
+       */
+      inline
+      T &
+      operator()          (const size_t & col,
+                           const size_t & lin,
+                           const size_t & cha,
+                           const size_t & set,
+                           const size_t & eco,
+                           const size_t & phs = 0,
+                           const size_t & rep = 0,
+                           const size_t & seg = 0,
+                           const size_t & par = 0,
+                           const size_t & slc = 0,
+                           const size_t & ida = 0,
+                           const size_t & idb = 0,
+                           const size_t & idc = 0,
+                           const size_t & idd = 0,
+                           const size_t & ide = 0,
+                           const size_t & ave = 0);
+      
+      
       //@}
       
       
       /**
-       * @brief           assignment operator
+       * @name            Friend operators.
+       */
+      //@{
+      
+      
+      /**
+       * @brief           Elementwise multiplication with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m * s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator*           (const    double     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m * s;
+      
+      }
+      
+      
+      /**
+       * @brief           Elementwise multiplication with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m * s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator*           (const     float     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m * s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise multiplication with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m * s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator*           (const     short     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m * s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise multiplication with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m * s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator*           (const      long     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m * s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise multiplication with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m * s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator*           (const      cxfl     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m * s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise multiplication with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m * s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator*           (const      cxdb     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m * s;
+      
+      }
+      
+      
+      /**
+       * @brief           Elementwise addition of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m + s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator+           (const    double     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m + s;
+      
+      }
+      
+      
+      /**
+       * @brief           Elementwise addition of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m + s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator+           (const     float     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m + s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise addition of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m + s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator+           (const     short     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m + s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise addition of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m + s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator+           (const      long     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m + s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise addition of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m + s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator+           (const      cxfl     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m + s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise addition of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m + s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator+           (const      cxdb     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m + s;
+      
+      }
+      
+      
+      /**
+       * @brief           Elementwise subtraction of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m - s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator-           (const    double     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m - s;
+      
+      }
+      
+      
+      /**
+       * @brief           Elementwise subtraction of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m - s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator-           (const     float     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m - s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise subtraction of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m - s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator-           (const     short     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m - s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise subtraction of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m - s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator-           (const      long     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m - s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise subtraction of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m - s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator-           (const      cxfl     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m - s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise subtraction of scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m - s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator-           (const      cxdb     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m - s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise division by scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m / s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator/           (const    double     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m / s;
+      
+      }
+      
+      
+      /**
+       * @brief           Elementwise division by scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m / s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator/           (const     float     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m / s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise division by scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m / s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator/           (const     short     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        /* TODO */
+        getData ();
+      
+        return m / s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise division by scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m / s.
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator/           (const      long     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        /* TODO */
+        getData ();
+      
+        return m / s;
+      
+      }
+      
+      
+      /**
+       * @brief           Elementwise equality with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m == s
+       */
+      inline
+      friend
+      oclMatrix <bool>
+      operator==          (const         T     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m == s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise greater/equal with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m >= s
+       */
+      inline
+      friend
+      oclMatrix <bool>
+      operator>=          (const         T     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m >= s;
+      
+      }
+      
+      
+      /**
+       * @brief           Elementwise less/equal with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m <= s
+       */
+      inline
+      friend
+      oclMatrix <bool>
+      operator<=          (const         T     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m <= s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise unequality with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m != s
+       */
+      inline
+      friend
+      oclMatrix <bool>
+      operator!=          (const         T     & s,
+                           const oclMatrix <T> & m)
+      {
+      
+        return m != s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise greater than with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m > s
+       */
+      inline
+      friend
+      oclMatrix <bool>
+      operator>          (const         T     & s,
+                          const oclMatrix <T> & m)
+      {
+      
+        return m > s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise less than with scalar. (lhs)
+       *
+       * @param  s        Scalar. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m < s
+       */
+      inline
+      friend
+      oclMatrix <bool>
+      operator<          (const         T     & s,
+                          const oclMatrix <T> & m)
+      {
+      
+        return m < s;
+      
+      }
+
+
+      /**
+       * @brief           Elementwise AND with boolean matrix. (lhs)
+       *
+       * @param  mb       Boolean matrix. (lhs)
+       * @param  m        Matrix. (rhs)
+       *
+       * @return          m & s
+       */
+      inline
+      friend
+      oclMatrix <T>
+      operator&          (const oclMatrix <T> & mb,
+                          const oclMatrix <T> &  m)
+      {
+      
+        return m & mb;
+      
+      }
+      
+      
+      //@}
+      
+      
+      /**
+       * @name            Assignment.
+       */
+      //@{
+      
+      
+      /**
+       * @brief           Assignment operator.
+       *
+       * @param  mat      Matrix to be assigned.
+       *
+       * @return          Reference to this-matrix.
        */
       oclMatrix <T> &
       operator=           (const oclMatrix <T> & mat);
+      
+      
+      /**
+       * @brief           Assignment of valarray.
+       *
+       * @param  v        Vallarray to be assigned.
+       *
+       * @return          Reference to this-matrix.
+       */
+      oclMatrix <T> &
+      operator=           (const std::valarray <T> & v);
+      
+      
+      /**
+       * @brief           Elemenwise assignment of scalar.
+       *
+       * @param  s        Scalar to be assigned.
+       *
+       * @return          Reference to this-matrix.
+       */
+      oclMatrix <T> &
+      operator=           (const T & s);
+      
+      
+      //@}
+      
+      
+      /**
+       * @brief           Resize to  m x n  2D matrix.
+       *                  Preserving data while shrinking.
+       *                  Adding zeros when growing.
+       *
+       * @param  m        No. of rows.
+       * @param  n        No. of cols.
+       */
+      inline
+      void
+      Resize              (const size_t & m,
+                           const size_t & n);
+      
+      
+      /**
+       * @brief           Purge data and free RAM.
+       */
+      inline
+      void
+      Clear               ( );
+      
+      
+      /**
+       * @brief           Cast operator.
+       *
+       * @return          Casted object if possible.
+       */
+      template <class S>
+      operator Matrix <S> ( )
+      const;
+      
+      
+
 
       
       /**
@@ -406,248 +1449,8 @@
 
 
 
-
-  /******************************
-   ** definitions in oclMatrix **
-   ******************************/
-
-
-  /**
-   * assignment operator
-   */
-  template <class T>
-  oclMatrix <T> &
-  oclMatrix <T> ::
-  operator=             (const oclMatrix <T> & mat)
-  {
-      
-    // otherwise: self assignment
-    if (this != &mat)
-    {
-
-      // copy members of Matrix <T>
-      memcpy (Matrix<T> :: _dim, mat.Dim(), INVALID_DIM * sizeof(size_t));
-      memcpy (Matrix<T> :: _res, mat.Res(), INVALID_DIM * sizeof( float));
-
-      // temporary save current oclDataObject
-      oclDataWrapper <T> * p_old_oclData = this -> mp_oclData;
-
-      /* if buffer is copied, CPU data need not to be copied */
-      if (! mat.mp_oclData -> bufferCopyable ())
-      {
-
-        // copy data array of Matrix <T>
-        Matrix<T> :: _M = mat.Dat();      // uses deep copy of valarray <T>
-
-      }
-      
-      // create new wrapper for gpu memory (and !new! cpu memory, copy object state!!!)
-      /* important to copy object after CPU data (since memory pointer may become invalid) !!! */
-      this -> mp_oclData = oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]), Matrix <T> :: Size (), * mat.mp_oclData, true);
-      
-      // delete old oclDataObject
-      delete p_old_oclData;
-      
-    }
-        
-    // for daisy chaining
-    return *this;
-       
-  }
-
-
-
-
-  /**
-   * elementwise access (copy)
-   */
-  template <class T>
-  inline
-  T
-  oclMatrix <T> ::
-  operator[]              (const size_t & p)
-  const
-  {
-  
-    /* chose this order to avoid unnecessary data transfer from GPU */
-    assert (p < Matrix <T> :: Size ());
-      
-    /* copy data to CPU */
-    getData ();                     /* TODO: possibility to copy just one element */
-      
-    return Matrix <T> :: _M [p];
-  
-  }
-
-
-
-
-  /**
-   * elementwise access (reference)
-   */
-  template <class T>
-  inline
-  T &
-  oclMatrix <T> ::
-  operator[]              (const size_t & p)
-  {
-  
-    assert (p < Matrix <T> :: Size ());
-
-    /* copy data to CPU */
-    getData ();                     /* TODO: see above */
-
-    return Matrix <T> :: _M [p];
-  
-  }
-
-
-
-  
-  template <class T>
-  template <class S>
-  inline
-  oclMatrix <T>
-  oclMatrix <T> ::
-  operator+               (const oclMatrix <S> & mat) const
-  {
-
-    print_optional ("oclMatrix :: operator+", op_v_level);
-
-    // create matrix for result
-    oclMatrix <T> sum (Matrix<T> (this -> Dim()));
-    
-    // call operator function of oclTraits
-    oclTraits <T> :: ocl_operator_add (this -> mp_oclData, mat.mp_oclData, sum.mp_oclData, this -> Size ());
-
-    return sum;
-    
-  }
-
-
-
-
-  template <class T>
-  template <class S>
-  inline
-  oclMatrix <T>
-  oclMatrix <T> ::
-  operator-               (const oclMatrix <S> & mat) const
-  {
-    
-    print_optional ("oclMatrix :: operator-", op_v_level);
-    
-    // create matrix for result
-    oclMatrix <T> diff (Matrix<T> (this -> Dim()));
-    
-    // call operator function of oclTraits
-    oclTraits <T> :: ocl_operator_subtract (this -> mp_oclData, mat.mp_oclData, diff.mp_oclData, this -> Size ());
-    
-    return diff;
-    
-  }
-  
-  
-  
-  
-  template <class T>
-  template <class S>
-  inline
-  oclMatrix <T> &
-  oclMatrix <T> ::
-  operator-=              (const S & dec)
-  {
-  
-    print_optional ("oclMatrix :: operator-=", op_v_level);
-    
-    // call operator function of oclTraits
-    oclTraits <T> :: ocl_operator_dec (this -> mp_oclData, T (dec), this -> Size ());
-    
-    return *this;
-    
-  }
-  
-  
-  
-  template <class T>
-  template <class S>
-  inline
-  oclMatrix <T> &
-  oclMatrix <T> ::
-  operator-=              (const oclMatrix <S> & dec_mat)
-  {
-  
-    print_optional ("oclMatrix :: operator-=", op_v_level);
-    
-    // call operator function of oclTraits
-    oclTraits <T> :: ocl_operator_subtract (this -> mp_oclData, dec_mat.mp_oclData, this -> mp_oclData, this -> Size ());
-    
-    return *this;
-  
-  }
-  
-  
-  
-
-  template <class T>  
-  template <class S>
-  inline
-  oclMatrix <T> &
-  oclMatrix <T> ::
-  operator+=              (const S & inc)
-  {
-  
-    print_optional ("oclMatrix :: operator+=", op_v_level);
- 
-    // call operator function of oclTraits
-    oclTraits <T> :: ocl_operator_inc (this -> mp_oclData, T (inc), this -> Size ());
-  
-    return *this;
-  
-  }
-   
-   
-   
-   
-  template <class T>  
-  template <class S>
-  inline
-  oclMatrix <T> &
-  oclMatrix <T> ::
-  operator+=              (const oclMatrix <S> & inc_mat)
-  {
-  
-    print_optional ("oclMatrix <T> :: operator+=", op_v_level);
- 
-    // call operator function of oclTraits
-    oclTraits <T> :: ocl_operator_add (this -> mp_oclData, inc_mat.mp_oclData, this -> mp_oclData, this -> Size ());
-  
-    return *this;
-  
-  }
-      
-      
-      
-  
-  template <class T>
-  inline
-  void
-  oclMatrix <T> ::
-  getData                 ()
-  const
-  {
-  
-    // check if data on CPU are up to date
-    if (! this -> mp_oclData -> getSyncState ())
-    {
-  
-      // load GPU data to CPU
-      this -> mp_oclData -> getData ();
-
-    }
-  
-  }
-
+  /* include function definitions */
+  # include "oclMatrix.cpp"
 
 
 

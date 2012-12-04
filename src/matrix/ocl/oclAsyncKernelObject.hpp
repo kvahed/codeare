@@ -56,7 +56,7 @@
                                        oclAsyncFunctionObject ( num_args )
       {
       
-        print_optional ("CTOR: oclAsyncKernelObject", oclAsyncKernelObject :: v_level);
+        print_optional ("Ctor: oclAsyncKernelObject", oclAsyncKernelObject :: v_level);
       
       }
       
@@ -68,7 +68,7 @@
       ~oclAsyncKernelObject           ( )
       {
       
-        print_optional ("DTOR: oclAsyncKernelObject", oclAsyncKernelObject :: v_level);
+        print_optional ("Dtor: oclAsyncKernelObject", oclAsyncKernelObject :: v_level);
       
       }
       
@@ -98,12 +98,21 @@
       
       
       /**
+       * @brief                       Wait for asynchronous execution to finish.
+       */
+      virtual
+      void
+      join                            ( )
+      const;
+      
+      
+      
+      /**
        * @brief                       Run kernel (inherited from oclKernelObject).
        */
       virtual
       void
-      run                             ( )
-      const;
+      run                             ( );
     
 
 
@@ -121,8 +130,7 @@
        */
       virtual
       void
-      run_async                       ( )
-      const;
+      run_async                       ( );
 
 
       /**
@@ -143,6 +151,24 @@
       //@}
 
 
+      /**
+       * @brief                       Function to be called by thread.
+       */
+      static
+      void *
+      call_thread                     ( void * obj )
+      {
+      
+        /* cast to oclAsyncKernelObject */
+        oclAsyncKernelObject * kernel_obj = (oclAsyncKernelObject *) obj;
+
+        print_optional ("oclAsyncFunctionObject :: call_thread", v_level);
+
+        /* run algorithm */
+        kernel_obj -> run_async ( );
+      
+      }
+
 
       /********************
        ** static members **
@@ -152,7 +178,6 @@
       static const VerbosityLevel v_level;
 
 
-  
   
   }; /* oclAsyncKernelObject */
   
@@ -211,14 +236,41 @@
   void
   oclAsyncKernelObject ::
   run_async                           ( )
-  const
   {
   
     print_optional ("oclAsyncKernelObject :: run_async", oclAsyncKernelObject :: v_level);
-  
-    /* TODO */
+
+    // run kernel
+    cl::NDRange global_dims (256);
+    cl::NDRange local_dims = cl::NullRange;
+    oclConnection :: Instance () -> runKernel (global_dims, local_dims);
+
+    /* deactivate asyncKernelObject */
+    oclAsyncFunctionObject :: m_active = false;
+
+    /* notify end of kernel execution */
+    oclAsyncFunctionObject :: m_observer.notify ( );
   
   }
+
+  
+  
+  /**
+   *                                  Wait for async execution to finish.
+   */
+  void
+  oclAsyncKernelObject ::
+  join                                ( )
+  const
+  {
+  
+    print_optional ("oclAsyncKernelObject :: run", oclAsyncKernelObject :: v_level);
+    
+    /* call join on thread handle */
+    pthread_join (oclAsyncFunctionObject :: m_thread, NULL);
+  
+  }
+  
   
   
   /**
@@ -227,15 +279,51 @@
   void
   oclAsyncKernelObject ::
   run                                 ( )
-  const
   {
   
     print_optional ("oclAsyncKernelObject :: run", oclAsyncKernelObject :: v_level);
     
-    /* TODO */
+    oclConnection * const oclCon = oclConnection :: Instance ( );
     
-  }
-  
+    /* activate asyncKernelObject */
+    this -> activate ( );
+    
+    // activate kernel
+    oclCon -> activateKernel (m_kernel_name);
+    
+    // prepare kernel arguments (load to gpu)
+    for (int i = 0; i < m_num_args; i++)
+    {
+
+      // prepare argument
+      mpp_args [i] -> prepare ();
+
+      // register argument at kernel
+      oclCon -> setKernelArg (i, mpp_args [i]);
+
+      try {
+
+        /* register argument at function observer */
+        oclAsyncFunctionObject :: m_observer.register_obj (mpp_args [i]);
+
+      }
+      catch (oclError & err)
+      {
+      
+        throw oclError (err, "oclAsyncKernelObject :: run");
+      
+      }
+
+    }
+
+    /* start thread for asynchronous kernel call */
+    pthread_create (& (oclAsyncFunctionObject :: m_thread), NULL, &oclAsyncKernelObject :: call_thread, this);
+
+//    this -> join ( );
+
+//    pthread_join (oclAsyncFunctionObject :: m_thread, NULL);
+
+  }  
   
   
   

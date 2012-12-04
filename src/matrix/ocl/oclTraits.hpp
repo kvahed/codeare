@@ -61,7 +61,7 @@
       
       /* verbosity of operators */
       static
-      const VerbosityLevel op_v_level = VERB_MIDDLE;
+      const VerbosityLevel op_v_level = VERB_LOW;
 
 
       /**
@@ -95,10 +95,21 @@
         // create function object
         oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
         
-        // execute function object
-        op_obj -> run ();
+        try
+        {
 
-        // clear memory      
+          // execute function object
+          op_obj -> run ( );
+
+        }
+        catch (oclError & err)
+        {
+        
+          print_optional (oclError (err, "oclTraits <float> :: ocl_basic_operator_kernel_3"), VERB_LOW);
+        
+        }
+
+        // clear memory
         delete op_obj;      
         delete args [3];
         free (args);
@@ -245,10 +256,10 @@
        */
       static inline
       oclDataWrapper <elem_type> *
-      make_GPU_Obj                   (           elem_type             *  const     cpu_arg,
-                                      const         size_t             &          num_elems,
-                                            oclDataWrapper <elem_type> &                obj,
-                                                      bool                      keep_buffer = false)
+      make_GPU_Obj                   (                      elem_type             *  const   cpu_arg,
+                                      const                    size_t             &        num_elems,
+                                                       oclDataWrapper <elem_type> &              obj,
+                                            oclDataObject :: CopyMode                      copy_mode = oclDataObject :: NO_BUFFER)
       {
       
         print_optional ("make_GPU_Obj <float> (copy obj's state)", VERB_HIGH);
@@ -264,10 +275,10 @@
         {
       
           // create oclDataObject to return
-          oclDataWrapper <elem_type> * cp_obj = new oclGPUDataObject <elem_type> (cpu_arg, num_elems, obj, keep_buffer);
+          oclDataWrapper <elem_type> * cp_obj = new oclGPUDataObject <elem_type> (cpu_arg, num_elems, obj, copy_mode);
         
           /* update GPU buffer with data if possible */
-          if (keep_buffer && obj.bufferCopyable ())
+          if (copy_mode == oclDataObject :: COPY_BUFFER  &&  obj.bufferCopyable ())
           {
   
             ocl_basic_operator_kernel_2 ("copy_buffer", cp_obj, & obj, num_elems);
@@ -304,7 +315,7 @@
         print_optional ("oclTraits <float> :: ocl_operator_add", op_v_level);
       
         ocl_basic_operator_kernel_3 ("add", arg1, arg2, sum, num_elems);
-      
+        
       }
         
     

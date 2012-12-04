@@ -95,7 +95,7 @@
    ** global vars **
    *****************/
 
-  const VerbosityLevel verbosity = VERB_LOW; //VERB_HIGH;
+   VerbosityLevel verbosity = VERB_NONE; //VERB_HIGH;
   
   static const VerbosityLevel global_verbosity [MAX_ID] =
   {
@@ -108,9 +108,9 @@
   /* 6. */    VERB_HIGH,
   /* 7. */    VERB_HIGH,
   /* 8. */    VERB_LOW,
-  /* 9. */    VERB_LOW,
+  /* 9. */    VERB_HIGH,
   /* 10. */   VERB_MIDDLE,
-  /* 11. */   VERB_MIDDLE,
+  /* 11. */   VERB_HIGH,
   /* 12. */   VERB_LOW,
   /* 13. */   VERB_LOW,
   /* 14. */   VERB_LOW

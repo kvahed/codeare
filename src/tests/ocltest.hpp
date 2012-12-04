@@ -32,6 +32,7 @@ mat_equal             ( const oclMatrix <T> & ocl_mat,
   for (int i = 0; i < smat.Height (); i++)
     for (int j = 0; j < smat.Width (); j++)
       result &= mat_comp (i,j);
+  
   return result;
 
 }
@@ -164,6 +165,51 @@ Init2D              ( size_t dimX, size_t dimY, const T & offset = 0 )
 
 template <class T>
 bool
+oclAccessTest       ( bool verbose )
+{
+
+  std::cout <<                     std::endl;
+  std::cout << " ************ " << std::endl;
+  std::cout << " ** access ** " << std::endl;
+  std::cout << " ************ " << std::endl;
+  std::cout <<                     std::endl;
+  
+  size_t dimX = 128,
+         dimY = 128;
+
+  /* elementwise access (rvalue) */
+  {
+    if (verbose) std::cout << " * At (p), [p] (rvalue)       ";
+       Matrix <T>    mat =    Init2D <T> (dimX, dimY);
+    oclMatrix <T> oclmat = oclInit2D <T> (dimX, dimY);
+    bool test = true;
+    for (int i = 0; i < mat.Size (); i++)
+      test &= (mat.At (i) == oclmat.At (i)) && (mat [i] == oclmat [i]);
+    assert (test && " Test failed! ");
+    if (verbose) std::cout << "passed!" << std::endl;
+  }
+
+  /* elementwise access (lvalue) */
+  {
+    if (verbose) std::cout << " * At (p), [p] (lvalue)       ";
+       Matrix <T>    mat =    Init2D <T> (dimX, dimY);
+    oclMatrix <T> oclmat = oclInit2D <T> (dimX, dimY);
+    bool test = true;
+    for (int i = 0; i < mat.Size (); i++)
+    {
+         mat.At (i) =    mat [i] = i;
+      oclmat.At (i) = oclmat [i] = i;
+      test &= (mat.At (i) == oclmat.At (i)) && (mat [i] == oclmat [i]);
+    }
+    assert (test && " Test failed! ");
+    if (verbose) std::cout << "passed!" << std::endl;
+  }
+
+}
+
+
+template <class T>
+bool
 oclArithmeticsTest    ( bool verbose )
 {
 
@@ -173,14 +219,16 @@ oclArithmeticsTest    ( bool verbose )
   std::cout << " ***************** " << std::endl;
   std::cout <<                          std::endl;
 
-  size_t  dimX     = 1024,
-          dimY     = 1024;
+  size_t  dimX     = 1025,
+          dimY     = 1025;
   double  time_ocl = 0.0,
           time_s   = 0.0;
   MyTimer t;  
   
   std::cout << " size: " << dimX << " x " << dimY << std::endl;
   
+  
+ // verbosity = VERB_HIGH;
   
   /* add two matrices */
   {
@@ -291,8 +339,16 @@ oclArithmeticsTest    ( bool verbose )
 template <class T> bool
 oclmatrixtest (Connector<T>* rc) {
 
-  oclCreatorsTest <elem_type>    (true);
-  oclArithmeticsTest <elem_type> (true);
+  try
+  {
+    oclCreatorsTest    <elem_type> (true);
+    oclArithmeticsTest <elem_type> (true);
+    oclAccessTest      <elem_type> (true);
+  }
+  catch (oclError & err)
+  {
+    print_optional (err, VERB_LOW);
+  }
 
   // choose tests
   enum Test_Type {constructors, ocl_scalar_add, ocl_mat_inc, ocl_mat_add, ocl_mat_sub, ocl_scalar_sub};

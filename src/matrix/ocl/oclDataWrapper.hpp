@@ -63,11 +63,11 @@
        * @brief             "copy state" constructor
        *
        */
-      oclDataWrapper        (                   T     * const    cpu_data,
-                             const            int               num_elems,
-                                   oclDataWrapper <T> &               obj,
-                                             bool             keep_buffer = false)
-                          : oclDataObject   (obj, keep_buffer),
+      oclDataWrapper        (                              T     * const  cpu_data,
+                             const                       int             num_elems,
+                                              oclDataWrapper <T> &             obj,
+                                   oclDataObject :: CopyMode             copy_mode = NO_BUFFER)
+                          : oclDataObject   (obj, copy_mode),
                             mp_cpu_data     (cpu_data)
       {
       
@@ -82,7 +82,7 @@
         }
         
         /* copy buffer of obj on GPU */
-        if (keep_buffer && obj.bufferCopyable ())
+        if (copy_mode == COPY_BUFFER && obj.bufferCopyable ())
         {
          
           // create buffer object
@@ -91,19 +91,6 @@
           // update memory state
           oclDataObject :: setLoaded ();
 
-        }
-        else
-        {
-        
-          /* data on GPU is newer than on CPU ? */
-          if (obj.getMemState () && ! obj.getSyncState ())
-          {
-        
-            // copy data of obj to CPU (so that data can be copied by oclMatrix)
-            obj.loadToCPU ();
-
-          }
-        
         }
               
       }
@@ -129,8 +116,7 @@
        */
       virtual
       void
-      getData               ()
-      throw (oclError) = 0;
+      getData               () = 0;
       
       
       /**
@@ -162,8 +148,7 @@
        */
       virtual
       void
-      loadToCPU             ()
-      throw (oclError);
+      loadToCPU             ();
       
       
       /**********************
@@ -229,7 +214,6 @@
   void
   oclDataWrapper <T> ::
   loadToCPU                 ()
-  throw (oclError)
   {
 
     print_optional ("oclDataWrapper :: loadToCPU ()", VERB_HIGH);

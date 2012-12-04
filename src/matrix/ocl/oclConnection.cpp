@@ -71,7 +71,6 @@ oclConnection::
 oclConnection ( const char      * filename,
                 cl_device_type    device_type,
                 VerbosityLevel    verbose )
-throw (oclError)
               : m_current_ocl_objects (),
                 m_current_buffers (),
                 m_loaded_ocl_objects ()
@@ -139,7 +138,6 @@ throw (oclError)
 int
 oclConnection::
 activateKernel            (const std::string kernelname)
-throw (oclError)
 {
 
   std::string act_kernelname;
@@ -178,7 +176,6 @@ int
 oclConnection::
 runKernel             (const cl::NDRange  & global_dims,
                        const cl::NDRange  & local_dims  )
-throw (oclError)
 {
 
   // execute activated kernel on all available devices 
