@@ -276,3 +276,29 @@ errorString             (cl_int e)
 
 }
 
+
+
+
+
+/** @brief Create a double precision kernel out of a single precision kernel
+ *
+ * @param  source          The source string
+ * @param  fp_extension    An info string that specifies the OpenCL double precision extension
+ *
+ * @return                The double precision kernel
+ */
+/*inline
+std::string
+make_double_kernel        (std::string const & source, std::string const & fp_extension)
+{
+
+//  std::stringstream ss;
+//  ss << "#pragma OPENCL EXTENSION " << fp_extension << " : enable\n\n";
+  
+//  std::string result = ss.str();
+  result.append(strReplace(source, "float", "double"));
+
+  return result;
+
+}*/
+

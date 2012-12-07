@@ -51,7 +51,8 @@
   enum vclAlgoType
   {
       
-    vclSUBTRACT
+    vclSUBTRACT,
+    vclMATPROD
   
   };
 
@@ -105,10 +106,10 @@
   /* 3. */    VERB_HIGH,
   /* 4. */    VERB_HIGH,
   /* 5. */    VERB_HIGH,
-  /* 6. */    VERB_HIGH,
+  /* 6. */    VERB_LOW,
   /* 7. */    VERB_HIGH,
-  /* 8. */    VERB_LOW,
-  /* 9. */    VERB_HIGH,
+  /* 8. */    VERB_HIGH,
+  /* 9. */    VERB_LOW,
   /* 10. */   VERB_MIDDLE,
   /* 11. */   VERB_HIGH,
   /* 12. */   VERB_LOW,

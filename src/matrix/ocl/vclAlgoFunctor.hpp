@@ -16,6 +16,9 @@
    
   // ocl
   # include "oclSettings.hpp"
+  
+  // ViennaCl
+  #include "/usr/include/viennacl/linalg/prod.hpp"
 
 
 
@@ -157,9 +160,9 @@
         /**
          * create ViennaCl arguments
          */
-        viennacl :: vector <T>   arg1 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (0);
-        viennacl :: vector <T>   arg2 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (1);
-        viennacl :: vector <T> result = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLArg <T> (2);
+        viennacl :: vector <T>   arg1 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLVector <T> (0);
+        viennacl :: vector <T>   arg2 = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLVector <T> (1);
+        viennacl :: vector <T> result = vclAlgoFunctor <T> :: mp_vclObj -> template getVCLVector <T> (2);
         
         /* perform calculation */
         if (m_sign < 0)
@@ -173,6 +176,88 @@
     private:
     
       int m_sign;
+  
+  
+  
+  }; // class vclSubtractAlgo
+
+
+
+  /****************************
+   ** class: vclMatProdAlgo  **
+   **    (derived)           **
+   ****************************/
+  template <class T>
+  class vclMatProdAlgo : public vclAlgoFunctor <T>
+  {
+
+  
+  
+    public:
+
+    
+      /**
+       * @name              constructors and destructors
+       */
+      //@{
+      
+      
+      /**
+       * @brief             constructor
+       */
+      vclMatProdAlgo      ( const oclViennaClObject <T> * const p_vclObj )
+                           : vclAlgoFunctor <T> (p_vclObj)
+      {
+
+        print_optional ("Ctor: \"vclMatProdAlgo\"", VERB_HIGH);
+
+
+
+        /* TODO */
+
+      }
+      
+      
+      //@}
+      
+      
+      /**
+       * @brief             refer to base class
+       */
+      virtual
+      void
+      operator()            ()
+      const
+      {
+
+        print_optional ("vclMatProdAlgo <T> :: operator()", vclAlgoFunctor <T> :: op_v_level);
+
+        int m = vclAlgoFunctor <T> :: mp_vclObj -> getSizeArg (0);
+        int k = vclAlgoFunctor <T> :: mp_vclObj -> getSizeArg (1);
+        int n = vclAlgoFunctor <T> :: mp_vclObj -> getSizeArg (2);
+
+        /**
+         * create ViennaCl arguments
+         */
+        viennacl :: matrix <T, viennacl :: column_major>   arg1 = vclAlgoFunctor <T> :: mp_vclObj
+                                                                   -> template getVCLMatrix <T, viennacl :: column_major> (0, m, k);
+        viennacl :: matrix <T, viennacl :: column_major>   arg2 = vclAlgoFunctor <T> :: mp_vclObj
+                                                                   -> template getVCLMatrix <T, viennacl :: column_major> (1, k, n);
+        viennacl :: matrix <T, viennacl :: column_major> result = vclAlgoFunctor <T> :: mp_vclObj
+                                                                   -> template getVCLMatrix <T, viennacl :: column_major> (2, m, n);
+        
+        /* perform calculation */
+        result = viennacl :: linalg :: prod (arg1, arg2);
+        
+        /* TODO */
+        T test = result (0, 0) + result (1, 0) + result (0, 1) + result (1, 1);
+        
+      }
+      
+      
+    private:
+    
+      int m_m, m_k, m_n;
   
   
   
@@ -199,6 +284,9 @@
     
       case vclSUBTRACT:
         return new vclAddSubAlgo <T> (p_vclObj, -1);
+      
+      case vclMATPROD:
+        return new vclMatProdAlgo <T> (p_vclObj);
 
       default:
         throw "*!* Specified ViennaCL algorithm not available! *!*";

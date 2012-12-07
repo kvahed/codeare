@@ -188,6 +188,7 @@ oclAccessTest       ( bool verbose )
     assert (test && " Test failed! ");
     if (verbose) std::cout << "passed!" << std::endl;
   }
+  
 
   /* elementwise access (lvalue) */
   {
@@ -219,8 +220,8 @@ oclArithmeticsTest    ( bool verbose )
   std::cout << " ***************** " << std::endl;
   std::cout <<                          std::endl;
 
-  size_t  dimX     = 1025,
-          dimY     = 1025;
+  size_t  dimX     = 20,
+          dimY     = 20;
   double  time_ocl = 0.0,
           time_s   = 0.0;
   MyTimer t;  
@@ -327,6 +328,22 @@ oclArithmeticsTest    ( bool verbose )
     assert (mat_equal <T> (ocl_mat, mat) && " Test failed! ");
     if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
   }
+  
+  /* matrix product */
+  {
+    if (verbose) std::cout << " * C = A * B                   ";
+    const    Matrix <T>     mat_A =    Init2D <T> (dimX, dimY);
+    const    Matrix <T>     mat_B =    Init2D <T> (dimY, dimX);
+    const oclMatrix <T> ocl_mat_A = oclInit2D <T> (dimX, dimY);
+    const oclMatrix <T> ocl_mat_B = oclInit2D <T> (dimY, dimX);
+    t.tic (time_default);
+      Matrix <T>        mat_C =     mat_A ->*     mat_B;
+    time_s   = t.tic (time_default);
+      oclMatrix <T> ocl_mat_C = ocl_mat_A ->* ocl_mat_B;
+    time_ocl = t.tic (time_default);
+    assert (mat_equal <T> (ocl_mat_C, mat_C) && " Test failed! ");
+    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+  }
 
 }
 
@@ -359,16 +376,18 @@ oclmatrixtest (Connector<T>* rc) {
   std::cout << " * oclmatrixtest " << std::endl << std::endl;
   
   // choose dimensions
-  int dimX = 512, dimY = 512;
+  int dimX = 2000, dimY = 3020;
 
   bool verbose;
   if (dimX + dimY < 100)
     verbose = true;
+  verbose = false;
 
   Matrix_type mat_zeros;
+  mat_zeros = 1.5;
   if (verbose)
-    std::cout << "mat_zeros" << mat_zeros << std::endl;
-  mat_zeros.getData ();
+    std::cout << "mat_zeros: \n" << mat_zeros << std::endl;
+//  mat_zeros.getData ();
 
   if (tests [constructors])
   {  
@@ -388,12 +407,14 @@ oclmatrixtest (Connector<T>* rc) {
   {
     std::cout << " * scalar addition" << std::endl;
     mat_zeros += 6;
+//    if (verbose)
+//      std::cout << "mat_zeros: \n" << mat_zeros << std::endl;
   }
   
   if (tests [ocl_scalar_sub])
   {
     std::cout << " * scalar subraction" << std::endl;
-    mat_zeros -= 6;
+    mat_zeros -= 3;
   }
 
   if (tests [ocl_mat_inc])
@@ -410,8 +431,7 @@ oclmatrixtest (Connector<T>* rc) {
   Matrix <bool> mat_comp;
   bool result;
   
-  mat_zeros.getData (); 
-  smat = mat_zeros;
+  assign (smat, mat_zeros);
   
   if (tests [ocl_mat_add])
   {
@@ -444,6 +464,31 @@ oclmatrixtest (Connector<T>* rc) {
     std::cout << "time_ocl: " << time_ocl << ", time_s: " << time_s << std::endl;
     std::cout << "------------------------------------------------------------" << std::endl;
   }
+  
+/*  mat_zeros = mat_zeros ->* mat_zeros;
+  if (verbose)
+    std::cout << " mat_zeros (prod): " << std::endl << mat_zeros << std::endl;
+*/
+  
+  oclMatrix <elem_type> otest (dimY, dimX);
+  otest = 1;
+  t.tic (time_default);
+  oclMatrix <elem_type> ores = mat_zeros ->* otest;
+  time_ocl = t.tic (time_default);
+  ores.getData ();
+  std::cout << " ores: (" << time_ocl << "s) \n" << std::endl;
+  if (verbose)
+    std::cout << ores << std::endl;
+
+  smat = mat_zeros;
+  Matrix <elem_type> test (dimY, dimX);
+  test = 1;
+  t.tic (time_default);
+  Matrix <elem_type> res = smat ->* test;
+  time_s = t.tic (time_default);
+  std::cout << " res: (" << time_s << "s) \n" << std::endl;
+  if (verbose)
+    std::cout << res << std::endl;
 
   ///////
 

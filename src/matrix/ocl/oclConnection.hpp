@@ -94,7 +94,8 @@
       oclFunctionObject * const
       makeFunctionObject    (const vclAlgoType & algo_name,
                              oclDataObject * const * const args, const int & num_args,
-                             const KernelType kernel_type, const SyncType sync_type);
+                             const KernelType kernel_type, const SyncType sync_type,
+                             int * scalars = NULL);
                              
  
       void
@@ -608,8 +609,9 @@
   oclFunctionObject * const
   oclConnection ::
   makeFunctionObject    (const   vclAlgoType &                 algo,
-                               oclDataObject * const * const        args, const      int &  num_args,
-                         const    KernelType                                   kernel_type, const SyncType   sync_type)
+                               oclDataObject * const * const   args,        const      int &  num_args,
+                         const    KernelType                                   kernel_type, const SyncType   sync_type,
+                                         int *                 scalars)
   {
   
     oclFunctionObject * algo_obj;
@@ -619,7 +621,7 @@
     
       if (sync_type == SYNC)
       {
-        algo_obj = new oclViennaClObject <T> (algo, args, num_args);
+        algo_obj = new oclViennaClObject <T> (algo, args, num_args, scalars);
       }
       else
       {

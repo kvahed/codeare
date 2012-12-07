@@ -20,6 +20,7 @@
 
   // ViennaCL
   # include "/usr/include/viennacl/vector.hpp"
+  # include "/usr/include/viennacl/matrix.hpp"
 
 
 
@@ -50,8 +51,7 @@
         KEEP_BUFFER,
         COPY_BUFFER
       
-      };
- 
+      }; 
  
  
       /***************************
@@ -78,11 +78,20 @@
 
 
       /**
-       * @brief             -- return ViennaCl representation of data object --
+       * @brief             -- return ViennaCl vector representation of data object --
        */
       template <class S>
       viennacl :: vector <S>
-      getVCLObject          ();
+      getVCLVector          ( );
+
+
+      /**
+       * @brief             -- return ViennaCl matrix representation of data object --
+       */
+      template <class S,
+                class R>
+      viennacl :: matrix <S, R>
+      getVCLMatrix          (int m, int n);
 
 
       /**
@@ -504,10 +513,10 @@ protected:
   template <class S>
   viennacl :: vector <S>
   oclDataObject ::
-  getVCLObject            ()
+  getVCLVector            ( )
   {
   
-    print_optional ("oclDataObject :: getVCLObject ()", VERB_HIGH);
+    print_optional ("oclDataObject :: getVCLVector ()", VERB_HIGH);
     
     /* ensure data is available on GPU */
     loadToGPU ();
@@ -515,6 +524,33 @@ protected:
     /* create (and return) ViennaCl vector */
     return viennacl :: vector <S> ((*mp_gpu_buffer)(), m_num_elems);
       
+  }
+  
+  
+  
+  /**
+   *                      -- refer to class definition --
+   */
+  template <class S,
+            class R>
+  viennacl :: matrix <S, R>
+  oclDataObject ::
+  getVCLMatrix            (int m, int n)
+  {  
+    
+    print_optional ("oclDataObject :: getVCLMatrix (m, n)", VERB_HIGH);
+    
+    /* check given sizes */
+    if (m * n != m_num_elems)
+    {
+      stringstream msg;
+      msg << " Given sizes m = " << m << ", n = " << n << " do not match number of elements!";
+      throw oclError (msg.str (), "oclDataObject :: getVCLMatrix");
+    }
+      
+    /* create (and return ViennaCl matrix */
+    return viennacl :: matrix <S, R> ((*mp_gpu_buffer)(), m, n);
+
   }
 
   

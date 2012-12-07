@@ -105,7 +105,7 @@
         catch (oclError & err)
         {
         
-          print_optional (oclError (err, "oclTraits <float> :: ocl_basic_operator_kernel_3"), VERB_LOW);
+          throw oclError (oclError (err, "oclTraits <float> :: ocl_basic_operator_kernel_3"), kernel_name);
         
         }
 
@@ -140,8 +140,19 @@
         // create function object
         oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
         
-        // execute function object
-        op_obj -> run ();
+        try
+        {
+
+          // execute function object
+          op_obj -> run ( );
+
+        }
+        catch (oclError & err)
+        {
+        
+          throw oclError (oclError (err, "oclTraits <float> :: ocl_basic_operator_kernel_11"), kernel_name);
+        
+        }
 
         // clear memory      
         delete op_obj;      
@@ -175,8 +186,19 @@
         // create function object
         oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
       
-        // execute function object
-        op_obj -> run ();
+        try
+        {
+
+          // execute function object
+          op_obj -> run ( );
+
+        }
+        catch (oclError & err)
+        {
+        
+          throw oclError (oclError (err, "oclTraits <float> :: ocl_basic_operator_kernel_2"), kernel_name);
+        
+        }
 
         // clear memory      
         delete op_obj;      
@@ -211,15 +233,80 @@
         // create function object
         oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (vcl_algo, args, num_args, oclConnection::VCL, oclConnection::SYNC);
       
-        // execute function object
-        op_obj -> run ();
+        try
+        {
+
+          // execute function object
+          op_obj -> run ( );
+
+        }
+        catch (oclError & err)
+        {
+        
+          throw oclError (err, "oclTraits <float> :: ocl_basic_operator_vclAlgo_3");
+        
+        }
 
         // clear memory      
         delete op_obj;      
         delete args [3];
         free (args);
     
-      }        
+      }
+      
+      
+      /**
+       * @brief                       execute specified ViennaCl algorithm with 3 arguments + 3 scalars
+       */
+      static inline
+      const oclError &
+      ocl_basic_operator_vclAlgo_33            ( const   vclAlgoType            vcl_algo,
+                                                       oclDataObject * const        arg1,
+                                                       oclDataObject * const        arg2,
+                                                       oclDataObject * const      result,
+                                                                 int                  s1,
+                                                                 int                  s2,
+                                                                 int                  s3 )
+      {
+    
+        // number of kernel arguments
+        const int num_args = 3;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = result;
+
+        // create array of scalars
+        int * scalars = (int *) malloc (3 * sizeof (oclDataObject *));
+        scalars [0] = s1;
+        scalars [1] = s2;
+        scalars [2] = s3;
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (vcl_algo, args, num_args, oclConnection::VCL, oclConnection::SYNC, scalars);
+
+        try
+        {
+
+          // execute function object
+          op_obj -> run ( );
+
+        }
+        catch (oclError & err)
+        {
+        
+          throw oclError (err, "oclTraits <float> :: ocl_basic_operator_vclAlgo_33");
+        
+        }
+
+        // clear memory      
+        delete op_obj;
+        free (scalars);
+        free (args);
+    
+      }  
     
     
       //@}
@@ -302,7 +389,38 @@
     
     
       /**
-       * @brief                       elementwise addition
+       * @brief                       Matrix product.
+       *
+       * @param  arg1                 Address of first factor   (m x k matrix).
+       * @param  arg2                 Address of second factor  (k x n matrix).
+       * @param  prod                 Address of product        (m x n matrix).
+       * @param  m                    First dimension of product.
+       * @param  k                    Inner dimension.
+       * @param  n                    Second dimension of product.
+       */
+      static inline
+      const oclError &
+      ocl_operator_matprod            ( oclDataObject * const     arg1,
+                                        oclDataObject * const     arg2,
+                                        oclDataObject * const     prod,
+                                                  int                m,
+                                                  int                k,
+                                                  int                n )
+      {
+      
+        print_optional ("oclTraits <float> :: ocl_operator_matprod", op_v_level);
+        ocl_basic_operator_vclAlgo_33 (vclMATPROD, arg1, arg2, prod, m, k, n);
+      
+      }
+    
+    
+      /**
+       * @brief                       Elementwise addition of two vectors.
+       *
+       * @param  arg1                 Address of first ocl data object.
+       * @param  arg2                 Address of second ocl data object.
+       * @param  sum                  Address of resulting ocl data object.
+       * @param  num_elems            Number of elements.
        */
       static inline
       const oclError &
@@ -313,14 +431,18 @@
       {
       
         print_optional ("oclTraits <float> :: ocl_operator_add", op_v_level);
-      
         ocl_basic_operator_kernel_3 ("add", arg1, arg2, sum, num_elems);
         
       }
         
     
       /**
-       * @brief                       elementwise subtraction
+       * @brief                       Elementwise subtraction of two vectors.
+       *
+       * @param  arg1                 Address of first ocl data object.
+       * @param  arg2                 Address of second ocl data object.
+       * @param  diff                 Address of resulting ocl data object.
+       * @param  num_elems            Number of elements.
        */
       static inline
       const oclError &
@@ -331,37 +453,43 @@
       {
       
         print_optional ("oclTraits <float> :: ocl_operator_subtract", op_v_level);
-      
         ocl_basic_operator_vclAlgo_3 (vclSUBTRACT, arg1, arg2, diff, num_elems);
       
       }
       
       
       /**
-       * @brief                       elementwise increment
+       * @brief                       Elementwise increment of vector.
+       *
+       * @param  arg1                 Address of vector's data object to be incremented.
+       * @param  inc                  Scalar (increment).
+       * @param  num_elems            Number of vector's elements.
        */
       static inline
       const oclError &
-      ocl_operator_inc                (       oclDataObject * const      arg1,
-                                                  elem_type               inc,
-                                                        int         num_elems )
+      ocl_operator_inc                ( oclDataObject * const      arg1,
+                                            elem_type               inc,
+                                                  int         num_elems )
       {
       
         print_optional ("oclTraits <float> :: ocl_operator_inc", op_v_level);
-        
         ocl_basic_operator_kernel_11 ("inc", arg1, inc, num_elems);
       
       }
 
 
       /**
-       * @brief                       elementwise decrement
+       * @brief                       Elementwise decrement of vector.
+       *
+       * @param  arg1                 Address of vector's data object to be decremented.
+       * @param  dec                  Scalar (decrement).
+       * @param  num_elems            Number of vector's elements.
        */
       static inline
       const oclError &
-      ocl_operator_dec                (       oclDataObject * const      arg1,
-                                                  elem_type               dec,
-                                                        int         num_elems )
+      ocl_operator_dec                ( oclDataObject * const      arg1,
+                                            elem_type               dec,
+                                                  int         num_elems )
       {
       
         print_optional ("oclTraits <float> :: ocl_operator_dec", op_v_level);
@@ -370,9 +498,49 @@
         ocl_basic_operator_kernel_11 ("inc", arg1, -1 * dec, num_elems);
       
       }
-    
+      
+      
+      /**
+       * @brief                       Elementwise assignment of scalar to vector.
+       *
+       * @param  arg1                 Address of vector's data object.
+       * @param  scalar               Scalar (to be assigned).
+       * @param  num_elems            Number of vector's elements.
+       */
+      static inline
+      const oclError &
+      ocl_operator_assign             ( oclDataObject * const      arg1,
+                                            elem_type            scalar,
+                                                  int         num_elems )
+      {
+      
+        print_optional ("oclTraits <float> :: ocl_operator_assign", op_v_level);
+        ocl_basic_operator_kernel_11 ("assign", arg1, scalar, num_elems);
+      
+      } 
+          
     
       //@}
+      
+      
+      /**
+       * @brief                       Deep copy of arg1 to arg2.
+       *
+       * @param  dest                 Address of destination.
+       * @param  src                  Address of source.
+       * @param  num_elems            Number of elements.
+       */
+      static inline
+      const oclError &
+      ocl_operator_copy               ( oclDataObject * const      dest,
+                                        oclDataObject * const       src,
+                                                  int         num_elems )
+      {
+      
+        print_optional ("oclTraits <float> :: ocl_operator_dec", op_v_level);
+        ocl_basic_operator_kernel_2 ("copy_buffer", dest, src, num_elems);
+      
+      }
     
     
     

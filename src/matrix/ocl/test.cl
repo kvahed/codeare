@@ -20,8 +20,20 @@ __kernel void testKernel2 (__global float * numbers, __global float * result) {
 }
 
 
-
-__kernel void add (__global float * arg1, __global float * arg2, __global float * result, __global int * size)
+/**
+ * @brief                 Elementwsie add elements of the two vectors.
+ *
+ * @param  arg1           Start address of first vector.
+ * @param  arg2           Start address of second vector.
+ * @param  result         Start address of result vector.
+ * @param  num_elems      Number of elements of all vectors.
+ */
+__kernel
+void
+add                       ( __global float *      arg1,
+                            __global float *      arg2,
+                            __global float *    result,
+                            __global   int  * num_elems )
 {
 
   int index;
@@ -41,7 +53,7 @@ __kernel void add (__global float * arg1, __global float * arg2, __global float 
   
   int local_position = index;
   
-  for (int i = local_position; i < *size; i += global_inc)
+  for (int i = local_position; i < *num_elems; i += global_inc)
   {
     result [i] = arg1 [i] + arg2 [i];
   }
@@ -50,10 +62,24 @@ __kernel void add (__global float * arg1, __global float * arg2, __global float 
 
 
 
-__kernel void inc (__global float * arg1, __global float * inc, __global int * size)
+/**
+ * @brief                 Elementwise increment vector.
+ *
+ * @param  arg1           Start address of first vector.
+ * @param  inc            Scalar value (increment).
+ * @param  num_elems      Number of elements.
+ */
+__kernel
+void
+inc                       ( __global float *      arg1,
+                            __global float *       inc,
+                            __global   int * num_elems )
 {
 
   int index;
+  
+  __local float scalar;
+  scalar = *inc;
 
   if (get_work_dim () == 1)
   {
@@ -70,16 +96,69 @@ __kernel void inc (__global float * arg1, __global float * inc, __global int * s
   
   int local_position = index;
   
-  for (int i = local_position; i < *size; i += global_inc)
+  for (int i = local_position; i < *num_elems; i += global_inc)
   {
-    arg1 [i] = arg1 [i] + *inc;
+    arg1 [i] = arg1 [i] + scalar;
   }
  
 }
 
 
 
-__kernel void copy_buffer (__global float * arg1, __global float * arg2, __global int * size)
+
+/**
+ * @brief                 Elementwise increment vector.
+ *
+ * @param  arg1           Start address of first vector.
+ * @param  inc            Scalar value (increment).
+ * @param  num_elems      Number of elements.
+ */
+__kernel
+void
+assign                    ( __global float *      arg1,
+                            __global float *    scalar,
+                            __global   int * num_elems )
+{
+
+  int index;
+  
+  if (get_work_dim () == 1)
+  {
+    index = get_local_id (0);
+  }
+  else
+  {
+    return;
+  }
+ 
+  int global_size = get_global_size (0);
+  
+  int global_inc = global_size;
+  
+  int local_position = index;
+  
+  for (int i = local_position; i < *num_elems; i += global_inc)
+  {
+    arg1 [i] = *scalar;
+  }
+ 
+}
+
+
+
+
+/**
+ * @brief                 Deep copy of a vector.
+ *
+ * @param  arg1           Destination.
+ * @param  arg2           Source.
+ * @param  num_elems      Number of elements.
+ */
+__kernel
+void
+copy_buffer               ( __global float *      arg1,
+                            __global float *      arg2,
+                            __global   int * num_elems )
 {
 
   int index;
@@ -99,7 +178,7 @@ __kernel void copy_buffer (__global float * arg1, __global float * arg2, __globa
   
   int local_position = index;
   
-  for (int i = local_position; i < *size; i += global_inc)
+  for (int i = local_position; i < *num_elems; i += global_inc)
   {
     arg1 [i] = arg2 [i];
   }

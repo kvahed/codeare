@@ -53,7 +53,7 @@
   
     
     public:
-      
+
       
       /**
        * @name            constructors and destructors
@@ -64,11 +64,13 @@
       /**
        * @brief           constructor
        */
-      oclViennaClObject   ( const vclAlgoType                        algo,
+      oclViennaClObject   ( const   vclAlgoType                      algo,
                                   oclDataObject  * const * const  pp_args,
-                                  int                            num_args )
+                                  int                            num_args,
+                                            int  * const          p_sizes = NULL )
                          : oclFunctionObject (pp_args, num_args),
-                           mp_algo_functor   (get_algo_functor <T> (algo, this))
+                           mp_algo_functor   (get_algo_functor <T> (algo, this)),
+                           mp_sizes          (p_sizes)
       {
       
         print_optional ("Ctor: \"oclViennaClObject\"", VERB_HIGH);
@@ -95,13 +97,33 @@
       void
       run                 ();
       
-
+      
       /**
-       * @brief           retrieve data wrapped by a ViennaCl object
+       * @brief           retrieve size at given position
+       */
+      int
+      getSizeArg          (const int num)
+      const;
+      
+      
+      /**
+       * @brief           retrieve data wrapped by a ViennaCl matrix
        */
       template <class S>
       viennacl :: vector <S>
-      getVCLArg           (const int num)
+      getVCLVector        (const int num )
+      const;
+      
+
+      /**
+       * @brief           retrieve data wrapped by a ViennaCl matrix
+       */
+      template <class S,
+                typename R>
+      viennacl :: matrix <S, R>
+      getVCLMatrix        (const        int  num,
+                                        int    m,
+                                        int    n )
       const;
       
       
@@ -113,6 +135,8 @@
        ** member variables **
        **********************/
       const vclAlgoFunctor <T> * const mp_algo_functor;
+      
+                       int     * const mp_sizes;
     
     
   
@@ -124,6 +148,33 @@
   /**************************
    ** function definitions **
    **************************/
+
+
+
+  /**
+   * @brief           retrieve size at given position
+   */
+  template <class T>
+  int
+  oclViennaClObject <T> ::
+  getSizeArg          (const int num)
+  const
+  {
+  
+    print_optional ("oclViennaClObject :: getSizeArg ()", VERB_HIGH);
+
+    if (num > 3)
+    {
+      throw oclError ("Requested size argument number is out of range!", "oclViennaClObject :: getSizeArg");
+    }
+    else if (mp_sizes == NULL)
+    {
+      throw oclError ("No Sizes given!", "oclViennaClObject :: getSizeArg");
+    }
+    
+    return mp_sizes [num];
+  
+  }
   
   
   
@@ -134,13 +185,55 @@
   template <class S>
   viennacl :: vector <S>
   oclViennaClObject <T> ::
-  getVCLArg               (const int num)
+  getVCLVector            ( const int num )
   const
   {
     
     print_optional ("oclViennaClObject :: getVCLArg ()", VERB_HIGH);
     
-    return mpp_args [num] -> getVCLObject <S> ();
+    if (num >= m_num_args)
+    {
+      throw oclError ("Requested argument number is out of range!", "oclViennaClObject :: getVCLVector");
+    }
+    
+    return mpp_args [num] -> getVCLVector <S> ();
+    
+  }
+
+
+
+
+  /**
+   * @brief               refer to class definition
+   */
+  template <class T>
+  template <class S,
+            typename R>// = viennacl :: column_major>
+  viennacl :: matrix <S, R>
+  oclViennaClObject <T> ::
+  getVCLMatrix            ( const int num,
+                            const int   m,
+                            const int   n )
+  const
+  {
+    
+    print_optional ("oclViennaClObject :: getVCLMatrix ()", VERB_HIGH);
+    
+    if (num >= m_num_args)
+    {
+      throw oclError ("Requested argument number is out of range!", "oclViennaClObject :: getVCLVector");
+    }
+    
+    try
+    {
+    
+      return mpp_args [num] -> getVCLMatrix <S, R> (m, n);
+  
+    }
+    catch (oclError & err)
+    {
+      throw oclError (err, "oclViennaClObject <T> :: getVCLMatrix");
+    }
     
   }
 
