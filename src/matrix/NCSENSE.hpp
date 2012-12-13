@@ -145,6 +145,64 @@ public:
 	}
 	
 	/**
+	 * @brief          Construct NCSENSE plans for forward and backward transform with credentials
+	 * 
+	 * @param  sens    Image space dims
+	 * @param  nk      # k-space points
+	 * @param  cgeps   Convergence limit of descent
+	 * @param  cgiter  Maximum # CG iterations
+	 * @param  lambda  Tikhonov regularisation (default 0.0)
+	 * @param  fteps   NFFT convergence criterium (default 7.0e-4)
+	 * @param  ftiter  Maximum # of NFFT gridding iterations (default 3)
+	 * @param  m       Spatial cut-off of FT (default 1)
+	 * @param  alpha   Oversampling factor (default 1.0)
+	 * @param  b0      Off-resonance maps if available (default empty)
+	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
+	 */
+	/*
+	NCSENSE (const Matrix< size_t >& imsz, const size_t& nk, const T& cgeps, const size_t& cgiter,
+			 const T& lambda = 0.0, const T& fteps = 7.0e-4, const size_t& ftiter = 3,
+			 const size_t& m = 1, const T& alpha = 1.0, const Matrix<T>& b0 = Matrix<T>(1),
+			 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1)) {
+		
+
+		m_dim = ndims(sens)-1;
+		Matrix<size_t> ms (m_dim,1);
+		for (size_t i = 0; i < m_dim; i++)
+			ms[i] = size(sens,i);
+		
+		printf ("  Initialising NCSENSE:\n");
+		printf ("  Signal nodes: %li\n", nk);
+		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", cgeps, cgiter, lambda);
+		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
+
+		int np = 1;
+		
+#pragma omp parallel default (shared)
+		{
+			np = omp_get_num_threads ();
+		}	
+		
+		m_fts = new NFFT<T>* [np];
+		
+		for (size_t i = 0; i < np; i++)
+			m_fts[i] = new NFFT<T> (ms, nk, m, alpha, b0, pc, fteps, ftiter);
+		
+		m_cgiter = cgiter;
+		m_cgeps  = cgeps;
+		m_lambda = lambda;
+		
+		m_sm     = sens;
+		m_ic     = IntensityMap (m_sm);
+		
+		m_initialised = true;
+		
+		printf ("  ...done.\n\n");
+		
+	}
+	*/
+	
+	/**
 	 * @brief        Clean up and destruct NFFT plans
 	 */ 
 	~NCSENSE () {
@@ -217,7 +275,21 @@ public:
 
 	
 	/**
-	 * @brief    Backward transform
+	 * @brief    Forward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	Matrix< std::complex<T> >
+	Trafo       (const Matrix< std::complex<T> >& m, const Matrix< std::complex<T> >& sens, const bool recal = true) const {
+
+		return E (m / ((recal) ? IntensityMap (sens) : m_ic), sens, m_fts);
+
+	}
+
+	
+	/**
+	 * @brief Backward transform
 	 *
 	 * @param  m To transform
 	 * @return   Transform
@@ -225,12 +297,26 @@ public:
 	Matrix< std::complex<T> >
 	Adjoint     (const Matrix< std::complex<T> >& m) const {
 
+		return this->Adjoint (m, m_sm, false);
+
+	}
+	
+	
+	/**
+	 * @brief Backward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	Matrix< std::complex<T> >
+	Adjoint     (const Matrix< std::complex<T> >& m, const Matrix< std::complex<T> >& sens, const bool recal = true) const {
+
 		std::complex<T> ts;
 		T rn, rno, xn;
 		Matrix< std::complex<T> > p, r, x, q;
 		vector<T> res;
 
-		p = EH (m, m_sm, m_fts) * m_ic;
+		p = EH (m, sens, m_fts) * ((recal) ? IntensityMap (sens) : m_ic);
 		r = p;
 		x = zeros< std::complex<T> >(size(p));
 		
@@ -246,9 +332,7 @@ public:
 			
 			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 
-			q   = EH (E  (p * m_ic, m_sm, m_fts), m_sm, m_fts);
-			q  *= m_ic;
-			
+			q   = EH (E  (p * ((recal) ? IntensityMap (sens) : m_ic), sens, m_fts), sens, m_fts) * ((recal) ? IntensityMap (sens) : m_ic);
 			if (m_lambda)
 				q  += m_lambda * p;
 			
@@ -263,7 +347,7 @@ public:
 		}
 
 		printf ("\n");
-		return x * m_ic;
+		return x * ((recal) ? IntensityMap (sens) : m_ic);
 
 	}
 	

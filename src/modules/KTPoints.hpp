@@ -195,7 +195,7 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
                         // off resonance: exp (2i\pidb0dt)  
                         exp (cxfl(0, 2.0 * PI * d[k] * (float) b0(s))) *
                         // encoding: exp (i k(t) r)
-                        exp (cxfl(0,(ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s))));
+                        exp (cxfl(0, (ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s))));
         
     }
 
@@ -378,6 +378,7 @@ CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk,
 		printf ("[us] ... done.\n\n");
 		
 	} else 
+
 		printf ("OK\n\n");
 
 	return amps_ok;

@@ -113,11 +113,11 @@ NuFFT::Prepare () {
 
 	RRSModule::error_code error = OK;
 
-	nfft->KSpace (GetRLDB ("kspace"));
-	nfft->Weights (GetRLDB ("weights"));
+	nfft->KSpace  (Get<double> ("kspace"));
+	nfft->Weights (Get<double> ("weights"));
 
-	FreeRLDB ("kspace");
-	FreeRLDB ("weights");
+	Free<double> ("kspace");
+	Free<double> ("weights");
 
 	return error;
 
@@ -130,7 +130,7 @@ NuFFT::Process () {
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
 	
-	GetCXDB ("img") = nfft->Adjoint(GetCXDB ("data"));
+	Get<cxdb> ("img") = nfft->Adjoint(Get<cxdb> ("data"));
 	
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
 

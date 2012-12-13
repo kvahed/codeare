@@ -153,14 +153,14 @@ namespace RRStrategy {
 		
 		/**
 		 * @brief       Get reference to complex single matrix by name from database 
-		 *              @see DataBase::GetCXFL(const string)
+		 *              @see DataBase::Get<T>(const string)
 		 * 
 		 * @param  name Name
 		 * @return      Reference to data 
 		 */
-		Matrix<cxfl>& 
-		GetCXFL         (const string name) const {
-			return DataBase::Instance()->GetCXFL(name);
+		template <class T> Matrix<T>& 
+		Get            (const string name) const {
+			return DataBase::Instance()->Get<T>(name);
 		}
 		
 		
@@ -171,139 +171,9 @@ namespace RRStrategy {
 		 * @param  name Name
 		 * @return      Reference to data if existent
 		 */
-		bool 
-		FreeCXFL        (const string name) const {
-			return DataBase::Instance()->FreeCXFL(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to complex double matrix by name from database
-		 *              @see DataBase::GetCXDB(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to data if existent
-		 */
-		Matrix<cxdb>& 
-		GetCXDB         (const string name) const {
-			return DataBase::Instance()->GetCXDB(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of complex double matrix by name
-		 *              @see DataBase::FreeCXDB(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to data if existent
-		 */
-		bool 
-		FreeCXDB        (const string name) const {
-			return DataBase::Instance()->FreeCXDB(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to single matrix by name from database
-		 *              @see DataBase::GetRLFL(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		Matrix<float>& 
-		GetRLFL         (const string name) const {
-			return DataBase::Instance()->GetRLFL(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of single matrix by name
-		 *              @see DataBase::FreeRLFL(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		bool 
-		FreeRLFL        (const string name) const {
-			return DataBase::Instance()->FreeRLFL(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to double matrix by name from database
-		 *              @see DataBase::GetRLDB(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		Matrix<double>& 
-		GetRLDB         (const string name) const {
-			return DataBase::Instance()->GetRLDB(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of double matrix by name
-		 *              @see DataBase::FreeRLDB(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		bool 
-		FreeRLDB        (const string name) const {
-			return DataBase::Instance()->FreeRLDB(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to short int matrix by name from database
-		 *              @see DataBase::GetSHRT(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		Matrix<short>& 
-		GetSHRT         (const string name) const {
-			return DataBase::Instance()->GetSHRT(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of short int matrix by name
-		 *              @see DataBase::FreeSHRT(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		bool 
-		FreeSHRT        (const string name) const {
-			return DataBase::Instance()->FreeSHRT(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to long int matrix by name from database
-		 *              @see DataBase::GetLONG(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		Matrix<long>& 
-		GetLONG         (const string name) const {
-			return DataBase::Instance()->GetLONG(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of long int matrix by name
-		 *              @see DataBase::FreeLONG(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		bool 
-		FreeLONG        (const string name) const {
-			return DataBase::Instance()->FreeLONG(name);
+		template<class T> bool 
+		Free            (const string name) const {
+			return DataBase::Instance()->Free<T>(name);
 		}
 
 

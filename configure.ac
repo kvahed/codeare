@@ -82,6 +82,8 @@ AC_OPENMP
 
 # SIMD capabilities
 AX_EXT
+CXXFLAGS="${CXXFLAGS} ${SIMD_FLAGS}"
+
 
 AC_ARG_ENABLE([documentation],
      [  --enable-documentation          turn on documentation C++ library support (default: yes)],
@@ -296,6 +298,7 @@ case $host in
         ])
 esac
 AM_CONDITIONAL([USE_LIBOPENCL],  [test "$HAVE_LIBOPENCL" -eq 1])
+
 
 case $host in
     *darwin*)

@@ -18,9 +18,18 @@
  *  02110-1301  USA
  */
 
+enum vmode {	
+	GENUINE,
+	MULTISLICE
+
+};
+
 template <class T> bool 
 cgsensetest (RRClient::Connector<T>* rc) {
 	
+	int vm; 
+	int iterations;
+
 	// Incoming
 	Matrix<cxfl>   rawdata; // Measurement data O(Nkx,Nky,Nkz)
 	Matrix<float>  weights; // NUFFT weights   
@@ -47,29 +56,20 @@ cgsensetest (RRClient::Connector<T>* rc) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}
+
+	// Volume? If so, 3D or multi-slice
+	if (rc->Attribute ("volume", &vm) != TIXML_SUCCESS)
+		vm = -1;
+
+	// Initial run -------------
 	
-	// Prepare -------------
-	
-	rc->SetMatrix (   "sens", sens);    // Sensitivities
 	rc->SetMatrix ("weights", weights); // Weights
 	rc->SetMatrix ( "kspace", kspace);  // K-space
 
-#ifdef HAVE_MAT_H	
-	MATFile* mf = matOpen (rev.c_str(), "w");
-	MXDump (weights, mf, "weights");
-	MXDump (sens, mf, "sens");
-	MXDump (kspace, mf, "kspace");
-	MXDump (rawdata, mf, "data");
-	if (matClose(mf) != 0) {
-		printf ("Error closing file %s\n", rev.c_str());
-		return false;
-	}
-#endif	
-	
-	rc->Prepare   (test);
-	
 	// Process -------------
 
+	rc->SetMatrix (   "sens", sens);    // Sensitivities
+	rc->Prepare   (test);
 	rc->SetMatrix (   "data", rawdata); // Measurement data
 	
 	rc->Process   (test);
@@ -84,6 +84,9 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	rc->Finalise   (test);
 	
 #ifdef HAVE_MAT_H	
+	
+	MATFile* mf;
+
 	mf = matOpen (odf.c_str(), "w");
 	
 	if (mf == NULL) {

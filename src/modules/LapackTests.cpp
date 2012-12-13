@@ -36,9 +36,9 @@ LapackTests::Process     () {
 
 	std::cout << "General LA tests ----------- \n";
 
-	Matrix<cxfl>&   cf = GetCXFL ("cf");
+	Matrix<cxfl>&   cf = Get<cxfl> ("cf");
 	Matrix<cxdb>    cd = (Matrix<cxdb>) cf;
-	Matrix<double>& rd = GetRLDB ("rd");
+	Matrix<double>& rd = Get<double> ("rd");
 
 	std::cout << "Testing eig (dgeev) ----------- \n";
 
@@ -199,8 +199,8 @@ LapackTests::Process     () {
 	A = chol (A);
 	std::cout << "chol(cov(A)) :\n" <<  A;
 
-	A = GetCXFL("EM");
-	b = GetCXFL("PA");
+	A = Get<cxfl>("EM");
+	b = Get<cxfl>("PA");
 
 	Matrix<cxfl> x = AddMatrix ("x", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (1)));
 	x = MCGLS (A, b, 100, 5.0e-6, 1.0e-3);

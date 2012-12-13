@@ -118,9 +118,9 @@ CGSENSE::Prepare () {
 
 	RRSModule::error_code error = OK;
 
-	Matrix<cxfl>&   sens   = GetCXFL("sens");
-	Matrix<float>& weights = GetRLFL("weights");
-	Matrix<float>& kspace  = GetRLFL("kspace");
+	Matrix<cxfl>&   sens   = Get<cxfl> ("sens");
+	Matrix<float>& weights = Get<float>("weights");
+	Matrix<float>& kspace  = Get<float>("kspace");
 
 	size_t nk = numel(weights);
 
@@ -129,15 +129,15 @@ CGSENSE::Prepare () {
 
 	size_t dim = ndims(sens) - 1;
 
+	// Outgoing images
 	Matrix<cxfl>& image = AddMatrix 
 		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(size(sens,0), size(sens,1), (dim == 3) ? size(sens,2) : 1)));
 
 	m_ncs->KSpace (kspace);
 	m_ncs->Weights (weights);
 	
-	FreeCXFL ("sens");
-	FreeRLFL ("weights");
-	FreeRLFL ("kspace");
+	Free<float> ("weights");
+	Free<float> ("kspace");
 	
 	m_initialised = true;
 
@@ -155,8 +155,9 @@ CGSENSE::Process () {
 	
 	printf ("Processing CGSENSE ...\n");
 
-	GetCXFL("image") = *m_ncs ->* GetCXFL("data");
-	FreeCXFL ("data");
+	Get<cxfl>("image") = m_ncs->Adjoint (Get<cxfl>("data"), Get<cxfl>("sens"));
+
+	Free<cxfl> ("data");
 
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 

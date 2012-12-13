@@ -47,7 +47,7 @@ public:
 	 * @brief  Default constructor 
 	 * @see    Connector (const connection_type)
 	 */
-	Connector () {
+	Connector () : m_conn() {
 
 	}
 	

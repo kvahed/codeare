@@ -89,10 +89,10 @@ CompressedSensing::Process () {
 	ticks tic; 
 	float ma;
 
-	Matrix<cxfl>&  data  = GetCXFL   ("data");
-	Matrix<float>& pdf   = GetRLFL   ("pdf" );
-	Matrix<float>& mask  = GetRLFL   ("mask");
-	Matrix<cxfl>&  pc    = GetCXFL   ("pc");
+	Matrix<cxfl>&  data  = Get<cxfl>   ("data");
+	Matrix<float>& pdf   = Get<float>  ("pdf" );
+	Matrix<float>& mask  = Get<float>  ("mask");
+	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
 	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
 	Matrix<cxfl>   orig;
 

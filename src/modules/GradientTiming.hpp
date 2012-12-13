@@ -28,6 +28,8 @@
 #include "Interpolate.hpp"
 #include "IO.hpp"
 
+#define announce_plan
+
 struct Solution {
 	
 	Matrix<double> k;
@@ -319,6 +321,7 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	printf ("done: (%.3f)\n  Final interpolations ....................... ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 	fflush(stdout);
+
 	start = getticks();
 
 	for (size_t i = 0; i < ss; i++)
@@ -330,15 +333,20 @@ Solution ComputeGradient (GradientParams& gp) {
 	
 	MXDump (sta, "sta.mat", "sta");
 	
-	tos    = cumsum (sta/(ds*size(sta,0)));
+	tos  = cumsum ((1.0)/(ds*sta));
+
 	MXDump (tos, "tos.mat", "tos");
-	T      = tos [ss-1];
+	T      = gp.dt*tos [ss-1];
 	Nt     = round (T/gp.dt); 
-	printf ("%e, %e, %zu\n", ds, T, Nt);
+	printf ("%f %zu\n",T,Nt);
+
 	t      = linspace<double> (0.0, T, Nt);
 
 	sot    = interp1 (tos,  sf,   t);
 	pot    = interp1 ( sf, pos, sot);
+	MXDump (t, "t.mat", "t");
+	MXDump (sot, "sot.mat", "sot");
+
 
 	pos.Clear();
 	
@@ -360,7 +368,7 @@ Solution ComputeGradient (GradientParams& gp) {
 		s.g(i,2) = (gp.k(i+1,2) - gp.k(i,2)) / (GAMMA / 10.0 * gp.dt);
 	}
 
-	for (size_t i = 1; i < Nt; i++) {
+	for (size_t i = 1; i < Nt-1; i++) {
 		s.k(i,0) =  s.k(i-1,0) + s.g(i,0) * (GAMMA / 10.0 * gp.dt);
 		s.k(i,1) =  s.k(i-1,1) + s.g(i,1) * (GAMMA / 10.0 * gp.dt);
 		s.k(i,2) =  s.k(i-1,2) + s.g(i,2) * (GAMMA / 10.0 * gp.dt);
@@ -369,7 +377,7 @@ Solution ComputeGradient (GradientParams& gp) {
 	for (size_t i = 0; i < 3; i++)
 		s.k(0,i) = 0.0;
 
-	for (size_t i = 0; i < Nt-1; i++) {
+	for (size_t i = 0; i < Nt-2; i++) {
 		s.s(i,0) = (s.g(i+1,0) - s.g(i,0)) / gp.dt;
 		s.s(i,1) = (s.g(i+1,1) - s.g(i,1)) / gp.dt;
 		s.s(i,2) = (s.g(i+1,2) - s.g(i,2)) / gp.dt;
@@ -377,7 +385,7 @@ Solution ComputeGradient (GradientParams& gp) {
 
 	for (size_t i = 0; i < 3; i++)
 		s.s(Nt-2,i) = s.s(Nt-3,i);  
-	
+
 	t = resize (t, Nt-1, 1);
 	s.t = t;
 

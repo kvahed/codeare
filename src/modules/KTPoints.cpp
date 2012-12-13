@@ -130,11 +130,11 @@ KTPoints::Process   ()     {
     // grad:   Gradient pulses
     // ----------------------------
 
-    Matrix<float>& k      = GetRLFL("k");
-    Matrix<float>& r      = GetRLFL("r");
-    Matrix<cxfl>&  b1     = GetCXFL("b1");
-    Matrix<float>& b0     = GetRLFL("b0");
-    Matrix<cxfl>&  target = GetCXFL("target");
+    Matrix<float>& k      = Get<float> ("k");
+    Matrix<float>& r      = Get<float> ("r");
+    Matrix<cxfl>&  b1     = Get<cxfl>  ("b1");
+    Matrix<float>& b0     = Get<float> ("b0");
+    Matrix<cxfl>&  target = Get<cxfl>  ("target");
 
     size_t ns = size( r,1); // # of spatial positions
     size_t nk = size( k,1); // # of kt points

@@ -239,14 +239,14 @@ namespace SSE {
 		typedef typename sse_type::Register reg_type;
 		
 		size_t   i  = 0;
-		size_t   ne = sse_type::ne;
-		size_t   na = floor((float)n/ne);
+		size_t   na = floor ((float)n / (float)sse_type::ne);
+		
 		load<T>  ld;
 		store<T> st;
 		reg_type a, b, c;
 		
 		// aligned 
-		for (size_t i = 0; i < na; i+=ne) {
+		for (size_t i = 0; i < n; i += sse_type::ne) {
 			a = load<T>::aligned (A + i);
 			b = load<T>::aligned (B + i);
 			c = op.packed (a, b);
@@ -254,13 +254,13 @@ namespace SSE {
 		}
 		
 		// rest
-		for (size_t i = na*ne; i < n; i++) {
+		for (size_t i = na * sse_type::ne; i < sse_type::ns; i++) {
 			a = load<T>::unaligned (A + i);
 			b = load<T>::unaligned (B + i);
 			c = op.single (a, b);
 			store<T>::unaligned (C + i, c);
 		}
-
+		
 	}; // namespace SSE
 
 #endif // HAVE_SSE

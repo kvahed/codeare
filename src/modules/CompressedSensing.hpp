@@ -249,6 +249,10 @@ namespace RRStrategy {
 
 	/**
 	 * @brief Compute gradient of the total variation operator
+	 *
+	 * @param  x   Image space original
+	 * @param  wx  Image space perturbance
+	 * @param  cgp Parameters
 	 */
 	Matrix<cxfl> 
 	GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {

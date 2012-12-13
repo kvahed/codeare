@@ -1,6 +1,11 @@
 #include <string.h>
 #include "cblas.h"
 
+static inline int v3p_netlib_dqrsl_ (double *x, int *ldx, int *n, int *k, double *qraux, double *y, 
+									 double *qy, double *qty,  double *b, double *rsd, double *xb, 
+									 int *job, int *info) {}
+
+static inline int v3p_netlib_dqrdc_ (double* x, int* ldx, int* n, int* p, int* jptv, double* work, int* job) {}
 
 extern "C" {
 
