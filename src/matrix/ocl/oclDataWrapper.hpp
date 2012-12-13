@@ -221,7 +221,7 @@
     // buffer on GPU exists
     if (oclDataObject :: getMemState ())
     {
-  
+      
       if (oclDataObject :: mp_modified [GPU])
       {
         

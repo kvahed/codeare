@@ -18,7 +18,7 @@
   # include "oclSettings.hpp"
   
   // ViennaCl
-  #include "/usr/include/viennacl/linalg/prod.hpp"
+  # include "/usr/include/viennacl/linalg/prod.hpp"
 
 
 
@@ -206,11 +206,15 @@
        * @brief             constructor
        */
       vclMatProdAlgo      ( const oclViennaClObject <T> * const p_vclObj )
-                           : vclAlgoFunctor <T> (p_vclObj)
+                           : vclAlgoFunctor <T> (p_vclObj),
+                                          m     (p_vclObj -> getScalarArg (0)),
+                                          k     (p_vclObj -> getScalarArg (1)),
+                                          n     (p_vclObj -> getScalarArg (2)),
+                                     transA     (p_vclObj -> getScalarArg (3)),
+                                     transB     (p_vclObj -> getScalarArg (4))
       {
 
         print_optional ("Ctor: \"vclMatProdAlgo\"", VERB_HIGH);
-
 
 
         /* TODO */
@@ -232,10 +236,6 @@
 
         print_optional ("vclMatProdAlgo <T> :: operator()", vclAlgoFunctor <T> :: op_v_level);
 
-        int m = vclAlgoFunctor <T> :: mp_vclObj -> getSizeArg (0);
-        int k = vclAlgoFunctor <T> :: mp_vclObj -> getSizeArg (1);
-        int n = vclAlgoFunctor <T> :: mp_vclObj -> getSizeArg (2);
-
         /**
          * create ViennaCl arguments
          */
@@ -245,20 +245,15 @@
                                                                    -> template getVCLMatrix <T, viennacl :: column_major> (1, k, n);
         viennacl :: matrix <T, viennacl :: column_major> result = vclAlgoFunctor <T> :: mp_vclObj
                                                                    -> template getVCLMatrix <T, viennacl :: column_major> (2, m, n);
-        
+       
         /* perform calculation */
         result = viennacl :: linalg :: prod (arg1, arg2);
-        
-        /* TODO */
-        T test = result (0, 0) + result (1, 0) + result (0, 1) + result (1, 1);
-        
+        viennacl::ocl::get_queue ().finish ();
+
       }
       
-      
-    private:
-    
-      int m_m, m_k, m_n;
-  
+      int m, k, n;
+      int transA, transB;
   
   
   }; // class vclSubtractAlgo

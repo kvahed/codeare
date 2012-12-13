@@ -196,6 +196,9 @@
     
     }
 
+        // update CPU data
+        oclConnection :: Instance () -> loadToCPU (oclDataObject :: mp_gpu_buffer, oclDataWrapper <T> :: mp_cpu_data, oclDataObject :: m_size);
+
     // update data state: available for use
     oclDataObject :: setUnlocked ();
     

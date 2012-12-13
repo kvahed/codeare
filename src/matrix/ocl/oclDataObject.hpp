@@ -224,8 +224,11 @@
       
       /**
        * @brief             copy constructor
-       *                      -> keep_buffer  (true): all state vars are copied
-       *                      -> keep_buffer (false): state "not on gpu"
+       *                      -> copy_mode (COPY_BUFFER): all state vars are copied
+       *                      -> copy_mode (  NO_BUFFER): state "not on gpu"
+       *                      -> copy_mode (KEEP_BUFFER): copy whole state,
+       *                                                  notify copied object, that buffer was grabbed
+       *                        !!! KEEP_BUFFER: intended for async mode !!!
        *
        * @param             pointer oclDataObject to copy
        */
@@ -662,8 +665,8 @@ protected:
   const
   {
     
-    return     mp_modified [CPU]
-            && mp_modified [GPU];
+    return     ! mp_modified [CPU]
+            && ! mp_modified [GPU];
     
   }
   

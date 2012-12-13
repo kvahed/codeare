@@ -18,22 +18,42 @@ typedef float elem_type;
 typedef oclMatrix <elem_type> Matrix_type;
 
 
+/*************
+ ** structs **
+ *************/
+
+struct result
+{
+  
+  bool equal;
+  elem_type mean_abs_err;
+  
+};
 
 
 template <class T>
-bool
+result
 mat_equal             ( const oclMatrix <T> & ocl_mat,
                         const    Matrix <T> &    smat )
 {
 
   ocl_mat.getData (); // !!! //
   Matrix <bool> mat_comp = (smat == ocl_mat);
-  bool result = true;
+  result res = {true, 0.0};
   for (int i = 0; i < smat.Height (); i++)
     for (int j = 0; j < smat.Width (); j++)
-      result &= mat_comp (i,j);
+      res.equal &= mat_comp (i,j);
   
-  return result;
+  if (! res.equal)
+  {
+    Matrix <elem_type> diff = smat - ((Matrix <elem_type>) ocl_mat);
+    for (int i = 0; i < smat.Height (); i++)
+      for (int j = 0; j < smat.Width (); j++)
+        res.mean_abs_err += abs (diff (i, j));
+    res.mean_abs_err /= smat.Size ();
+  }
+ 
+  return res;
 
 }
 
@@ -54,7 +74,7 @@ oclCreatorsTest       ( bool verbose )
     if (verbose) std::cout << " * oclMatrix ( )                       ";
     oclMatrix <T> ocl_mat;
        Matrix <T>     mat;
-    assert (mat_equal <T> (ocl_mat, mat) && " Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
     if (verbose) std::cout << "passed!" << std::endl;
   }
 
@@ -64,7 +84,7 @@ oclCreatorsTest       ( bool verbose )
     size_t dims [16] = {1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2};
        Matrix <T>     mat (dims);
     oclMatrix <T> ocl_mat (dims);
-    assert (mat_equal <T> (ocl_mat, mat) && " Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
     if (verbose) std::cout << "passed!" << std::endl;
   }
 
@@ -75,7 +95,7 @@ oclCreatorsTest       ( bool verbose )
      float  res [16] = {1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2};
        Matrix <T>     mat (dims, res);
     oclMatrix <T> ocl_mat (dims, res);
-    assert (mat_equal <T> (ocl_mat, mat) && "Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && "Test failed! ");
     if (verbose) std::cout << "passed!" << std::endl;
   }
 
@@ -85,7 +105,7 @@ oclCreatorsTest       ( bool verbose )
     size_t n = 16;
        Matrix <T>     mat (n);
     oclMatrix <T> ocl_mat (n);
-    assert (mat_equal <T> (ocl_mat, mat) && "Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && "Test failed! ");
     if (verbose) std::cout << "passed!" << std::endl;
   }
   
@@ -96,7 +116,7 @@ oclCreatorsTest       ( bool verbose )
            cols = 16;
        Matrix <T>     mat (rows, cols);
     oclMatrix <T> ocl_mat (rows, cols);
-    assert (mat_equal <T> (ocl_mat, mat) && "Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && "Test failed! ");
     if (verbose) std::cout << "passed!" << std::endl;
   }
 
@@ -108,7 +128,7 @@ oclCreatorsTest       ( bool verbose )
            slices = 16;
        Matrix <T>     mat (rows, cols, slices);
     oclMatrix <T> ocl_mat (rows, cols, slices);
-    assert (mat_equal <T> (ocl_mat, mat) && "Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && "Test failed! ");
     if (verbose) std::cout << "passed!" << std::endl;
   }
 
@@ -117,7 +137,7 @@ oclCreatorsTest       ( bool verbose )
     if (verbose) std::cout << " * oclMatrix ( col, lin, cha, ... )    ";
        Matrix <T>     mat (1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2);
     oclMatrix <T> ocl_mat (1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2);
-    assert (mat_equal <T> (ocl_mat, mat) && "Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && "Test failed! ");
     if (verbose) std::cout << "passed!" << std::endl;
   }
   
@@ -126,7 +146,7 @@ oclCreatorsTest       ( bool verbose )
     if (verbose) std::cout << " * zeros ( col, lin, cha, ... )        ";
        Matrix <T>     mat = zeros <T> (1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2);
     oclMatrix <T> ocl_mat = zeros <T> (1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2);
-    assert (mat_equal <T> (ocl_mat, mat) && "Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && "Test failed! ");
     if (verbose) std::cout << "passed!" << std::endl;
   }
 
@@ -141,7 +161,7 @@ oclInit2D              ( size_t dimX, size_t dimY, const T & offset = 0 )
   oclMatrix <T> ocl_mat (dimX, dimY);
   for (size_t i = 0; i < dimX; i++)
     for (size_t j = 0; j < dimY; j++)
-      ocl_mat (i, j) = i + j + offset;
+      ocl_mat (i, j) = (T) ((int) (i + j + offset) % 100);
       
   return ocl_mat;
 
@@ -156,7 +176,7 @@ Init2D              ( size_t dimX, size_t dimY, const T & offset = 0 )
   Matrix <T> mat (dimX, dimY);
   for (size_t i = 0; i < dimX; i++)
     for (size_t j = 0; j < dimY; j++)
-      mat (i, j) = i + j + offset;
+      mat (i, j) = (T) ((int) (i + j + offset) % 100);
       
   return mat;
 
@@ -174,8 +194,8 @@ oclAccessTest       ( bool verbose )
   std::cout << " ************ " << std::endl;
   std::cout <<                     std::endl;
   
-  size_t dimX = 128,
-         dimY = 128;
+  size_t dimX = 512,
+         dimY = 512;
 
   /* elementwise access (rvalue) */
   {
@@ -220,8 +240,8 @@ oclArithmeticsTest    ( bool verbose )
   std::cout << " ***************** " << std::endl;
   std::cout <<                          std::endl;
 
-  size_t  dimX     = 20,
-          dimY     = 20;
+  size_t  dimX     = 2048,
+          dimY     = 2048;
   double  time_ocl = 0.0,
           time_s   = 0.0;
   MyTimer t;  
@@ -245,7 +265,7 @@ oclArithmeticsTest    ( bool verbose )
       oclMatrix <T> ocl_res                  (dimX, dimY);
       ocl_res = ocl_mat1 + ocl_mat2;
     time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res) && " Test failed! ");
+    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
     if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
   }
 
@@ -263,7 +283,7 @@ oclArithmeticsTest    ( bool verbose )
       oclMatrix <T> ocl_res                  (dimX, dimY);
       ocl_res = ocl_mat1 - ocl_mat2;
     time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res) && " Test failed! ");
+    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
     if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
   }
 
@@ -278,7 +298,7 @@ oclArithmeticsTest    ( bool verbose )
       oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
       ocl_mat += scalar;
     time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat) && " Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
     if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
   }
 
@@ -293,7 +313,7 @@ oclArithmeticsTest    ( bool verbose )
       oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
       ocl_mat -= scalar;
     time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat) && " Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
     if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
   }
 
@@ -309,7 +329,7 @@ oclArithmeticsTest    ( bool verbose )
       oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
       ocl_mat += ocl_mat_inc;
     time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat) && " Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
     if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
   }
 
@@ -325,7 +345,7 @@ oclArithmeticsTest    ( bool verbose )
       oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
       ocl_mat -= ocl_mat_dec;
     time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat) && " Test failed! ");
+    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
     if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
   }
   
@@ -335,14 +355,16 @@ oclArithmeticsTest    ( bool verbose )
     const    Matrix <T>     mat_A =    Init2D <T> (dimX, dimY);
     const    Matrix <T>     mat_B =    Init2D <T> (dimY, dimX);
     const oclMatrix <T> ocl_mat_A = oclInit2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat_B = oclInit2D <T> (dimY, dimX);
+    const oclMatrix <T> ocl_mat_B = oclInit2D <T> (dimY, dimX);        
     t.tic (time_default);
       Matrix <T>        mat_C =     mat_A ->*     mat_B;
     time_s   = t.tic (time_default);
       oclMatrix <T> ocl_mat_C = ocl_mat_A ->* ocl_mat_B;
     time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat_C, mat_C) && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+    result res = mat_equal <T> (ocl_mat_C, mat_C);
+    assert ((res.equal || res.mean_abs_err < 1e-1) && " Test failed! ");
+    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)"
+                           << " -> mean abs. err. = " << res.mean_abs_err << std::endl;
   }
 
 }

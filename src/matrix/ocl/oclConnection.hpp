@@ -95,6 +95,7 @@
       makeFunctionObject    (const vclAlgoType & algo_name,
                              oclDataObject * const * const args, const int & num_args,
                              const KernelType kernel_type, const SyncType sync_type,
+                             const int num_sclars = 0,
                              int * scalars = NULL);
                              
  
@@ -609,8 +610,11 @@
   oclFunctionObject * const
   oclConnection ::
   makeFunctionObject    (const   vclAlgoType &                 algo,
-                               oclDataObject * const * const   args,        const      int &  num_args,
-                         const    KernelType                                   kernel_type, const SyncType   sync_type,
+                               oclDataObject * const * const   args,
+                         const           int &                 num_args,
+                         const    KernelType                   kernel_type,
+                         const      SyncType                   sync_type,
+                         const           int                   num_scalars,
                                          int *                 scalars)
   {
   
@@ -621,7 +625,7 @@
     
       if (sync_type == SYNC)
       {
-        algo_obj = new oclViennaClObject <T> (algo, args, num_args, scalars);
+        algo_obj = new oclViennaClObject <T> (algo, args, num_args, num_scalars, scalars);
       }
       else
       {
@@ -713,7 +717,7 @@
                    
       try {
 
-        m_error = it -> enqueueWriteBuffer (*buffer, CL_TRUE, 0, size, cpu_arg, NULL, NULL);
+        m_error = it -> enqueueWriteBuffer (*buffer, CL_FALSE, 0, size, cpu_arg, NULL, NULL);
 
       } catch (cl::Error cle) {
 

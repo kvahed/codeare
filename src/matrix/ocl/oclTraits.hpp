@@ -256,21 +256,24 @@
       
       
       /**
-       * @brief                       execute specified ViennaCl algorithm with 3 arguments + 3 scalars
+       * @brief                       execute specified ViennaCl algorithm with 3 arguments + 5 scalars
        */
       static inline
       const oclError &
-      ocl_basic_operator_vclAlgo_33            ( const   vclAlgoType            vcl_algo,
+      ocl_basic_operator_vclAlgo_35            ( const   vclAlgoType            vcl_algo,
                                                        oclDataObject * const        arg1,
                                                        oclDataObject * const        arg2,
                                                        oclDataObject * const      result,
                                                                  int                  s1,
                                                                  int                  s2,
-                                                                 int                  s3 )
+                                                                 int                  s3,
+                                                                 int                  s4,
+                                                                 int                  s5 )
       {
     
         // number of kernel arguments
         const int num_args = 3;
+        const int num_scalars = 5;
     
         // create array of function arguments
         oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
@@ -283,9 +286,11 @@
         scalars [0] = s1;
         scalars [1] = s2;
         scalars [2] = s3;
+        scalars [3] = s4;
+        scalars [4] = s5;
 
         // create function object
-        oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (vcl_algo, args, num_args, oclConnection::VCL, oclConnection::SYNC, scalars);
+        oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (vcl_algo, args, num_args, oclConnection::VCL, oclConnection::SYNC, num_scalars, scalars);
 
         try
         {
@@ -297,7 +302,7 @@
         catch (oclError & err)
         {
         
-          throw oclError (err, "oclTraits <float> :: ocl_basic_operator_vclAlgo_33");
+          throw oclError (err, "oclTraits <float> :: ocl_basic_operator_vclAlgo_35");
         
         }
 
@@ -397,6 +402,8 @@
        * @param  m                    First dimension of product.
        * @param  k                    Inner dimension.
        * @param  n                    Second dimension of product.
+       * @param  trans1               1 -> Transpose first matrix.
+       * @param  trans2               1 -> Transpose second matrix.
        */
       static inline
       const oclError &
@@ -405,11 +412,13 @@
                                         oclDataObject * const     prod,
                                                   int                m,
                                                   int                k,
-                                                  int                n )
+                                                  int                n,
+                                                  int           transA,
+                                                  int           transB )
       {
       
         print_optional ("oclTraits <float> :: ocl_operator_matprod", op_v_level);
-        ocl_basic_operator_vclAlgo_33 (vclMATPROD, arg1, arg2, prod, m, k, n);
+        ocl_basic_operator_vclAlgo_35 (vclMATPROD, arg1, arg2, prod, m, k, n, transA, transB);
       
       }
     

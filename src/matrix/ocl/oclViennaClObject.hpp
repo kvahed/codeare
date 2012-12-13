@@ -36,8 +36,8 @@
   template <class T>
   static
   const vclAlgoFunctor <T> * const
-  get_algo_functor     (const       vclAlgoType &       algo_name,
-                        const oclViennaClObject <T> * const  p_vclObj);
+  get_algo_functor     (const       vclAlgoType &            algo_name,
+                        const oclViennaClObject <T> * const   p_vclObj);
   
   
   
@@ -64,13 +64,15 @@
       /**
        * @brief           constructor
        */
-      oclViennaClObject   ( const   vclAlgoType                      algo,
-                                  oclDataObject  * const * const  pp_args,
-                                  int                            num_args,
-                                            int  * const          p_sizes = NULL )
-                         : oclFunctionObject (pp_args, num_args),
-                           mp_algo_functor   (get_algo_functor <T> (algo, this)),
-                           mp_sizes          (p_sizes)
+      oclViennaClObject   ( const   vclAlgoType                           algo,
+                                  oclDataObject  * const * const   pp_vec_args,
+                                            int                   num_vec_args,
+                                            int                    num_scalars = 0,
+                                            int  * const             p_scalars = NULL )
+                         : oclFunctionObject (pp_vec_args, num_vec_args),
+                           m_num_scalars     (num_scalars),
+                           mp_scalars        (p_scalars),
+                           mp_algo_functor   (get_algo_functor <T> (algo, this))
       {
       
         print_optional ("Ctor: \"oclViennaClObject\"", VERB_HIGH);
@@ -102,7 +104,7 @@
        * @brief           retrieve size at given position
        */
       int
-      getSizeArg          (const int num)
+      getScalarArg          (const int num)
       const;
       
       
@@ -134,10 +136,11 @@
       /**********************
        ** member variables **
        **********************/
-      const vclAlgoFunctor <T> * const mp_algo_functor;
       
-                       int     * const mp_sizes;
+      const            int             m_num_scalars;
+                       int     * const mp_scalars;
     
+      const vclAlgoFunctor <T> * const mp_algo_functor;
     
   
   }; // class oclViennaClObject
@@ -157,22 +160,22 @@
   template <class T>
   int
   oclViennaClObject <T> ::
-  getSizeArg          (const int num)
+  getScalarArg          (const int num)
   const
   {
   
     print_optional ("oclViennaClObject :: getSizeArg ()", VERB_HIGH);
 
-    if (num > 3)
+    if (num > m_num_scalars)
     {
       throw oclError ("Requested size argument number is out of range!", "oclViennaClObject :: getSizeArg");
     }
-    else if (mp_sizes == NULL)
+/*    else if (mp_scalars == NULL)
     {
       throw oclError ("No Sizes given!", "oclViennaClObject :: getSizeArg");
     }
-    
-    return mp_sizes [num];
+*/    
+    return mp_scalars [num];
   
   }
   

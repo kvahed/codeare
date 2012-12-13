@@ -1326,7 +1326,7 @@
        * @return          Casted object if possible.
        */
       template <class S>
-      operator Matrix <S> ( )
+      operator oclMatrix <S> ( )
       const;
       
       
