@@ -1,6 +1,7 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Juelich, Germany
+ *  codeare Copyright (C) 2007-2010 
+ *                        Kaveh Vahedipour
+ *                        Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -125,6 +126,15 @@ enum IceDim {
 #define GB    1073741824;
 #define TB 1099511627776;
 
+
+enum    paradigm {
+
+  SHM, /**< @brief Shared memory (Local RAM) */
+  OCL, /**< @brief Open CL GPU RAM */
+  MPI  /**< @brief Distributed memory */
+  
+};
+
 /**
  * @brief   Matrix template.<br/>
  *          This class intends to offer a simple interface for handling
@@ -136,6 +146,8 @@ enum IceDim {
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
  */
+
+
 template <class T>
 class Matrix  : public SmartObject {
     
@@ -512,7 +524,7 @@ public:
      * @return         Value
      */
     inline T            
-    At                   (const size_t& x, const size_t& y, const size_t& z)  const {
+    At                   (const size_t& x, const size_t& y, const size_t& z) const {
 
     	assert (x < _dim[0]);
     	assert (y < _dim[1]);
@@ -904,7 +916,7 @@ public:
      * @param  s        Scalar lhs
      * @param  m        Matrix rhs
      * @return          m * s
-     */
+a     */
     inline friend Matrix<T>    
     operator*  (const double& s, const Matrix<T>& m) { 
         return   m * s;
@@ -2005,12 +2017,6 @@ Matrix<T>::dotc (const Matrix<T>& M) const {
     
 }
 
-template<class T>  T 
-Matrix<T>::dotu (const Matrix<T>& M) const {
-
-    return DOTU (*this, M);
-    
-}
 
 template<class T>  T 
 Matrix<T>::dot (const Matrix<T>& M) const {
@@ -2297,22 +2303,22 @@ Matrix<T>::operator->* (const Matrix<T> &M) const {
 
 template <class T> inline Matrix<T> 
 Matrix<T>::operator!() const {
-
+	
     for (size_t i = 2; i < INVALID_DIM; i++)
         assert (_dim[i] == 1);
-
+	
     Matrix<T> res (_dim[1],_dim[0]);
 
 #pragma omp parallel
-		{
+	{
 #pragma omp for
-    for (size_t i = 0; i < _dim[1]; i++)
-        for (size_t j = 0; j < _dim[0]; j++)
-            res(i,j) = this->At(j,i);
-		}
-
+		for (size_t i = 0; i < _dim[1]; i++)
+			for (size_t j = 0; j < _dim[0]; j++)
+				res(i,j) = this->At(j,i);
+	}
+	
     return res;
-
+	
 }
 
 
@@ -2457,8 +2463,16 @@ Matrix<T>::operator+ (const Matrix<S> &M) const {
         assert (Dim(i) == M.Dim(i));
 
     Matrix<T> res = M;
+
+#pragma omp parallel default (shared) 
+	{
+#pragma omp for
+		for (size_t i = 0; i < Size(); i++)
+			res[i] += _M[i];
+	}
+
 	//SSE::process<T> (&_M[0], &res[0], M.Size(), SSE::add<T>(), &res[0]) ;
-	res.Dat() += _M;
+	//res.Dat() += _M;
 
     return res;
 
@@ -2468,9 +2482,16 @@ Matrix<T>::operator+ (const Matrix<S> &M) const {
 template <class T> template <class S> inline Matrix<T> 
 Matrix<T>::operator+ (const S& s) const {
 
-    Matrix<T> res = T(s);
+    Matrix<T> res = *this;
+	T t = T(s);
 	//SSE::process<T> (&_M[0], &res[0], Size(), SSE::add<T>(), &res[0]) ;
-	res.Dat() += _M;
+
+#pragma omp parallel default (shared) 
+	{
+#pragma omp for
+		for (size_t i = 0; i < Size(); i++)
+			res[i] += t;
+	}
 
     return res;
 
@@ -2518,8 +2539,15 @@ Matrix<T>::operator* (const Matrix<S> &M) const {
         assert (_dim[i] == M.Dim(i));
 
     Matrix<T> res = M;
+
+#pragma omp parallel default (shared) 
+	{
+#pragma omp for
+		for (size_t i = 0; i < Size(); i++)
+			res[i] *= _M[i];
+	}
+
 	//SSE::process<T> (&_M[0], &res[0], M.Size(), SSE::mul<T>(), &res[0]) ;
-	res.Dat() *= _M;
 
     return res;
 
@@ -2530,7 +2558,15 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator* (const S& s) const {
     
     Matrix<T> res = *this; 
-	res.Dat() *= T(s);
+	T t = T(s);
+
+#pragma omp parallel default (shared) 
+	{
+#pragma omp for
+		for (size_t i = 0; i < Size(); i++)
+			res[i] *= t;
+	}
+
     return res;
 
 }
@@ -2551,6 +2587,8 @@ Matrix<T>::operator *= (const Matrix<S> &M) {
 			_M[i] *= M[i];
 	}
 
+	//SSE::process<T> (&_M[0], &tmp[0], M.Size(), SSE::mul<T>(), &_M[0]);
+	
     return *this;
 
 }
@@ -2578,6 +2616,8 @@ Matrix<T>::operator += (const Matrix<S> &M) {
 			_M[i] += M[i];
 	}
 
+	//SSE::process<T> (&_M[0], &tmp[0], M.Size(), SSE::add<T>(), &_M[0]);
+
     return *this;
 
 }
@@ -2585,12 +2625,14 @@ Matrix<T>::operator += (const Matrix<S> &M) {
 
 template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator+= (const S& s) {
+
+	T t = T (s);
     
 #pragma omp parallel default (shared) 
 	{
 #pragma omp for
 		for (size_t i = 0; i < Size(); i++)
-			_M[i] += T(s);
+			_M[i] += t;
 	}
 
     return *this;
@@ -2694,13 +2736,13 @@ template <class T> template <class S> inline Matrix<T>
 Matrix<T>::operator/ (const S& s) const {
     
     assert (cabs(s) != 0.0);
-
+	T t = T (s);
     Matrix<T> res = *this;
 #pragma omp parallel default (shared) 
 	{
 #pragma omp for
 		for (size_t i = 0; i < Size(); i++)
-			res[i] /= T(s);
+			res[i] /= t;
 	}
 
     return res;

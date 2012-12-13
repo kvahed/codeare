@@ -23,14 +23,18 @@
 
 #include "CX.hpp"
 
+/**
+ * @brief    General parameters class for Fourier transform constructors
+ */
 template<class T>
 struct FTParams {
 
-	Matrix<T> b0; /**< @brief b0 map */
+	Matrix<T> b0;                 /**< @brief b0 map */
 	Matrix< std::complex<T> > pc; /**< @brief phase correction */
 	Matrix<T> b1; /**< @brief b1 maps */
 	
 	Matrix<size_t> sl; /**<@brief side length */
+  Matrix<size_t> zpad;     /**<@brief Zero-pad k-space */
 	Matrix<T> mask;    /**<@brief k-space mask */
 
 	size_t rank;  /**< @brief single side length applies to all dimensions */

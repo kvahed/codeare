@@ -116,7 +116,7 @@ GRAPPA::Prepare     () {
 
 	printf ("  Preparing %s ...\n", Name());
 
-	Matrix<cxfl>& acs  = GetCXFL("acs");
+	Matrix<cxfl>& acs  = Get<cxfl>("acs");
 	/*ComputeWeights (m_nc, m_acs_dim, m_kern_dim, m_d, m_R, acs, m_weights);*/
 
 	
@@ -145,8 +145,8 @@ GRAPPA::Process     () {
 
 	printf ("  Processing GRAPPA ...\n");
 
-	Matrix<cxfl>& acs  = GetCXFL("acs");
-	Matrix<cxfl>& data = GetCXFL("data");
+	Matrix<cxfl>& acs  = Get<cxfl>("acs");
+	Matrix<cxfl>& data = Get<cxfl>("data");
 
 	printf ("  data dims: %s\n", DimsToCString(data));
 

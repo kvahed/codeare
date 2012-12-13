@@ -62,7 +62,7 @@ AFI::Finalise () {
 RRSModule::error_code
 AFI::Process     () { 
 
-	Matrix<cxfl>& afid = GetCXFL("meas");
+	Matrix<cxfl>& afid = Get<cxfl>("meas");
 	
 	Matrix<float> ph1 (afid.Dim(0), afid.Dim(1), afid.Dim(2));
 	PhasePreset (afid, m_use_real, ph1);

@@ -106,23 +106,13 @@ class DataBase : public Configurable {
 	
 	
 	/**
-	 * @brief        Remove a complex single matrix
-	 *
-	 * @param  name  Name
-	 * @return       Success
-	 */
-	bool 
-	FreeCXFL         (const string name);
-	
-	
-	/**
 	 * @brief        Get reference to a complex single matrix
 	 * 
 	 * @param  name  Name
 	 * @return       Reference to data if existent
 	 */
-	Matrix<cxfl>& 
-	GetCXFL          (const string name);
+	template <class T> Matrix<T>& 
+	Get              (const string name);
 	
 	
 	/**
@@ -131,100 +121,10 @@ class DataBase : public Configurable {
 	 * @param  name  Name
 	 * @return       Success
 	 */
-	bool 
-	FreeCXDB         (const string name);
+	template <class T> bool 
+	Free             (const string name);
 	
 	
-	/**
-	 * @brief        Get reference to a complex double matrix
-	 * 
-	 * @param  name  Name
-	 * @return       Reference to data if existent
-	 */
-	Matrix<cxdb>& 
-	GetCXDB          (const string name);
-	
-	
-	/**
-	 * @brief        Remove a real single matrix
-	 *
-	 * @param  name  Name
-	 * @return       Success
-	 */
-	bool 
-	FreeRLFL         (const string name);
-		
-	
-	/**
-	 * @brief        Get reference to a real single matrix
-	 * 
-	 * @param  name  Name
-	 * @return       Reference to data if existent
-	 */
-	Matrix<float>& 
-	GetRLFL          (const string name);
-		
-		
-	/**
-	 * @brief        Remove a real double matrix
-	 *
-	 * @param  name  Name
-	 * @return       Success
-	 */
-	bool 
-	FreeRLDB         (const string name);
-		
-	
-	/**
-	 * @brief       Get reference to real double matrix
-	 * 
-	 * @param  name Name
-	 * @return      Reference to data if existent
-	 */
-	Matrix<double>& 
-	GetRLDB         (const string name);
-		
-		
-	/**
-	 * @brief        Remove a short int matrix
-	 *
-	 * @param  name  Name
-	 * @return       Success
-	 */
-	bool 
-	FreeSHRT         (const string name);
-	
-
-	/**
-	 * @brief        Get reference to a short int matrix
-	 * 
-	 * @param  name  Name
-	 * @return       Reference to data if existent
-	 */
-	Matrix<short>&   
-	GetSHRT          (const string name);
-	
-
-	/**
-	 * @brief        Remove a long int matrix 
-	 *
-	 * @param  name  Name
-	 * @return       Success
-	 */
-	bool 
-	FreeLONG         (const string name);
-	
-
-	/**
-	 * @brief        Get reference to a long int matrix
-	 * 
-	 * @param  name  Name
-	 * @return       Reference to data if existent
-	 */
-	Matrix<long>&   
-	GetLONG          (const string name);
-	
-
 	/**
 	 * @brief        Get reference to complex single store
 	 *
@@ -305,6 +205,105 @@ class DataBase : public Configurable {
 	static DataBase *m_inst; /*!< @brief Single database instance       */
 	
 };
+
+
+template<> inline bool 
+DataBase::Free<cxdb> (const string name) {
+	
+	map<string, Ptr< Matrix<cxdb> > >::iterator it = m_cxdb.find (name);
+	
+	if (it == m_cxdb.end())
+		return false;
+	
+	delete it->second;
+	m_cxdb.erase(it);
+
+	return true;
+	
+}
+	
+
+template<> inline bool 
+DataBase::Free<cxfl> (const string name) {
+	
+	map<string, Ptr< Matrix<cxfl> > >::iterator it = m_cxfl.find (name);
+	
+	if (it == m_cxfl.end())
+		return false;
+	
+	delete it->second;
+	m_cxfl.erase(it);
+		
+	return true;
+	
+}
+	
+
+template<> inline bool 
+DataBase::Free<float>        (const string name) {
+	
+	map<string, Ptr< Matrix<float> > >::iterator it = m_rlfl.find (name);
+	
+	if (it == m_rlfl.end())
+		return false;
+	
+	delete it->second;
+	m_rlfl.erase(it);
+	
+	return true;
+	
+}
+
+
+template<> inline bool 
+DataBase::Free<double>        (const string name) {
+	
+	map<string, Ptr< Matrix<double> > >::iterator it = m_rldb.find (name);
+	
+	if (it == m_rldb.end())
+		return false;
+	
+	delete it->second;
+	m_rldb.erase(it);
+	
+	return true;
+	
+}
+
+
+template<> inline bool 
+DataBase::Free<short>        (const string name) {
+		
+	map<string, Ptr< Matrix<short> > >::iterator it = m_shrt.find (name);
+	
+	if (it == m_shrt.end())
+		return false;
+	
+	delete it->second;
+	m_shrt.erase(it);
+	
+	return true;
+	
+}
+
+
+template<> inline bool 
+DataBase::Free<long>        (const string name) {
+	
+	map<string, Ptr< Matrix<long> > >::iterator it = m_long.find (name);
+	
+	if (it == m_long.end())
+		return false;
+	
+	delete it->second;
+	m_long.erase(it);
+	
+	return true;
+	
+}
+
+
+
 
 
 #endif /* _DATA_BASE_H_ */

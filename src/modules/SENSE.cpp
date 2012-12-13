@@ -24,8 +24,8 @@ SENSE::Prepare () {
 
 	printf ("Preparing Cartesian SENSE ...\n");
 
-	Matrix<cxfl>& smaps = GetCXFL("smaps");
-	Matrix<cxfl>& fimgs = GetCXFL("fimgs");
+	Matrix<cxfl>& smaps = Get<cxfl>("smaps");
+	Matrix<cxfl>& fimgs = Get<cxfl>("fimgs");
 
 	// We expect the first phase encoding dimension 
 	// to be accelerated
@@ -53,7 +53,7 @@ SENSE::Process () {
 	
 	printf ("Processing SENSE ...\n");
 
-	GetCXFL("image") = *m_cs ->* GetCXFL("fimgs");
+	Get<cxfl>("image") = *m_cs ->* Get<cxfl>("fimgs");
 
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 

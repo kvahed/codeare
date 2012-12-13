@@ -61,7 +61,7 @@ DeleteImage (T** pp) {
 RRSModule::error_code 
 MedianFilter_OMP::Process () {
 	
-	Matrix<short>& img = GetSHRT ("Image");
+	Matrix<short>& img = Get<short> ("Image");
 
 	const int ww = 25;
 	const int wh = 25;

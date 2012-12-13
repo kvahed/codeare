@@ -86,29 +86,29 @@ DirectMethod::Process     () {
     ticks           start  = getticks();
 
     
-    Matrix<float>& t = GetRLFL ("t");
+    Matrix<float>& t = Get<float> ("t");
 	
 	float t0, tT;
 	t0 = 0.0;
 	tT = t [numel(t)-1];
 	Matrix<float> nt = linspace(t0, tT, tT/m_dt);
 	
-	Matrix<float> ngx = !GetRLFL ("g");
-	Matrix<float> nj  =  GetRLFL ("j");
+	Matrix<float> ngx = !Get<float> ("g");
+	Matrix<float> nj  =  Get<float> ("j");
 	
 	ngx = !interp1 (t, ngx, nt, INTERP::LINEAR);
 	nj  = interp1  (t, nj, nt);
 	sb.g     = &ngx;
 
-    sb.b1    = &GetCXFL ("b1");
-    sb.tmxy  = &GetCXFL ("tmxy");
-    sb.smxy  = &GetCXFL ("smxy");
+    sb.b1    = &Get<cxfl> ("b1");
+    sb.tmxy  = &Get<cxfl> ("tmxy");
+    sb.smxy  = &Get<cxfl> ("smxy");
 
-    sb.tmz   = &GetRLFL ("tmz");
-    sb.smz   = &GetRLFL ("smz");
-    sb.roi   = &GetRLFL ("roi");
-    sb.b0    = &GetRLFL ("b0");
-    sb.r     = &GetRLFL ("r");
+    sb.tmz   = &Get<float> ("tmz");
+    sb.smz   = &Get<float> ("smz");
+    sb.roi   = &Get<float> ("roi");
+    sb.b0    = &Get<float> ("b0");
+    sb.r     = &Get<float> ("r");
     sb.jac   = &nj;
 
     sb.np     = m_np;

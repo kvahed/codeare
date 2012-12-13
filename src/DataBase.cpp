@@ -24,22 +24,22 @@ error_code
 DataBase::Finalise () {
 	
 	while (!m_cxfl.empty())
-		FreeCXFL(m_cxfl.begin()->first.c_str());
+		Free<cxfl>(m_cxfl.begin()->first.c_str());
 	
 	while (!m_cxdb.empty()) 
-		FreeCXDB(m_cxdb.begin()->first.c_str());
+		Free<cxdb>(m_cxdb.begin()->first.c_str());
 	
 	while (!m_rlfl.empty())
-		FreeRLFL(m_rlfl.begin()->first.c_str());
+		Free<float>(m_rlfl.begin()->first.c_str());
 	
 	while (!m_rldb.empty()) 
-		FreeRLDB(m_rldb.begin()->first.c_str());
+		Free<double>(m_rldb.begin()->first.c_str());
 	
 	while (!m_shrt.empty())
-		FreeSHRT(m_shrt.begin()->first.c_str());
+		Free<short>(m_shrt.begin()->first.c_str());
 	
 	while (!m_long.empty())
-		FreeLONG(m_long.begin()->first.c_str());
+		Free<long>(m_long.begin()->first.c_str());
 	
 	return OK;
 	
@@ -56,24 +56,8 @@ DataBase::AddMatrix (const string name, Ptr< Matrix<cxfl> > m) {
 }
 
 	
-bool 
-DataBase::FreeCXFL (const string name) {
-	
-	map<string, Ptr< Matrix<cxfl> > >::iterator it = m_cxfl.find (name);
-	
-	if (it == m_cxfl.end())
-		return false;
-	
-	delete it->second;
-	m_cxfl.erase(it);
-		
-	return true;
-	
-}
-	
-
-Matrix<cxfl>& 
-DataBase::GetCXFL (const string name) {
+template<> Matrix<cxfl>& 
+DataBase::Get<cxfl> (const string name) {
 	
 	return *m_cxfl[name];
 	
@@ -125,7 +109,7 @@ DataBase::SetMatrix (const string name, const cxfl_data& c)   {
 	Ptr< Matrix<cxfl> > tmp;
 	
 	if (m_cxfl.find (name) != m_cxfl.end())
-		FreeCXFL (name);
+		Free<cxfl> (name);
 
 	m_cxfl.insert (pair<string, Ptr< Matrix<cxfl> > > (name, tmp = NEW (Matrix<cxfl>(mdims, mress))));
 	
@@ -159,24 +143,8 @@ DataBase::AddMatrix (const string name, Ptr< Matrix<cxdb> > m) {
 }
 
 	
-bool 
-DataBase::FreeCXDB (const string name) {
-	
-	map<string, Ptr< Matrix<cxdb> > >::iterator it = m_cxdb.find (name);
-	
-	if (it == m_cxdb.end())
-		return false;
-	
-	delete it->second;
-	m_cxdb.erase(it);
-		
-	return true;
-	
-}
-	
-
-Matrix<cxdb>& 
-DataBase::GetCXDB (const string name) {
+template<> Matrix<cxdb>& 
+DataBase::Get<cxdb> (const string name) {
 	
 	return *m_cxdb[name];
 	
@@ -228,7 +196,7 @@ DataBase::SetMatrix (const string name, const cxdb_data& c)   {
 	Ptr< Matrix<cxdb> > tmp;
 	
 	if (m_cxdb.find (name) != m_cxdb.end())
-		FreeCXDB (name);
+		Free<cxdb> (name);
 		
 	m_cxdb.insert (pair<string, Ptr< Matrix<cxdb> > > (name, tmp = NEW (Matrix<cxdb>(mdims, mress))));
 
@@ -262,24 +230,8 @@ DataBase::AddMatrix         (const string name, Ptr< Matrix<float> > m) {
 }
 		
 
-bool 
-DataBase::FreeRLFL        (const string name) {
-	
-	map<string, Ptr< Matrix<float> > >::iterator it = m_rlfl.find (name);
-	
-	if (it == m_rlfl.end())
-				return false;
-	
-	delete it->second;
-	m_rlfl.erase(it);
-	
-	return true;
-	
-}
-
-
-Matrix<float>& 
-DataBase::GetRLFL (const string name) {
+template<> Matrix<float>& 
+DataBase::Get<float> (const string name) {
 			
 	return *m_rlfl[name];
 	
@@ -331,7 +283,7 @@ DataBase::SetMatrix        (const string name, const rlfl_data& r)   {
 	Ptr< Matrix<float> > tmp;
 	
 	if (m_rlfl.find (name) != m_rlfl.end())
-		FreeRLFL (name);
+		Free<float> (name);
 
 	m_rlfl.insert (pair<string, Ptr< Matrix<float> > > (name, tmp = NEW( Matrix<float>(mdims, mress))));
 	
@@ -365,24 +317,8 @@ DataBase::AddMatrix         (const string name, Ptr< Matrix<double> > m) {
 }
 		
 
-bool 
-DataBase::FreeRLDB        (const string name) {
-	
-	map<string, Ptr< Matrix<double> > >::iterator it = m_rldb.find (name);
-	
-	if (it == m_rldb.end())
-				return false;
-	
-	delete it->second;
-	m_rldb.erase(it);
-	
-	return true;
-	
-}
-
-
-Matrix<double>& 
-DataBase::GetRLDB (const string name) {
+template<> Matrix<double>& 
+DataBase::Get<double> (const string name) {
 			
 	return *m_rldb[name];
 	
@@ -434,7 +370,7 @@ DataBase::SetMatrix        (const string name, const rldb_data& r)   {
 	Ptr< Matrix<double> > tmp;
 	
 	if (m_rldb.find (name) != m_rldb.end())
-		FreeRLDB (name);
+		Free<double> (name);
 
 	m_rldb.insert (pair<string, Ptr< Matrix<double> > > (name, tmp = NEW( Matrix<double>(mdims, mress))));
 	
@@ -468,24 +404,8 @@ DataBase::AddMatrix        (const string name, Ptr< Matrix<short> > m) {
 }
 
 
-bool 
-DataBase::FreeSHRT        (const string name) {
-		
-	map<string, Ptr< Matrix<short> > >::iterator it = m_shrt.find (name);
-	
-	if (it == m_shrt.end())
-		return false;
-	
-	delete it->second;
-	m_shrt.erase(it);
-	
-	return true;
-	
-}
-
-
-Matrix<short>&   
-DataBase::GetSHRT         (const string name) {
+template<> Matrix<short>&   
+DataBase::Get<short>         (const string name) {
 	
 	return *m_shrt[name];
 	
@@ -509,7 +429,7 @@ DataBase::GetMatrix          (const string name, shrt_data& p) {
 	
 	memcpy (&p.vals[0], &tmp->At(0), tmp->Size() * sizeof(short));
 	
-	FreeSHRT(name);
+	Free<short>(name);
 	
 }
 
@@ -539,7 +459,7 @@ DataBase::SetMatrix         (const string name, const shrt_data& p)   {
 	Ptr< Matrix<short> > tmp;
 	
 	if (m_shrt.find (name) != m_shrt.end())
-		FreeSHRT (name);
+		Free<short> (name);
 
 	m_shrt.insert (pair<string, Ptr< Matrix<short> > > (name, tmp = NEW (Matrix<short>(mdims, mress))));
 
@@ -573,24 +493,8 @@ DataBase::AddMatrix        (const string name, Ptr< Matrix<long> > m) {
 }
 
 
-bool 
-DataBase::FreeLONG        (const string name) {
-	
-	map<string, Ptr< Matrix<long> > >::iterator it = m_long.find (name);
-	
-	if (it == m_long.end())
-		return false;
-	
-	delete it->second;
-	m_long.erase(it);
-	
-	return true;
-	
-}
-
-
-Matrix<long>&   
-DataBase::GetLONG         (const string name) {
+template<> Matrix<long>&   
+DataBase::Get<long>         (const string name) {
 	
 	return *m_long[name];
 	
@@ -614,7 +518,7 @@ DataBase::GetMatrix          (const string name, long_data& p) {
 	
 	memcpy (&p.vals[0], &tmp->At(0), tmp->Size() * sizeof(long));
 	
-	FreeLONG(name);
+	Free<long> (name);
 	
 }
 
@@ -644,7 +548,7 @@ DataBase::SetMatrix         (const string name, const long_data& p)   {
 	Ptr< Matrix<long> > tmp;
 	
 	if (m_long.find (name) != m_long.end())
-		FreeLONG (name);
+		Free<long> (name);
 
 	m_long.insert (pair<string, Ptr< Matrix<long> > > (name, tmp = NEW (Matrix<long>(mdims, mress))));
 	

@@ -1,3 +1,5 @@
+#include <complex>
+
 #ifdef __SSE__
 #include <xmmintrin.h>
 #endif
@@ -327,6 +329,7 @@ namespace SSE {
 		
 		typedef __m128d Register;         /**< @brief register type */
 		static const unsigned int ne = 1; /**< @brief # of processed elements */
+		static const unsigned int ns = 2; /**< @brief # of sub elements */
 		
 		/**
 		 * @brief     SSE2 load packed aligned
@@ -341,6 +344,22 @@ namespace SSE {
 		 */
 		static inline Register
 		loadu (const std::complex<double>* p) {
+			return _mm_loadu_pd ((double*)p); 
+		}
+
+		/**
+		 * @brief     SSE2 load packed aligned
+		 */
+		static inline Register 
+		loadoa (const std::complex<double>* p) {
+			return _mm_load_pd ((double*)p); 
+		}
+
+		/**
+		 * @brief     SSE2 load packed unaligned
+		 */
+		static inline Register
+		loadou (const std::complex<double>* p) {
 			return _mm_loadu_pd ((double*)p); 
 		}
 
@@ -397,15 +416,19 @@ namespace SSE {
 		 */
 		static inline Register 
 		mulp (const Register &a, const Register &b) {
-			Register t1,t2,t3,t4;
-			t1 = _mm_mul_pd(a,b);				
-			t2 = _mm_shuffle_pd(t1,t1,0x1);		
-			t3 = _mm_shuffle_pd(b,b,0x1);		
-			t4 = _mm_sub_pd(t1,t2);				
-			t2 = _mm_mul_pd(a,t3);				
-			t3 = _mm_shuffle_pd(t2,t2,0x1);		
-			t3 = _mm_add_pd(t2,t3);				
-			return _mm_shuffle_pd(t4,t3,0x2);
+
+			Register c, d, e, f;
+
+			c = _mm_mul_pd (a,b);				
+			d = _mm_shuffle_pd (c,c,0x1);		
+			e = _mm_shuffle_pd (b,b,0x1);		
+			f = _mm_sub_pd (c,d);				
+			d = _mm_mul_pd (a,e);				
+			e = _mm_shuffle_pd (d,d,0x1);		
+			e = _mm_add_pd (d,e);	
+			
+			return _mm_shuffle_pd (f,e,0x2);
+
 		}
 	
 		/**
@@ -487,6 +510,7 @@ namespace SSE {
 		
 		typedef __m128d Register;         /**< @brief register type */
 		static const unsigned int ne = 2; /**< @brief # of processed elements */
+		static const unsigned int ns = 1; /**< @brief # of sub elements */
 		
 		/**
 		 * @brief     SSE2 load packed aligned
@@ -553,7 +577,7 @@ namespace SSE {
 		}
 		
 		/**
-		 * @brief     SSE3 packed multiplication
+		 * @brief     SSE2 packed multiplication
 		 */
 		static inline Register 
 		mulp (const Register &a, const Register &b) {
@@ -639,6 +663,7 @@ namespace SSE {
 		
 		typedef __m128 Register;         /**< @brief register type */
 		static const unsigned int ne = 4; /**< @brief # of processed elements */
+		static const unsigned int ns = 1; /**< @brief # of processed elements */
 		
 		/**
 		 * @brief     SSE2 load packed aligned
@@ -790,7 +815,8 @@ namespace SSE {
 	struct SSETraits< std::complex<float> > {
 		
 		typedef __m128 Register;         /**< @brief register type */
-		static const unsigned int ne = 4; /**< @brief # of processed elements */
+		static const unsigned int ne = 2; /**< @brief # of processed elements */
+		static const unsigned int ns = 2; /**< @brief # of processed elements */
 		
 		/**
 		 * @brief     SSE2 load packed aligned
@@ -861,13 +887,17 @@ namespace SSE {
 		 */
 		static inline Register 
 		mulp (const Register &ab, const Register &cd) {
-			__m128 aa, bb, dc, x0, x1;  
+
+			Register aa, bb, dc, x0, x1;  
+
 			aa = _mm_moveldup_ps(ab);  
 			bb = _mm_movehdup_ps(ab);  
 			x0 = _mm_mul_ps(aa, cd);    //ac ad  
 			dc = _mm_shuffle_ps(cd, cd, _MM_SHUFFLE(2,3,0,1));  
 			x1 = _mm_mul_ps(bb, dc);    //bd bc  
-			return _mm_addsub_ps(x0, x1);  
+
+			return _mm_addsub_ps(x0, x1);
+
 		}
 		
 		/**
@@ -882,8 +912,33 @@ namespace SSE {
 		 * @brief     SSE2 packed division
 		 */
 		static inline Register 
-		divp (const Register &a, const Register &b) {
-			return _mm_div_ps(a, b);
+		divp (const Register &ab, const Register &cd) {
+
+			Register aa, bb, dc, x0, x1, x2, x3;  
+
+			bb = _mm_movehdup_ps (ab);   //  (   b1    b1    b0    b0) 
+			aa = _mm_moveldup_ps (ab);   //  (   a1    a1    a0    a0) 
+
+			dc = _mm_shuffle_ps(cd, cd, _MM_SHUFFLE(2,3,0,1));  
+			                             //  (   c1    d1,   c0,   d0)  
+
+			x0 = _mm_mul_ps (bb, cd);    //  ( b1d1  b1c1  b0d0  b0c0) 
+			x1 = _mm_mul_ps (aa, dc);    //  ( a1c1  a1d1  a0c0  a0d0) 
+
+			x2 = _mm_addsub_ps (x0, x1); //  ( b1d1  a1d1  b0d0  b0c0)
+                                         //  (+a1c1 -a1d1 +a0c0 -a0d0)
+			
+			x1 = _mm_mul_ps (dc, dc);    //  ( c1c1  d1d1  c0c0  d0d0)
+			x0 = _mm_shuffle_ps (x1, x1, _MM_SHUFFLE(2,3,0,1));
+			                             //  ( d1d1  c1c1  d0d0  c0c0)
+
+			x3 = _mm_add_ps (x1, x0);    //  ( c1c1  d1d1  c0c0  d0d0)
+                                         //  (+d1d1  c1c1  d0d0  c0c0)
+
+			x1 = _mm_div_ps (x2, x3);    //  ( b1d1+a1c1)
+                                         //   /c1c1+d1d1)
+
+			return _mm_shuffle_ps (x1, x1, _MM_SHUFFLE(2,3,0,1));
 		}
 		
 		/**

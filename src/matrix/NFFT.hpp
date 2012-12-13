@@ -42,7 +42,14 @@ public:
 	/**
 	 * @brief         Default constructor
 	 */
-	NFFT() : m_initialised (false) {};
+	NFFT() :
+		m_initialised (false),
+		m_have_pc (false),
+		m_imgsz (0),
+		m_M (0),
+		m_maxit (0),
+		m_prepared (false),
+		m_rank (0) {};
 
 	/**
 	 * @brief          Construct NFFT plans for forward and backward FT with credentials
@@ -59,7 +66,7 @@ public:
 	NFFT        (const Matrix<size_t>& imsize, const size_t& nk, const size_t m = 1, 
 				 const T alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1),
 				 const Matrix< std::complex<T> > pc = Matrix< std::complex<T> >(1),
-				 const T eps = 7.0e-4, const size_t maxit = 1) {
+				 const T eps = 7.0e-4, const size_t maxit = 1) : m_prepared (false) {
 		
 		m_M     = nk;
 		m_imgsz = 1;
@@ -68,9 +75,9 @@ public:
 			m_N[i] = 1; m_n[i] = 1;
 		}
 		
-		int  rank = numel (imsize);
+		m_rank = numel (imsize);
 		
-		for (size_t i = 0; i < rank; i++) {
+		for (size_t i = 0; i < m_rank; i++) {
 			m_N[i]   = imsize[i];
 			m_n[i]   = ceil (m_N[i]*alpha);
 			m_imgsz *= m_N[i];
@@ -79,7 +86,7 @@ public:
 		m_epsilon = eps;
 		m_maxit   = maxit;
 		
-		NFFTTraits<double>::Init (rank, m_N, m_M, m_n, m, m_fplan, m_iplan);
+		NFFTTraits<double>::Init (m_rank, m_N, m_M, m_n, m, m_fplan, m_iplan);
 		
 		if (pc.Size() > 1)
 			m_have_pc = true;
@@ -115,9 +122,9 @@ public:
 	KSpace (const Matrix<T>& k) {
 		
 		if (sizeof(T) == sizeof(double))
-			memcpy (m_fplan.x, k.Data(), numel(k) * sizeof(double));
+			memcpy (m_fplan.x, k.Data(), m_fplan.M_total * m_rank * sizeof(double));
 		else 
-			for (size_t i = 0; i < numel(k); i++)
+			for (size_t i = 0; i < m_fplan.M_total * m_rank; i++)
 				m_fplan.x[i] = k[i];
 		
 	}
@@ -132,9 +139,9 @@ public:
 	Weights (const Matrix<T>& w) {
 		
 		if (sizeof(T) == sizeof(double))
-			memcpy (m_iplan.w, w.Data(), numel(w) * sizeof(double));
+			memcpy (m_iplan.w, w.Data(), m_fplan.M_total * sizeof(double));
 		else 
-			for (size_t i = 0; i < numel(w); i++)
+			for (size_t i = 0; i < m_fplan.M_total; i++)
 				m_iplan.w[i] = w[i];
 		
 		NFFTTraits<double>::Weights (m_fplan, m_iplan);
@@ -235,6 +242,8 @@ private:
 	
 	bool      m_initialised;      /**< @brief Memory allocated / Plans, well, planned! :)*/
 	bool      m_have_pc;
+
+	size_t    m_rank;
 
 	Matrix< std::complex<T> > m_pc;  /**< @brief Phase correction (applied after inverse trafo)*/
 	Matrix< std::complex<T> > m_cpc; /**< @brief Phase correction (applied before forward trafo)*/
