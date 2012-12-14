@@ -13,6 +13,35 @@
 
 
 
+/** 
+ * @brief                  Create a double precision kernel out of a single precision kernel.
+ *
+ * @param  source          The source string.
+ * @param  fp_extension    An info string that specifies the OpenCL double precision extension.
+ *
+ * @return                 The double precision kernel.
+ */
+inline
+std::string
+make_double_kernel        (std::string const & source, std::string const & fp_extension)
+{
+
+  std::stringstream ss;
+  ss << "#pragma OPENCL EXTENSION " << fp_extension << " : enable\n\n";
+  
+  std::string result = ss.str();
+    
+  result.append(viennacl::tools::strReplace(source, "float", "double"));
+
+  return result;
+
+}
+
+
+
+
+
+template <class T>
 const char*
 oclConnection::
 ReadSource            (const char * fname,
@@ -41,7 +70,9 @@ ReadSource            (const char * fname,
   fclose (f);
   ((char*)buf)[*size] = '\0';
 
-  return (const char*)buf;
+   // = make_double_kernel (string ((const char *)buf), string ("cl_khr_fp64"));
+
+  return ocl_precision_trait <T> :: modify_source (buf); //result.c_str (); //(const char*)buf;
 
 }
 
@@ -53,14 +84,24 @@ oclConnection::
 BuildProgram            ()
 {
   try {
-    m_error = m_prog.build (m_devs);
+    m_error = m_prog_f.build (m_devs);
   } catch (cl::Error cle) {
     cout << "Error while building program: " << cle.what ()                                                << endl;
-    cout << "Build Status: "                 << m_prog.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
-    cout << "Build Options:\t"               << m_prog.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
-    cout << "Build Log:\t "                  << m_prog.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
+    cout << "Build Status: "                 << m_prog_f.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
+    cout << "Build Options:\t"               << m_prog_f.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
+    cout << "Build Log:\t "                  << m_prog_f.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
     return -1;
   }
+  try {
+    m_error = m_prog_d.build (m_devs);
+  } catch (cl::Error cle) {
+    cout << "Error while building program: " << cle.what ()                                                << endl;
+    cout << "Build Status: "                 << m_prog_d.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
+    cout << "Build Options:\t"               << m_prog_d.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
+    cout << "Build Log:\t "                  << m_prog_d.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
+    return -1;
+  }
+
 }
 
 
@@ -102,23 +143,31 @@ oclConnection ( const char      * filename,
     m_comqs.push_back (clCommandQueue (m_cont, *it));
   }
 
-  // source code
+  // source code (float)
   int size;
-  const char * source = ReadSource (filename, &size);
-  std::vector <std::pair <const char *, ::size_t> > sources;
-  sources.push_back (std::pair <const char*, ::size_t> (source, size));
+  const char * source_f = ReadSource <float> (filename, &size);
+  std::vector <std::pair <const char *, ::size_t> > sources_f;
+  sources_f.push_back (std::pair <const char*, ::size_t> (source_f, size));
+
+  // source code (double)
+  const char * source_d = ReadSource <double> (filename, &size);
+  std::vector <std::pair <const char *, ::size_t> > sources_d;
+  sources_d.push_back (std::pair <const char*, ::size_t> (source_d, size));
 
   // program
-  m_prog = clProgram (m_cont, sources, &m_error);
+  m_prog_f = clProgram (m_cont, sources_f, &m_error);
+  m_prog_d = clProgram (m_cont, sources_d, &m_error);
   BuildProgram ();                 // for all available devices
 
   // kernels
-  m_error = m_prog.createKernels (&m_kernels);
+  m_error = m_prog_f.createKernels (&m_kernels_f);
+  m_error = m_prog_d.createKernels (&m_kernels_d);
   num_kernel = 0;
-  mp_actKernel = & (m_kernels [num_kernel]);
+  mp_actKernel = & (m_kernels_f [num_kernel]); // defined default value !!!
   
   // create buffer vector
-  m_buffers = std::vector <clBuffers> (m_kernels.size());
+  m_buffers_f = std::vector <clBuffers> (m_kernels_f.size());
+  m_buffers_d = std::vector <clBuffers> (m_kernels_d.size());
 
   print_optional (" ** oclConnection constructed!", m_verbose);
     
@@ -127,6 +176,7 @@ oclConnection ( const char      * filename,
    */
   print_optional (" ** setup ViennaCl!", m_verbose);
   viennacl :: vector <float> tmp (10);
+  viennacl :: vector <double> tmp2 (10);
   tmp = tmp + tmp;
 
 }
@@ -135,6 +185,7 @@ oclConnection ( const char      * filename,
 
 
 // activate kernel, stays active until another kernel is activated (default: 0)
+//template <class T>
 int
 oclConnection::
 activateKernel            (const std::string kernelname)
@@ -145,16 +196,21 @@ activateKernel            (const std::string kernelname)
   // check if kernel already activated
   m_error = mp_actKernel -> getInfo <std::string> (CL_KERNEL_FUNCTION_NAME, &act_kernelname);
 
-  if (kernelname.compare (act_kernelname) == 0)
-    return 0;
+  /************************/
+  // ---> removed check by name, if kernel is already activated,
+  //      since the same kernels for different precisions have the same name
+  /************************/
+  
+//  if (kernelname.compare (act_kernelname) == 0)
+//    return 0;
 
   // search for matching kernel  
-  for (int i = 0; i < m_kernels.size(); i++)
+  for (int i = 0; i < mp_kernels -> size(); i++)
   {
-    m_error = m_kernels [i] . getInfo <std::string> (CL_KERNEL_FUNCTION_NAME, &act_kernelname);
+    m_error = (* mp_kernels) [i] . getInfo <std::string> (CL_KERNEL_FUNCTION_NAME, &act_kernelname);
     if (kernelname.compare (act_kernelname) == 0)
     {
-      mp_actKernel = & (m_kernels [i]);
+      mp_actKernel = & ((* mp_kernels) [i]);
       return 0;
     }
   }
@@ -280,25 +336,5 @@ errorString             (cl_int e)
 
 
 
-/** @brief Create a double precision kernel out of a single precision kernel
- *
- * @param  source          The source string
- * @param  fp_extension    An info string that specifies the OpenCL double precision extension
- *
- * @return                The double precision kernel
- */
-/*inline
-std::string
-make_double_kernel        (std::string const & source, std::string const & fp_extension)
-{
 
-//  std::stringstream ss;
-//  ss << "#pragma OPENCL EXTENSION " << fp_extension << " : enable\n\n";
-  
-//  std::string result = ss.str();
-  result.append(strReplace(source, "float", "double"));
-
-  return result;
-
-}*/
 

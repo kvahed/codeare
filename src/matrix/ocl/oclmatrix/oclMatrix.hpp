@@ -25,6 +25,81 @@
 
 
 
+  /************************************
+   ** struct: ocl_matrix_type_traits **
+   **   (base struct)                **
+   ************************************/
+  template <class T>
+  struct ocl_matrix_type_traits
+  {
+  
+    /* -- */
+  
+  };
+  
+  
+  /************************************
+   ** struct: ocl_matrix_type_traits **
+   **   (derived, type: float)       **
+   ************************************/
+  template <>
+  struct ocl_matrix_type_traits <float>
+  {
+  
+    typedef float elem_type;
+    
+    static
+    std::string
+    type_name         ( )
+    {
+      return std::string ("oclMatrix <float>");
+    }
+  
+  };
+  
+  
+  /************************************
+   ** struct: ocl_matrix_type_traits **
+   **   (derived, type: double)      **
+   ************************************/
+  template <>
+  struct ocl_matrix_type_traits <double>
+  {
+  
+    typedef double elem_type;
+    
+    static
+    std::string 
+    type_name         ( )
+    {
+      return std::string ("oclMatrix <double>");
+    }
+  
+  };
+  
+  
+  /************************************
+   ** struct: ocl_matrix_type_traits **
+   **   (derived, type: size_t)      **
+   ************************************/
+  template <>
+  struct ocl_matrix_type_traits <size_t>
+  {
+  
+    typedef size_t elem_type;
+    
+    static
+    std::string
+    type_name         ( )
+    {
+      return std::string ("oclMatrix <size_t>");
+    }
+  
+  };
+  
+    
+
+
   /*********************
    ** class oclMatrix **
    ** (declaration)   **
@@ -51,7 +126,8 @@
       inline
       oclMatrix           ()
                         : Matrix <T> (),
-                          mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
+                          class_name (ocl_matrix_type_traits <T> :: type_name ()),
+                          mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
                                                                         Matrix <T> :: Size ()))
       {
 
@@ -69,7 +145,8 @@
       inline
       oclMatrix           (const size_t * dim)
                         : Matrix <T> (dim),
-                          mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
+                          class_name (ocl_matrix_type_traits <T> :: type_name ()),
+                          mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
                                                                         Matrix <T> :: Size ()))
       {
       
@@ -89,7 +166,8 @@
       oclMatrix           ( const size_t * dim,
                             const  float * res )
                         : Matrix <T> (dim, res),
-                          mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
+                          class_name (ocl_matrix_type_traits <T> :: type_name ()),
+                          mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
                                                                         Matrix <T> :: Size ()))
       {
       
@@ -107,7 +185,8 @@
       inline
       oclMatrix           ( const size_t & n )
                          : Matrix <T> (n),
-                           mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
+                           class_name (ocl_matrix_type_traits <T> :: type_name ()),
+                           mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
                                                                          Matrix <T> :: Size ()))
       {
       
@@ -127,7 +206,8 @@
       oclMatrix           ( const size_t & rows,
                             const size_t & cols )
                          : Matrix <T> (rows, cols),
-                           mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
+                           class_name (ocl_matrix_type_traits <T> :: type_name ()),
+                           mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
                                                                          Matrix <T> :: Size ()))
       {
       
@@ -149,7 +229,8 @@
                             const size_t & cols,
                             const size_t & slices )
                          : Matrix <T> (rows, cols, slices),
-                           mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
+                           class_name (ocl_matrix_type_traits <T> :: type_name ()),
+                           mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
                                                                          Matrix <T> :: Size ()))
       {
       
@@ -182,7 +263,8 @@
                             const size_t & ide = 1,
                             const size_t & ave = 1 )
                          : Matrix <T> (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave),
-                           mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
+                           class_name (ocl_matrix_type_traits <T> :: type_name ()),
+                           mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
                                                                          Matrix <T> :: Size ()))
       {
       
@@ -200,7 +282,8 @@
       inline
       oclMatrix           (const Matrix <T> & mat)
                         : Matrix <T> (mat),
-                          mp_oclData (oclTraits <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
+                          class_name (ocl_matrix_type_traits <T> :: type_name ()),
+                          mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
                                                                         Matrix <T> :: Size ()))
       {
 
@@ -218,7 +301,8 @@
       inline
       oclMatrix           (const oclMatrix <T> & mat)
                         : Matrix <T> ((Matrix<T>) mat),
-                          mp_oclData (oclTraits <T> :: make_GPU_Obj (& (       Matrix <T> :: _M [0]),
+                          class_name (ocl_matrix_type_traits <T> :: type_name ()),
+                          mp_oclData (oclOperations <T> :: make_GPU_Obj (& (       Matrix <T> :: _M [0]),
                                                                                Matrix <T> :: Size (),
                                                                                     * mat.mp_oclData,
                                                                         oclDataObject :: COPY_BUFFER ))
@@ -237,7 +321,7 @@
       ~oclMatrix          ()
       {
 
-        // delete member oclDataObject (created by oclTraits)
+        // delete member oclDataObject (created by oclOperations)
         delete mp_oclData;
     
       }
@@ -1442,9 +1526,13 @@
       /**********************
        ** member variables **
        **********************/
-             
+      
+      // class name of specialised oclMatrix <T>
+      const std::string class_name;
+      
       // holds data of matrix for calculations on GPU
       oclDataWrapper <T> * mp_oclData;
+
       
       
       /**********************
@@ -1465,6 +1553,8 @@
       Validate            (float  & t)  const {}
       void
       Validate            (size_t & t)  const {}
+      void
+      Validate            (double & t)  const {}
 
 
       

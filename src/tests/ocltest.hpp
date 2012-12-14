@@ -161,7 +161,7 @@ oclInit2D              ( size_t dimX, size_t dimY, const T & offset = 0 )
   oclMatrix <T> ocl_mat (dimX, dimY);
   for (size_t i = 0; i < dimX; i++)
     for (size_t j = 0; j < dimY; j++)
-      ocl_mat (i, j) = (T) ((int) (i + j + offset) % 100);
+      ocl_mat (i, j) = (i + j + offset) / ((dimX + dimY) / 2);
       
   return ocl_mat;
 
@@ -176,7 +176,7 @@ Init2D              ( size_t dimX, size_t dimY, const T & offset = 0 )
   Matrix <T> mat (dimX, dimY);
   for (size_t i = 0; i < dimX; i++)
     for (size_t j = 0; j < dimY; j++)
-      mat (i, j) = (T) ((int) (i + j + offset) % 100);
+      mat (i, j) = (i + j + offset) / ((dimX + dimY) / 2);
       
   return mat;
 
@@ -240,8 +240,8 @@ oclArithmeticsTest    ( bool verbose )
   std::cout << " ***************** " << std::endl;
   std::cout <<                          std::endl;
 
-  size_t  dimX     = 2048,
-          dimY     = 2048;
+  size_t  dimX     = 2099,
+          dimY     = 2099;
   double  time_ocl = 0.0,
           time_s   = 0.0;
   MyTimer t;  
@@ -250,10 +250,11 @@ oclArithmeticsTest    ( bool verbose )
   
   
  // verbosity = VERB_HIGH;
-  
+
+
   /* add two matrices */
   {
-    if (verbose) std::cout << " * res = m1 + m2               ";
+    if (verbose) std::cout << " * C = A + B                   ";
     t.tic (time_default);
       Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
       Matrix <T>     mat2 =    Init2D <T> (dimX, dimY);
@@ -271,7 +272,7 @@ oclArithmeticsTest    ( bool verbose )
 
   /* subtract two matrices */
   {
-    if (verbose) std::cout << " * res = m1 - m2               ";
+    if (verbose) std::cout << " * C = A - B                   ";
     t.tic (time_default);
       Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
       Matrix <T>     mat2 =    Init2D <T> (dimX, dimY);
@@ -289,7 +290,7 @@ oclArithmeticsTest    ( bool verbose )
 
   /* increment matrix (uniform) */
   {
-    if (verbose) std::cout << " * m += scalar                 ";
+    if (verbose) std::cout << " * M += scalar                 ";
     const T scalar = (T) 33.3;
     t.tic (time_default);
       Matrix <T>     mat    =    Init2D <T> (dimX, dimY);
@@ -304,7 +305,7 @@ oclArithmeticsTest    ( bool verbose )
 
   /* decrement matrix (uniform) */
   {
-    if (verbose) std::cout << " * m -= scalar                 ";
+    if (verbose) std::cout << " * M -= scalar                 ";
     const T scalar = (T) 33.3;
     t.tic (time_default);
       Matrix <T>     mat    =    Init2D <T> (dimX, dimY);
@@ -319,7 +320,7 @@ oclArithmeticsTest    ( bool verbose )
 
   /* increment matrix (non uniform) */
   {
-    if (verbose) std::cout << " * m += matrix                 ";
+    if (verbose) std::cout << " * A += B                      ";
     const    Matrix <T>     mat_inc =    Init2D <T> (dimX, dimY);
     const oclMatrix <T> ocl_mat_inc = oclInit2D <T> (dimX, dimY);
     t.tic (time_default);
@@ -335,7 +336,7 @@ oclArithmeticsTest    ( bool verbose )
 
   /* decrement matrix (non uniform) */
   {
-    if (verbose) std::cout << " * m -= matrix                 ";
+    if (verbose) std::cout << " * A -= B                      ";
     const    Matrix <T>     mat_dec =    Init2D <T> (dimX, dimY);
     const oclMatrix <T> ocl_mat_dec = oclInit2D <T> (dimX, dimY);
     t.tic (time_default);

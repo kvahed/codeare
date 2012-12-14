@@ -21,28 +21,92 @@
       
   
 
-  
-  /***********************
-   ** struct: oclTraits **
-   **   (base struct)   **
-   ***********************/
+  /******************************
+   ** struct: elem_type_traits **
+   **     (base struct)        **
+   ******************************/
   template <class T>
-  struct oclTraits
+  struct elem_type_traits
   {
-
+    
     /* -- */
+    
+  }; // struct elem_type_traits <T>
 
-  }; // struct oclTraits
 
-  
-  
-  
-  /*******************************
-   ** struct: oclTraits <float> **
-   **   (single precision)      **
-   *******************************/
+  /******************************
+   ** struct: elem_type_traits **
+   **     (spec: float)        **
+   ******************************/
   template <>
-  struct oclTraits <float>
+  struct elem_type_traits <float>
+  {
+  
+    public:
+
+      typedef float elem_type;
+      
+      static inline
+      const char *
+      print_elem_type       ( )
+      {
+        return "float";
+      }
+  
+  }; // struct elem_type_traits <float>
+
+
+  /******************************
+   ** struct: elem_type_traits **
+   **     (spec: float)        **
+   ******************************/
+  template <>
+  struct elem_type_traits <double>
+  {
+  
+    public:
+
+      typedef double elem_type;
+      
+      static inline
+      const char *
+      print_elem_type       ( )
+      {
+        return "double";
+      }
+  
+  }; // struct elem_type_traits <double>
+
+
+  /******************************
+   ** struct: elem_type_traits **
+   **     (spec: size_t)       **
+   ******************************/
+  template <>
+  struct elem_type_traits <size_t>
+  {
+  
+    public:
+
+      typedef size_t elem_type;
+      
+      static inline
+      const char *
+      print_elem_type       ( )
+      {
+        return "size_t";
+      }
+  
+  }; // struct elem_type_traits <size_t>
+
+
+  
+  /***************************
+   ** struct: oclOperations **
+   **   (base struct)       **
+   ***************************/
+  template <class T, class trait = elem_type_traits <T> >
+  struct oclOperations
   {
     
 
@@ -52,7 +116,7 @@
       /**********************
        ** type definitions **
        **********************/
-      typedef float elem_type;
+      typedef typename trait :: elem_type elem_type;
       
       
       /*********************
@@ -98,6 +162,9 @@
         try
         {
 
+          // activate precision mode for type elem_type
+          oclConnection :: Instance () -> activate <elem_type> ();
+
           // execute function object
           op_obj -> run ( );
 
@@ -105,7 +172,10 @@
         catch (oclError & err)
         {
         
-          throw oclError (oclError (err, "oclTraits <float> :: ocl_basic_operator_kernel_3"), kernel_name);
+          stringstream msg;
+          msg << "oclOperations <" << trait :: print_elem_type () << "> :: ocl_basic_operator_kernel_3";
+        
+          throw oclError (oclError (err, msg.str ().c_str ()), kernel_name);
         
         }
 
@@ -143,6 +213,9 @@
         try
         {
 
+          // activate precision mode for type elem_type
+          oclConnection :: Instance () -> activate <elem_type> ();
+
           // execute function object
           op_obj -> run ( );
 
@@ -150,7 +223,10 @@
         catch (oclError & err)
         {
         
-          throw oclError (oclError (err, "oclTraits <float> :: ocl_basic_operator_kernel_11"), kernel_name);
+          stringstream msg;
+          msg << "oclTraits <" << trait :: print_elem_type () << "> :: ocl_basic_operator_kernel_11";
+        
+          throw oclError (oclError (err, msg.str ().c_str ()), kernel_name);
         
         }
 
@@ -189,6 +265,9 @@
         try
         {
 
+          // activate precision mode for type elem_type
+          oclConnection :: Instance () -> activate <elem_type> ();
+
           // execute function object
           op_obj -> run ( );
 
@@ -196,7 +275,10 @@
         catch (oclError & err)
         {
         
-          throw oclError (oclError (err, "oclTraits <float> :: ocl_basic_operator_kernel_2"), kernel_name);
+          stringstream msg;
+          msg << "oclTraits <" << trait :: print_elem_type () << "> :: ocl_basic_operator_kernel_2";
+        
+          throw oclError (oclError (err, msg.str ().c_str ()), kernel_name);
         
         }
 
@@ -236,14 +318,20 @@
         try
         {
 
+          // activate precision mode for type elem_type
+          oclConnection :: Instance () -> activate <elem_type> ();
+
           // execute function object
           op_obj -> run ( );
 
         }
         catch (oclError & err)
         {
+
+          stringstream msg;
+          msg << "oclTraits <" << trait :: print_elem_type () << "> :: ocl_basic_operator_vclAlgo_3";
         
-          throw oclError (err, "oclTraits <float> :: ocl_basic_operator_vclAlgo_3");
+          throw oclError (err, msg.str ().c_str ());
         
         }
 
@@ -295,6 +383,9 @@
         try
         {
 
+          // activate precision mode for type elem_type
+          oclConnection :: Instance () -> activate <elem_type> ();
+
           // execute function object
           op_obj -> run ( );
 
@@ -302,7 +393,10 @@
         catch (oclError & err)
         {
         
-          throw oclError (err, "oclTraits <float> :: ocl_basic_operator_vclAlgo_35");
+          stringstream msg;
+          msg << "oclTraits <" << trait :: print_elem_type () << "> :: ocl_basic_operator_vclAlgo_35";
+          
+          throw oclError (err, msg.str ().c_str ());
         
         }
 
@@ -335,7 +429,7 @@
                                        const    size_t &       num_elems)
       {
     
-        print_optional ("make_GPU_Obj <float> (create new)", VERB_HIGH);
+        print_optional ("make_GPU_Obj <", trait :: print_elem_type (), "> (create new)", VERB_HIGH);
     
         return new oclGPUDataObject <elem_type> (cpu_arg, num_elems);
       
@@ -354,7 +448,7 @@
                                             oclDataObject :: CopyMode                      copy_mode = oclDataObject :: NO_BUFFER)
       {
       
-        print_optional ("make_GPU_Obj <float> (copy obj's state)", VERB_HIGH);
+        print_optional ("make_GPU_Obj <", trait :: print_elem_type (), "> (copy obj's state)", VERB_HIGH);
       
         // check if sizes fit (for !some! more control (or safety))
         if (num_elems != obj.getNumElems ())
@@ -417,7 +511,7 @@
                                                   int           transB )
       {
       
-        print_optional ("oclTraits <float> :: ocl_operator_matprod", op_v_level);
+        print_optional ("oclTraits <", trait :: print_elem_type (), "> :: ocl_operator_matprod", op_v_level);
         ocl_basic_operator_vclAlgo_35 (vclMATPROD, arg1, arg2, prod, m, k, n, transA, transB);
       
       }
@@ -439,7 +533,7 @@
                                                   int         num_elems )
       {
       
-        print_optional ("oclTraits <float> :: ocl_operator_add", op_v_level);
+        print_optional ("oclTraits <", trait :: print_elem_type (), "> :: ocl_operator_add", op_v_level);
         ocl_basic_operator_kernel_3 ("add", arg1, arg2, sum, num_elems);
         
       }
@@ -461,7 +555,7 @@
                                                   int         num_elems )
       {
       
-        print_optional ("oclTraits <float> :: ocl_operator_subtract", op_v_level);
+        print_optional ("oclTraits <", trait :: print_elem_type (), "> :: ocl_operator_subtract", op_v_level);
         ocl_basic_operator_vclAlgo_3 (vclSUBTRACT, arg1, arg2, diff, num_elems);
       
       }
@@ -481,7 +575,7 @@
                                                   int         num_elems )
       {
       
-        print_optional ("oclTraits <float> :: ocl_operator_inc", op_v_level);
+        print_optional ("oclTraits <", trait :: print_elem_type (), "> :: ocl_operator_inc", op_v_level);
         ocl_basic_operator_kernel_11 ("inc", arg1, inc, num_elems);
       
       }
@@ -501,7 +595,7 @@
                                                   int         num_elems )
       {
       
-        print_optional ("oclTraits <float> :: ocl_operator_dec", op_v_level);
+        print_optional ("oclTraits <", trait :: print_elem_type (), "> :: ocl_operator_dec", op_v_level);
         
         /* use increment kernel with inverse decrement */
         ocl_basic_operator_kernel_11 ("inc", arg1, -1 * dec, num_elems);
@@ -523,7 +617,7 @@
                                                   int         num_elems )
       {
       
-        print_optional ("oclTraits <float> :: ocl_operator_assign", op_v_level);
+        print_optional ("oclTraits <", trait :: print_elem_type (), "> :: ocl_operator_assign", op_v_level);
         ocl_basic_operator_kernel_11 ("assign", arg1, scalar, num_elems);
       
       } 
@@ -546,48 +640,10 @@
                                                   int         num_elems )
       {
       
-        print_optional ("oclTraits <float> :: ocl_operator_dec", op_v_level);
+        print_optional ("oclTraits <", trait :: print_elem_type (), "> :: ocl_operator_dec", op_v_level);
         ocl_basic_operator_kernel_2 ("copy_buffer", dest, src, num_elems);
       
       }
-    
-    
-    
-  };
-  
-  
-  
-  
-  /********************************
-   ** struct: oclTraits <size_t> **
-   **   (size_t)                 **
-   ********************************/
-  template <>
-  struct oclTraits <size_t>
-  {
-    
-    
-    
-    /**********************
-     ** type definitions **
-     **********************/
-    typedef size_t elem_type;
-    
-    
-    
-    /**
-     * @brief                       Create oclDataObject
-     */
-    static inline
-    oclDataWrapper <elem_type> *
-    make_GPU_Obj                    (elem_type * const cpu_arg, const size_t & num_elems)
-    {
-    
-      print_optional ("make_GPU_Obj <size_t>", VERB_HIGH);
-    
-      return new oclGPUDataObject <elem_type> (cpu_arg, num_elems * sizeof (elem_type));
-      
-    }
     
     
     

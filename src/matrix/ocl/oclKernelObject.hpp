@@ -147,7 +147,7 @@
 
       // prepare argument
       mpp_args [i] -> prepare ();
-
+      
       // register argument at kernel
       oclCon -> setKernelArg (i, mpp_args [i]);
 

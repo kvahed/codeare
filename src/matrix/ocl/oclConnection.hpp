@@ -36,6 +36,17 @@
   
 
 
+inline
+std::string
+make_double_kernel        (std::string const & source, std::string const & fp_extension);
+
+
+
+
+
+
+
+
   /**************************
    ** class: oclConnection **
    **  (singleton)         **
@@ -115,7 +126,8 @@
       const clDevices       getDevices        () const { return m_devs; }
       const clContext       getContext        () const { return m_cont; }
       const clCommandQueues getCommandQueues  () const { return m_comqs; }
-      const clProgram       getProgram        () const { return m_prog; }
+      template <class T>
+      const clProgram       getProgram        () const { return ocl_precision_trait <T> :: getProgram (this); }
       
       
       /****************************************
@@ -163,7 +175,7 @@
           // create new buffer
           clBuffer * p_tmp_buffer = new clBuffer(m_cont, CL_MEM_READ_WRITE, size, cpu_arg, &m_error);
           
-          print_optional (" -- size: %d Bytes", size, m_verbose);
+          print_optional (" -- size: %d Bytes", size, VERB_LOW); //m_verbose);
           
           // read data from given buffer
           m_error = m_comqs [0] . enqueueReadBuffer (*buffer, CL_TRUE, 0, size, cpu_arg, NULL, NULL);
@@ -180,6 +192,7 @@
       
   
       // activate kernel (stays activated until another kernel is activated
+//      template <class T>
       int
       activateKernel        (const std::string kernelname);
     
@@ -198,6 +211,8 @@
                                cl_mem_flags  mem_flag,
                                clBuffer    * out = NULL)
       {
+
+        ocl_precision_trait <T> trait;
     
         // create new buffer
         clBuffer * p_tmp_buffer = new clBuffer(m_cont, mem_flag, size, in_argument, &m_error);
@@ -219,7 +234,7 @@
       
         // register buffer as argument      
         m_error = mp_actKernel -> setArg (num, *p_tmp_buffer);
-        m_buffers [num_kernel].push_back (p_tmp_buffer);
+        (trait.getBuffers (this)) [num_kernel].push_back (p_tmp_buffer);
 
         // if buffer is used for output, return buffer object
         if (   mem_flag == CL_MEM_READ_WRITE
@@ -281,7 +296,7 @@
 
         try {
 
-          m_error = m_comqs [0] . enqueueReadBuffer (*(m_buffers [num_kernel] [num]), CL_TRUE, 0, size, out_argument, NULL, NULL);
+          m_error = m_comqs [0] . enqueueReadBuffer (*((ocl_precision_trait <T> :: getBuffers (this)) [num_kernel] [num]), CL_TRUE, 0, size, out_argument, NULL, NULL);
 
         } catch (cl::Error cle) {
 
@@ -297,9 +312,20 @@
       void
       print_ocl_objects      ();
     
+
+      // set central vars for particular precision mode for type T
+      template <class T>
+      void
+      activate              ( );
+
+
     
+    /*************
+     ** private **
+     *************/
     private:
-    
+
+
       /**********************
        ** member variables **
        **********************/
@@ -312,18 +338,31 @@
       /********************
        ** OpenCL members **
        ********************/
-      clPlatform              m_plat;       // available platforms
-      clDevices               m_devs;       // vector of available devices on m_plat
-      clContext               m_cont;       // context used associated with m_devs
-      clCommandQueues         m_comqs;      // each command queue is associated with corresponding device from m_devs
-      clProgram               m_prog;       // program containing whole source code
-      clKernels               m_kernels;    // kernels available in m_prog
-      std::vector<clBuffers>  m_buffers;    // vectors of buffers for each kernels arguments
-      cl_int                  m_error;      // error variable
-      VerbosityLevel          m_verbose;    // verbosity level
-      clKernel              * mp_actKernel;
-      int                     num_kernel;
+      clPlatform               m_plat;       // available platforms
+      clDevices                m_devs;       // vector of available devices on m_plat
+      clContext                m_cont;       // context used associated with m_devs
+      clCommandQueues          m_comqs;      // each command queue is associated with corresponding device from m_devs
+      clProgram              * mp_prog,
+                               m_prog_f,     // program containing whole source code (single precision)
+                               m_prog_d;     // program containing whole source code (double precision)
+      clKernels              * mp_kernels,
+                               m_kernels_f,  // kernels available in m_prog_f
+                               m_kernels_d;  // kernels available in m_prog_d
+      std::vector<clBuffers> * mp_buffers,
+                               m_buffers_f,  // vectors of buffers for each kernels arguments (single prec)
+                               m_buffers_d;  // vectors of buffers for each kernels arguments (double prec)
+      cl_int                   m_error;      // error variable
+      VerbosityLevel           m_verbose;    // verbosity level
+      clKernel               * mp_actKernel;
+      int                      num_kernel;
 
+      
+      template <class T>
+      struct ocl_precision_trait
+      { };
+
+
+      template <class T> //, class trait = read_kernel_source_trait <T> >
       static const char * ReadSource   (const char *, int * size);
              int          BuildProgram ();
              const char * errorString (cl_int e);
@@ -337,9 +376,94 @@
                              VerbosityLevel verbose = VERB_NONE);
       
       oclConnection         (oclConnection &) { /*TODO*/};
-        
+      
 
   }; // class oclConnection
+  
+  
+  
+  
+  
+      template <>
+      struct oclConnection :: ocl_precision_trait <float>
+      {
+
+        public:
+  
+
+          typedef float elem_type;
+
+          static inline
+          const char *
+          modify_source (void * buf)
+          {
+            return (const char *) buf;
+          }
+          
+          static inline
+          clProgram *
+          getProgram    (oclConnection * const con)
+          {
+            return & (con -> m_prog_f);
+          }
+          
+          static inline
+          std::vector <clBuffers> *
+          getBuffers    (oclConnection * const con)
+          {
+            return & (con -> m_buffers_f);
+          }
+          
+          static inline
+          clKernels *
+          getKernels    (oclConnection * const con)
+          {
+            return & (con -> m_kernels_f);
+          }
+
+      };
+
+      template <>
+      struct oclConnection :: ocl_precision_trait <double>
+      {
+
+        public:
+  
+
+          typedef double elem_type;
+
+          static inline
+          const char *
+          modify_source (void * buf)
+          {
+            std::string * tmp_str = new string (make_double_kernel (std::string ((const char *) buf), std::string ("cl_khr_fp64")));
+            return tmp_str->c_str ();
+          }
+          
+          static inline
+          clProgram *
+          getProgram    (oclConnection * const con)
+          {
+            return & (con -> m_prog_d);
+          }
+          
+          static inline
+          std::vector <clBuffers> *
+          getBuffers    (oclConnection * const con)
+          {
+            return & (con -> m_buffers_d);
+          }
+          
+          static inline
+          clKernels *
+          getKernels    (oclConnection * const con)
+          {
+            return & (con -> m_kernels_d);
+          }
+          
+      };
+  
+  
   
   
 
@@ -370,6 +494,20 @@
    **************************/
 
   # include "oclConnection.cpp"
+
+
+
+  // set central vars for particular precision mode for type T
+  template <class T>
+  void
+  oclConnection ::
+  activate              ( )
+  {
+    mp_prog    = ocl_precision_trait <T> :: getProgram (this);
+    mp_kernels = ocl_precision_trait <T> :: getKernels (this);
+    mp_buffers = ocl_precision_trait <T> :: getBuffers (this);
+  }
+
   
 
 
@@ -420,7 +558,7 @@
   setKernelArg            (      int              num,
                            const oclDataObject *  p_arg)
   {
- 
+  
     // register kernel argument
     m_error = mp_actKernel -> setArg (num, * p_arg -> getBuffer ());
     

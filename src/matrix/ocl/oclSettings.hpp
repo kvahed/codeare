@@ -109,12 +109,12 @@
   /* 6. */    VERB_LOW,
   /* 7. */    VERB_HIGH,
   /* 8. */    VERB_HIGH,
-  /* 9. */    VERB_LOW,
-  /* 10. */   VERB_MIDDLE,
+  /* 9. */    VERB_HIGH,
+  /* 10. */   VERB_HIGH,
   /* 11. */   VERB_HIGH,
-  /* 12. */   VERB_LOW,
-  /* 13. */   VERB_LOW,
-  /* 14. */   VERB_LOW
+  /* 12. */   VERB_HIGH,
+  /* 13. */   VERB_HIGH,
+  /* 14. */   VERB_HIGH
   
   };
 
@@ -183,7 +183,29 @@
     if (v_level <= verbosity)
     {
     
-      std::cout << msg1 << msg2<< std::endl;
+      std::cout << msg1 << msg2 << std::endl;
+    
+    }
+  
+  }
+  
+  
+  /**
+   * @brief               print given messages, if v_level matches
+   */
+  inline
+  void
+  print_optional          ( const           char *    msg1,
+                            const           char *    msg2,
+                            const           char *    msg3,
+                                  VerbosityLevel   v_level )
+  {
+  
+    /* check verbosity level */
+    if (v_level <= verbosity)
+    {
+    
+      std::cout << msg1 << msg2 << msg3 << std::endl;
     
     }
   

@@ -57,7 +57,11 @@ add                       ( __global float *      arg1,
   {
     result [i] = arg1 [i] + arg2 [i];
   }
- 
+  
+/*  result [0] = 4.44;
+  result [(*num_elems)/2] = 8.88;
+  result [(*num_elems)] = 16.1616;
+*/ 
 }
 
 
@@ -146,7 +150,6 @@ assign                    ( __global float *      arg1,
 
 
 
-
 /**
  * @brief                 Deep copy of a vector.
  *
@@ -180,31 +183,33 @@ copy_buffer               ( __global float *      arg1,
   
   for (int i = local_position; i < *num_elems; i += global_inc)
   {
+    
     arg1 [i] = arg2 [i];
+
   }
   
 }
 
 
 
-typedef float elem_type;
+//typedef float elem_type;
 
-#pragma OPENCL_EXTENSION cl_amd_printf : enable
-__kernel void convolution1 (__global elem_type * signal, __global int * singal_length_x, __global int * signal_length_y,
-                            __global elem_type * filter, __global int * filter_length_x, __global int * filter_length_y)
-{
+//#pragma OPENCL_EXTENSION cl_amd_printf : enable
+//__kernel void convolution1 (__global elem_type * signal, __global int * singal_length_x, __global int * signal_length_y,
+//                            __global elem_type * filter, __global int * filter_length_x, __global int * filter_length_y)
+//{
 
-  int2 index;
+//  int2 index;
 
   // identify thread position
-  if (get_work_dim() == 2)
-  {
-    index.x = get_global_id (0), index.y = get_global_id (1);
-  }
-  else
-  {
-    return;
-  }
+//  if (get_work_dim() == 2)
+//  {
+//    index.x = get_global_id (0), index.y = get_global_id (1);
+//  }
+  //else
+  //{
+  //  return;
+  //}
 
   // load signal block to shared memory
   
@@ -212,4 +217,4 @@ __kernel void convolution1 (__global elem_type * signal, __global int * singal_l
   
   // write back calculated pixel value
 
-}
+//}
