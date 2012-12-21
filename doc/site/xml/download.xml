@@ -18,6 +18,14 @@
 	  <code>git checkout git://github.com/kvahed/codeare.git</code>
 	</p>
 
+	<p>
+	  Download test data for the available modules<br/>(unpack in top
+	  codeare folder):<br/>
+	  <a href="http://codeare.org/download/share.tar.gz">
+	  <code>http://codeare.org/download/share.tar.gz</code>
+	  </a>
+	</p>
+
     ]]>
   </article>
 </main> 

@@ -41,7 +41,8 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	Matrix<cxfl>   image;
 	Matrix<cxfl>   signals;
 	
-	std::string    odf = std::string (base + std::string("/images.mat")); // Binary Ouput (images etc)
+	// Binary Ouput (images etc)
+	std::string    odf = std::string (base + std::string("/images.mat")); 
 	std::string    rev = std::string (base + std::string("/rev.mat"));
 	
 	if (!Read (rawdata, rc->GetElement("/config/data/d"), base) ||
@@ -72,8 +73,8 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	rc->Prepare   (test);
 	rc->SetMatrix (   "data", rawdata); // Measurement data
 	
+	int err = 0;
 	rc->Process   (test);
-	
 	// Receive -------------
 	
 	rc->GetMatrix (  "image", image);  // Images
@@ -95,8 +96,7 @@ cgsensetest (RRClient::Connector<T>* rc) {
 	}
 	
 	MXDump       (image, mf, "image");
-	if (pulses)
-		MXDump (signals, mf, "signals");
+
 	if (nrmse.Size() > 1)
 		MXDump   (nrmse, mf, "nrmse");
 	
@@ -104,6 +104,7 @@ cgsensetest (RRClient::Connector<T>* rc) {
 		printf ("Error closing file %s\n", odf.c_str());
 		return false;
 	}
+
 #endif
 
 	return true;

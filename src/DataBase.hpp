@@ -22,6 +22,15 @@ using namespace RRSModule;
 class DataBase : public Configurable {
 
 
+	typedef map<string, string[2]> reflist;
+	typedef pair<string, string[2]> ref;
+	typedef map<string, Ptr< Matrix<cxfl> > > cxfl_db;
+	typedef map<string, Ptr< Matrix<cxdb> > > cxdb_db;
+	typedef map<string, Ptr< Matrix<float> > > rlfl_db;
+	typedef map<string, Ptr< Matrix<double> > > rldb_db;
+	typedef map<string, Ptr< Matrix<short> > > shrt_db;
+	typedef map<string, Ptr< Matrix<long> > > long_db;
+
  public:
 
 
@@ -122,7 +131,43 @@ class DataBase : public Configurable {
 	 * @return       Success
 	 */
 	template <class T> bool 
-	Free             (const string name);
+	Free             (const string name) {
+
+		reflist::iterator nit = m_ref.find(name);
+		
+		if (nit == m_ref.end())
+			return false;
+
+		if        (nit->second[1].compare("cxfl") == 0) {
+			cxfl_db::iterator dit = m_cxfl.find (nit->second[0]);
+			delete dit->second;
+			m_cxfl.erase(dit);
+		} else if (nit->second[1].compare("cxdb") == 0) {
+			cxdb_db::iterator dit = m_cxdb.find (nit->second[0]);
+			delete dit->second;
+			m_cxdb.erase(dit);
+		} else if (nit->second[1].compare("float") == 0) {
+			rlfl_db::iterator dit = m_rlfl.find (nit->second[0]);
+			delete dit->second;
+			m_rlfl.erase(dit);
+		} else if (nit->second[1].compare("double") == 0) {
+			rldb_db::iterator dit = m_rldb.find (nit->second[0]);
+			delete dit->second;
+			m_rldb.erase(dit);
+		} else if (nit->second[1].compare("shrt") == 0) {
+			shrt_db::iterator dit = m_shrt.find (nit->second[0]);
+			delete dit->second;
+			m_shrt.erase(dit);
+		} else if (nit->second[1].compare("long") == 0) {
+			long_db::iterator dit = m_long.find (nit->second[0]);
+			delete dit->second;
+			m_long.erase(dit);
+		} 
+
+		m_ref.erase(nit);
+		
+		return true;
+	}
 	
 	
 	/**
@@ -195,30 +240,23 @@ class DataBase : public Configurable {
 
 	}; 
 
-	map < string, Ptr< Matrix<cxfl>   > > m_cxfl; /*!< @brief Complex float data repository  */
-	map < string, Ptr< Matrix<cxdb>   > > m_cxdb; /*!< @brief Complex double data repository */
-	map < string, Ptr< Matrix<float>  > > m_rlfl; /*!< @brief Real float data repository     */
-	map < string, Ptr< Matrix<double> > > m_rldb; /*!< @brief Real double data repository    */
-	map < string, Ptr< Matrix<short>  > > m_shrt; /*!< @brief Integer data respository       */
-	map < string, Ptr< Matrix<long>   > > m_long; /*!< @brief Integer data respository       */
+	reflist             m_ref; /*! @brief Names and hash tags            */
+	
+	cxfl_db m_cxfl; /*!< @brief Complex float data repository  */
+	cxdb_db m_cxdb; /*!< @brief Complex double data repository */
+	rlfl_db m_rlfl; /*!< @brief Real float data repository     */
+	rldb_db m_rldb; /*!< @brief Real double data repository    */
+	shrt_db m_shrt; /*!< @brief Integer data respository       */
+	long_db m_long; /*!< @brief Integer data respository       */
 	
 	static DataBase *m_inst; /*!< @brief Single database instance       */
 	
 };
 
-
+/*
 template<> inline bool 
 DataBase::Free<cxdb> (const string name) {
 	
-	map<string, Ptr< Matrix<cxdb> > >::iterator it = m_cxdb.find (name);
-	
-	if (it == m_cxdb.end())
-		return false;
-	
-	delete it->second;
-	m_cxdb.erase(it);
-
-	return true;
 	
 }
 	
@@ -226,13 +264,16 @@ DataBase::Free<cxdb> (const string name) {
 template<> inline bool 
 DataBase::Free<cxfl> (const string name) {
 	
-	map<string, Ptr< Matrix<cxfl> > >::iterator it = m_cxfl.find (name);
+	reflist::iterator nit = m_ref.find(name);
 	
-	if (it == m_cxfl.end())
+	if (nit == m_ref.end())
 		return false;
 	
-	delete it->second;
-	m_cxfl.erase(it);
+	cxfl_db::iterator dit = m_cxfl.find (m_ref[name][0]);
+
+	delete dit->second;
+	m_cxfl.erase(dit);
+	m_ref.erase(nit);
 		
 	return true;
 	
@@ -242,14 +283,17 @@ DataBase::Free<cxfl> (const string name) {
 template<> inline bool 
 DataBase::Free<float>        (const string name) {
 	
-	map<string, Ptr< Matrix<float> > >::iterator it = m_rlfl.find (name);
+	reflist::iterator nit = m_ref.find(name);
 	
-	if (it == m_rlfl.end())
+	if (nit == m_ref.end())
 		return false;
 	
-	delete it->second;
-	m_rlfl.erase(it);
-	
+	rlfl_db::iterator dit = m_rlfl.find (m_ref[name][0]);
+
+	delete dit->second;
+	m_rlfl.erase(dit);
+	m_ref.erase(nit);
+		
 	return true;
 	
 }
@@ -258,14 +302,17 @@ DataBase::Free<float>        (const string name) {
 template<> inline bool 
 DataBase::Free<double>        (const string name) {
 	
-	map<string, Ptr< Matrix<double> > >::iterator it = m_rldb.find (name);
+	reflist::iterator nit = m_ref.find(name);
 	
-	if (it == m_rldb.end())
+	if (nit == m_ref.end())
 		return false;
 	
-	delete it->second;
-	m_rldb.erase(it);
-	
+	rldb_db::iterator dit = m_rldb.find (m_ref[name][0]);
+
+	delete dit->second;
+	m_rldb.erase(dit);
+	m_ref.erase(nit);
+		
 	return true;
 	
 }
@@ -274,14 +321,17 @@ DataBase::Free<double>        (const string name) {
 template<> inline bool 
 DataBase::Free<short>        (const string name) {
 		
-	map<string, Ptr< Matrix<short> > >::iterator it = m_shrt.find (name);
+	reflist::iterator nit = m_ref.find(name);
 	
-	if (it == m_shrt.end())
+	if (nit == m_ref.end())
 		return false;
 	
-	delete it->second;
-	m_shrt.erase(it);
-	
+	shrt_db::iterator dit = m_shrt.find (m_ref[name][0]);
+
+	delete dit->second;
+	m_shrt.erase(dit);
+	m_ref.erase(nit);
+		
 	return true;
 	
 }
@@ -290,20 +340,20 @@ DataBase::Free<short>        (const string name) {
 template<> inline bool 
 DataBase::Free<long>        (const string name) {
 	
-	map<string, Ptr< Matrix<long> > >::iterator it = m_long.find (name);
+	reflist::iterator nit = m_ref.find(name);
 	
-	if (it == m_long.end())
+	if (nit == m_ref.end())
 		return false;
 	
-	delete it->second;
-	m_long.erase(it);
-	
+	long_db::iterator dit = m_long.find (m_ref[name][0]);
+
+	delete dit->second;
+	m_long.erase(dit);
+	m_ref.erase(nit);
+		
 	return true;
 	
 }
 
-
-
-
-
+*/
 #endif /* _DATA_BASE_H_ */

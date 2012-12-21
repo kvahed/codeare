@@ -56,6 +56,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "KArb"))                  karbtest     (con);
 		else if (!strcmp (test, "Creators"))              creatorstest (con);
 		else if (!strcmp (test, "MPI"))                   mpitest      (con);
+		else if (!strcmp (test, "MD5"))                   md5test      (con);
 		else                                              internaltest (con);
 		
 		delete con;

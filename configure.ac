@@ -265,6 +265,7 @@ AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hd
 AC_CHECK_HEADERS([nifti1_io.h],      [], [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+AC_CHECK_HEADERS([openssl/evp.h CommonCrypto/CommonDigest.h], [HAVE_CRYPTO=1], [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
 AC_CHECK_HEADERS([fcntl.h],          [], [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
 AC_CHECK_HEADERS([stddef.h],         [], [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
 
@@ -309,10 +310,11 @@ esac
 AC_SUBST(PLUGIN_LDFLAGS)
 
 # Checks for C libraries.
-AC_CHECK_LIB([omnithread],   [read],          [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
-AC_CHECK_LIB([omniDynamic4], [main],          [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
-AC_CHECK_LIB([dl],           [dlopen],        [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
-AC_CHECK_LIB([z],            [deflate],       [], [AC_MSG_ERROR([cannot find libz, bailing out])])
+AC_CHECK_LIB([omnithread],   [read],     [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
+AC_CHECK_LIB([omniDynamic4], [main],     [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
+AC_CHECK_LIB([dl],           [dlopen],   [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
+AC_CHECK_LIB([z],            [deflate],  [], [AC_MSG_ERROR([cannot find libz, bailing out])])
+AC_CHECK_LIB([crypto], [EVP_MD_CTX_create], [], [AC_MSG_ERROR([cannot find libssl, bailing out])])
 
 AX_PTHREAD([[]])
 

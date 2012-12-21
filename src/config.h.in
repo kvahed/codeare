@@ -24,6 +24,9 @@
 /* Define to 1 if you have the <CL/cl.h> header file. */
 #undef HAVE_CL_CL_H
 
+/* Define to 1 if you have the <CommonCrypto/CommonDigest.h> header file. */
+#undef HAVE_COMMONCRYPTO_COMMONDIGEST_H
+
 /* Define to 1 if you have the <ctype.h> header file. */
 #undef HAVE_CTYPE_H
 
@@ -83,6 +86,9 @@
 
 /* Define to 1 if you have the `cblas' library (-lcblas). */
 #undef HAVE_LIBCBLAS
+
+/* Define to 1 if you have the `crypto' library (-lcrypto). */
+#undef HAVE_LIBCRYPTO
 
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
@@ -167,6 +173,9 @@
 
 /* Open CL headers */
 #undef HAVE_OPENCL_HEADERS
+
+/* Define to 1 if you have the <openssl/evp.h> header file. */
+#undef HAVE_OPENSSL_EVP_H
 
 /* Define to 1 if you have the `pow' function. */
 #undef HAVE_POW

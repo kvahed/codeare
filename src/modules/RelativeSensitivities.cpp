@@ -76,10 +76,17 @@ RelativeSensitivities::Process     () {
 
     // SVD calibration -------------------------
     Matrix<cxfl>&   rxm  = 
-		AddMatrix ("rxm",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
-    Matrix<cxfl>&   txm  = AddMatrix ("txm",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
-    Matrix<cxfl>&   shim = AddMatrix ("shim", (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (data.Dim(4), 1)));
-    Matrix<double>& snro = AddMatrix ("snro", (Ptr<Matrix<double> >) NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
+		AddMatrix ("rxm",  (Ptr<Matrix<cxfl> >)   
+				   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
+    Matrix<cxfl>&   txm  = 
+		AddMatrix ("txm",  (Ptr<Matrix<cxfl> >)   
+				   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
+    Matrix<cxfl>&   shim = 
+		AddMatrix ("shim", (Ptr<Matrix<cxfl> >)   
+				   NEW (Matrix<cxfl>   (data.Dim(4), 1)));
+    Matrix<double>& snro = 
+		AddMatrix ("snro", (Ptr<Matrix<double> >) 
+				   NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
 
     SVDCalibrate (data, rxm, txm, snro, shim, false);
 
