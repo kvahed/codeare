@@ -112,7 +112,7 @@ bool init (int argc, char** argv) {
 
 bool init (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-	name = "codeare";
+	//std::string("codeare").c_str();
 	
 
 }

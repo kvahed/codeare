@@ -55,6 +55,7 @@ enum IceDim {
 #include <time.h>
 #include <limits.h>
 #include <valarray>
+#include <vector>
 #include <ostream>
 
 #include <sys/mman.h>
@@ -165,7 +166,6 @@ public:
     /**
      * @brief           Contruct 1-dim with single element.
      */
-    inline              
     Matrix              ();
     
     
@@ -174,9 +174,15 @@ public:
      *
      * @param  dim      All 16 Dimensions
      */
-    inline 
     Matrix              (const size_t* dim);
     
+    
+    /**
+     * @brief           Construct matrix with dimension array
+     *
+     * @param  dim      All 16 Dimensions
+     */
+    Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res = std::vector<float> (INVALID_DIM, 1.0f));
     
     /**
      * @brief           Construct matrix with dimension and resolution arrays
@@ -184,7 +190,6 @@ public:
      * @param  dim      All 16 Dimensions
      * @param  res      All 16 Resolutions
      */
-    inline 
     Matrix              (const size_t* dim, const float* res);
     
     
@@ -198,7 +203,6 @@ public:
      *
      * @param  n        Rows & Columns
      */
-    inline              
     Matrix              (const size_t& n) ;
     
     
@@ -213,7 +217,6 @@ public:
      * @param  m        Rows
      * @param  n        Columns
      */
-    inline 
     Matrix              (const size_t& m, const size_t& n);
     
     
@@ -229,7 +232,6 @@ public:
      * @param  n        Columns
      * @param  k        Slices
      */
-    inline 
     Matrix              (const size_t& m, const size_t& n, const size_t& k);
     
 
@@ -253,7 +255,6 @@ public:
      * @param  ide      IDE
      * @param  ave      Averages
      */
-    inline 
     Matrix              (const size_t col, 
                          const size_t lin, 
                          const size_t cha,
@@ -290,7 +291,6 @@ public:
      *
      * @param  M        Right hand side
      */
-    inline 
     Matrix              (const Matrix<T> &M);
 
 
@@ -753,8 +753,7 @@ public:
      * @param  y        Line
      * @return          Value
      */
-    T
-    inline 
+    inline T 
     operator()          (const size_t& x, const size_t& y) const {
 
         return this->At(x,y);
@@ -916,7 +915,7 @@ public:
      * @param  s        Scalar lhs
      * @param  m        Matrix rhs
      * @return          m * s
-a     */
+     */
     inline friend Matrix<T>    
     operator*  (const double& s, const Matrix<T>& m) { 
         return   m * s;
@@ -1987,6 +1986,7 @@ protected:
     void Validate (double&    t) const {};
     void Validate (cxfl&      t) const {};
     void Validate (cxdb&      t) const {};
+	void Validate (bool&      t) const {};
 
 };
 
@@ -2151,6 +2151,26 @@ Matrix<T>::Matrix (const size_t* dim) {
     Validate (t);
 
     for (size_t i = 0; i < INVALID_DIM; i++) {
+        _dim[i] = dim[i];
+        _res[i] = 1.0;
+    }
+    
+    _M.resize(Size(),T(0));
+    
+}
+
+
+template <class T> inline 
+Matrix<T>::Matrix (const std::vector<size_t>& dim, const std::vector<float>& res) {
+    
+    T t;
+    Validate (t);
+	size_t l = dim.size();
+
+	assert (l <= INVALID_DIM);
+
+    for (size_t i = 0; i < l; i++) {
+		assert (dim[i] > 0);
         _dim[i] = dim[i];
         _res[i] = 1.0;
     }

@@ -68,7 +68,7 @@ namespace RRServer {
 		virtual 
 		~ReconServant ();
 		
-
+		
 		/**
 		 * @brief      Process startegy (Needs initialisation @see Init)
 		 *
@@ -79,7 +79,7 @@ namespace RRServer {
 		 */
 		virtual error_code
 		Process        (const char* name);
-
+		
 		
 		/**
 		 * @brief      Prepare startegy (Needs initialisation @see Init)
@@ -91,7 +91,7 @@ namespace RRServer {
 		 */
 		virtual error_code
 		Prepare        (const char* name);
-
+		
 		
 		/**
 		 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
