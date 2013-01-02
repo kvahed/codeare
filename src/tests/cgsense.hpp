@@ -77,12 +77,12 @@ cgsensetest (RRClient::Connector<T>* rc) {
     // Receive -------------
     
     rc->GetMatrix (  "image", image);  // Images
-    rc->GetMatrix (  "nrmse", nrmse);  // CG residuals
+    //rc->GetMatrix (  "nrmse", nrmse);  // CG residuals
     
     // ---------------------
-    
+
     rc->Finalise   (test);
-    
+
 #ifdef HAVE_MAT_H    
     
     MATFile* mf;
@@ -106,7 +106,7 @@ cgsensetest (RRClient::Connector<T>* rc) {
     }
 
 #endif
-	
+
     return true;
     
 }
