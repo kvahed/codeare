@@ -18,95 +18,95 @@
  *  02110-1301  USA
  */
 
-enum vmode {	
-	GENUINE,
-	MULTISLICE
+enum vmode {    
+    GENUINE,
+    MULTISLICE
 
 };
 
 template <class T> bool 
 cgsensetest (RRClient::Connector<T>* rc) {
-	
-	int vm; 
-	int iterations;
+    
+    int vm; 
+    int iterations;
 
-	// Incoming
-	Matrix<cxfl>   rawdata; // Measurement data O(Nkx,Nky,Nkz)
-	Matrix<float>  weights; // NUFFT weights   
-	Matrix<float>  kspace;  // Kspace positions O(Nkx,Nky,Nkz)
-	Matrix<cxfl>   sens;    // Sensitivity maps O(Nx, Ny, Nz)
-	
-	// Outgoing
-	Matrix<float>  nrmse;   // Residues of the CG process
-	Matrix<cxfl>   image;
-	Matrix<cxfl>   signals;
-	
-	// Binary Ouput (images etc)
-	std::string    odf = std::string (base + std::string("/images.mat")); 
-	std::string    rev = std::string (base + std::string("/rev.mat"));
-	
-	if (!Read (rawdata, rc->GetElement("/config/data/d"), base) ||
-		!Read (kspace,  rc->GetElement("/config/data/k"), base) ||
-		!Read (sens,    rc->GetElement("/config/data/s"), base) )
-		return false;
+    // Incoming
+    Matrix<cxfl>   rawdata; // Measurement data O(Nkx,Nky,Nkz)
+    Matrix<float>  weights; // NUFFT weights   
+    Matrix<float>  kspace;  // Kspace positions O(Nkx,Nky,Nkz)
+    Matrix<cxfl>   sens;    // Sensitivity maps O(Nx, Ny, Nz)
+    
+    // Outgoing
+    Matrix<float>  nrmse;   // Residues of the CG process
+    Matrix<cxfl>   image;
+    Matrix<cxfl>   signals;
+    
+    std::string    odf = std::string (base + std::string("/images.mat")); // Binary Ouput (images etc)
+    std::string    rev = std::string (base + std::string("/rev.mat"));
+    
+    if (!Read (rawdata, rc->GetElement("/config/data/d"), base) ||
+        !Read (kspace,  rc->GetElement("/config/data/k"), base) ||
+        !Read (sens,    rc->GetElement("/config/data/s"), base) )
+      return false;
 
-	if (!Read (weights, rc->GetElement("/config/data/w"), base))
-		weights = Matrix<float> (1);
+    if (!Read (weights, rc->GetElement("/config/data/w"), base))
+        weights = Matrix<float> (1);
 
-	if (rc->Init (test) != OK) {
-		printf ("Intialising failed ... bailing out!"); 
-		return false;
-	}
+    if (rc->Init (test) != OK) {
+        printf ("Intialising failed ... bailing out!"); 
+        return false;
+    }
 
-	// Volume? If so, 3D or multi-slice
-	if (rc->Attribute ("volume", &vm) != TIXML_SUCCESS)
-		vm = -1;
+    // Volume? If so, 3D or multi-slice
+    if (rc->Attribute ("volume", &vm) != TIXML_SUCCESS)
+        vm = -1;
 
-	// Initial run -------------
-	
-	rc->SetMatrix ("weights", weights); // Weights
-	rc->SetMatrix ( "kspace", kspace);  // K-space
+    // Initial run -------------
+    
+    rc->SetMatrix ("weights", weights); // Weights
+    rc->SetMatrix ( "kspace", kspace);  // K-space
 
-	// Process -------------
+    // Process -------------
 
-	rc->SetMatrix (   "sens", sens);    // Sensitivities
-	rc->Prepare   (test);
-	rc->SetMatrix (   "data", rawdata); // Measurement data
-	
-	int err = 0;
-	rc->Process   (test);
-	// Receive -------------
-	
-	rc->GetMatrix (  "image", image);  // Images
-	rc->GetMatrix (  "nrmse", nrmse);  // CG residuals
-	
-	// ---------------------
-	
-	rc->Finalise   (test);
-	
-#ifdef HAVE_MAT_H	
-	
-	MATFile* mf;
+    rc->SetMatrix (   "sens", sens);    // Sensitivities
+    rc->Prepare   (test);
+    rc->SetMatrix (   "data", rawdata); // Measurement data
+    
+    rc->Process   (test);
+    
+    // Receive -------------
+    
+    rc->GetMatrix (  "image", image);  // Images
+    rc->GetMatrix (  "nrmse", nrmse);  // CG residuals
+    
+    // ---------------------
+    
+    rc->Finalise   (test);
+    
+#ifdef HAVE_MAT_H    
+    
+    MATFile* mf;
 
-	mf = matOpen (odf.c_str(), "w");
-	
-	if (mf == NULL) {
-		printf ("Error creating file %s\n", odf.c_str());
-		return false;
-	}
-	
-	MXDump       (image, mf, "image");
-
-	if (nrmse.Size() > 1)
-		MXDump   (nrmse, mf, "nrmse");
-	
-	if (matClose(mf) != 0) {
-		printf ("Error closing file %s\n", odf.c_str());
-		return false;
-	}
+    mf = matOpen (odf.c_str(), "w");
+    
+    if (mf == NULL) {
+        printf ("Error creating file %s\n", odf.c_str());
+        return false;
+    }
+    
+    MXDump       (image, mf, "image");
+    if (pulses)
+        MXDump (signals, mf, "signals");
+    if (nrmse.Size() > 1)
+        MXDump   (nrmse, mf, "nrmse");
+    
+    if (matClose(mf) != 0) {
+        printf ("Error closing file %s\n", odf.c_str());
+        return false;
+    }
 
 #endif
-
-	return true;
 	
+    return true;
+    
 }

@@ -110,6 +110,8 @@ bool init (int argc, char** argv) {
 }
 
 
+#ifdef HAVE_MAT_H
+
 bool init (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	//std::string("codeare").c_str();
@@ -117,3 +119,4 @@ bool init (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 }
 
+#endif

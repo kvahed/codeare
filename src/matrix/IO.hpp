@@ -1140,6 +1140,8 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 }
 
 
+#ifdef HAVE_MAT_H
+
 /**
  * @brief          Dump matrix to MATLAB file
  * 
@@ -1154,8 +1156,6 @@ MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc =
 	
 	// Declare dimensions and allocate array -----
 	
-#ifdef HAVE_MAT_H
-
 	mwSize   dim[INVALID_DIM];
 	
 	for (size_t i = 0; i < INVALID_DIM; i++) 
@@ -1215,14 +1215,9 @@ MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc =
 	
 	return true;
 	
-#else 
-	
-	printf ("MATLAB IO ERROR - Didn't dump nothin'");
-	return false;
+}
 	
 #endif
-	
-}
 	
 
 
