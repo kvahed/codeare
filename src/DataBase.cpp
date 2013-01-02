@@ -22,6 +22,12 @@ DataBase::Instance ()  {
     if (m_inst == 0) 
         m_inst = new DataBase ();
 
+	bool t = true;
+	bool f = false;
+	
+	m_inst->SetAttribute("FFTWFThreadsInitialised", &f);
+	m_inst->SetAttribute("FFTWThreadsInitialised", &f);
+	
     return m_inst;
 		
 }

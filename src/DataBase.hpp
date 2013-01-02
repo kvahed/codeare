@@ -241,15 +241,12 @@ class DataBase : public Configurable {
 	 * @brief Private constructor (access Instance()). 
 	 *        Singleton object for data storage. Access through Instance().
 	 */
-    DataBase() {
+    DataBase () {}; 
 
-		bool t = true;
-		bool f = false;
-
-		this->SetAttribute("FFTWFThreadsInitialised", &f);
-		this->SetAttribute("FFTWThreadsInitialised", &f);
-
-	}; 
+	/**
+	 * @brief Private copy constructor (access Instance()).
+	 */
+	DataBase (const DataBase&) {};
 
 	reflist             m_ref; /*! @brief Names and hash tags            */
 	
@@ -264,107 +261,4 @@ class DataBase : public Configurable {
 	
 };
 
-/*
-template<> inline bool 
-DataBase::Free<cxdb> (const string name) {
-	
-	
-}
-	
-
-template<> inline bool 
-DataBase::Free<cxfl> (const string name) {
-	
-	reflist::iterator nit = m_ref.find(name);
-	
-	if (nit == m_ref.end())
-		return false;
-	
-	cxfl_db::iterator dit = m_cxfl.find (m_ref[name][0]);
-
-	delete dit->second;
-	m_cxfl.erase(dit);
-	m_ref.erase(nit);
-		
-	return true;
-	
-}
-	
-
-template<> inline bool 
-DataBase::Free<float>        (const string name) {
-	
-	reflist::iterator nit = m_ref.find(name);
-	
-	if (nit == m_ref.end())
-		return false;
-	
-	rlfl_db::iterator dit = m_rlfl.find (m_ref[name][0]);
-
-	delete dit->second;
-	m_rlfl.erase(dit);
-	m_ref.erase(nit);
-		
-	return true;
-	
-}
-
-
-template<> inline bool 
-DataBase::Free<double>        (const string name) {
-	
-	reflist::iterator nit = m_ref.find(name);
-	
-	if (nit == m_ref.end())
-		return false;
-	
-	rldb_db::iterator dit = m_rldb.find (m_ref[name][0]);
-
-	delete dit->second;
-	m_rldb.erase(dit);
-	m_ref.erase(nit);
-		
-	return true;
-	
-}
-
-
-template<> inline bool 
-DataBase::Free<short>        (const string name) {
-		
-	reflist::iterator nit = m_ref.find(name);
-	
-	if (nit == m_ref.end())
-		return false;
-	
-	shrt_db::iterator dit = m_shrt.find (m_ref[name][0]);
-
-	delete dit->second;
-	m_shrt.erase(dit);
-	m_ref.erase(nit);
-		
-	return true;
-	
-}
-
-
-template<> inline bool 
-DataBase::Free<long>        (const string name) {
-	
-	reflist::iterator nit = m_ref.find(name);
-	
-	if (nit == m_ref.end())
-		return false;
-	
-	long_db::iterator dit = m_long.find (m_ref[name][0]);
-
-	delete dit->second;
-	m_long.erase(dit);
-	m_ref.erase(nit);
-		
-	return true;
-	
-}
-
-*/
 #endif /* _DATA_BASE_H_ */
