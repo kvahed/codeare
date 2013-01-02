@@ -174,15 +174,7 @@ public:
      *
      * @param  dim      All 16 Dimensions
      */
-    Matrix              (const size_t* dim);
-    
-    
-    /**
-     * @brief           Construct matrix with dimension array
-     *
-     * @param  dim      All 16 Dimensions
-     */
-    Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res = std::vector<float> (INVALID_DIM, 1.0f));
+    Matrix              (const std::vector<size_t>& dim);
     
     /**
      * @brief           Construct matrix with dimension and resolution arrays
@@ -190,7 +182,25 @@ public:
      * @param  dim      All 16 Dimensions
      * @param  res      All 16 Resolutions
      */
-    Matrix              (const size_t* dim, const float* res);
+    Matrix              (const size_t dim[INVALID_DIM]);
+    
+    
+    /**
+     * @brief           Construct matrix with dimension and resolution arrays
+     *
+     * @param  dim      All 16 Dimensions
+     * @param  res      All 16 Resolutions
+     */
+    Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res);
+    
+    
+    /**
+     * @brief           Construct matrix with dimension and resolution arrays
+     *
+     * @param  dim      All 16 Dimensions
+     * @param  res      All 16 Resolutions
+     */
+    Matrix              (const size_t dim[INVALID_DIM], const float res[INVALID_DIM]);
     
     
     /**
@@ -1378,6 +1388,20 @@ public:
     
 
     /**
+     * @brief           Get dimension vector
+     *
+     * @return          All dimensions
+     */
+    inline std::vector<size_t>   
+    DimVector           ()                  const {
+		std::vector<size_t> dim (INVALID_DIM,1);
+		for (size_t i = 0; i < INVALID_DIM; i++)
+			dim[i] = _dim[i];
+        return dim;
+    }
+    
+
+    /**
      * @brief           Get size a given dimension.
      *
      * @return          Number of rows.
@@ -2039,7 +2063,7 @@ Matrix<T>::Matrix () {
 
     _M.resize(Size(), T(0));
         
-    _name = "Matrix<T>";
+    _name = "matrix";
 
 }
 
@@ -2047,6 +2071,8 @@ Matrix<T>::Matrix () {
 
 template <class T> inline 
 Matrix<T>::Matrix (const size_t& n) {
+
+	assert (n);
 
     T t;
     Validate (t);
@@ -2062,12 +2088,16 @@ Matrix<T>::Matrix (const size_t& n) {
     
     _M.resize(n*n, T(0));
     
+    _name = "matrix";
+
 }
 
 
 
 template <class T> inline 
 Matrix<T>::Matrix (const size_t& m, const size_t& n) {
+
+	assert (m * n);
 
     T t;
     Validate (t);
@@ -2083,12 +2113,16 @@ Matrix<T>::Matrix (const size_t& m, const size_t& n) {
 
     _M.resize(m*n, T(0));
 
+	_name = "matrix";
+
 }
 
 
 
 template <class T> inline 
 Matrix<T>::Matrix (const size_t& m, const size_t& n, const size_t& k) {
+
+	assert (m * n * k);
 
     T t;
     Validate (t);
@@ -2105,6 +2139,8 @@ Matrix<T>::Matrix (const size_t& m, const size_t& n, const size_t& k) {
     
     _M.resize(m*n*k, T(0));
     
+
+
 }
 
 
@@ -2115,6 +2151,9 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
                    const size_t par, const size_t slc, const size_t ida, const size_t idb, 
                    const size_t idc, const size_t idd, const size_t ide, const size_t ave) {
     
+	assert (col * lin * cha * set * eco * phs * rep * seg * 
+			par * slc * ida * idb * idc * idd * ide * ave);
+
     T t;
     Validate (t);
 
@@ -2143,17 +2182,30 @@ Matrix<T>::Matrix (const size_t col, const size_t lin, const size_t cha, const s
 }
 
 
-
 template <class T> inline 
-Matrix<T>::Matrix (const size_t* dim) {
+Matrix<T>::Matrix (const std::vector<size_t>& dim) {
     
+	assert (dim.size() <= INVALID_DIM);
+
+	size_t n = 1, i = 0;
+	
+	for (; i < dim.size(); i++)
+		n *= dim[i];
+
+	assert (n);
+
     T t;
     Validate (t);
 
-    for (size_t i = 0; i < INVALID_DIM; i++) {
+    for (i = 0; i < dim.size(); i++) {
         _dim[i] = dim[i];
         _res[i] = 1.0;
     }
+
+	for (; i < INVALID_DIM; i++) {
+        _dim[i] = 1;
+        _res[i] = 1.0;
+	}
     
     _M.resize(Size(),T(0));
     
@@ -2163,32 +2215,75 @@ Matrix<T>::Matrix (const size_t* dim) {
 template <class T> inline 
 Matrix<T>::Matrix (const std::vector<size_t>& dim, const std::vector<float>& res) {
     
+	assert (dim.size() <= INVALID_DIM);
+	assert (dim.size() == res.size());
+
+	size_t n = 1, i = 0;
+	
+	for (; i < dim.size(); i++)
+		n *= dim[i];
+
+	assert (n);
+
     T t;
     Validate (t);
-	size_t l = dim.size();
 
-	assert (l <= INVALID_DIM);
+	for (i = 0; i < dim.size(); i++) {
+		_dim[i] = dim[i];
+		_res[i] = res[i];
+	}
 
-    for (size_t i = 0; i < l; i++) {
-		assert (dim[i] > 0);
-        _dim[i] = dim[i];
-        _res[i] = 1.0;
-    }
+	for (; i < INVALID_DIM; i++) {
+		_dim[i] = 1;
+		_res[i] = 1.0;
+	}
     
     _M.resize(Size(),T(0));
-    
+
 }
 
 
 template <class T> inline 
-Matrix<T>::Matrix (const size_t* d, const float* r) {
+Matrix<T>::Matrix (const size_t dim[INVALID_DIM]) {
     
+	size_t n = 1, i = 0;
+	
+	for (; i < INVALID_DIM; i++)
+		n *= dim[i];
+
+	assert (n);
+
     T t;
     Validate (t);
 
-    memcpy (_dim, d, INVALID_DIM * sizeof(size_t));
-    memcpy (_res, r, INVALID_DIM * sizeof( float));
+	for (i = 0; i < INVALID_DIM; i++) {
+		_dim[i] = dim[i];
+		_res[i] = 1.0;
+	}
+
+    _M.resize(Size(),T(0));
+
+}
+
+
+template <class T> inline 
+Matrix<T>::Matrix (const size_t dim[INVALID_DIM], const float res[INVALID_DIM]) {
     
+	size_t n = 1, i = 0;
+	
+	for (; i < INVALID_DIM; i++)
+		n *= dim[i];
+
+	assert (n);
+
+    T t;
+    Validate (t);
+
+	for (i = 0; i < INVALID_DIM; i++) {
+		_dim[i] = dim[i];
+		_res[i] = res[i];
+	}
+
     _M.resize(Size(),T(0));
 
 }
@@ -2790,7 +2885,10 @@ Matrix<T>::operator[] (const size_t& p) {
 template<class T> template<class S> inline
 Matrix<T>::operator Matrix<S> () const {
 
-    Matrix<S> m (_dim);
+    Matrix<S> m (_dim[ 0],_dim[ 1],_dim[ 2],_dim[ 3],
+				 _dim[ 4],_dim[ 5],_dim[ 6],_dim[ 7],
+				 _dim[ 8],_dim[ 9],_dim[10],_dim[11],
+				 _dim[12],_dim[13],_dim[14],_dim[15]);
 
 #pragma omp parallel default (shared) 
 	{

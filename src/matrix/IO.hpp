@@ -396,7 +396,8 @@ PRRead (Matrix<T>& M, const string fname) {
 	
 	FILE *f;
 	int dt;
-	size_t dims[INVALID_DIM], ns, n;
+	size_t  ns, n;
+	std::vector<size_t> dims (INVALID_DIM,1);
 	float res[INVALID_DIM];
 	char* name;
 	
@@ -417,7 +418,7 @@ PRRead (Matrix<T>& M, const string fname) {
 		(typeid(T) == typeid(cxfl) && dt == SHRT)) {
 	
 		// Read dimensions and allocate matrix
-		if (!mread (dims, sizeof(size_t), INVALID_DIM, f, "dimensions")) return false;
+		if (!mread (&dims[0], sizeof(size_t), INVALID_DIM, f, "dimensions")) return false;
 		M = Matrix<T>(dims);
 		n = numel(M);
 		
@@ -902,16 +903,13 @@ H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc 
 			
 			hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
 			size_t    ndim    = space.getSimpleExtentDims(dims, NULL);
-			size_t    mdims [INVALID_DIM];
+			std::vector<size_t> mdims (ndim,1);
 			
 			if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) 
 				ndim--;
 			
 			for (size_t i = 0; i < ndim; i++)
 				mdims[i] = dims[ndim-i-1];
-			
-			for (size_t i = ndim; i < INVALID_DIM; i++)
-				mdims[i] = 1;
 			
 			M = Matrix<T> (mdims);
 			
@@ -1069,17 +1067,15 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 	mxClassID     mcid = mxGetClassID(mxa);
 	mwSize        ndim = mxGetNumberOfDimensions(mxa);
 	const mwSize*  dim = mxGetDimensions(mxa);
+	size_t i = 0;
 	
 	if (!MXValidateIO (M, mxa))
 		return false;
 	
-	size_t mdims[INVALID_DIM];
+	std::vector<size_t> mdims(ndim,1);
 	
-	for (size_t i = 0; i < ndim; i++)
+	for (; i < ndim; i++)
 		mdims[i] = (size_t)dim[i];
-	
-	for (size_t i = ndim; i < INVALID_DIM; i++)
-		mdims[i] = 1;
 	
 	M = Matrix<T> (mdims);
 	// -------------------------------------------
@@ -1090,24 +1086,24 @@ MXRead (Matrix<T>& M, const string fname, const string dname, const string dloc 
 	
 	if        (typeid(T) == typeid(cxfl)) {
 		if (mxIsComplex(mxa))
-			for (size_t i = 0; i < numel(M); i++) {
+			for (i = 0; i < numel(M); i++) {
 				float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag) 
 				memcpy(&M[i], f, 2 * sizeof(float));
 			}
 		else
-			for (size_t i = 0; i <numel(M); i++) {
+			for (i = 0; i <numel(M); i++) {
 				float f[2] = {((float*)mxGetPr(mxa))[i], 0.0}; 
 				memcpy(&M[i], f, 2 * sizeof(float));
 			}
 	} else if (typeid(T) == typeid(cxdb)) {
 		if (mxIsComplex(mxa))
-			for (size_t i = 0; i < numel(M); i++) {
+			for (i = 0; i < numel(M); i++) {
 				double* tmp = (double*) &M[0];
 				tmp [i*2]   = mxGetPr(mxa)[i];
 				tmp [i*2+1] = mxGetPi(mxa)[i];
 			}
 		else
-			for (size_t i = 0; i <numel(M); i++) {
+			for (i = 0; i <numel(M); i++) {
 				double* tmp = (double*) &M[0];
 				tmp [i*2]   = mxGetPr(mxa)[i];
 			}
@@ -1355,8 +1351,9 @@ NIDump (const Matrix<T>& M, const string fname) {
 template <class T> static bool
 NIRead (Matrix<T>& M, const string fname) {
 	
-	size_t ndims [INVALID_DIM];
-	float  nress [INVALID_DIM];
+	std::vector<size_t> ndims (INVALID_DIM,1);
+	std::vector<float>  nress (INVALID_DIM,1.0);
+	size_t i = 0;
 
 	if (fname != "") {
 		
@@ -1367,15 +1364,15 @@ NIRead (Matrix<T>& M, const string fname) {
 		if (ni == NULL) 
 			return false;
 		
-		for (size_t i = 0; i < ni->dim[0]; i++)
+		for (; i < ni->dim[0]; i++)
 			if (ni->dim[i+1] > 1) {
 				ndims[i] = ni->dim[i+1];
 				nress[i] = ni->pixdim[i+1];
 			}
 		
-		for (size_t i = ni->dim[0]; i < INVALID_DIM; i++) {
+		for (; i < INVALID_DIM; i++) {
 			ndims[i] = 1;
-			nress[i] = 0.0;
+			nress[i] = 1.0;
 		}
 		
 		M = Matrix<T>(ndims, nress);

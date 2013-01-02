@@ -65,13 +65,10 @@ zeros           (const size_t& col,
 template <class T> inline static Matrix<T> 
 zeros           (const Matrix<size_t>& sz) {
 
-	size_t n [INVALID_DIM], i;
+	std::vector<size_t> n (INVALID_DIM,1); 
 
-	for (i = 0; i < numel(sz) && i < INVALID_DIM; i++)
+	for (size_t i = 0; i < numel(sz) && i < INVALID_DIM; i++)
 		n[i] = sz[i];
-
-	for (     ; i < INVALID_DIM; i++)
-		n[i] = 1; 
 
  	return Matrix<T> (n);
 

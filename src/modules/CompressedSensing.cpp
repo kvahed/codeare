@@ -93,7 +93,7 @@ CompressedSensing::Process () {
 	Matrix<float>& pdf   = Get<float>  ("pdf" );
 	Matrix<float>& mask  = Get<float>  ("mask");
 	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
-	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
+	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.DimVector())));
 	Matrix<cxfl>   orig;
 
 	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
