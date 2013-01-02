@@ -155,7 +155,7 @@ RelativeSensitivities::Process     () {
 	
     // Remove original data from RAM -----------
 	
-    Free<cxfl> ("meas");
+    Free ("meas");
     // -----------------------------------------
     
     printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());

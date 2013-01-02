@@ -98,9 +98,9 @@ DataBase::GetMatrix (const string name, cxfl_data& c) {
 	
 	if (m_ref.find (name) == m_ref.end())
 		return;
-		
+	
 	map<string,string[2]>::iterator it = m_ref.find(name);
-
+	
 	Ptr< Matrix<cxfl> > tmp = m_cxfl[it->second[0]];
 	
 	for (int j = 0; j < INVALID_DIM; j++) {
@@ -110,7 +110,7 @@ DataBase::GetMatrix (const string name, cxfl_data& c) {
 	
 	c.vals.length(2 * tmp->Size()); 
 	
-	memcpy (&c.vals[0], &tmp[0], c.vals.length() * sizeof(double));
+	memcpy (&c.vals[0], &tmp->At(0), c.vals.length() * sizeof(float));
 	
 }	
 
@@ -142,7 +142,7 @@ DataBase::SetMatrix (const string name, const cxfl_data& c)   {
 	Ptr< Matrix<cxfl> > tmp;
 	
 	if (m_ref.find (name) != m_ref.end())
-		Free<cxfl> (name);
+		Free (name);
 
 	std::string tag[2];
 	tag[0] = sha256(name);
@@ -153,7 +153,7 @@ DataBase::SetMatrix (const string name, const cxfl_data& c)   {
 	
 	tmp->SetClassName(name.c_str());
 	
-	memcpy (&tmp[0], &c.vals[0], c.vals.length() * sizeof(float));
+	memcpy (&tmp->At(0), &c.vals[0], c.vals.length() * sizeof(float));
 	
 }
 
@@ -222,7 +222,7 @@ DataBase::GetMatrix (const string name, cxdb_data& c) {
 	
 	c.vals.length(2 * tmp->Size()); 
 	
-	memcpy (&c.vals[0], &tmp[0], c.vals.length() * sizeof(double));
+	memcpy (&c.vals[0], &tmp->At(0), c.vals.length() * sizeof(double));
 	
 }	
 
@@ -254,7 +254,7 @@ DataBase::SetMatrix (const string name, const cxdb_data& c)   {
 	Ptr< Matrix<cxdb> > tmp;
 	
 	if (m_ref.find (name) != m_ref.end())
-		Free<cxdb> (name);
+		Free (name);
 
 	std::string tag[2];
 	tag[0] = sha256(name);
@@ -265,7 +265,7 @@ DataBase::SetMatrix (const string name, const cxdb_data& c)   {
 
 	tmp->SetClassName(name.c_str());
 	
-	memcpy (&tmp[0], &c.vals[0], c.vals.length() * sizeof(double));
+	memcpy (&tmp->At(0), &c.vals[0], c.vals.length() * sizeof(double));
 	
 }
 
@@ -335,7 +335,7 @@ DataBase::GetMatrix        (const string name, rlfl_data& r) {
 	
 	r.vals.length(tmp->Size()); 
 	
-	memcpy (&r.vals[0], &tmp[0], tmp->Size() * sizeof(float));
+	memcpy (&r.vals[0], &tmp->At(0), tmp->Size() * sizeof(float));
 	
 }
 		
@@ -356,6 +356,7 @@ DataBase::GetMatrix         (const string name, Matrix<float>& m) {
 template<> void
 DataBase::SetMatrix        (const string name, const rlfl_data& r)   {
 	
+	int err = 0;
 	size_t mdims [INVALID_DIM];
 	float  mress [INVALID_DIM];
 	
@@ -367,7 +368,7 @@ DataBase::SetMatrix        (const string name, const rlfl_data& r)   {
 	Ptr< Matrix<float> > tmp;
 	
 	if (m_ref.find (name) != m_ref.end())
-		Free<float> (name);
+		Free (name);
 
 	std::string tag[2];
 	tag[0] = sha256(name);
@@ -375,10 +376,10 @@ DataBase::SetMatrix        (const string name, const rlfl_data& r)   {
 	
 	m_ref.insert (pair<string, string[2]> (name, tag));
 	m_rlfl.insert (pair<string, Ptr< Matrix<float> > > (tag[0], tmp = NEW (Matrix<float>(mdims, mress))));
-
+	
 	tmp->SetClassName(name.c_str());
 	
-	memcpy (&tmp[0], &r.vals[0], tmp->Size() * sizeof(float));
+	memcpy (&tmp->At(0), &r.vals[0], tmp->Size() * sizeof(float));
 	
 }
 		
@@ -447,7 +448,7 @@ DataBase::GetMatrix        (const string name, rldb_data& r) {
 	
 	r.vals.length(tmp->Size()); 
 	
-	memcpy (&r.vals[0], &tmp[0], tmp->Size() * sizeof(double));
+	memcpy (&r.vals[0], &tmp->At(0), tmp->Size() * sizeof(double));
 	
 }
 		
@@ -479,7 +480,7 @@ DataBase::SetMatrix        (const string name, const rldb_data& r)   {
 	Ptr< Matrix<double> > tmp;
 	
 	if (m_ref.find (name) != m_ref.end())
-		Free<double> (name);
+		Free (name);
 
 	std::string tag[2];
 	tag[0] = sha256(name);
@@ -490,7 +491,7 @@ DataBase::SetMatrix        (const string name, const rldb_data& r)   {
 
 	tmp->SetClassName(name.c_str());
 	
-	memcpy (&tmp[0], &r.vals[0], tmp->Size() * sizeof(double));
+	memcpy (&tmp->At(0), &r.vals[0], tmp->Size() * sizeof(double));
 	
 }
 		
@@ -559,9 +560,9 @@ DataBase::GetMatrix          (const string name, shrt_data& p) {
 	
 	p.vals.length(tmp->Size()); 
 	
-	memcpy (&p.vals[0], &tmp[0], tmp->Size() * sizeof(short));
+	memcpy (&p.vals[0], &tmp->At(0), tmp->Size() * sizeof(short));
 	
-	Free<short>(name);
+	Free(name);
 	
 }
 
@@ -593,7 +594,7 @@ DataBase::SetMatrix         (const string name, const shrt_data& p)   {
 	Ptr< Matrix<short> > tmp;
 	
 	if (m_ref.find (name) != m_ref.end())
-		Free<short> (name);
+		Free (name);
 
 	std::string tag[2];
 	tag[0] = sha256(name);
@@ -604,7 +605,7 @@ DataBase::SetMatrix         (const string name, const shrt_data& p)   {
 
 	tmp->SetClassName(name.c_str());
 	
-	memcpy (&tmp[0], &p.vals[0], tmp->Size() * sizeof(short));
+	memcpy (&tmp->At(0), &p.vals[0], tmp->Size() * sizeof(short));
 	
 }
 
@@ -673,9 +674,9 @@ DataBase::GetMatrix          (const string name, long_data& p) {
 	
 	p.vals.length(tmp->Size()); 
 	
-	memcpy (&p.vals[0], &tmp[0], tmp->Size() * sizeof(long));
+	memcpy (&p.vals[0], &tmp->At(0), tmp->Size() * sizeof(long));
 	
-	Free<long> (name);
+	Free (name);
 	
 }
 
@@ -707,7 +708,7 @@ DataBase::SetMatrix         (const string name, const long_data& p)   {
 	Ptr< Matrix<long> > tmp;
 	
 	if (m_ref.find (name) != m_ref.end())
-		Free<long> (name);
+		Free (name);
 
 	std::string tag[2];
 	tag[0] = sha256(name);
@@ -718,7 +719,7 @@ DataBase::SetMatrix         (const string name, const long_data& p)   {
 
 	tmp->SetClassName(name.c_str());
 	
-	memcpy (&tmp[0], &p.vals[0], tmp->Size() * sizeof(long));
+	memcpy (&tmp->At(0), &p.vals[0], tmp->Size() * sizeof(long));
 	
 }
 

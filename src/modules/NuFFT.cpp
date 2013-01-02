@@ -116,8 +116,8 @@ NuFFT::Prepare () {
 	nfft->KSpace  (Get<double> ("kspace"));
 	nfft->Weights (Get<double> ("weights"));
 
-	Free<double> ("kspace");
-	Free<double> ("weights");
+	Free ("kspace");
+	Free ("weights");
 
 	return error;
 
@@ -131,6 +131,7 @@ NuFFT::Process () {
 	ticks start = getticks();
 	
 	Get<cxdb> ("img") = nfft->Adjoint(Get<cxdb> ("data"));
+	Free ("data");
 	
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
 
