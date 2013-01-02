@@ -18,4 +18,4 @@
 #include "creators.hpp"
 #include "karb.hpp"
 #include "mpitest.hpp"
-#include "md5test.hpp"
+#include "sha256test.hpp"
