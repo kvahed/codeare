@@ -24,9 +24,6 @@
 /* Define to 1 if you have the <CL/cl.h> header file. */
 #undef HAVE_CL_CL_H
 
-/* Define to 1 if you have the <CommonCrypto/CommonDigest.h> header file. */
-#undef HAVE_COMMONCRYPTO_COMMONDIGEST_H
-
 /* Define to 1 if you have the <ctype.h> header file. */
 #undef HAVE_CTYPE_H
 

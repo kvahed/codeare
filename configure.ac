@@ -265,7 +265,7 @@ AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hd
 AC_CHECK_HEADERS([nifti1_io.h],      [], [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
-AC_CHECK_HEADERS([openssl/evp.h CommonCrypto/CommonDigest.h], [HAVE_CRYPTO=1], [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
+AC_CHECK_HEADERS([openssl/evp.h], [HAVE_CRYPTO=1], [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
 AC_CHECK_HEADERS([fcntl.h],          [], [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
 AC_CHECK_HEADERS([stddef.h],         [], [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
 
