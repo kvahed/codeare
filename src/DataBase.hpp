@@ -115,6 +115,17 @@ class DataBase : public Configurable {
 	
 	
 	/**
+	 * @brief        Add a matrix to according container
+	 *
+	 * @param  name  Name
+	 * @param  m     The added matrix
+	 * @return       Success
+	 */
+	//template <class T> Matrix<T>& 
+	//AddMatrix        (const string& name, const data_type dt, Ptr< Matrix<T> > m);
+	
+	
+	/**
 	 * @brief        Get reference to a complex single matrix
 	 * 
 	 * @param  name  Name
@@ -130,7 +141,7 @@ class DataBase : public Configurable {
 	 * @param  name  Name
 	 * @return       Success
 	 */
-	template <class T> bool 
+	inline bool 
 	Free             (const string name) {
 
 		reflist::iterator nit = m_ref.find(name);

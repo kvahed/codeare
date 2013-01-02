@@ -59,4 +59,14 @@ enum connection_type {
 	CON_REMOTE
 };
 
+enum data_type {
+	T_CXFL,
+	T_CXDB,
+	T_FLOAT,
+	T_DOUBLE,
+	T_SHORT,
+	T_LONG,
+	T_BOOL
+};
+
 #endif //__COMMON_H__

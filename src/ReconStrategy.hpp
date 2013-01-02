@@ -152,6 +152,20 @@ namespace RRStrategy {
 		
 		
 		/**
+		 * @brief       Add a matrix to workspace
+		 *
+		 * @param  name Name in workspace
+		 * @param  vt   Data type of matrix elements
+		 * @param  dims Dimensions 
+		 * @return      Reference to matrix
+		 */
+		//template <class T> Matrix<T>& 
+		//AddMatrix         (const string& name, const data_type dt, std::vector<size_t> dims) const {
+		//		return DataBase::Instance()->AddMatrix(name, dt, dims);
+		//}
+		
+		
+		/**
 		 * @brief       Get reference to complex single matrix by name from database 
 		 *              @see DataBase::Get<T>(const string)
 		 * 
@@ -171,9 +185,9 @@ namespace RRStrategy {
 		 * @param  name Name
 		 * @return      Reference to data if existent
 		 */
-		template<class T> bool 
+		inline bool 
 		Free            (const string name) const {
-			return DataBase::Instance()->Free<T>(name);
+			return DataBase::Instance()->Free (name);
 		}
 
 

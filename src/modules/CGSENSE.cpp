@@ -136,8 +136,8 @@ CGSENSE::Prepare () {
 	m_ncs->KSpace (kspace);
 	m_ncs->Weights (weights);
 	
-	Free<float> ("weights");
-	Free<float> ("kspace");
+	Free ("weights");
+	Free ("kspace");
 	
 	m_initialised = true;
 
@@ -157,7 +157,7 @@ CGSENSE::Process () {
 
 	Get<cxfl>("image") = m_ncs->Adjoint (Get<cxfl>("data"), Get<cxfl>("sens"));
 
-	Free<cxfl> ("data");
+	Free ("data");
 
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
