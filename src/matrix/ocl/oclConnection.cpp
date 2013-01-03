@@ -70,9 +70,8 @@ ReadSource            (const char * fname,
   fclose (f);
   ((char*)buf)[*size] = '\0';
 
-   // = make_double_kernel (string ((const char *)buf), string ("cl_khr_fp64"));
-
-  return ocl_precision_trait <T> :: modify_source (buf); //result.c_str (); //(const char*)buf;
+  /* source code !and! size may change with different precision */
+  return ocl_precision_trait <T> :: modify_source (buf, size); 
 
 }
 
@@ -194,7 +193,7 @@ activateKernel            (const std::string kernelname)
   std::string act_kernelname;
   
   // check if kernel already activated
-  m_error = mp_actKernel -> getInfo <std::string> (CL_KERNEL_FUNCTION_NAME, &act_kernelname);
+//  m_error = mp_actKernel -> getInfo <std::string> (CL_KERNEL_FUNCTION_NAME, &act_kernelname);
 
   /************************/
   // ---> removed check by name, if kernel is already activated,

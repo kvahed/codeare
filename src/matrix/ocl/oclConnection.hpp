@@ -200,82 +200,7 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
       int
       runKernel             (const cl::NDRange & global_dims,
                              const cl::NDRange & local_dims);
-    
-    
-      // set argument for kernel by pointer, optionally return created buffer
-      template <typename T>
-      cl_int
-      setKernelArg            (int           num,
-                               T           * in_argument,
-                               ::size_t      size,
-                               cl_mem_flags  mem_flag,
-                               clBuffer    * out = NULL)
-      {
-
-        ocl_precision_trait <T> trait;
-    
-        // create new buffer
-        clBuffer * p_tmp_buffer = new clBuffer(m_cont, mem_flag, size, in_argument, &m_error);
-
-        // if buffer is used for input, copy data to device
-        if (   mem_flag == CL_MEM_READ_ONLY
-            || mem_flag == CL_MEM_READ_WRITE)
-        {
-      
-          // loop over command queues, write information to device (global memory)
-          for (clCommandQueues::iterator it = m_comqs.begin(); it < m_comqs.end(); ++it)
-          {
-        
-            m_error = it -> enqueueWriteBuffer (*p_tmp_buffer, CL_TRUE, 0, size, in_argument, NULL, NULL);
-
-          }
-        
-        }
-      
-        // register buffer as argument      
-        m_error = mp_actKernel -> setArg (num, *p_tmp_buffer);
-        (trait.getBuffers (this)) [num_kernel].push_back (p_tmp_buffer);
-
-        // if buffer is used for output, return buffer object
-        if (   mem_flag == CL_MEM_READ_WRITE
-            || mem_flag == CL_MEM_WRITE_ONLY)
-        {
-
-          out = p_tmp_buffer;
-
-        }
-        else // delete buffer, if not needed
-        {
-
-          out = NULL;
   
-        }
-  
-      }
-  
-  
-      // TODO: distinction between read/write, read_only, write_only !!!
-      // set argument for kernel by buffer
-      template <typename T>
-      cl_int
-      setKernelArg            (int            num,
-                               clBuffer     * buf,
-                               T            * in_argument,
-                               ::size_t       size)
-      {
-      
-        cout << " ** !! not to use !! ** " << endl;
-
-        for (clCommandQueues::iterator it = m_comqs.begin(); it < m_comqs.end(); ++it)
-        {
-
-          m_error = it -> enqueueWriteBuffer (*buf, CL_TRUE, 0, size, in_argument, NULL, NULL);
-
-        }
-
-        m_error = mp_actKernel -> setArg (num, *buf);
-
-      }
       
       
       /**
@@ -284,30 +209,7 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
       cl_int
       setKernelArg            (      int              num,
                                const oclDataObject *  obj_id);
-    
-    
-      // get argument from activated kernel
-      template <typename T>
-      cl_int
-      getKernelArg            (int        num,
-                               T        * out_argument,
-                               ::size_t   size)
-      {
-
-        try {
-
-          m_error = m_comqs [0] . enqueueReadBuffer (*((ocl_precision_trait <T> :: getBuffers (this)) [num_kernel] [num]), CL_TRUE, 0, size, out_argument, NULL, NULL);
-
-        } catch (cl::Error cle) {
-
-          throw oclError (cle.err (), "oclConnection :: getKernelArg");
-
-        }
-
-        return m_error;
-
-      }
-    
+        
     
       void
       print_ocl_objects      ();
@@ -395,7 +297,7 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
 
           static inline
           const char *
-          modify_source (void * buf)
+          modify_source (void * buf, int * size)
           {
             return (const char *) buf;
           }
@@ -434,9 +336,10 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
 
           static inline
           const char *
-          modify_source (void * buf)
+          modify_source (void * buf, int * size)
           {
             std::string * tmp_str = new string (make_double_kernel (std::string ((const char *) buf), std::string ("cl_khr_fp64")));
+            *size = tmp_str -> size () * sizeof (char);
             return tmp_str->c_str ();
           }
           
@@ -461,6 +364,45 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
             return & (con -> m_kernels_d);
           }
           
+      };
+
+      template <>
+      struct oclConnection :: ocl_precision_trait <bool>
+      {
+
+        public:
+  
+
+          typedef bool elem_type;
+
+          static inline
+          const char *
+          modify_source (void * buf, int * size)
+          {
+            return (const char *) buf;
+          }
+          
+          static inline
+          clProgram *
+          getProgram    (oclConnection * const con)
+          {
+            return & (con -> m_prog_f);
+          }
+          
+          static inline
+          std::vector <clBuffers> *
+          getBuffers    (oclConnection * const con)
+          {
+            return & (con -> m_buffers_f);
+          }
+          
+          static inline
+          clKernels *
+          getKernels    (oclConnection * const con)
+          {
+            return & (con -> m_kernels_f);
+          }
+
       };
   
   

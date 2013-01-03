@@ -14,7 +14,7 @@
 /**********************
  ** type definitions **
  **********************/
-typedef float elem_type;
+typedef double elem_type;
 typedef oclMatrix <elem_type> Matrix_type;
 
 
@@ -231,6 +231,63 @@ oclAccessTest       ( bool verbose )
 
 template <class T>
 bool
+oclComparisonsTest    ( bool verbose )
+{
+
+  std::cout <<                          std::endl;
+  std::cout << " ***************** " << std::endl;
+  std::cout << " ** comparisons ** " << std::endl;
+  std::cout << " ***************** " << std::endl;
+  std::cout <<                          std::endl;
+
+  size_t  dimX     = 2099,
+          dimY     = 2099;
+  double  time_ocl = 0.0,
+          time_s   = 0.0;
+  MyTimer t;  
+  
+  std::cout << " size: " << dimX << " x " << dimY << std::endl;
+
+  /* compare matrix and scalar */
+  {
+    if (verbose) std::cout << " * A == s                      ";
+           T       scalar = 3;
+    t.tic (time_default);
+      Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
+      Matrix <bool>   res = mat1 == scalar;
+    time_s = t.tic (time_default);
+      oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
+      oclMatrix <bool>  ocl_res = ocl_mat1 == scalar;
+    time_ocl = t.tic (time_default);
+    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
+    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
+  }
+
+  /* compare matrices */
+  {
+    if (verbose) std::cout << " * A == B                      ";
+    int pos_x = 10,
+        pos_y = 11;
+    t.tic (time_default);
+      Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
+      Matrix <T>     mat2 = Init2D <T> (dimX, dimY);
+      mat2 (pos_x, pos_y) += 1;
+      Matrix <bool>   res = mat1 == mat2;
+    time_s = t.tic (time_default);
+      oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
+      oclMatrix <T>    ocl_mat2 = oclInit2D <T> (dimX, dimY);
+      ocl_mat2 (pos_x, pos_y) += 1;
+      oclMatrix <bool>  ocl_res = ocl_mat1 == ocl_mat2;
+    time_ocl = t.tic (time_default);
+    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
+    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
+  }
+
+}
+
+
+template <class T>
+bool
 oclArithmeticsTest    ( bool verbose )
 {
 
@@ -372,6 +429,19 @@ oclArithmeticsTest    ( bool verbose )
 
 
 
+template <class T>
+void
+exec_tests      (bool verbose)
+{
+
+  oclCreatorsTest     <T> (verbose);
+  oclArithmeticsTest  <T> (verbose);
+  oclAccessTest       <T> (verbose);
+  oclComparisonsTest  <T> (verbose);
+
+}
+
+
 
 /*******************
  ** test function **
@@ -381,200 +451,19 @@ oclmatrixtest (Connector<T>* rc) {
 
   try
   {
-    oclCreatorsTest    <elem_type> (true);
-    oclArithmeticsTest <elem_type> (true);
-    oclAccessTest      <elem_type> (true);
+    std::cout << std::endl;
+    std::cout << " ----------- // float  \\\\ ------------ " << std::endl;
+    std::cout << std::endl;
+    exec_tests <float>  (true);
+    std::cout << std::endl;
+    std::cout << " ----------- // double \\\\ ------------ " << std::endl;
+    std::cout << std::endl;
+    exec_tests <double> (true);
   }
   catch (oclError & err)
   {
     print_optional (err, VERB_LOW);
   }
-
-  // choose tests
-  enum Test_Type {constructors, ocl_scalar_add, ocl_mat_inc, ocl_mat_add, ocl_mat_sub, ocl_scalar_sub};
-  bool tests [6] = {      true,           true,        true,        true,        true,           true};
-  
-  
-  std::cout << std::endl;
-  std::cout << " * oclmatrixtest " << std::endl << std::endl;
-  
-  // choose dimensions
-  int dimX = 2000, dimY = 3020;
-
-  bool verbose;
-  if (dimX + dimY < 100)
-    verbose = true;
-  verbose = false;
-
-  Matrix_type mat_zeros;
-  mat_zeros = 1.5;
-  if (verbose)
-    std::cout << "mat_zeros: \n" << mat_zeros << std::endl;
-//  mat_zeros.getData ();
-
-  if (tests [constructors])
-  {  
-    // constructors
-    Matrix_type mat;
-    std::cout << "mat" << std::endl;;
-    Matrix <size_t> sz (2, 1);
-    sz [0] = dimX, sz[1] = dimY;
-    mat_zeros = zeros <elem_type> (Matrix <size_t> (sz));
-  
-    Matrix_type mat_copy (mat_zeros);
-    std::cout << "mat_copy" << std::endl;
-//    std::cout << " print \"mat_copy\": " << std::endl << mat_copy << std::endl;
-  }
-  
-  if (tests [ocl_scalar_add])
-  {
-    std::cout << " * scalar addition" << std::endl;
-    mat_zeros += 6;
-//    if (verbose)
-//      std::cout << "mat_zeros: \n" << mat_zeros << std::endl;
-  }
-  
-  if (tests [ocl_scalar_sub])
-  {
-    std::cout << " * scalar subraction" << std::endl;
-    mat_zeros -= 3;
-  }
-
-  if (tests [ocl_mat_inc])
-  {
-    std::cout << " * oclMatrix <T> addition" << std::endl;
-    mat_zeros += mat_zeros;
-  }
-  
-///////////////////////////////////////
-  
-  MyTimer t;
-  double time_ocl, time_s;
-  Matrix <elem_type> smat;
-  Matrix <bool> mat_comp;
-  bool result;
-  
-  assign (smat, mat_zeros);
-  
-  if (tests [ocl_mat_add])
-  {
-    
-    Matrix_type mat1 = mat_zeros, mat2 = mat_zeros;
-    if (verbose)
-      std::cout << "mat_zeros\n" << mat_zeros << std::endl;
-    //////
-    std::cout << "------------------------------------------------------------" << std::endl;
-    std::cout << " * oclMatrix<T> addition" << std::endl;
-
-    t.tic (time_default);
-    mat_zeros = mat1 + mat2;
-    time_ocl = t.tic (time_default);
-
-    if (verbose)
-      std::cout << " print \"mat_zeros\": " << std::endl << mat_zeros << std::endl;
-
-    t.tic (time_default);
-    smat = smat + smat;
-    time_s = t.tic (time_default);
-
-    mat_zeros.getData (); // !!! //
-    Matrix <bool> mat_comp = (smat == mat_zeros);
-    result = true;
-    for (int i = 0; i < dimX; i++)
-      for (int j = 0; j < dimY; j++)
-        result &= mat_comp (i,j);
-    assert (result == true);
-    std::cout << "time_ocl: " << time_ocl << ", time_s: " << time_s << std::endl;
-    std::cout << "------------------------------------------------------------" << std::endl;
-  }
-  
-/*  mat_zeros = mat_zeros ->* mat_zeros;
-  if (verbose)
-    std::cout << " mat_zeros (prod): " << std::endl << mat_zeros << std::endl;
-*/
-  
-  oclMatrix <elem_type> otest (dimY, dimX);
-  otest = 1;
-  t.tic (time_default);
-  oclMatrix <elem_type> ores = mat_zeros ->* otest;
-  time_ocl = t.tic (time_default);
-  ores.getData ();
-  std::cout << " ores: (" << time_ocl << "s) \n" << std::endl;
-  if (verbose)
-    std::cout << ores << std::endl;
-
-  smat = mat_zeros;
-  Matrix <elem_type> test (dimY, dimX);
-  test = 1;
-  t.tic (time_default);
-  Matrix <elem_type> res = smat ->* test;
-  time_s = t.tic (time_default);
-  std::cout << " res: (" << time_s << "s) \n" << std::endl;
-  if (verbose)
-    std::cout << res << std::endl;
-
-  ///////
-
-  if (tests [ocl_mat_sub])
-  {
-  
-    std::cout << " * oclMatrix<T> subtraction" << std::endl;
-
-    t.tic (time_default);
-    mat_zeros = mat_zeros - mat_zeros;
-    time_ocl = t.tic (time_default);
-  
-    if (verbose)
-      std::cout << " print \"mat_zeros\": " << std::endl << mat_zeros << std::endl;
-  
-    t.tic (time_default);
-    smat = smat - smat;
-    time_s = t.tic (time_default);
-  
-    mat_zeros.getData (); // !!! //
-    mat_comp = (smat == mat_zeros);
-    result = true;
-    for (int i = 0; i < dimX; i++)
-      for (int j = 0; j < dimY; j++)
-        result &= mat_comp (i,j);
-    assert (result == true);
-    std::cout << "time_ocl: " << time_ocl << ", time_s: " << time_s << std::endl;
-  }
-  
-//////////////////////////////////////////
-  
-  
-//  std::cout << " print \"mat_zeros\": " << std::endl << mat_zeros << std::endl;
- /*
- 
-  // choose dimensions
-  int dimX = 2, dimY = 2;
-  
-  Matrix <size_t> sz (2, 1);
-  sz [0] = dimX, sz[1] = dimY;
-  Matrix_type mat1 = zeros <elem_type> (sz);
-  Matrix_type mat2 = zeros <elem_type> (sz);
-  
-  mat1 += 3;
-  mat2 += 2;
-  
-  std::cout << "mat1: \n" << mat1 << std::endl;
-  std::cout << "mat2: \n" << mat2 << std::endl;
-  
-  Matrix_type result = mat1 + mat2;
-  
-  result += 0.5;
-
-  std::cout << "mat1: \n" << mat1 << std::endl;
-  std::cout << "mat2: \n" << mat2 << std::endl;
-  std::cout << "result: \n" << result << std::endl;
-    
-  mat1 = result + mat2;
-  
-  std::cout << "mat1: \n" << mat1 << std::endl;
-  std::cout << "mat2: \n" << mat2 << std::endl;
-  std::cout << "result: \n" << result << std::endl;
-*/
  
   /* print list of loaded objects */
   oclConnection :: Instance () -> print_ocl_objects ();

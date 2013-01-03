@@ -96,6 +96,26 @@
     }
   
   };
+
+
+  /************************************
+   ** struct: ocl_matrix_type_traits **
+   **   (derived, type: size_t)      **
+   ************************************/
+  template <>
+  struct ocl_matrix_type_traits <bool>
+  {
+  
+    typedef bool elem_type;
+    
+    static
+    std::string
+    type_name         ( )
+    {
+      return std::string ("oclMatrix <bool>");
+    }
+  
+  };
   
     
 
@@ -1504,11 +1524,164 @@
 
 
       /**
-       * @brief           
+       * @brief           Scalar equality.
+       *
+       * @param  s        Compared scalar.
+       *
+       * @return          Boolean oclMatrix containing elements' equality with scalar.
+       */
+      oclMatrix <bool>
+      operator==          (const T & s)
+      const;
+      
+      
+      /**
+       * @brief           Scalar inequality.
+       *
+       * @param  s        Compared scalar.
+       *
+       * @return          Boolean oclMatrix containing elements' inequality with scalar.
+       */
+      oclMatrix <bool>
+      operator!=          (const T & s)
+      const;
+      
+      
+      /**
+       * @brief           Scalar greater comparison.
+       *
+       * @param  s        Compared scalar.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons with scalar.
+       */
+      oclMatrix <bool>
+      operator>           (const T & s)
+      const;
+
+
+      /**
+       * @brief           Scalar greater or equal comparison.
+       *
+       * @param  s        Compared scalar.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons with scalar.
+       */
+      oclMatrix <bool>
+      operator>=          (const T & s)
+      const;
+      
+      
+      /**
+       * @brief           Scalar less comparison.
+       *
+       * @param  s        Compared scalar.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons with scalar.
+       */
+      oclMatrix <bool>
+      operator<           (const T & s)
+      const;
+      
+      
+      /**
+       * @brief           Scalar less or equal comparison.
+       *
+       * @param  s        Compared scalar.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons with scalar.
+       */
+      oclMatrix <bool>
+      operator<=           (const T & s)
+      const;
+      
+      
+      /**
+       * @brief           Elementwise equality.
+       *
+       * @param  mat      Compared matrix.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons.
+       */
+      oclMatrix <bool>
+      operator==          (const oclMatrix <T> & mat)
+      const;
+
+
+      /**
+       * @brief           Elementwise inequality.
+       *
+       * @param  mat      Compared matrix.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons.
+       */
+      oclMatrix <bool>
+      operator!=          (const oclMatrix <T> & mat)
+      const;
+      
+      
+      /**
+       * @brief           Elementwise greater comparison.
+       *
+       * @param  mat      Compared matrix.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons.
+       */
+      oclMatrix <bool>
+      operator>           (const oclMatrix <T> & mat)
+      const;
+      
+      
+      /**
+       * @brief           Elementwise greater or equal comparison.
+       *
+       * @param  mat      Compared matrix.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons.
+       */
+      oclMatrix <bool>
+      operator>=          (const oclMatrix <T> & mat)
+      const;
+
+
+      /**
+       * @brief           Elementwise less comparison.
+       *
+       * @param  mat      Compared matrix.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons.
+       */
+      oclMatrix <bool>
+      operator<           (const oclMatrix <T> & mat)
+      const;
+
+
+      /**
+       * @brief           Elementwise less or equal comparison.
+       *
+       * @param  mat      Compared matrix.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons.
+       */
+      oclMatrix <bool>
+      operator<=          (const oclMatrix <T> & mat)
+      const;
 
 
       //@} /*************************************************************************************/
       
+      
+      /** ****************************************
+       * @name            Boolean operators.    **
+       ** ****************************************/
+      //@{ /*************************************************************************************/
+      
+      
+      /**
+       * @brief           
+      
+      
+      //@} /*************************************************************************************/
+            
       
       /**
        * @brief           copy relevant data to CPU
@@ -1555,7 +1728,17 @@
       Validate            (size_t & t)  const {}
       void
       Validate            (double & t)  const {}
+      void
+      Validate            (bool   & t)  const {}
 
+
+      /*************************************
+       ** friend declarations (all typed) **
+       *************************************/
+      friend class oclMatrix <bool>;
+      friend class oclMatrix <float>;
+      friend class oclMatrix <double>;
+      friend class oclMatrix <size_t>;
 
       
   };

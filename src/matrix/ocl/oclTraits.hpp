@@ -98,6 +98,24 @@
       }
   
   }; // struct elem_type_traits <size_t>
+  
+  
+  template <>
+  struct elem_type_traits <bool>
+  {
+  
+    public:
+
+      typedef bool elem_type;
+      
+      static inline
+      const char *
+      print_elem_type       ( )
+      {
+        return "bool";
+      }
+  
+  }; // struct elem_type_traits <bool>
 
 
   
@@ -188,7 +206,7 @@
     
     
       /**
-       * @brief                      execute specified kernel with 2 arguments
+       * @brief                      execute specified kernel with 1 arguments and 1 scalar
        */
       static inline
       const oclError &
@@ -237,6 +255,60 @@
         free (args);
     
       }
+    
+    
+      /**
+       * @brief                      execute specified kernel with 2 arguments and 1 scalar
+       */
+      static inline
+      const oclError &
+      ocl_basic_operator_kernel_21              ( const          char * const kernel_name,
+                                                        oclDataObject * const        arg1,
+                                                            elem_type                arg2,
+                                                        oclDataObject * const        arg3,
+                                                                  int           num_elems )
+      {
+    
+        // number of kernel arguments
+        const int num_args = 4;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = new oclGPUDataObject <elem_type> (&      arg2, 1);
+        args [2] = arg3;
+        args [3] = new oclGPUDataObject       <int> (& num_elems, 1);
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance () -> makeFunctionObject <elem_type> (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
+        
+        try
+        {
+
+          // activate precision mode for type elem_type
+          oclConnection :: Instance () -> activate <elem_type> ();
+
+          // execute function object
+          op_obj -> run ( );
+
+        }
+        catch (oclError & err)
+        {
+        
+          stringstream msg;
+          msg << "oclTraits <" << trait :: print_elem_type () << "> :: ocl_basic_operator_kernel_21";
+        
+          throw oclError (oclError (err, msg.str ().c_str ()), kernel_name);
+        
+        }
+
+        // clear memory      
+        delete op_obj;      
+        delete args [1];
+        delete args [3];
+        free (args);
+    
+      }    
     
     
       /**
@@ -599,6 +671,50 @@
         
         /* use increment kernel with inverse decrement */
         ocl_basic_operator_kernel_11 ("inc", arg1, -1 * dec, num_elems);
+      
+      }
+      
+      
+      /**
+       * @brief                       Scalar equality.
+       *
+       * @param  arg1                 Address of vector's data object.
+       * @param  scalar               Scalar.
+       * @param  result               Address of result vector's data object.
+       * @param  num_elems            Number of vectors's elements.
+       */
+      static inline
+      const oclError &
+      ocl_operator_equal              ( oclDataObject * const      arg1,
+                                            elem_type            scalar,
+                                        oclDataObject * const    result,
+                                                  int         num_elems )
+      {
+      
+        print_optional ("oclTraits <", trait :: print_elem_type (), "> :: ocl_operator_equal (scalar)", op_v_level);
+        ocl_basic_operator_kernel_21 ("scalar_equal", arg1, scalar, result, num_elems);
+      
+      }
+
+
+      /**
+       * @brief                       Elementwise equality of vectors.
+       *
+       * @param  arg1                 Address of first vector's data object.
+       * @param  arg2                 Address of second vector's data object.
+       * @param  result               Address of result vector's data object.
+       * @param  num_elems            Number of vectors's elements.
+       */
+      static inline
+      const oclError &
+      ocl_operator_equal              ( oclDataObject * const      arg1,
+                                        oclDataObject * const      arg2,
+                                        oclDataObject * const    result,
+                                                  int         num_elems )
+      {
+      
+        print_optional ("oclTraits <", trait :: print_elem_type (), "> :: ocl_operator_equal (vector)", op_v_level);
+        ocl_basic_operator_kernel_3 ("vector_equal", arg1, arg2, result, num_elems);
       
       }
       
