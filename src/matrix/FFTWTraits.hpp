@@ -21,7 +21,7 @@
 #ifndef __FFTW_TRAITS_HPP__
 #define __FFTW_TRAITS_HPP__
 
-#include "DataBase.hpp"
+#include "Workspace.hpp"
 #include "OMP.hpp"
 
 #include <fftw3.h>
@@ -69,7 +69,7 @@ struct FTTraits<float> {
 		int  nt = 1;
 
 		// Already initialised?
-		DataBase::Instance()->Attribute ("FFTWThreadsInitialised", &ok);
+		Workspace::Instance()->Attribute ("FFTWThreadsInitialised", &ok);
 		/*if (ok)
 			return ok;*/
 
@@ -84,7 +84,7 @@ struct FTTraits<float> {
 #ifdef HAVE_FFTWF_THREADS
 		ok = fftwf_init_threads();
 		if (ok) {
-			DataBase::Instance()->SetAttribute("FFTWThreadsInitialised", &ok);
+			Workspace::Instance()->SetAttribute("FFTWThreadsInitialised", &ok);
 			PlanWithNThreads (nt);
 		}
 #endif
@@ -99,7 +99,7 @@ struct FTTraits<float> {
 	/**
 	 * @brief        Create plans with N threads
 	 * 
-	 * @param        # of threads
+	 * @param  nt    # of threads
 	 */
 	static void 
 	PlanWithNThreads (const int& nt) { 
@@ -203,7 +203,7 @@ struct FTTraits<double> {
 		int  nt = 1;
 
 		// Already initialised?
-		DataBase::Instance()->Attribute ("FFTWThreadsInitialised", &ok);
+		Workspace::Instance()->Attribute ("FFTWThreadsInitialised", &ok);
 		/*if (ok)
 		  return ok;*/
 
@@ -218,7 +218,7 @@ struct FTTraits<double> {
 #ifdef HAVE_FFTW_THREADS
 		ok = fftw_init_threads();
 		if (ok) {
-			DataBase::Instance()->SetAttribute("FFTWThreadsInitialised", &ok);
+			Workspace::Instance()->SetAttribute("FFTWThreadsInitialised", &ok);
 			PlanWithNThreads (nt);
 		}
 #endif
@@ -233,7 +233,7 @@ struct FTTraits<double> {
 	/**
 	 * @brief        Create plans with N threads
 	 * 
-	 * @param        # of threads
+	 * @param   nt   # of threads
 	 */
 	static void 
 	PlanWithNThreads (const int& nt) { 

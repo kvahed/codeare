@@ -61,7 +61,7 @@ FunctorContainer::Finalise (const char* name) {
 	
 	if (!name) {
 		
-		DataBase::Instance()->Finalise();
+		Workspace::Instance()->Finalise();
 		
 	} else {
 		

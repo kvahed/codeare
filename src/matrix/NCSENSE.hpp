@@ -77,15 +77,30 @@ public:
 	/**
 	 * @brief         Default constructor
 	 */
-	NCSENSE() : m_initialised (false) {};
+	NCSENSE() : m_initialised (false),
+		m_dim(2),
+		m_cgiter(100),
+		m_fts(0),
+		m_cgeps (1.0e-6),
+		m_nc (8),
+		m_nk (1024),
+		m_nr (4096),
+		m_lambda (1.0e-6) {}
 
 
 	/**
 	 * @brief         Construct with parameters
 	 */
-	NCSENSE (const NCSParams<T>& ncsp) {
-
-	}
+	NCSENSE (const NCSParams<T>& ncsp) :
+		m_initialised (false),
+		m_dim(2),
+		m_cgiter(100),
+		m_fts(0),
+		m_cgeps (1.0e-6),
+		m_nc (8),
+		m_nk (1024),
+		m_nr (4096),
+		m_lambda (1.0e-6) {}
 
 
 	/**
@@ -106,7 +121,10 @@ public:
 	NCSENSE (const Matrix< std::complex<T> >& sens, const size_t& nk, const T& cgeps, const size_t& cgiter,
 			 const T& lambda = 0.0, const T& fteps = 7.0e-4, const size_t& ftiter = 3,
 			 const size_t& m = 1, const T& alpha = 1.0, const Matrix<T>& b0 = Matrix<T>(1),
-			 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1)) {
+			 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1)) :
+		m_nc(8),
+		m_nk(4096),
+		m_nr(1024) {
 		
 
 		m_dim = ndims(sens)-1;
@@ -144,7 +162,7 @@ public:
 		
 	}
 	
-	/**
+	/***
 	 * @brief          Construct NCSENSE plans for forward and backward transform with credentials
 	 * 
 	 * @param  sens    Image space dims
@@ -277,7 +295,10 @@ public:
 	/**
 	 * @brief    Forward transform
 	 *
-	 * @param  m To transform
+	 * @param  m     To transform
+	 * @param  sens  Sensitivities
+	 * @param  recal Recompute intensity connection
+	 *
 	 * @return   Transform
 	 */
 	Matrix< std::complex<T> >
@@ -305,7 +326,10 @@ public:
 	/**
 	 * @brief Backward transform
 	 *
-	 * @param  m To transform
+	 * @param  m     To transform
+	 * @param  sens  Sensitivities
+	 * @param  recal Recompute intensity correction (default: true)
+	 *
 	 * @return   Transform
 	 */
 	Matrix< std::complex<T> >

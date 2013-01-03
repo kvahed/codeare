@@ -127,7 +127,7 @@ ones            (const size_t& col,
 }
 
 
-/**
+/***
  * @brief        Construct square m x m ScaLAPACK matrix
  *
  * @param  m     Side length

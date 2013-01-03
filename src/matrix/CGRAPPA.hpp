@@ -58,8 +58,9 @@ public:
 	 * @brief          Construct with
 	 *
 	 * @param   sl     Side length of full images
+	 * @param   acs    ACS lines
+	 * @param   kdims  Kernel size
 	 * @param   nc     # receive channels
-	 * @param   ksize  GRAPPA kernel size
 	 * @param   nacs   # ACS lines
 	 * @param   af     Acceleration factors
 	 */

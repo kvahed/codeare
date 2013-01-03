@@ -78,7 +78,7 @@ class Configurable {
 	 */
 	inline void
 	SetAttribute        (const char* name, const std::string& value) {
-		Configuration()->SetAttribute (name, value);
+		Configuration()->SetAttribute (name, value.c_str());
 	}
 
 	
