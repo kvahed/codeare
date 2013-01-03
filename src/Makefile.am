@@ -11,7 +11,7 @@ bin_PROGRAMS = reconserver lclient rclient
 AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml -Imisc $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON =  RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc DataBase.hpp DataBase.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp
+COMMON =  RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp RRSModule.hh RRSModuleSK.cc Workspace.hpp Workspace.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp
 
 # Reconstruction strategies & server side stuff
 SERVER_SIDE = 

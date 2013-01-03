@@ -23,7 +23,7 @@
 
 #include "Matrix.hpp"
 #include "Configurable.hpp"
-#include "DataBase.hpp"
+#include "Workspace.hpp"
 
 #include "DllExport.h"
 
@@ -59,7 +59,7 @@ namespace RRStrategy {
 		/**
 		 * @brief       Default constructor
 		 */ 
-		ReconStrategy   () {}
+		ReconStrategy   () : m_initialised (false) {}
 		
 
 		/**
@@ -132,9 +132,9 @@ namespace RRStrategy {
 		/**
 		 * @brief       Reference to Database singleton
 		 */
-		DataBase&
+		Workspace&
 		DB              () const {
-			return *(DataBase::Instance());
+			return *(Workspace::Instance());
 		}
 
 
@@ -147,11 +147,11 @@ namespace RRStrategy {
 		 */
 		template <class T> Matrix<T>& 
 		AddMatrix         (const string name, Ptr< Matrix<T> > p) const {
-			return DataBase::Instance()->AddMatrix(name, p);
+			return Workspace::Instance()->AddMatrix(name, p);
 		}
 		
 		
-		/**
+		/***
 		 * @brief       Add a matrix to workspace
 		 *
 		 * @param  name Name in workspace
@@ -161,33 +161,33 @@ namespace RRStrategy {
 		 */
 		//template <class T> Matrix<T>& 
 		//AddMatrix         (const string& name, const data_type dt, std::vector<size_t> dims) const {
-		//		return DataBase::Instance()->AddMatrix(name, dt, dims);
+		//		return Workspace::Instance()->AddMatrix(name, dt, dims);
 		//}
 		
 		
 		/**
 		 * @brief       Get reference to complex single matrix by name from database 
-		 *              @see DataBase::Get<T>(const string)
+		 *              @see Workspace::Get<T>(const string)
 		 * 
 		 * @param  name Name
 		 * @return      Reference to data 
 		 */
 		template <class T> Matrix<T>& 
 		Get            (const string name) const {
-			return DataBase::Instance()->Get<T>(name);
+			return Workspace::Instance()->Get<T>(name);
 		}
 		
 		
 		/**
 		 * @brief       Clear database of complex single matrix by name
-		 *              @see DataBase::FreeCXFL(const string)
+		 *              @see Workspace::FreeCXFL(const string)
 		 * 
 		 * @param  name Name
 		 * @return      Reference to data if existent
 		 */
 		inline bool 
 		Free            (const string name) const {
-			return DataBase::Instance()->Free (name);
+			return Workspace::Instance()->Free (name);
 		}
 
 

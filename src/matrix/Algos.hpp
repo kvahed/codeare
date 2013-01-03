@@ -812,7 +812,8 @@ resize (const Matrix<T>& M, const size_t& sc, const size_t& sl) {
  * @param   M       The matrix to resize
  * @param   sc      New height
  * @param   sl      New width
- * @param   sc      New # of slices
+ * @param   ss      New # of slices
+ *
  * @return          Resized vector
  */
 template <class T> inline static Matrix<T>

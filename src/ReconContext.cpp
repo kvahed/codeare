@@ -21,7 +21,7 @@
 #include "Loader.hpp"
 #include "ReconContext.hpp"
 #include "Matrix.hpp"
-#include "DataBase.hpp"
+#include "Workspace.hpp"
 
 namespace RRStrategy {
 

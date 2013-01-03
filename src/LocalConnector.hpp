@@ -33,7 +33,6 @@
 #include "Configurable.hpp"
 #include "ReconContext.hpp"
 #include "FunctorContainer.hpp"
-#include "DataBase.hpp"
 
 using namespace RRSModule;
 using namespace RRStrategy;
@@ -128,7 +127,7 @@ namespace RRClient {
 		template <class T> void 
 		SetMatrix           (const std::string& name, Matrix<T>& m) const {
 
-			DataBase::Instance()->SetMatrix(name, m);
+			Workspace::Instance()->SetMatrix(name, m);
 			
 		}
 		
@@ -142,7 +141,7 @@ namespace RRClient {
 		template <class T> void 
 		GetMatrix           (const std::string& name, Matrix<T>& m) const {
 			
-			DataBase::Instance()->GetMatrix(name, m);
+			Workspace::Instance()->GetMatrix(name, m);
 			
 		}
 		

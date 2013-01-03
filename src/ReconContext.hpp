@@ -126,7 +126,7 @@ namespace RRStrategy {
 		template <class T> void
 		SetMatrix        (const std::string name, const T& t) {
 
-			DataBase::Instance()->SetMatrix(name, t);
+			Workspace::Instance()->SetMatrix(name, t);
 
 		}
 		

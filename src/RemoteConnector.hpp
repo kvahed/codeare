@@ -136,7 +136,7 @@ namespace RRClient {
 		/**
 		 * @brief           Transmit measurement data to remote service
 		 *
-		 * @see             DataBase::SetMatrix
+		 * @see             Workspace::SetMatrix
 		 * @param  name     Name
 		 * @param  m        Complex data
 		 */
@@ -147,7 +147,7 @@ namespace RRClient {
 		/**
 		 * @brief           Retrieve manipulated data from remote service
 		 *
-		 * @see             DataBase::GetMatrix
+		 * @see             Workspace::GetMatrix
 		 * @param  name     Name
 		 * @param  m        Receive storage
 		 */

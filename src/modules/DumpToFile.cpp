@@ -29,9 +29,9 @@ DumpToFile::Process () {
 	std::stringstream fname;
 	const char* uid = Attribute ("UID");
 
-	map<string,Ptr< Matrix<cxfl> > >&   cfm = DataBase::Instance()->CXFLMap();
-	map<string,Ptr< Matrix<double> > >& rdm = DataBase::Instance()->RLDBMap();
-	map<string,Ptr< Matrix<short> > >&  sim = DataBase::Instance()->SHRTMap();
+	map<string,Ptr< Matrix<cxfl> > >&   cfm = Workspace::Instance()->CXFLMap();
+	map<string,Ptr< Matrix<double> > >& rdm = Workspace::Instance()->RLDBMap();
+	map<string,Ptr< Matrix<short> > >&  sim = Workspace::Instance()->SHRTMap();
 
 
 	printf ("Dumping ...\n");

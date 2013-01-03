@@ -73,7 +73,7 @@ namespace RRServer {
 	void
 	ReconServant::set_cxfl  (const char* name, const cxfl_data& c) {
 		
-		DataBase::Instance()->SetMatrix(name, c);
+		Workspace::Instance()->SetMatrix(name, c);
 		
 	}
 	
@@ -83,7 +83,7 @@ namespace RRServer {
 		
 		c.dims.length(INVALID_DIM);
 		c.res.length (INVALID_DIM);
-		DataBase::Instance()->GetMatrix(name, c);
+		Workspace::Instance()->GetMatrix(name, c);
 		
 	}
 	
@@ -91,7 +91,7 @@ namespace RRServer {
 	void
 	ReconServant::set_cxdb  (const char* name, const cxdb_data& c) {
 		
-		DataBase::Instance()->SetMatrix(name, c);
+		Workspace::Instance()->SetMatrix(name, c);
 		
 	}
 	
@@ -101,7 +101,7 @@ namespace RRServer {
 		
 		c.dims.length(INVALID_DIM);
 		c.res.length (INVALID_DIM);
-		DataBase::Instance()->GetMatrix(name, c);
+		Workspace::Instance()->GetMatrix(name, c);
 		
 	}
 	
@@ -109,7 +109,7 @@ namespace RRServer {
 	void
 	ReconServant::set_rldb       (const char* name, const rldb_data& r)   {
 		
-		DataBase::Instance()->SetMatrix(name, r);
+		Workspace::Instance()->SetMatrix(name, r);
 		
 	}
 	
@@ -119,7 +119,7 @@ namespace RRServer {
 		
 		r.dims.length(INVALID_DIM);
 		r.res.length (INVALID_DIM);
-		DataBase::Instance()->GetMatrix(name, r);
+		Workspace::Instance()->GetMatrix(name, r);
 		
 	}
 	
@@ -127,7 +127,7 @@ namespace RRServer {
 	void
 	ReconServant::set_rlfl       (const char* name, const rlfl_data& r)   {
 		
-		DataBase::Instance()->SetMatrix(name, r);
+		Workspace::Instance()->SetMatrix(name, r);
 		
 	}
 	
@@ -137,7 +137,7 @@ namespace RRServer {
 		
 		r.dims.length(INVALID_DIM);
 		r.res.length(INVALID_DIM);
-		DataBase::Instance()->GetMatrix(name, r);
+		Workspace::Instance()->GetMatrix(name, r);
 		
 	}
 	
@@ -145,7 +145,7 @@ namespace RRServer {
 	void
 	ReconServant::set_shrt        (const char* name, const shrt_data& p) {
 		
-		DataBase::Instance()->SetMatrix(name, p);
+		Workspace::Instance()->SetMatrix(name, p);
 		
 	}
 	
@@ -155,7 +155,7 @@ namespace RRServer {
 		
 		p.dims.length(INVALID_DIM);
 		p.res.length(INVALID_DIM);
-		DataBase::Instance()->GetMatrix(name, p);
+		Workspace::Instance()->GetMatrix(name, p);
 		
 	}
 	
@@ -163,7 +163,7 @@ namespace RRServer {
 	void
 	ReconServant::set_long        (const char* name, const long_data& p) {
 		
-		DataBase::Instance()->SetMatrix(name, p);
+		Workspace::Instance()->SetMatrix(name, p);
 		
 	}
 	
@@ -173,7 +173,7 @@ namespace RRServer {
 		
 		p.dims.length(INVALID_DIM);
 		p.res.length(INVALID_DIM);
-		DataBase::Instance()->GetMatrix(name, p);
+		Workspace::Instance()->GetMatrix(name, p);
 		
 	}
 	

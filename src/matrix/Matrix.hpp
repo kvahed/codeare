@@ -180,7 +180,6 @@ public:
      * @brief           Construct matrix with dimension and resolution arrays
      *
      * @param  dim      All 16 Dimensions
-     * @param  res      All 16 Resolutions
      */
     Matrix              (const size_t dim[INVALID_DIM]);
     
@@ -472,7 +471,7 @@ public:
     /**
      * @brief            Element at position (lhs)
      *  
-     * @param  p         Position
+     * @param  pos       Position
      * @return           Reference to _M[p]
      */
     inline T&           
@@ -1487,7 +1486,7 @@ public:
     /**
      * @brief           Assignment operator. i.e. this = m.
      *
-     * @param  M        The assigned matrix.
+     * @param  v        Data vector (size must match numel(M)).
      */
     Matrix<T>&
     operator=           (const std::valarray<T>& v);
