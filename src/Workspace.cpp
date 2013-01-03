@@ -1,0 +1,787 @@
+#include "Workspace.hpp"
+
+#if defined(__APPLE__)
+#  include "AppleDigest.hpp"
+#else
+#  include "Digest.hpp"
+#endif
+
+Workspace* Workspace::m_inst = 0; 
+
+Workspace::~Workspace () { 
+	
+	Finalise();
+	m_inst = 0; 
+	
+}
+
+
+Workspace* 
+Workspace::Instance ()  {
+
+    if (m_inst == 0) 
+        m_inst = new Workspace ();
+
+	bool t = true;
+	bool f = false;
+	
+	m_inst->SetAttribute("FFTWFThreadsInitialised", &f);
+	m_inst->SetAttribute("FFTWThreadsInitialised", &f);
+	
+    return m_inst;
+		
+}
+	
+error_code
+Workspace::Finalise () {
+	
+  	while (!m_cxfl.empty()) {
+		delete m_cxfl.begin()->second;
+		m_cxfl.erase(m_cxfl.begin());
+	}
+			   
+  	while (!m_cxdb.empty()) {
+		delete m_cxdb.begin()->second;
+		m_cxdb.erase(m_cxdb.begin());
+	}
+			   
+  	while (!m_rlfl.empty()) {
+		delete m_rlfl.begin()->second;
+		m_rlfl.erase(m_rlfl.begin());
+	}
+	
+  	while (!m_rldb.empty()) {
+		delete m_rldb.begin()->second;
+		m_rldb.erase(m_rldb.begin());
+	}
+	
+  	while (!m_shrt.empty()) {
+		delete m_shrt.begin()->second;
+		m_shrt.erase(m_shrt.begin());
+	}
+	
+  	while (!m_long.empty()) {
+		delete m_long.begin()->second;
+		m_long.erase(m_long.begin());
+	}
+	
+  	while (!m_ref.empty())
+		m_ref.erase(m_ref.begin());
+
+	return OK;
+	
+}
+
+
+template<> Matrix<cxfl>& 
+Workspace::AddMatrix (const string name, Ptr< Matrix<cxfl> > m) {
+	
+	std::string tag[2];
+	tag[1] = sha256(name);
+	tag[0] = "cxfl";
+
+	assert (m_ref.find (name) == m_ref.end());
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_cxfl.insert (pair< string, Ptr < Matrix<cxfl> > >(tag[0], m));
+
+	return *m_cxfl[tag[0]];
+	
+}
+
+	
+template<> Matrix<cxfl>& 
+Workspace::Get<cxfl> (const string name) {
+	
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	return *m_cxfl[it->second[0]];
+	
+}
+
+
+template<> void
+Workspace::GetMatrix (const string name, cxfl_data& c) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+	
+	map<string,string[2]>::iterator it = m_ref.find(name);
+	
+	Ptr< Matrix<cxfl> > tmp = m_cxfl[it->second[0]];
+	
+	for (int j = 0; j < INVALID_DIM; j++) {
+		c.dims[j] = tmp->Dim(j);
+		c.res[j]  = tmp->Res(j);
+	}
+	
+	c.vals.length(2 * tmp->Size()); 
+	
+	memcpy (&c.vals[0], &tmp->At(0), c.vals.length() * sizeof(float));
+	
+}	
+
+
+template<> void
+Workspace::GetMatrix (const string name, Matrix<cxfl>& m) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+
+	map<string,string[2]>::iterator it = m_ref.find(name);
+		
+	m = *m_cxfl[it->second[0]];
+	
+}
+
+
+template<> void 
+Workspace::SetMatrix (const string name, const cxfl_data& c)   {
+
+	size_t mdims [INVALID_DIM];
+	float  mress [INVALID_DIM];
+	
+	for (int i = 0; i < INVALID_DIM; i++) {
+		mdims[i] = c.dims[i];
+		mress[i] = c.res[i];
+	}
+	
+	Ptr< Matrix<cxfl> > tmp;
+	
+	if (m_ref.find (name) != m_ref.end())
+		Free (name);
+
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "cxfl";
+	
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_cxfl.insert (pair<string, Ptr< Matrix<cxfl> > > (tag[0], tmp = NEW (Matrix<cxfl>(mdims, mress))));
+	
+	tmp->SetClassName(name.c_str());
+	
+	memcpy (&tmp->At(0), &c.vals[0], c.vals.length() * sizeof(float));
+	
+}
+
+
+template<> void 
+Workspace::SetMatrix (const string name, Matrix<cxfl>& m)   {
+	
+	string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "cxfl";
+
+	if (m_ref.find (name) == m_ref.end()) {
+
+		m_ref.insert (pair<string,string[2]> (name,tag));
+		m_cxfl.insert (pair<string, Ptr< Matrix<cxfl> > > (tag[0], NEW (Matrix<cxfl>())));
+
+	}
+	
+	m.SetClassName(name.c_str());
+
+	*m_cxfl[tag[0]] = m;
+	
+}
+
+
+template<> Matrix<cxdb>& 
+Workspace::AddMatrix (const string name, Ptr< Matrix<cxdb> > m) {
+	
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "cxdb";
+
+	assert (m_ref.find (name) == m_ref.end());
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_cxdb.insert (pair< string, Ptr < Matrix<cxdb> > >(tag[0], m));
+
+	return *m_cxdb[tag[0]];
+
+}
+
+	
+template<> Matrix<cxdb>& 
+Workspace::Get<cxdb> (const string name) {
+	
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	return *m_cxdb[it->second[0]];
+	
+}
+	
+
+template<> void
+Workspace::GetMatrix (const string name, cxdb_data& c) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+		
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	Ptr< Matrix<cxdb> > tmp = m_cxdb[it->second[0]];
+	
+	for (int j = 0; j < INVALID_DIM; j++) {
+		c.dims[j] = tmp->Dim(j);
+		c.res[j]  = tmp->Res(j);
+	}
+	
+	c.vals.length(2 * tmp->Size()); 
+	
+	memcpy (&c.vals[0], &tmp->At(0), c.vals.length() * sizeof(double));
+	
+}	
+
+
+template<> void
+Workspace::GetMatrix (const string name, Matrix<cxdb>& m) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+
+	map<string,string[2]>::iterator it = m_ref.find(name);
+		
+	m = *m_cxdb[it->second[0]];
+	
+}
+
+
+template<> void 
+Workspace::SetMatrix (const string name, const cxdb_data& c)   {
+	
+	size_t mdims [INVALID_DIM];
+	float  mress [INVALID_DIM];
+	
+	for (int i = 0; i < INVALID_DIM; i++) {
+		mdims[i] = c.dims[i];
+		mress[i] = c.res[i];
+	}
+	
+	Ptr< Matrix<cxdb> > tmp;
+	
+	if (m_ref.find (name) != m_ref.end())
+		Free (name);
+
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "cxdb";
+	
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_cxdb.insert (pair<string, Ptr< Matrix<cxdb> > > (tag[0], tmp = NEW (Matrix<cxdb>(mdims, mress))));
+
+	tmp->SetClassName(name.c_str());
+	
+	memcpy (&tmp->At(0), &c.vals[0], c.vals.length() * sizeof(double));
+	
+}
+
+
+template<> void 
+Workspace::SetMatrix (const string name, Matrix<cxdb>& m)   {
+	
+
+	string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "cxdb";
+	
+	if (m_ref.find (name) == m_ref.end()) {
+
+		m_ref.insert (pair<string,string[2]> (name,tag));
+		m_cxdb.insert (pair<string, Ptr< Matrix<cxdb> > > (tag[0], NEW (Matrix<cxdb>())));
+
+	}
+	
+	m.SetClassName(name.c_str());
+	
+	*m_cxdb[tag[0]] = m;
+	
+}
+
+
+template<> Matrix<float>&
+Workspace::AddMatrix         (const string name, Ptr< Matrix<float> > m) {
+	
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "float";
+
+	assert (m_ref.find (name) == m_ref.end());
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_rlfl.insert (pair< string, Ptr < Matrix<float> > >(tag[0], m));
+
+	return *m_rlfl[tag[0]];
+
+}
+		
+
+template<> Matrix<float>& 
+Workspace::Get<float> (const string name) {
+	
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	return *m_rlfl[it->second[0]];
+	
+}
+
+		
+template<> void 
+Workspace::GetMatrix        (const string name, rlfl_data& r) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	Ptr< Matrix<float> > tmp = m_rlfl[it->second[0]];
+	
+	for (int j = 0; j < INVALID_DIM; j++) {
+		r.dims[j] = tmp->Dim(j);
+		r.res[j]  = tmp->Res(j);
+	}
+	
+	r.vals.length(tmp->Size()); 
+	
+	memcpy (&r.vals[0], &tmp->At(0), tmp->Size() * sizeof(float));
+	
+}
+		
+
+template<> void
+Workspace::GetMatrix         (const string name, Matrix<float>& m) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+		
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	m = *m_rlfl[it->second[0]];
+	
+}
+		
+	
+template<> void
+Workspace::SetMatrix        (const string name, const rlfl_data& r)   {
+	
+	int err = 0;
+	size_t mdims [INVALID_DIM];
+	float  mress [INVALID_DIM];
+	
+	for (int i = 0; i < INVALID_DIM; i++) {
+		mdims[i] = r.dims[i];
+		mress[i] = r.res[i];
+	}
+	
+	Ptr< Matrix<float> > tmp;
+	
+	if (m_ref.find (name) != m_ref.end())
+		Free (name);
+
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "float";
+	
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_rlfl.insert (pair<string, Ptr< Matrix<float> > > (tag[0], tmp = NEW (Matrix<float>(mdims, mress))));
+	
+	tmp->SetClassName(name.c_str());
+	
+	memcpy (&tmp->At(0), &r.vals[0], tmp->Size() * sizeof(float));
+	
+}
+		
+		
+template<> void 
+Workspace::SetMatrix         (const string name, Matrix<float>& m)   {
+	
+	string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "float";
+
+	if (m_ref.find (name) == m_ref.end()) {
+
+		m_ref.insert (pair<string,string[2]> (name,tag));
+		m_rlfl.insert (pair<string, Ptr< Matrix<float> > > (tag[0], NEW (Matrix<float>())));
+
+	}
+	
+	m.SetClassName(name.c_str());
+	
+	*m_rlfl[tag[0]] = m;
+	
+}
+		
+
+template<> Matrix<double>&
+Workspace::AddMatrix         (const string name, Ptr< Matrix<double> > m) {
+	
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "double";
+
+	assert (m_ref.find (name) == m_ref.end());
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_rldb.insert (pair< string, Ptr < Matrix<double> > >(tag[0], m));
+
+	return *m_rldb[tag[0]];
+
+}
+		
+
+template<> Matrix<double>& 
+Workspace::Get<double> (const string name) {
+			
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	return *m_rldb[it->second[0]];
+	
+}
+
+		
+template<> void 
+Workspace::GetMatrix        (const string name, rldb_data& r) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+		
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	Ptr< Matrix<double> > tmp = m_rldb[it->second[0]];
+	
+	for (int j = 0; j < INVALID_DIM; j++) {
+		r.dims[j] = tmp->Dim(j);
+		r.res[j]  = tmp->Res(j);
+	}
+	
+	r.vals.length(tmp->Size()); 
+	
+	memcpy (&r.vals[0], &tmp->At(0), tmp->Size() * sizeof(double));
+	
+}
+		
+
+template<> void
+Workspace::GetMatrix         (const string name, Matrix<double>& m) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	m = *m_rldb[it->second[0]];
+	
+}
+		
+	
+template<> void 
+Workspace::SetMatrix        (const string name, const rldb_data& r)   {
+	
+	size_t mdims [INVALID_DIM];
+	float  mress [INVALID_DIM];
+	
+	for (int i = 0; i < INVALID_DIM; i++) {
+		mdims[i] = r.dims[i];
+		mress[i] = r.res[i];
+	}
+	
+	Ptr< Matrix<double> > tmp;
+	
+	if (m_ref.find (name) != m_ref.end())
+		Free (name);
+
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "double";
+	
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_rldb.insert (pair<string, Ptr< Matrix<double> > > (tag[0], tmp = NEW (Matrix<double>(mdims, mress))));
+
+	tmp->SetClassName(name.c_str());
+	
+	memcpy (&tmp->At(0), &r.vals[0], tmp->Size() * sizeof(double));
+	
+}
+		
+		
+template<> void 
+Workspace::SetMatrix         (const string name, Matrix<double>& m)   {
+	
+	string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "double";
+	
+	if (m_ref.find (name) == m_ref.end()) {
+
+		m_ref.insert (pair<string,string[2]> (name,tag));
+		m_rldb.insert (pair<string, Ptr< Matrix<double> > > (tag[0], NEW (Matrix<double>())));
+
+	}
+	
+	m.SetClassName(name.c_str());
+	
+	*m_rldb[tag[0]] = m;	
+	
+}
+	
+
+template<> Matrix<short>&
+Workspace::AddMatrix        (const string name, Ptr< Matrix<short> > m) {
+	
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "short";
+
+	assert (m_ref.find (name) == m_ref.end());
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_shrt.insert (pair< string, Ptr < Matrix<short> > >(tag[0], m));
+
+	return *m_shrt[tag[0]];
+
+}
+
+
+template<> Matrix<short>&   
+Workspace::Get<short>         (const string name) {
+	
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	return *m_shrt[it->second[0]];
+	
+}
+
+
+template<> void 
+Workspace::GetMatrix          (const string name, shrt_data& p) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+		
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	Ptr< Matrix<short> > tmp = m_shrt[it->second[0]];
+	
+	for (int j = 0; j < INVALID_DIM; j++) {
+		p.dims[j] = tmp->Dim(j);
+		p.res[j]  = tmp->Res(j);
+	}
+	
+	p.vals.length(tmp->Size()); 
+	
+	memcpy (&p.vals[0], &tmp->At(0), tmp->Size() * sizeof(short));
+	
+	Free(name);
+	
+}
+
+
+template<> void
+Workspace::GetMatrix         (const string name, Matrix<short>& m) {
+		
+	if (m_ref.find (name) == m_ref.end())
+		return;
+		
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	m = *m_shrt[it->second[0]];
+	
+}
+
+		
+template<> void 
+Workspace::SetMatrix         (const string name, const shrt_data& p)   {
+	
+	size_t mdims [INVALID_DIM];
+	float  mress [INVALID_DIM];
+	
+	for (int i = 0; i < INVALID_DIM; i++) {
+		mdims[i] = p.dims[i];
+		mress[i] = p.res[i];
+	}
+	
+	Ptr< Matrix<short> > tmp;
+	
+	if (m_ref.find (name) != m_ref.end())
+		Free (name);
+
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "short";
+	
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_shrt.insert (pair<string, Ptr< Matrix<short> > > (tag[0], tmp = NEW (Matrix<short>(mdims, mress))));
+
+	tmp->SetClassName(name.c_str());
+	
+	memcpy (&tmp->At(0), &p.vals[0], tmp->Size() * sizeof(short));
+	
+}
+
+
+template<> void 
+Workspace::SetMatrix         (const string name, Matrix<short>& m)   {
+	
+	string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "short";
+		
+	if (m_ref.find (name) == m_ref.end()) {
+
+		m_ref.insert (pair<string,string[2]> (name,tag));
+		m_shrt.insert (pair<string, Ptr< Matrix<short> > > (tag[0], NEW (Matrix<short>())));
+
+	}
+	
+	m.SetClassName(name.c_str());
+	
+	*m_shrt[tag[0]] = m;	
+
+}
+
+		
+template<> Matrix<long>&
+Workspace::AddMatrix        (const string name, Ptr< Matrix<long> > m) {
+	
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "long";
+
+	assert (m_ref.find (name) == m_ref.end());
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_long.insert (pair< string, Ptr < Matrix<long> > >(tag[0], m));
+
+	return *m_long[tag[0]];
+
+}
+
+
+template<> Matrix<long>&   
+Workspace::Get<long>         (const string name) {
+	
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	return *m_long[it->second[0]];
+	
+}
+
+
+template<> void 
+Workspace::GetMatrix          (const string name, long_data& p) {
+	
+	if (m_ref.find (name) == m_ref.end())
+		return;
+		
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	Ptr< Matrix<long> > tmp = m_long[it->second[0]];
+	
+	for (int j = 0; j < INVALID_DIM; j++) {
+		p.dims[j] = tmp->Dim(j);
+		p.res[j]  = tmp->Res(j);
+	}
+	
+	p.vals.length(tmp->Size()); 
+	
+	memcpy (&p.vals[0], &tmp->At(0), tmp->Size() * sizeof(long));
+	
+	Free (name);
+	
+}
+
+
+template<> void
+Workspace::GetMatrix         (const string name, Matrix<long>& m) {
+		
+	if (m_ref.find (name) == m_ref.end())
+		return;
+		
+	map<string,string[2]>::iterator it = m_ref.find(name);
+
+	m = *m_long[it->second[0]];
+	
+}
+
+		
+template<> void 
+Workspace::SetMatrix         (const string name, const long_data& p)   {
+	
+	size_t mdims [INVALID_DIM];
+	float  mress [INVALID_DIM];
+	
+	for (int i = 0; i < INVALID_DIM; i++) {
+		mdims[i] = p.dims[i];
+		mress[i] = p.res[i];
+	}
+	
+	Ptr< Matrix<long> > tmp;
+	
+	if (m_ref.find (name) != m_ref.end())
+		Free (name);
+
+	std::string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "long";
+	
+	m_ref.insert (pair<string, string[2]> (name, tag));
+	m_long.insert (pair<string, Ptr< Matrix<long> > > (tag[0], tmp = NEW (Matrix<long>(mdims, mress))));
+
+	tmp->SetClassName(name.c_str());
+	
+	memcpy (&tmp->At(0), &p.vals[0], tmp->Size() * sizeof(long));
+	
+}
+
+
+template<> void 
+Workspace::SetMatrix         (const string name, Matrix<long>& m)   {
+	
+	string tag[2];
+	tag[0] = sha256(name);
+	tag[1] = "long";
+		
+	if (m_ref.find (name) == m_ref.end()) {
+
+		m_ref.insert (pair<string,string[2]> (name,tag));
+		m_long.insert (pair<string, Ptr< Matrix<long> > > (tag[0], NEW (Matrix<long>())));
+
+	}
+	
+	m.SetClassName(name.c_str());
+	
+	*m_long[tag[0]] = m;	
+
+}
+
+		
+map < string, Ptr< Matrix<cxfl> > >& 
+Workspace::CXFLMap () {
+	return m_cxfl;
+}
+
+
+map < string, Ptr< Matrix<cxdb> > >& 
+Workspace::CXDBMap () {
+	return m_cxdb;
+}
+
+
+map < string, Ptr< Matrix<float> > >& 
+Workspace::RLFLMap () {
+	return m_rlfl;
+}
+
+
+map < string, Ptr< Matrix<double> > >& 
+Workspace::RLDBMap () {
+	return m_rldb;
+}
+
+
+map < string, Ptr< Matrix<short> > >& 
+Workspace::SHRTMap () {
+	return m_shrt;
+}
+
+
+map < string, Ptr< Matrix<long> > >& 
+Workspace::LONGMap () {
+	return m_long;
+}
