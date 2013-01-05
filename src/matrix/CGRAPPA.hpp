@@ -158,7 +158,6 @@ private:
 
 		int c = 0;
 
-
 		//Grappa pattern for standard kernel 5x4
 		Matrix<double> p = zeros<double> ((kern_dim[1]-1)*R[1]+1, kern_dim[0], nc);
 		printf ("  patch size in ACS: %s\n", DimsToCString(p));
@@ -173,7 +172,6 @@ private:
 		for (int lin = lins; lin < lins + R[1] -1; lin++)
 			p(ceil(p.Dim(0)/2), lin) = -1.0;
 
-
 		printf ("  source matrix size %s\n", DimsToCString(s));
 
 		int ni  = acs_dim[0] - d[0];
@@ -186,16 +184,11 @@ private:
 						for (int ch = 0; ch < nc; ch++, pos++)
 							s.At(pos + c*s.Dim(0)) = acs(i+col,j+lin,ch);
 
-		//s.MXDump ("s.mat", "s", "");
-		//p.MXDump ("p.mat", "p", "");
-		//acs->MXDump ("acs.mat", "acs", "");
-
-
-		//s = s.Pinv();
-
 		/*
-		  weights = t->*s;
+		s = s.Pinv();
+		weights = t->*s;
 		*/
+
 		printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	}
