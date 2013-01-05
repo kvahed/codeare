@@ -2401,7 +2401,7 @@ template <class T> inline Matrix<bool>
 Matrix<T>::operator> (const T& s) const {
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M < s);
+    res.Dat() = (_M > s);
     return res;
 
 }
