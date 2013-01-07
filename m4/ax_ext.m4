@@ -97,13 +97,18 @@ AC_DEFUN([AX_EXT],
     fi
   ])
 
- AC_CACHE_CHECK([whether avx is supported], [ax_cv_have_avx_ext],
-  [
-    ax_cv_have_avx_ext=no
-    if test "$((0x$ecx>>28&0x01))" = 1; then
-      ax_cv_have_avx_ext=yes
-    fi
-  ])
+case $host in
+  *darwin*)
+    ax_cv_have_avx_ext=no;;
+  *)
+    AC_CACHE_CHECK([whether avx is supported], [ax_cv_have_avx_ext],
+  	 [
+	   ax_cv_have_avx_ext=no
+	   if test "$((0x$ecx>>28&0x01))" = 1; then
+         ax_cv_have_avx_ext=yes
+       fi
+     ]);;
+esac
 
   if test "$ax_cv_have_mmx_ext" = yes; then
     AC_DEFINE(HAVE_MMX,, [Support MMX instructions])
