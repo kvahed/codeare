@@ -814,6 +814,7 @@ enable_openmp
 enable_documentation
 with_pythonpath
 with_fftw
+with_ismrmrdroot
 with_itkroot
 with_matlabroot
 with_blas
@@ -1481,6 +1482,7 @@ Optional Packages:
   --with-pythonpath=PATH  specify an absolute path to python executable when
                           automatic version check (incorrectly) fails
   --with-fftw             	     Set directory of FFTW3 library
+  --with-ismrmrdroot       path to ISMRMRD install dir
   --with-itkroot       path to ITK install dir
   --with-matlabroot       path to MATLAB install dir
   --with-blas             which blas library to use
@@ -11783,10 +11785,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"d08874f8\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"c0670ec9\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Sat Jan 5 13:45:17 2013 +0100\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Jan 7 12:38:35 2013 +0100\"" >>confdefs.h
 
 
 # copyright notice
@@ -23430,6 +23432,72 @@ fi
 
 
 # Checks for C++ libraries with name spaces
+
+# ISMRMRD
+
+# Check whether --with-ismrmrdroot was given.
+if test "${with_ismrmrdroot+set}" = set; then :
+  withval=$with_ismrmrdroot;
+else
+  with_ismrmrdroot=/usr/local/ismrmrd
+fi
+
+
+if test x"$with_ismrmrdroot" != x"no" ; then
+
+    ISMRMRD_ROOT="$with_ismrmrdroot"
+    ISMRMRD_LIB_PATH="${ISMRMRD_ROOT}/lib"
+	CXXFLAGS="${CXXFLAGS} -I${ISMRMRD_ROOT}/include"
+	CPPFLAGS="${CPPFLAGS} -I${ISMRMRD_ROOT}/include"
+
+	for ac_header in ismrmrd_hdf5.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "ismrmrd_hdf5.h" "ac_cv_header_ismrmrd_hdf5_h" "$ac_includes_default"
+if test "x$ac_cv_header_ismrmrd_hdf5_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_ISMRMRD_HDF5_H 1
+_ACEOF
+
+else
+  as_fn_error $? "cannot find ismrmrd_hdf5.h, bailing out" "$LINENO" 5
+fi
+
+done
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for IsmrmrdDataset in -lismrmrd" >&5
+$as_echo_n "checking for IsmrmrdDataset in -lismrmrd... " >&6; }
+	OLD_LIBS=$LIBS
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -lboost_thread -lboost_system"
+
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ismrmrd_hdf5.h>
+int
+main ()
+{
+ISMRMRD::IsmrmrdDataset d("","");
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+   	  ismrmrd_found=yes
+else
+  LIBS=$OLD_LIBS
+   	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no. Cannot find libismrmrd, ismrmrd dump/read not available." >&5
+$as_echo "no. Cannot find libismrmrd, ismrmrd dump/read not available." >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+	if test -z $ismrmrd_found; then
+       LIBS=$OLD_LIBS
+	fi
+
+fi
 
 # HDF5
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getOrder in -lhdf5_cpp" >&5
