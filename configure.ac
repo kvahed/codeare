@@ -434,6 +434,36 @@ AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
 # Checks for C++ libraries with name spaces
 
+# ISMRMRD
+AC_ARG_WITH(ismrmrdroot,[  --with-ismrmrdroot       path to ISMRMRD install dir], 
+        [], [with_ismrmrdroot=/usr/local/ismrmrd])
+
+if test x"$with_ismrmrdroot" != x"no" ; then
+
+    ISMRMRD_ROOT="$with_ismrmrdroot"
+    ISMRMRD_LIB_PATH="${ISMRMRD_ROOT}/lib"
+	CXXFLAGS="${CXXFLAGS} -I${ISMRMRD_ROOT}/include"
+	CPPFLAGS="${CPPFLAGS} -I${ISMRMRD_ROOT}/include"
+
+	AC_CHECK_HEADERS([ismrmrd_hdf5.h], [], [AC_MSG_ERROR([cannot find ismrmrd_hdf5.h, bailing out])])
+
+	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
+	OLD_LIBS=$LIBS
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -lboost_thread -lboost_system"
+
+	AC_TRY_LINK([#include <ismrmrd_hdf5.h>],
+	  [ISMRMRD::IsmrmrdDataset d("","");],
+   	  [AC_MSG_RESULT([yes])]
+   	  ismrmrd_found=yes,
+   	  [LIBS=$OLD_LIBS]
+   	  [AC_MSG_RESULT([no. Cannot find libismrmrd, ismrmrd dump/read not available.])])
+
+	if test -z $ismrmrd_found; then
+       LIBS=$OLD_LIBS
+	fi
+
+fi
+
 # HDF5
 AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
 OLD_LIBS=$LIBS
