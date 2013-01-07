@@ -81,8 +81,12 @@ AC_CXX_HAVE_NUMERIC_LIMITS
 AC_OPENMP
 
 # SIMD capabilities
-AX_EXT
-CXXFLAGS="${CXXFLAGS} ${SIMD_FLAGS}"
+case $host in
+     *x86_64*)
+	AX_EXT
+	CXXFLAGS="${CXXFLAGS} ${SIMD_FLAGS}"
+     ;;
+esac
 
 
 AC_ARG_ENABLE([documentation],
