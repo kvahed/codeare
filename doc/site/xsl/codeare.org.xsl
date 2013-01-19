@@ -61,15 +61,11 @@
 		  </script>
 		  <div class="callout">
 			<a href="download.html" >v1.0b released<br />
-			<span class="date">on 23 mar 2012</span><br/>by kaveh vahedipour</a>
+			<span class="date">on <script type="text/javascript" language="JavaScript">document.write(document.lastModified);</script></span>
+			<br/>by kaveh vahedipour</a>
 		  </div>
 		  <br/>
 
-		  <div class="lastmodified">
-			last modified <script type="text/javascript" language="JavaScript">
-			  document.write(document.lastModified);
-			</script>
-		  </div>
 		</div>
 		
 		<div id="content">

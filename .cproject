@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 5.0.0?>
-
-<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage2">
+<?fileVersion 5.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage2">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="org.eclipse.linuxtools.cdt.autotools.core.toolChain.1728708759">
 			<storageModule externalCElementFile="org.eclipse.linuxtools.cdt.autotools.core.toolChain.1728708759_org.eclipse.cdt.core.settings" id="org.eclipse.linuxtools.cdt.autotools.core.toolChain.1728708759" name="Build (GNU)"/>

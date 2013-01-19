@@ -1,14 +1,14 @@
-#include "matrix/IO.hpp"
-#include "io/RawParser.hpp"
+#include "IO.hpp"
+#include "io/IOContext.hpp"
 
 template <class T> bool
 syngotest (Connector<T>* rc) {
 
-	using namespace matrix::io::SyngoMR;
+	using namespace codeare::matrix::io;
 	
 	std::string in = std::string (base + std::string (data));
 	
-	Matrix<cxfl>  meas;
+	Matrix<cxfl> meas;
 	Matrix<float> sync;
 	std::string   fname;
 	
@@ -17,22 +17,18 @@ syngotest (Connector<T>* rc) {
 		return false;
 	}
 
-	RawParser rp = RawParser (fname, true);
-	if (rp.Status()!=MF_OK) {
+	IOContext ioc (fname, SYNGOMR);
+
+	if (ioc.Status() != RRSModule::OK) {
 		printf ("\n  Couldn't initialise RawParser. Exiting!\n");
 		return false;
 	}
 
-	rp.Parse();
-	
-	Data<cxfl> dmeas = rp.GetMeas();
-	meas = Matrix<cxfl> (dmeas.dims, dmeas.ress);
-	meas.Dat() = dmeas.data;
-	meas = squeeze(meas);
+	ioc.Read("");
+	meas = squeeze(ioc.Get<cxfl>("meas"));
+	MXDump (meas, "meas.mat", "meas");
 
 	printf ("    Matrix dims: %s\n", DimsToCString(meas));
-
-	rp.CleanUp();
 
 	return true;
 	

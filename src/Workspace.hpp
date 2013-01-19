@@ -4,6 +4,7 @@
 #include "Matrix.hpp"
 #include "Configurable.hpp"
 
+#include <boost/any.hpp>
 #include <map>
 
 #ifdef __WIN32__ 
@@ -12,8 +13,42 @@
   #include "RRSModule.hh"
 #endif
 
+#ifdef __APPLE__
+  #include "AppleDigest.hpp"
+#else
+  #include "Digest.hpp"
+#endif
+
 using namespace std;
 using namespace RRSModule;
+
+template<class T>
+struct CorbaTraits {};
+
+template<>
+struct CorbaTraits<cxfl> {
+	typedef RRSModule::cxfl_data Type;
+};
+template<>
+struct CorbaTraits<cxdb> {
+	typedef RRSModule::cxdb_data Type;
+};
+template<>
+struct CorbaTraits<float> {
+	typedef RRSModule::rlfl_data Type;
+};
+template<>
+struct CorbaTraits<double> {
+	typedef RRSModule::rldb_data Type;
+};
+template<>
+struct CorbaTraits<long> {
+	typedef RRSModule::long_data Type;
+};
+template<>
+struct CorbaTraits<short> {
+	typedef RRSModule::shrt_data Type;
+};
 
 /**
  * @brief Central database for all shared matrices<br/>
@@ -30,6 +65,8 @@ class Workspace : public Configurable {
 	typedef map<string, Ptr< Matrix<double> > > rldb_db;
 	typedef map<string, Ptr< Matrix<short> > > shrt_db;
 	typedef map<string, Ptr< Matrix<long> > > long_db;
+	typedef map<string, boost::any> store;
+	typedef pair<string, boost::any> entry;
 
  public:
 
@@ -70,7 +107,15 @@ class Workspace : public Configurable {
 	 * @param  m     CXFL data storage 
 	 */
 	template <class T> void
-	GetMatrix          (const string name, Matrix<T>& m);
+	GetMatrix          (const string name, Matrix<T>& m) {
+
+		if (m_ref.find (name) == m_ref.end())
+				return;
+
+		reflist::iterator it = m_ref.find(name);
+		m = *boost::any_cast<Ptr<Matrix<T> > >(m_store[it->second[0]]);
+
+	}
 	
 	
 	/**
@@ -80,7 +125,25 @@ class Workspace : public Configurable {
 	 * @param  m     CXFL data storage 
 	 */
 	template <class T> void
-	SetMatrix          (const string name, Matrix<T>& m);
+	SetMatrix          (const string name, Matrix<T>& m) {
+
+		string tag[2];
+		tag[0] = sha256(name);
+		tag[1] = typeid(T).name();
+
+		Ptr<Matrix<T> > pm = NEW (Matrix<T>());
+		boost::any val     = pm;
+
+		if (m_ref.find (name) == m_ref.end()) {
+			m_ref.insert (ref(name,tag));
+			m_store.insert (entry(tag[0], val));
+		}
+
+		m.SetClassName(name.c_str());
+
+		*pm = m;
+
+	}
 	
 	
 	/**
@@ -90,7 +153,25 @@ class Workspace : public Configurable {
 	 * @param  t     Raw data storage type
 	 */
 	template <class T> void
-	GetMatrix        (const string name, T& t);
+	GetMatrix        (const string& name, typename CorbaTraits<T>::Type& t) {
+
+		if (m_ref.find (name) == m_ref.end())
+			return;
+
+		map<string,string[2]>::iterator it = m_ref.find(name);
+
+		Ptr< Matrix<cxfl> > tmp = boost::any_cast<Ptr<Matrix<cxfl> > >(m_store[it->second[0]]);
+
+		for (int j = 0; j < INVALID_DIM; j++) {
+			t.dims[j] = tmp->Dim(j);
+			t.res[j]  = tmp->Res(j);
+		}
+
+		t.vals.length(2 * tmp->Size());
+
+		memcpy (&t.vals[0], &tmp->At(0), tmp->Size() * sizeof(T));
+
+	}
 	
 	
 	/**
@@ -100,7 +181,34 @@ class Workspace : public Configurable {
 	 * @param t      Raw data storage type
 	 */
 	template <class T> void 
-	SetMatrix        (const string name, const T& t);
+	SetMatrix        (const string name, const typename CorbaTraits<T>::Type& t) {
+
+		size_t mdims [INVALID_DIM];
+		float  mress [INVALID_DIM];
+
+		for (int i = 0; i < INVALID_DIM; i++) {
+			mdims[i] = t.dims[i];
+			mress[i] = t.res[i];
+		}
+
+		Ptr<Matrix<T> > pm = NEW (Matrix<T>(mdims, mress));
+		boost::any val = pm;
+
+		if (m_ref.find (name) != m_ref.end())
+			Free (name);
+
+		std::string tag[2];
+		tag[0] = sha256(name);
+		tag[1] = typeid(T).name();
+
+		m_ref.insert (pair<string, string[2]> (name, tag));
+		m_store.insert (entry (tag[0], val));
+
+		pm->SetClassName(name.c_str());
+
+		memcpy (&pm->At(0), &t.vals[0], pm->Size() * sizeof(T));
+
+	}
 	
 	
 	/**
@@ -111,19 +219,22 @@ class Workspace : public Configurable {
 	 * @return       Success
 	 */
 	template <class T> Matrix<T>& 
-	AddMatrix        (const string name, Ptr< Matrix<T> > m);
-	
-	
-	/***
-	 * @brief        Add a matrix to according container
-	 *
-	 * @param  name  Name
-	 * @param  m     The added matrix
-	 * @return       Success
-	 */
-	//template <class T> Matrix<T>& 
-	//AddMatrix        (const string& name, const data_type dt, Ptr< Matrix<T> > m);
-	
+	AddMatrix        (const string name, Ptr< Matrix<T> > m) {
+
+		std::string tag[2];
+		tag[1] = sha256(name);
+		tag[0] = typeid(T).name();
+
+		boost::any value = m;
+
+		assert (m_ref.find (name) == m_ref.end());
+		m_ref.insert (pair<string, string[2]> (name, tag));
+		m_store.insert (entry (tag[0], value));
+
+		return *m;
+
+	}
+
 	
 	/**
 	 * @brief        Get reference to a complex single matrix
@@ -132,8 +243,13 @@ class Workspace : public Configurable {
 	 * @return       Reference to data if existent
 	 */
 	template <class T> Matrix<T>& 
-	Get              (const string name);
-	
+	Get              (const string name) {
+
+		map<string,string[2]>::iterator it = m_ref.find(name);
+		return *boost::any_cast<Ptr<Matrix<T> > >(m_store[it->second[0]]);
+
+	}
+
 	
 	/**
 	 * @brief        Remove a complex double matrix
@@ -143,16 +259,17 @@ class Workspace : public Configurable {
 	 */
 	inline bool 
 	Free             (const string name) {
-
+/*
 		reflist::iterator nit = m_ref.find(name);
 		
 		if (nit == m_ref.end())
 			return false;
 
+
 		if        (nit->second[1].compare("cxfl") == 0) {
-			cxfl_db::iterator dit = m_cxfl.find (nit->second[0]);
-			delete dit->second;
-			m_cxfl.erase(dit);
+			store::iterator dit = m_store.find (nit->second[0]);
+			delete boost::any_cast<Ptr<Matrix<cxfl> > >(dit->second);
+			m_store.erase(dit);
 		} else if (nit->second[1].compare("cxdb") == 0) {
 			cxdb_db::iterator dit = m_cxdb.find (nit->second[0]);
 			delete dit->second;
@@ -176,64 +293,10 @@ class Workspace : public Configurable {
 		} 
 
 		m_ref.erase(nit);
-		
+		*/
 		return true;
 	}
 	
-	
-	/**
-	 * @brief        Get reference to complex single store
-	 *
-	 * @return       Reference to complex single store
-	 */
-	map < string, Ptr< Matrix<cxfl> > >& 
-	CXFLMap          ();
-		
-
-	/**
-	 * @brief        Get reference to complex single store
-	 *
-	 * @return       Reference to complex single store
-	 */
-	map < string, Ptr< Matrix<cxdb> > >& 
-	CXDBMap          ();
-		
-
-	/**
-	 * @brief        Get reference to complex double store
-	 *
-	 * @return       Reference to complex double store
-	 */
-	map < string, Ptr< Matrix<float> > >& 
-	RLFLMap          ();
-		
-
-	/**
-	 * @brief        Get reference to real single store
-	 *
-	 * @return       Reference to real single store
-	 */
-	map < string, Ptr< Matrix<double> > >& 
-	RLDBMap          ();
-		
-
-	/**
-	 * @brief        Get reference to short int store
-	 *
-	 * @return       Reference to short int store
-	 */
-	map < string, Ptr< Matrix<short> > >& 
-	SHRTMap          ();
-
-
-	/**
-	 * @brief        Get reference to long int store
-	 *
-	 * @return       Reference to long int store
-	 */
-	map < string, Ptr< Matrix<long> > >& 
-	LONGMap          ();
-		
 
  private:
 
@@ -248,15 +311,9 @@ class Workspace : public Configurable {
 	 */
 	Workspace (const Workspace&) {};
 
-	reflist             m_ref; /*! @brief Names and hash tags            */
-	
-	cxfl_db m_cxfl; /*!< @brief Complex float data repository  */
-	cxdb_db m_cxdb; /*!< @brief Complex double data repository */
-	rlfl_db m_rlfl; /*!< @brief Real float data repository     */
-	rldb_db m_rldb; /*!< @brief Real double data repository    */
-	shrt_db m_shrt; /*!< @brief Integer data respository       */
-	long_db m_long; /*!< @brief Integer data respository       */
-	
+	reflist m_ref; /*! @brief Names and hash tags            */
+	store   m_store;
+
 	static Workspace *m_inst; /*!< @brief Single database instance       */
 	
 };
