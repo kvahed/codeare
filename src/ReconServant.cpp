@@ -226,7 +226,7 @@ namespace RRServer {
 
 		c.vals.length(tmp.Size());
 
-		memcpy (&c.vals[0], &tmp[0], tmp.Size() * sizeof(cxdb));
+		memcpy (&c.vals[0], &tmp[0], tmp.Size() * sizeof(double));
 
 	}
 
@@ -266,7 +266,7 @@ namespace RRServer {
 
 		c.vals.length(tmp.Size());
 
-		memcpy (&c.vals[0], &tmp[0], tmp.Size() * sizeof(cxdb));
+		memcpy (&c.vals[0], &tmp[0], tmp.Size() * sizeof(short));
 
 	}
 	

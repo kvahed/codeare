@@ -22,33 +22,6 @@
 using namespace std;
 using namespace RRSModule;
 
-template<class T>
-struct CorbaTraits {};
-
-template<>
-struct CorbaTraits<cxfl> {
-	typedef RRSModule::cxfl_data Type;
-};
-template<>
-struct CorbaTraits<cxdb> {
-	typedef RRSModule::cxdb_data Type;
-};
-template<>
-struct CorbaTraits<float> {
-	typedef RRSModule::rlfl_data Type;
-};
-template<>
-struct CorbaTraits<double> {
-	typedef RRSModule::rldb_data Type;
-};
-template<>
-struct CorbaTraits<long> {
-	typedef RRSModule::long_data Type;
-};
-template<>
-struct CorbaTraits<short> {
-	typedef RRSModule::shrt_data Type;
-};
 
 /**
  * @brief Central database for all shared matrices<br/>
@@ -59,12 +32,6 @@ class Workspace : public Configurable {
 
 	typedef map<string, string[2]> reflist;
 	typedef pair<string, string[2]> ref;
-	typedef map<string, Ptr< Matrix<cxfl> > > cxfl_db;
-	typedef map<string, Ptr< Matrix<cxdb> > > cxdb_db;
-	typedef map<string, Ptr< Matrix<float> > > rlfl_db;
-	typedef map<string, Ptr< Matrix<double> > > rldb_db;
-	typedef map<string, Ptr< Matrix<short> > > shrt_db;
-	typedef map<string, Ptr< Matrix<long> > > long_db;
 	typedef map<string, boost::any> store;
 	typedef pair<string, boost::any> entry;
 
@@ -180,7 +147,7 @@ class Workspace : public Configurable {
 	template <class T> Matrix<T>& 
 	Get              (const string name) {
 
-		map<string,string[2]>::iterator it = m_ref.find(name);
+		reflist::iterator it = m_ref.find(name);
 		return *boost::any_cast<Ptr<Matrix<T> > >(m_store[it->second[0]]);
 
 	}
@@ -202,19 +169,18 @@ class Workspace : public Configurable {
 
 		store::iterator dit = m_store.find (nit->second[0]);
 
-		if        (nit->second[1].compare("cxfl") == 0)
-			delete boost::any_cast<Ptr<Matrix<cxfl> > >(dit->second);
-		else if (nit->second[1].compare("cxdb") == 0)
-			delete boost::any_cast<Ptr<Matrix<cxdb> > >(dit->second);
-		else if (nit->second[1].compare("float") == 0)
-			delete boost::any_cast<Ptr<Matrix<float> > >(dit->second);
-		else if (nit->second[1].compare("double") == 0)
+		if      (nit->second[1].compare(typeid(cxfl).name())   == 0)
+			delete boost::any_cast<Ptr<Matrix<cxfl  > > >(dit->second);
+		else if (nit->second[1].compare(typeid(cxdb).name())   == 0)
+			delete boost::any_cast<Ptr<Matrix<cxdb  > > >(dit->second);
+		else if (nit->second[1].compare(typeid(float).name())  == 0)
+			delete boost::any_cast<Ptr<Matrix<float > > >(dit->second);
+		else if (nit->second[1].compare(typeid(double).name()) == 0)
 			delete boost::any_cast<Ptr<Matrix<double> > >(dit->second);
-		else if (nit->second[1].compare("shrt") == 0)
-			delete boost::any_cast<Ptr<Matrix<short> > >(dit->second);
-		else if (nit->second[1].compare("long") == 0)
-			delete boost::any_cast<Ptr<Matrix<long> > >(dit->second);
-
+		else if (nit->second[1].compare(typeid(short).name())   == 0)
+			delete boost::any_cast<Ptr<Matrix<short > > >(dit->second);
+		else if (nit->second[1].compare(typeid(long).name())   == 0)
+			delete boost::any_cast<Ptr<Matrix<long  > > >(dit->second);
 
 		m_store.erase(dit);
 		m_ref.erase(nit);
