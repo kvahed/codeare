@@ -28,11 +28,11 @@ DumpToFile::Process () {
 
 	std::stringstream fname;
 	const char* uid = Attribute ("UID");
-
+/*
 	map<string,Ptr< Matrix<cxfl> > >&   cfm = Workspace::Instance()->CXFLMap();
 	map<string,Ptr< Matrix<double> > >& rdm = Workspace::Instance()->RLDBMap();
 	map<string,Ptr< Matrix<short> > >&  sim = Workspace::Instance()->SHRTMap();
-
+*/
 
 	printf ("Dumping ...\n");
 
@@ -45,7 +45,7 @@ DumpToFile::Process () {
 	fname.str("");
 
 	fname << uid << "_data.mat";
-
+/*
 #ifdef HAVE_MAT_H
 	MATFile* mf = matOpen (fname.str().c_str(), "w");
 
@@ -77,6 +77,7 @@ DumpToFile::Process () {
 		return RRSModule::FILE_ACCESS_FAILED;
 	}
 #endif
+*/
 	printf ("... done\n");
 
 	return RRSModule::OK;

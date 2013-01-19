@@ -11785,10 +11785,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"c0670ec9\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"06ab5011\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Mon Jan 7 12:38:35 2013 +0100\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Jan 7 16:13:05 2013 +0100\"" >>confdefs.h
 
 
 # copyright notice
@@ -21898,6 +21898,20 @@ _ACEOF
 
 else
   as_fn_error $? "cannot find stddef.h, bailing out" "$LINENO" 5
+fi
+
+done
+
+for ac_header in boost/any.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "boost/any.hpp" "ac_cv_header_boost_any_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_any_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_BOOST_ANY_HPP 1
+_ACEOF
+
+else
+  as_fn_error $? "cannot find boost/any.hpp, bailing out" "$LINENO" 5
 fi
 
 done

@@ -1,8 +1,3 @@
-#if defined(__APPLE__)
-#  include "AppleDigest.hpp"
-#else
-#  include "Digest.hpp"
-#endif
 
 template <class T> bool 
 sha256test (Connector<T>* rc) {

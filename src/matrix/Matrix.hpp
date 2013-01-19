@@ -1534,7 +1534,7 @@ public:
      * @param  M        Added matrix.
      * @return          Result
      */
-    template <class S>  Matrix<T>           
+    template <class S>  Matrix<T>&           
     operator-=          (const Matrix<S>& M);
     
     
@@ -1544,7 +1544,7 @@ public:
      * @param  s        Added scalar.
      * @return          Result
      */
-    template <class S> Matrix<T>           
+    template <class S> Matrix<T>&
     operator-=         (const S& s);
     
     
@@ -1590,7 +1590,7 @@ public:
      * @param  M        Added matrix.
      * @return          Result
      */
-    template <class S> Matrix<T>           
+    template <class S> Matrix<T>&
     operator+=          (const Matrix<S>& M);
     
     
@@ -1600,7 +1600,7 @@ public:
      * @param  s        Added scalar.
      * @return          Result
      */
-    template <class S > Matrix<T>           
+    template <class S > Matrix<T>&           
     operator+=          (const S& s);
     
     
@@ -1778,7 +1778,7 @@ public:
      * @param  p        Power.
      * @return          Result
      */
-    Matrix<T>           
+    Matrix<T>&
     operator^=          (const float& p);
     
 
@@ -1808,7 +1808,7 @@ public:
      * @param  M        Factor matrix.
      * @return          Result
      */
-    template <class S> Matrix<T>           
+    template <class S> Matrix<T>&
     operator*=         (const Matrix<S>& M);
     
     
@@ -1818,7 +1818,7 @@ public:
      * @param  s        Factor scalar.
      * @return          Result
      */
-    template <class S> Matrix<T>
+    template <class S> Matrix<T>&
     operator*=         (const S& s);
     
     
@@ -1847,7 +1847,7 @@ public:
      * @param  M        Divisor matrix.
      * @return          Result
      */
-    template <class S> Matrix<T>           
+    template <class S> Matrix<T>&
     operator/=         (const Matrix<S> &M);
     
     
@@ -1857,7 +1857,7 @@ public:
      * @param  s        Divisor scalar.
      * @return          Result
      */
-    template <class S> Matrix<T>           
+    template <class S> Matrix<T>&
     operator/=         (const S& s);
     
     
@@ -2291,14 +2291,18 @@ Matrix<T>::Matrix (const size_t dim[INVALID_DIM], const float res[INVALID_DIM]) 
 template <class T> inline 
 Matrix<T>::Matrix (const Matrix<T> &M) {
     
-    T t;
-    Validate (t);
+	if (this != &M) { 
 
-    memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
-    memcpy (_res, M.Res(), INVALID_DIM * sizeof( float));
-    
-    _M = M.Dat();
-    
+		T t;
+		Validate (t);
+		
+		memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
+		memcpy (_res, M.Res(), INVALID_DIM * sizeof( float));
+		
+		_M = M.Dat();
+		
+	}
+
 }
 
 
@@ -2629,7 +2633,7 @@ Matrix<T>::operator^ (const float& p) const {
 }
 
 
-template <class T> inline Matrix<T>
+template <class T> inline Matrix<T>&
 Matrix<T>::operator ^= (const float& p) {
 
     size_t i = Size();
@@ -2686,7 +2690,7 @@ Matrix<T>::operator* (const S& s) const {
 }
 
 
-template <class T> template <class S> inline Matrix<T> 
+template <class T> template <class S> inline Matrix<T>&
 Matrix<T>::operator *= (const Matrix<S> &M) {
     
     size_t i;
@@ -2708,16 +2712,24 @@ Matrix<T>::operator *= (const Matrix<S> &M) {
 }
 
 
-template <class T> template <class S> inline Matrix<T>
+template <class T> template <class S> inline Matrix<T>&
 Matrix<T>::operator *= (const S& s) {
     
-    _M *= T(s);
+	T t = T (s);
+    
+#pragma omp parallel default (shared) 
+	{
+#pragma omp for
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] *= t;
+	}
+
     return *this;
 
 }
 
 
-template <class T> template <class S> inline Matrix<T> 
+template <class T> template <class S> inline Matrix<T>&
 Matrix<T>::operator += (const Matrix<S> &M) {
 
     for (size_t i = 0; i < INVALID_DIM; i++)
@@ -2737,7 +2749,7 @@ Matrix<T>::operator += (const Matrix<S> &M) {
 }
 
 
-template <class T> template <class S> inline Matrix<T>
+template <class T> template <class S> inline Matrix<T>&
 Matrix<T>::operator+= (const S& s) {
 
 	T t = T (s);
@@ -2754,7 +2766,7 @@ Matrix<T>::operator+= (const S& s) {
 }
 
 
-template <class T> template <class S> inline Matrix<T> 
+template <class T> template <class S> inline Matrix<T>&
 Matrix<T>::operator-= (const Matrix<S>& M) {
 
     for (size_t i = 0; i < INVALID_DIM; i++)
@@ -2772,7 +2784,7 @@ Matrix<T>::operator-= (const Matrix<S>& M) {
 }
 
 
-template <class T> template <class S> inline Matrix<T>
+template <class T> template <class S> inline Matrix<T>&
 Matrix<T>::operator-= (const S& s) {
     
 #pragma omp parallel default (shared) 
@@ -2787,7 +2799,7 @@ Matrix<T>::operator-= (const S& s) {
 }
 
 
-template<class T> template<class S> inline Matrix<T> 
+template<class T> template<class S> inline Matrix<T>&
 Matrix<T>::operator /= (const Matrix<S> &M) {
     
     size_t i;
@@ -2807,7 +2819,7 @@ Matrix<T>::operator /= (const Matrix<S> &M) {
 }
 
 
-template <class T> template<class S> inline Matrix<T>
+template <class T> template<class S> inline Matrix<T>&
 Matrix<T>::operator/= (const S& s) {
     
     assert (s);
