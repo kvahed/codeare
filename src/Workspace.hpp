@@ -147,71 +147,6 @@ class Workspace : public Configurable {
 	
 	
 	/**
-	 * @brief        Get data from recon (Remote connector)
-	 *
-	 * @param  name  Name
-	 * @param  t     Raw data storage type
-	 */
-	template <class T> void
-	GetMatrix        (const string& name, typename CorbaTraits<T>::Type& t) {
-
-		if (m_ref.find (name) == m_ref.end())
-			return;
-
-		map<string,string[2]>::iterator it = m_ref.find(name);
-
-		Ptr< Matrix<cxfl> > tmp = boost::any_cast<Ptr<Matrix<cxfl> > >(m_store[it->second[0]]);
-
-		for (int j = 0; j < INVALID_DIM; j++) {
-			t.dims[j] = tmp->Dim(j);
-			t.res[j]  = tmp->Res(j);
-		}
-
-		t.vals.length(2 * tmp->Size());
-
-		memcpy (&t.vals[0], &tmp->At(0), tmp->Size() * sizeof(T));
-
-	}
-	
-	
-	/**
-	 * @brief        Set data for recon (Remote connector)
-	 *
-	 * @param name   Name
-	 * @param t      Raw data storage type
-	 */
-	template <class T> void 
-	SetMatrix        (const string name, const typename CorbaTraits<T>::Type& t) {
-
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
-
-		for (int i = 0; i < INVALID_DIM; i++) {
-			mdims[i] = t.dims[i];
-			mress[i] = t.res[i];
-		}
-
-		Ptr<Matrix<T> > pm = NEW (Matrix<T>(mdims, mress));
-		boost::any val = pm;
-
-		if (m_ref.find (name) != m_ref.end())
-			Free (name);
-
-		std::string tag[2];
-		tag[0] = sha256(name);
-		tag[1] = typeid(T).name();
-
-		m_ref.insert (pair<string, string[2]> (name, tag));
-		m_store.insert (entry (tag[0], val));
-
-		pm->SetClassName(name.c_str());
-
-		memcpy (&pm->At(0), &t.vals[0], pm->Size() * sizeof(T));
-
-	}
-	
-	
-	/**
 	 * @brief        Add a matrix to according container
 	 *
 	 * @param  name  Name
@@ -259,41 +194,31 @@ class Workspace : public Configurable {
 	 */
 	inline bool 
 	Free             (const string name) {
-/*
+
 		reflist::iterator nit = m_ref.find(name);
 		
 		if (nit == m_ref.end())
 			return false;
 
+		store::iterator dit = m_store.find (nit->second[0]);
 
-		if        (nit->second[1].compare("cxfl") == 0) {
-			store::iterator dit = m_store.find (nit->second[0]);
+		if        (nit->second[1].compare("cxfl") == 0)
 			delete boost::any_cast<Ptr<Matrix<cxfl> > >(dit->second);
-			m_store.erase(dit);
-		} else if (nit->second[1].compare("cxdb") == 0) {
-			cxdb_db::iterator dit = m_cxdb.find (nit->second[0]);
-			delete dit->second;
-			m_cxdb.erase(dit);
-		} else if (nit->second[1].compare("float") == 0) {
-			rlfl_db::iterator dit = m_rlfl.find (nit->second[0]);
-			delete dit->second;
-			m_rlfl.erase(dit);
-		} else if (nit->second[1].compare("double") == 0) {
-			rldb_db::iterator dit = m_rldb.find (nit->second[0]);
-			delete dit->second;
-			m_rldb.erase(dit);
-		} else if (nit->second[1].compare("shrt") == 0) {
-			shrt_db::iterator dit = m_shrt.find (nit->second[0]);
-			delete dit->second;
-			m_shrt.erase(dit);
-		} else if (nit->second[1].compare("long") == 0) {
-			long_db::iterator dit = m_long.find (nit->second[0]);
-			delete dit->second;
-			m_long.erase(dit);
-		} 
+		else if (nit->second[1].compare("cxdb") == 0)
+			delete boost::any_cast<Ptr<Matrix<cxdb> > >(dit->second);
+		else if (nit->second[1].compare("float") == 0)
+			delete boost::any_cast<Ptr<Matrix<float> > >(dit->second);
+		else if (nit->second[1].compare("double") == 0)
+			delete boost::any_cast<Ptr<Matrix<double> > >(dit->second);
+		else if (nit->second[1].compare("shrt") == 0)
+			delete boost::any_cast<Ptr<Matrix<short> > >(dit->second);
+		else if (nit->second[1].compare("long") == 0)
+			delete boost::any_cast<Ptr<Matrix<long> > >(dit->second);
 
+
+		m_store.erase(dit);
 		m_ref.erase(nit);
-		*/
+
 		return true;
 	}
 	
