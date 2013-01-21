@@ -39,16 +39,17 @@ namespace io      {
 		 * @brief Construct with file
 		 *
 		 * @param  fname    Filename
+		 * @param  mode     IO mode (READ/WRITE)
 		 * @param  verbose  Verbose output? (default: true)
 		 */
-		IOFile (const std::string& fname, const IOMode& iom = READ, const bool& verbose = true) :
+		IOFile (const std::string& fname, const IOMode& mode = READ, const bool& verbose = true) :
 			m_fname(fname),
 			m_status(RRSModule::OK),
 			m_fopen(false),
 			m_verb(verbose),
 			m_alloc(false),
 			m_initialised (false),
-			m_mode (iom) {
+			m_mode (mode) {
 
 			// TODO: Check if file exists, set status
 
@@ -66,7 +67,8 @@ namespace io      {
 		/**
 		 * @brief Clean up
 		 */
-		virtual RRSModule::error_code CleanUp () {
+		virtual RRSModule::error_code
+		CleanUp () {
 
 			while (!m_data.empty()) {
 				delete boost::any_cast<Ptr<Matrix<cxfl> > >(m_data.begin()->second);
@@ -83,7 +85,8 @@ namespace io      {
 		 *
 		 * @return  File name
 		 */
-		std::string FileName() const {
+		std::string
+		FileName() const {
 			return m_fname;
 		}
 
@@ -93,7 +96,8 @@ namespace io      {
 		 *
 		 * @return Verbosity
 		 */
-		bool Verbosity() const {
+		bool
+		Verbosity() const {
 			return m_verb;
 		}
 
@@ -103,7 +107,8 @@ namespace io      {
 		 *
 		 * @return Status
 		 */
-		RRSModule::error_code Status () const {
+		RRSModule::error_code
+		Status () const {
 			return m_status;
 		}
 
@@ -113,7 +118,8 @@ namespace io      {
 		 *
 		 * @return Memory allocated?
 		 */
-		bool Allocated () const {
+		bool
+		Allocated () const {
 			return m_alloc;
 		}
 
@@ -123,7 +129,8 @@ namespace io      {
 		 *
 		 * @return Write lock?
 		 */
-		bool Locked () const {
+		bool
+		Locked () const {
 			return (m_mode == WRITE);
 		}
 
@@ -133,7 +140,8 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		virtual RRSModule::error_code Read (const std::string& dname = "") = 0;
+		virtual RRSModule::error_code
+		Read (const std::string& dname = "") = 0;
 
 
 		/**
@@ -141,7 +149,8 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		virtual RRSModule::error_code Write (const std::string& dname = "") = 0;
+		virtual RRSModule::error_code
+		Write (const std::string& dname = "") = 0;
 
 
 		/**
