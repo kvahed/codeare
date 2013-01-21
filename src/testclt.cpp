@@ -32,7 +32,6 @@ int main (int argc, char** argv) {
 		Connector<RemoteConnector>* con = new Connector<RemoteConnector> (name, verbose);
 #endif	
 		
-		// Read configuration file (f.e. share/cgsense/config_human.xml)
 		std::string cf = std::string (base + std::string(config));
 		con->ReadConfig (cf.c_str()); 
 		
@@ -57,6 +56,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "Creators"))              creatorstest (con);
 		else if (!strcmp (test, "MPI"))                   mpitest      (con);
 		else if (!strcmp (test, "SHA256"))                sha256test   (con);
+		else if (!strcmp (test, "ISMRMRD"))               ismrmrdtest  (con);
 		else                                              internaltest (con);
 		
 		delete con;
