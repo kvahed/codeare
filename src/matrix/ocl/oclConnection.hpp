@@ -38,12 +38,11 @@
 
 inline
 std::string
-make_double_kernel        (std::string const & source, std::string const & fp_extension);
-
-
-
-
-
+modify_kernel        ( std::string const &       source,
+                       std::string const & fp_extension,
+                       std::string const &  vector_type,
+                       std::string const &  scalar_type,
+                               int const &            n = 8 );
 
 
 
@@ -95,13 +94,13 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
       void
       Finalise              ();
       
-      template <class T>
+      template <class T, class S>
       oclFunctionObject * const
       makeFunctionObject    (const string & kernel_name,
                              oclDataObject * const * const args, const int & num_args,
                              const KernelType kernel_type, const SyncType sync_type);
                         
-      template <class T>     
+      template <class T, class S>     
       oclFunctionObject * const
       makeFunctionObject    (const vclAlgoType & algo_name,
                              oclDataObject * const * const args, const int & num_args,
@@ -126,8 +125,8 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
       const clDevices       getDevices        () const { return m_devs; }
       const clContext       getContext        () const { return m_cont; }
       const clCommandQueues getCommandQueues  () const { return m_comqs; }
-      template <class T>
-      const clProgram       getProgram        () const { return ocl_precision_trait <T> :: getProgram (this); }
+      template <class T, class S>
+      const clProgram       getProgram        () const { return ocl_precision_trait <T, S> :: getProgram (this); }
       
       
       /****************************************
@@ -216,7 +215,7 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
     
 
       // set central vars for particular precision mode for type T
-      template <class T>
+      template <class T, class S>
       void
       activate              ( );
 
@@ -246,25 +245,29 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
       clCommandQueues          m_comqs;      // each command queue is associated with corresponding device from m_devs
       clProgram              * mp_prog,
                                m_prog_f,     // program containing whole source code (single precision)
-                               m_prog_d;     // program containing whole source code (double precision)
+                               m_prog_d,     // program containing whole source code (double precision)
+                               m_prog_df,
+                               m_prog_fd;
       clKernels              * mp_kernels,
                                m_kernels_f,  // kernels available in m_prog_f
-                               m_kernels_d;  // kernels available in m_prog_d
-      std::vector<clBuffers> * mp_buffers,
-                               m_buffers_f,  // vectors of buffers for each kernels arguments (single prec)
-                               m_buffers_d;  // vectors of buffers for each kernels arguments (double prec)
+                               m_kernels_d,  // kernels available in m_prog_d
+                               m_kernels_df,
+                               m_kernels_fd;
+//      std::vector<clBuffers> * mp_buffers,
+//                               m_buffers_f,  // vectors of buffers for each kernels arguments (single prec)
+//                               m_buffers_d;  // vectors of buffers for each kernels arguments (double prec)
       cl_int                   m_error;      // error variable
       VerbosityLevel           m_verbose;    // verbosity level
       clKernel               * mp_actKernel;
       int                      num_kernel;
 
       
-      template <class T>
+      template <class T, class S>
       struct ocl_precision_trait
       { };
 
 
-      template <class T> //, class trait = read_kernel_source_trait <T> >
+      template <class T, class S> //, class trait = read_kernel_source_trait <T> >
       static const char * ReadSource   (const char *, int * size);
              int          BuildProgram ();
              const char * errorString (cl_int e);
@@ -274,6 +277,7 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
        ** constructors **
        ******************/
       oclConnection         (const char *,
+                             const char *,
                              cl_device_type device_type = CL_DEVICE_TYPE_GPU,
                              VerbosityLevel verbose = VERB_NONE);
       
@@ -287,7 +291,8 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
   
   
       template <>
-      struct oclConnection :: ocl_precision_trait <float>
+      template <>
+      struct oclConnection :: ocl_precision_trait <float, float>
       {
 
         public:
@@ -309,13 +314,13 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
             return & (con -> m_prog_f);
           }
           
-          static inline
+/*          static inline
           std::vector <clBuffers> *
           getBuffers    (oclConnection * const con)
           {
             return & (con -> m_buffers_f);
           }
-          
+*/          
           static inline
           clKernels *
           getKernels    (oclConnection * const con)
@@ -326,9 +331,10 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
       };
 
       template <>
-      struct oclConnection :: ocl_precision_trait <double>
+      template <>
+      struct oclConnection :: ocl_precision_trait <double, double>
       {
-
+      
         public:
   
 
@@ -338,7 +344,10 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
           const char *
           modify_source (void * buf, int * size)
           {
-            std::string * tmp_str = new string (make_double_kernel (std::string ((const char *) buf), std::string ("cl_khr_fp64")));
+            std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+                                                                std::string ("cl_khr_fp64"),
+                                                                std::string ("double"),
+                                                                std::string ("double") ) );
             *size = tmp_str -> size () * sizeof (char);
             return tmp_str->c_str ();
           }
@@ -350,13 +359,13 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
             return & (con -> m_prog_d);
           }
           
-          static inline
+/*          static inline
           std::vector <clBuffers> *
           getBuffers    (oclConnection * const con)
           {
             return & (con -> m_buffers_d);
           }
-          
+*/          
           static inline
           clKernels *
           getKernels    (oclConnection * const con)
@@ -367,7 +376,100 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
       };
 
       template <>
-      struct oclConnection :: ocl_precision_trait <bool>
+      template <>
+      struct oclConnection :: ocl_precision_trait <double, float>
+      {
+
+        public:
+  
+
+          typedef double elem_type_A;
+          typedef  float elem_type_B;
+
+          static inline
+          const char *
+          modify_source (void * buf, int * size)
+          {
+            std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+                                                                std::string ("cl_khr_fp64"),
+                                                                std::string ("double"),
+                                                                std::string ("float") ) );
+            *size = tmp_str -> size () * sizeof (char);
+            return tmp_str->c_str ();
+          }
+          
+          static inline
+          clProgram *
+          getProgram    (oclConnection * const con)
+          {
+            return & (con -> m_prog_df);
+          }
+          
+/*          static inline
+          std::vector <clBuffers> *
+          getBuffers    (oclConnection * const con)
+          {
+            return & (con -> m_buffers_df);
+          }
+*/          
+          static inline
+          clKernels *
+          getKernels    (oclConnection * const con)
+          {
+            return & (con -> m_kernels_df);
+          }
+
+      };
+
+      template <>
+      template <>
+      struct oclConnection :: ocl_precision_trait <float, double>
+      {
+      
+        public:
+  
+
+          typedef  float elem_type_A;
+          typedef double elem_type_B;
+
+          static inline
+          const char *
+          modify_source (void * buf, int * size)
+          {
+            std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+                                                                std::string ("cl_khr_fp64"),
+                                                                std::string ("float"),
+                                                                std::string ("double") ) );
+            *size = tmp_str -> size () * sizeof (char);
+            return tmp_str->c_str ();
+          }
+          
+          static inline
+          clProgram *
+          getProgram    (oclConnection * const con)
+          {
+            return & (con -> m_prog_fd);
+          }
+          
+/*          static inline
+          std::vector <clBuffers> *
+          getBuffers    (oclConnection * const con)
+          {
+            return & (con -> m_buffers_fd);
+          }
+*/          
+          static inline
+          clKernels *
+          getKernels    (oclConnection * const con)
+          {
+            return & (con -> m_kernels_fd);
+          }
+          
+      };
+
+      template <>
+      template <class S>
+      struct oclConnection :: ocl_precision_trait <bool, S>
       {
 
         public:
@@ -389,13 +491,13 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
             return & (con -> m_prog_f);
           }
           
-          static inline
+/*          static inline
           std::vector <clBuffers> *
           getBuffers    (oclConnection * const con)
           {
             return & (con -> m_buffers_f);
           }
-          
+*/          
           static inline
           clKernels *
           getKernels    (oclConnection * const con)
@@ -439,15 +541,15 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
 
 
 
-  // set central vars for particular precision mode for type T
-  template <class T>
+  // set central vars for particular precision mode for type T (vector) and type S (scalar)
+  template <class T, class S>
   void
   oclConnection ::
   activate              ( )
   {
-    mp_prog    = ocl_precision_trait <T> :: getProgram (this);
-    mp_kernels = ocl_precision_trait <T> :: getKernels (this);
-    mp_buffers = ocl_precision_trait <T> :: getBuffers (this);
+    mp_prog    = ocl_precision_trait <T, S> :: getProgram (this);
+    mp_kernels = ocl_precision_trait <T, S> :: getKernels (this);
+//    mp_buffers = ocl_precision_trait <T, S> :: getBuffers (this);
   }
 
   
@@ -484,7 +586,10 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
   {
   
     if (mp_inst == NULL)
-      mp_inst = new oclConnection ( "./src/matrix/ocl/test.cl", CL_DEVICE_TYPE_GPU, VERB_MIDDLE );
+      mp_inst = new oclConnection ( "./src/matrix/ocl/kernels/single_type_kernels.cl",
+                                    "./src/matrix/ocl/kernels/double_type_kernels.cl",
+                                    CL_DEVICE_TYPE_GPU,
+                                    global_verbosity [OCL_CONNECTION] );
       
     return mp_inst;
     
@@ -656,7 +761,7 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
   
   
   // create function object for running an OpenCL kernel
-  template <class T>
+  template <class T, class S>
   oclFunctionObject * const
   oclConnection ::
   makeFunctionObject    (const        string &               kernel_name,
@@ -686,7 +791,7 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
   
   
   // create function object for running an ViennaCL algorithm
-  template <class T>
+  template <class T, class S>
   oclFunctionObject * const
   oclConnection ::
   makeFunctionObject    (const   vclAlgoType &                 algo,
@@ -705,7 +810,7 @@ make_double_kernel        (std::string const & source, std::string const & fp_ex
     
       if (sync_type == SYNC)
       {
-        algo_obj = new oclViennaClObject <T> (algo, args, num_args, num_scalars, scalars);
+        algo_obj = new oclViennaClObject <T, S> (algo, args, num_args, num_scalars, scalars);
       }
       else
       {

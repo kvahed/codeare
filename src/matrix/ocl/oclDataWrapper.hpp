@@ -191,6 +191,7 @@
     
     }
 
+    // precondition: buffer exists now!
     if (oclDataObject :: mp_modified [CPU])
     {
       

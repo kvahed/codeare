@@ -27,17 +27,17 @@
    **************************/
 
   // classes
-  template <class T>
+  template <class T, class S>
   class vclAlgoFunctor;
-  template <class T>
+  template <class T, class S>
   class oclViennaClObject;
 
   // functions
-  template <class T>
+  template <class T, class S>
   static
-  const vclAlgoFunctor <T> * const
+  const vclAlgoFunctor <T, S> * const
   get_algo_functor     (const       vclAlgoType &            algo_name,
-                        const oclViennaClObject <T> * const   p_vclObj);
+                        const oclViennaClObject <T, S> * const   p_vclObj);
   
   
   
@@ -46,7 +46,7 @@
    ** class: oclViennaClObject **
    **   (derived)              **
    ******************************/
-  template <class T>
+  template <class T, class S>
   class oclViennaClObject : public oclFunctionObject
   {
   
@@ -111,8 +111,8 @@
       /**
        * @brief           retrieve data wrapped by a ViennaCl matrix
        */
-      template <class S>
-      viennacl :: vector <S>
+      template <class U>
+      viennacl :: vector <U>
       getVCLVector        (const int num )
       const;
       
@@ -120,9 +120,9 @@
       /**
        * @brief           retrieve data wrapped by a ViennaCl matrix
        */
-      template <class S,
+      template <class U,
                 typename R>
-      viennacl :: matrix <S, R>
+      viennacl :: matrix <U, R>
       getVCLMatrix        (const        int  num,
                                         int    m,
                                         int    n )
@@ -137,10 +137,10 @@
        ** member variables **
        **********************/
       
-      const            int             m_num_scalars;
-                       int     * const mp_scalars;
+      const            int                m_num_scalars;
+                       int        * const mp_scalars;
     
-      const vclAlgoFunctor <T> * const mp_algo_functor;
+      const vclAlgoFunctor <T, S> * const mp_algo_functor;
     
   
   }; // class oclViennaClObject
@@ -157,9 +157,9 @@
   /**
    * @brief           retrieve size at given position
    */
-  template <class T>
+  template <class T, class S>
   int
-  oclViennaClObject <T> ::
+  oclViennaClObject <T, S> ::
   getScalarArg          (const int num)
   const
   {
@@ -170,11 +170,11 @@
     {
       throw oclError ("Requested size argument number is out of range!", "oclViennaClObject :: getSizeArg");
     }
-/*    else if (mp_scalars == NULL)
+    else if (mp_scalars == NULL)
     {
       throw oclError ("No Sizes given!", "oclViennaClObject :: getSizeArg");
     }
-*/    
+    
     return mp_scalars [num];
   
   }
@@ -184,10 +184,10 @@
   /**
    * @brief               refer to class definition
    */
-  template <class T>
-  template <class S>
-  viennacl :: vector <S>
-  oclViennaClObject <T> ::
+  template <class T, class S>
+  template <class U>
+  viennacl :: vector <U>
+  oclViennaClObject <T, S> ::
   getVCLVector            ( const int num )
   const
   {
@@ -199,7 +199,7 @@
       throw oclError ("Requested argument number is out of range!", "oclViennaClObject :: getVCLVector");
     }
     
-    return mpp_args [num] -> getVCLVector <S> ();
+    return mpp_args [num] -> getVCLVector <U> ();
     
   }
 
@@ -209,11 +209,11 @@
   /**
    * @brief               refer to class definition
    */
-  template <class T>
-  template <class S,
+  template <class T, class S>
+  template <class U,
             typename R>// = viennacl :: column_major>
-  viennacl :: matrix <S, R>
-  oclViennaClObject <T> ::
+  viennacl :: matrix <U, R>
+  oclViennaClObject <T, S> ::
   getVCLMatrix            ( const int num,
                             const int   m,
                             const int   n )
@@ -230,7 +230,7 @@
     try
     {
     
-      return mpp_args [num] -> getVCLMatrix <S, R> (m, n);
+      return mpp_args [num] -> getVCLMatrix <U, R> (m, n);
   
     }
     catch (oclError & err)
@@ -259,8 +259,8 @@
   /**
    * @brief               virtual destructor
    */
-  template <class T>
-  oclViennaClObject <T> ::
+  template <class T, class S>
+  oclViennaClObject <T, S> ::
   ~oclViennaClObject      ()
   {
     
@@ -277,9 +277,9 @@
   /**
    * @brief               refer to class definition
    */
-  template <class T>
+  template <class T, class S>
   void
-  oclViennaClObject <T> ::
+  oclViennaClObject <T, S> ::
   run                     ()
   {
     

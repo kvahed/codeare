@@ -96,7 +96,7 @@
    ** global vars **
    *****************/
 
-   VerbosityLevel verbosity = VERB_NONE; //VERB_HIGH;
+  VerbosityLevel verbosity = VERB_NONE; //VERB_HIGH;
   
   static const VerbosityLevel global_verbosity [MAX_ID] =
   {
@@ -206,6 +206,53 @@
     {
     
       std::cout << msg1 << msg2 << msg3 << std::endl;
+    
+    }
+  
+  }
+
+
+  /**
+   * @brief               print given messages, if v_level matches
+   */
+  inline
+  void
+  print_optional          ( const           char *    msg1,
+                            const           char *    msg2,
+                            const           char *    msg3,
+                            const           char *    msg4,
+                                  VerbosityLevel   v_level )
+  {
+  
+    /* check verbosity level */
+    if (v_level <= verbosity)
+    {
+    
+      std::cout << msg1 << msg2 << msg3 << msg4 << std::endl;
+    
+    }
+  
+  }
+
+
+  /**
+   * @brief               print given messages, if v_level matches
+   */
+  inline
+  void
+  print_optional          ( const           char *    msg1,
+                            const           char *    msg2,
+                            const           char *    msg3,
+                            const           char *    msg4,
+                            const           char *    msg5,
+                                  VerbosityLevel   v_level )
+  {
+  
+    /* check verbosity level */
+    if (v_level <= verbosity)
+    {
+    
+      std::cout << msg1 << msg2 << msg3 << msg4 << msg5 << std::endl;
     
     }
   

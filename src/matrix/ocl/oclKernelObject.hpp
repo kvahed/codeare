@@ -136,7 +136,7 @@
     // oclConnection for reuse in this function
     oclConnection * oclCon = oclConnection :: Instance ();
   
-    print_optional ("oclKernelObject :: run ()", v_level);
+    print_optional ("oclKernelObject :: run ( \"", m_kernel_name.c_str (), "\" )", v_level);
     
     // activate kernel
     oclCon -> activateKernel (m_kernel_name);
@@ -154,7 +154,7 @@
     }
     
     // run kernel
-    cl::NDRange global_dims (1024);
+    cl::NDRange global_dims (512);
     cl::NDRange local_dims = cl::NullRange;
     oclCon -> runKernel (global_dims, local_dims);
 

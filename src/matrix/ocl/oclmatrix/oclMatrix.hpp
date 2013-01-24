@@ -322,7 +322,7 @@
       oclMatrix           (const oclMatrix <T> & mat)
                         : Matrix <T> ((Matrix<T>) mat),
                           class_name (ocl_matrix_type_traits <T> :: type_name ()),
-                          mp_oclData (oclOperations <T> :: make_GPU_Obj (& (       Matrix <T> :: _M [0]),
+                          mp_oclData (oclOperations <T> :: make_GPU_Obj (& (   Matrix <T> :: _M [0]),
                                                                                Matrix <T> :: Size (),
                                                                                     * mat.mp_oclData,
                                                                         oclDataObject :: COPY_BUFFER ))
@@ -1440,37 +1440,37 @@
        ** ****************************************/
       //@{ /*************************************************************************************/
 
+
+      /**
+       * @brief           Elementwise unary plus.
+       *
+       * @return          Identity of this - matrix.
+       */
+      oclMatrix <T>
+      operator+           ()
+      const;
+
       
       /**
        * @brief           Elementwise addition of two matrices.
        *
-       * @param mat       Matrix additive.
+       * @param  mat      Matrix additive.
        */
       template <class S>
-      inline
       oclMatrix <T>
-      operator+           (const oclMatrix <S> & mat) const;
+      operator+           (const oclMatrix <S> & mat)
+      const;
 
-      
+
       /**
-       * @brief           Elementwise subtraction of two matrices.
+       * @brief           Elementwise addition of all elements with a scalar.
        *
-       * @param mat       Matrix substruent.
+       * @param  s        Scalar additive.
        */
       template <class S>
-      inline
       oclMatrix <T>
-      operator-           (const oclMatrix <S> & mat) const;
-      
-      
-      /**
-       * @brief           Elementwise increment (uniform).
-       *
-       * @param inc       Increment.
-       */
-      template <class S>
-      oclMatrix <T> &
-      operator+=          (const S & inc);
+      operator+           (const S & s)
+      const;
 
 
       /**
@@ -1484,6 +1484,58 @@
 
 
       /**
+       * @brief           Elementwise increment (uniform).
+       *
+       * @param inc       Increment.
+       */
+      template <class S>
+      oclMatrix <T> &
+      operator+=          (const S & inc);
+
+
+      /**
+       * @brief           Elementwise unary minus.
+       *
+       * @return          Additive inverse.
+       */
+      oclMatrix <T>
+      operator-           ()
+      const;
+
+      
+      /**
+       * @brief           Elementwise subtraction of two matrices.
+       *
+       * @param  mat      Matrix substruent.
+       */
+      template <class S>
+      oclMatrix <T>
+      operator-           (const oclMatrix <S> & mat)
+      const;
+
+
+      /**
+       * @brief           Elementwise subtraction of all elements by a scalar.
+       *
+       * @param  s        Scalar substruent.
+       */
+      template <class S>
+      oclMatrix <T>
+      operator-           (const S & s)
+      const;
+      
+
+      /**
+       * @brief           Elementwise decrement (non uniform).
+       *
+       * @param  dec_mat  Matrix containing decrements.
+       */
+      template <class S>
+      oclMatrix <T> &
+      operator-=          (const oclMatrix <S> & dec_mat);
+
+
+      /**
        * @brief           Elementwise decrement (uniform).
        *
        * @param dec       Decrement.
@@ -1494,13 +1546,137 @@
       
       
       /**
-       * @brief           Elementwise decrement (non uniform).
+       * @brief           Elementwise raise to power of p.
        *
-       * @param dec_mat   Matrix containing decrements.
+       * @param  p        Power.
+       */
+      oclMatrix <T>
+      operator^           (const float & p)
+      const;
+      
+      
+      /**
+       * @brief           Elementwise raise to power of p
+       *                  and assignment.
+       *
+       * @param  p        Power.
+       */
+      oclMatrix <T> &
+      operator^=          (const float & p);
+      
+      
+      /**
+       * @brief           Elementwise multiplication with a scalar.
+       *
+       * @param  s        Factor scalar.
+       * @return          Scaled matrix.
+       */
+      template <class S>
+      oclMatrix <T>
+      operator*           (const S & s)
+      const;
+      
+      
+      /**
+       * @brief           Elementwise multiplication with a scalar
+       *                  and assignment.
+       *
+       * @param  s        Factor scalar.
+       * @return          Scaled matrix.
        */
       template <class S>
       oclMatrix <T> &
-      operator-=          (const oclMatrix <S> & dec_mat);
+      operator*=          (const S & s);
+      
+      
+      /**
+       * @brief           Elementwise multiplication with a matrix.
+       *
+       * @param  mat      Factor matrix.
+       * @return          Result matrix.
+       */
+      template <class S>
+      oclMatrix <T>
+      operator*           (const oclMatrix <S> & mat)
+      const;
+      
+      
+      /**
+       * @brief           Elementwise multiplication with a matrix
+       *                  and assignment.
+       *
+       * @param  mat      Factor matrix.
+       * @return          Result matrix.
+       */
+      template <class S>
+      oclMatrix <T> &
+      operator*=          (const oclMatrix <S> & mat);
+
+
+      /**
+       * @brief           Elementwise division by a sclar.
+       *
+       * @param  s        Divisor scalar.
+       * @return          Result matrix.
+       */
+      template <class S>
+      oclMatrix <T>
+      operator/           (const S & s)
+      const;
+
+
+      /**
+       * @brief           Elementwise division by a scalar and assignment.
+       *
+       * @param  s        Divisor scalar.
+       * @return          Result matrix.
+       */
+      template <class S>
+      oclMatrix <T> &
+      operator/=          (const S & s);
+      
+      
+      /**
+       * @brief           Elementwise division by a matrix.
+       *
+       * @param  mat      Divisor matrix.
+       * @return          Result matrix.
+       */
+      template <class S>
+      oclMatrix <T>
+      operator/           (const oclMatrix <S> & mat)
+      const;
+      
+
+      /**
+       * @brief           Elementwise division by a matrix and assignment.
+       *
+       * @param  mat      Divisor matrix.
+       * @return          Result matrix.
+       */
+      template <class S>
+      oclMatrix <T> &
+      operator/=          (const oclMatrix <S> & mat);
+
+      
+      //@} /*************************************************************************************/
+      
+      
+      
+      /** ****************************************
+       * @name            Linear Algebra        **
+       ** ****************************************/
+      //@{ /*************************************************************************************/
+      
+      
+      /**
+       * @brief           Transposition / Complex conjugation. (i.e. this')
+       *
+       * @return          Transposed matrix.
+       */
+      oclMatrix <T>
+      operator!           ()
+      const;
 
 
       /**
@@ -1511,7 +1687,7 @@
       oclMatrix <T>
       operator->*         (const oclMatrix <T> & fac_mat)
       const;
-
+      
       
       //@} /*************************************************************************************/
       
@@ -1677,10 +1853,43 @@
       
       
       /**
-       * @brief           
+       * @brief           Bitwise AND operation (mask).
+       *
+       * @param  mat      Mask matrix.
+       *
+       * @return          Cross-section or zero.
+       */
+      oclMatrix <T>
+      operator&           (const oclMatrix <bool> & mat)
+      const;
+
+
+      /**
+       * @brief           Elementwise AND operation.
+       *
+       * @param  mat      Compared matrix.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons.
+       */
+      oclMatrix <bool>
+      operator&&          (const oclMatrix <T> & mat)
+      const;
+      
+      
+      /**
+       * @brief           Elementwise OR operation.
+       *
+       * @param  mat      Compared matrix.
+       *
+       * @return          Boolean oclMatrix containing elements' comparisons.
+       */
+      oclMatrix <bool>
+      operator||          (const oclMatrix <T> & mat)
+      const;
       
       
       //@} /*************************************************************************************/
+          
             
       
       /**
@@ -1735,7 +1944,7 @@
       /*************************************
        ** friend declarations (all typed) **
        *************************************/
-      friend class oclMatrix <bool>;
+      friend class oclMatrix <bool>;      // for access to private members of !! different !! template type //
       friend class oclMatrix <float>;
       friend class oclMatrix <double>;
       friend class oclMatrix <size_t>;
