@@ -33,7 +33,7 @@ modify_kernel              ( std::string const &       source,
 {
 
   std::stringstream ss;          
-  ss << "#pragma OPENCL EXTENSION " << fp_extension << " : enable\n\n";
+  ss << "#pragma OPENCL EXTENSION " << fp_extension << ": enable\n\n";
   std::string result = ss.str ();
           
   ss.str (std::string ());
@@ -111,6 +111,7 @@ BuildProgram            ()
   try {
     m_error = m_prog_f.build (m_devs);
   } catch (cl::Error cle) {
+    cout << " Type: <<float, float>>" << std::endl;
     cout << "Error while building program: " << cle.what ()                                                << endl;
     cout << "Build Status: "                 << m_prog_f.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
     cout << "Build Options:\t"               << m_prog_f.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
@@ -120,6 +121,7 @@ BuildProgram            ()
   try {
     m_error = m_prog_d.build (m_devs);
   } catch (cl::Error cle) {
+    cout << " Type: <<double, double>>" << std::endl;
     cout << "Error while building program: " << cle.what ()                                                << endl;
     cout << "Build Status: "                 << m_prog_d.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
     cout << "Build Options:\t"               << m_prog_d.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
@@ -129,6 +131,7 @@ BuildProgram            ()
   try {
     m_error = m_prog_df.build (m_devs);
   } catch (cl::Error cle) {
+    cout << " Type: <<double, float>>" << std::endl;
     cout << "Error while building program: " << cle.what ()                                                << endl;
     cout << "Build Status: "                 << m_prog_df.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
     cout << "Build Options:\t"               << m_prog_df.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
@@ -138,6 +141,7 @@ BuildProgram            ()
   try {
     m_error = m_prog_fd.build (m_devs);
   } catch (cl::Error cle) {
+    cout << " Type: <<float, double>>" << std::endl;
     cout << "Error while building program: " << cle.what ()                                                << endl;
     cout << "Build Status: "                 << m_prog_fd.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
     cout << "Build Options:\t"               << m_prog_fd.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;

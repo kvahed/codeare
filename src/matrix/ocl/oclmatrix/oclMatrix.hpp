@@ -1250,7 +1250,7 @@
                            const oclMatrix <T> & m)
       {
       
-        return m >= s;
+        return m <= s;
       
       }
       
@@ -1270,7 +1270,7 @@
                            const oclMatrix <T> & m)
       {
       
-        return m <= s;
+        return m >= s;
       
       }
 
@@ -1310,7 +1310,7 @@
                           const oclMatrix <T> & m)
       {
       
-        return m > s;
+        return m < s;
       
       }
 
@@ -1330,7 +1330,7 @@
                           const oclMatrix <T> & m)
       {
       
-        return m < s;
+        return m > s;
       
       }
 

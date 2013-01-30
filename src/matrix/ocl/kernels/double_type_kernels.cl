@@ -80,6 +80,37 @@ vector_add                ( __global A_type *      arg1,
 
 
 /**
+ * @brief                 Elementwise subtract elements of the two vectors.
+ *
+ * @param  arg1           Start address of first vector.
+ * @param  arg2           Start address of second vector.
+ * @param  result         Start address of result vector.
+ * @param  num_elems      Number of elements of all vectors.
+ */
+__kernel
+void
+vector_sub                ( __global A_type *      arg1,
+                            __global B_type *      arg2,
+                            __global A_type *    result,
+                            __global    int * num_elems )
+{
+
+  int index, global_size, global_inc, local_position;
+  
+  /* initialize parameters */
+  init_params (&index, &global_size, &global_inc, &local_position);
+
+  /* calculation */
+  for (int i = local_position; i < *num_elems; i += global_inc)
+  {
+    result [i] = arg1 [i] - arg2 [i];
+  }
+
+}
+
+
+
+/**
  * @brief                 Elementwise increment vector.
  *
  * @param  arg1           Start address of first vector.
@@ -166,7 +197,7 @@ vector_mult               ( __global A_type *      arg1,
   /* calculation */
   for (int i = local_position; i < *num_elems; i += global_inc)
   {
-    res [i] = arg1 [i] * arg2 [i];
+    res [i] = ((A_type) arg2 [i]) * arg1 [i];
   }
   
 }
@@ -228,7 +259,8 @@ vector_div                ( __global A_type *      arg1,
   /* calculation */
   for (int i = local_position; i < *num_elems; i += global_inc)
   {
-    res [i] = (arg2 [i] != 0) ? arg1 [i] / arg2 [i] : 0;
+    A_type tmp = (A_type) arg2 [i];
+    res [i] = (arg2 [i] != 0) ? arg1 [i] / tmp : 0;
   }
   
 }

@@ -12,55 +12,8 @@
 
 // own
 # include "matrix/ocl/timer.h"
+# include "ocl/test_ops.hpp"
 
-
-/**********************
- ** type definitions **
- **********************/
-typedef double elem_type;
-typedef oclMatrix <elem_type> Matrix_type;
-
-
-/*************
- ** structs **
- *************/
-
-struct result
-{
-  
-  bool equal;
-  elem_type mean_abs_err;
-  
-};
-
-
-template <class T>
-result
-mat_equal             ( const oclMatrix <T> & ocl_mat,
-                        const    Matrix <T> &    smat )
-{
-
-  ocl_mat.getData (); // !!! //
-  Matrix <bool> mat_comp = (smat == ocl_mat);
-  result res = {true, 0.0};
-  for (int i = 0; i < smat.Height (); i++)
-    for (int j = 0; j < smat.Width (); j++)
-    {
-      res.equal &= mat_comp (i,j);
-    }
-  
-  if (! res.equal)
-  {
-    Matrix <elem_type> diff = smat - ((Matrix <elem_type>) ocl_mat);
-    for (int i = 0; i < smat.Height (); i++)
-      for (int j = 0; j < smat.Width (); j++)
-        res.mean_abs_err += abs (diff (i, j));
-    res.mean_abs_err /= smat.Size ();
-  }
-  
-  return res;
-
-}
 
 
 template <class T>
@@ -234,7 +187,7 @@ oclAccessTest       ( bool verbose )
 }
 
 
-template <class T>
+template <class T, class S>
 bool
 oclComparisonsTest    ( bool verbose )
 {
@@ -247,266 +200,81 @@ oclComparisonsTest    ( bool verbose )
 
   size_t  dimX     = 2048,
           dimY     = 2048;
-  double  time_ocl = 0.0,
-          time_s   = 0.0;
-  MyTimer t;  
   
-  std::cout << " size: " << dimX << " x " << dimY << std::endl;
+  std::cout << " size: " << dimX << " x " << dimY << std::endl << std::endl;
 
   /* compare matrix and scalar */
   {
+    std::cout << "\t\t  * Matrix: A, scalar: s * " << std::endl;
+    std::cout <<                                      std::endl;
+    // Init //
+                  S      scalar = (S) 3;
+             Matrix <T>     mat = Init2D <T> (dimX, dimY);
+          oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
+    // Tests //
     if (verbose) std::cout << " * A == s                      ";
-           T       scalar = 3;
-    const    Matrix <T>        mat1 = Init2D <T> (dimX, dimY);
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 == scalar;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 == scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* compare matrix and scalar */
-  {
+    operator_eval_MS <T, S, bool> (mat, ocl_mat, scalar, opEqual <T, S, bool> ());
     if (verbose) std::cout << " * A != s                      ";
-           T       scalar = 3;
-    const    Matrix <T>        mat1 = Init2D <T> (dimX, dimY);
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 != scalar;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 != scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* compare matrix and scalar */
-  {
+    operator_eval_MS <T, S, bool> (mat, ocl_mat, scalar, opInequal <T, S, bool> ());
     if (verbose) std::cout << " * A >  s                      ";
-           T       scalar = 3;
-    const    Matrix <T>        mat1 = Init2D <T> (dimX, dimY);
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 > scalar;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 > scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-  
-  /* compare matrix and scalar */
-  {
+    operator_eval_MS <T, S, bool> (mat, ocl_mat, scalar, opGreater <T, S, bool> ());
     if (verbose) std::cout << " * A >= s                      ";
-           T       scalar = 3;
-    const    Matrix <T>        mat1 = Init2D <T> (dimX, dimY);
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 >= scalar;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 >= scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* compare matrix and scalar */
-  {
+    operator_eval_MS <T, S, bool> (mat, ocl_mat, scalar, opGEqual <T, S, bool> ());
     if (verbose) std::cout << " * A <  s                      ";
-           T       scalar = 3;
-    const    Matrix <T>        mat1 = Init2D <T> (dimX, dimY);
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 < scalar;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 < scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-  
-  /* compare matrix and scalar */
-  {
+    operator_eval_MS <T, S, bool> (mat, ocl_mat, scalar, opLess <T, S, bool> ());
     if (verbose) std::cout << " * A <= s                      ";
-           T       scalar = 3;
-    const    Matrix <T>        mat1 = Init2D <T> (dimX, dimY);
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-         Matrix <bool>      res =     mat1 <= scalar;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 <= scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
+    operator_eval_MS <T, S, bool> (mat, ocl_mat, scalar, opLEqual <T, S, bool> ());
+    if (verbose) std::cout << " * s == A                      ";
+    operator_eval_SM <S, T, bool> (scalar, mat, ocl_mat, opEqual <S, T, bool> ());
+    if (verbose) std::cout << " * s != A                      ";
+    operator_eval_SM <S, T, bool> (scalar, mat, ocl_mat, opInequal <S, T, bool> ());
+    if (verbose) std::cout << " * s >  A                      ";
+    operator_eval_SM <S, T, bool> (scalar, mat, ocl_mat, opGreater <S, T, bool> ());
+    if (verbose) std::cout << " * s >= A                      ";
+    operator_eval_SM <S, T, bool> (scalar, mat, ocl_mat, opGEqual <S, T, bool> ());
+    if (verbose) std::cout << " * s <  A                      ";
+    operator_eval_SM <S, T, bool> (scalar, mat, ocl_mat, opLess <S, T, bool> ());
+    if (verbose) std::cout << " * s <= A                      ";
+    operator_eval_SM <S, T, bool> (scalar, mat, ocl_mat, opLEqual <S, T, bool> ());
   }
-
+  
   /* compare matrices */
   {
+    std::cout <<                                      std::endl;
+    std::cout << "\t\t  * Matrix: A, Matrix: B * " << std::endl;
+    std::cout <<                                      std::endl;
+    // Init //
+    const       int pos_x = 10,
+                    pos_y = 11;
+             Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
+    const    Matrix <S>     mat2 = Init2D <S> (dimX, dimY);
+                            mat1 (pos_x, pos_y) += 1;
+          oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
+    const oclMatrix <S>    ocl_mat2 = oclInit2D <S> (dimX, dimY);
+                           ocl_mat1 (pos_x, pos_y) += 1;
+    // Tests //
     if (verbose) std::cout << " * A == B                      ";
-    int pos_x = 10,
-        pos_y = 11;
-    const    Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
-             Matrix <T>     mat2 = Init2D <T> (dimX, dimY);
-                            mat2 (pos_x, pos_y) += 1;
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T>    ocl_mat2 = oclInit2D <T> (dimX, dimY);
-                           ocl_mat2 (pos_x, pos_y) += 1;
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 == mat2;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 == ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* compare matrices */
-  {
+    operator_eval_MM <T, S, bool> (mat1, mat2, ocl_mat1, ocl_mat2, opEqual <T, S, bool> ());
     if (verbose) std::cout << " * A != B                      ";
-    int pos_x = 10,
-        pos_y = 11;
-    const    Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
-             Matrix <T>     mat2 = Init2D <T> (dimX, dimY);
-                          mat2 (pos_x, pos_y) += 1;
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T>    ocl_mat2 = oclInit2D <T> (dimX, dimY);
-                           ocl_mat2 (pos_x, pos_y) += 1;
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 != mat2;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 != ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-  
-  /* compare matrices */
-  {
+    operator_eval_MM <T, S, bool> (mat1, mat2, ocl_mat1, ocl_mat2, opInequal <T, S, bool> ());
     if (verbose) std::cout << " * A >  B                      ";
-    int pos_x = 10,
-        pos_y = 11;
-    const    Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
-             Matrix <T>     mat2 = Init2D <T> (dimX, dimY);
-                          mat2 (pos_x, pos_y) += 1;
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T>    ocl_mat2 = oclInit2D <T> (dimX, dimY);
-                           ocl_mat2 (pos_x, pos_y) += 1;
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 > mat2;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 > ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* compare matrices */
-  {
+    operator_eval_MM <T, S, bool> (mat1, mat2, ocl_mat1, ocl_mat2, opGreater <T, S, bool> ());
     if (verbose) std::cout << " * A >= B                      ";
-    int pos_x = 10,
-        pos_y = 11;
-    const    Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
-             Matrix <T>     mat2 = Init2D <T> (dimX, dimY);
-                          mat2 (pos_x, pos_y) += 1;
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T>    ocl_mat2 = oclInit2D <T> (dimX, dimY);
-                           ocl_mat2 (pos_x, pos_y) += 1;
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 >= mat2;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 >= ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-  
-  /* compare matrices */
-  {
+    operator_eval_MM <T, S, bool> (mat1, mat2, ocl_mat1, ocl_mat2, opGEqual <T, S, bool> ());
     if (verbose) std::cout << " * A <  B                      ";
-    int pos_x = 10,
-        pos_y = 11;
-    const    Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
-             Matrix <T>     mat2 = Init2D <T> (dimX, dimY);
-                          mat2 (pos_x, pos_y) += 1;
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T>    ocl_mat2 = oclInit2D <T> (dimX, dimY);
-                           ocl_mat2 (pos_x, pos_y) += 1;
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 < mat2;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 < ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* compare matrices */
-  {
+    operator_eval_MM <T, S, bool> (mat1, mat2, ocl_mat1, ocl_mat2, opLess <T, S, bool> ());
     if (verbose) std::cout << " * A <= B                      ";
-    int pos_x = 10,
-        pos_y = 11;
-    const    Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
-             Matrix <T>     mat2 = Init2D <T> (dimX, dimY);
-                          mat2 (pos_x, pos_y) += 1;
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T>    ocl_mat2 = oclInit2D <T> (dimX, dimY);
-                           ocl_mat2 (pos_x, pos_y) += 1;
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 <= mat2;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 <= ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* elementwise AND */
-  {
+    operator_eval_MM <T, S, bool> (mat1, mat2, ocl_mat1, ocl_mat2, opLEqual <T, S, bool> ());
     if (verbose) std::cout << " * C = A && B                  ";
-    int pos_x = 10,
-        pos_y = 11;
-    const    Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
-             Matrix <T>     mat2 = Init2D <T> (dimX, dimY);
-                          mat2 (pos_x, pos_y) += 1;
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T>    ocl_mat2 = oclInit2D <T> (dimX, dimY);
-                           ocl_mat2 (pos_x, pos_y) += 1;
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 && mat2;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 && ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* elementwise OR */
-  {
+    operator_eval_MM <T, S, bool> (mat1, mat2, ocl_mat1, ocl_mat2, opAND <T, S, bool> ());
     if (verbose) std::cout << " * C = A || B                  ";
-    int pos_x = 10,
-        pos_y = 11;
-    const    Matrix <T>     mat1 = Init2D <T> (dimX, dimY);
-             Matrix <T>     mat2 = Init2D <T> (dimX, dimY);
-                          mat2 (pos_x, pos_y) += 1;
-    const oclMatrix <T>    ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T>    ocl_mat2 = oclInit2D <T> (dimX, dimY);
-                           ocl_mat2 (pos_x, pos_y) += 1;
-    t.tic (time_default);
-      Matrix <bool>   res = mat1 || mat2;
-    time_s = t.tic (time_default);
-      oclMatrix <bool>  ocl_res = ocl_mat1 || ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <bool> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
+    operator_eval_MM <T, S, bool> (mat1, mat2, ocl_mat1, ocl_mat2, opOR <T, S, bool> ());
   }
 
 }
 
 
-template <class T>
+template <class T, class S>
 bool
 oclArithmeticsTest    ( bool verbose )
 {
@@ -519,336 +287,158 @@ oclArithmeticsTest    ( bool verbose )
 
   size_t  dimX     = 2048,
           dimY     = 2048;
-  double  time_ocl = 0.0,
-          time_s   = 0.0;
-  MyTimer t;  
   
-  std::cout << " size: " << dimX << " x " << dimY << std::endl;
-  
-  
- // verbosity = VERB_HIGH;
+  std::cout << " size: " << dimX << " x " << dimY << std::endl << std::endl;
 
-
-  /* add two matrices */
+  /* M = op (M, s);
+     M = op (s, M); */
   {
-    if (verbose) std::cout << " * C = A + B                   ";
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-    const    Matrix <T>     mat2 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res                  (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat2 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res                  (dimX, dimY);
-    t.tic (time_default);
-          res = mat1 + mat2;
-    time_s = t.tic (time_default);
-      ocl_res = ocl_mat1 + ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;   
+    std::cout << "\t\t  * Matrix: A, scalar: s * " << std::endl;
+    std::cout <<                                      std::endl;
+    // Init //
+                  S      scalar = (S) 33.3;
+             Matrix <T>     mat =    Init2D <T> (dimX, dimY);
+          oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
+    // Tests //
+    if (verbose) std::cout << " * M = A + s                   ";
+    operator_eval_MS <T, S, T> (mat, ocl_mat, scalar, opAdd <T, S, T> ());
+    if (verbose) std::cout << " * M = A - s                   ";
+    operator_eval_MS <T, S, T> (mat, ocl_mat, scalar, opSub <T, S, T> ());
+    if (verbose) std::cout << " * M = A * s                   ";
+    operator_eval_MS <T, S, T> (mat, ocl_mat, scalar, opMult <T, S, T> ());
+    if (verbose) std::cout << " * M = A / s                   ";
+    operator_eval_MS <T, S, T> (mat, ocl_mat, scalar, opDiv <T, S, T> ());
+    if (verbose) std::cout << " * M = s / A                   ";
+    operator_eval_SM <S, T, T> (scalar, mat, ocl_mat, opDiv <S, T, T> ());
+    if (verbose) std::cout << " * M = s + A                   ";
+    operator_eval_SM <S, T, T> (scalar, mat, ocl_mat, opAdd <S, T, T> ());
+    if (verbose) std::cout << " * M = s - A                   ";
+    operator_eval_SM <S, T, T> (scalar, mat, ocl_mat, opSub <S, T, T> ());
+    if (verbose) std::cout << " * M = s * A                   ";
+    operator_eval_SM <S, T, T> (scalar, mat, ocl_mat, opMult <S, T, T> ());
   }
-
-  /* subtract two matrices */
+  
+  /* M = op (M1, M2); */
   {
-    if (verbose) std::cout << " * C = A - B                   ";
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-    const    Matrix <T>     mat2 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res                  (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat2 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res                  (dimX, dimY);
-    t.tic (time_default);
-      res = mat1 - mat2;
-    time_s = t.tic (time_default);
-      ocl_res = ocl_mat1 - ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+    std::cout <<                                      std::endl;
+    std::cout << "\t\t  * Matrix: A, Matrix: B * " << std::endl;
+    std::cout <<                                      std::endl;
+       Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
+       Matrix <S>     mat2 =    Init2D <S> (dimX, dimY);
+    oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
+    oclMatrix <S> ocl_mat2 = oclInit2D <S> (dimX, dimY);
+    if (verbose) std::cout << " * M = A + B                   ";
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opAdd <T, S, T> ());
+    if (verbose) std::cout << " * M = A - B                   ";
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opSub <T, S, T> ());
+    if (verbose) std::cout << " * M = A .* B                  ";
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opMult <T, S, T> ());
+    if (verbose) std::cout << " * M = A ./ B                  ";
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opDiv <T, S, T> ());
   }
 
   /* increment matrix (uniform) */
   {
-    if (verbose) std::cout << " * M = A + scalar              ";
-    const T scalar = (T) 33.3;
-       Matrix <T>     mat,
-                      mat_A =    Init2D <T> (dimX, dimY);
-    oclMatrix <T> ocl_mat,
-                  ocl_mat_A = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      mat     =     mat_A + scalar;
-    time_s = t.tic (time_default);
-      ocl_mat = ocl_mat_A + scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+    if (verbose) std::cout << " * M += s                      ";
+    const         S      scalar = (S) 33.3;
+             Matrix <T>     mat =    Init2D <T> (dimX, dimY);
+          oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
+    operator_eval_MS <T, S, T> (mat, ocl_mat, scalar, opAddAss <T, S, T> ());
   }
 
   /* decrement matrix (uniform) */
   {
-    if (verbose) std::cout << " * M = A - scalar              ";
-    const T scalar = (T) 33.3;
-       Matrix <T>     mat,
-                      mat_A =    Init2D <T> (dimX, dimY);
-    oclMatrix <T> ocl_mat,
-                  ocl_mat_A = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      mat     =     mat_A + scalar;
-    time_s = t.tic (time_default);
-      ocl_mat = ocl_mat_A + scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
-  }
-
-  /* increment matrix (uniform) */
-  {
-    if (verbose) std::cout << " * M += scalar                 ";
-    const T scalar = (T) 33.3;
-       Matrix <T>     mat =    Init2D <T> (dimX, dimY);
-    oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      mat     += scalar;
-    time_s = t.tic (time_default);
-      ocl_mat += scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
-  }
-
-  /* decrement matrix (uniform) */
-  {
-    if (verbose) std::cout << " * M -= scalar                 ";
-    const T scalar = (T) 33.3;
-       Matrix <T>     mat =    Init2D <T> (dimX, dimY);
-    oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      mat     -= scalar;
-    time_s   = t.tic (time_default);
-      ocl_mat -= scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+    if (verbose) std::cout << " * M -= s                      ";
+    const         S      scalar = (S) 33.3;
+             Matrix <T>     mat =    Init2D <T> (dimX, dimY);
+          oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
+    operator_eval_MS <T, S, T> (mat, ocl_mat, scalar, opSubAss <T, S, T> ());
   }
 
   /* increment matrix (non uniform) */
   {
     if (verbose) std::cout << " * A += B                      ";
              Matrix <T>         mat =    Init2D <T> (dimX, dimY);
-    const    Matrix <T>     mat_inc =    Init2D <T> (dimX, dimY);
+    const    Matrix <S>     mat_inc =    Init2D <S> (dimX, dimY);
           oclMatrix <T>     ocl_mat = oclInit2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat_inc = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      mat     +=     mat_inc;
-    time_s   = t.tic (time_default);
-      ocl_mat += ocl_mat_inc;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+    const oclMatrix <S> ocl_mat_inc = oclInit2D <S> (dimX, dimY);
+    operator_eval_MM <T, S, T> (mat, mat_inc, ocl_mat, ocl_mat_inc, opAddAss <T, S, T> ());
   }
 
   /* decrement matrix (non uniform) */
   {
     if (verbose) std::cout << " * A -= B                      ";
              Matrix <T>         mat =    Init2D <T> (dimX, dimY);
-    const    Matrix <T>     mat_dec =    Init2D <T> (dimX, dimY);
+    const    Matrix <S>     mat_dec =    Init2D <S> (dimX, dimY);
           oclMatrix <T>     ocl_mat = oclInit2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat_dec = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      mat     -=     mat_dec;
-    time_s   = t.tic (time_default);
-      ocl_mat -= ocl_mat_dec;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_mat, mat).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+    const oclMatrix <S> ocl_mat_dec = oclInit2D <S> (dimX, dimY);
+    operator_eval_MM <T, S, T> (mat, mat_dec, ocl_mat, ocl_mat_dec, opSubAss <T, S, T> ());
   }
 
   /* raise to higher power */
   {
     if (verbose) std::cout << " * C = A ^ p                   ";
-    const T p = 1.55;
-    const    Matrix <T>     mat_A =    Init2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat_A = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      Matrix <T>        mat_C =     mat_A ^ p;
-    time_s   = t.tic (time_default);
-      oclMatrix <T> ocl_mat_C = ocl_mat_A ^ p;
-    time_ocl = t.tic (time_default);
-    result res = mat_equal <T> (ocl_mat_C, mat_C);
-    assert ((res.equal || res.mean_abs_err < 1e-1) && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)"
-                           << " -> mean abs. err. = " << scientific << res.mean_abs_err << fixed << std::endl;
+    const         S           p = (S) 1.55;
+             Matrix <T>     mat =    Init2D <T> (dimX, dimY);
+          oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
+    operator_eval_MS <T, S, T> (mat, ocl_mat, p, opPow <T, S, T> ());
   }
 
   /* raise to higher power */
   {
     if (verbose) std::cout << " * M ^= p                      ";
-    const T p = 1.55;
-       Matrix <T>     mat =    Init2D <T> (dimX, dimY);
-    oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-          mat ^= p;
-    time_s   = t.tic (time_default);
-      ocl_mat ^= p;
-    time_ocl = t.tic (time_default);
-    result res = mat_equal <T> (ocl_mat, mat);
-    assert ((res.equal || res.mean_abs_err < 1e-1) && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)"
-                           << " -> mean abs. err. = " << scientific << res.mean_abs_err << fixed << std::endl;
-  }
-
-  /* elementwise multiplication of matrix and scalar */
-  {
-    if (verbose) std::cout << " * C = A * s                   ";
-    const     T       scalar = 3.33;
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res                  (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res                  (dimX, dimY);
-    t.tic (time_default);
-      res = mat1 * scalar;
-    time_s = t.tic (time_default);
-      ocl_res = ocl_mat1 * scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
+    const         S           p = (S) 1.55;
+             Matrix <T>     mat =    Init2D <T> (dimX, dimY);
+          oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
+    operator_eval_MS <T, S, T> (mat, ocl_mat, p, opPowAss <T, S, T> ());
   }
 
   /* elementwise multiplacation of matrix and scalar */
   {
     if (verbose) std::cout << " * C *= s                      ";
-    const     float       scalar = 3;
-             Matrix <T>     res   =    Init2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res   = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      res *= scalar;
-    time_s = t.tic (time_default);
-      ocl_res *= scalar;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* elementwise multiplication of two matrices */
-  {
-    if (verbose) std::cout << " * C = A .* B                  ";
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-    const    Matrix <T>     mat2 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res                  (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat2 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res                  (dimX, dimY);
-    t.tic (time_default);
-      res = mat1 * mat2;
-    time_s = t.tic (time_default);
-      ocl_res = ocl_mat1 * ocl_mat2;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
+    const         S      scalar = (S) 10 * (1./3.);
+             Matrix <T>     mat =    Init2D <T> (dimX, dimY);
+          oclMatrix <T> ocl_mat = oclInit2D <T> (dimX, dimY);
+    operator_eval_MS <T, S, T> (mat, ocl_mat, scalar, opMultAss <T, S, T> ());   
   }
 
   /* elementwise multiplacation of two matrices */
   {
     if (verbose) std::cout << " * C .*= A                     ";
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res  =    Init2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res  = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      res *= mat1;
-    time_s = t.tic (time_default);
-      ocl_res *= ocl_mat1;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;    
-  }
-
-  /* elementwise division of matrix by scalar */
-  {
-    if (verbose) std::cout << " * C = A / s                   ";
-    const     T       scalar = 3.33;
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res                  (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res                  (dimX, dimY);
-    t.tic (time_default);
-      res = mat1 / scalar;
-    time_s = t.tic (time_default);
-      ocl_res = ocl_mat1 / scalar;
-    time_ocl = t.tic (time_default);
-    result r = mat_equal <T> (ocl_res, res);
-    assert ((r.equal || r.mean_abs_err < 1e-1) && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)"
-                           << " -> mean abs. err. = " << scientific << r.mean_abs_err << fixed << std::endl;
+             Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
+    const    Matrix <S>     mat2 =    Init2D <S> (dimX, dimY);
+          oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
+    const oclMatrix <S> ocl_mat2  = oclInit2D <S> (dimX, dimY);
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opMultAss <T, S, T> ());   
   }
 
   /* elementwise division of matrix by scalar */
   {
     if (verbose) std::cout << " * C /= s                      ";
-    const     T      scalar = 3.33;
-             Matrix <T>     res  =    Init2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res  = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      res /= scalar;
-    time_s = t.tic (time_default);
-      ocl_res /= scalar;
-    time_ocl = t.tic (time_default);
-    result r = mat_equal <T> (ocl_res, res);
-    assert ((r.equal || r.mean_abs_err < 1e-1) && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)"
-                           << " -> mean abs. err. = " << scientific << r.mean_abs_err << fixed << std::endl;
-  }
-
-  /* elementwise division of two matrices */
-  {
-    if (verbose) std::cout << " * C = A ./ B                  ";
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-    const    Matrix <T>     mat2 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res                  (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat2 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res                  (dimX, dimY);
-    t.tic (time_default);
-      res = mat1 / mat2;
-    time_s = t.tic (time_default);
-      ocl_res = ocl_mat1 / ocl_mat2;
-    time_ocl = t.tic (time_default);
-    result r = mat_equal <T> (ocl_res, res);
-    assert ((r.equal || r.mean_abs_err < 1e-0) && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)"
-                           << " -> mean abs. err. = " << scientific << r.mean_abs_err << fixed << std::endl;
+    const         S       scalar = (S) 3.33;
+             Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
+          oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
+    operator_eval_MS <T, S, T> (mat1, ocl_mat1, scalar, opDivAss <T, S, T> ());
   }
 
   /* elementwise division of two matrices */
   {
     if (verbose) std::cout << " * C ./= A                     ";
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res  =    Init2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res  = oclInit2D <T> (dimX, dimY);
-    t.tic (time_default);
-      res = res / mat1;
-    time_s = t.tic (time_default);
-      ocl_res /= ocl_mat1;
-    time_ocl = t.tic (time_default);
-    result r = mat_equal <T> (ocl_res, res);
-    assert ((r.equal || r.mean_abs_err < 1e-0) && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)"
-                           << " -> mean abs. err. = " << scientific << r.mean_abs_err << fixed << std::endl;
+             Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
+    const    Matrix <S>     mat2 =    Init2D <S> (dimX, dimY);
+          oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
+    const oclMatrix <S> ocl_mat2 = oclInit2D <S> (dimX, dimY);
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opDivAss <T, S, T> ());
   }
   
   /* unary minus */
   {
     if (verbose) std::cout << " * C = -A                      ";
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res                  (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res                  (dimX, dimY);
-    t.tic (time_default);
-      res = -mat1;
-    time_s = t.tic (time_default);
-      ocl_res = -ocl_mat1;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+            Matrix <T>      mat1                 (dimX, dimY);
+    const   Matrix <S>      mat2 =    Init2D <S> (dimX, dimY);
+          oclMatrix <T> ocl_mat1                 (dimX, dimY);
+    const oclMatrix <S> ocl_mat2 = oclInit2D <S> (dimX, dimY);
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opMinus <T, S, T> ());
   }
 
   /* unary plus */
@@ -871,7 +461,7 @@ oclArithmeticsTest    ( bool verbose )
 
 
 
-template <class T>
+template <class T, class S>
 bool
 oclLinalgTest           ( bool verbose )
 {
@@ -884,60 +474,43 @@ oclLinalgTest           ( bool verbose )
 
   size_t  dimX     = 2048,
           dimY     = 2048;
-  double  time_ocl = 0.0,
-          time_s   = 0.0;
-  MyTimer t;  
   
-  std::cout << " size: " << dimX << " x " << dimY << std::endl;
+  std::cout << " size: " << dimX << " x " << dimY << std::endl << std::endl;
 
   /* transpose matrix */
   {
     if (verbose) std::cout << " * C = ! A                     ";
-    const    Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
-             Matrix <T>     res                  (dimX, dimY);
-    const oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
-          oclMatrix <T> ocl_res                  (dimX, dimY);
-    t.tic (time_default);
-          res = ! mat1;
-    time_s = t.tic (time_default);
-      ocl_res = ! ocl_mat1;
-    time_ocl = t.tic (time_default);
-    assert (mat_equal <T> (ocl_res, res).equal && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;   
+             Matrix <T>     mat1                 (dimX, dimY);
+    const    Matrix <S>     mat2 =    Init2D <S> (dimX, dimY);
+          oclMatrix <T> ocl_mat1                 (dimX, dimY);
+    const oclMatrix <S> ocl_mat2 = oclInit2D <S> (dimX, dimY);
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opTrans <T, S, T> ()); 
   }
 
   /* matrix product */
   {
     if (verbose) std::cout << " * C = A * B                   ";
-    const    Matrix <T>     mat_A =    Init2D <T> (dimX, dimY);
-    const    Matrix <T>     mat_B =    Init2D <T> (dimY, dimX);
-    const oclMatrix <T> ocl_mat_A = oclInit2D <T> (dimX, dimY);
-    const oclMatrix <T> ocl_mat_B = oclInit2D <T> (dimY, dimX);        
-    t.tic (time_default);
-      Matrix <T>        mat_C =     mat_A ->*     mat_B;
-    time_s   = t.tic (time_default);
-      oclMatrix <T> ocl_mat_C = ocl_mat_A ->* ocl_mat_B;
-    time_ocl = t.tic (time_default);
-    result res = mat_equal <T> (ocl_mat_C, mat_C);
-    assert ((res.equal || res.mean_abs_err < 1e-1) && " Test failed! ");
-    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)"
-                           << " -> mean abs. err. = " << scientific << res.mean_abs_err << fixed << std::endl;
+             Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
+    const    Matrix <S>     mat2 =    Init2D <S> (dimY, dimX);
+          oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
+    const oclMatrix <S> ocl_mat2 = oclInit2D <S> (dimY, dimX);
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opMatProd <T, S, T> ());
   }
 
 }
 
 
 
-template <class T>
+template <class T, class S>
 void
 exec_tests      (bool verbose)
 {
 
-  oclCreatorsTest     <T> (verbose);
-  oclArithmeticsTest  <T> (verbose);
-  oclLinalgTest       <T> (verbose);
-  oclAccessTest       <T> (verbose);
-  oclComparisonsTest  <T> (verbose);
+  oclCreatorsTest     <T>    (verbose);
+  oclArithmeticsTest  <T, S> (verbose);
+  oclLinalgTest       <T, S> (verbose);
+  oclAccessTest       <T>    (verbose);
+  oclComparisonsTest  <T, S> (verbose);
 
 }
 
@@ -956,15 +529,23 @@ oclmatrixtest (Connector<T>* rc) {
   try
   {
     std::cout << std::endl << std::endl;
-    std::cout << " ----------- // float  \\\\ ------------ " << std::endl;
+    std::cout << " ----------- // float, float  \\\\ ------------ " << std::endl;
     std::cout << std::endl;
-    exec_tests <float>  (true);
+    exec_tests <float, float>  (true);
     std::cout << std::endl << std::endl;
-    std::cout << " ----------- // double \\\\ ------------ " << std::endl;
+/*    std::cout << " ----------- // float, double  \\\\ ------------ " << std::endl;
     std::cout << std::endl;
-    exec_tests <double> (true);
+    exec_tests <float, double>  (true);
+    std::cout << std::endl << std::endl;
+*/    std::cout << " ----------- // double, double \\\\ ------------ " << std::endl;
     std::cout << std::endl;
-  }
+    exec_tests <double, double> (true);
+    std::cout << std::endl << std::endl;
+/*    std::cout << " ----------- // double, float  \\\\ ------------ " << std::endl;
+    std::cout << std::endl;
+    exec_tests <double, float>  (true);
+    std::cout << std::endl;
+*/  }
   catch (oclError & err)
   {
     print_optional (err, VERB_NONE);

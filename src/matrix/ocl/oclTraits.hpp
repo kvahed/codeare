@@ -740,6 +740,7 @@
         print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
                                            trait2 :: print_elem_type (), "> :: ocl_operator_subtract", op_v_level);
         ocl_basic_operator_vclAlgo_3 (vclSUBTRACT, arg1, arg2, diff, num_elems);
+//        ocl_basic_operator_kernel_3 ("vector_sub", arg1, arg2, diff, num_elems);
       
       }
       

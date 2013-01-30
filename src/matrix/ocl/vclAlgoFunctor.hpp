@@ -157,7 +157,7 @@
          * create ViennaCl arguments
          */
         viennacl :: vector <T>   arg1 = vclAlgoFunctor <T, S> :: mp_vclObj -> template getVCLVector <T> (0);
-        viennacl :: vector <T>   arg2 = vclAlgoFunctor <T, S> :: mp_vclObj -> template getVCLVector <T> (1);
+        viennacl :: vector <S>   arg2 = vclAlgoFunctor <T, S> :: mp_vclObj -> template getVCLVector <S> (1);
         viennacl :: vector <T> result = vclAlgoFunctor <T, S> :: mp_vclObj -> template getVCLVector <T> (2);
         
         /* perform calculation */
@@ -235,7 +235,7 @@
         viennacl :: matrix <T, viennacl :: column_major>   arg1 = vclAlgoFunctor <T, S> :: mp_vclObj
                                                                    -> template getVCLMatrix <T, viennacl :: column_major> (0, m, k);
         viennacl :: matrix <T, viennacl :: column_major>   arg2 = vclAlgoFunctor <T, S> :: mp_vclObj
-                                                                   -> template getVCLMatrix <T, viennacl :: column_major> (1, k, n);
+                                                                   -> template getVCLMatrix <S, viennacl :: column_major> (1, k, n);
         viennacl :: matrix <T, viennacl :: column_major> result = vclAlgoFunctor <T, S> :: mp_vclObj
                                                                    -> template getVCLMatrix <T, viennacl :: column_major> (2, m, n);
         
