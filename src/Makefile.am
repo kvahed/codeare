@@ -46,4 +46,4 @@ endif
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
 
-SUBDIRS = tinyxml modules
+SUBDIRS = tinyxml modules matrix

@@ -10,6 +10,76 @@ namespace io      {
 
 	enum IOMode {READ, WRITE};
 
+    /**
+     * @brief  General parameter container
+     */
+	struct Params {
+
+        /**
+         * @brief  Parameter entry
+         */
+		typedef typename std::pair<std::string, boost::any> param;
+
+        
+        /**
+         * @brief  Parameter container
+         */
+		typedef typename std::map<std::string, boost::any> plist;
+
+        
+        /**
+         * @brief  Get any parameter value
+         */
+		boost::any& GetAny (const std::string& key) {
+			if (pl.find(key) == pl.end())
+				return Toolbox::Instance()->void_any;
+			return pl[key];
+		}
+
+        
+        /**
+         * @brief  Get casted parameter value
+         */
+		template <class T>
+		T Get (const std::string& key) {
+			if (pl.find(key) == pl.end()) {
+				T t;
+				return t;
+			}
+			return boost::any_cast<T>(pl[key]);
+		}
+
+        
+        /**
+         * @brief
+         */
+		template <class T>
+		T Get (const char* key) {
+			return Get<T> (std::string(key));
+		}
+
+        
+        /**
+         * @brief  Set/add new parameter
+         */
+		void Set (const std::string& key, const boost::any& val) {
+			if (pl.find(key) != pl.end())
+				pl.erase(key);
+			pl.insert(param(key, val));
+		}
+
+        
+        /**
+         * @brief  Set 
+         */
+		void Set (const char* key, const boost::any& val) {
+			Set (std::string(key), val);
+		}
+
+		plist pl;
+
+	};
+
 	// TODO: deliver some crap
 	template<class T>
 	inline static bool is_mat (boost::any oper) {
@@ -42,9 +112,11 @@ namespace io      {
 		 * @param  mode     IO mode (READ/WRITE)
 		 * @param  verbose  Verbose output? (default: true)
 		 */
-		IOFile (const std::string& fname, const IOMode& mode = READ, const bool& verbose = true) :
+		IOFile (const std::string& fname, const IOMode& mode = READ,
+				Params params = Params(), const bool& verbose = true) :
 			m_fname(fname),
 			m_status(RRSModule::OK),
+			m_params(params),
 			m_fopen(false),
 			m_verb(verbose),
 			m_alloc(false),
@@ -152,7 +224,6 @@ namespace io      {
 		virtual RRSModule::error_code
 		Write (const std::string& dname = "") = 0;
 
-
 		/**
 		 * @brief  Get data by name
 		 *
@@ -167,7 +238,7 @@ namespace io      {
 			if (it == m_data.end()) {
 				printf ("  ERROR: No dataset by the name %s found?!\n",
 						dname.c_str());
-				return Toolbox::Instance()->b;
+				return Toolbox::Instance()->void_any;
 			}
 
 			return it->second;
@@ -202,6 +273,8 @@ namespace io      {
 		bool        m_alloc;  /**< @brief Memory allocated? */
 		bool        m_initialised; /**< @brief Initialised */
 
+		Params      m_params; /**< @brief Additional parameters */
+
 		DataStore   m_data; /**< Data */
 
 
@@ -215,7 +288,8 @@ namespace io      {
 			m_verb(true),
 			m_alloc(false),
 			m_initialised (false),
-			m_mode (READ) {}
+			m_mode (READ),
+			m_params(Params()){}
 
 		/**
 		 * @brief Copy constructor
@@ -229,7 +303,8 @@ namespace io      {
 			m_alloc (iob.Allocated()),
 			m_fopen (false),
 			m_initialised (false),
-			m_mode (READ) {}
+			m_mode (READ),
+			m_params (Params()) {}
 
 	};
 

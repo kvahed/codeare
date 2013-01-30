@@ -11785,10 +11785,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"06ab5011\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"115d24ac\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Mon Jan 7 16:13:05 2013 +0100\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Jan 21 08:49:08 2013 +0100\"" >>confdefs.h
 
 
 # copyright notice
@@ -24839,7 +24839,7 @@ fi
 
 
 # Generate files
-ac_config_files="$ac_config_files src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile"
+ac_config_files="$ac_config_files src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -26084,6 +26084,9 @@ do
     "doc/api/doxy-codeare.conf") CONFIG_FILES="$CONFIG_FILES doc/api/doxy-codeare.conf" ;;
     "doc/api/Makefile") CONFIG_FILES="$CONFIG_FILES doc/api/Makefile" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
+    "src/matrix/Makefile") CONFIG_FILES="$CONFIG_FILES src/matrix/Makefile" ;;
+    "src/matrix/io/Makefile") CONFIG_FILES="$CONFIG_FILES src/matrix/io/Makefile" ;;
+    "src/matrix/arithmetic/Makefile") CONFIG_FILES="$CONFIG_FILES src/matrix/arithmetic/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
