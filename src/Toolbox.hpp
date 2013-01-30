@@ -57,7 +57,8 @@ public:
 	double 
 	ClockRate       () const ;	
 
-	boost::any   b;
+	boost::any   void_any;
+	std::string  void_str;
 	
 		
 private:

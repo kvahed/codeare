@@ -384,7 +384,7 @@ reconserver_LDFLAGS = $(HDF5) @PLUGIN_LDFLAGS@ -dlopen \
 	tinyxml/libtinyxml.la $(am__append_2)
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
-SUBDIRS = tinyxml modules
+SUBDIRS = tinyxml modules matrix
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

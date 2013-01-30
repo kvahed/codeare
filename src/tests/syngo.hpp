@@ -4,8 +4,38 @@
 template <class T> bool
 syngotest (Connector<T>* rc) {
 
+	/*
+	struct Params {
+
+		short int mode;
+
+		bool      undo_os;
+		bool      rep_wise;
+		bool      average;
+		bool      ext_ref_only;
+
+		Params () {
+			mode         = TSE;
+			undo_os      = 1;
+			rep_wise     = 0;
+			average      = 1;
+			ext_ref_only = 0;
+		}
+
+	};
+*/
+
+
+
 	using namespace codeare::matrix::io;
-	
+
+	Params params;
+	params.Set("undo_os", true);
+	params.Set("res_wise", false);
+	params.Set("average", (int)1);
+	params.Set("ext_ref_only", false);
+	params.Set("mode", std::string("TSE"));
+
 	std::string in = std::string (base + std::string (data));
 	
 	Matrix<cxfl> meas;
@@ -17,7 +47,7 @@ syngotest (Connector<T>* rc) {
 		return false;
 	}
 
-	IOContext ioc (fname, SYNGOMR);
+	IOContext ioc (fname, SYNGOMR, params);
 
 	if (ioc.Status() != RRSModule::OK) {
 		printf ("\n  Couldn't initialise RawParser. Exiting!\n");

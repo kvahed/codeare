@@ -27,7 +27,7 @@
 #include "Toolbox.hpp"
 #include "IO.hpp"
 #include "DFT.hpp"
-#include "Math.hpp"
+#include "arithmetic/Trigonometry.hpp"
 
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
@@ -310,14 +310,14 @@ RRSModule::error_code
 SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	
 	printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
-	
+
 	ticks  tic = getticks();
 	
 	std::string orig = "orig.nii.gz";
 	std::string mask = "mask_mask.nii.gz";
 	std::string cmd  = "/usr/local/bin/mask.sh";
 
-	Matrix<double> tmp = log (img);
+	Matrix<double> tmp = codeare::matrix::arithmetic::log (img);
 	
 	NIDump(tmp, orig);
 	printf ("exporting ... "); fflush(stdout);
