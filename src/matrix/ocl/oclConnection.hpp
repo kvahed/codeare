@@ -42,7 +42,7 @@ modify_kernel        ( std::string const &       source,
                        std::string const & fp_extension,
                        std::string const &  vector_type,
                        std::string const &  scalar_type,
-                               int const &            n = 8 );
+                               int const &            n = -1 );
 
 
 
@@ -61,7 +61,6 @@ modify_kernel        ( std::string const &       source,
        ***********************/
       enum KernelType {KERNEL, VCL};
       enum SyncType   {SYNC, ASYNC};
-
 
       /**********************
        ** type definitions **
@@ -244,15 +243,19 @@ modify_kernel        ( std::string const &       source,
       clContext                m_cont;       // context used associated with m_devs
       clCommandQueues          m_comqs;      // each command queue is associated with corresponding device from m_devs
       clProgram              * mp_prog,
-                               m_prog_f,     // program containing whole source code (single precision)
-                               m_prog_d,     // program containing whole source code (double precision)
-                               m_prog_df,
-                               m_prog_fd;
+                               m_prog_ff,     // program containing whole source code (single precision)
+                               m_prog_dd,     // program containing whole source code (double precision)
+                               m_prog_cfcf,
+                               m_prog_cff,
+                               m_prog_cdcd,
+                               m_prog_cdd;
       clKernels              * mp_kernels,
-                               m_kernels_f,  // kernels available in m_prog_f
-                               m_kernels_d,  // kernels available in m_prog_d
-                               m_kernels_df,
-                               m_kernels_fd;
+                               m_kernels_ff,  // kernels available in m_prog_f
+                               m_kernels_dd,  // kernels available in m_prog_d
+                               m_kernels_cfcf,
+                               m_kernels_cff,
+                               m_kernels_cdcd,
+                               m_kernels_cdd;
 //      std::vector<clBuffers> * mp_buffers,
 //                               m_buffers_f,  // vectors of buffers for each kernels arguments (single prec)
 //                               m_buffers_d;  // vectors of buffers for each kernels arguments (double prec)
@@ -268,9 +271,14 @@ modify_kernel        ( std::string const &       source,
 
 
       template <class T, class S> //, class trait = read_kernel_source_trait <T> >
-      static const char * ReadSource   (const char *, int * size);
+      static const char * ReadSource   (std::string, int * size);
              int          BuildProgram ();
              const char * errorString (cl_int e);
+             
+      template <class T, class S>
+      static
+      oclError &
+      init_program_kernels    (oclConnection * const);
 
   
       /******************
@@ -278,17 +286,142 @@ modify_kernel        ( std::string const &       source,
        ******************/
       oclConnection         (const char *,
                              const char *,
+                             const char *,
+                             const char *,
+                             const char *,
+                             const char *,
                              cl_device_type device_type = CL_DEVICE_TYPE_GPU,
                              VerbosityLevel verbose = VERB_NONE);
       
       oclConnection         (oclConnection &) { /*TODO*/};
+    
       
 
   }; // class oclConnection
   
   
   
+  /**
+   * forbidden type combinations
+   */
+  template <>
+  template <>
+  struct oclConnection :: ocl_precision_trait <cxfl, double>
+  { /* -- */ };
   
+  
+      template <>
+      template <>
+      struct oclConnection :: ocl_precision_trait <cxfl, float>
+      {
+ 
+ 
+       public:
+  
+          typedef cxfl elem_type;
+          
+          static inline
+          const char *
+          getTypeString ()
+          {
+            return "<<cxfl, float>>";
+          }
+
+          static inline
+          const std::vector <std::string>
+          getFilenames  ()
+          {
+            std::vector <std::string> filenames;
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/mixed_A_kernels.cl"));
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/mixed_AB_kernels.cl"));
+            return filenames;
+          }
+          
+          static inline
+          const char *
+          modify_source (void * buf, int * size)
+          {
+            std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+                                                                std::string ("cl_khr_fp64: disable"),
+                                                                std::string ("float2"),
+                                                                std::string ("float"),
+                                                                          8 ) );
+            *size = tmp_str -> size () * sizeof (char);
+            return tmp_str->c_str ();
+          }
+          
+          static inline
+          clProgram *
+          getProgram    (oclConnection * const con)
+          {
+            return & (con -> m_prog_cff);
+          }
+            
+          static inline
+          clKernels *
+          getKernels    (oclConnection * const con)
+          {
+            return & (con -> m_kernels_cff);
+          }
+
+      };
+
+
+      template <>
+      template <>
+      struct oclConnection :: ocl_precision_trait <cxfl, cxfl>
+      {
+ 
+ 
+       public:
+  
+          typedef cxfl elem_type;
+          
+          static inline
+          const char *
+          getTypeString ()
+          {
+            return "<<cxfl, cxfl>>";
+          }
+
+          static inline
+          const std::vector <std::string>
+          getFilenames  ()
+          {
+            std::vector <std::string> filenames;
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/complex_A_kernels.cl"));
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/complex_AB_kernels.cl"));
+            return filenames;
+          }
+          
+          static inline
+          const char *
+          modify_source (void * buf, int * size)
+          {
+            std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+                                                                std::string ("cl_khr_fp64: disable"),
+                                                                std::string ("float2"),
+                                                                std::string ("float2") ) );
+            *size = tmp_str -> size () * sizeof (char);
+            return tmp_str->c_str ();
+          }
+          
+          static inline
+          clProgram *
+          getProgram    (oclConnection * const con)
+          {
+            return & (con -> m_prog_cfcf);
+          }
+            
+          static inline
+          clKernels *
+          getKernels    (oclConnection * const con)
+          {
+            return & (con -> m_kernels_cfcf);
+          }
+
+      };      
+
   
       template <>
       template <>
@@ -299,33 +432,49 @@ modify_kernel        ( std::string const &       source,
   
 
           typedef float elem_type;
+          
+          static inline
+          const char *
+          getTypeString ()
+          {
+            return "<<float, float>>";
+          }
+          
+          static inline
+          const std::vector <std::string>
+          getFilenames  ()
+          {
+            std::vector <std::string> filenames;
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/A_kernels.cl"));
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/AB_kernels.cl"));
+            return filenames;
+          }
 
           static inline
           const char *
           modify_source (void * buf, int * size)
           {
-            return (const char *) buf;
+            std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+                                                                std::string ("cl_khr_fp64: disable"),
+                                                                std::string ("float"),
+                                                                std::string ("float"),
+                                                                          8 ) );
+            *size = tmp_str -> size () * sizeof (char);
+            return tmp_str->c_str ();
           }
           
           static inline
           clProgram *
           getProgram    (oclConnection * const con)
           {
-            return & (con -> m_prog_f);
+            return & (con -> m_prog_ff);
           }
-          
-/*          static inline
-          std::vector <clBuffers> *
-          getBuffers    (oclConnection * const con)
-          {
-            return & (con -> m_buffers_f);
-          }
-*/          
+         
           static inline
           clKernels *
           getKernels    (oclConnection * const con)
           {
-            return & (con -> m_kernels_f);
+            return & (con -> m_kernels_ff);
           }
 
       };
@@ -339,15 +488,33 @@ modify_kernel        ( std::string const &       source,
   
 
           typedef double elem_type;
+          
+          static inline
+          const char *
+          getTypeString ()
+          {
+            return "<<double, double>>";
+          }
+          
+          static inline
+          const std::vector <std::string>
+          getFilenames  ()
+          {
+            std::vector <std::string> filenames;
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/A_kernels.cl"));
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/AB_kernels.cl"));
+            return filenames;
+          }
 
           static inline
           const char *
           modify_source (void * buf, int * size)
           {
             std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
-                                                                std::string ("cl_khr_fp64"),
+                                                                std::string ("cl_khr_fp64: enable"),
                                                                 std::string ("double"),
-                                                                std::string ("double") ) );
+                                                                std::string ("double"),
+                                                                          8 ) );
             *size = tmp_str -> size () * sizeof (char);
             return tmp_str->c_str ();
           }
@@ -356,44 +523,54 @@ modify_kernel        ( std::string const &       source,
           clProgram *
           getProgram    (oclConnection * const con)
           {
-            return & (con -> m_prog_d);
+            return & (con -> m_prog_dd);
           }
           
-/*          static inline
-          std::vector <clBuffers> *
-          getBuffers    (oclConnection * const con)
-          {
-            return & (con -> m_buffers_d);
-          }
-*/          
           static inline
           clKernels *
           getKernels    (oclConnection * const con)
           {
-            return & (con -> m_kernels_d);
+            return & (con -> m_kernels_dd);
           }
           
       };
 
       template <>
       template <>
-      struct oclConnection :: ocl_precision_trait <double, float>
+      struct oclConnection :: ocl_precision_trait <cxdb, double>
       {
 
         public:
   
 
-          typedef double elem_type_A;
-          typedef  float elem_type_B;
+          typedef double elem_type;
+          
+          static inline
+          const char *
+          getTypeString ()
+          {
+            return "<<cxdb, double>>";
+          }
+          
+          static inline
+          const std::vector <std::string>
+          getFilenames  ()
+          {
+            std::vector <std::string> filenames;
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/mixed_A_kernels.cl"));
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/mixed_AB_kernels.cl"));
+            return filenames;
+          }
 
           static inline
           const char *
           modify_source (void * buf, int * size)
           {
             std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
-                                                                std::string ("cl_khr_fp64"),
+                                                                std::string ("cl_khr_fp64: enable"),
+                                                                std::string ("double2"),
                                                                 std::string ("double"),
-                                                                std::string ("float") ) );
+                                                                          8 ) );
             *size = tmp_str -> size () * sizeof (char);
             return tmp_str->c_str ();
           }
@@ -402,44 +579,53 @@ modify_kernel        ( std::string const &       source,
           clProgram *
           getProgram    (oclConnection * const con)
           {
-            return & (con -> m_prog_df);
+            return & (con -> m_prog_cdd);
           }
-          
-/*          static inline
-          std::vector <clBuffers> *
-          getBuffers    (oclConnection * const con)
-          {
-            return & (con -> m_buffers_df);
-          }
-*/          
+         
           static inline
           clKernels *
           getKernels    (oclConnection * const con)
           {
-            return & (con -> m_kernels_df);
+            return & (con -> m_kernels_cdd);
           }
 
       };
 
       template <>
       template <>
-      struct oclConnection :: ocl_precision_trait <float, double>
+      struct oclConnection :: ocl_precision_trait <cxdb, cxdb>
       {
       
         public:
   
-
           typedef  float elem_type_A;
           typedef double elem_type_B;
 
           static inline
           const char *
+          getTypeString ()
+          {
+            return "<<cxdb, cxdb>>";
+          }
+  
+          static inline
+          const std::vector <std::string>
+          getFilenames  ()
+          {
+            std::vector <std::string> filenames;
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/complex_A_kernels.cl"));
+            filenames.push_back (std::string ("./src/matrix/ocl/kernels/complex_AB_kernels.cl"));
+            return filenames;
+          }
+
+          static inline
+          const char *
           modify_source (void * buf, int * size)
           {
             std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
-                                                                std::string ("cl_khr_fp64"),
-                                                                std::string ("float"),
-                                                                std::string ("double") ) );
+                                                                std::string ("cl_khr_fp64: enable"),
+                                                                std::string ("double2"),
+                                                                std::string ("double2") ) );
             *size = tmp_str -> size () * sizeof (char);
             return tmp_str->c_str ();
           }
@@ -448,21 +634,14 @@ modify_kernel        ( std::string const &       source,
           clProgram *
           getProgram    (oclConnection * const con)
           {
-            return & (con -> m_prog_fd);
+            return & (con -> m_prog_cdcd);
           }
           
-/*          static inline
-          std::vector <clBuffers> *
-          getBuffers    (oclConnection * const con)
-          {
-            return & (con -> m_buffers_fd);
-          }
-*/          
           static inline
           clKernels *
           getKernels    (oclConnection * const con)
           {
-            return & (con -> m_kernels_fd);
+            return & (con -> m_kernels_cdcd);
           }
           
       };
@@ -473,9 +652,15 @@ modify_kernel        ( std::string const &       source,
       {
 
         public:
-  
 
           typedef bool elem_type;
+
+          static inline
+          const std::vector <const char *>
+          getFilenames  ()
+          {
+            return std::vector <const char *> (0);
+          }
 
           static inline
           const char *
@@ -488,21 +673,14 @@ modify_kernel        ( std::string const &       source,
           clProgram *
           getProgram    (oclConnection * const con)
           {
-            return & (con -> m_prog_f);
+            return & (con -> m_prog_ff);
           }
-          
-/*          static inline
-          std::vector <clBuffers> *
-          getBuffers    (oclConnection * const con)
-          {
-            return & (con -> m_buffers_f);
-          }
-*/          
+        
           static inline
           clKernels *
           getKernels    (oclConnection * const con)
           {
-            return & (con -> m_kernels_f);
+            return & (con -> m_kernels_ff);
           }
 
       };
@@ -586,8 +764,12 @@ modify_kernel        ( std::string const &       source,
   {
   
     if (mp_inst == NULL)
-      mp_inst = new oclConnection ( "./src/matrix/ocl/kernels/single_type_kernels.cl",
-                                    "./src/matrix/ocl/kernels/double_type_kernels.cl",
+      mp_inst = new oclConnection ( "./src/matrix/ocl/kernels/A_kernels.cl",
+                                    "./src/matrix/ocl/kernels/AB_kernels.cl",
+                                    "./src/matrix/ocl/kernels/complex_A_kernels.cl",
+                                    "./src/matrix/ocl/kernels/complex_AB_kernels.cl",
+                                    "./src/matrix/ocl/kernels/mixed_A_kernels.cl",
+                                    "./src/matrix/ocl/kernels/mixed_AB_kernels.cl",
                                     CL_DEVICE_TYPE_GPU,
                                     global_verbosity [OCL_CONNECTION] );
       

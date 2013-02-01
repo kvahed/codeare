@@ -33,26 +33,17 @@ modify_kernel              ( std::string const &       source,
 {
 
   std::stringstream ss;          
-  ss << "#pragma OPENCL EXTENSION " << fp_extension << ": enable\n\n";
-  std::string result = ss.str ();
-          
-  ss.str (std::string ());
-  ss << A_type << n << " A_type_n";
-  std::string A_type_n = ss.str ();
-          
-  ss.str (std::string ());
-  ss << A_type << " A_type";
-  std::string A_type_mod = ss.str ();
-
-  ss.str (std::string ());
-  ss << B_type << n << " B_type_n";
-  std::string B_type_n = ss.str ();
-          
-  ss.str (std::string ());
-  ss << B_type << " B_type";
-  std::string B_type_mod = ss.str ();
-    
-  result.append ( viennacl::tools::strReplace (
+  ss <<              "# pragma OPENCL EXTENSION " << fp_extension << "\n\n";
+  ss <<              "# define  A_type_n " << A_type;
+  if (n > 0) ss << n;
+  ss << std::endl << "# define  A_type "   << A_type <<      std::endl;
+  ss <<              "# define  B_type_n " << B_type;
+  if (n > 0) ss << n;
+  ss << std::endl << "# define  B_type "   << B_type <<      std::endl;
+  ss <<              "# define  vec_len "  << (n > 0 ? n : 1) << std::endl;
+  ss << source << std::endl;
+  
+/*  result.append ( viennacl::tools::strReplace (
                     viennacl::tools::strReplace (
                       viennacl::tools::strReplace (
                         viennacl::tools::strReplace (source, "float A_type", A_type_mod),
@@ -60,8 +51,8 @@ modify_kernel              ( std::string const &       source,
                                                  "float B_type", B_type_mod),
                                               "float8 B_type_n", B_type_n)
                  );
-
-  return result;
+*/
+  return ss.str ();
 
 }
 
@@ -70,18 +61,18 @@ modify_kernel              ( std::string const &       source,
 template <class T, class S>
 const char*
 oclConnection::
-ReadSource            (const char * fname,
-                              int * size  )
+ReadSource            (std::string   fname,
+                               int * size  )
 {
 
   // open file
-  FILE *f = fopen(fname, "r");
+  FILE *f = fopen(fname.c_str (), "r");
 
   // create buffer for source code
   void *buf;
 
   if (!f) {
-    fprintf(stderr, "Unable to open %s for reading\n", fname);
+    fprintf(stderr, "Unable to open %s for reading\n", fname.c_str ());
     return NULL;
   }
 
@@ -108,7 +99,7 @@ int
 oclConnection::
 BuildProgram            ()
 {
-  try {
+/*  try {
     m_error = m_prog_f.build (m_devs);
   } catch (cl::Error cle) {
     cout << " Type: <<float, float>>" << std::endl;
@@ -148,6 +139,67 @@ BuildProgram            ()
     cout << "Build Log:\t "                  << m_prog_fd.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
     return -1;
   }
+  try {
+    m_error = m_prog_cf.build (m_devs);
+  } catch (cl::Error cle) {
+    cout << " Type: <<cxfl, cxfl>>" << std::endl;
+    cout << "Error while building program: " << cle.what ()                                                << endl;
+    cout << "Build Status: "                 << m_prog_cf.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
+    cout << "Build Options:\t"               << m_prog_cf.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
+    cout << "Build Log:\t "                  << m_prog_cf.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
+    return -1;
+  }*/
+}
+
+
+
+template <class T, class S>
+oclError &
+oclConnection ::
+init_program_kernels    (oclConnection * const con)
+{
+
+  print_optional (" ** Initializing oclConnection for types ", ocl_precision_trait <T, S> :: getTypeString (), con -> m_verbose);
+
+  // get sources
+  int size;
+  std::vector <std::pair <const char *, ::size_t> > sources;
+  const std::vector <std::string> filenames = ocl_precision_trait <T, S> :: getFilenames ();
+  for (std::vector <std::string> ::const_iterator it = filenames.begin (); it != filenames.end (); ++it)
+  {
+    const char * tmp_src = ReadSource <T, S> (*it, &size);
+    sources.push_back (std::pair <const char*, ::size_t> (tmp_src, size));
+  }
+  
+  clProgram prog;
+  clKernels kernels;
+  
+  try
+  {
+
+    // create program
+    prog = clProgram (con -> m_cont, sources, & con -> m_error);
+    *(ocl_precision_trait <T, S> :: getProgram (con)) = prog;
+  
+    // build program
+    con -> m_error = prog.build (con -> m_devs);
+
+    // create kernels
+    con -> m_error = prog.createKernels (&kernels);
+    *(ocl_precision_trait <T, S> :: getKernels (con)) = kernels;
+
+  }
+  catch (cl::Error cle)
+  {
+    cout << " Type: " << ocl_precision_trait <T, S> :: getTypeString () << std::endl;
+    cout << "Error while building program: " << cle.what ()                                            << endl;
+    cout << "Build Status: "                 << prog.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (con -> m_devs [0]) << endl;
+    cout << "Build Options:\t"               << prog.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (con -> m_devs [0]) << endl;
+    cout << "Build Log:\t "                  << prog.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (con -> m_devs [0]) << endl;
+    std::cout << " Error flag: " << cle.err () << " (" << con -> errorString (cle.err ()) << ")" << std::endl;
+    throw -1;
+  }
+  
 }
 
 
@@ -155,8 +207,12 @@ BuildProgram            ()
 
 // constructor
 oclConnection::
-oclConnection ( const char      * filename_s_type,
-                const char      * filename_d_type,
+oclConnection ( const char      * filename_A_type,
+                const char      * filename_AB_type,
+                const char      * filename_A_cx_type,
+                const char      * filename_AB_cx_type,
+                const char      * filename_A_mx_type,
+                const char      * filename_AB_mx_type,
                 cl_device_type    device_type,
                 VerbosityLevel    verbose )
               : m_current_ocl_objects (),
@@ -190,49 +246,16 @@ oclConnection ( const char      * filename_s_type,
     m_comqs.push_back (clCommandQueue (m_cont, *it));
   }
 
-  // source code (float)
-  int size;
-  const char * source_f = ReadSource <float, float> (filename_s_type, &size);
-  std::vector <std::pair <const char *, ::size_t> > sources_f;
-  sources_f.push_back (std::pair <const char*, ::size_t> (source_f, size));
-  source_f = ReadSource <float, float> (filename_d_type, &size);
-  sources_f.push_back (std::pair <const char*, ::size_t> (source_f, size));
+  init_program_kernels < float,  float> (this);
+  init_program_kernels <double, double> (this);
+  init_program_kernels <  cxfl,  float> (this);
+  init_program_kernels <  cxfl,   cxfl> (this);
+  init_program_kernels <  cxdb, double> (this);
+  init_program_kernels <  cxdb,   cxdb> (this);
 
-  // source code (double)
-  const char * source_d = ReadSource <double, double> (filename_s_type, &size);
-  std::vector <std::pair <const char *, ::size_t> > sources_d;
-  sources_d.push_back (std::pair <const char*, ::size_t> (source_d, size));
-  source_d = ReadSource <double, double> (filename_d_type, &size);
-  sources_d.push_back (std::pair <const char*, ::size_t> (source_d, size));
-
-  // source code (double, float)
-  const char * source_df = ReadSource <double, float> (filename_d_type, &size);
-  std::vector <std::pair <const char *, ::size_t> > sources_df;
-  sources_df.push_back (std::pair <const char*, ::size_t> (source_df, size));
-
-  // source code (float, double)
-  const char * source_fd = ReadSource <float, double> (filename_d_type, &size);
-  std::vector <std::pair <const char *, ::size_t> > sources_fd;
-  sources_fd.push_back (std::pair <const char*, ::size_t> (source_fd, size));
-
-  // program
-  m_prog_f = clProgram (m_cont, sources_f, &m_error);
-  m_prog_d = clProgram (m_cont, sources_d, &m_error);
-  m_prog_df = clProgram (m_cont, sources_df, &m_error);
-  m_prog_fd = clProgram (m_cont, sources_df, &m_error);
-  BuildProgram ();                 // for all available devices
-
-  // kernels
-  m_error = m_prog_f.createKernels (&m_kernels_f);
-  m_error = m_prog_d.createKernels (&m_kernels_d);
-  m_error = m_prog_df.createKernels (&m_kernels_df);
-  m_error = m_prog_fd.createKernels (&m_kernels_fd);
+  // set current kernel!
   num_kernel = 0;
-  mp_actKernel = & (m_kernels_f [num_kernel]); // defined default value !!!
-  
-  // create buffer vector
-//  m_buffers_f = std::vector <clBuffers> (m_kernels_f.size());
-//  m_buffers_d = std::vector <clBuffers> (m_kernels_d.size());
+  mp_actKernel = & (m_kernels_ff [num_kernel]); // defined default value !!!
 
   print_optional (" ** oclConnection constructed!", m_verbose);
     

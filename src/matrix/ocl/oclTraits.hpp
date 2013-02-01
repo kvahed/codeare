@@ -45,6 +45,7 @@
     public:
 
       typedef float elem_type;
+      typedef float value_type;
       
       static inline
       const char *
@@ -58,6 +59,29 @@
 
   /******************************
    ** struct: elem_type_traits **
+   **     (spec: cxfl)         **
+   ******************************/
+  template <>
+  struct elem_type_traits <cxfl>
+  {
+  
+    public:
+
+      typedef cxfl elem_type;
+      typedef float value_type;
+      
+      static inline
+      const char *
+      print_elem_type       ( )
+      {
+        return "cxfl";
+      }
+  
+  }; // struct elem_type_traits <cxfl>
+
+
+  /******************************
+   ** struct: elem_type_traits **
    **     (spec: double)       **
    ******************************/
   template <>
@@ -67,6 +91,7 @@
     public:
 
       typedef double elem_type;
+      typedef double value_type;
       
       static inline
       const char *
@@ -80,6 +105,29 @@
 
   /******************************
    ** struct: elem_type_traits **
+   **     (spec: cxdb)         **
+   ******************************/
+  template <>
+  struct elem_type_traits <cxdb>
+  {
+  
+    public:
+
+      typedef cxdb elem_type;
+      typedef double value_type;
+      
+      static inline
+      const char *
+      print_elem_type       ( )
+      {
+        return "cxdb";
+      }
+  
+  }; // struct elem_type_traits <cxdb>
+
+
+  /******************************
+   ** struct: elem_type_traits **
    **     (spec: size_t)       **
    ******************************/
   template <>
@@ -89,6 +137,7 @@
     public:
 
       typedef size_t elem_type;
+      typedef size_t value_type;
       
       static inline
       const char *
@@ -111,6 +160,7 @@
     public:
 
       typedef bool elem_type;
+      typedef bool value_type;
       
       static inline
       const char *
@@ -133,6 +183,7 @@
     public:
 
       typedef int elem_type;
+      typedef int value_type;
       
       static inline
       const char *
@@ -739,8 +790,8 @@
       
         print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
                                            trait2 :: print_elem_type (), "> :: ocl_operator_subtract", op_v_level);
-        ocl_basic_operator_vclAlgo_3 (vclSUBTRACT, arg1, arg2, diff, num_elems);
-//        ocl_basic_operator_kernel_3 ("vector_sub", arg1, arg2, diff, num_elems);
+//        ocl_basic_operator_vclAlgo_3 (vclSUBTRACT, arg1, arg2, diff, num_elems);
+        ocl_basic_operator_kernel_3 ("vector_sub", arg1, arg2, diff, num_elems);
       
       }
       
@@ -761,7 +812,7 @@
       
         print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
                                            trait2 :: print_elem_type (), "> :: ocl_operator_inc", op_v_level);
-        ocl_basic_operator_kernel_11 ("inc", arg1, inc, num_elems);
+        ocl_basic_operator_kernel_11 ("inc", arg1, (elem_type) inc, num_elems);
       
       }
 
@@ -783,8 +834,11 @@
         print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
                                            trait2 :: print_elem_type (), "> :: ocl_operator_dec", op_v_level);
         
+        // use matching type (for std::complex!) //
+        typename trait2 :: value_type factor = -1;
+        
         /* use increment kernel with inverse decrement */
-        ocl_basic_operator_kernel_11 ("inc", arg1, -1 * dec, num_elems);
+        ocl_basic_operator_kernel_11 ("inc", arg1, factor * dec, num_elems);
       
       }
 

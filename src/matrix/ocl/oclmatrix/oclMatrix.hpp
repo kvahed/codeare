@@ -60,6 +60,26 @@
   
   /************************************
    ** struct: ocl_matrix_type_traits **
+   **   (derived, type: cxfl)        **
+   ************************************/
+  template <>
+  struct ocl_matrix_type_traits <cxfl>
+  {
+  
+    typedef cxfl elem_type;
+    
+    static
+    std::string
+    type_name         ( )
+    {
+      return std::string ("oclMatrix <cxfl>");
+    }
+  
+  };
+  
+  
+  /************************************
+   ** struct: ocl_matrix_type_traits **
    **   (derived, type: double)      **
    ************************************/
   template <>
@@ -73,6 +93,26 @@
     type_name         ( )
     {
       return std::string ("oclMatrix <double>");
+    }
+  
+  };
+
+
+  /************************************
+   ** struct: ocl_matrix_type_traits **
+   **   (derived, type: cxdb)        **
+   ************************************/
+  template <>
+  struct ocl_matrix_type_traits <cxdb>
+  {
+  
+    typedef cxdb elem_type;
+    
+    static
+    std::string
+    type_name         ( )
+    {
+      return std::string ("oclMatrix <cxdb>");
     }
   
   };
@@ -1939,6 +1979,10 @@
       Validate            (double & t)  const {}
       void
       Validate            (bool   & t)  const {}
+      void
+      Validate            (cxfl   & t)  const {}
+      void
+      Validate            (cxdb   & t)  const {}
 
 
       /*************************************
@@ -1948,6 +1992,8 @@
       friend class oclMatrix <float>;
       friend class oclMatrix <double>;
       friend class oclMatrix <size_t>;
+      friend class oclMatrix <cxfl>;
+      friend class oclMatrix <cxdb>;
 
       
   };
