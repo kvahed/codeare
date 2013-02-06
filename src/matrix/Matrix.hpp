@@ -1085,7 +1085,7 @@ public:
      */
     inline friend Matrix<T>    
     operator-  (const double& s, const Matrix<T> &m) { 
-        return   m - s;
+        return -m + s;
     }
 
 
@@ -1098,7 +1098,7 @@ public:
      */
     inline friend Matrix<T>    
     operator-  (const float& s, const Matrix<T> &m) { 
-        return   m - s;
+        return -m + s;
     }
 
 
@@ -1111,7 +1111,7 @@ public:
      */
     inline friend Matrix<T>    
     operator-  (const short& s, const Matrix<T> &m) { 
-        return   m - s;
+        return -m + s;
     }
 
 
@@ -1124,7 +1124,7 @@ public:
      */
     inline friend Matrix<T>    
     operator-  (const long& s, const Matrix<T> &m) { 
-        return   m - s;
+        return   -m + s;
     }
 
 
@@ -1137,7 +1137,7 @@ public:
      */
     inline friend Matrix<T>    
     operator-  (const cxfl& s, const Matrix<T> &m) { 
-        return   m - s;
+        return   -m + s;
     }
 
 
@@ -1150,7 +1150,7 @@ public:
      */
     inline friend Matrix<T>    
     operator-  (const cxdb& s, const Matrix<T> &m) { 
-        return   m - s;
+        return   -m + s;
     }
 
 
