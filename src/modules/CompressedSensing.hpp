@@ -218,9 +218,8 @@ namespace RRStrategy {
 
 		Matrix<cxfl> g;
 		
-		g  = ft * wx;
-		g -= data;
-		g  = dwt * (ft->*g);
+		g  = - data + (ft * wx);
+		g  = dwt * (ft ->*g);
 
 		return (2.0 * g);
 
@@ -230,19 +229,17 @@ namespace RRStrategy {
 	/**
 	 * @brief Compute gradient of L1-transform operator
 	 *
-	 *
+	 * @param  x   X
+     * @param  cgp CG parameters
+     * @return     The gradient
 	 */
-	Matrix<cxfl> 
-	GradXFM   (const Matrix<cxfl>& x, const CSParam& cgp) {
+	template <class T> inline static Matrix<T> 
+	GradXFM   (const Matrix<T>& x, const CSParam& cgp) {
 		
-		Matrix<cxfl> g;
+		Matrix<T> g;
+        float pn = 0.5*cgp.pnorm-1.0, l1 = cgp.l1, xfm = cgp.xfmw;
 
-		g  = x * conj(x);
-		g += cxfl(cgp.l1);
-		g ^= (((float)cgp.pnorm)/2.0-1.0);
-		g *= x;
-
-		return (cgp.xfmw * g);
+		return xfm * (x * ((x * conj(x) + l1) ^ pn));
 
 	}
 

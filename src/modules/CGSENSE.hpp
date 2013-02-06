@@ -28,7 +28,7 @@
 
 typedef std::complex<float> raw;
 
-static const int NTHREADS = 8;
+static const int NTHREADS = 4;
 
 namespace RRStrategy {
 	
