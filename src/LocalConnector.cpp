@@ -29,14 +29,14 @@ namespace RRClient {
 	}
 	
 	
-	error_code
+	short
 	LocalConnector::CleanUp () {
 		
 		return FunctorContainer::Finalise ();
 		
 	}
 	
-	error_code
+	short
 	LocalConnector::Init (const char* name) {
 		
 		std::stringstream  temp;
@@ -49,7 +49,7 @@ namespace RRClient {
 	}
 	
 	
-	error_code
+	short
 	LocalConnector::Finalise (const char* name) {
 		
 		return FunctorContainer::Finalise (name);
@@ -57,7 +57,7 @@ namespace RRClient {
 	}
 	
 	
-	error_code
+	short
 	LocalConnector::Process  (const char* name)       {
 		
 		return FunctorContainer::Process (name);
@@ -65,7 +65,7 @@ namespace RRClient {
 	}
 	
 	
-	error_code
+	short
 	LocalConnector::Prepare  (const char* name)       {
 		
 		return FunctorContainer::Prepare (name);

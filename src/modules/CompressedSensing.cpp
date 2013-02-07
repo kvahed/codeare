@@ -27,7 +27,7 @@
 using namespace RRStrategy;
 
 
-RRSModule::error_code
+error_code
 CompressedSensing::Init () {
 
 	printf ("Intialising CompressedSensing ...\n");
@@ -77,12 +77,12 @@ CompressedSensing::Init () {
 	m_initialised = true;
 	printf ("... done.\n\n");
 
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
-RRSModule::error_code
+error_code
 CompressedSensing::Process () {
 
 	printf ("Processing CompressedSensing ...\n");

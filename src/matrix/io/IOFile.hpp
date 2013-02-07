@@ -115,7 +115,7 @@ namespace io      {
 		IOFile (const std::string& fname, const IOMode& mode = READ,
 				Params params = Params(), const bool& verbose = true) :
 			m_fname(fname),
-			m_status(RRSModule::OK),
+			m_status(OK),
 			m_params(params),
 			m_fopen(false),
 			m_verb(verbose),
@@ -139,7 +139,7 @@ namespace io      {
 		/**
 		 * @brief Clean up
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		CleanUp () {
 
 			while (!m_data.empty()) {
@@ -147,7 +147,7 @@ namespace io      {
 				m_data.erase(m_data.begin());
 			}
 
-			return RRSModule::OK;
+			return OK;
 
 		}
 
@@ -179,7 +179,7 @@ namespace io      {
 		 *
 		 * @return Status
 		 */
-		RRSModule::error_code
+		error_code
 		Status () const {
 			return m_status;
 		}
@@ -212,7 +212,7 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Read (const std::string& dname = "") = 0;
 
 
@@ -221,7 +221,7 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Write (const std::string& dname = "") = 0;
 
 		/**
@@ -264,7 +264,7 @@ namespace io      {
 
 		std::string m_fname; /**< @brief  File name */
 
-		RRSModule::error_code  m_status; /**< @brief Status */
+		error_code  m_status; /**< @brief Status */
 
 		IOMode      m_mode;   /**< @Brief IO mode */
 
@@ -283,7 +283,7 @@ namespace io      {
 		 */
 		IOFile () :
 			m_fname(""),
-			m_status(RRSModule::OK),
+			m_status(OK),
 			m_fopen(false),
 			m_verb(true),
 			m_alloc(false),

@@ -29,7 +29,7 @@
 using namespace RRStrategy;
 
 
-RRSModule::error_code
+error_code
 LapackTests::Process     () { 
 
 	// SGEEV, DGEEV, CGEEV, ZGEEV: Eigen value computation
@@ -205,7 +205,7 @@ LapackTests::Process     () {
 	Matrix<cxfl> x = AddMatrix ("x", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (1)));
 	x = MCGLS (A, b, 100, 5.0e-6, 1.0e-3);
 
-	return RRSModule::OK;
+	return OK;
 
 }
 

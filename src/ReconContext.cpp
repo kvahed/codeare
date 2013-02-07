@@ -53,25 +53,25 @@ ReconContext::ReconContext (const char* name) {
 ReconContext::ReconContext     () {}
 		
 		
-RRSModule::error_code
+error_code
 ReconContext::Process          () {
 	return m_strategy->Process();
 }
 
 
-RRSModule::error_code
+error_code
 ReconContext::Init             () {
 	return m_strategy->Init();
 }
 
 
-RRSModule::error_code
+error_code
 ReconContext::Prepare             () {
 	return m_strategy->Prepare();
 }
 
 
-RRSModule::error_code
+error_code
 ReconContext::Finalise     () {
 	return m_strategy->Finalise();
 }

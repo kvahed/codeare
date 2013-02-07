@@ -58,7 +58,7 @@ DeleteImage (T** pp) {
 }
 
 
-RRSModule::error_code 
+error_code 
 MedianFilter_OMP::Process () {
 	
 	Matrix<short>& img = Get<short> ("Image");
@@ -106,7 +106,7 @@ MedianFilter_OMP::Process () {
 		DeleteImage(array);
 	}
 
-	return RRSModule::OK;
+	return OK;
 
 }
 

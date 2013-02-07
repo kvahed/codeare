@@ -75,4 +75,35 @@ enum data_type {
 	T_BOOL
 };
 
+/**
+ * Some constants
+ */
+// PI
+#ifndef PI
+    # define PI 3.141592653589793238462643383279502884197169399375105820974944592
+#endif
+
+#ifndef TWOPI
+    #define TWOPI 6.283185307179586476925286766559005768394338798750211641949889185
+#endif
+
+// Gamma in Hz
+#ifndef GAMMA
+    #define GAMMA 42.576
+#endif
+
+// Gamma in radians
+#ifndef RGAMMA
+    #define RGAMMA 267.513
+#endif
+
+// Bytes & Co
+#define KB          1024;
+#define MB       1048576;
+#define GB    1073741824;
+#define TB 1099511627776;
+
+
+
+
 #endif //__COMMON_H__

@@ -49,7 +49,7 @@ syngotest (Connector<T>* rc) {
 
 	IOContext ioc (fname, SYNGOMR, params);
 
-	if (ioc.Status() != RRSModule::OK) {
+	if (ioc.Status() != OK) {
 		printf ("\n  Couldn't initialise RawParser. Exiting!\n");
 		return false;
 	}

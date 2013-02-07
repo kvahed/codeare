@@ -57,21 +57,21 @@ namespace RRStrategy {
         /**
          * @brief Process
          */
-        virtual RRSModule::error_code
+        virtual error_code
         Process ();
 
         
         /**
          * @brief Initialise
          */
-        virtual RRSModule::error_code
+        virtual error_code
         Init ();
         
 
         /**
          * @brief Finalise
          */
-        virtual RRSModule::error_code
+        virtual error_code
         Finalise ();
 
 

@@ -38,22 +38,22 @@ NuFFT::~NuFFT () {
 }
 
 
-RRSModule::error_code 
+error_code 
 NuFFT::Finalise () {
 
 	//if (m_initialised)
 	//	delete nfft;
 
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
 
-RRSModule::error_code
+error_code
 NuFFT::Init () {
 
-	RRSModule::error_code error = OK; 
+	error_code error = OK; 
 	m_initialised               = false;
 
 	int shots, M, dim, maxit, m, N[4], n[4];
@@ -108,10 +108,10 @@ NuFFT::Init () {
 
 }
 
-RRSModule::error_code 
+error_code 
 NuFFT::Prepare () {
 
-	RRSModule::error_code error = OK;
+	error_code error = OK;
 
 	nfft->KSpace  (Get<double> ("kspace"));
 	nfft->Weights (Get<double> ("weights"));
@@ -124,7 +124,7 @@ NuFFT::Prepare () {
 }
 
 
-RRSModule::error_code
+error_code
 NuFFT::Process () {
 
 	printf ("Processing NuFFT ...\n");

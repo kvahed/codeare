@@ -39,19 +39,19 @@ AFI::~AFI() {
 }
 
 
-RRSModule::error_code
+error_code
 AFI::Init () {
 
 	Attribute ("use_real",     &m_use_real);
 	Attribute ("retain_phase", &m_retain_phase);
 
 	m_initialised = true;
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
-RRSModule::error_code
+error_code
 AFI::Finalise () {
 
 	return ReconStrategy::Finalise();
@@ -59,7 +59,7 @@ AFI::Finalise () {
 }
 
 
-RRSModule::error_code
+error_code
 AFI::Process     () { 
 
 	Matrix<cxfl>& afid = Get<cxfl>("meas");
@@ -67,7 +67,7 @@ AFI::Process     () {
 	Matrix<float> ph1 (afid.Dim(0), afid.Dim(1), afid.Dim(2));
 	PhasePreset (afid, m_use_real, ph1);
 	
-	return RRSModule::OK;
+	return OK;
 	
 }
 

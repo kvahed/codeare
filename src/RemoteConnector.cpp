@@ -18,6 +18,7 @@
  *  02110-1301  USA
  */
 
+#include "common.h"
 #include "RemoteConnector.hpp"
 #include "CorbaExceptions.hpp"
 
@@ -120,7 +121,7 @@ namespace RRClient {
 		if (m_rrsi->Init (name) != OK)
 			return CANNOT_LOAD_LIBRARY;
 		
-		return OK;
+		return (error_code)OK;
 		
 	}
 	
@@ -129,7 +130,7 @@ namespace RRClient {
 	error_code 
 	RemoteConnector::Prepare  (const char* name)  {
 		
-		return m_rrsi->Prepare (name);
+		return (error_code) m_rrsi->Prepare (name);
 		
 	}
 	
@@ -138,7 +139,7 @@ namespace RRClient {
 	error_code 
 	RemoteConnector::Process  (const char* name)  {
 		
-		return  m_rrsi->Process (name);
+		return  (error_code) m_rrsi->Process (name);
 		
 	}
 	
@@ -147,7 +148,7 @@ namespace RRClient {
 	error_code
 	RemoteConnector::Finalise (const char* name) {
 		
-		return m_rrsi->Finalise(name);
+		return (error_code) m_rrsi->Finalise(name);
 		
 	}
 

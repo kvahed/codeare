@@ -75,7 +75,7 @@ WhiteNoise () {
 }
 
 
-RRSModule::error_code
+error_code
 AddPseudoRandomNoise (Matrix<raw>& m, const float& max) {
 
 	SetSeed();

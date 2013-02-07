@@ -44,7 +44,7 @@ namespace codeare {
 				 */
 				~IRDFile () {}
 
-				RRSModule::error_code Read (const std::string& dname) {
+				error_code Read (const std::string& dname) {
 
 					ISMRMRD::IsmrmrdDataset ds (m_fname.c_str(),dname.c_str());
 
@@ -94,12 +94,12 @@ namespace codeare {
 
 					printf ("%zu\n", i);
 
-					return RRSModule::OK;
+					return OK;
 
 				}
 
-				RRSModule::error_code Write (const std::string& dname) {
-					return RRSModule::UNIMPLEMENTED_METHOD;
+				error_code Write (const std::string& dname) {
+					return UNIMPLEMENTED_METHOD;
 				}
 
 				xml_schema::properties m_props; /**< @brief Properties */

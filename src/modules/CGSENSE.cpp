@@ -41,7 +41,7 @@ CGSENSE::~CGSENSE () {
 }
 
 
-RRSModule::error_code 
+error_code 
 CGSENSE::Finalise () {
 
 	if (m_initialised)
@@ -52,12 +52,12 @@ CGSENSE::Finalise () {
 }
 
 
-RRSModule::error_code 
+error_code 
 CGSENSE::Init() {
 
 	printf ("Intialising CG-SENSE ...\n");
 
-	RRSModule::error_code error = OK; 
+	error_code error = OK; 
 
 	m_initialised = false;
 
@@ -113,10 +113,10 @@ CGSENSE::Init() {
 }
 
 
-RRSModule::error_code
+error_code
 CGSENSE::Prepare () {
 
-	RRSModule::error_code error = OK;
+	error_code error = OK;
 
 	Matrix<cxfl>&   sens   = Get<cxfl> ("sens");
 	Matrix<float>& weights = Get<float>("weights");
@@ -146,10 +146,10 @@ CGSENSE::Prepare () {
 }
 
 
-RRSModule::error_code
+error_code
 CGSENSE::Process () {
 
-	RRSModule::error_code error = OK;
+	error_code error = OK;
 
 	ticks cgstart = getticks();
 	
