@@ -2,7 +2,7 @@
 
 using namespace RRStrategy;
 
-RRSModule::error_code 
+error_code 
 SENSE::Init () {
 
 	printf ("Intialising Cartesian SENSE ...\n");
@@ -14,12 +14,12 @@ SENSE::Init () {
 
 	printf ("... done.\n\n");
 
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
-RRSModule::error_code 
+error_code 
 SENSE::Prepare () {
 
 	printf ("Preparing Cartesian SENSE ...\n");
@@ -41,12 +41,12 @@ SENSE::Prepare () {
 	printf ("done\n");
 	printf ("... done.\n\n");
 
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
-RRSModule::error_code
+error_code
 SENSE::Process () { 
 
 	ticks cgstart = getticks();
@@ -57,17 +57,17 @@ SENSE::Process () {
 
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
-RRSModule::error_code
+error_code
 SENSE::Finalise () { 
 
 	delete m_cs;
 
-	return RRSModule::OK;
+	return OK;
 
 }
 

@@ -48,15 +48,15 @@ namespace RRStrategy {
 		/**
 		 * @brief Regrid data to Cartesian k-space
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Process () {
-			return RRSModule::OK;
+			return OK;
 		};
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Init () {
 			return OK;
 		}
@@ -64,7 +64,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Finalise () {
 			return OK;
 		}

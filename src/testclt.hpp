@@ -1,6 +1,8 @@
 #include "options.h"
-#include "RemoteConnector.hpp"
+
 #include "LocalConnector.hpp"
+#include "RemoteConnector.hpp"
+
 #include "IO.hpp"
 
 #ifndef __WIN32__

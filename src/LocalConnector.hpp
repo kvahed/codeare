@@ -75,7 +75,7 @@ namespace RRClient {
 		 * @param name Name of processing library
 		 * @return     Sucess
 		 */
-		virtual error_code
+		virtual short
 		Process        (const char* name);
 
 		
@@ -85,7 +85,7 @@ namespace RRClient {
 		 * @param name Name of processing library
 		 * @return     Sucess
 		 */
-		virtual error_code
+		virtual short
 		Prepare        (const char* name);
 
 		
@@ -95,7 +95,7 @@ namespace RRClient {
 		 * @param name Name of processing library
 		 * @return     Success
 		 */
-		virtual error_code
+		virtual short
 		Init           (const char* name);
 		
 
@@ -105,7 +105,7 @@ namespace RRClient {
 		 * @param name Name of processing library
 		 * @return     Success
 		 */
-		virtual error_code
+		virtual short
 		Finalise       (const char* name = 0);
 		
 
@@ -114,7 +114,7 @@ namespace RRClient {
 		 *
 		 * @return     Success
 		 */
-		virtual error_code
+		virtual short
 		CleanUp        ();
 		
 

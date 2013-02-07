@@ -94,7 +94,7 @@ namespace RRStrategy {
 		 */ 
 		virtual error_code
 		Prepare         () { 
-			return RRSModule::OK; 
+			return OK; 
 		}
 		
 

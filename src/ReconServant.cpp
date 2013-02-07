@@ -31,42 +31,42 @@ namespace RRServer {
 	ReconServant::~ReconServant () {}
 	
 	
-	error_code
+    short
 	ReconServant::CleanUp () {
-		
+
 		return FunctorContainer::CleanUp();
 		
 	}
 	
 	
-	error_code
+	short
 	ReconServant::Init (const char* name) {
 		
-		return FunctorContainer::Init (name);
+		return FunctorContainer::Init(name);
 		
 	}
 	
 	
-	error_code
+	short
 	ReconServant::Finalise (const char* name) {
 		
-		return FunctorContainer::Finalise (name);
+		return FunctorContainer::Finalise(name);
 		
 	}
 	
 	
-	error_code
-	ReconServant::Process  (const char* name)       {
-		
-		return FunctorContainer::Process (name);
+	short
+	ReconServant::Process  (const char* name) {
+        
+		return FunctorContainer::Process(name);
 		
 	}
 	
 	
-	error_code
+	short
 	ReconServant::Prepare  (const char* name)       {
 	
-		return FunctorContainer::Prepare (name);
+		return FunctorContainer::Prepare(name);
 		
 	}
 	

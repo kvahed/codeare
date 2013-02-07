@@ -23,7 +23,7 @@
 
 using namespace RRStrategy;
 
-RRSModule::error_code 
+error_code 
 DirectMethod::Init () {
 
     printf ("\nIntialising DirectMethod ...\n");
@@ -62,21 +62,21 @@ DirectMethod::Init () {
     printf ("... done.\n");
 
 
-    return RRSModule::OK;
+    return OK;
 
 }
 
 
-RRSModule::error_code
+error_code
 DirectMethod::Finalise() {
 
 	ReconStrategy::Finalise();
-    return RRSModule::OK;
+    return OK;
 
 }
 
 
-RRSModule::error_code
+error_code
 DirectMethod::Process     () { 
 
     printf ("Processing DirectMethod ..."); fflush (stdout);
@@ -134,7 +134,7 @@ DirectMethod::Process     () {
     sc.Simulate();
 
     printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
-    return RRSModule::OK;
+    return OK;
 
 }
 

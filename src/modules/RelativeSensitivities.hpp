@@ -59,19 +59,19 @@ namespace RRStrategy {
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Process ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Init ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Finalise ();
 
 
@@ -91,7 +91,7 @@ namespace RRStrategy {
 
 }
 
-RRSModule::error_code
+error_code
 SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Matrix<double>& snro, Matrix<cxfl>& shim, const bool& normalise) {
 	
 	size_t    nrxc = rxm.Dim(3);
@@ -157,13 +157,13 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return RRSModule::OK;
+	return OK;
 	
 }
 
 	
 
-RRSModule::error_code
+error_code
 FTVolumes (Matrix<cxfl>& r) {
 	
 	ticks        tic     = getticks();
@@ -229,13 +229,13 @@ FTVolumes (Matrix<cxfl>& r) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return RRSModule::OK;
+	return OK;
 	
 }
 
 
 
-RRSModule::error_code 
+error_code 
 RemoveOS (Matrix<cxfl>& imgs) {
 	
 	printf ("  Removing RO oversampling ... "); fflush(stdout);
@@ -255,13 +255,13 @@ RemoveOS (Matrix<cxfl>& imgs) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return RRSModule::OK;
+	return OK;
 		
 }
 
 
 
-RRSModule::error_code
+error_code
 B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	
 	printf ("  Computing b0 maps ... "); fflush(stdout);
@@ -295,7 +295,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return RRSModule::OK;
+	return OK;
 	
 }
 
@@ -306,7 +306,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
  *
  * @brief In-out Images/mask
  */
-RRSModule::error_code
+error_code
 SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	
 	printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);

@@ -47,13 +47,13 @@ namespace RRStrategy {
 		/**
 		 * @brief Dump data to disk
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Process     ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Init () {
 			return OK;
 		}
@@ -61,7 +61,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Finalise () {
 			return OK;
 		}

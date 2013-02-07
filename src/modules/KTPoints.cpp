@@ -43,12 +43,12 @@ KTPoints::KTPoints  () :
 KTPoints::~KTPoints ()     {}
 
 
-RRSModule::error_code
+error_code
 KTPoints::Init      ()     {
 
     printf ("Intialising KTPoints ...\n");
     
-    RRSModule::error_code e = OK;
+    error_code e = OK;
     
     // rf pulse durations --------------------
     /*
@@ -102,7 +102,7 @@ KTPoints::Init      ()     {
 }
 
 
-RRSModule::error_code
+error_code
 KTPoints::Finalise  ()     {
 
     return OK;
@@ -110,7 +110,7 @@ KTPoints::Finalise  ()     {
 }
 
 
-RRSModule::error_code
+error_code
 KTPoints::Process   ()     {
 
     printf ("Processing KTPoints ...\n");
@@ -200,7 +200,7 @@ KTPoints::Process   ()     {
     PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "t");
     // -----------------------------------
 
-    return RRSModule::OK;
+    return OK;
 
 }
 

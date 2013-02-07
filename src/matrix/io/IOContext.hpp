@@ -82,36 +82,36 @@ namespace io{
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		RRSModule::error_code Status () const {
+		error_code Status () const {
 
 			if (m_iof)
 				return m_iof->Status();
 
-			return RRSModule::NULL_FILE_HANDLE;
+			return NULL_FILE_HANDLE;
 
 		}
 
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		RRSModule::error_code Read (const std::string& dname) const {
+		error_code Read (const std::string& dname) const {
 
 			if (m_iof)
 				return m_iof->Read(dname);
 
-			return RRSModule::NULL_FILE_HANDLE;
+			return NULL_FILE_HANDLE;
 
 		}
 
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		RRSModule::error_code Write (const std::string& dname) const {
+		error_code Write (const std::string& dname) const {
 
 			if (m_iof)
 				return m_iof->Write(dname);
 
-			return RRSModule::NULL_FILE_HANDLE;
+			return NULL_FILE_HANDLE;
 
 		}
 
@@ -119,24 +119,24 @@ namespace io{
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		RRSModule::error_code Read (const char* dname) const {
+		error_code Read (const char* dname) const {
 
 			if (m_iof)
 				return m_iof->Read(std::string(dname));
 
-			return RRSModule::NULL_FILE_HANDLE;
+			return NULL_FILE_HANDLE;
 
 		}
 
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		RRSModule::error_code Write (const char* dname) const {
+		error_code Write (const char* dname) const {
 
 			if (m_iof)
 				return m_iof->Write(std::string(dname));
 
-			return RRSModule::NULL_FILE_HANDLE;
+			return NULL_FILE_HANDLE;
 
 		}
 
@@ -166,12 +166,12 @@ namespace io{
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		RRSModule::error_code CleanUp () const {
+		error_code CleanUp () const {
 
 			if (m_iof)
 				return m_iof->CleanUp();
 
-			return RRSModule::NULL_FILE_HANDLE;
+			return NULL_FILE_HANDLE;
 
 		}
 
