@@ -1,7 +1,11 @@
 #include "Complex.hpp"
 
-#define  MPICH_IGNORE_CXX_SEEK
+#ifndef __SCALAPACK_TRAITS_HPP__
+#define __SCALAPACK_TRAITS_HPP__
 
+/**
+ * @brief BLACS grid 
+ */
 struct grid_dims {
 	
 	int np; /**< @brief # of processes */
@@ -14,6 +18,7 @@ struct grid_dims {
 	char order; /**< @brief row/col major */
 
 };
+
 
 extern "C" {
 	
@@ -243,3 +248,5 @@ struct ScalapackTraits<double> {
 	}
 
 };
+
+#endif

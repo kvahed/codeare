@@ -22,17 +22,19 @@
 using namespace std;
 
 
+typedef map<string, string[2]> reflist;
+typedef pair<string, string[2]> ref;
+typedef map<string, boost::any> store;
+typedef pair<string, boost::any> entry;
+
+
 /**
  * @brief Central database for all shared matrices<br/>
- *        Matrix smart pointers are stored in individual (type) maps along with string identifier and retrieved by their names.
+ *        Matrix smart pointers are stored in individual (type) maps along
+ * with string identifier and retrieved by their names.
  */
 class Workspace : public Configurable {
 
-
-	typedef map<string, string[2]> reflist;
-	typedef pair<string, string[2]> ref;
-	typedef map<string, boost::any> store;
-	typedef pair<string, boost::any> entry;
 
  public:
 
@@ -72,7 +74,7 @@ class Workspace : public Configurable {
 	 * @param  name  Name
 	 * @param  m     CXFL data storage 
 	 */
-	template <class T> void
+	template <class T> inline void
 	GetMatrix          (const string name, Matrix<T>& m) {
 
 		if (m_ref.find (name) == m_ref.end())
@@ -90,7 +92,7 @@ class Workspace : public Configurable {
 	 * @param  name  Name
 	 * @param  m     CXFL data storage 
 	 */
-	template <class T> void
+	template <class T> inline void
 	SetMatrix          (const string name, Matrix<T>& m) {
 
 		string tag[2];
@@ -119,17 +121,17 @@ class Workspace : public Configurable {
 	 * @param  m     The added matrix
 	 * @return       Success
 	 */
-	template <class T> Matrix<T>& 
+	template <class T> inline Matrix<T>&
 	AddMatrix        (const string name, Ptr< Matrix<T> > m) {
 
 		std::string tag[2];
-		tag[1] = sha256(name);
-		tag[0] = typeid(T).name();
+		tag[0] = sha256(name);
+		tag[1] = typeid(T).name();
 
 		boost::any value = m;
 
 		assert (m_ref.find (name) == m_ref.end());
-		m_ref.insert (pair<string, string[2]> (name, tag));
+		m_ref.insert (ref(name, tag));
 		m_store.insert (entry (tag[0], value));
 
 		return *m;
@@ -143,7 +145,7 @@ class Workspace : public Configurable {
 	 * @param  name  Name
 	 * @return       Reference to data if existent
 	 */
-	template <class T> Matrix<T>& 
+	template <class T> inline Matrix<T>&
 	Get              (const string name) {
 
 		reflist::iterator it = m_ref.find(name);
@@ -151,7 +153,7 @@ class Workspace : public Configurable {
 
 	}
 
-	
+
 	/**
 	 * @brief        Remove a complex double matrix
 	 *
@@ -159,7 +161,7 @@ class Workspace : public Configurable {
 	 * @return       Success
 	 */
 	inline bool 
-	Free             (const string name) {
+	Free             (const std::string& name) {
 
 		reflist::iterator nit = m_ref.find(name);
 		
@@ -186,7 +188,26 @@ class Workspace : public Configurable {
 
 		return true;
 	}
-	
+
+    /**
+     * @brief String representation of mapping
+     */
+    const char* c_str() const {
+
+        std::string sb;
+        
+        for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++) {
+            sb = sb + i->first;
+        	sb = sb + "\t";
+        	sb = sb + i->second[0];
+        	sb = sb + "\t";
+        	sb = sb + i->second[1];
+        	sb = sb + "\n";
+        }
+
+        return sb.c_str();
+        
+    }
 
  private:
 
@@ -207,5 +228,19 @@ class Workspace : public Configurable {
 	static Workspace *m_inst; /*!< @brief Single database instance       */
 	
 };
+
+/**
+ *
+ */
+inline static std::ostream&
+operator<< (std::ostream& os, Workspace& w) {
+
+	os << w.c_str();
+    return os;
+
+}
+
+
+
 
 #endif /* _WORK_SPACE_H_ */

@@ -3,9 +3,12 @@
 
 static inline int v3p_netlib_dqrsl_ (double *x, int *ldx, int *n, int *k, double *qraux, double *y, 
 									 double *qy, double *qty,  double *b, double *rsd, double *xb, 
-									 int *job, int *info) {}
+									 int *job, int *info) {
+	return 0; }
 
-static inline int v3p_netlib_dqrdc_ (double* x, int* ldx, int* n, int* p, int* jptv, double* work, int* job) {}
+static inline int v3p_netlib_dqrdc_ (double* x, int* ldx, int* n, int* p, int* jptv, double* work, int* job) {
+	return 0;
+}
 
 extern "C" {
 
