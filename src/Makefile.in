@@ -87,8 +87,8 @@ liblocal_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(liblocal_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 libremote_la_LIBADD =
-am_libremote_la_OBJECTS = libremote_la-RRSModuleSK.lo \
-	libremote_la-RemoteConnector.lo libremote_la-testclt.lo
+am_libremote_la_OBJECTS = libremote_la-RemoteConnector.lo \
+	libremote_la-testclt.lo
 libremote_la_OBJECTS = $(am_libremote_la_OBJECTS)
 libremote_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libremote_la_CXXFLAGS) \
@@ -104,13 +104,14 @@ lclient_LDADD = $(LDADD)
 lclient_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(lclient_LDFLAGS) $(LDFLAGS) -o $@
-am_rclient_OBJECTS = $(am__objects_1)
+am__objects_2 = RRSModuleSK.$(OBJEXT)
+am_rclient_OBJECTS = $(am__objects_1) $(am__objects_2)
 rclient_OBJECTS = $(am_rclient_OBJECTS)
 rclient_LDADD = $(LDADD)
 rclient_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(rclient_LDFLAGS) $(LDFLAGS) -o $@
-am_reconserver_OBJECTS = $(am__objects_1) RRSModuleSK.$(OBJEXT) \
+am_reconserver_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	ReconServant.$(OBJEXT) reconserver.$(OBJEXT)
 reconserver_OBJECTS = $(am_reconserver_OBJECTS)
 reconserver_LDADD = $(LDADD)
@@ -344,8 +345,8 @@ AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml -Imisc $(OPENMP_CXXFLAGS)
 # Common sources
 COMMON = RRSModule.idl Configurable.h DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp
 
-# Reconstruction strategies & server side stuff
-SERVER_SIDE = 
+# OmniORB interface
+NETWORKING_COMMON = RRSModule.hh RRSModuleSK.cc 
 
 # Rules for clients
 noinst_LTLIBRARIES = libremote.la liblocal.la
@@ -366,14 +367,14 @@ lclient_LDFLAGS = liblocal.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) \
 lclient_DEPENDENCIES = liblocal.la
 
 # Remote client (rclient)
-libremote_la_SOURCES = RRSModule.hh RRSModuleSK.cc RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
+libremote_la_SOURCES = RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
 libremote_la_CXXFLAGS = $(AM_CXXFLAGS) -DREMOTE
-rclient_SOURCES = $(COMMON)
+rclient_SOURCES = $(COMMON) $(NETWORKING_COMMON)
 rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ 
 rclient_DEPENDENCIES = libremote.la
 
 # Rules for reconserver
-reconserver_SOURCES = $(COMMON) RRSModule.hh RRSModuleSK.cc ReconServant.hpp ReconServant.cpp reconserver.cpp
+reconserver_SOURCES = $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp reconserver.cpp
 reconserver_LDFLAGS = $(HDF5) @PLUGIN_LDFLAGS@ -dlopen \
 	modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen \
 	modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen \
@@ -522,7 +523,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Workspace.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblocal_la-LocalConnector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblocal_la-testclt.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libremote_la-RRSModuleSK.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libremote_la-RemoteConnector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libremote_la-testclt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
@@ -565,13 +565,6 @@ liblocal_la-testclt.lo: testclt.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='testclt.cpp' object='liblocal_la-testclt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblocal_la_CXXFLAGS) $(CXXFLAGS) -c -o liblocal_la-testclt.lo `test -f 'testclt.cpp' || echo '$(srcdir)/'`testclt.cpp
-
-libremote_la-RRSModuleSK.lo: RRSModuleSK.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libremote_la_CXXFLAGS) $(CXXFLAGS) -MT libremote_la-RRSModuleSK.lo -MD -MP -MF $(DEPDIR)/libremote_la-RRSModuleSK.Tpo -c -o libremote_la-RRSModuleSK.lo `test -f 'RRSModuleSK.cc' || echo '$(srcdir)/'`RRSModuleSK.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libremote_la-RRSModuleSK.Tpo $(DEPDIR)/libremote_la-RRSModuleSK.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RRSModuleSK.cc' object='libremote_la-RRSModuleSK.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libremote_la_CXXFLAGS) $(CXXFLAGS) -c -o libremote_la-RRSModuleSK.lo `test -f 'RRSModuleSK.cc' || echo '$(srcdir)/'`RRSModuleSK.cc
 
 libremote_la-RemoteConnector.lo: RemoteConnector.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libremote_la_CXXFLAGS) $(CXXFLAGS) -MT libremote_la-RemoteConnector.lo -MD -MP -MF $(DEPDIR)/libremote_la-RemoteConnector.Tpo -c -o libremote_la-RemoteConnector.lo `test -f 'RemoteConnector.cpp' || echo '$(srcdir)/'`RemoteConnector.cpp

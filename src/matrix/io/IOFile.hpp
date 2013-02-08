@@ -30,10 +30,22 @@ namespace io      {
         /**
          * @brief  Get any parameter value
          */
-		boost::any& GetAny (const std::string& key) {
+		boost::any& operator [](const std::string& key) {
+			plist::iterator pli = pl.find(key);
 			if (pl.find(key) == pl.end())
 				return Toolbox::Instance()->void_any;
-			return pl[key];
+			return pli->second;
+		}
+
+
+        /**
+         * @brief  Get any parameter value
+         */
+		boost::any operator [](const std::string& key) const {
+			plist::const_iterator pli = pl.find(key);
+			if (pli == pl.end())
+				return Toolbox::Instance()->void_any;
+			return pli->second;
 		}
 
         
@@ -75,6 +87,7 @@ namespace io      {
 		void Set (const char* key, const boost::any& val) {
 			Set (std::string(key), val);
 		}
+
 
 		plist pl;
 
