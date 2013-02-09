@@ -202,15 +202,16 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	
 	//SVD
 	LapackTraits<T>::gesdd (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+
+	free (work);
+	free (iwork);
 	
+    //Traspose the baby
 	V = !V;
 	
 	// Clean up
 	if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) 
 		free (rwork);
-	
-	free (work);
-	free (iwork);
 	
 	if (info > 0)
 		printf ("\nERROR - XGESDD: The updating process of SBDSDC did not converge.\n\n");
@@ -221,6 +222,10 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	
 } 
 	
+static Matrix<float>
+svd (const Matrix<<std::complex<float> >& A) {
+    return svd
+} 
 
 
 /**

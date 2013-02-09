@@ -143,6 +143,17 @@ CompressedSensing::Process () {
 }
 
 
+CompressedSensing::CompressedSensing() :
+	m_wm(0), m_csiter(0), m_wf(0), m_dim(0) {}
+
+
+CompressedSensing::~CompressedSensing() {}
+
+
+error_code
+CompressedSensing::Finalise() {return OK;}
+
+
 // the class factories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {
     return new CompressedSensing;

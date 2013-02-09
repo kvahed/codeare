@@ -62,24 +62,27 @@ namespace RRStrategy {
 		
 	};
 
+
 	/**
 	 * @brief CS reconstruction based on Sparse MRI v0.2 by Michael Lustig
 	 */
 	class CompressedSensing : public ReconStrategy {
 		
 		
+
 	public:
 		
 		/**
 		 * @brief Default constructor
 		 */
-		CompressedSensing  () {};
+		CompressedSensing  ();
+
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-		~CompressedSensing () {};
+		~CompressedSensing ();
 		
 		
 		/**
@@ -88,19 +91,20 @@ namespace RRStrategy {
 		virtual error_code
 		Process ();
 		
+
 		/**
 		 * @brief Do nothing 
 		 */
 		virtual error_code 
 		Init ();
 		
+
 		/**
 		 * @brief Do nothing 
 		 */
 		virtual error_code
-		Finalise () {
-			return OK;
-		};
+		Finalise ();
+
 
 
 	private:
@@ -218,8 +222,8 @@ namespace RRStrategy {
 
 		Matrix<cxfl> g;
 		
-		g  = - data + (ft * wx);
-		g  = dwt * (ft ->*g);
+		g  = ft ->* (- data + (ft * wx));
+		g  = dwt * g;
 
 		return (2.0 * g);
 

@@ -126,9 +126,7 @@ namespace RRClient {
 		 */
 		template <class T> void 
 		SetMatrix           (const std::string& name, Matrix<T>& m) const {
-
 			Workspace::Instance()->SetMatrix(name, m);
-			
 		}
 		
 		
@@ -140,17 +138,14 @@ namespace RRClient {
 		 */
 		template <class T> void 
 		GetMatrix           (const std::string& name, Matrix<T>& m) const {
-			
 			Workspace::Instance()->GetMatrix(name, m);
-			
 		}
 		
 		
 		
 	private:
 		
-		std::vector<short>  m_rstrats;    /**< Remote reconstruction strategies    */
-		char*                                m_config;   /**< Serialised XML document  */
+		std::vector<short>  m_rstrats; /**< Remote reconstruction strategies    */
 		std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
 		

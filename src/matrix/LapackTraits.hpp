@@ -59,17 +59,17 @@ extern "C" {
 				  int *ldvr, void *work, int *lwork, int *info);
 	
 	// Singular value decomposition 
-	void cgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+	void cgesdd_ (const char *jobz, int *m, int *n, void *a, int *lda, void *s, 
+				  void *u, int *ldu, void *vt, int *ldvt, void *work, int *lwork, 
 				  void *rwork, int *iwork, int*info);
-	void zgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+	void zgesdd_ (const char *jobz, int *m, int *n, void *a, int *lda, void *s, 
+				  void *u, int *ldu, void *vt, int *ldvt, void *work, int *lwork, 
 				  void *rwork, int *iwork, int*info);
-	void dgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+	void dgesdd_ (const char *jobz, int *m, int *n, void *a, int *lda, void *s, 
+				  void *u, int *ldu, void *vt, int *ldvt, void *work, int *lwork, 
 				  int *iwork, int*info);
-	void sgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+	void sgesdd_ (const char *jobz, int *m, int *n, void *a, int *lda, void *s, 
+				  void *u, int *ldu, void *vt, int *ldvt, void *work, int *lwork, 
 				  int *iwork, int*info);
 	
 	// Pseudo-inversion 
