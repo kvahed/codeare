@@ -1975,7 +1975,7 @@ protected:
     // Name
     std::string         _name; 
     
-#ifdef HAVE_MPIN
+#ifdef HAVE_MPI
     // BLACS 
 	grid_dims        _gd;
 	int              _bs;
@@ -2580,9 +2580,6 @@ Matrix<T,P>::operator+ (const Matrix<S,P> &M) const {
 			res[i] += _M[i];
 	}
 
-	//SSE::process<T,P> (&_M[0], &res[0], M.Size(), SSE::add<T,P>(), &res[0]) ;
-	//res.Dat() += _M;
-
     return res;
 
 }
@@ -2593,7 +2590,6 @@ Matrix<T,P>::operator+ (const S& s) const {
 
     Matrix<T,P> res = *this;
 	T t = T(s);
-	//SSE::process<T,P> (&_M[0], &res[0], Size(), SSE::add<T,P>(), &res[0]) ;
 
 #pragma omp parallel default (shared) 
 	{
@@ -2990,7 +2986,7 @@ Matrix<T,P>::Export (IceAs* ias, const size_t pos) const {
 /**
  * @brief             Construct with sizes
  */
-#ifdef HAVE_MPIN
+#ifdef HAVE_MPI
 
 /**
  * @brief   Who are we and where are we?

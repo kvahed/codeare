@@ -115,21 +115,21 @@ class Workspace : public Configurable {
 	
 	
 	/**
-	 * @brief        Add a matrix to according container
+	 * @brief        Add a matrix to workspace
 	 *
 	 * @param  name  Name
 	 * @param  m     The added matrix
+     *
 	 * @return       Success
 	 */
 	template <class T> inline Matrix<T>&
 	AddMatrix        (const string name, Ptr< Matrix<T> > m) {
 
 		std::string tag[2];
+		boost::any value = m;
+        
 		tag[0] = sha256(name);
 		tag[1] = typeid(T).name();
-
-		boost::any value = m;
-
 		assert (m_ref.find (name) == m_ref.end());
 		m_ref.insert (ref(name, tag));
 		m_store.insert (entry (tag[0], value));
@@ -160,87 +160,91 @@ class Workspace : public Configurable {
 	 * @param  name  Name
 	 * @return       Success
 	 */
-	inline bool 
-	Free             (const std::string& name) {
-
-		reflist::iterator nit = m_ref.find(name);
-		
-		if (nit == m_ref.end())
-			return false;
-
-		store::iterator dit = m_store.find (nit->second[0]);
-
-		if      (nit->second[1].compare(typeid(cxfl).name())   == 0)
-			delete boost::any_cast<Ptr<Matrix<cxfl  > > >(dit->second);
-		else if (nit->second[1].compare(typeid(cxdb).name())   == 0)
-			delete boost::any_cast<Ptr<Matrix<cxdb  > > >(dit->second);
-		else if (nit->second[1].compare(typeid(float).name())  == 0)
-			delete boost::any_cast<Ptr<Matrix<float > > >(dit->second);
-		else if (nit->second[1].compare(typeid(double).name()) == 0)
-			delete boost::any_cast<Ptr<Matrix<double> > >(dit->second);
-		else if (nit->second[1].compare(typeid(short).name())   == 0)
-			delete boost::any_cast<Ptr<Matrix<short > > >(dit->second);
-		else if (nit->second[1].compare(typeid(long).name())   == 0)
-			delete boost::any_cast<Ptr<Matrix<long  > > >(dit->second);
-
-		m_store.erase(dit);
-		m_ref.erase(nit);
-
-		return true;
-	}
+	bool 
+	Free (const std::string& name) {
+        
+        reflist::iterator nit = m_ref.find(name);
+        
+        if (nit == m_ref.end())
+            return false;
+        
+        store::iterator dit = m_store.find (nit->second[0]);
+    
+        if      (nit->second[1].compare(typeid(cxfl).name())   == 0)
+            delete boost::any_cast<Ptr<Matrix<cxfl  > > >(dit->second);
+        else if (nit->second[1].compare(typeid(cxdb).name())   == 0)
+            delete boost::any_cast<Ptr<Matrix<cxdb  > > >(dit->second);
+        else if (nit->second[1].compare(typeid(float).name())  == 0)
+            delete boost::any_cast<Ptr<Matrix<float > > >(dit->second);
+        else if (nit->second[1].compare(typeid(double).name()) == 0)
+            delete boost::any_cast<Ptr<Matrix<double> > >(dit->second);
+        else if (nit->second[1].compare(typeid(short).name())   == 0)
+            delete boost::any_cast<Ptr<Matrix<short > > >(dit->second);
+        else if (nit->second[1].compare(typeid(long).name())   == 0)
+            delete boost::any_cast<Ptr<Matrix<long  > > >(dit->second);
+        
+        m_store.erase(dit);
+        m_ref.erase(nit);
+        
+        return true;
+        
+    }
+    
 
     /**
-     * @brief String representation of mapping
+     * @brief        Get string representation of mapping
+     *
+     * @return       String representation of workspace content
      */
-    const char* c_str() const {
-
+    const char*
+    c_str            () const {
+    
         std::string sb;
         
-        for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++) {
-            sb = sb + i->first;
-        	sb = sb + "\t";
-        	sb = sb + i->second[0];
-        	sb = sb + "\t";
-        	sb = sb + i->second[1];
-        	sb = sb + "\n";
-        }
-
+        for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++)
+            sb += i->first + "\t" + i->second[0] + "\t" + i->second[1] + "\n";
+        
         return sb.c_str();
         
     }
 
+
+    /**
+     * 
+     */
  private:
 
 	/** 
-	 * @brief Private constructor (access Instance()). 
-	 *        Singleton object for data storage. Access through Instance().
+	 * @brief        Private constructor (access Instance()). 
+	 *               Singleton object for data storage. Access through Instance().
 	 */
-    Workspace () {}; 
+    Workspace        () {}; 
 
 	/**
-	 * @brief Private copy constructor (access Instance()).
+	 * @brief        Private copy constructor (access Instance()).
 	 */
-	Workspace (const Workspace&) {};
+	Workspace        (const Workspace&) {};
 
-	reflist m_ref; /*! @brief Names and hash tags            */
-	store   m_store;
+	reflist m_ref;   /**< @brief Names and hash tags               */
+	store   m_store; /**< @brief Data pointers                     */
 
-	static Workspace *m_inst; /*!< @brief Single database instance       */
+	static Workspace *m_inst; /**< @brief Single database instance */
 	
 };
 
+
 /**
+ * @brief            Dump to ostream
  *
+ * @param  os        Output stream
+ * @param  w         Workspace
+ * @return           The output stream
  */
 inline static std::ostream&
 operator<< (std::ostream& os, Workspace& w) {
-
 	os << w.c_str();
     return os;
-
 }
-
-
 
 
 #endif /* _WORK_SPACE_H_ */
