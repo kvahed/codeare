@@ -61,6 +61,7 @@ enum IceDim {
 #include <valarray>
 #include <vector>
 #include <ostream>
+#include <string>
 
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -1409,7 +1410,7 @@ public:
 
         _M.resize(Size(), T(0));
 
-		memcpy (&_M[0], &tmp[0], MIN(Size(),tmp.size()) * sizeof(T));
+        memcpy (&_M[0], &tmp[0], MIN(Size(),tmp.size()) * sizeof(T));
 
     }
     

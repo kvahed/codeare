@@ -79,12 +79,19 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	
 	int    lda   =  N;
 	int    ldvl  =  (jobvl) ? N : 1;
-	int    ldvr  =  (jobvr) ? m.Width() : 1;
+	int    ldvr  =  (jobvr) ? N : 1;
 	int    info  =  0;
 	int    lwork = -1;
-	
-	T*     rwork = 0;
-	
+
+    // Appropritely resize the output
+    resize (ev,N,1);
+    if (jobvl == 'V')
+        resize (lv,N,N);
+    if (jobvr == 'V')
+        resize(rv,N,N);
+    
+
+    T* rwork = 0;
 	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))  // Real workspace for complex matrices
 		rwork = (T*) malloc (N * sizeof(T));
 	
@@ -92,7 +99,7 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	
 	// Workspace query 
 	LapackTraits<T>::geev (&jobvl, &jobvr, N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
-	
+
 	// Intialise work space
 	lwork    = (int) creal (wkopt);
 	T* work  = (T*) malloc (lwork * sizeof(T));
@@ -107,7 +114,7 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	free (work);
 	
 	if (info > 0)
-		printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have been computed;\n elements i+1:N of ev contain eigenvalues which\n have converged.\n\n") ;
+		printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have been computed;\n elements %i+1:N of ev contain eigenvalues which\n have converged.\n\n", info) ;
 	else if (info < 0)
 		printf ("\nERROR - XGEEV: the %i-th argument had an illegal value.\n\n", -info); 
 	
@@ -192,7 +199,7 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 		if (jobz == 'N') rwork = malloc (mn * 7            * sizeof(T) / 2);
 		else             rwork = malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
 	}
-	
+    
 	// Workspace query
 	LapackTraits<T>::gesdd (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
 	
@@ -223,8 +230,20 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 } 
 	
 static Matrix<float>
-svd (const Matrix<<std::complex<float> >& A) {
-    return svd
+svd (const Matrix<cxfl>& A) {
+    //return svd
+} 
+static Matrix<float>
+svd (const Matrix<float>& A) {
+    //return svd
+} 
+static Matrix<double>
+svd (const Matrix<cxdb>& A) {
+    //return svd
+} 
+static Matrix<double>
+svd (const Matrix<double>& A) {
+    //return svd
 } 
 
 
