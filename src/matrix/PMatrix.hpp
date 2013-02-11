@@ -4,8 +4,6 @@
 #include "ScalapackTraits.hpp"
 #include "Matrix.hpp"
 
-static int izero = 0;
-static int ione  = 1;
 static int bs    = 16;
 
 /**

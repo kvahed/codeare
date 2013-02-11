@@ -1,5 +1,10 @@
-#include <string.h>
+#include "Complex.hpp"
+
+#include <stdlib.h>
 #include "cblas.h"
+
+static int izero = 0;
+static int ione  = 1;
 
 static inline int v3p_netlib_dqrsl_ (double *x, int *ldx, int *n, int *k, double *qraux, double *y, 
 									 double *qy, double *qty,  double *b, double *rsd, double *xb, 
@@ -185,18 +190,18 @@ struct LapackTraits<float> {
 		Type* dwr = (Type*) malloc (n * sizeof(Type));
 		Type* dwi = (Type*) malloc (n * sizeof(Type));
 		Type* dw  = (Type*) w;
-		
-		dgeev_ (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, lwork,
-				info);
-		
+
+		sgeev_ (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, 
+				lwork, info);
+
 		for (size_t i = 0; i < n; i++) {
-			dw[2*i]   = dwr[i];
+			dw[2*i  ] = dwr[i];
 			dw[2*i+1] = dwi[i];
 		}
-		
+
 		free (dwr);
 		free (dwi);
-		
+
 	}
 
 	inline static void 
@@ -285,7 +290,7 @@ struct LapackTraits<double> {
 
 		dgeev_ (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, 
 				lwork, info);
-		
+
 		for (size_t i = 0; i < n; i++) {
 			dw[2*i  ] = dwr[i];
 			dw[2*i+1] = dwi[i];
