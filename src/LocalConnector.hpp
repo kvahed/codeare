@@ -33,6 +33,7 @@
 #include "Configurable.hpp"
 #include "ReconContext.hpp"
 #include "FunctorContainer.hpp"
+#include "Connector.hpp"
 
 using namespace RRSModule;
 using namespace RRStrategy;

@@ -57,7 +57,6 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/acx_scalapack.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
 	$(top_srcdir)/m4/ax_cxx_exceptions.m4 \
-	$(top_srcdir)/m4/ax_cxx_have_numeric_limits.m4 \
 	$(top_srcdir)/m4/ax_ext.m4 \
 	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_prog_cxx_mpi.m4 \
@@ -139,6 +138,7 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OMNIIDL = @OMNIIDL@
 OPENMP_CXXFLAGS = @OPENMP_CXXFLAGS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@

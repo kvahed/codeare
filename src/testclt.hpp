@@ -1,7 +1,11 @@
 #include "options.h"
 
+#ifdef LOCAL
 #include "LocalConnector.hpp"
+#else 
 #include "RemoteConnector.hpp"
+#endif	
+
 
 #include "IO.hpp"
 

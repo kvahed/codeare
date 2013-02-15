@@ -53,7 +53,7 @@ host_triplet = x86_64-apple-darwin12.2.1
 TESTS = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) t_exp$(EXEEXT) \
 	t_asin$(EXEEXT) t_acos$(EXEEXT) t_atan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
-	t_tanh$(EXEEXT)
+	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/arithmetic
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -63,7 +63,6 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/acx_scalapack.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
 	$(top_srcdir)/m4/ax_cxx_exceptions.m4 \
-	$(top_srcdir)/m4/ax_cxx_have_numeric_limits.m4 \
 	$(top_srcdir)/m4/ax_ext.m4 \
 	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_prog_cxx_mpi.m4 \
@@ -80,7 +79,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__EXEEXT_1 = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) \
 	t_exp$(EXEEXT) t_asin$(EXEEXT) t_acos$(EXEEXT) t_atan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
-	t_tanh$(EXEEXT)
+	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT)
 am__objects_1 =
 am_t_acos_OBJECTS = $(am__objects_1) t_acos.$(OBJEXT)
 t_acos_OBJECTS = $(am_t_acos_OBJECTS)
@@ -103,6 +102,12 @@ t_cosh_LDADD = $(LDADD)
 am_t_exp_OBJECTS = $(am__objects_1) t_exp.$(OBJEXT)
 t_exp_OBJECTS = $(am_t_exp_OBJECTS)
 t_exp_LDADD = $(LDADD)
+am_t_log_OBJECTS = $(am__objects_1) t_log.$(OBJEXT)
+t_log_OBJECTS = $(am_t_log_OBJECTS)
+t_log_LDADD = $(LDADD)
+am_t_log10_OBJECTS = $(am__objects_1) t_log10.$(OBJEXT)
+t_log10_OBJECTS = $(am_t_log10_OBJECTS)
+t_log10_LDADD = $(LDADD)
 am_t_sin_OBJECTS = $(am__objects_1) t_sin.$(OBJEXT)
 t_sin_OBJECTS = $(am_t_sin_OBJECTS)
 t_sin_LDADD = $(LDADD)
@@ -139,12 +144,14 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
-	$(t_exp_SOURCES) $(t_sin_SOURCES) $(t_sinh_SOURCES) \
-	$(t_tan_SOURCES) $(t_tanh_SOURCES)
+	$(t_exp_SOURCES) $(t_log_SOURCES) $(t_log10_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_tan_SOURCES) \
+	$(t_tanh_SOURCES)
 DIST_SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
-	$(t_exp_SOURCES) $(t_sin_SOURCES) $(t_sinh_SOURCES) \
-	$(t_tan_SOURCES) $(t_tanh_SOURCES)
+	$(t_exp_SOURCES) $(t_log_SOURCES) $(t_log10_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_tan_SOURCES) \
+	$(t_tanh_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -204,7 +211,7 @@ LAPACK = -DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -lcblas -llapack -framework 
 LD = /usr/bin/ld
 LDFLAGS = -L/Applications/MATLAB_R2012b.app/bin/maci64  -framework OpenCL
 LIBOBJS =  ${LIBOBJDIR}error$U.o
-LIBS = -lgsl -lcblas -lm -lfftw3f_threads -lfftw3_threads -lfftw3f -lfftw3 -lcrypto -lz -ldl -lomniDynamic4 -lomnithread  -lm  -Wl,-rpath,/usr/local/lib -lnfft3 -L/usr/local/ismrmrd/lib -lismrmrd -lismrmrd_xsd -lboost_thread -lboost_system -lhdf5_cpp -lhdf5 -lniftiio -lznz -lomniORB4 -lmat -lmx -Wl,-rpath,/Applications/MATLAB_R2012b.app/bin/maci64
+LIBS = -lgsl -lcblas -lm -lfftw3f_threads -lfftw3_threads -lfftw3f -lfftw3 -lcrypto -lz -ldl  -lm  -Wl,-rpath,/usr/local/lib -lnfft3 -L/usr/local/ismrmrd/lib -lismrmrd -lismrmrd_xsd -lboost_thread -lboost_system -lhdf5_cpp -lhdf5 -lniftiio -lznz -lmat -lmx -Wl,-rpath,/Applications/MATLAB_R2012b.app/bin/maci64
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = lipo
 LN_S = ln -s
@@ -217,6 +224,7 @@ NM = /usr/bin/nm
 NMEDIT = nmedit
 OBJDUMP = false
 OBJEXT = o
+OMNIIDL = omniidl
 OPENMP_CXXFLAGS = -fopenmp
 OTOOL = otool
 OTOOL64 = :
@@ -386,6 +394,12 @@ t_cosh$(EXEEXT): $(t_cosh_OBJECTS) $(t_cosh_DEPENDENCIES) $(EXTRA_t_cosh_DEPENDE
 t_exp$(EXEEXT): $(t_exp_OBJECTS) $(t_exp_DEPENDENCIES) $(EXTRA_t_exp_DEPENDENCIES) 
 	@rm -f t_exp$(EXEEXT)
 	$(CXXLINK) $(t_exp_OBJECTS) $(t_exp_LDADD) $(LIBS)
+t_log$(EXEEXT): $(t_log_OBJECTS) $(t_log_DEPENDENCIES) $(EXTRA_t_log_DEPENDENCIES) 
+	@rm -f t_log$(EXEEXT)
+	$(CXXLINK) $(t_log_OBJECTS) $(t_log_LDADD) $(LIBS)
+t_log10$(EXEEXT): $(t_log10_OBJECTS) $(t_log10_DEPENDENCIES) $(EXTRA_t_log10_DEPENDENCIES) 
+	@rm -f t_log10$(EXEEXT)
+	$(CXXLINK) $(t_log10_OBJECTS) $(t_log10_LDADD) $(LIBS)
 t_sin$(EXEEXT): $(t_sin_OBJECTS) $(t_sin_DEPENDENCIES) $(EXTRA_t_sin_DEPENDENCIES) 
 	@rm -f t_sin$(EXEEXT)
 	$(CXXLINK) $(t_sin_OBJECTS) $(t_sin_LDADD) $(LIBS)
@@ -412,6 +426,8 @@ include ./$(DEPDIR)/t_atan2.Po
 include ./$(DEPDIR)/t_cos.Po
 include ./$(DEPDIR)/t_cosh.Po
 include ./$(DEPDIR)/t_exp.Po
+include ./$(DEPDIR)/t_log.Po
+include ./$(DEPDIR)/t_log10.Po
 include ./$(DEPDIR)/t_sin.Po
 include ./$(DEPDIR)/t_sinh.Po
 include ./$(DEPDIR)/t_tan.Po

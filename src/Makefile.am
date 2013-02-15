@@ -33,12 +33,12 @@ endif
 libremote_la_SOURCES = RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
 libremote_la_CXXFLAGS = $(AM_CXXFLAGS) -DREMOTE
 rclient_SOURCES = $(COMMON) $(NETWORKING_COMMON)
-rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ 
+rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@  -lomniORB4 -lomnithread -lomniDynamic4 
 rclient_DEPENDENCIES = libremote.la
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp reconserver.cpp
-reconserver_LDFLAGS = $(HDF5) @PLUGIN_LDFLAGS@ -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la -dlopen modules/LapackTests.la tinyxml/libtinyxml.la
+reconserver_LDFLAGS = @PLUGIN_LDFLAGS@ -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la -dlopen modules/LapackTests.la tinyxml/libtinyxml.la -lomniORB4 -lomnithread -lomniDynamic4
 if USE_NFFT3
     reconserver_LDFLAGS += -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 endif

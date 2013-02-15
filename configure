@@ -11,7 +11,7 @@
 # This configure script is free software; the Free Software Foundation
 # gives unlimited permission to copy, distribute and modify it.
 #
-# 2010-2012, Kaveh Vahedipour
+# 2010-2013, Kaveh Vahedipour
 ## -------------------- ##
 ## M4sh Initialization. ##
 ## -------------------- ##
@@ -658,6 +658,9 @@ ax_pthread_config
 PLUGIN_LDFLAGS
 USE_LIBOPENCL_FALSE
 USE_LIBOPENCL_TRUE
+OMNIIDL
+NETWORKING_FALSE
+NETWORKING_TRUE
 PYTHON_LDFLAGS
 PYTHON_INCLUDES
 pkgpyexecdir
@@ -813,6 +816,7 @@ with_mpi
 enable_openmp
 enable_documentation
 with_pythonpath
+enable_networking
 with_fftw
 with_ismrmrdroot
 with_itkroot
@@ -1466,7 +1470,8 @@ Optional Features:
                           speeds up one-time build
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --disable-openmp        do not use OpenMP
-  --enable-documentation          turn on documentation C++ library support (default: yes)
+  --enable-documentation          turn on documentation C++ library support (default: no)
+  --enable-networking          turn on networking support (default: yes)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1579,7 +1584,7 @@ Copyright (C) 2012 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-2010-2012, Kaveh Vahedipour
+2010-2013, Kaveh Vahedipour
 _ACEOF
   exit
 fi
@@ -11785,16 +11790,13 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"1ca8a029\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"77eaadd3\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Fri Feb 8 22:31:22 2013 -0600\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Feb 11 23:04:40 2013 +0100\"" >>confdefs.h
 
 
 # copyright notice
-
-
-# Produce first version of idl derivates
 
 
 # Checks for programs.
@@ -19886,56 +19888,7 @@ $as_echo "#define HAVE_EXCEPTIONS /**/" >>confdefs.h
 
 fi
 
-AX_CXX_NAMESPACES
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler has numeric_limits<T>" >&5
-$as_echo_n "checking whether the compiler has numeric_limits<T>... " >&6; }
-if ${ax_cv_cxx_have_numeric_limits+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
- cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <limits>
-#ifdef HAVE_NAMESPACES
-using namespace std;
-#endif
-int
-main ()
-{
-double e = numeric_limits<double>::epsilon(); return 0;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ax_cv_cxx_have_numeric_limits=yes
-else
-  ax_cv_cxx_have_numeric_limits=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_cxx_have_numeric_limits" >&5
-$as_echo "$ax_cv_cxx_have_numeric_limits" >&6; }
-if test "$ax_cv_cxx_have_numeric_limits" = yes; then
-
-$as_echo "#define HAVE_NUMERIC_LIMITS /**/" >>confdefs.h
-
-fi
-
+#AC_CXX_HAVE_NUMERIC_LIMITS
 
 # Check SMP capabilities
 
@@ -20583,6 +20536,7 @@ fi
      ;;
 esac
 
+# Optional documentation
 
 # Check whether --enable-documentation was given.
 if test "${enable_documentation+set}" = set; then :
@@ -20604,13 +20558,11 @@ else
 fi
 
 
-# Check for xsltproc & xmllint ()
 if test x$documentation = xtrue; then
 
-build_docs=yes
-
-XSLTPROC=
-for ac_prog in xsltproc
+   build_docs=yes
+   XSLTPROC=
+   for ac_prog in xsltproc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -20652,16 +20604,15 @@ fi
   test -n "$XSLTPROC" && break
 done
 
-if test -z "$XSLTPROC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: xsltproc (from the libxslt source package) not found, not building documentation" >&5
+   if test -z "$XSLTPROC"; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: xsltproc (from the libxslt source package) not found, not building documentation" >&5
 $as_echo "$as_me: WARNING: xsltproc (from the libxslt source package) not found, not building documentation" >&2;}
-  build_docs=no
-fi
+      build_docs=no
+   fi
 
-build_api=yes
-
-DOXYGEN=
-for ac_prog in doxygen
+   build_api=yes
+   DOXYGEN=
+   for ac_prog in doxygen
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -20703,11 +20654,11 @@ fi
   test -n "$DOXYGEN" && break
 done
 
-if test -z "$DOXYGEN"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: xsltproc (from the libxslt source package) not found, not building documentation" >&5
-$as_echo "$as_me: WARNING: xsltproc (from the libxslt source package) not found, not building documentation" >&2;}
-  build_api=no
-fi
+      if test -z "$DOXYGEN"; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: doxygen not found." >&5
+$as_echo "$as_me: WARNING: doxygen not found." >&2;}
+      build_api=no
+   fi
 
 fi
 
@@ -21228,8 +21179,14 @@ if test -x ${PYTHON}-config; then
 	fi
 else
 	if test "X$PYTHON_INCLUDES" = X -o "X$PYTHON_LDFLAGS" = X; then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: ${PYTHON}-config does not exist or is not executable, so we could not detect python development environment.  Your system may require an additional package (e.g. \"python3-dev\").  Alternatively, if you are sure you have python headers and libraries, define PYTHON_INCLUDES and PYTHON_LDFLAGS and run this script." >&5
-$as_echo "$as_me: WARNING: ${PYTHON}-config does not exist or is not executable, so we could not detect python development environment.  Your system may require an additional package (e.g. \"python3-dev\").  Alternatively, if you are sure you have python headers and libraries, define PYTHON_INCLUDES and PYTHON_LDFLAGS and run this script." >&2;}
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: ${PYTHON}-config does not exist or is not executable, so we could not detect python\
+ development environment.  Your system may require an additional package (e.g. \"python3-dev\").  Alternatively,\
+ if you are sure you have python headers and libraries, define PYTHON_INCLUDES and PYTHON_LDFLAGS and run this\
+ script." >&5
+$as_echo "$as_me: WARNING: ${PYTHON}-config does not exist or is not executable, so we could not detect python\
+ development environment.  Your system may require an additional package (e.g. \"python3-dev\").  Alternatively,\
+ if you are sure you have python headers and libraries, define PYTHON_INCLUDES and PYTHON_LDFLAGS and run this\
+ script." >&2;}
 	fi
 fi
 
@@ -21466,7 +21423,7 @@ $as_echo "$ac_cv_cxx_namespaces" >&6; }
 
 $as_echo "#define HAVE_NAMESPACES /**/" >>confdefs.h
 
-     fi
+    fi
 
 	 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether isnan is in namespace std" >&5
 $as_echo_n "checking whether isnan is in namespace std... " >&6; }
@@ -21758,7 +21715,88 @@ fi
 
 done
 
-for ac_header in omniORB4/CORBA.h
+
+# Check whether --enable-networking was given.
+if test "${enable_networking+set}" = set; then :
+  enableval=$enable_networking; case "${enableval}" in
+       yes) networking=true ;;
+       no)  networking=false ;;
+       *) as_fn_error $? "bad value ${enableval} for --enable-networking" "$LINENO" 5 ;;
+     esac
+else
+  networking=true
+fi
+
+      if test x$networking = xtrue; then
+  NETWORKING_TRUE=
+  NETWORKING_FALSE='#'
+else
+  NETWORKING_TRUE='#'
+  NETWORKING_FALSE=
+fi
+
+
+if test x$networking = xtrue; then
+
+    OMNIIDL_FAIL=false
+    CORBAH_FAIL=false
+    LIBOT_FAIL=false
+    LIBD4_FAIL=false
+    LIBO4_FAIL=false
+
+    # Produce first version of idl derivates
+    for ac_prog in omniidl
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_OMNIIDL+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$OMNIIDL"; then
+  ac_cv_prog_OMNIIDL="$OMNIIDL" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_OMNIIDL="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+OMNIIDL=$ac_cv_prog_OMNIIDL
+if test -n "$OMNIIDL"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $OMNIIDL" >&5
+$as_echo "$OMNIIDL" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$OMNIIDL" && break
+done
+
+    if test -z "$OMNIIDL"; then
+       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: omniidl not found, bailing out" >&5
+$as_echo "$as_me: WARNING: omniidl not found, bailing out" >&2;}
+       OMNIDL_FAIL=true
+    else
+       cd src; omniidl -bcxx RRSModule.idl; cd ..
+    fi
+
+    # Headers
+    for ac_header in omniORB4/CORBA.h
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "omniORB4/CORBA.h" "ac_cv_header_omniORB4_CORBA_h" "$ac_includes_default"
 if test "x$ac_cv_header_omniORB4_CORBA_h" = xyes; then :
@@ -21767,10 +21805,142 @@ if test "x$ac_cv_header_omniORB4_CORBA_h" = xyes; then :
 _ACEOF
 
 else
-  as_fn_error $? "cannot find omniORB4/CORBA.h, bailing out" "$LINENO" 5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no: cannot find omniORB4/CORBA4.h" >&5
+$as_echo "no: cannot find omniORB4/CORBA4.h" >&6; };CORBAH_FAIL=true
 fi
 
 done
+
+    OLD_LIBS=$LIBS
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for read in -lomnithread" >&5
+$as_echo_n "checking for read in -lomnithread... " >&6; }
+if ${ac_cv_lib_omnithread_read+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lomnithread  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char read ();
+int
+main ()
+{
+return read ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_omnithread_read=yes
+else
+  ac_cv_lib_omnithread_read=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_omnithread_read" >&5
+$as_echo "$ac_cv_lib_omnithread_read" >&6; }
+if test "x$ac_cv_lib_omnithread_read" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOMNITHREAD 1
+_ACEOF
+
+  LIBS="-lomnithread $LIBS"
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: no: cannot find libomnithread, bailing out" >&5
+$as_echo "$as_me: WARNING: no: cannot find libomnithread, bailing out" >&2;};LIBOT_FAIL=true
+fi
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lomniDynamic4" >&5
+$as_echo_n "checking for main in -lomniDynamic4... " >&6; }
+if ${ac_cv_lib_omniDynamic4_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lomniDynamic4  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_omniDynamic4_main=yes
+else
+  ac_cv_lib_omniDynamic4_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_omniDynamic4_main" >&5
+$as_echo "$ac_cv_lib_omniDynamic4_main" >&6; }
+if test "x$ac_cv_lib_omniDynamic4_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOMNIDYNAMIC4 1
+_ACEOF
+
+  LIBS="-lomniDynamic4 $LIBS"
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: no: cannot find libomniDynamic, bailing out" >&5
+$as_echo "$as_me: WARNING: no: cannot find libomniDynamic, bailing out" >&2;};LIBD4_FAIL=true
+fi
+
+    LIBS=$OLD_LIBS
+
+   # Libraries
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CORBA::ORB_init in -lomniORB4" >&5
+$as_echo_n "checking for CORBA::ORB_init in -lomniORB4... " >&6; }
+   OLD_LIBS=$LIBS
+   LIBS="${LIBS} -lomniDynamic4 -lomnithread -lomniORB4"
+   cd src
+   omniidl -bcxx RRSModule.idl
+   cd ..
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include "src/RRSModule.hh"
+int
+main ()
+{
+int argc = 0; char** argv = 0; CORBA::ORB_var orb = CORBA::ORB_init(argc, argv);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+      omniORB4_found=yes
+else
+  LIBS=$OLD_LIBS
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no. cannot find libomniORB4, bailing out" >&5
+$as_echo "no. cannot find libomniORB4, bailing out" >&6; }; LIBO4_FAIL=true
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+    LIBS=$OLD_LIBS
+
+    if $OMNIIDL_FAIL || $CORBAH_FAIL || $LIBOT_FAIL || $LIBD4_FAIL || $LIBO4_FAIL; then
+        as_fn_error $? "cannot find necessary OmniORB4 environment for building network support" "$LINENO" 5
+    fi
+
+fi
 
 for ac_header in nfft3.h
 do :
@@ -22091,94 +22261,6 @@ esac
 
 
 # Checks for C libraries.
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for read in -lomnithread" >&5
-$as_echo_n "checking for read in -lomnithread... " >&6; }
-if ${ac_cv_lib_omnithread_read+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lomnithread  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char read ();
-int
-main ()
-{
-return read ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_omnithread_read=yes
-else
-  ac_cv_lib_omnithread_read=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_omnithread_read" >&5
-$as_echo "$ac_cv_lib_omnithread_read" >&6; }
-if test "x$ac_cv_lib_omnithread_read" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBOMNITHREAD 1
-_ACEOF
-
-  LIBS="-lomnithread $LIBS"
-
-else
-  as_fn_error $? "cannot find libomnithread, bailing out" "$LINENO" 5
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lomniDynamic4" >&5
-$as_echo_n "checking for main in -lomniDynamic4... " >&6; }
-if ${ac_cv_lib_omniDynamic4_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lomniDynamic4  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_omniDynamic4_main=yes
-else
-  ac_cv_lib_omniDynamic4_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_omniDynamic4_main" >&5
-$as_echo "$ac_cv_lib_omniDynamic4_main" >&6; }
-if test "x$ac_cv_lib_omniDynamic4_main" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBOMNIDYNAMIC4 1
-_ACEOF
-
-  LIBS="-lomniDynamic4 $LIBS"
-
-else
-  as_fn_error $? "cannot find libomniDynamic, bailing out" "$LINENO" 5
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
 $as_echo_n "checking for dlopen in -ldl... " >&6; }
 if ${ac_cv_lib_dl_dlopen+:} false; then :
@@ -23606,12 +23688,18 @@ ITK_INSTALL_PREFIX=`echo $ITK_INSTALL_PREFIX | sed -e 's|/|\\\/|g'`
 itklib_path="${with_itkroot}/lib/InsightToolkit"
 itkconfig_cmake="${itklib_path}/ITKConfig.cmake"
 if test -a "$itkconfig_cmake"; then
-	INC_INSIGHT_H="`cat $itkconfig_cmake | grep 'SET(ITK_INCLUDE_DIRS' | sed 's/SET(ITK_INCLUDE_DIRS \"/;/' | sed 's/\")//' | sed 's/;/ -I/g'`"
-	INC_INSIGHT_H="`echo $INC_INSIGHT_H | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" | sed -e 's|\${||g' | sed -e 's|}||g'`"
-    insight_libs_dir="`cat $itkconfig_cmake | grep 'SET(ITK_LIBRARY_DIRS' | sed 's/SET(ITK_LIBRARY_DIRS \"/;/' | sed 's/\")//' | sed 's/;//g' | sed -e 's/\${ITK_INSTALL_PREFIX}/\/usr\/local/g'`"
+	INC_INSIGHT_H="`cat $itkconfig_cmake | grep 'SET(ITK_INCLUDE_DIRS' |\
+ sed 's/SET(ITK_INCLUDE_DIRS \"/;/' | sed 's/\")//' | sed 's/;/ -I/g'`"
+	INC_INSIGHT_H="`echo $INC_INSIGHT_H | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" |\
+ sed -e 's|\${||g' | sed -e 's|}||g'`"
+    insight_libs_dir="`cat $itkconfig_cmake | grep 'SET(ITK_LIBRARY_DIRS' |\
+ sed 's/SET(ITK_LIBRARY_DIRS \"/;/' | sed 's/\")//' | sed 's/;//g' |\
+ sed -e 's/\${ITK_INSTALL_PREFIX}/\/usr\/local/g'`"
 	INSIGHT_LIB_DIR_FLAG="-L$insight_libs_dir"
-	INSIGHT_LIB_DIR_FLAG="`echo $INSIGHT_LIB_DIR_FLAG | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" | sed -e 's|\${||g' | sed -e 's|}||g'`"
-	INSIGHT_LIB_FLAG="-lITKFEM -lITKIO -lITKMetaIO -lITKAlgorithms -lITKStatistics -lITKBasicFilters -lITKCommon  -litkvnl -litkvnl_algo -litksys -lITKDICOMParser -lz"
+	INSIGHT_LIB_DIR_FLAG="`echo $INSIGHT_LIB_DIR_FLAG | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" |\
+ sed -e 's|\${||g' | sed -e 's|}||g'`"
+	INSIGHT_LIB_FLAG="-lITKFEM -lITKIO -lITKMetaIO -lITKAlgorithms -lITKStatistics -lITKBasicFilters\
+ -lITKCommon  -litkvnl -litkvnl_algo -litksys -lITKDICOMParser -lz"
     DEF_INSIGHT="#define HAVE_INSIGHT"
 	$as_echo "#define HAVE_INSIGHT \"1\"" >>confdefs.h
 
@@ -23664,39 +23752,6 @@ rm -f core conftest.err conftest.$ac_objext \
 
 LIBS=${OLD_LIBS}
 CXXFLAGS=${OLD_CXXFLAGS}
-
-# OMNIORB
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for CORBA::ORB_init(int, char**) in -lomniORB4" >&5
-$as_echo_n "checking for CORBA::ORB_init(int, char**) in -lomniORB4... " >&6; }
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -lomniORB4"
-cd src
-omniidl -bcxx RRSModule.idl
-cd ..
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include "src/RRSModule.hh"
-int
-main ()
-{
-int argc = 0; char** argv = 0; CORBA::ORB_var orb = CORBA::ORB_init(argc, argv);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-   omniORB4_found=yes
-else
-  LIBS=$OLD_LIBS
-   as_fn_error $? "no. cannot find libomniORB4, bailing out" "$LINENO" 5
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-if test -z $omniORB4_found; then
-    LIBS=$OLD_LIBS
-fi
 
 # MATLAB IO LIBRARIES
 
@@ -23870,7 +23925,8 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  BLAS="/opt/intel/mkl/lib/intel64 -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -openmp -lpthread -lm"
+  BLAS="/opt/intel/mkl/lib/intel64 -lmkl_intel_ilp64 -lmkl_intel_thread\
+ -lmkl_core -openmp -lpthread -lm"
 fi
 
   fi
@@ -24996,6 +25052,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BUILD_API_TRUE}" && test -z "${BUILD_API_FALSE}"; then
   as_fn_error $? "conditional \"BUILD_API\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${NETWORKING_TRUE}" && test -z "${NETWORKING_FALSE}"; then
+  as_fn_error $? "conditional \"NETWORKING\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_LIBOPENCL_TRUE}" && test -z "${USE_LIBOPENCL_FALSE}"; then
