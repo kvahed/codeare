@@ -64,7 +64,6 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/acx_scalapack.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
 	$(top_srcdir)/m4/ax_cxx_exceptions.m4 \
-	$(top_srcdir)/m4/ax_cxx_have_numeric_limits.m4 \
 	$(top_srcdir)/m4/ax_ext.m4 \
 	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_prog_cxx_mpi.m4 \
@@ -250,6 +249,7 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OMNIIDL = @OMNIIDL@
 OPENMP_CXXFLAGS = @OPENMP_CXXFLAGS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
@@ -370,19 +370,20 @@ lclient_DEPENDENCIES = liblocal.la
 libremote_la_SOURCES = RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
 libremote_la_CXXFLAGS = $(AM_CXXFLAGS) -DREMOTE
 rclient_SOURCES = $(COMMON) $(NETWORKING_COMMON)
-rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ 
+rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@  -lomniORB4 -lomnithread -lomniDynamic4 
 rclient_DEPENDENCIES = libremote.la
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp reconserver.cpp
-reconserver_LDFLAGS = $(HDF5) @PLUGIN_LDFLAGS@ -dlopen \
-	modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen \
-	modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen \
+reconserver_LDFLAGS = @PLUGIN_LDFLAGS@ -dlopen modules/DummyRecon.la \
+	-dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la \
+	-dlopen modules/SystemCmd.la -dlopen \
 	modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la \
 	-dlopen modules/KTPoints.la -dlopen \
 	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
 	-dlopen modules/DirectMethod.la -dlopen modules/LapackTests.la \
-	tinyxml/libtinyxml.la $(am__append_2)
+	tinyxml/libtinyxml.la -lomniORB4 -lomnithread -lomniDynamic4 \
+	$(am__append_2)
 EXTRA_DIST = RRSModule.idl Makefile.win32
 CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
 SUBDIRS = tinyxml modules matrix

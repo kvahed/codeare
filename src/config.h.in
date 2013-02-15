@@ -162,9 +162,6 @@
 /* Define to 1 if you have the <nifti1_io.h> header file. */
 #undef HAVE_NIFTI1_IO_H
 
-/* define if the compiler has numeric_limits<T> */
-#undef HAVE_NUMERIC_LIMITS
-
 /* Define to 1 if you have the <omniORB4/CORBA.h> header file. */
 #undef HAVE_OMNIORB4_CORBA_H
 

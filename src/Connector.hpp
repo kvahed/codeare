@@ -21,14 +21,6 @@
 #ifndef __CONNECTOR_HPP__
 #define __CONNECTOR_HPP__
 
-#ifdef __WIN32__ 
-    #include "RRSModule.h"
-#else
-    #include "RRSModule.hh"
-#endif
-
-using namespace RRSModule;
-
 #include "Matrix.hpp"
 
 namespace RRClient {
