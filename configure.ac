@@ -18,7 +18,7 @@
 
 
 AC_PREREQ(2.59)
-AC_INIT([codeare], [1.0], [k.vahedipour@fz-juelich.de], [codeare])
+AC_INIT([codeare], [1.1], [k.vahedipour@fz-juelich.de], [codeare])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
@@ -133,6 +133,17 @@ AC_TYPE_UINT64_T
 # canonical host system type string
 AC_CANONICAL_HOST
 
+AC_ARG_ENABLE([python],
+     [  --enable-python          turn on python runtime support (default: no)],
+     [case "${enableval}" in
+       yes) python=true ;;
+       no)  python=false ;;
+       *) AC_MSG_ERROR([bad value ${enableval} for --enable-python]) ;;
+     esac],[python=false])
+     AM_CONDITIONAL([PYTHON], [test x$python = xtrue])
+
+if test x$python = xtrue; then
+
 # Check for Python
 m4_define([_AM_PYTHON_INTERPRETER_LIST], [python python3 python3.1])
 AC_ARG_WITH([pythonpath],
@@ -196,6 +207,8 @@ fi
 AC_SUBST(PYTHON_INCLUDES)
 AC_SUBST(PYTHON_LDFLAGS)
 CXXFLAGS="${CXXFLAGS} ${PYTHON_INCLUDES}"
+
+fi
 
 # enable "const" keyword
 AC_C_CONST
@@ -289,11 +302,11 @@ if test x$networking = xtrue; then
        AC_MSG_WARN([omniidl not found, bailing out])    
        OMNIDL_FAIL=true
     else
-       cd src; omniidl -bcxx RRSModule.idl; cd ..
+       omniidl -C${srcdir}/src/ -bcxx ${srcdir}/src/RRSModule.idl 
     fi
 
     # Headers
-    AC_CHECK_HEADERS([omniORB4/CORBA.h], [], 
+        AC_CHECK_HEADERS([omniORB4/CORBA.h], [], 
         [AC_MSG_RESULT([no: cannot find omniORB4/CORBA4.h]);CORBAH_FAIL=true])
     OLD_LIBS=$LIBS
     AC_CHECK_LIB([omnithread], [read], [], 
@@ -306,10 +319,8 @@ if test x$networking = xtrue; then
    AC_MSG_CHECKING([for CORBA::ORB_init in -lomniORB4])
    OLD_LIBS=$LIBS
    LIBS="${LIBS} -lomniDynamic4 -lomnithread -lomniORB4"
-   cd src
-   omniidl -bcxx RRSModule.idl
-   cd ..
-   AC_TRY_LINK([#include "src/RRSModule.hh"],
+
+   AC_TRY_LINK([#include "${srcdir}/src/RRSModule.hh"],
       [int argc = 0; char** argv = 0; CORBA::ORB_var orb = CORBA::ORB_init(argc, argv);],
       [AC_MSG_RESULT([yes])]
       omniORB4_found=yes,

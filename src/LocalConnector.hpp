@@ -21,12 +21,6 @@
 #ifndef __LOCAL_CONNECTOR_H__
 #define __LOCAL_CONNECTOR_H__
 
-#ifdef __WIN32__ 
-    #include "RRSModule.h"
-#else
-    #include "RRSModule.hh"
-#endif
-
 #include <complex>
 #include <vector>
 
@@ -35,7 +29,6 @@
 #include "FunctorContainer.hpp"
 #include "Connector.hpp"
 
-using namespace RRSModule;
 using namespace RRStrategy;
 
 /**
@@ -49,6 +42,8 @@ namespace RRClient {
 	class LocalConnector : public Configurable, 
 						   public FunctorContainer {
 		
+		typedef std::map<std::string, ReconContext*> context_map;
+
 		
 	public:
 		
@@ -147,7 +142,7 @@ namespace RRClient {
 	private:
 		
 		std::vector<short>  m_rstrats; /**< Remote reconstruction strategies    */
-		std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
+		context_map m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
 		
 	};

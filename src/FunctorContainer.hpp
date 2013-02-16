@@ -40,7 +40,7 @@ public:
 	/**
 	 * @brief      Default constructor
 	 */
-	FunctorContainer () {}
+	FunctorContainer () : m_config(0) {}
 
 
 	/**

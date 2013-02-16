@@ -409,7 +409,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../tinyxml -I../misc
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/misc
 EXTRA_DIST = GPUSimulator.cl
 
 # Rules for recon strategies
@@ -441,7 +441,7 @@ DumpToFile_la_LIBADD = $(COMMON_la_LIBADD)
 SENSE_la_SOURCES = SENSE.hpp SENSE.cpp ../matrix/CSENSE.hpp
 SENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 SENSE_la_LIBADD = $(COMMON_la_LIBADD)
-CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp ../matrix/NCSENSE.hpp ../matrix/SEM.hpp OMP.hpp
+CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp ../matrix/NCSENSE.hpp ../matrix/SEM.hpp
 CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK)
 CGSENSE_la_LIBADD = $(COMMON_la_LIBADD)
 SystemCmd_la_SOURCES = SystemCmd.hpp SystemCmd.cpp
@@ -450,7 +450,7 @@ SystemCmd_la_LIBADD = $(COMMON_la_LIBADD)
 LapackTests_la_SOURCES = LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 LapackTests_la_LIBADD = $(COMMON_la_LIBADD)
-GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp CGRAPPA.hpp
+GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp ../matrix/CGRAPPA.hpp
 GRAPPA_la_DEPENDENCIES = 
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)
