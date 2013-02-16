@@ -62,7 +62,6 @@ MCGLS (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit = 100,
 		
 		rn  = pow(creal(norm(r)), 2);
 		res.push_back(rn/xn);
-		
 		if (std::isnan(res.at(i)) || res.at(i) <= conv) break;
 		
 		if (i % 5 == 0 && i > 0) printf ("\n");

@@ -50,7 +50,7 @@ ReconContext::ReconContext (const char* name) {
 
 
 
-ReconContext::ReconContext     () {}
+ReconContext::ReconContext     () : m_strategy(0), m_dlib(0) {}
 		
 		
 error_code

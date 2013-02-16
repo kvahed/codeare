@@ -27,17 +27,10 @@
 
 #include "DllExport.h"
 
-#ifdef __WIN32__ 
-    #include "RRSModule.h"
-#else
-    #include "RRSModule.hh"
-#endif
-
 #include <cstdlib>
 #include <complex>
 #include <stdint.h>
 
-using namespace RRSModule;
 using namespace std;
 
 /**

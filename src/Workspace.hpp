@@ -7,12 +7,6 @@
 #include <boost/any.hpp>
 #include <map>
 
-#ifdef __WIN32__ 
-  #include "RRSModule.h"
-#else
-  #include "RRSModule.hh"
-#endif
-
 #ifdef __APPLE__
   #include "AppleDigest.hpp"
 #else
