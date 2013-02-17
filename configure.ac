@@ -206,7 +206,6 @@ else
 fi
 AC_SUBST(PYTHON_INCLUDES)
 AC_SUBST(PYTHON_LDFLAGS)
-CXXFLAGS="${CXXFLAGS} ${PYTHON_INCLUDES}"
 
 fi
 
@@ -516,7 +515,7 @@ AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
 # Checks for C++ libraries with name spaces
 
-# ISMRMRD
+# ISMRMRD (required)
 AC_ARG_WITH(ismrmrdroot,[  --with-ismrmrdroot       path to ISMRMRD install dir], 
         [], [with_ismrmrdroot=/usr/local/ismrmrd])
 
