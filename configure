@@ -11794,10 +11794,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"845ba08e\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"ec02ffc6\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Fri Feb 15 21:30:46 2013 +0100\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Sat Feb 16 12:17:27 2013 +0100\"" >>confdefs.h
 
 
 # copyright notice
@@ -21217,7 +21217,6 @@ $as_echo "$as_me: WARNING: ${PYTHON}-config does not exist or is not executable,
 fi
 
 
-CXXFLAGS="${CXXFLAGS} ${PYTHON_INCLUDES}"
 
 fi
 
@@ -23555,7 +23554,7 @@ fi
 
 # Checks for C++ libraries with name spaces
 
-# ISMRMRD
+# ISMRMRD (required)
 
 # Check whether --with-ismrmrdroot was given.
 if test "${with_ismrmrdroot+set}" = set; then :
