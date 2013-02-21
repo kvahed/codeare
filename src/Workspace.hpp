@@ -16,10 +16,40 @@
 using namespace std;
 
 
+
 typedef map<string, string[2]> reflist;
 typedef pair<string, string[2]> ref;
 typedef map<string, boost::any> store;
 typedef pair<string, boost::any> entry;
+
+/**
+ * @brief BLACS grid 
+ */
+struct Grid {
+    
+	int np; /**< @brief # of processes */
+	int rk; /**< @brief my rank        */
+	int ct; /**< @brief context        */
+	int nr; /**< @brief # of proc rows */
+	int nc; /**< @brief # of proc columns */
+	int mr; /**< @brief my row # */
+	int mc; /**< @brief my col # */ 
+	char order; /**< @brief row/col major */
+
+	Grid () : np(-1), rk(-1), ct(-1), nr(-1), nc(-1), mr(-1), mc(-1), order('R') {}
+
+    const char* c_str() const {
+
+        stringstream ss;
+        ss << "- np(" << np << ") rk(" << rk << ") ct(" << ct << ") nr(" << nr
+           << ") nc(" << nc << ") mr(" << mr << ") mc(" << mc << ") or(" << order
+           << ")\n";
+        return ss.str().c_str();
+
+    }
+
+};
+
 
 
 /**
@@ -72,7 +102,7 @@ class Workspace : public Configurable {
 	GetMatrix          (const string name, Matrix<T>& m) {
 
 		if (m_ref.find (name) == m_ref.end())
-				return;
+            return;
 
 		reflist::iterator it = m_ref.find(name);
 		m = *boost::any_cast<Ptr<Matrix<T> > >(m_store[it->second[0]]);
@@ -203,6 +233,11 @@ class Workspace : public Configurable {
     }
 
 
+    Grid& GridEnv () {
+        return m_gd;
+    }
+    
+    
     /**
      * 
      */
@@ -212,8 +247,8 @@ class Workspace : public Configurable {
 	 * @brief        Private constructor (access Instance()). 
 	 *               Singleton object for data storage. Access through Instance().
 	 */
-    Workspace        () {}; 
-
+    Workspace        ();
+    
 	/**
 	 * @brief        Private copy constructor (access Instance()).
 	 */
@@ -221,6 +256,7 @@ class Workspace : public Configurable {
 
 	reflist m_ref;   /**< @brief Names and hash tags               */
 	store   m_store; /**< @brief Data pointers                     */
+    Grid    m_gd;
 
 	static Workspace *m_inst; /**< @brief Single database instance */
 	
@@ -237,6 +273,19 @@ class Workspace : public Configurable {
 inline static std::ostream&
 operator<< (std::ostream& os, Workspace& w) {
 	os << w.c_str();
+    return os;
+}
+
+/**
+ * @brief            Dump to ostream
+ *
+ * @param  os        Output stream
+ * @param  w         Workspace
+ * @return           The output stream
+ */
+inline static std::ostream&
+operator<< (std::ostream& os, Grid& g) {
+	os << g.c_str();
     return os;
 }
 

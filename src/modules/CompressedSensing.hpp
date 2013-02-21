@@ -240,7 +240,6 @@ namespace RRStrategy {
 	template <class T> inline static Matrix<T> 
 	GradXFM   (const Matrix<T>& x, const CSParam& cgp) {
 		
-		Matrix<T> g;
         float pn = 0.5*cgp.pnorm-1.0, l1 = cgp.l1, xfm = cgp.xfmw;
 
 		return xfm * (x * ((x * conj(x) + l1) ^ pn));

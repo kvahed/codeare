@@ -154,7 +154,9 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 
 template<class T, class S> static int 
 svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& jobz = 'N') {
-	
+
+    assert (Is2D(IN));
+    
 	Matrix<T> A (IN);
 	
 	// SVD only defined on 2D data
@@ -228,22 +230,34 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	return info;
 	
 } 
-	
+// Convenience calls (for s = svd (A))	
 static Matrix<float>
 svd (const Matrix<cxfl>& A) {
-    //return svd
+    Matrix<float> s;
+    Matrix<cxfl> u,v;
+    svd(A, s, u, v);
+    return s;
 } 
 static Matrix<float>
 svd (const Matrix<float>& A) {
-    //return svd
+    Matrix<float> s;
+    Matrix<float> u,v;
+    svd(A, s, u, v);
+    return s;
 } 
 static Matrix<double>
 svd (const Matrix<cxdb>& A) {
-    //return svd
+    Matrix<double> s;
+    Matrix<cxdb> u,v;
+    svd(A, s, u, v);
+    return s;
 } 
 static Matrix<double>
 svd (const Matrix<double>& A) {
-    //return svd
+    Matrix<double> s;
+    Matrix<double> u,v;
+    svd(A, s, u, v);
+    return s;
 } 
 
 
@@ -266,7 +280,7 @@ template <class T> static Matrix<T>
 inv (const Matrix<T>& m) {
 	
 	// 2D 
-	if (!Is2D(m))       printf ("Inv Error: Parameter m must be 2D");
+    assert(Is2D(m));
 	
 	// Square matrix
 	if (size(m,1) != size (m,0)) printf ("Inv Error: Parameter m must be square");
@@ -336,7 +350,9 @@ inv (const Matrix<T>& m) {
 */
 template<class T> static Matrix<T> 
 pinv (const Matrix<T>& m, double rcond = 1.0) {
-	
+
+    assert (Is2D(m));
+    
 	void *s = 0, *rwork = 0;
 	T    *work = 0, wopt = T(0), rwopt = T(0);
 	int  *iwork = 0, iwopt = 0;
@@ -414,6 +430,8 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
  */
 template<class T> static Matrix<T> 
 chol (const Matrix<T>& A, const char uplo = 'U') {
+
+    assert(Is2D(A));
 	
 	Matrix<T> res  = A;
 	int       info = 0, n = A.Height();
@@ -423,7 +441,11 @@ chol (const Matrix<T>& A, const char uplo = 'U') {
 	if (info > 0)
 		printf ("\nERROR - XPOTRF: the leading minor of order %i is not\n positive definite, and the factorization could not be\n completed!\n\n", info);
 	else if (info < 0)
-		printf ("\nERROR - XPOTRF: the %i-th argument had an illegal value.\n\n!", -info); 
+		printf ("\nERROR - XPOTRF: the %i-th argument had an illegal value.\n\n!", -info);
+
+    for (size_t i = 0; i < n-1; i++)
+        for (size_t j = i+1; j < n; j++)
+            res(j,i) = T(0);
 	
 	return res;
 	
@@ -451,12 +473,16 @@ chol (const Matrix<T>& A, const char uplo = 'U') {
  */
 template<class T> static Matrix<T> 
 gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = 'N') {
-	
+
+    assert (Is1D(A)||Is2D(A));
+    assert (Is1D(B)||Is2D(B));
+    
 	int aw, ah, bw, bh, m, n, k, ldc;
 	T   alpha, beta;
 
 	aw = (int)size(A,1); ah = (int)size(A,0), bw = (int)size(B,1), bh = (int)size(B,0);
-	
+
+    // Check inner dimensions
 	if      ( transa == 'N'                   &&  transb == 'N'                  ) assert (aw == bh);
 	else if ( transa == 'N'                   && (transb == 'T' || transb == 'C')) assert (aw == bw);
 	else if ((transa == 'T' || transa == 'C') &&  transb == 'N'                  ) assert (ah == bh);
@@ -477,10 +503,10 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
 	
 	ldc = m;
 	
-	alpha =       T(1.0);
-	beta  =       T(0.0);
+	alpha =  T(1.0);
+	beta  =  T(0.0);
 	
-	Matrix<T> C  (m, n);
+	Matrix<T> C(m,n);
 	
 	LapackTraits<T>::gemm (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
 
@@ -491,7 +517,7 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
 
 
 /**
- * @brief              Eclidean norm
+ * @brief              Frobenius norm
  *
  * Usage:
  * @code{.cpp}
@@ -529,7 +555,7 @@ norm (const Matrix<T>& M) {
  */
 template <class T> static T 
 dotc (const Matrix<T>& A, const Matrix<T>& B) {
-	
+
 	int n, one;
 	T   res;
 
@@ -568,7 +594,7 @@ DOTC (const Matrix<T>& A, const Matrix<T>& B) {
  */
 template <class T> T 
 dot  (const Matrix<T>& A, const Matrix<T>& B) {
-	
+
 	int n, one;
 	T   res;
 
@@ -610,7 +636,10 @@ DOT  (const Matrix<T>& A, const Matrix<T>& B) {
  */
 template<class T> Matrix<T> 
 gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
-	
+
+    assert (Is1D(x));
+    assert (Is1D(A)||Is2D(A));
+    
 	int aw, ah, xh, m, n, one;
 	T   alpha, beta;
 

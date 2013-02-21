@@ -117,12 +117,8 @@ enum    paradigm {
 
 /**
  * @brief   Matrix template.<br/>
- *          This class intends to offer a simple interface for handling
- *          MR data in a simple way. <br/>As of now it only support Siemens 
- *          access specifiers for direct input.<br/>
- *          The data is organised in a 16 member long array for dimensions
- *          and a template array for the data. <br/>The order is column-major.
- * 
+ *          Core data structure
+ *          
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
  */
@@ -1303,6 +1299,39 @@ public:
     
     
     /**
+     * @brief           Get number of rows, i.e. tmp = size(this); tmp(1).
+     *
+     * @return          Number of rows.
+     */
+    inline size_t                 
+    GHeight              () const {
+        return _gdim[0];
+    }
+    
+    
+    /**
+     * @brief           Get number of columns, i.e. tmp = size(this); tmp(2).
+     *
+     * @return          Number of columns.
+     */
+    inline size_t                 
+    GWidth               () const {
+        return _gdim[1];
+    }
+
+
+    /**
+     * @brief           Get number of columns, i.e. tmp = size(this); tmp(2).
+     *
+     * @return          Number of columns.
+     */
+    inline const int*
+    Desc               () const {
+        return _desc;
+    }
+    
+
+    /**
      * @brief           Get resolution a given dimension.
      *
      * @param   i       Dimension
@@ -1978,7 +2007,6 @@ protected:
     
 #ifdef HAVE_MPI
     // BLACS 
-	grid_dims        _gd;
 	int              _bs;
 	int              _desc[9]; /**< @brief matrix grid vector */
 	int              _gdim[2]; /**< @brief Global dimensions */
@@ -2983,73 +3011,6 @@ Matrix<T,P>::Export (IceAs* ias, const size_t pos) const {
 }
 
 #endif // ICE
-
-/**
- * @brief             Construct with sizes
- */
-#ifdef HAVE_MPI
-
-/**
- * @brief   Who are we and where are we?
- */
-inline void 
-GridInfo (grid_dims& gd) {
-    
-    // Defaults
-    gd.rk = 0; 
-    gd.np = 0; 
-    gd.mr = 0; 
-    gd.mc = 0; 
-    gd.nc = 0; 
-    gd.nr = 0; 
-    gd.ct = 0;
-    
-#ifdef HAVE_MPI		
-    Cblacs_pinfo    (&gd.rk, &gd.np);
-    Cblacs_get      (-1, 0, &gd.ct);
-    Cblacs_gridinfo (gd.ct, &gd.nr, &gd.nc, &gd.mr, &gd.mc); 
-#endif
-    
-#ifdef GINFO_DEBUG
-    printf("id (%d), row(%d), col(%d)\n", gd.rk, gd.mr, gd.mc);
-#endif
-    
-}
-
-
-template<> inline
-Matrix<float,MPI>::Matrix (const size_t& cols, const size_t& rows) {
-
-		int info; 
-
-		// Get at home
-		GridInfo(_gd);
-
-		// Global size
-		_gdim[0] = cols;
-		_gdim[1] = rows;
-		
-		// Local size (only with MPI different from global)
-		_dim[0] = numroc_ (&_gdim[0], &_bs, &_gd.mc, &izero, &_gd.nc);
-		_dim[1] = numroc_ (&_gdim[1], &_bs, &_gd.mr, &izero, &_gd.nr);
-		
-		// Allocate
-		_M.resize(Size());
-		
-		// Descriptor 
-		int dims[2]; dims[0] = _dim[0]; dims[1] = _dim[1];
-		descinit_(_desc, &_gdim[0], &_gdim[1], &_bs, &_bs, &izero, &izero, &_gd.ct, 
-				  dims, &info);
-		
-#ifdef DESC_DEBUG
-		printf ("info(%d) desc({%d, %d, %4d, %4d, %d, %d, %d, %d, %4d})\n", 
-				info,     _desc[0], _desc[1], _desc[2], _desc[3], 
-				_desc[4], _desc[5], _desc[6], _desc[7], _desc[8]);
-#endif
-
-}
-	
-#endif // HAVE_MPI
 
 
 #endif // __MATRIX_H__

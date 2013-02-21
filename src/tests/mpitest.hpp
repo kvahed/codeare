@@ -1,70 +1,57 @@
 #include <math.h>
-#include "PMatrix.hpp"
+#include <iostream>
 #include "PIO.hpp"
 
-#ifdef HAVE_MPI
-static void 
-grid_setup (const int& np, int& nc, int& nr) {
+template<> inline
+Matrix<float,MPI>::Matrix (const size_t& cols, const size_t& rows) {
+
+    // Get at home
+    int info;
+    Grid& gd = Workspace::Instance()->GridEnv();
+    std::cout << gd;
+    
+    // Global size
+    _bs      = 16;
+    _gdim[0] = cols;
+    _gdim[1] = rows;
+		
+    // Local size (only with MPI different from global)
+    _dim[0] = numroc_ (&_gdim[0], &_bs, &gd.mc, &izero, &gd.nc);
+    _dim[1] = numroc_ (&_gdim[1], &_bs, &gd.mr, &izero, &gd.nr);
 	
-	int sqrtnp, i;
+    // Allocate
+    _M.resize(Size());
 	
-	sqrtnp = int(sqrt(double(np)) + 1);
-	
-	for (i = 1; i < sqrtnp; i++)
-		if (!(np % i))
-			nc = i;
-	
-	nr = np/nc;
-	
+    // Descriptor 
+    int dims[2]; dims[0] = _dim[0]; dims[1] = _dim[1];
+    descinit_(_desc, &_gdim[0], &_gdim[1], &_bs, &_bs, &izero, &izero, &gd.ct, 
+              dims, &info);
+
+//#ifdef BLACS_DEBUG
+    printf ("info(%d) desc({%d, %d, %4d, %4d, %d, %d, %d, %d, %4d})\n", 
+            info,     _desc[0], _desc[1], _desc[2], _desc[3], 
+            _desc[4], _desc[5], _desc[6], _desc[7], _desc[8]);
+//#endif
+    Cblacs_barrier();
+    
 }
-
-
-static void 
-sl_init (grid_dims& gd) {
-
-	/* General sizes */
-	Cblacs_pinfo(&gd.rk, &gd.np);
-
-	/* Grid setup */
-	grid_setup (gd.np, gd.nr, gd.nc);
-	Cblacs_get (-1, 0, &gd.ct);
-	Cblacs_gridinit (&gd.ct, &gd.order, gd.nr, gd.nc);
-
-}
-
-
-static void 
-sl_finalise (grid_dims& gd) {
-
-	/* Clean up */
-	Cblacs_gridexit (gd.ct);
-	Cblacs_exit (0);
-
-}
-#endif 
-
-
+	
 template <class T> bool
 mpitest (Connector<T>* rc) {
 
+    Grid& gd = Workspace::Instance()->GridEnv();
+    
 #ifdef HAVE_MPI
-	grid_dims gd;
-	gd.order = 'R';
-
-	/* Initialise ScaLAPACK */
-	sl_init (gd);
 
 	/* MPI aware matrices */
-	PMatrix<double> A (262,132);
-	PMatrix<double> B (262,132);
+	Matrix<float,MPI> A (256,256);
+	Matrix<float,MPI> B (256,256);
 
-	A = gd.rk; //operator=(const T& t)
-	B = A;     //operator=(const PMatrix<T>& P)
+	//A = gd.rk; //operator=(const T& t)
+	//B = A;     //operator=(const PMatrix<T>& P)
 
-	print (B, "B"); // Print to file
-
-	/* Finalise ScaLAPACK */
-	sl_finalise (gd);
+    //print (B,"B");
+    
 #else 
 	printf ("\nMPI not supported by this build\n");
 #endif
