@@ -22,7 +22,8 @@
 #define __CX_HPP__
 
 #include "Matrix.hpp"
-
+#include "Creators.hpp"
+#include "Algos.hpp"
 
 /**
  * @brief    Absolute values 

@@ -340,7 +340,6 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = tinyxml modules matrix
 AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml -Imisc $(OPENMP_CXXFLAGS)
 
 # Common sources
@@ -376,17 +375,18 @@ rclient_DEPENDENCIES = libremote.la
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp reconserver.cpp
-reconserver_LDFLAGS = @PLUGIN_LDFLAGS@ -dlopen modules/DummyRecon.la \
-	-dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la \
-	-dlopen modules/SystemCmd.la -dlopen \
+reconserver_LDFLAGS = $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -dlopen \
+	modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen \
+	modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen \
 	modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la \
 	-dlopen modules/KTPoints.la -dlopen \
 	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
 	-dlopen modules/DirectMethod.la -dlopen modules/LapackTests.la \
 	tinyxml/libtinyxml.la -lomniORB4 -lomnithread -lomniDynamic4 \
 	$(am__append_2)
-EXTRA_DIST = RRSModule.idl Makefile.win32
-CLEANFILES = RRSModule.hh RRSModuleSK.cc common.hh commonSK.cc
+EXTRA_DIST = RRSModule.idl Makefile.win32 common.h
+CLEANFILES = RRSModule.hh RRSModuleSK.cc
+SUBDIRS = tinyxml modules matrix
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

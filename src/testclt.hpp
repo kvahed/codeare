@@ -1,11 +1,10 @@
 #include "options.h"
 
 #ifdef LOCAL
-#include "LocalConnector.hpp"
+    #include "LocalConnector.hpp"
 #else 
-#include "RemoteConnector.hpp"
+    #include "RemoteConnector.hpp"
 #endif	
-
 
 #include "IO.hpp"
 
@@ -36,17 +35,21 @@ int    rank;
 
 bool init (int argc, char** argv) {
 	
+    Grid& gd = Workspace::Instance()->GridEnv();
+
+//	if (gd.rk == 0) {
 		cout << endl;
 #ifdef REMOTE
-		cout << "codeare remote client "         << VERSION                                        << endl;
+		cout << "codeare remote client " << VERSION  << endl;
 #else
-		cout << "codeare local client "         << VERSION                                        << endl;
+		cout << "codeare local client "  << VERSION  << endl;
 #endif
-		
+        
 #ifdef GIT_COMMIT
 		cout << "Commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
 #endif
-		
+        //  }
+    
 		Options *opt = new Options();
 		
 		opt->addUsage  ("Copyright (C) 2010-2012");
@@ -110,6 +113,7 @@ bool init (int argc, char** argv) {
 				   opt->getValue("test"  ) != (char*)"") ? opt->getValue(   "test") : (char*) "DummyRecon";
 		
 		delete opt;
+
 		
 	return true;
 	
