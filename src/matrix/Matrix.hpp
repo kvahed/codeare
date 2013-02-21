@@ -1329,7 +1329,7 @@ public:
     Desc               () const {
         return _desc;
     }
-#ifdef HAVE_MPI    
+#endif
     
 
     /**
