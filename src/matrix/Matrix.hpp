@@ -1297,7 +1297,7 @@ public:
         return _dim[1];
     }
     
-    
+#ifdef HAVE_MPI    
     /**
      * @brief           Get number of rows, i.e. tmp = size(this); tmp(1).
      *
@@ -1329,6 +1329,7 @@ public:
     Desc               () const {
         return _desc;
     }
+#ifdef HAVE_MPI    
     
 
     /**
