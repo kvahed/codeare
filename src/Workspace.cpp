@@ -1,74 +1,10 @@
 #include "Workspace.hpp"
 #include "BLACS.hpp"
 
-#ifdef HAVE_MPI
-static void 
-grid_setup (const int& np, int& nc, int& nr) {
-	
-	int sqrtnp, i;
-	
-	sqrtnp = int(sqrt(double(np)) + 1);
-	
-	for (i = 1; i < sqrtnp; i++)
-		if (!(np % i))
-			nc = i;
-	
-	nr = np/nc;
-	
-}
-
-
-static inline void 
-grid_init (Grid& gd) {
-
-	/* General sizes */
-	Cblacs_pinfo(&gd.rk, &gd.np);
-
-	/* Grid setup */
-	grid_setup (gd.np, gd.nr, gd.nc);
-	Cblacs_get (-1, 0, &gd.ct);
-	Cblacs_gridinit (&gd.ct, &gd.order, gd.nr, gd.nc);
-    Cblacs_gridinfo (gd.ct, &gd.nr, &gd.nc, &gd.mr, &gd.mc);
-
-}
-
-
-static inline void 
-grid_exit (Grid& gd) {
-
-	/* Clean up */
-	Cblacs_gridexit (gd.ct);
-	Cblacs_exit (0);
-
-}
-#endif 
-
-
-
-
 Workspace* Workspace::m_inst = 0; 
 
 
-Workspace::Workspace() {
-
-    // Defaults
-    m_gd.rk = 0; 
-    m_gd.np = 0; 
-    m_gd.mr = 0; 
-    m_gd.mc = 0; 
-    m_gd.nc = 0; 
-    m_gd.nr = 0; 
-    m_gd.ct = 0;
-    
-#ifdef HAVE_MPI
-    grid_init (m_gd);
-    
-#ifdef BLACS_DEBUG2
-    std::cout << m_gd;
-#endif
-#endif
-    
-}
+Workspace::Workspace() {}
 
 
 Workspace::~Workspace () { 
@@ -76,10 +12,6 @@ Workspace::~Workspace () {
 	Finalise();
 	m_inst = 0;
     
-#ifdef HAVE_MPI
-    grid_exit(m_gd);
-#endif
-	
 }
 
 
