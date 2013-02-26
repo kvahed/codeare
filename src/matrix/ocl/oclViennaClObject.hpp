@@ -164,15 +164,15 @@
   const
   {
   
-    print_optional ("oclViennaClObject :: getSizeArg ()", VERB_HIGH);
+    print_optional ("oclViennaClObject :: getScalarArg ()", VERB_HIGH);
 
     if (num > m_num_scalars)
     {
-      throw oclError ("Requested size argument number is out of range!", "oclViennaClObject :: getSizeArg");
+      throw oclError ("Requested size argument number is out of range!", "oclViennaClObject :: getScalarArg");
     }
     else if (mp_scalars == NULL)
     {
-      throw oclError ("No Sizes given!", "oclViennaClObject :: getSizeArg");
+      throw oclError ("No Sizes given!", "oclViennaClObject :: getScalarArg");
     }
     
     return mp_scalars [num];
@@ -192,7 +192,7 @@
   const
   {
     
-    print_optional ("oclViennaClObject :: getVCLArg ()", VERB_HIGH);
+    print_optional ("oclViennaClObject :: getVCLVector ()", VERB_HIGH);
     
     if (num >= m_num_args)
     {
@@ -224,7 +224,7 @@
     
     if (num >= m_num_args)
     {
-      throw oclError ("Requested argument number is out of range!", "oclViennaClObject :: getVCLVector");
+      throw oclError ("Requested argument number is out of range!", "oclViennaClObject :: getVCLMatrix");
     }
     
     try

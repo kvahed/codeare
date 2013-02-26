@@ -43,15 +43,6 @@ modify_kernel              ( std::string const &       source,
   ss <<              "# define  vec_len "  << (n > 0 ? n : 1) << std::endl;
   ss << source << std::endl;
   
-/*  result.append ( viennacl::tools::strReplace (
-                    viennacl::tools::strReplace (
-                      viennacl::tools::strReplace (
-                        viennacl::tools::strReplace (source, "float A_type", A_type_mod),
-                                                   "float8 A_type_n", A_type_n),
-                                                 "float B_type", B_type_mod),
-                                              "float8 B_type_n", B_type_n)
-                 );
-*/
   return ss.str ();
 
 }
@@ -90,65 +81,6 @@ ReadSource            (std::string   fname,
   /* source code !and! size may change with different precision */
   return ocl_precision_trait <T, S> :: modify_source (buf, size); 
 
-}
-
-
-
-
-int
-oclConnection::
-BuildProgram            ()
-{
-/*  try {
-    m_error = m_prog_f.build (m_devs);
-  } catch (cl::Error cle) {
-    cout << " Type: <<float, float>>" << std::endl;
-    cout << "Error while building program: " << cle.what ()                                                << endl;
-    cout << "Build Status: "                 << m_prog_f.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
-    cout << "Build Options:\t"               << m_prog_f.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
-    cout << "Build Log:\t "                  << m_prog_f.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
-    return -1;
-  }
-  try {
-    m_error = m_prog_d.build (m_devs);
-  } catch (cl::Error cle) {
-    cout << " Type: <<double, double>>" << std::endl;
-    cout << "Error while building program: " << cle.what ()                                                << endl;
-    cout << "Build Status: "                 << m_prog_d.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
-    cout << "Build Options:\t"               << m_prog_d.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
-    cout << "Build Log:\t "                  << m_prog_d.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
-    return -1;
-  }
-  try {
-    m_error = m_prog_df.build (m_devs);
-  } catch (cl::Error cle) {
-    cout << " Type: <<double, float>>" << std::endl;
-    cout << "Error while building program: " << cle.what ()                                                << endl;
-    cout << "Build Status: "                 << m_prog_df.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
-    cout << "Build Options:\t"               << m_prog_df.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
-    cout << "Build Log:\t "                  << m_prog_df.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
-    return -1;
-  }
-  try {
-    m_error = m_prog_fd.build (m_devs);
-  } catch (cl::Error cle) {
-    cout << " Type: <<float, double>>" << std::endl;
-    cout << "Error while building program: " << cle.what ()                                                << endl;
-    cout << "Build Status: "                 << m_prog_fd.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
-    cout << "Build Options:\t"               << m_prog_fd.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
-    cout << "Build Log:\t "                  << m_prog_fd.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
-    return -1;
-  }
-  try {
-    m_error = m_prog_cf.build (m_devs);
-  } catch (cl::Error cle) {
-    cout << " Type: <<cxfl, cxfl>>" << std::endl;
-    cout << "Error while building program: " << cle.what ()                                                << endl;
-    cout << "Build Status: "                 << m_prog_cf.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (m_devs [0]) << endl;
-    cout << "Build Options:\t"               << m_prog_cf.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (m_devs [0]) << endl;
-    cout << "Build Log:\t "                  << m_prog_cf.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (m_devs [0]) << endl;
-    return -1;
-  }*/
 }
 
 
@@ -234,6 +166,8 @@ oclConnection ( const char      * filename_A_type,
   // devices
   m_error = m_plat.getDevices (device_type, &m_devs);
   print_optional (" ** # of devices on platform: %d", m_devs.size(), VERB_LOW);
+  std::string vendor;
+  print_optional (" ** device type (0): ", (m_devs [0].getInfo (CL_DEVICE_VENDOR, &vendor), vendor.c_str ()), VERB_LOW);
   if (m_devs.size() == 0)
     throw oclError ("No devices available on this platform", "oclConnection :: CTOR");
 

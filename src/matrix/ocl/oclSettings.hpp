@@ -55,7 +55,13 @@
     vclMATPROD
   
   };
-
+  
+  enum oclAMDBlasType
+  {
+  
+    amdblasGEMM
+  
+  };
   
   enum VerbosityLevel
   {

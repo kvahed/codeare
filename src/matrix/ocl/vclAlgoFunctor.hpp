@@ -50,6 +50,7 @@
       /**
        * @brief               overloaded operator (functor)
        */
+      inline
       virtual
       void
       operator()              ()
@@ -145,6 +146,7 @@
       /**
        * @brief             refer to base class
        */
+      inline
       virtual
       void
       operator()            ()
@@ -221,6 +223,7 @@
       /**
        * @brief             refer to base class
        */
+      inline
       virtual
       void
       operator()            ()

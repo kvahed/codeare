@@ -18,6 +18,9 @@
   // ocl
   # include "oclGPUDataObject.hpp"
   # include "oclSettings.hpp"
+  
+  // AMD BLAS
+  # include <clAmdBlas.h>
       
   
 
@@ -53,6 +56,7 @@
       {
         return "float";
       }
+      
   
   }; // struct elem_type_traits <float>
 
@@ -92,7 +96,7 @@
 
       typedef double elem_type;
       typedef double value_type;
-      
+
       static inline
       const char *
       print_elem_type       ( )
@@ -229,6 +233,38 @@
        * @name                        basic operator algos
        */
       //@{
+      
+      
+      /**
+       * @brief                       run given function object
+       */
+      static inline
+      const oclError &
+      ocl_run_func_obj                (oclFunctionObject * const func_obj)
+      {
+      
+        try
+        {
+
+          // activate precision mode for type elem_type
+          oclConnection :: Instance () -> activate <elem_type, scalar_type> ();
+
+          // execute function object
+          func_obj -> run ( );
+
+        }
+        catch (oclError & err)
+        {
+        
+          stringstream msg;
+          msg << "oclOperations <" << trait1 :: print_elem_type () << ", "
+                                   << trait2 :: print_elem_type () << "> :: ocl_basic_operator_kernel_3";
+        
+          throw oclError (oclError (err, msg.str ().c_str ()));
+        
+        }
+      
+      }
     
     
       /**
@@ -258,30 +294,62 @@
                                         -> makeFunctionObject <elem_type, scalar_type>
                                               (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
         
-        try
-        {
-
-          // activate precision mode for type elem_type
-          oclConnection :: Instance () -> activate <elem_type, scalar_type> ();
-
-          // execute function object
-          op_obj -> run ( );
-
-        }
-        catch (oclError & err)
-        {
-        
-          stringstream msg;
-          msg << "oclOperations <" << trait1 :: print_elem_type () << ", "
-                                   << trait2 :: print_elem_type () << "> :: ocl_basic_operator_kernel_3";
-        
-          throw oclError (oclError (err, msg.str ().c_str ()), kernel_name);
-        
-        }
+        // execute function object
+        ocl_run_func_obj (op_obj);
 
         // clear memory
         delete op_obj;      
         delete args [3];
+        free (args);
+    
+      }
+
+
+      /**
+       * @brief                       execute specified kernel with 3 arguments and 5 scalars
+       */
+      static inline
+      const oclError &
+      ocl_basic_operator_kernel_35             ( const          char * const kernel_name,
+                                                       oclDataObject * const        arg1,
+                                                       oclDataObject * const        arg2,
+                                                       oclDataObject * const      result,
+                                                                 int                  s1,
+                                                                 int                  s2,
+                                                                 int                  s3,
+                                                                 int                  s4,
+                                                                 int                  s5 )
+      {
+    
+        // number of kernel arguments
+        const int num_args = 8;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = result;
+        args [3] = new oclGPUDataObject <int> (& s1, 1);
+        args [4] = new oclGPUDataObject <int> (& s2, 1);
+        args [5] = new oclGPUDataObject <int> (& s3, 1);
+        args [6] = new oclGPUDataObject <int> (& s4, 1);
+        args [7] = new oclGPUDataObject <int> (& s5, 1);
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance ()
+                                        -> makeFunctionObject <elem_type, scalar_type>
+                                              (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
+        
+        // execute function object
+        ocl_run_func_obj (op_obj);
+
+        // clear memory
+        delete op_obj;
+        delete args [3];
+        delete args [4];
+        delete args [5];
+        delete args [6];
+        delete args [7];
         free (args);
     
       }
@@ -312,26 +380,8 @@
                                         -> makeFunctionObject <elem_type, scalar_type>
                                               (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
         
-        try
-        {
-
-          // activate precision mode for type elem_type
-          oclConnection :: Instance () -> activate <elem_type, scalar_type> ();
-
-          // execute function object
-          op_obj -> run ( );
-
-        }
-        catch (oclError & err)
-        {
-        
-          stringstream msg;
-          msg << "oclOperations <" << trait1 :: print_elem_type () << ", "
-                                   << trait2 :: print_elem_type () << "> :: ocl_basic_operator_kernel_11";
-        
-          throw oclError (oclError (err, msg.str ().c_str ()), kernel_name);
-        
-        }
+        // execute function object
+        ocl_run_func_obj (op_obj);
 
         // clear memory      
         delete op_obj;
@@ -369,26 +419,8 @@
                                         -> makeFunctionObject <elem_type, scalar_type>
                                               (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
         
-        try
-        {
-
-          // activate precision mode for type elem_type
-          oclConnection :: Instance () -> activate <elem_type, scalar_type> ();
-
-          // execute function object
-          op_obj -> run ( );
-
-        }
-        catch (oclError & err)
-        {
-        
-          stringstream msg;
-          msg << "oclOperations <" << trait1 :: print_elem_type () << ", "
-                                   << trait2 :: print_elem_type () << "> :: ocl_basic_operator_kernel_21";
-        
-          throw oclError (oclError (err, msg.str ().c_str ()), kernel_name);
-        
-        }
+        // execute function object
+        ocl_run_func_obj (op_obj);
 
         // clear memory      
         delete op_obj;      
@@ -424,26 +456,8 @@
                                         -> makeFunctionObject <elem_type, scalar_type>
                                               (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
       
-        try
-        {
-
-          // activate precision mode for type elem_type
-          oclConnection :: Instance () -> activate <elem_type, scalar_type> ();
-
-          // execute function object
-          op_obj -> run ( );
-
-        }
-        catch (oclError & err)
-        {
-        
-          stringstream msg;
-          msg << "oclOperations <" << trait1 :: print_elem_type () << ", "
-                                   << trait2 :: print_elem_type () << "> :: ocl_basic_operator_kernel_2";
-        
-          throw oclError (oclError (err, msg.str ().c_str ()), kernel_name);
-        
-        }
+        // execute function object
+        ocl_run_func_obj (op_obj);
 
         // clear memory      
         delete op_obj;      
@@ -480,26 +494,8 @@
                                         -> makeFunctionObject <elem_type, scalar_type>
                                               (vcl_algo, args, num_args, oclConnection::VCL, oclConnection::SYNC);
       
-        try
-        {
-
-          // activate precision mode for type elem_type
-          oclConnection :: Instance () -> activate <elem_type, scalar_type> ();
-
-          // execute function object
-          op_obj -> run ( );
-
-        }
-        catch (oclError & err)
-        {
-
-          stringstream msg;
-          msg << "oclOperations <" << trait1 :: print_elem_type () << ", "
-                                   << trait2 :: print_elem_type () << "> :: ocl_basic_operator_vclAlgo_3";
-        
-          throw oclError (err, msg.str ().c_str ());
-        
-        }
+        // execute function object
+        ocl_run_func_obj (op_obj);
 
         // clear memory      
         delete op_obj;      
@@ -540,26 +536,8 @@
                                        -> makeFunctionObject <elem_type, scalar_type>
                                            (vcl_algo, args, num_args, oclConnection::VCL, oclConnection::SYNC, num_scalars, scalars);
 
-        try
-        {
-
-          // activate precision mode for type elem_type
-          oclConnection :: Instance () -> activate <elem_type, scalar_type> ();
-
-          // execute function object
-          op_obj -> run ( );
-
-        }
-        catch (oclError & err)
-        {
-        
-          stringstream msg;
-          msg << "oclOperations <" << trait1 :: print_elem_type () << ", "
-                                   << trait2 :: print_elem_type () << "> :: ocl_basic_operator_vclAlgo_22";
-          
-          throw oclError (err, msg.str ().c_str ());
-        
-        }
+        // execute function object
+        ocl_run_func_obj (op_obj);
 
         // clear memory      
         delete op_obj;
@@ -608,33 +586,65 @@
                                        -> makeFunctionObject <elem_type, scalar_type>
                                            (vcl_algo, args, num_args, oclConnection::VCL, oclConnection::SYNC, num_scalars, scalars);
 
-        try
-        {
-
-          // activate precision mode for type elem_type
-          oclConnection :: Instance () -> activate <elem_type, scalar_type> ();
-
-          // execute function object
-          op_obj -> run ( );
-
-        }
-        catch (oclError & err)
-        {
-        
-          stringstream msg;
-          msg << "oclOperations <" << trait1 :: print_elem_type () << ", "
-                                   << trait2 :: print_elem_type () << "> :: ocl_basic_operator_vclAlgo_35";
-          
-          throw oclError (err, msg.str ().c_str ());
-        
-        }
+        // execute function object
+        ocl_run_func_obj (op_obj);
 
         // clear memory      
         delete op_obj;
         free (scalars);
         free (args);
     
-      }  
+      }
+      
+      
+      /**
+       * @brief                       execute specified AMD BLAS algorithm
+       */
+      static inline
+      const oclError &
+      ocl_basic_operator_amdblas_35            ( const oclAMDBlasType            amd_algo,
+                                                       oclDataObject * const        arg1,
+                                                       oclDataObject * const        arg2,
+                                                       oclDataObject * const      result,
+                                                                 int                  s1,
+                                                                 int                  s2,
+                                                                 int                  s3,
+                                                                 int                  s4,
+                                                                 int                  s5 )
+      {
+    
+        // number of kernel arguments
+        const int num_args = 3;
+        const int num_scalars = 5;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = result;
+
+        // create array of scalars
+        int * scalars = (int *) malloc (num_scalars * sizeof (int));
+        scalars [0] = s1;
+        scalars [1] = s2;
+        scalars [2] = s3;
+        scalars [3] = s4;
+        scalars [4] = s5;
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance ()
+                                       -> makeFunctionObject <elem_type, scalar_type>
+                                           (amd_algo, args, num_args, oclConnection::AMD, oclConnection::SYNC, num_scalars, scalars);
+
+        // execute function object
+        ocl_run_func_obj (op_obj);
+
+        // clear memory      
+        delete op_obj;
+        free (scalars);
+        free (args);
+    
+      } 
     
     
       //@}
@@ -744,7 +754,7 @@
       
         print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
                                            trait2 :: print_elem_type (), "> :: ocl_operator_matprod", op_v_level);
-        ocl_basic_operator_vclAlgo_35 (vclMATPROD, arg1, arg2, prod, m, k, n, transA, transB);
+        ocl_basic_operator_amdblas_35 (amdblasGEMM, arg1, arg2, prod, m, k, n, transA, transB);
       
       }
     
@@ -812,7 +822,7 @@
       
         print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
                                            trait2 :: print_elem_type (), "> :: ocl_operator_inc", op_v_level);
-        ocl_basic_operator_kernel_11 ("inc", arg1, (elem_type) inc, num_elems);
+        ocl_basic_operator_kernel_11 ("inc", arg1, inc, num_elems);
       
       }
 
