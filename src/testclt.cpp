@@ -34,7 +34,7 @@ int main (int argc, char** argv) {
 		
 		std::string cf = std::string (base + std::string(config));
 		con->ReadConfig (cf.c_str()); 
-		
+
 		if      (!strcmp (test, "CGSENSE"))               cgsensetest  (con);
 		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
 		else if (!strcmp (test, "SENSE"))                 sensetest    (con);
@@ -58,7 +58,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "SHA256"))                sha256test   (con);
 		else if (!strcmp (test, "ISMRMRD"))               ismrmrdtest  (con);
 		else                                              internaltest (con);
-		
+
 		delete con;
 		
 	} else

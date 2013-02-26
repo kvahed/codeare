@@ -35,7 +35,7 @@ int    rank;
 
 bool init (int argc, char** argv) {
 	
-    Grid& gd = Workspace::Instance()->GridEnv();
+    Grid& gd = *Grid::Instance();
 
 //	if (gd.rk == 0) {
 		cout << endl;

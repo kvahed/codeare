@@ -96,7 +96,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = options.$(OBJEXT) Workspace.$(OBJEXT) \
 	FunctorContainer.$(OBJEXT) ReconContext.$(OBJEXT) \
-	Toolbox.$(OBJEXT)
+	Toolbox.$(OBJEXT) Grid.$(OBJEXT)
 am_lclient_OBJECTS = $(am__objects_1)
 lclient_OBJECTS = $(am_lclient_OBJECTS)
 lclient_LDADD = $(LDADD)
@@ -343,7 +343,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml -Imisc $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp
+COMMON = RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp Grid.hpp Grid.cpp
 
 # OmniORB interface
 NETWORKING_COMMON = RRSModule.hh RRSModuleSK.cc 
@@ -517,6 +517,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FunctorContainer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RRSModuleSK.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconServant.Po@am__quote@
