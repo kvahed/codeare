@@ -226,6 +226,12 @@ public:
 	}
 	
 
+	DFT        (const Params& params) :
+		FT<T>::FT(params) {
+
+	}
+
+
 	/**
 	 * @brief        Clean up RAM, destroy plans
 	 */

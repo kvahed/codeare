@@ -22,35 +22,7 @@
 #define __FT_HPP__
 
 #include "CX.hpp"
-
-/**
- * @brief    General parameters class for Fourier transform constructors
- */
-template<class T>
-struct FTParams {
-
-	Matrix<T> b0;                 /**< @brief b0 map */
-	Matrix< std::complex<T> > pc; /**< @brief phase correction */
-	Matrix<T> b1; /**< @brief b1 maps */
-	
-	Matrix<size_t> sl; /**<@brief side length */
-  Matrix<size_t> zpad;     /**<@brief Zero-pad k-space */
-	Matrix<T> mask;    /**<@brief k-space mask */
-
-	size_t rank;  /**< @brief single side length applies to all dimensions */
-
-	size_t nk;   /**< @brief # of k-space points*/
-
-};
-
-template <class T>
-struct FTCGParams {
-
-	size_t iters;  /**< @brief # of iterations */
-	T      lambda; /**< @brief tikhonov weight */
-	T      eps;    /**< @brief convergence residual */
-
-};
+#include "Params.hpp"
 
 
 /**
@@ -73,7 +45,9 @@ public:
 	/**
 	 * @brief     Contstruct with parameters
 	 */
-	FT (FTParams<T> ftp, FTCGParams<T> ftcgp);
+	FT (const Params& params) {
+		m_params = params;
+	}
 
 	/**
 	 * @brief    Default destructor
@@ -123,12 +97,14 @@ public:
 		return Adjoint (m);
 	}
 
-	
+
 protected:
 
     void Validate (double& t) const {};
 	void Validate (float&  t) const {};
 	
+	Params m_params;
+
 };
 
 #endif

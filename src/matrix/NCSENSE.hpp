@@ -26,43 +26,6 @@
 #include "SEM.hpp"
 #include "MRI.hpp"
 
-/**
- * @brief   Convenience structure for construction
- */
-template<class T>
-struct NCSParams {
-	
-	Matrix< std::complex<T> > sens;
-	Matrix< std::complex<T> > pc;
-
-	Matrix<T> b0;
-
-	T cgeps;
-	T lambda;
-	T fteps;
-	T alpha;
-
-	size_t nk;
-	size_t cgiter; 
-	size_t ftiter; 
-	size_t m; 
-
-	NCSParams () {
-		
-		cgeps  = 1.0e-6;
-		lambda = 2.0e-6;
-		fteps  = 7.0e-4;
-		alpha  = 1.0;
-
-		ftiter = 3;
-		m      = 1;
-		cgiter = 20;
-		nk     = 0;
-		
-	}
-
-};
-		
 
 /**
  * @brief Non-Cartesian SENSE<br/>
@@ -89,19 +52,14 @@ public:
 
 
 	/**
-	 * @brief         Construct with parameters
+	 * @brief          Construct with parameters
+	 *
+	 * @param  params  Configuration parameters
 	 */
-	NCSENSE (const NCSParams<T>& ncsp) :
-		m_initialised (false),
-		m_dim(2),
-		m_cgiter(100),
-		m_fts(0),
-		m_cgeps (1.0e-6),
-		m_nc (8),
-		m_nk (1024),
-		m_nr (4096),
-		m_lambda (1.0e-6) {}
+	NCSENSE        (const Params& params) :
+		FT<T>::FT(params) {
 
+	}
 
 	/**
 	 * @brief          Construct NCSENSE plans for forward and backward transform with credentials

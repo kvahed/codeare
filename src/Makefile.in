@@ -343,7 +343,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml -Imisc $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp Grid.hpp Grid.cpp
+COMMON = RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp Grid.hpp Grid.cpp Params.hpp
 
 # OmniORB interface
 NETWORKING_COMMON = RRSModule.hh RRSModuleSK.cc 
@@ -363,8 +363,8 @@ lclient_LDFLAGS = liblocal.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) \
 	-dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la \
 	-dlopen modules/RelativeSensitivities.la -dlopen \
 	modules/GRAPPA.la -dlopen modules/DirectMethod.la \
-	tinyxml/libtinyxml.la $(am__append_1)
-lclient_DEPENDENCIES = liblocal.la
+	$(am__append_1)
+lclient_DEPENDENCIES = liblocal.la 
 
 # Remote client (rclient)
 libremote_la_SOURCES = RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
@@ -386,7 +386,7 @@ reconserver_LDFLAGS = $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -dlopen \
 	$(am__append_2)
 EXTRA_DIST = RRSModule.idl Makefile.win32 common.h
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
-SUBDIRS = tinyxml modules matrix
+SUBDIRS = tinyxml modules matrix 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

@@ -466,7 +466,8 @@ phantom3D (const size_t& n) {
 
 
 
-template <class T> inline static Matrix<T>
+template <class T>
+inline static Matrix<T>
 eye (const size_t n) {
 
  	Matrix<T> M (n);
