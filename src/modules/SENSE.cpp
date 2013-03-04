@@ -24,22 +24,19 @@ SENSE::Prepare () {
 
 	printf ("Preparing Cartesian SENSE ...\n");
 
-	Matrix<cxfl>& smaps = Get<cxfl>("smaps");
-	Matrix<cxfl>& fimgs = Get<cxfl>("fimgs");
-
-	// We expect the first phase encoding dimension 
-	// to be accelerated
-	m_af = size(smaps, 1) / size(fimgs, 1);
-	printf ("  # channels:            %zu \n", size(smaps,0));
-	printf ("  # acceleration factor: %i \n", m_af);
-
 	Matrix<cxfl>& image = AddMatrix 
 		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(1)));
 
 	printf ("  allocating Cartesian SENSE operator: ... "); fflush(stdout);
-	m_cs = new CSENSE<float> (smaps, m_af, m_compgfm);
+	//m_cs = new CSENSE<float> (smaps, m_af, m_compgfm);
 	printf ("done\n");
 	printf ("... done.\n\n");
+
+	Params p;
+	p.Set("smaps_name", std::string("smaps"));
+	p.Set("fimgs_name", std::string("fimgs"));
+	p.Set("compgfm", m_compgfm);
+	m_cs = new CSENSE<float> (p);
 
 	return OK;
 

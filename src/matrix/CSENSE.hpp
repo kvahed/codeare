@@ -25,6 +25,7 @@
 #include "CX.hpp"
 #include "DFT.hpp"
 #include "Access.hpp"
+#include "Creators.hpp"
 
 /**
  * @brief SENSE: Sensitivity Encoding for Fast MRI<br/>
@@ -43,85 +44,67 @@ public:
 	/**
 	 * @brief          Default constructor
 	 */
-	CSENSE() {
-
-		// Some initing
-		m_initialised = false;
-		m_af          = 1;
-		m_dft         = 0;
-		m_ndim        = 1;
-		m_nc          = 1;
-		m_compgfm     = false;
-
-	}
+	CSENSE() : m_dft(0) {}
 
 
 	/**
-	 * @brief          Construct CSENSE plans for forward and backward transform with credentials<br/>
-	 *                 As of now we expect acceleration only in one direction
-	 * 
-	 * @param  sens    Sensitivity maps if imsize
-	 * @param  af      Acceleration factor vector 2/3 elements for 2D/3D 
-	 * @param  compgfm Compute g-factor maps
-	 * @param  mask    K-Space mask
-	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
-	 * @param  b0      Off-resonance maps if available (default empty)
+	 * @brief          Construct with parameters
+	 *
+	 * @param  params  Configuration parameters
 	 */
-	CSENSE             (const Matrix< std::complex<T> >& sens, const unsigned short& af, 
-						const bool& compgfm = false, const Matrix<T>& mask = Matrix<T>(1), 
-						const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1),
-						const Matrix<T>& b0 = Matrix<T>(1)) : m_initialised (false) {
+	CSENSE        (const Params& params) :
+		FT<T>::FT(params), m_dft(0) {
 
-		// Some initializing
-		m_initialised = false;
-		m_af          = 1;
-		m_dft         = 0;
-		m_ndim        = 1;
-		m_nc          = 1;
-		m_compgfm     = compgfm;
+		p = params;
 
-		// Some privates
-		m_sens = squeeze(sens);
-		m_af   = af;
-		
-		// Sensitivity maps dictate FT size
-		m_nc   = size (m_sens, ndims(m_sens)-1);
-		m_ndim = ndims(m_sens)-1;
+		p.Set ("initialised", false);
 
-		// Handle only 2D / 3D
-		assert (m_ndim == 2 || m_ndim == 3);
-		
-		// Need at least 2 channels
-		assert (m_nc > 1);
+		std::string map_name = p.Get<std::string> ("smaps_name");
+		std::string img_name = p.Get<std::string> ("fimgs_name");
+
+		sens = Workspace::Instance()->Get<std::complex<T> >(map_name);
+		Matrix<std::complex<T> >& imgs = Workspace::Instance()->Get<std::complex<T> >(img_name);
+
+		const size_t nc = size (sens, ndims(sens)-1);
+		assert (nc > 1);
+		p.Set ("nc", nc);
+
+		size_t af = size(sens, 1) / size(imgs, 1);
+		p.Set("af", af);
+
+		size_t ndim = ndims(sens)-1;
+		assert (ndim == 2 || ndim == 3);
+		p.Set ("ndim", ndim);
 
 		// We expect sensitivities O (X,Y,Z,CH)
-		m_dims = ones<size_t> (3,1);
+		dims = ones<size_t> (3,1);
+		for (size_t i = 0; i < ndim; i++)
+			dims[i] = size(sens,i);
+		dims[1] /= af;
 
-		// Set up FT
-		for (size_t i = 0; i < m_ndim; i++)
-			m_dims[i] = size(sens,i);
-		
-		// FT dimensions needs adjusting
-		m_dims[1] /= af;
-		
+		p.Set ("dims", dims);
+
+		if (!p.exists("treg"))
+			p.Set("treg", (T)0.0);
+
 		// Multi-threading will need multiple FFTW plans
 		int np;
 
 #pragma omp parallel default (shared)
 		{
 			np = omp_get_num_threads ();
-		}	
+		}
 
-		Matrix<size_t> ftdims = resize(m_dims,m_ndim,1);
+		Matrix<size_t> ftdims = resize(dims,ndim,1);
 
 		m_dft = new DFT<T>* [np];
-		
+
 		for (size_t i = 0; i < np; i++)
-			m_dft[i]  = new DFT<T> (m_dims, mask, pc, b0);
+			m_dft[i]  = new DFT<T> (dims/*, mask, pc, b0*/);
 
 		// Great
-		m_initialised = true;
-		
+		p.Set ("initialised", true);
+
 	}
 
 
@@ -131,17 +114,13 @@ public:
 	~CSENSE            () {
 
 		int np;
-		
-
 
 #pragma omp parallel default (shared)
 		{
 			np = omp_get_num_threads ();
 		}	
-		
 
-
-		if (m_initialised)
+		if (m_dft)
 			for (int i = 0; i < np; i++)
 				delete m_dft[i];
 	
@@ -157,8 +136,14 @@ public:
 	Matrix< std::complex<T> >
 	Adjoint       (const Matrix< std::complex<T> >& m) const {
 		
-		Matrix< std::complex<T> > res (m_dims[0], m_dims[1]*m_af, m_dims[2], (m_compgfm) ? 2 : 1);
+		bool compgfm     = p.Get<bool>("compgfm");
+		size_t af        = p.Get<size_t>("af");
+		size_t nc        = p.Get<size_t>("nc");
+		size_t ndim      = p.Get<size_t>("ndim");
+		T      treg      = p.Get<T>("treg");
+		bool initialised = p.Get<bool>("initialised");
 
+		Matrix< std::complex<T> > res (dims[0], dims[1]*af, dims[2], (compgfm) ? 2 : 1);
 		Matrix< std::complex<T> > tmp = m;
 		
 #pragma omp parallel
@@ -166,17 +151,18 @@ public:
 			
 			int tid = omp_get_thread_num ();
 			
-			Matrix< std::complex<T> > s  (m_nc, m_af);
-			Matrix< std::complex<T> > si (m_af, m_af);
-			Matrix< std::complex<T> > ra (m_nc,1);
-			Matrix< std::complex<T> > rp (m_af,1);
-			Matrix< std::complex<T> > gf (m_af,1);
+			Matrix<std::complex<T> > s  (nc, af);
+			Matrix<std::complex<T> > si (af, af);
+			Matrix<std::complex<T> > ra (nc,  1);
+			Matrix<std::complex<T> > rp (af,  1);
+			Matrix<std::complex<T> > gf (af,  1);
+			Matrix<std::complex<T> > reg = treg * eye<std::complex<T> >(af);
 			
 #pragma omp for 
 			
 			// FT individual channels
-			for (size_t i = 0; i < m_nc; i++)
-				if (m_ndim == 2)
+			for (size_t i = 0; i < nc; i++)
+				if (ndim == 2)
 					Slice  (tmp, i, *(m_dft[tid]) ->* Slice  (tmp, i));
 				else
 					Volume (tmp, i, *(m_dft[tid]) ->* Volume (tmp, i));
@@ -184,39 +170,38 @@ public:
 #pragma omp for schedule (guided)
 			
 			// Antialiasing
-			for (size_t x = 0; x < m_dims[0]; x++)
-				for (size_t y = 0; y < m_dims[1]; y++) 
-					for (size_t z = 0; z < m_dims[2]; z++) {
+			for (size_t x = 0; x < dims[0]; x++)
+				for (size_t y = 0; y < dims[1]; y++)
+					for (size_t z = 0; z < dims[2]; z++) {
 						
-						for (size_t c = 0; c < m_nc; c++) {
+						for (size_t c = 0; c < nc; c++) {
 							
-							ra [c] = (m_dims[2]-1) ? tmp (x, y, z, c) : tmp (x, y, c);
+							ra [c] = (dims[2]-1) ? tmp (x, y, z, c) : tmp (x, y, c);
 							
-							for (size_t i = 0; i < m_af; i++) 
-								s (c, i) = (m_dims[2]-1) ? m_sens (x, y + m_dims[1] * i, z, c) : m_sens (x, y + m_dims[1] * i, c);
+							for (size_t i = 0; i < af; i++)
+								s (c, i) = (dims[2]-1) ? sens (x, y + dims[1] * i, z, c) : sens (x, y + dims[1] * i, c);
 							
 						}
 						
 						si = gemm (s,   s, 'C', 'N');
 
-						if (m_compgfm)
+						if (compgfm)
 							gf = diag (si);
 
-						si = inv  (si);
+						si = inv  (si + reg);
 
-						if (m_compgfm)
+						if (compgfm)
 							gf = diag (si) * gf;
 
 						si = gemm (si,  s, 'N', 'C');
-						
 						rp = gemm (si, ra, 'N', 'N');
 						
-						for (size_t i = 0; i < m_af; i++) {
+						for (size_t i = 0; i < af; i++) {
 
-							res (x, y + m_dims[1] * i, z, 0) =          rp [i]; 
+							res (x, y + dims[1] * i, z, 0) =          rp [i];
 
-							if (m_compgfm)
-								res (x, y + m_dims[1] * i, z, 1) = sqrt(abs(gf [i]));
+							if (compgfm)
+								res (x, y + dims[1] * i, z, 1) = sqrt(abs(gf [i]));
 
 						}
 
@@ -240,7 +225,6 @@ public:
 	Trafo             (const Matrix< std::complex<T> >& m) const {
 		
 		Matrix < complex<T> > res;
-
 		return res;
 
 
@@ -249,21 +233,11 @@ public:
 
 private:
 
-	DFT<T>**       m_dft;
+	DFT<T>**              m_dft;
+	Params                p;
+	Matrix < complex<T> > sens;
+	Matrix <size_t>       dims;
 
-	Matrix<T>      m_b0;
-
-	Matrix< std::complex<T> > m_sens;
-	Matrix< std::complex<T> > m_pc;
-	
-	unsigned short m_af;
-	bool           m_compgfm;
-	
-	size_t         m_ndim;
-	Matrix<size_t> m_dims; /**< Operator dimensionality Valid: [2,3]*/
-	size_t         m_nc;
-
-	bool           m_initialised;
 
 };
 

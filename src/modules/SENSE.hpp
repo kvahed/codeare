@@ -40,7 +40,8 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		SENSE  () {};
+		SENSE  () :
+			m_ncpus(1), m_af(1), m_cs(0), m_compgfm(false) {};
 		
 		
 		/**

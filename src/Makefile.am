@@ -11,7 +11,7 @@ bin_PROGRAMS = reconserver lclient rclient
 AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Itinyxml -Imisc $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON =  RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp Grid.hpp Grid.cpp
+COMMON =  RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp Grid.hpp Grid.cpp Params.hpp
 
 # OmniORB interface
 NETWORKING_COMMON = RRSModule.hh RRSModuleSK.cc 
@@ -23,8 +23,8 @@ noinst_LTLIBRARIES = libremote.la liblocal.la
 liblocal_la_SOURCES = LocalConnector.hpp LocalConnector.cpp testclt.cpp
 liblocal_la_CXXFLAGS = $(AM_CXXFLAGS) -DLOCAL
 lclient_SOURCES = $(COMMON)
-lclient_LDFLAGS = liblocal.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK)  $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -dlopen modules/DummyRecon.la -dlopen modules/LapackTests.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la tinyxml/libtinyxml.la
-lclient_DEPENDENCIES = liblocal.la
+lclient_LDFLAGS = liblocal.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK)  $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -dlopen modules/DummyRecon.la -dlopen modules/LapackTests.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la 
+lclient_DEPENDENCIES = liblocal.la 
 if USE_NFFT3
     lclient_LDFLAGS += -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 endif
@@ -46,4 +46,4 @@ endif
 EXTRA_DIST = RRSModule.idl Makefile.win32 common.h
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 
-SUBDIRS = tinyxml modules matrix
+SUBDIRS = tinyxml modules matrix 

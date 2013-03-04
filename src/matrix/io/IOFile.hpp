@@ -2,96 +2,13 @@
 #define __IOFILE_HPP__
 
 #include "Matrix.hpp"
-#include "boost/any.hpp"
+#include "Params.hpp"
 
 namespace codeare {
 namespace matrix  {
 namespace io      {
 
 	enum IOMode {READ, WRITE};
-
-    /**
-     * @brief  General parameter container
-     */
-	struct Params {
-
-        /**
-         * @brief  Parameter entry
-         */
-		typedef typename std::pair<std::string, boost::any> param;
-
-        
-        /**
-         * @brief  Parameter container
-         */
-		typedef typename std::map<std::string, boost::any> plist;
-
-        
-        /**
-         * @brief  Get any parameter value
-         */
-		boost::any& operator [](const std::string& key) {
-			plist::iterator pli = pl.find(key);
-			if (pl.find(key) == pl.end())
-				return Toolbox::Instance()->void_any;
-			return pli->second;
-		}
-
-
-        /**
-         * @brief  Get any parameter value
-         */
-		boost::any operator [](const std::string& key) const {
-			plist::const_iterator pli = pl.find(key);
-			if (pli == pl.end())
-				return Toolbox::Instance()->void_any;
-			return pli->second;
-		}
-
-        
-        /**
-         * @brief  Get casted parameter value
-         */
-		template <class T>
-		T Get (const std::string& key) {
-			if (pl.find(key) == pl.end()) {
-				T t;
-				return t;
-			}
-			return boost::any_cast<T>(pl[key]);
-		}
-
-        
-        /**
-         * @brief
-         */
-		template <class T>
-		T Get (const char* key) {
-			return Get<T> (std::string(key));
-		}
-
-        
-        /**
-         * @brief  Set/add new parameter
-         */
-		void Set (const std::string& key, const boost::any& val) {
-			if (pl.find(key) != pl.end())
-				pl.erase(key);
-			pl.insert(param(key, val));
-		}
-
-        
-        /**
-         * @brief  Set 
-         */
-		void Set (const char* key, const boost::any& val) {
-			Set (std::string(key), val);
-		}
-
-
-		plist pl;
-
-	};
 
 	// TODO: deliver some crap
 	template<class T>
