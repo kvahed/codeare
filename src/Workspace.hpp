@@ -3,6 +3,7 @@
 
 #include "Matrix.hpp"
 #include "Configurable.hpp"
+#include "Params.hpp"
 
 #include <boost/any.hpp>
 #include <map>
@@ -28,7 +29,7 @@ typedef pair<string, boost::any> entry;
  *        Matrix smart pointers are stored in individual (type) maps along
  * with string identifier and retrieved by their names.
  */
-class Workspace : public Configurable {
+class Workspace {
 
 
  public:
@@ -43,9 +44,9 @@ class Workspace : public Configurable {
 	/**
 	 * @brief        Get pointer to database instance
 	 */
-	static Workspace* 
+	static Workspace&
 	Instance         () ;
-	
+
 
 	/**
 	 * @brief        Initialise database
@@ -204,9 +205,39 @@ class Workspace : public Configurable {
     }
 
 
+    template<class T> inline T
+    PGet (const std::string& key) const {
+    	return p.Get<T>(key);
+    }
+
+
+    template<class T> inline T
+    PGet (const char* key) const {
+        return p.Get<T>(std::string(key));
+    }
+
+
+    inline void
+    PSet (const std::string& key, const boost::any& val) {
+    	p.Set(key,val);
+    }
+
+    inline void
+    PSet (const char* key, const boost::any& val) {
+        p.Set(std::string(key),val);
+    }
+
+
+
+    inline Params Parameters () const {
+    	return p;
+    }
+
     /**
      * 
      */
+	Params p;
+
  private:
 
 	/** 
@@ -223,8 +254,9 @@ class Workspace : public Configurable {
 	reflist m_ref;   /**< @brief Names and hash tags               */
 	store   m_store; /**< @brief Data pointers                     */
 
-	static Workspace *m_inst; /**< @brief Single database instance */
+	static Workspace* m_inst; /**< @brief Single database instance */
 	
+
 };
 
 
@@ -236,7 +268,7 @@ class Workspace : public Configurable {
  * @return           The output stream
  */
 inline static std::ostream&
-operator<< (std::ostream& os, Workspace& w) {
+operator<< (std::ostream& os, const Workspace& w) {
 	os << w.c_str();
     return os;
 }

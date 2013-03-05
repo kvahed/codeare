@@ -4,7 +4,15 @@
 Workspace* Workspace::m_inst = 0; 
 
 
-Workspace::Workspace() {}
+Workspace::Workspace() {
+
+	bool f = false;
+	int  zero = 0;
+
+	p["FFTWFThreads"] = zero;
+	p[ "FFTWThreads"] = zero;
+
+}
 
 
 Workspace::~Workspace () { 
@@ -15,22 +23,16 @@ Workspace::~Workspace () {
 }
 
 
-Workspace* 
+Workspace&
 Workspace::Instance ()  {
 
-    if (m_inst == 0) 
+    if (m_inst == 0)
         m_inst = new Workspace ();
 
-	bool t = true;
-	bool f = false;
-	
-	m_inst->SetAttribute("FFTWFThreadsInitialised", &f);
-	m_inst->SetAttribute("FFTWThreadsInitialised", &f);
-	
-    return m_inst;
+	return *m_inst;
 		
 }
-	
+
 error_code
 Workspace::Finalise () {
 	

@@ -56,14 +56,15 @@ public:
 		FT<T>::FT(params), m_dft(0) {
 
 		p = params;
+		Workspace& w = Workspace::Instance();
 
 		p.Set ("initialised", false);
 
 		std::string map_name = p.Get<std::string> ("smaps_name");
 		std::string img_name = p.Get<std::string> ("fimgs_name");
 
-		sens = Workspace::Instance()->Get<std::complex<T> >(map_name);
-		Matrix<std::complex<T> >& imgs = Workspace::Instance()->Get<std::complex<T> >(img_name);
+		sens = w.Get<std::complex<T> >(map_name);
+		Matrix<std::complex<T> >& imgs = w.Get<std::complex<T> >(img_name);
 
 		const size_t nc = size (sens, ndims(sens)-1);
 		assert (nc > 1);
@@ -87,6 +88,18 @@ public:
 		if (!p.exists("treg"))
 			p.Set("treg", (T)0.0);
 
+		Matrix<T> b0;
+		Matrix<complex<T> > pc;
+		Matrix<T> mask;
+
+		if (p.exists("b0_name"))
+			b0 = w.Get<T>(p.Get<std::string>("b0_name"));
+		if (p.exists("mask_name"))
+			mask = w.Get<T>(p.Get<std::string>("mask_name"));
+		if (p.exists("pc_name"))
+			pc = w.Get<T>(p.Get<std::string>("pc_name"));
+
+
 		// Multi-threading will need multiple FFTW plans
 		int np;
 
@@ -100,7 +113,7 @@ public:
 		m_dft = new DFT<T>* [np];
 
 		for (size_t i = 0; i < np; i++)
-			m_dft[i]  = new DFT<T> (dims/*, mask, pc, b0*/);
+			m_dft[i]  = new DFT<T> (dims, mask, pc, b0);
 
 		// Great
 		p.Set ("initialised", true);

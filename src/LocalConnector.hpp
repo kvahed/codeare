@@ -122,7 +122,7 @@ namespace RRClient {
 		 */
 		template <class T> void 
 		SetMatrix           (const std::string& name, Matrix<T>& m) const {
-			Workspace::Instance()->SetMatrix(name, m);
+			Workspace::Instance().SetMatrix(name, m);
 		}
 		
 		
@@ -134,7 +134,7 @@ namespace RRClient {
 		 */
 		template <class T> void 
 		GetMatrix           (const std::string& name, Matrix<T>& m) const {
-			Workspace::Instance()->GetMatrix(name, m);
+			Workspace::Instance().GetMatrix(name, m);
 		}
 		
 		

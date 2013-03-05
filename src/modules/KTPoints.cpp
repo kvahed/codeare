@@ -201,8 +201,6 @@ KTPoints::Process   ()     {
     PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "t");
     // -----------------------------------
 
-    std::cout << *Workspace::Instance() << std::endl;
-
     return OK;
 
 }

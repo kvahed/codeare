@@ -127,7 +127,7 @@ namespace RRStrategy {
 		 */
 		Workspace&
 		DB              () const {
-			return *(Workspace::Instance());
+			return Workspace::Instance();
 		}
 
 
@@ -140,34 +140,20 @@ namespace RRStrategy {
 		 */
 		template <class T> Matrix<T>& 
 		AddMatrix         (const string name, Ptr< Matrix<T> > p) const {
-			return Workspace::Instance()->AddMatrix(name, p);
+			return DB().AddMatrix(name, p);
 		}
-		
-		
-		/***
-		 * @brief       Add a matrix to workspace
-		 *
-		 * @param  name Name in workspace
-		 * @param  vt   Data type of matrix elements
-		 * @param  dims Dimensions 
-		 * @return      Reference to matrix
-		 */
-		//template <class T> Matrix<T>& 
-		//AddMatrix         (const string& name, const data_type dt, std::vector<size_t> dims) const {
-		//		return Workspace::Instance()->AddMatrix(name, dt, dims);
-		//}
-		
-		
+
+
 		/**
-		 * @brief       Get reference to complex single matrix by name from database 
+		 * @brief       Get reference to complex single matrix by name from database
 		 *              @see Workspace::Get<T>(const string)
-		 * 
+		 *
 		 * @param  name Name
-		 * @return      Reference to data 
+		 * @return      Reference to data
 		 */
-		template <class T> Matrix<T>& 
+		template <class T> Matrix<T>&
 		Get            (const string name) const {
-			return Workspace::Instance()->Get<T>(name);
+			return DB().Get<T>(name);
 		}
 		
 		
@@ -180,7 +166,7 @@ namespace RRStrategy {
 		 */
 		inline bool 
 		Free            (const string name) const {
-			return Workspace::Instance()->Free (name);
+			return DB().Free (name);
 		}
 
 
