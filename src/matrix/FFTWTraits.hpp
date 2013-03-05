@@ -22,6 +22,7 @@
 #define __FFTW_TRAITS_HPP__
 
 #include "Workspace.hpp"
+#include "Params.hpp"
 #include "OMP.hpp"
 
 #include <fftw3.h>
@@ -52,7 +53,8 @@ struct FTTraits<float> {
 	 * @return        Plan
 	 */
 	static inline Plan 
-	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {                    
+	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {
+		InitThreads();
 	    return fftwf_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
@@ -65,33 +67,32 @@ struct FTTraits<float> {
 	static bool 
 	InitThreads () {
 
-		bool ok = false;
-		int  nt = 1;
+		Workspace& ws = Workspace::Instance();
+		int nt = boost::any_cast<int>(ws.p["FFTWFThreads"]);
 
-		// Already initialised?
-		Workspace::Instance()->Attribute ("FFTWThreadsInitialised", &ok);
-		/*if (ok)
-			return ok;*/
+		if (nt > 0)
+			return true;
 
 #pragma omp parallel
 		{
 			nt = omp_get_num_threads();
+			omp_set_dynamic(false);
 		}		
 
-		printf ("  Initialising %d-threaded FFT ... ", nt);
+		printf ("  Initialising %d-threaded FFTWF ... ", nt);
 		fflush (stdout);
 
 #ifdef HAVE_FFTWF_THREADS
-		ok = fftwf_init_threads();
+		bool ok = fftwf_init_threads();
 		if (ok) {
-			Workspace::Instance()->SetAttribute("FFTWThreadsInitialised", &ok);
 			PlanWithNThreads (nt);
+			ws.PSet("FFTWFThreads", nt);
 		}
 #endif
 
 		printf ("done\n");
 
-		return ok;
+		return true;
 		
 	}
 	
@@ -192,40 +193,41 @@ struct FTTraits<double> {
 	
 
 	/**
-	 * @brief         Initialise FFTWF threads (Should only be done once)
+	 * @brief         Initialise FFTW threads (Should only be done once)
 	 *
 	 * @return        Success
 	 */
 	static bool 
 	InitThreads () {
 
-		bool ok = false;
-		int  nt = 1;
+		Workspace& ws = Workspace::Instance();
+		std::cout << ws.Parameters() << std::endl;
 
-		// Already initialised?
-		Workspace::Instance()->Attribute ("FFTWThreadsInitialised", &ok);
-		/*if (ok)
-		  return ok;*/
+
+		int nt = ws.PGet<int>("FFTWThreads");
+
+		if (nt > 0)
+			return true;
 
 #pragma omp parallel
 		{
 			nt = omp_get_num_threads();
 		}		
 
-		printf ("Initialising %d-threaded FFT ...", nt);
+		printf ("  Initialising %d-threaded FFTW ... ", nt);
 		fflush (stdout);
 
-#ifdef HAVE_FFTW_THREADS
-		ok = fftw_init_threads();
+#ifdef HAVE_FFTWF_THREADS
+		bool ok = fftw_init_threads();
 		if (ok) {
-			Workspace::Instance()->SetAttribute("FFTWThreadsInitialised", &ok);
 			PlanWithNThreads (nt);
+			ws.PSet("FFTWThreads",nt);
 		}
 #endif
 
 		printf ("done\n");
 
-		return ok;
+		return true;
 		
 	}
 	

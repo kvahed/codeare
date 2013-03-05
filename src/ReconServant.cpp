@@ -86,7 +86,7 @@ namespace RRServer {
 
 		memcpy (&pm[0], &c.vals[0], pm.Size() * sizeof(cxfl));
 
-		Workspace::Instance()->SetMatrix(name, pm);
+		Workspace::Instance().SetMatrix(name, pm);
 		
 	}
 	
@@ -94,7 +94,7 @@ namespace RRServer {
 	void
 	ReconServant::get_cxfl (const char* name, cxfl_data& c) {
 		
-		Matrix<cxfl> tmp = Workspace::Instance()->Get<cxfl> (name);
+		Matrix<cxfl> tmp = Workspace::Instance().Get<cxfl> (name);
 
 		c.dims.length(INVALID_DIM);
 		c.res.length (INVALID_DIM);
@@ -126,7 +126,7 @@ namespace RRServer {
 
 		memcpy (&pm[0], &c.vals[0], pm.Size() * sizeof(cxdb));
 
-		Workspace::Instance()->SetMatrix(name, pm);
+		Workspace::Instance().SetMatrix(name, pm);
 
 	}
 
@@ -134,7 +134,7 @@ namespace RRServer {
 	void
 	ReconServant::get_cxdb (const char* name, cxdb_data& c) {
 
-		Matrix<cxdb> tmp = Workspace::Instance()->Get<cxdb> (name);
+		Matrix<cxdb> tmp = Workspace::Instance().Get<cxdb> (name);
 
 		c.dims.length(INVALID_DIM);
 		c.res.length (INVALID_DIM);
@@ -166,7 +166,7 @@ namespace RRServer {
 
 		memcpy (&pm[0], &c.vals[0], pm.Size() * sizeof(float));
 
-		Workspace::Instance()->SetMatrix(name, pm);
+		Workspace::Instance().SetMatrix(name, pm);
 		
 	}
 	
@@ -174,7 +174,7 @@ namespace RRServer {
 	void
 	ReconServant::get_rlfl (const char* name, rlfl_data& c) {
 		
-		Matrix<float> tmp = Workspace::Instance()->Get<float> (name);
+		Matrix<float> tmp = Workspace::Instance().Get<float> (name);
 
 		c.dims.length(INVALID_DIM);
 		c.res.length (INVALID_DIM);
@@ -206,7 +206,7 @@ namespace RRServer {
 
 		memcpy (&pm[0], &c.vals[0], pm.Size() * sizeof(double));
 
-		Workspace::Instance()->SetMatrix(name, pm);
+		Workspace::Instance().SetMatrix(name, pm);
 
 	}
 
@@ -214,7 +214,7 @@ namespace RRServer {
 	void
 	ReconServant::get_rldb (const char* name, rldb_data& c) {
 
-		Matrix<double> tmp = Workspace::Instance()->Get<double> (name);
+		Matrix<double> tmp = Workspace::Instance().Get<double> (name);
 
 		c.dims.length(INVALID_DIM);
 		c.res.length (INVALID_DIM);
@@ -246,7 +246,7 @@ namespace RRServer {
 
 		memcpy (&pm[0], &c.vals[0], pm.Size() * sizeof(short));
 
-		Workspace::Instance()->SetMatrix(name, pm);
+		Workspace::Instance().SetMatrix(name, pm);
 
 	}
 
@@ -254,7 +254,7 @@ namespace RRServer {
 	void
 	ReconServant::get_shrt (const char* name, shrt_data& c) {
 
-		Matrix<short> tmp = Workspace::Instance()->Get<short> (name);
+		Matrix<short> tmp = Workspace::Instance().Get<short> (name);
 
 		c.dims.length(INVALID_DIM);
 		c.res.length (INVALID_DIM);
@@ -286,7 +286,7 @@ namespace RRServer {
 
 		memcpy (&pm[0], &c.vals[0], pm.Size() * sizeof(long));
 
-		Workspace::Instance()->SetMatrix(name, pm);
+		Workspace::Instance().SetMatrix(name, pm);
 
 	}
 
@@ -294,7 +294,7 @@ namespace RRServer {
 	void
 	ReconServant::get_long (const char* name, long_data& c) {
 
-		Matrix<long> tmp = Workspace::Instance()->Get<long> (name);
+		Matrix<long> tmp = Workspace::Instance().Get<long> (name);
 
 		c.dims.length(INVALID_DIM);
 		c.res.length (INVALID_DIM);

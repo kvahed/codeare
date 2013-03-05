@@ -60,7 +60,7 @@ FunctorContainer::Finalise (const char* name) {
 	
 	if (!name) {
 		
-		Workspace::Instance()->Finalise();
+		Workspace::Instance().Finalise();
 		
 	} else {
 		
