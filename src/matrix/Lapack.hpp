@@ -53,6 +53,7 @@
 template <class T, class S> static int
 eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char& jobvl = 'N', const char& jobvr = 'N') {
 	
+
 	if (jobvl != 'N' && jobvl !='V') {
 		printf ("EIG Error: Parameter jobvl ('%c' provided) must be 'N' or 'V' \n", jobvl);
 		return -1;
@@ -91,33 +92,35 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
         resize(rv,N,N);
     
 
-    T* rwork = 0;
-	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))  // Real workspace for complex matrices
+    T* rwork = (T*) malloc (sizeof(T));
+	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) { // Real workspace for complex matrices
+		free (rwork);
 		rwork = (T*) malloc (N * sizeof(T));
+	}
 	
 	T  wkopt;
 	
-	// Workspace query 
-	LapackTraits<T>::geev (&jobvl, &jobvr, N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
+	Matrix<T> a = m;
 
-	// Intialise work space
+	// Work space query
+	LapackTraits<T>::geev (&jobvl, &jobvr, N, &a[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
+
+	// Initialize work space
 	lwork    = (int) creal (wkopt);
 	T* work  = (T*) malloc (lwork * sizeof(T));
-	
-	// Actual eigen value comp
-	LapackTraits<T>::geev (&jobvl, &jobvr, N, m.Data(), &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
-	
+
+	// Actual Eigenvalue computation
+	LapackTraits<T>::geev (&jobvl, &jobvr, N, &a[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
+
 	// Clean up
-	if (rwork) 
-		free (rwork);
-	
+	free (rwork);
 	free (work);
 	
 	if (info > 0)
-		printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have been computed;\n elements %i+1:N of ev contain eigenvalues which\n have converged.\n\n", info) ;
+		printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have been computed;\n elements %d+1:N of ev contain eigenvalues which\n have converged.\n\n", info) ;
 	else if (info < 0)
-		printf ("\nERROR - XGEEV: the %i-th argument had an illegal value.\n\n", -info); 
-	
+		printf ("\nERROR - XGEEV: the %d-th argument had an illegal value.\n\n", -info);
+
 	return info;
 	
 }

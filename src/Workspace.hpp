@@ -25,11 +25,10 @@ typedef pair<string, boost::any> entry;
 
 
 /**
- * @brief Central database for all shared matrices<br/>
- *        Matrix smart pointers are stored in individual (type) maps along
- * with string identifier and retrieved by their names.
+ * @brief Global workspace. Singleton.
  */
 class Workspace {
+
 
 
  public:
@@ -42,7 +41,7 @@ class Workspace {
 
 
 	/**
-	 * @brief        Get pointer to database instance
+	 * @brief        Get reference to database instance
 	 */
 	static Workspace&
 	Instance         () ;
@@ -205,38 +204,55 @@ class Workspace {
     }
 
 
+    /**
+     * @brief        Get casted parameter
+     *
+     * @param  key   Key
+     * @return       Parameter
+     */
     template<class T> inline T
     PGet (const std::string& key) const {
     	return p.Get<T>(key);
     }
 
 
+    /**
+	 * @brief        Get casted parameter
+	 *
+	 * @param  key   Key
+	 * @return       Parameter
+	 */
     template<class T> inline T
     PGet (const char* key) const {
         return p.Get<T>(std::string(key));
     }
 
 
+    /**
+	 * @brief        Set parameter
+	 *
+	 * @param  key   Key
+	 * @param  val   Value
+	 */
     inline void
     PSet (const std::string& key, const boost::any& val) {
     	p.Set(key,val);
     }
 
+
+    /**
+	 * @brief        Set parameter
+	 *
+	 * @param  key   Key
+	 * @param  val   Value
+	 */
     inline void
     PSet (const char* key, const boost::any& val) {
         p.Set(std::string(key),val);
     }
 
 
-
-    inline Params Parameters () const {
-    	return p;
-    }
-
-    /**
-     * 
-     */
-	Params p;
+	Params p;        /** < @brief Global parameter list */
 
  private:
 

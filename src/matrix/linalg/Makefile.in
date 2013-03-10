@@ -51,8 +51,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 TESTS = t_chol$(EXEEXT) t_svd$(EXEEXT) t_inv$(EXEEXT) t_pinv$(EXEEXT) \
-	t_gemm$(EXEEXT) t_gemv$(EXEEXT) t_eig$(EXEEXT) t_norm$(EXEEXT) \
-	t_dot$(EXEEXT)
+	t_gemm$(EXEEXT) t_gemv$(EXEEXT) t_norm$(EXEEXT) t_dot$(EXEEXT) \
+	t_eig$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/linalg
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -76,8 +76,8 @@ CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__EXEEXT_1 = t_chol$(EXEEXT) t_svd$(EXEEXT) t_inv$(EXEEXT) \
-	t_pinv$(EXEEXT) t_gemm$(EXEEXT) t_gemv$(EXEEXT) t_eig$(EXEEXT) \
-	t_norm$(EXEEXT) t_dot$(EXEEXT)
+	t_pinv$(EXEEXT) t_gemm$(EXEEXT) t_gemv$(EXEEXT) \
+	t_norm$(EXEEXT) t_dot$(EXEEXT) t_eig$(EXEEXT)
 am__objects_1 =
 am_t_chol_OBJECTS = $(am__objects_1) t_chol.$(OBJEXT)
 t_chol_OBJECTS = $(am_t_chol_OBJECTS)

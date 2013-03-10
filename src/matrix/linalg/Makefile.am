@@ -1,7 +1,7 @@
 AM_CXXFLAGS = -DNVERBOSE -I../ -I../../ -I../../misc
 COMMON = ../Matrix.hpp ../Lapack.hpp
 
-TESTS = t_chol t_svd t_inv t_pinv t_gemm t_gemv t_eig t_norm t_dot
+TESTS = t_chol t_svd t_inv t_pinv t_gemm t_gemv t_norm t_dot t_eig
 check_PROGRAMS = $(TESTS)
 
 t_svd_SOURCES = $(COMMON) t_svd.cpp
