@@ -35,7 +35,8 @@ KTPoints::KTPoints  () :
         m_breakearly(true),
         m_gd        (1.0e-5),
         m_max_rf    (0),
-        m_maxiter   (1000) {
+        m_maxiter   (1000),
+        ns(0), nk(0), nc(0) {
 
 }
 

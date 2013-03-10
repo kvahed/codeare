@@ -7,7 +7,7 @@ template<class T> void dot_check () {
     Matrix<T> A = rand<T> (4,1);
     Matrix<T> B = rand<T> (4,1);
     
-#ifdef NVERBOSE
+#ifdef VERBOSE
     std::cout << "A=\n" << A;
     std::cout << "B=\n" << B;
     std::cout << "A * B=\n" << dot(A,B) << std::endl;

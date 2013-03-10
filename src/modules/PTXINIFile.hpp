@@ -19,7 +19,7 @@
  */
 
 error_code
-PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<cxfl>& grad, 
+PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<float>& grad,
 						const int& dimrf, const int& dimgr, const int& nc, 
 						const int& sampint, const float& max_rf, 
 						const std::string& fname, const std::string& orientation) {	
@@ -94,11 +94,9 @@ PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<cxfl>& grad,
 
 	// Gradient section ----------------------------------
 
-	float maxg = 0.0;
-
-	for (int i = 0; i < nt; i++)
-		for (int j = nc; j < 3; j++)
-			maxg = (maxg > abs(grad(i,j))) ? maxg : abs(grad(i,j));
+	// Normalise amplitudes
+	float  maxg = max(abs(grad));
+	Matrix<float> go = grad / maxg;
 
 	fprintf (fp, "[Gradient]\n"                           );
 	fprintf (fp, "\n"                                     );
@@ -109,9 +107,9 @@ PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<cxfl>& grad,
 
 	for (int i = 0; i < nt; i++)
 		if (orientation.compare("transversal") == 0 || orientation.compare("t") == 0)
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, grad(i,0)/maxg, grad(i,1)/maxg,  grad(i,2)/maxg);
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, go(i,0), go(i,1),  go(i,2));
 		else if (orientation.compare("sagittal") == 0 || orientation.compare("s") == 0)
-			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, grad(i,2)/maxg, grad(i,1)/maxg, -grad(i,0)/maxg);
+			fprintf (fp, "G[%i]= %.4f	 %.4f	 %.4f \n", i, go(i,2), go(i,1), -go(i,0));
 	
 	for (int j = 0; j < nc; j++) {
 		
@@ -121,7 +119,7 @@ PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<cxfl>& grad,
 		fprintf (fp, "\n");
 		
 		for (int i = 0; i < nt; i++)
-			fprintf (fp, "RF[%i]= %.5f	 %.5f\n", i, abs(pt(i,j))*100.0, (arg(pt(i,j)) >= 0.0) ? arg(pt(i,j)) : 6.28318 + arg(pt(i,j)));
+			fprintf (fp, "RF[%i]= %.5f	 %.5f\n", i, abs(pt(i,j)), (arg(pt(i,j)) >= 0.0) ? arg(pt(i,j)) : 6.28318 + arg(pt(i,j)));
 		
 	}
     

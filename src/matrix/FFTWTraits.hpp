@@ -201,10 +201,7 @@ struct FTTraits<double> {
 	InitThreads () {
 
 		Workspace& ws = Workspace::Instance();
-		std::cout << ws.Parameters() << std::endl;
-
-
-		int nt = ws.PGet<int>("FFTWThreads");
+		int nt = boost::any_cast<int>(ws.p["FFTWFThreads"]);
 
 		if (nt > 0)
 			return true;
@@ -221,7 +218,7 @@ struct FTTraits<double> {
 		bool ok = fftw_init_threads();
 		if (ok) {
 			PlanWithNThreads (nt);
-			ws.PSet("FFTWThreads",nt);
+			ws.PSet("FFTWThreads", nt);
 		}
 #endif
 

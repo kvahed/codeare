@@ -26,6 +26,7 @@
 #include "ReconStrategy.hpp"
 #include "Lapack.hpp"
 #include "Toolbox.hpp"
+#include "IO.hpp"
 
 /**
  * @brief Reconstruction startegies
@@ -35,7 +36,7 @@ namespace RRStrategy {
     /**
      * @brief Spatial domain method for RF pulse generation with variable exchange method<br/>
      *        Cloos MA, Boulant N, Luong M, Ferrand G, Giacomini E, Le Bihan D, Amadon A.<br/>
-     *        kT-points: short three-dimensional tailored RF pulses for flip-angle homogenization over an extended volume. MRM:2012; 67(1), 72–80.
+     *        kT-points: short three-dimensional tailored RF pulses for flip-angle homogenization over an extended volume. MRM:2012; 67(1), 72���80.
      */
     class KTPoints : public ReconStrategy {
         
@@ -280,9 +281,8 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<s
                         0;
                     else                     // ramp down
                         gr -= sr;
-                    
+
                     grad (i,gc) = gr; 
-                    
                 }
             
         } 
@@ -308,7 +308,7 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
     
     minv  = m.prodt (m); 
     minv += treg;
-    minv  = pinv(minv);
+    minv  = inv(minv);
     minv  = minv.prod (m, 'N', 'C');
     
     // Valriable exchange method --------------
