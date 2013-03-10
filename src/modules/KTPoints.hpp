@@ -323,7 +323,7 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
 		if (j % 5 == 0 && j > 0)
 			printf ("\n");
 
-		printf ("    %04i %.6f", gc, res[gc]); 
+		printf ("    %04zu %.6f", gc, res[gc]); 
 
 		fflush (stdout);
 
