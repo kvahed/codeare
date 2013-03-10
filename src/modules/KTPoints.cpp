@@ -141,9 +141,9 @@ KTPoints::Process   ()     {
     size_t nk = size( k,1); // # of kt points
     size_t nc = size(b1,1); // # of RF channels
 
-    printf ("  # spatial sites: %i \n", ns);
-    printf ("  # transmitter: %i \n", nc);
-    printf ("  # kt points: %i \n", nk);
+    printf ("  # spatial sites: %zu \n", ns);
+    printf ("  # transmitter: %zu \n", nc);
+    printf ("  # kt points: %zu \n", nk);
 
     Matrix<float> max_rf (nk,1);
     Matrix<short> pd = ones<short>(nk,1); // Starting with shortest pulses possible 
