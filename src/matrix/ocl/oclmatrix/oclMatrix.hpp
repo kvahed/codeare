@@ -1929,7 +1929,91 @@
       
       
       //@} /*************************************************************************************/
-          
+
+
+
+      /** ***********************************************
+       * @name            Linear algebra functions.    **
+       ** ***********************************************/
+      //@{ /*************************************************************************************/
+      
+
+      /**
+       * @brief           Matrix Product.
+       *
+       * @param  mat      The factor.
+       * @param  transA   Transpose ('T') / Conjugate transpose ('C') the left matrix. Default: No transposition ('N')
+       * @param  transB   Transpose ('T') / Conjugate transpose ('C') the right matrix. Default: No transposition ('N')
+       *
+       * @return          Product of this and M.
+       */
+      oclMatrix <T>
+      prod                (const oclMatrix <T> &    mat,
+                           const      char     & transA = 'N',
+                           const      char     & transB = 'N')
+      const;
+      
+      
+      /**
+       * @brief           Complex conjugate left and multiply with right.
+       *
+       * @param  mat      Factor.
+       *
+       * @return          Product of conj(this) and M.
+       */
+      oclMatrix <T>
+      prodt               (const oclMatrix <T> & mat)
+      const;
+      
+      
+      /**
+       * @brief           Complex conjugate right and multiply with left.
+       *
+       * @param  mat      Factor.
+       *
+       * @return          Product of this and conj(mat).
+       */
+      oclMatrix <T>
+      tprod               (const oclMatrix <T> & mat)
+      const;
+      
+      
+      /**
+       * @brief           Scalar product (complex: conjugate first vector).
+       *
+       * @param  mat      Factor.
+       *
+       * @return          Scalar product.
+       */
+      T
+      dotc                (const oclMatrix <T> & mat)
+      const;
+      
+      
+      /**
+       * @brief           Scalar product.
+       *
+       * @param  mat      Factor.
+       *
+       * @return          Scalar product.
+       */
+      T
+      dot                 (const oclMatrix <T> & mat)
+      const;
+      
+      
+      /**
+       * @brief           Transposition / Compex conjugation and transposition.
+       *
+       * @return          Transposed matrix.
+       */
+      oclMatrix <T>
+      tr                  ()
+      const;
+      
+                
+      //@} /*************************************************************************************/
+
             
       
       /**
@@ -1986,7 +2070,7 @@
 
 
       /*************************************
-       ** friend declarations (all typed) **
+       ** friend declarations (all types) **
        *************************************/
       friend class oclMatrix <bool>;      // for access to private members of !! different !! template type //
       friend class oclMatrix <float>;

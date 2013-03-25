@@ -558,14 +558,14 @@ bool
 oclLinalgTest           ( bool verbose )
 {
 
-  std::cout <<                          std::endl;
+  std::cout <<                             std::endl;
   std::cout << " ******************** " << std::endl;
   std::cout << " ** Linear Algebra ** " << std::endl;
   std::cout << " ******************** " << std::endl;
-  std::cout <<                          std::endl;
+  std::cout <<                             std::endl;
 
   size_t  dimX     = 2048,
-          dimY     = 2048;
+          dimY     = 1024;
   
   std::cout << " size: " << dimX << " x " << dimY << std::endl << std::endl;
 
@@ -588,6 +588,80 @@ oclLinalgTest           ( bool verbose )
     const oclMatrix <S> ocl_mat2 = oclInit2D <S> (dimY, dimX);
     operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opMatProd <T, S, T> ());
   }
+  
+  /* matrix vector product */
+  {
+    if (verbose) std::cout << " * y = A * x                   ";
+             Matrix <T>     mat1 =    Init2D <T> (dimX, dimY);
+    const    Matrix <S>     mat2 =    Init2D <S> (dimY,    1);
+          oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, dimY);
+    const oclMatrix <S> ocl_mat2 = oclInit2D <S> (dimY,    1);
+    operator_eval_MM <T, S, T> (mat1, mat2, ocl_mat1, ocl_mat2, opMatProd <T, S, T> ());
+  }
+
+}
+
+
+
+template <class T, class S>
+bool
+oclLinalgTestExt            ( bool verbose )
+{
+
+  size_t  dimX     = 2048;
+
+  double time_s, time_ocl;
+  MyTimer t;
+  
+  std::cout << std::endl << " size: " << dimX << " x 1" << std::endl << std::endl;
+  
+  /* dot product */
+  {
+    if (verbose) std::cout << " * d = <u, v>                 ";
+             Matrix <T>     mat1 =    Init2D <T> (dimX, 1);
+    const    Matrix <S>     mat2 =    Init2D <S> (dimX, 1);
+          oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, 1);
+    const oclMatrix <S> ocl_mat2 = oclInit2D <S> (dimX, 1);
+               t.tic (time_default);
+    T dp_s   =     mat1.dot (    mat2);
+    time_s   = t.tic (time_default);
+    T dp_ocl = ocl_mat1.dot (ocl_mat2);
+    time_ocl = t.tic (time_default);
+    assert (dp_s == dp_ocl);
+    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+  }
+
+}
+
+
+
+template <class T, class S>
+bool
+oclLinalgTestExtC          ( bool verbose )
+{
+
+  size_t  dimX     = 2048;
+  
+  double time_s, time_ocl;
+  MyTimer t;
+
+  std::cout << std::endl << " size: " << dimX << " x 1" << std::endl << std::endl;
+  
+  /* complex dot product */
+  {
+    if (verbose) std::cout << " * d = <u, v>                 ";
+             Matrix <T>     mat1 =    Init2D <T> (dimX, 1);
+    const    Matrix <S>     mat2 =    Init2D <S> (dimX, 1);
+          oclMatrix <T> ocl_mat1 = oclInit2D <T> (dimX, 1);
+    const oclMatrix <S> ocl_mat2 = oclInit2D <S> (dimX, 1);
+               t.tic (time_default);
+    T dp_s   =     mat1.dotc (    mat2);
+    time_s   = t.tic (time_default);
+    T dp_ocl = ocl_mat1.dotc (ocl_mat2);
+    time_ocl = t.tic (time_default);
+    assert (dp_s == dp_ocl);
+    if (verbose) std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)" << std::endl;
+  }
 
 }
 
@@ -602,6 +676,7 @@ exec_tests      (bool verbose)
   oclArithmeticsTest    <T, S> (verbose);
   oclArithmeticsTestExt <T, S> (verbose);
   oclLinalgTest         <T, S> (verbose);
+  oclLinalgTestExt      <T, S> (verbose);
   oclAccessTest         <T>    (verbose);
   oclComparisonsTest    <T, S> (verbose);
 
@@ -617,6 +692,7 @@ exec_testsC     (bool verbose)
   oclCreatorsTest     <T>    (verbose);
   oclArithmeticsTest  <T, S> (verbose);
   oclLinalgTest       <T, S> (verbose);
+  oclLinalgTestExtC   <T, S> (verbose);
   oclAccessTest       <T>    (verbose);
   oclComparisonsTestC <T, S> (verbose);
 
@@ -636,20 +712,20 @@ oclmatrixtest (Connector<T>* rc) {
 
   try
   {
-    std::cout << std::endl << std::endl;
+/*    std::cout << std::endl << std::endl;
     std::cout << " ----------- // float, float  \\\\ ------------ " << std::endl;
     std::cout << std::endl;
     exec_tests <float, float>  (true);
     std::cout << std::endl << std::endl;
-/*    std::cout << " ----------- // float, double  \\\\ ------------ " << std::endl;
+*//*    std::cout << " ----------- // float, double  \\\\ ------------ " << std::endl;
     std::cout << std::endl;
     exec_tests <float, double>  (true);
     std::cout << std::endl << std::endl;
-*/    std::cout << " ----------- // double, double \\\\ ------------ " << std::endl;
+*//*    std::cout << " ----------- // double, double \\\\ ------------ " << std::endl;
     std::cout << std::endl;
     exec_tests <double, double> (true);
     std::cout << std::endl << std::endl;
-/*    std::cout << " ----------- // double, float  \\\\ ------------ " << std::endl;
+*//*    std::cout << " ----------- // double, float  \\\\ ------------ " << std::endl;
     std::cout << std::endl;
     exec_tests <double, float>  (true);
     std::cout << std::endl;

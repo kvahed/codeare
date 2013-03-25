@@ -77,6 +77,29 @@
                       numEventsInWaitList, eventWaitList, events);
       
     }
+
+
+    /**
+     * @brief           General matrix-vector product.
+     */
+    static
+    cl_int
+    GEMV                (clAmdBlasOrder order,
+                         clAmdBlasTranspose transA,
+                         size_t M, size_t N,
+                         cl_type alpha, const cl_mem A, size_t lda,
+                                        const cl_mem B,
+                         size_t off_B, size_t inc_B,
+                         cl_type  beta,       cl_mem C,
+                         size_t off_C, size_t inc_C,
+                         cl_uint numCommandQueues, cl_command_queue * commandQueues,
+                         cl_uint numEventsInWaitList, const cl_event * eventWaitList, cl_event * events)
+    {
+      
+      clAmdBlasSgemv (order, transA, M, N, alpha, A, lda, B, off_B, inc_B, beta, C, off_C, inc_C, numCommandQueues, commandQueues,
+                      numEventsInWaitList, eventWaitList, events);
+      
+    }
     
   
   };
@@ -125,6 +148,29 @@
                       numEventsInWaitList, eventWaitList, events);
       
     }
+
+
+    /**
+     * @brief           General matrix-vector product.
+     */
+    static
+    cl_int
+    GEMV                (clAmdBlasOrder order,
+                         clAmdBlasTranspose transA,
+                         size_t M, size_t N,
+                         cl_type alpha, const cl_mem A, size_t lda,
+                                        const cl_mem B,
+                         size_t off_B, size_t inc_B,
+                         cl_type  beta,       cl_mem C,
+                         size_t off_C, size_t inc_C,
+                         cl_uint numCommandQueues, cl_command_queue * commandQueues,
+                         cl_uint numEventsInWaitList, const cl_event * eventWaitList, cl_event * events)
+    {
+      
+      clAmdBlasDgemv (order, transA, M, N, alpha, A, lda, B, off_B, inc_B, beta, C, off_C, inc_C, numCommandQueues, commandQueues,
+                      numEventsInWaitList, eventWaitList, events);
+      
+    }
     
   
   };
@@ -162,7 +208,7 @@
                          clAmdBlasTranspose transA, clAmdBlasTranspose transB,
                          size_t M, size_t N, size_t K,
                          cl_type alpha, const cl_mem A, size_t lda,
-                                         const cl_mem B, size_t ldb,
+                                        const cl_mem B, size_t ldb,
                          cl_type  beta,       cl_mem C, size_t ldc,
                          cl_uint numCommandQueues, cl_command_queue * commandQueues,
                          cl_uint numEventsInWaitList, const cl_event * eventWaitList, cl_event * events)
@@ -175,6 +221,29 @@
       
     }
     
+
+    /**
+     * @brief           General matrix-vector product.
+     */
+    static
+    cl_int
+    GEMV                (clAmdBlasOrder order,
+                         clAmdBlasTranspose transA,
+                         size_t M, size_t N,
+                         cl_type alpha, const cl_mem A, size_t lda,
+                                        const cl_mem B,
+                         size_t off_B, size_t inc_B,
+                         cl_type  beta,       cl_mem C,
+                         size_t off_C, size_t inc_C,
+                         cl_uint numCommandQueues, cl_command_queue * commandQueues,
+                         cl_uint numEventsInWaitList, const cl_event * eventWaitList, cl_event * events)
+    {
+      
+      clAmdBlasCgemv (order, transA, M, N, alpha, A, lda, B, off_B, inc_B, beta, C, off_C, inc_C, numCommandQueues, commandQueues,
+                      numEventsInWaitList, eventWaitList, events);
+      
+    }
+
   
   };
   
@@ -220,6 +289,29 @@
       
       // TODO: use EXtended version
       clAmdBlasZgemm (order, transA, transB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc, numCommandQueues, commandQueues,
+                      numEventsInWaitList, eventWaitList, events);
+      
+    }
+
+
+    /**
+     * @brief           General matrix-vector product.
+     */
+    static
+    cl_int
+    GEMV                (clAmdBlasOrder order,
+                         clAmdBlasTranspose transA,
+                         size_t M, size_t N,
+                         cl_type alpha, const cl_mem A, size_t lda,
+                                        const cl_mem B,
+                         size_t off_B, size_t inc_B,
+                         cl_type  beta,       cl_mem C,
+                         size_t off_C, size_t inc_C,
+                         cl_uint numCommandQueues, cl_command_queue * commandQueues,
+                         cl_uint numEventsInWaitList, const cl_event * eventWaitList, cl_event * events)
+    {
+      
+      clAmdBlasZgemv (order, transA, M, N, alpha, A, lda, B, off_B, inc_B, beta, C, off_C, inc_C, numCommandQueues, commandQueues,
                       numEventsInWaitList, eventWaitList, events);
       
     }

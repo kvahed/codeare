@@ -59,7 +59,8 @@
   enum oclAMDBlasType
   {
   
-    amdblasGEMM
+    amdblasGEMM,
+    amdblasGEMV
   
   };
   

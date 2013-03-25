@@ -644,7 +644,55 @@
         free (scalars);
         free (args);
     
-      } 
+      }
+      
+      
+      /**
+       * @brief                       execute specified AMD BLAS algorithm
+       */
+      static inline
+      const oclError &
+      ocl_basic_operator_amdblas_34            ( const oclAMDBlasType            amd_algo,
+                                                       oclDataObject * const        arg1,
+                                                       oclDataObject * const        arg2,
+                                                       oclDataObject * const      result,
+                                                                 int                  s1,
+                                                                 int                  s2,
+                                                                 int                  s3,
+                                                                 int                  s4 )
+      {
+    
+        // number of kernel arguments
+        const int num_args = 3;
+        const int num_scalars = 4;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = result;
+
+        // create array of scalars
+        int * scalars = (int *) malloc (num_scalars * sizeof (int));
+        scalars [0] = s1;
+        scalars [1] = s2;
+        scalars [2] = s3;
+        scalars [3] = s4;
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance ()
+                                       -> makeFunctionObject <elem_type, scalar_type>
+                                           (amd_algo, args, num_args, oclConnection::AMD, oclConnection::SYNC, num_scalars, scalars);
+
+        // execute function object
+        ocl_run_func_obj (op_obj);
+
+        // clear memory      
+        delete op_obj;
+        free (scalars);
+        free (args);
+    
+      }
     
     
       //@}
@@ -727,7 +775,7 @@
        */
       //@{
     
-    
+
       /**
        * @brief                       Matrix product.
        *
@@ -737,8 +785,8 @@
        * @param  m                    First dimension of product.
        * @param  k                    Inner dimension.
        * @param  n                    Second dimension of product.
-       * @param  trans1               1 -> Transpose first matrix.
-       * @param  trans2               1 -> Transpose second matrix.
+       * @param  trans1               1 -> Transpose first matrix,  2 -> Complex conjugate and transpose first matrix.
+       * @param  trans2               1 -> Transpose second matrix, 2 -> Complex conjugate and transpose second matrix.
        */
       static inline
       const oclError &
@@ -754,7 +802,11 @@
       
         print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
                                            trait2 :: print_elem_type (), "> :: ocl_operator_matprod", op_v_level);
-        ocl_basic_operator_amdblas_35 (amdblasGEMM, arg1, arg2, prod, m, k, n, transA, transB);
+        
+        if (n == 1)
+          ocl_basic_operator_amdblas_34 (amdblasGEMV, arg1, arg2, prod, m, k,    transA, transB);
+        else
+          ocl_basic_operator_amdblas_35 (amdblasGEMM, arg1, arg2, prod, m, n, k, transA, transB);
       
       }
     
