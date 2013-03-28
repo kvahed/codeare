@@ -171,6 +171,20 @@ print (const Matrix<short>& M, std::ostream &os) {
     
     for (size_t i = 0; i < M.Dim(0); i++) {
         for(size_t j = 0; j < M.Dim(1); j++)
+            printf ("%s ", M(i,j) ? "true" : "false");
+        printf("\n");
+    }
+    
+    return os;
+
+}
+
+
+inline static std::ostream&  
+print (const Matrix<bool>& M, std::ostream &os) {
+    
+    for (size_t i = 0; i < M.Dim(0); i++) {
+        for(size_t j = 0; j < M.Dim(1); j++)
             printf ("%hi ", M(i,j));
         printf("\n");
     }

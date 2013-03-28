@@ -2821,7 +2821,7 @@ Matrix<T,P>::operator /= (const Matrix<S,P> &M) {
 	{
 #pragma omp for
 		for (size_t i = 0; i < Size(); i++)
-			_M[i] /= M[i];
+			_M[i] = (M[i] != (T)0) ? _M[i] / M[i] : 0;
 	}
 
     return *this;

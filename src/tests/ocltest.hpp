@@ -344,8 +344,8 @@ oclArithmeticsTest    ( bool verbose )
   std::cout << " ***************** " << std::endl;
   std::cout <<                          std::endl;
 
-  size_t  dimX     = 2048,
-          dimY     = 2048;
+  size_t  dimX     = 4,//2048,
+          dimY     = 4;//2048;
   
   std::cout << " size: " << dimX << " x " << dimY << std::endl << std::endl;
 
@@ -712,20 +712,20 @@ oclmatrixtest (Connector<T>* rc) {
 
   try
   {
-/*    std::cout << std::endl << std::endl;
+    std::cout << std::endl << std::endl;
     std::cout << " ----------- // float, float  \\\\ ------------ " << std::endl;
     std::cout << std::endl;
     exec_tests <float, float>  (true);
     std::cout << std::endl << std::endl;
-*//*    std::cout << " ----------- // float, double  \\\\ ------------ " << std::endl;
+/*    std::cout << " ----------- // float, double  \\\\ ------------ " << std::endl;
     std::cout << std::endl;
     exec_tests <float, double>  (true);
     std::cout << std::endl << std::endl;
-*//*    std::cout << " ----------- // double, double \\\\ ------------ " << std::endl;
+*/    std::cout << " ----------- // double, double \\\\ ------------ " << std::endl;
     std::cout << std::endl;
     exec_tests <double, double> (true);
     std::cout << std::endl << std::endl;
-*//*    std::cout << " ----------- // double, float  \\\\ ------------ " << std::endl;
+/*    std::cout << " ----------- // double, float  \\\\ ------------ " << std::endl;
     std::cout << std::endl;
     exec_tests <double, float>  (true);
     std::cout << std::endl;
