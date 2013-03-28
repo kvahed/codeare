@@ -162,7 +162,9 @@ public:
         try {
             if (m_ptr != NULL) {
                 if (m_ptr->TrackObjectMemory()) {
-                    USER_MSG("Memory leak detected! Object name: " << m_ptr->GetClassName());
+                	std::string msg = "Memory leak detected! Object name: ";
+                	msg += m_ptr->GetClassName();
+                    USER_MSG(msg.c_str());
                 }
                 m_ptr->SetProxy(NULL);
             }

@@ -15,8 +15,8 @@ nuffttest (Connector<T>* rc) {
 
 #ifdef HAVE_MAT_H	
 	if (!(MXRead (weights, df, "weights") && 
-		  MXRead (rawdata, df, "data") && 
-		  MXRead  (kspace, df, "kspace")))
+		  MXRead (rawdata, df,    "data") && 
+		  MXRead  (kspace, df,  "kspace") ))
 		return false;
 #endif
 	

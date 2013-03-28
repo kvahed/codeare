@@ -2,7 +2,6 @@
 #define __CREATORS_HPP__
 
 #include "Matrix.hpp"
-#include "PMatrix.hpp"
 #include "Algos.hpp"
 
 #include <gsl/gsl_rng.h>
@@ -65,13 +64,10 @@ zeros           (const size_t& col,
 template <class T> inline static Matrix<T> 
 zeros           (const Matrix<size_t>& sz) {
 
-	size_t n [INVALID_DIM], i;
+	std::vector<size_t> n (INVALID_DIM,1); 
 
-	for (i = 0; i < numel(sz) && i < INVALID_DIM; i++)
+	for (size_t i = 0; i < numel(sz) && i < INVALID_DIM; i++)
 		n[i] = sz[i];
-
-	for (     ; i < INVALID_DIM; i++)
-		n[i] = 1; 
 
  	return Matrix<T> (n);
 
@@ -131,23 +127,6 @@ ones            (const size_t& col,
 
 
 /**
- * @brief        Construct square m x m ScaLAPACK matrix
- *
- * @param  m     Side length
- * @return       Matrix
- */
-/*
-template <class T> inline static 
-PMatrix<T> pzeros (const size_t& m) {
-
-	PMatrix<T> M (m);
-	M = T(0);
-	return M;
-
-}
-*/
-
-/**
  * @brief       Random matrix
  *
  * @param  col  Column
@@ -201,24 +180,24 @@ rand           (const size_t& col,
 
 	if      (typeid(T) == typeid(float) || typeid(T) == typeid(double))
 		while (i--)
-			res[i] = gsl_rng_uniform (r);
+			res[i] = 2.0 * gsl_rng_uniform (r) - 1.0;
 	else if (typeid(T) == typeid(cxdb))
 		while (i--) {
-			((double*) &res[i])[0] = gsl_rng_uniform (r);
-			((double*) &res[i])[1] = gsl_rng_uniform (r);
+			((double*) &res[i])[0] = 2.0 * gsl_rng_uniform (r) - 1.0;
+			((double*) &res[i])[1] = 2.0 * gsl_rng_uniform (r) - 1.0;
 		}
 	else if (typeid(T) == typeid(cxfl))
 		while (i--) {
-			((float*) &res[i])[0] = gsl_rng_uniform (r);
-			((float*) &res[i])[1] = gsl_rng_uniform (r);
+			((float*) &res[i])[0] = 2.0 * gsl_rng_uniform (r) - 1.0;
+			((float*) &res[i])[1] = 2.0 * gsl_rng_uniform (r) - 1.0;
 		}
 	else if (typeid(T) == typeid(short))
 		while (i--)
-			res[i] = gsl_rng_uniform_int (r, SHRT_MAX);
+			res[i] = 2 * gsl_rng_uniform_int (r, SHRT_MAX) - SHRT_MAX;
 	
 	else if (typeid(T) == typeid(long))
 		while (i--)
-			res[i] = gsl_rng_uniform_int (r, INT_MAX);
+			res[i] = 2 * gsl_rng_uniform_int (r, INT_MAX) - INT_MAX;
 	
 	gsl_rng_free (r);
 
@@ -487,7 +466,8 @@ phantom3D (const size_t& n) {
 
 
 
-template <class T> inline static Matrix<T>
+template <class T>
+inline static Matrix<T>
 eye (const size_t n) {
 
  	Matrix<T> M (n);

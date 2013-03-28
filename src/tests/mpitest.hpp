@@ -1,67 +1,25 @@
+#include "Grid.hpp"
+#include "Matrix.hpp"
+
 #include <math.h>
-#include "PMatrix.hpp"
-#include "PIO.hpp"
-
-#ifdef HAVE_MPI
-static void 
-grid_setup (const int& np, int& nc, int& nr) {
-	
-	int sqrtnp, i;
-	
-	sqrtnp = int(sqrt(double(np)) + 1);
-	
-	for (i = 1; i < sqrtnp; i++)
-		if (!(np % i))
-			nc = i;
-	
-	nr = np/nc;
-	
-}
-
-
-static void 
-sl_init (grid_dims& gd) {
-
-	/* General sizes */
-	Cblacs_pinfo(&gd.rk, &gd.np);
-
-	/* Grid setup */
-	grid_setup (gd.np, gd.nr, gd.nc);
-	Cblacs_get (-1, 0, &gd.ct);
-	Cblacs_gridinit (&gd.ct, &gd.order, gd.nr, gd.nc);
-
-}
-
-
-static void 
-sl_finalise (grid_dims& gd) {
-
-	/* Clean up */
-	Cblacs_gridexit (gd.ct);
-	Cblacs_exit (0);
-
-}
-#endif 
-
+#include <iostream>
 
 template <class T> bool
 mpitest (Connector<T>* rc) {
 
+    Grid& gd = *Grid::Instance();
+    
 #ifdef HAVE_MPI
-	grid_dims gd;
-	gd.order = 'C';
 
-	/* Initialise ScaLAPACK */
-	sl_init (gd);
+	/* MPI aware matrices */
+	Matrix<float,MPI> A (16,16);
+	Matrix<float,MPI> B (16,16);
 
-	/* MPI aware matrix */
-	PMatrix<double> pm (32,40);
-	pm.Dat() = 20.0;
-	print (pm);
+    //std::cout << A[0] << std::endl;
+	//A = 1.0;//gd.rk; //operator=(const T& t)
+	//B = A;     //operator=(const PMatrix<T>& P)
 
-	/* Finalise ScaLAPACK */
-	sl_finalise (gd);
-#else 
+else 
 	printf ("\nMPI not supported by this build\n");
 #endif
 

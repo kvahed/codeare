@@ -77,6 +77,18 @@ class Configurable {
 	 * @param  value    Attribute value
 	 */
 	inline void
+	SetAttribute        (const char* name, const std::string& value) {
+		Configuration()->SetAttribute (name, value.c_str());
+	}
+
+	
+	/**
+	 * @brief           Set a string type attribute
+	 *
+	 * @param  name     Attribute name 
+	 * @param  value    Attribute value
+	 */
+	inline void
 	SetAttribute        (const char* name, const std::string value) {
 		Configuration()->SetAttribute (name, value.c_str());
 	}
@@ -163,8 +175,7 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, std::string* value) const {
-		value = new std::string (Configuration()->Attribute (name));
-		return value->length();
+		return Configuration()->QueryStringAttribute (name, value);
 	}
 	
 

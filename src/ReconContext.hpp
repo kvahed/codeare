@@ -68,7 +68,7 @@ namespace RRStrategy {
 		 *
 		 * @return       Success
 		 */
-		RRSModule::error_code
+		error_code
 		Process          ();
 		
 		
@@ -77,7 +77,7 @@ namespace RRStrategy {
 		 *
 		 * @return       Success
 		 */
-		RRSModule::error_code
+		error_code
 		Init             ();
 		
 		
@@ -86,7 +86,7 @@ namespace RRStrategy {
 		 *
 		 * @return       Success
 		 */
-		RRSModule::error_code
+		error_code
 		Prepare          ();
 		
 		
@@ -95,7 +95,7 @@ namespace RRStrategy {
 		 *
 		 * @return       Success
 		 */
-		RRSModule::error_code
+		error_code
 		Finalise     ();
 		
 		
@@ -126,7 +126,7 @@ namespace RRStrategy {
 		template <class T> void
 		SetMatrix        (const std::string name, const T& t) {
 
-			DataBase::Instance()->SetMatrix(name, t);
+			Workspace::Instance().SetMatrix(name, t);
 
 		}
 		

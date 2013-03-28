@@ -22,7 +22,7 @@
 //#include "CGRAPPA.hpp"
 using namespace RRStrategy;
 
-RRSModule::error_code
+error_code
 GRAPPA::Init () {
 	
 	printf ("Intialising %s ...\n", Name());
@@ -106,23 +106,23 @@ GRAPPA::Init () {
 
 	printf ("... done.\n\n");
 
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
-RRSModule::error_code
+error_code
 GRAPPA::Prepare     () { 
 
 	printf ("  Preparing %s ...\n", Name());
 
-	Matrix<cxfl>& acs  = GetCXFL("acs");
+	Matrix<cxfl>& acs  = Get<cxfl>("acs");
 	/*ComputeWeights (m_nc, m_acs_dim, m_kern_dim, m_d, m_R, acs, m_weights);*/
 
 	
 	
 	printf ("... done.\n\n");
-	return RRSModule::OK;
+	return OK;
 	
 
 }
@@ -138,30 +138,30 @@ GRAPPA::Prepare     () {
 // m_raw:     Reconstructed k-spaces O (Nc x NKx    x NKy    x NKz)
 // ---------------------------------
 
-RRSModule::error_code
+error_code
 GRAPPA::Process     () { 
 
 	ticks cgstart = getticks();
 
 	printf ("  Processing GRAPPA ...\n");
 
-	Matrix<cxfl>& acs  = GetCXFL("acs");
-	Matrix<cxfl>& data = GetCXFL("data");
+	Matrix<cxfl>& acs  = Get<cxfl>("acs");
+	Matrix<cxfl>& data = Get<cxfl>("data");
 
 	printf ("  data dims: %s\n", DimsToCString(data));
 
 	printf ("... done.. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
 
-RRSModule::error_code
+error_code
 GRAPPA::Finalise () {
 
-	return RRSModule::OK;
+	return OK;
 
 }
 

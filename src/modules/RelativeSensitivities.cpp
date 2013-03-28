@@ -25,7 +25,7 @@
 using namespace RRStrategy;
 
 
-RRSModule::error_code
+error_code
 RelativeSensitivities::Init        () {
 
     Attribute ("echo_shift", &m_echo_shift);
@@ -39,16 +39,16 @@ RelativeSensitivities::Init        () {
 	Attribute ("weigh_maps", &m_weigh_maps);
 	printf ("  Mask maps: %i\n", m_weigh_maps);
     
-    return RRSModule::OK;
+    return OK;
 
 }
 
 
-RRSModule::error_code
+error_code
 RelativeSensitivities::Process     () { 
 
-    Matrix<cxfl>& data = GetCXFL("meas");
-    Matrix<cxfl>& mask = GetCXFL("mask");
+    Matrix<cxfl>& data = Get<cxfl>("meas");
+    Matrix<cxfl>& mask = Get<cxfl>("mask");
 
     printf ("  Processing map generation ...\n");
     ticks start = getticks();
@@ -60,6 +60,7 @@ RelativeSensitivities::Process     () {
     printf ("  Data:\n");
     printf ("    Dimensions: %s \n", DimsToCString(data));
     printf ("    Reolutions: %s \n", ResToCString(data));
+	MXDump (data, "f.mat", "data");
 
 	mask = squeeze (mask);
     printf ("  Mask:\n");
@@ -67,17 +68,25 @@ RelativeSensitivities::Process     () {
     printf ("    Reolutions: %s \n", ResToCString(mask));
     // -----------------------------------------
 
-    // Fourier transform -----------------------
+    // Fourier transform and remove OS----------
 
     FTVolumes (data);
     RemoveOS (data);
     // -----------------------------------------
 
     // SVD calibration -------------------------
-    Matrix<cxfl>&   rxm  = AddMatrix ("rxm",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
-    Matrix<cxfl>&   txm  = AddMatrix ("txm",  (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
-    Matrix<cxfl>&   shim = AddMatrix ("shim", (Ptr<Matrix<cxfl> >)   NEW (Matrix<cxfl>   (data.Dim(4), 1)));
-    Matrix<double>& snro = AddMatrix ("snro", (Ptr<Matrix<double> >) NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
+    Matrix<cxfl>&   rxm  = 
+		AddMatrix ("rxm",  (Ptr<Matrix<cxfl> >)   
+				   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
+    Matrix<cxfl>&   txm  = 
+		AddMatrix ("txm",  (Ptr<Matrix<cxfl> >)   
+				   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
+    Matrix<cxfl>&   shim = 
+		AddMatrix ("shim", (Ptr<Matrix<cxfl> >)   
+				   NEW (Matrix<cxfl>   (data.Dim(4), 1)));
+    Matrix<double>& snro = 
+		AddMatrix ("snro", (Ptr<Matrix<double> >) 
+				   NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
 
     SVDCalibrate (data, rxm, txm, snro, shim, false);
 
@@ -85,7 +94,7 @@ RelativeSensitivities::Process     () {
 
     // Do we have GRE for segmentation? --------
 	
-    Matrix<short>& bets = AddMatrix ("bets", (Ptr<Matrix<short> >) NEW (Matrix<short> (mask.Dim())));
+    Matrix<short>& bets = AddMatrix ("bets", (Ptr<Matrix<short> >) NEW (Matrix<short> (mask.DimVector())));
 	
     if (m_use_bet == 1) { // Better test? / Replace with SNRO?
 		
@@ -94,7 +103,7 @@ RelativeSensitivities::Process     () {
 
 		SOS (mask, ndims(mask)-1);
         
-        Matrix<double> bet(mask.Dim());
+        Matrix<double> bet(mask.DimVector());
         double         tmp = 0.0;
 		
         for (size_t i = 0; i < numel(mask); i++) {
@@ -140,34 +149,34 @@ RelativeSensitivities::Process     () {
 		
 		for (int i = 0; i < numel(bets); i++)
 			b0[i] *= (double)bets[i];
-
+		
 	}
 	// -----------------------------------------
-
+	
     // Remove original data from RAM -----------
-
-    FreeCXFL ("meas");
+	
+    Free ("meas");
     // -----------------------------------------
     
     printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
-    return RRSModule::OK;
-
+    return OK;
+	
 }
 
 
-RRSModule::error_code
+error_code
 RelativeSensitivities::Finalise    () {
-
-    return RRSModule::OK;
-
+	
+    return OK;
+	
 }
 
 
 // the class factories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {
-
+	
     return new RelativeSensitivities;
-
+	
 }
 
 

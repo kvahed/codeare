@@ -21,6 +21,8 @@
 #ifndef __TOOLBOX_HPP__
 #define __TOOLBOX_HPP__
 
+#include <boost/any.hpp>
+
 #include <vector>
 #include <string>
 
@@ -55,7 +57,8 @@ public:
 	double 
 	ClockRate       () const ;	
 
-
+	boost::any   void_any;
+	std::string  void_str;
 	
 		
 private:

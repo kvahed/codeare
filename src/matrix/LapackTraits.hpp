@@ -1,6 +1,19 @@
-#include <string.h>
-#include <cblas.h>
+#include "Complex.hpp"
 
+#include <stdlib.h>
+#include "cblas.h"
+
+static int izero = 0;
+static int ione  = 1;
+
+static inline int v3p_netlib_dqrsl_ (double *x, int *ldx, int *n, int *k, double *qraux, double *y, 
+									 double *qy, double *qty,  double *b, double *rsd, double *xb, 
+									 int *job, int *info) {
+	return 0; }
+
+static inline int v3p_netlib_dqrdc_ (double* x, int* ldx, int* n, int* p, int* jptv, double* work, int* job) {
+	return 0;
+}
 
 extern "C" {
 
@@ -37,31 +50,35 @@ extern "C" {
 				  int *lwork, int*info);
 	
 	// Eigen value computations
-	void cgeev_  (const char *jvl, const char *jvr, int *n, const void *a, 
-				  int *lda, void *w,  void *vl, int *ldvl, void *vr, int *ldvr, 
-				  void *work, int *lwork, void *rwork, int *info);
-	void zgeev_  (const char *jvl, const char *jvr, int *n, const void *a, 
-				  int *lda, void *w,  void *vl, int *ldvl, void *vr, int *ldvr, 
-				  void *work, int *lwork, void *rwork, int *info);
-	void dgeev_  (const char *jvl, const char *jvr, int *n, const void *a, 
-				  int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, 
-				  int *ldvr, void *work, int *lwork, int *info);
-	void sgeev_  (const char *jvl, const char *jvr, int *n, const void *a, 
-				  int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, 
-				  int *ldvr, void *work, int *lwork, int *info);
-	
+	void cgeev_  (const char* jobvl, const char* jobvr, const int* n, cxfl *a,
+                  const int *lda, cxfl *w, cxfl *vl,
+                  const int* ldvl, cxfl *vr, const int* ldvr,
+				  cxfl *work, const int *lwork, cxfl *rwork, int *info);
+	void zgeev_  (const char* jobvl, const char* jobvr, const int* n, cxdb *a,
+	              const int *lda, cxdb *w, cxdb *vl,
+	              const int* ldvl, cxdb *vr, const int* ldvr,
+				  cxdb *work, const int *lwork, cxdb *rwork, int *info);
+	void sgeev_  (const char* jobvl, const char* jobvr, const int* n, float *a,
+			      const int *lda, float *wr, float *wi, float *vl, const int* ldvl,
+			      float *vr, const int* ldvr, float *work, const int *lwork,
+			      int *info);
+	void dgeev_  (const char* jobvl, const char* jobvr, const int* n, double *a,
+			      const int *lda, double *wr, double *wi, double *vl, const int* ldvl,
+			      double *vr, const int* ldvr, double *work, const int *lwork,
+			      int *info);
+
 	// Singular value decomposition 
-	void cgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+	void cgesdd_ (const char *jobz, int *m, int *n, void *a, int *lda, void *s, 
+				  void *u, int *ldu, void *vt, int *ldvt, void *work, int *lwork, 
 				  void *rwork, int *iwork, int*info);
-	void zgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+	void zgesdd_ (const char *jobz, int *m, int *n, void *a, int *lda, void *s, 
+				  void *u, int *ldu, void *vt, int *ldvt, void *work, int *lwork, 
 				  void *rwork, int *iwork, int*info);
-	void dgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+	void dgesdd_ (const char *jobz, int *m, int *n, void *a, int *lda, void *s, 
+				  void *u, int *ldu, void *vt, int *ldvt, void *work, int *lwork, 
 				  int *iwork, int*info);
-	void sgesdd_ (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
+	void sgesdd_ (const char *jobz, int *m, int *n, void *a, int *lda, void *s, 
+				  void *u, int *ldu, void *vt, int *ldvt, void *work, int *lwork,
 				  int *iwork, int*info);
 	
 	// Pseudo-inversion 
@@ -170,25 +187,31 @@ struct LapackTraits<float> {
 	}
 
 	inline static void
-	geev (const char *jvl, const char *jvr, int n, const void *a, int *lda, 
-		  void *w, void *vl, int *ldvl, void *vr, int *ldvr, void *work, 
-		  int *lwork, void* rwork, int *info) {
-		
+	geev (const char *jvl, const char *jvr, const int n, Type *a, const int *lda,
+		  std::complex<Type> *w, Type *vl, const int *ldvl, Type *vr, const int *ldvr,
+		  Type *work, const int *lwork, void* rwork, int *info) {
+
+		int err = 0;
 		Type* dwr = (Type*) malloc (n * sizeof(Type));
 		Type* dwi = (Type*) malloc (n * sizeof(Type));
+		printf ("%d\n",err++);
+
 		Type* dw  = (Type*) w;
-		
-		dgeev_ (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, lwork,
-				info);
-		
+		//sgeev_ (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work,
+		//		lwork, info);
+		printf ("%d\n",err++);
+
 		for (size_t i = 0; i < n; i++) {
-			dw[2*i]   = dwr[i];
+			dw[2*i  ] = dwr[i];
 			dw[2*i+1] = dwi[i];
 		}
-		
+		printf ("%d\n",err++);
 		free (dwr);
+		printf ("%d\n",err++);
+
 		free (dwi);
-		
+		printf ("%d\n",err++);
+
 	}
 
 	inline static void 
@@ -267,9 +290,9 @@ struct LapackTraits<double> {
 	}
 
 	inline static void
-	geev (const char *jvl, const char *jvr, int n, const void *a, int *lda, 
-		  void *w, void *vl, int *ldvl, void *vr, int *ldvr, void *work, 
-		  int *lwork, void* rwork, int *info) {
+	geev (const char *jvl, const char *jvr, const int n, Type *a, const int *lda,
+		  std::complex<Type> *w, Type *vl, const int *ldvl, Type *vr, const int *ldvr,
+		  Type *work, const int *lwork, void* rwork, int *info) {
 
 		Type* dwr = (Type*) malloc (n * sizeof(Type));
 		Type* dwi = (Type*) malloc (n * sizeof(Type));
@@ -277,7 +300,7 @@ struct LapackTraits<double> {
 
 		dgeev_ (jvl, jvr, &n, a, lda, dwr, dwi, vl, ldvl, vr, ldvr, work, 
 				lwork, info);
-		
+				
 		for (size_t i = 0; i < n; i++) {
 			dw[2*i  ] = dwr[i];
 			dw[2*i+1] = dwi[i];
@@ -365,9 +388,9 @@ struct LapackTraits<cxfl> {
 	}
 
 	inline static void 
-	geev (const char *jvl, const char *jvr, int n, const void *a, int *lda, 
-		  void *w, void *vl, int *ldvl, void *vr, int *ldvr, void *work, 
-		  int *lwork, void* rwork, int *info) {
+	geev (const char *jvl, const char *jvr, const int& n, Type *a, const int *lda,
+		  Type *w, Type *vl, const int *ldvl, Type *vr, const int *ldvr, Type *work,
+		  const int *lwork, Type* rwork, int *info) {
 		cgeev_  (jvl, jvr, &n, a, lda, w, vl, ldvl, vr, ldvr, work, lwork, 
 				 rwork, info);
 	}
@@ -449,10 +472,10 @@ struct LapackTraits<cxdb> {
 		cblas_zdotc_sub (N, X, incX, Y, incY, res);	
 	}
 
-	inline static void 
-	geev (const char *jvl, const char *jvr, int n, const void *a, int *lda, 
-		  void *w, void *vl, int *ldvl, void *vr, int *ldvr, void *work, 
-		  int *lwork, void* rwork, int *info) {
+	inline static void
+	geev (const char *jvl, const char *jvr, const int n, Type *a, const int *lda,
+		  Type *w, Type *vl, const int *ldvl, Type *vr, const int *ldvr, Type *work,
+		  int *lwork, Type* rwork, int *info) {
 		zgeev_  (jvl, jvr, &n, a, lda, w, vl, ldvl, vr, ldvr, work, lwork, 
 				 rwork, info);
 	}

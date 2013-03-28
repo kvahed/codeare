@@ -21,8 +21,11 @@
 #ifndef __FFTW_TRAITS_HPP__
 #define __FFTW_TRAITS_HPP__
 
-#include <fftw3.h>
+#include "Workspace.hpp"
+#include "Params.hpp"
+#include "OMP.hpp"
 
+#include <fftw3.h>
 
 template <class T>
 struct FTTraits { };
@@ -49,11 +52,61 @@ struct FTTraits<float> {
 	 *
 	 * @return        Plan
 	 */
-	static inline Plan 
-	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {                    
+	static inline Plan
+	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {
+		InitThreads();
 	    return fftwf_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
+
+		/**
+	 * @brief         Initialise FFTWF threads (Should only be done once)
+	 *
+	 * @return        Success
+	 */
+	static bool 
+	InitThreads () {
+
+		Workspace& ws = Workspace::Instance();
+		int nt = boost::any_cast<int>(ws.p["FFTWFThreads"]);
+
+		if (nt > 0)
+			return true;
+
+#pragma omp parallel
+		{
+			nt = omp_get_num_threads();
+			omp_set_dynamic(false);
+		}		
+
+		printf ("  Initialising %d-threaded FFTWF ... ", nt);
+		fflush (stdout);
+
+#ifdef HAVE_FFTWF_THREADS
+		bool ok = fftwf_init_threads();
+		if (ok) {
+			PlanWithNThreads (nt);
+			ws.PSet("FFTWFThreads", nt);
+		}
+#endif
+
+		printf ("done\n");
+
+		return true;
+		
+	}
+	
+
+	/**
+	 * @brief        Create plans with N threads
+	 * 
+	 * @param  nt    # of threads
+	 */
+	static void 
+	PlanWithNThreads (const int& nt) { 
+		fftwf_plan_with_nthreads (nt); 
+	}
+
 
 	/**
 	 * @brief        Inlined memory allocation for performance
@@ -138,6 +191,54 @@ struct FTTraits<double> {
 	    return fftw_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
+
+	/**
+	 * @brief         Initialise FFTW threads (Should only be done once)
+	 *
+	 * @return        Success
+	 */
+	static bool 
+	InitThreads () {
+
+		Workspace& ws = Workspace::Instance();
+		int nt = boost::any_cast<int>(ws.p["FFTWFThreads"]);
+
+		if (nt > 0)
+			return true;
+
+#pragma omp parallel
+		{
+			nt = omp_get_num_threads();
+		}		
+
+		printf ("  Initialising %d-threaded FFTW ... ", nt);
+		fflush (stdout);
+
+#ifdef HAVE_FFTWF_THREADS
+		bool ok = fftw_init_threads();
+		if (ok) {
+			PlanWithNThreads (nt);
+			ws.PSet("FFTWThreads", nt);
+		}
+#endif
+
+		printf ("done\n");
+
+		return true;
+		
+	}
+	
+
+	/**
+	 * @brief        Create plans with N threads
+	 * 
+	 * @param   nt   # of threads
+	 */
+	static void 
+	PlanWithNThreads (const int& nt) { 
+		fftw_plan_with_nthreads (nt); 
+	}
+
 
 	/**
 	 * @brief        Inlined memory allocation for performance

@@ -41,10 +41,19 @@ enum InterpMethod {
 	LINEAR, BSPLINE
 };
 
-
+/**
+ * @brief      3D resample data to new grid size
+ *
+ * @param  M   Incoming data
+ * @param  f   Resampling factor in all 3 dimensions
+ * @param  im  Interpolation method (LINEAR|BSPLINE)
+ *
+ * @return     Resampled data
+ */
 template<class T> static Matrix<T> 
 Resample (const Matrix<T>& M, const Matrix<double>& f, const InterpMethod& im) {
 	
+
 	Matrix <T> res = M;
 	
 #ifdef HAVE_INSIGHT
@@ -135,15 +144,20 @@ Resample (const Matrix<T>& M, const Matrix<double>& f, const InterpMethod& im) {
 }
 
 
+/**
+ * @brief      Isotropically 3D resample data to new grid size
+ *
+ * @param  M   Incoming data
+ * @param  f   Resampling factor for all 3 dimensions
+ * @param  im  Interpolation method (LINEAR|BSPLINE)
+ *
+ * @return     Resampled data
+ */
 template<class T> static Matrix<T>
-Resample (const Matrix<T>& M, const    double& f, const InterpMethod& im) {
+Resample (const Matrix<T>& M, const double& f, const InterpMethod& im) {
 	
 	Matrix<double> mf (3,1);
-	
-	mf[0] = f; 
-	mf[1] = f; 
-	mf[2] = f; 
-	
+	mf = f;
 	return Resample(M, mf, im);
 	
 }

@@ -68,7 +68,6 @@ namespace RRServer {
 		virtual 
 		~ReconServant ();
 		
-
 		/**
 		 * @brief      Process startegy (Needs initialisation @see Init)
 		 *
@@ -77,9 +76,9 @@ namespace RRServer {
 		 * @param name Name of library
 		 * @return     Sucess
 		 */
-		virtual error_code
+		virtual short
 		Process        (const char* name);
-
+		
 		
 		/**
 		 * @brief      Prepare startegy (Needs initialisation @see Init)
@@ -89,9 +88,9 @@ namespace RRServer {
 		 * @param name Name of library
 		 * @return     Sucess
 		 */
-		virtual error_code
+		virtual short
 		Prepare        (const char* name);
-
+		
 		
 		/**
 		 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
@@ -101,7 +100,7 @@ namespace RRServer {
 		 * @param name Name of processing library
 		 * @return     success
 		 */
-		virtual error_code
+		virtual short
 		Init          (const char* name);
 		
 
@@ -112,7 +111,7 @@ namespace RRServer {
 		 *
 		 * @param name Name of library
 		 */
-		virtual error_code
+		virtual short
 		Finalise      (const char* name = 0);
 		
 
@@ -121,7 +120,7 @@ namespace RRServer {
 		 *
 		 * @return    Success
 		 */
-		virtual error_code
+		virtual short
 		CleanUp       ();
 		
 

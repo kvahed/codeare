@@ -22,17 +22,16 @@
 #include "IO.hpp"
 
 using namespace RRStrategy;
-
 error_code 
 DumpToFile::Process () {
 
 	std::stringstream fname;
 	const char* uid = Attribute ("UID");
-
-	map<string,Ptr< Matrix<cxfl> > >&  cfm = DataBase::Instance()->CXFLMap();
-	map<string,Ptr< Matrix<double> > >&  rdm = DataBase::Instance()->RLDBMap();
-	map<string,Ptr< Matrix<short> > >& sim = DataBase::Instance()->SHRTMap();
-
+/*
+	map<string,Ptr< Matrix<cxfl> > >&   cfm = Workspace::Instance()->CXFLMap();
+	map<string,Ptr< Matrix<double> > >& rdm = Workspace::Instance()->RLDBMap();
+	map<string,Ptr< Matrix<short> > >&  sim = Workspace::Instance()->SHRTMap();
+*/
 
 	printf ("Dumping ...\n");
 
@@ -45,13 +44,13 @@ DumpToFile::Process () {
 	fname.str("");
 
 	fname << uid << "_data.mat";
-
+/*
 #ifdef HAVE_MAT_H
 	MATFile* mf = matOpen (fname.str().c_str(), "w");
 
 	if (mf == NULL) {
 		printf ("Error creating file %s\n", fname.str().c_str());
-		return RRSModule::FILE_ACCESS_FAILED;
+		return FILE_ACCESS_FAILED;
 	}
 
 	map<string,Ptr< Matrix<cxfl> > >::iterator cit = cfm.begin();
@@ -74,12 +73,13 @@ DumpToFile::Process () {
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n",fname.str().c_str());
-		return RRSModule::FILE_ACCESS_FAILED;
+		return FILE_ACCESS_FAILED;
 	}
 #endif
+*/
 	printf ("... done\n");
 
-	return RRSModule::OK;
+	return OK;
 
 }
 

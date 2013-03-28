@@ -27,7 +27,7 @@
 using namespace RRStrategy;
 
 
-RRSModule::error_code
+error_code
 CompressedSensing::Init () {
 
 	printf ("Intialising CompressedSensing ...\n");
@@ -38,14 +38,14 @@ CompressedSensing::Init () {
 	int wli = 0;
 	int m_fft = 0;
 
-	Attribute ("tvw",     &m_cgparam.tvw);
-	Attribute ("xfmw",    &m_cgparam.xfmw);
-	Attribute ("l1",      &m_cgparam.l1);
-	Attribute ("pnorm",   &m_cgparam.pnorm);
-    printf ("  Weights: TV(%.4f) XF(%.4f) L1(%.4f)\n", m_cgparam.tvw, m_cgparam.xfmw, m_cgparam.l1);
-    printf ("  Pnorm: %f\n", m_cgparam.pnorm);
+	Attribute ("tvw",     &m_csparam.tvw);
+	Attribute ("xfmw",    &m_csparam.xfmw);
+	Attribute ("l1",      &m_csparam.l1);
+	Attribute ("pnorm",   &m_csparam.pnorm);
+    printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
+    printf ("  Pnorm: %.2e\n", m_csparam.pnorm);
 	
-	Attribute ("fft",     &m_cgparam.fft);
+	Attribute ("fft",     &m_csparam.fft);
 	printf ("  FFT class: ");
 	switch (m_fft) 
 		{
@@ -63,54 +63,56 @@ CompressedSensing::Init () {
 	if (m_wf < -1 || m_wf > 5)
 		m_wf = -1;
 
-	Attribute ("cgconv", &m_cgparam.cgconv);
-	Attribute ("cgiter", &m_cgparam.cgiter);
-	Attribute ("lsiter", &m_cgparam.lsiter);
-	Attribute ("lsa",    &m_cgparam.lsa);
-	Attribute ("lsb",    &m_cgparam.lsb);
-    printf ("  Iterations: CS(%i) CG(%i) LS(%i)\n", m_csiter, m_cgparam.cgiter, m_cgparam.lsiter);
-	printf ("  Conv: CG(%.4f)\n", m_cgparam.cgconv);
-	printf ("  LS brackets: lsa(%.4f) lsb(%.4f)", m_cgparam.lsa, m_cgparam.lsb);
+	Attribute ("cgconv", &m_csparam.cgconv);
+	Attribute ("cgiter", &m_csparam.cgiter);
+	Attribute ("lsiter", &m_csparam.lsiter);
+	Attribute ("lsa",    &m_csparam.lsa);
+	Attribute ("lsb",    &m_csparam.lsb);
+    printf ("  Iterations: CS(%i) CG(%i) LS(%i)\n", m_csiter, m_csparam.cgiter, m_csparam.lsiter);
+	printf ("  Conv: CG(%.4f)\n", m_csparam.cgconv);
+	printf ("  LS brackets: lsa(%.2e) lsb(%.2e)", m_csparam.lsa, m_csparam.lsb);
 
 	
 
 	m_initialised = true;
 	printf ("... done.\n\n");
 
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
-RRSModule::error_code
+error_code
 CompressedSensing::Process () {
 
 	printf ("Processing CompressedSensing ...\n");
 	ticks tic; 
 	float ma;
 
-	Matrix<cxfl>&  data  = GetCXFL   ("data");
-	Matrix<float>& pdf   = GetRLFL   ("pdf" );
-	Matrix<float>& mask  = GetRLFL   ("mask");
-	Matrix<cxfl>&  pc    = GetCXFL   ("pc");
-	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.Dim())));
+	Matrix<cxfl>&  data  = Get<cxfl>   ("data");
+	Matrix<float>& pdf   = Get<float>  ("pdf" );
+	Matrix<float>& mask  = Get<float>  ("mask");
+	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
+	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.DimVector())));
 	Matrix<cxfl>   orig;
 
 	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
 		size(data,0), size(data,1), size(data,2));
 
-	m_cgparam.dwt = new DWT <cxfl> (data.Height(), wlfamily(m_wf), m_wm);
+	m_csparam.dwt = new DWT <cxfl> (data.Height(), wlfamily(m_wf), m_wm);
 
 	/** -----  Which Fourier transform? **/
-	m_cgparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);
-	// m_cgparam.ft = (FT<float>*) new NFFT<float> (ms, M * shots, m, alpha);
-	// m_cgparam.ft = (FT<float>*) new NCSENSE<float> (sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
+	m_csparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);
+
+	
+	// m_csparam.ft = (FT<float>*) new NFFT<float> (ms, M * shots, m, alpha);
+	// m_csparam.ft = (FT<float>*) new NCSENSE<float> (sens, nk, m_cseps, m_csmaxit, m_lambda, m_fteps, m_ftmaxit);
 	/*************************************/
 
-	m_cgparam.tvt = new TVOP ();
+	m_csparam.tvt = new TVOP ();
 
-	FT<float>& dft = *m_cgparam.ft;
-	DWT<cxfl>& dwt = *m_cgparam.dwt;
+	FT<float>& dft = *m_csparam.ft;
+	DWT<cxfl>& dwt = *m_csparam.dwt;
 	
 	im_dc    = data;
 	im_dc   /= pdf;
@@ -129,7 +131,7 @@ CompressedSensing::Process () {
 	tic      = getticks();
 
 	for (size_t i = 0; i < m_csiter; i++)
-		NLCG (im_dc, data, m_cgparam);
+		NLCG (im_dc, data, m_csparam);
 
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
@@ -139,6 +141,17 @@ CompressedSensing::Process () {
 	return OK;
 
 }
+
+
+CompressedSensing::CompressedSensing() :
+	m_wm(0), m_csiter(0), m_wf(0), m_dim(0) {}
+
+
+CompressedSensing::~CompressedSensing() {}
+
+
+error_code
+CompressedSensing::Finalise() {return OK;}
 
 
 // the class factories

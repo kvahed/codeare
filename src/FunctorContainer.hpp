@@ -40,7 +40,7 @@ public:
 	/**
 	 * @brief      Default constructor
 	 */
-	FunctorContainer () {}
+	FunctorContainer () : m_config(0) {}
 
 
 	/**
@@ -56,7 +56,7 @@ public:
 	 * @param name Name of library
 	 * @return     Sucess
 	 */
-	virtual error_code
+	virtual short
 	Process        (const char* name);
 	
 	
@@ -66,7 +66,7 @@ public:
 	 * @param name Name of library
 	 * @return     Sucess
 	 */
-	virtual error_code
+	virtual short
 	Prepare        (const char* name);
 	
 	
@@ -76,7 +76,7 @@ public:
 	 * @param name Name of processing library
 	 * @return     success
 	 */
-	virtual error_code
+	virtual short
 	Init          (const char* name);
 	
 	
@@ -85,7 +85,7 @@ public:
 	 *
 	 * @param name Name of processing library
 	 */
-	virtual error_code
+	virtual short
 	Finalise       (const char* name = 0);
 	
 	
@@ -94,7 +94,7 @@ public:
 	 *
 	 * @return     Success
 	 */
-	virtual error_code
+	virtual short
 	CleanUp        ();
 	
 

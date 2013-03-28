@@ -21,7 +21,7 @@
 #ifndef __DUMMY_RECON_HPP__
 #define __DUMMY_RECON_HPP__
 
-#include "ReconStrategy.hpp"
+#include "../ReconStrategy.hpp"
 
 /**
  * @brief Reconstruction startegies
@@ -51,13 +51,13 @@ namespace RRStrategy {
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Process ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Init () {
 			return OK;
 		}
@@ -65,7 +65,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Finalise () {
 
 			return OK;

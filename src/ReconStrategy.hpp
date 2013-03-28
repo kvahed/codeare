@@ -23,21 +23,14 @@
 
 #include "Matrix.hpp"
 #include "Configurable.hpp"
-#include "DataBase.hpp"
+#include "Workspace.hpp"
 
 #include "DllExport.h"
-
-#ifdef __WIN32__ 
-    #include "RRSModule.h"
-#else
-    #include "RRSModule.hh"
-#endif
 
 #include <cstdlib>
 #include <complex>
 #include <stdint.h>
 
-using namespace RRSModule;
 using namespace std;
 
 /**
@@ -58,8 +51,8 @@ namespace RRStrategy {
 
 		/**
 		 * @brief       Default constructor
-		 */ 
-		ReconStrategy   () {}
+		 */
+		ReconStrategy   () : m_initialised (false) {}
 		
 
 		/**
@@ -93,8 +86,8 @@ namespace RRStrategy {
 		 * @return      Success
 		 */ 
 		virtual error_code
-		Prepare         () { 
-			return RRSModule::OK; 
+		Prepare         () {
+			return OK;
 		}
 		
 
@@ -132,9 +125,9 @@ namespace RRStrategy {
 		/**
 		 * @brief       Reference to Database singleton
 		 */
-		DataBase&
+		Workspace&
 		DB              () const {
-			return *(DataBase::Instance());
+			return Workspace::Instance();
 		}
 
 
@@ -147,163 +140,33 @@ namespace RRStrategy {
 		 */
 		template <class T> Matrix<T>& 
 		AddMatrix         (const string name, Ptr< Matrix<T> > p) const {
-			return DataBase::Instance()->AddMatrix(name, p);
+			return DB().AddMatrix(name, p);
 		}
-		
-		
+
+
 		/**
-		 * @brief       Get reference to complex single matrix by name from database 
-		 *              @see DataBase::GetCXFL(const string)
-		 * 
+		 * @brief       Get reference to complex single matrix by name from database
+		 *              @see Workspace::Get<T>(const string)
+		 *
 		 * @param  name Name
-		 * @return      Reference to data 
+		 * @return      Reference to data
 		 */
-		Matrix<cxfl>& 
-		GetCXFL         (const string name) const {
-			return DataBase::Instance()->GetCXFL(name);
+		template <class T> Matrix<T>&
+		Get            (const string name) const {
+			return DB().Get<T>(name);
 		}
 		
 		
 		/**
 		 * @brief       Clear database of complex single matrix by name
-		 *              @see DataBase::FreeCXFL(const string)
+		 *              @see Workspace::FreeCXFL(const string)
 		 * 
 		 * @param  name Name
 		 * @return      Reference to data if existent
 		 */
-		bool 
-		FreeCXFL        (const string name) const {
-			return DataBase::Instance()->FreeCXFL(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to complex double matrix by name from database
-		 *              @see DataBase::GetCXDB(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to data if existent
-		 */
-		Matrix<cxdb>& 
-		GetCXDB         (const string name) const {
-			return DataBase::Instance()->GetCXDB(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of complex double matrix by name
-		 *              @see DataBase::FreeCXDB(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to data if existent
-		 */
-		bool 
-		FreeCXDB        (const string name) const {
-			return DataBase::Instance()->FreeCXDB(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to single matrix by name from database
-		 *              @see DataBase::GetRLFL(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		Matrix<float>& 
-		GetRLFL         (const string name) const {
-			return DataBase::Instance()->GetRLFL(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of single matrix by name
-		 *              @see DataBase::FreeRLFL(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		bool 
-		FreeRLFL        (const string name) const {
-			return DataBase::Instance()->FreeRLFL(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to double matrix by name from database
-		 *              @see DataBase::GetRLDB(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		Matrix<double>& 
-		GetRLDB         (const string name) const {
-			return DataBase::Instance()->GetRLDB(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of double matrix by name
-		 *              @see DataBase::FreeRLDB(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		bool 
-		FreeRLDB        (const string name) const {
-			return DataBase::Instance()->FreeRLDB(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to short int matrix by name from database
-		 *              @see DataBase::GetSHRT(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		Matrix<short>& 
-		GetSHRT         (const string name) const {
-			return DataBase::Instance()->GetSHRT(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of short int matrix by name
-		 *              @see DataBase::FreeSHRT(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		bool 
-		FreeSHRT        (const string name) const {
-			return DataBase::Instance()->FreeSHRT(name);
-		}
-
-
-		/**
-		 * @brief       Get reference to long int matrix by name from database
-		 *              @see DataBase::GetLONG(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		Matrix<long>& 
-		GetLONG         (const string name) const {
-			return DataBase::Instance()->GetLONG(name);
-		}
-		
-		
-		/**
-		 * @brief       Clear database of long int matrix by name
-		 *              @see DataBase::FreeLONG(const string)
-		 * 
-		 * @param  name Name
-		 * @return      Reference to matrix if existent
-		 */
-		bool 
-		FreeLONG        (const string name) const {
-			return DataBase::Instance()->FreeLONG(name);
+		inline bool 
+		Free            (const string name) const {
+			return DB().Free (name);
 		}
 
 

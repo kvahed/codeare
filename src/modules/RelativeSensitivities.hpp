@@ -27,7 +27,7 @@
 #include "Toolbox.hpp"
 #include "IO.hpp"
 #include "DFT.hpp"
-#include "Math.hpp"
+#include "arithmetic/Trigonometry.hpp"
 
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
@@ -59,19 +59,19 @@ namespace RRStrategy {
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Process ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Init ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Finalise ();
 
 
@@ -91,7 +91,7 @@ namespace RRStrategy {
 
 }
 
-RRSModule::error_code
+error_code
 SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Matrix<double>& snro, Matrix<cxfl>& shim, const bool& normalise) {
 	
 	size_t    nrxc = rxm.Dim(3);
@@ -101,7 +101,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 	size_t    rtms = imgs.Size() / rtmsiz / 2;  // division by 2 (Echoes)
 	ticks      tic = getticks();
 	
-	printf ("  SVDing %i matrices of %ix%i ... ", (int)rtms, (int)nrxc, (int)ntxc); fflush(stdout);
+	printf ("  SVDing %zu matrices of %zux%zu ... ", rtms, nrxc, ntxc); fflush(stdout);
 	
 	// Permute dimensions on imgs for contiguous RAM access
 	Matrix<cxfl> vxlm (nrxc, ntxc, imgs.Dim(0), imgs.Dim(1), imgs.Dim(2));
@@ -157,13 +157,13 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return RRSModule::OK;
+	return OK;
 	
 }
 
 	
 
-RRSModule::error_code
+error_code
 FTVolumes (Matrix<cxfl>& r) {
 	
 	ticks        tic     = getticks();
@@ -178,13 +178,15 @@ FTVolumes (Matrix<cxfl>& r) {
 
 	Matrix<cxfl> hann    = hannwindow (size, (float)1.0);
 	
-	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r.Dim(0), (int)r.Dim(1), (int)r.Dim(2)); fflush(stdout);
-
-	
 #pragma omp parallel default (shared) 
 	{
 		threads  = omp_get_num_threads();
 	}
+
+	printf ("  %i-core operation ...\n", threads);
+	
+	printf ("  Fourier transforming %i volumes of %ix%ix%i ... ", (int)vols, (int)r.Dim(0), (int)r.Dim(1), (int)r.Dim(2)); fflush(stdout);
+
 	
 	// # threads plans and matrices ------
 
@@ -227,13 +229,13 @@ FTVolumes (Matrix<cxfl>& r) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return RRSModule::OK;
+	return OK;
 	
 }
 
 
 
-RRSModule::error_code 
+error_code 
 RemoveOS (Matrix<cxfl>& imgs) {
 	
 	printf ("  Removing RO oversampling ... "); fflush(stdout);
@@ -253,13 +255,13 @@ RemoveOS (Matrix<cxfl>& imgs) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return RRSModule::OK;
+	return OK;
 		
 }
 
 
 
-RRSModule::error_code
+error_code
 B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	
 	printf ("  Computing b0 maps ... "); fflush(stdout);
@@ -293,7 +295,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return RRSModule::OK;
+	return OK;
 	
 }
 
@@ -304,18 +306,18 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
  *
  * @brief In-out Images/mask
  */
-RRSModule::error_code
+error_code
 SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	
 	printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
-	
+
 	ticks  tic = getticks();
 	
 	std::string orig = "orig.nii.gz";
 	std::string mask = "mask_mask.nii.gz";
 	std::string cmd  = "/usr/local/bin/mask.sh";
 
-	Matrix<double> tmp = log (img);
+	Matrix<double> tmp = codeare::matrix::arithmetic::log (img);
 	
 	NIDump(tmp, orig);
 	printf ("exporting ... "); fflush(stdout);

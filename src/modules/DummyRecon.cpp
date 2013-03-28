@@ -22,10 +22,10 @@
 
 using namespace RRStrategy;
 
-RRSModule::error_code
+error_code
 DummyRecon::Process     () { 
 
-	return RRSModule::OK;
+	return OK;
 
 }
 

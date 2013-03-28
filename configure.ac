@@ -1,13 +1,27 @@
-AC_PREREQ([1.10])
-AC_INIT([codeare], [1.0], [k.vahedipour@fz-juelich.de])
+## Copyright (C) 2009-2012 Kaveh Vahedipor
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2, or (at your option)
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+## 02111-1307, USA.
+##
+
+
+AC_PREREQ(2.59)
+AC_INIT([codeare], [1.1], [k.vahedipour@fz-juelich.de], [codeare])
 AC_CONFIG_SRCDIR([src])
-
-# m4 macros
-AC_CONFIG_MACRO_DIR([config])
-
-# where to put auxilliary files
 AC_CONFIG_AUX_DIR([config])
-
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -15,28 +29,68 @@ LT_PREREQ([2.2])
 LT_INIT([dlopen])
 
 # Revision string
-AC_DEFINE([GIT_COMMIT], "esyscmd(git show | head -n 1 | sed 's/commit //' |  grep -o -e '.\{8\}' | head -n 1 |tr -d '\n')", [git HEAD commit hash])
-AC_DEFINE([GIT_COMMIT_DATE], "esyscmd(git log -1 | head -n 3 | grep 'Date:' | sed s/'Date:   '// | tr -d '\n')", [git HEAD commit date])
+AC_DEFINE([GIT_COMMIT], "esyscmd(git show | head -n 1 | sed 's/commit //' |  grep -o -e '.\{8\}'\
+ | head -n 1 |tr -d '\n')", [git HEAD commit hash])
+AC_DEFINE([GIT_COMMIT_DATE], "esyscmd(git log -1 | head -n 3 | grep 'Date:' | sed s/'Date:   '//\
+ | tr -d '\n')", [git HEAD commit date])
 
 # copyright notice
-AC_COPYRIGHT([2010-2012, Kaveh Vahedipour])
-
-# Produce first version of idl derivates
-esyscmd([sh -c "cd src; omniidl -bcxx RRSModule.idl; cd .."])
+AC_COPYRIGHT([2010-2013, Kaveh Vahedipour])
 
 # Checks for programs.
+AH_TEMPLATE([CXX], [c++ compiler])
+
 AC_PROG_CC
+AC_PROG_FC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 
 # Set programming language
 AC_LANG([C++])
 
+# Compiler vendor
+AX_COMPILER_VENDOR
+
+# If --with-mpi=auto is used, try to find MPI, but use standard C compiler if it is not found.
+# If --with-mpi=yes is used, try to find MPI and fail if it isn't found.
+# If --with-mpi=no is used, use a standard C compiler instead.
+AH_TEMPLATE([HAVE_MPI], [Define to 1 if mpi compiler search succeeds])
+
+AC_ARG_WITH(mpi, [AS_HELP_STRING([--with-mpi],
+    [compile with MPI (parallelization) support. If none is found,
+    MPI is not used. Default: auto])
+],,[with_mpi=auto])
+
+AX_PROG_CXX_MPI([test x"$with_mpi" != xno],[
+  AC_DEFINE(HAVE_MPI, "1")
+  CXX=mpicxx
+  use_mpi=yes
+  ],[
+  use_mpi=no
+  if test x"$with_mpi" = xyes; then
+    AC_MSG_FAILURE([MPI compiler requested, but couldn't use MPI.])
+  else
+    AC_MSG_WARN([No MPI compiler found, won't use MPI.])
+  fi
+])
+AC_CXX_EXCEPTIONS
+#AC_CXX_HAVE_NUMERIC_LIMITS
+
 # Check SMP capabilities
 AC_OPENMP
 
+# SIMD capabilities
+case $host in
+     *x86_64*)
+	AX_EXT
+	CXXFLAGS="${CXXFLAGS} ${SIMD_FLAGS}"
+     ;;
+esac
+
+# Optional documentation 
+
 AC_ARG_ENABLE([documentation],
-     [  --enable-documentation          turn on documentation C++ library support (default: yes)],
+     [  --enable-documentation          turn on documentation C++ library support (default: no)],
      [case "${enableval}" in
        yes) documentation=true ;;
        no)  documentation=false ;;
@@ -44,26 +98,23 @@ AC_ARG_ENABLE([documentation],
      esac],[documentation=false])
      AM_CONDITIONAL([DOCUMENTATION], [test x$documentation = xtrue])
 
-# Check for xsltproc & xmllint ()
 if test x$documentation = xtrue; then
 
-build_docs=yes
+   build_docs=yes
+   XSLTPROC=
+   AC_CHECK_PROGS([XSLTPROC], [xsltproc])
+   if test -z "$XSLTPROC"; then
+      AC_MSG_WARN([xsltproc (from the libxslt source package) not found, not building documentation])
+      build_docs=no
+   fi
 
-XSLTPROC=
-AC_CHECK_PROGS([XSLTPROC], [xsltproc])
-if test -z "$XSLTPROC"; then
-  AC_MSG_WARN([xsltproc (from the libxslt source package) not found, not building documentation])
-  build_docs=no
-fi
-
-build_api=yes
-
-DOXYGEN=
-AC_CHECK_PROGS([DOXYGEN], [doxygen])
-if test -z "$DOXYGEN"; then
-  AC_MSG_WARN([xsltproc (from the libxslt source package) not found, not building documentation])
-  build_api=no
-fi
+   build_api=yes
+   DOXYGEN=
+   AC_CHECK_PROGS([DOXYGEN], [doxygen])
+      if test -z "$DOXYGEN"; then
+      AC_MSG_WARN([doxygen not found.])
+      build_api=no
+   fi
 
 fi
 
@@ -81,6 +132,17 @@ AC_TYPE_UINT64_T
 
 # canonical host system type string
 AC_CANONICAL_HOST
+
+AC_ARG_ENABLE([python],
+     [  --enable-python          turn on python runtime support (default: no)],
+     [case "${enableval}" in
+       yes) python=true ;;
+       no)  python=false ;;
+       *) AC_MSG_ERROR([bad value ${enableval} for --enable-python]) ;;
+     esac],[python=false])
+     AM_CONDITIONAL([PYTHON], [test x$python = xtrue])
+
+if test x$python = xtrue; then
 
 # Check for Python
 m4_define([_AM_PYTHON_INTERPRETER_LIST], [python python3 python3.1])
@@ -136,12 +198,16 @@ if test -x ${PYTHON}-config; then
 	fi
 else
 	if test "X$PYTHON_INCLUDES" = X -o "X$PYTHON_LDFLAGS" = X; then
-		AC_MSG_WARN([${PYTHON}-config does not exist or is not executable, so we could not detect python development environment.  Your system may require an additional package (e.g. "python3-dev").  Alternatively, if you are sure you have python headers and libraries, define PYTHON_INCLUDES and PYTHON_LDFLAGS and run this script.])
+		AC_MSG_WARN([${PYTHON}-config does not exist or is not executable, so we could not detect python\
+ development environment.  Your system may require an additional package (e.g. "python3-dev").  Alternatively,\
+ if you are sure you have python headers and libraries, define PYTHON_INCLUDES and PYTHON_LDFLAGS and run this\
+ script.])
 	fi
 fi
 AC_SUBST(PYTHON_INCLUDES)
 AC_SUBST(PYTHON_LDFLAGS)
-CXXFLAGS="${CXXFLAGS} ${PYTHON_INCLUDES}"
+
+fi
 
 # enable "const" keyword
 AC_C_CONST
@@ -152,21 +218,19 @@ AC_C_RESTRICT
 # enable "inline" keyword
 AC_C_INLINE
 
-# Compiler vendor (Courtesy fftw)
-AX_COMPILER_VENDOR
-
 AC_CHECK_TYPES([ptrdiff_t])
 
 #AC_CHECK_FUNCS([isnan isinf])
 AC_DEFUN([AC_CXX_NAMESPACES],
 	[AC_MSG_CHECKING([whether C++ namespaces are supported])
 	 AC_LANG_PUSH([C++])
-	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[namespace Outer { namespace Inner { int i = 0; }}]], [[using namespace Outer::Inner; return i;]])],[ac_cv_cxx_namespaces=yes],[ac_cv_cxx_namespaces=no])
+	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[namespace Outer { namespace Inner { int i = 0; }}]], 
+        [[using namespace Outer::Inner; return i;]])],[ac_cv_cxx_namespaces=yes],[ac_cv_cxx_namespaces=no])
      AC_LANG_POP
 	 AC_MSG_RESULT($ac_cv_cxx_namespaces)
 	 if test "$ac_cv_cxx_namespaces" = yes; then
 	     AC_DEFINE(HAVE_NAMESPACES,,[define if the compiler implements namespaces])
-     fi])
+    fi])
 			      
 AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_STD],
 	[AC_REQUIRE([AC_CXX_NAMESPACES])
@@ -174,7 +238,8 @@ AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_STD],
 	 AC_LANG_PUSH([C++])
 	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <cmath>
 	   namespace lemur { int isnan(float x){ return std::isnan(x); } };]], [[
-	   using namespace lemur; float x = 1.0; lemur::isnan(x); return 0;]])],[ac_cv_cxx_isnan_std=yes],[ac_cv_cxx_isnan_std=no])
+	   using namespace lemur; float x = 1.0; lemur::isnan(x); return 0;]])],[ac_cv_cxx_isnan_std=yes],
+       [ac_cv_cxx_isnan_std=no])
      AC_LANG_POP
  	 AC_MSG_RESULT($ac_cv_cxx_isnan_std)
      if test "$ac_cv_cxx_isnan_std" = yes; then
@@ -187,7 +252,8 @@ AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX],
 	 AC_LANG_PUSH([C++])
 	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <cmath>
 	   namespace lemur { int isnan(float x){ return __gnu_cxx::isnan(x); } };]], [[
-	   using namespace lemur; float x = 1.0; lemur::isnan(x); return 0;]])],[ac_cv_cxx_isnan_gnu_cxx=yes],[ac_cv_cxx_isnan_gnu_cxx=no])
+	   using namespace lemur; float x = 1.0; lemur::isnan(x); return 0;]])],[ac_cv_cxx_isnan_gnu_cxx=yes],
+       [ac_cv_cxx_isnan_gnu_cxx=no])
      AC_LANG_POP
  	 AC_MSG_RESULT($ac_cv_cxx_isnan_gnu_cxx)
      if test "$ac_cv_cxx_isnan_gnu_cxx" = yes; then
@@ -211,16 +277,81 @@ AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdio.h, bai
 AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdlib.h, bailing out])])
 AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find string.h, bailing out])])
 AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
-AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4/CORBA.h, bailing out])])
-AC_CHECK_HEADERS([nfft3.h],          [], [AC_MSG_RESULT([cannot find nfft3.h, NuFFT/CGSENSE unavailable!])])
-AC_CHECK_HEADERS([nfft3util.h],      [], [AC_MSG_RESULT([cannot find nfft3util.h, NuFFT/CGSENSE unavailable!])])
-AC_CHECK_HEADERS([H5Cpp.h],          [], [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
-AC_CHECK_HEADERS([nifti1_io.h],      [], [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
-AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
+
+AC_ARG_ENABLE([networking],
+     [  --enable-networking          turn on networking support (default: yes)],
+     [case "${enableval}" in
+       yes) networking=true ;;
+       no)  networking=false ;;
+       *) AC_MSG_ERROR([bad value ${enableval} for --enable-networking]) ;;
+     esac],[networking=true])
+     AM_CONDITIONAL([NETWORKING], [test x$networking = xtrue])
+
+if test x$networking = xtrue; then
+
+    OMNIIDL_FAIL=false
+    CORBAH_FAIL=false
+    LIBOT_FAIL=false
+    LIBD4_FAIL=false
+    LIBO4_FAIL=false
+
+    # Produce first version of idl derivates
+    AC_CHECK_PROGS([OMNIIDL], [omniidl])
+    if test -z "$OMNIIDL"; then
+       AC_MSG_WARN([omniidl not found, bailing out])    
+       OMNIDL_FAIL=true
+    else
+       omniidl -C${srcdir}/src/ -bcxx ${srcdir}/src/RRSModule.idl 
+    fi
+
+    # Headers
+        AC_CHECK_HEADERS([omniORB4/CORBA.h], [], 
+        [AC_MSG_RESULT([no: cannot find omniORB4/CORBA4.h]);CORBAH_FAIL=true])
+    OLD_LIBS=$LIBS
+    AC_CHECK_LIB([omnithread], [read], [], 
+        [AC_MSG_WARN([no: cannot find libomnithread, bailing out]);LIBOT_FAIL=true])
+    AC_CHECK_LIB([omniDynamic4], [main], [], 
+        [AC_MSG_WARN([no: cannot find libomniDynamic, bailing out]);LIBD4_FAIL=true])
+    LIBS=$OLD_LIBS
+
+   # Libraries
+   AC_MSG_CHECKING([for CORBA::ORB_init in -lomniORB4])
+   OLD_LIBS=$LIBS
+   LIBS="${LIBS} -lomniDynamic4 -lomnithread -lomniORB4"
+
+   AC_TRY_LINK([#include "${srcdir}/src/RRSModule.hh"],
+      [int argc = 0; char** argv = 0; CORBA::ORB_var orb = CORBA::ORB_init(argc, argv);],
+      [AC_MSG_RESULT([yes])]
+      omniORB4_found=yes,
+      [LIBS=$OLD_LIBS]
+      [AC_MSG_RESULT([no. cannot find libomniORB4, bailing out]); LIBO4_FAIL=true])
+    LIBS=$OLD_LIBS
+
+    if $OMNIIDL_FAIL || $CORBAH_FAIL || $LIBOT_FAIL || $LIBD4_FAIL || $LIBO4_FAIL; then 
+        AC_MSG_ERROR([cannot find necessary OmniORB4 environment for building network support])
+    fi
+
+fi
+
+AC_CHECK_HEADERS([nfft3.h],          [], 
+   [AC_MSG_RESULT([cannot find nfft3.h, NuFFT/CGSENSE unavailable!])])
+AC_CHECK_HEADERS([nfft3util.h],      [], 
+   [AC_MSG_RESULT([cannot find nfft3util.h, NuFFT/CGSENSE unavailable!])])
+AC_CHECK_HEADERS([H5Cpp.h],          [], 
+   [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
+AC_CHECK_HEADERS([nifti1_io.h],      [], 
+   [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
+AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], 
+   [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
-AC_CHECK_HEADERS([fcntl.h],          [], [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
-AC_CHECK_HEADERS([stddef.h],         [], [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
-AC_CHECK_HEADERS([cblas.h],          [], [AC_MSG_ERROR([cannot find cblas.h, bailing out])])
+AC_CHECK_HEADERS([openssl/evp.h], [HAVE_CRYPTO=1], 
+   [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
+AC_CHECK_HEADERS([fcntl.h],          [], 
+   [AC_MSG_ERROR([cannot find fcntl.h, bailing out])])
+AC_CHECK_HEADERS([stddef.h],         [], 
+   [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
+AC_CHECK_HEADERS([boost/any.hpp],    [], 
+   [AC_MSG_ERROR([cannot find boost/any.hpp, bailing out])])
 
 AC_CHECK_HEADERS(CL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
     AC_CHECK_HEADERS(OpenCL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
@@ -242,6 +373,7 @@ AC_MSG_CHECKING(whether host is Mac OS)
 case $host in
     *darwin*)
         LDFLAGS="$LDFLAGS -framework OpenCL"
+		AC_DEFINE(HAVE_LIBOPENCL, 1, [Open CL libraries])
         AC_MSG_RESULT(yes)
     ;;
     *)
@@ -250,7 +382,7 @@ case $host in
             echo "OpenCL library not found in your system"
         ])
 esac
-AM_CONDITIONAL([USE_OPENCL],  [test "$HAVE_LIBOPENCL" -eq 1])
+AM_CONDITIONAL([USE_LIBOPENCL],  [test "$HAVE_LIBOPENCL" -eq 1])
 
 case $host in
     *darwin*)
@@ -261,10 +393,11 @@ esac
 AC_SUBST(PLUGIN_LDFLAGS)
 
 # Checks for C libraries.
-AC_CHECK_LIB([omnithread],   [read],          [], [AC_MSG_ERROR([cannot find libomnithread, bailing out])])
-AC_CHECK_LIB([omniDynamic4], [main],          [], [AC_MSG_ERROR([cannot find libomniDynamic, bailing out])])
-AC_CHECK_LIB([dl],           [dlopen],        [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
-AC_CHECK_LIB([z],            [deflate],       [], [AC_MSG_ERROR([cannot find libz, bailing out])])
+AC_CHECK_LIB([dl],           [dlopen],   [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
+AC_CHECK_LIB([z],            [deflate],  [], [AC_MSG_ERROR([cannot find libz, bailing out])])
+AC_CHECK_LIB([crypto], [EVP_MD_CTX_create], [], [AC_MSG_ERROR([cannot find libssl, bailing out])])
+
+AX_PTHREAD([[]])
 
 AC_ARG_WITH(fftw,   [  --with-fftw             	     Set directory of FFTW3 library])
 #############################################################
@@ -319,8 +452,19 @@ then
   exit
 else
   echo " -> path $FFTPATH"
-  CXXFLAGS="${CXXFLAGS} -I$FFTPATH/include"
-  LIBS="${LIBS} -L$FFTPATH/lib -lfftw3 -lfftw3f -Wl,-rpath,${FFTPATH}/lib"
+  CXXFLAGS="${CXXFLAGS} -I$FFTPATH/include $PTHREAD_CFLAGS"
+  AC_CHECK_LIB([fftw3],  [fftw_execute],  [], [AC_MSG_ERROR([cannot find libfftw3, bailing out!])])
+  AC_CHECK_LIB([fftw3f], [fftwf_execute], [], [AC_MSG_ERROR([cannot find libfftw3, bailing out!])])
+  AC_CHECK_LIB([fftw3_threads], [fftw_init_threads], [
+    AC_DEFINE(HAVE_FFTW_THREADS, 1, [Double precision threaded fftw])
+    LIBS="-lfftw3_threads ${LIBS}"],
+    [AC_MSG_RESULT([cannot find libfftw3_threads, single threaded double precision FFTs only!])])
+  AC_CHECK_LIB([fftw3f_threads], [fftwf_init_threads], [
+    AC_DEFINE(HAVE_FFTWF_THREADS, 1, [Float precision threaded fftw])
+    LIBS="-lfftw3f_threads ${LIBS}"],
+    [AC_MSG_RESULT([cannot find libfftw3f_threads, single threaded float precision FFTs only!])])
+  AC_CHECK_LIB([m], [sinh], [], [AC_MSG_RESULT([cannot find libm])])
+  LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/lib"
 fi
 echo ""
 
@@ -341,7 +485,8 @@ AC_TRY_LINK([
 ], [_rtc()], [AC_DEFINE(HAVE__RTC,1,[Define if you have the UNICOS _rtc() intrinsic.])], [rtc_ok=no])
 AC_MSG_RESULT($rtc_ok)
 
-AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
+AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], 
+   [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
 AM_CONDITIONAL([USE_NFFT3],  [test "$HAVE_NFFT3" -eq 1])
 
 # NFFT naming differences starting with 3.2.0
@@ -369,6 +514,36 @@ AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
 # Checks for C++ libraries with name spaces
 
+# ISMRMRD (required)
+AC_ARG_WITH(ismrmrdroot,[  --with-ismrmrdroot       path to ISMRMRD install dir], 
+        [], [with_ismrmrdroot=/usr/local/ismrmrd])
+
+if test x"$with_ismrmrdroot" != x"no" ; then
+
+    ISMRMRD_ROOT="$with_ismrmrdroot"
+    ISMRMRD_LIB_PATH="${ISMRMRD_ROOT}/lib"
+	CXXFLAGS="${CXXFLAGS} -I${ISMRMRD_ROOT}/include"
+	CPPFLAGS="${CPPFLAGS} -I${ISMRMRD_ROOT}/include"
+
+	AC_CHECK_HEADERS([ismrmrd_hdf5.h], [], [AC_MSG_ERROR([cannot find ismrmrd_hdf5.h, bailing out])])
+
+	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
+	OLD_LIBS=$LIBS
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -lboost_thread -lboost_system"
+
+	AC_TRY_LINK([#include <ismrmrd_hdf5.h>],
+	  [ISMRMRD::IsmrmrdDataset d("","");],
+   	  [AC_MSG_RESULT([yes])]
+   	  ismrmrd_found=yes,
+   	  [LIBS=$OLD_LIBS]
+   	  [AC_MSG_RESULT([no. Cannot find libismrmrd, ismrmrd dump/read not available.])])
+
+	if test -z $ismrmrd_found; then
+       LIBS=$OLD_LIBS
+	fi
+
+fi
+
 # HDF5
 AC_MSG_CHECKING([for getOrder in -lhdf5_cpp])
 OLD_LIBS=$LIBS
@@ -390,7 +565,27 @@ AC_TRY_LINK([#include <H5Cpp.h>],
 if test -z $hdf5_found; then
     LIBS=$OLD_LIBS
 fi
+         
+AC_SUBST(ITK_INSTALL_PREFIX)
+AC_SUBST(HAVE_INSIGHT)
+AC_SUBST(INSIGHT_LIB_FLAG)
+AC_SUBST(INSIGHT_LIB_DIR_FLAG)
+AC_SUBST(INC_INSIGHT_H)
 
+AC_MSG_CHECKING([for itk::Image in ITK])
+OLD_LIBS=$LIBS
+OLD_CXXFLAGS=$CXXFLAGS
+LIBS="${LIBS} ${INSIGHT_LIB_DIR_FLAG} ${INSIGHT_LIB_FLAG}"
+CXXFLAGS="${CXXFLAGS} ${INC_INSIGHT_H}"
+
+AC_TRY_LINK([#include "itkImage.h"],
+   [
+	 typedef itk::Image< unsigned short, 3 > ImageType; ImageType::Pointer image = ImageType::New();
+   ],
+   [AC_MSG_RESULT([yes])]
+   itk_found=yes,
+   [LIBS=$OLD_LIBS]
+   [AC_MSG_RESULT([no. Cannot find libITKCommon, ITK operations not available.])])
 
 # NIFTI
 AC_MSG_CHECKING([for nifti_image_read in -lniftiio])
@@ -420,12 +615,18 @@ ITK_INSTALL_PREFIX=`echo $ITK_INSTALL_PREFIX | sed -e 's|/|\\\/|g'`
 itklib_path="${with_itkroot}/lib/InsightToolkit"
 itkconfig_cmake="${itklib_path}/ITKConfig.cmake"
 if test -a "$itkconfig_cmake"; then
-	INC_INSIGHT_H="`cat $itkconfig_cmake | grep 'SET(ITK_INCLUDE_DIRS' | sed 's/SET(ITK_INCLUDE_DIRS \"/;/' | sed 's/\")//' | sed 's/;/ -I/g'`"
-	INC_INSIGHT_H="`echo $INC_INSIGHT_H | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" | sed -e 's|\${||g' | sed -e 's|}||g'`"
-    insight_libs_dir="`cat $itkconfig_cmake | grep 'SET(ITK_LIBRARY_DIRS' | sed 's/SET(ITK_LIBRARY_DIRS \"/;/' | sed 's/\")//' | sed 's/;//g' | sed -e 's/\${ITK_INSTALL_PREFIX}/\/usr\/local/g'`"
+	INC_INSIGHT_H="`cat $itkconfig_cmake | grep 'SET(ITK_INCLUDE_DIRS' |\
+ sed 's/SET(ITK_INCLUDE_DIRS \"/;/' | sed 's/\")//' | sed 's/;/ -I/g'`"
+	INC_INSIGHT_H="`echo $INC_INSIGHT_H | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" |\
+ sed -e 's|\${||g' | sed -e 's|}||g'`"
+    insight_libs_dir="`cat $itkconfig_cmake | grep 'SET(ITK_LIBRARY_DIRS' |\
+ sed 's/SET(ITK_LIBRARY_DIRS \"/;/' | sed 's/\")//' | sed 's/;//g' |\
+ sed -e 's/\${ITK_INSTALL_PREFIX}/\/usr\/local/g'`"
 	INSIGHT_LIB_DIR_FLAG="-L$insight_libs_dir"	
-	INSIGHT_LIB_DIR_FLAG="`echo $INSIGHT_LIB_DIR_FLAG | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" | sed -e 's|\${||g' | sed -e 's|}||g'`"
-	INSIGHT_LIB_FLAG="-lITKFEM -lITKIO -lITKMetaIO -lITKAlgorithms -lITKStatistics -lITKBasicFilters -lITKCommon  -litkvnl -litkvnl_algo -litksys -lITKDICOMParser -lz"
+	INSIGHT_LIB_DIR_FLAG="`echo $INSIGHT_LIB_DIR_FLAG | sed -e "s|ITK_INSTALL_PREFIX|${ITK_INSTALL_PREFIX}|g" |\
+ sed -e 's|\${||g' | sed -e 's|}||g'`"
+	INSIGHT_LIB_FLAG="-lITKFEM -lITKIO -lITKMetaIO -lITKAlgorithms -lITKStatistics -lITKBasicFilters\
+ -lITKCommon  -litkvnl -litkvnl_algo -litksys -lITKDICOMParser -lz"
     DEF_INSIGHT="#define HAVE_INSIGHT"
 	AC_DEFINE(HAVE_INSIGHT, "1")
     HAVE_INSIGHT="yes"
@@ -458,23 +659,6 @@ AC_TRY_LINK([#include "itkImage.h"],
 
 LIBS=${OLD_LIBS}
 CXXFLAGS=${OLD_CXXFLAGS}
-
-# OMNIORB
-AC_MSG_CHECKING([for CORBA::ORB_init(int, char**) in -lomniORB4])
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -lomniORB4"
-cd src
-omniidl -bcxx RRSModule.idl
-cd ..
-AC_TRY_LINK([#include "src/RRSModule.hh"],
-   [int argc = 0; char** argv = 0; CORBA::ORB_var orb = CORBA::ORB_init(argc, argv);],
-   [AC_MSG_RESULT([yes])]
-   omniORB4_found=yes,
-   [LIBS=$OLD_LIBS]
-   [AC_MSG_ERROR([no. cannot find libomniORB4, bailing out])])
-if test -z $omniORB4_found; then
-    LIBS=$OLD_LIBS
-fi
 
 # MATLAB IO LIBRARIES
 AC_ARG_WITH(matlabroot,[  --with-matlabroot       path to MATLAB install dir], 
@@ -563,7 +747,8 @@ fi
 # If we're using the Intel compilers, we prefer MKL as well                                                                                 
 if test -z "$BLAS"; then
   if test $CC = icc -o $CXX = icpc; then
-    AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="/opt/intel/mkl/lib/intel64 -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -openmp -lpthread -lm")
+    AC_CHECK_LIB(mkl, $DGEMM_SYMBOL, BLAS="/opt/intel/mkl/lib/intel64 -lmkl_intel_ilp64 -lmkl_intel_thread\
+ -lmkl_core -openmp -lpthread -lm")
   fi
 fi
 
@@ -643,8 +828,10 @@ AC_SUBST(LAPACK)
 #AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
-AC_CHECK_LIB([cblas],  [cblas_dasum], [], [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
-AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
+AC_CHECK_LIB([cblas],     [cblas_dasum], [], 
+   [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
+AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], 
+   [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
 AM_CONDITIONAL([USE_GSL],    [test "$HAVE_GSL" -eq 1])
 
 AC_CHECK_FUNCS([floor])
@@ -660,214 +847,12 @@ AC_CHECK_FUNCS([strstr])
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 
-AC_ARG_ENABLE([mpi],
-     [  --enable-mpi            turn on parallel jemris (default: yes) ],
-     [case "${enableval}" in
-       yes) mpi=true ;;
-       no)  mpi=false ;;
-       *) AC_MSG_ERROR([bad value ${enableval} for --enable-mpi]) ;;
-     esac],[mpi=true])
-     AM_CONDITIONAL([MPI], [test x$mpi = xtrue])
-
-
-AC_DEFUN([AC_PROG_MPICXX], [
-AC_ARG_VAR([MPICXX],  [MPI C++ compiler command])
-AC_ARG_VAR([MPIRUN],  [MPI run command])
-
-# find compiler and characteristics
-AC_CHECK_PROGS([MPICXX], [$1], [none])
-if test x$MPICXX = xnone; then
-  AC_MSG_ERROR([MPI C++ compiler not found])
-fi
-
-# find compiler and characteristics
-#AC_MSG_CHECKING(for mpi.h)
-#  AC_PREPROC_IFELSE(
-#  [AC_LANG_SOURCE([[#include <mpi.h>]])],
-#  [ 
-#    AC_MSG_RESULT(yes)
-#    AC_DEFINE(HAVE_MPI_H,1,[define that mpi is being used])
-#  ],[AC_MSG_RESULT(no)])
-
-cat >>conftest.cpp <<_ACEOF
-#include <mpi.h>
-int main(int argc, char** argv) {
-  MPI::Init(argc, argv);
-  MPI::COMM_WORLD.Get_size();
-  MPI::Finalize();
-  return 0;
-}
-_ACEOF
-
-cat >>conftest2.cpp <<_ACEOF2
-#include <mpi.h>
-int main(int argc, char** argv) {
-  MPI::Init_thread(MPI_THREAD_MULTIPLE);
-  MPI::COMM_WORLD.Get_size();
-  MPI::Finalize();
-  return 0;
-}
-_ACEOF2
-
-AC_MSG_CHECKING([whether the MPI C++ compiler works])
-echo "$MPICXX $CXXFLAGS -o conftest conftest.cpp" >&5
-$MPICXX $CXXFLAGS -o conftest conftest.cpp 2>&5
-if test $? -ne 0; then
-  AC_MSG_FAILURE([failed!])
-else
-  mpiw=yes
-  AC_MSG_RESULT([yes])
-  AC_DEFINE(HAVE_MPI,1,[define that we have mpi])
-fi
-
-AC_MSG_CHECKING([whether MPI library supports threads])
-echo "$MPICXX $CXXFLAGS -o conftest2 conftest2.cpp" >&5
-$MPICXX $CXXFLAGS -o conftest2 conftest2.cpp 2>&5
-if test $? -ne 0; then
-  AC_MSG_RESULT([no])
-else
-  AC_MSG_RESULT([yes])
-  AC_DEFINE(HAVE_MPI_THREADS,1,[define that mpi supports threads])
-fi
-rm -f conftest2.*
-
-ic_mpirun_found=no
-if test x$mpiw = xyes; then
-  AC_MSG_CHECKING([for MPI run command])
-  if test x$ac_cv_env_MPIRUN_value = x; then
-  case "$MPICXX" in
-    *mpCC_r*)
-      mpirun="poe"
-      mpirun_proc_opt="-procs"
-      ;;
-    *mpiCC*)
-      mpirun="mpirun"
-      mpirun_proc_opt="-np"
-      ;;
-    *hCC*)
-      mpirun="mpiexec"
-      mpirun_proc_opt="-n"
-      ;;
-    *mpCC*)
-      mpirun="mprun"
-      mpirun_proc_opt="-np"
-      ;;
-    *mpicxx*)
-      mpirun="mpirun"
-      mpirun_proc_opt="-np"
-      ;;
-    *)
-      AC_MSG_ERROR([unknown MPI C++ compiler])
-      ;;
-  esac
-  else
-	  mpirun=$ac_cv_env_MPIRUN_value
-	  mpirun_proc_opt="-np"
-  fi
-  AC_MSG_RESULT([$mpirun])
-  AC_SUBST(MPIRUN, [$mpirun])
-  AC_SUBST(MPIRUN_PROC_OPT, [$mpirun_proc_opt])
-
-  AC_MSG_CHECKING([whether the MPI run command works])
-  if test $mpirun = poe; then
-    mpicmd="$mpirun $PWD/conftest $mpirun_proc_opt 2"
-  else
-    mpicmd="$mpirun $mpirun_proc_opt 2 $PWD/conftest"
-  fi
-  echo $mpicmd >&5
-  $mpicmd 2>&5
-  if test $? -ne 0; then
-    AC_MSG_RESULT([no, will skip MPI and P++ tests])
-  else
-    AC_MSG_RESULT([yes])
-    ic_mpirun_found=yes
-  fi
-fi
-rm -f conftest.*
-])
-
-case "$host" in 
-  *aix*)
-    cc_list="xlc_r gcc"
-    f77_list="xlf_r"
-    cxx_list="xlC_r g++"
-    f90_list="xlf90_r"
-    mpicc_list="mpcc_r mpicc"
-    mpif77_list="mpxlf_r mpif77"
-    mpicxx_list="mpCC_r mpiCC"
-    gm4_list="gm4 m4"
-    ;;
-  *darwin*)
-    cc_list="gcc"
-    f77_list="xlf"
-    cxx_list="g++"
-    f90_list="xlf90"
-    mpicc_list="mpicc"
-    mpif77_list="mpif77"
-    mpicxx_list="mpicxx"
-    ;;
-  *linux*)
-    cc_list="gcc pgcc icc"
-    f77_list="pgf77 ifort lf95 f95"
-    cxx_list="g++ pgCC icpc"
-    f90_list="pgf90 ifort lf95 f95"
-    mpicc_list="mpicc hcc"
-    mpif77_list="mpif90 mpif77 h77"
-    mpicxx_list="mpicxx mpiCC hCC"
-    gm4_list="gm4 m4"
-    ;;
-  *sun*)
-    cc_list="cc gcc"
-    f77_list="f77"
-    cxx_list="CC g++"
-    f90_list="f90"
-    mpicc_list="mpcc mpicc"
-    mpif77_list="mpf77 mpif77"
-    mpicxx_list="mpCC mpiCC"
-    gm4_list="gm4 m4"
-    ;;
-esac
-
-if test x$mpi = xtrue; then
-  AC_PROG_MPICXX($mpicxx_list)
-  CXX=$MPICXX
-fi
-
-# -----------------------------
-# scalapack
-#
-AC_ARG_WITH(scalapack, 
-   [AS_HELP_STRING([--with-scalapack],
-       [use scalapack if available (default: yes)])],
-   [if  test "$withval" = "yes" ; then
-      with_scalapack=1
-   else
-      with_scalapack=0
-   fi],
-   [with_scalapack=0])
-# -----------------------------
-
-AC_DEFINE([HAVE_F77_UNDERSCORE], [], [Description])
-
-AC_CHECK_LIB(
-    [scalapack], 
-    [pzgels_], 
-    [AC_DEFINE(HAVE_F77_UNDERSCORE, 0, []) LIBS="${LIBS} -lscalapack"], 
-    [AC_CHECK_LIB(
-	    [scalapack-mpich], 
-		  [pzgels_], 
-		  [AC_DEFINE(HAVE_F77_UNDERSCORE, 1, []) LIBS="${LIBS} -lscalapack-mpich"],  
-		  [AC_CHECK_LIB(
-		    [scalapack-openmpi],
-		    [pzgels_],
-		    [AC_DEFINE(HAVE_F77_UNDERSCORE, 1, []) LIBS="${LIBS} -lscalapack-openmpi"],  
-        [AC_MSG_ERROR([cannot find libscalapack-openmpi, bailing out])]
-		  )]
-	  )]
-)
-
+AH_TEMPLATE([HAVE_SCALAPACK], [Define to 1 if we could link against scalapack])
+ACX_SCALAPACK
 
 # Generate files
-AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile])
+AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile\
+ doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile\
+ src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile])
 AC_OUTPUT
 

@@ -28,7 +28,7 @@
 
 typedef std::complex<float> raw;
 
-static const int NTHREADS = 8;
+static const int NTHREADS = 4;
 
 namespace RRStrategy {
 	
@@ -54,25 +54,25 @@ namespace RRStrategy {
 		/**
 		 * @brief Process conjugate gradient SENSE
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Process ();
 
 		/**
 		 * @brief Prepare conjugate gradient SENSE
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Prepare ();
 
 		/**
 		 * @brief Initialise NuFFT plans
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Init ();
 		
 		/**
 		 * @brief Clean up
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Finalise ();
 		
 	private:

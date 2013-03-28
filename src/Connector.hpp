@@ -21,14 +21,6 @@
 #ifndef __CONNECTOR_HPP__
 #define __CONNECTOR_HPP__
 
-#ifdef __WIN32__ 
-    #include "RRSModule.h"
-#else
-    #include "RRSModule.hh"
-#endif
-
-using namespace RRSModule;
-
 #include "Matrix.hpp"
 
 namespace RRClient {
@@ -47,7 +39,7 @@ public:
 	 * @brief  Default constructor 
 	 * @see    Connector (const connection_type)
 	 */
-	Connector () {
+	Connector () : m_conn() {
 
 	}
 	
@@ -98,7 +90,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Process             (const char* name) {
-		return m_conn->Process(name);
+		return (error_code) m_conn->Process(name);
 	}
 	
 	
@@ -112,7 +104,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Prepare             (const char* name) {
-		return m_conn->Prepare(name);
+		return (error_code) m_conn->Prepare(name);
 	}
 	
 	
@@ -126,7 +118,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Init                (const char* name) {
-		return m_conn->Init(name);
+		return (error_code) m_conn->Init(name);
 	}
 	
 	
@@ -140,7 +132,7 @@ public:
 	 */ 
 	virtual inline error_code              
 	Finalise            (const char* name) {
-		return m_conn->Finalise(name);
+		return (error_code) m_conn->Finalise(name);
 	}
 	
 	

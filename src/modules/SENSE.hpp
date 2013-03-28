@@ -40,7 +40,8 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		SENSE  () {};
+		SENSE  () :
+			m_ncpus(1), m_af(1), m_cs(0), m_compgfm(false) {};
 		
 		
 		/**
@@ -53,28 +54,28 @@ namespace RRStrategy {
 		/**
 		 * @brief Initialise reco
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Init ();
 		
 
 		/**
 		 * @brief (Re-)prepare module
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Prepare ();
 
 		
 		/**
 		 * @brief Process data
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Process ();
 
 		
 		/**
 		 * @brief Clean up
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Finalise ();
 		
 

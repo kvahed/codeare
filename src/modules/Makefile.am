@@ -4,7 +4,7 @@
 ../%SK.cc: ../%.idl
 	omniidl -bcxx $<
 
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I../matrix -I../tinyxml -I../misc
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/misc
 
 EXTRA_DIST = GPUSimulator.cl
 
@@ -47,7 +47,7 @@ SENSE_la_SOURCES = SENSE.hpp SENSE.cpp ../matrix/CSENSE.hpp
 SENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 SENSE_la_LIBADD = $(COMMON_la_LIBADD)
 
-CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp ../matrix/NCSENSE.hpp ../matrix/SEM.hpp OMP.hpp
+CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp ../matrix/NCSENSE.hpp ../matrix/SEM.hpp
 CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK)
 CGSENSE_la_LIBADD = $(COMMON_la_LIBADD)
 
@@ -59,7 +59,7 @@ LapackTests_la_SOURCES = LapackTests.hpp LapackTests.cpp
 LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 LapackTests_la_LIBADD = $(COMMON_la_LIBADD)
 
-GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp CGRAPPA.hpp
+GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp ../matrix/CGRAPPA.hpp
 GRAPPA_la_DEPENDENCIES = 
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)
@@ -73,7 +73,7 @@ KTPoints_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 KTPoints_la_LIBADD = $(COMMON_la_LIBADD)
 
 RelativeSensitivities_la_SOURCES = RelativeSensitivities.hpp RelativeSensitivities.cpp
-RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG)
+RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) -llapack
 RelativeSensitivities_la_LIBADD = $(COMMON_la_LIBADD) $(INSIGHT_LIB_FLAG) 
 RelativeSensitivities_la_CXXFLAGS = $(AM_CXXFLAGS) $(INC_INSIGHT_H)
 
@@ -86,7 +86,7 @@ CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
 
 DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp
-if USE_OPENCL
+if USE_LIBOPENCL
     DirectMethod_la_SOURCES += GPUSimulator.cpp GPUSimulator.hpp
 endif
 DirectMethod_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)

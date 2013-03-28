@@ -33,7 +33,7 @@ GPUSimulator::GPUSimulator (SimulationBundle* sb) {
 
 	m_sb = sb;
 
-	m_gdt = GAMMARAD * m_sb->dt;
+	m_gdt = GAMMA * m_sb->dt;
 	m_nt  = m_sb->g->Dim(1);      // Time points
 	m_nc  = m_sb->b1->Dim(1);       // # channels
 	m_nr  = m_sb->r->Dim(1); 

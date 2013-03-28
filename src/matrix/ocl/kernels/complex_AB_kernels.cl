@@ -238,7 +238,7 @@ scalar_div                ( __global A_type *      arg1,
   // calculation //
   for (int i = local_position; i < *num_elems; i += global_inc)
   {
-    re = arg1 [i] * *scalar;
+    re = arg1 [i].yx * *scalar;
     div.x = pow (length (*scalar), 2);
     if (div.x == 0)
     {
@@ -247,8 +247,8 @@ scalar_div                ( __global A_type *      arg1,
     }
     else
     {
-      res [i].x = (re.x - re.y) / div.x;
-      res [i].y = (dot (arg1 [i].yx, *scalar)) / div.x;
+      res [i].x = (dot (arg1 [i], *scalar)) / div.x;
+      res [i].y = (re.x - re.y) / div.x;
     }  
   }
   
@@ -283,7 +283,7 @@ vector_div                ( __global A_type *      arg1,
   // calculation //
   for (int i = local_position; i < *num_elems; i += global_inc)
   {
-    re = arg1 [i] * arg2 [i];
+    re = arg1 [i].yx * arg2 [i];
     div.x = pow (length (arg2 [i]), 2);
     if (div.x == 0)
     {
@@ -292,8 +292,8 @@ vector_div                ( __global A_type *      arg1,
     }
     else
     {
-      res [i].x = (re.x - re.y) / div.x;
-      res [i].y = (dot (arg1 [i].yx, arg2 [i])) / div.x;
+      res [i].x = (dot (arg1 [i], arg2 [i])) / div.x;
+      res [i].y = (re.x - re.y) / div.x;
     }  
   }
   

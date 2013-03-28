@@ -3,9 +3,9 @@ ktptest (Connector<T>* rc) {
 
 	Matrix<cxfl>   target;
 	Matrix<cxfl>   b1;
-	Matrix<double> r;
-	Matrix<double> k;
-	Matrix<short>  b0;
+	Matrix<float>  r;
+	Matrix<float>  k;
+	Matrix<float>  b0;
 	
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
@@ -29,10 +29,14 @@ ktptest (Connector<T>* rc) {
 	rc->SetMatrix ("b0",     b0);
 	
 	rc->Process    (test);
-	
-	rc->GetMatrix ("target", target);
-	rc->GetMatrix ("ep",     b1);
-	rc->GetMatrix ("nrmse",  r);
+
+	Matrix<cxfl>   rf;
+	Matrix<float>  grad;
+	Matrix<float>  nrmse;
+
+	rc->GetMatrix ("nrmse",  nrmse);
+	rc->GetMatrix ("rf",     rf);
+	rc->GetMatrix ("grad",   grad);
 
 	rc->Finalise(test);
 	
@@ -46,15 +50,16 @@ ktptest (Connector<T>* rc) {
 		return false;
 	}
 
-	MXDump (target, mf, "pattern");
-	MXDump     (b1, mf, "ptx");
-	MXDump      (r, mf, "nrmse");
+	MXDump (nrmse, mf, "nrmse");
+	MXDump ( grad, mf,  "grad");
+	MXDump (   rf, mf,    "rf");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n",fname.c_str());
 		return false;
 	}
 #endif
+
 	return true;
 
 }

@@ -27,8 +27,6 @@
 module RRSModule {
 
 
-	#include "common.h"
-
 	typedef sequence<float>  floats;   /*!< raw data real or imaginary repositories */
 	typedef sequence<double> doubles;  /*!< helper data                             */
 	typedef sequence<short>  shorts;   /*!< pixel data repositories                 */
@@ -119,7 +117,7 @@ module RRSModule {
 		 * @param  name   Name of strategy
 		 * @return        Status
 		 */
-		error_code        Process (in string name);
+		short        Process (in string name);
 		
 		/**
 		 * @brief         Finalise
@@ -128,7 +126,7 @@ module RRSModule {
 		 * @param  name   Name of strategy
 		 * @return        Status
 		 */
-		error_code        Finalise (in string name);
+		short        Finalise (in string name);
 		
 		/**
 		 * @brief         Finalise
@@ -137,7 +135,7 @@ module RRSModule {
 		 * @param  name   Name of strategy
 		 * @return        Status
 		 */
-		error_code        Prepare (in string name);
+		short       Prepare (in string name);
 		
 		/**
 		 * @brief         Intialise
@@ -146,7 +144,7 @@ module RRSModule {
 		 * @param  name   Name of recontruction method
 		 * @return        Status
 		 */
-		error_code        Init (in string name);
+		short       Init (in string name);
 
 		/**
 		 * @brief         Clear RAM
@@ -154,7 +152,7 @@ module RRSModule {
 		 *
 		 * @return        Status
 		 */
-		error_code        CleanUp ();
+		short       CleanUp ();
 
 		/**
 		 * @brief         Transport complex matrix from backend identified by ...

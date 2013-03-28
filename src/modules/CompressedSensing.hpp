@@ -1,6 +1,7 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Juelich, Germany
+ *  codeare Copyright (C) 2007-2012 Kaveh Vahedipour
+ *                                  Daniel Joergens
+ *                                  Forschungszentrum Juelich, Germany
  *
  *  Stolen ;) from sparse MRI 0.2 by Michael Lustig
  *
@@ -40,7 +41,7 @@ namespace RRStrategy {
 	/**
 	 * @brief CG parameters
 	 */
-	struct CGParam {
+	struct CSParam {
 		
 		int    fft;
 		int    lsiter;
@@ -57,9 +58,10 @@ namespace RRStrategy {
 
 		DWT<cxfl>* dwt;
 		FT<float>*  ft;
-		TVOP*       tvt;
+		TVOP*      tvt;
 		
 	};
+
 
 	/**
 	 * @brief CS reconstruction based on Sparse MRI v0.2 by Michael Lustig
@@ -72,34 +74,36 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		CompressedSensing  () {};
+		CompressedSensing  ();
+
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-		~CompressedSensing () {};
+		~CompressedSensing ();
 		
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
+		virtual error_code
 		Process ();
 		
+
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code 
+		virtual error_code 
 		Init ();
 		
+
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual RRSModule::error_code
-		Finalise () {
-			return RRSModule::OK;
-		};
+		virtual error_code
+		Finalise ();
+
 
 
 	private:
@@ -108,14 +112,16 @@ namespace RRStrategy {
 		int            m_N[3];   /**< Data side lengths */
 		int            m_csiter; /**< # global iterations */
 
-		CGParam        m_cgparam;
+		CSParam        m_csparam;
 		int            m_wf;
 		int            m_wm;
 
 	};
 
 
-	float Obj (Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& data, float t) {
+	static float 
+	Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
+		 const Matrix<cxfl>&  data, const float&            t) {
 	
 		Matrix<cxfl> om;
 		float        o = 0.0;
@@ -132,7 +138,9 @@ namespace RRStrategy {
 	}
 
 
-	float ObjTV (Matrix<cxfl>& ttdbx, Matrix<cxfl>& ttdbg, float t, CGParam& cgp) {
+	static float 
+	ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
+		   const float&            t, const CSParam&        cgp) {
 		
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
@@ -144,7 +152,8 @@ namespace RRStrategy {
 		om += cgp.l1;
 		om ^= p;
 		
-		for (size_t i = 0; i < om.Size(); i++) o += om[i].real();
+		for (size_t i = 0; i < om.Size(); i++) 
+			o += creal(om[i]);
 		
 		return cgp.tvw * o;
 
@@ -154,38 +163,46 @@ namespace RRStrategy {
 	/**
 	 *
 	 */
-	float ObjXFM (Matrix<cxfl>& x, Matrix<cxfl>& g, float t, CGParam& cgp) {
+	static float 
+	ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g, 
+			const float&        t, const CSParam&    cgp) {
 		
 		Matrix<cxfl> om;
 		float        o = 0.0, p = (float)cgp.pnorm/2.0;
 
 		om  = x;
-		if (t > 0)
+		if (t > 0.0)
 			om += t * g;
 		om *= conj(om);
 		om += cgp.l1;
 		om ^= p;
 		
-		for (size_t i = 0; i < om.Size(); i++) o += om[i].real();
+		for (size_t i = 0; i < om.Size(); i++) 
+			o += om[i].real();
 
 		return cgp.xfmw * o;
 
 	} 
 
 
-	float Objective (Matrix<cxfl>& ffdbx, Matrix<cxfl>& ffdbg, Matrix<cxfl>& ttdbx, 
-					 Matrix<cxfl>& ttdbg, Matrix<cxfl>&     x, Matrix<cxfl>&     g, 
-					 Matrix<cxfl>&  data, float             t, float&         rmse,
-					 CGParam&        cgp) {
+	static float 
+	Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
+			   const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
+			   const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
+			   const Matrix<cxfl>&  data, const float             t, 
+			   float&         rmse, const CSParam&        cgp) {
 		
 		float obj = 0.0;
 		float nz = (float) nnz (data); 
 		
-		obj  =              Obj    (ffdbx, ffdbg, data, t);
+		obj  = Obj (ffdbx, ffdbg, data, t);
 		rmse = sqrt(obj/nz);
 		
-		obj += (cgp.tvw)  ? ObjTV  (ttdbx, ttdbg, t, cgp) : 0.0;
-		obj += (cgp.xfmw) ? ObjXFM (x,     g,     t, cgp) : 0.0;
+		if (cgp.tvw)
+			obj += ObjTV (ttdbx, ttdbg, t, cgp);
+		
+		if (cgp.xfmw)
+			obj += ObjXFM (x, g, t, cgp);
 
 		return obj;
 
@@ -195,17 +212,17 @@ namespace RRStrategy {
 	/**
 	 * @brief Compute gradient of the data consistency
 	 */
-	Matrix<cxfl> 
-	GradObj (Matrix<cxfl>& x, Matrix<cxfl>& wx, Matrix<cxfl>& data, CGParam& cgp) {
+	static Matrix<cxfl> 
+	GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, 
+			 const Matrix<cxfl>& data, const CSParam& cgp) {
 		
 		FT<float>& ft = *(cgp.ft);
 		DWT<cxfl>& dwt = *(cgp.dwt);
 
 		Matrix<cxfl> g;
 		
-		g  = ft * wx;
-		g -= data;
-		g  = dwt * (ft->*g);
+		g  = ft ->* (- data + (ft * wx));
+		g  = dwt * g;
 
 		return (2.0 * g);
 
@@ -215,28 +232,29 @@ namespace RRStrategy {
 	/**
 	 * @brief Compute gradient of L1-transform operator
 	 *
-	 *
+	 * @param  x   X
+     * @param  cgp CG parameters
+     * @return     The gradient
 	 */
-	Matrix<cxfl> 
-	GradXFM   (Matrix<cxfl>& x, CGParam& cgp) {
+	template <class T> inline static Matrix<T> 
+	GradXFM   (const Matrix<T>& x, const CSParam& cgp) {
 		
-		Matrix<cxfl> g;
+        float pn = 0.5*cgp.pnorm-1.0, l1 = cgp.l1, xfm = cgp.xfmw;
 
-		g  = x * conj(x);
-		g += cxfl(cgp.l1);
-		g ^= (((float)cgp.pnorm)/2.0-1.0);
-		g *= x;
-
-		return (cgp.xfmw * g);
+		return xfm * (x * ((x * conj(x) + l1) ^ pn));
 
 	}
 
 
 	/**
 	 * @brief Compute gradient of the total variation operator
+	 *
+	 * @param  x   Image space original
+	 * @param  wx  Image space perturbance
+	 * @param  cgp Parameters
 	 */
 	Matrix<cxfl> 
-	GradTV    (Matrix<cxfl>& x, Matrix<cxfl>& wx, CGParam& cgp) {
+	GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {
 
 		DWT<cxfl>&  dwt = *cgp.dwt;
 		TVOP& tvt = *cgp.tvt;
@@ -259,7 +277,7 @@ namespace RRStrategy {
 
 
 	Matrix<cxfl> 
-	Gradient (Matrix<cxfl>& x, Matrix<cxfl>& wx, Matrix<cxfl>& data, CGParam& cgp) {
+	Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CSParam& cgp) {
 
 		Matrix<cxfl> g;
 		
@@ -277,7 +295,7 @@ namespace RRStrategy {
 
 
 	void 
-	NLCG (Matrix<cxfl>& x, Matrix<cxfl>& data, CGParam& cgp) {
+	NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
 
 		
 		float     t0  = 1.0, t = 1.0, z = 0.0;
@@ -334,7 +352,7 @@ namespace RRStrategy {
 			else if (i < 1) t0 /= cgp.lsb;
 
 			// Update image
-			x += (dx * t);
+			x  += (dx * t);
 			wx  = dwt->*x;
 					
 			// CG computation 

@@ -22,6 +22,8 @@
 #define __FT_HPP__
 
 #include "CX.hpp"
+#include "Params.hpp"
+
 
 /**
  * @brief  Base class for single and double precision Fourier transforms
@@ -34,10 +36,18 @@ public:
 	/**
 	 * @brief    Default constructor
 	 */
-	FT() {
+	FT () {
 		T t;
 		Validate (t);
 	};
+
+
+	/**
+	 * @brief     Contstruct with parameters
+	 */
+	FT (const Params& params) {
+		m_params = params;
+	}
 
 	/**
 	 * @brief    Default destructor
@@ -87,12 +97,13 @@ public:
 		return Adjoint (m);
 	}
 
-	
 protected:
 
     void Validate (double& t) const {};
 	void Validate (float&  t) const {};
 	
+	Params m_params;
+
 };
 
 #endif

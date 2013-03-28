@@ -27,17 +27,16 @@ FunctorContainer::~FunctorContainer ()               {
 }
 
 
-error_code
+short
 FunctorContainer::CleanUp () {
 
-	
 	this->Finalise();
-	return OK;
+	return (short) OK;
 	
 }
 
 
-error_code
+short
 FunctorContainer::Init (const char* name) {
 	
 	ReconContext* rc;
@@ -51,17 +50,17 @@ FunctorContainer::Init (const char* name) {
 		return CONTEXT_CONFIGURATION_FAILED;
 	}
 
-	return OK;
+	return (short) OK;
 	
 }
 
 
-error_code
+short
 FunctorContainer::Finalise (const char* name) {
 	
 	if (!name) {
 		
-		DataBase::Instance()->Finalise();
+		Workspace::Instance().Finalise();
 		
 	} else {
 		
@@ -76,12 +75,12 @@ FunctorContainer::Finalise (const char* name) {
 		}
 	}
 	
-	return OK;
+	return (short) OK;
 	
 }
 
 
-error_code
+short
 FunctorContainer::Process  (const char* name)       {
 	
 	map<string, ReconContext*>::iterator it = m_contexts.find (name);
@@ -89,12 +88,12 @@ FunctorContainer::Process  (const char* name)       {
 	if (it == m_contexts.end()) 
 		return CONTEXT_NOT_FOUND;
 
-	return it->second->Process();
+	return (short) it->second->Process();
 	
 }
 
 
-error_code
+short
 FunctorContainer::Prepare  (const char* name)       {
 	
 	map<string, ReconContext*>::iterator it = m_contexts.find (name);
@@ -102,7 +101,7 @@ FunctorContainer::Prepare  (const char* name)       {
 	if (it == m_contexts.end()) 
 		return CONTEXT_NOT_FOUND;
 
-	return it->second->Prepare();
+	return (short) it->second->Prepare();
 	
 }
 

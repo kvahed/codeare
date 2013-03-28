@@ -33,7 +33,8 @@
  * @return        Vector x
  */
 template<class T> static Matrix<T> 
-MCGLS (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit = 100, const double& conv = 1.0e-6, const double& lambda = 0.0) {
+MCGLS (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit = 100,
+		const double& conv = 1.0e-6, const double& lambda = 0.0) {
 	
 	size_t ah   = size(A, 0);
 	size_t bh   = size(b, 0);
@@ -61,7 +62,6 @@ MCGLS (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit = 100, const 
 		
 		rn  = pow(creal(norm(r)), 2);
 		res.push_back(rn/xn);
-		
 		if (std::isnan(res.at(i)) || res.at(i) <= conv) break;
 		
 		if (i % 5 == 0 && i > 0) printf ("\n");
@@ -79,7 +79,8 @@ MCGLS (const Matrix<T>& A, const Matrix<T>& b, const size_t& maxit = 100, const 
 		
 	}
 	
-	printf ("\n  MCGLS time: %.4f s\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	printf ("\n  MCGLS time: %.4f s\n", elapsed(getticks(), tic) /
+			Toolbox::Instance()->ClockRate());
 	
 	return x;
 	

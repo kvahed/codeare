@@ -21,21 +21,14 @@
 #ifndef __LOCAL_CONNECTOR_H__
 #define __LOCAL_CONNECTOR_H__
 
-#ifdef __WIN32__ 
-    #include "RRSModule.h"
-#else
-    #include "RRSModule.hh"
-#endif
-
 #include <complex>
 #include <vector>
 
 #include "Configurable.hpp"
 #include "ReconContext.hpp"
 #include "FunctorContainer.hpp"
-#include "DataBase.hpp"
+#include "Connector.hpp"
 
-using namespace RRSModule;
 using namespace RRStrategy;
 
 /**
@@ -49,6 +42,8 @@ namespace RRClient {
 	class LocalConnector : public Configurable, 
 						   public FunctorContainer {
 		
+		typedef std::map<std::string, ReconContext*> context_map;
+
 		
 	public:
 		
@@ -76,7 +71,7 @@ namespace RRClient {
 		 * @param name Name of processing library
 		 * @return     Sucess
 		 */
-		virtual error_code
+		virtual short
 		Process        (const char* name);
 
 		
@@ -86,7 +81,7 @@ namespace RRClient {
 		 * @param name Name of processing library
 		 * @return     Sucess
 		 */
-		virtual error_code
+		virtual short
 		Prepare        (const char* name);
 
 		
@@ -96,7 +91,7 @@ namespace RRClient {
 		 * @param name Name of processing library
 		 * @return     Success
 		 */
-		virtual error_code
+		virtual short
 		Init           (const char* name);
 		
 
@@ -106,7 +101,7 @@ namespace RRClient {
 		 * @param name Name of processing library
 		 * @return     Success
 		 */
-		virtual error_code
+		virtual short
 		Finalise       (const char* name = 0);
 		
 
@@ -115,7 +110,7 @@ namespace RRClient {
 		 *
 		 * @return     Success
 		 */
-		virtual error_code
+		virtual short
 		CleanUp        ();
 		
 
@@ -127,9 +122,7 @@ namespace RRClient {
 		 */
 		template <class T> void 
 		SetMatrix           (const std::string& name, Matrix<T>& m) const {
-
-			DataBase::Instance()->SetMatrix(name, m);
-			
+			Workspace::Instance().SetMatrix(name, m);
 		}
 		
 		
@@ -141,18 +134,15 @@ namespace RRClient {
 		 */
 		template <class T> void 
 		GetMatrix           (const std::string& name, Matrix<T>& m) const {
-			
-			DataBase::Instance()->GetMatrix(name, m);
-			
+			Workspace::Instance().GetMatrix(name, m);
 		}
 		
 		
 		
 	private:
 		
-		std::vector<short>  m_rstrats;    /**< Remote reconstruction strategies    */
-		char*                                m_config;   /**< Serialised XML document  */
-		std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
+		std::vector<short>  m_rstrats; /**< Remote reconstruction strategies    */
+		context_map m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
 		
 	};

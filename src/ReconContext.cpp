@@ -21,7 +21,7 @@
 #include "Loader.hpp"
 #include "ReconContext.hpp"
 #include "Matrix.hpp"
-#include "DataBase.hpp"
+#include "Workspace.hpp"
 
 namespace RRStrategy {
 
@@ -49,29 +49,28 @@ ReconContext::ReconContext (const char* name) {
 }
 
 
-
-ReconContext::ReconContext     () {}
+ReconContext::ReconContext     () : m_strategy(0), m_dlib(0) {}
 		
 		
-RRSModule::error_code
+error_code
 ReconContext::Process          () {
 	return m_strategy->Process();
 }
 
 
-RRSModule::error_code
+error_code
 ReconContext::Init             () {
 	return m_strategy->Init();
 }
 
 
-RRSModule::error_code
+error_code
 ReconContext::Prepare             () {
 	return m_strategy->Prepare();
 }
 
 
-RRSModule::error_code
+error_code
 ReconContext::Finalise     () {
 	return m_strategy->Finalise();
 }

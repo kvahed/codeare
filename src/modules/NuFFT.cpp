@@ -38,22 +38,22 @@ NuFFT::~NuFFT () {
 }
 
 
-RRSModule::error_code 
+error_code 
 NuFFT::Finalise () {
 
 	//if (m_initialised)
 	//	delete nfft;
 
-	return RRSModule::OK;
+	return OK;
 
 }
 
 
 
-RRSModule::error_code
+error_code
 NuFFT::Init () {
 
-	RRSModule::error_code error = OK; 
+	error_code error = OK; 
 	m_initialised               = false;
 
 	int shots, M, dim, maxit, m, N[4], n[4];
@@ -108,29 +108,30 @@ NuFFT::Init () {
 
 }
 
-RRSModule::error_code 
+error_code 
 NuFFT::Prepare () {
 
-	RRSModule::error_code error = OK;
+	error_code error = OK;
 
-	nfft->KSpace (GetRLDB ("kspace"));
-	nfft->Weights (GetRLDB ("weights"));
+	nfft->KSpace  (Get<double> ("kspace"));
+	nfft->Weights (Get<double> ("weights"));
 
-	FreeRLDB ("kspace");
-	FreeRLDB ("weights");
+	Free ("kspace");
+	Free ("weights");
 
 	return error;
 
 }
 
 
-RRSModule::error_code
+error_code
 NuFFT::Process () {
 
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
 	
-	GetCXDB ("img") = nfft->Adjoint(GetCXDB ("data"));
+	Get<cxdb> ("img") = nfft->Adjoint(Get<cxdb> ("data"));
+	Free ("data");
 	
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
 
