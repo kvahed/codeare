@@ -406,7 +406,12 @@ AC_ARG_WITH(fftw,   [  --with-fftw             	     Set directory of FFTW3 libr
 #############################################################
 
 echo "Searching for FFTW library"
-
+if test -d "/usr/lib64"
+then
+  LIBDIR=lib64
+else
+  LIBDIR=lib
+fi
 if test "$with_fftw" = ""
 then
   # No path specified
@@ -414,7 +419,7 @@ then
   echo " -> Path not given. Searching for library..."
 else
   FFTPATH=$with_fftw
-  AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/lib/libfftw3.a $FFTPATH/lib/libfftw3f.a ,, [
+  AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/libfftw3.a $FFTPATH/$LIBDIR/libfftw3f.a ,, [
     echo " -> Given path not correct. Finding..."
     FFTPATH=""
   ] )
@@ -425,7 +430,7 @@ if test "$FFTPATH" = ""
 then
   if test "$FFTW_ROOT" != ""
   then
-    AC_CHECK_FILES( $FFTW_ROOT/include/fftw3.h $FFTW_ROOT/lib/libfftw3.a , FFTPATH=$FFTW_ROOT, )
+    AC_CHECK_FILES( $FFTW_ROOT/include/fftw3.h $FFTW_ROOT/$LIBDIR/libfftw3.a , FFTPATH=$FFTW_ROOT, )
   fi
 fi
 
@@ -443,8 +448,8 @@ then
     # Check for the rest of the files
 
     # NOTE: AC_CHECK_FILES works here, but AC_CHECK_FILE doesn't (?!)
-    AC_CHECK_FILES( $FFTPATH/lib/libfftw3.a $FFTPATH/lib/libfftw3f.a , , FFTPATH="" )
-    fi
+    AC_CHECK_FILES( $FFTPATH/$LIBDIR/libfftw3.a $FFTPATH/$LIBDIR/libfftw3f.a , , FFTPATH="" )
+  fi
 fi
 
 if test "$FFTPATH" = ""
@@ -465,7 +470,7 @@ else
     LIBS="-lfftw3f_threads ${LIBS}"],
     [AC_MSG_RESULT([cannot find libfftw3f_threads, single threaded float precision FFTs only!])])
   AC_CHECK_LIB([m], [sinh], [], [AC_MSG_RESULT([cannot find libm])])
-  LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/lib"
+  LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/$LIBDIR"
 fi
 echo ""
 

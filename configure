@@ -11794,10 +11794,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"4ae1cad6\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"7ab59891\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Tue Feb 26 14:04:27 2013 +0100\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"\"" >>confdefs.h
 
 
 # copyright notice
@@ -22834,7 +22834,12 @@ fi
 #############################################################
 
 echo "Searching for FFTW library"
-
+if test -d "/usr/lib64"
+then
+  LIBDIR=lib64
+else
+  LIBDIR=lib
+fi
 if test "$with_fftw" = ""
 then
   # No path specified
@@ -22871,15 +22876,15 @@ else
     FFTPATH=""
 
 fi
-as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/lib/libfftw3.a" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/lib/libfftw3.a" >&5
-$as_echo_n "checking for $FFTPATH/lib/libfftw3.a... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/$LIBDIR/libfftw3.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/$LIBDIR/libfftw3.a" >&5
+$as_echo_n "checking for $FFTPATH/$LIBDIR/libfftw3.a... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$FFTPATH/lib/libfftw3.a"; then
+if test -r "$FFTPATH/$LIBDIR/libfftw3.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -22891,7 +22896,7 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$FFTPATH/lib/libfftw3.a" | $as_tr_cpp` 1
+#define `$as_echo "HAVE_$FFTPATH/$LIBDIR/libfftw3.a" | $as_tr_cpp` 1
 _ACEOF
 
 else
@@ -22900,15 +22905,15 @@ else
     FFTPATH=""
 
 fi
-as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/lib/libfftw3f.a" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/lib/libfftw3f.a" >&5
-$as_echo_n "checking for $FFTPATH/lib/libfftw3f.a... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/$LIBDIR/libfftw3f.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/$LIBDIR/libfftw3f.a" >&5
+$as_echo_n "checking for $FFTPATH/$LIBDIR/libfftw3f.a... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$FFTPATH/lib/libfftw3f.a"; then
+if test -r "$FFTPATH/$LIBDIR/libfftw3f.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -22920,7 +22925,7 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$FFTPATH/lib/libfftw3f.a" | $as_tr_cpp` 1
+#define `$as_echo "HAVE_$FFTPATH/$LIBDIR/libfftw3f.a" | $as_tr_cpp` 1
 _ACEOF
 
 else
@@ -22961,15 +22966,15 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 FFTPATH=$FFTW_ROOT
 fi
-as_ac_File=`$as_echo "ac_cv_file_$FFTW_ROOT/lib/libfftw3.a" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTW_ROOT/lib/libfftw3.a" >&5
-$as_echo_n "checking for $FFTW_ROOT/lib/libfftw3.a... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_$FFTW_ROOT/$LIBDIR/libfftw3.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTW_ROOT/$LIBDIR/libfftw3.a" >&5
+$as_echo_n "checking for $FFTW_ROOT/$LIBDIR/libfftw3.a... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$FFTW_ROOT/lib/libfftw3.a"; then
+if test -r "$FFTW_ROOT/$LIBDIR/libfftw3.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -22981,7 +22986,7 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$FFTW_ROOT/lib/libfftw3.a" | $as_tr_cpp` 1
+#define `$as_echo "HAVE_$FFTW_ROOT/$LIBDIR/libfftw3.a" | $as_tr_cpp` 1
 _ACEOF
 FFTPATH=$FFTW_ROOT
 fi
@@ -23079,15 +23084,15 @@ fi
     # Check for the rest of the files
 
     # NOTE: AC_CHECK_FILES works here, but AC_CHECK_FILE doesn't (?!)
-    as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/lib/libfftw3.a" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/lib/libfftw3.a" >&5
-$as_echo_n "checking for $FFTPATH/lib/libfftw3.a... " >&6; }
+    as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/$LIBDIR/libfftw3.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/$LIBDIR/libfftw3.a" >&5
+$as_echo_n "checking for $FFTPATH/$LIBDIR/libfftw3.a... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$FFTPATH/lib/libfftw3.a"; then
+if test -r "$FFTPATH/$LIBDIR/libfftw3.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -23099,21 +23104,21 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$FFTPATH/lib/libfftw3.a" | $as_tr_cpp` 1
+#define `$as_echo "HAVE_$FFTPATH/$LIBDIR/libfftw3.a" | $as_tr_cpp` 1
 _ACEOF
 
 else
   FFTPATH=""
 fi
-as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/lib/libfftw3f.a" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/lib/libfftw3f.a" >&5
-$as_echo_n "checking for $FFTPATH/lib/libfftw3f.a... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_$FFTPATH/$LIBDIR/libfftw3f.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $FFTPATH/$LIBDIR/libfftw3f.a" >&5
+$as_echo_n "checking for $FFTPATH/$LIBDIR/libfftw3f.a... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$FFTPATH/lib/libfftw3f.a"; then
+if test -r "$FFTPATH/$LIBDIR/libfftw3f.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -23125,14 +23130,14 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$FFTPATH/lib/libfftw3f.a" | $as_tr_cpp` 1
+#define `$as_echo "HAVE_$FFTPATH/$LIBDIR/libfftw3f.a" | $as_tr_cpp` 1
 _ACEOF
 
 else
   FFTPATH=""
 fi
 
-    fi
+  fi
 fi
 
 if test "$FFTPATH" = ""
@@ -23378,7 +23383,7 @@ else
 $as_echo "cannot find libm" >&6; }
 fi
 
-  LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/lib"
+  LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/$LIBDIR"
 fi
 echo ""
 
