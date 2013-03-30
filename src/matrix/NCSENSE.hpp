@@ -57,7 +57,64 @@ public:
 	 * @param  params  Configuration parameters
 	 */
 	NCSENSE        (const Params& params) :
-		FT<T>::FT(params) {
+		FT<T>::FT(params), m_nc(0), m_nk(0), m_nr(0), m_fts(0), m_cgiter(0),
+		m_dim(0), m_initialised(false), m_cgeps(0.0), m_lambda(0.0) {
+
+		T fteps = 7.0e-4, alpha = 1.0;
+		size_t ftiter = 3, m = 1;
+
+		if (params.exists("fteps"))
+			fteps = boost::any_cast<T>(params["fteps"]);
+		if (params.exists("alpha"))
+			alpha = boost::any_cast<T>(params["alpha"]);
+		if (params.exists("ftiter"))
+			ftiter = boost::any_cast<size_t>(params["ftiter"]);
+		if (params.exists("m"))
+			m      = boost::any_cast<size_t>(params["m"]);
+
+		Workspace& ws = Workspace::Instance();
+		Matrix<T> b0;
+
+		m_smname = params.Get<std::string>("sens_maps");
+		m_wname  = params.Get<std::string>("weights_name");
+
+		if (params.exists("phase_cor"))
+			ws.GetMatrix(params.Get<std::string>("phase_cor"), m_pc);
+		if (params.exists("b0"))
+			ws.GetMatrix(params.Get<std::string>("b0"), b0);
+
+		m_dim = ndims(m_sm)-1;
+		Matrix<size_t> ms (m_dim,1);
+		for (size_t i = 0; i < m_dim; i++)
+			ms[i] = size(m_sm,i);
+
+		m_cgiter = params.Get<size_t>("cgiter");
+		m_cgeps  = params.Get<size_t>("cgeps");
+		m_lambda = params.Get<size_t>("lambda");
+		m_nk     = params.Get<size_t>("nk");
+
+		printf ("  Initialising NCSENSE:\n");
+		printf ("  Signal nodes: %li\n", m_nk);
+		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
+		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
+
+		int np = 1;
+
+#pragma omp parallel default (shared)
+		{
+			if (params.exists("np"))
+				np = boost::any_cast<int>("np");
+			else
+				np = omp_get_num_threads ();
+		}
+
+		m_fts = new NFFT<T>* [np];
+		for (size_t i = 0; i < np; i++)
+			m_fts[i] = new NFFT<T> (ms, m_nk, m, alpha, b0, m_pc, fteps, ftiter);
+
+		m_ic     = IntensityMap (m_sm);
+		m_initialised = true;
+		printf ("  ...done.\n\n");
 
 	}
 
@@ -120,63 +177,6 @@ public:
 		
 	}
 	
-	/***
-	 * @brief          Construct NCSENSE plans for forward and backward transform with credentials
-	 * 
-	 * @param  sens    Image space dims
-	 * @param  nk      # k-space points
-	 * @param  cgeps   Convergence limit of descent
-	 * @param  cgiter  Maximum # CG iterations
-	 * @param  lambda  Tikhonov regularisation (default 0.0)
-	 * @param  fteps   NFFT convergence criterium (default 7.0e-4)
-	 * @param  ftiter  Maximum # of NFFT gridding iterations (default 3)
-	 * @param  m       Spatial cut-off of FT (default 1)
-	 * @param  alpha   Oversampling factor (default 1.0)
-	 * @param  b0      Off-resonance maps if available (default empty)
-	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
-	 */
-	/*
-	NCSENSE (const Matrix< size_t >& imsz, const size_t& nk, const T& cgeps, const size_t& cgiter,
-			 const T& lambda = 0.0, const T& fteps = 7.0e-4, const size_t& ftiter = 3,
-			 const size_t& m = 1, const T& alpha = 1.0, const Matrix<T>& b0 = Matrix<T>(1),
-			 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1)) {
-		
-
-		m_dim = ndims(sens)-1;
-		Matrix<size_t> ms (m_dim,1);
-		for (size_t i = 0; i < m_dim; i++)
-			ms[i] = size(sens,i);
-		
-		printf ("  Initialising NCSENSE:\n");
-		printf ("  Signal nodes: %li\n", nk);
-		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", cgeps, cgiter, lambda);
-		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
-
-		int np = 1;
-		
-#pragma omp parallel default (shared)
-		{
-			np = omp_get_num_threads ();
-		}	
-		
-		m_fts = new NFFT<T>* [np];
-		
-		for (size_t i = 0; i < np; i++)
-			m_fts[i] = new NFFT<T> (ms, nk, m, alpha, b0, pc, fteps, ftiter);
-		
-		m_cgiter = cgiter;
-		m_cgeps  = cgeps;
-		m_lambda = lambda;
-		
-		m_sm     = sens;
-		m_ic     = IntensityMap (m_sm);
-		
-		m_initialised = true;
-		
-		printf ("  ...done.\n\n");
-		
-	}
-	*/
 	
 	/**
 	 * @brief        Clean up and destruct NFFT plans
@@ -291,7 +291,9 @@ public:
 	 * @return   Transform
 	 */
 	Matrix< std::complex<T> >
-	Adjoint     (const Matrix< std::complex<T> >& m, const Matrix< std::complex<T> >& sens, const bool recal = true) const {
+	Adjoint (const Matrix< std::complex<T> >& m,
+			 const Matrix< std::complex<T> >& sens,
+			 const bool recal = true) const {
 
 		std::complex<T> ts;
 		T rn, rno, xn;
@@ -314,7 +316,8 @@ public:
 			
 			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 
-			q   = EH (E  (p * ((recal) ? IntensityMap (sens) : m_ic), sens, m_fts), sens, m_fts) * ((recal) ? IntensityMap (sens) : m_ic);
+			q   = EH (E  (p * ((recal) ? IntensityMap (sens) : m_ic), sens, m_fts), sens, m_fts) *
+					((recal) ? IntensityMap (sens) : m_ic);
 			if (m_lambda)
 				q  += m_lambda * p;
 			
@@ -343,6 +346,10 @@ private:
 
 	Matrix< std::complex<T> > m_sm;          /**< Sensitivities */
 	Matrix<T> m_ic;     /**< Intensity correction I(r) */
+	Matrix< std::complex<T> > m_pc; /**< @brief Correction phase */
+
+	std::string m_smname;
+	std::string m_wname;
 
 	size_t    m_dim;            /**< Image dimensions {2,3} */
 	size_t    m_nr;             /**< # spatial image positions */

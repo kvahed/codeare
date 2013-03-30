@@ -118,11 +118,17 @@ CGSENSE::Prepare () {
 
 	error_code error = OK;
 
-	Matrix<cxfl>&   sens   = Get<cxfl> ("sens");
 	Matrix<float>& weights = Get<float>("weights");
-	Matrix<float>& kspace  = Get<float>("kspace");
+	Matrix<cxfl>& sens = Get<cxfl>("sens");
+	Matrix<float>& kspace = Get<float>("kspace");
 
 	size_t nk = numel(weights);
+
+	Params cgp;
+	cgp.Set("sens_maps", std::string("sens"));
+	cgp.Set("sens_maps", std::string("weights"));
+	cgp.Set("sens_maps", std::string("kspace"));
+
 
 	m_ncs = new NCSENSE<float>
 		(sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
