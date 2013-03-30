@@ -826,6 +826,7 @@ with_itkroot
 with_matlabroot
 with_blas
 with_lapack
+with_atlasroot
 with_scalapack
 '
       ac_precious_vars='build_alias
@@ -1496,6 +1497,7 @@ Optional Packages:
   --with-matlabroot       path to MATLAB install dir
   --with-blas             which blas library to use
   --with-lapack           which lapack library to use
+  --with-atlasroot       path to atlas install dir
   --with-scalapack=<lib>  use ScaLAPACK library <lib>
 
 Some influential environment variables:
@@ -3132,12 +3134,6 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MKDIR_P" >&5
 $as_echo "$MKDIR_P" >&6; }
 
-mkdir_p="$MKDIR_P"
-case $mkdir_p in
-  [\\/$]* | ?:[\\/]*) ;;
-  */*) mkdir_p="\$(top_builddir)/$mkdir_p" ;;
-esac
-
 for ac_prog in gawk mawk nawk awk
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -3269,6 +3265,12 @@ AUTOHEADER=${AUTOHEADER-"${am_missing_run}autoheader"}
 
 
 MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
+
+# For better backward compatibility.  To be removed once Automake 1.9.x
+# dies out for good.  For more background, see:
+# <http://lists.gnu.org/archive/html/automake/2012-07/msg00001.html>
+# <http://lists.gnu.org/archive/html/automake/2012-07/msg00014.html>
+mkdir_p='$(MKDIR_P)'
 
 # We need awk for the "check" target.  The system "awk" is bad on
 # some platforms.
@@ -11794,10 +11796,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"7ab59891\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"34f400c0\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Sat Mar 30 01:24:12 2013 -0500\"" >>confdefs.h
 
 
 # copyright notice
@@ -22263,7 +22265,7 @@ _ACEOF
 else
 
             echo "OpenCL library not found in your system"
-
+            HAVE_LIBOPENCL=0
 fi
 
 esac
@@ -23482,7 +23484,7 @@ if test "x$ac_cv_lib_nfft3_nfft_precompute_psi" = xyes; then :
   HAVE_NFFT3=1
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&5
-$as_echo "cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&6; }
+$as_echo "cannot find libnfft3, NuFFT/CGSENSE unavailable!" >&6; } ; HAVE_NFFT3=0
 fi
 
  if test "$HAVE_NFFT3" -eq 1; then
@@ -23547,6 +23549,10 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 fi
+if test "$HAVE_NFFT3" -eq 0 ; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
+$as_echo "none" >&6; }
+fi
 
  if test "$HAVE_NFFT3" -eq 1; then
   USE_NFFT3_TRUE=
@@ -23558,6 +23564,7 @@ fi
 
 
 # Checks for C++ libraries with name spaces
+
 
 # ISMRMRD (required)
 
@@ -23591,10 +23598,193 @@ fi
 done
 
 
+	OLD_LIBS=$LIBS
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_thread" >&5
+$as_echo_n "checking for exit in -lboost_thread... " >&6; }
+if ${ac_cv_lib_boost_thread_exit+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lboost_thread  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char exit ();
+int
+main ()
+{
+return exit ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_boost_thread_exit=yes
+else
+  ac_cv_lib_boost_thread_exit=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_thread_exit" >&5
+$as_echo "$ac_cv_lib_boost_thread_exit" >&6; }
+if test "x$ac_cv_lib_boost_thread_exit" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBBOOST_THREAD 1
+_ACEOF
+
+  LIBS="-lboost_thread $LIBS"
+
+fi
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_thread-mt" >&5
+$as_echo_n "checking for exit in -lboost_thread-mt... " >&6; }
+if ${ac_cv_lib_boost_thread_mt_exit+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lboost_thread-mt  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char exit ();
+int
+main ()
+{
+return exit ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_boost_thread_mt_exit=yes
+else
+  ac_cv_lib_boost_thread_mt_exit=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_thread_mt_exit" >&5
+$as_echo "$ac_cv_lib_boost_thread_mt_exit" >&6; }
+if test "x$ac_cv_lib_boost_thread_mt_exit" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBBOOST_THREAD_MT 1
+_ACEOF
+
+  LIBS="-lboost_thread-mt $LIBS"
+
+fi
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_system" >&5
+$as_echo_n "checking for exit in -lboost_system... " >&6; }
+if ${ac_cv_lib_boost_system_exit+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lboost_system  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char exit ();
+int
+main ()
+{
+return exit ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_boost_system_exit=yes
+else
+  ac_cv_lib_boost_system_exit=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_system_exit" >&5
+$as_echo "$ac_cv_lib_boost_system_exit" >&6; }
+if test "x$ac_cv_lib_boost_system_exit" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBBOOST_SYSTEM 1
+_ACEOF
+
+  LIBS="-lboost_system $LIBS"
+
+fi
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_system-mt" >&5
+$as_echo_n "checking for exit in -lboost_system-mt... " >&6; }
+if ${ac_cv_lib_boost_system_mt_exit+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lboost_system-mt  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char exit ();
+int
+main ()
+{
+return exit ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_boost_system_mt_exit=yes
+else
+  ac_cv_lib_boost_system_mt_exit=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_system_mt_exit" >&5
+$as_echo "$ac_cv_lib_boost_system_mt_exit" >&6; }
+if test "x$ac_cv_lib_boost_system_mt_exit" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBBOOST_SYSTEM_MT 1
+_ACEOF
+
+  LIBS="-lboost_system-mt $LIBS"
+
+fi
+
+
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for IsmrmrdDataset in -lismrmrd" >&5
 $as_echo_n "checking for IsmrmrdDataset in -lismrmrd... " >&6; }
-	OLD_LIBS=$LIBS
-	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -lboost_thread -lboost_system"
+
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd"
 
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -23963,6 +24153,107 @@ fi
 fi
 
 # Otherwise, run through a list of possibilities
+
+# Check whether --with-atlasroot was given.
+if test "${with_atlasroot+set}" = set; then :
+  withval=$with_atlasroot;
+else
+  with_atlasroot=/usr/lib64/atlas
+fi
+
+if test -z "$BLAS" -a x"$with_atlasroot" != x"no" ; then
+  OLD_LIBS=$LIBS
+  LIBS="$LIBS -L$with_atlasroot"
+  as_ac_Lib=`$as_echo "ac_cv_lib_blas_$DGEMM_SYMBOL" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEMM_SYMBOL in -lblas" >&5
+$as_echo_n "checking for $DGEMM_SYMBOL in -lblas... " >&6; }
+if eval \${$as_ac_Lib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lblas  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char $DGEMM_SYMBOL ();
+int
+main ()
+{
+return $DGEMM_SYMBOL ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  eval "$as_ac_Lib=yes"
+else
+  eval "$as_ac_Lib=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+eval ac_res=\$$as_ac_Lib
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+  BLAS="-latlas -lblas"
+else
+  LIBS=$OLD_LIBS
+fi
+
+  as_ac_Lib=`$as_echo "ac_cv_lib_lapack_$DGEEV_SYMBOL" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEEV_SYMBOL in -llapack" >&5
+$as_echo_n "checking for $DGEEV_SYMBOL in -llapack... " >&6; }
+if eval \${$as_ac_Lib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-llapack  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char $DGEEV_SYMBOL ();
+int
+main ()
+{
+return $DGEEV_SYMBOL ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  eval "$as_ac_Lib=yes"
+else
+  eval "$as_ac_Lib=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+eval ac_res=\$$as_ac_Lib
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+  LAPACK="-latlas -lapack"
+else
+  LIBS=$OLD_LIBS
+fi
+
+fi
+
 if test -z "$BLAS"; then
   as_ac_Lib=`$as_echo "ac_cv_lib_essl_$DGEMM_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEMM_SYMBOL in -lessl" >&5

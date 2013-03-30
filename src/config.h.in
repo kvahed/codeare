@@ -87,6 +87,20 @@
 /* Define to 1 if you have the <ismrmrd_hdf5.h> header file. */
 #undef HAVE_ISMRMRD_HDF5_H
 
+/* Define to 1 if you have the `boost_system' library (-lboost_system). */
+#undef HAVE_LIBBOOST_SYSTEM
+
+/* Define to 1 if you have the `boost_system-mt' library (-lboost_system-mt).
+   */
+#undef HAVE_LIBBOOST_SYSTEM_MT
+
+/* Define to 1 if you have the `boost_thread' library (-lboost_thread). */
+#undef HAVE_LIBBOOST_THREAD
+
+/* Define to 1 if you have the `boost_thread-mt' library (-lboost_thread-mt).
+   */
+#undef HAVE_LIBBOOST_THREAD_MT
+
 /* Define to 1 if you have the `cblas' library (-lcblas). */
 #undef HAVE_LIBCBLAS
 

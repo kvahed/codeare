@@ -380,7 +380,7 @@ case $host in
         AC_MSG_RESULT(no)
         AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [],[ 
             echo "OpenCL library not found in your system"
-        ])
+            HAVE_LIBOPENCL=0])
 esac
 AM_CONDITIONAL([USE_LIBOPENCL],  [test "$HAVE_LIBOPENCL" -eq 1])
 
@@ -492,7 +492,7 @@ AC_TRY_LINK([
 AC_MSG_RESULT($rtc_ok)
 
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], 
-   [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
+   [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!]) ; HAVE_NFFT3=0])
 AM_CONDITIONAL([USE_NFFT3],  [test "$HAVE_NFFT3" -eq 1])
 
 # NFFT naming differences starting with 3.2.0
@@ -515,10 +515,14 @@ if test -z $nfft_32_naming; then
 	   [HAVE_NFFT3=1],
    	   [LIBS=$OLD_LIBS])
 fi
+if test "$HAVE_NFFT3" -eq 0 ; then
+   AC_MSG_RESULT([none])
+fi
 
 AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
 # Checks for C++ libraries with name spaces
+
 
 # ISMRMRD (required)
 AC_ARG_WITH(ismrmrdroot,[  --with-ismrmrdroot       path to ISMRMRD install dir], 
@@ -533,9 +537,16 @@ if test x"$with_ismrmrdroot" != x"no" ; then
 
 	AC_CHECK_HEADERS([ismrmrd_hdf5.h], [], [AC_MSG_ERROR([cannot find ismrmrd_hdf5.h, bailing out])])
 
-	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
 	OLD_LIBS=$LIBS
-	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -lboost_thread -lboost_system"
+
+        AC_CHECK_LIB([boost_thread],        [exit])
+        AC_CHECK_LIB([boost_thread-mt],     [exit])
+        AC_CHECK_LIB([boost_system],        [exit])
+        AC_CHECK_LIB([boost_system-mt],     [exit])
+
+	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
+
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd"
 
 	AC_TRY_LINK([#include <ismrmrd_hdf5.h>],
 	  [ISMRMRD::IsmrmrdDataset d("","");],
@@ -739,6 +750,15 @@ if test -z "$BLAS"; then
 fi
 
 # Otherwise, run through a list of possibilities                                                                                            
+AC_ARG_WITH(atlasroot,[  --with-atlasroot       path to atlas install dir], 
+                           [], [with_atlasroot=/usr/lib64/atlas])
+if test -z "$BLAS" -a x"$with_atlasroot" != x"no" ; then
+  OLD_LIBS=$LIBS
+  LIBS="$LIBS -L$with_atlasroot"
+  AC_CHECK_LIB(blas, $DGEMM_SYMBOL, BLAS="-latlas -lblas", [LIBS=$OLD_LIBS])
+  AC_CHECK_LIB(lapack, $DGEEV_SYMBOL, LAPACK="-latlas -lapack", [LIBS=$OLD_LIBS])
+fi
+
 if test -z "$BLAS"; then
   AC_CHECK_LIB(essl, $DGEMM_SYMBOL, BLAS="-lessl -lpthread")
 fi
