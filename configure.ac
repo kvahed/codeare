@@ -755,8 +755,10 @@ AC_ARG_WITH(atlasroot,[  --with-atlasroot       path to atlas install dir],
 if test -z "$BLAS" -a x"$with_atlasroot" != x"no" ; then
   OLD_LIBS=$LIBS
   LIBS="$LIBS -L$with_atlasroot"
-  AC_CHECK_LIB(blas, $DGEMM_SYMBOL, BLAS="-latlas -lblas", [LIBS=$OLD_LIBS])
-  AC_CHECK_LIB(lapack, $DGEEV_SYMBOL, LAPACK="-latlas -lapack", [LIBS=$OLD_LIBS])
+  AC_CHECK_LIB(blas, $DGEMM_SYMBOL, BLAS="-L$with_atlasroot -latlas -lblas", [LIBS=$OLD_LIBS])
+  if test ! -z "$BLAS"; then
+    AC_CHECK_LIB(lapack, $DGEEV_SYMBOL, LAPACK="-llapack", [LIBS=$OLD_LIBS])
+  fi
 fi
 
 if test -z "$BLAS"; then
