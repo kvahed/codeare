@@ -344,8 +344,8 @@ oclArithmeticsTest    ( bool verbose )
   std::cout << " ***************** " << std::endl;
   std::cout <<                          std::endl;
 
-  size_t  dimX     = 4,//2048,
-          dimY     = 4;//2048;
+  size_t  dimX     = 2048,
+          dimY     = 2048;
   
   std::cout << " size: " << dimX << " x " << dimY << std::endl << std::endl;
 

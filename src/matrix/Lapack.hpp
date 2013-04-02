@@ -603,12 +603,9 @@ dot  (const Matrix<T>& A, const Matrix<T>& B) {
 	n   = (int) numel(A);
 	assert (n == (int) numel(B));
 	
-	res = T(0.0);
 	one = 1;
 
-	LapackTraits<T>::dot (n, A.Data(), one, B.Data(), one, &res);
-	
-	return res;
+	return LapackTraits<T>::dot (n, A.Data(), one, B.Data(), one);
 	
 }
 

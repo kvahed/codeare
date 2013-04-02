@@ -176,13 +176,13 @@ struct LapackTraits<float> {
 	
 	inline static Type
 	dot  (const int N, const Type *X, const int incX, const Type *Y, 
-		  const int incY, void* res) {
+		  const int incY) {
 		return cblas_sdot (N, X, incX, Y, incY);	
 	}
 
 	inline static Type 
 	dotc (const int N, const Type *X, const int incX, const Type *Y, 
-		  const int incY, void* res) {
+		  const int incY) {
 		return cblas_sdot (N, X, incX, Y, incY);	
 	}
 
@@ -279,13 +279,13 @@ struct LapackTraits<double> {
 	
 	inline static Type 
 	dot  (const int N, const Type *X, const int incX, const Type *Y, 
-		  const int incY, void* res) {
+		  const int incY) {
 		return cblas_ddot (N, X, incX, Y, incY);	
 	}
 
 	inline static Type
 	dotc (const int N, const Type *X, const int incX, const Type *Y, 
-		  const int incY, void* res) {
+		  const int incY) {
 		return cblas_ddot (N, X, incX, Y, incY);	
 	}
 
