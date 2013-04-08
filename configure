@@ -11796,10 +11796,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"34f400c0\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"ad0bb123\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Sat Mar 30 01:24:12 2013 -0500\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Sat Mar 30 02:20:33 2013 -0400\"" >>confdefs.h
 
 
 # copyright notice
@@ -24203,12 +24203,13 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  BLAS="-latlas -lblas"
+  BLAS="-L$with_atlasroot -latlas -lblas"
 else
   LIBS=$OLD_LIBS
 fi
 
-  as_ac_Lib=`$as_echo "ac_cv_lib_lapack_$DGEEV_SYMBOL" | $as_tr_sh`
+  if test ! -z "$BLAS"; then
+    as_ac_Lib=`$as_echo "ac_cv_lib_lapack_$DGEEV_SYMBOL" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DGEEV_SYMBOL in -llapack" >&5
 $as_echo_n "checking for $DGEEV_SYMBOL in -llapack... " >&6; }
 if eval \${$as_ac_Lib+:} false; then :
@@ -24247,11 +24248,12 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  LAPACK="-latlas -lapack"
+  LAPACK="-llapack"
 else
   LIBS=$OLD_LIBS
 fi
 
+  fi
 fi
 
 if test -z "$BLAS"; then
