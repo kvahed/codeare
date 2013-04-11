@@ -76,6 +76,8 @@ enum IceDim {
 
 #include "Ptr.h"
 
+#define HAVE_VALARRAY 1
+
 
 /**
  * Short test if the matrix is a vector.
@@ -398,11 +400,9 @@ public:
      * @return          Data 
      */
     inline const T*            
-    Data                (const size_t p = 0)  const {
-
+    Memory             (const size_t p = 0)  const {
         assert (p < Size());
         return &(_M[p]);
-
     }
 
     
@@ -412,7 +412,7 @@ public:
      * @return          Data 
      */
     inline std::valarray<T>&            
-    Dat                 ()  {
+    Container           ()  {
         return _M;
     }
 
@@ -423,7 +423,7 @@ public:
      * @return          Data 
      */
     inline std::valarray<T>            
-    Dat                 ()  const {
+    Container           ()  const {
         return _M;
     }
 
@@ -1139,13 +1139,13 @@ public:
     inline friend Matrix<T,P>    
     operator/  (const double& s, const Matrix<T,P> &m) { 
 
-        assert (s);
+    	assert (s != 0.0);
 
-        if (s == T(1.0))
+        if (s == 1.0)
             return Matrix<T,P> (m);
         
         Matrix<T,P> res = m;
-        res.Dat() /= s;
+        res.Container() = s / res.Container();
         return res;
         
     }
@@ -1161,14 +1161,14 @@ public:
     inline friend Matrix<T,P>    
     operator/  (const float& s, const Matrix<T,P> &m) { 
 
-        Matrix<T,P> res = m;
+    	assert (s != 0.0);
 
-        if (s == T(1.0))
-            return res;
-        
-		res.Dat() /= s;
-        
-        return res;
+		if (s == 1.0)
+			return Matrix<T,P> (m);
+
+		Matrix<T,P> res = m;
+		res.Container() = s / res.Container();
+		return res;
 
     }
 
@@ -1506,9 +1506,9 @@ public:
      *
      * @param  s        The assigned scalar.
      */
-    Matrix<T,P>           
+    Matrix<T,P>&
     operator=           (const T& s) {
-        //this->_M = s;
+        this->_M = s;
         return *this;
     }
     
@@ -2323,7 +2323,7 @@ Matrix<T,P>::Matrix (const Matrix<T,P> &M) {
 		memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
 		memcpy (_res, M.Res(), INVALID_DIM * sizeof( float));
 		
-		_M = M.Dat();
+		_M = M.Container();
 		
 	}
 
@@ -2344,7 +2344,7 @@ Matrix<T,P>::operator= (const Matrix<T,P>& M) {
         memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
         memcpy (_res, M.Res(), INVALID_DIM * sizeof( float));
         
-        _M = M.Dat();
+        _M = M.Container();
         
     }
 
@@ -2370,7 +2370,7 @@ template <class T, paradigm P> inline Matrix<bool>
 Matrix<T,P>::operator== (const T& s) const {
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M == s);
+    res.Container() = (_M == s);
     return res;
 
 }
@@ -2380,7 +2380,7 @@ template <class T, paradigm P> inline Matrix<bool>
 Matrix<T,P>::operator>= (const T& s) const {
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M >= s);
+    res.Container() = (_M >= s);
     return res;
 
 }
@@ -2390,7 +2390,7 @@ template <class T, paradigm P> inline Matrix<bool>
 Matrix<T,P>::operator<= (const T& s) const {
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M <= s);
+    res.Container() = (_M <= s);
     return res;
 
 }
@@ -2400,7 +2400,7 @@ template <class T, paradigm P> inline Matrix<bool>
 Matrix<T,P>::operator!= (const T& s) const {
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M != s);
+    res.Container() = (_M != s);
     return res;
 
 }
@@ -2410,7 +2410,7 @@ template <class T, paradigm P> inline Matrix<bool>
 Matrix<T,P>::operator< (const T& s) const {
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M < s);
+    res.Container() = (_M < s);
     return res;
 
 }
@@ -2420,7 +2420,7 @@ template <class T, paradigm P> inline Matrix<bool>
 Matrix<T,P>::operator> (const T& s) const {
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M > s);
+    res.Container() = (_M > s);
     return res;
 
 }
@@ -2459,7 +2459,7 @@ template <class T, paradigm P> inline Matrix<bool>
 Matrix<T,P>::operator&& (const Matrix<T,P>& M) const {
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M && M.Dat());
+    res.Container() = (_M && M.Container());
     return res;
 
 }
@@ -2472,7 +2472,7 @@ Matrix<T,P>::operator|| (const Matrix<T,P>& M) const {
         assert (Dim(i) == M.Dim(i));
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M || M.Dat());
+    res.Container() = (_M || M.Container());
     return res;
 
 }
@@ -2485,7 +2485,7 @@ Matrix<T,P>::operator== (const Matrix<T,P>& M) const {
         assert (Dim(i) == M.Dim(i));
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M == M.Dat());
+    res.Container() = (_M == M.Container());
     return res;
 
 }
@@ -2498,7 +2498,7 @@ Matrix<T,P>::operator>= (const Matrix<T,P>& M) const {
         assert (Dim(i) == M.Dim(i));
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M >= M.Dat());
+    res.Container() = (_M >= M.Container());
     return res;
 
 }
@@ -2511,7 +2511,7 @@ Matrix<T,P>::operator<= (const Matrix<T,P>& M) const {
         assert (Dim(i) == M.Dim(i));
 
     Matrix<bool> res(_dim);
-    res.Dat() = (_M <= M.Dat());
+    res.Container() = (_M <= M.Container());
     return res;
 
 }
@@ -2524,7 +2524,7 @@ Matrix<T,P>::operator!= (const Matrix<T,P>& M) const {
         assert (Dim(i) == M.Dim(i));
 
     Matrix<bool> res(_dim,_res);
-    res.Dat() = (_M != M.Dat());
+    res.Container() = (_M != M.Container());
     return res;
 
 }
@@ -2537,7 +2537,7 @@ Matrix<T,P>::operator> (const Matrix<T,P>& M) const {
         assert (Dim(i) == M.Dim(i));
 
     Matrix<bool> res(_dim,_res);
-    res.Dat() = (_M > M.Dat());
+    res.Container() = (_M > M.Container());
     return res;
 
 }
@@ -2550,7 +2550,7 @@ Matrix<T,P>::operator< (const Matrix<T,P>& M) const {
         assert (Dim(i) == M.Dim(i));
 
     Matrix<bool> res(_dim,_res);
-    res.Dat() = (_M < M.Dat());
+    res.Container() = (_M < M.Container());
     return res;
 
 }
@@ -2560,8 +2560,16 @@ template <class T, paradigm P> inline Matrix<T,P>
 Matrix<T,P>::operator- () const {
 
     Matrix<T,P> res (_dim,_res);
-    res.Dat() = -_M;
+    res.Container() = -_M;
     return res;
+
+}
+
+
+template <class T, paradigm P> inline Matrix<T,P>
+Matrix<T,P>::operator+ () const {
+
+    return *this;
 
 }
 
@@ -2573,7 +2581,7 @@ Matrix<T,P>::operator- (const Matrix<S,P> &M) const {
         assert (Dim(i) == M.Dim(i));
 
     Matrix<T,P> res = *this;
-	res.Dat() -= _M;
+	res.Container() -= M.Container();
     return res;
 
 }
@@ -2583,7 +2591,7 @@ template <class T, paradigm P> template <class S> inline Matrix<T,P>
 Matrix<T,P>::operator- (const S& s) const {
 
     Matrix<T,P> res = *this;
-	res.Dat() -= T(s);
+	res.Container() -= T(s);
     return res;
 
 }
@@ -2776,7 +2784,6 @@ Matrix<T,P>::operator+= (const S& s) {
 
 }
 
-
 template <class T, paradigm P> template <class S> inline Matrix<T,P>&
 Matrix<T,P>::operator-= (const Matrix<S,P>& M) {
 
@@ -2833,7 +2840,8 @@ Matrix<T,P>::operator /= (const Matrix<S,P> &M) {
 template <class T, paradigm P> template<class S> inline Matrix<T,P>&
 Matrix<T,P>::operator/= (const S& s) {
     
-    assert (s);
+	T zero = T(0.0);
+    assert (s != zero);
 
 #pragma omp parallel default (shared) 
 	{
@@ -3015,6 +3023,7 @@ Matrix<float,MPI>::Matrix (const size_t& cols, const size_t& rows) {
 
     // Get at home
     int info;
+    int izero = 0;
     Grid& gd = *Grid::Instance();
     
     // Global size

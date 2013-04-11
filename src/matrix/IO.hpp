@@ -250,14 +250,14 @@ print (const Matrix<cxdb>& M, std::ostream& os) {
 }
 
 
-template <class T> std::ostream& 
-operator<< (std::ostream& os, Matrix<T>& M) {
-    
+
+template <class T> std::ostream&
+operator<< (std::ostream& os, const Matrix<T>& M) {
+
     print (M, os);
     return os;
-    
-}
 
+}
 
 
 
@@ -348,7 +348,7 @@ PRDump (const Matrix<T>& M, const string fname) {
 		return false;
 	
 	// Dump data
-	if (!mwrite((const void*) M.Data(), sizeof(T), n, f, "data"))
+	if (!mwrite((const void*) M.Memory(), sizeof(T), n, f, "data"))
 		return false;
 	
 	fclose(f);
@@ -1189,7 +1189,7 @@ MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc =
 			im[i] = cimag(M[i]); 
 		}
 	} else 
-		memcpy(mxGetData(mxa), M.Data(), numel(M) * sizeof(T));
+		memcpy(mxGetData(mxa), M.Memory(), numel(M) * sizeof(T));
 	
 	// -------------------------------------------
 	
@@ -1317,7 +1317,7 @@ NIDump (const Matrix<T>& M, const string fname) {
 		strcpy(ni->iname,fname.c_str());
 		
 		ni->data = (void*) malloc (numel(M) * sizeof (T));
-		memcpy (ni->data, M.Data(), numel(M) * sizeof (T));
+		memcpy (ni->data, M.Memory(), numel(M) * sizeof (T));
 		
 		nifti_image_write (ni);
 		nifti_image_free (ni); 

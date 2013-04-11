@@ -119,7 +119,7 @@ ones            (const size_t& col,
  	 Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
 	 size_t i = numel(res);
 
-	 res.Dat() = T(1);
+	 res.Container() = T(1);
 
 	 return res;
 

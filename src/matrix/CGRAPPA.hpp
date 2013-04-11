@@ -82,11 +82,11 @@ public:
 		m_dft[0] = new DFT<T> (sl);
 		/*
 		if      (typeid(T) == typeid(double))
-			d_src_trg_mat_ (acs.Data(), asz.Data(), ksz.Data(), acs.Data(), asz.Data(), 
-						  msz.Data(), &m_dim, m_af.Data(), &s[0], ssz.Data(), &t[0], tsz.Data());
+			d_src_trg_mat_ (acs.Memory(), asz.Memory(), ksz.Memory(), acs.Memory(), asz.Memory(),
+						  msz.Memory(), &m_dim, m_af.Memory(), &s[0], ssz.Memory(), &t[0], tsz.Memory());
 		else if (typeid(T))
-			d_src_trg_mat_ (acs.Data(), asz.Data(), ksz.Data(), acs.Data(), asz.Data(), 
-						  msz.Data(), &m_dim, m_af.Data(), &s[0], ssz.Data(), &t[0], tsz.Data());
+			d_src_trg_mat_ (acs.Memory(), asz.Memory(), ksz.Memory(), acs.Memory(), asz.Memory(),
+						  msz.Memory(), &m_dim, m_af.Memory(), &s[0], ssz.Memory(), &t[0], tsz.Memory());
 		*/
 		m_weights = t.prod(pinv(s));
 

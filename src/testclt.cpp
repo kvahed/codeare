@@ -57,6 +57,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "MPI"))                   mpitest      (con);
 		else if (!strcmp (test, "SHA256"))                sha256test   (con);
 		else if (!strcmp (test, "ISMRMRD"))               ismrmrdtest  (con);
+		//else if (!strcmp (test, "ocl"))                   oclmatrixtest(con);
 		else                                              internaltest (con);
 
 		delete con;

@@ -103,7 +103,8 @@ enum data_type {
 #define GB    1073741824;
 #define TB 1099511627776;
 
-
+#define IZERO 0
+#define IONE  1
 
 
 #endif //__COMMON_H__

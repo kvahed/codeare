@@ -4,16 +4,16 @@
 
 template<class T> void pinv_check () {
 
-    Matrix<T> A = rand<T>(4,3);
-
+    Matrix<T> A = rand<T>(3,4);
+    
 #ifdef VERBOSE
     std::cout << "A=\n" << A;
 #endif
     
-    A = pinv (A);
+    Matrix<T> B = pinv (A);
     
 #ifdef VERBOSE
-    std::cout << "pinv(A)=\n" << A << std::endl;
+    std::cout << "pinv(A)=\n" << B << std::endl;
 #endif
     
 }

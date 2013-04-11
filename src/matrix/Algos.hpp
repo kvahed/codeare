@@ -225,7 +225,7 @@ isinf (const Matrix<T>& M) {
 	size_t i = numel(M);
 
 	while (i--)
-		res.Dat()[i] = (std::isinf(creal(M.At(i)))||std::isinf(cimag(M.At(i))));
+		res.Container()[i] = (std::isinf(creal(M.At(i)))||std::isinf(cimag(M.At(i))));
 	
     return res;
 
@@ -245,7 +245,7 @@ isfinite (const Matrix<T>& M) {
 	size_t i = numel(M);
 
 	while (i--)
-		res.Dat()[i] = true;//is_nan(creal(M[i]));
+		res.Container()[i] = true;//is_nan(creal(M[i]));
 			//()(!((bool)isnan(creal(M[i]))) && !isnan(cimag(M[i])) && !std::isinf(creal(M[i])) && !std::isinf(cimag(M[i])));
 	
     return res;
@@ -659,7 +659,7 @@ resize (const Matrix<T>& M, Matrix<size_t> sz) {
 	size_t copysz  = MIN(numel(M), numel(res));
 	std::slice  copyslc (0,copysz,1);
 
-	res.Dat()[copyslc] = M.Dat()[copyslc];
+	res.Container()[copyslc] = M.Container()[copyslc];
 
 	return res;
 	
@@ -786,7 +786,7 @@ squeeze (const Matrix<T>& M) {
 	for (size_t i = 0; i < INVALID_DIM; i++)
 		res.Res(i) = resl[i];
 
-	res.Dat() = M.Dat();
+	res.Container() = M.Container();
 	
 	return res;
 	

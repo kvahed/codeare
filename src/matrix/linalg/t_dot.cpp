@@ -2,6 +2,7 @@
 #include "Creators.hpp"
 #include "Lapack.hpp"
 
+
 template<class T> void dot_check () {
 
     Matrix<T> A = rand<T> (4,1);
@@ -15,6 +16,7 @@ template<class T> void dot_check () {
 #endif
 
 }
+
 
 int main (int args, char** argv) {
 

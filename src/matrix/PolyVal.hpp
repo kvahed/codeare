@@ -69,7 +69,7 @@ public:
 
 		Reset();
 		
-		if (!Initialise (x.Data(), y.Data(), intm, size(x,0)))
+		if (!Initialise (x.Memory(), y.Memory(), intm, size(x,0)))
 			printf ("  PolyVal construction failed!\n");
 		
 	}
@@ -88,7 +88,7 @@ public:
 	
 		Reset ();
 	
-		if (!Initialise (x.Data(), y, intm, size(x,0)))
+		if (!Initialise (x.Memory(), y, intm, size(x,0)))
 			printf ("  PolyVal construction failed!\n");
 
 	}

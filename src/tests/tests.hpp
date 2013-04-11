@@ -14,6 +14,7 @@
 #include "algos.hpp"
 #include "spiral.hpp"
 #include "syngo.hpp"
+//#include "ocltest.hpp"
 #include "iotest.hpp"
 #include "creators.hpp"
 #include "karb.hpp"

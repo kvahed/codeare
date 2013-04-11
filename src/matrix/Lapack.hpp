@@ -352,12 +352,15 @@ inv (const Matrix<T>& m) {
  * @return               Moore-Penrose pseudoinverse
 */
 template<class T> static Matrix<T> 
-pinv (const Matrix<T>& m, double rcond = 1.0) {
+pinv2 (const Matrix<T>& m, double rcond = 1.0) {
+
+	typedef typename LapackTraits<T>::Type2 T2;
+	Matrix<T> mm = m;
 
     assert (Is2D(m));
     
-	void *s = 0, *rwork = 0;
-	T    *work = 0, wopt = T(0), rwopt = T(0);
+	T2   *s = 0, *rwork = 0, rwopt;
+	T    *work = 0, wopt = T(0);
 	int  *iwork = 0, iwopt = 0;
 	
 	int  M      =  size(m, 0);
@@ -374,23 +377,27 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	if (typeid (T) == typeid(cxfl) || typeid (T) == typeid(cxdb))
 		swork /= 2;
 	
-	s      =        malloc (swork);
+	s      =    (T2*)    malloc (swork);
 	
 	Matrix<T> b = eye<T>(ldb);
 
-	LapackTraits<T>::gelsd (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, rcond, &rank, &wopt, &lwork, &rwopt, &iwopt, &info);
+	LapackTraits<T>::gelsd (&M, &N, &nrhs, &mm[0], &lda, &b[0], &ldb, s, rcond,
+			&rank, &wopt, &lwork, &rwopt, &iwopt, &info);
 	
 	lwork = (int) creal(wopt);
 	
 	if      (typeid(T) == typeid(cxfl) || 
 			 typeid(T) == typeid(cxdb))
-		rwork =    malloc ((sizeof(T)/2) * (int) creal(rwopt));
+		rwork =  (T2*) malloc ((sizeof(T2)) * (int) creal(rwopt));
 	
 	iwork = (int*) malloc (sizeof(int) * iwopt);
 	work  = (T*)   malloc (sizeof(T)   * lwork);
 	
-	LapackTraits<T>::gelsd (&M, &N, &nrhs, m.Data(), &lda, &b[0], &ldb, s, rcond, &rank, work, &lwork,   rwork,  iwork, &info);
+	LapackTraits<T>::gelsd (&M, &N, &nrhs, &mm[0], &lda, &b[0], &ldb, s, rcond,
+			&rank, work, &lwork,   rwork,  iwork, &info);
 	
+	printf ("%d\n", info);
+
 	if (M > N)
 		for (int i = 0; i < M; i++)
 			memcpy (&b[i*N], &b[i*M], N * sizeof(T));
@@ -413,7 +420,54 @@ pinv (const Matrix<T>& m, double rcond = 1.0) {
 	
 }
 	
-	
+
+template<class T> static Matrix<T>
+pinv (const Matrix<T>& m, const char& trans = 'N') {
+
+	Matrix<T> mm = m;
+
+    assert (Is2D(m));
+
+	T    *work, wopt = T(0);
+
+	int  M      =  size(m, 0);
+	int  N      =  size(m, 1);
+
+	int  nrhs   =  M;
+	int  lda    =  M;
+	int  ldb    =  MAX(M,N);
+	int  lwork  = -1;
+	int  rank   =  0;
+	int  info   =  0;
+	work        = (T*) malloc (sizeof(T));
+
+	Matrix<T> b = eye<T>(ldb);
+
+	LapackTraits<T>::gels (trans, M, N, nrhs, &mm[0], lda, &b[0], ldb, work, lwork, info);
+
+	lwork = (int) creal(*work);
+	work  = (T*) malloc (sizeof(T) * lwork);
+
+	LapackTraits<T>::gels (trans, M, N, nrhs, &mm[0], lda, &b[0], ldb, work, lwork, info);
+
+	if (M > N)
+		for (int i = 0; i < M; i++)
+			memcpy (&b[i*N], &b[i*M], N * sizeof(T));
+
+	b = resize (b, N, M);
+
+	free (work);
+
+	if (info > 0)
+		printf ("ERROR XGELS: the algorithm for computing the SVD failed to converge;\n %i off-diagonal elements of an intermediate bidiagonal form\n did not converge to zero.", info);
+	else if (info < 0)
+		printf ("ERROR XGELS: the %i-th argument had an illegal value.", -info);
+
+	return b;
+
+}
+
+
 /**
  * @brief        Cholesky decomposition of positive definite quadratic matrix
  *
@@ -511,7 +565,7 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
 	
 	Matrix<T> C(m,n);
 	
-	LapackTraits<T>::gemm (&transa, &transb, &m, &n, &k, &alpha, A.Data(), &ah, B.Data(), &bh, &beta, &C[0], &ldc);
+	LapackTraits<T>::gemm (&transa, &transb, &m, &n, &k, &alpha, A.Memory(), &ah, B.Memory(), &bh, &beta, &C[0], &ldc);
 
 	return C;
 	
@@ -537,7 +591,7 @@ norm (const Matrix<T>& M) {
 	int n    = (int) numel (M);
 	int incx = 1;
 
-	return creal(LapackTraits<T>::nrm2 (n, M.Data(), incx));
+	return creal(LapackTraits<T>::nrm2 (n, M.Memory(), incx));
 
 }
 
@@ -568,7 +622,7 @@ dotc (const Matrix<T>& A, const Matrix<T>& B) {
 	res = T(0.0);
 	one = 1;
 	
-	LapackTraits<T>::dotc (n, A.Data(), one, B.Data(), one, &res);
+	LapackTraits<T>::dotc (n, A.Memory(), one, B.Memory(), one, &res);
 	
 	return res;
 	
@@ -607,7 +661,7 @@ dot  (const Matrix<T>& A, const Matrix<T>& B) {
 	res = T(0.0);
 	one = 1;
 
-	LapackTraits<T>::dot (n, A.Data(), one, B.Data(), one, &res);
+	LapackTraits<T>::dot (n, A.Memory(), one, B.Memory(), one, &res);
 	
 	return res;
 	
@@ -667,7 +721,7 @@ gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
 	
 	Matrix<T> y ((trans == 'N') ? m : n, 1);
 
-	LapackTraits<T>::gemv (&trans, &m, &n, &alpha, A.Data(), &ah, x.Data(), &one, &beta, &y[0], &one);
+	LapackTraits<T>::gemv (&trans, &m, &n, &alpha, A.Memory(), &ah, x.Memory(), &one, &beta, &y[0], &one);
 	
 	return y;
 	

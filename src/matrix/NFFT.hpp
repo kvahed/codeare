@@ -122,7 +122,7 @@ public:
 	KSpace (const Matrix<T>& k) {
 		
 		if (sizeof(T) == sizeof(double))
-			memcpy (m_fplan.x, k.Data(), m_fplan.M_total * m_rank * sizeof(double));
+			memcpy (m_fplan.x, k.Memory(), m_fplan.M_total * m_rank * sizeof(double));
 		else 
 			for (size_t i = 0; i < m_fplan.M_total * m_rank; i++)
 				m_fplan.x[i] = k[i];
@@ -139,7 +139,7 @@ public:
 	Weights (const Matrix<T>& w) {
 		
 		if (sizeof(T) == sizeof(double))
-			memcpy (m_iplan.w, w.Data(), m_fplan.M_total * sizeof(double));
+			memcpy (m_iplan.w, w.Memory(), m_fplan.M_total * sizeof(double));
 		else 
 			for (size_t i = 0; i < m_fplan.M_total; i++)
 				m_iplan.w[i] = w[i];
@@ -162,7 +162,7 @@ public:
 		Matrix< std::complex<T> > out (m_M,1);
 		
 		if (sizeof(T) == sizeof(double))
-			memcpy (m_fplan.f_hat, m.Data(), m_imgsz * sizeof (std::complex<T>));
+			memcpy (m_fplan.f_hat, m.Memory(), m_imgsz * sizeof (std::complex<T>));
 		else 
 			for (size_t i = 0; i < m_imgsz; i++) {
 				m_fplan.f_hat[i][0] = creal(m[i]);
@@ -194,7 +194,7 @@ public:
 		Matrix< std::complex<T> > out (m_N[0], m_N[1], m_N[2], m_N[3]);
 		
 		if (sizeof(T) == sizeof(double))
-			memcpy (m_iplan.y, m.Data(), m_M * sizeof ( std::complex<T> ));
+			memcpy (m_iplan.y, m.Memory(), m_M * sizeof ( std::complex<T> ));
 		else 
 			for (size_t i = 0; i < m_M; i++) {
 				m_iplan.y[i][0] = creal(m[i]);

@@ -3134,6 +3134,12 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MKDIR_P" >&5
 $as_echo "$MKDIR_P" >&6; }
 
+mkdir_p="$MKDIR_P"
+case $mkdir_p in
+  [\\/$]* | ?:[\\/]*) ;;
+  */*) mkdir_p="\$(top_builddir)/$mkdir_p" ;;
+esac
+
 for ac_prog in gawk mawk nawk awk
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -3265,12 +3271,6 @@ AUTOHEADER=${AUTOHEADER-"${am_missing_run}autoheader"}
 
 
 MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
-
-# For better backward compatibility.  To be removed once Automake 1.9.x
-# dies out for good.  For more background, see:
-# <http://lists.gnu.org/archive/html/automake/2012-07/msg00001.html>
-# <http://lists.gnu.org/archive/html/automake/2012-07/msg00014.html>
-mkdir_p='$(MKDIR_P)'
 
 # We need awk for the "check" target.  The system "awk" is bad on
 # some platforms.
@@ -11796,10 +11796,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"ad0bb123\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"6c81a7bf\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Sat Mar 30 02:20:33 2013 -0400\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"\"" >>confdefs.h
 
 
 # copyright notice
