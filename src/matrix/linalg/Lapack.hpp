@@ -50,7 +50,7 @@
  * @param  jobvr  Compute right vectors ('N'/'V')
  * @return        Status of driver
  */
-template <class T, class S> int
+template <class T, class S> inline int
 eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char& jobvl = 'N', const char& jobvr = 'N') {
 	
 
@@ -155,7 +155,7 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
  * @return          Status of the driver
  */
 
-template<class T, class S> int 
+template<class T, class S> inline int 
 svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& jobz = 'N') {
 
     assert (Is2D(IN));
@@ -234,28 +234,28 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	
 } 
 // Convenience calls (for s = svd (A))	
-Matrix<float>
+inline Matrix<float> 
 svd (const Matrix<cxfl>& A) {
     Matrix<float> s;
     Matrix<cxfl> u,v;
     svd(A, s, u, v);
     return s;
 } 
-Matrix<float>
+inline  Matrix<float> 
 svd (const Matrix<float>& A) {
     Matrix<float> s;
     Matrix<float> u,v;
     svd(A, s, u, v);
     return s;
 } 
-Matrix<double>
+inline Matrix<double>
 svd (const Matrix<cxdb>& A) {
     Matrix<double> s;
     Matrix<cxdb> u,v;
     svd(A, s, u, v);
     return s;
 } 
-Matrix<double>
+inline Matrix<double>
 svd (const Matrix<double>& A) {
     Matrix<double> s;
     Matrix<double> u,v;
@@ -279,7 +279,7 @@ svd (const Matrix<double>& A) {
  * @param  m             Matrix
  * @return               Inverse
 */
-template <class T> Matrix<T> 
+template <class T> inline Matrix<T> 
 inv (const Matrix<T>& m) {
 	
 	// 2D 
@@ -351,7 +351,7 @@ inv (const Matrix<T>& m) {
  * @param  rcond         Condition number
  * @return               Moore-Penrose pseudoinverse
 */
-template<class T> Matrix<T> 
+template<class T> inline Matrix<T> 
 pinv2 (const Matrix<T>& m, const double& rcond = 1.0) {
 
 	typedef typename LapackTraits<T>::Type2 T2;
@@ -421,7 +421,7 @@ pinv2 (const Matrix<T>& m, const double& rcond = 1.0) {
 }
 	
 
-template<class T> Matrix<T>
+template<class T> inline Matrix<T>
 pinv (const Matrix<T>& m, const char& trans = 'N') {
 
 	Matrix<T> mm = m;
@@ -485,7 +485,7 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
  * @param  uplo  Use upper/lower triangle for decomposition ('U': default/'L')
  * @return       Cholesky decomposition
  */
-template<class T> Matrix<T> 
+template<class T> inline Matrix<T> 
 chol (const Matrix<T>& A, const char& uplo = 'U') {
 
     assert(Is2D(A));
@@ -528,7 +528,7 @@ chol (const Matrix<T>& A, const char& uplo = 'U') {
  * @param  transb  (N: ...*B | T: ...*B.' | C: ...*B') transpose right factor
  * @return         Product
  */
-template<class T> Matrix<T> 
+template<class T> inline Matrix<T> 
 gemm (const Matrix<T>& A, const Matrix<T>& B, const char& transa = 'N', const char& transb = 'N') {
 
     assert (Is1D(A)||Is2D(A));
@@ -585,7 +585,7 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, const char& transa = 'N', const ch
  * @param  M           Input
  * @return             Eclidean norm
  */
-template<class T> double
+template<class T> inline double
 norm (const Matrix<T>& M) {
 
 	int n    = (int) numel (M);
@@ -610,7 +610,7 @@ norm (const Matrix<T>& M) {
  * @param  B           Right factor
  * @return             A'*B
  */
-template <class T> T 
+template <class T> inline T 
 dotc (const Matrix<T>& A, const Matrix<T>& B) {
 
 	int n, one;
@@ -629,7 +629,7 @@ dotc (const Matrix<T>& A, const Matrix<T>& B) {
 }
 
 
-template <class T> T 
+template <class T> inline T 
 DOTC (const Matrix<T>& A, const Matrix<T>& B) {
 	return dotc (A,B);
 }
@@ -649,7 +649,7 @@ DOTC (const Matrix<T>& A, const Matrix<T>& B) {
  * @param  B           Right factor
  * @return             A*B
  */
-template <class T> T 
+template <class T> inline T 
 dot  (const Matrix<T>& A, const Matrix<T>& B) {
 
 	int n, one;
@@ -669,7 +669,7 @@ dot  (const Matrix<T>& A, const Matrix<T>& B) {
 
 
 
-template <class T> T 
+template <class T> inline T 
 DOT  (const Matrix<T>& A, const Matrix<T>& B) {
 	return dot (A, B);
 }
@@ -691,7 +691,7 @@ DOT  (const Matrix<T>& A, const Matrix<T>& B) {
  * 
  * @return            A*x
  */
-template<class T> Matrix<T> 
+template<class T> inline Matrix<T> 
 gemv (const Matrix<T>& A, const Matrix<T>& x, const char& trans = 'N') {
 
     assert (Is1D(x));

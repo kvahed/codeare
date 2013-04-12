@@ -33,7 +33,7 @@
  * @param   m     TO be shifted
  * @return        Shifted
  */
-template<class T> inline static Matrix<T>
+template<class T> inline Matrix<T>
 fftshift (const Matrix<T>& m) {
 	
 	assert (Is1D(m) || Is2D(m) || Is3D(m));
@@ -57,7 +57,7 @@ fftshift (const Matrix<T>& m) {
  * @param   t     Scaling factor
  * @return        Window
  */
-template <class T> inline static Matrix< std::complex<T> >
+template <class T> inline Matrix< std::complex<T> >
 hannwindow (const Matrix<size_t>& size, const T& t) {
 	
 	size_t dim = size.Dim(0);
@@ -232,6 +232,8 @@ public:
 	}
 
 
+    DFT () {}
+    
 	/**
 	 * @brief        Clean up RAM, destroy plans
 	 */
@@ -310,6 +312,30 @@ public:
 	}
 	
 	
+	/**
+	 * @brief    Forward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	virtual Matrix< std::complex<T> >
+	operator* (const Matrix< std::complex<T> >& m) const {
+		return Trafo(m);
+	}
+	
+
+	/**
+	 * @brief    Backward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	virtual Matrix< std::complex<T> >
+	operator->* (const Matrix< std::complex<T> >& m) const {
+		return Adjoint (m);
+	}
+
+
 private:
 	
 

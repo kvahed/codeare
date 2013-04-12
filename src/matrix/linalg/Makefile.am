@@ -1,6 +1,6 @@
 SUBDIRS = tests
 
-AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/misc 
+AM_CPPFLAGS = $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/misc 
 lib_LTLIBRARIES = libcodeare-linalg.la
 libcodeare_linalg_la_SOURCES = Lapack.cpp
 

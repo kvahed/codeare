@@ -25,8 +25,10 @@
 #include "CX.hpp"
 #include "SEM.hpp"
 #include "MRI.hpp"
-#include "linalg/Lapack.hpp"
+#include "Lapack.hpp"
+#include "tinyxml.h"
 
+#include "Workspace.hpp"
 
 /**
  * @brief Non-Cartesian SENSE<br/>
@@ -104,7 +106,7 @@ public:
 #pragma omp parallel default (shared)
 		{
 			if (params.exists("np"))
-				np = boost::any_cast<int>("np");
+				np = boost::any_cast<int>(params["np"]);
 			else
 				np = omp_get_num_threads ();
 		}
@@ -182,7 +184,7 @@ public:
 	/**
 	 * @brief        Clean up and destruct NFFT plans
 	 */ 
-	~NCSENSE () {
+	virtual ~NCSENSE () {
 		
 		int np = 1;
 		
@@ -242,7 +244,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix< std::complex<T> >
+	virtual Matrix< std::complex<T> >
 	Trafo       (const Matrix< std::complex<T> >& m) const {
 
 		Matrix< std::complex<T> > tmp = m / m_ic;
@@ -260,8 +262,8 @@ public:
 	 *
 	 * @return   Transform
 	 */
-	Matrix< std::complex<T> >
-	Trafo       (const Matrix< std::complex<T> >& m, const Matrix< std::complex<T> >& sens, const bool recal = true) const {
+	virtual Matrix< std::complex<T> >
+	Trafo       (const Matrix< std::complex<T> >& m, const Matrix< std::complex<T> >& sens, const bool& recal = true) const {
 
 		return E (m / ((recal) ? IntensityMap (sens) : m_ic), sens, m_fts);
 
@@ -274,7 +276,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix< std::complex<T> >
+	virtual Matrix< std::complex<T> >
 	Adjoint     (const Matrix< std::complex<T> >& m) const {
 
 		return this->Adjoint (m, m_sm, false);
@@ -291,7 +293,7 @@ public:
 	 *
 	 * @return   Transform
 	 */
-	Matrix< std::complex<T> >
+	virtual Matrix< std::complex<T> >
 	Adjoint (const Matrix< std::complex<T> >& m,
 			 const Matrix< std::complex<T> >& sens,
 			 const bool recal = true) const {
@@ -338,6 +340,29 @@ public:
 	}
 	
 	
+	/**
+	 * @brief    Forward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	virtual Matrix< std::complex<T> >
+	operator* (const Matrix< std::complex<T> >& m) const {
+		return Trafo(m);
+	}
+	
+
+	/**
+	 * @brief    Backward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	virtual Matrix< std::complex<T> >
+	operator->* (const Matrix< std::complex<T> >& m) const {
+		return Adjoint (m);
+	}
+
 	
 	
 private:

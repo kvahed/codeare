@@ -26,7 +26,7 @@
 #include "DFT.hpp"
 #include "Access.hpp"
 #include "Creators.hpp"
-#include "linalg/Lapack.hpp"
+#include "Lapack.hpp"
 
 /**
  * @brief SENSE: Sensitivity Encoding for Fast MRI<br/>
@@ -244,6 +244,29 @@ public:
 
 	}
 
+
+	/**
+	 * @brief    Forward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	virtual Matrix< std::complex<T> >
+	operator* (const Matrix< std::complex<T> >& m) const {
+		return Trafo(m);
+	}
+	
+
+	/**
+	 * @brief    Backward transform
+	 *
+	 * @param  m To transform
+	 * @return   Transform
+	 */
+	virtual Matrix< std::complex<T> >
+	operator->* (const Matrix< std::complex<T> >& m) const {
+		return Adjoint (m);
+	}
 
 private:
 

@@ -79,8 +79,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix< std::complex<T> >
-	operator*   (const Matrix< std::complex<T> >& m) const {
+	virtual Matrix< std::complex<T> >
+	operator* (const Matrix< std::complex<T> >& m) const {
 		return Trafo(m);
 	}
 	
@@ -91,7 +91,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	Matrix< std::complex<T> >
+	virtual Matrix< std::complex<T> >
 	operator->* (const Matrix< std::complex<T> >& m) const {
 		return Adjoint (m);
 	}

@@ -1,2 +1,2 @@
-SUBDIRS = io arithmetic linalg
+SUBDIRS = io arithmetic linalg ft
 EXTRA_DIST = Access.hpp Algos.hpp CGRAPPA.hpp CSENSE.hpp CX.hpp Complex.hpp Creators.hpp DFT.hpp DWT.hpp DWTTraits.hpp FFTWTraits.hpp FT.hpp IO.hpp Interpolate.hpp Lapack.hpp LapackTraits.hpp MCGLS.hpp MITK.hpp MRI.hpp Math.hpp Matrix.hpp NCSENSE.hpp NFFT.hpp NFFTTraits.hpp OMP.hpp PIO.hpp PMatrix.hpp PolyVal.hpp SEM.hpp SSE.hpp SSETraits.hpp ScalapackTraits.hpp Statistics.hpp TVOP.hpp XProtocolParser.hpp 

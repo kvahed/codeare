@@ -22,7 +22,7 @@
 #define __CONFIGURABLE_HPP__
 
 #include "tinyxml.h"
-#include "tinyxml/xpath_static.h"
+#include "xpath_static.h"
 
 #include <string>
 

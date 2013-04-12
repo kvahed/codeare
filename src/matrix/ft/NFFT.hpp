@@ -235,7 +235,7 @@ public:
 	Solver*
 	IPlan         () {
 		
-		return &m_fplan;
+		return &m_iplan;
 		
 	}
 	
