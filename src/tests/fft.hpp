@@ -1,4 +1,4 @@
-#include "matrix/DFT.hpp"
+#include "matrix/ft/DFT.hpp"
 
 template <class T> bool
 fftwtest (Connector<T>* rc) {
