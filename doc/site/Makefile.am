@@ -22,7 +22,7 @@ if BUILD_DOCS
 %.html: xml/%.xml
 	$(XSLTPROC) $(STYLESHEET) $< > $@
 
+endif
+
 clean-local:
 	rm -f *.html
-
-endif

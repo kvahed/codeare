@@ -519,6 +519,7 @@ uninstall-am: uninstall-apiDATA uninstall-local
 @BUILD_API_TRUE@clean-local:
 @BUILD_API_TRUE@	if test -d api; then rm -rf api; fi
 @BUILD_API_TRUE@	if test -f doxygen-build.stamp; then rm -f doxygen-build.stamp; fi
+@BUILD_API_TRUE@	if test -f doxy-codeare.conf; then rm -f doxy-codeare.conf; fi
 
 @BUILD_API_FALSE@doxygen-build.stamp:
 

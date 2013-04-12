@@ -39,6 +39,7 @@ uninstall-local:
 clean-local:
 	if test -d api; then rm -rf api; fi
 	if test -f doxygen-build.stamp; then rm -f doxygen-build.stamp; fi
+	if test -f doxy-codeare.conf; then rm -f doxy-codeare.conf; fi
 
 else 
 
