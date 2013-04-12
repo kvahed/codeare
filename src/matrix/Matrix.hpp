@@ -39,7 +39,7 @@ enum IceDim {
 #endif
 
 
-#include "ScalapackTraits.hpp"
+#include "linalg/ScalapackTraits.hpp"
 
 
 #include "config.h"
@@ -2039,7 +2039,7 @@ protected:
 
 
 
-#include "Lapack.hpp"
+#include "linalg/Lapack.hpp"
 
 template <class T, paradigm P> Matrix<T,P> 
 Matrix<T,P>::prodt (const Matrix<T,P> &M) const {

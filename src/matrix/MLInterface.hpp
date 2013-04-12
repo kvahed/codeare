@@ -17,15 +17,11 @@
     #ifndef NOUNDERSCORE
     #define NOUNDERSCORE
     #endif
-  #endif
-
-  #if defined(MRVISTA)
+  #elif defined(MRVISTA)
     #ifndef NOUNDERSCORE
     #define NOUNDERSCORE
     #endif
-  #endif
-
-  #if defined(__APPLE__)
+  #else
     #ifndef UNDERSCORE
     #define UNDERSCORE
     #endif

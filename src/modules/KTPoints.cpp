@@ -20,7 +20,6 @@
 
 #include "KTPoints.hpp"
 #include "PTXINIFile.hpp"
-#include "Lapack.hpp"
 #include "IO.hpp"
 #include "Creators.hpp"
 

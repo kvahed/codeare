@@ -21,7 +21,6 @@
 #include "CGSENSE.hpp"
 #include "Noise.hpp"
 #include "Toolbox.hpp"
-#include "Lapack.hpp"
 #include "Creators.hpp"
 
 #include <math.h>

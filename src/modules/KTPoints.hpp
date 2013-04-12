@@ -24,7 +24,6 @@
 #define __KT_POINTS_HPP__
 
 #include "ReconStrategy.hpp"
-#include "Lapack.hpp"
 #include "Toolbox.hpp"
 #include "IO.hpp"
 
