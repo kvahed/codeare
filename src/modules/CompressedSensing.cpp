@@ -20,8 +20,6 @@
 
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
-#include "TVOP.hpp"
-#include "IO.hpp"
 #include "DFT.hpp"
 
 using namespace RRStrategy;

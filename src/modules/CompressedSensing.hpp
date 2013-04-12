@@ -25,11 +25,12 @@
 #define __COMPRESSED_SENSING_HPP__
 
 #include "ReconStrategy.hpp"
+#include "Algos.hpp"
 #include "FT.hpp"
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
-#include "Algos.hpp"
+#include "linalg/Lapack.hpp"
 
 #include <pthread.h>
 /**

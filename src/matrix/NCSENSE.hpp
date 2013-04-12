@@ -25,6 +25,7 @@
 #include "CX.hpp"
 #include "SEM.hpp"
 #include "MRI.hpp"
+#include "linalg/Lapack.hpp"
 
 
 /**

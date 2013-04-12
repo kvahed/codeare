@@ -21,6 +21,7 @@
 #include "CGSENSE.hpp"
 #include "Noise.hpp"
 #include "Toolbox.hpp"
+#include "Algos.hpp"
 #include "Creators.hpp"
 
 #include <math.h>

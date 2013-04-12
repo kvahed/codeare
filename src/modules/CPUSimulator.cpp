@@ -1,5 +1,6 @@
 #include "CPUSimulator.hpp"
 #include "Creators.hpp"
+#include "linalg/Lapack.hpp"
 #include "MRI.hpp"
 
 using namespace RRStrategy;

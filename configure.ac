@@ -861,6 +861,7 @@ ACX_SCALAPACK
 # Generate files
 AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile\
  doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile\
- src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile])
+ src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile
+ src/matrix/linalg/tests/Makefile])
 AC_OUTPUT
 

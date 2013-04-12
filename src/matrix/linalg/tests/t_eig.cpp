@@ -1,4 +1,5 @@
 #include "Matrix.hpp"
+#include "Algos.hpp"
 #include "Creators.hpp"
 #include "Lapack.hpp"
 
@@ -24,7 +25,7 @@ template<class T, class S> void eig_check () {
 int main (int args, char** argv) {
 
     //eig_check<float,cxfl>();
-    eig_check<double,cxdb>();
+    //eig_check<double,cxdb>();
     //eig_check<cxfl,cxfl>();
     //eig_check<cxdb,cxdb>();
     

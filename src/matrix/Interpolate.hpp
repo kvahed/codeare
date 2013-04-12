@@ -2,6 +2,7 @@
 #define __INTERPOLATE_HPP__
 
 #include "PolyVal.hpp"
+#include "Algos.hpp"
 #include "Access.hpp"
 #include "IO.hpp" 
 

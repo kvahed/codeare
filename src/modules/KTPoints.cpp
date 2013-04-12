@@ -20,8 +20,6 @@
 
 #include "KTPoints.hpp"
 #include "PTXINIFile.hpp"
-#include "IO.hpp"
-#include "Creators.hpp"
 
 using namespace RRStrategy;
 

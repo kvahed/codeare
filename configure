@@ -11796,10 +11796,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"6c81a7bf\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"b0063b8d\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Fri Apr 12 08:33:57 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -25218,7 +25218,7 @@ fi
 
 
 # Generate files
-ac_config_files="$ac_config_files src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile"
+ac_config_files="$ac_config_files src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile src/matrix/linalg/tests/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -26475,6 +26475,7 @@ do
     "src/matrix/io/Makefile") CONFIG_FILES="$CONFIG_FILES src/matrix/io/Makefile" ;;
     "src/matrix/arithmetic/Makefile") CONFIG_FILES="$CONFIG_FILES src/matrix/arithmetic/Makefile" ;;
     "src/matrix/linalg/Makefile") CONFIG_FILES="$CONFIG_FILES src/matrix/linalg/Makefile" ;;
+    "src/matrix/linalg/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/matrix/linalg/tests/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

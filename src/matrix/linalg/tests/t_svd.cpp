@@ -1,4 +1,5 @@
 #include "Matrix.hpp"
+#include "Algos.hpp"
 #include "Creators.hpp"
 #include "Lapack.hpp"
 
@@ -12,7 +13,6 @@ template<class T, class S> void svd_check () {
     #endif
     fflush (stdout);
     
-    //svd (A, s, U, V, 'N');
     svd (A, s, U, V, 'N');
     
     #ifdef VERBOSE

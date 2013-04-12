@@ -1,4 +1,6 @@
 #include "SENSE.hpp"
+#include "Algos.hpp"
+#include "Creators.hpp"
 
 using namespace RRStrategy;
 

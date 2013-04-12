@@ -19,7 +19,7 @@
  */
 
 #include "GRAPPA.hpp"
-//#include "CGRAPPA.hpp"
+
 using namespace RRStrategy;
 
 error_code

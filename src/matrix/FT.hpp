@@ -24,7 +24,6 @@
 #include "CX.hpp"
 #include "Params.hpp"
 
-
 /**
  * @brief  Base class for single and double precision Fourier transforms
  */

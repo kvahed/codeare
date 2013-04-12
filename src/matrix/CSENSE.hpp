@@ -26,6 +26,7 @@
 #include "DFT.hpp"
 #include "Access.hpp"
 #include "Creators.hpp"
+#include "linalg/Lapack.hpp"
 
 /**
  * @brief SENSE: Sensitivity Encoding for Fast MRI<br/>

@@ -1,5 +1,6 @@
 #include "Statistics.hpp"
 #include "Interpolate.hpp"
+#include "linalg/Lapack.hpp"
 
 template <class T> bool
 algotest (Connector<T>* rc) {

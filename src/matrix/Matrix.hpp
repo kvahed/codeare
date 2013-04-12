@@ -2039,7 +2039,7 @@ protected:
 
 
 
-#include "linalg/Lapack.hpp"
+//#include "linalg/Lapack.hpp"
 
 template <class T, paradigm P> Matrix<T,P> 
 Matrix<T,P>::prodt (const Matrix<T,P> &M) const {
@@ -2319,11 +2319,13 @@ Matrix<T,P>::Matrix (const Matrix<T,P> &M) {
 
 		T t;
 		Validate (t);
-		
-		memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
-		memcpy (_res, M.Res(), INVALID_DIM * sizeof( float));
-		
-		_M = M.Container();
+
+        for (size_t i = 0; i < INVALID_DIM; i++) {
+            _dim[i] = M.Dim()[i];
+            _res[i] = M.Res()[i];
+        }
+        
+        _M = M.Container();
 		
 	}
 
@@ -2341,8 +2343,10 @@ Matrix<T,P>::operator= (const Matrix<T,P>& M) {
     
     if (this != &M) {
 
-        memcpy (_dim, M.Dim(), INVALID_DIM * sizeof(size_t));
-        memcpy (_res, M.Res(), INVALID_DIM * sizeof( float));
+        for (size_t i = 0; i < INVALID_DIM; i++) {
+            _dim[i] = M.Dim()[i];
+            _res[i] = M.Res()[i];
+        }
         
         _M = M.Container();
         

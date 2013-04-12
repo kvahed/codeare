@@ -19,6 +19,7 @@
  */
 
 #include "DumpToFile.hpp"
+#include "Algos.hpp"
 #include "IO.hpp"
 
 using namespace RRStrategy;

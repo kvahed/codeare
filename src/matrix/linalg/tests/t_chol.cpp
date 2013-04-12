@@ -1,4 +1,5 @@
 #include "Matrix.hpp"
+#include "Algos.hpp"
 #include "Creators.hpp"
 #include "Lapack.hpp"
 

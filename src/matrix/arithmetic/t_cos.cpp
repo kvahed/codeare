@@ -1,4 +1,5 @@
 #include "Trigonometry.hpp"
+#include "Algos.hpp"
 #include "Creators.hpp"
 
 template<class T>

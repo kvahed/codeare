@@ -22,9 +22,10 @@
 #define __NFFT_HPP__
 
 #include "NFFTTraits.hpp"
+#include "Algos.hpp"
 #include "FT.hpp"
 #include "CX.hpp"
-
+#include "Creators.hpp"
 /**
  * @brief Matrix templated ND non-equidistand Fourier transform with NFFT 3 (TU Chemnitz)<br/>
  *        Double and single precision

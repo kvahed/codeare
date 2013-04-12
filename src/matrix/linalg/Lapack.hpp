@@ -21,10 +21,10 @@
 #ifndef __LAPACK_HPP__
 #define __LAPACK_HPP__
 
-#include "LapackTraits.hpp"
 #include "Matrix.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "LapackTraits.hpp"
 
 
 /**
@@ -50,7 +50,7 @@
  * @param  jobvr  Compute right vectors ('N'/'V')
  * @return        Status of driver
  */
-template <class T, class S> static int
+template <class T, class S> int
 eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char& jobvl = 'N', const char& jobvr = 'N') {
 	
 
@@ -155,7 +155,7 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
  * @return          Status of the driver
  */
 
-template<class T, class S> static int 
+template<class T, class S> int 
 svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& jobz = 'N') {
 
     assert (Is2D(IN));
@@ -234,28 +234,28 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	
 } 
 // Convenience calls (for s = svd (A))	
-static Matrix<float>
+Matrix<float>
 svd (const Matrix<cxfl>& A) {
     Matrix<float> s;
     Matrix<cxfl> u,v;
     svd(A, s, u, v);
     return s;
 } 
-static Matrix<float>
+Matrix<float>
 svd (const Matrix<float>& A) {
     Matrix<float> s;
     Matrix<float> u,v;
     svd(A, s, u, v);
     return s;
 } 
-static Matrix<double>
+Matrix<double>
 svd (const Matrix<cxdb>& A) {
     Matrix<double> s;
     Matrix<cxdb> u,v;
     svd(A, s, u, v);
     return s;
 } 
-static Matrix<double>
+Matrix<double>
 svd (const Matrix<double>& A) {
     Matrix<double> s;
     Matrix<double> u,v;
@@ -279,7 +279,7 @@ svd (const Matrix<double>& A) {
  * @param  m             Matrix
  * @return               Inverse
 */
-template <class T> static Matrix<T> 
+template <class T> Matrix<T> 
 inv (const Matrix<T>& m) {
 	
 	// 2D 
@@ -351,8 +351,8 @@ inv (const Matrix<T>& m) {
  * @param  rcond         Condition number
  * @return               Moore-Penrose pseudoinverse
 */
-template<class T> static Matrix<T> 
-pinv2 (const Matrix<T>& m, double rcond = 1.0) {
+template<class T> Matrix<T> 
+pinv2 (const Matrix<T>& m, const double& rcond = 1.0) {
 
 	typedef typename LapackTraits<T>::Type2 T2;
 	Matrix<T> mm = m;
@@ -421,7 +421,7 @@ pinv2 (const Matrix<T>& m, double rcond = 1.0) {
 }
 	
 
-template<class T> static Matrix<T>
+template<class T> Matrix<T>
 pinv (const Matrix<T>& m, const char& trans = 'N') {
 
 	Matrix<T> mm = m;
@@ -485,8 +485,8 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
  * @param  uplo  Use upper/lower triangle for decomposition ('U': default/'L')
  * @return       Cholesky decomposition
  */
-template<class T> static Matrix<T> 
-chol (const Matrix<T>& A, const char uplo = 'U') {
+template<class T> Matrix<T> 
+chol (const Matrix<T>& A, const char& uplo = 'U') {
 
     assert(Is2D(A));
 	
@@ -528,8 +528,8 @@ chol (const Matrix<T>& A, const char uplo = 'U') {
  * @param  transb  (N: ...*B | T: ...*B.' | C: ...*B') transpose right factor
  * @return         Product
  */
-template<class T> static Matrix<T> 
-gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = 'N') {
+template<class T> Matrix<T> 
+gemm (const Matrix<T>& A, const Matrix<T>& B, const char& transa = 'N', const char& transb = 'N') {
 
     assert (Is1D(A)||Is2D(A));
     assert (Is1D(B)||Is2D(B));
@@ -585,7 +585,7 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
  * @param  M           Input
  * @return             Eclidean norm
  */
-template<class T> static double
+template<class T> double
 norm (const Matrix<T>& M) {
 
 	int n    = (int) numel (M);
@@ -610,7 +610,7 @@ norm (const Matrix<T>& M) {
  * @param  B           Right factor
  * @return             A'*B
  */
-template <class T> static T 
+template <class T> T 
 dotc (const Matrix<T>& A, const Matrix<T>& B) {
 
 	int n, one;
@@ -629,7 +629,7 @@ dotc (const Matrix<T>& A, const Matrix<T>& B) {
 }
 
 
-template <class T> static T 
+template <class T> T 
 DOTC (const Matrix<T>& A, const Matrix<T>& B) {
 	return dotc (A,B);
 }
@@ -692,7 +692,7 @@ DOT  (const Matrix<T>& A, const Matrix<T>& B) {
  * @return            A*x
  */
 template<class T> Matrix<T> 
-gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
+gemv (const Matrix<T>& A, const Matrix<T>& x, const char& trans = 'N') {
 
     assert (Is1D(x));
     assert (Is1D(A)||Is2D(A));

@@ -25,6 +25,7 @@
 #include "ReconStrategy.hpp"
 #include "Statistics.hpp"
 #include "Toolbox.hpp"
+#include "linalg/Lapack.hpp"
 #include "IO.hpp"
 #include "DFT.hpp"
 #include "arithmetic/Trigonometry.hpp"

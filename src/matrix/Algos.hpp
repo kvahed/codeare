@@ -24,7 +24,7 @@
 
 #include "IO.hpp"
 #include "math.h"
-#include "limits.h"
+#include <limits>
 
 template <bool> struct static_assert;
 template <> struct static_assert<true> { };

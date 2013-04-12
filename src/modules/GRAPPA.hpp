@@ -22,6 +22,7 @@
 #define __GRAPPA_HPP__
 
 #include "ReconStrategy.hpp"
+#include "Algos.hpp"
 #include "IO.hpp"
 #include "Toolbox.hpp"
 #include "Creators.hpp"
