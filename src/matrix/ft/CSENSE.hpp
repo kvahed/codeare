@@ -172,14 +172,16 @@ public:
 			Matrix<std::complex<T> > gf (af,  1);
 			Matrix<std::complex<T> > reg = treg * eye<std::complex<T> >(af);
 			
+			DFT<T>& ft = *(m_dft[tid]);
+
 #pragma omp for 
 			
 			// FT individual channels
 			for (size_t i = 0; i < nc; i++)
 				if (ndim == 2)
-					Slice  (tmp, i, *(m_dft[tid]) ->* Slice  (tmp, i));
+					Slice  (tmp, i, ft ->* Slice  (tmp, i));
 				else
-					Volume (tmp, i, *(m_dft[tid]) ->* Volume (tmp, i));
+					Volume (tmp, i, ft ->* Volume (tmp, i));
 			
 #pragma omp for schedule (guided)
 			
@@ -273,6 +275,7 @@ private:
 	DFT<T>**              m_dft;
 	Params                p;
 	Matrix < complex<T> > sens;
+	Matrix < T > gfm;
 	Matrix <size_t>       dims;
 
 
