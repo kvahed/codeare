@@ -49,10 +49,10 @@ extern "C" {
                                  int *info);
 	
 	// Computes an LU factorization of a general M-by-N matrix A
-	void F77name(sgetrf,SGETRF) (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
-	void F77name(dgetrf,DGETRF) (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
-	void F77name(cgetrf,CGETRF) (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
-	void F77name(zgetrf,ZGETRF) (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
+	void F77name(sgetrf,SGETRF) (const int* m, const int *n,  float *a, const int* lda, int *ipiv, int *info);
+	void F77name(dgetrf,DGETRF) (const int* m, const int *n, double *a, const int* lda, int *ipiv, int *info);
+	void F77name(cgetrf,CGETRF) (const int* m, const int *n,   cxfl *a, const int* lda, int *ipiv, int *info);
+	void F77name(zgetrf,ZGETRF) (const int* m, const int *n,   cxdb *a, const int* lda, int *ipiv, int *info);
 	
 	// Inverse of a complex Hermitian pos def mat with cpotrf/cpptrf
 	void F77name(spotri,SPOTRI) (const char* uplo, int*n, void *a, int* lda, int*info);
@@ -61,14 +61,14 @@ extern "C" {
 	void F77name(zpotri,ZPOTRI) (const char* uplo, int*n, void *a, int* lda, int*info);
 	
 	// Matrix inversion through cholesky decomposition
-	void F77name(sgetri,SGETRI) (int *n, void *a, int* lda, int *ipiv, void *work, 
-                                 int *lwork, int*info);
-	void F77name(dgetri,DGETRI) (int *n, void *a, int* lda, int *ipiv, void *work, 
-                                 int *lwork, int*info);
-	void F77name(cgetri,CGETRI) (int *n, void *a, int* lda, int *ipiv, void *work, 
-                                 int *lwork, int*info);
-	void F77name(zgetri,ZGETRI) (int *n, void *a, int* lda, int *ipiv, void *work, 
-                                 int *lwork, int*info);
+	void F77name(sgetri,SGETRI) (const int *n, float *a, const int* lda, int *ipiv, float *work,
+                                 const int *lwork, int* info);
+	void F77name(dgetri,DGETRI) (const int *n, double *a, const int* lda, int *ipiv, double *work,
+            const int *lwork, int* info);
+	void F77name(cgetri,CGETRI) (const int *n, cxfl *a, const int* lda, int *ipiv, cxfl *work,
+            const int *lwork, int* info);
+	void F77name(zgetri,ZGETRI) (const int *n, cxdb *a, const int* lda, int *ipiv, cxdb *work,
+            const int *lwork, int* info);
 	
 	// Eigen value computations
 	void F77name(sgeev,SGEEV)  (const char* jvl, const char* jvr, const int* n, float *a,

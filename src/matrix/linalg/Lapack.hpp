@@ -55,25 +55,12 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	
 	typedef typename LapackTraits<T>::RType T2;
 
-	if (jobvl != 'N' && jobvl !='V') {
-		printf ("EIG Error: Parameter jobvl ('%c' provided) must be 'N' or 'V' \n", jobvl);
-		return -1;
-	}
-	if (jobvr != 'N' && jobvr !='V') {
-		printf ("EIG Error: Parameter jobvl ('%c' provided) must be 'N' or 'V' \n", jobvr);
-		return -1;
-	}
-	if (!Is2D(m)) {
-		printf ("EIG Error: Parameter m must be 2D");
-		return -2;
-	}
-	if (m.Width() != m.Height()){
-		printf ("EIG Error: Parameter m must be square");
-		return -3;
-	}
-	
+    assert (jobvl == 'N' || jobvl =='V');
+	assert (jobvr == 'N' || jobvr =='V');
+    assert (Is2D(m));
+    assert (IsSquare(m));
+    
 	int    N     =  size(m, COL);
-	
 	int    lda   =  N;
 	int    ldvl  = (jobvl == 'V') ? N : 1;
 	int    ldvr  = (jobvr == 'V') ? N : 1;
@@ -90,21 +77,20 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
     
     // Workspace for real numbers
     T2* rwork = (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) ?
-				(T2*) malloc (N * sizeof(T)) : (T2*) malloc (1 * sizeof(T));
+        (T2*) malloc (N * sizeof(T)) : (T2*) malloc (1 * sizeof(T));
     // Workspace for complex numbers
 	T*  work  = (T*) malloc (sizeof(T));
 	
 	// Need copy. Lapack destroys A on output.
 	Matrix<T> a = m;
-
+    
 	// Work space query
 	LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, work, lwork, rwork, info);
-
+    
 	// Initialize work space
-	lwork    = (int) creal (*work);
-	free (work);
-	work  = (T*) malloc (lwork * sizeof(T));
-
+	lwork = (int) creal (*work);
+    work  = (T*) realloc (work, lwork * sizeof(T));
+    
 	// Actual Eigenvalue computation
 	LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, work, lwork, rwork, info);
 
@@ -204,13 +190,12 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	else
 		rwork = (T2*) malloc(sizeof(T*));
 
-    
 	// Workspace query
 	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, work, lwork, rwork, iwork, info);
 	
 	lwork = (int) creal (*work);
 	work  = (T*) realloc (work, lwork * sizeof(T));
-	assert (work!=NULL);
+	assert (work != NULL);
 
 	// SVD
 	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, work, lwork, rwork, iwork, info);
@@ -282,9 +267,7 @@ inv (const Matrix<T>& m) {
 	
 	// 2D 
     assert(Is2D(m));
-	
-	// Square matrix
-	if (size(m,1) != size (m,0)) printf ("Inv Error: Parameter m must be square");
+    assert(IsSquare(m));
 		
 	int N = (int) size (m,0);	
 	Matrix<T> res = m;
@@ -293,7 +276,7 @@ inv (const Matrix<T>& m) {
 	
 	// LU Factorisation -------------------
 
-	LapackTraits<T>::getrf (&N, &N, &res[0], &N, ipiv, &info);
+	LapackTraits<T>::getrf (N, N, &res[0], N, ipiv, info);
 	// ------------------------------------
 	
 	if (info < 0)
@@ -302,23 +285,18 @@ inv (const Matrix<T>& m) {
 		printf ("\nERROR - DPOTRI: the (%i,%i) element of the factor U or L is\n zero, and the inverse could not be computed.\n\n", info, info);
 	
 	int lwork = -1; 
-	T   wopt;
+	T*   work = (T*) malloc (sizeof(T));
 	
 	// Workspace determination ------------
-	
-	LapackTraits<T>::getri (&N, &res[0], &N, ipiv, &wopt, &lwork, &info);
-	// ------------------------------------
-	
+	LapackTraits<T>::getri (N, &res[0], N, ipiv, work, lwork, info);
+
 	// Work memory allocation -------------
-	
-	lwork   = (int) creal (wopt);
-	T* work = (T*) malloc (lwork * sizeof(T));
-	// ------------------------------------
+	lwork = (int) creal (*work);
+    work  = (T*) realloc (work, lwork * sizeof(T));
 	
 	// Inversion --------------------------
-	
-	LapackTraits<T>::getri (&N, &res[0], &N, ipiv, work, &lwork, &info);
-	// ------------------------------------
+	LapackTraits<T>::getri (N, &res[0], N, ipiv, work, lwork, info);
+
 	
 	free (ipiv);
 	free (work);

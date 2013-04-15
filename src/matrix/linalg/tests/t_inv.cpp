@@ -14,7 +14,8 @@ template<class T> void inv_check () {
     A  = inv (A);
     
 #ifdef VERBOSE
-    std::cout << "inv(A)=\n" << A << std::endl;
+    std::cout << "inv(A)=\n" << A;
+    std::cout << std::endl;
 #endif
 
 }

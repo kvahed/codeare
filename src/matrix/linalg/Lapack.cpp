@@ -50,4 +50,3 @@ template int svd (const Matrix<double>&, Matrix<double>&, Matrix<double>&, Matri
 template int svd (const Matrix<cxfl>&, Matrix<float>&, Matrix<cxfl>&, Matrix<cxfl>&, const char& = 'N');
 template int svd (const Matrix<cxdb>&, Matrix<double>&, Matrix<cxdb>&, Matrix<cxdb>&, const char& = 'N');
 
-

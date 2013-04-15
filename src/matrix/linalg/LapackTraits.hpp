@@ -24,12 +24,12 @@ struct LapackTraits<float> {
     }
     
     inline static void 
-    getrf (int* m, int*n, void *a, int* lda, int*ipiv, int*info) {
+	getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {
 #ifdef USE_ACML
 #else
-        SGETRF (m, n, a, lda, ipiv, info);
+		SGETRF (&m, &n, a, &lda, ipiv, &info);
 #endif
-    }
+	}
     
     inline static void 
     potri (const char* uplo, int*n, void *a, int* lda, int*info) {
@@ -40,11 +40,11 @@ struct LapackTraits<float> {
     }
     
     inline static void
-    getri (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, 
-           int*info) {
+    getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
+           int& info) {
 #ifdef USE_ACML
 #else
-        SGETRI (n, a, lda, ipiv, work, lwork, info);
+        SGETRI (&n, a, &lda, ipiv, work, &lwork, &info);
 #endif
     }
     
@@ -157,13 +157,13 @@ struct LapackTraits<double> {
     }
     
     inline static void 
-    getrf (int* m, int*n, void *a, int* lda, int*ipiv, int*info) {
+	getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {
 #ifdef USE_ACML
 #else
-        DGETRF (m, n, a, lda, ipiv, info);
+		DGETRF (&m, &n, a, &lda, ipiv, &info);
 #endif
-    }
-    
+	}
+
     inline static void 
     potri (const char* uplo, int*n, void *a, int* lda, int*info) {
 #ifdef USE_ACML
@@ -173,13 +173,15 @@ struct LapackTraits<double> {
     }
     
     inline static void
-    getri (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, 
-           int*info) {
+	getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
+		   int& info) {
 #ifdef USE_ACML
 #else
-        DGETRI (n, a, lda, ipiv, work, lwork, info);
+		DGETRI (&n, a, &lda, ipiv, work, &lwork, &info);
 #endif
-    }
+	}
+
+
     
     inline static void 
     gemv (const char* trans, int* m, int* n, void* alpha, const void *a, 
@@ -290,12 +292,12 @@ struct LapackTraits<cxfl> {
     }
 
     inline static void 
-    getrf (int* m, int*n, void *a, int* lda, int*ipiv, int*info) {
+	getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {
 #ifdef USE_ACML
 #else
-        CGETRF (m, n, a, lda, ipiv, info);
+		CGETRF (&m, &n, a, &lda, ipiv, &info);
 #endif
-    }
+	}
 
     inline static void 
     potri (const char* uplo, int*n, void *a, int* lda, int*info) {
@@ -306,13 +308,13 @@ struct LapackTraits<cxfl> {
     }
     
     inline static void
-    getri (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, 
-           int*info) {
+	getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
+		   int& info) {
 #ifdef USE_ACML
 #else
-        CGETRI (n, a, lda, ipiv, work, lwork, info);
+		CGETRI (&n, a, &lda, ipiv, work, &lwork, &info);
 #endif
-    }
+	}
 
     inline static void 
     gemv (const char* trans, int* m, int* n, void* alpha, const void *a, 
@@ -412,10 +414,10 @@ struct LapackTraits<cxdb> {
     }
 
     inline static void 
-    getrf (int* m, int*n, void *a, int* lda, int*ipiv, int*info) {
+    getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {
 #ifdef USE_ACML
 #else
-        ZGETRF (m, n, a, lda, ipiv, info);
+        ZGETRF (&m, &n, a, &lda, ipiv, &info);
 #endif
     }
 
@@ -428,13 +430,13 @@ struct LapackTraits<cxdb> {
     }
     
     inline static void
-    getri (int *n, void *a, int* lda, int *ipiv, void *work, int *lwork, 
-           int*info) {
+	getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
+		   int& info) {
 #ifdef USE_ACML
 #else
-        ZGETRI (n, a, lda, ipiv, work, lwork, info);
+		ZGETRI (&n, a, &lda, ipiv, work, &lwork, &info);
 #endif
-    }
+	}
 
     inline static void 
     gemv (const char* trans, int* m, int* n, void* alpha, const void *a, 
