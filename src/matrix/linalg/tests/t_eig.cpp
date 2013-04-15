@@ -12,7 +12,7 @@ template<class T, class S> void eig_check () {
     std::cout << "A =\n" << A;
 #endif
     
-    eig (A, ev, lv, rv, 'N', 'N');
+    eig (A, ev, lv, rv, 'V', 'V');
     
 #ifdef VERBOSE    
     std::cout << "ev=\n" << ev;
@@ -24,10 +24,10 @@ template<class T, class S> void eig_check () {
 
 int main (int args, char** argv) {
 
-    //eig_check<float,cxfl>();
-    //eig_check<double,cxdb>();
-    //eig_check<cxfl,cxfl>();
-    //eig_check<cxdb,cxdb>();
+    eig_check<float,cxfl>();
+    eig_check<double,cxdb>();
+    eig_check<cxfl,cxfl>();
+    eig_check<cxdb,cxdb>();
     
     return 0;
     

@@ -1,6 +1,6 @@
 #ifdef USE_ACML
 
-  // Declare wrappers for ACML versions of BLAS/LAPACK routines
+// Declare wrappers for ACML versions of BLAS/LAPACK routines
   #undef  UNDERSCORE
   #define NOUNDERSCORE
   #define F77name
@@ -37,16 +37,16 @@
   #endif
 
 extern "C" {
-
+    
 	// Cholesky factorization of a complex Hermitian positive definite matrix
 	void F77name(spotrf,CPOTRF) (const char* uplo, const int* n, void* a, const int* lda, 
-				  int *info);
+                                 int *info);
 	void F77name(dpotrf,DPOTRF) (const char* uplo, const int* n, void* a, const int* lda, 
-				  int *info);
+                                 int *info);
 	void F77name(cpotrf,CPOTRF) (const char* uplo, const int* n, void* a, const int* lda, 
-				  int *info);
+                                 int *info);
 	void F77name(zpotrf,ZPOTRF) (const char* uplo, const int* n, void* a, const int* lda, 
-				  int *info);
+                                 int *info);
 	
 	// Computes an LU factorization of a general M-by-N matrix A
 	void F77name(sgetrf,SGETRF) (int* m, int*n, void *a, int* lda, int*ipiv, int*info);
@@ -62,98 +62,98 @@ extern "C" {
 	
 	// Matrix inversion through cholesky decomposition
 	void F77name(sgetri,SGETRI) (int *n, void *a, int* lda, int *ipiv, void *work, 
-				  int *lwork, int*info);
+                                 int *lwork, int*info);
 	void F77name(dgetri,DGETRI) (int *n, void *a, int* lda, int *ipiv, void *work, 
-				  int *lwork, int*info);
+                                 int *lwork, int*info);
 	void F77name(cgetri,CGETRI) (int *n, void *a, int* lda, int *ipiv, void *work, 
-				  int *lwork, int*info);
+                                 int *lwork, int*info);
 	void F77name(zgetri,ZGETRI) (int *n, void *a, int* lda, int *ipiv, void *work, 
-				  int *lwork, int*info);
+                                 int *lwork, int*info);
 	
 	// Eigen value computations
-	void F77name(sgeev,SGEEV)  (const char *jvl, const char *jvr, int *n, const void *a, 
-				  int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, 
-				  int *ldvr, void *work, int *lwork, int *info);
-	void F77name(dgeev,DGEEV)  (const char *jvl, const char *jvr, int *n, const void *a, 
-				  int *lda, void *wr, void *wi, void *vl, int *ldvl, void *vr, 
-				  int *ldvr, void *work, int *lwork, int *info);
-	void F77name(cgeev,CGEEV)  (const char *jvl, const char *jvr, int *n, const void *a, 
-				  int *lda, void *w,  void *vl, int *ldvl, void *vr, int *ldvr, 
-				  void *work, int *lwork, void *rwork, int *info);
-	void F77name(zgeev,ZGEEV)  (const char *jvl, const char *jvr, int *n, const void *a, 
-				  int *lda, void *w,  void *vl, int *ldvl, void *vr, int *ldvr, 
-				  void *work, int *lwork, void *rwork, int *info);
+	void F77name(sgeev,SGEEV)  (const char* jvl, const char* jvr, const int* n, float *a,
+                                const int* lda, float *wr, float *wi, float *vl, const int* ldvl, float *vr,
+                                const int* ldvr, float *work, const int* lwork, int* info);
+	void F77name(dgeev,DGEEV)  (const char* jvl, const char* jvr, const int* n, double *a,
+                                const int* lda, double *wr, double *wi, double *vl, const int* ldvl, double *vr,
+                                const int* ldvr, double *work, const int* lwork, int* info);
+	void F77name(cgeev,CGEEV)  (const char* jvl, const char* jvr, const int *n, cxfl *a,
+                                const int *lda, cxfl *w, cxfl *vl, const int *ldvl, cxfl *vr, const int *ldvr,
+                                cxfl *work, const int *lwork, float *rwork, int *info);
+	void F77name(zgeev,ZGEEV)  (const char* jvl, const char* jvr, const int *n, cxdb *a,
+                                const int *lda, cxdb *w, cxdb *vl, const int *ldvl, cxdb *vr, const int *ldvr,
+                                cxdb *work, const int *lwork, double *rwork, int *info);
 	
 	// Singular value decomposition 
-	void F77name(sgesdd,SGESDD) (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
-				  int *iwork, int*info);
-	void F77name(dgesdd,DGESDD) (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
-				  int *iwork, int*info);
-	void F77name(cgesdd,CGESDD) (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
-				  void *rwork, int *iwork, int*info);
-	void F77name(zgesdd,ZGESDD) (const char *jobz, int*m, int *n, void *a, int *lda, void *s, 
-				  void*u, int*ldu, void *vt, int *ldvt, void *work, int*lwork, 
-				  void *rwork, int *iwork, int*info);
-	
+	void F77name(sgesdd,SGESDD) (const char* jobz, const int*m, const int *n, float *a, const int *lda,
+                                 float *s, float*u, const int*ldu, float *vt, const int *ldvt, float *work, const int*lwork,
+                                 int *iwork, int*info);
+	void F77name(dgesdd,DGESDD) (const char* jobz, const int*m, const int *n, double *a, const int *lda,
+                                 double *s, double*u, const int*ldu, double *vt, const int *ldvt, double *work, const int*lwork,
+                                 int *iwork, int*info);
+    void F77name(cgesdd,CGESDD) (const char *jobz, const int *m, const int *n, cxfl *a, const int *lda,
+                                 float *s, cxfl* u, const int* ldu, cxfl *vt, const int *ldvt, cxfl *work, const int* lwork,
+                                 float *rwork, int *iwork, int* info);
+	void F77name(zgesdd,ZGESDD) (const char *jobz, const int *m, const int *n, cxdb *a, const int *lda,
+                                 double *s, cxdb* u, const int* ldu, cxdb *vt, const int *ldvt, cxdb *work, const int* lwork,
+                                 double *rwork, int *iwork, int* info);
+    
 	// Pseudo-inversion 
 	void F77name(sgels,SGELS) (const char* trans, const int* m, const int* n, const int* nrhs,
-			float* a, const int* lda, float* b, const int* ldb, float* work, const int* lwork,
-			int* info);
+                               float* a, const int* lda, float* b, const int* ldb, float* work, const int* lwork,
+                               int* info);
 	void F77name(dgels,DGELS) (const char* trans, const int* m, const int* n, const int* nrhs,
-			double* a, const int* lda, double* b, const int* ldb, double* work, const int* lwork,
-			int* info);
+                               double* a, const int* lda, double* b, const int* ldb, double* work, const int* lwork,
+                               int* info);
 	void F77name(cgels,CGELS) (const char* trans, const int* m, const int* n, const int* nrhs,
-			cxfl* a, const int* lda, cxfl* b, const int* ldb, cxfl* work, const int* lwork,
-			int* info);
+                               cxfl* a, const int* lda, cxfl* b, const int* ldb, cxfl* work, const int* lwork,
+                               int* info);
 	void F77name(zgels,ZGELS) (const char* trans, const int* m, const int* n, const int* nrhs,
-			cxdb* a, const int* lda, cxdb* b, const int* ldb, cxdb* work, const int* lwork,
-			int* info);
-
+                               cxdb* a, const int* lda, cxdb* b, const int* ldb, cxdb* work, const int* lwork,
+                               int* info);
+    
 	// Pseudo-inversion
-		void F77name(sgelsd,SGELSD) (int* m, int* n, int* nrhs, float* a, int* lda, void* b,
-					  int* ldb, void *s, void* rcond, int* rank, void* work,
-					  int* lwork, void* iwork, int* info);
-		void F77name(dgelsd,DGELSD) (int* m, int* n, int* nrhs, double* a, int* lda, void* b,
-					  int* ldb, void *s, void* rcond, int* rank, void* work,
-					  int* lwork, void* iwork, int* info);
-		void F77name(cgelsd,CGELSD) (int* m, int* n, int* nrhs, cxfl* a, int* lda, void* b,
-					  int* ldb, void* s, void* rcond, int* rank, void* work,
-					  int* lwork, void* rwork, int* iwork, int* info);
-		void F77name(zgelsd,ZGELSD) (int* m, int* n, int* nrhs, cxdb* a, int* lda, void* b,
-					  int* ldb, void* s, void* rcond, int* rank, void* work,
-					  int* lwork, void* rwork, int* iwork, int* info);
-
-		// Matrix vector multiplication
+    void F77name(sgelsd,SGELSD) (int* m, int* n, int* nrhs, float* a, int* lda, void* b,
+                                 int* ldb, void *s, void* rcond, int* rank, void* work,
+                                 int* lwork, void* iwork, int* info);
+    void F77name(dgelsd,DGELSD) (int* m, int* n, int* nrhs, double* a, int* lda, void* b,
+                                 int* ldb, void *s, void* rcond, int* rank, void* work,
+                                 int* lwork, void* iwork, int* info);
+    void F77name(cgelsd,CGELSD) (int* m, int* n, int* nrhs, cxfl* a, int* lda, void* b,
+                                 int* ldb, void* s, void* rcond, int* rank, void* work,
+                                 int* lwork, void* rwork, int* iwork, int* info);
+    void F77name(zgelsd,ZGELSD) (int* m, int* n, int* nrhs, cxdb* a, int* lda, void* b,
+                                 int* ldb, void* s, void* rcond, int* rank, void* work,
+                                 int* lwork, void* rwork, int* iwork, int* info);
+    
+    // Matrix vector multiplication
 	void F77name(sgemv,SGEMV)  (const char* trans, int* m, int* n, void* alpha, const void *a, 
-				  int* lda, const void *x, int* incx, void* beta, void *y, 
-				  int* incy);
+                                int* lda, const void *x, int* incx, void* beta, void *y, 
+                                int* incy);
 	void F77name(dgemv,DGEMV)  (const char* trans, int* m, int* n, void* alpha, const void *a, 
-				  int* lda, const void *x, int* incx, void* beta, void *y, 
-				  int* incy);
+                                int* lda, const void *x, int* incx, void* beta, void *y, 
+                                int* incy);
 	void F77name(cgemv,CGEMV)  (const char* trans, int* m, int* n, void* alpha, const void *a, 
-				  int* lda, const void *x, int* incx, void* beta, void *y, 
-				  int* incy);
+                                int* lda, const void *x, int* incx, void* beta, void *y, 
+                                int* incy);
 	void F77name(zgemv,ZGEMV)  (const char* trans, int* m, int* n, void* alpha, const void *a, 
-				  int* lda, const void *x, int* incx, void* beta, void *y, 
-				  int* incy);
-
+                                int* lda, const void *x, int* incx, void* beta, void *y, 
+                                int* incy);
+    
 	// Matrix matrix multiplication
 	void F77name(sgemm,SGEMM)  (const char *transa, const char *transb, int *m, int *n, int *k,
-				  void *alpha, const void *a, int *lda, const void *b, int *ldb, 
-				  void *beta, void *c, int *ldc);
+                                void *alpha, const void *a, int *lda, const void *b, int *ldb, 
+                                void *beta, void *c, int *ldc);
 	void F77name(dgemm,DGEMM)  (const char *transa, const char *transb, int *m, int *n, int *k, 
-				  void *alpha, const void *a, int *lda, const void *b, int *ldb, 
-				  void *beta, void *c, int *ldc);
+                                void *alpha, const void *a, int *lda, const void *b, int *ldb, 
+                                void *beta, void *c, int *ldc);
 	void F77name(cgemm,CGEMM)  (const char *transa, const char *transb, int *m, int *n, int *k, 
-				  void *alpha, const void *a, int *lda, const void *b, int *ldb, 
-				  void *beta, void *c, int *ldc);
+                                void *alpha, const void *a, int *lda, const void *b, int *ldb, 
+                                void *beta, void *c, int *ldc);
 	void F77name(zgemm,ZGEMM) (const char *transa, const char *transb, int *m, int *n, int *k, 
-				  void *alpha, const void *a, int *lda, const void *b, int *ldb, 
-				  void *beta, void *c, int *ldc);
-
+                               void *alpha, const void *a, int *lda, const void *b, int *ldb, 
+                               void *beta, void *c, int *ldc);
+    
 }	
 
 #endif

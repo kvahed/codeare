@@ -5,21 +5,36 @@
 
 template<class T, class S> void svd_check () {
 
-    Matrix<T> A = rand<T>(8,8), U, V;
+    Matrix<T> A = rand<T>(8,3), U, V;
     Matrix<S> s;
 
-    #ifdef VERBOSE
+#ifdef VERBOSE
     std::cout << "A=\n" << A;
-    #endif
-    fflush (stdout);
+#endif
     
     svd (A, s, U, V, 'N');
-    
-    #ifdef VERBOSE
+#ifdef VERBOSE
     std::cout << "U=\n" << U;
     std::cout << "S=\n" << s;
-    std::cout << "V=\n" << V << std::endl;
-    #endif
+    std::cout << "V=\n" << V;
+    std::cout << std::endl;
+#endif
+
+    svd (A, s, U, V, 'S');
+#ifdef VERBOSE
+    std::cout << "U=\n" << U;
+    std::cout << "S=\n" << s;
+    std::cout << "V=\n" << V;
+    std::cout << std::endl;
+#endif
+
+    svd (A, s, U, V, 'A');
+#ifdef VERBOSE
+    std::cout << "U=\n" << U;
+    std::cout << "S=\n" << s;
+    std::cout << "V=\n" << V;
+    std::cout << std::endl;
+#endif
 
 }
 

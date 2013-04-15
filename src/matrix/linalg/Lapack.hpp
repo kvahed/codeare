@@ -53,64 +53,60 @@
 template <class T, class S> inline int
 eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char& jobvl = 'N', const char& jobvr = 'N') {
 	
+	typedef typename LapackTraits<T>::RType T2;
 
 	if (jobvl != 'N' && jobvl !='V') {
 		printf ("EIG Error: Parameter jobvl ('%c' provided) must be 'N' or 'V' \n", jobvl);
 		return -1;
 	}
-	
 	if (jobvr != 'N' && jobvr !='V') {
 		printf ("EIG Error: Parameter jobvl ('%c' provided) must be 'N' or 'V' \n", jobvr);
 		return -1;
 	}
-	
-	// 2D 
 	if (!Is2D(m)) {
 		printf ("EIG Error: Parameter m must be 2D");
 		return -2;
 	}
-	
-	// Square matrix
 	if (m.Width() != m.Height()){
 		printf ("EIG Error: Parameter m must be square");
 		return -3;
 	}
 	
-	int    N     =  size(m, 0);
+	int    N     =  size(m, COL);
 	
 	int    lda   =  N;
-	int    ldvl  =  (jobvl) ? N : 1;
-	int    ldvr  =  (jobvr) ? N : 1;
+	int    ldvl  = (jobvl == 'V') ? N : 1;
+	int    ldvr  = (jobvr == 'V') ? N : 1;
 	int    info  =  0;
 	int    lwork = -1;
 
     // Appropritely resize the output
-    resize (ev,N,1);
-    if (jobvl == 'V')
-        resize (lv,N,N);
-    if (jobvr == 'V')
-        resize(rv,N,N);
-    
+	ev = Matrix<S>(N,1);
 
-    T* rwork = (T*) malloc (sizeof(T));
-	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) { // Real workspace for complex matrices
-		free (rwork);
-		rwork = (T*) malloc (N * sizeof(T));
-	}
+	if (jobvl == 'V')
+        lv = Matrix<T>(N,N);
+    if (jobvr == 'V')
+        rv = Matrix<T>(N,N);
+    
+    // Workspace for real numbers
+    T2* rwork = (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) ?
+				(T2*) malloc (N * sizeof(T)) : (T2*) malloc (1 * sizeof(T));
+    // Workspace for complex numbers
+	T*  work  = (T*) malloc (sizeof(T));
 	
-	T  wkopt;
-	
+	// Need copy. Lapack destroys A on output.
 	Matrix<T> a = m;
 
 	// Work space query
-	LapackTraits<T>::geev (&jobvl, &jobvr, N, &a[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
+	LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, work, lwork, rwork, info);
 
 	// Initialize work space
-	lwork    = (int) creal (wkopt);
-	T* work  = (T*) malloc (lwork * sizeof(T));
+	lwork    = (int) creal (*work);
+	free (work);
+	work  = (T*) malloc (lwork * sizeof(T));
 
 	// Actual Eigenvalue computation
-	LapackTraits<T>::geev (&jobvl, &jobvr, N, &a[0], &lda, &ev[0], &lv[0], &ldvl, &rv[0], &ldvr, &wkopt, &lwork, rwork, &info);
+	LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, work, lwork, rwork, info);
 
 	// Clean up
 	free (rwork);
@@ -158,7 +154,10 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 template<class T, class S> inline int 
 svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& jobz = 'N') {
 
+	typedef typename LapackTraits<T>::RType T2;
+
     assert (Is2D(IN));
+    assert (jobz == 'N' || jobz == 'S' || jobz == 'A');
     
 	Matrix<T> A (IN);
 	
@@ -166,9 +165,9 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	if (!Is2D(A))
 		return -2;
 	
-	int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vcol = 1;
-	T     wopt;
-	void* rwork = 0;
+	int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vtcol = 1;
+	T2*   rwork;
+	T*    work = (T*) malloc (sizeof(T));
 	
 	m     =  A.Height();
 	n     =  A.Width();
@@ -177,53 +176,52 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	lda   =  m;
 	mn    =  MIN(m,n);
 	
-	if    (((jobz == 'A' || jobz == 'O') && m < n)) 
-		ucol = m;
-	else if (jobz == 'S')
-		ucol = mn;
-	
-	if      (jobz == 'S' || jobz == 'A' || (jobz == 'O' &&  m < n)) 
+	if (jobz != 'N')
 		ldu = m;
-	
-	if      (jobz == 'A' || (jobz == 'O' && m >= n))
-		ldvt = n;
-	else if (jobz == 'S')
+
+	if      (jobz == 'A') {
+		ldvt =  n;
+		vtcol = (m>=n) ? mn : n;
+		ucol =  m;
+	} else if (jobz == 'S') {
+		ucol = mn;
 		ldvt = mn;
-	
-	if      (jobz != 'N')
-		vcol = n;
-	
-	s = resize (s,   mn,    1);
-	U = resize (U,  ldu, ucol);
-	V = resize (V, ldvt, vcol);
+		vtcol = (m>=n) ? mn : n;
+	}
+
+
+	s = Matrix<S> (  mn,  IONE);
+	U = Matrix<T> ( ldu,  ucol);
+	V = Matrix<T> (ldvt, vtcol);
 	
 	int*   iwork =   (int*) malloc (8 * mn * sizeof(int));
 	
 	// Only needed for complex data
-	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) {
-		if (jobz == 'N') rwork = malloc (mn * 7            * sizeof(T) / 2);
-		else             rwork = malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
-	}
+	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))
+		rwork = (jobz == 'N') ?
+				(T2*) malloc (mn * 7 * sizeof(T) / 2) :
+				(T2*) malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
+	else
+		rwork = (T2*) malloc(sizeof(T*));
+
     
 	// Workspace query
-	LapackTraits<T>::gesdd (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, &wopt, &lwork, rwork, iwork, &info);
+	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, work, lwork, rwork, iwork, info);
 	
-	// Resize work according to ws query
-	lwork   = (int) creal (wopt);
-	T* work = (T*) malloc (lwork * sizeof(T));
-	
-	//SVD
-	LapackTraits<T>::gesdd (&jobz, &m, &n, &A[0], &lda, &s[0], &U[0], &ldu, &V[0], &ldvt, work, &lwork, rwork, iwork, &info);
+	lwork = (int) creal (*work);
+	work  = (T*) realloc (work, lwork * sizeof(T));
+	assert (work!=NULL);
+
+	// SVD
+	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, work, lwork, rwork, iwork, info);
 
 	free (work);
 	free (iwork);
-	
-    //Traspose the baby
+	free (rwork);
+
+    // Traspose the baby
 	V = !V;
-	
-	// Clean up
-	if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) 
-		free (rwork);
+	V = conj(V);
 	
 	if (info > 0)
 		printf ("\nERROR - XGESDD: The updating process of SBDSDC did not converge.\n\n");
@@ -354,7 +352,7 @@ inv (const Matrix<T>& m) {
 template<class T> inline Matrix<T> 
 pinv2 (const Matrix<T>& m, const double& rcond = 1.0) {
 
-	typedef typename LapackTraits<T>::Type2 T2;
+	typedef typename LapackTraits<T>::RType T2;
 	Matrix<T> mm = m;
 
     assert (Is2D(m));
