@@ -38,4 +38,30 @@ template<class T> T DOT  (const Matrix<T>& A, const Matrix<T>& B);
 template<class T> static Matrix<T> gemm (const Matrix<T>& A, const Matrix<T>& B, const char& transa = 'N', const char& transb = 'N');
 template<class T> Matrix<T> gemv (const Matrix<T>& A, const Matrix<T>& x, const char& trans = 'N');
 
+inline Matrix<float> svd (const Matrix<cxfl>& A) {
+    Matrix<float> s;
+    Matrix<cxfl> u,v;
+    svd(A, s, u, v);
+    return s;
+}
+inline  Matrix<float> svd (const Matrix<float>& A) {
+    Matrix<float> s;
+    Matrix<float> u,v;
+    svd(A, s, u, v);
+    return s;
+}
+inline Matrix<double> svd (const Matrix<cxdb>& A) {
+    Matrix<double> s;
+    Matrix<cxdb> u,v;
+    svd(A, s, u, v);
+    return s;
+}
+inline Matrix<double> svd (const Matrix<double>& A) {
+    Matrix<double> s;
+    Matrix<double> u,v;
+    svd(A, s, u, v);
+    return s;
+}
+
+
 #endif // __LINALG_H__

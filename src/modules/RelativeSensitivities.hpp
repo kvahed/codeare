@@ -125,13 +125,13 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 	Matrix<cxfl> m[threads]; // Combination
 	Matrix<cxfl> u[threads]; // Left-side and  O(NRX x NRX)
 	Matrix<cxfl> v[threads]; // Right-side singular vectors O(NTX, NTX)
-	Matrix<cxfl> s[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
+	Matrix<float> s[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
 	
 	for (int i = 0; i < threads; i++) {
 		m[i] = Matrix<cxfl>     (nrxc, ntxc);
 		u[i] = Matrix<cxfl>     (nrxc, ntxc);
 		v[i] = Matrix<cxfl>     (ntxc, ntxc);
-		s[i] = Matrix<cxfl> (MIN(ntxc, nrxc), 1);
+		s[i] = Matrix<float> (MIN(ntxc, nrxc), 1);
 	}
 	
 #pragma omp parallel default (shared) 
@@ -150,7 +150,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 			for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r] * exp(cxfl(0.0,1.0)*arg(u[tid][0])); // U 
 			for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t] * exp(cxfl(0.0,1.0)*arg(v[tid][0])); // V 
 
-			snro[i] = real(s[tid][0]);
+			snro[i] = s[tid][0];
 			
 		}
 		

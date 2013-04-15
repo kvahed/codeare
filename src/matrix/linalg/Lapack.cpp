@@ -7,8 +7,8 @@ template Matrix<cxdb> chol (const Matrix<cxdb>& A, const char& = 'U');
 
 template int eig (const Matrix<cxfl>&, Matrix<cxfl>&, Matrix<cxfl>&, Matrix<cxfl>&, const char& = 'N', const char& = 'N');
 template int eig (const Matrix<cxdb>&, Matrix<cxdb>&, Matrix<cxdb>&, Matrix<cxdb>&, const char& = 'N', const char& = 'N');
-template int eig (const Matrix<float>&, Matrix<float>&, Matrix<float>&, Matrix<float>&, const char& = 'N', const char& = 'N');
-template int eig (const Matrix<double>&, Matrix<double>&, Matrix<double>&, Matrix<double>&, const char& = 'N', const char& = 'N');
+template int eig (const Matrix<float>&, Matrix<cxfl>&, Matrix<float>&, Matrix<float>&, const char& = 'N', const char& = 'N');
+template int eig (const Matrix<double>&, Matrix<cxdb>&, Matrix<double>&, Matrix<double>&, const char& = 'N', const char& = 'N');
 
 template float dot (const Matrix<float>&, const Matrix<float>&);
 template double dot (const Matrix<double>&, const Matrix<double>&);
@@ -49,4 +49,5 @@ template int svd (const Matrix<float>&, Matrix<float>&, Matrix<float>&, Matrix<f
 template int svd (const Matrix<double>&, Matrix<double>&, Matrix<double>&, Matrix<double>&, const char& = 'N');
 template int svd (const Matrix<cxfl>&, Matrix<float>&, Matrix<cxfl>&, Matrix<cxfl>&, const char& = 'N');
 template int svd (const Matrix<cxdb>&, Matrix<double>&, Matrix<cxdb>&, Matrix<cxdb>&, const char& = 'N');
+
 
