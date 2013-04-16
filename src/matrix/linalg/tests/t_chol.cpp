@@ -3,6 +3,7 @@
 #include "Creators.hpp"
 #include "Lapack.hpp"
 
+
 template<class T> void chol_check () {
 
     Matrix<T> A = rand<T> (4,3);
@@ -11,11 +12,12 @@ template<class T> void chol_check () {
     std::cout << "A=\n" << A;
 #endif
     
-    A = A.prodt(A); // m*m' Must be positive definite 
+    A = A.prodt(A); // m*m' (Must be positive definite)
     A = chol (A);
 
 #ifdef VERBOSE
-    std::cout << "chol(A)=\n" << A << std::endl;
+    std::cout << "chol(A)=\n" << A ;
+    std::cout << std::endl;
 #endif
 
 }

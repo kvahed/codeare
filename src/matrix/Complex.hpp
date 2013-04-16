@@ -55,6 +55,7 @@ inline double cabs  (double d) {return fabs(d);}
 inline float  cabs  (float  f) {return fabs(f);}
 inline short  cabs  (short  s) {return fabs(s);}
 inline long   cabs  (long   l) {return fabs(l);}
+inline long   cabs  (int    i) {return fabs(i);}
 inline long   cabs  (size_t s) {return s;}
 inline double cabs  (cxdb  cd) {return std::abs(cd);}
 inline float  cabs  (cxfl  cf) {return std::abs(cf);}

@@ -54,7 +54,7 @@ TESTS = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) t_exp$(EXEEXT) \
 	t_asin$(EXEEXT) t_acos$(EXEEXT) t_atan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
 	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
-	t_emul$(EXEEXT)
+	t_emul$(EXEEXT) t_nrmse$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/arithmetic
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -81,7 +81,7 @@ am__EXEEXT_1 = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) \
 	t_exp$(EXEEXT) t_asin$(EXEEXT) t_acos$(EXEEXT) t_atan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
 	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
-	t_emul$(EXEEXT)
+	t_emul$(EXEEXT) t_nrmse$(EXEEXT)
 am__objects_1 =
 am_t_acos_OBJECTS = $(am__objects_1) t_acos.$(OBJEXT)
 t_acos_OBJECTS = $(am_t_acos_OBJECTS)
@@ -113,6 +113,9 @@ t_log_LDADD = $(LDADD)
 am_t_log10_OBJECTS = $(am__objects_1) t_log10.$(OBJEXT)
 t_log10_OBJECTS = $(am_t_log10_OBJECTS)
 t_log10_LDADD = $(LDADD)
+am_t_nrmse_OBJECTS = $(am__objects_1) t_nrmse.$(OBJEXT)
+t_nrmse_OBJECTS = $(am_t_nrmse_OBJECTS)
+t_nrmse_LDADD = $(LDADD)
 am_t_sin_OBJECTS = $(am__objects_1) t_sin.$(OBJEXT)
 t_sin_OBJECTS = $(am_t_sin_OBJECTS)
 t_sin_LDADD = $(LDADD)
@@ -150,13 +153,13 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
 	$(t_emul_SOURCES) $(t_exp_SOURCES) $(t_log_SOURCES) \
-	$(t_log10_SOURCES) $(t_sin_SOURCES) $(t_sinh_SOURCES) \
-	$(t_tan_SOURCES) $(t_tanh_SOURCES)
+	$(t_log10_SOURCES) $(t_nrmse_SOURCES) $(t_sin_SOURCES) \
+	$(t_sinh_SOURCES) $(t_tan_SOURCES) $(t_tanh_SOURCES)
 DIST_SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
 	$(t_emul_SOURCES) $(t_exp_SOURCES) $(t_log_SOURCES) \
-	$(t_log10_SOURCES) $(t_sin_SOURCES) $(t_sinh_SOURCES) \
-	$(t_tan_SOURCES) $(t_tanh_SOURCES)
+	$(t_log10_SOURCES) $(t_nrmse_SOURCES) $(t_sin_SOURCES) \
+	$(t_sinh_SOURCES) $(t_tan_SOURCES) $(t_tanh_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -320,7 +323,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -I../ -I../../ -I../../misc
+AM_CXXFLAGS = -I../ -I../linalg -I../../ -I../../misc
 COMMON = ../Matrix.hpp Trigonometry.hpp
 t_sin_SOURCES = $(COMMON) t_sin.cpp
 t_cos_SOURCES = $(COMMON) t_cos.cpp
@@ -336,6 +339,7 @@ t_exp_SOURCES = $(COMMON) t_exp.cpp
 t_log_SOURCES = $(COMMON) t_log.cpp
 t_log10_SOURCES = $(COMMON) t_log10.cpp
 t_emul_SOURCES = $(COMMON) t_emul.cpp
+t_nrmse_SOURCES = $(COMMON) t_nrmse.cpp
 all: all-am
 
 .SUFFIXES:
@@ -409,6 +413,9 @@ t_log$(EXEEXT): $(t_log_OBJECTS) $(t_log_DEPENDENCIES) $(EXTRA_t_log_DEPENDENCIE
 t_log10$(EXEEXT): $(t_log10_OBJECTS) $(t_log10_DEPENDENCIES) $(EXTRA_t_log10_DEPENDENCIES) 
 	@rm -f t_log10$(EXEEXT)
 	$(CXXLINK) $(t_log10_OBJECTS) $(t_log10_LDADD) $(LIBS)
+t_nrmse$(EXEEXT): $(t_nrmse_OBJECTS) $(t_nrmse_DEPENDENCIES) $(EXTRA_t_nrmse_DEPENDENCIES) 
+	@rm -f t_nrmse$(EXEEXT)
+	$(CXXLINK) $(t_nrmse_OBJECTS) $(t_nrmse_LDADD) $(LIBS)
 t_sin$(EXEEXT): $(t_sin_OBJECTS) $(t_sin_DEPENDENCIES) $(EXTRA_t_sin_DEPENDENCIES) 
 	@rm -f t_sin$(EXEEXT)
 	$(CXXLINK) $(t_sin_OBJECTS) $(t_sin_LDADD) $(LIBS)
@@ -438,6 +445,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_exp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log10.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_nrmse.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_sin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_sinh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_tan.Po@am__quote@

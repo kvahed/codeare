@@ -2688,8 +2688,6 @@ Matrix<T,P>::operator* (const Matrix<S,P> &M) const {
 			res[i] *= _M[i];
 	}
 
-	//SSE::process<T,P> (&_M[0], &res[0], M.Size(), SSE::mul<T,P>(), &res[0]) ;
-
     return res;
 
 }
@@ -2845,7 +2843,8 @@ template <class T, paradigm P> template<class S> inline Matrix<T,P>&
 Matrix<T,P>::operator/= (const S& s) {
     
 	T zero = T(0.0);
-    assert (s != zero);
+	T t    = T(s);
+    assert (t != zero);
 
 #pragma omp parallel default (shared) 
 	{

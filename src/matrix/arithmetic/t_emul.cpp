@@ -5,14 +5,18 @@
 template<class T>
 void emul_check () {
 
-    Matrix<T> rhs = rand<T>(3,4);
-    Matrix<T> lhs;
+    Matrix<T> A = rand<T>(3,4);
+    Matrix<T> B = resize(transpose(A),size(A));
 
-    lhs = rhs * rhs;
-    #ifdef VERBOSE
-    std::cout << "A=\n" << rhs;
-    std::cout << "A.*A=\n" << lhs << std::endl;
-    #endif
+    B /= 2.0;
+    B *= 2.0;
+    B  = A * B;
+
+#ifndef VERBOSE
+    std::cout << "A=\n" << A;
+    std::cout << "A.*A=\n" << B;
+    std::cout << std::endl;
+#endif
     
 }
 
