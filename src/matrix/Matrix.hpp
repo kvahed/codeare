@@ -1174,6 +1174,50 @@ public:
 
 
     /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator/  (const cxfl& s, const Matrix<T,P> &m) {
+
+    	assert (T(s) != T(0.0));
+
+        if (T(s) == T(1.0))
+            return Matrix<T,P> (m);
+
+        Matrix<T,P> res = m;
+        res.Container() = s / res.Container();
+        return res;
+
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator/  (const cxdb& s, const Matrix<T,P> &m) {
+
+    	assert (T(s) != T(0.0));
+
+		if (T(s) == T(1.0))
+			return Matrix<T,P> (m);
+
+		Matrix<T,P> res = m;
+		res.Container() = s / res.Container();
+		return res;
+
+    }
+
+
+    /**
      * @brief           Elementwise equality with scalar (lhs)
      *
      * @param  s        Scalar lhs

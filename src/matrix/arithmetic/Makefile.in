@@ -54,7 +54,8 @@ TESTS = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) t_exp$(EXEEXT) \
 	t_asin$(EXEEXT) t_acos$(EXEEXT) t_atan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
 	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
-	t_emul$(EXEEXT) t_nrmse$(EXEEXT)
+	t_emul$(EXEEXT) t_ediv$(EXEEXT) t_eadd$(EXEEXT) \
+	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/arithmetic
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -81,7 +82,8 @@ am__EXEEXT_1 = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) \
 	t_exp$(EXEEXT) t_asin$(EXEEXT) t_acos$(EXEEXT) t_atan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
 	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
-	t_emul$(EXEEXT) t_nrmse$(EXEEXT)
+	t_emul$(EXEEXT) t_ediv$(EXEEXT) t_eadd$(EXEEXT) \
+	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT)
 am__objects_1 =
 am_t_acos_OBJECTS = $(am__objects_1) t_acos.$(OBJEXT)
 t_acos_OBJECTS = $(am_t_acos_OBJECTS)
@@ -101,9 +103,21 @@ t_cos_LDADD = $(LDADD)
 am_t_cosh_OBJECTS = $(am__objects_1) t_cosh.$(OBJEXT)
 t_cosh_OBJECTS = $(am_t_cosh_OBJECTS)
 t_cosh_LDADD = $(LDADD)
+am_t_eadd_OBJECTS = $(am__objects_1) t_eadd.$(OBJEXT)
+t_eadd_OBJECTS = $(am_t_eadd_OBJECTS)
+t_eadd_LDADD = $(LDADD)
+am_t_ediv_OBJECTS = $(am__objects_1) t_ediv.$(OBJEXT)
+t_ediv_OBJECTS = $(am_t_ediv_OBJECTS)
+t_ediv_LDADD = $(LDADD)
 am_t_emul_OBJECTS = $(am__objects_1) t_emul.$(OBJEXT)
 t_emul_OBJECTS = $(am_t_emul_OBJECTS)
 t_emul_LDADD = $(LDADD)
+am_t_epow_OBJECTS = $(am__objects_1) t_epow.$(OBJEXT)
+t_epow_OBJECTS = $(am_t_epow_OBJECTS)
+t_epow_LDADD = $(LDADD)
+am_t_esub_OBJECTS = $(am__objects_1) t_esub.$(OBJEXT)
+t_esub_OBJECTS = $(am_t_esub_OBJECTS)
+t_esub_LDADD = $(LDADD)
 am_t_exp_OBJECTS = $(am__objects_1) t_exp.$(OBJEXT)
 t_exp_OBJECTS = $(am_t_exp_OBJECTS)
 t_exp_LDADD = $(LDADD)
@@ -152,14 +166,18 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
-	$(t_emul_SOURCES) $(t_exp_SOURCES) $(t_log_SOURCES) \
-	$(t_log10_SOURCES) $(t_nrmse_SOURCES) $(t_sin_SOURCES) \
-	$(t_sinh_SOURCES) $(t_tan_SOURCES) $(t_tanh_SOURCES)
+	$(t_eadd_SOURCES) $(t_ediv_SOURCES) $(t_emul_SOURCES) \
+	$(t_epow_SOURCES) $(t_esub_SOURCES) $(t_exp_SOURCES) \
+	$(t_log_SOURCES) $(t_log10_SOURCES) $(t_nrmse_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_tan_SOURCES) \
+	$(t_tanh_SOURCES)
 DIST_SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
-	$(t_emul_SOURCES) $(t_exp_SOURCES) $(t_log_SOURCES) \
-	$(t_log10_SOURCES) $(t_nrmse_SOURCES) $(t_sin_SOURCES) \
-	$(t_sinh_SOURCES) $(t_tan_SOURCES) $(t_tanh_SOURCES)
+	$(t_eadd_SOURCES) $(t_ediv_SOURCES) $(t_emul_SOURCES) \
+	$(t_epow_SOURCES) $(t_esub_SOURCES) $(t_exp_SOURCES) \
+	$(t_log_SOURCES) $(t_log10_SOURCES) $(t_nrmse_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_tan_SOURCES) \
+	$(t_tanh_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -339,7 +357,11 @@ t_exp_SOURCES = $(COMMON) t_exp.cpp
 t_log_SOURCES = $(COMMON) t_log.cpp
 t_log10_SOURCES = $(COMMON) t_log10.cpp
 t_emul_SOURCES = $(COMMON) t_emul.cpp
+t_ediv_SOURCES = $(COMMON) t_ediv.cpp
+t_eadd_SOURCES = $(COMMON) t_eadd.cpp
+t_esub_SOURCES = $(COMMON) t_esub.cpp
 t_nrmse_SOURCES = $(COMMON) t_nrmse.cpp
+t_epow_SOURCES = $(COMMON) t_epow.cpp
 all: all-am
 
 .SUFFIXES:
@@ -401,9 +423,21 @@ t_cos$(EXEEXT): $(t_cos_OBJECTS) $(t_cos_DEPENDENCIES) $(EXTRA_t_cos_DEPENDENCIE
 t_cosh$(EXEEXT): $(t_cosh_OBJECTS) $(t_cosh_DEPENDENCIES) $(EXTRA_t_cosh_DEPENDENCIES) 
 	@rm -f t_cosh$(EXEEXT)
 	$(CXXLINK) $(t_cosh_OBJECTS) $(t_cosh_LDADD) $(LIBS)
+t_eadd$(EXEEXT): $(t_eadd_OBJECTS) $(t_eadd_DEPENDENCIES) $(EXTRA_t_eadd_DEPENDENCIES) 
+	@rm -f t_eadd$(EXEEXT)
+	$(CXXLINK) $(t_eadd_OBJECTS) $(t_eadd_LDADD) $(LIBS)
+t_ediv$(EXEEXT): $(t_ediv_OBJECTS) $(t_ediv_DEPENDENCIES) $(EXTRA_t_ediv_DEPENDENCIES) 
+	@rm -f t_ediv$(EXEEXT)
+	$(CXXLINK) $(t_ediv_OBJECTS) $(t_ediv_LDADD) $(LIBS)
 t_emul$(EXEEXT): $(t_emul_OBJECTS) $(t_emul_DEPENDENCIES) $(EXTRA_t_emul_DEPENDENCIES) 
 	@rm -f t_emul$(EXEEXT)
 	$(CXXLINK) $(t_emul_OBJECTS) $(t_emul_LDADD) $(LIBS)
+t_epow$(EXEEXT): $(t_epow_OBJECTS) $(t_epow_DEPENDENCIES) $(EXTRA_t_epow_DEPENDENCIES) 
+	@rm -f t_epow$(EXEEXT)
+	$(CXXLINK) $(t_epow_OBJECTS) $(t_epow_LDADD) $(LIBS)
+t_esub$(EXEEXT): $(t_esub_OBJECTS) $(t_esub_DEPENDENCIES) $(EXTRA_t_esub_DEPENDENCIES) 
+	@rm -f t_esub$(EXEEXT)
+	$(CXXLINK) $(t_esub_OBJECTS) $(t_esub_LDADD) $(LIBS)
 t_exp$(EXEEXT): $(t_exp_OBJECTS) $(t_exp_DEPENDENCIES) $(EXTRA_t_exp_DEPENDENCIES) 
 	@rm -f t_exp$(EXEEXT)
 	$(CXXLINK) $(t_exp_OBJECTS) $(t_exp_LDADD) $(LIBS)
@@ -441,7 +475,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_atan2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_cos.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_cosh.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_eadd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_ediv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_emul.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_epow.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_esub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_exp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log10.Po@am__quote@

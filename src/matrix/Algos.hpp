@@ -26,20 +26,22 @@
 #include "math.h"
 #include <limits>
 
-template <bool> struct static_assert;
-template <> struct static_assert<true> { };
+template <bool> struct _assert;
+template <> struct _assert<true> { };
 
 template<class T> inline bool 
 is_nan (T const& x) {
-    static_cast<void>(sizeof(static_assert<std::numeric_limits<T>::has_quiet_NaN>));
+    static_cast<void>(sizeof(_assert<std::numeric_limits<T>::has_quiet_NaN>));
     return std::numeric_limits<T>::has_quiet_NaN and (x != x);
 }
 
 template <class T> inline bool 
 is_inf (T const& x) {
-    static_cast<void>(sizeof(static_assert<std::numeric_limits<T>::has_infinity>));
+    static_cast<void>(sizeof(_assert<std::numeric_limits<T>::has_infinity>));
     return x == std::numeric_limits<T>::infinity() or x == -std::numeric_limits<T>::infinity();
 }
+
+
 
 
 /**
@@ -55,7 +57,7 @@ is_inf (T const& x) {
  * @param M  Matrix
  * @return   Number of non-zero elements of matrix M
  */
-template <class T> inline static size_t 
+template <class T> inline  size_t
 nnz (const Matrix<T>& M) {
 	
 	size_t nz   = 0;
@@ -76,7 +78,7 @@ nnz (const Matrix<T>& M) {
  * @param M  Matrix
  * @return   1D?
  */
-template <class T>  inline static bool 
+template <class T>  inline  bool
 Is1D (const Matrix<T>& M) {
 	
 	return IsXD(M, 1);
@@ -90,7 +92,7 @@ Is1D (const Matrix<T>& M) {
  * @param M  Matrix
  * @return   2D?
  */
-template <class T>  inline static bool 
+template <class T>  inline  bool
 Is2D (const Matrix<T>& M) {
 	
 	return IsXD(M, 2);
@@ -104,7 +106,7 @@ Is2D (const Matrix<T>& M) {
  * @param M  Matrix
  * @return   2D?
  */
-template <class T>  inline static bool 
+template <class T>  inline  bool
 IsSquare (const Matrix<T>& M) {
 	
 	return Is2D(M) && size(M,0) == size(M,1);
@@ -118,7 +120,7 @@ IsSquare (const Matrix<T>& M) {
  * @param M  Matrix
  * @return   3D?
  */
-template <class T>  inline static bool 
+template <class T>  inline  bool
 Is3D (const Matrix<T>& M) {
 	
 	return IsXD(M, 3);
@@ -133,7 +135,7 @@ Is3D (const Matrix<T>& M) {
  * @param M  Matrix
  * @return   4D?
  */
-template <class T>  inline static bool 
+template <class T>  inline  bool
 Is4D (const Matrix<T>& M) {
 	
 	return IsXD(M, 4);
@@ -148,7 +150,7 @@ Is4D (const Matrix<T>& M) {
  * @param  d  Dimension
  * @return    X-dimensional?
  */
-template <class T>  inline static bool 
+template <class T>  inline  bool
 IsXD (const Matrix<T>& M, const size_t d) {
 	
 	size_t l = 0;
@@ -167,7 +169,7 @@ IsXD (const Matrix<T>& M, const size_t d) {
  * @param  M    Matrix
  * @return      All elements zero?
  */
-template <class T>  inline static bool 
+template <class T>  inline  bool
 IsZero (const Matrix<T>& M) {
 	
 	for (size_t i = 0; i < M.Size(); i++)
@@ -184,7 +186,7 @@ IsZero (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Empty?
  */
-template <class T> inline static bool
+template <class T> inline  bool
 IsEmpty (const Matrix<T>& M) {
 	
 	return (numel(M) == 1);
@@ -198,7 +200,7 @@ IsEmpty (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Matrix of booleans true where NaN
  */
-template <class T> inline static Matrix<bool> 
+template <class T> inline  Matrix<bool>
 isnan (const Matrix<T>& M) {
 
     Matrix<bool> res (M.Dim());
@@ -218,7 +220,7 @@ isnan (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Matrix of booleans true where inf
  */
-template <class T> inline static Matrix<bool> 
+template <class T> inline  Matrix<bool>
 isinf (const Matrix<T>& M) {
 
     Matrix<bool> res (M.Dim());
@@ -238,7 +240,7 @@ isinf (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Matrix of booleans true where inf
  */
-template <class T> inline static Matrix<bool> 
+template <class T> inline  Matrix<bool>
 isfinite (const Matrix<T>& M) {
 
     Matrix<bool> res (M.Dim());
@@ -260,7 +262,7 @@ isfinite (const Matrix<T>& M) {
  * @param  v    Optional value to which NaN and Inf elements are set. (default: T(0))
  * @return      Matrix stripped of NaN and Inf elements 
  */
-template <class T> inline static Matrix<T> 
+template <class T> inline  Matrix<T>
 dofinite (const Matrix<T>& M, const T& v = 0) {
 
     Matrix<T> res (M.Dim());
@@ -287,7 +289,7 @@ dofinite (const Matrix<T>& M, const T& v = 0) {
  * @param  M  Matrix
  * @return    Highest non-one dimension
  */
-template <class T> inline static size_t
+template <class T> inline  size_t
 ndims (const Matrix<T>& M) {
 	
 	size_t nd = 0;
@@ -316,7 +318,7 @@ ndims (const Matrix<T>& M) {
  * @param  M  Matrix
  * @return    Highest non-one dimension
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 diag (const Matrix<T>& M) {
 	
 	assert (Is2D(M));
@@ -339,7 +341,7 @@ diag (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Size in RAM in bytes.
  */
-template <class T> inline static size_t
+template <class T> inline  size_t
 SizeInRAM          (const Matrix<T>& M) {
 	
 	return numel(M) * sizeof (T);
@@ -353,7 +355,7 @@ SizeInRAM          (const Matrix<T>& M) {
  * @param   M       Matrix
  * @return          Number of cells.
  */
-template <class T> inline static size_t
+template <class T> inline  size_t
 numel               (const Matrix<T>& M) {
 	
 	size_t s = 1;
@@ -364,6 +366,22 @@ numel               (const Matrix<T>& M) {
 	return s;
 	
 }
+
+
+/**
+ * @brief          All elements non-zero?
+ *
+ * @param   M      Matrix in question
+ * @return         True if all elements non-zero
+ */
+template <class T> inline bool
+all (const Matrix<T>& M) {
+
+	return (nnz(M) == numel(M));
+
+}
+
+
 
 
 /**
@@ -399,7 +417,7 @@ size               (const Matrix<T,MPI>& M, const size_t& d) {
  * @param   sl      New width
  * @return          Resized vector
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 resize (const Matrix<T>& M, const size_t& sc, const size_t& sl) {
 
 	Matrix<size_t> sz (2,1);
@@ -423,7 +441,7 @@ resize (const Matrix<T>& M, const size_t& sc, const size_t& sl) {
  *
  * @return          Resized vector
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 resize (const Matrix<T>& M, const size_t& sc, const size_t& sl, const size_t& ss) {
 
 	Matrix<size_t> sz (3,1);
@@ -440,7 +458,7 @@ resize (const Matrix<T>& M, const size_t& sc, const size_t& sl, const size_t& ss
  * @param   M       Matrix
  * @return          Dimension vector.
  */
-template <class T>  inline static Matrix<size_t>
+template <class T>  inline  Matrix<size_t>
 size               (const Matrix<T>& M) {
 	
 	Matrix<size_t> res (1,INVALID_DIM);
@@ -489,7 +507,7 @@ resol               (const Matrix<T>& M, const size_t& d) {
  * @param   M       Matrix
  * @return          Length
  */
-template <class T>  inline static size_t
+template <class T>  inline  size_t
 length             (const Matrix<T>& M) {
 	
 	size_t l = 1;
@@ -509,7 +527,7 @@ length             (const Matrix<T>& M) {
  * @param   M       Matrix
  * @return          Width
  */
-template <class T> inline static size_t
+template <class T> inline  size_t
 width             (const Matrix<T>& M) {
 	
 	return size(M,1);
@@ -539,7 +557,7 @@ height             (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Maximum
  */
-template <class T> inline static T
+template <class T> inline  T
 max (const Matrix<T>& M) {
 
 	T max = cabs(M[0]);
@@ -559,7 +577,7 @@ max (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Minimum
  */
-template <class T> inline static T
+template <class T> inline  T
 min (const Matrix<T>& M) {
 
 	T min = cabs(M[0]);
@@ -582,7 +600,7 @@ min (const Matrix<T>& M) {
  *
  * @return          Non conjugate transpose
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 transpose (const Matrix<T>& M, const bool& c = false) {
 
 	assert (Is2D(M));
@@ -608,7 +626,7 @@ transpose (const Matrix<T>& M, const bool& c = false) {
  * @param  M        2D Matrix
  * @return          Complex conjugate transpose
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 ctranspose (const Matrix<T>& M) {
 
 	return transpose (M, true);
@@ -628,7 +646,7 @@ ctranspose (const Matrix<T>& M) {
  * @param   sz      New length
  * @return          Resized vector
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 resize (const Matrix<T>& M, const size_t& sz) {
 
 	Matrix<T> res = zeros<T> (sz,1);
@@ -652,7 +670,7 @@ resize (const Matrix<T>& M, const size_t& sz) {
  * @param   sz      New dimension vector
  * @return          Resized copy
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 resize (const Matrix<T>& M, Matrix<size_t> sz) {
 
 	Matrix<T> res  = zeros<T> (sz);
@@ -678,7 +696,7 @@ resize (const Matrix<T>& M, Matrix<size_t> sz) {
  * @param  d  Dimension
  * @return    Sum of M along dimension d
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 sum (Matrix<T>& M, const size_t d) {
 	
 	Matrix<size_t> sz = size(M);
@@ -745,7 +763,7 @@ sum (Matrix<T>& M, const size_t d) {
  * @param  d    Dimension
  * @return      Sum of squares
  */
-template <class T> inline static  Matrix<T> 
+template <class T> inline   Matrix<T>
 SOS (const Matrix<T>& M, const size_t d) {
 	
 	assert (M.Dim(d) > 1);
@@ -768,7 +786,7 @@ SOS (const Matrix<T>& M, const size_t d) {
  * @param  M       Matrix
  * @return         Squeezed matrix
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 squeeze (const Matrix<T>& M) {
 	
 	size_t found = 0;
@@ -800,7 +818,7 @@ squeeze (const Matrix<T>& M) {
  * @param   perm    New permuted dimensions
  * @return          Permuted matrix
  */
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	
 	// Check that perm only includes one number between 0 and INVALID_DIM once
@@ -873,7 +891,7 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
  * @return         Flipped matrix
  */
 /*
-template <class T> inline static Matrix<T>
+template <class T> inline  Matrix<T>
 flipud (const Matrix<T>& M)  {
 
 	size_t scol = size(M,0);

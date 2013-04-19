@@ -177,6 +177,7 @@ rand           (const size_t& col,
 	gsl_rng_env_setup();
 	grt = gsl_rng_default;
 	r = gsl_rng_alloc (grt);
+	gsl_rng_set (r, getticks()); // reseed
 
 	if      (typeid(T) == typeid(float) || typeid(T) == typeid(double))
 		while (i--)
@@ -194,7 +195,6 @@ rand           (const size_t& col,
 	else if (typeid(T) == typeid(short))
 		while (i--)
 			res[i] = 2 * gsl_rng_uniform_int (r, SHRT_MAX) - SHRT_MAX;
-	
 	else if (typeid(T) == typeid(long))
 		while (i--)
 			res[i] = 2 * gsl_rng_uniform_int (r, INT_MAX) - INT_MAX;
@@ -204,7 +204,6 @@ rand           (const size_t& col,
 	return res;
 
 }
-
 
 
 /**
