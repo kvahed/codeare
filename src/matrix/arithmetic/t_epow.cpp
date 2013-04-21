@@ -23,7 +23,6 @@ void epow_check () {
     std::cout << "A ^= p   [\n" << D << "];\n\n";
 #endif
 
-
 }
 
 
