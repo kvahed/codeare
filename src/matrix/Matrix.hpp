@@ -2009,7 +2009,7 @@ public:
             assert (_dim[i] == M.Dim(i));
 
 #if defined HAVE_SSE
-        SSE::process<T>(_M, M.Container(), SSE::add<T>(), this->Container());
+        SSE::process<T>(_M, M.Container(), SSE::add<T>(), _M);
 #else
         _M += M.Container();
 #endif
@@ -2545,7 +2545,7 @@ public:
             assert (_dim[i] == M.Dim(i));
 
 #if defined HAVE_SSE
-        SSE::process<T>(_M, M.Container(), SSE::mul<T>(), this->Container());
+        SSE::process<T>(_M, M.Container(), SSE::mul<T>(), _M);
 #else
         _M *= M.Container();
 #endif
@@ -2553,6 +2553,7 @@ public:
         return *this;
 
     }
+
 
     /**
      * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
@@ -2603,7 +2604,31 @@ public:
     }
 
     
-    
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    inline Matrix<T,P>&
+    operator/=         (const Matrix<T,P>& M) {
+
+        size_t i;
+
+        for (i = 0; i < INVALID_DIM; i++)
+            assert (_dim[i] == M.Dim(i));
+
+#if defined HAVE_SSE
+        SSE::process<T>(_M, M.Container(), SSE::div<T>(), _M);
+#else
+        _M /= M.Container();
+#endif
+
+        return *this;
+
+    }
+
+
     /**
      * @brief           Elelemtwise division by M.
      *

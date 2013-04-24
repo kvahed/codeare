@@ -2,8 +2,6 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 
-#define VERBOSE
-
 template<class T>
 void emul_check () {
 
@@ -53,10 +51,10 @@ void emul_check () {
 
 int main (int args, char** argv) {
     
-    //emul_check<float>();
-    //emul_check<double>();
+    emul_check<float>();
+    emul_check<double>();
     emul_check<cxfl>();
-    //emul_check<cxdb>();
+    emul_check<cxdb>();
     
     return 0;
     
