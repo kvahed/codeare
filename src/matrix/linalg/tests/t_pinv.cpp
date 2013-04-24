@@ -5,7 +5,7 @@
 
 template<class T> void pinv_check () {
 
-    Matrix<T> A = rand<T>(8,30);
+    Matrix<T> A = rand<T>(8,3);
     
 #ifdef VERBOSE
     std::cout << "A=\n" << A;

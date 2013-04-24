@@ -1,7 +1,7 @@
-#ifndef __SSE_HPP__
-#define __SSE_HPP__
+#ifndef __SIMD_HPP__
+#define __SIMD_HPP__
 
-#include "SSETraits.hpp"
+#include "SIMDTraits.hpp"
 
 #include <math.h>
 #include <stdio.h>
@@ -267,4 +267,4 @@ namespace SSE {
 	
 }
 
-#endif // __SSE_HPP__
+#endif // __SIMD_HPP__

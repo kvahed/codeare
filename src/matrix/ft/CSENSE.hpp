@@ -125,6 +125,7 @@ public:
 	/**
 	 * @brief          Clean up and destruct
 	 */
+	virtual
 	~CSENSE            () {
 
 		int np;

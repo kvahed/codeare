@@ -39,14 +39,11 @@ enum IceDim {
 #endif
 
 
-#include "linalg/ScalapackTraits.hpp"
-
-
 #include "config.h"
 #include "common.h"
 #include "OMP.hpp"
 #include "Complex.hpp"
-#include "SSE.hpp"
+#include "SIMD.hpp"
 
 #include "cycle.h"            // FFTW cycle implementation
 
@@ -946,12 +943,11 @@ public:
 
 		Matrix<S,P> m (_dim);
 
-#pragma omp parallel default (shared)
-		{
-#pragma omp for
-			for (size_t i = 0; i < Size(); i++)
-				m[i] = (S)_M[i];
-		}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			m[i] = (S)_M[i];
 
 		return m;
 
@@ -1709,30 +1705,6 @@ public:
     
     
     /**
-     * @brief        Resize to mxn 2D matrix.<br/>Preserving data while shrinking.<br/>Adding zeros when growing.
-     *               
-     * @param  m     # Rows
-     * @param  n     # Columns
-     */
-    inline void         
-    Resize          (const size_t& m, const size_t& n)                               {
-
-        _dim[0] = m;
-        _dim[1] = n;
-
-        for (size_t i = 2; i < INVALID_DIM; i++)
-            _dim[i] = 1;
-
-		std::valarray<T> tmp = _M;
-
-        _M.resize(Size(), T(0));
-
-        memcpy (&_M[0], &tmp[0], MIN(Size(),tmp.size()) * sizeof(T));
-
-    }
-    
-
-    /**
      * @brief           Purge data and free RAM.
      */
     inline void         
@@ -1889,14 +1861,11 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			_M[i] -= M[i];
-    	}
-
-    	//SSE::process<T,P> (&_M[0], &tmp[0], M.Size(), SSE::add<T,P>(), &_M[0]);
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] -= M[i];
 
         return *this;
 
@@ -1914,12 +1883,11 @@ public:
 
 		T t = T (s);
 
-#pragma omp parallel default (shared)
-		{
-#pragma omp for
-			for (size_t i = 0; i < Size(); i++)
-				_M[i] -= t;
-		}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] -= t;
 
 		return *this;
 
@@ -1965,16 +1933,15 @@ public:
         for (size_t i=0; i < INVALID_DIM; i++)
             assert (Dim(i) == M.Dim(i));
 
-        Matrix<T,P> res = M;
+        Matrix<T,P> res = *this;
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			res[i] += _M[i];
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			res[i] += M[i];
 
-        return res;
+    	return res;
 
     }
 
@@ -1991,12 +1958,11 @@ public:
         Matrix<T,P> res = *this;
     	T t = T(s);
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			res[i] += t;
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			res[i] += t;
 
         return res;
 
@@ -2016,16 +1982,13 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			_M[i] += M[i];
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] += M[i];
 
-    	//SSE::process<T,P> (&_M[0], &tmp[0], M.Size(), SSE::add<T,P>(), &_M[0]);
-
-        return *this;
+    	return *this;
 
     }
 
@@ -2042,12 +2005,11 @@ public:
 
     	T t = T (s);
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			_M[i] += t;
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] += t;
 
         return *this;
 
@@ -2068,13 +2030,12 @@ public:
 
         Matrix<T,P> res (_dim[1],_dim[0]);
 
-    #pragma omp parallel
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < _dim[1]; i++)
-    			for (size_t j = 0; j < _dim[0]; j++)
-    				res(i,j) = this->At(j,i);
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < _dim[1]; i++)
+			for (size_t j = 0; j < _dim[0]; j++)
+				res(i,j) = this->At(j,i);
 
         return res;
 
@@ -2136,7 +2097,13 @@ public:
     operator>           (const T& s) const {
 
         Matrix<bool> res(_dim);
-        res.Container() = (_M > s);
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::greater(_M[i], s);
+
         return res;
 
     }
@@ -2153,8 +2120,14 @@ public:
     operator>=          (const T& s) const {
 
 		Matrix<bool> res(_dim);
-		res.Container() = (_M >= s);
-		return res;
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::greater_or_equal(_M[i], s);
+
+        return res;
 
 	}
 
@@ -2169,7 +2142,13 @@ public:
     operator<=          (const T& s) const {
 
         Matrix<bool> res(_dim);
-        res.Container() = (_M <= s);
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::less_or_equal(_M[i], s);
+
         return res;
 
     }
@@ -2185,10 +2164,17 @@ public:
     operator<           (const T& s) const {
 
         Matrix<bool> res(_dim);
-        res.Container() = (_M < s);
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::less(_M[i], s);
+
         return res;
 
     }
+
 
     /**
      * @brief           Elementwise equality, result[i] = (this[i] == m[i]). i.e. this == m
@@ -2241,7 +2227,13 @@ public:
             assert (Dim(i) == M.Dim(i));
 
         Matrix<bool> res(_dim);
-        res.Container() = (_M >= M.Container());
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::greater_or_equal(_M[i], M[i]);
+
         return res;
 
     }
@@ -2260,7 +2252,13 @@ public:
             assert (Dim(i) == M.Dim(i));
 
         Matrix<bool> res(_dim);
-        res.Container() = (_M <= M.Container());
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::less_or_equal(_M[i], M[i]);
+
         return res;
 
     }
@@ -2279,7 +2277,13 @@ public:
             assert (Dim(i) == M.Dim(i));
 
         Matrix<bool> res(_dim,_res);
-        res.Container() = (_M > M.Container());
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::greater(_M[i], M[i]);
+
         return res;
 
     }
@@ -2298,7 +2302,13 @@ public:
             assert (Dim(i) == M.Dim(i));
 
         Matrix<bool> res(_dim,_res);
-        res.Container() = (_M < M.Container());
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::less(_M[i], M[i]);
+
         return res;
 
     }
@@ -2317,7 +2327,13 @@ public:
             assert (Dim(i) == M.Dim(i));
 
         Matrix<bool> res(_dim);
-        res.Container() = (_M || M.Container());
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::logical_or(_M[i], M[i]);
+
         return res;
 
     }
@@ -2334,7 +2350,13 @@ public:
     operator&&          (const Matrix<T,P>& M) const {
 
         Matrix<bool> res(_dim);
-        res.Container() = (_M && M.Container());
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); i++)
+        	res[i] = CompTraits<T>::logical_and(_M[i], M[i]);
+
         return res;
 
     }
@@ -2351,12 +2373,11 @@ public:
 
     	Matrix<T,P> res = *this;
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			res[i] = (p == 0) ? T(1) : pow(res[i],  p);
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			res[i] = (p == 0) ? T(1) : pow(res[i],  p);
 
         return res;
 
@@ -2372,12 +2393,11 @@ public:
     inline Matrix<T,P>&
     operator^=          (const float& p) {
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			_M[i] = (p == 0) ? T(1) : pow(_M[i],  p);
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] = pow(_M[i],  p);
 
         return *this;
 
@@ -2399,12 +2419,11 @@ public:
 
         Matrix<T,P> res = M;
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			res[i] *= _M[i];
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			res[i] *= _M[i];
 
         return res;
 
@@ -2424,12 +2443,11 @@ public:
         Matrix<T,P> res = *this;
     	T t = T(s);
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			res[i] *= t;
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			res[i] *= t;
 
         return res;
 
@@ -2452,14 +2470,11 @@ public:
         for (i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-#pragma omp parallel default (shared)
-    	{
-#pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			_M[i] *= M[i];
-    	}
-
-    	//SSE::process<T,P> (&_M[0], &tmp[0], M.Size(), SSE::mul<T,P>(), &_M[0]);
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] *= M[i];
 
         return *this;
 
@@ -2478,14 +2493,13 @@ public:
 
     	T t = T (s);
 
-#pragma omp parallel default (shared)
-    	{
-#pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			_M[i] *= t;
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] *= t;
 
-        return *this;
+		return *this;
 
     }
 
@@ -2508,12 +2522,11 @@ public:
 
         Matrix<T,P> res = *this;
 
-#pragma omp parallel default (shared)
-    	{
-#pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			res[i] = (M[i] != (T)0) ? _M[i] / M[i] : 0;
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			res[i] = (M[i] != (T)0) ? _M[i] / M[i] : 0;
 
         return res;
 
@@ -2534,12 +2547,11 @@ public:
 		T t = T (s);
 		Matrix<T,P> res = *this;
 
-#pragma omp parallel default (shared)
-		{
-#pragma omp for
-			for (size_t i = 0; i < Size(); i++)
-				res[i] /= t;
-		}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			res[i] /= t;
 
 		return res;
 
@@ -2563,12 +2575,11 @@ public:
         for (i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			_M[i] /= M[i];
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] /= M[i];
 
         return *this;
 
@@ -2590,12 +2601,11 @@ public:
     	T t    = T(s);
         assert (t != zero);
 
-    #pragma omp parallel default (shared)
-    	{
-    #pragma omp for
-    		for (size_t i = 0; i < Size(); i++)
-    			_M[i] /= T(s);
-    	}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			_M[i] /= T(s);
 
         return *this;
 

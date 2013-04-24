@@ -48,7 +48,9 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		RelativeSensitivities  () {}
+		RelativeSensitivities  () :
+			m_cutoff(0.0), m_echo_shift(0.0), m_weigh_maps(0),
+			m_log_mask(0), m_use_bet(0) {}
 		
 		/**
 		 * @brief Default destructor

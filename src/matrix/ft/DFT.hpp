@@ -227,12 +227,15 @@ public:
 	
 
 	DFT        (const Params& params) :
-		FT<T>::FT(params) {
+		FT<T>::FT(params), m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
+		m_out(0), m_initialised(false), m_have_mask(false) {
 
 	}
 
 
-    DFT () {}
+    DFT () :
+    	m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
+    	m_out(0), m_initialised(false), m_have_mask(false){}
     
 	/**
 	 * @brief        Clean up RAM, destroy plans

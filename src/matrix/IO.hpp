@@ -249,7 +249,18 @@ print (const Matrix<cxdb>& M, std::ostream& os) {
     
 }
 
+inline static std::ostream&
+print (const Matrix<bool>& M, std::ostream& os) {
 
+    for (size_t i = 0; i < M.Dim(0); i++) {
+        for(size_t j = 0; j < M.Dim(1); j++)
+            printf ("%d ", M(i,j) ? 1 : 0);
+        printf("\n");
+    }
+
+    return os;
+
+}
 
 template <class T> std::ostream&
 operator<< (std::ostream& os, const Matrix<T>& M) {

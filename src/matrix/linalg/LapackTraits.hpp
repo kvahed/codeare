@@ -475,3 +475,67 @@ struct LapackTraits<cxdb> {
 };
 
 
+template <>
+struct LapackTraits<bool> {
+
+    typedef bool Type;
+    typedef bool RType;
+    typedef bool CType;
+
+
+    inline static void
+    potrf (const char& uplo, const int& n, Type* a, const int& lda, int& info) {}
+
+    inline static void
+	getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {}
+
+    inline static void
+    potri (const char* uplo, int*n, void *a, int* lda, int*info) {}
+
+    inline static void
+    getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
+           int& info) {}
+
+    inline static void
+    gemv (const char& trans, const int& m, const int& n, const Type& alpha, const Type *a,
+          const int& lda, const Type *x, const int& incx, const Type& beta, Type *y,
+          const int& incy) {}
+
+    inline static void
+    gemm (const char& transa, const char& transb, const int& m, const int& n, const int& k,
+          const Type& alpha, const Type *a, const int& lda, const Type *b, const int& ldb,
+          const Type& beta, Type *c, const int& ldc) {}
+
+    inline static Type
+    nrm2 (const int N, const Type *X, const int incX) {
+    	return false;
+    }
+
+    inline static Type
+    dot  (const int N, const Type *X, const int incX, const Type *Y,
+          const int incY, void* res) {
+    	return false;
+    }
+
+    inline static Type
+    dotc (const int N, const Type *X, const int incX, const Type *Y,
+          const int incY, void* res) {
+    	return false;
+    }
+
+    inline static void
+    geev (const char& jvl, const char &jvr, const int& n, Type *a, const int& lda,
+          CType *w, Type *vl, const int& ldvl, Type *vr, const int& ldvr, Type *work,
+          const int& lwork, Type* rwork, int& info) {}
+
+    inline static void
+    gels (const char& trans, const int& m, const int& n, const int& nrhs,
+          Type* a, const int& lda, Type* b, const int& ldb, Type* work,
+          const int& lwork, int& info) {}
+
+    inline static void
+    gesdd (const char& jobz, const int& m, const int& n, Type *a, const int& lda, RType *s,
+           Type* u, const int& ldu, Type *vt, const int& ldvt, Type* work, const int& lwork,
+           RType *rwork, int* iwork, int& info) {}
+
+};

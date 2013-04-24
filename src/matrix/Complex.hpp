@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <complex>
 
+
 typedef std::complex<float>  cxfl;
 typedef std::complex<double> cxdb;
 
@@ -67,5 +68,80 @@ inline long   carg  (long   l) {return 0;}
 inline long   carg  (size_t s) {return 0;}
 inline double carg  (cxdb  cd) {return std::arg(cd);}
 inline float  carg  (cxfl  cf) {return std::arg(cf);}
+
+template<class T>
+struct CompTraits;
+
+template<>
+struct CompTraits<float> {
+
+	typedef float type;
+
+	inline static bool less_or_equal    (const type& a, const type& b) { return a <= b; }
+	inline static bool less             (const type& a, const type& b) { return a <  b; }
+	inline static bool greater_or_equal (const type& a, const type& b) { return a >= b; }
+	inline static bool greater          (const type& a, const type& b) { return a >  b; }
+	inline static bool logical_or       (const type& a, const type& b) { return a || b; }
+	inline static bool logical_and      (const type& a, const type& b) { return a && b; }
+
+};
+
+template<>
+struct CompTraits<double> {
+
+	typedef double type;
+
+	inline static bool less_or_equal    (const type& a, const type& b) { return a <= b; }
+	inline static bool less             (const type& a, const type& b) { return a <  b; }
+	inline static bool greater_or_equal (const type& a, const type& b) { return a >= b; }
+	inline static bool greater          (const type& a, const type& b) { return a >  b; }
+	inline static bool logical_or       (const type& a, const type& b) { return a || b; }
+	inline static bool logical_and      (const type& a, const type& b) { return a && b; }
+
+};
+
+template<>
+struct CompTraits<cxfl> {
+
+	typedef cxfl type;
+
+	inline static bool less_or_equal    (const type& a, const type& b) { return abs(a) <= abs(b); }
+	inline static bool less             (const type& a, const type& b) { return abs(a) <  abs(b); }
+	inline static bool greater_or_equal (const type& a, const type& b) { return abs(a) >= abs(b); }
+	inline static bool greater          (const type& a, const type& b) { return abs(a) >  abs(b); }
+	inline static bool logical_or       (const type& a, const type& b) { return abs(a) || abs(b); }
+	inline static bool logical_and      (const type& a, const type& b) { return abs(a) && abs(b); }
+
+};
+
+template<>
+struct CompTraits<cxdb> {
+
+	typedef cxdb type;
+
+	inline static bool less_or_equal    (const type& a, const type& b) { return abs(a) <= abs(b); }
+	inline static bool less             (const type& a, const type& b) { return abs(a) <  abs(b); }
+	inline static bool greater_or_equal (const type& a, const type& b) { return abs(a) >= abs(b); }
+	inline static bool greater          (const type& a, const type& b) { return abs(a) >  abs(b); }
+	inline static bool logical_or       (const type& a, const type& b) { return abs(a) || abs(b); }
+	inline static bool logical_and      (const type& a, const type& b) { return abs(a) && abs(b); }
+
+};
+
+template<>
+struct CompTraits<bool> {
+
+	typedef bool type;
+
+	inline static bool less_or_equal    (const type& a, const type& b) { return a <= b; }
+	inline static bool less             (const type& a, const type& b) { return a <  b; }
+	inline static bool greater_or_equal (const type& a, const type& b) { return a >= b; }
+	inline static bool greater          (const type& a, const type& b) { return a >  b; }
+	inline static bool logical_or       (const type& a, const type& b) { return a || b; }
+	inline static bool logical_and      (const type& a, const type& b) { return a && b; }
+
+};
+
+
 
 #endif

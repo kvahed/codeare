@@ -104,14 +104,10 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libcodeare_ft_la_LIBADD =
-am__libcodeare_ft_la_SOURCES_DIST = ../../Toolbox.hpp \
-	../../Toolbox.cpp ../../Workspace.hpp ../../Workspace.cpp \
-	DFT.hpp DFT.cpp CSENSE.hpp CSENSE.cpp NFFT.hpp NFFT.cpp \
-	NCSENSE.hpp NCSENSE.cpp
-am__dirstamp = $(am__leading_dot)dirstamp
+am__libcodeare_ft_la_SOURCES_DIST = DFT.hpp DFT.cpp CSENSE.hpp \
+	CSENSE.cpp NFFT.hpp NFFT.cpp NCSENSE.hpp NCSENSE.cpp
 @USE_NFFT3_TRUE@am__objects_1 = NFFT.lo NCSENSE.lo
-am_libcodeare_ft_la_OBJECTS = ../../Toolbox.lo ../../Workspace.lo \
-	DFT.lo CSENSE.lo $(am__objects_1)
+am_libcodeare_ft_la_OBJECTS = DFT.lo CSENSE.lo $(am__objects_1)
 libcodeare_ft_la_OBJECTS = $(am_libcodeare_ft_la_OBJECTS)
 libcodeare_ft_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -341,9 +337,8 @@ top_srcdir = @top_srcdir@
 SUBDIRS = tests
 AM_CPPFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/tinyxml
 lib_LTLIBRARIES = libcodeare-ft.la
-libcodeare_ft_la_SOURCES = ../../Toolbox.hpp ../../Toolbox.cpp \
-	../../Workspace.hpp ../../Workspace.cpp DFT.hpp DFT.cpp \
-	CSENSE.hpp CSENSE.cpp $(am__append_1)
+libcodeare_ft_la_SOURCES = DFT.hpp DFT.cpp CSENSE.hpp CSENSE.cpp \
+	$(am__append_1)
 libcodeare_ft_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
 include_HEADERS = codeare-ft.h
 all: all-recursive
@@ -414,31 +409,15 @@ clean-libLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-../../$(am__dirstamp):
-	@$(MKDIR_P) ../..
-	@: > ../../$(am__dirstamp)
-../../$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../../$(DEPDIR)
-	@: > ../../$(DEPDIR)/$(am__dirstamp)
-../../Toolbox.lo: ../../$(am__dirstamp) \
-	../../$(DEPDIR)/$(am__dirstamp)
-../../Workspace.lo: ../../$(am__dirstamp) \
-	../../$(DEPDIR)/$(am__dirstamp)
 libcodeare-ft.la: $(libcodeare_ft_la_OBJECTS) $(libcodeare_ft_la_DEPENDENCIES) $(EXTRA_libcodeare_ft_la_DEPENDENCIES) 
 	$(libcodeare_ft_la_LINK) -rpath $(libdir) $(libcodeare_ft_la_OBJECTS) $(libcodeare_ft_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ../../Toolbox.$(OBJEXT)
-	-rm -f ../../Toolbox.lo
-	-rm -f ../../Workspace.$(OBJEXT)
-	-rm -f ../../Workspace.lo
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@../../$(DEPDIR)/Toolbox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../../$(DEPDIR)/Workspace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CSENSE.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DFT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NCSENSE.Plo@am__quote@
@@ -473,7 +452,6 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf ../../.libs ../../_libs
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
@@ -738,8 +716,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f ../../$(DEPDIR)/$(am__dirstamp)
-	-rm -f ../../$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -750,7 +726,7 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ../../$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -796,7 +772,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ../../$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

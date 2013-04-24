@@ -94,7 +94,7 @@ bool init (int argc, char** argv) {
 			
 			opt->printUsage();
 			delete opt;
-			return 0;
+			return false;
 			
 		} 
 		
@@ -125,7 +125,7 @@ bool init (int argc, char** argv) {
 bool init (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	//std::string("codeare").c_str();
-	
+	return true;
 
 }
 

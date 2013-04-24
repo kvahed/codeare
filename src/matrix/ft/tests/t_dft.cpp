@@ -7,15 +7,12 @@
 
 int main (int args, char** argv) {
 
-    Matrix<cxfl> A = phantom<cxfl> (32), B;
+    Matrix<cxfl> A = rand<cxfl> (8,8), B;
     Matrix<size_t> sz (2,1);
-    sz[0] = 32; sz[1] = 32;
+    sz[0] = 8; sz[1] = 8;
     
     DFT<float> ft (sz);
     B = ft * A;
-
-    std::cout << A << std::endl;
-    std::cout << B << std::endl;
     
     return 0;
     
