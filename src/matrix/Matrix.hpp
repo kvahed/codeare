@@ -41,6 +41,7 @@ enum IceDim {
 
 #include "config.h"
 #include "common.h"
+
 #include "OMP.hpp"
 #include "Complex.hpp"
 #include "SIMD.hpp"
@@ -151,7 +152,7 @@ public:
             _res [i] = 1.0;
         }
 
-        _M.resize(Size(), T(0));
+        _M = std::valarray<T>(Size());
 
         _name = "matrix";
 
@@ -188,7 +189,7 @@ public:
 	        _res[i] = 1.0;
 		}
 
-	    _M.resize(Size(),T(0));
+        _M = std::valarray<T>(Size());
 
 	}
 
@@ -224,7 +225,7 @@ public:
 			_res[i] = 1.0;
 		}
 
-	    _M.resize(Size(),T(0));
+        _M = std::valarray<T>(Size());
 
 	}
 
@@ -262,7 +263,7 @@ public:
 			_res[i] = 1.0;
 		}
 
-	    _M.resize(Size(),T(0));
+        _M = std::valarray<T>(Size());
 
 	}
 
@@ -293,7 +294,7 @@ public:
 			_res[i] = res[i];
 		}
 
-	    _M.resize(Size(),T(0));
+        _M = std::valarray<T>(Size());
 
 	}
     
@@ -325,7 +326,7 @@ public:
 		for (size_t i = 0; i < INVALID_DIM; i++)
 			_res [i] = 1.0;
 
-		_M.resize(n*n, T(0));
+        _M = std::valarray<T>(Size());
 
 		_name = "matrix";
 
@@ -363,7 +364,7 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             _res [i] = 1.0;
 
-        _M.resize(m*n, T(0));
+        _M = std::valarray<T>(Size());
 
     	_name = "matrix";
 
@@ -401,9 +402,7 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             _res [i] = 1.0;
 
-        _M.resize(m*n*k, T(0));
-
-
+        _M = std::valarray<T>(Size());
 
     }
     
@@ -472,7 +471,7 @@ public:
 	    for (size_t i = 0; i < INVALID_DIM; i++)
 	        _res [i] = 1.0;
 
-	    _M.resize(Size(), T(0));
+        _M = std::valarray<T>(Size());
 
 	}
 
@@ -1580,7 +1579,8 @@ public:
         return _dim[1];
     }
     
-#ifdef HAVE_MPI    
+#ifdef HAVE_MPI
+
     /**
      * @brief           Get number of rows, i.e. tmp = size(this); tmp(1).
      *
@@ -1922,6 +1922,31 @@ public:
     
     
     /**
+     * @brief           Elementwise addition. i.e. this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    inline Matrix<T,P>
+    operator+          (const Matrix<T,P> &M) const {
+        
+        for (size_t i = 0; i < INVALID_DIM; i++)
+            assert (_dim[i] == M.Dim(i));
+        
+        Matrix<T,P> res = M;
+        
+#if defined HAVE_SSE
+        SSE::process<T>(res.Container(), _M, SSE::add<T>(), res.Container());
+#else
+        res.Container() += _M;
+#endif
+        
+		return res;
+        
+    }
+    
+    
+    /**
      * @brief           Elementwise addition of two matrices
      *
      * @param  M        Matrix additive.
@@ -1929,23 +1954,23 @@ public:
     template <class S>
     inline Matrix<T,P>
     operator+          (const Matrix<S,P>& M) const {
-
+        
         for (size_t i=0; i < INVALID_DIM; i++)
             assert (Dim(i) == M.Dim(i));
-
+        
         Matrix<T,P> res = *this;
-
+        
 #ifdef EW_OMP
-    #pragma omp parallel for
+#pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); i++)
 			res[i] += M[i];
-
+        
     	return res;
-
+        
     }
-
-
+    
+    
     /**
      * @brief           Elementwise addition iof all elements with a scalar
      *
@@ -1970,11 +1995,36 @@ public:
 
     
     /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
      *
-     * @param  M        Added matrix.
+     * @param  M        Factor matrix.
      * @return          Result
      */
+    inline Matrix<T,P>&
+    operator+=         (const Matrix<T,P>& M) {
+
+        size_t i;
+
+        for (i = 0; i < INVALID_DIM; i++)
+            assert (_dim[i] == M.Dim(i));
+
+#if defined HAVE_SSE
+        SSE::process<T>(_M, M.Container(), SSE::add<T>(), this->Container());
+#else
+        _M += M.Container();
+#endif
+        
+        return *this;
+        
+    }
+
+    
+/**
+ * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
+ *
+ * @param  M        Added matrix.
+ * @return          Result
+ */
     template <class S>
     inline Matrix<T,P>&
     operator+=          (const Matrix<S,P>& M) {
@@ -2410,6 +2460,31 @@ public:
      * @param  M        Factor matrix.
      * @return          Result
      */
+    inline Matrix<T,P>
+    operator*          (const Matrix<T,P> &M) const {
+
+        for (size_t i = 0; i < INVALID_DIM; i++)
+            assert (_dim[i] == M.Dim(i));
+
+        Matrix<T,P> res = M;
+
+#if defined HAVE_SSE
+        SSE::process<T>(res.Container(), _M, SSE::mul<T>(), res.Container());
+#else
+        res.Container() *= _M;
+#endif
+
+		return res;
+
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication. i.e. this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
     template <class S>
     inline Matrix<T,P>
     operator*          (const Matrix<S,P> &M) const {
@@ -2419,13 +2494,13 @@ public:
 
         Matrix<T,P> res = M;
 
-#ifdef EW_OMP
+#if defined EW_OMP
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); i++)
 			res[i] *= _M[i];
 
-        return res;
+		return res;
 
     }
 
@@ -2461,6 +2536,30 @@ public:
      * @param  M        Factor matrix.
      * @return          Result
      */
+    inline Matrix<T,P>&
+    operator*=         (const Matrix<T,P>& M) {
+
+        size_t i;
+
+        for (i = 0; i < INVALID_DIM; i++)
+            assert (_dim[i] == M.Dim(i));
+
+#if defined HAVE_SSE
+        SSE::process<T>(_M, M.Container(), SSE::mul<T>(), this->Container());
+#else
+        _M *= M.Container();
+#endif
+
+        return *this;
+
+    }
+
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
     template <class S>
     inline Matrix<T,P>&
     operator*=         (const Matrix<S,P>& M) {
@@ -2476,7 +2575,7 @@ public:
 		for (size_t i = 0; i < Size(); i++)
 			_M[i] *= M[i];
 
-        return *this;
+		return *this;
 
     }
 
@@ -2867,7 +2966,7 @@ Matrix<float,MPI>::Matrix (const size_t& cols, const size_t& rows) {
     _dim[1] = numroc_ (&_gdim[1], &_bs, &gd.mr, &izero, &gd.nr);
 	
     // Allocate
-    this->_M.resize(Size());
+    this->_M = std::valarray<float>(Size());
 	
     // RAM descriptor 
     int dims[2]; dims[0] = _dim[0]; dims[1] = _dim[1];

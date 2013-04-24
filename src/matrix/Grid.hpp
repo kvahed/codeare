@@ -1,6 +1,8 @@
 #ifndef __GRID_HPP__
 #define __GRID_HPP__
 
+#include "BLACS.hpp"
+
 #include <ostream>
 
 /**

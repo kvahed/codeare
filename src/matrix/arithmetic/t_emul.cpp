@@ -2,11 +2,13 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 
+#define VERBOSE
+
 template<class T>
 void emul_check () {
 
-    Matrix<T> A = rand<T>(3,4);
-    Matrix<T> B = rand<T>(3,4);
+    Matrix<T> A = rand<T>(32,8);
+    Matrix<T> B = rand<T>(32,8);
     T a = T(2.0);
     Matrix<T> C, D;
 
@@ -51,10 +53,10 @@ void emul_check () {
 
 int main (int args, char** argv) {
     
-    emul_check<float>();
-    emul_check<double>();
+    //emul_check<float>();
+    //emul_check<double>();
     emul_check<cxfl>();
-    emul_check<cxdb>();
+    //emul_check<cxdb>();
     
     return 0;
     

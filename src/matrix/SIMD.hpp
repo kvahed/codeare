@@ -5,6 +5,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <valarray>
 
 enum alignment {
 	A,
@@ -222,6 +223,7 @@ namespace SSE {
 
 	};
 	
+#endif
 
 	/**
 	 * @brief     Process SSE operation Op such that C = op (A, B);
@@ -232,38 +234,46 @@ namespace SSE {
 	 * @param  op Operator class
 	 * @param  C  Vector C
 	 */
-	template<class T, class Op> inline static void
-	process (const T* A, const T* B, const size_t n, const Op& op, T* C) {
+	template<class MA, class T, class Op> inline static void
+	process (const std::valarray<T>& A, const std::valarray<T>& B, const Op& op, std::valarray<T>& C) {
 		
 		typedef SSETraits<T>                sse_type;
 		typedef typename sse_type::Register reg_type;
 		
-		size_t   i  = 0;
-		size_t   na = floor ((float)n / (float)sse_type::ne);
+		size_t   n  = A.size();
+		size_t   ne = sse_type::ne;
+		size_t   na = floor ((float)n / (float)ne);
+		size_t   nr = n - na*ne;// sse_type::ns;
 		
-		load<T>  ld;
-		store<T> st;
+		load<MA>  ld;
+		store<MA> st;
 		reg_type a, b, c;
 		
+		const T* pA = &A[0];
+		const T* pB = &B[0];
+		T*       pC = &C[0];
+
 		// aligned 
-		for (size_t i = 0; i < n; i += sse_type::ne) {
-			a = load<T>::aligned (A + i);
-			b = load<T>::aligned (B + i);
+
+		for (size_t i = 0; i < na; i++) {
+			a = load<MA>::aligned (pA);
+			b = load<MA>::aligned (pB);
 			c = op.packed (a, b);
-			store<T>::aligned (C + i, c);
+			store<MA>::aligned (pC, c);
+			pA += ne; pB += ne; pC += ne;
 		}
-		
+
 		// rest
-		for (size_t i = na * sse_type::ne; i < sse_type::ns; i++) {
-			a = load<T>::unaligned (A + i);
-			b = load<T>::unaligned (B + i);
+		for (size_t i = 0; i < nr; i++) {
+			a = load<MA>::unaligned (pA++);
+			b = load<MA>::unaligned (pB++);
 			c = op.single (a, b);
-			store<T>::unaligned (C + i, c);
+			store<MA>::unaligned (pC++, c);
 		}
-		
+
 	}; // namespace SSE
 
-#endif // HAVE_SSE
+
 	
 }
 

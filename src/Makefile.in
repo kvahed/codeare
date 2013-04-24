@@ -369,7 +369,7 @@ lclient_DEPENDENCIES = liblocal.la
 libremote_la_SOURCES = RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
 libremote_la_CXXFLAGS = $(AM_CXXFLAGS) -DREMOTE
 rclient_SOURCES = $(COMMON) $(NETWORKING_COMMON)
-rclient_LDFLAGS = libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -lomniORB4 -lomnithread -lomniDynamic4 
+rclient_LDFLAGS = $(SCALAPACK_LIBS) libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ -lomniORB4 -lomnithread -lomniDynamic4 
 rclient_DEPENDENCIES = libremote.la
 
 # Rules for reconserver
