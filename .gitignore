@@ -1,0 +1,35 @@
+
+## folders (explicit) ##
+
+/autom4te.cache/
+
+
+
+## files (explicit) ##
+
+/aclocal.m4
+
+/config.log
+/config.status
+/configure
+
+/libtool
+
+/.autotools
+/.cproject
+
+
+
+## folders (global) ##
+.deps/
+
+
+
+## files (global) ##
+
+Makefile
+Makefile.in
+
+*.o
+*.lo
+*.la

@@ -1,0 +1,16 @@
+
+## files (explicit)
+
+/config.h
+/config.h.in
+
+/Loader.hpp
+
+/RRSModule.hh
+/RRSModuleSK.cc
+
+/stamp-h1
+
+/lclient
+/rclient
+/reconserver
