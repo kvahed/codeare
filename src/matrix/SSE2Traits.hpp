@@ -119,7 +119,27 @@
 		 */
 		static inline Register 
 		divp (const Register &a, const Register &b) {
-			return _mm_div_pd(a, b);
+
+            // The following code is made similar to the operator * to enable common
+            // subexpression elimination in code that contains both operator * and
+            // operator / where one or both operands are the same
+            __m256d a_re = _mm256_shuffle_pd(a,a,0); // Real part of a in both
+            __m256d arb = _mm256_mul_pd(a_re, b); // (a.re*b.re, a.re*b.im)
+            __m256d b_flip = _mm256_shuffle_pd(b,b,5); // Swap b.re and b.im
+            __m256d a_im = _mm256_shuffle_pd(a,a,0xF); // Imag part of a in both
+#ifdef __FMA__ // FMA3
+            __m256d n = _mm256_fmsubadd_pd(a_im, b_flip, arb);
+#elif defined (__FMA4__) // FMA4
+            __m256d n = _mm256_msubadd_pd (a_im, b_flip, arb);
+#else
+            __m256d aib = _mm256_mul_pd(a_im, b_flip); // (a.im*b.im, a.im*b.re)
+            __m256d arbm = change_sign<0,1,0,1>(Vec4d(arb));
+            __m256d n = _mm256_add_pd(arbm, aib); // arbm + aib
+#endif // FMA
+            __m256d bb = _mm256_mul_pd(b, b); // (b.re*b.re, b.im*b.im)
+            __m256d bsq = _mm256_hadd_pd(bb,bb); // (b.re*b.re + b.im*b.im) dublicated
+            return _mm256_div_pd(n, bsq); // n / 
+            
 		}
 		
 		/**

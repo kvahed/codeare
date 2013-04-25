@@ -22,6 +22,7 @@
 #define __CX_HPP__
 
 #include "Matrix.hpp"
+#include "Complex.hpp"
 #include "Creators.hpp"
 #include "Algos.hpp"
 
@@ -34,11 +35,10 @@
 inline static Matrix<double> 
 abs (const Matrix<cxdb>& m) {
 
-	Matrix<double> res = zeros<double> (size(m));
-	
+	Matrix<double> res (size(m));
+
 #pragma omp parallel default (shared) 
 	{
-		
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)

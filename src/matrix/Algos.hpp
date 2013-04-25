@@ -675,9 +675,11 @@ resize (const Matrix<T>& M, Matrix<size_t> sz) {
 
 	Matrix<T> res  = zeros<T> (sz);
 	size_t copysz  = MIN(numel(M), numel(res));
-	std::slice  copyslc (0,copysz,1);
 
-	res.Container()[copyslc] = M.Container()[copyslc];
+    memcpy (&res[0], M.Memory(), copysz * sizeof(T));
+    
+	//std::slice  copyslc (0,copysz,1);
+	//res.Container()[copyslc] = M.Container()[copyslc];
 
 	return res;
 	

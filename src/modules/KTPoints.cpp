@@ -198,7 +198,6 @@ KTPoints::Process   ()     {
     ofname << m_ptxfname << ".tra_ap";
     PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "t");
     // -----------------------------------
-
     return OK;
 
 }

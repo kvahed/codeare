@@ -95,8 +95,9 @@ PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<float>& grad,
 	// Gradient section ----------------------------------
 
 	// Normalise amplitudes
+    
 	float  maxg = max(abs(grad));
-	Matrix<float> go = grad / maxg;
+	/*Matrix<float> go = grad / maxg;
 
 	fprintf (fp, "[Gradient]\n"                           );
 	fprintf (fp, "\n"                                     );
@@ -120,9 +121,9 @@ PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<float>& grad,
 		
 		for (int i = 0; i < nt; i++)
 			fprintf (fp, "RF[%i]= %.5f	 %.5f\n", i, abs(pt(i,j)), (arg(pt(i,j)) >= 0.0) ? arg(pt(i,j)) : 6.28318 + arg(pt(i,j)));
-		
+            
 	}
-    
+*/
 	fclose (fp);
 	
 	return OK;

@@ -1,7 +1,7 @@
 AM_CXXFLAGS = -I../ -I../linalg -I../../ -I../../misc
-COMMON = ../Matrix.hpp Trigonometry.hpp
+COMMON = ../Matrix.hpp Trigonometry.hpp AVXTraits.hpp SSE2Traits.hpp SIMD.hpp SIMDTraits.hpp
 
-TESTS = t_sin t_cos t_tan t_exp t_asin t_acos t_atan t_atan2 t_sinh t_cosh t_tanh t_log t_log10 t_emul t_ediv t_eadd t_esub t_nrmse t_epow t_gtoreq
+TESTS = t_sin t_cos t_tan t_exp t_asin t_acos t_atan t_atan2 t_sinh t_cosh t_tanh t_log t_log10 t_emul t_ediv t_eadd t_esub t_nrmse t_epow #t_gtoreq
 check_PROGRAMS = $(TESTS)
 
 t_sin_SOURCES = $(COMMON) t_sin.cpp
