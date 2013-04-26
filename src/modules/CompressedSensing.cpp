@@ -134,6 +134,7 @@ CompressedSensing::Process () {
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	im_dc    = dwt ->* im_dc * ma;
+	im_dc    = fftshift(im_dc);
 	data     = orig;
 
 	return OK;

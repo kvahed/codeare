@@ -248,9 +248,9 @@ public:
 		
 		FTTraits<T>::CleanUp();
 		
-		FTTraits<T>::Free (m_in); 
+		FTTraits<T>::Free (m_in);
 		FTTraits<T>::Free (m_out);
-		
+
 	}
 	
 	
@@ -264,21 +264,17 @@ public:
 	virtual Matrix< std::complex<T> >
 	Trafo       (const Matrix< std::complex<T> >& m) const {
 		
-		Matrix< std::complex<T> > res = fftshift (m);
-		
-		memcpy (m_in, &res[0], m_cs);
+		Matrix< std::complex<T> > res = m;
 		
 		if (m_have_pc)
 			res *= m_pc;
 		
-		FTTraits<T>::Execute (m_fwplan);
-		
-		memcpy (&res[0], m_out, m_cs);
-		
+		FTTraits<T>::Execute (m_fwplan, (Type*)m.Memory(), (Type*)&res[0]);
+
 		if (m_have_mask)
 			res *= m_mask;
 
-		res  = fftshift (res) / m_sn;
+		res  /= m_sn;
 		
 		return res;
 		
@@ -293,22 +289,18 @@ public:
 	 */
 	virtual Matrix< std::complex<T> >
 	Adjoint     (const Matrix< std::complex<T> >& m) const {
-		
-		Matrix< std::complex<T> > res = fftshift (m);
+
+		Matrix< std::complex<T> > res = m;
 		
 		if (m_have_mask)
 			res *= m_mask;
-		
-		memcpy (m_in,  &res[0], m_cs);
-		
-		FTTraits<T>::Execute (m_bwplan);
-		
-		memcpy (&res[0], m_out, m_cs);
-		
+
+		FTTraits<T>::Execute (m_bwplan, (Type*)m.Memory(), (Type*)&res[0]);
+
 		if (m_have_pc)
 			res *= m_cpc;
 		
-		res  = fftshift (res) / m_sn;
+		res  /= m_sn;
 
 		return res;
 			

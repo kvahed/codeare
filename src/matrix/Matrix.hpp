@@ -146,6 +146,7 @@ public:
 
         for (size_t i = 0; i < INVALID_DIM; i++) {
             _dim [i] = 1;
+            _dsz [i] = 1;
             _res [i] = 1.0;
         }
 
@@ -178,11 +179,13 @@ public:
 
 	    for (i = 0; i < dim.size(); i++) {
 	        _dim[i] = dim[i];
+	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
 	    }
 
 		for (; i < INVALID_DIM; i++) {
 	        _dim[i] = 1;
+	        _dsz[i] = _dsz[i-1];
 	        _res[i] = 1.0;
 		}
 
@@ -219,6 +222,7 @@ public:
 
 		for (i = 0; i < INVALID_DIM; i++) {
 			_dim[i] = dim[i];
+	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 			_res[i] = 1.0;
 		}
 
@@ -252,11 +256,13 @@ public:
 
 		for (i = 0; i < dim.size(); i++) {
 			_dim[i] = dim[i];
+	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 			_res[i] = res[i];
 		}
 
 		for (; i < INVALID_DIM; i++) {
 			_dim[i] = 1;
+	        _dsz[i] = _dsz[i-1];
 			_res[i] = 1.0;
 		}
 
@@ -288,6 +294,7 @@ public:
 
 		for (i = 0; i < INVALID_DIM; i++) {
 			_dim[i] = dim[i];
+	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 			_res[i] = res[i];
 		}
 
@@ -316,6 +323,8 @@ public:
 
 		_dim [COL] = n;
 		_dim [LIN] = n;
+		_dsz [COL] = 1;
+		_dsz [LIN] = _dim[COL];
 
 		for (size_t i = 2; i < INVALID_DIM; i++)
 			_dim [i] = 1;
@@ -352,11 +361,15 @@ public:
         T t;
         Validate (t);
 
-        _dim [0] = m;
-        _dim [1] = n;
+        _dim [COL] = m;
+        _dim [LIN] = n;
+		_dsz [COL] = 1;
+		_dsz [LIN] = _dim[COL];
 
-        for (size_t i = 2; i < INVALID_DIM; i++)
+        for (size_t i = 2; i < INVALID_DIM; i++) {
             _dim [i] = 1;
+            _dsz [i] = _dsz[i-1];
+        }
 
         for (size_t i = 0; i < INVALID_DIM; i++)
             _res [i] = 1.0;
@@ -392,6 +405,9 @@ public:
         _dim [0] = m;
         _dim [1] = n;
         _dim [2] = k;
+		_dsz [0] = 1;
+		_dsz [1] = _dim[0];
+		_dsz [2] = _dim[1]*_dsz[1];
 
         for (size_t i = 3; i < INVALID_DIM; i++)
             _dim [i] = 1;
@@ -465,6 +481,10 @@ public:
 	    _dim[IDE] = ide;
 	    _dim[AVE] = ave;
 
+	    _dsz[COL] = 1;
+		for (size_t i = 1; i < INVALID_DIM; i++)
+	        _dsz[i] = _dsz[i-1]*_dim[i-1];
+
 	    for (size_t i = 0; i < INVALID_DIM; i++)
 	        _res [i] = 1.0;
 
@@ -497,6 +517,7 @@ public:
 
 	        for (size_t i = 0; i < INVALID_DIM; i++) {
 	            _dim[i] = M.Dim()[i];
+	            _dsz[i] = M.Dsz()[i];
 	            _res[i] = M.Res()[i];
 	        }
 
@@ -749,7 +770,7 @@ public:
     	assert (y < _dim[1]);
     	assert (z < _dim[2]);
 
-        return _M[x + _dim[0]*y + _dim[0]*_dim[1]*z];
+        return _M[x + _dsz[1]*y + _dsz[2]*z];
 
     }
     
@@ -771,7 +792,7 @@ public:
     	assert (y < _dim[1]);
     	assert (z < _dim[2]);
 
-        return _M[x + _dim[0]*y + _dim[0]*_dim[1]*z];
+        return _M[x + _dsz[1]*y + _dsz[2]*z];
 
     }
     
@@ -832,23 +853,9 @@ public:
     	assert (idd < _dim[IDD]);
     	assert (ide < _dim[IDE]);
 
-        return _M [col+
-                   lin*_dim[0]+
-                   cha*_dim[0]*_dim[1]+
-                   set*_dim[0]*_dim[1]*_dim[2]+
-                   eco*_dim[0]*_dim[1]*_dim[2]*_dim[3]+
-                   phs*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]+
-                   rep*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]+
-                   seg*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]+
-                   par*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]+
-                   slc*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]+
-                   ida*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]+
-                   idb*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]+
-                   idc*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]+
-                   idd*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]+
-                   ide*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]*_dim[13]+
-                   ave*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]*_dim[13]*_dim[14]
-                  ];
+   	 return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
+   	                  seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
+   	                  idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
 
     }
     
@@ -908,23 +915,9 @@ public:
     	assert (idd < _dim[IDD]);
     	assert (ide < _dim[IDE]);
 
-        return _M [col+
-                   lin*_dim[0]+
-                   cha*_dim[0]*_dim[1]+
-                   set*_dim[0]*_dim[1]*_dim[2]+
-                   eco*_dim[0]*_dim[1]*_dim[2]*_dim[3]+
-                   phs*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]+
-                   rep*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]+
-                   seg*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]+
-                   par*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]+
-                   slc*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]+
-                   ida*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]+
-                   idb*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]+
-                   idc*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]+
-                   idd*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]+
-                   ide*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]*_dim[13]+
-                   ave*_dim[0]*_dim[1]*_dim[2]*_dim[3]*_dim[4]*_dim[5]*_dim[6]*_dim[7]*_dim[8]*_dim[9]*_dim[10]*_dim[11]*_dim[12]*_dim[13]*_dim[14]
-                  ];
+    	 return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
+    	                  seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
+    	                  idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
 
     }
     
@@ -2778,6 +2771,17 @@ public:
 
 
     /**
+     * @brief           Get dimension sizes
+     *
+     * @return          All dimensions
+     */
+    inline const size_t*
+    Dsz                 ()                  const {
+        return _dsz;
+    }
+
+
+    /**
      * @brief           Get dimension vector
      *
      * @return          All dimensions
@@ -2809,8 +2813,11 @@ public:
     inline void
     Clear               ()                                      {
 
-        for (size_t i = 0; i < INVALID_DIM; i++)
+        for (size_t i = 0; i < INVALID_DIM; i++) {
             _dim[i] = 1;
+            _dsz[i] = 1;
+            _res[i] = 1.0;
+        }
 
         _M.resize(1);
 
@@ -2947,6 +2954,7 @@ protected:
 	
     // Structure
     size_t              _dim[INVALID_DIM]; /// Dimensions
+    size_t              _dsz[INVALID_DIM]; /// Dimension size.
     float               _res[INVALID_DIM]; /// Resolutions
 
 	// Data
