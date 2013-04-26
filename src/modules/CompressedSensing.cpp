@@ -116,7 +116,7 @@ CompressedSensing::Process () {
 	im_dc   /= pdf;
 	
 	im_dc    = dft ->* im_dc;
-	orig     = Matrix<cxfl>(im_dc);
+	orig     = im_dc;
 	
 	ma       = max(abs(im_dc));
 	im_dc   /= ma;
@@ -134,7 +134,6 @@ CompressedSensing::Process () {
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 	im_dc    = dwt ->* im_dc * ma;
-	im_dc    = fftshift(im_dc);
 	data     = orig;
 
 	return OK;
