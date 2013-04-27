@@ -35,7 +35,7 @@
  * @return        Shifted
  */
 template<class T> inline Matrix<T>
-fftshift (const Matrix<T>& m) {
+fftshif (const Matrix<T>& m) {
 	
 	assert (Is1D(m) || Is2D(m) || Is3D(m));
 
@@ -49,7 +49,52 @@ fftshift (const Matrix<T>& m) {
 	return res;
 
 }
+
+template<class T> inline Matrix<T>
+fftshift (const Matrix<T>& m) {
+
+	size_t cc = floor(((float)size(m,COL))/2);
+	size_t cl = floor(((float)size(m,LIN))/2);
+
+	Matrix<size_t> d = size(m);
+	size_t ii,jj;
+
+	Matrix<T> res = m;
+
+	for (int i = 0; i < d[1]; i++) {
+	    ii = (i + cl) % d[1];
+	    for (int j = 0; j < d[0]; j++) {
+	    	jj = (j + cc) % d[0];
+	    	res(jj,ii) = m(j,i);
+	    }
+	}
+
+	return res;
+
+}
 	
+template<class T> inline Matrix<T>
+ifftshift (const Matrix<T>& m) {
+
+	size_t cc = floor(((float)size(m,COL))/2);
+	size_t cl = floor(((float)size(m,LIN))/2);
+
+	Matrix<size_t> d = size(m);
+	size_t ii,jj;
+
+	Matrix<T> res = m;
+
+	for (int i = 0; i < d[1]; i++) {
+	    ii = (i + cl) % d[1];
+	    for (int j = 0; j < d[0]; j++) {
+	    	jj = (j + cc) % d[0];
+	    	res(j,i) = m(jj,ii);
+	    }
+	}
+
+	return res;
+
+}
 
 /**
  * @brief         Hann window
@@ -261,20 +306,19 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
+	inline virtual Matrix<CT>
 	Trafo       (const Matrix<CT>& m) const {
 		
-		Matrix<CT> res = fftshift(m);
-		
-		if (m_have_pc)
-			res *= m_pc;
-		
+		Matrix<CT> res = ifftshift((m_have_pc) ? m * m_pc : m);
+
 		FTTraits<T>::Execute (m_fwplan, (Type*)&res[0], (Type*)&res[0]);
+
+		res = fftshift(res);
 
 		if (m_have_mask)
 			res *= m_mask;
 		
-		return fftshift(res / m_sn);
+		return res / m_sn;
 		
 	}
 	
@@ -285,20 +329,19 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
+	inline virtual Matrix<CT>
 	Adjoint     (const Matrix<CT>& m) const {
 
-		Matrix<CT> res = fftshift(m);
-		
-		if (m_have_mask)
-			res *= m_mask;
+		Matrix<CT> res = ifftshift((m_have_mask) ? m * m_mask : m);
 
 		FTTraits<T>::Execute (m_bwplan, (Type*)&res[0], (Type*)&res[0]);
+
+		res = fftshift(res);
 
 		if (m_have_pc)
 			res *= m_cpc;
 		
-		return fftshift(res / m_sn);
+		return res / m_sn;
 			
 	}
 	
@@ -309,7 +352,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
+	inline virtual Matrix<CT>
 	operator* (const Matrix<CT>& m) const {
 		return Trafo(m);
 	}
@@ -321,7 +364,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
+	inline virtual Matrix<CT>
 	operator->* (const Matrix<CT>& m) const {
 		return Adjoint (m);
 	}
@@ -336,7 +379,7 @@ private:
 	 * @param  rank FT rank
 	 * @param  n    Side lengths
 	 */
-	void 
+	inline void
 	Allocate (const int rank, const int* n) {
 		
 		m_in     = FTTraits<T>::Malloc  (m_N);

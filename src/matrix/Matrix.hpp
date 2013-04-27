@@ -2013,9 +2013,7 @@ public:
     inline Matrix<T,P>&
     operator*=         (const Matrix<S,P>& M) {
 
-        size_t i;
-
-        for (i = 0; i < INVALID_DIM; i++)
+        for (size_t i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
 #ifdef EW_OMP

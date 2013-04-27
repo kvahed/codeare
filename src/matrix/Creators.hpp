@@ -126,6 +126,27 @@ ones            (const size_t& col,
 
 
 /**
+ * @brief       Zero matrix
+ *
+ * @param  sz   Size vector
+ * @return      Zero matrix
+ *
+ */
+template <class T> inline static Matrix<T>
+ones           (const Matrix<size_t>& sz) {
+
+	std::vector<size_t> n (INVALID_DIM,1);
+
+	for (size_t i = 0; i < numel(sz) && i < INVALID_DIM; i++)
+		n[i] = sz[i];
+
+ 	return Matrix<T> (n) = (T)1;
+
+
+}
+
+
+/**
  * @brief       Random matrix
  *
  * @param  col  Column
