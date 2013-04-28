@@ -35,22 +35,6 @@
  * @return        Shifted
  */
 template<class T> inline Matrix<T>
-fftshif (const Matrix<T>& m) {
-	
-	assert (Is1D(m) || Is2D(m) || Is3D(m));
-
-	Matrix<T> res  = m;
-
-	for (size_t s = 0; s < m.Dim(2); s++)
-		for (size_t l = 0; l < m.Dim(1); l++)
-			for (size_t c = 0; c < m.Dim(0); c++)
-				res (c,l,s) *= pow (-1.0,(s+l+c)%2+1);
-
-	return res;
-
-}
-
-template<class T> inline Matrix<T>
 fftshift (const Matrix<T>& m) {
 
 	size_t cc = floor(((float)size(m,COL))/2);
@@ -73,6 +57,13 @@ fftshift (const Matrix<T>& m) {
 
 }
 	
+
+/**
+ * @brief         Inverse FFT shift
+ *
+ * @param   m     TO be inversely shifted
+ * @return        Inversely shifted
+ */
 template<class T> inline Matrix<T>
 ifftshift (const Matrix<T>& m) {
 
@@ -95,6 +86,7 @@ ifftshift (const Matrix<T>& m) {
 	return res;
 
 }
+
 
 /**
  * @brief         Hann window

@@ -101,7 +101,7 @@ CompressedSensing::Process () {
 	m_csparam.dwt = new DWT <cxfl> (data.Height(), wlfamily(m_wf), m_wm);
 
 	/** -----  Which Fourier transform? **/
-	m_csparam.ft  = (FT<float>*) new DFT<float> (size(data), mask/*, pc*/);
+	m_csparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);
 
 	
 	// m_csparam.ft = (FT<float>*) new NFFT<float> (ms, M * shots, m, alpha);
@@ -116,9 +116,7 @@ CompressedSensing::Process () {
 	im_dc    = data;
 	im_dc   /= pdf;
 
-	MXDump (im_dc,"im_dca.mat","ima_dc");
 	im_dc    = dft ->* im_dc;
-	MXDump (im_dc,"im_dcb.mat","imb_dc");
 	orig     = im_dc;
 	
 	ma       = max(abs(im_dc));
