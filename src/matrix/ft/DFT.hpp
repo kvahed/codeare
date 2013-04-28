@@ -37,13 +37,15 @@
 template<class T> inline Matrix<T>
 fftshift (const Matrix<T>& m) {
 
+	Matrix<T> res = m;
+
 	size_t cc = floor(((float)size(m,COL))/2);
 	size_t cl = floor(((float)size(m,LIN))/2);
 
 	Matrix<size_t> d = size(m);
+	vector<size_t> si (INVALID_DIM,0);
+	vector<size_t> oi (INVALID_DIM,0);
 	size_t ii,jj;
-
-	Matrix<T> res = m;
 
 	for (int i = 0; i < d[1]; i++) {
 	    ii = (i + cl) % d[1];
@@ -110,13 +112,13 @@ hannwindow (const Matrix<size_t>& size, const T& t) {
 	float          h, d;
 	float          m[3];
 	
-	if (Is1D(res)) {
+	if (isvec(res)) {
 		
 		m[0] = 0.5 * size[0];
 		m[1] = 0.0;
 		m[2] = 0.0;
 		
-	} else if (Is2D(res)) {
+	} else if (is2d(res)) {
 		
 		m[0] = 0.5 * size[0];
 		m[1] = 0.5 * size[1];

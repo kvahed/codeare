@@ -137,7 +137,7 @@ whitened = ipermute(whitened,new_order);
 		
 		size_t nc = ndims(img);
 
-		if (IsZero(pc))
+		if (iszero(pc))
 			return;
 
 	}

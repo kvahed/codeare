@@ -57,8 +57,7 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
     
     assert (jobvl == 'N' || jobvl =='V');
 	assert (jobvr == 'N' || jobvr =='V');
-    assert (Is2D(m));
-    assert (IsSquare(m));
+    assert (issquare(m));
     
 	int    N     =  size(m, COL);
 	int    lda   =  N;
@@ -146,14 +145,10 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
     
 	typedef typename LapackTraits<T>::RType T2;
     
-    assert (Is2D(IN));
+    assert (is2d(IN));
     assert (jobz == 'N' || jobz == 'S' || jobz == 'A');
     
 	Matrix<T> A (IN);
-	
-	// SVD only defined on 2D data
-	if (!Is2D(A))
-		return -2;
 	
 	int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vtcol = 1;
 	T2*   rwork;
@@ -270,8 +265,7 @@ template <class T> inline Matrix<T>
 inv (const Matrix<T>& m) {
     
 	// 2D 
-    assert(Is2D(m));
-    assert(IsSquare(m));
+    assert(issquare(m));
 	
 	int N = (int) size (m,0);	
 	Matrix<T> res = m;
@@ -319,7 +313,7 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
     
 	Matrix<T> mm = m;
     
-    assert (Is2D(m));
+    assert (is2d(m));
 
 	T    *work, wopt = T(0);
     
@@ -382,7 +376,7 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
 template<class T> inline Matrix<T> 
 chol (const Matrix<T>& A, const char& uplo = 'U') {
     
-    assert(Is2D(A));
+    assert(is2d(A));
 	
 	Matrix<T> res  = A;
 	int       info = 0, n = A.Height();
@@ -426,8 +420,8 @@ chol (const Matrix<T>& A, const char& uplo = 'U') {
 template<class T> inline Matrix<T> 
 gemm (const Matrix<T>& A, const Matrix<T>& B, const char& transa = 'N', const char& transb = 'N') {
     
-    assert (Is1D(A)||Is2D(A));
-    assert (Is1D(B)||Is2D(B));
+    assert (isvec(A)||is2d(A));
+    assert (isvec(B)||is2d(B));
     
 	int aw, ah, bw, bh, m, n, k, ldc;
 	T   alpha, beta;
@@ -589,8 +583,8 @@ DOT  (const Matrix<T>& A, const Matrix<T>& B) {
 template<class T> inline Matrix<T> 
 gemv (const Matrix<T>& A, const Matrix<T>& x, const char& trans = 'N') {
     
-    assert (Is1D(x));
-    assert (Is1D(A)||Is2D(A));
+    assert (isvec(x));
+    assert (isvec(A)||is2d(A));
     
 	int aw, ah, xh, m, n, one;
 	T   alpha, beta;

@@ -73,15 +73,34 @@ nnz (const Matrix<T>& M) {
 
 
 /**
+ * @brief     Is matrix X-dimensional?
+ *
+ * @param  M  Matrix
+ * @param  d  Dimension
+ * @return    X-dimensional?
+ */
+template <class T>  inline  bool
+isxd (const Matrix<T>& M, const size_t d) {
+
+	size_t l = 0;
+
+	for (size_t i = 0; i < INVALID_DIM; i++)
+		if (M.Dim(i) > 1) l++;
+
+	return (l == d);
+
+}
+
+/**
  * @brief    Is matrix 1D?
  *
  * @param M  Matrix
  * @return   1D?
  */
 template <class T>  inline  bool
-Is1D (const Matrix<T>& M) {
+isvec (const Matrix<T>& M) {
 	
-	return IsXD(M, 1);
+	return isxd(M, 1);
 	
 }
 
@@ -93,9 +112,9 @@ Is1D (const Matrix<T>& M) {
  * @return   2D?
  */
 template <class T>  inline  bool
-Is2D (const Matrix<T>& M) {
+is2d (const Matrix<T>& M) {
 	
-	return IsXD(M, 2);
+	return isxd(M, 2);
 	
 }
 
@@ -107,9 +126,9 @@ Is2D (const Matrix<T>& M) {
  * @return   2D?
  */
 template <class T>  inline  bool
-IsSquare (const Matrix<T>& M) {
+issquare (const Matrix<T>& M) {
 	
-	return Is2D(M) && size(M,0) == size(M,1);
+	return isxd(M, 2) && (size(M,0) == size(M,1));
 	
 }
 
@@ -121,9 +140,9 @@ IsSquare (const Matrix<T>& M) {
  * @return   3D?
  */
 template <class T>  inline  bool
-Is3D (const Matrix<T>& M) {
+is3d (const Matrix<T>& M) {
 	
-	return IsXD(M, 3);
+	return isxd(M, 3);
 	
 }
 
@@ -136,29 +155,9 @@ Is3D (const Matrix<T>& M) {
  * @return   4D?
  */
 template <class T>  inline  bool
-Is4D (const Matrix<T>& M) {
+is4d (const Matrix<T>& M) {
 	
-	return IsXD(M, 4);
-	
-}
-
-
-/**
- * @brief     Is matrix X-dimensional?
- *
- * @param  M  Matrix
- * @param  d  Dimension
- * @return    X-dimensional?
- */
-template <class T>  inline  bool
-IsXD (const Matrix<T>& M, const size_t d) {
-	
-	size_t l = 0;
-	
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		if (M.Dim(i) > 1) l++;
-	
-	return (l == d);
+	return isxd(M, 4);
 	
 }
 
@@ -170,7 +169,7 @@ IsXD (const Matrix<T>& M, const size_t d) {
  * @return      All elements zero?
  */
 template <class T>  inline  bool
-IsZero (const Matrix<T>& M) {
+iszero (const Matrix<T>& M) {
 	
 	for (size_t i = 0; i < M.Size(); i++)
 		if (M[i] != T(0)) return false;
@@ -187,7 +186,7 @@ IsZero (const Matrix<T>& M) {
  * @return      Empty?
  */
 template <class T> inline  bool
-IsEmpty (const Matrix<T>& M) {
+isempty (const Matrix<T>& M) {
 	
 	return (numel(M) == 1);
 	
@@ -321,7 +320,7 @@ ndims (const Matrix<T>& M) {
 template <class T> inline  Matrix<T>
 diag (const Matrix<T>& M) {
 	
-	assert (Is2D(M));
+	assert (is2d(M));
 
 	size_t sz = MIN(size(M,0),size(M,1));
 
@@ -550,6 +549,50 @@ height             (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief           Round down
+ *
+ * @param  M        Matrix
+ * @return          Rounded down matrix
+ */
+template<class T> inline Matrix<T>
+floor (const Matrix<T>& M) {
+	Matrix<T> res = M;
+	for (size_t i = 0; i < numel(M); i++)
+		res[i] = floor (res[i]);
+	return res;
+}
+
+
+/**
+ * @brief           Round up
+ *
+ * @param  M        Matrix
+ * @return          Rounded up matrix
+ */
+template<class T> inline Matrix<T>
+ceil (const Matrix<T>& M) {
+	Matrix<T> res = M;
+	for (size_t i = 0; i < numel(M); i++)
+		res[i] = ceil (res[i]);
+	return res;
+}
+
+
+/**
+ * @brief           MATLAB-like round
+ *
+ * @param  M        Matrix
+ * @return          Rounded matrix
+ */
+template<class T> inline Matrix<T>
+round (const Matrix<T>& M) {
+	Matrix<T> res = M;
+	for (size_t i = 0; i < numel(M); i++)
+		res[i] = ROUND (res[i]);
+	return res;
+}
+
 
 /**
  * @brief           Maximal element
@@ -603,7 +646,7 @@ min (const Matrix<T>& M) {
 template <class T> inline  Matrix<T>
 transpose (const Matrix<T>& M, const bool& c = false) {
 
-	assert (Is2D(M));
+	assert (is2d(M));
 	size_t m, n, i, j;
 
 	m = size(M,0);
@@ -712,7 +755,7 @@ sum (Matrix<T>& M, const size_t d) {
 		return res;
 	
 	// Empty? allocation 
-	if (IsEmpty(M)) 
+	if (isempty(M))
 		return res;
 	
 	// Inner size 

@@ -50,7 +50,7 @@ Solution VDSpiral (SpiralParams& sp) {
 	long n = 0;
 
 	assert (numel(rad) >= 2);
-	assert (Is1D(rad) == Is1D(fov));
+	assert (isvec(rad) == isvec(fov));
 	assert (numel(rad) == numel(fov));
 
 	k_max   = 5.0 / sp.res;
