@@ -2,7 +2,6 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 
-#define VERBOSE
 
 template<class T>
 void esub_check () {

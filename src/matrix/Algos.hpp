@@ -479,6 +479,18 @@ size               (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief           Get vector of dimensions
+ *
+ * @param   M       Matrix
+ * @return          Dimension vector.
+ */
+template <class T>  inline  VECTOR_TYPE(size_t)
+vsize               (const Matrix<T>& M) {
+
+	return size(M).Container();
+
+}
 
 
 

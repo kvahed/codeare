@@ -185,7 +185,7 @@ public:
 
 		for (; i < INVALID_DIM; i++) {
 	        _dim[i] = 1;
-	        _dsz[i] = _dsz[i-1];
+	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
 		}
 
@@ -202,6 +202,43 @@ public:
 
     
     
+    /**
+     * @brief           Construct matrix with dimension array
+     *
+     * @param  dim      All 16 Dimensions
+     */
+	inline
+    Matrix              (const VECTOR_TYPE(size_t)& dim) {
+
+		assert (dim.size() <= INVALID_DIM);
+
+		size_t n = 1, i = 0;
+
+		for (; i < dim.size(); i++)
+			n *= dim[i];
+
+		assert (n);
+
+	    T t;
+	    Validate (t);
+
+	    for (i = 0; i < dim.size(); i++) {
+	        _dim[i] = dim[i];
+	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
+	        _res[i] = 1.0;
+	    }
+
+		for (; i < INVALID_DIM; i++) {
+	        _dim[i] = 1;
+	        _dsz[i] = _dsz[i-1]*_dim[i-1];
+	        _res[i] = 1.0;
+		}
+
+        _M = VECTOR_CONSTR(T,Size());
+
+	}
+
+
     /**
      * @brief           Construct matrix with dimension and resolution arrays
      *
@@ -262,7 +299,7 @@ public:
 
 		for (; i < INVALID_DIM; i++) {
 			_dim[i] = 1;
-	        _dsz[i] = _dsz[i-1];
+	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 			_res[i] = 1.0;
 		}
 
@@ -326,8 +363,10 @@ public:
 		_dsz [COL] = 1;
 		_dsz [LIN] = _dim[COL];
 
-		for (size_t i = 2; i < INVALID_DIM; i++)
+		for (size_t i = 2; i < INVALID_DIM; i++) {
 			_dim [i] = 1;
+			_dsz [i] = _dsz[i-1]*_dim[i-1];
+		}
 
 		for (size_t i = 0; i < INVALID_DIM; i++)
 			_res [i] = 1.0;
@@ -368,7 +407,7 @@ public:
 
         for (size_t i = 2; i < INVALID_DIM; i++) {
             _dim [i] = 1;
-            _dsz [i] = _dsz[i-1];
+            _dsz [i] = _dsz[i-1]*_dim[i-1];
         }
 
         for (size_t i = 0; i < INVALID_DIM; i++)
@@ -409,8 +448,10 @@ public:
 		_dsz [1] = _dim[0];
 		_dsz [2] = _dim[1]*_dsz[1];
 
-        for (size_t i = 3; i < INVALID_DIM; i++)
+        for (size_t i = 3; i < INVALID_DIM; i++) {
             _dim [i] = 1;
+            _dsz [i] =_dsz[i-1]*_dim[i-1];
+        }
 
         for (size_t i = 0; i < INVALID_DIM; i++)
             _res [i] = 1.0;
@@ -1134,6 +1175,7 @@ public:
             for (size_t i = 0; i < INVALID_DIM; i++) {
                 _dim[i] = M.Dim()[i];
                 _res[i] = M.Res()[i];
+                _dsz[i] = M.Dsz()[i];
             }
 
             _M = M.Container();
@@ -1551,23 +1593,6 @@ public:
     operator&           (const Matrix<bool>& M) const ;
     
     
-    /**
-     * @brief           Scalar equality. result[i] = (this[i] == m).
-     *
-     * @param  s        Comparing scalar.
-     * @return          Matrix of true where elements are equal s and false else.
-     */
-    inline Matrix<bool>
-    operator==          (const T& s) const {
-
-        Matrix<bool> res(_dim);
-        res.Container() = (_M == s);
-        return res;
-
-    }
-
-
-
      /**
      * @brief           Scalar inequality. result[i] = (this[i] != m). i.e. this ~= m
      *
@@ -1691,6 +1716,52 @@ public:
         return res;
 
     }
+
+
+    /**
+	 * @brief           Elementwise equality, result[i] = (this[i] == m[i]). i.e. this == m
+	 *
+	 * @param  M        Comparing matrix.
+	 * @return          Hit list
+	 */
+    template<class S>
+	inline Matrix<bool>
+	operator==          (const Matrix<S,P>& M) const {
+
+		for (size_t i=0; i < INVALID_DIM; i++)
+			assert (_dim[i] == M.Dim(i));
+
+		Matrix<bool> res (_dim);
+
+		for (size_t i = 0; i < Size(); i++)
+			res[i] = (_M[i] == M[i]);
+
+		return res;
+
+     }
+
+    /**
+     * @brief           Scalar equality. result[i] = (this[i] == m).
+     *
+     * @param  s        Comparing scalar.
+     * @return          Matrix of true where elements are equal s and false else.
+     */
+    inline Matrix<bool>
+    operator==          (const T& s) const {
+
+    	T t = (T) s;
+
+        Matrix<bool> res (_dim);
+
+		for (size_t i = 0; i < Size(); i++) {
+			bool b = (_M[i] == s);
+			res[i] = b;
+		}
+
+        return res;
+
+    }
+
 
     
     /**

@@ -27,6 +27,9 @@
 #include "FT.hpp"
 #include "FFTWTraits.hpp"
 
+#include <iterator>
+
+
 
 /**
  * @brief         FFT shift
@@ -35,25 +38,37 @@
  * @return        Shifted
  */
 template<class T> inline Matrix<T>
-fftshift (const Matrix<T>& m) {
+fftshift (const Matrix<T>& m, const bool& fw = true) {
 
-	Matrix<T> res = m;
+	Matrix<size_t> tmp = resize(size(m),INVALID_DIM,1);
+	for (size_t i = 0; i<INVALID_DIM; i++)
+		if (tmp[i] == 0)
+			tmp[i] = 1;
 
-	size_t cc = floor(((float)size(m,COL))/2);
-	size_t cl = floor(((float)size(m,LIN))/2);
+	VECTOR_TYPE(size_t) d = tmp.Container(); // data side lengths
+	VECTOR_TYPE(size_t) c = (floor(tmp/2)).Container(); // center coords
 
-	Matrix<size_t> d = size(m);
-	vector<size_t> si (INVALID_DIM,0);
-	vector<size_t> oi (INVALID_DIM,0);
-	size_t ii,jj;
+    vector<size_t> oi (INVALID_DIM,0); // original index
+    vector<size_t> si (INVALID_DIM,0); // shifted index
 
-	for (int i = 0; i < d[1]; i++) {
-	    ii = (i + cl) % d[1];
-	    for (int j = 0; j < d[0]; j++) {
-	    	jj = (j + cc) % d[0];
-	    	res(jj,ii) = m(j,i);
-	    }
-	}
+    Matrix<T> res (vsize(m));
+
+    for (oi[3] = 0; oi[3] < d[3]; oi[3]++) {
+   		si[3] = (oi[3] + c[3]) % d[3];
+		for (oi[2] = 0; oi[2] < d[2]; oi[2]++) {
+			si[2] = (oi[2] + c[2]) % d[2];
+			for (oi[1] = 0; oi[1] < d[1]; oi[1]++) {
+				si[1] = (oi[1] + c[1]) % d[1];
+				for (oi[0] = 0; oi[0] < d[0]; oi[0]++) {
+					si[0] = (oi[0] + c[0]) % d[0];
+					if (fw)
+						res(si[0],si[1],si[2],si[3]) = m(oi[0],oi[1],oi[2],oi[3]);
+					else
+						res(oi[0],oi[1],oi[2],oi[3]) = m(si[0],si[1],si[2],si[3]);
+				}
+			}
+		}
+    }
 
 	return res;
 
@@ -69,23 +84,7 @@ fftshift (const Matrix<T>& m) {
 template<class T> inline Matrix<T>
 ifftshift (const Matrix<T>& m) {
 
-	size_t cc = floor(((float)size(m,COL))/2);
-	size_t cl = floor(((float)size(m,LIN))/2);
-
-	Matrix<size_t> d = size(m);
-	size_t ii,jj;
-
-	Matrix<T> res = m;
-
-	for (int i = 0; i < d[1]; i++) {
-	    ii = (i + cl) % d[1];
-	    for (int j = 0; j < d[0]; j++) {
-	    	jj = (j + cc) % d[0];
-	    	res(j,i) = m(jj,ii);
-	    }
-	}
-
-	return res;
+	return fftshift (m,false);
 
 }
 
@@ -171,7 +170,8 @@ public:
 	 * @param  pc    Phase correction (or target phase)
 	 * @param  b0    Field distortion
 	 */
-	DFT         (const Matrix<size_t>& sl, const Matrix<T>& mask,
+	DFT         (const Matrix<size_t>& sl,
+				 const Matrix<T>& mask = Matrix<T>(1),
 				 const Matrix<CT>& pc = Matrix<CT>(1),
 				 const Matrix<T>& b0 = Matrix<T>(1)) :
 		m_N(1), m_have_mask (false), m_have_pc (false) {
@@ -196,6 +196,14 @@ public:
 			m_N  *= n[i];
 		}
 		
+		Matrix<size_t> tmp = resize(sl,INVALID_DIM,1);
+		for (size_t i = 0; i<INVALID_DIM; i++)
+			if (tmp[i] == 0)
+				tmp[i] = 1;
+
+		d = tmp.Container(); // data side lengths
+		c = (floor(tmp/2)).Container(); // center coords
+
 		Allocate (rank, n);
 		
 		m_initialised = true;
@@ -219,6 +227,8 @@ public:
 
 		int n[rank];
 		
+		size_t i;
+
 		if (numel(mask) > 1) {
 			m_have_mask = true;
 			m_mask      = mask;
@@ -230,11 +240,21 @@ public:
 			m_cpc  = conj(pc);
 		}
 		
-		for (size_t i = 0; i < rank; i++) {
+		for (i = 0; i < rank; i++) {
 			n[i]  = sl;
 			m_N  *= n[i];
 		}
 		
+
+		Matrix<size_t> tmp (INVALID_DIM,1);
+		for (i = 0; i <       rank; i++)
+			tmp[i] = sl;
+		for (     ; i< INVALID_DIM; i++)
+			tmp[i] = 1;
+
+		d = tmp.Container(); // data side lengths
+		c = (floor(tmp/2)).Container(); // center coords
+
 		Allocate (rank, n);
 		
 		m_initialised = true;
@@ -242,30 +262,6 @@ public:
 	}
 	
 	
-	/**
-	 * @brief        Construct FFTW plans for forward and backward FT
-	 * 
-	 * @param  sl    Matrix of side lengths of the FT range
-	 */
-	DFT         (const Matrix<size_t>& sl) : 
-		m_N(1), m_have_mask (false), m_have_pc (false) {
-		
-		
-		int rank = numel(sl);
-		int n[rank];
-		
-		for (int i = 0; i < rank; i++) {
-			n[i]  = (int) sl[rank-1-i];
-			m_N  *= n[i];
-		}
-
-		Allocate (rank, n);
-		
-		m_initialised = true;
-		
-	}
-	
-
 	DFT        (const Params& params) :
 		FT<T>::FT(params), m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
 		m_initialised(false), m_have_mask(false) {
@@ -293,7 +289,6 @@ public:
 	}
 	
 	
-
 	/**
 	 * @brief    Forward transform
 	 *
@@ -303,11 +298,11 @@ public:
 	inline virtual Matrix<CT>
 	Trafo       (const Matrix<CT>& m) const {
 		
-		Matrix<CT> res = ifftshift((m_have_pc) ? m * m_pc : m);
+		Matrix<CT> res = ishift((m_have_pc) ? m * m_pc : m);
 
 		FTTraits<T>::Execute (m_fwplan, (Type*)&res[0], (Type*)&res[0]);
 
-		res = fftshift(res);
+		res = shift(res);
 
 		if (m_have_mask)
 			res *= m_mask;
@@ -326,11 +321,11 @@ public:
 	inline virtual Matrix<CT>
 	Adjoint     (const Matrix<CT>& m) const {
 
-		Matrix<CT> res = ifftshift((m_have_mask) ? m * m_mask : m);
+		Matrix<CT> res = ishift((m_have_mask) ? m * m_mask : m);
 
 		FTTraits<T>::Execute (m_bwplan, (Type*)&res[0], (Type*)&res[0]);
 
-		res = fftshift(res);
+		res = shift(res);
 
 		if (m_have_pc)
 			res *= m_cpc;
@@ -364,8 +359,48 @@ public:
 	}
 
 
+
+
 private:
 	
+
+	inline Matrix<CT>
+	shift (const Matrix<CT>& m, const bool& fw = true) const {
+
+		VECTOR_TYPE(size_t) oi (INVALID_DIM,1);
+		VECTOR_TYPE(size_t) si (INVALID_DIM,1);
+
+		Matrix<CT> res (vsize(m));
+
+	    for (oi[3] = 0; oi[3] < d[3]; oi[3]++) {
+	   		si[3] = (oi[3] + c[3]) % d[3];
+			for (oi[2] = 0; oi[2] < d[2]; oi[2]++) {
+				si[2] = (oi[2] + c[2]) % d[2];
+				for (oi[1] = 0; oi[1] < d[1]; oi[1]++) {
+					si[1] = (oi[1] + c[1]) % d[1];
+					for (oi[0] = 0; oi[0] < d[0]; oi[0]++) {
+						si[0] = (oi[0] + c[0]) % d[0];
+						if (fw)
+							res(si[0],si[1],si[2],si[3]) = m(oi[0],oi[1],oi[2],oi[3]);
+						else
+							res(oi[0],oi[1],oi[2],oi[3]) = m(si[0],si[1],si[2],si[3]);
+					}
+				}
+			}
+	    }
+
+	    return res;
+
+	}
+
+
+	inline Matrix<CT>
+	ishift(const Matrix<CT>& m) const {
+
+		return shift(m,false);
+
+	}
+
 
 	/**
 	 * @brief       Allocate RAM and plans
@@ -407,6 +442,9 @@ private:
 	bool       m_zpad;         /**< @brief Zero padding? (!!!NOT OPERATIONAL YET!!!)*/
 	
 	Type*      m_in;           /**< @brief Aligned fftw input*/
+
+	VECTOR_TYPE(size_t) d;
+	VECTOR_TYPE(size_t) c;
 
 	
 };
