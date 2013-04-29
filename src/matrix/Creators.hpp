@@ -117,11 +117,31 @@ ones            (const size_t& col,
 				 const size_t& ave = 1) {
 
  	 Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-	 size_t i = numel(res);
-
-	 res.Container() = T(1);
+     for (size_t i = 0; i < numel(res); i++)
+         res[i] = T(1.0);
 
 	 return res;
+
+}
+
+
+/**
+ * @brief       Zero matrix
+ *
+ * @param  sz   Size vector
+ * @return      Zero matrix
+ *
+ */
+template <class T> inline static Matrix<T>
+ones           (const Matrix<size_t>& sz) {
+
+	std::vector<size_t> n (INVALID_DIM,1);
+
+	for (size_t i = 0; i < numel(sz) && i < INVALID_DIM; i++)
+		n[i] = sz[i];
+
+ 	return Matrix<T> (n) = (T)1;
+
 
 }
 

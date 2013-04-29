@@ -21,6 +21,7 @@
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
 #include "DFT.hpp"
+#include "IO.hpp"
 
 using namespace RRStrategy;
 
@@ -114,9 +115,9 @@ CompressedSensing::Process () {
 	
 	im_dc    = data;
 	im_dc   /= pdf;
-	
+
 	im_dc    = dft ->* im_dc;
-	orig     = Matrix<cxfl>(im_dc);
+	orig     = im_dc;
 	
 	ma       = max(abs(im_dc));
 	im_dc   /= ma;

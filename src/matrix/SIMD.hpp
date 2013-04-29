@@ -1,11 +1,31 @@
 #ifndef __SIMD_HPP__
 #define __SIMD_HPP__
 
+#include "config.h"
 #include "SIMDTraits.hpp"
+#include "AlignmentAllocator.hpp"
+
+#include <vector>
+
+
+#ifdef HAVE_SSE
+    #if defined __AVX__
+        #define ALIGNEMENT 32
+    #elif defined __SSE2__
+        #define ALIGNEMENT 16
+    #endif
+    #define VECTOR_TYPE(A) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >
+    #define VECTOR_CONSTR(A,B) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B)
+    #define VECTOR_CONSTR_VAL(A,B,C) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B,C)
+#else
+    #include <valarray>
+    #define VECTOR_TYPE(A) std::valarray<A>
+    #define VECTOR_CONSTR(A,B) std::valarray<A>(B)
+#endif
+
 
 #include <math.h>
 #include <stdio.h>
-#include <valarray>
 
 enum alignment {
 	A,
@@ -223,7 +243,6 @@ namespace SSE {
 
 	};
 	
-#endif
 
 	/**
 	 * @brief     Process SSE operation Op such that C = op (A, B);
@@ -235,7 +254,7 @@ namespace SSE {
 	 * @param  C  Vector C
 	 */
 	template<class MA, class T, class Op> inline static void
-	process (const std::valarray<T>& A, const std::valarray<T>& B, const Op& op, std::valarray<T>& C) {
+	process (const VECTOR_TYPE(T)& A, const VECTOR_TYPE(T)& B, const Op& op, VECTOR_TYPE(T)& C) {
 		
 		typedef SSETraits<T>                sse_type;
 		typedef typename sse_type::Register reg_type;
@@ -243,10 +262,8 @@ namespace SSE {
 		size_t   n  = A.size();
 		size_t   ne = sse_type::ne;
 		size_t   na = floor ((float)n / (float)ne);
-		size_t   nr = n - na*ne;// sse_type::ns;
+        size_t   nr = n % ne;
 		
-		load<MA>  ld;
-		store<MA> st;
 		reg_type a, b, c;
 		
 		const T* pA = &A[0];
@@ -264,15 +281,16 @@ namespace SSE {
 		}
 
 		// rest
-		for (size_t i = 0; i < nr; i++) {
-			a = load<MA>::unaligned (pA++);
-			b = load<MA>::unaligned (pB++);
+		if (nr) {
+			a = load<MA>::unaligned (pA);
+			b = load<MA>::unaligned (pB);
 			c = op.single (a, b);
-			store<MA>::unaligned (pC++, c);
+			store<MA>::unaligned (pC, c);
 		}
 
 	}; // namespace SSE
 
+#endif
 
 	
 }

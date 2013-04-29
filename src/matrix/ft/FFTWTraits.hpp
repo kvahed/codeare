@@ -38,6 +38,7 @@ struct FTTraits<float> {
 	
 	typedef fftwf_plan    Plan; /**< @brief fftw plan (float precision) */
 	typedef fftwf_complex Type; /**< @brief fftw complex data type (float precision) */
+	typedef float         otype;
 	
 
 	/**
@@ -55,7 +56,8 @@ struct FTTraits<float> {
 	static inline Plan 
 	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {
 		InitThreads();
-	    return fftwf_plan_dft (rank, n, in, out, sign, flags);
+		return fftwf_plan_dft (rank, n, in, out, sign, flags);
+
 	}
 	
 
@@ -64,13 +66,13 @@ struct FTTraits<float> {
 	 *
 	 * @return        Success
 	 */
-	static bool 
+	static inline bool
 	InitThreads () {
 
 		Workspace& ws = Workspace::Instance();
 		int nt = boost::any_cast<int>(ws.p["FFTWFThreads"]);
 
-		if (nt > 0)
+		if (nt)
 			return true;
 
 #pragma omp parallel
@@ -79,34 +81,17 @@ struct FTTraits<float> {
 			omp_set_dynamic(false);
 		}		
 
-		printf ("  Initialising %d-threaded FFTWF ... ", nt);
-		fflush (stdout);
-
 #ifdef HAVE_FFTWF_THREADS
-		bool ok = fftwf_init_threads();
-		if (ok) {
-			PlanWithNThreads (nt);
+		if (fftwf_init_threads()) {
+			fftwf_plan_with_nthreads (nt);
 			ws.PSet("FFTWFThreads", nt);
 		}
 #endif
-
-		printf ("done\n");
 
 		return true;
 		
 	}
 	
-
-	/**
-	 * @brief        Create plans with N threads
-	 * 
-	 * @param  nt    # of threads
-	 */
-	static void 
-	PlanWithNThreads (const int& nt) { 
-		fftwf_plan_with_nthreads (nt); 
-	}
-
 
 	/**
 	 * @brief        Inlined memory allocation for performance
@@ -136,6 +121,8 @@ struct FTTraits<float> {
 	 */
 	static inline void 
 	CleanUp () {
+		if (fftwf_init_threads())
+			fftwf_cleanup_threads();
 		fftwf_cleanup ();
 	}
 	
@@ -161,6 +148,16 @@ struct FTTraits<float> {
 		fftwf_execute (p); 
 	}        
 	
+	/**
+	 * @brief        Execute plan
+	 *
+	 * @param  p     Plan to be executed
+	 */
+	static inline void
+	Execute (Plan p, Type* in, Type* out) {
+		fftwf_execute_dft (p, in, out);
+	}
+
 };
 
 
@@ -172,7 +169,7 @@ struct FTTraits<double> {
 	
 	typedef fftw_plan    Plan;  /**< @brief fftw plan (double precision) */
 	typedef fftw_complex Type;  /**< @brief fftw complex data type (double precision) */
-	
+	typedef double      otype;
 
 	/**
 	 * @brief         DFT plan
@@ -187,7 +184,8 @@ struct FTTraits<double> {
 	 * @return        Plan
 	 */
 	static inline Plan 
-	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {                    
+	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {
+		InitThreads();
 	    return fftw_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
@@ -197,11 +195,11 @@ struct FTTraits<double> {
 	 *
 	 * @return        Success
 	 */
-	static bool 
+	static inline bool
 	InitThreads () {
 
 		Workspace& ws = Workspace::Instance();
-		int nt = boost::any_cast<int>(ws.p["FFTWFThreads"]);
+		int nt = boost::any_cast<int>(ws.p["FFTWThreads"]);
 
 		if (nt > 0)
 			return true;
@@ -211,33 +209,20 @@ struct FTTraits<double> {
 			nt = omp_get_num_threads();
 		}		
 
-		printf ("  Initialising %d-threaded FFTW ... ", nt);
-		fflush (stdout);
 
 #ifdef HAVE_FFTWF_THREADS
-		bool ok = fftw_init_threads();
-		if (ok) {
-			PlanWithNThreads (nt);
+		if (fftw_init_threads()) {
+			std::cout << nt << std::endl;
+			fftw_plan_with_nthreads (nt);
 			ws.PSet("FFTWThreads", nt);
 		}
 #endif
 
-		printf ("done\n");
 
 		return true;
 		
 	}
 	
-
-	/**
-	 * @brief        Create plans with N threads
-	 * 
-	 * @param   nt   # of threads
-	 */
-	static void 
-	PlanWithNThreads (const int& nt) { 
-		fftw_plan_with_nthreads (nt); 
-	}
 
 
 	/**
@@ -268,6 +253,8 @@ struct FTTraits<double> {
 	 */
 	static inline void 
 	CleanUp () {
+		if (fftw_init_threads())
+			fftw_cleanup_threads();
 		fftw_cleanup ();
 	}
 	
@@ -292,6 +279,16 @@ struct FTTraits<double> {
 	Execute (Plan p) { 
 		fftw_execute (p); 
 	}        
+
+	/**
+	 * @brief        Execute plan
+	 *
+	 * @param  p     Plan to be executed
+	 */
+	static inline void
+	Execute (Plan p, Type* in, Type* out) {
+		fftw_execute_dft (p, in, out);
+	}
 
 };
 

@@ -2,11 +2,13 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 
+#define VERBOSE
+
 template<class T>
 void esub_check () {
 
-    Matrix<T> A = rand<T>(3,4);
-    Matrix<T> B = rand<T>(3,4);
+    Matrix<T> A = rand<T>(8,3);
+    Matrix<T> B = rand<T>(8,3);
     T a = T(2.0);
     Matrix<T> C, D;
 

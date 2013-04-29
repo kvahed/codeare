@@ -55,8 +55,7 @@ TESTS = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) t_exp$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
 	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
 	t_emul$(EXEEXT) t_ediv$(EXEEXT) t_eadd$(EXEEXT) \
-	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT) \
-	t_gtoreq$(EXEEXT)
+	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/arithmetic
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -84,8 +83,7 @@ am__EXEEXT_1 = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
 	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
 	t_emul$(EXEEXT) t_ediv$(EXEEXT) t_eadd$(EXEEXT) \
-	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT) \
-	t_gtoreq$(EXEEXT)
+	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT)
 am__objects_1 =
 am_t_acos_OBJECTS = $(am__objects_1) t_acos.$(OBJEXT)
 t_acos_OBJECTS = $(am_t_acos_OBJECTS)
@@ -123,9 +121,6 @@ t_esub_LDADD = $(LDADD)
 am_t_exp_OBJECTS = $(am__objects_1) t_exp.$(OBJEXT)
 t_exp_OBJECTS = $(am_t_exp_OBJECTS)
 t_exp_LDADD = $(LDADD)
-am_t_gtoreq_OBJECTS = $(am__objects_1) t_gtoreq.$(OBJEXT)
-t_gtoreq_OBJECTS = $(am_t_gtoreq_OBJECTS)
-t_gtoreq_LDADD = $(LDADD)
 am_t_log_OBJECTS = $(am__objects_1) t_log.$(OBJEXT)
 t_log_OBJECTS = $(am_t_log_OBJECTS)
 t_log_LDADD = $(LDADD)
@@ -173,16 +168,16 @@ SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
 	$(t_eadd_SOURCES) $(t_ediv_SOURCES) $(t_emul_SOURCES) \
 	$(t_epow_SOURCES) $(t_esub_SOURCES) $(t_exp_SOURCES) \
-	$(t_gtoreq_SOURCES) $(t_log_SOURCES) $(t_log10_SOURCES) \
-	$(t_nrmse_SOURCES) $(t_sin_SOURCES) $(t_sinh_SOURCES) \
-	$(t_tan_SOURCES) $(t_tanh_SOURCES)
+	$(t_log_SOURCES) $(t_log10_SOURCES) $(t_nrmse_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_tan_SOURCES) \
+	$(t_tanh_SOURCES)
 DIST_SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
 	$(t_eadd_SOURCES) $(t_ediv_SOURCES) $(t_emul_SOURCES) \
 	$(t_epow_SOURCES) $(t_esub_SOURCES) $(t_exp_SOURCES) \
-	$(t_gtoreq_SOURCES) $(t_log_SOURCES) $(t_log10_SOURCES) \
-	$(t_nrmse_SOURCES) $(t_sin_SOURCES) $(t_sinh_SOURCES) \
-	$(t_tan_SOURCES) $(t_tanh_SOURCES)
+	$(t_log_SOURCES) $(t_log10_SOURCES) $(t_nrmse_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_tan_SOURCES) \
+	$(t_tanh_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -347,7 +342,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -I../ -I../linalg -I../../ -I../../misc
-COMMON = ../Matrix.hpp Trigonometry.hpp
+COMMON = ../Matrix.hpp Trigonometry.hpp AVXTraits.hpp SSE2Traits.hpp SIMD.hpp SIMDTraits.hpp
 t_sin_SOURCES = $(COMMON) t_sin.cpp
 t_cos_SOURCES = $(COMMON) t_cos.cpp
 t_tan_SOURCES = $(COMMON) t_tan.cpp
@@ -447,9 +442,6 @@ t_esub$(EXEEXT): $(t_esub_OBJECTS) $(t_esub_DEPENDENCIES) $(EXTRA_t_esub_DEPENDE
 t_exp$(EXEEXT): $(t_exp_OBJECTS) $(t_exp_DEPENDENCIES) $(EXTRA_t_exp_DEPENDENCIES) 
 	@rm -f t_exp$(EXEEXT)
 	$(CXXLINK) $(t_exp_OBJECTS) $(t_exp_LDADD) $(LIBS)
-t_gtoreq$(EXEEXT): $(t_gtoreq_OBJECTS) $(t_gtoreq_DEPENDENCIES) $(EXTRA_t_gtoreq_DEPENDENCIES) 
-	@rm -f t_gtoreq$(EXEEXT)
-	$(CXXLINK) $(t_gtoreq_OBJECTS) $(t_gtoreq_LDADD) $(LIBS)
 t_log$(EXEEXT): $(t_log_OBJECTS) $(t_log_DEPENDENCIES) $(EXTRA_t_log_DEPENDENCIES) 
 	@rm -f t_log$(EXEEXT)
 	$(CXXLINK) $(t_log_OBJECTS) $(t_log_LDADD) $(LIBS)
@@ -490,7 +482,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_epow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_esub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_exp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_gtoreq.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log10.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_nrmse.Po@am__quote@
