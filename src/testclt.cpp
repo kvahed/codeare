@@ -58,7 +58,9 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
 		else if (!strcmp (test, "KArb"))                  karbtest     (con);
 		else if (!strcmp (test, "Creators"))              creatorstest (con);
-		//else if (!strcmp (test, "MPI"))                   mpitest      (con);
+#ifdef HAVE_MPI
+		else if (!strcmp (test, "MPI"))                   mpitest      (con);
+#endif
 		else if (!strcmp (test, "SHA256"))                sha256test   (con);
 		else if (!strcmp (test, "ISMRMRD"))               ismrmrdtest  (con);
 		//else if (!strcmp (test, "ocl"))                   oclmatrixtest(con);

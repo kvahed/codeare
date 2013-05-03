@@ -1990,7 +1990,7 @@ public:
 #if defined HAVE_SSE
         SSE::process<T>(_M, M.Container(), SSE::mul<T>(), res.Container());
 #else
-        res.Container() *= M.Container();
+        res.Container() = _M * M.Container();
 #endif
 
 		return res;
@@ -2132,12 +2132,12 @@ public:
         for (size_t i=0; i < INVALID_DIM; i++)
             assert (Dim(i) == M.Dim(i));
 
-        Matrix<T,P> res = *this;
+        Matrix<T,P> res (_dim);
 
 #if defined HAVE_SSE
-        SSE::process<T>(res.Container(), M.Container(), SSE::div<T>(), res.Container());
+        SSE::process<T>(_M, M.Container(), SSE::div<T>(), res.Container());
 #else
-        res.Container() /= M.Container();
+        res.Container() = _M / M.Container();
 #endif
 
         return res;

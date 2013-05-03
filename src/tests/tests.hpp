@@ -18,6 +18,8 @@
 #include "iotest.hpp"
 #include "creators.hpp"
 #include "karb.hpp"
-//#include "mpitest.hpp"
+#ifdef HAVE_MPI
+    #include "mpitest.hpp"
+#endif
 #include "sha256test.hpp"
 #include "ismrmrdtest.hpp"
