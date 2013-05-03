@@ -72,17 +72,17 @@ struct LapackTraits<float> {
     nrm2 (const int N, const Type *X, const int incX) {
         return cblas_snrm2 (N, X, incX);
     }
-
+    
     inline static void
     dot  (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-        *res = cblas_sdot (N, X, incX, Y, incY);    
+        *res = cblas_sdot (N, X, incX, Y, incY);
     }
     
-    inline static void 
+    inline static void
     dotc (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-        *res = cblas_sdot (N, X, incX, Y, incY);    
+        *res = cblas_sdot (N, X, incX, Y, incY);
     }
     
     inline static void
@@ -198,13 +198,13 @@ struct LapackTraits<double> {
     inline static void
     dot  (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-        *res = cblas_ddot (N, X, incX, Y, incY);    
+        *res = cblas_ddot (N, X, incX, Y, incY);
     }
     
-    inline static void 
+    inline static void
     dotc (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-        *res = cblas_ddot (N, X, incX, Y, incY);    
+        *res = cblas_ddot (N, X, incX, Y, incY);
     }
 
     inline static void
