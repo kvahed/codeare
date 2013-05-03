@@ -1985,10 +1985,10 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-        Matrix<T,P> res = *this;
+        Matrix<T,P> res (_dim);
 
 #if defined HAVE_SSE
-        SSE::process<T>(res.Container(), _M, SSE::mul<T>(), res.Container());
+        SSE::process<T>(_M, M.Container(), SSE::mul<T>(), res.Container());
 #else
         res.Container() *= M.Container();
 #endif
