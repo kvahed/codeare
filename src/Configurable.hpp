@@ -155,6 +155,18 @@ class Configurable {
 
 
 	/**
+	 * @brief           Set a float type attribute
+	 *
+	 * @param  name     Attribute name
+	 * @param  value    Attribute value
+	 */
+	inline void
+	SetAttribute        (const char* name, float value) {
+		Configuration()->SetDoubleAttribute (name, (double)value);
+	}
+
+
+	/**
 	 * @brief           Get a string type attribute
 	 *
 	 * @param  name     Attribute name 
@@ -263,7 +275,10 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, float* value) const {
-		return Configuration()->QueryDoubleAttribute (name, (double*)value);
+		double v;
+		int success = Configuration()->QueryDoubleAttribute (name, &v);
+		*value = v;
+		return success;
 	}
 
 

@@ -55,7 +55,9 @@ TESTS = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) t_exp$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
 	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
 	t_emul$(EXEEXT) t_ediv$(EXEEXT) t_eadd$(EXEEXT) \
-	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT)
+	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT) \
+	t_floor$(EXEEXT) t_round$(EXEEXT) t_ceil$(EXEEXT) \
+	t_size$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/arithmetic
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -83,7 +85,9 @@ am__EXEEXT_1 = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
 	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
 	t_emul$(EXEEXT) t_ediv$(EXEEXT) t_eadd$(EXEEXT) \
-	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT)
+	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT) \
+	t_floor$(EXEEXT) t_round$(EXEEXT) t_ceil$(EXEEXT) \
+	t_size$(EXEEXT)
 am__objects_1 =
 am_t_acos_OBJECTS = $(am__objects_1) t_acos.$(OBJEXT)
 t_acos_OBJECTS = $(am_t_acos_OBJECTS)
@@ -97,6 +101,9 @@ t_atan_LDADD = $(LDADD)
 am_t_atan2_OBJECTS = $(am__objects_1) t_atan2.$(OBJEXT)
 t_atan2_OBJECTS = $(am_t_atan2_OBJECTS)
 t_atan2_LDADD = $(LDADD)
+am_t_ceil_OBJECTS = $(am__objects_1) t_ceil.$(OBJEXT)
+t_ceil_OBJECTS = $(am_t_ceil_OBJECTS)
+t_ceil_LDADD = $(LDADD)
 am_t_cos_OBJECTS = $(am__objects_1) t_cos.$(OBJEXT)
 t_cos_OBJECTS = $(am_t_cos_OBJECTS)
 t_cos_LDADD = $(LDADD)
@@ -121,6 +128,9 @@ t_esub_LDADD = $(LDADD)
 am_t_exp_OBJECTS = $(am__objects_1) t_exp.$(OBJEXT)
 t_exp_OBJECTS = $(am_t_exp_OBJECTS)
 t_exp_LDADD = $(LDADD)
+am_t_floor_OBJECTS = $(am__objects_1) t_floor.$(OBJEXT)
+t_floor_OBJECTS = $(am_t_floor_OBJECTS)
+t_floor_LDADD = $(LDADD)
 am_t_log_OBJECTS = $(am__objects_1) t_log.$(OBJEXT)
 t_log_OBJECTS = $(am_t_log_OBJECTS)
 t_log_LDADD = $(LDADD)
@@ -130,12 +140,18 @@ t_log10_LDADD = $(LDADD)
 am_t_nrmse_OBJECTS = $(am__objects_1) t_nrmse.$(OBJEXT)
 t_nrmse_OBJECTS = $(am_t_nrmse_OBJECTS)
 t_nrmse_LDADD = $(LDADD)
+am_t_round_OBJECTS = $(am__objects_1) t_round.$(OBJEXT)
+t_round_OBJECTS = $(am_t_round_OBJECTS)
+t_round_LDADD = $(LDADD)
 am_t_sin_OBJECTS = $(am__objects_1) t_sin.$(OBJEXT)
 t_sin_OBJECTS = $(am_t_sin_OBJECTS)
 t_sin_LDADD = $(LDADD)
 am_t_sinh_OBJECTS = $(am__objects_1) t_sinh.$(OBJEXT)
 t_sinh_OBJECTS = $(am_t_sinh_OBJECTS)
 t_sinh_LDADD = $(LDADD)
+am_t_size_OBJECTS = $(am__objects_1) t_size.$(OBJEXT)
+t_size_OBJECTS = $(am_t_size_OBJECTS)
+t_size_LDADD = $(LDADD)
 am_t_tan_OBJECTS = $(am__objects_1) t_tan.$(OBJEXT)
 t_tan_OBJECTS = $(am_t_tan_OBJECTS)
 t_tan_LDADD = $(LDADD)
@@ -165,19 +181,21 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
-	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
-	$(t_eadd_SOURCES) $(t_ediv_SOURCES) $(t_emul_SOURCES) \
-	$(t_epow_SOURCES) $(t_esub_SOURCES) $(t_exp_SOURCES) \
-	$(t_log_SOURCES) $(t_log10_SOURCES) $(t_nrmse_SOURCES) \
-	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_tan_SOURCES) \
-	$(t_tanh_SOURCES)
+	$(t_atan2_SOURCES) $(t_ceil_SOURCES) $(t_cos_SOURCES) \
+	$(t_cosh_SOURCES) $(t_eadd_SOURCES) $(t_ediv_SOURCES) \
+	$(t_emul_SOURCES) $(t_epow_SOURCES) $(t_esub_SOURCES) \
+	$(t_exp_SOURCES) $(t_floor_SOURCES) $(t_log_SOURCES) \
+	$(t_log10_SOURCES) $(t_nrmse_SOURCES) $(t_round_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_size_SOURCES) \
+	$(t_tan_SOURCES) $(t_tanh_SOURCES)
 DIST_SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
-	$(t_atan2_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
-	$(t_eadd_SOURCES) $(t_ediv_SOURCES) $(t_emul_SOURCES) \
-	$(t_epow_SOURCES) $(t_esub_SOURCES) $(t_exp_SOURCES) \
-	$(t_log_SOURCES) $(t_log10_SOURCES) $(t_nrmse_SOURCES) \
-	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_tan_SOURCES) \
-	$(t_tanh_SOURCES)
+	$(t_atan2_SOURCES) $(t_ceil_SOURCES) $(t_cos_SOURCES) \
+	$(t_cosh_SOURCES) $(t_eadd_SOURCES) $(t_ediv_SOURCES) \
+	$(t_emul_SOURCES) $(t_epow_SOURCES) $(t_esub_SOURCES) \
+	$(t_exp_SOURCES) $(t_floor_SOURCES) $(t_log_SOURCES) \
+	$(t_log10_SOURCES) $(t_nrmse_SOURCES) $(t_round_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_size_SOURCES) \
+	$(t_tan_SOURCES) $(t_tanh_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -219,8 +237,8 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-FC = @FC@
-FCFLAGS = @FCFLAGS@
+F77 = @F77@
+FFLAGS = @FFLAGS@
 FGREP = @FGREP@
 GREP = @GREP@
 HAVE_INSIGHT = @HAVE_INSIGHT@
@@ -290,7 +308,7 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
-ac_ct_FC = @ac_ct_FC@
+ac_ct_F77 = @ac_ct_F77@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -362,6 +380,10 @@ t_eadd_SOURCES = $(COMMON) t_eadd.cpp
 t_esub_SOURCES = $(COMMON) t_esub.cpp
 t_nrmse_SOURCES = $(COMMON) t_nrmse.cpp
 t_epow_SOURCES = $(COMMON) t_epow.cpp
+t_floor_SOURCES = $(COMMON) t_floor.cpp
+t_round_SOURCES = $(COMMON) t_round.cpp
+t_ceil_SOURCES = $(COMMON) t_ceil.cpp
+t_size_SOURCES = $(COMMON) t_size.cpp
 t_gtoreq_SOURCES = $(COMMON) t_gtoreq.cpp
 all: all-am
 
@@ -418,6 +440,9 @@ t_atan$(EXEEXT): $(t_atan_OBJECTS) $(t_atan_DEPENDENCIES) $(EXTRA_t_atan_DEPENDE
 t_atan2$(EXEEXT): $(t_atan2_OBJECTS) $(t_atan2_DEPENDENCIES) $(EXTRA_t_atan2_DEPENDENCIES) 
 	@rm -f t_atan2$(EXEEXT)
 	$(CXXLINK) $(t_atan2_OBJECTS) $(t_atan2_LDADD) $(LIBS)
+t_ceil$(EXEEXT): $(t_ceil_OBJECTS) $(t_ceil_DEPENDENCIES) $(EXTRA_t_ceil_DEPENDENCIES) 
+	@rm -f t_ceil$(EXEEXT)
+	$(CXXLINK) $(t_ceil_OBJECTS) $(t_ceil_LDADD) $(LIBS)
 t_cos$(EXEEXT): $(t_cos_OBJECTS) $(t_cos_DEPENDENCIES) $(EXTRA_t_cos_DEPENDENCIES) 
 	@rm -f t_cos$(EXEEXT)
 	$(CXXLINK) $(t_cos_OBJECTS) $(t_cos_LDADD) $(LIBS)
@@ -442,6 +467,9 @@ t_esub$(EXEEXT): $(t_esub_OBJECTS) $(t_esub_DEPENDENCIES) $(EXTRA_t_esub_DEPENDE
 t_exp$(EXEEXT): $(t_exp_OBJECTS) $(t_exp_DEPENDENCIES) $(EXTRA_t_exp_DEPENDENCIES) 
 	@rm -f t_exp$(EXEEXT)
 	$(CXXLINK) $(t_exp_OBJECTS) $(t_exp_LDADD) $(LIBS)
+t_floor$(EXEEXT): $(t_floor_OBJECTS) $(t_floor_DEPENDENCIES) $(EXTRA_t_floor_DEPENDENCIES) 
+	@rm -f t_floor$(EXEEXT)
+	$(CXXLINK) $(t_floor_OBJECTS) $(t_floor_LDADD) $(LIBS)
 t_log$(EXEEXT): $(t_log_OBJECTS) $(t_log_DEPENDENCIES) $(EXTRA_t_log_DEPENDENCIES) 
 	@rm -f t_log$(EXEEXT)
 	$(CXXLINK) $(t_log_OBJECTS) $(t_log_LDADD) $(LIBS)
@@ -451,12 +479,18 @@ t_log10$(EXEEXT): $(t_log10_OBJECTS) $(t_log10_DEPENDENCIES) $(EXTRA_t_log10_DEP
 t_nrmse$(EXEEXT): $(t_nrmse_OBJECTS) $(t_nrmse_DEPENDENCIES) $(EXTRA_t_nrmse_DEPENDENCIES) 
 	@rm -f t_nrmse$(EXEEXT)
 	$(CXXLINK) $(t_nrmse_OBJECTS) $(t_nrmse_LDADD) $(LIBS)
+t_round$(EXEEXT): $(t_round_OBJECTS) $(t_round_DEPENDENCIES) $(EXTRA_t_round_DEPENDENCIES) 
+	@rm -f t_round$(EXEEXT)
+	$(CXXLINK) $(t_round_OBJECTS) $(t_round_LDADD) $(LIBS)
 t_sin$(EXEEXT): $(t_sin_OBJECTS) $(t_sin_DEPENDENCIES) $(EXTRA_t_sin_DEPENDENCIES) 
 	@rm -f t_sin$(EXEEXT)
 	$(CXXLINK) $(t_sin_OBJECTS) $(t_sin_LDADD) $(LIBS)
 t_sinh$(EXEEXT): $(t_sinh_OBJECTS) $(t_sinh_DEPENDENCIES) $(EXTRA_t_sinh_DEPENDENCIES) 
 	@rm -f t_sinh$(EXEEXT)
 	$(CXXLINK) $(t_sinh_OBJECTS) $(t_sinh_LDADD) $(LIBS)
+t_size$(EXEEXT): $(t_size_OBJECTS) $(t_size_DEPENDENCIES) $(EXTRA_t_size_DEPENDENCIES) 
+	@rm -f t_size$(EXEEXT)
+	$(CXXLINK) $(t_size_OBJECTS) $(t_size_LDADD) $(LIBS)
 t_tan$(EXEEXT): $(t_tan_OBJECTS) $(t_tan_DEPENDENCIES) $(EXTRA_t_tan_DEPENDENCIES) 
 	@rm -f t_tan$(EXEEXT)
 	$(CXXLINK) $(t_tan_OBJECTS) $(t_tan_LDADD) $(LIBS)
@@ -474,6 +508,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_asin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_atan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_atan2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_ceil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_cos.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_cosh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_eadd.Po@am__quote@
@@ -482,11 +517,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_epow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_esub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_exp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_floor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log10.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_nrmse.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_round.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_sin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_sinh.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_size.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_tan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_tanh.Po@am__quote@
 

@@ -84,6 +84,7 @@ namespace RRStrategy {
 		int             m_testcase;  /**< Test case. Generate forward data first.             */
 		int             m_ftmaxit;   /**< Maximum number of NuFFT solver iterations           */
 		int             m_cgmaxit;   /**< Maximum number of CG iterations                     */
+		int             m_nthreads;  /**< Number of threads                                   */
 		
 		double          m_noise;     /**< Add noise?                                          */
 		double          m_lambda;    /**< Tikhonov factor                                     */

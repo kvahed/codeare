@@ -26,6 +26,7 @@
 #include "IO.hpp"
 #include "Toolbox.hpp"
 #include "Creators.hpp"
+#include "CGRAPPA.hpp"
 
 /**
  * @brief Reconstruction startegies
@@ -51,9 +52,9 @@ namespace RRStrategy {
 			m_acsinc(0),
 			m_nt(0),
 			m_nr(0),
-			m_ns(0)
-		{};
+			m_ns(0) {};
 		
+
 		/**
 		 * @brief Default destructor
 		 */

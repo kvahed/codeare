@@ -314,7 +314,7 @@ struct LapackTraits<cxfl> {
     }
     
     inline static Type
-    nrm2 (const int N, const void *X, const int incX) {
+    nrm2 (const int N, const Type *X, const int incX) {
         return cblas_scnrm2 (N, X, incX);
     }
     
@@ -425,7 +425,7 @@ struct LapackTraits<cxdb> {
     }
     
     inline static Type
-    nrm2 (const int N, const void *X, const int incX) {
+    nrm2 (const int N, const Type *X, const int incX) {
         return cblas_dznrm2 (N, X, incX);
     }
     

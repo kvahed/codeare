@@ -73,15 +73,34 @@ nnz (const Matrix<T>& M) {
 
 
 /**
+ * @brief     Is matrix X-dimensional?
+ *
+ * @param  M  Matrix
+ * @param  d  Dimension
+ * @return    X-dimensional?
+ */
+template <class T>  inline  bool
+isxd (const Matrix<T>& M, const size_t d) {
+
+	size_t l = 0;
+
+	for (size_t i = 0; i < INVALID_DIM; i++)
+		if (M.Dim(i) > 1) l++;
+
+	return (l == d);
+
+}
+
+/**
  * @brief    Is matrix 1D?
  *
  * @param M  Matrix
  * @return   1D?
  */
 template <class T>  inline  bool
-Is1D (const Matrix<T>& M) {
+isvec (const Matrix<T>& M) {
 	
-	return IsXD(M, 1);
+	return isxd(M, 1);
 	
 }
 
@@ -93,9 +112,9 @@ Is1D (const Matrix<T>& M) {
  * @return   2D?
  */
 template <class T>  inline  bool
-Is2D (const Matrix<T>& M) {
+is2d (const Matrix<T>& M) {
 	
-	return IsXD(M, 2);
+	return isxd(M, 2);
 	
 }
 
@@ -107,9 +126,9 @@ Is2D (const Matrix<T>& M) {
  * @return   2D?
  */
 template <class T>  inline  bool
-IsSquare (const Matrix<T>& M) {
+issquare (const Matrix<T>& M) {
 	
-	return Is2D(M) && size(M,0) == size(M,1);
+	return isxd(M, 2) && (size(M,0) == size(M,1));
 	
 }
 
@@ -121,9 +140,9 @@ IsSquare (const Matrix<T>& M) {
  * @return   3D?
  */
 template <class T>  inline  bool
-Is3D (const Matrix<T>& M) {
+is3d (const Matrix<T>& M) {
 	
-	return IsXD(M, 3);
+	return isxd(M, 3);
 	
 }
 
@@ -136,29 +155,9 @@ Is3D (const Matrix<T>& M) {
  * @return   4D?
  */
 template <class T>  inline  bool
-Is4D (const Matrix<T>& M) {
+is4d (const Matrix<T>& M) {
 	
-	return IsXD(M, 4);
-	
-}
-
-
-/**
- * @brief     Is matrix X-dimensional?
- *
- * @param  M  Matrix
- * @param  d  Dimension
- * @return    X-dimensional?
- */
-template <class T>  inline  bool
-IsXD (const Matrix<T>& M, const size_t d) {
-	
-	size_t l = 0;
-	
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		if (M.Dim(i) > 1) l++;
-	
-	return (l == d);
+	return isxd(M, 4);
 	
 }
 
@@ -170,7 +169,7 @@ IsXD (const Matrix<T>& M, const size_t d) {
  * @return      All elements zero?
  */
 template <class T>  inline  bool
-IsZero (const Matrix<T>& M) {
+iszero (const Matrix<T>& M) {
 	
 	for (size_t i = 0; i < M.Size(); i++)
 		if (M[i] != T(0)) return false;
@@ -187,7 +186,7 @@ IsZero (const Matrix<T>& M) {
  * @return      Empty?
  */
 template <class T> inline  bool
-IsEmpty (const Matrix<T>& M) {
+isempty (const Matrix<T>& M) {
 	
 	return (numel(M) == 1);
 	
@@ -321,7 +320,7 @@ ndims (const Matrix<T>& M) {
 template <class T> inline  Matrix<T>
 diag (const Matrix<T>& M) {
 	
-	assert (Is2D(M));
+	assert (is2d(M));
 
 	size_t sz = MIN(size(M,0),size(M,1));
 
@@ -480,6 +479,18 @@ size               (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief           Get vector of dimensions
+ *
+ * @param   M       Matrix
+ * @return          Dimension vector.
+ */
+template <class T>  inline  VECTOR_TYPE(size_t)
+vsize               (const Matrix<T>& M) {
+
+	return size(M).Container();
+
+}
 
 
 
@@ -550,6 +561,50 @@ height             (const Matrix<T>& M) {
 }
 
 
+/**
+ * @brief           Round down
+ *
+ * @param  M        Matrix
+ * @return          Rounded down matrix
+ */
+template<class T> inline Matrix<T>
+floor (const Matrix<T>& M) {
+	Matrix<T> res = M;
+	for (size_t i = 0; i < numel(M); i++)
+		res[i] = floor (res[i]);
+	return res;
+}
+
+
+/**
+ * @brief           Round up
+ *
+ * @param  M        Matrix
+ * @return          Rounded up matrix
+ */
+template<class T> inline Matrix<T>
+ceil (const Matrix<T>& M) {
+	Matrix<T> res = M;
+	for (size_t i = 0; i < numel(M); i++)
+		res[i] = ceil (res[i]);
+	return res;
+}
+
+
+/**
+ * @brief           MATLAB-like round
+ *
+ * @param  M        Matrix
+ * @return          Rounded matrix
+ */
+template<class T> inline Matrix<T>
+round (const Matrix<T>& M) {
+	Matrix<T> res = M;
+	for (size_t i = 0; i < numel(M); i++)
+		res[i] = ROUND (res[i]);
+	return res;
+}
+
 
 /**
  * @brief           Maximal element
@@ -603,7 +658,7 @@ min (const Matrix<T>& M) {
 template <class T> inline  Matrix<T>
 transpose (const Matrix<T>& M, const bool& c = false) {
 
-	assert (Is2D(M));
+	assert (is2d(M));
 	size_t m, n, i, j;
 
 	m = size(M,0);
@@ -699,7 +754,7 @@ resize (const Matrix<T>& M, Matrix<size_t> sz) {
  * @return    Sum of M along dimension d
  */
 template <class T> inline  Matrix<T>
-sum (Matrix<T>& M, const size_t d) {
+sum (const Matrix<T>& M, const size_t d) {
 	
 	Matrix<size_t> sz = size(M);
 	size_t        dim = sz[d];
@@ -712,7 +767,7 @@ sum (Matrix<T>& M, const size_t d) {
 		return res;
 	
 	// Empty? allocation 
-	if (IsEmpty(M)) 
+	if (isempty(M))
 		return res;
 	
 	// Inner size 
@@ -751,6 +806,114 @@ sum (Matrix<T>& M, const size_t d) {
 	
 }
 
+
+/**
+ * @brief     Sum of all elements
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = sum (m);
+ * @endcode
+ *
+ * @param  M  Matrix
+ * @return    Sum of M along dimension d
+ */
+template <class T> inline T
+sum (Matrix<T>& M) {
+	T s = 0;
+	for (size_t i = 0; i < numel(M); i++)
+		s += M[i];
+	return s;
+}
+
+
+/**
+ * @brief     Product along a dimension
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = prod (m,0); // dims (7,6);
+ * @endcode
+ *
+ * @param  M  Matrix
+ * @param  d  Dimension
+ * @return    Sum of M along dimension d
+ */
+template <class T> inline  Matrix<T>
+prod (const Matrix<T>& M, const size_t d) {
+
+	Matrix<size_t> sz = size(M);
+	size_t        dim = sz[d];
+	Matrix<T>     res;
+
+	assert (d < INVALID_DIM);
+
+	// No meaningful sum over particular dimension
+	if (dim == 1)
+		return res;
+
+	// Empty? allocation
+	if (isempty(M))
+		return res;
+
+	// Inner size
+	size_t insize = 1;
+	for (size_t i = 0; i < d; i++)
+		insize *= sz[i];
+
+	// Outer size
+	size_t outsize = 1;
+	for (size_t i = d+1; i < MIN(INVALID_DIM,numel(sz)); i++)
+		outsize *= sz[i];
+
+	// Adjust size vector and allocate
+	sz [d] = 1;
+	res = zeros<T>(sz);
+
+	// Sum
+#pragma omp parallel default (shared)
+	{
+
+#pragma omp for
+
+		for (size_t i = 0; i < outsize; i++) {
+
+			for (size_t j = 0; j < insize; j++) {
+				res[i*insize + j] = T(0);
+				for (size_t k = 0; k < dim; k++)
+					res[i*insize + j] += M[i*insize*dim + j + k*insize];
+			}
+
+		}
+
+	}
+
+	return res;
+
+}
+
+
+/**
+ * @brief     Product of all elements
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = prod (m);
+ * @endcode
+ *
+ * @param  M  Matrix
+ * @return    Sum of M along dimension d
+ */
+template <class T> inline T
+prod (const Matrix<T>& M) {
+	T p = (T) 1;
+	for (size_t i = 0; i < numel(M); i++)
+		p *= M[i];
+	return p;
+}
 
 /**
  * @brief       Sum of squares over a dimension

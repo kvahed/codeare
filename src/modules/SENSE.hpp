@@ -41,7 +41,7 @@ namespace RRStrategy {
 		 * @brief Default constructor
 		 */
 		SENSE  () :
-			m_ncpus(1), m_af(1), m_cs(0), m_compgfm(false) {};
+			m_nthreads(8), m_af(1), m_cs(0), m_compgfm(false) {};
 		
 		
 		/**
@@ -83,8 +83,10 @@ namespace RRStrategy {
 
 		CSENSE<float>*  m_cs;      /**< Cartesian sense operators (Multi-Core Reco)*/
 
-		unsigned short m_ncpus;   /**< Number of threads */
+		unsigned short m_nthreads;   /**< Number of threads */
 		unsigned short m_af;      /**< Acceleration factor */
+
+		float          m_lambda;  /**< Resularisation parameter */
 
 		bool           m_compgfm; /**< Compute g-factor map */
 

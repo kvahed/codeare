@@ -40,10 +40,10 @@ template<class T, class S> void svd_check () {
 
 int main (int args, char** argv) {
 
-    svd_check<cxfl,float>();
+    //svd_check<cxfl,float>();
     svd_check<cxdb,double>();
-    svd_check<float,float>();
-    svd_check<double,double>();
+    //svd_check<float,float>();
+    //svd_check<double,double>();
     
     return 0;
     

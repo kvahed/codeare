@@ -55,7 +55,7 @@ SystemCmd_la_SOURCES = SystemCmd.hpp SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 SystemCmd_la_LIBADD = $(COMMON_la_LIBADD)
 
-GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp ../matrix/CGRAPPA.hpp
+GRAPPA_la_SOURCES = ../matrix/ft/GRAPPA.f ../matrix/ft/CGRAPPA.hpp GRAPPA.hpp GRAPPA.cpp
 GRAPPA_la_DEPENDENCIES = 
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)

@@ -212,7 +212,6 @@ struct FTTraits<double> {
 
 #ifdef HAVE_FFTWF_THREADS
 		if (fftw_init_threads()) {
-			std::cout << nt << std::endl;
 			fftw_plan_with_nthreads (nt);
 			ws.PSet("FFTWThreads", nt);
 		}
