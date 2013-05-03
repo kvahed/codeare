@@ -754,7 +754,7 @@ resize (const Matrix<T>& M, Matrix<size_t> sz) {
  * @return    Sum of M along dimension d
  */
 template <class T> inline  Matrix<T>
-sum (Matrix<T>& M, const size_t d) {
+sum (const Matrix<T>& M, const size_t d) {
 	
 	Matrix<size_t> sz = size(M);
 	size_t        dim = sz[d];
@@ -806,6 +806,114 @@ sum (Matrix<T>& M, const size_t d) {
 	
 }
 
+
+/**
+ * @brief     Sum of all elements
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = sum (m);
+ * @endcode
+ *
+ * @param  M  Matrix
+ * @return    Sum of M along dimension d
+ */
+template <class T> inline T
+sum (Matrix<T>& M) {
+	T s = 0;
+	for (size_t i = 0; i < numel(M); i++)
+		s += M[i];
+	return s;
+}
+
+
+/**
+ * @brief     Product along a dimension
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = prod (m,0); // dims (7,6);
+ * @endcode
+ *
+ * @param  M  Matrix
+ * @param  d  Dimension
+ * @return    Sum of M along dimension d
+ */
+template <class T> inline  Matrix<T>
+prod (const Matrix<T>& M, const size_t d) {
+
+	Matrix<size_t> sz = size(M);
+	size_t        dim = sz[d];
+	Matrix<T>     res;
+
+	assert (d < INVALID_DIM);
+
+	// No meaningful sum over particular dimension
+	if (dim == 1)
+		return res;
+
+	// Empty? allocation
+	if (isempty(M))
+		return res;
+
+	// Inner size
+	size_t insize = 1;
+	for (size_t i = 0; i < d; i++)
+		insize *= sz[i];
+
+	// Outer size
+	size_t outsize = 1;
+	for (size_t i = d+1; i < MIN(INVALID_DIM,numel(sz)); i++)
+		outsize *= sz[i];
+
+	// Adjust size vector and allocate
+	sz [d] = 1;
+	res = zeros<T>(sz);
+
+	// Sum
+#pragma omp parallel default (shared)
+	{
+
+#pragma omp for
+
+		for (size_t i = 0; i < outsize; i++) {
+
+			for (size_t j = 0; j < insize; j++) {
+				res[i*insize + j] = T(0);
+				for (size_t k = 0; k < dim; k++)
+					res[i*insize + j] += M[i*insize*dim + j + k*insize];
+			}
+
+		}
+
+	}
+
+	return res;
+
+}
+
+
+/**
+ * @brief     Product of all elements
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (8,7,6);
+ *   m = prod (m);
+ * @endcode
+ *
+ * @param  M  Matrix
+ * @return    Sum of M along dimension d
+ */
+template <class T> inline T
+prod (const Matrix<T>& M) {
+	T p = (T) 1;
+	for (size_t i = 0; i < numel(M); i++)
+		p *= M[i];
+	return p;
+}
 
 /**
  * @brief       Sum of squares over a dimension

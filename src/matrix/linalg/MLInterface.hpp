@@ -117,6 +117,12 @@ extern "C" {
 	void F77name(zgemv,ZGEMV)  (const char* trans, const int* m, const int* n, const   cxdb* alpha, const   cxdb *a,
                                 const int* lda, const   cxdb *x, const int* incx, const  cxdb* beta,    cxdb *y,
                                 const int* incy);
+
+    // Euclidean norm
+    float  F77name(snrm2,SNRM2)   (const int* n, const  float* cx, const int* incx);
+    double F77name(dnrm2,DNRM2)   (const int* n, const double* cx, const int* incx);
+    cxfl   F77name(scnrm2,SCNRM2) (const int* n, const   cxfl* cx, const int* incx);
+    cxdb   F77name(dznrm2,DZNRM2) (const int* n, const   cxdb* cx, const int* incx);
     
 	// Matrix matrix multiplication
 	void F77name(sgemm,SGEMM)  (const char *transa, const char *transb, const int *m, const int *n, const int *k,
@@ -149,7 +155,8 @@ extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
 #define SGELS  F77name(sgels,SGELS)
 #define SGESDD F77name(sgesdd,SGESDD)
 #define SGEMM  F77name(sgemm,SGEMM) 
-#define SGEMV  F77name(sgemv,SGEMV) 
+#define SGEMV  F77name(sgemv,SGEMV)
+#define SNRM2  F77name(snrm2,SNRM2)
 
 #define DGEEV  F77name(dgeev,DGEEV)
 #define DGETRF F77name(dgetrf,DGETRF)
@@ -160,6 +167,7 @@ extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
 #define DGESDD F77name(dgesdd,DGESDD)
 #define DGEMM  F77name(dgemm,DGEMM) 
 #define DGEMV  F77name(dgemv,DGEMV) 
+#define DNRM2  F77name(dnrm2,DNRM2)
 
 #define CGEEV  F77name(cgeev,CGEEV)
 #define CGETRF F77name(cgetrf,CGETRF)
@@ -170,6 +178,7 @@ extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
 #define CGESDD F77name(cgesdd,CGESDD)
 #define CGEMM  F77name(cgemm,CGEMM) 
 #define CGEMV  F77name(cgemv,CGEMV) 
+#define SCNRM2 F77name(scnrm2,SCNRM2)
 
 #define ZGEEV  F77name(zgeev,ZGEEV)
 #define ZGETRF F77name(zgetrf,ZGETRF)
@@ -180,3 +189,4 @@ extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
 #define ZGESDD F77name(zgesdd,ZGESDD)
 #define ZGEMM  F77name(zgemm,ZGEMM) 
 #define ZGEMV  F77name(zgemv,ZGEMV) 
+#define DZNRM2 F77name(dznrm2,DZNRM2)

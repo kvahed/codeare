@@ -28,6 +28,7 @@
 #include "FFTWTraits.hpp"
 
 #include <iterator>
+#include <omp.h>
 
 
 
@@ -40,6 +41,8 @@
 template<class T> inline Matrix<T>
 fftshift (const Matrix<T>& m, const bool& fw = true) {
 
+	assert (isvec(m) || is2d(m) || is3d(m));
+
 	Matrix<size_t> tmp = resize(size(m),INVALID_DIM,1);
 	for (size_t i = 0; i<INVALID_DIM; i++)
 		if (tmp[i] == 0)
@@ -48,27 +51,24 @@ fftshift (const Matrix<T>& m, const bool& fw = true) {
 	VECTOR_TYPE(size_t) d = tmp.Container(); // data side lengths
 	VECTOR_TYPE(size_t) c = (floor(tmp/2)).Container(); // center coords
 
-    vector<size_t> oi (INVALID_DIM,0); // original index
-    vector<size_t> si (INVALID_DIM,0); // shifted index
-
     Matrix<T> res (vsize(m));
 
-    for (oi[3] = 0; oi[3] < d[3]; oi[3]++) {
-   		si[3] = (oi[3] + c[3]) % d[3];
-		for (oi[2] = 0; oi[2] < d[2]; oi[2]++) {
-			si[2] = (oi[2] + c[2]) % d[2];
-			for (oi[1] = 0; oi[1] < d[1]; oi[1]++) {
-				si[1] = (oi[1] + c[1]) % d[1];
-				for (oi[0] = 0; oi[0] < d[0]; oi[0]++) {
-					si[0] = (oi[0] + c[0]) % d[0];
-					if (fw)
-						res(si[0],si[1],si[2],si[3]) = m(oi[0],oi[1],oi[2],oi[3]);
-					else
-						res(oi[0],oi[1],oi[2],oi[3]) = m(si[0],si[1],si[2],si[3]);
-				}
+    size_t oi[3];
+    size_t si[3];
+
+	for (oi[0] = 0; oi[0] < d[0]; oi[0]++) {
+		si[0] = (oi[0] + c[0]) % d[0];
+		for (oi[1] = 0; oi[1] < d[1]; oi[1]++) {
+			si[1] = (oi[1] + c[1]) % d[1];
+			for (oi[2] = 0; oi[2] < d[2]; oi[2]++) {
+				si[2] = (oi[2] + c[2]) % d[2];
+				if (fw)
+					res(si[0],si[1],si[2]) = m(oi[0],oi[1],oi[2]);
+				else
+					res(oi[0],oi[1],oi[2]) = m(si[0],si[1],si[2]);
 			}
 		}
-    }
+	}
 
 	return res;
 
@@ -245,7 +245,6 @@ public:
 			m_N  *= n[i];
 		}
 		
-
 		Matrix<size_t> tmp (INVALID_DIM,1);
 		for (i = 0; i <       rank; i++)
 			tmp[i] = sl;
@@ -367,10 +366,10 @@ private:
 	inline Matrix<CT>
 	shift (const Matrix<CT>& m, const bool& fw = true) const {
 
+		Matrix<CT> res (vsize(m));
+
 		VECTOR_TYPE(size_t) oi (INVALID_DIM,1);
 		VECTOR_TYPE(size_t) si (INVALID_DIM,1);
-
-		Matrix<CT> res (vsize(m));
 
 	    for (oi[3] = 0; oi[3] < d[3]; oi[3]++) {
 	   		si[3] = (oi[3] + c[3]) % d[3];
@@ -387,8 +386,8 @@ private:
 					}
 				}
 			}
-	    }
 
+		}
 	    return res;
 
 	}

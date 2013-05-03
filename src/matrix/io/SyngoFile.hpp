@@ -1,5 +1,4 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -188,7 +187,7 @@ namespace io      {
 			}
 
 			m_initialised = true;
-			m_meas_dims.resize(INVALID_DIM,(size_t)1);
+			m_meas_dims = std::vector<size_t>(INVALID_DIM,(size_t)1);
 
 			dnames["NImageCols"] =  0; dnames["NLinMeas"] =  1; dnames["NSlcMeas"] =  2; dnames["NParMeas"] =  3;
 			dnames[  "NEcoMeas"] =  4; dnames["NPhsMeas"] =  5; dnames["NRepMeas"] =  6; dnames["NSetMeas"] =  7;
@@ -270,6 +269,15 @@ namespace io      {
 			m_status = OK;
 
 			printf ("  Allocating data matrices ...\n");
+
+			std::copy(m_meas_dims.begin(), m_meas_dims.end(), std::ostream_iterator<int>(std::cout));
+
+			float n = 8.0;
+			for (size_t i = 0; i < m_meas_dims.size(); i++)
+				n *= m_meas_dims[i];
+			n /= pow(1024.0,3);
+
+			printf ("\n%f\n", n);
 
 			boost::any val = (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl> (m_meas_dims));
 			m_data.insert(std::pair<std::string, boost::any>("meas", val));
@@ -370,6 +378,8 @@ namespace io      {
 
 			memcpy (&sync_size, &m_buffer[m_pos], sizeof(int));
 
+			std::cout << sync_size << std::endl;
+
 			m_pos += SYNC_HEADER_SIZE;
 
 			if (dry) {
@@ -460,7 +470,8 @@ namespace io      {
 					break;
 
 				if (bit_set(m_cur_mdh.aulEvalInfoMask[0], SYNCDATA))
-					ParseSyncData(verbose, dry);
+					break;
+					//ParseSyncData(verbose, dry);
 				else
 					ParseScan(verbose, dry);
 

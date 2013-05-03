@@ -5,7 +5,7 @@
 
 template<class T, class S> void svd_check () {
 
-    Matrix<T> A = rand<T>(8,3), U, V;
+    Matrix<T> A = rand<T>(8,30), U, V;
     Matrix<S> s;
 
 #ifdef VERBOSE
@@ -40,10 +40,10 @@ template<class T, class S> void svd_check () {
 
 int main (int args, char** argv) {
 
-    svd_check<cxfl,float>();
+    //svd_check<cxfl,float>();
     svd_check<cxdb,double>();
-    svd_check<float,float>();
-    svd_check<double,double>();
+    //svd_check<float,float>();
+    //svd_check<double,double>();
     
     return 0;
     

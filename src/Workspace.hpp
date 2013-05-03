@@ -155,7 +155,22 @@ class Workspace {
 	 * @param  name  Name
 	 * @return       Success
 	 */
-	bool 
+	inline bool
+	Exists (const std::string& name) const {
+
+        reflist::const_iterator nit = m_ref.find(name);
+        return (nit == m_ref.end()) ? false : true;
+
+    }
+
+
+ 	/**
+	 * @brief        Remove a complex double matrix
+	 *
+	 * @param  name  Name
+	 * @return       Success
+	 */
+	inline bool
 	Free (const std::string& name) {
         
         reflist::iterator nit = m_ref.find(name);

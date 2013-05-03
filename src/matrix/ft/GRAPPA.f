@@ -15,7 +15,7 @@
       integer, dimension (2), intent (in) :: ssz, tsz
       integer, dimension (4), intent (in) :: msz
       integer, intent (in) :: af, dim
-      complex*16, dimension (asz(1), asz(2), asz(3)) :: aln
+      complex*16, dimension (asz(1), asz(2), asz(3)), intent (in) :: aln
       complex*16, dimension (ssz(1), ssz(2)) :: s
       complex*16, dimension (tsz(1), tsz(2)) :: t
       integer :: nx, ny, nz, nc, sx, sy, dx, dy, nxacs, nyacs, nzacs
@@ -107,8 +107,8 @@
       integer, dimension (4), intent (in) :: n
       integer, dimension (2), intent (in) :: d
       integer, intent (in) :: af
-      complex*16, dimension (nx,ny,), intent (in) :: meas
-      complex*16, 
+c$$$      complex*16, dimension (nx,ny), intent (in) :: meas
+c$$$      complex*16, 
       
       
       end SUBROUTINE d_apply_weights

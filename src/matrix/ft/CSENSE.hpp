@@ -41,11 +41,12 @@ class CSENSE : public FT<T> {
 	
 public:
 	
+	typedef std::complex<T> CT;
 
 	/**
 	 * @brief          Default constructor
 	 */
-	CSENSE() : m_dft(0) {}
+	CSENSE() : m_dft(0), nthreads(1), compgfm(0), aaf(1), nc(1), initialised(0), ndim(1) {}
 
 
 	/**
@@ -54,70 +55,45 @@ public:
 	 * @param  params  Configuration parameters
 	 */
 	CSENSE        (const Params& params) :
-		FT<T>::FT(params), m_dft(0) {
+		FT<T>::FT(params), m_dft(0), nthreads (1), treg(0.), compgfm(0) {
 
-		p = params;
 		Workspace& w = Workspace::Instance();
 
-		p.Set ("initialised", false);
+		// Maps & 1st set of images
+		sens = w.Get<CT>(params.Get<std::string> ("smaps_name"));
+		Matrix<CT>& imgs = w.Get<CT>(params.Get<std::string> ("fimgs_name"));
 
-		std::string map_name = p.Get<std::string> ("smaps_name");
-		std::string img_name = p.Get<std::string> ("fimgs_name");
-
-		sens = w.Get<std::complex<T> >(map_name);
-		Matrix<std::complex<T> >& imgs = w.Get<std::complex<T> >(img_name);
-
-		const size_t nc = size (sens, ndims(sens)-1);
+		// Channels
+		nc = size (sens, ndims(sens)-1);
 		assert (nc > 1);
-		p.Set ("nc", nc);
 
-		size_t af = size(sens, 1) / size(imgs, 1);
-		p.Set("af", af);
+		// 3D acceleration
+		af = size(sens) / (Matrix<short>)size(imgs);
+		std::cout << "\n  acceleration vector: " << af;
+		aaf = prod (af);
 
-		size_t ndim = ndims(sens)-1;
+
+		// Can only handle 2D/3D SENSE
+		ndim = ndims(sens)-1;
 		assert (ndim == 2 || ndim == 3);
-		p.Set ("ndim", ndim);
 
 		// We expect sensitivities O (X,Y,Z,CH)
-		dims = ones<size_t> (3,1);
-		for (size_t i = 0; i < ndim; i++)
-			dims[i] = size(sens,i);
-		dims[1] /= af;
+		dims = size(imgs);
+		dims = resize(dims,1,size(dims,1)-1);
+		std::cout << "  fft dims: " << dims ;
 
-		p.Set ("dims", dims);
+		TikhonovMat(params);
 
-		if (!p.exists("treg"))
-			p.Set("treg", (T)0.0);
+		AllocateDFTs(params);
 
-		Matrix<T> b0;
-		Matrix<complex<T> > pc;
-		Matrix<T> mask;
-
-		if (p.exists("b0_name"))
-			b0 = w.Get<T>(p.Get<std::string>("b0_name"));
-		if (p.exists("mask_name"))
-			mask = w.Get<T>(p.Get<std::string>("mask_name"));
-		if (p.exists("pc_name"))
-			pc = w.Get<T>(p.Get<std::string>("pc_name"));
-
-
-		// Multi-threading will need multiple FFTW plans
-		int np;
-
-#pragma omp parallel default (shared)
-		{
-			np = omp_get_num_threads ();
+		// Need 3-dimensional extents even if 2D
+		if (numel(dims) == 2) {
+			dims = resize (dims,1,3);
+			dims[2] = 1;
 		}
 
-		Matrix<size_t> ftdims = resize(dims,ndim,1);
-
-		m_dft = new DFT<T>* [np];
-
-		for (size_t i = 0; i < np; i++)
-			m_dft[i]  = new DFT<T> (dims, mask, pc, b0);
-
-		// Great
-		p.Set ("initialised", true);
+		// We're good
+		initialised = true;
 
 	}
 
@@ -128,17 +104,11 @@ public:
 	virtual
 	~CSENSE            () {
 
-		int np;
+		if (initialised)
+			for (int i = 0; i < nthreads; i++)
+				if (m_dft[i] != 0)
+					delete m_dft[i];
 
-#pragma omp parallel default (shared)
-		{
-			np = omp_get_num_threads ();
-		}	
-
-		if (m_dft)
-			for (int i = 0; i < np; i++)
-				delete m_dft[i];
-	
 	}
 
 
@@ -148,34 +118,27 @@ public:
 	 * @param  m       To transform
 	 * @return         Transform
 	 */
-	Matrix< std::complex<T> >
-	Adjoint       (const Matrix< std::complex<T> >& m) const {
-		
-		bool compgfm     = p.Get<bool>("compgfm");
-		size_t af        = p.Get<size_t>("af");
-		size_t nc        = p.Get<size_t>("nc");
-		size_t ndim      = p.Get<size_t>("ndim");
-		T      treg      = p.Get<T>("treg");
-		bool initialised = p.Get<bool>("initialised");
+	Matrix<CT>
+	Adjoint       (const Matrix<CT>& m) const {
 
-		Matrix< std::complex<T> > res (dims[0], dims[1]*af, dims[2], (compgfm) ? 2 : 1);
-		Matrix< std::complex<T> > tmp = m;
-		
+		Matrix<CT> res (dims[0]*af[0], dims[1]*af[1], (ndim == 3) ? dims[2]*af[2] : 1);
+		Matrix<CT> tmp = m;
+
+		omp_set_num_threads(nthreads);
+
 #pragma omp parallel
 		{
 			
 			int tid = omp_get_thread_num ();
-			
-			Matrix<std::complex<T> > s  (nc, af);
-			Matrix<std::complex<T> > si (af, af);
-			Matrix<std::complex<T> > ra (nc,  1);
-			Matrix<std::complex<T> > rp (af,  1);
-			Matrix<std::complex<T> > gf (af,  1);
-			Matrix<std::complex<T> > reg = treg * eye<std::complex<T> >(af);
+			Matrix<CT> s  (nc,  aaf);
+			Matrix<CT> si (aaf, aaf);
+			Matrix<CT> ra (nc,    1);
+			Matrix<CT> rp (aaf,   1);
+			Matrix<CT> gf (aaf,   1);
 			
 			DFT<T>& ft = *(m_dft[tid]);
 
-#pragma omp for 
+#pragma omp for
 			
 			// FT individual channels
 			for (size_t i = 0; i < nc; i++)
@@ -183,7 +146,7 @@ public:
 					Slice  (tmp, i, ft ->* Slice  (tmp, i));
 				else
 					Volume (tmp, i, ft ->* Volume (tmp, i));
-			
+
 #pragma omp for schedule (guided)
 			
 			// Antialiasing
@@ -195,37 +158,46 @@ public:
 							
 							ra [c] = (dims[2]-1) ? tmp (x, y, z, c) : tmp (x, y, c);
 							
-							for (size_t i = 0; i < af; i++)
-								s (c, i) = (dims[2]-1) ? sens (x, y + dims[1] * i, z, c) : sens (x, y + dims[1] * i, c);
-							
+							size_t i = 0;
+							for (size_t zi = 0; zi < af[2]; zi++)
+								for (size_t yi = 0; yi < af[1]; yi++)
+									for (size_t xi = 0; xi < af[0]; xi++, i++) {
+									s (c, i) = (dims[2]-1) ?
+											sens (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], c):
+											sens (x + xi * dims[0], y + yi * dims[1],                   c);
+									}
 						}
-						
-						si = gemm (s,   s, 'C', 'N');
+
+						si = gemm (s,   s, 'C', 'N') ;
+
+						if (treg > 0.0)
+							si += reg;
 
 						if (compgfm)
 							gf = diag (si);
 
-						si = inv  (si + reg);
+						si = inv (si);
 
 						if (compgfm)
 							gf = diag (si) * gf;
 
 						si = gemm (si,  s, 'N', 'C');
 						rp = gemm (si, ra, 'N', 'N');
-						
-						for (size_t i = 0; i < af; i++) {
 
-							res (x, y + dims[1] * i, z, 0) =          rp [i];
+						size_t i = 0;
+						for (size_t zi = 0; zi < af[2]; zi++)
+							for (size_t yi = 0; yi < af[1]; yi++)
+								for (size_t xi = 0; xi < af[0]; xi++, i++) {
+									res (x+xi*dims[0], y+yi*dims[1] , z+zi*dims[2]) = rp [i];
+									//if (compgfm)
+										//res (x, y + dims[1] * i, z, 1) = sqrt(abs(gf [i]));
+								}
 
-							if (compgfm)
-								res (x, y + dims[1] * i, z, 1) = sqrt(abs(gf [i]));
-
-						}
 
 					}
 
-		}		
-		
+		}
+
 		return res;
 		
 	}
@@ -238,10 +210,10 @@ public:
 	 * @param  m       To transform
 	 * @return         Bummer! (This is not nice, right?)
 	 */
-	Matrix< std::complex<T> > 
-	Trafo             (const Matrix< std::complex<T> >& m) const {
+	Matrix<CT>
+	Trafo             (const Matrix<CT>& m) const {
 		
-		Matrix < complex<T> > res;
+		Matrix <CT> res;
 		return res;
 
 
@@ -254,8 +226,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	operator* (const Matrix< std::complex<T> >& m) const {
+	virtual Matrix<CT>
+	operator* (const Matrix<CT>& m) const {
 		return Trafo(m);
 	}
 	
@@ -266,19 +238,76 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	operator->* (const Matrix< std::complex<T> >& m) const {
+	virtual Matrix<CT>
+	operator->* (const Matrix<CT>& m) const {
 		return Adjoint (m);
 	}
 
 private:
 
-	DFT<T>**              m_dft;
-	Params                p;
-	Matrix < complex<T> > sens;
-	Matrix < T > gfm;
-	Matrix <size_t>       dims;
+	/**
+	 * @brief       Setup DFT operators
+	 *
+	 * @param  params Parameters
+	 */
+	inline void
+	AllocateDFTs (const Params& params) {
 
+		Workspace& w = Workspace::Instance();
+
+		nthreads = params.Get<unsigned short>("nthreads");
+
+		if (nthreads == 1)
+			#pragma omp parallel default (shared)
+			{
+				nthreads = omp_get_num_threads ();
+			}
+
+		printf ("  allocating %zu %zu-dim ffts\n", nthreads, ndim);
+
+		if (params.exists("nthreads"))
+			nthreads = params.Get<unsigned short>("nthreads");
+
+		m_dft = std::vector<DFT<T>*> (nthreads,(DFT<T>*)0);
+
+		for (size_t i = 0; i < nthreads; i++)
+			m_dft[i] = new DFT<T> (dims/*,
+				w.Get<T>(params.Get<std::string>("mask_name")),
+				w.Get<T>(params.Get<std::string>(  "pc_name")),
+				w.Get<T>(params.Get<std::string>(  "b0_name"))*/);
+
+	}
+
+
+	/**
+	 * @brief       Setup Tikhonov regularisation matrix
+	 *
+	 * @param  params Parameters
+	 */
+	inline void
+	TikhonovMat (const Params& params) {
+
+		treg = (params.exists("lambda")) ? params.Get<T>("lambda"): 0.0;
+		printf ("  Tikhonov lambda (%.2e)\n", treg);
+		assert (treg >= 0.0);
+		if (treg > 0.0)
+			reg = treg * eye<T>(aaf);
+
+	}
+
+
+	std::vector<DFT<T>*> m_dft;
+	Matrix <CT>          sens;
+	Matrix <size_t>      dims;
+	int                  nthreads;
+	Matrix <size_t>      af;
+	size_t               ndim;
+	size_t               nc;
+	bool                 compgfm;
+	T            		 treg;
+	Matrix<T>            reg;
+	bool                 initialised;
+	size_t               aaf;
 
 };
 

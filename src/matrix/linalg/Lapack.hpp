@@ -269,6 +269,7 @@ inv (const Matrix<T>& m) {
 	
 	int N = (int) size (m,0);	
 	Matrix<T> res = m;
+
 	int  info = 0;
 	int *ipiv = (int*) malloc (N * sizeof(int));
 	
