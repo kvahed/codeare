@@ -5,7 +5,7 @@
 
 template<class T, class S> void svd_check () {
 
-    Matrix<T> A = rand<T>(8,3), U, V;
+    Matrix<T> A = rand<T>(8,30), U, V;
     Matrix<S> s;
 
 #ifdef VERBOSE

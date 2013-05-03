@@ -1914,12 +1914,12 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-        Matrix<T,P> res = M;
+        Matrix<T,P> res = *this;
 
 #if defined HAVE_SSE
         SSE::process<T>(res.Container(), _M, SSE::mul<T>(), res.Container());
 #else
-        res.Container() *= _M;
+        res.Container() *= M.Container();
 #endif
 
 		return res;
@@ -1940,13 +1940,13 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-        Matrix<T,P> res = M;
+        Matrix<T,P> res = *this;
 
 #if defined EW_OMP
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); i++)
-			res[i] *= _M[i];
+			res[i] *= M[i];
 
 		return res;
 

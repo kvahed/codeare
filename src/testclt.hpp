@@ -104,11 +104,11 @@ bool init (int argc, char** argv) {
 		name    = (opt->getValue("name")   && 
 				   opt->getValue("name")   != (char*)"") ? opt->getValue(   "name") : (char*) "codeare" ;
 		base    = (opt->getValue("base")   && 
-				   opt->getValue("base")   != (char*)"") ? opt->getValue(   "base") : (char*) ".";
+				   opt->getValue("base")   != (char*)"") ? opt->getValue(   "base") : (char*) "";
 		data    = (opt->getValue("data")   && 
-				   opt->getValue("data")   != (char*)"") ? opt->getValue(   "data") : (char*) ".";
+				   opt->getValue("data")   != (char*)"") ? opt->getValue(   "data") : (char*) "";
 		config  = (opt->getValue("config") && 
-				   opt->getValue("config") != (char*)"") ? opt->getValue( "config") : (char*) ".";
+				   opt->getValue("config") != (char*)"") ? opt->getValue( "config") : (char*) "";
 		test    = (opt->getValue("test"  ) && 
 				   opt->getValue("test"  ) != (char*)"") ? opt->getValue(   "test") : (char*) "DummyRecon";
 		
