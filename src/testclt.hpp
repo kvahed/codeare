@@ -34,8 +34,10 @@ int    rank;
 #include "tests/tests.hpp"
 
 bool init (int argc, char** argv) {
-	
+
+#ifdef HAVE_MPI
     Grid& gd = *Grid::Instance();
+#endif
 
 //	if (gd.rk == 0) {
 		cout << endl;

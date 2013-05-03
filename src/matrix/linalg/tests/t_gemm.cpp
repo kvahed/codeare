@@ -13,8 +13,7 @@ template<class T,class S> void gemm_check () {
     std::cout << "B=\n" << B;
 #endif
     
-    A = gemm(A,A,'N','C');
-    inv(A);
+    A = gemm(A,B,'N','N');
 
 #ifdef VERBOSE
     std::cout << "A*B=\n" << A << std::endl;

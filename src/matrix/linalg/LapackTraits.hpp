@@ -72,17 +72,17 @@ struct LapackTraits<float> {
     nrm2 (const int N, const Type *X, const int incX) {
         return cblas_snrm2 (N, X, incX);
     }
-    
-    inline static Type
+
+    inline static void
     dot  (const int N, const Type *X, const int incX, const Type *Y, 
-          const int incY, void* res) {
-        return cblas_sdot (N, X, incX, Y, incY);    
+          const int incY, Type* res) {
+        *res = cblas_sdot (N, X, incX, Y, incY);    
     }
     
-    inline static Type 
+    inline static void 
     dotc (const int N, const Type *X, const int incX, const Type *Y, 
-          const int incY, void* res) {
-        return cblas_sdot (N, X, incX, Y, incY);    
+          const int incY, Type* res) {
+        *res = cblas_sdot (N, X, incX, Y, incY);    
     }
     
     inline static void
@@ -195,18 +195,18 @@ struct LapackTraits<double> {
         return cblas_dnrm2 (N, X, incX);
     }
     
-    inline static Type 
+    inline static void
     dot  (const int N, const Type *X, const int incX, const Type *Y, 
-          const int incY, void* res) {
-        return cblas_ddot (N, X, incX, Y, incY);    
+          const int incY, Type* res) {
+        *res = cblas_ddot (N, X, incX, Y, incY);    
     }
     
-    inline static Type
+    inline static void 
     dotc (const int N, const Type *X, const int incX, const Type *Y, 
-          const int incY, void* res) {
-        return cblas_ddot (N, X, incX, Y, incY);    
+          const int incY, Type* res) {
+        *res = cblas_ddot (N, X, incX, Y, incY);    
     }
-    
+
     inline static void
     geev (const char& jvl, const char &jvr, const int& n, Type *a, const int& lda,
           CType *w, Type *vl, const int& ldvl, Type *vr, const int& ldvr, Type *work,
