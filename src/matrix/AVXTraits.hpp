@@ -1,3 +1,11 @@
+#ifndef __AVX_TRAITS__
+#define __AVX_TRAITS__
+
+#include <pmmintrin.h>
+#include <xmmintrin.h>
+#include <emmintrin.h>
+#include <immintrin.h>
+
 template <int i0, int i1, int i2, int i3, int i4, int i5, int i6, int i7>
 static inline __m256 constant8f() {
     static const union {
@@ -6,8 +14,6 @@ static inline __m256 constant8f() {
     } u = {{i0,i1,i2,i3,i4,i5,i6,i7}};
     return u.ymm;
 }
-
-template<class T> struct SSETraits;
 
 template<>
 struct SSETraits< std::complex<double> > {
@@ -22,7 +28,7 @@ struct SSETraits< std::complex<double> > {
      */
     static inline Register 
     loada (const type* p) {
-        return _mm256_load_pd ((double*)p); 
+        return _mm256_load_pd ((double*)p);
     }
 
     /**
@@ -30,7 +36,7 @@ struct SSETraits< std::complex<double> > {
      */
     static inline Register
     loadu (const type* p) {
-        return _mm256_loadu_pd ((double*)p); 
+        return _mm256_loadu_pd ((double*)p);
     }
 
     /**
@@ -38,7 +44,7 @@ struct SSETraits< std::complex<double> > {
      */
     static inline Register 
     loadoa (const type* p) {
-        return _mm256_load_pd ((double*)p); 
+        return _mm256_load_pd ((double*)p);
     }
 
     /**
@@ -46,7 +52,7 @@ struct SSETraits< std::complex<double> > {
      */
     static inline Register
     loadou (const type* p) {
-        return _mm256_loadu_pd ((double*)p); 
+        return _mm256_loadu_pd ((double*)p);
     }
 
     /**
@@ -54,7 +60,7 @@ struct SSETraits< std::complex<double> > {
      */
     static inline void
     stora (type* p, Register a) {
-        _mm256_store_pd ((double*)p, a); 
+        _mm256_stream_pd ((double*)p, a);
     }
 
     /**
@@ -249,7 +255,7 @@ struct SSETraits<double> {
      */
     static inline void
     stora (double* p, Register a) {
-        _mm256_store_pd (p, a); 
+        _mm256_stream_pd (p, a);
     }
 
     /**
@@ -403,7 +409,7 @@ struct SSETraits<float> {
      */
     static inline void
     stora (type* p, Register a) {
-        _mm256_store_ps (p, a); 
+        _mm256_stream_ps (p, a);
     }
 
     /**
@@ -532,6 +538,7 @@ template<>
 struct SSETraits< std::complex<float> > {
     
     typedef std::complex<float> type;
+    typedef float rtype;
     typedef __m256 Register;         /**< @brief register type */
     static const unsigned int ne = 4; /**< @brief # of processed elements */
     static const unsigned int ns = 2; /**< @brief # of processed elements */
@@ -541,7 +548,7 @@ struct SSETraits< std::complex<float> > {
      */
     static inline Register 
     loada (const type* p) {
-        return _mm256_load_ps ((float*)p); 
+        return _mm256_load_ps ((rtype*)p);
     }
     
     /**
@@ -549,7 +556,7 @@ struct SSETraits< std::complex<float> > {
      */
     static inline Register
     loadu (const type* p) {
-        return _mm256_loadu_ps ((float*)p); 
+        return _mm256_loadu_ps ((rtype*)p);
     }
     
     /**
@@ -557,7 +564,7 @@ struct SSETraits< std::complex<float> > {
      */
     static inline void
     stora (type* p, Register a) {
-        _mm256_store_ps ((float*)p, a); 
+        _mm256_stream_ps ((rtype*)p, a);
     }
     
     /**
@@ -565,7 +572,7 @@ struct SSETraits< std::complex<float> > {
      */
     static inline void
     storu (type* p, Register a) {
-        _mm256_storeu_ps ((float*)p, a); 
+        _mm256_storeu_ps ((rtype*)p, a);
     }
     
     /**
@@ -722,3 +729,6 @@ struct SSETraits< std::complex<float> > {
     }
 
 }; // SSETraits<float>    
+
+
+#endif

@@ -1,36 +1,34 @@
-#include <complex>
+/*
+ * SIMDTraits.hpp
+ *
+ *  Created on: May 3, 2013
+ *      Author: kvahed
+ */
 
-#ifdef __SSE__
+#ifndef __SIMDTRAITS_HPP__
+#define __SIMDTRAITS_HPP__
+
+#include <complex>
 #include <xmmintrin.h>
-#endif
-#ifdef __SSE2__
-#include <emmintrin.h>
-#endif
-#ifdef __SSE3__
-#include <pmmintrin.h>
-#endif
-#ifdef __SSSE3__
-#include <tmmintrin.h>
-#endif 
-#ifdef __SSSE41__
-#include <smmintrin.h>
-#endif 
-#ifdef __SSSE42__
-#include <nmmintrin.h>
-#endif 
-#ifdef __AVX__
-#include <immintrin.h>
-#endif
+
 
 namespace SSE {
 
-	template<class T> 
-	struct SSETraits {};
+	template<class T> struct SSETraits;
 
-#if defined __AVX__
-#include "AVXTraits.hpp"
-#elif defined __SSE2__
-#include "SSE2Traits.hpp"
-#endif
+	#if defined __AVX__
+		#include "AVXTraits.hpp"
+	#elif defined __SSE2__
+		#include "SSE2Traits.hpp"
+	#endif
 
-} // namespace SSE 
+	#if defined __AVX2__
+		#include "AVX2Traits.hpp"
+	#elif defined __SSE4_2__
+		#include "SSE42Traits.hpp"
+	#endif
+
+} // namespace SSE
+
+
+#endif /* __SIMDTRAITS_HPP__ */

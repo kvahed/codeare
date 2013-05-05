@@ -67,7 +67,6 @@ enum IceDim {
 
 #define ICE_SHRT_MAX 4095
 
-
 #ifdef HAVE_MAT_H
 #include "mat.h"
 #endif
@@ -1250,12 +1249,16 @@ public:
         for (size_t i=0; i < INVALID_DIM; i++)
             assert (Dim(i) == M.Dim(i));
 
-        Matrix<T,P> res = *this;
+        Matrix<T,P> res (_dim);
 
 #if defined HAVE_SSE
-        SSE::process<T>(res.Container(), M.Container(), SSE::sub<T>(), res.Container());
+        if (fp_type(_M[0]))
+        	SSE::process<T>(_M, M.Container(), SSE::sub<T>(), res.Container());
+        else
+        	for (size_t i = 0; i < Size(); i++)
+        		res[i] = _M[i] - M[i];
 #else
-        res.Container() -= M.Container();
+        res.Container() = _M - M.Container();
 #endif
         
         return res;
@@ -1276,7 +1279,8 @@ public:
             assert (Dim(i) == M.Dim(i));
 
         Matrix<T,P> res = *this;
-    	res.Container() -= M.Container();
+    	for (size_t i = 0; i < Size(); i++)
+    		res[i] -= M[i];
         return res;
 
     }
@@ -1322,7 +1326,11 @@ public:
             assert (_dim[i] == M.Dim(i));
 
 #if defined HAVE_SSE
-        SSE::process<T>(_M, M.Container(), SSE::sub<T>(), _M);
+        if (fp_type(_M[0]))
+        	SSE::process<T>(_M, M.Container(), SSE::sub<T>(), _M);
+        else
+        	for (size_t i = 0; i < Size(); i++)
+        		_M[i] -= M[i];
 #else
         _M -= M.Container();
 #endif
@@ -1423,12 +1431,16 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
         
-        Matrix<T,P> res = M;
+        Matrix<T,P> res (_dim);
         
 #if defined HAVE_SSE
-        SSE::process<T>(res.Container(), _M, SSE::add<T>(), res.Container());
+        if (fp_type(_M[0]))
+        	SSE::process<T>(_M, M.Container(), SSE::add<T>(), res.Container());
+        else
+        	for (size_t i = 0; i < Size(); i++)
+        		res[i] = _M[i] + M[i];
 #else
-        res.Container() += _M;
+        res.Container() = _M + M.Container();
 #endif
         
 		return res;
@@ -1499,7 +1511,11 @@ public:
             assert (_dim[i] == M.Dim(i));
 
 #if defined HAVE_SSE
-        SSE::process<T>(_M, M.Container(), SSE::add<T>(), _M);
+        if (fp_type(_M[0]))
+        	SSE::process<T>(_M, M.Container(), SSE::add<T>(), _M);
+        else
+        	for (size_t i = 0; i < Size(); i++)
+        		_M[i] += M[i];
 #else
         _M += M.Container();
 #endif
@@ -1988,7 +2004,11 @@ public:
         Matrix<T,P> res (_dim);
 
 #if defined HAVE_SSE
-        SSE::process<T>(_M, M.Container(), SSE::mul<T>(), res.Container());
+        if (fp_type(_M[0]))
+        	SSE::process<T>(_M, M.Container(), SSE::mul<T>(), res.Container());
+        else
+        	for (size_t i = 0; i < Size(); i++)
+        		res[i] = _M[i] * M[i];
 #else
         res.Container() = _M * M.Container();
 #endif
@@ -2064,7 +2084,11 @@ public:
             assert (_dim[i] == M.Dim(i));
 
 #if defined HAVE_SSE
-        SSE::process<T>(_M, M.Container(), SSE::mul<T>(), _M);
+        if (fp_type(_M[0]))
+        	SSE::process<T>(_M, M.Container(), SSE::mul<T>(), _M);
+        else
+        	for (size_t i = 0; i < Size(); i++)
+        		_M[i] *= M[i];
 #else
         _M *= M.Container();
 #endif
@@ -2135,7 +2159,11 @@ public:
         Matrix<T,P> res (_dim);
 
 #if defined HAVE_SSE
-        SSE::process<T>(_M, M.Container(), SSE::div<T>(), res.Container());
+        if (fp_type(_M[0]))
+        	SSE::process<T>(_M, M.Container(), SSE::div<T>(), res.Container());
+        else
+        	for (size_t i = 0; i < Size(); i++)
+        		res[i] = _M[i] / M[i];
 #else
         res.Container() = _M / M.Container();
 #endif
@@ -2213,7 +2241,11 @@ public:
             assert (_dim[i] == M.Dim(i));
 
 #if defined HAVE_SSE
-        SSE::process<T>(_M, M.Container(), SSE::div<T>(), _M);
+        if (fp_type(_M[0]))
+        	SSE::process<T>(_M, M.Container(), SSE::div<T>(), _M);
+        else
+        	for (size_t i = 0; i < Size(); i++)
+        		_M[i] /= M[i];
 #else
         _M /= M.Container();
 #endif

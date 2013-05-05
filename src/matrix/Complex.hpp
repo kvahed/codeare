@@ -23,10 +23,34 @@
 
 #include <stdlib.h>
 #include <complex>
-
+#include <typeinfo>
 
 typedef std::complex<float>  cxfl;
 typedef std::complex<double> cxdb;
+
+
+static const std::type_info& float_type (typeid(float));
+static const std::type_info& double_type (typeid(double));
+static const std::type_info& cxfl_type (typeid(cxfl));
+static const std::type_info& cxdb_type (typeid(cxdb));
+
+static const std::type_info& short_type (typeid(short));
+static const std::type_info& long_type (typeid(long));
+static const std::type_info& bool_type (typeid(bool));
+static const std::type_info& int_type (typeid(int));
+static const std::type_info& size_t_type (typeid(size_t));
+
+template<class T>
+static inline bool fp_type (const T& t) {
+	return (typeid(T) == float_type || typeid(T) == double_type ||
+			typeid(T) ==  cxfl_type || typeid(T) ==   cxdb_type );
+}
+
+template<class T>
+static inline bool i_type (const T& t) {
+return (typeid(T) == short_type || typeid(T) == long_type ||
+		typeid(T) ==  bool_type || typeid(T) ==   int_type );
+}
 
 inline double cconj (double d) {return d;}
 inline float  cconj (float  f) {return f;}

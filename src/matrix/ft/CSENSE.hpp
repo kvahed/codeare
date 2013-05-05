@@ -68,7 +68,7 @@ public:
 		assert (nc > 1);
 
 		// 3D acceleration
-		af = size(sens) / (Matrix<short>)size(imgs);
+		af = size(sens) / size(imgs);
 		std::cout << "\n  acceleration vector: " << af;
 		aaf = prod (af);
 

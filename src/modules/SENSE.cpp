@@ -56,7 +56,8 @@ SENSE::Process () {
 
 	Get<cxfl>("image") = *m_cs ->* Get<cxfl>("fimgs");
 
-	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+	printf ("... done. WTime: %.4f seconds.\n\n",
+			elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	return OK;
 

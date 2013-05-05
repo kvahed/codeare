@@ -87,6 +87,9 @@ case $host in
      ;;
 esac
 
+# Get size of void*
+AC_CHECK_SIZEOF(void*)
+
 # Optional documentation 
 
 AC_ARG_ENABLE([documentation],
