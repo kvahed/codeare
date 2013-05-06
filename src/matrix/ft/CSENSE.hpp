@@ -263,7 +263,7 @@ private:
 				nthreads = omp_get_num_threads ();
 			}
 
-		printf ("  allocating %zu %zu-dim ffts\n", nthreads, ndim);
+		printf ("  allocating %d %zu-dim ffts\n", nthreads, ndim);
 
 		if (params.exists("nthreads"))
 			nthreads = params.Get<unsigned short>("nthreads");
