@@ -1,31 +1,25 @@
 
 ## folders (explicit) ##
-
 /autom4te.cache/
 
-
-
 ## files (explicit) ##
-
-/aclocal.m4
-
 /config.log
 /config.status
-
 /libtool
-
 /.autotools
-
-
+/.csettings
+/.settings
 
 ## folders (global) ##
 .deps/
 .libs/
-
-
+.dirstamp
 
 ## files (global) ##
-
+tests/pTXRFPulse0.ini.sag_ap
+tests/pTXRFPulse0.ini.tra_ap
+test
+test.cpp
 *~
 
 Makefile
