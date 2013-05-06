@@ -1178,14 +1178,14 @@ public:
             }
 
 #if defined HAVE_SSE
-            if (fp_type(_M[0])) {
+	    /*            if (fp_type(_M[0])) {
                 size_t ms = M.Size();
                 if (ms > 32 && _M.size() != ms) {
                 	_M = VECTOR_CONSTR(T,ms);
                 	SSE::assign<T>(M.Container(), _M);
                 } else
                 	_M = M.Container();
-            } else
+			} else*/
             	_M = M.Container();
 #else
             _M = M.Container();
