@@ -195,7 +195,6 @@ public:
 			n[i]  = (int) sl [rank-1-i];
 			m_N  *= n[i];
 		}
-		
 		Matrix<size_t> tmp = resize(sl,INVALID_DIM,1);
 		for (size_t i = 0; i<INVALID_DIM; i++)
 			if (tmp[i] == 0)

@@ -1177,7 +1177,19 @@ public:
                 _dsz[i] = M.Dsz()[i];
             }
 
+#if defined HAVE_SSE
+            if (fp_type(_M[0])) {
+                size_t ms = M.Size();
+                if (ms > 32 && _M.size() != ms) {
+                	_M = VECTOR_CONSTR(T,ms);
+                	SSE::assign<T>(M.Container(), _M);
+                } else
+                	_M = M.Container();
+            } else
+            	_M = M.Container();
+#else
             _M = M.Container();
+#endif
 
         }
 
@@ -1253,7 +1265,7 @@ public:
 
 #if defined HAVE_SSE
         if (fp_type(_M[0]))
-        	SSE::process<T>(_M, M.Container(), SSE::sub<T>(), res.Container());
+        	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] - M[i];
@@ -1327,7 +1339,7 @@ public:
 
 #if defined HAVE_SSE
         if (fp_type(_M[0]))
-        	SSE::process<T>(_M, M.Container(), SSE::sub<T>(), _M);
+        	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] -= M[i];
@@ -1435,7 +1447,7 @@ public:
         
 #if defined HAVE_SSE
         if (fp_type(_M[0]))
-        	SSE::process<T>(_M, M.Container(), SSE::add<T>(), res.Container());
+        	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] + M[i];
@@ -1512,7 +1524,7 @@ public:
 
 #if defined HAVE_SSE
         if (fp_type(_M[0]))
-        	SSE::process<T>(_M, M.Container(), SSE::add<T>(), _M);
+        	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] += M[i];
@@ -2005,7 +2017,7 @@ public:
 
 #if defined HAVE_SSE
         if (fp_type(_M[0]))
-        	SSE::process<T>(_M, M.Container(), SSE::mul<T>(), res.Container());
+        	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] * M[i];
@@ -2085,7 +2097,7 @@ public:
 
 #if defined HAVE_SSE
         if (fp_type(_M[0]))
-        	SSE::process<T>(_M, M.Container(), SSE::mul<T>(), _M);
+        	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] *= M[i];
@@ -2160,7 +2172,7 @@ public:
 
 #if defined HAVE_SSE
         if (fp_type(_M[0]))
-        	SSE::process<T>(_M, M.Container(), SSE::div<T>(), res.Container());
+        	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] / M[i];
@@ -2242,7 +2254,7 @@ public:
 
 #if defined HAVE_SSE
         if (fp_type(_M[0]))
-        	SSE::process<T>(_M, M.Container(), SSE::div<T>(), _M);
+        	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] /= M[i];
@@ -3036,7 +3048,7 @@ public:
      * @return          Size
      */
     inline size_t
-    Size() const {
+    Size () const {
         
         
         long size = 1;

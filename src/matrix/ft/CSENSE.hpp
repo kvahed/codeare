@@ -263,8 +263,8 @@ private:
 				nthreads = omp_get_num_threads ();
 			}
 
-		printf ("  allocating %d %zu-dim ffts\n", nthreads, ndim);
-
+		printf ("  allocating %d %zu-dim ffts ... ", nthreads, ndim);
+		fflush (stdout);
 		if (params.exists("nthreads"))
 			nthreads = params.Get<unsigned short>("nthreads");
 
@@ -275,6 +275,8 @@ private:
 				w.Get<T>(params.Get<std::string>("mask_name")),
 				w.Get<T>(params.Get<std::string>(  "pc_name")),
 				w.Get<T>(params.Get<std::string>(  "b0_name"))*/);
+
+		std::cout << "done\n";
 
 	}
 

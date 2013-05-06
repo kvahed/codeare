@@ -254,7 +254,7 @@ namespace SSE {
 	 * @param  C  Vector C
 	 */
 	template<class MA, class T, class Op> inline static void
-	process (const VECTOR_TYPE(T)& A, const VECTOR_TYPE(T)& B, const Op& op, VECTOR_TYPE(T)& C) {
+	binary (const VECTOR_TYPE(T)& A, const VECTOR_TYPE(T)& B, const Op& op, VECTOR_TYPE(T)& C) {
 		
 		typedef SSETraits<T>                sse_type;
 		typedef typename sse_type::Register reg_type;
@@ -288,9 +288,36 @@ namespace SSE {
 			store<MA>::unaligned (pC, c);
 		}
 
-	}; // namespace SSE
+	} // namespace SSE
 
-#endif
+	template<class MA, class T> inline static void
+	assign (const VECTOR_TYPE(T)& A, VECTOR_TYPE(T)& B) {
+
+		typedef SSETraits<T>                sse_type;
+		typedef typename sse_type::Register reg_type;
+
+		size_t   n  = A.size();
+		size_t   ne = sse_type::ne;
+		size_t   na = floor ((float)n / (float)ne);
+        size_t   nr = n % ne;
+
+		const T* pA = &A[0];
+		      T* pB = &B[0];
+
+		// aligned
+
+		for (size_t i = 0; i < na; i++) {
+			store<MA>::aligned (pB, load<MA>::aligned (pA));
+			pA += ne; pB += ne;
+		}
+
+		// rest
+		if (nr)
+			store<MA>::unaligned (pB, load<MA>::unaligned (pA));
+
+	}
+
+	#endif
 
 	
 }
