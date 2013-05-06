@@ -1,6 +1,8 @@
 
 ## folders (explicit) ##
 /autom4te.cache/
+/doc/api/api
+/share
 
 ## files (explicit) ##
 /config.log
@@ -14,12 +16,16 @@
 .deps/
 .libs/
 .dirstamp
+.DS_Store
 
 ## files (global) ##
+out.txt
 tests/pTXRFPulse0.ini.sag_ap
 tests/pTXRFPulse0.ini.tra_ap
 test
 test.cpp
+*.html
+*.log
 *~
 
 Makefile
