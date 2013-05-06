@@ -5,5 +5,5 @@ TESTS = t_dft
 check_PROGRAMS = $(TESTS)
 
 t_dft_SOURCES = $(COMMON) t_dft.cpp
-t_svd_LDFLAGS =  $(BLAS) $(LAPACK)
+t_dft_LDFLAGS =  $(BLAS) $(LAPACK)
 

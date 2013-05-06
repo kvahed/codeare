@@ -6,6 +6,8 @@
 #include <emmintrin.h>
 
 
+#include "SIMDTraits.hpp"
+
 template <int i0, int i1, int i2, int i3>
 static inline __m128i constant4i() {
     static const union {
@@ -15,10 +17,14 @@ static inline __m128i constant4i() {
     return u.xmm;
 }
 
+template<class T> struct SSETraits;
+
 
 template<>
 struct SSETraits< std::complex<double> > {
     
+	typedef double RType;
+	typedef std::complex<double> Type;
     typedef __m128d Register;         /**< @brief register type */
     static const unsigned int ne = 1; /**< @brief # of processed elements */
     static const unsigned int ns = 2; /**< @brief # of sub elements */
@@ -27,55 +33,39 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 load packed aligned
      */
     static inline Register 
-    loada (const std::complex<double>* p) {
-        return _mm_load_pd ((double*)p); 
+    loada (const Type* p) {
+        return _mm_load_pd ((const RType*)p);
     }
     
     /**
      * @brief     SSE2 load packed unaligned
      */
     static inline Register
-    loadu (const std::complex<double>* p) {
-        return _mm_loadu_pd ((double*)p); 
+    loadu (const Type* p) {
+        return _mm_loadu_pd ((const RType*)p);
     }
     
     /**
-     * @brief     SSE2 load packed aligned
-		 */
-    static inline Register 
-    loadoa (const std::complex<double>* p) {
-        return _mm_load_pd ((double*)p); 
-    }
-    
-    /**
-     * @brief     SSE2 load packed unaligned
-     */
-    static inline Register
-    loadou (const std::complex<double>* p) {
-        return _mm_loadu_pd ((double*)p); 
-    }
-    
-    /**
-     * @brief     SSE2 load packed aligned
+     * @brief     AVX load packed aligned
      */
     static inline void
-    stora (std::complex<double>* p, Register a) {
-        _mm_store_pd ((double*)p, a); 
+    stora (Type* p, Register a) {
+        _mm_stream_pd ((RType*)p, a);
     }
-    
+
     /**
-     * @brief     SSE2 load packed unaligned
+     * @brief     AVX load packed unaligned
      */
     static inline void
-    storu (std::complex<double>* p, Register a) {
-        _mm_storeu_pd ((double*)p, a); 
+    storu (Type* p, Register a) {
+        _mm_storeu_pd ((RType*)p, a); 
     }
-    
+
     /**
      * @brief     SSE2 packed addition
      */
     static inline Register
-    addp (const Register &a, const Register &b) {
+    addp (const Register& a, const Register& b) {
         return _mm_add_pd(a, b);
     }
 	
@@ -83,7 +73,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 single addition
      */
     static inline Register 
-    adds (const Register &a, const Register &b) {
+    adds (const Register& a, const Register& b) {
         return _mm_add_sd(a, b);
     }
 	
@@ -91,7 +81,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 packed subtraction
      */
     static inline Register 
-    subp (const Register &a, const Register &b) {
+    subp (const Register& a, const Register& b) {
         return _mm_sub_pd(a, b);
     }
 	
@@ -99,7 +89,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 single subtraction
      */
     static inline Register 
-    subs (const Register &a, const Register &b) {
+    subs (const Register& a, const Register& b) {
         return _mm_sub_sd(a, b);
     }
 	
@@ -114,7 +104,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE3 packed multiplication
      */
     static inline Register 
-    mulp (const Register &a, const Register &b) {
+    mulp (const Register& a, const Register& b) {
         
         Register b_flip = _mm_shuffle_pd(b,b,1);      // Swap b.re and b.im
         Register a_im   = _mm_shuffle_pd(a,a,3);      // Imag. part of a in both
@@ -139,7 +129,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 single multiplication
      */
     static inline Register 
-    muls (const Register &a, const Register &b) {
+    muls (const Register& a, const Register& b) {
         return mulp(a, b);
     }
 	/*
@@ -154,7 +144,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 packed division
      */
     static inline Register 
-    divp (const Register &a, const Register &b) {
+    divp (const Register& a, const Register& b) {
         
         Register a_re   = _mm_shuffle_pd(a,a,0);      // Real part of a in both
         Register arb    = _mm_mul_pd(a_re, b);        // (a.re*b.re, a.re*b.im)
@@ -184,7 +174,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 single division
      */
     static inline Register 
-    divs (const Register &a, const Register &b) {
+    divs (const Register& a, const Register& b) {
         return _mm_div_sd(a, b);
     }
     
@@ -192,7 +182,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 packed SQRT
      */
     static inline Register 
-    sqrtp (const Register &a) {
+    sqrtp (const Register& a) {
         return _mm_sqrt_pd(a);
     }
 	
@@ -200,7 +190,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 single SQRT
      */
     static inline Register 
-    sqrts (const Register &a, const Register &b) {
+    sqrts (const Register& a, const Register& b) {
         return _mm_sqrt_sd(a,b);
     }
 	
@@ -208,7 +198,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 packed comparison
      */
     static inline Register 
-    minp (const Register &a, const Register &b) {
+    minp (const Register& a, const Register& b) {
         return _mm_min_pd(a, b);
     }
 	
@@ -216,7 +206,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 single comparison
      */
     static inline Register 
-    mins (const Register &a, const Register &b) {
+    mins (const Register& a, const Register& b) {
         return _mm_min_sd(a, b);
     }
 	
@@ -224,7 +214,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 packed comparison
      */
     static inline Register 
-    maxp (const Register &a, const Register &b) {
+    maxp (const Register& a, const Register& b) {
         return _mm_max_pd(a, b);
     }
 		
@@ -232,7 +222,7 @@ struct SSETraits< std::complex<double> > {
      * @brief     SSE2 single comparison
      */
     static inline Register 
-    maxs (const Register &a, const Register &b) {
+    maxs (const Register& a, const Register& b) {
 			return _mm_max_sd(a, b);
     }
 	
@@ -241,6 +231,7 @@ struct SSETraits< std::complex<double> > {
 template<>
 	struct SSETraits< double > {
 		
+		typedef double Type;
 		typedef __m128d Register;         /**< @brief register type */
 		static const unsigned int ne = 2; /**< @brief # of processed elements */
 		static const unsigned int ns = 1; /**< @brief # of sub elements */
@@ -249,7 +240,7 @@ template<>
 		 * @brief     SSE2 load packed aligned
 		 */
 		static inline Register 
-		loada (const double* p) {
+		loada (const Type* p) {
 			return _mm_load_pd (p); 
 		}
 
@@ -257,31 +248,31 @@ template<>
 		 * @brief     SSE2 load packed unaligned
 		 */
 		static inline Register
-		loadu (const double* p) {
+		loadu (const Type* p) {
 			return _mm_loadu_pd (p); 
 		}
 
-		/**
-		 * @brief     SSE2 load packed aligned
-		 */
-		static inline void
-		stora (double* p, Register a) {
-			_mm_store_pd (p, a); 
-		}
+    /**
+     * @brief     AVX load packed aligned
+     */
+    static inline void
+    stora (Type* p, Register a) {
+        _mm_stream_pd (p, a);
+    }
 
-		/**
-		 * @brief     SSE2 load packed unaligned
-		 */
-		static inline void
-		storu (double* p, Register a) {
-			_mm_storeu_pd (p, a); 
-		}
+    /**
+     * @brief     AVX load packed unaligned
+     */
+    static inline void
+    storu (Type* p, Register a) {
+        _mm_storeu_pd (p, a); 
+    }
 
 		/**
 		 * @brief     SSE2 packed addition
 		 */
 		static inline Register
-		addp (const Register &a, const Register &b) {
+		addp (const Register& a, const Register& b) {
 			return _mm_add_pd(a, b);
 		}
 		
@@ -289,7 +280,7 @@ template<>
 		 * @brief     SSE2 single addition
 		 */
 		static inline Register 
-		adds (const Register &a, const Register &b) {
+		adds (const Register& a, const Register& b) {
 			return _mm_add_sd(a, b);
 		}
 		
@@ -297,7 +288,7 @@ template<>
 		 * @brief     SSE2 packed subtraction
 		 */
 		static inline Register 
-		subp (const Register &a, const Register &b) {
+		subp (const Register& a, const Register& b) {
 			return _mm_sub_pd(a, b);
 		}
 		
@@ -305,7 +296,7 @@ template<>
 		 * @brief     SSE2 single subtraction
 		 */
 		static inline Register 
-		subs (const Register &a, const Register &b) {
+		subs (const Register& a, const Register& b) {
 			return _mm_sub_sd(a, b);
 		}
 		
@@ -313,7 +304,7 @@ template<>
 		 * @brief     SSE2 packed multiplication
 		 */
 		static inline Register 
-		mulp (const Register &a, const Register &b) {
+		mulp (const Register& a, const Register& b) {
 			return _mm_mul_pd(a,b);				
 		}
 	
@@ -321,7 +312,7 @@ template<>
 		 * @brief     SSE2 single multiplication
 		 */
 		static inline Register 
-		muls (const Register &a, const Register &b) {
+		muls (const Register& a, const Register& b) {
 			return _mm_mul_sd(a,b);				
 		}
 		
@@ -329,7 +320,7 @@ template<>
 		 * @brief     SSE2 packed division
 		 */
 		static inline Register 
-		divp (const Register &a, const Register &b) {
+		divp (const Register& a, const Register& b) {
 			return _mm_div_pd(a, b);
 		}
 		
@@ -337,7 +328,7 @@ template<>
 		 * @brief     SSE2 single division
 		 */
 		static inline Register 
-		divs (const Register &a, const Register &b) {
+		divs (const Register& a, const Register& b) {
 			return _mm_div_sd(a, b);
 		}
 		
@@ -345,7 +336,7 @@ template<>
 		 * @brief     SSE2 packed SQRT
 		 */
 		static inline Register 
-		sqrtp (const Register &a) {
+		sqrtp (const Register& a) {
 			return _mm_sqrt_pd(a);
 		}
 		
@@ -353,7 +344,7 @@ template<>
 		 * @brief     SSE2 single SQRT
 		 */
 		static inline Register 
-		sqrts (const Register &a, const Register &b) {
+		sqrts (const Register& a, const Register& b) {
 			return _mm_sqrt_sd(a,b);
 		}
 		
@@ -361,7 +352,7 @@ template<>
 		 * @brief     SSE2 packed comparison
 		 */
 		static inline Register 
-		minp (const Register &a, const Register &b) {
+		minp (const Register& a, const Register& b) {
 			return _mm_min_pd(a, b);
 		}
 		
@@ -369,7 +360,7 @@ template<>
 		 * @brief     SSE2 single comparison
 		 */
 		static inline Register 
-		mins (const Register &a, const Register &b) {
+		mins (const Register& a, const Register& b) {
 			return _mm_min_sd(a, b);
 		}
 		
@@ -377,7 +368,7 @@ template<>
 		 * @brief     SSE2 packed comparison
 		 */
 		static inline Register 
-		maxp (const Register &a, const Register &b) {
+		maxp (const Register& a, const Register& b) {
 			return _mm_max_pd(a, b);
 		}
 		
@@ -385,7 +376,7 @@ template<>
 		 * @brief     SSE2 single comparison
 		 */
 		static inline Register 
-		maxs (const Register &a, const Register &b) {
+		maxs (const Register& a, const Register& b) {
 			return _mm_max_sd(a, b);
 		}
 		
@@ -394,6 +385,7 @@ template<>
 	template<>
 	struct SSETraits<float> {
 		
+		typedef float Type;
 		typedef __m128 Register;         /**< @brief register type */
 		static const unsigned int ne = 4; /**< @brief # of processed elements */
 		static const unsigned int ns = 1; /**< @brief # of processed elements */
@@ -402,7 +394,7 @@ template<>
 		 * @brief     SSE2 load packed aligned
 		 */
 		static inline Register 
-		loada (const float* p) {
+		loada (const Type* p) {
 			return _mm_load_ps (p); 
 		}
 
@@ -410,31 +402,32 @@ template<>
 		 * @brief     SSE2 load packed unaligned
 		 */
 		static inline Register
-		loadu (const float* p) {
+		loadu (const Type* p) {
 			return _mm_loadu_ps (p); 
 		}
 
-		/**
-		 * @brief     SSE2 load packed aligned
-		 */
-		static inline void
-		stora (float* p, Register a) {
-			_mm_store_ps (p, a); 
-		}
+    /**
+     * @brief     AVX load packed aligned
+     */
+    static inline void
+    stora (Type* p, Register a) {
+        _mm_stream_ps (p, a);
+    }
 
-		/**
-		 * @brief     SSE2 load packed unaligned
-		 */
-		static inline void
-		storu (float* p, Register a) {
-			_mm_storeu_ps (p, a); 
-		}
+    /**
+     * @brief     AVX load packed unaligned
+     */
+    static inline void
+    storu (Type* p, Register a) {
+        _mm_storeu_ps (p, a); 
+    }
+
 
 		/**
 		 * @brief     SSE2 packed addition
 		 */
 		static inline Register
-		addp (const Register &a, const Register &b) {
+		addp (const Register& a, const Register& b) {
 			return _mm_add_ps(a, b);
 		}
 		
@@ -442,7 +435,7 @@ template<>
 		 * @brief     SSE2 single addition
 		 */
 		static inline Register 
-		adds (const Register &a, const Register &b) {
+		adds (const Register& a, const Register& b) {
 			return _mm_add_ss(a, b);
 		}
 		
@@ -450,7 +443,7 @@ template<>
 		 * @brief     SSE2 packed subtraction
 		 */
 		static inline Register 
-		subp (const Register &a, const Register &b) {
+		subp (const Register& a, const Register& b) {
 			return _mm_sub_ps(a, b);
 		}
 		
@@ -458,7 +451,7 @@ template<>
 		 * @brief     SSE2 single subtraction
 		 */
 		static inline Register 
-		subs (const Register &a, const Register &b) {
+		subs (const Register& a, const Register& b) {
 			return _mm_sub_ss(a, b);
 		}
 		
@@ -466,7 +459,7 @@ template<>
 		 * @brief     SSE2 packed multiplication
 		 */
 		static inline Register 
-		mulp (const Register &a, const Register &b) {
+		mulp (const Register& a, const Register& b) {
 			return _mm_mul_ps(a, b);
 		}
 	
@@ -474,7 +467,7 @@ template<>
 		 * @brief     SSE2 single multiplication
 		 */
 		static inline Register 
-		muls (const Register &a, const Register &b) {
+		muls (const Register& a, const Register& b) {
 			return _mm_mul_ss(a, b);
 		}
 		
@@ -482,7 +475,7 @@ template<>
 		 * @brief     SSE2 packed division
 		 */
 		static inline Register 
-		divp (const Register &a, const Register &b) {
+		divp (const Register& a, const Register& b) {
 			return _mm_div_ps(a, b);
 		}
 		
@@ -490,7 +483,7 @@ template<>
 		 * @brief     SSE2 single division
 		 */
 		static inline Register 
-		divs (const Register &a, const Register &b) {
+		divs (const Register& a, const Register& b) {
 			return _mm_div_ss(a, b);
 		}
 		
@@ -498,7 +491,7 @@ template<>
 		 * @brief     SSE2 packed SQRT
 		 */
 		static inline Register 
-		sqrtp (const Register &a) {
+		sqrtp (const Register& a) {
 			return _mm_sqrt_ps(a);
 		}
 		
@@ -506,7 +499,7 @@ template<>
 		 * @brief     SSE2 single SQRT
 		 */
 		static inline Register 
-		sqrts (const Register &a) {
+		sqrts (const Register& a) {
 			return _mm_sqrt_ss(a);
 		}
 		
@@ -514,7 +507,7 @@ template<>
 		 * @brief     SSE2 packed comparison
 		 */
 		static inline Register 
-		minp (const Register &a, const Register &b) {
+		minp (const Register& a, const Register& b) {
 			return _mm_min_ps(a, b);
 		}
 		
@@ -522,7 +515,7 @@ template<>
 		 * @brief     SSE2 single comparison
 		 */
 		static inline Register 
-		mins (const Register &a, const Register &b) {
+		mins (const Register& a, const Register& b) {
 			return _mm_min_ss(a, b);
 		}
 		
@@ -530,7 +523,7 @@ template<>
 		 * @brief     SSE2 packed comparison
 		 */
 		static inline Register 
-		maxp (const Register &a, const Register &b) {
+		maxp (const Register& a, const Register& b) {
 			return _mm_max_ps(a, b);
 		}
 		
@@ -538,7 +531,7 @@ template<>
 		 * @brief     SSE2 single comparison
 		 */
 		static inline Register 
-		maxs (const Register &a, const Register &b) {
+		maxs (const Register& a, const Register& b) {
 			return _mm_max_ss(a, b);
 		}
 		
@@ -547,6 +540,8 @@ template<>
 	template<>
 	struct SSETraits< std::complex<float> > {
 		
+		typedef std::complex<float> Type;
+		typedef float RType;
 		typedef __m128 Register;         /**< @brief register type */
 		static const unsigned int ne = 2; /**< @brief # of processed elements */
 		static const unsigned int ns = 2; /**< @brief # of processed elements */
@@ -555,39 +550,40 @@ template<>
 		 * @brief     SSE2 load packed aligned
 		 */
 		static inline Register 
-		loada (const std::complex<float>* p) {
-			return _mm_load_ps ((float*)p); 
+		loada (const Type* p) {
+			return _mm_load_ps ((const RType*)p);
 		}
 
 		/**
 		 * @brief     SSE2 load packed unaligned
 		 */
 		static inline Register
-		loadu (const std::complex<float>* p) {
-			return _mm_loadu_ps ((float*)p); 
+		loadu (const Type* p) {
+			return _mm_loadu_ps ((const RType*)p);
 		}
+
 
 		/**
 		 * @brief     SSE2 load packed aligned
 		 */
 		static inline void
-		stora (std::complex<float>* p, Register a) {
-			_mm_store_ps ((float*)p, a); 
+		stora (Type* p, Register a) {
+			_mm_stream_ps ((RType*)p, a);
 		}
 
 		/**
 		 * @brief     SSE2 load packed unaligned
 		 */
 		static inline void
-		storu (std::complex<float>* p, Register a) {
-			_mm_storeu_ps ((float*)p, a); 
+		storu (Type* p, Register a) {
+			_mm_storeu_ps ((RType*)p, a);
 		}
 
 		/**
 		 * @brief     SSE2 packed addition
 		 */
 		static inline Register
-		addp (const Register &a, const Register &b) {
+		addp (const Register& a, const Register& b) {
 			return _mm_add_ps(a, b);
 		}
 		
@@ -595,7 +591,7 @@ template<>
 		 * @brief     SSE2 single addition
 		 */
 		static inline Register 
-		adds (const Register &a, const Register &b) {
+		adds (const Register& a, const Register& b) {
 			return _mm_add_ss(a, b);
 		}
 		
@@ -603,7 +599,7 @@ template<>
 		 * @brief     SSE2 packed subtraction
 		 */
 		static inline Register 
-		subp (const Register &a, const Register &b) {
+		subp (const Register& a, const Register& b) {
 			return _mm_sub_ps(a, b);
 		}
 		
@@ -611,7 +607,7 @@ template<>
 		 * @brief     SSE2 single subtraction
 		 */
 		static inline Register 
-		subs (const Register &a, const Register &b) {
+		subs (const Register& a, const Register& b) {
 			return _mm_sub_ss(a, b);
 		}
 		
@@ -619,7 +615,7 @@ template<>
 		 * @brief     SSE2 packed multiplication
 		 */
 		static inline Register 
-		mulp (const Register &ab, const Register &cd) {
+		mulp (const Register& ab, const Register& cd) {
 
 			Register aa, bb, dc, x0, x1;  
 
@@ -637,7 +633,7 @@ template<>
 		 * @brief     SSE2 single multiplication
 		 */
 		static inline Register 
-		muls (const Register &a, const Register &b) {
+		muls (const Register& a, const Register& b) {
 			return mulp(a, b);
 		}
 		
@@ -645,40 +641,30 @@ template<>
 		 * @brief     SSE2 packed division
 		 */
 		static inline Register 
-		divp (const Register &ab, const Register &cd) {
+		divp (const Register& ab, const Register& cd) {
 
 			Register aa, bb, dc, x0, x1, x2, x3;  
 
-			bb = _mm_movehdup_ps (ab);   //  (   b1    b1    b0    b0) 
-			aa = _mm_moveldup_ps (ab);   //  (   a1    a1    a0    a0) 
-
+			bb = _mm_movehdup_ps (ab);
+			aa = _mm_moveldup_ps (ab);
 			dc = _mm_shuffle_ps(cd, cd, _MM_SHUFFLE(2,3,0,1));  
-			                             //  (   c1    d1,   c0,   d0)  
-
-			x0 = _mm_mul_ps (bb, cd);    //  ( b1d1  b1c1  b0d0  b0c0) 
-			x1 = _mm_mul_ps (aa, dc);    //  ( a1c1  a1d1  a0c0  a0d0) 
-
-			x2 = _mm_addsub_ps (x0, x1); //  ( b1d1  a1d1  b0d0  b0c0)
-                                         //  (+a1c1 -a1d1 +a0c0 -a0d0)
-			
-			x1 = _mm_mul_ps (dc, dc);    //  ( c1c1  d1d1  c0c0  d0d0)
+			x0 = _mm_mul_ps (bb, cd);
+			x1 = _mm_mul_ps (aa, dc);
+			x2 = _mm_addsub_ps (x0, x1);
+			x1 = _mm_mul_ps (dc, dc);
 			x0 = _mm_shuffle_ps (x1, x1, _MM_SHUFFLE(2,3,0,1));
-			                             //  ( d1d1  c1c1  d0d0  c0c0)
-
-			x3 = _mm_add_ps (x1, x0);    //  ( c1c1  d1d1  c0c0  d0d0)
-                                         //  (+d1d1  c1c1  d0d0  c0c0)
-
-			x1 = _mm_div_ps (x2, x3);    //  ( b1d1+a1c1)
-                                         //   /c1c1+d1d1)
+			x3 = _mm_add_ps (x1, x0);
+			x1 = _mm_div_ps (x2, x3);
 
 			return _mm_shuffle_ps (x1, x1, _MM_SHUFFLE(2,3,0,1));
+
 		}
 		
 		/**
 		 * @brief     SSE2 single division
 		 */
 		static inline Register 
-		divs (const Register &a, const Register &b) {
+		divs (const Register& a, const Register& b) {
 			return _mm_div_ss(a, b);
 		}
 		
@@ -686,7 +672,7 @@ template<>
 		 * @brief     SSE2 packed SQRT
 		 */
 		static inline Register 
-		sqrtp (const Register &a) {
+		sqrtp (const Register& a) {
 			return _mm_sqrt_ps(a);
 		}
 		
@@ -694,7 +680,7 @@ template<>
 		 * @brief     SSE2 single SQRT
 		 */
 		static inline Register 
-		sqrts (const Register &a) {
+		sqrts (const Register& a) {
 			return _mm_sqrt_ss(a);
 		}
 		
@@ -702,7 +688,7 @@ template<>
 		 * @brief     SSE2 packed comparison
 		 */
 		static inline Register 
-		minp (const Register &a, const Register &b) {
+		minp (const Register& a, const Register& b) {
 			return _mm_min_ps(a, b);
 		}
 		
@@ -710,7 +696,7 @@ template<>
 		 * @brief     SSE2 single comparison
 		 */
 		static inline Register 
-		mins (const Register &a, const Register &b) {
+		mins (const Register& a, const Register& b) {
 			return _mm_min_ss(a, b);
 		}
 		
@@ -718,7 +704,7 @@ template<>
 		 * @brief     SSE2 packed comparison
 		 */
 		static inline Register 
-		maxp (const Register &a, const Register &b) {
+		maxp (const Register& a, const Register& b) {
 			return _mm_max_ps(a, b);
 		}
 		
@@ -726,7 +712,7 @@ template<>
 		 * @brief     SSE2 single comparison
 		 */
 		static inline Register 
-		maxs (const Register &a, const Register &b) {
+		maxs (const Register& a, const Register& b) {
 			return _mm_max_ss(a, b);
 		}
 		

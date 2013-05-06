@@ -15,6 +15,8 @@ static inline __m256 constant8f() {
     return u.ymm;
 }
 
+template<class T> struct SSETraits;
+
 template<>
 struct SSETraits< std::complex<double> > {
 

@@ -1,4 +1,4 @@
-#include "matrix/DWT.hpp"
+#include "matrix/dwt/DWT.hpp"
 #include "matrix/Creators.hpp"
 
 template <class T> bool

@@ -80,6 +80,9 @@ am__objects_1 = ../../../Workspace.$(OBJEXT) \
 am_t_dft_OBJECTS = $(am__objects_1) t_dft.$(OBJEXT)
 t_dft_OBJECTS = $(am_t_dft_OBJECTS)
 t_dft_LDADD = $(LDADD)
+t_dft_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(t_dft_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -261,7 +264,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/matrix/ft -I$(top_srcdir)/src/misc
 COMMON = ../../../Workspace.cpp ../../../Toolbox.cpp
 t_dft_SOURCES = $(COMMON) t_dft.cpp
-t_svd_LDFLAGS = $(BLAS) $(LAPACK)
+t_dft_LDFLAGS = $(BLAS) $(LAPACK)
 all: all-am
 
 .SUFFIXES:
@@ -317,7 +320,7 @@ clean-checkPROGRAMS:
 	../../../$(DEPDIR)/$(am__dirstamp)
 t_dft$(EXEEXT): $(t_dft_OBJECTS) $(t_dft_DEPENDENCIES) $(EXTRA_t_dft_DEPENDENCIES) 
 	@rm -f t_dft$(EXEEXT)
-	$(CXXLINK) $(t_dft_OBJECTS) $(t_dft_LDADD) $(LIBS)
+	$(t_dft_LINK) $(t_dft_OBJECTS) $(t_dft_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

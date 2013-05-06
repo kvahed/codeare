@@ -14,7 +14,6 @@
 
 namespace SSE {
 
-	template<class T> struct SSETraits;
 
 	#if defined __AVX__
 		#include "AVXTraits.hpp"

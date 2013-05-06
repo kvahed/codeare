@@ -118,11 +118,13 @@ CGSENSE_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_NFFT3_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
 CompressedSensing_la_DEPENDENCIES =
-am_CompressedSensing_la_OBJECTS = CompressedSensing.lo
+am_CompressedSensing_la_OBJECTS =  \
+	CompressedSensing_la-CompressedSensing.lo
 CompressedSensing_la_OBJECTS = $(am_CompressedSensing_la_OBJECTS)
 CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(CompressedSensing_la_CXXFLAGS) $(CXXFLAGS) \
+	$(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_GSL_TRUE@am_CompressedSensing_la_rpath = -rpath $(libdir)
 DirectMethod_la_DEPENDENCIES =
 am__DirectMethod_la_SOURCES_DIST = DirectMethod.hpp DirectMethod.cpp \
@@ -465,6 +467,7 @@ AFI_la_SOURCES = AFI.hpp AFI.cpp
 AFI_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 AFI_la_LIBADD = $(COMMON_la_LIBADD)
 CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
+CompressedSensing_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(top_srcdir)/src/matrix/dwt
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
 DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp \
@@ -591,7 +594,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AFI.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CGSENSE.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CPUSimulator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CompressedSensing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CompressedSensing_la-CompressedSensing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DirectMethod.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
@@ -629,6 +632,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+CompressedSensing_la-CompressedSensing.lo: CompressedSensing.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(CompressedSensing_la_CXXFLAGS) $(CXXFLAGS) -MT CompressedSensing_la-CompressedSensing.lo -MD -MP -MF $(DEPDIR)/CompressedSensing_la-CompressedSensing.Tpo -c -o CompressedSensing_la-CompressedSensing.lo `test -f 'CompressedSensing.cpp' || echo '$(srcdir)/'`CompressedSensing.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/CompressedSensing_la-CompressedSensing.Tpo $(DEPDIR)/CompressedSensing_la-CompressedSensing.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='CompressedSensing.cpp' object='CompressedSensing_la-CompressedSensing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(CompressedSensing_la_CXXFLAGS) $(CXXFLAGS) -c -o CompressedSensing_la-CompressedSensing.lo `test -f 'CompressedSensing.cpp' || echo '$(srcdir)/'`CompressedSensing.cpp
 
 RelativeSensitivities_la-RelativeSensitivities.lo: RelativeSensitivities.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(RelativeSensitivities_la_CXXFLAGS) $(CXXFLAGS) -MT RelativeSensitivities_la-RelativeSensitivities.lo -MD -MP -MF $(DEPDIR)/RelativeSensitivities_la-RelativeSensitivities.Tpo -c -o RelativeSensitivities_la-RelativeSensitivities.lo `test -f 'RelativeSensitivities.cpp' || echo '$(srcdir)/'`RelativeSensitivities.cpp

@@ -78,6 +78,7 @@ AFI_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 AFI_la_LIBADD = $(COMMON_la_LIBADD)
 
 CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
+CompressedSensing_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(top_srcdir)/src/matrix/dwt
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
 
