@@ -2117,7 +2117,7 @@ public:
     inline Matrix<T,P>
     operator/           (const S& s) const {
 
-		assert (cabs(s) != 0.0);
+      		assert (cabs(s) != 0.0);
 		T t = T (s);
 		Matrix<T,P> res = *this;
 
