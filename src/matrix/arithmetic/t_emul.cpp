@@ -5,8 +5,8 @@
 template<class T>
 void emul_check () {
 
-    Matrix<T> A = rand<T>(3,4);
-    Matrix<T> B = rand<T>(3,4);
+    Matrix<T> A = rand<T>(4,2);
+    Matrix<T> B = rand<T>(4,2);
     T a = T(2.0);
     Matrix<T> C, D;
 
