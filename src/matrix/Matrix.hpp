@@ -2918,22 +2918,6 @@ public:
     }
 
 
-    /**
-     * @brief           Reset. i.e. Set all fields = T(0)
-     */
-    inline void
-    Zero               ()                                      {
-
-#ifndef HAVE_SSE
-        _M = T(0);
-#else
-        for (size_t i = 0; i < Size(); i++)
-            _M[i] = 0;
-#endif
-
-    }
-
-
     //@}
 
 
