@@ -152,8 +152,6 @@ public:
 
         _M = VECTOR_CONSTR(T,DimProd());
 
-        _name = "matrix";
-
     }
 
 
@@ -373,8 +371,6 @@ public:
 
         _M = VECTOR_CONSTR(T,DimProd());
         
-		_name = "matrix";
-
 	}
 
 
@@ -414,8 +410,6 @@ public:
             _res [i] = 1.0;
 
         _M = VECTOR_CONSTR(T,DimProd());
-
-    	_name = "matrix";
 
     }
 
@@ -482,22 +476,22 @@ public:
      * @param  ave      Averages
      */
     inline
-    Matrix              (const size_t col, 
-                         const size_t lin, 
-                         const size_t cha,
-                         const size_t set,
-                         const size_t eco = 1,
-                         const size_t phs = 1,
-                         const size_t rep = 1,
-                         const size_t seg = 1,
-                         const size_t par = 1,
-                         const size_t slc = 1,
-                         const size_t ida = 1,
-                         const size_t idb = 1,
-                         const size_t idc = 1,
-                         const size_t idd = 1,
-                         const size_t ide = 1,
-                         const size_t ave = 1) {
+    Matrix              (const size_t& col, 
+                         const size_t& lin, 
+                         const size_t& cha,
+                         const size_t& set,
+                         const size_t& eco = 1,
+                         const size_t& phs = 1,
+                         const size_t& rep = 1,
+                         const size_t& seg = 1,
+                         const size_t& par = 1,
+                         const size_t& slc = 1,
+                         const size_t& ida = 1,
+                         const size_t& idb = 1,
+                         const size_t& idc = 1,
+                         const size_t& idd = 1,
+                         const size_t& ide = 1,
+                         const size_t& ave = 1) {
 
 		assert (col * lin * cha * set * eco * phs * rep * seg *
 				par * slc * ida * idb * idc * idd * ide * ave);
@@ -604,7 +598,7 @@ public:
      * @return          Amount of data read
      */
     size_t       
-    Import              (const IceAs* ias, const size_t pos);
+    Import              (const IceAs* ias, const size_t& pos);
 
 
     /**
@@ -635,7 +629,7 @@ public:
      * @param  pos      Export data starting at position pos of our repository
      */
     size_t
-    Export              (IceAs* ias, const size_t pos) const;
+    Export              (IceAs* ias, const size_t& pos) const;
  
     #endif
 
@@ -697,14 +691,14 @@ public:
      * @return          Data 
      */
     inline const T*            
-    Memory             (const size_t p = 0)  const {
+    Memory             (const size_t& p = 0)  const {
         assert (p < Size());
         return &(_M[p]);
     }
 
     
     /**
-     * @brief           Get data (lhs)
+     * @brief           Get data container (lhs)
      *  
      * @return          Data 
      */
@@ -715,7 +709,7 @@ public:
 
     
     /**
-     * @brief           Get data (rhs)
+     * @brief           Get data container (rhs)
      *  
      * @return          Data 
      */
@@ -733,10 +727,8 @@ public:
      */
     inline T            
     At                  (const size_t& p) const {
-
         assert (p < Size());
         return _M[p];
-
     }
 
 
@@ -748,10 +740,8 @@ public:
      */
     inline T&           
     At                  (const size_t& pos) {
-
         assert (pos < Size());
         return _M[pos];
-
     }
 
 
@@ -995,7 +985,6 @@ public:
     inline T
     operator()          (const size_t& p) const {
         return this->At(p);
-
     }
 
     
@@ -1233,10 +1222,8 @@ public:
      * @param  M        The factor.
      */
     inline Matrix<T,P>
-    operator->*         (const Matrix<T,P> &M) const {
-
+    operator->*         (const Matrix<T,P>& M) const {
         return this->prod(M);
-
     }
 
     /**
@@ -1281,6 +1268,10 @@ public:
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<T,P> res = *this;
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
     	for (size_t i = 0; i < Size(); i++)
     		res[i] -= M[i];
         return res;
@@ -1467,7 +1458,7 @@ public:
         Matrix<T,P> res = *this;
         
 #ifdef EW_OMP
-#pragma omp parallel for
+    #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); i++)
 			res[i] += M[i];
