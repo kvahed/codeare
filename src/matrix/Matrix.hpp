@@ -60,6 +60,7 @@ enum IceDim {
 #include <vector>
 #include <ostream>
 #include <string>
+#include <cstring>
 
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -99,6 +100,10 @@ enum IceDim {
  */
 # define ROUND(A) ( floor(A) + ((A - floor(A) >= 0.5) ? (A>0 ? 1 : 0) : 0))
 
+/**
+ * @brief bytes of dim vector
+ */
+static const size_t dvsz = INVALID_DIM*sizeof(size_t);
 
 /**
  * @brief   Memory paradigm (share, opencl or message passing)
@@ -1187,7 +1192,7 @@ public:
 
 
     /**
-     * @brief           Assignment operator. i.e. this = m.
+     * @brief           Assignment data
      *
      * @param  v        Data vector (size must match numel(M)).
      */
@@ -1246,11 +1251,10 @@ public:
     inline Matrix<T,P>
     operator-           (const Matrix<T,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
-
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        
         Matrix<T,P> res (_dim);
-
+        
 #if defined USE_VALARRAY
         res.Container() = _M - M.Container();
 #elif defined HAVE_SSE
@@ -1278,8 +1282,7 @@ public:
     inline Matrix<T,P>
     operator-           (const Matrix<S,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<T,P> res = *this;
     	for (size_t i = 0; i < Size(); i++)
@@ -1325,8 +1328,7 @@ public:
 
         size_t i;
 
-        for (i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #if defined USE_VALARRAY
         _M -= M.Container();
@@ -1356,8 +1358,7 @@ public:
     inline Matrix<T,P>&
     operator-=          (const Matrix<S,P>& M) {
 
-        for (size_t i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1434,8 +1435,7 @@ public:
     inline Matrix<T,P>
     operator+          (const Matrix<T,P> &M) const {
         
-        for (size_t i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
         
         Matrix<T,P> res (_dim);
 
@@ -1466,8 +1466,7 @@ public:
     inline Matrix<T,P>
     operator+          (const Matrix<S,P>& M) const {
         
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
         
         Matrix<T,P> res = *this;
         
@@ -1516,8 +1515,7 @@ public:
 
         size_t i;
 
-        for (i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #if defined USE_VALARRAY
         _M += M.Container();        
@@ -1547,8 +1545,7 @@ public:
     inline Matrix<T,P>&
     operator+=          (const Matrix<S,P>& M) {
 
-        for (size_t i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1736,8 +1733,7 @@ public:
     inline Matrix<bool>
     operator==          (const Matrix<T,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<bool> res(_dim);
         res.Container() = (_M == M.Container());
@@ -1756,8 +1752,7 @@ public:
 	inline Matrix<bool>
 	operator==          (const Matrix<S,P>& M) const {
 
-		for (size_t i=0; i < INVALID_DIM; i++)
-			assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 		Matrix<bool> res (_dim);
 
@@ -1801,8 +1796,7 @@ public:
     inline Matrix<bool>
     operator!=          (const Matrix<T,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<bool> res(_dim,_res);
         res.Container() = (_M != M.Container());
@@ -1820,8 +1814,7 @@ public:
     inline Matrix<bool>
     operator>=          (const Matrix<T,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<bool> res(_dim);
 
@@ -1845,8 +1838,7 @@ public:
     inline Matrix<bool>
     operator<=          (const Matrix<T,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<bool> res(_dim);
 
@@ -1870,8 +1862,7 @@ public:
     inline Matrix<bool>
     operator>           (const Matrix<T,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<bool> res(_dim,_res);
 
@@ -1895,8 +1886,7 @@ public:
     inline Matrix<bool>
     operator<           (const Matrix<T,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<bool> res(_dim,_res);
 
@@ -1920,8 +1910,7 @@ public:
     inline Matrix<bool>
     operator||          (const Matrix<T,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<bool> res(_dim);
 
@@ -2010,8 +1999,7 @@ public:
     inline Matrix<T,P>
     operator*          (const Matrix<T,P> &M) const {
 
-        for (size_t i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<T,P> res (_dim);
 
@@ -2095,8 +2083,7 @@ public:
 
         size_t i;
 
-        for (i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #if defined USE_VALARRAY
         _M *= M.Container();        
@@ -2126,8 +2113,7 @@ public:
     inline Matrix<T,P>&
     operator*=         (const Matrix<S,P>& M) {
 
-        for (size_t i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -2171,8 +2157,7 @@ public:
     inline Matrix<T,P>
     operator/           (const Matrix<T,P>& M) const {
 
-        for (size_t i=0; i < INVALID_DIM; i++)
-            assert (Dim(i) == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<T,P> res (_dim);
 
@@ -2206,8 +2191,7 @@ public:
 
         size_t i;
 
-        for (i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<T,P> res = *this;
 
@@ -2258,8 +2242,7 @@ public:
 
         size_t i;
 
-        for (i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #if defined USE_VALARRAY
         _M /= M.Container();
@@ -2270,7 +2253,8 @@ public:
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] /= M[i];
 #else
-        _M /= M.Container();
+        for (size_t i = 0; i < Size(); i++)
+            _M[i] /= M[i];
 #endif
 
         return *this;
@@ -2290,8 +2274,7 @@ public:
 
         size_t i;
 
-        for (i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
+        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -3059,8 +3042,22 @@ public:
      * @return          Size
      */
     inline size_t
-    Size () const {
-        
+    Size () const {        
+        return _M.size();
+    }
+
+    //@}
+
+
+protected:
+	
+    /**
+     * @brief           Number of elements
+     *
+     * @return          Size
+     */
+    inline size_t
+    DimProd () const {
         
         long size = 1;
         
@@ -3071,11 +3068,6 @@ public:
         
     }
 
-    //@}
-
-
-protected:
-	
     // Structure
     size_t              _dim[INVALID_DIM]; /// Dimensions
     size_t              _dsz[INVALID_DIM]; /// Dimension size.
