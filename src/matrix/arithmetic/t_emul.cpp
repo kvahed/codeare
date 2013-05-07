@@ -5,8 +5,8 @@
 template<class T>
 void emul_check () {
 
-    Matrix<T> A = rand<T>(8,8);
-    Matrix<T> B = rand<T>(8,8);
+    Matrix<T> A = rand<T>(3,4);
+    Matrix<T> B = rand<T>(3,4);
     T a = T(2.0);
     Matrix<T> C, D;
 
@@ -25,6 +25,7 @@ void emul_check () {
     std::cout << std::endl;
 #endif
 
+
     C = B * A;
     D = A * B;
 
@@ -33,7 +34,7 @@ void emul_check () {
     std::cout << "A.*B=[\n" << D << "];\n";
     std::cout << std::endl;
 #endif
-    
+
     D = B;
     B *= a;
     C = B;
