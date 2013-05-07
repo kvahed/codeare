@@ -1251,18 +1251,21 @@ public:
 
         Matrix<T,P> res (_dim);
 
-#if defined HAVE_SSE
+#if defined USE_VALARRAY
+        res.Container() = _M - M.Container();
+#elif defined HAVE_SSE
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] - M[i];
 #else
-        res.Container() = _M - M.Container();
+        for (size_t i = 0; i < Size(); i++)
+            res[i] = _M[i] - M[i];        
 #endif
         
         return res;
-
+        
     }
 
     
@@ -1325,14 +1328,17 @@ public:
         for (i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-#if defined HAVE_SSE
+#if defined USE_VALARRAY
+        _M -= M.Container();
+#elif defined HAVE_SSE
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] -= M[i];
 #else
-        _M -= M.Container();
+        for (size_t i = 0; i < Size(); i++)
+            _M[i] -= M[i];
 #endif
 
         return *this;
@@ -1432,15 +1438,18 @@ public:
             assert (_dim[i] == M.Dim(i));
         
         Matrix<T,P> res (_dim);
-        
-#if defined HAVE_SSE
+
+#if defined USE_VALARRAY
+        res.Container() = _M + M.Container();
+#elif defined HAVE_SSE
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] + M[i];
 #else
-        res.Container() = _M + M.Container();
+        for (size_t i = 0; i < Size(); i++)
+            res[i] = _M[i] + M[i];
 #endif
         
 		return res;
@@ -1510,14 +1519,17 @@ public:
         for (i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-#if defined HAVE_SSE
+#if defined USE_VALARRAY
+        _M += M.Container();        
+#elif defined HAVE_SSE
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] += M[i];
 #else
-        _M += M.Container();
+        for (size_t i = 0; i < Size(); i++)
+            _M[i] += M[i];
 #endif
         
         return *this;
@@ -2003,14 +2015,17 @@ public:
 
         Matrix<T,P> res (_dim);
 
-#if defined HAVE_SSE
+#if defined USE_VALARRAY
+        res.Container() = _M * M.Container();
+#elif defined HAVE_SSE
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] * M[i];
 #else
-        res.Container() = _M * M.Container();
+        for (size_t i = 0; i < Size(); i++)
+            res[i] = _M[i] * M[i];
 #endif
 
 		return res;
@@ -2083,14 +2098,17 @@ public:
         for (i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-#if defined HAVE_SSE
+#if defined USE_VALARRAY
+        _M *= M.Container();        
+#elif defined HAVE_SSE
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] *= M[i];
 #else
-        _M *= M.Container();
+        for (size_t i = 0; i < Size(); i++)
+            _M[i] *= M[i];
 #endif
 
         return *this;
@@ -2158,14 +2176,17 @@ public:
 
         Matrix<T,P> res (_dim);
 
-#if defined HAVE_SSE
+#if defined USE_VALARRAY
+        res.Container() = _M / M.Container();
+#elif defined HAVE_SSE
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] / M[i];
 #else
-        res.Container() = _M / M.Container();
+        for (size_t i = 0; i < Size(); i++)
+            res[i] = _M[i] / M[i];
 #endif
 
         return res;
@@ -2240,7 +2261,9 @@ public:
         for (i = 0; i < INVALID_DIM; i++)
             assert (_dim[i] == M.Dim(i));
 
-#if defined HAVE_SSE
+#if defined USE_VALARRAY
+        _M /= M.Container();
+#elif defined HAVE_SSE
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), _M);
         else
