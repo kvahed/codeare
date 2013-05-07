@@ -62,10 +62,6 @@ enum IceDim {
 #include <string>
 #include <cstring>
 
-#include <sys/mman.h>
-#include <sys/types.h>
-
-
 #define ICE_SHRT_MAX 4095
 
 #ifdef HAVE_MAT_H
@@ -154,7 +150,7 @@ public:
             _res [i] = 1.0;
         }
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
 
         _name = "matrix";
 
@@ -193,7 +189,7 @@ public:
 	        _res[i] = 1.0;
 		}
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
 
 	}
 
@@ -238,7 +234,7 @@ public:
 	        _res[i] = 1.0;
 		}
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
 
 	}
 
@@ -267,7 +263,7 @@ public:
 			_res[i] = 1.0;
 		}
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
 
 	}
 
@@ -307,7 +303,7 @@ public:
 			_res[i] = 1.0;
 		}
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
 
 	}
 
@@ -339,7 +335,7 @@ public:
 			_res[i] = res[i];
 		}
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
 
 	}
     
@@ -375,7 +371,7 @@ public:
 		for (size_t i = 0; i < INVALID_DIM; i++)
 			_res [i] = 1.0;
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
         
 		_name = "matrix";
 
@@ -417,7 +413,7 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             _res [i] = 1.0;
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
 
     	_name = "matrix";
 
@@ -460,7 +456,7 @@ public:
         for (size_t i = 0; i < INVALID_DIM; i++)
             _res [i] = 1.0;
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
 
     }
     
@@ -533,7 +529,7 @@ public:
 	    for (size_t i = 0; i < INVALID_DIM; i++)
 	        _res [i] = 1.0;
 
-        _M = VECTOR_CONSTR(T,Size());
+        _M = VECTOR_CONSTR(T,DimProd());
 
 	}
 
