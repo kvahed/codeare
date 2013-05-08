@@ -12,7 +12,8 @@
     #include <valarray>
     #define VECTOR_TYPE(A) std::valarray<A>
     #define VECTOR_CONSTR(A,B) std::valarray<A>(B)
-#elif defined HAVE_SSE
+#else
+    #include "AlignmentAllocator.hpp"
     #if defined __AVX__
         #define ALIGNEMENT 32
     #elif defined __SSE2__
@@ -21,10 +22,6 @@
     #define VECTOR_TYPE(A) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >
     #define VECTOR_CONSTR(A,B) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B)
     #define VECTOR_CONSTR_VAL(A,B,C) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B,C)
-#else
-    #define VECTOR_TYPE(A) std::vector<A>
-    #define VECTOR_CONSTR(A,B) std::vector<A>(B)
-    #define VECTOR_CONSTR_VAL(A,B,C) std::vector<A>(B,C)
 #endif
 
 

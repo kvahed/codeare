@@ -158,7 +158,7 @@ public:
     /**
      * @brief           Construct matrix with dimension array
      *
-     * @param  dim      All 16 Dimensions
+     * @param  dim      All <= INVALID_DIM Dimensions
      */
 	inline
     Matrix              (const std::vector<size_t>& dim) {
@@ -201,9 +201,9 @@ public:
     
     
     /**
-     * @brief           Construct matrix with dimension array
+     * @brief           Construct matrix with aligned dimension vector
      *
-     * @param  dim      All 16 Dimensions
+     * @param  dim      All n <= INVALID_DIM dimensions
      */
 	inline
     Matrix              (const VECTOR_TYPE(size_t)& dim) {
@@ -215,7 +215,7 @@ public:
 		for (; i < dim.size(); i++)
 			n *= dim[i];
 
-		assert (n);
+		assert (n > 0);
 
 	    T t;
 	    Validate (t);
@@ -1204,12 +1204,15 @@ public:
     operator=           (const T& s) {
 
         T t = T(s);
-        
-#ifdef HAVE_SSE
+
+#if defined USE_VALARRAY
+        _M = t;        
+#else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < Size(); i++)
             _M[i] = t;
-#else
-        this->_M = t;        
 #endif
         
         return *this;
@@ -1240,13 +1243,16 @@ public:
         
 #if defined USE_VALARRAY
         res.Container() = _M - M.Container();
-#elif defined HAVE_SSE
+#elif defined EXPLICIT_SIMD
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] - M[i];
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < Size(); i++)
             res[i] = _M[i] - M[i];        
 #endif
@@ -1319,13 +1325,16 @@ public:
 
 #if defined USE_VALARRAY
         _M -= M.Container();
-#elif defined HAVE_SSE
+#elif defined EXPLICIT_SIMD
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] -= M[i];
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < Size(); i++)
             _M[i] -= M[i];
 #endif
@@ -1428,13 +1437,16 @@ public:
 
 #if defined USE_VALARRAY
         res.Container() = _M + M.Container();
-#elif defined HAVE_SSE
+#elif defined EXPLICIT_SIMD
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] + M[i];
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < Size(); i++)
             res[i] = _M[i] + M[i];
 #endif
@@ -1506,13 +1518,16 @@ public:
 
 #if defined USE_VALARRAY
         _M += M.Container();        
-#elif defined HAVE_SSE
+#elif defined EXPLICIT_SIMD
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] += M[i];
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < Size(); i++)
             _M[i] += M[i];
 #endif
@@ -1641,7 +1656,7 @@ public:
 
         return res;
 
-    }
+    } // TODO: OMP
 
     
     
@@ -1726,7 +1741,7 @@ public:
         res.Container() = (_M == M.Container());
         return res;
 
-    }
+    } // TODO: OMP
 
 
     /**
@@ -1743,6 +1758,9 @@ public:
 
 		Matrix<bool> res (_dim);
 
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
 		for (size_t i = 0; i < Size(); i++)
 			res[i] = (_M[i] == M[i]);
 
@@ -1763,10 +1781,11 @@ public:
 
         Matrix<bool> res (_dim);
 
-		for (size_t i = 0; i < Size(); i++) {
-			bool b = (_M[i] == s);
-			res[i] = b;
-		}
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); i++)
+			res[i] (_M[i] == s);
 
         return res;
 
@@ -1992,13 +2011,16 @@ public:
 
 #if defined USE_VALARRAY
         res.Container() = _M * M.Container();
-#elif defined HAVE_SSE
+#elif defined EXPLICIT_SIMD
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] * M[i];
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < Size(); i++)
             res[i] = _M[i] * M[i];
 #endif
@@ -2074,13 +2096,16 @@ public:
 
 #if defined USE_VALARRAY
         _M *= M.Container();        
-#elif defined HAVE_SSE
+#elif defined EXPLICIT_SIMD
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] *= M[i];
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < Size(); i++)
             _M[i] *= M[i];
 #endif
@@ -2150,13 +2175,16 @@ public:
 
 #if defined USE_VALARRAY
         res.Container() = _M / M.Container();
-#elif defined HAVE_SSE
+#elif defined EXPLICIT_SIMD
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), res.Container());
         else
         	for (size_t i = 0; i < Size(); i++)
         		res[i] = _M[i] / M[i];
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < Size(); i++)
             res[i] = _M[i] / M[i];
 #endif
@@ -2233,13 +2261,16 @@ public:
 
 #if defined USE_VALARRAY
         _M /= M.Container();
-#elif defined HAVE_SSE
+#elif defined EXPLICIT_SIMD
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), _M);
         else
         	for (size_t i = 0; i < Size(); i++)
         		_M[i] /= M[i];
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < Size(); i++)
             _M[i] /= M[i];
 #endif
@@ -2562,9 +2593,12 @@ public:
     operator/  (const double& s, const Matrix<T,P> &m) {
 
         Matrix<T,P> res = m;
-#ifndef HAVE_SSE
+#ifdef USE_VALARRAY
 		res.Container() = s / res.Container();
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < m.Size(); i++)
             res[i] = s / res[i];
 #endif
@@ -2584,9 +2618,12 @@ public:
     operator/  (const float& s, const Matrix<T,P> &m) {
 
 		Matrix<T,P> res = m;
-#ifndef HAVE_SSE
+#ifdef USE_VALARRAY
 		res.Container() = s / res.Container();
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < m.Size(); i++)
             res[i] = s / res[i];
 #endif
@@ -2606,9 +2643,12 @@ public:
     operator/  (const cxfl& s, const Matrix<T,P> &m) {
 
         Matrix<T,P> res = m;
-#ifndef HAVE_SSE
+#ifdef USE_VALARRAY
 		res.Container() = s / res.Container();
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < m.Size(); i++)
             res[i] = s / res[i];
 #endif
@@ -2629,9 +2669,12 @@ public:
 
 		Matrix<T,P> res = m;
 
-#ifndef HAVE_SSE
+#ifdef USE_VALARRAY
 		res.Container() = s / res.Container();
 #else
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
         for (size_t i = 0; i < m.Size(); i++)
             res[i] = s / res[i];
 #endif
@@ -2883,8 +2926,7 @@ public:
     inline std::vector<size_t>
     DimVector           ()                  const {
 		std::vector<size_t> dim (INVALID_DIM,1);
-		for (size_t i = 0; i < INVALID_DIM; i++)
-			dim[i] = _dim[i];
+        std::memcpy (&dim[0], _dim, dvsz);
         return dim;
     }
 
