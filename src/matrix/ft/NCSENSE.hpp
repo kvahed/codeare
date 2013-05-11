@@ -44,28 +44,38 @@ public:
 	 * @brief         Default constructor
 	 */
 	NCSENSE() : m_initialised (false),
-		m_dim(2),
-		m_cgiter(100),
-		m_fts(0),
-		m_cgeps (1.0e-6),
-		m_nc (8),
-		m_nk (1024),
-		m_nr (4096),
-		m_lambda (1.0e-6) {}
-
-
+                m_dim(2),
+                m_cgiter(100),
+                m_fts(0),
+                m_cgeps (1.0e-6),
+                m_nc (8),
+                m_nk (1024),
+                m_nr (4096),
+                m_lambda (1.0e-6),
+                m_verbose (false) {}
+    
+    
 	/**
 	 * @brief          Construct with parameters
 	 *
 	 * @param  params  Configuration parameters
 	 */
-	NCSENSE        (const Params& params) :
-		FT<T>::FT(params), m_nc(0), m_nk(0), m_nr(0), m_fts(0), m_cgiter(0),
-		m_dim(0), m_initialised(false), m_cgeps(0.0), m_lambda(0.0) {
-
+	NCSENSE        (const Params& params)
+              : FT<T>::FT(params),
+                m_nc(0),
+                m_nk(0),
+                m_nr(0),
+                m_fts(0),
+                m_cgiter(0),
+                m_dim(0),
+                m_initialised(false),
+                m_cgeps(0.0),
+                m_lambda(0.0),
+                m_verbose (false) {
+        
 		T fteps = 7.0e-4, alpha = 1.0;
 		size_t ftiter = 3, m = 1;
-
+        
 		if (params.exists("fteps"))
 			fteps = boost::any_cast<T>(params["fteps"]);
 		if (params.exists("alpha"))
@@ -80,6 +90,8 @@ public:
 
 		m_smname = params.Get<std::string>("sens_maps");
 		m_wname  = params.Get<std::string>("weights_name");
+        m_verbose = params.Get<bool>("verbose");
+        m_verbose = true;
 
 		if (params.exists("phase_cor"))
 			ws.GetMatrix(params.Get<std::string>("phase_cor"), m_pc);
@@ -302,6 +314,7 @@ public:
 		T rn, rno, xn;
 		Matrix< std::complex<T> > p, r, x, q;
 		vector<T> res;
+        std::vector< Matrix<cxfl> > vc;
 
 		p = EH (m, sens, m_fts) * ((recal) ? IntensityMap (sens) : m_ic);
 		r = p;
@@ -316,8 +329,8 @@ public:
 			
 			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps) 
 				break;
-			
-			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
+
+ 			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 
 			q   = EH (E  (p * ((recal) ? IntensityMap (sens) : m_ic), sens, m_fts), sens, m_fts) *
 					((recal) ? IntensityMap (sens) : m_ic);
@@ -326,16 +339,26 @@ public:
 			
 			ts  = rn / p.dotc(q);
 			x  += ts * p;
+            if (m_verbose)
+                vc.push_back (x * ((recal) ? IntensityMap (sens) : m_ic));
 			r  -= ts * q;
 			rno = rn;
 			rn  = pow(norm(r), 2.0);
 			p  *= rn / rno;
 			p  += r;
-			
+
 		}
 
 		printf ("\n");
-		return x * ((recal) ? IntensityMap (sens) : m_ic);
+
+        if (m_verbose) {
+            size_t cpsz = numel(x);
+            x = zeros<std::complex<T> > (size(x,0), size(x,1), (m_dim == 3) ? size(x,2) : 1, vc.size());
+            for (size_t i = 0; i < vc.size(); i++)
+                memcpy (&x[i*cpsz], &(vc[i][0]), cpsz*sizeof(std::complex<T>));
+            return x;
+        } else        
+            return x * ((recal) ? IntensityMap (sens) : m_ic);
 
 	}
 	
@@ -369,6 +392,7 @@ private:
 
 	NFFT<T>** m_fts;         /**< Non-Cartesian FT operators (Multi-Core?) */
 	bool      m_initialised; /**< All initialised? */
+    bool      m_verbose;
 
 	Matrix< std::complex<T> > m_sm;          /**< Sensitivities */
 	Matrix<T> m_ic;     /**< Intensity correction I(r) */

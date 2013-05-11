@@ -5,8 +5,9 @@ fftwtest (Connector<T>* rc) {
 
 	typedef double Type;
 
-	Matrix< std::complex<Type> > m   = phantom< std::complex<Type> > (128);
+	Matrix< std::complex<Type> > m   = phantom3D< std::complex<Type> > (64);
 	Matrix< std::complex<Type> > k, i, j;
+    m = resize(m,64,32,64);
 	Matrix<Type> mask = ones<Type> (size(m));
 	Matrix<std::complex<Type> > pc = ones<std::complex<Type> > (size(m));
 

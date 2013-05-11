@@ -44,12 +44,12 @@ cgsensetest (RRClient::Connector<T>* rc) {
     std::string    odf = std::string (base + std::string("/images.mat")); // Binary Ouput (images etc)
     std::string    rev = std::string (base + std::string("/rev.mat"));
     
-    if (!Read (rawdata, rc->GetElement("/config/data/d"), base) ||
-        !Read (kspace,  rc->GetElement("/config/data/k"), base) ||
-        !Read (sens,    rc->GetElement("/config/data/s"), base) )
+    if (!Read (rawdata, rc->GetElement("/config/data-in/d"), base) ||
+        !Read (kspace,  rc->GetElement("/config/data-in/k"), base) ||
+        !Read (sens,    rc->GetElement("/config/data-in/s"), base) )
       return false;
 
-    if (!Read (weights, rc->GetElement("/config/data/w"), base))
+    if (!Read (weights, rc->GetElement("/config/data-in/w"), base))
         weights = Matrix<float> (1);
 
     if (rc->Init (test) != OK) {
@@ -95,8 +95,6 @@ cgsensetest (RRClient::Connector<T>* rc) {
     }
     
     MXDump       (image, mf, "image");
-    if (pulses)
-        MXDump (signals, mf, "signals");
     if (nrmse.Size() > 1)
         MXDump   (nrmse, mf, "nrmse");
     

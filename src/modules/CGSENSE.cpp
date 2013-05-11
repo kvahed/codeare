@@ -128,6 +128,7 @@ CGSENSE::Prepare () {
 	cgp.Set("sens_maps", std::string("sens"));
 	cgp.Set("sens_maps", std::string("weights"));
 	cgp.Set("sens_maps", std::string("kspace"));
+	cgp.Set("verbose", m_verbose);
 
 
 	m_ncs = new NCSENSE<float>
@@ -137,7 +138,7 @@ CGSENSE::Prepare () {
 
 	// Outgoing images
 	Matrix<cxfl>& image = AddMatrix 
-		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(size(sens,0), size(sens,1), (dim == 3) ? size(sens,2) : 1)));
+		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>()));
 
 	m_ncs->KSpace (kspace);
 	m_ncs->Weights (weights);

@@ -55,7 +55,7 @@ public:
 	 * @param  params  Configuration parameters
 	 */
 	CSENSE        (const Params& params) :
-		FT<T>::FT(params), m_dft(0), nthreads (1), treg(0.), compgfm(0) {
+		FT<T>::FT(params), m_dft(0), nthreads (1), treg(0.), compgfm(1) {
 
 		Workspace& w = Workspace::Instance();
 
@@ -121,7 +121,7 @@ public:
 	Matrix<CT>
 	Adjoint       (const Matrix<CT>& m) const {
 
-		Matrix<CT> res (dims[0]*af[0], dims[1]*af[1], (ndim == 3) ? dims[2]*af[2] : 1);
+		Matrix<CT> res (dims[0]*af[0], dims[1]*af[1], (ndim == 3) ? dims[2]*af[2] : 1, (compgfm) ? 2 : 1);
 		Matrix<CT> tmp = m;
 
 		omp_set_num_threads(nthreads);
@@ -146,63 +146,58 @@ public:
 					Slice  (tmp, i, ft ->* Slice  (tmp, i));
 				else
 					Volume (tmp, i, ft ->* Volume (tmp, i));
-
+            
 #pragma omp for schedule (guided)
 			
 			// Antialiasing
 			for (size_t x = 0; x < dims[0]; x++)
 				for (size_t y = 0; y < dims[1]; y++)
 					for (size_t z = 0; z < dims[2]; z++) {
-						
 						for (size_t c = 0; c < nc; c++) {
+                            
+							ra [c] = (ndim == 3) ? tmp (x, y, z, c) : tmp (x, y, c);
 							
-							ra [c] = (dims[2]-1) ? tmp (x, y, z, c) : tmp (x, y, c);
-							
-							size_t i = 0;
-							for (size_t zi = 0; zi < af[2]; zi++)
+							for (size_t zi = 0, i = 0; zi < af[2]; zi++)
 								for (size_t yi = 0; yi < af[1]; yi++)
-									for (size_t xi = 0; xi < af[0]; xi++, i++) {
-									s (c, i) = (dims[2]-1) ?
+									for (size_t xi = 0; xi < af[0]; xi++, i++) 
+                                        s (c, i) = (ndim == 3) ?
 											sens (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], c):
 											sens (x + xi * dims[0], y + yi * dims[1],                   c);
-									}
+                            
 						}
 
 						si = gemm (s,   s, 'C', 'N') ;
 
 						if (treg > 0.0)
 							si += reg;
-
+                        
 						if (compgfm)
 							gf = diag (si);
-
+                        
 						si = inv (si);
-
+                        
 						if (compgfm)
 							gf = diag (si) * gf;
-
+                        
 						si = gemm (si,  s, 'N', 'C');
 						rp = gemm (si, ra, 'N', 'N');
-
-						size_t i = 0;
-						for (size_t zi = 0; zi < af[2]; zi++)
-							for (size_t yi = 0; yi < af[1]; yi++)
-								for (size_t xi = 0; xi < af[0]; xi++, i++) {
-									res (x+xi*dims[0], y+yi*dims[1] , z+zi*dims[2]) = rp [i];
-									//if (compgfm)
-										//res (x, y + dims[1] * i, z, 1) = sqrt(abs(gf [i]));
-								}
-
-
+                        
+                        for (size_t zi = 0, i = 0; zi < af[2]; zi++)
+                            for (size_t yi = 0; yi < af[1]; yi++)
+                                for (size_t xi = 0; xi < af[0]; xi++, i++) {
+                                    res (x + xi * dims[0], y + yi * dims[1] , z + zi * dims[2], 0) = rp [i];
+                                    if (compgfm)
+                                        res (x + xi * dims[0], y + yi * dims[1] , z + zi * dims[2], 1) = sqrt(abs(gf [i]));
+                                }
+                        
+                        
 					}
-
-		}
-
+            
+        }
+        
 		return res;
 		
 	}
-	
-	
 	/**
 	 * @brief          Backward transform (SENSE backward trafo? I don't know!)<br/> Bloedsinn!
 	 *                 Why would anyone want to go back to sensitivity weighted undersampled k-space data?

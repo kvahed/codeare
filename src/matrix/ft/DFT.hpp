@@ -370,23 +370,20 @@ private:
 		VECTOR_TYPE(size_t) oi (INVALID_DIM,1);
 		VECTOR_TYPE(size_t) si (INVALID_DIM,1);
 
-	    for (oi[3] = 0; oi[3] < d[3]; oi[3]++) {
-	   		si[3] = (oi[3] + c[3]) % d[3];
-			for (oi[2] = 0; oi[2] < d[2]; oi[2]++) {
-				si[2] = (oi[2] + c[2]) % d[2];
-				for (oi[1] = 0; oi[1] < d[1]; oi[1]++) {
-					si[1] = (oi[1] + c[1]) % d[1];
-					for (oi[0] = 0; oi[0] < d[0]; oi[0]++) {
-						si[0] = (oi[0] + c[0]) % d[0];
-						if (fw)
-							res(si[0],si[1],si[2],si[3]) = m(oi[0],oi[1],oi[2],oi[3]);
-						else
-							res(oi[0],oi[1],oi[2],oi[3]) = m(si[0],si[1],si[2],si[3]);
-					}
-				}
-			}
-
-		}
+        for (oi[2] = 0; oi[2] < d[2]; oi[2]++) {
+            si[2] = (oi[2] + c[2]) % d[2];
+            for (oi[1] = 0; oi[1] < d[1]; oi[1]++) {
+                si[1] = (oi[1] + c[1]) % d[1];
+                for (oi[0] = 0; oi[0] < d[0]; oi[0]++) {
+                    si[0] = (oi[0] + c[0]) % d[0];
+                    if (fw)
+                        res(si[0],si[1],si[2]) = m(oi[0],oi[1],oi[2]);
+                    else
+                        res(oi[0],oi[1],oi[2]) = m(si[0],si[1],si[2]);
+                }
+            }
+        }
+        
 	    return res;
 
 	}

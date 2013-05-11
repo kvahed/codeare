@@ -33,11 +33,8 @@ int main (int argc, char** argv) {
 #endif	
 		
 		std::string cf = std::string (base + std::string(config));
-		if (cf.compare(std::string(base)) != 0) {
-		  printf("%s\n",cf.c_str());
-		  printf("%s\n",base);
-		  con->ReadConfig (cf.c_str());
-		}
+		if (cf.compare(std::string(base)) != 0)
+            con->ReadConfig (cf.c_str());
 
 		if      (!strcmp (test, "CGSENSE"))               cgsensetest  (con);
 		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);

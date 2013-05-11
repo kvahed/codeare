@@ -494,7 +494,7 @@ public:
                          const size_t& ave = 1) {
 
 		assert (col * lin * cha * set * eco * phs * rep * seg *
-				par * slc * ida * idb * idc * idd * ide * ave);
+				par * slc * ida * idb * idc * idd * ide * ave > 0);
 
 	    T t;
 	    Validate (t);
