@@ -91,7 +91,6 @@ public:
 		m_smname = params.Get<std::string>("sens_maps");
 		m_wname  = params.Get<std::string>("weights_name");
         m_verbose = params.Get<bool>("verbose");
-        m_verbose = true;
 
 		if (params.exists("phase_cor"))
 			ws.GetMatrix(params.Get<std::string>("phase_cor"), m_pc);

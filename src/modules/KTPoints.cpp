@@ -416,6 +416,8 @@ KTPoints::Process   ()     {
     Matrix<float>& b0     = Get<float> ("b0");
     Matrix<cxfl>&  target = Get<cxfl>  ("target");
 
+	std::cout << k << std::endl;
+
     size_t ns = size( r,1); // # of spatial positions
     size_t nk = size( k,1); // # of kt points
     size_t nc = size(b1,1); // # of RF channels
@@ -426,6 +428,7 @@ KTPoints::Process   ()     {
 
     Matrix<float> max_rf (nk,1);
     Matrix<short> pd = ones<short>(nk,1); // Starting with shortest pulses possible 
+	pd *= 50;
 
     Matrix<cxfl>    solution; // Solution for timing calculation
     Matrix<cxfl>    final;    // Excitation profile

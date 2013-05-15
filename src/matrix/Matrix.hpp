@@ -1237,27 +1237,8 @@ public:
     inline Matrix<T,P>
     operator-           (const Matrix<T,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-        
-        Matrix<T,P> res (_dim);
-        
-#if defined USE_VALARRAY
-        res.Container() = _M - M.Container();
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), res.Container());
-        else
-        	for (size_t i = 0; i < Size(); i++)
-        		res[i] = _M[i] - M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); i++)
-            res[i] = _M[i] - M[i];        
-#endif
-        
-        return res;
+		Matrix<T,P> res = *this;
+		return res -= M;
         
     }
 
@@ -1271,16 +1252,8 @@ public:
     inline Matrix<T,P>
     operator-           (const Matrix<S,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-
-        Matrix<T,P> res = *this;
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-    	for (size_t i = 0; i < Size(); i++)
-    		res[i] -= M[i];
-        return res;
+		Matrix<T,P> res = *this;
+		return res -= M;
 
     }
 
@@ -1431,27 +1404,8 @@ public:
     inline Matrix<T,P>
     operator+          (const Matrix<T,P> &M) const {
         
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-        
-        Matrix<T,P> res (_dim);
-
-#if defined USE_VALARRAY
-        res.Container() = _M + M.Container();
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), res.Container());
-        else
-        	for (size_t i = 0; i < Size(); i++)
-        		res[i] = _M[i] + M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); i++)
-            res[i] = _M[i] + M[i];
-#endif
-        
-		return res;
+		Matrix<T,P> res = *this;
+		return res += M;
         
     }
     
@@ -1465,18 +1419,9 @@ public:
     inline Matrix<T,P>
     operator+          (const Matrix<S,P>& M) const {
         
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-        
-        Matrix<T,P> res = *this;
-        
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); i++)
-			res[i] += M[i];
-        
-    	return res;
-        
+		Matrix<T,P> res = *this;
+		return res += M;
+		
     }
     
     
@@ -2005,27 +1950,8 @@ public:
     inline Matrix<T,P>
     operator*          (const Matrix<T,P> &M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-
-        Matrix<T,P> res (_dim);
-
-#if defined USE_VALARRAY
-        res.Container() = _M * M.Container();
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), res.Container());
-        else
-        	for (size_t i = 0; i < Size(); i++)
-        		res[i] = _M[i] * M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); i++)
-            res[i] = _M[i] * M[i];
-#endif
-
-		return res;
+		Matrix<T,P> res = *this;
+		return res *= M;
 
     }
 
@@ -2040,18 +1966,8 @@ public:
     inline Matrix<T,P>
     operator*          (const Matrix<S,P> &M) const {
 
-        for (size_t i = 0; i < INVALID_DIM; i++)
-            assert (_dim[i] == M.Dim(i));
-
-        Matrix<T,P> res = *this;
-
-#if defined EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); i++)
-			res[i] *= M[i];
-
-		return res;
+		Matrix<T,P> res = *this;
+		return res *= M;
 
     }
 
@@ -2169,27 +2085,8 @@ public:
     inline Matrix<T,P>
     operator/           (const Matrix<T,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-
-        Matrix<T,P> res (_dim);
-
-#if defined USE_VALARRAY
-        res.Container() = _M / M.Container();
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), res.Container());
-        else
-        	for (size_t i = 0; i < Size(); i++)
-        		res[i] = _M[i] / M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); i++)
-            res[i] = _M[i] / M[i];
-#endif
-
-        return res;
+		Matrix<T,P> res = *this;
+		return res /= M;
 
     }
 
@@ -2204,19 +2101,8 @@ public:
     inline Matrix<T,P>
     operator/          (const Matrix<S,P>& M) const {
 
-        size_t i;
-
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-
-        Matrix<T,P> res = *this;
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); i++)
-			res[i] = (M[i] != (T)0) ? _M[i] / M[i] : 0;
-
-        return res;
+		Matrix<T,P> res = *this;
+		return res /= M;
 
     }
 
