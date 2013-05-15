@@ -123,8 +123,8 @@ enum    paradigm {
 
 template <class T, paradigm P = SHM>
 class Matrix  : public SmartObject {
-    
-
+	
+	
 public:
     
     
@@ -140,21 +140,21 @@ public:
      */
 	inline
     Matrix              () {
-
+		
         T t;
         Validate (t);
-
+		
         for (size_t i = 0; i < INVALID_DIM; i++) {
             _dim [i] = 1;
             _dsz [i] = 1;
             _res [i] = 1.0;
         }
-
+		
         _M = VECTOR_CONSTR(T,DimProd());
-
+		
     }
-
-
+	
+	
     /**
      * @brief           Construct matrix with dimension array
      *
@@ -162,42 +162,42 @@ public:
      */
 	inline
     Matrix              (const std::vector<size_t>& dim) {
-
+		
 		assert (dim.size() <= INVALID_DIM);
-
+		
 		size_t n = 1, i = 0;
-
+		
 		for (; i < dim.size(); i++)
 			n *= dim[i];
-
+		
 		assert (n);
-
+		
 	    T t;
 	    Validate (t);
-
+		
 	    for (i = 0; i < dim.size(); i++) {
 	        _dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
 	    }
-
+		
 		for (; i < INVALID_DIM; i++) {
 	        _dim[i] = 1;
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
 		}
-
+		
         _M = VECTOR_CONSTR(T,DimProd());
-
+		
 	}
-
-
+	
+	
     /**
      * @brief           Delete array containing data.
      */
 	inline virtual
 	~Matrix() {};
-
+	
     
     
     /**
@@ -207,36 +207,36 @@ public:
      */
 	inline
     Matrix              (const VECTOR_TYPE(size_t)& dim) {
-
+		
 		assert (dim.size() <= INVALID_DIM);
-
+		
 		size_t n = 1, i = 0;
-
+		
 		for (; i < dim.size(); i++)
 			n *= dim[i];
-
+		
 		assert (n > 0);
-
+		
 	    T t;
 	    Validate (t);
-
+		
 	    for (i = 0; i < dim.size(); i++) {
 	        _dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
 	    }
-
+		
 		for (; i < INVALID_DIM; i++) {
 	        _dim[i] = 1;
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
 		}
-
+		
         _M = VECTOR_CONSTR(T,DimProd());
-
+		
 	}
-
-
+	
+	
     /**
      * @brief           Construct matrix with dimension and resolution arrays
      *
@@ -244,27 +244,27 @@ public:
      */
 	inline
     Matrix              (const size_t dim[INVALID_DIM]) {
-
+		
 		size_t n = 1, i = 0;
-
+		
 		for (; i < INVALID_DIM; i++)
 			n *= dim[i];
-
+		
 		assert (n);
-
+		
 	    T t;
 	    Validate (t);
-
+		
 		for (i = 0; i < INVALID_DIM; i++) {
 			_dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 			_res[i] = 1.0;
 		}
-
+		
         _M = VECTOR_CONSTR(T,DimProd());
-
+		
 	}
-
+	
     
     
     /**
@@ -275,37 +275,37 @@ public:
      */
 	inline
     Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res) {
-
+		
 		assert (dim.size() <= INVALID_DIM);
 		assert (dim.size() == res.size());
 
 		size_t n = 1, i = 0;
-
+		
 		for (; i < dim.size(); i++)
 			n *= dim[i];
-
+		
 		assert (n);
-
+		
 	    T t;
 	    Validate (t);
-
+		
 		for (i = 0; i < dim.size(); i++) {
 			_dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 			_res[i] = res[i];
 		}
-
+		
 		for (; i < INVALID_DIM; i++) {
 			_dim[i] = 1;
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 			_res[i] = 1.0;
 		}
-
+		
         _M = VECTOR_CONSTR(T,DimProd());
-
+		
 	}
-
-
+	
+	
     
     
     /**
@@ -316,25 +316,25 @@ public:
      */
 	inline
     Matrix              (const size_t dim[INVALID_DIM], const float res[INVALID_DIM]) {
-
+		
 		size_t n = 1, i = 0;
-
+		
 		for (; i < INVALID_DIM; i++)
 			n *= dim[i];
-
+		
 		assert (n);
-
+		
 	    T t;
 	    Validate (t);
-
+		
 		for (i = 0; i < INVALID_DIM; i++) {
 			_dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 			_res[i] = res[i];
 		}
-
+		
         _M = VECTOR_CONSTR(T,DimProd());
-
+		
 	}
     
     

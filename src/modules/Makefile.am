@@ -82,10 +82,7 @@ CompressedSensing_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(top_srcdir)/src/matrix/dwt
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
 
-DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp
-if USE_LIBOPENCL
-    DirectMethod_la_SOURCES += GPUSimulator.cpp GPUSimulator.hpp
-endif
+DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp
 DirectMethod_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 DirectMethod_la_LIBADD = $(COMMON_la_LIBADD)
 
