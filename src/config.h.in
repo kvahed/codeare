@@ -1,5 +1,7 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
+#define EW_OMP
+
 /* c++ compiler */
 #undef CXX
 

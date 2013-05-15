@@ -10,8 +10,8 @@
 
 #include "SIMDTraits.hpp"
 
-#include <smmintrin.h>
-#include <nmmintrin.h>
+//#include <smmintrin.h>
+//#include <nmmintrin.h>
 
 template<>
 struct SSETraits<size_t> {

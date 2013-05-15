@@ -21,11 +21,11 @@ namespace SSE {
 		#include "SSE2Traits.hpp"
 	#endif
 
-	#if defined __AVX2__
-		#include "AVX2Traits.hpp"
-	#elif defined __SSE4_2__
+	//	#if defined __AVX2__
+	//		#include "AVX2Traits.hpp"
+//#elif defined __SSE4_2__
 		#include "SSE42Traits.hpp"
-	#endif
+//	#endif
 
 } // namespace SSE
 
