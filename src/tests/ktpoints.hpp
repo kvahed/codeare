@@ -3,6 +3,7 @@ ktptest (Connector<T>* rc) {
 
 	Matrix<cxfl>   target;
 	Matrix<cxfl>   b1;
+	Matrix<cxfl>   final;
 	Matrix<float>  r;
 	Matrix<float>  k;
 	Matrix<float>  b0;
@@ -10,17 +11,21 @@ ktptest (Connector<T>* rc) {
 	std::string    cf  = std::string (base + std::string(config));
 	std::string    df  = std::string (base + std::string(data));
 	std::string    odf = std::string (base + std::string("sdmout.mat"));
-	std::string    pdf = std::string (base + std::string("result.h5"));
-	std::string    rdf = std::string (base + std::string("residuals.h5"));
 
 	rc->ReadConfig (cf.c_str());
 	rc->Init(test);
 
-	Read  (target, df, "target");
-	Read      (b1, df, "b1");
-	Read      (b0, df, "b0");
-	Read       (k, df, "k");
-	Read       (r, df, "r");
+#ifdef HAVE_MAT_H
+    #define FORMAT MATLAB
+#else
+	#define FORMAT HDF5
+#endif
+
+	Read  (target, df, "target", "", FORMAT);
+	Read  (b1    , df, "b1"    , "", FORMAT);
+	Read  (b0    , df, "b0"    , "", FORMAT);
+	Read  (k     , df, "k"     , "", FORMAT);
+	Read  (r     , df, "r"     , "", FORMAT);
 
 	rc->SetMatrix ("target", target);
 	rc->SetMatrix ("b1",     b1);
@@ -37,6 +42,7 @@ ktptest (Connector<T>* rc) {
 	rc->GetMatrix ("nrmse",  nrmse);
 	rc->GetMatrix ("rf",     rf);
 	rc->GetMatrix ("grad",   grad);
+	rc->GetMatrix ("final", final);
 
 	rc->Finalise(test);
 	
@@ -53,6 +59,7 @@ ktptest (Connector<T>* rc) {
 	MXDump (nrmse, mf, "nrmse");
 	MXDump ( grad, mf,  "grad");
 	MXDump (   rf, mf,    "rf");
+	MXDump (final, mf, "final");
 
 	if (matClose(mf) != 0) {
 		printf ("Error closing file %s\n",fname.c_str());

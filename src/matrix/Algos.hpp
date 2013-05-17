@@ -707,7 +707,12 @@ resize (const Matrix<T>& M, const size_t& sz) {
 	Matrix<T> res = zeros<T> (sz,1);
 	size_t copysz = MIN(numel(M), sz);
 
-	memcpy (&res[0], &(M[0]), copysz);
+    typedef typename VECTOR_TYPE(T)::iterator VI;
+
+    VI rb = res.Container().begin();
+    VI mb = M.Container().begin;
+    
+    std::copy (rb, rb+copysz, mb);
 
 	return res;
 	
@@ -1046,26 +1051,56 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 
 
 /**
-/**
  * @brief          FLip up down
  * 
  * @param          Matrix
  * @return         Flipped matrix
  */
-/*
+
 template <class T> inline  Matrix<T>
 flipud (const Matrix<T>& M)  {
 
 	size_t scol = size(M,0);
 	size_t ncol = numel (M)/scol;
 
-	Matrix<T> res (M.Dim());
+	Matrix<T> res = M;
+
+    if (scol == 1) // trivial
+        return res;
+
+    typedef typename VECTOR_TYPE(T)::iterator VI;
+    
+    VI rb = res.Container().begin();
 
 	for (size_t i = 0; i < ncol; i++)
-		reverse_copy (myints, myints+9, myvector.begin());
+        std::reverse(rb+i*scol, rb+(i+1)*scol);
 
 	return res;
 
 }
-*/
+
+/**
+ * @brief          FLip up down
+ * 
+ * @param          Matrix
+ * @return         Flipped matrix
+ */
+
+template <class T> inline  Matrix<T>
+fliplr (const Matrix<T>& M)  {
+
+	size_t srow = size(M,1);
+	size_t scol = size(M,0);
+	size_t nrow = numel (M)/srow;
+
+	Matrix<T> res (M.Dim());
+
+    for (size_t i = 0; i < nrow; i++)
+        for (size_t j = 0; j < srow; j++)
+            res[j*scol+i] = M[(srow-1-j)*scol+i]; 
+
+	return res;
+
+}
+
 #endif 

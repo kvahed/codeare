@@ -47,6 +47,9 @@
 /src/matrix/linalg/tests/t_norm
 /src/matrix/linalg/tests/t_pinv
 /src/matrix/linalg/tests/t_svd
+/src/matrix/arithmetic/t_fliplr
+/src/matrix/arithmetic/t_flipud
+/src/matrix/arithmetic/t_resize
 
 ## folders (global) ##
 .deps/

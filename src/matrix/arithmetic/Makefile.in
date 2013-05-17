@@ -53,11 +53,12 @@ host_triplet = @host@
 TESTS = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) t_exp$(EXEEXT) \
 	t_asin$(EXEEXT) t_acos$(EXEEXT) t_atan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
-	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
-	t_emul$(EXEEXT) t_ediv$(EXEEXT) t_eadd$(EXEEXT) \
-	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT) \
-	t_floor$(EXEEXT) t_round$(EXEEXT) t_ceil$(EXEEXT) \
-	t_size$(EXEEXT)
+	t_tanh$(EXEEXT) t_log$(EXEEXT) t_flipud$(EXEEXT) \
+	t_fliplr$(EXEEXT) t_log10$(EXEEXT) t_emul$(EXEEXT) \
+	t_ediv$(EXEEXT) t_eadd$(EXEEXT) t_esub$(EXEEXT) \
+	t_nrmse$(EXEEXT) t_epow$(EXEEXT) t_floor$(EXEEXT) \
+	t_round$(EXEEXT) t_ceil$(EXEEXT) t_size$(EXEEXT) \
+	t_resize$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/arithmetic
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -83,11 +84,12 @@ CONFIG_CLEAN_VPATH_FILES =
 am__EXEEXT_1 = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) \
 	t_exp$(EXEEXT) t_asin$(EXEEXT) t_acos$(EXEEXT) t_atan$(EXEEXT) \
 	t_atan2$(EXEEXT) t_sinh$(EXEEXT) t_cosh$(EXEEXT) \
-	t_tanh$(EXEEXT) t_log$(EXEEXT) t_log10$(EXEEXT) \
-	t_emul$(EXEEXT) t_ediv$(EXEEXT) t_eadd$(EXEEXT) \
-	t_esub$(EXEEXT) t_nrmse$(EXEEXT) t_epow$(EXEEXT) \
-	t_floor$(EXEEXT) t_round$(EXEEXT) t_ceil$(EXEEXT) \
-	t_size$(EXEEXT)
+	t_tanh$(EXEEXT) t_log$(EXEEXT) t_flipud$(EXEEXT) \
+	t_fliplr$(EXEEXT) t_log10$(EXEEXT) t_emul$(EXEEXT) \
+	t_ediv$(EXEEXT) t_eadd$(EXEEXT) t_esub$(EXEEXT) \
+	t_nrmse$(EXEEXT) t_epow$(EXEEXT) t_floor$(EXEEXT) \
+	t_round$(EXEEXT) t_ceil$(EXEEXT) t_size$(EXEEXT) \
+	t_resize$(EXEEXT)
 am__objects_1 =
 am_t_acos_OBJECTS = $(am__objects_1) t_acos.$(OBJEXT)
 t_acos_OBJECTS = $(am_t_acos_OBJECTS)
@@ -128,6 +130,12 @@ t_esub_LDADD = $(LDADD)
 am_t_exp_OBJECTS = $(am__objects_1) t_exp.$(OBJEXT)
 t_exp_OBJECTS = $(am_t_exp_OBJECTS)
 t_exp_LDADD = $(LDADD)
+am_t_fliplr_OBJECTS = $(am__objects_1) t_fliplr.$(OBJEXT)
+t_fliplr_OBJECTS = $(am_t_fliplr_OBJECTS)
+t_fliplr_LDADD = $(LDADD)
+am_t_flipud_OBJECTS = $(am__objects_1) t_flipud.$(OBJEXT)
+t_flipud_OBJECTS = $(am_t_flipud_OBJECTS)
+t_flipud_LDADD = $(LDADD)
 am_t_floor_OBJECTS = $(am__objects_1) t_floor.$(OBJEXT)
 t_floor_OBJECTS = $(am_t_floor_OBJECTS)
 t_floor_LDADD = $(LDADD)
@@ -140,6 +148,9 @@ t_log10_LDADD = $(LDADD)
 am_t_nrmse_OBJECTS = $(am__objects_1) t_nrmse.$(OBJEXT)
 t_nrmse_OBJECTS = $(am_t_nrmse_OBJECTS)
 t_nrmse_LDADD = $(LDADD)
+am_t_resize_OBJECTS = $(am__objects_1) t_resize.$(OBJEXT)
+t_resize_OBJECTS = $(am_t_resize_OBJECTS)
+t_resize_LDADD = $(LDADD)
 am_t_round_OBJECTS = $(am__objects_1) t_round.$(OBJEXT)
 t_round_OBJECTS = $(am_t_round_OBJECTS)
 t_round_LDADD = $(LDADD)
@@ -184,16 +195,18 @@ SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_ceil_SOURCES) $(t_cos_SOURCES) \
 	$(t_cosh_SOURCES) $(t_eadd_SOURCES) $(t_ediv_SOURCES) \
 	$(t_emul_SOURCES) $(t_epow_SOURCES) $(t_esub_SOURCES) \
-	$(t_exp_SOURCES) $(t_floor_SOURCES) $(t_log_SOURCES) \
-	$(t_log10_SOURCES) $(t_nrmse_SOURCES) $(t_round_SOURCES) \
+	$(t_exp_SOURCES) $(t_fliplr_SOURCES) $(t_flipud_SOURCES) \
+	$(t_floor_SOURCES) $(t_log_SOURCES) $(t_log10_SOURCES) \
+	$(t_nrmse_SOURCES) $(t_resize_SOURCES) $(t_round_SOURCES) \
 	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_size_SOURCES) \
 	$(t_tan_SOURCES) $(t_tanh_SOURCES)
 DIST_SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
 	$(t_atan2_SOURCES) $(t_ceil_SOURCES) $(t_cos_SOURCES) \
 	$(t_cosh_SOURCES) $(t_eadd_SOURCES) $(t_ediv_SOURCES) \
 	$(t_emul_SOURCES) $(t_epow_SOURCES) $(t_esub_SOURCES) \
-	$(t_exp_SOURCES) $(t_floor_SOURCES) $(t_log_SOURCES) \
-	$(t_log10_SOURCES) $(t_nrmse_SOURCES) $(t_round_SOURCES) \
+	$(t_exp_SOURCES) $(t_fliplr_SOURCES) $(t_flipud_SOURCES) \
+	$(t_floor_SOURCES) $(t_log_SOURCES) $(t_log10_SOURCES) \
+	$(t_nrmse_SOURCES) $(t_resize_SOURCES) $(t_round_SOURCES) \
 	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_size_SOURCES) \
 	$(t_tan_SOURCES) $(t_tanh_SOURCES)
 am__can_run_installinfo = \
@@ -384,7 +397,10 @@ t_floor_SOURCES = $(COMMON) t_floor.cpp
 t_round_SOURCES = $(COMMON) t_round.cpp
 t_ceil_SOURCES = $(COMMON) t_ceil.cpp
 t_size_SOURCES = $(COMMON) t_size.cpp
-t_gtoreq_SOURCES = $(COMMON) t_gtoreq.cpp
+#t_gtoreq_SOURCES = $(COMMON) t_gtoreq.cpp
+t_flipud_SOURCES = $(COMMON) t_flipud.cpp
+t_fliplr_SOURCES = $(COMMON) t_fliplr.cpp
+t_resize_SOURCES = $(COMMON) t_resize.cpp
 all: all-am
 
 .SUFFIXES:
@@ -467,6 +483,12 @@ t_esub$(EXEEXT): $(t_esub_OBJECTS) $(t_esub_DEPENDENCIES) $(EXTRA_t_esub_DEPENDE
 t_exp$(EXEEXT): $(t_exp_OBJECTS) $(t_exp_DEPENDENCIES) $(EXTRA_t_exp_DEPENDENCIES) 
 	@rm -f t_exp$(EXEEXT)
 	$(CXXLINK) $(t_exp_OBJECTS) $(t_exp_LDADD) $(LIBS)
+t_fliplr$(EXEEXT): $(t_fliplr_OBJECTS) $(t_fliplr_DEPENDENCIES) $(EXTRA_t_fliplr_DEPENDENCIES) 
+	@rm -f t_fliplr$(EXEEXT)
+	$(CXXLINK) $(t_fliplr_OBJECTS) $(t_fliplr_LDADD) $(LIBS)
+t_flipud$(EXEEXT): $(t_flipud_OBJECTS) $(t_flipud_DEPENDENCIES) $(EXTRA_t_flipud_DEPENDENCIES) 
+	@rm -f t_flipud$(EXEEXT)
+	$(CXXLINK) $(t_flipud_OBJECTS) $(t_flipud_LDADD) $(LIBS)
 t_floor$(EXEEXT): $(t_floor_OBJECTS) $(t_floor_DEPENDENCIES) $(EXTRA_t_floor_DEPENDENCIES) 
 	@rm -f t_floor$(EXEEXT)
 	$(CXXLINK) $(t_floor_OBJECTS) $(t_floor_LDADD) $(LIBS)
@@ -479,6 +501,9 @@ t_log10$(EXEEXT): $(t_log10_OBJECTS) $(t_log10_DEPENDENCIES) $(EXTRA_t_log10_DEP
 t_nrmse$(EXEEXT): $(t_nrmse_OBJECTS) $(t_nrmse_DEPENDENCIES) $(EXTRA_t_nrmse_DEPENDENCIES) 
 	@rm -f t_nrmse$(EXEEXT)
 	$(CXXLINK) $(t_nrmse_OBJECTS) $(t_nrmse_LDADD) $(LIBS)
+t_resize$(EXEEXT): $(t_resize_OBJECTS) $(t_resize_DEPENDENCIES) $(EXTRA_t_resize_DEPENDENCIES) 
+	@rm -f t_resize$(EXEEXT)
+	$(CXXLINK) $(t_resize_OBJECTS) $(t_resize_LDADD) $(LIBS)
 t_round$(EXEEXT): $(t_round_OBJECTS) $(t_round_DEPENDENCIES) $(EXTRA_t_round_DEPENDENCIES) 
 	@rm -f t_round$(EXEEXT)
 	$(CXXLINK) $(t_round_OBJECTS) $(t_round_LDADD) $(LIBS)
@@ -517,10 +542,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_epow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_esub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_exp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_fliplr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_flipud.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_floor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_log10.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_nrmse.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_resize.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_round.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_sin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_sinh.Po@am__quote@

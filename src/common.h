@@ -89,7 +89,7 @@ enum data_type {
 
 // Gamma in Hz
 #ifndef GAMMA
-    #define GAMMA 42.576
+    #define GAMMA 42.57748
 #endif
 
 // Gamma in radians

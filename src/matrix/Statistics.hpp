@@ -58,7 +58,7 @@ cov (const Matrix<T>& m) {
 	size_t mn    = size(m,1);
 
 	Matrix<T> mh = mean(m,0);
-	Matrix<T> tmp  (mm, mn);
+	Matrix<T> tmp = m;
 
 #pragma omp parallel
 	{
@@ -66,7 +66,7 @@ cov (const Matrix<T>& m) {
 #pragma omp for schedule (guided)
 		for (size_t i = 0; i < mm; i++)
 			for (size_t j = 0; j < mn; j++)
-				tmp [i*mn+j] = m[i*mn+j] - mh[j];
+				tmp [i*mn+j] -= mh[j];
 		
 	}	
 
