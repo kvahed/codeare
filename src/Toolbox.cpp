@@ -86,7 +86,8 @@ Toolbox::ClockRate () const {
 #else
 	
 	// LINUX
-	std::string mhzstr = exec("lscpu | grep \"CPU MHz\"|awk '{print $3}'");
+	std::string cmd ("lscpu | grep \"CPU MHz\"|awk '{print $3}'");
+	std::string mhzstr = exec(&cmd[0]);
 	float mhz = atof(mhzstr.c_str());
 	return 1000000.0 * mhz;
 
