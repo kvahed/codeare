@@ -72,10 +72,10 @@ public:
                 m_cgeps(0.0),
                 m_lambda(0.0),
                 m_verbose (false) {
-        
+
 		T fteps = 7.0e-4, alpha = 1.0;
 		size_t ftiter = 3, m = 1;
-        
+
 		if (params.exists("fteps"))
 			fteps = boost::any_cast<T>(params["fteps"]);
 		if (params.exists("alpha"))
@@ -134,7 +134,7 @@ public:
 
 	/**
 	 * @brief          Construct NCSENSE plans for forward and backward transform with credentials
-	 * 
+	 *
 	 * @param  sens    Sensitivity maps if imsize
 	 * @param  nk      # k-space points
 	 * @param  cgeps   Convergence limit of descent
@@ -154,43 +154,43 @@ public:
 		m_nc(8),
 		m_nk(4096),
 		m_nr(1024) {
-		
+
 
 		m_dim = ndims(sens)-1;
 		Matrix<size_t> ms (m_dim,1);
 		for (size_t i = 0; i < m_dim; i++)
 			ms[i] = size(sens,i);
-		
+
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  Signal nodes: %li\n", nk);
 		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", cgeps, cgiter, lambda);
 		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
 
 		int np = 1;
-		
+
 #pragma omp parallel default (shared)
 		{
 			np = omp_get_num_threads ();
-		}	
-		
+		}
+
 		m_fts = new NFFT<T>* [np];
-		
+
 		for (size_t i = 0; i < np; i++)
 			m_fts[i] = new NFFT<T> (ms, nk, m, alpha, b0, pc, fteps, ftiter);
-		
+
 		m_cgiter = cgiter;
 		m_cgeps  = cgeps;
 		m_lambda = lambda;
-		
+
 		m_sm     = sens;
 		m_ic     = IntensityMap (m_sm);
-		
+
 		m_initialised = true;
-		
+
 		printf ("  ...done.\n\n");
-		
+
 	}
-	
+
 	
 	/**
 	 * @brief        Clean up and destruct NFFT plans

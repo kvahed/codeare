@@ -71,7 +71,7 @@ enum IceDim {
 #include "Ptr.h"
 
 /**
- * Short test if the matrix is a vector.
+ * @brief Is matrix is a vector.
  */
 # define VECT(M) assert((M)->width() == 1 || (M)->height() == 1);
 
@@ -684,7 +684,7 @@ public:
 
     
     /**
-     * @brief           Get pointer to data starting from p-th (default:0) element.
+     * @brief           Get pointer to memory starting at p-th (default:0) element.
      *  
      * @param  p        Position
      *
@@ -698,9 +698,9 @@ public:
 
     
     /**
-     * @brief           Get data container (lhs)
+     * @brief           Data container (lhs)
      *  
-     * @return          Data 
+     * @return          Data container
      */
     inline VECTOR_TYPE(T)&
     Container           ()  {
@@ -709,9 +709,9 @@ public:
 
     
     /**
-     * @brief           Get data container (rhs)
+     * @brief           Data container (rhs)
      *  
-     * @return          Data 
+     * @return          Data container
      */
     inline VECTOR_TYPE(T)
     Container           ()  const {
@@ -747,7 +747,7 @@ public:
 
     
     /**
-     * @brief           Get element in (first) slice
+     * @brief           Get element in (first) slice (rhs)
      *  
      * @param  x        Column
      * @param  y        Line
@@ -767,7 +767,7 @@ public:
     
 
     /**
-     * @brief            Reference to value in slice
+     * @brief            Reference to element in (first) slice (rhs)
      *  
      * @param  x         Column
      * @param  y         Line
@@ -786,7 +786,7 @@ public:
 
     
     /**
-     * @brief          Get value in volume
+     * @brief          Get element in (first) volume (lhs)
      *  
      * @param  x       Column
      * @param  y       Line
@@ -808,7 +808,7 @@ public:
     
 
     /**
-     * @brief            Reference to value in volume
+     * @brief            Reference to element in (first) volume (lhs)
      *  
      * @param  x         Column
      * @param  y         Line
@@ -830,7 +830,7 @@ public:
     
 
     /**
-     * @brief            Get value in store
+     * @brief            Get value at position (lhs)
      *  
      * @param  col       Column
      * @param  lin       Line
@@ -892,7 +892,7 @@ public:
     
     
     /**
-     * @brief            Reference to value in volume
+     * @brief            Reference to value in volume (rhs)
      *  
      * @param  col       Column
      * @param  lin       Line
@@ -956,7 +956,7 @@ public:
     /**
      * @brief          Cast operator
      *
-     * @return         Cast if possible
+     * @return         Casted copy
      */
     template<class S>
     inline operator Matrix<S,P> () const {
@@ -977,7 +977,7 @@ public:
 
 
     /**
-     * @brief           Get the element at position p of the vector, i.e. this(p).
+     * @brief           @see At(const size_t&)
      *
      * @param  p        Requested position.
      * @return          Requested scalar value.
@@ -2221,8 +2221,6 @@ public:
     //@}
 
 
-
-
     /**
      * @name            Friend operators
      *                  Who doesn't need friends
@@ -2664,8 +2662,6 @@ public:
 
 
 
-    //@}
-
     /**
      * @name            Dimensions
      *                  Some convenience functions to access dimensionality
@@ -2971,12 +2967,12 @@ protected:
     size_t              _dim[INVALID_DIM]; /// Dimensions
     size_t              _dsz[INVALID_DIM]; /// Dimension size.
     float               _res[INVALID_DIM]; /// Resolutions
-
-	// Data
-    VECTOR_TYPE(T)    _M;
     
+    //Data
+    VECTOR_TYPE(T)    _M; /// Data container
+
     // Name
-    std::string         _name; 
+    std::string         _name; /// Name
     
 #ifdef HAVE_MPI
     // BLACS 

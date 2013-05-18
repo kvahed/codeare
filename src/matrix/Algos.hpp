@@ -645,7 +645,6 @@ min (const Matrix<T>& M) {
 	
 }
 
-#include "CX.hpp"
 
 /**
  * @brief           Transpose

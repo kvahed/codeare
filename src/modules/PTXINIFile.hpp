@@ -18,6 +18,8 @@
  *  02110-1301  USA
  */
 
+#include "CX.hpp"
+
 error_code
 PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<float>& grad,
 						const int& dimrf, const int& dimgr, const int& nc, 

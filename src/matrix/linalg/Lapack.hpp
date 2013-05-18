@@ -25,6 +25,7 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 #include "LapackTraits.hpp"
+#include "CX.hpp"
 
 
 /**
