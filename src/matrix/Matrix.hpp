@@ -144,7 +144,7 @@ public:
         T t;
         Validate (t);
 		
-        for (size_t i = 0; i < INVALID_DIM; i++) {
+        for (size_t i = 0; i < INVALID_DIM; ++i) {
             _dim [i] = 1;
             _dsz [i] = 1;
             _res [i] = 1.0;
@@ -160,14 +160,14 @@ public:
      *
      * @param  dim      All <= INVALID_DIM Dimensions
      */
-	inline
+	inline explicit
     Matrix              (const std::vector<size_t>& dim) {
 		
 		assert (dim.size() <= INVALID_DIM);
 		
 		size_t n = 1, i = 0;
 		
-		for (; i < dim.size(); i++)
+		for (; i < dim.size(); ++i)
 			n *= dim[i];
 		
 		assert (n);
@@ -175,13 +175,13 @@ public:
 	    T t;
 	    Validate (t);
 		
-	    for (i = 0; i < dim.size(); i++) {
+	    for (i = 0; i < dim.size(); ++i) {
 	        _dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
 	    }
 		
-		for (; i < INVALID_DIM; i++) {
+		for (; i < INVALID_DIM; ++i) {
 	        _dim[i] = 1;
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
@@ -195,7 +195,7 @@ public:
     /**
      * @brief           Delete array containing data.
      */
-	inline virtual
+	inline
 	~Matrix() {};
 	
     
@@ -212,7 +212,7 @@ public:
 		
 		size_t n = 1, i = 0;
 		
-		for (; i < dim.size(); i++)
+		for (; i < dim.size(); ++i)
 			n *= dim[i];
 		
 		assert (n > 0);
@@ -220,13 +220,13 @@ public:
 	    T t;
 	    Validate (t);
 		
-	    for (i = 0; i < dim.size(); i++) {
+	    for (i = 0; i < dim.size(); ++i) {
 	        _dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
 	    }
 		
-		for (; i < INVALID_DIM; i++) {
+		for (; i < INVALID_DIM; ++i) {
 	        _dim[i] = 1;
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 	        _res[i] = 1.0;
@@ -242,12 +242,12 @@ public:
      *
      * @param  dim      All 16 Dimensions
      */
-	inline
+	inline explicit
     Matrix              (const size_t dim[INVALID_DIM]) {
 		
 		size_t n = 1, i = 0;
 		
-		for (; i < INVALID_DIM; i++)
+		for (; i < INVALID_DIM; ++i)
 			n *= dim[i];
 		
 		assert (n);
@@ -255,7 +255,7 @@ public:
 	    T t;
 	    Validate (t);
 		
-		for (i = 0; i < INVALID_DIM; i++) {
+		for (i = 0; i < INVALID_DIM; ++i) {
 			_dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 			_res[i] = 1.0;
@@ -273,7 +273,7 @@ public:
      * @param  dim      All 16 Dimensions
      * @param  res      All 16 Resolutions
      */
-	inline
+	inline explicit
     Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res) {
 		
 		assert (dim.size() <= INVALID_DIM);
@@ -281,7 +281,7 @@ public:
 
 		size_t n = 1, i = 0;
 		
-		for (; i < dim.size(); i++)
+		for (; i < dim.size(); ++i)
 			n *= dim[i];
 		
 		assert (n);
@@ -289,13 +289,13 @@ public:
 	    T t;
 	    Validate (t);
 		
-		for (i = 0; i < dim.size(); i++) {
+		for (i = 0; i < dim.size(); ++i) {
 			_dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 			_res[i] = res[i];
 		}
 		
-		for (; i < INVALID_DIM; i++) {
+		for (; i < INVALID_DIM; ++i) {
 			_dim[i] = 1;
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 			_res[i] = 1.0;
@@ -319,7 +319,7 @@ public:
 		
 		size_t n = 1, i = 0;
 		
-		for (; i < INVALID_DIM; i++)
+		for (; i < INVALID_DIM; ++i)
 			n *= dim[i];
 		
 		assert (n);
@@ -327,7 +327,7 @@ public:
 	    T t;
 	    Validate (t);
 		
-		for (i = 0; i < INVALID_DIM; i++) {
+		for (i = 0; i < INVALID_DIM; ++i) {
 			_dim[i] = dim[i];
 	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
 			_res[i] = res[i];
@@ -348,7 +348,7 @@ public:
      *
      * @param  n        Rows & Columns
      */
-    inline
+    inline explicit
     Matrix (const size_t& n) {
 
 		assert (n);
@@ -361,12 +361,12 @@ public:
 		_dsz [COL] = 1;
 		_dsz [LIN] = _dim[COL];
 
-		for (size_t i = 2; i < INVALID_DIM; i++) {
+		for (size_t i = 2; i < INVALID_DIM; ++i) {
 			_dim [i] = 1;
 			_dsz [i] = _dsz[i-1]*_dim[i-1];
 		}
 
-		for (size_t i = 0; i < INVALID_DIM; i++)
+		for (size_t i = 0; i < INVALID_DIM; ++i)
 			_res [i] = 1.0;
 
         _M = VECTOR_CONSTR(T,DimProd());
@@ -401,12 +401,12 @@ public:
 		_dsz [COL] = 1;
 		_dsz [LIN] = _dim[COL];
 
-        for (size_t i = 2; i < INVALID_DIM; i++) {
+        for (size_t i = 2; i < INVALID_DIM; ++i) {
             _dim [i] = 1;
             _dsz [i] = _dsz[i-1]*_dim[i-1];
         }
 
-        for (size_t i = 0; i < INVALID_DIM; i++)
+        for (size_t i = 0; i < INVALID_DIM; ++i)
             _res [i] = 1.0;
 
         _M = VECTOR_CONSTR(T,DimProd());
@@ -442,12 +442,12 @@ public:
 		_dsz [1] = _dim[0];
 		_dsz [2] = _dim[1]*_dsz[1];
 
-        for (size_t i = 3; i < INVALID_DIM; i++) {
+        for (size_t i = 3; i < INVALID_DIM; ++i) {
             _dim [i] = 1;
             _dsz [i] =_dsz[i-1]*_dim[i-1];
         }
 
-        for (size_t i = 0; i < INVALID_DIM; i++)
+        for (size_t i = 0; i < INVALID_DIM; ++i)
             _res [i] = 1.0;
 
         _M = VECTOR_CONSTR(T,DimProd());
@@ -517,10 +517,10 @@ public:
 	    _dim[AVE] = ave;
 
 	    _dsz[COL] = 1;
-		for (size_t i = 1; i < INVALID_DIM; i++)
+		for (size_t i = 1; i < INVALID_DIM; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 
-	    for (size_t i = 0; i < INVALID_DIM; i++)
+	    for (size_t i = 0; i < INVALID_DIM; ++i)
 	        _res [i] = 1.0;
 
         _M = VECTOR_CONSTR(T,DimProd());
@@ -550,7 +550,7 @@ public:
 			T t;
 			Validate (t);
 
-	        for (size_t i = 0; i < INVALID_DIM; i++) {
+	        for (size_t i = 0; i < INVALID_DIM; ++i) {
 	            _dim[i] = M.Dim()[i];
 	            _dsz[i] = M.Dsz()[i];
 	            _res[i] = M.Res()[i];
@@ -966,7 +966,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			m[i] = (S)_M[i];
 
 		return m;
@@ -1161,7 +1161,7 @@ public:
 
         if (this != &M) {
 
-            for (size_t i = 0; i < INVALID_DIM; i++) {
+            for (size_t i = 0; i < INVALID_DIM; ++i) {
                 _dim[i] = M.Dim()[i];
                 _res[i] = M.Res()[i];
                 _dsz[i] = M.Dsz()[i];
@@ -1211,7 +1211,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
             _M[i] = t;
 #endif
         
@@ -1274,7 +1274,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			res[i] -= t;
         
         return res;
@@ -1302,13 +1302,13 @@ public:
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), _M);
         else
-        	for (size_t i = 0; i < Size(); i++)
+        	for (size_t i = 0; i < Size(); ++i)
         		_M[i] -= M[i];
 #else
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
             _M[i] -= M[i];
 #endif
 
@@ -1332,7 +1332,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			_M[i] -= M[i];
 
         return *this;
@@ -1354,7 +1354,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			_M[i] -= t;
 
 		return *this;
@@ -1374,7 +1374,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			res[i] = -res[i];
 
         return res;
@@ -1440,7 +1440,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			res[i] += t;
 
         return res;
@@ -1467,13 +1467,13 @@ public:
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), _M);
         else
-        	for (size_t i = 0; i < Size(); i++)
+        	for (size_t i = 0; i < Size(); ++i)
         		_M[i] += M[i];
 #else
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
             _M[i] += M[i];
 #endif
         
@@ -1497,7 +1497,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			_M[i] += M[i];
 
     	return *this;
@@ -1520,7 +1520,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			_M[i] += t;
 
         return *this;
@@ -1537,7 +1537,7 @@ public:
     inline Matrix<T,P>
     operator!           () const {
 
-        for (size_t i = 2; i < INVALID_DIM; i++)
+        for (size_t i = 2; i < INVALID_DIM; ++i)
             assert (_dim[i] == 1);
 
         Matrix<T,P> res (_dim[1],_dim[0]);
@@ -1545,7 +1545,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < _dim[1]; i++)
+		for (size_t i = 0; i < _dim[1]; ++i)
 			for (size_t j = 0; j < _dim[0]; j++)
 				res(i,j) = this->At(j,i);
 
@@ -1596,12 +1596,12 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater(_M[i], s);
 
         return res;
 
-    } // TODO: OMP
+    }
 
     
     
@@ -1619,7 +1619,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater_or_equal(_M[i], s);
 
         return res;
@@ -1641,7 +1641,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less_or_equal(_M[i], s);
 
         return res;
@@ -1663,7 +1663,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less(_M[i], s);
 
         return res;
@@ -1683,10 +1683,15 @@ public:
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<bool> res(_dim);
-        res.Container() = (_M == M.Container());
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); ++i)
+			res[i] = (_M[i] == M[i]);
+
         return res;
 
-    } // TODO: OMP
+    }
 
 
     /**
@@ -1706,7 +1711,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			res[i] = (_M[i] == M[i]);
 
 		return res;
@@ -1729,7 +1734,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			res[i] (_M[i] == s);
 
         return res;
@@ -1772,7 +1777,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater_or_equal(_M[i], M[i]);
 
         return res;
@@ -1796,7 +1801,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less_or_equal(_M[i], M[i]);
 
         return res;
@@ -1820,7 +1825,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater(_M[i], M[i]);
 
         return res;
@@ -1844,7 +1849,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less(_M[i], M[i]);
 
         return res;
@@ -1868,7 +1873,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::logical_or(_M[i], M[i]);
 
         return res;
@@ -1891,7 +1896,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::logical_and(_M[i], M[i]);
 
         return res;
@@ -1913,7 +1918,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			res[i] = (p == 0) ? T(1) : pow(res[i],  p);
 
         return res;
@@ -1933,7 +1938,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			_M[i] = pow(_M[i],  p);
 
         return *this;
@@ -1988,7 +1993,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			res[i] *= t;
 
         return res;
@@ -2016,13 +2021,13 @@ public:
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), _M);
         else
-        	for (size_t i = 0; i < Size(); i++)
+        	for (size_t i = 0; i < Size(); ++i)
         		_M[i] *= M[i];
 #else
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
             _M[i] *= M[i];
 #endif
 
@@ -2046,7 +2051,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			_M[i] *= M[i];
 
 		return *this;
@@ -2069,7 +2074,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			_M[i] *= t;
 
 		return *this;
@@ -2124,7 +2129,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			res[i] /= t;
 
 		return res;
@@ -2151,13 +2156,13 @@ public:
         if (fp_type(_M[0]))
         	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), _M);
         else
-        	for (size_t i = 0; i < Size(); i++)
+        	for (size_t i = 0; i < Size(); ++i)
         		_M[i] /= M[i];
 #else
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < Size(); i++)
+        for (size_t i = 0; i < Size(); ++i)
             _M[i] /= M[i];
 #endif
 
@@ -2183,7 +2188,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			_M[i] /= M[i];
 
         return *this;
@@ -2209,7 +2214,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < Size(); i++)
+		for (size_t i = 0; i < Size(); ++i)
 			_M[i] /= T(s);
 
         return *this;
@@ -2483,7 +2488,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < m.Size(); i++)
+        for (size_t i = 0; i < m.Size(); ++i)
             res[i] = s / res[i];
 #endif
         return res;
@@ -2508,7 +2513,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < m.Size(); i++)
+        for (size_t i = 0; i < m.Size(); ++i)
             res[i] = s / res[i];
 #endif
 		return res;
@@ -2533,7 +2538,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < m.Size(); i++)
+        for (size_t i = 0; i < m.Size(); ++i)
             res[i] = s / res[i];
 #endif
         return res;
@@ -2559,7 +2564,7 @@ public:
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
-        for (size_t i = 0; i < m.Size(); i++)
+        for (size_t i = 0; i < m.Size(); ++i)
             res[i] = s / res[i];
 #endif
 
@@ -2727,7 +2732,7 @@ public:
 
 
     /**
-     * @brief           Get resolution a given dimension.
+     * @brief           Get resolution of a given dimension.
      *
      * @param   i       Dimension
      * @return          Resolution .
@@ -2740,7 +2745,7 @@ public:
 
 
     /**
-     * @brief           Rresolution a given dimension.
+     * @brief           Resolution of a given dimension.
      *
      * @param   i       Dimension
      * @return          Resolution
@@ -2801,7 +2806,7 @@ public:
 
 
     /**
-     * @brief           Get dimension vector
+     * @brief           Get copy of dimension vector
      *
      * @return          All dimensions
      */
@@ -2831,7 +2836,7 @@ public:
     inline void
     Clear               ()                                      {
 
-        for (size_t i = 0; i < INVALID_DIM; i++) {
+        for (size_t i = 0; i < INVALID_DIM; ++i) {
             _dim[i] = 1;
             _dsz[i] = 1;
             _res[i] = 1.0;
@@ -2956,7 +2961,7 @@ protected:
         
         long size = 1;
         
-        for (size_t i = 0; i < INVALID_DIM; i++)
+        for (size_t i = 0; i < INVALID_DIM; ++i)
             size *= _dim[i];
         
         return size;
@@ -3013,12 +3018,12 @@ Matrix<T,P>::Import     (const IceAs* ias, const size_t pos) {
     int  i    = 0;
     long size = 1;
     
-    for (i = 0; i < INVALID_DIM; i++)
+    for (i = 0; i < INVALID_DIM; ++i)
         size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
     
     T* data = (T*) ias->calcSplObjStartAddr() ;
     
-    for (i = 0; i < size; i++, data++)
+    for (i = 0; i < size; ++i, ++data)
         _M[i+pos] = *data;
     
     return size;
@@ -3033,7 +3038,7 @@ Matrix<T,P>::Import(const IceAs* ias) {
         
     int i;
     
-    for (i = 0; i < INVALID_DIM; i++)
+    for (i = 0; i < INVALID_DIM; ++i)
         _dim[i] = (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
     
     _M = new T[Size()]();
@@ -3041,7 +3046,7 @@ Matrix<T,P>::Import(const IceAs* ias) {
     
     T* data = (T*) ias->calcSplObjStartAddr() ;
     
-    for (i = 0; i < Size(); i++, data++)
+    for (i = 0; i < Size(); ++i, data++)
         _M[i] = *data;
     
     return Size();
@@ -3056,7 +3061,7 @@ Matrix<T,P>::Export (IceAs* ias) const {
         
     T* data = (T*) ias->calcSplObjStartAddr() ;
     
-    for (int i = 0; i < Size(); i++, data++)
+    for (int i = 0; i < Size(); ++i, data++)
         *data = _M[i];
     
     return Size();
@@ -3072,13 +3077,13 @@ Matrix<T,P>::Export (IceAs* ias, const size_t pos) const {
         int  i    = 0;
     long size = 1;
     
-    for (i = 0; i < INVALID_DIM; i++) {
+    for (i = 0; i < INVALID_DIM; ++i) {
         size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
     }
     
     T* data = (T*) ias->calcSplObjStartAddr() ;
     
-    for (i = 0; i < size; i++, data++)
+    for (i = 0; i < size; ++i, data++)
         *data = _M[i+pos];
     
     return size;

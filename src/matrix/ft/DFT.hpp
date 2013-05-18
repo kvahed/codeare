@@ -367,10 +367,26 @@ private:
 
 		Matrix<CT> res (vsize(m));
 
-		VECTOR_TYPE(size_t) oi (INVALID_DIM,1);
-		VECTOR_TYPE(size_t) si (INVALID_DIM,1);
+		//VECTOR_TYPE(size_t) oi (INVALID_DIM,1);
+		//VECTOR_TYPE(size_t) si (INVALID_DIM,1);
 
-        for (oi[2] = 0; oi[2] < d[2]; oi[2]++) {
+		size_t xi,yi,zi,xs,ys,zs;
+		for (zi = 0; zi < d[2]; zi++) {
+			zs = (zi + c[2]) % d[2];
+#pragma omp for private (xi,yi,zi,xs,ys,zs)
+			for (yi = 0; yi < d[1]; yi++) {
+				ys = (yi + c[1]) % d[1];
+				for (xi = 0; xi < d[0]; xi++) {
+					xs = (xi + c[0]) % d[0];
+					if (fw)
+						res(xs,ys,zs) = m(xi,yi,zi);
+					else
+						res(xi,yi,zi) = m(xs,ys,zs);
+				}
+			}
+		}
+/*
+		for (oi[2] = 0; oi[2] < d[2]; oi[2]++) {
             si[2] = (oi[2] + c[2]) % d[2];
             for (oi[1] = 0; oi[1] < d[1]; oi[1]++) {
                 si[1] = (oi[1] + c[1]) % d[1];
@@ -383,7 +399,7 @@ private:
                 }
             }
         }
-        
+*/
 	    return res;
 
 	}

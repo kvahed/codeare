@@ -63,9 +63,9 @@ nnz (const Matrix<T>& M) {
 	size_t nz   = 0;
 	T      zero = T(0);
 	
-	for (int i = 0; i < M.Size(); i++)
+	for (int i = 0; i < M.Size(); ++i)
 		if (M[i] != T(0))
-			nz++;
+			++nz;
 	
 	return nz;
 	
@@ -84,8 +84,8 @@ isxd (const Matrix<T>& M, const size_t d) {
 
 	size_t l = 0;
 
-	for (size_t i = 0; i < INVALID_DIM; i++)
-		if (M.Dim(i) > 1) l++;
+	for (size_t i = 0; i < INVALID_DIM; ++i)
+		if (M.Dim(i) > 1) ++l;
 
 	return (l == d);
 
@@ -171,7 +171,7 @@ is4d (const Matrix<T>& M) {
 template <class T>  inline  bool
 iszero (const Matrix<T>& M) {
 	
-	for (size_t i = 0; i < M.Size(); i++)
+	for (size_t i = 0; i < M.Size(); ++i)
 		if (M[i] != T(0)) return false;
 	
 	return true;
@@ -293,7 +293,7 @@ ndims (const Matrix<T>& M) {
 	
 	size_t nd = 0;
 	
-	for (size_t i = 1; i < INVALID_DIM; i++)
+	for (size_t i = 1; i < INVALID_DIM; ++i)
 		if (size(M,i) > 1)
 			nd = i;
 	
@@ -326,7 +326,7 @@ diag (const Matrix<T>& M) {
 
 	Matrix<T> res (sz,1);
 
-	for (size_t i = 0; i < sz; i++)
+	for (size_t i = 0; i < sz; ++i)
 		res(i) = M(i,i); 
 
 	return res;
@@ -359,7 +359,7 @@ numel               (const Matrix<T>& M) {
 	
 	size_t s = 1;
     
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; ++i)
 		s *= M.Dim(i);
     
 	return s;
@@ -463,12 +463,12 @@ size               (const Matrix<T>& M) {
 	Matrix<size_t> res (1,INVALID_DIM);
 	size_t ones = 0;
     
-	for (size_t i = 0; i < INVALID_DIM; i++) {
+	for (size_t i = 0; i < INVALID_DIM; ++i) {
 		
 		res[i] = size(M, i);
 
 		if (res[i] == 1)
-			ones++;
+			++ones;
 		else
 			ones = 0;
 		
@@ -523,7 +523,7 @@ length             (const Matrix<T>& M) {
 	
 	size_t l = 1;
 
-	for (size_t i = 0; i < INVALID_DIM; i++) 
+	for (size_t i = 0; i < INVALID_DIM; ++i)
 		l = (l > size(M,i)) ? l : size(M,i);
 
 	return l;
@@ -570,7 +570,7 @@ height             (const Matrix<T>& M) {
 template<class T> inline Matrix<T>
 floor (const Matrix<T>& M) {
 	Matrix<T> res = M;
-	for (size_t i = 0; i < numel(M); i++)
+	for (size_t i = 0; i < numel(M); ++i)
 		res[i] = floor (res[i]);
 	return res;
 }
@@ -585,7 +585,7 @@ floor (const Matrix<T>& M) {
 template<class T> inline Matrix<T>
 ceil (const Matrix<T>& M) {
 	Matrix<T> res = M;
-	for (size_t i = 0; i < numel(M); i++)
+	for (size_t i = 0; i < numel(M); ++i)
 		res[i] = ceil (res[i]);
 	return res;
 }
@@ -600,7 +600,7 @@ ceil (const Matrix<T>& M) {
 template<class T> inline Matrix<T>
 round (const Matrix<T>& M) {
 	Matrix<T> res = M;
-	for (size_t i = 0; i < numel(M); i++)
+	for (size_t i = 0; i < numel(M); ++i)
 		res[i] = ROUND (res[i]);
 	return res;
 }
@@ -617,7 +617,7 @@ max (const Matrix<T>& M) {
 
 	T max = cabs(M[0]);
 
-	for (size_t i = 0; i < numel(M); i++)
+	for (size_t i = 0; i < numel(M); ++i)
 		if (cabs(M[i]) > max)
 			max = M[i];
 
@@ -637,7 +637,7 @@ min (const Matrix<T>& M) {
 
 	T min = cabs(M[0]);
 
-	for (size_t i = 0; i < numel(M); i++)
+	for (size_t i = 0; i < numel(M); ++i)
 		if (cabs(M[i]) < min)
 			min = M[i];
 
@@ -665,8 +665,8 @@ transpose (const Matrix<T>& M, const bool& c = false) {
 
 	Matrix<T> res (n,m);
 
-	for (j = 0; j < n; j++)
-		for (i = 0; i < m; i++)
+	for (j = 0; j < n; ++j)
+		for (i = 0; i < m; ++i)
 			res (j,i) = M(i,j);
 	
 	return c ? conj(res) : res;
@@ -773,12 +773,12 @@ sum (const Matrix<T>& M, const size_t d) {
 	
 	// Inner size 
 	size_t insize = 1;
-	for (size_t i = 0; i < d; i++)
+	for (size_t i = 0; i < d; ++i)
 		insize *= sz[i];
 	
 	// Outer size
 	size_t outsize = 1;
-	for (size_t i = d+1; i < MIN(INVALID_DIM,numel(sz)); i++)
+	for (size_t i = d+1; i < MIN(INVALID_DIM,numel(sz)); ++i)
 		outsize *= sz[i];
 	
 	// Adjust size vector and allocate
@@ -791,11 +791,11 @@ sum (const Matrix<T>& M, const size_t d) {
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < outsize; i++) {
+		for (size_t i = 0; i < outsize; ++i) {
 			
-			for (size_t j = 0; j < insize; j++) {
+			for (size_t j = 0; j < insize; ++j) {
 				res[i*insize + j] = T(0);
-				for (size_t k = 0; k < dim; k++)
+				for (size_t k = 0; k < dim; ++k)
 					res[i*insize + j] += M[i*insize*dim + j + k*insize];
 			}
 			
@@ -823,7 +823,7 @@ sum (const Matrix<T>& M, const size_t d) {
 template <class T> inline T
 sum (Matrix<T>& M) {
 	T s = 0;
-	for (size_t i = 0; i < numel(M); i++)
+	for (size_t i = 0; i < numel(M); ++i)
 		s += M[i];
 	return s;
 }
@@ -861,12 +861,12 @@ prod (const Matrix<T>& M, const size_t d) {
 
 	// Inner size
 	size_t insize = 1;
-	for (size_t i = 0; i < d; i++)
+	for (size_t i = 0; i < d; ++i)
 		insize *= sz[i];
 
 	// Outer size
 	size_t outsize = 1;
-	for (size_t i = d+1; i < MIN(INVALID_DIM,numel(sz)); i++)
+	for (size_t i = d+1; i < MIN(INVALID_DIM,numel(sz)); ++i)
 		outsize *= sz[i];
 
 	// Adjust size vector and allocate
@@ -879,11 +879,11 @@ prod (const Matrix<T>& M, const size_t d) {
 
 #pragma omp for
 
-		for (size_t i = 0; i < outsize; i++) {
+		for (size_t i = 0; i < outsize; ++i) {
 
-			for (size_t j = 0; j < insize; j++) {
+			for (size_t j = 0; j < insize; ++j) {
 				res[i*insize + j] = T(0);
-				for (size_t k = 0; k < dim; k++)
+				for (size_t k = 0; k < dim; ++k)
 					res[i*insize + j] += M[i*insize*dim + j + k*insize];
 			}
 
@@ -911,7 +911,7 @@ prod (const Matrix<T>& M, const size_t d) {
 template <class T> inline T
 prod (const Matrix<T>& M) {
 	T p = (T) 1;
-	for (size_t i = 0; i < numel(M); i++)
+	for (size_t i = 0; i < numel(M); ++i)
 		p *= M[i];
 	return p;
 }
@@ -959,7 +959,7 @@ squeeze (const Matrix<T>& M) {
 	Matrix<size_t> dims = ones<size_t> (INVALID_DIM,1);
 	Matrix<float>  resl = ones<float>  (INVALID_DIM,1);
 	
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; ++i)
 		if (size(M, i) > 1) {
 			dims[found]   = size (M,i);
 			resl[found++] = resol(M,i);
@@ -967,7 +967,7 @@ squeeze (const Matrix<T>& M) {
 	
 	Matrix<T> res = zeros<T> (dims);
 	
-	for (size_t i = 0; i < INVALID_DIM; i++)
+	for (size_t i = 0; i < INVALID_DIM; ++i)
 		res.Res(i) = resl[i];
 
 	res.Container() = M.Container();
@@ -997,7 +997,7 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	// Every number between 0 and ndnew must appear exactly once
 	vector<bool> occupied;
 	occupied.resize(ndnew);
-	for (i = 0; i < ndnew; i++) {
+	for (i = 0; i < ndnew; ++i) {
 		assert (!occupied[perm[i]]);
 		occupied [perm[i]] = true;
 	}			
@@ -1006,7 +1006,7 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	Matrix<size_t> so = size (M);
 	Matrix<size_t> sn = ones<size_t> (16,1);
 
-	for (i = 0; i < ndnew; i++)
+	for (i = 0; i < ndnew; ++i)
 		sn[i] = so[perm[i]];
 	
 	// Allocate new matrix with permuted dimensions
@@ -1015,8 +1015,8 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	// Relation of old to new indices
 	size_t  d[16];
 	size_t od[16];
-	for (i = 0; i < ndnew; i++) od[i] = perm[i];
-	for (     ; i <    16; i++)	od[i] =      i;
+	for (i = 0; i < ndnew; ++i) od[i] = perm[i];
+	for (     ; i <    16; ++i)	od[i] =      i;
 	
 	// Copy data accordingly
 	for (d[15] = 0; d[15] < size(res,15); d[15]++)
@@ -1071,7 +1071,7 @@ flipud (const Matrix<T>& M)  {
     
     VI rb = res.Container().begin();
 
-	for (size_t i = 0; i < ncol; i++)
+	for (size_t i = 0; i < ncol; ++i)
         std::reverse(rb+i*scol, rb+(i+1)*scol);
 
 	return res;
@@ -1094,8 +1094,8 @@ fliplr (const Matrix<T>& M)  {
 
 	Matrix<T> res (M.Dim());
 
-    for (size_t i = 0; i < nrow; i++)
-        for (size_t j = 0; j < srow; j++)
+    for (size_t i = 0; i < nrow; ++i)
+        for (size_t j = 0; j < srow; ++j)
             res[j*scol+i] = M[(srow-1-j)*scol+i]; 
 
 	return res;
