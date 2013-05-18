@@ -126,8 +126,7 @@ CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_GSL_TRUE@am_CompressedSensing_la_rpath = -rpath $(libdir)
 DirectMethod_la_DEPENDENCIES =
-am_DirectMethod_la_OBJECTS = DirectMethod.lo CPUSimulator.lo \
-	GPUSimulator.lo
+am_DirectMethod_la_OBJECTS = DirectMethod.lo CPUSimulator.lo
 DirectMethod_la_OBJECTS = $(am_DirectMethod_la_OBJECTS)
 DirectMethod_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -465,7 +464,7 @@ CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
 CompressedSensing_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(top_srcdir)/src/matrix/dwt
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
-DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp GPUSimulator.cpp GPUSimulator.hpp
+DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp #GPUSimulator.cpp GPUSimulator.hpp
 DirectMethod_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 DirectMethod_la_LIBADD = $(COMMON_la_LIBADD)
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
@@ -591,7 +590,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DirectMethod.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GPUSimulator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GRAPPA.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GenericRegrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KTPoints.Plo@am__quote@
