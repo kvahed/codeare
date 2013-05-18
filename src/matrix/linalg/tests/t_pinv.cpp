@@ -3,7 +3,7 @@
 #include "Creators.hpp"
 #include "Lapack.hpp"
 
-template<class T> void pinv_check () {
+template<class T> void check () {
 
     Matrix<T> A = rand<T>(8,3);
     
@@ -14,17 +14,19 @@ template<class T> void pinv_check () {
     Matrix<T> B = pinv (A);
     
 #ifdef VERBOSE
-    std::cout << "pinv(A)=\n" << B << std::endl;
+    std::cout << "pinv(A)=\n" << B;
+    std::cout << std::endl;
 #endif
     
 }
 
 int main (int args, char** argv) {
 
-    pinv_check<cxfl>();
-    pinv_check<cxdb>();
-    pinv_check<float>();
-    pinv_check<double>();
+    check<float>();
+    check<double>();
+    check<cxfl>();
+    check<cxdb>();
+
     
     return 0;
     

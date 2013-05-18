@@ -22,10 +22,10 @@ template<class T> void inv_check () {
 
 int main (int args, char** argv) {
 
-    inv_check<cxfl>();
-    inv_check<cxdb>();
     inv_check<float>();
     inv_check<double>();
+    inv_check<cxfl>();
+    inv_check<cxdb>();
     
     return 0;
     

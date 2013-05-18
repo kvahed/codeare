@@ -144,9 +144,6 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
 
     printf (" done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 
-	if (n==0)
-		MXDump(m,"m.mat","m","/");
-
 	return m;
 
 }

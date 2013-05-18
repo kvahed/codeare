@@ -3,6 +3,7 @@
 #include "Creators.hpp"
 #include "Lapack.hpp"
 
+
 template<class T, class S> void eig_check () {
 
     Matrix<T> A = rand<T>(6,6), lv(6,6), rv(6,6);
@@ -17,7 +18,8 @@ template<class T, class S> void eig_check () {
 #ifdef VERBOSE    
     std::cout << "ev=\n" << ev;
     std::cout << "lv=\n" << lv;
-    std::cout << "rv=\n" << rv << std::endl;
+    std::cout << "rv=\n" << rv;
+    std::cout << std::endl;
 #endif
 
 }

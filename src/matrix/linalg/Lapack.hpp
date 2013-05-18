@@ -76,28 +76,25 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
         rv = Matrix<T>(N,N);
     
     // Workspace for real numbers
-    T2* rwork = (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) ?
-        (T2*) malloc (N * sizeof(T)) : (T2*) malloc (1 * sizeof(T));
+    VECTOR_TYPE(T2) rwork = (typeid(T) == cxfl_type || typeid(T) == cxdb_type) ?
+    	VECTOR_CONSTR(T2,2*N) : VECTOR_CONSTR(T2,1);
+
     // Workspace for complex numbers
-	T*  work  = (T*) malloc (sizeof(T));
+	VECTOR_TYPE(T) work = VECTOR_CONSTR(T,1);
 	
 	// Need copy. Lapack destroys A on output.
 	Matrix<T> a = m;
     
 	// Work space query
-	LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, work, lwork, rwork, info);
+	LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, &work[0], lwork, &rwork[0], info);
     
 	// Initialize work space
-	lwork = (int) creal (*work);
-    work  = (T*) realloc (work, lwork * sizeof(T));
+	lwork = (int) creal (work[0]);
+    work.resize(lwork);
     
 	// Actual Eigenvalue computation
-	LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, work, lwork, rwork, info);
-    
-	// Clean up
-	free (rwork);
-	free (work);
-	
+	LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, &work[0], lwork, &rwork[0], info);
+
 	if (info > 0) {
 		printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have " \
                 "been computed;\n elements %d+1:N of ev contain eigenvalues which\n have converged.\n\n", info) ;
@@ -151,14 +148,13 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
     
 	Matrix<T> A (IN);
 	
-	int   m, n, lwork, info, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vtcol = 1;
-	T2*   rwork;
-	T*    work = (T*) malloc (sizeof(T));
+	int   m, n, lwork, info = 0, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vtcol = 1;
+
+	VECTOR_TYPE(T2) rwork;
+	VECTOR_TYPE(T)  work = VECTOR_CONSTR(T,1);
 	
-	m     =  A.Height();
-	n     =  A.Width();
+	m     =  A.Height(); n = A.Width();
 	lwork = -1;
-	info  =  0;
 	lda   =  m;
 	mn    =  MIN(m,n);
 	
@@ -174,35 +170,26 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 		ldvt = mn;
 		vtcol = (m>=n) ? mn : n;
 	}
-    
-    
+
 	s = Matrix<S> (  mn,  IONE);
 	U = Matrix<T> ( ldu,  ucol);
 	V = Matrix<T> (ldvt, vtcol);
 	
-	int*   iwork =   (int*) malloc (8 * mn * sizeof(int));
+	VECTOR_TYPE(int) iwork = VECTOR_CONSTR(int, 8 * mn);
 	
-	// Only needed for complex data
-	if (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb))
-		rwork = (jobz == 'N') ?
-            (T2*) malloc (mn * 7 * sizeof(T) / 2) :
-            (T2*) malloc (mn * (5 * mn + 7) * sizeof(T) / 2);
-	else
-		rwork = (T2*) malloc(sizeof(T*));
-    
+	size_t nr = (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) ?
+			((jobz == 'N') ? mn * 7 : mn * (5 * mn + 7)) : 1;
+	rwork = VECTOR_CONSTR (T2, nr);
+
 	// Workspace query
-	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, work, lwork, rwork, iwork, info);
+	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, &work[0], lwork, &rwork[0], &iwork[0], info);
 	
-	lwork = (int) creal (*work);
-	work  = (T*) realloc (work, lwork * sizeof(T));
-	assert (work != NULL);
+	lwork = (int) creal (work[0]);
+	work.resize(lwork);
     
 	// SVD
-	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, work, lwork, rwork, iwork, info);
+	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, &work[0], lwork, &rwork[0], &iwork[0], info);
     
-	free (work);
-	free (iwork);
-	free (rwork);
     
     // Traspose the baby
 	V = !V;
@@ -272,10 +259,10 @@ inv (const Matrix<T>& m) {
 	Matrix<T> res = m;
 
 	int  info = 0;
-	int *ipiv = (int*) malloc (N * sizeof(int));
+	VECTOR_TYPE(int) ipiv = VECTOR_CONSTR(int, N);
 	
 	// LU Factorisation -------------------
-	LapackTraits<T>::getrf (N, N, &res[0], N, ipiv, info);
+	LapackTraits<T>::getrf (N, N, &res[0], N, &ipiv[0], info);
 	
 	if (info < 0)
 		printf ("\nERROR - DPOTRI: the %i-th argument had an illegal value.\n\n", -info);
@@ -284,21 +271,18 @@ inv (const Matrix<T>& m) {
                 "computed.\n\n", info, info);
 	
 	int lwork = -1; 
-	T*   work = (T*) malloc (sizeof(T));
+	VECTOR_TYPE(T) work = VECTOR_CONSTR(T,1);
 	
 	// Workspace determination ------------
-	LapackTraits<T>::getri (N, &res[0], N, ipiv, work, lwork, info);
+	LapackTraits<T>::getri (N, &res[0], N, &ipiv[0], &work[0], lwork, info);
     
 	// Work memory allocation -------------
-	lwork = (int) creal (*work);
-    work  = (T*) realloc (work, lwork * sizeof(T));
+	lwork = (int) creal (work[0]);
+    work.resize(lwork);
 	
 	// Inversion --------------------------
-	LapackTraits<T>::getri (N, &res[0], N, ipiv, work, lwork, info);
-    
-	free (ipiv);
-	free (work);
-	
+	LapackTraits<T>::getri (N, &res[0], N, &ipiv[0], &work[0], lwork, info);
+
 	if (info < 0)
 		printf ("\nERROR - XGETRI: The %i-th argument had an illegal value.\n\n", -info);
 	else if (info > 0)
@@ -317,7 +301,8 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
     
     assert (is2d(m));
 
-	T    *work, wopt = T(0);
+	T wopt = T(0);
+	VECTOR_TYPE(T) work = VECTOR_CONSTR(T,1);
     
 	int  M      =  size(m, 0);
 	int  N      =  size(m, 1);
@@ -328,25 +313,22 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
 	int  lwork  = -1;
 	int  rank   =  0;
 	int  info   =  0;
-	work        = (T*) malloc (sizeof(T));
 
 	Matrix<T> b = eye<T>(ldb);
     
-	LapackTraits<T>::gels (trans, M, N, nrhs, &mm[0], lda, &b[0], ldb, work, lwork, info);
+	LapackTraits<T>::gels (trans, M, N, nrhs, &mm[0], lda, &b[0], ldb, &work[0], lwork, info);
     
-	lwork = (int) creal(*work);
-	work  = (T*) malloc (sizeof(T) * lwork);
+	lwork = (int) creal(work[0]);
+	work.resize(lwork);
 
-	LapackTraits<T>::gels (trans, M, N, nrhs, &mm[0], lda, &b[0], ldb, work, lwork, info);
+	LapackTraits<T>::gels (trans, M, N, nrhs, &mm[0], lda, &b[0], ldb, &work[0], lwork, info);
     
 	if (M > N)
 		for (int i = 0; i < M; i++)
 			memcpy (&b[i*N], &b[i*M], N * sizeof(T));
     
 	b = resize (b, N, M);
-    
-	free (work);
-    
+
 	if (info > 0)
 		printf ("ERROR XGELS: the algorithm for computing the SVD failed to converge;\n %i off-diagonal elements " \
                 "of an intermediate bidiagonal form\n did not converge to zero.", info);
