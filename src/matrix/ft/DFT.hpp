@@ -373,7 +373,6 @@ private:
 		size_t xi,yi,zi,xs,ys,zs;
 		for (zi = 0; zi < d[2]; zi++) {
 			zs = (zi + c[2]) % d[2];
-#pragma omp for private (xi,yi,zi,xs,ys,zs)
 			for (yi = 0; yi < d[1]; yi++) {
 				ys = (yi + c[1]) % d[1];
 				for (xi = 0; xi < d[0]; xi++) {
