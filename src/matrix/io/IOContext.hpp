@@ -11,6 +11,8 @@
 #include "ISMRMRD.hpp"
 #include "HDF5File.hpp"
 #include "SyngoFile.hpp"
+#include "MLFile.hpp"
+
 /*
 #include "NetCDF.hpp"
 #include "Nifti.hpp"
@@ -25,7 +27,8 @@ namespace io{
 	/**
 	 * @brief Supported data formats
 	 */
-	enum IOStrategy {CODRAW, HDF5, MATLAB, ISMRM, SYNGOMR, GE, PHILIPS};
+	enum IOStrategy {CODRAW = 0, HDF5, MATLAB, ISMRM, SYNGOMR, GE, PHILIPS};
+	static const std::string IOSName[6] = {"CODRAW", "HDF5", "MATLAB", "SYNGOMR", "GE", "PHILIPS"};
 
 	/**
 	 * @brief       Interface to concrete IO implementation
@@ -38,34 +41,52 @@ namespace io{
 		 * @brief   Default constructor
 		 */
 		IOContext () :
-			m_iof(0) {}
+			m_iof(0), m_ios (HDF5) {}
 
 		/**
 		 * @brief   Default copy constructor
 		 */
 		IOContext (const IOContext& ioc) :
-			m_iof (0) {}
+			m_iof (0), m_ios (HDF5) {}
+
 
 		/**
 		 *
 		 */
-		IOContext (const std::string& fname, const IOStrategy& iocs = HDF5,
-				const Params& params = Params(), const IOMode& mode = READ,
-				const bool& verbosity = true) :
-			m_iof(0) {
+		IOContext (const std::string& fname, const IOStrategy& ios = HDF5,
+				const IOMode& mode = READ, const Params& params = Params(),
+				const bool verbosity = true) :
+			m_iof(0) , m_ios(ios) {
 
-			switch (iocs) {
-				case CODRAW:  break;
-				case HDF5:    break;
-				case MATLAB:  break;
-				case ISMRM: m_iof = (IOFile*) new IRDFile (fname, mode, params, verbosity);break;
-				case SYNGOMR: m_iof = (IOFile*) new SyngoFile (fname, mode, params, verbosity); break;
-				case GE:      break;
-				case PHILIPS: break;
-				default:      break;
-			}
+			this->Concretize(fname, mode, params, verbosity);
 
 		}
+
+
+		/**
+		 *
+		 */
+		IOContext (const TiXmlElement* txe, const std::string& base = ".",
+				const IOMode mode = READ, const bool verbosity = true) :
+			m_iof(0), m_ios(HDF5) {
+
+			std::string ftype (txe->Attribute("ftype"));
+
+			if (ftype.compare("CODRAW") == 0)
+				m_ios = CODRAW;
+			else if (ftype.compare("MATLAB") == 0)
+				m_ios = MATLAB;
+			else if (ftype.compare("HDF5") == 0)
+				m_ios = HDF5;
+			else if (ftype.compare("SYNGOMR") == 0)
+				m_ios = SYNGOMR;
+
+			std::string fname = base + "/" + std::string(txe->Attribute("fname"));
+
+			this->Concretize(fname, mode, Params(), verbosity);
+
+		} // TODO: UPPERCASE
+
 
 		/**
 		 * @brief  Destroy file handle
@@ -75,8 +96,8 @@ namespace io{
 				delete m_iof;
 		}
 
-		IOFile* Context () {
-			return m_iof;
+		IOFile& Context () {
+			return *m_iof;
 		}
 
 		/**
@@ -87,80 +108,95 @@ namespace io{
 			if (m_iof)
 				return m_iof->Status();
 
-			return NULL_FILE_HANDLE;
+			return GENERAL_IO_ERROR;
 
 		}
 
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		error_code Read (const std::string& dname) const {
+		template<class T> Matrix<T>
+		Read (const std::string& uri) const {
 
-			if (m_iof)
-				return m_iof->Read(dname);
-
-			return NULL_FILE_HANDLE;
-
-		}
-
-		/**
-		 * @brief   Return concrete handle's status
-		 */
-		error_code Write (const std::string& dname) const {
-
-			if (m_iof)
-				return m_iof->Write(dname);
-
-			return NULL_FILE_HANDLE;
-
-		}
-
-
-		/**
-		 * @brief   Return concrete handle's status
-		 */
-		error_code Read (const char* dname) const {
-
-			if (m_iof)
-				return m_iof->Read(std::string(dname));
-
-			return NULL_FILE_HANDLE;
+			if (m_iof) {
+				//switch (m_ios) {
+					//case CODRAW:  break;
+					//case HDF5:
+				printf ("hallo\n");return ((HDF5File*)m_iof)->Read<T>(uri);
+				/*	case MATLAB:  return ((MLFile*)m_iof)->Read<T>(uri);
+					case ISMRM:   return ((IRDFile*)m_iof)->Read<T>(uri);
+					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(uri);
+					case GE:      break;
+					case PHILIPS: break;
+					default:      break;
+				}*/
+			}
 
 		}
 
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		error_code Write (const char* dname) const {
+		template <class T>
+		bool Write (const Matrix<T>& M, const std::string& uri) {
 
-			if (m_iof)
-				return m_iof->Write(std::string(dname));
-
-			return NULL_FILE_HANDLE;
+			if (m_iof) {
+				switch (m_ios) {
+					case CODRAW:  break;
+					case HDF5:    return ((HDF5File*)m_iof)->Write(M,uri);
+					case MATLAB:  return ((MLFile*)m_iof)->Write(M,uri);
+					case ISMRM:   return ((IRDFile*)m_iof)->Write(M,uri);
+					case SYNGOMR: return ((SyngoFile*)m_iof)->Write(M,uri);
+					case GE:      break;
+					case PHILIPS: break;
+					default:      break;
+				}
+			}
 
 		}
 
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		boost::any& GetAny (const std::string& dname) const {
+		template<class T> Matrix<T>
+		Read (const TiXmlElement* txe) const {
 
-			if (!m_iof)
-				return Toolbox::Instance()->void_any;
-
-			return m_iof->GetAny (dname);
+			if (m_iof) {
+				switch (m_ios) {
+					case CODRAW:  break;
+					case HDF5:    return ((HDF5File*)m_iof)->Read<T>(txe);
+					case MATLAB:  return ((MLFile*)m_iof)->Read<T>(txe);
+					case ISMRM:   return ((IRDFile*)m_iof)->Read<T>(txe);
+					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(txe);
+					case GE:      break;
+					case PHILIPS: break;
+					default:      break;
+				}
+			}
 
 		}
-
 
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		template<class T>
-		const Matrix<T>& Get (const std::string& dname) const {
+		template <class T>
+		bool Write (const Matrix<T>& M, const TiXmlElement* txe) {
 
-			return m_iof->Get<T> (dname);
+			if (m_iof) {
+				switch (m_ios) {
+					case CODRAW:  break;
+					case HDF5:    return ((HDF5File*)m_iof)->Write(M,txe);
+					case MATLAB:  return ((MLFile*)m_iof)->Write(M,txe);
+					case ISMRM:   return ((IRDFile*)m_iof)->Write(M,txe);
+					case SYNGOMR: return ((SyngoFile*)m_iof)->Write(M,txe);
+					case GE:      break;
+					case PHILIPS: break;
+					default:      break;
+				}
+			}
+
 		}
+
 
 
 		/**
@@ -176,13 +212,43 @@ namespace io{
 		}
 
 
+		/**
+		 * @brief   Return concrete handle's status
+		 */
+		error_code Close () const {
+
+			if (m_iof)
+				return m_iof->CleanUp();
+
+			return NULL_FILE_HANDLE;
+
+		}
+
+	private:
+
+
+		void Concretize (const std::string& fname, const IOMode mode,
+				const Params& params, const bool verbosity) {
+
+			switch (m_ios) {
+				case CODRAW:  break;
+				case HDF5:    m_iof = (IOFile*) new HDF5File  (fname, mode, params, verbosity); break;
+				case MATLAB:  m_iof = (IOFile*) new MLFile    (fname, mode, params, verbosity); break;
+				case ISMRM:   m_iof = (IOFile*) new IRDFile   (fname, mode, params, verbosity); break;
+				case SYNGOMR: m_iof = (IOFile*) new SyngoFile (fname, mode, params, verbosity); break;
+				case GE:      break;
+				case PHILIPS: break;
+				default:      printf ("Failed to make IO context concrete!\n ");  break;
+			}
+
+		}
+
+		IOStrategy m_ios;
 		IOFile* m_iof; /**< @brief  My actual context */
 
 	};
 
-}
-}
-}
+}}}
 
 
 #endif /* __IOCONTEXT_HPP__ */

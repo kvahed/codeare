@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <assert.h>
 
 static inline std::vector<std::string>
 Split     (const std::string& str, const std::string& dlm) {
@@ -32,7 +33,6 @@ Split     (const std::string& str, const std::string& dlm) {
 	assert (dlm.size() > 0);
 
 	std::vector<std::string> sv;
-	
 	size_t  start = 0, end = 0;
 	
 	while (end != std::string::npos) {

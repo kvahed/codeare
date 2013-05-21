@@ -555,6 +555,29 @@ namespace io      {
 		}
 
 
+		template<class T> Matrix<T>
+		Read (const std::string& name) const {
+			Matrix<T> M;
+			return M;
+		}
+
+		template<class T> bool
+		Write (const Matrix<T>& M, const std::string& uri) {
+			return false;
+		}
+
+		template<class T> Matrix<T>
+		Read (const TiXmlElement* txe) const {
+			Matrix<T> M;
+			return M;
+		}
+
+		template<class T> bool
+		Write (const Matrix<T>& M, const TiXmlElement* txe) {
+			return false;
+		}
+
+
 		error_code
 		Read (const std::string& dname = "") {
 			return Read (SCAN_MEAS);

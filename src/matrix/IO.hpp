@@ -980,34 +980,34 @@ H5Read (Matrix<T>& M, const string fname, const string dname, const string dloc 
 
 static inline std::string
 demangle (const char* symbol) {
-	
+
 #ifdef HAVE_CXXABI_H
-	
+
 	size_t size;
 	int    status;
 	char   temp[128];
 	char*  demangled;
-	
+
 	//first, try to demangle a c++ name
 	if (1 == sscanf(symbol, "%*[^(]%*[^_]%127[^)+]", temp)) {
-		
+
 		if (NULL != (demangled = abi::__cxa_demangle(temp, NULL, &size, &status))) {
 			std::string result(demangled);
 			free(demangled);
 			return result;
 		}
 	}
-	
+
 	//if that didn't work, try to get a regular c symbol
 	if (1 == sscanf(symbol, "%127s", temp)) {
 		return temp;
 	}
-	
-#endif 
-	
+
+#endif
+
 	//if all else fails, just return the symbol
 	return symbol;
-	
+
 }
 
 
@@ -1170,13 +1170,13 @@ MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc =
 	
 	mxArray*  mxa = 0;
 	
-	if      (typeid(T) == typeid(double))
-		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
-	else if (typeid(T) == typeid(float))
+	if      (typeid(T) == float_type)
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS,    mxREAL);
-	else if (typeid(T) == typeid(cxfl))
+	else if (typeid(T) == double_type)
+		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
+	else if (typeid(T) == cxfl_type)
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
-	else if (typeid(T) == typeid(cxdb))
+	else if (typeid(T) == cxdb_type)
 		mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS, mxCOMPLEX);
 	else if (typeid(T) == typeid(short))
 		mxa = mxCreateNumericArray (INVALID_DIM, dim,  mxINT16_CLASS,    mxREAL);
@@ -1185,7 +1185,7 @@ MXDump (const Matrix<T>& M, MATFile* mf, const string dname, const string dloc =
 	
 	// Copy to memory block ----------------------
 	
-	if (typeid(T) == typeid(cxfl)) {
+	if (typeid(T) == cxfl_type) {
 	    float* re = (float*)mxGetData(mxa);
 		float* im = (float*)mxGetImagData(mxa);
 		for (size_t i = 0; i < numel(M); i++) {

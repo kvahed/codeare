@@ -2,7 +2,11 @@
 #define __IOFILE_HPP__
 
 #include "Matrix.hpp"
+#include "Complex.hpp"
 #include "Params.hpp"
+
+#include "tinyxml/tinyxml.h"
+#include "tinyxml/xpath_static.h"
 
 namespace codeare {
 namespace matrix  {
@@ -40,6 +44,7 @@ namespace io      {
 		 *
 		 * @param  fname    Filename
 		 * @param  mode     IO mode (READ/WRITE)
+		 * @param  params   Optional parameters
 		 * @param  verbose  Verbose output? (default: true)
 		 */
 		IOFile (const std::string& fname, const IOMode& mode = READ,
@@ -57,7 +62,6 @@ namespace io      {
 
 		}
 
-
 		/**
 		 * @brief  Default destructor
 		 */
@@ -71,14 +75,7 @@ namespace io      {
 		 */
 		virtual error_code
 		CleanUp () {
-
-			while (!m_data.empty()) {
-				delete boost::any_cast<Ptr<Matrix<cxfl> > >(m_data.begin()->second);
-				m_data.erase(m_data.begin());
-			}
-
 			return OK;
-
 		}
 
 
@@ -87,7 +84,7 @@ namespace io      {
 		 *
 		 * @return  File name
 		 */
-		std::string
+		inline std::string
 		FileName() const {
 			return m_fname;
 		}
@@ -98,7 +95,7 @@ namespace io      {
 		 *
 		 * @return Verbosity
 		 */
-		bool
+		inline bool
 		Verbosity() const {
 			return m_verb;
 		}
@@ -109,7 +106,7 @@ namespace io      {
 		 *
 		 * @return Status
 		 */
-		error_code
+		inline error_code
 		Status () const {
 			return m_status;
 		}
@@ -120,7 +117,7 @@ namespace io      {
 		 *
 		 * @return Memory allocated?
 		 */
-		bool
+		inline bool
 		Allocated () const {
 			return m_alloc;
 		}
@@ -131,7 +128,7 @@ namespace io      {
 		 *
 		 * @return Write lock?
 		 */
-		bool
+		inline bool
 		Locked () const {
 			return (m_mode == WRITE);
 		}
@@ -142,8 +139,8 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		virtual error_code
-		Read (const std::string& dname = "") = 0;
+		template<class T> Matrix<T>
+		Read (const std::string& uri) const;
 
 
 		/**
@@ -151,44 +148,32 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		virtual error_code
-		Write (const std::string& dname = "") = 0;
+		template<class T> bool
+		Write (const Matrix<T>& M, const std::string& uri);
+
 
 		/**
-		 * @brief  Get data by name
+		 * @brief Read a particular data set from file
 		 *
-		 * @return  Any data type
+		 * @return  Success
 		 */
-		boost::any&
-		GetAny (const std::string& dname) {
-
-			std::map<std::string, boost::any>::iterator it;
-			it = m_data.find(dname);
-
-			if (it == m_data.end()) {
-				printf ("  ERROR: No dataset by the name %s found?!\n",
-						dname.c_str());
-				return Toolbox::Instance()->void_any;
-			}
-
-			return it->second;
-
+		template<class T> Matrix<T>
+		Read (const TiXmlElement* txe) const {
+			std::string uri (txe->Attribute("uri"));
+			return this->Read<T>(uri);
 		}
 
 
 		/**
-		 * @brief  Get casted Matrix by name
+		 * @brief  Write data to file
 		 *
-		 * @return  Any data type
+		 * @return  Success
 		 */
-		template<class T> Matrix<T>&
-		Get (const std::string& dname) {
-			return *boost::any_cast<Ptr<Matrix<T> > >(GetAny(dname));
+		template<class T> bool
+		Write (const Matrix<T>& M, const TiXmlElement* txe) {
+			std::string uri (txe->Attribute("uri"));
+			return this->Write (M, uri);
 		}
-
-
-
-
 
 	protected:
 
@@ -196,7 +181,7 @@ namespace io      {
 
 		error_code  m_status; /**< @brief Status */
 
-		IOMode      m_mode;   /**< @Brief IO mode */
+		IOMode      m_mode;   /**< @brief IO mode */
 
 		bool        m_fopen;  /**< @brief File open? */
 		bool        m_verb;   /**< @brief Verbosity */

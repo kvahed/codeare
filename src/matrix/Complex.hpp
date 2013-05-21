@@ -41,13 +41,28 @@ static const std::type_info& int_type (typeid(int));
 static const std::type_info& size_t_type (typeid(size_t));
 
 template<class T>
-static inline bool fp_type (const T& t) {
+static inline bool fp_type (const T t) {
 	return (typeid(T) == float_type || typeid(T) == double_type ||
 			typeid(T) ==  cxfl_type || typeid(T) ==   cxdb_type );
 }
 
 template<class T>
-static inline bool i_type (const T& t) {
+static inline bool is_complex (const T t) {
+	return (typeid(T) == cxfl_type || typeid(T) == cxdb_type );
+}
+
+template<class T>
+static inline bool is_singlep (const T t) {
+	return (typeid(T) == cxfl_type || typeid(T) == float_type );
+}
+
+template<class T>
+static inline bool is_doublep (const T t) {
+	return (typeid(T) == cxdb_type || typeid(T) == double_type );
+}
+
+template<class T>
+static inline bool i_type (const T t) {
 return (typeid(T) == short_type || typeid(T) == long_type ||
 		typeid(T) ==  bool_type || typeid(T) ==   int_type );
 }

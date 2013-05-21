@@ -47,15 +47,15 @@ syngotest (Connector<T>* rc) {
 		return false;
 	}
 
-	IOContext ioc (fname, SYNGOMR, params);
+	IOContext ioc (fname, SYNGOMR, READ, params);
 
 	if (ioc.Status() != OK) {
 		printf ("\n  Couldn't initialise RawParser. Exiting!\n");
 		return false;
 	}
 
-	ioc.Read("");
-	meas = squeeze(ioc.Get<cxfl>("meas"));
+	//ioc.Read("");
+	//meas = squeeze(ioc.Get<cxfl>("meas"));
 	MXDump (meas, "meas.mat", "meas");
 
 	printf ("    Matrix dims: %s\n", DimsToCString(meas));
