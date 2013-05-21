@@ -50,6 +50,8 @@
 /src/matrix/arithmetic/t_fliplr
 /src/matrix/arithmetic/t_flipud
 /src/matrix/arithmetic/t_resize
+src/pTXRFPulse0.ini.sag_ap
+src/pTXRFPulse0.ini.tra_ap
 
 ## folders (global) ##
 .deps/
