@@ -156,7 +156,9 @@ namespace io{
 					{
 					case CODRAW:  break;
 					case HDF5:    return ((HDF5File*)m_iof)->Read<T>(uri);
+#ifdef HAVE_MAT_H
 					case MATLAB:  return ((MLFile*)m_iof)->Read<T>(uri);
+#endif
 					case ISMRM:   return ((IRDFile*)m_iof)->Read<T>(uri);
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(uri);
 					case GE:      break;
@@ -177,7 +179,9 @@ namespace io{
 				switch (m_ios) {
 					case CODRAW:  break;
 					case HDF5:    return ((HDF5File*)m_iof)->Write(M,uri);
+#ifdef HAVE_MAT_H
 					case MATLAB:  return ((MLFile*)m_iof)->Write(M,uri);
+#endif
 					case ISMRM:   return ((IRDFile*)m_iof)->Write(M,uri);
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Write(M,uri);
 					case GE:      break;
@@ -198,7 +202,9 @@ namespace io{
 				switch (m_ios) {
 					case CODRAW:  break;
 					case HDF5:    return ((HDF5File*)m_iof)->Read<T>(txe);
+#ifdef HAVE_MAT_H
 					case MATLAB:  return ((MLFile*)m_iof)->Read<T>(txe);
+#endif
 					case ISMRM:   return ((IRDFile*)m_iof)->Read<T>(txe);
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(txe);
 					case GE:      break;
@@ -219,7 +225,9 @@ namespace io{
 				switch (m_ios) {
 					case CODRAW:  break;
 					case HDF5:    return ((HDF5File*)m_iof)->Write(M,txe);
+#ifdef HAVE_MAT_H
 					case MATLAB:  return ((MLFile*)m_iof)->Write(M,txe);
+#endif
 					case ISMRM:   return ((IRDFile*)m_iof)->Write(M,txe);
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Write(M,txe);
 					case GE:      break;
@@ -266,7 +274,9 @@ namespace io{
 			switch (m_ios) {
 				case CODRAW:  break;
 				case HDF5:    m_iof = (IOFile*) new HDF5File  (fname, mode, params, verbosity); break;
+#ifdef HAVE_MAT_H
 				case MATLAB:  m_iof = (IOFile*) new MLFile    (fname, mode, params, verbosity); break;
+#endif
 				case ISMRM:   m_iof = (IOFile*) new IRDFile   (fname, mode, params, verbosity); break;
 				case SYNGOMR: m_iof = (IOFile*) new SyngoFile (fname, mode, params, verbosity); break;
 				case GE:      break;
