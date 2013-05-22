@@ -1,2 +1,2 @@
 #!/bin/sh
-../src/lclient -b ../share/ktpoints/ -c config_homogen.xml -t KTPoints -d 7t-8ch-8p.mat
+../src/lclient -b ../share/ktpoints/ -c 7t-8ch-8p.xml -t KTPoints

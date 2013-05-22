@@ -82,7 +82,8 @@ namespace io {
 			IOFile (fname, mode, params, verbose) {
 
 			if (verbose)
-				printf ("Opening %s\n", fname.c_str());
+				printf ("Opening %s (%s).\n", fname.c_str(), (mode == READ) ? "r" : "w");
+
 			m_file = matOpen (fname.c_str(), (mode == READ) ? "r" : "w" );
 
 			if (m_file == NULL)

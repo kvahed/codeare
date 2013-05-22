@@ -1,24 +1,25 @@
+#include "matrix/io/IOContext.hpp"
+
 template <class T> bool
 nuffttest (Connector<T>* rc) {
+
+	using namespace codeare::matrix::io;
 
 	Matrix<cxdb>   rawdata;
 	Matrix<double> weights;
 	Matrix<double> kspace;
 	Matrix<cxdb>   img;
-	
-	std::string    cf  = std::string (base + std::string(config));
-	std::string    df  = std::string (base + std::string(data));
-	std::string    odf = std::string (base + std::string("/images.mat"));
 
-	rc->ReadConfig (cf.c_str());
+	std::string ipf = base;
+	ipf += rc->GetElement("/config/data-in")->Attribute("fname");
+
 	rc->Init(test);
 
-#ifdef HAVE_MAT_H	
-	if (!(MXRead (weights, df, "weights") && 
-		  MXRead (rawdata, df,    "data") && 
-		  MXRead  (kspace, df,  "kspace") ))
-		return false;
-#endif
+	IOContext in = fopen (ipf, "r");
+	rawdata = fread<cxfl> (in, "data");
+	kspace  = fread<float> (in, "kspace");
+	weights = fread<float> (in, "weights");
+	fclose (in);
 	
 	rc->SetMatrix    ("data",    rawdata);
 	rc->SetMatrix    ("weights", weights);
@@ -28,18 +29,16 @@ nuffttest (Connector<T>* rc) {
 	rc->Process      (test);
 	
 	rc->GetMatrix    ("img", img);
+	img.SetClassName("img");
 
 	rc->Finalise(test);
 
-#ifdef HAVE_MAT_H	
-	MXDump   (img, odf.c_str(), "image");
-#endif
+	std::string opf = base;
+	opf += rc->GetElement("/config/data-out")->Attribute("fname");
+	IOContext out = fopen (opf, "w");
+	fwrite (out, img);
+	fclose (out);
 
-	/*
-#ifdef HAVE_NIFTI1_IO_H
-	NIDump   (img, "image.nii.gz");
-#endif
-	*/
 	return true;
 	
 }

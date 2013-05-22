@@ -56,7 +56,7 @@ namespace io{
 		IOContext (const std::string& fname, const std::string& fmode) :
 			m_iof(0), m_ios(HDF5) {
 
-			assert (fmode.compare("r") || fmode.compare("rb") || fmode.compare("w") || fmode.compare("wb"));
+			assert (fmode.compare("r") == 0 || fmode.compare("rb") == 0 || fmode.compare("w") == 0 || fmode.compare("wb") == 0);
 
 			if (HasSuffix (fname, ".h5"))
 				m_ios = HDF5;
@@ -70,9 +70,9 @@ namespace io{
 				m_ios = SYNGOMR;
 
 			IOMode mode;
-			if (fmode.compare("r") || fmode.compare("rb"))
+			if (fmode.compare("r") == 0 || fmode.compare("rb") == 0)
 				mode = READ;
-			else if (fmode.compare("w") || fmode.compare("wb"))
+			else if (fmode.compare("w") == 0 || fmode.compare("wb") == 0)
 				mode = WRITE;
 
 			this->Concretize(fname, mode, Params(), false);
@@ -303,7 +303,7 @@ namespace io{
 	 * @return        Number of written elements
 	 */
 	template<class T> inline static
-	size_t fwrite (const IOContext& f, const Matrix<T>& M) {
+	size_t fwrite (IOContext& f, const Matrix<T>& M) {
 		f.Write (M, M.GetClassName());
 	}
 

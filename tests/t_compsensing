@@ -1,2 +1,2 @@
 #!/bin/sh
-../src/lclient -b ../share/compressedsensing/ -c config_denoise.xml -t CompressedSensing
+../src/lclient -b ../share/compressedsensing/ -c phantom_denoising.xml -t CompressedSensing
