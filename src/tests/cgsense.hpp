@@ -34,6 +34,8 @@ cgsensetest (RRClient::Connector<T>* rc) {
     // Outgoing
     Matrix<cxfl>  image;
 
+    std::cout << rc->GetElement("/config/data-in");
+
     // Read data
     IOContext ic (rc->GetElement("/config/data-in"), base, READ);
     rawdata = ic.Read<cxfl>(rc->GetElement("/config/data-in/d"));

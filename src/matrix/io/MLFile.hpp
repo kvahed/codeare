@@ -81,6 +81,8 @@ namespace io {
 		MLFile (const std::string& fname, const IOMode mode, const Params& params = Params(), const bool verbose = false) :
 			IOFile (fname, mode, params, verbose) {
 
+			if (verbose)
+				printf ("Opening %s\n", fname.c_str());
 			m_file = matOpen (fname.c_str(), (mode == READ) ? "r" : "w" );
 
 			if (m_file == NULL)

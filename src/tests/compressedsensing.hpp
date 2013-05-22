@@ -18,8 +18,12 @@
  *  02110-1301  USA
  */
 
+#include "matrix/io/IOContext.hpp"
+
 template <class T> bool
 cstest (Connector<T>* con) {
+
+    using namespace codeare::matrix::io;
 
 	Matrix<cxfl>  indata;
 	Matrix<cxfl>  im_dc;
@@ -27,33 +31,25 @@ cstest (Connector<T>* con) {
 	Matrix<float> pdf;
 	Matrix<cxfl>  pc;
 	
-	std::string   cf  = std::string (base + std::string(config));
-	std::string   odf = std::string (base + std::string("/csout.mat"));
+    // Read data
+    IOContext ic (con->GetElement("/config/data-in"), base, READ);
+    indata = ic.Read<cxfl>(con->GetElement("/config/data-in/data"));
+    mask   = ic.Read<float>(con->GetElement("/config/data-in/mask"));
+    pdf    = ic.Read<float>(con->GetElement("/config/data-in/pdf"));
+    pc     = ic.Read<cxfl>(con->GetElement("/config/data-in/pc"));
+    ic.Close();
 
-	con->ReadConfig (cf.c_str());
-	
 	if (con->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}
 	
-	if (!Read (indata, con->GetElement("/config/data/data"), base))
-		return false;
-	if (!Read (pdf,    con->GetElement("/config/data/pdf"),  base))
-		pdf  = Matrix<float>(1);
-	if (!Read (mask,   con->GetElement("/config/data/mask"), base))
-		mask = Matrix<float>(1);
-	if (!Read (pc,     con->GetElement("/config/data/pc"),   base))
-		pc   = Matrix<cxfl> (1);
-
-
 	// Outgoing -------------
 	
 	con->SetMatrix  ("data", indata); // Measurement data
 	con->SetMatrix  ("pdf",  pdf);    // Sensitivities
 	con->SetMatrix  ("mask", mask);   // Weights
 	con->SetMatrix  ("pc",   pc);     // Phase correction
-	
 	// ---------------------
 	
 	con->Process (test);
@@ -62,29 +58,15 @@ cstest (Connector<T>* con) {
 	
 	con->GetMatrix ("im_dc", im_dc);  // Recon output
 	con->GetMatrix ("data",  indata); // Weighted FT of original input
-	
 	// ---------------------
 	
 	con->Finalise   (test);
 	
-#ifdef HAVE_MAT_H	
-
-	MATFile* mf = matOpen (odf.c_str(), "w");
-
-	if (mf == NULL) {
-		printf ("Error creating file %s\n", odf.c_str());
-		return false;
-	}
-
-	MXDump (indata, mf, "in");
-	MXDump (im_dc,  mf, "out");
-
-	if (matClose(mf) != 0) {
-		printf ("Error closing file %s\n", odf.c_str());
-		return false;
-	}
-
-#endif
+    // Write images
+    IOContext oc (con->GetElement("/config/data-out"), base, WRITE);
+    oc.Write(im_dc, "out");
+    oc.Write(indata, "in");
+    oc.Close();
 	
 	return true;
 	

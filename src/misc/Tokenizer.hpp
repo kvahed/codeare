@@ -51,4 +51,17 @@ Split     (const std::string& str, const std::string& dlm) {
 
 }
 
+
+
+static inline bool
+HasSuffix (const std::string& str, const std::string suf) {
+
+	assert (str.length() > 0);
+	assert (suf.length() > 0);
+
+	return (str.length() >= suf.length()) ?
+		   (0 == str.compare(str.length() - suf.length(), suf.length(), suf)) : false;
+
+}
+
 #endif 

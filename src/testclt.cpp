@@ -32,7 +32,9 @@ int main (int argc, char** argv) {
 		Connector<RemoteConnector>* con = new Connector<RemoteConnector> (name, verbose);
 #endif	
 		
-		std::string cf = std::string (base + std::string(config));
+		std::string cf = base;
+		cf += "/"; 
+		cf += std::string(config);
 		if (cf.compare(std::string(base)) != 0)
             con->ReadConfig (cf.c_str());
 

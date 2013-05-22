@@ -27,8 +27,8 @@ namespace io{
 	/**
 	 * @brief Supported data formats
 	 */
-	enum IOStrategy {CODRAW = 0, HDF5, MATLAB, ISMRM, SYNGOMR, GE, PHILIPS};
-	static const std::string IOSName[6] = {"CODRAW", "HDF5", "MATLAB", "SYNGOMR", "GE", "PHILIPS"};
+	enum IOStrategy {CODRAW = 0, HDF5, MATLAB, ISMRM, NIFTI, SYNGOMR, GE, PHILIPS, NO_STRATEGY};
+	static const std::string IOSName[(int)NO_STRATEGY] = {"CODRAW", "HDF5", "MATLAB", "NIFTI", "SYNGOMR", "GE", "PHILIPS"};
 
 	/**
 	 * @brief       Interface to concrete IO implementation
@@ -53,6 +53,37 @@ namespace io{
 		/**
 		 *
 		 */
+		IOContext (const std::string& fname, const std::string& fmode) :
+			m_iof(0), m_ios(HDF5) {
+
+			assert (fmode.compare("r") || fmode.compare("rb") || fmode.compare("w") || fmode.compare("wb"));
+
+			if (HasSuffix (fname, ".h5"))
+				m_ios = HDF5;
+			else if (HasSuffix (fname, ".mat"))
+				m_ios = MATLAB;
+			else if (HasSuffix (fname, ".cod"))
+				m_ios = CODRAW;
+			else if (HasSuffix (fname, ".nii"))
+				m_ios = NIFTI;
+			else if (HasSuffix (fname, ".dat"))
+				m_ios = SYNGOMR;
+
+			IOMode mode;
+			if (fmode.compare("r") || fmode.compare("rb"))
+				mode = READ;
+			else if (fmode.compare("w") || fmode.compare("wb"))
+				mode = WRITE;
+
+			this->Concretize(fname, mode, Params(), false);
+
+		}
+
+
+
+		/**
+		 *
+		 */
 		IOContext (const std::string& fname, const IOStrategy& ios = HDF5,
 				const IOMode& mode = READ, const Params& params = Params(),
 				const bool verbosity = true) :
@@ -70,6 +101,11 @@ namespace io{
 				const IOMode mode = READ, const bool verbosity = true) :
 			m_iof(0), m_ios(HDF5) {
 
+			if (!txe)
+				printf ("Ouch, XML element for construction is 0!\n");
+
+			std::string fname = base + "/" + std::string(txe->Attribute("fname"));
+
 			std::string ftype (txe->Attribute("ftype"));
 
 			if (ftype.compare("CODRAW") == 0)
@@ -80,8 +116,6 @@ namespace io{
 				m_ios = HDF5;
 			else if (ftype.compare("SYNGOMR") == 0)
 				m_ios = SYNGOMR;
-
-			std::string fname = base + "/" + std::string(txe->Attribute("fname"));
 
 			this->Concretize(fname, mode, Params(), verbosity);
 
@@ -119,17 +153,17 @@ namespace io{
 		Read (const std::string& uri) const {
 
 			if (m_iof) {
-				//switch (m_ios) {
-					//case CODRAW:  break;
-					//case HDF5:
-				printf ("hallo\n");return ((HDF5File*)m_iof)->Read<T>(uri);
-				/*	case MATLAB:  return ((MLFile*)m_iof)->Read<T>(uri);
+				switch (m_ios) 
+					{
+					case CODRAW:  break;
+					case HDF5:    return ((HDF5File*)m_iof)->Read<T>(uri);
+					case MATLAB:  return ((MLFile*)m_iof)->Read<T>(uri);
 					case ISMRM:   return ((IRDFile*)m_iof)->Read<T>(uri);
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(uri);
 					case GE:      break;
 					case PHILIPS: break;
 					default:      break;
-				}*/
+				}
 			}
 
 		}
@@ -247,6 +281,28 @@ namespace io{
 		IOFile* m_iof; /**< @brief  My actual context */
 
 	};
+
+	inline static
+	IOContext fopen (const std::string& fname, const std::string& mode) {
+		return IOContext (fname, mode);
+	}
+
+	template<class T> inline static
+	size_t fwrite (const IOContext& f, const Matrix<T>& M) {
+		f.Write (M, M.GetClassName());
+	}
+
+	template<class T> inline static
+	Matrix<T> fread (const IOContext& f, const std::string& name) {
+		return f.Read<T> (name);
+	}
+
+	static int
+	fclose (IOContext& f) {
+		return (int)f.Close();
+	}
+
+
 
 }}}
 
