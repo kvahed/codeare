@@ -34,10 +34,10 @@ ktptest (Connector<T>* rc) {
 	
     IOContext ic (rc->GetElement("/config/data-in"), base, READ);
     target  = ic.Read<cxfl>(rc->GetElement("/config/data-in/target"));
-    b1      = ic.Read<cxfl>(rc->GetElement("/config/data-in/b1"));
     b0      = ic.Read<float>(rc->GetElement("/config/data-in/b0"));
     k	    = ic.Read<float>(rc->GetElement("/config/data-in/k"));
     r	    = ic.Read<float>(rc->GetElement("/config/data-in/r"));
+    b1      = ic.Read<cxfl>(rc->GetElement("/config/data-in/b1"));
     ic.Close();
 
 	rc->Init(test);
