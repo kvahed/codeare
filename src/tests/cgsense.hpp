@@ -31,11 +31,6 @@ cgsensetest (RRClient::Connector<T>* rc) {
     Matrix<float> weights; // NUFFT weights
     Matrix<float> kspace;  // Kspace positions O(Nkx,Nky,Nkz)
 
-    // Outgoing
-    Matrix<cxfl>  image;
-
-    std::cout << rc->GetElement("/config/data-in");
-
     // Read data
     IOContext ic (rc->GetElement("/config/data-in"), base, READ);
     rawdata = ic.Read<cxfl>(rc->GetElement("/config/data-in/d"));
@@ -58,8 +53,10 @@ cgsensetest (RRClient::Connector<T>* rc) {
     // Recon
     rc->SetMatrix (   "data", rawdata); // Measurement data
     rc->Process   (test);
-    
-    // Receive & finalise
+
+    // Outgoing
+    Matrix<cxfl>  image;
+
     rc->GetMatrix (  "image", image);  // Images
     rc->Finalise   (test);
 

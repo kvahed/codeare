@@ -105,7 +105,6 @@ namespace io{
 				printf ("Ouch, XML element for construction is 0!\n");
 
 			std::string fname = base + "/" + std::string(txe->Attribute("fname"));
-
 			std::string ftype (txe->Attribute("ftype"));
 
 			if (ftype.compare("CODRAW") == 0)
@@ -282,21 +281,52 @@ namespace io{
 
 	};
 
+	/**
+	 * @brief         Convenience interface to IOContext class. Close to MATLAB behaviour of fopen.
+	 *
+	 * @param  fname  File name (full path)
+	 * @param  mode   Access mode ("r" || "w")
+	 *
+	 * @return        File IO context for further use.
+	 */
 	inline static
 	IOContext fopen (const std::string& fname, const std::string& mode) {
 		return IOContext (fname, mode);
 	}
 
+	/**
+	 * @brief         Convenience interface to IOContext class. Close to MATLAB behaviour of fwrite.
+	 *
+	 * @param  f      IO context, which has been created with fopen.
+	 * @param  M      Data matrix for writing.
+	 *
+	 * @return        Number of written elements
+	 */
 	template<class T> inline static
 	size_t fwrite (const IOContext& f, const Matrix<T>& M) {
 		f.Write (M, M.GetClassName());
 	}
 
+	/**
+	 * @brief         Convenience interface to IOContext class. Close to MATLAB behaviour of fread.
+	 *
+	 * @param  f      IO context, which has been created with fopen.
+	 * @param  name   Name of data object, which needs to be read from the file.
+	 *
+	 * @return        Data matrix
+	 */
 	template<class T> inline static
 	Matrix<T> fread (const IOContext& f, const std::string& name) {
 		return f.Read<T> (name);
 	}
 
+	/**
+	 * @brief         Convenience interface to IOContext class. Close to MATLAB behaviour of fclose.
+	 *
+	 * @param  f      IO context, which has been created with fopen.
+	 *
+	 * @return        Success (Any value > 0 indicates a problem).
+	 */
 	static int
 	fclose (IOContext& f) {
 		return (int)f.Close();
