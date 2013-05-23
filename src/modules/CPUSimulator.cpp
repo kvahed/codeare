@@ -1,4 +1,5 @@
 #include "CPUSimulator.hpp"
+#include "Algos.hpp"
 #include "Creators.hpp"
 #include "linalg/Lapack.hpp"
 #include "MRI.hpp"

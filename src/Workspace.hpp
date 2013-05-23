@@ -129,6 +129,8 @@ class Workspace {
 		m_ref.insert (ref(name, tag));
 		m_store.insert (entry (tag[0], value));
 
+        m->SetClassName(name.c_str());
+        
 		return *m;
 
 	}

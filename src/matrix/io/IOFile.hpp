@@ -4,6 +4,7 @@
 #include "Matrix.hpp"
 #include "Complex.hpp"
 #include "Params.hpp"
+#include "Print.hpp"
 
 #include "tinyxml/tinyxml.h"
 #include "tinyxml/xpath_static.h"
@@ -13,6 +14,24 @@ namespace matrix  {
 namespace io      {
 
 	enum IOMode {READ, WRITE};
+
+    
+    /**
+     * brief          Does a file exist?
+     * 
+     * @param  fname  File name
+     * @return        Does it exist?
+     */
+    inline bool
+    FExists (const char* fname) {
+		
+        ifstream fs (fname);
+        return (fs);
+        
+    }
+    
+
+
 
 	// TODO: deliver some crap
 	template<class T>

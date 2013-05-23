@@ -19,6 +19,7 @@
  */
 
 #include "RelativeSensitivities.hpp"
+#include "Print.hpp"
 #include "MITK.hpp"
 
 
@@ -60,7 +61,6 @@ RelativeSensitivities::Process     () {
     printf ("  Data:\n");
     printf ("    Dimensions: %s \n", DimsToCString(data));
     printf ("    Reolutions: %s \n", ResToCString(data));
-	MXDump (data, "f.mat", "data");
 
 	mask = squeeze (mask);
     printf ("  Mask:\n");

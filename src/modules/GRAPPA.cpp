@@ -19,6 +19,7 @@
  */
 
 #include "GRAPPA.hpp"
+#include "Print.hpp"
 
 using namespace RRStrategy;
 

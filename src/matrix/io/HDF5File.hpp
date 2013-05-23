@@ -246,6 +246,27 @@ namespace io {
 	};
 
 
+	template<class T> inline static
+	bool h5write (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
+
+		HDF5File file (fname, WRITE);
+		file.Write(M, uri);
+
+		return true;
+
+	}
+
+	template<class T> inline static
+	bool h5read (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
+
+		HDF5File h5f (fname, READ);
+		M = h5f.Read<T>(uri);
+
+		return true;
+
+	}
+
+
 
 }// namespace io
 }// namespace matrix

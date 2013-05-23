@@ -1,6 +1,6 @@
 /*
  *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Jülich, Germany
+ *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ enum SIM_MODE {
 	CG   // CG ATA
 };
 
-#include "../common.h"
+#include "common.h"
 #include "Matrix.hpp"
-#include "IO.hpp"
+#include "IOContext.hpp"
 
 namespace RRStrategy {
 	
@@ -71,42 +71,6 @@ namespace RRStrategy {
 		Ptr< Matrix<cxfl> >   mxy;  /**<! Excited transverse magnetisation  */
 		Ptr< Matrix<float> >   mz;  /**<! Longitudinal magnetisation        */
 
-		bool Dump (std::string odf) {
-			
-#ifdef HAVE_MAT_H	
-			
-			MATFile* mf = matOpen (odf.c_str(), "w");
-			
-			if (mf == NULL) {
-				printf ("Error creating file %s\n", odf.c_str());
-				return false;
-			}
-			
-			MXDump   (*b1, mf, "b1"  );
-			MXDump    (*r,  mf, "r"   );
-			MXDump   (*b0, mf, "b0"  );
-			MXDump    (*g,  mf, "g"   );
-			MXDump (*tmxy, mf, "tmxy");
-			MXDump  (*tmz, mf, "tmz" );
-			MXDump (*smxy, mf, "smxy");
-			MXDump  (*smz, mf, "smz" );
-			MXDump  (*jac, mf, "jac" );
-			MXDump   (*rf, mf, "rf"  );
-			MXDump  (*mxy, mf, "mxy" );
-			MXDump   (*mz, mf, "mz"  );
-			
-			if (matClose(mf) != 0) {
-				printf ("Error closing file %s\n", odf.c_str());
-				return false;
-			}
-
-			return true;
-#endif
-
-			return false;
-
-		}
-		
 	};
 
 	/**

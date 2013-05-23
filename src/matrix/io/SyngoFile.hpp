@@ -31,6 +31,7 @@
 #include <complex>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 namespace codeare {
 namespace matrix  {
@@ -527,25 +528,25 @@ namespace io      {
 			m_status = OK;
 
 			/* Calculate data size */
-			CalcSize (verbose);
+			CalcSize (this->m_verb);
 
 			/* Read data into buffer */
-			ReadFile (verbose);
+			ReadFile (this->m_verb);
 
 			/* Exract protocol */
 			ExtractProtocol();
 
 			/* Access matrix sizes */
 			if (amode == SCAN_MEAS)
-				ParseMeas(verbose, true);
+				ParseMeas(this->m_verb, true);
 			else
-				ParseProtocol(verbose);
+				ParseProtocol(this->m_verb);
 
 			/* Allocate matrices */
-			AllocateMatrices(verbose);
+			AllocateMatrices(this->m_verb);
 
 			/* Parse data into matrices */
-			ParseMeas(verbose);
+			ParseMeas(this->m_verb);
 
 			/* Free buffer */
 			CleanUp();

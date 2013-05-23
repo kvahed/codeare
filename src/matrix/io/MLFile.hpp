@@ -17,7 +17,7 @@
 
 
 static inline std::string
-deman (const char* symbol) {
+demangle (const char* symbol) {
 
 #ifdef HAVE_CXXABI_H
 
@@ -55,7 +55,7 @@ MXValidate  (const Matrix<T>& M, const mxArray* mxa) {
 	mxClassID     mcid = mxGetClassID(mxa);
 	std::string cplx = (mxIsComplex(mxa)) ? "complex" : "real";
 
-	const char* vname = deman(typeid(T).name()).c_str();
+	const char* vname = demangle(typeid(T).name()).c_str();
 
 	if (is_singlep(t) && mcid == 7)
 		return true;
@@ -271,6 +271,27 @@ namespace io {
 		MATFile*  m_file;
 
 	};
+
+
+	template<class T> inline static
+	bool mxwrite (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
+
+		MLFile mlf (fname, WRITE);
+		mlf.Write(M, uri);
+
+		return true;
+
+	}
+
+	template<class T> inline static
+	bool mxread (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
+
+		MLFile mlf (fname, READ);
+		M = mlf.Read<T>(uri);
+
+		return true;
+
+	}
 
 }}}
 
