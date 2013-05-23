@@ -376,6 +376,7 @@ AC_MSG_CHECKING(whether host is Mac OS)
 case $host in
     *darwin*)
         LDFLAGS="$LDFLAGS -framework OpenCL"
+        HAVE_LIBOPENCL=1
 		AC_DEFINE(HAVE_LIBOPENCL, 1, [Open CL libraries])
         AC_MSG_RESULT(yes)
     ;;
@@ -695,8 +696,10 @@ if test x"$with_matlabroot" != x"no" ; then
    		matlab_found=yes,
    		[LIBS=$OLD_LIBS]
    		[AC_MSG_ERROR([no. cannot link to libmat, bailing out])])
-
 fi
+
+AM_CONDITIONAL([USE_MATLAB], [test x"$matlab_found" = x"yes"])
+
 
 # BLAS and LAPACK
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[

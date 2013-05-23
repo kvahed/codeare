@@ -50,7 +50,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-TESTS = t_hdf5$(EXEEXT) t_matlab$(EXEEXT)
+TESTS = t_hdf5$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/io/tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -73,13 +73,10 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__EXEEXT_1 = t_hdf5$(EXEEXT) t_matlab$(EXEEXT)
+am__EXEEXT_1 = t_hdf5$(EXEEXT)
 am_t_hdf5_OBJECTS = t_hdf5.$(OBJEXT)
 t_hdf5_OBJECTS = $(am_t_hdf5_OBJECTS)
 t_hdf5_LDADD = $(LDADD)
-am_t_matlab_OBJECTS = t_matlab.$(OBJEXT)
-t_matlab_OBJECTS = $(am_t_matlab_OBJECTS)
-t_matlab_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -93,8 +90,8 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(t_hdf5_SOURCES) $(t_matlab_SOURCES)
-DIST_SOURCES = $(t_hdf5_SOURCES) $(t_matlab_SOURCES)
+SOURCES = $(t_hdf5_SOURCES)
+DIST_SOURCES = $(t_hdf5_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -260,7 +257,6 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/io 
 t_hdf5_SOURCES = $(COMMON) t_hdf5.cpp
-t_matlab_SOURCES = $(COMMON) t_matlab.cpp
 all: all-am
 
 .SUFFIXES:
@@ -307,9 +303,6 @@ clean-checkPROGRAMS:
 t_hdf5$(EXEEXT): $(t_hdf5_OBJECTS) $(t_hdf5_DEPENDENCIES) $(EXTRA_t_hdf5_DEPENDENCIES) 
 	@rm -f t_hdf5$(EXEEXT)
 	$(CXXLINK) $(t_hdf5_OBJECTS) $(t_hdf5_LDADD) $(LIBS)
-t_matlab$(EXEEXT): $(t_matlab_OBJECTS) $(t_matlab_DEPENDENCIES) $(EXTRA_t_matlab_DEPENDENCIES) 
-	@rm -f t_matlab$(EXEEXT)
-	$(CXXLINK) $(t_matlab_OBJECTS) $(t_matlab_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -318,7 +311,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_hdf5.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_matlab.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -662,6 +654,8 @@ uninstall-am:
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am
 
+@USE_MATLAB_TRUE@	TESTS += t_matlab
+@USE_MATLAB_TRUE@	t_matlab_SOURCES = $(COMMON) t_matlab.cpp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

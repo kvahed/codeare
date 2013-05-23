@@ -25,7 +25,9 @@
 #include "ISMRMRD.hpp"
 #include "HDF5File.hpp"
 #include "SyngoFile.hpp"
+#ifdef HAVE_MAT_H
 #include "MLFile.hpp"
+#endif
 
 /*
 #include "NetCDF.hpp"

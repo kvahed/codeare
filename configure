@@ -644,6 +644,8 @@ USE_GSL_FALSE
 USE_GSL_TRUE
 LAPACK
 BLAS
+USE_MATLAB_FALSE
+USE_MATLAB_TRUE
 INC_INSIGHT_H
 INSIGHT_LIB_DIR_FLAG
 INSIGHT_LIB_FLAG
@@ -11979,10 +11981,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"f7f27a95\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"fbbbb6ab\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Sun May 19 00:11:12 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Thu May 23 16:22:12 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -22281,6 +22283,7 @@ $as_echo_n "checking whether host is Mac OS... " >&6; }
 case $host in
     *darwin*)
         LDFLAGS="$LDFLAGS -framework OpenCL"
+        HAVE_LIBOPENCL=1
 
 $as_echo "#define HAVE_LIBOPENCL 1" >>confdefs.h
 
@@ -24114,8 +24117,17 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-
 fi
+
+ if test x"$matlab_found" = x"yes"; then
+  USE_MATLAB_TRUE=
+  USE_MATLAB_FALSE='#'
+else
+  USE_MATLAB_TRUE='#'
+  USE_MATLAB_FALSE=
+fi
+
+
 
 # BLAS and LAPACK
 
@@ -25466,6 +25478,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_NFFT3_TRUE}" && test -z "${USE_NFFT3_FALSE}"; then
   as_fn_error $? "conditional \"USE_NFFT3\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${USE_MATLAB_TRUE}" && test -z "${USE_MATLAB_FALSE}"; then
+  as_fn_error $? "conditional \"USE_MATLAB\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_GSL_TRUE}" && test -z "${USE_GSL_FALSE}"; then
