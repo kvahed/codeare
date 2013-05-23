@@ -52,6 +52,8 @@
 /src/matrix/arithmetic/t_resize
 src/pTXRFPulse0.ini.sag_ap
 src/pTXRFPulse0.ini.tra_ap
+src/matrix/io/tests/t_hdf5
+src/matrix/io/tests/t_matlab
 
 ## folders (global) ##
 .deps/

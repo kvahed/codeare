@@ -90,22 +90,21 @@ namespace io {
 			DataSet   dataset = m_file.openDataSet(uri);
 			DataSpace space   = dataset.getSpace();
 			hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
-			size_t    ndim    = MIN(space.getSimpleExtentDims(dims, NULL),INVALID_DIM);
-
+			size_t    ndim    = MIN(space.getSimpleExtentDims(dims, NULL), (is_complex(t)) ? INVALID_DIM + 1 : INVALID_DIM);
 
 			if (this->m_verb)
 				printf ("Reading dataset %s ... ", uri.c_str());
 			fflush(stdout);
 
-			std::vector<size_t> mdims (ndim,1);
-
 			if (is_complex(t))
 				--ndim;
+
+			std::vector<size_t> mdims (ndim,1);
 
 			for (size_t i = 0; i < ndim; ++i)
 				mdims[i] = dims[ndim-i-1];
 
-			PredType*  type;
+			PredType* type;
 			if      (is_singlep(t))
 				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
 			else if (is_doublep(t))
