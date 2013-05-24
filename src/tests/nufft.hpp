@@ -29,12 +29,12 @@ nuffttest (Connector<T>* rc) {
 	rc->Process      (test);
 	
 	rc->GetMatrix    ("img", img);
-	img.SetClassName("img");
 
 	rc->Finalise(test);
 
 	std::string opf = base;
 	opf += rc->GetElement("/config/data-out")->Attribute("fname");
+
 	IOContext out = fopen (opf, "w");
 	fwrite (out, img);
 	fclose (out);

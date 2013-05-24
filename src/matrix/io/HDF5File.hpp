@@ -15,6 +15,18 @@
 #include <H5Cpp.h>
 using namespace H5;
 
+
+enum dtype {
+
+	RLFL,
+	RLDB,
+	CXFL,
+	CXDB,
+	LONG,
+	SHRT
+
+};
+
 namespace codeare {
 namespace matrix {
 namespace io {
@@ -236,8 +248,7 @@ namespace io {
 
 	private:
 
-		HDF5File (const HDF5File& h5f) {}
-
+		HDF5File (const HDF5File&) {}
 		HDF5File  () {}
 
 		H5File m_file; /// @brief My file
@@ -246,23 +257,22 @@ namespace io {
 	};
 
 
-	template<class T> inline static
-	bool h5write (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
+#define h5write(X,Y) _h5write (X,Y,#X)
+	template<class T> inline static bool
+	_h5write (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
 
-		HDF5File file (fname, WRITE);
-		file.Write(M, uri);
-
+		HDF5File h5f (fname, WRITE);
+		h5f.Write(M, uri);
 		return true;
 
 	}
 
-	template<class T> inline static
-	bool h5read (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
+
+	template<class T> inline static Matrix<T>
+	h5read (const std::string& fname, const std::string& uri) {
 
 		HDF5File h5f (fname, READ);
-		M = h5f.Read<T>(uri);
-
-		return true;
+		return h5f.Read<T>(uri);
 
 	}
 

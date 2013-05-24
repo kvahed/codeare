@@ -22,14 +22,25 @@ namespace io      {
      * @param  fname  File name
      * @return        Does it exist?
      */
-    inline bool
-    FExists (const char* fname) {
-		
+    inline static bool
+    fexists (const char* fname) {
+    	assert (fname[0] != '\0');
         ifstream fs (fname);
         return (fs);
-        
     }
     
+
+    /**
+     * brief          Does a file exist?
+     *
+     * @param  fname  File name
+     * @return        Does it exist?
+     */
+    inline static bool
+    fexists (const std::string& fname) {
+        return (fexists(fname.c_str()));
+    }
+
 
 
 

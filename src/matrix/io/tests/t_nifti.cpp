@@ -5,24 +5,24 @@
  *      Author: kvahed
  */
 
-#include "HDF5File.hpp"
+#include "NIFile.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
 
 using namespace codeare::matrix::io;
 
-std::string mname = "/group1/group2/A";
-std::string fname = "test.h5";
+std::string fname = "test.nii";
+std::string mname = "t_nifti";
 
 template <class T>
 inline static bool write (const Matrix<T> A) {
-	HDF5File nf (fname, WRITE);
+	NIFile nf (fname, WRITE);
 	nf.Write (A, mname);
 }
 
 template <class T>
 inline static bool read (Matrix<T>& A) {
-	HDF5File nf (fname, READ);
+	NIFile nf (fname, READ);
 	A = nf.Read<T>(mname);
 }
 
@@ -31,18 +31,11 @@ inline static bool check () {
 
 	Matrix<T> A = rand<T>(3,4), B;
 
-	// Class interface
 	write(A);
 	read(B);
 
-#if defined (VERBOSE)
-	std::cout << (A == B);
-	std::cout << std::endl;
-#endif
-
-	// Convenience interface
-	h5write (A,fname);
-    B = h5read<T> (fname,"/A");
+/*	h5write (A,fname);
+    A = h5read<T> (fname);*/
 
 #if defined (VERBOSE)
 	std::cout << (A == B);

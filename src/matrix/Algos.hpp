@@ -22,9 +22,11 @@
 #ifndef __ALGOS_HPP__
 #define __ALGOS_HPP__
 
-#include "IO.hpp"
+#include "Matrix.hpp"
 #include "math.h"
 #include <limits>
+#include <vector>
+#include <algorithm>    // std::reverse
 
 template <bool> struct _assert;
 template <> struct _assert<true> { };
@@ -995,7 +997,7 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	assert (ndnew == ndold);
 
 	// Every number between 0 and ndnew must appear exactly once
-	vector<bool> occupied;
+	std::vector<bool> occupied;
 	occupied.resize(ndnew);
 	for (i = 0; i < ndnew; ++i) {
 		assert (!occupied[perm[i]]);

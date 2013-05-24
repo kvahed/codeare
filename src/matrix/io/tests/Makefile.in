@@ -654,7 +654,13 @@ uninstall-am:
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am
 
+#if USE_NIFTI
+	TESTS += t_nifti
+#endif
 @USE_MATLAB_TRUE@	TESTS += t_matlab
+#if USE_NIFTI
+	t_nifti_SOURCES = $(COMMON) t_nifti.cpp
+#endif
 @USE_MATLAB_TRUE@	t_matlab_SOURCES = $(COMMON) t_matlab.cpp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

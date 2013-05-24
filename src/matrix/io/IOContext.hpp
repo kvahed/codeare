@@ -25,13 +25,18 @@
 #include "ISMRMRD.hpp"
 #include "HDF5File.hpp"
 #include "SyngoFile.hpp"
+#include "NIFile.hpp"
+
 #ifdef HAVE_MAT_H
 #include "MLFile.hpp"
 #endif
 
+#ifdef HAVE_NIFTI1_IO_H
+#include "NIFile.hpp"
+#endif
+
 /*
 #include "NetCDF.hpp"
-#include "Nifti.hpp"
 #include "CodRaw.hpp"
 #include "GE.hpp"
 #include "PHILIPS.hpp"
@@ -129,6 +134,8 @@ namespace io{
 				m_ios = MATLAB;
 			else if (ftype.compare("HDF5") == 0)
 				m_ios = HDF5;
+			else if (ftype.compare("NIFTI") == 0)
+				m_ios = NIFTI;
 			else if (ftype.compare("SYNGOMR") == 0)
 				m_ios = SYNGOMR;
 
@@ -176,6 +183,9 @@ namespace io{
 					case MATLAB:  return ((MLFile*)m_iof)->Read<T>(uri);
 #endif
 					case ISMRM:   return ((IRDFile*)m_iof)->Read<T>(uri);
+#ifdef HAVE_NIFTI1_IO_H
+					case NIFTI:   return ((NIFile*)m_iof)->Read<T>(uri);
+#endif
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(uri);
 					case GE:      break;
 					case PHILIPS: break;
@@ -199,6 +209,9 @@ namespace io{
 					case MATLAB:  return ((MLFile*)m_iof)->Write(M,uri);
 #endif
 					case ISMRM:   return ((IRDFile*)m_iof)->Write(M,uri);
+#ifdef HAVE_NIFTI1_IO_H
+					case NIFTI:   return ((NIFile*)m_iof)->Write(M,uri);
+#endif
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Write(M,uri);
 					case GE:      break;
 					case PHILIPS: break;
@@ -222,6 +235,9 @@ namespace io{
 					case MATLAB:  return ((MLFile*)m_iof)->Read<T>(txe);
 #endif
 					case ISMRM:   return ((IRDFile*)m_iof)->Read<T>(txe);
+#ifdef HAVE_NIFTI1_IO_H
+					case NIFTI:   return ((NIFile*)m_iof)->Read<T>(txe);
+#endif
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(txe);
 					case GE:      break;
 					case PHILIPS: break;
@@ -245,6 +261,9 @@ namespace io{
 					case MATLAB:  return ((MLFile*)m_iof)->Write(M,txe);
 #endif
 					case ISMRM:   return ((IRDFile*)m_iof)->Write(M,txe);
+#ifdef HAVE_NIFTI1_IO_H
+					case NIFTI:   return ((NIFile*)m_iof)->Write(M,txe);
+#endif
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Write(M,txe);
 					case GE:      break;
 					case PHILIPS: break;
@@ -285,7 +304,7 @@ namespace io{
 
 
 		void Concretize (const std::string& fname, const IOMode mode,
-				const Params& params, const bool verbosity) {
+			const Params& params, const bool verbosity) {
 
 			switch (m_ios) {
 				case CODRAW:  break;
@@ -294,6 +313,9 @@ namespace io{
 				case MATLAB:  m_iof = (IOFile*) new MLFile    (fname, mode, params, verbosity); break;
 #endif
 				case ISMRM:   m_iof = (IOFile*) new IRDFile   (fname, mode, params, verbosity); break;
+#ifdef HAVE_NIFTI1_IO_H
+				case NIFTI:   m_iof = (IOFile*) new NIFile    (fname, mode, params, verbosity); break;
+#endif
 				case SYNGOMR: m_iof = (IOFile*) new SyngoFile (fname, mode, params, verbosity); break;
 				case GE:      break;
 				case PHILIPS: break;
@@ -328,9 +350,10 @@ namespace io{
 	 *
 	 * @return        Number of written elements
 	 */
+#define fwrite(X,Y) _fwrite(X,Y,#X)
 	template<class T> inline static
-	size_t fwrite (IOContext& f, const Matrix<T>& M) {
-		f.Write (M, M.GetClassName());
+	size_t _fwrite (IOContext& f, const Matrix<T>& M, const std::string& name) {
+		f.Write (M, name);
 	}
 
 	/**

@@ -268,28 +268,30 @@ namespace io {
 
 	private:
 
-		MATFile*  m_file;
+		MLFile (const MLFile& mf) : m_file(0) {}
+		MLFile ()                 : m_file(0) {}
+
+		MATFile*                    m_file;
 
 	};
 
 
-	template<class T> inline static
-	bool mxwrite (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
+#define mxwrite(X,Y) _h5write (X,Y,#X)
+	template<class T> inline static bool
+	_mxwrite (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
 
-		MLFile mlf (fname, WRITE);
-		mlf.Write(M, uri);
-
+		MLFile mf (fname, WRITE);
+		mf.Write(M, uri);
 		return true;
 
 	}
 
-	template<class T> inline static
-	bool mxread (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
 
-		MLFile mlf (fname, READ);
-		M = mlf.Read<T>(uri);
+	template<class T> inline static Matrix<T>
+	mxread (const std::string& fname, const std::string& uri) {
 
-		return true;
+		MLFile mf (fname, READ);
+		return mf.Read<T>(uri);
 
 	}
 

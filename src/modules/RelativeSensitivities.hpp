@@ -29,6 +29,8 @@
 #include "IO.hpp"
 #include "DFT.hpp"
 #include "arithmetic/Trigonometry.hpp"
+#include "NIFile.hpp"
+#include "Print.hpp"
 
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
@@ -322,7 +324,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 
 	Matrix<double> tmp = codeare::matrix::arithmetic::log (img);
 	
-	NIDump(tmp, orig);
+	niwrite (tmp, orig);
 	printf ("exporting ... "); fflush(stdout);
 	
 	if (!std::system(NULL))
@@ -333,7 +335,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	int i = system (cmd.c_str());
 	
 	printf ("exited with %i, importing ... ", i); fflush(stdout);
-	NIRead(msk, mask);
+	msk = niread<short>(mask);
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 

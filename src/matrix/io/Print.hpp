@@ -19,6 +19,9 @@
  *  02110-1301  USA
  */
 
+#ifndef __PRINT_HPP__
+#define __PRINT_HPP__
+
 #include "Matrix.hpp"
 
 /**
@@ -206,3 +209,4 @@ operator<< (std::ostream& os, const Matrix<T>& M) {
 
 }
 
+#endif
