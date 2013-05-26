@@ -5,10 +5,10 @@ template Matrix<double> chol (const Matrix<double>& A, const char& = 'U');
 template Matrix<cxfl> chol (const Matrix<cxfl>& A, const char& = 'U');
 template Matrix<cxdb> chol (const Matrix<cxdb>& A, const char& = 'U');
 
-template int eig (const Matrix<cxfl>&, Matrix<cxfl>&, Matrix<cxfl>&, Matrix<cxfl>&, const char& = 'N', const char& = 'N');
-template int eig (const Matrix<cxdb>&, Matrix<cxdb>&, Matrix<cxdb>&, Matrix<cxdb>&, const char& = 'N', const char& = 'N');
-template int eig (const Matrix<float>&, Matrix<cxfl>&, Matrix<float>&, Matrix<float>&, const char& = 'N', const char& = 'N');
-template int eig (const Matrix<double>&, Matrix<cxdb>&, Matrix<double>&, Matrix<double>&, const char& = 'N', const char& = 'N');
+template boost::tuple<Matrix<float>,Matrix<cxfl>,Matrix<float> > eig2<float,cxfl> (const Matrix<float>&, const char& = 'N', const char& = 'N');
+template boost::tuple<Matrix<double>,Matrix<cxdb>,Matrix<double> > eig2<double,cxdb> (const Matrix<double>&, const char& = 'N', const char& = 'N');
+template boost::tuple<Matrix<cxfl>,Matrix<cxfl>,Matrix<cxfl> > eig2<cxfl,cxfl> (const Matrix<cxfl>&, const char& = 'N', const char& = 'N');
+template boost::tuple<Matrix<cxdb>,Matrix<cxdb>,Matrix<cxdb> > eig2<cxdb,cxdb> (const Matrix<cxdb>&, const char& = 'N', const char& = 'N');
 
 template float dot (const Matrix<float>&, const Matrix<float>&);
 template double dot (const Matrix<double>&, const Matrix<double>&);
@@ -45,8 +45,8 @@ template Matrix<double> pinv (const Matrix<double>&, const char& = 'N');
 template Matrix<cxfl> pinv (const Matrix<cxfl>&, const char& = 'N');
 template Matrix<cxdb> pinv (const Matrix<cxdb>&, const char& = 'N');
 
-template int svd (const Matrix<float>&, Matrix<float>&, Matrix<float>&, Matrix<float>&, const char& = 'N');
-template int svd (const Matrix<double>&, Matrix<double>&, Matrix<double>&, Matrix<double>&, const char& = 'N');
-template int svd (const Matrix<cxfl>&, Matrix<float>&, Matrix<cxfl>&, Matrix<cxfl>&, const char& = 'N');
-template int svd (const Matrix<cxdb>&, Matrix<double>&, Matrix<cxdb>&, Matrix<cxdb>&, const char& = 'N');
+template boost::tuple<Matrix<float>,Matrix<float>,Matrix<float> > svd2<float,float> (const Matrix<float>&, const char& = 'N');
+template boost::tuple<Matrix<double>,Matrix<double>,Matrix<double> > svd2<double,double> (const Matrix<double>&, const char& = 'N');
+template boost::tuple<Matrix<cxfl>,Matrix<float>,Matrix<cxfl> > svd2<cxfl,float> (const Matrix<cxfl>&, const char& = 'N');
+template boost::tuple<Matrix<cxdb>,Matrix<double>,Matrix<cxdb> > svd2<cxdb,double> (const Matrix<cxdb>&, const char& = 'N');
 

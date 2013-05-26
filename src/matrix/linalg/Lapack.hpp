@@ -27,6 +27,7 @@
 #include "LapackTraits.hpp"
 #include "CX.hpp"
 
+#include <boost/tuple/tuple.hpp>
 
 /**
  * @brief         Eigenvalue decomposition
@@ -51,11 +52,15 @@
  * @param  jobvr  Compute right vectors ('N'/'V')
  * @return        Status of driver
  */
-template <class T, class S> inline int
-eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char& jobvl = 'N', const char& jobvr = 'N') {
+template <class T, class S> inline boost::tuple< Matrix<T>, Matrix<S>, Matrix<T> >
+eig2 (const Matrix<T>& m, const char& jobvl = 'N', const char& jobvr = 'N') {
     
 	typedef typename LapackTraits<T>::RType T2;
+	T t;
     
+	boost::tuple< Matrix<T>, Matrix<S>, Matrix<T> > ret;
+
+
     assert (jobvl == 'N' || jobvl =='V');
 	assert (jobvr == 'N' || jobvr =='V');
     assert (issquare(m));
@@ -68,19 +73,21 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	int    lwork = -1;
     
     // Appropritely resize the output
-	ev = Matrix<S>(N,1);
+	boost::get<1>(ret) = Matrix<S>(N,1);
     
-	if (jobvl == 'V')
-        lv = Matrix<T>(N,N);
-    if (jobvr == 'V')
-        rv = Matrix<T>(N,N);
+	if (jobvl == 'V') boost::get<0>(ret) = Matrix<T>(N,N);
+    if (jobvr == 'V') boost::get<2>(ret) = Matrix<T>(N,N);
     
+    Matrix<S>& ev = boost::get<1>(ret);
+    Matrix<T> &lv = boost::get<0>(ret), &rv = boost::get<2>(ret);
+
+
     // Workspace for real numbers
-    VECTOR_TYPE(T2) rwork = (typeid(T) == cxfl_type || typeid(T) == cxdb_type) ?
+    VECTOR_TYPE(T2) rwork = (is_complex(t)) ?
     	VECTOR_CONSTR(T2,2*N) : VECTOR_CONSTR(T2,1);
 
     // Workspace for complex numbers
-	VECTOR_TYPE(T) work = VECTOR_CONSTR(T,1);
+	VECTOR_TYPE( T)  work = VECTOR_CONSTR(T,1);
 	
 	// Need copy. Lapack destroys A on output.
 	Matrix<T> a = m;
@@ -101,8 +108,21 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
 	} else if (info < 0)
 		printf ("\nERROR - XGEEV: the %d-th argument had an illegal value.\n\n", -info);
     
-	return info;
+	return ret;
 	
+}
+
+inline Matrix<cxfl> eig (const Matrix<float>& m) {
+	return boost::get<1>(eig2<float,cxfl>(m,'N','N'));
+}
+inline Matrix<cxdb> eig (const Matrix<double>& m) {
+	return boost::get<1>(eig2<double,cxdb>(m,'N','N'));
+}
+inline Matrix<cxfl> eig (const Matrix<cxfl>& m) {
+	return boost::get<1>(eig2<cxfl,cxfl>(m,'N','N'));
+}
+inline Matrix<cxdb> eig (const Matrix<cxdb>& m) {
+	return boost::get<1>(eig2<cxdb,cxdb>(m,'N','N'));
 }
 
 
@@ -138,10 +158,11 @@ eig (const Matrix<T>& m, Matrix<S>& ev, Matrix<T>& lv, Matrix<T>& rv, const char
  * @return          Status of the driver
  */
 
-template<class T, class S> inline int 
-svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& jobz = 'N') {
+template<class T, class S> inline boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> >
+svd2 (const Matrix<T>& IN, const char& jobz = 'N') {
     
 	typedef typename LapackTraits<T>::RType T2;
+	boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> > ret;
     
     assert (is2d(IN));
     assert (jobz == 'N' || jobz == 'S' || jobz == 'A');
@@ -171,9 +192,9 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 		vtcol = (m>=n) ? mn : n;
 	}
 
-	s = Matrix<S> (  mn,  IONE);
-	U = Matrix<T> ( ldu,  ucol);
-	V = Matrix<T> (ldvt, vtcol);
+	Matrix<S>& s = boost::get<1>(ret) = Matrix<S>(  mn,  IONE);
+	Matrix<T>& U = boost::get<0>(ret) = Matrix<T>( ldu,  ucol);
+	Matrix<T>& V = boost::get<2>(ret) = Matrix<T>(ldvt, vtcol);
 	
 	VECTOR_TYPE(int) iwork = VECTOR_CONSTR(int, 8 * mn);
 	
@@ -182,13 +203,15 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	rwork = VECTOR_CONSTR (T2, nr);
 
 	// Workspace query
-	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, &work[0], lwork, &rwork[0], &iwork[0], info);
+	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0],
+			ldvt, &work[0], lwork, &rwork[0], &iwork[0], info);
 	
 	lwork = (int) creal (work[0]);
 	work.resize(lwork);
     
 	// SVD
-	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0], ldvt, &work[0], lwork, &rwork[0], &iwork[0], info);
+	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0],
+			ldvt, &work[0], lwork, &rwork[0], &iwork[0], info);
     
     
     // Traspose the baby
@@ -200,39 +223,22 @@ svd (const Matrix<T>& IN, Matrix<S>& s, Matrix<T>& U, Matrix<T>& V, const char& 
 	else if (info < 0)
 		printf ("\nERROR - XGESDD: The %i-th argument had an illegal value.\n\n", -info); 
 	
-	return info;
+	return ret;
 	
 } 
 // Convenience calls (for s = svd (A))	
-inline Matrix<float> 
-svd (const Matrix<cxfl>& A) {
-    Matrix<float> s;
-    Matrix<cxfl> u,v;
-    svd(A, s, u, v);
-    return s;
+inline Matrix<float> svd (const Matrix<float>& A) {
+    return boost::get<1>(svd2<float,float>(A));
+}
+inline Matrix<double> svd (const Matrix<double>& A) {
+    return boost::get<1>(svd2<double,double>(A));
+}
+inline Matrix<float> svd (const Matrix<cxfl>& A) {
+    return boost::get<1>(svd2<cxfl,float>(A));
 } 
-inline  Matrix<float> 
-svd (const Matrix<float>& A) {
-    Matrix<float> s;
-    Matrix<float> u,v;
-    svd(A, s, u, v);
-    return s;
-} 
-inline Matrix<double>
-svd (const Matrix<cxdb>& A) {
-    Matrix<double> s;
-    Matrix<cxdb> u,v;
-    svd(A, s, u, v);
-    return s;
-} 
-inline Matrix<double>
-svd (const Matrix<double>& A) {
-    Matrix<double> s;
-    Matrix<double> u,v;
-    svd(A, s, u, v);
-    return s;
-} 
-
+inline Matrix<double> svd (const Matrix<cxdb>& A) {
+    return boost::get<1>(svd2<cxdb,double>(A));
+}
 
 /**
  * @brief                Invert quadratic well conditioned matrix

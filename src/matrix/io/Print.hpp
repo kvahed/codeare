@@ -24,6 +24,9 @@
 
 #include "Matrix.hpp"
 
+#include <sstream>
+
+
 /**
  * @brief          Print dimensions to string
  * 
@@ -66,7 +69,7 @@ DimsToCString (const Matrix<T>& M) {
 template <class T> inline static std::string 
 ResToString (const Matrix<T>& M) {
 	
-	stringstream ss;
+	std::stringstream ss;
 	
 	for (size_t i = 0; i < ndims(M); i++)
 		ss << M.Res(i) << " ";

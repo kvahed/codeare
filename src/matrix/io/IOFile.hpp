@@ -18,6 +18,59 @@ namespace io      {
 	enum IOMode {READ, WRITE};
 
     
+	/**
+	 * @brief           Verbose wrapper around fwrite
+	 *
+	 * @param  d        Data repository to write from
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	inline static bool
+	mwrite (const void* d, const size_t sz, const size_t n, FILE* f, std::string desc) {
+
+		if (size_t l = fwrite (d, sz, n, f) != n) {
+
+			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
+			fclose (f);
+			return false;
+
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * @brief           Verbose wrapper around fread
+	 *
+	 * @param  d        Place holder to read into
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	inline static bool
+	mread (void* d, const size_t sz, const size_t n, FILE* f, const std::string desc) {
+
+		if (size_t l = fread (d, sz, n, f) != n) {
+
+			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
+			fclose (f);
+			return false;
+
+		}
+
+		return true;
+
+	}
+
+
+
+
     /**
      * brief          Does a file exist?
      * 

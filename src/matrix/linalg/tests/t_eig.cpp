@@ -2,23 +2,24 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 #include "Lapack.hpp"
-
+#include "Print.hpp"
 
 template<class T, class S> void eig_check () {
 
-    Matrix<T> A = rand<T>(6,6), lv(6,6), rv(6,6);
-    Matrix<S> ev;
+    Matrix<T> A = rand<T>(6,6);
+    boost::tuple <Matrix<T>,Matrix<S>,Matrix<T> > lev;
 
 #ifdef VERBOSE    
     std::cout << "A =\n" << A;
 #endif
     
-    eig (A, ev, lv, rv, 'V', 'V');
+    lev = eig2<T,S> (A, 'V', 'V');
     
 #ifdef VERBOSE    
-    std::cout << "ev=\n" << ev;
-    std::cout << "lv=\n" << lv;
-    std::cout << "rv=\n" << rv;
+    std::cout << "ev=\n" << boost::get<1>(lev);
+    std::cout << "ev=\n" << eig(A);
+    std::cout << "lv=\n" << boost::get<0>(lev);
+    std::cout << "rv=\n" << boost::get<2>(lev);
     std::cout << std::endl;
 #endif
 

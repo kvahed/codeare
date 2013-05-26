@@ -2,37 +2,40 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 #include "Lapack.hpp"
+#include "Print.hpp"
 
 template<class T, class S> void svd_check () {
 
-    Matrix<T> A = rand<T>(8,3), U, V;
-    Matrix<S> s;
+    Matrix<T> A = rand<T>(8,3);
+    boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> > usv;
 
 #ifdef VERBOSE
     std::cout << "A=\n" << A;
 #endif
     
-    svd (A, s, U, V, 'N');
+    usv = svd2<T,S> (A);
+
 #ifdef VERBOSE
-    std::cout << "U=\n" << U;
-    std::cout << "S=\n" << s;
-    std::cout << "V=\n" << V;
+    std::cout << "U=\n" << boost::get<0>(usv);
+    std::cout << "S=\n" << boost::get<1>(usv);
+    std::cout << "S=\n" << svd(A);
+    std::cout << "V=\n" << boost::get<2>(usv);
     std::cout << std::endl;
 #endif
 
-    svd (A, s, U, V, 'S');
+    usv = svd2<T,S> (A, 'S');
 #ifdef VERBOSE
-    std::cout << "U=\n" << U;
-    std::cout << "S=\n" << s;
-    std::cout << "V=\n" << V;
+    std::cout << "U=\n" << boost::get<0>(usv);
+    std::cout << "S=\n" << boost::get<1>(usv);
+    std::cout << "V=\n" << boost::get<2>(usv);
     std::cout << std::endl;
 #endif
 
-    svd (A, s, U, V, 'A');
+    usv = svd2<T,S> (A, 'A');
 #ifdef VERBOSE
-    std::cout << "U=\n" << U;
-    std::cout << "S=\n" << s;
-    std::cout << "V=\n" << V;
+    std::cout << "U=\n" << boost::get<0>(usv);
+    std::cout << "S=\n" << boost::get<1>(usv);
+    std::cout << "V=\n" << boost::get<2>(usv);
     std::cout << std::endl;
 #endif
 
