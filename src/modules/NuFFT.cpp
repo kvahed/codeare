@@ -21,7 +21,6 @@
 #include "NuFFT.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
-#include "IO.hpp"
 
 using namespace RRStrategy;
 

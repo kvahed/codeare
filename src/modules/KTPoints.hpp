@@ -27,8 +27,7 @@
 #include "Toolbox.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
-#include "IO.hpp"
-#include "linalg/Lapack.hpp"
+#include "Lapack.hpp"
 
 /**
  * @brief Reconstruction startegies

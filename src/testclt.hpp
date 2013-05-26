@@ -6,8 +6,6 @@
     #include "RemoteConnector.hpp"
 #endif	
 
-#include "IO.hpp"
-
 #ifndef __WIN32__
     #include "config.h"
 #endif

@@ -350,7 +350,7 @@ namespace io{
 	 *
 	 * @return        Number of written elements
 	 */
-#define fwrite(X,Y) _fwrite(X,Y,#X)
+#define fwrite(X,Y) _fwrite(X,Y,#Y)
 	template<class T> inline static
 	size_t _fwrite (IOContext& f, const Matrix<T>& M, const std::string& name) {
 		f.Write (M, name);

@@ -54,6 +54,9 @@ src/pTXRFPulse0.ini.sag_ap
 src/pTXRFPulse0.ini.tra_ap
 src/matrix/io/tests/t_hdf5
 src/matrix/io/tests/t_matlab
+src/matrix/io/tests/t_nifti
+src/matrix/io/tests/t_codeare
+src/matrix/io/tests/test*
 
 ## folders (global) ##
 .deps/

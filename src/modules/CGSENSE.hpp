@@ -44,7 +44,8 @@ namespace RRStrategy {
 		 * @brief Default constructor
 		 */
 		CGSENSE () : m_cgeps(1.0e-7), m_ncs(0), m_fteps(1.0e-3), m_cgmaxit(10),
-					 m_ftmaxit(3), m_noise(0.0), m_lambda(1.0e-6), m_testcase(0), m_verbose(0) {}
+					 m_ftmaxit(3), m_noise(0.0), m_lambda(1.0e-6), m_testcase(0),
+					 m_verbose(0), m_nthreads (0) {}
 		
 		/**
 		 * @brief Default destructor

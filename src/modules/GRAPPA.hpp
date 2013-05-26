@@ -23,7 +23,6 @@
 
 #include "ReconStrategy.hpp"
 #include "Algos.hpp"
-#include "IO.hpp"
 #include "Toolbox.hpp"
 #include "Creators.hpp"
 #include "CGRAPPA.hpp"
@@ -52,7 +51,8 @@ namespace RRStrategy {
 			m_acsinc(0),
 			m_nt(0),
 			m_nr(0),
-			m_ns(0) {};
+			m_ns(0),
+			m_dim(0) {};
 		
 
 		/**

@@ -15,18 +15,6 @@
 #include <H5Cpp.h>
 using namespace H5;
 
-
-enum dtype {
-
-	RLFL,
-	RLDB,
-	CXFL,
-	CXDB,
-	LONG,
-	SHRT
-
-};
-
 namespace codeare {
 namespace matrix {
 namespace io {

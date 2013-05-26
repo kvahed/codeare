@@ -13,6 +13,8 @@ namespace codeare {
 namespace matrix  {
 namespace io      {
 
+	enum dtype {RLFL, RLDB, CXFL, CXDB, LONG, SHRT};
+
 	enum IOMode {READ, WRITE};
 
     
