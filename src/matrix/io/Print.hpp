@@ -23,6 +23,7 @@
 #define __PRINT_HPP__
 
 #include "Matrix.hpp"
+#include "Algos.hpp"
 
 #include <sstream>
 
