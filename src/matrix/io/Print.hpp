@@ -138,13 +138,13 @@ print (const Matrix<long>& M, std::ostream &os) {
 
 inline static std::ostream&  
 print (const Matrix<double>& M, std::ostream &os) {
-    
+
     for (size_t i = 0; i < M.Dim(0); i++) {
         for(size_t j = 0; j < M.Dim(1); j++)
             printf ("%+.4e ", M(i,j));
         printf("\n");
     }
-    
+
     return os;
     
 }

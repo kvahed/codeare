@@ -487,7 +487,7 @@ size               (const Matrix<T>& M) {
  * @param   M       Matrix
  * @return          Dimension vector.
  */
-template <class T>  inline  VECTOR_TYPE(size_t)
+template <class T>  inline  container<size_t>
 vsize               (const Matrix<T>& M) {
 
 	return size(M).Container();
@@ -708,7 +708,7 @@ resize (const Matrix<T>& M, const size_t& sz) {
 	Matrix<T> res = zeros<T> (sz,1);
 	size_t copysz = MIN(numel(M), sz);
 
-    typedef typename VECTOR_TYPE(T)::iterator VI;
+    typedef typename container<T>::iterator VI;
 
     VI rb = res.Container().begin();
     VI mb = M.Container().begin;
@@ -1069,7 +1069,7 @@ flipud (const Matrix<T>& M)  {
     if (scol == 1) // trivial
         return res;
 
-    typedef typename VECTOR_TYPE(T)::iterator VI;
+    typedef typename container<T>::iterator VI;
     
     VI rb = res.Container().begin();
 

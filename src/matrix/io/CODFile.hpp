@@ -49,10 +49,54 @@ namespace io{
 		template <class T> Matrix<T>
 		Read (const std::string& uri = "") const {
 
+			int dt;
+			size_t  ns, n;
+			std::vector<size_t> dims (INVALID_DIM,1);
+			float res[INVALID_DIM];
+			char* name;
 			Matrix<T> M;
+			T t;
+
+			// Read type
+			if (!mread ( &dt, sizeof(   int),           1, m_file, "data type")) return M;
+
+			// Matrix and data type must fit as of now.
+			if ((typeid(T) == float_type    && dt == RLFL) ||
+				(typeid(T) == double_type   && dt == RLDB) ||
+				(typeid(T) == cxfl_type     && dt == CXFL) ||
+				(typeid(T) == cxdb_type     && dt == CXDB) ||
+				(typeid(T) == typeid(long)  && dt == LONG) ||
+				(typeid(T) == typeid(short) && dt == SHRT)) {
+
+				// Read dimensions and allocate matrix
+				if (!mread (&dims[0], sizeof(size_t), INVALID_DIM, m_file, "dimensions")) return M;
+				M = Matrix<T>(dims);
+				n = numel(M);
+
+				// Read resolutions and assign
+				if (!mread ( res, sizeof( float), INVALID_DIM, m_file, "resolutions")) return M;
+				for (size_t i = 0; i < INVALID_DIM; i++)
+					M.Res(i) = res[i];
+
+				// Name
+				if (!mread ( &ns, sizeof(size_t),           1, m_file, "name length")) return M;
+				name = new char [ns];
+				if (!mread (name,   sizeof(char),          ns, m_file, "name")) return M;
+				M.SetClassName(name);
+
+				// Read data
+				if (!mread (&M[0],     sizeof(T),           n, m_file, "data")) return M;
+
+				//Close and clean up;
+				fclose(f);
+				delete name;
+
+			}
+
 			return M;
 
 		}
+
 
 		template <class T> bool
 		Write (const Matrix<T>& M, const std::string& uri = "") {
@@ -111,7 +155,10 @@ namespace io{
 
 
 	template<class T>
-	static bool codwrite (const std::string& fname, const Matrix<T>& M)
+	static bool codwrite (const std::string& fname, const Matrix<T>& M);
+
+	template<class T>
+	static Matrix<T> codread (const std::string& fname, const )
 
 }
 }

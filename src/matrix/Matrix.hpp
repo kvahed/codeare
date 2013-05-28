@@ -44,7 +44,7 @@ enum IceDim {
 
 #include "OMP.hpp"
 #include "Complex.hpp"
-#include "SIMD.hpp"
+#include "Container.hpp"
 
 #include "cycle.h"            // FFTW cycle implementation
 
@@ -102,26 +102,13 @@ enum IceDim {
 static const size_t dvsz = INVALID_DIM*sizeof(size_t);
 
 /**
- * @brief   Memory paradigm (share, opencl or message passing)
- */
-enum    paradigm {
-
-  SHM, /**< @brief Shared memory (Local RAM) */
-  OCL, /**< @brief Open CL GPU RAM */
-  MPI  /**< @brief Distributed memory */
-  
-};
-
-/**
  * @brief   Matrix template.<br/>
  *          Core data structure
  *          
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
  */
-
-
-template <class T, paradigm P = SHM>
+template <class T, paradigm P=SHM>
 class Matrix  : public SmartObject {
 	
 	
@@ -150,7 +137,7 @@ public:
             _res [i] = 1.0;
         }
 		
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
 		
     }
 	
@@ -187,7 +174,7 @@ public:
 	        _res[i] = 1.0;
 		}
 		
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
 		
 	}
 	
@@ -206,7 +193,7 @@ public:
      * @param  dim      All n <= INVALID_DIM dimensions
      */
 	inline
-    Matrix              (const VECTOR_TYPE(size_t)& dim) {
+    Matrix              (const container<size_t>& dim) {
 		
 		assert (dim.size() <= INVALID_DIM);
 		
@@ -232,7 +219,7 @@ public:
 	        _res[i] = 1.0;
 		}
 		
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
 		
 	}
 	
@@ -261,7 +248,7 @@ public:
 			_res[i] = 1.0;
 		}
 		
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
 		
 	}
 	
@@ -301,7 +288,7 @@ public:
 			_res[i] = 1.0;
 		}
 		
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
 		
 	}
 	
@@ -333,7 +320,7 @@ public:
 			_res[i] = res[i];
 		}
 		
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
 		
 	}
     
@@ -369,7 +356,7 @@ public:
 		for (size_t i = 0; i < INVALID_DIM; ++i)
 			_res [i] = 1.0;
 
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
         
 	}
 
@@ -409,7 +396,7 @@ public:
         for (size_t i = 0; i < INVALID_DIM; ++i)
             _res [i] = 1.0;
 
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
 
     }
 
@@ -450,7 +437,7 @@ public:
         for (size_t i = 0; i < INVALID_DIM; ++i)
             _res [i] = 1.0;
 
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
 
     }
     
@@ -523,7 +510,7 @@ public:
 	    for (size_t i = 0; i < INVALID_DIM; ++i)
 	        _res [i] = 1.0;
 
-        _M = VECTOR_CONSTR(T,DimProd());
+        _M = container<T>(DimProd());
 
 	}
 
@@ -693,7 +680,7 @@ public:
     inline const T*            
     Memory             (const size_t p = 0)  const {
         assert (p < Size());
-        return &(_M[p]);
+        return _M.memory(p);
     }
 
     
@@ -702,7 +689,7 @@ public:
      *  
      * @return          Data container
      */
-    inline VECTOR_TYPE(T)&
+    inline container<T>&
     Container           ()  {
         return _M;
     }
@@ -713,7 +700,7 @@ public:
      *  
      * @return          Data container
      */
-    inline VECTOR_TYPE(T)
+    inline container<T>
     Container           ()  const {
         return _M;
     }
@@ -1182,7 +1169,7 @@ public:
      * @param  v        Data vector (size must match numel(M)).
      */
     inline Matrix<T,P>&
-    operator=           (const VECTOR_TYPE(T)& v) {
+    operator=           (const container<T>& v) {
         
     	assert (_M.size() == v.size());
 
@@ -1687,7 +1674,7 @@ public:
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); ++i)
-			res.Container().at(i) = (_M[i] == M[i]);
+			res[i] = (_M[i] == M[i]);
 
         return res;
 
@@ -1712,7 +1699,7 @@ public:
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); ++i)
-			res.Container().at(i) = (_M[i] == (T)M[i]);
+			res[i] = (_M[i] == (T)M[i]);
 
 		return res;
 
@@ -1735,7 +1722,7 @@ public:
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); ++i)
-			res.Container().at(i) =  (_M[i] == s);
+			res[i] =  (_M[i] == s);
 
         return res;
 
@@ -2974,7 +2961,7 @@ protected:
     float               _res[INVALID_DIM]; /// Resolutions
     
     //Data
-    VECTOR_TYPE(T)    _M; /// Data container
+    container<T>    _M; /// Data container
 
     // Name
     std::string         _name; /// Name
@@ -3133,3 +3120,5 @@ Matrix<float,MPI>::Matrix (const size_t cols, const size_t rows) {
 #endif
 
 #endif // __MATRIX_H__
+
+
