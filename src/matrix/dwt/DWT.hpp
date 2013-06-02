@@ -68,14 +68,14 @@ public:
     DWT (const size_t& sl, const wlfamily& wf = WL_DAUBECHIES, const size_t& wm = 4) {
         
         // Checks missing !!!
-        
+
         m_wf = wf;
-        
+
         if (m_wf > ID) {
-            
+
             m_sl   = sl;
             m_sz   = sl*sl;
-            
+
             switch (wf) {
                 case WL_DAUBECHIES         : m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies,          wm); break;
                 case WL_DAUBECHIES_CENTERED: m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies_centered, wm); break;
@@ -85,16 +85,16 @@ public:
                 case WL_BSPLINE_CENTERED   : m_w = gsl_wavelet_alloc (gsl_wavelet_bspline_centered,    wm); break;
                 default                    : m_w = gsl_wavelet_alloc (gsl_wavelet_daubechies,          wm); break;
             }
-            
+
             m_work = gsl_wavelet_workspace_alloc (m_sz);
             m_iwork = gsl_wavelet_workspace_alloc (m_sz);
 
             m_re = VECTOR_CONSTR(Type,m_sz);
             if (typeid(T) == cxfl_type || typeid(T) == cxdb_type)
                 m_im = VECTOR_CONSTR(Type,m_sz);
-            
+
         }
-        
+
     }
     
 
@@ -171,17 +171,17 @@ private:
 	Transform    (const Matrix<T>& m, const bool& bw = false)  {
         
         Matrix<T> res = m;
-        
+
         if (m_wf > ID) {
-            
+
             // Checks missing !!!
-            
+
             DWTTraits<T>::prepare (res, m_re, m_im, m_sl);
-            
+
             omp_set_num_threads (2);
 
             if (bw) {
-                
+
 #pragma omp parallel default (shared)
             	{
             		if (omp_get_thread_num()) {
@@ -207,27 +207,27 @@ private:
                 }
 
             }
-            
+
             DWTTraits<T>::finalize (res, m_re, m_im, m_sl);
-            
+
         }
-        
+
         return res;
         
     }
     
 	wlfamily m_wf;                 /**< @brief wavelet family */
-    
+
 	size_t  m_sz;                  /**< @brief data size */
 	size_t  m_sl;                  /**< @brief side length */
-    
+
 	VECTOR_TYPE(double) m_re;                   /**< @brief Real store */
 	VECTOR_TYPE(double) m_im;                   /**< @brief Imag store */
-	
+
 	gsl_wavelet_workspace *m_work; /**< @brief Work space */
 	gsl_wavelet_workspace *m_iwork;
 	gsl_wavelet           *m_w;    /**< @brief Wavelet    */
-    
+
 	
 };
 
