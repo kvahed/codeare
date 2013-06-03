@@ -12,4 +12,4 @@
 #ifdef HAVE_MPI
     #include "mpitest.hpp"
 #endif
-
+# include "dwt2test.hpp"

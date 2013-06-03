@@ -36,41 +36,34 @@ struct DWTTraits { };
 /**
  * @brief C++ friendly interface to DWT (double precision)
  */
-/*
+
 template<>
 struct DWTTraits<double> {
 
 	typedef double mType;
 	typedef double Type;
-	
-	
-	// Allocate memory for type "Type"
-	static inline Type *
-	Malloc (const size_t& n) {
-        return (Type *) malloc ( n * sizeof (Type) );
-	}
-	
+
 	
 	// copy matrix data to real / imaginary array
 	static inline void
-	prepare (Matrix<mType> & m, Type* re, Type* im) {
-        memcpy (re, &m[0], m.Size() * sizeof(Type));
+	prepare (Matrix<mType> & m, VECTOR_TYPE(Type)& re, VECTOR_TYPE(Type)& im, size_t sl) {
+        memcpy (&re[0], &m[0], m.Size() * sizeof(Type));
 	}
 	
 	
 	// copy DWT data back to matrix
 	static inline void
-	finalize (Matrix<mType> & m, Type* re, Type* im) {
-        memcpy (&m[0], re, m.Size() * sizeof(Type));
+	finalize (Matrix<mType> & m, VECTOR_TYPE(Type)& re, VECTOR_TYPE(Type)& im, size_t sl) {
+        memcpy (&m[0], &re[0], m.Size() * sizeof(Type));
 	}
 	
 	
 	// DWT non-standard, inverse
 	static inline int
-	nstransform_inverse (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false) {
+	nstransform_inverse (const gsl_wavelet * w, VECTOR_TYPE(Type)& data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false) {
 
 	if (!im)
-		return gsl_wavelet2d_nstransform_inverse (w, data, tda, size1, size2, work);
+		return gsl_wavelet2d_nstransform_inverse (w, &data[0], tda, size1, size2, work);
 	else
 		return GSL_SUCCESS;
 
@@ -80,11 +73,11 @@ struct DWTTraits<double> {
   // DWT non-standard, forward
   static inline
   int
-  nstransform_forward (const gsl_wavelet * w, Type * data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
+  nstransform_forward (const gsl_wavelet * w, VECTOR_TYPE(Type)& data, size_t tda, size_t size1, size_t size2, gsl_wavelet_workspace * work, bool im = false)
   {
 		
 		if (!im)
-      return gsl_wavelet2d_nstransform_forward (w, data, tda, size1, size2, work);
+      return gsl_wavelet2d_nstransform_forward (w, &data[0], tda, size1, size2, work);
     else
       return GSL_SUCCESS;
 
@@ -93,12 +86,12 @@ struct DWTTraits<double> {
 
 };
 
-*/
+
 
 /**
  * @brief C++ friendly interface to DWT (single precision)
  */
-/*
+
 template<>
 struct DWTTraits<float> {
 
@@ -106,18 +99,10 @@ struct DWTTraits<float> {
 	typedef double Type;
 	
 	
-	// Allocate memory for type "Type"
-	static inline
-	Type *
-	Malloc (size_t n) {
-	  return (Type *) malloc ( n * sizeof (Type) );
-	}
-	
-	
 	// copy matrix data to real / imaginary array
 	static inline
 	void
-	prepare (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
+	prepare (Matrix<mType> & m, VECTOR_TYPE(Type)& re, VECTOR_TYPE(Type)& im, size_t sl) {
 	  
    	for (size_t j = 0; j < sl; j++)
 			for (size_t i = 0; i < sl; i++)
@@ -129,7 +114,7 @@ struct DWTTraits<float> {
 	// copy DWT data back to matrix
 	static inline
 	void
-	finalize (Matrix<mType> & m, Type* re, Type* im, size_t sl) {
+	finalize (Matrix<mType> & m, VECTOR_TYPE(Type)& re, VECTOR_TYPE(Type)& im, size_t sl) {
 	
  		for (size_t j = 0; j < sl; j++)
 			for (size_t i = 0; i < sl; i++) 
@@ -167,7 +152,7 @@ struct DWTTraits<float> {
 
 
 };
-*/
+
 
 /**
  * @brief C++ friendly interface to complex DWT (double precision)

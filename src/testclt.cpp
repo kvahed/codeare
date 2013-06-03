@@ -54,6 +54,7 @@ int main (int argc, char** argv) {
 #endif
 		//else if (!strcmp (test, "ocl"))                   oclmatrixtest(con);
 		//else                                              internaltest (con);
+		else if (!strcmp (test, "dwt2"))					dwt2test	(con);
 
 		delete con;
 		
