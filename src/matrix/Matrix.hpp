@@ -1148,6 +1148,7 @@ public:
 
         if (this != &M) {
 
+
             for (size_t i = 0; i < INVALID_DIM; ++i) {
                 _dim[i] = M.Dim()[i];
                 _res[i] = M.Res()[i];
@@ -1444,8 +1445,6 @@ public:
     inline Matrix<T,P>&
     operator+=         (const Matrix<T,P>& M) {
 
-        size_t i;
-
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #if defined USE_VALARRAY
@@ -1562,7 +1561,11 @@ public:
     operator!=          (const T s) const {
 
         Matrix<bool> res(_dim);
-        res.Container() = (_M != s);
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = _M[i] != s;
         return res;
 
     }
@@ -1742,7 +1745,11 @@ public:
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
         Matrix<bool> res(_dim,_res);
-        res.Container() = (_M != M.Container());
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = (_M[i]!= M[i]);
         return res;
 
     }

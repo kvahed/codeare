@@ -651,6 +651,8 @@ INSIGHT_LIB_DIR_FLAG
 INSIGHT_LIB_FLAG
 HAVE_INSIGHT
 ITK_INSTALL_PREFIX
+USE_NIFTI_FALSE
+USE_NIFTI_TRUE
 USE_NFFT3_FALSE
 USE_NFFT3_TRUE
 PTHREAD_CFLAGS
@@ -11981,10 +11983,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"fbbbb6ab\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"d501092d\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Thu May 23 16:22:12 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Tue May 28 21:11:58 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -23963,6 +23965,15 @@ rm -f core conftest.err conftest.$ac_objext \
 if test -z $niftiio_found; then
     LIBS=$OLD_LIBS
 fi
+ if test x"$niftiio_found" = x"yes"; then
+  USE_NIFTI_TRUE=
+  USE_NIFTI_FALSE='#'
+else
+  USE_NIFTI_TRUE='#'
+  USE_NIFTI_FALSE=
+fi
+
+
 
 # ITK
 
@@ -25478,6 +25489,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_NFFT3_TRUE}" && test -z "${USE_NFFT3_FALSE}"; then
   as_fn_error $? "conditional \"USE_NFFT3\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${USE_NIFTI_TRUE}" && test -z "${USE_NIFTI_FALSE}"; then
+  as_fn_error $? "conditional \"USE_NIFTI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_MATLAB_TRUE}" && test -z "${USE_MATLAB_FALSE}"; then

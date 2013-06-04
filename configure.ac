@@ -605,6 +605,8 @@ AC_TRY_LINK([#include <nifti1_io.h>],
 if test -z $niftiio_found; then
     LIBS=$OLD_LIBS
 fi
+AM_CONDITIONAL([USE_NIFTI], [test x"$niftiio_found" = x"yes"])
+
 
 # ITK
 AH_TEMPLATE([HAVE_INSIGHT], [Define to 1 if you have the <itkImage.h> header file.])
