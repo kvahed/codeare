@@ -44,7 +44,7 @@
 namespace codeare {
 namespace matrix{
 namespace io{
-
+	
 	/**
 	 * @brief Supported data formats
 	 */
@@ -52,11 +52,11 @@ namespace io{
 
 	template<IOStrategy T>
 	struct IOTraits;
-
+	
 	template<>
 	struct IOTraits<HDF5> {
 		typedef HDF5File IOClass;
-
+		
 		static const
 		std::string Suffix () {
 			return ".h5";
@@ -92,12 +92,12 @@ namespace io{
 	struct IOTraits<ISMRM> {
 		typedef HDF5File IOClass;
 
-		static const
-		std::string Suffix () {
+		static const std::string 
+		Suffix () {
 			return ".ird";
 		}
-		static const
-		std::string CName () {
+		static const std::string 
+		CName () {
 			return "ismrm";
 		}
 		inline static IOFile*
@@ -122,12 +122,10 @@ namespace io{
 			return ((IOClass*)iof)->Write(M,txe);
 		}
 	};
-
-#ifdef HAVE_MAT_H
+	
 	template<>
 	struct IOTraits<MATLAB> {
-		typedef MLFile IOClass;
-        
+
 		static const
 		std::string Suffix () {
 			return ".mat";
@@ -136,6 +134,10 @@ namespace io{
 		std::string CName () {
 			return "matlab";
 		}
+
+#ifdef HAVE_MAT_H
+		typedef MLFile IOClass;
+        
 		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
               const Params& params, const bool verbosity) {
@@ -157,8 +159,8 @@ namespace io{
 		Write (IOFile* iof, const Matrix<T>& M, const TiXmlElement* txe) {
 			return ((IOClass*)iof)->Write(M,txe);
 		}
-	};
 #endif
+	};
     
 	template<>
 	struct IOTraits<CODRAW> {
@@ -195,22 +197,24 @@ namespace io{
 		}
 	};
     
-#ifdef HAVE_NIFTI1_IO_H
 	template<>
 	struct IOTraits<NIFTI> {
-		typedef NIFile IOClass;
-
-		static const
-		std::string Suffix () {
+		
+		static const std::string 
+		Suffix () {
 			return ".nii";
 		}
-		static const
-		std::string CName () {
+		static const std::string 
+		CName () {
 			return "nifti";
 		}
+
+#ifdef HAVE_NIFTI1_IO_H
+		typedef NIFile IOClass;
+
 		inline static IOFile*
-        Open (const std::string& fname, const IOMode mode,
-				const Params& params, const bool verbosity) {
+		Open (const std::string& fname, const IOMode mode,
+			  const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
 		}
 		template <class T> inline static Matrix<T>
@@ -229,13 +233,14 @@ namespace io{
 		Write (IOFile* iof, const Matrix<T>& M, const TiXmlElement* txe) {
 			return ((IOClass*)iof)->Write(M,txe);
 		}
-	};
 #endif
+	};
 
+	
 	template<>
 	struct IOTraits<SYNGO> {
-		typedef NIFile IOClass;
-
+		typedef SyngoFile IOClass;
+		
 		static const std::string
 		Suffix () {
 			return ".dat";
@@ -246,7 +251,7 @@ namespace io{
 		}
 		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
-				const Params& params, const bool verbosity) {
+			  const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
 		}
 		template <class T> inline static Matrix<T>
@@ -267,9 +272,9 @@ namespace io{
 		}
 	};
 
-
-
-
+	
+	
+	
 	/**
 	 * @brief       Interface to concrete IO implementation
 	 */
