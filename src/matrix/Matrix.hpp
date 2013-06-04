@@ -179,13 +179,6 @@ public:
 	}
 	
 	
-    /**
-     * @brief           Delete array containing data.
-     */
-	inline
-	~Matrix() {};
-	
-    
     
     /**
      * @brief           Construct matrix with aligned dimension vector
@@ -548,6 +541,13 @@ public:
 		}
 
 	}
+
+
+    /**
+     * @brief           Delete array containing data.
+     */
+	inline
+	~Matrix() {};
 
 
 

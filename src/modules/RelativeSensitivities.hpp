@@ -28,8 +28,12 @@
 #include "linalg/Lapack.hpp"
 #include "DFT.hpp"
 #include "arithmetic/Trigonometry.hpp"
-#include "NIFile.hpp"
 #include "Print.hpp"
+
+#ifdef HAVE_NIFTI1_IO_H
+  #include "NIFile.hpp"
+#endif
+
 
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
@@ -313,7 +317,9 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 error_code
 SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	
-	printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
+#ifdef HAVE_NIFTI1_IO_H
+
+    printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
 
 	ticks  tic = getticks();
 	
@@ -338,6 +344,12 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
+#else
+
+    printf (  "WARNIN: Do not have NIFTO IO built in. Thus, no brain mask segmentation available!\n");
+
+#endif
+    
 	return OK;	
 }
 

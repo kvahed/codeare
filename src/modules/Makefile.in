@@ -143,8 +143,7 @@ DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
 DumpToFile_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) -o $@
-am__dirstamp = $(am__leading_dot)dirstamp
-am_GRAPPA_la_OBJECTS = ../matrix/ft/GRAPPA.lo GRAPPA.lo
+am_GRAPPA_la_OBJECTS = GRAPPA.lo
 GRAPPA_la_OBJECTS = $(am_GRAPPA_la_OBJECTS)
 GRAPPA_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -214,13 +213,6 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
-F77COMPILE = $(F77) $(AM_FFLAGS) $(FFLAGS)
-LTF77COMPILE = $(LIBTOOL) --tag=F77 $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(F77) $(AM_FFLAGS) $(FFLAGS)
-F77LD = $(F77)
-F77LINK = $(LIBTOOL) --tag=F77 $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(F77LD) $(AM_FFLAGS) $(FFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -443,7 +435,7 @@ CGSENSE_la_LIBADD = $(COMMON_la_LIBADD)
 SystemCmd_la_SOURCES = SystemCmd.hpp SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 SystemCmd_la_LIBADD = $(COMMON_la_LIBADD)
-GRAPPA_la_SOURCES = ../matrix/ft/GRAPPA.f ../matrix/ft/CGRAPPA.hpp GRAPPA.hpp GRAPPA.cpp
+GRAPPA_la_SOURCES = ../matrix/ft/CGRAPPA.hpp GRAPPA.hpp GRAPPA.cpp
 GRAPPA_la_DEPENDENCIES = 
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)
@@ -471,7 +463,7 @@ CLEANFILES = RRSModule.hh RRSModuleSK.cc
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .f .lo .o .obj
+.SUFFIXES: .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -548,14 +540,6 @@ DummyRecon.la: $(DummyRecon_la_OBJECTS) $(DummyRecon_la_DEPENDENCIES) $(EXTRA_Du
 	$(DummyRecon_la_LINK) -rpath $(libdir) $(DummyRecon_la_OBJECTS) $(DummyRecon_la_LIBADD) $(LIBS)
 DumpToFile.la: $(DumpToFile_la_OBJECTS) $(DumpToFile_la_DEPENDENCIES) $(EXTRA_DumpToFile_la_DEPENDENCIES) 
 	$(DumpToFile_la_LINK) -rpath $(libdir) $(DumpToFile_la_OBJECTS) $(DumpToFile_la_LIBADD) $(LIBS)
-../matrix/ft/$(am__dirstamp):
-	@$(MKDIR_P) ../matrix/ft
-	@: > ../matrix/ft/$(am__dirstamp)
-../matrix/ft/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../matrix/ft/$(DEPDIR)
-	@: > ../matrix/ft/$(DEPDIR)/$(am__dirstamp)
-../matrix/ft/GRAPPA.lo: ../matrix/ft/$(am__dirstamp) \
-	../matrix/ft/$(DEPDIR)/$(am__dirstamp)
 GRAPPA.la: $(GRAPPA_la_OBJECTS) $(GRAPPA_la_DEPENDENCIES) $(EXTRA_GRAPPA_la_DEPENDENCIES) 
 	$(GRAPPA_la_LINK) -rpath $(libdir) $(GRAPPA_la_OBJECTS) $(GRAPPA_la_LIBADD) $(LIBS)
 GenericRegrid.la: $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_DEPENDENCIES) $(EXTRA_GenericRegrid_la_DEPENDENCIES) 
@@ -577,8 +561,6 @@ SystemCmd.la: $(SystemCmd_la_OBJECTS) $(SystemCmd_la_DEPENDENCIES) $(EXTRA_Syste
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ../matrix/ft/GRAPPA.$(OBJEXT)
-	-rm -f ../matrix/ft/GRAPPA.lo
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -638,21 +620,11 @@ RelativeSensitivities_la-RelativeSensitivities.lo: RelativeSensitivities.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(RelativeSensitivities_la_CXXFLAGS) $(CXXFLAGS) -c -o RelativeSensitivities_la-RelativeSensitivities.lo `test -f 'RelativeSensitivities.cpp' || echo '$(srcdir)/'`RelativeSensitivities.cpp
 
-.f.o:
-	$(F77COMPILE) -c -o $@ $<
-
-.f.obj:
-	$(F77COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.f.lo:
-	$(LTF77COMPILE) -c -o $@ $<
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf ../matrix/ft/.libs ../matrix/ft/_libs
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -784,8 +756,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f ../matrix/ft/$(DEPDIR)/$(am__dirstamp)
-	-rm -f ../matrix/ft/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
