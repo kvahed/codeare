@@ -27,20 +27,21 @@
 /**
  * @brief  Supported wavelet families
  */
-enum wlfamily {
-	
-	ID = -1,                  /**< Identity transform*/
-	WL_DAUBECHIES,
-	WL_DAUBECHIES_CENTERED,
-	WL_HAAR,
-	WL_HAAR_CENTERED,
-	WL_BSPLINE,
-	WL_BSPLINE_CENTERED
+//enum wlfamily {
+//
+//	ID = -1,                  /**< Identity transform*/
+//	WL_DAUBECHIES,
+//	WL_DAUBECHIES_CENTERED,
+//	WL_HAAR,
+//	WL_HAAR_CENTERED,
+//	WL_BSPLINE,
+//	WL_BSPLINE_CENTERED
 
-};
+//};
 
 
 # include "Matrix.hpp"
+# include "DWT.hpp"
 
 
 
@@ -48,10 +49,10 @@ enum wlfamily {
  * @brief 2D Discrete wavelet transform for Matrix template (from GSL)
  */
 template <class T>
-class DWT {
+class DWT2 {
 
 
-	typedef typename DWTTraits<T>::Type Type;
+//	typedef typename DWTTraits<T>::Type Type;
 
 
 public:
@@ -64,25 +65,27 @@ public:
 	 * @param  wf      Wavelet family (default none, i.e. ID)
 	 * @param  wm      Familty member (default 4)
 	 */
-    DWT (const int dim = 2)
-		: m_dim (dim)
+    DWT2 (const int dim = 2)
+		: m_dim (dim),
+		  m_lpf (2),    // (haar)
+		  m_hpf (2)     // (haar)
 	{
 
     	float norm_factor = 1 / sqrt (m_dim);
 
     	// set high pass filter (haar)
-    	m_hpf [0] = 1; m_hpf [1] = 1;
-    	m_hpf *= norm_factor;
+    	m_lpf [0] = 1; m_lpf [1] = 1;
+    	m_lpf *= norm_factor;
 
     	// set low pass filter (haar)
-    	m_lpf [0] = 1; m_lpf [1] = -1;
-    	m_lpf *= norm_factor;
+    	m_hpf [0] = 1; m_hpf [1] = -1;
+    	m_hpf *= norm_factor;
 
     }
     
 
     virtual
-    ~DWT () {
+    ~DWT2 () {
         
 
         
@@ -95,7 +98,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-    inline Matrix<T>
+    inline
+    Matrix<T>
 	Trafo        (const Matrix<T>& m) {
 		return TransformForward (m);
 	}
@@ -107,7 +111,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline Matrix<T>
+	inline
+	Matrix<T>
 	Adjoint      (const Matrix<T>& m) {
 		return TransformBackwards (m);
 	}
@@ -119,7 +124,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-    inline Matrix<T>
+    inline
+    Matrix<T>
 	operator*    (const Matrix<T>& m) {
 		return Trafo(m);
 	}
@@ -131,7 +137,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-    inline Matrix<T>
+    inline
+    Matrix<T>
 	operator->* (const Matrix<T>& m) {
 		return Adjoint(m);
 	}
@@ -148,10 +155,10 @@ private:
     const int m_dim;
 
     // high pass filter
-    Matrix <double> m_hpf;
+    Matrix <double> m_lpf;
 
     // low pass filter
-    Matrix <double> m_lpf;
+    Matrix <double> m_hpf;
 
 
     /**
@@ -165,17 +172,18 @@ private:
 	 * @param   bw  Backward: true, Forward: false
 	 * @return      Transform
 	 */
-	inline Matrix<T>
+	inline
+	Matrix<T>
 	TransformForward    	(const Matrix<T>& m)
 	{
         
         Matrix<T> res (m.DimVector());
-        
+
         if (m_dim == 2)
         {
 
         	// create temporary memory
-        	double * temp = (double *) malloc (3 * m.Height() * m.Width());
+        	T * temp = (T*) malloc(3*m.Height()*m.Width()*sizeof(T));
 
         	// create vars from mex function
         	int J = 0, nn;
@@ -200,7 +208,8 @@ private:
 	/**
 	 * backwards transform
 	 */
-	inline Matrix <T>
+	inline
+	Matrix <T>
 	TransformBackwards		(const Matrix <T> & m)
 	{
 
@@ -210,7 +219,7 @@ private:
         {
 
         	// create temporary memory
-        	double * temp = (double *) malloc (4 * m.Height() * m.Width());
+        	T * temp = (T*) malloc (4*m.Height()*m.Width()*sizeof(T));
 
         	// create vars from mex function
         	int J = 0, nn;
@@ -242,9 +251,13 @@ private:
 
 		Matrix <T> res (sig.DimVector ());
 
-		double *wcplo,*wcphi,*templo,*temphi;
+		T *wcplo,*wcphi,*templo,*temphi;
 		int k,j,nj;
-		copydouble(sig,res,sig.DimProd());
+//		copydouble(&sig[0],&res[0],sig.Height()*sig.Width());
+
+		// assign signal to result matrix
+		res = sig;
+
 		templo = &temp[sig.Height ()];
 		temphi = &temp[2*sig.Height()];
 
@@ -260,10 +273,10 @@ private:
 				downhi(temp, nj,wcphi);
 			}
 			for( k=0; k < nj; k++){
-				unpackdouble(res,nj,nc,k,temp);
+				unpackdouble(&res[0],nj,nc,k,temp);
 				downlo(temp, nj,templo);
 				downhi(temp, nj,temphi);
-				packdouble(templo,nj/2,nc,k,res);
+				packdouble(templo,nj/2,nc,k,&res[0]);
 				packdouble(temphi,nj/2,nc,k,&res[nj/2*nr]);
 			}
 			nj = nj/2;
@@ -274,7 +287,7 @@ private:
 	}
 
 	void
-	unpackdouble	(const Matrix <T> & x, const int n, const int nc, const int k, Matrix <T> & y)
+	unpackdouble	(const T * const x, const int n, const int nc, const int k, T * const y)
 	{
 		int i;
 		for( i=0; i < n; i++)
@@ -282,7 +295,7 @@ private:
 	}
 
 	void
-	packdouble		(const Matrix <T> & x, const int n, const int nc, const int k, Matrix <T> & y)
+	packdouble		(const T * const x, const int n, const int nc, const int k, T * const y)
 	{
 		int i;
 		for( i=0; i < n; i++)
@@ -291,7 +304,7 @@ private:
 
 
 	void
-	copydouble		(const Matrix <T> & x, Matrix <T> & y, const int n)
+	copydouble		(const T * const x, T * const y, const int n)
 	{
 
 		// TODO: use operator= instead ...
@@ -304,10 +317,10 @@ private:
 
 
 	void
-	downhi			(const Matrix <T> & x, const int n, Matrix <T> & y)
+	downhi			(const T * const x, const int n, T * const y)
 	{
 		int n2, mlo, i, h, j;
-		double s;
+		T s;
 
 		int m = m_hpf.Dim (0);
 
@@ -337,11 +350,11 @@ private:
 
 
 	void
-	downlo		(const Matrix <T> & x, const int n, Matrix <T> & y)
+	downlo		(const T * const x, const int n, T * const y)
 	{
 
 		int n2, mlo, mhi, i, h, j;
-		double s;
+		T s;
 
 		int m = m_lpf.Dim (0);
 
@@ -381,9 +394,13 @@ private:
 		const int nr = wc.Height();
 		const int nc = wc.Width();
 
-		double *wcplo,*wcphi,*templo,*temphi,*temptop;
+		T *wcplo,*wcphi,*templo,*temphi,*temptop;
 		int k,j,nj;
-		copydouble(wc,img,nr*nc);
+//		copydouble(wc,img,nr*nc);
+
+		// assign dwt to result image
+		img = wc;
+
 		templo = &temp[nr];
 		temphi = &temp[2*nr];
 		temptop = &temp[3*nr];
@@ -415,7 +432,7 @@ private:
 
 
 	void
-	adddouble		(const Matrix <T> & x, const Matrix <T> & y, const int n, Matrix <T> & z)
+	adddouble		(const T * const x, const T * const y, const int n, T * const z)
 	{
 
 		// TODO: use operator+ instead ...
@@ -428,10 +445,10 @@ private:
 
 
 	void
-	uplo		(const Matrix <T> & x, const int n, Matrix <T> & y)
+	uplo		(const T * const x, const int n, T * const y)
 	{
 	           int  meven, modd, i, h, j, mmax;
-			   double s;
+			   T s;
 
 			   const int m = m_lpf.Dim (0);
 
@@ -477,10 +494,10 @@ private:
 
 
 	void
-	uphi		(const Matrix <T> & x, const int n, Matrix <T> & y)
+	uphi		(const T * const x, const int n, T * const y)
 	{
 	           int  meven, modd, i, h, j, mmin;
-			   double s;
+			   T s;
 
 			   const int m = m_hpf.Dim (0);
 
@@ -530,4 +547,4 @@ private:
 };
 
 
-# endif // __DWT_HPP__
+# endif // __DWT2_HPP__

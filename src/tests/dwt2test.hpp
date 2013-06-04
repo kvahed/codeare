@@ -4,6 +4,7 @@
 # include "matrix/Matrix.hpp"
 # include "matrix/io/IOContext.hpp"
 # include "matrix/dwt/DWT.hpp"
+# include "matrix/dwt/DWT2.hpp"
 
 /**********************
  ** type definitions **
@@ -20,7 +21,7 @@ dwt2test (RRClient::Connector<T>* rc)
 
 	// Intro
 	std::cout << std::endl;
-	std::cout << " * Running test: \"ocl_dwt\"!";
+	std::cout << " * Running test: \"dwt2\"!";
 	std::cout << std::endl;
 	std::cout << std::endl;
 
@@ -28,13 +29,15 @@ dwt2test (RRClient::Connector<T>* rc)
 	// create oclMatrix from input file
 	Matrix <elem_type> mat_in;
 	IOContext ioc (rc->GetElement ("/config/data/in"), base, READ);
-	std::cout << " bla " << std::endl;
-	mat_in = ioc.Read <elem_type> (rc->GetElement ("/config/data/in"));
+	mat_in = ioc.Read <elem_type> (rc->GetElement ("/config/data/in/signal"));
 
 
 	// do something
-	DWT <elem_type> dwt (WL_HAAR);
-	mat_in = dwt * mat_in;
+	DWT <elem_type> dwt (mat_in.Dim (0), WL_HAAR, 2);
+	Matrix <elem_type> mat_out_dwt = dwt * mat_in;
+
+	DWT2 <elem_type> dwt2 (2);
+	Matrix <elem_type> mat_out_dwt2 = dwt2 * mat_in;
 
 
 	// output oclMatrix to output file
@@ -43,11 +46,12 @@ dwt2test (RRClient::Connector<T>* rc)
 //	std::string odname (rc->GetElement ("/config/data/out") -> Attribute ("dname"));
 
 	IOContext ioc2 (rc->GetElement ("/config/data/out"), base, WRITE);
-	ioc2.Write(mat_in, rc->GetElement ("/config/data/out"));
+	ioc2.Write(mat_out_dwt, rc->GetElement ("/config/data/out/res-dwt"));
+	ioc2.Write(mat_out_dwt2, rc->GetElement ("/config/data/out/res-dwt2"));
 
 	// Outro
 	std::cout << std::endl;
-	std::cout << " * Finished test: \"ocl_dwt\"!";
+	std::cout << " * Finished test: \"dwt2\"!";
 	std::cout << std::endl;
 	std::cout << std::endl;
 
