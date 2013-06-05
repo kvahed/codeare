@@ -88,7 +88,7 @@ namespace io{
 				if (!mread (&M[0],     sizeof(T),           n, m_file, "data")) return M;
 
 				//Close and clean up;
-				fclose(f);
+				fclose(m_file);
 				delete name;
 
 			}
@@ -158,7 +158,7 @@ namespace io{
 	static bool codwrite (const std::string& fname, const Matrix<T>& M);
 
 	template<class T>
-	static Matrix<T> codread (const std::string& fname, const )
+	static Matrix<T> codread (const std::string& fname);
 
 }
 }

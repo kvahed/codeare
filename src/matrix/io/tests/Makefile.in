@@ -50,7 +50,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-TESTS = t_hdf5$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2)
+TESTS = t_iocontext$(EXEEXT) t_hdf5$(EXEEXT) $(am__EXEEXT_1) \
+	$(am__EXEEXT_2)
 @USE_NIFTI_TRUE@am__append_1 = t_nifti
 @USE_MATLAB_TRUE@am__append_2 = t_matlab
 check_PROGRAMS = $(am__EXEEXT_3)
@@ -77,10 +78,14 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 @USE_NIFTI_TRUE@am__EXEEXT_1 = t_nifti$(EXEEXT)
 @USE_MATLAB_TRUE@am__EXEEXT_2 = t_matlab$(EXEEXT)
-am__EXEEXT_3 = t_hdf5$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2)
+am__EXEEXT_3 = t_iocontext$(EXEEXT) t_hdf5$(EXEEXT) $(am__EXEEXT_1) \
+	$(am__EXEEXT_2)
 am_t_hdf5_OBJECTS = t_hdf5.$(OBJEXT)
 t_hdf5_OBJECTS = $(am_t_hdf5_OBJECTS)
 t_hdf5_LDADD = $(LDADD)
+am_t_iocontext_OBJECTS = t_iocontext.$(OBJEXT)
+t_iocontext_OBJECTS = $(am_t_iocontext_OBJECTS)
+t_iocontext_LDADD = $(LDADD)
 am__t_matlab_SOURCES_DIST = t_matlab.cpp
 @USE_MATLAB_TRUE@am_t_matlab_OBJECTS = t_matlab.$(OBJEXT)
 t_matlab_OBJECTS = $(am_t_matlab_OBJECTS)
@@ -102,9 +107,10 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(t_hdf5_SOURCES) $(t_matlab_SOURCES) $(t_nifti_SOURCES)
-DIST_SOURCES = $(t_hdf5_SOURCES) $(am__t_matlab_SOURCES_DIST) \
-	$(am__t_nifti_SOURCES_DIST)
+SOURCES = $(t_hdf5_SOURCES) $(t_iocontext_SOURCES) $(t_matlab_SOURCES) \
+	$(t_nifti_SOURCES)
+DIST_SOURCES = $(t_hdf5_SOURCES) $(t_iocontext_SOURCES) \
+	$(am__t_matlab_SOURCES_DIST) $(am__t_nifti_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -270,6 +276,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/io 
 t_hdf5_SOURCES = $(COMMON) t_hdf5.cpp
+t_iocontext_SOURCES = $(COMMON) t_iocontext.cpp
 @USE_NIFTI_TRUE@t_nifti_SOURCES = $(COMMON) t_nifti.cpp
 @USE_MATLAB_TRUE@t_matlab_SOURCES = $(COMMON) t_matlab.cpp
 all: all-am
@@ -318,6 +325,9 @@ clean-checkPROGRAMS:
 t_hdf5$(EXEEXT): $(t_hdf5_OBJECTS) $(t_hdf5_DEPENDENCIES) $(EXTRA_t_hdf5_DEPENDENCIES) 
 	@rm -f t_hdf5$(EXEEXT)
 	$(CXXLINK) $(t_hdf5_OBJECTS) $(t_hdf5_LDADD) $(LIBS)
+t_iocontext$(EXEEXT): $(t_iocontext_OBJECTS) $(t_iocontext_DEPENDENCIES) $(EXTRA_t_iocontext_DEPENDENCIES) 
+	@rm -f t_iocontext$(EXEEXT)
+	$(CXXLINK) $(t_iocontext_OBJECTS) $(t_iocontext_LDADD) $(LIBS)
 t_matlab$(EXEEXT): $(t_matlab_OBJECTS) $(t_matlab_DEPENDENCIES) $(EXTRA_t_matlab_DEPENDENCIES) 
 	@rm -f t_matlab$(EXEEXT)
 	$(CXXLINK) $(t_matlab_OBJECTS) $(t_matlab_LDADD) $(LIBS)
@@ -332,6 +342,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_hdf5.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_iocontext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_matlab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_nifti.Po@am__quote@
 
