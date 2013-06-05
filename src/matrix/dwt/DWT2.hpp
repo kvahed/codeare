@@ -67,19 +67,39 @@ public:
 	 */
     DWT2 (const int dim = 2)
 		: m_dim (dim),
-		  m_lpf (2),    // (haar)
-		  m_hpf (2)     // (haar)
+//		  m_lpf_d (2),
+//		  m_lpf_r (2),
+//		  m_hpf_d (2),
+//		  m_hpf_r (2)
+		  m_lpf_d (8),    // (db4)
+		  m_lpf_r (8),
+		  m_hpf_d (8),     // (db4)
+		  m_hpf_r (8)
 	{
 
     	float norm_factor = 1 / sqrt (m_dim);
 
     	// set high pass filter (haar)
-    	m_lpf [0] = 1; m_lpf [1] = 1;
-    	m_lpf *= norm_factor;
+//    	m_lpf_d [0] = 1; m_lpf_d [1] = 1;
+//    	m_lpf_d *= norm_factor;
+//        m_lpf_r [0] = 1; m_lpf_r [1] = 1;
+//        m_lpf_r *= norm_factor;
+    	m_lpf_d [0] = -0.0106; m_lpf_d [1] = 0.0329; m_lpf_d [2] = 0.0308; m_lpf_d [3] = -0.1870;
+    	m_lpf_d [4] = -0.0280; m_lpf_d [5] = 0.6309; m_lpf_d [6] = 0.7148; m_lpf_d [7] = 0.2304;
+        m_lpf_r [0] = 0.2304; m_lpf_d [1] = 0.7148; m_lpf_d [2] = 0.6309; m_lpf_d [3] = -0.0280;
+        m_lpf_r [4] = -0.1870; m_lpf_d [5] = 0.0308; m_lpf_d [6] = 0.0329; m_lpf_d [7] = -0.0106;
+
 
     	// set low pass filter (haar)
-    	m_hpf [0] = 1; m_hpf [1] = -1;
-    	m_hpf *= norm_factor;
+//    	m_hpf_d [0] = -1; m_hpf_d [1] = 1;
+//    	m_hpf_d *= norm_factor;
+//        m_hpf_r [0] = 1; m_hpf_r [1] = -1;
+//        m_hpf_r *= norm_factor;
+    	m_hpf_d [0] = -0.2304; m_hpf_d [1] = 0.7148; m_hpf_d [2] = -0.6409; m_hpf_d [3] = -0.0280;
+    	m_hpf_d [4] = 0.1870; m_hpf_d [5] = 0.0308; m_hpf_d [6] = -0.0329; m_hpf_d [7] = -0.0106;
+        m_hpf_d [0] = -0.0106; m_hpf_d [1] = -0.0329; m_hpf_d [2] = 0.0308; m_hpf_d [3] = 0.1870;
+        m_hpf_d [4] = -0.0280; m_hpf_d [5] = -0.6309; m_hpf_d [6] = 0.7148; m_hpf_d [7] = -0.2304;
+
 
     }
     
@@ -154,11 +174,13 @@ private:
     // dimension of DWT2
     const int m_dim;
 
-    // high pass filter
-    Matrix <double> m_lpf;
+    // low pass filters
+    Matrix <double> m_lpf_d;
+    Matrix <double> m_lpf_r;
 
-    // low pass filter
-    Matrix <double> m_hpf;
+    // high pass filters
+    Matrix <double> m_hpf_d;
+    Matrix <double> m_hpf_r;
 
 
     /**
@@ -198,6 +220,8 @@ private:
         	// call dpwt2
         	res = dpwt2 (m, ell, J, temp);
 
+        	free (temp);
+
         }
 
         return res;
@@ -233,6 +257,8 @@ private:
 
         	// call dpwt2
         	res = idpwt2 (m, ell, J, temp);
+
+        	free (temp);
 
         }
 
@@ -322,7 +348,7 @@ private:
 		int n2, mlo, i, h, j;
 		T s;
 
-		int m = m_hpf.Dim (0);
+		int m = m_hpf_d.Dim (0);
 
 		/* highpass version */
 		n2 = n/2;
@@ -331,7 +357,7 @@ private:
 		for( i= mlo; i<n2; i++) {
 			s = 0.;
 			for( h=0; h < m; h++)
-				s += m_hpf[h]*x[2*i+1-h];
+				s += ((T)m_hpf_d[h])*x[2*i+1-h];
 			y[i] = s;
 		}
 		if(mlo > n2) mlo = n2;
@@ -341,7 +367,7 @@ private:
 			j = 2*i+1;
 			for( h=0; h < m; h++) {
 				if(j < 0) j += n;
-				s += m_hpf[h]*x[j];
+				s += ((T)m_hpf_d[h])*x[j];
 				--j;
 			}
 			y[i] = s;
@@ -356,7 +382,7 @@ private:
 		int n2, mlo, mhi, i, h, j;
 		T s;
 
-		int m = m_lpf.Dim (0);
+		int m = m_lpf_d.Dim (0);
 
 		/*lowpass version */
 		n2 = n/2;
@@ -367,7 +393,7 @@ private:
 		for( i= 0; i<=mhi; i++){
 			s = 0.;
 			for( h=0; h < m; h++)
-				s += m_lpf[h]*x[2*i+h];
+				s += ((T)m_lpf_d[h])*x[2*i+h];
 			y[i] = s;
 		}
 
@@ -377,7 +403,7 @@ private:
 			j = 2*i;
 			for( h=0; h < m; h++){
 				if(j >= n) j -= n;
-				s += m_lpf[h]*x[j];
+				s += ((T)m_lpf_d[h])*x[j];
 				j++;
 			}
 			y[i] = s;
@@ -385,7 +411,7 @@ private:
 	}
 
 
-	void
+	Matrix <T>
 	idpwt2		(const Matrix <T> & wc, const int ell, const int J, T * temp)
 	{
 
@@ -410,12 +436,12 @@ private:
 
 		for( j=ell; j < J; j++){
 			for( k=0; k < 2*nj; k++){
-				unpackdouble(img,nj,nc,k,templo);
+				unpackdouble(&img[0],nj,nc,k,templo);
 				unpackdouble(&img[nj*nr],nj,nc,k,temphi);
 				uplo(templo, nj,temp);
 				uphi(temphi, nj, temptop);
 				adddouble(temp,temptop,nj*2,temp);
-				packdouble(temp,nj*2,nc,k,img);
+				packdouble(temp,nj*2,nc,k,&img[0]);
 			}
 
 			for( k=0; k < 2*nj; k++){
@@ -428,6 +454,9 @@ private:
 			}
 			nj *= 2;
 		}
+
+		return img;
+
 	}
 
 
@@ -450,7 +479,7 @@ private:
 	           int  meven, modd, i, h, j, mmax;
 			   T s;
 
-			   const int m = m_lpf.Dim (0);
+			   const int m = m_lpf_r.Dim (0);
 
 	           /*lowpass version */
 
@@ -459,11 +488,11 @@ private:
 	           for( i= meven; i<n; i++){
 			   		s = 0.;
 					for( h=0; h < meven; h++)
-						s += m_lpf[2*h]*x[i-h];
+						s += ((T)m_lpf_r[2*h])*x[i-h];
 					y[2*i] = s;
 					s = 0.;
 					for( h=0; h < modd; h++)
-						s += m_lpf[2*h+1]*x[i-h];
+						s += ((T)m_lpf_r[2*h+1])*x[i-h];
 					y[2*i+1] = s;
 				}
 
@@ -476,7 +505,7 @@ private:
 					j = i;
 					for( h=0; h < meven; h++){
 						if(j < 0) j += n;
-						s += m_lpf[2*h]*x[j];
+						s += ((T)m_lpf_r[2*h])*x[j];
 						--j;
 					}
 					y[2*i] = s;
@@ -485,7 +514,7 @@ private:
 					j = i;
 					for( h=0; h < modd; h++){
 						if(j < 0) j += n;
-						s += m_lpf[2*h+1]*x[j];
+						s += ((T)m_lpf_r[2*h+1])*x[j];
 						--j;
 					}
 					y[2*i+1] = s;
@@ -499,7 +528,7 @@ private:
 	           int  meven, modd, i, h, j, mmin;
 			   T s;
 
-			   const int m = m_hpf.Dim (0);
+			   const int m = m_hpf_r.Dim (0);
 
 			   /*hipass version */
 		       meven = (m+1)/2;
@@ -509,11 +538,11 @@ private:
 	           for( i= 0; i+meven<n; i++){
 			   		s = 0.;
 					for( h=0; h < meven; h++)
-						s += m_hpf[2*h]*x[i+h];
+						s += ((T)m_hpf_r[2*h])*x[i+h];
 					y[2*i+1] = s;
 					s = 0.;
 					for( h=0; h < modd; h++)
-						s += m_hpf[2*h+1]*x[i+h];
+						s += ((T)m_hpf_r[2*h+1])*x[i+h];
 					y[2*i] = s;
 				}
 
@@ -526,7 +555,7 @@ private:
 					j = i;
 					for( h=0; h < meven; h++){
 						if(j >= n) j -= n;
-						s += m_hpf[2*h]*x[j];
+						s += ((T)m_hpf_r[2*h])*x[j];
 						j++;
 					}
 					y[2*i+1] = s;
@@ -535,7 +564,7 @@ private:
 					j = i;
 					for( h=0; h < modd; h++){
 						if(j >= n) j -= n;
-						s += m_hpf[2*h+1]*x[j];
+						s += ((T)m_hpf_r[2*h+1])*x[j];
 						j++;
 					}
 					y[2*i] = s;

@@ -33,11 +33,12 @@ dwt2test (RRClient::Connector<T>* rc)
 
 
 	// do something
-	DWT <elem_type> dwt (mat_in.Dim (0), WL_HAAR, 2);
+	DWT <elem_type> dwt (mat_in.Dim (0), WL_DAUBECHIES, 4);
 	Matrix <elem_type> mat_out_dwt = dwt * mat_in;
 
 	DWT2 <elem_type> dwt2 (2);
 	Matrix <elem_type> mat_out_dwt2 = dwt2 * mat_in;
+	Matrix <elem_type> mat_out_dwt2_recon = dwt2 ->* mat_out_dwt2;
 
 
 	// output oclMatrix to output file
@@ -48,6 +49,7 @@ dwt2test (RRClient::Connector<T>* rc)
 	IOContext ioc2 (rc->GetElement ("/config/data/out"), base, WRITE);
 	ioc2.Write(mat_out_dwt, rc->GetElement ("/config/data/out/res-dwt"));
 	ioc2.Write(mat_out_dwt2, rc->GetElement ("/config/data/out/res-dwt2"));
+	ioc2.Write(mat_out_dwt2_recon, rc->GetElement ("/config/data/out/res-dwt2-recon"));
 
 	// Outro
 	std::cout << std::endl;
