@@ -215,7 +215,7 @@ private:
         		std::cout << "FWT2 requires dyadic length sides" << std::endl;
         		assert (false);
         	}
-        	const int ell = 0;
+        	const int ell = 1;
 
         	// call dpwt2
         	res = dpwt2 (m, ell, J, temp);
@@ -253,7 +253,7 @@ private:
         		std::cout << "IWT2 requires dyadic length sides" << std::endl;
         		assert (false);
         	}
-        	const int ell = 0;
+        	const int ell = 1;
 
         	// call dpwt2
         	res = idpwt2 (m, ell, J, temp);
