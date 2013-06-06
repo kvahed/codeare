@@ -50,8 +50,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-TESTS = t_iocontext$(EXEEXT) t_hdf5$(EXEEXT) $(am__EXEEXT_1) \
-	$(am__EXEEXT_2)
+TESTS = t_codeare$(EXEEXT) t_hdf5$(EXEEXT) t_iocontext$(EXEEXT) \
+	$(am__EXEEXT_1) $(am__EXEEXT_2)
 @USE_NIFTI_TRUE@am__append_1 = t_nifti
 @USE_MATLAB_TRUE@am__append_2 = t_matlab
 check_PROGRAMS = $(am__EXEEXT_3)
@@ -78,8 +78,11 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 @USE_NIFTI_TRUE@am__EXEEXT_1 = t_nifti$(EXEEXT)
 @USE_MATLAB_TRUE@am__EXEEXT_2 = t_matlab$(EXEEXT)
-am__EXEEXT_3 = t_iocontext$(EXEEXT) t_hdf5$(EXEEXT) $(am__EXEEXT_1) \
-	$(am__EXEEXT_2)
+am__EXEEXT_3 = t_codeare$(EXEEXT) t_hdf5$(EXEEXT) t_iocontext$(EXEEXT) \
+	$(am__EXEEXT_1) $(am__EXEEXT_2)
+am_t_codeare_OBJECTS = t_codeare.$(OBJEXT)
+t_codeare_OBJECTS = $(am_t_codeare_OBJECTS)
+t_codeare_LDADD = $(LDADD)
 am_t_hdf5_OBJECTS = t_hdf5.$(OBJEXT)
 t_hdf5_OBJECTS = $(am_t_hdf5_OBJECTS)
 t_hdf5_LDADD = $(LDADD)
@@ -107,10 +110,11 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(t_hdf5_SOURCES) $(t_iocontext_SOURCES) $(t_matlab_SOURCES) \
-	$(t_nifti_SOURCES)
-DIST_SOURCES = $(t_hdf5_SOURCES) $(t_iocontext_SOURCES) \
-	$(am__t_matlab_SOURCES_DIST) $(am__t_nifti_SOURCES_DIST)
+SOURCES = $(t_codeare_SOURCES) $(t_hdf5_SOURCES) \
+	$(t_iocontext_SOURCES) $(t_matlab_SOURCES) $(t_nifti_SOURCES)
+DIST_SOURCES = $(t_codeare_SOURCES) $(t_hdf5_SOURCES) \
+	$(t_iocontext_SOURCES) $(am__t_matlab_SOURCES_DIST) \
+	$(am__t_nifti_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -275,6 +279,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/io 
+t_codeare_SOURCES = $(COMMON) t_codeare.cpp
 t_hdf5_SOURCES = $(COMMON) t_hdf5.cpp
 t_iocontext_SOURCES = $(COMMON) t_iocontext.cpp
 @USE_NIFTI_TRUE@t_nifti_SOURCES = $(COMMON) t_nifti.cpp
@@ -322,6 +327,9 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+t_codeare$(EXEEXT): $(t_codeare_OBJECTS) $(t_codeare_DEPENDENCIES) $(EXTRA_t_codeare_DEPENDENCIES) 
+	@rm -f t_codeare$(EXEEXT)
+	$(CXXLINK) $(t_codeare_OBJECTS) $(t_codeare_LDADD) $(LIBS)
 t_hdf5$(EXEEXT): $(t_hdf5_OBJECTS) $(t_hdf5_DEPENDENCIES) $(EXTRA_t_hdf5_DEPENDENCIES) 
 	@rm -f t_hdf5$(EXEEXT)
 	$(CXXLINK) $(t_hdf5_OBJECTS) $(t_hdf5_LDADD) $(LIBS)
@@ -341,6 +349,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_codeare.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_hdf5.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_iocontext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_matlab.Po@am__quote@
@@ -603,7 +612,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
+clean-am: clean-checkPROGRAMS clean-generic clean-libtool clean-local \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -675,8 +684,8 @@ uninstall-am:
 .MAKE: check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-TESTS check-am clean \
-	clean-checkPROGRAMS clean-generic clean-libtool cscopelist \
-	ctags distclean distclean-compile distclean-generic \
+	clean-checkPROGRAMS clean-generic clean-libtool clean-local \
+	cscopelist ctags distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
@@ -688,6 +697,9 @@ uninstall-am:
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am
 
+
+clean-local:
+	rm -f test.mat test.h5 test.cod test.nii
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -15,13 +15,22 @@
 #include <fstream>
 #include <iostream>
 
+
 namespace codeare {
 namespace matrix{
 namespace io{
 
+	template <class T>
+	struct CODTraits;
+
+	template<>
+	struct CODTraits<float> {
+
+	};
+
+	static char* delimiter = "543f562189f1e82beb9c177f89f67822";
+
 	class CODFile : public IOFile {
-
-
 
 	public:
 
@@ -30,12 +39,18 @@ namespace io{
 				const Params& params = Params(), const bool verbose = false) :
 					IOFile (fname, mode, params, verbose) {
 
+
+
 			const char* R = "rb";
 			const char* W = "wb";
 
-			assert (fexists(fname));
-			if ((m_file = fopen(this->m_fname.c_str(), (mode == READ) ? R : W))==NULL)
-				printf("Cannot open %s file (%s).\n", this->m_fname.c_str(), (mode == READ) ? R : W);
+			bool  reading = (mode == READ);
+
+			if (reading)
+				assert (fexists(fname));
+
+			if ((m_file = fopen(this->m_fname.c_str(), reading ? R : W))==NULL)
+				printf("Cannot open %s file (%s).\n", this->m_fname.c_str(), reading ? R : W);
 
 		}
 
@@ -88,7 +103,6 @@ namespace io{
 				if (!mread (&M[0],     sizeof(T),           n, m_file, "data")) return M;
 
 				//Close and clean up;
-				fclose(m_file);
 				delete name;
 
 			}

@@ -257,7 +257,7 @@ namespace io{
 		 */
 		IOContext (const std::string& fname, const IOStrategy& ios = HDF5,
 				const IOMode& mode = READ, const Params& params = Params(),
-				const bool verbosity = true) :
+				const bool verbosity = false) :
 			m_iof(0) , m_ios(ios) {
 
 			this->Concretize(fname, mode, params, verbosity);
@@ -269,7 +269,7 @@ namespace io{
 		 *
 		 */
 		IOContext (const TiXmlElement* txe, const std::string& base = ".",
-				const IOMode mode = READ, const bool verbosity = true) :
+				const IOMode mode = READ, const bool verbosity = false) :
 			m_iof(0), m_ios(HDF5) {
 
 			if (!txe)
@@ -319,13 +319,13 @@ namespace io{
 				switch (m_ios)
 					{
 					case CODRAW:  break;
-					case HDF5:    return ((HDF5File*)m_iof)->Read<T>(uri);
+					case HDF5:    return  ((HDF5File*)m_iof)->Read<T>(uri);
 #ifdef HAVE_MAT_H
-					case MATLAB:  return ((MLFile*)m_iof)->Read<T>(uri);
+					case MATLAB:  return    ((MLFile*)m_iof)->Read<T>(uri);
 #endif
-					case ISMRM:   return ((IRDFile*)m_iof)->Read<T>(uri);
+					case ISMRM:   return   ((IRDFile*)m_iof)->Read<T>(uri);
 #ifdef HAVE_NIFTI1_IO_H
-					case NIFTI:   return ((NIFile*)m_iof)->Read<T>(uri);
+					case NIFTI:   return    ((NIFile*)m_iof)->Read<T>(uri);
 #endif
 					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(uri);
 					case GE:      break;
@@ -462,15 +462,15 @@ namespace io{
 
 		IOStrategy TypeByName (const std::string& name) const {
 
-			if (name.compare("CODRAW") == 0)
+			if (name.compare(IOTraits<CODRAW>::CName()) == 0)
 				return CODRAW;
-			else if (name.compare("MATLAB") == 0)
+			else if (name.compare(IOTraits<MATLAB>::CName()) == 0)
 				return MATLAB;
-			else if (name.compare("HDF5") == 0)
+			else if (name.compare(IOTraits<HDF5>::CName()) == 0)
 				return HDF5;
-			else if (name.compare("NIFTI") == 0)
+			else if (name.compare(IOTraits<MATLAB>::CName()) == 0)
 				return NIFTI;
-			else if (name.compare("SYNGOMR") == 0)
+			else if (name.compare(IOTraits<MATLAB>::CName()) == 0)
 				return SYNGOMR;
 			else
 				return HDF5;
