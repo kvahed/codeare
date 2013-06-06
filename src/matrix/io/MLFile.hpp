@@ -108,24 +108,21 @@ static void read_complex (Matrix<std::complex<T> >& M, const mxArray* mxa) {
 		M[i] = std::complex<T>(re[i], (cplx) ? im[i] : 0.0);
 }
 
-template <>
-struct MXTraits<float> {
+template <> struct MXTraits<float> {
 	static const mxClassID prec = mxSINGLE_CLASS;
 	static const mxComplexity cplx = mxREAL;
 	typedef float T;
 	static void Write (mxArray* mxa, const Matrix<T>& M) {write_real(mxa,M);}
 	static void Read (Matrix<T>& M, const mxArray* mxa) {read_real(M,mxa);}
 };
-template <>
-struct MXTraits<double> {
+template <> struct MXTraits<double> {
 	static const mxClassID prec = mxDOUBLE_CLASS;
 	static const mxComplexity cplx = mxREAL;
 	typedef double T;
 	static void Write (mxArray* mxa, const Matrix<T>& M) {write_real(mxa,M);}
 	static void Read (Matrix<T>& M, const mxArray* mxa) {read_real(M,mxa);}
 };
-template <>
-struct MXTraits<cxfl> {
+template <> struct MXTraits<cxfl> {
 	static const mxClassID prec = mxSINGLE_CLASS;
 	static const mxComplexity cplx = mxCOMPLEX;
 	typedef cxfl T;
@@ -133,8 +130,7 @@ struct MXTraits<cxfl> {
 	static void Write (mxArray* mxa, const Matrix<T>& M) {write_complex(mxa,M);}
 	static void Read (Matrix<T>& M, const mxArray* mxa) {read_complex(M,mxa);}
 };
-template <>
-struct MXTraits<cxdb> {
+template <> struct MXTraits<cxdb> {
 	static const mxClassID prec = mxDOUBLE_CLASS;
 	static const mxComplexity cplx = mxCOMPLEX;
 	typedef cxdb T;
@@ -142,8 +138,7 @@ struct MXTraits<cxdb> {
 	static void Write (mxArray* mxa, const Matrix<T>& M) {write_complex(mxa,M);}
 	static void Read (Matrix<T>& M, const mxArray* mxa) {read_complex(M,mxa);}
 };
-template <>
-struct MXTraits<short> {
+template <> struct MXTraits<short> {
 	static const mxClassID prec = mxINT16_CLASS;
 	static const mxComplexity cplx = mxREAL;
 	typedef cxdb T;

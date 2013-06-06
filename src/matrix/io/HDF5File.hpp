@@ -19,6 +19,33 @@ namespace codeare {
 namespace matrix {
 namespace io {
 
+	template<class T> struct HDF5Traits;
+
+	template<> struct HDF5Traits<float> {
+		static PredType* PType () {
+			return (PredType*) new FloatType (PredType::NATIVE_FLOAT);
+		}
+	};
+	template<> struct HDF5Traits<double> {
+		static PredType* PType () {
+			return (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
+		}
+	};
+	template<> struct HDF5Traits<cxfl> {
+		static PredType* PType () {
+			return (PredType*) new FloatType (PredType::NATIVE_FLOAT);
+		}
+	};
+	template<> struct HDF5Traits<cxdb> {
+		static PredType* PType () {
+			return (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
+		}
+	};
+	template<> struct HDF5Traits<short> {
+		static PredType* PType () {
+			return (PredType*) new FloatType (PredType::NATIVE_SHORT);
+		}
+	};
 
 	class HDF5File : public IOFile {
 
@@ -104,13 +131,7 @@ namespace io {
 			for (size_t i = 0; i < ndim; ++i)
 				mdims[i] = dims[ndim-i-1];
 
-			PredType* type;
-			if      (is_singlep(t))
-				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
-			else if (is_doublep(t))
-				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
-			else
-				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
+			PredType* type = HDF5Traits<T>::PType();
 
 			Matrix<T> M (mdims);
 			dataset.read (&M[0], *type);
@@ -189,16 +210,9 @@ namespace io {
 				dims[INVALID_DIM] = 2;
 
 			DataSpace space (tmpdim, dims);
-			PredType*  type;
+			PredType*  type = HDF5Traits<T>::PType();
 
 			delete [] dims;
-
-			if      (is_singlep(t))
-				type = (PredType*) new FloatType (PredType::NATIVE_FLOAT);
-			else if (is_doublep(t))
-				type = (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
-			else if (typeid(T) == typeid(short))
-				type = (PredType*) new IntType   (PredType::NATIVE_SHORT);
 
 			DataSet set = group.createDataSet(name, (*type), space);
 
