@@ -87,7 +87,7 @@ public:
 	inline const bool* data() const { return _data; }
 	inline bool* data() { return _data; }
 	inline size_t size() const { return _n; }
-	inline ~container () { if (_malloc) realloc(_data,0); _malloc = false; }
+	inline ~container () { /*if (_malloc) _data = (bool*) realloc(_data,0); _malloc = false;*/ }
 	inline void resize (const size_t n, const bool val = bool()) {
 		_n = n;
 		_data = (_malloc) ?

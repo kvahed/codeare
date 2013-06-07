@@ -112,24 +112,24 @@ public:
 		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
 		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
 
-		int np = 1;
-
-#pragma omp parallel default (shared)
-		{
-			if (params.exists("np"))
-				np = boost::any_cast<int>(params["np"]);
-			else
-				np = omp_get_num_threads ();
+		if (params.exists("np")) {
+			m_np = boost::any_cast<int>(params["np"]);
+			omp_set_num_threads(m_np);
+		} else {
+#pragma omp parallel 
+			{
+			m_np = omp_get_num_threads ();
+			}
 		}
 
-		m_fts = new NFFT<T>* [np];
-		for (size_t i = 0; i < np; i++)
+		m_fts = new NFFT<T>* [m_np];
+		for (size_t i = 0; i < m_np; i++)
 			m_fts[i] = new NFFT<T> (ms, m_nk, m, alpha, b0, m_pc, fteps, ftiter);
-
+		
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
 		printf ("  ...done.\n\n");
-
+		
 	}
 
 	/**
@@ -166,16 +166,14 @@ public:
 		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", cgeps, cgiter, lambda);
 		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
 
-		int np = 1;
-
-#pragma omp parallel default (shared)
+#pragma omp parallel 
 		{
-			np = omp_get_num_threads ();
+			m_np = omp_get_num_threads ();
 		}
 
-		m_fts = new NFFT<T>* [np];
-
-		for (size_t i = 0; i < np; i++)
+		m_fts = new NFFT<T>* [m_np];
+		
+		for (size_t i = 0; i < m_np; i++)
 			m_fts[i] = new NFFT<T> (ms, nk, m, alpha, b0, pc, fteps, ftiter);
 
 		m_cgiter = cgiter;
@@ -197,15 +195,8 @@ public:
 	 */ 
 	virtual ~NCSENSE () {
 		
-		int np = 1;
-		
-#pragma omp parallel default (shared)
-		{
-			np = omp_get_num_threads ();
-		}	
-		
 		if (m_initialised)
-			for (size_t i = 0; i < np; i++)
+			for (size_t i = 0; i < m_np; i++)
 				delete m_fts[i];
 		
 	}
@@ -350,13 +341,13 @@ public:
 
 		printf ("\n");
 
-        if (m_verbose) {
+        /*if (m_verbose) {
             size_t cpsz = numel(x);
             x = zeros<std::complex<T> > (size(x,0), size(x,1), (m_dim == 3) ? size(x,2) : 1, vc.size());
             for (size_t i = 0; i < vc.size(); i++)
                 memcpy (&x[i*cpsz], &(vc[i][0]), cpsz*sizeof(std::complex<T>));
             return x;
-        } else        
+			} else        */
             return x * ((recal) ? IntensityMap (sens) : m_ic);
 
 	}
@@ -408,6 +399,8 @@ private:
 	size_t    m_cgiter;         /**< Max # CG iterations */
 	double    m_cgeps;          /**< Convergence limit */
 	double    m_lambda;         /**< Tikhonov weight */
+	
+	int       m_np;
 
 };
 

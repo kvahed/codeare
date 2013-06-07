@@ -130,7 +130,6 @@ CGSENSE::Prepare () {
 	cgp.Set("sens_maps", std::string("kspace"));
 	cgp.Set("verbose", m_verbose);
 
-
 	m_ncs = new NCSENSE<float>
 		(sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
 

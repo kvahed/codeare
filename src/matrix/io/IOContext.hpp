@@ -50,13 +50,10 @@ namespace io{
 	 */
 	enum IOStrategy {CODRAW = 0, HDF5, MATLAB, ISMRM, NIFTI, SYNGO, GE, PHILIPS, NO_STRATEGY};
 
-	template<IOStrategy T>
-	struct IOTraits;
+	template<IOStrategy T> struct IOTraits;
 	
-	template<>
-	struct IOTraits<HDF5> {
+	template<> struct IOTraits<HDF5> {
 		typedef HDF5File IOClass;
-		
 		static const
 		std::string Suffix () {
 			return ".h5";
