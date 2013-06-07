@@ -84,22 +84,26 @@ public:
 //    	m_lpf_d *= norm_factor;
 //        m_lpf_r [0] = 1; m_lpf_r [1] = 1;
 //        m_lpf_r *= norm_factor;
-    	m_lpf_d [0] = -0.0106; m_lpf_d [1] = 0.0329; m_lpf_d [2] = 0.0308; m_lpf_d [3] = -0.1870;
-    	m_lpf_d [4] = -0.0280; m_lpf_d [5] = 0.6309; m_lpf_d [6] = 0.7148; m_lpf_d [7] = 0.2304;
-        m_lpf_r [0] = 0.2304; m_lpf_d [1] = 0.7148; m_lpf_d [2] = 0.6309; m_lpf_d [3] = -0.0280;
-        m_lpf_r [4] = -0.1870; m_lpf_d [5] = 0.0308; m_lpf_d [6] = 0.0329; m_lpf_d [7] = -0.0106;
+//    	m_lpf_d [0] = -0.0106; m_lpf_d [1] = 0.0329; m_lpf_d [2] = 0.0308; m_lpf_d [3] = -0.1870;
+//    	m_lpf_d [4] = -0.0280; m_lpf_d [5] = 0.6309; m_lpf_d [6] = 0.7148; m_lpf_d [7] = 0.2304;
+        m_lpf_r [0] = 0.2304; m_lpf_r [1] = 0.7148; m_lpf_r [2] = 0.6309; m_lpf_r [3] = -0.0280;
+        m_lpf_r [4] = -0.1870; m_lpf_r [5] = 0.0308; m_lpf_r [6] = 0.0329; m_lpf_r [7] = -0.0106;
 
+        m_lpf_d = m_lpf_r;
 
     	// set low pass filter (haar)
 //    	m_hpf_d [0] = -1; m_hpf_d [1] = 1;
 //    	m_hpf_d *= norm_factor;
 //        m_hpf_r [0] = 1; m_hpf_r [1] = -1;
 //        m_hpf_r *= norm_factor;
-    	m_hpf_d [0] = -0.2304; m_hpf_d [1] = 0.7148; m_hpf_d [2] = -0.6409; m_hpf_d [3] = -0.0280;
-    	m_hpf_d [4] = 0.1870; m_hpf_d [5] = 0.0308; m_hpf_d [6] = -0.0329; m_hpf_d [7] = -0.0106;
-        m_hpf_d [0] = -0.0106; m_hpf_d [1] = -0.0329; m_hpf_d [2] = 0.0308; m_hpf_d [3] = 0.1870;
-        m_hpf_d [4] = -0.0280; m_hpf_d [5] = -0.6309; m_hpf_d [6] = 0.7148; m_hpf_d [7] = -0.2304;
+//    	m_hpf_d [0] = -0.2304; m_hpf_d [1] = 0.7148; m_hpf_d [2] = -0.6409; m_hpf_d [3] = -0.0280;
+//    	m_hpf_d [4] = 0.1870; m_hpf_d [5] = 0.0308; m_hpf_d [6] = -0.0329; m_hpf_d [7] = -0.0106;
+//        m_hpf_d [0] = -0.0106; m_hpf_d [1] = -0.0329; m_hpf_d [2] = 0.0308; m_hpf_d [3] = 0.1870;
+//        m_hpf_d [4] = -0.0280; m_hpf_d [5] = -0.6309; m_hpf_d [6] = 0.7148; m_hpf_d [7] = -0.2304;
+        mirrorfilt((double*)m_lpf_d.Memory(0), (double*)m_hpf_d.Memory(0),m_lpf_d.Dim(0));
+        mirrorfilt((double*)m_lpf_r.Memory(0), (double*)m_hpf_r.Memory(0),m_lpf_r.Dim(0));
 
+//    	m_hpf_r = m_hpf_d;
 
     }
     
@@ -267,6 +271,19 @@ private:
 	}
 
 
+	void
+	mirrorfilt              (double * lpf, double * hpf, int length)
+	{
+	    int i,isign;
+	    isign = 1;
+	    for(i=0; i < length; i++){
+	        *hpf++ = isign * *lpf++;
+	        isign *= -1;
+	    }
+	}
+
+
+
 	/**
 	 *  COPIED FROM WAVELAB IMPLEMENTATION
 	 */
@@ -278,7 +295,6 @@ private:
 		Matrix <T> res (sig.DimVector ());
 
 		T *wcplo,*wcphi,*templo,*temphi;
-		int k,j,nj;
 //		copydouble(&sig[0],&res[0],sig.Height()*sig.Width());
 
 		// assign signal to result matrix
@@ -287,26 +303,56 @@ private:
 		templo = &temp[sig.Height ()];
 		temphi = &temp[2*sig.Height()];
 
-		int nr = sig.Height();
-		int nc = sig.Width();
-		nj = sig.Height();
-		for( j=(J-1); j >= ell; --j){
-			for( k=0; k < nj; k++){
-				wcplo = &res[k*nr];
-				wcphi = &res[k*nr + nj/2];
-				copydouble(wcplo,temp,nj);
-				downlo(temp, nj,wcplo);
-				downhi(temp, nj,wcphi);
-			}
-			for( k=0; k < nj; k++){
-				unpackdouble(&res[0],nj,nc,k,temp);
-				downlo(temp, nj,templo);
-				downhi(temp, nj,temphi);
-				packdouble(templo,nj/2,nc,k,&res[0]);
-				packdouble(temphi,nj/2,nc,k,&res[nj/2*nr]);
-			}
-			nj = nj/2;
-		}
+		int num_rows = sig.Height();
+		int num_cols = sig.Width();
+		int side_length = sig.Height();
+
+		// loop over levels of DWT
+		for (int j = (J-1); j >= ell; --j)
+		{
+
+		    // loop over columns of image
+			for (int col=0; col < side_length; col++)
+			{
+
+			    // access to lowpass part of DWT
+				wcplo = &res[col*num_rows];
+				// access to highpass part of DWT
+				wcphi = &res[col*num_rows + side_length/2];
+
+				// copy part of image to temp memory
+				copydouble (wcplo, temp, side_length);
+
+				// apply low pass filter on column and write to result matrix
+				downlo (temp, side_length, wcplo);
+				// apply high pass filter on column and wirte to result matrix
+				downhi (temp, side_length, wcphi);
+
+			} // loop over columns
+
+			// loop over rows of image
+			for (int row=0; row < side_length; row++)
+			{
+
+			    // copy row-th row of imag to temp
+				unpackdouble (res.Memory(0), side_length, num_cols, row, temp);
+
+				// apply low pass filter on row and write to temp mem
+				downlo (temp, side_length, templo);
+				// apply high pass filter on row and write to temp mem
+				downhi (temp, side_length, temphi);
+
+				// write temp lowpass result to result matrix
+				packdouble (templo, side_length/2, num_cols, row, &res[0]);
+				// write temp highpass result to result matrix
+				packdouble (temphi, side_length/2, num_cols, row, &res[side_length/2*num_rows]);
+
+			} // loop over rows of image
+
+			// reduce dimension for next level
+			side_length = side_length/2;
+
+		} // loop over levels of DWT
 
 		return res;
 
@@ -330,84 +376,180 @@ private:
 
 
 	void
-	copydouble		(const T * const x, T * const y, const int n)
+	copydouble		(const T * const src, T * const dest, const int n)
 	{
 
 		// TODO: use operator= instead ...
-		for (int i = n; i > 0; --i)
+		for (int i = 0; i < n; ++i)
 		{
-			y[i] = x[i];
+			dest [i] = src [i];
 		}
 
 	}
 
 
+    /**
+     * @brief               Perform highpass part of one level forward 1D DWT on signal with given side_length.
+     *
+     * @param  signal       Signal to be transformed.
+     * @param  side_length  Side length of current DWT level.
+     * @param  dwt_hgih     Resulting DWT.
+     */
 	void
-	downhi			(const T * const x, const int n, T * const y)
+	downhi			(const T * const signal, const int side_length, T * const dwt_high)
 	{
-		int n2, mlo, i, h, j;
+		int n2, mlo, j;
 		T s;
 
-		int m = m_hpf_d.Dim (0);
+		int filter_length = m_hpf_d.Dim (0);
 
 		/* highpass version */
-		n2 = n/2;
-		mlo = m/2-1;
-		if(2*mlo+1 - (m-1) < 0) mlo++;
-		for( i= mlo; i<n2; i++) {
+
+		// half of side_length
+		n2 = side_length/2;
+
+		// half of filter length
+		mlo = filter_length/2 - 1;
+
+		// adjust lower bound if to low
+		if (2*mlo+1 - (filter_length-1) < 0)
+		    mlo++;
+
+		// loop over pixels of dwt_high
+		for (int i = mlo; i < n2; i++)
+		{
+
+		    // result of convolution
 			s = 0.;
-			for( h=0; h < m; h++)
-				s += ((T)m_hpf_d[h])*x[2*i+1-h];
-			y[i] = s;
-		}
-		if(mlo > n2) mlo = n2;
+
+			// perform convolution
+			for (int h = 0; h < filter_length; h++)
+				s += ((T) m_hpf_d [h]) * signal [2*i+1-h];
+
+			// assign result of convolution
+			dwt_high[i] = s;
+
+		} // loop over pixels of dwt_high
+
+		// case: filter_length > side_length => only edge values
+		if (mlo > n2)
+		    mlo = n2;
+
+
 		/* fix up edge values */
-		for( i= 0; i<mlo; i++) {
+
+		// loop over edge values
+		for (int i = 0; i < mlo; i++)
+		{
+
+		    // result of convolution
 			s = 0.;
+
+			// start signal index for convolution
 			j = 2*i+1;
-			for( h=0; h < m; h++) {
-				if(j < 0) j += n;
-				s += ((T)m_hpf_d[h])*x[j];
+
+			// loop over filter elements
+			for (int h = 0; h < filter_length; h++)
+			{
+
+			    // adjust index if it exceeds side_length
+				if (j < 0)
+				    j += side_length;
+
+				s += ((T) m_hpf_d [h]) * signal [j];
+
+				// update index
 				--j;
+
 			}
-			y[i] = s;
-		}
+
+			// assign result of convolution
+			dwt_high[i] = s;
+
+		} // loop over edge values
+
 	}
 
 
+	/**
+	 * @brief               Perform lowpass part of one level forward 1D DWT on signal with given side_length.
+	 *
+	 * @param  signal       Signal to be transformed.
+	 * @param  side_length  Side length of current DWT level.
+	 * @param  dwt_low      Resulting DWT.
+	 */
 	void
-	downlo		(const T * const x, const int n, T * const y)
+	downlo  		        (const T * const signal, const int side_length, T * const dwt_low)
 	{
 
-		int n2, mlo, mhi, i, h, j;
+		int n2, mlo, mhi, j;
 		T s;
 
-		int m = m_lpf_d.Dim (0);
+		int filter_length = m_lpf_d.Dim (0);
 
 		/*lowpass version */
-		n2 = n/2;
-		mlo = m /2;
-		mhi = n2-mlo;
-		if(2*mhi + (m-1) >= n) --mhi;
-		if(mhi < 0) mhi = -1;
-		for( i= 0; i<=mhi; i++){
+
+		// half of side_length (length of dwt_low)
+		n2 = side_length/2;
+
+		// half of filter_length
+		mlo = filter_length /2;
+
+		// upper bound for "normal" convolution
+		mhi = n2 - mlo;
+
+		// upper bound to high
+		if (2*mhi + (filter_length-1) >= side_length)
+		    --mhi;
+		// upper bound to low
+		if (mhi < 0)
+		    mhi = -1;
+
+		// loop over pixels of dwt_low
+		for (int i= 0; i<=mhi; i++)
+		{
+
+		    // result of convolution
 			s = 0.;
-			for( h=0; h < m; h++)
-				s += ((T)m_lpf_d[h])*x[2*i+h];
-			y[i] = s;
-		}
+			// apply low pass filter (convolution)
+			for (int h = 0; h < filter_length; h++)
+				s += ((T) m_lpf_d [h]) * signal [2*i+h];
+			// assign result of convolution
+			dwt_low [i] = s;
+
+		} // loop over pixels of dwt_low
+
 
 		/* fix up edge values */
-		for( i= mhi+1; i<n2; i++){
+
+		// loop over edge values (periodic boundary)
+		for (int i = mhi+1; i < n2; i++)
+		{
+
+		    // result of convolution
 			s = 0.;
+
+			// start signal index for convolution
 			j = 2*i;
-			for( h=0; h < m; h++){
-				if(j >= n) j -= n;
-				s += ((T)m_lpf_d[h])*x[j];
+
+			// loop over filter elements
+			for (int h = 0; h < filter_length; h++){
+
+			    // adjust index if it exceeds current side_length
+				if (j >= side_length)
+				    j -= side_length;
+				s += ((T) m_lpf_d [h]) * signal [j];
+
+				// update index
 				j++;
-			}
-			y[i] = s;
+
+			} // perform convolution
+
+			// assign result of convolution
+			dwt_low [i] = s;
+
 		}
+
 	}
 
 
@@ -465,7 +607,7 @@ private:
 	{
 
 		// TODO: use operator+ instead ...
-		for (int i = n; i > 0; --i)
+		for (int i = 0; i < n; ++i)
 		{
 			z[i] = x[i] + y[i];
 		}
