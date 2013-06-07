@@ -65,7 +65,7 @@ namespace io{
 		std::string CName () {
 			return "CODRAW";
 		}
-		inline IOFile*
+		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
               const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
@@ -88,6 +88,41 @@ namespace io{
 		}
 	};
     
+	template<>
+	struct IOTraits<ISMRM> {
+		typedef HDF5File IOClass;
+
+		static const
+		std::string Suffix () {
+			return ".ird";
+		}
+		static const
+		std::string CName () {
+			return "ISMRM";
+		}
+		inline static IOFile*
+        Open (const std::string& fname, const IOMode mode,
+              const Params& params, const bool verbosity) {
+			return (IOFile*) new IOClass (fname, mode, params, verbosity);
+		}
+		template <class T> inline static Matrix<T>
+		Read (const IOFile* iof, const std::string& uri) {
+			return ((IOClass*)iof)->Read<T>(uri);
+		}
+		template <class T> inline static Matrix<T>
+		Read (const IOFile* iof, const TiXmlElement* txe) {
+			return ((IOClass*)iof)->Read<T>(txe);
+		}
+		template <class T> inline static bool
+		Write (IOFile* iof, const Matrix<T>& M, const std::string& uri) {
+			return ((IOClass*)iof)->Write(M,uri);
+		}
+		template <class T> inline static bool
+		Write (IOFile* iof, const Matrix<T>& M, const TiXmlElement* txe) {
+			return ((IOClass*)iof)->Write(M,txe);
+		}
+	};
+
 #ifdef HAVE_MAT_H
 	template<>
 	struct IOTraits<MATLAB> {
@@ -101,7 +136,7 @@ namespace io{
 		std::string CName () {
 			return "MATLAB";
 		}
-		inline IOFile*
+		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
               const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
@@ -137,7 +172,7 @@ namespace io{
 		std::string CName () {
 			return "CODRAW";
 		}
-		inline IOFile*
+		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
               const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
@@ -173,7 +208,7 @@ namespace io{
 		std::string CName () {
 			return "NIFTI";
 		}
-		inline IOFile*
+		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
 				const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
@@ -209,7 +244,7 @@ namespace io{
 		CName () {
 			return "SYNGOMR";
 		}
-		inline IOFile*
+		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
 				const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
@@ -223,6 +258,8 @@ namespace io{
 			return ((IOClass*)iof)->Read<T>(txe);
 		}
 	};
+
+
 
 
 	/**
@@ -492,15 +529,15 @@ namespace io{
 
 			switch (m_ios) {
 				case CODRAW:  break;
-				case HDF5:    m_iof = (IOFile*) new HDF5File  (fname, mode, params, verbosity); break;
+				case HDF5:    m_iof = IOTraits<HDF5>::Open(fname, mode, params, verbosity); break;
 #ifdef HAVE_MAT_H
-				case MATLAB:  m_iof = (IOFile*) new MLFile    (fname, mode, params, verbosity); break;
+				case MATLAB:  m_iof = IOTraits<MATLAB>::Open(fname, mode, params, verbosity); break;
 #endif
-				case ISMRM:   m_iof = (IOFile*) new IRDFile   (fname, mode, params, verbosity); break;
+				case ISMRM:   m_iof = IOTraits<ISMRM>::Open(fname, mode, params, verbosity); break;
 #ifdef HAVE_NIFTI1_IO_H
-				case NIFTI:   m_iof = (IOFile*) new NIFile    (fname, mode, params, verbosity); break;
+				case NIFTI:   m_iof = IOTraits<NIFTI>::Open(fname, mode, params, verbosity); break;
 #endif
-				case SYNGOMR: m_iof = (IOFile*) new SyngoFile (fname, mode, params, verbosity); break;
+				case SYNGOMR: m_iof = IOTraits<SYNGOMR>::Open(fname, mode, params, verbosity); break;
 				case GE:      break;
 				case PHILIPS: break;
 				default:      printf ("Failed to make IO context concrete!\n ");  break;
