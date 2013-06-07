@@ -48,7 +48,7 @@ namespace io{
 	/**
 	 * @brief Supported data formats
 	 */
-	enum IOStrategy {CODRAW = 0, HDF5, MATLAB, ISMRM, NIFTI, SYNGOMR, GE, PHILIPS, NO_STRATEGY};
+	enum IOStrategy {CODRAW = 0, HDF5, MATLAB, ISMRM, NIFTI, SYNGO, GE, PHILIPS, NO_STRATEGY};
 
 	template<IOStrategy T>
 	struct IOTraits;
@@ -63,7 +63,7 @@ namespace io{
 		}
 		static const
 		std::string CName () {
-			return "CODRAW";
+			return "hdf5";
 		}
 		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
@@ -98,7 +98,7 @@ namespace io{
 		}
 		static const
 		std::string CName () {
-			return "ISMRM";
+			return "ismrm";
 		}
 		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
@@ -134,7 +134,7 @@ namespace io{
 		}
 		static const
 		std::string CName () {
-			return "MATLAB";
+			return "matlab";
 		}
 		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
@@ -170,7 +170,7 @@ namespace io{
 		}
 		static const
 		std::string CName () {
-			return "CODRAW";
+			return "codraw";
 		}
 		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
@@ -206,7 +206,7 @@ namespace io{
 		}
 		static const
 		std::string CName () {
-			return "NIFTI";
+			return "nifti";
 		}
 		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
@@ -233,7 +233,7 @@ namespace io{
 #endif
 
 	template<>
-	struct IOTraits<SYNGOMR> {
+	struct IOTraits<SYNGO> {
 		typedef NIFile IOClass;
 
 		static const std::string
@@ -242,7 +242,7 @@ namespace io{
 		}
 		static const std::string
 		CName () {
-			return "SYNGOMR";
+			return "syngo";
 		}
 		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
@@ -256,6 +256,14 @@ namespace io{
 		template <class T> inline static Matrix<T>
 		Read (const IOFile* iof, const TiXmlElement* txe) {
 			return ((IOClass*)iof)->Read<T>(txe);
+		}
+		template<class T> inline static bool
+		Write (IOFile*, const Matrix<T>&, const std::string&) {
+			return false;
+		}
+		template<class T> inline static bool
+		Write (IOFile*, const Matrix<T>&, const TiXmlElement*) {
+			return false;
 		}
 	};
 
@@ -328,7 +336,7 @@ namespace io{
 
 			this->Concretize(fname, mode, Params(), verbosity);
 
-		} // TODO: UPPERCASE
+		}
 
 
 		/**
@@ -362,21 +370,20 @@ namespace io{
 		Read (const std::string& uri) const {
 
 			if (m_iof) {
-				switch (m_ios)
-					{
-					case CODRAW:  break;
-					case HDF5:    return  ((HDF5File*)m_iof)->Read<T>(uri);
+				switch (m_ios) {
+				case CODRAW: break;
+				case HDF5:   return IOTraits<  HDF5>::Read<T>(m_iof, uri);
 #ifdef HAVE_MAT_H
-					case MATLAB:  return    ((MLFile*)m_iof)->Read<T>(uri);
+				case MATLAB: return IOTraits<MATLAB>::Read<T>(m_iof, uri);
 #endif
-					case ISMRM:   return   ((IRDFile*)m_iof)->Read<T>(uri);
+				case ISMRM:  return IOTraits< ISMRM>::Read<T>(m_iof, uri);
 #ifdef HAVE_NIFTI1_IO_H
-					case NIFTI:   return    ((NIFile*)m_iof)->Read<T>(uri);
+				case NIFTI:  return IOTraits< NIFTI>::Read<T>(m_iof, uri);
 #endif
-					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(uri);
-					case GE:      break;
-					case PHILIPS: break;
-					default:      break;
+				case SYNGO:  return IOTraits< SYNGO>::Read<T>(m_iof, uri);
+				case GE:     break;
+				case PHILIPS: break;
+				default:     break;
 				}
 			}
 
@@ -390,19 +397,19 @@ namespace io{
 
 			if (m_iof) {
 				switch (m_ios) {
-					case CODRAW:  break;
-					case HDF5:    return ((HDF5File*)m_iof)->Write(M,uri);
+				case CODRAW: break;
+				case HDF5:   return IOTraits<  HDF5>::Write<T>(m_iof, M, uri);
 #ifdef HAVE_MAT_H
-					case MATLAB:  return ((MLFile*)m_iof)->Write(M,uri);
+				case MATLAB: return IOTraits<MATLAB>::Write<T>(m_iof, M, uri);
 #endif
-					case ISMRM:   return ((IRDFile*)m_iof)->Write(M,uri);
+				case ISMRM:  return IOTraits< ISMRM>::Write<T>(m_iof, M, uri);
 #ifdef HAVE_NIFTI1_IO_H
-					case NIFTI:   return ((NIFile*)m_iof)->Write(M,uri);
+				case NIFTI:  return IOTraits< NIFTI>::Write<T>(m_iof, M, uri);
 #endif
-					case SYNGOMR: return ((SyngoFile*)m_iof)->Write(M,uri);
-					case GE:      break;
-					case PHILIPS: break;
-					default:      break;
+				case SYNGO:  return IOTraits< SYNGO>::Write<T>(m_iof, M, uri);
+				case GE:     break;
+				case PHILIPS: break;
+				default:     break;
 				}
 			}
 
@@ -416,19 +423,19 @@ namespace io{
 
 			if (m_iof) {
 				switch (m_ios) {
-					case CODRAW:  break;
-					case HDF5:    return ((HDF5File*)m_iof)->Read<T>(txe);
+				case CODRAW: break;
+				case HDF5:   return IOTraits<  HDF5>::Read<T>(m_iof, txe);
 #ifdef HAVE_MAT_H
-					case MATLAB:  return ((MLFile*)m_iof)->Read<T>(txe);
+				case MATLAB: return IOTraits<MATLAB>::Read<T>(m_iof, txe);
 #endif
-					case ISMRM:   return ((IRDFile*)m_iof)->Read<T>(txe);
+				case ISMRM:  return IOTraits< ISMRM>::Read<T>(m_iof, txe);
 #ifdef HAVE_NIFTI1_IO_H
-					case NIFTI:   return ((NIFile*)m_iof)->Read<T>(txe);
+				case NIFTI:  return IOTraits< NIFTI>::Read<T>(m_iof, txe);
 #endif
-					case SYNGOMR: return ((SyngoFile*)m_iof)->Read<T>(txe);
-					case GE:      break;
-					case PHILIPS: break;
-					default:      break;
+				case SYNGO:  return IOTraits< SYNGO>::Read<T>(m_iof, txe);
+				case GE:     break;
+				case PHILIPS: break;
+				default:     break;
 				}
 			}
 
@@ -442,19 +449,19 @@ namespace io{
 
 			if (m_iof) {
 				switch (m_ios) {
-					case CODRAW:  break;
-					case HDF5:    return ((HDF5File*)m_iof)->Write(M,txe);
+				case CODRAW: break;
+				case HDF5:   return IOTraits<  HDF5>::Write<T>(m_iof, M, txe);
 #ifdef HAVE_MAT_H
-					case MATLAB:  return ((MLFile*)m_iof)->Write(M,txe);
+				case MATLAB: return IOTraits<MATLAB>::Write<T>(m_iof, M, txe);
 #endif
-					case ISMRM:   return ((IRDFile*)m_iof)->Write(M,txe);
+				case ISMRM:  return IOTraits< ISMRM>::Write<T>(m_iof, M, txe);
 #ifdef HAVE_NIFTI1_IO_H
-					case NIFTI:   return ((NIFile*)m_iof)->Write(M,txe);
+				case NIFTI:  return IOTraits< NIFTI>::Write<T>(m_iof, M, txe);
 #endif
-					case SYNGOMR: return ((SyngoFile*)m_iof)->Write(M,txe);
-					case GE:      break;
-					case PHILIPS: break;
-					default:      break;
+				case SYNGO:  return IOTraits< SYNGO>::Write<T>(m_iof, M, txe);
+				case GE:     break;
+				case PHILIPS: break;
+				default:     break;
 				}
 			}
 
@@ -490,16 +497,18 @@ namespace io{
 
 		IOStrategy TypeBySuffix (const std::string& fname) const {
             
-			if      (HasSuffix (fname, IOTraits<HDF5>::Suffix()))
+			std::string lfname = strtolower (fname);
+
+			if      (HasSuffix (lfname, IOTraits<HDF5>::Suffix()))
 				return HDF5;
-			else if (HasSuffix (fname, IOTraits<MATLAB>::Suffix()))
+			else if (HasSuffix (lfname, IOTraits<MATLAB>::Suffix()))
 				return MATLAB;
-			else if (HasSuffix (fname, IOTraits<CODRAW>::Suffix()))
+			else if (HasSuffix (lfname, IOTraits<CODRAW>::Suffix()))
 				return CODRAW;
-			else if (HasSuffix (fname, IOTraits<NIFTI>::Suffix()))
+			else if (HasSuffix (lfname, IOTraits<NIFTI>::Suffix()))
 				return NIFTI;
-			else if (HasSuffix (fname, IOTraits<SYNGOMR>::Suffix()))
-				return SYNGOMR;
+			else if (HasSuffix (lfname, IOTraits<SYNGO>::Suffix()))
+				return SYNGO;
 			else
 				return HDF5;
             
@@ -508,16 +517,18 @@ namespace io{
 
 		IOStrategy TypeByName (const std::string& name) const {
 
-			if      (name.compare(IOTraits<CODRAW>::CName()) == 0)
+			std::string lname = strtolower (name);
+
+			if      (lname.compare(IOTraits<CODRAW>::CName()) == 0)
 				return CODRAW;
-			else if (name.compare(IOTraits<MATLAB>::CName()) == 0)
+			else if (lname.compare(IOTraits<MATLAB>::CName()) == 0)
 				return MATLAB;
-			else if (name.compare(IOTraits<HDF5>::CName())   == 0)
+			else if (lname.compare(IOTraits<HDF5>::CName())   == 0)
 				return HDF5;
-			else if (name.compare(IOTraits<MATLAB>::CName()) == 0)
+			else if (lname.compare(IOTraits<MATLAB>::CName()) == 0)
 				return NIFTI;
-			else if (name.compare(IOTraits<MATLAB>::CName()) == 0)
-				return SYNGOMR;
+			else if (lname.compare(IOTraits<MATLAB>::CName()) == 0)
+				return SYNGO;
 			else
 				return HDF5;
 
@@ -529,15 +540,15 @@ namespace io{
 
 			switch (m_ios) {
 				case CODRAW:  break;
-				case HDF5:    m_iof = IOTraits<HDF5>::Open(fname, mode, params, verbosity); break;
+				case HDF5:   m_iof = IOTraits<  HDF5>::Open(fname, mode, params, verbosity); break;
 #ifdef HAVE_MAT_H
-				case MATLAB:  m_iof = IOTraits<MATLAB>::Open(fname, mode, params, verbosity); break;
+				case MATLAB: m_iof = IOTraits<MATLAB>::Open(fname, mode, params, verbosity); break;
 #endif
-				case ISMRM:   m_iof = IOTraits<ISMRM>::Open(fname, mode, params, verbosity); break;
+				case ISMRM:  m_iof = IOTraits< ISMRM>::Open(fname, mode, params, verbosity); break;
 #ifdef HAVE_NIFTI1_IO_H
-				case NIFTI:   m_iof = IOTraits<NIFTI>::Open(fname, mode, params, verbosity); break;
+				case NIFTI:  m_iof = IOTraits< NIFTI>::Open(fname, mode, params, verbosity); break;
 #endif
-				case SYNGOMR: m_iof = IOTraits<SYNGOMR>::Open(fname, mode, params, verbosity); break;
+				case SYNGO:  m_iof = IOTraits< SYNGO>::Open(fname, mode, params, verbosity); break;
 				case GE:      break;
 				case PHILIPS: break;
 				default:      printf ("Failed to make IO context concrete!\n ");  break;
