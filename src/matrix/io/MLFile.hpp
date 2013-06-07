@@ -275,7 +275,7 @@ template <> struct MXTraits<short> {
 	};
 
 
-#define mxwrite(X,Y) _h5write (X,Y,#X)
+#define mxwrite(X,Y) _mxwrite (X,Y,#X)
 	template<class T> inline static bool
 	_mxwrite (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
 

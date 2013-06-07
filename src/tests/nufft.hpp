@@ -15,7 +15,7 @@ nuffttest (Connector<T>* rc) {
 
 	rc->Init(test);
 
-	IOContext in = fopen (ipf, "r");
+	IOContext in = fopen (ipf);
 	rawdata = fread<cxfl> (in, "data");
 	kspace  = fread<float> (in, "kspace");
 	weights = fread<float> (in, "weights");

@@ -57,14 +57,17 @@ namespace io{
 	struct IOTraits<HDF5> {
 		typedef HDF5File IOClass;
 
-		static const std::string Suffix () {
+		static const
+		std::string Suffix () {
 			return ".h5";
 		}
-		static const std::string CName () {
+		static const
+		std::string CName () {
 			return "CODRAW";
 		}
-		inline IOFile* Open (const std::string& fname, const IOMode mode,
-				const Params& params, const bool verbosity) {
+		inline IOFile*
+        Open (const std::string& fname, const IOMode mode,
+              const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
 		}
 		template <class T> inline static Matrix<T>
@@ -84,20 +87,23 @@ namespace io{
 			return ((IOClass*)iof)->Write(M,txe);
 		}
 	};
-
+    
 #ifdef HAVE_MAT_H
 	template<>
 	struct IOTraits<MATLAB> {
 		typedef MLFile IOClass;
-
-		static const std::string Suffix () {
+        
+		static const
+		std::string Suffix () {
 			return ".mat";
 		}
-		static const std::string CName () {
+		static const
+		std::string CName () {
 			return "MATLAB";
 		}
-		inline IOFile* Open (const std::string& fname, const IOMode mode,
-				const Params& params, const bool verbosity) {
+		inline IOFile*
+        Open (const std::string& fname, const IOMode mode,
+              const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
 		}
 		template <class T> inline static Matrix<T>
@@ -118,19 +124,22 @@ namespace io{
 		}
 	};
 #endif
-
+    
 	template<>
 	struct IOTraits<CODRAW> {
 		typedef CODFile IOClass;
-
-		static const std::string Suffix () {
+        
+		static const
+		std::string Suffix () {
 			return ".cod";
 		}
-		static const std::string CName () {
+		static const
+		std::string CName () {
 			return "CODRAW";
 		}
-		inline IOFile* Open (const std::string& fname, const IOMode mode,
-				const Params& params, const bool verbosity) {
+		inline IOFile*
+        Open (const std::string& fname, const IOMode mode,
+              const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
 		}
 		template <class T> inline static Matrix<T>
@@ -150,19 +159,22 @@ namespace io{
 			return ((IOClass*)iof)->Write(M,txe);
 		}
 	};
-
+    
 #ifdef HAVE_NIFTI1_IO_H
 	template<>
 	struct IOTraits<NIFTI> {
 		typedef NIFile IOClass;
 
-		static const std::string Suffix () {
+		static const
+		std::string Suffix () {
 			return ".nii";
 		}
-		static const std::string CName () {
+		static const
+		std::string CName () {
 			return "NIFTI";
 		}
-		inline IOFile* Open (const std::string& fname, const IOMode mode,
+		inline IOFile*
+        Open (const std::string& fname, const IOMode mode,
 				const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
 		}
@@ -189,13 +201,16 @@ namespace io{
 	struct IOTraits<SYNGOMR> {
 		typedef NIFile IOClass;
 
-		static const std::string Suffix () {
+		static const std::string
+		Suffix () {
 			return ".dat";
 		}
-		static const std::string CName () {
+		static const std::string
+		CName () {
 			return "SYNGOMR";
 		}
-		inline IOFile* Open (const std::string& fname, const IOMode mode,
+		inline IOFile*
+        Open (const std::string& fname, const IOMode mode,
 				const Params& params, const bool verbosity) {
 			return (IOFile*) new IOClass (fname, mode, params, verbosity);
 		}
@@ -237,14 +252,8 @@ namespace io{
 			m_iof(0), m_ios(HDF5) {
 
 			assert (fmode.compare("r") == 0 || fmode.compare("rb") == 0 || fmode.compare("w") == 0 || fmode.compare("wb") == 0);
-
 			m_ios = TypeBySuffix (fname);
-
-			IOMode mode;
-			if (fmode.compare("r") == 0 || fmode.compare("rb") == 0)
-				mode = READ;
-			else if (fmode.compare("w") == 0 || fmode.compare("wb") == 0)
-				mode = WRITE;
+			IOMode mode = (fmode.compare("r") == 0 || fmode.compare("rb") == 0) ? READ : WRITE;
 
 			this->Concretize(fname, mode, Params(), false);
 
@@ -443,30 +452,30 @@ namespace io{
 
 
 		IOStrategy TypeBySuffix (const std::string& fname) const {
-
-			if      (HasSuffix (fname, IOTraits<HDF5>::CName()))
+            
+			if      (HasSuffix (fname, IOTraits<HDF5>::Suffix()))
 				return HDF5;
-			else if (HasSuffix (fname, IOTraits<MATLAB>::CName()))
+			else if (HasSuffix (fname, IOTraits<MATLAB>::Suffix()))
 				return MATLAB;
-			else if (HasSuffix (fname, IOTraits<CODRAW>::CName()))
+			else if (HasSuffix (fname, IOTraits<CODRAW>::Suffix()))
 				return CODRAW;
-			else if (HasSuffix (fname, IOTraits<NIFTI>::CName()))
+			else if (HasSuffix (fname, IOTraits<NIFTI>::Suffix()))
 				return NIFTI;
-			else if (HasSuffix (fname, IOTraits<SYNGOMR>::CName()))
+			else if (HasSuffix (fname, IOTraits<SYNGOMR>::Suffix()))
 				return SYNGOMR;
 			else
 				return HDF5;
-
+            
 		}
 
 
 		IOStrategy TypeByName (const std::string& name) const {
 
-			if (name.compare(IOTraits<CODRAW>::CName()) == 0)
+			if      (name.compare(IOTraits<CODRAW>::CName()) == 0)
 				return CODRAW;
 			else if (name.compare(IOTraits<MATLAB>::CName()) == 0)
 				return MATLAB;
-			else if (name.compare(IOTraits<HDF5>::CName()) == 0)
+			else if (name.compare(IOTraits<HDF5>::CName())   == 0)
 				return HDF5;
 			else if (name.compare(IOTraits<MATLAB>::CName()) == 0)
 				return NIFTI;
@@ -518,7 +527,7 @@ namespace io{
 	 * @return        File IO context for further use.
 	 */
 	inline static
-	IOContext fopen (const std::string& fname, const std::string& mode) {
+	IOContext fopen (const std::string& fname, const std::string& mode = "rb") {
 		return IOContext (fname, mode);
 	}
 
