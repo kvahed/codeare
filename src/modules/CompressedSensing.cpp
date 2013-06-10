@@ -125,7 +125,7 @@ CompressedSensing::Process () {
 	data    /= ma;
 	
 	im_dc    = dwt * im_dc;
-	mxwrite (im_dc, "im_dc.mat");
+    mxwrite (im_dc, "im_dc.mat");
 	
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 

@@ -184,10 +184,12 @@ private:
                 
 #pragma omp parallel default (shared)
             	{
-            		if (omp_get_thread_num()) {
+#pragma omp sections nowait
+            		{
+#pragma omp section
             			if (!(DWTTraits<T>::nstransform_inverse (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
             				printf ("Wavelet transform for real part failed\n.");
-            		} else {
+#pragma omp section
             			if (!(DWTTraits<T>::nstransform_inverse (m_w, m_im, m_sl, m_sl, m_sl, m_iwork, true) == GSL_SUCCESS))
             				printf ("Wavelet transform for imaginary part failed\n.");
             		}
@@ -197,10 +199,12 @@ private:
                 
 #pragma omp parallel default (shared)
             	{
-               		if (omp_get_thread_num()) {
+#pragma omp sections nowait
+            		{
+#pragma omp section
 						if (!(DWTTraits<T>::nstransform_forward (m_w, m_re, m_sl, m_sl, m_sl, m_work) == GSL_SUCCESS))
 							printf ("Wavelet transform for real part failed\n.");
-					} else {
+#pragma omp section
 						if (!(DWTTraits<T>::nstransform_forward (m_w, m_im, m_sl, m_sl, m_sl, m_iwork, true) == GSL_SUCCESS))
                 			printf ("Wavelet transform for imaginary part failed\n.");
                 	}
@@ -221,8 +225,8 @@ private:
 	size_t  m_sz;                  /**< @brief data size */
 	size_t  m_sl;                  /**< @brief side length */
     
-	VECTOR_TYPE(double) m_re;                   /**< @brief Real store */
-	VECTOR_TYPE(double) m_im;                   /**< @brief Imag store */
+	VECTOR_TYPE(double) m_re;      /**< @brief Real store */
+	VECTOR_TYPE(double) m_im;      /**< @brief Imag store */
 	
 	gsl_wavelet_workspace *m_work; /**< @brief Work space */
 	gsl_wavelet_workspace *m_iwork;
