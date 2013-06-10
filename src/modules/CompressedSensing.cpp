@@ -21,11 +21,8 @@
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
 #include "DFT.hpp"
-#include "MLFile.hpp"
 
 using namespace RRStrategy;
-using namespace codeare::matrix::io;
-
 
 error_code
 CompressedSensing::Init () {
@@ -125,7 +122,6 @@ CompressedSensing::Process () {
 	data    /= ma;
 	
 	im_dc    = dwt * im_dc;
-    mxwrite (im_dc, "im_dc.mat");
 	
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
