@@ -201,10 +201,10 @@ isempty (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Matrix of booleans true where NaN
  */
-template <class T> inline  Matrix<bool>
+template <class T> inline  Matrix<BOOL>
 isnan (const Matrix<T>& M) {
 
-    Matrix<bool> res (M.Dim());
+    Matrix<BOOL> res (M.Dim());
 	size_t i = numel(M);
 
 	while (i--)
@@ -221,10 +221,10 @@ isnan (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Matrix of booleans true where inf
  */
-template <class T> inline  Matrix<bool>
+template <class T> inline  Matrix<BOOL>
 isinf (const Matrix<T>& M) {
 
-    Matrix<bool> res (M.Dim());
+    Matrix<BOOL> res (M.Dim());
 	size_t i = numel(M);
 
 	while (i--)
@@ -241,10 +241,10 @@ isinf (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Matrix of booleans true where inf
  */
-template <class T> inline  Matrix<bool>
+template <class T> inline  Matrix<BOOL>
 isfinite (const Matrix<T>& M) {
 
-    Matrix<bool> res (M.Dim());
+    Matrix<BOOL> res (M.Dim());
 	size_t i = numel(M);
 
 	while (i--)

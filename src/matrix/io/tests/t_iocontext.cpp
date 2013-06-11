@@ -29,12 +29,12 @@ int main (int args, char** argv) {
 
 	if (!check<float>())
 		return 1;
-/*	if (!check<double>())
+	if (!check<double>())
 		return 1;
 	if (!check<cxfl>())
 		return 1;
 	if (!check<cxdb>())
-    return 1;*/
+    return 1;
 
 	return 0;
 

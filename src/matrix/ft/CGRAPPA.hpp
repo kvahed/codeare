@@ -23,6 +23,7 @@
 
 #include "DFT.hpp"
 #include "GRAPPATraits.hpp"
+#include "Print.hpp"
 
 
 /**
@@ -50,31 +51,42 @@ public:
 
 
 	/**
-	 * #brief Construct with parameters
+	 * @brief Construct with parameters
 	 */
-	CGRAPPA (const Params& params) : m_nc(1), m_dft(0) {
+	CGRAPPA (const Params& p) : m_nc(1), m_dft(0) {
 
-		/*m_dft    = 0;
-		m_af     = af;
-		m_nc     = nc;
-		m_kdims  = kdims;
+		Workspace& ws = Workspace::Instance();
+		printf ("Initialising GRAPPA operator ...\n");
+
+		// Scan and ACS sizes
+		CheckScan(p, ws);
+		CheckACS(p, ws);
+		assert (m_sdims[0] == m_adims[0]);
 		
-		Matrix<CT> s;
-		Matrix<CT> t;
+		// Kernel dims usually ROxPExSS = 5x4x4
+		m_kdims = p.Get<Matrix<size_t> >("kern_dims");
 
-		m_dft    = new DFT<T>*[1];
-		m_dft[0] = new DFT<T> (sl);
+		// Acceleartion factors
+		m_af    = p.Get<Matrix<size_t> >("acc_factors");
+		size_t af = prod(m_af);
 
-		Matrix<size_t> asz = size(acs);
-		Matrix<size_t> ksz;
+		// Source and target matrices
+		size_t nr = (m_adims[1]-m_kdims[1]-1) * (m_adims[2]-m_kdims[2]-1) * af;
+		Matrix<CT> src = zeros<CT>(m_nc * prod(m_kdims), nr);
+		Matrix<CT> trg = zeros<CT>(m_nc * af           , nr);
+
+		for (size_t y = floor(m_kdims[1]/2); y < m_adims[1]-floor(m_kdims[1]/2); ++y)
+			for (size_t x = floor(m_kdims[0]/2); x < m_adims[0]-floor(m_kdims[0]/2); ++x) // f.e. 2-253
+				for (size_t c = 0, srci = 0, trgi = 0; c < m_nc; ++c) {
+					for (size_t yt = y; yt < af; ++yt, ++trgi)
+
+						trg (c,trgi) = m_acs (c,x,yt);
+					for (size_t ys = 0; ys < y+(m_kdims[1]-1)*af; ys += m_af[1])
+						for (size_t xs = x-floor(m_kdims[0]/2); xs < x+floor(m_kdims[0]/2); ++xs, ++srci)
+							src (c,srci) = m_acs (c,xs,ys);
+				}
 
 
-		GRAPPATraits<T>::src_trg_mat (acs.Memory(), asz.Memory(), ksz.Memory(), acs.Memory(), asz.Memory(),
-				  msz.Memory(), &m_dim, m_af.Memory(), &s[0], ssz.Memory(), &t[0], tsz.Memory());
-
-		m_weights = t.prod(pinv(s));
-*/
-		//(nc*sy*sx,(nyacs-(sy-1)*af*(nxacs-(sx-1))))
 
 	}
 
@@ -90,7 +102,7 @@ public:
 	 * @brief    Adjoint transform
 	 */
 	Matrix<CT>
-	Adjoint (Matrix<CT>) const {
+	Adjoint (const Matrix<CT>& kspace) const {
 
 		Matrix<T> res;
 		return res;
@@ -102,7 +114,7 @@ public:
 	 * @brief    Forward transform
 	 */
 	Matrix<CT>
-	Trafo (Matrix<CT>) const {
+	Trafo (const Matrix<CT>& image) const {
 
 		Matrix<T> res;
 		return res;
@@ -112,14 +124,32 @@ public:
 private:
 
 
+	bool CheckScan (const Params& p, const Workspace& ws) {
+		m_sdims = p.Get<Matrix<size_t> >("scan_dims");
+		std::cout << "  Data dims: " << m_sdims;
+		return true;
+	}
+
+	bool CheckACS (const Params& p, Workspace& ws) {
+		bool integrated_acs = (p.exists("acs_integrated")) ? p.Get<bool>("integrated_acs") : false;
+		assert((p.exists("acs_dims") && p.Get<bool>("acs_integrated")) || p.exists("acs_name"));
+		m_acs   = (integrated_acs) ?
+				  zeros<CT>(p.Get<Matrix<size_t> >("acs_dims")) :
+				  ws.Get<CT>(p.Get<std::string>("acs_name"));
+		m_adims = size(m_acs);
+		m_nc    = m_adims[0];
+		std::cout << "  ACS dims: " << size(m_acs);
+		return true;
+	}
+
 	Matrix<CT>           m_weights; /**< @brief Correction patch  */
 	Matrix<CT>           m_acs;     /**< @brief ACS lines         */
 
 	Matrix<size_t>       m_kdims;   /**< @brief Kernel dimensions */
+	Matrix<size_t>       m_adims;
 	Matrix<size_t>       m_d;       /**< @brief Dimensions        */
 	Matrix<size_t>       m_af;      /**< @brief Acceleration factors */
-	Matrix<size_t>       acs_dim;
-	Matrix<size_t>       kern_dim;
+	Matrix<size_t>       m_sdims;   /**< @brief Scan dimensions */
 
 	std::vector<DFT<T>*> m_dft;     /**< @brief DFT operator      */
 

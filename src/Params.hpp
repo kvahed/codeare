@@ -64,8 +64,11 @@ public:
 	 */
 	inline boost::any operator [](const std::string& key) const {
 		plist::const_iterator pi = pl.find(key);
-		assert (pi != pl.end());
-		return pi->second;
+		if (pi != pl.end())
+			return pi->second;
+		else
+			printf ("Params: operator[] failed for key %s\n", key.c_str());
+		return key;
 	}
 
 
