@@ -12,6 +12,9 @@
 typedef double elem_type;
 
 
+using namespace codeare::matrix::io;
+
+
 /*******************
  ** test function **
  *******************/
@@ -43,6 +46,7 @@ dwt2test (RRClient::Connector<T>* rc)
 	    mat_out_dwt_recon = dwt ->* mat_out_dwt;
 	    mat_out_dwt = dwt * mat_out_dwt_recon;
 	}
+
 
 	DWT2 <elem_type> dwt2 (2);
 	Matrix <elem_type> mat_out_dwt2 = dwt2 * mat_in;
