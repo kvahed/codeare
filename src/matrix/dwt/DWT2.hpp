@@ -63,15 +63,16 @@ class DWT2 {
          * @brief Construct 2D Wavelet transform with wavelet class and side length
          *
          * @param  sl      Side length
-         * @param  wf      Wavelet family (default none, i.e. ID)
-         * @param  wm      Familty member (default 4)
          */
-        DWT2 (const int dim = 2)
+        DWT2 (const size_t sl, const int wl_scale = 0, const int dim = 2)
             : m_dim (dim),
               m_lpf_d (wl_mem),
               m_lpf_r (wl_mem),
               m_hpf_d (wl_mem),
-              m_hpf_r (wl_mem)
+              m_hpf_r (wl_mem),
+              m_max_size (sl * sl),
+              temp ((T *) malloc (4 * m_max_size * sizeof (T))),
+              m_wl_scale (wl_scale)
         {
 
             wl_traits::LowPassFilterDecom (m_lpf_d);
@@ -88,6 +89,9 @@ class DWT2 {
         ~DWT2 ()
         {
             /* -- */
+
+            free (temp);
+
         }
 
 
@@ -155,6 +159,7 @@ class DWT2 {
          */
         typedef typename elem_type_traits <T> :: value_type value_type;
 
+
         /**
          * variable definitions
          */
@@ -169,6 +174,15 @@ class DWT2 {
         // high pass filters
         Matrix <value_type> m_hpf_d;
         Matrix <value_type> m_hpf_r;
+
+        // maximum size of matrix
+        const size_t m_max_size;
+
+        // temporary memory
+        T * temp;
+
+        // wavelet scale (max. decomposition level)
+        const int m_wl_scale;
 
 
         /**
@@ -187,13 +201,12 @@ class DWT2 {
         TransformForward    	(const Matrix<T>& m)
         {
 
+            assert (m.Size () <= m_max_size);
+
             Matrix<T> res (m.DimVector());
 
-            if (m_dim == 2)
-            {
-
-                // create temporary memory
-                T * temp = (T*) malloc(3*m.Height()*m.Width()*sizeof(T));
+//            if (m_dim == 2)
+//            {
 
                 // create vars from mex function
                 int J = 0, nn;
@@ -203,14 +216,11 @@ class DWT2 {
                     std::cout << "FWT2 requires dyadic length sides" << std::endl;
                     assert (false);
                 }
-                const int ell = 0;
 
                 // call dpwt2
-                res = dpwt2 (m, ell, J, temp);
+                res = dpwt2 (m, m_wl_scale, J, temp);
 
-                free (temp);
-
-            }
+//            }
 
             return res;
 
@@ -225,13 +235,12 @@ class DWT2 {
         TransformBackwards		(const Matrix <T> & m)
         {
 
+            assert (m.Size () <= m_max_size);
+
             Matrix <T> res (m.DimVector());
 
-            if (m_dim == 2)
-            {
-
-                // create temporary memory
-                T * temp = (T*) malloc (4*m.Height()*m.Width()*sizeof(T));
+//            if (m_dim == 2)
+//            {
 
                 // create vars from mex function
                 int J = 0, nn;
@@ -241,14 +250,11 @@ class DWT2 {
                     std::cout << "IWT2 requires dyadic length sides" << std::endl;
                     assert (false);
                 }
-                const int ell = 0;
 
                 // call dpwt2
-                res = idpwt2 (m, ell, J, temp);
+                res = idpwt2 (m, m_wl_scale, J, temp);
 
-                free (temp);
-
-            }
+//            }
 
             return res;
 

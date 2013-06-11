@@ -37,7 +37,7 @@ dwt2test (RRClient::Connector<T>* rc)
 	int iterations = 5;
 
 	// do something
-	DWT <elem_type> dwt (mat_in.Dim (0), WL_DAUBECHIES, 4);
+	DWT <elem_type> dwt (mat_in.Dim (0), WL_DAUBECHIES, 8);
 	Matrix <elem_type> mat_out_dwt = dwt * mat_in;
 	Matrix <elem_type> mat_out_dwt_recon;
 
@@ -48,7 +48,7 @@ dwt2test (RRClient::Connector<T>* rc)
 	}
 
 
-	DWT2 <elem_type> dwt2 (2);
+	DWT2 <elem_type> dwt2 (mat_in.Dim (0));
 	Matrix <elem_type> mat_out_dwt2 = dwt2 * mat_in;
 	Matrix <elem_type> mat_out_dwt2_recon;
 
