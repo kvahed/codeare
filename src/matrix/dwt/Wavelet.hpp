@@ -97,6 +97,78 @@ class WaveletTraits <T, WL_HAAR, wl_mem>
 
 
 /**
+ * @brief           Implementation of Daubechies wavelet, member: 4.
+ */
+template <>
+template <class T>
+class WaveletTraits <T, WL_DAUBECHIES, 4>
+{
+
+    public:
+
+        // extract "real" value type
+        typedef typename elem_type_traits <T> :: value_type value_type;
+
+        /**
+         * @brief               Getter for low pass reconstruction filter of Daubechies wavelet, member: 8.
+         *
+         * @return              Low pass reconstruction filter.
+         */
+        static
+        inline
+        void
+        LowPassFilterDecom      (Matrix <value_type> & lpf_d)
+        {
+            lpf_d [0] =  0.48296291314453414337487159986;
+            lpf_d [1] =  0.83651630373780790557529378092;
+            lpf_d [2] =  0.22414386804201338102597276224;
+            lpf_d [3] = -0.12940952255126038117444941881;
+        }
+
+        /**
+         * @brief               Getter for high pass reconstruction filter of Daubechies wavelet, member: 8.
+         *
+         * @return              High pass reconstruction filter.
+         */
+        static
+        inline
+        void
+        HighPassFilterDecom     (Matrix <value_type> & hpf_d)
+        {
+            Matrix <value_type> lpf_d (8);
+            LowPassFilterDecom (lpf_d);
+            mirrorfilt (lpf_d, hpf_d);
+        }
+
+        /**
+         * @brief               Getter for low pass decomposition filter of Daubechies wavelet, member: 8.
+         *
+         * @return              Low pass decomposition filter.
+         */
+        static
+        inline
+        void
+        LowPassFilterRecon      (Matrix <value_type> & lpf_r)
+        {
+            LowPassFilterDecom (lpf_r);
+        }
+
+        /**
+         * @brief               Getter for high pass decomposition filter of Daubechies wavelet, member: 8.
+         *
+         * @return              High pass decomposition filter.
+         */
+        static
+        inline
+        void
+        HighPassFilterRecon     (Matrix <value_type> & hpf_r)
+        {
+            HighPassFilterDecom (hpf_r);
+        }
+
+};
+
+/**
  * @brief           Implementation of Daubechies wavelet, member: 8.
  */
 template <>
