@@ -79,6 +79,8 @@ class DWT2 {
             wl_traits::HighPassFilterDecom (m_hpf_d);
             wl_traits::HighPassFilterRecon (m_hpf_r);
 
+            omp_set_num_threads (2);
+
         }
 
 
@@ -253,19 +255,6 @@ class DWT2 {
         }
 
 
-        void
-        mirrorfilt              (double * lpf, double * hpf, int length)
-        {
-            int i,isign;
-            isign = 1;
-            for(i=0; i < length; i++){
-                *hpf++ = isign * *lpf++;
-                isign *= -1;
-            }
-        }
-
-
-
         /**
          *  COPIED FROM WAVELAB IMPLEMENTATION
          */
@@ -346,7 +335,7 @@ class DWT2 {
 
             int i;
 
-# pragma omp parallel for
+//# pragma omp parallel for num_threads (2)
             for( i=0; i < n; i++)
                 y[i] = x[k+nc*i];
         }
@@ -356,7 +345,7 @@ class DWT2 {
         {
             int i;
 
-# pragma omp parallel for
+//# pragma omp parallel for num_threads (2)
             for( i=0; i < n; i++)
                 y[k+nc*i] = x[i];
         }
@@ -368,10 +357,24 @@ class DWT2 {
 
             // TODO: use operator= instead ...
 
-# pragma omp parallel for
+//# pragma omp parallel for num_threads (2)
             for (int i = 0; i < n; ++i)
             {
                 dest [i] = src [i];
+            }
+
+        }
+
+
+        void
+        adddouble       (const T * const x, const T * const y, const int n, T * const z)
+        {
+
+            // TODO: use operator+ instead ...
+//# pragma omp parallel for num_threads (2)
+            for (int i = 0; i < n; ++i)
+            {
+                z[i] = x[i] + y[i];
             }
 
         }
@@ -405,7 +408,7 @@ class DWT2 {
                 mlo++;
 
             // loop over pixels of dwt_high
-# pragma omp parallel for private (s)
+//# pragma omp parallel for private (s) num_threads (2)
             for (int i = mlo; i < n2; i++)
             {
 
@@ -414,7 +417,7 @@ class DWT2 {
 
                 // perform convolution
                 for (int h = 0; h < filter_length; h++)
-                    s += ((T) m_hpf_d [h]) * signal [2*i+1-h];
+                    s += m_hpf_d [h]* signal [2*i+1-h];
 
                 // assign result of convolution
                 dwt_high[i] = s;
@@ -446,7 +449,7 @@ class DWT2 {
                     if (j < 0)
                         j += side_length;
 
-                    s += ((T) m_hpf_d [h]) * signal [j];
+                    s += m_hpf_d [h] * signal [j];
 
                     // update index
                     --j;
@@ -496,7 +499,7 @@ class DWT2 {
                 mhi = -1;
 
             // loop over pixels of dwt_low
-# pragma omp parallel for private (s)
+//# pragma omp parallel for private (s) num_threads (2)
             for (int i= 0; i<=mhi; i++)
             {
 
@@ -504,7 +507,7 @@ class DWT2 {
                 s = 0.;
                 // apply low pass filter (convolution)
                 for (int h = 0; h < filter_length; h++)
-                    s += ((T) m_lpf_d [h]) * signal [2*i+h];
+                    s += m_lpf_d [h] * signal [2*i+h];
                 // assign result of convolution
                 dwt_low [i] = s;
 
@@ -529,7 +532,7 @@ class DWT2 {
                     // adjust index if it exceeds current side_length
                     if (j >= side_length)
                         j -= side_length;
-                    s += ((T) m_lpf_d [h]) * signal [j];
+                    s += m_lpf_d [h] * signal [j];
 
                     // update index
                     j++;
@@ -628,20 +631,6 @@ class DWT2 {
 
 
         void
-        adddouble		(const T * const x, const T * const y, const int n, T * const z)
-        {
-
-            // TODO: use operator+ instead ...
-# pragma omp parallel for
-            for (int i = 0; i < n; ++i)
-            {
-                z[i] = x[i] + y[i];
-            }
-
-        }
-
-
-        void
         uplo		(const T * const wc, const int side_length, T * const signal)
         {
             int j, meven, modd, mmax;
@@ -659,17 +648,9 @@ class DWT2 {
             modd = filter_length/2;
 
             // loop over regular signal indices
-# pragma omp parallel for private (s, s_odd)
+//# pragma omp parallel for private (s, s_odd) num_threads (2)
             for (int i = meven; i < side_length; i++)
             {
-                //			   		s = 0.;
-                //					for (int h = 0; h < meven; h++)
-                //						s += ((T)m_lpf_r[2*h])*wc[i-h];
-                //					signal[2*i] = s;
-                //					s = 0.;
-                //					for (int h = 0; h < modd; h++)
-                //						s += ((T)m_lpf_r[2*h+1])*wc[i-h];
-                //					signal[2*i+1] = s;
 
                 // init convolution results
                 s = 0.;
@@ -680,14 +661,14 @@ class DWT2 {
                 {
 
                     // even filter index
-                    s += ((T) m_lpf_r [2*h]) * wc [i-h];
+                    s += m_lpf_r [2*h] * wc [i-h];
                     // odd filter index
-                    s_odd += ((T) m_lpf_r [2*h+1]) * wc [i-h];
+                    s_odd += m_lpf_r [2*h+1] * wc [i-h];
 
                 }
                 // case of odd filter_length (-> more even indices: start with index 0)
                 if (meven > modd)
-                    s += ((T) m_lpf_r [2*meven]) * wc [i-meven];
+                    s += m_lpf_r [2*meven] * wc [i-meven];
 
                 // assign convolution results
                 signal [2*i] = s;
@@ -714,27 +695,7 @@ class DWT2 {
                 // set start index of wavelet coefficients
                 j = i;
 
-                //		           for (int h = 0; h < meven; h++)
-                //		           {
-                //		               if (j < 0)
-                //		                   j += side_length;
-                //		               s += ((T)m_lpf_r[2*h])*wc[j];
-                //		               --j;
-                //		           }
-                //		           signal[2*i] = s;
-                //
-                //		           s = 0.;
-                //		           j = i;
-                //		           for (int h = 0; h < modd; h++)
-                //		           {
-                //		               if (j < 0)
-                //		                   j += side_length;
-                //		               s += ((T)m_lpf_r[2*h+1])*wc[j];
-                //		               --j;
-                //		           }
-                //		           signal[2*i+1] = s;
-
-                // perform convolution
+                 // perform convolution
                 for (int h = 0; h < modd; h++)
                 {
 
@@ -743,9 +704,9 @@ class DWT2 {
                         j += side_length;
 
                     // even part of convolution
-                    s += ((T) m_lpf_r [2*h]) * wc [j];
+                    s += m_lpf_r [2*h] * wc [j];
                     // odd part of convolution
-                    s_odd += ((T) m_lpf_r [2*h+1]) * wc [j];
+                    s_odd += m_lpf_r [2*h+1] * wc [j];
 
                     // update index
                     --j;
@@ -754,7 +715,7 @@ class DWT2 {
 
                 // case of odd filter_length
                 if (meven > modd)
-                    s += ((T) m_lpf_r [2*meven]) * wc [j];
+                    s += m_lpf_r [2*meven] * wc [j];
 
                 // assign convolution results
                 signal [2*i] = s;
@@ -766,52 +727,95 @@ class DWT2 {
 
 
         void
-        uphi		(const T * const x, const int n, T * const y)
+        uphi		(const T * const wc, const int side_length, T * const signal)
         {
-            int  meven, modd, i, h, j, mmin;
-            T s;
+            int  meven, modd, j, mmin;
+            T s, s_odd;
 
-            const int m = m_hpf_r.Dim (0);
+            const int filter_length = m_hpf_r.Dim (0);
 
             /*hipass version */
-            meven = (m+1)/2;
-            modd = m/2;
+
+            // upper bound for even filter indices
+            meven = (filter_length+1)/2;
+            // upper bound for odd filter indices
+            modd = filter_length/2;
 
             /* away from edges */
-            for( i= 0; i+meven<n; i++){
+
+            // loop over regular signal indices
+//# pragma omp parallel for private (s, s_odd) num_threads (2)
+            for (int i = 0; i < side_length - meven; i++)
+            {
+
+                // init convolution results
                 s = 0.;
-                for( h=0; h < meven; h++)
-                    s += ((T)m_hpf_r[2*h])*x[i+h];
-                y[2*i+1] = s;
-                s = 0.;
-                for( h=0; h < modd; h++)
-                    s += ((T)m_hpf_r[2*h+1])*x[i+h];
-                y[2*i] = s;
-            }
+                s_odd = 0.;
+
+                // perform convolution for even and odd filter indices
+                for (int h = 0; h < modd; h++)
+                {
+
+                    // even filter index
+                    s += m_hpf_r [2*h] * wc [i+h];
+                    // odd filter index
+                    s_odd += m_hpf_r [2*h+1] * wc [i+h];
+
+                } // perform convolution
+
+                // case of odd filter_length
+                if (meven > modd)
+                    s += m_hpf_r [2*meven] * wc [i+meven];
+
+                // assign convolution results
+                signal [2*i+1] = s;
+                signal [2*i] = s_odd;
+
+            } // loop over regular signal indices
+
 
             /* fix up edge values */
-            mmin = n-meven;
-            if(mmin < 0) mmin = 0;
-            for( i= mmin; i<n; i++){
 
-                s = 0.;
-                j = i;
-                for( h=0; h < meven; h++){
-                    if(j >= n) j -= n;
-                    s += ((T)m_hpf_r[2*h])*x[j];
-                    j++;
-                }
-                y[2*i+1] = s;
+            // lower bound for indices of edge values
+            mmin = side_length - meven;
+            // possible correction if mmin less than zero
+            if (mmin < 0)
+                mmin = 0;
 
+            // loop over edge values
+            for (int i = mmin; i < side_length; i++)
+            {
+
+                // init convolution results
                 s = 0.;
+                s_odd = 0.;
+                // start index of wavelet coefficients
                 j = i;
-                for( h=0; h < modd; h++){
-                    if(j >= n) j -= n;
-                    s += ((T)m_hpf_r[2*h+1])*x[j];
+
+                // perform convolution for even and odd indices
+                for (int h = 0; h < meven; h++)
+                {
+
+                    // correct current wavelet coeff's index if needed
+                    if (j >= side_length)
+                        j -= side_length;
+
+                    // even filter index
+                    s += m_hpf_r [2*h] * wc [j];
+                    // odd filter index
+                    s_odd += m_hpf_r [2*h+1] * wc [j];
+
+                    // update current wc index
                     j++;
-                }
-                y[2*i] = s;
-            }
+
+                } // perform convolution
+
+                // assign convolution results
+                signal [2*i+1] = s;
+                signal [2*i] = s_odd;
+
+            } // loop over edge values
+
         }
 
 
