@@ -158,8 +158,10 @@ template <> struct MXTraits<short> {
 
 			m_file = matOpen (fname.c_str(), (mode == READ) ? "r" : "w" );
 
-			if (m_file == NULL)
+			if (m_file == NULL) {
 				printf ("Error opening MATLAB file %s\n", fname.c_str());
+				assert (false);
+			}
 
 		}
 
@@ -178,8 +180,8 @@ template <> struct MXTraits<short> {
 			Matrix<T> M;
 
 			if (!mxa) {
-				printf ("Error opening variable %s\n", uri.c_str());
-				return M;
+				printf ("**ERROR**: Failed to retrieve variable %s\n", uri.c_str());
+				assert (false);
 			}
 
 			mxClassID     mcid = mxGetClassID(mxa);
@@ -187,8 +189,7 @@ template <> struct MXTraits<short> {
 			const mwSize*  dim = mxGetDimensions(mxa);
 			size_t i = 0;
 
-			if (!MXValidate (M, mxa))
-				return M;
+			assert (MXValidate (M, mxa));
 
 			std::vector<size_t> mdims(ndim,1);
 

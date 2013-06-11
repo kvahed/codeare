@@ -27,7 +27,7 @@
 #include "ReconStrategy.hpp"
 #include "Algos.hpp"
 #include "FT.hpp"
-#include "DWT.hpp"
+#include "DWT2.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
 #include "linalg/Lapack.hpp"
@@ -57,7 +57,7 @@ namespace RRStrategy {
         double lsa;
         double lsb;
 
-        DWT<cxfl>* dwt;
+        DWT2<cxfl>* dwt;
         FT<float>*  ft;
         TVOP*      tvt;
         
@@ -219,7 +219,7 @@ namespace RRStrategy {
              const Matrix<cxfl>& data, const CSParam& cgp) {
         
         FT<float>& ft = *(cgp.ft);
-        DWT<cxfl>& dwt = *(cgp.dwt);
+        DWT2<cxfl>& dwt = *(cgp.dwt);
         
         Matrix<cxfl> g;
         
@@ -258,7 +258,7 @@ namespace RRStrategy {
     Matrix<cxfl> 
     GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {
         
-        DWT<cxfl>&  dwt = *cgp.dwt;
+        DWT2<cxfl>&  dwt = *cgp.dwt;
         TVOP& tvt = *cgp.tvt;
         float p   = ((float)cgp.pnorm)/2.0-1.0;
         
@@ -306,7 +306,7 @@ namespace RRStrategy {
         
         Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
         
-        DWT<cxfl>& dwt = *cgp.dwt;
+        DWT2<cxfl>& dwt = *cgp.dwt;
         FT<float>& ft  = *cgp.ft;
         TVOP&      tvt = *cgp.tvt;
         

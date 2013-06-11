@@ -24,16 +24,16 @@ grappatest (Connector<T>* rc) {
 
     using namespace codeare::matrix::io;
 	// Incoming
-	Matrix<cxfl> scan;   // Folded images O (Nc, RO, PE/AF, PE2)
-	Matrix<cxfl> acs;   // Sensitivity maps O (Nc, RO, PE, PE2)
+	Matrix<cxdb> scan;   // Folded images O (Nc, RO, PE/AF, PE2)
+	Matrix<cxdb> acs;   // Sensitivity maps O (Nc, RO, PE, PE2)
 	
     IOContext ic (rc->GetElement("/config/data-in"), base, READ);
-    scan = ic.Read<cxfl>(rc->GetElement("/config/data-in/scan"));
-    acs = ic.Read<cxfl>(rc->GetElement("/config/data-in/acs"));
+    scan = ic.Read<cxdb>(rc->GetElement("/config/data-in/scan"));
+    acs = ic.Read<cxdb>(rc->GetElement("/config/data-in/acs"));
     ic.Close();
 
 	// Outgoing
-	Matrix<cxfl> recon;   // Reconstructed unaliased O (RO, PE, PE2)
+	Matrix<cxdb> recon;   // Reconstructed unaliased O (RO, PE, PE2)
 
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
@@ -53,7 +53,7 @@ grappatest (Connector<T>* rc) {
 	
 	// Receive -------------
 	
-	rc->GetMatrix ("recon", recon);  // Images
+	//rc->GetMatrix ("recon", recon);  // Images
 	
 	// ---------------------
 	

@@ -40,15 +40,24 @@ GRAPPA::Prepare     () {
 
 	printf ("  Preparing %s ...\n", Name());
 
+    Matrix<size_t> scan_dims = size(Get<cxdb>("scan"));
+
+    Matrix<size_t> acc_factors (2,1);
+    acc_factors[0] = 1; acc_factors[1] = 3;
+
+    Matrix<size_t> kern_dims (2,1);
+    acc_factors[0] = 5; acc_factors[1] = 4;
+
     Params p;
     p.Set("acs_name", std::string("acs"));
-
-    Matrix<size_t> scan_dims = size(Get<cxfl>("scan"));
     p.Set("scan_dims", scan_dims);
+    p.Set("kern_dims", kern_dims);
+    p.Set("acc_factors", acc_factors);
 
     m_ft = new CGRAPPA<double>(p);
 
 	printf ("  ... done.\n\n");
+
 	return OK;
 	
 
@@ -72,10 +81,10 @@ GRAPPA::Process     () {
 
 	printf ("  Processing GRAPPA ...\n");
 
-	Matrix<cxfl>& scan = Get<cxfl>("scan");
+	Matrix<cxdb>& scan = Get<cxdb>("scan");
 
-
-	printf ("... done.. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+	printf ("... done.. WTime: %.4f seconds.\n\n",
+			elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	return OK;
 
