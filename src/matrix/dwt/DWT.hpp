@@ -144,8 +144,6 @@ class DWT {
         Matrix<T>
         Adjoint      (const Matrix<T>& m) {
 
-        	std::cout << wl_fam << std::endl;
-
            	if (wl_fam == ID)
             		return m;
 
