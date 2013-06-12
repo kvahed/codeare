@@ -11,42 +11,7 @@
 #include "IOFile.hpp"
 #include "mat.h"
 
-#ifdef HAVE_CXXABI_H
-    #include <cxxabi.h>
-#endif
-
-
-static inline std::string
-demangle (const char* symbol) {
-
-#ifdef HAVE_CXXABI_H
-
-	size_t size;
-	int    status;
-	char   temp[128];
-	char*  demangled;
-
-	//first, try to demangle a c++ name
-	if (1 == sscanf(symbol, "%*[^(]%*[^_]%127[^)+]", temp)) {
-
-		if (NULL != (demangled = abi::__cxa_demangle(temp, NULL, &size, &status))) {
-			std::string result(demangled);
-			free(demangled);
-			return result;
-		}
-	}
-
-	//if that didn't work, try to get a regular c symbol
-	if (1 == sscanf(symbol, "%127s", temp)) {
-		return temp;
-	}
-
-#endif
-
-	//if all else fails, just return the symbol
-	return symbol;
-
-}
+#include "Demangle.hpp"
 
 template <class T> inline static bool
 MXValidate  (const Matrix<T>& M, const mxArray* mxa) {

@@ -9,6 +9,8 @@
 #define PARAMS_HPP_
 
 #include "Toolbox.hpp"
+#include "Demangle.hpp"
+
 #include <boost/any.hpp>
 #include <assert.h>
 #include <map>
@@ -53,8 +55,10 @@ public:
 	 */
 	inline boost::any& operator [](const std::string& key) {
 		plist::iterator pli = pl.find(key);
-		if (pl.find(key) == pl.end())
-			return Toolbox::Instance()->void_any;
+		if (pl.find(key) == pl.end()) {
+			pl.insert(param(key, Toolbox::Instance()->void_any));
+            pli = pl.find(key);
+        }
 		return pli->second;
 	}
 
@@ -67,7 +71,7 @@ public:
 		if (pi != pl.end())
 			return pi->second;
 		else
-			printf ("Params: operator[] failed for key %s\n", key.c_str());
+			printf ("**WARNING**: operator[] failed for key %s\n", key.c_str());
 		return key;
 	}
 
@@ -85,9 +89,11 @@ public:
 		try {
 			return boost::any_cast<T>(ba);
 		} catch (const boost::bad_any_cast& e) {
-			printf ("Failed to retrieve %s - %s.\n Requested %s - have %s.\n",
-					key.c_str(), e.what(), typeid(T).name(), ba.type().name());
-			assert(false);
+			printf ("**WARNING**: Failed to retrieve %s - %s.\n             Requested %s - have %s.\n",
+					key.c_str(), e.what(),
+                    demangle(typeid(T).name()).c_str(),
+                    demangle(ba.type().name()).c_str());
+			//assert(false);
 		}
 	}
 
@@ -162,7 +168,7 @@ public:
 		std::string sb;
 
 		for (plist::const_iterator i = pl.begin(); i != pl.end(); i++)
-			sb += i->first + "\t" + i->second.type().name() + "\n";
+			sb += i->first + "\t" + demangle(i->second.type().name()).c_str() + "\n";
 
 		return sb.c_str();
 

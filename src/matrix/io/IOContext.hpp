@@ -26,6 +26,7 @@
 #include "HDF5File.hpp"
 #include "SyngoFile.hpp"
 #include "CODFile.hpp"
+#include "Demangle.hpp"
 
 #ifdef HAVE_MAT_H
 #include "MLFile.hpp"

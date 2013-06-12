@@ -51,10 +51,7 @@ enum wlfamily {
 /**
  * @brief 2D Discrete wavelet transform for Matrix template (from GSL)
  */
-template <   class         T,
-          wlfamily    wl_fam = WL_DAUBECHIES,
-               int    wl_mem = 4,
-             class wl_traits = WaveletTraits <T, wl_fam, wl_mem> >
+template<class T>
 class DWT {
 
 
@@ -66,7 +63,8 @@ class DWT {
          *
          * @param  sl      Side length
          */
-        DWT (const size_t sl, const int wl_scale = 4, const int dim = 2)
+        DWT (const size_t sl, const wlfamily wl_fam = WL_DAUBECHIES, const int wl_mem = 4,
+        		const int wl_scale = 4, const int dim = 2)
             : m_dim (dim),
               m_lpf_d (wl_mem),
               m_lpf_r (wl_mem),
@@ -74,17 +72,18 @@ class DWT {
               m_hpf_r (wl_mem),
               m_sl (sl),
               temp (container<T>(omp_get_num_threads() * 8 * sl)),
-              m_wl_scale (wl_scale)
+              m_wl_scale (wl_scale),
+              _fam(wl_fam)
         {
 
-            wl_traits::LowPassFilterDecom (m_lpf_d);
-            wl_traits::LowPassFilterRecon (m_lpf_r);
-            wl_traits::HighPassFilterDecom (m_hpf_d);
-            wl_traits::HighPassFilterRecon (m_hpf_r);
+            setupWlFilters (wl_fam, wl_mem, m_lpf_d, m_lpf_r, m_hpf_d, m_hpf_r);
 
+            std::cout << " lpf_d: " << m_lpf_d [0] << ", " << m_lpf_d [1] << std::endl;
+            std::cout << " lpf_r: " << m_lpf_r [0] << ", " << m_lpf_r [1] << std::endl;
+            std::cout << " hpf_d: " << m_hpf_d [0] << ", " << m_hpf_d [1] << std::endl;
+            std::cout << " hpf_r: " << m_hpf_r [0] << ", " << m_hpf_r [1] << std::endl;
 
         }
-
 
         virtual
         ~DWT ()
@@ -105,7 +104,7 @@ class DWT {
         Trafo        (const Matrix<T>& m)
         {
 
-        	if (wl_fam == ID)
+        	if (_fam == ID)
         		return m;
 
             assert (m.Size () <= m_sl*m_sl);
@@ -144,7 +143,7 @@ class DWT {
         Matrix<T>
         Adjoint      (const Matrix<T>& m) {
 
-           	if (wl_fam == ID)
+           	if (_fam == ID)
             		return m;
 
             assert (m.Size () <= m_sl*m_sl);
@@ -232,6 +231,8 @@ class DWT {
 
         // wavelet scale (max. decomposition level)
         const int m_wl_scale;
+
+        wlfamily _fam;
 
 
         /**
