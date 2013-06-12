@@ -2695,7 +2695,7 @@ public:
         return _dim[1];
     }
 
-#ifdef HAVE_MPI
+#ifdef HAVE_SCALAPACK
 
     /**
      * @brief           Get number of rows, i.e. tmp = size(this); tmp(1).
@@ -2979,7 +2979,7 @@ protected:
     // Name
     std::string         _name; /// Name
     
-#ifdef HAVE_MPI
+#ifdef HAVE_SCALAPACK
     // BLACS 
 	int              _bs;
 	int              _desc[9]; /**< @brief matrix grid vector */
@@ -3092,7 +3092,7 @@ Matrix<T,P>::Export (IceAs* ias, const size_t pos) const {
 
 #endif // ICE
 
-#ifdef HAVE_MPI
+#ifdef HAVE_SCALAPACK
 #include "Grid.hpp"
 
 template<> inline
