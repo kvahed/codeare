@@ -49,10 +49,7 @@
 /**
  * @brief 2D Discrete wavelet transform for Matrix template (from GSL)
  */
-template <   class         T,
-          wlfamily    wl_fam = WL_DAUBECHIES,
-               int    wl_mem = 8,
-             class wl_traits = WaveletTraits <T, wl_fam, wl_mem> >
+template <class T>
 class DWT2 {
 
 
@@ -64,7 +61,8 @@ class DWT2 {
          *
          * @param  sl      Side length
          */
-        DWT2 (const size_t sl, const int wl_scale = 0, const int dim = 2)
+        DWT2 (const size_t sl, const wlfamily wl_fam = WL_DAUBECHIES, const int wl_mem = 4,
+        		const int wl_scale = 4, const int dim = 2)
             : m_dim (dim),
               m_lpf_d (wl_mem),
               m_lpf_r (wl_mem),
@@ -75,12 +73,12 @@ class DWT2 {
               m_wl_scale (wl_scale)
         {
 
-            wl_traits::LowPassFilterDecom (m_lpf_d);
-            wl_traits::LowPassFilterRecon (m_lpf_r);
-            wl_traits::HighPassFilterDecom (m_hpf_d);
-            wl_traits::HighPassFilterRecon (m_hpf_r);
+            setupWlFilters (wl_fam, wl_mem, m_lpf_d, m_lpf_r, m_hpf_d, m_hpf_r);
 
-            omp_set_num_threads (2);
+            std::cout << " lpf_d: " << m_lpf_d [0] << ", " << m_lpf_d [1] << std::endl;
+            std::cout << " lpf_r: " << m_lpf_r [0] << ", " << m_lpf_r [1] << std::endl;
+            std::cout << " hpf_d: " << m_hpf_d [0] << ", " << m_hpf_d [1] << std::endl;
+            std::cout << " hpf_r: " << m_hpf_r [0] << ", " << m_hpf_r [1] << std::endl;
 
         }
 
@@ -423,7 +421,7 @@ class DWT2 {
 
                 // perform convolution
                 for (int h = 0; h < filter_length; h++)
-                    s += m_hpf_d [h]* signal [2*i+1-h];
+                    s += m_hpf_d [h] * signal [2*i+1-h];
 
                 // assign result of convolution
                 dwt_high[i] = s;

@@ -34,10 +34,14 @@ dwt2test (RRClient::Connector<T>* rc)
 	IOContext ioc (rc->GetElement ("/config/data/in"), base, READ);
 	mat_in = ioc.Read <elem_type> (rc->GetElement ("/config/data/in/signal"));
 
+	// read DWT params
+	wlfamily wl_fam = (wlfamily) atoi (rc->GetElement ("/config")->Attribute ("wl_fam"));
+	const int wl_mem = atoi (rc->GetElement ("/config")->Attribute ("wl_mem"));
+
 	int iterations = 5;
 
 	// do something
-	DWT <elem_type> dwt (mat_in.Dim (0), WL_DAUBECHIES, 8);
+	DWT <elem_type> dwt (mat_in.Dim (0), wl_fam, wl_mem);
 	Matrix <elem_type> mat_out_dwt = dwt * mat_in;
 	Matrix <elem_type> mat_out_dwt_recon;
 
@@ -47,8 +51,7 @@ dwt2test (RRClient::Connector<T>* rc)
 	    mat_out_dwt = dwt * mat_out_dwt_recon;
 	}
 
-
-	DWT2 <elem_type> dwt2 (mat_in.Dim (0));
+	DWT2 <elem_type> dwt2 (mat_in.Dim (0), wl_fam, wl_mem, 4);
 	Matrix <elem_type> mat_out_dwt2 = dwt2 * mat_in;
 	Matrix <elem_type> mat_out_dwt2_recon;
 
