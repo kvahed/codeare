@@ -35,10 +35,15 @@ inline float
 NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
 
     float nrmse = 0.0;
+    size_t i;
 
-    for (size_t i = 0; i < numel(target); i++ )
-        nrmse = nrmse + pow(abs(target[i]) - abs(result[i]), 2);
-    
+#pragma omp parallel default (shared) private (i)
+    {
+#pragma omp for reduction(+:nrmse)
+    for (i = 0; i < numel(target); i++ )
+        nrmse += pow(abs(target[i]) - abs(result[i]), 2);
+    }
+
     nrmse = sqrt(nrmse)/norm(target);
     
     return nrmse;
@@ -58,11 +63,11 @@ inline float
 NOHO                         (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
 
     float nrmse = 0.0;
+    size_t i;
 
-    for (size_t i = 0; i < numel(target); i++ )
-        nrmse = nrmse + pow(abs(target[i]) - abs(result[i]), 2);
-    
-    nrmse = sqrt(nrmse)/norm(target);
+#pragma omp parallel for default (shared) private (i) reduction(+:nrmse)
+	for (i = 0; i < numel(target); i++ )
+		nrmse += pow(abs(target[i]) - abs(result[i]), 2);
     
     return nrmse;
 

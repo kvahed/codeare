@@ -104,7 +104,33 @@ class DWT {
         Matrix<T>
         Trafo        (const Matrix<T>& m)
         {
-            return TransformForward (m);
+
+        	if (wl_fam == ID)
+        		return m;
+
+            assert (m.Size () <= m_sl*m_sl);
+
+            Matrix<T> res (m.DimVector());
+
+//            if (m_dim == 2)
+//            {
+
+                // create vars from mex function
+                int J = 0, nn;
+                for (nn = 1; nn < m.Height (); nn *= 2 )
+                    J ++;
+                if (nn  !=  m.Height ()){
+                    std::cout << "FWT2 requires dyadic length sides" << std::endl;
+                    assert (false);
+                }
+
+                // call dpwt2
+                res = dpwt2 (m, m_wl_scale, J, temp);
+
+//            }
+
+            return res;
+
         }
 
 
@@ -116,9 +142,35 @@ class DWT {
          */
         inline
         Matrix<T>
-        Adjoint      (const Matrix<T>& m)
-        {
-            return TransformBackwards (m);
+        Adjoint      (const Matrix<T>& m) {
+
+        	std::cout << wl_fam << std::endl;
+
+           	if (wl_fam == ID)
+            		return m;
+
+            assert (m.Size () <= m_sl*m_sl);
+
+            Matrix <T> res (m.DimVector());
+
+//            if (m_dim == 2)
+//            {
+
+                // create vars from mex function
+                int J = 0, nn;
+                for (nn = 1; nn < m.Height (); nn *= 2 )
+                    J ++;
+                if (nn  !=  m.Height ()){
+                    std::cout << "IWT2 requires dyadic length sides" << std::endl;
+                    assert (false);
+                }
+
+                // call dpwt2
+                res = idpwt2 (m, m_wl_scale, J, temp);
+
+//            }
+
+            return res;
         }
 
 
@@ -188,77 +240,6 @@ class DWT {
          * function definitions
          */
 
-        /**
-         * @brief   Transform
-         *
-         * @param   m   To transform
-         * @param   bw  Backward: true, Forward: false
-         * @return      Transform
-         */
-        inline
-        Matrix<T>
-        TransformForward    	(const Matrix<T>& m)
-        {
-
-            assert (m.Size () <= m_sl*m_sl);
-
-            Matrix<T> res (m.DimVector());
-
-//            if (m_dim == 2)
-//            {
-
-                // create vars from mex function
-                int J = 0, nn;
-                for (nn = 1; nn < m.Height (); nn *= 2 )
-                    J ++;
-                if (nn  !=  m.Height ()){
-                    std::cout << "FWT2 requires dyadic length sides" << std::endl;
-                    assert (false);
-                }
-
-                // call dpwt2
-                res = dpwt2 (m, m_wl_scale, J, temp);
-
-//            }
-
-            return res;
-
-        }
-
-
-        /**
-         * backwards transform
-         */
-        inline
-        Matrix <T>
-        TransformBackwards		(const Matrix <T> & m)
-        {
-
-            assert (m.Size () <= m_sl*m_sl);
-
-            Matrix <T> res (m.DimVector());
-
-//            if (m_dim == 2)
-//            {
-
-                // create vars from mex function
-                int J = 0, nn;
-                for (nn = 1; nn < m.Height (); nn *= 2 )
-                    J ++;
-                if (nn  !=  m.Height ()){
-                    std::cout << "IWT2 requires dyadic length sides" << std::endl;
-                    assert (false);
-                }
-
-                // call dpwt2
-                res = idpwt2 (m, m_wl_scale, J, temp);
-
-//            }
-
-            return res;
-
-        }
-
 
         /**
          *  COPIED FROM WAVELAB IMPLEMENTATION
@@ -271,12 +252,9 @@ class DWT {
             Matrix <T> res (sig.DimVector ());
 
             T *wcplo,*wcphi,*templo,*temphi;
-            //		copydouble(&sig[0],&res[0],sig.Height()*sig.Width());
 
             // assign signal to result matrix
             res = sig;
-
-
 
             int num_rows = sig.Height();
             int num_cols = sig.Width();
@@ -368,12 +346,7 @@ class DWT {
         {
 
             // TODO: use operator= instead ...
-
-//# pragma omp parallel for num_threads (2)
-            for (int i = 0; i < n; ++i)
-            {
-                dest [i] = src [i];
-            }
+        	memcpy (dest, src, n*sizeof (T));
 
         }
 
@@ -383,11 +356,8 @@ class DWT {
         {
 
             // TODO: use operator+ instead ...
-//# pragma omp parallel for num_threads (2)
             for (int i = 0; i < n; ++i)
-            {
                 z[i] = x[i] + y[i];
-            }
 
         }
 
@@ -428,6 +398,7 @@ class DWT {
                 s = 0.;
 
                 // perform convolution
+//#pragma omp parallel for reduction (+:s)
                 for (int h = 0; h < filter_length; h++)
                     s += m_hpf_d [h]* signal [2*i+1-h];
 

@@ -21,11 +21,11 @@ class WaveletTraits
 { /* -- */ };
 
 
+
 /**
  * @brief           Implementation of haar wavelet.
  */
-template <>
-template <class T, int wl_mem>
+template <> template <class T, int wl_mem>
 class WaveletTraits <T, WL_HAAR, wl_mem>
 {
 
@@ -230,11 +230,8 @@ class WaveletTraits <T, WL_DAUBECHIES, 8>
          *
          * @return              High pass decomposition filter.
          */
-        static
-        inline
-        void
-        HighPassFilterRecon     (Matrix <value_type> & hpf_r)
-        {
+        static inline void
+        HighPassFilterRecon     (Matrix <value_type> & hpf_r) {
             HighPassFilterDecom (hpf_r);
         }
 
