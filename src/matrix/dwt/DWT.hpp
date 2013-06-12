@@ -261,12 +261,12 @@ class DWT {
             // loop over levels of DWT
             for (int j = (J-1); j >= ell; --j)
             {
-size_t stride = 0;
-//#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (8)
-//            	{
-//            	size_t stride = 8*m_sl*omp_get_thread_num();
-//                // loop over columns of image
-//#pragma omp for schedule (guided)
+
+#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (8)
+            	{
+            	size_t stride = 8*m_sl*omp_get_thread_num();
+                // loop over columns of image
+#pragma omp for schedule (guided)
                 for (int col=0; col < side_length; col++)
                 {
 
@@ -285,7 +285,7 @@ size_t stride = 0;
 
                 } // loop over columns
 
-//#pragma omp for schedule (guided)
+#pragma omp for schedule (guided)
                 // loop over rows of image
                 for (int row=0; row < side_length; row++)
                 {
@@ -307,7 +307,7 @@ size_t stride = 0;
                     packdouble (temphi, side_length/2, num_cols, row, &res[side_length/2*num_rows]);
 
                 } // loop over rows of image
-//            	}
+            	}
                 // reduce dimension for next level
                 side_length = side_length/2;
 
@@ -553,12 +553,12 @@ size_t stride = 0;
             // loop over levels of backwards DWT
             for (int j = ell; j < J; j++)
             {
-size_t stride = 0;
-//#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop)
-//            	{
-//            	size_t stride = 8*m_sl*omp_get_thread_num();
-//                // loop over columns of image
-//#pragma omp for schedule (guided)
+
+#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop)
+            	{
+            	size_t stride = 8*m_sl*omp_get_thread_num();
+                // loop over columns of image
+#pragma omp for schedule (guided)
                 // loop over rows of result image
                 for (int k = 0; k < 2 * nj; k++)
                 {
@@ -585,7 +585,7 @@ size_t stride = 0;
                 } // loop over rows of result image
 
                 // loop  over cols of result image
-//#pragma omp for schedule (guided)
+#pragma omp for schedule (guided)
                 for (int k = 0; k < 2 * nj; k++)
                 {
 
@@ -608,7 +608,7 @@ size_t stride = 0;
                     adddouble(templo,temphi,nj*2,wcplo);
 
                 } // loop over cols of result image
-//            	}
+            	}
                 // update current row / column size
                 nj *= 2;
 
