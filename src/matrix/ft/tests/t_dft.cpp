@@ -11,7 +11,7 @@ int main (int args, char** argv) {
     Matrix<size_t> sz (2,1);
     sz[0] = 8; sz[1] = 8;
     
-    DFT<float> ft (sz);
+    DFT<> ft (sz);
     B = ft * A;
     
     return 0;

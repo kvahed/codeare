@@ -550,7 +550,7 @@ if test x"$with_ismrmrdroot" != x"no" ; then
 
 	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
 
-	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd"
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -Wl,-rpath,${ISMRMRD_LIB_PATH}"
 
 	AC_TRY_LINK([#include <ismrmrd_hdf5.h>],
 	  [ISMRMRD::IsmrmrdDataset d("","");],

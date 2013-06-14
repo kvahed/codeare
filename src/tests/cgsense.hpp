@@ -25,6 +25,8 @@ cgsensetest (RRClient::Connector<T>* rc) {
     
     using namespace codeare::matrix::io;
 
+    // PARC or being scanned
+    
     // Incoming
     Matrix<cxfl>  rawdata; // Measurement data O(Nkx,Nky,Nkz)
     Matrix<cxfl>  sens;    // Sensitivity maps O(Nx, Ny, Nz)
@@ -39,11 +41,13 @@ cgsensetest (RRClient::Connector<T>* rc) {
     sens	= ic.Read<cxfl>(rc->GetElement("/config/data-in/s"));
     ic.Close();
 
+    rc->SetAttribute ("hans", 10.0);
+    
     if (rc->Init (test) != OK) {
         printf ("Intialising failed ... bailing out!"); 
         return false;
     }
-
+    
     // Send one time data
     rc->SetMatrix ("weights", weights); // Weights
     rc->SetMatrix ( "kspace", kspace);  // K-space

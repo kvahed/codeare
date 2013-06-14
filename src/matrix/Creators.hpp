@@ -146,6 +146,11 @@ ones           (const Matrix<size_t>& sz) {
 }
 
 
+//enum {
+//    normal,
+//    gaussian
+//} distribution;
+
 /**
  * @brief       Random matrix
  *
@@ -193,8 +198,15 @@ rand           (const size_t& col,
 	
 	const gsl_rng_type* grt;
 	gsl_rng* r;
-	
+    double s;
+    
 	gsl_rng_env_setup();
+
+    //switch (D){
+    //   case normal:  grt = gsl_rng_default; break;
+            //case gaussian: s = 1.0; grt = gsl_ran_gaussian; break;
+    //}
+    
 	grt = gsl_rng_default;
 	r = gsl_rng_alloc (grt);
 	gsl_rng_set (r, getticks()); // reseed

@@ -73,15 +73,9 @@ class DWT {
               m_sl (sl),
               temp (container<T>(omp_get_num_threads() * 8 * sl)),
               m_wl_scale (wl_scale),
-              _fam(wl_fam)
-        {
+              _fam(wl_fam) {
 
             setupWlFilters (wl_fam, wl_mem, m_lpf_d, m_lpf_r, m_hpf_d, m_hpf_r);
-
-            std::cout << " lpf_d: " << m_lpf_d [0] << ", " << m_lpf_d [1] << std::endl;
-            std::cout << " lpf_r: " << m_lpf_r [0] << ", " << m_lpf_r [1] << std::endl;
-            std::cout << " hpf_d: " << m_hpf_d [0] << ", " << m_hpf_d [1] << std::endl;
-            std::cout << " hpf_r: " << m_hpf_r [0] << ", " << m_hpf_r [1] << std::endl;
 
         }
 
@@ -103,7 +97,6 @@ class DWT {
         Matrix<T>
         Trafo        (const Matrix<T>& m)
         {
-
         	if (_fam == ID)
         		return m;
 
@@ -179,9 +172,8 @@ class DWT {
          */
         inline
         Matrix<T>
-        operator*    (const Matrix<T>& m)
-        {
-            return Trafo(m);
+        operator*    (const Matrix<T>& m) {
+            return (_fam == ID) ? m :  Trafo(m);
         }
 
 
@@ -193,9 +185,8 @@ class DWT {
          */
         inline
         Matrix<T>
-        operator->* (const Matrix<T>& m)
-        {
-            return Adjoint(m);
+        operator->* (const Matrix<T>& m) {
+            return (_fam == ID) ? m :  Trafo(m);
         }
 
 

@@ -12046,10 +12046,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"f44c93e5\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"f629e045\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Tue Jun 11 15:17:16 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"\"" >>confdefs.h
 
 
 # copyright notice
@@ -24189,7 +24189,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for IsmrmrdDataset in -lismrmrd" >&5
 $as_echo_n "checking for IsmrmrdDataset in -lismrmrd... " >&6; }
 
-	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd"
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -Wl,-rpath,${ISMRMRD_LIB_PATH}"
 
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */

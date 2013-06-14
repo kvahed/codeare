@@ -37,7 +37,7 @@
  * @param   m     TO be shifted
  * @return        Shifted
  */
-template<class T> inline Matrix<T>
+template <class T> inline Matrix<T>
 fftshift (const Matrix<T>& m, const bool& fw = true) {
 
 	assert (isvec(m) || is2d(m) || is3d(m));
@@ -148,7 +148,7 @@ hannwindow (const Matrix<size_t>& size, const T& t) {
 /**
  * @brief Matrix templated 1-3D Discrete Cartesian Fourier transform
  */
-template <class T>
+template <class T=float>
 class DFT : public FT<T> {
 
 

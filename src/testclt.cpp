@@ -20,6 +20,10 @@
 
 #include "testclt.hpp"
 
+enum {
+    local, remote
+} con;
+
 int main (int argc, char** argv) {
 	
 	int  rc  = 0;
