@@ -15,13 +15,36 @@
 #include <fstream>
 #include <iostream>
 
+
 namespace codeare {
 namespace matrix{
 namespace io{
 
+	template <class T>
+	struct CODTraits;
+
+	template<> struct CODTraits<float> {
+		static const dtype dt = RLFL;
+	};
+	template<> struct CODTraits<double> {
+		static const dtype dt = RLDB;
+	};
+	template<> struct CODTraits<cxfl> {
+		static const dtype dt = CXFL;
+	};
+	template<> struct CODTraits<cxdb> {
+		static const dtype dt = CXDB;
+	};
+	template<> struct CODTraits<long> {
+		static const dtype dt = LONG;
+	};
+	template<> struct CODTraits<short> {
+		static const dtype dt = SHRT;
+	};
+
+	static const std::string delim = "543f562189f1e82beb9c177f89f67822";
+
 	class CODFile : public IOFile {
-
-
 
 	public:
 
@@ -30,12 +53,18 @@ namespace io{
 				const Params& params = Params(), const bool verbose = false) :
 					IOFile (fname, mode, params, verbose) {
 
+
+
 			const char* R = "rb";
 			const char* W = "wb";
 
-			assert (fexists(fname));
-			if ((m_file = fopen(this->m_fname.c_str(), (mode == READ) ? R : W))==NULL)
-				printf("Cannot open %s file (%s).\n", this->m_fname.c_str(), (mode == READ) ? R : W);
+			bool  reading = (mode == READ);
+
+			if (reading)
+				assert (fexists(fname));
+
+			if ((m_file = fopen(this->m_fname.c_str(), reading ? R : W))==NULL)
+				printf("Cannot open %s file (%s).\n", this->m_fname.c_str(), reading ? R : W);
 
 		}
 
@@ -61,12 +90,7 @@ namespace io{
 			if (!mread ( &dt, sizeof(   int),           1, m_file, "data type")) return M;
 
 			// Matrix and data type must fit as of now.
-			if ((typeid(T) == float_type    && dt == RLFL) ||
-				(typeid(T) == double_type   && dt == RLDB) ||
-				(typeid(T) == cxfl_type     && dt == CXFL) ||
-				(typeid(T) == cxdb_type     && dt == CXDB) ||
-				(typeid(T) == typeid(long)  && dt == LONG) ||
-				(typeid(T) == typeid(short) && dt == SHRT)) {
+			if (CODTraits<T>::dt == dt) {
 
 				// Read dimensions and allocate matrix
 				if (!mread (&dims[0], sizeof(size_t), INVALID_DIM, m_file, "dimensions")) return M;
@@ -88,7 +112,6 @@ namespace io{
 				if (!mread (&M[0],     sizeof(T),           n, m_file, "data")) return M;
 
 				//Close and clean up;
-				fclose(f);
 				delete name;
 
 			}
@@ -107,12 +130,7 @@ namespace io{
 			int dt;
 			size_t ns, l;
 
-			if      (typeid(T) == typeid(float))  dt = RLFL;
-			else if (typeid(T) == typeid(double)) dt = RLDB;
-			else if (typeid(T) == typeid(cxfl))   dt = CXFL;
-			else if (typeid(T) == typeid(cxdb))   dt = CXDB;
-			else if (typeid(T) == typeid(long))   dt = LONG;
-			else if (typeid(T) == typeid(short))  dt = SHRT;
+			dt = CODTraits<T>::dt;
 
 			// Dump type
 			if (!mwrite(&dt, sizeof(int), 1, m_file, "data type"))
@@ -158,7 +176,7 @@ namespace io{
 	static bool codwrite (const std::string& fname, const Matrix<T>& M);
 
 	template<class T>
-	static Matrix<T> codread (const std::string& fname, const )
+	static Matrix<T> codread (const std::string& fname);
 
 }
 }

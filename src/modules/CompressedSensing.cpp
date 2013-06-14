@@ -24,7 +24,6 @@
 
 using namespace RRStrategy;
 
-
 error_code
 CompressedSensing::Init () {
 
@@ -97,7 +96,7 @@ CompressedSensing::Process () {
 	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
 		size(data,0), size(data,1), size(data,2));
 
-	m_csparam.dwt = new DWT <cxfl> (data.Height(), wlfamily(m_wf), m_wm);
+	m_csparam.dwt = new DWT <cxfl> (data.Height());
 
 	/** -----  Which Fourier transform? **/
 	m_csparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);

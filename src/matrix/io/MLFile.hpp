@@ -11,42 +11,7 @@
 #include "IOFile.hpp"
 #include "mat.h"
 
-#ifdef HAVE_CXXABI_H
-    #include <cxxabi.h>
-#endif
-
-
-static inline std::string
-demangle (const char* symbol) {
-
-#ifdef HAVE_CXXABI_H
-
-	size_t size;
-	int    status;
-	char   temp[128];
-	char*  demangled;
-
-	//first, try to demangle a c++ name
-	if (1 == sscanf(symbol, "%*[^(]%*[^_]%127[^)+]", temp)) {
-
-		if (NULL != (demangled = abi::__cxa_demangle(temp, NULL, &size, &status))) {
-			std::string result(demangled);
-			free(demangled);
-			return result;
-		}
-	}
-
-	//if that didn't work, try to get a regular c symbol
-	if (1 == sscanf(symbol, "%127s", temp)) {
-		return temp;
-	}
-
-#endif
-
-	//if all else fails, just return the symbol
-	return symbol;
-
-}
+#include "Demangle.hpp"
 
 template <class T> inline static bool
 MXValidate  (const Matrix<T>& M, const mxArray* mxa) {
@@ -70,9 +35,81 @@ MXValidate  (const Matrix<T>& M, const mxArray* mxa) {
 
 }
 
+
+
 namespace codeare {
 namespace matrix {
 namespace io {
+
+template <class T>
+struct MXTraits;
+
+template <class T>
+static void write_real (mxArray* mxa, const Matrix<T>& M) {
+	memcpy(mxGetData(mxa), M.Memory(), numel(M) * sizeof(T));
+}
+
+template <class T>
+static void read_real (Matrix<T>& M, const mxArray* mxa) {
+	memcpy (&M[0], mxGetPr(mxa), numel(M) * sizeof (T));
+}
+
+template <class T>
+static void write_complex (mxArray* mxa, const Matrix<std::complex<T> >& M) {
+	T* re = (T*)mxGetPr(mxa);
+	T* im = (T*)mxGetPi(mxa);
+	for (size_t i = 0; i < numel(M); ++i) {
+		re[i] = creal(M[i]);
+		im[i] = cimag(M[i]);
+	}
+}
+
+template <class T>
+static void read_complex (Matrix<std::complex<T> >& M, const mxArray* mxa) {
+	T* re = (T*)mxGetPr(mxa);
+	T* im = (T*)mxGetPi(mxa);
+	bool cplx = (im != NULL);
+	for (size_t i = 0; i < numel(M); ++i)
+		M[i] = std::complex<T>(re[i], (cplx) ? im[i] : 0.0);
+}
+
+template <> struct MXTraits<float> {
+	static const mxClassID prec = mxSINGLE_CLASS;
+	static const mxComplexity cplx = mxREAL;
+	typedef float T;
+	static void Write (mxArray* mxa, const Matrix<T>& M) {write_real(mxa,M);}
+	static void Read (Matrix<T>& M, const mxArray* mxa) {read_real(M,mxa);}
+};
+template <> struct MXTraits<double> {
+	static const mxClassID prec = mxDOUBLE_CLASS;
+	static const mxComplexity cplx = mxREAL;
+	typedef double T;
+	static void Write (mxArray* mxa, const Matrix<T>& M) {write_real(mxa,M);}
+	static void Read (Matrix<T>& M, const mxArray* mxa) {read_real(M,mxa);}
+};
+template <> struct MXTraits<cxfl> {
+	static const mxClassID prec = mxSINGLE_CLASS;
+	static const mxComplexity cplx = mxCOMPLEX;
+	typedef cxfl T;
+	typedef float T2;
+	static void Write (mxArray* mxa, const Matrix<T>& M) {write_complex(mxa,M);}
+	static void Read (Matrix<T>& M, const mxArray* mxa) {read_complex(M,mxa);}
+};
+template <> struct MXTraits<cxdb> {
+	static const mxClassID prec = mxDOUBLE_CLASS;
+	static const mxComplexity cplx = mxCOMPLEX;
+	typedef cxdb T;
+	typedef double T2;
+	static void Write (mxArray* mxa, const Matrix<T>& M) {write_complex(mxa,M);}
+	static void Read (Matrix<T>& M, const mxArray* mxa) {read_complex(M,mxa);}
+};
+template <> struct MXTraits<short> {
+	static const mxClassID prec = mxINT16_CLASS;
+	static const mxComplexity cplx = mxREAL;
+	typedef cxdb T;
+	static void Write (mxArray* mxa, const Matrix<T>& M) {write_complex(mxa,M);}
+	static void Read (Matrix<T>& M, const mxArray* mxa) {read_real(M,mxa);}
+};
 
 	class MLFile : public IOFile {
 
@@ -86,8 +123,10 @@ namespace io {
 
 			m_file = matOpen (fname.c_str(), (mode == READ) ? "r" : "w" );
 
-			if (m_file == NULL)
+			if (m_file == NULL) {
 				printf ("Error opening MATLAB file %s\n", fname.c_str());
+				assert (false);
+			}
 
 		}
 
@@ -106,8 +145,8 @@ namespace io {
 			Matrix<T> M;
 
 			if (!mxa) {
-				printf ("Error opening variable %s\n", uri.c_str());
-				return M;
+				printf ("**ERROR**: Failed to retrieve variable %s\n", uri.c_str());
+				assert (false);
 			}
 
 			mxClassID     mcid = mxGetClassID(mxa);
@@ -115,57 +154,21 @@ namespace io {
 			const mwSize*  dim = mxGetDimensions(mxa);
 			size_t i = 0;
 
-
-			if (!MXValidate (M, mxa))
-				return M;
+			assert (MXValidate (M, mxa));
 
 			std::vector<size_t> mdims(ndim,1);
 
-			for (; i < ndim; i++)
+			for (; i < ndim; ++i)
 				mdims[i] = (size_t)dim[i];
 
 			M = Matrix<T> (mdims);
-			// -------------------------------------------
 
 			// Copy from memory block ----------------------
-
-			printf ("  Reading (type: %i) %s: (%s) ... ", (int)mcid, uri.c_str(), DimsToCString(M)); fflush(stdout);
-
-			if        (typeid(T) == typeid(cxfl)) {
-				if (mxIsComplex(mxa))
-					for (i = 0; i < numel(M); i++) {
-						float f[2] = {((float*)mxGetPr(mxa))[i], ((float*)mxGetPi(mxa))[i]}; // Template compilation. Can't create T(real,imag)
-						memcpy(&M[i], f, 2 * sizeof(float));
-					}
-				else
-					for (i = 0; i <numel(M); i++) {
-						float f[2] = {((float*)mxGetPr(mxa))[i], 0.0};
-						memcpy(&M[i], f, 2 * sizeof(float));
-					}
-			} else if (typeid(T) == typeid(cxdb)) {
-				if (mxIsComplex(mxa))
-					for (i = 0; i < numel(M); i++) {
-						double* tmp = (double*) &M[0];
-						tmp [i*2]   = mxGetPr(mxa)[i];
-						tmp [i*2+1] = mxGetPi(mxa)[i];
-					}
-				else
-					for (i = 0; i <numel(M); i++) {
-						double* tmp = (double*) &M[0];
-						tmp [i*2]   = mxGetPr(mxa)[i];
-					}
-			} else
-				memcpy (&M[0], mxGetPr(mxa), numel(M) * sizeof (T));
-
-
-			printf ("done\n");
-			// -------------------------------------------
+			MXTraits<T>::Read(M, mxa);
 
 			// Clean up and close file -------------------
 			if (mxa != NULL)
 				mxDestroyArray(mxa);
-
-			// -------------------------------------------
 
 			return M;
 
@@ -176,64 +179,26 @@ namespace io {
 		Write (const Matrix<T>& M, const std::string& uri) {
 
 
-			// Declare dimensions and allocate array -----
-
+			// Declare dimensions and allocate array
 			mwSize   dim[INVALID_DIM];
-
-			for (size_t i = 0; i < INVALID_DIM; i++)
+			for (size_t i = 0; i < INVALID_DIM; ++i)
 				dim[i] = (mwSize)M.Dim(i);
+			mxArray*  mxa = mxCreateNumericArray (INVALID_DIM, dim,
+					MXTraits<T>::prec, MXTraits<T>::cplx);
 
-			mxArray*  mxa = 0;
+			// Assign data
+			MXTraits<T>::Write (mxa, M);
 
-			if      (typeid(T) == float_type)
-				mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS,    mxREAL);
-			else if (typeid(T) == double_type)
-				mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS,    mxREAL);
-			else if (typeid(T) == cxfl_type)
-				mxa = mxCreateNumericArray (INVALID_DIM, dim, mxSINGLE_CLASS, mxCOMPLEX);
-			else if (typeid(T) == cxdb_type)
-				mxa = mxCreateNumericArray (INVALID_DIM, dim, mxDOUBLE_CLASS, mxCOMPLEX);
-			else if (typeid(T) == typeid(short))
-				mxa = mxCreateNumericArray (INVALID_DIM, dim,  mxINT16_CLASS,    mxREAL);
-			// -------------------------------------------
-
-
-			// Copy to memory block ----------------------
-
-			if (typeid(T) == cxfl_type) {
-			    float* re = (float*)mxGetData(mxa);
-				float* im = (float*)mxGetImagData(mxa);
-				for (size_t i = 0; i < numel(M); i++) {
-					re[i] = creal(M[i]);
-					im[i] = cimag(M[i]);
-				}
-			} else if (typeid(T) == typeid(cxdb)) {
-				double* re = mxGetPr(mxa);
-				double* im = mxGetPi(mxa);
-				for (size_t i = 0; i < numel(M); i++) {
-					re[i] = creal(M[i]);
-					im[i] = cimag(M[i]);
-				}
-			} else
-				memcpy(mxGetData(mxa), M.Memory(), numel(M) * sizeof(T));
-
-			// -------------------------------------------
-
-			// Write data --------------------------------
+			// Write data
 			int status = matPutVariable(m_file, uri.c_str(), mxa);
-
 			if (status != 0) {
 				printf("%s :  Error using matPutVariable on line %d\n", __FILE__, __LINE__);
 				return false;
 			}
-			// -------------------------------------------
 
-
-			// Clean up RAM ------------------------------
-
+			// Clean up RAM
 			if (mxa != NULL)
 				mxDestroyArray(mxa);
-			// -------------------------------------------
 
 			return true;
 
@@ -276,7 +241,7 @@ namespace io {
 	};
 
 
-#define mxwrite(X,Y) _h5write (X,Y,#X)
+#define mxwrite(X,Y) _mxwrite (X,Y,#X)
 	template<class T> inline static bool
 	_mxwrite (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
 

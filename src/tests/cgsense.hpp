@@ -61,9 +61,12 @@ cgsensetest (RRClient::Connector<T>* rc) {
     rc->Finalise   (test);
 
     // Write images
-    IOContext oc (rc->GetElement("/config/data-out"), base, WRITE);
-    oc.Write(image, "image");
-    oc.Close();
+
+	std::string ofname = base;
+	ofname += rc->GetElement("/config/data-out")->Attribute("fname");
+	IOContext ofile = fopen (ofname, "w");
+	fwrite (ofile, image);
+	fclose (ofile);
 
     return true;
     

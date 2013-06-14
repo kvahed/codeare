@@ -43,7 +43,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "SENSE"))                 sensetest    (con);
 		else if (!strcmp (test, "NuFFT"))                 nuffttest    (con); 
 		else if (!strcmp (test, "NuFFT_OMP"))             nuffttest    (con);
-		//else if (!strcmp (test, "GRAPPA"))                grappatest   (con);
+		else if (!strcmp (test, "GRAPPA"))                grappatest   (con);
 		else if (!strcmp (test, "KTPoints"))              ktptest      (con);
 		else if (!strcmp (test, "CompressedSensing"))     cstest       (con);
 		//else if (!strcmp (test, "RelativeSensitivities")) resetest     (con);
@@ -54,7 +54,6 @@ int main (int argc, char** argv) {
 #endif
 		//else if (!strcmp (test, "ocl"))                   oclmatrixtest(con);
 		//else                                              internaltest (con);
-		else if (!strcmp (test, "dwt2"))					dwt2test	(con);
 
 		delete con;
 		

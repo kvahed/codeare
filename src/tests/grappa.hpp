@@ -22,27 +22,47 @@
 template <class T> bool 
 grappatest (Connector<T>* rc) {
 
-	Matrix<cxfl> sig;
-	Matrix<cxfl> acs;
+    using namespace codeare::matrix::io;
+	// Incoming
+	Matrix<cxdb> scan;   // Folded images O (Nc, RO, PE/AF, PE2)
+	Matrix<cxdb> acs;   // Sensitivity maps O (Nc, RO, PE, PE2)
 	
-	std::string cf = std::string (base + std::string(config));
-	std::string df = std::string (base + std::string(data));
+    IOContext ic (rc->GetElement("/config/data-in"), base, READ);
+    scan = ic.Read<cxdb>(rc->GetElement("/config/data-in/scan"));
+    acs = ic.Read<cxdb>(rc->GetElement("/config/data-in/acs"));
+    ic.Close();
 
-#ifdef HAVE_MAT_H
-	MXRead  (sig, df, "data", "");
-	MXRead  (acs, df, "acs",  "");
-#endif
+	// Outgoing
+	Matrix<cxdb> recon;   // Reconstructed unaliased O (RO, PE, PE2)
 
-	rc->ReadConfig (cf.c_str());
+	if (rc->Init (test) != OK) {
+		printf ("Intialising failed ... bailing out!"); 
+		return false;
+	}
 	
-	rc->Init (test);
-	rc->SetMatrix  ("acs",  acs);
-	rc->Prepare (test);
-	rc->SetMatrix  ("data", sig); // Measurement data
-	rc->Process (test);
-	rc->GetMatrix  ("data", sig);
-	rc->Finalise (test);
+	// Prepare -------------
 	
+	rc->SetMatrix ("scan", scan); // Sensitivities
+	rc->SetMatrix ("acs", acs); // Weights
+	
+	rc->Prepare   (test);
+	
+	// Process -------------
+	
+	rc->Process   (test);
+	
+	// Receive -------------
+	
+	//rc->GetMatrix ("recon", recon);  // Images
+	
+	// ---------------------
+	
+	rc->Finalise   (test);
+	
+	IOContext oc (rc->GetElement("/config/data-out"), base, WRITE);
+    oc.Write(recon, "recon");
+    oc.Close();
+
 	return true;
 
 }

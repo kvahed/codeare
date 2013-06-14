@@ -102,6 +102,12 @@ enum IceDim {
 static const size_t dvsz = INVALID_DIM*sizeof(size_t);
 
 /**
+ * @brief bits just suck.
+ */
+typedef unsigned short BOOL;
+
+
+/**
  * @brief   Matrix template.<br/>
  *          Core data structure
  *          
@@ -179,13 +185,6 @@ public:
 	}
 	
 	
-    /**
-     * @brief           Delete array containing data.
-     */
-	inline
-	~Matrix() {};
-	
-    
     
     /**
      * @brief           Construct matrix with aligned dimension vector
@@ -548,6 +547,13 @@ public:
 		}
 
 	}
+
+
+    /**
+     * @brief           Delete array containing data.
+     */
+	inline
+	~Matrix() {};
 
 
 
@@ -1148,6 +1154,7 @@ public:
 
         if (this != &M) {
 
+
             for (size_t i = 0; i < INVALID_DIM; ++i) {
                 _dim[i] = M.Dim()[i];
                 _res[i] = M.Res()[i];
@@ -1444,8 +1451,6 @@ public:
     inline Matrix<T,P>&
     operator+=         (const Matrix<T,P>& M) {
 
-        size_t i;
-
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
 #if defined USE_VALARRAY
@@ -1549,7 +1554,7 @@ public:
      * @return          Cross-section or zero
      */
     inline Matrix<T,P>
-    operator&           (const Matrix<bool>& M) const ;
+    operator&           (const Matrix<BOOL>& M) const ;
     
     
      /**
@@ -1558,11 +1563,15 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of false where elements are equal s and true else.
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator!=          (const T s) const {
 
-        Matrix<bool> res(_dim);
-        res.Container() = (_M != s);
+        Matrix<BOOL> res(_dim);
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = (_M[i] != s) ? 1 : 0;
         return res;
 
     }
@@ -1575,10 +1584,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator>           (const T s) const {
 
-        Matrix<bool> res(_dim);
+        Matrix<BOOL> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1598,10 +1607,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator>=          (const T s) const {
 
-		Matrix<bool> res(_dim);
+		Matrix<BOOL> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1620,10 +1629,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator<=          (const T s) const {
 
-        Matrix<bool> res(_dim);
+        Matrix<BOOL> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1642,10 +1651,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator<           (const T s) const {
 
-        Matrix<bool> res(_dim);
+        Matrix<BOOL> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1664,17 +1673,17 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator==          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<bool> res(_dim);
+        Matrix<BOOL> res(_dim);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (_M[i] == M[i]);
+			res[i] = (_M[i] == M[i]) ? 1 : 0;
 
         return res;
 
@@ -1688,18 +1697,18 @@ public:
 	 * @return          Hit list
 	 */
     template<class S>
-	inline Matrix<bool>
+	inline Matrix<BOOL>
 	operator==          (const Matrix<S,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-		Matrix<bool> res (_dim);
+		Matrix<BOOL> res (_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (_M[i] == (T)M[i]);
+			res[i] = (_M[i] == (T)M[i]) ? 1 : 0;
 
 		return res;
 
@@ -1711,18 +1720,18 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of true where elements are equal s and false else.
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator==          (const T s) const {
 
     	T t = (T) s;
 
-        Matrix<bool> res (_dim);
+        Matrix<BOOL> res (_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); ++i)
-			res[i] =  (_M[i] == s);
+			res[i] =  (_M[i] == s) ? 1 : 0;
 
         return res;
 
@@ -1736,13 +1745,17 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator!=          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<bool> res(_dim,_res);
-        res.Container() = (_M != M.Container());
+        Matrix<BOOL> res(_dim,_res);
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = (_M[i]!= M[i]) ? 1 : 0;
         return res;
 
     }
@@ -1754,12 +1767,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator>=          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<bool> res(_dim);
+        Matrix<BOOL> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1778,12 +1791,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator<=          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<bool> res(_dim);
+        Matrix<BOOL> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1802,12 +1815,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator>           (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<bool> res(_dim,_res);
+        Matrix<BOOL> res(_dim,_res);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1826,12 +1839,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator<           (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<bool> res(_dim,_res);
+        Matrix<BOOL> res(_dim,_res);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1850,12 +1863,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator||          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<bool> res(_dim);
+        Matrix<BOOL> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1875,10 +1888,10 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<bool>
+    inline Matrix<BOOL>
     operator&&          (const Matrix<T,P>& M) const {
 
-        Matrix<bool> res(_dim);
+        Matrix<BOOL> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -2567,7 +2580,7 @@ public:
      * @param  m        Matrix rhs
      * @return          m == s
      */
-    inline friend Matrix<bool>
+    inline friend Matrix<BOOL>
     operator== (const T s, const Matrix<T,P>& m) {
         return   m == s;
     }
@@ -2580,7 +2593,7 @@ public:
      * @param  m        Matrix rhs
      * @return          m <= t
      */
-    inline friend Matrix<bool>
+    inline friend Matrix<BOOL>
     operator>= (const T s, const Matrix<T,P>& m) {
         return   m <= s;
     }
@@ -2593,7 +2606,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T<=M
      */
-    inline friend Matrix<bool>
+    inline friend Matrix<BOOL>
     operator<= (const T s, const Matrix<T,P>& m) {
         return   m >= s;
     }
@@ -2606,7 +2619,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T!=M
      */
-    inline friend Matrix<bool>
+    inline friend Matrix<BOOL>
     operator!= (const T s, const Matrix<T,P>& m) {
         return   m != s;
     }
@@ -2619,7 +2632,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T+M
      */
-    inline friend Matrix<bool>
+    inline friend Matrix<BOOL>
     operator>  (const T s, const Matrix<T,P>& m) {
         return   m <  s;
     }
@@ -2632,7 +2645,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T+M
      */
-    inline friend Matrix<bool>
+    inline friend Matrix<BOOL>
     operator<  (const T s, const Matrix<T,P>& m) {
         return   m >  s;
     }
@@ -2646,7 +2659,7 @@ public:
      * @return          T+M
      */
     inline friend Matrix<T,P>
-    operator&  (const Matrix<bool>& mb, const Matrix<T,P>& m) {
+    operator&  (const Matrix<BOOL>& mb, const Matrix<T,P>& m) {
         return   m & mb;
     }
 
@@ -2682,7 +2695,7 @@ public:
         return _dim[1];
     }
 
-#ifdef HAVE_MPI
+#ifdef HAVE_SCALAPACK
 
     /**
      * @brief           Get number of rows, i.e. tmp = size(this); tmp(1).
@@ -2966,7 +2979,7 @@ protected:
     // Name
     std::string         _name; /// Name
     
-#ifdef HAVE_MPI
+#ifdef HAVE_SCALAPACK
     // BLACS 
 	int              _bs;
 	int              _desc[9]; /**< @brief matrix grid vector */
@@ -2990,7 +3003,7 @@ protected:
     void Validate (double t) const {};
     void Validate (cxfl   t) const {};
     void Validate (cxdb   t) const {};
-	void Validate (bool&   t) const {};
+	void Validate (BOOL   t) const {};
 
 };
 
@@ -3079,7 +3092,7 @@ Matrix<T,P>::Export (IceAs* ias, const size_t pos) const {
 
 #endif // ICE
 
-#ifdef HAVE_MPI
+#ifdef HAVE_SCALAPACK
 #include "Grid.hpp"
 
 template<> inline

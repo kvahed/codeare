@@ -125,15 +125,16 @@ CGSENSE::Prepare () {
 	size_t nk = numel(weights);
 
 	Params cgp;
-	cgp.Set("sens_maps", std::string("sens"));
-	cgp.Set("sens_maps", std::string("weights"));
-	cgp.Set("sens_maps", std::string("kspace"));
-	cgp.Set("verbose", m_verbose);
+	cgp["sens_maps"] = std::string("sens");
+    cgp["weights_name"] = std::string("weights");
+    cgp["verbose"] = m_verbose;
+    cgp["ftiter"] = (size_t) m_ftmaxit;
+    cgp["cgiter"] = (size_t) m_cgmaxit;
+    cgp["cgeps"] = m_cgeps;
+    cgp["lambda"] = m_lambda;
+    cgp["nk"] = nk;
 
-
-	m_ncs = new NCSENSE<float>
-		(sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
-
+	m_ncs = new NCSENSE<float>(cgp);
 	size_t dim = ndims(sens) - 1;
 
 	// Outgoing images

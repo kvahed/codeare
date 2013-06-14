@@ -2,7 +2,7 @@
 #include "cgsense.hpp"
 #include "sense.hpp"
 //#include "directmethod.hpp"
-//#include "grappa.hpp"
+#include "grappa.hpp"
 #include "ktpoints.hpp"
 //#include "nifty.hpp"
 #include "nufft.hpp"
@@ -12,4 +12,4 @@
 #ifdef HAVE_MPI
     #include "mpitest.hpp"
 #endif
-# include "dwt2test.hpp"
+

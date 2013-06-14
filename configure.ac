@@ -424,12 +424,14 @@ then
 else
   FFTPATH=$with_fftw
   AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/libfftw3.a $FFTPATH/$LIBDIR/libfftw3f.a ,, [
-    echo " -> Given path not correct. Finding..."
-    FFTPATH=""
+     AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3.a $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3f.a ,, [
+      echo " -> Given path not correct. Finding..."
+      FFTPATH=""
+  	  ] )
   ] )
 fi
 
-# Test if FFTW_ROOT is set
+# Test if FFTW is 
 if test "$FFTPATH" = ""
 then
   if test "$FFTW_ROOT" != ""
@@ -449,8 +451,6 @@ then
 
   if test "$FFTPATH" != ""
   then
-    # Check for the rest of the files
-
     # NOTE: AC_CHECK_FILES works here, but AC_CHECK_FILE doesn't (?!)
     AC_CHECK_FILES( $FFTPATH/$LIBDIR/libfftw3.a $FFTPATH/$LIBDIR/libfftw3f.a , , FFTPATH="" )
   fi
@@ -605,6 +605,8 @@ AC_TRY_LINK([#include <nifti1_io.h>],
 if test -z $niftiio_found; then
     LIBS=$OLD_LIBS
 fi
+AM_CONDITIONAL([USE_NIFTI], [test x"$niftiio_found" = x"yes"])
+
 
 # ITK
 AH_TEMPLATE([HAVE_INSIGHT], [Define to 1 if you have the <itkImage.h> header file.])

@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 #include <assert.h>
+#include <algorithm>
+
 
 static inline std::vector<std::string>
 Split     (const std::string& str, const std::string& dlm) {
@@ -62,6 +64,19 @@ HasSuffix (const std::string& str, const std::string& suf) {
 	return (str.length() >= suf.length()) ?
 		   (0 == str.compare(str.length() - suf.length(), suf.length(), suf)) : false;
 
+}
+
+
+static inline std::string strtoupper (const std::string& str) {
+	std::string res = str;
+	std::transform(res.begin(), res.end(), res.begin(), ::toupper);
+	return res;
+}
+
+static inline std::string strtolower (const std::string& str) {
+	std::string res = str;
+	std::transform(res.begin(), res.end(), res.begin(), ::tolower);
+	return res;
 }
 
 #endif 

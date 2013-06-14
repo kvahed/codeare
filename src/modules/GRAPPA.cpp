@@ -25,88 +25,11 @@ using namespace RRStrategy;
 
 error_code
 GRAPPA::Init () {
-	
-	printf ("Intialising %s ...\n", Name());
-	
-	// Intialising ---------------------
-	
-	m_nc       = 0;
-	m_testcase = 0;
-	m_verbose  = 0;
-	m_noise    = 0;
-	m_acsinc   = 0;
-	
-	for (int i = 0; i < 3; i++) {
-		m_R[i] = 1; m_acs_dim[i] = 1; m_data_dim[i] = 1;
-	}
 
-	// ---------------------------------
-	
-	// Dimensions  ---------------------
-	
-	Attribute("dim",       &m_dim);
-    printf ("  # dimensions: %i \n", m_dim);
-	
-	if (m_dim < 2 || m_dim > 3) {
-		printf ("%s only supports 2-3 dimensions. %i was specified.\n", Name(), m_dim);
-		return UNSUPPORTED_DIMENSION;
-	}
-	// ---------------------------------
-	
-	// Coils and accelerqtion ----------
-	
-	Attribute("nc",       &m_nc);
-    printf ("  # channels: %i \n", m_nc);
+	printf ("  Initialising %s ...\n", Name());
 
-	if (m_nc == 0) {
-		printf ("Initialising %s with %i channels? Check configuration! FAILED: Bailing out!\n", Name(), m_nc);
-		return CGSENSE_ZERO_CHANNELS;
-	}
-	
-	int tmp = 0;
 
-	// Acceleration factors
-	Attribute ("rx",        &tmp); m_R[0]        = tmp;
-	Attribute ("ry",        &tmp); m_R[1]        = tmp;
-	Attribute ("rz",        &tmp); m_R[2]        = tmp;
-    printf ("  acceleration factors: %.1f,%.1f,%.1f \n", m_R[0], m_R[1], m_R[2]);
-
-	// Kernel dimensions
-	Attribute ("kernx",     &tmp); m_kern_dim[0] = tmp;
-	Attribute ("kerny",     &tmp); m_kern_dim[1] = tmp;
-	Attribute ("kernz",     &tmp); m_kern_dim[2] = tmp;
-    printf ("  kernel dimensions: %i,%i,%i \n", m_kern_dim[0], m_kern_dim[1], m_kern_dim[2]);
-
-	// ACS dimensions
-	Attribute ("acs_x",     &tmp); m_acs_dim[0]  = tmp;
-	Attribute ("acs_y",     &tmp); m_acs_dim[1]  = tmp;
-	Attribute ("acs_z",     &tmp); m_acs_dim[2]  = tmp;
-    printf ("  acs dimesions: %i,%i,%i \n", m_acs_dim[0], m_acs_dim[1], m_acs_dim[2]);
-
-	// Incoming data dimensions 
-	// (Outgoing: m_data_dim[i] * m_R[i])
-	Attribute ("nx",        &tmp); m_data_dim[0] = tmp;
-	Attribute ("ny",        &tmp); m_data_dim[1] = tmp;
-	Attribute ("nz",        &tmp); m_data_dim[2] = tmp;
-    printf ("  measured dims: %i,%i,%.i \n", m_data_dim[0], m_data_dim[1], m_data_dim[2]);
-
-	m_d[0] = floor ((float) m_kern_dim[0] / 2);
-	m_d[1] =       ((float) m_kern_dim[1] / 2 - 1) * m_R[1]; 
-    printf ("  steps: %.i,%.i \n", m_d[0], m_d[1]);
-
-	// ---------------------------------
-
-	// Test and verbosity --------------
-
-	Attribute ("testcase", &m_testcase);
-	Attribute ("verbose",  &m_verbose); 
-	Attribute ("noise",    &m_noise);
-	// ---------------------------------
-
-	m_initialised = true;
-
-	printf ("... done.\n\n");
-
+	printf ("  ... done.\n\n");
 	return OK;
 
 }
@@ -117,12 +40,24 @@ GRAPPA::Prepare     () {
 
 	printf ("  Preparing %s ...\n", Name());
 
-	Matrix<cxfl>& acs  = Get<cxfl>("acs");
-	/*ComputeWeights (m_nc, m_acs_dim, m_kern_dim, m_d, m_R, acs, m_weights);*/
+    Matrix<size_t> scan_dims = size(Get<cxdb>("scan"));
 
-	
-	
-	printf ("... done.\n\n");
+    Matrix<size_t> acc_factors (2,1);
+    acc_factors[0] = 1; acc_factors[1] = 3;
+
+    Matrix<size_t> kern_dims (2,1);
+    acc_factors[0] = 5; acc_factors[1] = 4;
+
+    Params p;
+    p.Set("acs_name", std::string("acs"));
+    p.Set("scan_dims", scan_dims);
+    p.Set("kern_dims", kern_dims);
+    p.Set("acc_factors", acc_factors);
+
+    m_ft = new CGRAPPA<double>(p);
+
+	printf ("  ... done.\n\n");
+
 	return OK;
 	
 
@@ -146,12 +81,10 @@ GRAPPA::Process     () {
 
 	printf ("  Processing GRAPPA ...\n");
 
-	Matrix<cxfl>& acs  = Get<cxfl>("acs");
-	Matrix<cxfl>& data = Get<cxfl>("data");
+	Matrix<cxdb>& scan = Get<cxdb>("scan");
 
-	printf ("  data dims: %s\n", DimsToCString(data));
-
-	printf ("... done.. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+	printf ("... done.. WTime: %.4f seconds.\n\n",
+			elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	return OK;
 

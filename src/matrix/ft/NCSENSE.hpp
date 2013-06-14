@@ -88,9 +88,12 @@ public:
 		Workspace& ws = Workspace::Instance();
 		Matrix<T> b0;
 
+		assert (params.exists("sens_maps"));
 		m_smname = params.Get<std::string>("sens_maps");
+        ws.GetMatrix(m_smname, m_sm);
+
 		m_wname  = params.Get<std::string>("weights_name");
-        m_verbose = params.Get<bool>("verbose");
+        //m_verbose = params.Get<int>("verbose");
 
 		if (params.exists("phase_cor"))
 			ws.GetMatrix(params.Get<std::string>("phase_cor"), m_pc);
@@ -103,8 +106,8 @@ public:
 			ms[i] = size(m_sm,i);
 
 		m_cgiter = params.Get<size_t>("cgiter");
-		m_cgeps  = params.Get<size_t>("cgeps");
-		m_lambda = params.Get<size_t>("lambda");
+		m_cgeps  = params.Get<double>("cgeps");
+		m_lambda = params.Get<double>("lambda");
 		m_nk     = params.Get<size_t>("nk");
 
 		printf ("  Initialising NCSENSE:\n");
@@ -112,100 +115,33 @@ public:
 		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
 		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
 
-		int np = 1;
-
-#pragma omp parallel default (shared)
-		{
-			if (params.exists("np"))
-				np = boost::any_cast<int>(params["np"]);
-			else
-				np = omp_get_num_threads ();
+		if (params.exists("np")) {
+			m_np = boost::any_cast<int>(params["np"]);
+			omp_set_num_threads(m_np);
+		} else {
+#pragma omp parallel 
+			{
+                m_np = omp_get_num_threads ();
+			}
 		}
-
-		m_fts = new NFFT<T>* [np];
-		for (size_t i = 0; i < np; i++)
+        
+		m_fts = new NFFT<T>* [m_np];
+		for (size_t i = 0; i < m_np; i++)
 			m_fts[i] = new NFFT<T> (ms, m_nk, m, alpha, b0, m_pc, fteps, ftiter);
-
+		
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
 		printf ("  ...done.\n\n");
-
+		
 	}
 
-	/**
-	 * @brief          Construct NCSENSE plans for forward and backward transform with credentials
-	 *
-	 * @param  sens    Sensitivity maps if imsize
-	 * @param  nk      # k-space points
-	 * @param  cgeps   Convergence limit of descent
-	 * @param  cgiter  Maximum # CG iterations
-	 * @param  lambda  Tikhonov regularisation (default 0.0)
-	 * @param  fteps   NFFT convergence criterium (default 7.0e-4)
-	 * @param  ftiter  Maximum # of NFFT gridding iterations (default 3)
-	 * @param  m       Spatial cut-off of FT (default 1)
-	 * @param  alpha   Oversampling factor (default 1.0)
-	 * @param  b0      Off-resonance maps if available (default empty)
-	 * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
-	 */
-	NCSENSE (const Matrix< std::complex<T> >& sens, const size_t& nk, const T& cgeps, const size_t& cgiter,
-			 const T& lambda = 0.0, const T& fteps = 7.0e-4, const size_t& ftiter = 3,
-			 const size_t& m = 1, const T& alpha = 1.0, const Matrix<T>& b0 = Matrix<T>(1),
-			 const Matrix< std::complex<T> >& pc = Matrix< std::complex<T> >(1)) :
-		m_nc(8),
-		m_nk(4096),
-		m_nr(1024) {
-
-
-		m_dim = ndims(sens)-1;
-		Matrix<size_t> ms (m_dim,1);
-		for (size_t i = 0; i < m_dim; i++)
-			ms[i] = size(sens,i);
-
-		printf ("  Initialising NCSENSE:\n");
-		printf ("  Signal nodes: %li\n", nk);
-		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", cgeps, cgiter, lambda);
-		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
-
-		int np = 1;
-
-#pragma omp parallel default (shared)
-		{
-			np = omp_get_num_threads ();
-		}
-
-		m_fts = new NFFT<T>* [np];
-
-		for (size_t i = 0; i < np; i++)
-			m_fts[i] = new NFFT<T> (ms, nk, m, alpha, b0, pc, fteps, ftiter);
-
-		m_cgiter = cgiter;
-		m_cgeps  = cgeps;
-		m_lambda = lambda;
-
-		m_sm     = sens;
-		m_ic     = IntensityMap (m_sm);
-
-		m_initialised = true;
-
-		printf ("  ...done.\n\n");
-
-	}
-
-	
 	/**
 	 * @brief        Clean up and destruct NFFT plans
 	 */ 
 	virtual ~NCSENSE () {
 		
-		int np = 1;
-		
-#pragma omp parallel default (shared)
-		{
-			np = omp_get_num_threads ();
-		}	
-		
 		if (m_initialised)
-			for (size_t i = 0; i < np; i++)
+			for (size_t i = 0; i < m_np; i++)
 				delete m_fts[i];
 		
 	}
@@ -321,7 +257,7 @@ public:
 		
 		xn = pow(norm(p), 2.0);
 		rn = xn;
-		
+
 		for (size_t i = 0; i < m_cgiter; i++) {
 			
 			res.push_back(rn/xn);
@@ -408,6 +344,8 @@ private:
 	size_t    m_cgiter;         /**< Max # CG iterations */
 	double    m_cgeps;          /**< Convergence limit */
 	double    m_lambda;         /**< Tikhonov weight */
+	
+	int       m_np;
 
 };
 

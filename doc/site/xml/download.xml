@@ -15,7 +15,7 @@
 
 	<p>
 	  Download a copy including test data for all available modules:<br/>
-	  <code>git checkout git://github.com/kvahed/codeare.git</code>
+	  <code>git clone http://github.com/kvahed/codeare.git</code>
 	</p>
 
 	<p>
