@@ -69,7 +69,7 @@ class Workspace {
         reflist::iterator it = m_ref.find(name);
 
         if (it == m_ref.end())
-            printf ("**WARNING**: Matrix %s could not be found in workspace!\n");
+            printf ("**WARNING**: Matrix %s could not be found in workspace!\n", name.c_str());
 
         const boost::any& ba = m_store[it->second[0]];
         
