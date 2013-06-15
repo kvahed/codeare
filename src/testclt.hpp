@@ -1,7 +1,7 @@
 #include "options.h"
 
 #include "LocalConnector.hpp"
-#ifdef HAVE_OMNIORB4_CORBA_H
+#if defined HAVE_OMNIORB4_CORBA_H && defined REMOTE
     #include "RemoteConnector.hpp"
 #endif	
 
