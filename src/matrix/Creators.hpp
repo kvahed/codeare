@@ -3,7 +3,7 @@
 
 #include "Matrix.hpp"
 #include "Algos.hpp"
-#include "NoiseTraits.hpp"
+#include "RandTraits.hpp"
 
 
 
