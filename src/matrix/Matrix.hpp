@@ -1254,7 +1254,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator-           (const S& s) const {
+    operator-           (const S s) const {
 
         T t = T(s);
         
@@ -1336,7 +1336,7 @@ public:
      */
     template <class S >
     inline Matrix<T,P>&
-    operator-=          (const S& s) {
+    operator-=          (const S s) {
 
 		T t = T (s);
 
@@ -1421,7 +1421,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator+           (const S& s) const {
+    operator+           (const S s) const {
 
         Matrix<T,P> res = *this;
     	T t = T(s);
@@ -1500,7 +1500,7 @@ public:
      */
     template <class S >
     inline Matrix<T,P>&
-    operator+=          (const S& s) {
+    operator+=          (const S s) {
 
     	T t = T (s);
 
@@ -1980,7 +1980,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator*          (const S& s) const  {
+    operator*          (const S s) const  {
 
         Matrix<T,P> res = *this;
     	T t = T(s);
@@ -2062,7 +2062,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>&
-    operator*=         (const S& s) {
+    operator*=         (const S s) {
 
     	T t = T (s);
 
@@ -2115,7 +2115,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator/           (const S& s) const {
+    operator/           (const S s) const {
 
       		assert (cabs(s) != 0.0);
 		T t = T (s);
@@ -2200,7 +2200,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>&
-    operator/=         (const S& s) {
+    operator/=         (const S s) {
 
     	T zero = T(0.0);
     	T t    = T(s);
@@ -2887,7 +2887,7 @@ public:
      * @return          Product of this and M.
      */
     inline Matrix<T,P>
-    prod                (const Matrix<T,P> &M, const char& transa = 'N', const char& transb = 'N') const {
+    prod                (const Matrix<T,P> &M, const char transa = 'N', const char transb = 'N') const {
         return gemm (*this, M, transa, transb);
     }
 
