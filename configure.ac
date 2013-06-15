@@ -346,7 +346,7 @@ AC_CHECK_HEADERS([nifti1_io.h],      [],
    [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], 
    [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
-AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h sys/sysctl.h])
 AC_CHECK_HEADERS([openssl/evp.h], [HAVE_CRYPTO=1], 
    [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
 AC_CHECK_HEADERS([fcntl.h],          [], 
@@ -528,7 +528,7 @@ AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 # Checks for C++ libraries with name spaces
 
 
-# ISMRMRD (required)
+# ISMRMRD
 AC_ARG_WITH(ismrmrdroot,[  --with-ismrmrdroot       path to ISMRMRD install dir], 
         [], [with_ismrmrdroot=/usr/local/ismrmrd])
 
@@ -787,7 +787,7 @@ fi
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
-  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -latlas -lblas")
+  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -lblas")
   LIBS=$SAVE_LIBS2
 fi
 

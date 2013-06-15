@@ -12046,10 +12046,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"f629e045\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"5f4d23f5\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Fri Jun 14 22:17:28 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -22192,7 +22192,7 @@ fi
 
 done
 
-for ac_header in sys/time.h c_asm.h intrinsics.h mach/mach_time.h
+for ac_header in sys/time.h c_asm.h intrinsics.h mach/mach_time.h sys/sysctl.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -24859,7 +24859,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  BLAS="-lcblas -latlas -lblas"
+  BLAS="-lcblas -lblas"
 fi
 
   LIBS=$SAVE_LIBS2

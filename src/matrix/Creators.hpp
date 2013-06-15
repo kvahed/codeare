@@ -3,9 +3,8 @@
 
 #include "Matrix.hpp"
 #include "Algos.hpp"
+#include "NoiseTraits.hpp"
 
-#include <gsl/gsl_rng.h>
-#include <limits>
 
 
 /**
