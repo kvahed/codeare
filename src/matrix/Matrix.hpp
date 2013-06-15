@@ -101,11 +101,6 @@ enum IceDim {
  */
 static const size_t dvsz = INVALID_DIM*sizeof(size_t);
 
-/**
- * @brief bits just suck.
- */
-typedef unsigned short BOOL;
-
 
 /**
  * @brief   Matrix template.<br/>
@@ -1554,7 +1549,7 @@ public:
      * @return          Cross-section or zero
      */
     inline Matrix<T,P>
-    operator&           (const Matrix<BOOL>& M) const ;
+    operator&           (const Matrix<unsigned short>& M) const ;
     
     
      /**
@@ -1563,10 +1558,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of false where elements are equal s and true else.
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator!=          (const T s) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<unsigned short> res(_dim);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
@@ -1584,10 +1579,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator>           (const T s) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<unsigned short> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1607,10 +1602,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator>=          (const T s) const {
 
-		Matrix<BOOL> res(_dim);
+		Matrix<unsigned short> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1629,10 +1624,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator<=          (const T s) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<unsigned short> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1651,10 +1646,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator<           (const T s) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<unsigned short> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1673,12 +1668,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator==          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<BOOL> res(_dim);
+        Matrix<unsigned short> res(_dim);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
@@ -1697,12 +1692,12 @@ public:
 	 * @return          Hit list
 	 */
     template<class S>
-	inline Matrix<BOOL>
+	inline Matrix<unsigned short>
 	operator==          (const Matrix<S,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-		Matrix<BOOL> res (_dim);
+		Matrix<unsigned short> res (_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1720,12 +1715,12 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of true where elements are equal s and false else.
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator==          (const T s) const {
 
     	T t = (T) s;
 
-        Matrix<BOOL> res (_dim);
+        Matrix<unsigned short> res (_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1745,12 +1740,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator!=          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<BOOL> res(_dim,_res);
+        Matrix<unsigned short> res(_dim,_res);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
@@ -1767,12 +1762,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator>=          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<BOOL> res(_dim);
+        Matrix<unsigned short> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1791,12 +1786,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator<=          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<BOOL> res(_dim);
+        Matrix<unsigned short> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1815,12 +1810,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator>           (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<BOOL> res(_dim,_res);
+        Matrix<unsigned short> res(_dim,_res);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1839,12 +1834,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator<           (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<BOOL> res(_dim,_res);
+        Matrix<unsigned short> res(_dim,_res);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1863,12 +1858,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator||          (const Matrix<T,P>& M) const {
 
         assert (memcmp(_dim, M.Dim(), dvsz) == 0);
 
-        Matrix<BOOL> res(_dim);
+        Matrix<unsigned short> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1888,10 +1883,10 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<unsigned short>
     operator&&          (const Matrix<T,P>& M) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<unsigned short> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -2580,7 +2575,7 @@ public:
      * @param  m        Matrix rhs
      * @return          m == s
      */
-    inline friend Matrix<BOOL>
+    inline friend Matrix<unsigned short>
     operator== (const T s, const Matrix<T,P>& m) {
         return   m == s;
     }
@@ -2593,7 +2588,7 @@ public:
      * @param  m        Matrix rhs
      * @return          m <= t
      */
-    inline friend Matrix<BOOL>
+    inline friend Matrix<unsigned short>
     operator>= (const T s, const Matrix<T,P>& m) {
         return   m <= s;
     }
@@ -2606,7 +2601,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T<=M
      */
-    inline friend Matrix<BOOL>
+    inline friend Matrix<unsigned short>
     operator<= (const T s, const Matrix<T,P>& m) {
         return   m >= s;
     }
@@ -2619,7 +2614,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T!=M
      */
-    inline friend Matrix<BOOL>
+    inline friend Matrix<unsigned short>
     operator!= (const T s, const Matrix<T,P>& m) {
         return   m != s;
     }
@@ -2632,7 +2627,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T+M
      */
-    inline friend Matrix<BOOL>
+    inline friend Matrix<unsigned short>
     operator>  (const T s, const Matrix<T,P>& m) {
         return   m <  s;
     }
@@ -2645,7 +2640,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T+M
      */
-    inline friend Matrix<BOOL>
+    inline friend Matrix<unsigned short>
     operator<  (const T s, const Matrix<T,P>& m) {
         return   m >  s;
     }
@@ -2659,7 +2654,7 @@ public:
      * @return          T+M
      */
     inline friend Matrix<T,P>
-    operator&  (const Matrix<BOOL>& mb, const Matrix<T,P>& m) {
+    operator&  (const Matrix<unsigned short>& mb, const Matrix<T,P>& m) {
         return   m & mb;
     }
 
@@ -3003,7 +2998,7 @@ protected:
     void Validate (double t) const {};
     void Validate (cxfl   t) const {};
     void Validate (cxdb   t) const {};
-	void Validate (BOOL   t) const {};
+	void Validate (unsigned short   t) const {};
 
 };
 

@@ -34,7 +34,7 @@ inline static bool check () {
 	write(A);
 	read(B);
 
-	Matrix<BOOL> C (A == B);
+	Matrix<unsigned short> C (A == B);
 
 #if defined (VERBOSE)
 	std::cout << C;

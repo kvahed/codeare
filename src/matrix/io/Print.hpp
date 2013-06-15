@@ -193,7 +193,7 @@ print (const Matrix<cxdb>& M, std::ostream& os) {
 }
 
 inline static std::ostream&
-print (const Matrix<BOOL>& M, std::ostream& os) {
+print (const Matrix<unsigned short>& M, std::ostream& os) {
 
     for (size_t i = 0; i < M.Dim(0); i++) {
         for(size_t j = 0; j < M.Dim(1); j++)

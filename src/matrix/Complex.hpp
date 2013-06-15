@@ -168,7 +168,7 @@ struct CompTraits<cxdb> {
 };
 
 template<>
-struct CompTraits<bool> {
+struct CompTraits<unsigned short> {
 
 	typedef bool type;
 

@@ -476,11 +476,11 @@ struct LapackTraits<cxdb> {
 
 
 template <>
-struct LapackTraits<bool> {
+struct LapackTraits<unsigned short> {
 
-    typedef bool Type;
-    typedef bool RType;
-    typedef bool CType;
+    typedef unsigned short Type;
+    typedef unsigned short RType;
+    typedef unsigned short CType;
 
 
     inline static void
