@@ -416,10 +416,10 @@ case $host in
 	    LIBEXT=dylib
     ;;
     *cygwin*)
-	    LIBEXT=dll
+	    LIBEXT=dll.a
     ;;
     *mingw*)
-	    LIBEXT=dll
+	    LIBEXT=dll.a
     ;;
 esac
 
