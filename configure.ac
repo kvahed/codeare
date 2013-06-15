@@ -773,7 +773,7 @@ fi
 
 # Otherwise, run through a list of possibilities                                                                                            
 AC_ARG_WITH(atlasroot,[  --with-atlasroot       path to atlas install dir], 
-                           [], [with_atlasroot=/usr/lib64/atlas])
+                           [], [with_atlasroot=no])
 if test -z "$BLAS" -a x"$with_atlasroot" != x"no" ; then
   OLD_LIBS=$LIBS
   LIBS="$LIBS -L$with_atlasroot"

@@ -12046,10 +12046,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"14b1a80d\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"413e109f\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Sat Jun 15 17:31:57 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Sat Jun 15 18:17:17 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -22991,10 +22991,10 @@ case $host in
 	    LIBEXT=dylib
     ;;
     *cygwin*)
-	    LIBEXT=dll
+	    LIBEXT=dll.a
     ;;
     *mingw*)
-	    LIBEXT=dll
+	    LIBEXT=dll.a
     ;;
 esac
 
@@ -24595,7 +24595,7 @@ fi
 if test "${with_atlasroot+set}" = set; then :
   withval=$with_atlasroot;
 else
-  with_atlasroot=/usr/lib64/atlas
+  with_atlasroot=no
 fi
 
 if test -z "$BLAS" -a x"$with_atlasroot" != x"no" ; then
