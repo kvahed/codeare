@@ -408,6 +408,20 @@ AC_ARG_WITH(fftw,   [  --with-fftw             	     Set directory of FFTW3 libr
 #############################################################
 # FFT routines
 #############################################################
+case $host in
+    *linux-gnu*)
+	    LIBEXT=so
+    ;;
+    *darwin*)
+	    LIBEXT=dylib
+    ;;
+    *cygwin*)
+	    LIBEXT=dll
+    ;;
+    *mingw*)
+	    LIBEXT=dll
+    ;;
+esac
 
 echo "Searching for FFTW library"
 if test -d "/usr/lib64"
@@ -423,8 +437,8 @@ then
   echo " -> Path not given. Searching for library..."
 else
   FFTPATH=$with_fftw
-  AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/libfftw3.a $FFTPATH/$LIBDIR/libfftw3f.a ,, [
-     AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3.a $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3f.a ,, [
+  AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT ,, [
+     AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3f.$LIBEXT $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3f.$LIBEXT ,, [
       echo " -> Given path not correct. Finding..."
       FFTPATH=""
   	  ] )
@@ -436,7 +450,7 @@ if test "$FFTPATH" = ""
 then
   if test "$FFTW_ROOT" != ""
   then
-    AC_CHECK_FILES( $FFTW_ROOT/include/fftw3.h $FFTW_ROOT/$LIBDIR/libfftw3.a , FFTPATH=$FFTW_ROOT, )
+    AC_CHECK_FILES( $FFTW_ROOT/include/fftw3.h $FFTW_ROOT/$LIBDIR/libfftw3f.$LIBEXT , FFTPATH=$FFTW_ROOT, )
   fi
 fi
 
@@ -452,7 +466,7 @@ then
   if test "$FFTPATH" != ""
   then
     # NOTE: AC_CHECK_FILES works here, but AC_CHECK_FILE doesn't (?!)
-    AC_CHECK_FILES( $FFTPATH/$LIBDIR/libfftw3.a $FFTPATH/$LIBDIR/libfftw3f.a , , FFTPATH="" )
+    AC_CHECK_FILES( $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT , , FFTPATH="" )
   fi
 fi
 
