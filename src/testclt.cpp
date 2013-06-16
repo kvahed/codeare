@@ -53,7 +53,7 @@ int main (int argc, char** argv) {
 #ifdef HAVE_MPI
 		else if (!strcmp (test, "MPI"))                   mpitest      (con);
 #endif
-		else                                              internaltest (con);
+		//else                                              internaltest (con);
 
 		delete con;
 		
