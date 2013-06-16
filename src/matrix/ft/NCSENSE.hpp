@@ -108,9 +108,10 @@ public:
 		for (size_t i = 0; i < m_dim; i++)
 			ms[i] = size(m_sm,i);
 
-		m_cgiter = params.Get<size_t>("cgiter");
-		m_cgeps  = params.Get<double>("cgeps");
-		m_lambda = params.Get<double>("lambda");
+		m_cgiter  = params.Get<size_t>("cgiter");
+		m_cgeps   = params.Get<double>("cgeps");
+		m_lambda  = params.Get<double>("lambda");
+		m_verbose = params.Get<int>("verbose");
 
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  Signal nodes: %li\n", m_nk);
@@ -133,8 +134,6 @@ public:
 		
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
-
-                m_verbose = true;
 
 
 		printf ("  ...done.\n\n");
@@ -251,11 +250,18 @@ public:
 		vector<T> res;
         std::vector< Matrix<cxfl> > vc;
 
-		p = EH (m, sens, m_fts) * ((recal) ? IntensityMap (sens) : m_ic);
+        if (recal)
+        	IntensityMap (sens);
+
+
+		p = EH (m, sens, m_fts) * m_ic;
 		r = p;
 		x = zeros<CT>(size(p));
 		
-		xn = pow(norm(p), 2.0);
+        if (m_verbose)
+            vc.push_back (p/m_ic);
+
+        xn = pow(norm(p), 2.0);
 		rn = xn;
 
 		for (size_t i = 0; i < m_cgiter; i++) {
@@ -267,15 +273,15 @@ public:
 
  			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 
-			q   = EH (E  (p * ((recal) ? IntensityMap (sens) : m_ic), sens, m_fts), sens, m_fts) *
-					((recal) ? IntensityMap (sens) : m_ic);
+			q   = EH (E  (p * m_ic, sens, m_fts), sens, m_fts) * m_ic;
+
 			if (m_lambda)
 				q  += m_lambda * p;
 			
 			ts  = rn / p.dotc(q);
 			x  += ts * p;
             if (m_verbose)
-                vc.push_back (x * ((recal) ? IntensityMap (sens) : m_ic));
+                vc.push_back (x * m_ic);
 			r  -= ts * q;
 			rno = rn;
 			rn  = pow(norm(r), 2.0);
@@ -293,7 +299,7 @@ public:
                 memcpy (&x[i*cpsz], &(vc[i][0]), cpsz*sizeof(CT));
             return x;
         } else        
-            return x * ((recal) ? IntensityMap (sens) : m_ic);
+            return x * m_ic;
 
 	}
 	

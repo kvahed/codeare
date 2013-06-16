@@ -19,7 +19,7 @@ template<class T> inline static Matrix<T>
 normal (Matrix<T>&) {}
 
 
-enum distribution { uniform, gaussian };
+enum distribution { uniform, gaussian, rayleigh, landau };
 enum algorithm { def, mt19937, ranlxs0, ranlxs1, ranlxs2, ranlxd1, ranlxd2,
 	             ranlux, ranlux389, cmrg, mrg, taus, taus2, gfsr4};
 
@@ -114,28 +114,84 @@ template<> template<>
 struct generator<float,gaussian> {
 	typedef double T;
 	inline static T generate (gsl_rng* r) {
-		return (2.0 * gsl_ran_gaussian (r,1.0) - 1.0);
+		return (2.0 * gsl_ran_ugaussian (r) - 1.0);
 	}
 };
 template<> template<>
 struct generator<double,gaussian> {
 	typedef double T;
 	inline static T generate (gsl_rng* r) {
-		return (2.0 * gsl_ran_gaussian (r,1.0) - 1.0);
+		return (2.0 * gsl_ran_ugaussian (r) - 1.0);
 	}
 };
 template<> template<>
 struct generator<cxfl,gaussian> {
 	typedef cxfl T;
 	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_ran_gaussian (r,1.0) - 1.0, 2.0 * gsl_ran_gaussian (r,1.0) - 1.0);
+		return T(2.0 * gsl_ran_ugaussian (r) - 1.0, 2.0 * gsl_ran_ugaussian (r) - 1.0);
 	}
 };
 template<> template<>
 struct generator<cxdb,gaussian> {
 	typedef cxdb T;
 	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_ran_gaussian (r,1.0) - 1.0, 2.0 * gsl_ran_gaussian (r,1.0) - 1.0);
+		return T(2.0 * gsl_ran_ugaussian (r) - 1.0, 2.0 * gsl_ran_ugaussian (r) - 1.0);
+	}
+};
+template<> template<>
+struct generator<float,rayleigh> {
+	typedef double T;
+	inline static T generate (gsl_rng* r) {
+		return (2.0 * gsl_ran_rayleigh (r,1.0) - 1.0);
+	}
+};
+template<> template<>
+struct generator<double,rayleigh> {
+	typedef double T;
+	inline static T generate (gsl_rng* r) {
+		return (2.0 * gsl_ran_rayleigh (r,1.0) - 1.0);
+	}
+};
+template<> template<>
+struct generator<cxfl,rayleigh> {
+	typedef cxfl T;
+	inline static T generate (gsl_rng* r) {
+		return T(2.0 * gsl_ran_rayleigh (r,1.0) - 1.0, 2.0 * gsl_ran_rayleigh (r,1.0) - 1.0);
+	}
+};
+template<> template<>
+struct generator<cxdb,rayleigh> {
+	typedef cxdb T;
+	inline static T generate (gsl_rng* r) {
+		return T(2.0 * gsl_ran_rayleigh (r,1.0) - 1.0, 2.0 * gsl_ran_rayleigh (r,1.0) - 1.0);
+	}
+};
+template<> template<>
+struct generator<float,landau> {
+	typedef double T;
+	inline static T generate (gsl_rng* r) {
+		return (2.0 * gsl_ran_landau (r) - 1.0);
+	}
+};
+template<> template<>
+struct generator<double,landau> {
+	typedef double T;
+	inline static T generate (gsl_rng* r) {
+		return (2.0 * gsl_ran_landau (r) - 1.0);
+	}
+};
+template<> template<>
+struct generator<cxfl,landau> {
+	typedef cxfl T;
+	inline static T generate (gsl_rng* r) {
+		return T(2.0 * gsl_ran_landau (r) - 1.0, 2.0 * gsl_ran_landau (r) - 1.0);
+	}
+};
+template<> template<>
+struct generator<cxdb,landau> {
+	typedef cxdb T;
+	inline static T generate (gsl_rng* r) {
+		return T(2.0 * gsl_ran_landau (r) - 1.0, 2.0 * gsl_ran_landau (r) - 1.0);
 	}
 };
 

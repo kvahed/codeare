@@ -23,6 +23,7 @@
 #include "Toolbox.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "Print.hpp"
 
 #include <math.h>
 
@@ -151,7 +152,19 @@ CGSENSE::Process () {
 	
 	printf ("Processing CGSENSE ...\n");
 
-    Matrix<cxfl> img = m_ncs->Adjoint (Get<cxfl>("data"), Get<cxfl>("sens"));
+    const Matrix<cxfl>& sens = Get<cxfl>("sens");
+    
+    Matrix<cxfl> data;
+
+    if (!m_testcase)
+        data = Get<cxfl>("data");
+    else {
+        data  = m_ncs->Trafo (phantom<cxfl>(size(sens,0)), sens);
+        data += m_noise * rand<cxfl,gaussian>(size(data));
+    }
+    
+    
+    Matrix<cxfl> img = m_ncs->Adjoint (data, sens);
     wspace.Add("image", img);
 
 	Free ("data");
