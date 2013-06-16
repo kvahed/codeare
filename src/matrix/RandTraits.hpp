@@ -76,14 +76,14 @@ struct generator<cxfl,uniform> {
 };
 template<> template<>
 struct generator<cxdb,uniform> {
-	typedef cxfl T;
+	typedef cxdb T;
 	inline static T generate (gsl_rng* r) {
 		return T(2.0 * gsl_rng_uniform(r) - 1.0, 2.0 * gsl_rng_uniform(r) - 1.0);
 	}
 };
 template<> template<>
 struct generator<short,uniform> {
-	typedef long T;
+	typedef short T;
 	inline static T generate (gsl_rng* r) {
 		return 2 * gsl_rng_uniform_int (r, SHRT_MAX) - SHRT_MAX;
 	}
@@ -133,7 +133,7 @@ struct generator<cxfl,gaussian> {
 };
 template<> template<>
 struct generator<cxdb,gaussian> {
-	typedef cxfl T;
+	typedef cxdb T;
 	inline static T generate (gsl_rng* r) {
 		return T(2.0 * gsl_ran_gaussian (r,1.0) - 1.0, 2.0 * gsl_ran_gaussian (r,1.0) - 1.0);
 	}
