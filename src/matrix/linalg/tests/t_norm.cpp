@@ -5,7 +5,7 @@
 
 template<class T> void norm_check () {
 
-    Matrix<T> A = rand<T> (4,3);
+    Matrix<T> A = rand<T,uniform> (4,3);
     
 #ifdef VERBOSE
     std::cout << "A=\n" << A;

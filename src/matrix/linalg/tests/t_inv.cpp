@@ -5,7 +5,7 @@
 
 template<class T> void inv_check () {
 
-    Matrix<T> A = rand<T>(3,3);
+    Matrix<T> A = rand<T,uniform>(3,3);
 
 #ifdef VERBOSE
     std::cout << "A=\n" << A;

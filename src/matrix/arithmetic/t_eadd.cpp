@@ -5,8 +5,8 @@
 template<class T>
 void eadd_check () {
 
-    Matrix<T> A = rand<T>(32,8);
-    Matrix<T> B = rand<T>(32,8);
+    Matrix<T> A = rand<T,uniform>(32,8);
+    Matrix<T> B = rand<T,uniform>(32,8);
     T a = T(2.0);
     Matrix<T> C, D;
 

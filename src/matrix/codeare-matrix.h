@@ -1803,65 +1803,13 @@ public:
      * @param   i       Dimension
      * @return          Dimension
      */
-    inline size_t
-    Dim                 (const size_t i)  const {
-        assert (i < INVALID_DIM);
-        return _dim[i];
-    }
-
-
-    /**
-     * @brief           Get dimension array
-     *
-     * @return          All dimensions
-     */
-    inline const size_t*
-    Dim                 ()                  const {
-        return _dim;
-    }
-
-
-    /**
-     * @brief           Get dimension sizes
-     *
-     * @return          All dimensions
-     */
-    inline const size_t*
-    Dsz                 ()                  const {
-        return _dsz;
-    }
-
-
-    /**
-     * @brief           Get copy of dimension vector
-     *
-     * @return          All dimensions
-     */
-    inline std::vector<size_t>
-    DimVector           ()                  const {
-		std::vector<size_t> dim (INVALID_DIM,1);
-        std::memcpy (&dim[0], _dim, dvsz);
-        return dim;
-    }
-
-
-    /**
-     * @brief           Get size a given dimension.
-     *
-     * @return          Number of rows.
-     */
-    inline size_t
-    Dim                 (const int i)      const {
-        assert (i < INVALID_DIM);
-        return _dim[i];
-    }
-
-
-    /**
-     * @brief           Purge data and free RAM.
-     */
+    inline size_t Dim (const size_t i)  const;
+    inline const size_t* Dim () const;
+    inline const size_t* Dsz () const;
+    inline std::vector<size_t> DimVector () const;
+    inline size_t Dim (const int i) const;
     inline void Clear ();
-    inline const char* GetClassName        () const;
+    inline const char* GetClassName () const;
     inline void SetClassName (const char* name);
     inline Matrix<T,P> prod (const Matrix<T,P> &M, const char transa, const char transb) const;
     inline Matrix<T,P> prodt (const Matrix<T,P> &M) const;

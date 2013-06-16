@@ -20,9 +20,6 @@
 
 #include "testclt.hpp"
 
-enum {
-    local, remote
-} con;
 
 int main (int argc, char** argv) {
 	
@@ -56,8 +53,7 @@ int main (int argc, char** argv) {
 #ifdef HAVE_MPI
 		else if (!strcmp (test, "MPI"))                   mpitest      (con);
 #endif
-		//else if (!strcmp (test, "ocl"))                   oclmatrixtest(con);
-		//else                                              internaltest (con);
+		else                                              internaltest (con);
 
 		delete con;
 		

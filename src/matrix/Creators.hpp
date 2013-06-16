@@ -32,7 +32,7 @@
  */
 template <class T> inline static Matrix<T> 
 zeros           (const size_t& col, 
-				 const size_t& lin = 1, 
+				 const size_t& lin,
 				 const size_t& cha = 1,
 				 const size_t& set = 1,
 				 const size_t& eco = 1,
@@ -72,6 +72,17 @@ zeros           (const Matrix<size_t>& sz) {
 
 }
 
+/**
+ * @brief       Square matrix of zeros
+ *
+ * @param  n    Side length
+ * @return      Zero matrix
+ */
+template <class T> inline static Matrix<T>
+zeros            (const size_t& n) {
+	return zeros<T>(n,n);
+}
+
 
 
 /**
@@ -99,7 +110,7 @@ zeros           (const Matrix<size_t>& sz) {
  */
 template <class T> inline static Matrix<T> 
 ones            (const size_t& col, 
-				 const size_t& lin = 1, 
+				 const size_t& lin,
 				 const size_t& cha = 1,
 				 const size_t& set = 1,
 				 const size_t& eco = 1,
@@ -125,6 +136,18 @@ ones            (const size_t& col,
 
 
 /**
+ * @brief       Square matrix of ones
+ *
+ * @param  n    Side length
+ * @return      Random matrix
+ */
+template <class T> inline static Matrix<T>
+ones            (const size_t& n) {
+	return ones<T>(n,n);
+}
+
+
+/**
  * @brief       Zero matrix
  *
  * @param  sz   Size vector
@@ -144,11 +167,6 @@ ones           (const Matrix<size_t>& sz) {
 
 }
 
-
-//enum {
-//    normal,
-//    gaussian
-//} distribution;
 
 /**
  * @brief       Random matrix
@@ -173,9 +191,9 @@ ones           (const Matrix<size_t>& sz) {
  * @return      Random matrix
  *
  */
-template<class T> static Matrix<T> 
+template<class T, distribution D> static Matrix<T>
 rand           (const size_t& col, 
-				const size_t& lin = 1, 
+				const size_t& lin,
 				const size_t& cha = 1,
 				const size_t& set = 1,
 				const size_t& eco = 1,
@@ -192,48 +210,43 @@ rand           (const size_t& col,
 				const size_t& ave = 1) {
 	
 	Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-	
-	size_t i = numel(res);
-	
-	const gsl_rng_type* grt;
-	gsl_rng* r;
-    double s;
-    
-	gsl_rng_env_setup();
 
-    //switch (D){
-    //   case normal:  grt = gsl_rng_default; break;
-            //case gaussian: s = 1.0; grt = gsl_ran_gaussian; break;
-    //}
-    
-	grt = gsl_rng_default;
-	r = gsl_rng_alloc (grt);
-	gsl_rng_set (r, getticks()); // reseed
-
-	if      (typeid(T) == typeid(float) || typeid(T) == typeid(double))
-		while (i--)
-			res[i] = 2.0 * gsl_rng_uniform (r) - 1.0;
-	else if (typeid(T) == typeid(cxdb))
-		while (i--) {
-			((double*) &res[i])[0] = 2.0 * gsl_rng_uniform (r) - 1.0;
-			((double*) &res[i])[1] = 2.0 * gsl_rng_uniform (r) - 1.0;
-		}
-	else if (typeid(T) == typeid(cxfl))
-		while (i--) {
-			((float*) &res[i])[0] = 2.0 * gsl_rng_uniform (r) - 1.0;
-			((float*) &res[i])[1] = 2.0 * gsl_rng_uniform (r) - 1.0;
-		}
-	else if (typeid(T) == typeid(short))
-		while (i--)
-			res[i] = 2 * gsl_rng_uniform_int (r, SHRT_MAX) - SHRT_MAX;
-	else if (typeid(T) == typeid(long))
-		while (i--)
-			res[i] = 2 * gsl_rng_uniform_int (r, INT_MAX) - INT_MAX;
-	
-	gsl_rng_free (r);
+	rand_pop<T,D>(res);
 
 	return res;
 
+}
+
+
+/**
+ * @brief       Rand matrix
+ *
+ * @param  sz   Size vector
+ * @return      Rand matrix
+ *
+ */
+template <class T, distribution D> inline static Matrix<T>
+rand           (const Matrix<size_t>& sz) {
+
+	std::vector<size_t> n (INVALID_DIM,1);
+
+	for (size_t i = 0; i < numel(sz) && i < INVALID_DIM; i++)
+		n[i] = sz[i];
+
+	Matrix<T> res (n);
+	rand_pop<T,D> (res);
+ 	return res;
+
+
+}/**
+ * @brief       Random square matrix
+ *
+ * @param  n    Side length
+ * @return      Random matrix
+ */
+template<class T, distribution D> static Matrix<T>
+rand (const size_t n) {
+	return rand<T,D>(n,n);
 }
 
 

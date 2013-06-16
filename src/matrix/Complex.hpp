@@ -67,6 +67,12 @@ return (typeid(T) == short_type || typeid(T) == long_type ||
 		typeid(T) ==  bool_type || typeid(T) ==   int_type );
 }
 
+template<class T>
+static inline bool is_unsigned (const T t) {
+	return (typeid(T) == typeid(unsigned int) || typeid(T) == typeid(unsigned short) ||
+			typeid(T) == typeid(unsigned long) || typeid(T) == typeid(size_t));
+}
+
 inline double cconj (double d) {return d;}
 inline float  cconj (float  f) {return f;}
 inline short  cconj (short  s) {return s;}

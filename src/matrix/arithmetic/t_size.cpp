@@ -2,7 +2,7 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 
-template<class T> void exp_check () {
+template<class T> void size_check () {
 
     using namespace codeare::matrix::arithmetic;
     
@@ -21,8 +21,8 @@ template<class T> void exp_check () {
 
 int main (int args, char** argv) {
 
-    exp_check<float>();
-    exp_check<double>();
+    size_check<float>();
+    size_check<double>();
     
     return 0;
     

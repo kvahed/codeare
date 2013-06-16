@@ -6,8 +6,8 @@
 template<class T>
 void emul_check () {
 
-    Matrix<T> A = rand<T>(3,4);
-    Matrix<T> B = rand<T>(3,4);
+    Matrix<T> A = rand<T,uniform>(3,4);
+    Matrix<T> B = rand<T,uniform>(3,4);
 
 #ifdef VERBOSE
     std::cout << "A=\n" << A;

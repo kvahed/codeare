@@ -6,7 +6,7 @@
 
 template<class T, class S> void svd_check () {
 
-    Matrix<T> A = rand<T>(8,3);
+    Matrix<T> A = rand<T,uniform>(8,3);
     boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> > usv;
 
 #ifdef VERBOSE
