@@ -24,6 +24,8 @@ AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
+AM_MAINTAINER_MODE
+
 
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
