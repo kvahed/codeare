@@ -37,6 +37,8 @@ inline static bool check () {
 	Matrix<unsigned short> C (A == B);
 
 #if defined (VERBOSE)
+	std::cout << A;
+	std::cout << B;
 	std::cout << C;
 	std::cout << std::endl;
 #endif

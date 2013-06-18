@@ -74,13 +74,14 @@ public:
 		header.sizeof_hdr = 348;
 		header.dim[0] = ndims(tmp);
 		header.pixdim[0] = ndims(tmp);
+		size_t nd = ndims(tmp);
 
-		if (ndims(tmp) > 7) {
+		if (nd > 7) {
 			printf ("Cannot dump more than 8 dimensions to NIFTI file\n.");
 			return false;
 		}
 
-		for (size_t i = 0; i < 7; ++i) {
+		for (size_t i = 0; i < nd; ++i) {
 			header.dim   [i+1] = tmp.Dim(i);
 			header.pixdim[i+1] = tmp.Res(i);
 		}
@@ -118,8 +119,6 @@ public:
 	template <class T> Matrix<T>
 	Read (const std::string& uri = "") const {
 
-		std::vector<size_t> ndims (INVALID_DIM,1);
-		std::vector<float>  nress (INVALID_DIM,1.0);
 		size_t i = 0;
 
 		nifti_image* ni = nifti_image_read (this->m_fname.c_str(), 1);
@@ -128,16 +127,14 @@ public:
 		if (ni == NULL)
 			return M;
 
+		std::vector<size_t> ndims;
+		std::vector<float>  nress;
+
 		for (; i < ni->dim[0]; ++i)
 			if (ni->dim[i+1] > 1) {
-				ndims[i] = ni->dim[i+1];
-				nress[i] = ni->pixdim[i+1];
+				ndims.push_back(ni->dim[i+1]);
+				nress.push_back(ni->pixdim[i+1]);
 			}
-
-		for (; i < INVALID_DIM; ++i) {
-			ndims[i] = 1;
-			nress[i] = 1.0;
-		}
 
 		M = Matrix<T>(ndims, nress);
 
