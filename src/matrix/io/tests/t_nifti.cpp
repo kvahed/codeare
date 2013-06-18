@@ -8,6 +8,7 @@
 #include "NIFile.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "Print.hpp"
 
 using namespace codeare::matrix::io;
 
@@ -34,10 +35,9 @@ inline static bool check () {
 	write(A);
 	read(B);
 
-/*	h5write (A,fname);
-    A = h5read<T> (fname);*/
-
 #if defined (VERBOSE)
+	std::cout << A;
+	std::cout << B;
 	std::cout << (A == B);
 	std::cout << std::endl;
 #endif

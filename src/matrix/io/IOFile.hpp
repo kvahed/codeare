@@ -54,18 +54,36 @@ namespace io      {
 	 */
 	template<class T> inline static bool
 	mwrite (const std::vector<T>& d, FILE* f, std::string desc) {
-
 		size_t n = d.size();
 		size_t sz = sizeof(T);
-
-		if (size_t l = fwrite (d, sz, n, f) != n) {
+		if (size_t l = fwrite (&d.front(), sz, n, f) != n) {
 			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
 			return false;
 		}
-
 		return true;
-
 	}
+
+	/**
+	 * @brief           Verbose wrapper around fwrite
+	 *
+	 * @param  d        Data repository to write from
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mwrite (const container<T>& d, FILE* f, std::string desc) {
+		size_t n = d.size();
+		size_t sz = sizeof(T);
+		if (size_t l = fwrite (d.memory(), sz, n, f) != n) {
+			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+		return true;
+	}
+
 
 
 	/**
@@ -79,7 +97,7 @@ namespace io      {
 	 * @return          Success
 	 */
 	template<class T> inline static bool
-	mread (T*& d, const size_t n, FILE* f, const std::string desc) {
+	mread (T* d, const size_t n, FILE* f, const std::string desc) {
 
 		size_t sz = sizeof(T);
 
@@ -109,7 +127,7 @@ namespace io      {
 		size_t sz = sizeof(T);
 		size_t n  = d.size();
 
-		if (size_t l = fread (d, sz, n, f) != n) {
+		if (size_t l = fread (&d[0], sz, n, f) != n) {
 			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
 			return false;
 		}
@@ -118,6 +136,30 @@ namespace io      {
 
 	}
 
+	/**
+	 * @brief           Verbose wrapper around fread
+	 *
+	 * @param  d        Place holder to read into
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mread (container<T>& d, FILE* f, const std::string desc) {
+
+		size_t sz = sizeof(T);
+		size_t n  = d.size();
+
+		if (size_t l = fread (&d[0], sz, n, f) != n) {
+			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+
+		return true;
+
+	}
 
 
     /**
