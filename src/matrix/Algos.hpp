@@ -86,7 +86,7 @@ isxd (const Matrix<T>& M, const size_t d) {
 
 	size_t l = 0;
 
-	for (size_t i = 0; i < INVALID_DIM; ++i)
+	for (size_t i = 0; i < M.NDim(); ++i)
 		if (M.Dim(i) > 1) ++l;
 
 	return (l == d);
@@ -295,7 +295,7 @@ ndims (const Matrix<T>& M) {
 	
 	size_t nd = 0;
 	
-	for (size_t i = 1; i < INVALID_DIM; ++i)
+	for (size_t i = 1; i < M.NDim(); ++i)
 		if (size(M,i) > 1)
 			nd = i;
 	
@@ -358,14 +358,7 @@ SizeInRAM          (const Matrix<T>& M) {
  */
 template <class T> inline  size_t
 numel               (const Matrix<T>& M) {
-	
-	size_t s = 1;
-    
-	for (size_t i = 0; i < INVALID_DIM; ++i)
-		s *= M.Dim(i);
-    
-	return s;
-	
+	return M.Size();
 }
 
 
@@ -377,12 +370,8 @@ numel               (const Matrix<T>& M) {
  */
 template <class T> inline bool
 all (const Matrix<T>& M) {
-
 	return (nnz(M) == numel(M));
-
 }
-
-
 
 
 /**
@@ -394,15 +383,11 @@ all (const Matrix<T>& M) {
  */
 template <class T>  size_t
 size               (const Matrix<T>& M, const size_t& d) {
-	
 	return M.Dim(d);
-	
 }
 template <class T>  size_t
 size               (const Matrix<T,MPI>& M, const size_t& d) {
-	
 	return M.Dim(d);
-	
 }
 
 
@@ -462,22 +447,11 @@ resize (const Matrix<T>& M, const size_t& sc, const size_t& sl, const size_t& ss
 template <class T>  inline  Matrix<size_t>
 size               (const Matrix<T>& M) {
 	
-	Matrix<size_t> res (1,INVALID_DIM);
-	size_t ones = 0;
-    
-	for (size_t i = 0; i < INVALID_DIM; ++i) {
-		
-		res[i] = size(M, i);
+	Matrix<size_t> ret (1,M.NDim());
+	for (size_t i = 0; i < numel(ret); ++i)
+		ret[i] = size(M,i);
+	return ret;
 
-		if (res[i] == 1)
-			++ones;
-		else
-			ones = 0;
-		
-	}
-	
-	return resize (res, 1, INVALID_DIM-ones);
-	
 }
 
 
@@ -495,9 +469,6 @@ vsize               (const Matrix<T>& M) {
 }
 
 
-
-
-
 /**
  * @brief           Get resolution of a dimension
  *
@@ -513,7 +484,6 @@ resol               (const Matrix<T>& M, const size_t& d) {
 }
 
 
-
 /**
  * @brief           Get length
  *
@@ -525,7 +495,7 @@ length             (const Matrix<T>& M) {
 	
 	size_t l = 1;
 
-	for (size_t i = 0; i < INVALID_DIM; ++i)
+	for (size_t i = 0; i < M.NDim(); ++i)
 		l = (l > size(M,i)) ? l : size(M,i);
 
 	return l;
@@ -652,7 +622,7 @@ min (const Matrix<T>& M) {
  * @brief           Transpose
  *
  * @param  M        2D Matrix
- * @param  conj     Conjugate while transosing
+ * @param  c        Conjugate while transposing
  *
  * @return          Non conjugate transpose
  */
@@ -669,7 +639,7 @@ transpose (const Matrix<T>& M, const bool& c = false) {
 
 	for (j = 0; j < n; ++j)
 		for (i = 0; i < m; ++i)
-			res (j,i) = M(i,j);
+			res(j,i) = M(i,j);
 	
 	return c ? conj(res) : res;
 
@@ -711,9 +681,9 @@ resize (const Matrix<T>& M, const size_t& sz) {
     typedef typename container<T>::iterator VI;
 
     VI rb = res.Container().begin();
-    VI mb = M.Container().begin;
+    VI mb = M.Container().begin();
     
-    std::copy (rb, rb+copysz, mb);
+    std::copy (mb, mb+copysz, rb);
 
 	return res;
 	
@@ -732,13 +702,18 @@ resize (const Matrix<T>& M, const size_t& sz) {
  * @return          Resized copy
  */
 template <class T> inline  Matrix<T>
-resize (const Matrix<T>& M, Matrix<size_t> sz) {
+resize (const Matrix<T>& M, const Matrix<size_t>& sz) {
 
 	Matrix<T> res  = zeros<T>(sz);
 	size_t copysz  = MIN(numel(M), numel(res));
 
-    memcpy (&res[0], M.Memory(), copysz * sizeof(T));
-    
+    typedef typename container<T>::iterator VI;
+
+    VI rb = res.Container().begin();
+    VI mb = M.Container().begin();
+
+    std::copy (mb, mb+copysz, rb);
+
 	return res;
 	
 }
@@ -763,7 +738,7 @@ sum (const Matrix<T>& M, const size_t d) {
 	size_t        dim = sz[d];
 	Matrix<T>     res;
 
-	assert (d < INVALID_DIM);
+	assert (d < M.NDim());
 	
 	// No meaningful sum over particular dimension
 	if (dim == 1) 
@@ -780,7 +755,7 @@ sum (const Matrix<T>& M, const size_t d) {
 	
 	// Outer size
 	size_t outsize = 1;
-	for (size_t i = d+1; i < MIN(INVALID_DIM,numel(sz)); ++i)
+	for (size_t i = d+1; i < MIN(M.NDim(),numel(sz)); ++i)
 		outsize *= sz[i];
 	
 	// Adjust size vector and allocate
@@ -851,7 +826,7 @@ prod (const Matrix<T>& M, const size_t d) {
 	size_t        dim = sz[d];
 	Matrix<T>     res;
 
-	assert (d < INVALID_DIM);
+	assert (d < M.NDim());
 
 	// No meaningful sum over particular dimension
 	if (dim == 1)
@@ -868,7 +843,7 @@ prod (const Matrix<T>& M, const size_t d) {
 
 	// Outer size
 	size_t outsize = 1;
-	for (size_t i = d+1; i < MIN(INVALID_DIM,numel(sz)); ++i)
+	for (size_t i = d+1; i < MIN(M.NDim(),numel(sz)); ++i)
 		outsize *= sz[i];
 
 	// Adjust size vector and allocate
@@ -957,24 +932,19 @@ SOS (const Matrix<T>& M, const size_t d) {
 template <class T> inline  Matrix<T>
 squeeze (const Matrix<T>& M) {
 	
-	size_t found = 0;
-	Matrix<size_t> dims = ones<size_t> (INVALID_DIM,1);
-	Matrix<float>  resl = ones<float>  (INVALID_DIM,1);
-	
-	for (size_t i = 0; i < INVALID_DIM; ++i)
+	std::vector<size_t> dim;
+	std::vector<float>  res;
+
+	for (size_t i = 0; i < M.NDim(); ++i)
 		if (size(M, i) > 1) {
-			dims[found]   = size (M,i);
-			resl[found++] = resol(M,i);
+			dim.push_back(size (M,i));
+			res.push_back(resol(M,i));
 		}
 	
-	Matrix<T> res = zeros<T> (dims);
+	Matrix<T> ret (dim,res);
+	ret.Container() = M.Container();
 	
-	for (size_t i = 0; i < INVALID_DIM; ++i)
-		res.Res(i) = resl[i];
-
-	res.Container() = M.Container();
-	
-	return res;
+	return ret;
 	
 }
 
@@ -982,6 +952,12 @@ squeeze (const Matrix<T>& M) {
 /**
  * @brief           MATLAB-like permute
  * 
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (1,8,7,1,6);
+ *   m = permute (m); // dims: (8,7,6);
+ * @endcode
+ *
  * @param   M       Input matrix 
  * @param   perm    New permuted dimensions
  * @return          Permuted matrix
@@ -1054,7 +1030,7 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 /**
  * @brief          FLip up down
  * 
- * @param          Matrix
+ * @param   M      Matrix
  * @return         Flipped matrix
  */
 
@@ -1083,7 +1059,7 @@ flipud (const Matrix<T>& M)  {
 /**
  * @brief          FLip up down
  * 
- * @param          Matrix
+ * @param  M        Matrix
  * @return         Flipped matrix
  */
 

@@ -1,6 +1,7 @@
 #include "Trigonometry.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "Print.hpp"
 
 template<class T>
 void check () {

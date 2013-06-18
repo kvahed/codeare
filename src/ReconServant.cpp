@@ -74,10 +74,11 @@ namespace RRServer {
 	void
 	ReconServant::set_cxfl  (const char* name, const cxfl_data& c) {
 		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
+		size_t nd = c.dims.length();
+		std::vector<size_t> mdims (nd);
+		std::vector<float>  mress (nd);
 
-		for (int i = 0; i < INVALID_DIM; i++) {
+		for (int i = 0; i < nd; i++) {
 			mdims[i] = c.dims[i];
 			mress[i] = c.res[i];
 		}
@@ -96,10 +97,11 @@ namespace RRServer {
 		
 		Matrix<cxfl> tmp = Workspace::Instance().Get<cxfl> (name);
 
-		c.dims.length(INVALID_DIM);
-		c.res.length (INVALID_DIM);
+		size_t nd = tmp.NDim();
+		c.dims.length(nd);
+		c.res.length (nd);
 
-		for (int j = 0; j < INVALID_DIM; j++) {
+		for (int j = 0; j < nd; j++) {
 			c.dims[j] = tmp.Dim(j);
 			c.res[j]  = tmp.Res(j);
 		}
@@ -114,10 +116,11 @@ namespace RRServer {
 	void
 	ReconServant::set_cxdb  (const char* name, const cxdb_data& c) {
 		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
+		size_t nd = c.dims.length();
+		std::vector<size_t> mdims (nd);
+		std::vector<float>  mress (nd);
 
-		for (int i = 0; i < INVALID_DIM; i++) {
+		for (int i = 0; i < nd; i++) {
 			mdims[i] = c.dims[i];
 			mress[i] = c.res[i];
 		}
@@ -136,10 +139,11 @@ namespace RRServer {
 
 		Matrix<cxdb> tmp = Workspace::Instance().Get<cxdb> (name);
 
-		c.dims.length(INVALID_DIM);
-		c.res.length (INVALID_DIM);
+		size_t nd = tmp.NDim();
+		c.dims.length(nd);
+		c.res.length (nd);
 
-		for (int j = 0; j < INVALID_DIM; j++) {
+		for (int j = 0; j < nd; j++) {
 			c.dims[j] = tmp.Dim(j);
 			c.res[j]  = tmp.Res(j);
 		}
@@ -154,10 +158,11 @@ namespace RRServer {
 	void
 	ReconServant::set_rlfl  (const char* name, const rlfl_data& c) {
 		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
+		size_t nd = c.dims.length();
+		std::vector<size_t> mdims (nd);
+		std::vector<float>  mress (nd);
 
-		for (int i = 0; i < INVALID_DIM; i++) {
+		for (int i = 0; i < nd; i++) {
 			mdims[i] = c.dims[i];
 			mress[i] = c.res[i];
 		}
@@ -176,10 +181,11 @@ namespace RRServer {
 		
 		Matrix<float> tmp = Workspace::Instance().Get<float> (name);
 
-		c.dims.length(INVALID_DIM);
-		c.res.length (INVALID_DIM);
+		size_t nd = tmp.NDim();
+		c.dims.length(nd);
+		c.res.length (nd);
 
-		for (int j = 0; j < INVALID_DIM; j++) {
+		for (int j = 0; j < nd; j++) {
 			c.dims[j] = tmp.Dim(j);
 			c.res[j]  = tmp.Res(j);
 		}
@@ -194,10 +200,11 @@ namespace RRServer {
 	void
 	ReconServant::set_rldb  (const char* name, const rldb_data& c) {
 		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
+		size_t nd = c.dims.length();
+		std::vector<size_t> mdims (nd);
+		std::vector<float>  mress (nd);
 
-		for (int i = 0; i < INVALID_DIM; i++) {
+		for (int i = 0; i < nd; i++) {
 			mdims[i] = c.dims[i];
 			mress[i] = c.res[i];
 		}
@@ -216,10 +223,11 @@ namespace RRServer {
 
 		Matrix<double> tmp = Workspace::Instance().Get<double> (name);
 
-		c.dims.length(INVALID_DIM);
-		c.res.length (INVALID_DIM);
+		size_t nd = tmp.NDim();
+		c.dims.length(nd);
+		c.res.length (nd);
 
-		for (int j = 0; j < INVALID_DIM; j++) {
+		for (int j = 0; j < nd; j++) {
 			c.dims[j] = tmp.Dim(j);
 			c.res[j]  = tmp.Res(j);
 		}
@@ -234,10 +242,11 @@ namespace RRServer {
 	void
 	ReconServant::set_shrt  (const char* name, const shrt_data& c) {
 		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
+		size_t nd = c.dims.length();
+		std::vector<size_t> mdims (nd);
+		std::vector<float>  mress (nd);
 
-		for (int i = 0; i < INVALID_DIM; i++) {
+		for (int i = 0; i < nd; i++) {
 			mdims[i] = c.dims[i];
 			mress[i] = c.res[i];
 		}
@@ -256,10 +265,11 @@ namespace RRServer {
 
 		Matrix<short> tmp = Workspace::Instance().Get<short> (name);
 
-		c.dims.length(INVALID_DIM);
-		c.res.length (INVALID_DIM);
+		size_t nd = tmp.NDim();
+		c.dims.length(nd);
+		c.res.length (nd);
 
-		for (int j = 0; j < INVALID_DIM; j++) {
+		for (int j = 0; j < nd; j++) {
 			c.dims[j] = tmp.Dim(j);
 			c.res[j]  = tmp.Res(j);
 		}
@@ -274,10 +284,11 @@ namespace RRServer {
 	void
 	ReconServant::set_long  (const char* name, const long_data& c) {
 		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
+		size_t nd = c.dims.length();
+		std::vector<size_t> mdims (nd);
+		std::vector<float>  mress (nd);
 
-		for (int i = 0; i < INVALID_DIM; i++) {
+		for (int i = 0; i < nd; i++) {
 			mdims[i] = c.dims[i];
 			mress[i] = c.res[i];
 		}
@@ -296,10 +307,11 @@ namespace RRServer {
 
 		Matrix<long> tmp = Workspace::Instance().Get<long> (name);
 
-		c.dims.length(INVALID_DIM);
-		c.res.length (INVALID_DIM);
+		size_t nd = tmp.NDim();
+		c.dims.length(nd);
+		c.res.length (nd);
 
-		for (int j = 0; j < INVALID_DIM; j++) {
+		for (int j = 0; j < nd; j++) {
 			c.dims[j] = tmp.Dim(j);
 			c.res[j]  = tmp.Res(j);
 		}

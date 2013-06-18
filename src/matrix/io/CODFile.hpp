@@ -85,7 +85,7 @@ namespace io{
 			char* name;
 			Matrix<T> M;
 			T t;
-
+/*
 			// Read type
 			if (!mread ( &dt, sizeof(   int),           1, m_file, "data type")) return M;
 
@@ -117,7 +117,7 @@ namespace io{
 			}
 
 			return M;
-
+*/
 		}
 
 
@@ -131,13 +131,13 @@ namespace io{
 			size_t ns, l;
 
 			dt = CODTraits<T>::dt;
-
+/*
 			// Dump type
 			if (!mwrite(&dt, sizeof(int), 1, m_file, "data type"))
 				return false;
 
 			// Dump dimensions
-			if (!mwrite((const void*) M.Dim(), sizeof(size_t), INVALID_DIM, m_file, "dimensions"))
+			if (!mwrite(M.Dim, sizeof(size_t), INVALID_DIM, m_file, "dimensions"))
 				return false;
 
 			// Dump resolutions
@@ -156,7 +156,7 @@ namespace io{
 			// Dump data
 			if (!mwrite((const void*) M.Memory(), sizeof(T), n, m_file, "data"))
 				return false;
-
+*/
 			return true;
 
 		}

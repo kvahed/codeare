@@ -141,7 +141,7 @@ namespace RRClient {
 		 * @param  m        Complex data
 		 */
 		template <class T> void 
-		SetMatrix           (const std::string& name, Matrix<T>& m) const;
+		SetMatrix           (const std::string& name, const Matrix<T>& m) const;
 		
 		
 		/**

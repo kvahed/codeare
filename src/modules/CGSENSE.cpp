@@ -162,8 +162,7 @@ CGSENSE::Process () {
         data  = m_ncs->Trafo (phantom<cxfl>(size(sens,0)), sens);
         data += m_noise * rand<cxfl,gaussian>(size(data));
     }
-    
-    
+
     Matrix<cxfl> img = m_ncs->Adjoint (data, sens);
     wspace.Add("image", img);
 

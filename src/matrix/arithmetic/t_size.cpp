@@ -1,6 +1,7 @@
 #include "Trigonometry.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "Print.hpp"
 
 template<class T> void size_check () {
 
@@ -9,11 +10,10 @@ template<class T> void size_check () {
     Matrix<T> rhs (3,4,5);
     Matrix<size_t> lhs;
 
-    lhs = floor (size(rhs)/2);
+    lhs = size(rhs);
 
 #ifdef VERBOSE
-    std::cout << "A=\n" << rhs;
-    std::cout << "round(A)=\n" << lhs << std::endl;
+    std::cout << "size(A)=\n" << lhs << std::endl;
 #endif
 
 }

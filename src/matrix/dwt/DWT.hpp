@@ -102,7 +102,7 @@ class DWT {
 
             assert (m.Size () <= m_sl*m_sl);
 
-            Matrix<T> res (m.DimVector());
+            Matrix<T> res (m.Dim());
 
 //            if (m_dim == 2)
 //            {
@@ -141,7 +141,7 @@ class DWT {
 
             assert (m.Size () <= m_sl*m_sl);
 
-            Matrix <T> res (m.DimVector());
+            Matrix <T> res (m.Dim());
 
 //            if (m_dim == 2)
 //            {
@@ -239,7 +239,7 @@ class DWT {
         dpwt2		(const Matrix <T> & sig, const int ell, const int J, container<T>& temp)
         {
 
-            Matrix <T> res (sig.DimVector ());
+            Matrix <T> res (sig.Dim ());
 
             T *wcplo,*wcphi,*templo,*temphi;
 
@@ -357,7 +357,7 @@ class DWT {
          *
          * @param  signal       Signal to be transformed.
          * @param  side_length  Side length of current DWT level.
-         * @param  dwt_hgih     Resulting DWT.
+         * @param  dwt_high     Resulting DWT.
          */
         void
         downhi			(const T * const signal, const int side_length, T * const dwt_high)
@@ -524,7 +524,7 @@ class DWT {
         idpwt2		(const Matrix <T> & wc, const int ell, const int J, container<T>& temp)
         {
 
-            Matrix <T> img (wc.DimVector());
+            Matrix <T> img (wc.Dim());
 
             const int nr = wc.Height();
             const int nc = wc.Width();

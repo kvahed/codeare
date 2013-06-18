@@ -102,7 +102,7 @@ namespace RRStrategy {
 		
 	protected: 
 		
-		SimulationStrategy  ()                    {};
+		SimulationStrategy  () : m_sb(0)                   {};
 
 		SimulationBundle* m_sb;
 

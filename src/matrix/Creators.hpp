@@ -63,12 +63,7 @@ zeros           (const size_t& col,
 template <class T> inline static Matrix<T> 
 zeros           (const Matrix<size_t>& sz) {
 
-	std::vector<size_t> n (INVALID_DIM,1); 
-
-	for (size_t i = 0; i < numel(sz) && i < INVALID_DIM; i++)
-		n[i] = sz[i];
-
- 	return Matrix<T> (n);
+ 	return Matrix<T> (sz.Container());
 
 }
 
@@ -156,15 +151,7 @@ ones            (const size_t& n) {
  */
 template <class T> inline static Matrix<T>
 ones           (const Matrix<size_t>& sz) {
-
-	std::vector<size_t> n (INVALID_DIM,1);
-
-	for (size_t i = 0; i < numel(sz) && i < INVALID_DIM; i++)
-		n[i] = sz[i];
-
- 	return Matrix<T> (n) = (T)1;
-
-
+ 	return Matrix<T> (sz.Container()) = (T)1;
 }
 
 
@@ -228,17 +215,14 @@ rand           (const size_t& col,
 template <class T, distribution D> inline static Matrix<T>
 rand           (const Matrix<size_t>& sz) {
 
-	std::vector<size_t> n (INVALID_DIM,1);
-
-	for (size_t i = 0; i < numel(sz) && i < INVALID_DIM; i++)
-		n[i] = sz[i];
-
-	Matrix<T> res (n);
+	Matrix<T> res (sz.Container());
 	rand_pop<T,D> (res);
  	return res;
 
+}
 
-}/**
+
+/**
  * @brief       Random square matrix
  *
  * @param  n    Side length

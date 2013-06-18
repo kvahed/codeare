@@ -14,7 +14,6 @@
 #include <assert.h>
 #include <string.h>
 #include <math.h>
-#include <boost/dynamic_bitset.hpp>
 
 /**
  * @brief   Memory paradigm (share, opencl or message passing)

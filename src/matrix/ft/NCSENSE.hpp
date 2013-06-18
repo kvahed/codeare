@@ -54,7 +54,8 @@ public:
                 m_nk (1024),
                 m_nr (4096),
                 m_lambda (1.0e-6),
-                m_verbose (false) {}
+                m_verbose (false),
+                m_np(0) {}
     
     
 	/**

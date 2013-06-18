@@ -33,6 +33,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifndef PARC_MODULE_NAME
+enum IceDim {
+    COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE
+};
+#endif
+
+
 namespace codeare {
 namespace matrix  {
 namespace io      {
@@ -271,7 +278,7 @@ namespace io      {
 
 			printf ("  Allocating data matrices ...\n");
 
-			std::copy(m_meas_dims.begin(), m_meas_dims.end(), std::ostream_iterator<int>(std::cout));
+			//std::copy(m_meas_dims.begin(), m_meas_dims.end(), std::ostream_iterator<int>(std::cout));
 
 			float n = 8.0;
 			for (size_t i = 0; i < m_meas_dims.size(); i++)

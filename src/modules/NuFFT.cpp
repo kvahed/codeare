@@ -27,7 +27,7 @@ using namespace RRStrategy;
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
 
-NuFFT::NuFFT () {
+NuFFT::NuFFT () : nfft(0) {
 
 }
 

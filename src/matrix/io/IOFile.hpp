@@ -28,20 +28,45 @@ namespace io      {
 	 * @param  desc     Description
 	 * @return          Success
 	 */
-	inline static bool
-	mwrite (const void* d, const size_t sz, const size_t n, FILE* f, std::string desc) {
+	template<class T> inline static bool
+	mwrite (const T* d, const size_t n, FILE* f, std::string desc) {
+
+		size_t sz = sizeof(T);
 
 		if (size_t l = fwrite (d, sz, n, f) != n) {
-
 			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
-			fclose (f);
 			return false;
-
 		}
 
 		return true;
 
 	}
+
+	/**
+	 * @brief           Verbose wrapper around fwrite
+	 *
+	 * @param  d        Data repository to write from
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mwrite (const std::vector<T>& d, FILE* f, std::string desc) {
+
+		size_t n = d.size();
+		size_t sz = sizeof(T);
+
+		if (size_t l = fwrite (d, sz, n, f) != n) {
+			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+
+		return true;
+
+	}
+
 
 	/**
 	 * @brief           Verbose wrapper around fread
@@ -53,21 +78,45 @@ namespace io      {
 	 * @param  desc     Description
 	 * @return          Success
 	 */
-	inline static bool
-	mread (void* d, const size_t sz, const size_t n, FILE* f, const std::string desc) {
+	template<class T> inline static bool
+	mread (T*& d, const size_t n, FILE* f, const std::string desc) {
+
+		size_t sz = sizeof(T);
 
 		if (size_t l = fread (d, sz, n, f) != n) {
-
 			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
-			fclose (f);
 			return false;
-
 		}
 
 		return true;
 
 	}
 
+
+	/**
+	 * @brief           Verbose wrapper around fread
+	 *
+	 * @param  d        Place holder to read into
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mread (std::vector<T>& d, FILE* f, const std::string desc) {
+
+		size_t sz = sizeof(T);
+		size_t n  = d.size();
+
+		if (size_t l = fread (d, sz, n, f) != n) {
+			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+
+		return true;
+
+	}
 
 
 

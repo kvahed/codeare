@@ -82,7 +82,7 @@ rmse (const Matrix<T>& A, const Matrix<T>& B) {
 
     Matrix<T> res = (A - B) ^ 2;
     res = resize (res,numel(res),1);
-    res = sum(res,COL);
+    res = sum(res,0);
 
     return (sqrt(res[0]));
 

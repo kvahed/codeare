@@ -94,19 +94,16 @@ CompressedSensing::Process () {
 	Matrix<float>& pdf   = Get<float>  ("pdf" );
 	Matrix<float>& mask  = Get<float>  ("mask");
 	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
-	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(data.DimVector())));
+	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(data.Dim())));
 
 	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
 		size(data,0), size(data,1), size(data,2));
-
 	m_csparam.dwt = new DWT <cxfl> (data.Height(), ID);
 
 	/** -----  Which Fourier transform? **/
 	m_csparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);
-
-	
-	// m_csparam.ft = (FT<float>*) new NFFT<float> (ms, M * shots, m, alpha);
-	// m_csparam.ft = (FT<float>*) new NCSENSE<float> (sens, nk, m_cseps, m_csmaxit, m_lambda, m_fteps, m_ftmaxit);
+	// m_csparam.ft = (FT<float>*) new NFFT<float> (params);
+	// m_csparam.ft = (FT<float>*) new NCSENSE<float> (params);
 	/*************************************/
 
 	m_csparam.tvt = new TVOP ();
