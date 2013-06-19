@@ -44,6 +44,12 @@ namespace io{
 
 	static const std::string delim = "543f562189f1e82beb9c177f89f67822";
 
+
+	/**
+	 * @brief    codeare .cod file io class
+	 *
+	 *
+	 */
 	class CODFile : public IOFile {
 
 	public:
@@ -52,8 +58,6 @@ namespace io{
 		CODFile (const std::string& fname, const IOMode mode = READ,
 				const Params& params = Params(), const bool verbose = false) :
 					IOFile (fname, mode, params, verbose) {
-
-
 
 			const char* R = "rb";
 			const char* W = "wb";
@@ -87,34 +91,41 @@ namespace io{
 			T t;
 
 			// Read type
-			if (!mread ( &dt,           1, m_file, "data type")) return M;
+			if (!mread (&dt, 1, m_file, "data type"))
+				return M;
 
 			// Matrix and data type must fit as of now.
 			if (CODTraits<T>::dt == dt) {
 
-				if (!mread (&n, 1, m_file, "dimensions")) return M;
+				if (!mread (&n, 1, m_file, "dimensions"))
+					return M;
 				dim = std::vector<size_t>(n,1);
 				res = std::vector<float>(n,1.0);
 
 				// Read dimensions and allocate matrix
-				if (!mread (dim, m_file, "dimensions")) return M;
+				if (!mread (dim, m_file, "dimensions"))
+					return M;
 
 				//Read resolutions and assign
-				if (!mread (res, m_file, "resolutions")) return M;
+				if (!mread (res, m_file, "resolutions"))
+					return M;
 				M = Matrix<T>(dim,res);
 				n = numel(M);
 
 				// Name
-				if (!mread (&n,  1, m_file, "name length")) return M;
+				if (!mread (&n,  1, m_file, "name length"))
+					return M;
 
 				name = new char [n+1];
 
-				if (!mread (name, n, m_file, "name")) return M;
+				if (!mread (name, n, m_file, "name"))
+					return M;
 				name[n] = '\0';
 				M.SetClassName(name);
 
 				// Read data
-				if (!mread (M.Container(), m_file, "data")) return M;
+				if (!mread (M.Container(), m_file, "data"))
+					return M;
 
 				//Close and clean up;
 				delete name;
@@ -161,6 +172,9 @@ namespace io{
 
 			// Dump data
 			if (!mwrite(M.Container(),  m_file, "data"))
+				return false;
+
+			if (!mwrite(delim.c_str(), delim.length(), m_file, "delimiter"))
 				return false;
 
 			return true;
