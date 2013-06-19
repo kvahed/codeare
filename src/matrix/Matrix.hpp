@@ -30,8 +30,6 @@
 
 #endif
 
-#define INVALID_DIM 16
-
 #include "config.h"
 #include "common.h"
 
@@ -54,6 +52,7 @@
 #include <ostream>
 #include <string>
 #include <cstring>
+#include <algorithm>
 
 #define ICE_SHRT_MAX 4095
 
@@ -125,15 +124,13 @@ public:
 	inline
     Matrix              () {
 		
-        T t;
-        Validate (t);
+	    TypeTraits<T>::Validate();
 		
         _dim.resize(1,1);
-        _dsz.resize(1,1);
         _res.resize(1,1.0);
-		
-        _M = container<T>(DimProd());
-		
+        
+        Allocate();
+        
     }
 	
 	
@@ -145,22 +142,18 @@ public:
 	inline explicit
     Matrix              (const std::vector<size_t>& dim) {
 		
-	    T t;
-	    Validate (t);
+	    TypeTraits<T>::Validate();
+
+	    assert(!dim.empty() &&
+	    		std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
+
 	    size_t n = 1, i = 0, ds = dim.size();
-		
-		for (; i < ds; ++i)
-			n *= dim[i];
-		assert (n);
 
 		_dim = dim;
-		_dsz.resize(ds,1);
-	    for (i = 1; i < ds; ++i)
-	        _dsz[i] = _dsz[i-1]*_dim[i-1];
 		_res.resize(ds,1.0);
 
-        _M = container<T>(DimProd());
-		
+        Allocate();
+        
 	}
 	
 	
@@ -173,20 +166,19 @@ public:
 	inline
     Matrix              (const container<size_t>& dim) {
 		
-	    T t;
-	    Validate (t);
-	    size_t n = 1, i = 0, ds = dim.size();
+	    TypeTraits<T>::Validate();
+
+	    size_t ds = dim.size();
+	    assert(ds &&
+	    	   std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
+
+	    size_t n = 1, i = 0;
 		
-		for (; i < ds; ++i)
-			n *= dim[i];
-		assert (n);
 		_dim.resize(ds);
 		std::copy (dim.begin(),dim.end(),_dim.begin());
 		_res.resize(ds,1.0);
-		_dsz.resize(ds,1);
-	    for (i = 1; i < ds; ++i)
-	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-        _M = container<T>(DimProd());
+
+        Allocate();
 		
 	}
 	
@@ -200,22 +192,18 @@ public:
 	inline explicit
     Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res) {
 		
-	    T t;
-	    Validate (t);
+	    TypeTraits<T>::Validate();
+
+	    assert(!dim.empty() &&
+	    	    std::find(dim.begin(),dim.end(),size_t(0))==dim.end() &&
+	    	    dim.size() == res.size());
+
 	    size_t n = 1, i = 0, ds = dim.size();
 		
-		for (; i < ds; ++i)
-			n *= dim[i];
-		assert (dim.size() == res.size());
-		assert (n);
-
 		_dim = dim;
 		_res = res;
-        _dsz.resize(ds,1);
-	    for (i = 1; i < ds; ++i)
-	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-        _M = container<T>(DimProd());
 
+        Allocate();
 		
 	}
 
@@ -233,16 +221,14 @@ public:
     inline explicit
     Matrix (const size_t n) {
 
-	    T t;
-	    Validate (t);
-		assert (n);
+	    TypeTraits<T>::Validate();
+
+	    assert (n);
 
 		_dim.resize(2,n);
 	    _res.resize(2,1.0);
-	    _dsz.resize(2,1);
-	    _dsz[1] = n;
 
-        _M = container<T>(DimProd());
+        Allocate();
         
 	}
 
@@ -264,14 +250,13 @@ public:
     inline
     Matrix              (const size_t m, const size_t n) {
 
-        T t;
-        Validate (t);
-    	assert (m*n >= 1);
+        TypeTraits<T>::Validate();
+    	assert (m && n);
 
     	_dim.resize(2); _dim[0] = m; _dim[1] = n;
-        _dsz.resize(2); _dsz[0] = 1; _dsz[1] = m;
 		_res.resize(2,1.0);
-		_M = container<T>(DimProd());
+
+        Allocate();
 
     }
 
@@ -292,14 +277,14 @@ public:
     inline
     Matrix (const size_t m, const size_t n, const size_t k) {
 
-        T t;
-        Validate (t);
-    	assert (m * n * k);
+	    TypeTraits<T>::Validate();
+
+	    assert (m && n && k);
 
     	_dim.resize(3); _dim[0] = m; _dim[1] = n; _dim[2] = k;
-        _dsz.resize(3,1);            _dsz[1] = m; _dsz[2] = m*n;
 		_res.resize(3,1.0);
-		_M = container<T>(DimProd());
+
+        Allocate();
 
     }
     
@@ -342,37 +327,31 @@ public:
                          const size_t ide = 1,
                          const size_t ave = 1) {
 
-		assert (col * lin * cha * set * eco * phs * rep * seg *
-				par * slc * ida * idb * idc * idd * ide * ave > 0);
+    	TypeTraits<T>::Validate();
 
-	    T t;
-	    Validate (t);
-	    size_t n = 16;
+		assert (col && lin && cha && set && eco && phs && rep && seg &&
+				par && slc && ida && idb && idc && idd && ide && ave );
+
+	    size_t nd = 16, n = nd, sd, i;
 
 	    _dim.resize(n);
-	    _dim[ 0] = col;
-	    _dim[ 1] = lin;
-	    _dim[ 2] = cha;
-	    _dim[ 3] = set;
-	    _dim[ 4] = eco;
-	    _dim[ 5] = phs;
-	    _dim[ 6] = rep;
-	    _dim[ 7] = seg;
-	    _dim[ 8] = par;
-	    _dim[ 9] = slc;
-	    _dim[10] = ida;
-	    _dim[11] = idb;
-	    _dim[12] = idc;
-	    _dim[13] = idd;
-	    _dim[14] = ide;
-	    _dim[15] = ave;
+	    _dim[ 0] = col; _dim[ 1] = lin; _dim[ 2] = cha; _dim[ 3] = set;
+	    _dim[ 4] = eco; _dim[ 5] = phs; _dim[ 6] = rep; _dim[ 7] = seg;
+	    _dim[ 8] = par; _dim[ 9] = slc; _dim[10] = ida; _dim[11] = idb;
+	    _dim[12] = idc; _dim[13] = idd; _dim[14] = ide; _dim[15] = ave;
 
-	    _dsz.resize(n,1);
-		for (size_t i = 1; i < n; ++i)
-	        _dsz[i] = _dsz[i-1]*_dim[i-1];
+        // Remove trailing singleton dimensions
+        for (i = 0; i < nd; i++)
+            if (_dim[i] == 1)
+                n--;
+            else
+                n = nd;
+        
+        // Resize skeleton
+        _dim.resize(n);
 		_res.resize(n,1.0);
-        _M = container<T>(DimProd());
 
+        Allocate();
 
 	}
 
@@ -396,14 +375,12 @@ public:
 
 		if (this != &M) {
 
-			T t;
-			Validate (t);
+		    TypeTraits<T>::Validate();
 
 			_dim = M.Dim();
 			_dsz = M.Dsz();
 			_res = M.Res();
-
-	        _M = M.Container();
+	        _M   = M.Container();
 
 		}
 
@@ -572,6 +549,32 @@ public:
         return _M;
     }
 
+
+    /**
+     * @brief			Container iterator (lhs)
+     *
+     * @param			Position
+     *
+     * @return			Container iterator
+     */
+    inline typename container<T>::iterator
+    ContainerIterator	(const size_t p = 0) {
+    	return _M.begin () + p;
+    }
+
+
+    /**
+     * @brief			Container const iterator (rhs)
+     *
+     * @param			Position
+     *
+     * @return			Container const iterator
+     */
+    inline typename container<T>::const_iterator
+    ContainerIterator	(const size_t p = 0)  const {
+    	return _M.begin () + p;
+    }
+
     
     /**
      * @brief           Element at position p (rhs)
@@ -611,8 +614,8 @@ public:
     inline T            
     At                  (const size_t x, const size_t y) const {
 
-    	assert (x == 0 || x < _dim[0]);
-    	assert (y == 0 || y < _dim[1]);
+    	assert ((!x || x < _dim[0]) &&
+    			(!y || y < _dim[1]));
 
         return _M[x + _dim[0]*y];
 
@@ -631,8 +634,7 @@ public:
     inline T&           
     At                  (const size_t x, const size_t y) {
 
-    	assert (x == 0 || x < _dim[0]);
-    	assert (y == 0 || y < _dim[1]);
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]));
 
         return _M[x + _dim[0]*y];
 
@@ -651,9 +653,7 @@ public:
     inline T            
     At                   (const size_t x, const size_t y, const size_t z) const {
 
-    	assert (x == 0 || x < _dim[0]);
-    	assert (y == 0 || y < _dim[1]);
-    	assert (z == 0 || z < _dim[2]);
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
 
         return _M[x + _dsz[1]*y + _dsz[2]*z];
 
@@ -673,9 +673,7 @@ public:
     inline T&            
     At                   (const size_t x, const size_t y, const size_t z) {
 
-    	assert (x == 0 || x < _dim[0]);
-    	assert (y == 0 || y < _dim[1]);
-    	assert (z == 0 || z < _dim[2]);
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
 
         return _M[x + _dsz[1]*y + _dsz[2]*z];
 
@@ -722,22 +720,22 @@ public:
                           const size_t ide = 0,
                           const size_t ave = 0) const {
 
-    	assert (col == 0 || col < _dim[ 0]);
-    	assert (lin == 0 || lin < _dim[ 1]);
-    	assert (cha == 0 || cha < _dim[ 2]);
-    	assert (set == 0 || set < _dim[ 3]);
-    	assert (eco == 0 || eco < _dim[ 4]);
-    	assert (phs == 0 || phs < _dim[ 5]);
-    	assert (rep == 0 || rep < _dim[ 6]);
-    	assert (seg == 0 || seg < _dim[ 7]);
-    	assert (par == 0 || par < _dim[ 8]);
-    	assert (slc == 0 || slc < _dim[ 9]);
-    	assert (ida == 0 || ida < _dim[10]);
-    	assert (idb == 0 || idb < _dim[11]);
-    	assert (idc == 0 || idc < _dim[12]);
-    	assert (idd == 0 || idd < _dim[13]);
-    	assert (ide == 0 || ide < _dim[14]);
-    	assert (ave == 0 || ave < _dim[15]);
+    	assert ((!col || col < _dim[ 0])&&
+    	        (!lin || lin < _dim[ 1])&&
+    	        (!cha || cha < _dim[ 2])&&
+    	        (!set || set < _dim[ 3])&&
+    	        (!eco || eco < _dim[ 4])&&
+    	        (!phs || phs < _dim[ 5])&&
+    	        (!rep || rep < _dim[ 6])&&
+    	        (!seg || seg < _dim[ 7])&&
+    	        (!par || par < _dim[ 8])&&
+    	        (!slc || slc < _dim[ 9])&&
+    	        (!ida || ida < _dim[10])&&
+    	        (!idb || idb < _dim[11])&&
+    	        (!idc || idc < _dim[12])&&
+    	        (!idd || idd < _dim[13])&&
+    	        (!ide || ide < _dim[14])&&
+    	        (!ave || ave < _dim[15]));
 
         return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
    	               seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
@@ -785,22 +783,22 @@ public:
                           const size_t ide = 0,
                           const size_t ave = 0) {
 
-    	assert (col == 0 || col < _dim[ 0]);
-    	assert (lin == 0 || lin < _dim[ 1]);
-    	assert (cha == 0 || cha < _dim[ 2]);
-    	assert (set == 0 || set < _dim[ 3]);
-    	assert (eco == 0 || eco < _dim[ 4]);
-    	assert (phs == 0 || phs < _dim[ 5]);
-    	assert (rep == 0 || rep < _dim[ 6]);
-    	assert (seg == 0 || seg < _dim[ 7]);
-    	assert (par == 0 || par < _dim[ 8]);
-    	assert (slc == 0 || slc < _dim[ 9]);
-    	assert (ida == 0 || ida < _dim[10]);
-    	assert (idb == 0 || idb < _dim[11]);
-    	assert (idc == 0 || idc < _dim[12]);
-    	assert (idd == 0 || idd < _dim[13]);
-    	assert (ide == 0 || ide < _dim[14]);
-    	assert (ave == 0 || ave < _dim[15]);
+    	assert ((!col || col < _dim[ 0])&&
+    	       (!lin || lin < _dim[ 1])&&
+    	       (!cha || cha < _dim[ 2])&&
+    	       (!set || set < _dim[ 3])&&
+    	       (!eco || eco < _dim[ 4])&&
+    	       (!phs || phs < _dim[ 5])&&
+    	       (!rep || rep < _dim[ 6])&&
+    	       (!seg || seg < _dim[ 7])&&
+    	       (!par || par < _dim[ 8])&&
+    	       (!slc || slc < _dim[ 9])&&
+    	       (!ida || ida < _dim[10])&&
+    	       (!idb || idb < _dim[11])&&
+    	       (!idc || idc < _dim[12])&&
+    	       (!idd || idd < _dim[13])&&
+    	       (!ide || ide < _dim[14])&&
+    	       (!ave || ave < _dim[15]));
 
     	return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
     	                 seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
@@ -1016,13 +1014,10 @@ public:
     operator=           (const Matrix<T,P>& M) {
 
         if (this != &M) {
-
         	_dim = M.Dim();
         	_dsz = M.Dsz();
         	_res = M.Res();
-
-            _M = M.Container();
-
+            _M  = M.Container();
         }
 
         return *this;
@@ -2799,6 +2794,18 @@ protected:
             size *= _dim[i];
         
         return size;
+        
+    }
+
+    inline void
+    Allocate () {
+
+        size_t ds = _dim.size(), i;
+		_dsz.resize(ds,1);
+	    for (i = 1; i < ds; ++i)
+	        _dsz[i] = _dsz[i-1]*_dim[i-1];
+        
+        _M = container<T>(DimProd());
         
     }
 

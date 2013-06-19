@@ -35,8 +35,10 @@
 
 #ifndef PARC_MODULE_NAME
 enum IceDim {
-    COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE
+    COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE, MAX_ICE_DIM
 };
+#else
+#define MAX_ICE_DIM 16
 #endif
 
 
@@ -130,9 +132,9 @@ namespace io      {
 		 * @brief Constructor
 		 */
 		Data () {
-			dims.resize(INVALID_DIM,(size_t)1);
-			ress.resize(INVALID_DIM,(float)1);
-			idx.resize(INVALID_DIM,(size_t)1);
+			dims.resize(MAX_ICE_DIM,(size_t)1);
+			ress.resize(MAX_ICE_DIM,(float)1);
+			idx.resize(MAX_ICE_DIM,(size_t)1);
 		}
 
 		/**
@@ -141,10 +143,10 @@ namespace io      {
 		inline void
 		Allocate (const bool verbose = false) {
 			idx [0] = 1;
-			for (size_t i = 1; i < INVALID_DIM; i++)
+			for (size_t i = 1; i < MAX_ICE_DIM; i++)
 				idx[i] = idx[i-1]*dims[i-1];
 			printf ("  Data (dims: ");
-			for (size_t i = 0; i < INVALID_DIM; i++) {
+			for (size_t i = 0; i < MAX_ICE_DIM; i++) {
 				printf ("%zu", dims[i]);
 				if (i < AVE)
 					printf (" ");
@@ -160,9 +162,9 @@ namespace io      {
 		inline void
 		Clear() {
 
-			dims.resize(INVALID_DIM,(size_t)1);
-			ress.resize(INVALID_DIM,(float)1);
-			idx.resize(INVALID_DIM,(size_t)1);
+			dims.resize(MAX_ICE_DIM,(size_t)1);
+			ress.resize(MAX_ICE_DIM,(float)1);
+			idx.resize(MAX_ICE_DIM,(size_t)1);
 			data.resize(1, T(0));
 
 		}
@@ -195,7 +197,7 @@ namespace io      {
 			}
 
 			m_initialised = true;
-			m_meas_dims = std::vector<size_t>(INVALID_DIM,(size_t)1);
+			m_meas_dims = std::vector<size_t>(MAX_ICE_DIM,(size_t)1);
 
 			dnames["NImageCols"] =  0; dnames["NLinMeas"] =  1; dnames["NSlcMeas"] =  2; dnames["NParMeas"] =  3;
 			dnames[  "NEcoMeas"] =  4; dnames["NPhsMeas"] =  5; dnames["NRepMeas"] =  6; dnames["NSetMeas"] =  7;
@@ -291,7 +293,7 @@ namespace io      {
 			m_data.insert(std::pair<std::string, boost::any>("meas", val));
 			printf ("  Data (dims: ");
 
-			for (size_t i = 0; i < INVALID_DIM; i++) {
+			for (size_t i = 0; i < MAX_ICE_DIM; i++) {
 				printf ("%zu", m_meas_dims[i]);
 				if (i < AVE)
 					printf (" ");
