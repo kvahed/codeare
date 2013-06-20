@@ -54,7 +54,14 @@ namespace io{
 
 	public:
 
-
+		/**
+		 * @brief    Open codeare raw file handle
+		 *
+		 * @param  fname   File name
+		 * @param  mode    READ(default)/WRITE
+		 * @param  params  Optional parameter set (not used yet)
+		 * @param  verbose Verbose output true/false
+		 */
 		CODFile (const std::string& fname, const IOMode mode = READ,
 				const Params& params = Params(), const bool verbose = false) :
 					IOFile (fname, mode, params, verbose) {
@@ -73,6 +80,9 @@ namespace io{
 		}
 
 
+		/**
+		 * @brief  Close file handle
+		 */
 		~CODFile () {
 			if (m_file)
 				fclose(m_file);

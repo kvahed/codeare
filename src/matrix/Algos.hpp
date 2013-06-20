@@ -31,14 +31,11 @@
 template <bool> struct _assert;
 template <> struct _assert<true> { };
 
-template<class T> inline bool 
-is_nan (T const& x) {
+template<class T> inline bool is_nan (T const& x) {
     static_cast<void>(sizeof(_assert<std::numeric_limits<T>::has_quiet_NaN>));
     return std::numeric_limits<T>::has_quiet_NaN and (x != x);
 }
-
-template <class T> inline bool 
-is_inf (T const& x) {
+template <class T> inline bool is_inf (T const& x) {
     static_cast<void>(sizeof(_assert<std::numeric_limits<T>::has_infinity>));
     return x == std::numeric_limits<T>::infinity() or x == -std::numeric_limits<T>::infinity();
 }
@@ -228,7 +225,7 @@ isinf (const Matrix<T>& M) {
 	size_t i = numel(M);
 
 	while (i--)
-		res.Container()[i] = (std::isinf(creal(M.At(i)))||std::isinf(cimag(M.At(i))));
+		res.Container()[i] = (std::isinf(creal(M[i]))||std::isinf(cimag(M[i])));
 	
     return res;
 
@@ -247,9 +244,6 @@ isfinite (const Matrix<T>& M) {
     Matrix<unsigned short> res (M.Dim());
 	size_t i = numel(M);
 
-	while (i--)
-		res.Container()[i] = true;//is_nan(creal(M[i]));
-			//()(!((bool)isnan(creal(M[i]))) && !isnan(cimag(M[i])) && !std::isinf(creal(M[i])) && !std::isinf(cimag(M[i])));
 	
     return res;
 
@@ -271,7 +265,6 @@ dofinite (const Matrix<T>& M, const T& v = 0) {
 
 	while (i--)
 		res[i] = is_nan(creal(M[i])) ? v : M[i];
-	//(std::isnan(ceal(M[i])) || std::isnan(cimag(M[i])) || std::isinf(creal(M[i])) || std::isinf(cimag(M[i]))) ? v : M[i];
 	
     return res;
 
