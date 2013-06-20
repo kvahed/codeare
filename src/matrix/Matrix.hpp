@@ -551,31 +551,49 @@ public:
 
 
     /**
-     * @brief			Container iterator (lhs)
+     * @brief           Container iterator to first element (lhs)
      *
-     * @param			Position
-     *
-     * @return			Container iterator
+     * @return          Container iterator
      */
     inline typename container<T>::iterator
-    ContainerIterator	(const size_t p = 0) {
-    	return _M.begin () + p;
+    Begin               () {
+    	return _M.begin ();
     }
 
 
     /**
-     * @brief			Container const iterator (rhs)
+     * @brief           Container const iterator to first element (rhs)
      *
-     * @param			Position
-     *
-     * @return			Container const iterator
+     * @return          Container const iterator
      */
     inline typename container<T>::const_iterator
-    ContainerIterator	(const size_t p = 0)  const {
-    	return _M.begin () + p;
+    Begin               ()  const {
+    	return _M.begin ();
     }
 
     
+    /**
+     * @brief           Container iterator to last element (lhs)
+     *
+     * @return          Container iterator
+     */
+    inline typename container<T>::iterator
+    End                 () {
+    	return _M.end ();
+    }
+
+
+    /**
+     * @brief           Container const iterator to last element (rhs)
+     *
+     * @return          Container const iterator
+     */
+    inline typename container<T>::const_iterator
+    End                 ()  const {
+    	return _M.end ();
+    }
+
+
     /**
      * @brief           Element at position p (rhs)
      *  
