@@ -15,6 +15,15 @@
 #include <string.h>
 #include <math.h>
 
+template<class T> inline static std::ostream&
+operator<< (std::ostream& os, const std::vector<T> v) {
+    for (size_t i = 0; i < v.size(); ++i)
+        os << v[i] << " ";
+    return os;
+}
+
+typedef unsigned char cbool;
+
 /**
  * @brief   Memory paradigm (share, opencl or message passing)
  */

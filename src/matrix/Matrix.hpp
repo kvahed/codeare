@@ -88,14 +88,6 @@
  */
 # define ROUND(A) ( floor(A) + ((A - floor(A) >= 0.5) ? (A>0 ? 1 : 0) : 0))
 
-template<class T> inline static std::ostream&
-operator<< (std::ostream& os, const std::vector<T> v) {
-    for (size_t i = 0; i < v.size(); ++i)
-        os << v[i] << " ";
-    return os;
-}
-
-
 
 /**
  * @brief   Matrix template.<br/>
@@ -551,31 +543,50 @@ public:
 
 
     /**
-     * @brief			Container iterator (lhs)
+     * @brief           Container iterator to first element (lhs)
      *
-     * @param			Position
-     *
-     * @return			Container iterator
+     * @return          Container iterator
      */
     inline typename container<T>::iterator
-    Iterator	(const size_t p = 0) {
-    	return _M.begin () + p;
+
+    Begin               () {
+    	return _M.begin ();
     }
 
 
     /**
-     * @brief			Container const iterator (rhs)
+     * @brief           Container const iterator to first element (rhs)
      *
-     * @param			Position
-     *
-     * @return			Container const iterator
+     * @return          Container const iterator
      */
     inline typename container<T>::const_iterator
-    Iterator	(const size_t p = 0)  const {
-    	return _M.begin () + p;
+    Begin               ()  const {
+    	return _M.begin ();
     }
 
     
+    /**
+     * @brief           Container iterator to last element (lhs)
+     *
+     * @return          Container iterator
+     */
+    inline typename container<T>::iterator
+    End                 () {
+    	return _M.end ();
+    }
+
+
+    /**
+     * @brief           Container const iterator to last element (rhs)
+     *
+     * @return          Container const iterator
+     */
+    inline typename container<T>::const_iterator
+    End                 ()  const {
+    	return _M.end ();
+    }
+
+
     /**
      * @brief           Element at position p (rhs)
      *  
@@ -1406,7 +1417,7 @@ public:
      * @return          Cross-section or zero
      */
     inline Matrix<T,P>
-    operator&           (const Matrix<unsigned short>& M) const ;
+    operator&           (const Matrix<cbool>& M) const ;
     
     
      /**
@@ -1415,10 +1426,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of false where elements are equal s and true else.
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator!=          (const T s) const {
 
-        Matrix<unsigned short> res(_dim);
+        Matrix<cbool> res(_dim);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
@@ -1436,10 +1447,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator>           (const T s) const {
 
-        Matrix<unsigned short> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1459,10 +1470,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator>=          (const T s) const {
 
-		Matrix<unsigned short> res(_dim);
+		Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1481,10 +1492,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator<=          (const T s) const {
 
-        Matrix<unsigned short> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1503,10 +1514,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator<           (const T s) const {
 
-        Matrix<unsigned short> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1525,12 +1536,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator==          (const Matrix<T,P>& M) const {
 
         assert (Size() == M.Size());
 
-        Matrix<unsigned short> res(_dim);
+        Matrix<cbool> res(_dim);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
@@ -1549,12 +1560,12 @@ public:
 	 * @return          Hit list
 	 */
     template<class S>
-	inline Matrix<unsigned short>
+	inline Matrix<cbool>
 	operator==          (const Matrix<S,P>& M) const {
 
         assert (Size() == M.Size());
 
-		Matrix<unsigned short> res (_dim);
+		Matrix<cbool> res (_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1572,12 +1583,12 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of true where elements are equal s and false else.
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator==          (const T s) const {
 
     	T t = (T) s;
 
-        Matrix<unsigned short> res (_dim);
+        Matrix<cbool> res (_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1597,12 +1608,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator!=          (const Matrix<T,P>& M) const {
 
         assert (Size() == M.Size());
 
-        Matrix<unsigned short> res(_dim,_res);
+        Matrix<cbool> res(_dim,_res);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
@@ -1619,12 +1630,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator>=          (const Matrix<T,P>& M) const {
 
         assert (Size() == M.Size());
 
-        Matrix<unsigned short> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1643,12 +1654,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator<=          (const Matrix<T,P>& M) const {
 
         assert (Size() == M.Size());
 
-        Matrix<unsigned short> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1667,12 +1678,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator>           (const Matrix<T,P>& M) const {
 
         assert (Size() == M.Size());
 
-        Matrix<unsigned short> res(_dim,_res);
+        Matrix<cbool> res(_dim,_res);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1691,12 +1702,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator<           (const Matrix<T,P>& M) const {
 
         assert (Size() == M.Size());
 
-        Matrix<unsigned short> res(_dim,_res);
+        Matrix<cbool> res(_dim,_res);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1715,12 +1726,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator||          (const Matrix<T,P>& M) const {
 
         assert (Size() == M.Size());
 
-        Matrix<unsigned short> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1740,10 +1751,10 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<unsigned short>
+    inline Matrix<cbool>
     operator&&          (const Matrix<T,P>& M) const {
 
-        Matrix<unsigned short> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -2432,7 +2443,7 @@ public:
      * @param  m        Matrix rhs
      * @return          m == s
      */
-    inline friend Matrix<unsigned short>
+    inline friend Matrix<cbool>
     operator== (const T s, const Matrix<T,P>& m) {
         return   m == s;
     }
@@ -2445,7 +2456,7 @@ public:
      * @param  m        Matrix rhs
      * @return          m <= t
      */
-    inline friend Matrix<unsigned short>
+    inline friend Matrix<cbool>
     operator>= (const T s, const Matrix<T,P>& m) {
         return   m <= s;
     }
@@ -2458,7 +2469,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T<=M
      */
-    inline friend Matrix<unsigned short>
+    inline friend Matrix<cbool>
     operator<= (const T s, const Matrix<T,P>& m) {
         return   m >= s;
     }
@@ -2471,7 +2482,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T!=M
      */
-    inline friend Matrix<unsigned short>
+    inline friend Matrix<cbool>
     operator!= (const T s, const Matrix<T,P>& m) {
         return   m != s;
     }
@@ -2484,7 +2495,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T+M
      */
-    inline friend Matrix<unsigned short>
+    inline friend Matrix<cbool>
     operator>  (const T s, const Matrix<T,P>& m) {
         return   m <  s;
     }
@@ -2497,7 +2508,7 @@ public:
      * @param  m        Matrix rhs
      * @return          T+M
      */
-    inline friend Matrix<unsigned short>
+    inline friend Matrix<cbool>
     operator<  (const T s, const Matrix<T,P>& m) {
         return   m >  s;
     }
@@ -2511,7 +2522,7 @@ public:
      * @return          T+M
      */
     inline friend Matrix<T,P>
-    operator&  (const Matrix<unsigned short>& mb, const Matrix<T,P>& m) {
+    operator&  (const Matrix<cbool>& mb, const Matrix<T,P>& m) {
         return   m & mb;
     }
 
@@ -2835,16 +2846,6 @@ protected:
      */
     bool
     RSAdjust            (const std::string& fname);
-
-    /* Who do we support? */
-    void Validate (short  t) const {};
-    void Validate (long   t) const {};
-    void Validate (size_t t) const {};
-    void Validate (float  t) const {};
-    void Validate (double t) const {};
-    void Validate (cxfl   t) const {};
-    void Validate (cxdb   t) const {};
-	void Validate (unsigned short   t) const {};
 
 };
 

@@ -147,12 +147,12 @@ template<> struct TypeTraits<short> {
 	}
 };
 
-template<> struct TypeTraits<short unsigned> {
-	typedef short unsigned  T;
-	typedef short unsigned  RT;
+template<> struct TypeTraits<unsigned char> {
+	typedef unsigned char  T;
+	typedef unsigned char  RT;
 	typedef void   CT;
 	inline static const std::string Name () {
-		return std::string("unsigned short int");
+		return std::string("codeare bool");
 	}
 	inline static const std::type_info& Info () {
 		return typeid(T);
@@ -345,9 +345,9 @@ struct CompTraits<cxdb> {
 };
 
 template<>
-struct CompTraits<unsigned short> {
+struct CompTraits<unsigned char> {
 
-	typedef bool type;
+	typedef unsigned char type;
 
 	inline static bool less_or_equal    (const type& a, const type& b) { return a <= b; }
 	inline static bool less             (const type& a, const type& b) { return a <  b; }
@@ -358,6 +358,19 @@ struct CompTraits<unsigned short> {
 
 };
 
+template<>
+struct CompTraits<size_t> {
+
+	typedef size_t type;
+
+	inline static bool less_or_equal    (const type& a, const type& b) { return a <= b; }
+	inline static bool less             (const type& a, const type& b) { return a <  b; }
+	inline static bool greater_or_equal (const type& a, const type& b) { return a >= b; }
+	inline static bool greater          (const type& a, const type& b) { return a >  b; }
+	inline static bool logical_or       (const type& a, const type& b) { return a || b; }
+	inline static bool logical_and      (const type& a, const type& b) { return a && b; }
+
+};
 
 
 #endif
