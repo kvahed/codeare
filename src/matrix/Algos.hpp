@@ -678,17 +678,14 @@ resize (const Matrix<T>& M, const size_t& sz) {
 	Matrix<T> res = zeros<T> (sz,1);
 	size_t copysz = MIN(numel(M), sz);
 
-    typedef typename container<T>::iterator VI;
-
-    VI rb = res.Container().begin();
-    VI mb = M.Container().begin();
+    typename container<T>::      iterator rb = res.ContainerIterator ();
+    typename container<T>::const_iterator mb =   M.ContainerIterator ();
     
     std::copy (mb, mb+copysz, rb);
 
 	return res;
 	
 }
-
 
 
 /**
@@ -707,10 +704,8 @@ resize (const Matrix<T>& M, const Matrix<size_t>& sz) {
 	Matrix<T> res  = zeros<T>(sz);
 	size_t copysz  = MIN(numel(M), numel(res));
 
-    typedef typename container<T>::iterator VI;
-
-    VI rb = res.Container().begin();
-    VI mb = M.Container().begin();
+    typename container<T>::      iterator rb = res.ContainerIterator ();
+    typename container<T>::const_iterator mb =   M.ContainerIterator ();
 
     std::copy (mb, mb+copysz, rb);
 

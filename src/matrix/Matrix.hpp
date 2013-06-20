@@ -565,6 +565,32 @@ public:
         return _M;
     }
 
+
+    /**
+     * @brief			Container iterator (lhs)
+     *
+     * @param			Position
+     *
+     * @return			Container iterator
+     */
+    inline typename container<T>::iterator
+    ContainerIterator	(const size_t p = 0) {
+    	return _M.begin () + p;
+    }
+
+
+    /**
+     * @brief			Container const iterator (rhs)
+     *
+     * @param			Position
+     *
+     * @return			Container const iterator
+     */
+    inline typename container<T>::const_iterator
+    ContainerIterator	(const size_t p = 0)  const {
+    	return _M.begin () + p;
+    }
+
     
     /**
      * @brief           Element at position p (rhs)
