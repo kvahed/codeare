@@ -49,6 +49,14 @@ class NIFile : public IOFile {
 public:
 
 
+	/**
+	 * @brief    Open NIFTI file handle
+	 *
+	 * @param  fname   File name
+	 * @param  mode    READ(default)/WRITE
+	 * @param  params  Optional parameter set (not used yet)
+	 * @param  verbose Verbose output true/false
+	 */
 	NIFile (const std::string& fname, const IOMode mode = READ,
 			const Params& params = Params(), const bool verbose = false) :
 			IOFile (fname, mode, params, verbose) {
@@ -60,9 +68,14 @@ public:
 	/**
 	 * @brief          Dump matrix to NIFTI file
 	 *
-	 * @param  M       Matrix
-	 * @param  fname   File name
-	 * @return         Success
+	 * @code{.cpp}
+	 *   Matrix<cxdb> M(256,16);
+	 *   NIFile nf ("test.nii",WRITE);
+	 *   nf.Write (M, "M");
+	 * @endcode
+	 * @param  M    Matrix
+	 * @param  uri  XML element
+	 * @return      Success
 	 */
 	template <class T> bool
 	Write (const Matrix<T>& M, const std::string& uri = "") {
@@ -112,9 +125,14 @@ public:
 	/**
 	 * @brief          Read matrix from NIFTI file
 	 *
-	 * @param  M       Matrix
-	 * @param  fname   File name
-	 * @return         Success
+	 * @code{.cpp}
+	 *   Matrix<cxfl> A;
+	 *   NIFile nf ("test.nii");
+	 *   A = nf.Read ("A");
+	 * @endcode
+	 *
+	 * @param  uri     Data name
+	 * @return         Data
 	 */
 	template <class T> Matrix<T>
 	Read (const std::string& uri = "") const {
@@ -149,7 +167,10 @@ public:
 
 
 	/**
-	 * @brief Read a particular data set from file
+	 * @brief  Read data from file
+	 *
+	 * @param  M    Matrix
+	 * @param  txe  XML element
 	 *
 	 * @return  Success
 	 */
@@ -161,6 +182,9 @@ public:
 
 	/**
 	 * @brief  Write data to file
+	 *
+	 * @param  M    Matrix
+	 * @param  txe  XML element
 	 *
 	 * @return  Success
 	 */
@@ -178,26 +202,50 @@ private:
 
 };
 
+/**
+ * @brief  Write a single entry into a NIFTI file
+ *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<double> m = rand<double,gaussian>(128); // 128x128 rand matrix
+ *   niwrite (m, "test.nii");
+ * @endcode
+ *
+ * @param  M      Matrix
+ * @param  fname  File name
+ * @param  uri    Data name (default actual name of object; in examplte above: m)
+ * @return        Success
+ */
 #define niwrite(X,Y) _niwrite (X,Y,#X)
-	template<class T> inline static bool
-	_niwrite (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
 
-		NIFile nif (fname, WRITE);
-		nif.Write(M, uri);
-		return true;
+template<class T> inline static bool
+_niwrite (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
 
-	}
+	NIFile nif (fname, WRITE);
+	nif.Write(M, uri);
+	return true;
 
+}
 
-	template<class T> inline static Matrix<T>
-	niread (const std::string& fname, const std::string& uri = "") {
+/**
+ * @brief  Read a single entry from a NIFTI file
+ *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<double> m = rand<double,gaussian>(128); // 128x128 rand matrix
+ *   niwrite (m, "test.nii");
+ * @endcode
+ *
+ * @param  fname  File name
+ * @param  uri    Data name
+ * @return        Data
+ */
+template<class T> inline static Matrix<T>
+niread (const std::string& fname, const std::string& uri = "") {
 
-		NIFile nif (fname, READ);
-		return nif.Read<T>(uri);
+	NIFile nif (fname, READ);
+	return nif.Read<T>(uri);
 
-	}
-
-
-
+}
 
 #endif /* NIFILE_HPP_ */
