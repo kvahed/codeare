@@ -558,7 +558,7 @@ public:
      * @return			Container iterator
      */
     inline typename container<T>::iterator
-    ContainerIterator	(const size_t p = 0) {
+    Iterator	(const size_t p = 0) {
     	return _M.begin () + p;
     }
 
@@ -571,7 +571,7 @@ public:
      * @return			Container const iterator
      */
     inline typename container<T>::const_iterator
-    ContainerIterator	(const size_t p = 0)  const {
+    Iterator	(const size_t p = 0)  const {
     	return _M.begin () + p;
     }
 
