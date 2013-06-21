@@ -24,6 +24,8 @@ AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
+AM_MAINTAINER_MODE
+
 
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
@@ -346,7 +348,7 @@ AC_CHECK_HEADERS([nifti1_io.h],      [],
    [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], 
    [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
-AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h sys/sysctl.h])
 AC_CHECK_HEADERS([openssl/evp.h], [HAVE_CRYPTO=1], 
    [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
 AC_CHECK_HEADERS([fcntl.h],          [], 
@@ -408,6 +410,20 @@ AC_ARG_WITH(fftw,   [  --with-fftw             	     Set directory of FFTW3 libr
 #############################################################
 # FFT routines
 #############################################################
+case $host in
+    *linux-gnu*)
+	    LIBEXT=so
+    ;;
+    *darwin*)
+	    LIBEXT=dylib
+    ;;
+    *cygwin*)
+	    LIBEXT=dll.a
+    ;;
+    *mingw*)
+	    LIBEXT=dll.a
+    ;;
+esac
 
 echo "Searching for FFTW library"
 if test -d "/usr/lib64"
@@ -423,8 +439,8 @@ then
   echo " -> Path not given. Searching for library..."
 else
   FFTPATH=$with_fftw
-  AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/libfftw3.a $FFTPATH/$LIBDIR/libfftw3f.a ,, [
-     AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3.a $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3f.a ,, [
+  AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT ,, [
+     AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3f.$LIBEXT $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3f.$LIBEXT ,, [
       echo " -> Given path not correct. Finding..."
       FFTPATH=""
   	  ] )
@@ -436,7 +452,7 @@ if test "$FFTPATH" = ""
 then
   if test "$FFTW_ROOT" != ""
   then
-    AC_CHECK_FILES( $FFTW_ROOT/include/fftw3.h $FFTW_ROOT/$LIBDIR/libfftw3.a , FFTPATH=$FFTW_ROOT, )
+    AC_CHECK_FILES( $FFTW_ROOT/include/fftw3.h $FFTW_ROOT/$LIBDIR/libfftw3f.$LIBEXT , FFTPATH=$FFTW_ROOT, )
   fi
 fi
 
@@ -452,7 +468,7 @@ then
   if test "$FFTPATH" != ""
   then
     # NOTE: AC_CHECK_FILES works here, but AC_CHECK_FILE doesn't (?!)
-    AC_CHECK_FILES( $FFTPATH/$LIBDIR/libfftw3.a $FFTPATH/$LIBDIR/libfftw3f.a , , FFTPATH="" )
+    AC_CHECK_FILES( $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT , , FFTPATH="" )
   fi
 fi
 
@@ -528,7 +544,7 @@ AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 # Checks for C++ libraries with name spaces
 
 
-# ISMRMRD (required)
+# ISMRMRD
 AC_ARG_WITH(ismrmrdroot,[  --with-ismrmrdroot       path to ISMRMRD install dir], 
         [], [with_ismrmrdroot=/usr/local/ismrmrd])
 
@@ -550,7 +566,7 @@ if test x"$with_ismrmrdroot" != x"no" ; then
 
 	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
 
-	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd"
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -Wl,-rpath,${ISMRMRD_LIB_PATH}"
 
 	AC_TRY_LINK([#include <ismrmrd_hdf5.h>],
 	  [ISMRMRD::IsmrmrdDataset d("","");],
@@ -759,7 +775,7 @@ fi
 
 # Otherwise, run through a list of possibilities                                                                                            
 AC_ARG_WITH(atlasroot,[  --with-atlasroot       path to atlas install dir], 
-                           [], [with_atlasroot=/usr/lib64/atlas])
+                           [], [with_atlasroot=no])
 if test -z "$BLAS" -a x"$with_atlasroot" != x"no" ; then
   OLD_LIBS=$LIBS
   LIBS="$LIBS -L$with_atlasroot"
@@ -787,7 +803,7 @@ fi
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
-  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -latlas -lblas")
+  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -lblas")
   LIBS=$SAVE_LIBS2
 fi
 
@@ -867,8 +883,8 @@ AH_TEMPLATE([HAVE_SCALAPACK], [Define to 1 if we could link against scalapack])
 ACX_SCALAPACK
 
 # Generate files
-AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile\
- doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile\
+AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile
+ doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile
  src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile
  src/matrix/linalg/tests/Makefile src/matrix/ft/Makefile src/matrix/ft/tests/Makefile 
  src/matrix/dwt/Makefile src/matrix/dwt/tests/Makefile src/matrix/io/tests/Makefile])

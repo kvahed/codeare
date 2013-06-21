@@ -28,16 +28,7 @@
   #include     "MrServers/MrVista/include/Ice/IceBasic/IceObj.h"
   #include     "MrServers/MrVista/include/Parc/Trace/IceTrace.h"
 
-#else
-enum IceDim {
-    COL, LIN, CHA, SET, ECO, PHS, REP, SEG, PAR, SLC, IDA, IDB, IDC, IDD, IDE, AVE
-};
 #endif
-
-#ifndef INVALID_DIM
-    #define INVALID_DIM 16
-#endif
-
 
 #include "config.h"
 #include "common.h"
@@ -57,10 +48,10 @@ enum IceDim {
 #include <time.h>
 #include <limits.h>
 
-#include <vector>
 #include <ostream>
 #include <string>
 #include <cstring>
+#include <algorithm>
 
 #define ICE_SHRT_MAX 4095
 
@@ -96,16 +87,6 @@ enum IceDim {
  */
 # define ROUND(A) ( floor(A) + ((A - floor(A) >= 0.5) ? (A>0 ? 1 : 0) : 0))
 
-/**
- * @brief bytes of dim vector
- */
-static const size_t dvsz = INVALID_DIM*sizeof(size_t);
-
-/**
- * @brief bits just suck.
- */
-typedef unsigned short BOOL;
-
 
 /**
  * @brief   Matrix template.<br/>
@@ -134,54 +115,36 @@ public:
 	inline
     Matrix              () {
 		
-        T t;
-        Validate (t);
+	    TypeTraits<T>::Validate();
 		
-        for (size_t i = 0; i < INVALID_DIM; ++i) {
-            _dim [i] = 1;
-            _dsz [i] = 1;
-            _res [i] = 1.0;
-        }
-		
-        _M = container<T>(DimProd());
-		
+        _dim.resize(1,1);
+        _res.resize(1,1.0);
+        
+        Allocate();
+        
     }
 	
 	
     /**
      * @brief           Construct matrix with dimension array
      *
-     * @param  dim      All <= INVALID_DIM Dimensions
+     * @param  dim      All dimensions
      */
 	inline explicit
     Matrix              (const std::vector<size_t>& dim) {
 		
-		assert (dim.size() <= INVALID_DIM);
-		
-		size_t n = 1, i = 0;
-		
-		for (; i < dim.size(); ++i)
-			n *= dim[i];
-		
-		assert (n);
-		
-	    T t;
-	    Validate (t);
-		
-	    for (i = 0; i < dim.size(); ++i) {
-	        _dim[i] = dim[i];
-	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
-	        _res[i] = 1.0;
-	    }
-		
-		for (; i < INVALID_DIM; ++i) {
-	        _dim[i] = 1;
-	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-	        _res[i] = 1.0;
-		}
-		
-        _M = container<T>(DimProd());
-		
+	    TypeTraits<T>::Validate();
+
+	    assert(!dim.empty() &&
+	    		std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
+
+	    size_t n = 1, i = 0, ds = dim.size();
+
+		_dim = dim;
+		_res.resize(ds,1.0);
+
+        Allocate();
+        
 	}
 	
 	
@@ -189,70 +152,28 @@ public:
     /**
      * @brief           Construct matrix with aligned dimension vector
      *
-     * @param  dim      All n <= INVALID_DIM dimensions
+     * @param  dim      All dimensions
      */
 	inline
     Matrix              (const container<size_t>& dim) {
 		
-		assert (dim.size() <= INVALID_DIM);
+	    TypeTraits<T>::Validate();
+
+	    size_t ds = dim.size();
+	    assert(ds &&
+	    	   std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
+
+	    size_t n = 1, i = 0;
 		
-		size_t n = 1, i = 0;
-		
-		for (; i < dim.size(); ++i)
-			n *= dim[i];
-		
-		assert (n > 0);
-		
-	    T t;
-	    Validate (t);
-		
-	    for (i = 0; i < dim.size(); ++i) {
-	        _dim[i] = dim[i];
-	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
-	        _res[i] = 1.0;
-	    }
-		
-		for (; i < INVALID_DIM; ++i) {
-	        _dim[i] = 1;
-	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-	        _res[i] = 1.0;
-		}
-		
-        _M = container<T>(DimProd());
+		_dim.resize(ds);
+		std::copy (dim.begin(),dim.end(),_dim.begin());
+		_res.resize(ds,1.0);
+
+        Allocate();
 		
 	}
 	
 	
-    /**
-     * @brief           Construct matrix with dimension and resolution arrays
-     *
-     * @param  dim      All 16 Dimensions
-     */
-	inline explicit
-    Matrix              (const size_t dim[INVALID_DIM]) {
-		
-		size_t n = 1, i = 0;
-		
-		for (; i < INVALID_DIM; ++i)
-			n *= dim[i];
-		
-		assert (n);
-		
-	    T t;
-	    Validate (t);
-		
-		for (i = 0; i < INVALID_DIM; ++i) {
-			_dim[i] = dim[i];
-	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
-			_res[i] = 1.0;
-		}
-		
-        _M = container<T>(DimProd());
-		
-	}
-	
-    
-    
     /**
      * @brief           Construct matrix with dimension and resolution arrays
      *
@@ -262,67 +183,21 @@ public:
 	inline explicit
     Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res) {
 		
-		assert (dim.size() <= INVALID_DIM);
-		assert (dim.size() == res.size());
+	    TypeTraits<T>::Validate();
 
-		size_t n = 1, i = 0;
+	    assert(!dim.empty() &&
+	    	    std::find(dim.begin(),dim.end(),size_t(0))==dim.end() &&
+	    	    dim.size() == res.size());
+
+	    size_t n = 1, i = 0, ds = dim.size();
 		
-		for (; i < dim.size(); ++i)
-			n *= dim[i];
-		
-		assert (n);
-		
-	    T t;
-	    Validate (t);
-		
-		for (i = 0; i < dim.size(); ++i) {
-			_dim[i] = dim[i];
-	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
-			_res[i] = res[i];
-		}
-		
-		for (; i < INVALID_DIM; ++i) {
-			_dim[i] = 1;
-	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-			_res[i] = 1.0;
-		}
-		
-        _M = container<T>(DimProd());
+		_dim = dim;
+		_res = res;
+
+        Allocate();
 		
 	}
-	
-	
-    
-    
-    /**
-     * @brief           Construct matrix with dimension and resolution arrays
-     *
-     * @param  dim      All 16 Dimensions
-     * @param  res      All 16 Resolutions
-     */
-	inline
-    Matrix              (const size_t dim[INVALID_DIM], const float res[INVALID_DIM]) {
-		
-		size_t n = 1, i = 0;
-		
-		for (; i < INVALID_DIM; ++i)
-			n *= dim[i];
-		
-		assert (n);
-		
-	    T t;
-	    Validate (t);
-		
-		for (i = 0; i < INVALID_DIM; ++i) {
-			_dim[i] = dim[i];
-	        _dsz[i] = (i == 0) ? 1 : _dsz[i-1]*_dim[i-1];
-			_res[i] = res[i];
-		}
-		
-        _M = container<T>(DimProd());
-		
-	}
-    
+
     
     /**
      * @brief           Construct square 2D matrix
@@ -337,25 +212,14 @@ public:
     inline explicit
     Matrix (const size_t n) {
 
-		assert (n);
+	    TypeTraits<T>::Validate();
 
-		T t;
-		Validate (t);
+	    assert (n);
 
-		_dim [COL] = n;
-		_dim [LIN] = n;
-		_dsz [COL] = 1;
-		_dsz [LIN] = _dim[COL];
+		_dim.resize(2,n);
+	    _res.resize(2,1.0);
 
-		for (size_t i = 2; i < INVALID_DIM; ++i) {
-			_dim [i] = 1;
-			_dsz [i] = _dsz[i-1]*_dim[i-1];
-		}
-
-		for (size_t i = 0; i < INVALID_DIM; ++i)
-			_res [i] = 1.0;
-
-        _M = container<T>(DimProd());
+        Allocate();
         
 	}
 
@@ -377,25 +241,13 @@ public:
     inline
     Matrix              (const size_t m, const size_t n) {
 
-    	assert (m*n >= 1);
+        TypeTraits<T>::Validate();
+    	assert (m && n);
 
-        T t;
-        Validate (t);
+    	_dim.resize(2); _dim[0] = m; _dim[1] = n;
+		_res.resize(2,1.0);
 
-        _dim [COL] = m;
-        _dim [LIN] = n;
-		_dsz [COL] = 1;
-		_dsz [LIN] = _dim[COL];
-
-        for (size_t i = 2; i < INVALID_DIM; ++i) {
-            _dim [i] = 1;
-            _dsz [i] = _dsz[i-1]*_dim[i-1];
-        }
-
-        for (size_t i = 0; i < INVALID_DIM; ++i)
-            _res [i] = 1.0;
-
-        _M = container<T>(DimProd());
+        Allocate();
 
     }
 
@@ -416,27 +268,14 @@ public:
     inline
     Matrix (const size_t m, const size_t n, const size_t k) {
 
-    	assert (m * n * k);
+	    TypeTraits<T>::Validate();
 
-        T t;
-        Validate (t);
+	    assert (m && n && k);
 
-        _dim [0] = m;
-        _dim [1] = n;
-        _dim [2] = k;
-		_dsz [0] = 1;
-		_dsz [1] = _dim[0];
-		_dsz [2] = _dim[1]*_dsz[1];
+    	_dim.resize(3); _dim[0] = m; _dim[1] = n; _dim[2] = k;
+		_res.resize(3,1.0);
 
-        for (size_t i = 3; i < INVALID_DIM; ++i) {
-            _dim [i] = 1;
-            _dsz [i] =_dsz[i-1]*_dim[i-1];
-        }
-
-        for (size_t i = 0; i < INVALID_DIM; ++i)
-            _res [i] = 1.0;
-
-        _M = container<T>(DimProd());
+        Allocate();
 
     }
     
@@ -479,37 +318,31 @@ public:
                          const size_t ide = 1,
                          const size_t ave = 1) {
 
-		assert (col * lin * cha * set * eco * phs * rep * seg *
-				par * slc * ida * idb * idc * idd * ide * ave > 0);
+    	TypeTraits<T>::Validate();
 
-	    T t;
-	    Validate (t);
+		assert (col && lin && cha && set && eco && phs && rep && seg &&
+				par && slc && ida && idb && idc && idd && ide && ave );
 
-	    _dim[COL] = col;
-	    _dim[LIN] = lin;
-	    _dim[CHA] = cha;
-	    _dim[SET] = set;
-	    _dim[ECO] = eco;
-	    _dim[PHS] = phs;
-	    _dim[REP] = rep;
-	    _dim[SEG] = seg;
-	    _dim[PAR] = par;
-	    _dim[SLC] = slc;
-	    _dim[IDA] = ida;
-	    _dim[IDB] = idb;
-	    _dim[IDC] = idc;
-	    _dim[IDD] = idd;
-	    _dim[IDE] = ide;
-	    _dim[AVE] = ave;
+	    size_t nd = 16, n = nd, sd, i;
 
-	    _dsz[COL] = 1;
-		for (size_t i = 1; i < INVALID_DIM; ++i)
-	        _dsz[i] = _dsz[i-1]*_dim[i-1];
+	    _dim.resize(n);
+	    _dim[ 0] = col; _dim[ 1] = lin; _dim[ 2] = cha; _dim[ 3] = set;
+	    _dim[ 4] = eco; _dim[ 5] = phs; _dim[ 6] = rep; _dim[ 7] = seg;
+	    _dim[ 8] = par; _dim[ 9] = slc; _dim[10] = ida; _dim[11] = idb;
+	    _dim[12] = idc; _dim[13] = idd; _dim[14] = ide; _dim[15] = ave;
 
-	    for (size_t i = 0; i < INVALID_DIM; ++i)
-	        _res [i] = 1.0;
+        // Remove trailing singleton dimensions
+        for (i = 0; i < nd; i++)
+            if (_dim[i] == 1)
+                n--;
+            else
+                n = nd;
+        
+        // Resize skeleton
+        _dim.resize(n);
+		_res.resize(n,1.0);
 
-        _M = container<T>(DimProd());
+        Allocate();
 
 	}
 
@@ -533,16 +366,12 @@ public:
 
 		if (this != &M) {
 
-			T t;
-			Validate (t);
+		    TypeTraits<T>::Validate();
 
-	        for (size_t i = 0; i < INVALID_DIM; ++i) {
-	            _dim[i] = M.Dim()[i];
-	            _dsz[i] = M.Dsz()[i];
-	            _res[i] = M.Res()[i];
-	        }
-
-	        _M = M.Container();
+			_dim = M.Dim();
+			_dsz = M.Dsz();
+			_res = M.Res();
+	        _M   = M.Container();
 
 		}
 
@@ -711,7 +540,52 @@ public:
         return _M;
     }
 
+
+    /**
+     * @brief           Container iterator to first element (lhs)
+     *
+     * @return          Container iterator
+     */
+    inline typename container<T>::iterator
+
+    Begin               () {
+    	return _M.begin ();
+    }
+
+
+    /**
+     * @brief           Container const iterator to first element (rhs)
+     *
+     * @return          Container const iterator
+     */
+    inline typename container<T>::const_iterator
+    Begin               ()  const {
+    	return _M.begin ();
+    }
+
     
+    /**
+     * @brief           Container iterator to last element (lhs)
+     *
+     * @return          Container iterator
+     */
+    inline typename container<T>::iterator
+    End                 () {
+    	return _M.end ();
+    }
+
+
+    /**
+     * @brief           Container const iterator to last element (rhs)
+     *
+     * @return          Container const iterator
+     */
+    inline typename container<T>::const_iterator
+    End                 ()  const {
+    	return _M.end ();
+    }
+
+
     /**
      * @brief           Element at position p (rhs)
      *  
@@ -750,10 +624,10 @@ public:
     inline T            
     At                  (const size_t x, const size_t y) const {
 
-        assert (x < _dim[0]);
-        assert (y < _dim[1]);
+    	assert ((!x || x < _dim[0]) &&
+    			(!y || y < _dim[1]));
 
-        return _M[x + _dim[COL]*y];
+        return _M[x + _dim[0]*y];
 
     }
 
@@ -770,10 +644,9 @@ public:
     inline T&           
     At                  (const size_t x, const size_t y) {
 
-        assert (x < _dim[0]);
-        assert (y < _dim[1]);
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]));
 
-        return _M[x + _dim[COL]*y];
+        return _M[x + _dim[0]*y];
 
     }
 
@@ -790,9 +663,7 @@ public:
     inline T            
     At                   (const size_t x, const size_t y, const size_t z) const {
 
-    	assert (x < _dim[0]);
-    	assert (y < _dim[1]);
-    	assert (z < _dim[2]);
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
 
         return _M[x + _dsz[1]*y + _dsz[2]*z];
 
@@ -812,9 +683,7 @@ public:
     inline T&            
     At                   (const size_t x, const size_t y, const size_t z) {
 
-    	assert (x < _dim[0]);
-    	assert (y < _dim[1]);
-    	assert (z < _dim[2]);
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
 
         return _M[x + _dsz[1]*y + _dsz[2]*z];
 
@@ -861,25 +730,26 @@ public:
                           const size_t ide = 0,
                           const size_t ave = 0) const {
 
-    	assert (col < _dim[COL]);
-    	assert (lin < _dim[LIN]);
-    	assert (cha < _dim[CHA]);
-    	assert (set < _dim[SET]);
-    	assert (eco < _dim[ECO]);
-    	assert (phs < _dim[PHS]);
-    	assert (rep < _dim[REP]);
-    	assert (seg < _dim[SEG]);
-    	assert (par < _dim[PAR]);
-    	assert (slc < _dim[SLC]);
-    	assert (ida < _dim[IDA]);
-    	assert (idb < _dim[IDB]);
-    	assert (idc < _dim[IDC]);
-    	assert (idd < _dim[IDD]);
-    	assert (ide < _dim[IDE]);
+    	assert ((!col || col < _dim[ 0])&&
+    	        (!lin || lin < _dim[ 1])&&
+    	        (!cha || cha < _dim[ 2])&&
+    	        (!set || set < _dim[ 3])&&
+    	        (!eco || eco < _dim[ 4])&&
+    	        (!phs || phs < _dim[ 5])&&
+    	        (!rep || rep < _dim[ 6])&&
+    	        (!seg || seg < _dim[ 7])&&
+    	        (!par || par < _dim[ 8])&&
+    	        (!slc || slc < _dim[ 9])&&
+    	        (!ida || ida < _dim[10])&&
+    	        (!idb || idb < _dim[11])&&
+    	        (!idc || idc < _dim[12])&&
+    	        (!idd || idd < _dim[13])&&
+    	        (!ide || ide < _dim[14])&&
+    	        (!ave || ave < _dim[15]));
 
-   	 return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
-   	                  seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
-   	                  idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
+        return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
+   	               seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
+   	               idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
 
     }
     
@@ -923,25 +793,26 @@ public:
                           const size_t ide = 0,
                           const size_t ave = 0) {
 
-    	assert (col < _dim[COL]);
-    	assert (lin < _dim[LIN]);
-    	assert (cha < _dim[CHA]);
-    	assert (set < _dim[SET]);
-    	assert (eco < _dim[ECO]);
-    	assert (phs < _dim[PHS]);
-    	assert (rep < _dim[REP]);
-    	assert (seg < _dim[SEG]);
-    	assert (par < _dim[PAR]);
-    	assert (slc < _dim[SLC]);
-    	assert (ida < _dim[IDA]);
-    	assert (idb < _dim[IDB]);
-    	assert (idc < _dim[IDC]);
-    	assert (idd < _dim[IDD]);
-    	assert (ide < _dim[IDE]);
+    	assert ((!col || col < _dim[ 0])&&
+    	       (!lin || lin < _dim[ 1])&&
+    	       (!cha || cha < _dim[ 2])&&
+    	       (!set || set < _dim[ 3])&&
+    	       (!eco || eco < _dim[ 4])&&
+    	       (!phs || phs < _dim[ 5])&&
+    	       (!rep || rep < _dim[ 6])&&
+    	       (!seg || seg < _dim[ 7])&&
+    	       (!par || par < _dim[ 8])&&
+    	       (!slc || slc < _dim[ 9])&&
+    	       (!ida || ida < _dim[10])&&
+    	       (!idb || idb < _dim[11])&&
+    	       (!idc || idc < _dim[12])&&
+    	       (!idd || idd < _dim[13])&&
+    	       (!ide || ide < _dim[14])&&
+    	       (!ave || ave < _dim[15]));
 
-    	 return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
-    	                  seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
-    	                  idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
+    	return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
+    	                 seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
+    	                 idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
 
     }
     
@@ -1153,16 +1024,10 @@ public:
     operator=           (const Matrix<T,P>& M) {
 
         if (this != &M) {
-
-
-            for (size_t i = 0; i < INVALID_DIM; ++i) {
-                _dim[i] = M.Dim()[i];
-                _res[i] = M.Res()[i];
-                _dsz[i] = M.Dsz()[i];
-            }
-
-            _M = M.Container();
-
+        	_dim = M.Dim();
+        	_dsz = M.Dsz();
+        	_res = M.Res();
+            _M  = M.Container();
         }
 
         return *this;
@@ -1259,7 +1124,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator-           (const S& s) const {
+    operator-           (const S s) const {
 
         T t = T(s);
         
@@ -1288,7 +1153,7 @@ public:
 
         size_t i;
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
 #if defined USE_VALARRAY
         _M -= M.Container();
@@ -1321,7 +1186,7 @@ public:
     inline Matrix<T,P>&
     operator-=          (const Matrix<S,P>& M) {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1341,7 +1206,7 @@ public:
      */
     template <class S >
     inline Matrix<T,P>&
-    operator-=          (const S& s) {
+    operator-=          (const S s) {
 
 		T t = T (s);
 
@@ -1410,7 +1275,7 @@ public:
      * @param  M        Matrix additive.
      */
     template <class S>
-    inline Matrix<T,P>
+    inline const Matrix<T,P>
     operator+          (const Matrix<S,P>& M) const {
         
 		Matrix<T,P> res = *this;
@@ -1426,7 +1291,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator+           (const S& s) const {
+    operator+           (const S s) const {
 
         Matrix<T,P> res = *this;
     	T t = T(s);
@@ -1451,7 +1316,7 @@ public:
     inline Matrix<T,P>&
     operator+=         (const Matrix<T,P>& M) {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
 #if defined USE_VALARRAY
         _M += M.Container();        
@@ -1484,7 +1349,7 @@ public:
     inline Matrix<T,P>&
     operator+=          (const Matrix<S,P>& M) {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1505,7 +1370,7 @@ public:
      */
     template <class S >
     inline Matrix<T,P>&
-    operator+=          (const S& s) {
+    operator+=          (const S s) {
 
     	T t = T (s);
 
@@ -1529,10 +1394,7 @@ public:
     inline Matrix<T,P>
     operator!           () const {
 
-        for (size_t i = 2; i < INVALID_DIM; ++i)
-            assert (_dim[i] == 1);
-
-        Matrix<T,P> res (_dim[1],_dim[0]);
+        Matrix<T,P> res (_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1554,7 +1416,7 @@ public:
      * @return          Cross-section or zero
      */
     inline Matrix<T,P>
-    operator&           (const Matrix<BOOL>& M) const ;
+    operator&           (const Matrix<cbool>& M) const ;
     
     
      /**
@@ -1563,10 +1425,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of false where elements are equal s and true else.
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator!=          (const T s) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<cbool> res(_dim);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
@@ -1584,10 +1446,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator>           (const T s) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1607,10 +1469,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator>=          (const T s) const {
 
-		Matrix<BOOL> res(_dim);
+		Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1629,10 +1491,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator<=          (const T s) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1651,10 +1513,10 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator<           (const T s) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1673,12 +1535,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator==          (const Matrix<T,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
-        Matrix<BOOL> res(_dim);
+        Matrix<cbool> res(_dim);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
@@ -1697,12 +1559,12 @@ public:
 	 * @return          Hit list
 	 */
     template<class S>
-	inline Matrix<BOOL>
+	inline Matrix<cbool>
 	operator==          (const Matrix<S,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
-		Matrix<BOOL> res (_dim);
+		Matrix<cbool> res (_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1720,12 +1582,12 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of true where elements are equal s and false else.
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator==          (const T s) const {
 
     	T t = (T) s;
 
-        Matrix<BOOL> res (_dim);
+        Matrix<cbool> res (_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1745,12 +1607,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator!=          (const Matrix<T,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
-        Matrix<BOOL> res(_dim,_res);
+        Matrix<cbool> res(_dim,_res);
 #ifdef EW_OMP
     #pragma omp parallel for
 #endif
@@ -1767,12 +1629,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator>=          (const Matrix<T,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
-        Matrix<BOOL> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1791,12 +1653,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator<=          (const Matrix<T,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
-        Matrix<BOOL> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1815,12 +1677,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator>           (const Matrix<T,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
-        Matrix<BOOL> res(_dim,_res);
+        Matrix<cbool> res(_dim,_res);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1839,12 +1701,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator<           (const Matrix<T,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
-        Matrix<BOOL> res(_dim,_res);
+        Matrix<cbool> res(_dim,_res);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1863,12 +1725,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator||          (const Matrix<T,P>& M) const {
 
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
+        assert (Size() == M.Size());
 
-        Matrix<BOOL> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1888,10 +1750,10 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<BOOL>
+    inline Matrix<cbool>
     operator&&          (const Matrix<T,P>& M) const {
 
-        Matrix<BOOL> res(_dim);
+        Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1946,726 +1808,9 @@ public:
     }
     
 
-    /**
-     * @brief           Elementwise multiplication. i.e. this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    inline Matrix<T,P>
-    operator*          (const Matrix<T,P> &M) const {
-
-		Matrix<T,P> res = *this;
-		return res *= M;
-
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication. i.e. this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    template <class S>
-    inline Matrix<T,P>
-    operator*          (const Matrix<S,P> &M) const {
-
-		Matrix<T,P> res = *this;
-		return res *= M;
-
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
-     *
-     * @param  s        Factor scalar
-     * @return          Result
-     */
-    template <class S>
-    inline Matrix<T,P>
-    operator*          (const S& s) const  {
-
-        Matrix<T,P> res = *this;
-    	T t = T(s);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] *= t;
-
-        return res;
-
-    }
-
-
-
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    inline Matrix<T,P>&
-    operator*=         (const Matrix<T,P>& M) {
-
-        size_t i;
-
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-
-#if defined USE_VALARRAY
-        _M *= M.Container();        
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), _M);
-        else
-        	for (size_t i = 0; i < Size(); ++i)
-        		_M[i] *= M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-            _M[i] *= M[i];
-#endif
-
-        return *this;
-
-    }
-
-
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    template <class S>
-    inline Matrix<T,P>&
-    operator*=         (const Matrix<S,P>& M) {
-
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] *= M[i];
-
-		return *this;
-
-    }
-
-
-    /**
-     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this *= s.
-     *
-     * @param  s        Factor scalar.
-     * @return          Result
-     */
-    template <class S>
-    inline Matrix<T,P>&
-    operator*=         (const S& s) {
-
-    	T t = T (s);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] *= t;
-
-		return *this;
-
-    }
-
-
-    /**
-     * @brief           Elementwise substruction of two matrices
-     *
-     * @param  M        Matrix substruent.
-     */
-    inline Matrix<T,P>
-    operator/           (const Matrix<T,P>& M) const {
-
-		Matrix<T,P> res = *this;
-		return res /= M;
-
-    }
-
-
-    /**
-     * @brief           Elelemtwise division by M.
-     *
-     * @param  M        The divisor.
-     * @return          Result
-     */
-    template <class S>
-    inline Matrix<T,P>
-    operator/          (const Matrix<S,P>& M) const {
-
-		Matrix<T,P> res = *this;
-		return res /= M;
-
-    }
-
-    
-    /**
-     * @brief           Elementwise division by scalar. i.e. this * m.
-     *
-     * @param  s        The divisor.
-     * @return          Result
-     */
-    template <class S>
-    inline Matrix<T,P>
-    operator/           (const S& s) const {
-
-      		assert (cabs(s) != 0.0);
-		T t = T (s);
-		Matrix<T,P> res = *this;
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] /= t;
-
-		return res;
-
-	}
-
-
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    inline Matrix<T,P>&
-    operator/=         (const Matrix<T,P>& M) {
-
-        size_t i;
-
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-
-#if defined USE_VALARRAY
-        _M /= M.Container();
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), _M);
-        else
-        	for (size_t i = 0; i < Size(); ++i)
-        		_M[i] /= M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-            _M[i] /= M[i];
-#endif
-
-        return *this;
-
-    }
-
-
-    /**
-     * @brief           ELementwise division and assignment operator. i.e. this = this ./ M.
-     *
-     * @param  M        Divisor matrix.
-     * @return          Result
-     */
-    template <class S>
-    inline Matrix<T,P>&
-    operator/=         (const Matrix<S,P> &M) {
-
-        size_t i;
-
-        assert (memcmp(_dim, M.Dim(), dvsz) == 0);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] /= M[i];
-
-        return *this;
-
-    }
-
+	#include "Operators.hpp"
     
     
-    /**
-     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Divisor scalar.
-     * @return          Result
-     */
-    template <class S>
-    inline Matrix<T,P>&
-    operator/=         (const S& s) {
-
-    	T zero = T(0.0);
-    	T t    = T(s);
-        assert (t != zero);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] /= T(s);
-
-        return *this;
-
-    }
-
-    
-    
-    //@}
-
-
-    /**
-     * @name            Friend operators
-     *                  Who doesn't need friends
-     */
-
-    //@{
-
-
-    //--
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const double s, const Matrix<T,P>& m) {
-        return   m * s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const float s, const Matrix<T,P> &m) {
-        return   m * s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const short s, const Matrix<T,P> &m) {
-        return   m * s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const long s, const Matrix<T,P> &m) {
-        return   m * s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const cxfl s, const Matrix<T,P> &m) {
-        return   m * s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const cxdb s, const Matrix<T,P> &m) {
-        return   m * s;
-    }
-
-
-    //--
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator+  (const double s, const Matrix<T,P> &m) {
-        return   m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator+  (const float s, const Matrix<T,P> &m) {
-        return   m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator+  (const short s, const Matrix<T,P> &m) {
-        return   m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator+  (const long s, const Matrix<T,P> &m) {
-        return   m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator+  (const cxfl s, const Matrix<T,P> &m) {
-        return   m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator+  (const cxdb s, const Matrix<T,P> &m) {
-        return   m + s;
-    }
-
-
-    //--
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator-  (const double s, const Matrix<T,P> &m) {
-        return -m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator-  (const float s, const Matrix<T,P> &m) {
-        return -m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator-  (const short s, const Matrix<T,P> &m) {
-        return -m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator-  (const long s, const Matrix<T,P> &m) {
-        return   -m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator-  (const cxfl s, const Matrix<T,P> &m) {
-        return   -m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator-  (const cxdb s, const Matrix<T,P> &m) {
-        return   -m + s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator/  (const double s, const Matrix<T,P> &m) {
-
-        Matrix<T,P> res = m;
-#ifdef USE_VALARRAY
-		res.Container() = s / res.Container();
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < m.Size(); ++i)
-            res[i] = s / res[i];
-#endif
-        return res;
-
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator/  (const float s, const Matrix<T,P> &m) {
-
-		Matrix<T,P> res = m;
-#ifdef USE_VALARRAY
-		res.Container() = s / res.Container();
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < m.Size(); ++i)
-            res[i] = s / res[i];
-#endif
-		return res;
-
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator/  (const cxfl s, const Matrix<T,P> &m) {
-
-        Matrix<T,P> res = m;
-#ifdef USE_VALARRAY
-		res.Container() = s / res.Container();
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < m.Size(); ++i)
-            res[i] = s / res[i];
-#endif
-        return res;
-
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator/  (const cxdb s, const Matrix<T,P> &m) {
-
-		Matrix<T,P> res = m;
-
-#ifdef USE_VALARRAY
-		res.Container() = s / res.Container();
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < m.Size(); ++i)
-            res[i] = s / res[i];
-#endif
-
-		return res;
-
-    }
-
-
-    /**
-     * @brief           Elementwise equality with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m == s
-     */
-    inline friend Matrix<BOOL>
-    operator== (const T s, const Matrix<T,P>& m) {
-        return   m == s;
-    }
-
-
-    /**
-     * @brief           Elementwise >= with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m <= t
-     */
-    inline friend Matrix<BOOL>
-    operator>= (const T s, const Matrix<T,P>& m) {
-        return   m <= s;
-    }
-
-
-    /**
-     * @brief           Elementwise <= with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T<=M
-     */
-    inline friend Matrix<BOOL>
-    operator<= (const T s, const Matrix<T,P>& m) {
-        return   m >= s;
-    }
-
-
-    /**
-     * @brief           Elementwise unequality with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T!=M
-     */
-    inline friend Matrix<BOOL>
-    operator!= (const T s, const Matrix<T,P>& m) {
-        return   m != s;
-    }
-
-
-    /**
-     * @brief           Elementwise equality with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T+M
-     */
-    inline friend Matrix<BOOL>
-    operator>  (const T s, const Matrix<T,P>& m) {
-        return   m <  s;
-    }
-
-
-    /**
-     * @brief           Elementwise < with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T+M
-     */
-    inline friend Matrix<BOOL>
-    operator<  (const T s, const Matrix<T,P>& m) {
-        return   m >  s;
-    }
-
-
-    /**
-     * @brief           Elementwise equality with scalar (lhs)
-     *
-     * @param  mb       Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T+M
-     */
-    inline friend Matrix<T,P>
-    operator&  (const Matrix<BOOL>& mb, const Matrix<T,P>& m) {
-        return   m & mb;
-    }
-
-    //@}
-
-
 
     /**
      * @name            Dimensions
@@ -2739,7 +1884,7 @@ public:
      */
     inline float
     Res                 (const size_t i) const {
-        assert (i < INVALID_DIM);
+        assert (i < _res.size());
         return _res[i];
     }
 
@@ -2752,7 +1897,7 @@ public:
      */
     inline float&
     Res                 (const size_t i)       {
-        assert (i < INVALID_DIM);
+        assert (i < _res.size());
         return _res[i];
     }
 
@@ -2763,9 +1908,9 @@ public:
      *
      * @return          All resolutions
      */
-    inline const float*
+    inline std::vector<float>
     Res                 () const {
-        return &_res[0];
+        return _res;
     }
 
 
@@ -2778,8 +1923,7 @@ public:
      */
     inline size_t
     Dim                 (const size_t i)  const {
-        assert (i < INVALID_DIM);
-        return _dim[i];
+        return (i < _dim.size()) ? _dim[i]: 1;
     }
 
 
@@ -2788,9 +1932,15 @@ public:
      *
      * @return          All dimensions
      */
-    inline const size_t*
+    inline std::vector<size_t>
     Dim                 ()                  const {
         return _dim;
+    }
+
+
+    inline size_t
+    NDim() const {
+    	return _dim.size();
     }
 
 
@@ -2799,34 +1949,9 @@ public:
      *
      * @return          All dimensions
      */
-    inline const size_t*
+    inline std::vector<size_t>
     Dsz                 ()                  const {
         return _dsz;
-    }
-
-
-    /**
-     * @brief           Get copy of dimension vector
-     *
-     * @return          All dimensions
-     */
-    inline std::vector<size_t>
-    DimVector           ()                  const {
-		std::vector<size_t> dim (INVALID_DIM,1);
-        std::memcpy (&dim[0], _dim, dvsz);
-        return dim;
-    }
-
-
-    /**
-     * @brief           Get size a given dimension.
-     *
-     * @return          Number of rows.
-     */
-    inline size_t
-    Dim                 (const int i)      const {
-        assert (i < INVALID_DIM);
-        return _dim[i];
     }
 
 
@@ -2836,12 +1961,9 @@ public:
     inline void
     Clear               ()                                      {
 
-        for (size_t i = 0; i < INVALID_DIM; ++i) {
-            _dim[i] = 1;
-            _dsz[i] = 1;
-            _res[i] = 1.0;
-        }
-
+    	_dim.resize(1,1);
+        _dsz.resize(1,1);
+        _res.resize(1,1.0);
         _M.resize(1);
 
     }
@@ -2892,7 +2014,7 @@ public:
      * @return          Product of this and M.
      */
     inline Matrix<T,P>
-    prod                (const Matrix<T,P> &M, const char& transa = 'N', const char& transb = 'N') const {
+    prod                (const Matrix<T,P> &M, const char transa = 'N', const char transb = 'N') const {
         return gemm (*this, M, transa, transb);
     }
 
@@ -2961,17 +2083,29 @@ protected:
         
         long size = 1;
         
-        for (size_t i = 0; i < INVALID_DIM; ++i)
+        for (size_t i = 0; i < _dim.size(); ++i)
             size *= _dim[i];
         
         return size;
         
     }
 
+    inline void
+    Allocate () {
+
+        size_t ds = _dim.size(), i;
+		_dsz.resize(ds,1);
+	    for (i = 1; i < ds; ++i)
+	        _dsz[i] = _dsz[i-1]*_dim[i-1];
+        
+        _M = container<T>(DimProd());
+        
+    }
+
     // Structure
-    size_t              _dim[INVALID_DIM]; /// Dimensions
-    size_t              _dsz[INVALID_DIM]; /// Dimension size.
-    float               _res[INVALID_DIM]; /// Resolutions
+    std::vector<size_t> _dim; /// Dimensions
+    std::vector<size_t> _dsz; /// Dimension size.
+    std::vector<float>  _res; /// Resolutions
     
     //Data
     container<T>    _M; /// Data container
@@ -2995,16 +2129,6 @@ protected:
     bool
     RSAdjust            (const std::string& fname);
 
-    /* Who do we support? */
-    void Validate (short  t) const {};
-    void Validate (long   t) const {};
-    void Validate (size_t t) const {};
-    void Validate (float  t) const {};
-    void Validate (double t) const {};
-    void Validate (cxfl   t) const {};
-    void Validate (cxdb   t) const {};
-	void Validate (BOOL   t) const {};
-
 };
 
 
@@ -3018,7 +2142,7 @@ Matrix<T,P>::Import     (const IceAs* ias, const size_t pos) {
     int  i    = 0;
     long size = 1;
     
-    for (i = 0; i < INVALID_DIM; ++i)
+    for (i = 0; i < MAX_ICE_DIM; ++i)
         size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
     
     T* data = (T*) ias->calcSplObjStartAddr() ;
@@ -3038,7 +2162,7 @@ Matrix<T,P>::Import(const IceAs* ias) {
         
     int i;
     
-    for (i = 0; i < INVALID_DIM; ++i)
+    for (i = 0; i < MAX_ICE_DIM; ++i)
         _dim[i] = (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
     
     _M = new T[Size()]();
@@ -3077,7 +2201,7 @@ Matrix<T,P>::Export (IceAs* ias, const size_t pos) const {
         int  i    = 0;
     long size = 1;
     
-    for (i = 0; i < INVALID_DIM; ++i) {
+    for (i = 0; i < MSX_ICE_DIM; ++i) {
         size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
     }
     

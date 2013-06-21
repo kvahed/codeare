@@ -1,13 +1,14 @@
 #include "Trigonometry.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "Print.hpp"
 
 template<class T>
 void check () {
 
     using namespace codeare::matrix::arithmetic;
     
-    Matrix<T> rhs = rand<T>(3,4);
+    Matrix<T> rhs = rand<T,uniform>(3,4);
     Matrix<T> lhs;
 
     lhs = fliplr (rhs);

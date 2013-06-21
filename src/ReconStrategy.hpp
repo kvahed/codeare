@@ -140,7 +140,7 @@ namespace RRStrategy {
 		 */
 		template <class T> Matrix<T>& 
 		AddMatrix         (const string name, Ptr< Matrix<T> > p) const {
-			return DB().AddMatrix(name, p);
+			return Workspace::Instance().AddMatrix(name, p);
 		}
 
 
@@ -153,7 +153,7 @@ namespace RRStrategy {
 		 */
 		template <class T> Matrix<T>&
 		Get            (const string name) const {
-			return DB().Get<T>(name);
+			return Workspace::Instance().Get<T>(name);
 		}
 		
 		
@@ -166,7 +166,7 @@ namespace RRStrategy {
 		 */
 		inline bool 
 		Free            (const string name) const {
-			return DB().Free (name);
+			return Workspace::Instance().Free (name);
 		}
 
 

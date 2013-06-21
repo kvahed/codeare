@@ -117,6 +117,7 @@ namespace RRStrategy {
         CSParam        m_csparam;
         int            m_wf;
         int            m_wm;
+        int            m_verbose;
         
     };
     

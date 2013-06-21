@@ -20,6 +20,7 @@
 
 #include "testclt.hpp"
 
+
 int main (int argc, char** argv) {
 	
 	int  rc  = 0;
@@ -39,21 +40,19 @@ int main (int argc, char** argv) {
             con->ReadConfig (cf.c_str());
 
 		if      (!strcmp (test, "CGSENSE"))               cgsensetest  (con);
-		//else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
 		else if (!strcmp (test, "SENSE"))                 sensetest    (con);
 		else if (!strcmp (test, "NuFFT"))                 nuffttest    (con); 
 		else if (!strcmp (test, "NuFFT_OMP"))             nuffttest    (con);
 		else if (!strcmp (test, "GRAPPA"))                grappatest   (con);
 		else if (!strcmp (test, "KTPoints"))              ktptest      (con);
 		else if (!strcmp (test, "CompressedSensing"))     cstest       (con);
-		//else if (!strcmp (test, "RelativeSensitivities")) resetest     (con);
-		//else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
-		//else if (!strcmp (test, "KArb"))                  karbtest     (con);
-#ifdef HAVE_MPI
-		else if (!strcmp (test, "MPI"))                   mpitest      (con);
-#endif
-		//else if (!strcmp (test, "ocl"))                   oclmatrixtest(con);
-		//else                                              internaltest (con);
+        /*
+		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
+		else if (!strcmp (test, "RelativeSensitivities")) resetest     (con);
+		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
+		else if (!strcmp (test, "KArb"))                  karbtest     (con);
+        */
+        else    {printf ("Cannot call unknow module %", test); return 1;}
 
 		delete con;
 		

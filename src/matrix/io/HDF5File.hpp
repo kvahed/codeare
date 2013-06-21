@@ -116,15 +116,18 @@ namespace io {
 			T         t;
 			DataSet   dataset = m_file.openDataSet(uri);
 			DataSpace space   = dataset.getSpace();
-			hsize_t*  dims    = (hsize_t*) malloc (space.getSimpleExtentNdims() * sizeof (hsize_t));
-			size_t    ndim    = MIN(space.getSimpleExtentDims(dims, NULL), (is_complex(t)) ? INVALID_DIM + 1 : INVALID_DIM);
+			std::vector<hsize_t> dims (space.getSimpleExtentNdims());
+			size_t    ndim    = space.getSimpleExtentDims(&dims[0], NULL);
 
-			if (this->m_verb)
+			if (this->m_verb) {
 				printf ("Reading dataset %s ... ", uri.c_str());
-			fflush(stdout);
+				fflush(stdout);
+			}
 
-			if (is_complex(t))
+			if (is_complex(t)) {
+				dims.pop_back();
 				--ndim;
+			}
 
 			std::vector<size_t> mdims (ndim,1);
 
@@ -200,19 +203,20 @@ namespace io {
 			}
 
 			// One more field for complex numbers
-			size_t tmpdim = (is_complex(t)) ? INVALID_DIM+1 : INVALID_DIM;
-			hsize_t* dims = new hsize_t[tmpdim];
+			size_t tmpdim = ndims(M);
 
-			for (size_t i = 0; i < INVALID_DIM; i++)
-				dims[i] = M.Dim(INVALID_DIM-1-i);
+			std::vector<hsize_t> dims (tmpdim);
 
-			if (typeid(T) == cxfl_type || typeid(T) == cxdb_type)
-				dims[INVALID_DIM] = 2;
+			for (size_t i = 0; i < tmpdim; i++)
+				dims[i] = M.Dim(tmpdim-1-i);
 
-			DataSpace space (tmpdim, dims);
+			if (typeid(T) == cxfl_type || typeid(T) == cxdb_type) {
+				dims.push_back(2);
+				tmpdim++;
+			}
+
+			DataSpace space (tmpdim, &dims[0]);
 			PredType*  type = HDF5Traits<T>::PType();
-
-			delete [] dims;
 
 			DataSet set = group.createDataSet(name, (*type), space);
 

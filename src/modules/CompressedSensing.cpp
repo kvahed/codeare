@@ -21,6 +21,8 @@
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
 #include "DFT.hpp"
+#include "Algos.hpp"
+#include "Creators.hpp"
 
 using namespace RRStrategy;
 
@@ -39,6 +41,8 @@ CompressedSensing::Init () {
 	Attribute ("xfmw",    &m_csparam.xfmw);
 	Attribute ("l1",      &m_csparam.l1);
 	Attribute ("pnorm",   &m_csparam.pnorm);
+	Attribute ("verbose", &m_verbose);
+
     printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
     printf ("  Pnorm: %.2e\n", m_csparam.pnorm);
 	
@@ -90,32 +94,28 @@ CompressedSensing::Process () {
 	Matrix<float>& pdf   = Get<float>  ("pdf" );
 	Matrix<float>& mask  = Get<float>  ("mask");
 	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
-	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>  (data.DimVector())));
-	Matrix<cxfl>   orig;
+	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(data.Dim())));
 
 	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
 		size(data,0), size(data,1), size(data,2));
-
-	m_csparam.dwt = new DWT <cxfl> (data.Height());
+	m_csparam.dwt = new DWT <cxfl> (data.Height(), ID);
 
 	/** -----  Which Fourier transform? **/
 	m_csparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);
-
-	
-	// m_csparam.ft = (FT<float>*) new NFFT<float> (ms, M * shots, m, alpha);
-	// m_csparam.ft = (FT<float>*) new NCSENSE<float> (sens, nk, m_cseps, m_csmaxit, m_lambda, m_fteps, m_ftmaxit);
+	// m_csparam.ft = (FT<float>*) new NFFT<float> (params);
+	// m_csparam.ft = (FT<float>*) new NCSENSE<float> (params);
 	/*************************************/
 
 	m_csparam.tvt = new TVOP ();
 
 	FT<float>& dft = *m_csparam.ft;
 	DWT<cxfl>& dwt = *m_csparam.dwt;
+    std::vector< Matrix<cxfl> > vc;
 	
 	im_dc    = data;
 	im_dc   /= pdf;
 
 	im_dc    = dft ->* im_dc;
-	orig     = im_dc;
 	
 	ma       = max(abs(im_dc));
 	im_dc   /= ma;
@@ -127,21 +127,33 @@ CompressedSensing::Process () {
 
 	tic      = getticks();
 
-	for (size_t i = 0; i < m_csiter; i++)
+	if (m_verbose)
+		vc.push_back(im_dc*ma);
+
+	for (size_t i = 0; i < m_csiter; i++) {
 		NLCG (im_dc, data, m_csparam);
+		if (m_verbose)
+			vc.push_back(im_dc*ma);
+	}
 
 	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
-	im_dc    = dwt ->* im_dc * ma;
-	data     = orig;
+    if (m_verbose) {
+        size_t cpsz = numel(im_dc);
+        im_dc = zeros<cxfl> (size(im_dc,0), size(im_dc,1), (m_dim == 3) ? size(im_dc,2) : 1, vc.size());
+        for (size_t i = 0; i < vc.size(); i++)
+            memcpy (&im_dc[i*cpsz], &(vc[i][0]), cpsz*sizeof(cxfl));
 
-	return OK;
+    } else
+        im_dc = dwt ->* im_dc * ma;
+
+    return OK;
 
 }
 
 
 CompressedSensing::CompressedSensing() :
-	m_wm(0), m_csiter(0), m_wf(0), m_dim(0) {}
+	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0) {}
 
 
 CompressedSensing::~CompressedSensing() {}
@@ -151,7 +163,7 @@ error_code
 CompressedSensing::Finalise() {return OK;}
 
 
-// the class factories
+// the class facxflories
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {
     return new CompressedSensing;
 }

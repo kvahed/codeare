@@ -93,7 +93,6 @@ public:
 					key.c_str(), e.what(),
                     demangle(typeid(T).name()).c_str(),
                     demangle(ba.type().name()).c_str());
-			//assert(false);
 		}
 	}
 

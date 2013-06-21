@@ -5,8 +5,8 @@
 template<class T>
 void ediv_check () {
 
-    Matrix<T> A = rand<T>(8,3);
-    Matrix<T> B = rand<T>(8,3);
+    Matrix<T> A = rand<T,uniform>(8,3);
+    Matrix<T> B = rand<T,uniform>(8,3);
     T a = T(2.0);
     Matrix<T> C, D;
 

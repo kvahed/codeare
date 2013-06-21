@@ -1,19 +1,19 @@
 #include "Trigonometry.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "Print.hpp"
 
-template<class T> void exp_check () {
+template<class T> void size_check () {
 
     using namespace codeare::matrix::arithmetic;
     
     Matrix<T> rhs (3,4,5);
     Matrix<size_t> lhs;
 
-    lhs = floor (size(rhs)/2);
+    lhs = size(rhs);
 
 #ifdef VERBOSE
-    std::cout << "A=\n" << rhs;
-    std::cout << "round(A)=\n" << lhs << std::endl;
+    std::cout << "size(A)=\n" << lhs << std::endl;
 #endif
 
 }
@@ -21,8 +21,8 @@ template<class T> void exp_check () {
 
 int main (int args, char** argv) {
 
-    exp_check<float>();
-    exp_check<double>();
+    size_check<float>();
+    size_check<double>();
     
     return 0;
     

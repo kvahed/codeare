@@ -45,7 +45,7 @@
        * @brief                       Constructor (such as oclKernelObject).
        *
        * @param  kernel_name          Name of kernel to call.
-       * @param         args          Pointers to kernel's arguments.
+       * @param      pp_args          Pointers to kernel's arguments.
        * @param     num_args          Number of kernel arguments.
        *
        */
@@ -166,6 +166,8 @@
 
         /* run algorithm */
         kernel_obj -> run_async ( );
+
+        return obj;
       
       }
 

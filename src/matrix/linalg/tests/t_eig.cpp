@@ -6,7 +6,7 @@
 
 template<class T, class S> void eig_check () {
 
-    Matrix<T> A = rand<T>(6,6);
+    Matrix<T> A = rand<T,uniform>(6,6);
     boost::tuple <Matrix<T>,Matrix<S>,Matrix<T> > lev;
 
 #ifdef VERBOSE    

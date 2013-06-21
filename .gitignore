@@ -57,6 +57,7 @@ src/matrix/io/tests/t_matlab
 src/matrix/io/tests/t_nifti
 src/matrix/io/tests/t_codeare
 src/matrix/io/tests/test*
+src/matrix/io/tests/t_iocontext
 
 ## folders (global) ##
 .deps/

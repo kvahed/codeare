@@ -8,10 +8,11 @@
 #include "HDF5File.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "Print.hpp"
 
 using namespace codeare::matrix::io;
 
-std::string mname = "/group1/group2/A";
+std::string mname = "A";
 std::string fname = "test.h5";
 
 template <class T>
@@ -29,13 +30,15 @@ inline static bool read (Matrix<T>& A) {
 template<class T>
 inline static bool check () {
 
-	Matrix<T> A = rand<T>(3,4), B;
+	Matrix<T> A = rand<T,uniform>(3,4), B;
 
 	// Class interface
 	write(A);
 	read(B);
 
 #if defined (VERBOSE)
+	std::cout << A;
+	std::cout << B;
 	std::cout << (A == B);
 	std::cout << std::endl;
 #endif
@@ -45,6 +48,8 @@ inline static bool check () {
     B = h5read<T> (fname,"/A");
 
 #if defined (VERBOSE)
+	std::cout << A;
+	std::cout << B;
 	std::cout << (A == B);
 	std::cout << std::endl;
 #endif
@@ -62,6 +67,8 @@ int main (int args, char** argv) {
 	if (!check<cxfl>())
 		return 1;
 	if (!check<cxdb>())
+		return 1;
+	if (!check<short>())
 		return 1;
 
 	return 0;

@@ -94,7 +94,7 @@ RelativeSensitivities::Process     () {
 
     // Do we have GRE for segmentation? --------
 	
-    Matrix<short>& bets = AddMatrix ("bets", (Ptr<Matrix<short> >) NEW (Matrix<short> (mask.DimVector())));
+    Matrix<short>& bets = AddMatrix ("bets", (Ptr<Matrix<short> >) NEW (Matrix<short> (mask.Dim())));
 	
     if (m_use_bet == 1) { // Better test? / Replace with SNRO?
 		
@@ -103,7 +103,7 @@ RelativeSensitivities::Process     () {
 
 		SOS (mask, ndims(mask)-1);
         
-        Matrix<double> bet(mask.DimVector());
+        Matrix<double> bet(mask.Dim());
         double         tmp = 0.0;
 		
         for (size_t i = 0; i < numel(mask); i++) {

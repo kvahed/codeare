@@ -178,13 +178,13 @@ template <> struct MXTraits<short> {
 		template <class T> bool
 		Write (const Matrix<T>& M, const std::string& uri) {
 
-
+			size_t nd = M.NDim();
 			// Declare dimensions and allocate array
-			mwSize   dim[INVALID_DIM];
-			for (size_t i = 0; i < INVALID_DIM; ++i)
+			mwSize   dim[nd];
+			for (size_t i = 0; i < nd; ++i)
 				dim[i] = (mwSize)M.Dim(i);
-			mxArray*  mxa = mxCreateNumericArray (INVALID_DIM, dim,
-					MXTraits<T>::prec, MXTraits<T>::cplx);
+
+			mxArray*  mxa = mxCreateNumericArray (nd, dim, MXTraits<T>::prec, MXTraits<T>::cplx);
 
 			// Assign data
 			MXTraits<T>::Write (mxa, M);

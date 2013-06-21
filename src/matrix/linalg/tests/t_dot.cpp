@@ -5,8 +5,8 @@
 
 template<class T> void dot_check () {
 
-    Matrix<T> A = rand<T> (4,1);
-    Matrix<T> B = rand<T> (4,1);
+    Matrix<T> A = rand<T,uniform> (4,1);
+    Matrix<T> B = rand<T,uniform> (4,1);
     
 #ifdef VERBOSE
     std::cout << "A=\n" << A;

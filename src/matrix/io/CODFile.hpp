@@ -44,16 +44,27 @@ namespace io{
 
 	static const std::string delim = "543f562189f1e82beb9c177f89f67822";
 
+
+	/**
+	 * @brief    codeare .cod file io class
+	 *
+	 *
+	 */
 	class CODFile : public IOFile {
 
 	public:
 
-
+		/**
+		 * @brief    Open codeare raw file handle
+		 *
+		 * @param  fname   File name
+		 * @param  mode    READ(default)/WRITE
+		 * @param  params  Optional parameter set (not used yet)
+		 * @param  verbose Verbose output true/false
+		 */
 		CODFile (const std::string& fname, const IOMode mode = READ,
 				const Params& params = Params(), const bool verbose = false) :
 					IOFile (fname, mode, params, verbose) {
-
-
 
 			const char* R = "rb";
 			const char* W = "wb";
@@ -69,6 +80,9 @@ namespace io{
 		}
 
 
+		/**
+		 * @brief  Close file handle
+		 */
 		~CODFile () {
 			if (m_file)
 				fclose(m_file);
@@ -80,36 +94,48 @@ namespace io{
 
 			int dt;
 			size_t  ns, n;
-			std::vector<size_t> dims (INVALID_DIM,1);
-			float res[INVALID_DIM];
+			std::vector<size_t> dim;
+			std::vector<float>  res;
 			char* name;
 			Matrix<T> M;
 			T t;
 
 			// Read type
-			if (!mread ( &dt, sizeof(   int),           1, m_file, "data type")) return M;
+			if (!mread (&dt, 1, m_file, "data type"))
+				return M;
 
 			// Matrix and data type must fit as of now.
 			if (CODTraits<T>::dt == dt) {
 
+				if (!mread (&n, 1, m_file, "dimensions"))
+					return M;
+				dim = std::vector<size_t>(n,1);
+				res = std::vector<float>(n,1.0);
+
 				// Read dimensions and allocate matrix
-				if (!mread (&dims[0], sizeof(size_t), INVALID_DIM, m_file, "dimensions")) return M;
-				M = Matrix<T>(dims);
+				if (!mread (dim, m_file, "dimensions"))
+					return M;
+
+				//Read resolutions and assign
+				if (!mread (res, m_file, "resolutions"))
+					return M;
+				M = Matrix<T>(dim,res);
 				n = numel(M);
 
-				// Read resolutions and assign
-				if (!mread ( res, sizeof( float), INVALID_DIM, m_file, "resolutions")) return M;
-				for (size_t i = 0; i < INVALID_DIM; i++)
-					M.Res(i) = res[i];
-
 				// Name
-				if (!mread ( &ns, sizeof(size_t),           1, m_file, "name length")) return M;
-				name = new char [ns];
-				if (!mread (name,   sizeof(char),          ns, m_file, "name")) return M;
+				if (!mread (&n,  1, m_file, "name length"))
+					return M;
+
+				name = new char [n+1];
+
+				if (!mread (name, n, m_file, "name"))
+					return M;
+				name[n] = '\0';
 				M.SetClassName(name);
 
 				// Read data
-				if (!mread (&M[0],     sizeof(T),           n, m_file, "data")) return M;
+				if (!mread (M.Container(), m_file, "data"))
+					return M;
 
 				//Close and clean up;
 				delete name;
@@ -126,35 +152,39 @@ namespace io{
 
 			assert (m_file != NULL);
 
-			size_t n = numel(M);
-			int dt;
-			size_t ns, l;
-
-			dt = CODTraits<T>::dt;
+			dtype dt = CODTraits<T>::dt;
+			size_t n, l;
 
 			// Dump type
-			if (!mwrite(&dt, sizeof(int), 1, m_file, "data type"))
+			if (!mwrite(&dt,         1, m_file, "data type"))
+				return false;
+
+			n = M.NDim();
+			if (!mwrite(&n,          1, m_file, "data dimensions"))
 				return false;
 
 			// Dump dimensions
-			if (!mwrite((const void*) M.Dim(), sizeof(size_t), INVALID_DIM, m_file, "dimensions"))
+			if (!mwrite(M.Dim(),        m_file, "dimensions"))
 				return false;
 
 			// Dump resolutions
-			if (!mwrite((const void*) M.Res(), sizeof(float), INVALID_DIM, m_file, "resolutions"))
+			if (!mwrite(M.Res(),        m_file, "resolutions"))
 				return false;
 
 			// Size of name and name
-			ns = uri.size();
-			if (!mwrite(&ns, sizeof(size_t), 1, m_file, "name length"))
+			n = uri.size();
+			if (!mwrite(&n,          1, m_file, "name length"))
 				return false;
 
 			// Dump name
-			if (!mwrite((const void*) uri.c_str(), sizeof(char), ns, m_file, "name"))
+			if (!mwrite(uri.c_str(), n, m_file, "name"))
 				return false;
 
 			// Dump data
-			if (!mwrite((const void*) M.Memory(), sizeof(T), n, m_file, "data"))
+			if (!mwrite(M.Container(),  m_file, "data"))
+				return false;
+
+			if (!mwrite(delim.c_str(), delim.length(), m_file, "delimiter"))
 				return false;
 
 			return true;

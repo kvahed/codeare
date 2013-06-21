@@ -22,11 +22,14 @@
 #ifndef __IOCONTEXT_HPP__
 #define __IOCONTEXT_HPP__
 
-#include "ISMRMRD.hpp"
 #include "HDF5File.hpp"
 #include "SyngoFile.hpp"
 #include "CODFile.hpp"
 #include "Demangle.hpp"
+
+#ifdef HAVE_ISMRMRD_HDF5_H
+#include "ISMRMRD.hpp"
+#endif
 
 #ifdef HAVE_MAT_H
 #include "MLFile.hpp"
@@ -38,10 +41,10 @@
 
 /*
 #include "NetCDF.hpp"
-#include "CodRaw.hpp"
 #include "GE.hpp"
 #include "PHILIPS.hpp"
 */
+
 namespace codeare {
 namespace matrix{
 namespace io{
@@ -98,6 +101,8 @@ namespace io{
 		CName () {
 			return "ismrm";
 		}
+
+#ifdef HAVE_ISMRMRD_HDF5_H        
 		inline static IOFile*
         Open (const std::string& fname, const IOMode mode,
               const Params& params, const bool verbosity) {
@@ -119,6 +124,7 @@ namespace io{
 		Write (IOFile* iof, const Matrix<T>& M, const TiXmlElement* txe) {
 			return ((IOClass*)iof)->Write(M,txe);
 		}
+#endif        
 	};
 	
 	template<>
@@ -379,7 +385,9 @@ namespace io{
 #ifdef HAVE_MAT_H
 				case MATLAB: return IOTraits<MATLAB>::Read<T>(m_iof, uri);
 #endif
+#ifdef HAVE_ISMRMRD_HDF5_H
 				case ISMRM:  return IOTraits< ISMRM>::Read<T>(m_iof, uri);
+#endif
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  return IOTraits< NIFTI>::Read<T>(m_iof, uri);
 #endif
@@ -405,7 +413,9 @@ namespace io{
 #ifdef HAVE_MAT_H
 				case MATLAB: return IOTraits<MATLAB>::Write<T>(m_iof, M, uri);
 #endif
+#ifdef HAVE_ISMRMRD_HDF5_H
 				case ISMRM:  return IOTraits< ISMRM>::Write<T>(m_iof, M, uri);
+#endif
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  return IOTraits< NIFTI>::Write<T>(m_iof, M, uri);
 #endif
@@ -431,7 +441,9 @@ namespace io{
 #ifdef HAVE_MAT_H
 				case MATLAB: return IOTraits<MATLAB>::Read<T>(m_iof, txe);
 #endif
+#ifdef HAVE_ISMRMRD_HDF5_H
 				case ISMRM:  return IOTraits< ISMRM>::Read<T>(m_iof, txe);
+#endif
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  return IOTraits< NIFTI>::Read<T>(m_iof, txe);
 #endif
@@ -457,7 +469,9 @@ namespace io{
 #ifdef HAVE_MAT_H
 				case MATLAB: return IOTraits<MATLAB>::Write<T>(m_iof, M, txe);
 #endif
+#ifdef HAVE_ISMRMRD_HDF5_H
 				case ISMRM:  return IOTraits< ISMRM>::Write<T>(m_iof, M, txe);
+#endif
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  return IOTraits< NIFTI>::Write<T>(m_iof, M, txe);
 #endif
@@ -547,7 +561,9 @@ namespace io{
 #ifdef HAVE_MAT_H
 				case MATLAB: m_iof = IOTraits<MATLAB>::Open(fname, mode, params, verbosity); break;
 #endif
+#ifdef HAVE_ISMRMRD_HDF5_H
 				case ISMRM:  m_iof = IOTraits< ISMRM>::Open(fname, mode, params, verbosity); break;
+#endif
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  m_iof = IOTraits< NIFTI>::Open(fname, mode, params, verbosity); break;
 #endif

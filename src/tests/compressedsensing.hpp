@@ -57,15 +57,13 @@ cstest (Connector<T>* con) {
 	// Incoming -------------
 	
 	con->GetMatrix ("im_dc", im_dc);  // Recon output
-	con->GetMatrix ("data",  indata); // Weighted FT of original input
 	// ---------------------
 	
 	con->Finalise   (test);
 	
     // Write images
     IOContext oc (con->GetElement("/config/data-out"), base, WRITE);
-    oc.Write(im_dc, "out");
-    oc.Write(indata, "in");
+    oc.Write(im_dc, "image");
     oc.Close();
 	
 	return true;

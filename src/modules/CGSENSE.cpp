@@ -23,6 +23,7 @@
 #include "Toolbox.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "Print.hpp"
 
 #include <math.h>
 
@@ -118,31 +119,19 @@ CGSENSE::Prepare () {
 
 	error_code error = OK;
 
-	Matrix<float>& weights = Get<float>("weights");
-	Matrix<cxfl>& sens = Get<cxfl>("sens");
-	Matrix<float>& kspace = Get<float>("kspace");
-
-	size_t nk = numel(weights);
-
 	Params cgp;
-	cgp["sens_maps"] = std::string("sens");
+	cgp["sens_maps"]    = std::string("sens");
     cgp["weights_name"] = std::string("weights");
-    cgp["verbose"] = m_verbose;
-    cgp["ftiter"] = (size_t) m_ftmaxit;
-    cgp["cgiter"] = (size_t) m_cgmaxit;
-    cgp["cgeps"] = m_cgeps;
-    cgp["lambda"] = m_lambda;
-    cgp["nk"] = nk;
+    cgp["verbose"]      = m_verbose;
+    cgp["ftiter"]       = (size_t) m_ftmaxit;
+    cgp["cgiter"]       = (size_t) m_cgmaxit;
+    cgp["cgeps"]        = m_cgeps;
+    cgp["lambda"]       = m_lambda;
 
 	m_ncs = new NCSENSE<float>(cgp);
-	size_t dim = ndims(sens) - 1;
 
-	// Outgoing images
-	Matrix<cxfl>& image = AddMatrix 
-		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>()));
-
-	m_ncs->KSpace (kspace);
-	m_ncs->Weights (weights);
+	m_ncs->KSpace (Get<float>("kspace"));
+	m_ncs->Weights (Get<float>("weights"));
 	
 	Free ("weights");
 	Free ("kspace");
@@ -163,7 +152,19 @@ CGSENSE::Process () {
 	
 	printf ("Processing CGSENSE ...\n");
 
-	Get<cxfl>("image") = m_ncs->Adjoint (Get<cxfl>("data"), Get<cxfl>("sens"));
+    const Matrix<cxfl>& sens = Get<cxfl>("sens");
+    
+    Matrix<cxfl> data;
+
+    if (!m_testcase)
+        data = Get<cxfl>("data");
+    else {
+        data  = m_ncs->Trafo (phantom<cxfl>(size(sens,0)), sens);
+        data += m_noise * rand<cxfl,gaussian>(size(data));
+    }
+
+    Matrix<cxfl> img = m_ncs->Adjoint (data, sens);
+    wspace.Add("image", img);
 
 	Free ("data");
 

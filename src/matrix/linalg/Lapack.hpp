@@ -34,23 +34,23 @@
  * 
  * Usage:
  * @code{.cpp}
- *   Matrix<cxfl> m = rand<cxfl> (10,10), lv, rv;
- *   Matrix<float> ev;
- * 
- *   int res = eig (m, ev, lv, rv, 'N', 'N');
+ *   Matrix<cxfl> m = rand<cxfl> (10,10), ev;
+ *   Matrix<float> lv, rv;
+ *   boost::tuple<Matrix<float>,Matrix<cxfl>,Matrix<float>> ler
+ *   ler = eig2 (m);
+ *   lv = boost::get<0>(ler)
+ *   ev = boost::get<1>(ler);
+ *   rv = boost::get<2>(ler)
  * @endcode
  * where m is the complex decomposed matrix, lv and rv are the left hand and right 
- * hand side eigen vectors and ev is the real eigenvalue vector.
+ * hand side eigen vectors and ev is the eigenvalue vector.
  *
  * @see           LAPACK driver xGEEV
  *
  * @param  m      Matrix for decomposition
- * @param  ev     Eigenvalues
- * @param  lv     Left  Eigen-vectors
- * @param  rv     Right Eigen-vectors
  * @param  jobvl  Compute left vectors ('N'/'V')
  * @param  jobvr  Compute right vectors ('N'/'V')
- * @return        Status of driver
+ * @return        Eigenvectors and values
  */
 template <class T, class S> inline boost::tuple< Matrix<T>, Matrix<S>, Matrix<T> >
 eig2 (const Matrix<T>& m, const char& jobvl = 'N', const char& jobvr = 'N') {
@@ -65,7 +65,7 @@ eig2 (const Matrix<T>& m, const char& jobvl = 'N', const char& jobvr = 'N') {
 	assert (jobvr == 'N' || jobvr =='V');
     assert (issquare(m));
     
-	int    N     =  size(m, COL);
+	int    N     =  size(m, 0);
 	int    lda   =  N;
 	int    ldvl  = (jobvl == 'V') ? N : 1;
 	int    ldvr  = (jobvr == 'V') ? N : 1;
@@ -133,18 +133,18 @@ inline Matrix<cxdb> eig (const Matrix<cxdb>& m) {
  * @code{.cpp}
  *   Matrix<cxfl>  m = rand<cxfl> (20,10), u, v;
  *   Matrix<float> s;
- * 
- *   int res = svd (m, s, u, v, 'N');
+ *   boost::tuple<Matrix<cxfl>, Matrix<float>, Matrix<cxfl>> usv;
+ *   usv = svd2 (m);
+ *   u = boost::get<0>(usv);
+ *   s = boost::get<1>(usv);
+ *   v = boost::get<2>(usv);
  * @endcode
  * where m is the complex decomposed matrix, u and v are the left hand and right 
  * hand side singular vectors and s is the vector of real singular values.
  *
  * @see             LAPACK driver xGESDD
  * 
- * @param  IN       Incoming matrix
- * @param  s        Sorted singular values 
- * @param  U        Left-side singlar vectors
- * @param  V        Right-side singular vectors
+ * @param  m       Incoming matrix
  * @param  jobz     Computation mode<br/>
  *                  'A': all m columns of U and all n rows of VT are returned in the arrays u and vt<br/>
  *                  'S', the first min(m, n) columns of U and the first min(m, n) rows of VT are returned in the arrays
@@ -154,8 +154,8 @@ inline Matrix<cxdb> eig (const Matrix<cxdb>& m) {
  *                       rows of VT are returned in the array vt;<br/>
  *                  &nbsp;&nbsp;&nbsp;&nbsp;if m < n, all columns of U are returned in the array u and the first m rows
  *                       of VT are overwritten in the array a;<br/>
- *                  'N', no columns of U or rows of VT are computed.
- * @return          Status of the driver
+ *                  'N', no columns of U or rows of VT are computed (default).
+ * @return          Signular vectors and values
  */
 
 template<class T, class S> inline boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> >
@@ -300,6 +300,22 @@ inv (const Matrix<T>& m) {
 } 
 	
 
+/**
+ * @brief                Moore penrose pseudo-invert
+ *
+ * Usage:
+ * @code{.cpp}
+ *   Matrix<cxfl> m = rand<cxfl> (10,6);
+ *
+ *   m = pinv (m);
+ * @endcode
+ *
+ * @see                  Lapack xGELS
+ *
+ * @param  m             Matrix
+ * @param  trans         Transpose m before pinv?
+ * @return               Pseudo-inverse
+ */
 template<class T> inline Matrix<T>
 pinv (const Matrix<T>& m, const char& trans = 'N') {
     
@@ -458,7 +474,7 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, const char& transa = 'N', const ch
  * Usage:
  * @code{.cpp}
  *   Matrix<cxfl> m = rand<cxfl> (20,10);
- *   float normm    = creal(norm (m)); // Lapack driver below produces complex variable with real value
+ *   float nm       = norm (m); // Lapack driver below produces complex variable with real value
  * @endcode
  *
  * @param  M           Input
@@ -482,7 +498,7 @@ norm (const Matrix<T>& M) {
  * @code{.cpp}
  *   Matrix<cxdb> a = rand<cxdb> (20,1);
  *   Matrix<cxdb> b = rand<cxdb> (20,1);
- *   double dotpr   = dotc (a, b);
+ *   cxdb   dotpr   = dotc (a, b);
  * @endcode
  *
  * @param  A           Left factor (is conjugated)
@@ -521,7 +537,7 @@ DOTC (const Matrix<T>& A, const Matrix<T>& B) {
  * @code{.cpp}
  *   Matrix<float> a = rand<float> (20,1);
  *   Matrix<float> b = rand<float> (20,1);
- *   double dotpr    = dot (a, b);
+ *   float dotpr     = dot (a, b);
  * @endcode
  *
  * @param  A           Left factor
@@ -564,8 +580,8 @@ DOT  (const Matrix<T>& A, const Matrix<T>& B) {
  *   double prod     = gemv (A, x, 'C');
  * @endcode
  *
- * @param  A          left factor matrix
- * @param  x          Right factor vector
+ * @param  A          Matrix A
+ * @param  x          Vector x
  * @param  trans      Transpose A?
  * 
  * @return            A*x

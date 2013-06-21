@@ -41,8 +41,8 @@
       /**
        * @brief               constructor
        *
-       * @param               cpu_data  @see oclDataWrapper <T>
-       * @param               size      @see ocldataWrapper <T>
+       * @param               cpu_data  @see oclDataWrapper<T>
+       * @param               size      @see ocldataWrapper<T>
        *
        */
       oclCPUDataObject        (           T   * const   cpu_data,

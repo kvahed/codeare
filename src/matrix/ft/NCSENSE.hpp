@@ -37,6 +37,8 @@
  */
 template <class T>
 class NCSENSE : public FT<T> {
+
+    typedef std::complex<T> CT;
 	
 public:
 
@@ -52,7 +54,8 @@ public:
                 m_nk (1024),
                 m_nr (4096),
                 m_lambda (1.0e-6),
-                m_verbose (false) {}
+                m_verbose (false),
+                m_np(0) {}
     
     
 	/**
@@ -90,25 +93,26 @@ public:
 
 		assert (params.exists("sens_maps"));
 		m_smname = params.Get<std::string>("sens_maps");
-        ws.GetMatrix(m_smname, m_sm);
+        m_sm = ws.Get<CT>(m_smname);
 
+		assert (params.exists("weights_name"));
 		m_wname  = params.Get<std::string>("weights_name");
-        //m_verbose = params.Get<int>("verbose");
+        m_nk = numel(ws.Get<T>(m_wname));
 
 		if (params.exists("phase_cor"))
-			ws.GetMatrix(params.Get<std::string>("phase_cor"), m_pc);
+			m_pc = ws.Get<CT>(params.Get<std::string>("phase_cor"));
 		if (params.exists("b0"))
-			ws.GetMatrix(params.Get<std::string>("b0"), b0);
+			m_pc = ws.Get<T>(params.Get<std::string>("b0"));
 
 		m_dim = ndims(m_sm)-1;
 		Matrix<size_t> ms (m_dim,1);
 		for (size_t i = 0; i < m_dim; i++)
 			ms[i] = size(m_sm,i);
 
-		m_cgiter = params.Get<size_t>("cgiter");
-		m_cgeps  = params.Get<double>("cgeps");
-		m_lambda = params.Get<double>("lambda");
-		m_nk     = params.Get<size_t>("nk");
+		m_cgiter  = params.Get<size_t>("cgiter");
+		m_cgeps   = params.Get<double>("cgeps");
+		m_lambda  = params.Get<double>("lambda");
+		m_verbose = params.Get<int>("verbose");
 
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  Signal nodes: %li\n", m_nk);
@@ -126,11 +130,13 @@ public:
 		}
         
 		m_fts = new NFFT<T>* [m_np];
-		for (size_t i = 0; i < m_np; i++)
+		for (size_t i = 0; i < m_np; i++) // FFTW planning not thread-safe
 			m_fts[i] = new NFFT<T> (ms, m_nk, m, alpha, b0, m_pc, fteps, ftiter);
 		
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
+
+
 		printf ("  ...done.\n\n");
 		
 	}
@@ -157,10 +163,7 @@ public:
 		
 #pragma omp parallel 
 		{
-			
-			for (size_t i = 0; i < omp_get_num_threads (); i++)
-				m_fts[i]->KSpace(k);
-			
+            m_fts[omp_get_thread_num()]->KSpace(k);
 		}
 		
 	}
@@ -176,10 +179,7 @@ public:
 		
 #pragma omp parallel 
 		{
-			
-			for (size_t i = 0; i < omp_get_num_threads (); i++)
-				m_fts[i]->Weights(w);
-			
+            m_fts[omp_get_thread_num()]->Weights(w);
 		}
 		
 	}
@@ -191,10 +191,10 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	Trafo       (const Matrix< std::complex<T> >& m) const {
+	virtual Matrix<CT>
+	Trafo       (const Matrix<CT>& m) const {
 
-		Matrix< std::complex<T> > tmp = m / m_ic;
+		Matrix<CT> tmp = m / m_ic;
 		return E (tmp, m_sm, m_fts);
 
 	}
@@ -209,8 +209,8 @@ public:
 	 *
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	Trafo       (const Matrix< std::complex<T> >& m, const Matrix< std::complex<T> >& sens, const bool& recal = true) const {
+	virtual Matrix<CT>
+	Trafo       (const Matrix<CT>& m, const Matrix<CT>& sens, const bool& recal = true) const {
 
 		return E (m / ((recal) ? IntensityMap (sens) : m_ic), sens, m_fts);
 
@@ -223,8 +223,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	Adjoint     (const Matrix< std::complex<T> >& m) const {
+	virtual Matrix<CT>
+	Adjoint     (const Matrix<CT>& m) const {
 
 		return this->Adjoint (m, m_sm, false);
 
@@ -240,22 +240,29 @@ public:
 	 *
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	Adjoint (const Matrix< std::complex<T> >& m,
-			 const Matrix< std::complex<T> >& sens,
+	virtual Matrix<CT>
+	Adjoint (const Matrix<CT>& m,
+			 const Matrix<CT>& sens,
 			 const bool recal = true) const {
 
-		std::complex<T> ts;
+		CT ts;
 		T rn, rno, xn;
-		Matrix< std::complex<T> > p, r, x, q;
+		Matrix<CT> p, r, x, q;
 		vector<T> res;
         std::vector< Matrix<cxfl> > vc;
 
-		p = EH (m, sens, m_fts) * ((recal) ? IntensityMap (sens) : m_ic);
+        if (recal)
+        	IntensityMap (sens);
+
+
+		p = EH (m, sens, m_fts) * m_ic;
 		r = p;
-		x = zeros< std::complex<T> >(size(p));
+		x = zeros<CT>(size(p));
 		
-		xn = pow(norm(p), 2.0);
+        if (m_verbose)
+            vc.push_back (p/m_ic);
+
+        xn = pow(norm(p), 2.0);
 		rn = xn;
 
 		for (size_t i = 0; i < m_cgiter; i++) {
@@ -267,15 +274,15 @@ public:
 
  			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 
-			q   = EH (E  (p * ((recal) ? IntensityMap (sens) : m_ic), sens, m_fts), sens, m_fts) *
-					((recal) ? IntensityMap (sens) : m_ic);
+			q   = EH (E  (p * m_ic, sens, m_fts), sens, m_fts) * m_ic;
+
 			if (m_lambda)
 				q  += m_lambda * p;
 			
 			ts  = rn / p.dotc(q);
 			x  += ts * p;
             if (m_verbose)
-                vc.push_back (x * ((recal) ? IntensityMap (sens) : m_ic));
+                vc.push_back (x * m_ic);
 			r  -= ts * q;
 			rno = rn;
 			rn  = pow(norm(r), 2.0);
@@ -288,12 +295,12 @@ public:
 
         if (m_verbose) {
             size_t cpsz = numel(x);
-            x = zeros<std::complex<T> > (size(x,0), size(x,1), (m_dim == 3) ? size(x,2) : 1, vc.size());
+            x = zeros<CT> (size(x,0), size(x,1), (m_dim == 3) ? size(x,2) : 1, vc.size());
             for (size_t i = 0; i < vc.size(); i++)
-                memcpy (&x[i*cpsz], &(vc[i][0]), cpsz*sizeof(std::complex<T>));
+                memcpy (&x[i*cpsz], &(vc[i][0]), cpsz*sizeof(CT));
             return x;
         } else        
-            return x * ((recal) ? IntensityMap (sens) : m_ic);
+            return x * m_ic;
 
 	}
 	
@@ -304,8 +311,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	operator* (const Matrix< std::complex<T> >& m) const {
+	virtual Matrix<CT>
+	operator* (const Matrix<CT>& m) const {
 		return Trafo(m);
 	}
 	
@@ -316,8 +323,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	operator->* (const Matrix< std::complex<T> >& m) const {
+	virtual Matrix<CT>
+	operator->* (const Matrix<CT>& m) const {
 		return Adjoint (m);
 	}
 
@@ -329,9 +336,9 @@ private:
 	bool      m_initialised; /**< All initialised? */
     bool      m_verbose;
 
-	Matrix< std::complex<T> > m_sm;          /**< Sensitivities */
+	Matrix<CT> m_sm;          /**< Sensitivities */
 	Matrix<T> m_ic;     /**< Intensity correction I(r) */
-	Matrix< std::complex<T> > m_pc; /**< @brief Correction phase */
+	Matrix<CT> m_pc; /**< @brief Correction phase */
 
 	std::string m_smname;
 	std::string m_wname;

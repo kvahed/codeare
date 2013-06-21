@@ -6,7 +6,7 @@ template<class T> void exp_check () {
 
     using namespace codeare::matrix::arithmetic;
     
-    Matrix<T> rhs = 10. * ( rand<T>(3,4) + 1.0);
+    Matrix<T> rhs = 10. * ( rand<T,uniform>(3,4) + 1.0);
     Matrix<size_t> lhs;
 
     lhs = (Matrix<size_t>) floor (rhs);

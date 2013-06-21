@@ -26,6 +26,8 @@ struct SSETraits<size_t> {
      */
     static inline Register
     loada (const Type* p) {
+    	Register r;
+    	return r;
     }
 
     /**
@@ -33,6 +35,8 @@ struct SSETraits<size_t> {
      */
     static inline Register
     loadu (const Type* p) {
+    	Register r;
+    	return r;
     }
 
     /**
@@ -175,6 +179,8 @@ struct SSETraits<short> {
      */
     static inline Register
     loada (const Type* p) {
+    	Register r;
+    	return r;
     }
 
     /**
@@ -182,6 +188,8 @@ struct SSETraits<short> {
      */
     static inline Register
     loadu (const Type* p) {
+    	Register r;
+    	return r;
     }
 
     /**
@@ -326,6 +334,8 @@ struct SSETraits<long> {
      */
     static inline Register
     loada (const Type* p) {
+    	Register r;
+    	return r;
     }
 
     /**
@@ -333,6 +343,8 @@ struct SSETraits<long> {
      */
     static inline Register
     loadu (const Type* p) {
+    	Register r;
+    	return r;
     }
 
     /**

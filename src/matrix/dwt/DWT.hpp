@@ -73,15 +73,9 @@ class DWT {
               m_sl (sl),
               temp (container<T>(omp_get_num_threads() * 8 * sl)),
               m_wl_scale (wl_scale),
-              _fam(wl_fam)
-        {
+              _fam(wl_fam) {
 
             setupWlFilters (wl_fam, wl_mem, m_lpf_d, m_lpf_r, m_hpf_d, m_hpf_r);
-
-            std::cout << " lpf_d: " << m_lpf_d [0] << ", " << m_lpf_d [1] << std::endl;
-            std::cout << " lpf_r: " << m_lpf_r [0] << ", " << m_lpf_r [1] << std::endl;
-            std::cout << " hpf_d: " << m_hpf_d [0] << ", " << m_hpf_d [1] << std::endl;
-            std::cout << " hpf_r: " << m_hpf_r [0] << ", " << m_hpf_r [1] << std::endl;
 
         }
 
@@ -103,13 +97,12 @@ class DWT {
         Matrix<T>
         Trafo        (const Matrix<T>& m)
         {
-
         	if (_fam == ID)
         		return m;
 
             assert (m.Size () <= m_sl*m_sl);
 
-            Matrix<T> res (m.DimVector());
+            Matrix<T> res (m.Dim());
 
 //            if (m_dim == 2)
 //            {
@@ -148,7 +141,7 @@ class DWT {
 
             assert (m.Size () <= m_sl*m_sl);
 
-            Matrix <T> res (m.DimVector());
+            Matrix <T> res (m.Dim());
 
 //            if (m_dim == 2)
 //            {
@@ -179,9 +172,8 @@ class DWT {
          */
         inline
         Matrix<T>
-        operator*    (const Matrix<T>& m)
-        {
-            return Trafo(m);
+        operator*    (const Matrix<T>& m) {
+            return (_fam == ID) ? m :  Trafo(m);
         }
 
 
@@ -193,9 +185,8 @@ class DWT {
          */
         inline
         Matrix<T>
-        operator->* (const Matrix<T>& m)
-        {
-            return Adjoint(m);
+        operator->* (const Matrix<T>& m) {
+            return (_fam == ID) ? m :  Trafo(m);
         }
 
 
@@ -248,7 +239,7 @@ class DWT {
         dpwt2		(const Matrix <T> & sig, const int ell, const int J, container<T>& temp)
         {
 
-            Matrix <T> res (sig.DimVector ());
+            Matrix <T> res (sig.Dim ());
 
             T *wcplo,*wcphi,*templo,*temphi;
 
@@ -366,7 +357,7 @@ class DWT {
          *
          * @param  signal       Signal to be transformed.
          * @param  side_length  Side length of current DWT level.
-         * @param  dwt_hgih     Resulting DWT.
+         * @param  dwt_high     Resulting DWT.
          */
         void
         downhi			(const T * const signal, const int side_length, T * const dwt_high)
@@ -533,7 +524,7 @@ class DWT {
         idpwt2		(const Matrix <T> & wc, const int ell, const int J, container<T>& temp)
         {
 
-            Matrix <T> img (wc.DimVector());
+            Matrix <T> img (wc.Dim());
 
             const int nr = wc.Height();
             const int nc = wc.Width();

@@ -3,10 +3,10 @@
 #include "Creators.hpp"
 #include "Lapack.hpp"
 
-template<class T,class S> void gemv_check () {
+template<class T> void gemv_check () {
 
-    Matrix<T> A = rand<T> (4,4);
-    Matrix<S> b = rand<S> (4,1);
+    Matrix<T> A = rand<T,uniform> (4,4);
+    Matrix<T> b = rand<T,uniform> (4,1);
     
 #ifdef VERBOSE
     std::cout << "A=\n" << A;
@@ -24,10 +24,10 @@ template<class T,class S> void gemv_check () {
 
 int main (int args, char** argv) {
 
-    gemv_check<cxfl,cxfl>();
-    gemv_check<cxdb,cxdb>();
-    gemv_check<float,float>();
-    gemv_check<double,double>();
+    gemv_check<cxfl>();
+    gemv_check<cxdb>();
+    gemv_check<float>();
+    gemv_check<double>();
     
     return 0;
     

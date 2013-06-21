@@ -41,7 +41,7 @@ namespace RRStrategy {
 		 * @brief Default constructor
 		 */
 		SENSE  () :
-			m_nthreads(8), m_af(1), m_cs(0), m_compgfm(false) {};
+			m_nthreads(8), m_af(1), m_cs(0), m_compgfm(false), m_lambda(0.0) {};
 		
 		
 		/**

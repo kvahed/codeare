@@ -1,8 +1,9 @@
-AM_CXXFLAGS = -I../ -I../linalg -I../../ -I../../misc
+AM_CXXFLAGS = -I../ -I../linalg -I../../ -I../../misc -I../io
 COMMON = ../Matrix.hpp Trigonometry.hpp AVXTraits.hpp SSE2Traits.hpp SIMD.hpp SIMDTraits.hpp
 
 TESTS  = t_sin t_cos t_tan t_exp t_asin t_acos t_atan t_atan2 t_sinh t_cosh t_tanh t_log t_flipud t_fliplr
-TESTS += t_log10 t_emul t_ediv t_eadd t_esub t_nrmse t_epow t_floor t_round t_ceil t_size t_resize #t_gtoreq
+TESTS += t_log10 t_emul t_ediv t_eadd t_esub t_nrmse t_epow t_floor t_round t_ceil t_size t_resize t_isnan 
+TESTS += #t_gtoreq
 
 check_PROGRAMS = $(TESTS)
 
@@ -33,4 +34,6 @@ t_size_SOURCES = $(COMMON) t_size.cpp
 t_flipud_SOURCES = $(COMMON) t_flipud.cpp
 t_fliplr_SOURCES = $(COMMON) t_fliplr.cpp
 t_resize_SOURCES = $(COMMON) t_resize.cpp
+t_resize_SOURCES = $(COMMON) t_isnan.cpp
+
 

@@ -52,9 +52,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = reconserver$(EXEEXT) lclient$(EXEEXT) rclient$(EXEEXT)
-@USE_NFFT3_TRUE@am__append_1 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
-@USE_NFFT3_TRUE@am__append_2 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
+bin_PROGRAMS = lclient$(EXEEXT) $(am__EXEEXT_1)
+@NETWORKING_TRUE@am__append_1 = rclient reconserver
+@NETWORKING_TRUE@am__append_2 = libremote.la 
+@USE_NFFT3_TRUE@am__append_3 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
+#-dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la 
+@USE_NFFT3_TRUE@am__append_4 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 subdir = src
 DIST_COMMON = $(srcdir)/Loader.hpp.in $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
@@ -92,6 +95,8 @@ libremote_la_OBJECTS = $(am_libremote_la_OBJECTS)
 libremote_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libremote_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@NETWORKING_TRUE@am_libremote_la_rpath =
+@NETWORKING_TRUE@am__EXEEXT_1 = rclient$(EXEEXT) reconserver$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = options.$(OBJEXT) Workspace.$(OBJEXT) \
@@ -241,6 +246,7 @@ LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
+MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -349,20 +355,15 @@ COMMON = RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h 
 NETWORKING_COMMON = RRSModule.hh RRSModuleSK.cc 
 
 # Rules for clients
-noinst_LTLIBRARIES = libremote.la liblocal.la
+noinst_LTLIBRARIES = liblocal.la $(am__append_2)
 
 # Local client (lclient)
 liblocal_la_SOURCES = LocalConnector.hpp LocalConnector.cpp testclt.cpp
 liblocal_la_CXXFLAGS = $(AM_CXXFLAGS) -DLOCAL
 lclient_SOURCES = $(COMMON)
 lclient_LDFLAGS = liblocal.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) \
-	$(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -dlopen \
-	modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen \
-	modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen \
-	modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la \
-	-dlopen modules/KTPoints.la -dlopen \
-	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
-	-dlopen modules/DirectMethod.la $(am__append_1)
+	$(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ $(am__append_3)
+# -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la 
 lclient_DEPENDENCIES = liblocal.la 
 
 # Remote client (rclient)
@@ -374,14 +375,9 @@ rclient_DEPENDENCIES = libremote.la
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp reconserver.cpp
-reconserver_LDFLAGS = $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -dlopen \
-	modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen \
-	modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen \
-	modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la \
-	-dlopen modules/KTPoints.la -dlopen \
-	modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la \
-	-dlopen modules/DirectMethod.la tinyxml/libtinyxml.la \
-	-lomniORB4 -lomnithread -lomniDynamic4 $(am__append_2)
+reconserver_LDFLAGS = $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -lomniORB4 \
+	-lomnithread -lomniDynamic4 tinyxml/libtinyxml.la \
+	$(am__append_4)
 EXTRA_DIST = RRSModule.idl Makefile.win32 common.h
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 SUBDIRS = tinyxml modules matrix 
@@ -390,7 +386,7 @@ all: config.h
 
 .SUFFIXES:
 .SUFFIXES: .cc .cpp .lo .o .obj
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -415,9 +411,9 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
-$(top_srcdir)/configure:  $(am__configure_deps)
+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
@@ -428,7 +424,7 @@ config.h: stamp-h1
 stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status src/config.h
-$(srcdir)/config.h.in:  $(am__configure_deps) 
+$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
 	rm -f stamp-h1
 	touch $@
@@ -451,7 +447,7 @@ clean-noinstLTLIBRARIES:
 liblocal.la: $(liblocal_la_OBJECTS) $(liblocal_la_DEPENDENCIES) $(EXTRA_liblocal_la_DEPENDENCIES) 
 	$(liblocal_la_LINK)  $(liblocal_la_OBJECTS) $(liblocal_la_LIBADD) $(LIBS)
 libremote.la: $(libremote_la_OBJECTS) $(libremote_la_DEPENDENCIES) $(EXTRA_libremote_la_DEPENDENCIES) 
-	$(libremote_la_LINK)  $(libremote_la_OBJECTS) $(libremote_la_LIBADD) $(LIBS)
+	$(libremote_la_LINK) $(am_libremote_la_rpath) $(libremote_la_OBJECTS) $(libremote_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \

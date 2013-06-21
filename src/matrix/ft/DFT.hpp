@@ -37,13 +37,13 @@
  * @param   m     TO be shifted
  * @return        Shifted
  */
-template<class T> inline Matrix<T>
+template <class T> inline Matrix<T>
 fftshift (const Matrix<T>& m, const bool& fw = true) {
 
 	assert (isvec(m) || is2d(m) || is3d(m));
 
-	Matrix<size_t> tmp = resize(size(m),INVALID_DIM,1);
-	for (size_t i = 0; i<INVALID_DIM; i++)
+	Matrix<size_t> tmp = resize(size(m),ndims(m),1);
+	for (size_t i = 0; i<ndims(m); i++)
 		if (tmp[i] == 0)
 			tmp[i] = 1;
 
@@ -148,7 +148,7 @@ hannwindow (const Matrix<size_t>& size, const T& t) {
 /**
  * @brief Matrix templated 1-3D Discrete Cartesian Fourier transform
  */
-template <class T>
+template <class T=float>
 class DFT : public FT<T> {
 
 
@@ -194,10 +194,10 @@ public:
 			n[i]  = (int) sl [rank-1-i];
 			m_N  *= n[i];
 		}
-		Matrix<size_t> tmp = resize(sl,INVALID_DIM,1);
-		for (size_t i = 0; i<INVALID_DIM; i++)
-			if (tmp[i] == 0)
-				tmp[i] = 1;
+
+		Matrix<size_t> tmp = resize(sl,3,1);
+		for (size_t i = 0; i < 3; ++i)
+			tmp[i] = (tmp[i] > 0) ? tmp[i] : 1;
 
 		d = tmp.Container(); // data side lengths
 		c = (floor(tmp/2)).Container(); // center coords
@@ -243,10 +243,10 @@ public:
 			m_N  *= n[i];
 		}
 		
-		Matrix<size_t> tmp (INVALID_DIM,1);
-		for (i = 0; i <       rank; i++)
+		Matrix<size_t> tmp (3,1);
+		for (i = 0; i < rank; ++i)
 			tmp[i] = sl;
-		for (     ; i< INVALID_DIM; i++)
+		for (     ; i < 3;    ++i)
 			tmp[i] = 1;
 
 		d = tmp.Container(); // data side lengths

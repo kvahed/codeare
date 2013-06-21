@@ -6,7 +6,7 @@ template<class T>
 void epow_check () {
 
 	float p = 2.0;
-    Matrix<T> A = rand<T>(3,4);
+    Matrix<T> A = rand<T,uniform>(3,4);
     Matrix<T> C, D;
 
 #ifdef VERBOSE
