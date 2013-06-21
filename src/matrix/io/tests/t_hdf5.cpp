@@ -71,6 +71,8 @@ int main (int args, char** argv) {
 	if (!check<short>())
 		return 1;
 
+	Matrix<unsigned int,SHM> MUI;
+
 	return 0;
 
 }
