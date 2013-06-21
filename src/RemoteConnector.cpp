@@ -26,6 +26,7 @@
 #include <assert.h>
 #include <complex>
 
+
 namespace RRClient {
 
 
@@ -101,10 +102,8 @@ namespace RRClient {
 	
 	
 	RemoteConnector::~RemoteConnector         ()            {
-		
 		m_rrsi->CleanUp();
 		m_orb->destroy();
-		
 	}
 	
 	
@@ -129,305 +128,35 @@ namespace RRClient {
 	
 	error_code 
 	RemoteConnector::Prepare  (const char* name)  {
-		
 		return (error_code) m_rrsi->Prepare (name);
-		
 	}
 	
 	
 	
 	error_code 
 	RemoteConnector::Process  (const char* name)  {
-		
 		return  (error_code) m_rrsi->Process (name);
-		
 	}
 	
 	
 	
 	error_code
 	RemoteConnector::Finalise (const char* name) {
-		
 		return (error_code) m_rrsi->Finalise(name);
-		
 	}
 
 	
 	
-	long 
+	inline long
 	RemoteConnector::GetSize (const longs dims) const {
 		
 		long size = 1;
-		
+
 		for (int i = 0; i < dims.length(); i++)
 			size *= dims[i];
-		
+
 		return size;
 		
 	}
-	
-	
-	
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, const Matrix< std::complex<float> >& M) const {
-		
-		cxfl_data r;
-		size_t nd = M.NDim();
-		
-		r.dims.length(nd);
-		r.res.length(nd);
-		
-		for (int j = 0; j < nd; j++) {
-			r.dims[j] = M.Dim(j);
-			r.res[j]  = M.Res(j);
-		}
-		
-		r.vals.length(2 * M.Size());
-		
-		memcpy (&r.vals[0], M.Memory(), r.vals.length() * sizeof(float));
-		m_rrsi->set_cxfl(name.c_str(), r);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix< std::complex<float> >& m) const {
-		
-		cxfl_data rp;
-		m_rrsi->get_cxfl(name.c_str(), rp);
-		
-		std::vector<size_t> mdims (rp.dims.length());
-		std::vector<float>  mress (rp.dims.length());
-		
-		for (int j = 0; j < rp.dims.length(); j++) {
-			mdims[j] = rp.dims[j];
-			mress[j] = rp.res[j]; 
-		}
-		
-		m = Matrix<cxfl> (mdims, mress);
-		
-		memcpy (&m[0], &rp.vals[0], rp.vals.length() * sizeof(float));
-		
-	}
-	
-
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, const Matrix<cxdb>& M) const {
-		
-		cxdb_data r; 
-		size_t nd = M.NDim();
-		
-		r.dims.length(nd);
-		r.res.length(nd);
-		
-		for (int j = 0; j < nd; j++) {
-			r.dims[j] = M.Dim(j);
-			r.res[j]  = M.Res(j);
-		}
-		
-		r.vals.length(2 * M.Size());
-		
-		memcpy (&r.vals[0], M.Memory(), r.vals.length() * sizeof(double));
-		
-		m_rrsi->set_cxdb(name.c_str(), r);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<cxdb>& m) const {
-		
-		cxdb_data rp;
-		m_rrsi->get_cxdb(name.c_str(), rp);
-		size_t nd = rp.dims.length();
-		
-		std::vector<size_t> mdims (nd);
-		std::vector<float>  mress (nd);
-		
-		for (int j = 0; j < nd; j++) {
-			mdims[j] = rp.dims[j];
-			mress[j] = rp.res[j]; 
-		}
-		
-		m = Matrix<cxdb> (mdims, mress);
-		
-		memcpy (&m[0], &rp.vals[0], rp.vals.length() * sizeof(double));
-		
-	}
-	
-
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, const Matrix<double>& m) const {
-		
-		rldb_data r;
-		size_t nd = m.NDim();
-		
-		r.dims.length(nd); r.res.length(nd);
-		
-		for (int j = 0; j < nd; j++) { r.dims[j] = m.Dim(j);
-			r.res[j] = m.Res(j); }
-		
-		r.vals.length(m.Size());
-		
-		for (int i = 0; i < m.Size(); i++) r.vals[i] = m[i];
-		
-		m_rrsi->set_rldb(name.c_str(), r);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<double>& m) const {
-		
-		rldb_data r;
-		m_rrsi->get_rldb(name.c_str(), r);
-		size_t nd = r.dims.length();
-
-		
-		std::vector<size_t> mdims (nd);
-		std::vector<float>  mress (nd);
-		
-		for (int j = 0; j < nd; j++) {
-			mdims[j] = r.dims[j];
-			mress[j] = r.res[j]; 
-		}
-		
-		m = Matrix<double> (mdims, mress);
-		
-		for (int i = 0; i < GetSize(r.dims); i++) m[i] = r.vals[i];
-		
-	}
-	
-	
-	
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, const Matrix<float>& m) const {
-		
-		rlfl_data r;
-		size_t nd = m.NDim();
-		
-		r.dims.length(nd);
-		r.res.length(nd);
-		
-		for (int j = 0; j < nd; j++) { r.dims[j] = m.Dim(j);
-			r.res[j] = m.Res(j); }
-		
-		r.vals.length(m.Size());
-		
-		for (int i = 0; i < m.Size(); i++) r.vals[i] = m[i];
-		
-		m_rrsi->set_rlfl(name.c_str(), r);
-		
-	}
-	
-
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<float>& m) const {
-		
-		rlfl_data r;
-		m_rrsi->get_rlfl(name.c_str(), r);
-		size_t nd = r.dims.length();
-
-		std::vector<size_t> mdims (nd);
-		std::vector<float>  mress (nd);
-		
-		for (int j = 0; j < nd; j++) {
-			mdims[j] = r.dims[j];
-			mress[j] = r.res[j]; 
-		}
-		
-		m = Matrix<float> (mdims, mress);
-		
-		for (int i = 0; i < GetSize(r.dims); i++) m[i] = r.vals[i];
-		
-	}
-	
-	
-	
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, const Matrix<short>& m) const {
-		
-		shrt_data p;
-		size_t nd = m.NDim();
-
-		p.dims.length(nd);
-		p.res.length(nd);
-		
-		for (int j = 0; j < nd; j++) { p.dims[j] = m.Dim(j);
-			p.res[j] = m.Res(j); }
-		
-		p.vals.length(m.Size());
-		
-		for (int i = 0; i < m.Size(); i++) p.vals[i] = m[i];
-		
-		m_rrsi->set_shrt(name.c_str(), p);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<short>& m) const {
-		
-		shrt_data p;
-		m_rrsi->get_shrt(name.c_str(), p);
-		size_t nd = p.dims.length();
-		
-		std::vector<size_t> mdims (nd);
-		std::vector<float>  mress (nd);
-		
-		for (int j = 0; j < nd; j++) {
-			mdims[j] = p.dims[j];
-			mress[j] = p.res[j]; 
-		}
-		
-		m = Matrix<short> (mdims, mress);
-		
-		for (int i = 0; i < GetSize(p.dims); i++) m[i] = p.vals[i];
-		
-	}
-
-
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, const Matrix<long>& m) const {
-		
-		long_data p;
-		size_t nd = m.NDim();
-
-		p.dims.length(nd);
-		p.res.length(nd);
-		
-		for (int j = 0; j < nd; j++) { p.dims[j] = m.Dim(j);
-			p.res[j] = m.Res(j); }
-		
-		p.vals.length(m.Size());
-		
-		for (int i = 0; i < m.Size(); i++) p.vals[i] = m[i];
-		
-		m_rrsi->set_long(name.c_str(), p);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<long>& m) const {
-		
-		long_data p;
-		m_rrsi->get_long(name.c_str(), p);
-		size_t nd = p.dims.length();
-		
-		std::vector<size_t> mdims (nd);
-		std::vector<float>  mress (nd);
-		
-		for (int j = 0; j < nd; j++) {
-			mdims[j] = p.dims[j];
-			mress[j] = p.res[j]; 
-		}
-		
-		m = Matrix<long> (mdims, mress);		
-
-		for (int i = 0; i < GetSize(p.dims); i++) m[i] = p.vals[i];
-		
-	}
-
 
 }

@@ -5,25 +5,7 @@
 #include "SIMDTraits.hpp"
 #include "AlignmentAllocator.hpp"
 
-#include <vector>
-
-
-#if defined USE_VALARRAY
-    #include <valarray>
-    #define VECTOR_TYPE(A) std::valarray<A>
-    #define VECTOR_CONSTR(A,B) std::valarray<A>(B)
-#else
-    #include "AlignmentAllocator.hpp"
-    #if defined __AVX__
-        #define ALIGNEMENT 32
-    #elif defined __SSE2__
-        #define ALIGNEMENT 16
-    #endif
-    #define VECTOR_TYPE(A) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >
-    #define VECTOR_CONSTR(A,B) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B)
-    #define VECTOR_CONSTR_VAL(A,B,C) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B,C)
-#endif
-
+#include "Container.hpp"
 
 #include <math.h>
 #include <stdio.h>
