@@ -47,7 +47,7 @@ template<> struct TypeTraits<float> {
 	typedef float  T;
 	typedef float RT;
 	typedef cxfl  CT;
-	static const bool Valid;
+	static const bool Supported;
 	inline static const std::string Name () {
 		return std::string("single");
 	}
@@ -60,16 +60,13 @@ template<> struct TypeTraits<float> {
 	inline static const bool IsReal() {
 		return (typeid(T) == typeid(RT));
 	}
-	inline static const bool Validate () {
-		return true;
-	}
 };
 
 template<> struct TypeTraits<double> {
 	typedef double  T;
 	typedef double RT;
 	typedef cxdb  CT;
-	static const bool Valid;
+	static const bool Supported;
 
 	inline static const std::string Name () {
 		return std::string("double");
@@ -83,16 +80,14 @@ template<> struct TypeTraits<double> {
 	inline static const bool IsReal() {
 		return (typeid(T) == typeid(RT));
 	}
-	inline static const bool Validate () {
-		return true;
-	}
+
 };
 
 template<> struct TypeTraits<cxfl> {
 	typedef cxfl  T;
 	typedef float RT;
 	typedef cxfl  CT;
-	static const bool Valid;
+	static const bool Supported;
 	inline static const std::string Name () {
 		return std::string("complex single");
 	}
@@ -114,7 +109,7 @@ template<> struct TypeTraits<cxdb> {
 	typedef cxdb  T;
 	typedef double RT;
 	typedef cxdb  CT;
-	static const bool Valid;
+	static const bool Supported;
 	inline static const std::string Name () {
 		return std::string("complex double");
 	}
@@ -127,16 +122,13 @@ template<> struct TypeTraits<cxdb> {
 	inline static const bool IsReal() {
 		return (typeid(T) == typeid(RT));
 	}
-	inline static const bool Validate () {
-		return true;
-	}
 };
 
 template<> struct TypeTraits<short> {
 	typedef short  T;
 	typedef short  RT;
 	typedef void   CT;
-	static const bool Valid;
+	static const bool Supported;
 	inline static const std::string Name () {
 		return std::string("short int");
 	}
@@ -149,16 +141,13 @@ template<> struct TypeTraits<short> {
 	inline static const bool IsReal() {
 		return (typeid(T) == typeid(RT));
 	}
-	inline static const bool Validate () {
-		return true;
-	}
 };
 
 template<> struct TypeTraits<unsigned char> {
 	typedef unsigned char  T;
 	typedef unsigned char  RT;
 	typedef void   CT;
-	static const bool Valid;
+	static const bool Supported;
 	inline static const std::string Name () {
 		return std::string("codeare bool");
 	}
@@ -171,9 +160,6 @@ template<> struct TypeTraits<unsigned char> {
 	inline static const bool IsReal() {
 		return (typeid(T) == typeid(RT));
 	}
-	inline static const bool Validate () {
-		return Valid;
-	}
 };
 
 
@@ -181,7 +167,7 @@ template<> struct TypeTraits<long> {
 	typedef long   T;
 	typedef long   RT;
 	typedef void   CT;
-	static const bool Valid;
+	static const bool Supported;
 	inline static const std::string Name () {
 		return std::string("long int");
 	}
@@ -194,16 +180,13 @@ template<> struct TypeTraits<long> {
 	inline static const bool IsReal() {
 		return (typeid(T) == typeid(RT));
 	}
-	inline static const bool Validate () {
-		return true;
-	}
 };
 
 template<> struct TypeTraits<size_t> {
 	typedef size_t  T;
 	typedef size_t RT;
 	typedef void   CT;
-	static const bool Valid;
+	static const bool Supported;
 	inline static const std::string Name () {
 		return std::string("size type");
 	}
@@ -216,9 +199,7 @@ template<> struct TypeTraits<size_t> {
 	inline static const bool IsReal() {
 		return (typeid(T) == typeid(RT));
 	}
-	inline static const bool Validate () {
-		return true;
-	}
+
 };
 
 

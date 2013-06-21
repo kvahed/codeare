@@ -95,7 +95,7 @@
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
  */
-template <class T, paradigm P=SHM, const bool& b = TypeTraits<T>::Valid>
+template <class T, paradigm P=SHM, const bool& b = TypeTraits<T>::Supported>
 class Matrix  : public SmartObject {
 	
 	
