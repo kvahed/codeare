@@ -42,7 +42,30 @@ using namespace std;
 
 
 namespace RRServer {
+
+
+	template<class T> struct RemoteTraits;
 	
+	template<> struct RemoteTraits<rlfl_data> {
+		typedef float Type;
+	};
+	template<> struct RemoteTraits<rldb_data> {
+		typedef double Type;
+	};
+	template<> struct RemoteTraits<cxfl_data> {
+		typedef cxfl Type;
+	};
+	template<> struct RemoteTraits<cxdb_data> {
+		typedef cxdb Type;
+	};
+	template<> struct RemoteTraits<shrt_data> {
+		typedef short Type;
+	};
+	template<> struct RemoteTraits<long_data> {
+		typedef long Type;
+	};
+
+
 	/**
 	 * @brief Servant implementation <br/>
 	 *        Perform duties on remote server
@@ -53,6 +76,7 @@ namespace RRServer {
 		public FunctorContainer {
 		
 		
+
 	public:
 		
 		
@@ -123,7 +147,51 @@ namespace RRServer {
 		 */
 		virtual short
 		CleanUp       ();
-		
+
+
+		template <class CORBA_Type> void
+		SetMatrix (const char* name, const CORBA_Type& c) {
+
+			typedef typename RemoteTraits<CORBA_Type>::Type T;
+
+			size_t nd = c.dims.length();
+			std::vector<size_t> mdims (nd);
+			std::vector<float>  mress (nd);
+
+			for (int i = 0; i < nd; i++) {
+				mdims[i] = c.dims[i];
+				mress[i] = c.res[i];
+			}
+
+			Matrix<T> pm (mdims, mress);
+			memcpy (&pm[0], &c.vals[0], pm.Size() * sizeof(T));
+
+			Workspace::Instance().SetMatrix(name, pm);
+
+		}
+
+		template <class CORBA_Type> void
+		GetMatrix (const char* name, CORBA_Type& c) {
+
+			typedef typename RemoteTraits<CORBA_Type>::Type T;
+
+			Matrix<T> tmp = Workspace::Instance().Get<T> (name);
+			size_t cpsz = tmp.Size();
+			size_t nd = tmp.NDim();
+			c.dims.length(nd);
+			c.res.length (nd);
+
+			for (int j = 0; j < nd; j++) {
+				c.dims[j] = tmp.Dim(j);
+				c.res[j]  = tmp.Res(j);
+			}
+
+			c.vals.length(TypeTraits<T>::IsComplex() ? 2 * cpsz : cpsz);
+			memcpy (&c.vals[0], &tmp[0], tmp.Size() * sizeof(T));
+
+		}
+
+
 
 		/**
 		 * @brief       Retreive measurement data

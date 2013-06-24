@@ -5,6 +5,8 @@
 #include <exception>
 #include <cstddef>
 #include <new>
+#include <complex>
+#include <xmmintrin.h>
 
 template<std::size_t alignment>
 struct static_allocator {

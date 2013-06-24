@@ -8,12 +8,37 @@
 #ifndef CONTAINER_HPP_
 #define CONTAINER_HPP_
 
-#include "SIMD.hpp"
-
 #include <iostream>
 #include <assert.h>
 #include <string.h>
 #include <math.h>
+
+#include <vector>
+
+#if defined USE_VALARRAY
+    #include <valarray>
+    #define VECTOR_TYPE(A) std::valarray<A>
+    #define VECTOR_CONSTR(A,B) std::valarray<A>(B)
+#else
+    #include "AlignmentAllocator.hpp"
+    #if defined __AVX__
+        #define ALIGNEMENT 32
+    #elif defined __SSE2__
+        #define ALIGNEMENT 16
+    #endif
+    #define VECTOR_TYPE(A) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >
+    #define VECTOR_CONSTR(A,B) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B)
+    #define VECTOR_CONSTR_VAL(A,B,C) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B,C)
+#endif
+
+template<class T> inline static std::ostream&
+operator<< (std::ostream& os, const std::vector<T> v) {
+    for (size_t i = 0; i < v.size(); ++i)
+        os << v[i] << " ";
+    return os;
+}
+
+typedef unsigned char cbool;
 
 /**
  * @brief   Memory paradigm (share, opencl or message passing)

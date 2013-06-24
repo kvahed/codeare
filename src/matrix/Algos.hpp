@@ -198,10 +198,10 @@ isempty (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Matrix of booleans true where NaN
  */
-template <class T> inline  Matrix<unsigned short>
+template <class T> inline  Matrix<cbool>
 isnan (const Matrix<T>& M) {
 
-    Matrix<unsigned short> res (M.Dim());
+    Matrix<cbool> res (M.Dim());
 	size_t i = numel(M);
 
 	while (i--)
@@ -218,10 +218,10 @@ isnan (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Matrix of booleans true where inf
  */
-template <class T> inline  Matrix<unsigned short>
+template <class T> inline  Matrix<cbool>
 isinf (const Matrix<T>& M) {
 
-    Matrix<unsigned short> res (M.Dim());
+    Matrix<cbool> res (M.Dim());
 	size_t i = numel(M);
 
 	while (i--)
@@ -238,10 +238,10 @@ isinf (const Matrix<T>& M) {
  * @param  M    Matrix
  * @return      Matrix of booleans true where inf
  */
-template <class T> inline  Matrix<unsigned short>
+template <class T> inline  Matrix<cbool>
 isfinite (const Matrix<T>& M) {
 
-    Matrix<unsigned short> res (M.Dim());
+    Matrix<cbool> res (M.Dim());
 	size_t i = numel(M);
 
 	
@@ -671,8 +671,8 @@ resize (const Matrix<T>& M, const size_t& sz) {
 	Matrix<T> res = zeros<T> (sz,1);
 	size_t copysz = MIN(numel(M), sz);
 
-    typename container<T>::      iterator rb = res.ContainerIterator ();
-    typename container<T>::const_iterator mb =   M.ContainerIterator ();
+    typename container<T>::      iterator rb = res.Begin ();
+    typename container<T>::const_iterator mb =   M.Begin ();
     
     std::copy (mb, mb+copysz, rb);
 
@@ -697,8 +697,8 @@ resize (const Matrix<T>& M, const Matrix<size_t>& sz) {
 	Matrix<T> res  = zeros<T>(sz);
 	size_t copysz  = MIN(numel(M), numel(res));
 
-    typename container<T>::      iterator rb = res.ContainerIterator ();
-    typename container<T>::const_iterator mb =   M.ContainerIterator ();
+    typename container<T>::      iterator rb = res.Begin ();
+    typename container<T>::const_iterator mb =   M.Begin ();
 
     std::copy (mb, mb+copysz, rb);
 
