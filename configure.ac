@@ -881,6 +881,8 @@ AC_FUNC_MMAP
 
 AH_TEMPLATE([HAVE_SCALAPACK], [Define to 1 if we could link against scalapack])
 ACX_SCALAPACK
+AM_CONDITIONAL([USE_SCALAPACK],    [test "$HAVE_SCALAPACK" -eq 1])
+
 
 # Generate files
 AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile

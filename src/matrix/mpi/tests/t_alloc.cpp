@@ -16,7 +16,6 @@ check_alloc() {
     Grid& gd = *Grid::Instance();
 	Matrix<T,MPI> A (16,16);
     A = rand<T,uniform>(size(A));
-    std::cout << A << std::endl;
     return true;
 
 }

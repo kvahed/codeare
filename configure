@@ -638,6 +638,8 @@ ac_header_list=
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+USE_SCALAPACK_FALSE
+USE_SCALAPACK_TRUE
 SCALAPACK_LIBS
 LIBOBJS
 USE_GSL_FALSE
@@ -12077,10 +12079,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"c77d4631\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"8de8da06\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Fri Jun 21 15:13:59 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Jun 24 23:00:10 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -25684,6 +25686,15 @@ if test "x$SCALAPACK_LIBS" != x; then
 fi
 
 
+ if test "$HAVE_SCALAPACK" -eq 1; then
+  USE_SCALAPACK_TRUE=
+  USE_SCALAPACK_FALSE='#'
+else
+  USE_SCALAPACK_TRUE='#'
+  USE_SCALAPACK_FALSE=
+fi
+
+
 
 # Generate files
 ac_config_files="$ac_config_files src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile src/matrix/linalg/tests/Makefile src/matrix/ft/Makefile src/matrix/ft/tests/Makefile src/matrix/dwt/Makefile src/matrix/dwt/tests/Makefile src/matrix/io/tests/Makefile src/matrix/mpi/Makefile src/matrix/mpi/tests/Makefile"
@@ -25879,6 +25890,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_GSL_TRUE}" && test -z "${USE_GSL_FALSE}"; then
   as_fn_error $? "conditional \"USE_GSL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${USE_SCALAPACK_TRUE}" && test -z "${USE_SCALAPACK_FALSE}"; then
+  as_fn_error $? "conditional \"USE_SCALAPACK\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
