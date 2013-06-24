@@ -11,8 +11,8 @@ int main (int args, char** argv) {
     
     Matrix<cxfl> A = rand <cxfl, uniform> (32, 32), B;
     
-//    DWT<cxfl> wt (sl);
-//    B = wt * A;
+    DWT<cxfl> wt (sl);
+    B = wt * A;
     
     return 0;
     
