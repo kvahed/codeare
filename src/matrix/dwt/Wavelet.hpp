@@ -36,7 +36,7 @@ class WaveletTraits <T, WL_HAAR, wl_mem>
         {
             T norm_factor = 1 / sqrt (2);
             lpf_d [0] = 1; lpf_d [1] = 1;
-            lpf_d /= norm_factor;
+            lpf_d *= norm_factor;
         }
 
         /**

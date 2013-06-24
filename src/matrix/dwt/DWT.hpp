@@ -71,7 +71,7 @@ class DWT {
               m_hpf_d (wl_mem),
               m_hpf_r (wl_mem),
               m_sl (sl),
-              temp (container<T>(omp_get_num_threads() * 4 * sl)),
+              temp (container<T>(/*omp_get_num_threads()*/8 * 4 * sl)),
               m_wl_scale (wl_scale),
               _fam(wl_fam) {
 
@@ -186,7 +186,7 @@ class DWT {
         inline
         Matrix<T>
         operator->* (const Matrix<T>& m) {
-            return (_fam == ID) ? m :  Trafo(m);
+            return (_fam == ID) ? m :  Adjoint(m);
         }
 
 
@@ -253,7 +253,8 @@ class DWT {
             // loop over levels of DWT
             for (int j = (J-1); j >= ell; --j)
             {
-
+                std::cout << " .. . . " << std::endl;
+//size_t stride = 0;
 #pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (8)
             	{
             	size_t stride = 4*m_sl*omp_get_thread_num();
@@ -545,8 +546,8 @@ class DWT {
             // loop over levels of backwards DWT
             for (int j = ell; j < J; j++)
             {
-size_t stride = 0;
-#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop)
+//size_t stride = 0;
+#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop) num_threads (8)
             	{
             	size_t stride = 4*m_sl*omp_get_thread_num();
                 // loop over columns of image

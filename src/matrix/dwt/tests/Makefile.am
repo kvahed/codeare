@@ -8,4 +8,4 @@ t_dwt_SOURCES = $(COMMON) t_dwt.cpp
 t_dwt_LDFLAGS =  $(BLAS) $(LAPACK)
 
 t_dwt2_SOURCES = $(COMMON) t_dwt2.cpp
-t_dwt2_LDFLAGS =  $(BLAS) $(LAPACK)
+t_dwt2_LDFLAGS =  $(BLAS) $(LAPACK) ../../../tinyxml/libtinyxml.la
