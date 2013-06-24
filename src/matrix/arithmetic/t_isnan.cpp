@@ -3,8 +3,6 @@
 #include "Creators.hpp"
 #include "Print.hpp"
 
-#define VERBOSE
-
 template<class T> void isnan_check () {
 
     using namespace codeare::matrix::arithmetic;

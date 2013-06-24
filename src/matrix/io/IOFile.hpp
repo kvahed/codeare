@@ -4,6 +4,7 @@
 #include "Matrix.hpp"
 #include "Complex.hpp"
 #include "Params.hpp"
+#include "Algos.hpp"
 #include "Print.hpp"
 
 #include "tinyxml/tinyxml.h"
