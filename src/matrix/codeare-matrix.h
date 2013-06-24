@@ -34,10 +34,6 @@ enum IceDim {
 };
 #endif
 
-#ifndef INVALID_DIM
-    #define INVALID_DIM 16
-#endif
-
 #include "config.h"
 #include "common.h"
 #include "OMP.hpp"

@@ -199,14 +199,11 @@ isempty (const Matrix<T>& M) {
  * @return      Matrix of booleans true where NaN
  */
 template <class T> inline  Matrix<cbool>
-isnan (const Matrix<T>& M) {
+isinf (const Matrix<T>& M) {
 
     Matrix<cbool> res (M.Dim());
-	size_t i = numel(M);
-
-	while (i--)
+    for (size_t i = 0; i < res.Size(); ++i)
 		res[i] = (std::isinf(creal(M[i]))||std::isinf(cimag(M[i])));
-	
     return res;
 
 }
@@ -219,14 +216,11 @@ isnan (const Matrix<T>& M) {
  * @return      Matrix of booleans true where inf
  */
 template <class T> inline  Matrix<cbool>
-isinf (const Matrix<T>& M) {
+isnan (const Matrix<T>& M) {
 
     Matrix<cbool> res (M.Dim());
-	size_t i = numel(M);
-
-	while (i--)
-		res.Container()[i] = (std::isinf(creal(M[i]))||std::isinf(cimag(M[i])));
-	
+    for (size_t i = 0; i < res.Size(); ++i)
+		res.Container()[i] = (std::isnan(creal(M[i]))||std::isnan(cimag(M[i])));
     return res;
 
 }
@@ -437,8 +431,8 @@ resize (const Matrix<T>& M, const size_t& sc, const size_t& sl, const size_t& ss
  * @param   M       Matrix
  * @return          Dimension vector.
  */
-template <class T>  inline  Matrix<size_t>
-size               (const Matrix<T>& M) {
+template <class T,paradigm P>  inline  Matrix<size_t>
+size               (const Matrix<T,P>& M) {
 	
 	Matrix<size_t> ret (1,M.NDim());
 	for (size_t i = 0; i < numel(ret); ++i)

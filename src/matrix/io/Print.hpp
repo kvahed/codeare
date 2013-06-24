@@ -23,7 +23,6 @@
 #define __PRINT_HPP__
 
 #include "Matrix.hpp"
-#include "Algos.hpp"
 
 #include <sstream>
 
@@ -205,8 +204,8 @@ print (const Matrix<cbool>& M, std::ostream& os) {
 
 }
 
-template <class T> std::ostream&
-operator<< (std::ostream& os, const Matrix<T>& M) {
+template <class T,paradigm P> std::ostream&
+operator<< (std::ostream& os, const Matrix<T,P>& M) {
 
     print (M, os);
     return os;

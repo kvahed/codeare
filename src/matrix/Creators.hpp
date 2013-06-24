@@ -221,7 +221,6 @@ rand           (const Matrix<size_t>& sz) {
 
 }
 
-
 /**
  * @brief       Random square matrix
  *

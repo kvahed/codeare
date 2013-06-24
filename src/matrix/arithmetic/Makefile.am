@@ -34,6 +34,6 @@ t_size_SOURCES = $(COMMON) t_size.cpp
 t_flipud_SOURCES = $(COMMON) t_flipud.cpp
 t_fliplr_SOURCES = $(COMMON) t_fliplr.cpp
 t_resize_SOURCES = $(COMMON) t_resize.cpp
-t_resize_SOURCES = $(COMMON) t_isnan.cpp
+t_isnan_SOURCES = $(COMMON) t_isnan.cpp
 
 
