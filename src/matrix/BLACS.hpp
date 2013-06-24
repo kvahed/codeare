@@ -1,7 +1,7 @@
-#define BLACS_DEBUG 1
-
 #ifndef __BLACS_HPP__
 #define __BLACS_HPP__
+
+#include "config.h"
 
 #ifdef HAVE_MPI
 
@@ -29,7 +29,7 @@ extern "C" {
 // Local grid 
     int  numroc_    (int *n, int *nb, int *iproc, int *isrcproc, int *nprocs);
     
-};
+}
 
 #endif // HAVE_MPI
 

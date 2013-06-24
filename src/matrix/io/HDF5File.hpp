@@ -224,6 +224,8 @@ namespace io {
 			set.close   ();
 			space.close ();
 
+            return true;
+
 		}
 
 

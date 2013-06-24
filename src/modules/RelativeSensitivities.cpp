@@ -139,15 +139,15 @@ RelativeSensitivities::Process     () {
 
 	if (m_weigh_maps) {
 
-		for (int ch = 0; ch < size(txm,3); ch++)
-			for (int i = 0; i < numel(bets); i++)
+		for (size_t ch = 0; ch < size(txm,3); ch++)
+			for (size_t i = 0; i < numel(bets); i++)
 				txm[ch*numel(bets) + i] *= (double)bets[i];
 		
-		for (int ch = 0; ch < size(rxm,3); ch++)
-			for (int i = 0; i < numel(bets); i++)
+		for (size_t ch = 0; ch < size(rxm,3); ch++)
+			for (size_t i = 0; i < numel(bets); i++)
 				rxm[ch*numel(bets) + i] *= (double)bets[i];
 		
-		for (int i = 0; i < numel(bets); i++)
+		for (size_t i = 0; i < numel(bets); i++)
 			b0[i] *= (double)bets[i];
 		
 	}

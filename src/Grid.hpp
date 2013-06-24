@@ -2,6 +2,7 @@
 #define __GRID_HPP__
 
 #include "BLACS.hpp"
+#include "config.h"
 
 #include <ostream>
 
@@ -23,7 +24,7 @@ public:
     
     const char* c_str() const;
     
-    static Grid* Instance();
+    static Grid& Instance();
 
     virtual ~Grid();
     

@@ -177,7 +177,7 @@ public:
 
 		size_t rank = numel(sl);
 
-		int n [rank];
+		std::vector<int> n (rank);
 		
 		if (numel(mask) > 1) {
 			m_have_mask = true;
@@ -202,7 +202,7 @@ public:
 		d = tmp.Container(); // data side lengths
 		c = (floor(tmp/2)).Container(); // center coords
 
-		Allocate (rank, n);
+		Allocate (rank, &n[0]);
 		
 		m_initialised = true;
 
@@ -223,7 +223,7 @@ public:
 				 const Matrix<T>& b0 = Matrix<T>(1)) :
 		m_have_mask (false), m_have_pc (false) {
 
-		int n[rank];
+		std::vector<int> n (rank);
 		
 		size_t i;
 
@@ -252,7 +252,7 @@ public:
 		d = tmp.Container(); // data side lengths
 		c = (floor(tmp/2)).Container(); // center coords
 
-		Allocate (rank, n);
+		Allocate (rank, &n[0]);
 		
 		m_initialised = true;
 	

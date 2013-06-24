@@ -111,24 +111,23 @@ PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
  */
 inline static Matrix<cxfl>
 STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, const Matrix<float>& b0, 
-     const int& nc, const int& nk, const int& ns, const int gd, const Matrix<short>& pd, const size_t& n) {
+     const size_t nc, const size_t nk, const size_t ns, const size_t gd, const Matrix<short>& pd, const size_t n) {
 
     Matrix<float> d (nk,1);
     vector<float> t (nk);
 	Matrix<cxfl>  m (ns,nc*nk);
-	float dt = 1.0e-5;
 
     ticks start = getticks();
     printf ("  Computing STA encoding matrix ..."); 
     fflush (stdout);
     
-    for (int i = 0; i< nk; i++)
+    for (size_t i = 0; i< nk; i++)
         d[i] = (i==0) ? pd[i] + gd : d[i-1] + pd[i] + gd;
 
-    for (int i = 0; i< nk; i++)        
+    for (size_t i = 0; i< nk; i++)        
         t[i] = d [nk-i-1];
     
-    for (int i = 0; i < nk-1; i++)
+    for (size_t i = 0; i < nk-1; i++)
         d[i] = 1.0e-5 * t[i+1] + 1.0e-5 * pd[i]/2;
 
     d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
@@ -139,9 +138,9 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
     {
 
 #pragma omp for
-        for (int c = 0; c < nc; c++) 
-            for (int k = 0; k < nk; k++) 
-                for (int s = 0; s < ns; s++) 
+        for (size_t c = 0; c < nc; c++) 
+            for (size_t k = 0; k < nk; k++) 
+                for (size_t s = 0; s < ns; s++) 
                     m(s, c*nk + k) =  pgd * b1(s,c) *
 						exp (cxfl(0, ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s) + TWOPI * d[k] * b0(s)));
 
@@ -160,15 +159,15 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
  *
  */
 static inline void
-PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<short>& pd, const int& gd, 
-           const int& nk, const int& nc, Matrix<cxfl>& rf, Matrix<float>& grad) {
+PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<short>& pd, const size_t gd, 
+           const size_t nk, const size_t nc, Matrix<cxfl>& rf, Matrix<float>& grad) {
     
-
+    
     // Total pulse duration --------------
     
-    int tpd = 2;  // Start and end
-    for (int i = 0; i < nk-1; i++) 
-        tpd += (int) (pd[i] + gd);
+    size_t tpd = 2;  // Start and end
+    for (size_t i = 0; i < nk-1; i++) 
+        tpd += (size_t) (pd[i] + gd);
     tpd += pd[nk-1];
     // -----------------------------------
     
@@ -180,19 +179,19 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<s
     
     // RF Timing -------------------------
 
-    for (int rc = 0; rc < nc; rc++) {
+    for (size_t rc = 0; rc < nc; rc++) {
         
-        int i = 1;
+        size_t i = 1;
         
-        for (int k = 0; k < nk; k++) {
+        for (size_t k = 0; k < nk; k++) {
             
             // RF action
-            for (int p = 0; p < pd[k]; p++, i++) 
+            for (short p = 0; p < pd[k]; p++, i++)
                 rf (i,rc) = solution(k + rc*nk) / (float) pd[k] * cxfl(1000.0,0.0);
 
             // Gradient action, no RF
             if (k < nk-1)
-                for (int g = 0; g <    gd; g++, i++)
+                for (size_t g = 0; g <    gd; g++, i++)
                     grad (i,0) = 0.0;
 
         }
@@ -205,19 +204,19 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<s
     float gr = 0.0;
     float sr = 0.0;
 
-    for (int gc = 0; gc < 3; gc++) {
+    for (size_t gc = 0; gc < 3; gc++) {
         
-        int i = 1;
+        size_t i = 1;
         
-        for (int k = 0; k < nk-1; k++) {
+        for (size_t k = 0; k < nk-1; k++) {
             
             // RF action, no gradients
-            for (int p = 0; p < pd[k]; p++, i++) 
+            for (short p = 0; p < pd[k]; p++, i++)
                 grad (i,gc) = 0.0; 
             
             if (k < nk-1) 
                 
-                for (int g = 0; g <    gd; g++, i++) {
+                for (size_t g = 0; g <    gd; g++, i++) {
                     
                     sr = (k+1 < nk) ? ks(gc,k+1) - ks(gc,k) : - ks(gc,i);
                     sr = 4.0 * sr / (2 * PI * 4.2576e7 * gd * gd * 1.0e-5 * 1.0e-5);
@@ -226,8 +225,8 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<s
                     // Gradient action 
                     if(g < gd/2)             // ramp up
                         gr = sr * (0.5 + g);
-                    else if (g < gd/2+1)     // flat top
-                        0;
+                    //else if (g < gd/2+1)     // flat top
+                    //    0;
                     else                     // ramp down
                         gr -= sr;
 
@@ -302,7 +301,7 @@ CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk,
 
         max_rf[i] = 0.0;
         
-        for (int j = 0; j < nc; j++)
+        for (size_t j = 0; j < nc; j++)
             if (max_rf[i] < abs (solution[i+nk*j]) / (float)(10.0*pd[i])) 
                 max_rf[i] = abs (solution[i+nk*j]) / (float)(10.0*pd[i]);
 
@@ -310,7 +309,7 @@ CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk,
 
     }
     
-	for (int i = 0; i < nk; i++)
+	for (size_t i = 0; i < nk; i++)
 		if (max_rf[i] > rflim) amps_ok = false;
 	
 	// Update Pulse durations if necessary -------
@@ -319,8 +318,8 @@ CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk,
 		
 		printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
         
-		for (int i = 0; i < nk; i++) {
-			pd[i] = 1 + (int) (max_rf[i] * pd[i] / rflim); 
+		for (size_t i = 0; i < nk; i++) {
+			pd[i] = 1 + (short) (max_rf[i] * pd[i] / rflim); 
 			printf ("%i ", 10*pd[i]); fflush(stdout);
 		}
         
@@ -491,7 +490,7 @@ KTPoints::Process   ()     {
             Toolbox::Instance()->ClockRate());
     
     // Put actual maximum RF amplitude into first cell
-    for (int i = 1; i < nk; i++)
+    for (size_t i = 1; i < nk; i++)
         if (max_rf[i] > max_rf[0])
             max_rf[0] = max_rf[i];
     // -----------------------------------

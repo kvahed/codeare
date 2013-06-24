@@ -207,6 +207,7 @@ public :
                      break;
                }
                break;
+         case s_end: break;
          }
          if (lex_next == lex_null)
             state = s_end;

@@ -9,7 +9,4 @@
 //#include "relativesensitivities.hpp"
 //#include "spiral.hpp"
 //#include "karb.hpp"
-#ifdef HAVE_MPI
-    #include "mpitest.hpp"
-#endif
 

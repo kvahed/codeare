@@ -318,7 +318,7 @@ namespace RRStrategy {
         
         wdx = dwt->*dx;
         
-        for (size_t k = 0; k < cgp.cgiter; k++) {
+        for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
             
             t = t0;
             

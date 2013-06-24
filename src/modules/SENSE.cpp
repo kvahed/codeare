@@ -25,8 +25,7 @@ SENSE::Prepare () {
 
 	printf ("Preparing Cartesian SENSE ...\n");
 
-	Matrix<cxfl>& image = AddMatrix 
-		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(1)));
+	AddMatrix ("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>()));
 
 	printf ("  allocating Cartesian SENSE operator: ... "); fflush(stdout);
 

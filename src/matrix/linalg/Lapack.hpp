@@ -323,7 +323,6 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
     
     assert (is2d(m));
 
-	T wopt = T(0);
 	VECTOR_TYPE(T) work = VECTOR_CONSTR(T,1);
     
 	int  M      =  size(m, 0);
@@ -333,7 +332,6 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
 	int  lda    =  M;
 	int  ldb    =  MAX(M,N);
 	int  lwork  = -1;
-	int  rank   =  0;
 	int  info   =  0;
 
 	Matrix<T> b = eye<T>(ldb);

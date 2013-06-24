@@ -53,7 +53,6 @@
 #include <cstring>
 #include <algorithm>
 
-#define ICE_SHRT_MAX 4095
 
 #ifdef HAVE_MAT_H
 #include "mat.h"
@@ -115,8 +114,6 @@ public:
 	inline
     Matrix              () {
 
-	    //TypeTraits<T>::Validate();
-
         _dim.resize(1,1);
         _res.resize(1,1.0);
         
@@ -133,15 +130,11 @@ public:
 	inline explicit
     Matrix              (const std::vector<size_t>& dim) {
 		
-	    //TypeTraits<T>::Validate();
-
 	    assert(!dim.empty() &&
 	    		std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
 
-	    size_t n = 1, i = 0, ds = dim.size();
-
 		_dim = dim;
-		_res.resize(ds,1.0);
+		_res.resize(dim.size(),1.0);
 
         Allocate();
         
@@ -157,14 +150,10 @@ public:
 	inline
     Matrix              (const container<size_t>& dim) {
 		
-	    //TypeTraits<T>::Validate();
-
 	    size_t ds = dim.size();
 	    assert(ds &&
 	    	   std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
 
-	    size_t n = 1, i = 0;
-		
 		_dim.resize(ds);
 		std::copy (dim.begin(),dim.end(),_dim.begin());
 		_res.resize(ds,1.0);
@@ -183,14 +172,10 @@ public:
 	inline explicit
     Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res) {
 		
-	    //TypeTraits<T>::Validate();
-
 	    assert(!dim.empty() &&
 	    	    std::find(dim.begin(),dim.end(),size_t(0))==dim.end() &&
 	    	    dim.size() == res.size());
 
-	    size_t n = 1, i = 0, ds = dim.size();
-		
 		_dim = dim;
 		_res = res;
 
@@ -211,8 +196,6 @@ public:
      */
     inline explicit
     Matrix (const size_t n) {
-
-	    //TypeTraits<T>::Validate();
 
 	    assert (n);
 
@@ -241,7 +224,6 @@ public:
     inline
     Matrix              (const size_t m, const size_t n) {
 
-        //TypeTraits<T>::Validate();
     	assert (m && n);
 
     	_dim.resize(2); _dim[0] = m; _dim[1] = n;
@@ -267,8 +249,6 @@ public:
      */
     inline
     Matrix (const size_t m, const size_t n, const size_t k) {
-
-	    //TypeTraits<T>::Validate();
 
 	    assert (m && n && k);
 
@@ -318,12 +298,10 @@ public:
                          const size_t ide = 1,
                          const size_t ave = 1) {
 
-    	//TypeTraits<T>::Validate();
-
 		assert (col && lin && cha && set && eco && phs && rep && seg &&
 				par && slc && ida && idb && idc && idd && ide && ave );
 
-	    size_t nd = 16, n = nd, sd, i;
+	    size_t nd = 16, n = nd, i;
 
 	    _dim.resize(n);
 	    _dim[ 0] = col; _dim[ 1] = lin; _dim[ 2] = cha; _dim[ 3] = set;
@@ -365,8 +343,6 @@ public:
     Matrix             (const Matrix<T,P> &M) {
 
 		if (this != &M) {
-
-		    //TypeTraits<T>::Validate();
 
 			_dim = M.Dim();
 			_dsz = M.Dsz();
@@ -1014,6 +990,10 @@ public:
     //@{
     
 
+
+    template<paradigm Q> Matrix<T,P>&
+    operator= (const Matrix<T,Q>&);
+
     
     /**
      * @brief           Assignment operator. i.e. this = m.
@@ -1027,7 +1007,7 @@ public:
         	_dim = M.Dim();
         	_dsz = M.Dsz();
         	_res = M.Res();
-            _M  = M.Container();
+            _M   = M.Container();
         }
 
         return *this;
@@ -1150,8 +1130,6 @@ public:
      */
     inline Matrix<T,P>&
     operator-=         (const Matrix<T,P>& M) {
-
-        size_t i;
 
         assert (Size() == M.Size());
 
@@ -2215,46 +2193,6 @@ Matrix<T,P>::Export (IceAs* ias, const size_t pos) const {
 }
 
 #endif // ICE
-
-#ifdef HAVE_SCALAPACK
-#include "Grid.hpp"
-
-template<> inline
-Matrix<float,MPI>::Matrix (const size_t cols, const size_t rows) {
-
-    // Get at home
-    int info;
-    int izero = 0;
-    Grid& gd = *Grid::Instance();
-    
-    // Global size
-    _bs      = 8;
-    _gdim[0] = cols;
-    _gdim[1] = rows;
-		
-    // Local size (only with MPI different from global)
-    _dim[0] = numroc_ (&_gdim[0], &_bs, &gd.mc, &izero, &gd.nc);
-    _dim[1] = numroc_ (&_gdim[1], &_bs, &gd.mr, &izero, &gd.nr);
-	
-    // Allocate
-    //this->_M = VECTOR_CONSTR(float,Size());
-	
-    // RAM descriptor 
-    int dims[2]; dims[0] = _dim[0]; dims[1] = _dim[1];
-    descinit_(_desc, &_gdim[0], &_gdim[1], &_bs, &_bs, &izero,
-              &izero, &gd.ct, dims, &info);
-
-#ifdef BLACS_DEBUG
-    printf ("info(%d) desc({%d, %d, %4d, %4d, %d, %d, %d, %d, %4d})\n", 
-            info,     _desc[0], _desc[1], _desc[2], _desc[3], 
-            _desc[4], _desc[5], _desc[6], _desc[7], _desc[8]);
-#endif
-
-    char a = 'a';
-    Cblacs_barrier (gd.ct, &a);
-
-}
-#endif
 
 #endif // __MATRIX_H__
 

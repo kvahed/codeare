@@ -57,14 +57,12 @@ NuFFT::Init () {
 	error_code error = OK; 
 	m_initialised               = false;
 
-	int shots, M, dim, maxit, m, N[4], n[4];
+	int shots, M, dim, maxit, m, N[4];
 	double epsilon, alpha;
  
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++)
 		N[i] = 1; 
-		n[i] = 1;
-	}
 
 	// Dimensions ---------------------------
 
@@ -89,19 +87,15 @@ NuFFT::Init () {
 	Attribute ("m",       &m);
 	Attribute ("alpha",   &alpha);
 
-	for (int i = 0; i < dim; i++)
-		n[i] = ceil (N[i]*alpha);
-
 	// --------------------------------------
 
 	Matrix<size_t> ms (dim,1);
-	for (size_t i = 0; i < dim; i++)
+	for (size_t i = 0; i < (size_t)dim; i++)
 		ms[i] = N[i];
 
 	nfft = new NFFT<float> (ms, M * shots, m, alpha);
 
-	Matrix<cxdb>& img = AddMatrix 
-		("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> (N[0],N[1],N[2])));
+	AddMatrix ("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> ()));
 
 	m_initialised = true;
 

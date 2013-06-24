@@ -35,7 +35,7 @@ nuffttest (Connector<T>* rc) {
 	std::string opf = base;
 	opf += rc->GetElement("/config/data-out")->Attribute("fname");
 
-	IOContext out = fopen (opf, "w");
+	IOContext out = fopen (opf, WRITE);
 	fwrite (out, img);
 	fclose (out);
 

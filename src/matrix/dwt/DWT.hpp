@@ -26,6 +26,8 @@
 
 # define __DWT_HPP__
 
+# define NUM_THREADS_DWT 8
+
 
 /**
  * @brief  Supported wavelet families
@@ -71,7 +73,7 @@ class DWT {
               m_hpf_d (wl_mem),
               m_hpf_r (wl_mem),
               m_sl (sl),
-              temp (container<T>(omp_get_num_threads() * 8 * sl)),
+              temp (container<T>(/*omp_get_num_threads()*/NUM_THREADS_DWT * 4 * sl)),
               m_wl_scale (wl_scale),
               _fam(wl_fam) {
 
@@ -186,7 +188,7 @@ class DWT {
         inline
         Matrix<T>
         operator->* (const Matrix<T>& m) {
-            return (_fam == ID) ? m :  Trafo(m);
+            return (_fam == ID) ? m :  Adjoint(m);
         }
 
 
@@ -253,10 +255,10 @@ class DWT {
             // loop over levels of DWT
             for (int j = (J-1); j >= ell; --j)
             {
-
-#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (8)
+//size_t stride = 0;
+#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (NUM_THREADS_DWT)
             	{
-            	size_t stride = 8*m_sl*omp_get_thread_num();
+            	size_t stride = 4*m_sl*omp_get_thread_num();
                 // loop over columns of image
 #pragma omp for schedule (guided)
                 for (int col=0; col < side_length; col++)
@@ -545,10 +547,10 @@ class DWT {
             // loop over levels of backwards DWT
             for (int j = ell; j < J; j++)
             {
-size_t stride = 0;
-#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop)
+//size_t stride = 0;
+#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop) num_threads (NUM_THREADS_DWT)
             	{
-            	size_t stride = 8*m_sl*omp_get_thread_num();
+            	size_t stride = 4*m_sl*omp_get_thread_num();
                 // loop over columns of image
 #pragma omp for schedule (guided)
                 // loop over rows of result image

@@ -68,7 +68,7 @@ cgsensetest (RRClient::Connector<T>* rc) {
 
 	std::string ofname = base;
 	ofname += rc->GetElement("/config/data-out")->Attribute("fname");
-	IOContext ofile = fopen (ofname, "w");
+	IOContext ofile = fopen (ofname, WRITE);
 	fwrite (ofile, image);
 	fclose (ofile);
 

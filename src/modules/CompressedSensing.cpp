@@ -34,7 +34,6 @@ CompressedSensing::Init () {
 	for (size_t i = 0; i < 3; i++)
 		m_N[i] = 1;
 
-	int wli = 0;
 	int m_fft = 0;
 
 	Attribute ("tvw",     &m_csparam.tvw);
@@ -98,7 +97,7 @@ CompressedSensing::Process () {
 
 	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
 		size(data,0), size(data,1), size(data,2));
-	m_csparam.dwt = new DWT <cxfl> (data.Height(), ID);
+	m_csparam.dwt = new DWT <cxfl> (data.Height(), (wlfamily) m_wf, m_wm);
 
 	/** -----  Which Fourier transform? **/
 	m_csparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);
@@ -130,7 +129,7 @@ CompressedSensing::Process () {
 	if (m_verbose)
 		vc.push_back(im_dc*ma);
 
-	for (size_t i = 0; i < m_csiter; i++) {
+	for (size_t i = 0; i < (size_t)m_csiter; i++) {
 		NLCG (im_dc, data, m_csparam);
 		if (m_verbose)
 			vc.push_back(im_dc*ma);

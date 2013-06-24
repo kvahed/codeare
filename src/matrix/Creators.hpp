@@ -221,7 +221,6 @@ rand           (const Matrix<size_t>& sz) {
 
 }
 
-
 /**
  * @brief       Random square matrix
  *
@@ -325,11 +324,7 @@ ellipse (const float* p, const size_t n, const T s = T(1)) {
 	
 #pragma omp parallel default (shared) 
 	{
-		
-		size_t tid      = omp_get_thread_num();
-		size_t chunk    = n / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk) 
+#pragma omp for schedule (dynamic, n / omp_get_num_threads())
 		
 	for (size_t r = 0; r < n; r++)
 		for (size_t c = 0; c < n; c++) {
@@ -376,11 +371,7 @@ ellipsoid (const float* p, const size_t n, const T s) {
 	
 #pragma omp parallel default (shared) 
 	{
-		
-		size_t tid      = omp_get_thread_num();
-		size_t chunk    = n / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk) 
+#pragma omp for schedule (dynamic, n / omp_get_num_threads())
 		
 		for (size_t s = 0; s < n; s++)
 			for (size_t r = 0; r < n; r++)

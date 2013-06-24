@@ -7,9 +7,8 @@
 #ifndef TRIGINOMETRY_HPP_
 #define TRIGINOMETRY_HPP_
 
-#include "../Matrix.hpp"
+#include "Matrix.hpp"
 #include <math.h>
-
 
 namespace codeare {
     namespace matrix {
