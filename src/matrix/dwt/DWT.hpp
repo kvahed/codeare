@@ -253,7 +253,6 @@ class DWT {
             // loop over levels of DWT
             for (int j = (J-1); j >= ell; --j)
             {
-                std::cout << " .. . . " << std::endl;
 //size_t stride = 0;
 #pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (8)
             	{

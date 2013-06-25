@@ -59,20 +59,14 @@ main            (int argc, char ** args)
 
 	// do something
 	DWT <elem_type> dwt (mat_in.Dim (0), wl_fam, wl_mem, wl_scale);
-	std::cout << " test 3 " << std::endl;
 	Matrix <elem_type> mat_out_dwt = dwt * mat_in;
-	std::cout << " test 4 " << std::endl;
 	Matrix <elem_type> mat_out_dwt_recon = dwt ->* mat_out_dwt;
-
-	std::cout << " test 2 " << std::endl;
 
 	for (int i = 0; i < iterations; i++)
 	{
 	    mat_out_dwt = dwt * mat_out_dwt_recon;
         mat_out_dwt_recon = dwt ->* mat_out_dwt;
 	}
-
-	std::cout << " test " << std::endl;
 
 	// output oclMatrix to output file
 
