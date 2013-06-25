@@ -27,6 +27,7 @@
 /src/matrix/arithmetic/t_exp
 /src/matrix/arithmetic/t_floor
 /src/matrix/arithmetic/t_gtoreq
+/src/matrix/arithmetic/t_isnan
 /src/matrix/arithmetic/t_log
 /src/matrix/arithmetic/t_log10
 /src/matrix/arithmetic/t_nrmse
@@ -37,6 +38,7 @@
 /src/matrix/arithmetic/t_tan
 /src/matrix/arithmetic/t_tanh
 /src/matrix/dwt/tests/t_dwt
+/src/matrix/dwt/tests/t_dwt2
 /src/matrix/ft/tests/t_dft
 /src/matrix/linalg/tests/t_chol
 /src/matrix/linalg/tests/t_dot
