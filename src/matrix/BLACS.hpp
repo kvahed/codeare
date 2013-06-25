@@ -1,7 +1,7 @@
-#define BLACS_DEBUG 1
-
 #ifndef __BLACS_HPP__
 #define __BLACS_HPP__
+
+#include "config.h"
 
 #ifdef HAVE_MPI
 

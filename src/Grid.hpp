@@ -2,6 +2,7 @@
 #define __GRID_HPP__
 
 #include "BLACS.hpp"
+#include "config.h"
 
 #include <ostream>
 
