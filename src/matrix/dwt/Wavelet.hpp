@@ -3,7 +3,6 @@
 # define __WAVELET_HPP__
 
 
-# include "ElemTypeTraits.hpp"
 # include "DWT.hpp"
 
 

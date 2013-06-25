@@ -26,7 +26,11 @@
 
 # define __DWT_HPP__
 
+/**
+ * OMP related makros
+ */
 # define NUM_THREADS_DWT 8
+# define OMP_SCHEDULE runtime
 
 
 /**
@@ -66,16 +70,17 @@ class DWT {
          * @param  sl      Side length
          */
         DWT (const size_t sl, const wlfamily wl_fam = WL_DAUBECHIES, const int wl_mem = 4,
-        		const int wl_scale = 4, const int dim = 2)
+        		const int wl_scale = 4, const int num_threads = 8, const int dim = 2)
             : m_dim (dim),
               m_lpf_d (wl_mem),
               m_lpf_r (wl_mem),
               m_hpf_d (wl_mem),
               m_hpf_r (wl_mem),
               m_sl (sl),
-              temp (container<T>(/*omp_get_num_threads()*/NUM_THREADS_DWT * 4 * sl)),
+              temp (container<T>(/*omp_get_num_threads()*/num_threads * 4 * sl)),
               m_wl_scale (wl_scale),
-              _fam(wl_fam) {
+              _fam(wl_fam),
+              _num_threads (num_threads) {
 
             setupWlFilters (wl_fam, wl_mem, m_lpf_d, m_lpf_r, m_hpf_d, m_hpf_r);
 
@@ -198,7 +203,7 @@ class DWT {
         /**
          * type definitions
          */
-        typedef typename elem_type_traits <T> :: value_type value_type;
+        typedef typename TypeTraits <T> :: RT RT;
 
 
         /**
@@ -209,12 +214,12 @@ class DWT {
         const int m_dim;
 
         // low pass filters
-        Matrix <value_type> m_lpf_d;
-        Matrix <value_type> m_lpf_r;
+        Matrix <RT> m_lpf_d;
+        Matrix <RT> m_lpf_r;
 
         // high pass filters
-        Matrix <value_type> m_hpf_d;
-        Matrix <value_type> m_hpf_r;
+        Matrix <RT> m_hpf_d;
+        Matrix <RT> m_hpf_r;
 
         // maximum size of matrix
         const size_t m_sl;
@@ -226,6 +231,8 @@ class DWT {
         const int m_wl_scale;
 
         wlfamily _fam;
+
+        const int _num_threads;
 
 
         /**
@@ -255,53 +262,57 @@ class DWT {
             // loop over levels of DWT
             for (int j = (J-1); j >= ell; --j)
             {
-//size_t stride = 0;
-#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (NUM_THREADS_DWT)
+
+#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (_num_threads)
             	{
-            	size_t stride = 4*m_sl*omp_get_thread_num();
-                // loop over columns of image
-#pragma omp for schedule (guided)
-                for (int col=0; col < side_length; col++)
-                {
 
-                    // access to lowpass part of DWT
-                    wcplo = &res[col*num_rows];
-                    // access to highpass part of DWT
-                    wcphi = &res[col*num_rows + side_length/2];
+            	    size_t stride = 4 * side_length * omp_get_thread_num ();
 
-                    // copy part of image to temp memory
-                    copydouble (wcplo, &temp[0+stride], side_length);
+#pragma omp for schedule (OMP_SCHEDULE)
+            	    // loop over columns of image
+            	    for (int col=0; col < side_length; col++)
+                    {
 
-                    // apply low pass filter on column and write to result matrix
-                    downlo (&temp[0+stride], side_length, wcplo);
-                    // apply high pass filter on column and wirte to result matrix
-                    downhi (&temp[0+stride], side_length, wcphi);
+                        // access to lowpass part of DWT
+                        wcplo = &res[col*num_rows];
+                        // access to highpass part of DWT
+                        wcphi = &res[col*num_rows + side_length/2];
 
-                } // loop over columns
+                        // copy part of image to temp memory
+                        copydouble (wcplo, &temp[0+stride], side_length);
 
-#pragma omp for schedule (guided)
-                // loop over rows of image
-                for (int row=0; row < side_length; row++)
-                {
+                        // apply low pass filter on column and write to result matrix
+                        downlo (&temp[0+stride], side_length, wcplo);
+                        // apply high pass filter on column and wirte to result matrix
+                        downhi (&temp[0+stride], side_length, wcphi);
 
-                    templo = &temp[sig.Height ()+stride];
-                    temphi = &temp[2*sig.Height()+stride];
+                    } // loop over columns
 
-                     // copy row-th row of imag to temp
-                    unpackdouble (res.Memory(0), side_length, num_cols, row, &temp[0+stride]);
+#pragma omp for schedule (OMP_SCHEDULE)
+                    // loop over rows of image
+                    for (int row=0; row < side_length; row++)
+                    {
 
-                    // apply low pass filter on row and write to temp mem
-                    downlo (&temp[0+stride], side_length, templo);
-                    // apply high pass filter on row and write to temp mem
-                    downhi (&temp[0+stride], side_length, temphi);
+                        templo = &temp[sig.Height ()+stride];
+                        temphi = &temp[2*sig.Height()+stride];
 
-                    // write temp lowpass result to result matrix
-                    packdouble (templo, side_length/2, num_cols, row, &res[0]);
-                    // write temp highpass result to result matrix
-                    packdouble (temphi, side_length/2, num_cols, row, &res[side_length/2*num_rows]);
+                        // copy row-th row of imag to temp
+                        unpackdouble (res.Memory(0), side_length, num_cols, row, &temp[0+stride]);
 
-                } // loop over rows of image
-            	}
+                        // apply low pass filter on row and write to temp mem
+                        downlo (&temp[0+stride], side_length, templo);
+                        // apply high pass filter on row and write to temp mem
+                        downhi (&temp[0+stride], side_length, temphi);
+
+                        // write temp lowpass result to result matrix
+                        packdouble (templo, side_length/2, num_cols, row, &res[0]);
+                        // write temp highpass result to result matrix
+                        packdouble (temphi, side_length/2, num_cols, row, &res[side_length/2*num_rows]);
+
+                    } // loop over rows of image
+
+            	} // omp parallel
+
                 // reduce dimension for next level
                 side_length = side_length/2;
 
@@ -542,68 +553,71 @@ class DWT {
             // calculate start level for backwards DWT
             nj = 1;
             for (int k = 0; k < ell; k++)
-                nj *=2;
+                nj *= 2;
 
             // loop over levels of backwards DWT
             for (int j = ell; j < J; j++)
             {
-//size_t stride = 0;
-#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop) num_threads (NUM_THREADS_DWT)
+
+#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop) num_threads (_num_threads)
             	{
-            	size_t stride = 4*m_sl*omp_get_thread_num();
-                // loop over columns of image
-#pragma omp for schedule (guided)
-                // loop over rows of result image
-                for (int k = 0; k < 2 * nj; k++)
-                {
 
-                    templo = &temp[nr+stride];
-                    temphi = &temp[2*nr+stride];
-                    temptop = &temp[3*nr+stride];
-                    // copy lowpass part of current row to temporary memory
-                    unpackdouble(&img[0],nj,nc,k,templo);
-                    // copy highpass part of current row to temporary memory
-                    unpackdouble(&img[nj*nr],nj,nc,k,temphi);
+            	    size_t stride = 4 * nj * omp_get_thread_num ();
 
-                    // perform lowpass reconstruction
-                    uplo(templo, nj,&temp[0+stride]);
-                    // perform highpass reconstruction
-                    uphi(temphi, nj, temptop);
+#pragma omp for schedule (OMP_SCHEDULE)
+            	    // loop over rows of result image
+                    for (int k = 0; k < 2 * nj; k++)
+                    {
 
-                    // fusion of reconstruction parts
-                    adddouble(&temp[0+stride],temptop,nj*2,&temp[0+stride]);
+                        templo = &temp[nr+stride];
+                        temphi = &temp[2*nr+stride];
+                        temptop = &temp[3*nr+stride];
+                        // copy lowpass part of current row to temporary memory
+                        unpackdouble(&img[0],nj,nc,k,templo);
+                        // copy highpass part of current row to temporary memory
+                        unpackdouble(&img[nj*nr],nj,nc,k,temphi);
 
-                    // write back reconstructed row
-                    packdouble(&temp[0+stride],nj*2,nc,k,&img[0]);
+                        // perform lowpass reconstruction
+                        uplo(templo, nj,&temp[0+stride]);
+                        // perform highpass reconstruction
+                        uphi(temphi, nj, temptop);
 
-                } // loop over rows of result image
+                        // fusion of reconstruction parts
+                        adddouble(&temp[0+stride],temptop,nj*2,&temp[0+stride]);
 
-                // loop  over cols of result image
-#pragma omp for schedule (guided)
-                for (int k = 0; k < 2 * nj; k++)
-                {
+                        // write back reconstructed row
+                        packdouble(&temp[0+stride],nj*2,nc,k,&img[0]);
 
-                    templo = &temp[nr+stride];
-                    temphi = &temp[2*nr+stride];
-                    // assign address of current column's lowpass part
-                    wcplo = &img[k*nr];
-                    // assign address of current column's highpass part
-                    wcphi = &img[k*nr + nj];
+                    } // loop over rows of result image
 
-                    // copy lowpass part to temporary memory
-                    copydouble(wcplo,&temp[0+stride],nj);
+#pragma omp for schedule (OMP_SCHEDULE)
+                    // loop  over cols of result image
+                    for (int k = 0; k < 2 * nj; k++)
+                    {
 
-                    // perform lowpass reconstruction
-                    uplo(wcplo, nj, templo);
-                    // perform highpass reconstruction
-                    uphi(wcphi, nj, temphi);
+                        templo = &temp[nr+stride];
+                        temphi = &temp[2*nr+stride];
+                        // assign address of current column's lowpass part
+                        wcplo = &img[k*nr];
+                        // assign address of current column's highpass part
+                        wcphi = &img[k*nr + nj];
 
-                    // combine reconstructed parts and write back to current column
-                    adddouble(templo,temphi,nj*2,wcplo);
+                        // copy lowpass part to temporary memory
+                        copydouble(wcplo,&temp[0+stride],nj);
 
-                } // loop over cols of result image
-            	}
-                // update current row / column size
+                        // perform lowpass reconstruction
+                        uplo(wcplo, nj, templo);
+                        // perform highpass reconstruction
+                        uphi(wcphi, nj, temphi);
+
+                        // combine reconstructed parts and write back to current column
+                        adddouble(templo,temphi,nj*2,wcplo);
+
+                    } // loop over cols of result image
+
+            	} // omp parallel
+
+            	// update current row / column size
                 nj *= 2;
 
             } // loop over levels of backwards DWT
