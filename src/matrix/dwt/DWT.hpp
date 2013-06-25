@@ -26,6 +26,8 @@
 
 # define __DWT_HPP__
 
+# define NUM_THREADS_DWT 8
+
 
 /**
  * @brief  Supported wavelet families
@@ -71,7 +73,7 @@ class DWT {
               m_hpf_d (wl_mem),
               m_hpf_r (wl_mem),
               m_sl (sl),
-              temp (container<T>(/*omp_get_num_threads()*/8 * 4 * sl)),
+              temp (container<T>(/*omp_get_num_threads()*/NUM_THREADS_DWT * 4 * sl)),
               m_wl_scale (wl_scale),
               _fam(wl_fam) {
 
@@ -254,7 +256,7 @@ class DWT {
             for (int j = (J-1); j >= ell; --j)
             {
 //size_t stride = 0;
-#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (8)
+#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (NUM_THREADS_DWT)
             	{
             	size_t stride = 4*m_sl*omp_get_thread_num();
                 // loop over columns of image
@@ -546,7 +548,7 @@ class DWT {
             for (int j = ell; j < J; j++)
             {
 //size_t stride = 0;
-#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop) num_threads (8)
+#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop) num_threads (NUM_THREADS_DWT)
             	{
             	size_t stride = 4*m_sl*omp_get_thread_num();
                 // loop over columns of image
