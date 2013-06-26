@@ -77,7 +77,7 @@ class DWT {
               m_hpf_d (wl_mem),
               m_hpf_r (wl_mem),
               m_sl (sl),
-              temp (container<T>(/*omp_get_num_threads()*/num_threads * 4 * sl)),
+              temp (container<T>(/*omp_get_num_threads()*/num_threads * 6 * sl)),
               m_wl_scale (wl_scale),
               _fam(wl_fam),
               _num_threads (num_threads) {
@@ -266,7 +266,7 @@ class DWT {
 #pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (_num_threads)
             	{
 
-            	    size_t stride = 4 * side_length * omp_get_thread_num ();
+            	    size_t stride = side_length * omp_get_thread_num ();
 
 #pragma omp for schedule (OMP_SCHEDULE)
             	    // loop over columns of image
@@ -288,13 +288,16 @@ class DWT {
 
                     } // loop over columns
 
+            	    // update stride
+            	    stride = 2 * side_length * omp_get_thread_num ();
+
 #pragma omp for schedule (OMP_SCHEDULE)
                     // loop over rows of image
                     for (int row=0; row < side_length; row++)
                     {
 
-                        templo = &temp[sig.Height ()+stride];
-                        temphi = &temp[2*sig.Height()+stride];
+                        templo = &temp [      side_length + stride];
+                        temphi = &temp [1.5 * side_length + stride];
 
                         // copy row-th row of imag to temp
                         unpackdouble (res.Memory(0), side_length, num_cols, row, &temp[0+stride]);
@@ -539,11 +542,10 @@ class DWT {
 
             Matrix <T> img (wc.Dim());
 
-            const int nr = wc.Height();
-            const int nc = wc.Width();
+            const int num_rows = wc.Height();
+            const int num_cols = wc.Width();
 
             T *wcplo,*wcphi,*templo,*temphi,*temptop;
-            int nj;
             //		copydouble(wc,img,nr*nc);
 
             // assign dwt to result image
@@ -551,9 +553,9 @@ class DWT {
 
 
             // calculate start level for backwards DWT
-            nj = 1;
+            int side_length = 1;
             for (int k = 0; k < ell; k++)
-                nj *= 2;
+                side_length *= 2;
 
             // loop over levels of backwards DWT
             for (int j = ell; j < J; j++)
@@ -562,63 +564,67 @@ class DWT {
 #pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop) num_threads (_num_threads)
             	{
 
-            	    size_t stride = 4 * nj * omp_get_thread_num ();
+            	    size_t stride = 6 * side_length * omp_get_thread_num ();
 
 #pragma omp for schedule (OMP_SCHEDULE)
             	    // loop over rows of result image
-                    for (int k = 0; k < 2 * nj; k++)
+                    for (int k = 0; k < 2 * side_length; k++)
                     {
 
-                        templo = &temp[nr+stride];
-                        temphi = &temp[2*nr+stride];
-                        temptop = &temp[3*nr+stride];
+                        templo  = &temp [2 * side_length + stride];
+                        temphi  = &temp [3 * side_length + stride];
+                        temptop = &temp [4 * side_length + stride];
+
                         // copy lowpass part of current row to temporary memory
-                        unpackdouble(&img[0],nj,nc,k,templo);
+                        unpackdouble(&img[0],side_length,num_cols,k,templo);
                         // copy highpass part of current row to temporary memory
-                        unpackdouble(&img[nj*nr],nj,nc,k,temphi);
+                        unpackdouble(&img[side_length*num_rows],side_length,num_cols,k,temphi);
 
                         // perform lowpass reconstruction
-                        uplo(templo, nj,&temp[0+stride]);
+                        uplo(templo, side_length,&temp[0+stride]);
                         // perform highpass reconstruction
-                        uphi(temphi, nj, temptop);
+                        uphi(temphi, side_length, temptop);
 
                         // fusion of reconstruction parts
-                        adddouble(&temp[0+stride],temptop,nj*2,&temp[0+stride]);
+                        adddouble(&temp[0+stride],temptop,side_length*2,&temp[0+stride]);
 
                         // write back reconstructed row
-                        packdouble(&temp[0+stride],nj*2,nc,k,&img[0]);
+                        packdouble(&temp[0+stride],side_length*2,num_cols,k,&img[0]);
 
                     } // loop over rows of result image
 
+                    // update stride
+                    stride = 5 * side_length * omp_get_thread_num ();
+
 #pragma omp for schedule (OMP_SCHEDULE)
                     // loop  over cols of result image
-                    for (int k = 0; k < 2 * nj; k++)
+                    for (int k = 0; k < 2 * side_length; k++)
                     {
 
-                        templo = &temp[nr+stride];
-                        temphi = &temp[2*nr+stride];
+                        templo = &temp [    side_length + stride];
+                        temphi = &temp [3 * side_length + stride];
                         // assign address of current column's lowpass part
-                        wcplo = &img[k*nr];
+                        wcplo = &img[k*num_rows];
                         // assign address of current column's highpass part
-                        wcphi = &img[k*nr + nj];
+                        wcphi = &img[k*num_rows + side_length];
 
                         // copy lowpass part to temporary memory
-                        copydouble(wcplo,&temp[0+stride],nj);
+                        copydouble(wcplo,&temp[0+stride],side_length);
 
                         // perform lowpass reconstruction
-                        uplo(wcplo, nj, templo);
+                        uplo(wcplo, side_length, templo);
                         // perform highpass reconstruction
-                        uphi(wcphi, nj, temphi);
+                        uphi(wcphi, side_length, temphi);
 
                         // combine reconstructed parts and write back to current column
-                        adddouble(templo,temphi,nj*2,wcplo);
+                        adddouble(templo,temphi,side_length*2,wcplo);
 
                     } // loop over cols of result image
 
             	} // omp parallel
 
             	// update current row / column size
-                nj *= 2;
+                side_length *= 2;
 
             } // loop over levels of backwards DWT
 
