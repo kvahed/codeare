@@ -70,7 +70,7 @@ class DWT {
          * @param  sl      Side length
          */
         DWT (const size_t sl, const wlfamily wl_fam = WL_DAUBECHIES, const int wl_mem = 4,
-        		const int wl_scale = 4, const int num_threads = 8, const int dim = 2)
+        		const int wl_scale = 4, const int num_threads = NUM_THREADS_DWT, const int dim = 2)
             : m_dim (dim),
               m_lpf_d (wl_mem),
               m_lpf_r (wl_mem),

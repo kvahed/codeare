@@ -57,31 +57,57 @@ main            (int argc, char ** args)
 	const int wl_scale =            atoi (conf.GetElement ("/config/dwt")->Attribute ("wl_scale"));
 
 	// more params
-	const int    iterations  = atoi (conf.GetElement ("/config")->Attribute ("iterations"));
-	const int    num_threads = atoi (conf.GetElement ("/config")->Attribute ("num_threads"));
-	const char * of_name     =       conf.GetElement ("/config")->Attribute ("ofname");
+	const int    iterations   = atoi (conf.GetElement ("/config")->Attribute ("iterations"));
+	const int    num_threads  = atoi (conf.GetElement ("/config")->Attribute ("num_threads"));
+	const char * of_name_base =       conf.GetElement ("/config")->Attribute ("ofname");
+	const char * range        =       conf.GetElement ("/config")->Attribute ("range");
 
 	// open measurement output file
 	ss.clear (), ss.str (std::string ());
-	ss << base << of_name;
+	ss << base << of_name_base << "_wl_fam_" << wl_fam << "_wl_mem_" << wl_mem << "_wl_scale_" << wl_scale << ".txt";
 	std::fstream fs;
 	fs.open (ss.str ().c_str (), std::fstream::out);
 
-	// do something
-	DWT <elem_type> dwt (mat_in.Dim (0), wl_fam, wl_mem, wl_scale, num_threads);
-	Matrix <elem_type> mat_out_dwt       = dwt   * mat_in;
-	Matrix <elem_type> mat_out_dwt_recon = dwt ->* mat_out_dwt;
+	// adjust start value of loop index
+	int init_num_threads = 1;
+	if (!strcmp (range, "no"))
+	    init_num_threads = num_threads;
 
-	double time = omp_get_wtime ();
-	for (int i = 0; i < iterations; i++)
+	// headline of table
+    fs << "## No. of threads  --  per transform:  --  single forward:  --  single backwards:  --  S(p)" << std::endl;
+
+    Matrix <elem_type> mat_out_dwt;
+    Matrix <elem_type> mat_out_dwt_recon;
+
+    double time_ref = 0;
+
+	// loop over number of threads
+	for (int threads = init_num_threads; threads <= num_threads; threads *= 2)
 	{
-	    mat_out_dwt       = dwt   * mat_out_dwt_recon;
-        mat_out_dwt_recon = dwt ->* mat_out_dwt;
+
+	    // do something
+	    DWT <elem_type> dwt (mat_in.Dim (0), wl_fam, wl_mem, wl_scale, threads);
+	    double s_time_f = omp_get_wtime ();
+	    mat_out_dwt       = dwt   * mat_in;
+	    s_time_f = omp_get_wtime () - s_time_f;
+	    double s_time_b = omp_get_wtime ();
+	    mat_out_dwt_recon = dwt ->* mat_out_dwt;
+	    s_time_b = omp_get_wtime () - s_time_b;
+
+	    double time = omp_get_wtime ();
+	    for (int i = 0; i < iterations; i++)
+	    {
+	        mat_out_dwt       = dwt   * mat_out_dwt_recon;
+	        mat_out_dwt_recon = dwt ->* mat_out_dwt;
+	    }
+	    time = omp_get_wtime () - time;
+
+	    if (threads == 1)
+	        time_ref = time;
+
+	    fs << "\t" << threads << "\t\t" << time/iterations/2 << "\t\t" << s_time_f << "\t\t" << s_time_b << "\t\t" << time_ref/time << std::endl;
+
 	}
-	time = omp_get_wtime () - time;
-	fs << " -- elapsed time: " << time << std::endl;
-	fs << " -- per iteration: " << time/iterations << std::endl;
-	fs << " -- per transform: " << time/iterations/2 << std::endl;
 
 	// output oclMatrix to output file
 	IOContext ioc2 (conf.GetElement ("/config/data/out"), base, WRITE);
