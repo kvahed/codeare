@@ -99,7 +99,7 @@ struct LapackTraits<float> {
                &info);
 #endif
         
-        for (size_t i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             w[i] = CType (dwr[i], dwi[i]);
         }
         
@@ -221,7 +221,7 @@ struct LapackTraits<double> {
                &info);
 #endif
         
-        for (size_t i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             w[i] = CType (dwr[i], dwi[i]);
         }
         

@@ -81,13 +81,13 @@ const char* Grid::c_str() const {
     
 }
 
-Grid* Grid::Instance() {
+Grid& Grid::Instance() {
     
     
     if (m_inst == 0)
         m_inst = new Grid ();
     
-	return m_inst;
+	return *m_inst;
 
 }
 

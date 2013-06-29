@@ -238,6 +238,7 @@ setupWlFilters			(const wlfamily wl_fam, const int wl_mem, Matrix <T> & lpf_d, M
 {
 	switch (wl_fam)
 	{
+    case ID: break;
 	case WL_DAUBECHIES:
 		switch (wl_mem)
 		{
@@ -255,13 +256,22 @@ setupWlFilters			(const wlfamily wl_fam, const int wl_mem, Matrix <T> & lpf_d, M
 			break;
 		}
 		break;
+    case WL_DAUBECHIES_CENTERED:
+        break;
 	case WL_HAAR:
         WaveletTraits <T, WL_HAAR, 2> :: LowPassFilterDecom (lpf_d);
         WaveletTraits <T, WL_HAAR, 2> :: LowPassFilterRecon (lpf_r);
         WaveletTraits <T, WL_HAAR, 2> :: HighPassFilterDecom (hpf_d);
         WaveletTraits <T, WL_HAAR, 2> :: HighPassFilterRecon (hpf_r);
         break;
+    case WL_HAAR_CENTERED:
+        break;
+    case WL_BSPLINE:
+        break;
+    case WL_BSPLINE_CENTERED:
+        break;
 	}
+    
 }
 
 

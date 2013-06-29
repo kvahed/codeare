@@ -24,7 +24,7 @@ public:
     
     const char* c_str() const;
     
-    static Grid* Instance();
+    static Grid& Instance();
 
     virtual ~Grid();
     

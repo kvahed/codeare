@@ -114,8 +114,6 @@ public:
 	inline
     Matrix              () {
 
-	    //TypeTraits<T>::Validate();
-
         _dim.resize(1,1);
         _res.resize(1,1.0);
         
@@ -132,15 +130,11 @@ public:
 	inline explicit
     Matrix              (const std::vector<size_t>& dim) {
 		
-	    //TypeTraits<T>::Validate();
-
 	    assert(!dim.empty() &&
 	    		std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
 
-	    size_t n = 1, i = 0, ds = dim.size();
-
 		_dim = dim;
-		_res.resize(ds,1.0);
+		_res.resize(dim.size(),1.0);
 
         Allocate();
         
@@ -156,14 +150,10 @@ public:
 	inline
     Matrix              (const container<size_t>& dim) {
 		
-	    //TypeTraits<T>::Validate();
-
 	    size_t ds = dim.size();
 	    assert(ds &&
 	    	   std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
 
-	    size_t n = 1, i = 0;
-		
 		_dim.resize(ds);
 		std::copy (dim.begin(),dim.end(),_dim.begin());
 		_res.resize(ds,1.0);
@@ -182,14 +172,10 @@ public:
 	inline explicit
     Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res) {
 		
-	    //TypeTraits<T>::Validate();
-
 	    assert(!dim.empty() &&
 	    	    std::find(dim.begin(),dim.end(),size_t(0))==dim.end() &&
 	    	    dim.size() == res.size());
 
-	    size_t n = 1, i = 0, ds = dim.size();
-		
 		_dim = dim;
 		_res = res;
 
@@ -210,8 +196,6 @@ public:
      */
     inline explicit
     Matrix (const size_t n) {
-
-	    //TypeTraits<T>::Validate();
 
 	    assert (n);
 
@@ -240,7 +224,6 @@ public:
     inline
     Matrix              (const size_t m, const size_t n) {
 
-        //TypeTraits<T>::Validate();
     	assert (m && n);
 
     	_dim.resize(2); _dim[0] = m; _dim[1] = n;
@@ -266,8 +249,6 @@ public:
      */
     inline
     Matrix (const size_t m, const size_t n, const size_t k) {
-
-	    //TypeTraits<T>::Validate();
 
 	    assert (m && n && k);
 
@@ -317,12 +298,10 @@ public:
                          const size_t ide = 1,
                          const size_t ave = 1) {
 
-    	//TypeTraits<T>::Validate();
-
 		assert (col && lin && cha && set && eco && phs && rep && seg &&
 				par && slc && ida && idb && idc && idd && ide && ave );
 
-	    size_t nd = 16, n = nd, sd, i;
+	    size_t nd = 16, n = nd, i;
 
 	    _dim.resize(n);
 	    _dim[ 0] = col; _dim[ 1] = lin; _dim[ 2] = cha; _dim[ 3] = set;
@@ -364,8 +343,6 @@ public:
     Matrix             (const Matrix<T,P> &M) {
 
 		if (this != &M) {
-
-		    //TypeTraits<T>::Validate();
 
 			_dim = M.Dim();
 			_dsz = M.Dsz();

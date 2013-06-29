@@ -23,9 +23,10 @@ demangle (const char* symbol) {
 		}
     
 	//if that didn't work, try to get a regular c symbol
-	if (1 == sscanf(symbol, "%127s", temp))
-		return temp;
+	//if (1 == sscanf(symbol, "%127s", temp))
+	//	return temp;
 
+    return std::string(symbol);
 }
 
 #else
