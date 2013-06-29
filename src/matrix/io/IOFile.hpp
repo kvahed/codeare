@@ -360,12 +360,12 @@ namespace io      {
 
 		IOMode      m_mode;   /**< @brief IO mode */
 
+		Params      m_params; /**< @brief Additional parameters */
 		bool        m_fopen;  /**< @brief File open? */
 		bool        m_verb;   /**< @brief Verbosity */
 		bool        m_alloc;  /**< @brief Memory allocated? */
 		bool        m_initialised; /**< @brief Initialised */
 
-		Params      m_params; /**< @brief Additional parameters */
 
 		DataStore   m_data; /**< Data */
 

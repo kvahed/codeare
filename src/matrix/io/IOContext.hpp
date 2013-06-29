@@ -648,8 +648,8 @@ namespace io{
 	 *
 	 * @return        Data matrix
 	 */
-	template<class T> inline static
-	Matrix<T> fread (const IOContext& f, const std::string& name) {
+	template<class T> inline static Matrix<T>
+	fread (const IOContext& f, const std::string& name) {
 		return f.Read<T> (name);
 	}
 
@@ -660,9 +660,9 @@ namespace io{
 	 *
 	 * @return        Success (Any value > 0 indicates a problem).
 	 */
-	static int
+	static void
 	fclose (IOContext& f) {
-		return (int)f.Close();
+		f.Close();
 	}
 
 

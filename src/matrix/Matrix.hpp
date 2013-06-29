@@ -1131,8 +1131,6 @@ public:
     inline Matrix<T,P>&
     operator-=         (const Matrix<T,P>& M) {
 
-        size_t i;
-
         assert (Size() == M.Size());
 
 #if defined USE_VALARRAY

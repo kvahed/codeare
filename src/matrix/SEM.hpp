@@ -69,9 +69,8 @@ E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm, NFF
 template <class T> inline static Matrix< std::complex<T> >
 EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm, NFFT<T>** fts) {
 
-	size_t nc, nk, nd;
+	size_t nc, nd;
 
-	nk = fts[0]->FPlan()->M_total; // K-space points
 	nd = fts[0]->FPlan()->d;       // Image space dims
 	nc = size (sm, nd);            // # Receivers
 

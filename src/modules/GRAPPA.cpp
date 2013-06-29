@@ -81,7 +81,8 @@ GRAPPA::Process     () {
 
 	printf ("  Processing GRAPPA ...\n");
 
-	Matrix<cxdb>& scan = Get<cxdb>("scan");
+	//Matrix<cxdb>& scan = Get<cxdb>("scan");
+
 
 	printf ("... done.. WTime: %.4f seconds.\n\n",
 			elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());

@@ -70,7 +70,6 @@ MedianFilter_OMP::Process () {
 	int ih = img.Height(); //image height
 	
 	int ex = (ww / 2), ey = (wh / 2);
-	int array[ww*wh];
 	
 	int x,y,fx,fy;
 	int** input_image  = CreateImage<int>(iw,ih);

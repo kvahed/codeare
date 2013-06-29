@@ -60,7 +60,6 @@ template <class T> inline  size_t
 nnz (const Matrix<T>& M) {
 	
 	size_t nz   = 0;
-	T      zero = T(0);
 	
 	for (int i = 0; i < M.Size(); ++i)
 		if (M[i] != T(0))

@@ -63,8 +63,6 @@
     inline Matrix<T,P>&
     operator*=         (const Matrix<T,P>& M) {
 
-        size_t i;
-
         assert (Size() == M.Size());
 
 #if defined USE_VALARRAY
@@ -174,7 +172,7 @@
     inline Matrix<T,P>
     operator/           (const S s) const {
 
-      		assert (cabs(s) != 0.0);
+      	assert (cabs(s) != 0.0);
 		T t = T (s);
 		Matrix<T,P> res = *this;
 
@@ -197,8 +195,6 @@
      */
     inline Matrix<T,P>&
     operator/=         (const Matrix<T,P>& M) {
-
-        size_t i;
 
         assert (Size() == M.Size());
 
@@ -232,8 +228,6 @@
     template <class S>
     inline Matrix<T,P>&
     operator/=         (const Matrix<S,P> &M) {
-
-        size_t i;
 
         assert (Size() == M.Size());
 

@@ -186,7 +186,7 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<s
         for (size_t k = 0; k < nk; k++) {
             
             // RF action
-            for (size_t p = 0; p < pd[k]; p++, i++) 
+            for (short p = 0; p < pd[k]; p++, i++)
                 rf (i,rc) = solution(k + rc*nk) / (float) pd[k] * cxfl(1000.0,0.0);
 
             // Gradient action, no RF
@@ -211,7 +211,7 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<s
         for (size_t k = 0; k < nk-1; k++) {
             
             // RF action, no gradients
-            for (size_t p = 0; p < pd[k]; p++, i++) 
+            for (short p = 0; p < pd[k]; p++, i++)
                 grad (i,gc) = 0.0; 
             
             if (k < nk-1) 

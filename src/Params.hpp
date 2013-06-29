@@ -94,6 +94,7 @@ public:
                     demangle(typeid(T).name()).c_str(),
                     demangle(ba.type().name()).c_str());
 		}
+		return T(0);
 	}
 
 
