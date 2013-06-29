@@ -37,6 +37,7 @@
 /src/matrix/arithmetic/t_size
 /src/matrix/arithmetic/t_tan
 /src/matrix/arithmetic/t_tanh
+/src/matrix/arithmetic/t_complex
 /src/matrix/dwt/tests/t_dwt
 /src/matrix/dwt/tests/t_dwt2
 /src/matrix/ft/tests/t_dft
