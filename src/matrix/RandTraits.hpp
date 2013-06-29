@@ -8,6 +8,7 @@
 #ifndef NOISETRAITS_HPP_
 #define NOISETRAITS_HPP_
 
+#include "TypeTraits.hpp"
 #include "Matrix.hpp"
 
 #include <gsl/gsl_rng.h>
@@ -212,5 +213,42 @@ inline static void rand_pop (Matrix<T>& M, algorithm a = def) {
 }
 
 
+#include <boost/random.hpp> 
+
+
+
+
+template<class T, class G = boost::mt19937, class D = boost::normal_distribution<typename TypeTraits<T>::RT > >
+class Random {
+
+    typedef boost::variate_generator<G&,D> vg_type;
+    
+public:
+    
+    inline static void Populate (Matrix<T>& M, const T mean, const T sigma) {
+        static G rng (static_cast<unsigned> (time(0)));
+        vg_type generator (rng, D(mean,sigma));
+        std::generate (M.Container().begin(), M.Container.end(), generator);
+    }
+    
+};
+
+
+template<class T> inline std::complex<T>
+AddNoise (std::complex<T> &val, double &noiseest, const double relativenoiselevel,
+          const double absolutenoiselevel, boost::lagged_fibonacci607 &generator) {
+    
+    typedef boost::variate_generator<boost::lagged_fibonacci607&, boost::normal_distribution<> > vg_type;
+    typedef boost::normal_distribution<> d_type;
+
+    //determine the noise level for the real and imaginary parts
+    double realnoiselevel = std::max (std::abs(val.real() * relativenoiselevel), absolutenoiselevel);
+    double imagnoiselevel = std::max (std::abs(val.imag() * relativenoiselevel), absolutenoiselevel);
+    
+    //draw a sample from a normal distribution
+    return std::complex<T>(vg_type (generator, dtype(val.real(), realnoiselevel))(),
+                           vg_type (generator, dtype(val.imag(), imagnoiselevel))());
+    
+}
 
 #endif /* NOISETRAITS_HPP_ */
