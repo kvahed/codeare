@@ -12077,10 +12077,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"3d3bba5b\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"89464dd6\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Sun Jun 30 15:15:18 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Sun Jun 30 15:32:10 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -22608,53 +22608,6 @@ else
   as_fn_error $? "cannot find libssl, bailing out" "$LINENO" 5
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gsl_spline_init in -lgsl" >&5
-$as_echo_n "checking for gsl_spline_init in -lgsl... " >&6; }
-if ${ac_cv_lib_gsl_gsl_spline_init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgsl  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char gsl_spline_init ();
-int
-main ()
-{
-return gsl_spline_init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_gsl_gsl_spline_init=yes
-else
-  ac_cv_lib_gsl_gsl_spline_init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gsl_gsl_spline_init" >&5
-$as_echo "$ac_cv_lib_gsl_gsl_spline_init" >&6; }
-if test "x$ac_cv_lib_gsl_gsl_spline_init" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBGSL 1
-_ACEOF
-
-  LIBS="-lgsl $LIBS"
-
-else
-  as_fn_error $? "cannot find libgsl, bailing out" "$LINENO" 5
-fi
-
 
 
 
@@ -25269,6 +25222,53 @@ _ACEOF
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find libcblas, Compressed sensing reconstruction unavailable!" >&5
 $as_echo "cannot find libcblas, Compressed sensing reconstruction unavailable!" >&6; }
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gsl_spline_init in -lgsl" >&5
+$as_echo_n "checking for gsl_spline_init in -lgsl... " >&6; }
+if ${ac_cv_lib_gsl_gsl_spline_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgsl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gsl_spline_init ();
+int
+main ()
+{
+return gsl_spline_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_gsl_gsl_spline_init=yes
+else
+  ac_cv_lib_gsl_gsl_spline_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gsl_gsl_spline_init" >&5
+$as_echo "$ac_cv_lib_gsl_gsl_spline_init" >&6; }
+if test "x$ac_cv_lib_gsl_gsl_spline_init" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGSL 1
+_ACEOF
+
+  LIBS="-lgsl $LIBS"
+
+else
+  as_fn_error $? "cannot find libgsl, bailing out" "$LINENO" 5
 fi
 
 

@@ -402,7 +402,6 @@ AC_SUBST(PLUGIN_LDFLAGS)
 AC_CHECK_LIB([dl],           [dlopen],   [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],  [], [AC_MSG_ERROR([cannot find libz, bailing out])])
 AC_CHECK_LIB([crypto], [EVP_MD_CTX_create], [], [AC_MSG_ERROR([cannot find libssl, bailing out])])
-AC_CHECK_LIB([gsl],   [gsl_spline_init], [], [AC_MSG_ERROR([cannot find libgsl, bailing out])])
 
 AX_PTHREAD([[]])
 
@@ -862,6 +861,7 @@ LIBS=$SAVE_LIBS
 
 AC_CHECK_LIB([cblas],     [cblas_dasum], [], 
    [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
+AC_CHECK_LIB([gsl],   [gsl_spline_init], [], [AC_MSG_ERROR([cannot find libgsl, bailing out])])
 
 AC_CHECK_FUNCS([floor])
 AC_CHECK_FUNCS([getpagesize])
