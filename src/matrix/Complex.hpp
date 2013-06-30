@@ -24,8 +24,6 @@
 #include "TypeTraits.hpp"
 
 #include <stdlib.h>
-#include <typeinfo>
-#include <boost/static_assert.hpp>
 
 static const std::type_info& float_type (typeid(float));
 static const std::type_info& double_type (typeid(double));
