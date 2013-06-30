@@ -9,14 +9,10 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$
 EXTRA_DIST = GPUSimulator.cl
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la SpatialDomain.la KTPoints.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la SENSE.la
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la SpatialDomain.la KTPoints.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la SENSE.la CompressedSensing.la
 
 if USE_NFFT3
     lib_LTLIBRARIES += NuFFT.la CGSENSE.la 
-endif
-
-if USE_GSL
-    lib_LTLIBRARIES += CompressedSensing.la
 endif
 
 # Common linker flags

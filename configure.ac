@@ -282,6 +282,7 @@ AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdio.h, bai
 AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdlib.h, bailing out])])
 AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find string.h, bailing out])])
 AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
+AC_CHECK_HEADERS([gsl/gsl_spline.h], [], [AC_MSG_ERROR([cannot find gsl/gsl_wavelet2d.h, bailing out])])
 
 AC_ARG_ENABLE([networking],
      [  --enable-networking          turn on networking support (default: yes)],
@@ -346,8 +347,6 @@ AC_CHECK_HEADERS([H5Cpp.h],          [],
    [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([nifti1_io.h],      [], 
    [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
-AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], 
-   [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h sys/sysctl.h])
 AC_CHECK_HEADERS([openssl/evp.h], [HAVE_CRYPTO=1], 
    [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
@@ -403,6 +402,7 @@ AC_SUBST(PLUGIN_LDFLAGS)
 AC_CHECK_LIB([dl],           [dlopen],   [], [AC_MSG_ERROR([cannot find libdl, bailing out])])
 AC_CHECK_LIB([z],            [deflate],  [], [AC_MSG_ERROR([cannot find libz, bailing out])])
 AC_CHECK_LIB([crypto], [EVP_MD_CTX_create], [], [AC_MSG_ERROR([cannot find libssl, bailing out])])
+AC_CHECK_LIB([gsl],   [gsl_spline_init], [], [AC_MSG_ERROR([cannot find libgsl, bailing out])])
 
 AX_PTHREAD([[]])
 
@@ -862,9 +862,6 @@ LIBS=$SAVE_LIBS
 
 AC_CHECK_LIB([cblas],     [cblas_dasum], [], 
    [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
-AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], 
-   [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
-AM_CONDITIONAL([USE_GSL],    [test "$HAVE_GSL" -eq 1])
 
 AC_CHECK_FUNCS([floor])
 AC_CHECK_FUNCS([getpagesize])

@@ -52,7 +52,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @USE_NFFT3_TRUE@am__append_1 = NuFFT.la CGSENSE.la 
-@USE_GSL_TRUE@am__append_2 = CompressedSensing.la
 subdir = src/modules
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/config/depcomp
@@ -124,7 +123,6 @@ CompressedSensing_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(CompressedSensing_la_CXXFLAGS) $(CXXFLAGS) \
 	$(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
-@USE_GSL_TRUE@am_CompressedSensing_la_rpath = -rpath $(libdir)
 DirectMethod_la_DEPENDENCIES =
 am_DirectMethod_la_OBJECTS = DirectMethod.lo CPUSimulator.lo
 DirectMethod_la_OBJECTS = $(am_DirectMethod_la_OBJECTS)
@@ -406,7 +404,7 @@ EXTRA_DIST = GPUSimulator.cl
 lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	MedianFilter_OMP.la SystemCmd.la SpatialDomain.la KTPoints.la \
 	RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la \
-	SENSE.la $(am__append_1) $(am__append_2)
+	SENSE.la CompressedSensing.la $(am__append_1)
 
 # Common linker flags
 COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
@@ -534,7 +532,7 @@ AFI.la: $(AFI_la_OBJECTS) $(AFI_la_DEPENDENCIES) $(EXTRA_AFI_la_DEPENDENCIES)
 CGSENSE.la: $(CGSENSE_la_OBJECTS) $(CGSENSE_la_DEPENDENCIES) $(EXTRA_CGSENSE_la_DEPENDENCIES) 
 	$(CGSENSE_la_LINK) $(am_CGSENSE_la_rpath) $(CGSENSE_la_OBJECTS) $(CGSENSE_la_LIBADD) $(LIBS)
 CompressedSensing.la: $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_DEPENDENCIES) $(EXTRA_CompressedSensing_la_DEPENDENCIES) 
-	$(CompressedSensing_la_LINK) $(am_CompressedSensing_la_rpath) $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_LIBADD) $(LIBS)
+	$(CompressedSensing_la_LINK) -rpath $(libdir) $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_LIBADD) $(LIBS)
 DirectMethod.la: $(DirectMethod_la_OBJECTS) $(DirectMethod_la_DEPENDENCIES) $(EXTRA_DirectMethod_la_DEPENDENCIES) 
 	$(DirectMethod_la_LINK) -rpath $(libdir) $(DirectMethod_la_OBJECTS) $(DirectMethod_la_LIBADD) $(LIBS)
 DummyRecon.la: $(DummyRecon_la_OBJECTS) $(DummyRecon_la_DEPENDENCIES) $(EXTRA_DummyRecon_la_DEPENDENCIES) 

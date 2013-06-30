@@ -11,9 +11,6 @@
 #include "TypeTraits.hpp"
 #include "Matrix.hpp"
 
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
-
 #include <limits>
 
 #include <limits>
