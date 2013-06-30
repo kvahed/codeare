@@ -16,224 +16,127 @@
 
 #include <limits>
 
-template<class T> inline static Matrix<T>
-normal (Matrix<T>&) {}
+#include <limits>
+#include <iostream>
+#include <algorithm>
+#include <cycle.h>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 
+template <class T>
+struct RandTraits;
 
-enum distribution { uniform, gaussian, rayleigh, landau };
-enum algorithm { def, mt19937, ranlxs0, ranlxs1, ranlxs2, ranlxd1, ranlxd2,
-	             ranlux, ranlux389, cmrg, mrg, taus, taus2, gfsr4};
-
-inline static const gsl_rng_type*
-gen_type (const algorithm alg) {
-
-	const gsl_rng_type* T;
-
-	switch (alg) {
-		case 0: T=gsl_rng_default;   break;
-		case 1: T=gsl_rng_mt19937;   break;
-		case 2: T=gsl_rng_ranlxs0;   break;
-		case 3: T=gsl_rng_ranlxs1;   break;
-		case 4: T=gsl_rng_ranlxs2;   break;
-		case 5: T=gsl_rng_ranlxd1;   break;
-		case 6: T=gsl_rng_ranlxd2;   break;
-		case 7: T=gsl_rng_ranlux;    break;
-		case 8: T=gsl_rng_ranlux389; break;
-		case 9: T=gsl_rng_cmrg;      break;
-		case 10: T=gsl_rng_mrg;      break;
-		case 11: T=gsl_rng_taus;     break;
-		case 12: T=gsl_rng_taus2;    break;
-		case 13: T=gsl_rng_gfsr4;    break;
-		default: T=gsl_rng_default;  break;
-	}
-
-	return T;
-
-}
-
-template <class T, distribution D>
-struct generator;
-
-template<> template<>
-struct generator<float,uniform> {
-	typedef float T;
-	inline static T generate (gsl_rng* r) {
-		return 2.0 * gsl_rng_uniform (r) - 1.0;
-	}
+template <>
+struct RandTraits<float> {
+    typedef float T;
+    typedef typename TypeTraits<T>::RT RT;
+    typedef boost::normal_distribution<RT> normal;
+    typedef boost::random::uniform_real_distribution<RT> uniform;
+    inline static RT stdmin () {return -1.0;}
+    inline static RT stdmax () {return  1.0;}
+    template <class G>
+    inline static void Populate (Matrix<T>& rta, G& generator) {
+        std::generate (rta.Begin(), rta.End(), generator);
+    }
 };
-template<> template<>
-struct generator<double,uniform> {
-	typedef double T;
-	inline static T generate (gsl_rng* r) {
-		return 2.0 * gsl_rng_uniform (r) - 1.0;
-	}
+template <>
+struct RandTraits<double> {
+    typedef double T;
+    typedef typename TypeTraits<T>::RT RT;
+    typedef boost::normal_distribution<RT> normal;
+    typedef boost::random::uniform_real_distribution<RT> uniform;
+    inline static RT stdmin () {return -1.0;}
+    inline static RT stdmax () {return  1.0;}
+    template <class G>
+    inline static void Populate (Matrix<T>& rta, G& generator) {
+        std::generate (rta.Begin(), rta.End(), generator);
+    }
 };
-template<> template<>
-struct generator<cxfl,uniform> {
-	typedef cxfl T;
-	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_rng_uniform(r) - 1.0, 2.0 * gsl_rng_uniform(r) - 1.0);
-	}
+template <>
+struct RandTraits<cxfl> {
+    typedef cxfl T;
+    typedef typename TypeTraits<T>::RT RT;
+    typedef boost::random::normal_distribution<RT> normal;
+    typedef boost::random::uniform_real_distribution<RT> uniform;
+    inline static RT stdmin () {return -1.0;}
+    inline static RT stdmax () {return  1.0;}
+    template <class G>
+    inline static void Populate (Matrix<T>& rta, G& generator) { 
+        for (size_t i = 0; i < rta.Size(); ++i)
+          rta[i] = T(generator(),generator());
+    }
 };
-template<> template<>
-struct generator<cxdb,uniform> {
-	typedef cxdb T;
-	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_rng_uniform(r) - 1.0, 2.0 * gsl_rng_uniform(r) - 1.0);
-	}
+template <>
+struct RandTraits<cxdb> {
+    typedef cxdb T;
+    typedef typename TypeTraits<T>::RT RT;
+    typedef boost::normal_distribution<RT> normal;
+    typedef boost::random::uniform_real_distribution<RT> uniform;
+    inline static RT stdmin () {return -1.0;}
+    inline static RT stdmax () {return  1.0;}
+    template <class G>
+    inline static void Populate (Matrix<T>& rta, G& generator) { 
+        for (size_t i = 0; i < rta.Size(); ++i)
+          rta[i] = T(generator(),generator());
+    }
 };
-template<> template<>
-struct generator<short,uniform> {
-	typedef short T;
-	inline static T generate (gsl_rng* r) {
-		return 2 * gsl_rng_uniform_int (r, SHRT_MAX) - SHRT_MAX;
-	}
+template <>
+struct RandTraits<short> {
+    typedef short T;
+    typedef typename TypeTraits<T>::RT RT;
+    typedef boost::random::uniform_int_distribution<RT> uniform;
+    typedef boost::random::uniform_int_distribution<RT> normal;
+    inline static RT stdmin () {return -SHRT_MAX;}
+    inline static RT stdmax () {return  SHRT_MAX;}
+    template <class G>
+    inline static void Populate (Matrix<T>& rta, G& generator) {
+        std::generate (rta.Begin(), rta.End(), generator);
+    }
 };
-template<> template<>
-struct generator<long,uniform> {
-	typedef long T;
-	inline static T generate (gsl_rng* r) {
-		return 2 * gsl_rng_uniform_int (r, INT_MAX) - INT_MAX;
-	}
-};
-template<> template<>
-struct generator<unsigned short,uniform> {
-	typedef unsigned short T;
-	inline static T generate (gsl_rng* r) {
-		return gsl_rng_uniform_int (r, SHRT_MAX);
-	}
-};
-template<> template<>
-struct generator<size_t,uniform> {
-	typedef size_t T;
-	inline static T generate (gsl_rng* r) {
-		return gsl_rng_uniform_int (r, INT_MAX);
-	}
-};
-
-template<> template<>
-struct generator<float,gaussian> {
-	typedef double T;
-	inline static T generate (gsl_rng* r) {
-		return (2.0 * gsl_ran_ugaussian (r) - 1.0);
-	}
-};
-template<> template<>
-struct generator<double,gaussian> {
-	typedef double T;
-	inline static T generate (gsl_rng* r) {
-		return (2.0 * gsl_ran_ugaussian (r) - 1.0);
-	}
-};
-template<> template<>
-struct generator<cxfl,gaussian> {
-	typedef cxfl T;
-	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_ran_ugaussian (r) - 1.0, 2.0 * gsl_ran_ugaussian (r) - 1.0);
-	}
-};
-template<> template<>
-struct generator<cxdb,gaussian> {
-	typedef cxdb T;
-	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_ran_ugaussian (r) - 1.0, 2.0 * gsl_ran_ugaussian (r) - 1.0);
-	}
-};
-template<> template<>
-struct generator<float,rayleigh> {
-	typedef double T;
-	inline static T generate (gsl_rng* r) {
-		return (2.0 * gsl_ran_rayleigh (r,1.0) - 1.0);
-	}
-};
-template<> template<>
-struct generator<double,rayleigh> {
-	typedef double T;
-	inline static T generate (gsl_rng* r) {
-		return (2.0 * gsl_ran_rayleigh (r,1.0) - 1.0);
-	}
-};
-template<> template<>
-struct generator<cxfl,rayleigh> {
-	typedef cxfl T;
-	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_ran_rayleigh (r,1.0) - 1.0, 2.0 * gsl_ran_rayleigh (r,1.0) - 1.0);
-	}
-};
-template<> template<>
-struct generator<cxdb,rayleigh> {
-	typedef cxdb T;
-	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_ran_rayleigh (r,1.0) - 1.0, 2.0 * gsl_ran_rayleigh (r,1.0) - 1.0);
-	}
-};
-template<> template<>
-struct generator<float,landau> {
-	typedef double T;
-	inline static T generate (gsl_rng* r) {
-		return (2.0 * gsl_ran_landau (r) - 1.0);
-	}
-};
-template<> template<>
-struct generator<double,landau> {
-	typedef double T;
-	inline static T generate (gsl_rng* r) {
-		return (2.0 * gsl_ran_landau (r) - 1.0);
-	}
-};
-template<> template<>
-struct generator<cxfl,landau> {
-	typedef cxfl T;
-	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_ran_landau (r) - 1.0, 2.0 * gsl_ran_landau (r) - 1.0);
-	}
-};
-template<> template<>
-struct generator<cxdb,landau> {
-	typedef cxdb T;
-	inline static T generate (gsl_rng* r) {
-		return T(2.0 * gsl_ran_landau (r) - 1.0, 2.0 * gsl_ran_landau (r) - 1.0);
-	}
+template <>
+struct RandTraits<long> {
+    typedef long T;
+    typedef typename TypeTraits<T>::RT RT;
+    typedef boost::random::uniform_int_distribution<RT> uniform;
+    typedef boost::random::uniform_int_distribution<RT> normal;
+    inline static RT stdmin () {return -LONG_MAX;}
+    inline static RT stdmax () {return  LONG_MAX;}
+    template <class G>
+    inline static void Populate (Matrix<T>& rta, G& generator) {
+        std::generate (rta.Begin(), rta.End(), generator);
+    }
 };
 
-template<class T, distribution D>
-inline static void rand_pop (Matrix<T>& M, algorithm a = def) {
-
-	const gsl_rng_type* grt = gen_type(a);
-	gsl_rng_env_setup();
-	gsl_rng* r = gsl_rng_alloc (grt);
-
-	gsl_rng_set (r, getticks()); // reseed
-
-	for (size_t i = 0; i < numel(M); ++i)
-		M[i] = generator<T,D>::generate(r);
-
-	gsl_rng_free (r);
-
-}
-
-
-#include <boost/random.hpp> 
-
-
-
-
-template<class T, class G = boost::mt19937, class D = boost::normal_distribution<typename TypeTraits<T>::RT > >
+template<class T, class RNG = boost::mt19937>
 class Random {
 
-    typedef boost::variate_generator<G&,D> vg_type;
+    typedef typename TypeTraits<T>::RT RT;
     
 public:
     
-    inline static void Populate (Matrix<T>& M, const T mean, const T sigma) {
-        static G rng (static_cast<unsigned> (time(0)));
-        vg_type generator (rng, D(mean,sigma));
-        std::generate (M.Container().begin(), M.Container.end(), generator);
+    inline static void Normal (Matrix<T>& vt, const RT mean = 0.0, const RT sigma = 1.0) {
+        RNG rng (static_cast<unsigned> (getticks()));
+        boost::variate_generator<RNG&,typename RandTraits<T>::normal>
+            generator (rng, typename RandTraits<T>::normal(mean,sigma));
+        RandTraits<T>::Populate(vt, generator);
     }
     
+    inline static void Uniform (Matrix<T>& vt, const RT min = RandTraits<T>::stdmin(),
+                                const RT max = RandTraits<T>::stdmax()) {
+        RNG rng (static_cast<unsigned> (getticks()));
+        boost::variate_generator<RNG&,typename RandTraits<T>::uniform>
+            generator (rng, typename RandTraits<T>::uniform(min,max));
+        RandTraits<T>::Populate(vt, generator);
+    }
+
 };
 
 
+/*
 template<class T> inline std::complex<T>
 AddNoise (std::complex<T> &val, double &noiseest, const double relativenoiselevel,
           const double absolutenoiselevel, boost::lagged_fibonacci607 &generator) {
@@ -250,5 +153,5 @@ AddNoise (std::complex<T> &val, double &noiseest, const double relativenoiseleve
                            vg_type (generator, dtype(val.imag(), imagnoiselevel))());
     
 }
-
+*/
 #endif /* NOISETRAITS_HPP_ */

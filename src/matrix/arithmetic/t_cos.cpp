@@ -7,7 +7,7 @@ void cos_check () {
 
     using namespace codeare::matrix::arithmetic;
     
-    Matrix<T> rhs = rand<T,uniform>(3,4);
+    Matrix<T> rhs = rand<T>(3,4);
     Matrix<T> lhs;
 
     lhs = cos (rhs);

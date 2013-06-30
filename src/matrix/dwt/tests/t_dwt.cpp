@@ -9,7 +9,7 @@ int main (int args, char** argv) {
 
     size_t sl = 32;
     
-    Matrix<cxfl> A = rand <cxfl, uniform> (32, 32), B;
+    Matrix<cxfl> A = rand <cxfl> (32, 32), B;
     
     DWT<cxfl> wt (sl);
     B = wt * A;

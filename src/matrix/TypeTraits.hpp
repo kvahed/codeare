@@ -173,7 +173,7 @@ template<> struct TypeTraits<long> {
 		return (typeid(T) == typeid(RT));
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
-        os << boost::format("%l") % t;
+        os << boost::format("%li") % t;
         return os;
     }
 };

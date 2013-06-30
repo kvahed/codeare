@@ -160,7 +160,7 @@ CGSENSE::Process () {
         data = Get<cxfl>("data");
     else {
         data  = m_ncs->Trafo (phantom<cxfl>(size(sens,0)), sens);
-        data += m_noise * rand<cxfl,gaussian>(size(data));
+        data += m_noise * randn<cxfl>(size(data));
     }
 
     Matrix<cxfl> img = m_ncs->Adjoint (data, sens);

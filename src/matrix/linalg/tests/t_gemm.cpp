@@ -5,8 +5,8 @@
 
 template<class T,class S> void gemm_check () {
 
-    Matrix<T> A = rand<T,uniform> (4,3);
-    Matrix<S> B = rand<S,uniform> (3,4);
+    Matrix<T> A = rand<T> (4,3);
+    Matrix<S> B = rand<S> (3,4);
     
 #ifdef VERBOSE
     std::cout << "A=\n" << A;

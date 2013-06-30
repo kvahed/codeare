@@ -83,6 +83,7 @@ ResToCString (const Matrix<T>& M) {
 	return ResToString(M).c_str();
 }
 
+
 template<class T> inline std::ostream&
 operator<< (std::ostream& os, const Matrix<T>& v) {
     size_t i,j;

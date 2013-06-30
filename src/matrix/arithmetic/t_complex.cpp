@@ -9,8 +9,8 @@ template<class T, class S> void complex_check () {
 
     using namespace codeare::matrix::arithmetic;
     
-    Matrix<T> rhs1 = rand<T,uniform>(3,4);
-    Matrix<S> rhs2 = rand<S,uniform>(3,4);
+    Matrix<T> rhs1 = rand<T>(3,4);
+    Matrix<S> rhs2 = rand<S>(3,4);
     Matrix<std::complex<T> > lhs;
 
     lhs = complex(rhs1,rhs2);
