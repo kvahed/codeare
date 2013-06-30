@@ -196,7 +196,7 @@ template<> struct TypeTraits<size_t> {
 		return (typeid(T) == typeid(RT));
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
-        os << boost::format("%li") % t;
+        os << t;
         return os;
     }
 };
