@@ -210,7 +210,7 @@ namespace io {
 			for (size_t i = 0; i < tmpdim; i++)
 				dims[i] = M.Dim(tmpdim-1-i);
 
-			if (typeid(T) == cxfl_type || typeid(T) == cxdb_type) {
+			if (is_complex(t)) {
 				dims.push_back(2);
 				tmpdim++;
 			}

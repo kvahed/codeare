@@ -1504,67 +1504,8 @@
     }
 
 
-    
-    /**
-     * @brief           Matrix product. i.e. this * M.
-     *
-     * @param  M        The factor.
-     */
-    inline Matrix<T,P>
-    operator->*         (const Matrix<T,P>& M) const {
-        return this->prod(M);
-    }
-
-    /**
-     * @brief           Matrix Product.
-     *
-     * @param   M       The factor
-     * @param   transa  Transpose ('T') / Conjugate transpose ('C') the left matrix. Default: No transposition'N'
-     * @param   transb  Transpose ('T') / Conjugate transpose ('C') the right matrix. Default: No transposition 'N'
-     * @return          Product of this and M.
-     */
-    inline Matrix<T,P>
-    prod                (const Matrix<T,P> &M, const char transa = 'N', const char transb = 'N') const {
-        return gemm (*this, M, transa, transb);
-    }
-
-
-    /**
-     * @brief           Complex conjugate left and multiply with right.
-     *
-     * @param   M       Factor
-     * @return          Product of conj(this) and M.
-     */
-    inline Matrix<T,P>
-    prodt               (const Matrix<T,P> &M) const {
-        return gemm (*this, M, 'C');
-    }
-
-
-    /**
-     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTC and XDOT
-     *
-     * @param  M        Factor
-     * @return          Scalar product
-     */
-    inline T
-    dotc (const Matrix<T,P>& M) const  {
-        return DOTC (*this, M);
-    }
-
-
-    /**
-     * @brief           Scalar product using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTU and XDOT
-     *
-     * @param  M        Factor
-     * @return          Scalar product
-     */
-    inline T
-    dot (const Matrix<T,P>& M) const {
-
-        return DOT  (*this, M);
-
-    }
-
+//Matrix<T,P> prod (const Matrix<T,P> &M, const char transa, const char transb) const {
+//    return gemm (*this, M, transa, transb);
+//}   
     
     

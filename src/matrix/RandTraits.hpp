@@ -34,7 +34,7 @@ struct RandTraits<float> {
     typedef boost::normal_distribution<RT> normal;
     typedef boost::random::uniform_real_distribution<RT> uniform;
     inline static RT stdmin () {return -1.0;}
-    inline static RT stdmax () {return  1.0;}
+    inline static RT stdmax () {return +1.0;}
     template <class G>
     inline static void Populate (Matrix<T>& rta, G& generator) {
         std::generate (rta.Begin(), rta.End(), generator);
@@ -47,7 +47,7 @@ struct RandTraits<double> {
     typedef boost::normal_distribution<RT> normal;
     typedef boost::random::uniform_real_distribution<RT> uniform;
     inline static RT stdmin () {return -1.0;}
-    inline static RT stdmax () {return  1.0;}
+    inline static RT stdmax () {return +1.0;}
     template <class G>
     inline static void Populate (Matrix<T>& rta, G& generator) {
         std::generate (rta.Begin(), rta.End(), generator);
@@ -60,7 +60,7 @@ struct RandTraits<cxfl> {
     typedef boost::random::normal_distribution<RT> normal;
     typedef boost::random::uniform_real_distribution<RT> uniform;
     inline static RT stdmin () {return -1.0;}
-    inline static RT stdmax () {return  1.0;}
+    inline static RT stdmax () {return +1.0;}
     template <class G>
     inline static void Populate (Matrix<T>& rta, G& generator) { 
         for (size_t i = 0; i < rta.Size(); ++i)
@@ -74,7 +74,7 @@ struct RandTraits<cxdb> {
     typedef boost::normal_distribution<RT> normal;
     typedef boost::random::uniform_real_distribution<RT> uniform;
     inline static RT stdmin () {return -1.0;}
-    inline static RT stdmax () {return  1.0;}
+    inline static RT stdmax () {return +1.0;}
     template <class G>
     inline static void Populate (Matrix<T>& rta, G& generator) { 
         for (size_t i = 0; i < rta.Size(); ++i)
@@ -88,7 +88,7 @@ struct RandTraits<short> {
     typedef boost::random::uniform_int_distribution<RT> uniform;
     typedef boost::random::uniform_int_distribution<RT> normal;
     inline static RT stdmin () {return -SHRT_MAX;}
-    inline static RT stdmax () {return  SHRT_MAX;}
+    inline static RT stdmax () {return +SHRT_MAX;}
     template <class G>
     inline static void Populate (Matrix<T>& rta, G& generator) {
         std::generate (rta.Begin(), rta.End(), generator);
@@ -101,7 +101,7 @@ struct RandTraits<long> {
     typedef boost::random::uniform_int_distribution<RT> uniform;
     typedef boost::random::uniform_int_distribution<RT> normal;
     inline static RT stdmin () {return -LONG_MAX;}
-    inline static RT stdmax () {return  LONG_MAX;}
+    inline static RT stdmax () {return +LONG_MAX;}
     template <class G>
     inline static void Populate (Matrix<T>& rta, G& generator) {
         std::generate (rta.Begin(), rta.End(), generator);
@@ -132,23 +132,4 @@ public:
 
 };
 
-
-/*
-template<class T> inline std::complex<T>
-AddNoise (std::complex<T> &val, double &noiseest, const double relativenoiselevel,
-          const double absolutenoiselevel, boost::lagged_fibonacci607 &generator) {
-    
-    typedef boost::variate_generator<boost::lagged_fibonacci607&, boost::normal_distribution<> > vg_type;
-    typedef boost::normal_distribution<> d_type;
-
-    //determine the noise level for the real and imaginary parts
-    double realnoiselevel = std::max (std::abs(val.real() * relativenoiselevel), absolutenoiselevel);
-    double imagnoiselevel = std::max (std::abs(val.imag() * relativenoiselevel), absolutenoiselevel);
-    
-    //draw a sample from a normal distribution
-    return std::complex<T>(vg_type (generator, dtype(val.real(), realnoiselevel))(),
-                           vg_type (generator, dtype(val.imag(), imagnoiselevel))());
-    
-}
-*/
 #endif /* NOISETRAITS_HPP_ */

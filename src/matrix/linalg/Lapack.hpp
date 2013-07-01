@@ -464,7 +464,70 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, const char& transa = 'N', const ch
 	
 }
 
+template<class T, paradigm P, const bool& b> Matrix<T,P>
+Matrix<T,P,b>::prod  (const Matrix<T,P> &M, const char transa, const char transb) const {
+    return gemm (*this, M, transa, transb);
+}
+template<class T, paradigm P, const bool& b> inline Matrix<T,P>
+Matrix<T,P,b>::prodt (const Matrix<T,P> &M) const {
+    return gemm (*this, M, 'C');
+}
+template<class T, paradigm P, const bool& b> inline Matrix<T,P>
+Matrix<T,P,b>::operator->* (const Matrix<T,P> &M) const {
+    return gemm (*this, M);
+}
 
+/**
+ * @brief             Matrix vector product A*x
+ *
+ * Usage: 
+ * @code{.cpp}
+ *   Matrix<cxdb> A  = rand<cxdb> (20,5);
+ *   Matrix<cxdb> x  = rand<cxdb> (20,1);
+ *   double prod     = gemv (A, x, 'C');
+ * @endcode
+ *
+ * @param  A          Matrix A
+ * @param  x          Vector x
+ * @param  trans      Transpose A?
+ * 
+ * @return            A*x
+ */
+template<class T> inline Matrix<T> 
+gemv (const Matrix<T>& A, const Matrix<T>& x, const char& trans = 'N') {
+    
+    assert (isvec(x));
+    assert (isvec(A)||is2d(A));
+    
+	int aw, ah, xh, m, n, one;
+	T   alpha, beta;
+    
+	// Column vector
+	assert (size(x, 1) == 1);
+	
+	aw  = (int) size (A, 1);
+	ah  = (int) size (A, 0);
+	xh  = (int) size (x, 0);
+	
+	m   = ah;
+	n   = aw; 
+	one = 1;
+	
+	if (trans == 'N')
+		assert (aw == xh);
+	else if (trans == 'T' || trans == 'C')
+		assert (ah == xh);
+	
+	alpha  = T(1.0);
+	beta   = T(0.0);
+	
+	Matrix<T> y ((trans == 'N') ? m : n, 1);
+    
+	LapackTraits<T>::gemv (trans, m, n, alpha, A.Memory(), ah, x.Memory(), one, beta, &y[0], one);
+	
+	return y;
+	
+}
 
 /**
  * @brief              Frobenius norm
@@ -566,58 +629,13 @@ template <class T> inline T
 DOT  (const Matrix<T>& A, const Matrix<T>& B) {
 	return dot (A, B);
 }
-
-
-/**
- * @brief             Matrix vector product A*x
- *
- * Usage: 
- * @code{.cpp}
- *   Matrix<cxdb> A  = rand<cxdb> (20,5);
- *   Matrix<cxdb> x  = rand<cxdb> (20,1);
- *   double prod     = gemv (A, x, 'C');
- * @endcode
- *
- * @param  A          Matrix A
- * @param  x          Vector x
- * @param  trans      Transpose A?
- * 
- * @return            A*x
- */
-template<class T> inline Matrix<T> 
-gemv (const Matrix<T>& A, const Matrix<T>& x, const char& trans = 'N') {
-    
-    assert (isvec(x));
-    assert (isvec(A)||is2d(A));
-    
-	int aw, ah, xh, m, n, one;
-	T   alpha, beta;
-    
-	// Column vector
-	assert (size(x, 1) == 1);
-	
-	aw  = (int) size (A, 1);
-	ah  = (int) size (A, 0);
-	xh  = (int) size (x, 0);
-	
-	m   = ah;
-	n   = aw; 
-	one = 1;
-	
-	if (trans == 'N')
-		assert (aw == xh);
-	else if (trans == 'T' || trans == 'C')
-		assert (ah == xh);
-	
-	alpha  = T(1.0);
-	beta   = T(0.0);
-	
-	Matrix<T> y ((trans == 'N') ? m : n, 1);
-    
-	LapackTraits<T>::gemv (trans, m, n, alpha, A.Memory(), ah, x.Memory(), one, beta, &y[0], one);
-	
-	return y;
-	
+template<class T, paradigm P, const bool& b> inline T
+Matrix<T,P,b>::dotc (const Matrix<T,P>& M) const  {
+    return DOTC (*this, M);
+}
+template<class T, paradigm P, const bool& b> inline T
+Matrix<T,P,b>::dot (const Matrix<T,P>& M) const {
+    return DOT  (*this, M);
 }
 
 

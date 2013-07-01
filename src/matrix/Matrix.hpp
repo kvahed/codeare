@@ -94,11 +94,11 @@
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
  */
-#if _MSC_VER<1300
-template <class T, paradigm P=SHM>
-#else
-template <class T, paradigm P=SHM, const bool& b = TypeTraits<T>::Supported>
+template <class T, paradigm P=SHM
+#if !defined(_MSC_VER) || _MSC_VER>1200
+    ,const bool& b = TypeTraits<T>::Supported
 #endif
+>
 class Matrix  : public SmartObject {
 	
 	
@@ -986,12 +986,61 @@ public:
     
 
     
-#if !(_MSC_VER<1300)
+#if !defined(_MSC_VER) || _MSC_VER>1200
 	#include "Operators.hpp"
 #endif
     
-    
 
+    /**
+     * @brief           Matrix product. i.e. this * M.
+     *
+     * @param  M        The factor.
+     */
+    inline Matrix<T,P>
+    operator->*         (const Matrix<T,P>& M) const;
+
+    /**
+     * @brief           Matrix Product.
+     *
+     * @param   M       The factor
+     * @param   transa  Transpose ('T') / Conjugate transpose ('C') the left matrix. Default: No transposition'N'
+     * @param   transb  Transpose ('T') / Conjugate transpose ('C') the right matrix. Default: No transposition 'N'
+     * @return          Product of this and M.
+     */
+    Matrix<T,P>
+    prod                (const Matrix<T,P> &M, const char transa = 'N', const char transb = 'N') const;
+
+
+
+    /**
+     * @brief           Complex conjugate left and multiply with right.
+     *
+     * @param   M       Factor
+     * @return          Product of conj(this) and M.
+     */
+    inline Matrix<T,P>
+    prodt               (const Matrix<T,P> &M) const;
+
+
+    /**
+     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTC and XDOT
+     *
+     * @param  M        Factor
+     * @return          Scalar product
+     */
+    inline T
+    dotc (const Matrix<T,P>& M) const;
+
+
+    /**
+     * @brief           Scalar product using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTU and XDOT
+     *
+     * @param  M        Factor
+     * @return          Scalar product
+     */
+    inline T
+    dot (const Matrix<T,P>& M) const;
+    
     /**
      * @name            Dimensions
      *                  Some convenience functions to access dimensionality

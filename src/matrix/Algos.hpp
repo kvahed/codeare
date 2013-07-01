@@ -28,7 +28,7 @@
 #include <vector>
 #include <algorithm>    // std::reverse
 
-#if !(_MSC_VER<1300)
+#if !defined(_MSC_VER) || _MSC_VER>1200
 template <bool> struct _assert;
 template <> struct _assert<true> { };
 
@@ -251,7 +251,7 @@ isfinite (const Matrix<T>& M) {
  * @param  v    Optional value to which NaN and Inf elements are set. (default: T(0))
  * @return      Matrix stripped of NaN and Inf elements 
  */
-#if !(_MSC_VER<1300)
+#if !defined(_MSC_VER) || _MSC_VER>1200
 template <class T> inline  Matrix<T>
 dofinite (const Matrix<T>& M, const T& v = 0) {
 

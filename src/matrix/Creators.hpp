@@ -3,8 +3,8 @@
 
 #include "Matrix.hpp"
 #include "Algos.hpp"
-#if !(_MSC_VER<1300)
-#include "RandTraits.hpp"
+#if !defined(_MSC_VER) || _MSC_VER>1200
+#  include "RandTraits.hpp"
 #endif
 
 
@@ -132,8 +132,6 @@ ones            (const size_t& col,
 }
 
 
-#if !(_MSC_VER<1300)
-
 /**
  * @brief       Square matrix of ones
  *
@@ -159,6 +157,7 @@ ones           (const Matrix<size_t>& sz) {
 }
 
 
+#if !defined(_MSC_VER) || _MSC_VER>1200
 /**
  * @brief       Uniformly random matrix
  *
