@@ -3,7 +3,9 @@
 
 #include "Matrix.hpp"
 #include "Algos.hpp"
+#if !(_MSC_VER<1300)
 #include "RandTraits.hpp"
+#endif
 
 
 
@@ -129,6 +131,8 @@ ones            (const size_t& col,
 
 }
 
+
+#if !(_MSC_VER<1300)
 
 /**
  * @brief       Square matrix of ones
@@ -305,7 +309,7 @@ template<class T> static Matrix<T>
 randn (const size_t n) {
 	return rand<T>(n,n);
 }
-
+#endif
 
 /**
  * @brief       nxn square matrix with circle centered at p

@@ -28,6 +28,7 @@
 #include <vector>
 #include <algorithm>    // std::reverse
 
+#if !(_MSC_VER<1300)
 template <bool> struct _assert;
 template <> struct _assert<true> { };
 
@@ -39,7 +40,7 @@ template <class T> inline bool is_inf (T const& x) {
     static_cast<void>(sizeof(_assert<std::numeric_limits<T>::has_infinity>));
     return x == std::numeric_limits<T>::infinity() or x == -std::numeric_limits<T>::infinity();
 }
-
+#endif
 
 
 
@@ -250,6 +251,7 @@ isfinite (const Matrix<T>& M) {
  * @param  v    Optional value to which NaN and Inf elements are set. (default: T(0))
  * @return      Matrix stripped of NaN and Inf elements 
  */
+#if !(_MSC_VER<1300)
 template <class T> inline  Matrix<T>
 dofinite (const Matrix<T>& M, const T& v = 0) {
 
@@ -262,6 +264,7 @@ dofinite (const Matrix<T>& M, const T& v = 0) {
     return res;
 
 }
+#endif
 
 
 /**
