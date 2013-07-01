@@ -108,7 +108,7 @@
 // Customize these as needed for your application
 #define USER_MSG(msg)  { std::cerr << msg << std::endl; }
 #define TRAP(cond, msg) { if(cond) { USER_MSG(msg); throw msg; } }
-#define ERROR(msg) { TRAP(true, msg); }
+#define PERROR(msg) { TRAP(true, msg); }
 
 
 // Note: for the objects that you use NEW instead of new, you get memory leak
@@ -365,8 +365,8 @@ private:
     bool m_hasOwnership;
     AutoPtr(const AutoPtr<ELT>& other); //disallow copy ctor
     AutoPtr& operator=(AutoPtr<ELT> &other); //disallow operator=
-    virtual Ptr<ELT>& operator=(Ptr<ELT> &ptr) { ERROR("Operator= is disallowed for AutoPtr"); return *this; }
-    virtual Ptr<ELT>& operator=(ELT* ptr)  { ERROR("Operator= is disallowed for AutoPtr");  return *this; }
+    virtual Ptr<ELT>& operator=(Ptr<ELT> &ptr) { PERROR("Operator= is disallowed for AutoPtr"); return *this; }
+    virtual Ptr<ELT>& operator=(ELT* ptr)  { PERROR("Operator= is disallowed for AutoPtr");  return *this; }
 };
 
 
