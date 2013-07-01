@@ -25,42 +25,31 @@
 
 #include <stdlib.h>
 
-static const std::type_info& float_type (typeid(float));
-static const std::type_info& double_type (typeid(double));
-static const std::type_info& cxfl_type (typeid(cxfl));
-static const std::type_info& cxdb_type (typeid(cxdb));
-
-static const std::type_info& short_type (typeid(short));
-static const std::type_info& long_type (typeid(long));
-static const std::type_info& bool_type (typeid(bool));
-static const std::type_info& int_type (typeid(int));
-static const std::type_info& size_t_type (typeid(size_t));
-
 template<class T>
 static inline bool fp_type (const T t) {
-	return (typeid(T) == float_type || typeid(T) == double_type ||
-			typeid(T) ==  cxfl_type || typeid(T) ==   cxdb_type );
+	return (typeid(T) == typeid(float) || typeid(T) == typeid(double) ||
+			typeid(T) ==  typeid(cxfl) || typeid(T) ==   typeid(cxdb) );
 }
 
 template<class T>
 static inline bool is_complex (const T t) {
-	return (typeid(T) == cxfl_type || typeid(T) == cxdb_type );
+	return (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb) );
 }
 
 template<class T>
 static inline bool is_singlep (const T t) {
-	return (typeid(T) == cxfl_type || typeid(T) == float_type );
+	return (typeid(T) == typeid(cxfl) || typeid(T) == typeid(float) );
 }
 
 template<class T>
 static inline bool is_doublep (const T t) {
-	return (typeid(T) == cxdb_type || typeid(T) == double_type );
+	return (typeid(T) == typeid(cxdb) || typeid(T) == typeid(double) );
 }
 
 template<class T>
 static inline bool i_type (const T t) {
-return (typeid(T) == short_type || typeid(T) == long_type ||
-		typeid(T) ==  bool_type || typeid(T) ==   int_type );
+	return (typeid(T) == typeid(short) || typeid(T) == typeid(long) ||
+			typeid(T) ==  typeid(bool) || typeid(T) ==   typeid(int) );
 }
 
 template<class T>
@@ -146,12 +135,12 @@ struct CompTraits<cxfl> {
 
 	typedef cxfl type;
 
-	inline static bool less_or_equal    (const type& a, const type& b) { return abs(a) <= abs(b); }
-	inline static bool less             (const type& a, const type& b) { return abs(a) <  abs(b); }
-	inline static bool greater_or_equal (const type& a, const type& b) { return abs(a) >= abs(b); }
-	inline static bool greater          (const type& a, const type& b) { return abs(a) >  abs(b); }
-	inline static bool logical_or       (const type& a, const type& b) { return abs(a) || abs(b); }
-	inline static bool logical_and      (const type& a, const type& b) { return abs(a) && abs(b); }
+	inline static bool less_or_equal    (const type& a, const type& b) { return std::abs(a) <= std::abs(b); }
+	inline static bool less             (const type& a, const type& b) { return std::abs(a) <  std::abs(b); }
+	inline static bool greater_or_equal (const type& a, const type& b) { return std::abs(a) >= std::abs(b); }
+	inline static bool greater          (const type& a, const type& b) { return std::abs(a) >  std::abs(b); }
+	inline static bool logical_or       (const type& a, const type& b) { return std::abs(a) || std::abs(b); }
+	inline static bool logical_and      (const type& a, const type& b) { return std::abs(a) && std::abs(b); }
 
 };
 
@@ -160,12 +149,12 @@ struct CompTraits<cxdb> {
 
 	typedef cxdb type;
 
-	inline static bool less_or_equal    (const type& a, const type& b) { return abs(a) <= abs(b); }
-	inline static bool less             (const type& a, const type& b) { return abs(a) <  abs(b); }
-	inline static bool greater_or_equal (const type& a, const type& b) { return abs(a) >= abs(b); }
-	inline static bool greater          (const type& a, const type& b) { return abs(a) >  abs(b); }
-	inline static bool logical_or       (const type& a, const type& b) { return abs(a) || abs(b); }
-	inline static bool logical_and      (const type& a, const type& b) { return abs(a) && abs(b); }
+	inline static bool less_or_equal    (const type& a, const type& b) { return std::abs(a) <= std::abs(b); }
+	inline static bool less             (const type& a, const type& b) { return std::abs(a) <  std::abs(b); }
+	inline static bool greater_or_equal (const type& a, const type& b) { return std::abs(a) >= std::abs(b); }
+	inline static bool greater          (const type& a, const type& b) { return std::abs(a) >  std::abs(b); }
+	inline static bool logical_or       (const type& a, const type& b) { return std::abs(a) || std::abs(b); }
+	inline static bool logical_and      (const type& a, const type& b) { return std::abs(a) && std::abs(b); }
 
 };
 
