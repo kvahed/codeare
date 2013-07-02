@@ -4,7 +4,9 @@
 #include <complex>
 #include <typeinfo>
 #include <iostream>
-#include <boost/format.hpp>
+#ifndef MSVC60
+#  include <boost/format.hpp>
+#endif
 
 typedef std::complex<float>  cxfl;
 typedef std::complex<double> cxdb;
@@ -29,7 +31,11 @@ template<> struct TypeTraits<float> {
 		return (typeid(T) == typeid(RT));
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
+#ifndef MSVC60
         os << boost::format("%+.4e") % t;
+#else
+        os << t;
+#endif
         return os;
     }
 };
@@ -53,7 +59,11 @@ template<> struct TypeTraits<double> {
 		return (typeid(T) == typeid(RT));
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
+#ifndef MSVC60
         os << boost::format("%+.4e") % t;
+#else
+        os << t;
+#endif
         return os;
     }
 
@@ -80,7 +90,11 @@ template<> struct TypeTraits<cxfl> {
 		return true;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
+#ifndef MSVC60
         os << boost::format("%+.4e+1i*%+.4e") % t.real() % t.imag();
+#else
+        os << t;
+#endif
         return os;
     }
 };
@@ -103,7 +117,11 @@ template<> struct TypeTraits<cxdb> {
 		return (typeid(T) == typeid(RT));
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
+#ifndef MSVC60
         os << boost::format("%+.4e+1i*%+.4e") % t.real() % t.imag();
+#else
+        os << t;
+#endif
         return os;
     }
 };
@@ -126,7 +144,11 @@ template<> struct TypeTraits<short> {
 		return (typeid(T) == typeid(RT));
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
+#ifndef MSVC60
         os << boost::format("%+.4e") % t;
+#else
+        os << t;
+#endif
         return os;
     }
 };
@@ -149,7 +171,11 @@ template<> struct TypeTraits<unsigned char> {
 		return (typeid(T) == typeid(RT));
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
+#ifndef MSVC60
         os << boost::format("%d") % (unsigned short)t;
+#else
+        os << (unsigned short)t;
+#endif
         return os;
     }
 };
@@ -173,7 +199,11 @@ template<> struct TypeTraits<long> {
 		return (typeid(T) == typeid(RT));
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
+#ifndef MSVC60
         os << boost::format("%li") % t;
+#else
+        os << t;
+#endif
         return os;
     }
 };
@@ -196,7 +226,11 @@ template<> struct TypeTraits<size_t> {
 		return (typeid(T) == typeid(RT));
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
+#ifndef MSVC60
+        os << boost::format("%zu") % t;
+#else
         os << t;
+#endif
         return os;
     }
 };

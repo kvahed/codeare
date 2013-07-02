@@ -14,9 +14,6 @@
   #include "Digest.hpp"
 #endif
 
-using namespace std;
-
-
 
 typedef map<string, string[2]> reflist;
 typedef pair<string, string[2]> ref;
@@ -64,9 +61,9 @@ class Workspace {
 	
 	
     template <class T> inline Matrix<T>&
-	Get              (const string& name) {
+	Get              (const std::string& name) {
 
-        reflist::iterator it = m_ref.find(name);
+		reflist::iterator it = m_ref.find(name);
 
         if (it == m_ref.end())
             printf ("**WARNING**: Matrix %s could not be found in workspace!\n", name.c_str());
@@ -93,7 +90,7 @@ class Workspace {
 	 * @param  m     CXFL data storage 
 	 */
 	template <class T> inline void
-	GetMatrix          (const string& name, Matrix<T>& m) {
+	GetMatrix          (const std::string& name, Matrix<T>& m) {
         m = Get<T>(name);
 	}
 
@@ -106,7 +103,7 @@ class Workspace {
 	 * @param  m     CXFL data storage 
 	 */
 	template <class T> inline void
-	SetMatrix          (const string& name, Matrix<T>& m) {
+	SetMatrix          (const std::string& name, Matrix<T>& m) {
 
 		string tag[2];
 		tag[0] = sha256(name);
@@ -126,11 +123,11 @@ class Workspace {
 
 	}
     template<class T> inline void
-    Set (const string& name, Matrix<T>& m) {
+    Set (const std::string& name, Matrix<T>& m) {
         SetMatrix (name, m);
     }
     template<class T> inline void
-    Add (const string& name, Matrix<T>& m) {
+    Add (const std::string& name, Matrix<T>& m) {
         SetMatrix (name, m);
     }
 	
@@ -144,8 +141,35 @@ class Workspace {
 	 * @return       Success
 	 */
 	template<class T> inline Matrix<T>&
-	AddMatrix        (const string& name, Ptr< Matrix<T> > m = NEW (Matrix<T>)) {
+	AddMatrix        (const std::string& name, Ptr< Matrix<T> > m) {
 
+		std::string tag[2];
+		boost::any value = m;
+        
+		tag[0] = sha256(name);
+		tag[1] = typeid(T).name();
+		assert (m_ref.find (name) == m_ref.end());
+		m_ref.insert (ref(name, tag));
+		m_store.insert (entry (tag[0], value));
+
+        m->SetClassName(name.c_str());
+        
+		return *m;
+
+	}
+
+	/**
+	 * @brief        Add a matrix to workspace
+	 *
+	 * @param  name  Name
+	 * @param  m     The added matrix
+     *
+	 * @return       Success
+	 */
+	template<class T> inline Matrix<T>&
+	AddMatrix        (const std::string& name) {
+
+		Ptr<Matrix<T> > m = NEW (Matrix<T>());
 		std::string tag[2];
 		boost::any value = m;
         
@@ -171,7 +195,7 @@ class Workspace {
 	 * @return       Success
 	 */
 	template<class T> inline Matrix<T>&
-	AddMatrix        (const string& name, Matrix<T>& m) {
+	AddMatrix        (const std::string& name, Matrix<T>& m) {
 
 		return AddMatrix(name, &m);
 

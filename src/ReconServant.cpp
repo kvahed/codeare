@@ -72,62 +72,62 @@ namespace RRServer {
 	}
 	
 	void
-	ReconServant::set_cxfl  (const char* name, const cxfl_data& c) {
+	ReconServant::set_cxfl  (const char* name, const RRSModule::cxfl_data& c) {
 		this->SetMatrix (name,c);
 	}
 	
 	void
-	ReconServant::get_cxfl (const char* name, cxfl_data& c) {
+	ReconServant::get_cxfl (const char* name, RRSModule::cxfl_data& c) {
 		this->GetMatrix (name, c);
 	}
 
 	void
-	ReconServant::set_cxdb  (const char* name, const cxdb_data& c) {
+	ReconServant::set_cxdb  (const char* name, const RRSModule::cxdb_data& c) {
 		this->SetMatrix (name,c);
 	}
 
 	void
-	ReconServant::get_cxdb (const char* name, cxdb_data& c) {
+	ReconServant::get_cxdb (const char* name, RRSModule::cxdb_data& c) {
 		this->GetMatrix (name,c);
 	}
 
 	void
-	ReconServant::set_rlfl  (const char* name, const rlfl_data& c) {
+	ReconServant::set_rlfl  (const char* name, const RRSModule::rlfl_data& c) {
 		this->SetMatrix (name,c);
 	}
 	
 	void
-	ReconServant::get_rlfl (const char* name, rlfl_data& c) {
+	ReconServant::get_rlfl (const char* name, RRSModule::rlfl_data& c) {
 		this->SetMatrix (name,c);
 	}
 	
 	void
-	ReconServant::set_rldb  (const char* name, const rldb_data& c) {
+	ReconServant::set_rldb  (const char* name, const RRSModule::rldb_data& c) {
 		this->SetMatrix (name,c);
 	}
 
 	void
-	ReconServant::get_rldb (const char* name, rldb_data& c) {
+	ReconServant::get_rldb (const char* name, RRSModule::rldb_data& c) {
 		this->GetMatrix (name,c);
 	}
 
 	void
-	ReconServant::set_shrt  (const char* name, const shrt_data& c) {
+	ReconServant::set_shrt  (const char* name, const RRSModule::shrt_data& c) {
 		this->SetMatrix (name,c);
 	}
 
 	void
-	ReconServant::get_shrt (const char* name, shrt_data& c) {
+	ReconServant::get_shrt (const char* name, RRSModule::shrt_data& c) {
 		this->GetMatrix (name,c);
 	}
 	
 	void
-	ReconServant::set_long  (const char* name, const long_data& c) {
+	ReconServant::set_long  (const char* name, const RRSModule::long_data& c) {
 		this->SetMatrix (name,c);
 	}
 
 	void
-	ReconServant::get_long (const char* name, long_data& c) {
+	ReconServant::get_long (const char* name, RRSModule::long_data& c) {
 		this->GetMatrix (name,c);
 	}
 

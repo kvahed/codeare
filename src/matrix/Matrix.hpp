@@ -380,60 +380,8 @@ public:
 
     // Only if compiled within IDEA we know of access specifiers.
 #ifdef PARC_MODULE_NAME
-    
-
-    /**
-     * @brief           Reset and import data from IceAs
-     *                   
-     * @param  ias      IceAs containing data
-     * @return          Amount of data read
-     */
-    size_t       
-    Import              (const IceAs* ias);
-
-
-    /**
-     * @brief           Continue import from IceAs
-     *                   
-     * @param  ias      IceAs containing data
-     * @param  pos      Import data starting at position pos of own repository
-     * @return          Amount of data read
-     */
-    size_t       
-    Import              (const IceAs* ias, const size_t pos);
-
-
-    /**
-     * @brief           Import with MDH
-     *                   
-     * @param  ias      IceAs containing data
-     * @param  mdh      Measurement data header      
-     * @return          Amount of data read
-     */
-    size_t       
-    Import              (const IceAs* ias, sMDH* mdh);
-
-
-    /**
-     * @brief           Export data to ias
-     *                   
-     * @param  ias      IceAs for data export
-     * @return          Amount of data exported
-     */
-    size_t         
-    Export              (IceAs* ias) const;
-
-
-    /**
-     * @brief           Partially export data to ias 
-     * 
-     * @param  ias      IceAs for data export
-     * @param  pos      Export data starting at position pos of our repository
-     */
-    size_t
-    Export              (IceAs* ias, const size_t pos) const;
- 
-    #endif
+    #include "ICE.hpp"
+#endif
 
     //@}
 
@@ -1309,86 +1257,6 @@ protected:
 
 
 #ifdef PARC_MODULE_NAME
-
-template <class T, paradigm P> long 
-Matrix<T,P>::Import     (const IceAs* ias, const size_t pos) {
-    
-    ICE_SET_FN("Matrix<T,P>::Import(IceAs, long)")
-        
-    int  i    = 0;
-    long size = 1;
-    
-    for (i = 0; i < MAX_ICE_DIM; ++i)
-        size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
-    
-    T* data = (T*) ias->calcSplObjStartAddr() ;
-    
-    for (i = 0; i < size; ++i, ++data)
-        _M[i+pos] = *data;
-    
-    return size;
-    
-}
-
-
-template <class T, paradigm P> long 
-Matrix<T,P>::Import(const IceAs* ias) {
-    
-    ICE_SET_FN("Matrix<T,P>::Import(IceAs)")
-        
-    int i;
-    
-    for (i = 0; i < MAX_ICE_DIM; ++i)
-        _dim[i] = (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
-    
-    _M = new T[Size()]();
-    nb_alloc = 1;
-    
-    T* data = (T*) ias->calcSplObjStartAddr() ;
-    
-    for (i = 0; i < Size(); ++i, data++)
-        _M[i] = *data;
-    
-    return Size();
-    
-}
-
-
-template <class T, paradigm P> long 
-Matrix<T,P>::Export (IceAs* ias) const {
-    
-    ICE_SET_FN("Matrix<T,P>::Export(IceAs)")
-        
-    T* data = (T*) ias->calcSplObjStartAddr() ;
-    
-    for (int i = 0; i < Size(); ++i, data++)
-        *data = _M[i];
-    
-    return Size();
-    
-}
-
-
-template <class T, paradigm P> long
-Matrix<T,P>::Export (IceAs* ias, const size_t pos) const {
-
-    ICE_SET_FN("Matrix<T,P>::Export(IceAs, long)")
-        
-        int  i    = 0;
-    long size = 1;
-    
-    for (i = 0; i < MSX_ICE_DIM; ++i) {
-        size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
-    }
-    
-    T* data = (T*) ias->calcSplObjStartAddr() ;
-    
-    for (i = 0; i < size; ++i, data++)
-        *data = _M[i+pos];
-    
-    return size;
-    
-}
 
 #endif // ICE
 

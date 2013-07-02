@@ -103,8 +103,6 @@ namespace RRClient {
 	};
 
 
-	class LocalConnector;
-	
 	/**
 	 * @brief               Remotely connected reconstruction client 
 	 */
@@ -120,30 +118,6 @@ namespace RRClient {
 		RemoteConnector         (const char* name, const char* tracelevel);
 
 
-		/**
-		 * @brief           Construct from local connector (i.e. implicit cast)
-		 */
-		RemoteConnector         (const RRClient::LocalConnector&) ;
-
-
-		/**
-		 * @brief           Construct from local connector (i.e. implicit cast)
-		 */
-		RemoteConnector         (const RRClient::LocalConnector*&) ;
-
-
-		/**
-		 * @brief           Construct from local connector (i.e. implicit cast)
-		 */
-		RemoteConnector         (RRClient::LocalConnector&) ;
-
-
-		/**
-		 * @brief           Construct from local connector (i.e. implicit cast)
-		 */
-		RemoteConnector         (RRClient::LocalConnector*&) ;
-		
-		
 		/**
 		 * @brief           Clean up and destroy ORB
 		 */

@@ -29,9 +29,8 @@
 
 #include <cstdlib>
 #include <complex>
-#include <stdint.h>
 
-using namespace std;
+class Workspace;
 
 /**
  * @brief Reconstruction / Manipulation modules
@@ -98,7 +97,7 @@ namespace RRStrategy {
 		 */
 		void 
 		Name            (const char* name) { 
-			m_name = string(name);
+			m_name = std::string(name);
 		}
 
 
@@ -139,7 +138,7 @@ namespace RRStrategy {
 		 * @return      Reference to matrix
 		 */
 		template <class T> Matrix<T>& 
-		AddMatrix         (const string name, Ptr< Matrix<T> > p) const {
+		AddMatrix         (const std::string& name, Ptr< Matrix<T> > p) const {
 			return Workspace::Instance().AddMatrix(name, p);
 		}
 
@@ -152,7 +151,7 @@ namespace RRStrategy {
 		 * @return      Reference to data
 		 */
 		template <class T> Matrix<T>&
-		Get            (const string name) const {
+		Get            (const std::string& name) const {
 			return Workspace::Instance().Get<T>(name);
 		}
 		
@@ -165,14 +164,14 @@ namespace RRStrategy {
 		 * @return      Reference to data if existent
 		 */
 		inline bool 
-		Free            (const string name) const {
+		Free            (const std::string& name) const {
 			return Workspace::Instance().Free (name);
 		}
 
 
 	protected:
 		
-		string    m_name;         /*!< @brief Name                        */
+		std::string    m_name;         /*!< @brief Name                        */
 		bool      m_initialised;  /*!< @brief Reco is initialised         */
 		
 	};
