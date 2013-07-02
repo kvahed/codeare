@@ -227,7 +227,7 @@ template<> struct TypeTraits<size_t> {
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
-        os << boost::format("%zu") % t;
+      os << boost::format("%li") % (unsigned long)t;
 #else
         os << t;
 #endif
