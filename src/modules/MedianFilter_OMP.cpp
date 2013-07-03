@@ -58,22 +58,46 @@ DeleteImage (T** pp) {
 }
 
 
+error_code
+MedianFilter_OMP::Init () {
+
+	printf ("Intialising MedianFilter ...\n");
+
+    double temp;
+    
+    Attribute ("wh", &temp);
+    m_wh = (unsigned short)temp;
+    printf ("  Filter size : %ix", m_wh);
+
+    Attribute ("ww", &temp);
+    m_ww = (unsigned short)temp;
+    printf ("%i\n", m_ww);
+    
+    m_uname = Attribute ("uname");
+    printf ("  Unique name : %s\n", m_uname);    
+
+	printf ("... done.\n");
+
+
+}
+
 error_code 
 MedianFilter_OMP::Process () {
 	
-	Matrix<short>& img = Get<short> ("Image");
+	ticks cgstart = getticks();
+	printf ("Processing MedianFilter ...\n");
 
-	const int ww = 25;
-	const int wh = 25;
- 
+	Matrix<short>& img = Get<short> (m_uname);
+    if (img.Size() == 1)
+        return OK;
+
 	int iw = img.Width(); //image width 
 	int ih = img.Height(); //image height
 	
-	int ex = (ww / 2), ey = (wh / 2);
+	int ex = (m_ww / 2), ey = (m_wh / 2);
 	
 	int x,y,fx,fy;
 	int** input_image  = CreateImage<int>(iw,ih);
-	
 	
 #pragma omp parallel default(shared)  private(y,fx,fy)
 	{
@@ -90,20 +114,22 @@ MedianFilter_OMP::Process () {
 			for (y=0; y<ih; ++y)
 				input_image[x][y]  = img(x,y);
 
-		int** array = CreateImage<int>(ww,wh); //local to each thread !
+		int** array = CreateImage<int>(m_ww,m_wh); //local to each thread !
 
 #pragma omp for  schedule(dynamic,chunk)
 		for (x=ex; x<iw-ex; ++x)
 			for (y=ey; y<ih-ey; ++y) {
-				for (fx=0; fx<ww; ++fx)
-					for (fy=0; fy<wh; ++fy)
+				for (fx=0; fx<m_ww; ++fx)
+					for (fy=0; fy<m_wh; ++fy)
 						array[fx][fy] = input_image[x+fx-ex][y+fy-ey]; 
-				qsort(array[0], ww*wh, sizeof(int), t_compare_ints);
-				img(x,y) = array[ww/2][wh/2];
+				qsort(array[0], m_ww*m_wh, sizeof(int), t_compare_ints);
+				img(x,y) = array[m_ww/2][m_wh/2];
 			}
 
 		DeleteImage(array);
 	}
+
+	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	return OK;
 
