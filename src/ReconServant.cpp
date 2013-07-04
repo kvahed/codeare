@@ -41,7 +41,6 @@ namespace RRServer {
 		tmp << d;
 		m_config = new char[tmp.str().length() + 1];
 		strcpy (m_config, tmp.str().c_str());
-
 	}
 	
 	char*
@@ -52,8 +51,8 @@ namespace RRServer {
 	}
 	
 	short
-	ReconServant::Init (const char* name) {
-		return FunctorContainer::Init(name);
+	ReconServant::Init (const char* name, const char* client_id) {
+		return FunctorContainer::Init(name, client_id);
 	}
 	
 	short

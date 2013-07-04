@@ -25,19 +25,28 @@
 
 #include <assert.h>
 #include <complex>
-
+#include <string>
+#include <sstream>
 
 namespace RRClient {
 
 
-	RemoteConnector::RemoteConnector          (const char* name, const char* debug) {
+	RemoteConnector::RemoteConnector          (const std::string& service_id, const std::string& debug_level, const std::string& client_id) {
 		
 		try {
+
+            if (!client_id.empty()) {
+                m_client_id = client_id;
+            } else {
+                std::stringstream ss;
+                ss << (size_t)this;
+                m_client_id = ss.str();
+            }
 			
 			// Initialise ORB
 			int         i            = 0;
 			char**      c            = 0;
-			const char* options[][2] = { { (char*)"traceLevel", debug }, { 0, 0 } };
+			const char* options[][2] = { { (char*)"traceLevel", debug_level.c_str()}, { 0, 0 } };
 			
 			m_orb = CORBA::ORB_init(i, c, "omniORB4", options);
 			
@@ -52,7 +61,7 @@ namespace RRClient {
 			// Bind to the name server and lookup 
 			CosNaming::Name m_name;
 			m_name.length(1);
-			m_name[0].id = CORBA::string_dup(name);
+			m_name[0].id = CORBA::string_dup(service_id.c_str());
 			
 			// Resolve object reference.
 			CORBA::Object_var orid = context->resolve(m_name);
@@ -69,7 +78,7 @@ namespace RRClient {
 			return;
 			
 		} catch (CORBA::SystemException&)     {
-			
+            
 			std::cerr << "Caught a CORBA::SystemException." << std::endl;
 			throw DS_SystemException();
 			return;
@@ -109,7 +118,7 @@ namespace RRClient {
 	
 	
 	error_code
-	RemoteConnector::Init (const char* name) {
+	RemoteConnector::Init (const std::string& name) {
 		
 		// Prepare configuration for the journey
 		std::stringstream  temp;
@@ -117,7 +126,7 @@ namespace RRClient {
 		m_rrsi->config  (temp.str().c_str());
 		
 		// Initialise back end
-		if (m_rrsi->Init (name) != OK)
+        if (m_rrsi->Init (name.c_str(), m_client_id.c_str()) != OK)
 			return CANNOT_LOAD_LIBRARY;
 		
 		return (error_code)OK;
@@ -127,28 +136,31 @@ namespace RRClient {
 	
 	
 	error_code 
-	RemoteConnector::Prepare  (const char* name)  {
-		return (error_code) m_rrsi->Prepare (name);
+	RemoteConnector::Prepare  (const std::string& name)  {
+        std::string call = m_client_id + name;
+		return (error_code) m_rrsi->Prepare (call.c_str());
 	}
 	
 	
 	
 	error_code 
-	RemoteConnector::Process  (const char* name)  {
-		return  (error_code) m_rrsi->Process (name);
+	RemoteConnector::Process  (const std::string& name)  {
+        std::string call = m_client_id + name;
+		return  (error_code) m_rrsi->Process (call.c_str());
 	}
 	
 	
 	
 	error_code
-	RemoteConnector::Finalise (const char* name) {
-		return (error_code) m_rrsi->Finalise(name);
+	RemoteConnector::Finalise (const std::string& name) {
+        std::string call = m_client_id + name;
+		return (error_code) m_rrsi->Finalise(call.c_str());
 	}
 
 	
 	
 	inline long
-	RemoteConnector::GetSize (const longs dims) const {
+	RemoteConnector::GetSize (const longs& dims) const {
 		
 		long size = 1;
 

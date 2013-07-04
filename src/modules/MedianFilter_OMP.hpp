@@ -68,7 +68,7 @@ namespace RRStrategy {
 
         unsigned short m_ww;
         unsigned short m_wh;
-        const char* m_uname;
+        std::string m_uname;
 		
 	};
 

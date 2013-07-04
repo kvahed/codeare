@@ -20,6 +20,12 @@
 
 #include "MedianFilter_OMP.hpp"
 
+#include "IOContext.hpp"
+#include "Print.hpp"
+#include "MedianFilter.hpp"
+
+using namespace codeare::matrix::io;
+
 using namespace RRStrategy;
 
 template <class T> T** CreateImage (int n, int m) {
@@ -73,8 +79,7 @@ MedianFilter_OMP::Init () {
     m_ww = (unsigned short)temp;
     printf ("%i\n", m_ww);
     
-    m_uname = Attribute ("uname");
-    printf ("  Unique name : %s\n", m_uname);    
+    m_uname = std::string(Attribute ("uname"));
 
 	printf ("... done.\n");
 
@@ -88,47 +93,16 @@ MedianFilter_OMP::Process () {
 	printf ("Processing MedianFilter ...\n");
 
 	Matrix<short>& img = Get<short> (m_uname);
-    if (img.Size() == 1)
+    if (img.Size() <= 1)
         return OK;
 
-	int iw = img.Width(); //image width 
-	int ih = img.Height(); //image height
-	
-	int ex = (m_ww / 2), ey = (m_wh / 2);
-	
-	int x,y,fx,fy;
-	int** input_image  = CreateImage<int>(iw,ih);
-	
-#pragma omp parallel default(shared)  private(y,fx,fy)
-	{
-		int tid      = omp_get_thread_num();
-		int nthreads = omp_get_num_threads();
-		int chunk    = iw/nthreads; //chunk-size for loop splitting
-		
-		if (tid==0) 
-			std::cout << "MedianFilter_OMP::Process() running on " << iw << "x" << ih 
-					  << " image with " << nthreads << " threads" << std::endl; 
-
-#pragma omp for schedule(dynamic,chunk)
-		for (x=0; x<iw; ++x)
-			for (y=0; y<ih; ++y)
-				input_image[x][y]  = img(x,y);
-
-		int** array = CreateImage<int>(m_ww,m_wh); //local to each thread !
-
-#pragma omp for  schedule(dynamic,chunk)
-		for (x=ex; x<iw-ex; ++x)
-			for (y=ey; y<ih-ey; ++y) {
-				for (fx=0; fx<m_ww; ++fx)
-					for (fy=0; fy<m_wh; ++fy)
-						array[fx][fy] = input_image[x+fx-ex][y+fy-ey]; 
-				qsort(array[0], m_ww*m_wh, sizeof(int), t_compare_ints);
-				img(x,y) = array[m_ww/2][m_wh/2];
-			}
-
-		DeleteImage(array);
-	}
-
+    img = medfilt2 (img, m_wh, m_ww);
+    std::string fname = m_uname + ".mat";
+    IOContext f = fopen (fname, WRITE);
+    fwrite (f,(Matrix<float>)img, m_uname);
+    printf (" @%zu - Unique name : %s\n", (size_t)this, m_uname.c_str());    
+    fclose(f);
+    
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	return OK;
