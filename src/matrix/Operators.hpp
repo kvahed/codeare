@@ -1502,10 +1502,3 @@
         return res;
 
     }
-
-
-//Matrix<T,P> prod (const Matrix<T,P> &M, const char transa, const char transb) const {
-//    return gemm (*this, M, transa, transb);
-//}   
-    
-    

@@ -196,7 +196,7 @@ namespace io      {
 	inline static bool is_mat (boost::any oper) {
 
 		try {
-			boost::any_cast<Ptr<Matrix<T> > >(oper);
+			boost::any_cast<boost::shared_ptr<Matrix<T> > >(oper);
 		} catch(const boost::bad_any_cast &) {
 			return false;
 		}

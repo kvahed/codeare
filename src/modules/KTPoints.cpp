@@ -456,17 +456,18 @@ KTPoints::Process   ()     {
 	pd *= 5;
 
     Matrix<cxfl>    solution; // Solution for timing calculation
-    Matrix<cxfl>&   final = AddMatrix (  "final",  (Ptr<Matrix<cxfl> >)  NEW (Matrix<cxfl>  ()));   // Excitation profile
+    Matrix<cxfl>&   final = AddMatrix<cxfl> ("final");   // Excitation profile
 
-    Matrix<cxfl>&   rf     = AddMatrix (  "rf",  (Ptr<Matrix<cxfl> >)  NEW (Matrix<cxfl>  ())); 
-    Matrix<float>&  grad   = AddMatrix ("grad",  (Ptr<Matrix<float> >) NEW (Matrix<float> ()));
+    Matrix<cxfl>&   rf    = AddMatrix<cxfl> ("rf"); 
+    Matrix<float>&  grad  = AddMatrix<float> ("grad");
 
     Matrix<cxfl> m;// (ns, nk*nc); // STA system encoding matrix
 
     bool        amps_ok = false;
     size_t      gc    = 0;      // Global counter for VE iterations
 
-	Matrix<float>& res     = AddMatrix ("nrmse",  (Ptr<Matrix<float> >) NEW (Matrix<float> (m_maxiter,1)));
+	Matrix<float>& res  = AddMatrix<float> ("nrmse");
+    res = Matrix<float> (m_maxiter,1);
 
     ticks vestart = getticks();
     printf ("Starting KT-Points algorithm ...\n");

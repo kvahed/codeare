@@ -53,12 +53,13 @@
 #include <cstring>
 #include <algorithm>
 
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 
 #ifdef HAVE_MAT_H
 #include "mat.h"
 #endif
-
-#include "Ptr.h"
 
 /**
  * @brief Is matrix is a vector.
@@ -99,7 +100,7 @@ template <class T, paradigm P=SHM
     ,const bool& b = TypeTraits<T>::Supported
 #endif
 >
-class Matrix  : public SmartObject {
+class Matrix {
 	
 	
 public:
@@ -363,7 +364,6 @@ public:
      */
 	inline
 	~Matrix() {};
-
 
 
     //@}

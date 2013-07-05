@@ -24,6 +24,8 @@
 
 using namespace RRStrategy;
 
+#define clear(X) Free("X")
+
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
 
@@ -95,7 +97,7 @@ NuFFT::Init () {
 
 	nfft = new NFFT<float> (ms, M * shots, m, alpha);
 
-	AddMatrix ("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> ()));
+	AddMatrix<cxdb> ("img");
 
 	m_initialised = true;
 
@@ -111,8 +113,8 @@ NuFFT::Prepare () {
 	nfft->KSpace  (Get<double> ("kspace"));
 	nfft->Weights (Get<double> ("weights"));
 
-	Free ("kspace");
-	Free ("weights");
+	clear (kspace);
+	clear (weights);
 
 	return error;
 
@@ -124,9 +126,13 @@ NuFFT::Process () {
 
 	printf ("Processing NuFFT ...\n");
 	ticks start = getticks();
-	
-	Get<cxdb> ("img") = nfft->Adjoint(Get<cxdb> ("data"));
-	Free ("data");
+
+    Matrix<cxdb>& out = Get<cxdb> ("img");
+    Matrix<cxdb>& in = Get<cxdb> ("data");
+
+    out = *nfft ->* in;
+
+	clear (data);
 	
 	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
 

@@ -289,7 +289,7 @@ namespace io      {
 
 			printf ("\n%f\n", n);
 
-			boost::any val = (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl> (m_meas_dims));
+			boost::any val = boost::make_shared<Matrix<cxfl> >(m_meas_dims);
 			m_data.insert(std::pair<std::string, boost::any>("meas", val));
 			printf ("  Data (dims: ");
 
@@ -320,8 +320,8 @@ namespace io      {
 			if (dry)
 				return m_status;
 
-			Ptr<Matrix<cxfl> > m_meas =
-					boost::any_cast<Ptr<Matrix<cxfl> > >(m_data[std::string("meas")]);
+            boost::shared_ptr<Matrix<cxfl> > m_meas =
+					boost::any_cast<boost::shared_ptr<Matrix<cxfl> > >(m_data[std::string("meas")]);
 			/*
 			size_t dpos =
 				m_cur_mdh.sLC.ushLine       * m_meas_dims[LIN] +

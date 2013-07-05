@@ -104,4 +104,3 @@ namespace RRStrategy {
 }
 #endif /* __KT_POINTS_HPP__ */
 
-

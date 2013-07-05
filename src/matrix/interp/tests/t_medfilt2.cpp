@@ -7,14 +7,8 @@
 template<class T> bool
 check_medfilt2 () {
 
-    IOContext f = fopen ("test.mat",WRITE);
-
     Matrix<T> A = phantom<T>(256) + 2.5e-2 * rand<T>(256);
-    fwrite (f, A, "A");
-    A = medfilt2(A);
-    fwrite (f, A, "A_filt");
-
-    fclose (f);
+    A = medfilt2(A,5,5);
 
     return true;
 
@@ -23,7 +17,17 @@ check_medfilt2 () {
 
 int main (int args, char** argv) {
 
+    if (!check_medfilt2<float>())
+        return 1;
+    if (!check_medfilt2<double>())
+        return 1;
     if (!check_medfilt2<cxfl>())
+        return 1;
+    if (!check_medfilt2<cxdb>())
+        return 1;
+    if (!check_medfilt2<short>())
+        return 1;
+    if (!check_medfilt2<long>())
         return 1;
 
     return 0;

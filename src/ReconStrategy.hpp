@@ -138,8 +138,34 @@ namespace RRStrategy {
 		 * @return      Reference to matrix
 		 */
 		template <class T> Matrix<T>& 
-		AddMatrix         (const std::string& name, Ptr< Matrix<T> > p) const {
+		AddMatrix         (const std::string& name, boost::shared_ptr< Matrix<T> > p) const {
 			return Workspace::Instance().AddMatrix(name, p);
+		}
+
+
+		/**
+		 * @brief       Add a matrix to database map
+		 *
+		 * @param  name Name in map
+		 * @param  p    Smart pointer to the matrix
+		 * @return      Reference to matrix
+		 */
+		template <class T> Matrix<T>& 
+		AddMatrix         (const std::string& name) const {
+			return Workspace::Instance().AddMatrix<T>(name);
+		}
+
+
+		/**
+		 * @brief       Add a matrix to database map
+		 *
+		 * @param  name Name in map
+		 * @param  p    Smart pointer to the matrix
+		 * @return      Reference to matrix
+		 */
+		template <class T> Matrix<T>& 
+		AddMatrix         (const char* name) const {
+			return Workspace::Instance().AddMatrix<T>(std::string(name));
 		}
 
 

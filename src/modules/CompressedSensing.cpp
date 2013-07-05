@@ -93,7 +93,7 @@ CompressedSensing::Process () {
 	Matrix<float>& pdf   = Get<float>  ("pdf" );
 	Matrix<float>& mask  = Get<float>  ("mask");
 	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
-	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(data.Dim())));
+    Matrix<cxfl> im_dc;
 
 	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
 		size(data,0), size(data,1), size(data,2));
@@ -145,6 +145,8 @@ CompressedSensing::Process () {
 
     } else
         im_dc = dwt ->* im_dc * ma;
+
+    wspace.Add ("im_dc", im_dc);
 
     return OK;
 

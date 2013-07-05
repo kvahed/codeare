@@ -97,11 +97,6 @@ MedianFilter_OMP::Process () {
         return OK;
 
     img = medfilt2 (img, m_wh, m_ww);
-    std::string fname = m_uname + ".mat";
-    IOContext f = fopen (fname, WRITE);
-    fwrite (f,(Matrix<float>)img, m_uname);
-    printf (" @%zu - Unique name : %s\n", (size_t)this, m_uname.c_str());    
-    fclose(f);
     
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 

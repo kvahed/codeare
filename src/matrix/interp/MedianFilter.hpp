@@ -29,7 +29,7 @@ medfilt2 (const Matrix<T>& M, const size_t fh = 3, const size_t fw = 3) {
     size_t ih = size(M,0);
     size_t iw = size(M,1);
     
-	size_t x, y, fx, fy, ex = (fw / 2), ey = (fh / 2);
+	size_t x, y, fx, fy, ex = fw/2, ey = fh/2;
     
 #pragma omp parallel default (shared) private (y,fx,fy)
     {
@@ -44,7 +44,7 @@ medfilt2 (const Matrix<T>& M, const size_t fh = 3, const size_t fw = 3) {
                     for (fy=0; fy<fh; ++fy)
                         local(fy,fx) = M(y+fy-ey,x+fx-ex); 
                 qsort(&local[0], ne, sizeof(T), t_compare);
-                ret(y,x) = local(fh/2,fw/2);
+                ret(y,x) = local[ne/2];
             }
     }
     
