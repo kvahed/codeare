@@ -27,6 +27,8 @@
 
 #include "DllExport.h"
 
+#include <boost/timer/timer.hpp>
+
 #include <cstdlib>
 #include <complex>
 

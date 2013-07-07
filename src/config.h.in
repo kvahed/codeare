@@ -18,6 +18,9 @@
 /* Define to 1 if you have the <boost/any.hpp> header file. */
 #undef HAVE_BOOST_ANY_HPP
 
+/* Define to 1 if you have the <boost/timer/timer.hpp> header file. */
+#undef HAVE_BOOST_TIMER_TIMER_HPP
+
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 

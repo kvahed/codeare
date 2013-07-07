@@ -125,7 +125,9 @@ error_code
 NuFFT::Process () {
 
 	printf ("Processing NuFFT ...\n");
-	ticks start = getticks();
+    boost::timer::auto_cpu_timer t;
+
+	//ticks start = getticks();
 
     Matrix<cxdb>& out = Get<cxdb> ("img");
     Matrix<cxdb>& in = Get<cxdb> ("data");
@@ -134,7 +136,8 @@ NuFFT::Process () {
 
 	clear (data);
 	
-	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
+	//printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
+    printf ("... done. ");
 
 	return OK;
 

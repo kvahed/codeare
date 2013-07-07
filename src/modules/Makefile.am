@@ -16,7 +16,7 @@ if USE_NFFT3
 endif
 
 # Common linker flags
-COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
+COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@ -lboost_timer 
 
 # Libraries
 DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp

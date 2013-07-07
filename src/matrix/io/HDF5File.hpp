@@ -12,6 +12,8 @@
 #include "Matrix.hpp"
 #include "Tokenizer.hpp"
 
+#include <boost/tokenizer.hpp>
+
 #include <H5Cpp.h>
 using namespace H5;
 
@@ -159,6 +161,7 @@ namespace io {
 			Group group, *tmp;
 			std::string path;
 
+            boost::tokenizer<> tok(uri);
 			std::vector<std::string> sv (Split (uri, "/"));
 			std::string name = sv[sv.size() - 1];
 			sv.pop_back(); // data name not part of path

@@ -407,7 +407,7 @@ lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	SENSE.la CompressedSensing.la $(am__append_1)
 
 # Common linker flags
-COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
+COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@ -lboost_timer 
 
 # Libraries
 DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp

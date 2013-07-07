@@ -49,8 +49,8 @@ SENSE::Prepare () {
 error_code
 SENSE::Process () { 
 
-	ticks cgstart = getticks();
 	printf ("Processing SENSE ...\n");
+    boost::timer::auto_cpu_timer t;
 
     Matrix<cxfl>& out = Get<cxfl>("image");
     Matrix<cxfl>& in = Get<cxfl>("fimgs");
@@ -58,8 +58,9 @@ SENSE::Process () {
 
     out = sense ->* in;
     
-	printf ("... done. WTime: %.4f seconds.\n\n",
-			elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+	//printf ("... done. WTime: %.4f seconds.\n\n",
+	//		elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+    printf ("... done. ");
 	return OK;
 
 }

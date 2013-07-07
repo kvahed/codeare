@@ -6,6 +6,9 @@
 #include "Params.hpp"
 
 #include <boost/any.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 #include <map>
 
 #ifdef __APPLE__

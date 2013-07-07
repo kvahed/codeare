@@ -146,7 +146,8 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
 
     }
 
-    printf (" done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+    //printf (" done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+	printf ("... done. ");
 
 	return m;
 
@@ -469,7 +470,8 @@ KTPoints::Process   ()     {
 	Matrix<float>& res  = AddMatrix<float> ("nrmse");
     res = Matrix<float> (m_maxiter,1);
 
-    ticks vestart = getticks();
+    boost::timer::auto_cpu_timer t;
+//    ticks vestart = getticks();
     printf ("Starting KT-Points algorithm ...\n");
     
     while (!amps_ok) {
@@ -487,8 +489,11 @@ KTPoints::Process   ()     {
         
     } // End of pulse duration loop
 
-    printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) /
-            Toolbox::Instance()->ClockRate());
+    t.stop();
+    printf ("... done. ");
+
+    //printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) /
+    //      Toolbox::Instance()->ClockRate());
     
     // Put actual maximum RF amplitude into first cell
     for (size_t i = 1; i < nk; i++)
@@ -514,6 +519,7 @@ KTPoints::Process   ()     {
     ofname << m_ptxfname << ".tra_ap";
     PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "t");
     // -----------------------------------
+    t.resume();
     return OK;
 
 }

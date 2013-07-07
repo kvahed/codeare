@@ -86,7 +86,8 @@ error_code
 CompressedSensing::Process () {
 
 	printf ("Processing CompressedSensing ...\n");
-	ticks tic; 
+    boost::timer::auto_cpu_timer t;
+
 	float ma;
 
 	Matrix<cxfl>&  data  = Get<cxfl>   ("data");
@@ -124,8 +125,6 @@ CompressedSensing::Process () {
 	
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
-	tic      = getticks();
-
 	if (m_verbose)
 		vc.push_back(im_dc*ma);
 
@@ -135,7 +134,7 @@ CompressedSensing::Process () {
 			vc.push_back(im_dc*ma);
 	}
 
-	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+	printf ("... done. ");
 
     if (m_verbose) {
         size_t cpsz = numel(im_dc);

@@ -23,6 +23,7 @@
 #include "Toolbox.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+
 #include "Print.hpp"
 
 #include <math.h>
@@ -148,9 +149,8 @@ CGSENSE::Process () {
 
 	error_code error = OK;
 
-	ticks cgstart = getticks();
-	
 	printf ("Processing CGSENSE ...\n");
+    boost::timer::auto_cpu_timer t;
 
     const Matrix<cxfl>& sens = Get<cxfl>("sens");
     
@@ -164,11 +164,11 @@ CGSENSE::Process () {
     }
 
     Matrix<cxfl> img = m_ncs->Adjoint (data, sens);
+    
     wspace.Add("image", img);
+    
 
-	Free ("data");
-
-	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+	printf ("... done. ");//. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 	return error;
 

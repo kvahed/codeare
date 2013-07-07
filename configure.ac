@@ -356,6 +356,8 @@ AC_CHECK_HEADERS([stddef.h],         [],
    [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
 AC_CHECK_HEADERS([boost/any.hpp],    [], 
    [AC_MSG_ERROR([cannot find boost/any.hpp, bailing out])])
+AC_CHECK_HEADERS([boost/timer/timer.hpp],    [], 
+   [AC_MSG_ERROR([cannot find boost/any.hpp, bailing out])])
 
 AC_CHECK_HEADERS(CL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
     AC_CHECK_HEADERS(OpenCL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [

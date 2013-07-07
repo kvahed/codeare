@@ -12077,10 +12077,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"f362be11\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"901ab09d\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Wed Jul 3 20:05:34 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Fri Jul 5 11:36:45 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -22283,6 +22283,20 @@ do :
 if test "x$ac_cv_header_boost_any_hpp" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_BOOST_ANY_HPP 1
+_ACEOF
+
+else
+  as_fn_error $? "cannot find boost/any.hpp, bailing out" "$LINENO" 5
+fi
+
+done
+
+for ac_header in boost/timer/timer.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "boost/timer/timer.hpp" "ac_cv_header_boost_timer_timer_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_timer_timer_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_BOOST_TIMER_TIMER_HPP 1
 _ACEOF
 
 else
