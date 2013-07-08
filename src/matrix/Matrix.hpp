@@ -53,10 +53,6 @@
 #include <cstring>
 #include <algorithm>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-
-
 #ifdef HAVE_MAT_H
 #include "mat.h"
 #endif

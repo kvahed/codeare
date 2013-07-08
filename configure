@@ -653,6 +653,7 @@ HAVE_INSIGHT
 ITK_INSTALL_PREFIX
 USE_NIFTI_FALSE
 USE_NIFTI_TRUE
+LIB_BOOST_TIMER
 USE_NFFT3_FALSE
 USE_NFFT3_TRUE
 PTHREAD_CFLAGS
@@ -12077,10 +12078,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"901ab09d\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"007b21c7\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Fri Jul 5 11:36:45 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Sun Jul 7 11:05:20 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -22291,6 +22292,34 @@ fi
 
 done
 
+for ac_header in boost/shared_ptr.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "boost/shared_ptr.hpp" "ac_cv_header_boost_shared_ptr_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_shared_ptr_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_BOOST_SHARED_PTR_HPP 1
+_ACEOF
+
+else
+  as_fn_error $? "cannot boost/shared_ptr.hpp, bailing out" "$LINENO" 5
+fi
+
+done
+
+for ac_header in boost/make_shared.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "boost/make_shared.hpp" "ac_cv_header_boost_make_shared_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_make_shared_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_BOOST_MAKE_SHARED_HPP 1
+_ACEOF
+
+else
+  as_fn_error $? "cannot boost/make_shared.hpp, bailing out" "$LINENO" 5
+fi
+
+done
+
 for ac_header in boost/timer/timer.hpp
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "boost/timer/timer.hpp" "ac_cv_header_boost_timer_timer_hpp" "$ac_includes_default"
@@ -22300,7 +22329,23 @@ if test "x$ac_cv_header_boost_timer_timer_hpp" = xyes; then :
 _ACEOF
 
 else
-  as_fn_error $? "cannot find boost/any.hpp, bailing out" "$LINENO" 5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find boost/timer/timer.hpp, will not generate timing measurements!" >&5
+$as_echo "cannot find boost/timer/timer.hpp, will not generate timing measurements!" >&6; }
+fi
+
+done
+
+for ac_header in boost/random/variate_generator.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "boost/random/variate_generator.hpp" "ac_cv_header_boost_random_variate_generator_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_random_variate_generator_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_BOOST_RANDOM_VARIATE_GENERATOR_HPP 1
+_ACEOF
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find boost/random/variate_generator.hpp, random numbers not available!" >&5
+$as_echo "cannot find boost/random/variate_generator.hpp, random numbers not available!" >&6; }
 fi
 
 done
@@ -24316,6 +24361,40 @@ rm -f core conftest.err conftest.$ac_objext \
 if test -z $hdf5_found; then
     LIBS=$OLD_LIBS
 fi
+
+
+# Boost
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for progress_timer in -lboost_timer" >&5
+$as_echo_n "checking for progress_timer in -lboost_timer... " >&6; }
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -lboost_timer"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <boost/timer/timer.hpp>
+int
+main ()
+{
+
+     boost::timer::auto_cpu_timer act;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+   LIB_BOOST_TIMER=-lboost_timer
+   boost_timer_found=yes
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no. Cannot find libboost_timer, timer not available." >&5
+$as_echo "no. Cannot find libboost_timer, timer not available." >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$OLD_LIBS
+
+
 
 
 # NIFTI

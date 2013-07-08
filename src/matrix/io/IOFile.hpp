@@ -10,12 +10,14 @@
 #include "tinyxml/tinyxml.h"
 #include "tinyxml/xpath_static.h"
 
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 namespace codeare {
 namespace matrix  {
 namespace io      {
 
 	enum dtype {RLFL, RLDB, CXFL, CXDB, LONG, SHRT};
-
 	enum IOMode {READ, WRITE};
 
     

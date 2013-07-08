@@ -18,6 +18,16 @@
 /* Define to 1 if you have the <boost/any.hpp> header file. */
 #undef HAVE_BOOST_ANY_HPP
 
+/* Define to 1 if you have the <boost/make_shared.hpp> header file. */
+#undef HAVE_BOOST_MAKE_SHARED_HPP
+
+/* Define to 1 if you have the <boost/random/variate_generator.hpp> header
+   file. */
+#undef HAVE_BOOST_RANDOM_VARIATE_GENERATOR_HPP
+
+/* Define to 1 if you have the <boost/shared_ptr.hpp> header file. */
+#undef HAVE_BOOST_SHARED_PTR_HPP
+
 /* Define to 1 if you have the <boost/timer/timer.hpp> header file. */
 #undef HAVE_BOOST_TIMER_TIMER_HPP
 

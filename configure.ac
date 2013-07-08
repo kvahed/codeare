@@ -356,8 +356,14 @@ AC_CHECK_HEADERS([stddef.h],         [],
    [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
 AC_CHECK_HEADERS([boost/any.hpp],    [], 
    [AC_MSG_ERROR([cannot find boost/any.hpp, bailing out])])
+AC_CHECK_HEADERS([boost/shared_ptr.hpp],    [], 
+   [AC_MSG_ERROR([cannot boost/shared_ptr.hpp, bailing out])])
+AC_CHECK_HEADERS([boost/make_shared.hpp],    [], 
+   [AC_MSG_ERROR([cannot boost/make_shared.hpp, bailing out])])
 AC_CHECK_HEADERS([boost/timer/timer.hpp],    [], 
-   [AC_MSG_ERROR([cannot find boost/any.hpp, bailing out])])
+   [AC_MSG_RESULT([cannot find boost/timer/timer.hpp, will not generate timing measurements!])])
+AC_CHECK_HEADERS([boost/random/variate_generator.hpp],    [], 
+   [AC_MSG_RESULT([cannot find boost/random/variate_generator.hpp, random numbers not available!])])
 
 AC_CHECK_HEADERS(CL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
     AC_CHECK_HEADERS(OpenCL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
@@ -603,6 +609,23 @@ AC_TRY_LINK([#include <H5Cpp.h>],
 if test -z $hdf5_found; then
     LIBS=$OLD_LIBS
 fi
+
+
+# Boost
+AC_MSG_CHECKING([for progress_timer in -lboost_timer])
+OLD_LIBS=$LIBS
+LIBS="${LIBS} -lboost_timer"
+AC_TRY_LINK([#include <boost/timer/timer.hpp>],
+   [
+     boost::timer::auto_cpu_timer act; 
+   ],
+   [AC_MSG_RESULT([yes])]
+   LIB_BOOST_TIMER=-lboost_timer
+   boost_timer_found=yes,
+   [AC_MSG_RESULT([no. Cannot find libboost_timer, timer not available.])])
+LIBS=$OLD_LIBS
+AC_SUBST(LIB_BOOST_TIMER)
+
 
 
 # NIFTI

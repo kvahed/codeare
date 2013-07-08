@@ -294,6 +294,7 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIB_BOOST_TIMER = @LIB_BOOST_TIMER@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
@@ -407,7 +408,7 @@ lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
 	SENSE.la CompressedSensing.la $(am__append_1)
 
 # Common linker flags
-COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@ -lboost_timer 
+COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@ $(LIB_BOOST_TIMER)
 
 # Libraries
 DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp
