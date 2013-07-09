@@ -59,18 +59,24 @@ enum    paradigm {
 template <class T, paradigm P=SHM>
 class container {
 public:
+	typedef typename VECTOR_TYPE(T)::iterator iterator;
+	typedef typename VECTOR_TYPE(T)::const_iterator const_iterator;
 	inline container () { _data = VECTOR_CONSTR (T,1); }
 	inline container (const size_t n) { assert(n>0); _data = VECTOR_CONSTR (T,n); }
 	inline T& operator[] (const size_t n) { return _data[n]; }
 	inline T operator[] (const size_t n) const { return _data[n]; }
+	inline T& back () { return _data.back(); }
+	inline T back () const { return _data.back; }
+	inline T& front () { return _data.front(); }
+	inline T front () const { return _data.front; }
+	inline T& at (const size_t n) { return _data.at(n); }
+	inline T at (const size_t n) const { return _data.at(n); }
 	inline const T* memory (const size_t n = 0) const { return &_data[n]; }
 	inline T* memory (const size_t n = 0)  { return &_data[n]; }
 	inline VECTOR_TYPE(T) data() const { return _data; }
 	inline VECTOR_TYPE(T)& data() { return _data; }
 	inline size_t size() const { return _data.size(); }
 	inline ~container () {}
-	typedef typename VECTOR_TYPE(T)::iterator iterator;
-	typedef typename VECTOR_TYPE(T)::const_iterator const_iterator;
 	inline iterator begin() { return _data.begin(); }
 	inline iterator end() { return _data.end(); }
 	inline const_iterator begin() const { return _data.begin(); }
@@ -79,5 +85,13 @@ public:
 private:
 	VECTOR_TYPE(T) _data;
 };
+
+
+template<class T> inline std::ostream&
+operator<< (std::ostream& os, const container<T>& ct) {
+    for (typename container<T>::const_iterator it = ct.begin(); it != ct.end(); ++it)
+        os << *it << " ";
+    return os;
+}
 
 #endif /* CONTAINER_HPP_ */
