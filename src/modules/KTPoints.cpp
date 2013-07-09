@@ -470,10 +470,8 @@ KTPoints::Process   ()     {
 	Matrix<float>& res  = AddMatrix<float> ("nrmse");
     res = Matrix<float> (m_maxiter,1);
 
-    boost::timer::auto_cpu_timer t;
-//    ticks vestart = getticks();
-    printf ("Starting KT-Points algorithm ...\n");
-    
+    SimpleTimer st ("KT-Points");
+
     while (!amps_ok) {
         
 		// Compute SEM
@@ -489,12 +487,6 @@ KTPoints::Process   ()     {
         
     } // End of pulse duration loop
 
-    t.stop();
-    printf ("... done. ");
-
-    //printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) /
-    //      Toolbox::Instance()->ClockRate());
-    
     // Put actual maximum RF amplitude into first cell
     for (size_t i = 1; i < nk; i++)
         if (max_rf[i] > max_rf[0])
@@ -519,7 +511,6 @@ KTPoints::Process   ()     {
     ofname << m_ptxfname << ".tra_ap";
     PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "t");
     // -----------------------------------
-    t.resume();
     return OK;
 
 }

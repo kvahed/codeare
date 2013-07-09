@@ -24,10 +24,10 @@
 #include "Matrix.hpp"
 #include "Configurable.hpp"
 #include "Workspace.hpp"
+#include "SimpleTimer.hpp"
 
 #include "DllExport.h"
 
-#include <boost/timer/timer.hpp>
 
 #include <cstdlib>
 #include <complex>

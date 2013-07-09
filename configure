@@ -653,7 +653,6 @@ HAVE_INSIGHT
 ITK_INSTALL_PREFIX
 USE_NIFTI_FALSE
 USE_NIFTI_TRUE
-LIB_BOOST_TIMER
 USE_NFFT3_FALSE
 USE_NFFT3_TRUE
 PTHREAD_CFLAGS
@@ -12078,10 +12077,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"007b21c7\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"e06249c2\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Sun Jul 7 11:05:20 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Tue Jul 9 13:37:13 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -22320,21 +22319,6 @@ fi
 
 done
 
-for ac_header in boost/timer/timer.hpp
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "boost/timer/timer.hpp" "ac_cv_header_boost_timer_timer_hpp" "$ac_includes_default"
-if test "x$ac_cv_header_boost_timer_timer_hpp" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_BOOST_TIMER_TIMER_HPP 1
-_ACEOF
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot find boost/timer/timer.hpp, will not generate timing measurements!" >&5
-$as_echo "cannot find boost/timer/timer.hpp, will not generate timing measurements!" >&6; }
-fi
-
-done
-
 for ac_header in boost/random/variate_generator.hpp
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "boost/random/variate_generator.hpp" "ac_cv_header_boost_random_variate_generator_hpp" "$ac_includes_default"
@@ -24108,7 +24092,7 @@ done
 
 	OLD_LIBS=$LIBS
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_thread" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_thread" >&5
 $as_echo_n "checking for exit in -lboost_thread... " >&6; }
 if ${ac_cv_lib_boost_thread_exit+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -24153,52 +24137,7 @@ _ACEOF
 
 fi
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_thread-mt" >&5
-$as_echo_n "checking for exit in -lboost_thread-mt... " >&6; }
-if ${ac_cv_lib_boost_thread_mt_exit+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lboost_thread-mt  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char exit ();
-int
-main ()
-{
-return exit ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_boost_thread_mt_exit=yes
-else
-  ac_cv_lib_boost_thread_mt_exit=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_thread_mt_exit" >&5
-$as_echo "$ac_cv_lib_boost_thread_mt_exit" >&6; }
-if test "x$ac_cv_lib_boost_thread_mt_exit" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBBOOST_THREAD_MT 1
-_ACEOF
-
-  LIBS="-lboost_thread-mt $LIBS"
-
-fi
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_system" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_system" >&5
 $as_echo_n "checking for exit in -lboost_system... " >&6; }
 if ${ac_cv_lib_boost_system_exit+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -24240,51 +24179,6 @@ if test "x$ac_cv_lib_boost_system_exit" = xyes; then :
 _ACEOF
 
   LIBS="-lboost_system $LIBS"
-
-fi
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_system-mt" >&5
-$as_echo_n "checking for exit in -lboost_system-mt... " >&6; }
-if ${ac_cv_lib_boost_system_mt_exit+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lboost_system-mt  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char exit ();
-int
-main ()
-{
-return exit ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_boost_system_mt_exit=yes
-else
-  ac_cv_lib_boost_system_mt_exit=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_system_mt_exit" >&5
-$as_echo "$ac_cv_lib_boost_system_mt_exit" >&6; }
-if test "x$ac_cv_lib_boost_system_mt_exit" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBBOOST_SYSTEM_MT 1
-_ACEOF
-
-  LIBS="-lboost_system-mt $LIBS"
 
 fi
 
@@ -24361,40 +24255,6 @@ rm -f core conftest.err conftest.$ac_objext \
 if test -z $hdf5_found; then
     LIBS=$OLD_LIBS
 fi
-
-
-# Boost
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for progress_timer in -lboost_timer" >&5
-$as_echo_n "checking for progress_timer in -lboost_timer... " >&6; }
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -lboost_timer"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <boost/timer/timer.hpp>
-int
-main ()
-{
-
-     boost::timer::auto_cpu_timer act;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-   LIB_BOOST_TIMER=-lboost_timer
-   boost_timer_found=yes
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no. Cannot find libboost_timer, timer not available." >&5
-$as_echo "no. Cannot find libboost_timer, timer not available." >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$OLD_LIBS
-
-
 
 
 # NIFTI

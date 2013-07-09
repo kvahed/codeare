@@ -360,8 +360,6 @@ AC_CHECK_HEADERS([boost/shared_ptr.hpp],    [],
    [AC_MSG_ERROR([cannot boost/shared_ptr.hpp, bailing out])])
 AC_CHECK_HEADERS([boost/make_shared.hpp],    [], 
    [AC_MSG_ERROR([cannot boost/make_shared.hpp, bailing out])])
-AC_CHECK_HEADERS([boost/timer/timer.hpp],    [], 
-   [AC_MSG_RESULT([cannot find boost/timer/timer.hpp, will not generate timing measurements!])])
 AC_CHECK_HEADERS([boost/random/variate_generator.hpp],    [], 
    [AC_MSG_RESULT([cannot find boost/random/variate_generator.hpp, random numbers not available!])])
 
@@ -566,10 +564,8 @@ if test x"$with_ismrmrdroot" != x"no" ; then
 
 	OLD_LIBS=$LIBS
 
-        AC_CHECK_LIB([boost_thread],        [exit])
-        AC_CHECK_LIB([boost_thread-mt],     [exit])
-        AC_CHECK_LIB([boost_system],        [exit])
-        AC_CHECK_LIB([boost_system-mt],     [exit])
+    AC_CHECK_LIB([boost_thread],        [exit])
+    AC_CHECK_LIB([boost_system],        [exit])
 
 	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
 
@@ -609,23 +605,6 @@ AC_TRY_LINK([#include <H5Cpp.h>],
 if test -z $hdf5_found; then
     LIBS=$OLD_LIBS
 fi
-
-
-# Boost
-AC_MSG_CHECKING([for progress_timer in -lboost_timer])
-OLD_LIBS=$LIBS
-LIBS="${LIBS} -lboost_timer"
-AC_TRY_LINK([#include <boost/timer/timer.hpp>],
-   [
-     boost::timer::auto_cpu_timer act; 
-   ],
-   [AC_MSG_RESULT([yes])]
-   LIB_BOOST_TIMER=-lboost_timer
-   boost_timer_found=yes,
-   [AC_MSG_RESULT([no. Cannot find libboost_timer, timer not available.])])
-LIBS=$OLD_LIBS
-AC_SUBST(LIB_BOOST_TIMER)
-
 
 
 # NIFTI

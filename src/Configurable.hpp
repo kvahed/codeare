@@ -28,6 +28,16 @@
 
 using namespace TinyXPath;
 
+inline static void report (const int res, const char* name) {
+    if (res == TIXML_SUCCESS)
+        return;
+    else
+        if (res == TIXML_WRONG_TYPE)
+            printf ("**WARNING! Trying to access attribute '%s' with wrong type.\n", name);
+        else
+            printf ("**WARNING! Attribute '%s' does not exist in parameter list.\n", name);
+}
+
 /**
  * @brief Skeleton of an XML configurable class
  */
@@ -78,18 +88,6 @@ class Configurable {
 	 */
 	inline void
 	SetAttribute        (const char* name, const std::string& value) {
-		Configuration()->SetAttribute (name, value.c_str());
-	}
-
-	
-	/**
-	 * @brief           Set a string type attribute
-	 *
-	 * @param  name     Attribute name 
-	 * @param  value    Attribute value
-	 */
-	inline void
-	SetAttribute        (const char* name, const std::string value) {
 		Configuration()->SetAttribute (name, value.c_str());
 	}
 
@@ -187,8 +185,9 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, std::string* value) const {
-		return Configuration()->QueryStringAttribute (name, value);
-
+        int res = Configuration()->QueryStringAttribute (name, value);
+		report (res, name);
+        return res;
 	}
 	
 
@@ -201,7 +200,9 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, int* value) const {
-		return Configuration()->QueryIntAttribute (name, value);
+        int res = Configuration()->QueryIntAttribute (name, value);
+		report (res, name);
+        return res;
 	}
 
 	
@@ -214,10 +215,11 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, unsigned short* value) const {
-		int ival, success;
-		success = Configuration()->QueryIntAttribute (name, &ival);
+		int ival, res;
+		res = Configuration()->QueryIntAttribute (name, &ival);
+		report (res, name);
 		*value = (unsigned short) ival;
-		return success;
+		return res;
 	}
 
 	
@@ -230,10 +232,11 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, size_t* value) const {
-		int ival, success;
-		success = Configuration()->QueryIntAttribute (name, &ival);
+		int ival, res;
+		res = Configuration()->QueryIntAttribute (name, &ival);
+		report (res, name);
 		*value = (size_t) ival;
-		return success;
+		return res;
 	}
 
 	
@@ -246,10 +249,11 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, bool* value) const {
-		int ival, success;
-		success = Configuration()->QueryIntAttribute (name, &ival);
+		int ival, res;
+		res = Configuration()->QueryIntAttribute (name, &ival);
+		report (res, name);
 		*value = (bool) ival;
-		return success;
+		return res;
 	}
 
 	
@@ -262,7 +266,9 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, double* value) const {
-		return Configuration()->QueryDoubleAttribute (name, value);
+        int res = Configuration()->QueryDoubleAttribute (name, value);
+		report (res, name);
+        return res;
 	}
 
 
@@ -275,10 +281,12 @@ class Configurable {
 	 */
 	inline int
 	Attribute           (const char* name, float* value) const {
-		double v;
-		int success = Configuration()->QueryDoubleAttribute (name, &v);
-		*value = v;
-		return success;
+		double val;
+        int res;
+		res = Configuration()->QueryDoubleAttribute (name, &val);
+		report (res, name);
+		*value = (float) val;
+		return res;
 	}
 
 

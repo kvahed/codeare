@@ -114,13 +114,6 @@ public:
 		m_lambda  = params.Get<double>("lambda");
 		m_verbose = params.Get<int>("verbose");
 
-		printf ("  Initialising NCSENSE:\n");
-		printf ("  Signal nodes: %li\n", m_nx[2]);
-        printf ("  Channels: %zu\n", m_nx[1]);
-        printf ("  Space size: %zu\n", m_nx[3]);
-		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
-		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
-
 		if (params.exists("np")) {
 			m_np = boost::any_cast<int>(params["np"]);
 			omp_set_num_threads(m_np);
@@ -131,13 +124,20 @@ public:
 			}
 		}
         
+		printf ("  Initialising NCSENSE:\n");
+		printf ("  No of threads: %li\n", m_np);
+		printf ("  Signal nodes: %li\n", m_nx[2]);
+        printf ("  Channels: %zu\n", m_nx[1]);
+        printf ("  Space size: %zu\n", m_nx[3]);
+		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
+		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
 
 		for (size_t i = 0; i < m_np; i++) // FFTW planning not thread-safe
 			m_fts.push_back(new NFFT<T> (ms, m_nx[2], m, alpha, b0, m_pc, fteps, ftiter));
 		
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
-
+        
 		printf ("  ...done.\n\n");
 		
 	}
@@ -290,8 +290,6 @@ public:
 			p  += r;
 
 		}
-
-		printf ("\n");
 
         if (m_verbose) {
             size_t cpsz = numel(x);

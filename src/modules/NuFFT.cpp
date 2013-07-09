@@ -44,9 +44,6 @@ NuFFT::~NuFFT () {
 error_code 
 NuFFT::Finalise () {
 
-	//if (m_initialised)
-	//	delete nfft;
-
 	return OK;
 
 }
@@ -124,10 +121,7 @@ NuFFT::Prepare () {
 error_code
 NuFFT::Process () {
 
-	printf ("Processing NuFFT ...\n");
-    boost::timer::auto_cpu_timer t;
-
-	//ticks start = getticks();
+    SimpleTimer st ("SENSE");
 
     Matrix<cxdb>& out = Get<cxdb> ("img");
     Matrix<cxdb>& in = Get<cxdb> ("data");
@@ -136,9 +130,6 @@ NuFFT::Process () {
 
 	clear (data);
 	
-	//printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
-    printf ("... done. ");
-
 	return OK;
 
 }

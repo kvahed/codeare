@@ -85,9 +85,6 @@ CompressedSensing::Init () {
 error_code
 CompressedSensing::Process () {
 
-	printf ("Processing CompressedSensing ...\n");
-    boost::timer::auto_cpu_timer t;
-
 	float ma;
 
 	Matrix<cxfl>&  data  = Get<cxfl>   ("data");
@@ -128,14 +125,14 @@ CompressedSensing::Process () {
 	if (m_verbose)
 		vc.push_back(im_dc*ma);
 
+	SimpleTimer st ("CompressedSensing");
 	for (size_t i = 0; i < (size_t)m_csiter; i++) {
 		NLCG (im_dc, data, m_csparam);
 		if (m_verbose)
 			vc.push_back(im_dc*ma);
 	}
-
-	printf ("... done. ");
-
+    st.Stop();
+    
     if (m_verbose) {
         size_t cpsz = numel(im_dc);
         im_dc = zeros<cxfl> (size(im_dc,0), size(im_dc,1), (m_dim == 3) ? size(im_dc,2) : 1, vc.size());
