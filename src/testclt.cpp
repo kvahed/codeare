@@ -52,7 +52,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
 		else if (!strcmp (test, "KArb"))                  karbtest     (con);
         */
-        else    {printf ("Cannot call unknow module %", test); return 1;}
+        else    {printf ("Cannot call unknow module %s", test); return 1;}
 
 		delete con;
 		
