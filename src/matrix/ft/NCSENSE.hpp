@@ -70,7 +70,8 @@ public:
                 m_initialised(false),
                 m_cgeps(1.0e-6),
                 m_lambda(1.0e-6),
-                m_verbose (false) {
+                m_verbose (false),
+		m_np(0) {
 
 		T fteps = 7.0e-4, alpha = 1.0;
 		size_t ftiter = 3, m = 1;
@@ -113,17 +114,16 @@ public:
 		m_cgeps   = params.Get<double>("cgeps");
 		m_lambda  = params.Get<double>("lambda");
 		m_verbose = params.Get<int>("verbose");
-
-		if (params.exists("np")) {
-			m_np = boost::any_cast<int>(params["np"]);
-			omp_set_num_threads(m_np);
-		} else {
+		
 #pragma omp parallel 
-			{
-                m_np = omp_get_num_threads ();
-			}
+		{
+		  m_np = omp_get_num_threads ();
 		}
-        
+		
+		if (params.exists("np") && boost::any_cast<int>(params["np"]) > 0) {
+		  omp_set_num_threads(boost::any_cast<int>(params["np"]));
+		}
+
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  No of threads: %i\n", m_np);
 		printf ("  Signal nodes: %li\n", m_nx[2]);

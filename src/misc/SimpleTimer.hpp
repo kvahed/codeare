@@ -20,7 +20,7 @@ public:
         if (!_stopped)
             Stop();
         float e = 1.0 / Toolbox::Instance()->ClockRate() * _net;
-        *_os << " ... done. WTime: " << boost::format("%.4f") % e << " ... \n\n";
+        *_os << "... done. WTime: " << boost::format("%.4f") % e << " ... \n\n";
     }
 
     inline void Stop () {
