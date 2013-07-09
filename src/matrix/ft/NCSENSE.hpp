@@ -125,7 +125,7 @@ public:
 		}
         
 		printf ("  Initialising NCSENSE:\n");
-		printf ("  No of threads: %li\n", m_np);
+		printf ("  No of threads: %i\n", m_np);
 		printf ("  Signal nodes: %li\n", m_nx[2]);
         printf ("  Channels: %zu\n", m_nx[1]);
         printf ("  Space size: %zu\n", m_nx[3]);
