@@ -11,7 +11,7 @@
 /**********************
  ** type definitions **
  **********************/
-typedef double elem_type;
+typedef cxdb elem_type;
 
 
 using namespace codeare::matrix::io;
@@ -76,29 +76,33 @@ main            (int argc, char ** args)
 	// headline of table
     fs << "## No. of threads  --  per transform:  --  single forward:  --  single backwards:  --  S(p)" << std::endl;
 
-    Matrix <elem_type> mat_out_dwt;
-    Matrix <elem_type> mat_out_dwt_recon;
+    Matrix <elem_type> mat_out_dwt (mat_in.Dim ());
+    Matrix <elem_type> mat_out_dwt_recon (mat_in.Dim ());
 
     double time_ref = 0;
 
+//#pragma pomp inst init
+
 	// loop over number of threads
-	for (int threads = init_num_threads; threads <= num_threads; threads *= 2)
+	for (int threads = init_num_threads; threads <= num_threads; threads +=1) //*= 2)
 	{
 
 	    // do something
 	    DWT <elem_type> dwt (mat_in.Dim (0), wl_fam, wl_mem, wl_scale, threads);
 	    double s_time_f = omp_get_wtime ();
-	    mat_out_dwt       = dwt   * mat_in;
+	    dwt.Trafo (mat_in, mat_out_dwt);
 	    s_time_f = omp_get_wtime () - s_time_f;
 	    double s_time_b = omp_get_wtime ();
-	    mat_out_dwt_recon = dwt ->* mat_out_dwt;
+	    dwt.Adjoint (mat_out_dwt, mat_out_dwt_recon);
 	    s_time_b = omp_get_wtime () - s_time_b;
 
 	    double time = omp_get_wtime ();
 	    for (int i = 0; i < iterations; i++)
 	    {
-	        mat_out_dwt       = dwt   * mat_out_dwt_recon;
-	        mat_out_dwt_recon = dwt ->* mat_out_dwt;
+//#pragma pomp inst begin(jojo)
+	        dwt.Trafo (mat_out_dwt_recon, mat_out_dwt);
+	        dwt.Adjoint (mat_out_dwt, mat_out_dwt_recon);
+//#pragma pomp inst end(jojo)
 	    }
 	    time = omp_get_wtime () - time;
 

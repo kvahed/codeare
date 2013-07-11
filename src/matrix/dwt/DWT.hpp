@@ -72,17 +72,18 @@ class DWT {
         DWT (const size_t sl, const wlfamily wl_fam = WL_DAUBECHIES, const int wl_mem = 4,
         		const int wl_scale = 4, const int num_threads = NUM_THREADS_DWT, const int dim = 2)
             : m_dim (dim),
-              m_lpf_d (wl_mem),
-              m_lpf_r (wl_mem),
-              m_hpf_d (wl_mem),
-              m_hpf_r (wl_mem),
+//              m_lpf_d (wl_mem),
+//              m_lpf_r (wl_mem),
+//              m_hpf_d (wl_mem),
+//              m_hpf_r (wl_mem),
               m_sl (sl),
+              m_fl (wl_mem),
               temp (container<T>(/*omp_get_num_threads()*/num_threads * 6 * sl)),
               m_wl_scale (wl_scale),
               _fam(wl_fam),
               _num_threads (num_threads) {
 
-            setupWlFilters (wl_fam, wl_mem, m_lpf_d, m_lpf_r, m_hpf_d, m_hpf_r);
+            setupWlFilters <T> (wl_fam, wl_mem, m_lpf_d, m_lpf_r, m_hpf_d, m_hpf_r);
 
         }
 
@@ -101,34 +102,25 @@ class DWT {
          * @return   Transform
          */
         inline
-        Matrix<T>
-        Trafo        (const Matrix<T>& m)
+        void
+        Trafo        (const Matrix <T> & m, Matrix <T> & res)
         {
-        	if (_fam == ID)
-        		return m;
 
-            assert (m.Size () <= m_sl*m_sl);
+            assert (m.Size () <= m_sl*m_sl
+                    && m.Dim () == res.Dim ());
 
-            Matrix<T> res (m.Dim());
+            // create vars from mex function
+            int J = 0, nn;
+            for (nn = 1; nn < m.Height (); nn *= 2 )
+                J ++;
+            if (nn  !=  m.Height ()){
+                std::cout << "FWT2 requires dyadic length sides" << std::endl;
+                assert (false);
+            }
 
-//            if (m_dim == 2)
-//            {
+            // call dpwt2
+            dpwt2 (m, m_wl_scale, J, temp, res);
 
-                // create vars from mex function
-                int J = 0, nn;
-                for (nn = 1; nn < m.Height (); nn *= 2 )
-                    J ++;
-                if (nn  !=  m.Height ()){
-                    std::cout << "FWT2 requires dyadic length sides" << std::endl;
-                    assert (false);
-                }
-
-                // call dpwt2
-                res = dpwt2 (m, m_wl_scale, J, temp);
-
-//            }
-
-            return res;
 
         }
 
@@ -140,34 +132,25 @@ class DWT {
          * @return   Transform
          */
         inline
-        Matrix<T>
-        Adjoint      (const Matrix<T>& m) {
+        void
+        Adjoint      (const Matrix <T> & m, Matrix <T> & res)
+        {
 
-           	if (_fam == ID)
-            		return m;
+            assert (m.Size () <= m_sl*m_sl
+                    && m.Dim () == res.Dim ());
 
-            assert (m.Size () <= m_sl*m_sl);
+            // create vars from mex function
+            int J = 0, nn;
+            for (nn = 1; nn < m.Height (); nn *= 2 )
+                J ++;
+            if (nn  !=  m.Height ()){
+                std::cout << "IWT2 requires dyadic length sides" << std::endl;
+                assert (false);
+            }
 
-            Matrix <T> res (m.Dim());
+            // call dpwt2
+            idpwt2 (m, m_wl_scale, J, temp, res);
 
-//            if (m_dim == 2)
-//            {
-
-                // create vars from mex function
-                int J = 0, nn;
-                for (nn = 1; nn < m.Height (); nn *= 2 )
-                    J ++;
-                if (nn  !=  m.Height ()){
-                    std::cout << "IWT2 requires dyadic length sides" << std::endl;
-                    assert (false);
-                }
-
-                // call dpwt2
-                res = idpwt2 (m, m_wl_scale, J, temp);
-
-//            }
-
-            return res;
         }
 
 
@@ -180,7 +163,16 @@ class DWT {
         inline
         Matrix<T>
         operator*    (const Matrix<T>& m) {
-            return (_fam == ID) ? m :  Trafo(m);
+
+            Matrix <T> res (m);
+
+//#pragma pomp inst init
+//#pragma pomp inst begin(forward)
+            return (_fam == ID) ? m :  (Trafo(m, res), res);
+//#pragma pomp inst end(forward)
+
+            return res;
+
         }
 
 
@@ -193,7 +185,12 @@ class DWT {
         inline
         Matrix<T>
         operator->* (const Matrix<T>& m) {
-            return (_fam == ID) ? m :  Adjoint(m);
+
+            Matrix <T> res (m);
+
+//#pragma pomp inst begin(backward)
+            return (_fam == ID) ? m :  (Adjoint(m, res), res);
+//#pragma pomp inst end(backward)
         }
 
 
@@ -214,15 +211,21 @@ class DWT {
         const int m_dim;
 
         // low pass filters
-        Matrix <RT> m_lpf_d;
-        Matrix <RT> m_lpf_r;
+        typename TypeTraits <T> :: RT * m_lpf_d;
+        typename TypeTraits <T> :: RT * m_lpf_r;
+//        Matrix <RT> m_lpf_d;
+//        Matrix <RT> m_lpf_r;
 
         // high pass filters
-        Matrix <RT> m_hpf_d;
-        Matrix <RT> m_hpf_r;
+        typename TypeTraits <T> :: RT * m_hpf_d;
+        typename TypeTraits <T> :: RT * m_hpf_r;
+//        Matrix <RT> m_hpf_d;
+//        Matrix <RT> m_hpf_r;
 
         // maximum size of matrix
         const size_t m_sl;
+        // filter length
+        const size_t m_fl;
 
         // temporary memory
         container<T> temp;
@@ -244,33 +247,35 @@ class DWT {
          *  COPIED FROM WAVELAB IMPLEMENTATION
          */
 
-        Matrix <T>
-        dpwt2		(const Matrix <T> & sig, const int ell, const int J, container<T>& temp)
+        void
+        dpwt2		(const Matrix <T> & sig, const int ell, const int J,
+             		 container<T>& temp, Matrix <T> & res)
         {
-
-            Matrix <T> res (sig.Dim ());
 
             T *wcplo,*wcphi,*templo,*temphi;
 
             // assign signal to result matrix
             res = sig;
 
-            int num_rows = sig.Height();
-            int num_cols = sig.Width();
-            int side_length = sig.Height();
+            const int num_rows = sig.Height();
+            const int num_cols = sig.Width();
 
-            // loop over levels of DWT
-            for (int j = (J-1); j >= ell; --j)
+#pragma omp parallel default (shared), private (wcplo, wcphi, temphi, templo) num_threads (_num_threads)
             {
 
-#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo) num_threads (_num_threads)
-            	{
+                size_t stride;
+                int side_length = sig.Height ();
+                const int t_num = omp_get_thread_num ();
 
-            	    size_t stride = side_length * omp_get_thread_num ();
+                // loop over levels of DWT
+                for (int j = (J-1); j >= ell; --j)
+                {
+
+                    stride = side_length * t_num;
 
 #pragma omp for schedule (OMP_SCHEDULE)
-            	    // loop over columns of image
-            	    for (int col=0; col < side_length; col++)
+                    // loop over columns of image
+                    for (int col=0; col < side_length; col++)
                     {
 
                         // access to lowpass part of DWT
@@ -288,8 +293,8 @@ class DWT {
 
                     } // loop over columns
 
-            	    // update stride
-            	    stride = 2 * side_length * omp_get_thread_num ();
+                    // update stride
+                    stride = 2 * side_length * t_num;
 
 #pragma omp for schedule (OMP_SCHEDULE)
                     // loop over rows of image
@@ -314,14 +319,12 @@ class DWT {
 
                     } // loop over rows of image
 
-            	} // omp parallel
+                    // reduce dimension for next level
+                    side_length = side_length/2;
 
-                // reduce dimension for next level
-                side_length = side_length/2;
+                } // loop over levels of DWT
 
-            } // loop over levels of DWT
-
-            return res;
+            } // omp parallel
 
         }
 
@@ -361,6 +364,10 @@ class DWT {
         adddouble       (const T * const x, const T * const y, const int n, T * const z)
         {
 
+//            const typename TypeTraits <T> :: RT * const xx = (const typename TypeTraits <T> :: RT * const) x;
+//            const typename TypeTraits <T> :: RT * const yy = (const typename TypeTraits <T> :: RT * const) y;
+//                  typename TypeTraits <T> :: RT * const zz = (      typename TypeTraits <T> :: RT * const) z;
+
             // TODO: use operator+ instead ...
             for (int i = 0; i < n; ++i)
                 z[i] = x[i] + y[i];
@@ -381,7 +388,7 @@ class DWT {
             int n2, mlo, j;
             T s;
 
-            int filter_length = m_hpf_d.Dim (0);
+            int filter_length = m_fl;
 
             /* highpass version */
 
@@ -467,7 +474,7 @@ class DWT {
             int n2, mlo, mhi, j;
             T s;
 
-            int filter_length = m_lpf_d.Dim (0);
+            int filter_length = m_fl;
 
             /*lowpass version */
 
@@ -536,11 +543,10 @@ class DWT {
         }
 
 
-        Matrix <T>
-        idpwt2		(const Matrix <T> & wc, const int ell, const int J, container<T>& temp)
+        void
+        idpwt2		(const Matrix <T> & wc, const int ell, const int J,
+              		 container<T>& temp, Matrix <T> & img)
         {
-
-            Matrix <T> img (wc.Dim());
 
             const int num_rows = wc.Height();
             const int num_cols = wc.Width();
@@ -557,17 +563,21 @@ class DWT {
             for (int k = 0; k < ell; k++)
                 side_length *= 2;
 
-            // loop over levels of backwards DWT
-            for (int j = ell; j < J; j++)
+
+#pragma omp parallel default (shared) firstprivate (side_length) private (wcplo, wcphi, temphi, templo, temptop) num_threads (_num_threads)
             {
 
-#pragma omp parallel default (shared) private (wcplo, wcphi, temphi, templo, temptop) num_threads (_num_threads)
-            	{
+                size_t stride;
+                const int t_num = omp_get_thread_num ();
 
-            	    size_t stride = 6 * side_length * omp_get_thread_num ();
+                // loop over levels of backwards DWT
+                for (int j = ell; j < J; j++)
+                {
+
+                    stride = 6 * side_length * t_num;
 
 #pragma omp for schedule (OMP_SCHEDULE)
-            	    // loop over rows of result image
+                    // loop over rows of result image
                     for (int k = 0; k < 2 * side_length; k++)
                     {
 
@@ -594,7 +604,7 @@ class DWT {
                     } // loop over rows of result image
 
                     // update stride
-                    stride = 5 * side_length * omp_get_thread_num ();
+                    stride = 5 * side_length * t_num;
 
 #pragma omp for schedule (OMP_SCHEDULE)
                     // loop  over cols of result image
@@ -621,14 +631,13 @@ class DWT {
 
                     } // loop over cols of result image
 
-            	} // omp parallel
 
-            	// update current row / column size
-                side_length *= 2;
+                    // update current row / column size
+                    side_length *= 2;
 
-            } // loop over levels of backwards DWT
+                } // loop over levels of backwards DWT
 
-            return img;
+            } // omp parallel
 
         }
 
@@ -639,7 +648,7 @@ class DWT {
             int j, meven, modd, mmax;
             T s, s_odd;
 
-            const int filter_length = m_lpf_r.Dim (0);
+            const int filter_length = m_fl;
 
             /*lowpass version */
 
@@ -735,7 +744,7 @@ class DWT {
             int  meven, modd, j, mmin;
             T s, s_odd;
 
-            const int filter_length = m_hpf_r.Dim (0);
+            const int filter_length = m_fl;
 
             /*hipass version */
 
