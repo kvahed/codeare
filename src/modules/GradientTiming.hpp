@@ -26,7 +26,6 @@
 #include "CX.hpp"
 #include "Math.hpp"
 #include "Interpolate.hpp"
-#include "IOContext.hpp"
 
 #define announce_plan
 
@@ -216,8 +215,6 @@ Solution ComputeGradient (GradientParams& gp) {
 	Solution s;
 	size_t ups = 25, ts = 0;
 
-    IOContext f = fopen ("spiral_debug.mat", WRITE);
-
 	printf ("  Const arc-length parametrization "); fflush(stdout);
 	ticks start = getticks();
 
@@ -393,8 +390,6 @@ Solution ComputeGradient (GradientParams& gp) {
 	t = resize (t, Nt-1, 1);
 	s.t = t;
 
-    fclose (f);
-    
 	printf ("done: (%.3f)\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 
 	return s;
