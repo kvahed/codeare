@@ -1,9 +1,12 @@
-#include "../modules/VDSpiral.hpp"
+#include "VDSpiral.hpp"
 #include "Statistics.hpp"
 #include "Tokenizer.hpp"
 #include "SimpleTimer.hpp"
+#include "IOContext.hpp"
 
 #include <sstream>
+
+using namespace codeare::matrix::io;
 
 template <class T> bool
 vdspiraltest (Connector<T>* rc) {

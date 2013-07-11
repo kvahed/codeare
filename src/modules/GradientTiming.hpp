@@ -26,6 +26,9 @@
 #include "CX.hpp"
 #include "Math.hpp"
 #include "Interpolate.hpp"
+#include "IOContext.hpp"
+
+using namespace codeare::matrix::io;
 
 #define announce_plan
 
