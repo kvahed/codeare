@@ -46,13 +46,13 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "GRAPPA"))                grappatest   (con);
 		else if (!strcmp (test, "KTPoints"))              ktptest      (con);
 		else if (!strcmp (test, "CompressedSensing"))     cstest       (con);
+		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
+		else if (!strcmp (test, "KArb"))                  karbtest     (con);
         /*
 		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
 		else if (!strcmp (test, "RelativeSensitivities")) resetest     (con);
-		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
-		else if (!strcmp (test, "KArb"))                  karbtest     (con);
         */
-        else    {printf ("Cannot call unknow module %s", test); return 1;}
+        else    {printf ("ERROR: Cannot call unknow module %s\n", test); return 1;}
 
 		delete con;
 		

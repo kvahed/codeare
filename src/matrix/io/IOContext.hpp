@@ -45,7 +45,7 @@
 #include "PHILIPS.hpp"
 */
 
-#define _fwrite(X,Y) fwrite(X,Y,#Y)
+#define fwrite(X,Y) _fwrite(X,Y,#Y)
 
 namespace codeare {
 namespace matrix{
@@ -609,8 +609,8 @@ namespace io{
 	 *
 	 * @return        File IO context for further use.
 	 */
-	inline static
-	IOContext fopen (const std::string& fname, const IOMode mode = READ) {
+	inline static IOContext
+    fopen (const std::string& fname, const IOMode mode = READ) {
 		return IOContext (fname, mode);
 	}
 
@@ -624,21 +624,9 @@ namespace io{
 	 * @return        Number of written elements
 	 */
 	template<class T> inline static	size_t
-    fwrite (IOContext& f, const Matrix<T>& M, const std::string& name) {
+    _fwrite (IOContext& f, const Matrix<T>& M, const std::string& name) {
 		return f.Write (M, name);
 	}
-	/**
-	 * @brief         Convenience interface to IOContext class. Close to MATLAB behaviour of fwrite.
-	 *
-	 * @param  f      IO context, which has been created with fopen.
-	 * @param  M      Data matrix for writing.
-	 *
-	 * @return        Number of written elements
-	 */
-    template<class T> inline static size_t
-    fwrite (IOContext& f, const Matrix<T>& M) {
-        return _fwrite (f,M);
-    }
 
 	/**
 	 * @brief         Convenience interface to IOContext class. Close to MATLAB behaviour of fread.

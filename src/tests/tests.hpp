@@ -7,6 +7,6 @@
 //#include "nifty.hpp"
 #include "nufft.hpp"
 //#include "relativesensitivities.hpp"
-//#include "spiral.hpp"
-//#include "karb.hpp"
+#include "spiral.hpp"
+#include "karb.hpp"
 

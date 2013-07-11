@@ -20,10 +20,10 @@
     operator=           (const Matrix<T,P>& M) {
 
         if (this != &M) {
-        	_dim = M.Dim();
-        	_dsz = M.Dsz();
-        	_res = M.Res();
-            _M   = M.Container();
+			_dim = M._dim;
+			_dsz = M._dsz;
+			_res = M._res;
+	        _M   = M._M;
         }
 
         return *this;

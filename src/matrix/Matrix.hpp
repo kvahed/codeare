@@ -37,8 +37,6 @@
 #include "Complex.hpp"
 #include "Container.hpp"
 
-#include "cycle.h"            // FFTW cycle implementation
-
 #include <assert.h>
 #include <iostream>
 #include <memory>
@@ -341,17 +339,8 @@ public:
      * @param  M        Right hand side
      */
     inline
-    Matrix             (const Matrix<T,P> &M) {
-
-		if (this != &M) {
-
-			_dim = M.Dim();
-			_dsz = M.Dsz();
-			_res = M.Res();
-	        _M   = M.Container();
-
-		}
-
+    Matrix             (const Matrix<T,P> &M) { 
+            *this = M;
 	}
 
 
@@ -1218,7 +1207,7 @@ protected:
 	    for (i = 1; i < ds; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
         
-        _M = container<T>(DimProd());
+        _M.resize(DimProd());
         
     }
 
