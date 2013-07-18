@@ -50,7 +50,6 @@ class WaveletTraits <T, WL_HAAR, wl_mem>
         {
             typename TypeTraits <T> :: RT norm_factor = 1 / sqrt (2);
             lpf_d [0] = norm_factor; lpf_d [1] = norm_factor;
-//            lpf_d *= norm_factor;
             mirrorfilt (lpf_d, hpf_d, 2);
         }
 
@@ -192,7 +191,6 @@ class WaveletTraits <T, WL_DAUBECHIES, 8>
 template <class T>
 static inline
 void
-//mirrorfilt              (typename TypeTraits <T> :: RT * lpf, typename TypeTraits <T> :: RT * hpf, const int fl)
 mirrorfilt (T * lpf, T * hpf, const int fl)
 {
     int isign = 1;

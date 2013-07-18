@@ -29,8 +29,8 @@
 /**
  * OMP related makros
  */
-# define NUM_THREADS_DWT 8
-# define OMP_SCHEDULE runtime
+# define NUM_THREADS_DWT 4
+# define OMP_SCHEDULE guided
 
 
 /**
@@ -71,42 +71,36 @@ class DWT {
          */
         DWT (const size_t sl, const wlfamily wl_fam = WL_DAUBECHIES, const int wl_mem = 4,
         		const int wl_scale = 4, const int num_threads = NUM_THREADS_DWT, const int dim = 2)
-            : m_dim (dim),
-//              m_lpf_d (wl_mem),
-//              m_lpf_r (wl_mem),
-//              m_hpf_d (wl_mem),
-//              m_hpf_r (wl_mem),
-              m_sl (sl),
-              m_fl (wl_mem),
-              temp (container<T>(/*omp_get_num_threads()*/num_threads * 6 * sl)),
-              m_wl_scale (wl_scale),
+            : _dim (dim),
+              _sl1 (sl),
+              _sl2 (sl),
+              _fl (wl_mem),
+              temp (container<T>(num_threads * 6 * sl)),
+              _wl_scale (wl_scale),
               _fam(wl_fam),
               _num_threads (num_threads) {
 
-            setupWlFilters <T> (wl_fam, wl_mem, m_lpf_d, m_lpf_r, m_hpf_d, m_hpf_r);
+            setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
 
         }
 
         virtual
         ~DWT ()
-        {
-            /* -- */
-        	/* :) */
-        }
+        { }
 
 
         /**
-         * @brief    Forward transform
+         * @brief    Forward transform (no constructor calls)
          *
-         * @param  m To transform
-         * @return   Transform
+         * @param  m    Signal to decompose
+         * @param  res  Resulting DWT
          */
         inline
         void
         Trafo        (const Matrix <T> & m, Matrix <T> & res)
         {
 
-            assert (m.Size () <= m_sl*m_sl
+            assert (m.Size () <= _sl1 * _sl2
                     && m.Dim () == res.Dim ());
 
             // create vars from mex function
@@ -119,24 +113,23 @@ class DWT {
             }
 
             // call dpwt2
-            dpwt2 (m, m_wl_scale, J, temp, res);
-
+            dpwt2 (m, _wl_scale, J, temp, res);
 
         }
 
 
         /**
-         * @brief    Adjoint transform
+         * @brief    Adjoint transform (no constructor calls)
          *
-         * @param  m To transform
-         * @return   Transform
+         * @param  m    DWT to transform
+         * @param  res  Reconstructed signal
          */
         inline
         void
         Adjoint      (const Matrix <T> & m, Matrix <T> & res)
         {
 
-            assert (m.Size () <= m_sl*m_sl
+            assert (m.Size () <= _sl1 * _sl2
                     && m.Dim () == res.Dim ());
 
             // create vars from mex function
@@ -148,8 +141,8 @@ class DWT {
                 assert (false);
             }
 
-            // call dpwt2
-            idpwt2 (m, m_wl_scale, J, temp, res);
+            // call idpwt2
+            idpwt2 (m, _wl_scale, J, temp, res);
 
         }
 
@@ -161,17 +154,17 @@ class DWT {
          * @return   Transform
          */
         inline
-        Matrix<T>
-        operator*    (const Matrix<T>& m) {
+        Matrix <T>
+        operator*    (const Matrix <T> & m) {
 
-            Matrix <T> res (m);
-
-//#pragma pomp inst init
-//#pragma pomp inst begin(forward)
-            return (_fam == ID) ? m :  (Trafo(m, res), res);
-//#pragma pomp inst end(forward)
-
-            return res;
+            if (_fam == ID)
+                return m;
+            else
+            {
+                Matrix <T> res (m);
+                Trafo (m, res);
+                return res;
+            }
 
         }
 
@@ -183,14 +176,18 @@ class DWT {
          * @return   Transform
          */
         inline
-        Matrix<T>
-        operator->* (const Matrix<T>& m) {
+        Matrix <T>
+        operator->* (const Matrix <T> & m) {
 
-            Matrix <T> res (m);
+            if (_fam == ID)
+                return m;
+            else
+            {
+                Matrix <T> res (m);
+                Adjoint (m, res);
+                return res;
+            }
 
-//#pragma pomp inst begin(backward)
-            return (_fam == ID) ? m :  (Adjoint(m, res), res);
-//#pragma pomp inst end(backward)
         }
 
 
@@ -208,32 +205,30 @@ class DWT {
          */
 
         // dimension of DWT
-        const int m_dim;
+        const int _dim;
 
         // low pass filters
-        typename TypeTraits <T> :: RT * m_lpf_d;
-        typename TypeTraits <T> :: RT * m_lpf_r;
-//        Matrix <RT> m_lpf_d;
-//        Matrix <RT> m_lpf_r;
+        RT * _lpf_d;
+        RT * _lpf_r;
 
         // high pass filters
-        typename TypeTraits <T> :: RT * m_hpf_d;
-        typename TypeTraits <T> :: RT * m_hpf_r;
-//        Matrix <RT> m_hpf_d;
-//        Matrix <RT> m_hpf_r;
+        RT * _hpf_d;
+        RT * _hpf_r;
 
         // maximum size of matrix
-        const size_t m_sl;
+        const size_t _sl1; // side length in first dimension
+        const size_t _sl2; // side length in second dimension
+
         // filter length
-        const size_t m_fl;
+        const size_t _fl;
 
         // temporary memory
         container<T> temp;
 
         // wavelet scale (max. decomposition level)
-        const int m_wl_scale;
+        const int _wl_scale;
 
-        wlfamily _fam;
+        const wlfamily _fam;
 
         const int _num_threads;
 
@@ -249,10 +244,10 @@ class DWT {
 
         void
         dpwt2		(const Matrix <T> & sig, const int ell, const int J,
-             		 container<T>& temp, Matrix <T> & res)
+             		 container <T> & temp, Matrix <T> & res)
         {
 
-            T *wcplo,*wcphi,*templo,*temphi;
+            T * wcplo, * wcphi, * templo, * temphi;
 
             // assign signal to result matrix
             res = sig;
@@ -331,47 +326,30 @@ class DWT {
         void
         unpackdouble	(const T * const x, const int n, const int nc, const int k, T * const y)
         {
-
-            int i;
-
-//# pragma omp parallel for num_threads (2)
-            for( i=0; i < n; i++)
-                y[i] = x[k+nc*i];
+            for (int i = 0; i < n; i++)
+                y [i] = x [k + nc * i];
         }
 
         void
         packdouble		(const T * const x, const int n, const int nc, const int k, T * const y)
         {
-            int i;
-
-//# pragma omp parallel for num_threads (2)
-            for( i=0; i < n; i++)
-                y[k+nc*i] = x[i];
+            for (int i = 0; i < n; i++)
+                y [k + nc * i] = x [i];
         }
 
 
         void
         copydouble		(const T * const src, T * const dest, const int n)
         {
-
-            // TODO: use operator= instead ...
-        	memcpy (dest, src, n*sizeof (T));
-
+        	memcpy (dest, src, n * sizeof (T));
         }
 
 
         void
         adddouble       (const T * const x, const T * const y, const int n, T * const z)
         {
-
-//            const typename TypeTraits <T> :: RT * const xx = (const typename TypeTraits <T> :: RT * const) x;
-//            const typename TypeTraits <T> :: RT * const yy = (const typename TypeTraits <T> :: RT * const) y;
-//                  typename TypeTraits <T> :: RT * const zz = (      typename TypeTraits <T> :: RT * const) z;
-
-            // TODO: use operator+ instead ...
             for (int i = 0; i < n; ++i)
                 z[i] = x[i] + y[i];
-
         }
 
 
@@ -385,25 +363,23 @@ class DWT {
         void
         downhi			(const T * const signal, const int side_length, T * const dwt_high)
         {
-            int n2, mlo, j;
-            T s;
 
-            int filter_length = m_fl;
+            int j;
+            T s;
 
             /* highpass version */
 
             // half of side_length
-            n2 = side_length/2;
+            const int n2 = side_length / 2;
 
             // half of filter length
-            mlo = filter_length/2 - 1;
+            int mlo = _fl / 2 - 1;
 
             // adjust lower bound if to low
-            if (2*mlo+1 - (filter_length-1) < 0)
+            if (2 * mlo + 1 - (_fl - 1) < 0)
                 mlo++;
 
             // loop over pixels of dwt_high
-//# pragma omp parallel for private (s) num_threads (2)
             for (int i = mlo; i < n2; i++)
             {
 
@@ -411,12 +387,11 @@ class DWT {
                 s = 0.;
 
                 // perform convolution
-//#pragma omp parallel for reduction (+:s)
-                for (int h = 0; h < filter_length; h++)
-                    s += m_hpf_d [h]* signal [2*i+1-h];
+                for (int h = 0; h < _fl; h++)
+                    s += _hpf_d [h] * signal [2 * i + 1 - h];
 
                 // assign result of convolution
-                dwt_high[i] = s;
+                dwt_high [i] = s;
 
             } // loop over pixels of dwt_high
 
@@ -435,17 +410,17 @@ class DWT {
                 s = 0.;
 
                 // start signal index for convolution
-                j = 2*i+1;
+                j = 2 * i + 1;
 
                 // loop over filter elements
-                for (int h = 0; h < filter_length; h++)
+                for (int h = 0; h < _fl; h++)
                 {
 
                     // adjust index if it exceeds side_length
                     if (j < 0)
                         j += side_length;
 
-                    s += m_hpf_d [h] * signal [j];
+                    s += _hpf_d [h] * signal [j];
 
                     // update index
                     --j;
@@ -453,7 +428,7 @@ class DWT {
                 }
 
                 // assign result of convolution
-                dwt_high[i] = s;
+                dwt_high [i] = s;
 
             } // loop over edge values
 
@@ -471,39 +446,36 @@ class DWT {
         downlo  		        (const T * const signal, const int side_length, T * const dwt_low)
         {
 
-            int n2, mlo, mhi, j;
+            int j;
             T s;
-
-            int filter_length = m_fl;
 
             /*lowpass version */
 
             // half of side_length (length of dwt_low)
-            n2 = side_length/2;
+            const int n2 = side_length / 2;
 
             // half of filter_length
-            mlo = filter_length /2;
+            const int mlo = _fl /2;
 
             // upper bound for "normal" convolution
-            mhi = n2 - mlo;
+            int mhi = n2 - mlo;
 
             // upper bound to high
-            if (2*mhi + (filter_length-1) >= side_length)
+            if (2 * mhi + (_fl - 1) >= side_length)
                 --mhi;
             // upper bound to low
             if (mhi < 0)
                 mhi = -1;
 
             // loop over pixels of dwt_low
-//# pragma omp parallel for private (s) num_threads (2)
-            for (int i= 0; i<=mhi; i++)
+            for (int i= 0; i <= mhi; i++)
             {
 
                 // result of convolution
                 s = 0.;
                 // apply low pass filter (convolution)
-                for (int h = 0; h < filter_length; h++)
-                    s += m_lpf_d [h] * signal [2*i+h];
+                for (int h = 0; h < _fl; h++)
+                    s += _lpf_d [h] * signal [2 * i + h];
                 // assign result of convolution
                 dwt_low [i] = s;
 
@@ -513,22 +485,22 @@ class DWT {
             /* fix up edge values */
 
             // loop over edge values (periodic boundary)
-            for (int i = mhi+1; i < n2; i++)
+            for (int i = mhi + 1; i < n2; i++)
             {
 
                 // result of convolution
                 s = 0.;
 
                 // start signal index for convolution
-                j = 2*i;
+                j = 2 * i;
 
                 // loop over filter elements
-                for (int h = 0; h < filter_length; h++){
+                for (int h = 0; h < _fl; h++){
 
                     // adjust index if it exceeds current side_length
                     if (j >= side_length)
                         j -= side_length;
-                    s += m_lpf_d [h] * signal [j];
+                    s += _lpf_d [h] * signal [j];
 
                     // update index
                     j++;
@@ -551,12 +523,10 @@ class DWT {
             const int num_rows = wc.Height();
             const int num_cols = wc.Width();
 
-            T *wcplo,*wcphi,*templo,*temphi,*temptop;
-            //		copydouble(wc,img,nr*nc);
+            T * wcplo, * wcphi, * templo, * temphi, * temptop;
 
             // assign dwt to result image
             img = wc;
-
 
             // calculate start level for backwards DWT
             int side_length = 1;
@@ -645,22 +615,20 @@ class DWT {
         void
         uplo		(const T * const wc, const int side_length, T * const signal)
         {
-            int j, meven, modd, mmax;
-            T s, s_odd;
 
-            const int filter_length = m_fl;
+            int j;
+            T s, s_odd;
 
             /*lowpass version */
 
             /* away from edges */
 
             // upper bound for even filter indices
-            meven = (filter_length+1)/2;
+            const int meven = (_fl + 1) / 2;
             // upper bound for odd filter indices
-            modd = filter_length/2;
+            const int modd = _fl / 2;
 
             // loop over regular signal indices
-//# pragma omp parallel for private (s, s_odd) num_threads (2)
             for (int i = meven; i < side_length; i++)
             {
 
@@ -673,18 +641,18 @@ class DWT {
                 {
 
                     // even filter index
-                    s += m_lpf_r [2*h] * wc [i-h];
+                    s += _lpf_r [2 * h] * wc [i - h];
                     // odd filter index
-                    s_odd += m_lpf_r [2*h+1] * wc [i-h];
+                    s_odd += _lpf_r [2 * h + 1] * wc [i - h];
 
                 }
                 // case of odd filter_length (-> more even indices: start with index 0)
                 if (meven > modd)
-                    s += m_lpf_r [2*meven] * wc [i-meven];
+                    s += _lpf_r [2 * meven] * wc [i - meven];
 
                 // assign convolution results
-                signal [2*i] = s;
-                signal [2*i+1] = s_odd;
+                signal [2 * i] = s;
+                signal [2 * i + 1] = s_odd;
 
             } // loop over regular signal indices
 
@@ -692,7 +660,7 @@ class DWT {
             /* fix up edge values */
 
             // upper bound for filter indices
-            mmax = meven;
+            int mmax = meven;
             // possible correction if mmax greater than current side length
             if (mmax > side_length)
                 mmax = side_length;
@@ -716,9 +684,9 @@ class DWT {
                         j += side_length;
 
                     // even part of convolution
-                    s += m_lpf_r [2*h] * wc [j];
+                    s += _lpf_r [2 * h] * wc [j];
                     // odd part of convolution
-                    s_odd += m_lpf_r [2*h+1] * wc [j];
+                    s_odd += _lpf_r [2 * h + 1] * wc [j];
 
                     // update index
                     --j;
@@ -727,11 +695,11 @@ class DWT {
 
                 // case of odd filter_length
                 if (meven > modd)
-                    s += m_lpf_r [2*meven] * wc [j];
+                    s += _lpf_r [2 * meven] * wc [j];
 
                 // assign convolution results
-                signal [2*i] = s;
-                signal [2*i+1] = s_odd;
+                signal [2 * i] = s;
+                signal [2 * i + 1] = s_odd;
 
             } // loop over edge values
 
@@ -741,22 +709,20 @@ class DWT {
         void
         uphi		(const T * const wc, const int side_length, T * const signal)
         {
-            int  meven, modd, j, mmin;
-            T s, s_odd;
 
-            const int filter_length = m_fl;
+            int j;
+            T s, s_odd;
 
             /*hipass version */
 
             // upper bound for even filter indices
-            meven = (filter_length+1)/2;
+            const int meven = (_fl + 1) / 2;
             // upper bound for odd filter indices
-            modd = filter_length/2;
+            const int modd = _fl / 2;
 
             /* away from edges */
 
             // loop over regular signal indices
-//# pragma omp parallel for private (s, s_odd) num_threads (2)
             for (int i = 0; i < side_length - meven; i++)
             {
 
@@ -769,19 +735,19 @@ class DWT {
                 {
 
                     // even filter index
-                    s += m_hpf_r [2*h] * wc [i+h];
+                    s += _hpf_r [2 * h] * wc [i + h];
                     // odd filter index
-                    s_odd += m_hpf_r [2*h+1] * wc [i+h];
+                    s_odd += _hpf_r [2 * h + 1] * wc [i + h];
 
                 } // perform convolution
 
                 // case of odd filter_length
                 if (meven > modd)
-                    s += m_hpf_r [2*meven] * wc [i+meven];
+                    s += _hpf_r [2 * meven] * wc [i + meven];
 
                 // assign convolution results
-                signal [2*i+1] = s;
-                signal [2*i] = s_odd;
+                signal [2 * i + 1] = s;
+                signal [2 * i] = s_odd;
 
             } // loop over regular signal indices
 
@@ -789,7 +755,7 @@ class DWT {
             /* fix up edge values */
 
             // lower bound for indices of edge values
-            mmin = side_length - meven;
+            int mmin = side_length - meven;
             // possible correction if mmin less than zero
             if (mmin < 0)
                 mmin = 0;
@@ -813,9 +779,9 @@ class DWT {
                         j -= side_length;
 
                     // even filter index
-                    s += m_hpf_r [2*h] * wc [j];
+                    s += _hpf_r [2 * h] * wc [j];
                     // odd filter index
-                    s_odd += m_hpf_r [2*h+1] * wc [j];
+                    s_odd += _hpf_r [2 * h + 1] * wc [j];
 
                     // update current wc index
                     j++;
@@ -823,8 +789,8 @@ class DWT {
                 } // perform convolution
 
                 // assign convolution results
-                signal [2*i+1] = s;
-                signal [2*i] = s_odd;
+                signal [2 * i + 1] = s;
+                signal [2 * i] = s_odd;
 
             } // loop over edge values
 
