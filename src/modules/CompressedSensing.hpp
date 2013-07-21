@@ -68,8 +68,7 @@ namespace RRStrategy {
      * @brief CS reconstruction based on Sparse MRI v0.2 by Michael Lustig
      */
     class CompressedSensing : public ReconStrategy {
-        
-        
+            
         
     public:
         
@@ -122,9 +121,9 @@ namespace RRStrategy {
     };
     
     
-    static float 
+    inline static float 
     Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
-         const Matrix<cxfl>&  data, const float&            t) {
+         const Matrix<cxfl>&  data, const float             t) {
         
         Matrix<cxfl> om;
         float        o = 0.0;
@@ -141,12 +140,12 @@ namespace RRStrategy {
     }
     
     
-    static float 
+    inline static float 
     ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
-           const float&            t, const CSParam&        cgp) {
+           const float             t, const CSParam&        cgp) {
         
         Matrix<cxfl> om;
-        float        o = 0.0, p = (float)cgp.pnorm/2.0;
+        float        o = 0.0, p = 0.5*cgp.pnorm;
         
         om  = ttdbx;
         if (t > 0.0)
@@ -166,12 +165,12 @@ namespace RRStrategy {
     /**
      *
      */
-    static float 
+    inline static float 
     ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g, 
-            const float&        t, const CSParam&    cgp) {
+            const float         t, const CSParam&    cgp) {
         
         Matrix<cxfl> om;
-        float        o = 0.0, p = (float)cgp.pnorm/2.0;
+        float        o = 0.0, p = 0.5*cgp.pnorm;
         
         om  = x;
         if (t > 0.0)
@@ -193,9 +192,9 @@ namespace RRStrategy {
                const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
                const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
                const Matrix<cxfl>&  data, const float             t, 
-               float&         rmse, const CSParam&        cgp) {
+                     float&         rmse, const CSParam&        cgp) {
         
-        float obj = 0.0;
+        float obj;
         float nz = (float) nnz (data); 
         
         obj  = Obj (ffdbx, ffdbg, data, t);
@@ -261,7 +260,7 @@ namespace RRStrategy {
         
         DWT<cxfl>&  dwt = *cgp.dwt;
         TVOP& tvt = *cgp.tvt;
-        float p   = ((float)cgp.pnorm)/2.0-1.0;
+        float p   = 0.5*cgp.pnorm-1.0;
         
         Matrix<cxfl> dx, g;
         
@@ -271,7 +270,7 @@ namespace RRStrategy {
         g += cxfl(cgp.l1);
         g ^= p;
         g *= dx;
-        g *= cxfl(cgp.pnorm);
+        g *= cgp.pnorm;
         g  = dwt * (tvt->*g);
         
         return (cgp.tvw * g);
@@ -297,8 +296,7 @@ namespace RRStrategy {
     } 
     
 
-    void 
-    NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
+    void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
 
         
         float     t0  = 1.0, t = 1.0, z = 0.0;

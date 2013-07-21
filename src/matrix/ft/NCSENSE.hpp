@@ -27,6 +27,7 @@
 #include "MRI.hpp"
 #include "Lapack.hpp"
 #include "tinyxml.h"
+#include "IOContext.hpp"
 
 #include "Workspace.hpp"
 
@@ -247,7 +248,7 @@ public:
 			 const bool recal = true) const {
 
 		CT ts;
-		T rn, rno, xn;
+        T rn, rno, xn;
 		Matrix<CT> p, r, x, q;
 		vector<T> res;
         std::vector< Matrix<cxfl> > vc;
@@ -255,39 +256,38 @@ public:
         if (recal)
         	IntensityMap (sens);
 
-		p = EH (m, sens, m_nx, m_fts) * m_ic;
-		r = p;
-		x = zeros<CT>(size(p));
+		p  = EH (m, sens, m_nx, m_fts) * m_ic;
+		r  = p;
+		x  = zeros<CT>(size(p));
 		
         if (m_verbose)
             vc.push_back (p/m_ic);
 
         xn = pow(norm(p), 2.0);
-		rn = xn;
+        rn = xn;
 
 		for (size_t i = 0; i < m_cgiter; i++) {
 			
 			res.push_back(rn/xn);
 			
-			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps) 
-				break;
-
+			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps)  break;
  			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 
-			q   = EH (E  (p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
+			q  = EH (E  (p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
 
 			if (m_lambda)
 				q  += m_lambda * p;
-			
-			ts  = rn / p.dotc(q);
+
+            ts  = rn / p.dotc(q);
 			x  += ts * p;
-            if (m_verbose)
-                vc.push_back (x * m_ic);
 			r  -= ts * q;
 			rno = rn;
 			rn  = pow(norm(r), 2.0);
 			p  *= rn / rno;
 			p  += r;
+
+            if (m_verbose)
+                vc.push_back (x * m_ic);
 
 		}
 
@@ -298,7 +298,7 @@ public:
                 memcpy (&x[i*cpsz], &(vc[i][0]), cpsz*sizeof(CT));
             return x;
         } else        
-            return x * m_ic;
+            return x;
 
 	}
 	

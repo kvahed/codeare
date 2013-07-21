@@ -115,6 +115,10 @@ CompressedSensing::Process () {
 	im_dc    = dft ->* im_dc;
 	
 	ma       = max(abs(im_dc));
+
+    if (m_verbose)
+		vc.push_back(im_dc);
+
 	im_dc   /= ma;
 	data    /= ma;
 	
@@ -122,14 +126,12 @@ CompressedSensing::Process () {
 	
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
-	if (m_verbose)
-		vc.push_back(im_dc*ma);
 
 	SimpleTimer st ("CompressedSensing");
 	for (size_t i = 0; i < (size_t)m_csiter; i++) {
 		NLCG (im_dc, data, m_csparam);
 		if (m_verbose)
-			vc.push_back(im_dc*ma);
+			vc.push_back(dwt ->* im_dc*ma);
 	}
     st.Stop();
     

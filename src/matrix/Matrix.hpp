@@ -1240,11 +1240,6 @@ protected:
 
 };
 
-
-#ifdef PARC_MODULE_NAME
-
-#endif // ICE
-
 #endif // __MATRIX_H__
 
 

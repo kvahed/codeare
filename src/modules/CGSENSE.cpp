@@ -161,10 +161,12 @@ CGSENSE::Process () {
     Matrix<cxfl> data;
 
     data = (!m_testcase) ? Get<cxfl>("data") : 
-        m_ncs->Trafo (phantom<cxfl>(size(sens,0)), sens) + m_noise * randn<cxfl>(size(data));
+        m_ncs->Trafo (phantom<cxfl>(size(sens,0)), sens);
+    if (m_noise)
+        data += m_noise * randn<cxfl>(size(data));
 
     SimpleTimer st("CGSENSE");
-    Matrix<cxfl> img = m_ncs->Adjoint (data, sens);
+    Matrix<cxfl> img = *m_ncs ->* data;
     st.Stop();
     
     wspace.Add("image", img);
