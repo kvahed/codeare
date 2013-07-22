@@ -101,10 +101,10 @@ class DWT {
 
             // calc 2^...
             int tmp_two = 1;
-            for (nn = _wl_scale; nn <= _J; nn++)
+            for (nn = _wl_scale; nn < _J; nn++)
                 tmp_two *= 2;
 
-            std::cout << " min_sl: " << _min_sl << std::endl;
+//            std::cout << " min_sl: " << _min_sl << std::endl;
             _sl1_scale = _sl1 / tmp_two;
             _sl2_scale = _sl2 / tmp_two;
             _sl3_scale = _sl3 / tmp_two;
@@ -553,14 +553,14 @@ class DWT {
             img = wc;
 
             // calculate start level for backwards DWT
-            int side_length = 1;
-            for (int k = 0; k < ell; k++)
-                side_length *= 2;
-            std::cout << " side_length: " << side_length << ", _sl1_scale: " << _sl1_scale << std::endl;
+//            int side_length = 1;
+//            for (int k = 0; k < ell; k++)
+//                side_length *= 2;
+//            std::cout << " side_length: " << side_length << ", _sl1_scale: " << _sl1_scale << std::endl;
             int sl1 = _sl1_scale,
                 sl2 = _sl2_scale,
                 sl3 = _sl3_scale;
-
+            int side_length = sl1;
 
 # pragma omp parallel default (shared) firstprivate (side_length) \
                      private (wcplo, wcphi, temphi, templo, temptop, tmp) num_threads (_num_threads)
