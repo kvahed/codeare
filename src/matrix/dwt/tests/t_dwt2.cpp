@@ -88,7 +88,7 @@ main            (int argc, char ** args)
 	{
 
 	    // do something
-	    DWT <elem_type> dwt (mat_in.Dim (0), wl_fam, wl_mem, wl_scale, threads);
+	    DWT <elem_type> dwt (mat_in.Dim (0), mat_in.Dim (1), wl_fam, wl_mem, wl_scale, threads);
 	    double s_time_f = omp_get_wtime ();
 	    dwt.Trafo (mat_in, mat_out_dwt);
 	    s_time_f = omp_get_wtime () - s_time_f;
