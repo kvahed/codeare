@@ -69,12 +69,12 @@ class DWT {
          *
          * @param  sl      Side length
          */
-        DWT (const size_t sl1, const size_t sl2, const wlfamily wl_fam = WL_DAUBECHIES, const int wl_mem = 4,
-        		const int wl_scale = 4, const int num_threads = NUM_THREADS_DWT, const int dim = 2)
-            : _dim (dim),
-              _sl1 (sl1),
+        DWT (const size_t sl1, const size_t sl2, const size_t sl3, const wlfamily wl_fam = WL_DAUBECHIES, const int wl_mem = 4,
+        		const int wl_scale = 4, const int num_threads = NUM_THREADS_DWT)
+            : _sl1 (sl1),
               _sl2 (sl2),
-              _sl3 (1),
+              _sl3 (sl3),
+              _dim (sl3 == 1 ? 2 : 3),
               _fl (wl_mem),
               temp (container<T>(num_threads * MAX (6 * sl2, 5 * sl1))),
               _wl_scale (wl_scale),
@@ -104,7 +104,6 @@ class DWT {
             for (nn = _wl_scale; nn < _J; nn++)
                 tmp_two *= 2;
 
-//            std::cout << " min_sl: " << _min_sl << std::endl;
             _sl1_scale = _sl1 / tmp_two;
             _sl2_scale = _sl2 / tmp_two;
             _sl3_scale = _sl3 / tmp_two;
@@ -285,12 +284,8 @@ class DWT {
 
                 size_t stride;
                 int sl1 = _sl1,
-                    sl2 = _sl2,
-                    sl3 = _sl3;
+                    sl2 = _sl2;
                 const int t_num = omp_get_thread_num ();
-                int c1_glob,
-                    c2_glob,
-                    c3_glob;
 
                 // loop over levels of DWT
                 for (int j = (J-1); j >= ell; --j)
@@ -303,15 +298,13 @@ class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along first dimension ('columns') of image
-                    for (int c2_loc = 0; c2_loc < sl2 * sl3; c2_loc++)
+                    for (int c2_loc = 0; c2_loc < sl2; c2_loc++)
                     {
 
-                        int c2_glob = (c2_loc / sl2) * _sl1 * _sl2 + (c2_loc % sl2) * _sl1;
-
                         // access to lowpass part of DWT
-                        wcplo = & res [c2_glob /** _sl1*/];
+                        wcplo = & res [c2_loc * _sl1];
                         // access to highpass part of DWT
-                        wcphi = & res [c2_glob /** _sl1*/ + sl1 / 2];
+                        wcphi = & res [c2_loc * _sl1 + sl1 / 2];
 
                         // copy part of image to temp memory
                         copydouble (wcplo, tmp, sl1);
@@ -332,13 +325,13 @@ class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along second dimension ('rows') of image
-                    for (int c1_loc = 0; c1_loc < sl1 * sl3; c1_loc++)
+                    for (int c1_loc = 0; c1_loc < sl1; c1_loc++)
                     {
 
                         int c1_glob = (c1_loc / sl1) * _sl1 * _sl2;
 
                         // copy c1-th line of image to temp_mem
-                        unpackdouble (& res [c1_glob], sl2, _sl1, c1_loc % sl1, tmp);
+                        unpackdouble (& res [0], sl2, _sl1, c1_loc, tmp);
 
                         // apply low pass filter on current line and write to temp mem
                         downlo (tmp, sl2, templo);
@@ -346,9 +339,9 @@ class DWT {
                         downhi (tmp, sl2, temphi);
 
                         // write temp lowpass result to result matrix
-                        packdouble (templo, sl2 / 2, _sl1, c1_loc % sl1, & res [c1_glob]);
+                        packdouble (templo, sl2 / 2, _sl1, c1_loc, & res [0]);
                         // write temp highpass result to result matrix
-                        packdouble (temphi, sl2 / 2, _sl1, c1_loc % sl1, & res [c1_glob + sl2 / 2 * _sl1]);
+                        packdouble (temphi, sl2 / 2, _sl1, c1_loc, & res [sl2 / 2 * _sl1]);
 
                     } // loop over lines along second dimension
 
@@ -373,6 +366,8 @@ class DWT {
             // assign signal to result matrix
             res = sig;
 
+            std::cout << " 3D " << std::endl;
+
 # pragma omp parallel default (shared), private (wcplo, wcphi, temphi, templo, tmp)\
                                         num_threads (_num_threads)
             {
@@ -382,9 +377,6 @@ class DWT {
                     sl2 = _sl2,
                     sl3 = _sl3;
                 const int t_num = omp_get_thread_num ();
-                int c1_glob,
-                    c2_glob,
-                    c3_glob;
 
                 // loop over levels of DWT
                 for (int j = (J-1); j >= ell; --j)
@@ -446,9 +438,34 @@ class DWT {
 
                     } // loop over lines along second dimension
 
+                    int ld = _sl1 * _sl2;
+
+# pragma omp for schedule (OMP_SCHEDULE)
+                    // loop over lines along third dimension ('third') of image
+                    for (int c2_loc = 0; c2_loc < sl2 * sl1; c2_loc++)
+                    {
+
+                        int c2_glob = (c2_loc / sl2) + (c2_loc % sl2) * _sl1;
+
+                        // copy c2-th line of image to temp_mem
+                        unpackdouble (& res [c2_glob], sl3, ld, 0, tmp);
+
+                        // apply low pass filter on current line and write to temp mem
+                        downlo (tmp, sl3, templo);
+                        // apply high pass filter on current line and write to temp mem
+                        downhi (tmp, sl3, temphi);
+
+                        // write temp lowpass result to result matrix
+                        packdouble (templo, sl3 / 2, ld, 0, & res [c2_glob]);
+                        // write temp highpass result to result matrix
+                        packdouble (temphi, sl3 / 2, ld, 0, & res [c2_glob + sl3 / 2 * ld]);
+
+                    } // loop over lines along third dimension
+
                     // reduce dimensions for next level
-                    sl1 = sl1 / 2;
-                    sl2 = sl2 / 2;
+                    sl1 /= 2;
+                    sl2 /= 2;
+                    sl3 /= 2;
 
                 } // loop over levels of DWT
 
@@ -663,10 +680,9 @@ class DWT {
 
             // calculate start level for backwards DWT
             int sl1 = _sl1_scale,
-                sl2 = _sl2_scale,
-                sl3 = _sl3_scale;
+                sl2 = _sl2_scale;
 
-# pragma omp parallel default (shared) firstprivate (sl1, sl2, sl3) \
+# pragma omp parallel default (shared) firstprivate (sl1, sl2) \
                      private (wcplo, wcphi, temphi, templo, temptop, tmp) num_threads (_num_threads)
             {
 
@@ -689,13 +705,11 @@ class DWT {
                     for (int c1_loc = 0; c1_loc < 2 * sl1; c1_loc++)
                     {
 
-                        int c1_glob = (c1_loc / (2 * sl1)) * _sl1 * _sl2;
-
                         // copy lowpass part of current line to temporary memory
-                        unpackdouble (& img [c1_glob], sl2, _sl1, c1_loc % (2 * sl1), templo);
+                        unpackdouble (& img [0], sl2, _sl1, c1_loc, templo);
 
                         // copy highpass part of current line to temporary memory
-                        unpackdouble (& img [c1_glob + sl2 * _sl1], sl2, _sl1, c1_loc % (2 * sl1), temphi);
+                        unpackdouble (& img [sl2 * _sl1], sl2, _sl1, c1_loc, temphi);
 
                         // perform lowpass reconstruction
                         uplo (templo, sl2, tmp);
@@ -706,7 +720,7 @@ class DWT {
                         adddouble (tmp, temptop, sl2 * 2, tmp);
 
                         // write back reconstructed line
-                        packdouble (tmp, sl2 * 2, _sl1, c1_loc % (2 * sl1), & img [c1_glob]);
+                        packdouble (tmp, sl2 * 2, _sl1, c1_loc, & img [0]);
 
                     } // loop over lines along second dimension of result image
 
@@ -721,12 +735,10 @@ class DWT {
                     for (int c2_loc = 0; c2_loc < 2 * sl2; c2_loc++)
                     {
 
-                        int c2_glob = (c2_loc / (2 * sl2)) * _sl2 * _sl1 + (c2_loc % (2 * sl2)) * _sl1;
-
                         // assign address of current line's lowpass part
-                        wcplo = & img [c2_glob];
+                        wcplo = & img [c2_loc * _sl1];
                         // assign address of current line's highpass part
-                        wcphi = & img [c2_glob + sl1];
+                        wcphi = & img [c2_loc * _sl1 + sl1];
 
                         // copy lowpass part to temporary memory
                         copydouble (wcplo, tmp, sl1);
@@ -787,7 +799,7 @@ class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along second dimension ('rows') of result image
-                    for (int c1_loc = 0; c1_loc < 2 * sl1 /* * 2 * sl3 */; c1_loc++)
+                    for (int c1_loc = 0; c1_loc < 2 * sl1 * 2 * sl3; c1_loc++)
                     {
 
                         int c1_glob = (c1_loc / (2 * sl1)) * _sl1 * _sl2;
@@ -819,7 +831,7 @@ class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop  over lines along first dimension ('columns') of result image
-                    for (int c2_loc = 0; c2_loc < 2 * sl2 /* * 2 * sl3 */; c2_loc++)
+                    for (int c2_loc = 0; c2_loc < 2 * sl2 * 2 * sl3; c2_loc++)
                     {
 
                         int c2_glob = (c2_loc / (2 * sl2)) * _sl2 * _sl1 + (c2_loc % (2 * sl2)) * _sl1;
@@ -845,6 +857,7 @@ class DWT {
                     // update current row / column size
                     sl2 *= 2;
                     sl1 *= 2;
+                    sl3 *= 2;
 
                 } // loop over levels of backwards DWT
 
