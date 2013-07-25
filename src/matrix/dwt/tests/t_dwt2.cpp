@@ -11,7 +11,7 @@
 /**********************
  ** type definitions **
  **********************/
-typedef cxdb elem_type;
+typedef double elem_type;
 
 
 using namespace codeare::matrix::io;
@@ -95,6 +95,9 @@ main            (int argc, char ** args)
 	    double s_time_b = omp_get_wtime ();
 	    dwt.Adjoint (mat_out_dwt, mat_out_dwt_recon);
 	    s_time_b = omp_get_wtime () - s_time_b;
+
+	    // make sure input data is correct for iteration ;) !!!
+//	    mat_out_dwt_recon = mat_in;
 
 	    double time = omp_get_wtime ();
 	    for (int i = 0; i < iterations; i++)
