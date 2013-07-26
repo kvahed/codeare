@@ -63,7 +63,7 @@ cstest (Connector<T>* con) {
 	
     // Write images
     IOContext oc (con->GetElement("/config/data-out"), base, WRITE);
-    oc.Write(im_dc, "image");
+    oc.Write(im_dc, "im_dc");
     oc.Close();
 	
 	return true;

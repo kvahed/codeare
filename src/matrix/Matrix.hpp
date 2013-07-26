@@ -1206,8 +1206,10 @@ protected:
 		_dsz.resize(ds,1);
 	    for (i = 1; i < ds; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-        
-        _M.resize(DimProd());
+
+        size_t  n = DimProd(); 
+        if (n != _M.size())
+            _M.resize(n);
         
     }
 
