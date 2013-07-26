@@ -146,7 +146,7 @@ class DWT {
                     && m.Dim () == res.Dim ());
 
             /* function pointer */
-            (this ->* dpwt) (m, res);
+            (this ->* idpwt) (m, res);
 
         }
 
