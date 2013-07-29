@@ -41,7 +41,27 @@ namespace RRStrategy {
      */
     class KTPoints : public ReconStrategy {
         
+
+    private:
         
+        int           nc;       /**< @brief Transmit channels       */
+        Matrix<short> m_pd;       /**< @brief Pulse durations         */
+        int           m_gd;       /**< @brief Gradient durations      */
+        int           ns;       /**< @brief # Spatial positions     */
+        int           nk;       /**< @brief # kt-points             */
+        int           m_maxiter;  /**< @brief # Variable exchange method iterations */
+        int           m_verbose;  /**< @brief Verbose output. All intermediate results. */
+        int           m_breakearly;  /**< @brief Break search with first diverging step */
+
+        double        m_lambda;   /**< @brief Tikhonov parameter      */
+        double        m_rflim;    /**< @brief Maximum rf amplitude    */
+        double        m_conv;     /**< @brief Convergence criterium   */
+        
+        float*        m_max_rf;   /**< @brief Maximum reached RF amps */
+
+        std::string   m_orient;   /**< @brief Orientation             */ 
+        std::string   m_ptxfname; /**< @brief PTX file name           */
+
     public:
         
         /**
@@ -78,29 +98,9 @@ namespace RRStrategy {
 
 
 
-    private:
- 
-        int           nc;       /**< @brief Transmit channels       */
-        Matrix<short> m_pd;       /**< @brief Pulse durations         */
-        int           m_gd;       /**< @brief Gradient durations      */
-        int           ns;       /**< @brief # Spatial positions     */
-        int           nk;       /**< @brief # kt-points             */
-        int           m_maxiter;  /**< @brief # Variable exchange method iterations */
-        int           m_verbose;  /**< @brief Verbose output. All intermediate results. */
-        int           m_breakearly;  /**< @brief Break search with first diverging step */
-
-        double        m_lambda;   /**< @brief Tikhonov parameter      */
-        double        m_rflim;    /**< @brief Maximum rf amplitude    */
-        double        m_conv;     /**< @brief Convergence criterium   */
-        
-        float*        m_max_rf;   /**< @brief Maximum reached RF amps */
-
-        std::string   m_orient;   /**< @brief Orientation             */ 
-        std::string   m_ptxfname; /**< @brief PTX file name           */
 
     };
 
 }
 #endif /* __KT_POINTS_HPP__ */
-
 

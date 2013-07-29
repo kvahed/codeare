@@ -21,8 +21,10 @@
 #include "CGSENSE.hpp"
 #include "Noise.hpp"
 #include "Toolbox.hpp"
+#include "SimpleTimer.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+
 #include "Print.hpp"
 
 #include <math.h>
@@ -81,6 +83,12 @@ CGSENSE::Init() {
 	printf ("  test case: %i \n", m_testcase);
 	// --------------------------------------
 
+	// # threads ----------------------------
+
+	Attribute ("threads",  &m_nthreads);
+	printf ("  # of threads: %i \n", m_nthreads);
+	// --------------------------------------
+
 	// Verbosity ----------------------------
 
 	Attribute ("verbose",   &m_verbose);
@@ -127,6 +135,8 @@ CGSENSE::Prepare () {
     cgp["cgiter"]       = (size_t) m_cgmaxit;
     cgp["cgeps"]        = m_cgeps;
     cgp["lambda"]       = m_lambda;
+    cgp["lambda"]       = m_lambda;
+    cgp["np"]           = m_nthreads;
 
 	m_ncs = new NCSENSE<float>(cgp);
 
@@ -147,29 +157,19 @@ error_code
 CGSENSE::Process () {
 
 	error_code error = OK;
-
-	ticks cgstart = getticks();
-	
-	printf ("Processing CGSENSE ...\n");
-
     const Matrix<cxfl>& sens = Get<cxfl>("sens");
-    
     Matrix<cxfl> data;
 
-    if (!m_testcase)
-        data = Get<cxfl>("data");
-    else {
-        data  = m_ncs->Trafo (phantom<cxfl>(size(sens,0)), sens);
-        data += m_noise * rand<cxfl,gaussian>(size(data));
-    }
+    data = (!m_testcase) ? Get<cxfl>("data") : 
+        m_ncs->Trafo (phantom<cxfl>(size(sens,0)), sens);
+    if (m_noise)
+        data += m_noise * randn<cxfl>(size(data));
 
-    Matrix<cxfl> img = m_ncs->Adjoint (data, sens);
+    SimpleTimer st("CGSENSE");
+    Matrix<cxfl> img = *m_ncs ->* data;
+    st.Stop();
+    
     wspace.Add("image", img);
-
-	Free ("data");
-
-	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
-
 	return error;
 
 }

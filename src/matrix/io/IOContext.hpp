@@ -45,6 +45,8 @@
 #include "PHILIPS.hpp"
 */
 
+#define fwrite(X,Y) _fwrite(X,Y,#Y)
+
 namespace codeare {
 namespace matrix{
 namespace io{
@@ -314,6 +316,18 @@ namespace io{
 		}
 
 
+		/**
+		 *
+		 */
+		IOContext (const std::string& fname, const IOMode mode) :
+			m_iof(0), m_ios(HDF5) {
+
+			m_ios = TypeBySuffix (fname);
+			this->Concretize(fname, mode, Params(), false);
+
+		}
+
+
 
 		/**
 		 *
@@ -426,6 +440,8 @@ namespace io{
 				}
 			}
 
+            return false;
+            
 		}
 
 		/**
@@ -593,8 +609,8 @@ namespace io{
 	 *
 	 * @return        File IO context for further use.
 	 */
-	inline static
-	IOContext fopen (const std::string& fname, const std::string& mode = "rb") {
+	inline static IOContext
+    fopen (const std::string& fname, const IOMode mode = READ) {
 		return IOContext (fname, mode);
 	}
 
@@ -603,13 +619,13 @@ namespace io{
 	 *
 	 * @param  f      IO context, which has been created with fopen.
 	 * @param  M      Data matrix for writing.
+     * @param  name   Name in data file
 	 *
 	 * @return        Number of written elements
 	 */
-#define fwrite(X,Y) _fwrite(X,Y,#Y)
-	template<class T> inline static
-	size_t _fwrite (IOContext& f, const Matrix<T>& M, const std::string& name) {
-		f.Write (M, name);
+	template<class T> inline static	size_t
+    _fwrite (IOContext& f, const Matrix<T>& M, const std::string& name) {
+		return f.Write (M, name);
 	}
 
 	/**
@@ -620,8 +636,8 @@ namespace io{
 	 *
 	 * @return        Data matrix
 	 */
-	template<class T> inline static
-	Matrix<T> fread (const IOContext& f, const std::string& name) {
+	template<class T> inline static Matrix<T>
+	fread (const IOContext& f, const std::string& name) {
 		return f.Read<T> (name);
 	}
 
@@ -632,9 +648,9 @@ namespace io{
 	 *
 	 * @return        Success (Any value > 0 indicates a problem).
 	 */
-	static int
+	static void
 	fclose (IOContext& f) {
-		return (int)f.Close();
+		f.Close();
 	}
 
 

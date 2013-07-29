@@ -37,8 +37,6 @@
 #include "Complex.hpp"
 #include "Container.hpp"
 
-#include "cycle.h"            // FFTW cycle implementation
-
 #include <assert.h>
 #include <iostream>
 #include <memory>
@@ -53,12 +51,9 @@
 #include <cstring>
 #include <algorithm>
 
-
 #ifdef HAVE_MAT_H
 #include "mat.h"
 #endif
-
-#include "Ptr.h"
 
 /**
  * @brief Is matrix is a vector.
@@ -94,8 +89,12 @@
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
  */
-template <class T, paradigm P=SHM, const bool& b = TypeTraits<T>::Supported>
-class Matrix  : public SmartObject {
+template <class T, paradigm P=SHM
+#if !defined(_MSC_VER) || _MSC_VER>1200
+    ,const bool& b = TypeTraits<T>::Supported
+#endif
+>
+class Matrix {
 	
 	
 public:
@@ -114,8 +113,6 @@ public:
 	inline
     Matrix              () {
 
-	    //TypeTraits<T>::Validate();
-
         _dim.resize(1,1);
         _res.resize(1,1.0);
         
@@ -132,15 +129,11 @@ public:
 	inline explicit
     Matrix              (const std::vector<size_t>& dim) {
 		
-	    //TypeTraits<T>::Validate();
-
 	    assert(!dim.empty() &&
 	    		std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
 
-	    size_t n = 1, i = 0, ds = dim.size();
-
 		_dim = dim;
-		_res.resize(ds,1.0);
+		_res.resize(dim.size(),1.0);
 
         Allocate();
         
@@ -156,14 +149,10 @@ public:
 	inline
     Matrix              (const container<size_t>& dim) {
 		
-	    //TypeTraits<T>::Validate();
-
 	    size_t ds = dim.size();
 	    assert(ds &&
 	    	   std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
 
-	    size_t n = 1, i = 0;
-		
 		_dim.resize(ds);
 		std::copy (dim.begin(),dim.end(),_dim.begin());
 		_res.resize(ds,1.0);
@@ -182,14 +171,10 @@ public:
 	inline explicit
     Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res) {
 		
-	    //TypeTraits<T>::Validate();
-
 	    assert(!dim.empty() &&
 	    	    std::find(dim.begin(),dim.end(),size_t(0))==dim.end() &&
 	    	    dim.size() == res.size());
 
-	    size_t n = 1, i = 0, ds = dim.size();
-		
 		_dim = dim;
 		_res = res;
 
@@ -210,8 +195,6 @@ public:
      */
     inline explicit
     Matrix (const size_t n) {
-
-	    //TypeTraits<T>::Validate();
 
 	    assert (n);
 
@@ -240,7 +223,6 @@ public:
     inline
     Matrix              (const size_t m, const size_t n) {
 
-        //TypeTraits<T>::Validate();
     	assert (m && n);
 
     	_dim.resize(2); _dim[0] = m; _dim[1] = n;
@@ -266,8 +248,6 @@ public:
      */
     inline
     Matrix (const size_t m, const size_t n, const size_t k) {
-
-	    //TypeTraits<T>::Validate();
 
 	    assert (m && n && k);
 
@@ -317,12 +297,10 @@ public:
                          const size_t ide = 1,
                          const size_t ave = 1) {
 
-    	//TypeTraits<T>::Validate();
-
 		assert (col && lin && cha && set && eco && phs && rep && seg &&
 				par && slc && ida && idb && idc && idd && ide && ave );
 
-	    size_t nd = 16, n = nd, sd, i;
+	    size_t nd = 16, n = nd, i;
 
 	    _dim.resize(n);
 	    _dim[ 0] = col; _dim[ 1] = lin; _dim[ 2] = cha; _dim[ 3] = set;
@@ -361,19 +339,8 @@ public:
      * @param  M        Right hand side
      */
     inline
-    Matrix             (const Matrix<T,P> &M) {
-
-		if (this != &M) {
-
-		    //TypeTraits<T>::Validate();
-
-			_dim = M.Dim();
-			_dsz = M.Dsz();
-			_res = M.Res();
-	        _M   = M.Container();
-
-		}
-
+    Matrix             (const Matrix<T,P> &M) { 
+            *this = M;
 	}
 
 
@@ -382,7 +349,6 @@ public:
      */
 	inline
 	~Matrix() {};
-
 
 
     //@}
@@ -399,60 +365,8 @@ public:
 
     // Only if compiled within IDEA we know of access specifiers.
 #ifdef PARC_MODULE_NAME
-    
-
-    /**
-     * @brief           Reset and import data from IceAs
-     *                   
-     * @param  ias      IceAs containing data
-     * @return          Amount of data read
-     */
-    size_t       
-    Import              (const IceAs* ias);
-
-
-    /**
-     * @brief           Continue import from IceAs
-     *                   
-     * @param  ias      IceAs containing data
-     * @param  pos      Import data starting at position pos of own repository
-     * @return          Amount of data read
-     */
-    size_t       
-    Import              (const IceAs* ias, const size_t pos);
-
-
-    /**
-     * @brief           Import with MDH
-     *                   
-     * @param  ias      IceAs containing data
-     * @param  mdh      Measurement data header      
-     * @return          Amount of data read
-     */
-    size_t       
-    Import              (const IceAs* ias, sMDH* mdh);
-
-
-    /**
-     * @brief           Export data to ias
-     *                   
-     * @param  ias      IceAs for data export
-     * @return          Amount of data exported
-     */
-    size_t         
-    Export              (IceAs* ias) const;
-
-
-    /**
-     * @brief           Partially export data to ias 
-     * 
-     * @param  ias      IceAs for data export
-     * @param  pos      Export data starting at position pos of our repository
-     */
-    size_t
-    Export              (IceAs* ias, const size_t pos) const;
- 
-    #endif
+    #include "ICE.hpp"
+#endif
 
     //@}
 
@@ -1005,816 +919,61 @@ public:
     
 
     
-    /**
-     * @name            Some operators
-     *                  Operator definitions. Needs big expansion still.
-     */
-    
-    //@{
-    
-
-
-    template<paradigm Q> Matrix<T,P>&
-    operator= (const Matrix<T,Q>&);
-
-    
-    /**
-     * @brief           Assignment operator. i.e. this = m.
-     *
-     * @param  M        The assigned matrix.
-     */
-    inline Matrix<T,P>&
-    operator=           (const Matrix<T,P>& M) {
-
-        if (this != &M) {
-        	_dim = M.Dim();
-        	_dsz = M.Dsz();
-        	_res = M.Res();
-            _M   = M.Container();
-        }
-
-        return *this;
-
-    }
-
-
-    /**
-     * @brief           Assignment data
-     *
-     * @param  v        Data vector (size must match numel(M)).
-     */
-    inline Matrix<T,P>&
-    operator=           (const container<T>& v) {
-        
-    	assert (_M.size() == v.size());
-
-        if (&_M != &v)
-            _M = v;
-
-        return *this;
-
-    }
-    
-    
-    
-    /**
-     * @brief           Assignment operator. Sets all elements s.
-     *
-     * @param  s        The assigned scalar.
-     */
-    inline Matrix<T,P>&
-    operator=           (const T s) {
-
-        T t = T(s);
-
-#if defined USE_VALARRAY
-        _M = t;        
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
+#if !defined(_MSC_VER) || _MSC_VER>1200
+	#include "Operators.hpp"
 #endif
-        for (size_t i = 0; i < Size(); ++i)
-            _M[i] = t;
-#endif
-        
-        return *this;
-    }
     
-    
+
     /**
      * @brief           Matrix product. i.e. this * M.
      *
      * @param  M        The factor.
      */
     inline Matrix<T,P>
-    operator->*         (const Matrix<T,P>& M) const {
-        return this->prod(M);
-    }
+    operator->*         (const Matrix<T,P>& M) const;
 
     /**
-     * @brief           Elementwise substruction of two matrices
+     * @brief           Matrix Product.
      *
-     * @param  M        Matrix substruent.
+     * @param   M       The factor
+     * @param   transa  Transpose ('T') / Conjugate transpose ('C') the left matrix. Default: No transposition'N'
+     * @param   transb  Transpose ('T') / Conjugate transpose ('C') the right matrix. Default: No transposition 'N'
+     * @return          Product of this and M.
+     */
+    Matrix<T,P>
+    prod                (const Matrix<T,P> &M, const char transa = 'N', const char transb = 'N') const;
+
+
+
+    /**
+     * @brief           Complex conjugate left and multiply with right.
+     *
+     * @param   M       Factor
+     * @return          Product of conj(this) and M.
      */
     inline Matrix<T,P>
-    operator-           (const Matrix<T,P>& M) const {
-
-		Matrix<T,P> res = *this;
-		return res -= M;
-        
-    }
-
-    
-    /**
-     * @brief           Elementwise substruction of two matrices
-     *
-     * @param  M        Matrix substruent.
-     */
-    template <class S>
-    inline Matrix<T,P>
-    operator-           (const Matrix<S,P>& M) const {
-
-		Matrix<T,P> res = *this;
-		return res -= M;
-
-    }
+    prodt               (const Matrix<T,P> &M) const;
 
 
     /**
-     * @brief           Elementwise subtraction all elements by a scalar
+     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTC and XDOT
      *
-     * @param  s        Scalar substruent.
+     * @param  M        Factor
+     * @return          Scalar product
      */
-    template <class S>
-    inline Matrix<T,P>
-    operator-           (const S s) const {
-
-        T t = T(s);
-        
-        Matrix<T,P> res = *this;
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] -= t;
-        
-        return res;
-
-    }
-
-    
-    
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    inline Matrix<T,P>&
-    operator-=         (const Matrix<T,P>& M) {
-
-        size_t i;
-
-        assert (Size() == M.Size());
-
-#if defined USE_VALARRAY
-        _M -= M.Container();
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), _M);
-        else
-        	for (size_t i = 0; i < Size(); ++i)
-        		_M[i] -= M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-            _M[i] -= M[i];
-#endif
-
-        return *this;
-
-    }
+    inline T
+    dotc (const Matrix<T,P>& M) const;
 
 
     /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
+     * @brief           Scalar product using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTU and XDOT
      *
-     * @param  M        Added matrix.
-     * @return          Result
+     * @param  M        Factor
+     * @return          Scalar product
      */
-    template <class S>
-    inline Matrix<T,P>&
-    operator-=          (const Matrix<S,P>& M) {
-
-        assert (Size() == M.Size());
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] -= M[i];
-
-        return *this;
-
-    }
-
-    /**
-     * @brief           ELementwise substration with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Added scalar.
-     * @return          Result
-     */
-    template <class S >
-    inline Matrix<T,P>&
-    operator-=          (const S s) {
-
-		T t = T (s);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] -= t;
-
-		return *this;
-
-    }
-
-    /**
-     * @brief           Unary minus (additive inverse)
-     *
-     * @return          Negation
-     */
-    inline Matrix<T,P>
-    operator-           () const {
-
-        Matrix<T,P> res = *this;
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] = -res[i];
-
-        return res;
-
-    }
-
-
-    /**
-     * @brief           Unary plus
-     *
-     * @return          Identity
-     */
-    inline Matrix<T,P>
-    operator+           () const {
-
-        return *this;
-
-    }
+    inline T
+    dot (const Matrix<T,P>& M) const;
     
-    
-    /**
-     * @brief           Elementwise addition. i.e. this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    inline Matrix<T,P>
-    operator+          (const Matrix<T,P> &M) const {
-        
-		Matrix<T,P> res = *this;
-		return res += M;
-        
-    }
-    
-    
-    /**
-     * @brief           Elementwise addition of two matrices
-     *
-     * @param  M        Matrix additive.
-     */
-    template <class S>
-    inline const Matrix<T,P>
-    operator+          (const Matrix<S,P>& M) const {
-        
-		Matrix<T,P> res = *this;
-		return res += M;
-		
-    }
-    
-    
-    /**
-     * @brief           Elementwise addition iof all elements with a scalar
-     *
-     * @param  s        Scalar additive.
-     */
-    template <class S>
-    inline Matrix<T,P>
-    operator+           (const S s) const {
-
-        Matrix<T,P> res = *this;
-    	T t = T(s);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] += t;
-
-        return res;
-
-    }
-
-    
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    inline Matrix<T,P>&
-    operator+=         (const Matrix<T,P>& M) {
-
-        assert (Size() == M.Size());
-
-#if defined USE_VALARRAY
-        _M += M.Container();        
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), _M);
-        else
-        	for (size_t i = 0; i < Size(); ++i)
-        		_M[i] += M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-            _M[i] += M[i];
-#endif
-        
-        return *this;
-        
-    }
-
-    
-/**
- * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
- *
- * @param  M        Added matrix.
- * @return          Result
- */
-    template <class S>
-    inline Matrix<T,P>&
-    operator+=          (const Matrix<S,P>& M) {
-
-        assert (Size() == M.Size());
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] += M[i];
-
-    	return *this;
-
-    }
-
-
-    /**
-     * @brief           ELementwise addition with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Added scalar.
-     * @return          Result
-     */
-    template <class S >
-    inline Matrix<T,P>&
-    operator+=          (const S s) {
-
-    	T t = T (s);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] += t;
-
-        return *this;
-
-    }
-
-    
-    
-    /**
-     * @brief           Transposition / Complex conjugation. i.e. this'.
-     *
-     * @return          Matrix::tr()
-     */
-    inline Matrix<T,P>
-    operator!           () const {
-
-        Matrix<T,P> res (_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < _dim[1]; ++i)
-			for (size_t j = 0; j < _dim[0]; j++)
-				res(i,j) = this->At(j,i);
-
-        return res;
-
-    }
-
-    
-    
-    /**
-     * @brief           Return a matrix with result[i] = (m[i] ? this[i] : 0).
-     *
-     * @param  M        The operand
-     * @return          Cross-section or zero
-     */
-    inline Matrix<T,P>
-    operator&           (const Matrix<cbool>& M) const ;
-    
-    
-     /**
-     * @brief           Scalar inequality. result[i] = (this[i] != m). i.e. this ~= m
-     *
-     * @param  s        Comparing scalar.
-     * @return          Matrix of false where elements are equal s and true else.
-     */
-    inline Matrix<cbool>
-    operator!=          (const T s) const {
-
-        Matrix<cbool> res(_dim);
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = (_M[i] != s) ? 1 : 0;
-        return res;
-
-    }
-
-    
-    
-    /**
-     * @brief           Scalar greater comaprison, result[i] = (this[i] > m). i.e. this > m
-     *
-     * @param  s        Comparing scalar.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator>           (const T s) const {
-
-        Matrix<cbool> res(_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::greater(_M[i], s);
-
-        return res;
-
-    }
-
-    
-    
-    /**
-     * @brief           Scalar greater or equal comparison. result[i] = (this[i] >= m). i.e. this >= m
-     *
-     * @param  s        Comparing scalar.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator>=          (const T s) const {
-
-		Matrix<cbool> res(_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::greater_or_equal(_M[i], s);
-
-        return res;
-
-	}
-
-    
-    /**
-     * @brief           Scalar minor or equal comparison. result[i] = (this[i] <= m). i.e. this <= m
-     *
-     * @param  s        Comparing scalar.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator<=          (const T s) const {
-
-        Matrix<cbool> res(_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::less_or_equal(_M[i], s);
-
-        return res;
-
-    }
-
-    
-    /**
-     * @brief           Scalar minor or equal comparison. result[i] = (this[i] < m). i.e. this < m
-     *
-     * @param  s        Comparing scalar.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator<           (const T s) const {
-
-        Matrix<cbool> res(_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::less(_M[i], s);
-
-        return res;
-
-    }
-
-
-    /**
-     * @brief           Elementwise equality, result[i] = (this[i] == m[i]). i.e. this == m
-     *
-     * @param  M        Comparing matrix.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator==          (const Matrix<T,P>& M) const {
-
-        assert (Size() == M.Size());
-
-        Matrix<cbool> res(_dim);
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (_M[i] == M[i]) ? 1 : 0;
-
-        return res;
-
-    }
-
-
-    /**
-	 * @brief           Elementwise equality, result[i] = (this[i] == m[i]). i.e. this == m
-	 *
-	 * @param  M        Comparing matrix.
-	 * @return          Hit list
-	 */
-    template<class S>
-	inline Matrix<cbool>
-	operator==          (const Matrix<S,P>& M) const {
-
-        assert (Size() == M.Size());
-
-		Matrix<cbool> res (_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (_M[i] == (T)M[i]) ? 1 : 0;
-
-		return res;
-
-     }
-
-    /**
-     * @brief           Scalar equality. result[i] = (this[i] == m).
-     *
-     * @param  s        Comparing scalar.
-     * @return          Matrix of true where elements are equal s and false else.
-     */
-    inline Matrix<cbool>
-    operator==          (const T s) const {
-
-    	T t = (T) s;
-
-        Matrix<cbool> res (_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] =  (_M[i] == s) ? 1 : 0;
-
-        return res;
-
-    }
-
-
-    
-    /**
-     * @brief           Elementwise equality, result[i] = (this[i] != m[i]). i.e. this ~= m
-     *
-     * @param  M        Comparing matrix.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator!=          (const Matrix<T,P>& M) const {
-
-        assert (Size() == M.Size());
-
-        Matrix<cbool> res(_dim,_res);
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = (_M[i]!= M[i]) ? 1 : 0;
-        return res;
-
-    }
-
-    
-    /**
-     * @brief           Matrix comparison, result[i] = (this[i] >= m[i]). i.e. this >= m
-     *
-     * @param  M        Comparing matrix.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator>=          (const Matrix<T,P>& M) const {
-
-        assert (Size() == M.Size());
-
-        Matrix<cbool> res(_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::greater_or_equal(_M[i], M[i]);
-
-        return res;
-
-    }
-
-    
-    /**
-     * @brief           Matrix comparison, result[i] = (this[i] <= m[i]). i.e. this <= m.
-     *
-     * @param  M        Comparing matrix.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator<=          (const Matrix<T,P>& M) const {
-
-        assert (Size() == M.Size());
-
-        Matrix<cbool> res(_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::less_or_equal(_M[i], M[i]);
-
-        return res;
-
-    }
-
-    
-    /**
-     * @brief           Matrix comparison, result[i] = (this[i] > m[i]). i.e. this > m.
-     *
-     * @param  M        Comparing matrix.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator>           (const Matrix<T,P>& M) const {
-
-        assert (Size() == M.Size());
-
-        Matrix<cbool> res(_dim,_res);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::greater(_M[i], M[i]);
-
-        return res;
-
-    }
-
-    
-    /**
-     * @brief           Matrix comparison, result[i] = (this[i] < m[i]). i.e. this < m.
-     *
-     * @param  M        Comparing matrix.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator<           (const Matrix<T,P>& M) const {
-
-        assert (Size() == M.Size());
-
-        Matrix<cbool> res(_dim,_res);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::less(_M[i], M[i]);
-
-        return res;
-
-    }
-
-    
-    /**
-     * @brief           Matrix comparison, result[i] = (m[i] || this[i] ? 1 : 0). i.e. this | m.
-     *
-     * @param  M        Comparing matrix.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator||          (const Matrix<T,P>& M) const {
-
-        assert (Size() == M.Size());
-
-        Matrix<cbool> res(_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::logical_or(_M[i], M[i]);
-
-        return res;
-
-    }
-
-    
-    
-    /**
-     * @brief           Matrix comparison, result[i] = (m[i] && this[i] ? 1 : 0). i.e. this & m.
-     *
-     * @param  M        Comparing matrix.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator&&          (const Matrix<T,P>& M) const {
-
-        Matrix<cbool> res(_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < Size(); ++i)
-        	res[i] = CompTraits<T>::logical_and(_M[i], M[i]);
-
-        return res;
-
-    }
-
-
-    /**
-     * @brief           Elementwise raise of power. i.e. this .^ p.
-     *
-     * @param  p        Power.
-     * @return          Result
-     */
-    inline Matrix<T,P>
-    operator^           (const float p) const {
-
-    	Matrix<T,P> res = *this;
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (p == 0) ? T(1) : pow(res[i],  p);
-
-        return res;
-
-    }
-
-
-    /**
-     * @brief           Elementwise raise of power. i.e. this .^ p.
-     *
-     * @param  p        Power.
-     * @return          Result
-     */
-    inline Matrix<T,P>&
-    operator^=          (const float p) {
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] = pow(_M[i],  p);
-
-        return *this;
-
-    }
-    
-
-	#include "Operators.hpp"
-    
-    
-
     /**
      * @name            Dimensions
      *                  Some convenience functions to access dimensionality
@@ -2009,59 +1168,6 @@ public:
 
 
     /**
-     * @brief           Matrix Product.
-     *
-     * @param   M       The factor
-     * @param   transa  Transpose ('T') / Conjugate transpose ('C') the left matrix. Default: No transposition'N'
-     * @param   transb  Transpose ('T') / Conjugate transpose ('C') the right matrix. Default: No transposition 'N'
-     * @return          Product of this and M.
-     */
-    inline Matrix<T,P>
-    prod                (const Matrix<T,P> &M, const char transa = 'N', const char transb = 'N') const {
-        return gemm (*this, M, transa, transb);
-    }
-
-
-    /**
-     * @brief           Complex conjugate left and multiply with right.
-     *
-     * @param   M       Factor
-     * @return          Product of conj(this) and M.
-     */
-    inline Matrix<T,P>
-    prodt               (const Matrix<T,P> &M) const {
-        return gemm (*this, M, 'C');
-    }
-
-
-    /**
-     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTC and XDOT
-     *
-     * @param  M        Factor
-     * @return          Scalar product
-     */
-    inline T
-    dotc (const Matrix<T,P>& M) const  {
-        return DOTC (*this, M);
-    }
-
-
-    /**
-     * @brief           Scalar product using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTU and XDOT
-     *
-     * @param  M        Factor
-     * @return          Scalar product
-     */
-    inline T
-    dot (const Matrix<T,P>& M) const {
-
-        return DOT  (*this, M);
-
-    }
-
-    
-    
-    /**
      * @brief           Number of elements
      *
      * @return          Size
@@ -2100,8 +1206,10 @@ protected:
 		_dsz.resize(ds,1);
 	    for (i = 1; i < ds; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-        
-        _M = container<T>(DimProd());
+
+        size_t  n = DimProd(); 
+        if (n != _M.size())
+            _M.resize(n);
         
     }
 
@@ -2133,91 +1241,6 @@ protected:
     RSAdjust            (const std::string& fname);
 
 };
-
-
-#ifdef PARC_MODULE_NAME
-
-template <class T, paradigm P> long 
-Matrix<T,P>::Import     (const IceAs* ias, const size_t pos) {
-    
-    ICE_SET_FN("Matrix<T,P>::Import(IceAs, long)")
-        
-    int  i    = 0;
-    long size = 1;
-    
-    for (i = 0; i < MAX_ICE_DIM; ++i)
-        size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
-    
-    T* data = (T*) ias->calcSplObjStartAddr() ;
-    
-    for (i = 0; i < size; ++i, ++data)
-        _M[i+pos] = *data;
-    
-    return size;
-    
-}
-
-
-template <class T, paradigm P> long 
-Matrix<T,P>::Import(const IceAs* ias) {
-    
-    ICE_SET_FN("Matrix<T,P>::Import(IceAs)")
-        
-    int i;
-    
-    for (i = 0; i < MAX_ICE_DIM; ++i)
-        _dim[i] = (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
-    
-    _M = new T[Size()]();
-    nb_alloc = 1;
-    
-    T* data = (T*) ias->calcSplObjStartAddr() ;
-    
-    for (i = 0; i < Size(); ++i, data++)
-        _M[i] = *data;
-    
-    return Size();
-    
-}
-
-
-template <class T, paradigm P> long 
-Matrix<T,P>::Export (IceAs* ias) const {
-    
-    ICE_SET_FN("Matrix<T,P>::Export(IceAs)")
-        
-    T* data = (T*) ias->calcSplObjStartAddr() ;
-    
-    for (int i = 0; i < Size(); ++i, data++)
-        *data = _M[i];
-    
-    return Size();
-    
-}
-
-
-template <class T, paradigm P> long
-Matrix<T,P>::Export (IceAs* ias, const size_t pos) const {
-
-    ICE_SET_FN("Matrix<T,P>::Export(IceAs, long)")
-        
-        int  i    = 0;
-    long size = 1;
-    
-    for (i = 0; i < MSX_ICE_DIM; ++i) {
-        size *= (ias->getLen(IceDim(i)) <= 1) ? 1 : ias->getLen(IceDim(i));
-    }
-    
-    T* data = (T*) ias->calcSplObjStartAddr() ;
-    
-    for (i = 0; i < size; ++i, data++)
-        *data = _M[i+pos];
-    
-    return size;
-    
-}
-
-#endif // ICE
 
 #endif // __MATRIX_H__
 

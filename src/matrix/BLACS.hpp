@@ -29,7 +29,7 @@ extern "C" {
 // Local grid 
     int  numroc_    (int *n, int *nb, int *iproc, int *isrcproc, int *nprocs);
     
-};
+}
 
 #endif // HAVE_MPI
 

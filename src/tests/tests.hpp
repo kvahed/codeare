@@ -7,9 +7,6 @@
 //#include "nifty.hpp"
 #include "nufft.hpp"
 //#include "relativesensitivities.hpp"
-//#include "spiral.hpp"
-//#include "karb.hpp"
-#ifdef HAVE_MPI
-    #include "mpitest.hpp"
-#endif
+#include "spiral.hpp"
+#include "karb.hpp"
 

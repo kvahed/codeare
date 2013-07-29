@@ -98,18 +98,18 @@ DirectMethod::Process     () {
 	
 	ngx = !interp1 (t, ngx, nt, INTERP::LINEAR);
 	nj  = interp1  (t, nj, nt);
-	sb.g     = &ngx;
+	sb.g     = boost::make_shared<Matrix<float> >(ngx);
 
-    sb.b1    = &Get<cxfl> ("b1");
-    sb.tmxy  = &Get<cxfl> ("tmxy");
-    sb.smxy  = &Get<cxfl> ("smxy");
+    sb.b1    = boost::make_shared<Matrix<cxfl> >(Get<cxfl> ("b1"));
+    sb.tmxy  = boost::make_shared<Matrix<cxfl> >(Get<cxfl> ("tmxy"));
+    sb.smxy  = boost::make_shared<Matrix<cxfl> >(Get<cxfl> ("smxy"));
 
-    sb.tmz   = &Get<float> ("tmz");
-    sb.smz   = &Get<float> ("smz");
-    sb.roi   = &Get<float> ("roi");
-    sb.b0    = &Get<float> ("b0");
-    sb.r     = &Get<float> ("r");
-    sb.jac   = &nj;
+    sb.tmz   = boost::make_shared<Matrix<float> >(Get<float> ("tmz"));
+    sb.smz   = boost::make_shared<Matrix<float> >(Get<float> ("smz"));
+    sb.roi   = boost::make_shared<Matrix<float> >(Get<float> ("roi"));
+    sb.b0    = boost::make_shared<Matrix<float> >(Get<float> ("b0"));
+    sb.r     = boost::make_shared<Matrix<float> >(Get<float> ("r"));
+    sb.jac   = boost::make_shared<Matrix<float> >(nj);
 
     sb.np     = m_np;
     sb.mode   = m_mode;
@@ -122,9 +122,12 @@ DirectMethod::Process     () {
 
     // Outgoing
 
-    AddMatrix ( "rf", sb.rf  = NEW (Matrix<cxfl>  (sb.g->Dim(1), sb.b1->Dim(1))));
-    AddMatrix ("mxy", sb.mxy = NEW (Matrix<cxfl>  (sb.r->Dim(1), 1)));
-    AddMatrix ( "mz", sb.mz  = NEW (Matrix<float> (sb.r->Dim(1), 1)));
+    Matrix<cxfl> rf (sb.g->Dim(1), sb.b1->Dim(1));
+    sb.rf = boost::make_shared<Matrix<cxfl> >(rf);
+    Matrix<cxfl> mxy (sb.r->Dim(1), 1);
+    sb.mxy = boost::make_shared<Matrix<cxfl> >(mxy);
+    Matrix<float> mz (sb.r->Dim(1), 1);
+    sb.mz = boost::make_shared<Matrix<float> >(mz);
 
     // Initialise CPU/GPU simulator
     SimulationContext sc (&sb);

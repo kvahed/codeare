@@ -1,7 +1,7 @@
 OORB_HOME = C:/"Program Files"/omniORB-4.1.1
 
 CXX	     = cl
-CXXFLAGS = /c /I$(OORB_HOME)/include  /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 /GX /DTIXML_USE_STL /nologo /Ox
+CXXFLAGS = /c /I$(OORB_HOME)/include  /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 /GX /DTIXML_USE_STL /nologo /Ox /I. /I../../boost /Imatrix /Imisc /Itinyxml /I"C:\Program Files\OpenSSL-Win32\include" /w -GX
 
 LD       = link.exe
 LDFLAGS  = /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcmtd.lib /LIBPATH:$(OORB_HOME)/lib/x86_win32 omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib ws2_32.lib mswsock.lib advapi32.lib 
@@ -10,11 +10,12 @@ OMNIIDL  = omniidl -bcxx -Wbh=.h -Wbs=.cpp
 
 CP       = copy
 
-COMMON   = Matrix.obj RRSModule.obj options.obj tinyxml.obj tinyxmlparser.obj tinyxmlerror.obj 
-CLIENT   = ReconClient.obj
+COMMON   = RRSModule.obj options.obj tinyxml.obj tinyxmlparser.obj tinyxmlerror.obj 
+CLIENT   = LocalConnector.obj
 SERVER   = ReconServant.obj ReconStrategy.obj ReconContext.obj reconserver.obj
 
-all: $(COMMON) $(CLIENT) testclt.exe $(SERVER) reconserver.exe
+all: $(COMMON) $(CLIENT) 
+
 
 RRSModule.h: RRSModule.idl
 	$(OMNIIDL) RRSModule.idl
@@ -25,41 +26,41 @@ RRSModule.cpp: RRSModule.idl
 RRSModule.obj: RRSModule.cpp RRSModule.h
 	$(CXX) $(CXXFLAGS) RRSModule.cpp
 
-Matrix.obj: Matrix.cpp Matrix.h
-	$(CXX) $(CXXFLAGS) Matrix.cpp
+Workspace.obj: Workspace.cpp Workspace.hpp Configurable.hpp
+	$(CXX) $(CXXFLAGS) Workspace.cpp
 
-ReconClient.obj: ReconClient.cpp ReconClient.h RRSModule.h Configurable.h
-	$(CXX) $(CXXFLAGS) ReconClient.cpp
+LocalConnector.obj: LocalConnector.cpp LocalConnector.hpp Configurable.hpp
+	$(CXX) $(CXXFLAGS) LocalConnector.cpp
 
-ReconServant.obj: ReconServant.cpp ReconServant.h RRSModule.h
-	$(CXX) $(CXXFLAGS) ReconServant.cpp
+RemoteConnector.obj: RemoteConnector.cpp RemoteConnector.hpp Configurable.hpp RRSModule.h 
+	$(CXX) $(CXXFLAGS) RemoteConnector.cpp
 
 ReconStrategy.obj: ReconStrategy.cpp ReconStrategy.h RRSModule.h Configurable.h
 	$(CXX) $(CXXFLAGS) ReconStrategy.cpp
 
-Loader.h:
-    $(CP) Loader.h.in Loader.h
+Loader.hpp:
+    $(CP) /y Loader.hpp.in Loader.hpp
 
-ReconContext.obj: ReconContext.cpp ReconContext.h Loader.h Loader.h.in
+ReconContext.obj: ReconContext.cpp ReconContext.hpp Loader.hpp
 	$(CXX) $(CXXFLAGS) ReconContext.cpp
 
 options.obj: options.cpp options.h
 	$(CXX) $(CXXFLAGS) options.cpp
 
-testclt.obj: testclt.cpp
-	$(CXX) $(CXXFLAGS) testclt.cpp
+lclient.obj: testclt.cpp 
+	$(CXX) $(CXXFLAGS) -DLOCAL testclt.cpp
 
 reconserver.obj: reconserver.cpp
 	$(CXX) $(CXXFLAGS) reconserver.cpp
 
-tinyxml.obj: tinyxml.h tinyxml.cpp
-    $(CXX) $(CXXFLAGS) tinyxml.cpp	
+tinyxml.obj: tinyxml/tinyxml.h tinyxml/tinyxml.cpp
+    $(CXX) $(CXXFLAGS) tinyxml/tinyxml.cpp	
 
-tinyxmlerror.obj: tinyxml.h tinyxmlerror.cpp
-    $(CXX) $(CXXFLAGS) tinyxmlerror.cpp	
+tinyxmlerror.obj: tinyxml/tinyxml.h tinyxml/tinyxmlerror.cpp
+    $(CXX) $(CXXFLAGS) tinyxml/tinyxmlerror.cpp	
 
-tinyxmlparser.obj: tinyxml.h tinyxmlparser.cpp
-    $(CXX) $(CXXFLAGS) tinyxmlparser.cpp	
+tinyxmlparser.obj: tinyxml/tinyxml.h tinyxml/tinyxmlparser.cpp
+    $(CXX) $(CXXFLAGS) tinyxml/tinyxmlparser.cpp	
 
 testclt.exe: $(COMMON) $(CLIENT) testclt.obj
 	$(LD) $(LDFLAGS) $(COMMON) $(CLIENT) testclt.obj /out:testclt.exe 
@@ -73,4 +74,4 @@ clean clean_all:
 	del *.exe
 	del RRSModule.h 
 	del RRSModule.cpp
-	del Loader.h
+	del Loader.hpp

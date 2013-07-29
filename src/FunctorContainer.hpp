@@ -77,7 +77,7 @@ public:
 	 * @return     success
 	 */
 	virtual short
-	Init          (const char* name);
+	Init          (const char* name, const char* client_id = "");
 	
 	
 	/**

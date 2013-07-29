@@ -214,6 +214,7 @@ setupWlFilters			(const wlfamily wl_fam, const int wl_mem, typename TypeTraits <
 {
 	switch (wl_fam)
 	{
+    case ID: break;
 	case WL_DAUBECHIES:
 		switch (wl_mem)
 		{
@@ -229,12 +230,21 @@ setupWlFilters			(const wlfamily wl_fam, const int wl_mem, typename TypeTraits <
 			break;
 		}
 		break;
+    case WL_DAUBECHIES_CENTERED:
+        break;
 	case WL_HAAR:
         WaveletTraits <T, WL_HAAR, 2> :: Malloc (lpf_d, lpf_r, hpf_d, hpf_r);
         WaveletTraits <T, WL_HAAR, 2> :: DecomFilters (lpf_d, hpf_d);
         WaveletTraits <T, WL_HAAR, 2> :: ReconFilters (lpf_r, hpf_r);
         break;
+    case WL_HAAR_CENTERED:
+        break;
+    case WL_BSPLINE:
+        break;
+    case WL_BSPLINE_CENTERED:
+        break;
 	}
+    
 }
 
 

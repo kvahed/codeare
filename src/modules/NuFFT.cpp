@@ -24,6 +24,8 @@
 
 using namespace RRStrategy;
 
+#define clear(X) Free("X")
+
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
 
@@ -42,9 +44,6 @@ NuFFT::~NuFFT () {
 error_code 
 NuFFT::Finalise () {
 
-	//if (m_initialised)
-	//	delete nfft;
-
 	return OK;
 
 }
@@ -57,14 +56,12 @@ NuFFT::Init () {
 	error_code error = OK; 
 	m_initialised               = false;
 
-	int shots, M, dim, maxit, m, N[4], n[4];
+	int shots, M, dim, maxit, m, N[4];
 	double epsilon, alpha;
  
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++)
 		N[i] = 1; 
-		n[i] = 1;
-	}
 
 	// Dimensions ---------------------------
 
@@ -89,19 +86,15 @@ NuFFT::Init () {
 	Attribute ("m",       &m);
 	Attribute ("alpha",   &alpha);
 
-	for (int i = 0; i < dim; i++)
-		n[i] = ceil (N[i]*alpha);
-
 	// --------------------------------------
 
 	Matrix<size_t> ms (dim,1);
-	for (size_t i = 0; i < dim; i++)
+	for (size_t i = 0; i < (size_t)dim; i++)
 		ms[i] = N[i];
 
 	nfft = new NFFT<float> (ms, M * shots, m, alpha);
 
-	Matrix<cxdb>& img = AddMatrix 
-		("img", (Ptr<Matrix<cxdb> >) NEW (Matrix<cxdb> (N[0],N[1],N[2])));
+	AddMatrix<cxdb> ("img");
 
 	m_initialised = true;
 
@@ -117,8 +110,8 @@ NuFFT::Prepare () {
 	nfft->KSpace  (Get<double> ("kspace"));
 	nfft->Weights (Get<double> ("weights"));
 
-	Free ("kspace");
-	Free ("weights");
+	clear (kspace);
+	clear (weights);
 
 	return error;
 
@@ -128,14 +121,15 @@ NuFFT::Prepare () {
 error_code
 NuFFT::Process () {
 
-	printf ("Processing NuFFT ...\n");
-	ticks start = getticks();
-	
-	Get<cxdb> ("img") = nfft->Adjoint(Get<cxdb> ("data"));
-	Free ("data");
-	
-	printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), start)/Toolbox::Instance()->ClockRate());
+    SimpleTimer st ("SENSE");
 
+    Matrix<cxdb>& out = Get<cxdb> ("img");
+    Matrix<cxdb>& in = Get<cxdb> ("data");
+
+    out = *nfft ->* in;
+
+	clear (data);
+	
 	return OK;
 
 }

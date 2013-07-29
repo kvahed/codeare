@@ -54,9 +54,7 @@ namespace RRStrategy {
 		 * @brief Do nothing 
 		 */
 		virtual error_code
-		Init () {
-			return OK;
-		}
+		Init () ;
 		
 		/**
 		 * @brief Do nothing 
@@ -65,6 +63,12 @@ namespace RRStrategy {
 		Finalise () {
 			return OK;
 		}
+
+    private:
+
+        unsigned short m_ww;
+        unsigned short m_wh;
+        std::string m_uname;
 		
 	};
 

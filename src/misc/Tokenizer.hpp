@@ -55,8 +55,7 @@ Split     (const std::string& str, const std::string& dlm) {
 
 
 
-static inline bool
-HasSuffix (const std::string& str, const std::string& suf) {
+static inline bool HasSuffix (const std::string& str, const std::string& suf) {
 
 	assert (str.length() > 0);
 	assert (suf.length() > 0);

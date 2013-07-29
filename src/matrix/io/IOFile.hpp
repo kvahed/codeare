@@ -10,12 +10,14 @@
 #include "tinyxml/tinyxml.h"
 #include "tinyxml/xpath_static.h"
 
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 namespace codeare {
 namespace matrix  {
 namespace io      {
 
 	enum dtype {RLFL, RLDB, CXFL, CXDB, LONG, SHRT};
-
 	enum IOMode {READ, WRITE};
 
     
@@ -196,7 +198,7 @@ namespace io      {
 	inline static bool is_mat (boost::any oper) {
 
 		try {
-			boost::any_cast<Ptr<Matrix<T> > >(oper);
+			boost::any_cast<boost::shared_ptr<Matrix<T> > >(oper);
 		} catch(const boost::bad_any_cast &) {
 			return false;
 		}
@@ -360,12 +362,12 @@ namespace io      {
 
 		IOMode      m_mode;   /**< @brief IO mode */
 
+		Params      m_params; /**< @brief Additional parameters */
 		bool        m_fopen;  /**< @brief File open? */
 		bool        m_verb;   /**< @brief Verbosity */
 		bool        m_alloc;  /**< @brief Memory allocated? */
 		bool        m_initialised; /**< @brief Initialised */
 
-		Params      m_params; /**< @brief Additional parameters */
 
 		DataStore   m_data; /**< Data */
 

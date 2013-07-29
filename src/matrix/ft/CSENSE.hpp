@@ -249,8 +249,6 @@ private:
 	inline void
 	AllocateDFTs (const Params& params) {
 
-		Workspace& w = Workspace::Instance();
-
 		nthreads = params.Get<unsigned short>("nthreads");
 
 		if (nthreads == 1)

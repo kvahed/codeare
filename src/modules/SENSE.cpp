@@ -25,8 +25,7 @@ SENSE::Prepare () {
 
 	printf ("Preparing Cartesian SENSE ...\n");
 
-	Matrix<cxfl>& image = AddMatrix 
-		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(1)));
+    AddMatrix<cxfl> ("image");
 
 	printf ("  allocating Cartesian SENSE operator: ... "); fflush(stdout);
 
@@ -50,15 +49,14 @@ SENSE::Prepare () {
 error_code
 SENSE::Process () { 
 
-	ticks cgstart = getticks();
-	
-	printf ("Processing SENSE ...\n");
+    SimpleTimer st ("SENSE");
 
-	Get<cxfl>("image") = *m_cs ->* Get<cxfl>("fimgs");
+    Matrix<cxfl>& out = Get<cxfl>("image");
+    Matrix<cxfl>& in = Get<cxfl>("fimgs");
+    CSENSE<float>& sense = *m_cs;
 
-	printf ("... done. WTime: %.4f seconds.\n\n",
-			elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
-
+    out = sense ->* in;
+    
 	return OK;
 
 }

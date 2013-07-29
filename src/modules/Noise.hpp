@@ -84,7 +84,7 @@ AddPseudoRandomNoise (Matrix<raw>& m, const float& max) {
 	{
 
 #pragma omp for schedule (guided)
-	for (int i = 0; i < m.Size(); i++)
+	for (size_t i = 0; i < m.Size(); i++)
 		m[i] = m[i] + max * WhiteNoise();
 	
 	}

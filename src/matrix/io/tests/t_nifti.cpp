@@ -30,7 +30,7 @@ inline static bool read (Matrix<T>& A) {
 template<class T>
 inline static bool check () {
 
-	Matrix<T> A = rand<T,uniform>(3,4), B;
+	Matrix<T> A = rand<T>(3,4), B;
 
 	write(A);
 	read(B);

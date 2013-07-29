@@ -1,4 +1,4 @@
-TESTS   = t_sense t_ktpoints t_compsensing
+TESTS   = t_sense t_ktpoints t_compsensing t_spiral
 if USE_NFFT3
   TESTS += t_cgsense t_nufft
 endif

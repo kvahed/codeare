@@ -117,7 +117,7 @@ module RRSModule {
 		 * @param  name   Name of strategy
 		 * @return        Status
 		 */
-		short        Process (in string name);
+		short       Process (in string name);
 		
 		/**
 		 * @brief         Finalise
@@ -126,7 +126,7 @@ module RRSModule {
 		 * @param  name   Name of strategy
 		 * @return        Status
 		 */
-		short        Finalise (in string name);
+		short       Finalise (in string name);
 		
 		/**
 		 * @brief         Finalise
@@ -142,9 +142,9 @@ module RRSModule {
 		 *                Initilise process library
 		 *
 		 * @param  name   Name of recontruction method
-		 * @return        Status
+		 * @return        Unique identifier 
 		 */
-		short       Init (in string name);
+		short      Init (in string name, in string client_id);
 
 		/**
 		 * @brief         Clear RAM
@@ -160,7 +160,7 @@ module RRSModule {
 		 * @param  name   its name
 		 * @param  data   Data matrix
 		 */ 
-		void              get_cxfl (in string name, inout cxfl_data data);
+		void        get_cxfl (in string name, inout cxfl_data data);
 
 		
 		/**

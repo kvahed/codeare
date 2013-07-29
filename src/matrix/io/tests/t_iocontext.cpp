@@ -17,7 +17,7 @@ std::string fname = "test.h5";
 template<class T>
 inline static bool check () {
 
-	Matrix<T> A = rand<T,uniform>(3,4), B;
+	Matrix<T> A = rand<T>(3,4), B;
 
     IOContext ioc (fname);
 

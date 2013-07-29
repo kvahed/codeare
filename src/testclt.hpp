@@ -16,6 +16,8 @@
 using namespace std;
 using namespace RRClient;
 
+#include "Grid.hpp"
+
 #include <time.h>
 #include <stdio.h>
 
@@ -33,7 +35,7 @@ int    rank;
 bool init (int argc, char** argv) {
 
 #ifdef HAVE_MPI
-    Grid& gd = *Grid::Instance();
+    Grid& gd = Grid::Instance();
 #endif
 
 //	if (gd.rk == 0) {

@@ -124,9 +124,9 @@ namespace codeare {
 
 		}
 
-	};
+	}
 
-};
+}
 
 
 #endif /* __ISMRMRD_HPP__ */

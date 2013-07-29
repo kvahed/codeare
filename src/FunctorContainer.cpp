@@ -37,11 +37,11 @@ FunctorContainer::CleanUp () {
 
 
 short
-FunctorContainer::Init (const char* name) {
+FunctorContainer::Init (const char* name, const char* client_id) {
 	
 	ReconContext* rc;
 	
-	m_contexts.insert (pair< std::string, ReconContext* > (std::string(name), rc = new ReconContext(name)));
+	m_contexts.insert (pair< std::string, ReconContext* > (std::string(client_id) + std::string(name), rc = new ReconContext(name)));
 
     rc->SetConfig (m_config);
 

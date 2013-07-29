@@ -103,8 +103,6 @@ namespace RRClient {
 	};
 
 
-	class LocalConnector;
-	
 	/**
 	 * @brief               Remotely connected reconstruction client 
 	 */
@@ -117,37 +115,14 @@ namespace RRClient {
 		/**
 		 * @brief           Construct and initialise remote interface
 		 */
-		RemoteConnector         (const char* name, const char* tracelevel);
+		RemoteConnector     (const std::string& service_id, const std::string& trace_level = "0",
+                             const std::string& client_id = "");
 
 
-		/**
-		 * @brief           Construct from local connector (i.e. implicit cast)
-		 */
-		RemoteConnector         (const RRClient::LocalConnector&) ;
-
-
-		/**
-		 * @brief           Construct from local connector (i.e. implicit cast)
-		 */
-		RemoteConnector         (const RRClient::LocalConnector*&) ;
-
-
-		/**
-		 * @brief           Construct from local connector (i.e. implicit cast)
-		 */
-		RemoteConnector         (RRClient::LocalConnector&) ;
-
-
-		/**
-		 * @brief           Construct from local connector (i.e. implicit cast)
-		 */
-		RemoteConnector         (RRClient::LocalConnector*&) ;
-		
-		
 		/**
 		 * @brief           Clean up and destroy ORB
 		 */
-		~RemoteConnector        ();
+		~RemoteConnector    ();
 		
 		
  		/**
@@ -158,7 +133,7 @@ namespace RRClient {
 		 * @return          Error code
 		 */ 
 		virtual error_code              
-		Process             (const char* name);
+		Process             (const std::string& name);
 		
 
  		/**
@@ -169,7 +144,7 @@ namespace RRClient {
 		 * @return          Error code
 		 */ 
 		virtual error_code              
-		Prepare             (const char* name);
+		Prepare             (const std::string& name);
 		
 
  		/**
@@ -180,7 +155,7 @@ namespace RRClient {
 		 * @return          Error code
 		 */ 
 		virtual error_code              
-		Init                (const char* name);
+		Init                (const std::string& name);
 		
 
  		/**
@@ -191,7 +166,7 @@ namespace RRClient {
 		 * @return          Error error
 		 */ 
 		virtual error_code              
-		Finalise            (const char* name);
+		Finalise            (const std::string& name);
 		
 
 		/**
@@ -260,6 +235,7 @@ namespace RRClient {
 		
 		RRSInterface_var    m_rrsi;       /**< @brief Remote Recon interface               */
 		CORBA::ORB_var      m_orb;        /**< @brief Orb                                  */
+        std::string         m_client_id;
 		
 		/**
 		 * @brief           Get size from dimensions (Needed internally)
@@ -268,7 +244,7 @@ namespace RRClient {
 		 * @return          Size
 		 */
 		long
-		GetSize             (const longs dims) const;
+		GetSize             (const longs& dims) const;
 		
 		
 	};

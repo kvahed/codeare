@@ -34,7 +34,6 @@ CompressedSensing::Init () {
 	for (size_t i = 0; i < 3; i++)
 		m_N[i] = 1;
 
-	int wli = 0;
 	int m_fft = 0;
 
 	Attribute ("tvw",     &m_csparam.tvw);
@@ -86,15 +85,13 @@ CompressedSensing::Init () {
 error_code
 CompressedSensing::Process () {
 
-	printf ("Processing CompressedSensing ...\n");
-	ticks tic; 
 	float ma;
 
 	Matrix<cxfl>&  data  = Get<cxfl>   ("data");
 	Matrix<float>& pdf   = Get<float>  ("pdf" );
 	Matrix<float>& mask  = Get<float>  ("mask");
 	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
-	Matrix<cxfl>&  im_dc = AddMatrix ("im_dc", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(data.Dim())));
+    Matrix<cxfl> im_dc;
 
 	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
 		size(data,0), size(data,1), size(data,2));
@@ -118,6 +115,10 @@ CompressedSensing::Process () {
 	im_dc    = dft ->* im_dc;
 	
 	ma       = max(abs(im_dc));
+
+    if (m_verbose)
+		vc.push_back(im_dc);
+
 	im_dc   /= ma;
 	data    /= ma;
 	
@@ -125,19 +126,15 @@ CompressedSensing::Process () {
 	
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
-	tic      = getticks();
 
-	if (m_verbose)
-		vc.push_back(im_dc*ma);
-
-	for (size_t i = 0; i < m_csiter; i++) {
+	SimpleTimer st ("CompressedSensing");
+	for (size_t i = 0; i < (size_t)m_csiter; i++) {
 		NLCG (im_dc, data, m_csparam);
 		if (m_verbose)
-			vc.push_back(im_dc*ma);
+			vc.push_back(dwt ->* im_dc*ma);
 	}
-
-	printf ("  done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
-
+    st.Stop();
+    
     if (m_verbose) {
         size_t cpsz = numel(im_dc);
         im_dc = zeros<cxfl> (size(im_dc,0), size(im_dc,1), (m_dim == 3) ? size(im_dc,2) : 1, vc.size());
@@ -146,6 +143,8 @@ CompressedSensing::Process () {
 
     } else
         im_dc = dwt ->* im_dc * ma;
+
+    wspace.Add ("im_dc", im_dc);
 
     return OK;
 

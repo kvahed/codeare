@@ -38,25 +38,14 @@ public:
 	~Params() {};
 
 
-	/**
-	 * @brief  Parameter entry
-	 */
-	typedef typename std::pair<std::string, boost::any> param;
-
-
-	/**
-	 * @brief  Parameter container
-	 */
-	typedef typename std::map<std::string, boost::any> plist;
-
 
 	/**
 	 * @brief  Access entry (lhs)
 	 */
 	inline boost::any& operator [](const std::string& key) {
-		plist::iterator pli = pl.find(key);
+		std::map<std::string, boost::any>::iterator pli = pl.find(key);
 		if (pl.find(key) == pl.end()) {
-			pl.insert(param(key, Toolbox::Instance()->void_any));
+			pl.insert(std::pair<std::string, boost::any>(key, Toolbox::Instance()->void_any));
             pli = pl.find(key);
         }
 		return pli->second;
@@ -67,7 +56,7 @@ public:
 	 * @brief  Access entry (rhs)
 	 */
 	inline boost::any operator [](const std::string& key) const {
-		plist::const_iterator pi = pl.find(key);
+		std::map<std::string, boost::any>::const_iterator pi = pl.find(key);
 		if (pi != pl.end())
 			return pi->second;
 		else
@@ -94,6 +83,7 @@ public:
                     demangle(typeid(T).name()).c_str(),
                     demangle(ba.type().name()).c_str());
 		}
+		return T(0);
 	}
 
 
@@ -141,7 +131,7 @@ public:
 	inline void Set (const std::string& key, const boost::any& val) {
 		if (pl.find(key) != pl.end())
 			pl.erase(key);
-		pl.insert(param(key, val));
+		pl.insert(std::pair<std::string, boost::any>(key, val));
 	}
 
 
@@ -166,7 +156,7 @@ public:
 
 		std::string sb;
 
-		for (plist::const_iterator i = pl.begin(); i != pl.end(); i++)
+		for (std::map<std::string, boost::any>::const_iterator i = pl.begin(); i != pl.end(); i++)
 			sb += i->first + "\t" + demangle(i->second.type().name()).c_str() + "\n";
 
 		return sb.c_str();
@@ -178,7 +168,7 @@ public:
 private:
 
 
-	plist pl; /**< @brief Parameter list */
+	std::map<std::string, boost::any> pl; /**< @brief Parameter list */
 
 };
 

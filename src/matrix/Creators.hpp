@@ -3,7 +3,9 @@
 
 #include "Matrix.hpp"
 #include "Algos.hpp"
-#include "RandTraits.hpp"
+#if !defined(_MSC_VER) || _MSC_VER>1200
+#  include "RandTraits.hpp"
+#endif
 
 
 
@@ -155,8 +157,9 @@ ones           (const Matrix<size_t>& sz) {
 }
 
 
+#if !defined(_MSC_VER) || _MSC_VER>1200
 /**
- * @brief       Random matrix
+ * @brief       Uniformly random matrix
  *
  * @param  col  Column
  * @param  lin  Rows
@@ -178,7 +181,7 @@ ones           (const Matrix<size_t>& sz) {
  * @return      Random matrix
  *
  */
-template<class T, distribution D> static Matrix<T>
+template<class T> static Matrix<T>
 rand           (const size_t& col, 
 				const size_t& lin,
 				const size_t& cha = 1,
@@ -197,26 +200,24 @@ rand           (const size_t& col,
 				const size_t& ave = 1) {
 	
 	Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-
-	rand_pop<T,D>(res);
-
+    Random<T>::Uniform(res);
 	return res;
 
 }
 
 
 /**
- * @brief       Rand matrix
+ * @brief       Uniformly random matrix
  *
  * @param  sz   Size vector
  * @return      Rand matrix
  *
  */
-template <class T, distribution D> inline static Matrix<T>
+template <class T> inline static Matrix<T>
 rand           (const Matrix<size_t>& sz) {
 
 	Matrix<T> res (sz.Container());
-	rand_pop<T,D> (res);
+    Random<T>::Uniform(res);
  	return res;
 
 }
@@ -227,11 +228,87 @@ rand           (const Matrix<size_t>& sz) {
  * @param  n    Side length
  * @return      Random matrix
  */
-template<class T, distribution D> static Matrix<T>
+template<class T> static Matrix<T>
 rand (const size_t n) {
-	return rand<T,D>(n,n);
+	return rand<T>(n,n);
 }
 
+
+/**
+ * @brief       Uniformly random matrix
+ *
+ * @param  col  Column
+ * @param  lin  Rows
+ * @param  cha  Dimension
+ * @param  set  Dimension
+ * @param  eco  Dimension
+ * @param  phs  Dimension
+ * @param  rep  Dimension
+ * @param  seg  Dimension
+ * @param  par  Dimension
+ * @param  slc  Dimension
+ * @param  ida  Dimension
+ * @param  idb  Dimension
+ * @param  idc  Dimension
+ * @param  idd  Dimension
+ * @param  ide  Dimension
+ * @param  ave  Dimension
+ *
+ * @return      Random matrix
+ *
+ */
+template<class T> static Matrix<T>
+randn          (const size_t& col, 
+				const size_t& lin,
+				const size_t& cha = 1,
+				const size_t& set = 1,
+				const size_t& eco = 1,
+				const size_t& phs = 1,
+				const size_t& rep = 1,
+				const size_t& seg = 1,
+				const size_t& par = 1,
+				const size_t& slc = 1,
+				const size_t& ida = 1,
+				const size_t& idb = 1,
+				const size_t& idc = 1,
+				const size_t& idd = 1,
+				const size_t& ide = 1,
+				const size_t& ave = 1) {
+	
+	Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
+    Random<T>::Normal(res);
+	return res;
+
+}
+
+
+/**
+ * @brief       Uniformly random matrix
+ *
+ * @param  sz   Size vector
+ * @return      Rand matrix
+ *
+ */
+template <class T> inline static Matrix<T>
+randn          (const Matrix<size_t>& sz) {
+
+	Matrix<T> res (sz.Container());
+    Random<T>::Normal(res);
+ 	return res;
+
+}
+
+/**
+ * @brief       Random square matrix
+ *
+ * @param  n    Side length
+ * @return      Random matrix
+ */
+template<class T> static Matrix<T>
+randn (const size_t n) {
+	return rand<T>(n,n);
+}
+#endif
 
 /**
  * @brief       nxn square matrix with circle centered at p
@@ -324,11 +401,7 @@ ellipse (const float* p, const size_t n, const T s = T(1)) {
 	
 #pragma omp parallel default (shared) 
 	{
-		
-		size_t tid      = omp_get_thread_num();
-		size_t chunk    = n / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk) 
+#pragma omp for schedule (dynamic, n / omp_get_num_threads())
 		
 	for (size_t r = 0; r < n; r++)
 		for (size_t c = 0; c < n; c++) {
@@ -375,11 +448,7 @@ ellipsoid (const float* p, const size_t n, const T s) {
 	
 #pragma omp parallel default (shared) 
 	{
-		
-		size_t tid      = omp_get_thread_num();
-		size_t chunk    = n / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk) 
+#pragma omp for schedule (dynamic, n / omp_get_num_threads())
 		
 		for (size_t s = 0; s < n; s++)
 			for (size_t r = 0; r < n; r++)

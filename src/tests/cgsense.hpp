@@ -59,17 +59,18 @@ cgsensetest (RRClient::Connector<T>* rc) {
     rc->Process   (test);
 
     // Outgoing
-    Matrix<cxfl>  image;
+    Matrix<cxfl>  cgimg;
 
-    rc->GetMatrix (  "image", image);  // Images
+    rc->GetMatrix (  "image", cgimg);  // Images
     rc->Finalise   (test);
 
     // Write images
 
 	std::string ofname = base;
+    ofname += "/";
 	ofname += rc->GetElement("/config/data-out")->Attribute("fname");
-	IOContext ofile = fopen (ofname, "w");
-	fwrite (ofile, image);
+	IOContext ofile = fopen (ofname, WRITE);
+	fwrite (ofile, cgimg);
 	fclose (ofile);
 
     return true;

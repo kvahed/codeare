@@ -1,4 +1,3 @@
-#include "Lapack.hpp"
 #include "Matrix.hpp"
 
 template class Matrix<float,SHM>;

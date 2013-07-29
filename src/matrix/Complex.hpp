@@ -21,213 +21,35 @@
 #ifndef __COMPLEX_HPP__
 #define __COMPLEX_HPP__
 
+#include "TypeTraits.hpp"
+
 #include <stdlib.h>
-#include <complex>
-#include <typeinfo>
-#include <boost/static_assert.hpp>
-
-typedef std::complex<float>  cxfl;
-typedef std::complex<double> cxdb;
-
-
-static const std::type_info& float_type (typeid(float));
-static const std::type_info& double_type (typeid(double));
-static const std::type_info& cxfl_type (typeid(cxfl));
-static const std::type_info& cxdb_type (typeid(cxdb));
-
-static const std::type_info& short_type (typeid(short));
-static const std::type_info& long_type (typeid(long));
-static const std::type_info& bool_type (typeid(bool));
-static const std::type_info& int_type (typeid(int));
-static const std::type_info& size_t_type (typeid(size_t));
-
-template<class T> struct TypeTraits;
-
-template<> struct TypeTraits<float> {
-	typedef float  T;
-	typedef float RT;
-	typedef cxfl  CT;
-	static const bool Supported;
-	inline static const std::string Name () {
-		return std::string("single");
-	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
-	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
-	}
-	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
-	}
-};
-
-template<> struct TypeTraits<double> {
-	typedef double  T;
-	typedef double RT;
-	typedef cxdb  CT;
-	static const bool Supported;
-
-	inline static const std::string Name () {
-		return std::string("double");
-	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
-	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
-	}
-	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
-	}
-
-};
-
-template<> struct TypeTraits<cxfl> {
-	typedef cxfl  T;
-	typedef float RT;
-	typedef cxfl  CT;
-	static const bool Supported;
-	inline static const std::string Name () {
-		return std::string("complex single");
-	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
-	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
-	}
-	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
-	}
-	inline static const bool Validate () {
-		return true;
-	}
-};
-
-template<> struct TypeTraits<cxdb> {
-	typedef cxdb  T;
-	typedef double RT;
-	typedef cxdb  CT;
-	static const bool Supported;
-	inline static const std::string Name () {
-		return std::string("complex double");
-	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
-	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
-	}
-	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
-	}
-};
-
-template<> struct TypeTraits<short> {
-	typedef short  T;
-	typedef short  RT;
-	typedef void   CT;
-	static const bool Supported;
-	inline static const std::string Name () {
-		return std::string("short int");
-	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
-	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
-	}
-	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
-	}
-};
-
-template<> struct TypeTraits<unsigned char> {
-	typedef unsigned char  T;
-	typedef unsigned char  RT;
-	typedef void   CT;
-	static const bool Supported;
-	inline static const std::string Name () {
-		return std::string("codeare bool");
-	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
-	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
-	}
-	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
-	}
-};
-
-
-template<> struct TypeTraits<long> {
-	typedef long   T;
-	typedef long   RT;
-	typedef void   CT;
-	static const bool Supported;
-	inline static const std::string Name () {
-		return std::string("long int");
-	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
-	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
-	}
-	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
-	}
-};
-
-template<> struct TypeTraits<size_t> {
-	typedef size_t  T;
-	typedef size_t RT;
-	typedef void   CT;
-	static const bool Supported;
-	inline static const std::string Name () {
-		return std::string("size type");
-	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
-	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
-	}
-	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
-	}
-
-};
-
 
 template<class T>
 static inline bool fp_type (const T t) {
-	return (typeid(T) == float_type || typeid(T) == double_type ||
-			typeid(T) ==  cxfl_type || typeid(T) ==   cxdb_type );
+	return (typeid(T) == typeid(float) || typeid(T) == typeid(double) ||
+			typeid(T) ==  typeid(cxfl) || typeid(T) ==   typeid(cxdb) );
 }
 
 template<class T>
 static inline bool is_complex (const T t) {
-	return (typeid(T) == cxfl_type || typeid(T) == cxdb_type );
+	return (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb) );
 }
 
 template<class T>
 static inline bool is_singlep (const T t) {
-	return (typeid(T) == cxfl_type || typeid(T) == float_type );
+	return (typeid(T) == typeid(cxfl) || typeid(T) == typeid(float) );
 }
 
 template<class T>
 static inline bool is_doublep (const T t) {
-	return (typeid(T) == cxdb_type || typeid(T) == double_type );
+	return (typeid(T) == typeid(cxdb) || typeid(T) == typeid(double) );
 }
 
 template<class T>
 static inline bool i_type (const T t) {
-return (typeid(T) == short_type || typeid(T) == long_type ||
-		typeid(T) ==  bool_type || typeid(T) ==   int_type );
+	return (typeid(T) == typeid(short) || typeid(T) == typeid(long) ||
+			typeid(T) ==  typeid(bool) || typeid(T) ==   typeid(int) );
 }
 
 template<class T>
@@ -313,12 +135,12 @@ struct CompTraits<cxfl> {
 
 	typedef cxfl type;
 
-	inline static bool less_or_equal    (const type& a, const type& b) { return abs(a) <= abs(b); }
-	inline static bool less             (const type& a, const type& b) { return abs(a) <  abs(b); }
-	inline static bool greater_or_equal (const type& a, const type& b) { return abs(a) >= abs(b); }
-	inline static bool greater          (const type& a, const type& b) { return abs(a) >  abs(b); }
-	inline static bool logical_or       (const type& a, const type& b) { return abs(a) || abs(b); }
-	inline static bool logical_and      (const type& a, const type& b) { return abs(a) && abs(b); }
+	inline static bool less_or_equal    (const type& a, const type& b) { return std::abs(a) <= std::abs(b); }
+	inline static bool less             (const type& a, const type& b) { return std::abs(a) <  std::abs(b); }
+	inline static bool greater_or_equal (const type& a, const type& b) { return std::abs(a) >= std::abs(b); }
+	inline static bool greater          (const type& a, const type& b) { return std::abs(a) >  std::abs(b); }
+	inline static bool logical_or       (const type& a, const type& b) { return std::abs(a) || std::abs(b); }
+	inline static bool logical_and      (const type& a, const type& b) { return std::abs(a) && std::abs(b); }
 
 };
 
@@ -327,12 +149,12 @@ struct CompTraits<cxdb> {
 
 	typedef cxdb type;
 
-	inline static bool less_or_equal    (const type& a, const type& b) { return abs(a) <= abs(b); }
-	inline static bool less             (const type& a, const type& b) { return abs(a) <  abs(b); }
-	inline static bool greater_or_equal (const type& a, const type& b) { return abs(a) >= abs(b); }
-	inline static bool greater          (const type& a, const type& b) { return abs(a) >  abs(b); }
-	inline static bool logical_or       (const type& a, const type& b) { return abs(a) || abs(b); }
-	inline static bool logical_and      (const type& a, const type& b) { return abs(a) && abs(b); }
+	inline static bool less_or_equal    (const type& a, const type& b) { return std::abs(a) <= std::abs(b); }
+	inline static bool less             (const type& a, const type& b) { return std::abs(a) <  std::abs(b); }
+	inline static bool greater_or_equal (const type& a, const type& b) { return std::abs(a) >= std::abs(b); }
+	inline static bool greater          (const type& a, const type& b) { return std::abs(a) >  std::abs(b); }
+	inline static bool logical_or       (const type& a, const type& b) { return std::abs(a) || std::abs(b); }
+	inline static bool logical_and      (const type& a, const type& b) { return std::abs(a) && std::abs(b); }
 
 };
 

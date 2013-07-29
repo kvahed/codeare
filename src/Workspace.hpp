@@ -6,6 +6,9 @@
 #include "Params.hpp"
 
 #include <boost/any.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 #include <map>
 
 #ifdef __APPLE__
@@ -13,9 +16,6 @@
 #else
   #include "Digest.hpp"
 #endif
-
-using namespace std;
-
 
 
 typedef map<string, string[2]> reflist;
@@ -64,25 +64,25 @@ class Workspace {
 	
 	
     template <class T> inline Matrix<T>&
-	Get              (const string& name) {
+	Get              (const std::string& name) {
 
-        reflist::iterator it = m_ref.find(name);
+		reflist::iterator it = m_ref.find(name);
 
         if (it == m_ref.end())
             printf ("**WARNING**: Matrix %s could not be found in workspace!\n", name.c_str());
 
         const boost::any& ba = m_store[it->second[0]];
-        
+
         try {
-			boost::any_cast<Ptr<Matrix<T> > >(m_store[it->second[0]]);
+			boost::any_cast<boost::shared_ptr<Matrix<T> > >(m_store[it->second[0]]);
 		} catch (const boost::bad_any_cast& e) {
 			printf ("**WARNING**: Failed to retrieve %s - %s.\n             Requested %s - have %s.\n",
 					name.c_str(), e.what(),
-                    demangle(typeid(Ptr<Matrix<T> >).name()).c_str(),
+                    demangle(typeid(boost::shared_ptr<Matrix<T> >).name()).c_str(),
                     demangle(ba.type().name()).c_str());
 		}
 
-		return *boost::any_cast<Ptr<Matrix<T> > >(m_store[it->second[0]]);
+		return *boost::any_cast<boost::shared_ptr<Matrix<T> > >(m_store[it->second[0]]);
 
 	}
 
@@ -93,7 +93,7 @@ class Workspace {
 	 * @param  m     CXFL data storage 
 	 */
 	template <class T> inline void
-	GetMatrix          (const string& name, Matrix<T>& m) {
+	GetMatrix          (const std::string& name, Matrix<T>& m) {
         m = Get<T>(name);
 	}
 
@@ -106,19 +106,19 @@ class Workspace {
 	 * @param  m     CXFL data storage 
 	 */
 	template <class T> inline void
-	SetMatrix          (const string& name, Matrix<T>& m) {
+	SetMatrix          (const std::string& name, Matrix<T>& m) {
 
 		string tag[2];
 		tag[0] = sha256(name);
 		tag[1] = typeid(T).name();
 
-		Ptr<Matrix<T> > pm = NEW (Matrix<T>());
+		boost::shared_ptr<Matrix<T> > pm = boost::make_shared<Matrix<T> >();
 		boost::any val     = pm;
 
 		if (m_ref.find (name) == m_ref.end()) {
 			m_ref.insert (ref(name,tag));
 			m_store.insert (entry(tag[0], val));
-		}
+		} else 
 
 		m.SetClassName(name.c_str());
 
@@ -126,11 +126,11 @@ class Workspace {
 
 	}
     template<class T> inline void
-    Set (const string& name, Matrix<T>& m) {
+    Set (const std::string& name, Matrix<T>& m) {
         SetMatrix (name, m);
     }
     template<class T> inline void
-    Add (const string& name, Matrix<T>& m) {
+    Add (const std::string& name, Matrix<T>& m) {
         SetMatrix (name, m);
     }
 	
@@ -144,8 +144,35 @@ class Workspace {
 	 * @return       Success
 	 */
 	template<class T> inline Matrix<T>&
-	AddMatrix        (const string& name, Ptr< Matrix<T> > m = NEW (Matrix<T>)) {
+	AddMatrix        (const std::string& name, boost::shared_ptr< Matrix<T> > m) {
 
+		std::string tag[2];
+		boost::any value = m;
+        
+		tag[0] = sha256(name);
+		tag[1] = typeid(T).name();
+		assert (m_ref.find (name) == m_ref.end());
+		m_ref.insert (ref(name, tag));
+		m_store.insert (entry (tag[0], value));
+
+        m->SetClassName(name.c_str());
+        
+		return *m;
+
+	}
+
+	/**
+	 * @brief        Add a matrix to workspace
+	 *
+	 * @param  name  Name
+	 * @param  m     The added matrix
+     *
+	 * @return       Success
+	 */
+	template<class T> inline Matrix<T>&
+	AddMatrix        (const std::string& name) {
+
+		boost::shared_ptr<Matrix<T> > m = boost::make_shared<Matrix<T> >();
 		std::string tag[2];
 		boost::any value = m;
         
@@ -171,7 +198,7 @@ class Workspace {
 	 * @return       Success
 	 */
 	template<class T> inline Matrix<T>&
-	AddMatrix        (const string& name, Matrix<T>& m) {
+	AddMatrix        (const std::string& name, Matrix<T>& m) {
 
 		return AddMatrix(name, &m);
 
@@ -209,17 +236,17 @@ class Workspace {
         store::iterator dit = m_store.find (nit->second[0]);
         
         if      (nit->second[1].compare(typeid(cxfl).name())   == 0)
-            delete boost::any_cast<Ptr<Matrix<cxfl  > > >(dit->second);
+            boost::any_cast<boost::shared_ptr<Matrix<cxfl  > > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(cxdb).name())   == 0)
-            delete boost::any_cast<Ptr<Matrix<cxdb  > > >(dit->second);
+            boost::any_cast<boost::shared_ptr<Matrix<cxdb  > > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(float).name())  == 0)
-            delete boost::any_cast<Ptr<Matrix<float > > >(dit->second);
+            boost::any_cast<boost::shared_ptr<Matrix<float > > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(double).name()) == 0)
-            delete boost::any_cast<Ptr<Matrix<double> > >(dit->second);
+            boost::any_cast<boost::shared_ptr<Matrix<double> > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(short).name())   == 0)
-            delete boost::any_cast<Ptr<Matrix<short > > >(dit->second);
+            boost::any_cast<boost::shared_ptr<Matrix<short > > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(long).name())   == 0)
-            delete boost::any_cast<Ptr<Matrix<long  > > >(dit->second);
+            boost::any_cast<boost::shared_ptr<Matrix<long  > > >(dit->second).reset();
         
         m_store.erase(dit);
         m_ref.erase(nit);
@@ -318,6 +345,7 @@ class Workspace {
 };
 
 static Workspace& wspace = Workspace::Instance();
+
 
 /**
  * @brief            Dump to ostream

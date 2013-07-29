@@ -12,6 +12,8 @@
 #include "Matrix.hpp"
 #include "Tokenizer.hpp"
 
+#include <boost/tokenizer.hpp>
+
 #include <H5Cpp.h>
 using namespace H5;
 
@@ -159,6 +161,7 @@ namespace io {
 			Group group, *tmp;
 			std::string path;
 
+            boost::tokenizer<> tok(uri);
 			std::vector<std::string> sv (Split (uri, "/"));
 			std::string name = sv[sv.size() - 1];
 			sv.pop_back(); // data name not part of path
@@ -210,7 +213,7 @@ namespace io {
 			for (size_t i = 0; i < tmpdim; i++)
 				dims[i] = M.Dim(tmpdim-1-i);
 
-			if (typeid(T) == cxfl_type || typeid(T) == cxdb_type) {
+			if (is_complex(t)) {
 				dims.push_back(2);
 				tmpdim++;
 			}
@@ -223,6 +226,8 @@ namespace io {
 			set.write   (M.Memory(), (*type));
 			set.close   ();
 			space.close ();
+
+            return true;
 
 		}
 

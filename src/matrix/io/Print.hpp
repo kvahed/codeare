@@ -25,6 +25,8 @@
 #include "Matrix.hpp"
 
 #include <sstream>
+#include <boost/format.hpp>
+
 
 
 /**
@@ -35,14 +37,10 @@
  */
 template <class T> inline static std::string 
 DimsToString (const Matrix<T>& M) {
-	
 	std::stringstream ss;
-		
 	for (size_t i = 0; i < ndims(M); i++)
 		ss << (int)M.Dim(i) << " ";
-	
 	return ss.str();
-		
 }
 	
 	
@@ -54,9 +52,7 @@ DimsToString (const Matrix<T>& M) {
  */
 template <class T> inline static const char* 
 DimsToCString (const Matrix<T>& M) {
-	
 	return DimsToString(M).c_str();
-	
 }
 	
 	
@@ -68,14 +64,10 @@ DimsToCString (const Matrix<T>& M) {
  */
 template <class T> inline static std::string 
 ResToString (const Matrix<T>& M) {
-	
 	std::stringstream ss;
-	
 	for (size_t i = 0; i < ndims(M); i++)
 		ss << M.Res(i) << " ";
-	
 	return ss.str();
-	
 }
 
 
@@ -88,128 +80,20 @@ ResToString (const Matrix<T>& M) {
  */
 template <class T> inline static const char* 
 ResToCString (const Matrix<T>& M) {
-	
 	return ResToString(M).c_str();
-	
 }
 
 
-inline static std::ostream&  
-print (const Matrix<size_t>& M, std::ostream &os) {
-    
-    for (size_t i = 0; i < M.Dim(0); i++) {
-        for(size_t j = 0; j < M.Dim(1); j++)
-			printf ("%zu ", M(i,j));
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-
-inline static std::ostream&  
-print (const Matrix<short>& M, std::ostream &os) {
-    
-    for (size_t i = 0; i < M.Dim(0); i++) {
-        for(size_t j = 0; j < M.Dim(1); j++)
-            printf ("%hi ", M(i,j));
-        printf("\n");
-    }
-    
-    return os;
-
-}
-
-
-inline static std::ostream&  
-print (const Matrix<long>& M, std::ostream &os) {
-    
-    for (size_t i = 0; i < M.Dim(0); i++) {
-        for(size_t j = 0; j < M.Dim(1); j++)
-            printf ("%li ", M(i,j));
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-
-inline static std::ostream&  
-print (const Matrix<double>& M, std::ostream &os) {
-
-    for (size_t i = 0; i < M.Dim(0); i++) {
-        for(size_t j = 0; j < M.Dim(1); j++)
-            printf ("%+.4e ", M(i,j));
-        printf("\n");
-    }
-
-    return os;
-    
-}
-
-
-inline static std::ostream&  
-print (const Matrix<float>& M, std::ostream &os) {
-    
-    for (size_t i = 0; i < M.Dim(0); i++) {
-        for(size_t j = 0; j < M.Dim(1); j++)
-            printf ("%+.4f ", M(i,j));
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-
-inline static std::ostream&  
-print (const Matrix<cxfl>& M, std::ostream& os) {
-    
-    for (size_t i = 0; i < M.Dim(0); i++) {
-        for(size_t j = 0; j < M.Dim(1); j++)
-            printf ("%+.4f+%+.4fi ", M(i,j).real(), M(i,j).imag());
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-
-inline static std::ostream&  
-print (const Matrix<cxdb>& M, std::ostream& os) {
-    
-    for (size_t i = 0; i < M.Dim(0); i++) {
-        for(size_t j = 0; j < M.Dim(1); j++)
-            printf ("%+.4f+%+.4fi ", M(i,j).real(), M(i,j).imag());
-        printf("\n");
-    }
-    
-    return os;
-    
-}
-
-inline static std::ostream&
-print (const Matrix<cbool>& M, std::ostream& os) {
-
-    for (size_t i = 0; i < M.Dim(0); i++) {
-        for(size_t j = 0; j < M.Dim(1); j++)
-            os << (M(i,j)>0) << " " ;
+template<class T> inline std::ostream&
+operator<< (std::ostream& os, const Matrix<T>& v) {
+    size_t i,j;
+    for (i = 0; i < v.Dim(0); ++i) {
+        for (j = 0; j < v.Dim(1); ++j)
+            TypeTraits<T>::print(os, v(i,j)) << " ";
         os << std::endl;
     }
-
     return os;
-
 }
 
-template <class T,paradigm P> std::ostream&
-operator<< (std::ostream& os, const Matrix<T,P>& M) {
-
-    print (M, os);
-    return os;
-
-}
 
 #endif

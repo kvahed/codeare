@@ -282,6 +282,7 @@ AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdio.h, bai
 AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdlib.h, bailing out])])
 AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find string.h, bailing out])])
 AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
+AC_CHECK_HEADERS([gsl/gsl_spline.h], [], [AC_MSG_ERROR([cannot find gsl/gsl_wavelet2d.h, bailing out])])
 
 AC_ARG_ENABLE([networking],
      [  --enable-networking          turn on networking support (default: yes)],
@@ -346,8 +347,6 @@ AC_CHECK_HEADERS([H5Cpp.h],          [],
    [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([nifti1_io.h],      [], 
    [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
-AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], 
-   [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h sys/sysctl.h])
 AC_CHECK_HEADERS([openssl/evp.h], [HAVE_CRYPTO=1], 
    [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
@@ -357,6 +356,12 @@ AC_CHECK_HEADERS([stddef.h],         [],
    [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
 AC_CHECK_HEADERS([boost/any.hpp],    [], 
    [AC_MSG_ERROR([cannot find boost/any.hpp, bailing out])])
+AC_CHECK_HEADERS([boost/shared_ptr.hpp],    [], 
+   [AC_MSG_ERROR([cannot boost/shared_ptr.hpp, bailing out])])
+AC_CHECK_HEADERS([boost/make_shared.hpp],    [], 
+   [AC_MSG_ERROR([cannot boost/make_shared.hpp, bailing out])])
+AC_CHECK_HEADERS([boost/random/variate_generator.hpp],    [], 
+   [AC_MSG_RESULT([cannot find boost/random/variate_generator.hpp, random numbers not available!])])
 
 AC_CHECK_HEADERS(CL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
     AC_CHECK_HEADERS(OpenCL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
@@ -559,10 +564,8 @@ if test x"$with_ismrmrdroot" != x"no" ; then
 
 	OLD_LIBS=$LIBS
 
-        AC_CHECK_LIB([boost_thread],        [exit])
-        AC_CHECK_LIB([boost_thread-mt],     [exit])
-        AC_CHECK_LIB([boost_system],        [exit])
-        AC_CHECK_LIB([boost_system-mt],     [exit])
+    AC_CHECK_LIB([boost_thread],        [exit])
+    AC_CHECK_LIB([boost_system],        [exit])
 
 	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
 
@@ -862,9 +865,7 @@ LIBS=$SAVE_LIBS
 
 AC_CHECK_LIB([cblas],     [cblas_dasum], [], 
    [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
-AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], 
-   [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
-AM_CONDITIONAL([USE_GSL],    [test "$HAVE_GSL" -eq 1])
+AC_CHECK_LIB([gsl],   [gsl_spline_init], [], [AC_MSG_ERROR([cannot find libgsl, bailing out])])
 
 AC_CHECK_FUNCS([floor])
 AC_CHECK_FUNCS([getpagesize])
@@ -890,6 +891,7 @@ AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/t
  src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile
  src/matrix/linalg/tests/Makefile src/matrix/ft/Makefile src/matrix/ft/tests/Makefile 
  src/matrix/dwt/Makefile src/matrix/dwt/tests/Makefile src/matrix/io/tests/Makefile
- src/matrix/mpi/Makefile src/matrix/mpi/tests/Makefile])
+ src/matrix/mpi/Makefile src/matrix/mpi/tests/Makefile src/matrix/interp/Makefile
+ src/matrix/interp/tests/Makefile])
 AC_OUTPUT
 
