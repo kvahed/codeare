@@ -27,10 +27,17 @@
 # define __DWT_HPP__
 
 /**
- * OMP related makros
+ * @brief OMP related makros
  */
 # define NUM_THREADS_DWT 4
 # define OMP_SCHEDULE guided
+
+/**
+ * @brief Default wavelet parameters
+ */
+# define WL_FAM WL_DAUBECHIES
+# define WL_MEM 4
+# define WL_SCALE 4
 
 
 /**
@@ -76,16 +83,12 @@ class DWT {
          * @param  num_threads  Number of OMP threads used in parallel regions.
          */
         DWT (const size_t sl1, const size_t sl2, const size_t sl3,
-             const wlfamily wl_fam = WL_DAUBECHIES, const int wl_mem = 4, const int wl_scale = 4,
+             const wlfamily wl_fam = WL_FAM, const int wl_mem = WL_MEM, const int wl_scale = WL_SCALE,
              const int num_threads = NUM_THREADS_DWT)
             : _sl1 (sl1),
               _sl2 (sl2),
               _sl3 (sl3),
-              _dim (sl3 == 1 ? 2 : 3),
-              _wl_fam(wl_fam),
-              _fl (wl_mem),
-              _num_threads (num_threads),
-              _temp (container <T> (num_threads * MAX (6 * sl3, MAX (6 * sl2, 5 * sl1)))),
+              _dim (_sl3 == 1 ? 2 : 3),
               _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
               _min_level (wl_scale),
               _max_level (MaxLevel ()),
@@ -93,10 +96,87 @@ class DWT {
               _sl2_scale (_sl2 / pow (2, _max_level - _min_level)),
               _sl3_scale (_sl3 / pow (2, _max_level - _min_level)),
               _ld12 (_sl1 * _sl2),
-              dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
-              idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3),
+              _wl_fam(wl_fam),
+              _fl (wl_mem),
               _modd (_fl/2),
-              _meven ((_fl+1)/2)
+              _meven ((_fl+1)/2),
+              _num_threads (num_threads),
+              _temp (container <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
+              dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
+              idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3)
+        {
+            setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
+        }
+
+
+        /**
+         * @brief       Construct 2D DWT object.
+         *
+         * @param  sl1          Side length along first dimension.
+         * @param  sl2          Side length along second dimension.
+         * @param  wl_fam       Wavelet family.
+         * @param  wl_mem       Member of wavelet family.
+         * @param  wl_scale     Decomposition until side length equals 2^wl_scale.
+         * @param  num_threads  Number of OMP threads used in parallel regions.
+         */
+        DWT (const size_t sl1, const size_t sl2,
+             const wlfamily wl_fam = WL_FAM, const int wl_mem = WL_MEM, const int wl_scale = WL_SCALE,
+             const int num_threads = NUM_THREADS_DWT)
+        : _sl1 (sl1),
+          _sl2 (sl2),
+          _sl3 (1),
+          _dim (_sl3 == 1 ? 2 : 3),
+          _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
+          _min_level (wl_scale),
+          _max_level (MaxLevel ()),
+          _sl1_scale (_sl1 / pow (2, _max_level - _min_level)),
+          _sl2_scale (_sl2 / pow (2, _max_level - _min_level)),
+          _sl3_scale (_sl3 / pow (2, _max_level - _min_level)),
+          _ld12 (_sl1 * _sl2),
+          _wl_fam(wl_fam),
+          _fl (wl_mem),
+          _modd (_fl/2),
+          _meven ((_fl+1)/2),
+          _num_threads (num_threads),
+          _temp (container <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
+          dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
+          idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3)
+        {
+            setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
+        }
+
+
+        /**
+         * @brief       Construct 2D DWT object for square matrices.
+         *
+         * @param  sl1          Side length along first dimension.
+         * @param  wl_fam       Wavelet family.
+         * @param  wl_mem       Member of wavelet family.
+         * @param  wl_scale     Decomposition until side length equals 2^wl_scale.
+         * @param  num_threads  Number of OMP threads used in parallel regions.
+         */
+        DWT (const size_t sl1,
+             const wlfamily wl_fam = WL_FAM, const int wl_mem = WL_MEM, const int wl_scale = WL_SCALE,
+             const int num_threads = NUM_THREADS_DWT)
+        : _sl1 (sl1),
+          _sl2 (_sl1),
+          _sl3 (1),
+          _dim (_sl3 == 1 ? 2 : 3),
+          _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
+          _min_level (wl_scale),
+          _max_level (MaxLevel ()),
+          _sl1_scale (_sl1 / pow (2, _max_level - _min_level)),
+          _sl2_scale (_sl2 / pow (2, _max_level - _min_level)),
+          _sl3_scale (_sl3 / pow (2, _max_level - _min_level)),
+          _ld12 (_sl1 * _sl2),
+          _wl_fam(wl_fam),
+          _fl (wl_mem),
+          _modd (_fl/2),
+          _meven ((_fl+1)/2),
+          _num_threads (num_threads),
+          _temp (container <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
+          dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
+          idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3)
         {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
         }
@@ -208,10 +288,40 @@ class DWT {
          * variable definitions
          */
 
+        // size of valid matrices
+        const size_t _sl1;      // side length in first dimension  ('x')
+        const size_t _sl2;      // side length in second dimension ('y')
+        const size_t _sl3;      // side length in third dimension  ('z')
+
         // dimension of DWT
         const int _dim;
 
+        const size_t _min_sl;   // minimum side length
+
+        // wavelet scales => (_max_level - _min_level) decompositions
+        const int _min_level;   // min. decomposition level
+        const int _max_level;   // max. decomposition level
+
+        const size_t _sl1_scale; // starting side length for reconstruction ('x')
+        const size_t _sl2_scale; // starting side length for reconstruction ('y')
+        const size_t _sl3_scale; // starting side length for reconstruction ('z')
+        const int _ld12;        // size of xy - plane
+
+        // wavelet family
         const wlfamily _wl_fam;
+
+        // filter length
+        const int _fl;
+
+        // fields for reconstruction in uphi / uplo
+        const int _modd;
+        const int _meven;
+
+        // number of OMP - threads used in parallel regions
+        const int _num_threads;
+
+        // temporary memory used in transform algorithms
+        container<T> _temp;
 
         // used transform functions
         void (DWT <T> :: * dpwt) (const Matrix <T> &, Matrix <T> &);
@@ -224,33 +334,6 @@ class DWT {
         // high pass filters
         RT * _hpf_d;
         RT * _hpf_r;
-
-        // maximum size of matrix
-        const size_t _sl1;      // side length in first dimension  ('x')
-        const size_t _sl2;      // side length in second dimension ('y')
-        const size_t _sl3;      // side length in third dimension  ('z')
-        const size_t _min_sl;   // minimum side length
-        const size_t _sl1_scale; // starting side length for reconstruction ('x')
-        const size_t _sl2_scale; // starting side length for reconstruction ('y')
-        const size_t _sl3_scale; // starting side length for reconstruction ('z')
-        const int _ld12;        // size of xy - plane
-
-        // wavelet scales => (_max_level - _min_level) decompositions
-        const int _min_level;   // min. decomposition level
-        const int _max_level;   // max. decomposition level
-
-        // filter length
-        const size_t _fl;
-
-        // fields for reconstruction in uphi / uplo
-        const int _modd;
-        const int _meven;
-
-        // temporary memory used in transform algorithms
-        container<T> _temp;
-
-        // number of OMP - threads used in parallel regions
-        const int _num_threads;
 
 
         /**
@@ -268,7 +351,7 @@ class DWT {
         MaxLevel            ()
         {
             // create vars from mex function
-            int nn = 1, max_level = 0;
+            size_t nn = 1, max_level = 0;
             for (; nn < _min_sl; nn *= 2 )
                 max_level ++;
             if (nn  !=  _min_sl){
@@ -347,8 +430,6 @@ class DWT {
                     // loop over lines along second dimension ('rows') of image
                     for (int c1_loc = 0; c1_loc < sl1; c1_loc++)
                     {
-
-                        int c1_glob = (c1_loc / sl1) * _sl1 * _sl2;
 
                         // copy c1-th line of image to temp_mem
                         unpackdouble (& res [0], sl2, _sl1, c1_loc, tmp);
@@ -984,11 +1065,6 @@ class DWT {
 
             /* away from edges */
 
-//            // upper bound for even filter indices
-//            const int meven = (_fl + 1) / 2;
-//            // upper bound for odd filter indices
-//            const int modd = _fl / 2;
-
             // loop over regular signal indices
             for (int i = _meven; i < side_length; i++)
             {
@@ -1082,11 +1158,6 @@ class DWT {
             T s, s_odd;
 
             /*hipass version */
-
-//            // upper bound for even filter indices
-//            const int meven = (_fl + 1) / 2;
-//            // upper bound for odd filter indices
-//            const int modd = _fl / 2;
 
             /* away from edges */
 
