@@ -506,15 +506,7 @@
     operator+           (const S s) const {
 
         Matrix<T,P> res = *this;
-    	T t = T(s);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] += t;
-
-        return res;
+        return res += s;
 
     }
 
@@ -583,18 +575,18 @@
      * @param  s        Added scalar.
      * @return          Result
      */
-    template <class S >
-    inline Matrix<T,P>&
+    template <class S > inline Matrix<T,P>&
     operator+=          (const S s) {
 
     	T t = T (s);
 
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			_M[i] += t;
-
+#else
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),t));
+#endif
         return *this;
 
     }
@@ -620,8 +612,7 @@
      *
      * @param  M        Matrix substruent.
      */
-    template <class S>
-    inline Matrix<T,P>
+    template <class S> inline Matrix<T,P>
     operator-           (const Matrix<S,P>& M) const {
 
 		Matrix<T,P> res = *this;
@@ -639,17 +630,8 @@
     inline Matrix<T,P>
     operator-           (const S s) const {
 
-        T t = T(s);
-        
-        Matrix<T,P> res = *this;
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] -= t;
-        
-        return res;
+		Matrix<T,P> res = *this;
+		return res -= s;
 
     }
 
@@ -677,9 +659,11 @@
 #else
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
         for (size_t i = 0; i < Size(); ++i)
             _M[i] -= M[i];
+#else
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
+#endif
 #endif
 
         return *this;
@@ -693,17 +677,18 @@
      * @param  M        Added matrix.
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>&
+    template <class S> inline Matrix<T,P>&
     operator-=          (const Matrix<S,P>& M) {
 
         assert (Size() == M.Size());
 
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			_M[i] -= M[i];
+#else
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
+#endif
 
         return *this;
 
@@ -723,9 +708,11 @@
 
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			_M[i] -= t;
+#else
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::minus<T>(),t));
+#endif
 
 		return *this;
 
@@ -773,15 +760,7 @@
     operator*          (const S s) const  {
 
         Matrix<T,P> res = *this;
-    	T t = T(s);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] *= t;
-
-        return res;
+        return res *= s;
 
     }
 
@@ -851,18 +830,16 @@
      * @param  s        Factor scalar.
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>&
+    template <class S> inline Matrix<T,P>&
     operator*=         (const S s) {
-
-    	T t = T (s);
 
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
-			_M[i] *= t;
-
+			_M[i] += t;
+#else
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),s));
+#endif
 		return *this;
 
     }
@@ -908,17 +885,8 @@
     inline Matrix<T,P>
     operator/           (const S s) const {
 
-      	assert (cabs(s) != 0.0);
-		T t = T (s);
 		Matrix<T,P> res = *this;
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] /= t;
-
-		return res;
+		return res /= s;
 
 	}
 
@@ -945,9 +913,11 @@
 #else
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
         for (size_t i = 0; i < Size(); ++i)
             _M[i] /= M[i];
+#else
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
+        #endif
 #endif
 
         return *this;
@@ -961,18 +931,18 @@
      * @param  M        Divisor matrix.
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>&
+    template <class S> inline Matrix<T,P>&
     operator/=         (const Matrix<S,P> &M) {
 
         assert (Size() == M.Size());
 
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			_M[i] /= M[i];
-
+#else
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
+#endif
         return *this;
 
     }
@@ -989,15 +959,13 @@
     inline Matrix<T,P>&
     operator/=         (const S s) {
 
-    	T zero = T(0.0);
-    	T t    = T(s);
-        assert (t != zero);
-
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			_M[i] /= T(s);
+#else
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::divides<T>(),s));
+#endif
 
         return *this;
 
