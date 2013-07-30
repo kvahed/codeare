@@ -783,10 +783,7 @@ sum (const Matrix<T>& M, const size_t d) {
  */
 template <class T> inline T
 sum (Matrix<T>& M) {
-	T s = 0;
-	for (size_t i = 0; i < numel(M); ++i)
-		s += M[i];
-	return s;
+	return std::accumulate(M.Begin(),M.End());
 }
 
 
@@ -820,17 +817,12 @@ prod (const Matrix<T>& M, const size_t d) {
 	if (isempty(M))
 		return res;
 
-	// Inner size
-	size_t insize = 1;
-	for (size_t i = 0; i < d; ++i)
-		insize *= sz[i];
-
-	// Outer size
-	size_t outsize = 1;
-	for (size_t i = d+1; i < MIN(M.NDim(),numel(sz)); ++i)
-		outsize *= sz[i];
-
-	// Adjust size vector and allocate
+	// Inner and outer sizes
+    container<size_t>::const_iterator ci = sz.Begin();
+	size_t insize = std::accumulate (ci, ci+d, 1, multiply<size_t>);
+    size_t outsize = std::accumulate (ci+d+1, ci+d+MIN(M.NDim(),numel(sz)), 1, multiply<size_t>);
+        
+    // Adjust size vector and allocate
 	sz [d] = 1;
 	res = zeros<T>(sz);
 
@@ -871,10 +863,7 @@ prod (const Matrix<T>& M, const size_t d) {
  */
 template <class T> inline T
 prod (const Matrix<T>& M) {
-	T p = (T) 1;
-	for (size_t i = 0; i < numel(M); ++i)
-		p *= M[i];
-	return p;
+	return std::accumulate(M.Begin(), M.End(), T(1), multiply<T>);
 }
 
 /**

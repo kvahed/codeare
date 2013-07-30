@@ -1,4 +1,6 @@
-    /**
+#include <functional>
+
+/**
      * @name            Some operators
      *                  Operator definitions. Needs big expansion still.
      */
@@ -65,9 +67,10 @@
 #else
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
         for (size_t i = 0; i < Size(); ++i)
             _M[i] = t;
+#endif
+        std::fill(_M.begin(), _M.end(), t);
 #endif
         
         return *this;
@@ -82,14 +85,19 @@
     inline Matrix<T,P>
     operator-           () const {
 
-        Matrix<T,P> res = *this;
+        Matrix<T,P> res (_dim);
 
+#if defined USE_VALARRAY
+        res = -_M;        
+#else
 #ifdef EW_OMP
-    #pragma omp parallel for
+     #pragma omp parallel for
+        for (size_t i = 0; i < Size(); ++i)
+			res[i] = -_M[i];
+#else
+        std::transform (_M.begin(), _M.end(), res.Begin(), std::negate<T>());
 #endif
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] = -res[i];
-
+#endif
         return res;
 
     }
@@ -533,9 +541,11 @@
 #else
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
         for (size_t i = 0; i < Size(); ++i)
             _M[i] += M[i];
+#else
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
+#endif
 #endif
         
         return *this;
@@ -549,19 +559,20 @@
  * @param  M        Added matrix.
  * @return          Result
  */
-    template <class S>
-    inline Matrix<T,P>&
-    operator+=          (const Matrix<S,P>& M) {
+    template <class S> inline Matrix<T,P>&
+    operator+=         (const Matrix<S,P>& M) {
 
         assert (Size() == M.Size());
 
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
-			_M[i] += M[i];
+			_M[i] *= M[i];
+#else
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
+#endif
 
-    	return *this;
+		return *this;
 
     }
 
@@ -798,9 +809,11 @@
 #else
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
         for (size_t i = 0; i < Size(); ++i)
             _M[i] *= M[i];
+#else
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
+#endif
 #endif
 
         return *this;
@@ -814,17 +827,18 @@
      * @param  M        Factor matrix.
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>&
+    template <class S> inline Matrix<T,P>&
     operator*=         (const Matrix<S,P>& M) {
 
         assert (Size() == M.Size());
 
 #ifdef EW_OMP
     #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			_M[i] *= M[i];
+#else
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
+#endif
 
 		return *this;
 

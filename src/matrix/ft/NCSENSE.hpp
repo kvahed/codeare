@@ -33,10 +33,6 @@
 
 #include <numeric>
 
-inline size_t multiply (size_t x, size_t y) {
-    return x*y;
-}
-
 /**
  * @brief Non-Cartesian SENSE<br/>
  *        According Pruessmann et al. (2001). MRM, 46(4), 638-51.
@@ -109,7 +105,7 @@ public:
         container<size_t> sizesm = vsize(m_sm);
         m_nx.push_back(sizesm.back()); // NC
         m_nx.push_back(numel(ws.Get<T>(m_wname))); // NK
-        m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, multiply)/m_nx[1]); //NR
+        m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, multiply<size_t>)/m_nx[1]); //NR
 
 		m_cgiter  = params.Get<size_t>("cgiter");
 		m_cgeps   = params.Get<double>("cgeps");
@@ -196,8 +192,7 @@ public:
 	virtual Matrix<CT>
 	Trafo       (const Matrix<CT>& m) const {
 
-		Matrix<CT> tmp = m / m_ic;
-		return E (tmp, m_sm, m_nx, m_fts);
+		return E (m, m_sm, m_nx, m_fts);
 
 	}
 
@@ -214,7 +209,7 @@ public:
 	virtual Matrix<CT>
 	Trafo       (const Matrix<CT>& m, const Matrix<CT>& sens, const bool& recal = true) const {
 
-		return E (m / ((recal) ? IntensityMap (sens) : m_ic), sens, m_nx, m_fts);
+		return E (m, sens, m_nx, m_fts);
 
 	}
 
@@ -245,47 +240,38 @@ public:
 	virtual Matrix<CT>
 	Adjoint (const Matrix<CT>& m,
 			 const Matrix<CT>& sens,
-			 const bool recal = true) const {
+			 const bool recal = false) const {
 
-		CT ts;
-        T rn, rno, xn;
+        T rn, rno, xn, ts;
 		Matrix<CT> p, r, x, q;
 		vector<T> res;
         std::vector< Matrix<cxfl> > vc;
 
-        if (recal)
-        	IntensityMap (sens);
-
 		p  = EH (m, sens, m_nx, m_fts) * m_ic;
 		r  = p;
 		x  = zeros<CT>(size(p));
-		
+        xn = creal(p.dotc(p));
+        rn = xn;
         if (m_verbose)
             vc.push_back (p/m_ic);
-
-        xn = pow(norm(p), 2.0);
-        rn = xn;
 
 		for (size_t i = 0; i < m_cgiter; i++) {
 			
 			res.push_back(rn/xn);
-			
 			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps)  break;
  			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
 
-			q  = EH (E  (p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
-
+			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
 			if (m_lambda)
 				q  += m_lambda * p;
-
-            ts  = rn / p.dotc(q);
+            ts  = creal(rn);
+            ts /= creal(p.dotc(q));
 			x  += ts * p;
 			r  -= ts * q;
 			rno = rn;
-			rn  = pow(norm(r), 2.0);
+			rn  = creal(r.dotc(r));
 			p  *= rn / rno;
 			p  += r;
-
             if (m_verbose)
                 vc.push_back (x * m_ic);
 
@@ -293,12 +279,17 @@ public:
 
         if (m_verbose) {
             size_t cpsz = numel(x);
-            x = zeros<CT> (size(x,0), size(x,1), (m_nx[0] == 3) ? size(x,2) : 1, vc.size());
-            for (size_t i = 0; i < vc.size(); i++)
-                memcpy (&x[i*cpsz], &(vc[i][0]), cpsz*sizeof(CT));
-            return x;
-        } else        
-            return x;
+            x = Matrix<CT> (size(x,0), size(x,1), (m_nx[0] == 3) ? size(x,2) : 1, vc.size());
+            typename container<CT>::iterator ti = x.Begin();
+            
+            for (size_t i = 0; i < vc.size(); i++) {
+                std::copy (vc[i].Begin(), vc[i].End(), ti);
+                ti += cpsz;
+            }
+        } else
+            x *= m_ic;
+
+        return x;
 
 	}
 	

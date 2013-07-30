@@ -21,6 +21,8 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#include <cstddef>
+
 /**
  * Returned error codes 
  */
@@ -112,5 +114,9 @@ enum data_type {
 #define IZERO 0
 #define IONE  1
 
+template<class T> inline static T
+multiply (const T a, const T b) {
+    return (a*b);
+}
 
 #endif //__COMMON_H__
