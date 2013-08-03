@@ -31,6 +31,7 @@
 #include <map>
 #include "ReconContext.hpp"
 #include "FunctorContainer.hpp"
+#include "omniORB4/omniInterceptors.h"
 
 using namespace std;
 
@@ -327,6 +328,10 @@ namespace RRServer {
 		 */
 		void 
 		config        (const char* c);
+
+
+        static void
+        inform        (omni::omniInterceptors::assignUpcallThread_T::info_T &info);
 
 		
 	};

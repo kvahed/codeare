@@ -253,14 +253,12 @@ public:
         xn = creal(p.dotc(p));
         rn = xn;
         if (m_verbose)
-            vc.push_back (p/m_ic);
+            vc.push_back (p);
 
 		for (size_t i = 0; i < m_cgiter; i++) {
-			
 			res.push_back(rn/xn);
 			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps)  break;
  			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
-
 			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
 			if (m_lambda)
 				q  += m_lambda * p;
@@ -274,14 +272,12 @@ public:
 			p  += r;
             if (m_verbose)
                 vc.push_back (x * m_ic);
-
 		}
 
         if (m_verbose) {
             size_t cpsz = numel(x);
             x = Matrix<CT> (size(x,0), size(x,1), (m_nx[0] == 3) ? size(x,2) : 1, vc.size());
             typename container<CT>::iterator ti = x.Begin();
-            
             for (size_t i = 0; i < vc.size(); i++) {
                 std::copy (vc[i].Begin(), vc[i].End(), ti);
                 ti += cpsz;

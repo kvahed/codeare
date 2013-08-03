@@ -161,23 +161,23 @@ struct NFFTTraits<float> {
 		if (spc.flags & PRECOMPUTE_DAMP) {
 			if (np.d == 3) {
 				for (j = 0; j < N; j++) {
-					int    j2 = j - N/2; 
+					const int j2 = j - N/2; 
 					for (k = 0; k < N; k++) {
-						int    k2 = k - N/2;
+						const int k2 = k - N/2;
 						for (z = 0; z < N; z++) {
-							int    z2 = z - N/2;
-							double r  = sqrt(j2*j2+k2*k2+z2*z2);
+							const int z2 = z - N/2;
+							const double r  = sqrt(j2*j2+k2*k2+z2*z2);
 							spc.w_hat[z*N*N+j*N+k] = (r > (double) N/2) ? 0.0 : 1.0;
 						}
 					}
 				}
 			} else {
 				for (j = 0; j < N; j++) {
-					int    j2 = j-N/2;
+					const int j2 = j-N/2;
 					for (k = 0; k < N; k++) {
-						int    k2 = k-N/2;
-						double r  = sqrt(j2*j2+k2*k2);
-						spc.w_hat[j*N+k]       = (r > (double) N/2) ? 0.0 : 1.0;
+						const int k2 = k-N/2;
+						const double r = sqrt(j2*j2+k2*k2);
+						spc.w_hat[j*N+k] = (r > (double) N/2) ? 0.0 : 1.0;
 					}
 				}
 			}

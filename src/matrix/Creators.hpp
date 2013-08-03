@@ -124,8 +124,7 @@ ones            (const size_t& col,
 				 const size_t& ave = 1) {
 
  	 Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-     for (size_t i = 0; i < numel(res); i++)
-         res[i] = T(1.0);
+     std::fill (res.Begin(), res.End(), T(1));
 
 	 return res;
 

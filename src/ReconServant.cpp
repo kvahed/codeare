@@ -130,4 +130,10 @@ namespace RRServer {
 		this->GetMatrix (name,c);
 	}
 
+
+    void
+    ReconServant::inform (omni::omniInterceptors::assignUpcallThread_T::info_T &info) {
+        info.run();
+    }
+
 }

@@ -36,7 +36,7 @@ class NFFT : public FT<T> {
 
 	typedef typename NFFTTraits<double>::Plan   Plan;
 	typedef typename NFFTTraits<double>::Solver Solver;
-
+    typedef typename std::vector<std::complex<double> >::iterator it;
 	
 public:
 
@@ -89,6 +89,9 @@ public:
 		
 		NFFTTraits<double>::Init (m_rank, m_N, m_M, m_n, m, m_fplan, m_iplan);
 		
+        m_y = it((std::complex<double>*)m_iplan.y);
+        m_f = it((std::complex<double>*)m_iplan.f_hat_iter);
+
 		if (pc.Size() > 1)
 			m_have_pc = true;
 		
@@ -191,8 +194,8 @@ public:
 	 */
 	Matrix< std::complex<T> >
 	Adjoint     (const Matrix< std::complex<T> >& m) const {
-		
-		Matrix< std::complex<T> > out (m_N[0], m_N[1], m_N[2], m_N[3]);
+
+        Matrix< std::complex<T> > out (m_N[0], m_N[1], m_N[2], m_N[3]);
 		
 		if (sizeof(T) == sizeof(double))
 			memcpy (m_iplan.y, m.Memory(), m_M * sizeof ( std::complex<T> ));
@@ -201,9 +204,9 @@ public:
 				m_iplan.y[i][0] = creal(m[i]);
 				m_iplan.y[i][1] = cimag(m[i]);
 			}
-		
+
 		NFFTTraits<double>::ITrafo ((Plan&) m_fplan, (Solver&) m_iplan, m_maxit, m_epsilon);
-		
+
 		if (sizeof(T) == sizeof(double))
 			memcpy (&out[0], m_iplan.f_hat_iter, m_imgsz*sizeof ( std::complex<T> ));
 		else 
@@ -260,6 +263,10 @@ private:
 	Solver    m_iplan;            /**< infft plan */
 	
 	bool      m_prepared;
+
+    it        m_y;
+    it        m_f;
+
 
 };
 

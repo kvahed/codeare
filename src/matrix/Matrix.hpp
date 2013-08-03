@@ -52,10 +52,6 @@
 #include <cstring>
 #include <algorithm>
 
-#ifdef HAVE_MAT_H
-#include "mat.h"
-#endif
-
 /**
  * @brief Is matrix is a vector.
  */
@@ -400,7 +396,7 @@ public:
     
     
     /**
-     * @brief           Get reference to pth element.
+     * @brief           Get reference to p-th element.
      *
      * Usage:
      * @code{.cpp}

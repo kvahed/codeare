@@ -15,7 +15,8 @@
  * @return           Interpolation values
  */
 template <class T> inline static Matrix<T>
-interp1 (const Matrix<double>& x, const Matrix<T>& y, const Matrix<double>& xi, const INTERP::Method& intm = INTERP::CSPLINE) {
+interp1 (const Matrix<double>& x, const Matrix<T>& y,
+		const Matrix<double>& xi, const INTERP::Method& intm = INTERP::CSPLINE) {
 
 	size_t  nxi = size(xi,0);
 	size_t  nd  = size( y,1);

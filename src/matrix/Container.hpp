@@ -12,10 +12,10 @@
 #include <assert.h>
 #include <string.h>
 #include <math.h>
-
+#include <algorithm>
 #include <vector>
 
-#if _MSC_VER<1300
+#if defined (_MSC_VER) && _MSC_VER<1300
 #    define VECTOR_TYPE(A) std::vector<A>
 #    define VECTOR_CONSTR(A,B) std::vector<A>(B)
 #    define VECTOR_CONSTR_VAL(A,B,C) std::vector<A>(B,C)
@@ -56,6 +56,8 @@ enum    paradigm {
 
 };
 
+
+
 template <class T, paradigm P=SHM>
 class container {
 public:
@@ -86,6 +88,22 @@ private:
 	VECTOR_TYPE(T) _data;
 };
 
+template<class T>
+inline T ct_real (const std::complex<T> ct) {return ct.real();};
+template<class T>
+inline T ct_imag (const std::complex<T> ct) {return ct.imag();};
+template<class T> inline static container<T>
+real (const container<std::complex<T> >& c) {
+	container<T> res (c.size());
+	std::transform (c.begin(), c.end(), res.begin(), ct_real<T>);
+	return res;
+}
+template<class T> inline static container<T>
+imag (const container<std::complex<T> >& c) {
+	container<T> res (c.size());
+	std::transform (c.begin(), c.end(), res.begin(), ct_imag<T>);
+	return res;
+}
 
 template<class T> inline std::ostream&
 operator<< (std::ostream& os, const container<T>& ct) {
