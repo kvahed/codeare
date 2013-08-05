@@ -62,6 +62,9 @@ src/matrix/io/tests/t_nifti
 src/matrix/io/tests/t_codeare
 src/matrix/io/tests/test*
 src/matrix/io/tests/t_iocontext
+src/matrix/interp/tests/t_interp1
+src/matrix/interp/tests/t_ppval
+src/matrix/interp/tests/t_resample
 
 ## folders (global) ##
 .deps/
