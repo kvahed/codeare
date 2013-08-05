@@ -5,7 +5,7 @@
 #include "Interpolate.hpp"
 #include "Print.hpp"
 
-#define VERBOSE
+//#define VERBOSE
 
 template<class T> bool
 check_interp1 () {

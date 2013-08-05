@@ -4,7 +4,7 @@
 #include "IOContext.hpp"
 #include "PolyVal.hpp"
 
-#define VERBOSE
+//#define VERBOSE
 
 template<class T> bool
 check_ppval () {

@@ -58,31 +58,30 @@ resample (const Matrix<T>& M, const Matrix<double>& f, const InterpMethod& im) {
 	
 #ifdef HAVE_INSIGHT
 	
-	typedef typename itk::OrientedImage<T, 3> Image;
-	typedef typename itk::IdentityTransform<double, 3> TransformType;
-	typedef typename itk::LinearInterpolateImageFunction<Image, double> InterpolatorType;
-	typedef typename itk::ResampleImageFilter<Image, Image> ResampleFilterType;
+	typedef typename itk::OrientedImage< T, 3 > InputImageType;
+	typedef typename itk::OrientedImage< T, 3 > OutputImageType;
+	typedef typename itk::IdentityTransform< double, 3 > TransformType;
+	typedef typename itk::LinearInterpolateImageFunction< InputImageType, double > InterpolatorType;
+	typedef typename itk::ResampleImageFilter< InputImageType, InputImageType > ResampleFilterType;
 	
 	typename InterpolatorType::Pointer linterp = InterpolatorType::New();
-	
-	std::cout << "No interpolation attempted. Interpolation method unknown!" << std::endl;
 	
 	TransformType::Pointer trafo = TransformType::New();
 	trafo->SetIdentity();
 	
-	typename Image::SpacingType space;
+	typename InputImageType::SpacingType space;
 	space[0] = 1.0/f[0];
 	space[1] = 1.0/f[1];
 	space[2] = 1.0/f[2];
 	
-	typedef typename Image::SizeType::SizeValueType SizeValue;
-	typename Image::SizeType size;
-	size[0] = static_cast<SizeValue>(res.Dim(0));
-	size[1] = static_cast<SizeValue>(res.Dim(1));
-	size[2] = static_cast<SizeValue>(res.Dim(2));
+	typedef typename InputImageType::SizeType::SizeValueType SizeValueType;
+	typename InputImageType::SizeType size; 
+	size[0] = static_cast<SizeValueType>(res.Dim(0));
+	size[1] = static_cast<SizeValueType>(res.Dim(1));
+	size[2] = static_cast<SizeValueType>(res.Dim(2));
 	
-	typename itk::OrientedImage<T, 3>::Pointer input = itk::OrientedImage< T, 3 >::New();
-	typename itk::OrientedImage<T, 3>::Pointer output = itk::OrientedImage< T, 3 >::New();
+	typename itk::OrientedImage< T, 3 >::Pointer input = itk::OrientedImage< T, 3 >::New();
+	typename itk::OrientedImage< T, 3 >::Pointer output = itk::OrientedImage< T, 3 >::New();
 	
 	typename itk::Image< T, 3 >::IndexType ipos;
 	ipos[0] = 0; ipos[1] = 0; ipos[2] = 0;
@@ -153,10 +152,11 @@ resample (const Matrix<T>& M, const Matrix<double>& f, const InterpMethod& im) {
  * @return     Resampled data
  */
 template<class T> static Matrix<T>
-resample (const Matrix<T>& M, const double f, const InterpMethod& im) {
+resample (const Matrix<T>& M, const double& f, const InterpMethod& im) {
 	
 	Matrix<double> mf (3,1);
-	return resample(M, mf = 3, im);
+	mf = f;
+	return resample(M, mf, im);
 	
 }
 

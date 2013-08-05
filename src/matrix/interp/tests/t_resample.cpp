@@ -10,7 +10,7 @@ check_resample () {
 
 
 	Matrix<T> img = phantom3D<T> (32);
-	resample (img,.5,LINEAR);
+	resample (img,.5,BSPLINE);
 
 	return true;
 
