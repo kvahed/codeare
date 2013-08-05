@@ -9,7 +9,7 @@ AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$
 EXTRA_DIST = GPUSimulator.cl
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la SpatialDomain.la KTPoints.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la SENSE.la CompressedSensing.la
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la SpatialDomain.la KTPoints.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la SENSE.la CompressedSensing.la MyAlgo.la
 
 if USE_NFFT3
     lib_LTLIBRARIES += NuFFT.la CGSENSE.la 
@@ -22,6 +22,10 @@ COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
 DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp
 DummyRecon_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 DummyRecon_la_LIBADD = $(COMMON_la_LIBADD)
+
+MyAlgo_la_SOURCES = MyAlgo.hpp MyAlgo.cpp
+MyAlgo_la_LDFLAGS = $(COMMON_la_LDFLAGS)
+MyAlgo_la_LIBADD = $(COMMON_la_LIBADD)
 
 GenericRegrid_la_SOURCES = GenericRegrid.hpp GenericRegrid.cpp
 GenericRegrid_la_LDFLAGS = $(COMMON_la_LDFLAGS)

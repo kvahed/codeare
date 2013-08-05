@@ -2,8 +2,10 @@
 #define __WORK_SPACE_HPP_
 
 #include "Matrix.hpp"
+#include "Algos.hpp"
 #include "Configurable.hpp"
 #include "Params.hpp"
+#include "Print.hpp"
 
 #include <boost/any.hpp>
 #include <boost/shared_ptr.hpp>
@@ -22,6 +24,9 @@ typedef map<string, string[2]> reflist;
 typedef pair<string, string[2]> ref;
 typedef map<string, boost::any> store;
 typedef pair<string, boost::any> entry;
+
+
+template<class T> struct PrintTraits;
 
 
 /**
@@ -261,16 +266,31 @@ class Workspace {
      *
      * @return       String representation of workspace content
      */
-    const char*
-    c_str            () const {
+    void
+    Print           (std::ostream& os) const {
     
         std::string sb;
         
         for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++) {
-            //store::iterator dit = m_store.find (i->second[0]);
-            sb += i->first + "\t" + i->second[0] + "\t" + i->second[1] + "\n";
+        	os << i->first << "\t";
+            const boost::any& b = m_store.find (i->second[0])->second;
+            if (b.type() == typeid(boost::shared_ptr<Matrix<float> >))
+            	os << "\t Matrix<float>          \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<float> > >(b));
+            if (b.type() == typeid(boost::shared_ptr<Matrix<double> >))
+            	os << "\t Matrix<double>         \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<double> > >(b));
+            if (b.type() == typeid(boost::shared_ptr<Matrix<cxfl> >))
+            	os << "\t Matrix<complex<float>> \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<cxfl> > >(b));
+            if (b.type() == typeid(boost::shared_ptr<Matrix<cxdb> >))
+            	os << "\t Matrix<complex<double>>\t" << size(*boost::any_cast<boost::shared_ptr<Matrix<cxdb> > >(b));
+            if (b.type() == typeid(boost::shared_ptr<Matrix<short> >))
+            	os << "\t Matrix<short>          \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<short> > >(b));
+            if (b.type() == typeid(boost::shared_ptr<Matrix<long> >))
+            	os << "\t Matrix<long>           \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<long> > >(b));
+            if (b.type() == typeid(boost::shared_ptr<Matrix<size_t> >))
+            	os << "\t Matrix<size_t>         \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<size_t> > >(b));
+            if (b.type() == typeid(boost::shared_ptr<Matrix<cbool> >))
+            	os << "\t Matrix<bool>           \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<cbool> > >(b));
         }
-        return sb.c_str();
         
     }
 
@@ -357,7 +377,7 @@ static Workspace& wspace = Workspace::Instance();
  */
 inline static std::ostream&
 operator<< (std::ostream& os, const Workspace& w) {
-	os << w.c_str();
+	w.Print(os);
     return os;
 }
 

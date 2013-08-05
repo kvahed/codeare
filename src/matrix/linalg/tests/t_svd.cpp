@@ -4,6 +4,8 @@
 #include "Lapack.hpp"
 #include "Print.hpp"
 
+#define VERBOSE
+
 template<class T, class S> void svd_check () {
 
     Matrix<T> A = rand<T>(8,3);

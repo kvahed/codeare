@@ -48,6 +48,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "CompressedSensing"))     cstest       (con);
 		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
 		else if (!strcmp (test, "KArb"))                  karbtest     (con);
+        else if (!strcmp (test, "DummyRecon"))            dummytest    (con);
         /*
 		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
 		else if (!strcmp (test, "RelativeSensitivities")) resetest     (con);
