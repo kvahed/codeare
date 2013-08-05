@@ -345,8 +345,8 @@ SizeInRAM          (const Matrix<T>& M) {
  * @param   M       Matrix
  * @return          Number of cells.
  */
-template <class T> inline  size_t
-numel               (const Matrix<T>& M) {
+template <class T, paradigm P> inline  size_t
+numel               (const Matrix<T,P>& M) {
 	return M.Size();
 }
 
@@ -783,7 +783,7 @@ sum (const Matrix<T>& M, const size_t d) {
  */
 template <class T> inline T
 sum (Matrix<T>& M) {
-	return std::accumulate(M.Begin(),M.End());
+	return std::accumulate(M.Begin(),M.End(),(T)0);
 }
 
 

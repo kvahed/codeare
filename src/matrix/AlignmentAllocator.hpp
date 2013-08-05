@@ -38,9 +38,9 @@ struct static_allocator {
 #if defined(__GNUC__) || defined (__INTEL_COMPILER)
         _mm_free
 #else
-            _aligned_free
+        _aligned_free
 #endif
-            (p);
+        (p);
 
     }
     

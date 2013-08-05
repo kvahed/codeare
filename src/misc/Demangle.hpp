@@ -3,35 +3,22 @@
 
 #include "../config.h"
 
-#ifdef HAVE_CXXABI_H
+#ifdef HAVE_DEMANGLE
 #include <cxxabi.h>
 
-static inline std::string
-demangle (const char* symbol) {
-
-	size_t size;
-	int    status;
-	char   temp[128];
-	char*  demangled;
-
-	//first, try to demangle a c++ name
-	if (1 == sscanf(symbol, "%*[^(]%*[^_]%127[^)+]", temp))
-		if (NULL != (demangled = abi::__cxa_demangle(temp, NULL, &size, &status))) {
-			std::string result(demangled);
-			free(demangled);
-			return result;
-		}
-    
-	//if that didn't work, try to get a regular c symbol
-	//if (1 == sscanf(symbol, "%127s", temp))
-	//	return temp;
-
-    return std::string(symbol);
+static inline const std::string
+demangle(const char* name) {
+    int status = -4;
+    char* res = abi::__cxa_demangle(name, NULL, NULL, &status);
+    const char* const demangled_name = (status==0)?res:name;
+    string ret_val(demangled_name);
+    free(res);
+    return ret_val;
 }
 
 #else
 
-static inline std::string
+static inline const std::string
 demangle (const char* symbol) {
     return std::string(symbol); 
 }

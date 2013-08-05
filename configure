@@ -12077,10 +12077,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"e06249c2\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"792bec92\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Tue Jul 9 13:37:13 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Mon Aug 5 18:47:01 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -20685,6 +20685,7 @@ fi
 	CXXFLAGS="${CXXFLAGS} ${SIMD_FLAGS}"
      ;;
 esac
+CXXFLAGS="${CXXFLAGS} -Wno-psabi"
 
 # Get size of void*
 # The cast to long int works around a bug in the HP C Compiler
@@ -23880,6 +23881,40 @@ fi
   LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/$LIBDIR"
 fi
 echo ""
+
+## Name demangling?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for abi::__cxa_demangle" >&5
+$as_echo_n "checking for abi::__cxa_demangle... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+  #include <typeinfo>
+  using namespace std;
+  #include <cxxabi.h>
+  int main(int c,char **v) {
+   int dstat;
+   char *demangled = abi::__cxa_demangle(typeid(dstat).name(),0,0,&dstat);
+   return 0;
+  }
+
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_DEMANGLE /**/" >>confdefs.h
+
+
+else
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
 
 # Time & Co for FFTW cycle
 ac_fn_cxx_check_type "$LINENO" "hrtime_t" "ac_cv_type_hrtime_t" "

@@ -1,4 +1,7 @@
 #include "Workspace.hpp"
+#include "Algos.hpp"
+#include "Print.hpp"
+
 
 Workspace* Workspace::m_inst = 0; 
 
@@ -61,4 +64,36 @@ Workspace::Finalise () {
 	return OK;
 	
 }
+
+void Workspace::Print (std::ostream& os) const {
+
+       os << "\nMatrices:\n";
+       for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++) {
+
+           const boost::any& b = m_store.find (i->second[0])->second;
+           os << i->first << "\t";
+           if (b.type() == typeid(boost::shared_ptr<Matrix<float> >))
+        	   os << "\t Matrix<float>          \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<float> > >(b));
+           else if (b.type() == typeid(boost::shared_ptr<Matrix<double> >))
+        	   os << "\t Matrix<double>         \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<double> > >(b));
+           else if (b.type() == typeid(boost::shared_ptr<Matrix<cxfl> >))
+        	   os << "\t Matrix<complex<float>> \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<cxfl> > >(b));
+           else if (b.type() == typeid(boost::shared_ptr<Matrix<cxdb> >))
+        	   os << "\t Matrix<complex<double>>\t" << size(*boost::any_cast<boost::shared_ptr<Matrix<cxdb> > >(b));
+           else if (b.type() == typeid(boost::shared_ptr<Matrix<short> >))
+        	   os << "\t Matrix<short>          \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<short> > >(b));
+           else if (b.type() == typeid(boost::shared_ptr<Matrix<long> >))
+        	   os << "\t Matrix<long>           \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<long> > >(b));
+           else if (b.type() == typeid(boost::shared_ptr<Matrix<size_t> >))
+        	   os << "\t Matrix<size_t>         \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<size_t> > >(b));
+           else if (b.type() == typeid(boost::shared_ptr<Matrix<cbool> >))
+        	   os << "\t Matrix<bool>           \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<cbool> > >(b));
+       }
+
+       os << "\nParameters:\n" ;
+       os << p;
+
+   }
+
+
 

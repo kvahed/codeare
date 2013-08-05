@@ -72,7 +72,7 @@ eig2 (const Matrix<T>& m, const char& jobvl = 'N', const char& jobvr = 'N') {
 	int    info  =  0;
 	int    lwork = -1;
     
-    // Appropritely resize the output
+    // Appropriately resize the output
 	boost::get<1>(ret) = Matrix<S>(N,1);
     
 	if (jobvl == 'V') boost::get<0>(ret) = Matrix<T>(N,N);
@@ -83,11 +83,11 @@ eig2 (const Matrix<T>& m, const char& jobvl = 'N', const char& jobvr = 'N') {
 
 
     // Workspace for real numbers
-    VECTOR_TYPE(T2) rwork = (is_complex(t)) ?
-    	VECTOR_CONSTR(T2,2*N) : VECTOR_CONSTR(T2,1);
+    container<T2> rwork = (is_complex(t)) ?
+    	container<T2>(2*N) : container<T2>(1);
 
     // Workspace for complex numbers
-	VECTOR_TYPE( T)  work = VECTOR_CONSTR(T,1);
+	container<T>  work = container<T>(1);
 	
 	// Need copy. Lapack destroys A on output.
 	Matrix<T> a = m;
@@ -171,8 +171,8 @@ svd2 (const Matrix<T>& IN, const char& jobz = 'N') {
 	
 	int   m, n, lwork, info = 0, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vtcol = 1;
 
-	VECTOR_TYPE(T2) rwork;
-	VECTOR_TYPE(T)  work = VECTOR_CONSTR(T,1);
+	container<T2> rwork;
+	container<T>  work = container<T>(1);
 	
 	m     =  A.Height(); n = A.Width();
 	lwork = -1;
@@ -196,11 +196,11 @@ svd2 (const Matrix<T>& IN, const char& jobz = 'N') {
 	Matrix<T>& U = boost::get<0>(ret) = Matrix<T>( ldu,  ucol);
 	Matrix<T>& V = boost::get<2>(ret) = Matrix<T>(ldvt, vtcol);
 	
-	VECTOR_TYPE(int) iwork = VECTOR_CONSTR(int, 8 * mn);
+	container<int> iwork = container<int>(8 * mn);
 	
 	size_t nr = (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) ?
 			((jobz == 'N') ? mn * 7 : mn * (5 * mn + 7)) : 1;
-	rwork = VECTOR_CONSTR (T2, nr);
+	rwork.resize(nr);
 
 	// Workspace query
 	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0],
@@ -265,7 +265,7 @@ inv (const Matrix<T>& m) {
 	Matrix<T> res = m;
 
 	int  info = 0;
-	VECTOR_TYPE(int) ipiv = VECTOR_CONSTR(int, N);
+	container<int> ipiv = container<int>(N);
 	
 	// LU Factorisation -------------------
 	LapackTraits<T>::getrf (N, N, &res[0], N, &ipiv[0], info);
@@ -277,7 +277,7 @@ inv (const Matrix<T>& m) {
                 "computed.\n\n", info, info);
 	
 	int lwork = -1; 
-	VECTOR_TYPE(T) work = VECTOR_CONSTR(T,1);
+	container<T> work = container<T>(1);
 	
 	// Workspace determination ------------
 	LapackTraits<T>::getri (N, &res[0], N, &ipiv[0], &work[0], lwork, info);
@@ -319,11 +319,11 @@ inv (const Matrix<T>& m) {
 template<class T> inline Matrix<T>
 pinv (const Matrix<T>& m, const char& trans = 'N') {
     
-	Matrix<T> mm = m;
+	Matrix<T> mm (m);
     
     assert (is2d(m));
 
-	VECTOR_TYPE(T) work = VECTOR_CONSTR(T,1);
+	container<T> work = container<T>(1);
     
 	int  M      =  size(m, 0);
 	int  N      =  size(m, 1);
@@ -336,12 +336,12 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
 
 	Matrix<T> b = eye<T>(ldb);
     
-	LapackTraits<T>::gels (trans, M, N, nrhs, &mm[0], lda, &b[0], ldb, &work[0], lwork, info);
+	LapackTraits<T>::gels (trans, M, N, nrhs, mm, lda, b, ldb, work, lwork, info);
     
 	lwork = (int) creal(work[0]);
 	work.resize(lwork);
 
-	LapackTraits<T>::gels (trans, M, N, nrhs, &mm[0], lda, &b[0], ldb, &work[0], lwork, info);
+	LapackTraits<T>::gels (trans, M, N, nrhs, mm, lda, b, ldb, work, lwork, info);
     
 	if (M > N)
 		for (int i = 0; i < M; i++)

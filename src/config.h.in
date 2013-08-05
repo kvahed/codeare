@@ -46,6 +46,9 @@
 /* Define to 1 if you have the <c_asm.h> header file. */
 #undef HAVE_C_ASM_H
 
+/* defined if abi::__cxa_demangle is available */
+#undef HAVE_DEMANGLE
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 

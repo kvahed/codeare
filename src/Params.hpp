@@ -151,15 +151,32 @@ public:
 	 *
 	 * @return       String representation of workspace content
 	 */
-	const char*
-	c_str            () const {
+	void
+	Print            (std::ostream& os) const {
 
-		std::string sb;
-
-		for (std::map<std::string, boost::any>::const_iterator i = pl.begin(); i != pl.end(); i++)
-			sb += i->first + "\t" + demangle(i->second.type().name()).c_str() + "\n";
-
-		return sb.c_str();
+		for (std::map<std::string, boost::any>::const_iterator i = pl.begin(); i != pl.end(); i++) {
+			const boost::any& b = i->second;
+			os <<  i->first << "\t" << demangle(i->second.type().name()).c_str() << "\t";
+			if (b.type() == typeid(float))
+				TypeTraits<float>::print(os,boost::any_cast<float>(b));
+			else if (b.type() == typeid(double))
+				TypeTraits<double>::print(os,boost::any_cast<double>(b));
+			else if (b.type() == typeid(cxfl))
+				TypeTraits<cxfl>::print(os,boost::any_cast<cxfl>(b));
+			else if (b.type() == typeid(cxdb))
+				TypeTraits<cxdb>::print(os,boost::any_cast<cxdb>(b));
+			else if (b.type() == typeid(int))
+				os << boost::any_cast<int>(b);
+			else if (b.type() == typeid(short))
+				os << boost::any_cast<short>(b);
+			else if (b.type() == typeid(long))
+				os << boost::any_cast<long>(b);
+			else if (b.type() == typeid(size_t))
+				os << boost::any_cast<size_t>(b);
+			else if (b.type() == typeid(cbool))
+				os << boost::any_cast<cbool>(b);
+			os << "\n";
+		}
 
 	}
 
@@ -182,7 +199,7 @@ private:
  */
 inline static std::ostream&
 operator<< (std::ostream& os, const Params& p) {
-	os << p.c_str();
+	p.Print(os);
 	return os;
 }
 

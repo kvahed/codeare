@@ -88,6 +88,7 @@ case $host in
 	CXXFLAGS="${CXXFLAGS} ${SIMD_FLAGS}"
      ;;
 esac
+CXXFLAGS="${CXXFLAGS} -Wno-psabi"
 
 # Get size of void*
 AC_CHECK_SIZEOF(void*)
@@ -498,6 +499,26 @@ else
   LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/$LIBDIR"
 fi
 echo ""
+
+## Name demangling?
+AC_MSG_CHECKING([for abi::__cxa_demangle])
+AC_COMPILE_IFELSE([
+  #include <typeinfo>
+  using namespace std;
+  #include <cxxabi.h>
+  int main(int c,char **v) {
+   int dstat;
+   char *demangled = abi::__cxa_demangle(typeid(dstat).name(),0,0,&dstat);
+   return 0;
+  }
+ ],[
+  AC_MSG_RESULT([yes])
+  AC_DEFINE([HAVE_DEMANGLE],,[defined if abi::__cxa_demangle is available])
+ ],[
+  AC_MSG_RESULT([no])
+ ]
+)
+
 
 # Time & Co for FFTW cycle
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[

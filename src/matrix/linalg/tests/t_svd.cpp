@@ -4,7 +4,7 @@
 #include "Lapack.hpp"
 #include "Print.hpp"
 
-#define VERBOSE
+//#define VERBOSE
 
 template<class T, class S> void svd_check () {
 
