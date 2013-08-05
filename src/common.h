@@ -114,9 +114,19 @@ enum data_type {
 #define IZERO 0
 #define IONE  1
 
+#if defined (_MSC_VER) && _MSC_VER<1300
+template<class T> inline static T
+c_multiply (const T a, const T b);
+
+template<> inline static size_t
+c_multiply (const size_t a, const size_t b) {
+    return (a*b);
+}
+#else
 template<class T> inline static T
 c_multiply (const T a, const T b) {
     return (a*b);
 }
+#endif
 
 #endif //__COMMON_H__
