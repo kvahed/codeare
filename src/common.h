@@ -115,7 +115,7 @@ enum data_type {
 #define IONE  1
 
 template<class T> inline static T
-multiply (const T a, const T b) {
+c_multiply (const T a, const T b) {
     return (a*b);
 }
 

@@ -26,18 +26,9 @@
 #include "Algos.hpp"
 
 namespace INTERP {
-
 	enum Method {
-
-		LINEAR,
-		POLYNOMIAL,
-		CSPLINE,
-		CSPLINE_PERIODIC,
-		AKIMA,
-		AKIMA_PERIODIC
-		
+		LINEAR, POLYNOMIAL, CSPLINE, CSPLINE_PERIODIC, AKIMA, AKIMA_PERIODIC
 	};
-
 }
 
 
@@ -88,7 +79,7 @@ template<> struct ITraits<cxfl> {
 };
 template<> struct ITraits<cxdb> {
 	typedef cxdb T;
-	static void ac (const container<T>& data, std::vector<container<double> >& y, const size_t n){
+	static void ac (const container<T>& data, std::vector<container<double> >& y){
 		y.push_back(real(data));
 		y.push_back(imag(data));
 	}

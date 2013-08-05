@@ -81,6 +81,16 @@ public:
 	
 	
 	/**
+	 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
+	 *
+	 * @param name Name of processing library
+	 * @return     success
+	 */
+	//virtual short
+	//Init          (const char* client_id = "");
+
+
+	/**
 	 * @brief      Finalise algorithm
 	 *
 	 * @param name Name of processing library

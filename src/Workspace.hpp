@@ -266,9 +266,10 @@ class Workspace {
     
         std::string sb;
         
-        for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++)
+        for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++) {
+            //store::iterator dit = m_store.find (i->second[0]);
             sb += i->first + "\t" + i->second[0] + "\t" + i->second[1] + "\n";
-        
+        }
         return sb.c_str();
         
     }

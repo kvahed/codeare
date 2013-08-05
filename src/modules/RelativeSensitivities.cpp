@@ -20,7 +20,7 @@
 
 #include "RelativeSensitivities.hpp"
 #include "Print.hpp"
-#include "MITK.hpp"
+#include "Resample.hpp"
 
 
 using namespace RRStrategy;
@@ -112,7 +112,7 @@ RelativeSensitivities::Process     () {
         }
         
         SegmentBrain (bet, bets);
-		bets = Resample (bets, 0.5, LINEAR);
+		bets = resample (bets, 0.5, LINEAR);
 		
     } else if (m_use_bet == 2) {
 		

@@ -105,7 +105,7 @@ public:
         container<size_t> sizesm = vsize(m_sm);
         m_nx.push_back(sizesm.back()); // NC
         m_nx.push_back(numel(ws.Get<T>(m_wname))); // NK
-        m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, multiply<size_t>)/m_nx[1]); //NR
+        m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, c_multiply<size_t>)/m_nx[1]); //NR
 
 		m_cgiter  = params.Get<size_t>("cgiter");
 		m_cgeps   = params.Get<double>("cgeps");

@@ -819,8 +819,8 @@ prod (const Matrix<T>& M, const size_t d) {
 
 	// Inner and outer sizes
     container<size_t>::const_iterator ci = sz.Begin();
-	size_t insize = std::accumulate (ci, ci+d, 1, multiply<size_t>);
-    size_t outsize = std::accumulate (ci+d+1, ci+d+MIN(M.NDim(),numel(sz)), 1, multiply<size_t>);
+	size_t insize = std::accumulate (ci, ci+d, 1, c_multiply<size_t>);
+    size_t outsize = std::accumulate (ci+d+1, ci+d+MIN(M.NDim(),numel(sz)), 1, c_multiply<size_t>);
         
     // Adjust size vector and allocate
 	sz [d] = 1;
@@ -863,7 +863,7 @@ prod (const Matrix<T>& M, const size_t d) {
  */
 template <class T> inline T
 prod (const Matrix<T>& M) {
-	return std::accumulate(M.Begin(), M.End(), T(1), multiply<T>);
+	return std::accumulate(M.Begin(), M.End(), T(1), c_multiply<T>);
 }
 
 /**

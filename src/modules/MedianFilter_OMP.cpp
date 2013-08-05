@@ -100,6 +100,8 @@ MedianFilter_OMP::Process () {
     
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
+    std::cout << wspace << std::endl;
+
 	return OK;
 
 }

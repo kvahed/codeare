@@ -18,13 +18,16 @@ template <class T> inline static Matrix<T>
 interp1 (const Matrix<double>& x, const Matrix<T>& y,
 		const Matrix<double>& xi, const INTERP::Method& intm = INTERP::CSPLINE) {
 
-	size_t  nxi = size(xi,0);
-	size_t  nd  = size( y,1);
-	size_t  nx  = size( x,0);
+	size_t  nx = size(x,0);
+	assert (nx > 0);
+	assert (nx == size(y,0));
+
+	size_t  nd  = numel(y)/nx;
+	size_t  nxi  = size(xi,0);
 
 	Matrix<T> yi (nxi,nd);
 	for (size_t j = 0; j < nd; j++) {
-		
+
 		PolyVal<T> pv (x, (T*) y.Memory(j*nx), intm);
 		
 		for (size_t i = 0; i < nxi; i++)

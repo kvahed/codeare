@@ -50,7 +50,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-TESTS = t_medfilt2$(EXEEXT)
+TESTS = t_medfilt2$(EXEEXT) t_ppval$(EXEEXT) t_interp1$(EXEEXT) \
+	t_resample$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/interp/tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -73,10 +74,24 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__EXEEXT_1 = t_medfilt2$(EXEEXT)
+am__EXEEXT_1 = t_medfilt2$(EXEEXT) t_ppval$(EXEEXT) t_interp1$(EXEEXT) \
+	t_resample$(EXEEXT)
+am_t_interp1_OBJECTS = t_interp1.$(OBJEXT)
+t_interp1_OBJECTS = $(am_t_interp1_OBJECTS)
+t_interp1_LDADD = $(LDADD)
 am_t_medfilt2_OBJECTS = t_medfilt2.$(OBJEXT)
 t_medfilt2_OBJECTS = $(am_t_medfilt2_OBJECTS)
 t_medfilt2_LDADD = $(LDADD)
+am_t_ppval_OBJECTS = t_ppval.$(OBJEXT)
+t_ppval_OBJECTS = $(am_t_ppval_OBJECTS)
+t_ppval_LDADD = $(LDADD)
+am_t_resample_OBJECTS = t_resample-t_resample.$(OBJEXT)
+t_resample_OBJECTS = $(am_t_resample_OBJECTS)
+am__DEPENDENCIES_1 =
+t_resample_DEPENDENCIES = $(am__DEPENDENCIES_1)
+t_resample_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(t_resample_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -90,8 +105,10 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(t_medfilt2_SOURCES)
-DIST_SOURCES = $(t_medfilt2_SOURCES)
+SOURCES = $(t_interp1_SOURCES) $(t_medfilt2_SOURCES) \
+	$(t_ppval_SOURCES) $(t_resample_SOURCES)
+DIST_SOURCES = $(t_interp1_SOURCES) $(t_medfilt2_SOURCES) \
+	$(t_ppval_SOURCES) $(t_resample_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -258,6 +275,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/matrix/interp
 t_medfilt2_SOURCES = $(COMMON) t_medfilt2.cpp
+t_ppval_SOURCES = $(COMMON) t_ppval.cpp
+t_interp1_SOURCES = $(COMMON) t_interp1.cpp
+t_resample_SOURCES = $(COMMON) t_resample.cpp
+t_resample_CXXFLAGS = $(AM_CXXFLAGS) $(INC_INSIGHT_H)
+t_resample_LDADD = $(COMMON_la_LDADD) $(INSIGHT_LIB_FLAG) 
+RelativeSensitivities_la_LDFLAGS = $(INSIGHT_LIB_DIR_FLAG)
 all: all-am
 
 .SUFFIXES:
@@ -301,9 +324,18 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+t_interp1$(EXEEXT): $(t_interp1_OBJECTS) $(t_interp1_DEPENDENCIES) $(EXTRA_t_interp1_DEPENDENCIES) 
+	@rm -f t_interp1$(EXEEXT)
+	$(CXXLINK) $(t_interp1_OBJECTS) $(t_interp1_LDADD) $(LIBS)
 t_medfilt2$(EXEEXT): $(t_medfilt2_OBJECTS) $(t_medfilt2_DEPENDENCIES) $(EXTRA_t_medfilt2_DEPENDENCIES) 
 	@rm -f t_medfilt2$(EXEEXT)
 	$(CXXLINK) $(t_medfilt2_OBJECTS) $(t_medfilt2_LDADD) $(LIBS)
+t_ppval$(EXEEXT): $(t_ppval_OBJECTS) $(t_ppval_DEPENDENCIES) $(EXTRA_t_ppval_DEPENDENCIES) 
+	@rm -f t_ppval$(EXEEXT)
+	$(CXXLINK) $(t_ppval_OBJECTS) $(t_ppval_LDADD) $(LIBS)
+t_resample$(EXEEXT): $(t_resample_OBJECTS) $(t_resample_DEPENDENCIES) $(EXTRA_t_resample_DEPENDENCIES) 
+	@rm -f t_resample$(EXEEXT)
+	$(t_resample_LINK) $(t_resample_OBJECTS) $(t_resample_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -311,7 +343,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_interp1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_medfilt2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_ppval.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_resample-t_resample.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -336,6 +371,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+t_resample-t_resample.o: t_resample.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(t_resample_CXXFLAGS) $(CXXFLAGS) -MT t_resample-t_resample.o -MD -MP -MF $(DEPDIR)/t_resample-t_resample.Tpo -c -o t_resample-t_resample.o `test -f 't_resample.cpp' || echo '$(srcdir)/'`t_resample.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/t_resample-t_resample.Tpo $(DEPDIR)/t_resample-t_resample.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='t_resample.cpp' object='t_resample-t_resample.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(t_resample_CXXFLAGS) $(CXXFLAGS) -c -o t_resample-t_resample.o `test -f 't_resample.cpp' || echo '$(srcdir)/'`t_resample.cpp
+
+t_resample-t_resample.obj: t_resample.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(t_resample_CXXFLAGS) $(CXXFLAGS) -MT t_resample-t_resample.obj -MD -MP -MF $(DEPDIR)/t_resample-t_resample.Tpo -c -o t_resample-t_resample.obj `if test -f 't_resample.cpp'; then $(CYGPATH_W) 't_resample.cpp'; else $(CYGPATH_W) '$(srcdir)/t_resample.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/t_resample-t_resample.Tpo $(DEPDIR)/t_resample-t_resample.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='t_resample.cpp' object='t_resample-t_resample.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(t_resample_CXXFLAGS) $(CXXFLAGS) -c -o t_resample-t_resample.obj `if test -f 't_resample.cpp'; then $(CYGPATH_W) 't_resample.cpp'; else $(CYGPATH_W) '$(srcdir)/t_resample.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

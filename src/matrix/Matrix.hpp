@@ -1186,7 +1186,7 @@ protected:
      */
     inline size_t
     DimProd () const {
-        return std::accumulate(_dim.begin(), _dim.end(), 1, multiply<size_t>);
+        return std::accumulate(_dim.begin(), _dim.end(), 1, c_multiply<size_t>);
     }
 
     /**
