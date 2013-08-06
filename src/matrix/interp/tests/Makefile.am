@@ -8,8 +8,7 @@ t_ppval_SOURCES= $(COMMON) t_ppval.cpp
 t_interp1_SOURCES= $(COMMON) t_interp1.cpp
 t_resample_SOURCES= $(COMMON) t_resample.cpp
 t_resample_CXXFLAGS = $(AM_CXXFLAGS) $(INC_INSIGHT_H)
-t_resample_LDADD = $(COMMON_la_LDADD) $(INSIGHT_LIB_FLAG) 
-RelativeSensitivities_la_LDFLAGS = $(INSIGHT_LIB_DIR_FLAG)
+t_resample_LDADD = $(COMMON_la_LDADD) $(INSIGHT_LIB_FLAG) $(INSIGHT_LIB_DIR_FLAG)
 
 
 

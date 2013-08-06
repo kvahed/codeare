@@ -45,7 +45,8 @@ rclient_DEPENDENCIES = libremote.la
 
 # Rules for reconserver
 reconserver_SOURCES = $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp reconserver.cpp
-reconserver_LDFLAGS = $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@  -lomniORB4 -lomnithread -lomniDynamic4 tinyxml/libtinyxml.la
+reconserver_CXXFLAGS = $(AM_CXXFLAGS) -Imongoose
+reconserver_LDFLAGS = $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@  -lomniORB4 -lomnithread -lomniDynamic4 tinyxml/libtinyxml.la mongoose/libmongoose.la
 #-dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la 
 if USE_NFFT3
     reconserver_LDFLAGS += -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
@@ -54,4 +55,4 @@ endif
 EXTRA_DIST = RRSModule.idl Makefile.win32 common.h
 CLEANFILES = RRSModule.hh RRSModuleSK.cc
 
-SUBDIRS = tinyxml modules matrix 
+SUBDIRS = tinyxml modules matrix mongoose

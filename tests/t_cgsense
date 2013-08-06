@@ -1,2 +1,2 @@
 #!/bin/sh
-../src/lclient -b ../share/cgsense/ -c 3fold.xml -t CGSENSE
+DYLD_LIBRARY_PATH=/Applications/MATLAB_R2013a.app/bin/maci64:/usr/local/lib:/usr/local/ismrmrd/lib:/usr/local/lib ../src/lclient -b ../share/cgsense/ -c 3fold.xml -t CGSENSE

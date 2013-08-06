@@ -21,6 +21,8 @@ dummytest (Connector<T>* rc) {
     rc->SetMatrix("mli", mli);
 
     rc->Process(test);
+
+    rc->Finalise(test);
     
     return true;
 

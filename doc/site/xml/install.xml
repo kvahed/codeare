@@ -2,7 +2,7 @@
 <main>
   <title>install</title>
   <article>  
-    <!--	<![CDATA[-->
+    <![CDATA[
 	
     <h2>Installation guide</h2>
     
@@ -12,25 +12,14 @@
     
 	<h3>Installing prerequisites</h3>
     <pre class="sh_sh">
-      sudo apt-get install git build-essential fftw3-dev itk3-dev
-      libboost-dev libboost-system-dev libboost-thread-dev
-      libboost-program-options-dev libnifti-dev liblapack-dev
-      libgsl0-dev omniorb-nameserver libomniorb4-dev omniidl
-      libatlas-dev autoconf libtool libinsighttoolkit3-dev
-    </pre>
-	<h3>ISMRMRD</h3>
-    <p>Stronlgy suggested for building in ISMRMRD support</p>
-    <pre>
-      sudo apt-get install xsdcxx cmake swig libpython-dev
-         openjdk-7-jdk libxerces-c-dev python-numpy<br/>
-      git clone git://git.code.sf.net/p/ismrmrd/code ismrmrd<br/>
-      mkdir ismrmrd/build<br/>
-      cd ismrmrd/build<br/>
-      cmake ../<br/>
-      make <br/>
-      sudo make install
+      > sudo apt-get install git build-essential fftw3-dev itk3-dev \
+        libboost-dev libboost-system-dev libboost-thread-dev \
+        libboost-program-options-dev libnifti-dev liblapack-dev \
+        libgsl0-dev omniorb-nameserver libomniorb4-dev omniidl \
+        libatlas-dev autoconf libtool libinsighttoolkit3-dev 
     </pre>
 
+    <h3>HDF5 (&gt;=1.8)</h3>
     <p>
       Unfortunately somebody has broken the HDF5 library which is
       shipped with Ubuntu (12.10-13.04). So either you take 12.04LTS or
@@ -43,11 +32,11 @@
     </p>
     
     <pre class="sh_sh">
-      cd hdf5-1.x.xx;
-      ./configure --enable-cxx --prefix=/usr/local
-      make 
-      make check 
-      sudo make install 
+      > cd hdf5-1.x.xx;
+      > ./configure --enable-cxx --prefix=/usr/local
+      > make 
+      > make check 
+      > sudo make install 
     </pre>
 
     <h3>NFFT 3</h3>
@@ -58,10 +47,23 @@
       </a>
     </p>
     <pre class="sh_sh">
-      tar xzf nfft-x.x.x/
-      CXXFLAGS="-Ofast -march=native" CFLAGS=$CXXFLAGS ./configure  --enable-all
-      make 
-      sudo make install 
+      > tar xzf nfft-x.x.x/
+      > CXXFLAGS="-Ofast -march=native" CFLAGS=$CXXFLAGS ./configure  --enable-all
+      > make 
+      > sudo make install 
+    </pre>
+
+	<h3>ISMRMRD</h3>
+    <p>Stronlgy suggested for building in ISMRMRD support</p>
+    <pre class="sh_sh">
+      > sudo apt-get install xsdcxx cmake swig libpython-dev\
+        openjdk-7-jdk libxerces-c-dev python-numpy
+      > git clone git://git.code.sf.net/p/ismrmrd/code ismrmrd
+      > mkdir ismrmrd/build
+      > cd ismrmrd/build
+      > cmake ../
+      > make 
+      > sudo make install
     </pre>
 
     <p>
@@ -72,7 +74,7 @@
 
 	<h3>Getting codeare</h3>
     <pre class="sh_sh">
-      git clone http://github.com/kvahed/codeare.git codeare
+      > git clone http://github.com/kvahed/codeare.git codeare
     </pre>
     
    
@@ -95,7 +97,7 @@
       > make check
       > make install
     </pre>
-    <!--]]>-->
+    ]]>
   </article>
 </main> 
 

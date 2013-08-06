@@ -591,7 +591,7 @@ if test x"$with_ismrmrdroot" != x"no" ; then
 
 	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
 
-	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_utilities -Wl,-rpath,${ISMRMRD_LIB_PATH}"
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -Wl,-rpath,${ISMRMRD_LIB_PATH}"
 
 	AC_TRY_LINK([#include <ismrmrd_hdf5.h>],
 	  [ISMRMRD::IsmrmrdDataset d("","");],
@@ -914,6 +914,6 @@ AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/t
  src/matrix/linalg/tests/Makefile src/matrix/ft/Makefile src/matrix/ft/tests/Makefile 
  src/matrix/dwt/Makefile src/matrix/dwt/tests/Makefile src/matrix/io/tests/Makefile
  src/matrix/mpi/Makefile src/matrix/mpi/tests/Makefile src/matrix/interp/Makefile
- src/matrix/interp/tests/Makefile])
+ src/matrix/interp/tests/Makefile src/mongoose/Makefile])
 AC_OUTPUT
 
