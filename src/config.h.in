@@ -181,6 +181,9 @@
 /* Define to 1 if you have the <nifti1_io.h> header file. */
 #undef HAVE_NIFTI1_IO_H
 
+/* Define to 1 if you have the <nifti/nifti1_io.h> header file. */
+#undef HAVE_NIFTI_NIFTI1_IO_H
+
 /* Define to 1 if you have the <omniORB4/CORBA.h> header file. */
 #undef HAVE_OMNIORB4_CORBA_H
 
