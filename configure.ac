@@ -347,7 +347,8 @@ AC_CHECK_HEADERS([nfft3util.h],      [],
 AC_CHECK_HEADERS([H5Cpp.h],          [], 
    [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([nifti1_io.h],      [], 
-   [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
+   [AC_CHECK_HEADERS([nifti/nifti1_io.h],      [], 
+   [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])])
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h sys/sysctl.h])
 AC_CHECK_HEADERS([openssl/evp.h], [HAVE_CRYPTO=1], 
    [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
@@ -590,7 +591,7 @@ if test x"$with_ismrmrdroot" != x"no" ; then
 
 	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
 
-	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -Wl,-rpath,${ISMRMRD_LIB_PATH}"
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_utilities -Wl,-rpath,${ISMRMRD_LIB_PATH}"
 
 	AC_TRY_LINK([#include <ismrmrd_hdf5.h>],
 	  [ISMRMRD::IsmrmrdDataset d("","");],
@@ -903,7 +904,7 @@ AC_FUNC_MMAP
 
 AH_TEMPLATE([HAVE_SCALAPACK], [Define to 1 if we could link against scalapack])
 ACX_SCALAPACK
-AM_CONDITIONAL([USE_SCALAPACK],    [test "$HAVE_SCALAPACK" -eq 1])
+AM_CONDITIONAL([USE_SCALAPACK],    [test x"$HAVE_SCALAPACK" = x1])
 
 
 # Generate files
