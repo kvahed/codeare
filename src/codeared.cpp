@@ -18,77 +18,19 @@
  *  02110-1301  USA
  */
 
-#include <stdlib.h>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <assert.h>
-#include <signal.h>
-
-#include <boost/thread/thread.hpp>
-
-                                                                                
-#include "ReconServant.hpp"
-#include "CorbaExceptions.hpp"
-
-#ifndef __WIN32__
-#include "config.h"
-#endif
-
-#include "options.h"
-
-#include "mongoose.h"
-
-#ifndef SVN_REVISION
-    #define SVN_REVISION "unkown"
-#endif
-
-char*  name;
-char*  debug;
-char*  logfile;
-
-using namespace std;
-using namespace RRServer;
-
-static const std::string head = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s";
-
-bool init (int argc, char** argv);
-
-inline static int req_handler (struct mg_connection *conn) {
-
-    mg_get_request_info(conn);
-    std::stringstream wd;
-    wd << wspace;
-    std::string ws = wd.str();
-    
-    mg_printf(conn, head.c_str(), ws.length(), ws.c_str());
-    
-    return 1;
-    
-}
-
-inline static void mongoose_service () {
-    
-    struct mg_context *ctx;
-    struct mg_callbacks callbacks;
-    const char *options[] = {"listening_ports", "8080", NULL};
-    
-    memset(&callbacks, 0, sizeof(callbacks));
-    callbacks.begin_request = req_handler;
-    ctx = mg_start(&callbacks, NULL, options);
-    getchar();
-    mg_stop(ctx);
-    
-}
+#include "codeared.h"
+#include "MongooseService.hpp"
 
 int main (int argc, char** argv) {
 
     if (!init (argc, argv))
         return 1;
 
-    // Webserver for worspace view
-    boost::thread bt (mongoose_service);
-    bt.detach();
+    // --------------------------------------------------------------------------
+    // Start HTTP server:
+    // --------------------------------------------------------------------------
+    using namespace codeare::service;
+    MongooseService& mg = MongooseService::Instance();
 
     // --------------------------------------------------------------------------
     // Start CORBA server:
@@ -150,8 +92,6 @@ int main (int argc, char** argv) {
         // Accept requests from clients
         orb->run();
                                                                                 
-        // If orb leaves event handling loop.
-        // - currently configured never to time out (??)
         orb->destroy();
         
         free(m_name[0].id); // str_dup does a malloc internally
@@ -181,57 +121,3 @@ int main (int argc, char** argv) {
 }
 
 
-bool init (int argc, char** argv) {
-    
-    cout << endl;
-    cout << "codeare service "         << VERSION                                     << endl;
-#ifdef GIT_COMMIT
-    cout << "Commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
-#endif
-    
-    Options *opt = new Options();
-    
-    opt->addUsage  ("Copyright (C) 2010-2012");
-    opt->addUsage  ("Kaveh Vahedipour<k.vahedipour@fz-juelich.de>");
-    opt->addUsage  ("Juelich Research Centre");
-    opt->addUsage  ("Medical Imaging Physics");
-    opt->addUsage  ("");
-    opt->addUsage  ("Usage:");
-    opt->addUsage  ("reconserver -n <servicename> [-l <logfile> -d <debuglevel>]");
-    opt->addUsage  ("");
-    opt->addUsage  (" -n, --name    Service name");
-    opt->addUsage  (" -d, --debug   Debug level 0-40 (default: 5)");
-    opt->addUsage  (" -l, --logfile Log file (default: ./reconserver.log)");
-    opt->addUsage  ("");
-    opt->addUsage  (" -h, --help    Print this help screen"); 
-    
-    opt->setFlag   ("help"    , 'h');
-    
-    opt->setOption ("logfile" , 'l');
-    opt->setOption ("debug"   , 'd');
-    opt->setOption ("name"    , 'n');
-    
-    opt->processCommandArgs(argc, argv);
-    
-    if ( !(opt->hasOptions()) || opt->getFlag("help") ) {
-        
-        opt->printUsage();
-        delete opt;
-        return false;
-        
-    } 
-    
-    debug   = (opt->getValue("debug")                && 
-               atoi(opt->getValue("debug")) >= 0     &&  
-               atoi(opt->getValue("debug")) <= 40)    ? opt->getValue("debug")   : (char*)"5";
-    
-    logfile = (opt->getValue("logfile")              &&
-               opt->getValue("logfile") != (char*)"") ? opt->getValue("logfile") : (char*)"./reconserver.log";
-    
-    name    = (opt->getValue("name")                 &&      
-               opt->getValue("name") != (char*)"")    ? opt->getValue("name")    : (char*)"ReconService";
-    
-    delete opt;
-    return true;
-    
-}

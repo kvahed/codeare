@@ -53,7 +53,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = lclient$(EXEEXT) $(am__EXEEXT_1)
-@NETWORKING_TRUE@am__append_1 = rclient reconserver
+@NETWORKING_TRUE@am__append_1 = rclient codeared
 @NETWORKING_TRUE@am__append_2 = libremote.la 
 @USE_NFFT3_TRUE@am__append_3 = -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 #-dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la 
@@ -96,39 +96,38 @@ libremote_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libremote_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @NETWORKING_TRUE@am_libremote_la_rpath =
-@NETWORKING_TRUE@am__EXEEXT_1 = rclient$(EXEEXT) reconserver$(EXEEXT)
+@NETWORKING_TRUE@am__EXEEXT_1 = rclient$(EXEEXT) codeared$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 = options.$(OBJEXT) Workspace.$(OBJEXT) \
+am__objects_1 = codeared-options.$(OBJEXT) \
+	codeared-Workspace.$(OBJEXT) \
+	codeared-FunctorContainer.$(OBJEXT) \
+	codeared-ReconContext.$(OBJEXT) codeared-Toolbox.$(OBJEXT) \
+	codeared-Grid.$(OBJEXT)
+am__objects_2 = codeared-RRSModuleSK.$(OBJEXT)
+am_codeared_OBJECTS = $(am__objects_1) $(am__objects_2) \
+	codeared-ReconServant.$(OBJEXT) codeared-codeared.$(OBJEXT)
+codeared_OBJECTS = $(am_codeared_OBJECTS)
+codeared_LDADD = $(LDADD)
+codeared_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(codeared_CXXFLAGS) \
+	$(CXXFLAGS) $(codeared_LDFLAGS) $(LDFLAGS) -o $@
+am__objects_3 = options.$(OBJEXT) Workspace.$(OBJEXT) \
 	FunctorContainer.$(OBJEXT) ReconContext.$(OBJEXT) \
 	Toolbox.$(OBJEXT) Grid.$(OBJEXT)
-am_lclient_OBJECTS = $(am__objects_1)
+am_lclient_OBJECTS = $(am__objects_3)
 lclient_OBJECTS = $(am_lclient_OBJECTS)
 lclient_LDADD = $(LDADD)
 lclient_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(lclient_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_2 = RRSModuleSK.$(OBJEXT)
-am_rclient_OBJECTS = $(am__objects_1) $(am__objects_2)
+am__objects_4 = RRSModuleSK.$(OBJEXT)
+am_rclient_OBJECTS = $(am__objects_3) $(am__objects_4)
 rclient_OBJECTS = $(am_rclient_OBJECTS)
 rclient_LDADD = $(LDADD)
 rclient_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(rclient_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_3 = reconserver-options.$(OBJEXT) \
-	reconserver-Workspace.$(OBJEXT) \
-	reconserver-FunctorContainer.$(OBJEXT) \
-	reconserver-ReconContext.$(OBJEXT) \
-	reconserver-Toolbox.$(OBJEXT) reconserver-Grid.$(OBJEXT)
-am__objects_4 = reconserver-RRSModuleSK.$(OBJEXT)
-am_reconserver_OBJECTS = $(am__objects_3) $(am__objects_4) \
-	reconserver-ReconServant.$(OBJEXT) \
-	reconserver-reconserver.$(OBJEXT)
-reconserver_OBJECTS = $(am_reconserver_OBJECTS)
-reconserver_LDADD = $(LDADD)
-reconserver_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(reconserver_CXXFLAGS) \
-	$(CXXFLAGS) $(reconserver_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -152,9 +151,9 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(liblocal_la_SOURCES) $(libremote_la_SOURCES) \
-	$(lclient_SOURCES) $(rclient_SOURCES) $(reconserver_SOURCES)
+	$(codeared_SOURCES) $(lclient_SOURCES) $(rclient_SOURCES)
 DIST_SOURCES = $(liblocal_la_SOURCES) $(libremote_la_SOURCES) \
-	$(lclient_SOURCES) $(rclient_SOURCES) $(reconserver_SOURCES)
+	$(codeared_SOURCES) $(lclient_SOURCES) $(rclient_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -380,10 +379,10 @@ rclient_SOURCES = $(COMMON) $(NETWORKING_COMMON)
 rclient_LDFLAGS = $(SCALAPACK_LIBS) libremote.la tinyxml/libtinyxml.la $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ -lomniORB4 -lomnithread -lomniDynamic4 
 rclient_DEPENDENCIES = libremote.la
 
-# Rules for reconserver
-reconserver_SOURCES = $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp reconserver.cpp
-reconserver_CXXFLAGS = $(AM_CXXFLAGS) -Imongoose
-reconserver_LDFLAGS = $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -lomniORB4 \
+# Rules for codeared
+codeared_SOURCES = $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp codeared.cpp
+codeared_CXXFLAGS = $(AM_CXXFLAGS) -Imongoose
+codeared_LDFLAGS = $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ -lomniORB4 \
 	-lomnithread -lomniDynamic4 tinyxml/libtinyxml.la \
 	mongoose/libmongoose.la $(am__append_4)
 EXTRA_DIST = RRSModule.idl Makefile.win32 common.h
@@ -502,15 +501,15 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+codeared$(EXEEXT): $(codeared_OBJECTS) $(codeared_DEPENDENCIES) $(EXTRA_codeared_DEPENDENCIES) 
+	@rm -f codeared$(EXEEXT)
+	$(codeared_LINK) $(codeared_OBJECTS) $(codeared_LDADD) $(LIBS)
 lclient$(EXEEXT): $(lclient_OBJECTS) $(lclient_DEPENDENCIES) $(EXTRA_lclient_DEPENDENCIES) 
 	@rm -f lclient$(EXEEXT)
 	$(lclient_LINK) $(lclient_OBJECTS) $(lclient_LDADD) $(LIBS)
 rclient$(EXEEXT): $(rclient_OBJECTS) $(rclient_DEPENDENCIES) $(EXTRA_rclient_DEPENDENCIES) 
 	@rm -f rclient$(EXEEXT)
 	$(rclient_LINK) $(rclient_OBJECTS) $(rclient_LDADD) $(LIBS)
-reconserver$(EXEEXT): $(reconserver_OBJECTS) $(reconserver_DEPENDENCIES) $(EXTRA_reconserver_DEPENDENCIES) 
-	@rm -f reconserver$(EXEEXT)
-	$(reconserver_LINK) $(reconserver_OBJECTS) $(reconserver_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -524,20 +523,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Workspace.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-FunctorContainer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-Grid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-RRSModuleSK.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-ReconContext.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-ReconServant.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-Toolbox.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-Workspace.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-codeared.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblocal_la-LocalConnector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblocal_la-testclt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libremote_la-RemoteConnector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libremote_la-testclt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver-FunctorContainer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver-Grid.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver-RRSModuleSK.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver-ReconContext.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver-ReconServant.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver-Toolbox.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver-Workspace.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver-options.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reconserver-reconserver.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -591,131 +590,131 @@ libremote_la-testclt.lo: testclt.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libremote_la_CXXFLAGS) $(CXXFLAGS) -c -o libremote_la-testclt.lo `test -f 'testclt.cpp' || echo '$(srcdir)/'`testclt.cpp
 
-reconserver-options.o: options.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-options.o -MD -MP -MF $(DEPDIR)/reconserver-options.Tpo -c -o reconserver-options.o `test -f 'options.cpp' || echo '$(srcdir)/'`options.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-options.Tpo $(DEPDIR)/reconserver-options.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='options.cpp' object='reconserver-options.o' libtool=no @AMDEPBACKSLASH@
+codeared-options.o: options.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-options.o -MD -MP -MF $(DEPDIR)/codeared-options.Tpo -c -o codeared-options.o `test -f 'options.cpp' || echo '$(srcdir)/'`options.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-options.Tpo $(DEPDIR)/codeared-options.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='options.cpp' object='codeared-options.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-options.o `test -f 'options.cpp' || echo '$(srcdir)/'`options.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-options.o `test -f 'options.cpp' || echo '$(srcdir)/'`options.cpp
 
-reconserver-options.obj: options.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-options.obj -MD -MP -MF $(DEPDIR)/reconserver-options.Tpo -c -o reconserver-options.obj `if test -f 'options.cpp'; then $(CYGPATH_W) 'options.cpp'; else $(CYGPATH_W) '$(srcdir)/options.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-options.Tpo $(DEPDIR)/reconserver-options.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='options.cpp' object='reconserver-options.obj' libtool=no @AMDEPBACKSLASH@
+codeared-options.obj: options.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-options.obj -MD -MP -MF $(DEPDIR)/codeared-options.Tpo -c -o codeared-options.obj `if test -f 'options.cpp'; then $(CYGPATH_W) 'options.cpp'; else $(CYGPATH_W) '$(srcdir)/options.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-options.Tpo $(DEPDIR)/codeared-options.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='options.cpp' object='codeared-options.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-options.obj `if test -f 'options.cpp'; then $(CYGPATH_W) 'options.cpp'; else $(CYGPATH_W) '$(srcdir)/options.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-options.obj `if test -f 'options.cpp'; then $(CYGPATH_W) 'options.cpp'; else $(CYGPATH_W) '$(srcdir)/options.cpp'; fi`
 
-reconserver-Workspace.o: Workspace.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-Workspace.o -MD -MP -MF $(DEPDIR)/reconserver-Workspace.Tpo -c -o reconserver-Workspace.o `test -f 'Workspace.cpp' || echo '$(srcdir)/'`Workspace.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-Workspace.Tpo $(DEPDIR)/reconserver-Workspace.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Workspace.cpp' object='reconserver-Workspace.o' libtool=no @AMDEPBACKSLASH@
+codeared-Workspace.o: Workspace.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-Workspace.o -MD -MP -MF $(DEPDIR)/codeared-Workspace.Tpo -c -o codeared-Workspace.o `test -f 'Workspace.cpp' || echo '$(srcdir)/'`Workspace.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-Workspace.Tpo $(DEPDIR)/codeared-Workspace.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Workspace.cpp' object='codeared-Workspace.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-Workspace.o `test -f 'Workspace.cpp' || echo '$(srcdir)/'`Workspace.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-Workspace.o `test -f 'Workspace.cpp' || echo '$(srcdir)/'`Workspace.cpp
 
-reconserver-Workspace.obj: Workspace.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-Workspace.obj -MD -MP -MF $(DEPDIR)/reconserver-Workspace.Tpo -c -o reconserver-Workspace.obj `if test -f 'Workspace.cpp'; then $(CYGPATH_W) 'Workspace.cpp'; else $(CYGPATH_W) '$(srcdir)/Workspace.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-Workspace.Tpo $(DEPDIR)/reconserver-Workspace.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Workspace.cpp' object='reconserver-Workspace.obj' libtool=no @AMDEPBACKSLASH@
+codeared-Workspace.obj: Workspace.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-Workspace.obj -MD -MP -MF $(DEPDIR)/codeared-Workspace.Tpo -c -o codeared-Workspace.obj `if test -f 'Workspace.cpp'; then $(CYGPATH_W) 'Workspace.cpp'; else $(CYGPATH_W) '$(srcdir)/Workspace.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-Workspace.Tpo $(DEPDIR)/codeared-Workspace.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Workspace.cpp' object='codeared-Workspace.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-Workspace.obj `if test -f 'Workspace.cpp'; then $(CYGPATH_W) 'Workspace.cpp'; else $(CYGPATH_W) '$(srcdir)/Workspace.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-Workspace.obj `if test -f 'Workspace.cpp'; then $(CYGPATH_W) 'Workspace.cpp'; else $(CYGPATH_W) '$(srcdir)/Workspace.cpp'; fi`
 
-reconserver-FunctorContainer.o: FunctorContainer.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-FunctorContainer.o -MD -MP -MF $(DEPDIR)/reconserver-FunctorContainer.Tpo -c -o reconserver-FunctorContainer.o `test -f 'FunctorContainer.cpp' || echo '$(srcdir)/'`FunctorContainer.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-FunctorContainer.Tpo $(DEPDIR)/reconserver-FunctorContainer.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FunctorContainer.cpp' object='reconserver-FunctorContainer.o' libtool=no @AMDEPBACKSLASH@
+codeared-FunctorContainer.o: FunctorContainer.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-FunctorContainer.o -MD -MP -MF $(DEPDIR)/codeared-FunctorContainer.Tpo -c -o codeared-FunctorContainer.o `test -f 'FunctorContainer.cpp' || echo '$(srcdir)/'`FunctorContainer.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-FunctorContainer.Tpo $(DEPDIR)/codeared-FunctorContainer.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FunctorContainer.cpp' object='codeared-FunctorContainer.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-FunctorContainer.o `test -f 'FunctorContainer.cpp' || echo '$(srcdir)/'`FunctorContainer.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-FunctorContainer.o `test -f 'FunctorContainer.cpp' || echo '$(srcdir)/'`FunctorContainer.cpp
 
-reconserver-FunctorContainer.obj: FunctorContainer.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-FunctorContainer.obj -MD -MP -MF $(DEPDIR)/reconserver-FunctorContainer.Tpo -c -o reconserver-FunctorContainer.obj `if test -f 'FunctorContainer.cpp'; then $(CYGPATH_W) 'FunctorContainer.cpp'; else $(CYGPATH_W) '$(srcdir)/FunctorContainer.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-FunctorContainer.Tpo $(DEPDIR)/reconserver-FunctorContainer.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FunctorContainer.cpp' object='reconserver-FunctorContainer.obj' libtool=no @AMDEPBACKSLASH@
+codeared-FunctorContainer.obj: FunctorContainer.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-FunctorContainer.obj -MD -MP -MF $(DEPDIR)/codeared-FunctorContainer.Tpo -c -o codeared-FunctorContainer.obj `if test -f 'FunctorContainer.cpp'; then $(CYGPATH_W) 'FunctorContainer.cpp'; else $(CYGPATH_W) '$(srcdir)/FunctorContainer.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-FunctorContainer.Tpo $(DEPDIR)/codeared-FunctorContainer.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FunctorContainer.cpp' object='codeared-FunctorContainer.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-FunctorContainer.obj `if test -f 'FunctorContainer.cpp'; then $(CYGPATH_W) 'FunctorContainer.cpp'; else $(CYGPATH_W) '$(srcdir)/FunctorContainer.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-FunctorContainer.obj `if test -f 'FunctorContainer.cpp'; then $(CYGPATH_W) 'FunctorContainer.cpp'; else $(CYGPATH_W) '$(srcdir)/FunctorContainer.cpp'; fi`
 
-reconserver-ReconContext.o: ReconContext.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-ReconContext.o -MD -MP -MF $(DEPDIR)/reconserver-ReconContext.Tpo -c -o reconserver-ReconContext.o `test -f 'ReconContext.cpp' || echo '$(srcdir)/'`ReconContext.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-ReconContext.Tpo $(DEPDIR)/reconserver-ReconContext.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReconContext.cpp' object='reconserver-ReconContext.o' libtool=no @AMDEPBACKSLASH@
+codeared-ReconContext.o: ReconContext.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-ReconContext.o -MD -MP -MF $(DEPDIR)/codeared-ReconContext.Tpo -c -o codeared-ReconContext.o `test -f 'ReconContext.cpp' || echo '$(srcdir)/'`ReconContext.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-ReconContext.Tpo $(DEPDIR)/codeared-ReconContext.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReconContext.cpp' object='codeared-ReconContext.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-ReconContext.o `test -f 'ReconContext.cpp' || echo '$(srcdir)/'`ReconContext.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-ReconContext.o `test -f 'ReconContext.cpp' || echo '$(srcdir)/'`ReconContext.cpp
 
-reconserver-ReconContext.obj: ReconContext.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-ReconContext.obj -MD -MP -MF $(DEPDIR)/reconserver-ReconContext.Tpo -c -o reconserver-ReconContext.obj `if test -f 'ReconContext.cpp'; then $(CYGPATH_W) 'ReconContext.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconContext.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-ReconContext.Tpo $(DEPDIR)/reconserver-ReconContext.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReconContext.cpp' object='reconserver-ReconContext.obj' libtool=no @AMDEPBACKSLASH@
+codeared-ReconContext.obj: ReconContext.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-ReconContext.obj -MD -MP -MF $(DEPDIR)/codeared-ReconContext.Tpo -c -o codeared-ReconContext.obj `if test -f 'ReconContext.cpp'; then $(CYGPATH_W) 'ReconContext.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconContext.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-ReconContext.Tpo $(DEPDIR)/codeared-ReconContext.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReconContext.cpp' object='codeared-ReconContext.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-ReconContext.obj `if test -f 'ReconContext.cpp'; then $(CYGPATH_W) 'ReconContext.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconContext.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-ReconContext.obj `if test -f 'ReconContext.cpp'; then $(CYGPATH_W) 'ReconContext.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconContext.cpp'; fi`
 
-reconserver-Toolbox.o: Toolbox.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-Toolbox.o -MD -MP -MF $(DEPDIR)/reconserver-Toolbox.Tpo -c -o reconserver-Toolbox.o `test -f 'Toolbox.cpp' || echo '$(srcdir)/'`Toolbox.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-Toolbox.Tpo $(DEPDIR)/reconserver-Toolbox.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Toolbox.cpp' object='reconserver-Toolbox.o' libtool=no @AMDEPBACKSLASH@
+codeared-Toolbox.o: Toolbox.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-Toolbox.o -MD -MP -MF $(DEPDIR)/codeared-Toolbox.Tpo -c -o codeared-Toolbox.o `test -f 'Toolbox.cpp' || echo '$(srcdir)/'`Toolbox.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-Toolbox.Tpo $(DEPDIR)/codeared-Toolbox.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Toolbox.cpp' object='codeared-Toolbox.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-Toolbox.o `test -f 'Toolbox.cpp' || echo '$(srcdir)/'`Toolbox.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-Toolbox.o `test -f 'Toolbox.cpp' || echo '$(srcdir)/'`Toolbox.cpp
 
-reconserver-Toolbox.obj: Toolbox.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-Toolbox.obj -MD -MP -MF $(DEPDIR)/reconserver-Toolbox.Tpo -c -o reconserver-Toolbox.obj `if test -f 'Toolbox.cpp'; then $(CYGPATH_W) 'Toolbox.cpp'; else $(CYGPATH_W) '$(srcdir)/Toolbox.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-Toolbox.Tpo $(DEPDIR)/reconserver-Toolbox.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Toolbox.cpp' object='reconserver-Toolbox.obj' libtool=no @AMDEPBACKSLASH@
+codeared-Toolbox.obj: Toolbox.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-Toolbox.obj -MD -MP -MF $(DEPDIR)/codeared-Toolbox.Tpo -c -o codeared-Toolbox.obj `if test -f 'Toolbox.cpp'; then $(CYGPATH_W) 'Toolbox.cpp'; else $(CYGPATH_W) '$(srcdir)/Toolbox.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-Toolbox.Tpo $(DEPDIR)/codeared-Toolbox.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Toolbox.cpp' object='codeared-Toolbox.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-Toolbox.obj `if test -f 'Toolbox.cpp'; then $(CYGPATH_W) 'Toolbox.cpp'; else $(CYGPATH_W) '$(srcdir)/Toolbox.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-Toolbox.obj `if test -f 'Toolbox.cpp'; then $(CYGPATH_W) 'Toolbox.cpp'; else $(CYGPATH_W) '$(srcdir)/Toolbox.cpp'; fi`
 
-reconserver-Grid.o: Grid.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-Grid.o -MD -MP -MF $(DEPDIR)/reconserver-Grid.Tpo -c -o reconserver-Grid.o `test -f 'Grid.cpp' || echo '$(srcdir)/'`Grid.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-Grid.Tpo $(DEPDIR)/reconserver-Grid.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Grid.cpp' object='reconserver-Grid.o' libtool=no @AMDEPBACKSLASH@
+codeared-Grid.o: Grid.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-Grid.o -MD -MP -MF $(DEPDIR)/codeared-Grid.Tpo -c -o codeared-Grid.o `test -f 'Grid.cpp' || echo '$(srcdir)/'`Grid.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-Grid.Tpo $(DEPDIR)/codeared-Grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Grid.cpp' object='codeared-Grid.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-Grid.o `test -f 'Grid.cpp' || echo '$(srcdir)/'`Grid.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-Grid.o `test -f 'Grid.cpp' || echo '$(srcdir)/'`Grid.cpp
 
-reconserver-Grid.obj: Grid.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-Grid.obj -MD -MP -MF $(DEPDIR)/reconserver-Grid.Tpo -c -o reconserver-Grid.obj `if test -f 'Grid.cpp'; then $(CYGPATH_W) 'Grid.cpp'; else $(CYGPATH_W) '$(srcdir)/Grid.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-Grid.Tpo $(DEPDIR)/reconserver-Grid.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Grid.cpp' object='reconserver-Grid.obj' libtool=no @AMDEPBACKSLASH@
+codeared-Grid.obj: Grid.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-Grid.obj -MD -MP -MF $(DEPDIR)/codeared-Grid.Tpo -c -o codeared-Grid.obj `if test -f 'Grid.cpp'; then $(CYGPATH_W) 'Grid.cpp'; else $(CYGPATH_W) '$(srcdir)/Grid.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-Grid.Tpo $(DEPDIR)/codeared-Grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Grid.cpp' object='codeared-Grid.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-Grid.obj `if test -f 'Grid.cpp'; then $(CYGPATH_W) 'Grid.cpp'; else $(CYGPATH_W) '$(srcdir)/Grid.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-Grid.obj `if test -f 'Grid.cpp'; then $(CYGPATH_W) 'Grid.cpp'; else $(CYGPATH_W) '$(srcdir)/Grid.cpp'; fi`
 
-reconserver-RRSModuleSK.o: RRSModuleSK.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-RRSModuleSK.o -MD -MP -MF $(DEPDIR)/reconserver-RRSModuleSK.Tpo -c -o reconserver-RRSModuleSK.o `test -f 'RRSModuleSK.cc' || echo '$(srcdir)/'`RRSModuleSK.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-RRSModuleSK.Tpo $(DEPDIR)/reconserver-RRSModuleSK.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RRSModuleSK.cc' object='reconserver-RRSModuleSK.o' libtool=no @AMDEPBACKSLASH@
+codeared-RRSModuleSK.o: RRSModuleSK.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-RRSModuleSK.o -MD -MP -MF $(DEPDIR)/codeared-RRSModuleSK.Tpo -c -o codeared-RRSModuleSK.o `test -f 'RRSModuleSK.cc' || echo '$(srcdir)/'`RRSModuleSK.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-RRSModuleSK.Tpo $(DEPDIR)/codeared-RRSModuleSK.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RRSModuleSK.cc' object='codeared-RRSModuleSK.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-RRSModuleSK.o `test -f 'RRSModuleSK.cc' || echo '$(srcdir)/'`RRSModuleSK.cc
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-RRSModuleSK.o `test -f 'RRSModuleSK.cc' || echo '$(srcdir)/'`RRSModuleSK.cc
 
-reconserver-RRSModuleSK.obj: RRSModuleSK.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-RRSModuleSK.obj -MD -MP -MF $(DEPDIR)/reconserver-RRSModuleSK.Tpo -c -o reconserver-RRSModuleSK.obj `if test -f 'RRSModuleSK.cc'; then $(CYGPATH_W) 'RRSModuleSK.cc'; else $(CYGPATH_W) '$(srcdir)/RRSModuleSK.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-RRSModuleSK.Tpo $(DEPDIR)/reconserver-RRSModuleSK.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RRSModuleSK.cc' object='reconserver-RRSModuleSK.obj' libtool=no @AMDEPBACKSLASH@
+codeared-RRSModuleSK.obj: RRSModuleSK.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-RRSModuleSK.obj -MD -MP -MF $(DEPDIR)/codeared-RRSModuleSK.Tpo -c -o codeared-RRSModuleSK.obj `if test -f 'RRSModuleSK.cc'; then $(CYGPATH_W) 'RRSModuleSK.cc'; else $(CYGPATH_W) '$(srcdir)/RRSModuleSK.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-RRSModuleSK.Tpo $(DEPDIR)/codeared-RRSModuleSK.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RRSModuleSK.cc' object='codeared-RRSModuleSK.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-RRSModuleSK.obj `if test -f 'RRSModuleSK.cc'; then $(CYGPATH_W) 'RRSModuleSK.cc'; else $(CYGPATH_W) '$(srcdir)/RRSModuleSK.cc'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-RRSModuleSK.obj `if test -f 'RRSModuleSK.cc'; then $(CYGPATH_W) 'RRSModuleSK.cc'; else $(CYGPATH_W) '$(srcdir)/RRSModuleSK.cc'; fi`
 
-reconserver-ReconServant.o: ReconServant.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-ReconServant.o -MD -MP -MF $(DEPDIR)/reconserver-ReconServant.Tpo -c -o reconserver-ReconServant.o `test -f 'ReconServant.cpp' || echo '$(srcdir)/'`ReconServant.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-ReconServant.Tpo $(DEPDIR)/reconserver-ReconServant.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReconServant.cpp' object='reconserver-ReconServant.o' libtool=no @AMDEPBACKSLASH@
+codeared-ReconServant.o: ReconServant.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-ReconServant.o -MD -MP -MF $(DEPDIR)/codeared-ReconServant.Tpo -c -o codeared-ReconServant.o `test -f 'ReconServant.cpp' || echo '$(srcdir)/'`ReconServant.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-ReconServant.Tpo $(DEPDIR)/codeared-ReconServant.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReconServant.cpp' object='codeared-ReconServant.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-ReconServant.o `test -f 'ReconServant.cpp' || echo '$(srcdir)/'`ReconServant.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-ReconServant.o `test -f 'ReconServant.cpp' || echo '$(srcdir)/'`ReconServant.cpp
 
-reconserver-ReconServant.obj: ReconServant.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-ReconServant.obj -MD -MP -MF $(DEPDIR)/reconserver-ReconServant.Tpo -c -o reconserver-ReconServant.obj `if test -f 'ReconServant.cpp'; then $(CYGPATH_W) 'ReconServant.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconServant.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-ReconServant.Tpo $(DEPDIR)/reconserver-ReconServant.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReconServant.cpp' object='reconserver-ReconServant.obj' libtool=no @AMDEPBACKSLASH@
+codeared-ReconServant.obj: ReconServant.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-ReconServant.obj -MD -MP -MF $(DEPDIR)/codeared-ReconServant.Tpo -c -o codeared-ReconServant.obj `if test -f 'ReconServant.cpp'; then $(CYGPATH_W) 'ReconServant.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconServant.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-ReconServant.Tpo $(DEPDIR)/codeared-ReconServant.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReconServant.cpp' object='codeared-ReconServant.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-ReconServant.obj `if test -f 'ReconServant.cpp'; then $(CYGPATH_W) 'ReconServant.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconServant.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-ReconServant.obj `if test -f 'ReconServant.cpp'; then $(CYGPATH_W) 'ReconServant.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconServant.cpp'; fi`
 
-reconserver-reconserver.o: reconserver.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-reconserver.o -MD -MP -MF $(DEPDIR)/reconserver-reconserver.Tpo -c -o reconserver-reconserver.o `test -f 'reconserver.cpp' || echo '$(srcdir)/'`reconserver.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-reconserver.Tpo $(DEPDIR)/reconserver-reconserver.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='reconserver.cpp' object='reconserver-reconserver.o' libtool=no @AMDEPBACKSLASH@
+codeared-codeared.o: codeared.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-codeared.o -MD -MP -MF $(DEPDIR)/codeared-codeared.Tpo -c -o codeared-codeared.o `test -f 'codeared.cpp' || echo '$(srcdir)/'`codeared.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-codeared.Tpo $(DEPDIR)/codeared-codeared.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='codeared.cpp' object='codeared-codeared.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-reconserver.o `test -f 'reconserver.cpp' || echo '$(srcdir)/'`reconserver.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-codeared.o `test -f 'codeared.cpp' || echo '$(srcdir)/'`codeared.cpp
 
-reconserver-reconserver.obj: reconserver.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -MT reconserver-reconserver.obj -MD -MP -MF $(DEPDIR)/reconserver-reconserver.Tpo -c -o reconserver-reconserver.obj `if test -f 'reconserver.cpp'; then $(CYGPATH_W) 'reconserver.cpp'; else $(CYGPATH_W) '$(srcdir)/reconserver.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/reconserver-reconserver.Tpo $(DEPDIR)/reconserver-reconserver.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='reconserver.cpp' object='reconserver-reconserver.obj' libtool=no @AMDEPBACKSLASH@
+codeared-codeared.obj: codeared.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-codeared.obj -MD -MP -MF $(DEPDIR)/codeared-codeared.Tpo -c -o codeared-codeared.obj `if test -f 'codeared.cpp'; then $(CYGPATH_W) 'codeared.cpp'; else $(CYGPATH_W) '$(srcdir)/codeared.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-codeared.Tpo $(DEPDIR)/codeared-codeared.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='codeared.cpp' object='codeared-codeared.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(reconserver_CXXFLAGS) $(CXXFLAGS) -c -o reconserver-reconserver.obj `if test -f 'reconserver.cpp'; then $(CYGPATH_W) 'reconserver.cpp'; else $(CYGPATH_W) '$(srcdir)/reconserver.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-codeared.obj `if test -f 'codeared.cpp'; then $(CYGPATH_W) 'codeared.cpp'; else $(CYGPATH_W) '$(srcdir)/codeared.cpp'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

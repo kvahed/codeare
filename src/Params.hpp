@@ -105,8 +105,7 @@ public:
 	 * @param  key  Key
 	 * @param  val  Casted value
 	 */
-	template <class T>
-	inline void
+	template <class T> inline void
 	Get (const char* key, T& val) const {
 		val = Get<T>(key);
 	}
