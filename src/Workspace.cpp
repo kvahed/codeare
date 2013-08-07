@@ -67,33 +67,44 @@ Workspace::Finalise () {
 
 void Workspace::Print (std::ostream& os) const {
 
-       os << "\nMatrices:\n";
-       for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++) {
+	os << "codeare service " << VERSION << endl;
+#ifdef GIT_COMMIT
+	os << "commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
+#endif
 
-           const boost::any& b = m_store.find (i->second[0])->second;
-           os << i->first << "\t";
-           if (b.type() == typeid(boost::shared_ptr<Matrix<float> >))
-        	   os << "\t Matrix<float>          \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<float> > >(b));
-           else if (b.type() == typeid(boost::shared_ptr<Matrix<double> >))
-        	   os << "\t Matrix<double>         \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<double> > >(b));
-           else if (b.type() == typeid(boost::shared_ptr<Matrix<cxfl> >))
-        	   os << "\t Matrix<complex<float>> \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<cxfl> > >(b));
-           else if (b.type() == typeid(boost::shared_ptr<Matrix<cxdb> >))
-        	   os << "\t Matrix<complex<double>>\t" << size(*boost::any_cast<boost::shared_ptr<Matrix<cxdb> > >(b));
-           else if (b.type() == typeid(boost::shared_ptr<Matrix<short> >))
-        	   os << "\t Matrix<short>          \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<short> > >(b));
-           else if (b.type() == typeid(boost::shared_ptr<Matrix<long> >))
-        	   os << "\t Matrix<long>           \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<long> > >(b));
-           else if (b.type() == typeid(boost::shared_ptr<Matrix<size_t> >))
-        	   os << "\t Matrix<size_t>         \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<size_t> > >(b));
-           else if (b.type() == typeid(boost::shared_ptr<Matrix<cbool> >))
-        	   os << "\t Matrix<bool>           \t" << size(*boost::any_cast<boost::shared_ptr<Matrix<cbool> > >(b));
-       }
+	os << "\nMatrices\n";
+	os <<   "--------\n\n";
+	for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++) {
 
-       os << "\nParameters:\n" ;
-       os << p;
+	    const boost::any& b = m_store.find (i->second[0])->second;
+	    const std::string k_name = i->first;
+	    const size_t kl = k_name.length();
 
-   }
+	    os << setw(24) << k_name << " | ";
+	    if (b.type() == typeid(boost::shared_ptr<Matrix<float> >))
+		    os << "           float |" << setw(8) << size(*boost::any_cast<boost::shared_ptr<Matrix<float> > >(b));
+	    else if (b.type() == typeid(boost::shared_ptr<Matrix<double> >))
+		    os << "          double |" << setw(8) << size(*boost::any_cast<boost::shared_ptr<Matrix<double> > >(b));
+	    else if (b.type() == typeid(boost::shared_ptr<Matrix<cxfl> >))
+		    os << "  complex<float> |" << setw(8) << size(*boost::any_cast<boost::shared_ptr<Matrix<cxfl> > >(b));
+	    else if (b.type() == typeid(boost::shared_ptr<Matrix<cxdb> >))
+		    os << " complex<double> |" << setw(8) << size(*boost::any_cast<boost::shared_ptr<Matrix<cxdb> > >(b));
+	    else if (b.type() == typeid(boost::shared_ptr<Matrix<short> >))
+		    os << "           short |" << setw(8) << size(*boost::any_cast<boost::shared_ptr<Matrix<short> > >(b));
+	    else if (b.type() == typeid(boost::shared_ptr<Matrix<long> >))
+		    os << "            long |" << setw(8) << size(*boost::any_cast<boost::shared_ptr<Matrix<long> > >(b));
+	    else if (b.type() == typeid(boost::shared_ptr<Matrix<size_t> >))
+		    os << "          size_t |" << setw(8) << size(*boost::any_cast<boost::shared_ptr<Matrix<size_t> > >(b));
+	    else if (b.type() == typeid(boost::shared_ptr<Matrix<cbool> >))
+		    os << "            bool |" << setw(8) << size(*boost::any_cast<boost::shared_ptr<Matrix<cbool> > >(b));
+	}
+
+    os << "\n\n\nParameters\n" ;
+    os <<       "----------\n\n";
+
+    os << p;
+
+}
 
 
 

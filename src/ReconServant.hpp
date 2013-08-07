@@ -330,6 +330,7 @@ namespace RRServer {
 		config        (const char* c);
 
 
+
         static void
         inform        (omni::omniInterceptors::assignUpcallThread_T::info_T &info);
 

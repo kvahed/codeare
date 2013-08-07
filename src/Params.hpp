@@ -153,9 +153,18 @@ public:
 	void
 	Print            (std::ostream& os) const {
 
-		for (std::map<std::string, boost::any>::const_iterator i = pl.begin(); i != pl.end(); i++) {
+		typedef std::map<std::string, boost::any>::const_iterator it;
+
+		for (it i = pl.begin(); i != pl.end(); i++) {
+
 			const boost::any& b = i->second;
-			os <<  i->first << "\t" << demangle(i->second.type().name()).c_str() << "\t";
+			std::string v_name  = demangle(i->second.type().name()),
+					    k_name  = i->first;
+			size_t vl = v_name.length(), kl = k_name.length();
+
+			os << setw(24) << k_name << " | "
+			   << setw(16) << v_name << " | "
+			   << setw(32);
 			if (b.type() == typeid(float))
 				TypeTraits<float>::print(os,boost::any_cast<float>(b));
 			else if (b.type() == typeid(double))
@@ -174,7 +183,14 @@ public:
 				os << boost::any_cast<size_t>(b);
 			else if (b.type() == typeid(cbool))
 				os << boost::any_cast<cbool>(b);
+			else if (b.type() == typeid(char*))
+				os << boost::any_cast<char*>(b);
+			else if (b.type() == typeid(const char*))
+				os << boost::any_cast<const char*>(b);
+			else if (b.type() == typeid(std::string))
+				os << boost::any_cast<std::string>(b).c_str();
 			os << "\n";
+
 		}
 
 	}

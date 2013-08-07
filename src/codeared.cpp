@@ -31,6 +31,11 @@ int main (int argc, char** argv) {
     // --------------------------------------------------------------------------
     using namespace codeare::service;
     MongooseService& mg = MongooseService::Instance();
+    for (size_t i = 1; i < argc; ++i) {
+    	std::stringstream key;
+    	key << "arg_" << i;
+    	wspace.p[key.str()] = argv[i];
+    }
 
     // --------------------------------------------------------------------------
     // Start CORBA server:
