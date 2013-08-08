@@ -71,23 +71,19 @@ public:
 		
 		m_M     = nk;
 		m_imgsz = 1;
+		m_m = m;
 		
-		for (size_t i = 0; i < 4; i++) {
-			m_N[i] = 1; m_n[i] = 1;
-		}
+		m_N = imsize.Container();
+		m_n = m_N;//ceil (alpha*m_N);
+
+		m_rank = numel(imsize);
 		
-		m_rank = numel (imsize);
-		
-		for (size_t i = 0; i < m_rank; i++) {
-			m_N[i]   = imsize[i];
-			m_n[i]   = ceil (m_N[i]*alpha);
-			m_imgsz *= m_N[i];
-		}
-		
+		m_imgsz = prod(m_N);
+
 		m_epsilon = eps;
 		m_maxit   = maxit;
 		
-		NFFTTraits<double>::Init (m_rank, m_N, m_M, m_n, m, m_fplan, m_iplan);
+		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
 		
         m_y = it((std::complex<double>*)m_iplan.y);
         m_f = it((std::complex<double>*)m_iplan.f_hat_iter);
@@ -104,18 +100,48 @@ public:
 	
 	
 	/**
+	 * @brief Copy conctructor
+	 */
+	NFFT (const NFFT<T>& ft) {
+		*this = ft;
+	}
+
+
+	/**
 	 * @brief        Clean up and destruct
 	 */ 
 	~NFFT () {
 		
-		if (m_initialised) {
-			
+		if (m_initialised)
 			NFFTTraits<double>::Finalize (m_fplan, m_iplan);
 
-		}
-		
 	}
 
+
+	/**
+	 * @brief 	Assignement
+	 */
+	inline NFFT<T>& operator= (const NFFT<T>& ft) {
+
+		m_initialised = ft.m_initialised;
+		m_have_pc = ft.m_have_pc;
+		m_rank = ft.m_rank;
+		m_pc = ft.m_pc;
+		m_cpc =ft.m_cpc;
+		m_N = ft.m_N;
+		m_n = ft.m_n;
+		m_M = ft.m_M;
+		m_maxit = ft.m_maxit;
+		m_epsilon = ft.m_epsilon;
+		m_imgsz = ft.m_imgsz;
+		m_m = ft.m_m;
+		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
+		m_prepared = ft.m_prepared;
+	    m_y = ft.m_y;
+	    m_f = ft.m_f;
+	    return *this;
+		
+	}
 
 	/**
 	 * @brief      Assign k-space 
@@ -195,7 +221,7 @@ public:
 	Matrix< std::complex<T> >
 	Adjoint     (const Matrix< std::complex<T> >& m) const {
 
-        Matrix< std::complex<T> > out (m_N[0], m_N[1], m_N[2], m_N[3]);
+        Matrix< std::complex<T> > out (m_N);
 		
 		if (sizeof(T) == sizeof(double))
 			memcpy (m_iplan.y, m.Memory(), m_M * sizeof ( std::complex<T> ));
@@ -252,10 +278,11 @@ private:
 	Matrix< std::complex<T> > m_pc;  /**< @brief Phase correction (applied after inverse trafo)*/
 	Matrix< std::complex<T> > m_cpc; /**< @brief Phase correction (applied before forward trafo)*/
 	
-	int       m_N[4];             /**< @brief Image matrix side length (incl. k_{\\omega})*/
-	int       m_n[4];             /**< @brief Oversampling */
-	int       m_M;                /**< @brief Number of k-space knots */
-	int       m_maxit;            /**< @brief Number of Recon iterations (NFFT 3) */
+	container<size_t> m_N;             /**< @brief Image matrix side length (incl. k_{\\omega})*/
+	container<size_t> m_n;             /**< @brief Oversampling */
+
+	size_t m_M;                /**< @brief Number of k-space knots */
+	size_t       m_maxit;            /**< @brief Number of Recon iterations (NFFT 3) */
 	T         m_epsilon;          /**< @brief Convergence criterium */
 	size_t    m_imgsz;
 	
@@ -267,6 +294,7 @@ private:
     it        m_y;
     it        m_f;
 
+    size_t m_m;
 
 };
 

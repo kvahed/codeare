@@ -48,7 +48,7 @@ fftshift (const Matrix<T>& m, const bool& fw = true) {
 			tmp[i] = 1;
 
 	container<size_t> d = tmp.Container(); // data side lengths
-	container<size_t> c = (floor(tmp/2)).Container(); // center coords
+	container<size_t> c = floor(tmp/2).Container(); // center coords
 
     Matrix<T> res (vsize(m));
 

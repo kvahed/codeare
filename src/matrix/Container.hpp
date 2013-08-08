@@ -13,6 +13,7 @@
 #include <string.h>
 #include <math.h>
 #include <algorithm>
+#include <numeric>
 #include <vector>
 
 #if defined (_MSC_VER) && _MSC_VER<1300
@@ -84,14 +85,21 @@ public:
 	inline const_iterator begin() const { return _data.begin(); }
 	inline const_iterator end() const { return _data.end(); }
 	inline void resize (const size_t n, const T val = T()) { assert(n>0); _data.resize(n,val); }
+	inline void push_back (const T& t) { _data.push_back(t);}
+	template <class S> container<S> operator() () {
+		container<S> cs (size());
+		std::copy(_data.begin(), _data.end(), cs.begin());
+	}
+	template<class S> container (const container<S>& cs) {
+		_data.resize(cs.size());
+		std::copy(cs.begin(), cs.end(), _data.begin());
+	}
 private:
 	VECTOR_TYPE(T) _data;
 };
 
-template<class T>
-inline T ct_real (const std::complex<T> ct) {return ct.real();};
-template<class T>
-inline T ct_imag (const std::complex<T> ct) {return ct.imag();};
+template<class T> inline T ct_real (const std::complex<T> ct) {return ct.real();};
+template<class T> inline T ct_imag (const std::complex<T> ct) {return ct.imag();};
 template<class T> inline static container<T>
 real (const container<std::complex<T> >& c) {
 	container<T> res (c.size());
@@ -111,5 +119,13 @@ operator<< (std::ostream& os, const container<T>& ct) {
         os << *it << " ";
     return os;
 }
+
+template<class T> inline static T multiply (const T a, const T b) {
+    return (a*b);
+}
+template<class T> inline static T prod (const container<T>& ct) {
+	return std::accumulate(ct.begin(), ct.end(), (T)1, multiply<T>);
+}
+
 
 #endif /* CONTAINER_HPP_ */

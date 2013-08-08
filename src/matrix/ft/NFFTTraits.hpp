@@ -23,6 +23,8 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include "Matrix.hpp"
+#include "Algos.hpp"
 #include "Complex.hpp"
 
 #include "nfft3util.h"
@@ -270,6 +272,38 @@ struct NFFTTraits<double> {
 	}
 
 
+	/**
+	 * @brief            Initialise plan
+	 *
+	 * @param  d         Number of dimension (i.e. {1..3})
+	 * @param  N         Actual dimensions
+	 * @param  M         Number of k-space samples
+	 * @param  n         Oversampled N
+	 * @param  m         Spatial cutoff
+	 * @param  np        Forward FT plan
+	 * @param  inp       Inverse FT plan
+	 *
+	 * @return success
+	 */
+	inline static int
+	Init  (const container<size_t>& N, const size_t& M, const container<size_t>& n, const size_t& m, Plan& np, Solver& inp) {
+		int _d (N.size());
+		container<int> _N(N);
+		container<int> _n(n);
+		int _M(M), _m(m);
+		nfft_init_guru
+			(&np, _d, &_N[0], _M, &_n[0], _m,
+			 PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
+			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
+
+		solver_init_advanced_complex
+			(&inp, (nfft_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
+
+		return 0;
+
+	}
+
+	//inline static int Init(container<long unsigned int>&, size_t&, container<long unsigned int>&, size_t&, NFFT<T>::Plan&, NFFT<T>::Solver&);
 
 	/**
 	 * @brief            Inverse FT

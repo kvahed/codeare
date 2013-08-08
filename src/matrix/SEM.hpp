@@ -26,24 +26,23 @@
  * @brief Right hand side operator E (i.e. forward transform) 
  *
  * @param  in      Image
- * @param  sm      Sensitivities 
+ * @param  sm      Sensitivities
+ * @param  nx      Sizes & co.
  * @param  fts     FT operators
  * @return         K-space 
  */
 template <class T> inline static Matrix< std::complex<T> >
 E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
-   const std::vector<size_t>& nx, std::vector<NFFT<T>*> fts) {
+   const std::vector<size_t>& nx, const std::vector<NFFT<T> >& fts) {
 
 	Matrix< std::complex<T> > out (nx[2],nx[1]);
 	
 #pragma omp parallel default (shared) 
 	{
 
-		NFFT<T>&  ft = *fts[omp_get_thread_num()];
-		
 #pragma omp for 
 		for (int j = 0; j < nx[1]; j++)
-			Column (out, j, ft * (((nx[0] == 2) ? Slice (sm, j) : Volume (sm, j)) * in));
+			Column (out, j, fts[omp_get_thread_num()] * (((nx[0] == 2) ? Slice (sm, j) : Volume (sm, j)) * in));
 		
 	}
 	
@@ -57,23 +56,22 @@ E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
  *
  * @param  in      K-space
  * @param  sm      Sensitivities 
+ * @param  nx      Sizes & co.
  * @param  fts     FT operators
  * @return         Image
  */
 template <class T> inline static Matrix< std::complex<T> >
 EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
-    const std::vector<size_t>& nx, std::vector<NFFT<T>*> fts) {
+    const std::vector<size_t>& nx, const std::vector<NFFT<T> >& fts) {
 
 	Matrix< std::complex<T> > out = zeros< std::complex<T> > (size(sm));
 
 #pragma omp parallel default (shared) 
 	{
 		
-		NFFT<T>&  ft = *fts[omp_get_thread_num()];
-		
 #pragma omp for
 		for (int j = 0; j < nx[1]; j++)
-			Slice (out, j, ft ->* Column (in,j) * conj(Slice (sm, j)));
+			Slice (out, j, fts[omp_get_thread_num()] ->* Column (in,j) * conj(Slice (sm, j)));
 
 	}
 

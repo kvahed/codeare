@@ -99,7 +99,7 @@ void Workspace::Print (std::ostream& os) const {
 		    os << "            bool |" << setw(8) << size(*boost::any_cast<boost::shared_ptr<Matrix<cbool> > >(b));
 	}
 
-    os << "\n\n\nParameters\n" ;
+    os << "\n\nParameters\n" ;
     os <<       "----------\n\n";
 
     os << p;

@@ -130,7 +130,7 @@ public:
 		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
 
 		for (size_t i = 0; i < m_np; i++) // FFTW planning not thread-safe
-			m_fts.push_back(new NFFT<T> (ms, m_nx[2], m, alpha, b0, m_pc, fteps, ftiter));
+			m_fts.push_back(NFFT<T> (ms, m_nx[2], m, alpha, b0, m_pc, fteps, ftiter));
 		
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
@@ -144,10 +144,10 @@ public:
 	 */ 
 	virtual ~NCSENSE () {
 		
-		if (m_initialised)
+		/*if (m_initialised)
 			for (size_t i = 0; i < m_np; i++)
 				delete m_fts[i];
-		
+		*/
 	}
 	
 	
@@ -161,7 +161,7 @@ public:
 		
 #pragma omp parallel 
 		{
-            m_fts[omp_get_thread_num()]->KSpace(k);
+            m_fts[omp_get_thread_num()].KSpace(k);
 		}
 		
 	}
@@ -177,7 +177,7 @@ public:
 		
 #pragma omp parallel 
 		{
-            m_fts[omp_get_thread_num()]->Weights(w);
+            m_fts[omp_get_thread_num()].Weights(w);
 		}
 		
 	}
@@ -262,8 +262,7 @@ public:
 			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
 			if (m_lambda)
 				q  += m_lambda * p;
-            ts  = creal(rn);
-            ts /= creal(p.dotc(q));
+            ts  = rn / creal(p.dotc(q));
 			x  += ts * p;
 			r  -= ts * q;
 			rno = rn;
@@ -271,7 +270,7 @@ public:
 			p  *= rn / rno;
 			p  += r;
             if (m_verbose)
-                vc.push_back (x * m_ic);
+                vc.push_back(x * m_ic);
 		}
 
         if (m_verbose) {
@@ -317,7 +316,7 @@ public:
 	
 private:
 
-    std::vector<NFFT<T>*> m_fts;         /**< Non-Cartesian FT operators (Multi-Core?) */
+    std::vector<NFFT<T> > m_fts;         /**< Non-Cartesian FT operators (Multi-Core?) */
 	bool      m_initialised; /**< All initialised? */
     bool      m_verbose;
 

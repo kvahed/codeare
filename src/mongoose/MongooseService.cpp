@@ -43,7 +43,7 @@ static void Serve () {
 
     struct mg_context *ctx;
     struct mg_callbacks callbacks;
-    const char *options[] = {"listening_ports", "8080", NULL};
+    const char *options[] = {"listening_ports", wspace.p.Get<char*>("http_port"), NULL};
 
     memset(&callbacks, 0, sizeof(callbacks));
     callbacks.begin_request = handler;

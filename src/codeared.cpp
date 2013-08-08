@@ -29,13 +29,14 @@ int main (int argc, char** argv) {
     // --------------------------------------------------------------------------
     // Start HTTP server:
     // --------------------------------------------------------------------------
-    using namespace codeare::service;
-    MongooseService& mg = MongooseService::Instance();
     for (size_t i = 1; i < argc; ++i) {
     	std::stringstream key;
     	key << "arg_" << i;
     	wspace.p[key.str()] = argv[i];
     }
+    wspace.p["http_port"] = port;
+    using namespace codeare::service;
+    MongooseService& mg = MongooseService::Instance();
 
     // --------------------------------------------------------------------------
     // Start CORBA server:

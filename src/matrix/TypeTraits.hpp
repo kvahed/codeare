@@ -208,6 +208,33 @@ template<> struct TypeTraits<long> {
     }
 };
 
+template<> struct TypeTraits<int> {
+	typedef long   T;
+	typedef long   RT;
+	typedef void   CT;
+	static const bool Supported;
+	inline static const std::string Name () {
+		return std::string("int");
+	}
+	inline static const std::type_info& Info () {
+		return typeid(T);
+	}
+	inline static const bool IsComplex() {
+		return (typeid(T) == typeid(CT));
+	}
+	inline static const bool IsReal() {
+		return (typeid(T) == typeid(RT));
+	}
+    inline static std::ostream& print (std::ostream& os, const T t) {
+#ifndef MSVC60
+        os << boost::format("%d") % t;
+#else
+        os << t;
+#endif
+        return os;
+    }
+};
+
 template<> struct TypeTraits<size_t> {
 	typedef size_t  T;
 	typedef size_t RT;
