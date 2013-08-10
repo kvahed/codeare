@@ -6,22 +6,12 @@
 Workspace* Workspace::m_inst = 0; 
 
 
-Workspace::Workspace() {
-    
-	bool f = false;
-	int  zero = 0;
-    
-	p["FFTWFThreads"] = zero;
-	p[ "FFTWThreads"] = zero;
-    
-}
+Workspace::Workspace() {}
 
 
 Workspace::~Workspace () { 
-    
 	Finalise();
 	m_inst = 0;
-    
 }
 
 

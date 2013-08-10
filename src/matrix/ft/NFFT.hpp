@@ -37,6 +37,7 @@ class NFFT : public FT<T> {
 	typedef typename NFFTTraits<double>::Plan   Plan;
 	typedef typename NFFTTraits<double>::Solver Solver;
     typedef typename std::vector<std::complex<double> >::iterator it;
+    typedef typename std::complex<T> CT;
 	
 public:
 
@@ -50,7 +51,8 @@ public:
 		m_M (0),
 		m_maxit (0),
 		m_prepared (false),
-		m_rank (0) {};
+		m_rank (0),
+		m_m(0) {};
 
 	/**
 	 * @brief          Construct NFFT plans for forward and backward FT with credentials
@@ -124,21 +126,21 @@ public:
 	inline NFFT<T>& operator= (const NFFT<T>& ft) {
 
 		m_initialised = ft.m_initialised;
-		m_have_pc = ft.m_have_pc;
-		m_rank = ft.m_rank;
-		m_pc = ft.m_pc;
-		m_cpc =ft.m_cpc;
-		m_N = ft.m_N;
-		m_n = ft.m_n;
-		m_M = ft.m_M;
-		m_maxit = ft.m_maxit;
-		m_epsilon = ft.m_epsilon;
-		m_imgsz = ft.m_imgsz;
-		m_m = ft.m_m;
+		m_have_pc     = ft.m_have_pc;
+		m_rank        = ft.m_rank;
+		m_pc          = ft.m_pc;
+		m_cpc         = ft.m_cpc;
+		m_N           = ft.m_N;
+		m_n           = ft.m_n;
+		m_M           = ft.m_M;
+		m_maxit       = ft.m_maxit;
+		m_epsilon     = ft.m_epsilon;
+		m_imgsz       = ft.m_imgsz;
+		m_m           = ft.m_m;
 		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
-		m_prepared = ft.m_prepared;
-	    m_y = ft.m_y;
-	    m_f = ft.m_f;
+		m_prepared    = ft.m_prepared;
+	    m_y           = ft.m_y;
+	    m_f           = ft.m_f;
 	    return *this;
 		
 	}
@@ -151,10 +153,13 @@ public:
 	inline void 
 	KSpace (const Matrix<T>& k) {
 		
+		size_t cpsz = k.Size();
+		assert (cpsz = m_fplan.M_total * m_rank);
+
 		if (sizeof(T) == sizeof(double))
-			memcpy (m_fplan.x, k.Memory(), m_fplan.M_total * m_rank * sizeof(double));
+			memcpy (m_fplan.x, k.Memory(), cpsz * sizeof(double));
 		else 
-			for (size_t i = 0; i < m_fplan.M_total * m_rank; i++)
+			for (size_t i = 0; i < cpsz; ++i)
 				m_fplan.x[i] = k[i];
 		
 	}
@@ -168,10 +173,13 @@ public:
 	inline void 
 	Weights (const Matrix<T>& w) {
 		
+		size_t cpsz = w.Size();
+		assert (cpsz = m_fplan.M_total);
+
 		if (sizeof(T) == sizeof(double))
-			memcpy (m_iplan.w, w.Memory(), m_fplan.M_total * sizeof(double));
+			memcpy (m_iplan.w, w.Memory(), cpsz * sizeof(double));
 		else 
-			for (size_t i = 0; i < m_fplan.M_total; i++)
+			for (size_t i = 0; i < cpsz; ++i)
 				m_iplan.w[i] = w[i];
 		
 		NFFTTraits<double>::Weights (m_fplan, m_iplan);
@@ -194,7 +202,7 @@ public:
 		if (sizeof(T) == sizeof(double))
 			memcpy (m_fplan.f_hat, m.Memory(), m_imgsz * sizeof (std::complex<T>));
 		else 
-			for (size_t i = 0; i < m_imgsz; i++) {
+			for (size_t i = 0; i < m_imgsz; ++i) {
 				m_fplan.f_hat[i][0] = creal(m[i]);
 				m_fplan.f_hat[i][1] = cimag(m[i]);
 			}
@@ -204,7 +212,7 @@ public:
 		if (sizeof(T) == sizeof(double))
 			memcpy (&out[0], m_fplan.f, m_M * sizeof (std::complex<T>));
 		else 
-			for (size_t i = 0; i < m_M; i++)
+			for (size_t i = 0; i < m_M; ++i)
 				out[i] = std::complex<T>(m_fplan.f[i][0],m_fplan.f[i][1]);
 		
 		return out;
@@ -226,7 +234,7 @@ public:
 		if (sizeof(T) == sizeof(double))
 			memcpy (m_iplan.y, m.Memory(), m_M * sizeof ( std::complex<T> ));
 		else 
-			for (size_t i = 0; i < m_M; i++) {
+			for (size_t i = 0; i < m_M; ++i) {
 				m_iplan.y[i][0] = creal(m[i]);
 				m_iplan.y[i][1] = cimag(m[i]);
 			}
@@ -236,7 +244,7 @@ public:
 		if (sizeof(T) == sizeof(double))
 			memcpy (&out[0], m_iplan.f_hat_iter, m_imgsz*sizeof ( std::complex<T> ));
 		else 
-			for (size_t i = 0; i < m_imgsz; i++)
+			for (size_t i = 0; i < m_imgsz; ++i)
 				out[i] = std::complex<T>(m_iplan.f_hat_iter[i][0],m_iplan.f_hat_iter[i][1]);
 		
 		return out;
@@ -270,31 +278,31 @@ public:
 	
 private:
 	
-	bool      m_initialised;      /**< @brief Memory allocated / Plans, well, planned! :)*/
-	bool      m_have_pc;
+	bool       m_initialised;   /**< @brief Memory allocated / Plans, well, planned! :)*/
+	bool       m_have_pc;
 
-	size_t    m_rank;
+	size_t     m_rank;
 
-	Matrix< std::complex<T> > m_pc;  /**< @brief Phase correction (applied after inverse trafo)*/
-	Matrix< std::complex<T> > m_cpc; /**< @brief Phase correction (applied before forward trafo)*/
+	Matrix<CT> m_pc;            /**< @brief Phase correction (applied after inverse trafo)*/
+	Matrix<CT> m_cpc;           /**< @brief Phase correction (applied before forward trafo)*/
 	
-	container<size_t> m_N;             /**< @brief Image matrix side length (incl. k_{\\omega})*/
-	container<size_t> m_n;             /**< @brief Oversampling */
+	container<size_t> m_N;      /**< @brief Image matrix side length (incl. k_{\\omega})*/
+	container<size_t> m_n;      /**< @brief Oversampling */
 
-	size_t m_M;                /**< @brief Number of k-space knots */
-	size_t       m_maxit;            /**< @brief Number of Recon iterations (NFFT 3) */
-	T         m_epsilon;          /**< @brief Convergence criterium */
-	size_t    m_imgsz;
+	size_t     m_M;             /**< @brief Number of k-space knots */
+	size_t     m_maxit;         /**< @brief Number of Recon iterations (NFFT 3) */
+	T          m_epsilon;       /**< @brief Convergence criterium */
+	size_t     m_imgsz;
 	
-	Plan      m_fplan;            /**< nfft  plan */
-	Solver    m_iplan;            /**< infft plan */
+	Plan       m_fplan;         /**< nfft  plan */
+	Solver     m_iplan;         /**< infft plan */
 	
-	bool      m_prepared;
+	bool       m_prepared;
 
-    it        m_y;
-    it        m_f;
+    it         m_y;
+    it         m_f;
 
-    size_t m_m;
+    size_t     m_m;
 
 };
 

@@ -103,7 +103,7 @@ public:
 			ms[i] = size(m_sm,i);
 
         container<size_t> sizesm = vsize(m_sm);
-        m_nx.push_back(sizesm.back()); // NC
+        m_nx.push_back(sizesm.back());             // NC
         m_nx.push_back(numel(ws.Get<T>(m_wname))); // NK
         m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, c_multiply<size_t>)/m_nx[1]); //NR
 
@@ -144,13 +144,14 @@ public:
 	 */ 
 	virtual ~NCSENSE () {
 		
-		/*if (m_initialised)
-			for (size_t i = 0; i < m_np; i++)
-				delete m_fts[i];
-		*/
+		do {
+			m_fts.pop_back();
+		} while (m_fts.size());
+
 	}
 	
 	
+
 	/**
 	 * @brief      Assign k-space trajectory
 	 * 
@@ -281,6 +282,7 @@ public:
                 std::copy (vc[i].Begin(), vc[i].End(), ti);
                 ti += cpsz;
             }
+            vc.clear();
         } else
             x *= m_ic;
 
@@ -317,11 +319,11 @@ public:
 private:
 
     std::vector<NFFT<T> > m_fts;         /**< Non-Cartesian FT operators (Multi-Core?) */
-	bool      m_initialised; /**< All initialised? */
-    bool      m_verbose;
+	bool       m_initialised; /**< All initialised? */
+    bool       m_verbose;
 
 	Matrix<CT> m_sm;          /**< Sensitivities */
-	Matrix<T> m_ic;     /**< Intensity correction I(r) */
+	Matrix<T>  m_ic;     /**< Intensity correction I(r) */
 	Matrix<CT> m_pc; /**< @brief Correction phase */
 
 	std::string m_smname;
@@ -329,11 +331,11 @@ private:
 
     std::vector<size_t> m_nx;
     
-	size_t    m_cgiter;         /**< Max # CG iterations */
-	double    m_cgeps;          /**< Convergence limit */
-	double    m_lambda;         /**< Tikhonov weight */
+	size_t     m_cgiter;         /**< Max # CG iterations */
+	double     m_cgeps;          /**< Convergence limit */
+	double     m_lambda;         /**< Tikhonov weight */
 	
-	int       m_np;
+	int        m_np;
 
 };
 

@@ -37,7 +37,7 @@ SENSE::Prepare () {
 	p.Set("nthreads", m_nthreads);
 	p.Set("lambda",   m_lambda);
 
-	m_cs = new CSENSE<float> (p);
+	m_cs = CSENSE<float> (p);
 
 	printf ("... done.\n\n");
 
@@ -53,9 +53,8 @@ SENSE::Process () {
 
     Matrix<cxfl>& out = Get<cxfl>("image");
     Matrix<cxfl>& in = Get<cxfl>("fimgs");
-    CSENSE<float>& sense = *m_cs;
 
-    out = sense ->* in;
+    out = m_cs ->* in;
     
 	return OK;
 
@@ -65,7 +64,7 @@ SENSE::Process () {
 error_code
 SENSE::Finalise () { 
 
-	delete m_cs;
+	//delete m_cs;
 
 	return OK;
 

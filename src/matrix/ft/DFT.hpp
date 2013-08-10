@@ -169,7 +169,7 @@ public:
 	 * @param  pc    Phase correction (or target phase)
 	 * @param  b0    Field distortion
 	 */
-	DFT         (const Matrix<size_t>& sl,
+	explicit DFT         (const Matrix<size_t>& sl,
 				 const Matrix<T>& mask = Matrix<T>(1),
 				 const Matrix<CT>& pc = Matrix<CT>(1),
 				 const Matrix<T>& b0 = Matrix<T>(1)) :
@@ -177,23 +177,20 @@ public:
 
 		size_t rank = numel(sl);
 
-		std::vector<int> n (rank);
+		container<int> n (rank);
 		
 		if (numel(mask) > 1) {
-			m_have_mask = true;
-			m_mask      = mask;
+			m_have_mask = true;	m_mask = mask;
 		}
 		
 		if (numel(pc)   > 1) {
-			m_have_pc   = true;
-			m_pc        = pc;
-			m_cpc       = conj(pc);
+			m_have_pc = true; m_pc = pc; m_cpc = conj(pc);
 		}
 		
-		for (int i = 0; i < rank; i++) {
+		for (int i = 0; i < rank; i++)
 			n[i]  = (int) sl [rank-1-i];
-			m_N  *= n[i];
-		}
+
+		m_N = std::accumulate(n.begin(), n.end(), 1, std::multiplies<int>());
 
 		Matrix<size_t> tmp = resize(sl,3,1);
 		for (size_t i = 0; i < 3; ++i)
@@ -202,13 +199,50 @@ public:
 		d = tmp.Container(); // data side lengths
 		c = (floor(tmp/2)).Container(); // center coords
 
-		Allocate (rank, &n[0]);
-		
+ 		Allocate (rank, &n[0]);
+
 		m_initialised = true;
 
 	}
 
+
+	DFT (const DFT<T>& ft) {
+		*this = ft;
+	}
+
 	
+	DFT<T>& operator= (const DFT<T>& ft) {
+
+		m_mask = ft.m_mask;
+
+		m_pc = ft.m_pc;
+		m_cpc = ft.m_cpc;
+
+
+		m_N = ft.m_N;
+		m_cs = ft.m_cs;
+
+		m_sn = ft.m_sn;
+
+		m_have_mask=ft.m_have_mask;
+		m_have_pc=ft.m_have_pc;
+		m_zpad=ft.m_zpad;
+
+		m_in=ft.m_in;
+		d=ft.d;
+		c=ft.c;
+
+		container<int> n (d);
+		std::reverse(n.begin(),n.end());
+		int rank = d.size();
+
+		Allocate (rank, &n[0]);
+
+		m_initialised = ft.m_initialised;
+		return *this;
+
+	}
+
 	/**
 	 * @brief        Construct FFTW plans for forward and backward FT with credentials for FT with identical side lengths
 	 * 
@@ -218,9 +252,8 @@ public:
 	 * @param  pc    Phase correction (or target phase)
 	 * @param  b0    Static field distortion
 	 */
-	DFT         (const size_t rank, const size_t sl, const Matrix<T>& mask = Matrix<T>(1),
-				 const Matrix<CT>& pc = Matrix<CT>(1),
-				 const Matrix<T>& b0 = Matrix<T>(1)) :
+	DFT         (const size_t rank, const size_t sl, const Matrix<T>& mask = Matrix<T>(),
+				 const Matrix<CT>& pc = Matrix<CT>(), const Matrix<T>& b0 = Matrix<T>()) :
 		m_have_mask (false), m_have_pc (false) {
 
 		std::vector<int> n (rank);
@@ -278,11 +311,8 @@ public:
 
 		FTTraits<T>::Destroy (m_fwplan);
 		FTTraits<T>::Destroy (m_bwplan);
+		//FTTraits<T>::CleanUp();
 		
-		FTTraits<T>::CleanUp();
-		
-		FTTraits<T>::Free (m_in);
-
 	}
 	
 	
@@ -403,10 +433,10 @@ private:
 	inline void
 	Allocate (const int rank, const int* n) {
 		
-		m_in     = FTTraits<T>::Malloc  (m_N);
+		m_in     = container<CT> (m_N);
 
-		m_fwplan = FTTraits<T>::DFTPlan (rank, n, m_in, m_in, FFTW_FORWARD,  FFTW_MEASURE);
-		m_bwplan = FTTraits<T>::DFTPlan (rank, n, m_in, m_in, FFTW_BACKWARD, FFTW_MEASURE);
+		m_fwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0], FFTW_FORWARD,  FFTW_MEASURE);
+		m_bwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0], FFTW_BACKWARD, FFTW_MEASURE);
 
 		m_cs     = m_N * sizeof(Type);
 		m_sn     = sqrt (m_N);
@@ -433,10 +463,12 @@ private:
 	bool       m_have_pc;      /**< @brief Apply phase correction?*/
 	bool       m_zpad;         /**< @brief Zero padding? (!!!NOT OPERATIONAL YET!!!)*/
 	
-	Type*      m_in;           /**< @brief Aligned fftw input*/
+	container<CT> m_in;           /**< @brief Aligned fftw input*/
 
 	container<size_t> d;
 	container<size_t> c;
+
+	//Type*      m_in;           /**< @brief Aligned fftw input*/
 
 	
 };

@@ -37,14 +37,12 @@
     #define nfftf_mv_plan_complex mv_plan_complex
 #endif
 
-template <class T>
-struct NFFTTraits { };
+template <class T> struct NFFTTraits { };
 
 
 #ifdef USE_NFFT_32_NAMING
 
-template <>
-struct NFFTTraits<float> {
+template <> struct NFFTTraits<float> {
 
 	typedef nfftf_plan           Plan;    /**< @brief nfft plan (float precision) */
 	typedef solverf_plan_complex Solver;  /**< @brief nfft solver plan (float precision) */
@@ -63,7 +61,8 @@ struct NFFTTraits<float> {
 	 * @return success
 	 */
 	inline static int
-	Init  (const int d, int* N, const int M, int* n, const int m, nfftf_plan& np, solverf_plan_complex& inp) {
+	Init  (const int d, int* N, const int M, int* n,
+			const int m, Plan& np, Solver& inp) {
 		
 		nfftf_init_guru 
 			(&np, d, N, M, n, m,
@@ -80,6 +79,30 @@ struct NFFTTraits<float> {
 
 
 	/**
+	 * @brief            Initialise plan
+	 *
+	 * @param  d         Number of dimension (i.e. {1..3})
+	 * @param  N         Actual dimensions
+	 * @param  M         Number of k-space samples
+	 * @param  n         Oversampled N
+	 * @param  m         Spatial cutoff
+	 * @param  np        Forward FT plan
+	 * @param  inp       Inverse FT plan
+	 *
+	 * @return success
+	 */
+	inline static int
+	Init  (const container<size_t>& N, const size_t& M, const container<size_t>& n,
+			const size_t& m, Plan& np, Solver& inp) {
+
+		container<int> _N(N), _n(n);
+		int _d (N.size()), _M(M), _m(m);
+
+		return Init (_d, &_N[0], _M, &_n[0], _m, np, inp);
+
+	}
+
+	/**
 	 * @brief            Inverse FT
 	 * 
 	 * @param  np        NFFT plan
@@ -90,7 +113,8 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	ITrafo              (nfftf_plan& np, solverf_plan_complex& spc, const int maxiter = 3, const double epsilon = 3e-7) {
+	ITrafo              (Plan& np, Solver& spc,
+			const int maxiter = 3, const double epsilon = 3e-7) {
 		
 		int k, l;
 		
@@ -123,9 +147,9 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Trafo                (const nfftf_plan& np) {
+	Trafo                (const Plan& np) {
 		
-		nfftf_trafo ((nfftf_plan*) &np);
+		nfftf_trafo ((Plan*) &np);
 		return 0;
 		
 	}
@@ -140,9 +164,9 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Adjoint              (const nfftf_plan& np) {
+	Adjoint              (const Plan& np) {
 		
-		nfftf_adjoint ((nfftf_plan*) &np);
+		nfftf_adjoint ((Plan*) &np);
 		return 0;
 		
 	}
@@ -156,7 +180,7 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Weights              (const nfftf_plan& np, const solverf_plan_complex& spc) {
+	Weights              (const Plan& np, const Solver& spc) {
 		
 		int j, k, z, N = np.N[0];
 		
@@ -198,7 +222,7 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Psi                  (nfftf_plan& np) {
+	Psi                  (Plan& np) {
 		
 		/* precompute full psi */
 		if(np.nfft_flags & PRE_PSI)
@@ -222,7 +246,7 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Finalize             (nfftf_plan& np, solverf_plan_complex& spc) {
+	Finalize             (Plan& np, Solver& spc) {
 		
 		solverf_finalize_complex(&spc);
 		nfftf_finalize(&np);
@@ -237,8 +261,7 @@ struct NFFTTraits<float> {
 #endif
 
 
-template <>
-struct NFFTTraits<double> {
+template <> struct NFFTTraits<double> {
 
 	typedef nfft_plan           Plan;    /**< @brief nfft plan (float precision) */
 	typedef solver_plan_complex Solver;  /**< @brief nfft solver plan (float precision) */
@@ -257,7 +280,8 @@ struct NFFTTraits<double> {
 	 * @return success
 	 */
 	inline static int
-	Init  (const int d, int* N, const int M, int* n, const int m, nfft_plan& np, solver_plan_complex& inp) {
+	Init  (const int d, int* N, const int M, int* n, const int m,
+			Plan& np, Solver& inp) {
 		
 		nfft_init_guru 
 			(&np, d, N, M, n, m,
@@ -286,24 +310,16 @@ struct NFFTTraits<double> {
 	 * @return success
 	 */
 	inline static int
-	Init  (const container<size_t>& N, const size_t& M, const container<size_t>& n, const size_t& m, Plan& np, Solver& inp) {
-		int _d (N.size());
-		container<int> _N(N);
-		container<int> _n(n);
-		int _M(M), _m(m);
-		nfft_init_guru
-			(&np, _d, &_N[0], _M, &_n[0], _m,
-			 PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
-			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
+	Init  (const container<size_t>& N, const size_t& M, const container<size_t>& n,
+			const size_t& m, Plan& np, Solver& inp) {
 
-		solver_init_advanced_complex
-			(&inp, (nfft_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
+		container<int> _N(N), _n(n);
+		int _d (N.size()), _M(M), _m(m);
 
-		return 0;
+		return Init (_d, &_N[0], _M, &_n[0], _m, np, inp);
 
 	}
 
-	//inline static int Init(container<long unsigned int>&, size_t&, container<long unsigned int>&, size_t&, NFFT<T>::Plan&, NFFT<T>::Solver&);
 
 	/**
 	 * @brief            Inverse FT
@@ -316,7 +332,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	ITrafo              (nfft_plan& np, solver_plan_complex& spc, const int maxiter = 3, const double epsilon = 3e-7) {
+	ITrafo              (Plan& np, Solver& spc, const int maxiter = 3, const double epsilon = 3e-7) {
 		
 		int k, l;
 		
@@ -349,9 +365,9 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Trafo                (const nfft_plan& np) {
+	Trafo                (const Plan& np) {
 		
-		nfft_trafo ((nfft_plan*) &np);
+		nfft_trafo ((Plan*) &np);
 		return 0;
 		
 	}
@@ -366,9 +382,9 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Adjoint              (const nfft_plan& np) {
+	Adjoint              (const Plan& np) {
 		
-		nfft_adjoint ((nfft_plan*) &np);
+		nfft_adjoint ((Plan*) &np);
 		return 0;
 		
 	}
@@ -382,7 +398,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Weights              (const nfft_plan& np, const solver_plan_complex& spc) {
+	Weights              (const Plan& np, const Solver& spc) {
 		
 		int j, k, z, N = np.N[0];
 		
@@ -424,7 +440,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Psi                  (nfft_plan& np) {
+	Psi                  (Plan& np) {
 		
 		/* precompute full psi */
 		if(np.nfft_flags & PRE_PSI)
@@ -448,7 +464,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Finalize             (nfft_plan& np, solver_plan_complex& spc) {
+	Finalize             (Plan& np, Solver& spc) {
 		
 		solver_finalize_complex(&spc);
 		nfft_finalize(&np);

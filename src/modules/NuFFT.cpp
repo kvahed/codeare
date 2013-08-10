@@ -29,7 +29,7 @@ using namespace RRStrategy;
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
 
-NuFFT::NuFFT () : nfft(0) {
+NuFFT::NuFFT () {
 
 }
 
@@ -92,9 +92,7 @@ NuFFT::Init () {
 	for (size_t i = 0; i < (size_t)dim; i++)
 		ms[i] = N[i];
 
-	nfft = new NFFT<float> (ms, M * shots, m, alpha);
-
-	AddMatrix<cxdb> ("img");
+	ft = NFFT<float> (ms, M * shots, m, alpha);
 
 	m_initialised = true;
 
@@ -107,8 +105,8 @@ NuFFT::Prepare () {
 
 	error_code error = OK;
 
-	nfft->KSpace  (Get<double> ("kspace"));
-	nfft->Weights (Get<double> ("weights"));
+	ft.KSpace  (Get<double> ("kspace"));
+	ft.Weights (Get<double> ("weights"));
 
 	clear (kspace);
 	clear (weights);
@@ -123,10 +121,8 @@ NuFFT::Process () {
 
     SimpleTimer st ("SENSE");
 
-    Matrix<cxdb>& out = Get<cxdb> ("img");
-    Matrix<cxdb>& in = Get<cxdb> ("data");
-
-    out = *nfft ->* in;
+    Matrix<cxdb> img =  ft ->* Get<cxdb> ("data");
+    wspace.Add ("img", img);
 
 	clear (data);
 	

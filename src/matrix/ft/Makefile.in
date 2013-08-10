@@ -105,9 +105,11 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libcodeare_ft_la_LIBADD =
 am__libcodeare_ft_la_SOURCES_DIST = DFT.hpp DFT.cpp CSENSE.hpp \
-	CSENSE.cpp NFFT.hpp NFFT.cpp NCSENSE.hpp NCSENSE.cpp
+	CSENSE.cpp CGRAPPA.cpp CGRAPPA.hpp NFFT.hpp NFFT.cpp \
+	NCSENSE.hpp NCSENSE.cpp
 @USE_NFFT3_TRUE@am__objects_1 = NFFT.lo NCSENSE.lo
-am_libcodeare_ft_la_OBJECTS = DFT.lo CSENSE.lo $(am__objects_1)
+am_libcodeare_ft_la_OBJECTS = DFT.lo CSENSE.lo CGRAPPA.lo \
+	$(am__objects_1)
 libcodeare_ft_la_OBJECTS = $(am_libcodeare_ft_la_OBJECTS)
 libcodeare_ft_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -339,7 +341,7 @@ SUBDIRS = tests
 AM_CPPFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/matrix/arithmetic -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/tinyxml
 lib_LTLIBRARIES = libcodeare-ft.la
 libcodeare_ft_la_SOURCES = DFT.hpp DFT.cpp CSENSE.hpp CSENSE.cpp \
-	$(am__append_1)
+	CGRAPPA.cpp CGRAPPA.hpp $(am__append_1)
 libcodeare_ft_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
 include_HEADERS = codeare-ft.h
 all: all-recursive
@@ -419,6 +421,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CGRAPPA.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CSENSE.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DFT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NCSENSE.Plo@am__quote@

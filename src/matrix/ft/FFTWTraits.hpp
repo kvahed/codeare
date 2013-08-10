@@ -57,11 +57,10 @@ struct FTTraits<float> {
 	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {
 		InitThreads();
 		return fftwf_plan_dft (rank, n, in, out, sign, flags);
-
 	}
 	
 
-		/**
+	/**
 	 * @brief         Initialise FFTWF threads (Should only be done once)
 	 *
 	 * @return        Success
@@ -69,22 +68,20 @@ struct FTTraits<float> {
 	static inline bool
 	InitThreads () {
 
-		Workspace& ws = Workspace::Instance();
-		int nt = boost::any_cast<int>(ws.p["FFTWFThreads"]);
-
-		if (nt)
+		if (wspace.p.exists("FFTWThreads"))
 			return true;
+
+		int nt;
 
 #pragma omp parallel
 		{
 			nt = omp_get_num_threads();
-			omp_set_dynamic(false);
 		}		
 
 #ifdef HAVE_FFTWF_THREADS
 		if (fftwf_init_threads()) {
 			fftwf_plan_with_nthreads (nt);
-			ws.PSet("FFTWFThreads", nt);
+			wspace.p["FFTWThreads"] = nt;
 		}
 #endif
 
@@ -133,7 +130,7 @@ struct FTTraits<float> {
 	 * @param  p     Plan to be destroyed
 	 */
 	static inline void 
-	Destroy (Plan p) { 
+	Destroy (Plan p) {
 		fftwf_destroy_plan (p); 
 	}
 	
@@ -144,7 +141,7 @@ struct FTTraits<float> {
 	 * @param  p     Plan to be executed
 	 */
 	static inline void 
-	Execute (Plan p) { 
+	Execute (Plan p) {
 		fftwf_execute (p); 
 	}        
 	
@@ -198,25 +195,22 @@ struct FTTraits<double> {
 	static inline bool
 	InitThreads () {
 
-		Workspace& ws = Workspace::Instance();
-		int nt = boost::any_cast<int>(ws.p["FFTWThreads"]);
-
-		if (nt > 0)
+		if (wspace.p.exists("FFTWThreads"))
 			return true;
+
+		int nt;
 
 #pragma omp parallel
 		{
 			nt = omp_get_num_threads();
 		}		
 
-
 #ifdef HAVE_FFTWF_THREADS
 		if (fftw_init_threads()) {
 			fftw_plan_with_nthreads (nt);
-			ws.PSet("FFTWThreads", nt);
+			wspace.p["FFTWThreads"] = nt;
 		}
 #endif
-
 
 		return true;
 		
@@ -264,7 +258,7 @@ struct FTTraits<double> {
 	 * @param   p    Plan to be destroyed
 	 */
 	static inline void 
-	Destroy (Plan p) { 
+	Destroy (Plan p) {
 		fftw_destroy_plan (p); 
 	}
 
@@ -275,7 +269,7 @@ struct FTTraits<double> {
 	 * @param  p    Plan to be executed
 	 */
 	static inline void
-	Execute (Plan p) { 
+	Execute (Plan p) {
 		fftw_execute (p); 
 	}        
 

@@ -47,7 +47,7 @@ public:
 	/**
 	 * @brief          Default constructor
 	 */
-	CSENSE() : m_dft(0), nthreads(1), compgfm(0), aaf(1), nc(1), initialised(0), ndim(1) {}
+	CSENSE() :  nthreads(1), compgfm(0), aaf(1), nc(1), initialised(0), ndim(1) {}
 
 
 	/**
@@ -56,7 +56,7 @@ public:
 	 * @param  params  Configuration parameters
 	 */
 	CSENSE        (const Params& params) :
-		FT<T>::FT(params), m_dft(0), nthreads (1), treg(0.), compgfm(1) {
+		FT<T>::FT(params), nthreads (1), treg(0.), compgfm(1) {
 
 		Workspace& w = Workspace::Instance();
 
@@ -105,11 +105,6 @@ public:
 	virtual
 	~CSENSE            () {
 
-		if (initialised)
-			for (int i = 0; i < nthreads; i++)
-				if (m_dft[i] != 0)
-					delete m_dft[i];
-
 	}
 
 
@@ -137,7 +132,7 @@ public:
 			Matrix<CT> rp (aaf,   1);
 			Matrix<CT> gf (aaf,   1);
 			
-			DFT<T>& ft = *(m_dft[tid]);
+			const DFT<T>& ft = m_dft[tid];
 
 #pragma omp for
 			
@@ -249,26 +244,20 @@ private:
 	inline void
 	AllocateDFTs (const Params& params) {
 
-		nthreads = params.Get<unsigned short>("nthreads");
+		if (params.exists("nthreads"))
+			nthreads = params.Get<unsigned short>("nthreads");
 
 		if (nthreads == 1)
-			#pragma omp parallel default (shared)
+#pragma omp parallel default (shared)
 			{
 				nthreads = omp_get_num_threads ();
 			}
 
 		printf ("  allocating %d %zu-dim ffts ... ", nthreads, ndim);
 		fflush (stdout);
-		if (params.exists("nthreads"))
-			nthreads = params.Get<unsigned short>("nthreads");
 
-		m_dft = std::vector<DFT<T>*> (nthreads,(DFT<T>*)0);
-
-		for (size_t i = 0; i < nthreads; i++)
-			m_dft[i] = new DFT<T> (dims/*,
-				w.Get<T>(params.Get<std::string>("mask_name")),
-				w.Get<T>(params.Get<std::string>(  "pc_name")),
-				w.Get<T>(params.Get<std::string>(  "b0_name"))*/);
+		for (size_t i = 0; i < nthreads; ++i)
+			m_dft.push_back(DFT<T>(dims));
 
 		std::cout << "done\n";
 
@@ -292,7 +281,7 @@ private:
 	}
 
 
-	std::vector<DFT<T>*> m_dft;
+	std::vector<DFT<T> > m_dft;
 	Matrix <CT>          sens;
 	Matrix <size_t>      dims;
 	int                  nthreads;

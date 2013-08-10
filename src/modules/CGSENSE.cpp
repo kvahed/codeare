@@ -38,20 +38,13 @@ using namespace RRStrategy;
 
 
 CGSENSE::~CGSENSE () {
-
 	this->Finalise();
-
 }
 
 
 error_code 
 CGSENSE::Finalise () {
-
-	if (m_initialised)
-		delete m_ncs;
-
 	return OK;
-
 }
 
 
@@ -138,10 +131,10 @@ CGSENSE::Prepare () {
     cgp["lambda"]       = m_lambda;
     cgp["np"]           = m_nthreads;
 
-	m_ncs = new NCSENSE<float>(cgp);
+	m_ncs = NCSENSE<float>(cgp);
 
-	m_ncs->KSpace (Get<float>("kspace"));
-	m_ncs->Weights (Get<float>("weights"));
+	m_ncs.KSpace (Get<float>("kspace"));
+	m_ncs.Weights (Get<float>("weights"));
 	
 	Free ("weights");
 	Free ("kspace");
@@ -161,12 +154,12 @@ CGSENSE::Process () {
     Matrix<cxfl> data;
 
     data = (!m_testcase) ? Get<cxfl>("data") : 
-        m_ncs->Trafo (phantom<cxfl>(size(sens,0)), sens);
+        m_ncs.Trafo (phantom<cxfl>(size(sens,0)), sens);
     if (m_noise)
         data += m_noise * randn<cxfl>(size(data));
 
     SimpleTimer st("CGSENSE");
-    Matrix<cxfl> img = *m_ncs ->* data;
+    Matrix<cxfl> img = m_ncs ->* data;
     st.Stop();
     
     wspace.Add("image", img);

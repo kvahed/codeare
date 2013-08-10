@@ -44,7 +44,6 @@ public:
 	 * @brief          Default constructor
 	 */
 	CGRAPPA           () {
-		m_dft = 0;
 		m_af  = 1;
 		m_nc  = 1;
 	}
@@ -53,7 +52,7 @@ public:
 	/**
 	 * @brief Construct with parameters
 	 */
-	CGRAPPA (const Params& p) : m_nc(1), m_dft(0) {
+	CGRAPPA (const Params& p) : m_nc(1) {
 
 		Workspace& ws = Workspace::Instance();
 		printf ("Initialising GRAPPA operator ...\n");
@@ -173,7 +172,7 @@ private:
 	Matrix<size_t>       m_af;      /**< @brief Acceleration factors */
 	Matrix<size_t>       m_sdims;   /**< @brief Scan dimensions */
 
-	std::vector<DFT<T>*> m_dft;     /**< @brief DFT operator      */
+	std::vector<DFT<T> > m_dft;     /**< @brief DFT operator      */
 
 	size_t               m_nc;      /**< @brief Number of receive channels */
 

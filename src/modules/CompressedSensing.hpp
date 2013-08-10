@@ -358,13 +358,13 @@ namespace RRStrategy {
                     
             // CG computation 
             g1  =  Gradient (x, wx, data, cgp);
-            bk  =  creal(g1.dotc(g1) / g0.dotc(g0));
+            bk  =  creal(g1.dotc(g1)) / creal(g0.dotc(g0));
             g0  =  g1;
             dx  = -g1 + dx * bk;
             
             wdx = dwt->*dx;
             
-            float dxn = creal(norm(dx))/xn;
+            float dxn = norm(dx)/xn;
             printf ("dxnrm: %0.4f\n", dxn);
             if (dxn < cgp.cgconv) 
                 break;
