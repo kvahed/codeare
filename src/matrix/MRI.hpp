@@ -36,11 +36,9 @@ IntensityMap (const Matrix< std::complex <T> >& sens, bool sqroot = true) {
 template <class T> inline static Matrix<T>
 PhaseCombine (const Matrix<T>& A, const Matrix<T>& B = Matrix<T>(), const Matrix<T>& NoiseCov = Matrix<T>()) {
     
-    if (numel(B) == 1) {
+    if (numel(B) == 1)
         Matrix<size_t> pm;
-    }
         
-
 }
 
 
