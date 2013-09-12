@@ -11,7 +11,18 @@
 typedef std::complex<float>  cxfl;
 typedef std::complex<double> cxdb;
 
-template<class T> struct TypeTraits;
+template <class, class>
+struct SameType { static const bool val = false; };
+
+template <class T>
+struct SameType<T,T> { static const bool val = true; };
+
+
+template<class T> struct TypeTraits {
+	inline static const std::type_info& Info () {
+		return typeid(T);
+	}
+};
 
 template<> struct TypeTraits<float> {
 	typedef float  T;
@@ -21,14 +32,11 @@ template<> struct TypeTraits<float> {
 	inline static const std::string Name () {
 		return std::string("single");
 	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
 	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
+		return SameType<T,CT>::val;
 	}
 	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
+		return SameType<T,RT>::val;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
@@ -49,14 +57,11 @@ template<> struct TypeTraits<double> {
 	inline static const std::string Name () {
 		return std::string("double");
 	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
 	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
+		return SameType<T,CT>::val;
 	}
 	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
+		return SameType<T,RT>::val;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
@@ -77,17 +82,11 @@ template<> struct TypeTraits<cxfl> {
 	inline static const std::string Name () {
 		return std::string("complex single");
 	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
 	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
+		return SameType<T,CT>::val;
 	}
 	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
-	}
-	inline static const bool Validate () {
-		return true;
+		return SameType<T,RT>::val;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
@@ -107,14 +106,11 @@ template<> struct TypeTraits<cxdb> {
 	inline static const std::string Name () {
 		return std::string("complex double");
 	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
 	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
+		return SameType<T,CT>::val;
 	}
 	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
+		return SameType<T,RT>::val;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
@@ -134,14 +130,11 @@ template<> struct TypeTraits<short> {
 	inline static const std::string Name () {
 		return std::string("short int");
 	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
 	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
+		return SameType<T,CT>::val;
 	}
 	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
+		return SameType<T,RT>::val;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
@@ -161,14 +154,11 @@ template<> struct TypeTraits<unsigned char> {
 	inline static const std::string Name () {
 		return std::string("codeare bool");
 	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
 	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
+		return SameType<T,CT>::val;
 	}
 	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
+		return SameType<T,RT>::val;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
@@ -189,14 +179,11 @@ template<> struct TypeTraits<long> {
 	inline static const std::string Name () {
 		return std::string("long int");
 	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
 	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
+		return SameType<T,CT>::val;
 	}
 	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
+		return SameType<T,RT>::val;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
@@ -216,14 +203,11 @@ template<> struct TypeTraits<int> {
 	inline static const std::string Name () {
 		return std::string("int");
 	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
 	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
+		return SameType<T,CT>::val;
 	}
 	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
+		return SameType<T,RT>::val;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
@@ -243,14 +227,11 @@ template<> struct TypeTraits<size_t> {
 	inline static const std::string Name () {
 		return std::string("size type");
 	}
-	inline static const std::type_info& Info () {
-		return typeid(T);
-	}
 	inline static const bool IsComplex() {
-		return (typeid(T) == typeid(CT));
+		return SameType<T,CT>::val;
 	}
 	inline static const bool IsReal() {
-		return (typeid(T) == typeid(RT));
+		return SameType<T,RT>::val;
 	}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60

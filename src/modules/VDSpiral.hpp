@@ -26,7 +26,7 @@
  */
 struct SpiralParams {
 
-	size_t shots;       /**< @brief # shots */
+	double shots;       /**< @brief # shots */
 	double res;         /**< @brief Maximum resolution */
 	Matrix<double> fov; /**< @brief FOV vector */
 	Matrix<double> rad; /**< @brief Corresponding radius vector */
@@ -56,14 +56,14 @@ Solution VDSpiral (SpiralParams& sp) {
 	k_max   = 5.0 / sp.res;
 	fov_max = max(fov);
 
-	dr  = ((double) sp.shots) / (fov_max);
+	dr  = sp.shots / (fov_max);
 	n   = size(fov,1)*100;
 	r   = linspace<double> (0.0, k_max, n);
 	
 	Matrix<double> x = k_max*rad;
 	fov = interp1 (x, fov, r, INTERP::LINEAR);
 
-	dr  = ((double) sp.shots) / (1500.0 * fov_max);
+	dr  = sp.shots / (1500.0 * fov_max);
 	n   = ceil (k_max/dr);
 	x   = r;
 	r   = linspace<double> (0.0, k_max, n);

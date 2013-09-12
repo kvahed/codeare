@@ -18,17 +18,16 @@
  *  02110-1301  USA
  */
 
-#include "FunctorContainer.hpp"
+#include "Queue.hpp"
 
-FunctorContainer::~FunctorContainer ()               {
+Queue::~Queue ()               {
 	
 	this->Finalise();
 	
 }
 
 
-short
-FunctorContainer::CleanUp () {
+short Queue::CleanUp () {
 
 	this->Finalise();
 	return (short) OK;
@@ -36,8 +35,7 @@ FunctorContainer::CleanUp () {
 }
 
 
-short
-FunctorContainer::Init (const char* name, const char* client_id) {
+short Queue::Init (const char* name, const char* client_id) {
 	
 	ReconContext* rc;
 	
@@ -55,8 +53,7 @@ FunctorContainer::Init (const char* name, const char* client_id) {
 }
 
 
-short
-FunctorContainer::Finalise (const char* name) {
+short Queue::Finalise (const char* name) {
 	
 	if (!name) {
 		
@@ -80,8 +77,7 @@ FunctorContainer::Finalise (const char* name) {
 }
 
 
-short
-FunctorContainer::Process  (const char* name)       {
+short Queue::Process  (const char* name)       {
 	
 	map<string, ReconContext*>::iterator it = m_contexts.find (name);
 	
@@ -93,8 +89,7 @@ FunctorContainer::Process  (const char* name)       {
 }
 
 
-short
-FunctorContainer::Prepare  (const char* name)       {
+short Queue::Prepare  (const char* name)       {
 	
 	map<string, ReconContext*>::iterator it = m_contexts.find (name);
 	
@@ -107,8 +102,7 @@ FunctorContainer::Prepare  (const char* name)       {
 
 
 
-void
-FunctorContainer::config (const char* c)    {
+void Queue::config (const char* c)    {
 		
 	std::stringstream tmp;
 	

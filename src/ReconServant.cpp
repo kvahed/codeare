@@ -32,7 +32,7 @@ namespace RRServer {
 	
     short
 	ReconServant::CleanUp () {
-		return FunctorContainer::CleanUp();
+		return Queue::CleanUp();
 	}
 
 	void
@@ -52,22 +52,22 @@ namespace RRServer {
 	
 	short
 	ReconServant::Init (const char* name, const char* client_id) {
-		return FunctorContainer::Init(name, client_id);
+		return Queue::Init(name, client_id);
 	}
 	
 	short
 	ReconServant::Finalise (const char* name) {
-		return FunctorContainer::Finalise(name);
+		return Queue::Finalise(name);
 	}
 	
 	short
 	ReconServant::Process  (const char* name) {
-		return FunctorContainer::Process(name);
+		return Queue::Process(name);
 	}
 	
 	short
 	ReconServant::Prepare  (const char* name)       {
-		return FunctorContainer::Prepare(name);
+		return Queue::Prepare(name);
 	}
 	
 	void

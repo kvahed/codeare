@@ -20,6 +20,7 @@
 
 #include "KTPoints.hpp"
 #include "PTXINIFile.hpp"
+#include "IOContext.hpp"
 
 using namespace RRStrategy;
 
@@ -37,12 +38,9 @@ NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result)
     float nrmse = 0.0;
     size_t i;
 
-#pragma omp parallel default (shared) private (i)
-    {
-#pragma omp for reduction(+:nrmse)
-    for (i = 0; i < numel(target); i++ )
+#pragma omp parallel for reduction(+:nrmse)
+    for (size_t i = 0; i < numel(target); i++ )
         nrmse += pow(abs(target[i]) - abs(result[i]), 2);
-    }
 
     nrmse = sqrt(nrmse)/norm(target);
     
@@ -113,40 +111,32 @@ inline static Matrix<cxfl>
 STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, const Matrix<float>& b0, 
      const size_t nc, const size_t nk, const size_t ns, const size_t gd, const Matrix<short>& pd, const size_t n) {
 
-    Matrix<float> d (nk,1);
-    vector<float> t (nk);
+    container<float> d (nk);
 	Matrix<cxfl>  m (ns,nc*nk);
 
-    ticks start = getticks();
     printf ("  Computing STA encoding matrix ..."); 
     fflush (stdout);
     
     for (size_t i = 0; i< nk; i++)
         d[i] = (i==0) ? pd[i] + gd : d[i-1] + pd[i] + gd;
 
-    for (size_t i = 0; i< nk; i++)        
-        t[i] = d [nk-i-1];
-    
+    std::reverse (d.begin(), d.end());
+
     for (size_t i = 0; i < nk-1; i++)
-        d[i] = 1.0e-5 * t[i+1] + 1.0e-5 * pd[i]/2;
+        d[i] = 1.0e-5 * d[i+1] + 1.0e-5 * pd[i]/2;
 
     d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
 
-    cxfl pgd = cxfl(0, 2.0 * PI * GAMMA * 10.0);
+    cxfl pgd = cxfl(0, TWOPI * GAMMA * 10.0);
 
-#pragma omp parallel default (shared) 
-    {
-
-#pragma omp for
-        for (size_t c = 0; c < nc; c++) 
+    #pragma omp for
             for (size_t k = 0; k < nk; k++) 
-                for (size_t s = 0; s < ns; s++) 
-                    m(s, c*nk + k) =  pgd * b1(s,c) *
-						exp (cxfl(0, ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s) + TWOPI * d[k] * b0(s)));
-
-    }
-
-    //printf (" done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+                for (size_t s = 0; s < ns; s++) {
+                	cxfl eikr = pgd * exp (cxfl(0, ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s) + TWOPI * d[k] * b0(s)));
+                	for (size_t c = 0; c < nc; c++)
+                		m(s,c*nk+k) =  b1(s,c) * eikr;
+                }
+    
 	printf ("... done. ");
 
 	return m;
@@ -220,14 +210,14 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<s
                 for (size_t g = 0; g <    gd; g++, i++) {
                     
                     sr = (k+1 < nk) ? ks(gc,k+1) - ks(gc,k) : - ks(gc,i);
-                    sr = 4.0 * sr / (2 * PI * 4.2576e7 * gd * gd * 1.0e-5 * 1.0e-5);
+                    sr = 4.0 * sr / (2 * PI * GAMMA * 1e6 * gd * gd * 1.0e-5 * 1.0e-5);
                     sr =       sr / 100.0;
                     
                     // Gradient action 
                     if(g < gd/2)             // ramp up
                         gr = sr * (0.5 + g);
-                    //else if (g < gd/2+1)     // flat top
-                    //    0;
+                    else if (g < gd/2+1)     // flat top
+                        0;
                     else                     // ramp down
                         gr -= sr;
 

@@ -30,7 +30,7 @@
 #include <string>
 #include <map>
 #include "ReconContext.hpp"
-#include "FunctorContainer.hpp"
+#include "Queue.hpp"
 #include "omniORB4/omniInterceptors.h"
 
 using namespace std;
@@ -72,7 +72,7 @@ namespace RRServer {
 	class ReconServant : 
 		public POA_RRSModule::RRSInterface, 
 		public PortableServer::RefCountServantBase,
-		public FunctorContainer {
+		public Queue {
 		
 		
 

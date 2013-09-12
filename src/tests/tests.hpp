@@ -9,4 +9,5 @@
 //#include "relativesensitivities.hpp"
 #include "spiral.hpp"
 #include "karb.hpp"
+#include "slicegrad.hpp"
 #include "dummy.hpp"

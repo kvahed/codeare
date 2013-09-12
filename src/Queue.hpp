@@ -18,8 +18,8 @@
  *  02110-1301  USA
  */
 
-#ifndef __FUNCTOR_CONTAINER_H__
-#define __FUNCTOR_CONTAINER_H__
+#ifndef __QUEUE_H__
+#define __QUEUE_H__
 
 #include "ReconContext.hpp"
 
@@ -29,7 +29,7 @@ using namespace RRStrategy;
 /**
  * @brief Container for data and reconstructions
  */
-class FunctorContainer {
+class Queue {
 
 
 
@@ -40,14 +40,14 @@ public:
 	/**
 	 * @brief      Default constructor
 	 */
-	FunctorContainer () : m_config(0) {}
+	Queue () : m_config(0) {}
 
 
 	/**
 	 * @brief      Destructor
 	 */
 	virtual
-	~FunctorContainer ();
+	~Queue ();
 
 	
 	/**
@@ -126,4 +126,4 @@ protected:
 
 };
 
-#endif //__FUNCTOR_CONTAINER_H__
+#endif //__QUEUE_H__

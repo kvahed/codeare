@@ -15,9 +15,7 @@ vdspiraltest (Connector<T>* rc) {
 
 	rc->Attribute ("maxgrad", &(p.mgr));
 	rc->Attribute ("maxslew", &(p.msr));
-	int ss ;
-	rc->Attribute ("shots",   &ss);
-	p.shots = ss;
+	rc->Attribute ("shots",   &(p.shots));
 	rc->Attribute ("dt",      &(p.dt));
 	rc->Attribute ("res",     &(p.res));
 
@@ -41,7 +39,7 @@ vdspiraltest (Connector<T>* rc) {
 	}
 
 	printf ("\nComputing variable density spiral for ... \n");
-	printf ("    [maxgrad: %.2f, maxslew: %.2f, res: %.2f, dt: %.2e, shots: %li]\n\n",
+	printf ("    [maxgrad: %.2f, maxslew: %.2f, res: %.2f, dt: %.2e, shots: %.2f]\n\n",
             p.mgr, p.msr, p.res, p.dt, p.shots);
 
 	ticks start = getticks();

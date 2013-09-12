@@ -100,8 +100,7 @@ libremote_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = codeared-options.$(OBJEXT) \
-	codeared-Workspace.$(OBJEXT) \
-	codeared-FunctorContainer.$(OBJEXT) \
+	codeared-Workspace.$(OBJEXT) codeared-Queue.$(OBJEXT) \
 	codeared-ReconContext.$(OBJEXT) codeared-Toolbox.$(OBJEXT) \
 	codeared-Grid.$(OBJEXT)
 am__objects_2 = codeared-RRSModuleSK.$(OBJEXT)
@@ -112,9 +111,8 @@ codeared_LDADD = $(LDADD)
 codeared_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(codeared_CXXFLAGS) \
 	$(CXXFLAGS) $(codeared_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_3 = options.$(OBJEXT) Workspace.$(OBJEXT) \
-	FunctorContainer.$(OBJEXT) ReconContext.$(OBJEXT) \
-	Toolbox.$(OBJEXT) Grid.$(OBJEXT)
+am__objects_3 = options.$(OBJEXT) Workspace.$(OBJEXT) Queue.$(OBJEXT) \
+	ReconContext.$(OBJEXT) Toolbox.$(OBJEXT) Grid.$(OBJEXT)
 am_lclient_OBJECTS = $(am__objects_3)
 lclient_OBJECTS = $(am_lclient_OBJECTS)
 lclient_LDADD = $(LDADD)
@@ -355,7 +353,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Imatrix/linalg -Itinyxml -Imisc -Imatrix/arithmetic -Imatrix/interp -Imatrix/io -Imodules $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp FunctorContainer.hpp FunctorContainer.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp Grid.hpp Grid.cpp Params.hpp
+COMMON = RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp Queue.hpp Queue.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp Grid.hpp Grid.cpp Params.hpp
 
 # OmniORB interface
 NETWORKING_COMMON = RRSModule.hh RRSModuleSK.cc 
@@ -517,14 +515,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FunctorContainer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Queue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RRSModuleSK.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Toolbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Workspace.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-FunctorContainer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-Grid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-Queue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-RRSModuleSK.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-ReconServant.Po@am__quote@
@@ -618,19 +616,19 @@ codeared-Workspace.obj: Workspace.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-Workspace.obj `if test -f 'Workspace.cpp'; then $(CYGPATH_W) 'Workspace.cpp'; else $(CYGPATH_W) '$(srcdir)/Workspace.cpp'; fi`
 
-codeared-FunctorContainer.o: FunctorContainer.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-FunctorContainer.o -MD -MP -MF $(DEPDIR)/codeared-FunctorContainer.Tpo -c -o codeared-FunctorContainer.o `test -f 'FunctorContainer.cpp' || echo '$(srcdir)/'`FunctorContainer.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-FunctorContainer.Tpo $(DEPDIR)/codeared-FunctorContainer.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FunctorContainer.cpp' object='codeared-FunctorContainer.o' libtool=no @AMDEPBACKSLASH@
+codeared-Queue.o: Queue.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-Queue.o -MD -MP -MF $(DEPDIR)/codeared-Queue.Tpo -c -o codeared-Queue.o `test -f 'Queue.cpp' || echo '$(srcdir)/'`Queue.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-Queue.Tpo $(DEPDIR)/codeared-Queue.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Queue.cpp' object='codeared-Queue.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-FunctorContainer.o `test -f 'FunctorContainer.cpp' || echo '$(srcdir)/'`FunctorContainer.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-Queue.o `test -f 'Queue.cpp' || echo '$(srcdir)/'`Queue.cpp
 
-codeared-FunctorContainer.obj: FunctorContainer.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-FunctorContainer.obj -MD -MP -MF $(DEPDIR)/codeared-FunctorContainer.Tpo -c -o codeared-FunctorContainer.obj `if test -f 'FunctorContainer.cpp'; then $(CYGPATH_W) 'FunctorContainer.cpp'; else $(CYGPATH_W) '$(srcdir)/FunctorContainer.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-FunctorContainer.Tpo $(DEPDIR)/codeared-FunctorContainer.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FunctorContainer.cpp' object='codeared-FunctorContainer.obj' libtool=no @AMDEPBACKSLASH@
+codeared-Queue.obj: Queue.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-Queue.obj -MD -MP -MF $(DEPDIR)/codeared-Queue.Tpo -c -o codeared-Queue.obj `if test -f 'Queue.cpp'; then $(CYGPATH_W) 'Queue.cpp'; else $(CYGPATH_W) '$(srcdir)/Queue.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/codeared-Queue.Tpo $(DEPDIR)/codeared-Queue.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Queue.cpp' object='codeared-Queue.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-FunctorContainer.obj `if test -f 'FunctorContainer.cpp'; then $(CYGPATH_W) 'FunctorContainer.cpp'; else $(CYGPATH_W) '$(srcdir)/FunctorContainer.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-Queue.obj `if test -f 'Queue.cpp'; then $(CYGPATH_W) 'Queue.cpp'; else $(CYGPATH_W) '$(srcdir)/Queue.cpp'; fi`
 
 codeared-ReconContext.o: ReconContext.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-ReconContext.o -MD -MP -MF $(DEPDIR)/codeared-ReconContext.Tpo -c -o codeared-ReconContext.o `test -f 'ReconContext.cpp' || echo '$(srcdir)/'`ReconContext.cpp
