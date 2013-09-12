@@ -5,6 +5,8 @@
 /share
 
 ## files (explicit) ##
+/.cproject
+/.project
 /config.log
 /config.status
 /libtool
