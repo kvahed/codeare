@@ -82,6 +82,7 @@ test.cpp
 \#*
 *.html
 *.log
+*.trs
 *~
 
 Makefile
