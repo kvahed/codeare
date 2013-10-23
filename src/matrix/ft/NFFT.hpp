@@ -203,8 +203,8 @@ public:
 			memcpy (m_fplan.f_hat, m.Memory(), m_imgsz * sizeof (std::complex<T>));
 		else 
 			for (size_t i = 0; i < m_imgsz; ++i) {
-				m_fplan.f_hat[i][0] = creal(m[i]);
-				m_fplan.f_hat[i][1] = cimag(m[i]);
+				m_fplan.f_hat[i][0] = real(m[i]);
+				m_fplan.f_hat[i][1] = imag(m[i]);
 			}
 		
 		NFFTTraits<double>::Trafo (m_fplan);
@@ -235,8 +235,8 @@ public:
 			memcpy (m_iplan.y, m.Memory(), m_M * sizeof ( std::complex<T> ));
 		else 
 			for (size_t i = 0; i < m_M; ++i) {
-				m_iplan.y[i][0] = creal(m[i]);
-				m_iplan.y[i][1] = cimag(m[i]);
+				m_iplan.y[i][0] = real(m[i]);
+				m_iplan.y[i][1] = imag(m[i]);
 			}
 
 		NFFTTraits<double>::ITrafo ((Plan&) m_fplan, (Solver&) m_iplan, m_maxit, m_epsilon);

@@ -114,12 +114,11 @@ public:
 		
 #pragma omp parallel 
 		{
-		  m_np = omp_get_num_threads ();
+			m_np = omp_get_num_threads ();
 		}
 		
-		if (params.exists("np") && boost::any_cast<int>(params["np"]) > 0) {
-		  omp_set_num_threads(boost::any_cast<int>(params["np"]));
-		}
+		if (params.exists("np") && boost::any_cast<int>(params["np"]) > 0)
+			omp_set_num_threads(boost::any_cast<int>(params["np"]));
 
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  No of threads: %i\n", m_np);
@@ -251,7 +250,7 @@ public:
 		p  = EH (m, sens, m_nx, m_fts) * m_ic;
 		r  = p;
 		x  = zeros<CT>(size(p));
-        xn = creal(p.dotc(p));
+        xn = real(p.dotc(p));
         rn = xn;
         if (m_verbose)
             vc.push_back (p);
@@ -263,11 +262,11 @@ public:
 			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
 			if (m_lambda)
 				q  += m_lambda * p;
-            ts  = rn / creal(p.dotc(q));
+            ts  = rn / real(p.dotc(q));
 			x  += ts * p;
 			r  -= ts * q;
 			rno = rn;
-			rn  = creal(r.dotc(r));
+			rn  = real(r.dotc(r));
 			p  *= rn / rno;
 			p  += r;
             if (m_verbose)
@@ -318,7 +317,7 @@ public:
 	
 private:
 
-    std::vector<NFFT<T> > m_fts;         /**< Non-Cartesian FT operators (Multi-Core?) */
+    std::vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
 	bool       m_initialised; /**< All initialised? */
     bool       m_verbose;
 

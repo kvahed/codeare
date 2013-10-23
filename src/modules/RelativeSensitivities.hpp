@@ -358,7 +358,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 void LogMask (Matrix<double>& m, const double& m_cutoff) {
 	
 	for (size_t i = 0; i < m.Size(); i++)
-		m[i] = (log(abs(m[i])) < m_cutoff) ? 0.0 : 1.0;
+		m[i] = (log(std::abs(m[i])) < m_cutoff) ? 0.0 : 1.0;
 	
 }
 

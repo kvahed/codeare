@@ -133,7 +133,7 @@ namespace RRStrategy {
             om += t * ffdbg;
         om -= data;
         
-        o = creal(om.dotc(om));
+        o = real(om.dotc(om));
         
         return o;
 
@@ -155,7 +155,7 @@ namespace RRStrategy {
         om ^= p;
         
         for (size_t i = 0; i < om.Size(); i++) 
-            o += creal(om[i]);
+            o += real(om[i]);
         
         return cgp.tvw * o;
         
@@ -300,7 +300,7 @@ namespace RRStrategy {
 
         
         float     t0  = 1.0, t = 1.0, z = 0.0;
-        float     xn  = creal(norm(x));
+        float     xn  = real(norm(x));
         float     rmse, bk, f0, f1;
         
         Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
@@ -336,7 +336,7 @@ namespace RRStrategy {
                 
                 t *= cgp.lsb;
                 f1 = Objective(ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
-                if (f1 <= f0 - (cgp.lsa * t * cabs(g0.dotc(dx))))
+                if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
                     break;
                 i++;
                 
@@ -358,7 +358,7 @@ namespace RRStrategy {
                     
             // CG computation 
             g1  =  Gradient (x, wx, data, cgp);
-            bk  =  creal(g1.dotc(g1)) / creal(g0.dotc(g0));
+            bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
             g0  =  g1;
             dx  = -g1 + dx * bk;
             

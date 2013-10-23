@@ -203,7 +203,7 @@ isinf (const Matrix<T>& M) {
 
     Matrix<cbool> res (M.Dim());
     for (size_t i = 0; i < res.Size(); ++i)
-		res[i] = (std::isinf(creal(M[i]))||std::isinf(cimag(M[i])));
+		res[i] = (std::isinf(real(M[i]))||std::isinf(imag(M[i])));
     return res;
 
 }
@@ -220,7 +220,7 @@ isnan (const Matrix<T>& M) {
 
     Matrix<cbool> res (M.Dim());
     for (size_t i = 0; i < res.Size(); ++i)
-		res.Container()[i] = (std::isnan(creal(M[i]))||std::isnan(cimag(M[i])));
+		res.Container()[i] = (std::isnan(real(M[i]))||std::isnan(imag(M[i])));
     return res;
 
 }
@@ -259,7 +259,7 @@ dofinite (const Matrix<T>& M, const T& v = 0) {
 	size_t i = numel(M);
 
 	while (i--)
-		res[i] = is_nan(creal(M[i])) ? v : M[i];
+		res[i] = is_nan(real(M[i])) ? v : M[i];
 	
     return res;
 
@@ -576,10 +576,10 @@ round (const Matrix<T>& M) {
 template <class T> inline  T
 max (const Matrix<T>& M) {
 
-	T max = cabs(M[0]);
+	T max = std::abs(M[0]);
 
 	for (size_t i = 0; i < numel(M); ++i)
-		if (cabs(M[i]) > max)
+		if (std::abs(M[i]) > max)
 			max = M[i];
 
 	return max;
@@ -596,10 +596,10 @@ max (const Matrix<T>& M) {
 template <class T> inline  T
 min (const Matrix<T>& M) {
 
-	T min = cabs(M[0]);
+	T min = abs(M[0]);
 
 	for (size_t i = 0; i < numel(M); ++i)
-		if (cabs(M[i]) < min)
+		if (abs(M[i]) < min)
 			min = M[i];
 
 	return min;

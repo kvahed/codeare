@@ -59,8 +59,8 @@ static void write_complex (mxArray* mxa, const Matrix<std::complex<T> >& M) {
 	T* re = (T*)mxGetPr(mxa);
 	T* im = (T*)mxGetPi(mxa);
 	for (size_t i = 0; i < numel(M); ++i) {
-		re[i] = creal(M[i]);
-		im[i] = cimag(M[i]);
+		re[i] = real(M[i]);
+		im[i] = imag(M[i]);
 	}
 }
 

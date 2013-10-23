@@ -43,7 +43,7 @@ abs (const Matrix<cxdb>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = cabs(m[i]);
+			res[i] = std::abs(m[i]);
 		
 	}		
 	
@@ -69,7 +69,7 @@ abs (const Matrix<cxfl>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = cabs(m[i]);
+			res[i] = std::abs(m[i]);
 		
 	}		
 	
@@ -95,7 +95,7 @@ abs (const Matrix<float>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = cabs(m[i]);
+			res[i] = fabs(m[i]);
 		
 	}		
 	
@@ -121,7 +121,7 @@ abs (const Matrix<double>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = cabs(m[i]);
+			res[i] = fabs(m[i]);
 		
 	}		
 	
@@ -147,7 +147,7 @@ arg (const Matrix<cxdb>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = carg(m[i]);
+			res[i] = arg(m[i]);
 		
 	}		
 	
@@ -173,7 +173,7 @@ arg (const Matrix<cxfl>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = carg(m[i]);
+			res[i] = arg(m[i]);
 		
 	}		
 	
@@ -227,7 +227,7 @@ real (const Matrix<cxdb>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = creal(m[i]);
+			res[i] = real(m[i]);
 		
 	}		
 	
@@ -253,7 +253,7 @@ real (const Matrix<cxfl>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = creal(m[i]);
+			res[i] = real(m[i]);
 		
 	}		
 	
@@ -308,7 +308,7 @@ imag (const Matrix<cxdb>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = cimag(m[i]);
+			res[i] = imag(m[i]);
 		
 	}		
 	
@@ -334,7 +334,7 @@ imag (const Matrix<cxfl>& m) {
 #pragma omp for
 		
 		for (size_t i = 0; i < numel(m); i++)
-			res[i] = cimag(m[i]);
+			res[i] = imag(m[i]);
 		
 	}		
 	
@@ -391,7 +391,7 @@ conj (const Matrix<T>& m) {
 #pragma omp for
 			
 			for (size_t i = 0; i < numel(m); i++)
-				res[i] = cconj(res[i]);
+				res[i] = conj(res[i]);
 
 		}
 		
@@ -420,7 +420,7 @@ complex2 (const Matrix<T>& mag, const Matrix<S>& arg) {
     Matrix<std::complex<T> > ret (vsize(arg));
 #pragma omp for
     for (size_t i = 0; i < numel(arg); ++i)
-        ret[i] = std::complex<T>(mag[i]*cos(arg[i]),mag[i]*sin(arg[i]));
+        ret[i] = std::polar(mag[i],arg[i]);
     return ret;
 }
 template <class T, class S> inline static Matrix<std::complex<T> > 
@@ -428,7 +428,7 @@ complex2 (const T mag, const Matrix<S>& arg) {
     Matrix<std::complex<T> > ret (vsize(arg));
 #pragma omp for
     for (size_t i = 0; i < numel(arg); ++i)
-        ret[i] = std::complex<T>(mag*cos(arg[i]),mag*sin(arg[i]));
+        ret[i] = std::polar(mag[i],arg[i]);
     return ret;
 }
 

@@ -40,7 +40,7 @@
 /src/matrix/arithmetic/t_tan
 /src/matrix/arithmetic/t_tanh
 /src/matrix/arithmetic/t_complex
-src/matrix/interp/tests/t_medfilt2
+/src/matrix/interp/tests/t_medfilt2
 /src/matrix/dwt/tests/t_dwt
 /src/matrix/dwt/tests/t_dwt2
 /src/matrix/ft/tests/t_dft
@@ -56,17 +56,15 @@ src/matrix/interp/tests/t_medfilt2
 /src/matrix/arithmetic/t_fliplr
 /src/matrix/arithmetic/t_flipud
 /src/matrix/arithmetic/t_resize
-src/pTXRFPulse0.ini.sag_ap
-src/pTXRFPulse0.ini.tra_ap
-src/matrix/io/tests/t_hdf5
-src/matrix/io/tests/t_matlab
-src/matrix/io/tests/t_nifti
-src/matrix/io/tests/t_codeare
-src/matrix/io/tests/test*
-src/matrix/io/tests/t_iocontext
-src/matrix/interp/tests/t_interp1
-src/matrix/interp/tests/t_ppval
-src/matrix/interp/tests/t_resample
+/src/matrix/io/tests/t_hdf5
+/src/matrix/io/tests/t_matlab
+/src/matrix/io/tests/t_nifti
+/src/matrix/io/tests/t_codeare
+/src/matrix/io/tests/test*
+/src/matrix/io/tests/t_iocontext
+/src/matrix/interp/tests/t_interp1
+/src/matrix/interp/tests/t_ppval
+/src/matrix/interp/tests/t_resample
 
 ## folders (global) ##
 .deps/
@@ -75,9 +73,9 @@ src/matrix/interp/tests/t_resample
 .DS_Store
 
 ## files (global) ##
+pTXRFPulse0.ini.sag_ap
+pTXRFPulse0.ini.tra_ap
 out.txt
-tests/pTXRFPulse0.ini.sag_ap
-tests/pTXRFPulse0.ini.tra_ap
 test
 test.cpp
 .\#*

@@ -153,7 +153,7 @@ class DFT : public FT<T> {
 
 
 	typedef typename FTTraits<T>::Plan Plan;
-	typedef typename FTTraits<T>::Type Type;
+	typedef typename FTTraits<T>::T Type;
 	typedef typename std::complex<T>   CT;
 
 

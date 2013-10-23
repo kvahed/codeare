@@ -66,14 +66,14 @@ template<> struct ITraits<cxfl> {
 		y.push_back(container<double>(n));
 		y.push_back(container<double>(n));
 		for (size_t i = 0; i < n; ++i) {
-			y[0][i] = creal(data[i]); y[1][i] = cimag(data[i]);
+			y[0][i] = real(data[i]); y[1][i] = imag(data[i]);
 		}
 	}
 	static void ac (const T* data, const size_t n, std::vector<container<double> >& y){
 		y.push_back(container<double>(n));
 		y.push_back(container<double>(n));
 		for (size_t i = 0; i < n; ++i) {
-			y[0][i] = creal(data[i]); y[1][i] = cimag(data[i]);
+			y[0][i] = real(data[i]); y[1][i] = imag(data[i]);
 		}
 	}
 };
@@ -87,7 +87,7 @@ template<> struct ITraits<cxdb> {
 		y.push_back(container<double>(n));
 		y.push_back(container<double>(n));
 		for (size_t i = 0; i < n; ++i) {
-			y[0][i] = creal(data[i]); y[1][i] = cimag(data[i]);
+			y[0][i] = real(data[i]); y[1][i] = imag(data[i]);
 		}
 	}
 };

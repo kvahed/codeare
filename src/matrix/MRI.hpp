@@ -21,7 +21,7 @@ IntensityMap (const Matrix< std::complex <T> >& sens, bool sqroot = true) {
 		for (size_t i = 0; i < nr; i++) {
 			
 			for (size_t j = 0; j < nc; j++)
-				res[i] += creal(sens(i+j*nr) * conj(sens(i+j*nr)));
+				res[i] += real(sens(i+j*nr) * conj(sens(i+j*nr)));
 			
 			res[i] = 1.0 / (((sqroot) ? sqrt (res[i]) : res[i]) + 1.0e-10);
 			

@@ -119,7 +119,7 @@ NuFFT::Prepare () {
 error_code
 NuFFT::Process () {
 
-    SimpleTimer st ("SENSE");
+    SimpleTimer st ("NuFFT");
 
     Matrix<cxdb> img =  ft ->* Get<cxdb> ("data");
     wspace.Add ("img", img);

@@ -37,7 +37,7 @@ template<>
 struct FTTraits<float> {
 	
 	typedef fftwf_plan    Plan; /**< @brief fftw plan (float precision) */
-	typedef fftwf_complex Type; /**< @brief fftw complex data type (float precision) */
+	typedef fftwf_complex T; /**< @brief fftw complex data type (float precision) */
 	typedef float         otype;
 	
 
@@ -54,7 +54,7 @@ struct FTTraits<float> {
 	 * @return        Plan
 	 */
 	static inline Plan 
-	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {
+	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags) {
 		InitThreads();
 		return fftwf_plan_dft (rank, n, in, out, sign, flags);
 	}
@@ -96,9 +96,9 @@ struct FTTraits<float> {
 	 * @param  n     # of elements
 	 * @return       Memory address
 	 */
-	static inline Type*
+	static inline T*
 	Malloc (size_t n) {
-		return (Type*) fftwf_malloc (n * sizeof(Type));
+		return (T*) fftwf_malloc (n * sizeof(T));
 	}
 	
 
@@ -151,7 +151,7 @@ struct FTTraits<float> {
 	 * @param  p     Plan to be executed
 	 */
 	static inline void
-	Execute (Plan p, Type* in, Type* out) {
+	Execute (Plan p, T* in, T* out) {
 		fftwf_execute_dft (p, in, out);
 	}
 
@@ -165,7 +165,7 @@ template<>
 struct FTTraits<double> {
 	
 	typedef fftw_plan    Plan;  /**< @brief fftw plan (double precision) */
-	typedef fftw_complex Type;  /**< @brief fftw complex data type (double precision) */
+	typedef fftw_complex T;  /**< @brief fftw complex data type (double precision) */
 	typedef double      otype;
 
 	/**
@@ -181,7 +181,7 @@ struct FTTraits<double> {
 	 * @return        Plan
 	 */
 	static inline Plan 
-	DFTPlan (int rank, const int *n, Type *in, Type *out, int sign, unsigned flags) {
+	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags) {
 		InitThreads();
 	    return fftw_plan_dft (rank, n, in, out, sign, flags);
 	}
@@ -224,9 +224,9 @@ struct FTTraits<double> {
 	 * @param  n     # of elements
 	 * @return       Memory address
 	 */
-	static inline Type*
+	static inline T*
 	Malloc (size_t n) {
-		return (Type*) fftw_malloc (n * sizeof(Type));
+		return (T*) fftw_malloc (n * sizeof(T));
 	}
 	
 
@@ -279,7 +279,7 @@ struct FTTraits<double> {
 	 * @param  p     Plan to be executed
 	 */
 	static inline void
-	Execute (Plan p, Type* in, Type* out) {
+	Execute (Plan p, T* in, T* out) {
 		fftw_execute_dft (p, in, out);
 	}
 
