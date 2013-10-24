@@ -80,7 +80,7 @@ namespace io      {
 	mwrite (const container<T>& d, FILE* f, std::string desc) {
 		size_t n = d.size();
 		size_t sz = sizeof(T);
-		if (size_t l = fwrite (d.memory(), sz, n, f) != n) {
+		if (size_t l = fwrite (d.ptr(), sz, n, f) != n) {
 			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
 			return false;
 		}

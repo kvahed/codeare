@@ -11,8 +11,8 @@
 */
 
 #include "Matrix.hpp"
-#include "Common.hpp"
-#include "HDF5IO.hpp"
+#include "Algos.hpp"
+#include "Creators.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -208,7 +208,7 @@ unwrap (const Matrix<size_t>& s, const size_t unb,
     maxin    = max(inamp);
     diff     = 1.00001 * (maxin - minin);
     
-    sp = sub2ind(wrapped,s.Data());
+    sp = sub2ind(wrapped,s.Container());
     
     flag.resize(sze);
     

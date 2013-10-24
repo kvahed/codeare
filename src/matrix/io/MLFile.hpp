@@ -46,7 +46,7 @@ struct MXTraits;
 
 template <class T>
 static void write_real (mxArray* mxa, const Matrix<T>& M) {
-	memcpy(mxGetData(mxa), M.Memory(), numel(M) * sizeof(T));
+	memcpy(mxGetData(mxa), M.Ptr(), numel(M) * sizeof(T));
 }
 
 template <class T>

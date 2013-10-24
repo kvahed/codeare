@@ -74,8 +74,8 @@ public:
 	inline T front () const { return _data.front; }
 	inline T& at (const size_t n) { return _data.at(n); }
 	inline T at (const size_t n) const { return _data.at(n); }
-	inline const T* memory (const size_t n = 0) const { return &_data[n]; }
-	inline T* memory (const size_t n = 0)  { return &_data[n]; }
+	inline const T* ptr (const size_t n = 0) const { return &_data[n]; }
+	inline T* ptr (const size_t n = 0)  { return &_data[n]; }
 	inline VECTOR_TYPE(T) data() const { return _data; }
 	inline VECTOR_TYPE(T)& data() { return _data; }
 	inline size_t size() const { return _data.size(); }

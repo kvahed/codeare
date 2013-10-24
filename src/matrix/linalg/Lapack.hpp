@@ -458,7 +458,7 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, const char& transa = 'N', const ch
 	
 	Matrix<T> C(m,n);
 	
-	LapackTraits<T>::gemm (transa, transb, m, n, k, alpha, A.Memory(), ah, B.Memory(), bh, beta, &C[0], ldc);
+	LapackTraits<T>::gemm (transa, transb, m, n, k, alpha, A.Ptr(), ah, B.Ptr(), bh, beta, &C[0], ldc);
     
 	return C;
 	
@@ -523,7 +523,7 @@ gemv (const Matrix<T>& A, const Matrix<T>& x, const char& trans = 'N') {
 	
 	Matrix<T> y ((trans == 'N') ? m : n, 1);
     
-	LapackTraits<T>::gemv (trans, m, n, alpha, A.Memory(), ah, x.Memory(), one, beta, &y[0], one);
+	LapackTraits<T>::gemv (trans, m, n, alpha, A.Ptr(), ah, x.Ptr(), one, beta, &y[0], one);
 	
 	return y;
 	
@@ -547,7 +547,7 @@ norm (const Matrix<T>& M) {
 	int n    = (int) numel (M);
 	int incx = 1;
     
-	return real(LapackTraits<T>::nrm2 (n, M.Memory(), incx));
+	return real(LapackTraits<T>::nrm2 (n, M.Ptr(), incx));
     
 }
 
@@ -578,7 +578,7 @@ dotc (const Matrix<T>& A, const Matrix<T>& B) {
 	res = T(0.0);
 	one = 1;
 	
-	LapackTraits<T>::dotc (n, A.Memory(), one, B.Memory(), one, &res);
+	LapackTraits<T>::dotc (n, A.Ptr(), one, B.Ptr(), one, &res);
 	
 	return res;
 	
@@ -617,7 +617,7 @@ dot  (const Matrix<T>& A, const Matrix<T>& B) {
 	res = T(0.0);
 	one = 1;
     
-	LapackTraits<T>::dot (n, A.Memory(), one, B.Memory(), one, &res);
+	LapackTraits<T>::dot (n, A.Ptr(), one, B.Ptr(), one, &res);
 	
 	return res;
 	

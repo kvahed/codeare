@@ -223,7 +223,7 @@ namespace io {
 
 			DataSet set = group.createDataSet(name, (*type), space);
 
-			set.write   (M.Memory(), (*type));
+			set.write   (M.Ptr(), (*type));
 			set.close   ();
 			space.close ();
 

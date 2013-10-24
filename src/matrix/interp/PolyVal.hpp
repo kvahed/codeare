@@ -237,7 +237,7 @@ protected:
 		for (size_t i = 0; i < m_y.size(); ++i) {
 			m_acc.push_back(gsl_interp_accel_alloc());
 			m_spline.push_back(gsl_spline_alloc (IntMeth(intm), n));
-			gsl_spline_init (m_spline[i], x.memory(), m_y[i].memory(),n);
+			gsl_spline_init (m_spline[i], x.ptr(), m_y[i].ptr(),n);
 		}
 
 		return true;

@@ -192,7 +192,7 @@ namespace RRClient {
 			}
 
 			ct.vals.length(TypeTraits<T>::IsComplex() ? ms * 2 : ms);
-			memcpy (&ct.vals[0], m.Memory(), ms * sizeof(T));
+			memcpy (&ct.vals[0], m.Ptr(), ms * sizeof(T));
 
 			RemoteTraits<T>::Send(m_rrsi, name, ct);
 

@@ -28,7 +28,7 @@ interp1 (const Matrix<double>& x, const Matrix<T>& y,
 	Matrix<T> yi (nxi,nd);
 	for (size_t j = 0; j < nd; j++) {
 
-		PolyVal<T> pv (x, (T*) y.Memory(j*nx), intm);
+		PolyVal<T> pv (x, (T*) y.Ptr(j*nx), intm);
 		
 		for (size_t i = 0; i < nxi; i++)
 			yi [j * nxi + i] = pv.Lookup (xi[i]); 

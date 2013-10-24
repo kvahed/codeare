@@ -98,7 +98,7 @@ Volume (const Matrix<T>& M, const size_t& s) {
 	Matrix<T> res (size(M,0), size(M,1), size(M,2));
 	size_t nc = numel (res);
 	
-	memcpy (&res[0], M.Memory(s*nc), nc * sizeof(T));
+	memcpy (&res[0], M.Ptr(s*nc), nc * sizeof(T));
 	
 	return res;
 	
@@ -121,7 +121,7 @@ Volume (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
 
 	size_t nc = size(M,0) * size(M,1) * size(M,2);
 
-	memcpy (&M[s*nc], A.Memory(), nc*sizeof(T));
+	memcpy (&M[s*nc], A.Ptr(), nc*sizeof(T));
 	
 }
 	
@@ -139,7 +139,7 @@ Slice (const Matrix<T>& M, const size_t& s) {
 	Matrix<T> res (size(M,0),size(M,1));
 	size_t nc = numel (res);
 	
-	memcpy (&res[0], M.Memory(s*nc), nc*sizeof(T));
+	memcpy (&res[0], M.Ptr(s*nc), nc*sizeof(T));
 	
 	return res;
 	
@@ -161,7 +161,7 @@ Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
 
 	size_t ns = size(M,0) * size(M,1);
 
-	memcpy (&M[s * ns], A.Memory(), ns * sizeof(T));
+	memcpy (&M[s * ns], A.Ptr(), ns * sizeof(T));
 	
 }
 
@@ -278,7 +278,7 @@ Column (const Matrix<T>& M, const size_t& c) {
 	
 	Matrix<T> res (size(M, 0),1);
 	
-	memcpy (&res[0], M.Memory(c*size(M, 0)), size(M, 0) * sizeof(T));
+	memcpy (&res[0], M.Ptr(c*size(M, 0)), size(M, 0) * sizeof(T));
 	
 	return res;
 	
@@ -298,7 +298,7 @@ Column (Matrix<T>& M, const size_t& c, const Matrix<T> A) {
 	assert (size(M,0) == size (A,0));
 	size_t nc = size(M,0);
 
-	memcpy (&M[c*nc], A.Memory(), nc * sizeof(T));
+	memcpy (&M[c*nc], A.Ptr(), nc * sizeof(T));
 	
 }
 

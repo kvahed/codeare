@@ -112,7 +112,7 @@ public:
 		strcpy(ni->iname,this->m_fname.c_str());
 
 		ni->data = (void*) malloc (numel(M) * sizeof (T));
-		memcpy (ni->data, M.Memory(), numel(M) * sizeof (T));
+		memcpy (ni->data, M.Ptr(), numel(M) * sizeof (T));
 
 		nifti_image_write (ni);
 		nifti_image_free (ni);
