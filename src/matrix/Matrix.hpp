@@ -37,6 +37,10 @@
 #include "Complex.hpp"
 #include "Container.hpp"
 
+#ifdef EXPLICIT_SIMD
+#    include "SIMD.hpp"
+#endif
+
 #include <assert.h>
 #include <iostream>
 #include <memory>

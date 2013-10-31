@@ -5,7 +5,7 @@
 #include "SIMDTraits.hpp"
 #include "AlignmentAllocator.hpp"
 
-#include "Container.hpp"
+#include "../Container.hpp"
 
 #include <math.h>
 #include <stdio.h>
@@ -237,7 +237,7 @@ namespace SSE {
 	 * @param  C  Vector C
 	 */
 	template<class MA, class T, class Op> inline static void
-	binary (const VECTOR_TYPE(T)& A, const VECTOR_TYPE(T)& B, const Op& op, VECTOR_TYPE(T)& C) {
+	binary (const container<T>& A, const container<T>& B, const Op& op, container<T>& C) {
 		
 		typedef SSETraits<T>                sse_type;
 		typedef typename sse_type::Register reg_type;
@@ -249,13 +249,13 @@ namespace SSE {
 		
 		reg_type a, b, c;
 		
-		const T* pA = &A[0];
-		const T* pB = &B[0];
-		T*       pC = &C[0];
+		const T* pA = A.ptr();
+		const T* pB = B.ptr();
+		T*       pC = C.ptr();
 
 		// aligned 
 
-		for (size_t i = 0; i < na; i++) {
+		for (size_t i = 0; i < na; ++i) {
 			a = load<MA>::aligned (pA);
 			b = load<MA>::aligned (pB);
 			c = op.packed (a, b);
@@ -274,7 +274,7 @@ namespace SSE {
 	} // namespace SSE
 
 	template<class MA, class T> inline static void
-	assign (const VECTOR_TYPE(T)& A, VECTOR_TYPE(T)& B) {
+	assign (const container<T>& A, container<T>& B) {
 
 		typedef SSETraits<T>                sse_type;
 		typedef typename sse_type::Register reg_type;
@@ -284,8 +284,8 @@ namespace SSE {
 		size_t   na = floor ((float)n / (float)ne);
         size_t   nr = n % ne;
 
-		const T* pA = &A[0];
-		      T* pB = &B[0];
+		const T* pA = A.ptr();
+        T* pB = B.ptr();
 
 		// aligned
 

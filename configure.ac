@@ -915,6 +915,6 @@ AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/t
  src/matrix/dwt/Makefile src/matrix/dwt/tests/Makefile src/matrix/io/tests/Makefile
  src/matrix/mpi/Makefile src/matrix/mpi/tests/Makefile src/matrix/interp/Makefile
  src/matrix/interp/tests/Makefile src/matrix/unwrap/Makefile src/matrix/unwrap/tests/Makefile 
- src/mongoose/Makefile])
+ src/mongoose/Makefile src/matrix/mri/Makefile src/matrix/mri/tests/Makefile])
 AC_OUTPUT
 

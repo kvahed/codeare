@@ -24,7 +24,7 @@
 #include "NFFT.hpp"
 #include "CX.hpp"
 #include "SEM.hpp"
-#include "MRI.hpp"
+#include "mri/MRI.hpp"
 #include "Lapack.hpp"
 #include "tinyxml.h"
 #include "IOContext.hpp"

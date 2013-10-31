@@ -836,7 +836,7 @@
 #ifdef EW_OMP
     #pragma omp parallel for
 		for (size_t i = 0; i < Size(); ++i)
-			_M[i] += t;
+			_M[i] += s;
 #else
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),s));
 #endif

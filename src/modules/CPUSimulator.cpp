@@ -2,7 +2,7 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 #include "linalg/Lapack.hpp"
-#include "MRI.hpp"
+#include "mri/MRI.hpp"
 
 using namespace RRStrategy;
 
