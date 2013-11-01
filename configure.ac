@@ -420,15 +420,19 @@ AC_ARG_WITH(fftw,   [  --with-fftw             	     Set directory of FFTW3 libr
 case $host in
     *linux-gnu*)
 	    LIBEXT=so
+        LIBPATH=LD_LIBRARY_PATH
     ;;
     *darwin*)
 	    LIBEXT=dylib
+        LIBPATH=DYLD_LIBRARY_PATH
     ;;
     *cygwin*)
 	    LIBEXT=dll.a
+        LIBPATH=LD_LIBRARY_PATH
     ;;
     *mingw*)
 	    LIBEXT=dll.a
+        LIBPATH=LD_LIBRARY_PATH
     ;;
 esac
 

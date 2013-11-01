@@ -3518,12 +3518,7 @@ mkdir_p='$(MKDIR_P)'
 # in the wild :-(  We should find a proper way to deprecate it ...
 AMTAR='$${TAR-tar}'
 
-
-# We'll loop over all known methods to create a tar archive until one works.
-_am_tools='gnutar  pax cpio none'
-
 am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
-
 
 
 
@@ -12128,10 +12123,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"34d2e457\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"5c583c76\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Thu Oct 31 22:21:01 2013 +0100\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Fri Nov 1 23:10:02 2013 +0100\"" >>confdefs.h
 
 
 # copyright notice
@@ -23157,15 +23152,19 @@ fi
 case $host in
     *linux-gnu*)
 	    LIBEXT=so
+        LIBPATH=LD_LIBRARY_PATH
     ;;
     *darwin*)
 	    LIBEXT=dylib
+        LIBPATH=DYLD_LIBRARY_PATH
     ;;
     *cygwin*)
 	    LIBEXT=dll.a
+        LIBPATH=LD_LIBRARY_PATH
     ;;
     *mingw*)
 	    LIBEXT=dll.a
+        LIBPATH=LD_LIBRARY_PATH
     ;;
 esac
 
@@ -27697,7 +27696,7 @@ $as_echo X"$mf" |
     DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
     test -z "$DEPDIR" && continue
     am__include=`sed -n 's/^am__include = //p' < "$mf"`
-    test -z "$am__include" && continue
+    test -z "am__include" && continue
     am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
     # Find all dependency output files, they are included files with
     # $(DEPDIR) in their names.  We invoke sed twice because it is the
