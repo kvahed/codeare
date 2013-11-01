@@ -24,9 +24,6 @@
 
 #include "mongoose.h"
 
-#include <boost/thread/thread.hpp>
-
-
 namespace codeare {
 namespace service {
 
