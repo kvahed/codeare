@@ -749,6 +749,10 @@ LIBTOOL
 MAINT
 MAINTAINER_MODE_FALSE
 MAINTAINER_MODE_TRUE
+AM_BACKSLASH
+AM_DEFAULT_VERBOSITY
+AM_DEFAULT_V
+AM_V
 am__untar
 am__tar
 AMTAR
@@ -813,6 +817,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_silent_rules
 enable_maintainer_mode
 enable_shared
 enable_static
@@ -1472,6 +1477,8 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-silent-rules   less verbose build output (undo: "make V=1")
+  --disable-silent-rules  verbose build output (undo: "make V=0")
   --enable-maintainer-mode
                           enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
@@ -2985,7 +2992,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 ac_config_headers="$ac_config_headers src/config.h"
 
-am__api_version='1.12'
+am__api_version='1.13'
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -3169,8 +3176,8 @@ if test x"${MISSING+set}" != xset; then
   esac
 fi
 # Use eval to expand $SHELL
-if eval "$MISSING --run true"; then
-  am_missing_run="$MISSING --run "
+if eval "$MISSING --is-lightweight"; then
+  am_missing_run="$MISSING "
 else
   am_missing_run=
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: 'missing' script is too old or missing" >&5
@@ -3328,12 +3335,6 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MKDIR_P" >&5
 $as_echo "$MKDIR_P" >&6; }
 
-mkdir_p="$MKDIR_P"
-case $mkdir_p in
-  [\\/$]* | ?:[\\/]*) ;;
-  */*) mkdir_p="\$(top_builddir)/$mkdir_p" ;;
-esac
-
 for ac_prog in gawk mawk nawk awk
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -3416,6 +3417,45 @@ else
 fi
 rmdir .tst 2>/dev/null
 
+# Check whether --enable-silent-rules was given.
+if test "${enable_silent_rules+set}" = set; then :
+  enableval=$enable_silent_rules;
+fi
+
+case $enable_silent_rules in # (((
+  yes) AM_DEFAULT_VERBOSITY=0;;
+   no) AM_DEFAULT_VERBOSITY=1;;
+    *) AM_DEFAULT_VERBOSITY=1;;
+esac
+am_make=${MAKE-make}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $am_make supports nested variables" >&5
+$as_echo_n "checking whether $am_make supports nested variables... " >&6; }
+if ${am_cv_make_support_nested_variables+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if $as_echo 'TRUE=$(BAR$(V))
+BAR0=false
+BAR1=true
+V=1
+am__doit:
+	@$(TRUE)
+.PHONY: am__doit' | $am_make -f - >/dev/null 2>&1; then
+  am_cv_make_support_nested_variables=yes
+else
+  am_cv_make_support_nested_variables=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_make_support_nested_variables" >&5
+$as_echo "$am_cv_make_support_nested_variables" >&6; }
+if test $am_cv_make_support_nested_variables = yes; then
+    AM_V='$(V)'
+  AM_DEFAULT_V='$(AM_DEFAULT_VERBOSITY)'
+else
+  AM_V=$AM_DEFAULT_VERBOSITY
+  AM_DEFAULT_V=$AM_DEFAULT_VERBOSITY
+fi
+AM_BACKSLASH='\'
+
 if test "`cd $srcdir && pwd`" != "`pwd`"; then
   # Use -I$(srcdir) only when $(srcdir) != ., so that make's output
   # is not polluted with repeated "-I."
@@ -3466,13 +3506,24 @@ AUTOHEADER=${AUTOHEADER-"${am_missing_run}autoheader"}
 
 MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
 
+# For better backward compatibility.  To be removed once Automake 1.9.x
+# dies out for good.  For more background, see:
+# <http://lists.gnu.org/archive/html/automake/2012-07/msg00001.html>
+# <http://lists.gnu.org/archive/html/automake/2012-07/msg00014.html>
+mkdir_p='$(MKDIR_P)'
+
 # We need awk for the "check" target.  The system "awk" is bad on
 # some platforms.
 # Always define AMTAR for backward compatibility.  Yes, it's still used
 # in the wild :-(  We should find a proper way to deprecate it ...
 AMTAR='$${TAR-tar}'
 
+
+# We'll loop over all known methods to create a tar archive until one works.
+_am_tools='gnutar  pax cpio none'
+
 am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
+
 
 
 
@@ -12077,10 +12128,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"7bde8c0f\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"34d2e457\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Fri Oct 25 15:00:18 2013 +0200\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Thu Oct 31 22:21:01 2013 +0100\"" >>confdefs.h
 
 
 # copyright notice
@@ -21261,6 +21312,25 @@ $as_echo "$am_cv_python_platform" >&6; }
   PYTHON_PLATFORM=$am_cv_python_platform
 
 
+  # Just factor out some code duplication.
+  am_python_setup_sysconfig="\
+import sys
+# Prefer sysconfig over distutils.sysconfig, for better compatibility
+# with python 3.x.  See automake bug#10227.
+try:
+    import sysconfig
+except ImportError:
+    can_use_sysconfig = 0
+else:
+    can_use_sysconfig = 1
+# Can't use sysconfig in CPython 2.7, since it's broken in virtualenvs:
+# <https://github.com/pypa/virtualenv/issues/118>
+try:
+    from platform import python_implementation
+    if python_implementation() == 'CPython' and sys.version[:3] == '2.7':
+        can_use_sysconfig = 0
+except ImportError:
+    pass"
 
 
             { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $am_display_PYTHON script directory" >&5
@@ -21274,7 +21344,14 @@ else
      else
        am_py_prefix=$prefix
      fi
-     am_cv_python_pythondir=`$PYTHON -c "import sys; from distutils import sysconfig; sys.stdout.write(sysconfig.get_python_lib(0,0,prefix='$am_py_prefix'))" 2>/dev/null`
+     am_cv_python_pythondir=`$PYTHON -c "
+$am_python_setup_sysconfig
+if can_use_sysconfig:
+    sitedir = sysconfig.get_path('purelib', vars={'base':'$am_py_prefix'})
+else:
+    from distutils import sysconfig
+    sitedir = sysconfig.get_python_lib(0, 0, prefix='$am_py_prefix')
+sys.stdout.write(sitedir)"`
      case $am_cv_python_pythondir in
      $am_py_prefix*)
        am__strip_prefix=`echo "$am_py_prefix" | sed 's|.|.|g'`
@@ -21311,7 +21388,14 @@ else
      else
        am_py_exec_prefix=$exec_prefix
      fi
-     am_cv_python_pyexecdir=`$PYTHON -c "import sys; from distutils import sysconfig; sys.stdout.write(sysconfig.get_python_lib(1,0,prefix='$am_py_exec_prefix'))" 2>/dev/null`
+     am_cv_python_pyexecdir=`$PYTHON -c "
+$am_python_setup_sysconfig
+if can_use_sysconfig:
+    sitedir = sysconfig.get_path('platlib', vars={'platbase':'$am_py_prefix'})
+else:
+    from distutils import sysconfig
+    sitedir = sysconfig.get_python_lib(1, 0, prefix='$am_py_prefix')
+sys.stdout.write(sitedir)"`
      case $am_cv_python_pyexecdir in
      $am_py_exec_prefix*)
        am__strip_prefix=`echo "$am_py_exec_prefix" | sed 's|.|.|g'`
@@ -24105,42 +24189,7 @@ fi
 
 # Checks for C++ libraries with name spaces
 
-
-# ISMRMRD
-
-# Check whether --with-ismrmrdroot was given.
-if test "${with_ismrmrdroot+set}" = set; then :
-  withval=$with_ismrmrdroot;
-else
-  with_ismrmrdroot=/usr/local/ismrmrd
-fi
-
-
-if test x"$with_ismrmrdroot" != x"no" ; then
-
-    ISMRMRD_ROOT="$with_ismrmrdroot"
-    ISMRMRD_LIB_PATH="${ISMRMRD_ROOT}/lib"
-	CXXFLAGS="${CXXFLAGS} -I${ISMRMRD_ROOT}/include"
-	CPPFLAGS="${CPPFLAGS} -I${ISMRMRD_ROOT}/include"
-
-	for ac_header in ismrmrd_hdf5.h
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "ismrmrd_hdf5.h" "ac_cv_header_ismrmrd_hdf5_h" "$ac_includes_default"
-if test "x$ac_cv_header_ismrmrd_hdf5_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_ISMRMRD_HDF5_H 1
-_ACEOF
-
-else
-  as_fn_error $? "cannot find ismrmrd_hdf5.h, bailing out" "$LINENO" 5
-fi
-
-done
-
-
-	OLD_LIBS=$LIBS
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_thread" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_thread" >&5
 $as_echo_n "checking for exit in -lboost_thread... " >&6; }
 if ${ac_cv_lib_boost_thread_exit+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -24185,7 +24234,7 @@ _ACEOF
 
 fi
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_system" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_system" >&5
 $as_echo_n "checking for exit in -lboost_system... " >&6; }
 if ${ac_cv_lib_boost_system_exit+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -24230,6 +24279,41 @@ _ACEOF
 
 fi
 
+
+
+# ISMRMRD
+
+# Check whether --with-ismrmrdroot was given.
+if test "${with_ismrmrdroot+set}" = set; then :
+  withval=$with_ismrmrdroot;
+else
+  with_ismrmrdroot=/usr/local/ismrmrd
+fi
+
+
+if test x"$with_ismrmrdroot" != x"no" ; then
+
+    ISMRMRD_ROOT="$with_ismrmrdroot"
+    ISMRMRD_LIB_PATH="${ISMRMRD_ROOT}/lib"
+	CXXFLAGS="${CXXFLAGS} -I${ISMRMRD_ROOT}/include"
+	CPPFLAGS="${CPPFLAGS} -I${ISMRMRD_ROOT}/include"
+
+	for ac_header in ismrmrd_hdf5.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "ismrmrd_hdf5.h" "ac_cv_header_ismrmrd_hdf5_h" "$ac_includes_default"
+if test "x$ac_cv_header_ismrmrd_hdf5_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_ISMRMRD_HDF5_H 1
+_ACEOF
+
+else
+  as_fn_error $? "cannot find ismrmrd_hdf5.h, bailing out" "$LINENO" 5
+fi
+
+done
+
+
+	OLD_LIBS=$LIBS
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for IsmrmrdDataset in -lismrmrd" >&5
 $as_echo_n "checking for IsmrmrdDataset in -lismrmrd... " >&6; }
@@ -27562,7 +27646,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
   case $ac_file$ac_mode in
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
-  # Autoconf 2.62 quotes --file arguments for eval, but not when files
+  # Older Autoconf quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval
   # if we detect the quoting.
   case $CONFIG_FILES in
@@ -27613,7 +27697,7 @@ $as_echo X"$mf" |
     DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
     test -z "$DEPDIR" && continue
     am__include=`sed -n 's/^am__include = //p' < "$mf"`
-    test -z "am__include" && continue
+    test -z "$am__include" && continue
     am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
     # Find all dependency output files, they are included files with
     # $(DEPDIR) in their names.  We invoke sed twice because it is the
