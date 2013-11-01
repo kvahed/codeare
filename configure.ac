@@ -570,6 +570,9 @@ AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
 # Checks for C++ libraries with name spaces
 
+AC_CHECK_LIB([boost_thread],        [exit])
+AC_CHECK_LIB([boost_system],        [exit])
+
 
 # ISMRMRD
 AC_ARG_WITH(ismrmrdroot,[  --with-ismrmrdroot       path to ISMRMRD install dir], 
@@ -585,9 +588,6 @@ if test x"$with_ismrmrdroot" != x"no" ; then
 	AC_CHECK_HEADERS([ismrmrd_hdf5.h], [], [AC_MSG_ERROR([cannot find ismrmrd_hdf5.h, bailing out])])
 
 	OLD_LIBS=$LIBS
-
-    AC_CHECK_LIB([boost_thread],        [exit])
-    AC_CHECK_LIB([boost_system],        [exit])
 
 	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
 

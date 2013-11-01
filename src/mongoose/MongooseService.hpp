@@ -24,6 +24,12 @@
 
 #include "mongoose.h"
 
+<<<<<<< HEAD
+=======
+#include <boost/thread/thread.hpp>
+#include <boost/bind.hpp>
+
+>>>>>>> ea712459d0489e93869a2aad5bcff31693097973
 namespace codeare {
 namespace service {
 
