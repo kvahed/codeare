@@ -36,16 +36,16 @@ E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
    const std::vector<size_t>& nx, const std::vector<NFFT<T> >& fts) {
 
 	Matrix< std::complex<T> > out (nx[2],nx[1]);
-	
+
 #pragma omp parallel default (shared) 
 	{
 
 #pragma omp for 
 		for (int j = 0; j < nx[1]; j++)
-			Column (out, j, fts[omp_get_thread_num()] * (((nx[0] == 2) ? Slice (sm, j) : Volume (sm, j)) * in));
+			Column (out, j, fts[omp_get_thread_num()] * (resize(((nx[0] == 2) ? Slice (sm, j) : Volume (sm, j)),size(in)) * in));
 		
 	}
-	
+
 	return out;
 	
 }
