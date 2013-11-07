@@ -66,21 +66,24 @@
 //    std::cout << " ocl: \n" << ocl_mat << std::endl;
   
     ocl_mat.getData (); // !!! //
-    Matrix <bool> mat_comp = (smat == ocl_mat);
+    Matrix <cbool> mat_comp = (smat == ocl_mat);
     result <double> res = {true, 0.0};
-    for (int i = 0; i < smat.Height (); i++)
-      for (int j = 0; j < smat.Width (); j++)
+    std::cout << " dims (smat/ocl_mat): " << smat.Size () << "/" << ocl_mat.Size () << std::endl;
+    for (int i = 0; i < mat_comp.Height (); i++)
+      for (int j = 0; j < mat_comp.Width (); j++)
       {
+        if (!mat_comp (i,j))
+          std::cout << " smat/ocl_mat: " << smat(i,j) << "/" << ocl_mat (i,j) << std::endl;
         res.equal &= mat_comp (i,j);
       }
   
     if (! res.equal)
     {
-      Matrix <T> diff = smat - ((Matrix <T>) ocl_mat);
-      for (int i = 0; i < smat.Height (); i++)
-        for (int j = 0; j < smat.Width (); j++)
-          res.mean_abs_err += abs (diff (i, j));
-      res.mean_abs_err /= smat.Size ();
+      const Matrix <T> diff = smat - ((Matrix <T>) ocl_mat);
+      for (int i = 0; i < diff.Height (); i++)
+        for (int j = 0; j < diff.Width (); j++)
+          res.mean_abs_err += std::abs (diff (i, j));
+      res.mean_abs_err /= diff.Size ();
     }
   
     return res;
@@ -249,7 +252,10 @@
       oclMatrix <R> ocl_res = op. template apply <SCALAR, OCL_MATRIX, OCL_MATRIX> (scalar, oclmat2);
     time_ocl = t.tic (time_default);
     result <double> r = mat_equal <R> (ocl_res, res);
-    assert ((r.equal || r.mean_abs_err < 1e-1) && " Test failed! ");
+//    assert ((r.equal || r.mean_abs_err < 1e-1) && " Test failed! ");
+    if (!((r.equal || r.mean_abs_err < 1e-1)))
+      std::cerr << "FAILED (mean_abs_err: " << r.mean_abs_err << ")" << std::endl;
+    else
     if (verbose)
     {
       std::cout << "passed! (time_s: " << time_s << "s, time_ocl: " << time_ocl << "s)";

@@ -3,6 +3,7 @@
 #define __OCL_MATRIX_HPP__
 
 #include "../../Matrix.hpp"
+#include "../../Algos.hpp"
 #include "../oclSettings.hpp"
 #include "../oclConnection.hpp"
 #include "../oclTraits.hpp"
@@ -39,8 +40,8 @@ template <> struct ocl_matrix_type_traits <size_t> {
         return std::string ("oclMatrix <size_t>");
     }
 };
-template <> struct ocl_matrix_type_traits <bool> {
-    typedef bool elem_type;
+template <> struct ocl_matrix_type_traits <cbool> {
+    typedef cbool elem_type;
     static std::string type_name ( ) {
         return std::string ("oclMatrix <bool>");
     }
@@ -82,7 +83,7 @@ public:
        * @param  dim      All 16 dimensions.
        */
       inline
-      oclMatrix           (const size_t * dim)
+      oclMatrix           (const std::vector <size_t> & dim)
                         : Matrix <T> (dim),
                           class_name (ocl_matrix_type_traits <T> :: type_name ()),
                           mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
@@ -102,8 +103,8 @@ public:
        * @param  res      All 16 resolutions.
        */
       inline
-      oclMatrix           ( const size_t * dim,
-                            const  float * res )
+      oclMatrix           ( const std::vector <size_t> & dim,
+                            const std::vector <float> & res )
                         : Matrix <T> (dim, res),
                           class_name (ocl_matrix_type_traits <T> :: type_name ()),
                           mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
@@ -310,7 +311,7 @@ public:
        */
       inline
       const T *
-      Data                (const size_t p = 0)
+      Ptr                 (const size_t p = 0)
       const;
       
       
@@ -320,8 +321,8 @@ public:
        * @return          Data.
        */
       inline
-      std::valarray <T> &
-      Dat                 ( );
+      container <T> &
+      Container           ( );
       
       
       /**
@@ -330,8 +331,8 @@ public:
        * @return          Data.
        */
       inline
-      std::valarray <T>
-      Dat                 ( )
+      container <T>
+      Container           ( )
       const;
       
       
@@ -1144,7 +1145,7 @@ public:
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator==          (const         T     & s,
                            const oclMatrix <T> & m)
       {
@@ -1164,7 +1165,7 @@ public:
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>=          (const         T     & s,
                            const oclMatrix <T> & m)
       {
@@ -1184,7 +1185,7 @@ public:
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<=          (const         T     & s,
                            const oclMatrix <T> & m)
       {
@@ -1204,7 +1205,7 @@ public:
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator!=          (const         T     & s,
                            const oclMatrix <T> & m)
       {
@@ -1224,7 +1225,7 @@ public:
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>          (const         T     & s,
                           const oclMatrix <T> & m)
       {
@@ -1244,7 +1245,7 @@ public:
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<          (const         T     & s,
                           const oclMatrix <T> & m)
       {
@@ -1625,7 +1626,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' equality with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator==          (const T & s)
       const;
       
@@ -1637,7 +1638,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' inequality with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator!=          (const T & s)
       const;
       
@@ -1649,7 +1650,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>           (const T & s)
       const;
 
@@ -1661,7 +1662,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>=          (const T & s)
       const;
       
@@ -1673,7 +1674,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<           (const T & s)
       const;
       
@@ -1685,7 +1686,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<=           (const T & s)
       const;
       
@@ -1697,7 +1698,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator==          (const oclMatrix <T> & mat)
       const;
 
@@ -1709,7 +1710,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator!=          (const oclMatrix <T> & mat)
       const;
       
@@ -1721,7 +1722,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>           (const oclMatrix <T> & mat)
       const;
       
@@ -1733,7 +1734,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>=          (const oclMatrix <T> & mat)
       const;
 
@@ -1745,7 +1746,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<           (const oclMatrix <T> & mat)
       const;
 
@@ -1757,7 +1758,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<=          (const oclMatrix <T> & mat)
       const;
 
@@ -1779,7 +1780,7 @@ public:
        * @return          Cross-section or zero.
        */
       oclMatrix <T>
-      operator&           (const oclMatrix <bool> & mat)
+      operator&           (const oclMatrix <cbool> & mat)
       const;
 
 
@@ -1790,7 +1791,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator&&          (const oclMatrix <T> & mat)
       const;
       
@@ -1802,7 +1803,7 @@ public:
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator||          (const oclMatrix <T> & mat)
       const;
       
@@ -1827,7 +1828,7 @@ public:
        * @return          Product of this and M.
        */
       oclMatrix <T>
-      prod                (const oclMatrix <T>&  mat, const char transA = 'N', const char transB = 'N') const;
+      prod                (const oclMatrix <T> &  mat, const char & transA = 'N', const char & transB = 'N') const;
       
       
       /**
@@ -1903,12 +1904,12 @@ public:
       void Validate            (float  & t)  const {}
       void Validate            (size_t & t)  const {}
       void Validate            (double & t)  const {}
-      void Validate            (bool   & t)  const {}
+      void Validate            (cbool  & t)  const {}
       void Validate            (cxfl   & t)  const {}
       void Validate            (cxdb   & t)  const {}
 
       // Friends
-      friend class oclMatrix <bool>;      // for access to private members of !! different !! template type //
+      friend class oclMatrix <cbool>;      // for access to private members of !! different !! template type //
       friend class oclMatrix <float>;
       friend class oclMatrix <double>;
       friend class oclMatrix <size_t>;

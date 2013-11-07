@@ -17,8 +17,8 @@
     {
 
       // copy members of Matrix <T>
-      memcpy (Matrix<T> :: _dim, mat.Dim(), INVALID_DIM * sizeof(size_t));
-      memcpy (Matrix<T> :: _res, mat.Res(), INVALID_DIM * sizeof( float));
+      Matrix<T> :: _dim = mat._dim;
+      Matrix<T> :: _res = mat._res;
 
       // temporary save current oclDataObject
       oclDataWrapper <T> * p_old_oclData = this -> mp_oclData;
@@ -31,14 +31,14 @@
         {
 
           // copy data array of Matrix <T>
-          Matrix<T> :: _M = mat.Dat();      // uses deep copy of valarray <T>
+          Matrix<T> :: _M = mat.Container ();      // uses deep copy of valarray <T>/std::vector <T> (container)
 
         }
         else  /* but set size */
         {
           
           // copy data array of Matrix <T>
-          Matrix<T> :: _M = mat.Dat();      // since resize also iterates over all elements !!!
+          Matrix<T> :: _M = mat.Container ();      // since resize also iterates over all elements !!!
           
         }
       
@@ -137,7 +137,7 @@
   inline
   const T *
   oclMatrix <T> ::
-  Data                    (const size_t p)
+  Ptr                    (const size_t p)
   const
   {
   
@@ -153,7 +153,7 @@
 
     }
     
-    return & (Matrix <T> :: _M [p]);
+    return this -> _M.ptr (p);
   
   }
 
@@ -165,9 +165,9 @@
    */
   template <class T>
   inline
-  std::valarray <T> &
+  container <T> &
   oclMatrix <T> ::
-  Dat                     ( )
+  Container              ( )
   {
 
     /* need to update CPU data ?? */
@@ -192,9 +192,9 @@
    */
   template <class T>
   inline
-  std::valarray <T>
+  container <T>
   oclMatrix <T> ::
-  Dat                     ( )
+  Container                ( )
   const
   {
   
@@ -1024,8 +1024,7 @@
     print_optional (class_name.c_str (), " :: operator* (vector)", op_v_level);
     
     /* assert that matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create result matrix
     oclMatrix <T> res (this -> Dim ());
@@ -1053,8 +1052,7 @@
     print_optional (class_name.c_str (), " :: operator*= (vector)", op_v_level);
     
     /* assert that matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // call operator function of oclOperations
     oclOperations <T, S> :: ocl_operator_mult_vector (this -> mp_oclData, mat.mp_oclData, this -> mp_oclData, this -> Size ());
@@ -1188,7 +1186,7 @@
    * scalar equality
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator==              (const T & s)
   const
@@ -1197,7 +1195,7 @@
     print_optional (class_name.c_str (), " :: operator==", op_v_level);
 
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_equal (this -> mp_oclData, s, result.mp_oclData, this -> Size ());
@@ -1212,7 +1210,7 @@
    * scalar inequality
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator!=          (const T & s)
   const
@@ -1221,7 +1219,7 @@
     print_optional (class_name.c_str (), " :: operator!=", op_v_level);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_inequal (this -> mp_oclData, s, result.mp_oclData, this -> Size ());
@@ -1236,7 +1234,7 @@
    * Scalar greater comparison.
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator>           (const T & s)
   const
@@ -1245,7 +1243,7 @@
     print_optional (class_name.c_str (), " :: operator>", op_v_level);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_greater (this -> mp_oclData, s, result.mp_oclData, this -> Size ());
@@ -1259,7 +1257,7 @@
    * Scalar greater or equal comparison.
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator>=          (const T & s)
   const
@@ -1268,7 +1266,7 @@
     print_optional (class_name.c_str (), " :: operator>=", op_v_level);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_greater_equal (this -> mp_oclData, s, result.mp_oclData, this -> Size ());
@@ -1282,7 +1280,7 @@
    * Scalar less comparison.
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator<           (const T & s)
   const
@@ -1291,7 +1289,7 @@
     print_optional (class_name.c_str (), " :: operator<", op_v_level);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_less (this -> mp_oclData, s, result.mp_oclData, this -> Size ());
@@ -1305,7 +1303,7 @@
    * Scalar less or equal comparison.
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator<=           (const T & s)
   const
@@ -1314,7 +1312,7 @@
     print_optional (class_name.c_str (), " :: operator<=", op_v_level);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_less_equal (this -> mp_oclData, s, result.mp_oclData, this -> Size ());
@@ -1329,7 +1327,7 @@
    * elementwise equality with matrix
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator==          (const oclMatrix <T> & mat)
   const
@@ -1338,11 +1336,10 @@
     print_optional (class_name.c_str (), " :: operator==", op_v_level);
     
     /* assert matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_equal (this -> mp_oclData, mat.mp_oclData, result.mp_oclData, this -> Size ());
@@ -1357,7 +1354,7 @@
    * elementwise inequality with matrix
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator!=          (const oclMatrix <T> & mat)
   const
@@ -1366,11 +1363,10 @@
     print_optional (class_name.c_str (), " :: operator!=", op_v_level);
     
     /* assert matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_inequal (this -> mp_oclData, mat.mp_oclData, result.mp_oclData, this -> Size ());
@@ -1385,7 +1381,7 @@
    * elementwise greater with matrix
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator>           (const oclMatrix <T> & mat)
   const
@@ -1394,11 +1390,10 @@
     print_optional (class_name.c_str (), " :: operator>", op_v_level);
     
     /* assert matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_greater (this -> mp_oclData, mat.mp_oclData, result.mp_oclData, this -> Size ());
@@ -1413,7 +1408,7 @@
    * elementwise greater or equal with matrix
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator>=          (const oclMatrix <T> & mat)
   const
@@ -1422,11 +1417,10 @@
     print_optional (class_name.c_str (), " :: operator>=", op_v_level);
     
     /* assert matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_greater_equal (this -> mp_oclData, mat.mp_oclData, result.mp_oclData, this -> Size ());
@@ -1441,7 +1435,7 @@
    * elementwise less with matrix
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator<           (const oclMatrix <T> & mat)
   const
@@ -1450,11 +1444,10 @@
     print_optional (class_name.c_str (), " :: operator<", op_v_level);
     
     /* assert matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_less (this -> mp_oclData, mat.mp_oclData, result.mp_oclData, this -> Size ());
@@ -1469,7 +1462,7 @@
    * elementwise less or equal with matrix
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator<=          (const oclMatrix <T> & mat)
   const
@@ -1478,11 +1471,10 @@
     print_optional (class_name.c_str (), " :: operator<=", op_v_level);
     
     /* assert matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_less_equal (this -> mp_oclData, mat.mp_oclData, result.mp_oclData, this -> Size ());
@@ -1500,15 +1492,14 @@
   template <class T>
   oclMatrix <T>
   oclMatrix <T> ::
-  operator&           (const oclMatrix <bool> & mat)
+  operator&           (const oclMatrix <cbool> & mat)
   const
   {
   
     print_optional (class_name.c_str (), " :: operator&", op_v_level);
     
     /* assert matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create matrix for result
     oclMatrix <T> result (this -> Dim ());
@@ -1527,7 +1518,7 @@
    * elementwise AND operation with matrix
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator&&          (const oclMatrix <T> & mat)
   const
@@ -1536,11 +1527,10 @@
     print_optional (class_name.c_str (), " :: operator&&", op_v_level);
     
     /* assert matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_and (this -> mp_oclData, mat.mp_oclData, result.mp_oclData, this -> Size ());
@@ -1556,7 +1546,7 @@
    * elementwise OR operation with matrix
    */
   template <class T>
-  oclMatrix <bool>
+  oclMatrix <cbool>
   oclMatrix <T> ::
   operator||          (const oclMatrix <T> & mat)
   const
@@ -1565,11 +1555,10 @@
     print_optional (class_name.c_str (), " :: operator||", op_v_level);
     
     /* assert matrices have the same dimensions */
-    for (int i = 0; i < INVALID_DIM; ++i)
-      assert (this -> Dim () [i] == mat.Dim () [i]);
+    assert (this -> _dim == mat._dim);
     
     // create matrix for result
-    oclMatrix <bool> result (this -> Dim ());
+    oclMatrix <cbool> result (this -> Dim ());
     
     // call operator function of oclOperations
     oclOperations <T> :: ocl_operator_or (this -> mp_oclData, mat.mp_oclData, result.mp_oclData, this -> Size ());
@@ -1662,8 +1651,8 @@
   
     print_optional (class_name.c_str (), " :: prod", op_v_level);
     
-    assert (Is1D (*this) || Is2D (*this));
-    assert (Is1D   (mat) || Is2D   (mat));
+    assert (isxd (*this, 1) || is2d (*this));
+    assert (isxd   (mat, 1) || is2d   (mat));
     
     int m, k, n,
         tr_A, tr_B;
@@ -1729,7 +1718,7 @@
     oclMatrix <T> prod_mat = prod (mat, 'T');
     
     prod_mat.getData ();
-    return * (prod_mat.Data ());
+    return * (prod_mat.Ptr ());
   
   }
 
@@ -1756,7 +1745,7 @@
     oclMatrix <T> prod_mat = prod (mat, 'C');
     
     prod_mat.getData ();
-    return * (prod_mat.Data ());
+    return * (prod_mat.Ptr ());
   
   }
 
