@@ -95,5 +95,4 @@ operator<< (std::ostream& os, const Matrix<T>& v) {
     return os;
 }
 
-
 #endif
