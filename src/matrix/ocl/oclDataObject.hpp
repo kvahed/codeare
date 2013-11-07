@@ -19,8 +19,10 @@
   # include "oclConnection.hpp"
 
   // ViennaCL
-  # include "/usr/local/include/viennacl/vector.hpp"
-  # include "/usr/local/include/viennacl/matrix.hpp"
+# ifdef __USE_VIENNA_CL__
+  # include <viennacl/vector.hpp>
+  # include <viennacl/matrix.hpp>
+# endif
 
 
 
@@ -65,7 +67,7 @@
        *                    -- prepare data object for use on gpu --
        */
       virtual
-      void
+      double
       prepare               () = 0;
 
 
@@ -77,6 +79,8 @@
       print                 ();
 
 
+
+# ifdef __USE_VIENNA_CL__
       /**
        * @brief             -- return ViennaCl vector representation of data object --
        */
@@ -92,7 +96,8 @@
                 class R>
       viennacl :: matrix <S, R>
       getVCLMatrix          (int m, int n);
-
+# endif
+     
 
       /**
        * @name              getters (public)
@@ -114,6 +119,14 @@
       inline
       size_t
       getSize               () const;
+      
+      
+      /**
+       * @brief             return size for kernel argument
+       */
+      virtual
+      size_t
+      getUploadSize         () const;
       
      
       /**
@@ -331,7 +344,7 @@
        * @brief             synchronize data on GPU with CPU
        */
       virtual
-      void
+      double
       loadToGPU             () = 0;
 
 
@@ -339,7 +352,7 @@
        * @brief             synchronize data on CPU with GPU
        */
       virtual
-      void
+      double
       loadToCPU             () = 0;
 
 
@@ -510,6 +523,7 @@ protected:
   
 
 
+# ifdef __USE_VIENNA_CL__
   /**
    *                      -- refer to class definition --
    */
@@ -555,7 +569,7 @@ protected:
     return viennacl :: matrix <S, R> ((*mp_gpu_buffer)(), m, n);
 
   }
-
+# endif
   
   
   /**
@@ -634,6 +648,21 @@ protected:
   {
     
     return m_size;
+    
+  }
+  
+
+
+  /**
+   * @brief               getter of object size
+   */
+  size_t
+  oclDataObject ::
+  getUploadSize                 ()
+  const
+  {
+    
+    return sizeof (cl_mem);
     
   }
   

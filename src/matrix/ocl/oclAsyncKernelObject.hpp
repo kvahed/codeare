@@ -112,7 +112,7 @@
        */
       virtual
       void
-      run                             ( );
+      run                             (const LaunchInformation &);
     
 
 
@@ -280,7 +280,7 @@
    */
   void
   oclAsyncKernelObject ::
-  run                                 ( )
+  run                                 (const LaunchInformation & lc)
   {
   
     print_optional ("oclAsyncKernelObject :: run", oclAsyncKernelObject :: v_level);
@@ -291,7 +291,7 @@
     this -> activate ( );
     
     // activate kernel
-    oclCon -> activateKernel (m_kernel_name);
+    oclCon -> activateKernel (m_kernel_names [0]);
     
     // prepare kernel arguments (load to gpu)
     for (int i = 0; i < m_num_args; i++)

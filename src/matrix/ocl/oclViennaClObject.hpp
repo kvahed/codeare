@@ -1,5 +1,6 @@
 # ifndef __OCL_VIENNA_CL_OBJECT_HPP__
 
+# ifdef __USE_VIENNA_CL__
 
 
 
@@ -306,6 +307,6 @@
   }
   
   
-  
+# endif // __USE_VIENNA_CL__
   
 # endif // __OCL_VIENNA_CL_OBJECT_HPP__

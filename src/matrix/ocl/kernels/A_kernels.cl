@@ -22,10 +22,10 @@
                               int * local_position )
   {
 
-    if (get_work_dim () == 1)
+//    if (get_work_dim () == 1)
       *index = get_local_id (0);
-    else
-      return false;
+//    else
+//      return false;
  
     *global_size    = get_global_size (0);
     *global_inc     = *global_size;
@@ -36,7 +36,7 @@
   }
   
 # endif // __OCL_KERNEL_HEADER__
-
+  
 
 
 /**

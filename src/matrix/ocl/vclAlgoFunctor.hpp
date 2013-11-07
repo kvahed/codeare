@@ -1,5 +1,6 @@
 # ifndef __VCL_ALGO_FUNCTOR_HPP__
 
+# ifdef __USE_VIENNA_CL__
 
 
 
@@ -298,6 +299,6 @@
   }
   
   
-  
+# endif // __USE_VIENNA_CL__
   
 # endif // __VCL_ALGO_FUNCTOR_HPP__

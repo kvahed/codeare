@@ -7,6 +7,7 @@
    ** makros **
    ************/
   # define __OCL_TRAITS_HPP__
+  # define __PERFORMANCE_INFO__
   
   
 
@@ -17,6 +18,7 @@
   
   // ocl
   # include "oclGPUDataObject.hpp"
+  # include "oclLocalMemObject.hpp"
   # include "oclSettings.hpp"
   
   // AMD BLAS
@@ -155,25 +157,25 @@
 
   /******************************
    ** struct: elem_type_traits **
-   **     (spec: bool)         **
+   **     (spec: cbool)        **
    ******************************/  
   template <>
-  struct elem_type_traits <bool>
+  struct elem_type_traits <cbool>
   {
   
     public:
 
-      typedef bool elem_type;
-      typedef bool value_type;
+      typedef cbool elem_type;
+      typedef cbool value_type;
       
       static inline
       const char *
       print_elem_type       ( )
       {
-        return "bool";
+        return "codeare bool";
       }
   
-  }; // struct elem_type_traits <bool>
+  }; // struct elem_type_traits <cbool>
 
 
   /******************************
@@ -204,7 +206,7 @@
    ** struct: oclOperations **
    **   (base struct)       **
    ***************************/
-  template <class      T,                        class      S =                   T,
+  template <class      T,                        class      S =                T,
             class trait1 = elem_type_traits <T>, class trait2 = elem_type_traits <S> >
   struct oclOperations
   {
@@ -240,7 +242,8 @@
        */
       static inline
       const oclError &
-      ocl_run_func_obj                (oclFunctionObject * const func_obj)
+      ocl_run_func_obj            (      oclFunctionObject * const func_obj,
+                                   const LaunchInformation               lc = LaunchInformation (128, 1, 128, 1))
       {
       
         try
@@ -250,15 +253,15 @@
           oclConnection :: Instance () -> activate <elem_type, scalar_type> ();
 
           // execute function object
-          func_obj -> run ( );
+          func_obj -> run (lc);
 
         }
         catch (oclError & err)
         {
         
-          stringstream msg;
+          std::stringstream msg;
           msg << "oclOperations <" << trait1 :: print_elem_type () << ", "
-                                   << trait2 :: print_elem_type () << "> :: ocl_basic_operator_kernel_3";
+                                   << trait2 :: print_elem_type () << "> :: ocl_run_func_obj";
         
           throw oclError (oclError (err, msg.str ().c_str ()));
         
@@ -304,6 +307,325 @@
     
       }
 
+
+      /**
+       * @brief                       execute specified kernel with 3 arguments and 1 scalar
+       */
+      static inline
+      ProfilingInformation
+      ocl_basic_operator_kernel_31              ( const std::string & kernel_name,
+                                                       oclDataObject * const        arg1,
+                                                       oclDataObject * const        arg2,
+                                                       oclDataObject * const      arg3,
+                                                      int               s1,
+                                                 const LaunchInformation              lc )
+      {
+    
+        // number of kernel arguments
+        const int num_args = 4;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = arg3;
+        args [3] = new oclGPUDataObject <int> (& s1, 1);
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance ()
+                                        -> makeFunctionObject <elem_type, scalar_type>
+                                              (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
+        
+        // execute function object
+        ocl_run_func_obj (op_obj, lc);
+
+        // retrieve profiling information
+        ProfilingInformation pi = op_obj -> getProfilingInformation(0);
+        
+        // clear memory
+        delete op_obj;
+        delete args [3];
+        free (args);
+        
+        return pi;
+    
+      }
+      
+      
+            /**
+       * @brief                       execute specified kernel with 2 arguments and 1 scalar
+       */
+      static inline
+      ProfilingInformation
+      ocl_basic_operator_kernel_21              ( const std::string & kernel_name,
+                                                       oclDataObject * const        arg1,
+                                                       oclDataObject * const        arg2,
+                                                   int                           s1,
+                                                 const LaunchInformation              lc )
+      {
+    
+        // number of kernel arguments
+        const int num_args = 3;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = new oclGPUDataObject <int> (& s1, 1);
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance ()
+                                        -> makeFunctionObject <elem_type, scalar_type>
+                                              (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
+        
+        // execute function object
+        ocl_run_func_obj (op_obj, lc);
+
+        // retrieve profiling information
+        ProfilingInformation pi = op_obj -> getProfilingInformation ();
+        
+        // clear memory
+        delete op_obj;
+        delete args [2];
+        free (args);
+        
+        return pi;
+    
+      }
+      
+      
+      /**
+       * @brief                     execute specified kernel with 5 arguments and 5 scalars
+       */
+      static inline
+      ProfilingInformation
+      ocl_basic_operator_kernel_55  ( const   std::string               &        kernel_name,
+                                            oclDataObject               * const         arg1,
+                                            oclDataObject               * const         arg2,
+                                            oclDataObject               * const         arg3,
+                                            oclDataObject               * const       result,
+                                            oclDataObject               * const      loc_mem,
+                                                      int                                 s1,
+                                                      int                                 s2,
+                                                      int                                 s3,
+                                                      int                                 s4,
+                                                      int                       loc_mem_size,
+                                      const LaunchInformation                             lc)
+      {
+
+        // number of kernel arguments
+        const int num_args = 10;
+
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = arg3;
+        args [3] = result;
+        args [4] = loc_mem;
+        args [5] = new oclGPUDataObject <int> (& s1, 1);
+        args [6] = new oclGPUDataObject <int> (& s2, 1);
+        args [7] = new oclGPUDataObject <int> (& s3, 1);
+        args [8] = new oclGPUDataObject <int> (& s4, 1);
+        args [9] = new oclGPUDataObject <int> (& loc_mem_size, 1);
+        
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance ()
+                                        -> makeFunctionObject <elem_type, scalar_type>
+                                              (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
+        
+        // execute function object
+        ocl_run_func_obj (op_obj, lc);
+        
+        // retrieve profiling information
+        ProfilingInformation pi = op_obj -> getProfilingInformation ();
+
+        // clear memory
+        delete op_obj;
+        delete args [5];
+        delete args [6];
+        delete args [7];
+        delete args [8];
+        delete args [9];
+        free (args);
+
+        return pi;
+        
+      }
+      
+      
+      /**
+       * @brief                     execute specified kernel with 6 arguments and 5 scalars
+       */
+      static inline
+      std::vector <ProfilingInformation>
+      ocl_basic_operator_kernel_65  ( const   std::vector <std::string> &       kernel_names,
+                                            oclDataObject               * const         arg1,
+                                            oclDataObject               * const         arg2,
+                                            oclDataObject               * const         arg3,
+                                            oclDataObject               * const         arg4,
+                                            oclDataObject               * const       result,
+                                            oclDataObject               * const      loc_mem,
+                                                      int                                 s1,
+                                                      int                                 s2,
+                                                      int                                 s3,
+                                                      int                                 s4,
+                                                      int                       loc_mem_size,
+                                      const LaunchInformation                             lc)
+      {
+
+        // number of kernel arguments
+        const int num_args = 11;
+
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = arg3;
+        args [3] = arg4;
+        args [4] = result;
+        args [5] = loc_mem;
+        args [6] = new oclGPUDataObject <int> (& s1, 1);
+        args [7] = new oclGPUDataObject <int> (& s2, 1);
+        args [8] = new oclGPUDataObject <int> (& s3, 1);
+        args [9] = new oclGPUDataObject <int> (& s4, 1);
+        args [10] = new oclGPUDataObject <int> (& loc_mem_size, 1);
+        
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance ()
+                                        -> makeFunctionObject <elem_type, scalar_type>
+                                              (kernel_names, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
+        
+        // execute function object
+        ocl_run_func_obj (op_obj, lc);
+        
+        // retrieve profiling information
+        std::vector <ProfilingInformation> vec_pi;
+        for (int i = 0; i < kernel_names.size (); i++)
+          vec_pi.push_back (op_obj -> getProfilingInformation(i));
+
+        // clear memory
+        delete op_obj;
+        delete args [6];
+        delete args [7];
+        delete args [8];
+        delete args [9];
+        delete args [10];
+        free (args);
+
+        return vec_pi;
+        
+      }
+
+      
+      /**
+       * @brief                       execute specified kernel with 2 arguments and 5 scalars
+       */
+      static inline
+      std::vector <ProfilingInformation>
+      ocl_basic_operator_kernel_25             ( const          char * const kernel_name,
+                                                       oclDataObject * const        arg1,
+                                                       oclDataObject * const        arg2,
+                                                                 int                  s1,
+                                                                 int                  s2,
+                                                                 int                  s3,
+                                                                 int                  s4,
+                                                                 int                  s5,
+                                                LaunchInformation                     lc)
+      {
+    
+        // number of kernel arguments
+        const int num_args = 7;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = new oclGPUDataObject <int> (& s1, 1);
+        args [3] = new oclGPUDataObject <int> (& s2, 1);
+        args [4] = new oclGPUDataObject <int> (& s3, 1);
+        args [5] = new oclGPUDataObject <int> (& s4, 1);
+        args [6] = new oclGPUDataObject <int> (& s5, 1);
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance ()
+                                        -> makeFunctionObject <elem_type, scalar_type>
+                                              (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
+        
+
+        // execute function object
+        ocl_run_func_obj (op_obj, lc);
+        
+        // retrieve profiling information
+        std::vector <ProfilingInformation> vec_pi;
+        vec_pi.push_back (op_obj -> getProfilingInformation(0));
+
+        // clear memory
+        delete op_obj;
+        delete args [2];
+        delete args [3];
+        delete args [4];
+        delete args [5];
+        delete args [6];
+        free (args);
+
+        return vec_pi;
+        
+      }
+      
+      
+            /**
+       * @brief                       execute specified kernel with 2 arguments and 4 scalars
+       */
+      static inline
+      ProfilingInformation
+      ocl_basic_operator_kernel_24             ( const          char * const kernel_name,
+                                                       oclDataObject * const        arg1,
+                                                       oclDataObject * const        arg2,
+                                                                 int                  s1,
+                                                                 int                  s2,
+                                                                 int                  s3,
+                                                                 int                  s4,
+                                                LaunchInformation                     lc)
+      {
+    
+        // number of kernel arguments
+        const int num_args = 6;
+    
+        // create array of function arguments
+        oclDataObject ** args = (oclDataObject **) malloc (num_args * sizeof (oclDataObject *));
+        args [0] = arg1;
+        args [1] = arg2;
+        args [2] = new oclGPUDataObject <int> (& s1, 1);
+        args [3] = new oclGPUDataObject <int> (& s2, 1);
+        args [4] = new oclGPUDataObject <int> (& s3, 1);
+        args [5] = new oclGPUDataObject <int> (& s4, 1);
+
+        // create function object
+        oclFunctionObject * op_obj = oclConnection :: Instance ()
+                                        -> makeFunctionObject <elem_type, scalar_type>
+                                              (kernel_name, args, num_args, oclConnection::KERNEL, oclConnection::SYNC);
+        
+
+        // execute function object
+        ocl_run_func_obj (op_obj, lc);
+        
+        // retrieve profiling information
+        ProfilingInformation pi;
+        pi = op_obj -> getProfilingInformation(0);
+
+        // clear memory
+        delete op_obj;
+        delete args [2];
+        delete args [3];
+        delete args [4];
+        delete args [5];
+        free (args);
+
+        return pi;
+        
+      }
+      
 
       /**
        * @brief                       execute specified kernel with 3 arguments and 5 scalars
@@ -467,6 +789,7 @@
       }
     
     
+# ifdef __USE_VIENNA_CL__
       /**
        * @brief                       execute specified ViennaCl algorithm with 3 arguments
        */
@@ -595,6 +918,7 @@
         free (args);
     
       }
+# endif
       
       
       /**
@@ -715,12 +1039,12 @@
       make_GPU_Obj                    (      elem_type * const   cpu_arg,
                                        const    size_t &       num_elems)
       {
-    
-        print_optional ("make_GPU_Obj <", trait1 :: print_elem_type (),
+
+    	print_optional ("make_GPU_Obj <", trait1 :: print_elem_type (),
                                           trait2 :: print_elem_type (), "> (create new)", VERB_HIGH);
     
         return new oclGPUDataObject <elem_type> (cpu_arg, num_elems);
-      
+
       }
     
     
@@ -768,13 +1092,351 @@
     
     
       //@}
-    
+      
+      
+      static inline
+      void
+      addKernelSource                 (const std::string & filename)
+      {
+        oclConnection :: Instance () -> rebuildWithSource <T, S> (filename);
+      }
+
+
+      static inline
+      void
+      addKernelSource                 (const std::string               & filename,
+                                       const std::vector <std::string> & makros)
+      {
+        oclConnection :: Instance () -> rebuildWithSource <T, S> (filename, makros);
+      }
+
+      
+      static inline
+      void
+      addKernelSources                (const std::vector <std::string> & filenames)
+      {
+        oclConnection :: Instance () -> rebuildWithSources <T, S> (filenames);
+      }
+
+      
+      static inline
+      void
+      addKernelSources                (const std::vector <std::string> & filenames,
+                                       const std::vector <std::string> & makros)
+      {
+        oclConnection :: Instance () -> rebuildWithSources <T, S> (filenames, makros);
+      }
+
+      
     
       /**
        * @name                        operators
        */
       //@{
-    
+
+
+
+      static inline
+      std::vector <PerformanceInformation>
+      ocl_operator_perf_dwt           ( oclDataObject * const arg1,
+                                        oclDataObject * const lpf,
+                                        oclDataObject * const hpf,
+                                        oclDataObject * const arg2,
+                                        const int line_length,
+                                        const int num_loc_mem_elems,
+                                        const int fl,
+                                        const int group_size_x,
+                                        const int group_size_y,
+                                        const int global_x,
+                                        const int global_y )
+      {
+        
+          std::vector <PerformanceInformation> vec_perf;
+        
+          print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
+                                             trait2 :: print_elem_type (), "> :: ocl_operator_perf_dwt", op_v_level);
+
+          // dynamically allocate local memory
+          oclDataObject * loc_mem = new oclLocalMemObject <elem_type> (num_loc_mem_elems);
+          
+          // kernel launch configuration
+          LaunchInformation lc (group_size_x, group_size_y, global_x, global_y);
+
+          ////////////////////
+          // Global to Local
+          ////////////////////
+          std::string kernel_name ("perf_dwtGlobalToLocal");
+          ProfilingInformation pi = ocl_basic_operator_kernel_21 (kernel_name, loc_mem, arg1, line_length, lc);
+          double time_seconds = pi.time_end - pi.time_start;
+          double effective_bw = ((double) ((line_length/(global_x/(double)group_size_x)+fl-2)/(double)group_size_x * (line_length/(global_y/(double)group_size_y)+fl-2)/(double)group_size_y) * global_x * global_y * sizeof (elem_type) ) * 1.0e-9f / time_seconds;
+          vec_perf.push_back (PerformanceInformation (kernel_name, lc, std::string () + " Effective bandwidth (GB/s)", time_seconds, pi.time_mem_up, pi.time_mem_down, effective_bw));
+                    
+          ////////////////////
+          // Local to Global
+          ////////////////////
+          kernel_name = std::string ("perf_dwtLocalToGlobal");
+          pi = ocl_basic_operator_kernel_21 (kernel_name, loc_mem, arg2, line_length, lc);
+          time_seconds = pi.time_end - pi.time_start;
+          effective_bw = ((double) pow (line_length,2) * sizeof (elem_type) ) * 1.0e-9f / time_seconds;
+          vec_perf.push_back (PerformanceInformation (kernel_name, lc, std::string () + " Effective bandwidth (GB/s)", time_seconds, pi.time_mem_up, pi.time_mem_down, effective_bw));
+          
+          ////////////////////
+          // Convolution
+          ////////////////////
+          kernel_name = std::string ("perf_dwtFilter");
+          pi = ocl_basic_operator_kernel_31 (kernel_name, loc_mem, lpf, hpf, line_length, lc);
+          time_seconds = pi.time_end - pi.time_start;
+          float effective_flops = ((float) (7 + (line_length/(global_x/group_size_x)+fl) / group_size_x * line_length/global_x * (9 + 4 * fl + 2)) + (7 + pow(line_length/global_x,2)) * (9 + 4*fl + 2)) * global_x * global_y / time_seconds * 1.0e-9f;
+          vec_perf.push_back (PerformanceInformation (kernel_name, lc, std::string () + " Effective Flop/s (GFlop/s)", time_seconds, pi.time_mem_up, pi.time_mem_down, effective_flops));
+                    
+          delete loc_mem;
+          
+          return vec_perf;
+        
+      }
+
+
+      /**
+       * @brief                       3D Discrete Wavelet Transform.
+       *
+       * @param  arg1                 Address of signal (n x m x k).
+       * @param  arg2                 Address of resulting DWT (n x m x k).
+       * @param  n                    First dimension.
+       * @param  m                    Second dimension.
+       * @param  k                    Third dimension.
+       * @param  filter               Convolution kernel.
+       * @param  fl                   Length of convolution kernel.
+       * ...
+       */
+      static inline
+      std::vector <PerformanceInformation>
+      ocl_operator_dwt                ( oclDataObject * const arg1,
+                                                  int            n,
+                                                  int            m,
+                                                  int            k,
+                                        oclDataObject * const  lpf,
+                                        oclDataObject * const  hpf,
+                                                  int           fl,
+                                            const int         levels,
+                                        oclDataObject * const arg2,
+                                                  int         num_loc_mem_elems,
+                                                  int   const group_size_x,
+                                                  int   const group_size_y,
+                                                  int   const global_x,
+                                                  int   const global_y)
+      {
+        
+          print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
+                                             trait2 :: print_elem_type (), "> :: ocl_operator_dwt", op_v_level);
+
+          // dynamically allocate local memory
+          oclDataObject * loc_mem = new oclLocalMemObject <elem_type> (num_loc_mem_elems);
+          
+          // create kernel launch configuration
+          LaunchInformation lc (group_size_x, group_size_y, global_x, global_y);
+          
+          std::vector <ProfilingInformation> vec_pi;
+          
+          // launch kernels
+          oclDataObject * tmp1 = arg1;
+          oclDataObject * tmp2 = arg2;
+          for (int i = 0; i < levels; i++)
+          {
+            const int line_length = n / pow (2, i);
+            ProfilingInformation pi = ocl_basic_operator_kernel_55 ("dwt2", tmp1, lpf, hpf, tmp2, loc_mem, n, m, k, line_length, num_loc_mem_elems, lc);
+            vec_pi.push_back (pi);
+            oclDataObject * tmp = tmp1;
+            tmp1 = tmp2;
+            tmp2 = tmp;
+          }
+          std::vector <ProfilingInformation> vec_tmp = ocl_basic_operator_kernel_25 ("dwt2_final", arg1, arg2, n, m, k, n / pow (2, levels-1), levels, lc);
+          
+          delete loc_mem;
+          
+          ///////////////
+          // performance
+          ///////////////
+
+# ifdef __PERFORMANCE_INFO__
+          
+          const int num_groups_0 = global_x / group_size_x;
+          const int num_groups_1 = global_y / group_size_y;
+          
+          // data amount for dwt2 over all levels
+          int data_size_1 = 0;
+          for (int i = 0; i < levels; i++)
+          {
+            const int sl_0 = n / pow (2, i);
+            const int sl_1 = m / pow (2, i);
+            const float block_size_0 = sl_0 / num_groups_0;
+            const float block_size_1 = sl_1 / num_groups_1;
+            const int offset = fl - 2;
+            // global -> local
+            data_size_1 += (block_size_0 + offset) * (block_size_1 + offset) * num_groups_0 * num_groups_1;
+            // local -> global
+            data_size_1 += sl_0 * sl_1;
+          }
+          
+          std::vector <PerformanceInformation> vec_perf;
+          float time_seconds_1 = 0,
+                time_mem_up_1 = 0,
+                time_mem_down_1;
+          for (std::vector <ProfilingInformation> :: const_iterator it_pi = vec_pi.begin (); it_pi != vec_pi.end (); ++it_pi)
+          {
+            time_seconds_1 += it_pi -> time_end - it_pi -> time_start;
+            time_mem_up_1   += it_pi -> time_mem_up;
+            time_mem_down_1 += it_pi -> time_mem_down;
+          }
+          float effective_bw_1 = (data_size_1 * sizeof (elem_type) * 1.0e-9f) / time_seconds_1;
+          
+          // data amount for dwt2_final
+          int data_size_2 = 0;
+          for (int i = 1; i <= (levels-1)/2; i++)
+            data_size_2 += pow (n/pow (2,2*i), 2);
+          data_size_2 *= 3;
+          if (levels&1)
+            data_size_2 += pow (n/pow (2,2*(levels-1)), 2);
+          
+          float time_seconds_2 = vec_tmp [0].time_end - vec_tmp [0].time_start;
+          float effective_bw_2 = (data_size_2 * sizeof (elem_type) * 1.0e-9f) / time_seconds_2;
+
+          float effective_bw = ((data_size_1 + data_size_2) * sizeof (elem_type) * 1.0e-9f) / (time_seconds_1 + time_seconds_2);
+          vec_perf.push_back (PerformanceInformation ("dwt2 (all levels, final)", lc, " Effective bandwidth (GB/s)", time_seconds_1 + time_seconds_2, time_mem_up_1 + vec_tmp [0].time_mem_up, time_mem_down_1 + vec_tmp [0].time_mem_down, effective_bw));
+          vec_perf.push_back (PerformanceInformation ("dwt2 (all levels)", lc, " Effective bandwidth (GB/s)", time_seconds_1, time_mem_up_1, time_mem_down_1, effective_bw_1));
+          vec_perf.push_back (PerformanceInformation ("dwt2_final", lc, " Effective bandwidth (GB/s)", time_seconds_2, vec_tmp [0].time_mem_up, vec_tmp [0].time_mem_down, effective_bw_2));
+# endif
+          
+          return vec_perf;
+          
+      }
+      
+      
+      
+            /**
+       * @brief                       3D Discrete Wavelet Transform.
+       *
+       * @param  arg1                 Address of signal (n x m x k).
+       * @param  arg2                 Address of resulting DWT (n x m x k).
+       * @param  n                    First dimension.
+       * @param  m                    Second dimension.
+       * @param  k                    Third dimension.
+       * @param  filter               Convolution kernel.
+       * @param  fl                   Length of convolution kernel.
+       * ...
+       */
+      static inline
+      std::vector <PerformanceInformation>
+      ocl_operator_idwt               ( oclDataObject * const arg1,
+                                                  int            n,
+                                                  int            m,
+                                                  int            k,
+                                        oclDataObject * const  lpf,
+                                        oclDataObject * const  hpf,
+                                                  int           fl,
+                                            const int         levels,
+                                        oclDataObject * const arg2,
+                                                  int         num_loc_mem_elems,
+                                                  int   const group_size_x,
+                                                  int   const group_size_y,
+                                                  int   const global_x,
+                                                  int   const global_y)
+      {
+        
+          std::vector <PerformanceInformation> vec_perf;
+        
+          print_optional ("oclOperations <", trait1 :: print_elem_type (), ", ",
+                                             trait2 :: print_elem_type (), "> :: ocl_operator_idwt", op_v_level);
+
+          // dynamically allocate local memory
+          oclDataObject * loc_mem = new oclLocalMemObject <elem_type> (num_loc_mem_elems);
+          std::cout << " local_mem: " << num_loc_mem_elems * sizeof (elem_type) << " Bytes " << std::endl;
+          
+          // create launch configuration
+          LaunchInformation lc (group_size_x, group_size_y, global_x, global_y);
+                    
+          std::vector <ProfilingInformation> vec_pi_1, vec_pi_2;
+          
+          const int line_length = n/pow (2,levels-1);
+          ProfilingInformation pi = ocl_basic_operator_kernel_55 ("idwt2", arg1, lpf, hpf, arg2, loc_mem, n, m, k, line_length, num_loc_mem_elems, lc);
+          vec_pi_1.push_back (pi);
+          
+          for (int i = levels-2; i >= 0; i--)
+          {
+            const int line_length2 = n / pow (2, i);
+            ProfilingInformation pi_tmp2 = ocl_basic_operator_kernel_24 ("idwt2_prepare", arg1, arg2, n, m, k, line_length2/2, lc);
+            ProfilingInformation pi_tmp1 = ocl_basic_operator_kernel_55 ("idwt2", arg1, lpf, hpf, arg2, loc_mem, n, m, k, line_length2, num_loc_mem_elems, lc);
+            vec_pi_2.push_back (pi_tmp2);
+            vec_pi_1.push_back (pi_tmp1);
+          }
+          
+# ifdef __PERFORMANCE_INFO__
+          
+          const int num_groups_0 = global_x / group_size_x;
+          const int num_groups_1 = global_y / group_size_y;
+          
+          // data amount for idwt2 over all levels
+          int data_size_1 = 0;
+          for (int i = levels-1; i >= 0; i--)
+          {
+            const int sl_0 = n / pow (2, i);
+            const int sl_1 = m / pow (2, i);
+            const float block_size_0 = sl_0 / num_groups_0;
+            const float block_size_1 = sl_1 / num_groups_1;
+            const int offset = fl - 1;
+            // global -> local
+            data_size_1 += (block_size_0 + 2 * offset) * (block_size_1 + 2 * offset) * num_groups_0 * num_groups_1;
+            // local -> global
+            data_size_1 += sl_0 * sl_1;
+          }
+          
+          float time_seconds_1 = 0,
+                time_mem_up_1 = 0,
+                time_mem_down_1 = 0;
+          for (std::vector <ProfilingInformation> :: const_iterator it = vec_pi_1.begin (); it != vec_pi_1.end (); ++it)
+          {
+            time_seconds_1 += it -> time_end - it -> time_start;
+            time_mem_up_1 += it -> time_mem_up;
+            time_mem_down_1 += it -> time_mem_down;
+          }
+          float effective_bw_1 = ((float) (data_size_1 * sizeof (elem_type)) * 1.0e-9f) / time_seconds_1;
+          
+          // data amount for idwt2_prepare
+          int data_size_2 = 0;
+          for (int l = 2; l <= levels; l++)
+          {
+            const int sl_0 = n / pow (2, l-1);
+            const int sl_1 = m / pow (2, l-1);
+            data_size_2 += sl_0 * sl_1;
+          }
+          
+          float time_seconds_2 = 0,
+                time_mem_up_2 = 0,
+                time_mem_down_2 = 0;
+          for (std::vector <ProfilingInformation> :: const_iterator it = vec_pi_2.begin (); it != vec_pi_2.end (); ++it)
+          {
+            time_seconds_2 += it -> time_end - it -> time_start;
+            time_mem_up_2 += it -> time_mem_up;
+            time_mem_down_2 += it -> time_mem_down;
+          }
+          float effective_bw_2 = ((float)(data_size_2 * sizeof (elem_type)) * 1.0e-9f) / time_seconds_2;
+          
+          // overall bandwidth
+          float effective_bw = ((float)((data_size_1 + data_size_2) * sizeof (elem_type)) * 1.0e-9f) / (time_seconds_1 + time_seconds_2);
+          
+            vec_perf.push_back (PerformanceInformation ("idwt2 (+prepare)", lc, " Effective bandwidth (GB/s)", time_seconds_1 + time_seconds_2, time_mem_up_1 + time_mem_up_2, time_mem_down_1 + time_mem_down_2, effective_bw));
+            vec_perf.push_back (PerformanceInformation ("idwt2 (kernel)", lc, " Effective bandwidth (GB/s)", time_seconds_1, time_mem_up_1, time_mem_down_1, effective_bw_1));
+            vec_perf.push_back (PerformanceInformation ("idwt2_prepare (kernel)", lc, " Effective bandwidth (GB/s)", time_seconds_2, time_mem_up_2, time_mem_down_2, effective_bw_2));
+                        
+# endif
+            
+          delete loc_mem;
+          
+          return vec_perf;
+          
+      }
+      
+
+
 
       /**
        * @brief                       Matrix product.
