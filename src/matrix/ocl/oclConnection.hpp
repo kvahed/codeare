@@ -667,17 +667,17 @@ modify_kernel        ( std::string const &       source,
 
 
   /***********************************
-   ** precision trait (bool, S)     **
+   ** precision trait (cbool, S)    **
    **   (derived)                   **
    ***********************************/
   template <>
   template <class S>
-  struct oclConnection :: ocl_precision_trait <bool, S>
+  struct oclConnection :: ocl_precision_trait <cbool, S>
   {
 
     public:
 
-      typedef bool elem_type;
+      typedef cbool elem_type;
 
       static inline
       const std::vector <const char *>
