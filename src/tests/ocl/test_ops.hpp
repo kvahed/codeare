@@ -68,12 +68,9 @@
     ocl_mat.getData (); // !!! //
     Matrix <cbool> mat_comp = (smat == ocl_mat);
     result <double> res = {true, 0.0};
-    std::cout << " dims (smat/ocl_mat): " << smat.Size () << "/" << ocl_mat.Size () << std::endl;
     for (int i = 0; i < mat_comp.Height (); i++)
       for (int j = 0; j < mat_comp.Width (); j++)
       {
-        if (!mat_comp (i,j))
-          std::cout << " smat/ocl_mat: " << smat(i,j) << "/" << ocl_mat (i,j) << std::endl;
         res.equal &= mat_comp (i,j);
       }
   
