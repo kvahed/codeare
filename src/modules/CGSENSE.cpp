@@ -47,9 +47,6 @@ CGSENSE::Finalise () {
 	return OK;
 }
 
-	return OK;
-	
-}
 
 error_code 
 CGSENSE::Init() {
