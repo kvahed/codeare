@@ -68,8 +68,8 @@
     ocl_mat.getData (); // !!! //
     Matrix <cbool> mat_comp = (smat == ocl_mat);
     result <double> res = {true, 0.0};
-    for (int i = 0; i < mat_comp.Height (); i++)
-      for (int j = 0; j < mat_comp.Width (); j++)
+    for (int i = 0; i < mat_comp.Dim (0); i++)
+      for (int j = 0; j < mat_comp.Dim (1); j++)
       {
         res.equal &= mat_comp (i,j);
       }
@@ -77,8 +77,8 @@
     if (! res.equal)
     {
       const Matrix <T> diff = smat - ((Matrix <T>) ocl_mat);
-      for (int i = 0; i < diff.Height (); i++)
-        for (int j = 0; j < diff.Width (); j++)
+      for (int i = 0; i < diff.Dim (0); i++)
+        for (int j = 0; j < diff.Dim (1); j++)
           res.mean_abs_err += std::abs (diff (i, j));
       res.mean_abs_err /= diff.Size ();
     }

@@ -712,10 +712,10 @@ oclmatrixtest (Connector<T>* rc) {
 
   try
   {
-//    std::cout << std::endl << std::endl;
-//    std::cout << " ----------- // float, float  \\\\ ------------ " << std::endl;
-//    std::cout << std::endl;
-//    exec_tests <float, float>  (true);
+    std::cout << std::endl << std::endl;
+    std::cout << " ----------- // float, float  \\\\ ------------ " << std::endl;
+    std::cout << std::endl;
+    exec_tests <float, float>  (true);
     std::cout << std::endl << std::endl;
 /*    std::cout << " ----------- // float, double  \\\\ ------------ " << std::endl;
     std::cout << std::endl;
