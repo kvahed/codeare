@@ -135,9 +135,7 @@ whitened = ipermute(whitened,new_order);
 
 	void PhaseCombine (const Matrix<cxfl>& img, Matrix<float>& pc) {
 		
-		size_t nc = ndims(img);
-
-		if (IsZero(pc))
+		if (iszero(pc))
 			return;
 
 	}

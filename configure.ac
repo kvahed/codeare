@@ -24,6 +24,8 @@ AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
+AM_MAINTAINER_MODE
+
 
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
@@ -41,7 +43,7 @@ AC_COPYRIGHT([2010-2013, Kaveh Vahedipour])
 AH_TEMPLATE([CXX], [c++ compiler])
 
 AC_PROG_CC
-AC_PROG_FC
+AC_PROG_F77
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 
@@ -86,6 +88,10 @@ case $host in
 	CXXFLAGS="${CXXFLAGS} ${SIMD_FLAGS}"
      ;;
 esac
+CXXFLAGS="${CXXFLAGS} -Wno-psabi"
+
+# Get size of void*
+AC_CHECK_SIZEOF(void*)
 
 # Optional documentation 
 
@@ -277,6 +283,7 @@ AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdio.h, bai
 AC_CHECK_HEADERS([stdlib.h],         [], [AC_MSG_ERROR([cannot find stdlib.h, bailing out])])
 AC_CHECK_HEADERS([string.h],         [], [AC_MSG_ERROR([cannot find string.h, bailing out])])
 AC_CHECK_HEADERS([signal.h],         [], [AC_MSG_ERROR([cannot find signal.h, bailing out])])
+AC_CHECK_HEADERS([gsl/gsl_spline.h], [], [AC_MSG_ERROR([cannot find gsl/gsl_wavelet2d.h, bailing out])])
 
 AC_ARG_ENABLE([networking],
      [  --enable-networking          turn on networking support (default: yes)],
@@ -340,10 +347,9 @@ AC_CHECK_HEADERS([nfft3util.h],      [],
 AC_CHECK_HEADERS([H5Cpp.h],          [], 
    [AC_MSG_RESULT([cannot find H5Cpp.h, hdf5 dump / read functionality unavailable!])])
 AC_CHECK_HEADERS([nifti1_io.h],      [], 
-   [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])
-AC_CHECK_HEADERS([gsl/gsl_wavelet2d.h], [HAVE_GSL=1], 
-   [AC_MSG_RESULT([cannot find gsl/gsl_wavelet2d.h, CompressedSensing unavailable!])])
-AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+   [AC_CHECK_HEADERS([nifti/nifti1_io.h],      [], 
+   [AC_MSG_RESULT([cannot find nifti1_io.h, NIFTI dump / read functionality unavailable!])])])
+AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h sys/sysctl.h])
 AC_CHECK_HEADERS([openssl/evp.h], [HAVE_CRYPTO=1], 
    [AC_MSG_ERROR([cannot find openssl headers, bailing out])])
 AC_CHECK_HEADERS([fcntl.h],          [], 
@@ -352,6 +358,12 @@ AC_CHECK_HEADERS([stddef.h],         [],
    [AC_MSG_ERROR([cannot find stddef.h, bailing out])])
 AC_CHECK_HEADERS([boost/any.hpp],    [], 
    [AC_MSG_ERROR([cannot find boost/any.hpp, bailing out])])
+AC_CHECK_HEADERS([boost/shared_ptr.hpp],    [], 
+   [AC_MSG_ERROR([cannot boost/shared_ptr.hpp, bailing out])])
+AC_CHECK_HEADERS([boost/make_shared.hpp],    [], 
+   [AC_MSG_ERROR([cannot boost/make_shared.hpp, bailing out])])
+AC_CHECK_HEADERS([boost/random/variate_generator.hpp],    [], 
+   [AC_MSG_RESULT([cannot find boost/random/variate_generator.hpp, random numbers not available!])])
 
 AC_CHECK_HEADERS(CL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
     AC_CHECK_HEADERS(OpenCL/cl.h, [AC_DEFINE(HAVE_OPENCL_HEADERS, 1, [Open CL headers])], [
@@ -373,6 +385,7 @@ AC_MSG_CHECKING(whether host is Mac OS)
 case $host in
     *darwin*)
         LDFLAGS="$LDFLAGS -framework OpenCL"
+        HAVE_LIBOPENCL=1
 		AC_DEFINE(HAVE_LIBOPENCL, 1, [Open CL libraries])
         AC_MSG_RESULT(yes)
     ;;
@@ -380,7 +393,7 @@ case $host in
         AC_MSG_RESULT(no)
         AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [],[ 
             echo "OpenCL library not found in your system"
-        ])
+            HAVE_LIBOPENCL=0])
 esac
 AM_CONDITIONAL([USE_LIBOPENCL],  [test "$HAVE_LIBOPENCL" -eq 1])
 
@@ -403,9 +416,32 @@ AC_ARG_WITH(fftw,   [  --with-fftw             	     Set directory of FFTW3 libr
 #############################################################
 # FFT routines
 #############################################################
+case $host in
+    *linux-gnu*)
+	    LIBEXT=so
+        LIBPATH=LD_LIBRARY_PATH
+    ;;
+    *darwin*)
+	    LIBEXT=dylib
+        LIBPATH=DYLD_LIBRARY_PATH
+    ;;
+    *cygwin*)
+	    LIBEXT=dll.a
+        LIBPATH=LD_LIBRARY_PATH
+    ;;
+    *mingw*)
+	    LIBEXT=dll.a
+        LIBPATH=LD_LIBRARY_PATH
+    ;;
+esac
 
 echo "Searching for FFTW library"
-
+if test -d "/usr/lib64"
+then
+  LIBDIR=lib64
+else
+  LIBDIR=lib
+fi
 if test "$with_fftw" = ""
 then
   # No path specified
@@ -413,18 +449,20 @@ then
   echo " -> Path not given. Searching for library..."
 else
   FFTPATH=$with_fftw
-  AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/lib/libfftw3.a $FFTPATH/lib/libfftw3f.a ,, [
-    echo " -> Given path not correct. Finding..."
-    FFTPATH=""
+  AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT ,, [
+     AC_CHECK_FILES( $FFTPATH/include/fftw3.h $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3f.$LIBEXT $FFTPATH/$LIBDIR/x86_64-linux-gnu/libfftw3f.$LIBEXT ,, [
+      echo " -> Given path not correct. Finding..."
+      FFTPATH=""
+  	  ] )
   ] )
 fi
 
-# Test if FFTW_ROOT is set
+# Test if FFTW is 
 if test "$FFTPATH" = ""
 then
   if test "$FFTW_ROOT" != ""
   then
-    AC_CHECK_FILES( $FFTW_ROOT/include/fftw3.h $FFTW_ROOT/lib/libfftw3.a , FFTPATH=$FFTW_ROOT, )
+    AC_CHECK_FILES( $FFTW_ROOT/include/fftw3.h $FFTW_ROOT/$LIBDIR/libfftw3f.$LIBEXT , FFTPATH=$FFTW_ROOT, )
   fi
 fi
 
@@ -439,11 +477,9 @@ then
 
   if test "$FFTPATH" != ""
   then
-    # Check for the rest of the files
-
     # NOTE: AC_CHECK_FILES works here, but AC_CHECK_FILE doesn't (?!)
-    AC_CHECK_FILES( $FFTPATH/lib/libfftw3.a $FFTPATH/lib/libfftw3f.a , , FFTPATH="" )
-    fi
+    AC_CHECK_FILES( $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT $FFTPATH/$LIBDIR/libfftw3f.$LIBEXT , , FFTPATH="" )
+  fi
 fi
 
 if test "$FFTPATH" = ""
@@ -464,9 +500,29 @@ else
     LIBS="-lfftw3f_threads ${LIBS}"],
     [AC_MSG_RESULT([cannot find libfftw3f_threads, single threaded float precision FFTs only!])])
   AC_CHECK_LIB([m], [sinh], [], [AC_MSG_RESULT([cannot find libm])])
-  LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/lib"
+  LIBS="${LIBS} -lm $PTHREAD_LIBS -Wl,-rpath,${FFTPATH}/$LIBDIR"
 fi
 echo ""
+
+## Name demangling?
+AC_MSG_CHECKING([for abi::__cxa_demangle])
+AC_COMPILE_IFELSE([
+  #include <typeinfo>
+  using namespace std;
+  #include <cxxabi.h>
+  int main(int c,char **v) {
+   int dstat;
+   char *demangled = abi::__cxa_demangle(typeid(dstat).name(),0,0,&dstat);
+   return 0;
+  }
+ ],[
+  AC_MSG_RESULT([yes])
+  AC_DEFINE([HAVE_DEMANGLE],,[defined if abi::__cxa_demangle is available])
+ ],[
+  AC_MSG_RESULT([no])
+ ]
+)
+
 
 # Time & Co for FFTW cycle
 AC_CHECK_TYPE([hrtime_t],[AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])],,[
@@ -486,7 +542,7 @@ AC_TRY_LINK([
 AC_MSG_RESULT($rtc_ok)
 
 AC_CHECK_LIB([nfft3],        [nfft_precompute_psi], [HAVE_NFFT3=1], 
-   [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!])])
+   [AC_MSG_RESULT([cannot find libnfft3, NuFFT/CGSENSE unavailable!]) ; HAVE_NFFT3=0])
 AM_CONDITIONAL([USE_NFFT3],  [test "$HAVE_NFFT3" -eq 1])
 
 # NFFT naming differences starting with 3.2.0
@@ -509,12 +565,19 @@ if test -z $nfft_32_naming; then
 	   [HAVE_NFFT3=1],
    	   [LIBS=$OLD_LIBS])
 fi
+if test "$HAVE_NFFT3" -eq 0 ; then
+   AC_MSG_RESULT([none])
+fi
 
 AM_CONDITIONAL([USE_NFFT3], [test "$HAVE_NFFT3" -eq 1])
 
 # Checks for C++ libraries with name spaces
 
-# ISMRMRD (required)
+AC_CHECK_LIB([boost_thread],        [exit])
+AC_CHECK_LIB([boost_system],        [exit])
+
+
+# ISMRMRD
 AC_ARG_WITH(ismrmrdroot,[  --with-ismrmrdroot       path to ISMRMRD install dir], 
         [], [with_ismrmrdroot=/usr/local/ismrmrd])
 
@@ -527,9 +590,11 @@ if test x"$with_ismrmrdroot" != x"no" ; then
 
 	AC_CHECK_HEADERS([ismrmrd_hdf5.h], [], [AC_MSG_ERROR([cannot find ismrmrd_hdf5.h, bailing out])])
 
-	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
 	OLD_LIBS=$LIBS
-	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -lismrmrd_xsd -lboost_thread -lboost_system"
+
+	AC_MSG_CHECKING([for IsmrmrdDataset in -lismrmrd])
+
+	LIBS="${LIBS} -L${ISMRMRD_LIB_PATH} -lismrmrd -Wl,-rpath,${ISMRMRD_LIB_PATH}"
 
 	AC_TRY_LINK([#include <ismrmrd_hdf5.h>],
 	  [ISMRMRD::IsmrmrdDataset d("","");],
@@ -604,6 +669,8 @@ AC_TRY_LINK([#include <nifti1_io.h>],
 if test -z $niftiio_found; then
     LIBS=$OLD_LIBS
 fi
+AM_CONDITIONAL([USE_NIFTI], [test x"$niftiio_found" = x"yes"])
+
 
 # ITK
 AH_TEMPLATE([HAVE_INSIGHT], [Define to 1 if you have the <itkImage.h> header file.])
@@ -695,8 +762,10 @@ if test x"$with_matlabroot" != x"no" ; then
    		matlab_found=yes,
    		[LIBS=$OLD_LIBS]
    		[AC_MSG_ERROR([no. cannot link to libmat, bailing out])])
-
 fi
+
+AM_CONDITIONAL([USE_MATLAB], [test x"$matlab_found" = x"yes"])
+
 
 # BLAS and LAPACK
 AC_ARG_WITH(blas,[  --with-blas             which blas library to use],[
@@ -753,6 +822,17 @@ if test -z "$BLAS"; then
 fi
 
 # Otherwise, run through a list of possibilities                                                                                            
+AC_ARG_WITH(atlasroot,[  --with-atlasroot       path to atlas install dir], 
+                           [], [with_atlasroot=no])
+if test -z "$BLAS" -a x"$with_atlasroot" != x"no" ; then
+  OLD_LIBS=$LIBS
+  LIBS="$LIBS -L$with_atlasroot"
+  AC_CHECK_LIB(blas, $DGEMM_SYMBOL, BLAS="-L$with_atlasroot -latlas -lblas", [LIBS=$OLD_LIBS])
+  if test ! -z "$BLAS"; then
+    AC_CHECK_LIB(lapack, $DGEEV_SYMBOL, LAPACK="-llapack", [LIBS=$OLD_LIBS])
+  fi
+fi
+
 if test -z "$BLAS"; then
   AC_CHECK_LIB(essl, $DGEMM_SYMBOL, BLAS="-lessl -lpthread")
 fi
@@ -771,7 +851,7 @@ fi
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
-  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -latlas -lblas")
+  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -lblas")
   LIBS=$SAVE_LIBS2
 fi
 
@@ -830,9 +910,7 @@ LIBS=$SAVE_LIBS
 
 AC_CHECK_LIB([cblas],     [cblas_dasum], [], 
    [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
-AC_CHECK_LIB([gsl],          [gsl_wavelet_alloc], [], 
-   [AC_MSG_RESULT([cannot find libgsl, Compressed sensing reconstruction unavailable!])])
-AM_CONDITIONAL([USE_GSL],    [test "$HAVE_GSL" -eq 1])
+AC_CHECK_LIB([gsl],   [gsl_spline_init], [], [AC_MSG_ERROR([cannot find libgsl, bailing out])])
 
 AC_CHECK_FUNCS([floor])
 AC_CHECK_FUNCS([getpagesize])
@@ -849,10 +927,17 @@ AC_FUNC_MMAP
 
 AH_TEMPLATE([HAVE_SCALAPACK], [Define to 1 if we could link against scalapack])
 ACX_SCALAPACK
+AM_CONDITIONAL([USE_SCALAPACK],    [test x"$HAVE_SCALAPACK" = x1])
+
 
 # Generate files
-AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile\
- doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile\
- src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile])
+AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/tinyxml/Makefile
+ doc/Makefile doc/site/Makefile doc/api/doxy-codeare.conf doc/api/Makefile tests/Makefile
+ src/matrix/Makefile src/matrix/io/Makefile src/matrix/arithmetic/Makefile src/matrix/linalg/Makefile
+ src/matrix/linalg/tests/Makefile src/matrix/ft/Makefile src/matrix/ft/tests/Makefile 
+ src/matrix/dwt/Makefile src/matrix/dwt/tests/Makefile src/matrix/io/tests/Makefile
+ src/matrix/mpi/Makefile src/matrix/mpi/tests/Makefile src/matrix/interp/Makefile
+ src/matrix/interp/tests/Makefile src/matrix/unwrap/Makefile src/matrix/unwrap/tests/Makefile 
+ src/mongoose/Makefile src/matrix/mri/Makefile src/matrix/mri/tests/Makefile])
 AC_OUTPUT
 

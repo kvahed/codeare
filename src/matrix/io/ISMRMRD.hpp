@@ -44,7 +44,9 @@ namespace codeare {
 				 */
 				~IRDFile () {}
 
-				error_code Read (const std::string& dname) {
+				template<class T> Matrix<T> Read (const std::string& dname) const {
+
+					Matrix<T> M;
 
 					ISMRMRD::IsmrmrdDataset ds (m_fname.c_str(),dname.c_str());
 
@@ -94,12 +96,25 @@ namespace codeare {
 
 					printf ("%zu\n", i);
 
-					return OK;
+					return M;
 
 				}
 
-				error_code Write (const std::string& dname) {
-					return UNIMPLEMENTED_METHOD;
+
+				template<class T> bool
+				Write (const Matrix<T>& M, const std::string& uri) {
+					return false;
+				}
+
+				template<class T> Matrix<T>
+				Read (const TiXmlElement* txe) const {
+					Matrix<T> M;
+					return M;
+				}
+
+				template<class T> bool
+				Write (const Matrix<T>& M, const TiXmlElement* txe) {
+					return false;
 				}
 
 				xml_schema::properties m_props; /**< @brief Properties */
@@ -109,9 +124,9 @@ namespace codeare {
 
 		}
 
-	};
+	}
 
-};
+}
 
 
 #endif /* __ISMRMRD_HPP__ */

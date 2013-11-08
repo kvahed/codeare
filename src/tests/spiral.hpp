@@ -1,19 +1,21 @@
-#include "../modules/VDSpiral.hpp"
+#include "VDSpiral.hpp"
 #include "Statistics.hpp"
 #include "Tokenizer.hpp"
+#include "SimpleTimer.hpp"
+#include "IOContext.hpp"
+
+#include <sstream>
+
+using namespace codeare::matrix::io;
 
 template <class T> bool
 vdspiraltest (Connector<T>* rc) {
 
 	SpiralParams p;
 
-	std::string ofname = std::string (base + std::string("spiral.mat"));
-
 	rc->Attribute ("maxgrad", &(p.mgr));
 	rc->Attribute ("maxslew", &(p.msr));
-	int ss ;
-	rc->Attribute ("shots",   &ss);
-	p.shots = ss;
+	rc->Attribute ("shots",   &(p.shots));
 	rc->Attribute ("dt",      &(p.dt));
 	rc->Attribute ("res",     &(p.res));
 
@@ -36,35 +38,23 @@ vdspiraltest (Connector<T>* rc) {
 		p.rad[i] = atof(rads[i].c_str()); 
 	}
 
-	printf ("Computing variable density spiral for ... \n");
-	printf ("    [maxgrad: %.2f, maxslew: %.2f, res: %.2f, dt: %.2e, shots: %li]\n", p.mgr, p.msr, p.res, p.dt, p.shots);
+	printf ("\nComputing variable density spiral for ... \n");
+	printf ("    [maxgrad: %.2f, maxslew: %.2f, res: %.2f, dt: %.2e, shots: %.2f]\n\n",
+            p.mgr, p.msr, p.res, p.dt, p.shots);
 
 	ticks start = getticks();
+    SimpleTimer st ("VD spiral design");
 	Solution s = VDSpiral (p);
-	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+    st.Stop();
 
-	
-
-#ifdef HAVE_MAT_H	
-	
-	MATFile* mf = matOpen (ofname.c_str(), "w");
-	
-	if (mf == NULL) {
-		printf ("Error creating file %s\n", "");
-		return false;
-	}
-	
-	MXDump (s.g, mf, "g");
-	MXDump (s.k, mf, "k");
-	MXDump (s.s, mf, "sr");
-	MXDump (s.t, mf, "t");
-	
-	if (matClose(mf) != 0) {
-		printf ("Error closing file %s\n", "");
-		return false;
-	}
-
-#endif
+    std::stringstream ofname;
+    ofname << base;
+    ofname << "/";
+    ofname << rc->GetElement("/config/data-out")->Attribute("fname");
+    
+    IOContext f = fopen (ofname.str(), WRITE);
+    s.dump (f);
+    fclose (f);
 	
 	return true;
 

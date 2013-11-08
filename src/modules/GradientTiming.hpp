@@ -26,7 +26,9 @@
 #include "CX.hpp"
 #include "Math.hpp"
 #include "Interpolate.hpp"
-#include "IO.hpp"
+#include "IOContext.hpp"
+
+using namespace codeare::matrix::io;
 
 #define announce_plan
 
@@ -36,6 +38,13 @@ struct Solution {
 	Matrix<double> g;
 	Matrix<double> s;
 	Matrix<double> t;
+
+    void dump (IOContext& f) const {
+        fwrite (f, g);
+        fwrite (f, k);
+        fwrite (f, s);
+        fwrite (f, t);
+    }
 	
 };
 
@@ -53,19 +62,13 @@ struct GradientParams {
 
 
 inline static double
-RungeKutta (const double& s, const double&   ds, const double& st, 
-			const double* k, const double& smax, const double&  L, 
-			const bool&  fw) {
+RungeKutta (const double s, const double   ds, const double st, 
+			const double* k, const double smax, const double  L, 
+			const bool  fw) {
 
 	double k1, k2, k3, k4;
-	size_t l,   m,  n;
+	size_t l = (fw) ? 0 : 2, m = 1,  n = (fw) ? 2 : 0;
 	double pgs = pow (GAMMA / 10.0 * smax, 2);
-
-	if (fw) {
-		l = 0; m = 1; n = 2;
-	} else {
-		l = 2; m = 1; n = 0;
-	}
 
 	k1 = ds * sqrt (pgs - pow(k[l],2) * pow (st       ,3));
 	k2 = ds * sqrt (pgs - pow(k[m],2) * pow (st + k1/2,3));
@@ -98,7 +101,12 @@ struct SDOut {
 
 	Matrix<double> k;
 	Matrix<double> phi;
-	
+
+    void dump (IOContext& f) {
+        fwrite (f,k);
+        fwrite (f,phi);
+    }
+
 };
 
 
@@ -208,7 +216,7 @@ SDOut SDMax (SDIn& si) {
 Solution ComputeGradient (GradientParams& gp) {
 
 	Solution s;
-	size_t ups = 50, ts = 0;
+	size_t ups = 25, ts = 0;
 
 	printf ("  Const arc-length parametrization "); fflush(stdout);
 	ticks start = getticks();
@@ -258,15 +266,15 @@ Solution ComputeGradient (GradientParams& gp) {
 		sop [i+1] = sop[i] + sqrt (pow(s.g(i,0),2) + pow(s.g(i,1),2) + pow(s.g(i,2),2));
 
 	sop /= (double)ups;
-	
+
 	printf ("."); fflush (stdout);
 	
 	double st0 = GAMMA / 10.0 * gp.msr * gp.dt;
 	double ds  = st0 * gp.dt / 3.0;
 	
-	double L   = max(sop);
+	double L   = sop(numel(sop)-1);
 	ts = ceil(L/ds);
-	
+
 	Matrix<double> sf, sta, stb, pos;
 	
 	printf ("."); fflush (stdout);
@@ -288,7 +296,6 @@ Solution ComputeGradient (GradientParams& gp) {
 	for (size_t i = 0; i < size(pos,0); i++)
 		pos[i] = sdin.posh[i*2];
 
-
 	printf (" done: (%.3f)\n  Computing geometry dependent constraints ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate()); 
 	fflush(stdout);
 	start = getticks();
@@ -302,6 +309,8 @@ Solution ComputeGradient (GradientParams& gp) {
 	sdout.k[sk+1] = sdout.k[sk-1];
 
 	sta[0] = 0.0;
+
+    //OK
 
 	printf ("done: (%.3f)\n  Solving ODE forward ........................ ", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
 	fflush(stdout);
@@ -330,23 +339,18 @@ Solution ComputeGradient (GradientParams& gp) {
 	Matrix<double> tos, sot, t, pot;
 	double T;
 	size_t Nt;
-	
-	MXDump (sta, "sta.mat", "sta");
-	
-	tos  = cumsum ((1.0)/(ds*sta));
+    
+	tos  = ds/sta;
+    tos[0] = 0;
+    tos = cumsum (tos);
 
-	MXDump (tos, "tos.mat", "tos");
-	T      = gp.dt*tos [ss-1];
+	T      = tos [numel(tos)-1];
 	Nt     = round (T/gp.dt); 
-	printf ("%f %zu\n",T,Nt);
 
 	t      = linspace<double> (0.0, T, Nt);
 
 	sot    = interp1 (tos,  sf,   t);
 	pot    = interp1 ( sf, pos, sot);
-	MXDump (t, "t.mat", "t");
-	MXDump (sot, "sot.mat", "sot");
-
 
 	pos.Clear();
 	

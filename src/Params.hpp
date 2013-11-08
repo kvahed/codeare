@@ -9,6 +9,8 @@
 #define PARAMS_HPP_
 
 #include "Toolbox.hpp"
+#include "Demangle.hpp"
+
 #include <boost/any.hpp>
 #include <assert.h>
 #include <map>
@@ -36,25 +38,16 @@ public:
 	~Params() {};
 
 
-	/**
-	 * @brief  Parameter entry
-	 */
-	typedef typename std::pair<std::string, boost::any> param;
-
-
-	/**
-	 * @brief  Parameter container
-	 */
-	typedef typename std::map<std::string, boost::any> plist;
-
 
 	/**
 	 * @brief  Access entry (lhs)
 	 */
 	inline boost::any& operator [](const std::string& key) {
-		plist::iterator pli = pl.find(key);
-		if (pl.find(key) == pl.end())
-			return Toolbox::Instance()->void_any;
+		std::map<std::string, boost::any>::iterator pli = pl.find(key);
+		if (pl.find(key) == pl.end()) {
+			pl.insert(std::pair<std::string, boost::any>(key, Toolbox::Instance()->void_any));
+            pli = pl.find(key);
+        }
 		return pli->second;
 	}
 
@@ -63,9 +56,12 @@ public:
 	 * @brief  Access entry (rhs)
 	 */
 	inline boost::any operator [](const std::string& key) const {
-		plist::const_iterator pi = pl.find(key);
-		assert (pi != pl.end());
-		return pi->second;
+		std::map<std::string, boost::any>::const_iterator pi = pl.find(key);
+		if (pi != pl.end())
+			return pi->second;
+		else
+			printf ("**WARNING**: operator[] failed for key %s\n", key.c_str());
+		return key;
 	}
 
 
@@ -82,10 +78,12 @@ public:
 		try {
 			return boost::any_cast<T>(ba);
 		} catch (const boost::bad_any_cast& e) {
-			printf ("Failed to retrieve %s - %s.\n Requested %s - have %s.\n",
-					key.c_str(), e.what(), typeid(T).name(), ba.type().name());
-			assert(false);
+			printf ("**WARNING**: Failed to retrieve %s - %s.\n             Requested %s - have %s.\n",
+					key.c_str(), e.what(),
+                    demangle(typeid(T).name()).c_str(),
+                    demangle(ba.type().name()).c_str());
 		}
+		return T(0);
 	}
 
 
@@ -107,8 +105,7 @@ public:
 	 * @param  key  Key
 	 * @param  val  Casted value
 	 */
-	template <class T>
-	inline void
+	template <class T> inline void
 	Get (const char* key, T& val) const {
 		val = Get<T>(key);
 	}
@@ -133,7 +130,7 @@ public:
 	inline void Set (const std::string& key, const boost::any& val) {
 		if (pl.find(key) != pl.end())
 			pl.erase(key);
-		pl.insert(param(key, val));
+		pl.insert(std::pair<std::string, boost::any>(key, val));
 	}
 
 
@@ -153,15 +150,48 @@ public:
 	 *
 	 * @return       String representation of workspace content
 	 */
-	const char*
-	c_str            () const {
+	void
+	Print            (std::ostream& os) const {
 
-		std::string sb;
+		typedef std::map<std::string, boost::any>::const_iterator it;
 
-		for (plist::const_iterator i = pl.begin(); i != pl.end(); i++)
-			sb += i->first + "\t" + i->second.type().name() + "\n";
+		for (it i = pl.begin(); i != pl.end(); i++) {
 
-		return sb.c_str();
+			const boost::any& b = i->second;
+			std::string v_name  = demangle(i->second.type().name()),
+					    k_name  = i->first;
+			size_t vl = v_name.length(), kl = k_name.length();
+
+			os << setw(24) << k_name << " | "
+			   << setw(16) << v_name << " | "
+			   << setw(32);
+			if (b.type() == typeid(float))
+				TypeTraits<float>::print(os,boost::any_cast<float>(b));
+			else if (b.type() == typeid(double))
+				TypeTraits<double>::print(os,boost::any_cast<double>(b));
+			else if (b.type() == typeid(cxfl))
+				TypeTraits<cxfl>::print(os,boost::any_cast<cxfl>(b));
+			else if (b.type() == typeid(cxdb))
+				TypeTraits<cxdb>::print(os,boost::any_cast<cxdb>(b));
+			else if (b.type() == typeid(int))
+				os << boost::any_cast<int>(b);
+			else if (b.type() == typeid(short))
+				os << boost::any_cast<short>(b);
+			else if (b.type() == typeid(long))
+				os << boost::any_cast<long>(b);
+			else if (b.type() == typeid(size_t))
+				os << boost::any_cast<size_t>(b);
+			else if (b.type() == typeid(cbool))
+				os << boost::any_cast<cbool>(b);
+			else if (b.type() == typeid(char*))
+				os << boost::any_cast<char*>(b);
+			else if (b.type() == typeid(const char*))
+				os << boost::any_cast<const char*>(b);
+			else if (b.type() == typeid(std::string))
+				os << boost::any_cast<std::string>(b).c_str();
+			os << "\n";
+
+		}
 
 	}
 
@@ -170,7 +200,7 @@ public:
 private:
 
 
-	plist pl; /**< @brief Parameter list */
+	std::map<std::string, boost::any> pl; /**< @brief Parameter list */
 
 };
 
@@ -184,7 +214,7 @@ private:
  */
 inline static std::ostream&
 operator<< (std::ostream& os, const Params& p) {
-	os << p.c_str();
+	p.Print(os);
 	return os;
 }
 

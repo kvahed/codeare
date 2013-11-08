@@ -25,6 +25,9 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <assert.h>
+#include <algorithm>
+
 
 static inline std::vector<std::string>
 Split     (const std::string& str, const std::string& dlm) {
@@ -32,7 +35,6 @@ Split     (const std::string& str, const std::string& dlm) {
 	assert (dlm.size() > 0);
 
 	std::vector<std::string> sv;
-	
 	size_t  start = 0, end = 0;
 	
 	while (end != std::string::npos) {
@@ -49,6 +51,31 @@ Split     (const std::string& str, const std::string& dlm) {
 
 	return sv;
 
+}
+
+
+
+static inline bool HasSuffix (const std::string& str, const std::string& suf) {
+
+	assert (str.length() > 0);
+	assert (suf.length() > 0);
+
+	return (str.length() >= suf.length()) ?
+		   (0 == str.compare(str.length() - suf.length(), suf.length(), suf)) : false;
+
+}
+
+
+static inline std::string strtoupper (const std::string& str) {
+	std::string res = str;
+	std::transform(res.begin(), res.end(), res.begin(), ::toupper);
+	return res;
+}
+
+static inline std::string strtolower (const std::string& str) {
+	std::string res = str;
+	std::transform(res.begin(), res.end(), res.begin(), ::tolower);
+	return res;
 }
 
 #endif 

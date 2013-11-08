@@ -2,20 +2,203 @@
 #define __IOFILE_HPP__
 
 #include "Matrix.hpp"
+#include "Complex.hpp"
 #include "Params.hpp"
+#include "Algos.hpp"
+#include "Print.hpp"
+
+#include "tinyxml/tinyxml.h"
+#include "tinyxml/xpath_static.h"
+
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 namespace codeare {
 namespace matrix  {
 namespace io      {
 
+	enum dtype {RLFL, RLDB, CXFL, CXDB, LONG, SHRT};
 	enum IOMode {READ, WRITE};
+
+    
+	/**
+	 * @brief           Verbose wrapper around fwrite
+	 *
+	 * @param  d        Data repository to write from
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mwrite (const T* d, const size_t n, FILE* f, std::string desc) {
+
+		size_t sz = sizeof(T);
+
+		if (size_t l = fwrite (d, sz, n, f) != n) {
+			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * @brief           Verbose wrapper around fwrite
+	 *
+	 * @param  d        Data repository to write from
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mwrite (const std::vector<T>& d, FILE* f, std::string desc) {
+		size_t n = d.size();
+		size_t sz = sizeof(T);
+		if (size_t l = fwrite (&d.front(), sz, n, f) != n) {
+			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @brief           Verbose wrapper around fwrite
+	 *
+	 * @param  d        Data repository to write from
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mwrite (const container<T>& d, FILE* f, std::string desc) {
+		size_t n = d.size();
+		size_t sz = sizeof(T);
+		if (size_t l = fwrite (d.ptr(), sz, n, f) != n) {
+			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+		return true;
+	}
+
+
+
+	/**
+	 * @brief           Verbose wrapper around fread
+	 *
+	 * @param  d        Place holder to read into
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mread (T* d, const size_t n, FILE* f, const std::string desc) {
+
+		size_t sz = sizeof(T);
+
+		if (size_t l = fread (d, sz, n, f) != n) {
+			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+
+		return true;
+
+	}
+
+
+	/**
+	 * @brief           Verbose wrapper around fread
+	 *
+	 * @param  d        Place holder to read into
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mread (std::vector<T>& d, FILE* f, const std::string desc) {
+
+		size_t sz = sizeof(T);
+		size_t n  = d.size();
+
+		if (size_t l = fread (&d[0], sz, n, f) != n) {
+			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * @brief           Verbose wrapper around fread
+	 *
+	 * @param  d        Place holder to read into
+	 * @param  sz       Size of individual elements
+	 * @param  n        Number of elements
+	 * @param  f        File handle
+	 * @param  desc     Description
+	 * @return          Success
+	 */
+	template<class T> inline static bool
+	mread (container<T>& d, FILE* f, const std::string desc) {
+
+		size_t sz = sizeof(T);
+		size_t n  = d.size();
+
+		if (size_t l = fread (&d[0], sz, n, f) != n) {
+			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
+			return false;
+		}
+
+		return true;
+
+	}
+
+
+    /**
+     * brief          Does a file exist?
+     * 
+     * @param  fname  File name
+     * @return        Does it exist?
+     */
+    inline static bool
+    fexists (const char* fname) {
+    	assert (fname[0] != '\0');
+        ifstream fs (fname);
+        return (fs);
+    }
+    
+
+    /**
+     * brief          Does a file exist?
+     *
+     * @param  fname  File name
+     * @return        Does it exist?
+     */
+    inline static bool
+    fexists (const std::string& fname) {
+        return (fexists(fname.c_str()));
+    }
+
+
+
 
 	// TODO: deliver some crap
 	template<class T>
 	inline static bool is_mat (boost::any oper) {
 
 		try {
-			boost::any_cast<Ptr<Matrix<T> > >(oper);
+			boost::any_cast<boost::shared_ptr<Matrix<T> > >(oper);
 		} catch(const boost::bad_any_cast &) {
 			return false;
 		}
@@ -40,6 +223,7 @@ namespace io      {
 		 *
 		 * @param  fname    Filename
 		 * @param  mode     IO mode (READ/WRITE)
+		 * @param  params   Optional parameters
 		 * @param  verbose  Verbose output? (default: true)
 		 */
 		IOFile (const std::string& fname, const IOMode& mode = READ,
@@ -57,7 +241,6 @@ namespace io      {
 
 		}
 
-
 		/**
 		 * @brief  Default destructor
 		 */
@@ -71,14 +254,7 @@ namespace io      {
 		 */
 		virtual error_code
 		CleanUp () {
-
-			while (!m_data.empty()) {
-				delete boost::any_cast<Ptr<Matrix<cxfl> > >(m_data.begin()->second);
-				m_data.erase(m_data.begin());
-			}
-
 			return OK;
-
 		}
 
 
@@ -87,7 +263,7 @@ namespace io      {
 		 *
 		 * @return  File name
 		 */
-		std::string
+		inline std::string
 		FileName() const {
 			return m_fname;
 		}
@@ -98,7 +274,7 @@ namespace io      {
 		 *
 		 * @return Verbosity
 		 */
-		bool
+		inline bool
 		Verbosity() const {
 			return m_verb;
 		}
@@ -109,7 +285,7 @@ namespace io      {
 		 *
 		 * @return Status
 		 */
-		error_code
+		inline error_code
 		Status () const {
 			return m_status;
 		}
@@ -120,7 +296,7 @@ namespace io      {
 		 *
 		 * @return Memory allocated?
 		 */
-		bool
+		inline bool
 		Allocated () const {
 			return m_alloc;
 		}
@@ -131,7 +307,7 @@ namespace io      {
 		 *
 		 * @return Write lock?
 		 */
-		bool
+		inline bool
 		Locked () const {
 			return (m_mode == WRITE);
 		}
@@ -142,8 +318,8 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		virtual error_code
-		Read (const std::string& dname = "") = 0;
+		template<class T> Matrix<T>
+		Read (const std::string& uri) const;
 
 
 		/**
@@ -151,44 +327,32 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		virtual error_code
-		Write (const std::string& dname = "") = 0;
+		template<class T> bool
+		Write (const Matrix<T>& M, const std::string& uri);
+
 
 		/**
-		 * @brief  Get data by name
+		 * @brief Read a particular data set from file
 		 *
-		 * @return  Any data type
+		 * @return  Success
 		 */
-		boost::any&
-		GetAny (const std::string& dname) {
-
-			std::map<std::string, boost::any>::iterator it;
-			it = m_data.find(dname);
-
-			if (it == m_data.end()) {
-				printf ("  ERROR: No dataset by the name %s found?!\n",
-						dname.c_str());
-				return Toolbox::Instance()->void_any;
-			}
-
-			return it->second;
-
+		template<class T> Matrix<T>
+		Read (const TiXmlElement* txe) const {
+			std::string uri (txe->Attribute("uri"));
+			return this->Read<T>(uri);
 		}
 
 
 		/**
-		 * @brief  Get casted Matrix by name
+		 * @brief  Write data to file
 		 *
-		 * @return  Any data type
+		 * @return  Success
 		 */
-		template<class T> Matrix<T>&
-		Get (const std::string& dname) {
-			return *boost::any_cast<Ptr<Matrix<T> > >(GetAny(dname));
+		template<class T> bool
+		Write (const Matrix<T>& M, const TiXmlElement* txe) {
+			std::string uri (txe->Attribute("uri"));
+			return this->Write (M, uri);
 		}
-
-
-
-
 
 	protected:
 
@@ -196,14 +360,14 @@ namespace io      {
 
 		error_code  m_status; /**< @brief Status */
 
-		IOMode      m_mode;   /**< @Brief IO mode */
+		IOMode      m_mode;   /**< @brief IO mode */
 
+		Params      m_params; /**< @brief Additional parameters */
 		bool        m_fopen;  /**< @brief File open? */
 		bool        m_verb;   /**< @brief Verbosity */
 		bool        m_alloc;  /**< @brief Memory allocated? */
 		bool        m_initialised; /**< @brief Initialised */
 
-		Params      m_params; /**< @brief Additional parameters */
 
 		DataStore   m_data; /**< Data */
 

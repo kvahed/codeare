@@ -25,18 +25,28 @@
 
 #include <assert.h>
 #include <complex>
+#include <string>
+#include <sstream>
 
 namespace RRClient {
 
 
-	RemoteConnector::RemoteConnector          (const char* name, const char* debug) {
+	RemoteConnector::RemoteConnector          (const std::string& service_id, const std::string& debug_level, const std::string& client_id) {
 		
 		try {
+
+            if (!client_id.empty()) {
+                m_client_id = client_id;
+            } else {
+                std::stringstream ss;
+                ss << (size_t)this;
+                m_client_id = ss.str();
+            }
 			
 			// Initialise ORB
 			int         i            = 0;
 			char**      c            = 0;
-			const char* options[][2] = { { (char*)"traceLevel", debug }, { 0, 0 } };
+			const char* options[][2] = { { (char*)"traceLevel", debug_level.c_str()}, { 0, 0 } };
 			
 			m_orb = CORBA::ORB_init(i, c, "omniORB4", options);
 			
@@ -51,7 +61,7 @@ namespace RRClient {
 			// Bind to the name server and lookup 
 			CosNaming::Name m_name;
 			m_name.length(1);
-			m_name[0].id = CORBA::string_dup(name);
+			m_name[0].id = CORBA::string_dup(service_id.c_str());
 			
 			// Resolve object reference.
 			CORBA::Object_var orid = context->resolve(m_name);
@@ -68,7 +78,7 @@ namespace RRClient {
 			return;
 			
 		} catch (CORBA::SystemException&)     {
-			
+            
 			std::cerr << "Caught a CORBA::SystemException." << std::endl;
 			throw DS_SystemException();
 			return;
@@ -101,16 +111,14 @@ namespace RRClient {
 	
 	
 	RemoteConnector::~RemoteConnector         ()            {
-		
 		m_rrsi->CleanUp();
 		m_orb->destroy();
-		
 	}
 	
 	
 	
 	error_code
-	RemoteConnector::Init (const char* name) {
+	RemoteConnector::Init (const std::string& name) {
 		
 		// Prepare configuration for the journey
 		std::stringstream  temp;
@@ -118,7 +126,7 @@ namespace RRClient {
 		m_rrsi->config  (temp.str().c_str());
 		
 		// Initialise back end
-		if (m_rrsi->Init (name) != OK)
+        if (m_rrsi->Init (name.c_str(), m_client_id.c_str()) != OK)
 			return CANNOT_LOAD_LIBRARY;
 		
 		return (error_code)OK;
@@ -128,286 +136,39 @@ namespace RRClient {
 	
 	
 	error_code 
-	RemoteConnector::Prepare  (const char* name)  {
-		
-		return (error_code) m_rrsi->Prepare (name);
-		
+	RemoteConnector::Prepare  (const std::string& name)  {
+        std::string call = m_client_id + name;
+		return (error_code) m_rrsi->Prepare (call.c_str());
 	}
 	
 	
 	
 	error_code 
-	RemoteConnector::Process  (const char* name)  {
-		
-		return  (error_code) m_rrsi->Process (name);
-		
+	RemoteConnector::Process  (const std::string& name)  {
+        std::string call = m_client_id + name;
+		return  (error_code) m_rrsi->Process (call.c_str());
 	}
 	
 	
 	
 	error_code
-	RemoteConnector::Finalise (const char* name) {
-		
-		return (error_code) m_rrsi->Finalise(name);
-		
+	RemoteConnector::Finalise (const std::string& name) {
+        std::string call = m_client_id + name;
+		return (error_code) m_rrsi->Finalise(call.c_str());
 	}
 
 	
 	
-	long 
-	RemoteConnector::GetSize (const longs dims) const {
+	inline long
+	RemoteConnector::GetSize (const longs& dims) const {
 		
 		long size = 1;
-		
-		for (int i = 0; i < INVALID_DIM; i++)
+
+		for (int i = 0; i < dims.length(); i++)
 			size *= dims[i];
-		
+
 		return size;
 		
 	}
-	
-	
-	
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, Matrix< std::complex<float> >& M) const {
-		
-		cxfl_data r; 
-		
-		r.dims.length(INVALID_DIM);
-		r.res.length(INVALID_DIM);
-		
-		for (int j = 0; j < INVALID_DIM; j++) {
-			r.dims[j] = M.Dim(j);
-			r.res[j]  = M.Res(j);
-		}
-		
-		r.vals.length(2 * M.Size());
-		
-		memcpy (&r.vals[0], &M[0], r.vals.length() * sizeof(float));
-		
-		m_rrsi->set_cxfl(name.c_str(), r);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix< std::complex<float> >& m) const {
-		
-		cxfl_data rp; m_rrsi->get_cxfl(name.c_str(), rp);
-		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
-		
-		for (int j = 0; j < INVALID_DIM; j++) { 
-			mdims[j] = rp.dims[j];
-			mress[j] = rp.res[j]; 
-		}
-		
-		m = Matrix<cxfl> (mdims, mress);
-		
-		memcpy (&m[0], &rp.vals[0], rp.vals.length() * sizeof(float));
-		
-	}
-	
-
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, Matrix<cxdb>& M) const {
-		
-		cxdb_data r; 
-		
-		r.dims.length(INVALID_DIM);
-		r.res.length(INVALID_DIM);
-		
-		for (int j = 0; j < INVALID_DIM; j++) {
-			r.dims[j] = M.Dim(j);
-			r.res[j]  = M.Res(j);
-		}
-		
-		r.vals.length(2 * M.Size());
-		
-		memcpy (&r.vals[0], &M[0], r.vals.length() * sizeof(double));
-		
-		m_rrsi->set_cxdb(name.c_str(), r);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<cxdb>& m) const {
-		
-		cxdb_data rp; m_rrsi->get_cxdb(name.c_str(), rp);
-		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
-		
-		for (int j = 0; j < INVALID_DIM; j++) { 
-			mdims[j] = rp.dims[j];
-			mress[j] = rp.res[j]; 
-		}
-		
-		m = Matrix<cxdb> (mdims, mress);
-		
-		memcpy (&m[0], &rp.vals[0], rp.vals.length() * sizeof(double));
-		
-	}
-	
-
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, Matrix<double>& m) const {
-		
-		rldb_data r;
-		
-		r.dims.length(INVALID_DIM); r.res.length(INVALID_DIM);
-		
-		for (int j = 0; j < INVALID_DIM; j++) { r.dims[j] = m.Dim(j);
-			r.res[j] = m.Res(j); }
-		
-		r.vals.length(m.Size());
-		
-		for (int i = 0; i < m.Size(); i++) r.vals[i] = m[i];
-		
-		m_rrsi->set_rldb(name.c_str(), r);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<double>& m) const {
-		
-		rldb_data r; m_rrsi->get_rldb(name.c_str(), r);
-		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
-		
-		for (int j = 0; j < INVALID_DIM; j++) { 
-			mdims[j] = r.dims[j];
-			mress[j] = r.res[j]; 
-		}
-		
-		m = Matrix<double> (mdims, mress);
-		
-		for (int i = 0; i < GetSize(r.dims); i++) m[i] = r.vals[i];
-		
-	}
-	
-	
-	
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, Matrix<float>& m) const {
-		
-		rlfl_data r;
-		
-		r.dims.length(INVALID_DIM); r.res.length(INVALID_DIM);
-		
-		for (int j = 0; j < INVALID_DIM; j++) { r.dims[j] = m.Dim(j);
-			r.res[j] = m.Res(j); }
-		
-		r.vals.length(m.Size());
-		
-		for (int i = 0; i < m.Size(); i++) r.vals[i] = m[i];
-		
-		m_rrsi->set_rlfl(name.c_str(), r);
-		
-	}
-	
-
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<float>& m) const {
-		
-		rlfl_data r; m_rrsi->get_rlfl(name.c_str(), r);
-		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
-		
-		for (int j = 0; j < INVALID_DIM; j++) { 
-			mdims[j] = r.dims[j];
-			mress[j] = r.res[j]; 
-		}
-		
-		m = Matrix<float> (mdims, mress);
-		
-		for (int i = 0; i < GetSize(r.dims); i++) m[i] = r.vals[i];
-		
-	}
-	
-	
-	
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, Matrix<short>& m) const {
-		
-		shrt_data p;
-		
-		p.dims.length(INVALID_DIM); p.res.length(INVALID_DIM);
-		
-		for (int j = 0; j < INVALID_DIM; j++) { p.dims[j] = m.Dim(j);
-			p.res[j] = m.Res(j); }
-		
-		p.vals.length(m.Size());
-		
-		for (int i = 0; i < m.Size(); i++) p.vals[i] = m[i];
-		
-		m_rrsi->set_shrt(name.c_str(), p);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<short>& m) const {
-		
-		shrt_data p; m_rrsi->get_shrt(name.c_str(), p);
-		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
-		
-		for (int j = 0; j < INVALID_DIM; j++) { 
-			mdims[j] = p.dims[j];
-			mress[j] = p.res[j]; 
-		}
-		
-		m = Matrix<short> (mdims, mress);
-		
-		for (int i = 0; i < GetSize(p.dims); i++) m[i] = p.vals[i];
-		
-	}
-
-
-	template<> void 
-	RemoteConnector::SetMatrix (const std::string& name, Matrix<long>& m) const {
-		
-		long_data p;
-		
-		p.dims.length(INVALID_DIM); p.res.length(INVALID_DIM);
-		
-		for (int j = 0; j < INVALID_DIM; j++) { p.dims[j] = m.Dim(j);
-			p.res[j] = m.Res(j); }
-		
-		p.vals.length(m.Size());
-		
-		for (int i = 0; i < m.Size(); i++) p.vals[i] = m[i];
-		
-		m_rrsi->set_long(name.c_str(), p);
-		
-	}
-	
-	
-	template<> void 
-	RemoteConnector::GetMatrix (const std::string& name, Matrix<long>& m) const {
-		
-		long_data p; m_rrsi->get_long(name.c_str(), p);
-		
-		size_t mdims [INVALID_DIM];
-		float  mress [INVALID_DIM];
-		
-		for (int j = 0; j < INVALID_DIM; j++) { 
-			mdims[j] = p.dims[j];
-			mress[j] = p.res[j]; 
-		}
-		
-		m = Matrix<long> (mdims, mress);		
-
-		for (int i = 0; i < GetSize(p.dims); i++) m[i] = p.vals[i];
-		
-	}
-
 
 }

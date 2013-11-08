@@ -21,6 +21,8 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#include <cstddef>
+
 /**
  * Returned error codes 
  */
@@ -45,7 +47,11 @@ enum error_code   {
 	FILE_READ_FAILED,
 	FILE_WRITE_FAILED,
 	NULL_FILE_HANDLE,
-	UNIMPLEMENTED_METHOD
+	UNIMPLEMENTED_METHOD,
+	HDF5_ERROR_FOPEN,
+	HDF5_ERROR_FCLOSE,
+	HDF5_ERROR_FFLUSH,
+	GENERAL_IO_ERROR
 
 };
 
@@ -75,6 +81,8 @@ enum data_type {
 	T_BOOL
 };
 
+
+
 /**
  * Some constants
  */
@@ -89,7 +97,7 @@ enum data_type {
 
 // Gamma in Hz
 #ifndef GAMMA
-    #define GAMMA 42.576
+    #define GAMMA 42.57748
 #endif
 
 // Gamma in radians
@@ -103,7 +111,22 @@ enum data_type {
 #define GB    1073741824;
 #define TB 1099511627776;
 
+#define IZERO 0
+#define IONE  1
 
+#if defined (_MSC_VER) && _MSC_VER<1300
+template<class T> inline static T
+c_multiply (const T a, const T b);
 
+template<> inline static size_t
+c_multiply (const size_t a, const size_t b) {
+    return (a*b);
+}
+#else
+template<class T> inline static T
+c_multiply (const T a, const T b) {
+    return (a*b);
+}
+#endif
 
 #endif //__COMMON_H__

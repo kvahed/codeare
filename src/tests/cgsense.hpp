@@ -18,95 +18,60 @@
  *  02110-1301  USA
  */
 
-
-enum vmode {    
-    GENUINE,
-    MULTISLICE
-
-};
+#include "matrix/io/IOContext.hpp"
 
 template <class T> bool 
 cgsensetest (RRClient::Connector<T>* rc) {
     
-    int vm; 
-    int iterations;
+    using namespace codeare::matrix::io;
 
+    // PARC or being scanned
+    
     // Incoming
-    Matrix<cxfl>   rawdata; // Measurement data O(Nkx,Nky,Nkz)
-    Matrix<float>  weights; // NUFFT weights   
-    Matrix<float>  kspace;  // Kspace positions O(Nkx,Nky,Nkz)
-    Matrix<cxfl>   sens;    // Sensitivity maps O(Nx, Ny, Nz)
-    
-    // Outgoing
-    Matrix<float>  nrmse;   // Residues of the CG process
-    Matrix<cxfl>   image;
-    Matrix<cxfl>   signals;
-    
-    std::string    odf = std::string (base + std::string("/images.mat")); // Binary Ouput (images etc)
-    std::string    rev = std::string (base + std::string("/rev.mat"));
-    
-    if (!Read (rawdata, rc->GetElement("/config/data/d"), base) ||
-        !Read (kspace,  rc->GetElement("/config/data/k"), base) ||
-        !Read (sens,    rc->GetElement("/config/data/s"), base) )
-      return false;
+    Matrix<cxfl>  rawdata; // Measurement data O(Nkx,Nky,Nkz)
+    Matrix<cxfl>  sens;    // Sensitivity maps O(Nx, Ny, Nz)
+    Matrix<float> weights; // NUFFT weights
+    Matrix<float> kspace;  // Kspace positions O(Nkx,Nky,Nkz)
 
-    if (!Read (weights, rc->GetElement("/config/data/w"), base))
-        weights = Matrix<float> (1);
+    // Read data
+    IOContext ic (rc->GetElement("/config/data-in"), base, READ);
+    rawdata = ic.Read<cxfl>(rc->GetElement("/config/data-in/d"));
+    kspace  = ic.Read<float>(rc->GetElement("/config/data-in/k"));
+    weights = ic.Read<float>(rc->GetElement("/config/data-in/w"));
+    sens	= ic.Read<cxfl>(rc->GetElement("/config/data-in/s"));
+    ic.Close();
 
+    rc->SetAttribute ("hans", 10.0);
+    
     if (rc->Init (test) != OK) {
         printf ("Intialising failed ... bailing out!"); 
         return false;
     }
-
-    // Volume? If so, 3D or multi-slice
-    if (rc->Attribute ("volume", &vm) != TIXML_SUCCESS)
-        vm = -1;
-
-    // Initial run -------------
     
+    // Send one time data
     rc->SetMatrix ("weights", weights); // Weights
     rc->SetMatrix ( "kspace", kspace);  // K-space
-
-    // Process -------------
-
     rc->SetMatrix (   "sens", sens);    // Sensitivities
     rc->Prepare   (test);
-    rc->SetMatrix (   "data", rawdata); // Measurement data
-    
-    rc->Process   (test);
-    
-    // Receive -------------
-    
-    rc->GetMatrix (  "image", image);  // Images
-    //rc->GetMatrix (  "nrmse", nrmse);  // CG residuals
-    
-    // ---------------------
 
+    // Recon
+    rc->SetMatrix (   "data", rawdata); // Measurement data
+    rc->Process   (test);
+
+    // Outgoing
+    Matrix<cxfl>  cgimg;
+
+    rc->GetMatrix (  "image", cgimg);  // Images
     rc->Finalise   (test);
 
-#ifdef HAVE_MAT_H    
-    
-    MATFile* mf;
+    // Write images
 
-    mf = matOpen (odf.c_str(), "w");
-    
-    if (mf == NULL) {
-        printf ("Error creating file %s\n", odf.c_str());
-        return false;
-    }
-    
-    MXDump       (image, mf, "image");
-    if (pulses)
-        MXDump (signals, mf, "signals");
-    if (nrmse.Size() > 1)
-        MXDump   (nrmse, mf, "nrmse");
-    
-    if (matClose(mf) != 0) {
-        printf ("Error closing file %s\n", odf.c_str());
-        return false;
-    }
-
-#endif
+	std::string ofname = base;
+    ofname += "/";
+	ofname += rc->GetElement("/config/data-out")->Attribute("fname");
+	IOContext ofile = fopen (ofname, WRITE);
+	fwrite (ofile, cgimg);
+	fclose (ofile);
 
     return true;
 

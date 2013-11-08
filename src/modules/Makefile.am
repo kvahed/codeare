@@ -4,19 +4,15 @@
 ../%SK.cc: ../%.idl
 	omniidl -bcxx $<
 
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/misc
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/matrix/ft -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/matrix/arithmetic -I$(top_srcdir)/src/matrix/interp -I$(top_srcdir)/src/misc 
 
 EXTRA_DIST = GPUSimulator.cl
 
 # Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la LapackTests.la SpatialDomain.la KTPoints.la RelativeSensitivities.la GRAPPA.la DirectMethod.la AFI.la SENSE.la
+lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la MedianFilter_OMP.la SystemCmd.la SpatialDomain.la KTPoints.la GRAPPA.la DirectMethod.la AFI.la SENSE.la CompressedSensing.la RelativeSensitivities.la 
 
 if USE_NFFT3
     lib_LTLIBRARIES += NuFFT.la CGSENSE.la 
-endif
-
-if USE_GSL
-    lib_LTLIBRARIES += CompressedSensing.la
 endif
 
 # Common linker flags
@@ -55,11 +51,7 @@ SystemCmd_la_SOURCES = SystemCmd.hpp SystemCmd.cpp
 SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 SystemCmd_la_LIBADD = $(COMMON_la_LIBADD)
 
-LapackTests_la_SOURCES = LapackTests.hpp LapackTests.cpp
-LapackTests_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-LapackTests_la_LIBADD = $(COMMON_la_LIBADD)
-
-GRAPPA_la_SOURCES = GRAPPA.hpp GRAPPA.cpp ../matrix/CGRAPPA.hpp
+GRAPPA_la_SOURCES = ../matrix/ft/CGRAPPA.hpp GRAPPA.hpp GRAPPA.cpp
 GRAPPA_la_DEPENDENCIES = 
 GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)
@@ -82,13 +74,11 @@ AFI_la_LDFLAGS = $(COMMON_la_LDFLAGS)
 AFI_la_LIBADD = $(COMMON_la_LIBADD)
 
 CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
+CompressedSensing_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(top_srcdir)/src/matrix/dwt
 CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
 
-DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp
-if USE_LIBOPENCL
-    DirectMethod_la_SOURCES += GPUSimulator.cpp GPUSimulator.hpp
-endif
+DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp #GPUSimulator.cpp GPUSimulator.hpp
 DirectMethod_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
 DirectMethod_la_LIBADD = $(COMMON_la_LIBADD)
 

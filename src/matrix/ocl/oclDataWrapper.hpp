@@ -115,7 +115,7 @@
        * @brief             getter to cpu_data
        */
       virtual
-      void
+      double
       getData               () = 0;
       
       
@@ -137,7 +137,7 @@
        * @see               oclDataObject :: loadToGPU ()
        */
       virtual
-      void
+      double
       loadToGPU             ();
       
       
@@ -147,7 +147,7 @@
        * @see               oclDataObject :: loadToCPU ()
        */
       virtual
-      void
+      double
       loadToCPU             ();
       
       
@@ -172,19 +172,26 @@
    * @brief                 -- refer to class definition --
    */
   template <class T>
-  void
+  double
   oclDataWrapper <T> ::
   loadToGPU                 ()
   {
       
     print_optional ("oclDataWrapper :: loadToGPU ()", VERB_HIGH);
 
+    // memory transfer time
+    double mem_time = .0;
+    
     // buffer on GPU exists ?
     if (! oclDataObject :: getMemState ())
     {
-
+      
       // create buffer object
-      oclConnection :: Instance () -> createBuffer (mp_cpu_data, oclDataObject :: getSize (), oclDataObject :: getID ());
+      try {
+    	  oclConnection :: Instance () -> createBuffer (mp_cpu_data, oclDataObject :: getSize (), oclDataObject :: getID ());
+      } catch (oclError & oe) {
+    	  throw oclError (oe, "oclDataWrapper :: loadToGPU ()");
+      }
     
       // update memory state
       oclDataObject :: setLoaded ();
@@ -196,13 +203,14 @@
     {
       
       // update GPU data
-      oclConnection :: Instance () -> loadToGPU (mp_cpu_data, oclDataObject :: getSize (), oclDataObject :: getBuffer ());
+      mem_time = oclConnection :: Instance () -> loadToGPU (mp_cpu_data, oclDataObject :: getSize (), oclDataObject :: getBuffer ());
 
       // update states
       oclDataObject :: setSync ();
 
     }
     
+    return mem_time;
     
   }
   
@@ -212,22 +220,25 @@
    * @brief                 -- refer to class definition --
    */
   template <class T>
-  void
+  double
   oclDataWrapper <T> ::
   loadToCPU                 ()
   {
 
     print_optional ("oclDataWrapper :: loadToCPU ()", VERB_HIGH);
 
+    // memory transfer time
+    double mem_time = .0;
+    
     // buffer on GPU exists
     if (oclDataObject :: getMemState ())
     {
       
-      if (oclDataObject :: mp_modified [GPU])
+      if (oclDataObject :: mp_modified [oclDataObject::GPU])
       {
         
         // update CPU data
-        oclConnection :: Instance () -> loadToCPU (oclDataObject :: mp_gpu_buffer, mp_cpu_data, oclDataObject :: m_size);
+        mem_time = oclConnection :: Instance () -> loadToCPU (oclDataObject :: mp_gpu_buffer, mp_cpu_data, oclDataObject :: m_size);
         
         // update states
         oclDataObject :: setSync ();
@@ -238,13 +249,15 @@
     else // ERROR if no buffer exists
     {
     
-      stringstream tmp;
+      std::stringstream tmp;
       tmp << "No buffer on GPU (id:" << oclDataObject :: getID () << ")";
       
       throw oclError (tmp.str (), "oclDataWrapper :: loadToCPU", oclError :: WARNING);
     
     }
-  
+    
+    return mem_time;
+    
   }
   
   
@@ -272,7 +285,7 @@
         std::cout << mp_cpu_data [i] << " ";
       std::cout << std::endl;
     }
-  
+
   }
 
   

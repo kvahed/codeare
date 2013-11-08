@@ -78,7 +78,7 @@ ReconContext::Finalise     () {
 
 void
 ReconContext::SetConfig        (const char* cstr) {
-	return m_strategy->SetConfig(cstr);
+	m_strategy->SetConfig(cstr);
 }
 
 

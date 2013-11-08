@@ -112,10 +112,9 @@ public:
 				// accept worse solution with some probability
 				dl   = len - m_len;
 				rndn = gsl_rng_uniform (m_rng);
-				prob = exp (- abs(dl) / m_ct);
+				prob = exp (- std::abs(dl) / m_ct);
 				
 				if (prob > rndn) {
-					
 					m_sol = m_nsol;
 					m_len = len;
 					
@@ -225,10 +224,6 @@ public:
 		m_bestlen = m_len;
 		
 		printf ("    Initial lenth: %.2f\n", m_len);
-		
-		if (m_verb) 
-			MXDump (GetSolution(), "start.mat", "start");
-
 		printf ("  ... done\n");
 	} 
 

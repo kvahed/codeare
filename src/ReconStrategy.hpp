@@ -24,14 +24,15 @@
 #include "Matrix.hpp"
 #include "Configurable.hpp"
 #include "Workspace.hpp"
+#include "SimpleTimer.hpp"
 
 #include "DllExport.h"
 
+
 #include <cstdlib>
 #include <complex>
-#include <stdint.h>
 
-using namespace std;
+class Workspace;
 
 /**
  * @brief Reconstruction / Manipulation modules
@@ -98,7 +99,7 @@ namespace RRStrategy {
 		 */
 		void 
 		Name            (const char* name) { 
-			m_name = string(name);
+			m_name = std::string(name);
 		}
 
 
@@ -139,8 +140,34 @@ namespace RRStrategy {
 		 * @return      Reference to matrix
 		 */
 		template <class T> Matrix<T>& 
-		AddMatrix         (const string name, Ptr< Matrix<T> > p) const {
-			return DB().AddMatrix(name, p);
+		AddMatrix         (const std::string& name, boost::shared_ptr< Matrix<T> > p) const {
+			return Workspace::Instance().AddMatrix(name, p);
+		}
+
+
+		/**
+		 * @brief       Add a matrix to database map
+		 *
+		 * @param  name Name in map
+		 * @param  p    Smart pointer to the matrix
+		 * @return      Reference to matrix
+		 */
+		template <class T> Matrix<T>& 
+		AddMatrix         (const std::string& name) const {
+			return Workspace::Instance().AddMatrix<T>(name);
+		}
+
+
+		/**
+		 * @brief       Add a matrix to database map
+		 *
+		 * @param  name Name in map
+		 * @param  p    Smart pointer to the matrix
+		 * @return      Reference to matrix
+		 */
+		template <class T> Matrix<T>& 
+		AddMatrix         (const char* name) const {
+			return Workspace::Instance().AddMatrix<T>(std::string(name));
 		}
 
 
@@ -152,8 +179,8 @@ namespace RRStrategy {
 		 * @return      Reference to data
 		 */
 		template <class T> Matrix<T>&
-		Get            (const string name) const {
-			return DB().Get<T>(name);
+		Get            (const std::string& name) const {
+			return Workspace::Instance().Get<T>(name);
 		}
 		
 		
@@ -165,15 +192,16 @@ namespace RRStrategy {
 		 * @return      Reference to data if existent
 		 */
 		inline bool 
-		Free            (const string name) const {
-			return DB().Free (name);
+		Free            (const std::string& name) const {
+			return Workspace::Instance().Free (name);
 		}
 
 
 	protected:
 		
-		string    m_name;         /*!< @brief Name                        */
+		std::string    m_name;         /*!< @brief Name                        */
 		bool      m_initialised;  /*!< @brief Reco is initialised         */
+		ReconStrategy* _successor;
 		
 	};
 	

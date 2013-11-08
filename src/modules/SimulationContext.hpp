@@ -23,6 +23,8 @@
 
 #include "CPUSimulator.hpp"
 
+#undef HAVE_OPENCL_HEADERS
+
 #ifdef HAVE_OPENCL_HEADERS
     #include "GPU.hpp"
     #include "GPUSimulator.hpp"

@@ -1,5 +1,7 @@
 #include "Trigonometry.hpp"
+#include "Algos.hpp"
 #include "Creators.hpp"
+//#include "Print.hpp"
 
 template<class T> void sin_check () {
 
@@ -9,9 +11,10 @@ template<class T> void sin_check () {
     Matrix<T> lhs;
 
     lhs = sin (rhs);
-    #ifdef VERBOSE    
-    std::cout << "A=\n" << rhs;
-    std::cout << "sin(A)=\n" << lhs << std::endl;
+    #ifdef VERBOSE
+    print (rhs, std::cout);
+    //std::cout << "A=\n" << rhs;
+    //std::cout << "sin(A)=\n" << lhs << std::endl;
     #endif
 }
 

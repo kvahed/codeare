@@ -2,74 +2,102 @@
 <main>
   <title>install</title>
   <article>  
-	<![CDATA[
+    <![CDATA[
 	
-	<h2>Installation guide</h2>
+    <h2>Installation guide</h2>
+    
+    <p class="lead">
+      Ubuntu
+    </p>
+    
+	<h3>Installing prerequisites</h3>
+    <pre class="sh_sh">
+      > sudo apt-get install git build-essential fftw3-dev itk3-dev \
+        libboost-dev libboost-system-dev libboost-thread-dev \
+        libboost-program-options-dev libnifti-dev liblapack-dev \
+        libgsl0-dev omniorb-nameserver libomniorb4-dev omniidl \
+        libatlas-dev libatlas-base-dev autoconf libtool \
+	libinsighttoolkit3-dev  
+    </pre>
 
-	<p class="lead">
-	  The installation of codeare will require some prerequisites. 
-	<p>
+    <h3>HDF5 (&gt;=1.8)</h3>
+    <p>
+      Unfortunately somebody has broken the HDF5 library which is
+      shipped with Ubuntu (12.10-13.04). So either you take 12.04LTS or
+      you will have to build HDF5 yourself. Download HDF5 from here:
+      <a href="http://www.hdfgroup.org/ftp/HDF5/current/src/"
+         target="hdf5"> 
+        http://www.hdfgroup.org/ftp/HDF5/current/src/
+      </a>
+      Build as follows. This will take a little while
+    </p>
+    
+    <pre class="sh_sh">
+      > cd hdf5-1.x.xx;
+      > ./configure --enable-cxx --prefix=/usr/local
+      > make 
+      > make check 
+      > sudo make install 
+    </pre>
 
-	<p>
-	  Mandatory:
-	  <ul>
-		<li>omniORB &gt; 4.1.2</li>
-		<li>Lapack (ATLAS, mkl, veclib, ACML and the like)</li>
-		<li>HDF5 &gt; 1.6 </li>
-		<li>FFTW (including float precision libraries) &rt; 3.2</li>
-		<li>NFFT 3.1.3</li>
-		<li>GSL &gt; 1.11</li>
-	  </ul>
-	</p>
-	
-	<p>
-	  Optional, however strongly recommended:
-	  <ul>
-		<li>nifticlib 2.0.0</li>
-		<li>ITK 3.2.0</li>
-	  </ul>
-	</p>
-	
-	<p>
-	  Optional, for file IO only, if desired:
-	  <ul>
-		<li>MATLAB &gt; 7.4</li>
-	  </ul>
-	</p>
-	
-	<h3>Ubuntu / Debian</h3>
-	
-	<p>
-	  You'll need to install 
-	  <ul>
-		<li><code>build-essential</code></li>
-		<li><code>libatlas-dev</code></li>
-		<li><code>libatlas-base-dev</code></li>
-		<li><code>liblapack-dev</code></li>
-		<li><code>itk3-dev</code></li>
-		<li><code>libinsighttoolkit3-dev</code></li>
-		<li><code>omniidl</code></li>
-		<li><code>libomniorb4-dev</code></li>
-		<li><code>libnifti-dev</code></li>
-		<li><code>libhdf5-serial-dev</code></li>
-		<li><code>fftw3-dev</code></li>
-		<li><code>libgsl0-dev</code></li>
-	  </ul>
-	</p>	
-	
+    <h3>NFFT 3</h3>
+    <p>
+      Get NFFT3 from here: 
+      <a href="http://www-user.tu-chemnitz.de/~potts/nfft/download.php" target="nfft">
+        http://www-user.tu-chemnitz.de/~potts/nfft/download.php
+      </a>
+    </p>
+    <pre class="sh_sh">
+      > tar xzf nfft-x.x.x/
+      > CXXFLAGS="-Ofast -march=native" CFLAGS=$CXXFLAGS ./configure  --enable-all
+      > make 
+      > sudo make install 
+    </pre>
+
+	<h3>ISMRMRD</h3>
+    <p>Stronlgy suggested for building in ISMRMRD support</p>
+    <pre class="sh_sh">
+      > sudo apt-get install xsdcxx cmake swig libpython-dev\
+        openjdk-7-jdk libxerces-c-dev python-numpy
+      > git clone git://git.code.sf.net/p/ismrmrd/code ismrmrd
+      > mkdir ismrmrd/build
+      > cd ismrmrd/build
+      > cmake ../
+      > make 
+      > sudo make install
+    </pre>
+
+    <p>
+      All of the above amounts to some 300 packages and 350
+      MB. Without ISMRMRD support roughly 150 packges and 160 MB
+      less. 
+    </p>
+
+	<h3>Getting codeare</h3>
+    <pre class="sh_sh">
+      > git clone http://github.com/kvahed/codeare.git codeare
+    </pre>
+    
+   
 	<h3>Building codeare</h3>
 	
 	<p>
 	  Fairly easy (f.e. ubuntu with MATLAB 2012a at the default location)
 	</p>
-
+    Configure with MATLAB and ISMRMRD support:
     <pre class="sh_sh">
-> CXXFLAGS="-O3" CFLAGS="-O3" ./configure \
-  --with-matlabroot=/opt/MATLAB/R2012a \ 
-  --with-fftw=/usr --with-itkroot=/usr
-> make
-> make check
-> make install</pre>
+      > CPPFLAGS="-I/usr/include/nifti" CXXFLAGS="-Ofast -march=native"\
+        CFLAGS=$CXXFLAGS ./configure --with-matlabroot=/opt/MATLAB/... \ 
+        --with-fftw=/usr --with-itkroot=/usr --disable-static
+      > make
+      > wget http://codeare.org/download/matlab_share.tar.gz 
+        #if built with MATLAB support else:
+      > wget http://codeare.org/download/hdf5_share.tar.gz
+        # Unpack with tar xzf
+      > export LD_LIBRARY_PATH=/usr/local/lib 
+      > make check
+      > make install
+    </pre>
     ]]>
   </article>
 </main> 

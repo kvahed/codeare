@@ -8,9 +8,9 @@ ismrmrdtest (Connector<T>* rc) {
 	
 	Params params;
 	params.Set("scheme", std::string("/usr/local/ismrmrd/schema/ismrmrd.xsd"));
-	IOContext ioc = IOContext (std::string (base + std::string (data)), ISMRM, params);
+	IOContext ioc = IOContext (std::string (base + std::string (data)), ISMRM, READ, params);
 
-	ioc.Read("dataset");
+	//ioc.Read("dataset");
 
 	return true;
 	

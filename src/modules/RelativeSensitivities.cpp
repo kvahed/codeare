@@ -19,7 +19,8 @@
  */
 
 #include "RelativeSensitivities.hpp"
-#include "MITK.hpp"
+#include "Print.hpp"
+#include "Resample.hpp"
 
 
 using namespace RRStrategy;
@@ -60,7 +61,6 @@ RelativeSensitivities::Process     () {
     printf ("  Data:\n");
     printf ("    Dimensions: %s \n", DimsToCString(data));
     printf ("    Reolutions: %s \n", ResToCString(data));
-	MXDump (data, "f.mat", "data");
 
 	mask = squeeze (mask);
     printf ("  Mask:\n");
@@ -75,18 +75,17 @@ RelativeSensitivities::Process     () {
     // -----------------------------------------
 
     // SVD calibration -------------------------
-    Matrix<cxfl>&   rxm  = 
-		AddMatrix ("rxm",  (Ptr<Matrix<cxfl> >)   
-				   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5))));
-    Matrix<cxfl>&   txm  = 
-		AddMatrix ("txm",  (Ptr<Matrix<cxfl> >)   
-				   NEW (Matrix<cxfl>   (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4))));
-    Matrix<cxfl>&   shim = 
-		AddMatrix ("shim", (Ptr<Matrix<cxfl> >)   
-				   NEW (Matrix<cxfl>   (data.Dim(4), 1)));
-    Matrix<double>& snro = 
-		AddMatrix ("snro", (Ptr<Matrix<double> >) 
-				   NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
+    Matrix<cxfl>&   rxm  = AddMatrix<cxfl> ("rxm");
+    rxm = Matrix<cxfl> (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(5));
+    
+    Matrix<cxfl>&   txm  = AddMatrix<cxfl> ("txm");
+	txm = Matrix<cxfl> (data.Dim(0), data.Dim(1), data.Dim(2), data.Dim(4));
+    
+    Matrix<cxfl>&   shim = AddMatrix<cxfl> ("shim"); 
+	shim = Matrix<cxfl> (data.Dim(4), 1);
+
+    Matrix<double>& snro = AddMatrix<double> ("snro"); 
+    snro = Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2));
 
     SVDCalibrate (data, rxm, txm, snro, shim, false);
 
@@ -94,7 +93,8 @@ RelativeSensitivities::Process     () {
 
     // Do we have GRE for segmentation? --------
 	
-    Matrix<short>& bets = AddMatrix ("bets", (Ptr<Matrix<short> >) NEW (Matrix<short> (mask.DimVector())));
+    Matrix<short>& bets = AddMatrix<short> ("bets");
+    bets = Matrix<short> (mask.Dim());
 	
     if (m_use_bet == 1) { // Better test? / Replace with SNRO?
 		
@@ -103,7 +103,7 @@ RelativeSensitivities::Process     () {
 
 		SOS (mask, ndims(mask)-1);
         
-        Matrix<double> bet(mask.DimVector());
+        Matrix<double> bet(mask.Dim());
         double         tmp = 0.0;
 		
         for (size_t i = 0; i < numel(mask); i++) {
@@ -112,7 +112,7 @@ RelativeSensitivities::Process     () {
         }
         
         SegmentBrain (bet, bets);
-		bets = Resample (bets, 0.5, LINEAR);
+		bets = resample (bets, 0.5, LINEAR);
 		
     } else if (m_use_bet == 2) {
 		
@@ -130,7 +130,8 @@ RelativeSensitivities::Process     () {
 
     // B0 calculation --------------------------
 	
-    Matrix<double>& b0 = AddMatrix ("b0", (Ptr<Matrix<double> >) NEW (Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2))));
+    Matrix<double>& b0 = AddMatrix<double> ("b0");
+    b0 = Matrix<double> (data.Dim(0), data.Dim(1), data.Dim(2));
 	
     B0Map (data, b0, m_echo_shift);
     // -----------------------------------------
@@ -139,15 +140,15 @@ RelativeSensitivities::Process     () {
 
 	if (m_weigh_maps) {
 
-		for (int ch = 0; ch < size(txm,3); ch++)
-			for (int i = 0; i < numel(bets); i++)
+		for (size_t ch = 0; ch < size(txm,3); ch++)
+			for (size_t i = 0; i < numel(bets); i++)
 				txm[ch*numel(bets) + i] *= (double)bets[i];
 		
-		for (int ch = 0; ch < size(rxm,3); ch++)
-			for (int i = 0; i < numel(bets); i++)
+		for (size_t ch = 0; ch < size(rxm,3); ch++)
+			for (size_t i = 0; i < numel(bets); i++)
 				rxm[ch*numel(bets) + i] *= (double)bets[i];
 		
-		for (int i = 0; i < numel(bets); i++)
+		for (size_t i = 0; i < numel(bets); i++)
 			b0[i] *= (double)bets[i];
 		
 	}

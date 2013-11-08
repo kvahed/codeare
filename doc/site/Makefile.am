@@ -23,3 +23,6 @@ if BUILD_DOCS
 	$(XSLTPROC) $(STYLESHEET) $< > $@
 
 endif
+
+clean-local:
+	rm -f *.html

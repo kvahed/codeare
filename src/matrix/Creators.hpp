@@ -3,9 +3,10 @@
 
 #include "Matrix.hpp"
 #include "Algos.hpp"
+#if !defined(_MSC_VER) || _MSC_VER>1200
+#  include "RandTraits.hpp"
+#endif
 
-#include <gsl/gsl_rng.h>
-#include <limits>
 
 
 /**
@@ -33,7 +34,7 @@
  */
 template <class T> inline static Matrix<T> 
 zeros           (const size_t& col, 
-				 const size_t& lin = 1, 
+				 const size_t& lin,
 				 const size_t& cha = 1,
 				 const size_t& set = 1,
 				 const size_t& eco = 1,
@@ -64,13 +65,19 @@ zeros           (const size_t& col,
 template <class T> inline static Matrix<T> 
 zeros           (const Matrix<size_t>& sz) {
 
-	std::vector<size_t> n (INVALID_DIM,1); 
+ 	return Matrix<T> (sz.Container());
 
-	for (size_t i = 0; i < numel(sz) && i < INVALID_DIM; i++)
-		n[i] = sz[i];
+}
 
- 	return Matrix<T> (n);
-
+/**
+ * @brief       Square matrix of zeros
+ *
+ * @param  n    Side length
+ * @return      Zero matrix
+ */
+template <class T> inline static Matrix<T>
+zeros            (const size_t& n) {
+	return zeros<T>(n,n);
 }
 
 
@@ -100,7 +107,7 @@ zeros           (const Matrix<size_t>& sz) {
  */
 template <class T> inline static Matrix<T> 
 ones            (const size_t& col, 
-				 const size_t& lin = 1, 
+				 const size_t& lin,
 				 const size_t& cha = 1,
 				 const size_t& set = 1,
 				 const size_t& eco = 1,
@@ -117,9 +124,7 @@ ones            (const size_t& col,
 				 const size_t& ave = 1) {
 
  	 Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-	 size_t i = numel(res);
-
-	 res.Dat() = T(1);
+     std::fill (res.Begin(), res.End(), T(1));
 
 	 return res;
 
@@ -127,7 +132,33 @@ ones            (const size_t& col,
 
 
 /**
- * @brief       Random matrix
+ * @brief       Square matrix of ones
+ *
+ * @param  n    Side length
+ * @return      Random matrix
+ */
+template <class T> inline static Matrix<T>
+ones            (const size_t& n) {
+	return ones<T>(n,n);
+}
+
+
+/**
+ * @brief       Zero matrix
+ *
+ * @param  sz   Size vector
+ * @return      Zero matrix
+ *
+ */
+template <class T> inline static Matrix<T>
+ones           (const Matrix<size_t>& sz) {
+ 	return Matrix<T> (sz.Container()) = (T)1;
+}
+
+
+#if !defined(_MSC_VER) || _MSC_VER>1200
+/**
+ * @brief       Uniformly random matrix
  *
  * @param  col  Column
  * @param  lin  Rows
@@ -149,9 +180,9 @@ ones            (const size_t& col,
  * @return      Random matrix
  *
  */
-template<class T> static Matrix<T> 
+template<class T> static Matrix<T>
 rand           (const size_t& col, 
-				const size_t& lin = 1, 
+				const size_t& lin,
 				const size_t& cha = 1,
 				const size_t& set = 1,
 				const size_t& eco = 1,
@@ -168,44 +199,115 @@ rand           (const size_t& col,
 				const size_t& ave = 1) {
 	
 	Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-	
-	size_t i = numel(res);
-	
-	const gsl_rng_type* grt;
-	gsl_rng* r;
-	
-	gsl_rng_env_setup();
-	grt = gsl_rng_default;
-	r = gsl_rng_alloc (grt);
-
-	if      (typeid(T) == typeid(float) || typeid(T) == typeid(double))
-		while (i--)
-			res[i] = 2.0 * gsl_rng_uniform (r) - 1.0;
-	else if (typeid(T) == typeid(cxdb))
-		while (i--) {
-			((double*) &res[i])[0] = 2.0 * gsl_rng_uniform (r) - 1.0;
-			((double*) &res[i])[1] = 2.0 * gsl_rng_uniform (r) - 1.0;
-		}
-	else if (typeid(T) == typeid(cxfl))
-		while (i--) {
-			((float*) &res[i])[0] = 2.0 * gsl_rng_uniform (r) - 1.0;
-			((float*) &res[i])[1] = 2.0 * gsl_rng_uniform (r) - 1.0;
-		}
-	else if (typeid(T) == typeid(short))
-		while (i--)
-			res[i] = 2 * gsl_rng_uniform_int (r, SHRT_MAX) - SHRT_MAX;
-	
-	else if (typeid(T) == typeid(long))
-		while (i--)
-			res[i] = 2 * gsl_rng_uniform_int (r, INT_MAX) - INT_MAX;
-	
-	gsl_rng_free (r);
-
+    Random<T>::Uniform(res);
 	return res;
 
 }
 
 
+/**
+ * @brief       Uniformly random matrix
+ *
+ * @param  sz   Size vector
+ * @return      Rand matrix
+ *
+ */
+template <class T> inline static Matrix<T>
+rand           (const Matrix<size_t>& sz) {
+
+	Matrix<T> res (sz.Container());
+    Random<T>::Uniform(res);
+ 	return res;
+
+}
+
+/**
+ * @brief       Random square matrix
+ *
+ * @param  n    Side length
+ * @return      Random matrix
+ */
+template<class T> static Matrix<T>
+rand (const size_t n) {
+	return rand<T>(n,n);
+}
+
+
+/**
+ * @brief       Uniformly random matrix
+ *
+ * @param  col  Column
+ * @param  lin  Rows
+ * @param  cha  Dimension
+ * @param  set  Dimension
+ * @param  eco  Dimension
+ * @param  phs  Dimension
+ * @param  rep  Dimension
+ * @param  seg  Dimension
+ * @param  par  Dimension
+ * @param  slc  Dimension
+ * @param  ida  Dimension
+ * @param  idb  Dimension
+ * @param  idc  Dimension
+ * @param  idd  Dimension
+ * @param  ide  Dimension
+ * @param  ave  Dimension
+ *
+ * @return      Random matrix
+ *
+ */
+template<class T> static Matrix<T>
+randn          (const size_t& col, 
+				const size_t& lin,
+				const size_t& cha = 1,
+				const size_t& set = 1,
+				const size_t& eco = 1,
+				const size_t& phs = 1,
+				const size_t& rep = 1,
+				const size_t& seg = 1,
+				const size_t& par = 1,
+				const size_t& slc = 1,
+				const size_t& ida = 1,
+				const size_t& idb = 1,
+				const size_t& idc = 1,
+				const size_t& idd = 1,
+				const size_t& ide = 1,
+				const size_t& ave = 1) {
+	
+	Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
+    Random<T>::Normal(res);
+	return res;
+
+}
+
+
+/**
+ * @brief       Uniformly random matrix
+ *
+ * @param  sz   Size vector
+ * @return      Rand matrix
+ *
+ */
+template <class T> inline static Matrix<T>
+randn          (const Matrix<size_t>& sz) {
+
+	Matrix<T> res (sz.Container());
+    Random<T>::Normal(res);
+ 	return res;
+
+}
+
+/**
+ * @brief       Random square matrix
+ *
+ * @param  n    Side length
+ * @return      Random matrix
+ */
+template<class T> static Matrix<T>
+randn (const size_t n) {
+	return rand<T>(n,n);
+}
+#endif
 
 /**
  * @brief       nxn square matrix with circle centered at p
@@ -298,11 +400,7 @@ ellipse (const float* p, const size_t n, const T s = T(1)) {
 	
 #pragma omp parallel default (shared) 
 	{
-		
-		size_t tid      = omp_get_thread_num();
-		size_t chunk    = n / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk) 
+#pragma omp for schedule (dynamic, n / omp_get_num_threads())
 		
 	for (size_t r = 0; r < n; r++)
 		for (size_t c = 0; c < n; c++) {
@@ -349,11 +447,7 @@ ellipsoid (const float* p, const size_t n, const T s) {
 	
 #pragma omp parallel default (shared) 
 	{
-		
-		size_t tid      = omp_get_thread_num();
-		size_t chunk    = n / omp_get_num_threads();
-		
-#pragma omp for schedule (dynamic, chunk) 
+#pragma omp for schedule (dynamic, n / omp_get_num_threads())
 		
 		for (size_t s = 0; s < n; s++)
 			for (size_t r = 0; r < n; r++)
@@ -389,20 +483,20 @@ phantom (const size_t& n) {
 	const size_t np = 5;  // Number of geometrical parameters
 	
 	float p[ne][np] = {
-		{ 0.6900, 0.9200,  0.00,  0.0000,  0.0 },
-		{ 0.6624, 0.8740,  0.00, -0.0184,  0.0 },
-        { 0.1100, 0.3100, -0.22,  0.0000, -0.3 },
-		{ 0.1600, 0.4100,  0.22,  0.0000,  0.3 },
-		{ 0.2100, 0.2500,  0.00,  0.3500,  0.0 },
-		{ 0.0460, 0.0460,  0.00,  0.1000,  0.0 },
-		{ 0.0460, 0.0460,  0.00, -0.1000,  0.0 },
-		{ 0.0460, 0.0230,  0.08, -0.6050,  0.0 },
-		{ 0.0230, 0.0230,  0.00, -0.6060,  0.0 },
-		{ 0.0230, 0.0460, -0.06, -0.6050,  0.0 }
+		{ .69,   .92,   .0,   .0,     .0 },
+		{ .6624, .874,  .0,  -.0184,  .0 },
+        { .11,   .31,  -.22,  .0,    -.3 },
+		{ .16,   .41,   .22,  .0,     .3 },
+		{ .21,   .25,   .0,   .35,    .0 },
+		{ .046,  .046,  .00,  .1,     .0 },
+		{ .046,  .046,  .0,  -.1,     .0 },
+		{ .046,  .023,  .08, -.605,   .0 },
+		{ .023,  .023,  .0,  -.606,   .0 },
+		{ .023,  .046, -.06, -.605,   .0 }
 	};
 
 	// Size_Tensities
-	T v[ne] = {T(1.0), T(-0.8), T(-0.2), T(-0.2), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1), T(0.1)};
+	T v[ne] = {T(1.), T(-.8), T(-.2), T(-.2), T(.1), T(.1), T(.1), T(.1), T(.1), T(.1)};
 
 	// Empty matrix
 	Matrix<T> res (n);
@@ -438,19 +532,19 @@ phantom3D (const size_t& n) {
 	const size_t np =  9; // Number of geometrical parameters
 
 	float p[ne][np] = {
-		{ 0.690, 0.920, 0.900,  0.00,  0.000,  0.000,  0.0, 0.0, 0.0 },
-        { 0.662, 0.874, 0.880,  0.00,  0.000,  0.000,  0.0, 0.0, 0.0 },
-        { 0.110, 0.310, 0.220, -0.22,  0.000, -0.250, -0.3, 0.0, 0.0 },
-        { 0.160, 0.410, 0.210,  0.22,  0.000, -0.250,  0.3, 0.0, 0.0 },
-        { 0.210, 0.250, 0.500,  0.00,  0.350, -0.250,  0.0, 0.0, 0.0 },
-        { 0.046, 0.046, 0.046,  0.00,  0.100, -0.250,  0.0, 0.0, 0.0 },
-        { 0.046, 0.023, 0.020,  0.08, -0.650, -0.250,  0.0, 0.0, 0.0 },
-        { 0.046, 0.023, 0.020,  0.06, -0.650, -0.250,  0.0, 0.0, 0.0 },
-        { 0.056, 0.040, 0.100, -0.06, -0.105,  0.625,  0.0, 0.0, 0.0 },
-        { 0.056, 0.056, 0.100,  0.00,  0.100,  0.625,  0.0, 0.0, 0.0 }
+		{ .69,  .92,  .9,   .0,   .0,   .0,   .0, .0, .0 },
+        { .662, .874, .88,  .0,   .0,   .0,   .0, .0, .0 },
+        { .11,  .31,  .22, -.22,  .0,  -.25, -.3, .0, .0 },
+        { .16,  .41,  .21,  .22,  .0,  -.25,  .3, .0, .0 },
+        { .21,  .25,  .5,   .0,   .35, -.25,  .0, .0, .0 },
+        { .046, .046, .046, .0,   .1,  -.25,  .0, .0, .0 },
+        { .046, .023, .02,  .08, -.65, -.25,  .0, .0, .0 },
+        { .046, .023, .02,  .06, -.65, -.25,  .0, .0, .0 },
+        { .056, .04,  .1,  -.06, -.105, .625, .0, .0, .0 },
+        { .056, .056, .1,   .0,   .1,   .625, .0, .0, .0 }
 	};
 
-	T v[ne] = {2.0, -0.8, -0.2, -0.2, 0.2, 0.2, 0.1, 0.1, 0.2, -0.2};
+	T v[ne] = {2., -.8, -.2, -.2, .2, .2, .1, .1, .2, -.2};
 
 	Matrix<T> res = zeros<T>(n,n,n);
 	Matrix<T> e;
@@ -536,7 +630,6 @@ meshgrid (const Matrix<T>& x, const Matrix<T>& y, const Matrix<T>& z = Matrix<T>
 			Slice  (res, i +  2 * nz, z[i]);
 	
 	return res;	
-
 
 }
 

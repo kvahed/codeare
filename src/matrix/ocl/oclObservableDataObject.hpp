@@ -32,7 +32,7 @@
        * @brief            pure virtual: finish ()
        */
       virtual
-      void
+      double
       finish               () = 0;
 
 

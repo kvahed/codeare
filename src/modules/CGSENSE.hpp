@@ -43,7 +43,9 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		CGSENSE () {};
+		CGSENSE () : m_cgeps(1.0e-7), m_fteps(1.0e-3), m_cgmaxit(10),
+					 m_ftmaxit(3), m_noise(0.0), m_lambda(1.0e-6), m_testcase(0),
+					 m_verbose(0), m_nthreads (0) {}
 		
 		/**
 		 * @brief Default destructor
@@ -77,13 +79,13 @@ namespace RRStrategy {
 		
 	private:
 
-		NCSENSE<float>* m_ncs;
+		NCSENSE<float>  m_ncs;
 		
-		int             m_iter;      /**< Maximum number of NuFFT solver iterations           */
 		int             m_verbose;   /**< Verbose should give back the reconstruction series? */
 		int             m_testcase;  /**< Test case. Generate forward data first.             */
 		int             m_ftmaxit;   /**< Maximum number of NuFFT solver iterations           */
 		int             m_cgmaxit;   /**< Maximum number of CG iterations                     */
+		int             m_nthreads;  /**< Number of threads                                   */
 		
 		double          m_noise;     /**< Add noise?                                          */
 		double          m_lambda;    /**< Tikhonov factor                                     */

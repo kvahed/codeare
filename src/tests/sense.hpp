@@ -18,13 +18,21 @@
  *  02110-1301  USA
  */
 
+#include "matrix/io/IOContext.hpp"
+
 template <class T> bool 
 sensetest (RRClient::Connector<T>* rc) {
 	
+    using namespace codeare::matrix::io;
 	// Incoming
 	Matrix<cxfl> fimgs;   // Folded images O (Nc, RO, PE/AF, PE2)
 	Matrix<cxfl> smaps;   // Sensitivity maps O (Nc, RO, PE, PE2)
 	
+    IOContext ic (rc->GetElement("/config/data-in"), base, READ);
+    fimgs = ic.Read<cxfl>(rc->GetElement("/config/data-in/in"));
+    smaps = ic.Read<cxfl>(rc->GetElement("/config/data-in/sm"));
+    ic.Close();
+
 	// Outgoing
 	Matrix<cxfl> ufimg;   // Reconstructed unaliased O (RO, PE, PE2)
 
@@ -32,12 +40,6 @@ sensetest (RRClient::Connector<T>* rc) {
 	bool         compgfm = false;
 	rc->Attribute("compgfm", &compgfm);
 
-	std::string    odf = std::string (base + std::string("/images.mat")); // Binary Ouput (images etc)
-	
-	if (!Read (fimgs, rc->GetElement("/config/data/in"), base) ||
-		!Read (smaps, rc->GetElement("/config/data/sm"), base))
-		return false;
-	
 	if (rc->Init (test) != OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
@@ -62,21 +64,9 @@ sensetest (RRClient::Connector<T>* rc) {
 	
 	rc->Finalise   (test);
 	
-#ifdef HAVE_MAT_H	
-	MATFile* mf = matOpen (odf.c_str(), "w");
-	
-	if (mf == NULL) {
-		printf ("Error creating file %s\n", odf.c_str());
-		return false;
-	}
-	
-	MXDump     (ufimg, mf, "ufimg");
-	
-	if (matClose(mf) != 0) {
-		printf ("Error closing file %s\n", odf.c_str());
-		return false;
-	}
-#endif
+	IOContext oc (rc->GetElement("/config/data-out"), base, WRITE);
+    oc.Write(ufimg, "image");
+    oc.Close();
 
 	return true;
 	

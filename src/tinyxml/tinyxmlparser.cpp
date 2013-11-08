@@ -111,21 +111,17 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
 			--output; 
 			*output = (char)((input | BYTE_MARK) & BYTE_MASK); 
 			input >>= 6;
-			break;
 		case 3:
 			--output; 
 			*output = (char)((input | BYTE_MARK) & BYTE_MASK); 
 			input >>= 6;
-			break;
 		case 2:
 			--output; 
 			*output = (char)((input | BYTE_MARK) & BYTE_MASK); 
 			input >>= 6;
-			break;
 		case 1:
 			--output; 
 			*output = (char)(input | FIRST_BYTE_MARK[*length]);
-			break;
 	}
 }
 
@@ -379,8 +375,6 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p, TiXmlEncoding encoding )
 
 		*tag += (char) in->get();
 	}
-
-	return true;
 }
 
 /*static*/ bool TiXmlBase::StreamTo( std::istream * in, int character, TIXML_STRING * tag )

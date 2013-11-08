@@ -26,33 +26,26 @@
  * @brief Right hand side operator E (i.e. forward transform) 
  *
  * @param  in      Image
- * @param  sm      Sensitivities 
+ * @param  sm      Sensitivities
+ * @param  nx      Sizes & co.
  * @param  fts     FT operators
  * @return         K-space 
  */
 template <class T> inline static Matrix< std::complex<T> >
-E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm, NFFT<T>** fts) {
+E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
+   const std::vector<size_t>& nx, const std::vector<NFFT<T> >& fts) {
 
-	// Leading extends
-	size_t nc, nk, nd;
+	Matrix< std::complex<T> > out (nx[2],nx[1]);
 
-	nk = fts[0]->FPlan()->M_total; // K-space points
-	nd = fts[0]->FPlan()->d;       // Image space dims
-	nc = size (sm, nd);            // # Receivers
-
-	Matrix< std::complex<T> > out (nk,nc);
-	
 #pragma omp parallel default (shared) 
 	{
 
-		NFFT<T>&  ft = *fts[omp_get_thread_num()];
-		
 #pragma omp for 
-		for (int j = 0; j < nc; j++)
-			Column (out, j, ft * (((nd == 2) ? Slice (sm, j) : Volume (sm, j)) * in));
+		for (int j = 0; j < nx[1]; j++)
+			Column (out, j, fts[omp_get_thread_num()] * (resize(((nx[0] == 2) ? Slice (sm, j) : Volume (sm, j)),size(in)) * in));
 		
 	}
-	
+
 	return out;
 	
 }
@@ -63,32 +56,26 @@ E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm, NFF
  *
  * @param  in      K-space
  * @param  sm      Sensitivities 
+ * @param  nx      Sizes & co.
  * @param  fts     FT operators
  * @return         Image
  */
 template <class T> inline static Matrix< std::complex<T> >
-EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm, NFFT<T>** fts) {
-
-	size_t nc, nk, nd;
-
-	nk = fts[0]->FPlan()->M_total; // K-space points
-	nd = fts[0]->FPlan()->d;       // Image space dims
-	nc = size (sm, nd);            // # Receivers
+EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
+    const std::vector<size_t>& nx, const std::vector<NFFT<T> >& fts) {
 
 	Matrix< std::complex<T> > out = zeros< std::complex<T> > (size(sm));
 
 #pragma omp parallel default (shared) 
 	{
 		
-		NFFT<T>&  ft = *fts[omp_get_thread_num()];
-		
 #pragma omp for
-		for (int j = 0; j < nc; j++)
-			Slice (out, j, ft ->* Column (in,j) * conj(Slice (sm, j)));
+		for (int j = 0; j < nx[1]; j++)
+			Slice (out, j, fts[omp_get_thread_num()] ->* Column (in,j) * conj(Slice (sm, j)));
 
 	}
 
-	return sum (out, nd);
+	return sum (out, nx[0]);
 
 }
 

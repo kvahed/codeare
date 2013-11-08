@@ -12,7 +12,7 @@ api_DATA = $(EXTRA_DIST) doxygen-build.stamp ../../src/doc/mainpage.ixx
 if BUILD_API
 
 
-doxygen-build.stamp: $(DOXY_FILE) $(top_srcdir)/src/*.hpp $(top_srcdir)/src/matrix/*.hpp $(top_srcdir)/src/misc/*.hpp ../../src/doc/mainpage.ixx ../../src/doc/matrix.ixx
+doxygen-build.stamp: $(DOXY_FILE) $(top_srcdir)/src/*.hpp $(top_srcdir)/src/matrix/*.hpp $(top_srcdir)/src/matrix/io/*.hpp $(top_srcdir)/src/matrix/linalg/*.hpp $(top_srcdir)/src/matrix/ft/*.hpp $(top_srcdir)/src/misc/*.hpp ../../src/doc/mainpage.ixx ../../src/doc/matrix.ixx
 	doxygen $(DOXY_FILE)
 	touch doxygen-build.stamp
 
@@ -39,6 +39,7 @@ uninstall-local:
 clean-local:
 	if test -d api; then rm -rf api; fi
 	if test -f doxygen-build.stamp; then rm -f doxygen-build.stamp; fi
+	if test -f doxy-codeare.conf; then rm -f doxy-codeare.conf; fi
 
 else 
 

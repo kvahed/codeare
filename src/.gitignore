@@ -2,7 +2,6 @@
 ## files (explicit)
 
 /config.h
-/config.h.in
 
 /Loader.hpp
 

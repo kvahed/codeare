@@ -25,11 +25,12 @@
 #define __COMPRESSED_SENSING_HPP__
 
 #include "ReconStrategy.hpp"
+#include "Algos.hpp"
 #include "FT.hpp"
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
-#include "Algos.hpp"
+#include "linalg/Lapack.hpp"
 
 #include <pthread.h>
 /**
@@ -38,340 +39,340 @@
 namespace RRStrategy {
 
 
-	/**
-	 * @brief CG parameters
-	 */
-	struct CSParam {
-		
-		int    fft;
-		int    lsiter;
-		int    lsto ;
-		int    cgiter;
-		
-		double pnorm;
-		double tvw;
-		double xfmw;
-		double cgconv;
-		double l1;
-		double lsa;
-		double lsb;
+    /**
+     * @brief CG parameters
+     */
+    struct CSParam {
+        
+        int    fft;
+        int    lsiter;
+        int    lsto ;
+        int    cgiter;
+        
+        double pnorm;
+        double tvw;
+        double xfmw;
+        double cgconv;
+        double l1;
+        double lsa;
+        double lsb;
 
-		DWT<cxfl>* dwt;
-		FT<float>*  ft;
-		TVOP*      tvt;
-		
-	};
+        DWT<cxfl>* dwt;
+        FT<float>*  ft;
+        TVOP*      tvt;
+        
+    };
 
+    
+    /**
+     * @brief CS reconstruction based on Sparse MRI v0.2 by Michael Lustig
+     */
+    class CompressedSensing : public ReconStrategy {
+            
+        
+    public:
+        
+        /**
+         * @brief Default constructor
+         */
+        CompressedSensing  ();
+        
+        
+        /**
+         * @brief Default destructor
+         */
+        virtual 
+        ~CompressedSensing ();
+        
+        
+        /**
+         * @brief Do nothing 
+         */
+        virtual error_code
+        Process ();
+        
+        
+        /**
+         * @brief Do nothing 
+         */
+        virtual error_code 
+        Init ();
+        
+        
+        /**
+         * @brief Do nothing 
+         */
+        virtual error_code
+        Finalise ();
+        
+        
+        
+    private:
+        
+        int            m_dim;    /**< Image recon dim */
+        int            m_N[3];   /**< Data side lengths */
+        int            m_csiter; /**< # global iterations */
 
-	/**
-	 * @brief CS reconstruction based on Sparse MRI v0.2 by Michael Lustig
-	 */
-	class CompressedSensing : public ReconStrategy {
-		
-		
-	public:
-		
-		/**
-		 * @brief Default constructor
-		 */
-		CompressedSensing  ();
+        CSParam        m_csparam;
+        int            m_wf;
+        int            m_wm;
+        int            m_verbose;
+        
+    };
+    
+    
+    inline static float 
+    Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
+         const Matrix<cxfl>&  data, const float             t) {
+        
+        Matrix<cxfl> om;
+        float        o = 0.0;
+        
+        om  = ffdbx;
+        if (t > 0.0) 
+            om += t * ffdbg;
+        om -= data;
+        
+        o = real(om.dotc(om));
+        
+        return o;
 
-		
-		/**
-		 * @brief Default destructor
-		 */
-		virtual 
-		~CompressedSensing ();
-		
-		
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual error_code
-		Process ();
-		
+    }
+    
+    
+    inline static float 
+    ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
+           const float             t, const CSParam&        cgp) {
+        
+        Matrix<cxfl> om;
+        float        o = 0.0, p = 0.5*cgp.pnorm;
+        
+        om  = ttdbx;
+        if (t > 0.0)
+            om += t * ttdbg;
+        om *= conj(om);
+        om += cgp.l1;
+        om ^= p;
+        
+        for (size_t i = 0; i < om.Size(); i++) 
+            o += real(om[i]);
+        
+        return cgp.tvw * o;
+        
+    }
+    
+    
+    /**
+     *
+     */
+    inline static float 
+    ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g, 
+            const float         t, const CSParam&    cgp) {
+        
+        Matrix<cxfl> om;
+        float        o = 0.0, p = 0.5*cgp.pnorm;
+        
+        om  = x;
+        if (t > 0.0)
+            om += t * g;
+        om *= conj(om);
+        om += cgp.l1;
+        om ^= p;
+        
+        for (size_t i = 0; i < om.Size(); i++) 
+            o += om[i].real();
+        
+        return cgp.xfmw * o;
+        
+    } 
+    
+    
+    static float 
+    Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
+               const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
+               const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
+               const Matrix<cxfl>&  data, const float             t, 
+                     float&         rmse, const CSParam&        cgp) {
+        
+        float obj;
+        float nz = (float) nnz (data); 
+        
+        obj  = Obj (ffdbx, ffdbg, data, t);
+        rmse = sqrt(obj/nz);
+        
+        if (cgp.tvw)
+            obj += ObjTV (ttdbx, ttdbg, t, cgp);
+        
+        if (cgp.xfmw)
+            obj += ObjXFM (x, g, t, cgp);
+        
+        return obj;
 
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual error_code 
-		Init ();
-		
+    }
+    
+    
+    /**
+     * @brief Compute gradient of the data consistency
+     */
+    static Matrix<cxfl> 
+    GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, 
+             const Matrix<cxfl>& data, const CSParam& cgp) {
+        
+        FT<float>& ft = *(cgp.ft);
+        DWT<cxfl>& dwt = *(cgp.dwt);
+        
+        Matrix<cxfl> g;
+        
+        g  = ft ->* (- data + (ft * wx));
+        g  = dwt * g;
+        
+        return (2.0 * g);
+        
+    }
 
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual error_code
-		Finalise ();
-
-
-
-	private:
-		
-		int            m_dim;    /**< Image recon dim */
-		int            m_N[3];   /**< Data side lengths */
-		int            m_csiter; /**< # global iterations */
-
-		CSParam        m_csparam;
-		int            m_wf;
-		int            m_wm;
-
-	};
-
-
-	static float 
-	Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
-		 const Matrix<cxfl>&  data, const float&            t) {
-	
-		Matrix<cxfl> om;
-		float        o = 0.0;
-		
-		om  = ffdbx;
-		if (t > 0.0) 
-			om += t * ffdbg;
-		om -= data;
-
-		o = creal(om.dotc(om));
-
-		return o;
-
-	}
-
-
-	static float 
-	ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
-		   const float&            t, const CSParam&        cgp) {
-		
-		Matrix<cxfl> om;
-		float        o = 0.0, p = (float)cgp.pnorm/2.0;
-		
-		om  = ttdbx;
-		if (t > 0.0)
-			om += t * ttdbg;
-		om *= conj(om);
-		om += cgp.l1;
-		om ^= p;
-		
-		for (size_t i = 0; i < om.Size(); i++) 
-			o += creal(om[i]);
-		
-		return cgp.tvw * o;
-
-	}
-
-
-	/**
-	 *
-	 */
-	static float 
-	ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g, 
-			const float&        t, const CSParam&    cgp) {
-		
-		Matrix<cxfl> om;
-		float        o = 0.0, p = (float)cgp.pnorm/2.0;
-
-		om  = x;
-		if (t > 0.0)
-			om += t * g;
-		om *= conj(om);
-		om += cgp.l1;
-		om ^= p;
-		
-		for (size_t i = 0; i < om.Size(); i++) 
-			o += om[i].real();
-
-		return cgp.xfmw * o;
-
-	} 
-
-
-	static float 
-	Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
-			   const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
-			   const Matrix<cxfl>&     x, const Matrix<cxfl>&     g, 
-			   const Matrix<cxfl>&  data, const float             t, 
-			   float&         rmse, const CSParam&        cgp) {
-		
-		float obj = 0.0;
-		float nz = (float) nnz (data); 
-		
-		obj  = Obj (ffdbx, ffdbg, data, t);
-		rmse = sqrt(obj/nz);
-		
-		if (cgp.tvw)
-			obj += ObjTV (ttdbx, ttdbg, t, cgp);
-		
-		if (cgp.xfmw)
-			obj += ObjXFM (x, g, t, cgp);
-
-		return obj;
-
-	}
-
-
-	/**
-	 * @brief Compute gradient of the data consistency
-	 */
-	static Matrix<cxfl> 
-	GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, 
-			 const Matrix<cxfl>& data, const CSParam& cgp) {
-		
-		FT<float>& ft = *(cgp.ft);
-		DWT<cxfl>& dwt = *(cgp.dwt);
-
-		Matrix<cxfl> g;
-		
-		g  = ft ->* (- data + (ft * wx));
-		g  = dwt * g;
-
-		return (2.0 * g);
-
-	}
-
-
-	/**
-	 * @brief Compute gradient of L1-transform operator
-	 *
-	 * @param  x   X
+    
+    /**
+     * @brief Compute gradient of L1-transform operator
+     *
+     * @param  x   X
      * @param  cgp CG parameters
      * @return     The gradient
-	 */
-	template <class T> inline static Matrix<T> 
-	GradXFM   (const Matrix<T>& x, const CSParam& cgp) {
-		
+     */
+    template <class T> inline static Matrix<T> 
+    GradXFM   (const Matrix<T>& x, const CSParam& cgp) {
+        
         float pn = 0.5*cgp.pnorm-1.0, l1 = cgp.l1, xfm = cgp.xfmw;
+        
+        return xfm * (x * ((x * conj(x) + l1) ^ pn));
+        
+    }
+    
+    
+    /**
+     * @brief Compute gradient of the total variation operator
+     *
+     * @param  x   Image space original
+     * @param  wx  Image space perturbance
+     * @param  cgp Parameters
+     */
+    Matrix<cxfl> 
+    GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {
+        
+        DWT<cxfl>&  dwt = *cgp.dwt;
+        TVOP& tvt = *cgp.tvt;
+        float p   = 0.5*cgp.pnorm-1.0;
+        
+        Matrix<cxfl> dx, g;
+        
+        dx = tvt * wx;
 
-		return xfm * (x * ((x * conj(x) + l1) ^ pn));
+        g  = dx * conj(dx);
+        g += cxfl(cgp.l1);
+        g ^= p;
+        g *= dx;
+        g *= cgp.pnorm;
+        g  = dwt * (tvt->*g);
+        
+        return (cgp.tvw * g);
+        
+    }
+    
+    
+    Matrix<cxfl> 
+    Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CSParam& cgp) {
+        
+        Matrix<cxfl> g;
+        
+        g = GradObj (x, wx, data, cgp);
+        
+        if (cgp.xfmw)
+            g += GradXFM (x, cgp);
+        
+        if (cgp.tvw)
+            g += GradTV  (x, wx, cgp);
+        
+        return g;
+        
+    } 
+    
 
-	}
+    void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
 
+        
+        float     t0  = 1.0, t = 1.0, z = 0.0;
+        float     xn  = real(norm(x));
+        float     rmse, bk, f0, f1;
+        
+        Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
+        
+        DWT<cxfl>& dwt = *cgp.dwt;
+        FT<float>& ft  = *cgp.ft;
+        TVOP&      tvt = *cgp.tvt;
+        
+        wx  = dwt->*x;
+        
+        g0 = Gradient (x, wx, data, cgp);
+        dx = -g0;
+        
+        wdx = dwt->*dx;
+        
+        for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
+            
+            t = t0;
+            
+            ffdbx = ft * wx;
+            ffdbg = ft * wdx;
+            
+            if (cgp.tvw) {
+                ttdbx = tvt * wx;
+                ttdbg = tvt * wdx;
+            }
+            
+            f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
+            
+            int i = 0;
+            
+            while (i < cgp.lsiter) {
+                
+                t *= cgp.lsb;
+                f1 = Objective(ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
+                if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
+                    break;
+                i++;
+                
+            } 
+            
+            printf ("    %02zu - nrms: %1.7f, l-search: %i, ", k, rmse, i); fflush (stdout);
 
-	/**
-	 * @brief Compute gradient of the total variation operator
-	 *
-	 * @param  x   Image space original
-	 * @param  wx  Image space perturbance
-	 * @param  cgp Parameters
-	 */
-	Matrix<cxfl> 
-	GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {
-
-		DWT<cxfl>&  dwt = *cgp.dwt;
-		TVOP& tvt = *cgp.tvt;
-		float p   = ((float)cgp.pnorm)/2.0-1.0;
-
-		Matrix<cxfl> dx, g;
-
-		dx = tvt * wx;
-
-		g  = dx * conj(dx);
-		g += cxfl(cgp.l1);
-		g ^= p;
-		g *= dx;
-		g *= cxfl(cgp.pnorm);
-		g  = dwt * (tvt->*g);
-
-		return (cgp.tvw * g);
-
-	}
-
-
-	Matrix<cxfl> 
-	Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CSParam& cgp) {
-
-		Matrix<cxfl> g;
-		
-		g = GradObj (x, wx, data, cgp);
-
-		if (cgp.xfmw)
-			g += GradXFM (x, cgp);
-
-		if (cgp.tvw)
-			g += GradTV  (x, wx, cgp);
-
-		return g;
-
-	} 
-
-
-	void 
-	NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
-
-		
-		float     t0  = 1.0, t = 1.0, z = 0.0;
-		float     xn  = creal(norm(x));
-		float     rmse, bk, f0, f1;
-		
-		Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
-
-		DWT<cxfl>& dwt = *cgp.dwt;
-		FT<float>& ft  = *cgp.ft;
-		TVOP&      tvt = *cgp.tvt;
-		
-		wx  = dwt->*x;
-
-		g0 = Gradient (x, wx, data, cgp);
-		dx = -g0;
-		
-		wdx = dwt->*dx;
-
-		for (size_t k = 0; k < cgp.cgiter; k++) {
-			
-			t = t0;
-			
-			ffdbx = ft * wx;
-			ffdbg = ft * wdx;
-			
-			if (cgp.tvw) {
-				ttdbx = tvt * wx;
-				ttdbg = tvt * wdx;
-			}
-			
-			f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
-		   
-			int i = 0;
-
-			while (i < cgp.lsiter) {
-				
-				t *= cgp.lsb;
-				f1 = Objective(ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
-				if (f1 <= f0 - (cgp.lsa * t * cabs(g0.dotc(dx))))
-					break;
-				i++;
-				
-			} 
-			
-			printf ("    %02zu - nrms: %1.7f, l-search: %i, ", k, rmse, i); fflush (stdout);
-
-			if (i == cgp.lsiter) {
-				printf ("Reached max line search, exiting... \n"); 
-				return;
-			}
-			
-			if      (i > 2) t0 *= cgp.lsb;
-			else if (i < 1) t0 /= cgp.lsb;
-
-			// Update image
-			x  += (dx * t);
-			wx  = dwt->*x;
-					
-			// CG computation 
-			g1  =  Gradient (x, wx, data, cgp);
-			bk  =  creal(g1.dotc(g1) / g0.dotc(g0));
-			g0  =  g1;
-			dx  = -g1 + dx * bk;
-
-			wdx = dwt->*dx;
-
-			float dxn = creal(norm(dx))/xn;
-			printf ("dxnrm: %0.4f\n", dxn);
-			if (dxn < cgp.cgconv) 
-				break;
-			
-		} 
-
-	}
-	
+            if (i == cgp.lsiter) {
+                printf ("Reached max line search, exiting... \n"); 
+                return;
+            }
+            
+            if      (i > 2) t0 *= cgp.lsb;
+            else if (i < 1) t0 /= cgp.lsb;
+            
+            // Update image
+            x  += (dx * t);
+            wx  = dwt->*x;
+                    
+            // CG computation 
+            g1  =  Gradient (x, wx, data, cgp);
+            bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
+            g0  =  g1;
+            dx  = -g1 + dx * bk;
+            
+            wdx = dwt->*dx;
+            
+            float dxn = norm(dx)/xn;
+            printf ("dxnrm: %0.4f\n", dxn);
+            if (dxn < cgp.cgconv) 
+                break;
+            
+        } 
+        
+    }
+    
 }
 #endif /* __COMPRESSED_SENSING_H__ */
 

@@ -1,200 +1,80 @@
-# ifndef __OCL_MATRIX_HPP__
+#ifndef __OCL_MATRIX_HPP__
 
+#define __OCL_MATRIX_HPP__
 
+#include "../../Matrix.hpp"
+#include "../../Algos.hpp"
+#include "../oclSettings.hpp"
+#include "../oclConnection.hpp"
+#include "../oclTraits.hpp"
 
+template <class T> struct ocl_matrix_type_traits;
 
-  /************
-   ** makros **
-   ************/
-  # define __OCL_MATRIX_HPP__
-
-
-
-
-  /**************
-   ** includes **
-   **************/
- 
-  // CoDEARE
-  # include "../../Matrix.hpp"
-  
-  // ocl
-  # include "../oclSettings.hpp"
-  # include "../oclConnection.hpp"
-  # include "../oclTraits.hpp"
-
-
-
-  /************************************
-   ** struct: ocl_matrix_type_traits **
-   **   (base struct)                **
-   ************************************/
-  template <class T>
-  struct ocl_matrix_type_traits
-  {
-  
-    /* -- */
-  
-  };
-  
-  
-  /************************************
-   ** struct: ocl_matrix_type_traits **
-   **   (derived, type: float)       **
-   ************************************/
-  template <>
-  struct ocl_matrix_type_traits <float>
-  {
-  
+template <> struct ocl_matrix_type_traits <float> {
     typedef float elem_type;
-    
-    static
-    std::string
-    type_name         ( )
-    {
-      return std::string ("oclMatrix <float>");
+    static std::string type_name ( ) {
+      return std::string ("oclMatrix<float>");
     }
-  
-  };
-  
-  
-  /************************************
-   ** struct: ocl_matrix_type_traits **
-   **   (derived, type: cxfl)        **
-   ************************************/
-  template <>
-  struct ocl_matrix_type_traits <cxfl>
-  {
-  
+};
+template <> struct ocl_matrix_type_traits <cxfl> {
     typedef cxfl elem_type;
-    
-    static
-    std::string
-    type_name         ( )
-    {
-      return std::string ("oclMatrix <cxfl>");
+    static std::string type_name ( ) {
+        return std::string ("oclMatrix<cxfl>");
     }
-  
-  };
-  
-  
-  /************************************
-   ** struct: ocl_matrix_type_traits **
-   **   (derived, type: double)      **
-   ************************************/
-  template <>
-  struct ocl_matrix_type_traits <double>
-  {
-  
+};
+template <> struct ocl_matrix_type_traits <double> {
     typedef double elem_type;
-    
-    static
-    std::string 
-    type_name         ( )
-    {
-      return std::string ("oclMatrix <double>");
+    static std::string  type_name ( ){
+      return std::string ("oclMatrix<double>");
     }
-  
-  };
-
-
-  /************************************
-   ** struct: ocl_matrix_type_traits **
-   **   (derived, type: cxdb)        **
-   ************************************/
-  template <>
-  struct ocl_matrix_type_traits <cxdb>
-  {
-  
+};
+template <> struct ocl_matrix_type_traits <cxdb> {
     typedef cxdb elem_type;
-    
-    static
-    std::string
-    type_name         ( )
-    {
-      return std::string ("oclMatrix <cxdb>");
+    static std::string type_name ( ) {
+        return std::string ("oclMatrix <cxdb>");
     }
-  
-  };
-  
-  
-  /************************************
-   ** struct: ocl_matrix_type_traits **
-   **   (derived, type: size_t)      **
-   ************************************/
-  template <>
-  struct ocl_matrix_type_traits <size_t>
-  {
-  
+};
+template <> struct ocl_matrix_type_traits <size_t> {
     typedef size_t elem_type;
-    
-    static
-    std::string
-    type_name         ( )
-    {
-      return std::string ("oclMatrix <size_t>");
+    static std::string type_name ( ) {
+        return std::string ("oclMatrix <size_t>");
     }
-  
-  };
-
-
-  /************************************
-   ** struct: ocl_matrix_type_traits **
-   **   (derived, type: size_t)      **
-   ************************************/
-  template <>
-  struct ocl_matrix_type_traits <bool>
-  {
-  
-    typedef bool elem_type;
-    
-    static
-    std::string
-    type_name         ( )
-    {
-      return std::string ("oclMatrix <bool>");
+};
+template <> struct ocl_matrix_type_traits <cbool> {
+    typedef cbool elem_type;
+    static std::string type_name ( ) {
+        return std::string ("oclMatrix <bool>");
     }
-  
-  };
-  
+};
+
+/**
+ * @brief OpenCL paradigm
+ */
+template <class T>
+class oclMatrix : public Matrix <T> {
     
-
-
-  /*********************
-   ** class oclMatrix **
-   ** (declaration)   **
-   *********************/
-  template <class T>
-  class oclMatrix : public Matrix <T>
-  {
-
-
-
-    public: 
-
-
-      /** ************************************************
-       * @name            Constructors and destructors  **
-       *                  Constructors and destructors  **
-       ** ************************************************/
-      //@{ /*************************************************************************************/
-
-  
-      /**
-       * @brief           Construct with size 1x1
-       */
-      inline
-      oclMatrix           ()
-                        : Matrix <T> (),
-                          class_name (ocl_matrix_type_traits <T> :: type_name ()),
-                          mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
-                                                                        Matrix <T> :: Size ()))
-      {
-
+public: 
+    
+    
+    /** 
+     * @name            Constructors and destructors
+     *                  Constructors and destructors
+     **
+     
+     //@{
+     
+     
+     /**
+     * @brief           Construct with size 1x1
+     */
+    inline  oclMatrix ()
+        : Matrix <T> () ,
+          class_name (ocl_matrix_type_traits <T> :: type_name ()),
+          mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T>::_M[0]), Matrix <T> :: Size ())) {
+        
         T t;
         Validate (t);
-                
-      }
+    }
       
       
       /**
@@ -203,7 +83,7 @@
        * @param  dim      All 16 dimensions.
        */
       inline
-      oclMatrix           (const size_t * dim)
+      oclMatrix           (const std::vector <size_t> & dim)
                         : Matrix <T> (dim),
                           class_name (ocl_matrix_type_traits <T> :: type_name ()),
                           mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
@@ -223,8 +103,8 @@
        * @param  res      All 16 resolutions.
        */
       inline
-      oclMatrix           ( const size_t * dim,
-                            const  float * res )
+      oclMatrix           ( const std::vector <size_t> & dim,
+                            const std::vector <float> & res )
                         : Matrix <T> (dim, res),
                           class_name (ocl_matrix_type_traits <T> :: type_name ()),
                           mp_oclData (oclOperations <T> :: make_GPU_Obj (& (Matrix <T> :: _M [0]),
@@ -431,7 +311,7 @@
        */
       inline
       const T *
-      Data                (const size_t p = 0)
+      Ptr                 (const size_t p = 0)
       const;
       
       
@@ -441,8 +321,8 @@
        * @return          Data.
        */
       inline
-      std::valarray <T> &
-      Dat                 ( );
+      container <T> &
+      Container           ( );
       
       
       /**
@@ -451,8 +331,8 @@
        * @return          Data.
        */
       inline
-      std::valarray <T>
-      Dat                 ( )
+      container <T>
+      Container           ( )
       const;
       
       
@@ -1265,7 +1145,7 @@
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator==          (const         T     & s,
                            const oclMatrix <T> & m)
       {
@@ -1285,7 +1165,7 @@
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>=          (const         T     & s,
                            const oclMatrix <T> & m)
       {
@@ -1305,7 +1185,7 @@
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<=          (const         T     & s,
                            const oclMatrix <T> & m)
       {
@@ -1325,7 +1205,7 @@
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator!=          (const         T     & s,
                            const oclMatrix <T> & m)
       {
@@ -1345,7 +1225,7 @@
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>          (const         T     & s,
                           const oclMatrix <T> & m)
       {
@@ -1365,7 +1245,7 @@
        */
       inline
       friend
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<          (const         T     & s,
                           const oclMatrix <T> & m)
       {
@@ -1746,7 +1626,7 @@
        *
        * @return          Boolean oclMatrix containing elements' equality with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator==          (const T & s)
       const;
       
@@ -1758,7 +1638,7 @@
        *
        * @return          Boolean oclMatrix containing elements' inequality with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator!=          (const T & s)
       const;
       
@@ -1770,7 +1650,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>           (const T & s)
       const;
 
@@ -1782,7 +1662,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>=          (const T & s)
       const;
       
@@ -1794,7 +1674,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<           (const T & s)
       const;
       
@@ -1806,7 +1686,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons with scalar.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<=           (const T & s)
       const;
       
@@ -1818,7 +1698,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator==          (const oclMatrix <T> & mat)
       const;
 
@@ -1830,7 +1710,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator!=          (const oclMatrix <T> & mat)
       const;
       
@@ -1842,7 +1722,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>           (const oclMatrix <T> & mat)
       const;
       
@@ -1854,7 +1734,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator>=          (const oclMatrix <T> & mat)
       const;
 
@@ -1866,7 +1746,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<           (const oclMatrix <T> & mat)
       const;
 
@@ -1878,7 +1758,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator<=          (const oclMatrix <T> & mat)
       const;
 
@@ -1900,7 +1780,7 @@
        * @return          Cross-section or zero.
        */
       oclMatrix <T>
-      operator&           (const oclMatrix <bool> & mat)
+      operator&           (const oclMatrix <cbool> & mat)
       const;
 
 
@@ -1911,7 +1791,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator&&          (const oclMatrix <T> & mat)
       const;
       
@@ -1923,7 +1803,7 @@
        *
        * @return          Boolean oclMatrix containing elements' comparisons.
        */
-      oclMatrix <bool>
+      oclMatrix <cbool>
       operator||          (const oclMatrix <T> & mat)
       const;
       
@@ -1932,74 +1812,63 @@
 
 
 
-      /** ***********************************************
-       * @name            Linear algebra functions.    **
-       ** ***********************************************/
-      //@{ /*************************************************************************************/
+      /**
+       * @name            Other functions.
+       *                  Other functions.
+       */
+      //@{ 
       
-
+      
       /**
        * @brief           Matrix Product.
        *
        * @param  mat      The factor.
        * @param  transA   Transpose ('T') / Conjugate transpose ('C') the left matrix. Default: No transposition ('N')
        * @param  transB   Transpose ('T') / Conjugate transpose ('C') the right matrix. Default: No transposition ('N')
-       *
        * @return          Product of this and M.
        */
       oclMatrix <T>
-      prod                (const oclMatrix <T> &    mat,
-                           const      char     & transA = 'N',
-                           const      char     & transB = 'N')
-      const;
+      prod                (const oclMatrix <T> &  mat, const char & transA = 'N', const char & transB = 'N') const;
       
       
       /**
        * @brief           Complex conjugate left and multiply with right.
        *
        * @param  mat      Factor.
-       *
        * @return          Product of conj(this) and M.
        */
       oclMatrix <T>
-      prodt               (const oclMatrix <T> & mat)
-      const;
+      prodt               (const oclMatrix <T> & mat) const;
       
       
       /**
        * @brief           Complex conjugate right and multiply with left.
        *
        * @param  mat      Factor.
-       *
        * @return          Product of this and conj(mat).
        */
       oclMatrix <T>
-      tprod               (const oclMatrix <T> & mat)
-      const;
+      tprod               (const oclMatrix <T> & mat) const;
       
       
       /**
        * @brief           Scalar product (complex: conjugate first vector).
        *
        * @param  mat      Factor.
-       *
        * @return          Scalar product.
        */
       T
-      dotc                (const oclMatrix <T> & mat)
-      const;
+      dotc                (const oclMatrix <T> & mat) const;
       
       
       /**
        * @brief           Scalar product.
        *
        * @param  mat      Factor.
-       *
        * @return          Scalar product.
        */
       T
-      dot                 (const oclMatrix <T> & mat)
-      const;
+      dot                 (const oclMatrix <T> & mat) const;
       
       
       /**
@@ -2008,8 +1877,7 @@
        * @return          Transposed matrix.
        */
       oclMatrix <T>
-      tr                  ()
-      const;
+      tr                  () const;
       
                 
       //@} /*************************************************************************************/
@@ -2028,66 +1896,29 @@
 
     private:
 
-
-      /**********************
-       ** member variables **
-       **********************/
+      const std::string class_name;     // class name
+      oclDataWrapper <T> * mp_oclData;  // data
+      static const VerbosityLevel op_v_level = VERB_LOW; // Verbosity level
       
-      // class name of specialised oclMatrix <T>
-      const std::string class_name;
-      
-      // holds data of matrix for calculations on GPU
-      oclDataWrapper <T> * mp_oclData;
-
-      
-      
-      /**********************
-       ** static variables **
-       **********************/
-      
-      // verbosity level for operators
-      static
-      const VerbosityLevel op_v_level = VERB_LOW;
-      
-      
-      /********************************
-       ** member functions (private) **
-       ********************************/
-       
       // allowed element types for an instance of oclMatrix
-      void
-      Validate            (float  & t)  const {}
-      void
-      Validate            (size_t & t)  const {}
-      void
-      Validate            (double & t)  const {}
-      void
-      Validate            (bool   & t)  const {}
-      void
-      Validate            (cxfl   & t)  const {}
-      void
-      Validate            (cxdb   & t)  const {}
+      void Validate            (float  & t)  const {}
+      void Validate            (size_t & t)  const {}
+      void Validate            (double & t)  const {}
+      void Validate            (cbool  & t)  const {}
+      void Validate            (cxfl   & t)  const {}
+      void Validate            (cxdb   & t)  const {}
 
-
-      /*************************************
-       ** friend declarations (all types) **
-       *************************************/
-      friend class oclMatrix <bool>;      // for access to private members of !! different !! template type //
+      // Friends
+      friend class oclMatrix <cbool>;      // for access to private members of !! different !! template type //
       friend class oclMatrix <float>;
       friend class oclMatrix <double>;
       friend class oclMatrix <size_t>;
       friend class oclMatrix <cxfl>;
       friend class oclMatrix <cxdb>;
-
       
   };
 
-
-
-  /* include function definitions */
-  # include "oclMatrix.cpp"
+// Declarations
+#include "oclMatrix.cpp"
   
-
-
-
-# endif __OCL_MATRIX_HPP__
+#endif //__OCL_MATRIX_HPP__

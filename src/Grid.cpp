@@ -1,5 +1,8 @@
 #include "Grid.hpp"
+#include "BLACS.hpp"
 #include <sstream>
+#include <math.h>
+#include <iostream>
 
 #ifdef HAVE_MPI
 static void 
@@ -47,12 +50,12 @@ Grid* Grid::m_inst = 0;
 
 Grid::Grid () :
     np(0), rk(0), ct(0), nr(0), nc(0), mr(0), mc(0), order('R') {
-
+    
 #ifdef HAVE_MPI
-    grid_init (m_gd);
+    grid_init (*this);
     
 #ifdef BLACS_DEBUG2
-    std::cout << m_gd;
+    std::cout << *this;
 #endif
     
 #endif
@@ -63,7 +66,7 @@ Grid::Grid () :
 Grid::~Grid () {
     
 #ifdef HAVE_MPI
-    grid_exit(m_gd);
+    grid_exit(*this);
 #endif
     
 }
@@ -78,13 +81,13 @@ const char* Grid::c_str() const {
     
 }
 
-Grid* Grid::Instance() {
+Grid& Grid::Instance() {
     
     
     if (m_inst == 0)
         m_inst = new Grid ();
     
-	return m_inst;
+	return *m_inst;
 
 }
 

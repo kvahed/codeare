@@ -1,3 +1,0 @@
-#!/bin/sh
-../src/lclient -b ../share/common/ -c config.xml -t LapackTests -d tmp.mat
-

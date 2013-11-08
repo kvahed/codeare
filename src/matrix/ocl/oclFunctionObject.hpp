@@ -63,7 +63,13 @@
 
       virtual
       void
-      run () = 0;
+      run (const LaunchInformation &) = 0;
+      
+      
+      virtual
+      const ProfilingInformation
+      getProfilingInformation (const int = 0)
+      const = 0;
 
   
     protected:
@@ -74,8 +80,8 @@
        */
        
       /* function arguments */
-      oclDataObject     * const * const mpp_args;
-      int                               m_num_args;
+      oclDataObject     * const * mpp_args;
+      int                         m_num_args;
   
  
   }; // class oclFunctionObject

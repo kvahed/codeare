@@ -41,7 +41,13 @@ dmtest (Connector<T>* rc) {
 	std::string cf  = std::string (base + std::string(config));
 	std::string odf = std::string (base + std::string("/simout.mat"));
 	
-	rc->ReadConfig (cf.c_str());
+	std::string b1_map_name;
+	std::string target_name;
+	std::string b0_map_name;
+	std::string
+
+    IOContext f (rc->GetElement("/config/data-in"), base, READ);
+    g = fread (f, "")
 	
 #ifdef HAVE_MAT_H
 
@@ -109,11 +115,11 @@ dmtest (Connector<T>* rc) {
 		return false;
 	}
 
-	MXDump  (mxy, od, "mxy");
-	MXDump   (mz, od, "mz");
-	MXDump (tmxy, od, "tmxy");
-	MXDump  (tmz, od, "tmz");
-	MXDump   (rf, od, "rf");
+	h5write (mxy, od "mxy");
+	h5write (mz, od, "mz");
+	h5write (tmxy, od, "tmxy");
+	h5write (tmz, od, "tmz");
+	h5write (rf, od, "rf");
 
 	if (matClose(od) != 0) {
 		printf ("Error closing file %s\n", odf.c_str());

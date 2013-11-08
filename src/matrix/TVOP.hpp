@@ -46,24 +46,19 @@ public:
 		
 		Matrix<T> res (M, N, 2); 
 		
-#pragma omp parallel default (shared)
-		{
-
-#pragma omp for schedule (guided, 100) 
+#pragma omp for
 			for (size_t i = 0; i < N; i++) {
 				for (size_t j = 0; j < M-1; j++)
 					res(j,i,0) = m(j+1,i) - m(j,i);
 				res (M-1,i,0) = T(0.0);
 			}
 			
-#pragma omp for schedule (guided, 100) 
+#pragma omp for
 			for (size_t i = 0; i < M; i++) {
 				for (size_t j = 0; j < N-1; j++)
 					res(i,j,1) = m(i,j+1) - m(i,j);
 				res (i,N-1,1) = T(0.0);
 			}
-			
-		}
 		
 		return res;
 		
@@ -81,13 +76,10 @@ public:
 		size_t M = m.Dim(0);
 		size_t N = m.Dim(1);
 		
-		Matrix<cxfl> resx (M, N);
-		Matrix<cxfl> resy (M, N);
+		Matrix<T> resx (M, N);
+		Matrix<T> resy (M, N);
 
-#pragma omp parallel default (shared)
-		{
-			
-#pragma omp for schedule (guided, 100) 
+#pragma omp for
 			for (size_t i = 0; i < M; i++) {
 				resy (0,i) = -m(0,i,0);
 				for (size_t j = 1; j < N-1; j++)
@@ -95,15 +87,13 @@ public:
 				resy (N-1,i) = m(N-2,i,0);
 			}
 			
-#pragma omp for schedule (guided, 100) 
+#pragma omp for
 			for (size_t i = 0; i < N; i++) {
 				resx (i,0) = -m(i,0,1);
 				for (size_t j = 1; j < M-1; j++)
 					resx (i,j) = m(i,j-1,1) - m(i,j,1);
 				resx (i,M-1) = m(i,M-2,1);
 			}
-			
-		}
 		
 		resx += resy;
 		
@@ -121,9 +111,7 @@ public:
 	 */
 	template <class T> Matrix<T> 
 	operator*    (const Matrix<T>& m) {
-
 		return Trafo (m);
-		
 	}
 
 
@@ -135,9 +123,7 @@ public:
 	 */
 	template <class T> Matrix<T> 
 	operator->*  (const Matrix<T>& m) {
-
 		return Adjoint (m);
-		
 	}
 
 

@@ -2,9 +2,13 @@
  ** includes **
  **************/
 
-// ocl
-# include "oclConnection.hpp"
 
+# ifdef __USE_VIENNA_CL__
+  // ViennaCL
+  # include <viennacl/ocl/backend.hpp>
+# endif
+
+#include "oclConnection.hpp"
 
 
 /**************************
@@ -13,7 +17,7 @@
 
 
 /** 
- * @brief                  Create a double precision kernel out of a single precision kernel.
+ * @brief                  Modify kernel source code by adding predefined makro definitions.
  *
  * @param  source          The source string.
  * @param  fp_extension    An info string that specifies the OpenCL double precision extension.
@@ -48,12 +52,38 @@ modify_kernel              ( std::string const &       source,
 }
 
 
+/**
+ * @brief                 Add arbitrary makro definition at the front of the
+ *                        given kernel source code.
+ * 
+ * @param  source         Kernel source code.
+ * @param  vec_makros     Vector of makro definitions (without keyword).
+ * 
+ * @return                Modified kernel source code.
+ */
+std::string
+modify_kernel             ( const std::string               & source,
+                            const std::vector <std::string> & vec_makros )
+{
+  
+  std::stringstream ss;
+  for (std::vector <std::string> :: const_iterator it = vec_makros.begin ();
+          it != vec_makros.end (); it++)
+    ss << "# define " << *it << std::endl;
+  
+  ss << source << std::endl;
+  
+  return ss.str ();
+  
+}
+
+
 
 template <class T, class S>
 const char*
 oclConnection::
 ReadSource            (std::string   fname,
-                               int * size  )
+                               int *  size)
 {
 
   // open file
@@ -79,16 +109,57 @@ ReadSource            (std::string   fname,
   ((char*)buf)[*size] = '\0';
 
   /* source code !and! size may change with different precision */
-  return ocl_precision_trait <T, S> :: modify_source (buf, size); 
+  const char * tmp_src = ocl_precision_trait <T, S> :: modify_source (buf, size); 
+  
+  free (buf);
+  
+  return tmp_src;
 
 }
-
 
 
 template <class T, class S>
 oclError &
 oclConnection ::
-init_program_kernels    (oclConnection * const con)
+rebuildWithSource       (const std::string & filename)
+{
+  init_program_kernels <T, S> (this, std::vector <std::string> (1, filename));
+}
+
+
+template <class T, class S>
+oclError &
+oclConnection ::
+rebuildWithSource       (const std::string & filename,
+                         const std::vector <std::string> & makros)
+{
+  init_program_kernels <T, S> (this, std::vector <std::string> (1, filename), makros);
+}
+
+
+template <class T, class S>
+oclError &
+oclConnection ::
+rebuildWithSources      (const std::vector <std::string> & filenames)
+{
+  init_program_kernels <T, S> (this, filenames);
+}
+
+
+template <class T, class S>
+oclError &
+oclConnection ::
+rebuildWithSources      (const std::vector <std::string> & filenames,
+                         const std::vector <std::string> & makros)
+{
+  init_program_kernels <T, S> (this, filenames, makros);
+}
+
+
+template <class T, class S>
+oclError &
+oclConnection ::
+init_program_kernels    (oclConnection * const con, const std::vector <std::string> & add_filenames, const std::vector <std::string> & add_makros)
 {
 
   print_optional (" ** Initializing oclConnection for types ", ocl_precision_trait <T, S> :: getTypeString (), con -> m_verbose);
@@ -96,6 +167,8 @@ init_program_kernels    (oclConnection * const con)
   // get sources
   int size;
   std::vector <std::pair <const char *, ::size_t> > sources;
+
+  // read standard sources from precision trait
   const std::vector <std::string> filenames = ocl_precision_trait <T, S> :: getFilenames ();
   for (std::vector <std::string> ::const_iterator it = filenames.begin (); it != filenames.end (); ++it)
   {
@@ -103,35 +176,55 @@ init_program_kernels    (oclConnection * const con)
     sources.push_back (std::pair <const char*, ::size_t> (tmp_src, size));
   }
   
+  // read additional sources
+  if (add_filenames.size ())
+  {
+    for (std::vector <std::string> :: const_iterator it = add_filenames.begin (); it != add_filenames.end (); ++it)
+    {
+      const char * tmp_src = ReadSource <T, S> (*it, &size);
+      if (add_makros.size ())
+      {
+        std::string * p_tmp_src = new std::string (modify_kernel(std::string (tmp_src), add_makros));
+        size = p_tmp_src -> size () * sizeof (char);
+        tmp_src = p_tmp_src -> c_str ();
+      }
+      sources.push_back (std::pair <const char *, ::size_t> (tmp_src, size));
+    }
+  }
+  
   clProgram prog;
   clKernels kernels;
-  
+    
   try
   {
 
     // create program
     prog = clProgram (con -> m_cont, sources, & con -> m_error);
-    *(ocl_precision_trait <T, S> :: getProgram (con)) = prog;
-  
+
     // build program
-    con -> m_error = prog.build (con -> m_devs);
+	  con -> m_error = prog.build (con -> m_devs, "-cl-std=CL1.0");//1 -cl-mad-enable -cl-fast-relaxed-math -cl-nv-maxrregcount=32 -cl-nv-verbose");
+    
+//    std::cout << "Build Log:\t "                  << prog.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (con -> m_devs [0]) << std::endl;
 
     // create kernels
     con -> m_error = prog.createKernels (&kernels);
+
+    // assign created objects to type specific storage
+    *(ocl_precision_trait <T, S> :: getProgram (con)) = prog;
     *(ocl_precision_trait <T, S> :: getKernels (con)) = kernels;
 
   }
-  catch (cl::Error cle)
+  catch (cl::Error & cle)
   {
-    cout << " Type: " << ocl_precision_trait <T, S> :: getTypeString () << std::endl;
-    cout << "Error while building program: " << cle.what ()                                            << endl;
-    cout << "Build Status: "                 << prog.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (con -> m_devs [0]) << endl;
-    cout << "Build Options:\t"               << prog.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (con -> m_devs [0]) << endl;
-    cout << "Build Log:\t "                  << prog.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (con -> m_devs [0]) << endl;
+    std::cout << " Type: " << ocl_precision_trait <T, S> :: getTypeString () << std::endl;
+    std::cout << "Error while building program: " << cle.what ()                                                     << std::endl;
+    std::cout << "Build Status: "                 << prog.getBuildInfo<CL_PROGRAM_BUILD_STATUS>  (con -> m_devs [0]) << std::endl;
+    std::cout << "Build Options:\t"               << prog.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS> (con -> m_devs [0]) << std::endl;
+    std::cout << "Build Log:\t "                  << prog.getBuildInfo<CL_PROGRAM_BUILD_LOG>     (con -> m_devs [0]) << std::endl;
     std::cout << " Error flag: " << cle.err () << " (" << con -> errorString (cle.err ()) << ")" << std::endl;
     throw -1;
   }
-  
+    
 }
 
 
@@ -139,13 +232,7 @@ init_program_kernels    (oclConnection * const con)
 
 // constructor
 oclConnection::
-oclConnection ( const char      * filename_A_type,
-                const char      * filename_AB_type,
-                const char      * filename_A_cx_type,
-                const char      * filename_AB_cx_type,
-                const char      * filename_A_mx_type,
-                const char      * filename_AB_mx_type,
-                cl_device_type    device_type,
+oclConnection ( cl_device_type    device_type,
                 VerbosityLevel    verbose )
               : m_current_ocl_objects (),
                 m_current_buffers (),
@@ -164,27 +251,50 @@ oclConnection ( const char      * filename_A_type,
     throw oclError ("No platform available", "oclConnection :: CTOR");
 
   // devices
-  m_error = m_plat.getDevices (device_type, &m_devs);
+  try {
+	  m_error = m_plat.getDevices (device_type, &m_devs);
+  } catch (cl::Error & cle)
+  {
+	  std::cerr << oclError (cle.err(), " Error while requesting device ids! ") << std::endl;
+  	  std::cerr << cle.what () << std::endl;
+  }
   print_optional (" ** # of devices on platform: %d", m_devs.size(), VERB_LOW);
-  std::string vendor;
-  print_optional (" ** device type (0): ", (m_devs [0].getInfo (CL_DEVICE_VENDOR, &vendor), vendor.c_str ()), VERB_LOW);
+  std::string info_string;
+  print_optional (" ** device type [0]: ", (m_devs [0].getInfo (CL_DEVICE_VENDOR, &info_string), info_string.c_str ()), VERB_LOW);
+  print_optional (" ** device extensions [0]: ", (m_devs [0].getInfo (CL_DEVICE_EXTENSIONS, &info_string), info_string.c_str ()), VERB_MIDDLE);
+  print_optional (" ** device max WG size [0]: %d", (m_devs [0].getInfo (CL_DEVICE_MAX_WORK_GROUP_SIZE, &m_max_wg_size), m_max_wg_size), VERB_NONE);
+  print_optional (" ** device max WI dim [0]: %d", (m_devs [0].getInfo (CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, &m_max_wi_dim), m_max_wi_dim), VERB_NONE);
+  m_devs [0].getInfo (CL_DEVICE_MAX_WORK_ITEM_SIZES, &m_max_wi_sizes);
+  print_optional (" ** device max WI sizes [0]: %zu, %zu, %zu", m_max_wi_sizes[0], m_max_wi_sizes[1], m_max_wi_sizes[2], VERB_NONE);
   if (m_devs.size() == 0)
     throw oclError ("No devices available on this platform", "oclConnection :: CTOR");
-
+  
+  // don't use multiple devices (for now)
+  if (m_devs.size () > 1)
+  {
+    clDevices tmp_devs;
+    tmp_devs.push_back (m_devs [0]);
+    m_devs = tmp_devs;
+  }
+  
+# ifdef __USE_VIENNA_CL__
   // context /** ViennaCL **/ /* TODO */
   m_cont = clContext ( viennacl::ocl::current_context () . handle () . get ()); //clContext (m_devs);       // same context for all devices
+# else
+  m_cont = clContext (m_devs); // same context for all devices
+# endif
   
   // command queues
   for (clDevices::iterator it = m_devs.begin(); it < m_devs.end(); ++it)  // iterate over all devices and create a command queue for each
   {
-    m_comqs.push_back (clCommandQueue (m_cont, *it));
+    m_comqs.push_back (clCommandQueue (m_cont, *it, CL_QUEUE_PROFILING_ENABLE));
   }
 
   init_program_kernels < float,  float> (this);
   init_program_kernels <double, double> (this);
-  init_program_kernels <  cxfl,  float> (this);
+//  init_program_kernels <  cxfl,  float> ();
   init_program_kernels <  cxfl,   cxfl> (this);
-  init_program_kernels <  cxdb, double> (this);
+//  init_program_kernels <  cxdb, double> ();
   init_program_kernels <  cxdb,   cxdb> (this);
 
   // set current kernel!
@@ -193,6 +303,7 @@ oclConnection ( const char      * filename_A_type,
 
   print_optional (" ** oclConnection constructed!", m_verbose);
     
+# ifdef __USE_VIENNA_CL__
   /**
    * setup ViennaCL
    */
@@ -200,7 +311,8 @@ oclConnection ( const char      * filename_A_type,
   viennacl :: vector <float> tmp (10);
   viennacl :: vector <double> tmp2 (10);
   tmp = tmp + tmp;
-
+# endif
+  
 }
 
 
@@ -238,7 +350,7 @@ activateKernel            (const std::string kernelname)
   }
 
   /* throw error message */
-  stringstream msg;
+  std::stringstream msg;
   msg << "No kernel found (" << kernelname << ")";
   throw oclError (msg.str (), "oclConnection :: activateKernel");
 
@@ -247,23 +359,55 @@ activateKernel            (const std::string kernelname)
 }
 
 
+void
+oclConnection::
+waitForEvent          (const cl::Event & event)
+const
+{
+  event.wait ();
+}
+
+
+const ProfilingInformation
+oclConnection::
+getProfilingInformation (const cl::Event & event)
+const
+{
+  
+  cl_ulong start, end;
+  
+  event.wait ();
+  
+  // read timing information
+  clGetEventProfilingInfo(event(), CL_PROFILING_COMMAND_START, sizeof (cl_ulong), &start, NULL);
+  clGetEventProfilingInfo(event(), CL_PROFILING_COMMAND_END, sizeof (cl_ulong), &end, NULL);
+  
+  return {start*1.e-9, end*1.e-9, 0};
+  
+}
 
 
 // run active kernel with given dimensions for work groups and work items
-int
+const cl::Event
 oclConnection::
 runKernel             (const cl::NDRange  & global_dims,
                        const cl::NDRange  & local_dims  )
 {
-
+  
   // execute activated kernel on all available devices 
   for (clCommandQueues::iterator it = m_comqs.begin(); it < m_comqs.end(); ++it)
   {
     try {
-    
-      m_error = (*it).enqueueNDRangeKernel (*mp_actKernel, cl::NullRange, global_dims, local_dims);
 
-    } catch (cl::Error cle) {
+      cl::Event event;
+      
+      m_error = (*it).enqueueNDRangeKernel (*mp_actKernel, cl::NullRange, global_dims, local_dims, NULL, &event);
+      
+      m_error = (*it).enqueueBarrier ();
+      
+      return event;
+      
+    } catch (cl::Error & cle) {
 
       throw oclError (cle.err (), "oclConnection :: runKernel");
 

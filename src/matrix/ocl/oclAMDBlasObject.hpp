@@ -96,7 +96,16 @@
        */
       virtual
       void
-      run                 ();
+      run                 (const LaunchInformation &);
+      
+      
+      /**
+       * @brief           retrieve profiling information
+       */
+      virtual
+      const ProfilingInformation
+      getProfilingInformation   (const int)
+      const;
       
       
       /**
@@ -235,7 +244,7 @@
   template <class T, class S>
   void
   oclAMDBlasObject <T, S> ::
-  run                     ()
+  run                     (const LaunchInformation & lc)
   {
     
     print_optional ("oclAMDBlasObject :: run ()", VERB_HIGH);
@@ -260,6 +269,17 @@
     
   }
 
+  
+  template <class T, class S>
+  const ProfilingInformation
+  oclAMDBlasObject <T, S> ::
+  getProfilingInformation   (const int)
+  const
+  {
+    throw oclError ("Not yet implemented!", "oclAMDBlasObject :: getProfilingInformation");
+    
+    return {-1.0, -1.0, -1.0, -1.0};
+  }
   
   
   

@@ -23,7 +23,9 @@
 using namespace RRStrategy;
 
 error_code
-DummyRecon::Process     () { 
+DummyRecon::Process     () {
+
+    std::cout << wspace << std::endl;
 
 	return OK;
 

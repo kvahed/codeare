@@ -30,10 +30,9 @@
 #include <string>
 #include <map>
 #include "ReconContext.hpp"
-#include "FunctorContainer.hpp"
+#include "Queue.hpp"
+#include "omniORB4/omniInterceptors.h"
 
-using namespace RRSModule;
-using namespace RRStrategy;
 using namespace std;
 
 /**
@@ -42,7 +41,30 @@ using namespace std;
 
 
 namespace RRServer {
+
+
+	template<class T> struct RemoteTraits;
 	
+	template<> struct RemoteTraits<RRSModule::rlfl_data> {
+		typedef float Type;
+	};
+	template<> struct RemoteTraits<RRSModule::rldb_data> {
+		typedef double Type;
+	};
+	template<> struct RemoteTraits<RRSModule::cxfl_data> {
+		typedef cxfl Type;
+	};
+	template<> struct RemoteTraits<RRSModule::cxdb_data> {
+		typedef cxdb Type;
+	};
+	template<> struct RemoteTraits<RRSModule::shrt_data> {
+		typedef short Type;
+	};
+	template<> struct RemoteTraits<RRSModule::long_data> {
+		typedef long Type;
+	};
+
+
 	/**
 	 * @brief Servant implementation <br/>
 	 *        Perform duties on remote server
@@ -50,9 +72,10 @@ namespace RRServer {
 	class ReconServant : 
 		public POA_RRSModule::RRSInterface, 
 		public PortableServer::RefCountServantBase,
-		public FunctorContainer {
+		public Queue {
 		
 		
+
 	public:
 		
 		
@@ -101,7 +124,7 @@ namespace RRServer {
 		 * @return     success
 		 */
 		virtual short
-		Init          (const char* name);
+		Init          (const char* name, const char* client_id);
 		
 
 		/**
@@ -122,7 +145,51 @@ namespace RRServer {
 		 */
 		virtual short
 		CleanUp       ();
-		
+
+
+		template <class CORBA_Type> void
+		SetMatrix (const char* name, const CORBA_Type& c) {
+
+			typedef typename RemoteTraits<CORBA_Type>::Type T;
+
+			size_t nd = c.dims.length();
+			std::vector<size_t> mdims (nd);
+			std::vector<float>  mress (nd);
+
+			for (int i = 0; i < nd; i++) {
+				mdims[i] = c.dims[i];
+				mress[i] = c.res[i];
+			}
+
+			Matrix<T> pm (mdims, mress);
+			memcpy (&pm[0], &c.vals[0], pm.Size() * sizeof(T));
+
+			Workspace::Instance().SetMatrix(name, pm);
+
+		}
+
+		template <class CORBA_Type> void
+		GetMatrix (const char* name, CORBA_Type& c) {
+
+			typedef typename RemoteTraits<CORBA_Type>::Type T;
+
+			Matrix<T> tmp = Workspace::Instance().Get<T> (name);
+			size_t cpsz = tmp.Size();
+			size_t nd = tmp.NDim();
+			c.dims.length(nd);
+			c.res.length (nd);
+
+			for (int j = 0; j < nd; j++) {
+				c.dims[j] = tmp.Dim(j);
+				c.res[j]  = tmp.Res(j);
+			}
+
+			c.vals.length(TypeTraits<T>::IsComplex() ? 2 * cpsz : cpsz);
+			memcpy (&c.vals[0], &tmp[0], tmp.Size() * sizeof(T));
+
+		}
+
+
 
 		/**
 		 * @brief       Retreive measurement data
@@ -131,7 +198,7 @@ namespace RRServer {
 		 * @param  c    Data respository
 		 */
 		void
-		get_cxfl      (const char* name, cxfl_data& c);
+		get_cxfl      (const char* name, RRSModule::cxfl_data& c);
 		
 
 		/**
@@ -141,7 +208,7 @@ namespace RRServer {
 		 * @param c   Complex measurement data
 		 */
 		void 
-		set_cxfl      (const char* name, const cxfl_data& c);
+		set_cxfl      (const char* name, const RRSModule::cxfl_data& c);
 
 		
 		/**
@@ -151,7 +218,7 @@ namespace RRServer {
 		 * @param  c    Data respository
 		 */
 		void
-		get_cxdb      (const char* name, cxdb_data& c);
+		get_cxdb      (const char* name, RRSModule::cxdb_data& c);
 		
 
 		/**
@@ -161,7 +228,7 @@ namespace RRServer {
 		 * @param c   Complex measurement data
 		 */
 		void 
-		set_cxdb      (const char* name, const cxdb_data& c);
+		set_cxdb      (const char* name, const RRSModule::cxdb_data& c);
 
 		
 		/**
@@ -171,7 +238,7 @@ namespace RRServer {
 		 * @param  r    Data
 		 */
 		void
-		get_rldb      (const char* name, rldb_data& r);
+		get_rldb      (const char* name, RRSModule::rldb_data& r);
 		
 
 		/**
@@ -181,7 +248,7 @@ namespace RRServer {
 		 * @param r   Real helper data
 		 */
 		void 
-		set_rldb      (const char* name, const rldb_data& r);
+		set_rldb      (const char* name, const RRSModule::rldb_data& r);
 		
 
 		/**
@@ -191,7 +258,7 @@ namespace RRServer {
 		 * @param  r    Data
 		 */
 		void
-		get_rlfl      (const char* name, rlfl_data& r);
+		get_rlfl      (const char* name, RRSModule::rlfl_data& r);
 		
 
 		/**
@@ -201,7 +268,7 @@ namespace RRServer {
 		 * @param r   Rlfl data
 		 */
 		void 
-		set_rlfl      (const char* name, const rlfl_data& r);
+		set_rlfl      (const char* name, const RRSModule::rlfl_data& r);
 		
 
 		/**
@@ -211,7 +278,7 @@ namespace RRServer {
 		 * @param  p     Data
 		 */
 		void
-		get_shrt     (const char* name, shrt_data& p);
+		get_shrt     (const char* name, RRSModule::shrt_data& p);
 		
 
 		/**
@@ -221,7 +288,7 @@ namespace RRServer {
 		 * @param p   Shrt data
 		 */
 		void 
-		set_shrt     (const char* name, const shrt_data& p);
+		set_shrt     (const char* name, const RRSModule::shrt_data& p);
 		
 
 		/**
@@ -231,7 +298,7 @@ namespace RRServer {
 		 * @param  p     Data
 		 */
 		void
-		get_long     (const char* name, long_data& p);
+		get_long     (const char* name, RRSModule::long_data& p);
 		
 
 		/**
@@ -241,7 +308,7 @@ namespace RRServer {
 		 * @param p   Long data
 		 */
 		void 
-		set_long     (const char* name, const long_data& p);
+		set_long     (const char* name, const RRSModule::long_data& p);
 		
 
 		/**
@@ -260,6 +327,11 @@ namespace RRServer {
 		 */
 		void 
 		config        (const char* c);
+
+
+
+        static void
+        inform        (omni::omniInterceptors::assignUpcallThread_T::info_T &info);
 
 		
 	};

@@ -26,7 +26,7 @@
 
 #include "Configurable.hpp"
 #include "ReconContext.hpp"
-#include "FunctorContainer.hpp"
+#include "Queue.hpp"
 #include "Connector.hpp"
 
 using namespace RRStrategy;
@@ -40,7 +40,7 @@ namespace RRClient {
 	 * @brief               Locally connected reconstruction client 
 	 */
 	class LocalConnector : public Configurable, 
-						   public FunctorContainer {
+						   public Queue {
 		
 		typedef std::map<std::string, ReconContext*> context_map;
 

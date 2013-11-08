@@ -23,7 +23,9 @@
 
 #include <assert.h>
 #include <sys/types.h>
+#ifdef HAVE_SYS_SYSCTL_H
 #include <sys/sysctl.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -86,7 +88,8 @@ Toolbox::ClockRate () const {
 #else
 	
 	// LINUX
-	std::string mhzstr = exec("lscpu | grep \"CPU MHz\"|awk '{print $3}'");
+	std::string cmd ("lscpu | grep \"CPU MHz\"|awk '{print $3}'");
+	std::string mhzstr = exec(&cmd[0]);
 	float mhz = atof(mhzstr.c_str());
 	return 1000000.0 * mhz;
 

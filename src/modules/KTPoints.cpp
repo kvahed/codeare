@@ -20,11 +20,309 @@
 
 #include "KTPoints.hpp"
 #include "PTXINIFile.hpp"
-#include "Lapack.hpp"
-#include "IO.hpp"
-#include "Creators.hpp"
+#include "IOContext.hpp"
 
 using namespace RRStrategy;
+
+/**
+ * @brief           Normalised root-means-squared error
+ *
+ * @param  target   Target magnetisation
+ * @param  result   Achieved result
+ * @param  iter     Iteration
+ * @param  nrmse    Returned NRMSE
+ */
+inline float
+NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
+
+    float nrmse = 0.0;
+    size_t i;
+
+#pragma omp parallel for reduction(+:nrmse)
+    for (size_t i = 0; i < numel(target); i++ )
+        nrmse += pow(abs(target[i]) - abs(result[i]), 2);
+
+    nrmse = sqrt(nrmse)/norm(target);
+    
+    return nrmse;
+
+}
+
+
+/**
+ * @brief           Normalised root-means-squared error
+ *
+ * @param  target   Target magnetisation
+ * @param  result   Achieved result
+ * @param  iter     Iteration
+ * @param  nrmse    Returned NRMSE
+ */
+inline float
+NOHO                         (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
+
+    float nrmse = 0.0;
+    size_t i;
+
+#pragma omp parallel for default (shared) private (i) reduction(+:nrmse)
+	for (i = 0; i < numel(target); i++ )
+		nrmse += pow(abs(target[i]) - abs(result[i]), 2);
+    
+    return nrmse;
+
+}
+
+
+
+/**
+ * @brief           Phase correction from off-resonance
+ *
+ * @param  target   Target magnetisation
+ * @param  result   Achieved result
+ * @return          Phase corrected 
+ */
+inline static void
+PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
+    
+    size_t n = target.Size();
+    
+#pragma omp parallel for
+    for (size_t i = 0; i < n; i++) 
+        target[i] = abs(target[i]) * result[i] / abs(result[i]);
+
+}
+
+
+/**
+ * @brief           STA integral
+ *
+ * @param  ks       k
+ * @param  r        r
+ * @param  b1       b1 map
+ * @param  b0       b0 map
+ * @param  nc       # of transmit channels
+ * @param  nk       # of kspace positions
+ * @param  ns       # of spatial positions
+ * @param  gd       Gradient duration
+ * @param  pd       Pulse durations
+ *
+ * @return          STA matrix
+ */
+inline static Matrix<cxfl>
+STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, const Matrix<float>& b0, 
+     const size_t nc, const size_t nk, const size_t ns, const size_t gd, const Matrix<short>& pd, const size_t n) {
+
+    container<float> d (nk);
+	Matrix<cxfl>  m (ns,nc*nk);
+
+    printf ("  Computing STA encoding matrix ..."); 
+    fflush (stdout);
+    
+    for (size_t i = 0; i< nk; i++)
+        d[i] = (i==0) ? pd[i] + gd : d[i-1] + pd[i] + gd;
+
+    std::reverse (d.begin(), d.end());
+
+    for (size_t i = 0; i < nk-1; i++)
+        d[i] = 1.0e-5 * d[i+1] + 1.0e-5 * pd[i]/2;
+
+    d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
+
+    cxfl pgd = cxfl(0, TWOPI * GAMMA * 10.0);
+
+    #pragma omp for
+            for (size_t k = 0; k < nk; k++) 
+                for (size_t s = 0; s < ns; s++) {
+                	cxfl eikr = pgd * exp (cxfl(0, ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s) + TWOPI * d[k] * b0(s)));
+                	for (size_t c = 0; c < nc; c++)
+                		m(s,c*nk+k) =  b1(s,c) * eikr;
+                }
+    
+	printf ("... done. ");
+
+	return m;
+
+}
+
+
+/**
+ * @brief Construct actual pulses
+ *
+ *
+ */
+static inline void
+PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<short>& pd, const size_t gd, 
+           const size_t nk, const size_t nc, Matrix<cxfl>& rf, Matrix<float>& grad) {
+    
+    
+    // Total pulse duration --------------
+    
+    size_t tpd = 2;  // Start and end
+    for (size_t i = 0; i < nk-1; i++) 
+        tpd += (size_t) (pd[i] + gd);
+    tpd += pd[nk-1];
+    // -----------------------------------
+    
+    // Outgoing brepository ---------------
+    
+    rf   = Matrix<cxfl>  (tpd, nc);
+    grad = Matrix<float> (tpd, 3);
+    // -----------------------------------
+    
+    // RF Timing -------------------------
+
+    for (size_t rc = 0; rc < nc; rc++) {
+        
+        size_t i = 1;
+        
+        for (size_t k = 0; k < nk; k++) {
+            
+            // RF action
+            for (short p = 0; p < pd[k]; p++, i++)
+                rf (i,rc) = solution(k + rc*nk) / (float) pd[k] * cxfl(1000.0,0.0);
+
+            // Gradient action, no RF
+            if (k < nk-1)
+                for (size_t g = 0; g <    gd; g++, i++)
+                    grad (i,0) = 0.0;
+
+        }
+        
+    }
+    // -----------------------------------
+    
+    // Gradient and slew -----------------
+    
+    float gr = 0.0;
+    float sr = 0.0;
+
+    for (size_t gc = 0; gc < 3; gc++) {
+        
+        size_t i = 1;
+        
+        for (size_t k = 0; k < nk-1; k++) {
+            
+            // RF action, no gradients
+            for (short p = 0; p < pd[k]; p++, i++)
+                grad (i,gc) = 0.0; 
+            
+            if (k < nk-1) 
+                
+                for (size_t g = 0; g <    gd; g++, i++) {
+                    
+                    sr = (k+1 < nk) ? ks(gc,k+1) - ks(gc,k) : - ks(gc,i);
+                    sr = 4.0 * sr / (2 * PI * GAMMA * 1e6 * gd * gd * 1.0e-5 * 1.0e-5);
+                    sr =       sr / 100.0;
+                    
+                    // Gradient action 
+                    if(g < gd/2)             // ramp up
+                        gr = sr * (0.5 + g);
+                    else if (g < gd/2+1)     // flat top
+                        0;
+                    else                     // ramp down
+                        gr -= sr;
+
+                    grad (i,gc) = gr; 
+                }
+            
+        } 
+        
+    }
+    // ----------------------------------
+    
+}
+
+
+
+static inline void
+KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
+          Matrix<cxfl>& solution, const double& lambda, const size_t& mxit, 
+          const float& conv, const bool& breakearly, size_t& gc, 
+		  Matrix<float>& res) {
+
+    ticks start = getticks();
+    printf ("  Starting variable exchange method ...\n");
+    
+    Matrix<cxfl> treg = lambda *  eye<cxfl>(size(m,1));
+    Matrix<cxfl> minv;
+
+    minv  = m.prodt(m); 
+    minv += treg;
+    minv  = inv(minv);
+    minv  = minv.prod (m, 'N', 'C');
+    
+    // Valriable exchange method --------------
+    for (size_t j = 0; gc < mxit; j++, gc++) {
+		
+        solution = minv ->* target;
+        final    = m    ->* solution;
+        
+        res[gc]  = NRMSE (target, final);
+        PhaseCorrection  (target, final);
+		
+		if (j % 5 == 0 && j > 0)
+			printf ("\n");
+
+		printf ("    %04zu %.6f", gc, res[gc]); 
+
+		fflush (stdout);
+
+        if ((gc && j && breakearly && res[gc] > res[gc-1]) || res[gc] < conv || isnan(res[gc])) {
+			gc++;
+            break; 
+		} 
+        
+    } 
+    
+    printf ("\n  ... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+    
+}
+
+
+
+inline static bool 
+CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk, 
+		   const size_t& nc, Matrix<float>& max_rf, const float& rflim) {
+
+	bool amps_ok = true;
+
+	printf ("  Checking pulse amplitudes: "); 
+	fflush(stdout);
+	
+    for (size_t i = 0; i < nk; i++) {
+
+        max_rf[i] = 0.0;
+        
+        for (size_t j = 0; j < nc; j++)
+            if (max_rf[i] < abs (solution[i+nk*j]) / (float)(10.0*pd[i])) 
+                max_rf[i] = abs (solution[i+nk*j]) / (float)(10.0*pd[i]);
+
+        max_rf[i] *= 100.0;
+
+    }
+    
+	for (size_t i = 0; i < nk; i++)
+		if (max_rf[i] > rflim) amps_ok = false;
+	
+	// Update Pulse durations if necessary -------
+    
+	if (!amps_ok) {
+		
+		printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
+        
+		for (size_t i = 0; i < nk; i++) {
+			pd[i] = 1 + (short) (max_rf[i] * pd[i] / rflim); 
+			printf ("%i ", 10*pd[i]); fflush(stdout);
+		}
+        
+		printf ("[us] ... done.\n\n");
+		
+	} else 
+
+		printf ("OK\n\n");
+
+	return amps_ok;
+	
+}
 
 
 KTPoints::KTPoints  () :
@@ -136,7 +434,6 @@ KTPoints::Process   ()     {
     Matrix<cxfl>&  b1     = Get<cxfl>  ("b1");
     Matrix<float>& b0     = Get<float> ("b0");
     Matrix<cxfl>&  target = Get<cxfl>  ("target");
-
     size_t ns = size( r,1); // # of spatial positions
     size_t nk = size( k,1); // # of kt points
     size_t nc = size(b1,1); // # of RF channels
@@ -147,41 +444,41 @@ KTPoints::Process   ()     {
 
     Matrix<float> max_rf (nk,1);
     Matrix<short> pd = ones<short>(nk,1); // Starting with shortest pulses possible 
+	pd *= 5;
 
     Matrix<cxfl>    solution; // Solution for timing calculation
-    Matrix<cxfl>    final;    // Excitation profile
+    Matrix<cxfl>&   final = AddMatrix<cxfl> ("final");   // Excitation profile
 
-    Matrix<cxfl>&   rf     = AddMatrix (  "rf",  (Ptr<Matrix<cxfl> >)  NEW (Matrix<cxfl>  ())); 
-    Matrix<float>&  grad   = AddMatrix ("grad",  (Ptr<Matrix<float> >) NEW (Matrix<float> ()));
+    Matrix<cxfl>&   rf    = AddMatrix<cxfl> ("rf"); 
+    Matrix<float>&  grad  = AddMatrix<float> ("grad");
 
-    Matrix<cxfl> m (ns, nk*nc); // STA system encoding matrix
+    Matrix<cxfl> m;// (ns, nk*nc); // STA system encoding matrix
 
     bool        amps_ok = false;
     size_t      gc    = 0;      // Global counter for VE iterations
 
-	Matrix<float>& res     = AddMatrix ("nrmse",  (Ptr<Matrix<float> >) NEW (Matrix<float> (m_maxiter,1)));
+	Matrix<float>& res  = AddMatrix<float> ("nrmse");
+    res = Matrix<float> (m_maxiter,1);
 
-    ticks vestart = getticks();
-    printf ("Starting KT-Points algorithm ...\n");
-    
+    SimpleTimer st ("KT-Points");
+
     while (!amps_ok) {
         
 		// Compute SEM
-        STA   (k, r, b1, b0, nc, nk, ns, m_gd, pd, m);
+        m = STA (k, r, b1, b0, nc, nk, ns, m_gd, pd, gc);
 
 		// Solve KTPoints
         KTPSolve (m, target, final, solution, m_lambda, m_maxiter, m_conv, m_breakearly, gc, res);
+		if (isnan(res(gc)))
+			break;
     
         // Check max pulse amplitude -----------------        
 		amps_ok = CheckAmps(solution, pd, nk, nc, max_rf, m_rflim);
         
     } // End of pulse duration loop
 
-    printf ("... done. WTime: %.4f seconds.\n", elapsed(getticks(), vestart) /
-            Toolbox::Instance()->ClockRate());
-    
     // Put actual maximum RF amplitude into first cell
-    for (int i = 1; i < nk; i++)
+    for (size_t i = 1; i < nk; i++)
         if (max_rf[i] > max_rf[0])
             max_rf[0] = max_rf[i];
     // -----------------------------------
@@ -195,13 +492,15 @@ KTPoints::Process   ()     {
 
     stringstream ofname;
 
+	// Resize NRMSE vector
+	res = resize (res,gc,1);
+
     ofname << m_ptxfname << ".sag_ap";
     PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "s");
     ofname.str("");
     ofname << m_ptxfname << ".tra_ap";
     PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "t");
     // -----------------------------------
-
     return OK;
 
 }

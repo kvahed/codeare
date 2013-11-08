@@ -21,8 +21,8 @@
 #ifndef __STATISTICS_HPP__
 #define __STATISTICS_HPP__
 
-#include "Lapack.hpp"
 #include "Algos.hpp"
+#include "Lapack.hpp"
 
 /**
  * @brief      Mean reducing a dimension
@@ -58,8 +58,7 @@ cov (const Matrix<T>& m) {
 	size_t mn    = size(m,1);
 
 	Matrix<T> mh = mean(m,0);
-
-	Matrix<T> tmp  (mm, mn);
+	Matrix<T> tmp = m;
 
 #pragma omp parallel
 	{
@@ -67,8 +66,7 @@ cov (const Matrix<T>& m) {
 #pragma omp for schedule (guided)
 		for (size_t i = 0; i < mm; i++)
 			for (size_t j = 0; j < mn; j++)
-				tmp [i*mn+j] = m[i*mn+j] - mh[j];
-		
+				tmp [i*mn+j] -= mh[j];
 		
 	}	
 
@@ -76,6 +74,27 @@ cov (const Matrix<T>& m) {
 
 }
 
+
+template<class T> T
+rmse (const Matrix<T>& A, const Matrix<T>& B) {
+
+    assert (numel(A) == numel(B));
+
+    Matrix<T> res = (A - B) ^ 2;
+    res = resize (res,numel(res),1);
+    res = sum(res,0);
+
+    return (sqrt(res[0]));
+
+}
+
+
+template<class T> T
+nrmse (const Matrix<T>& A, const Matrix<T>& B) {
+
+	return rmse(A,B)/T(norm(A));
+
+}
 
 
 #endif // __STATISTICS_HPP__

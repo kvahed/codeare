@@ -1,2 +1,2 @@
 #!/bin/sh
-../src/lclient -b ../share/nufft/ -c config.xml -d doublepr.mat -t NuFFT
+../src/lclient -b ../share/nufft/ -c 16shot.xml -d 16shot.mat -t NuFFT

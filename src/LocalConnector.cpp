@@ -24,7 +24,7 @@ namespace RRClient {
 
 	LocalConnector::~LocalConnector ()               {
 		
-		FunctorContainer::Finalise ();
+		Queue::Finalise ();
 		
 	}
 	
@@ -32,7 +32,7 @@ namespace RRClient {
 	short
 	LocalConnector::CleanUp () {
 		
-		return FunctorContainer::Finalise ();
+		return Queue::Finalise ();
 		
 	}
 	
@@ -42,9 +42,9 @@ namespace RRClient {
 		std::stringstream  temp;
 		temp << GetConfig();
 		
-		FunctorContainer::config  (temp.str().c_str());
+		Queue::config  (temp.str().c_str());
 		
-		return FunctorContainer::Init (name);
+		return Queue::Init (name);
 		
 	}
 	
@@ -52,7 +52,7 @@ namespace RRClient {
 	short
 	LocalConnector::Finalise (const char* name) {
 		
-		return FunctorContainer::Finalise (name);
+		return Queue::Finalise (name);
 		
 	}
 	
@@ -60,7 +60,7 @@ namespace RRClient {
 	short
 	LocalConnector::Process  (const char* name)       {
 		
-		return FunctorContainer::Process (name);
+		return Queue::Process (name);
 		
 	}
 	
@@ -68,7 +68,7 @@ namespace RRClient {
 	short
 	LocalConnector::Prepare  (const char* name)       {
 		
-		return FunctorContainer::Prepare (name);
+		return Queue::Prepare (name);
 		
 	}
 	

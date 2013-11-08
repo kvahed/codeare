@@ -6,15 +6,8 @@ karbtest (Connector<T>* rc) {
 
 	GradientParams gp;
 
-	std::string    cf  = std::string (base + std::string(config));
-	rc->ReadConfig (cf.c_str());
-
-#ifdef HAVE_MAT_H
-
-	// Gradients
-	Read    (gp.k, rc->GetElement("/config/data/k"),    base);
-
-#endif
+	std::string in_file;// = std::string (base + "/" + std::string(rc->GetElement("/config/data-in")->Attribute("fname")));
+	std::string out_file;// = std::string (base + "/" + rc->GetElement("/config/data-out")->Attribute("fname"));
 
 	bool   simann  = false;
 	size_t hpoints = 1;
@@ -47,40 +40,22 @@ karbtest (Connector<T>* rc) {
 	rc->Attribute ("gunits",  &(gp.gunits));
 	rc->Attribute ("lunits",  &(gp.lunits));
 	
-	
 	Matrix<double> x  = linspace<double> (0.0,1.0,size(gp.k,0));
 	Matrix<double> xi = linspace<double> (0.0,1.0,size(gp.k,0)*hpoints);
 
 	gp.k = interp1 (x, gp.k, xi, INTERP::AKIMA);
 
-	printf ("Computing trajectory for ... \n");
-	printf ("    [maxgrad: %.2f, maxslew: %.2f, dt: %.2e]\n", gp.mgr, gp.msr, gp.dt);
+	printf ("\nComputing trajectory for ... \n");
+	printf ("    [maxgrad: %.2f, maxslew: %.2f, dt: %.2e]\n\n", gp.mgr, gp.msr, gp.dt);
 	
-	ticks start = getticks();
+    SimpleTimer st ("VD spiral design");
 	Solution s = ComputeGradient (gp);
-	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+    st.Stop();
 	
-#ifdef HAVE_MAT_H	
+    IOContext f = fopen (out_file.c_str(), WRITE);
+    s.dump (f);
+    fclose (f);
 	
-	MATFile* mf = matOpen ("spiral.mat", "w");
-	
-	if (mf == NULL) {
-		printf ("Error creating file %s\n", "");
-		return false;
-	}
-	
-	MXDump (s.g, mf, "g");
-	MXDump (s.k, mf, "k");
-	MXDump (s.s, mf, "sr");
-	MXDump (s.t, mf, "t");
-	
-	if (matClose(mf) != 0) {
-		printf ("Error closing file %s\n", "");
-		return false;
-	}
-	
-#endif
-
 
 	return true;
 

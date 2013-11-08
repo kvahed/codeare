@@ -1,6 +1,6 @@
 /*
  *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Jülich, Germany
+ *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ enum SIM_MODE {
 	CG   // CG ATA
 };
 
-#include "../common.h"
+#include "common.h"
 #include "Matrix.hpp"
-#include "IO.hpp"
+#include "IOContext.hpp"
 
 namespace RRStrategy {
 	
@@ -39,21 +39,21 @@ namespace RRStrategy {
 	struct SimulationBundle {
 
 		// Incoming
-		Ptr< Matrix<cxfl> >    b1;  /**<! b1                               */ 
+		boost::shared_ptr<Matrix<cxfl> >    b1;  /**<! b1                               */ 
 		
-		Ptr< Matrix<float> >    g;  /**<! Acquisition gradients            */ 
+		boost::shared_ptr<Matrix<float> >    g;  /**<! Acquisition gradients            */ 
 
-		Ptr< Matrix<float> >    r;  /**<! spatial vectors                  */ 
+		boost::shared_ptr<Matrix<float> >    r;  /**<! spatial vectors                  */ 
 
-		Ptr< Matrix<float> >   b0;  /**<! b0 maps                          */ 
+		boost::shared_ptr<Matrix<float> >   b0;  /**<! b0 maps                          */ 
 
-		Ptr< Matrix<cxfl> >  tmxy;  /**<! starting magnetisation (target)  */
-		Ptr< Matrix<float> >  tmz;
-		Ptr< Matrix<cxfl> >  smxy;  /**<!                        (sample)  */
-		Ptr< Matrix<float> >  smz;  
-		Ptr< Matrix<float> >  roi;  /**<! ROI                    (sample)  */
+		boost::shared_ptr<Matrix<cxfl> >  tmxy;  /**<! starting magnetisation (target)  */
+		boost::shared_ptr<Matrix<float> >  tmz;
+		boost::shared_ptr<Matrix<cxfl> >  smxy;  /**<!                        (sample)  */
+		boost::shared_ptr<Matrix<float> >  smz;  
+		boost::shared_ptr<Matrix<float> >  roi;  /**<! ROI                    (sample)  */
 
-		Ptr< Matrix<float> >  jac;  /**<! jacobian j(k(t))                 */
+		boost::shared_ptr<Matrix<float> >  jac;  /**<! jacobian j(k(t))                 */
 
 		int                    np;  /**<! # threads                        */
 		int                  mode;  /**<! mode (0:single run, 1:iterative) */
@@ -67,46 +67,10 @@ namespace RRStrategy {
 		bool                  cb0;  /**<! correct b0?                      */
 		
 		// Outgoing
-		Ptr< Matrix<cxfl> >    rf;  /**<! RF pulses                         */
-		Ptr< Matrix<cxfl> >   mxy;  /**<! Excited transverse magnetisation  */
-		Ptr< Matrix<float> >   mz;  /**<! Longitudinal magnetisation        */
+		boost::shared_ptr<Matrix<cxfl> >    rf;  /**<! RF pulses                         */
+		boost::shared_ptr<Matrix<cxfl> >   mxy;  /**<! Excited transverse magnetisation  */
+		boost::shared_ptr<Matrix<float> >   mz;  /**<! Longitudinal magnetisation        */
 
-		bool Dump (std::string odf) {
-			
-#ifdef HAVE_MAT_H	
-			
-			MATFile* mf = matOpen (odf.c_str(), "w");
-			
-			if (mf == NULL) {
-				printf ("Error creating file %s\n", odf.c_str());
-				return false;
-			}
-			
-			MXDump   (*b1, mf, "b1"  );
-			MXDump    (*r,  mf, "r"   );
-			MXDump   (*b0, mf, "b0"  );
-			MXDump    (*g,  mf, "g"   );
-			MXDump (*tmxy, mf, "tmxy");
-			MXDump  (*tmz, mf, "tmz" );
-			MXDump (*smxy, mf, "smxy");
-			MXDump  (*smz, mf, "smz" );
-			MXDump  (*jac, mf, "jac" );
-			MXDump   (*rf, mf, "rf"  );
-			MXDump  (*mxy, mf, "mxy" );
-			MXDump   (*mz, mf, "mz"  );
-			
-			if (matClose(mf) != 0) {
-				printf ("Error closing file %s\n", odf.c_str());
-				return false;
-			}
-
-			return true;
-#endif
-
-			return false;
-
-		}
-		
 	};
 
 	/**
@@ -138,7 +102,7 @@ namespace RRStrategy {
 		
 	protected: 
 		
-		SimulationStrategy  ()                    {};
+		SimulationStrategy  () : m_sb(0)                   {};
 
 		SimulationBundle* m_sb;
 

@@ -3,25 +3,25 @@
 
 #include "Algos.hpp"
 
-template<class T> inline static size_t
+template<class T> inline size_t
 ind2i (const Matrix<T>& M, const size_t& ind) {
     return (size_t) ind % size(M,0);
 }
 
 
-template<class T> inline static size_t
+template<class T> inline size_t
 ind2j (const Matrix<T>& M, const size_t& ind) {
     return (size_t) floor (ind/size(M,0)) % (size(M,1)-1);
 }
 
 
-template<class T> inline static size_t
+template<class T> inline size_t
 ind2k (const Matrix<T>& M, const size_t& ind) {
     return (size_t) floor (ind/(size(M,0)*size(M,1))) % (size(M,2)-1);
 }
 
 
-template<class T> inline static size_t
+template<class T> inline size_t
 ind2l (const Matrix<T>& M, const size_t& ind) {
     return (size_t) floor (ind/(size(M,0)*size(M,1)*size(M,2))) % (size(M,3)-1);
 }
@@ -42,7 +42,7 @@ ind2x (const Matrix<T>& M, const size_t& ind, const size_t& dim) {
 }
 
 
-template<class T> inline static Matrix<size_t>
+template<class T> inline Matrix<size_t>
 ind2sub2d (const Matrix<T>& M, const Matrix<size_t>& inds) {
 
     Matrix<T>      tmp = squeeze(M);
@@ -57,7 +57,7 @@ ind2sub2d (const Matrix<T>& M, const Matrix<size_t>& inds) {
 }
 
 
-template <class T> inline static Matrix<size_t>
+template <class T> inline Matrix<size_t>
 ind2sub3d (const Matrix<T>& M, const Matrix<size_t>& inds) {
 
     Matrix <size_t> subs (inds.Size(), 3);
@@ -92,13 +92,13 @@ sub2ind  (const Matrix<T>& M, const Matrix<size_t>& subs) {
  * @param  s           # of volume
  * @return             Desired volume of M
  */
-template <class T> static inline Matrix<T> 
+template <class T> inline Matrix<T>
 Volume (const Matrix<T>& M, const size_t& s) {
 	
 	Matrix<T> res (size(M,0), size(M,1), size(M,2));
 	size_t nc = numel (res);
 	
-	memcpy (&res[0], M.Data(s*nc), nc * sizeof(T));
+	memcpy (&res[0], M.Ptr(s*nc), nc * sizeof(T));
 	
 	return res;
 	
@@ -112,7 +112,7 @@ Volume (const Matrix<T>& M, const size_t& s) {
  * @param  s           # of volume
  * @param  A           Matrix to insert
  */
-template <class T> inline static void
+template <class T> inline void
 Volume (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
 	
 	assert (size(M,0) == size(A,0));
@@ -121,7 +121,7 @@ Volume (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
 
 	size_t nc = size(M,0) * size(M,1) * size(M,2);
 
-	memcpy (&M[s*nc], A.Data(), nc*sizeof(T));
+	memcpy (&M[s*nc], A.Ptr(), nc*sizeof(T));
 	
 }
 	
@@ -133,13 +133,13 @@ Volume (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
  * @param  s           # of slice
  * @return             Desired slice of M
  */
-template <class T> static inline Matrix<T> 
+template <class T> inline Matrix<T>
 Slice (const Matrix<T>& M, const size_t& s) {
 	
 	Matrix<T> res (size(M,0),size(M,1));
 	size_t nc = numel (res);
 	
-	memcpy (&res[0], M.Data(s*nc), nc*sizeof(T));
+	memcpy (&res[0], M.Ptr(s*nc), nc*sizeof(T));
 	
 	return res;
 	
@@ -153,7 +153,7 @@ Slice (const Matrix<T>& M, const size_t& s) {
  * @param  s           # of slice
  * @param  A           New slice
  */
-template <class T> static inline void
+template <class T> inline void
 Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
 	
 	assert (size(M,0) == size(A,0));
@@ -161,7 +161,7 @@ Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
 
 	size_t ns = size(M,0) * size(M,1);
 
-	memcpy (&M[s * ns], A.Data(), ns * sizeof(T));
+	memcpy (&M[s * ns], A.Ptr(), ns * sizeof(T));
 	
 }
 
@@ -173,7 +173,7 @@ Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
  * @param  s           # of slice
  * @param  v           Scalar value           
  */
-template <class T> static inline void
+template <class T> inline void
 Slice (Matrix<T>& M, const size_t& s, const T& v) {
 	
 	size_t ns = size(M,0) * size(M,1);
@@ -193,7 +193,7 @@ Slice (Matrix<T>& M, const size_t& s, const T& v) {
  * @param  r           # of row
  * @return             Desired row of M
  */
-template <class T> static inline Matrix<T> 
+template <class T> inline Matrix<T>
 Row (const Matrix<T>& M, const size_t& r)  {
 	
 	size_t nc, nr, ns, s, rr;
@@ -221,7 +221,7 @@ Row (const Matrix<T>& M, const size_t& r)  {
  * @param  r           # of row
  * @param  A           Matrix to copy from
  */
-template <class T> static inline void 
+template <class T> inline void
 Row (Matrix<T>& M, const size_t& r, const Matrix<T> A)  {
 	
 	size_t nc, nr, ns, s, rr;
@@ -248,7 +248,7 @@ Row (Matrix<T>& M, const size_t& r, const Matrix<T> A)  {
  * @param  r           # of row
  * @param  v           Scalar value
  */
-template <class T> static inline void 
+template <class T> inline void
 Row (Matrix<T>& M, const size_t& r, const T& v)  {
 	
 	size_t nc, nr, ns, s, rr;
@@ -273,12 +273,12 @@ Row (Matrix<T>& M, const size_t& r, const T& v)  {
  * @param  c           # of row
  * @return             Desired row of M
  */
-template <class T> static inline Matrix<T> 
+template <class T> inline Matrix<T>
 Column (const Matrix<T>& M, const size_t& c) {
 	
 	Matrix<T> res (size(M, 0),1);
 	
-	memcpy (&res[0], M.Data(c*size(M, 0)), size(M, 0) * sizeof(T));
+	memcpy (&res[0], M.Ptr(c*size(M, 0)), size(M, 0) * sizeof(T));
 	
 	return res;
 	
@@ -292,13 +292,13 @@ Column (const Matrix<T>& M, const size_t& c) {
  * @param  c           # of row
  * @param  A           Vector to copy from
  */
-template <class T> static inline void
+template <class T> inline void
 Column (Matrix<T>& M, const size_t& c, const Matrix<T> A) {
 	
 	assert (size(M,0) == size (A,0));
 	size_t nc = size(M,0);
 
-	memcpy (&M[c*nc], A.Data(), nc * sizeof(T));
+	memcpy (&M[c*nc], A.Ptr(), nc * sizeof(T));
 	
 }
 

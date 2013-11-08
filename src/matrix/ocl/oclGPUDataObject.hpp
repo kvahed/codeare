@@ -52,7 +52,7 @@
       {
       
         print_optional ("Ctor: \"oclGPUDataObject\" (id: %d)", oclDataObject :: getID (), v_level);
-        
+
       }
       
       
@@ -94,7 +94,7 @@
        * @brief               inherited (oclDataObject)
        */
       virtual
-      void
+      double
       prepare                 ();
       
       
@@ -102,7 +102,7 @@
        * @brief               inherited (oclObservableDataObject)
        */
       virtual
-      void
+      double
       finish                  ();
       
       
@@ -110,7 +110,7 @@
        * @brief               inherited (oclDataWrapper)
        */
       virtual
-      void
+      double
       getData                 ();
 
 
@@ -146,27 +146,31 @@
    *                          !! precondition: data not in use !!
    */
   template <class T>
-  void
+  double
   oclGPUDataObject <T> ::
   prepare                     ()
   {
 
     print_optional ("oclGPUDataObject::prepare (%d)", oclDataObject :: getID (), v_level);
   
+    double mem_time = .0;
+    
     if (! oclDataObject :: getLockState ( ))
     {
   
       // set status: calculating (set available via finish ())
       oclDataObject :: setLocked ();
-    
+      
       // synchronize GPU data / load to GPU
-      oclDataWrapper <T> :: loadToGPU ();
+      mem_time = oclDataWrapper <T> :: loadToGPU ();
     
       // notify modification of GPU data
       oclDataObject :: setGPUModified ();
 
     }
 
+    return mem_time;
+    
   }
   
   
@@ -175,13 +179,16 @@
    * @brief                   keep data in GPU memory (since it's a GPU object)
    */
   template <class T>
-  void
+  double
   oclGPUDataObject <T> ::
   finish                      ()
   {
 
     print_optional ("oclGPUDataObject::finish (%d)", oclDataObject :: getID (), v_level);
 
+    // time for memory transfer
+    double mem_time = .0;
+    
     /* check if buffer was grabbed */
     if (oclDataObject :: m_release_buffer)
     {
@@ -189,7 +196,7 @@
       print_optional (" oclGPUDataObject :: finish -> releaseBuffer", v_level);
       
       /* copy data to CPU */
-      oclDataWrapper <T> :: loadToCPU ( );
+      mem_time = oclDataWrapper <T> :: loadToCPU ( );
       
       /* release buffer */
       oclDataObject :: releaseBuffer ( );
@@ -202,6 +209,8 @@
     // update data state: available for use
     oclDataObject :: setUnlocked ();
     
+    return mem_time;
+    
   }
   
   
@@ -210,13 +219,16 @@
    * @brief                   copy data to CPU memory
    */
   template <class T>
-  void
+  double
   oclGPUDataObject <T> ::
   getData                     ()
   {
   
     print_optional ("oclGPUDataObject::getData", v_level);
-        
+    
+    // memory transfer time
+    double mem_time = .0;
+    
     // check wether data is available or used on GPU
     if (oclDataObject :: getLockState ())
     {
@@ -236,7 +248,7 @@
       {
 
         // synchronize CPU data with GPU
-        oclDataWrapper <T> :: loadToCPU ();
+        mem_time = oclDataWrapper <T> :: loadToCPU ();
 
       }
       catch (const oclError & err)
@@ -246,7 +258,9 @@
       
       }
 
-    }    
+    }
+    
+    return mem_time;
     
   }
   

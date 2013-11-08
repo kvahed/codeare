@@ -45,7 +45,7 @@
        * @brief                       Constructor (such as oclKernelObject).
        *
        * @param  kernel_name          Name of kernel to call.
-       * @param         args          Pointers to kernel's arguments.
+       * @param      pp_args          Pointers to kernel's arguments.
        * @param     num_args          Number of kernel arguments.
        *
        */
@@ -112,7 +112,7 @@
        */
       virtual
       void
-      run                             ( );
+      run                             (const LaunchInformation &);
     
 
 
@@ -166,6 +166,8 @@
 
         /* run algorithm */
         kernel_obj -> run_async ( );
+
+        return obj;
       
       }
 
@@ -278,7 +280,7 @@
    */
   void
   oclAsyncKernelObject ::
-  run                                 ( )
+  run                                 (const LaunchInformation & lc)
   {
   
     print_optional ("oclAsyncKernelObject :: run", oclAsyncKernelObject :: v_level);
@@ -289,7 +291,7 @@
     this -> activate ( );
     
     // activate kernel
-    oclCon -> activateKernel (m_kernel_name);
+    oclCon -> activateKernel (m_kernel_names [0]);
     
     // prepare kernel arguments (load to gpu)
     for (int i = 0; i < m_num_args; i++)

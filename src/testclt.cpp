@@ -20,6 +20,7 @@
 
 #include "testclt.hpp"
 
+
 int main (int argc, char** argv) {
 	
 	int  rc  = 0;
@@ -32,33 +33,28 @@ int main (int argc, char** argv) {
 		Connector<RemoteConnector>* con = new Connector<RemoteConnector> (name, verbose);
 #endif	
 		
-		std::string cf = std::string (base + std::string(config));
-		con->ReadConfig (cf.c_str()); 
+		std::string cf = base;
+		cf += "/"; 
+		cf += std::string(config);
+		if (cf.compare(std::string(base)) != 0)
+            con->ReadConfig (cf.c_str());
 
 		if      (!strcmp (test, "CGSENSE"))               cgsensetest  (con);
-		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
 		else if (!strcmp (test, "SENSE"))                 sensetest    (con);
 		else if (!strcmp (test, "NuFFT"))                 nuffttest    (con); 
 		else if (!strcmp (test, "NuFFT_OMP"))             nuffttest    (con);
 		else if (!strcmp (test, "GRAPPA"))                grappatest   (con);
 		else if (!strcmp (test, "KTPoints"))              ktptest      (con);
 		else if (!strcmp (test, "CompressedSensing"))     cstest       (con);
-		else if (!strcmp (test, "mxtest"))                mxtest       (con);
-		else if (!strcmp (test, "nitest"))                nitest       (con);
-		else if (!strcmp (test, "iotest"))                iotest       (con);
-		else if (!strcmp (test, "fftwtest"))              fftwtest     (con);
-		else if (!strcmp (test, "dwttest"))               dwttest      (con);
-		else if (!strcmp (test, "algotest"))              algotest     (con);
-		else if (!strcmp (test, "syngotest"))             syngotest    (con);
-		else if (!strcmp (test, "RelativeSensitivities")) resetest     (con);
 		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
 		else if (!strcmp (test, "KArb"))                  karbtest     (con);
-		else if (!strcmp (test, "Creators"))              creatorstest (con);
-		else if (!strcmp (test, "MPI"))                   mpitest      (con);
-		else if (!strcmp (test, "SHA256"))                sha256test   (con);
-		else if (!strcmp (test, "ISMRMRD"))               ismrmrdtest  (con);
-		else if (!strcmp (test, "ocl"))                   oclmatrixtest(con);
-		else                                              internaltest (con);
+		else if (!strcmp (test, "SliceGrad"))             slicegrad    (con);
+        else if (!strcmp (test, "DummyRecon"))            dummytest    (con);
+        /*
+		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
+		else if (!strcmp (test, "RelativeSensitivities")) resetest     (con);
+        */
+        else    {printf ("ERROR: Cannot call unknow module %s\n", test); return 1;}
 
 		delete con;
 		

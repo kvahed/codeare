@@ -25,9 +25,15 @@
 #include "ReconStrategy.hpp"
 #include "Statistics.hpp"
 #include "Toolbox.hpp"
-#include "IO.hpp"
+#include "linalg/Lapack.hpp"
 #include "DFT.hpp"
 #include "arithmetic/Trigonometry.hpp"
+#include "Print.hpp"
+
+#ifdef HAVE_NIFTI1_IO_H
+  #include "NIFile.hpp"
+#endif
+
 
 const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
 
@@ -47,7 +53,9 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		RelativeSensitivities  () {}
+		RelativeSensitivities  () :
+			m_cutoff(0.0), m_echo_shift(0.0), m_weigh_maps(0),
+			m_log_mask(0), m_use_bet(0) {}
 		
 		/**
 		 * @brief Default destructor
@@ -124,13 +132,13 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 	Matrix<cxfl> m[threads]; // Combination
 	Matrix<cxfl> u[threads]; // Left-side and  O(NRX x NRX)
 	Matrix<cxfl> v[threads]; // Right-side singular vectors O(NTX, NTX)
-	Matrix<cxfl> s[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
+	Matrix<float> s[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
 	
 	for (int i = 0; i < threads; i++) {
 		m[i] = Matrix<cxfl>     (nrxc, ntxc);
 		u[i] = Matrix<cxfl>     (nrxc, ntxc);
 		v[i] = Matrix<cxfl>     (ntxc, ntxc);
-		s[i] = Matrix<cxfl> (MIN(ntxc, nrxc), 1);
+		s[i] = Matrix<float> (MIN(ntxc, nrxc), 1);
 	}
 	
 #pragma omp parallel default (shared) 
@@ -144,12 +152,12 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 			
 			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cxfl));
 			
-			svd (m[tid], s[tid], u[tid], v[tid], 'S');
+			//svd (m[tid], s[tid], u[tid], v[tid], 'S');
 			
 			for (size_t r = 0; r < nrxc; r++) rxm[r*volsize + i] = u[tid][r] * exp(cxfl(0.0,1.0)*arg(u[tid][0])); // U 
 			for (size_t t = 0; t < ntxc; t++) txm[t*volsize + i] = v[tid][t] * exp(cxfl(0.0,1.0)*arg(v[tid][0])); // V 
 
-			snro[i] = real(s[tid][0]);
+			snro[i] = s[tid][0];
 			
 		}
 		
@@ -309,7 +317,9 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 error_code
 SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	
-	printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
+#ifdef HAVE_NIFTI1_IO_H
+
+    printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
 
 	ticks  tic = getticks();
 	
@@ -319,7 +329,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 
 	Matrix<double> tmp = codeare::matrix::arithmetic::log (img);
 	
-	NIDump(tmp, orig);
+	niwrite (tmp, orig);
 	printf ("exporting ... "); fflush(stdout);
 	
 	if (!std::system(NULL))
@@ -330,10 +340,16 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	int i = system (cmd.c_str());
 	
 	printf ("exited with %i, importing ... ", i); fflush(stdout);
-	NIRead(msk, mask);
+	msk = niread<short>(mask);
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
+#else
+
+    printf (  "WARNIN: Do not have NIFTO IO built in. Thus, no brain mask segmentation available!\n");
+
+#endif
+    
 	return OK;	
 }
 
@@ -342,7 +358,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 void LogMask (Matrix<double>& m, const double& m_cutoff) {
 	
 	for (size_t i = 0; i < m.Size(); i++)
-		m[i] = (log(abs(m[i])) < m_cutoff) ? 0.0 : 1.0;
+		m[i] = (log(std::abs(m[i])) < m_cutoff) ? 0.0 : 1.0;
 	
 }
 

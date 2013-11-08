@@ -1,12 +1,9 @@
 #include "options.h"
 
-#ifdef LOCAL
-    #include "LocalConnector.hpp"
-#else 
+#include "LocalConnector.hpp"
+#if defined HAVE_OMNIORB4_CORBA_H && defined REMOTE
     #include "RemoteConnector.hpp"
 #endif	
-
-#include "IO.hpp"
 
 #ifndef __WIN32__
     #include "config.h"
@@ -18,6 +15,8 @@
 
 using namespace std;
 using namespace RRClient;
+
+#include "Grid.hpp"
 
 #include <time.h>
 #include <stdio.h>
@@ -34,8 +33,10 @@ int    rank;
 #include "tests/tests.hpp"
 
 bool init (int argc, char** argv) {
-	
-    Grid& gd = *Grid::Instance();
+
+#ifdef HAVE_MPI
+    Grid& gd = Grid::Instance();
+#endif
 
 //	if (gd.rk == 0) {
 		cout << endl;
@@ -94,7 +95,7 @@ bool init (int argc, char** argv) {
 			
 			opt->printUsage();
 			delete opt;
-			return 0;
+			return false;
 			
 		} 
 		
@@ -104,11 +105,11 @@ bool init (int argc, char** argv) {
 		name    = (opt->getValue("name")   && 
 				   opt->getValue("name")   != (char*)"") ? opt->getValue(   "name") : (char*) "codeare" ;
 		base    = (opt->getValue("base")   && 
-				   opt->getValue("base")   != (char*)"") ? opt->getValue(   "base") : (char*) ".";
+				   opt->getValue("base")   != (char*)"") ? opt->getValue(   "base") : (char*) "";
 		data    = (opt->getValue("data")   && 
-				   opt->getValue("data")   != (char*)"") ? opt->getValue(   "data") : (char*) ".";
+				   opt->getValue("data")   != (char*)"") ? opt->getValue(   "data") : (char*) "";
 		config  = (opt->getValue("config") && 
-				   opt->getValue("config") != (char*)"") ? opt->getValue( "config") : (char*) ".";
+				   opt->getValue("config") != (char*)"") ? opt->getValue( "config") : (char*) "";
 		test    = (opt->getValue("test"  ) && 
 				   opt->getValue("test"  ) != (char*)"") ? opt->getValue(   "test") : (char*) "DummyRecon";
 		
@@ -125,8 +126,9 @@ bool init (int argc, char** argv) {
 bool init (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	//std::string("codeare").c_str();
-	
+	return true;
 
 }
+
 
 #endif

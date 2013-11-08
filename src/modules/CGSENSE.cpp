@@ -21,8 +21,11 @@
 #include "CGSENSE.hpp"
 #include "Noise.hpp"
 #include "Toolbox.hpp"
-#include "Lapack.hpp"
+#include "SimpleTimer.hpp"
+#include "Algos.hpp"
 #include "Creators.hpp"
+
+#include "Print.hpp"
 
 #include <math.h>
 
@@ -35,22 +38,14 @@ using namespace RRStrategy;
 
 
 CGSENSE::~CGSENSE () {
-
 	this->Finalise();
-
 }
 
 
 error_code 
 CGSENSE::Finalise () {
-
-	if (m_initialised)
-		delete m_ncs;
-
 	return OK;
-
-	if (m_initialised)
-		delete m_ncs;
+}
 
 	return OK;
 	
@@ -82,6 +77,12 @@ CGSENSE::Init() {
 
 	Attribute ("testcase",  &m_testcase);
 	printf ("  test case: %i \n", m_testcase);
+	// --------------------------------------
+
+	// # threads ----------------------------
+
+	Attribute ("threads",  &m_nthreads);
+	printf ("  # of threads: %i \n", m_nthreads);
 	// --------------------------------------
 
 	// Verbosity ----------------------------
@@ -122,23 +123,21 @@ CGSENSE::Prepare () {
 
 	error_code error = OK;
 
-	Matrix<cxfl>&   sens   = Get<cxfl> ("sens");
-	Matrix<float>& weights = Get<float>("weights");
-	Matrix<float>& kspace  = Get<float>("kspace");
+	Params cgp;
+	cgp["sens_maps"]    = std::string("sens");
+    cgp["weights_name"] = std::string("weights");
+    cgp["verbose"]      = m_verbose;
+    cgp["ftiter"]       = (size_t) m_ftmaxit;
+    cgp["cgiter"]       = (size_t) m_cgmaxit;
+    cgp["cgeps"]        = m_cgeps;
+    cgp["lambda"]       = m_lambda;
+    cgp["lambda"]       = m_lambda;
+    cgp["np"]           = m_nthreads;
 
-	size_t nk = numel(weights);
+	m_ncs = NCSENSE<float>(cgp);
 
-	m_ncs = new NCSENSE<float>
-		(sens, nk, m_cgeps, m_cgmaxit, m_lambda, m_fteps, m_ftmaxit);
-
-	size_t dim = ndims(sens) - 1;
-
-	// Outgoing images
-	Matrix<cxfl>& image = AddMatrix 
-		("image", (Ptr<Matrix<cxfl> >) NEW (Matrix<cxfl>(size(sens,0), size(sens,1), (dim == 3) ? size(sens,2) : 1)));
-
-	m_ncs->KSpace (kspace);
-	m_ncs->Weights (weights);
+	m_ncs.KSpace (Get<float>("kspace"));
+	m_ncs.Weights (Get<float>("weights"));
 	
 	Free ("weights");
 	Free ("kspace");
@@ -154,17 +153,19 @@ error_code
 CGSENSE::Process () {
 
 	error_code error = OK;
+    const Matrix<cxfl>& sens = Get<cxfl>("sens");
+    Matrix<cxfl> data;
 
-	ticks cgstart = getticks();
-	
-	printf ("Processing CGSENSE ...\n");
+    data = (!m_testcase) ? Get<cxfl>("data") : 
+        m_ncs.Trafo (phantom<cxfl>(size(sens,0)), sens);
+    if (m_noise)
+        data += m_noise * randn<cxfl>(size(data));
 
-	Get<cxfl>("image") = m_ncs->Adjoint (Get<cxfl>("data"), Get<cxfl>("sens"));
-
-	Free ("data");
-
-	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
-
+    SimpleTimer st("CGSENSE");
+    Matrix<cxfl> img = m_ncs ->* data;
+    st.Stop();
+    
+    wspace.Add("image", img);
 	return error;
 
 }

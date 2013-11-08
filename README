@@ -12,3 +12,7 @@ TODO:
                                                                            
 BUILD & INSTALL
 Refer to http://codeare.org/install.html
+
+FEDORA NOTES
+./configure --with-atlasroot=/usr/lib64/atlas
+./configure --with-atlasroot=/usr/lib64/atlas-sse3

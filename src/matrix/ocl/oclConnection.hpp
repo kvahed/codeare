@@ -95,10 +95,17 @@ modify_kernel        ( std::string const &       source,
       
       template <class T, class S>
       oclFunctionObject * const
-      makeFunctionObject    (const string & kernel_name,
+      makeFunctionObject    (const std::string & kernel_name,
                              oclDataObject * const * const args, const int & num_args,
                              const KernelType kernel_type, const SyncType sync_type);
-                        
+                
+      template <class T, class S>
+      oclFunctionObject * const
+      makeFunctionObject    (const std::vector <std::string> & kernel_name,
+                             oclDataObject * const * const args, const int & num_args,
+                             const KernelType kernel_type, const SyncType sync_type);
+      
+# ifdef __USE_VIENNA_CL__
       template <class T, class S>     
       oclFunctionObject * const
       makeFunctionObject    (const vclAlgoType & algo_name,
@@ -106,7 +113,8 @@ modify_kernel        ( std::string const &       source,
                              const KernelType kernel_type, const SyncType sync_type,
                              const int num_sclars = 0,
                              int * scalars = NULL);
-
+# endif
+      
       template <class T, class S>     
       oclFunctionObject * const
       makeFunctionObject    (const oclAMDBlasType & algo_name,
@@ -126,6 +134,7 @@ modify_kernel        ( std::string const &       source,
                           
       void
       run                   (oclFunctionObject * const func_obj) const;
+      
 
       // getters for OpenCL objects
       const clPlatform      getPlatform       () const { return m_plat; }
@@ -145,7 +154,7 @@ modify_kernel        ( std::string const &       source,
        *                      
        */
       template <class T>
-      void
+      double
       loadToGPU             (       T   * const cpu_arg,
                              ::size_t           size,
                              clBuffer   * const buffer);
@@ -167,7 +176,7 @@ modify_kernel        ( std::string const &       source,
        * @param             size - ... in bytes
        */
       template <class T>
-      void
+      double
       loadToCPU             (const clBuffer * const buffer,
                                           T * const cpu_arg,
                              const ::size_t         size)
@@ -177,17 +186,17 @@ modify_kernel        ( std::string const &       source,
         
         try
         {
-        
-          // create new buffer
-          clBuffer * p_tmp_buffer = new clBuffer(m_cont, CL_MEM_READ_WRITE, size, cpu_arg, &m_error);
           
           print_optional (" -- size: %d Bytes", size, VERB_LOW); //m_verbose);
-          
+
+          // TODO: !! blocking !! //
+          double mem_time = omp_get_wtime ();
           // read data from given buffer
           m_error = m_comqs [0] . enqueueReadBuffer (*buffer, CL_TRUE, 0, size, cpu_arg, NULL, NULL);
+          return omp_get_wtime () - mem_time;
         
         }
-        catch (cl::Error cle)
+        catch (cl::Error & cle)
         {
           
           throw oclError (cle.err(), "oclConnection :: loadToCPU");
@@ -203,10 +212,17 @@ modify_kernel        ( std::string const &       source,
       activateKernel        (const std::string kernelname);
     
       // run kernel with given dimensions
-      int
+      const cl::Event
       runKernel             (const cl::NDRange & global_dims,
                              const cl::NDRange & local_dims);
   
+      // wait for event
+      void
+      waitForEvent          (const cl::Event & event) const;
+      
+      // get profiling info
+      const ProfilingInformation
+      getProfilingInformation (const cl::Event & event) const;
       
       
       /**
@@ -236,7 +252,25 @@ modify_kernel        ( std::string const &       source,
         return (m_comqs [0]) ();
       
       }
+      
+      
+      template <class T, class S>
+      oclError &
+      rebuildWithSources      (const std::vector <std::string> &);
 
+      template <class T, class S>
+      oclError &
+      rebuildWithSources      (const std::vector <std::string> &,
+                               const std::vector <std::string> &);
+
+      template <class T, class S>
+      oclError &
+      rebuildWithSource       (const std::string &);
+      
+      template <class T, class S>
+      oclError &
+      rebuildWithSource       (const std::string &,
+                               const std::vector <std::string> &);
 
     
     /*************
@@ -261,13 +295,19 @@ modify_kernel        ( std::string const &       source,
       clDevices                m_devs;       // vector of available devices on m_plat
       clContext                m_cont;       // context used associated with m_devs
       clCommandQueues          m_comqs;      // each command queue is associated with corresponding device from m_devs
+      
+      size_t                   m_max_wg_size;
+      size_t                   m_max_wi_dim;
+      size_t                   m_max_wi_sizes [3];
+      
       clProgram              * mp_prog,
                                m_prog_ff,     // program containing whole source code (single precision)
                                m_prog_dd,     // program containing whole source code (double precision)
                                m_prog_cfcf,
                                m_prog_cff,
                                m_prog_cdcd,
-                               m_prog_cdd;
+                               m_prog_cdd,
+                               m_prog_alt;  // program for alternatively build kernels (not at construction time!)
       clKernels              * mp_kernels,
                                m_kernels_ff,  // kernels available in m_prog_f
                                m_kernels_dd,  // kernels available in m_prog_d
@@ -301,19 +341,16 @@ modify_kernel        ( std::string const &       source,
       template <class T, class S>
       static
       oclError &
-      init_program_kernels    (oclConnection * const);
+      init_program_kernels (oclConnection * const,
+                            const std::vector <std::string> & = std::vector <std::string> (0),
+                            const std::vector <std::string> & = std::vector <std::string> (0)
+                            );
 
-  
+      
       /******************
        ** constructors **
        ******************/
-      oclConnection         (const char *,
-                             const char *,
-                             const char *,
-                             const char *,
-                             const char *,
-                             const char *,
-                             cl_device_type device_type = CL_DEVICE_TYPE_GPU,
+      oclConnection         (cl_device_type device_type = CL_DEVICE_TYPE_GPU,
                              VerbosityLevel verbose = VERB_NONE);
       
       oclConnection         (oclConnection &) { /*TODO*/};
@@ -349,7 +386,6 @@ modify_kernel        ( std::string const &       source,
   struct oclConnection :: ocl_precision_trait <cxfl, float>
   {
  
- 
     public:
   
       typedef cxfl elem_type;
@@ -363,9 +399,10 @@ modify_kernel        ( std::string const &       source,
       const std::vector <std::string>
       getFilenames  ()
       {
+        std::string base = base_kernel_path + "src/matrix/ocl/kernels/";
         std::vector <std::string> filenames;
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/mixed_A_kernels.cl"));
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/mixed_AB_kernels.cl"));
+        filenames.push_back (base + "mixed_A_kernels.cl");
+        filenames.push_back (base + "mixed_AB_kernels.cl");
         return filenames;
       }
           
@@ -373,11 +410,11 @@ modify_kernel        ( std::string const &       source,
       const char *
       modify_source (void * buf, int * size)
       {
-        std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
-                                                            std::string ("cl_khr_fp64: disable"),
-                                                            std::string ("float2"),
-                                                            std::string ("float"),
-                                                                      8 ) );
+        std::string * tmp_str = new std::string ( modify_kernel (std::string ((const char *) buf),
+                                                                 std::string ("cl_khr_fp64: disable"),
+                                                                 std::string ("float2"),
+                                                                 std::string ("float"),
+                                                                           8 ) );
         *size = tmp_str -> size () * sizeof (char);
         return tmp_str->c_str ();
       }
@@ -403,8 +440,7 @@ modify_kernel        ( std::string const &       source,
   template <>
   struct oclConnection :: ocl_precision_trait <cxfl, cxfl>
   {
- 
- 
+
     public:
   
       typedef cxfl elem_type;
@@ -418,9 +454,10 @@ modify_kernel        ( std::string const &       source,
       const std::vector <std::string>
       getFilenames  ()
       {
+        std::string base = base_kernel_path + "src/matrix/ocl/kernels/";
         std::vector <std::string> filenames;
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/complex_A_kernels.cl"));
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/complex_AB_kernels.cl"));
+        filenames.push_back (base + "complex_A_kernels.cl");
+        filenames.push_back (base + "complex_AB_kernels.cl");
         return filenames;
       }
           
@@ -428,10 +465,10 @@ modify_kernel        ( std::string const &       source,
       const char *
       modify_source (void * buf, int * size)
       {
-        std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
-                                                            std::string ("cl_khr_fp64: disable"),
-                                                            std::string ("float2"),
-                                                            std::string ("float2") ) );
+        std::string * tmp_str = new std::string ( modify_kernel (std::string ((const char *) buf),
+                                                                 std::string ("cl_khr_fp64: disable"),
+                                                                 std::string ("float2"),
+                                                                 std::string ("float2") ) );
         *size = tmp_str -> size () * sizeof (char);
         return tmp_str->c_str ();
       }
@@ -471,9 +508,10 @@ modify_kernel        ( std::string const &       source,
       const std::vector <std::string>
       getFilenames  ()
       {
+        std::string base = base_kernel_path + "src/matrix/ocl/kernels/";
         std::vector <std::string> filenames;
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/A_kernels.cl"));
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/AB_kernels.cl"));
+        filenames.push_back (base + "A_kernels.cl");
+        filenames.push_back (base + "AB_kernels.cl");
         return filenames;
       }
 
@@ -481,11 +519,11 @@ modify_kernel        ( std::string const &       source,
       const char *
       modify_source (void * buf, int * size)
       {
-        std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+        std::string * tmp_str = new std::string ( modify_kernel (std::string ((const char *) buf),
                                                             std::string ("cl_khr_fp64: disable"),
                                                             std::string ("float"),
                                                             std::string ("float"),
-                                                                      8 ) );
+                                                                      2 ) );
         *size = tmp_str -> size () * sizeof (char);
         return tmp_str->c_str ();
       }
@@ -525,9 +563,10 @@ modify_kernel        ( std::string const &       source,
       const std::vector <std::string>
       getFilenames  ()
       {
+        std::string base = base_kernel_path + "src/matrix/ocl/kernels/";
         std::vector <std::string> filenames;
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/A_kernels.cl"));
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/AB_kernels.cl"));
+        filenames.push_back (base + "A_kernels.cl");
+        filenames.push_back (base + "AB_kernels.cl");
         return filenames;
       }
 
@@ -535,7 +574,7 @@ modify_kernel        ( std::string const &       source,
       const char *
       modify_source (void * buf, int * size)
       {
-        std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+        std::string * tmp_str = new std::string ( modify_kernel (std::string ((const char *) buf),
                                                             std::string ("cl_khr_fp64: enable"),
                                                             std::string ("double"),
                                                             std::string ("double"),
@@ -580,9 +619,10 @@ modify_kernel        ( std::string const &       source,
       const std::vector <std::string>
       getFilenames  ()
       {
+        std::string base = base_kernel_path + "src/matrix/ocl/kernels/";
         std::vector <std::string> filenames;
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/mixed_A_kernels.cl"));
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/mixed_AB_kernels.cl"));
+        filenames.push_back (base + "mixed_A_kernels.cl");
+        filenames.push_back (base + "mixed_AB_kernels.cl");
         return filenames;
       }
 
@@ -590,7 +630,7 @@ modify_kernel        ( std::string const &       source,
       const char *
       modify_source (void * buf, int * size)
       {
-        std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+        std::string * tmp_str = new std::string ( modify_kernel (std::string ((const char *) buf),
                                                             std::string ("cl_khr_fp64: enable"),
                                                             std::string ("double2"),
                                                             std::string ("double"),
@@ -635,9 +675,10 @@ modify_kernel        ( std::string const &       source,
       const std::vector <std::string>
       getFilenames  ()
       {
+        std::string base = base_kernel_path + "src/matrix/ocl/kernels/";
         std::vector <std::string> filenames;
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/complex_A_kernels.cl"));
-        filenames.push_back (std::string ("./src/matrix/ocl/kernels/complex_AB_kernels.cl"));
+        filenames.push_back (base + "complex_A_kernels.cl");
+        filenames.push_back (base + "complex_AB_kernels.cl");
         return filenames;
       }
 
@@ -645,7 +686,7 @@ modify_kernel        ( std::string const &       source,
       const char *
       modify_source (void * buf, int * size)
       {
-        std::string * tmp_str = new string ( modify_kernel (std::string ((const char *) buf),
+        std::string * tmp_str = new std::string ( modify_kernel (std::string ((const char *) buf),
                                                             std::string ("cl_khr_fp64: enable"),
                                                             std::string ("double2"),
                                                             std::string ("double2") ) );
@@ -667,17 +708,17 @@ modify_kernel        ( std::string const &       source,
 
 
   /***********************************
-   ** precision trait (bool, S)     **
+   ** precision trait (cbool, S)    **
    **   (derived)                   **
    ***********************************/
   template <>
   template <class S>
-  struct oclConnection :: ocl_precision_trait <bool, S>
+  struct oclConnection :: ocl_precision_trait <cbool, S>
   {
 
     public:
 
-      typedef bool elem_type;
+      typedef cbool elem_type;
 
       static inline
       const std::vector <const char *>
@@ -709,15 +750,19 @@ modify_kernel        ( std::string const &       source,
   /*******************
    ** includes (II) **
    *******************/
-   
+
   // ocl
+//# include "oclViennaClObject.hpp"
   # include "oclFunctionObject.hpp"
   # include "oclDataObject.hpp"
   # include "oclKernelObject.hpp"
-  # include "oclViennaClObject.hpp"
   # include "oclAsyncKernelObject.hpp"
   # include "oclAMDBlasObject.hpp"
   
+# ifdef __USE_VIENNA_CL__
+  template <class T, class S>
+  class oclViennaClObject;
+#endif
   
 
   /**************************************
@@ -781,13 +826,7 @@ modify_kernel        ( std::string const &       source,
   {
   
     if (mp_inst == NULL)
-      mp_inst = new oclConnection ( "./src/matrix/ocl/kernels/A_kernels.cl",
-                                    "./src/matrix/ocl/kernels/AB_kernels.cl",
-                                    "./src/matrix/ocl/kernels/complex_A_kernels.cl",
-                                    "./src/matrix/ocl/kernels/complex_AB_kernels.cl",
-                                    "./src/matrix/ocl/kernels/mixed_A_kernels.cl",
-                                    "./src/matrix/ocl/kernels/mixed_AB_kernels.cl",
-                                    CL_DEVICE_TYPE_GPU,
+      mp_inst = new oclConnection ( CL_DEVICE_TYPE_GPU,
                                     global_verbosity [OCL_CONNECTION] );
       
     return mp_inst;
@@ -804,10 +843,10 @@ modify_kernel        ( std::string const &       source,
   setKernelArg            (      int              num,
                            const oclDataObject *  p_arg)
   {
-  
+
     // register kernel argument
-    m_error = mp_actKernel -> setArg (num, * p_arg -> getBuffer ());
-    
+    m_error = mp_actKernel -> setArg (num, p_arg -> getUploadSize(), p_arg -> getBuffer ());
+
     print_optional (" -!-> setKernelArg: ", errorString (m_error), m_verbose);
   
   }
@@ -963,7 +1002,7 @@ modify_kernel        ( std::string const &       source,
   template <class T, class S>
   oclFunctionObject * const
   oclConnection ::
-  makeFunctionObject    (const        string &               kernel_name,
+  makeFunctionObject    (const   std::string &               kernel_name,
                                oclDataObject * const * const        args, const      int &  num_args,
                          const    KernelType                 kernel_type, const SyncType   sync_type)
   {
@@ -989,6 +1028,39 @@ modify_kernel        ( std::string const &       source,
   }
   
   
+    // create function object for running an OpenCL kernel
+  template <class T, class S>
+  oclFunctionObject * const
+  oclConnection ::
+  makeFunctionObject    (const std::vector  <std::string> &               kernel_names,
+                               oclDataObject              * const * const         args,
+                         const           int              &                   num_args,
+                         const    KernelType                               kernel_type,
+                         const      SyncType                                 sync_type)
+  {
+    
+    oclFunctionObject * kernel_obj;
+   
+    if (kernel_type == KERNEL)
+    {
+    
+      if (sync_type == SYNC)
+      {
+        kernel_obj = new oclKernelObject (kernel_names, args, num_args);
+      }
+      else
+      {
+        kernel_obj = new oclAsyncKernelObject (kernel_names[1], args, num_args);
+      }
+
+    }
+    
+    return kernel_obj;
+    
+  }
+  
+  
+# ifdef __USE_VIENNA_CL__
   // create function object for running an ViennaCL algorithm
   template <class T, class S>
   oclFunctionObject * const
@@ -1021,7 +1093,8 @@ modify_kernel        ( std::string const &       source,
     return algo_obj;
     
   }
-
+# endif
+  
 
   // create function object for running an ViennaCL algorithm
   template <class T, class S>
@@ -1079,7 +1152,7 @@ modify_kernel        ( std::string const &       source,
     if (tmp_it == m_current_ocl_objects.end ())
     {
 
-      stringstream msg;
+      std::stringstream msg;
       msg << "oclDataObject (" << obj_id << ") does not exist!";
 
       throw oclError (msg.str (), "oclConnection :: createBuffer");
@@ -1093,7 +1166,7 @@ modify_kernel        ( std::string const &       source,
     if (p_tmp_obj -> getMemState ())
     {
     
-      stringstream msg;
+      std::stringstream msg;
       msg << "oclDataObject (" << obj_id << ") already has a GPU buffer!";
       
       throw oclError (msg.str (), "oclConnection :: createBuffer");
@@ -1101,15 +1174,23 @@ modify_kernel        ( std::string const &       source,
     }
 
     // create buffer object
-    p_tmp_obj -> setBuffer (new clBuffer (m_cont, CL_MEM_READ_WRITE, size, cpu_arg, &m_error));
+    try {
+    	p_tmp_obj -> setBuffer (new clBuffer (m_cont, CL_MEM_READ_WRITE, size, NULL, &m_error));
+    }
+    catch (cl::Error & cle)
+    {
+    	if (cpu_arg == NULL)
+    		std::cout << " jojojo NULL " << std::endl;
+    	throw oclError (cle.err(), "oclConnection :: createBuffer");
+    }
     print_optional (" -!-> createBuffer: ", errorString (m_error), m_verbose);
-      
+    
     // add to buffer list
     m_current_buffers.insert (std::pair <clBuffer *, int> (p_tmp_obj -> getBuffer (), 1));
         
     // add data object to list of loaded objects
     m_loaded_ocl_objects.push_back (obj_id);
-      
+    
   }
   
   
@@ -1120,7 +1201,7 @@ modify_kernel        ( std::string const &       source,
    * @param             size    ... in bytes
    */
   template <class T>
-  void
+  double
   oclConnection ::
   loadToGPU             (       T   * const cpu_arg,
                          ::size_t           size,
@@ -1135,8 +1216,12 @@ modify_kernel        ( std::string const &       source,
                    
       try {
 
-        m_error = it -> enqueueWriteBuffer (*buffer, CL_FALSE, 0, size, cpu_arg, NULL, NULL);
-
+        // TODO: !! blocking !! //
+        double mem_time = omp_get_wtime ();
+        m_error = it -> enqueueWriteBuffer (*buffer, CL_TRUE, 0, size, cpu_arg, NULL, NULL);
+        
+        return omp_get_wtime () - mem_time;
+        
       } catch (cl::Error cle) {
 
         throw oclError (cle.err (), "oclConnection :: loadToGPU");
