@@ -273,7 +273,7 @@ public:
                 vc.push_back(x * m_ic);
 		}
 
-        if (m_verbose) {
+        if (m_verbose) { // Keep intermediate results
             size_t cpsz = numel(x);
             x = Matrix<CT> (size(x,0), size(x,1), (m_nx[0] == 3) ? size(x,2) : 1, vc.size());
             typename container<CT>::iterator ti = x.Begin();

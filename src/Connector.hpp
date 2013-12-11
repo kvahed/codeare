@@ -22,6 +22,7 @@
 #define __CONNECTOR_HPP__
 
 #include "Matrix.hpp"
+#include "tinyxml.h"
 
 namespace RRClient {
 

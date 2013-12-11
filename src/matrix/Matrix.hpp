@@ -418,7 +418,12 @@ public:
     }
 
 
+	//#include "AssignmentHandler.hpp"
     
+    //inline AssignmentHandler<T> operator[] (const int, const int) {
+
+    //}
+
     /**
      * @brief           Get pointer to memory starting at p-th (default:0) element.
      *  
@@ -1000,7 +1005,7 @@ public:
      */
     inline size_t
     Width               () const {
-        return _dim[1];
+        return (_dim.size()>1) ? _dim[1] : 1;
     }
 
 #ifdef HAVE_SCALAPACK

@@ -104,7 +104,8 @@
     inline Matrix<T,P>
     operator!           () const {
 
-        Matrix<T,P> res (_dim);
+    	assert(_dim.size() ==2);
+    	Matrix<T,P> res (_dim[1],_dim[0]);
 
 #ifdef EW_OMP
     #pragma omp parallel for
