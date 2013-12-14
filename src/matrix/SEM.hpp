@@ -37,16 +37,11 @@ E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
 
 	Matrix< std::complex<T> > out (nx[2],nx[1]);
 
-#pragma omp parallel default (shared) 
-	{
+#pragma omp parallel for 
+    for (int j = 0; j < nx[1]; j++)
+        Column (out, j, fts[omp_get_thread_num()] * (resize(((nx[0] == 2) ? Slice (sm, j) : Volume (sm, j)),size(in)) * in));
 
-#pragma omp for 
-		for (int j = 0; j < nx[1]; j++)
-			Column (out, j, fts[omp_get_thread_num()] * (resize(((nx[0] == 2) ? Slice (sm, j) : Volume (sm, j)),size(in)) * in));
-		
-	}
-
-	return out;
+    return out;
 	
 }
 
@@ -66,15 +61,10 @@ EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
 
 	Matrix< std::complex<T> > out = zeros< std::complex<T> > (size(sm));
 
-#pragma omp parallel default (shared) 
-	{
-		
 #pragma omp for
-		for (int j = 0; j < nx[1]; j++)
-			Slice (out, j, fts[omp_get_thread_num()] ->* Column (in,j) * conj(Slice (sm, j)));
-
-	}
-
+    for (int j = 0; j < nx[1]; j++)
+        Slice (out, j, fts[omp_get_thread_num()] ->* Column (in,j) * conj(Slice (sm, j)));
+    
 	return sum (out, nx[0]);
 
 }

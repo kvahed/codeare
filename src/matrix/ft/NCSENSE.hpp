@@ -245,7 +245,7 @@ public:
         T rn, rno, xn, ts;
 		Matrix<CT> p, r, x, q;
 		vector<T> res;
-        std::vector< Matrix<cxfl> > vc;
+        std::vector<Matrix<cxfl> > vc;
 
 		p  = EH (m, sens, m_nx, m_fts) * m_ic;
 		r  = p;
