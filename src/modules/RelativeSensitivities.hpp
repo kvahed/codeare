@@ -333,7 +333,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	printf ("exporting ... "); fflush(stdout);
 	
 	if (!std::system(NULL))
-		return FATAL_SYSTEM_CALL;
+	  return codeare::FATAL_SYSTEM_CALL;
 	
 	// Call bet
 	printf ("bet2ing ... "); fflush(stdout);
