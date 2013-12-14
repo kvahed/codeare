@@ -26,7 +26,7 @@
 
 using namespace RRStrategy;
 
-error_code
+codeare::error_code
 CompressedSensing::Init () {
 
 	printf ("Intialising CompressedSensing ...\n");
@@ -77,12 +77,12 @@ CompressedSensing::Init () {
 	m_initialised = true;
 	printf ("... done.\n\n");
 
-	return OK;
+	return codeare::OK;
 
 }
 
 
-error_code
+codeare::error_code
 CompressedSensing::Process () {
 
 	float ma;
@@ -146,7 +146,7 @@ CompressedSensing::Process () {
 
     wspace.Add ("im_dc", im_dc);
 
-    return OK;
+    return codeare::OK;
 
 }
 
@@ -158,8 +158,8 @@ CompressedSensing::CompressedSensing() :
 CompressedSensing::~CompressedSensing() {}
 
 
-error_code
-CompressedSensing::Finalise() {return OK;}
+codeare::error_code
+CompressedSensing::Finalise() {return codeare::OK;}
 
 
 // the class facxflories

@@ -27,7 +27,6 @@
 #include "FFTWTraits.hpp"
 
 #include <iterator>
-#include <omp.h>
 
 
 

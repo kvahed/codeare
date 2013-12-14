@@ -79,21 +79,21 @@ namespace RRStrategy {
         /**
          * @brief Process
          */
-        virtual error_code
+        virtual codeare::error_code
         Process ();
 
         
         /**
          * @brief Initialise
          */
-        virtual error_code
+        virtual codeare::error_code
         Init ();
         
 
         /**
          * @brief Finalise
          */
-        virtual error_code
+        virtual codeare::error_code
         Finalise ();
 
 

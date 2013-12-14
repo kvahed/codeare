@@ -26,6 +26,7 @@
 /**
  * Returned error codes 
  */
+namespace codeare {
 enum error_code   {
 	
 	OK,
@@ -54,7 +55,7 @@ enum error_code   {
 	GENERAL_IO_ERROR
 
 };
-
+}
 enum coords {
 	X,
 	Y,

@@ -54,28 +54,28 @@ namespace RRStrategy {
 		/**
 		 * @brief Initialise reco
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Init ();
 		
 
 		/**
 		 * @brief (Re-)prepare module
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Prepare ();
 
 		
 		/**
 		 * @brief Process data
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Process ();
 
 		
 		/**
 		 * @brief Clean up
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Finalise ();
 		
 

@@ -318,7 +318,7 @@ CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk,
 		
 	} else 
 
-		printf ("OK\n\n");
+		printf ("codeare::OK\n\n");
 
 	return amps_ok;
 	
@@ -342,12 +342,12 @@ KTPoints::KTPoints  () :
 KTPoints::~KTPoints ()     {}
 
 
-error_code
+codeare::error_code
 KTPoints::Init      ()     {
 
     printf ("Intialising KTPoints ...\n");
     
-    error_code e = OK;
+    codeare::error_code e = codeare::OK;
     
     // rf pulse durations --------------------
     /*
@@ -401,15 +401,15 @@ KTPoints::Init      ()     {
 }
 
 
-error_code
+codeare::error_code
 KTPoints::Finalise  ()     {
 
-    return OK;
+    return codeare::OK;
 
 }
 
 
-error_code
+codeare::error_code
 KTPoints::Process   ()     {
 
     printf ("Processing KTPoints ...\n");
@@ -501,7 +501,7 @@ KTPoints::Process   ()     {
     ofname << m_ptxfname << ".tra_ap";
     PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "t");
     // -----------------------------------
-    return OK;
+    return codeare::OK;
 
 }
 

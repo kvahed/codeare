@@ -68,7 +68,7 @@ namespace RRStrategy {
 		 *
 		 * @return      Success
 		 */ 
-		virtual error_code
+		virtual codeare::error_code
 		Process         () = 0;
 		
 
@@ -77,7 +77,7 @@ namespace RRStrategy {
 		 *
 		 * @return      Success
 		 */ 
-		virtual error_code
+		virtual codeare::error_code
 		Init            () = 0;
 		
 
@@ -86,9 +86,9 @@ namespace RRStrategy {
 		 *
 		 * @return      Success
 		 */ 
-		virtual error_code
+		virtual codeare::error_code
 		Prepare         () { 
-			return OK; 
+			return codeare::OK; 
 		}
 		
 
@@ -119,8 +119,8 @@ namespace RRStrategy {
 		 *
 		 * @return      Success
 		 */ 
-		virtual error_code 
-		Finalise        () { return OK; };
+		virtual codeare::error_code 
+		Finalise        () { return codeare::OK; };
 	
 	
 		/**

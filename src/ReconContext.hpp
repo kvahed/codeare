@@ -68,7 +68,7 @@ namespace RRStrategy {
 		 *
 		 * @return       Success
 		 */
-		error_code
+		codeare::error_code
 		Process          ();
 		
 		
@@ -77,7 +77,7 @@ namespace RRStrategy {
 		 *
 		 * @return       Success
 		 */
-		error_code
+		codeare::error_code
 		Init             ();
 		
 		
@@ -86,7 +86,7 @@ namespace RRStrategy {
 		 *
 		 * @return       Success
 		 */
-		error_code
+		codeare::error_code
 		Prepare          ();
 		
 		
@@ -95,7 +95,7 @@ namespace RRStrategy {
 		 *
 		 * @return       Success
 		 */
-		error_code
+		codeare::error_code
 		Finalise     ();
 		
 		

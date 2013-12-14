@@ -39,7 +39,7 @@ cstest (Connector<T>* con) {
     pc     = ic.Read<cxfl>(con->GetElement("/config/data-in/pc"));
     ic.Close();
 
-	if (con->Init (test) != OK) {
+	if (con->Init (test) != codeare::OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}

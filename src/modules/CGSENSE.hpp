@@ -56,25 +56,25 @@ namespace RRStrategy {
 		/**
 		 * @brief Process conjugate gradient SENSE
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Process ();
 
 		/**
 		 * @brief Prepare conjugate gradient SENSE
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Prepare ();
 
 		/**
 		 * @brief Initialise NuFFT plans
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Init ();
 		
 		/**
 		 * @brief Clean up
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Finalise ();
 		
 	private:

@@ -49,7 +49,7 @@ syngotest (Connector<T>* rc) {
 
 	IOContext ioc (fname, SYNGOMR, READ, params);
 
-	if (ioc.Status() != OK) {
+	if (ioc.Status() != codeare::OK) {
 		printf ("\n  Couldn't initialise RawParser. Exiting!\n");
 		return false;
 	}

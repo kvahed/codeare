@@ -42,18 +42,18 @@ CGSENSE::~CGSENSE () {
 }
 
 
-error_code 
+codeare::error_code 
 CGSENSE::Finalise () {
-	return OK;
+	return codeare::OK;
 }
 
 
-error_code 
+codeare::error_code 
 CGSENSE::Init() {
 
 	printf ("Intialising CG-SENSE ...\n");
 
-	error_code error = OK; 
+	codeare::error_code error = codeare::OK; 
 
 	m_initialised = false;
 
@@ -115,10 +115,10 @@ CGSENSE::Init() {
 }
 
 
-error_code
+codeare::error_code
 CGSENSE::Prepare () {
 
-	error_code error = OK;
+	codeare::error_code error = codeare::OK;
 
 	Params cgp;
 	cgp["sens_maps"]    = std::string("sens");
@@ -146,10 +146,10 @@ CGSENSE::Prepare () {
 }
 
 
-error_code
+codeare::error_code
 CGSENSE::Process () {
 
-	error_code error = OK;
+	codeare::error_code error = codeare::OK;
     const Matrix<cxfl>& sens = Get<cxfl>("sens");
     Matrix<cxfl> data;
 

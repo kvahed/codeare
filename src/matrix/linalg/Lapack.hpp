@@ -96,7 +96,7 @@ eig2 (const Matrix<T>& m, const char& jobvl = 'N', const char& jobvr = 'N') {
 	LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, &work[0], lwork, &rwork[0], info);
     
 	// Initialize work space
-	lwork = (int) real (work[0]);
+	lwork = (int) TypeTraits<T>::Real (work[0]);
     work.resize(lwork);
     
 	// Actual Eigenvalue computation
@@ -206,7 +206,7 @@ svd2 (const Matrix<T>& IN, const char& jobz = 'N') {
 	LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0],
 			ldvt, &work[0], lwork, &rwork[0], &iwork[0], info);
 	
-	lwork = (int) real (work[0]);
+	lwork = (int) TypeTraits<T>::Real(work[0]);
 	work.resize(lwork);
     
 	// SVD
@@ -283,7 +283,7 @@ inv (const Matrix<T>& m) {
 	LapackTraits<T>::getri (N, &res[0], N, &ipiv[0], &work[0], lwork, info);
     
 	// Work memory allocation -------------
-	lwork = (int) real (work[0]);
+	lwork = (int) TypeTraits<T>::Real (work[0]);
     work.resize(lwork);
 	
 	// Inversion --------------------------
@@ -338,7 +338,7 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
     
 	LapackTraits<T>::gels (trans, M, N, nrhs, mm, lda, b, ldb, work, lwork, info);
     
-	lwork = (int) real(work[0]);
+	lwork = (int) TypeTraits<T>::Real(work[0]);
 	work.resize(lwork);
 
 	LapackTraits<T>::gels (trans, M, N, nrhs, mm, lda, b, ldb, work, lwork, info);

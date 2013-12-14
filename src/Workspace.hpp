@@ -18,8 +18,8 @@
 #endif
 
 
-typedef map<string, string[2]> reflist;
-typedef pair<string, string[2]> ref;
+typedef map<string, std::vector<std::string> > reflist;
+typedef pair<string, std::vector<std::string> > refent;
 typedef map<string, boost::any> store;
 typedef pair<string, boost::any> entry;
 
@@ -53,7 +53,7 @@ class Workspace {
 	/**
 	 * @brief        Initialise database
 	 */
-	error_code 
+	codeare::error_code 
 	Initialise       ();
 
 
@@ -62,7 +62,7 @@ class Workspace {
 	 *
 	 * @return       Success
 	 */ 
-	error_code 
+	codeare::error_code 
 	Finalise         ();
 	
 	
@@ -111,7 +111,7 @@ class Workspace {
 	template <class T> inline void
 	SetMatrix          (const std::string& name, Matrix<T>& m) {
 
-		string tag[2];
+	  std::vector<std::string> tag(2);
 		tag[0] = sha256(name);
 		tag[1] = typeid(T).name();
 
@@ -119,7 +119,7 @@ class Workspace {
 		boost::any val     = pm;
 
 		if (m_ref.find (name) == m_ref.end()) {
-			m_ref.insert (ref(name,tag));
+			m_ref.insert (refent(name,tag));
 			m_store.insert (entry(tag[0], val));
 		} else 
 
@@ -149,13 +149,13 @@ class Workspace {
 	template<class T> inline Matrix<T>&
 	AddMatrix        (const std::string& name, boost::shared_ptr< Matrix<T> > m) {
 
-		std::string tag[2];
+	  std::vector<std::string> tag(2);
 		boost::any value = m;
         
 		tag[0] = sha256(name);
 		tag[1] = typeid(T).name();
 		assert (m_ref.find (name) == m_ref.end());
-		m_ref.insert (ref(name, tag));
+		m_ref.insert (refent(name, tag));
 		m_store.insert (entry (tag[0], value));
 
         m->SetClassName(name.c_str());
@@ -176,13 +176,13 @@ class Workspace {
 	AddMatrix        (const std::string& name) {
 
 		boost::shared_ptr<Matrix<T> > m = boost::make_shared<Matrix<T> >();
-		std::string tag[2];
+		std::vector<std::string> tag(2);
 		boost::any value = m;
         
 		tag[0] = sha256(name);
 		tag[1] = typeid(T).name();
 		assert (m_ref.find (name) == m_ref.end());
-		m_ref.insert (ref(name, tag));
+		m_ref.insert (refent(name, tag));
 		m_store.insert (entry (tag[0], value));
 
         m->SetClassName(name.c_str());

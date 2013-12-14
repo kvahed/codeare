@@ -75,7 +75,7 @@ WhiteNoise () {
 }
 
 
-error_code
+codeare::error_code
 AddPseudoRandomNoise (Matrix<raw>& m, const float& max) {
 
 	SetSeed();
@@ -89,7 +89,7 @@ AddPseudoRandomNoise (Matrix<raw>& m, const float& max) {
 	
 	}
 
-	return OK;
+	return codeare::OK;
 
 }
 

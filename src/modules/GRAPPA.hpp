@@ -56,25 +56,25 @@ namespace RRStrategy {
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Process ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Init ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Prepare ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Finalise ();
 
 

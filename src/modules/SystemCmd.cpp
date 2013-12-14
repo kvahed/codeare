@@ -22,7 +22,7 @@
 
 using namespace RRStrategy;
 
-error_code 
+codeare::error_code 
 SystemCmd::Process () {
 
 	std::stringstream invoce;
@@ -31,8 +31,8 @@ SystemCmd::Process () {
 	if (std::system(NULL)) 
 		puts ("Ok");
 	else 
-		return FATAL_SYSTEM_CALL;
+	  return codeare::FATAL_SYSTEM_CALL;
 
-	return (error_code ) system (invoce.str().c_str());
+	return (codeare::error_code ) system (invoce.str().c_str());
 
 }

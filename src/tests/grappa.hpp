@@ -35,7 +35,7 @@ grappatest (Connector<T>* rc) {
 	// Outgoing
 	Matrix<cxdb> recon;   // Reconstructed unaliased O (RO, PE, PE2)
 
-	if (rc->Init (test) != OK) {
+	if (rc->Init (test) != codeare::OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}

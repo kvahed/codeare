@@ -4,7 +4,7 @@
 
 using namespace RRStrategy;
 
-error_code 
+codeare::error_code 
 SENSE::Init () {
 
 	printf ("Intialising Cartesian SENSE ...\n");
@@ -15,12 +15,12 @@ SENSE::Init () {
 
 	printf ("... done.\n\n");
 
-	return OK;
+	return codeare::OK;
 
 }
 
 
-error_code 
+codeare::error_code 
 SENSE::Prepare () {
 
 	printf ("Preparing Cartesian SENSE ...\n");
@@ -41,12 +41,12 @@ SENSE::Prepare () {
 
 	printf ("... done.\n\n");
 
-	return OK;
+	return codeare::OK;
 
 }
 
 
-error_code
+codeare::error_code
 SENSE::Process () { 
 
     SimpleTimer st ("SENSE");
@@ -56,17 +56,17 @@ SENSE::Process () {
 
     out = m_cs ->* in;
     
-	return OK;
+    return codeare::OK;
 
 }
 
 
-error_code
+codeare::error_code
 SENSE::Finalise () { 
 
 	//delete m_cs;
 
-	return OK;
+  return codeare::OK;
 
 }
 

@@ -22,7 +22,7 @@
 #include "Algos.hpp"
 
 using namespace RRStrategy;
-error_code 
+codeare::error_code 
 DumpToFile::Process () {
 
 	std::stringstream fname;
@@ -79,7 +79,7 @@ DumpToFile::Process () {
 */
 	printf ("... done\n");
 
-	return OK;
+	return codeare::OK;
 
 }
 

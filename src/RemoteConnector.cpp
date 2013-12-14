@@ -117,7 +117,7 @@ namespace RRClient {
 	
 	
 	
-	error_code
+	codeare::error_code
 	RemoteConnector::Init (const std::string& name) {
 		
 		// Prepare configuration for the journey
@@ -126,35 +126,35 @@ namespace RRClient {
 		m_rrsi->config  (temp.str().c_str());
 		
 		// Initialise back end
-        if (m_rrsi->Init (name.c_str(), m_client_id.c_str()) != OK)
-			return CANNOT_LOAD_LIBRARY;
+        if (m_rrsi->Init (name.c_str(), m_client_id.c_str()) != codeare::OK)
+	  return codeare::CANNOT_LOAD_LIBRARY;
 		
-		return (error_code)OK;
+		return (codeare::error_code)codeare::OK;
 		
 	}
 	
 	
 	
-	error_code 
+	codeare::error_code 
 	RemoteConnector::Prepare  (const std::string& name)  {
         std::string call = m_client_id + name;
-		return (error_code) m_rrsi->Prepare (call.c_str());
+		return (codeare::error_code) m_rrsi->Prepare (call.c_str());
 	}
 	
 	
 	
-	error_code 
+	codeare::error_code 
 	RemoteConnector::Process  (const std::string& name)  {
         std::string call = m_client_id + name;
-		return  (error_code) m_rrsi->Process (call.c_str());
+		return  (codeare::error_code) m_rrsi->Process (call.c_str());
 	}
 	
 	
 	
-	error_code
+	codeare::error_code
 	RemoteConnector::Finalise (const std::string& name) {
         std::string call = m_client_id + name;
-		return (error_code) m_rrsi->Finalise(call.c_str());
+		return (codeare::error_code) m_rrsi->Finalise(call.c_str());
 	}
 
 	

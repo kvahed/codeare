@@ -30,7 +30,7 @@ Queue::~Queue ()               {
 short Queue::CleanUp () {
 
 	this->Finalise();
-	return (short) OK;
+	return (short) codeare::OK;
 	
 }
 
@@ -43,12 +43,12 @@ short Queue::Init (const char* name, const char* client_id) {
 
     rc->SetConfig (m_config);
 
-	if ((rc->Init()) != OK) {
+	if ((rc->Init()) != codeare::OK) {
 		this->Finalise();
-		return CONTEXT_CONFIGURATION_FAILED;
+		return codeare::CONTEXT_CONFIGURATION_FAILED;
 	}
 
-	return (short) OK;
+	return (short) codeare::OK;
 	
 }
 
@@ -65,14 +65,14 @@ short Queue::Finalise (const char* name) {
 		
 		if (it == m_contexts.end()) {
 			Finalise ();
-			return CONTEXT_NOT_FOUND;
+			return codeare::CONTEXT_NOT_FOUND;
 		} else {
 			delete it->second;
 			m_contexts.erase(it);
 		}
 	}
 	
-	return (short) OK;
+	return (short) codeare::OK;
 	
 }
 
@@ -82,7 +82,7 @@ short Queue::Process  (const char* name)       {
 	map<string, ReconContext*>::iterator it = m_contexts.find (name);
 	
 	if (it == m_contexts.end()) 
-		return CONTEXT_NOT_FOUND;
+		return codeare::CONTEXT_NOT_FOUND;
 
 	return (short) it->second->Process();
 	
@@ -94,7 +94,7 @@ short Queue::Prepare  (const char* name)       {
 	map<string, ReconContext*>::iterator it = m_contexts.find (name);
 	
 	if (it == m_contexts.end()) 
-		return CONTEXT_NOT_FOUND;
+		return codeare::CONTEXT_NOT_FOUND;
 
 	return (short) it->second->Prepare();
 	

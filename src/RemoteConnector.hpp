@@ -132,7 +132,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
-		virtual error_code              
+		virtual codeare::error_code              
 		Process             (const std::string& name);
 		
 
@@ -143,7 +143,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
-		virtual error_code              
+		virtual codeare::error_code              
 		Prepare             (const std::string& name);
 		
 
@@ -154,7 +154,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
-		virtual error_code              
+		virtual codeare::error_code              
 		Init                (const std::string& name);
 		
 
@@ -165,7 +165,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error error
 		 */ 
-		virtual error_code              
+		virtual codeare::error_code              
 		Finalise            (const std::string& name);
 		
 

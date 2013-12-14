@@ -20,7 +20,7 @@
 
 #include "CX.hpp"
 
-error_code
+codeare::error_code
 PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<float>& grad,
 						const int& dimrf, const int& dimgr, const int& nc, 
 						const int& sampint, const float& max_rf, 
@@ -31,7 +31,7 @@ PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<float>& grad,
 	size_t ci[8] = {0, 1, 2, 3, 4, 5, 6, 7}; // Order of coils
 
 	if (fp == NULL)
-		return FILE_ACCESS_FAILED;
+	  return codeare::FILE_ACCESS_FAILED;
 	
 	// Preamble ------------------------------------------
 	
@@ -128,6 +128,6 @@ PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<float>& grad,
 
 	fclose (fp);
 	
-	return OK;
+	return codeare::OK;
 	
 }

@@ -64,7 +64,7 @@ DeleteImage (T** pp) {
 }
 
 
-error_code
+codeare::error_code
 MedianFilter_OMP::Init () {
 
 	printf ("Intialising MedianFilter ...\n");
@@ -86,7 +86,7 @@ MedianFilter_OMP::Init () {
 
 }
 
-error_code 
+codeare::error_code 
 MedianFilter_OMP::Process () {
 	
 	ticks cgstart = getticks();
@@ -94,13 +94,13 @@ MedianFilter_OMP::Process () {
 
 	Matrix<short>& img = Get<short> (m_uname);
     if (img.Size() <= 1)
-        return OK;
+        return codeare::OK;
 
     img = medfilt2 (img, m_wh, m_ww);
     
 	printf ("... done. WTime: %.4f seconds.\n\n", elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
-	return OK;
+	return codeare::OK;
 
 }
 

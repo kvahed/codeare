@@ -23,19 +23,19 @@
 
 using namespace RRStrategy;
 
-error_code
+codeare::error_code
 GRAPPA::Init () {
 
 	printf ("  Initialising %s ...\n", Name());
 
 
 	printf ("  ... done.\n\n");
-	return OK;
+	return codeare::OK;
 
 }
 
 
-error_code
+codeare::error_code
 GRAPPA::Prepare     () { 
 
 	printf ("  Preparing %s ...\n", Name());
@@ -58,7 +58,7 @@ GRAPPA::Prepare     () {
 
 	printf ("  ... done.\n\n");
 
-	return OK;
+	return codeare::OK;
 	
 
 }
@@ -74,7 +74,7 @@ GRAPPA::Prepare     () {
 // m_raw:     Reconstructed k-spaces O (Nc x NKx    x NKy    x NKz)
 // ---------------------------------
 
-error_code
+codeare::error_code
 GRAPPA::Process     () { 
 
 	ticks cgstart = getticks();
@@ -87,16 +87,16 @@ GRAPPA::Process     () {
 	printf ("... done.. WTime: %.4f seconds.\n\n",
 			elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
-	return OK;
+	return codeare::OK;
 
 }
 
 
 
-error_code
+codeare::error_code
 GRAPPA::Finalise () {
 
-	return OK;
+	return codeare::OK;
 
 }
 

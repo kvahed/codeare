@@ -25,7 +25,7 @@ Workspace::Instance ()  {
 	
 }
 
-error_code
+codeare::error_code
 Workspace::Finalise () {
     
 	while (!m_ref.empty()) {
@@ -51,7 +51,7 @@ Workspace::Finalise () {
         
   	}
     
-	return OK;
+	return codeare::OK;
 	
 }
 

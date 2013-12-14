@@ -22,10 +22,10 @@
 
 using namespace RRStrategy;
 
-error_code
+codeare::error_code
 DummyRecon::Process     () { 
 
-	return OK;
+  return codeare::OK;
 
 }
 

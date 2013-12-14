@@ -48,25 +48,25 @@ namespace RRStrategy {
 		/**
 		 * @brief Process
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Process ();
 		
 		/**
 		 * @brief Prepare
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Prepare ();
 		
 		/**
 		 * @brief Initialise
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Init ();
 		
 		/**
 		 * @brief Clean up and exit
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Finalise ();
 		
 	private:

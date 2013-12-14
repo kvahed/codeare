@@ -40,7 +40,7 @@ sensetest (RRClient::Connector<T>* rc) {
 	bool         compgfm = false;
 	rc->Attribute("compgfm", &compgfm);
 
-	if (rc->Init (test) != OK) {
+	if (rc->Init (test) != codeare::OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}

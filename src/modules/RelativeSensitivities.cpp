@@ -26,7 +26,7 @@
 using namespace RRStrategy;
 
 
-error_code
+codeare::error_code
 RelativeSensitivities::Init        () {
 
     Attribute ("echo_shift", &m_echo_shift);
@@ -40,12 +40,12 @@ RelativeSensitivities::Init        () {
 	Attribute ("weigh_maps", &m_weigh_maps);
 	printf ("  Mask maps: %i\n", m_weigh_maps);
     
-    return OK;
+    return codeare::OK;
 
 }
 
 
-error_code
+codeare::error_code
 RelativeSensitivities::Process     () { 
 
     Matrix<cxfl>& data = Get<cxfl>("meas");
@@ -160,15 +160,15 @@ RelativeSensitivities::Process     () {
     // -----------------------------------------
     
     printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
-    return OK;
+    return codeare::OK;
 	
 }
 
 
-error_code
+codeare::error_code
 RelativeSensitivities::Finalise    () {
 	
-    return OK;
+    return codeare::OK;
 	
 }
 

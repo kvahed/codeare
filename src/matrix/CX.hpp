@@ -380,25 +380,24 @@ imag (const Matrix<double>& m) {
  */
 template<class T> inline static Matrix<T>
 conj (const Matrix<T>& m) {
+  return m;
+}
 	
-	Matrix<T> res = m;
-	
-	if (typeid (T) == typeid (cxfl) || typeid (T) == typeid (cxdb)) {
-
-#pragma omp parallel default (shared)
-		{
-			
+template<> inline Matrix<std::complex<float> >
+conj (const Matrix<std::complex<float> >& m) {
+	Matrix<std::complex<float> > res = m;
 #pragma omp for
-			
-			for (size_t i = 0; i < numel(m); i++)
-				res[i] = conj(res[i]);
-
-		}
-		
-	}
-
+	for (size_t i = 0; i < numel(m); i++)
+	  res[i] = std::conj(res[i]);
 	return res;
-
+}
+template<> inline Matrix<std::complex<double> >
+conj (const Matrix<std::complex<double> >& m) {
+	Matrix<std::complex<double> > res = m;
+#pragma omp for
+	for (size_t i = 0; i < numel(m); i++)
+	  res[i] = std::conj(res[i]);
+	return res;
 }
 
 

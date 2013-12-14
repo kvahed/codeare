@@ -67,19 +67,19 @@ namespace RRStrategy {
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Process ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Init ();
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual error_code
+		virtual codeare::error_code
 		Finalise ();
 
 
@@ -99,7 +99,7 @@ namespace RRStrategy {
 
 }
 
-error_code
+codeare::error_code
 SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Matrix<double>& snro, Matrix<cxfl>& shim, const bool& normalise) {
 	
 	size_t    nrxc = rxm.Dim(3);
@@ -129,10 +129,10 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 		threads  = omp_get_num_threads();
 	}
 	
-	Matrix<cxfl> m[threads]; // Combination
-	Matrix<cxfl> u[threads]; // Left-side and  O(NRX x NRX)
-	Matrix<cxfl> v[threads]; // Right-side singular vectors O(NTX, NTX)
-	Matrix<float> s[threads]; // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
+	std::vector<Matrix<cxfl> >m(threads); // Combination
+	std::vector<Matrix<cxfl> >u(threads); // Left-side and  O(NRX x NRX)
+	std::vector<Matrix<cxfl> >v(threads); // Right-side singular vectors O(NTX, NTX)
+	std::vector<Matrix<float> > s(threads); // Sorted singular values (i.e. first biggest) O (MIN(NRX,NTX));
 	
 	for (int i = 0; i < threads; i++) {
 		m[i] = Matrix<cxfl>     (nrxc, ntxc);
@@ -165,13 +165,13 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return OK;
+	return codeare::OK;
 	
 }
 
 	
 
-error_code
+codeare::error_code
 FTVolumes (Matrix<cxfl>& r) {
 	
 	ticks        tic     = getticks();
@@ -198,8 +198,8 @@ FTVolumes (Matrix<cxfl>& r) {
 	
 	// # threads plans and matrices ------
 
-	Matrix<cxfl> mr[threads];
-	fftwf_plan	  p[threads]; // Thread safety of plans
+	std::vector<Matrix<cxfl> >mr(threads);
+	std::vector<fftwf_plan>	  p(threads); // Thread safety of plans
 	
 	for (int i = 0; i < threads; i++) {
 		mr[i] = Matrix<cxfl>      (r.Dim(0), r.Dim(1), r.Dim(2));
@@ -237,13 +237,13 @@ FTVolumes (Matrix<cxfl>& r) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return OK;
+	return codeare::OK;
 	
 }
 
 
 
-error_code 
+codeare::error_code 
 RemoveOS (Matrix<cxfl>& imgs) {
 	
 	printf ("  Removing RO oversampling ... "); fflush(stdout);
@@ -263,13 +263,13 @@ RemoveOS (Matrix<cxfl>& imgs) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return OK;
+	return codeare::OK;
 		
 }
 
 
 
-error_code
+codeare::error_code
 B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	
 	printf ("  Computing b0 maps ... "); fflush(stdout);
@@ -303,7 +303,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	
 	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
-	return OK;
+	return codeare::OK;
 	
 }
 
@@ -314,7 +314,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
  *
  * @brief In-out Images/mask
  */
-error_code
+codeare::error_code
 SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	
 #ifdef HAVE_NIFTI1_IO_H
@@ -350,7 +350,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 
 #endif
     
-	return OK;	
+	return codeare::OK;	
 }
 
 

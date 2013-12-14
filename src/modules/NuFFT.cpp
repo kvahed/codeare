@@ -41,19 +41,19 @@ NuFFT::~NuFFT () {
 }
 
 
-error_code 
+codeare::error_code 
 NuFFT::Finalise () {
 
-	return OK;
+	return codeare::OK;
 
 }
 
 
 
-error_code
+codeare::error_code
 NuFFT::Init () {
 
-	error_code error = OK; 
+	codeare::error_code error = codeare::OK; 
 	m_initialised               = false;
 
 	int shots, M, dim, maxit, m, N[4];
@@ -100,10 +100,10 @@ NuFFT::Init () {
 
 }
 
-error_code 
+codeare::error_code 
 NuFFT::Prepare () {
 
-	error_code error = OK;
+	codeare::error_code error = codeare::OK;
 
 	ft.KSpace  (Get<double> ("kspace"));
 	ft.Weights (Get<double> ("weights"));
@@ -116,7 +116,7 @@ NuFFT::Prepare () {
 }
 
 
-error_code
+codeare::error_code
 NuFFT::Process () {
 
     SimpleTimer st ("NuFFT");
@@ -126,7 +126,7 @@ NuFFT::Process () {
 
 	clear (data);
 	
-	return OK;
+	return codeare::OK;
 
 }
 

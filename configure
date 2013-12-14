@@ -12077,10 +12077,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"ef552b2e\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"7bde8c0f\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Wed Oct 23 13:12:55 2013 -0700\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Fri Oct 25 15:00:18 2013 +0200\"" >>confdefs.h
 
 
 # copyright notice
@@ -24105,6 +24105,88 @@ fi
 
 # Checks for C++ libraries with name spaces
 
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lboost_thread" >&5
+$as_echo_n "checking for main in -lboost_thread... " >&6; }
+if ${ac_cv_lib_boost_thread_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lboost_thread  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_boost_thread_main=yes
+else
+  ac_cv_lib_boost_thread_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_thread_main" >&5
+$as_echo "$ac_cv_lib_boost_thread_main" >&6; }
+if test "x$ac_cv_lib_boost_thread_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBBOOST_THREAD 1
+_ACEOF
+
+  LIBS="-lboost_thread $LIBS"
+
+else
+  as_fn_error $? "cannot find ismrmrd_hdf5.h, bailing out" "$LINENO" 5
+fi
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lboost_system" >&5
+$as_echo_n "checking for main in -lboost_system... " >&6; }
+if ${ac_cv_lib_boost_system_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lboost_system  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_boost_system_main=yes
+else
+  ac_cv_lib_boost_system_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_system_main" >&5
+$as_echo "$ac_cv_lib_boost_system_main" >&6; }
+if test "x$ac_cv_lib_boost_system_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBBOOST_SYSTEM 1
+_ACEOF
+
+  LIBS="-lboost_system $LIBS"
+
+else
+  as_fn_error $? "cannot find ismrmrd_hdf5.h, bailing out" "$LINENO" 5
+fi
+
 
 # ISMRMRD
 
@@ -24139,97 +24221,6 @@ done
 
 
 	OLD_LIBS=$LIBS
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_thread" >&5
-$as_echo_n "checking for exit in -lboost_thread... " >&6; }
-if ${ac_cv_lib_boost_thread_exit+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lboost_thread  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char exit ();
-int
-main ()
-{
-return exit ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_boost_thread_exit=yes
-else
-  ac_cv_lib_boost_thread_exit=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_thread_exit" >&5
-$as_echo "$ac_cv_lib_boost_thread_exit" >&6; }
-if test "x$ac_cv_lib_boost_thread_exit" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBBOOST_THREAD 1
-_ACEOF
-
-  LIBS="-lboost_thread $LIBS"
-
-fi
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lboost_system" >&5
-$as_echo_n "checking for exit in -lboost_system... " >&6; }
-if ${ac_cv_lib_boost_system_exit+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lboost_system  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char exit ();
-int
-main ()
-{
-return exit ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_boost_system_exit=yes
-else
-  ac_cv_lib_boost_system_exit=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_boost_system_exit" >&5
-$as_echo "$ac_cv_lib_boost_system_exit" >&6; }
-if test "x$ac_cv_lib_boost_system_exit" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBBOOST_SYSTEM 1
-_ACEOF
-
-  LIBS="-lboost_system $LIBS"
-
-fi
-
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for IsmrmrdDataset in -lismrmrd" >&5
 $as_echo_n "checking for IsmrmrdDataset in -lismrmrd... " >&6; }

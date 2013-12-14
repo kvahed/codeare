@@ -43,7 +43,7 @@ cgsensetest (RRClient::Connector<T>* rc) {
 
     rc->SetAttribute ("hans", 10.0);
     
-    if (rc->Init (test) != OK) {
+    if (rc->Init (test) != codeare::OK) {
         printf ("Intialising failed ... bailing out!"); 
         return false;
     }

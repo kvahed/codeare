@@ -69,7 +69,7 @@ dmtest (Connector<T>* rc) {
 	Read ( b0, rc->GetElement("/config/data/b0"),   base);
 
 #endif	
-	if (rc->Init (test) != OK) {
+	if (rc->Init (test) != codeare::OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}

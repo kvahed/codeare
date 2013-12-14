@@ -38,6 +38,10 @@ template<> struct TypeTraits<float> {
 	inline static const bool IsReal() {
 		return SameType<T,RT>::val;
 	}
+  inline static const RT Real (const T t) {return t;}
+  inline static const RT Imag (const T) {return 0.;}
+  inline static const RT Abs (const T t) {return t;}
+  inline static const RT Arg (const T) {return 0.;}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << boost::format("%+.4e") % t;
@@ -63,6 +67,10 @@ template<> struct TypeTraits<double> {
 	inline static const bool IsReal() {
 		return SameType<T,RT>::val;
 	}
+  inline static const RT Real (const T t) {return t;}
+  inline static const RT Imag (const T) {return 0.;}
+  inline static const RT Abs (const T t) {return t;}
+  inline static const RT Arg (const T) {return 0.;}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << boost::format("%+.4e") % t;
@@ -88,6 +96,10 @@ template<> struct TypeTraits<cxfl> {
 	inline static const bool IsReal() {
 		return SameType<T,RT>::val;
 	}
+  inline static const RT Real (const T t) {return std::real(t);}
+  inline static const RT Imag (const T t) {return std::imag(t);}
+  inline static const RT Abs (const T t) {return std::abs(t);}
+  inline static const RT Arg (const T t) {return std::arg(t);}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << boost::format("%+.4e+1i*%+.4e") % t.real() % t.imag();
@@ -112,6 +124,10 @@ template<> struct TypeTraits<cxdb> {
 	inline static const bool IsReal() {
 		return SameType<T,RT>::val;
 	}
+  inline static const RT Real (const T t) {return std::real(t);}
+  inline static const RT Imag (const T t) {return std::imag(t);}
+  inline static const RT Abs (const T t) {return std::abs(t);}
+  inline static const RT Arg (const T t) {return std::arg(t);}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << boost::format("%+.4e+1i*%+.4e") % t.real() % t.imag();

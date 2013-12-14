@@ -53,25 +53,25 @@ ReconContext::ReconContext (const char* name) {
 ReconContext::ReconContext     () : m_strategy(0), m_dlib(0) {}
 		
 		
-error_code
+codeare::error_code
 ReconContext::Process          () {
 	return m_strategy->Process();
 }
 
 
-error_code
+codeare::error_code
 ReconContext::Init             () {
 	return m_strategy->Init();
 }
 
 
-error_code
+codeare::error_code
 ReconContext::Prepare             () {
 	return m_strategy->Prepare();
 }
 
 
-error_code
+codeare::error_code
 ReconContext::Finalise     () {
 	return m_strategy->Finalise();
 }

@@ -36,7 +36,7 @@ class NFFT : public FT<T> {
 
 	typedef typename NFFTTraits<double>::Plan   Plan;
 	typedef typename NFFTTraits<double>::Solver Solver;
-    typedef typename std::vector<std::complex<double> >::iterator it;
+  //typedef typename std::vector<std::complex<double> >::iterator it;
     typedef typename std::complex<T> CT;
 	
 public:
@@ -87,8 +87,8 @@ public:
 		
 		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
 		
-        m_y = it((std::complex<double>*)m_iplan.y);
-        m_f = it((std::complex<double>*)m_iplan.f_hat_iter);
+        m_y = m_iplan.y;
+        m_f = m_iplan.f_hat_iter;
 
 		if (pc.Size() > 1)
 			m_have_pc = true;
@@ -299,8 +299,8 @@ private:
 	
 	bool       m_prepared;
 
-    it         m_y;
-    it         m_f;
+    fftw_complex *         m_y;
+    fftw_complex *         m_f;
 
     size_t     m_m;
 

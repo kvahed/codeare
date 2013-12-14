@@ -88,21 +88,21 @@ namespace RRStrategy {
         /**
          * @brief Do nothing 
          */
-        virtual error_code
+        virtual codeare::error_code
         Process ();
         
         
         /**
          * @brief Do nothing 
          */
-        virtual error_code 
+        virtual codeare::error_code 
         Init ();
         
         
         /**
          * @brief Do nothing 
          */
-        virtual error_code
+        virtual codeare::error_code
         Finalise ();
         
         
@@ -300,7 +300,7 @@ namespace RRStrategy {
 
         
         float     t0  = 1.0, t = 1.0, z = 0.0;
-        float     xn  = real(norm(x));
+        float     xn  = TypeTraits<cxfl>::Real(norm(x));
         float     rmse, bk, f0, f1;
         
         Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;

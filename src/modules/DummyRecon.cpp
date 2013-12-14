@@ -22,12 +22,12 @@
 
 using namespace RRStrategy;
 
-error_code
+codeare::error_code
 DummyRecon::Process     () {
 
     std::cout << wspace << std::endl;
 
-	return OK;
+	return codeare::OK;
 
 }
 

@@ -1,7 +1,7 @@
 template <class T> bool 
 dummytest (Connector<T>* rc) {
 
-    if (rc->Init (test) != OK) {
+    if (rc->Init (test) != codeare::OK) {
         printf ("Intialising failed ... bailing out!"); 
         return false;
     }

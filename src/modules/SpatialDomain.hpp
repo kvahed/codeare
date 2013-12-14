@@ -59,7 +59,7 @@ namespace RRStrategy {
 		 */
 		virtual RRSModule::error_code
 		Init () {
-			return OK;
+			return codeare::OK;
 		}
 		
 		/**
@@ -68,7 +68,7 @@ namespace RRStrategy {
 		virtual RRSModule::error_code
 		Finalise () {
 
-			return OK;
+			return codeare::OK;
 
 		}
 		
