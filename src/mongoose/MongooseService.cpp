@@ -57,12 +57,7 @@ static void Serve () {
 }
 
 MongooseService::MongooseService() {
-<<<<<<< HEAD
-  //boost::thread bt (Serve);
-=======
-    std::cout << "Starting mongoose " << std::endl;
     boost::thread bt (Serve);
->>>>>>> 4748397b63b0c1d1f93fe786f4a3d0b0b3b912d6
 }
 
 MongooseService::~MongooseService() {}
