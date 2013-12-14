@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -50,10 +51,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@USE_NFFT3_TRUE@am__append_1 = NuFFT.la CGSENSE.la 
-subdir = src/modules
+subdir = src/matrix/mri
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/config/depcomp
+	$(top_srcdir)/config/depcomp $(include_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_scalapack.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
@@ -99,115 +99,19 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(libdir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-AFI_la_DEPENDENCIES =
-am_AFI_la_OBJECTS = AFI.lo
-AFI_la_OBJECTS = $(am_AFI_la_OBJECTS)
+libcodeare_mri_la_LIBADD =
+am_libcodeare_mri_la_OBJECTS = MRI.lo
+libcodeare_mri_la_OBJECTS = $(am_libcodeare_mri_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-AFI_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(AFI_la_LDFLAGS) $(LDFLAGS) -o $@
-CGSENSE_la_DEPENDENCIES =
-am_CGSENSE_la_OBJECTS = CGSENSE.lo
-CGSENSE_la_OBJECTS = $(am_CGSENSE_la_OBJECTS)
-CGSENSE_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(CGSENSE_la_LDFLAGS) $(LDFLAGS) -o $@
-@USE_NFFT3_TRUE@am_CGSENSE_la_rpath = -rpath $(libdir)
-CompressedSensing_la_DEPENDENCIES =
-am_CompressedSensing_la_OBJECTS =  \
-	CompressedSensing_la-CompressedSensing.lo
-CompressedSensing_la_OBJECTS = $(am_CompressedSensing_la_OBJECTS)
-CompressedSensing_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+libcodeare_mri_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(CompressedSensing_la_CXXFLAGS) $(CXXFLAGS) \
-	$(CompressedSensing_la_LDFLAGS) $(LDFLAGS) -o $@
-DirectMethod_la_DEPENDENCIES =
-am_DirectMethod_la_OBJECTS = DirectMethod.lo CPUSimulator.lo
-DirectMethod_la_OBJECTS = $(am_DirectMethod_la_OBJECTS)
-DirectMethod_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(DirectMethod_la_LDFLAGS) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(libcodeare_mri_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
-DummyRecon_la_DEPENDENCIES =
-am_DummyRecon_la_OBJECTS = DummyRecon.lo
-DummyRecon_la_OBJECTS = $(am_DummyRecon_la_OBJECTS)
-DummyRecon_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(DummyRecon_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-DumpToFile_la_DEPENDENCIES =
-am_DumpToFile_la_OBJECTS = DumpToFile.lo
-DumpToFile_la_OBJECTS = $(am_DumpToFile_la_OBJECTS)
-DumpToFile_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(DumpToFile_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-am_GRAPPA_la_OBJECTS = GRAPPA.lo
-GRAPPA_la_OBJECTS = $(am_GRAPPA_la_OBJECTS)
-GRAPPA_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(GRAPPA_la_LDFLAGS) $(LDFLAGS) -o $@
-GenericRegrid_la_DEPENDENCIES =
-am_GenericRegrid_la_OBJECTS = GenericRegrid.lo
-GenericRegrid_la_OBJECTS = $(am_GenericRegrid_la_OBJECTS)
-GenericRegrid_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(GenericRegrid_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-KTPoints_la_DEPENDENCIES =
-am_KTPoints_la_OBJECTS = KTPoints.lo
-KTPoints_la_OBJECTS = $(am_KTPoints_la_OBJECTS)
-KTPoints_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(KTPoints_la_LDFLAGS) $(LDFLAGS) -o $@
-MedianFilter_OMP_la_DEPENDENCIES =
-am_MedianFilter_OMP_la_OBJECTS = MedianFilter_OMP.lo
-MedianFilter_OMP_la_OBJECTS = $(am_MedianFilter_OMP_la_OBJECTS)
-MedianFilter_OMP_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(MedianFilter_OMP_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-NuFFT_la_DEPENDENCIES =
-am_NuFFT_la_OBJECTS = NuFFT.lo
-NuFFT_la_OBJECTS = $(am_NuFFT_la_OBJECTS)
-NuFFT_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(NuFFT_la_LDFLAGS) $(LDFLAGS) -o $@
-@USE_NFFT3_TRUE@am_NuFFT_la_rpath = -rpath $(libdir)
-am__DEPENDENCIES_1 =
-RelativeSensitivities_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_RelativeSensitivities_la_OBJECTS =  \
-	RelativeSensitivities_la-RelativeSensitivities.lo
-RelativeSensitivities_la_OBJECTS =  \
-	$(am_RelativeSensitivities_la_OBJECTS)
-RelativeSensitivities_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(RelativeSensitivities_la_CXXFLAGS) $(CXXFLAGS) \
-	$(RelativeSensitivities_la_LDFLAGS) $(LDFLAGS) -o $@
-SENSE_la_DEPENDENCIES =
-am_SENSE_la_OBJECTS = SENSE.lo
-SENSE_la_OBJECTS = $(am_SENSE_la_OBJECTS)
-SENSE_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(SENSE_la_LDFLAGS) $(LDFLAGS) -o $@
-SpatialDomain_la_DEPENDENCIES =
-am_SpatialDomain_la_OBJECTS = SpatialDomain.lo
-SpatialDomain_la_OBJECTS = $(am_SpatialDomain_la_OBJECTS)
-SpatialDomain_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(SpatialDomain_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-SystemCmd_la_DEPENDENCIES =
-am_SystemCmd_la_OBJECTS = SystemCmd.lo
-SystemCmd_la_OBJECTS = $(am_SystemCmd_la_OBJECTS)
-SystemCmd_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(SystemCmd_la_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -260,27 +164,30 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(AFI_la_SOURCES) $(CGSENSE_la_SOURCES) \
-	$(CompressedSensing_la_SOURCES) $(DirectMethod_la_SOURCES) \
-	$(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
-	$(GRAPPA_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(KTPoints_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
-	$(SENSE_la_SOURCES) $(SpatialDomain_la_SOURCES) \
-	$(SystemCmd_la_SOURCES)
-DIST_SOURCES = $(AFI_la_SOURCES) $(CGSENSE_la_SOURCES) \
-	$(CompressedSensing_la_SOURCES) $(DirectMethod_la_SOURCES) \
-	$(DummyRecon_la_SOURCES) $(DumpToFile_la_SOURCES) \
-	$(GRAPPA_la_SOURCES) $(GenericRegrid_la_SOURCES) \
-	$(KTPoints_la_SOURCES) $(MedianFilter_OMP_la_SOURCES) \
-	$(NuFFT_la_SOURCES) $(RelativeSensitivities_la_SOURCES) \
-	$(SENSE_la_SOURCES) $(SpatialDomain_la_SOURCES) \
-	$(SystemCmd_la_SOURCES)
+SOURCES = $(libcodeare_mri_la_SOURCES)
+DIST_SOURCES = $(libcodeare_mri_la_SOURCES)
+RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
+	ctags-recursive dvi-recursive html-recursive info-recursive \
+	install-data-recursive install-dvi-recursive \
+	install-exec-recursive install-html-recursive \
+	install-info-recursive install-pdf-recursive \
+	install-ps-recursive install-recursive installcheck-recursive \
+	installdirs-recursive pdf-recursive ps-recursive \
+	tags-recursive uninstall-recursive
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+HEADERS = $(include_HEADERS)
+RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
+  distclean-recursive maintainer-clean-recursive
+am__recursive_targets = \
+  $(RECURSIVE_TARGETS) \
+  $(RECURSIVE_CLEAN_TARGETS) \
+  $(am__extra_recursive_targets)
+AM_RECURSIVE_TARGETS = $(am__recursive_targets:-recursive=) TAGS CTAGS \
+	distdir
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -300,7 +207,33 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
+DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+am__relativize = \
+  dir0=`pwd`; \
+  sed_first='s,^\([^/]*\)/.*$$,\1,'; \
+  sed_rest='s,^[^/]*/*,,'; \
+  sed_last='s,^.*/\([^/]*\)$$,\1,'; \
+  sed_butlast='s,/*[^/]*$$,,'; \
+  while test -n "$$dir1"; do \
+    first=`echo "$$dir1" | sed -e "$$sed_first"`; \
+    if test "$$first" != "."; then \
+      if test "$$first" = ".."; then \
+        dir2=`echo "$$dir0" | sed -e "$$sed_last"`/"$$dir2"; \
+        dir0=`echo "$$dir0" | sed -e "$$sed_butlast"`; \
+      else \
+        first2=`echo "$$dir2" | sed -e "$$sed_first"`; \
+        if test "$$first2" = "$$first"; then \
+          dir2=`echo "$$dir2" | sed -e "$$sed_rest"`; \
+        else \
+          dir2="../$$dir2"; \
+        fi; \
+        dir0="$$dir0"/"$$first"; \
+      fi; \
+    fi; \
+    dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
+  done; \
+  reldir="$$dir2"
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
@@ -454,69 +387,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/matrix/ft -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/matrix/arithmetic -I$(top_srcdir)/src/matrix/interp -I$(top_srcdir)/src/misc 
-EXTRA_DIST = GPUSimulator.cl
-
-# Rules for recon strategies
-lib_LTLIBRARIES = DummyRecon.la DumpToFile.la GenericRegrid.la \
-	MedianFilter_OMP.la SystemCmd.la SpatialDomain.la KTPoints.la \
-	GRAPPA.la DirectMethod.la AFI.la SENSE.la CompressedSensing.la \
-	RelativeSensitivities.la $(am__append_1)
-
-# Common linker flags
-COMMON_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
-
-# Libraries
-DummyRecon_la_SOURCES = DummyRecon.hpp DummyRecon.cpp
-DummyRecon_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-DummyRecon_la_LIBADD = $(COMMON_la_LIBADD)
-GenericRegrid_la_SOURCES = GenericRegrid.hpp GenericRegrid.cpp
-GenericRegrid_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-GenericRegrid_la_LIBADD = $(COMMON_la_LIBADD)
-MedianFilter_OMP_la_SOURCES = MedianFilter_OMP.hpp MedianFilter_OMP.cpp
-MedianFilter_OMP_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-MedianFilter_OMP_la_LIBADD = $(COMMON_la_LIBADD)
-NuFFT_la_SOURCES = NuFFT.hpp NuFFT.cpp
-NuFFT_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3
-NuFFT_la_LIBADD = $(COMMON_la_LIBADD)
-DumpToFile_la_SOURCES = DumpToFile.hpp DumpToFile.cpp
-DumpToFile_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-DumpToFile_la_LIBADD = $(COMMON_la_LIBADD)
-SENSE_la_SOURCES = SENSE.hpp SENSE.cpp ../matrix/CSENSE.hpp
-SENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-SENSE_la_LIBADD = $(COMMON_la_LIBADD)
-CGSENSE_la_SOURCES = CGSENSE.hpp CGSENSE.cpp Noise.hpp ../matrix/NCSENSE.hpp ../matrix/SEM.hpp
-CGSENSE_la_LDFLAGS = $(COMMON_la_LDFLAGS) -lnfft3 $(BLAS) $(LAPACK)
-CGSENSE_la_LIBADD = $(COMMON_la_LIBADD)
-SystemCmd_la_SOURCES = SystemCmd.hpp SystemCmd.cpp
-SystemCmd_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-SystemCmd_la_LIBADD = $(COMMON_la_LIBADD)
-GRAPPA_la_SOURCES = ../matrix/ft/CGRAPPA.hpp GRAPPA.hpp GRAPPA.cpp
-GRAPPA_la_DEPENDENCIES = 
-GRAPPA_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-GRAPPA_la_LIBADD = $(COMMON_la_LIBADD)
-SpatialDomain_la_SOURCES = SpatialDomain.hpp SpatialDomain.cpp
-SpatialDomain_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-SpatialDomain_la_LIBADD = $(COMMON_la_LIBADD)
-KTPoints_la_SOURCES = KTPoints.hpp KTPoints.cpp
-KTPoints_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-KTPoints_la_LIBADD = $(COMMON_la_LIBADD)
-RelativeSensitivities_la_SOURCES = RelativeSensitivities.hpp RelativeSensitivities.cpp
-RelativeSensitivities_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK) $(INSIGHT_LIB_DIR_FLAG) -llapack
-RelativeSensitivities_la_LIBADD = $(COMMON_la_LIBADD) $(INSIGHT_LIB_FLAG) 
-RelativeSensitivities_la_CXXFLAGS = $(AM_CXXFLAGS) $(INC_INSIGHT_H)
-AFI_la_SOURCES = AFI.hpp AFI.cpp
-AFI_la_LDFLAGS = $(COMMON_la_LDFLAGS)
-AFI_la_LIBADD = $(COMMON_la_LIBADD)
-CompressedSensing_la_SOURCES = CompressedSensing.hpp CompressedSensing.cpp
-CompressedSensing_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(top_srcdir)/src/matrix/dwt
-CompressedSensing_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-CompressedSensing_la_LIBADD = $(COMMON_la_LIBADD) 
-DirectMethod_la_SOURCES = DirectMethod.hpp DirectMethod.cpp SimulationStrategy.hpp SimulationContext.hpp CPUSimulator.cpp CPUSimulator.hpp #GPUSimulator.cpp GPUSimulator.hpp
-DirectMethod_la_LDFLAGS = $(COMMON_la_LDFLAGS) $(BLAS) $(LAPACK)
-DirectMethod_la_LIBADD = $(COMMON_la_LIBADD)
-CLEANFILES = RRSModule.hh RRSModuleSK.cc
-all: all-am
+SUBDIRS = tests
+AM_CPPFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/matrix/arithmetic -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/tinyxml
+lib_LTLIBRARIES = libcodeare-mri.la
+libcodeare_mri_la_SOURCES = MRI.hpp MRI.cpp
+libcodeare_mri_la_LDFLAGS = -module -avoid-version @PLUGIN_LDFLAGS@
+include_HEADERS = codeare-mri.h
+all: all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .cpp .lo .o .obj
@@ -529,9 +406,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/modules/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/matrix/mri/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/modules/Makefile
+	  $(AUTOMAKE) --gnu src/matrix/mri/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -585,36 +462,8 @@ clean-libLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-AFI.la: $(AFI_la_OBJECTS) $(AFI_la_DEPENDENCIES) $(EXTRA_AFI_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(AFI_la_LINK) -rpath $(libdir) $(AFI_la_OBJECTS) $(AFI_la_LIBADD) $(LIBS)
-CGSENSE.la: $(CGSENSE_la_OBJECTS) $(CGSENSE_la_DEPENDENCIES) $(EXTRA_CGSENSE_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CGSENSE_la_LINK) $(am_CGSENSE_la_rpath) $(CGSENSE_la_OBJECTS) $(CGSENSE_la_LIBADD) $(LIBS)
-CompressedSensing.la: $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_DEPENDENCIES) $(EXTRA_CompressedSensing_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CompressedSensing_la_LINK) -rpath $(libdir) $(CompressedSensing_la_OBJECTS) $(CompressedSensing_la_LIBADD) $(LIBS)
-DirectMethod.la: $(DirectMethod_la_OBJECTS) $(DirectMethod_la_DEPENDENCIES) $(EXTRA_DirectMethod_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(DirectMethod_la_LINK) -rpath $(libdir) $(DirectMethod_la_OBJECTS) $(DirectMethod_la_LIBADD) $(LIBS)
-DummyRecon.la: $(DummyRecon_la_OBJECTS) $(DummyRecon_la_DEPENDENCIES) $(EXTRA_DummyRecon_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(DummyRecon_la_LINK) -rpath $(libdir) $(DummyRecon_la_OBJECTS) $(DummyRecon_la_LIBADD) $(LIBS)
-DumpToFile.la: $(DumpToFile_la_OBJECTS) $(DumpToFile_la_DEPENDENCIES) $(EXTRA_DumpToFile_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(DumpToFile_la_LINK) -rpath $(libdir) $(DumpToFile_la_OBJECTS) $(DumpToFile_la_LIBADD) $(LIBS)
-GRAPPA.la: $(GRAPPA_la_OBJECTS) $(GRAPPA_la_DEPENDENCIES) $(EXTRA_GRAPPA_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(GRAPPA_la_LINK) -rpath $(libdir) $(GRAPPA_la_OBJECTS) $(GRAPPA_la_LIBADD) $(LIBS)
-GenericRegrid.la: $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_DEPENDENCIES) $(EXTRA_GenericRegrid_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(GenericRegrid_la_LINK) -rpath $(libdir) $(GenericRegrid_la_OBJECTS) $(GenericRegrid_la_LIBADD) $(LIBS)
-KTPoints.la: $(KTPoints_la_OBJECTS) $(KTPoints_la_DEPENDENCIES) $(EXTRA_KTPoints_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(KTPoints_la_LINK) -rpath $(libdir) $(KTPoints_la_OBJECTS) $(KTPoints_la_LIBADD) $(LIBS)
-MedianFilter_OMP.la: $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_DEPENDENCIES) $(EXTRA_MedianFilter_OMP_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(MedianFilter_OMP_la_LINK) -rpath $(libdir) $(MedianFilter_OMP_la_OBJECTS) $(MedianFilter_OMP_la_LIBADD) $(LIBS)
-NuFFT.la: $(NuFFT_la_OBJECTS) $(NuFFT_la_DEPENDENCIES) $(EXTRA_NuFFT_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(NuFFT_la_LINK) $(am_NuFFT_la_rpath) $(NuFFT_la_OBJECTS) $(NuFFT_la_LIBADD) $(LIBS)
-RelativeSensitivities.la: $(RelativeSensitivities_la_OBJECTS) $(RelativeSensitivities_la_DEPENDENCIES) $(EXTRA_RelativeSensitivities_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(RelativeSensitivities_la_LINK) -rpath $(libdir) $(RelativeSensitivities_la_OBJECTS) $(RelativeSensitivities_la_LIBADD) $(LIBS)
-SENSE.la: $(SENSE_la_OBJECTS) $(SENSE_la_DEPENDENCIES) $(EXTRA_SENSE_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(SENSE_la_LINK) -rpath $(libdir) $(SENSE_la_OBJECTS) $(SENSE_la_LIBADD) $(LIBS)
-SpatialDomain.la: $(SpatialDomain_la_OBJECTS) $(SpatialDomain_la_DEPENDENCIES) $(EXTRA_SpatialDomain_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(SpatialDomain_la_LINK) -rpath $(libdir) $(SpatialDomain_la_OBJECTS) $(SpatialDomain_la_LIBADD) $(LIBS)
-SystemCmd.la: $(SystemCmd_la_OBJECTS) $(SystemCmd_la_DEPENDENCIES) $(EXTRA_SystemCmd_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(SystemCmd_la_LINK) -rpath $(libdir) $(SystemCmd_la_OBJECTS) $(SystemCmd_la_LIBADD) $(LIBS)
+libcodeare-mri.la: $(libcodeare_mri_la_OBJECTS) $(libcodeare_mri_la_DEPENDENCIES) $(EXTRA_libcodeare_mri_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(libcodeare_mri_la_LINK) -rpath $(libdir) $(libcodeare_mri_la_OBJECTS) $(libcodeare_mri_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -622,22 +471,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AFI.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CGSENSE.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CPUSimulator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CompressedSensing_la-CompressedSensing.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DirectMethod.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DummyRecon.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DumpToFile.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GRAPPA.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GenericRegrid.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KTPoints.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MedianFilter_OMP.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NuFFT.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RelativeSensitivities_la-RelativeSensitivities.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SENSE.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpatialDomain.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SystemCmd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MRI.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -663,34 +497,89 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-CompressedSensing_la-CompressedSensing.lo: CompressedSensing.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(CompressedSensing_la_CXXFLAGS) $(CXXFLAGS) -MT CompressedSensing_la-CompressedSensing.lo -MD -MP -MF $(DEPDIR)/CompressedSensing_la-CompressedSensing.Tpo -c -o CompressedSensing_la-CompressedSensing.lo `test -f 'CompressedSensing.cpp' || echo '$(srcdir)/'`CompressedSensing.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/CompressedSensing_la-CompressedSensing.Tpo $(DEPDIR)/CompressedSensing_la-CompressedSensing.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='CompressedSensing.cpp' object='CompressedSensing_la-CompressedSensing.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(CompressedSensing_la_CXXFLAGS) $(CXXFLAGS) -c -o CompressedSensing_la-CompressedSensing.lo `test -f 'CompressedSensing.cpp' || echo '$(srcdir)/'`CompressedSensing.cpp
-
-RelativeSensitivities_la-RelativeSensitivities.lo: RelativeSensitivities.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(RelativeSensitivities_la_CXXFLAGS) $(CXXFLAGS) -MT RelativeSensitivities_la-RelativeSensitivities.lo -MD -MP -MF $(DEPDIR)/RelativeSensitivities_la-RelativeSensitivities.Tpo -c -o RelativeSensitivities_la-RelativeSensitivities.lo `test -f 'RelativeSensitivities.cpp' || echo '$(srcdir)/'`RelativeSensitivities.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/RelativeSensitivities_la-RelativeSensitivities.Tpo $(DEPDIR)/RelativeSensitivities_la-RelativeSensitivities.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='RelativeSensitivities.cpp' object='RelativeSensitivities_la-RelativeSensitivities.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(RelativeSensitivities_la_CXXFLAGS) $(CXXFLAGS) -c -o RelativeSensitivities_la-RelativeSensitivities.lo `test -f 'RelativeSensitivities.cpp' || echo '$(srcdir)/'`RelativeSensitivities.cpp
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-includeHEADERS: $(include_HEADERS)
+	@$(NORMAL_INSTALL)
+	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(includedir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
+	done
+
+uninstall-includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
+
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run 'make' without going through this Makefile.
+# To change the values of 'make' variables: instead of editing Makefiles,
+# (1) if the variable is set in 'config.status', edit 'config.status'
+#     (which will cause the Makefiles to be regenerated when you run 'make');
+# (2) otherwise, pass the desired values on the 'make' command line.
+$(am__recursive_targets):
+	@fail= failcom='exit 1'; \
+	for f in x $$MAKEFLAGS; do \
+	  case $$f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
+	dot_seen=no; \
+	target=`echo $@ | sed s/-recursive//`; \
+	case "$@" in \
+	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
+	  *) list='$(SUBDIRS)' ;; \
+	esac; \
+	for subdir in $$list; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    dot_seen=yes; \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	  || eval $$failcom; \
+	done; \
+	if test "$$dot_seen" = "no"; then \
+	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
+	fi; test -z "$$fail"
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
-tags: tags-am
+tags: tags-recursive
 TAGS: tags
 
 tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
 	set x; \
 	here=`pwd`; \
+	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
+	  include_option=--etags-include; \
+	  empty_fix=.; \
+	else \
+	  include_option=--include; \
+	  empty_fix=; \
+	fi; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    test ! -f $$subdir/TAGS || \
+	      set "$$@" "$$include_option=$$here/$$subdir/TAGS"; \
+	  fi; \
+	done; \
 	$(am__define_uniq_tagged_files); \
 	shift; \
 	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
@@ -703,7 +592,7 @@ tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
 	      $$unique; \
 	  fi; \
 	fi
-ctags: ctags-am
+ctags: ctags-recursive
 
 CTAGS: ctags
 ctags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
@@ -716,7 +605,7 @@ GTAGS:
 	here=`$(am__cd) $(top_builddir) && pwd` \
 	  && $(am__cd) $(top_srcdir) \
 	  && gtags -i $(GTAGS_ARGS) "$$here"
-cscopelist: cscopelist-am
+cscopelist: cscopelist-recursive
 
 cscopelist-am: $(am__tagged_files)
 	list='$(am__tagged_files)'; \
@@ -765,22 +654,48 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
+	@list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    $(am__make_dryrun) \
+	      || test -d "$(distdir)/$$subdir" \
+	      || $(MKDIR_P) "$(distdir)/$$subdir" \
+	      || exit 1; \
+	    dir1=$$subdir; dir2="$(distdir)/$$subdir"; \
+	    $(am__relativize); \
+	    new_distdir=$$reldir; \
+	    dir1=$$subdir; dir2="$(top_distdir)"; \
+	    $(am__relativize); \
+	    new_top_distdir=$$reldir; \
+	    echo " (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir="$$new_top_distdir" distdir="$$new_distdir" \\"; \
+	    echo "     am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir)"; \
+	    ($(am__cd) $$subdir && \
+	      $(MAKE) $(AM_MAKEFLAGS) \
+	        top_distdir="$$new_top_distdir" \
+	        distdir="$$new_distdir" \
+		am__remove_distdir=: \
+		am__skip_length_check=: \
+		am__skip_mode_fix=: \
+	        distdir) \
+	      || exit 1; \
+	  fi; \
+	done
 check-am: all-am
-check: check-am
-all-am: Makefile $(LTLIBRARIES)
-installdirs:
-	for dir in "$(DESTDIR)$(libdir)"; do \
+check: check-recursive
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
+installdirs: installdirs-recursive
+installdirs-am:
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
-install-exec: install-exec-am
-install-data: install-data-am
-uninstall: uninstall-am
+install: install-recursive
+install-exec: install-exec-recursive
+install-data: install-data-recursive
+uninstall: uninstall-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-am
+installcheck: installcheck-recursive
 install-strip:
 	if test -z '$(STRIP)'; then \
 	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
@@ -794,7 +709,6 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -803,99 +717,95 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-am
+clean: clean-recursive
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
-distclean: distclean-am
+distclean: distclean-recursive
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
 
-dvi: dvi-am
+dvi: dvi-recursive
 
 dvi-am:
 
-html: html-am
+html: html-recursive
 
 html-am:
 
-info: info-am
+info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-includeHEADERS
 
-install-dvi: install-dvi-am
+install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
 install-exec-am: install-libLTLIBRARIES
 
-install-html: install-html-am
+install-html: install-html-recursive
 
 install-html-am:
 
-install-info: install-info-am
+install-info: install-info-recursive
 
 install-info-am:
 
 install-man:
 
-install-pdf: install-pdf-am
+install-pdf: install-pdf-recursive
 
 install-pdf-am:
 
-install-ps: install-ps-am
+install-ps: install-ps-recursive
 
 install-ps-am:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-am
+maintainer-clean: maintainer-clean-recursive
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-am
+mostlyclean: mostlyclean-recursive
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-pdf: pdf-am
+pdf: pdf-recursive
 
 pdf-am:
 
-ps: ps-am
+ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-libLTLIBRARIES
+uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES
 
-.MAKE: install-am install-strip
+.MAKE: $(am__recursive_targets) install-am install-strip
 
-.PHONY: CTAGS GTAGS TAGS all all-am check check-am clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool cscopelist-am ctags \
-	ctags-am distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
+.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am check \
+	check-am clean clean-generic clean-libLTLIBRARIES \
+	clean-libtool cscopelist-am ctags ctags-am distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-includeHEADERS install-info \
 	install-info-am install-libLTLIBRARIES install-man install-pdf \
 	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-libLTLIBRARIES
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-includeHEADERS uninstall-libLTLIBRARIES
 
-
-# Add idl to dependencies.
-../%.hh: ../%.idl
-	omniidl -bcxx $<
-../%SK.cc: ../%.idl
-	omniidl -bcxx $<
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

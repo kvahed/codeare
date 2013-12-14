@@ -26,7 +26,7 @@
 #        define VECTOR_TYPE(A) std::valarray<A>
 #        define VECTOR_CONSTR(A,B) std::valarray<A>(B)
 #    else
-#        include "AlignmentAllocator.hpp"
+#        include "simd/AlignmentAllocator.hpp"
 #        if defined __AVX__
 #            define ALIGNEMENT 32
 #        elif defined __SSE2__

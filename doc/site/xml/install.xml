@@ -16,7 +16,8 @@
         libboost-dev libboost-system-dev libboost-thread-dev \
         libboost-program-options-dev libnifti-dev liblapack-dev \
         libgsl0-dev omniorb-nameserver libomniorb4-dev omniidl \
-        libatlas-dev autoconf libtool libinsighttoolkit3-dev 
+        libatlas-dev libatlas-base-dev autoconf libtool \
+	libinsighttoolkit3-dev  
     </pre>
 
     <h3>HDF5 (&gt;=1.8)</h3>

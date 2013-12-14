@@ -420,15 +420,19 @@ AC_ARG_WITH(fftw,   [  --with-fftw             	     Set directory of FFTW3 libr
 case $host in
     *linux-gnu*)
 	    LIBEXT=so
+        LIBPATH=LD_LIBRARY_PATH
     ;;
     *darwin*)
 	    LIBEXT=dylib
+        LIBPATH=DYLD_LIBRARY_PATH
     ;;
     *cygwin*)
 	    LIBEXT=dll.a
+        LIBPATH=LD_LIBRARY_PATH
     ;;
     *mingw*)
 	    LIBEXT=dll.a
+        LIBPATH=LD_LIBRARY_PATH
     ;;
 esac
 
@@ -914,6 +918,6 @@ AC_CONFIG_FILES([src/Loader.hpp Makefile src/Makefile src/modules/Makefile src/t
  src/matrix/dwt/Makefile src/matrix/dwt/tests/Makefile src/matrix/io/tests/Makefile
  src/matrix/mpi/Makefile src/matrix/mpi/tests/Makefile src/matrix/interp/Makefile
  src/matrix/interp/tests/Makefile src/matrix/unwrap/Makefile src/matrix/unwrap/tests/Makefile 
- src/mongoose/Makefile])
+ src/mongoose/Makefile src/matrix/mri/Makefile src/matrix/mri/tests/Makefile])
 AC_OUTPUT
 

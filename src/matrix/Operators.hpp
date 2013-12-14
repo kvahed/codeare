@@ -14,33 +14,13 @@
 
     
     /**
-     * @brief           Assignment operator. i.e. this = m.
-     *
-     * @param  M        The assigned matrix.
-     */
-    inline Matrix<T,P>&
-    operator=           (const Matrix<T,P>& M) {
-
-        if (this != &M) {
-			_dim = M._dim;
-			_dsz = M._dsz;
-			_res = M._res;
-	        _M   = M._M;
-        }
-
-        return *this;
-
-    }
-
-
-    /**
      * @brief           Assignment data
      *
      * @param  v        Data vector (size must match numel(M)).
      */
     inline Matrix<T,P>&
     operator=           (const container<T>& v) {
-        
+
     	assert (_M.size() == v.size());
 
         if (&_M != &v)
@@ -49,9 +29,9 @@
         return *this;
 
     }
-    
-    
-    
+
+
+
     /**
      * @brief           Assignment operator. Sets all elements s.
      *
@@ -124,7 +104,8 @@
     inline Matrix<T,P>
     operator!           () const {
 
-        Matrix<T,P> res (_dim);
+    	assert(_dim.size() ==2);
+    	Matrix<T,P> res (_dim[1],_dim[0]);
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -268,7 +249,7 @@
     inline Matrix<cbool>
     operator!=          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
         Matrix<cbool> res(_dim,_res);
 #ifdef EW_OMP
@@ -290,7 +271,7 @@
     inline Matrix<cbool>
     operator>=          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
         Matrix<cbool> res(_dim);
 
@@ -314,7 +295,7 @@
     inline Matrix<cbool>
     operator<=          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
         Matrix<cbool> res(_dim);
 
@@ -338,7 +319,7 @@
     inline Matrix<cbool>
     operator>           (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
         Matrix<cbool> res(_dim,_res);
 
@@ -362,7 +343,7 @@
     inline Matrix<cbool>
     operator<           (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
         Matrix<cbool> res(_dim,_res);
 
@@ -386,7 +367,7 @@
     inline Matrix<cbool>
     operator||          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
         Matrix<cbool> res(_dim);
 
@@ -410,6 +391,8 @@
      */
     inline Matrix<cbool>
     operator&&          (const Matrix<T,P>& M) const {
+
+        assert (_dim == M._dim);
 
         Matrix<cbool> res(_dim);
 
@@ -520,7 +503,7 @@
     inline Matrix<T,P>&
     operator+=         (const Matrix<T,P>& M) {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
 #if defined USE_VALARRAY
         _M += M.Container();        
@@ -554,7 +537,7 @@
     template <class S> inline Matrix<T,P>&
     operator+=         (const Matrix<S,P>& M) {
 
-        assert (Size() == M.Size());
+        assert (_dim == M.Dim());
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -646,7 +629,7 @@
     inline Matrix<T,P>&
     operator-=         (const Matrix<T,P>& M) {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
 #if defined USE_VALARRAY
         _M -= M.Container();
@@ -680,7 +663,7 @@
     template <class S> inline Matrix<T,P>&
     operator-=          (const Matrix<S,P>& M) {
 
-        assert (Size() == M.Size());
+        assert (_dim == M.Dim());
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -775,7 +758,7 @@
     inline Matrix<T,P>&
     operator*=         (const Matrix<T,P>& M) {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
 #if defined USE_VALARRAY
         _M *= M.Container();
@@ -809,7 +792,7 @@
     template <class S> inline Matrix<T,P>&
     operator*=         (const Matrix<S,P>& M) {
 
-        assert (Size() == M.Size());
+        assert (_dim == M.Dim());
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -836,7 +819,7 @@
 #ifdef EW_OMP
     #pragma omp parallel for
 		for (size_t i = 0; i < Size(); ++i)
-			_M[i] += t;
+			_M[i] += s;
 #else
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),s));
 #endif
@@ -900,7 +883,7 @@
     inline Matrix<T,P>&
     operator/=         (const Matrix<T,P>& M) {
 
-        assert (Size() == M.Size());
+        assert (_dim == M._dim);
 
 #if defined USE_VALARRAY
         _M /= M.Container();
@@ -934,7 +917,7 @@
     template <class S> inline Matrix<T,P>&
     operator/=         (const Matrix<S,P> &M) {
 
-        assert (Size() == M.Size());
+        assert (_dim == M.Dim());
 
 #ifdef EW_OMP
     #pragma omp parallel for

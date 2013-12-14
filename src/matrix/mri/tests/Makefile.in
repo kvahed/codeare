@@ -49,11 +49,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-TESTS = t_chol$(EXEEXT) t_svd$(EXEEXT) t_inv$(EXEEXT) t_pinv$(EXEEXT) \
-	t_gemm$(EXEEXT) t_gemv$(EXEEXT) t_norm$(EXEEXT) t_dot$(EXEEXT) \
-	t_eig$(EXEEXT)
+TESTS = t_phase_combine$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
-subdir = src/matrix/linalg/tests
+subdir = src/matrix/mri/tests
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/config/depcomp $(top_srcdir)/config/test-driver
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -74,68 +72,22 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__EXEEXT_1 = t_chol$(EXEEXT) t_svd$(EXEEXT) t_inv$(EXEEXT) \
-	t_pinv$(EXEEXT) t_gemm$(EXEEXT) t_gemv$(EXEEXT) \
-	t_norm$(EXEEXT) t_dot$(EXEEXT) t_eig$(EXEEXT)
-am__objects_1 =
-am_t_chol_OBJECTS = $(am__objects_1) t_chol.$(OBJEXT)
-t_chol_OBJECTS = $(am_t_chol_OBJECTS)
-t_chol_LDADD = $(LDADD)
+am__EXEEXT_1 = t_phase_combine$(EXEEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+am__objects_1 = ../../../Workspace.$(OBJEXT) \
+	../../../Toolbox.$(OBJEXT)
+am_t_phase_combine_OBJECTS = $(am__objects_1) \
+	t_phase_combine.$(OBJEXT)
+t_phase_combine_OBJECTS = $(am_t_phase_combine_OBJECTS)
+t_phase_combine_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-t_chol_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(t_chol_LDFLAGS) $(LDFLAGS) -o $@
-am_t_dot_OBJECTS = $(am__objects_1) t_dot.$(OBJEXT)
-t_dot_OBJECTS = $(am_t_dot_OBJECTS)
-t_dot_LDADD = $(LDADD)
-t_dot_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(t_dot_LDFLAGS) $(LDFLAGS) -o $@
-am_t_eig_OBJECTS = $(am__objects_1) t_eig.$(OBJEXT)
-t_eig_OBJECTS = $(am_t_eig_OBJECTS)
-t_eig_LDADD = $(LDADD)
-t_eig_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(t_eig_LDFLAGS) $(LDFLAGS) -o $@
-am_t_gemm_OBJECTS = $(am__objects_1) t_gemm.$(OBJEXT)
-t_gemm_OBJECTS = $(am_t_gemm_OBJECTS)
-t_gemm_LDADD = $(LDADD)
-t_gemm_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(t_gemm_LDFLAGS) $(LDFLAGS) -o $@
-am_t_gemv_OBJECTS = t_gemv.$(OBJEXT)
-t_gemv_OBJECTS = $(am_t_gemv_OBJECTS)
-t_gemv_LDADD = $(LDADD)
-t_gemv_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(t_gemv_LDFLAGS) $(LDFLAGS) -o $@
-am_t_inv_OBJECTS = $(am__objects_1) t_inv.$(OBJEXT)
-t_inv_OBJECTS = $(am_t_inv_OBJECTS)
-t_inv_LDADD = $(LDADD)
-t_inv_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(t_inv_LDFLAGS) $(LDFLAGS) -o $@
-am_t_norm_OBJECTS = $(am__objects_1) t_norm.$(OBJEXT)
-t_norm_OBJECTS = $(am_t_norm_OBJECTS)
-t_norm_LDADD = $(LDADD)
-t_norm_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(t_norm_LDFLAGS) $(LDFLAGS) -o $@
-am_t_pinv_OBJECTS = $(am__objects_1) t_pinv.$(OBJEXT)
-t_pinv_OBJECTS = $(am_t_pinv_OBJECTS)
-t_pinv_LDADD = $(LDADD)
-t_pinv_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(t_pinv_LDFLAGS) $(LDFLAGS) -o $@
-am_t_svd_OBJECTS = $(am__objects_1) t_svd.$(OBJEXT)
-t_svd_OBJECTS = $(am_t_svd_OBJECTS)
-t_svd_LDADD = $(LDADD)
-t_svd_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(t_svd_LDFLAGS) $(LDFLAGS) -o $@
+t_phase_combine_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(t_phase_combine_LDFLAGS) \
+	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -170,30 +122,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-AM_V_CC = $(am__v_CC_@AM_V@)
-am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
-am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
-CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CCLD = $(am__v_CCLD_@AM_V@)
-am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
-am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
-SOURCES = $(t_chol_SOURCES) $(t_dot_SOURCES) $(t_eig_SOURCES) \
-	$(t_gemm_SOURCES) $(t_gemv_SOURCES) $(t_inv_SOURCES) \
-	$(t_norm_SOURCES) $(t_pinv_SOURCES) $(t_svd_SOURCES)
-DIST_SOURCES = $(t_chol_SOURCES) $(t_dot_SOURCES) $(t_eig_SOURCES) \
-	$(t_gemm_SOURCES) $(t_gemv_SOURCES) $(t_inv_SOURCES) \
-	$(t_norm_SOURCES) $(t_pinv_SOURCES) $(t_svd_SOURCES)
+SOURCES = $(t_phase_combine_SOURCES)
+DIST_SOURCES = $(t_phase_combine_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -576,26 +506,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = $(OPENMP_CXXFLAGS) -DNVERBOSE -I../ -I../../ -I../../io -I../../../ -I../../../misc -I../../arithmetic
-COMMON = ../Matrix.hpp ../Lapack.hpp
-t_svd_SOURCES = $(COMMON) t_svd.cpp
-t_svd_LDFLAGS = $(BLAS) $(LAPACK)
-t_chol_SOURCES = $(COMMON) t_chol.cpp
-t_chol_LDFLAGS = $(BLAS) $(LAPACK)
-t_dot_SOURCES = $(COMMON) t_dot.cpp
-t_dot_LDFLAGS = $(BLAS) $(LAPACK)
-t_eig_SOURCES = $(COMMON) t_eig.cpp
-t_eig_LDFLAGS = $(BLAS) $(LAPACK)
-t_gemm_SOURCES = $(COMMON) t_gemm.cpp
-t_gemm_LDFLAGS = $(BLAS) $(LAPACK)
-t_gemv_SOURCES = $(COMVON) t_gemv.cpp
-t_gemv_LDFLAGS = $(BLAS) $(LAPACK)
-t_inv_SOURCES = $(COMMON) t_inv.cpp
-t_inv_LDFLAGS = $(BLAS) $(LAPACK)
-t_norm_SOURCES = $(COMMON) t_norm.cpp
-t_norm_LDFLAGS = $(BLAS) $(LAPACK)
-t_pinv_SOURCES = $(COMMON) t_pinv.cpp
-t_pinv_LDFLAGS = $(BLAS) $(LAPACK)
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/matrix/mri -I$(top_srcdir)/src/matrix/arithmetic -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/matrix/io
+COMMON = ../../../Workspace.cpp ../../../Toolbox.cpp
+t_phase_combine_SOURCES = $(COMMON) t_phase_combine.cpp
+t_phase_combine_LDFLAGS = $(BLAS) $(LAPACK)
 all: all-am
 
 .SUFFIXES:
@@ -609,9 +523,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/matrix/linalg/tests/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/matrix/mri/tests/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/matrix/linalg/tests/Makefile
+	  $(AUTOMAKE) --gnu src/matrix/mri/tests/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -639,49 +553,30 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-t_chol$(EXEEXT): $(t_chol_OBJECTS) $(t_chol_DEPENDENCIES) $(EXTRA_t_chol_DEPENDENCIES) 
-	@rm -f t_chol$(EXEEXT)
-	$(AM_V_CXXLD)$(t_chol_LINK) $(t_chol_OBJECTS) $(t_chol_LDADD) $(LIBS)
-t_dot$(EXEEXT): $(t_dot_OBJECTS) $(t_dot_DEPENDENCIES) $(EXTRA_t_dot_DEPENDENCIES) 
-	@rm -f t_dot$(EXEEXT)
-	$(AM_V_CXXLD)$(t_dot_LINK) $(t_dot_OBJECTS) $(t_dot_LDADD) $(LIBS)
-t_eig$(EXEEXT): $(t_eig_OBJECTS) $(t_eig_DEPENDENCIES) $(EXTRA_t_eig_DEPENDENCIES) 
-	@rm -f t_eig$(EXEEXT)
-	$(AM_V_CXXLD)$(t_eig_LINK) $(t_eig_OBJECTS) $(t_eig_LDADD) $(LIBS)
-t_gemm$(EXEEXT): $(t_gemm_OBJECTS) $(t_gemm_DEPENDENCIES) $(EXTRA_t_gemm_DEPENDENCIES) 
-	@rm -f t_gemm$(EXEEXT)
-	$(AM_V_CXXLD)$(t_gemm_LINK) $(t_gemm_OBJECTS) $(t_gemm_LDADD) $(LIBS)
-t_gemv$(EXEEXT): $(t_gemv_OBJECTS) $(t_gemv_DEPENDENCIES) $(EXTRA_t_gemv_DEPENDENCIES) 
-	@rm -f t_gemv$(EXEEXT)
-	$(AM_V_CXXLD)$(t_gemv_LINK) $(t_gemv_OBJECTS) $(t_gemv_LDADD) $(LIBS)
-t_inv$(EXEEXT): $(t_inv_OBJECTS) $(t_inv_DEPENDENCIES) $(EXTRA_t_inv_DEPENDENCIES) 
-	@rm -f t_inv$(EXEEXT)
-	$(AM_V_CXXLD)$(t_inv_LINK) $(t_inv_OBJECTS) $(t_inv_LDADD) $(LIBS)
-t_norm$(EXEEXT): $(t_norm_OBJECTS) $(t_norm_DEPENDENCIES) $(EXTRA_t_norm_DEPENDENCIES) 
-	@rm -f t_norm$(EXEEXT)
-	$(AM_V_CXXLD)$(t_norm_LINK) $(t_norm_OBJECTS) $(t_norm_LDADD) $(LIBS)
-t_pinv$(EXEEXT): $(t_pinv_OBJECTS) $(t_pinv_DEPENDENCIES) $(EXTRA_t_pinv_DEPENDENCIES) 
-	@rm -f t_pinv$(EXEEXT)
-	$(AM_V_CXXLD)$(t_pinv_LINK) $(t_pinv_OBJECTS) $(t_pinv_LDADD) $(LIBS)
-t_svd$(EXEEXT): $(t_svd_OBJECTS) $(t_svd_DEPENDENCIES) $(EXTRA_t_svd_DEPENDENCIES) 
-	@rm -f t_svd$(EXEEXT)
-	$(AM_V_CXXLD)$(t_svd_LINK) $(t_svd_OBJECTS) $(t_svd_LDADD) $(LIBS)
+../../../$(am__dirstamp):
+	@$(MKDIR_P) ../../..
+	@: > ../../../$(am__dirstamp)
+../../../$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../../../$(DEPDIR)
+	@: > ../../../$(DEPDIR)/$(am__dirstamp)
+../../../Workspace.$(OBJEXT): ../../../$(am__dirstamp) \
+	../../../$(DEPDIR)/$(am__dirstamp)
+../../../Toolbox.$(OBJEXT): ../../../$(am__dirstamp) \
+	../../../$(DEPDIR)/$(am__dirstamp)
+t_phase_combine$(EXEEXT): $(t_phase_combine_OBJECTS) $(t_phase_combine_DEPENDENCIES) $(EXTRA_t_phase_combine_DEPENDENCIES) 
+	@rm -f t_phase_combine$(EXEEXT)
+	$(AM_V_CXXLD)$(t_phase_combine_LINK) $(t_phase_combine_OBJECTS) $(t_phase_combine_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ../../../*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_chol.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_dot.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_eig.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_gemm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_gemv.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_inv.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_norm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_pinv.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_svd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../../../$(DEPDIR)/Toolbox.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../../../$(DEPDIR)/Workspace.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_phase_combine.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -906,65 +801,9 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-t_chol.log: t_chol$(EXEEXT)
-	@p='t_chol$(EXEEXT)'; \
-	b='t_chol'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-t_svd.log: t_svd$(EXEEXT)
-	@p='t_svd$(EXEEXT)'; \
-	b='t_svd'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-t_inv.log: t_inv$(EXEEXT)
-	@p='t_inv$(EXEEXT)'; \
-	b='t_inv'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-t_pinv.log: t_pinv$(EXEEXT)
-	@p='t_pinv$(EXEEXT)'; \
-	b='t_pinv'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-t_gemm.log: t_gemm$(EXEEXT)
-	@p='t_gemm$(EXEEXT)'; \
-	b='t_gemm'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-t_gemv.log: t_gemv$(EXEEXT)
-	@p='t_gemv$(EXEEXT)'; \
-	b='t_gemv'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-t_norm.log: t_norm$(EXEEXT)
-	@p='t_norm$(EXEEXT)'; \
-	b='t_norm'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-t_dot.log: t_dot$(EXEEXT)
-	@p='t_dot$(EXEEXT)'; \
-	b='t_dot'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-t_eig.log: t_eig$(EXEEXT)
-	@p='t_eig$(EXEEXT)'; \
-	b='t_eig'; \
+t_phase_combine.log: t_phase_combine$(EXEEXT)
+	@p='t_phase_combine$(EXEEXT)'; \
+	b='t_phase_combine'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -1049,6 +888,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ../../../$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../../../$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1059,7 +900,7 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ../../../$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1105,7 +946,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ../../../$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
