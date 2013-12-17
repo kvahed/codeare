@@ -22,7 +22,7 @@ IntensityMap (const Matrix< std::complex <T> >& sens, bool sqroot = true) {
 		for (size_t i = 0; i < nr; i++) {
 			
 			for (size_t j = 0; j < nc; j++)
-				res[i] += real(sens(i+j*nr) * conj(sens(i+j*nr)));
+				res[i] += real(sens(i+j*nr) * TypeTraits<std::complex<T> >::Conj(sens(i+j*nr)));
 			
 			res[i] = 1.0 / (((sqroot) ? sqrt (res[i]) : res[i]) + 1.0e-10);
 			
@@ -68,7 +68,7 @@ phase_combine (const Matrix<T>& M, const size_t d) {
 
 		for (size_t i = 0; i < outsize; ++i)
 			for (size_t j = 0; j < insize; ++j)
-				ret[i*insize + j] += sqrt(M[j] * conj(M[i*insize + j]));
+				ret[i*insize + j] += sqrt(M[j] * TypeTraits<T>::Conj(M[i*insize + j]));
 
 	}
 

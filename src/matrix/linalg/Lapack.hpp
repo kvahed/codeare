@@ -547,7 +547,7 @@ norm (const Matrix<T>& M) {
 	int n    = (int) numel (M);
 	int incx = 1;
     
-	return real(LapackTraits<T>::nrm2 (n, M.Ptr(), incx));
+	return TypeTraits<T>::Real(LapackTraits<T>::nrm2 (n, M.Ptr(), incx));
     
 }
 

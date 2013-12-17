@@ -59,16 +59,6 @@ static inline bool is_unsigned (const T t) {
 			typeid(T) == typeid(unsigned long) || typeid(T) == typeid(size_t));
 }
 
-inline double conj (double d) {return d;}
-inline float  conj (float  f) {return f;}
-inline double real (double d) {return d;}
-inline float  real (float  d) {return d;}
-inline double imag (double d) {return 0.;}
-inline float  imag (float  f) {return 0.;}
-inline double abs  (double d) {return fabs(d);}
-inline float  abs  (float  f) {return fabs(f);}
-inline double arg  (double d) {return 0.;}
-inline float  arg  (float  f) {return 0.;}
 
 template<class T>
 struct CompTraits;
