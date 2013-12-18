@@ -420,7 +420,7 @@ template <class T> inline  Matrix<T>
 resize (const Matrix<T>& M, const size_t& sc, const size_t& sl, const size_t& ss) {
 
 	Matrix<size_t> sz (3,1);
-	sz[0] = sc; sz[1] = sl; sz[2] = sc;
+	sz[0] = sc; sz[1] = sl; sz[2] = ss;
 
 	return resize (M, sz);
 	

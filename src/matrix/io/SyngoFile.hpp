@@ -19,6 +19,7 @@
 
 #include "IOFile.hpp"
 
+#include "SiemensSoda.hpp"
 #include "mdhVB15.hpp"
 
 #include <valarray>
@@ -85,7 +86,7 @@ namespace io      {
 	const size_t SYNC_HEADER_SIZE = 64;
 
 	static bool bit_set (long eim, const EIM_BIT eb) {
-		return (eim & (long)pow(2.0,(float)eb));
+		return (eim & (long)pow((float)2.,(float)eb));
 	}
 
 
@@ -189,7 +190,7 @@ namespace io      {
 			m_buffer(0), m_cur_sync(0), m_file(0), m_fod(0),
 			m_meas_col_bytes(0), m_pos(0), m_size(0) {
 
-			m_file   = fopen (fname.c_str(), "rb");
+			m_file   = ::fopen (fname.c_str(), "rb");
 
 			if (m_file == NULL) {
 				printf ("Error opening file '%s'\n", fname.c_str());
@@ -221,7 +222,7 @@ namespace io      {
 
 			m_alloc = true;
 
-			read = fread (m_buffer, sizeof(char), m_size, m_file);
+			read = ::fread (m_buffer, sizeof(char), m_size, m_file);
 
 			if (read != m_size) {
 				fputs ("Reading error", stderr);
@@ -245,7 +246,7 @@ namespace io      {
 			size_t read;
 			unsigned fod;
 
-			read = fread (&fod, sizeof(unsigned), 1, m_file);
+			read = ::fread (&fod, sizeof(unsigned), 1, m_file);
 			m_fod = (size_t) fod;
 			if (read != 1) {
 				fputs ("Reading error", stderr);
@@ -506,7 +507,7 @@ namespace io      {
 				if (m_alloc)
 					free (m_buffer);
 
-				fclose(m_file);
+				::fclose(m_file);
 
 				m_sync.Clear();
 				m_noise.Clear();

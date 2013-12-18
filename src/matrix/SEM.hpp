@@ -21,7 +21,7 @@
 #include "OMP.hpp"
 #include "Access.hpp"
 #include "NFFT.hpp"
-
+#include "HDF5File.hpp"
 /**
  * @brief Right hand side operator E (i.e. forward transform) 
  *
@@ -60,12 +60,22 @@ EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
     const std::vector<size_t>& nx, const std::vector<NFFT<T> >& fts) {
 
 	Matrix< std::complex<T> > out = zeros< std::complex<T> > (size(sm));
-
+	size_t nr = size(sm,0)*size(sm,1);
+#pragma omp parallel default (shared)
+    {
 #pragma omp for
     for (int j = 0; j < nx[1]; j++)
         Slice (out, j, fts[omp_get_thread_num()] ->* Column (in,j) * conj(Slice (sm, j)));
-    
-	return sum (out, nx[0]);
 
+    }
+
+    h5write(out,"out.h5");
+    for (size_t r = 0; r < nr; ++r)
+    	for (size_t c = 1; c < nx[1]; ++c)
+    		out[r] += out[r+c*nr];
+    out = resize (out,256,256,1);
+    //std::cout << size(out) << std::endl;
+	//return sum (out, nx[0]);
+    return out;
 }
 

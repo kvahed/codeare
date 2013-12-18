@@ -373,31 +373,49 @@ imag (const Matrix<double>& m) {
 
 
 /**
- * @brief           Complex conjugate (no transposition)
+ * @brief    Dummy for double
  *
- * @param   m       Input 
- * @return          Complex conjugate 
+ * @param  m Input
+ * @return   Imaginary part
  */
-template<class T> inline static Matrix<T>
-conj (const Matrix<T>& m) {
-  return m;
+inline static Matrix<double>
+conj (const Matrix<double>& m) {
+	return m;
 }
-	
-template<> inline Matrix<std::complex<float> >
-conj (const Matrix<std::complex<float> >& m) {
-	Matrix<std::complex<float> > res = m;
-#pragma omp for
-	for (size_t i = 0; i < numel(m); i++)
-	  res[i] = std::conj(res[i]);
-	return res;
+
+/**
+ * @brief    Dummy for double
+ *
+ * @param  m Input
+ * @return   Imaginary part
+ */
+inline static Matrix<float>
+conj (const Matrix<float>& m) {
+	return m;
 }
-template<> inline Matrix<std::complex<double> >
-conj (const Matrix<std::complex<double> >& m) {
-	Matrix<std::complex<double> > res = m;
-#pragma omp for
-	for (size_t i = 0; i < numel(m); i++)
-	  res[i] = std::conj(res[i]);
-	return res;
+/**
+ * @brief    Dummy for double
+ *
+ * @param  m Input
+ * @return   Imaginary part
+ */
+inline static Matrix<cxfl>
+conj (const Matrix<cxfl>& m) {
+	Matrix<cxfl> ret = m;
+	ret.Container() = conj(ret.Container());
+	return m;
+}
+/**
+ * @brief    Dummy for double
+ *
+ * @param  m Input
+ * @return   Imaginary part
+ */
+inline static Matrix<cxdb>
+conj (const Matrix<cxdb>& m) {
+	Matrix<cxdb> ret = m;
+	ret.Container() = conj(ret.Container());
+	return m;
 }
 
 

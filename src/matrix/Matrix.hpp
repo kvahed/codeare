@@ -437,6 +437,20 @@ public:
         return _M.ptr(p);
     }
 
+    /**
+     * @brief           Get pointer to memory starting at p-th (default:0) element.
+     *
+     * @param  p        Position
+     *
+     * @return          Data
+     */
+    inline T*
+    Ptr             (const size_t p = 0) {
+        assert (p < Size());
+        return _M.ptr(p);
+    }
+
+
     
     /**
      * @brief           Data container (lhs)
