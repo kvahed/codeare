@@ -58,38 +58,132 @@ enum    paradigm {
 };
 
 
-template <class T, paradigm P=SHM>
-class container {
+/**
+ * @brief Alligned data container for Matrix<T>
+ */
+template <class T, paradigm P=SHM> class container {
 public:
+
+    /**
+     * @brief convenience typedefs 
+     */
 	typedef typename VECTOR_TYPE(T)::iterator iterator;
 	typedef typename VECTOR_TYPE(T)::const_iterator const_iterator;
-	inline container () { _data = VECTOR_CONSTR (T,1); }
-	inline container (const size_t n) { assert(n>0); _data = VECTOR_CONSTR (T,n); }
-	inline T& operator[] (const size_t n) { return _data[n]; }
-	inline T operator[] (const size_t n) const { return _data[n]; }
-	inline T& back () { return _data.back(); }
-	inline T back () const { return _data.back; }
-	inline T& front () { return _data.front(); }
-	inline T front () const { return _data.front; }
-	inline T& at (const size_t n) { return _data.at(n); }
-	inline T at (const size_t n) const { return _data.at(n); }
-	inline const T* ptr (const size_t n = 0) const { return &_data[n]; }
-	inline T* ptr (const size_t n = 0)  { return &_data[n]; }
-	inline VECTOR_TYPE(T) data() const { return _data; }
-	inline VECTOR_TYPE(T)& data() { return _data; }
-	inline size_t size() const { return _data.size(); }
-	inline ~container () {}
-	inline iterator begin() { return _data.begin(); }
-	inline iterator end() { return _data.end(); }
-	inline const_iterator begin() const { return _data.begin(); }
-	inline const_iterator end() const { return _data.end(); }
-	inline void resize (const size_t n, const T val = T()) { assert(n>0); _data.resize(n,val); }
-	inline void push_back (const T& t) { _data.push_back(t);}
+
+    /**
+     * @brief Default constructor
+     */
+	explicit inline container () {}
+    /**
+     * @brief Construct with size
+     * @bparam  n  New size
+     */
+	explicit inline container (const size_t n) { _data = VECTOR_CONSTR (T,n); }
+    /**
+     * @brief Copy constructor from different type
+     * @param  cs  To copy
+     */
+	explicit inline container (const container<T>& cs) {
+        _data = cs._data;
+	}
+    /**
+     * @brief Copy constructor from different type
+     * @param  cs  To copy
+     */
 	template<class S> inline container (const container<S>& cs) {
 		_data.resize(cs.size());
 		for (size_t i = 0; i < _data.size(); ++i)
-			_data[i] = cs[i];
+			_data[i] = (T)cs[i];
 	}
+
+    /**
+     * @brief Default destructor 
+     */
+    inline ~container () {}
+
+    /**
+     * @brief Elementwise access (lhs)
+     * @param  n  n-th element 
+     */
+	inline T& operator[] (const size_t n) { return _data[n]; }
+    /**
+     * @brief Elementwise access (rhs)
+     * @param  n  n-th element 
+     */
+	inline const T& operator[] (const size_t n) const { return _data[n]; }
+
+    /**
+     * @brief Access last element (lhs)
+     */
+	inline T& back () { return _data.back(); }
+    /**
+     * @brief Access last element (rhs)
+     */
+	inline const T& back () const { return _data.back; }
+
+    /**
+     * @brief Access first element (lhs)
+     */
+	inline T& front () { return _data.front(); }
+    /**
+     * @brief Access first element (rhs)
+     */
+	inline const T& front () const { return _data.front; }
+
+    /**
+     * @brief Access RAM address (lhs)
+     * @param  n  at n-th element (default 0)
+     */
+	inline T* ptr (const size_t n = 0) { return &_data[n]; }
+    /**
+     * @brief Access RAM address (rhs)
+     * @param  n  at n-th element (default 0)
+     */
+	inline const T* ptr (const size_t n = 0) const { return &_data[n]; }
+
+    /**
+     * @brief Access data vector (lhs)
+     */
+	inline VECTOR_TYPE(T)& data() { return _data; }
+    /**
+     * @brief Access data vector (rhs)
+     */
+	inline const VECTOR_TYPE(T)& data() const { return _data; }
+
+    /**
+     * @brief Vector size
+     */
+	inline size_t size() const { return _data.size(); }
+
+    /**
+     * @brief Iterator at start of vector (lhs)
+     */
+	inline iterator begin() { return _data.begin(); }
+    /**
+     * @brief Iterator at start of vector (rhs)
+     */
+	inline const_iterator begin() const { return _data.begin(); }
+
+    /**
+     * @brief Iterator at end of vector (lhs)
+     */
+	inline iterator end() { return _data.end(); }
+    /**
+     * @brief Iterator at end of vector (rhs)
+     */
+	inline const_iterator end() const { return _data.end(); }
+
+    /**
+     * @brief resize data storage
+     */
+	inline void resize (const size_t n, const T val = T()) { _data.resize(n,val); }
+
+    /**
+     * @brief Add elemet at end
+     * @param t  Element to be added
+     */
+	inline void push_back (const T& t) { _data.push_back(t);}
+
 private:
 	VECTOR_TYPE(T) _data;
 };
@@ -133,12 +227,14 @@ operator<< (std::ostream& os, const container<T>& ct) {
         os << *it << " ";
     return os;
 }
-
-template<class T> inline static T multiply (const T a, const T b) {
-    return (a*b);
+template<class T> inline static T multiply (const T& a, const T& b) {
+    return a*b;
 }
 template<class T> inline static T prod (const container<T>& ct) {
 	return std::accumulate(ct.begin(), ct.end(), (T)1, multiply<T>);
+}
+template<class T> inline static T sum (const container<T>& ct) {
+	return std::accumulate(ct.begin(), ct.end(), (T)0);
 }
 
 
