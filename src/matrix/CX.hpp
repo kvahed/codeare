@@ -403,7 +403,7 @@ inline static Matrix<cxfl>
 conj (const Matrix<cxfl>& m) {
 	Matrix<cxfl> ret = m;
 	ret.Container() = conj(ret.Container());
-	return m;
+	return ret;
 }
 /**
  * @brief    Dummy for double
@@ -415,7 +415,7 @@ inline static Matrix<cxdb>
 conj (const Matrix<cxdb>& m) {
 	Matrix<cxdb> ret = m;
 	ret.Container() = conj(ret.Container());
-	return m;
+	return ret;
 }
 
 
