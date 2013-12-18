@@ -83,23 +83,11 @@ public:
      * @brief Copy constructor from different type
      * @param  cs  To copy
      */
-	explicit inline container (const container<T>& cs) {
-        _data = cs._data;
-	}
-    /**
-     * @brief Copy constructor from different type
-     * @param  cs  To copy
-     */
 	template<class S> inline container (const container<S>& cs) {
 		_data.resize(cs.size());
 		for (size_t i = 0; i < _data.size(); ++i)
 			_data[i] = (T)cs[i];
 	}
-
-    /**
-     * @brief Default destructor 
-     */
-    inline ~container () {}
 
     /**
      * @brief Elementwise access (lhs)

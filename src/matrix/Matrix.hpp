@@ -345,13 +345,6 @@ public:
 	}
 
 
-    /**
-     * @brief           Delete array containing data.
-     */
-	inline
-	~Matrix() {};
-
-
     //@}
 
 
