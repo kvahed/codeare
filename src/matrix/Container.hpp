@@ -238,5 +238,8 @@ template<class T> inline static T sum (const container<T>& ct) {
 	return std::accumulate(ct.begin(), ct.end(), (T)0);
 }
 
+template<class T> inline static void swapd (T& x,T& y) {T temp=x; x=y; y=temp;}
+
+
 
 #endif /* CONTAINER_HPP_ */

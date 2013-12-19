@@ -619,11 +619,7 @@ template <class T> inline  Matrix<T>
 transpose (const Matrix<T>& M, const bool& c = false) {
 
 	assert (is2d(M));
-	size_t m, n, i, j;
-
-	m = size(M,0);
-	n = size(M,1);
-
+	size_t m = size(M,0), n = size(M,1), i, j;
 	Matrix<T> res (n,m);
 
 	for (j = 0; j < n; ++j)
