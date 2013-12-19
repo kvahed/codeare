@@ -929,7 +929,7 @@ public:
 	#include "Operators.hpp"
 #endif
     
-
+#ifndef NO_LAPACK
     /**
      * @brief           Matrix product. i.e. this * M.
      *
@@ -980,6 +980,7 @@ public:
     inline T
     dot (const Matrix<T,P>& M) const;
     
+#endif
     /**
      * @name            Dimensions
      *                  Some convenience functions to access dimensionality
@@ -1195,7 +1196,7 @@ protected:
      */
     inline size_t
     DimProd () const {
-        return std::accumulate(_dim.begin(), _dim.end(), 1, c_multiply<size_t>);
+      return std::accumulate(_dim.begin(), _dim.end(), size_t(1), c_multiply<size_t>);
     }
 
     /**

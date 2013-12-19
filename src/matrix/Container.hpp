@@ -29,7 +29,7 @@
 #        include "simd/AlignmentAllocator.hpp"
 #        if defined __AVX__
 #            define ALIGNEMENT 32
-#        elif defined __SSE2__
+#        else
 #            define ALIGNEMENT 16
 #        endif
 #        define VECTOR_TYPE(A) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >

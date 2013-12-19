@@ -30,7 +30,7 @@ struct RandTraits;
 template <>
 struct RandTraits<float> {
     typedef float T;
-    typedef typename TypeTraits<T>::RT RT;
+    typedef TypeTraits<T>::RT RT;
     typedef boost::normal_distribution<RT> normal;
     typedef boost::random::uniform_real_distribution<RT> uniform;
     inline static RT stdmin () {return -1.0;}
@@ -43,7 +43,7 @@ struct RandTraits<float> {
 template <>
 struct RandTraits<double> {
     typedef double T;
-    typedef typename TypeTraits<T>::RT RT;
+    typedef  TypeTraits<T>::RT RT;
     typedef boost::normal_distribution<RT> normal;
     typedef boost::random::uniform_real_distribution<RT> uniform;
     inline static RT stdmin () {return -1.0;}
@@ -56,7 +56,7 @@ struct RandTraits<double> {
 template <>
 struct RandTraits<cxfl> {
     typedef cxfl T;
-    typedef typename TypeTraits<T>::RT RT;
+    typedef  TypeTraits<T>::RT RT;
     typedef boost::random::normal_distribution<RT> normal;
     typedef boost::random::uniform_real_distribution<RT> uniform;
     inline static RT stdmin () {return -1.0;}
@@ -70,7 +70,7 @@ struct RandTraits<cxfl> {
 template <>
 struct RandTraits<cxdb> {
     typedef cxdb T;
-    typedef typename TypeTraits<T>::RT RT;
+    typedef  TypeTraits<T>::RT RT;
     typedef boost::normal_distribution<RT> normal;
     typedef boost::random::uniform_real_distribution<RT> uniform;
     inline static RT stdmin () {return -1.0;}
@@ -84,7 +84,7 @@ struct RandTraits<cxdb> {
 template <>
 struct RandTraits<short> {
     typedef short T;
-    typedef typename TypeTraits<T>::RT RT;
+    typedef  TypeTraits<T>::RT RT;
     typedef boost::random::uniform_int_distribution<RT> uniform;
     typedef boost::random::uniform_int_distribution<RT> normal;
     inline static RT stdmin () {return -SHRT_MAX;}
@@ -97,7 +97,7 @@ struct RandTraits<short> {
 template <>
 struct RandTraits<long> {
     typedef long T;
-    typedef typename TypeTraits<T>::RT RT;
+    typedef  TypeTraits<T>::RT RT;
     typedef boost::random::uniform_int_distribution<RT> uniform;
     typedef boost::random::uniform_int_distribution<RT> normal;
     inline static RT stdmin () {return -LONG_MAX;}

@@ -1211,7 +1211,7 @@
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator/  (const double s, const Matrix<T,P> &m) {
+    operator/  (const T s, const Matrix<T,P> &m) {
 
         Matrix<T,P> res = m;
 #ifdef USE_VALARRAY
@@ -1226,84 +1226,6 @@
         return res;
 
     }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator/  (const float s, const Matrix<T,P> &m) {
-
-		Matrix<T,P> res = m;
-#ifdef USE_VALARRAY
-		res.Container() = s / res.Container();
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < m.Size(); ++i)
-            res[i] = s / res[i];
-#endif
-		return res;
-
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator/  (const cxfl s, const Matrix<T,P> &m) {
-
-        Matrix<T,P> res = m;
-#ifdef USE_VALARRAY
-		res.Container() = s / res.Container();
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < m.Size(); ++i)
-            res[i] = s / res[i];
-#endif
-        return res;
-
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator/  (const cxdb s, const Matrix<T,P> &m) {
-
-		Matrix<T,P> res = m;
-
-#ifdef USE_VALARRAY
-		res.Container() = s / res.Container();
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
-        for (size_t i = 0; i < m.Size(); ++i)
-            res[i] = s / res[i];
-#endif
-
-		return res;
-
-    }
-
 
     /**
      * @brief           Elementwise equality with scalar (lhs)
