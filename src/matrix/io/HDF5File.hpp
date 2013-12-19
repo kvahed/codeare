@@ -267,31 +267,30 @@ namespace io {
 
 	};
 
+}// namespace io
+}// namespace matrix
+}// namespace codeare
 
-#define h5write(X,Y) _h5write (X,Y,#X)
+
 	template<class T> inline static bool
 	_h5write (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
-
+		using namespace codeare::matrix::io;
 		HDF5File h5f (fname, WRITE);
 		h5f.Write(M, uri);
 		return true;
-
 	}
+#define h5write(X,Y) _h5write (X,Y,#X)
 
 
 	template<class T> inline static Matrix<T>
 	h5read (const std::string& fname, const std::string& uri) {
-
+		using namespace codeare::matrix::io;
 		HDF5File h5f (fname, READ);
 		return h5f.Read<T>(uri);
-
 	}
 
 
 
-}// namespace io
-}// namespace matrix
-}// namespace codeare
 
 
 #endif /* __HDF5FILE_HPP__ */

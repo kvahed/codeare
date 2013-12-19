@@ -57,7 +57,8 @@ TESTS = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) t_exp$(EXEEXT) \
 	t_ediv$(EXEEXT) t_eadd$(EXEEXT) t_esub$(EXEEXT) \
 	t_nrmse$(EXEEXT) t_epow$(EXEEXT) t_floor$(EXEEXT) \
 	t_round$(EXEEXT) t_ceil$(EXEEXT) t_size$(EXEEXT) \
-	t_resize$(EXEEXT) t_isnan$(EXEEXT) t_complex$(EXEEXT)
+	t_resize$(EXEEXT) t_isnan$(EXEEXT) t_complex$(EXEEXT) \
+	t_abs$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/matrix/arithmetic
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -88,15 +89,19 @@ am__EXEEXT_1 = t_sin$(EXEEXT) t_cos$(EXEEXT) t_tan$(EXEEXT) \
 	t_ediv$(EXEEXT) t_eadd$(EXEEXT) t_esub$(EXEEXT) \
 	t_nrmse$(EXEEXT) t_epow$(EXEEXT) t_floor$(EXEEXT) \
 	t_round$(EXEEXT) t_ceil$(EXEEXT) t_size$(EXEEXT) \
-	t_resize$(EXEEXT) t_isnan$(EXEEXT) t_complex$(EXEEXT)
+	t_resize$(EXEEXT) t_isnan$(EXEEXT) t_complex$(EXEEXT) \
+	t_abs$(EXEEXT)
 am__objects_1 =
-am_t_acos_OBJECTS = $(am__objects_1) t_acos.$(OBJEXT)
-t_acos_OBJECTS = $(am_t_acos_OBJECTS)
-t_acos_LDADD = $(LDADD)
+am_t_abs_OBJECTS = $(am__objects_1) t_abs.$(OBJEXT)
+t_abs_OBJECTS = $(am_t_abs_OBJECTS)
+t_abs_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am_t_acos_OBJECTS = $(am__objects_1) t_acos.$(OBJEXT)
+t_acos_OBJECTS = $(am_t_acos_OBJECTS)
+t_acos_LDADD = $(LDADD)
 am_t_asin_OBJECTS = $(am__objects_1) t_asin.$(OBJEXT)
 t_asin_OBJECTS = $(am_t_asin_OBJECTS)
 t_asin_LDADD = $(LDADD)
@@ -230,26 +235,26 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
-	$(t_atan2_SOURCES) $(t_ceil_SOURCES) $(t_complex_SOURCES) \
-	$(t_cos_SOURCES) $(t_cosh_SOURCES) $(t_eadd_SOURCES) \
-	$(t_ediv_SOURCES) $(t_emul_SOURCES) $(t_epow_SOURCES) \
-	$(t_esub_SOURCES) $(t_exp_SOURCES) $(t_fliplr_SOURCES) \
-	$(t_flipud_SOURCES) $(t_floor_SOURCES) $(t_isnan_SOURCES) \
-	$(t_log_SOURCES) $(t_log10_SOURCES) $(t_nrmse_SOURCES) \
-	$(t_resize_SOURCES) $(t_round_SOURCES) $(t_sin_SOURCES) \
-	$(t_sinh_SOURCES) $(t_size_SOURCES) $(t_tan_SOURCES) \
-	$(t_tanh_SOURCES)
-DIST_SOURCES = $(t_acos_SOURCES) $(t_asin_SOURCES) $(t_atan_SOURCES) \
-	$(t_atan2_SOURCES) $(t_ceil_SOURCES) $(t_complex_SOURCES) \
-	$(t_cos_SOURCES) $(t_cosh_SOURCES) $(t_eadd_SOURCES) \
-	$(t_ediv_SOURCES) $(t_emul_SOURCES) $(t_epow_SOURCES) \
-	$(t_esub_SOURCES) $(t_exp_SOURCES) $(t_fliplr_SOURCES) \
-	$(t_flipud_SOURCES) $(t_floor_SOURCES) $(t_isnan_SOURCES) \
-	$(t_log_SOURCES) $(t_log10_SOURCES) $(t_nrmse_SOURCES) \
-	$(t_resize_SOURCES) $(t_round_SOURCES) $(t_sin_SOURCES) \
-	$(t_sinh_SOURCES) $(t_size_SOURCES) $(t_tan_SOURCES) \
-	$(t_tanh_SOURCES)
+SOURCES = $(t_abs_SOURCES) $(t_acos_SOURCES) $(t_asin_SOURCES) \
+	$(t_atan_SOURCES) $(t_atan2_SOURCES) $(t_ceil_SOURCES) \
+	$(t_complex_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
+	$(t_eadd_SOURCES) $(t_ediv_SOURCES) $(t_emul_SOURCES) \
+	$(t_epow_SOURCES) $(t_esub_SOURCES) $(t_exp_SOURCES) \
+	$(t_fliplr_SOURCES) $(t_flipud_SOURCES) $(t_floor_SOURCES) \
+	$(t_isnan_SOURCES) $(t_log_SOURCES) $(t_log10_SOURCES) \
+	$(t_nrmse_SOURCES) $(t_resize_SOURCES) $(t_round_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_size_SOURCES) \
+	$(t_tan_SOURCES) $(t_tanh_SOURCES)
+DIST_SOURCES = $(t_abs_SOURCES) $(t_acos_SOURCES) $(t_asin_SOURCES) \
+	$(t_atan_SOURCES) $(t_atan2_SOURCES) $(t_ceil_SOURCES) \
+	$(t_complex_SOURCES) $(t_cos_SOURCES) $(t_cosh_SOURCES) \
+	$(t_eadd_SOURCES) $(t_ediv_SOURCES) $(t_emul_SOURCES) \
+	$(t_epow_SOURCES) $(t_esub_SOURCES) $(t_exp_SOURCES) \
+	$(t_fliplr_SOURCES) $(t_flipud_SOURCES) $(t_floor_SOURCES) \
+	$(t_isnan_SOURCES) $(t_log_SOURCES) $(t_log10_SOURCES) \
+	$(t_nrmse_SOURCES) $(t_resize_SOURCES) $(t_round_SOURCES) \
+	$(t_sin_SOURCES) $(t_sinh_SOURCES) $(t_size_SOURCES) \
+	$(t_tan_SOURCES) $(t_tanh_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -634,6 +639,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -I../ -I../linalg -I../../ -I../../misc -I../io
 COMMON = ../Matrix.hpp Trigonometry.hpp AVXTraits.hpp SSE2Traits.hpp SIMD.hpp SIMDTraits.hpp
+t_abs_SOURCES = $(COMMON) t_abs.cpp
 t_sin_SOURCES = $(COMMON) t_sin.cpp
 t_cos_SOURCES = $(COMMON) t_cos.cpp
 t_tan_SOURCES = $(COMMON) t_tan.cpp
@@ -706,6 +712,9 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+t_abs$(EXEEXT): $(t_abs_OBJECTS) $(t_abs_DEPENDENCIES) $(EXTRA_t_abs_DEPENDENCIES) 
+	@rm -f t_abs$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(t_abs_OBJECTS) $(t_abs_LDADD) $(LIBS)
 t_acos$(EXEEXT): $(t_acos_OBJECTS) $(t_acos_DEPENDENCIES) $(EXTRA_t_acos_DEPENDENCIES) 
 	@rm -f t_acos$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(t_acos_OBJECTS) $(t_acos_LDADD) $(LIBS)
@@ -797,6 +806,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_abs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_acos.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_asin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_atan.Po@am__quote@
@@ -1241,6 +1251,13 @@ t_isnan.log: t_isnan$(EXEEXT)
 t_complex.log: t_complex$(EXEEXT)
 	@p='t_complex$(EXEEXT)'; \
 	b='t_complex'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t_abs.log: t_abs$(EXEEXT)
+	@p='t_abs$(EXEEXT)'; \
+	b='t_abs'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

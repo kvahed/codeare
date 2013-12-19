@@ -203,7 +203,7 @@ isinf (const Matrix<T>& M) {
 
     Matrix<cbool> res (M.Dim());
     for (size_t i = 0; i < res.Size(); ++i)
-		res[i] = (std::isinf(real(M[i]))||std::isinf(imag(M[i])));
+		res[i] = (std::isinf(TypeTraits<T>::Real(M[i]))||std::isinf(TypeTraits<T>::Imag(M[i])));
     return res;
 
 }
@@ -220,7 +220,7 @@ isnan (const Matrix<T>& M) {
 
     Matrix<cbool> res (M.Dim());
     for (size_t i = 0; i < res.Size(); ++i)
-		res.Container()[i] = (std::isnan(real(M[i]))||std::isnan(imag(M[i])));
+		res.Container()[i] = (std::isnan(TypeTraits<T>::Imag(M[i]))||std::isnan(TypeTraits<T>::Imag(M[i])));
     return res;
 
 }
@@ -259,7 +259,7 @@ dofinite (const Matrix<T>& M, const T& v = 0) {
 	size_t i = numel(M);
 
 	while (i--)
-		res[i] = is_nan(real(M[i])) ? v : M[i];
+		res[i] = is_nan(TypeTraits<T>::Real(M[i])) ? v : M[i];
 	
     return res;
 
@@ -420,7 +420,7 @@ template <class T> inline  Matrix<T>
 resize (const Matrix<T>& M, const size_t& sc, const size_t& sl, const size_t& ss) {
 
 	Matrix<size_t> sz (3,1);
-	sz[0] = sc; sz[1] = sl; sz[2] = sc;
+	sz[0] = sc; sz[1] = sl; sz[2] = ss;
 
 	return resize (M, sz);
 	
@@ -619,11 +619,7 @@ template <class T> inline  Matrix<T>
 transpose (const Matrix<T>& M, const bool& c = false) {
 
 	assert (is2d(M));
-	size_t m, n, i, j;
-
-	m = size(M,0);
-	n = size(M,1);
-
+	size_t m = size(M,0), n = size(M,1), i, j;
 	Matrix<T> res (n,m);
 
 	for (j = 0; j < n; ++j)

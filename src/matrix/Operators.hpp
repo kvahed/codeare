@@ -105,14 +105,11 @@
     operator!           () const {
 
     	assert(_dim.size() ==2);
-    	Matrix<T,P> res (_dim[1],_dim[0]);
+    	Matrix<T,P> res = *this;
 
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < _dim[1]; ++i)
 			for (size_t j = 0; j < _dim[0]; j++)
-				res(i,j) = this->At(j,i);
+				swapd(res(j,i),res(i,j));
 
         return res;
 
