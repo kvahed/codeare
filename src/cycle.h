@@ -79,7 +79,7 @@
 /***************************************************************************/
 
 #if TIME_WITH_SYS_TIME
-# include <sys/time.h>
+//# include <sys/time.h>
 # include <time.h>
 #else
 # if HAVE_SYS_TIME_H
