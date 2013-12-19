@@ -26,6 +26,7 @@
 #include "Creators.hpp"
 #include "Algos.hpp"
 #include "Trigonometry.hpp"
+#include "Print.hpp"
 
 /**
  * @brief    Absolute values 
@@ -33,102 +34,15 @@
  * @param  m Input
  * @return   Absolute values 
  */
-inline static Matrix<double> 
-abs (const Matrix<cxdb>& m) {
-
-	Matrix<double> res (size(m));
-
-#pragma omp parallel default (shared) 
-	{
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = std::abs(m[i]);
-		
-	}		
-	
+template<class T> inline static Matrix<typename TypeTraits<T>::RT>
+abs (const Matrix<T>& m) {
+	Matrix<typename TypeTraits<T>::RT> res (vsize(m));
+	for (size_t i = 0; i < numel(m); i++)
+		res[i] = TypeTraits<T>::Abs(m[i]);
 	return res;
-	
 }
  
 
-/**
- * @brief    Absolute values 
- * 
- * @param  m Input
- * @return   Absolute values 
- */
-inline static Matrix<float> 
-abs (const Matrix<cxfl>& m) {
-
-	Matrix<float> res = zeros<float> (size(m));
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = std::abs(m[i]);
-		
-	}		
-	
-	return res;
-	
-}
-
-
-/**
- * @brief    Absolute values 
- * 
- * @param  m Input
- * @return   Absolute values 
- */
-inline static Matrix<float> 
-abs (const Matrix<float>& m) {
-	
-	Matrix<float> res = zeros<float> (size(m));
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = fabs(m[i]);
-		
-	}		
-	
-	return res;
-	
-}
-
-
-/**
- * @brief    Absolute values 
- * 
- * @param  m Input
- * @return   Absolute values 
- */
-inline static Matrix<double> 
-abs (const Matrix<double>& m) {
-	
-	Matrix<double> res = zeros<double> (size(m));
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = fabs(m[i]);
-		
-	}		
-	
-	return res;
-	
-}
-
 
 /**
  * @brief    Arguments
@@ -136,103 +50,12 @@ abs (const Matrix<double>& m) {
  * @param  m Input
  * @return   Arguments
  */
-inline static Matrix<double> 
-arg (const Matrix<cxdb>& m) {
-
-	Matrix<double> res = zeros<double> (size(m));
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = arg(m[i]);
-		
-	}		
-	
+template<class T> inline static Matrix<typename TypeTraits<T>::RT>
+arg (const Matrix<T>& m) {
+	Matrix<typename TypeTraits<T>::RT> res (vsize(m));
+	for (size_t i = 0; i < numel(m); i++)
+		res[i] = TypeTraits<T>::Arg(m[i]);
 	return res;
-	
-}
- 
-
-/**
- * @brief    Arguments
- * 
- * @param  m Input
- * @return   Arguments
- */
-inline static Matrix<float> 
-arg (const Matrix<cxfl>& m) {
-
-	Matrix<float> res = zeros<float> (size(m));
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = arg(m[i]);
-		
-	}		
-	
-	return res;
-	
-}
-
-
-/**
- * @brief    Arguments
- * 
- * @param  m Input
- * @return   Arguments
- */
-inline static Matrix<float> 
-arg (const Matrix<float>& m) {
-	
-	return 	zeros<float> (size(m));
-	
-}
-
-
-/**
- * @brief    Arguments
- * 
- * @param  m Input
- * @return   Arguments
- */
-inline static Matrix<double> 
-arg (const Matrix<double>& m) {
-	
-	return zeros<double> (size(m));
-	
-}
-
-
-/**
- * @brief    Real part
- * 
- * @param  m Input
- * @return   Real part
- */
-inline static Matrix<double> 
-real (const Matrix<cxdb>& m) {
-
-	Matrix<double> res = zeros<double> (size(m));
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = real(m[i]);
-		
-	}		
-	
-	return res;
-	
 }
  
 
@@ -242,53 +65,13 @@ real (const Matrix<cxdb>& m) {
  * @param  m Input
  * @return   Real part
  */
-inline static Matrix<float> 
-real (const Matrix<cxfl>& m) {
-
-	Matrix<float> res = zeros<float> (size(m));
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = real(m[i]);
-		
-	}		
-	
+template<class T> inline static Matrix<typename TypeTraits<T>::RT>
+real (const Matrix<T>& m) {
+	Matrix<typename TypeTraits<T>::RT> res (vsize(m));
+	for (size_t i = 0; i < numel(m); i++)
+		res[i] = TypeTraits<T>::Real(m[i]);
 	return res;
-	
 }
-
-
-/**
- * @brief    Dummy Real 
- * 
- * @param  m Input
- * @return   Real part
- */
-inline static Matrix<float> 
-real (const Matrix<float>& m) {
-	
-	return Matrix<float>(m);
-	
-}
-
-
-/**
- * @brief    Dummy real
- * 
- * @param  m Input
- * @return   Real part
- */
-inline static Matrix<double> 
-real (const Matrix<double>& m) {
-	
-	return Matrix<double>(m);
-	
-}
-
 
 
 /**
@@ -297,125 +80,29 @@ real (const Matrix<double>& m) {
  * @param  m Input
  * @return   Imaginary part
  */
-inline static Matrix<double> 
-imag (const Matrix<cxdb>& m) {
-
-	Matrix<double> res = zeros<double> (size(m));
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = imag(m[i]);
-		
-	}		
-	
+template<class T> inline static Matrix<typename TypeTraits<T>::RT>
+imag (const Matrix<T>& m) {
+	Matrix<typename TypeTraits<T>::RT> res (vsize(m));
+	for (size_t i = 0; i < numel(m); i++)
+		res[i] = TypeTraits<T>::Imag(m[i]);
 	return res;
-	
 }
  
 
+
+
 /**
- * @brief    Imaginary part
- * 
+ * @brief    Dummy for double
+ *
  * @param  m Input
  * @return   Imaginary part
  */
-inline static Matrix<float> 
-imag (const Matrix<cxfl>& m) {
-
-	Matrix<float> res = zeros<float> (size(m));
-	
-#pragma omp parallel default (shared) 
-	{
-		
-#pragma omp for
-		
-		for (size_t i = 0; i < numel(m); i++)
-			res[i] = imag(m[i]);
-		
-	}		
-	
+template<class T> inline static Matrix<T>
+conj (const Matrix<T>& m) {
+	Matrix<T> res (vsize(m));
+	for (size_t i = 0; i < numel(m); i++)
+		res[i] = TypeTraits<T>::Conj(m[i]);
 	return res;
-	
-}
-
-
-/**
- * @brief    Dummy for float
- * 
- * @param  m Input
- * @return   Imaginary part
- */
-inline static Matrix<float> 
-imag (const Matrix<float>& m) {
-	
-	return 	zeros<double>(size(m));
-	
-}
-
-
-
-/**
- * @brief    Dummy for double
- * 
- * @param  m Input
- * @return   Imaginary part
- */
-inline static Matrix<double> 
-imag (const Matrix<double>& m) {
-	
-	return zeros<double>(size(m));
-	
-}
-
-
-/**
- * @brief    Dummy for double
- *
- * @param  m Input
- * @return   Imaginary part
- */
-inline static Matrix<double>
-conj (const Matrix<double>& m) {
-	return m;
-}
-
-/**
- * @brief    Dummy for double
- *
- * @param  m Input
- * @return   Imaginary part
- */
-inline static Matrix<float>
-conj (const Matrix<float>& m) {
-	return m;
-}
-/**
- * @brief    Dummy for double
- *
- * @param  m Input
- * @return   Imaginary part
- */
-inline static Matrix<cxfl>
-conj (const Matrix<cxfl>& m) {
-	Matrix<cxfl> ret = m;
-	ret.Container() = conj(ret.Container());
-	return ret;
-}
-/**
- * @brief    Dummy for double
- *
- * @param  m Input
- * @return   Imaginary part
- */
-inline static Matrix<cxdb>
-conj (const Matrix<cxdb>& m) {
-	Matrix<cxdb> ret = m;
-	ret.Container() = conj(ret.Container());
-	return ret;
 }
 
 

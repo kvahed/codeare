@@ -3,10 +3,11 @@ COMMON = ../Matrix.hpp Trigonometry.hpp AVXTraits.hpp SSE2Traits.hpp SIMD.hpp SI
 
 TESTS  = t_sin t_cos t_tan t_exp t_asin t_acos t_atan t_atan2 t_sinh t_cosh t_tanh t_log t_flipud t_fliplr
 TESTS += t_log10 t_emul t_ediv t_eadd t_esub t_nrmse t_epow t_floor t_round t_ceil t_size t_resize t_isnan 
-TESTS += t_complex #t_gtoreq
+TESTS += t_complex t_abs #t_gtoreq
 
 check_PROGRAMS = $(TESTS)
 
+t_abs_SOURCES = $(COMMON) t_abs.cpp
 t_sin_SOURCES = $(COMMON) t_sin.cpp
 t_cos_SOURCES = $(COMMON) t_cos.cpp
 t_tan_SOURCES = $(COMMON) t_tan.cpp

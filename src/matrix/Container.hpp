@@ -164,7 +164,20 @@ public:
     /**
      * @brief resize data storage
      */
-	inline void resize (const size_t n, const T val = T()) { _data.resize(n,val); }
+	inline void resize (const size_t n) {
+		if (!(n==_data.size()))
+			_data.resize(n);
+	}
+
+    /**
+     * @brief resize data storage
+     */
+	inline void resize (const size_t n, const T val) {
+		if (!(n==_data.size()))
+			_data.resize(n,val);
+		else
+			_data.assign(n,val);
+	}
 
     /**
      * @brief Add elemet at end
