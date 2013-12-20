@@ -19,12 +19,14 @@ template <class T>
 inline static bool write (const Matrix<T> A) {
 	HDF5File nf (fname, WRITE);
 	nf.Write (A, mname);
+    return true;
 }
 
 template <class T>
 inline static bool read (Matrix<T>& A) {
 	HDF5File nf (fname, READ);
 	A = nf.Read<T>(mname);
+    return true;
 }
 
 template<class T>

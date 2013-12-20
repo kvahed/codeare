@@ -1,0 +1,52 @@
+CXX=cl
+CXXFLAGS=/openmp /nologo /EHsc /I..\.. /I..\..\.. /I.. /I..\..\..\misc /IC:\Intel\ComposerXE-2011\mkl\include "/IC:\Program Files\HDF_Group\HDF5\1.8.12\include" /IC:\local\boost_1_55_0 /I"C:\Program Files\MATLAB\R2013b\extern\include" /c 
+LINK=link
+LDFLAGS=/libpath:C:\Intel\ComposerXE-2011\mkl\lib\intel64 /libpath:"C:\Program Files\HDF_Group\HDF5\1.8.12\lib" /libpath:"C:\Program Files\MATLAB\R2013b\extern\lib\win64\microsoft"
+LIBS=mkl_rt.lib hdf5.lib hdf5_cpp.lib libmx.lib libmat.lib
+RM=del
+
+all: t_hdf5.exe t_matlab.exe check
+# t_dot.exe  t_eig.exe  t_gemm.exe  t_gemv.exe  t_inv.exe  t_norm.exe  t_pinv.exe  t_svd.exe check
+
+t_hdf5.exe: t_hdf5.cpp
+	$(CXX) $(CXXFLAGS) t_hdf5.cpp 
+	$(LINK) $(LDFLAGS) t_hdf5.obj $(LIBS)
+t_matlab.exe: t_matlab.cpp
+	$(CXX) $(CXXFLAGS) t_matlab.cpp 
+	$(LINK) $(LDFLAGS) t_matlab.obj $(LIBS)
+# t_eig.exe: t_eig.cpp
+# 	$(CXX) $(CXXFLAGS) t_eig.cpp 
+# 	$(LINK) $(LDFLAGS) t_eig.obj $(LIBS)
+# t_gemm.exe: t_gemm.cpp
+# 	$(CXX) $(CXXFLAGS) t_gemm.cpp 
+# 	$(LINK) $(LDFLAGS) t_gemm.obj $(LIBS)
+# t_gemv.exe: t_gemv.cpp
+# 	$(CXX) $(CXXFLAGS) t_gemv.cpp 
+# 	$(LINK) $(LDFLAGS) t_gemv.obj $(LIBS)
+# t_inv.exe: t_inv.cpp
+# 	$(CXX) $(CXXFLAGS) t_inv.cpp 
+# 	$(LINK) $(LDFLAGS) t_inv.obj $(LIBS)
+# t_norm.exe: t_norm.cpp
+# 	$(CXX) $(CXXFLAGS) t_norm.cpp 
+# 	$(LINK) $(LDFLAGS) t_norm.obj $(LIBS)
+# t_pinv.exe: t_pinv.cpp
+# 	$(CXX) $(CXXFLAGS) t_pinv.cpp 
+# 	$(LINK) $(LDFLAGS) t_pinv.obj $(LIBS)
+# t_svd.exe: t_svd.cpp
+# 	$(CXX) $(CXXFLAGS) t_svd.cpp 
+# 	$(LINK) $(LDFLAGS) t_svd.obj $(LIBS)
+
+check:
+	t_hdf5.exe
+	t_matlab.exe
+#	 t_eig.exe
+#	 t_gemm.exe
+#	 t_gemv.exe
+#	 t_inv.exe
+#	 t_norm.exe
+#	 t_pinv.exe
+#	 t_svd.exe
+
+clean: 
+	$(RM) *.obj
+	$(RM) *.exe

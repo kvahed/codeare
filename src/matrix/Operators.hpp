@@ -123,8 +123,8 @@
      * @param  M        The operand
      * @return          Cross-section or zero
      */
-    inline Matrix<T,P>
-    operator&           (const Matrix<cbool>& M) const ;
+    //inline Matrix<T,P>
+    //operator&           (const Matrix<cbool>& M) const ;
     
     
      /**
@@ -419,7 +419,7 @@
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (p == 0) ? T(1) : pow(res[i],  p);
+			res[i] = (p == 0) ? T(1) : TypeTraits<T>::Pow(res[i],  p);
 
         return res;
 
@@ -439,7 +439,7 @@
     #pragma omp parallel for
 #endif
 		for (size_t i = 0; i < Size(); ++i)
-			_M[i] = pow(_M[i],  p);
+			_M[i] = TypeTraits<T>::Pow(_M[i],  p);
 
         return *this;
 
@@ -558,7 +558,7 @@
     template <class S > inline Matrix<T,P>&
     operator+=          (const S s) {
 
-    	T t = T (s);
+    	T t = (T)s;
 
 #ifdef EW_OMP
     #pragma omp parallel for
@@ -1309,10 +1309,10 @@
      * @param  m        Matrix rhs
      * @return          T+M
      */
-    inline friend Matrix<T,P>
-    operator&  (const Matrix<cbool>& mb, const Matrix<T,P>& m) {
-        return   m & mb;
-    }
+    //inline friend Matrix<T,P>
+    //operator&  (const Matrix<cbool>& mb, const Matrix<T,P>& m) {
+    //    return   m & mb;
+// }
 
     //@}
 
