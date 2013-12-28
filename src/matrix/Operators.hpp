@@ -37,7 +37,7 @@
      *
      * @param  s        The assigned scalar.
      */
-    inline Matrix<T,P>&
+    inline const Matrix<T,P>&
     operator=           (const T s) {
 
         T t = T(s);

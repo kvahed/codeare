@@ -518,7 +518,7 @@ public:
      * @param  p        Position
      * @return          Value at _M[p]
      */
-    inline T            
+    inline const T&
     At                  (const size_t p) const {
         assert (p < Size());
         return _M[p];
@@ -547,7 +547,7 @@ public:
      *
      * @return          Value
      */
-    inline T            
+    inline const T&
     At                  (const size_t x, const size_t y) const {
 
     	assert ((!x || x < _dim[0]) &&
@@ -586,7 +586,7 @@ public:
      *
      * @return         Value
      */
-    inline T            
+    inline const T&
     At                   (const size_t x, const size_t y, const size_t z) const {
 
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
@@ -638,7 +638,7 @@ public:
      * @param  ave       Average
      * @return           Value at position
      */
-    inline T            
+    inline const T&
     At                   (const size_t col,
                           const size_t lin,
                           const size_t cha,
@@ -772,7 +772,7 @@ public:
      * @param  p        Requested position.
      * @return          Requested scalar value.
      */
-    inline T
+    inline const T&
     operator()          (const size_t p) const {
         return this->At(p);
     }
@@ -797,7 +797,7 @@ public:
      * @param  y        Line
      * @return          Value
      */
-    inline T 
+    inline const T&
     operator()          (const size_t x, const size_t y) const {
         return this->At(x,y);
     }
@@ -810,7 +810,7 @@ public:
      * @param  y        Line
      * @return          Reference
      */
-    inline T&                  
+    inline T&
     operator()           (const size_t x, const size_t y) {
         return this->At(x,y);
     }
@@ -825,7 +825,7 @@ public:
      *
      * @return           Value
      */
-    inline T                  
+    inline const T&
     operator()           (const size_t x, const size_t y, const size_t z) const {
         return this->At(x,y,z);
     }
@@ -840,7 +840,7 @@ public:
      *
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
-    inline T&                 
+    inline T&
     operator()           (const size_t x, const size_t y, const size_t z) {
         return this->At(x,y,z);
     }
@@ -908,7 +908,7 @@ public:
      * @param  ave      Average
      * @return          Value
      */
-    inline T
+    inline const T&
     operator()           (const size_t col,
                           const size_t lin,
                           const size_t cha,
@@ -964,7 +964,7 @@ public:
      * @param   M       Factor
      * @return          Product of conj(this) and M.
      */
-    inline Matrix<T,P>
+    Matrix<T,P>
     prodt               (const Matrix<T,P> &M) const;
 
 
@@ -1084,7 +1084,7 @@ public:
      *
      * @return          All resolutions
      */
-    inline std::vector<float>
+    inline const std::vector<float>&
     Res                 () const {
         return _res;
     }
@@ -1108,7 +1108,7 @@ public:
      *
      * @return          All dimensions
      */
-    inline std::vector<size_t>
+    inline const std::vector<size_t>&
     Dim                 ()                  const {
         return _dim;
     }
@@ -1125,7 +1125,7 @@ public:
      *
      * @return          All dimensions
      */
-    inline std::vector<size_t>
+    inline const std::vector<size_t>&
     Dsz                 ()                  const {
         return _dsz;
     }

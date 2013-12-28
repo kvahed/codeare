@@ -32,7 +32,7 @@
  * @return     Average of M reducing d matrix
  */
 template <class T> static inline Matrix<T>
-mean (const Matrix<T>& M, const size_t& d) {
+mean (const Matrix<T>& M, size_t d) {
 	
 	Matrix<T> res  = M;
 	float     quot = (float) res.Dim(d);
