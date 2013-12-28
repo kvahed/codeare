@@ -616,15 +616,15 @@ min (const Matrix<T>& M) {
  * @return          Non conjugate transpose
  */
 template <class T> inline  Matrix<T>
-transpose (const Matrix<T>& M, const bool& c = false) {
+transpose (const Matrix<T>& M, bool c = false) {
 
 	assert (is2d(M));
 	size_t m = size(M,0), n = size(M,1), i, j;
-	Matrix<T> res (n,m);
+	Matrix<T> res (M);
 
 	for (j = 0; j < n; ++j)
-		for (i = 0; i < m; ++i)
-			res(j,i) = M(i,j);
+		for (i = 0; i < j; ++i)
+			swapd(res(j,i),res(i,j));
 	
 	return c ? conj(res) : res;
 
