@@ -639,9 +639,7 @@ transpose (const Matrix<T>& M, bool c = false) {
  */
 template <class T> inline  Matrix<T>
 ctranspose (const Matrix<T>& M) {
-
 	return transpose (M, true);
-
 }
 
 
