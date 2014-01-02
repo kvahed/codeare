@@ -134,18 +134,17 @@ public:
 			
 			const DFT<T>& ft = m_dft[tid];
 
-#pragma omp for
 			
 			// FT individual channels
+#pragma omp for
 			for (size_t i = 0; i < nc; i++)
 				if (ndim == 2)
 					Slice  (tmp, i, ft ->* Slice  (tmp, i));
 				else
 					Volume (tmp, i, ft ->* Volume (tmp, i));
-            
-#pragma omp for schedule (guided)
-			
+
 			// Antialiasing
+#pragma omp for
 			for (size_t x = 0; x < dims[0]; x++)
 				for (size_t y = 0; y < dims[1]; y++)
 					for (size_t z = 0; z < dims[2]; z++) {
@@ -176,7 +175,7 @@ public:
 							gf = diag (si) * gf;
                         
 						si = gemm (si,  s, 'N', 'C');
-						rp = gemm (si, ra, 'N', 'N');
+							rp = gemm (si, ra, 'N', 'N');
                         
                         for (size_t zi = 0, i = 0; zi < af[2]; zi++)
                             for (size_t yi = 0; yi < af[1]; yi++)
@@ -203,11 +202,8 @@ public:
 	 */
 	Matrix<CT>
 	Trafo             (const Matrix<CT>& m) const {
-		
 		Matrix <CT> res;
 		return res;
-
-
 	}
 
 
@@ -271,13 +267,11 @@ private:
 	 */
 	inline void
 	TikhonovMat (const Params& params) {
-
 		treg = (params.exists("lambda")) ? params.Get<T>("lambda"): 0.0;
 		printf ("  Tikhonov lambda (%.2e)\n", treg);
 		assert (treg >= 0.0);
 		if (treg > 0.0)
 			reg = treg * eye<T>(aaf);
-
 	}
 
 
