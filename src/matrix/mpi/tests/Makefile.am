@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/mpi -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/misc 
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/simd -I$(top_srcdir)/src/matrix/mpi -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/misc 
 COMMON = ../../../Grid.cpp
 
 if USE_SCALAPACK

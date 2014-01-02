@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/matrix/interp
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/simd -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/matrix/interp
 
 TESTS = t_medfilt2 t_ppval t_interp1 t_resample
 check_PROGRAMS = $(TESTS)

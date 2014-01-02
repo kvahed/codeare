@@ -311,7 +311,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL -I../ -I../matrix -I../tinyxml -I../misc
+AM_CXXFLAGS = -DTIXML_USE_STL -I../ -I../matrix -I../matrix/simd -I../tinyxml -I../misc
 noinst_LTLIBRARIES = libmongoose.la 
 libmongoose_la_SOURCES = mongoose.h mongoose.c MongooseService.hpp MongooseService.cpp
 all: all-am
