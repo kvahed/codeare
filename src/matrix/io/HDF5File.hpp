@@ -115,7 +115,7 @@ namespace io {
 		template<class T> Matrix<T>
 		Read (const std::string& uri) const {
 
-			T         t;
+			T         t       = (T) 0;
 			DataSet   dataset = m_file.openDataSet(uri);
 			DataSpace space   = dataset.getSpace();
 			std::vector<hsize_t> dims (space.getSimpleExtentNdims());
@@ -157,7 +157,7 @@ namespace io {
 		template<class T> bool
 		Write (const Matrix<T>& M, const std::string& uri) {
 
-			T t;
+			T t = (T)0;
 			Group group, *tmp;
 			std::string path;
 

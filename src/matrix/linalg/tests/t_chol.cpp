@@ -3,7 +3,6 @@
 #include "Creators.hpp"
 #include "Lapack.hpp"
 
-
 template<class T> void chol_check () {
 
     Matrix<T> A = rand<T> (4,3);

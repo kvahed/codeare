@@ -16,6 +16,12 @@
 #include <numeric>
 #include <vector>
 
+#if (_MSC_VER >= 1300) && (WINVER < 0x0500) && !defined(_ftol)
+#ifndef _ftol
+extern "C" long _ftol( double d) { return (long) d;}
+#endif
+#endif
+
 #if defined (_MSC_VER) && _MSC_VER<1300
 #    define VECTOR_TYPE(A) std::vector<A>
 #    define VECTOR_CONSTR(A,B) std::vector<A>(B)

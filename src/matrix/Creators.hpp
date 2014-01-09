@@ -34,24 +34,24 @@
  */
 template <class T> inline static Matrix<T> 
 zeros           (const size_t& col, 
-				 const size_t& lin,
-				 const size_t& cha = 1,
-				 const size_t& set = 1,
-				 const size_t& eco = 1,
-				 const size_t& phs = 1,
-				 const size_t& rep = 1,
-				 const size_t& seg = 1,
-				 const size_t& par = 1,
-				 const size_t& slc = 1,
-				 const size_t& ida = 1,
-				 const size_t& idb = 1,
-				 const size_t& idc = 1,
-				 const size_t& idd = 1,
-				 const size_t& ide = 1,
-				 const size_t& ave = 1) {
-
- 	return Matrix<T> (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-
+		 const size_t& lin,
+		 const size_t& cha = 1,
+		 const size_t& set = 1,
+		 const size_t& eco = 1,
+		 const size_t& phs = 1,
+		 const size_t& rep = 1,
+		 const size_t& seg = 1,
+		 const size_t& par = 1,
+		 const size_t& slc = 1,
+		 const size_t& ida = 1,
+		 const size_t& idb = 1,
+		 const size_t& idc = 1,
+		 const size_t& idd = 1,
+		 const size_t& ide = 1,
+		 const size_t& ave = 1) {
+  
+  return Matrix<T> (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
+  
 }
 
 
@@ -135,7 +135,7 @@ ones            (const size_t& col,
  * @brief       Square matrix of ones
  *
  * @param  n    Side length
- * @return      Random matrix
+ * @return      Ones matrix
  */
 template <class T> inline static Matrix<T>
 ones            (const size_t& n) {
@@ -258,24 +258,24 @@ rand (const size_t n) {
  */
 template<class T> static Matrix<T>
 randn          (const size_t& col, 
-				const size_t& lin,
-				const size_t& cha = 1,
-				const size_t& set = 1,
-				const size_t& eco = 1,
-				const size_t& phs = 1,
-				const size_t& rep = 1,
-				const size_t& seg = 1,
-				const size_t& par = 1,
-				const size_t& slc = 1,
-				const size_t& ida = 1,
-				const size_t& idb = 1,
-				const size_t& idc = 1,
-				const size_t& idd = 1,
-				const size_t& ide = 1,
-				const size_t& ave = 1) {
+		const size_t& lin,
+		const size_t& cha = 1,
+		const size_t& set = 1,
+		const size_t& eco = 1,
+		const size_t& phs = 1,
+		const size_t& rep = 1,
+		const size_t& seg = 1,
+		const size_t& par = 1,
+		const size_t& slc = 1,
+		const size_t& ida = 1,
+		const size_t& idb = 1,
+		const size_t& idc = 1,
+		const size_t& idd = 1,
+		const size_t& ide = 1,
+		const size_t& ave = 1) {
 	
 	Matrix<T> res (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-    Random<T>::Normal(res);
+	Random<T>::Normal(res);
 	return res;
 
 }
@@ -292,7 +292,7 @@ template <class T> inline static Matrix<T>
 randn          (const Matrix<size_t>& sz) {
 
 	Matrix<T> res (sz.Container());
-    Random<T>::Normal(res);
+	Random<T>::Normal(res);
  	return res;
 
 }
@@ -402,7 +402,7 @@ ellipse (const float* p, const size_t n, const T s = T(1)) {
 	{
 #pragma omp for schedule (dynamic, n / omp_get_num_threads())
 		
-	for (size_t r = 0; r < n; r++)
+	for (int r = 0; r < n; r++)
 		for (size_t c = 0; c < n; c++) {
 			float x = (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1];
 			float y = (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0];

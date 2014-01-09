@@ -1241,15 +1241,6 @@ protected:
 	int              _gdim[2]; /**< @brief Global dimensions */
 #endif
     
-    /**
-     * @brief           Adjust and resize for Syngo read
-     *
-     * @param  fname    Syngo MR meas file name
-     * @return          Success
-     */
-    bool
-    RSAdjust            (const std::string& fname);
-
 };
 
 #endif // __MATRIX_H__
