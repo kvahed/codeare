@@ -28,7 +28,7 @@ template <class T, wlfamily wl_fam, int wl_mem> class WaveletTraits { /* -- */ }
 /**
  * @brief           Implementation of haar wavelet.
  */
-/*template<>*/ template <class T, int wl_mem>
+template <class T, int wl_mem>
 class WaveletTraits <T, WL_HAAR, wl_mem> {
 
     typedef typename TypeTraits <T>::RT RT;
@@ -72,7 +72,7 @@ public:
 /**
  * @brief           Implementation of Daubechies wavelet, member: 4.
  */
-/*template <>*/ template <class T> class WaveletTraits <T, WL_DAUBECHIES, 4> {
+template <class T> class WaveletTraits <T, WL_DAUBECHIES, 4> {
 
     private:
         typedef typename TypeTraits <T>::RT RT;
@@ -116,7 +116,7 @@ public:
 /**
  * @brief           Implementation of Daubechies wavelet, member: 8.
  */
-/*template<>*/ template<class T> class WaveletTraits <T, WL_DAUBECHIES, 8> {
+template<class T> class WaveletTraits <T, WL_DAUBECHIES, 8> {
 
     private:
         typedef typename TypeTraits <T>::RT RT;

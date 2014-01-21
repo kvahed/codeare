@@ -29,7 +29,7 @@
 /**
  * @brief OMP related makros
  */
-# define NUM_THREADS_DWT 8
+# define NUM_THREADS_DWT 4
 # define OMP_SCHEDULE guided
 
 /**
@@ -64,12 +64,12 @@ enum wlfamily {
 /**
  * @brief   Discrete wavelet transform (periodic boundaries) for 2d and 3D case for Matrix template.
  */
-template<class T> class DWT {
+template<class T>
+class DWT {
 
-    typedef typename TypeTraits <T>::RT RT;
-    
 
     public:
+
 
         /**
          * @brief Construct DWT object for images of given side lengths and column major memory scheme.
@@ -92,9 +92,9 @@ template<class T> class DWT {
               _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
               _min_level (wl_scale),
               _max_level (MaxLevel ()),
-              _sl1_scale (_sl1 / pow ((RT)2, (RT)(_max_level - _min_level))),
-              _sl2_scale (_sl2 / pow ((RT)2, (RT)(_max_level - _min_level))),
-              _sl3_scale (_sl3 / pow ((RT)2, (RT)(_max_level - _min_level))),
+              _sl1_scale (_sl1 / pow (2, _max_level - _min_level)),
+              _sl2_scale (_sl2 / pow (2, _max_level - _min_level)),
+              _sl3_scale (_sl3 / pow (2, _max_level - _min_level)),
               _ld12 (_sl1 * _sl2),
               _wl_fam(wl_fam),
               _fl (wl_mem),
@@ -102,8 +102,9 @@ template<class T> class DWT {
               _meven ((_fl+1)/2),
               _num_threads (num_threads),
               _temp (container <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
-              dpwt (_dim == 2 ? &DWT<T>::dpwt2 : &DWT<T>::dpwt3),
-              idpwt (_dim == 2 ? &DWT<T>::idpwt2 : &DWT<T>::idpwt3) {
+              dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
+              idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3)
+        {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
         }
 
@@ -128,9 +129,9 @@ template<class T> class DWT {
           _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
           _min_level (wl_scale),
           _max_level (MaxLevel ()),
-          _sl1_scale (_sl1 / pow ((RT)2, (RT)(_max_level - _min_level))),
-          _sl2_scale (_sl2 / pow ((RT)2, (RT)(_max_level - _min_level))),
-          _sl3_scale (_sl3 / pow ((RT)2, (RT)(_max_level - _min_level))),
+          _sl1_scale (_sl1 / pow (2, _max_level - _min_level)),
+          _sl2_scale (_sl2 / pow (2, _max_level - _min_level)),
+          _sl3_scale (_sl3 / pow (2, _max_level - _min_level)),
           _ld12 (_sl1 * _sl2),
           _wl_fam(wl_fam),
           _fl (wl_mem),
@@ -138,8 +139,9 @@ template<class T> class DWT {
           _meven ((_fl+1)/2),
           _num_threads (num_threads),
           _temp (container <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
-          dpwt (_dim == 2 ? &DWT<T>::dpwt2 : &DWT<T>::dpwt3),
-          idpwt (_dim == 2 ? &DWT<T>::idpwt2 : &DWT<T>::idpwt3) {
+          dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
+          idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3)
+        {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
         }
 
@@ -163,9 +165,9 @@ template<class T> class DWT {
           _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
           _min_level (wl_scale),
           _max_level (MaxLevel ()),
-          _sl1_scale (_sl1 / pow ((RT)2, (RT)(_max_level - _min_level))),
-          _sl2_scale (_sl2 / pow ((RT)2, (RT)(_max_level - _min_level))),
-          _sl3_scale (_sl3 / pow ((RT)2, (RT)(_max_level - _min_level))),
+          _sl1_scale (_sl1 / pow (2, _max_level - _min_level)),
+          _sl2_scale (_sl2 / pow (2, _max_level - _min_level)),
+          _sl3_scale (_sl3 / pow (2, _max_level - _min_level)),
           _ld12 (_sl1 * _sl2),
           _wl_fam(wl_fam),
           _fl (wl_mem),
@@ -173,14 +175,16 @@ template<class T> class DWT {
           _meven ((_fl+1)/2),
           _num_threads (num_threads),
           _temp (container <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
-          dpwt (_dim == 2 ? &DWT<T>::dpwt2 : &DWT<T>::dpwt3),
-          idpwt (_dim == 2 ? &DWT<T>::idpwt2 : &DWT<T>::idpwt3)
+          dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
+          idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3)
         {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
         }
 
 
-        virtual ~DWT () {}
+        virtual
+        ~DWT ()
+        { }
 
 
         /**
@@ -189,13 +193,19 @@ template<class T> class DWT {
          * @param  m    Signal to decompose
          * @param  res  Resulting DWT
          */
-        inline void Trafo (const Matrix<T>& m, Matrix<T>& res) {
+        inline
+        void
+        Trafo        (const Matrix <T> & m, Matrix <T> & res)
+        {
+
             assert (   m.Dim (0) == _sl1
                     && m.Dim (1) == _sl2
                     && (_dim == 2 || m.Dim (2) == _sl3)
                     && m.Dim () == res.Dim ());
+
             /* function pointer */
             (this ->* dpwt) (m, res);
+
         }
 
 
@@ -205,13 +215,19 @@ template<class T> class DWT {
          * @param  m    DWT to transform
          * @param  res  Reconstructed signal
          */
-        inline void Adjoint (const Matrix<T>& m, Matrix<T>& res) {
+        inline
+        void
+        Adjoint      (const Matrix <T> & m, Matrix <T> & res)
+        {
+
             assert (   m.Dim (0) == _sl1
                     && m.Dim (1) == _sl2
                     && (_dim == 2 || m.Dim (2) == _sl3)
                     && m.Dim () == res.Dim ());
+
             /* function pointer */
             (this ->* idpwt) (m, res);
+
         }
 
 
@@ -221,14 +237,19 @@ template<class T> class DWT {
          * @param  m To transform
          * @return   Transform
          */
-        inline Matrix<T> operator* (const Matrix<T>& m) {
+        inline
+        Matrix <T>
+        operator*    (const Matrix <T> & m) {
+
             if (_wl_fam == ID)
                 return m;
-            else {
-                Matrix<T> res (m);
+            else
+            {
+                Matrix <T> res (m);
                 Trafo (m, res);
                 return res;
             }
+
         }
 
 
@@ -238,18 +259,29 @@ template<class T> class DWT {
          * @param  m To transform
          * @return   Transform
          */
-        inline Matrix<T> operator->* (const Matrix<T>& m) {
+        inline
+        Matrix <T>
+        operator->* (const Matrix <T> & m) {
+
             if (_wl_fam == ID)
                 return m;
-            else {
-                Matrix<T> res (m);
+            else
+            {
+                Matrix <T> res (m);
                 Adjoint (m, res);
                 return res;
             }
+
         }
 
 
     private:
+
+
+        /**
+         * type definitions
+         */
+        typedef typename TypeTraits <T> :: RT RT;
 
 
         /**
@@ -292,16 +324,16 @@ template<class T> class DWT {
         container<T> _temp;
 
         // used transform functions
-        void (DWT<T>::* dpwt) (const Matrix<T>&, Matrix<T>&);
-        void (DWT<T>::* idpwt) (const Matrix<T>&, Matrix<T>&);
+        void (DWT <T> :: * dpwt) (const Matrix <T> &, Matrix <T> &);
+        void (DWT <T> :: * idpwt) (const Matrix <T> &, Matrix <T> &);
 
         // low pass filters
-        RT* _lpf_d;
-        RT* _lpf_r;
+        RT * _lpf_d;
+        RT * _lpf_r;
 
         // high pass filters
-        RT* _hpf_d;
-        RT* _hpf_r;
+        RT * _hpf_d;
+        RT * _hpf_r;
 
 
         /**
@@ -315,12 +347,14 @@ template<class T> class DWT {
          *
          * @return          Start level.
          */
-        int MaxLevel () {
+        int
+        MaxLevel            ()
+        {
             // create vars from mex function
             size_t nn = 1, max_level = 0;
             for (; nn < _min_sl; nn *= 2 )
                 max_level ++;
-            if (nn  !=  _min_sl) {
+            if (nn  !=  _min_sl){
                 std::cout << "FWT2 requires dyadic length sides" << std::endl;
                 assert (false);
             }
@@ -339,7 +373,9 @@ template<class T> class DWT {
          * @param  sig  Signal to be transformed.
          * @param  res  Decomposed signal.
          */
-        void dpwt2 (const Matrix<T>& sig, Matrix<T>& res) {
+        void
+        dpwt2		(const Matrix <T> & sig, Matrix <T> & res)
+        {
 
             // assign signal to result matrix
             res = sig;
@@ -355,7 +391,8 @@ template<class T> class DWT {
                 const int t_num = omp_get_thread_num ();
 
                 // loop over levels of DWT
-                for (int j = (_max_level-1); j >= _min_level; --j) {
+                for (int j = (_max_level-1); j >= _min_level; --j)
+                {
 
                     // update stride
                     stride = sl1 * t_num;
@@ -364,7 +401,8 @@ template<class T> class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along first dimension ('columns') of image
-                    for (int c2_loc = 0; c2_loc < sl2; c2_loc++) {
+                    for (int c2_loc = 0; c2_loc < sl2; c2_loc++)
+                    {
 
                         // access to lowpass part of DWT
                         wcplo = & res [c2_loc * _sl1];
@@ -425,7 +463,9 @@ template<class T> class DWT {
          * @param  sig  Signal to be transformed.
          * @param  res  Decomposed signal.
          */
-        void dpwt3 (const Matrix<T>& sig, Matrix<T>& res) {
+        void
+        dpwt3       (const Matrix <T> & sig, Matrix <T> & res)
+        {
 
             // assign signal to result matrix
             res = sig;
@@ -442,7 +482,8 @@ template<class T> class DWT {
                 const int t_num = omp_get_thread_num ();
 
                 // loop over levels of DWT
-                for (int j = (_max_level-1); j >= _min_level; --j) {
+                for (int j = (_max_level-1); j >= _min_level; --j)
+                {
 
                     // update stride
                     stride = sl1 * t_num;
@@ -451,7 +492,8 @@ template<class T> class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along first dimension ('columns') of image
-                    for (int c2_loc = 0; c2_loc < sl2 * sl3; c2_loc++) {
+                    for (int c2_loc = 0; c2_loc < sl2 * sl3; c2_loc++)
+                    {
 
                         int c2_glob = (c2_loc / sl2) * _sl1 * _sl2 + (c2_loc % sl2) * _sl1;
 
@@ -479,7 +521,8 @@ template<class T> class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along second dimension ('rows') of image
-                    for (int c1_loc = 0; c1_loc < sl1 * sl3; c1_loc++) {
+                    for (int c1_loc = 0; c1_loc < sl1 * sl3; c1_loc++)
+                    {
 
                         int c1_glob = (c1_loc / sl1) * _sl1 * _sl2;
 
@@ -507,7 +550,8 @@ template<class T> class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along third dimension ('third') of image
-                    for (int c1_loc = 0; c1_loc < sl1 * sl2; c1_loc++) {
+                    for (int c1_loc = 0; c1_loc < sl1 * sl2; c1_loc++)
+                    {
 
                         int c1_glob = (c1_loc % sl1) + (c1_loc / sl1) * _sl1;
 
@@ -546,9 +590,14 @@ template<class T> class DWT {
          * @param  offset   Offset relative to x.
          * @param  y        Data array to be written to.
          */
-        inline void unpackdouble (const T* const x, int n, int stride, int offset, T* const y) {
+        inline
+        void
+        unpackdouble	(const T * const x, const int n, const int stride, const int offset, T * const y)
+        {
             for (int i = 0; i < n; i++)
-                y[i] = x[offset + stride * i];
+            {
+                y [i] = x [offset + stride * i];
+            }
         }
 
 
@@ -561,7 +610,10 @@ template<class T> class DWT {
          * @param  offset   Offset relative to y.
          * @param  y        Data array to be written to.
          */
-        inline void packdouble (const T* const x, int n, int stride, int offset, T* const y) {
+        inline
+        void
+        packdouble		(const T * const x, const int n, const int stride, const int offset, T * const y)
+        {
             for (int i = 0; i < n; i++)
                 y [offset + stride * i] = x [i];
         }
@@ -573,8 +625,11 @@ template<class T> class DWT {
          * @param  dest Destination.
          * @param  n    Number of data elements.
          */
-        inline void copydouble (const T* const src, T* const dest, int n) {
-        	std::copy(src, src+n, dest);
+        inline
+        void
+        copydouble		(const T * const src, T * const dest, const int n)
+        {
+        	memcpy (dest, src, n * sizeof (T));
         }
 
 
@@ -586,7 +641,10 @@ template<class T> class DWT {
          * @param  n    Vectors' lengths.
          * @param  z    Result vector.
          */
-        inline void  adddouble (const T * const x, const T * const y, const int n, T * const z) {
+        inline
+        void
+        adddouble       (const T * const x, const T * const y, const int n, T * const z)
+        {
             for (int i = 0; i < n; ++i)
                 z[i] = x[i] + y[i];
         }
@@ -599,7 +657,9 @@ template<class T> class DWT {
          * @param  side_length  Side length of current DWT level.
          * @param  dwt_high     Resulting DWT.
          */
-        void downhi	(const T * const signal, const int side_length, T * const dwt_high) {
+        void
+        downhi			(const T * const signal, const int side_length, T * const dwt_high)
+        {
 
             int j;
             T s;
@@ -617,8 +677,8 @@ template<class T> class DWT {
                 mlo++;
 
             // loop over pixels of dwt_high
-#pragma omp parallel for default (shared) private (s)
-            for (int i = mlo; i < n2; i++) {
+            for (int i = mlo; i < n2; i++)
+            {
 
                 // result of convolution
                 s = 0.;
@@ -640,8 +700,8 @@ template<class T> class DWT {
             /* fix up edge values */
 
             // loop over edge values
-#pragma omp parallel for default (shared) private (s,j)
-            for (int i = 0; i < mlo; i++) {
+            for (int i = 0; i < mlo; i++)
+            {
 
                 // result of convolution
                 s = 0.;
@@ -650,7 +710,8 @@ template<class T> class DWT {
                 j = 2 * i + 1;
 
                 // loop over filter elements
-                for (int h = 0; h < _fl; h++) {
+                for (int h = 0; h < _fl; h++)
+                {
 
                     // adjust index if it exceeds side_length
                     if (j < 0)
@@ -678,7 +739,9 @@ template<class T> class DWT {
          * @param  side_length  Side length of current DWT level.
          * @param  dwt_low      Resulting DWT.
          */
-        void downlo (const T * const signal, const int side_length, T * const dwt_low) {
+        void
+        downlo  		        (const T * const signal, const int side_length, T * const dwt_low)
+        {
 
             int j;
             T s;
@@ -702,8 +765,8 @@ template<class T> class DWT {
                 mhi = -1;
 
             // loop over pixels of dwt_low
-#pragma omp parallel for default (shared) private (s)
-            for (int i= 0; i <= mhi; i++) {
+            for (int i= 0; i <= mhi; i++)
+            {
 
                 // result of convolution
                 s = 0.;
@@ -719,8 +782,8 @@ template<class T> class DWT {
             /* fix up edge values */
 
             // loop over edge values (periodic boundary)
-#pragma omp parallel for default (shared) private (s,j)
-            for (int i = mhi + 1; i < n2; i++) {
+            for (int i = mhi + 1; i < n2; i++)
+            {
 
                 // result of convolution
                 s = 0.;
@@ -755,7 +818,9 @@ template<class T> class DWT {
          * @param  wc   Wavelet presentation of 2D data.
          * @param  img  Reconstructed signal.
          */
-        void idpwt2		(const Matrix<T>& wc, Matrix<T>& img) {
+        void
+        idpwt2		(const Matrix <T> & wc, Matrix <T> & img)
+        {
 
             // assign dwt to result image
             img = wc;
@@ -771,17 +836,20 @@ template<class T> class DWT {
                 const int t_num = omp_get_thread_num ();
 
                 // loop over levels of backwards DWT
-                for (int j = _min_level; j < _max_level; j++){
+                for (int j = _min_level; j < _max_level; j++)
+                {
+
                     // update stride
                     stride = 6 * sl2 * t_num;
-                    tmp = &_temp [stride];
-                    templo  = &_temp [2 * sl2 + stride];
-                    temphi  = &_temp [3 * sl2 + stride];
-                    temptop = &_temp [4 * sl2 + stride];
+                    tmp = & _temp [stride];
+                    templo  = & _temp [2 * sl2 + stride];
+                    temphi  = & _temp [3 * sl2 + stride];
+                    temptop = & _temp [4 * sl2 + stride];
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along second dimension ('rows') of result image
-                    for (int c1_loc = 0; c1_loc < 2 * sl1; c1_loc++) {
+                    for (int c1_loc = 0; c1_loc < 2 * sl1; c1_loc++)
+                    {
 
                         // copy lowpass part of current line to temporary memory
                         unpackdouble (& img [0], sl2, _sl1, c1_loc, templo);
@@ -808,7 +876,7 @@ template<class T> class DWT {
                     templo = & _temp [    sl1 + stride];
                     temphi = & _temp [3 * sl1 + stride];
 
-//# pragma omp for schedule (OMP_SCHEDULE)
+# pragma omp for schedule (OMP_SCHEDULE)
                     // loop  over lines along first dimension ('columns') of result image
                     for (int c2_loc = 0; c2_loc < 2 * sl2; c2_loc++)
                     {
@@ -848,7 +916,9 @@ template<class T> class DWT {
          * @param  wc   Wavelet presentation of 3D data.
          * @param  img  Reconstructed signal.
          */
-        void idpwt3 (const Matrix<T>& wc, Matrix<T>& img) {
+        void
+        idpwt3      (const Matrix <T> & wc, Matrix <T> & img)
+        {
 
             // assign dwt to result image
             img = wc;
@@ -865,7 +935,8 @@ template<class T> class DWT {
                 const int t_num = omp_get_thread_num ();
 
                 // loop over levels of backwards DWT
-                for (int j = _min_level; j < _max_level; j++) {
+                for (int j = _min_level; j < _max_level; j++)
+                {
 
                     // update stride
                     stride = 6 * sl3 * t_num;
@@ -876,7 +947,8 @@ template<class T> class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along third dimension ('third') of result image
-                    for (int c1_loc = 0; c1_loc < 2 * sl1 * 2 * sl2; c1_loc++) {
+                    for (int c1_loc = 0; c1_loc < 2 * sl1 * 2 * sl2; c1_loc++)
+                    {
 
                         int c1_glob = (c1_loc % (2 * sl1)) + (c1_loc / (2 * sl1)) * _sl1;
 
@@ -908,7 +980,8 @@ template<class T> class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop over lines along second dimension ('rows') of result image
-                    for (int c1_loc = 0; c1_loc < 2 * sl1 * 2 * sl3; c1_loc++) {
+                    for (int c1_loc = 0; c1_loc < 2 * sl1 * 2 * sl3; c1_loc++)
+                    {
 
                         int c1_glob = (c1_loc / (2 * sl1)) * _sl1 * _sl2;
 
@@ -939,7 +1012,8 @@ template<class T> class DWT {
 
 # pragma omp for schedule (OMP_SCHEDULE)
                     // loop  over lines along first dimension ('columns') of result image
-                    for (int c2_loc = 0; c2_loc < 2 * sl2 * 2 * sl3; c2_loc++) {
+                    for (int c2_loc = 0; c2_loc < 2 * sl2 * 2 * sl3; c2_loc++)
+                    {
 
                         int c2_glob = (c2_loc / (2 * sl2)) * _sl2 * _sl1 + (c2_loc % (2 * sl2)) * _sl1;
 
@@ -980,7 +1054,9 @@ template<class T> class DWT {
          * @param  side_length  Length of wc.
          * @param  signal       Reconstructed signal.
          */
-        void uplo (const T * const wc, const int side_length, T * const signal) {
+        void
+        uplo		(const T * const wc, const int side_length, T * const signal)
+        {
 
             int j;
             T s, s_odd;
@@ -990,14 +1066,16 @@ template<class T> class DWT {
             /* away from edges */
 
             // loop over regular signal indices
-            for (int i = _meven; i < side_length; i++) {
+            for (int i = _meven; i < side_length; i++)
+            {
 
                 // init convolution results
                 s = 0.;
                 s_odd = 0.;
 
                 // perform convolution for even and odd filter indices
-                for (int h = 0; h < _modd; h++) {
+                for (int h = 0; h < _modd; h++)
+                {
 
                     // even filter index
                     s += _lpf_r [2 * h] * wc [i - h];
@@ -1025,7 +1103,8 @@ template<class T> class DWT {
                 mmax = side_length;
 
             // loop over edge values
-            for (int i = 0; i < mmax; i++) {
+            for (int i = 0; i < mmax; i++)
+            {
 
                 // init convolution results
                 s = 0.;
@@ -1034,7 +1113,8 @@ template<class T> class DWT {
                 j = i;
 
                  // perform convolution
-                for (int h = 0; h < _modd; h++) {
+                for (int h = 0; h < _modd; h++)
+                {
 
                     // correct current wavelet coeff's index if needed
                     if (j < 0)
@@ -1070,7 +1150,9 @@ template<class T> class DWT {
          * @param  side_length  Length of wc.
          * @param  signal       Reconstructed signal.
          */
-        void uphi (const T * const wc, const int side_length, T * const signal) {
+        void
+        uphi		(const T * const wc, const int side_length, T * const signal)
+        {
 
             int j;
             T s, s_odd;
@@ -1080,14 +1162,16 @@ template<class T> class DWT {
             /* away from edges */
 
             // loop over regular signal indices
-            for (int i = 0; i < side_length - _meven; i++) {
+            for (int i = 0; i < side_length - _meven; i++)
+            {
 
                 // init convolution results
                 s = 0.;
                 s_odd = 0.;
 
                 // perform convolution for even and odd filter indices
-                for (int h = 0; h < _modd; h++) {
+                for (int h = 0; h < _modd; h++)
+                {
 
                     // even filter index
                     s += _hpf_r [2 * h] * wc [i + h];
@@ -1116,7 +1200,8 @@ template<class T> class DWT {
                 mmin = 0;
 
             // loop over edge values
-            for (int i = mmin; i < side_length; i++) {
+            for (int i = mmin; i < side_length; i++)
+            {
 
                 // init convolution results
                 s = 0.;
@@ -1125,7 +1210,8 @@ template<class T> class DWT {
                 j = i;
 
                 // perform convolution for even and odd indices
-                for (int h = 0; h < _meven; h++) {
+                for (int h = 0; h < _meven; h++)
+                {
 
                     // correct current wavelet coeff's index if needed
                     if (j >= side_length)
