@@ -28,7 +28,7 @@ template <class T, wlfamily wl_fam, int wl_mem> class WaveletTraits { /* -- */ }
 /**
  * @brief           Implementation of haar wavelet.
  */
-template <> template <class T, int wl_mem>
+/*template<>*/ template <class T, int wl_mem>
 class WaveletTraits <T, WL_HAAR, wl_mem> {
 
     typedef typename TypeTraits <T>::RT RT;
@@ -52,7 +52,7 @@ public:
          * @return              Low pass reconstruction filter.
          */
         static inline void DecomFilters (RT* lpf_d, RT* hpf_d){
-            RT norm_factor = 1 / sqrt (2);
+            RT norm_factor = 1 / sqrt (2.f);
             lpf_d [0] = norm_factor; lpf_d [1] = norm_factor;
             mirrorfilt (lpf_d, hpf_d, 2);
         }
@@ -72,7 +72,7 @@ public:
 /**
  * @brief           Implementation of Daubechies wavelet, member: 4.
  */
-template <> template <class T> class WaveletTraits <T, WL_DAUBECHIES, 4> {
+/*template <>*/ template <class T> class WaveletTraits <T, WL_DAUBECHIES, 4> {
 
     private:
         typedef typename TypeTraits <T>::RT RT;
@@ -116,7 +116,7 @@ template <> template <class T> class WaveletTraits <T, WL_DAUBECHIES, 4> {
 /**
  * @brief           Implementation of Daubechies wavelet, member: 8.
  */
-template<> template<class T> class WaveletTraits <T, WL_DAUBECHIES, 8> {
+/*template<>*/ template<class T> class WaveletTraits <T, WL_DAUBECHIES, 8> {
 
     private:
         typedef typename TypeTraits <T>::RT RT;
@@ -163,31 +163,31 @@ template<> template<class T> class WaveletTraits <T, WL_DAUBECHIES, 8> {
  * @brief				Setup given filter matrices for specified wavlet.
  */
 template <class T> static void setupWlFilters (const wlfamily wl_fam, const int wl_mem,
-		typename TypeTraits <T>::RT* & lpf_d, typename TypeTraits <T>::RT* & lpf_r,
-		typename TypeTraits <T>::RT* & hpf_d, typename TypeTraits <T>::RT* & hpf_r) {
+		typename TypeTraits<T>::RT* & lpf_d, typename TypeTraits<T>::RT* & lpf_r,
+		typename TypeTraits<T>::RT* & hpf_d, typename TypeTraits<T>::RT* & hpf_r) {
 
 	switch (wl_fam) {
     case ID: break;
 	case WL_DAUBECHIES:
 		switch (wl_mem) {
 		case 8:
-		    WaveletTraits <T, WL_DAUBECHIES, 8>::Malloc (lpf_d, lpf_r, hpf_d, hpf_r);
-            WaveletTraits <T, WL_DAUBECHIES, 8>::DecomFilters (lpf_d, hpf_d);
-            WaveletTraits <T, WL_DAUBECHIES, 8>::ReconFilters (lpf_r, hpf_r);
+		    WaveletTraits<T, WL_DAUBECHIES, 8>::Malloc (lpf_d, lpf_r, hpf_d, hpf_r);
+            WaveletTraits<T, WL_DAUBECHIES, 8>::DecomFilters (lpf_d, hpf_d);
+            WaveletTraits<T, WL_DAUBECHIES, 8>::ReconFilters (lpf_r, hpf_r);
             break;
 		case 4:
-            WaveletTraits <T, WL_DAUBECHIES, 4>::Malloc (lpf_d, lpf_r, hpf_d, hpf_r);
-	        WaveletTraits <T, WL_DAUBECHIES, 4>::DecomFilters (lpf_d, hpf_d);
-	        WaveletTraits <T, WL_DAUBECHIES, 4>::ReconFilters (lpf_r, hpf_r);
+            WaveletTraits<T, WL_DAUBECHIES, 4>::Malloc (lpf_d, lpf_r, hpf_d, hpf_r);
+	        WaveletTraits<T, WL_DAUBECHIES, 4>::DecomFilters (lpf_d, hpf_d);
+	        WaveletTraits<T, WL_DAUBECHIES, 4>::ReconFilters (lpf_r, hpf_r);
 			break;
 		}
 		break;
     case WL_DAUBECHIES_CENTERED:
         break;
 	case WL_HAAR:
-        WaveletTraits <T, WL_HAAR, 2>::Malloc (lpf_d, lpf_r, hpf_d, hpf_r);
-        WaveletTraits <T, WL_HAAR, 2>::DecomFilters (lpf_d, hpf_d);
-        WaveletTraits <T, WL_HAAR, 2>::ReconFilters (lpf_r, hpf_r);
+        WaveletTraits<T, WL_HAAR, 2>::Malloc (lpf_d, lpf_r, hpf_d, hpf_r);
+        WaveletTraits<T, WL_HAAR, 2>::DecomFilters (lpf_d, hpf_d);
+        WaveletTraits<T, WL_HAAR, 2>::ReconFilters (lpf_r, hpf_r);
         break;
     case WL_HAAR_CENTERED:
         break;
