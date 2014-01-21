@@ -22,6 +22,7 @@
 #define __CGRAPPA_HPP__
 
 #include "DFT.hpp"
+#include "Workspace.hpp"
 #include "GRAPPATraits.hpp"
 #include "Print.hpp"
 

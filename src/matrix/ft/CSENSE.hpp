@@ -28,6 +28,7 @@
 #include "Creators.hpp"
 #include "Lapack.hpp"
 #include "Print.hpp"
+#include "Workspace.hpp"
 
 /**
  * @brief SENSE: Sensitivity Encoding for Fast MRI<br/>
