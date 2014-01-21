@@ -68,6 +68,12 @@ template<class T>
 class DWT {
 
 
+        /**
+         * type definitions
+         */
+        typedef typename TypeTraits <T> :: RT RT;
+
+
     public:
 
 
@@ -92,9 +98,9 @@ class DWT {
               _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
               _min_level (wl_scale),
               _max_level (MaxLevel ()),
-              _sl1_scale (_sl1 / pow (2, _max_level - _min_level)),
-              _sl2_scale (_sl2 / pow (2, _max_level - _min_level)),
-              _sl3_scale (_sl3 / pow (2, _max_level - _min_level)),
+              _sl1_scale (_sl1 / pow ((RT)2, (RT)_max_level - _min_level)),
+              _sl2_scale (_sl2 / pow ((RT)2, (RT)_max_level - _min_level)),
+              _sl3_scale (_sl3 / pow ((RT)2, (RT)_max_level - _min_level)),
               _ld12 (_sl1 * _sl2),
               _wl_fam(wl_fam),
               _fl (wl_mem),
@@ -129,9 +135,9 @@ class DWT {
           _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
           _min_level (wl_scale),
           _max_level (MaxLevel ()),
-          _sl1_scale (_sl1 / pow (2, _max_level - _min_level)),
-          _sl2_scale (_sl2 / pow (2, _max_level - _min_level)),
-          _sl3_scale (_sl3 / pow (2, _max_level - _min_level)),
+          _sl1_scale (_sl1 / pow ((RT)2, (RT)_max_level - _min_level)),
+          _sl2_scale (_sl2 / pow ((RT)2, (RT)_max_level - _min_level)),
+          _sl3_scale (_sl3 / pow ((RT)2, (RT)_max_level - _min_level)),
           _ld12 (_sl1 * _sl2),
           _wl_fam(wl_fam),
           _fl (wl_mem),
@@ -165,9 +171,9 @@ class DWT {
           _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
           _min_level (wl_scale),
           _max_level (MaxLevel ()),
-          _sl1_scale (_sl1 / pow (2, _max_level - _min_level)),
-          _sl2_scale (_sl2 / pow (2, _max_level - _min_level)),
-          _sl3_scale (_sl3 / pow (2, _max_level - _min_level)),
+          _sl1_scale (_sl1 / pow ((RT)2, (RT)_max_level - _min_level)),
+          _sl2_scale (_sl2 / pow ((RT)2, (RT)_max_level - _min_level)),
+          _sl3_scale (_sl3 / pow ((RT)2, (RT)_max_level - _min_level)),
           _ld12 (_sl1 * _sl2),
           _wl_fam(wl_fam),
           _fl (wl_mem),
@@ -276,12 +282,6 @@ class DWT {
 
 
     private:
-
-
-        /**
-         * type definitions
-         */
-        typedef typename TypeTraits <T> :: RT RT;
 
 
         /**
