@@ -24,7 +24,7 @@ namespace SSE {
 	//	#if defined __AVX2__
 	//		#include "AVX2Traits.hpp"
 //#elif defined __SSE4_2__
-		#include "SSE42Traits.hpp"
+    //#include "SSE42Traits.hpp"
 //	#endif
 
 } // namespace SSE

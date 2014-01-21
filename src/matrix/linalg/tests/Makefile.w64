@@ -1,7 +1,7 @@
 CXX=cl
-CXXFLAGS=/openmp /nologo /EHsc /I..\.. /I..\..\.. /I.. /I..\..\io /IC:\Intel\ComposerXE-2011\mkl\include /IC:\local\boost_1_55_0 /I..\..\arithmetic /c
+CXXFLAGS=/openmp /nologo /EHsc /I..\.. /I..\..\.. /I.. /I..\..\io /I..\..\simd /IC:\Intel\ComposerXE-2011\mkl\include /IC:\local\boost_1_55_0 /I..\..\arithmetic /c /w
 LINK=link
-LDFLAGS=/libpath:C:\Intel\ComposerXE-2011\mkl\lib\intel64
+LDFLAGS=/libpath:C:\Intel\ComposerXE-2011\mkl\lib\intel64 /nologo
 LIBS=mkl_rt.lib
 RM=del
 

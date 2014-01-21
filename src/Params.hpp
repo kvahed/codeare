@@ -22,6 +22,7 @@
 class Params {
 
 
+    struct UnspecParam {};
 
 public:
 
@@ -45,7 +46,7 @@ public:
 	inline boost::any& operator [](const std::string& key) {
 		std::map<std::string, boost::any>::iterator pli = pl.find(key);
 		if (pl.find(key) == pl.end()) {
-			pl.insert(std::pair<std::string, boost::any>(key, Toolbox::Instance()->void_any));
+			pl.insert(std::pair<std::string, boost::any>(key, UnspecParam()));
             pli = pl.find(key);
         }
 		return pli->second;

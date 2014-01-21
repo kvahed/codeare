@@ -21,11 +21,13 @@
 #ifndef __FFTW_TRAITS_HPP__
 #define __FFTW_TRAITS_HPP__
 
-#include "Workspace.hpp"
+//#include "Workspace.hpp"
 #include "Params.hpp"
 #include "OMP.hpp"
 
 #include <fftw3.h>
+
+static Params p;
 
 template <class T>
 struct FTTraits { };
@@ -68,7 +70,7 @@ struct FTTraits<float> {
 	static inline bool
 	InitThreads () {
 
-		if (wspace.p.exists("FFTWThreads"))
+		if (p.exists("FFTWThreads"))
 			return true;
 
 		int nt;
@@ -81,7 +83,7 @@ struct FTTraits<float> {
 #ifdef HAVE_FFTWF_THREADS
 		if (fftwf_init_threads()) {
 			fftwf_plan_with_nthreads (nt);
-			wspace.p["FFTWThreads"] = nt;
+			p["FFTWThreads"] = nt;
 		}
 #endif
 
@@ -195,7 +197,7 @@ struct FTTraits<double> {
 	static inline bool
 	InitThreads () {
 
-		if (wspace.p.exists("FFTWThreads"))
+		if (p.exists("FFTWThreads"))
 			return true;
 
 		int nt;
@@ -208,7 +210,7 @@ struct FTTraits<double> {
 #ifdef HAVE_FFTWF_THREADS
 		if (fftw_init_threads()) {
 			fftw_plan_with_nthreads (nt);
-			wspace.p["FFTWThreads"] = nt;
+			p["FFTWThreads"] = nt;
 		}
 #endif
 

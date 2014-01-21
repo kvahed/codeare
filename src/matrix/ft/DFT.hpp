@@ -196,7 +196,7 @@ public:
 			tmp[i] = (tmp[i] > 0) ? tmp[i] : 1;
 
 		d = tmp.Container(); // data side lengths
-		c = (floor(tmp/2)).Container(); // center coords
+		c = floor((Matrix<float>)tmp/2).Container(); // center coords
 
  		Allocate (rank, &n[0]);
 
@@ -438,7 +438,7 @@ private:
 		m_bwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0], FFTW_BACKWARD, FFTW_MEASURE);
 
 		m_cs     = m_N * sizeof(Type);
-		m_sn     = sqrt (m_N);
+		m_sn     = sqrt ((T)m_N);
 
 	}
 
