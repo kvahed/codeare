@@ -53,7 +53,7 @@
  * @return        Eigenvectors and values
  */
 template <class T, class S> inline boost::tuple< Matrix<T>, Matrix<S>, Matrix<T> >
-eig2 (const Matrix<T>& m, const char& jobvl = 'N', const char& jobvr = 'N') {
+eig2 (const Matrix<T>& m, char jobvl = 'N', char jobvr = 'N') {
     
     typedef typename LapackTraits<T>::RType T2;
     T t = (T)0;
@@ -159,7 +159,7 @@ inline Matrix<cxdb> eig (const Matrix<cxdb>& m) {
  */
 
 template<class T, class S> inline boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> >
-svd2 (const Matrix<T>& IN, const char& jobz = 'N') {
+svd2 (const Matrix<T>& IN, char jobz = 'N') {
     
     typedef typename LapackTraits<T>::RType T2;
     boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> > ret;
@@ -317,7 +317,7 @@ inv (const Matrix<T>& m) {
  * @return               Pseudo-inverse
  */
 template<class T> inline Matrix<T>
-pinv (const Matrix<T>& m, const char& trans = 'N') {
+pinv (const Matrix<T>& m, char trans = 'N') {
     
     Matrix<T> mm (m);
     
@@ -378,7 +378,7 @@ pinv (const Matrix<T>& m, const char& trans = 'N') {
  * @return       Cholesky decomposition
  */
 template<class T> inline Matrix<T> 
-chol (const Matrix<T>& A, const char& uplo = 'U') {
+chol (const Matrix<T>& A, char uplo = 'U') {
     
     assert(is2d(A));
     
@@ -422,50 +422,45 @@ chol (const Matrix<T>& A, const char& uplo = 'U') {
  * @return         Product
  */
 template<class T> inline Matrix<T> 
-gemm (const Matrix<T>& A, const Matrix<T>& B, const char& transa = 'N', const char& transb = 'N') {
+gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = 'N') {
     
     assert (isvec(A)||is2d(A));
     assert (isvec(B)||is2d(B));
     
-    int aw, ah, bw, bh, m, n, k, ldc;
-    T   alpha, beta;
+	int aw, ah, bw, bh, m, n, k;
+	T   alpha = (T)1., beta = (T)0.;
     
     aw = (int)size(A,1); ah = (int)size(A,0), bw = (int)size(B,1), bh = (int)size(B,0);
     
     // Check inner dimensions
-    if      ( transa == 'N'                   &&  transb == 'N'                  ) assert (aw == bh);
-    else if ( transa == 'N'                   && (transb == 'T' || transb == 'C')) assert (aw == bw);
-    else if ((transa == 'T' || transa == 'C') &&  transb == 'N'                  ) assert (ah == bh);
-    else if ((transa == 'T' || transa == 'C') && (transb == 'T' || transb == 'C')) assert (ah == bw);
+	if      ( transa == 'N'                   &&  transb == 'N'                  ) assert (aw == bh);
+	else if ( transa == 'N'                   && (transb == 'T' || transb == 'C')) assert (aw == bw);
+	else if ((transa == 'T' || transa == 'C') &&  transb == 'N'                  ) assert (ah == bh);
+	else if ((transa == 'T' || transa == 'C') && (transb == 'T' || transb == 'C')) assert (ah == bw);
+	
+	if (transa == 'N') {
+		m = ah;
+		k = aw;
+	} else if (transa == 'T' || transa == 'C') {
+		m = aw;
+		k = ah;
+	}
+	
+	if (transb == 'N')
+		n = bw;
+	else if (transb == 'T' || transb == 'C')
+		n = bh;
+
+	Matrix<T> C(m,n);
+	
+	LapackTraits<T>::gemm (transa, transb, m, n, k, alpha, A.Ptr(), ah, B.Ptr(), bh, beta, &C[0], m);
     
-    if (transa == 'N') {
-        m = ah;
-        k = aw;
-    } else if (transa == 'T' || transa == 'C') {
-        m = aw;
-        k = ah;
-    }
-    
-    if (transb == 'N')
-        n = bw;
-    else if (transb == 'T' || transb == 'C')
-        n = bh;
-    
-    ldc = m;
-    
-    alpha =  T(1.0);
-    beta  =  T(0.0);
-    
-    Matrix<T> C(m,n);
-    
-    LapackTraits<T>::gemm (transa, transb, m, n, k, alpha, A.Ptr(), ah, B.Ptr(), bh, beta, &C[0], ldc);
-    
-    return C;
-    
+	return C;
+	
 }
 
 template<class T, paradigm P, const bool& b> Matrix<T,P>
-Matrix<T,P,b>::prod  (const Matrix<T,P> &M, const char transa, const char transb) const {
+Matrix<T,P,b>::prod  (const Matrix<T,P> &M, char transa, char transb) const {
     return gemm (*this, M, transa, transb);
 }
 template<class T, paradigm P, const bool& b> inline Matrix<T,P>
@@ -494,39 +489,35 @@ Matrix<T,P,b>::operator->* (const Matrix<T,P> &M) const {
  * @return            A*x
  */
 template<class T> inline Matrix<T> 
-gemv (const Matrix<T>& A, const Matrix<T>& x, const char& trans = 'N') {
+gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
     
     assert (isvec(x));
     assert (isvec(A)||is2d(A));
     
-    int aw, ah, xh, m, n, one;
-    T   alpha, beta;
+	int aw, ah, xh, m, n, one = 1;
+	T   alpha = (T)1., beta = (T)0.;
     
-    // Column vector
-    assert (size(x, 1) == 1);
+	// Column vector
+	assert (size(x, 1) == 1);
+	
+	aw  = (int) size (A, 1);
+	ah  = (int) size (A, 0);
+	xh  = (int) size (x, 0);
+	
+	m   = ah;
+	n   = aw; 
+	
+	if (trans == 'N')
+		assert (aw == xh);
+	else if (trans == 'T' || trans == 'C')
+		assert (ah == xh);
+
+	Matrix<T> y ((trans == 'N') ? m : n, 1);
     
-    aw  = (int) size (A, 1);
-    ah  = (int) size (A, 0);
-    xh  = (int) size (x, 0);
-    
-    m   = ah;
-    n   = aw; 
-    one = 1;
-    
-    if (trans == 'N')
-        assert (aw == xh);
-    else if (trans == 'T' || trans == 'C')
-        assert (ah == xh);
-    
-    alpha  = T(1.0);
-    beta   = T(0.0);
-    
-    Matrix<T> y ((trans == 'N') ? m : n, 1);
-    
-    LapackTraits<T>::gemv (trans, m, n, alpha, A.Ptr(), ah, x.Ptr(), one, beta, &y[0], one);
-    
-    return y;
-    
+	LapackTraits<T>::gemv (trans, m, n, alpha, A.Ptr(), ah, x.Ptr(), one, beta, &y[0], one);
+	
+	return y;
+	
 }
 
 /**
@@ -569,19 +560,15 @@ norm (const Matrix<T>& M) {
 template <class T> inline T 
 dotc (const Matrix<T>& A, const Matrix<T>& B) {
     
-    int n, one;
-    T   res;
+	int n = (int) numel(A), one = 1;
+	T   res = (T)0.;
     
-    n   = (int) numel(A);
-    assert (n == (int) numel(B));
-    
-    res = T(0.0);
-    one = 1;
-    
-    LapackTraits<T>::dotc (n, A.Ptr(), one, B.Ptr(), one, &res);
-    
-    return res;
-    
+	assert (n == (int) numel(B));
+
+	LapackTraits<T>::dotc (n, A.Ptr(), one, B.Ptr(), one, &res);
+	
+	return res;
+
 }
 
 

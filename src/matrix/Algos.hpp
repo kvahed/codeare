@@ -77,7 +77,7 @@ nnz (const Matrix<T>& M) {
  * @return    X-dimensional?
  */
 template <class T>  inline  bool
-isxd (const Matrix<T>& M, const size_t d) {
+isxd (const Matrix<T>& M, size_t d) {
 
 	size_t l = 0;
 
@@ -369,11 +369,11 @@ all (const Matrix<T>& M) {
  * @return          Number of cells.
  */
 template <class T>  size_t
-size               (const Matrix<T>& M, const size_t& d) {
+size               (const Matrix<T>& M, size_t d) {
 	return M.Dim(d);
 }
 template <class T>  size_t
-size               (const Matrix<T,MPI>& M, const size_t& d) {
+size               (const Matrix<T,MPI>& M, size_t d) {
 	return M.Dim(d);
 }
 
@@ -391,7 +391,7 @@ size               (const Matrix<T,MPI>& M, const size_t& d) {
  * @return          Resized vector
  */
 template <class T> inline  Matrix<T>
-resize (const Matrix<T>& M, const size_t& sc, const size_t& sl) {
+resize (const Matrix<T>& M, size_t sc, size_t sl) {
 
 	Matrix<size_t> sz (2,1);
 	sz[0] = sc; sz[1] = sl;
@@ -415,7 +415,7 @@ resize (const Matrix<T>& M, const size_t& sc, const size_t& sl) {
  * @return          Resized vector
  */
 template <class T> inline  Matrix<T>
-resize (const Matrix<T>& M, const size_t& sc, const size_t& sl, const size_t& ss) {
+resize (const Matrix<T>& M, size_t sc, size_t sl, size_t ss) {
 
 	Matrix<size_t> sz (3,1);
 	sz[0] = sc; sz[1] = sl; sz[2] = ss;
@@ -464,7 +464,7 @@ vsize               (const Matrix<T>& M) {
  * @return          Resolution
  */
 template <class T>  size_t
-resol               (const Matrix<T>& M, const size_t& d) {
+resol               (const Matrix<T>& M, size_t d) {
 	
 	return M.Res(d);
 	
@@ -614,15 +614,15 @@ min (const Matrix<T>& M) {
  * @return          Non conjugate transpose
  */
 template <class T> inline  Matrix<T>
-transpose (const Matrix<T>& M, const bool& c = false) {
+transpose (const Matrix<T>& M, bool c = false) {
 
 	assert (is2d(M));
 	size_t m = size(M,0), n = size(M,1), i, j;
-	Matrix<T> res (n,m);
+	Matrix<T> res (M);
 
 	for (j = 0; j < n; ++j)
-		for (i = 0; i < m; ++i)
-			res(j,i) = M(i,j);
+		for (i = 0; i < j; ++i)
+			swapd(res(j,i),res(i,j));
 	
 	return c ? conj(res) : res;
 
@@ -637,9 +637,7 @@ transpose (const Matrix<T>& M, const bool& c = false) {
  */
 template <class T> inline  Matrix<T>
 ctranspose (const Matrix<T>& M) {
-
 	return transpose (M, true);
-
 }
 
 
@@ -656,7 +654,7 @@ ctranspose (const Matrix<T>& M) {
  * @return          Resized vector
  */
 template <class T> inline  Matrix<T>
-resize (const Matrix<T>& M, const size_t& sz) {
+resize (const Matrix<T>& M, size_t sz) {
 
 	Matrix<T> res = zeros<T> (sz,1);
 	size_t copysz = MIN(numel(M), sz);
@@ -710,7 +708,7 @@ resize (const Matrix<T>& M, const Matrix<size_t>& sz) {
  * @return    Sum of M along dimension d
  */
 template <class T> inline  Matrix<T>
-sum (const Matrix<T>& M, const size_t d) {
+sum (const Matrix<T>& M, size_t d) {
 	
 	Matrix<size_t> sz = size(M);
 	size_t        dim = sz[d];
@@ -795,7 +793,7 @@ sum (Matrix<T>& M) {
  * @return    Sum of M along dimension d
  */
 template <class T> inline  Matrix<T>
-prod (const Matrix<T>& M, const size_t d) {
+prod (const Matrix<T>& M, size_t d) {
 
 	Matrix<size_t> sz = size(M);
 	size_t        dim = sz[d];
@@ -874,7 +872,7 @@ prod (const Matrix<T>& M) {
  * @return      Sum of squares
  */
 template <class T> inline   Matrix<T>
-SOS (const Matrix<T>& M, const size_t d) {
+SOS (const Matrix<T>& M, size_t d) {
 	
 	assert (M.Dim(d) > 1);
 	

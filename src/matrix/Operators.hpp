@@ -37,7 +37,7 @@
      *
      * @param  s        The assigned scalar.
      */
-    inline Matrix<T,P>&
+    inline const Matrix<T,P>&
     operator=           (const T s) {
 
         T t = T(s);
@@ -108,7 +108,7 @@
     	Matrix<T,P> res = *this;
 
 		for (size_t i = 0; i < _dim[1]; ++i)
-			for (size_t j = 0; j < _dim[0]; j++)
+			for (size_t j = 0; j < i; j++)
 				swapd(res(j,i),res(i,j));
 
         return res;

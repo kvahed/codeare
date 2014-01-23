@@ -195,14 +195,14 @@ private:
 	VECTOR_TYPE(T) _data;
 };
 
-template <class T> class vector_inserter {
+template <class T> class container_inserter {
 public:
-    container<T>& v;
-    vector_inserter(container<T>& v):v(v){}
-    vector_inserter& operator,(const T& val){v.push_back(val);return *this;}
+    container<T>& _ct;
+    container_inserter (container<T>& ct):_ct(ct) {}
+    inline container_inserter& operator, (const T& val) {_ct.push_back(val);return *this;}
 };
-template <class T> vector_inserter<T>& operator+= (container<T>& v,const T& x){
-    return vector_inserter<T>(v),x;
+template <class T> inline container_inserter<T>& operator+= (container<T>& ct,const T& x) {
+    return container_inserter<T>(ct),x;
 }
 
 
@@ -245,7 +245,5 @@ template<class T> inline static T sum (const container<T>& ct) {
 }
 
 template<class T> inline static void swapd (T& x,T& y) {T temp=x; x=y; y=temp;}
-
-
 
 #endif /* CONTAINER_HPP_ */

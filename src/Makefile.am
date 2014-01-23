@@ -11,7 +11,7 @@ if NETWORKING
 bin_PROGRAMS += rclient codeared
 endif
 
-AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Imatrix/linalg -Itinyxml -Imisc -Imatrix/arithmetic -Imatrix/interp -Imatrix/io -Imodules $(OPENMP_CXXFLAGS)
+AM_CXXFLAGS = -DTIXML_USE_STL -Imatrix -Imatrix/simd -Imatrix/linalg -Itinyxml -Imisc -Imatrix/arithmetic -Imatrix/interp -Imatrix/io -Imodules $(OPENMP_CXXFLAGS)
 
 # Common sources
 COMMON =  RRSModule.idl Configurable.hpp DllExport.h matrix/Matrix.hpp options.h options.cpp Workspace.hpp Workspace.cpp Queue.hpp Queue.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Toolbox.hpp Toolbox.cpp Connector.hpp Grid.hpp Grid.cpp Params.hpp
