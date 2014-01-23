@@ -9,9 +9,6 @@ template<class T> void isnan_check () {
     
     Matrix<T> rhs (3,2);
     Matrix<cbool> lhs;
-
-    rhs(1,0) = 1.0/0.0;
-    rhs(0,1) = 1.0/0.0;
     lhs = isnan(rhs);
 
 #ifdef VERBOSE

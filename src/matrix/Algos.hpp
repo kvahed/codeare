@@ -28,17 +28,15 @@
 #include <vector>
 #include <algorithm>    // std::reverse
 
+
 #if !defined(_MSC_VER) || _MSC_VER>1200
-template <bool> struct _assert;
-template <> struct _assert<true> { };
+#include <boost/math/special_functions/fpclassify.hpp>
 
 template<class T> inline bool is_nan (T const& x) {
-    static_cast<void>(sizeof(_assert<std::numeric_limits<T>::has_quiet_NaN>));
-    return std::numeric_limits<T>::has_quiet_NaN and (x != x);
+    return boost::math::isnan (x);
 }
 template <class T> inline bool is_inf (T const& x) {
-    static_cast<void>(sizeof(_assert<std::numeric_limits<T>::has_infinity>));
-    return x == std::numeric_limits<T>::infinity() or x == -std::numeric_limits<T>::infinity();
+    return boost::math::isinf (x);
 }
 #endif
 
@@ -203,7 +201,7 @@ isinf (const Matrix<T>& M) {
 
     Matrix<cbool> res (M.Dim());
     for (size_t i = 0; i < res.Size(); ++i)
-		res[i] = (std::isinf(TypeTraits<T>::Real(M[i]))||std::isinf(TypeTraits<T>::Imag(M[i])));
+		res[i] = (is_inf(TypeTraits<T>::Real(M[i]))||is_inf(TypeTraits<T>::Imag(M[i])));
     return res;
 
 }
@@ -220,7 +218,7 @@ isnan (const Matrix<T>& M) {
 
     Matrix<cbool> res (M.Dim());
     for (size_t i = 0; i < res.Size(); ++i)
-		res.Container()[i] = (std::isnan(TypeTraits<T>::Imag(M[i]))||std::isnan(TypeTraits<T>::Imag(M[i])));
+		res.Container()[i] = (is_nan(TypeTraits<T>::Imag(M[i]))||is_nan(TypeTraits<T>::Imag(M[i])));
     return res;
 
 }

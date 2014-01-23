@@ -19,7 +19,7 @@ namespace codeare {
             sin (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::sin(m[i]);
                 return ret;
             }
@@ -28,7 +28,7 @@ namespace codeare {
             cos (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::cos(m[i]);
                 return ret;
             }
@@ -37,7 +37,7 @@ namespace codeare {
             tan (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::tan(m[i]);
                 return ret;
             }
@@ -46,7 +46,7 @@ namespace codeare {
             asin (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::asin(m[i]);
                 return ret;
             }
@@ -55,7 +55,7 @@ namespace codeare {
             acos (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::acos(m[i]);
                 return ret;
             }
@@ -64,7 +64,7 @@ namespace codeare {
             atan (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::atan(m[i]);
                 return ret;
             }
@@ -73,7 +73,7 @@ namespace codeare {
             atan2 (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::atan2(m[i]);
                 return ret;
             }
@@ -82,7 +82,7 @@ namespace codeare {
             sinh (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::sinh(m[i]);
                 return ret;
             }
@@ -91,7 +91,7 @@ namespace codeare {
             cosh (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::cosh(m[i]);
                 return ret;
             }
@@ -100,7 +100,7 @@ namespace codeare {
             tanh (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::tanh(m[i]);
                 return ret;
             }
@@ -109,7 +109,7 @@ namespace codeare {
             exp (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::exp(m[i]);
                 return ret;
             }
@@ -118,7 +118,7 @@ namespace codeare {
             log (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::log(m[i]);
                 return ret;
             }
@@ -127,7 +127,7 @@ namespace codeare {
             log10 (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for
-                for (size_t i = 0; i < numel(m); i++)
+                for (int i = 0; i < numel(m); i++)
                     ret[i] = std::log10(m[i]);
                 return ret;
             }

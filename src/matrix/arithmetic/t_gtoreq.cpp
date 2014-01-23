@@ -8,7 +8,7 @@ void emul_check () {
     Matrix<T> A = rand<T>(3,4);
     Matrix<T> B = rand<T>(3,4);
     T a = T(0.0);
-    Matrix<bool> C, D;
+    Matrix<cbool> C, D;
 
 #ifdef VERBOSE
     std::cout << "A=[\n" << A << "];\n";

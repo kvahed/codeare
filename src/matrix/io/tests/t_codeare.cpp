@@ -18,12 +18,14 @@ template <class T>
 inline static bool write (const Matrix<T> A) {
 	CODFile mfw (fname, WRITE);
 	mfw.Write (A, mname);
+    return true;
 }
 
 template <class T>
 inline static bool read (Matrix<T>& A) {
 	CODFile mfr (fname, READ);
 	A = mfr.Read<T>(mname);
+    return true;
 }
 
 template<class T>
