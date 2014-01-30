@@ -499,29 +499,9 @@
      */
     inline Matrix<T,P>&
     operator+=         (const Matrix<T,P>& M) {
-
         assert (_dim == M._dim);
-
-#if defined USE_VALARRAY
-        _M += M.Container();        
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::add<T>(), _M);
-        else
-        	for (size_t i = 0; i < Size(); ++i)
-        		_M[i] += M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-        for (size_t i = 0; i < Size(); ++i)
-            _M[i] += M[i];
-#else
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
-#endif
-#endif
-        
         return *this;
-        
     }
 
     
@@ -535,15 +515,7 @@
     operator+=         (const Matrix<S,P>& M) {
 
         assert (_dim == M.Dim());
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] *= M[i];
-#else
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
-#endif
-
 		return *this;
 
     }
@@ -557,18 +529,8 @@
      */
     template <class S > inline Matrix<T,P>&
     operator+=          (const S s) {
-
-    	T t = (T)s;
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] += t;
-#else
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),t));
-#endif
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),(T)s));
         return *this;
-
     }
 
     
@@ -625,29 +587,9 @@
      */
     inline Matrix<T,P>&
     operator-=         (const Matrix<T,P>& M) {
-
         assert (_dim == M._dim);
-
-#if defined USE_VALARRAY
-        _M -= M.Container();
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::sub<T>(), _M);
-        else
-        	for (size_t i = 0; i < Size(); ++i)
-        		_M[i] -= M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-        for (size_t i = 0; i < Size(); ++i)
-            _M[i] -= M[i];
-#else
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
-#endif
-#endif
-
         return *this;
-
     }
 
 
@@ -659,19 +601,9 @@
      */
     template <class S> inline Matrix<T,P>&
     operator-=          (const Matrix<S,P>& M) {
-
         assert (_dim == M.Dim());
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] -= M[i];
-#else
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
-#endif
-
         return *this;
-
     }
 
     /**
@@ -683,19 +615,8 @@
     template <class S >
     inline Matrix<T,P>&
     operator-=          (const S s) {
-
-		T t = T (s);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] -= t;
-#else
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::minus<T>(),t));
-#endif
-
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::minus<T>(),(T)s));
 		return *this;
-
     }
 
     /**
@@ -754,29 +675,9 @@
      */
     inline Matrix<T,P>&
     operator*=         (const Matrix<T,P>& M) {
-
         assert (_dim == M._dim);
-
-#if defined USE_VALARRAY
-        _M *= M.Container();
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::mul<T>(), _M);
-        else
-        	for (size_t i = 0; i < Size(); ++i)
-        		_M[i] *= M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-        for (size_t i = 0; i < Size(); ++i)
-            _M[i] *= M[i];
-#else
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
-#endif
-#endif
-
         return *this;
-
     }
 
 
@@ -788,19 +689,9 @@
      */
     template <class S> inline Matrix<T,P>&
     operator*=         (const Matrix<S,P>& M) {
-
         assert (_dim == M.Dim());
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] *= M[i];
-#else
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
-#endif
-
-		return *this;
-
+        return *this;
     }
 
 
@@ -812,16 +703,8 @@
      */
     template <class S> inline Matrix<T,P>&
     operator*=         (const S s) {
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] += s;
-#else
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),s));
-#endif
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
 		return *this;
-
     }
 
 
@@ -879,29 +762,9 @@
      */
     inline Matrix<T,P>&
     operator/=         (const Matrix<T,P>& M) {
-
         assert (_dim == M._dim);
-
-#if defined USE_VALARRAY
-        _M /= M.Container();
-#elif defined EXPLICIT_SIMD
-        if (fp_type(_M[0]))
-        	SSE::binary<T>(_M, M.Container(), SSE::div<T>(), _M);
-        else
-        	for (size_t i = 0; i < Size(); ++i)
-        		_M[i] /= M[i];
-#else
-#ifdef EW_OMP
-    #pragma omp parallel for
-        for (size_t i = 0; i < Size(); ++i)
-            _M[i] /= M[i];
-#else
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
-        #endif
-#endif
-
         return *this;
-
     }
 
 
@@ -913,18 +776,9 @@
      */
     template <class S> inline Matrix<T,P>&
     operator/=         (const Matrix<S,P> &M) {
-
         assert (_dim == M.Dim());
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] /= M[i];
-#else
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
-#endif
         return *this;
-
     }
 
 
@@ -938,17 +792,8 @@
     template <class S>
     inline Matrix<T,P>&
     operator/=         (const S s) {
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-		for (size_t i = 0; i < Size(); ++i)
-			_M[i] /= T(s);
-#else
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::divides<T>(),s));
-#endif
-
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::divides<T>(),(T)s));
         return *this;
-
     }
 
 
