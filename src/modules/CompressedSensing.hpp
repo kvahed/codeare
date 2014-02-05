@@ -32,6 +32,11 @@
 #include "CX.hpp"
 #include "linalg/Lapack.hpp"
 
+#ifdef _MSC_VER
+std::string ofstr = "    %02Iu - nrms: %1.7f, l-search: %d, ";
+#else
+std::string ofstr = "    %02zu - nrms: %1.7f, l-search: %d, ";
+#endif
 //#include <pthread.h>
 /**
  * @brief Reconstruction startegies
@@ -342,7 +347,7 @@ namespace RRStrategy {
                 
             } 
             
-            printf ("    %02zu - nrms: %1.7f, l-search: %i, ", k, rmse, i); fflush (stdout);
+            printf (ofstr.c_str(), k, rmse, i); fflush (stdout);
 
             if (i == cgp.lsiter) {
                 printf ("Reached max line search, exiting... \n"); 

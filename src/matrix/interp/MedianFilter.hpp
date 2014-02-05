@@ -29,7 +29,7 @@ medfilt2 (const Matrix<T>& M, const size_t fh = 3, const size_t fw = 3) {
     size_t ih = size(M,0);
     size_t iw = size(M,1);
     
-	size_t x, y, fx, fy, ex = fw/2, ey = fh/2;
+	int x, y, fx, fy, ex = fw/2, ey = fh/2;
     
 #pragma omp parallel default (shared) private (y,fx,fy)
     {

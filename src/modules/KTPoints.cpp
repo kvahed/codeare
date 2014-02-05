@@ -22,6 +22,12 @@
 #include "PTXINIFile.hpp"
 #include "IOContext.hpp"
 
+#ifdef _MSC_VER
+std::string ofstr = "    %04Iu %.6f";
+#else
+std::string ofstr = "    %04zu %.6f";
+#endif
+
 using namespace RRStrategy;
 
 /**
@@ -39,7 +45,7 @@ NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result)
     size_t i;
 
 #pragma omp parallel for reduction(+:nrmse)
-    for (size_t i = 0; i < numel(target); i++ )
+    for (int i = 0; i < numel(target); i++ )
         nrmse += pow(abs(target[i]) - abs(result[i]), 2);
 
     nrmse = sqrt(nrmse)/norm(target);
@@ -60,11 +66,10 @@ NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result)
 inline float
 NOHO                         (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
 
-    float nrmse = 0.0;
-    size_t i;
+    float nrmse = 0.f;
 
-#pragma omp parallel for default (shared) private (i) reduction(+:nrmse)
-	for (i = 0; i < numel(target); i++ )
+#pragma omp parallel for default (shared) reduction(+:nrmse)
+	for (int i = 0; i < numel(target); i++ )
 		nrmse += pow(abs(target[i]) - abs(result[i]), 2);
     
     return nrmse;
@@ -86,7 +91,7 @@ PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
     size_t n = target.Size();
     
 #pragma omp parallel for
-    for (size_t i = 0; i < n; i++) 
+    for (int i = 0; i < n; i++) 
         target[i] = abs(target[i]) * result[i] / abs(result[i]);
 
 }
@@ -130,10 +135,10 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
     cxfl pgd = cxfl(0, TWOPI * GAMMA * 10.0);
 
     #pragma omp for
-            for (size_t k = 0; k < nk; k++) 
-                for (size_t s = 0; s < ns; s++) {
+            for (int k = 0; k < nk; k++) 
+                for (int s = 0; s < ns; s++) {
                 	cxfl eikr = pgd * exp (cxfl(0, ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s) + TWOPI * d[k] * b0(s)));
-                	for (size_t c = 0; c < nc; c++)
+                	for (int c = 0; c < nc; c++)
                 		m(s,c*nk+k) =  b1(s,c) * eikr;
                 }
     
@@ -262,7 +267,7 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
 		if (j % 5 == 0 && j > 0)
 			printf ("\n");
 
-		printf ("    %04zu %.6f", gc, res[gc]); 
+		printf (ofstr.c_str(), gc, res[gc]); 
 
 		fflush (stdout);
 

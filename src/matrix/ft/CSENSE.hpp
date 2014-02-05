@@ -138,7 +138,7 @@ public:
 			
 			// FT individual channels
 #pragma omp for
-			for (size_t i = 0; i < nc; i++)
+			for (int i = 0; i < nc; i++)
 				if (ndim == 2)
 					Slice  (tmp, i, ft ->* Slice  (tmp, i));
 				else
@@ -146,16 +146,16 @@ public:
 
 			// Antialiasing
 #pragma omp for
-			for (size_t x = 0; x < dims[0]; x++)
-				for (size_t y = 0; y < dims[1]; y++)
-					for (size_t z = 0; z < dims[2]; z++) {
-						for (size_t c = 0; c < nc; c++) {
+			for (int x = 0; x < dims[0]; x++)
+				for (int y = 0; y < dims[1]; y++)
+					for (int z = 0; z < dims[2]; z++) {
+						for (int c = 0; c < nc; c++) {
                             
 							ra [c] = (ndim == 3) ? tmp (x, y, z, c) : tmp (x, y, c);
 							
-							for (size_t zi = 0, i = 0; zi < af[2]; zi++)
-								for (size_t yi = 0; yi < af[1]; yi++)
-									for (size_t xi = 0; xi < af[0]; xi++, i++) 
+							for (int zi = 0, i = 0; zi < af[2]; zi++)
+								for (int yi = 0; yi < af[1]; yi++)
+									for (int xi = 0; xi < af[0]; xi++, i++) 
                                         s (c, i) = (ndim == 3) ?
 											sens (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], c):
 											sens (x + xi * dims[0], y + yi * dims[1],                   c);
@@ -178,9 +178,9 @@ public:
 						si = gemm (si,  s, 'N', 'C');
 							rp = gemm (si, ra, 'N', 'N');
                         
-                        for (size_t zi = 0, i = 0; zi < af[2]; zi++)
-                            for (size_t yi = 0; yi < af[1]; yi++)
-                                for (size_t xi = 0; xi < af[0]; xi++, i++) {
+                        for (int zi = 0, i = 0; zi < af[2]; zi++)
+                            for (int yi = 0; yi < af[1]; yi++)
+                                for (int xi = 0; xi < af[0]; xi++, i++) {
                                     res (x + xi * dims[0], y + yi * dims[1] , z + zi * dims[2], 0) = rp [i];
                                     if (compgfm)
                                         res (x + xi * dims[0], y + yi * dims[1] , z + zi * dims[2], 1) = sqrt(abs(gf [i]));
@@ -253,7 +253,7 @@ private:
 		printf ("  allocating %d " JL_SIZE_T_SPECIFIER "-dim ffts ... ", nthreads, ndim);
 		fflush (stdout);
 
-		for (size_t i = 0; i < nthreads; ++i)
+		for (int i = 0; i < nthreads; ++i)
 			m_dft.push_back(DFT<T>(dims));
 
 		std::cout << "done\n";

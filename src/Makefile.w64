@@ -2,7 +2,7 @@ LOCAL_HOME = c:\local
 OORB_HOME = $(LOCAL_HOME)\omniORB-4.1.6
 
 CXX      = cl
-CXXFLAGS = /c /Imatrix /Imatrix\simd /Imatrix\linalg /Imatrix\ft /Imatrix\interp /Imatrix\io /Imatrix\arithmetic /Imatrix\dwt /Itinyxml /Imisc /I$(LOCAL_HOME)\OpenSSL-Win64\include /I$(OORB_HOME)\include /I$(LOCAL_HOME)\boost_1_55_0 /I"C:\Program Files\HDF_Group\HDF5\1.8.12\include" /IC:\Intel\ComposerXE-2011\mkl\include /I$(LOCAL_HOME)\fftw /I.. /I$(OORB_HOME)\include /I$(LOCAL_HOME)\gsl\include /Imodules /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 /EHsc /DTIXML_USE_STL /nologo /Ox /MT 
+CXXFLAGS = /c /Imatrix /Imatrix\simd /Imatrix\linalg /Imatrix\ft /Imatrix\interp /Imatrix\io /Imatrix\arithmetic /Imatrix\dwt /Itinyxml /Imisc /I$(LOCAL_HOME)\OpenSSL-Win64\include /I$(OORB_HOME)\include /I$(LOCAL_HOME)\boost_1_55_0 /I"C:\Program Files\HDF_Group\HDF5\1.8.12\include" /IC:\Intel\ComposerXE-2011\mkl\include /I$(LOCAL_HOME)\fftw /I.. /I$(OORB_HOME)\include /I$(LOCAL_HOME)\gsl\include /Imodules /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 /EHsc /DTIXML_USE_STL /nologo /Ox /MT /openmp
 
 LD       = link
 LDFLAGS  =  /nologo /libpath:$(OORB_HOME)/lib/x86_win32 /libpath:tinyxml /libpath:C:\Intel\ComposerXE-2011\mkl\lib\intel64 /libpath:$(LOCAL_HOME)\fftw /libpath:$(LOCAL_HOME)\OpenSSL-Win64\lib\VC\static /NODEFAULTLIB:LIBCMT  /libpath:"C:\Program Files\HDF_Group\HDF5\1.8.12\lib" /libpath:"C:\Program Files\MATLAB\R2013b\extern\lib\win64\microsoft" /libpath:C:\local\gsl\lib 
