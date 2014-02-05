@@ -1,6 +1,7 @@
 #ifndef __WORK_SPACE_HPP_
 #define __WORK_SPACE_HPP_
 
+#include "DllExport.h"
 #include "Matrix.hpp"
 #include "Configurable.hpp"
 #include "Params.hpp"
@@ -17,7 +18,6 @@
   #include "Digest.hpp"
 #endif
 
-
 typedef map<string, std::vector<std::string> > reflist;
 typedef pair<string, std::vector<std::string> > refent;
 typedef map<string, boost::any> store;
@@ -30,7 +30,7 @@ template<class T> struct PrintTraits;
 /**
  * @brief Global workspace. Singleton.
  */
-class Workspace {
+class DLLEXPORT Workspace {
 
 
 

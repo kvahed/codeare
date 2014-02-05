@@ -345,7 +345,7 @@ Solution ComputeGradient (GradientParams& gp) {
     tos = cumsum (tos);
 
 	T      = tos [numel(tos)-1];
-	Nt     = round (T/gp.dt); 
+	Nt     = ROUND (T/gp.dt); 
 
 	t      = linspace<double> (0.0, T, Nt);
 

@@ -275,7 +275,7 @@ public:
 	
 		// Create a temporary array that holds all the values between place1 and place2
 		size_t len = y - x + 1;
-		size_t cut [len];
+		container<size_t> cut (len);
 
 		i = len;
 		while (i--)

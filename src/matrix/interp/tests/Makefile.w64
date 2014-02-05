@@ -1,0 +1,21 @@
+CXX=cl
+CXXFLAGS=/openmp /nologo /EHsc /I.. /I..\.. /I..\..\.. /I..\..\..\misc /I..\..\arithmetic /I..\..\..\tinyxml /I..\..\io /I..\..\linalg /I..\..\simd /IC:\local\boost_1_55_0 /IC:\local\gsl\include /c /w /DTIXML_USE_STL
+LINK=link
+LDFLAGS=/libpath:C:\local\gsl\lib /nologo
+LIBS=libgsl-0.lib libgslcblas-0.lib
+RM=del
+
+.SUFFIXES: .cpp .obj
+
+all: t_ppval.exe t_interp1.exe check
+
+.cpp.exe:
+	$(CXX) $(CXXFLAGS) $*.cpp
+	$(LINK) $(LDFLAGS) $(LIBS) $*.obj
+
+clean: 
+	$(RM) *.obj
+	$(RM) *.exe
+
+check:
+	t_interp1.exe

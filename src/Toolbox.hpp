@@ -21,6 +21,8 @@
 #ifndef __TOOLBOX_HPP__
 #define __TOOLBOX_HPP__
 
+#include "DllExport.h"
+
 #include <boost/any.hpp>
 
 #include <iomanip> 
@@ -29,11 +31,10 @@
 
 using namespace std;
 
-
 /**
  * @brief  A toolbox for some static stuff
  */
-class Toolbox {
+class DLLEXPORT Toolbox {
 
 public:
 

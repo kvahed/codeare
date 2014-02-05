@@ -1,0 +1,22 @@
+CXX=cl
+CXXFLAGS=/openmp /nologo /EHsc /c /w /DTIXML_USE_STL /nologo /MT
+LINK=lib
+LDFLAGS=/nologo /NODEFAULTLIB:LIBCMT
+LIBS=mkl_rt.lib
+RM=del
+
+all: tinyxml.lib
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $*.cpp
+#	$(LINK) $(LDFLAGS) $*.obj
+
+tinyxml.lib: action_store.obj node_set.obj tinyxml.obj tinyxmlparser.obj xml_util.obj xpath_processor.obj xpath_static.obj xpath_syntax.obj lex_util.obj tinystr.obj tinyxmlerror.obj tokenlist.obj xpath_expression.obj  xpath_stack.obj xpath_stream.obj
+    $(LINK) *.obj $(LDFLAGS) /out:tinyxml.lib
+
+clean: 
+	$(RM) *.obj
+	$(RM) *.lib
+
+#check:
+#

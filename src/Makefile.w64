@@ -1,0 +1,86 @@
+LOCAL_HOME = c:\local
+OORB_HOME = $(LOCAL_HOME)\omniORB-4.1.6
+
+CXX      = cl
+CXXFLAGS = /c /Imatrix /Imatrix\simd /Imatrix\linalg /Imatrix\ft /Imatrix\interp /Imatrix\io /Imatrix\arithmetic /Imatrix\dwt /Itinyxml /Imisc /I$(LOCAL_HOME)\OpenSSL-Win64\include /I$(OORB_HOME)\include /I$(LOCAL_HOME)\boost_1_55_0 /I"C:\Program Files\HDF_Group\HDF5\1.8.12\include" /IC:\Intel\ComposerXE-2011\mkl\include /I$(LOCAL_HOME)\fftw /I.. /I$(OORB_HOME)\include /I$(LOCAL_HOME)\gsl\include /Imodules /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 /EHsc /DTIXML_USE_STL /nologo /Ox /MT 
+
+LD       = link
+LDFLAGS  =  /nologo /libpath:$(OORB_HOME)/lib/x86_win32 /libpath:tinyxml /libpath:C:\Intel\ComposerXE-2011\mkl\lib\intel64 /libpath:$(LOCAL_HOME)\fftw /libpath:$(LOCAL_HOME)\OpenSSL-Win64\lib\VC\static /NODEFAULTLIB:LIBCMT  /libpath:"C:\Program Files\HDF_Group\HDF5\1.8.12\lib" /libpath:"C:\Program Files\MATLAB\R2013b\extern\lib\win64\microsoft" /libpath:C:\local\gsl\lib 
+LIBS     = mkl_rt.lib libfftw3-3.lib libfftw3f-3.lib ssleay32MT.lib libeay32MT.lib omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib msvcrt.lib tinyxml.lib hdf5.lib hdf5_cpp.lib libmx.lib libmat.lib libgsl-0.lib libgslcblas-0.lib Advapi32.lib User32.lib Ole32.lib Oleaut32.lib Gdi32.lib
+
+
+OMNIIDL  = $(OORB_HOME)\bin\x86_win32\omniidl -bcxx -Wbh=.h -Wbs=.cpp
+
+CP       = copy
+
+COMMON   = RRSModule.obj options.obj Workspace.obj Queue.obj ReconContext.obj Toolbox.obj 
+CLIENT   = lclient.exe
+SERVER   = ReconServant.obj ReconStrategy.obj ReconContext.obj reconserver.obj
+
+all: $(COMMON) $(CLIENT) 
+
+RRSModule.h: RRSModule.idl
+	$(OMNIIDL) RRSModule.idl
+
+RRSModule.cpp: RRSModule.idl
+	$(OMNIIDL) RRSModule.idl
+
+RRSModule.obj: RRSModule.cpp RRSModule.h
+	$(CXX) $(CXXFLAGS) RRSModule.cpp
+
+Workspace.obj: Workspace.cpp Workspace.hpp Configurable.hpp
+	$(CXX) $(CXXFLAGS) Workspace.cpp
+
+Queue.obj: Queue.cpp Queue.hpp Configurable.hpp
+	$(CXX) $(CXXFLAGS) Queue.cpp
+
+LocalConnector.obj: LocalConnector.cpp LocalConnector.hpp Configurable.hpp
+	$(CXX) $(CXXFLAGS) LocalConnector.cpp
+
+RemoteConnector.obj: RemoteConnector.cpp RemoteConnector.hpp Configurable.hpp RRSModule.h 
+	$(CXX) $(CXXFLAGS) RemoteConnector.cpp
+
+ReconStrategy.obj: ReconStrategy.cpp ReconStrategy.h RRSModule.h Configurable.h
+	$(CXX) $(CXXFLAGS) ReconStrategy.cpp
+
+ReconContext.obj: ReconContext.cpp ReconContext.hpp ReconStrategy.hpp RRSModule.h Configurable.hpp Loader.hpp
+	$(CXX) $(CXXFLAGS) ReconContext.cpp
+
+Loader.hpp:
+    $(CP) /y Loader.hpp.in Loader.hpp
+
+Toolbox.obj: Toolbox.cpp Toolbox.hpp
+	$(CXX) $(CXXFLAGS) Toolbox.cpp
+
+options.obj: options.cpp options.h
+	$(CXX) $(CXXFLAGS) options.cpp
+
+lclient.exe: LocalConnector.obj testclt.cpp 
+	$(CXX) $(CXXFLAGS) -DLOCAL testclt.cpp 
+    $(LD) $(LDFLAGS) $(COMMON) LocalConnector.obj $(LIBS) testclt.obj /out:lclient.exe
+
+# reconserver.obj: reconserver.cpp
+# 	$(CXX) $(CXXFLAGS) reconserver.cpp
+
+# tinyxml.obj: tinyxml/tinyxml.h tinyxml/tinyxml.cpp
+#     $(CXX) $(CXXFLAGS) tinyxml/tinyxml.cpp	
+
+# tinyxmlerror.obj: tinyxml/tinyxml.h tinyxml/tinyxmlerror.cpp
+#     $(CXX) $(CXXFLAGS) tinyxml/tinyxmlerror.cpp	
+
+# tinyxmlparser.obj: tinyxml/tinyxml.h tinyxml/tinyxmlparser.cpp
+#     $(CXX) $(CXXFLAGS) tinyxml/tinyxmlparser.cpp	
+
+# testclt.exe: $(COMMON) $(CLIENT) testclt.obj
+# 	$(LD) $(LDFLAGS) $(COMMON) $(CLIENT) testclt.obj /out:testclt.exe 
+
+# reconserver.exe: $(COMMON) $(SERVER)
+# 	$(LD) /out:reconserver.exe $(SERVER) $(COMMON) $(LDFLAGS) 
+
+
+clean clean_all:
+	del *.obj
+	del *.exe
+	del RRSModule.h 
+	del RRSModule.cpp
+	del Loader.hpp

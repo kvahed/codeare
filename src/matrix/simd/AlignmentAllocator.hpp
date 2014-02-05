@@ -8,10 +8,10 @@
 #include <complex>
 #include <xmmintrin.h>
 
-template<std::size_t alignment>
+template<size_t alignment>
 struct static_allocator {
     
-    static void* allocate(std::size_t n) {
+    static void* allocate(size_t n) {
 
         if(n == 0)
             return 0;
@@ -44,8 +44,9 @@ struct static_allocator {
 
     }
     
-    static std::size_t max_size () {
-        return std::numeric_limits<std::size_t>::max();
+    static size_t max_size () {
+        #undef max
+        return std::numeric_limits<size_t>::max();
     }
 
 };
@@ -54,11 +55,11 @@ struct static_allocator {
 template<>
 struct static_allocator<1> {
 
-    static std::size_t max_size ()  {
-        return std::numeric_limits<std::size_t>::max();
+    static size_t max_size ()  {
+        return std::numeric_limits<size_t>::max();
     }
     
-    static void* allocate (std::size_t n) { 
+    static void* allocate (size_t n) { 
 
         if(n == 0)
             return 0;
@@ -78,7 +79,7 @@ struct static_allocator<1> {
 template<> struct static_allocator<0>;
 
 /// allocator with explicit alignment
-template<typename _Tp, std::size_t alignment = 16>
+template<typename _Tp, size_t alignment = 16>
 class AlignmentAllocator {
     
     typedef static_allocator<alignment> static_alloc;
@@ -176,7 +177,7 @@ public:
 };// class AlignmentAllocator<>
 
 /// AlignmentAllocator<void> specialization.
-template<std::size_t alignment>
+template<size_t alignment>
 class AlignmentAllocator<void, alignment> {
 
 public:

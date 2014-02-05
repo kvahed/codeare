@@ -1,0 +1,50 @@
+CXX=cl
+CXXFLAGS=/openmp /nologo /EHsc /I.. /I..\.. /I..\io /I..\linalg /I..\simd /IC:\Intel\ComposerXE-2011\mkl\include /IC:\local\boost_1_55_0 /c /w
+LINK=link
+LDFLAGS=/libpath:C:\Intel\ComposerXE-2011\mkl\lib\intel64
+LIBS=mkl_rt.lib
+RM=del
+
+.SUFFIXES: .cpp .obj
+
+all: t_abs.exe t_asin.exe t_atan2.exe t_complex.exe t_cosh.exe t_ediv.exe t_epow.exe t_exp.exe t_flipud.exe t_gtoreq.exe t_log.exe t_nrmse.exe t_round.exe t_sinh.exe t_tan.exe t_acos.exe t_atan.exe t_ceil.exe t_cos.exe t_eadd.exe t_emul.exe t_esub.exe t_fliplr.exe t_floor.exe t_isnan.exe t_log10.exe t_resize.exe t_sin.exe t_size.exe t_tanh.exe check
+
+.cpp.exe:
+	$(CXX) $(CXXFLAGS) $*.cpp
+	$(LINK) $(LDFLAGS) $*.obj
+
+clean: 
+	$(RM) *.obj
+	$(RM) *.exe
+
+check:
+	t_abs.exe
+	t_asin.exe
+	t_atan2.exe
+	t_complex.exe
+	t_cosh.exe
+	t_ediv.exe
+	t_epow.exe
+	t_exp.exe
+	t_flipud.exe
+	t_gtoreq.exe
+	t_log.exe
+	t_nrmse.exe
+	t_round.exe
+	t_sinh.exe
+	t_tan.exe
+	t_acos.exe
+	t_atan.exe
+	t_ceil.exe
+	t_cos.exe
+	t_eadd.exe
+	t_emul.exe
+	t_esub.exe
+	t_fliplr.exe
+	t_floor.exe
+	t_isnan.exe
+	t_log10.exe
+	t_resize.exe
+	t_sin.exe
+	t_size.exe
+	t_tanh.exe
