@@ -1,0 +1,21 @@
+CXX=cl
+CXXFLAGS=/openmp /nologo /EHsc /I.. /Iio /Ilinalg /I. /Isimd /IC:\Intel\ComposerXE-2011\mkl\include /IC:\local\boost_1_55_0 /Iarithmetic /c /w
+LINK=link
+LDFLAGS=/libpath:C:\Intel\ComposerXE-2011\mkl\lib\intel64
+LIBS=mkl_rt.lib
+RM=del
+
+all: test.exe Matrix.obj
+
+test.exe: test.obj
+	$(LINK) $(LDFLAGS) test.obj $(LIBS)
+
+test.obj: test.cpp
+	$(CXX) $(CXXFLAGS) test.cpp 
+
+Matrix.obj:
+	$(CXX) $(CXXFLAGS) /DNO_LAPACK Matrix.cpp
+
+clean: 
+	$(RM) *.obj
+	$(RM) *.exe
