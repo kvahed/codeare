@@ -109,7 +109,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 	size_t    rtms = imgs.Size() / rtmsiz / 2;  // division by 2 (Echoes)
 	ticks      tic = getticks();
 	
-	printf ("  SVDing %zu matrices of %zux%zu ... ", rtms, nrxc, ntxc); fflush(stdout);
+	printf ("  SVDing " JL_SIZE_T_SPECIFIER " matrices of " JL_SIZE_T_SPECIFIER "x" JL_SIZE_T_SPECIFIER " ... ", rtms, nrxc, ntxc); fflush(stdout);
 	
 	// Permute dimensions on imgs for contiguous RAM access
 	Matrix<cxfl> vxlm (nrxc, ntxc, imgs.Dim(0), imgs.Dim(1), imgs.Dim(2));

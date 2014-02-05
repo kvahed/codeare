@@ -92,7 +92,8 @@ public:
 			for (size_t x = floor(m_kdims[0]/2); x < m_adims[0]-floor(m_kdims[0]/2); ++x) // f.e. 2-253
 				for (size_t c = 0, /*srci = 0,*/ trgi = 0; c < m_nc; ++c) {
 					for (size_t yt = y; yt < af; ++yt, ++trgi) {
-						printf ("%zu, %zu, %zu, %zu, %zu\n", c, trgi, c, x, yt);
+						printf ("" JL_SIZE_T_SPECIFIER ", " JL_SIZE_T_SPECIFIER ", " JL_SIZE_T_SPECIFIER
+                                ", " JL_SIZE_T_SPECIFIER ", " JL_SIZE_T_SPECIFIER "\n", c, trgi, c, x, yt);
 						trg (c,trgi) = m_acs (c,x,yt);
 					}
 					/*

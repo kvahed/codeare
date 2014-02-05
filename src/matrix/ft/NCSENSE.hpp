@@ -123,8 +123,8 @@ public:
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  No of threads: %i\n", m_np);
 		printf ("  Signal nodes: %li\n", m_nx[2]);
-        printf ("  Channels: %zu\n", m_nx[1]);
-        printf ("  Space size: %zu\n", m_nx[3]);
+        printf ("  Channels: " JL_SIZE_T_SPECIFIER "\n", m_nx[1]);
+        printf ("  Space size: " JL_SIZE_T_SPECIFIER "\n", m_nx[3]);
 		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
 		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
 

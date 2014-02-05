@@ -94,7 +94,7 @@ namespace codeare {
 
 					}
 
-					printf ("%zu\n", i);
+					printf ("" JL_SIZE_T_SPECIFIER "\n", i);
 
 					return M;
 

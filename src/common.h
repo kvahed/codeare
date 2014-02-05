@@ -130,4 +130,25 @@ c_multiply (const T a, const T b) {
 }
 #endif
 
+#if defined(_MSC_VER)
+  #define JL_SIZE_T_SPECIFIER    "%Iu"
+  #define JL_SSIZE_T_SPECIFIER   "%Id"
+  #define JL_PTRDIFF_T_SPECIFIER "%Id"
+#elif defined (__GNUC__)
+  #define JL_SIZE_T_SPECIFIER    "%zu"
+  #define JL_SSIZE_T_SPECIFIER   "%zd"
+  #define JL_PTRDIFF_T_SPECIFIER "%zd"
+#else
+// TODO figure out which to use.
+  #if NUMBITS == 32
+    #define JL_SIZE_T_SPECIFIER    something_unsigned
+    #define JL_SSIZE_T_SPECIFIER   something_signed
+    #define JL_PTRDIFF_T_SPECIFIER something_signed
+  #else
+    #define JL_SIZE_T_SPECIFIER    something_bigger_unsigned
+    #define JL_SSIZE_T_SPECIFIER   something_bigger_signed
+    #define JL_PTRDIFF_T_SPECIFIER something-bigger_signed
+  #endif
+#endif
+
 #endif //__COMMON_H__

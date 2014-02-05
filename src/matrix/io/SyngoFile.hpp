@@ -148,7 +148,7 @@ namespace io      {
 				idx[i] = idx[i-1]*dims[i-1];
 			printf ("  Data (dims: ");
 			for (size_t i = 0; i < MAX_ICE_DIM; i++) {
-				printf ("%zu", dims[i]);
+				printf ("" JL_SIZE_T_SPECIFIER "", dims[i]);
 				if (i < AVE)
 					printf (" ");
 				else
@@ -295,7 +295,7 @@ namespace io      {
 			printf ("  Data (dims: ");
 
 			for (size_t i = 0; i < MAX_ICE_DIM; i++) {
-				printf ("%zu", m_meas_dims[i]);
+				printf ("" JL_SIZE_T_SPECIFIER "", m_meas_dims[i]);
 				if (i < AVE)
 					printf (" ");
 				else

@@ -250,7 +250,7 @@ private:
 				nthreads = omp_get_num_threads ();
 			}
 
-		printf ("  allocating %d %zu-dim ffts ... ", nthreads, ndim);
+		printf ("  allocating %d " JL_SIZE_T_SPECIFIER "-dim ffts ... ", nthreads, ndim);
 		fflush (stdout);
 
 		for (size_t i = 0; i < nthreads; ++i)

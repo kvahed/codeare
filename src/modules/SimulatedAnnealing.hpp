@@ -142,7 +142,7 @@ public:
 		}
 
 		
-		printf ("\n  ... done. Best trip length (%zu): %.4f, WTime: %.4f seconds.\n\n", 
+		printf ("\n  ... done. Best trip length (" JL_SIZE_T_SPECIFIER "): %.4f, WTime: %.4f seconds.\n\n", 
 				m_bestn, m_bestlen, elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
 
 

@@ -93,7 +93,8 @@ CompressedSensing::Process () {
 	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
     Matrix<cxfl> im_dc;
 
-	printf ("  Geometry: %zuD (%zu,%zu,%zu)\n", ndims (data), 
+	printf ("  Geometry: " JL_SIZE_T_SPECIFIER "D (" JL_SIZE_T_SPECIFIER ","
+            JL_SIZE_T_SPECIFIER "," JL_SIZE_T_SPECIFIER ")\n", ndims (data), 
 		size(data,0), size(data,1), size(data,2));
 	m_csparam.dwt = new DWT <cxfl> (data.Height(), (wlfamily) m_wf, m_wm);
 
