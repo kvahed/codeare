@@ -266,7 +266,7 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
 
 		fflush (stdout);
 
-        if ((gc && j && breakearly && res[gc] > res[gc-1]) || res[gc] < conv || isnan(res[gc])) {
+        if ((gc && j && breakearly && res[gc] > res[gc-1]) || res[gc] < conv || is_nan(res[gc])) {
 			gc++;
             break; 
 		} 
@@ -469,7 +469,7 @@ KTPoints::Process   ()     {
 
 		// Solve KTPoints
         KTPSolve (m, target, final, solution, m_lambda, m_maxiter, m_conv, m_breakearly, gc, res);
-		if (isnan(res(gc)))
+		if (is_nan(res(gc)))
 			break;
     
         // Check max pulse amplitude -----------------        

@@ -1,7 +1,7 @@
 OORB_HOME = C:/"Program Files"/omniORB-4.1.1
 
 CXX      = cl
-CXXFLAGS = /c /I$(OORB_HOME)/include /I../ /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 /GD /GX /DTIXML_USE_STL /nologo /Ox
+CXXFLAGS = /c /I..\matrix /I$(OORB_HOME)/include /I../ /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 /GD /GX /DTIXML_USE_STL /nologo /Ox
 
 LD       = link.exe
 LDFLAGS  = /nologo omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib msvcstub.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcmtd.lib ws2_32.lib mswsock.lib advapi32.lib /libpath:$(OORB_HOME)/lib/x86_win32 /libpath:..\ /DLL

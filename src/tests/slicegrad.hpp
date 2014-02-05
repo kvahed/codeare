@@ -26,4 +26,5 @@ slicegrad (Connector<T>* rc) {
     s.dump (fout);
     fout.Close();
 
+    return true;
 }

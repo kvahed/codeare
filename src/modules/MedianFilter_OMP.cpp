@@ -83,6 +83,7 @@ MedianFilter_OMP::Init () {
 
 	printf ("... done.\n");
 
+	return codeare::OK;
 
 }
 

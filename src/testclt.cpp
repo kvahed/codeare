@@ -23,8 +23,6 @@
 
 int main (int argc, char** argv) {
 	
-	int  rc  = 0;
-
 	if (init (argc, argv)) {
 		
 #ifdef LOCAL
@@ -56,13 +54,11 @@ int main (int argc, char** argv) {
         */
         else    {printf ("ERROR: Cannot call unknow module %s\n", test); return 1;}
 
-		delete con;
-		
+        return 0;
+
 	} else
 		
-		rc = 1;	
-	
-	return rc;
+		return 1;	
 
 }
 

@@ -35,16 +35,18 @@
 
 std::string exec(char* cmd) {
 
-  FILE* pipe = popen(cmd, "r");
+  std::string result = "";
+#ifndef _MSC_VER
+    FILE* pipe = popen(cmd, "r");
   if (!pipe) return "ERROR";
   char buffer[128];
-  std::string result = "";
 
   while(!feof(pipe))
     if(fgets(buffer, 128, pipe) != NULL)
       result += buffer;
 
   pclose(pipe);
+  #endif
   return result;
 
 }
@@ -73,7 +75,7 @@ Toolbox::Instance  () {
 double 
 Toolbox::ClockRate () const {
 	
-#if defined(HAVE_MACH_ABSOLUTE_TIME)
+#if defined __APPLE__
 	
 	// OSX
 	
@@ -85,7 +87,7 @@ Toolbox::ClockRate () const {
 	
 	return freq;
 	
-#else
+#elif defined __LINUX__
 	
 	// LINUX
 	std::string cmd ("lscpu | grep \"CPU MHz\"|awk '{print $3}'");
@@ -93,6 +95,9 @@ Toolbox::ClockRate () const {
 	float mhz = atof(mhzstr.c_str());
 	return 1000000.0 * mhz;
 
+#else
+
+    	return 1000000.0;
 #endif
 }
 
