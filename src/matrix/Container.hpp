@@ -18,7 +18,7 @@
 
 #if (_MSC_VER >= 1300) && (WINVER < 0x0500) && !defined(_ftol)
 #ifndef _ftol
-extern "C" long _ftol( double d) { return (long) d;}
+extern "C" inline long _ftol( double d) { return (long) d;}
 #endif
 #endif
 

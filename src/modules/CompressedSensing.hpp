@@ -32,7 +32,7 @@
 #include "CX.hpp"
 #include "linalg/Lapack.hpp"
 
-#include <pthread.h>
+//#include <pthread.h>
 /**
  * @brief Reconstruction startegies
  */
