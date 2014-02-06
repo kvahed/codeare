@@ -1,0 +1,2 @@
+#define codeare_VERSION_MAJOR @codeare_VERSION_MAJOR@
+#define codeare_VERSION_MINOR @codeare_VERSION_MINOR@
