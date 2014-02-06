@@ -98,7 +98,7 @@ PTXWriteSiemensINIFile (const Matrix<cxfl>& pt, const Matrix<float>& grad,
 
 	// Normalise amplitudes
     
-	float  maxg = max(abs(grad));
+	float  maxg = m_max(abs(grad));
 	Matrix<float> go = grad / maxg;
 
 	fprintf (fp, "[Gradient]\n"                           );

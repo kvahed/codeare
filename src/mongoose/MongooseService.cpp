@@ -57,7 +57,9 @@ static void Serve () {
 }
 
 MongooseService::MongooseService() {
+#ifndef __APPLE__
     boost::thread bt (Serve);
+#endif
 }
 
 MongooseService::~MongooseService() {}

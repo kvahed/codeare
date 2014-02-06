@@ -115,7 +115,7 @@ CompressedSensing::Process () {
 
 	im_dc    = dft ->* im_dc;
 	
-	ma       = max(abs(im_dc));
+	ma       = m_max(abs(im_dc));
 
     if (m_verbose)
 		vc.push_back(im_dc);
