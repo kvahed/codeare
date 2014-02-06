@@ -572,15 +572,15 @@ round (const Matrix<T>& M) {
  * @return          Maximum
  */
 template <class T> inline  T
-max (const Matrix<T>& M) {
+m_max (const Matrix<T>& M) {
 
-	T max = std::abs(M[0]);
+	T mx = std::abs(M[0]);
 
 	for (size_t i = 0; i < numel(M); ++i)
-		if (std::abs(M[i]) > max)
-			max = M[i];
+		if (std::abs(M[i]) > mx)
+			mx = M[i];
 
-	return max;
+	return mx;
 	
 }
 
@@ -592,15 +592,15 @@ max (const Matrix<T>& M) {
  * @return          Minimum
  */
 template <class T> inline  T
-min (const Matrix<T>& M) {
+m_min (const Matrix<T>& M) {
 
-	T min = abs(M[0]);
+	T mn = abs(M[0]);
 
 	for (size_t i = 0; i < numel(M); ++i)
-		if (abs(M[i]) < min)
-			min = M[i];
+		if (abs(M[i]) < mn)
+			mn = M[i];
 
-	return min;
+	return mn;
 	
 }
 

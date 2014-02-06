@@ -159,15 +159,15 @@ inline Matrix<cxdb> eig (const Matrix<cxdb>& m) {
  */
 
 template<class T, class S> inline boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> >
-svd2 (const Matrix<T>& IN, char jobz = 'N') {
+svd2 (const Matrix<T>& M, char jobz = 'N') {
     
     typedef typename LapackTraits<T>::RType T2;
     boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> > ret;
     
-    assert (is2d(IN));
+    assert (is2d(M));
     assert (jobz == 'N' || jobz == 'S' || jobz == 'A');
     
-    Matrix<T> A (IN);
+    Matrix<T> A (M);
     
     int   m, n, lwork, info = 0, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vtcol = 1;
 

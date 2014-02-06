@@ -54,7 +54,7 @@ Solution VDSpiral (SpiralParams& sp) {
 	assert (numel(rad) == numel(fov));
 
 	k_max   = 5.0 / sp.res;
-	fov_max = max(fov);
+	fov_max = m_max(fov);
 
 	dr  = sp.shots / (fov_max);
 	n   = size(fov,1)*100;

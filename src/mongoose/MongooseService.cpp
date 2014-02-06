@@ -57,7 +57,7 @@ static void Serve () {
 }
 
 MongooseService::MongooseService() {
-    // boost::thread bt (Serve);
+    boost::thread bt (Serve);
 }
 
 MongooseService::~MongooseService() {}

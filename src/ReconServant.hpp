@@ -21,7 +21,7 @@
 #ifndef __RECON_SERVANT_HPP__
 #define __RECON_SERVANT_HPP__
 
-#ifdef __WIN32__ 
+#ifdef _MSC_VER 
     #include "RRSModule.h"
 #else
     #include "RRSModule.hh"
