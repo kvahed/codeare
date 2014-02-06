@@ -14,7 +14,7 @@ endif
 AM_CXXFLAGS = -DTIXML_USE_STL -Icore -Imatrix -Imatrix/simd -Imatrix/linalg -Itinyxml -Imisc -Imatrix/arithmetic -Imatrix/interp -Imatrix/io -Imodules $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON =  RRSModule.idl Configurable.hpp DllExport.h options.h options.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Connector.hpp Grid.hpp Grid.cpp
+COMMON =  RRSModule.idl Configurable.hpp DllExport.h options.h options.cpp ReconStrategy.hpp Loader.hpp Connector.hpp Grid.hpp Grid.cpp
 
 COMMON_LD_FLAGS=tinyxml/libtinyxml.la core/libcore.la
 
@@ -33,7 +33,7 @@ liblocal_la_CXXFLAGS = $(AM_CXXFLAGS) -DLOCAL
 lclient_SOURCES = $(COMMON)
 lclient_LDFLAGS = $(COMMON_LD_FLAGS) liblocal.la $(BLAS) $(LAPACK)  $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@
 # -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la 
-lclient_DEPENDENCIES = liblocal.la 
+lclient_DEPENDENCIES = liblocal.la
 if USE_NFFT3
     lclient_LDFLAGS += -dlopen modules/CGSENSE.la -dlopen modules/NuFFT.la
 endif

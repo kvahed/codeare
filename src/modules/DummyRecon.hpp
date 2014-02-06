@@ -21,7 +21,7 @@
 #ifndef __DUMMY_RECON_HPP__
 #define __DUMMY_RECON_HPP__
 
-#include "../ReconStrategy.hpp"
+#include "ReconStrategy.hpp"
 
 /**
  * @brief Reconstruction startegies

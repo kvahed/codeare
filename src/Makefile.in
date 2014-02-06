@@ -130,8 +130,7 @@ libremote_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @NETWORKING_TRUE@am__EXEEXT_1 = rclient$(EXEEXT) codeared$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 = codeared-options.$(OBJEXT) \
-	codeared-ReconContext.$(OBJEXT) codeared-Grid.$(OBJEXT)
+am__objects_1 = codeared-options.$(OBJEXT) codeared-Grid.$(OBJEXT)
 am__objects_2 = codeared-RRSModuleSK.$(OBJEXT)
 am_codeared_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	codeared-ReconServant.$(OBJEXT) codeared-codeared.$(OBJEXT)
@@ -140,8 +139,7 @@ codeared_LDADD = $(LDADD)
 codeared_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(codeared_CXXFLAGS) \
 	$(CXXFLAGS) $(codeared_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_3 = options.$(OBJEXT) ReconContext.$(OBJEXT) \
-	Grid.$(OBJEXT)
+am__objects_3 = options.$(OBJEXT) Grid.$(OBJEXT)
 am_lclient_OBJECTS = $(am__objects_3)
 lclient_OBJECTS = $(am_lclient_OBJECTS)
 lclient_LDADD = $(LDADD)
@@ -435,7 +433,7 @@ top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -DTIXML_USE_STL -Icore -Imatrix -Imatrix/simd -Imatrix/linalg -Itinyxml -Imisc -Imatrix/arithmetic -Imatrix/interp -Imatrix/io -Imodules $(OPENMP_CXXFLAGS)
 
 # Common sources
-COMMON = RRSModule.idl Configurable.hpp DllExport.h options.h options.cpp ReconStrategy.hpp ReconContext.hpp ReconContext.cpp Loader.hpp Connector.hpp Grid.hpp Grid.cpp
+COMMON = RRSModule.idl Configurable.hpp DllExport.h options.h options.cpp ReconStrategy.hpp Loader.hpp Connector.hpp Grid.hpp Grid.cpp
 COMMON_LD_FLAGS = tinyxml/libtinyxml.la core/libcore.la
 
 # OmniORB interface
@@ -451,7 +449,7 @@ lclient_SOURCES = $(COMMON)
 lclient_LDFLAGS = $(COMMON_LD_FLAGS) liblocal.la $(BLAS) $(LAPACK) \
 	$(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@ $(am__append_3)
 # -dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la 
-lclient_DEPENDENCIES = liblocal.la 
+lclient_DEPENDENCIES = liblocal.la
 
 # Remote client (rclient)
 libremote_la_SOURCES = RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
@@ -608,10 +606,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RRSModuleSK.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-Grid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-RRSModuleSK.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-ReconContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-ReconServant.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-codeared.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codeared-options.Po@am__quote@
@@ -686,20 +682,6 @@ codeared-options.obj: options.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='options.cpp' object='codeared-options.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-options.obj `if test -f 'options.cpp'; then $(CYGPATH_W) 'options.cpp'; else $(CYGPATH_W) '$(srcdir)/options.cpp'; fi`
-
-codeared-ReconContext.o: ReconContext.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-ReconContext.o -MD -MP -MF $(DEPDIR)/codeared-ReconContext.Tpo -c -o codeared-ReconContext.o `test -f 'ReconContext.cpp' || echo '$(srcdir)/'`ReconContext.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/codeared-ReconContext.Tpo $(DEPDIR)/codeared-ReconContext.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ReconContext.cpp' object='codeared-ReconContext.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-ReconContext.o `test -f 'ReconContext.cpp' || echo '$(srcdir)/'`ReconContext.cpp
-
-codeared-ReconContext.obj: ReconContext.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-ReconContext.obj -MD -MP -MF $(DEPDIR)/codeared-ReconContext.Tpo -c -o codeared-ReconContext.obj `if test -f 'ReconContext.cpp'; then $(CYGPATH_W) 'ReconContext.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconContext.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/codeared-ReconContext.Tpo $(DEPDIR)/codeared-ReconContext.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ReconContext.cpp' object='codeared-ReconContext.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -c -o codeared-ReconContext.obj `if test -f 'ReconContext.cpp'; then $(CYGPATH_W) 'ReconContext.cpp'; else $(CYGPATH_W) '$(srcdir)/ReconContext.cpp'; fi`
 
 codeared-Grid.o: Grid.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codeared_CXXFLAGS) $(CXXFLAGS) -MT codeared-Grid.o -MD -MP -MF $(DEPDIR)/codeared-Grid.Tpo -c -o codeared-Grid.o `test -f 'Grid.cpp' || echo '$(srcdir)/'`Grid.cpp
