@@ -5,25 +5,13 @@
 
 Workspace* Workspace::m_inst = 0; 
 
-
-Workspace::Workspace() {}
-
+Workspace::Workspace () {}
 
 Workspace::~Workspace () { 
 	Finalise();
 	m_inst = 0;
 }
 
-
-Workspace&
-Workspace::Instance ()  {
-
-    if (m_inst == 0)
-        m_inst = new Workspace ();
-
-	return *m_inst;
-	
-}
 
 codeare::error_code
 Workspace::Finalise () {

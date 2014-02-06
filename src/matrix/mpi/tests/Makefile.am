@@ -6,5 +6,5 @@ TESTS = #t_alloc
 endif
 check_PROGRAMS = $(TESTS)
 
-t_alloc_SOURCES = $(COMMON) t_alloc.cpp
-t_alloc_LDFLAGS = $(BLAS) $(LAPACK) $(SCALAPACK_LIBS) 
+#t_alloc_SOURCES = $(COMMON) t_alloc.cpp
+#t_alloc_LDFLAGS = $(BLAS) $(LAPACK) $(SCALAPACK_LIBS) 

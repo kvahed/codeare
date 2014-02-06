@@ -46,8 +46,11 @@ class DLLEXPORT Workspace {
 	/**
 	 * @brief        Get reference to database instance
 	 */
-	static Workspace&
-	Instance         () ;
+	static Workspace& Instance  () {
+        if (m_inst == 0)
+            m_inst = new Workspace ();        
+        return *m_inst;
+    }
 
 
 	/**
