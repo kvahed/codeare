@@ -10,5 +10,7 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/src/matrix/arithmetic
         ${PROJECT_SOURCE_DIR}/src/matrix/io)
 
-add_executable (t_dft t_dft.cpp)
+add_executable(t_dft t_dft.cpp)
 target_link_libraries (t_dft ${FFTW3_LIBRARIES})
+add_test(dft t_dft)
+
