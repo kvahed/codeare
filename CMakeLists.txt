@@ -4,6 +4,8 @@ project (codeare)
 set (codeare_VERSION_MAJOR 1)
 set (codeare_VERSION_MINOR 2)
 
+enable_testing()
+
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
 configure_file (
