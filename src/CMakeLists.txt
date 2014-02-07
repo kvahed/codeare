@@ -5,6 +5,8 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/src/tinyxml
         ${PROJECT_SOURCE_DIR}/src/misc)
 add_subdirectory(tinyxml)
+add_subdirectory(core)
+add_subdirectory(matrix)
 add_subdirectory(mongoose)
 add_subdirectory(modules)
 

@@ -23,7 +23,7 @@
 
 #include <assert.h>
 #include <sys/types.h>
-#ifdef HAVE_SYS_SYSCTL_H
+#ifdef __APPLE__
 #include <sys/sysctl.h>
 #endif
 #include <stdio.h>
