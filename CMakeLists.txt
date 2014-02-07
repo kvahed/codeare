@@ -26,6 +26,7 @@ include (OptimizeForArchitecture)
 find_package(Boost COMPONENTS thread system REQUIRED)
 find_package(HDF5 1.8 COMPONENTS C CXX REQUIRED)
 find_package(BLAS REQUIRED)
+find_package(LAPACK REQUIRED)
 find_package(FFTW3 COMPONENTS double single threads)
 find_package(OpenSSL) 
 
