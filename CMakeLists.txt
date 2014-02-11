@@ -4,6 +4,10 @@ project (codeare)
 set (codeare_VERSION_MAJOR 1)
 set (codeare_VERSION_MINOR 2)
 
+set(PROJECT_URL "http://codeare.org/")
+set(PROJECT_VERSION
+"${LIBICAL_LIB_MAJOR_VERSION}.${LIBICAL_LIB_MINOR_VERSION}")
+
 enable_testing()
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
@@ -28,6 +32,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox /nologo /MT")
 endif()
 
+# Architecture
 include (VcMacros)
 include (OptimizeForArchitecture)
 
