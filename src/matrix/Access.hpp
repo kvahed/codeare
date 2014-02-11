@@ -175,14 +175,10 @@ Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
  */
 template <class T> inline void
 Slice (Matrix<T>& M, const size_t& s, const T& v) {
-	
 	size_t ns = size(M,0) * size(M,1);
-
-	vector<T> vv; 
+	container<T> vv; 
 	vv.resize(ns, v);
-
-	memcpy (&M[s * ns], &vv[0], ns * sizeof(T));
-	
+    std::copy (vv.begin(), vv.end(), M.begin()+s*ns);
 }
 
 	

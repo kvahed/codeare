@@ -20,7 +20,6 @@
 
 #include "KTPoints.hpp"
 #include "PTXINIFile.hpp"
-#include "IOContext.hpp"
 
 #ifdef _MSC_VER
 std::string ofstr = "    %04Iu %.6f";

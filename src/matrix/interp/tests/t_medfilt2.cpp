@@ -1,7 +1,6 @@
 #include "Matrix.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
-#include "IOContext.hpp"
 #include "MedianFilter.hpp"
 
 template<class T> bool
