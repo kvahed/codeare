@@ -9,13 +9,12 @@ include_directories (${PROJECT_SOURCE_DIR}/src/matrix/io
 	${PROJECT_SOURCE_DIR}/src/matrix/dwt
 	${PROJECT_SOURCE_DIR}/src/matrix/ft 
 	${PROJECT_SOURCE_DIR}/src/matrix/linalg
-	${CBLAS_INCLUDE_DIR}
 	${FFTW3_INCLUDE_DIR}
 )
 
 add_library (CompressedSensing MODULE CompressedSensing.hpp CompressedSensing.cpp)
 target_link_libraries (CompressedSensing tinyxml core
-  ${CBLAS_LINKER_FLAGS} ${CBLAS_LIBRARIES} ${FFTW3_LIBRARIES})
+  ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${FFTW3_LIBRARIES})
 
 add_library (KTPoints MODULE KTPoints.hpp KTPoints.cpp)
 target_link_libraries (KTPoints tinyxml core ${BLAS_LINKER_FLAGS}
@@ -35,5 +34,5 @@ if (${NFFT_FOUND})
   
   add_library (CGSENSE MODULE CGSENSE.hpp CGSENSE.cpp)
   target_link_libraries (CGSENSE tinyxml core ${NFFT_LIBRARIES}
-    ${CBLAS_LINKER_FLAGS} ${CBLAS_LIBRARIES}) 
+    ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES}) 
 endif()

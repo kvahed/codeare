@@ -39,7 +39,6 @@ find_package(ZLIB REQUIRED)
 
 # Linear algebra
 find_package(BLAS REQUIRED)
-find_package(CBLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 
 # Fourier transform
