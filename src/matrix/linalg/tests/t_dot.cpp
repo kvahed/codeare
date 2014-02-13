@@ -2,6 +2,9 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 #include "Lapack.hpp"
+#include "Print.hpp"
+
+#define VERBOSE
 
 template<class T> void dot_check () {
 

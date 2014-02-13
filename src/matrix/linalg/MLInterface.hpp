@@ -59,29 +59,27 @@ extern "C" {
 	// Inverse of a complex Hermitian pos def mat with cpotrf/cpptrf
 #ifdef __APPLE__
     double F77name(sdot, SDOT)  (const int* n, const float* x, const int* incx, const float* y, const int* incy);
-#else
-    float  F77name(sdot, SDOT)  (const int* n, const float* x, const int* incx, const float* y, const int* incy);
-#endif
-    double F77name(ddot, DDOT)  (const int* n, const double* x, const int* incx, const double* y, const int* incy);
-#ifdef __APPLE__
     void   F77name(cdotc,CDOTC) (cxfl*, const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
-	void   F77name(cdotu,CDOTU) (cxfl*, const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
+    void   F77name(cdotu,CDOTU) (cxfl*, const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
     void   F77name(zdotc,ZDOTC) (cxdb*, const int* n, const cxdb* x, const int* incx, const cxdb* y, const int* incy);
     void   F77name(zdotu,ZDOTU) (cxdb*, const int* n, const cxdb* x, const int* incx, const cxdb* y, const int* incy);
 #else
+    float  F77name(sdot, SDOT)  (const int* n, const float* x, const int* incx, const float* y, const int* incy);
     cxfl   F77name(cdotc,CDOTC) (const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
-	cxfl   F77name(cdotu,CDOTU) (const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
+    cxfl   F77name(cdotu,CDOTU) (const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
     cxdb   F77name(zdotc,ZDOTC) (const int* n, const cxdb* x, const int* incx, const cxdb* y, const int* incy);
     cxdb   F77name(zdotu,ZDOTU) (const int* n, const cxdb* x, const int* incx, const cxdb* y, const int* incy);
 #endif
+    double F77name(ddot, DDOT)  (const int* n, const double* x, const int* incx, const double* y, const int* incy);
 
 #ifdef __APPLE__
     double F77name(snrm2,SNRM2) (const int* n, const float* x, const int* incx);
+    double F77name(scnrm2,SCNRM2) (const int* n, const cxfl* x, const int* incx);
 #else
     float F77name(snrm2,SNRM2) (const int* n, const float* x, const int* incx);
+    float F77name(scnrm2,SCNRM2) (const int* n, const cxfl* x, const int* incx);
 #endif
     double F77name(dnrm2,DNRM2) (const int* n, const double* x, const int* incx);
-    double F77name(scnrm2,SCNRM2) (const int* n, const cxfl* x, const int* incx);
     double F77name(dznrm2,DZNRM2) (const int* n, const cxdb* x, const int* incx);
 
 	// Matrix inversion through cholesky decomposition
