@@ -535,10 +535,8 @@ gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
 template<class T> inline double
 norm (const Matrix<T>& M) {
     
-    int n    = (int) numel (M);
     int incx = 1;
-    
-    return TypeTraits<T>::Real(LapackTraits<T>::nrm2 (n, M.Ptr(), incx));
+    return LapackTraits<T>::nrm2 (M.Size(), M.Ptr(), incx);
     
 }
 

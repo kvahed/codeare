@@ -888,8 +888,6 @@ AC_SUBST(LAPACK)
 #AC_DEFINE(HAVE_LAPACK)
 LIBS=$SAVE_LIBS
 
-AC_CHECK_LIB([cblas],     [cblas_dasum], [], 
-   [AC_MSG_RESULT([cannot find libcblas, Compressed sensing reconstruction unavailable!])])
 AC_CHECK_LIB([gsl],   [gsl_spline_init], [], [AC_MSG_ERROR([cannot find libgsl, bailing out])])
 
 AC_CHECK_FUNCS([floor])

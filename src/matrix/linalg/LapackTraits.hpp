@@ -67,7 +67,7 @@ struct LapackTraits<float> {
 #endif
     }
     
-    inline static Type 
+    inline static double
     nrm2 (const int N, const Type *X, const int incX) {
         return SNRM2 (&N, X, &incX);
     }
@@ -193,7 +193,7 @@ struct LapackTraits<double> {
 #endif
     }
 
-    inline static Type 
+    inline static double
     nrm2 (const int N, const Type *X, const int incX) {
         return DNRM2 (&N, X, &incX);
     }
@@ -323,7 +323,7 @@ struct LapackTraits<cxfl> {
 #endif
     }
     
-    inline static Type
+    inline static double
     nrm2 (const int N, const Type *X, const int incX) {
         return SCNRM2 (&N, X, &incX);
     }
@@ -444,7 +444,7 @@ struct LapackTraits<cxdb> {
 #endif
     }
     
-    inline static Type
+    inline static double
     nrm2 (const int N, const Type *X, const int incX) {
         return DZNRM2 (&N, X, &incX);
     }
