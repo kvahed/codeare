@@ -101,10 +101,7 @@ CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__EXEEXT_1 = t_unwrap$(EXEEXT)
-am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_1 = ../../../Workspace.$(OBJEXT) \
-	../../../Toolbox.$(OBJEXT)
-am_t_unwrap_OBJECTS = $(am__objects_1) t_unwrap.$(OBJEXT)
+am_t_unwrap_OBJECTS = t_unwrap.$(OBJEXT)
 t_unwrap_OBJECTS = $(am_t_unwrap_OBJECTS)
 t_unwrap_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -532,8 +529,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/simd -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/matrix/unwrap -I$(top_srcdir)/src/matrix/arithmetic -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/matrix/io
-COMMON = ../../../Workspace.cpp ../../../Toolbox.cpp
+AM_CXXFLAGS = -DTIXML_USE_STL $(OPENMP_CXXFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/matrix -I$(top_srcdir)/src/matrix/simd -I$(top_srcdir)/src/matrix/linalg -I$(top_srcdir)/src/matrix/unwrap -I$(top_srcdir)/src/matrix/arithmetic -I$(top_srcdir)/src/misc -I$(top_srcdir)/src/matrix/io -I$(top_srcdir)/src/core
 t_unwrap_SOURCES = $(COMMON) t_unwrap.cpp
 t_unwrap_LDFLAGS = $(BLAS) $(LAPACK)
 all: all-am
@@ -579,16 +575,6 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-../../../$(am__dirstamp):
-	@$(MKDIR_P) ../../..
-	@: > ../../../$(am__dirstamp)
-../../../$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../../../$(DEPDIR)
-	@: > ../../../$(DEPDIR)/$(am__dirstamp)
-../../../Workspace.$(OBJEXT): ../../../$(am__dirstamp) \
-	../../../$(DEPDIR)/$(am__dirstamp)
-../../../Toolbox.$(OBJEXT): ../../../$(am__dirstamp) \
-	../../../$(DEPDIR)/$(am__dirstamp)
 
 t_unwrap$(EXEEXT): $(t_unwrap_OBJECTS) $(t_unwrap_DEPENDENCIES) $(EXTRA_t_unwrap_DEPENDENCIES) 
 	@rm -f t_unwrap$(EXEEXT)
@@ -596,13 +582,10 @@ t_unwrap$(EXEEXT): $(t_unwrap_OBJECTS) $(t_unwrap_DEPENDENCIES) $(EXTRA_t_unwrap
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ../../../*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@../../../$(DEPDIR)/Toolbox.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../../../$(DEPDIR)/Workspace.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/t_unwrap.Po@am__quote@
 
 .cpp.o:
@@ -915,8 +898,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f ../../../$(DEPDIR)/$(am__dirstamp)
-	-rm -f ../../../$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -927,7 +908,7 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ../../../$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -973,7 +954,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ../../../$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

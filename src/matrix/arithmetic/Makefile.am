@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -I../ -I../linalg -I../../ -I../../misc -I../io -I../simd
+AM_CXXFLAGS = -I../ -I../linalg -I../../ -I../../misc -I../io -I../simd -I$(top_srcdir)/src/core
 COMMON = ../Matrix.hpp Trigonometry.hpp AVXTraits.hpp SSE2Traits.hpp SIMD.hpp SIMDTraits.hpp
 
 TESTS  = t_sin t_cos t_tan t_exp t_asin t_acos t_atan t_atan2 t_sinh t_cosh t_tanh t_log t_flipud t_fliplr
