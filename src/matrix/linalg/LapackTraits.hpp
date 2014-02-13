@@ -335,7 +335,7 @@ struct LapackTraits<cxfl> {
 #elif defined __APPLE__
         CDOTU (res, &N, X, &incX, Y, &incY);
 #else
-        *res = CDOTU (N, X, incX, Y, incY);
+        *res = CDOTU (&N, X, &incX, Y, &incY);
 #endif
     }
     
@@ -346,7 +346,7 @@ struct LapackTraits<cxfl> {
 #elif defined __APPLE__
         CDOTC (res, &N, X, &incX, Y, &incY);
 #else
-        *res = CDOTC (N, X, incX, Y, incY);
+        *res = CDOTC (&N, X, &incX, Y, &incY);
 #endif
     }
     
@@ -456,7 +456,7 @@ struct LapackTraits<cxdb> {
 #elif defined __APPLE__
         ZDOTU (res, &N, X, &incX, Y, &incY);
 #else
-        *res = ZDOTU (N, X, incX, Y, incY);
+        *res = ZDOTU (&N, X, &incX, Y, &incY);
 #endif
     }
     
@@ -467,7 +467,7 @@ struct LapackTraits<cxdb> {
 #elif defined __APPLE__
         ZDOTC (res, &N, X, &incX, Y, &incY);
 #else
-        *res = ZDOTC (N, X, incX, Y, incY);
+        *res = ZDOTC (&N, X, &incX, Y, &incY);
 #endif
     }
     
