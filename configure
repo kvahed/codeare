@@ -12228,10 +12228,10 @@ CC="$lt_save_CC"
 
 # Revision string
 
-$as_echo "#define GIT_COMMIT \"b565eb0c\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT \"c14db918\"" >>confdefs.h
 
 
-$as_echo "#define GIT_COMMIT_DATE \"Thu Feb 6 12:08:35 2014 +0100\"" >>confdefs.h
+$as_echo "#define GIT_COMMIT_DATE \"Tue Feb 11 17:49:34 2014 +0100\"" >>confdefs.h
 
 
 # copyright notice
@@ -24801,7 +24801,7 @@ LIBS="$LIBS $CLIBS $FLIBS"
 if test -z "$BLAS"; then
 case $host in
   *darwin*)
-    BLAS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -lcblas -llapack -framework vecLib"
+    BLAS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -llapack -framework vecLib"
     AUTOAPPLE="yes"
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: Mac OSX: Assuming vecLib is available!" >&5
 $as_echo "Mac OSX: Assuming vecLib is available!" >&6; }
@@ -25142,7 +25142,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  BLAS="-lcblas -lblas"
+  BLAS="-lblas"
 fi
 
   LIBS=$SAVE_LIBS2

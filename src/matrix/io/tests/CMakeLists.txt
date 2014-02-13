@@ -17,9 +17,8 @@ add_executable (t_codeare t_codeare.cpp)
 add_test (cod t_codeare)
 
 add_executable (t_hdf5 t_hdf5.cpp)
-target_link_libraries (t_hdf5 -L${HDF5_LIBRARY_DIRS} -lhdf5 -lhdf5_cpp)
+target_link_libraries (t_hdf5)
 add_test (hdf5 t_hdf5)
-#${HDF5_CXX_LIBRARIES} ${HDF5_C_LIBRARIES}
 
 if (${MATLAB_FOUND})
 	add_executable (t_matlab t_matlab.cpp)

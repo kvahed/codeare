@@ -27,7 +27,6 @@
 #include "mri/MRI.hpp"
 #include "Lapack.hpp"
 #include "tinyxml.h"
-#include "IOContext.hpp"
 
 #include "Workspace.hpp"
 

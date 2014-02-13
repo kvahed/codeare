@@ -6,7 +6,7 @@ set (codeare_VERSION_MINOR 2)
 
 set(PROJECT_URL "http://codeare.org/")
 set(PROJECT_VERSION
-"${LIBICAL_LIB_MAJOR_VERSION}.${LIBICAL_LIB_MINOR_VERSION}")
+"${codeare_VERSION_MAJOR}.${codeare_VERSION_MINOR}")
 
 enable_testing()
 
@@ -20,15 +20,11 @@ configure_file (
   "${PROJECT_BINARY_DIR}/config.h"
   )
 
-if ($CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-
-endif()
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
-    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  set(warnings "")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox /nologo /MT")
 endif()
 
@@ -48,7 +44,7 @@ find_package(LAPACK REQUIRED)
 
 # Fourier transform
 find_package(FFTW3 COMPONENTS double single threads REQUIRED)
-#find_package(NFFT3 COMPONENTS single OPTIONAL)
+find_package(NFFT)
 
 # Interpolations
 find_package(ITK)
@@ -56,10 +52,11 @@ find_package(GSL)
 
 # File IO 
 find_package(HDF5 COMPONENTS CXX REQUIRED)
+set(CMAKE_CXX_LINK_FLAGS "-L${HDF5_LIBRARY_DIRS} -lhdf5 -lhdf5_cpp")
 find_package(Ismrmrd REQUIRED)
 find_package(Matlab)
 if (${ZLIB_FOUND}) 
-	find_package(NIFTI) 
+  find_package(NIFTI) 
 endif()
 
 include_directories("${PROJECT_BINARY_DIR}")

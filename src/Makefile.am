@@ -28,7 +28,7 @@ noinst_LTLIBRARIES += libremote.la
 endif
 
 # Local client (lclient)
-liblocal_la_SOURCES = LocalConnector.hpp LocalConnector.cpp testclt.cpp
+liblocal_la_SOURCES = Loader.hpp LocalConnector.hpp LocalConnector.cpp testclt.cpp
 liblocal_la_CXXFLAGS = $(AM_CXXFLAGS) -DLOCAL
 lclient_SOURCES = $(COMMON)
 lclient_LDFLAGS = $(COMMON_LD_FLAGS) liblocal.la $(BLAS) $(LAPACK)  $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@
@@ -39,14 +39,14 @@ if USE_NFFT3
 endif
 
 # Remote client (rclient)
-libremote_la_SOURCES = RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
+libremote_la_SOURCES = Loader.hpp RemoteConnector.hpp RemoteConnector.cpp testclt.cpp
 libremote_la_CXXFLAGS = $(AM_CXXFLAGS) -DREMOTE
 rclient_SOURCES = $(COMMON) $(NETWORKING_COMMON)
 rclient_LDFLAGS = $(SCALAPACK_LIBS) libremote.la $(COMMON_LD_FLAGS) $(BLAS) $(LAPACK) @PLUGIN_LDFLAGS@ -lomniORB4 -lomnithread -lomniDynamic4 
 rclient_DEPENDENCIES = libremote.la
 
 # Rules for codeared
-codeared_SOURCES = $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp codeared.cpp
+codeared_SOURCES = Loader.hpp $(COMMON) $(NETWORKING_COMMON) ReconServant.hpp ReconServant.cpp codeared.cpp
 codeared_CXXFLAGS = $(AM_CXXFLAGS) -Imongoose
 codeared_LDFLAGS = $(SCALAPACK_LIBS) @PLUGIN_LDFLAGS@  -lomniORB4 -lomnithread -lomniDynamic4 $(COMMON_LD_FLAGS) mongoose/libmongoose.la
 #-dlopen modules/DummyRecon.la -dlopen modules/DumpToFile.la -dlopen modules/GenericRegrid.la -dlopen modules/SystemCmd.la -dlopen modules/MedianFilter_OMP.la -dlopen modules/SpatialDomain.la -dlopen modules/KTPoints.la -dlopen modules/RelativeSensitivities.la -dlopen modules/GRAPPA.la -dlopen modules/DirectMethod.la 

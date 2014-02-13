@@ -17,6 +17,7 @@ public:
 	}
 
 	inline AssignmentHandler& operator= (const Matrix<T>& M) {
+		_M = M;
 		return *this;
 	}
 

@@ -56,6 +56,34 @@ extern "C" {
 	void F77name(cpotri,CPOTRI) (const char* uplo, int*n, void *a, int* lda, int*info);
 	void F77name(zpotri,ZPOTRI) (const char* uplo, int*n, void *a, int* lda, int*info);
 	
+	// Inverse of a complex Hermitian pos def mat with cpotrf/cpptrf
+#ifdef __APPLE__
+    double F77name(sdot, SDOT)  (const int* n, const float* x, const int* incx, const float* y, const int* incy);
+#else
+    float  F77name(sdot, SDOT)  (const int* n, const float* x, const int* incx, const float* y, const int* incy);
+#endif
+    double F77name(ddot, DDOT)  (const int* n, const double* x, const int* incx, const double* y, const int* incy);
+#ifdef __APPLE__
+    void   F77name(cdotc,CDOTC) (cxfl*, const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
+	void   F77name(cdotu,CDOTU) (cxfl*, const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
+    void   F77name(zdotc,ZDOTC) (cxdb*, const int* n, const cxdb* x, const int* incx, const cxdb* y, const int* incy);
+    void   F77name(zdotu,ZDOTU) (cxdb*, const int* n, const cxdb* x, const int* incx, const cxdb* y, const int* incy);
+#else
+    cxfl   F77name(cdotc,CDOTC) (const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
+	cxfl   F77name(cdotu,CDOTU) (const int* n, const cxfl* x, const int* incx, const cxfl* y, const int* incy);
+    cxdb   F77name(zdotc,ZDOTC) (const int* n, const cxdb* x, const int* incx, const cxdb* y, const int* incy);
+    cxdb   F77name(zdotu,ZDOTU) (const int* n, const cxdb* x, const int* incx, const cxdb* y, const int* incy);
+#endif
+
+#ifdef __APPLE__
+    double F77name(snrm2,SNRM2) (const int* n, const float* x, const int* incx);
+#else
+    float F77name(snrm2,SNRM2) (const int* n, const float* x, const int* incx);
+#endif
+    double F77name(dnrm2,DNRM2) (const int* n, const double* x, const int* incx);
+    float F77name(scnrm2,SCNRM2) (const int* n, const cxfl* x, const int* incx);
+    double F77name(dznrm2,DZNRM2) (const int* n, const cxdb* x, const int* incx);
+
 	// Matrix inversion through cholesky decomposition
 	void F77name(sgetri,SGETRI) (const int *n,  float *a, const int* lda, int *ipiv,  float *work, const int *lwork,
                                  int* info);
@@ -118,12 +146,6 @@ extern "C" {
                                 const int* lda, const   cxdb *x, const int* incx, const  cxdb* beta,    cxdb *y,
                                 const int* incy);
 
-    // Euclidean norm
-    float  F77name(snrm2,SNRM2)   (const int* n, const  float* cx, const int* incx);
-    double F77name(dnrm2,DNRM2)   (const int* n, const double* cx, const int* incx);
-    cxfl   F77name(scnrm2,SCNRM2) (const int* n, const   cxfl* cx, const int* incx);
-    cxdb   F77name(dznrm2,DZNRM2) (const int* n, const   cxdb* cx, const int* incx);
-    
 	// Matrix matrix multiplication
 	void F77name(sgemm,SGEMM)  (const char *transa, const char *transb, const int *m, const int *n, const int *k,
                                 const  float *alpha, const  float *a, const int *lda, const  float *b, const int *ldb,
@@ -147,6 +169,8 @@ extern "C" long _ftol( double ); //defined by VC6 C libs
 extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
 #endif
 
+#define SDOT   F77name(sdot,SDOT)
+#define SNRM2  F77name(snrm2,SNRM2)
 #define SGEEV  F77name(sgeev,SGEEV)
 #define SGETRF F77name(sgetrf,SGETRF)
 #define SGETRI F77name(sgetri,SGETRI) 
@@ -156,8 +180,9 @@ extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
 #define SGESDD F77name(sgesdd,SGESDD)
 #define SGEMM  F77name(sgemm,SGEMM) 
 #define SGEMV  F77name(sgemv,SGEMV)
-#define SNRM2  F77name(snrm2,SNRM2)
 
+#define DDOT   F77name(ddot,DDOT)
+#define DNRM2  F77name(dnrm2,DNRM2)
 #define DGEEV  F77name(dgeev,DGEEV)
 #define DGETRF F77name(dgetrf,DGETRF)
 #define DGETRI F77name(dgetri,DGETRI) 
@@ -167,8 +192,10 @@ extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
 #define DGESDD F77name(dgesdd,DGESDD)
 #define DGEMM  F77name(dgemm,DGEMM) 
 #define DGEMV  F77name(dgemv,DGEMV) 
-#define DNRM2  F77name(dnrm2,DNRM2)
 
+#define CDOTU  F77name(cdotu,CDOTU)
+#define CDOTC  F77name(cdotc,CDOTC)
+#define SCNRM2 F77name(scnrm2,SCNRM2)
 #define CGEEV  F77name(cgeev,CGEEV)
 #define CGETRF F77name(cgetrf,CGETRF)
 #define CGETRI F77name(cgetri,CGETRI) 
@@ -178,8 +205,10 @@ extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
 #define CGESDD F77name(cgesdd,CGESDD)
 #define CGEMM  F77name(cgemm,CGEMM) 
 #define CGEMV  F77name(cgemv,CGEMV) 
-#define SCNRM2 F77name(scnrm2,SCNRM2)
 
+#define ZDOTU  F77name(zdotu,ZDOTU)
+#define ZDOTC  F77name(zdotc,ZDOTC)
+#define DZNRM2 F77name(dznrm2,DZNRM2)
 #define ZGEEV  F77name(zgeev,ZGEEV)
 #define ZGETRF F77name(zgetrf,ZGETRF)
 #define ZGETRI F77name(zgetri,ZGETRI) 
@@ -189,4 +218,3 @@ extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
 #define ZGESDD F77name(zgesdd,ZGESDD)
 #define ZGEMM  F77name(zgemm,ZGEMM) 
 #define ZGEMV  F77name(zgemv,ZGEMV) 
-#define DZNRM2 F77name(dznrm2,DZNRM2)

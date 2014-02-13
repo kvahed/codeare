@@ -125,7 +125,7 @@ CompressedSensing::Process () {
 	
 	im_dc    = dwt * im_dc;
 	
-	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
+	printf ("  Running ?? %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
 
 	SimpleTimer st ("CompressedSensing");

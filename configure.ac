@@ -786,7 +786,7 @@ LIBS="$LIBS $CLIBS $FLIBS"
 if test -z "$BLAS"; then
 case $host in
   *darwin*)
-    BLAS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -lcblas -llapack -framework vecLib"
+    BLAS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -llapack -framework vecLib"
     AUTOAPPLE="yes"
     AC_MSG_RESULT([Mac OSX: Assuming vecLib is available!])
     ;;
@@ -831,7 +831,7 @@ fi
 if test -z "$BLAS"; then
   SAVE_LIBS2=$LIBS
   LIBS="-latlas $LIBS"
-  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lcblas -lblas")
+  AC_CHECK_LIB(f77blas, $DGEMM_SYMBOL, BLAS="-lblas")
   LIBS=$SAVE_LIBS2
 fi
 

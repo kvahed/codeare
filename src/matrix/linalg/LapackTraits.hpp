@@ -1,6 +1,5 @@
 #include "MLInterface.hpp"
 
-#include <cblas.h>
 #include <string.h>
 
 template <class T>
@@ -70,19 +69,25 @@ struct LapackTraits<float> {
     
     inline static Type 
     nrm2 (const int N, const Type *X, const int incX) {
-        return cblas_snrm2 (N, X, incX);
+        return SNRM2 (&N, X, &incX);
     }
     
     inline static void
     dot  (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-        *res = cblas_sdot (N, X, incX, Y, incY);
+#ifdef USE_ACML
+#else
+        *res = SDOT (&N, X, &incX, Y, &incY);
+#endif
     }
     
     inline static void
     dotc (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-        *res = cblas_sdot (N, X, incX, Y, incY);
+#ifdef USE_ACML
+#else
+        *res = SDOT (&N, X, &incX, Y, &incY);
+#endif
     }
     
     inline static void
@@ -98,10 +103,8 @@ struct LapackTraits<float> {
         SGEEV (&jvl, &jvr, &n, a, &lda, dwr, dwi, vl, &ldvl, vr, &ldvr, work, &lwork,
                &info);
 #endif
-        
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++)
             w[i] = CType (dwr[i], dwi[i]);
-        }
         
         free (dwr);
         free (dwi);
@@ -192,19 +195,25 @@ struct LapackTraits<double> {
 
     inline static Type 
     nrm2 (const int N, const Type *X, const int incX) {
-        return cblas_dnrm2 (N, X, incX);
+        return DNRM2 (&N, X, &incX);
     }
     
     inline static void
     dot  (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-        *res = cblas_ddot (N, X, incX, Y, incY);
+#ifdef USE_ACML
+#else
+        *res = DDOT (&N, X, &incX, Y, &incY);
+#endif
     }
     
     inline static void
     dotc (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-        *res = cblas_ddot (N, X, incX, Y, incY);
+#ifdef USE_ACML
+#else
+        *res = DDOT (&N, X, &incX, Y, &incY);
+#endif
     }
 
     inline static void
@@ -316,19 +325,29 @@ struct LapackTraits<cxfl> {
     
     inline static Type
     nrm2 (const int N, const Type *X, const int incX) {
-        return cblas_scnrm2 (N, X, incX);
+        return SCNRM2 (&N, X, &incX);
     }
     
     inline static void 
-    dot  (const int N, const void *X, const int incX, const void *Y, 
-          const int incY, void* res) {
-        cblas_cdotu_sub (N, X, incX, Y, incY, res);    
+    dot  (const int N, const cxfl *X, const int incX, const cxfl *Y, 
+          const int incY, cxfl* res) {
+#if defined USE_ACML
+#elif defined __APPLE__
+        CDOTU (res, &N, X, &incX, Y, &incY);
+#else
+        *res = CDOTU (N, X, incX, Y, incY);
+#endif
     }
     
     inline static void 
-    dotc (const int N, const void *X, const int incX, const void *Y, 
-          const int incY, void* res) {
-        cblas_cdotc_sub (N, X, incX, Y, incY, res);    
+    dotc (const int N, const cxfl *X, const int incX, const cxfl *Y, 
+          const int incY, cxfl* res) {
+#ifdef USE_ACML
+#elif defined __APPLE__
+        CDOTC (res, &N, X, &incX, Y, &incY);
+#else
+        *res = CDOTC (N, X, incX, Y, incY);
+#endif
     }
     
     inline static void 
@@ -427,19 +446,29 @@ struct LapackTraits<cxdb> {
     
     inline static Type
     nrm2 (const int N, const Type *X, const int incX) {
-        return cblas_dznrm2 (N, X, incX);
+        return DZNRM2 (&N, X, &incX);
     }
     
     inline static void 
-    dot  (const int N, const void *X, const int incX, const void *Y, 
-          const int incY, void* res) {
-        cblas_zdotu_sub (N, X, incX, Y, incY, res);    
+    dot  (const int N, const cxdb *X, const int incX, const cxdb *Y, 
+          const int incY, cxdb* res) {
+#if defined USE_ACML
+#elif defined __APPLE__
+        ZDOTU (res, &N, X, &incX, Y, &incY);
+#else
+        *res = ZDOTU (N, X, incX, Y, incY);
+#endif
     }
     
     inline static void 
-    dotc (const int N, const void *X, const int incX, const void *Y, 
-          const int incY, void* res) {
-        cblas_zdotc_sub (N, X, incX, Y, incY, res);    
+    dotc (const int N, const cxdb *X, const int incX, const cxdb *Y, 
+          const int incY, cxdb* res) {
+#if defined USE_ACML
+#elif defined __APPLE__
+        ZDOTC (res, &N, X, &incX, Y, &incY);
+#else
+        *res = ZDOTC (N, X, incX, Y, incY);
+#endif
     }
     
     inline static void 

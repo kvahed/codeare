@@ -253,9 +253,10 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
     minv += treg;
     minv  = inv(minv);
     minv  = minv.prod (m, 'N', 'C');
-    
+    size_t j = 0;
+
     // Valriable exchange method --------------
-    for (size_t j = 0; gc < mxit; j++, gc++) {
+    while (gc < mxit) {
 		
         solution = minv ->* target;
         final    = m    ->* solution;
@@ -275,6 +276,8 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
             break; 
 		} 
         
+        j++; gc++;
+
     } 
     
     printf ("\n  ... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
