@@ -77,11 +77,12 @@ extern "C" {
 
 #ifdef __APPLE__
     double F77name(snrm2,SNRM2) (const int* n, const float* x, const int* incx);
+    double F77name(scnrm2,SCNRM2) (const int* n, const cxfl* x, const int* incx);
 #else
     float F77name(snrm2,SNRM2) (const int* n, const float* x, const int* incx);
+    float F77name(scnrm2,SCNRM2) (const int* n, const cxfl* x, const int* incx);
 #endif
     double F77name(dnrm2,DNRM2) (const int* n, const double* x, const int* incx);
-    double F77name(scnrm2,SCNRM2) (const int* n, const cxfl* x, const int* incx);
     double F77name(dznrm2,DZNRM2) (const int* n, const cxdb* x, const int* incx);
 
 	// Matrix inversion through cholesky decomposition
