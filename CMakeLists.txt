@@ -51,7 +51,7 @@ find_package(LAPACK REQUIRED)
 # Fourier transform
 find_package(FFTW3 COMPONENTS double single threads REQUIRED)
 include_directories(${FFTW3_INCLUDE_DIR})
-set (NFFT_INCLUDE_DIR "")
+#set (NFFT_INCLUDE_DIR "")
 find_package(NFFT)
 
 # Interpolations
@@ -70,7 +70,7 @@ set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${HDF5_LIBRARIES}")
 
 find_package(Ismrmrd)
 find_package(Matlab)
-set(NIFTI_INCLUDE_DIR "")
+#set(NIFTI_INCLUDE_DIR "")
 if (${ZLIB_FOUND}) 
   find_package(NIFTI) 
 endif()
