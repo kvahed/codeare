@@ -31,6 +31,7 @@ endif()
 # Architecture
 include (VcMacros)
 include (OptimizeForArchitecture)
+find_package (OpenMP)
 
 # Core
 find_package(Boost COMPONENTS thread system REQUIRED)
