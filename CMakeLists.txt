@@ -46,7 +46,11 @@ find_package(FFTW3 COMPONENTS double single threads REQUIRED)
 find_package(NFFT)
 
 # Interpolations
-find_package(ITK)
+find_package (PNG)
+find_package (TIFF)
+if (${PNG_FOUND} AND ${TIFF_FOUND})
+  find_package(ITK)
+endif()
 find_package(GSL)
 
 # File IO 
