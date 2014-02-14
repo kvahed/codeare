@@ -19,7 +19,7 @@
 /**
  * @brief  General parameter container
  */
-class Params {
+class DLLEXPORT Params {
 
 
     struct UnspecParam {};
@@ -199,10 +199,9 @@ public:
 
 
 private:
-
-
+#pragma warning (disable : 4251)
 	std::map<std::string, boost::any> pl; /**< @brief Parameter list */
-
+#pragma warning (default : 4251)
 };
 
 

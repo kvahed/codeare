@@ -11,7 +11,7 @@ template<class T> bool dot_check () {
 	size_t n = 4;
     Matrix<T> x = rand<T> (n,1);
     Matrix<T> y = rand<T> (n,1);
-	T a = dot(x,y), b = dotc(x,y), c = 0., d = 0.; 
+	dot(x,y), b = dotc(x,y), c = 0., d = 0.; 
 
 	for (size_t i = 0; i < n; ++i) {
 		c += x[i]*y[i];
@@ -23,10 +23,8 @@ template<class T> bool dot_check () {
     std::cout << "y * y=\n" << a << " " << c << std::endl;
     std::cout << "x**H * y=\n" << b << " " << d << "\n" << std::endl;
 #endif
-
 	return (TypeTraits<T>::Abs((a-c)/a)<1.e-6 && 
 			TypeTraits<T>::Abs((b-d)/b)<1.e-6);
-
 }
 
 int main (int args, char** argv) {

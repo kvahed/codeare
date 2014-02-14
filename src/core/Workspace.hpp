@@ -333,8 +333,10 @@ class DLLEXPORT Workspace {
 	 */
 	Workspace        (const Workspace&) {};
 
-	reflist m_ref;   /**< @brief Names and hash tags               */
+#pragma warning (disable : 4251)
+    reflist m_ref;   /**< @brief Names and hash tags               */
 	store   m_store; /**< @brief Data pointers                     */
+#pragma warning (default : 4251)
 
 	static Workspace* m_inst; /**< @brief Single database instance */
 

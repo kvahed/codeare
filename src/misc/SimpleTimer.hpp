@@ -2,7 +2,7 @@
 #define __SIMPLE_TIMER_HPP__
 
 #ifdef _MSC_VER 
-#include <windows.h>
+#include <Windows.h>
 #else         
 #include <sys/time.h>
 #endif
@@ -13,12 +13,13 @@
 class SimpleTimer {
 
 #ifdef _MSC_VER
-    typedef LONG_INTEGER TimeType ;
+    typedef LARGE_INTEGER TimeType;
 #else
     typedef timeval      TimeType;
 #endif
     
-public: 
+public:
+
     inline SimpleTimer (const std::string& identifier = "", std::ostream& os = std::cout) :
         _os(&os), _stopped(false), _freq (1.0e-6), _net(0.) {
         *_os << "Processing " << identifier.c_str() << " ... \n";

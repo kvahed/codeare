@@ -252,7 +252,7 @@ class Configurable {
 		int ival, res;
 		res = Configuration()->QueryIntAttribute (name, &ival);
 		report (res, name);
-		*value = (bool) ival;
+		*value = ival>0;
 		return res;
 	}
 

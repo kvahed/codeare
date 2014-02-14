@@ -25,7 +25,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox /nologo /MT")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox
+  /nologo /MT /wd4267 /wd4244 /wd4190 /wd4996 /LD /MD /DEXP_STL")
 endif()
 
 # Architecture
@@ -42,7 +43,7 @@ endif()
 find_package(Boost COMPONENTS thread system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 find_package(OpenSSL REQUIRED)
-find_package(ZLIB REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 # Linear algebra
 find_package(BLAS REQUIRED)
@@ -51,8 +52,10 @@ find_package(LAPACK REQUIRED)
 # Fourier transform
 find_package(FFTW3 COMPONENTS double single threads REQUIRED)
 include_directories(${FFTW3_INCLUDE_DIR})
-#set (NFFT_INCLUDE_DIR "")
 find_package(NFFT)
+if(${NFFT_INCLUDE_DIR} MATCHES "")
+  set (NFFT_INCLUDE_DIR "")
+endif()
 
 # Interpolations
 find_package (PNG)
@@ -66,14 +69,24 @@ find_package(GSL)
 find_package(HDF5 COMPONENTS CXX REQUIRED)
 include_directories (${HDF5_INCLUDE_DIRS})
 link_directories (${HDF5_LIBRARY_DIRS})
-set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${HDF5_LIBRARIES}")
+set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} hdf5.lib hdf5_cpp.lib")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set(ZLIB_LIBRARY ${HDF5_DIR}/../../lib/zlib.lib)
+  set(ZLIB_INCLUDE_DIR ${HDF5_DIR}/../../include)
+else()
+  find_package(ZLIB REQUIRED)
+endif()
+
 
 find_package(Ismrmrd)
 find_package(Matlab)
-#set(NIFTI_INCLUDE_DIR "")
 if (${ZLIB_FOUND}) 
   find_package(NIFTI) 
+  if (${NIFTI_INCLUDE_DIR} MATCHES "")
+    set(NIFTI_INCLUDE_DIR "")
+  endif()
 endif()
+
 
 include_directories("${PROJECT_BINARY_DIR}")
 
