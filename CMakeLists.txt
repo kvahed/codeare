@@ -40,6 +40,7 @@ if(OPENMP_FOUND)
 endif()
 # Core
 find_package(Boost COMPONENTS thread system REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -49,6 +50,8 @@ find_package(LAPACK REQUIRED)
 
 # Fourier transform
 find_package(FFTW3 COMPONENTS double single threads REQUIRED)
+include_directories(${FFTW3_INCLUDE_DIR})
+set (NFFT_INCLUDE_DIR "")
 find_package(NFFT)
 
 # Interpolations
@@ -61,9 +64,13 @@ find_package(GSL)
 
 # File IO 
 find_package(HDF5 COMPONENTS CXX REQUIRED)
-set(CMAKE_CXX_LINK_FLAGS "-L${HDF5_LIBRARY_DIRS} -lhdf5 -lhdf5_cpp")
-find_package(Ismrmrd REQUIRED)
+include_directories (${HDF5_INCLUDE_DIRS})
+link_directories (${HDF5_LIBRARY_DIRS})
+set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${HDF5_LIBRARIES}")
+
+find_package(Ismrmrd)
 find_package(Matlab)
+set(NIFTI_INCLUDE_DIR "")
 if (${ZLIB_FOUND}) 
   find_package(NIFTI) 
 endif()
