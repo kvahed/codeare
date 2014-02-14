@@ -11,7 +11,7 @@ template<class T> bool dot_check () {
 	size_t n = 4;
     Matrix<T> x = rand<T> (n,1);
     Matrix<T> y = rand<T> (n,1);
-	dot(x,y), b = dotc(x,y), c = 0., d = 0.; 
+	T a = dot(x,y), b = dotc(x,y), c = 0., d = 0.; 
 
 	for (size_t i = 0; i < n; ++i) {
 		c += x[i]*y[i];

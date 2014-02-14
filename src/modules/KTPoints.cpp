@@ -41,12 +41,10 @@ inline float
 NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
 
     float nrmse = 0.0;
-    size_t i;
 
 #pragma omp parallel for reduction(+:nrmse)
     for (int i = 0; i < numel(target); i++ )
         nrmse += pow(abs(target[i]) - abs(result[i]), 2);
-
     nrmse = sqrt(nrmse)/norm(target);
     
     return nrmse;
@@ -131,7 +129,7 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
 
     d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
 
-    cxfl pgd = cxfl(0, TWOPI * GAMMA * 10.0);
+    cxfl pgd ((float)0.f, (float)(10.f*TWOPI*GAMMA));
 
     #pragma omp for
             for (int k = 0; k < nk; k++) 
@@ -475,7 +473,7 @@ KTPoints::Process   ()     {
         m = STA (k, r, b1, b0, nc, nk, ns, m_gd, pd, gc);
 
 		// Solve KTPoints
-        KTPSolve (m, target, final, solution, m_lambda, m_maxiter, m_conv, m_breakearly, gc, res);
+        KTPSolve (m, target, final, solution, m_lambda, m_maxiter, m_conv, (m_breakearly>0), gc, res);
 		if (is_nan(res(gc)))
 			break;
     

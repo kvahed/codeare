@@ -29,7 +29,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   /nologo /MT /wd4267 /wd4244 /wd4190 /wd4996 /LD /MD /DEXP_STL")
 endif()
 
-# Architecture
+# Architecture ------------------------------------------------------------------
 include (VcMacros)
 include (OptimizeForArchitecture)
 find_package (OpenMP)
@@ -37,19 +37,21 @@ if(OPENMP_FOUND)
   message("OPENMP FOUND")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}
+  ${OpenMP_EXE_LINKER_FLAGS}") 
 endif()
-# Core
+
+# Core --------------------------------------------------------------------------
 find_package(Boost COMPONENTS thread system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 
-# Linear algebra
+# Linear algebra ----------------------------------------------------------------
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 
-# Fourier transform
+# Fourier transform -------------------------------------------------------------
 find_package(FFTW3 COMPONENTS double single threads REQUIRED)
 include_directories(${FFTW3_INCLUDE_DIR})
 find_package(NFFT)
@@ -57,7 +59,7 @@ if(${NFFT_INCLUDE_DIR} MATCHES "")
   set (NFFT_INCLUDE_DIR "")
 endif()
 
-# Interpolations
+# Interpolations ----------------------------------------------------------------
 find_package (PNG)
 find_package (TIFF)
 if (${PNG_FOUND} AND ${TIFF_FOUND})
@@ -65,28 +67,34 @@ if (${PNG_FOUND} AND ${TIFF_FOUND})
 endif()
 find_package(GSL)
 
-# File IO 
+# File IO -----------------------------------------------------------------------
 find_package(HDF5 COMPONENTS CXX REQUIRED)
 include_directories (${HDF5_INCLUDE_DIRS})
 link_directories (${HDF5_LIBRARY_DIRS})
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} hdf5.lib hdf5_cpp.lib")
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  set(ZLIB_LIBRARY ${HDF5_DIR}/../../lib/zlib.lib)
-  set(ZLIB_INCLUDE_DIR ${HDF5_DIR}/../../include)
+  set(ZLIB_LIBRARY "${HDF5_DIR}/../../lib/zlib.lib")
+  set(ZLIB_INCLUDE_DIR "${HDF5_DIR}/../../include")
+  set(ZLIB_FOUND "1")
 else()
   find_package(ZLIB REQUIRED)
 endif()
 
-
 find_package(Ismrmrd)
+
 find_package(Matlab)
+if(${MATLAB_FOUND})
+  include_directories (${MATLAB_INCLUDE_DIRS})
+  link_directories (${MATLAB_LIBRARY_DIRS}) 
+  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${MATLAB_LIBRARIES}")
+endif()
+
 if (${ZLIB_FOUND}) 
   find_package(NIFTI) 
   if (${NIFTI_INCLUDE_DIR} MATCHES "")
     set(NIFTI_INCLUDE_DIR "")
   endif()
 endif()
-
 
 include_directories("${PROJECT_BINARY_DIR}")
 

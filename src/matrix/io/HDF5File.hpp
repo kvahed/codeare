@@ -100,13 +100,13 @@ namespace io {
 				m_file.flush(H5F_SCOPE_LOCAL);
 			} catch (const Exception& e) {
 				this->m_status = HDF5_ERROR_FFLUSH;
-				printf ("Couldn't flush HDF5 file %s!\n", this->FileName().c_str());
+				printf ("Couldn't flush HDF5 file %s!\n%s\n", this->FileName().c_str(), e.getDetailMsg().c_str());
 			}
 			try {
 				m_file.close();
 			} catch (const Exception& e) {
 				this->m_status = HDF5_ERROR_FCLOSE;
-				printf ("Couldn't close HDF5 file %s!\n", this->FileName().c_str());
+				printf ("Couldn't close HDF5 file %s!\n%s\n", this->FileName().c_str(), e.getDetailMsg().c_str());
 			}
 		}
 
@@ -184,7 +184,7 @@ namespace io {
 				if (this->m_verb)
 					printf ("Group %s opened for writing\n", path.c_str()) ;
 
-			} catch (const Exception& e) {
+			} catch (const Exception&) {
 
 				for (size_t i = 0, depth = 0; i < sv.size(); i++) {
 
@@ -192,7 +192,7 @@ namespace io {
 
 						try {
 							group = (depth) ? (*tmp).openGroup(sv[i])   : m_file.openGroup(sv[i]);
-						} catch (const Exception& e) {
+						} catch (const Exception&) {
 							group = (depth) ? (*tmp).createGroup(sv[i]) : m_file.createGroup(sv[i]);
 						}
 
