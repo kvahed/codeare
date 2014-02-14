@@ -2,18 +2,18 @@ LOCAL_HOME = c:\local
 OORB_HOME = $(LOCAL_HOME)\omniORB-4.1.6
 
 CXX      = cl
-CXXFLAGS = /c /Imatrix /Imatrix\simd /Imatrix\linalg /Imatrix\ft /Imatrix\interp /Imatrix\io /Imatrix\arithmetic /Imatrix\dwt /Itinyxml /Imisc /I$(LOCAL_HOME)\OpenSSL-Win64\include /I$(OORB_HOME)\include /I$(LOCAL_HOME)\boost_1_55_0 /I"C:\Program Files\HDF_Group\HDF5\1.8.12\include" /IC:\Intel\ComposerXE-2011\mkl\include /I$(LOCAL_HOME)\fftw /I.. /I$(OORB_HOME)\include /I$(LOCAL_HOME)\gsl\include /Imongoose /Imodules /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 /EHsc /DTIXML_USE_STL /nologo /Ox /MT /openmp
+CXXFLAGS = /c /Imatrix /Imatrix\simd /Imatrix\linalg /Imatrix\ft /Imatrix\interp /Imatrix\io /Imatrix\arithmetic /Imatrix\dwt /Itinyxml /Imisc /Icore /I$(LOCAL_HOME)\OpenSSL-Win64\include /I$(OORB_HOME)\include /I$(LOCAL_HOME)\boost_1_55_0 /I"C:\Program Files\HDF_Group\HDF5\1.8.12\include" /IC:\Intel\ComposerXE-2011\mkl\include /I$(LOCAL_HOME)\fftw /I.. /I$(OORB_HOME)\include /I$(LOCAL_HOME)\gsl\include /Imongoose /Imodules /D__WIN32__ /D__x86__ /D_WIN32_WINNT=0x0400 /D__NT__ /D__OSVERSION__=4 /EHsc /DTIXML_USE_STL /nologo /Ox /MT /openmp  /wd4190
 
 LD       = link
-LDFLAGS  =  /nologo /libpath:$(OORB_HOME)/lib/x86_win32 /libpath:tinyxml /libpath:mongoose /libpath:C:\Intel\ComposerXE-2011\mkl\lib\intel64 /libpath:$(LOCAL_HOME)\fftw /libpath:$(LOCAL_HOME)\OpenSSL-Win64\lib\VC\static /NODEFAULTLIB:LIBCMT  /libpath:"C:\Program Files\HDF_Group\HDF5\1.8.12\lib" /libpath:"C:\Program Files\MATLAB\R2013b\extern\lib\win64\microsoft" /libpath:C:\local\gsl\lib 
-LIBS     = mkl_rt.lib libfftw3-3.lib libfftw3f-3.lib ssleay32MT.lib libeay32MT.lib msvcstub.lib msvcrt.lib tinyxml.lib mongoose.lib hdf5.lib hdf5_cpp.lib libmx.lib libmat.lib libgsl-0.lib libgslcblas-0.lib Advapi32.lib User32.lib Ole32.lib Oleaut32.lib Gdi32.lib
+LDFLAGS  =  /nologo /libpath:$(OORB_HOME)/lib/x86_win32 /libpath:core /libpath:tinyxml /libpath:mongoose /libpath:C:\Intel\ComposerXE-2011\mkl\lib\intel64 /libpath:$(LOCAL_HOME)\fftw /libpath:$(LOCAL_HOME)\OpenSSL-Win64\lib\VC\static /NODEFAULTLIB:LIBCMT  /libpath:"C:\Program Files\HDF_Group\HDF5\1.8.12\lib" /libpath:"C:\Program Files\MATLAB\R2013b\extern\lib\win64\microsoft" /libpath:C:\local\gsl\lib 
+LIBS     = mkl_rt.lib libfftw3-3.lib libfftw3f-3.lib ssleay32MT.lib libeay32MT.lib msvcstub.lib msvcrt.lib tinyxml.lib core.lib mongoose.lib hdf5.lib hdf5_cpp.lib libmx.lib libmat.lib libgsl-0.lib libgslcblas-0.lib Advapi32.lib User32.lib Ole32.lib Oleaut32.lib Gdi32.lib
 
 
 OMNIIDL  = $(OORB_HOME)\bin\x86_win32\omniidl -bcxx -Wbh=.h -Wbs=.cpp
 
 CP       = copy
 
-COMMON   = options.obj Workspace.obj Queue.obj ReconContext.obj Toolbox.obj 
+COMMON   = options.obj
 CLIENT   = lclient.exe rclient.exe
 SERVER   = codeared.exe
 
@@ -27,12 +27,6 @@ RRSModule.cpp: RRSModule.idl
 
 RRSModule.obj: RRSModule.cpp RRSModule.h
 	$(CXX) $(CXXFLAGS) RRSModule.cpp
-
-Workspace.obj: Workspace.cpp Workspace.hpp Configurable.hpp
-	$(CXX) $(CXXFLAGS) Workspace.cpp
-
-Queue.obj: Queue.cpp Queue.hpp Configurable.hpp
-	$(CXX) $(CXXFLAGS) Queue.cpp
 
 LocalConnector.obj: LocalConnector.cpp LocalConnector.hpp Configurable.hpp
 	$(CXX) $(CXXFLAGS) LocalConnector.cpp
@@ -62,9 +56,9 @@ lclient.exe: LocalConnector.obj testclt.cpp
 	$(CXX) $(CXXFLAGS) -DLOCAL testclt.cpp 
     $(LD) $(LDFLAGS) $(COMMON) LocalConnector.obj $(LIBS) testclt.obj /out:lclient.exe
 
-rclient.exe: RemoteConnector.obj testclt.cpp 
+rclient.exe: RemoteConnector.obj RRSModule.obj testclt.cpp 
 	$(CXX) $(CXXFLAGS) -DREMOTE testclt.cpp 
-    $(LD) $(LDFLAGS) $(COMMON) RemoteConnector.obj $(LIBS) omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib testclt.obj /out:r	client.exe
+    $(LD) $(LDFLAGS) $(COMMON) RemoteConnector.obj RRSModule.obj $(LIBS) omniORB4_rt.lib omnithread_rt.lib omniDynamic4_rt.lib testclt.obj /out:rclient.exe
 
 codeared.exe: ReconServant.obj $(COMMON) 
 	$(CXX) $(CXXFLAGS) codeared.cpp 

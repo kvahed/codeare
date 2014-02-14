@@ -175,7 +175,7 @@ namespace io      {
     fexists (const char* fname) {
     	assert (fname[0] != '\0');
         ifstream fs (fname);
-        return (fs);
+		return (fs.is_open());
     }
     
 

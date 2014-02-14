@@ -483,20 +483,22 @@ phantom (const size_t& n) {
 	const size_t np = 5;  // Number of geometrical parameters
 	
 	float p[ne][np] = {
-		{ .69,   .92,   .0,   .0,     .0 },
-		{ .6624, .874,  .0,  -.0184,  .0 },
-        { .11,   .31,  -.22,  .0,    -.3 },
-		{ .16,   .41,   .22,  .0,     .3 },
-		{ .21,   .25,   .0,   .35,    .0 },
-		{ .046,  .046,  .00,  .1,     .0 },
-		{ .046,  .046,  .0,  -.1,     .0 },
-		{ .046,  .023,  .08, -.605,   .0 },
-		{ .023,  .023,  .0,  -.606,   .0 },
-		{ .023,  .046, -.06, -.605,   .0 }
+		{ .69f,   .92f,   .0f,   .0f,     .0f },
+		{ .6624f, .874f,  .0f,  -.0184f,  .0f },
+        { .11f,   .31f,  -.22f,  .0f,    -.3f },
+		{ .16f,   .41f,   .22f,  .0f,     .3f },
+		{ .21f,   .25f,   .0f,   .35f,    .0f },
+		{ .046f,  .046f,  .00f,  .1f,     .0f },
+		{ .046f,  .046f,  .0f,  -.1f,     .0f },
+		{ .046f,  .023f,  .08f, -.605f,   .0f },
+		{ .023f,  .023f,  .0f,  -.606f,   .0f },
+		{ .023f,  .046f, -.06f, -.605f,   .0f }
 	};
 
 	// Size_Tensities
-	T v[ne] = {T(1.), T(-.8), T(-.2), T(-.2), T(.1), T(.1), T(.1), T(.1), T(.1), T(.1)};
+#pragma warning (disable : 4305)
+	T v[ne] = {(T)1., (T)-.8, (T)-.2, (T)-.2, (T).1, (T).1, (T).1, (T).1, (T).1, (T).1};
+#pragma warning (default : 4305)
 
 	// Empty matrix
 	Matrix<T> res (n);
@@ -522,16 +524,16 @@ phantom (const size_t& n) {
  *                  Three dimensional analytical magnetic resonance imaging phantom in the Fourier domain.<br/>
  *                  MRM. 2007; 58: 430-436
  *
- * @param  n        Side length of matrix
+ * @param  n        Side length o matrix
  * @return          nxn zeros
  */
 template <class T> inline static Matrix<T> 
 phantom3D (const size_t& n) {
 
-	const size_t ne = 10; // Number of ellipses
-	const size_t np =  9; // Number of geometrical parameters
+	const size_t ne = 10; // Number o ellipses
+	const size_t np =  9; // Number o geometrical parameters
 
-	float p[ne][np] = {
+	double p[ne][np] = {
 		{ .69,  .92,  .9,   .0,   .0,   .0,   .0, .0, .0 },
         { .662, .874, .88,  .0,   .0,   .0,   .0, .0, .0 },
         { .11,  .31,  .22, -.22,  .0,  -.25, -.3, .0, .0 },
@@ -544,7 +546,7 @@ phantom3D (const size_t& n) {
         { .056, .056, .1,   .0,   .1,   .625, .0, .0, .0 }
 	};
 
-	T v[ne] = {2., -.8, -.2, -.2, .2, .2, .1, .1, .2, -.2};
+	double v[ne] = {2., -.8, -.2, -.2, .2, .2, .1, .1, .2, -.2};
 
 	Matrix<T> res = zeros<T>(n,n,n);
 	Matrix<T> e;

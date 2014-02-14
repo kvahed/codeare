@@ -1,7 +1,7 @@
 #ifndef __SSE2_TRAITS__
 #define __SSE2_TRAITS__
 
-#include <pmmintrin.h>
+//#include <pmmintrin.h>
 #include <xmmintrin.h>
 #include <emmintrin.h>
 

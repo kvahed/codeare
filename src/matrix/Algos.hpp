@@ -530,7 +530,7 @@ template<class T> inline Matrix<T>
 floor (const Matrix<T>& M) {
 	Matrix<T> res = M;
 	for (size_t i = 0; i < numel(M); ++i)
-		res[i] = floor (res[i]);
+		res[i] = floor ((float)res[i]);
 	return res;
 }
 

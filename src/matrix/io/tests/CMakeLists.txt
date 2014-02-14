@@ -17,12 +17,11 @@ add_executable (t_codeare t_codeare.cpp)
 add_test (cod t_codeare)
 
 add_executable (t_hdf5 t_hdf5.cpp)
-target_link_libraries (t_hdf5)
 add_test (hdf5 t_hdf5)
 
 if (${MATLAB_FOUND})
 	add_executable (t_matlab t_matlab.cpp)
-	target_link_libraries (t_matlab -L${MATLAB_LIBRARY_DIRS} ${MATLAB_LIBRARIES})
+	target_link_libraries (t_matlab ${MATLAB_LIBRARIES})
 	add_test (matlab t_matlab)
 endif()
 

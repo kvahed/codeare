@@ -93,12 +93,11 @@ namespace io{
 		Read (const std::string& uri = "") const {
 
 			int dt;
-			size_t  ns, n;
+			size_t n;
 			std::vector<size_t> dim;
 			std::vector<float>  res;
 			char* name;
 			Matrix<T> M;
-			T t;
 
 			// Read type
 			if (!mread (&dt, 1, m_file, "data type"))
@@ -153,13 +152,12 @@ namespace io{
 			assert (m_file != NULL);
 
 			dtype dt = CODTraits<T>::dt;
-			size_t n, l;
+			size_t n = M.NDim();
 
 			// Dump type
 			if (!mwrite(&dt,         1, m_file, "data type"))
 				return false;
 
-			n = M.NDim();
 			if (!mwrite(&n,          1, m_file, "data dimensions"))
 				return false;
 

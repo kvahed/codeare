@@ -412,6 +412,8 @@ namespace io{
 				}
 			}
 
+            return Matrix<T>();
+
 		}
 
 		/**
@@ -470,6 +472,8 @@ namespace io{
 				}
 			}
 
+            return Matrix<T>();
+            
 		}
 
 		/**
@@ -497,6 +501,8 @@ namespace io{
 				default:     break;
 				}
 			}
+
+            return false;
 
 		}
 

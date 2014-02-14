@@ -60,8 +60,10 @@ public:
 	double 
 	ClockRate       () const ;	
 
+#pragma warning (disable : 4251)
 	boost::any   void_any;
 	std::string  void_str;
+#pragma warning (default : 4251)
 	
 		
 private:

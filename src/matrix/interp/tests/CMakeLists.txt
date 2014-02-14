@@ -9,7 +9,7 @@ include_directories(
     ${GSL_INCLUDE_DIR}
   endif()
   if (${ITK_FOUND})
-     ${ITK_INCLUDE_DIRS}
+    ${ITK_INCLUDE_DIRS}
   endif()
   )
 
