@@ -46,6 +46,8 @@ find_package(Boost COMPONENTS thread system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
+link_directories (${OPENSSL_LIBRARIES})
+
 
 # Linear algebra ----------------------------------------------------------------
 find_package(BLAS REQUIRED)
@@ -85,8 +87,10 @@ find_package(Ismrmrd)
 find_package(Matlab)
 if(${MATLAB_FOUND})
   include_directories (${MATLAB_INCLUDE_DIRS})
-  link_directories (${MATLAB_LIBRARY_DIRS}) 
-  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${MATLAB_LIBRARIES}")
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    link_directories ("${MATLAB_ROOT_DIR}/extern/lib/win64/microsoft")
+  endif()
+
 endif()
 
 if (${ZLIB_FOUND}) 

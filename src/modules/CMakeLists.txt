@@ -19,33 +19,37 @@ include_directories (${PROJECT_SOURCE_DIR}/src/matrix/io
 
 add_library (CompressedSensing MODULE CompressedSensing.hpp CompressedSensing.cpp)
 target_link_libraries (CompressedSensing tinyxml core
-  ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${FFTW3_LIBRARIES})
+  ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${FFTW3_LIBRARIES}
+  ${OPENSSL_LIBRARIES}) 
 
 add_library (KTPoints MODULE KTPoints.hpp KTPoints.cpp)
 target_link_libraries (KTPoints tinyxml core ${BLAS_LINKER_FLAGS}
-  ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} )
+  ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
+  ${OPENSSL_LIBRARIES}) 
 
 add_library (SENSE MODULE SENSE.hpp SENSE.cpp)
 target_link_libraries (SENSE tinyxml core ${BLAS_LINKER_FLAGS}
   ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
-  ${FFTW3_LIBRARIES} )
+  ${FFTW3_LIBRARIES} ${OPENSSL_LIBRARIES})
 
 add_library (DummyRecon MODULE DummyRecon.hpp DummyRecon.cpp)
-target_link_libraries (DummyRecon tinyxml core )
+target_link_libraries (DummyRecon tinyxml core ${OPENSSL_LIBRARIES})
 
 if (${NFFT_FOUND})
   add_library (NuFFT MODULE NuFFT.hpp NuFFT.cpp)
-  target_link_libraries (NuFFT tinyxml core ${NFFT_LIBRARIES})
+  target_link_libraries (NuFFT tinyxml core ${NFFT_LIBRARIES}
+  ${OPENSSL_LIBRARIES}) 
   
   add_library (CGSENSE MODULE CGSENSE.hpp CGSENSE.cpp)
   target_link_libraries (CGSENSE tinyxml core ${NFFT_LIBRARIES}
-    ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES}) 
+    ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${OPENSSL_LIBRARIES})  
 endif()
 
 if (${ITK_FOUND})
   add_library (RelativeSensitivities MODULE RelativeSensitivities.cpp
   RelativeSensitivities.hpp)  
   target_link_libraries (RelativeSensitivities -L${ITK_LIBRARY_DIRS}
-  ${ITK_LIBRARIES} ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES})  
+  ${ITK_LIBRARIES} ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES}
+  ${OPENSSL_LIBRARIES})   
 endif()
 
