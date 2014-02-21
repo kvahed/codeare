@@ -49,6 +49,15 @@ include_directories(${OPENSSL_INCLUDE_DIR})
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
 
+# OmniORB -----------------------------------------------------------------------
+find_package (OmniORB)
+if (!{$OMNIORB4_FOUND})
+  message (WARNING "OmniORB4 library not found. Networking infrastructure won't be built.")
+endif ()
+message (STATUS ${OMNIORB4_IDL_COMPILER})
+message (STATUS ${OMNIORB4_LIBRARIES})
+message (STATUS ${OMNIORB4_VERSION})
+
 # Linear algebra ----------------------------------------------------------------
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
