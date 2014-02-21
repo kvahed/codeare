@@ -40,7 +40,6 @@ if(OPENMP_FOUND)
   set(CMAKE_EXE_LINKER_FLAGS 
     "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}") 
 endif()
-
 # Core --------------------------------------------------------------------------
 find_package(Boost COMPONENTS thread system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
@@ -105,8 +104,10 @@ endif()
 
 if (${ZLIB_FOUND}) 
   find_package(NIFTI) 
-  if (${NIFTI_INCLUDE_DIR} MATCHES "")
+  if (!${NIFTI_FOUND})
     set(NIFTI_INCLUDE_DIR "")
+  else()
+    include_directories (${NIFTI_INCLUDE_DIR})
   endif()
 endif()
 
