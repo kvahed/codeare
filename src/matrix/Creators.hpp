@@ -533,7 +533,7 @@ phantom3D (const size_t& n) {
 	const size_t ne = 10; // Number o ellipses
 	const size_t np =  9; // Number o geometrical parameters
 
-	double p[ne][np] = {
+    float p[ne][np] = {
 		{ .69,  .92,  .9,   .0,   .0,   .0,   .0, .0, .0 },
         { .662, .874, .88,  .0,   .0,   .0,   .0, .0, .0 },
         { .11,  .31,  .22, -.22,  .0,  -.25, -.3, .0, .0 },
