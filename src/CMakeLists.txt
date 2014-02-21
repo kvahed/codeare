@@ -17,7 +17,7 @@ include_directories(
   if (${OMNIORB4_FOUND})
     ${OMNIORB4_INCLUDE_DIR}
   endif()
-)
+  )
 
 add_subdirectory(tinyxml)
 add_subdirectory(core)
@@ -29,7 +29,16 @@ add_executable(lclient LocalConnector.hpp LocalConnector.cpp
   testclt.cpp options.cpp) 
 target_compile_definitions(lclient PRIVATE LOCAL)
 target_link_libraries (lclient core tinyxml ${GSL_LIBRARIES}
-  ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp) 
+  ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp boost_thread boost_system)
+if (${MATLAB_FOUND})
+  target_link_libraries (lclient ${MATLAB_LIBRARIES})
+endif()
+if(${ISMRMRD_FOUND})
+  target_link_libraries (lclient ${ISMRMRD_LIBRARIES})
+endif()
+if (${NIFTI_FOUND})
+  target_link_libraries (lclient ${NIFTI_NIFTIIO_LIBRARY} ${NIFTI_ZNZ_LIBRARY} z)
+endif()
 
 #add_executable(rclient LocalConnector.hpp RemoteConnector.cpp
 #  testclt.cpp options.cpp) 
