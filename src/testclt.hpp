@@ -1,4 +1,5 @@
 #include "options.h"
+#include "GitSHA1.h"
 
 #include "LocalConnector.hpp"
 #if defined HAVE_OMNIORB4_CORBA_H && defined REMOTE

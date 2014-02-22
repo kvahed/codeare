@@ -12,6 +12,9 @@ enable_testing()
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+
 include(ConfigureChecks.cmake)
 add_definitions(-DHAVE_CONFIG_H)
 
@@ -21,7 +24,7 @@ configure_file (
   )
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC") 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -102,7 +105,6 @@ if(${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     link_directories ("${MATLAB_ROOT_DIR}/extern/lib/win64/microsoft")
   endif()
-
 endif()
 
 if (${ZLIB_FOUND}) 

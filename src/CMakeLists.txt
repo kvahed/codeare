@@ -26,62 +26,45 @@ add_subdirectory(matrix)
 add_subdirectory(mongoose)
 add_subdirectory(modules)
 
-### lclient ###
-add_executable(lclient LocalConnector.hpp LocalConnector.cpp
-  testclt.cpp options.cpp) 
-target_compile_definitions(lclient PRIVATE LOCAL)
-target_link_libraries (lclient core tinyxml ${GSL_LIBRARIES}
-  ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp boost_thread boost_system)
+configure_file(GitSHA1.cpp.in GitSHA1.cpp @ONLY)
+list (APPEND SOURCES options.h options.cpp GitSHA1.cpp GitSHA1.h)
+
+list (APPEND COMLIBS tinyxml core ${GSL_LIBRARIES}
+  ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp boost_thread boost_system) 
 if (${MATLAB_FOUND})
-  target_link_libraries (lclient ${MATLAB_LIBRARIES})
+  list (APPEND COMLIBS ${MATLAB_LIBRARIES})
 endif()
 if(${ISMRMRD_FOUND})
-  target_link_libraries (lclient ${ISMRMRD_LIBRARIES})
+  list (APPEND COMLIBS ${ISMRMRD_LIBRARIES})
 endif()
 if (${NIFTI_FOUND})
-  target_link_libraries (lclient ${NIFTI_NIFTIIO_LIBRARY}
-  ${NIFTI_ZNZ_LIBRARY} z) 
+  list (APPEND COMLIBS ${NIFTI_NIFTIIO_LIBRARY} 
+    ${NIFTI_ZNZ_LIBRARY} z)
 endif()
 
+
+
+### lclient ###
+add_executable(lclient ${SOURCES} LocalConnector.hpp
+  LocalConnector.cpp testclt.cpp) 
+target_compile_definitions(lclient PRIVATE LOCAL)
+target_link_libraries (lclient ${COMLIBS})
 install (TARGETS lclient DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 if (${OMNIORB4_FOUND})
 
   ### rclient ###
-  add_executable(rclient RemoteConnector.hpp RemoteConnector.cpp
-    testclt.cpp RRSModule.hh RRSModuleSK.cc options.cpp) 
+  add_executable(rclient ${SOURCES} RemoteConnector.hpp
+  RemoteConnector.cpp testclt.cpp RRSModule.hh RRSModuleSK.cc) 
   target_compile_definitions(rclient PRIVATE REMOTE)
-  target_link_libraries (rclient core tinyxml ${GSL_LIBRARIES}
-    ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp boost_thread boost_system
-    ${OMNIORB4_LIBRARIES}) 
-  if (${MATLAB_FOUND})
-    target_link_libraries (rclient ${MATLAB_LIBRARIES})
-  endif()
-  if(${ISMRMRD_FOUND})
-    target_link_libraries (rclient ${ISMRMRD_LIBRARIES})
-  endif()
-  if (${NIFTI_FOUND})
-    target_link_libraries (rclient ${NIFTI_NIFTIIO_LIBRARY}
-      ${NIFTI_ZNZ_LIBRARY} z) 
-  endif()
+  target_link_libraries (rclient ${COMLIBS}
+    ${OMNIORB4_LIBRARIES})  
 
   ### codeared ###
-  add_executable(codeared codeared.cpp RRSModule.hh RRSModuleSK.cc
-  ReconServant.hpp ReconServant.cpp options.cpp)  
-  target_compile_definitions(codeared PRIVATE REMOTE)
-  target_link_libraries (codeared core mongoose tinyxml
-    ${GSL_LIBRARIES} ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp boost_thread
-    boost_system ${OMNIORB4_LIBRARIES})
-  if (${MATLAB_FOUND})
-    target_link_libraries (codeared ${MATLAB_LIBRARIES})
-  endif()
-  if(${ISMRMRD_FOUND})
-    target_link_libraries (codeared ${ISMRMRD_LIBRARIES})
-  endif()
-  if (${NIFTI_FOUND})
-    target_link_libraries (codeared ${NIFTI_NIFTIIO_LIBRARY}
-      ${NIFTI_ZNZ_LIBRARY} z) 
-  endif()
+  add_executable(codeared ${SOURCES} codeared.cpp RRSModule.hh
+  RRSModuleSK.cc ReconServant.hpp ReconServant.cpp)  
+  target_link_libraries (codeared mongoose ${COMLIBS}
+    ${OMNIORB4_LIBRARIES}) 
 
   install (TARGETS rclient codeared DESTINATION
     ${CMAKE_INSTALL_PREFIX}/bin) 
