@@ -33,7 +33,11 @@ list (APPEND SOURCES options.h options.cpp)
 list (APPEND COMLIBS tinyxml core ${GSL_LIBRARIES}
   ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp boost_thread boost_system) 
 if (${MATLAB_FOUND})
-  list (APPEND COMLIBS ${MATLAB_LIBRARIES})
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    list (APPEND COMLIBS libmx libmat)           
+  else()
+    list (APPEND COMLIBS ${MATLAB_LIBRARIES})           
+  endif()
 endif()
 if(${ISMRMRD_FOUND})
   list (APPEND COMLIBS ${ISMRMRD_LIBRARIES})
@@ -41,6 +45,9 @@ endif()
 if (${NIFTI_FOUND})
   list (APPEND COMLIBS ${NIFTI_NIFTIIO_LIBRARY} 
     ${NIFTI_ZNZ_LIBRARY} z)
+endif()
+if(${MATLAB_FOUND})
+  include_directories (${MATLAB_INCLUDE_DIRS})
 endif()
 
 ### lclient ###
@@ -52,16 +59,25 @@ install (TARGETS lclient DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 if (${OMNIORB4_FOUND})
 
+  add_custom_target (RRSModuleSK.cc 
+    COMMAND ${OMNIORB4_IDL_COMPILER} -bcxx RRSModule.idl 
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
+
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    list (APPEND OORB_DEFINES __WIN32__ __x86__ _WIN32_WINNT=0x0400)
+  endif()
+
   ### rclient ###
   add_executable(rclient ${SOURCES} RemoteConnector.hpp
   RemoteConnector.cpp testclt.cpp RRSModule.hh RRSModuleSK.cc) 
-  target_compile_definitions(rclient PRIVATE REMOTE)
+  target_compile_definitions(rclient PRIVATE REMOTE ${OORB_DEFINES})
   target_link_libraries (rclient ${COMLIBS}
     ${OMNIORB4_LIBRARIES})  
 
   ### codeared ###
   add_executable(codeared ${SOURCES} codeared.cpp RRSModule.hh
   RRSModuleSK.cc ReconServant.hpp ReconServant.cpp)  
+  target_compile_definitions(rclient PRIVATE ${OORB_DEFINES})
   target_link_libraries (codeared mongoose ${COMLIBS}
     ${OMNIORB4_LIBRARIES}) 
 

@@ -22,7 +22,11 @@ target_link_libraries (t_hdf5 hdf5 hdf5_cpp)
 
 if (${MATLAB_FOUND})
 	add_executable (t_matlab t_matlab.cpp)
-	target_link_libraries (t_matlab ${MATLAB_LIBRARIES})
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+      target_link_libraries (t_matlab libmx libmat)
+    else()           
+      target_link_libraries (t_matlab ${MATLAB_LIBRARIES})
+    endif()
 	add_test (matlab t_matlab)
 endif()
 

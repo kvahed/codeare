@@ -162,12 +162,11 @@ namespace RRClient {
 	inline long
 	RemoteConnector::GetSize (const longs& dims) const {
 		
-		long size = 1;
-
-		for (int i = 0; i < dims.length(); i++)
+        return std::accumulate (&dims[0], &dims[dims.length()-1], 1, std::multiplies<long>());
+/*		for (size_t i = 0; i < dims.length(); i++)
 			size *= dims[i];
 
-		return size;
+            return size;*/
 		
 	}
 
