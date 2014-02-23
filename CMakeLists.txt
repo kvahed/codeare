@@ -26,7 +26,10 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox
-  /nologo /MT /wd4267 /wd4244 /wd4190 /wd4996 /LD /MD /DEXP_STL")
+  /nologo /MT /wd4267 /wd4244 /wd4190 /wd4996 /LD /MD /DEXP_STL") 
+  set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
+  set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
+  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
 endif()
 
 # Architecture ------------------------------------------------------------------
@@ -43,15 +46,15 @@ endif()
 # Core --------------------------------------------------------------------------
 find_package(Boost COMPONENTS thread system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
+link_directories (${BOOST_LIBRARYDIR})
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
-
 # OmniORB -----------------------------------------------------------------------
 find_package (OmniORB)
 if (!{$OMNIORB4_FOUND})
-  message (WARNING "OmniORB4 library not found. Networking infrastructure won't be built.")
+  message (WARNING "OmniORB4 library not found. Networking infrastructure will not bebuilt.")
 endif ()
 
 # Linear algebra ----------------------------------------------------------------
@@ -93,7 +96,7 @@ if (${ISMRMRD_FOUND})
   include_directories(${ISMRMRD_INCLUDE_DIR})
   link_directories(${ISMRMRD_INCLUDE_DIR})
 else ()
-  message (WARNING "Couldn't find ISMRMRD installation. Support won\'t be built in.") 
+  message (WARNING "Couldn't find ISMRMRD installation. Support will not be built in.") 
 endif()
 
 find_package(Matlab)
@@ -102,15 +105,14 @@ if(${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     link_directories ("${MATLAB_ROOT_DIR}/extern/lib/win64/microsoft")
   endif()
-
 endif()
 
 if (${ZLIB_FOUND}) 
   find_package(NIFTI) 
-  if (!${NIFTI_FOUND})
-    set(NIFTI_INCLUDE_DIR "")
-  else()
+  if (${NIFTI_FOUND})
     include_directories (${NIFTI_INCLUDE_DIR})
+  else()
+    set(NIFTI_INCLUDE_DIR "")   
   endif()
 endif()
 

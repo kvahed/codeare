@@ -29,5 +29,5 @@ template<class T> bool dot_check () {
 
 int main (int args, char** argv) {
 	return (dot_check<cxfl>() && dot_check<cxdb>() && 
-			dot_check<float>() && dot_check<double>()) ? 0 : 1;
+            dot_check<float>() && dot_check<double>()) ? 0 : 1;
 }
