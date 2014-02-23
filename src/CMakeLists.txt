@@ -20,14 +20,15 @@ include_directories(
   endif()
   )
 
-add_subdirectory(tinyxml)
 add_subdirectory(core)
 add_subdirectory(matrix)
-add_subdirectory(mongoose)
 add_subdirectory(modules)
+add_subdirectory(mongoose)
+add_subdirectory(tinyxml)
 
-configure_file(GitSHA1.cpp.in GitSHA1.cpp @ONLY)
-list (APPEND SOURCES options.h options.cpp GitSHA1.cpp GitSHA1.h)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp" @ONLY)
+list (APPEND SOURCES GitSHA1.hpp)
+list (APPEND SOURCES options.h options.cpp)
 
 list (APPEND COMLIBS tinyxml core ${GSL_LIBRARIES}
   ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp boost_thread boost_system) 
@@ -41,8 +42,6 @@ if (${NIFTI_FOUND})
   list (APPEND COMLIBS ${NIFTI_NIFTIIO_LIBRARY} 
     ${NIFTI_ZNZ_LIBRARY} z)
 endif()
-
-
 
 ### lclient ###
 add_executable(lclient ${SOURCES} LocalConnector.hpp
