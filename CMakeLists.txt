@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
 
 project (codeare)
 set (codeare_VERSION_MAJOR 1)
@@ -106,6 +106,8 @@ if(${MATLAB_FOUND})
   include_directories (${MATLAB_INCLUDE_DIRS})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     link_directories ("${MATLAB_ROOT_DIR}/extern/lib/win64/microsoft")
+  else()
+    link_directories ("${MATLAB_LIBRARY_DIRS}")
   endif()
 endif()
 

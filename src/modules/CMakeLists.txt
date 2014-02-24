@@ -12,6 +12,9 @@ include_directories (${PROJECT_SOURCE_DIR}/src/matrix/io
   endif()
   )
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flat_namespace") 
+
+
 list (APPEND COMLIBS tinyxml core ${BLAS_LINKER_FLAGS}
   ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
   ${FFTW3_LIBRARIES} ${OPENSSL_LIBRARIES}) 
