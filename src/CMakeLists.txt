@@ -30,7 +30,7 @@ configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in" "${CMAKE_CURRENT_SO
 list (APPEND SOURCES GitSHA1.hpp)
 list (APPEND SOURCES options.h options.cpp)
 
-list (APPEND COMLIBS tinyxml core ${GSL_LIBRARIES}
+list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}
   ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp boost_thread boost_system) 
 if (${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -76,7 +76,7 @@ if (${OMNIORB4_FOUND})
   ### codeared ###
   add_executable (codeared ${SOURCES} codeared.cpp RRSModule.hh
     RRSModuleSK.cc ReconServant.hpp ReconServant.cpp)
-  target_compile_definitions (codeared PRIVATE ${OORB_DEFINES})
+  target_compile_definitions (codeared PRIVATE REMOTE ${OORB_DEFINES})
   target_link_libraries (codeared mongoose ${COMLIBS}
     ${OMNIORB4_LIBRARIES})  
   

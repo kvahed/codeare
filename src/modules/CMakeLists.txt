@@ -12,7 +12,7 @@ include_directories (${PROJECT_SOURCE_DIR}/src/matrix/io
   endif()
   )
 
-if (UNIX)
+if (MACOSX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flat_namespace") 
 endif()
 

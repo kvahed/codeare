@@ -23,6 +23,14 @@ configure_file (
   "${PROJECT_BINARY_DIR}/config.h"
   )
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  set(WINDOWS TRUE)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(LINUX TRUE)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(MACOSX TRUE)
+endif()
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC") 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
