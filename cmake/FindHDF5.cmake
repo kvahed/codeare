@@ -74,7 +74,7 @@ set( HDF5_VALID_COMPONENTS
 
 # Validate the list of find components.
 if( NOT HDF5_FIND_COMPONENTS )
-    set( HDF5_LANGUAGE_BINDINGS "C" )
+    set( HDF5_LANGUAGE_BINDINGS "CXX" )
 else()
     # add the extra specified components, ensuring that they are valid.
     foreach( component ${HDF5_FIND_COMPONENTS} )

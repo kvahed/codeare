@@ -31,12 +31,12 @@ list (APPEND SOURCES GitSHA1.hpp)
 list (APPEND SOURCES options.h options.cpp)
 
 list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}
-  ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY}) 
+  ${OPENSSL_LIBRARIES} ${HDF5_LIBRARIES} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY}) 
 if (${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND COMLIBS libmx libmat)           
   else ()
-    list (APPEND COMLIBS mx mat)           
+    list (APPEND COMLIBS mx mat)
   endif ()
 endif ()
 if (${ISMRMRD_FOUND})
@@ -86,3 +86,44 @@ if (${OMNIORB4_FOUND})
 
 endif()
 
+if (LINUX)
+  set (RT_LIBS_ENV LD_LIBRARY_PATH)
+elseif (MACOSX)
+  set (RT_LIBS_ENV DYLD_LIBRARY_PATH)
+endif()
+
+if (MATLAB_FOUND)
+  if (LINUX)
+    list (APPEND RT_LIBS_DIR ${MATLAB_ROOT_DIR}/bin/glnxa64)
+  elseif (MACOSX)
+    list (APPEND RT_LIBS_DIR ${MATLAB_ROOT_DIR}/bin/maci64)
+  endif()
+endif()
+
+if (ISMRMRD_FOUND)
+  list (APPEND RT_LIBS_DIR ${ISMRMRD_INCLUDE_DIR}/../lib)
+endif()
+
+list (APPEND RT_LIBS_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+
+add_test (sense lclient -t SENSE -b ${PROJECT_SOURCE_DIR}/share/sense
+  -c 3fold.xml)
+set_tests_properties (sense PROPERTIES ENVIRONMENT ${RT_LIBS_DIR})
+
+add_test (cgsense lclient -t CGSENSE -b
+  ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml)
+set_tests_properties (cgsense PROPERTIES ENVIRONMENT ${RT_LIBS_DIR})
+
+add_test (compressedsensing lclient -t CompressedSensing -b
+  ${PROJECT_SOURCE_DIR}/share/compressedsensing -c
+  phantom_denoising.xml) 
+set_tests_properties (compressedsensing PROPERTIES ENVIRONMENT
+  ${RT_LIBS_DIR})
+
+add_test (nufft lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/
+  -c 16shot.xml)
+set_tests_properties (nufft PROPERTIES ENVIRONMENT ${RT_LIBS_DIR})
+
+add_test (nufft lclient -t VDSpiral -b
+  ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml)
+set_tests_properties (nufft PROPERTIES ENVIRONMENT ${RT_LIBS_DIR}) 

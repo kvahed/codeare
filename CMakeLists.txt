@@ -88,7 +88,8 @@ endif()
 find_package(GSL)
 
 # File IO -----------------------------------------------------------------------
-find_package(HDF5 COMPONENTS CXX REQUIRED)
+find_package(HDF5 REQUIRED)
+message (STATUS ${HDF5_LIBRARIES})
 include_directories (${HDF5_INCLUDE_DIRS})
 link_directories (${HDF5_LIBRARY_DIRS})
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
