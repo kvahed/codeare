@@ -28,7 +28,7 @@ add_subdirectory (tinyxml)
 
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp" @ONLY)
 list (APPEND SOURCES GitSHA1.hpp)
-list (APPEND SOURCES options.h options.cpp)
+list (APPEND SOURCES options.h options.cpp core/Workspace.hpp core/Workspace.cpp)
 
 list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}
   ${OPENSSL_LIBRARIES} ${HDF5_LIBRARIES} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY}) 
@@ -36,6 +36,7 @@ if (${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND COMLIBS libmx libmat)           
   else ()
+    message (STATUS ${MATLAB_LIBRARY_DIRS})
     list (APPEND COMLIBS mx mat)
   endif ()
 endif ()
@@ -93,11 +94,7 @@ elseif (MACOSX)
 endif()
 
 if (MATLAB_FOUND)
-  if (LINUX)
-    list (APPEND RT_LIBS_DIR ${MATLAB_ROOT_DIR}/bin/glnxa64)
-  elseif (MACOSX)
-    list (APPEND RT_LIBS_DIR ${MATLAB_ROOT_DIR}/bin/maci64)
-  endif()
+  list (APPEND RT_LIBS_DIR ${MATLAB_LIBRARY_DIRS})
 endif()
 
 if (ISMRMRD_FOUND)
@@ -114,6 +111,10 @@ add_test (cgsense lclient -t CGSENSE -b
   ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml)
 set_tests_properties (cgsense PROPERTIES ENVIRONMENT ${RT_LIBS_DIR})
 
+add_test (ktpoints lclient -t KTPoints -b
+  ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml)
+set_tests_properties (ktpoints PROPERTIES ENVIRONMENT ${RT_LIBS_DIR}) 
+
 add_test (compressedsensing lclient -t CompressedSensing -b
   ${PROJECT_SOURCE_DIR}/share/compressedsensing -c
   phantom_denoising.xml) 
@@ -124,6 +125,6 @@ add_test (nufft lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/
   -c 16shot.xml)
 set_tests_properties (nufft PROPERTIES ENVIRONMENT ${RT_LIBS_DIR})
 
-add_test (nufft lclient -t VDSpiral -b
+add_test (vdspiral lclient -t VDSpiral -b
   ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml)
-set_tests_properties (nufft PROPERTIES ENVIRONMENT ${RT_LIBS_DIR}) 
+set_tests_properties (vdspiral PROPERTIES ENVIRONMENT ${RT_LIBS_DIR}) 
