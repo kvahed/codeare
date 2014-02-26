@@ -39,13 +39,13 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		DummyRecon  () {};
+		DummyRecon  () {}
 		
 		/**
 		 * @brief Default destructor
 		 */
 		virtual 
-		~DummyRecon () {};
+		~DummyRecon () {}
 		
 		
 		/**

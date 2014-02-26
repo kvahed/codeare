@@ -32,15 +32,9 @@ DummyRecon::Process     () {
 }
 
 // the class factories
-extern "C" DLLEXPORT ReconStrategy* create  ()                 {
-
+extern "C" DLLEXPORT ReconStrategy* create  ()                  {
     return new DummyRecon;
-
 }
-
-
-extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
-
+extern "C" DLLEXPORT void           destroy (ReconStrategy* p)  {
 	delete p;
-
 }

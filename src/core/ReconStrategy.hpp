@@ -53,7 +53,7 @@ namespace RRStrategy {
 		/**
 		 * @brief       Default constructor
 		 */ 
-		ReconStrategy   () : m_initialised (false) {}
+		ReconStrategy   () : m_initialised (false), global (Workspace::Instance()) {}
 		
 
 		/**
@@ -200,8 +200,10 @@ namespace RRStrategy {
 	protected:
 		
 		std::string    m_name;         /*!< @brief Name                        */
-		bool      m_initialised;  /*!< @brief Reco is initialised         */
+		bool           m_initialised;  /*!< @brief Reco is initialised         */
 		ReconStrategy* _successor;
+
+        Workspace&     global;
 		
 	};
 	
