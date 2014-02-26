@@ -31,7 +31,7 @@ list (APPEND SOURCES GitSHA1.hpp)
 list (APPEND SOURCES options.h options.cpp)
 
 list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}
-  ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp boost_thread boost_system) 
+  ${OPENSSL_LIBRARIES} hdf5 hdf5_cpp ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY}) 
 if (${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND COMLIBS libmx libmat)           
@@ -65,6 +65,7 @@ if (${OMNIORB4_FOUND})
 
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND OORB_DEFINES __WIN32__ __x86__ _WIN32_WINNT=0x0400)
+    list (APPEND OMNIORB4_LIBRARIES ws2_32 mswsock advapi32)
   endif()
 
   ### rclient ###
