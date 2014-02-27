@@ -18,8 +18,13 @@ add_test (cod t_codeare)
 
 add_executable (t_hdf5 t_hdf5.cpp)
 add_test (hdf5 t_hdf5)
-message (STATUS export ${HDF_LIBRARIES})
-target_link_libraries (t_hdf5 ${HDF5_LIBRARIES})
+
+if (!${WINDOWS})
+  target_link_libraries (t_hdf5 ${HDF5_LIBRARIES})
+else()
+  target_link_libraries (t_hdf5 hdf5 hdf5_cpp)
+endif()
+
 
 if (${MATLAB_FOUND})
 	add_executable (t_matlab t_matlab.cpp)

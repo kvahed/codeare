@@ -30,8 +30,16 @@ configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in" "${CMAKE_CURRENT_SO
 list (APPEND SOURCES GitSHA1.hpp)
 list (APPEND SOURCES options.h options.cpp core/Workspace.hpp core/Workspace.cpp)
 
+if (WINDOWS)
+  list (APPEND COMLIBS hdf5 hdf5_cpp)
+else ()
+  list (APPEND COMLIBS ${HDF5_LIBRARIES})
+endif()
+
 list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}
-  ${OPENSSL_LIBRARIES} ${HDF5_LIBRARIES} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY}) 
+  ${OPENSSL_LIBRARIES} ${Boost_THREAD_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}) 
+
 if (${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND COMLIBS libmx libmat)           
@@ -91,13 +99,15 @@ if (LINUX)
   set (RT_LIBS_ENV LD_LIBRARY_PATH)
 elseif (MACOSX)
   set (RT_LIBS_ENV DYLD_LIBRARY_PATH)
+elseif (WINDOWS)
+  set (RT_LIBS_ENV PATH)
 endif()
 
-if (MATLAB_FOUND)
+if (${MATLAB_FOUND})
   list (APPEND RT_LIBS_DIR ${MATLAB_LIBRARY_DIRS})
 endif()
 
-if (ISMRMRD_FOUND)
+if (${ISMRMRD_FOUND})
   list (APPEND RT_LIBS_DIR ${ISMRMRD_INCLUDE_DIR}/../lib)
 endif()
 
@@ -105,26 +115,26 @@ list (APPEND RT_LIBS_DIR ${CMAKE_INSTALL_PREFIX}/lib)
 
 add_test (sense lclient -t SENSE -b ${PROJECT_SOURCE_DIR}/share/sense
   -c 3fold.xml)
-set_tests_properties (sense PROPERTIES ENVIRONMENT ${RT_LIBS_DIR})
+set_tests_properties (sense PROPERTIES ENVIRONMENT "${RT_LIBS_ENV}=${RT_LIBS_DIR}")
 
 add_test (cgsense lclient -t CGSENSE -b
   ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml)
-set_tests_properties (cgsense PROPERTIES ENVIRONMENT ${RT_LIBS_DIR})
+set_tests_properties (cgsense PROPERTIES ENVIRONMENT "${RT_LIBS_ENV}=${RT_LIBS_DIR}")
 
 add_test (ktpoints lclient -t KTPoints -b
   ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml)
-set_tests_properties (ktpoints PROPERTIES ENVIRONMENT ${RT_LIBS_DIR}) 
+set_tests_properties (ktpoints PROPERTIES ENVIRONMENT "${RT_LIBS_ENV}=${RT_LIBS_DIR}") 
 
 add_test (compressedsensing lclient -t CompressedSensing -b
   ${PROJECT_SOURCE_DIR}/share/compressedsensing -c
   phantom_denoising.xml) 
 set_tests_properties (compressedsensing PROPERTIES ENVIRONMENT
-  ${RT_LIBS_DIR})
+  "${RT_LIBS_ENV}=${RT_LIBS_DIR}")
 
 add_test (nufft lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/
   -c 16shot.xml)
-set_tests_properties (nufft PROPERTIES ENVIRONMENT ${RT_LIBS_DIR})
+set_tests_properties (nufft PROPERTIES ENVIRONMENT "${RT_LIBS_ENV}=${RT_LIBS_DIR}")
 
 add_test (vdspiral lclient -t VDSpiral -b
   ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml)
-set_tests_properties (vdspiral PROPERTIES ENVIRONMENT ${RT_LIBS_DIR}) 
+set_tests_properties (vdspiral PROPERTIES ENVIRONMENT "${RT_LIBS_ENV}=${RT_LIBS_DIR}") 
