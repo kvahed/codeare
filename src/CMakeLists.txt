@@ -26,8 +26,11 @@ add_subdirectory (modules)
 add_subdirectory (mongoose)
 add_subdirectory (tinyxml)
 
+set (prefix ${CMAKE_INSTALL_PREFIX})
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in"
   "${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp" @ONLY) 
+configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/Loader.hpp.in"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Loader.hpp" @ONLY) 
 list (APPEND SOURCES GitSHA1.hpp)
 list (APPEND SOURCES options.h options.cpp core/Workspace.hpp
   core/Workspace.cpp) 
@@ -46,7 +49,6 @@ if (${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND COMLIBS libmx libmat)           
   else ()
-    message (STATUS ${MATLAB_LIBRARY_DIRS})
     list (APPEND COMLIBS mx mat)
   endif ()
 endif ()
@@ -70,42 +72,42 @@ install (TARGETS lclient DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 if (${OMNIORB4_FOUND})
 
-  add_custom_target (RRSModuleSK.cc 
-    COMMAND ${OMNIORB4_IDL_COMPILER} -bcxx RRSModule.idl 
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
+  set (OMNIORB_GENERATED ${CMAKE_CURRENT_SOURCE_DIR}/RRSModule.hh
+    ${CMAKE_CURRENT_SOURCE_DIR}/RRSModuleSK.cc) 
 
-  add_custom_target (RRSModule.hh 
-    COMMAND ${OMNIORB4_IDL_COMPILER} -bcxx RRSModule.idl 
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
-
+  add_custom_command (
+    OUTPUT ${OMNIORB_GENERATED} 
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND ${OMNIORB4_IDL_COMPILER} -bcxx ${CMAKE_CURRENT_SOURCE_DIR}/RRSModule.idl)
+  
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND OORB_DEFINES __WIN32__ __x86__ _WIN32_WINNT=0x0400)
     list (APPEND OMNIORB4_LIBRARIES ws2_32 mswsock advapi32)
   endif()
-
+  
   ### rclient ###
-  add_executable (rclient ${SOURCES} RemoteConnector.hpp
-    RemoteConnector.cpp testclt.cpp RRSModule.hh RRSModuleSK.cc) 
+  add_executable (rclient ${OMNIORB_GENERATED} ${SOURCES}
+    RemoteConnector.hpp RemoteConnector.cpp testclt.cpp) 
   target_compile_definitions (rclient PRIVATE REMOTE ${OORB_DEFINES})
   target_link_libraries (rclient ${COMLIBS} ${OMNIORB4_LIBRARIES})
-
+  
   ### codeared ###
-  add_executable (codeared ${SOURCES} codeared.cpp RRSModule.hh
-    RRSModuleSK.cc ReconServant.hpp ReconServant.cpp)
+  add_executable (codeared ${OMNIORB_GENERATED} ${SOURCES}
+    codeared.cpp ReconServant.hpp ReconServant.cpp)
   target_compile_definitions (codeared PRIVATE REMOTE ${OORB_DEFINES})
   target_link_libraries (codeared mongoose ${COMLIBS}
     ${OMNIORB4_LIBRARIES})  
   
   install (TARGETS rclient codeared DESTINATION
     ${CMAKE_INSTALL_PREFIX}/bin) 
-
+  
 endif()
 
 if (${LINUX})
   set (RT_LIBS_ENV LD_LIBRARY_PATH)
 elseif (${MACOSX})
   set (RT_LIBS_ENV DYLD_LIBRARY_PATH)
-elseif (WINDOWS)
+elseif (${WINDOWS})
   set (RT_LIBS_ENV PATH)
 endif()
 
