@@ -24,13 +24,13 @@
 #include "Matrix.hpp"
 
 #ifdef HAVE_INSIGHT
-    #include "itkImage.h"
-    #include "itkMinimumMaximumImageFilter.h"
-    #include "itkOrientedImage.h"
-    #include "itkIdentityTransform.h"
-    #include "itkLinearInterpolateImageFunction.h"
-    #include "itkBSplineInterpolateImageFunction.h"
-    #include "itkResampleImageFilter.h"
+    #include <itkImage.h>
+    #include <itkMinimumMaximumImageFilter.h>
+//    #include <itkOrientedImage.h>
+    #include <itkIdentityTransform.h>
+    #include <itkLinearInterpolateImageFunction.h>
+    #include <itkBSplineInterpolateImageFunction.h>
+    #include <itkResampleImageFilter.h>
 #endif
 
 	
@@ -58,8 +58,8 @@ resample (const Matrix<T>& M, const Matrix<double>& f, const InterpMethod& im) {
 	
 #ifdef HAVE_INSIGHT
 	
-	typedef typename itk::OrientedImage< T, 3 > InputImageType;
-	typedef typename itk::OrientedImage< T, 3 > OutputImageType;
+	typedef typename itk::Image< T, 3 > InputImageType;
+	typedef typename itk::Image< T, 3 > OutputImageType;
 	typedef typename itk::IdentityTransform< double, 3 > TransformType;
 	typedef typename itk::LinearInterpolateImageFunction< InputImageType, double > InterpolatorType;
 	typedef typename itk::ResampleImageFilter< InputImageType, InputImageType > ResampleFilterType;
@@ -80,8 +80,8 @@ resample (const Matrix<T>& M, const Matrix<double>& f, const InterpMethod& im) {
 	size[1] = static_cast<SizeValueType>(res.Dim(1));
 	size[2] = static_cast<SizeValueType>(res.Dim(2));
 	
-	typename itk::OrientedImage< T, 3 >::Pointer input = itk::OrientedImage< T, 3 >::New();
-	typename itk::OrientedImage< T, 3 >::Pointer output = itk::OrientedImage< T, 3 >::New();
+	typename itk::Image< T, 3 >::Pointer input = itk::Image< T, 3 >::New();
+	typename itk::Image< T, 3 >::Pointer output = itk::Image< T, 3 >::New();
 	
 	typename itk::Image< T, 3 >::IndexType ipos;
 	ipos[0] = 0; ipos[1] = 0; ipos[2] = 0;

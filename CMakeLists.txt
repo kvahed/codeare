@@ -1,28 +1,29 @@
-cmake_minimum_required (VERSION 2.8)
-
+# Project -----------------------------------------------------------------------
 project (codeare)
 set (codeare_VERSION_MAJOR 1)
 set (codeare_VERSION_MINOR 2)
+set (PROJECT_URL "http://codeare.org/")
+set (PROJECT_VERSION
+  "${codeare_VERSION_MAJOR}.${codeare_VERSION_MINOR}")
 
-set(PROJECT_URL "http://codeare.org/")
-set(PROJECT_VERSION
-"${codeare_VERSION_MAJOR}.${codeare_VERSION_MINOR}")
-
+# CMake -------------------------------------------------------------------------
+cmake_minimum_required (VERSION 2.8)
 enable_testing()
-
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
-
-include(GetGitRevisionDescription)
-get_git_head_revision(GIT_REFSPEC GIT_SHA1)
-
 include(ConfigureChecks.cmake)
 add_definitions(-DHAVE_CONFIG_H)
 
+# Git ---------------------------------------------------------------------------
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+
+# Configuration for C++ compile time --------------------------------------------
 configure_file (
   "${PROJECT_SOURCE_DIR}/config.h.in"
   "${PROJECT_BINARY_DIR}/config.h"
   )
 
+# OS type -----------------------------------------------------------------------
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(WINDOWS TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -31,6 +32,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(MACOSX TRUE)
 endif()
 
+# C++ flags ---------------------------------------------------------------------
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC") 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -80,11 +82,11 @@ if(${NFFT_INCLUDE_DIR} MATCHES "")
 endif()
 
 # Interpolations ----------------------------------------------------------------
-find_package (PNG)
-find_package (TIFF)
-if (${PNG_FOUND} AND ${TIFF_FOUND})
-  find_package(ITK)
+if (${WINDOWS})
+  find_package (PNG)
+  find_package (TIFF)
 endif()
+find_package(ITK)
 find_package(GSL)
 
 # File IO -----------------------------------------------------------------------
