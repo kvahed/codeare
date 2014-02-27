@@ -25,7 +25,6 @@ else()
   target_link_libraries (t_hdf5 hdf5 hdf5_cpp)
 endif()
 
-
 if (${MATLAB_FOUND})
 	add_executable (t_matlab t_matlab.cpp)
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

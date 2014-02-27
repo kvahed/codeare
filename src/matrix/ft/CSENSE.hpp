@@ -59,18 +59,16 @@ public:
 	CSENSE        (const Params& params) :
 		FT<T>::FT(params), nthreads (1), treg(0.), compgfm(1) {
 
-		Workspace& w = Workspace::Instance();
-
 		// Maps & 1st set of images
-		sens = w.Get<CT>(params.Get<std::string> ("smaps_name"));
-		Matrix<CT>& imgs = w.Get<CT>(params.Get<std::string> ("fimgs_name"));
+		sens = params.Get<Matrix<cxfl> > ("smaps");
+		dims = params.Get<Matrix<size_t> > ("fdims");
 
 		// Channels
 		nc = size (sens, ndims(sens)-1);
 		assert (nc > 1);
 
 		// 3D acceleration
-		af = size(sens) / size(imgs);
+		af = size(sens) / dims;
 		std::cout << "\n  acceleration vector: " << af;
 		aaf = prod (af);
 
@@ -80,7 +78,6 @@ public:
 		assert (ndim == 2 || ndim == 3);
 
 		// We expect sensitivities O (X,Y,Z,CH)
-		dims = size(imgs);
 		dims = resize(dims,1,size(dims,1)-1);
 		std::cout << "  fft dims: " << dims ;
 

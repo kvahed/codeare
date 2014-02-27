@@ -72,6 +72,10 @@ if (${OMNIORB4_FOUND})
     COMMAND ${OMNIORB4_IDL_COMPILER} -bcxx RRSModule.idl 
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
 
+  add_custom_target (RRSModule.hh 
+    COMMAND ${OMNIORB4_IDL_COMPILER} -bcxx RRSModule.idl 
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
+
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND OORB_DEFINES __WIN32__ __x86__ _WIN32_WINNT=0x0400)
     list (APPEND OMNIORB4_LIBRARIES ws2_32 mswsock advapi32)
@@ -95,23 +99,23 @@ if (${OMNIORB4_FOUND})
 
 endif()
 
-if (LINUX)
+if (${LINUX})
   set (RT_LIBS_ENV LD_LIBRARY_PATH)
-elseif (MACOSX)
+elseif (${MACOSX})
   set (RT_LIBS_ENV DYLD_LIBRARY_PATH)
 elseif (WINDOWS)
   set (RT_LIBS_ENV PATH)
 endif()
 
 if (${MATLAB_FOUND})
-  list (APPEND RT_LIBS_DIR ${MATLAB_LIBRARY_DIRS})
+  set (RT_LIBS_DIR "${MATLAB_LIBRARY_DIRS}")
 endif()
 
 if (${ISMRMRD_FOUND})
-  list (APPEND RT_LIBS_DIR ${ISMRMRD_INCLUDE_DIR}/../lib)
+  set (RT_LIBS_DIR "${RT_LIBS_DIR}:${ISMRMRD_INCLUDE_DIR}/../lib")
 endif()
 
-list (APPEND RT_LIBS_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+set (RT_LIBS_DIR "${RT_LIBS_DIR}:${CMAKE_INSTALL_PREFIX}/lib")
 
 add_test (sense lclient -t SENSE -b ${PROJECT_SOURCE_DIR}/share/sense
   -c 3fold.xml)

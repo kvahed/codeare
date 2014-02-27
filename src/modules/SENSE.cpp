@@ -31,13 +31,14 @@ SENSE::Prepare () {
 
 	Params p;
 
-	p.Set("smaps_name", std::string("smaps"));
-	p.Set("fimgs_name", std::string("fimgs"));
-	p.Set("compgfm", m_compgfm);
-	p.Set("nthreads", m_nthreads);
-	p.Set("lambda",   m_lambda);
+    p.Set("smaps", Get<cxfl>("smaps"));       // Sensitivities
+    p.Set("fdims", size(Get<cxfl>("fimgs"))); // Folded dimensions
 
-	m_cs = CSENSE<float> (p);
+	p.Set("compgfm", m_compgfm);              // Compute g-factors?
+	p.Set("nthreads", m_nthreads);            // Number of threads for FFT
+	p.Set("lambda", m_lambda);                // Tikhonov regularizing term
+
+	m_cs = CSENSE<float> (p);                 // Cartesian SENSE operator
 
 	printf ("... done.\n\n");
 
