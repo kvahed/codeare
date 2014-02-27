@@ -45,6 +45,7 @@ ReconContext::ReconContext (const char* name) {
 	create_t* create = (create_t*) GetFunction (m_dlib, (char*)"create");
 	m_strategy = create();
 	m_strategy->Name (name);
+    m_strategy->WSpace (Workspace::Instance());
 	
 }
 

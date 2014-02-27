@@ -128,7 +128,7 @@ namespace RRStrategy {
 		 */
 		Workspace&
 		DB              () const {
-			return Workspace::Instance();
+			return global;
 		}
 
 
@@ -141,7 +141,7 @@ namespace RRStrategy {
 		 */
 		template <class T> Matrix<T>& 
 		AddMatrix         (const std::string& name, boost::shared_ptr< Matrix<T> > p) const {
-			return Workspace::Instance().AddMatrix(name, p);
+			return global.AddMatrix(name, p);
 		}
 
 
@@ -154,7 +154,7 @@ namespace RRStrategy {
 		 */
 		template <class T> Matrix<T>& 
 		AddMatrix         (const std::string& name) const {
-			return Workspace::Instance().AddMatrix<T>(name);
+			return global.AddMatrix<T>(name);
 		}
 
 
@@ -167,7 +167,7 @@ namespace RRStrategy {
 		 */
 		template <class T> Matrix<T>& 
 		AddMatrix         (const char* name) const {
-			return Workspace::Instance().AddMatrix<T>(std::string(name));
+			return global.AddMatrix<T>(std::string(name));
 		}
 
 
@@ -180,7 +180,7 @@ namespace RRStrategy {
 		 */
 		template <class T> Matrix<T>&
 		Get            (const std::string& name) const {
-			return Workspace::Instance().Get<T>(name);
+			return global.Get<T>(name);
 		}
 		
 		
@@ -193,7 +193,20 @@ namespace RRStrategy {
 		 */
 		inline bool 
 		Free            (const std::string& name) const {
-			return Workspace::Instance().Free (name);
+			return global.Free (name);
+		}
+
+
+		/**
+		 * @brief       Clear database of complex single matrix by name
+		 *              @see Workspace::FreeCXFL(const string)
+		 * 
+		 * @param  name Name
+		 * @return      Reference to data if existent
+		 */
+		inline void 
+		WSpace         (Workspace& ws) {
+			global = ws;
 		}
 
 
