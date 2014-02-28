@@ -139,24 +139,22 @@ message (STATUS ${LD_ENV})
 add_test (sense lclient -t SENSE -b ${PROJECT_SOURCE_DIR}/share/sense
   -c 3fold.xml) 
 set_tests_properties (sense PROPERTIES ENVIRONMENT ${LD_ENV}) 
-
-add_test (cgsense lclient -t CGSENSE
-  -b ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
-set_tests_properties (cgsense PROPERTIES ENVIRONMENT ${LD_ENV}) 
-
 add_test (ktpoints lclient -t KTPoints 
   -b ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml) 
 set_tests_properties (ktpoints PROPERTIES ENVIRONMENT ${LD_ENV})
-
 add_test (compressedsensing lclient -t CompressedSensing
   -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c
   phantom_denoising.xml)  
 set_tests_properties (compressedsensing PROPERTIES ENVIRONMENT ${LD_ENV})
-
-add_test (nufft lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/
-  -c 16shot.xml) 
-set_tests_properties (nufft PROPERTIES ENVIRONMENT ${LD_ENV}) 
-
 add_test (vdspiral lclient -t VDSpiral
   -b ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml) 
 set_tests_properties (vdspiral PROPERTIES ENVIRONMENT ${LD_ENV})  
+if (${NFFT_FOUND})
+  add_test (nufft lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/
+    -c 16shot.xml) 
+  set_tests_properties (nufft PROPERTIES ENVIRONMENT ${LD_ENV}) 
+  add_test (cgsense lclient -t CGSENSE
+    -b ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
+  set_tests_properties (cgsense PROPERTIES ENVIRONMENT ${LD_ENV}) 
+endif()
+
