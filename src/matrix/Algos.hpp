@@ -744,7 +744,7 @@ sum (const Matrix<T>& M, size_t d) {
 		
 #pragma omp for
 		
-		for (size_t i = 0; i < outsize; ++i) {
+		for (int i = 0; i < outsize; ++i) {
 			
 			for (size_t j = 0; j < insize; ++j) {
 				res[i*insize + j] = T(0);

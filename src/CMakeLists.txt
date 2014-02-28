@@ -105,50 +105,58 @@ if (${OMNIORB4_FOUND})
 endif()
 
 if (${LINUX})
-  set (RT_LIBS_ENV LD_LIBRARY_PATH)
+  set (LD_ENV "LD_LIBRARY_PATH=$LD_LIBRARY_PATH")
 elseif (${MACOSX})
-  set (RT_LIBS_ENV DYLD_LIBRARY_PATH)
+  set (LD_ENV "DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH")
 elseif (${WINDOWS})
-  set (RT_LIBS_ENV PATH)
+  set (LD_ENV "PATH=%PATH%")
 endif()
 
 if (${MATLAB_FOUND})
-  set (RT_LIBS_DIR "${MATLAB_LIBRARY_DIRS}")
+  if (${WINDOWS}) 
+    set (LD_ENV "${LD_ENV}\;${MATLAB_LIBRARY_DIRS}")
+  else ()
+    set (LD_ENV "${LD_ENV}:${MATLAB_LIBRARY_DIRS}")
+  endif ()
 endif()
 
 if (${ISMRMRD_FOUND})
-  set (RT_LIBS_DIR "${RT_LIBS_DIR}:${ISMRMRD_INCLUDE_DIR}/../lib")
+  if (${WINDOWS}) 
+    set (LD_ENV "${LD_ENV}\;${ISMRMRD_INCLUDE_DIR}/../lib")
+  else ()
+    set (LD_ENV "${LD_ENV}:${ISMRMRD_INCLUDE_DIR}/../lib")
+  endif ()
 endif()
 
-set (RT_LIBS_DIR "${RT_LIBS_DIR}:${CMAKE_INSTALL_PREFIX}/lib")
+if (${WINDOWS}) 
+  set (LD_ENV "${LD_ENV}\;${CMAKE_CURRENT_BINARY_DIR}/modules/Release\;${CMAKE_INSTALL_PREFIX}/lib")
+else ()
+  set (LD_ENV "${LD_ENV}:${CMAKE_CURRENT_BINARY_DIR}/modules:${CMAKE_INSTALL_PREFIX}/lib")
+endif ()
+
+message (STATUS ${LD_ENV})
 
 add_test (sense lclient -t SENSE -b ${PROJECT_SOURCE_DIR}/share/sense
-  -c 3fold.xml)
-set_tests_properties (sense PROPERTIES ENVIRONMENT
-  "${RT_LIBS_ENV}=${RT_LIBS_DIR}") 
+  -c 3fold.xml) 
+set_tests_properties (sense PROPERTIES ENVIRONMENT ${LD_ENV}) 
 
-add_test (cgsense lclient -t CGSENSE -b
-  ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml)
-set_tests_properties (cgsense PROPERTIES ENVIRONMENT
-  "${RT_LIBS_ENV}=${RT_LIBS_DIR}") 
+add_test (cgsense lclient -t CGSENSE
+  -b ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
+set_tests_properties (cgsense PROPERTIES ENVIRONMENT ${LD_ENV}) 
 
-add_test (ktpoints lclient -t KTPoints -b
-  ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml)
-set_tests_properties (ktpoints PROPERTIES ENVIRONMENT
-  "${RT_LIBS_ENV}=${RT_LIBS_DIR}")
+add_test (ktpoints lclient -t KTPoints 
+  -b ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml) 
+set_tests_properties (ktpoints PROPERTIES ENVIRONMENT ${LD_ENV})
 
-add_test (compressedsensing lclient -t CompressedSensing -b
-  ${PROJECT_SOURCE_DIR}/share/compressedsensing -c
-  phantom_denoising.xml) 
-set_tests_properties (compressedsensing PROPERTIES ENVIRONMENT
-  "${RT_LIBS_ENV}=${RT_LIBS_DIR}")
+add_test (compressedsensing lclient -t CompressedSensing
+  -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c
+  phantom_denoising.xml)  
+set_tests_properties (compressedsensing PROPERTIES ENVIRONMENT ${LD_ENV})
 
 add_test (nufft lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/
-  -c 16shot.xml)
-set_tests_properties (nufft PROPERTIES ENVIRONMENT
-  "${RT_LIBS_ENV}=${RT_LIBS_DIR}") 
+  -c 16shot.xml) 
+set_tests_properties (nufft PROPERTIES ENVIRONMENT ${LD_ENV}) 
 
-add_test (vdspiral lclient -t VDSpiral -b
-  ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml)
-set_tests_properties (vdspiral PROPERTIES ENVIRONMENT
-  "${RT_LIBS_ENV}=${RT_LIBS_DIR}")  
+add_test (vdspiral lclient -t VDSpiral
+  -b ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml) 
+set_tests_properties (vdspiral PROPERTIES ENVIRONMENT ${LD_ENV})  

@@ -35,7 +35,7 @@
 #endif
 
 
-const static float GAMMA_1_PER_UT_MS = 2.675222099e-4;
+const static float GAMMA_1_PER_UT_MS = 2.675222099e-4f;
 
 /**
  * @brief Reconstruction startegies
@@ -148,7 +148,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 		
 #pragma omp for schedule (guided, 96)
 		
-		for (size_t i = 0; i < rtms; i++) {
+		for (int i = 0; i < rtms; i++) {
 			
 			memcpy (&m[tid][0], &vxlm[i*rtmsiz], rtmsiz * sizeof(cxfl));
 			
@@ -217,7 +217,7 @@ FTVolumes (Matrix<cxfl>& r) {
 		
 #pragma omp for schedule (dynamic, vols / omp_get_num_threads())
 
-		for (size_t i = 0; i < vols; i++) {
+		for (int i = 0; i < vols; i++) {
 
 			memcpy (&mr[tid][0], &r[i*imsize], imsize * sizeof(cxfl));
 
@@ -292,7 +292,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 		
 #pragma omp for schedule (dynamic, np / omp_get_num_threads())
 		
-		for (size_t i = 0; i < np; i++) {
+		for (int i = 0; i < np; i++) {
 			r = cxfl (0.0,0.0);
 			for (size_t j = 0; j < nc; j++)
 				r += tmp[i + 2*j*np] * conj(tmp[i + (2*j+1)*np]);
