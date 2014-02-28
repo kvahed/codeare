@@ -70,7 +70,7 @@ if (!{$OMNIORB4_FOUND})
 endif ()
 
 # Linear algebra ----------------------------------------------------------------
-find_package(BLAS REQUIRED)
+#find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 
 # Fourier transform -------------------------------------------------------------
