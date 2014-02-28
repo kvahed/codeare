@@ -96,6 +96,11 @@ if (${WINDOWS})
 endif()
 find_package(ITK)
 find_package(GSL)
+if (!{GSL_FOUND})
+  set (GSL_INCLUDE_DIR "")
+else ()
+  add_definitions (-DHAVE_GSL)
+endif()
 
 # OpenCL ------------------------------------------------------------------------
 find_package (OpenCL)

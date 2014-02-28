@@ -86,7 +86,7 @@ namespace io      {
 	const size_t SYNC_HEADER_SIZE = 64;
 
 	static bool bit_set (long eim, const EIM_BIT eb) {
-		return (eim & (long)pow((float)2.,(float)eb));
+		return ((eim & (long)pow((float)2.,(float)eb))>0);
 	}
 
 
