@@ -66,12 +66,20 @@ set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 # OmniORB -----------------------------------------------------------------------
 find_package (OmniORB)
 if (!{$OMNIORB4_FOUND})
-  message (WARNING "OmniORB4 library not found. Networking infrastructure will not bebuilt.")
+  message (WARNING "OmniORB4 library not found. Networking
+    infrastructure will not bebuilt.")
 endif ()
+if(${OMNIORB4_INCLUDE_DIR} MATCHES "")
+  set (OMNIORB4_INCLUDE_DIR "")
+endif()
 
 # Linear algebra ----------------------------------------------------------------
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
+if (${WINDOWS})
+   link_directories (${INTEL_COMPILER_DIR}/lib/intel64)
+   message (STATUS "${INTEL_COMPILER_DIR}/lib/intel64")
+endif ()
 
 # Fourier transform -------------------------------------------------------------
 find_package(FFTW3 COMPONENTS double single threads REQUIRED)
