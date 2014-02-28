@@ -26,8 +26,11 @@ add_subdirectory (modules)
 add_subdirectory (mongoose)
 add_subdirectory (tinyxml)
 
+set (prefix ${CMAKE_INSTALL_PREFIX})
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in"
   "${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp" @ONLY) 
+configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/Loader.hpp.in"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Loader.hpp" @ONLY) 
 list (APPEND SOURCES GitSHA1.hpp)
 list (APPEND SOURCES options.h options.cpp core/Workspace.hpp
   core/Workspace.cpp) 
@@ -46,7 +49,6 @@ if (${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND COMLIBS libmx libmat)           
   else ()
-    message (STATUS ${MATLAB_LIBRARY_DIRS})
     list (APPEND COMLIBS mx mat)
   endif ()
 endif ()
@@ -70,91 +72,83 @@ install (TARGETS lclient DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 if (${OMNIORB4_FOUND})
 
-  add_custom_target (RRSModuleSK.cc 
-    COMMAND ${OMNIORB4_IDL_COMPILER} -bcxx RRSModule.idl 
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
+  set (OMNIORB_GENERATED ${CMAKE_CURRENT_SOURCE_DIR}/RRSModule.hh
+    ${CMAKE_CURRENT_SOURCE_DIR}/RRSModuleSK.cc) 
 
-  add_custom_target (RRSModule.hh 
-    COMMAND ${OMNIORB4_IDL_COMPILER} -bcxx RRSModule.idl 
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
-
+  add_custom_command (
+    OUTPUT ${OMNIORB_GENERATED} 
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND ${OMNIORB4_IDL_COMPILER} -bcxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/RRSModule.idl) 
+  
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list (APPEND OORB_DEFINES __WIN32__ __x86__ _WIN32_WINNT=0x0400)
     list (APPEND OMNIORB4_LIBRARIES ws2_32 mswsock advapi32)
   endif()
-
+  
   ### rclient ###
-  add_executable (rclient ${SOURCES} RemoteConnector.hpp
-    RemoteConnector.cpp testclt.cpp RRSModule.hh RRSModuleSK.cc) 
+  add_executable (rclient ${OMNIORB_GENERATED} ${SOURCES}
+    RemoteConnector.hpp RemoteConnector.cpp testclt.cpp) 
   target_compile_definitions (rclient PRIVATE REMOTE ${OORB_DEFINES})
   target_link_libraries (rclient ${COMLIBS} ${OMNIORB4_LIBRARIES})
-
+  
   ### codeared ###
-  add_executable (codeared ${SOURCES} codeared.cpp RRSModule.hh
-    RRSModuleSK.cc ReconServant.hpp ReconServant.cpp)
+  add_executable (codeared ${OMNIORB_GENERATED} ${SOURCES}
+    codeared.cpp ReconServant.hpp ReconServant.cpp)
   target_compile_definitions (codeared PRIVATE REMOTE ${OORB_DEFINES})
   target_link_libraries (codeared mongoose ${COMLIBS}
     ${OMNIORB4_LIBRARIES})  
-
+  
   install (TARGETS rclient codeared DESTINATION
     ${CMAKE_INSTALL_PREFIX}/bin) 
-
+  
 endif()
 
 if (${LINUX})
-  set (RT_ENV "LD_LIBRARY_PATH=$LD_LIBRARY_PATH")
+  set (RT_LIBS_ENV LD_LIBRARY_PATH)
 elseif (${MACOSX})
-  set (RT_ENV "DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH")
+  set (RT_LIBS_ENV DYLD_LIBRARY_PATH)
 elseif (${WINDOWS})
-  set (RT_ENV "PATH=%PATH%")
+  set (RT_LIBS_ENV PATH)
 endif()
 
 if (${MATLAB_FOUND})
-  set (RT_ENV "${RT_ENV}\;${MATLAB_LIBRARY_DIRS}")
+  set (RT_LIBS_DIR "${MATLAB_LIBRARY_DIRS}")
 endif()
 
 if (${ISMRMRD_FOUND})
-  set (RT_ENV "${RT_ENV}:${ISMRMRD_INCLUDE_DIR}/../lib")
+  set (RT_LIBS_DIR "${RT_LIBS_DIR}:${ISMRMRD_INCLUDE_DIR}/../lib")
 endif()
 
-if (${WINDOWS})
-  set (RT_ENV "${RT_ENV}\;${CMAKE_CURRENT_BINARY_DIR}/modules/Release")
-else ()
-  set (RT_ENV "${RT_ENV}:${CMAKE_INSTALL_PREFIX}/lib")
-endif ()
+set (RT_LIBS_DIR "${RT_LIBS_DIR}:${CMAKE_INSTALL_PREFIX}/lib")
 
-message (STATUS ${RT_ENV})
+add_test (sense lclient -t SENSE -b ${PROJECT_SOURCE_DIR}/share/sense
+  -c 3fold.xml)
+set_tests_properties (sense PROPERTIES ENVIRONMENT
+  "${RT_LIBS_ENV}=${RT_LIBS_DIR}") 
 
-add_test (NAME sense 
-	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/modules/Release"
-	COMMAND lclient -t SENSE -b ${PROJECT_SOURCE_DIR}/share/sense -c 3fold.xml)
-set_tests_properties (sense PROPERTIES ENVIRONMENT ${RT_ENV})
+add_test (cgsense lclient -t CGSENSE -b
+  ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml)
+set_tests_properties (cgsense PROPERTIES ENVIRONMENT
+  "${RT_LIBS_ENV}=${RT_LIBS_DIR}") 
 
-if (${NFFT_FOUND})
-  add_test (nufft lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/
-    -c 16shot.xml)
-  set_tests_properties (nufft PROPERTIES ENVIRONMENT ${RT_ENV}) 
-
-  add_test (cgsense lclient -t CGSENSE -b
-    ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml)
-  set_tests_properties (cgsense PROPERTIES ENVIRONMENT ${RT_ENV})
-endif()
-
-add_test (NAME ktpoints 
-	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/modules/Release"
-	COMMAND lclient -t KTPoints -b
+add_test (ktpoints lclient -t KTPoints -b
   ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml)
-set_tests_properties (ktpoints PROPERTIES ENVIRONMENT ${RT_ENV})
+set_tests_properties (ktpoints PROPERTIES ENVIRONMENT
+  "${RT_LIBS_ENV}=${RT_LIBS_DIR}")
 
-add_test (NAME compressedsensing
-	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/modules/Release"
-	COMMAND lclient -t CompressedSensing -b
-	${PROJECT_SOURCE_DIR}/share/compressedsensing -c
-	phantom_denoising.xml) 
-set_tests_properties (compressedsensing PROPERTIES ENVIRONMENT ${RT_ENV})
+add_test (compressedsensing lclient -t CompressedSensing -b
+  ${PROJECT_SOURCE_DIR}/share/compressedsensing -c
+  phantom_denoising.xml) 
+set_tests_properties (compressedsensing PROPERTIES ENVIRONMENT
+  "${RT_LIBS_ENV}=${RT_LIBS_DIR}")
 
-add_test (NAME vdspiral
-	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/modules/Release"
-	COMMAND lclient -t VDSpiral -b
-	${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml)	
-set_tests_properties (vdspiral PROPERTIES ENVIRONMENT ${RT_ENV}) 
+add_test (nufft lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/
+  -c 16shot.xml)
+set_tests_properties (nufft PROPERTIES ENVIRONMENT
+  "${RT_LIBS_ENV}=${RT_LIBS_DIR}") 
+
+add_test (vdspiral lclient -t VDSpiral -b
+  ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml)
+set_tests_properties (vdspiral PROPERTIES ENVIRONMENT
+  "${RT_LIBS_ENV}=${RT_LIBS_DIR}")  
