@@ -1,5 +1,5 @@
 # Project -----------------------------------------------------------------------
-project (codeare)
+project (codeare CXX C)
 set (codeare_VERSION_MAJOR 1)
 set (codeare_VERSION_MINOR 2)
 set (PROJECT_URL "http://codeare.org/")
@@ -88,6 +88,18 @@ if (${WINDOWS})
 endif()
 find_package(ITK)
 find_package(GSL)
+
+# OpenCL ------------------------------------------------------------------------
+find_package (OpenCL)
+if (OPENCL_FOUND)
+  include_directories(${OPENCL_INCLUDE_DIRS})
+endif()
+
+# MPI ---------------------------------------------------------------------------
+find_package (MPI)
+if (MPI)
+  include_directories(${MPI_INCLUDE_DIRS})
+endif()
 
 # File IO -----------------------------------------------------------------------
 find_package(HDF5 REQUIRED)
