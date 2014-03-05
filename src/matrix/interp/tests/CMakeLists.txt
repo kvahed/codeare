@@ -21,7 +21,7 @@ if (${ITK_FOUND})
   set_target_properties (t_resample PROPERTIES COMPILE_FLAGS
   "-DHAVE_INSIGHT -fpermissive") 
   target_link_libraries (t_resample ${ITK_LIBRARIES})
-#  add_test (resample t_resample)
+  add_test (resample t_resample)
 endif()
 
 if (${GSL_FOUND})
