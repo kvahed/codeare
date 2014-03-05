@@ -20,7 +20,7 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 # Configuration for C++ compile time --------------------------------------------
 configure_file (
   "${PROJECT_SOURCE_DIR}/config.h.in"
-  "${PROJECT_BINARY_DIR}/config.h"
+  "${PROJECT_SOURCE_DIR}/src/config.h"
   )
 
 # OS type -----------------------------------------------------------------------
@@ -45,6 +45,9 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
 endif()
 
+# C++ 0x/11 ---------------------------------------------------------------------
+include (CheckCXX11Features) 
+
 # Architecture ------------------------------------------------------------------
 include (VcMacros)
 include (OptimizeForArchitecture)
@@ -55,6 +58,7 @@ if(OPENMP_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
+
 # Core --------------------------------------------------------------------------
 find_package(Boost COMPONENTS thread system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
