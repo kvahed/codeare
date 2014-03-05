@@ -68,7 +68,6 @@ ReconContext::Init             () {
 
 codeare::error_code
 ReconContext::Prepare             () {
-    std::cout << Workspace::Instance() << std::endl;
 	return m_strategy->Prepare();
 }
 

@@ -2,7 +2,7 @@
 #include "GitSHA1.hpp"
 
 #include "LocalConnector.hpp"
-#if defined HAVE_OMNIORB4_CORBA_H && defined REMOTE
+#if defined REMOTE
     #include "RemoteConnector.hpp"
 #endif	
 

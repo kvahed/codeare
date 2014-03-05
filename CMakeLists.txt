@@ -1,4 +1,4 @@
-# Project -----------------------------------------------------------------------
+# Project ------------------------------------------------------------
 project (codeare CXX C)
 set (codeare_VERSION_MAJOR 1)
 set (codeare_VERSION_MINOR 2)
@@ -6,24 +6,24 @@ set (PROJECT_URL "http://codeare.org/")
 set (PROJECT_VERSION
   "${codeare_VERSION_MAJOR}.${codeare_VERSION_MINOR}")
 
-# CMake -------------------------------------------------------------------------
+# CMake --------------------------------------------------------------
 cmake_minimum_required (VERSION 2.8)
 enable_testing()
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 include(ConfigureChecks.cmake)
 add_definitions(-DHAVE_CONFIG_H)
 
-# Git ---------------------------------------------------------------------------
+# Git ----------------------------------------------------------------
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-# Configuration for C++ compile time --------------------------------------------
+# Configuration for C++ compile time ---------------------------------
 configure_file (
   "${PROJECT_SOURCE_DIR}/config.h.in"
   "${PROJECT_SOURCE_DIR}/src/config.h"
   )
 
-# OS type -----------------------------------------------------------------------
+# OS type ------------------------------------------------------------
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(WINDOWS TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -32,23 +32,30 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(MACOSX TRUE)
 endif()
 
-# C++ flags ---------------------------------------------------------------------
+# C++ flags ----------------------------------------------------------
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC") 
+  set(CMAKE_CXX_FLAGS 
+    "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox
-  /nologo /MT /wd4267 /wd4244 /wd4190 /wd4996 /LD /MD /DEXP_STL") 
-  set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
-  set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
-  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
+  set(CMAKE_CXX_FLAGS 
+    "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox /nologo /MT /wd4267 /wd4244 /wd4190 /wd4996 /LD /MD /DEXP_STL") 
+  set (CMAKE_LINKER_FLAGS 
+    "${CMAKE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
+  set (CMAKE_SHARED_LINKER_FLAGS 
+    "${CMAKE_SHARED_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
+  set (CMAKE_EXE_LINKER_FLAGS 
+    "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
 endif()
 
-# C++ 0x/11 ---------------------------------------------------------------------
-include (CheckCXX11Features) 
+# C++ 0x/11 ----------------------------------------------------------
+include (CheckCXX11Features)
+if (${HAS_CXX11_SHARED_PTR}) 
+  add_definitions (-DHAVE_CXX11_SHARED_PTR)
+endif ()
 
-# Architecture ------------------------------------------------------------------
+# Architecture -------------------------------------------------------
 include (VcMacros)
 include (OptimizeForArchitecture)
 find_package (OpenMP)
@@ -56,10 +63,11 @@ if(OPENMP_FOUND)
   message("OPENMP FOUND")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS 
+    "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-# Core --------------------------------------------------------------------------
+# Core ---------------------------------------------------------------
 find_package(Boost COMPONENTS thread system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories (${BOOST_LIBRARYDIR})
@@ -67,7 +75,7 @@ find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
-# OmniORB -----------------------------------------------------------------------
+# OmniORB ------------------------------------------------------------
 find_package (OmniORB)
 if (!{$OMNIORB4_FOUND})
   message (WARNING "OmniORB4 library not found. Networking
@@ -77,7 +85,7 @@ if(${OMNIORB4_INCLUDE_DIR} MATCHES "")
   set (OMNIORB4_INCLUDE_DIR "")
 endif()
 
-# Linear algebra ----------------------------------------------------------------
+# Linear algebra -----------------------------------------------------
 #find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 if (${WINDOWS})
@@ -85,7 +93,7 @@ if (${WINDOWS})
    message (STATUS "${INTEL_COMPILER_DIR}/lib/intel64")
 endif ()
 
-# Fourier transform -------------------------------------------------------------
+# Fourier transform --------------------------------------------------
 find_package(FFTW3 COMPONENTS double single threads REQUIRED)
 include_directories(${FFTW3_INCLUDE_DIR})
 find_package(NFFT)
@@ -93,7 +101,7 @@ if(${NFFT_INCLUDE_DIR} MATCHES "")
   set (NFFT_INCLUDE_DIR "")
 endif()
 
-# Interpolations ----------------------------------------------------------------
+# Interpolations -----------------------------------------------------
 if (${WINDOWS})
   find_package (PNG)
   find_package (TIFF)
@@ -106,19 +114,19 @@ else ()
   add_definitions (-DHAVE_GSL)
 endif()
 
-# OpenCL ------------------------------------------------------------------------
+# OpenCL -------------------------------------------------------------
 find_package (OpenCL)
 if (OPENCL_FOUND)
   include_directories(${OPENCL_INCLUDE_DIRS})
 endif()
 
-# MPI ---------------------------------------------------------------------------
+# MPI ----------------------------------------------------------------
 find_package (MPI)
 if (MPI)
   include_directories(${MPI_INCLUDE_DIRS})
 endif()
 
-# File IO -----------------------------------------------------------------------
+# File IO ------------------------------------------------------------
 find_package(HDF5 REQUIRED)
 message (STATUS ${HDF5_LIBRARIES})
 include_directories (${HDF5_INCLUDE_DIRS})
@@ -138,7 +146,8 @@ if (${ISMRMRD_FOUND})
   include_directories(${ISMRMRD_INCLUDE_DIR})
   link_directories(${ISMRMRD_INCLUDE_DIR})
 else ()
-  message (WARNING "Couldn't find ISMRMRD installation. Support will not be built in.") 
+  message (WARNING 
+    "Couldn't find ISMRMRD installation. Support will not be built in.") 
 endif()
 
 find_package(Matlab)
