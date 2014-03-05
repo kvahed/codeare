@@ -53,6 +53,7 @@ endif()
 include (CheckCXX11Features)
 if (${HAS_CXX11_SHARED_PTR}) 
   add_definitions (-DHAVE_CXX11_SHARED_PTR)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_COMPILER_FLAGS}")
 endif ()
 
 # Architecture -------------------------------------------------------
