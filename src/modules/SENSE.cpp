@@ -64,11 +64,7 @@ SENSE::Process () {
 
 codeare::error_code
 SENSE::Finalise () { 
-
-	//delete m_cs;
-
-  return codeare::OK;
-
+	return codeare::OK;
 }
 
 

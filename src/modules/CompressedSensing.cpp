@@ -72,8 +72,6 @@ CompressedSensing::Init () {
 	printf ("  Conv: CG(%.4f)\n", m_csparam.cgconv);
 	printf ("  LS brackets: lsa(%.2e) lsb(%.2e)", m_csparam.lsa, m_csparam.lsb);
 
-	
-
 	m_initialised = true;
 	printf ("... done.\n\n");
 
@@ -145,7 +143,7 @@ CompressedSensing::Process () {
     } else
         im_dc = dwt ->* im_dc * ma;
 
-    wspace.Add ("im_dc", im_dc);
+    Add ("im_dc", im_dc);
 
     return codeare::OK;
 

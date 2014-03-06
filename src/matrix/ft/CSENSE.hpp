@@ -275,6 +275,7 @@ private:
 
 	std::vector<DFT<T> > m_dft;
 	Matrix <CT>          sens;
+	Matrix<size_t> d; /* Bug in MSVC 10? Do not touch */
 	Matrix <size_t>      dims;
 	int                  nthreads;
 	Matrix <size_t>      af;

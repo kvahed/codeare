@@ -197,6 +197,11 @@ namespace RRStrategy {
 		}
 
 
+		template<class T>
+		void Add (const std::string& name, Matrix<T>& M) {
+			global->Add(name, M);
+		}
+
 		/**
 		 * @brief       Clear database of complex single matrix by name
 		 *              @see Workspace::FreeCXFL(const string)
@@ -207,6 +212,7 @@ namespace RRStrategy {
 		inline void 
 		WSpace         (Workspace* ws) {
 			global = ws;
+			wspace = *ws;
 		}
 
 

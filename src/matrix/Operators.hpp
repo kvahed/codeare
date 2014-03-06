@@ -12,7 +12,7 @@
     template<paradigm Q> Matrix<T,P>&
     operator= (const Matrix<T,Q>&);
 
-    
+	
     /**
      * @brief           Assignment data
      *
