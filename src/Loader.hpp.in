@@ -62,7 +62,7 @@ LoadModule        (char* name) {
 
     #elif defined(__GNUC__) 
 
-		std::string fname = std::string("@prefix@/lib/") + std::string(name) + std::string(".so");
+		std::string fname = std::string(name) + std::string(".so");
 
 		std::cout << "Loading library ... " << fname.c_str() << std::endl;
 

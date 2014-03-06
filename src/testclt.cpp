@@ -20,8 +20,9 @@
 
 #include "testclt.hpp"
 
-
 int main (int argc, char** argv) {
+
+    int error =1;
 	
 	if (init (argc, argv)) {
 		
@@ -44,9 +45,11 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "GRAPPA"))                grappatest   (con);
 		else if (!strcmp (test, "KTPoints"))              ktptest      (con);
 		else if (!strcmp (test, "CompressedSensing"))     cstest       (con);
-		else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
+#ifndef _MSC_VER
+        else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
 		else if (!strcmp (test, "KArb"))                  karbtest     (con);
-		else if (!strcmp (test, "SliceGrad"))             slicegrad    (con);
+        else if (!strcmp (test, "SliceGrad"))             slicegrad    (con);
+#endif
         else if (!strcmp (test, "DummyRecon"))            dummytest    (con);
         /*
 		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
@@ -54,11 +57,11 @@ int main (int argc, char** argv) {
         */
         else    {printf ("ERROR: Cannot call unknow module %s\n", test); return 1;}
 
-        return 0;
+        error = 0;
 
-	} else
+	} 
 		
-		return 1;	
+    return error;	
 
 }
 

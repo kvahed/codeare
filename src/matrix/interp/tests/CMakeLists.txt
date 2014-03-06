@@ -1,4 +1,4 @@
-include_directories(
+include_directories (
   ${PROJECT_SOURCE_DIR}/src/core
   ${PROJECT_SOURCE_DIR}/src/matrix
   ${PROJECT_SOURCE_DIR}/src/matrix/simd
@@ -18,9 +18,9 @@ add_test (medfilt2 t_medfilt2)
 
 if (${ITK_FOUND})
   add_executable (t_resample t_resample.cpp)
-  set_target_properties(t_resample PROPERTIES COMPILE_FLAGS
-  "-DHAVE_INSIGHT")
-  target_link_libraries (t_resample -L${ITK_LIBRARY_DIRS} ${ITK_LIBRARIES})
+  set_target_properties (t_resample PROPERTIES COMPILE_FLAGS
+  "-DHAVE_INSIGHT -fpermissive") 
+  target_link_libraries (t_resample ${ITK_LIBRARIES})
   add_test (resample t_resample)
 endif()
 

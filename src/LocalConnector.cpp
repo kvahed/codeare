@@ -49,11 +49,8 @@ namespace RRClient {
 	}
 	
 	
-	short
-	LocalConnector::Finalise (const char* name) {
-		
+	short LocalConnector::Finalise (const char* name) {
 		return Queue::Finalise (name);
-		
 	}
 	
 	

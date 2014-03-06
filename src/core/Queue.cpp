@@ -21,7 +21,8 @@
 #include "Queue.hpp"
 
 Queue::~Queue ()               {
-	
+
+    
 	this->Finalise();
 	
 }
@@ -55,18 +56,14 @@ short Queue::Init (const char* name, const char* client_id) {
 
 short Queue::Finalise (const char* name) {
 	
-	if (!name) {
-		
+	if (!name) 
 		Workspace::Instance().Finalise();
-		
-	} else {
-		
+	else {
 		map<string, ReconContext*>::iterator it = m_contexts.find (name);
-		
-		if (it == m_contexts.end()) {
-			Finalise ();
+
+		if (it == m_contexts.end())
 			return codeare::CONTEXT_NOT_FOUND;
-		} else {
+		else {
 			delete it->second;
 			m_contexts.erase(it);
 		}

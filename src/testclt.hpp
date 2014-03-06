@@ -1,7 +1,8 @@
 #include "options.h"
+#include "GitSHA1.hpp"
 
 #include "LocalConnector.hpp"
-#if defined HAVE_OMNIORB4_CORBA_H && defined REMOTE
+#if defined REMOTE
     #include "RemoteConnector.hpp"
 #endif	
 
@@ -47,7 +48,7 @@ bool init (int argc, char** argv) {
 #endif
         
 #ifdef GIT_COMMIT
-		cout << "Commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
+		cout << "Commit " << g_GIT_SHA1 << " [" << GIT_COMMIT_DATE << "]" << endl;
 #endif
         //  }
     

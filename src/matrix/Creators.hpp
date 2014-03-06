@@ -449,7 +449,7 @@ ellipsoid (const float* p, const size_t n, const T s) {
 	{
 #pragma omp for schedule (dynamic, n / omp_get_num_threads())
 		
-		for (size_t s = 0; s < n; s++)
+		for (int s = 0; s < n; s++)
 			for (size_t r = 0; r < n; r++)
 				for (size_t c = 0; c < n; c++) {
 					float x = (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1];
@@ -533,7 +533,7 @@ phantom3D (const size_t& n) {
 	const size_t ne = 10; // Number o ellipses
 	const size_t np =  9; // Number o geometrical parameters
 
-	double p[ne][np] = {
+    float p[ne][np] = {
 		{ .69,  .92,  .9,   .0,   .0,   .0,   .0, .0, .0 },
         { .662, .874, .88,  .0,   .0,   .0,   .0, .0, .0 },
         { .11,  .31,  .22, -.22,  .0,  -.25, -.3, .0, .0 },

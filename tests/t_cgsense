@@ -1,2 +1,2 @@
 #!/bin/sh
-../src/lclient -b ../share/cgsense/ -c 3fold.xml -t CGSENSE
+../build/src/lclient -b ../share/cgsense/ -c 3fold.xml -t CGSENSE

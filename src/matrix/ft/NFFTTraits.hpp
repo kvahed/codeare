@@ -32,11 +32,6 @@
 
 #include "../config.h"
 
-#ifndef USE_NFFT_32_NAMING
-    #define nfft_mv_plan_complex mv_plan_complex
-    #define nfftf_mv_plan_complex mv_plan_complex
-#endif
-
 template <class T> struct NFFTTraits { };
 
 
@@ -70,7 +65,7 @@ template <> struct NFFTTraits<float> {
 			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
 		
 		solverf_init_advanced_complex 
-			(&inp, (nfftf_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
+			(&inp, (nfftf_nfft_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
 		
 		return 0;
 		

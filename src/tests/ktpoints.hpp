@@ -21,7 +21,7 @@
 #include "matrix/io/IOContext.hpp"
 
 template <class T> bool
-ktptest (Connector<T>* rc) {
+ktptest (Connector<T>* con) {
 
     using namespace codeare::matrix::io;
 
@@ -32,42 +32,41 @@ ktptest (Connector<T>* rc) {
 	Matrix<float>  k;
 	Matrix<float>  b0;
 	
-    IOContext ic (rc->GetElement("/config/data-in"), base, READ);
-    target  = ic.Read<cxfl>(rc->GetElement("/config/data-in/target"));
-    b0      = ic.Read<float>(rc->GetElement("/config/data-in/b0"));
-    k	    = ic.Read<float>(rc->GetElement("/config/data-in/k"));
-    r	    = ic.Read<float>(rc->GetElement("/config/data-in/r"));
-    b1      = ic.Read<cxfl>(rc->GetElement("/config/data-in/b1"));
+    IOContext ic (con->GetElement("/config/data-in"), base, READ);
+    target  = ic.Read<cxfl>(con->GetElement("/config/data-in/target"));
+    b0      = ic.Read<float>(con->GetElement("/config/data-in/b0"));
+    k	    = ic.Read<float>(con->GetElement("/config/data-in/k"));
+    r	    = ic.Read<float>(con->GetElement("/config/data-in/r"));
+    b1      = ic.Read<cxfl>(con->GetElement("/config/data-in/b1"));
     ic.Close();
 
-	rc->Init(test);
+	con->Init(test);
 
-	rc->SetMatrix ("target", target);
-	rc->SetMatrix ("b1",     b1);
-	rc->SetMatrix ("r",      r);
-	rc->SetMatrix ("k",      k);
-	rc->SetMatrix ("b0",     b0);
+	con->SetMatrix ("target", target);
+	con->SetMatrix ("b1",     b1);
+	con->SetMatrix ("r",      r);
+	con->SetMatrix ("k",      k);
+	con->SetMatrix ("b0",     b0);
 	
-	rc->Process    (test);
+	con->Process    (test);
 
 	Matrix<cxfl>   rf;
 	Matrix<float>  grad;
 	Matrix<float>  nrmse;
 
-	rc->GetMatrix ("nrmse",  nrmse);
-	rc->GetMatrix ("rf",     rf);
-	rc->GetMatrix ("grad",   grad);
-	rc->GetMatrix ("final", final);
+	con->GetMatrix ("nrmse",  nrmse);
+	con->GetMatrix ("rf",     rf);
+	con->GetMatrix ("grad",   grad);
+	con->GetMatrix ("final", final);
 
-	rc->Finalise(test);
-
-	
-    IOContext oc (rc->GetElement("/config/data-out"), base, WRITE);
+    IOContext oc (con->GetElement("/config/data-out"), base, WRITE);
     oc.Write (final, "final");
     oc.Write (rf,    "rf");
     oc.Write (grad,  "grad");
 	oc.Write (nrmse, "nrmse");
 	oc.Close();
+
+	con->Finalise(test);
 
 	return true;
 

@@ -334,6 +334,10 @@ struct LapackTraits<cxfl> {
 #if defined USE_ACML
 #elif defined __APPLE__
         CDOTU (res, &N, X, &incX, Y, &incY);
+#elif defined _MSC_VER
+        *res = *X++ * *Y++;
+        for (int i = 1; i < N; ++i)
+            *res += *X++ * *Y++;
 #else
         *res = CDOTU (&N, X, &incX, Y, &incY);
 #endif
@@ -345,6 +349,10 @@ struct LapackTraits<cxfl> {
 #ifdef USE_ACML
 #elif defined __APPLE__
         CDOTC (res, &N, X, &incX, Y, &incY);
+#elif defined _MSC_VER
+        *res = conj(*X++) * *Y++;
+        for (int i = 1; i < N; ++i)
+            *res += conj(*X++) * *Y++;
 #else
         *res = CDOTC (&N, X, &incX, Y, &incY);
 #endif
@@ -455,6 +463,10 @@ struct LapackTraits<cxdb> {
 #if defined USE_ACML
 #elif defined __APPLE__
         ZDOTU (res, &N, X, &incX, Y, &incY);
+#elif defined _MSC_VER
+        *res = *X++ * *Y++;
+        for (int i = 1; i < N; ++i)
+            *res += *X++ * *Y++;
 #else
         *res = ZDOTU (&N, X, &incX, Y, &incY);
 #endif
@@ -466,6 +478,10 @@ struct LapackTraits<cxdb> {
 #if defined USE_ACML
 #elif defined __APPLE__
         ZDOTC (res, &N, X, &incX, Y, &incY);
+#elif defined _MSC_VER
+        *res = conj(*X++) * *Y++;
+        for (int i = 1; i < N; ++i)
+            *res += conj(*X++) * *Y++;
 #else
         *res = ZDOTC (&N, X, &incX, Y, &incY);
 #endif
