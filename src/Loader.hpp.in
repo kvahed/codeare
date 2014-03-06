@@ -121,7 +121,7 @@ bool
 CloseModule       (void* handle) {
 
     #if defined(_MSC_VER)
-        return FreeLibrary((HINSTANCE)handle);
+    //return FreeLibrary((HINSTANCE)handle);
     #elif defined(__GNUC__)
         return dlclose(handle);
 		const char* err = dlerror();
