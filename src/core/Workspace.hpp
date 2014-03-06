@@ -10,12 +10,12 @@
 #ifdef HAVE_CXX11_SHARED_PTR
 #  include <boost/shared_ptr.hpp>
 #  include <boost/make_shared.hpp>
-#  define  s_ptr boost::shared_ptr
-#  define  m_shared boost::make_shared 
+#  define  shrd_ptr boost::shared_ptr
+#  define  mk_shared boost::make_shared
 #else
 #  include <memory>
-#  define  s_ptr std::shared_ptr 
-#  define  m_shared std::make_shared
+#  define  shrd_ptr std::shared_ptr
+#  define  mk_shared std::make_shared
 #endif
 
 #include <map>
@@ -88,15 +88,15 @@ class DLLEXPORT Workspace {
         const boost::any& ba = m_store[it->second[0]];
 
         try {
-			boost::any_cast<s_ptr<Matrix<T> > >(m_store[it->second[0]]);
+			boost::any_cast<shrd_ptr<Matrix<T> > >(m_store[it->second[0]]);
 		} catch (const boost::bad_any_cast& e) {
 			printf ("**WARNING**: Failed to retrieve %s - %s.\n             Requested %s - have %s.\n",
 					name.c_str(), e.what(),
-                    demangle(typeid(s_ptr<Matrix<T> >).name()).c_str(),
+                    demangle(typeid(shrd_ptr<Matrix<T> >).name()).c_str(),
                     demangle(ba.type().name()).c_str());
 		}
 
-		return *boost::any_cast<s_ptr<Matrix<T> > >(m_store[it->second[0]]);
+		return *boost::any_cast<shrd_ptr<Matrix<T> > >(m_store[it->second[0]]);
 
 	}
 
@@ -126,7 +126,7 @@ class DLLEXPORT Workspace {
 		tag[0] = sha256(name);
 		tag[1] = typeid(T).name();
 
-		s_ptr<Matrix<T> > pm = m_shared<Matrix<T> >();
+		shrd_ptr<Matrix<T> > pm = mk_shared<Matrix<T> >();
 		boost::any val     = pm;
 
 		if (m_ref.find (name) == m_ref.end()) {
@@ -158,7 +158,7 @@ class DLLEXPORT Workspace {
 	 * @return       Success
 	 */
 	template<class T> inline Matrix<T>&
-	AddMatrix        (const std::string& name, s_ptr< Matrix<T> > m) {
+	AddMatrix        (const std::string& name, shrd_ptr< Matrix<T> > m) {
 
 	  std::vector<std::string> tag(2);
 		boost::any value = m;
@@ -186,7 +186,7 @@ class DLLEXPORT Workspace {
 	template<class T> inline Matrix<T>&
 	AddMatrix        (const std::string& name) {
 
-		s_ptr<Matrix<T> > m = m_shared<Matrix<T> >();
+		shrd_ptr<Matrix<T> > m = mk_shared<Matrix<T> >();
 		std::vector<std::string> tag(2);
 		boost::any value = m;
         
@@ -213,9 +213,7 @@ class DLLEXPORT Workspace {
 	 */
 	template<class T> inline Matrix<T>&
 	AddMatrix        (const std::string& name, Matrix<T>& m) {
-
 		return AddMatrix(name, &m);
-
 	}
 	
 	/**
@@ -250,17 +248,17 @@ class DLLEXPORT Workspace {
         store::iterator dit = m_store.find (nit->second[0]);
         
         if      (nit->second[1].compare(typeid(cxfl).name())   == 0)
-            boost::any_cast<s_ptr<Matrix<cxfl  > > >(dit->second).reset();
+            boost::any_cast<shrd_ptr<Matrix<cxfl  > > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(cxdb).name())   == 0)
-            boost::any_cast<s_ptr<Matrix<cxdb  > > >(dit->second).reset();
+            boost::any_cast<shrd_ptr<Matrix<cxdb  > > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(float).name())  == 0)
-            boost::any_cast<s_ptr<Matrix<float > > >(dit->second).reset();
+            boost::any_cast<shrd_ptr<Matrix<float > > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(double).name()) == 0)
-            boost::any_cast<s_ptr<Matrix<double> > >(dit->second).reset();
+            boost::any_cast<shrd_ptr<Matrix<double> > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(short).name())   == 0)
-            boost::any_cast<s_ptr<Matrix<short > > >(dit->second).reset();
+            boost::any_cast<shrd_ptr<Matrix<short > > >(dit->second).reset();
         else if (nit->second[1].compare(typeid(long).name())   == 0)
-            boost::any_cast<s_ptr<Matrix<long  > > >(dit->second).reset();
+            boost::any_cast<shrd_ptr<Matrix<long  > > >(dit->second).reset();
         
         m_store.erase(dit);
         m_ref.erase(nit);

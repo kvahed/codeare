@@ -20,6 +20,8 @@
 #  HAS_CXX11_SIZEOF_MEMBER      - sizeof() non-static members
 #  HAS_CXX11_STATIC_ASSERT      - static_assert()
 #  HAS_CXX11_VARIADIC_TEMPLATES - variadic templates
+#  HAS_CXX11_SHARED_PTR         - Shared Pointer
+#  HAS_CXX11_THREAD             - Shared Pointer
 
 #=============================================================================
 # Copyright 2011,2012 Rolf Eike Beer <eike@sf-mail.de>
@@ -44,8 +46,10 @@
 # The first one is mandatory, the latter 2 are optional and do not depend on
 # each other (i.e. only one may be present).
 #
+# Modification for std::thread (Kaveh Vahdipour, Forschungszentrum Juelich)
+#
 
-if (NOT CMAKE_CXX_COMPILER_LOADED)
+IF (NOT CMAKE_CXX_COMPILER_LOADED)
     message(FATAL_ERROR "CheckCXX11Features modules only works if language CXX is enabled")
 endif ()
 
@@ -141,3 +145,4 @@ cxx11_check_feature("sizeof_member" HAS_CXX11_SIZEOF_MEMBER)
 cxx11_check_feature("static_assert" HAS_CXX11_STATIC_ASSERT)
 cxx11_check_feature("variadic_templates" HAS_CXX11_VARIADIC_TEMPLATES)
 cxx11_check_feature("shared_ptr" HAS_CXX11_SHARED_PTR)
+cxx11_check_feature("thread" HAS_CXX11_THREAD)
