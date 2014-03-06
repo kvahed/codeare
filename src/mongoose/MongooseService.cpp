@@ -10,6 +10,7 @@
 
 #ifdef HAVE_CXX11_THREAD
 #  include <thread>
+#  include <atomic>         // std::atomic
 #  define thread_i std::thread
 #else
 #  include <boost/thread.hpp>
@@ -48,7 +49,6 @@ namespace service {
     }
     
     void Serve () {
-
         struct mg_context *ctx;
         struct mg_callbacks callbacks;
         const char *options[] = {"listening_ports", wspace.p.Get<char*>("http_port"), NULL};
@@ -58,11 +58,10 @@ namespace service {
         ctx = mg_start(&callbacks, NULL, options);
         getchar();
         mg_stop(ctx);
-
     }
-    
+
     MongooseService::MongooseService() {
-        thread_i thrd (Serve);
+        //thread_i thrd (Serve);
     }
     
     MongooseService::~MongooseService() {}
