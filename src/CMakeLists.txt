@@ -131,32 +131,97 @@ if (${ISMRMRD_FOUND})
 endif()
 
 if (${WINDOWS}) 
-  set (LD_ENV "${LD_ENV}\;${CMAKE_CURRENT_BINARY_DIR}/modules/Release\;${CMAKE_INSTALL_PREFIX}/lib")
+  set (LD_ENV "${LD_ENV}\;${CMAKE_CURRENT_BINARY_DIR}/modules/Release\;${CMAKE_CURRENT_BINARY_DIR}/Release")
 else ()
   set (LD_ENV "${LD_ENV}:${CMAKE_CURRENT_BINARY_DIR}/modules:${CMAKE_INSTALL_PREFIX}/lib")
 endif ()
 
+if (${WINDOWS})
+  string(REPLACE "/" "\\" LD_ENV "${LD_ENV}")
+endif()
 message (STATUS ${LD_ENV})
 
-add_test (sense lclient -t SENSE -b ${PROJECT_SOURCE_DIR}/share/sense
-  -c 3fold.xml) 
-set_tests_properties (sense PROPERTIES ENVIRONMENT ${LD_ENV}) 
-add_test (ktpoints lclient -t KTPoints 
-  -b ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml) 
-set_tests_properties (ktpoints PROPERTIES ENVIRONMENT ${LD_ENV})
-add_test (compressedsensing lclient -t CompressedSensing
-  -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c
-  phantom_denoising.xml)  
-set_tests_properties (compressedsensing PROPERTIES ENVIRONMENT ${LD_ENV})
-add_test (vdspiral lclient -t VDSpiral
-  -b ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml) 
-set_tests_properties (vdspiral PROPERTIES ENVIRONMENT ${LD_ENV})  
+set (RUN_CMD 
+  "lclient -t SENSE -b ${PROJECT_SOURCE_DIR}/share/sense -c 3fold.xml") 
+if (${WINDOWS})
+  set(bat_file ${CMAKE_CURRENT_BINARY_DIR}/test_sense.bat)
+  file(WRITE ${bat_file} "@echo off\n")
+  file(APPEND ${bat_file} "SET ${LD_ENV}\n")
+  file(APPEND ${bat_file} "${RUN_CMD}\n")
+  add_test (sense ${bat_file})
+else ()
+  add_test (sense ${RUN_CMD}) 
+  set_tests_properties (sense PROPERTIES ENVIRONMENT ${LD_ENV}) 
+endif()
+
+set (RUN_CMD 
+  "lclient -t KTPoints -b ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml") 
+if (${WINDOWS})
+  set(bat_file ${CMAKE_CURRENT_BINARY_DIR}/test_ktpoints.bat)
+  file(WRITE ${bat_file} "@echo off\n")
+  file(APPEND ${bat_file} "SET ${LD_ENV}\n")
+  file(APPEND ${bat_file} "${RUN_CMD}\n")
+  add_test (ktpoints ${bat_file})
+else ()
+  add_test (ktpoints ${RUN_CMD}) 
+  set_tests_properties (ktpoints PROPERTIES ENVIRONMENT ${LD_ENV}) 
+endif()
+
+set (RUN_CMD 
+  "lclient -t CompressedSensing -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c phantom_denoising.xml")
+if (${WINDOWS})
+  set(bat_file ${CMAKE_CURRENT_BINARY_DIR}/test_compressedsensing.bat)
+  file(WRITE ${bat_file} "@echo off\n")
+  file(APPEND ${bat_file} "SET ${LD_ENV}\n")
+  file(APPEND ${bat_file} "${RUN_CMD}\n")
+  add_test (compressedsensing ${bat_file})
+else ()
+  add_test (compressedsensing ${RUN_CMD}) 
+  set_tests_properties (compressedsensing PROPERTIES ENVIRONMENT ${LD_ENV}) 
+endif()
+
+if (${GSL_FOUND})
+  set (RUN_CMD 
+	"lclient -t VDSpiral -b ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml")
+  if (${WINDOWS})
+	set(bat_file ${CMAKE_CURRENT_BINARY_DIR}/test_vdspiral.bat)
+	file(WRITE ${bat_file} "@echo off\n")
+	file(APPEND ${bat_file} "SET ${LD_ENV}\n")
+	file(APPEND ${bat_file} "${RUN_CMD}\n")
+	add_test (vdspiral ${bat_file})
+  else ()
+	add_test (vdspiral ${RUN_CMD}) 
+	set_tests_properties (vdspiral PROPERTIES ENVIRONMENT ${LD_ENV}) 
+  endif()
+endif()
+
 if (${NFFT_FOUND})
-  add_test (nufft lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/
-    -c 16shot.xml) 
-  set_tests_properties (nufft PROPERTIES ENVIRONMENT ${LD_ENV}) 
-  add_test (cgsense lclient -t CGSENSE
-    -b ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
-  set_tests_properties (cgsense PROPERTIES ENVIRONMENT ${LD_ENV}) 
+
+  set (RUN_CMD 
+	"lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/ -c 16shot.xml")
+  if (${WINDOWS})
+	set(bat_file ${CMAKE_CURRENT_BINARY_DIR}/test_nufft.bat)
+	file(WRITE ${bat_file} "@echo off\n")
+	file(APPEND ${bat_file} "SET ${LD_ENV}\n")
+	file(APPEND ${bat_file} "${RUN_CMD}\n")
+	add_test (nufft ${bat_file})
+  else ()
+	add_test (nufft ${RUN_CMD}) 
+	set_tests_properties (nufft PROPERTIES ENVIRONMENT ${LD_ENV}) 
+  endif()
+
+  set (RUN_CMD 
+	"lclient -t CGSENSE -b ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml")
+  if (${WINDOWS})
+	set(bat_file ${CMAKE_CURRENT_BINARY_DIR}/test_cgsense.bat)
+	file(WRITE ${bat_file} "@echo off\n")
+	file(APPEND ${bat_file} "SET ${LD_ENV}\n")
+	file(APPEND ${bat_file} "${RUN_CMD}\n")
+	add_test (cgsense ${bat_file})
+  else ()
+	add_test (cgsense ${RUN_CMD}) 
+	set_tests_properties (cgsense PROPERTIES ENVIRONMENT ${LD_ENV}) 
+  endif()
+
 endif()
 
