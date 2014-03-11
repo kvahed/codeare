@@ -45,7 +45,7 @@ int main (int argc, char** argv) {
 		else if (!strcmp (test, "GRAPPA"))                grappatest   (con);
 		else if (!strcmp (test, "KTPoints"))              ktptest      (con);
 		else if (!strcmp (test, "CompressedSensing"))     cstest       (con);
-#ifndef _MSC_VER
+#ifdef HAVE_GSL
         else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
 		else if (!strcmp (test, "KArb"))                  karbtest     (con);
         else if (!strcmp (test, "SliceGrad"))             slicegrad    (con);
