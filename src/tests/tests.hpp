@@ -7,7 +7,7 @@
 //#include "nifty.hpp"
 #include "nufft.hpp"
 //#include "relativesensitivities.hpp"
-#ifndef _MSC_VER
+#ifdef HAVE_GSL
   #include "spiral.hpp"
   #include "karb.hpp"
   #include "slicegrad.hpp"
