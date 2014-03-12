@@ -1,2 +1,0 @@
-#!/bin/sh
-../src/lclient -b ../share/ktpoints/ -c 7t-8ch-8p.xml -t KTPoints

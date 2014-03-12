@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 ## folders (explicit) ##
 /autom4te.cache/
@@ -88,9 +89,101 @@ test.cpp
 Makefile
 
 *.o
+## folders (explicit) ##
+/autom4te.cache/
+/doc/api/api
+/share
+/build
+
+## files (explicit) ##
+/.cproject
+/.project
+/config.log
+/config.status
+/libtool
+/.autotools
+/.csettings
+/.settings
+/src/GitSHA1.hpp
+/src/matrix/arithmetic/AVXTraits.hpp
+/src/matrix/arithmetic/t_acos
+/src/matrix/arithmetic/t_asin
+/src/matrix/arithmetic/t_atan
+/src/matrix/arithmetic/t_atan2
+/src/matrix/arithmetic/t_ceil
+/src/matrix/arithmetic/t_cos
+/src/matrix/arithmetic/t_cosh
+/src/matrix/arithmetic/t_eadd
+/src/matrix/arithmetic/t_ediv
+/src/matrix/arithmetic/t_emul
+/src/matrix/arithmetic/t_epow
+/src/matrix/arithmetic/t_esub
+/src/matrix/arithmetic/t_exp
+/src/matrix/arithmetic/t_floor
+/src/matrix/arithmetic/t_gtoreq
+/src/matrix/arithmetic/t_isnan
+/src/matrix/arithmetic/t_log
+/src/matrix/arithmetic/t_log10
+/src/matrix/arithmetic/t_nrmse
+/src/matrix/arithmetic/t_round
+/src/matrix/arithmetic/t_sin
+/src/matrix/arithmetic/t_sinh
+/src/matrix/arithmetic/t_size
+/src/matrix/arithmetic/t_tan
+/src/matrix/arithmetic/t_tanh
+/src/matrix/arithmetic/t_complex
+/src/matrix/interp/tests/t_medfilt2
+/src/matrix/dwt/tests/t_dwt
+/src/matrix/dwt/tests/t_dwt2
+/src/matrix/ft/tests/t_dft
+/src/matrix/linalg/tests/t_chol
+/src/matrix/linalg/tests/t_dot
+/src/matrix/linalg/tests/t_eig
+/src/matrix/linalg/tests/t_gemm
+/src/matrix/linalg/tests/t_gemv
+/src/matrix/linalg/tests/t_inv
+/src/matrix/linalg/tests/t_norm
+/src/matrix/linalg/tests/t_pinv
+/src/matrix/linalg/tests/t_svd
+/src/matrix/arithmetic/t_fliplr
+/src/matrix/arithmetic/t_flipud
+/src/matrix/arithmetic/t_resize
+/src/matrix/io/tests/t_hdf5
+/src/matrix/io/tests/t_matlab
+/src/matrix/io/tests/t_nifti
+/src/matrix/io/tests/t_codeare
+/src/matrix/io/tests/test*
+/src/matrix/io/tests/t_iocontext
+/src/matrix/interp/tests/t_interp1
+/src/matrix/interp/tests/t_ppval
+/src/matrix/interp/tests/t_resample
+
+## folders (global) ##
+.deps/
+.libs/
+.dirstamp
+.DS_Store
+
+## files (global) ##
+pTXRFPulse0.ini.sag_ap
+pTXRFPulse0.ini.tra_ap
+out.txt
+test
+test.cpp
+.\#*
+\#*
+*.html
+*.log
+*.trs
+*~
+
+Makefile
+
+*.o
 *.lo
 *.la
 *.obj
 *.exe
-*.suo
 *.lib
+*.suo
+

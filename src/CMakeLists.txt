@@ -1,4 +1,7 @@
-cmake_policy(SET CMP0021 OLD)
+if (POLICY CMP0021)
+  cmake_policy(SET CMP0021 OLD)
+endif()
+
 
 include_directories (
   ${PROJECT_SOURCE_DIR}/src
@@ -32,6 +35,9 @@ add_subdirectory (tinyxml)
 if (${OMNIORB4_FOUND})
   add_subdirectory (mongoose)
 endif()
+
+configure_file ( "${CMAKE_CURRENT_SOURCE_DIR}/config.h.in"
+  "${CMAKE_CURRENT_SOURCE_DIR}/config.h")
 
 set (prefix ${CMAKE_INSTALL_PREFIX})
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in"
