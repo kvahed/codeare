@@ -1,4 +1,7 @@
-cmake_policy(SET CMP0021 OLD)
+if (POLICY CMP0021)
+  cmake_policy(SET CMP0021 OLD)
+endif()
+
 
 include_directories (
   ${PROJECT_SOURCE_DIR}/src
