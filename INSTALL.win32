@@ -1,4 +1,0 @@
-To build jrrs for Windows:
-
-   # nmake /nologo /f Makefile.win32
-
