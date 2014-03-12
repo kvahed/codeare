@@ -1,2 +1,0 @@
-#!/bin/sh
-../src/lclient -b ../share/gradients -c config_vdcs.xml -t VDSpiral
