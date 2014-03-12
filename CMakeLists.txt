@@ -5,10 +5,8 @@ set (codeare_VERSION_MINOR 2)
 set (PROJECT_URL "http://codeare.org/")
 set (PROJECT_VERSION
   "${codeare_VERSION_MAJOR}.${codeare_VERSION_MINOR}")
-set (PACKAGE_NAME
-  "codeare")
-set (PACKAGE_VERSION
-  "${PROJECT_VERSION}")
+set (PACKAGE_NAME "codeare")
+set (PACKAGE_VERSION "${PROJECT_VERSION}")
 set (top_srcdir "${PROJECT_SOURCE_DIR}")
 
 # CMake --------------------------------------------------------------
@@ -21,12 +19,6 @@ add_definitions(-DHAVE_CONFIG_H)
 # Git ----------------------------------------------------------------
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
-
-# Configuration for C++ compile time ---------------------------------
-configure_file (
-  "${PROJECT_SOURCE_DIR}/config.h.in"
-  "${PROJECT_SOURCE_DIR}/src/config.h"
-  )
 
 # OS type ------------------------------------------------------------
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")

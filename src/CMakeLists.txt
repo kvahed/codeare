@@ -33,6 +33,9 @@ if (${OMNIORB4_FOUND})
   add_subdirectory (mongoose)
 endif()
 
+configure_file ( "${CMAKE_CURRENT_SOURCE_DIR}/config.h.in"
+  "${CMAKE_CURRENT_SOURCE_DIR}/config.h")
+
 set (prefix ${CMAKE_INSTALL_PREFIX})
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in"
   "${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp" @ONLY) 
