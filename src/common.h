@@ -21,6 +21,8 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#define CMP0021_DEFINE
+
 #include <cstddef>
 
 /**

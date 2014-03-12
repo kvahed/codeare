@@ -131,8 +131,13 @@ endif()
 
 # MPI ----------------------------------------------------------------
 find_package (MPI)
-if (MPI)
+if (${MPI_FOUND})
+  message (STATUS "Found MPI.")
   include_directories(${MPI_INCLUDE_DIRS})
+  find_package (Scalapack)
+  if (${SCALAPACK_FOUND})
+    message (STATUS "Found Scalapack.")
+  endif()
 endif()
 
 # File IO ------------------------------------------------------------

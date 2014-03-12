@@ -7,40 +7,31 @@
 #ifdef HAVE_MPI
 static void 
 grid_setup (const int& np, int& nc, int& nr) {
-	
 	int sqrtnp, i;
 	sqrtnp = int(sqrt(double(np)) + 1);
-	
 	for (i = 1; i < sqrtnp; i++)
 		if (!(np % i))
 			nc = i;
-	
 	nr = np/nc;
-	
 }
 
 static inline void 
 grid_init (Grid& gd) {
-
 	/* General sizes */
 	Cblacs_pinfo(&gd.rk, &gd.np);
-
 	/* Grid setup */
 	grid_setup (gd.np, gd.nr, gd.nc);
 	Cblacs_get (-1, 0, &gd.ct);
 	Cblacs_gridinit (&gd.ct, &gd.order, gd.nr, gd.nc);
     Cblacs_gridinfo (gd.ct, &gd.nr, &gd.nc, &gd.mr, &gd.mc);
-
 }
 
 
 static inline void 
 grid_exit (Grid& gd) {
-
 	/* Clean up */
 	Cblacs_gridexit (gd.ct);
 	Cblacs_exit (0);
-
 }
 #endif 
 
@@ -82,11 +73,9 @@ const char* Grid::c_str() const {
 }
 
 Grid& Grid::Instance() {
-    
-    
+
     if (m_inst == 0)
         m_inst = new Grid ();
-    
 	return *m_inst;
 
 }

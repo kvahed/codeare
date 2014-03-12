@@ -16,55 +16,37 @@ struct LapackTraits<float> {
     
     inline static void 
     potrf (const char& uplo, const int& n, Type* a, const int& lda, int& info) {
-#ifdef USE_ACML
-#else
         SPOTRF (&uplo, &n, a, &lda, &info);
-#endif
     }
     
     inline static void 
 	getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {
-#ifdef USE_ACML
-#else
 		SGETRF (&m, &n, a, &lda, ipiv, &info);
-#endif
 	}
     
     inline static void 
     potri (const char* uplo, int*n, void *a, int* lda, int*info) {
-#ifdef USE_ACML
-#else
         SPOTRI (uplo, n, a, lda, info);
-#endif
     }
     
     inline static void
     getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
            int& info) {
-#ifdef USE_ACML
-#else
         SGETRI (&n, a, &lda, ipiv, work, &lwork, &info);
-#endif
     }
     
     inline static void 
     gemv (const char& trans, const int& m, const int& n, const Type& alpha, const Type *a,
           const int& lda, const Type *x, const int& incx, const Type& beta, Type *y,
           const int& incy) {
-#ifdef USE_ACML
-#else
         SGEMV (&trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
-#endif
     }
     
     inline static void 
     gemm (const char& transa, const char& transb, const int& m, const int& n, const int& k,
           const Type& alpha, const Type *a, const int& lda, const Type *b, const int& ldb,
           const Type& beta, Type *c, const int& ldc) {
-#ifdef USE_ACML
-#else
         SGEMM (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
-#endif
     }
     
     inline static double
@@ -75,19 +57,13 @@ struct LapackTraits<float> {
     inline static void
     dot  (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-#ifdef USE_ACML
-#else
         *res = SDOT (&N, X, &incX, Y, &incY);
-#endif
     }
     
     inline static void
     dotc (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-#ifdef USE_ACML
-#else
         *res = SDOT (&N, X, &incX, Y, &incY);
-#endif
     }
     
     inline static void
@@ -98,11 +74,8 @@ struct LapackTraits<float> {
         Type* dwr = (Type*) malloc (n * sizeof(Type));
         Type* dwi = (Type*) malloc (n * sizeof(Type));
         
-#ifdef USE_ACML
-#else
         SGEEV (&jvl, &jvr, &n, a, &lda, dwr, dwi, vl, &ldvl, vr, &ldvr, work, &lwork,
                &info);
-#endif
         for (int i = 0; i < n; i++)
             w[i] = CType (dwr[i], dwi[i]);
         
@@ -124,10 +97,7 @@ struct LapackTraits<float> {
     gesdd (const char& jobz, const int& m, const int& n, Type *a, const int& lda, RType *s,
            Type* u, const int& ldu, Type *vt, const int& ldvt, Type* work, const int& lwork,
            RType *rwork, int* iwork, int& info) {
-#ifdef USE_ACML
-#else
         SGESDD (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
-#endif
     }
     
 };
@@ -142,55 +112,37 @@ struct LapackTraits<double> {
     
     inline static void 
     potrf (const char& uplo, const int& n, Type* a, const int& lda, int& info) {
-#ifdef USE_ACML
-#else
 		DPOTRF (&uplo, &n, a, &lda, &info);
-#endif
 	}
     
     inline static void 
 	getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {
-#ifdef USE_ACML
-#else
 		DGETRF (&m, &n, a, &lda, ipiv, &info);
-#endif
 	}
     
     inline static void 
     potri (const char* uplo, int*n, void *a, int* lda, int*info) {
-#ifdef USE_ACML
-#else
         DPOTRI (uplo, n, a, lda, info);
-#endif
     }
     
     inline static void
 	getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
 		   int& info) {
-#ifdef USE_ACML
-#else
 		DGETRI (&n, a, &lda, ipiv, work, &lwork, &info);
-#endif
 	}
     
     inline static void 
     gemv (const char& trans, const int& m, const int& n, const Type& alpha, const Type *a,
           const int& lda, const Type *x, const int& incx, const Type& beta, Type *y,
           const int& incy) {
-#ifdef USE_ACML
-#else
         DGEMV (&trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
-#endif
     }
     
     inline static void 
     gemm (const char& transa, const char& transb, const int& m, const int& n, const int& k,
           const Type& alpha, const Type *a, const int& lda, const Type *b, const int& ldb,
           const Type& beta, Type *c, const int& ldc) {
-#ifdef USE_ACML
-#else
         DGEMM (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
-#endif
     }
 
     inline static double
@@ -201,19 +153,13 @@ struct LapackTraits<double> {
     inline static void
     dot  (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-#ifdef USE_ACML
-#else
         *res = DDOT (&N, X, &incX, Y, &incY);
-#endif
     }
     
     inline static void
     dotc (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
-#ifdef USE_ACML
-#else
         *res = DDOT (&N, X, &incX, Y, &incY);
-#endif
     }
 
     inline static void
@@ -224,11 +170,8 @@ struct LapackTraits<double> {
         Type* dwr = (Type*) malloc (n * sizeof(Type));
         Type* dwi = (Type*) malloc (n * sizeof(Type));
         
-#ifdef USE_ACML
-#else
         DGEEV (&jvl, &jvr, &n, a, &lda, dwr, dwi, vl, &ldvl, vr, &ldvr, work, &lwork,
                &info);
-#endif
         
         for (int i = 0; i < n; i++) {
             w[i] = CType (dwr[i], dwi[i]);
@@ -253,10 +196,7 @@ struct LapackTraits<double> {
     gesdd (const char& jobz, const int& m, const int& n, Type *a, const int& lda, RType *s,
            Type* u, const int& ldu, Type *vt, const int& ldvt, Type* work, const int& lwork,
            RType *rwork, int* iwork, int& info) {
-#ifdef USE_ACML
-#else
         DGESDD (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
-#endif
     }
     
 };
@@ -272,55 +212,37 @@ struct LapackTraits<cxfl> {
     
     inline static void 
     potrf (const char& uplo, const int& n, Type* a, const int& lda, int& info) {
-#ifdef USE_ACML
-#else
 		CPOTRF (&uplo, &n, a, &lda, &info);
-#endif
 	}
     
     inline static void 
 	getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {
-#ifdef USE_ACML
-#else
 		CGETRF (&m, &n, a, &lda, ipiv, &info);
-#endif
 	}
     
     inline static void 
     potri (const char* uplo, int*n, void *a, int* lda, int*info) {
-#ifdef USE_ACML
-#else
         CPOTRI (uplo, n, a, lda, info);
-#endif
     }
     
     inline static void
 	getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
 		   int& info) {
-#ifdef USE_ACML
-#else
 		CGETRI (&n, a, &lda, ipiv, work, &lwork, &info);
-#endif
 	}
     
     inline static void 
     gemv (const char& trans, const int& m, const int& n, const Type& alpha, const Type *a,
           const int& lda, const Type *x, const int& incx, const Type& beta, Type *y,
           const int& incy) {
-#ifdef USE_ACML
-#else
         CGEMV (&trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
-#endif
     }
     
     inline static void 
     gemm (const char& transa, const char& transb, const int& m, const int& n, const int& k,
           const Type& alpha, const Type *a, const int& lda, const Type *b, const int& ldb,
           const Type& beta, Type *c, const int& ldc) {
-#ifdef USE_ACML
-#else
         CGEMM (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
-#endif
     }
     
     inline static double
@@ -331,8 +253,7 @@ struct LapackTraits<cxfl> {
     inline static void 
     dot  (const int N, const cxfl *X, const int incX, const cxfl *Y, 
           const int incY, cxfl* res) {
-#if defined USE_ACML
-#elif defined __APPLE__
+#if defined __APPLE__
         CDOTU (res, &N, X, &incX, Y, &incY);
 #elif defined _MSC_VER
         *res = *X++ * *Y++;
@@ -346,8 +267,7 @@ struct LapackTraits<cxfl> {
     inline static void 
     dotc (const int N, const cxfl *X, const int incX, const cxfl *Y, 
           const int incY, cxfl* res) {
-#ifdef USE_ACML
-#elif defined __APPLE__
+#if defined __APPLE__
         CDOTC (res, &N, X, &incX, Y, &incY);
 #elif defined _MSC_VER
         *res = conj(*X++) * *Y++;
@@ -362,11 +282,8 @@ struct LapackTraits<cxfl> {
     geev (const char& jvl, const char& jvr, const int& n, Type *a, const int& lda,
           Type *w, Type *vl, const int& ldvl, Type *vr, const int& ldvr, Type *work,
           const int& lwork, RType* rwork, int& info) {
-#ifdef USE_ACML
-#else
         CGEEV  (&jvl, &jvr, &n, a, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork,
                 rwork, &info);
-#endif
     }
     
     inline static void
@@ -382,10 +299,7 @@ struct LapackTraits<cxfl> {
     gesdd (const char& jobz, const int& m, const int& n, Type *a, const int& lda, RType *s,
            Type* u, const int& ldu, Type *vt, const int& ldvt, Type* work, const int& lwork,
            RType *rwork, int* iwork, int& info) {
-#ifdef USE_ACML
-#else
         CGESDD (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
-#endif
     }
     
 };
@@ -401,55 +315,37 @@ struct LapackTraits<cxdb> {
     
     inline static void 
     potrf (const char& uplo, const int& n, Type* a, const int& lda, int& info) {
-#ifdef USE_ACML
-#else
 		ZPOTRF (&uplo, &n, a, &lda, &info);
-#endif
 	}
     
     inline static void 
     getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {
-#ifdef USE_ACML
-#else
         ZGETRF (&m, &n, a, &lda, ipiv, &info);
-#endif
     }
     
     inline static void 
     potri (const char* uplo, int*n, void *a, int* lda, int*info) {
-#ifdef USE_ACML
-#else
         ZPOTRI (uplo, n, a, lda, info);
-#endif
     }
     
     inline static void
 	getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
 		   int& info) {
-#ifdef USE_ACML
-#else
 		ZGETRI (&n, a, &lda, ipiv, work, &lwork, &info);
-#endif
 	}
     
     inline static void 
     gemv (const char& trans, const int& m, const int& n, const Type& alpha, const Type *a,
           const int& lda, const Type *x, const int& incx, const Type& beta, Type *y,
           const int& incy) {
-#ifdef USE_ACML
-#else
         ZGEMV (&trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
-#endif
     }
     
     inline static void 
     gemm (const char& transa, const char& transb, const int& m, const int& n, const int& k,
           const Type& alpha, const Type *a, const int& lda, const Type *b, const int& ldb,
           const Type& beta, Type *c, const int& ldc) {
-#ifdef USE_ACML
-#else
         ZGEMM (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
-#endif
     }
     
     inline static double
@@ -460,8 +356,7 @@ struct LapackTraits<cxdb> {
     inline static void 
     dot  (const int N, const cxdb *X, const int incX, const cxdb *Y, 
           const int incY, cxdb* res) {
-#if defined USE_ACML
-#elif defined __APPLE__
+#if defined __APPLE__
         ZDOTU (res, &N, X, &incX, Y, &incY);
 #elif defined _MSC_VER
         *res = *X++ * *Y++;
@@ -475,8 +370,7 @@ struct LapackTraits<cxdb> {
     inline static void 
     dotc (const int N, const cxdb *X, const int incX, const cxdb *Y, 
           const int incY, cxdb* res) {
-#if defined USE_ACML
-#elif defined __APPLE__
+#if defined __APPLE__
         ZDOTC (res, &N, X, &incX, Y, &incY);
 #elif defined _MSC_VER
         *res = conj(*X++) * *Y++;
@@ -491,11 +385,8 @@ struct LapackTraits<cxdb> {
     geev (const char& jvl, const char& jvr, const int& n, Type *a, const int& lda,
           Type *w, Type *vl, const int& ldvl, Type *vr, const int& ldvr, cxdb *work,
           const int& lwork, double* rwork, int& info) {
-#ifdef USE_ACML
-#else
         ZGEEV  (&jvl, &jvr, &n, a, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork,
                 rwork, &info);
-#endif
     }
     
     inline static void
@@ -511,10 +402,7 @@ struct LapackTraits<cxdb> {
     gesdd (const char& jobz, const int& m, const int& n, Type *a, const int& lda, RType *s,
            Type* u, const int& ldu, Type *vt, const int& ldvt, Type* work, const int& lwork,
            RType *rwork, int* iwork, int& info) {
-#ifdef USE_ACML
-#else
         ZGESDD (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
-#endif
     }
     
     
