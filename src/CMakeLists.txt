@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_policy(SET CMP0021 OLD)
 
 include_directories (
   ${PROJECT_SOURCE_DIR}/src
@@ -12,12 +12,14 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src/matrix/linalg
   ${PROJECT_SOURCE_DIR}/src/matrix/simd
   ${PROJECT_SOURCE_DIR}/src/misc
-  ${PROJECT_SOURCE_DIR}/src/mongoose
   ${PROJECT_SOURCE_DIR}/src/tests
   ${PROJECT_SOURCE_DIR}/src/tinyxml
   ${PROJECT_SOURCE_DIR}/src/modules
-  ${GSL_INCLUDE_DIR}
+  if (${GSL_FOUND})
+	${GSL_INCLUDE_DIR}
+  endif()
   if (${OMNIORB4_FOUND})
+	${PROJECT_SOURCE_DIR}/src/mongoose
     ${OMNIORB4_INCLUDE_DIR}
   endif()
   )
@@ -25,8 +27,11 @@ include_directories (
 add_subdirectory (core)
 add_subdirectory (matrix)
 add_subdirectory (modules)
-add_subdirectory (mongoose)
 add_subdirectory (tinyxml)
+
+if (${OMNIORB4_FOUND})
+  add_subdirectory (mongoose)
+endif()
 
 set (prefix ${CMAKE_INSTALL_PREFIX})
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in"
@@ -142,7 +147,6 @@ endif ()
 if (${WINDOWS})
   string(REPLACE "/" "\\" LD_ENV "${LD_ENV}")
 endif()
-message (STATUS ${LD_ENV})
 
 if (${WINDOWS})
   set (CLIENT_CALL "${CMAKE_CURRENT_BINARY_DIR}/Release/lclient")

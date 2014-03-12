@@ -25,11 +25,7 @@
 #include "Connector.hpp"
 #include "Matrix.hpp"
 
-#ifdef __WIN32__ 
-    #include "RRSModule.h"
-#else
-    #include "RRSModule.hh"
-#endif
+#include "RRSModule.hh"
 
 #include <complex>
 #include <vector>

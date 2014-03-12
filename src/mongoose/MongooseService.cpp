@@ -61,7 +61,7 @@ namespace service {
     }
 
     MongooseService::MongooseService() {
-        //thread_i thrd (Serve);
+        thread_i thrd (Serve);
     }
     
     MongooseService::~MongooseService() {}

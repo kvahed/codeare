@@ -81,16 +81,13 @@ set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
 # OmniORB ------------------------------------------------------------
 find_package (OmniORB)
-if (!{$OMNIORB4_FOUND})
-  message (WARNING "OmniORB4 library not found. Networking
-    infrastructure will not bebuilt.")
+if (${OMNIORB4_FOUND})
+  message ("OmniORB4 library found.")
+else ()
+  message ("OmniORB4 library not found. Networking infrastructure will not bebuilt.")
 endif ()
-if(${OMNIORB4_INCLUDE_DIR} MATCHES "")
-  set (OMNIORB4_INCLUDE_DIR "")
-endif()
 
 # Linear algebra -----------------------------------------------------
-#find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 if (${WINDOWS})
    link_directories (${INTEL_COMPILER_DIR}/lib/intel64)
@@ -134,10 +131,10 @@ find_package (MPI)
 if (${MPI_FOUND})
   message (STATUS "Found MPI.")
   include_directories(${MPI_INCLUDE_DIRS})
-  find_package (Scalapack)
-  if (${SCALAPACK_FOUND})
-    message (STATUS "Found Scalapack.")
-  endif()
+  #find_package (Scalapack)
+  #if (${SCALAPACK_FOUND})
+  #  message (STATUS "Found Scalapack.")
+  #endif()
 endif()
 
 # File IO ------------------------------------------------------------

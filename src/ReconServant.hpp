@@ -21,11 +21,7 @@
 #ifndef __RECON_SERVANT_HPP__
 #define __RECON_SERVANT_HPP__
 
-#ifdef _MSC_VER 
-    #include "RRSModule.h"
-#else
-    #include "RRSModule.hh"
-#endif
+#include "RRSModule.hh"
 
 #include <string>
 #include <map>
