@@ -137,6 +137,8 @@ endif()
 
 if (${WINDOWS}) 
   set (LD_ENV
+    "${LD_ENV}\;${CMAKE_CURRENT_BINARY_DIR}/modules")
+  set (LD_ENV
     "${LD_ENV}\;${CMAKE_CURRENT_BINARY_DIR}/modules/Release")
   set (LD_ENV "${LD_ENV}\;${CMAKE_CURRENT_BINARY_DIR}/Release")
 else ()
@@ -146,12 +148,6 @@ endif ()
 
 if (${WINDOWS})
   string(REPLACE "/" "\\" LD_ENV "${LD_ENV}")
-endif()
-
-if (${WINDOWS})
-  set (CLIENT_CALL "${CMAKE_CURRENT_BINARY_DIR}/Release/lclient")
-else()
-  set (CLIENT_CALL "${CMAKE_CURRENT_BINARY_DIR}/lclient")
 endif()
 
 # Test macro -------------------------------------------------------- 

@@ -90,3 +90,7 @@ Makefile
 *.o
 *.lo
 *.la
+*.obj
+*.exe
+*.suo
+*.lib

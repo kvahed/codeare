@@ -40,7 +40,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox /nologo /MT /wd4267 /wd4244 /wd4190 /wd4996 /LD /MD /DEXP_STL") 
+    "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox /nologo /wd4267 /wd4244 /wd4190 /wd4996 /LD /MD /DEXP_STL") 
   set (CMAKE_LINKER_FLAGS 
     "${CMAKE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
   set (CMAKE_SHARED_LINKER_FLAGS 
@@ -80,6 +80,7 @@ include_directories(${OPENSSL_INCLUDE_DIR})
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
 # OmniORB ------------------------------------------------------------
+set (OMNIORB4_INCLUDE_DIR "")
 find_package (OmniORB)
 if (${OMNIORB4_FOUND})
   message ("OmniORB4 library found.")
