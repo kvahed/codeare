@@ -5,6 +5,11 @@ set (codeare_VERSION_MINOR 2)
 set (PROJECT_URL "http://codeare.org/")
 set (PROJECT_VERSION
   "${codeare_VERSION_MAJOR}.${codeare_VERSION_MINOR}")
+set (PACKAGE_NAME
+  "codeare")
+set (PACKAGE_VERSION
+  "${PROJECT_VERSION}")
+set (top_srcdir "${PROJECT_SOURCE_DIR}")
 
 # CMake --------------------------------------------------------------
 cmake_minimum_required (VERSION 2.8)
@@ -184,3 +189,4 @@ endif()
 include_directories("${PROJECT_BINARY_DIR}")
 
 add_subdirectory(src)
+add_subdirectory(doc)
