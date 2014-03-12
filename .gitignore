@@ -3,6 +3,7 @@
 /autom4te.cache/
 /doc/api/api
 /share
+/build
 
 ## files (explicit) ##
 /.cproject
@@ -13,6 +14,7 @@
 /.autotools
 /.csettings
 /.settings
+/src/GitSHA1.hpp
 /src/matrix/arithmetic/AVXTraits.hpp
 /src/matrix/arithmetic/t_acos
 /src/matrix/arithmetic/t_asin
