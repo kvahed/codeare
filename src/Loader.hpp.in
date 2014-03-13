@@ -28,11 +28,11 @@
 
 // Thus far only cl.exe and g++
 #if defined(_MSC_VER)
-    #include <windows.h>
-#elif defined(__GNUC__)
-    #include <dlfcn.h>
+#    include <windows.h>
+#    define LIB_SUFFIX ".dll"
 #else
-    #error Unknown compiler
+#    include <dlfcn.h>
+#    define LIB_SUFFIX ".so"
 #endif
 
 
@@ -42,41 +42,27 @@
  * @param  name   Module name
  * @return        RAM address
  */ 
-void* 
-LoadModule        (char* name) {
+void*  LoadModule        (char* name) {
 
-	void* handle = 0;
-	
-    #if defined(_MSC_VER) 
+    void* handle = 0;
+    char* error;
+    std::string fname = std::string(name) + std::string(LIB_SUFFIX);
 
-	    name = strcat (name, ".dll");
-		std::cout << "Loading library ... " << name << std::endl;
-
-	    handle = (void*)LoadLibrary(name);
-		
-		if (!handle) 
-			std::cerr << "... FAILED! Cannot open " << name << std::endl;
-		else
-			std::cout << "... done.\n" << std::endl;
-
-
-    #elif defined(__GNUC__) 
-
-		std::string fname = std::string(name) + std::string(".so");
-
-		std::cout << "Loading library ... " << fname.c_str() << std::endl;
-
-		handle = dlopen ((fname).c_str(), RTLD_NOW);
-
-		const char* err = dlerror();
-
-		if (err)
-			std::cerr << "Cannot open " << err << std::endl;
-		else
-			std::cout << "... done.\n" << std::endl;
-		
-    #endif
-
+    std::cout << "Loading library ... " << fname << std::endl;
+    
+#if defined(_MSC_VER) 
+    handle = (void*) LoadLibrary(name);
+#else 
+    dlerror();
+    handle = dlopen (fname.c_str(), RTLD_NOW);
+    error = dlerror();
+#endif
+    
+    if (NULL == handle) 
+        std::cerr << "... FAILED!\n" << error << std::endl;
+    else
+        std::cout << "... done.\n" << std::endl;
+    
 	return handle;
 
 }
@@ -88,26 +74,24 @@ LoadModule        (char* name) {
  * @param  handle Handle on module
  * @param  name   Function name
  */
-void*
-GetFunction       (void* handle, char* name) {
+void* GetFunction       (void* handle, char* name) {
 
 	void* fnptr = 0;
-	
-    #if defined(_MSC_VER)
-
-	    fnptr = (void*) GetProcAddress((HINSTANCE)handle, name);
-
-    #elif defined(__GNUC__)
-
-		const char* err = dlerror();
-	    fnptr = dlsym (handle, name);
-		if (err) 
-			std::cerr << "Cannot load symbol " << name << ": " << err << std::endl;
-
-    #endif
+	char* error = 0;
+    
+#if defined(_MSC_VER)
+    fnptr = (void*) GetProcAddress ((HINSTANCE)handle, name);
+#else
+    dlerror();    
+    fnptr = dlsym (handle, name);
+    error = dlerror();
+#endif
+    
+    if (!fnptr)  
+        std::cerr << "Cannot load symbol " << name << ": " << error << std::endl;
 
 	return fnptr;
-
+    
 }
 
 
@@ -117,17 +101,22 @@ GetFunction       (void* handle, char* name) {
  * @param  handle Handle on module
  * @return        Success
  */
-bool 
-CloseModule       (void* handle) {
+bool  CloseModule  (void* handle) {
 
-    #if defined(_MSC_VER)
-    //return FreeLibrary((HINSTANCE)handle);
-    #elif defined(__GNUC__)
-        return dlclose(handle);
-		const char* err = dlerror();
-		if (err) 
-			std::cerr << "Cannot unload: " << err << std::endl;
-    #endif
+#if defined(_MSC_VER)
+    try  {
+        if (!FreeLibrary(handle))
+            fprintf(stderr, "Cannot unload library. Error Code: %02X\n. Attempting to unmap...", GetLastError());
+        if (!UnmapViewOfFile(handle))
+            fprintf(stderr, "Couldn't unmap the file! Error Code: %02X\n", GetLastError());
+    } catch (const std::exception&) {}   
+#else
+    dlerror (); // Clear last errors
+    dlclose(handle);
+    const char* error = dlerror();
+    if (error) 
+        std::cerr << "Cannot unload: " << error << std::endl;
+#endif
     
     return true;
 
