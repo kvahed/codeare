@@ -10,6 +10,43 @@
 #include <iostream>
 #include <boost/format.hpp>
 
+#include <boost/timer/timer.hpp>
+#include <cmath>
+
+
+class SimpleTimer {
+
+public:
+
+    inline SimpleTimer (const std::string& identifier = "",
+                        std::ostream& os = std::cout) : _os(&os) { 
+        *_os << "Processing " << identifier.c_str() << " ... \n";
+        _timer.start();
+    }
+
+    inline ~SimpleTimer () {
+        if (!_timer.is_stopped())
+            _timer.stop();
+        *_os << "... done. WTime: " << boost::format("%.4f") % (_timer.format()) << " ... \n\n";
+    }
+
+    inline void Stop () {
+        _timer.stop();
+    }
+
+    inline void Resume () {
+        _timer.resume();
+    }
+
+private:
+
+    boost::timer::cpu_timer _timer;
+    std::ostream  *_os;
+    
+};
+
+
+/*
 class SimpleTimer {
 
 #ifdef _MSC_VER
@@ -62,5 +99,7 @@ private:
     double    _freq;
     
 };
+
+*/
 
 #endif // __SIMPLE_TIMER_HPP__

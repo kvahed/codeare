@@ -21,26 +21,13 @@
 #include "codeared.h"
 #include "MongooseService.hpp"
 
-int main (int argc, char** argv) {
-
-    if (!init (argc, argv))
-        return 1;
-
-    // --------------------------------------------------------------------------
-    // Start HTTP server:
-    // --------------------------------------------------------------------------
-    for (size_t i = 1; i < argc; ++i) {
-    	std::stringstream key;
-    	key << "arg_" << i;
-    	wspace.p[key.str()] = argv[i];
-    }
-    wspace.p["http_port"] = port;
+void http_service () {
     using namespace codeare::service;
     MongooseService& mg = MongooseService::Instance();
+}
 
-    // --------------------------------------------------------------------------
-    // Start CORBA server:
-    // --------------------------------------------------------------------------
+void corba_service (int argc, char** argv) {
+
     try {
         
         streambuf* out;
@@ -53,7 +40,6 @@ int main (int argc, char** argv) {
         } else {
             cout << "Could not open logfile " << logfile << "." << endl;
             cout << "Exiting :(" << endl << endl;
-            return 1;
         }
         
         // Initialise ORB
@@ -122,6 +108,28 @@ int main (int argc, char** argv) {
         throw DS_Exception();
     }
     
+
+}
+
+int main (int argc, char** argv) {
+
+    if (!init (argc, argv))
+        return 1;
+
+    // Keep call parameters in workspace
+    for (size_t i = 1; i < argc; ++i) {
+    	std::stringstream key;
+    	key << "arg_" << i;
+    	wspace.p[key.str()] = argv[i];
+    }
+    wspace.p["http_port"] = port;
+
+    // Web service thread
+    http_service ();
+
+    // Corba service threads
+    corba_service (argc, argv);
+
     return 0;
     
 }

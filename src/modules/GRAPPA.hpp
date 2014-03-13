@@ -44,7 +44,7 @@ namespace RRStrategy {
 		 * @brief Default constructor
 		 */
 		GRAPPA () : m_ft(0) {};
-		
+
 
 		/**
 		 * @brief Default destructor

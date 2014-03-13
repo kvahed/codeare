@@ -21,8 +21,6 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
-#define CMP0021_DEFINE
-
 #include <cstddef>
 
 /**
@@ -59,19 +57,15 @@ enum error_code   {
 };
 }
 enum coords {
-	X,
-	Y,
-	Z
+	X, Y, Z
 };
 
 enum sim_mode {
-	ACQUIRE,
-	EXCITE
+	ACQUIRE, EXCITE
 };
 
 enum connection_type {
-	CON_LOCAL,
-	CON_REMOTE
+	CON_LOCAL, CON_REMOTE
 };
 
 enum data_type {
@@ -100,12 +94,12 @@ enum data_type {
 
 // Gamma in Hz
 #ifndef GAMMA
-    #define GAMMA 42.57748
+    #define GAMMA 4.257748e1
 #endif
 
 // Gamma in radians
 #ifndef RGAMMA
-    #define RGAMMA 267.513
+    #define RGAMMA 2.67513e2
 #endif
 
 // Bytes & Co

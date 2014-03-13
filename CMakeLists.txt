@@ -69,7 +69,7 @@ if(OPENMP_FOUND)
 endif()
 
 # Core ---------------------------------------------------------------
-find_package(Boost COMPONENTS thread system REQUIRED)
+find_package(Boost COMPONENTS thread system timer REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories (${BOOST_LIBRARYDIR})
 find_package(OpenSSL REQUIRED)

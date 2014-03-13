@@ -55,8 +55,7 @@ else ()
 endif()
 
 list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}
-  ${OPENSSL_LIBRARIES} ${Boost_THREAD_LIBRARY}
-  ${Boost_SYSTEM_LIBRARY}) 
+  ${OPENSSL_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_TIMER_LIBRARY}) 
 
 if (${MATLAB_FOUND})
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -109,8 +108,8 @@ if (${OMNIORB4_FOUND})
   add_executable (codeared ${OMNIORB_GENERATED} ${SOURCES}
     codeared.cpp ReconServant.hpp ReconServant.cpp)
   target_compile_definitions (codeared PRIVATE REMOTE ${OORB_DEFINES})
-  target_link_libraries (codeared mongoose ${COMLIBS}
-    ${OMNIORB4_LIBRARIES})  
+  target_link_libraries (codeared mongoose ${COMLIBS} ${OMNIORB4_LIBRARIES}
+    ${Boost_THREAD_LIBRARY})  
   
   install (TARGETS rclient codeared DESTINATION
     ${CMAKE_INSTALL_PREFIX}/bin) 
