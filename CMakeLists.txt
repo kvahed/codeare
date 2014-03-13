@@ -69,21 +69,26 @@ if(OPENMP_FOUND)
 endif()
 
 # Core ---------------------------------------------------------------
-find_package(Boost COMPONENTS thread system timer REQUIRED)
+set (Boost_USE_STATIC_LIBS ON)
+find_package(Boost COMPONENTS thread chrono timer system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories (${BOOST_LIBRARYDIR})
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
-# OmniORB ------------------------------------------------------------
-set (OMNIORB4_INCLUDE_DIR "")
-find_package (OmniORB)
-if (${OMNIORB4_FOUND})
-  message ("OmniORB4 library found.")
-else ()
-  message ("OmniORB4 library not found. Networking infrastructure will not bebuilt.")
-endif ()
+
+# MATLAB --------------------------------------------------------------
+find_package(Matlab)
+if(${MATLAB_FOUND})
+  include_directories (${MATLAB_INCLUDE_DIRS})
+  add_definitions (-DHAVE_MAT_H)
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    link_directories ("${MATLAB_ROOT_DIR}/extern/lib/win64/microsoft")
+  else()
+    link_directories ("${MATLAB_LIBRARY_DIRS}")
+  endif()
+endif()
 
 # Linear algebra -----------------------------------------------------
 find_package(LAPACK REQUIRED)
@@ -92,6 +97,14 @@ if (${WINDOWS})
    message (STATUS "${INTEL_COMPILER_DIR}/lib/intel64")
 endif ()
 
+# OmniORB ------------------------------------------------------------
+find_package (OmniORB)
+if (${OMNIORB4_FOUND})
+  message ("OmniORB4 library not found. Networking infrastructure will not bebuilt.")
+endif ()
+if (!${OMNIORB4_INCLUDE_DIR})
+  set (OMNIORB4_INCLUDE_DIR "")
+endif()
 # Fourier transform --------------------------------------------------
 find_package(FFTW3 COMPONENTS double single threads REQUIRED)
 include_directories(${FFTW3_INCLUDE_DIR})
@@ -157,17 +170,6 @@ if (${ISMRMRD_FOUND})
 else ()
   message (WARNING 
     "Couldn't find ISMRMRD installation. Support will not be built in.") 
-endif()
-
-find_package(Matlab)
-if(${MATLAB_FOUND})
-  include_directories (${MATLAB_INCLUDE_DIRS})
-  add_definitions (-DHAVE_MAT_H)
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    link_directories ("${MATLAB_ROOT_DIR}/extern/lib/win64/microsoft")
-  else()
-    link_directories ("${MATLAB_LIBRARY_DIRS}")
-  endif()
 endif()
 
 if (${ZLIB_FOUND}) 

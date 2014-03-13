@@ -27,7 +27,7 @@ public:
     inline ~SimpleTimer () {
         if (!_timer.is_stopped())
             _timer.stop();
-        *_os << "... done. WTime: " << boost::format("%.4f") % (_timer.format()) << " ... \n\n";
+        *_os << "... done. WTime: " << boost::format("%.4f") % (_timer.format()) << "\n\n";
     }
 
     inline void Stop () {

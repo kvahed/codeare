@@ -139,7 +139,7 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
                 		m(s,c*nk+k) =  b1(s,c) * eikr;
                 }
     
-	printf ("... done. ");
+	printf ("  ... done.\n");
 
 	return m;
 
@@ -241,8 +241,7 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
           const float& conv, const bool& breakearly, size_t& gc, 
 		  Matrix<float>& res) {
 
-    ticks start = getticks();
-    printf ("  Starting variable exchange method ...\n");
+//    SimpleTimer t ("Variable exchange method");
     
     Matrix<cxfl> treg = lambda *  eye<cxfl>(size(m,1));
     Matrix<cxfl> minv;
@@ -253,7 +252,7 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
     minv  = minv.prod (m, 'N', 'C');
     size_t j = 0;
 
-    // Valriable exchange method --------------
+    // Variable exchange method --------------
     while (gc < mxit) {
 		
         solution = minv ->* target;
@@ -276,10 +275,9 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
         
         j++; gc++;
 
-    } 
-    
-    printf ("\n  ... done. WTime: %.4f seconds.\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
-    
+    }
+
+    printf ("\n");
 }
 
 
@@ -323,7 +321,7 @@ CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk,
 		
 	} else 
 
-		printf ("codeare::OK\n\n");
+		printf ("OK\n\n");
 
 	return amps_ok;
 	
@@ -416,8 +414,6 @@ KTPoints::Finalise  ()     {
 
 codeare::error_code
 KTPoints::Process   ()     {
-
-    printf ("Processing KTPoints ...\n");
 
     // On entry -------------------
     //

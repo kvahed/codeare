@@ -18,7 +18,9 @@ endif()
 
 list (APPEND COMLIBS tinyxml core ${BLAS_LINKER_FLAGS}
   ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
-  ${FFTW3_LIBRARIES} ${OPENSSL_LIBRARIES} ${Boost_TIMER_LIBRARY}) 
+  ${FFTW3_LIBRARIES} ${OPENSSL_LIBRARIES} ${Boost_CHRONO_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY} ${Boost_CHRONO_LIBRARY}
+  ${Boost_TIMER_LIBRARY})   
 
 add_library (CompressedSensing MODULE CompressedSensing.hpp
   CompressedSensing.cpp) 
