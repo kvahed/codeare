@@ -5,12 +5,6 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src/matrix/interp
   ${PROJECT_SOURCE_DIR}/src/matrix/arithmetic
   ${PROJECT_SOURCE_DIR}/src/matrix/io
-  if (${GSL_FOUND})
-    ${GSL_INCLUDE_DIR}
-  endif()
-  if (${ITK_FOUND})
-    ${ITK_INCLUDE_DIRS}
-  endif()
   )
 
 add_executable (t_medfilt2 t_medfilt2.cpp)

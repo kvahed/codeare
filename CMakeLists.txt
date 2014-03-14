@@ -69,6 +69,8 @@ if(OPENMP_FOUND)
 endif()
 
 # Core ---------------------------------------------------------------
+set(BOOST_ROOT "" CACHE FILEPATH "Path to boost")
+
 if (!${LINUX})
   set (Boost_USE_STATIC_LIBS ON)
 endif()
@@ -96,17 +98,15 @@ endif()
 find_package(LAPACK REQUIRED)
 if (${WINDOWS})
    link_directories (${INTEL_COMPILER_DIR}/lib/intel64)
-   message (STATUS "${INTEL_COMPILER_DIR}/lib/intel64")
 endif ()
 
 # OmniORB ------------------------------------------------------------
 find_package (OmniORB)
 if (${OMNIORB4_FOUND})
   message ("OmniORB4 library not found. Networking infrastructure will not bebuilt.")
+  include_directories (${OMNIORB4_INCLUDE_DIR})
 endif ()
-if (!${OMNIORB4_INCLUDE_DIR})
-  set (OMNIORB4_INCLUDE_DIR "")
-endif()
+
 # Fourier transform --------------------------------------------------
 find_package(FFTW3 COMPONENTS double single threads REQUIRED)
 include_directories(${FFTW3_INCLUDE_DIR})
@@ -127,9 +127,8 @@ if (${PNG_FOUND} AND ${TIFF_FOUND})
 endif()
 
 find_package(GSL)
-if (!{GSL_FOUND})
-  set (GSL_INCLUDE_DIR "")
-else ()
+if (${GSL_FOUND})
+  include_directories (${GSL_INCLUDE_DIR})
   add_definitions (-DHAVE_GSL)
 endif()
 

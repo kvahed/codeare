@@ -18,13 +18,7 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src/tests
   ${PROJECT_SOURCE_DIR}/src/tinyxml
   ${PROJECT_SOURCE_DIR}/src/modules
-  if (${GSL_FOUND})
-	${GSL_INCLUDE_DIR}
-  endif()
-  if (${OMNIORB4_FOUND})
-	${PROJECT_SOURCE_DIR}/src/mongoose
-    ${OMNIORB4_INCLUDE_DIR}
-  endif()
+  ${PROJECT_SOURCE_DIR}/src/mongoose
   )
 
 add_subdirectory (core)
