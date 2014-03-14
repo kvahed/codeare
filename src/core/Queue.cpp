@@ -56,11 +56,10 @@ short Queue::Init (const char* name, const char* client_id) {
 
 short Queue::Finalise (const char* name) {
 	
-	if (!name) 
-		Workspace::Instance().Finalise();
-	else {
-		map<string, ReconContext*>::iterator it = m_contexts.find (name);
 
+	if (name) {
+		map<string, ReconContext*>::iterator it = m_contexts.find (name);
+        
 		if (it == m_contexts.end())
 			return codeare::CONTEXT_NOT_FOUND;
 		else {
@@ -69,6 +68,7 @@ short Queue::Finalise (const char* name) {
 		}
 	}
 	
+    Workspace::Instance().Finalise();
 	return (short) codeare::OK;
 	
 }

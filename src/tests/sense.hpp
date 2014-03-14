@@ -62,7 +62,7 @@ sensetest (RRClient::Connector<T>* rc) {
 	
 	// ---------------------
 	
-	//	rc->Finalise   (test);
+	rc->Finalise   (test);
 	
 	IOContext oc (rc->GetElement("/config/data-out"), base, WRITE);
     oc.Write(ufimg, "image");

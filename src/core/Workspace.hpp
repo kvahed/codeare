@@ -165,7 +165,9 @@ class DLLEXPORT Workspace {
         
 		tag[0] = sha256(name);
 		tag[1] = typeid(T).name();
-		assert (m_ref.find (name) == m_ref.end());
+		reflist::iterator ri = m_ref.find (name);
+		if (ri != m_ref.end())
+			Free (name);
 		m_ref.insert (refent(name, tag));
 		m_store.insert (entry (tag[0], value));
 
@@ -192,7 +194,9 @@ class DLLEXPORT Workspace {
         
 		tag[0] = sha256(name);
 		tag[1] = typeid(T).name();
-		assert (m_ref.find (name) == m_ref.end());
+		reflist::iterator ri = m_ref.find (name);
+		if (ri != m_ref.end())
+			Free (name);
 		m_ref.insert (refent(name, tag));
 		m_store.insert (entry (tag[0], value));
 

@@ -116,10 +116,7 @@ public:
 	virtual void 
 	config         (const char* c);
 	
-
-	
 protected:
-
 
 	char*                                m_config;   /**< Serialised XML document  */
 	std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/

@@ -69,7 +69,7 @@ if(OPENMP_FOUND)
 endif()
 
 # Core ---------------------------------------------------------------
-if (!${LINUX})
+if (${MACOSX})
   set (Boost_USE_STATIC_LIBS ON)
 endif()
 find_package(Boost COMPONENTS thread chrono timer system REQUIRED)
