@@ -13,7 +13,9 @@
 using namespace std;
 using namespace RRClient;
 
-#include "Grid.hpp"
+#ifdef HAVE_MPI
+#  include "Grid.hpp"
+#endif
 
 #include <time.h>
 #include <stdio.h>
