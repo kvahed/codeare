@@ -1,18 +1,15 @@
 This is the COmmon Data Exchange and Rconstruction Engine (codeare).
 This software is a framework for live communication with MRI sequence and 
-reconstruction software. 
+reconstruction software. It is distributed under der LGPL v3.0
 
-TODO:
-* Cient stubs for more MRI hardware vendors.
-* Checks for NaN in maps.
-* OK - well ya - ... a lot!
-* modules: kt-BLAST
-* ICE: publish simple reconstuction chain 
-* Reunify Different memory schemes
-                                                                           
 BUILD & INSTALL
-Refer to http://codeare.org/install.html
+For example:
+# cd codeare
+# mkdir build
+# cmake ../
+# make 
+# make test
+# sudo make install
 
-FEDORA NOTES
-./configure --with-atlasroot=/usr/lib64/atlas
-./configure --with-atlasroot=/usr/lib64/atlas-sse3
+For more information refer to http://codeare.org
+
