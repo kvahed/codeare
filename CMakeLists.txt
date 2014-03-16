@@ -13,7 +13,8 @@ set (top_srcdir "${PROJECT_SOURCE_DIR}")
 cmake_minimum_required (VERSION 2.8)
 enable_testing()
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
-include(ConfigureChecks.cmake)
+include(CheckIncludeFiles)
+check_include_files(assert.h HAVE_ASSERT_H)
 add_definitions(-DHAVE_CONFIG_H)
 
 # Git ----------------------------------------------------------------
