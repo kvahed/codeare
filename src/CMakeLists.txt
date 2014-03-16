@@ -36,8 +36,6 @@ configure_file ( "${CMAKE_CURRENT_SOURCE_DIR}/config.h.in"
 set (prefix ${CMAKE_INSTALL_PREFIX})
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in"
   "${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp" @ONLY) 
-configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/Loader.hpp.in"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Loader.hpp" @ONLY) 
 list (APPEND SOURCES GitSHA1.hpp)
 list (APPEND SOURCES options.h options.cpp core/Workspace.hpp
   core/Workspace.cpp) 
