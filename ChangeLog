@@ -1,3 +1,25 @@
+2014-03-16 Kaveh Vahedpour <k.vahedipour@fz-juelich.de> (1.2)
+
+	* CMake wins
+	* Windows build includes all tests 
+	* Windows build has been tested with VS 2008, 2010 and 2013
+
+2012-12-27 Kaveh Vahedpour <k.vahedipour@fz-juelich.de> (1.1)
+
+	* Perfomance and vectorization improvements
+	* Fourier operators pluggable
+	* Variadic returns for SVD and EIG
+	* Lots of new funtions on matrices (Phase unwrapping etc.)
+
+2012-01-10 Kaveh Vahedpour <k.vahedipour@fz-juelich.de> (1.0)
+
+	* Redesign of transport layer
+	* Introduction of more flexible workspace
+	* Aligned memory in all cases
+	* OpenCL modality
+	* MPI modality
+	* Lots of new matrix functions (interpolations etc.)
+
 2010-08-12 Kaveh Vahedipour <k.vahedipour@fz-juelich.de> (0.4)
 	
 	* ReconStrategy.h configured now with XML backend
