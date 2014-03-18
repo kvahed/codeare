@@ -56,7 +56,7 @@ namespace RRClient {
 		/**
 		 * @brief       Default constructor
 		 */
-		LocalConnector (const char* name, const char* debug) {};
+		LocalConnector (int args, char** argv, const char* name, const char* debug) {};
 
 
 		/**

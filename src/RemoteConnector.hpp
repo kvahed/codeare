@@ -111,8 +111,8 @@ namespace RRClient {
 		/**
 		 * @brief           Construct and initialise remote interface
 		 */
-		RemoteConnector     (const std::string& service_id, const std::string& trace_level = "0",
-                             const std::string& client_id = "");
+		RemoteConnector     (int argc, char** argv, const std::string& service_id,
+				             const std::string& trace_level = "0", const std::string& client_id = "");
 
 
 		/**

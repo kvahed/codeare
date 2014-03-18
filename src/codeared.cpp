@@ -43,7 +43,7 @@ void corba_service (int argc, char** argv) {
         }
         
         // Initialise ORB
-        const char*    options[][2] = { { (char*)"traceLevel", debug}, /*{ (char*)"traceFile", logfile}, */{ 0, 0 } };
+        const char*    options[][2] = { {(char*)"traceLevel", debug}, { 0, 0 } };
         CORBA::ORB_var orb          = CORBA::ORB_init(argc, argv, "omniORB4", options);
         
         // Get reference to the RootPOA.
@@ -64,7 +64,7 @@ void corba_service (int argc, char** argv) {
         CORBA::String_var sior(orb->object_to_string(SA_obj.in()));
         
         // Bind to the name server and lookup 
-        CORBA::Object_var obj1=orb->resolve_initial_references("NameService");
+       CORBA::Object_var obj1= orb->resolve_initial_references("NameService");
         assert(!CORBA::is_nil(obj1.in()));
         
         // Get context

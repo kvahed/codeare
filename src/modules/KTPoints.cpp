@@ -38,11 +38,11 @@ using namespace RRStrategy;
  * @param  nrmse    Returned NRMSE
  */
 inline float
-NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
+NRMSE                         (const Matrix<cxfl>& target, const Matrix<cxfl>& result) {
 
     float nrmse = 0.0;
 
-#pragma omp parallel for reduction(+:nrmse)
+#pragma omp parallel for reduction (+:nrmse)
     for (int i = 0; i < numel(target); i++ )
         nrmse += pow(abs(target[i]) - abs(result[i]), 2);
     nrmse = sqrt(nrmse)/norm(target);
@@ -61,14 +61,13 @@ NRMSE                         (Matrix<cxfl>& target, const Matrix<cxfl>& result)
  * @param  nrmse    Returned NRMSE
  */
 inline float
-NOHO                         (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
+NOHO                         (const Matrix<cxfl>& target, const Matrix<cxfl>& result) {
 
     float nrmse = 0.f;
 
-#pragma omp parallel for default (shared) reduction(+:nrmse)
+#pragma omp parallel for default (shared) reduction (+:nrmse)
 	for (int i = 0; i < numel(target); i++ )
 		nrmse += pow(abs(target[i]) - abs(result[i]), 2);
-    
     return nrmse;
 
 }

@@ -51,13 +51,9 @@ public:
 	 * @param name  Service name
 	 * @param debug Trace level
 	 */
-	Connector       (const char* name, const char* debug) {
-
-		m_name  = name;
-		m_debug = debug;
-
+	Connector       (int args, char** argv, const char* name, const char* debug) :
+		m_name (name), m_debug (debug), m_args (args), m_argv (argv) {
 		Connect ();
-
 	}
 	
 	
@@ -76,7 +72,7 @@ public:
 	inline void 
 	Connect() {
 
-		m_conn  = new T (m_name.c_str(), m_debug.c_str());
+		m_conn  = new T (m_args, m_argv, m_name.c_str(), m_debug.c_str());
 
 	}
 
@@ -256,6 +252,8 @@ private:
 	T*          m_conn; /**< Actual connection */
 	std::string m_name;
 	std::string m_debug;
+	int         m_args;
+	char**      m_argv;
 	
 };
 	

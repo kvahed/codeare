@@ -27,9 +27,9 @@ int main (int argc, char** argv) {
 	if (init (argc, argv)) {
 		
 #ifdef LOCAL
-		Connector<LocalConnector>*  con = new Connector<LocalConnector>  (name, verbose);
+		Connector<LocalConnector>*  con = new Connector<LocalConnector>  (argc, argv, name, verbose);
 #else 
-		Connector<RemoteConnector>* con = new Connector<RemoteConnector> (name, verbose);
+		Connector<RemoteConnector>* con = new Connector<RemoteConnector> (argc, argv, name, verbose);
 #endif	
 		
 		std::string cf = base;

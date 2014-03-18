@@ -31,10 +31,10 @@
 namespace RRClient {
 
 
-	RemoteConnector::RemoteConnector          (const std::string& service_id, const std::string& debug_level, const std::string& client_id) {
+	RemoteConnector::RemoteConnector  (int i, char** c, const std::string& service_id,
+			const std::string& debug_level, const std::string& client_id) {
 		
 		try {
-
             if (!client_id.empty()) {
                 m_client_id = client_id;
             } else {
@@ -44,8 +44,6 @@ namespace RRClient {
             }
 			
 			// Initialise ORB
-			int         i            = 0;
-			char**      c            = 0;
 			const char* options[][2] = { { (char*)"traceLevel", debug_level.c_str()}, { 0, 0 } };
 			
 			m_orb = CORBA::ORB_init(i, c, "omniORB4", options);
