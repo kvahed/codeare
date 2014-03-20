@@ -108,11 +108,11 @@ bool  CloseModule  (void* handle) {
 
 #if defined(_MSC_VER)
 	/*#pragma omp parallel
-	{
-		if (handle && omp_get_thread_num() == 0)
-			if (!FreeLibrary((HINSTANCE)handle))
-				fprintf(stderr, "Cannot unload library. Error Code: %02X\n. Attempting to unmap...", GetLastError());
-				}*/
+	  {
+	  if (handle && omp_get_thread_num() == 0)
+	  if (!FreeLibrary((HINSTANCE)handle))
+	  fprintf(stderr, "Cannot unload library. Error Code: %02X\n. Attempting to unmap...", GetLastError());
+	  }*/
 #else
     dlerror (); // Clear last errors
     dlclose(handle);

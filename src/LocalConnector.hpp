@@ -141,7 +141,6 @@ namespace RRClient {
 		
 	private:
 		
-		std::vector<short>  m_rstrats; /**< Remote reconstruction strategies    */
 		context_map m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 		
 		

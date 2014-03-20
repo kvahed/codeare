@@ -38,14 +38,10 @@ int main (int argc, char** argv) {
 	    IOContext ic (datain, base_dir, READ);
 
 	    while (datain_entry) {
-
 	    	const std::string data_name = datain_entry->Attribute("uri");
 	    	const std::string data_type = datain_entry->Attribute("dtype");
-
 	    	if (!(data_name.length() && data_type.length()))
-	    		printf("Error reading binary data %s with type %s. Exiting.\n",
-	    				data_name.c_str(), data_type.c_str());
-
+	    		printf("Error reading binary data %s with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
 	    	if        (TypeTraits<float>::Abbrev().compare(data_type) == 0)  {
 	    		Matrix<float> M = ic.Read<float>(datain_entry);
 	    		con.SetMatrix(data_name, M);
@@ -59,9 +55,7 @@ int main (int argc, char** argv) {
 	    		Matrix<cxdb> M = ic.Read<cxdb>(datain_entry);
 	    		con.SetMatrix(data_name, M);
 	    	}
-
 	    	datain_entry = datain_entry->NextSiblingElement();
-
 	    }
 
 		TiXmlElement* chain = con.GetElement("/config/chain");
@@ -73,22 +67,19 @@ int main (int argc, char** argv) {
 	    	std::string config;
 	    	config << *module;
 	    	std::string module_name = module->Value();
-
 	    	if (module_name.length() == 0) {
 	    		printf ("  *** ERROR: Module has no name \"%s\" ... bailing out\n", module_name.c_str());
 	    		nmodules = 0;
 	    		break;
 	    	}
 
+	    	printf ("Initialising %s ...\n", module_name.c_str());
 	    	if (con.Init (module_name.c_str(), config.c_str()) != codeare::OK) {
 	    		printf ("  *** ERROR: Intialising failed ... bailing out!");
-	    		nmodules = 0;
-	    		break;
+	    		return false;
 	    	}
-
 	    	module = module->NextSiblingElement();
 	    	nmodules++;
-
 	    }
 
 

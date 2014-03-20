@@ -24,10 +24,12 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 # OS type ------------------------------------------------------------
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(WINDOWS TRUE)
+  set (Boost_USE_STATIC_LIBS ON)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINUX TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(MACOSX TRUE)
+  set (Boost_USE_STATIC_LIBS ON)
 endif()
 
 # C++ flags ----------------------------------------------------------
@@ -70,9 +72,6 @@ if(OPENMP_FOUND)
 endif()
 
 # Core ---------------------------------------------------------------
-if (${MACOSX})
-  set (Boost_USE_STATIC_LIBS ON)
-endif()
 find_package(Boost COMPONENTS thread chrono timer system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories (${BOOST_LIBRARYDIR})

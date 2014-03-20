@@ -68,6 +68,8 @@ if (${MATLAB_FOUND})
   include_directories (${MATLAB_INCLUDE_DIRS})
 endif ()
 
+set (NETWORKING_SOURCES "")
+
 if (${OMNIORB4_FOUND})
   
   set (OMNIORB_GENERATED ${CMAKE_CURRENT_SOURCE_DIR}/RRSModule.hh
@@ -85,6 +87,7 @@ if (${OMNIORB4_FOUND})
   endif()
   
   list (APPEND COMLIBS ${OMNIORB4_LIBRARIES})
+  list (APPEND NETWORKING_SOURCES "RemoteConnector.hpp" "RemoteConnector.cpp")
   
   ### codeared ###
   add_executable (codeared ${OMNIORB_GENERATED} ${SOURCES}
@@ -92,16 +95,19 @@ if (${OMNIORB4_FOUND})
   target_compile_definitions (codeared PRIVATE ${OORB_DEFINES})
   target_link_libraries (codeared mongoose ${COMLIBS} ${Boost_THREAD_LIBRARY})  
   
+install (TARGETS codeared DESTINATION
+  ${CMAKE_INSTALL_PREFIX}/bin) 
+
 endif()  
 
 ### codeare ###
 add_executable (codeare ${OMNIORB_GENERATED} ${SOURCES}
   Connector.hpp LocalConnector.hpp LocalConnector.cpp
-  RemoteConnector.hpp RemoteConnector.cpp testclt.cpp)  
+  ${NETWORKING_SOURCES} testclt.cpp)  
 target_compile_definitions (codeare PRIVATE ${OORB_DEFINES})
 target_link_libraries (codeare ${COMLIBS})
 
-install (TARGETS codeared codeare DESTINATION
+install (TARGETS codeare DESTINATION
   ${CMAKE_INSTALL_PREFIX}/bin) 
 
 if (${LINUX})
