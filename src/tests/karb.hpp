@@ -1,18 +1,17 @@
 #include "../modules/GradientTiming.hpp"
 #include "../modules/SimulatedAnnealing.hpp"
 
-template <class T> bool
-karbtest (Connector<T>* rc) {
+template <ConType CT> bool karbtest (Connector<CT>& rc) {
 
 	GradientParams gp;
 
-	std::string in_file;// = std::string (base + "/" + std::string(rc->GetElement("/config/data-in")->Attribute("fname")));
-	std::string out_file;// = std::string (base + "/" + rc->GetElement("/config/data-out")->Attribute("fname"));
+	std::string in_file;// = std::string (base + "/" + std::string(rc.GetElement("/config/data-in")->Attribute("fname")));
+	std::string out_file;// = std::string (base + "/" + rc.GetElement("/config/data-out")->Attribute("fname"));
 
 	bool   simann  = false;
 	size_t hpoints = 1;
-	rc->Attribute ("simann",   &simann);
-	rc->Attribute ("hpoints",  &hpoints);
+	rc.Attribute ("simann",   &simann);
+	rc.Attribute ("hpoints",  &hpoints);
 
 	if (simann) {
 
@@ -20,12 +19,12 @@ karbtest (Connector<T>* rc) {
 		size_t coolit;
 		bool   verbose, exchange;
 		
-		rc->Attribute ("coolrate", &coolrate);
-		rc->Attribute ("startt",   &startt);
-		rc->Attribute ("finalt",   &finalt);
-		rc->Attribute ("coolit",   &coolit);
-		rc->Attribute ("verbose",  &verbose);
-		rc->Attribute ("exchange", &exchange);
+		rc.Attribute ("coolrate", &coolrate);
+		rc.Attribute ("startt",   &startt);
+		rc.Attribute ("finalt",   &finalt);
+		rc.Attribute ("coolit",   &coolit);
+		rc.Attribute ("verbose",  &verbose);
+		rc.Attribute ("exchange", &exchange);
 		
 		SimulatedAnnealing sa (gp.k, coolit, startt, finalt, coolrate, verbose, exchange);
 		sa.Cool();
@@ -33,12 +32,12 @@ karbtest (Connector<T>* rc) {
 		
 	}
 	
-	rc->Attribute ("maxgrad", &(gp.mgr));
-	rc->Attribute ("maxslew", &(gp.msr));
-	rc->Attribute ("dt",      &(gp.dt));
+	rc.Attribute ("maxgrad", &(gp.mgr));
+	rc.Attribute ("maxslew", &(gp.msr));
+	rc.Attribute ("dt",      &(gp.dt));
 	
-	rc->Attribute ("gunits",  &(gp.gunits));
-	rc->Attribute ("lunits",  &(gp.lunits));
+	rc.Attribute ("gunits",  &(gp.gunits));
+	rc.Attribute ("lunits",  &(gp.lunits));
 	
 	Matrix<double> x  = linspace<double> (0.0,1.0,size(gp.k,0));
 	Matrix<double> xi = linspace<double> (0.0,1.0,size(gp.k,0)*hpoints);

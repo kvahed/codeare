@@ -19,47 +19,46 @@
  */
 
 
-template <class T> bool 
-grappatest (Connector<T>* rc) {
+template <ConType CT> bool grappatest (Connector<CT>& rc) {
 
     using namespace codeare::matrix::io;
 	// Incoming
 	Matrix<cxdb> scan;   // Folded images O (Nc, RO, PE/AF, PE2)
 	Matrix<cxdb> acs;   // Sensitivity maps O (Nc, RO, PE, PE2)
 	
-    IOContext ic (rc->GetElement("/config/data-in"), base, READ);
-    scan = ic.Read<cxdb>(rc->GetElement("/config/data-in/scan"));
-    acs = ic.Read<cxdb>(rc->GetElement("/config/data-in/acs"));
+    IOContext ic (rc.GetElement("/config/data-in"), base, READ);
+    scan = ic.Read<cxdb>(rc.GetElement("/config/data-in/scan"));
+    acs = ic.Read<cxdb>(rc.GetElement("/config/data-in/acs"));
     ic.Close();
 
 	// Outgoing
 	Matrix<cxdb> recon;   // Reconstructed unaliased O (RO, PE, PE2)
 
-	if (rc->Init (test) != codeare::OK) {
+	if (rc.Init (test) != codeare::OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}
 	
 	// Prepare -------------
 	
-	rc->SetMatrix ("scan", scan); // Sensitivities
-	rc->SetMatrix ("acs", acs); // Weights
+	rc.SetMatrix ("scan", scan); // Sensitivities
+	rc.SetMatrix ("acs", acs); // Weights
 	
-	rc->Prepare   (test);
+	rc.Prepare   (test);
 	
 	// Process -------------
 	
-	rc->Process   (test);
+	rc.Process   (test);
 	
 	// Receive -------------
 	
-	//rc->GetMatrix ("recon", recon);  // Images
+	//rc.GetMatrix ("recon", recon);  // Images
 	
 	// ---------------------
 	
-	rc->Finalise   (test);
+	rc.Finalise   (test);
 	
-	IOContext oc (rc->GetElement("/config/data-out"), base, WRITE);
+	IOContext oc (rc.GetElement("/config/data-out"), base, WRITE);
     oc.Write(recon, "recon");
     oc.Close();
 

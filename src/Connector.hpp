@@ -22,38 +22,36 @@
 #define __CONNECTOR_HPP__
 
 #include "Matrix.hpp"
-#include "tinyxml.h"
+#include "LocalConnector.hpp"
+#include "RemoteConnector.hpp"
 
 namespace RRClient {
+
+enum ConType {LOCAL, REMOTE};
+
+template<ConType CT> struct ConSelector;
+template<> struct ConSelector<LOCAL> { typedef LocalConnector Type; };
+template<> struct ConSelector<REMOTE> { typedef RemoteConnector Type; };
+
 
 /**
  * @brief Connector skeleton
  *        Abstraction layer for local or remote access to reconstruction schemes
  */
-template <class T>
-class Connector {
+template <ConType CT> class Connector {
 
 public:
-	
 
-	/**
-	 * @brief  Default constructor 
-	 * @see    Connector (const connection_type)
-	 */
-	Connector () : m_conn() {
+	typedef typename ConSelector<CT>::Type T;
 
-	}
-	
-	
 	/**
 	 * @brief       Construct with service name and debug level.
 	 *
 	 * @param name  Service name
 	 * @param debug Trace level
 	 */
-	Connector       (int args, char** argv, const char* name, const char* debug) :
-		m_name (name), m_debug (debug), m_args (args), m_argv (argv) {
-		Connect ();
+    Connector       (int args = 0, char** argv = 0, const char* name = 0, const char* debug = 0) {
+        m_conn  = (Connection*) new T (args, argv, name, debug);
 	}
 	
 	
@@ -67,17 +65,6 @@ public:
 
 
 	/**
-	 * @brief      Connect
-	 */
-	inline void 
-	Connect() {
-
-		m_conn  = new T (m_args, m_argv, m_name.c_str(), m_debug.c_str());
-
-	}
-
-
-	/**
 	 * @brief           Request data procession on remote service
 	 *
 	 *                  @see RRStrategy::ReconStrategy::Process()
@@ -87,7 +74,7 @@ public:
 	 */ 
 	virtual inline codeare::error_code              
 	Process             (const char* name) {
-		return (codeare::error_code) m_conn->Process(name);
+		return (codeare::error_code) ((T*) m_conn)->Process(name);
 	}
 	
 	
@@ -101,7 +88,7 @@ public:
 	 */ 
 	virtual inline codeare::error_code              
 	Prepare             (const char* name) {
-		return (codeare::error_code) m_conn->Prepare(name);
+		return (codeare::error_code) ((T*) m_conn)->Prepare(name);
 	}
 	
 	
@@ -115,7 +102,7 @@ public:
 	 */ 
 	virtual inline codeare::error_code              
 	Init                (const char* name) {
-		return (codeare::error_code) m_conn->Init(name);
+		return (codeare::error_code) ((T*) m_conn)->Init(name);
 	}
 	
 	
@@ -129,7 +116,7 @@ public:
 	 */ 
 	virtual inline codeare::error_code              
 	Finalise            (const char* name) {
-		return (codeare::error_code) m_conn->Finalise(name);
+		return (codeare::error_code) ((T*) m_conn)->Finalise(name);
 	}
 	
 	
@@ -143,7 +130,7 @@ public:
 	 */
 	template <class S> inline void 
 	SetMatrix           (const std::string& name, Matrix<S>& m) const {
-		m_conn->SetMatrix (name, m);
+		((T*) m_conn)->SetMatrix (name, m);
 	}
 	
 	
@@ -157,7 +144,7 @@ public:
 	 */
 	template <class S> inline void 
 	GetMatrix           (const std::string& name, Matrix<S>& m) const {
-		m_conn->GetMatrix (name, m);
+		((T*) m_conn)->GetMatrix (name, m);
 	}
 		
 		
@@ -171,7 +158,7 @@ public:
 	 */
 	template <class S> inline void 
 	ReadConfig        (S config) {
-		m_conn->ReadConfig (config);
+		((T*) m_conn)->ReadConfig (config);
 	}
 	
 
@@ -185,7 +172,7 @@ public:
 	 */
 	template <class S> inline void
 	SetAttribute        (const char* name, S value) {
-		m_conn->SetAttribute (name, value);
+		((T*) m_conn)->SetAttribute (name, value);
 	}
 
 	
@@ -199,7 +186,7 @@ public:
 	 */
 	template <class S> inline int
 	Attribute        (const char* name, S* value) {
-		return m_conn->Attribute (name, value);
+		return ((T*) m_conn)->Attribute (name, value);
 	}
 
 	
@@ -213,7 +200,7 @@ public:
 	 */
 	inline const char*
 	Attribute          (const char* name) {
-		return m_conn->Attribute (name);
+		return ((T*) m_conn)->Attribute (name);
 	}
 
 	
@@ -227,7 +214,7 @@ public:
 	 */
 	inline const char*
 	GetText            (const char* path) {
-		return m_conn->GetText (path);
+		return ((T*) m_conn)->GetText (path);
 	}
 
 	
@@ -241,7 +228,7 @@ public:
 	 */
 	inline TiXmlElement*
 	GetElement          (const char* path) {
-		return m_conn->GetElement (path);
+		return ((T*) m_conn)->GetElement (path);
 	}
 
 	
@@ -249,11 +236,7 @@ public:
 private:
 	
 	
-	T*          m_conn; /**< Actual connection */
-	std::string m_name;
-	std::string m_debug;
-	int         m_args;
-	char**      m_argv;
+	Connection* m_conn; /**< Actual connection */
 	
 };
 	

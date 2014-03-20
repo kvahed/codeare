@@ -25,23 +25,18 @@ int main (int argc, char** argv) {
     int error =1;
 	
 	if (init (argc, argv)) {
-		
-#ifdef LOCAL
-		Connector<LocalConnector>*  con = new Connector<LocalConnector>  (argc, argv, name, verbose);
-#else 
-		Connector<RemoteConnector>* con = new Connector<RemoteConnector> (argc, argv, name, verbose);
-#endif	
+
+		Connector<LOCAL> con;
 		
 		std::string cf = base;
 		cf += "/"; 
 		cf += std::string(config);
 		if (cf.compare(std::string(base)) != 0)
-            con->ReadConfig (cf.c_str());
+          con.ReadConfig (cf.c_str());
 
 		if      (!strcmp (test, "CGSENSE"))               cgsensetest  (con);
 		else if (!strcmp (test, "SENSE"))                 sensetest    (con);
-		else if (!strcmp (test, "NuFFT"))                 nuffttest    (con); 
-		else if (!strcmp (test, "NuFFT_OMP"))             nuffttest    (con);
+		else if (!strcmp (test, "NuFFT"))                 nuffttest    (con);
 		else if (!strcmp (test, "GRAPPA"))                grappatest   (con);
 		else if (!strcmp (test, "KTPoints"))              ktptest      (con);
 		else if (!strcmp (test, "CompressedSensing"))     cstest       (con);

@@ -8,22 +8,21 @@
 
 using namespace codeare::matrix::io;
 
-template <class T> bool
-vdspiraltest (Connector<T>* rc) {
+template <ConType CT> bool vdspiraltest (Connector<CT>& rc) {
 
 	SpiralParams p;
 
-	rc->Attribute ("maxgrad", &(p.mgr));
-	rc->Attribute ("maxslew", &(p.msr));
-	rc->Attribute ("shots",   &(p.shots));
-	rc->Attribute ("dt",      &(p.dt));
-	rc->Attribute ("res",     &(p.res));
+	rc.Attribute ("maxgrad", &(p.mgr));
+	rc.Attribute ("maxslew", &(p.msr));
+	rc.Attribute ("shots",   &(p.shots));
+	rc.Attribute ("dt",      &(p.dt));
+	rc.Attribute ("res",     &(p.res));
 
-	rc->Attribute ("gunits",  &(p.gunits));
-	rc->Attribute ("lunits",  &(p.lunits));
+	rc.Attribute ("gunits",  &(p.gunits));
+	rc.Attribute ("lunits",  &(p.lunits));
 
-	std::string rad (rc->GetText("/config/rad"));
-	std::string fov (rc->GetText("/config/fov"));
+	std::string rad (rc.GetText("/config/rad"));
+	std::string fov (rc.GetText("/config/fov"));
 	std::vector<std::string> rads = Split (rad, ",");
 	std::vector<std::string> fovs = Split (fov, ",");
 
@@ -50,7 +49,7 @@ vdspiraltest (Connector<T>* rc) {
     std::stringstream ofname;
     ofname << base;
     ofname << "/";
-    ofname << rc->GetElement("/config/data-out")->Attribute("fname");
+    ofname << rc.GetElement("/config/data-out")->Attribute("fname");
     
     IOContext f = fopen (ofname.str(), WRITE);
     s.dump (f);

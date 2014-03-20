@@ -20,9 +20,7 @@
 
 #include "matrix/io/IOContext.hpp"
 
-
-template <class T> bool 
-cgsensetest (RRClient::Connector<T>* rc) {
+template<ConType CT> bool cgsensetest (RRClient::Connector<CT>& rc) {
     
     using namespace codeare::matrix::io;
 
@@ -35,41 +33,39 @@ cgsensetest (RRClient::Connector<T>* rc) {
     Matrix<float> kspace;  // Kspace positions O(Nkx,Nky,Nkz)
 
     // Read data
-    IOContext ic (rc->GetElement("/config/data-in"), base, READ);
-    rawdata = ic.Read<cxfl>(rc->GetElement("/config/data-in/d"));
-    kspace  = ic.Read<float>(rc->GetElement("/config/data-in/k"));
-    weights = ic.Read<float>(rc->GetElement("/config/data-in/w"));
-    sens	= ic.Read<cxfl>(rc->GetElement("/config/data-in/s"));
+    IOContext ic (rc.GetElement("/config/data-in"), base, READ);
+    rawdata = ic.Read<cxfl>(rc.GetElement("/config/data-in/d"));
+    kspace  = ic.Read<float>(rc.GetElement("/config/data-in/k"));
+    weights = ic.Read<float>(rc.GetElement("/config/data-in/w"));
+    sens	= ic.Read<cxfl>(rc.GetElement("/config/data-in/s"));
     ic.Close();
 
-    rc->SetAttribute ("hans", 10.0);
-    
-    if (rc->Init (test) != codeare::OK) {
+    if (rc.Init (test) != codeare::OK) {
         printf ("Intialising failed ... bailing out!"); 
         return false;
     }
     
     // Send one time data
-    rc->SetMatrix ("weights", weights); // Weights
-    rc->SetMatrix ( "kspace", kspace);  // K-space
-    rc->SetMatrix (   "sens", sens);    // Sensitivities
-    rc->Prepare   (test);
+    rc.SetMatrix ("weights", weights); // Weights
+    rc.SetMatrix ( "kspace", kspace);  // K-space
+    rc.SetMatrix (   "sens", sens);    // Sensitivities
+    rc.Prepare   (test);
 
     // Recon
-    rc->SetMatrix (   "data", rawdata); // Measurement data
-    rc->Process   (test);
+    rc.SetMatrix (   "data", rawdata); // Measurement data
+    rc.Process   (test);
 
     // Outgoing
     Matrix<cxfl>  cgimg;
 
-    rc->GetMatrix (  "image", cgimg);  // Images
-    rc->Finalise   (test);
+    rc.GetMatrix (  "image", cgimg);  // Images
+    //rc.Finalise   (test);
 
     // Write images
 
 	std::string ofname = base;
     ofname += "/";
-	ofname += rc->GetElement("/config/data-out")->Attribute("fname");
+	ofname += rc.GetElement("/config/data-out")->Attribute("fname");
 	IOContext ofile = fopen (ofname, WRITE);
 	fwrite (ofile, cgimg);
 	fclose (ofile);

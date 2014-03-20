@@ -22,12 +22,11 @@
 
 namespace RRClient {
 
+	LocalConnector::LocalConnector (int, char**, const char*, const char*) {}
+
 	LocalConnector::~LocalConnector ()               {
-		
 		Queue::Finalise ();
-		
 	}
-	
 	
 	short
 	LocalConnector::CleanUp () {

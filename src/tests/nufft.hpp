@@ -1,7 +1,7 @@
 #include "matrix/io/IOContext.hpp"
 
-template <class T> bool
-nuffttest (Connector<T>* rc) {
+template<ConType CT> bool nuffttest (RRClient::Connector<CT>& rc) {
+
 
 	using namespace codeare::matrix::io;
 
@@ -11,9 +11,9 @@ nuffttest (Connector<T>* rc) {
 	Matrix<cxdb>   img;
 
 	std::string ipf = base;
-	ipf += rc->GetElement("/config/data-in")->Attribute("fname");
+	ipf += rc.GetElement("/config/data-in")->Attribute("fname");
 
-	rc->Init(test);
+	rc.Init(test);
 
 	IOContext in = fopen (ipf);
 	rawdata = fread<cxfl> (in, "data");
@@ -21,19 +21,19 @@ nuffttest (Connector<T>* rc) {
 	weights = fread<float> (in, "weights");
 	fclose (in);
 	
-	rc->SetMatrix    ("data",    rawdata);
-	rc->SetMatrix    ("weights", weights);
-	rc->SetMatrix    ("kspace",  kspace);
+	rc.SetMatrix    ("data",    rawdata);
+	rc.SetMatrix    ("weights", weights);
+	rc.SetMatrix    ("kspace",  kspace);
 	
-	rc->Prepare      (test);
-	rc->Process      (test);
+	rc.Prepare      (test);
+	rc.Process      (test);
 	
-	rc->GetMatrix    ("img", img);
+	rc.GetMatrix    ("img", img);
 
-	rc->Finalise(test);
+	rc.Finalise(test);
 
 	std::string opf = base;
-	opf += rc->GetElement("/config/data-out")->Attribute("fname");
+	opf += rc.GetElement("/config/data-out")->Attribute("fname");
 
 	IOContext out = fopen (opf, WRITE);
 	fwrite (out, img);

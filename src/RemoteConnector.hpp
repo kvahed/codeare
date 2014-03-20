@@ -22,7 +22,7 @@
 #define __REMOTE_CONNECTOR_H__
 
 #include "Configurable.hpp"
-#include "Connector.hpp"
+#include "Connection.hpp"
 #include "Matrix.hpp"
 
 #include "RRSModule.hh"
@@ -102,7 +102,7 @@ namespace RRClient {
 	/**
 	 * @brief               Remotely connected reconstruction client 
 	 */
-	class RemoteConnector : public Configurable {
+	class RemoteConnector : public Configurable, public Connection {
 		
 		
 	public:
@@ -128,7 +128,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
-		virtual codeare::error_code              
+		codeare::error_code
 		Process             (const std::string& name);
 		
 
@@ -139,7 +139,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
-		virtual codeare::error_code              
+		codeare::error_code
 		Prepare             (const std::string& name);
 		
 
@@ -150,7 +150,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error code
 		 */ 
-		virtual codeare::error_code              
+		codeare::error_code
 		Init                (const std::string& name);
 		
 
@@ -161,7 +161,7 @@ namespace RRClient {
 		 * @param  name     Recon method
 		 * @return          Error error
 		 */ 
-		virtual codeare::error_code              
+		codeare::error_code
 		Finalise            (const std::string& name);
 		
 

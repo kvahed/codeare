@@ -20,17 +20,16 @@
 
 #include "matrix/io/IOContext.hpp"
 
-template <class T> bool 
-sensetest (RRClient::Connector<T>* rc) {
+template <ConType CT> bool sensetest (Connector<CT>& rc) {
 	
     using namespace codeare::matrix::io;
 	// Incoming
 	Matrix<cxfl> fimgs;   // Folded images O (Nc, RO, PE/AF, PE2)
 	Matrix<cxfl> smaps;   // Sensitivity maps O (Nc, RO, PE, PE2)
 	
-    IOContext ic (rc->GetElement("/config/data-in"), base, READ);
-    fimgs = ic.Read<cxfl>(rc->GetElement("/config/data-in/in"));
-    smaps = ic.Read<cxfl>(rc->GetElement("/config/data-in/sm"));
+    IOContext ic (rc.GetElement("/config/data-in"), base, READ);
+    fimgs = ic.Read<cxfl>(rc.GetElement("/config/data-in/in"));
+    smaps = ic.Read<cxfl>(rc.GetElement("/config/data-in/sm"));
     ic.Close();
 
 	// Outgoing
@@ -38,33 +37,33 @@ sensetest (RRClient::Connector<T>* rc) {
 
 	// Compute g-factor maps?
 	bool         compgfm = false;
-	rc->Attribute("compgfm", &compgfm);
+	rc.Attribute("compgfm", &compgfm);
 
-	if (rc->Init (test) != codeare::OK) {
+	if (rc.Init (test) != codeare::OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}
 	
 	// Prepare -------------
 	
-	rc->SetMatrix ("smaps", smaps); // Sensitivities
-	rc->SetMatrix ("fimgs", fimgs); // Weights
+	rc.SetMatrix ("smaps", smaps); // Sensitivities
+	rc.SetMatrix ("fimgs", fimgs); // Weights
 	
-	rc->Prepare   (test);
+	rc.Prepare   (test);
 	
 	// Process -------------
 	
-	rc->Process   (test);
+	rc.Process   (test);
 	
 	// Receive -------------
 	
-	rc->GetMatrix ("image", ufimg);  // Images
+	rc.GetMatrix ("image", ufimg);  // Images
 	
 	// ---------------------
 	
-	rc->Finalise   (test);
+	rc.Finalise   (test);
 	
-	IOContext oc (rc->GetElement("/config/data-out"), base, WRITE);
+	IOContext oc (rc.GetElement("/config/data-out"), base, WRITE);
     oc.Write(ufimg, "image");
     oc.Close();
 

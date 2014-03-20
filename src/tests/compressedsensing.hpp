@@ -20,8 +20,7 @@
 
 #include "matrix/io/IOContext.hpp"
 
-template <class T> bool
-cstest (Connector<T>* con) {
+template <ConType CT> bool cstest (Connector<CT>& con) {
 
     using namespace codeare::matrix::io;
 
@@ -32,37 +31,37 @@ cstest (Connector<T>* con) {
 	Matrix<cxfl>  pc;
 	
     // Read data
-    IOContext ic (con->GetElement("/config/data-in"), base, READ);
-    indata = ic.Read<cxfl>(con->GetElement("/config/data-in/data"));
-    mask   = ic.Read<float>(con->GetElement("/config/data-in/mask"));
-    pdf    = ic.Read<float>(con->GetElement("/config/data-in/pdf"));
-    pc     = ic.Read<cxfl>(con->GetElement("/config/data-in/pc"));
+    IOContext ic (con.GetElement("/config/data-in"), base, READ);
+    indata = ic.Read<cxfl>(con.GetElement("/config/data-in/data"));
+    mask   = ic.Read<float>(con.GetElement("/config/data-in/mask"));
+    pdf    = ic.Read<float>(con.GetElement("/config/data-in/pdf"));
+    pc     = ic.Read<cxfl>(con.GetElement("/config/data-in/pc"));
     ic.Close();
 
-	if (con->Init (test) != codeare::OK) {
+	if (con.Init (test) != codeare::OK) {
 		printf ("Intialising failed ... bailing out!"); 
 		return false;
 	}
 	
 	// Outgoing -------------
 	
-	con->SetMatrix  ("data", indata); // Measurement data
-	con->SetMatrix  ("pdf",  pdf);    // Sensitivities
-	con->SetMatrix  ("mask", mask);   // Weights
-	con->SetMatrix  ("pc",   pc);     // Phase correction
+	con.SetMatrix  ("data", indata); // Measurement data
+	con.SetMatrix  ("pdf",  pdf);    // Sensitivities
+	con.SetMatrix  ("mask", mask);   // Weights
+	con.SetMatrix  ("pc",   pc);     // Phase correction
 	// ---------------------
 	
-	con->Process (test);
+	con.Process (test);
 	
 	// Incoming -------------
 	
-	con->GetMatrix ("im_dc", im_dc);  // Recon output
+	con.GetMatrix ("im_dc", im_dc);  // Recon output
 	// ---------------------
 	
-	con->Finalise   (test);
+	con.Finalise   (test);
 	
     // Write images
-    IOContext oc (con->GetElement("/config/data-out"), base, WRITE);
+    IOContext oc (con.GetElement("/config/data-out"), base, WRITE);
     oc.Write(im_dc, "im_dc");
     oc.Close();
 	

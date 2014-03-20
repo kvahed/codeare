@@ -26,8 +26,8 @@
 
 #include "Configurable.hpp"
 #include "ReconContext.hpp"
+#include "Connection.hpp"
 #include "Queue.hpp"
-#include "Connector.hpp"
 
 using namespace RRStrategy;
 
@@ -39,8 +39,8 @@ namespace RRClient {
 	/**
 	 * @brief               Locally connected reconstruction client 
 	 */
-	class LocalConnector : public Configurable, 
-						   public Queue {
+	class LocalConnector :
+        public Configurable, public Connection, public Queue {
 		
 		typedef std::map<std::string, ReconContext*> context_map;
 
@@ -50,13 +50,13 @@ namespace RRClient {
 		/**
 		 * @brief       Default constructor
 		 */
-		LocalConnector () {};
+		LocalConnector ();
 
 
 		/**
 		 * @brief       Default constructor
 		 */
-		LocalConnector (int args, char** argv, const char* name, const char* debug) {};
+		LocalConnector (int args, char** argv, const char* name, const char* debug);
 
 
 		/**

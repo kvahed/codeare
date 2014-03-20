@@ -8,7 +8,7 @@
 #include "nufft.hpp"
 //#include "relativesensitivities.hpp"
 #ifdef HAVE_GSL
-  #include "spiral.hpp"
+#include "spiral.hpp"
   #include "karb.hpp"
   #include "slicegrad.hpp"
 #endif

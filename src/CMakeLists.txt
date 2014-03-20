@@ -68,18 +68,11 @@ if (${MATLAB_FOUND})
   include_directories (${MATLAB_INCLUDE_DIRS})
 endif ()
 
-### lclient ###
-add_executable (lclient ${SOURCES} LocalConnector.hpp
-  LocalConnector.cpp testclt.cpp) 
-target_compile_definitions (lclient PRIVATE LOCAL)
-target_link_libraries (lclient ${COMLIBS})
-install (TARGETS lclient DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-
 if (${OMNIORB4_FOUND})
-
+  
   set (OMNIORB_GENERATED ${CMAKE_CURRENT_SOURCE_DIR}/RRSModule.hh
     ${CMAKE_CURRENT_SOURCE_DIR}/RRSModuleSK.cc) 
-
+  
   add_custom_command (
     OUTPUT ${OMNIORB_GENERATED} 
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -91,23 +84,25 @@ if (${OMNIORB4_FOUND})
     list (APPEND OMNIORB4_LIBRARIES ws2_32 mswsock advapi32)
   endif()
   
-  ### rclient ###
-  add_executable (rclient ${OMNIORB_GENERATED} ${SOURCES}
-    RemoteConnector.hpp RemoteConnector.cpp testclt.cpp) 
-  target_compile_definitions (rclient PRIVATE REMOTE ${OORB_DEFINES})
-  target_link_libraries (rclient ${COMLIBS} ${OMNIORB4_LIBRARIES})
+  list (APPEND COMLIBS ${OMNIORB4_LIBRARIES})
   
   ### codeared ###
   add_executable (codeared ${OMNIORB_GENERATED} ${SOURCES}
     codeared.cpp ReconServant.hpp ReconServant.cpp)
-  target_compile_definitions (codeared PRIVATE REMOTE ${OORB_DEFINES})
-  target_link_libraries (codeared mongoose ${COMLIBS} ${OMNIORB4_LIBRARIES}
-    ${Boost_THREAD_LIBRARY})  
+  target_compile_definitions (codeared PRIVATE ${OORB_DEFINES})
+  target_link_libraries (codeared mongoose ${COMLIBS} ${Boost_THREAD_LIBRARY})  
   
-  install (TARGETS rclient codeared DESTINATION
-    ${CMAKE_INSTALL_PREFIX}/bin) 
-  
-endif()
+endif()  
+
+### codeare ###
+add_executable (codeare ${OMNIORB_GENERATED} ${SOURCES}
+  Connector.hpp LocalConnector.hpp LocalConnector.cpp
+  RemoteConnector.hpp RemoteConnector.cpp testclt.cpp)  
+target_compile_definitions (codeare PRIVATE ${OORB_DEFINES})
+target_link_libraries (codeare ${COMLIBS})
+
+install (TARGETS codeared codeare DESTINATION
+  ${CMAKE_INSTALL_PREFIX}/bin) 
 
 if (${LINUX})
   set (LD_ENV "LD_LIBRARY_PATH=$LD_LIBRARY_PATH")
@@ -153,31 +148,31 @@ endif()
 # Test macro -------------------------------------------------------- 
 include (TestMacro)
 
-set (TEST_CALL lclient -t SENSE -b
+set (TEST_CALL codeare -t SENSE -b
   ${PROJECT_SOURCE_DIR}/share/sense -c 3fold.xml)  
 MP_TESTS ("sense" "${TEST_CALL}")
 
-set (TEST_CALL lclient -t KTPoints -b
+set (TEST_CALL codeare -t KTPoints -b
   ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml)  
 MP_TESTS ("ktpoints" "${TEST_CALL}")
 
-set (TEST_CALL lclient -t CompressedSensing -b
+set (TEST_CALL codeare -t CompressedSensing -b
   ${PROJECT_SOURCE_DIR}/share/compressedsensing -c phantom_denoising.xml) 
 MP_TESTS ("compressedsensing" "${TEST_CALL}")
 
 if (${GSL_FOUND})
-   set (TEST_CALL lclient -t VDSpiral -b
+   set (TEST_CALL codeare -t VDSpiral -b
      ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml) 
    MP_TESTS ("vdspiral" "${TEST_CALL}")
 endif()
 
 if (${NFFT_FOUND})
 
-  set (TEST_CALL lclient -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/ -c
+  set (TEST_CALL codeare -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/ -c
     16shot.xml) 
   MP_TESTS ("nufft" "${TEST_CALL}")
 
-  set (TEST_CALL lclient -t CGSENSE -b
+  set (TEST_CALL codeare -t CGSENSE -b
     ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
   MP_TESTS ("cgsense" "${TEST_CALL}")
 

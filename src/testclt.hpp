@@ -1,10 +1,7 @@
 #include "options.h"
 #include "GitSHA1.hpp"
 
-#include "LocalConnector.hpp"
-#if defined REMOTE
-#    include "RemoteConnector.hpp"
-#endif	
+#include "Connector.hpp"
 
 #ifndef __WIN32__
 #    include "config.h"
@@ -120,9 +117,9 @@ bool init (int argc, char** argv) {
 }
 
 
-#ifdef HAVE_MAT_H
+/*#ifdef HAVE_MAT_H
 bool init (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	//std::string("codeare").c_str();
 	return true;
 }
-#endif
+#endif*/
