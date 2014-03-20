@@ -58,7 +58,7 @@ int main (int argc, char** argv) {
 	    	datain_entry = datain_entry->NextSiblingElement();
 	    }
 
-		TiXmlElement* chain = con.GetElement("/config/chain");
+	    TiXmlElement* chain = con.GetElement("/config/chain");
 	    TiXmlElement* module = chain->FirstChildElement();
 	    size_t nmodules = 0;
 
