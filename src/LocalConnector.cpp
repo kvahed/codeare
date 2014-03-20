@@ -29,22 +29,16 @@ namespace RRClient {
 	}
 	
 	short
-	LocalConnector::CleanUp () {
-		
+	LocalConnector::CleanUp () {	
 		return Queue::Finalise ();
-		
 	}
 	
 	short
 	LocalConnector::Init (const char* name, const char* configuration) {
-		
 		std::stringstream  temp;
 		temp << GetConfig();
-		
 		Queue::config  (temp.str().c_str());
-		
 		return Queue::Init (name, configuration);
-		
 	}
 	
 	
@@ -55,17 +49,13 @@ namespace RRClient {
 	
 	short
 	LocalConnector::Process  (const char* name)       {
-		
 		return Queue::Process (name);
-		
 	}
 	
 	
 	short
 	LocalConnector::Prepare  (const char* name)       {
-		
 		return Queue::Prepare (name);
-		
 	}
 	
 	

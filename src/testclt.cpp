@@ -59,14 +59,14 @@ int main (int argc, char** argv) {
 	    }
 
 		TiXmlElement* chain = con.GetElement("/config/chain");
-	    TiXmlElement* module = chain->FirstChildElement("config");
+	    TiXmlElement* module = chain->FirstChildElement();
 	    size_t nmodules = 0;
 
 	    while (module) {
 
 	    	std::string config;
 	    	config << *module;
-	    	std::string module_name = module->Attribute("name");
+	    	std::string module_name = module->Value();
 	    	if (module_name.length() == 0) {
 	    		printf ("  *** ERROR: Module has no name \"%s\" ... bailing out\n", module_name.c_str());
 	    		nmodules = 0;
@@ -74,7 +74,7 @@ int main (int argc, char** argv) {
 	    	}
 
 	    	printf ("Initialising %s ...\n", module_name.c_str());
-	    	if (con.Init (module->Attribute("name"), config.c_str()) != codeare::OK) {
+	    	if (con.Init (module_name.c_str(), config.c_str()) != codeare::OK) {
 	    		printf ("  *** ERROR: Intialising failed ... bailing out!");
 	    		return false;
 	    	}
