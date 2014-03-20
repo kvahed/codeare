@@ -92,7 +92,7 @@ NuFFT::Init () {
 	for (size_t i = 0; i < (size_t)dim; i++)
 		ms[i] = N[i];
 
-	ft = NFFT<double> (ms, M * shots, m, alpha);
+	ft = NFFT<float> (ms, M * shots, m, alpha);
 
 	m_initialised = true;
 
@@ -105,8 +105,8 @@ NuFFT::Prepare () {
 
 	codeare::error_code error = codeare::OK;
 
-	ft.KSpace  (Get<double> ("kspace"));
-	ft.Weights (Get<double> ("weights"));
+	ft.KSpace  (Get<float> ("kspace"));
+	ft.Weights (Get<float> ("weights"));
 
 	clear (kspace);
 	clear (weights);
@@ -121,7 +121,7 @@ NuFFT::Process () {
 
     SimpleTimer st ("NuFFT");
 
-    Matrix<cxdb> img =  ft ->* Get<cxdb> ("data");
+    Matrix<cxdb> img =  ft ->* Get<cxfl> ("data");
     wspace.Add ("img", img);
 
 	clear (data);

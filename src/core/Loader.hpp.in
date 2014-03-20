@@ -57,7 +57,7 @@ void*  LoadModule        (char* name) {
     handle = (void*) LoadLibrary(name);
 #else 
     dlerror();
-    handle = dlopen (fname.c_str(), RTLD_NOW);
+    handle = dlopen (fname.str().c_str(), RTLD_NOW);
     error = dlerror();
 #endif
     
