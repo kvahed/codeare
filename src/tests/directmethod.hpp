@@ -38,35 +38,35 @@ dmtest (Connector<T>* rc) {
 	Matrix<float> t;   
 	Matrix<float> j;
 	
-	std::string cf  = std::string (base + std::string(config));
-	std::string odf = std::string (base + std::string("/simout.mat"));
+	std::string cf  = std::string (base_dir + std::string(config));
+	std::string odf = std::string (base_dir + std::string("/simout.mat"));
 	
 	std::string b1_map_name;
 	std::string target_name;
 	std::string b0_map_name;
 	std::string
 
-    IOContext f (rc->GetElement("/config/data-in"), base, READ);
+    IOContext f (rc->GetElement("/config/data-in"), base_dir, READ);
     g = fread (f, "")
 	
 #ifdef HAVE_MAT_H
 
 	// Gradients
-	Read    (g, rc->GetElement("/config/data/g"),    base);
-	Read    (j, rc->GetElement("/config/data/j"),    base);
-	Read    (t, rc->GetElement("/config/data/t"),    base);
+	Read    (g, rc->GetElement("/config/data/g"),    base_dir);
+	Read    (j, rc->GetElement("/config/data/j"),    base_dir);
+	Read    (t, rc->GetElement("/config/data/t"),    base_dir);
 	
 	// Target excitation, ROI, sample
-	Read    (r, rc->GetElement("/config/data/r"),    base);
-	Read (tmxy, rc->GetElement("/config/data/tmxy"), base);
+	Read    (r, rc->GetElement("/config/data/r"),    base_dir);
+	Read (tmxy, rc->GetElement("/config/data/tmxy"), base_dir);
 	tmz  = zeros<float> (size(r,1), 1);
 	smxy = zeros<cxfl>  (size(r,1), 1);
-	Read ( smz, rc->GetElement("/config/data/smz"), base);
-	Read ( roi, rc->GetElement("/config/data/roi"), base);
+	Read ( smz, rc->GetElement("/config/data/smz"), base_dir);
+	Read ( roi, rc->GetElement("/config/data/roi"), base_dir);
 	
 	// Maps
-	Read ( b1, rc->GetElement("/config/data/b1"),   base);
-	Read ( b0, rc->GetElement("/config/data/b0"),   base);
+	Read ( b1, rc->GetElement("/config/data/b1"),   base_dir);
+	Read ( b0, rc->GetElement("/config/data/b0"),   base_dir);
 
 #endif	
 	if (rc->Init (test) != codeare::OK) {

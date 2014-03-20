@@ -33,7 +33,7 @@ internaltest (Connector<T>* rc) {
 	// Test casting
 	Matrix<cxdb> cd = (Matrix<cxdb>) cf;
 
-	std::string    df  = std::string (base + std::string(data));
+	std::string    df  = std::string (base_dir + std::string(data));
 
 	Matrix<cxfl> em, pa;
 	MXRead (em, df, "EM");

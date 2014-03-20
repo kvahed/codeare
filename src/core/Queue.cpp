@@ -36,13 +36,13 @@ short Queue::CleanUp () {
 }
 
 
-short Queue::Init (const char* name, const char* client_id) {
+short Queue::Init (const char* name, const char* config, const char* client_id) {
 	
 	ReconContext* rc;
 	
 	m_contexts.insert (pair< std::string, ReconContext* > (std::string(client_id) + std::string(name), rc = new ReconContext(name)));
 
-    rc->SetConfig (m_config);
+    rc->SetConfig (config);
 
 	if ((rc->Init()) != codeare::OK) {
 		this->Finalise();
@@ -76,24 +76,32 @@ short Queue::Finalise (const char* name) {
 
 short Queue::Process  (const char* name)       {
 	
-	map<string, ReconContext*>::iterator it = m_contexts.find (name);
-	
-	if (it == m_contexts.end()) 
-		return codeare::CONTEXT_NOT_FOUND;
+	short ret = 0;
+	map<string, ReconContext*>::iterator it;
 
-	return (short) it->second->Process();
+	for (it = m_contexts.begin(); it != m_contexts.end(); ++it)
+		if ((ret = it->second->Process()) != codeare::OK) {
+			printf ("Procession of %s \n", it->first.c_str());
+			break;
+		}
+
+	return (short)ret;
 	
 }
 
 
 short Queue::Prepare  (const char* name)       {
 	
-	map<string, ReconContext*>::iterator it = m_contexts.find (name);
-	
-	if (it == m_contexts.end()) 
-		return codeare::CONTEXT_NOT_FOUND;
+	short ret = 0;
+	map<string, ReconContext*>::iterator it;
 
-	return (short) it->second->Prepare();
+	for (it = m_contexts.begin(); it != m_contexts.end(); ++it)
+		if ((ret = it->second->Prepare()) != codeare::OK) {
+			printf ("Preparation of %s \n", it->first.c_str());
+			break;
+		}
+
+	return (short)ret;
 	
 }
 

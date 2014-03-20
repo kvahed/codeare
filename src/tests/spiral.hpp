@@ -8,7 +8,7 @@
 
 using namespace codeare::matrix::io;
 
-template <ConType CT> bool vdspiraltest (Connector<CT>& rc) {
+bool vdspiraltest (Connector& rc) {
 
 	SpiralParams p;
 
@@ -47,7 +47,7 @@ template <ConType CT> bool vdspiraltest (Connector<CT>& rc) {
     st.Stop();
 
     std::stringstream ofname;
-    ofname << base;
+    ofname << base_dir;
     ofname << "/";
     ofname << rc.GetElement("/config/data-out")->Attribute("fname");
     

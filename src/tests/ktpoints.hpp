@@ -20,7 +20,7 @@
 
 #include "matrix/io/IOContext.hpp"
 
-template <ConType CT> bool ktptest (Connector<CT>& con) {
+bool ktptest (Connector& con) {
 
     using namespace codeare::matrix::io;
 
@@ -31,7 +31,7 @@ template <ConType CT> bool ktptest (Connector<CT>& con) {
 	Matrix<float>  k;
 	Matrix<float>  b0;
 	
-    IOContext ic (con.GetElement("/config/data-in"), base, READ);
+    IOContext ic (con.GetElement("/config/data-in"), base_dir, READ);
     target  = ic.Read<cxfl>(con.GetElement("/config/data-in/target"));
     b0      = ic.Read<float>(con.GetElement("/config/data-in/b0"));
     k	    = ic.Read<float>(con.GetElement("/config/data-in/k"));
@@ -58,7 +58,7 @@ template <ConType CT> bool ktptest (Connector<CT>& con) {
 	con.GetMatrix ("grad",   grad);
 	con.GetMatrix ("final", final);
 
-    IOContext oc (con.GetElement("/config/data-out"), base, WRITE);
+    IOContext oc (con.GetElement("/config/data-out"), base_dir, WRITE);
     oc.Write (final, "final");
     oc.Write (rf,    "rf");
     oc.Write (grad,  "grad");

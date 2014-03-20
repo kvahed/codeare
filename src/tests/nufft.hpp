@@ -1,6 +1,6 @@
 #include "matrix/io/IOContext.hpp"
 
-template<ConType CT> bool nuffttest (RRClient::Connector<CT>& rc) {
+bool nuffttest (Connector& rc) {
 
 
 	using namespace codeare::matrix::io;
@@ -10,7 +10,7 @@ template<ConType CT> bool nuffttest (RRClient::Connector<CT>& rc) {
 	Matrix<double> kspace;
 	Matrix<cxdb>   img;
 
-	std::string ipf = base;
+	std::string ipf = base_dir;
 	ipf += rc.GetElement("/config/data-in")->Attribute("fname");
 
 	rc.Init(test);
@@ -32,7 +32,7 @@ template<ConType CT> bool nuffttest (RRClient::Connector<CT>& rc) {
 
 	rc.Finalise(test);
 
-	std::string opf = base;
+	std::string opf = base_dir;
 	opf += rc.GetElement("/config/data-out")->Attribute("fname");
 
 	IOContext out = fopen (opf, WRITE);

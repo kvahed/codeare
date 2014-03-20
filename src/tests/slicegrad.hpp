@@ -1,10 +1,10 @@
 #include "../modules/GradientTiming.hpp"
 
-template <ConType CT> bool slicegrad (Connector<CT>& rc) {
+bool slicegrad (Connector& rc) {
 
 	GradientParams gp;
     
-    IOContext fin (rc.GetElement("/config/data-in"), base, READ);
+    IOContext fin (rc.GetElement("/config/data-in"), base_dir, READ);
     gp.k = fin.Read<double>(rc.GetElement("/config/data-in/kin"));
     fin.Close();
 
@@ -21,7 +21,7 @@ template <ConType CT> bool slicegrad (Connector<CT>& rc) {
 
     Solution s = ComputeGradient (gp);
 
-    IOContext fout (rc.GetElement("/config/data-out"), base, WRITE);
+    IOContext fout (rc.GetElement("/config/data-out"), base_dir, WRITE);
     s.dump (fout);
     fout.Close();
 

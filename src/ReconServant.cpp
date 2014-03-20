@@ -51,8 +51,8 @@ namespace RRServer {
 	}
 	
 	short
-	ReconServant::Init (const char* name, const char* client_id) {
-		return Queue::Init(name, client_id);
+	ReconServant::Init (const char* name, const char* config, const char* client_id) {
+		return Queue::Init(name, config, client_id);
 	}
 	
 	short

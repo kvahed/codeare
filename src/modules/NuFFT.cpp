@@ -92,7 +92,7 @@ NuFFT::Init () {
 	for (size_t i = 0; i < (size_t)dim; i++)
 		ms[i] = N[i];
 
-	ft = NFFT<float> (ms, M * shots, m, alpha);
+	ft = NFFT<double> (ms, M * shots, m, alpha);
 
 	m_initialised = true;
 

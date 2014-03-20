@@ -29,20 +29,13 @@ namespace RRClient {
 
 enum ConType {LOCAL, REMOTE};
 
-template<ConType CT> struct ConSelector;
-template<> struct ConSelector<LOCAL> { typedef LocalConnector Type; };
-template<> struct ConSelector<REMOTE> { typedef RemoteConnector Type; };
-
-
 /**
  * @brief Connector skeleton
  *        Abstraction layer for local or remote access to reconstruction schemes
  */
-template <ConType CT> class Connector {
+class Connector {
 
 public:
-
-	typedef typename ConSelector<CT>::Type T;
 
 	/**
 	 * @brief       Construct with service name and debug level.
@@ -50,8 +43,12 @@ public:
 	 * @param name  Service name
 	 * @param debug Trace level
 	 */
-    Connector       (int args = 0, char** argv = 0, const char* name = 0, const char* debug = 0) {
-        m_conn  = (Connection*) new T (args, argv, name, debug);
+    Connector  (int args = 0, char** argv = 0,
+    		const char* name = 0, const char* debug = 0) {
+    	m_ct = (name==0) ? LOCAL : REMOTE;
+        m_conn = (m_ct==LOCAL) ?
+        		(Connection*) new LocalConnector (args, argv, name, debug) :
+        		(Connection*) new RemoteConnector (args, argv, name, debug);
 	}
 	
 	
@@ -74,7 +71,13 @@ public:
 	 */ 
 	virtual inline codeare::error_code              
 	Process             (const char* name) {
-		return (codeare::error_code) ((T*) m_conn)->Process(name);
+		codeare::error_code ec = codeare::OK;
+		switch (m_ct) {
+		case  LOCAL: ec = (codeare::error_code) ( (LocalConnector*) m_conn)->Process(name); break;
+		case REMOTE: ec = (codeare::error_code) ((RemoteConnector*) m_conn)->Process(name); break;
+		default: break;
+		}
+		return ec;
 	}
 	
 	
@@ -88,7 +91,13 @@ public:
 	 */ 
 	virtual inline codeare::error_code              
 	Prepare             (const char* name) {
-		return (codeare::error_code) ((T*) m_conn)->Prepare(name);
+		codeare::error_code ec = codeare::OK;
+		switch (m_ct) {
+		case  LOCAL: ec = (codeare::error_code) ( (LocalConnector*) m_conn)->Prepare(name); break;
+		case REMOTE: ec = (codeare::error_code) ((RemoteConnector*) m_conn)->Prepare(name); break;
+		default: break;
+		}
+		return ec;
 	}
 	
 	
@@ -101,8 +110,14 @@ public:
 	 * @return          Error code
 	 */ 
 	virtual inline codeare::error_code              
-	Init                (const char* name) {
-		return (codeare::error_code) ((T*) m_conn)->Init(name);
+	Init                (const char* name, const char* config) {
+		codeare::error_code ec = codeare::OK;
+		switch (m_ct) {
+		case  LOCAL: ec = (codeare::error_code) ( (LocalConnector*) m_conn)->Init(name, config); break;
+		case REMOTE: ec = (codeare::error_code) ((RemoteConnector*) m_conn)->Init(name, config); break;
+		default: break;
+		}
+		return ec;
 	}
 	
 	
@@ -116,7 +131,13 @@ public:
 	 */ 
 	virtual inline codeare::error_code              
 	Finalise            (const char* name) {
-		return (codeare::error_code) ((T*) m_conn)->Finalise(name);
+		codeare::error_code ec = codeare::OK;
+		switch (m_ct) {
+		case  LOCAL: ec = (codeare::error_code) ( (LocalConnector*) m_conn)->Finalise(name); break;
+		case REMOTE: ec = (codeare::error_code) ((RemoteConnector*) m_conn)->Finalise(name); break;
+		default: break;
+		}
+		return ec;
 	}
 	
 	
@@ -130,7 +151,11 @@ public:
 	 */
 	template <class S> inline void 
 	SetMatrix           (const std::string& name, Matrix<S>& m) const {
-		((T*) m_conn)->SetMatrix (name, m);
+		switch (m_ct) {
+		case  LOCAL: ( (LocalConnector*) m_conn)->SetMatrix(name, m); break;
+		case REMOTE: ((RemoteConnector*) m_conn)->SetMatrix(name, m); break;
+		default: break;
+		}
 	}
 	
 	
@@ -144,7 +169,11 @@ public:
 	 */
 	template <class S> inline void 
 	GetMatrix           (const std::string& name, Matrix<S>& m) const {
-		((T*) m_conn)->GetMatrix (name, m);
+		switch (m_ct) {
+		case  LOCAL: ( (LocalConnector*) m_conn)->GetMatrix(name, m); break;
+		case REMOTE: ((RemoteConnector*) m_conn)->GetMatrix(name, m); break;
+		default: break;
+		}
 	}
 		
 		
@@ -158,9 +187,30 @@ public:
 	 */
 	template <class S> inline void 
 	ReadConfig        (S config) {
-		((T*) m_conn)->ReadConfig (config);
+		switch (m_ct) {
+		case  LOCAL: ( (LocalConnector*) m_conn)->ReadConfig(config); break;
+		case REMOTE: ((RemoteConnector*) m_conn)->ReadConfig(config); break;
+		default: break;
+		}
 	}
 	
+
+	/**
+	 * @brief          Read configuration
+	 *
+	 *                 @see Configurable::ReadConfig(const char* fname)
+	 *                 @see Configurable::ReadConfig(FILE* file)
+	 *
+	 * @param config   Name of input file or file access pointer
+	 */
+	void SetConfig        (const char *confstr) {
+		switch (m_ct) {
+		case  LOCAL: ( (LocalConnector*) m_conn)->SetConfig(confstr); break;
+		case REMOTE: ((RemoteConnector*) m_conn)->SetConfig(confstr); break;
+		default: break;
+		}
+	}
+
 
 	/**
 	 * @brief           Set a string type attribute
@@ -172,10 +222,14 @@ public:
 	 */
 	template <class S> inline void
 	SetAttribute        (const char* name, S value) {
-		((T*) m_conn)->SetAttribute (name, value);
+		switch (m_ct) {
+		case  LOCAL: ( (LocalConnector*) m_conn)->SetAttribute (name, value); break;
+		case REMOTE: ((RemoteConnector*) m_conn)->SetAttribute (name, value); break;
+		default: break;
+		}
 	}
 
-	
+
 	/**
 	 * @brief           Set a string type attribute
 	 *
@@ -186,7 +240,11 @@ public:
 	 */
 	template <class S> inline int
 	Attribute        (const char* name, S* value) {
-		return ((T*) m_conn)->Attribute (name, value);
+		switch (m_ct) {
+		case  LOCAL: ( (LocalConnector*) m_conn)->Attribute (name, value); break;
+		case REMOTE: ((RemoteConnector*) m_conn)->Attribute (name, value); break;
+		default: break;
+		}
 	}
 
 	
@@ -200,7 +258,13 @@ public:
 	 */
 	inline const char*
 	Attribute          (const char* name) {
-		return ((T*) m_conn)->Attribute (name);
+		const char* ret;
+		switch (m_ct) {
+		case  LOCAL: ret = ( (LocalConnector*) m_conn)->Attribute (name); break;
+		case REMOTE: ret = ((RemoteConnector*) m_conn)->Attribute (name); break;
+		default: break;
+		}
+		return ret;
 	}
 
 	
@@ -214,7 +278,13 @@ public:
 	 */
 	inline const char*
 	GetText            (const char* path) {
-		return ((T*) m_conn)->GetText (path);
+		const char* ret;
+		switch (m_ct) {
+		case  LOCAL: ret = ( (LocalConnector*) m_conn)->GetText (path); break;
+		case REMOTE: ret = ((RemoteConnector*) m_conn)->GetText (path); break;
+		default: break;
+		}
+		return ret;
 	}
 
 	
@@ -228,16 +298,21 @@ public:
 	 */
 	inline TiXmlElement*
 	GetElement          (const char* path) {
-		return ((T*) m_conn)->GetElement (path);
+		TiXmlElement* ret;
+		switch (m_ct) {
+		case  LOCAL: ret = ( (LocalConnector*) m_conn)->GetElement (path); break;
+		case REMOTE: ret = ((RemoteConnector*) m_conn)->GetElement (path); break;
+		default: break;
+		}
+		return ret;
 	}
 
-	
 
 private:
 	
-	
+	ConType m_ct;
 	Connection* m_conn; /**< Actual connection */
-	
+
 };
 	
 

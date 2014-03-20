@@ -31,8 +31,8 @@ SENSE::Prepare () {
 
 	Params p;
 
-    p.Set("smaps", Get<cxfl>("smaps"));       // Sensitivities
-    p.Set("fdims", size(Get<cxfl>("fimgs"))); // Folded dimensions
+    p.Set("smaps", Get<cxfl>("sensitivities"));       // Sensitivities
+    p.Set("fdims", size(Get<cxfl>("aliased"))); // Folded dimensions
 
 	p.Set("compgfm", m_compgfm);              // Compute g-factors?
 	p.Set("nthreads", m_nthreads);            // Number of threads for FFT
@@ -53,7 +53,7 @@ SENSE::Process () {
     SimpleTimer st ("SENSE");
 
     Matrix<cxfl>& out = Get<cxfl>("image");
-    Matrix<cxfl>& in = Get<cxfl>("fimgs");
+    Matrix<cxfl>& in = Get<cxfl>("aliased");
 
     out = m_cs ->* in;
     

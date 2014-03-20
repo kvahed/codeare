@@ -151,7 +151,7 @@ namespace RRClient {
 		 * @return          Error code
 		 */ 
 		codeare::error_code
-		Init                (const std::string& name);
+		Init                (const std::string& name, const std::string& configuration);
 		
 
  		/**

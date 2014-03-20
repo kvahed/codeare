@@ -20,11 +20,9 @@
 
 #include "matrix/io/IOContext.hpp"
 
-template<ConType CT> bool cgsensetest (RRClient::Connector<CT>& rc) {
+bool cgsensetest (Connector& rc, TiXmlElement* txe) {
     
     using namespace codeare::matrix::io;
-
-    // PARC or being scanned
     
     // Incoming
     Matrix<cxfl>  rawdata; // Measurement data O(Nkx,Nky,Nkz)
@@ -33,12 +31,16 @@ template<ConType CT> bool cgsensetest (RRClient::Connector<CT>& rc) {
     Matrix<float> kspace;  // Kspace positions O(Nkx,Nky,Nkz)
 
     // Read data
-    IOContext ic (rc.GetElement("/config/data-in"), base, READ);
+    IOContext ic (rc.GetElement("/config/data-in"), base_dir, READ);
     rawdata = ic.Read<cxfl>(rc.GetElement("/config/data-in/d"));
     kspace  = ic.Read<float>(rc.GetElement("/config/data-in/k"));
     weights = ic.Read<float>(rc.GetElement("/config/data-in/w"));
     sens	= ic.Read<cxfl>(rc.GetElement("/config/data-in/s"));
     ic.Close();
+
+    std::string configuration;
+    configuration << *txe;
+    rc.SetConfig(configuration.c_str());
 
     if (rc.Init (test) != codeare::OK) {
         printf ("Intialising failed ... bailing out!"); 
@@ -62,14 +64,14 @@ template<ConType CT> bool cgsensetest (RRClient::Connector<CT>& rc) {
     //rc.Finalise   (test);
 
     // Write images
-
-	std::string ofname = base;
+/*
+	std::string ofname = base_dir;
     ofname += "/";
 	ofname += rc.GetElement("/config/data-out")->Attribute("fname");
 	IOContext ofile = fopen (ofname, WRITE);
 	fwrite (ofile, cgimg);
 	fclose (ofile);
-
+*/
     return true;
     
 }

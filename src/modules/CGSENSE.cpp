@@ -121,7 +121,7 @@ CGSENSE::Prepare () {
 	codeare::error_code error = codeare::OK;
 
 	Params cgp;
-	cgp["sens_maps"]    = std::string("sens");
+	cgp["sens_maps"]    = std::string("sensitivities");
     cgp["weights_name"] = std::string("weights");
     cgp["verbose"]      = m_verbose;
     cgp["ftiter"]       = (size_t) m_ftmaxit;
@@ -150,10 +150,10 @@ codeare::error_code
 CGSENSE::Process () {
 
 	codeare::error_code error = codeare::OK;
-    const Matrix<cxfl>& sens = Get<cxfl>("sens");
+    const Matrix<cxfl>& sens = Get<cxfl>("sensitivities");
     Matrix<cxfl> data;
 
-    data = (!m_testcase) ? Get<cxfl>("data") : 
+    data = (!m_testcase) ? Get<cxfl>("signals") :
         m_ncs.Trafo (phantom<cxfl>(size(sens,0)), sens);
     if (m_noise)
         data += m_noise * randn<cxfl>(size(data));

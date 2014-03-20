@@ -1,12 +1,12 @@
 #include "../modules/GradientTiming.hpp"
 #include "../modules/SimulatedAnnealing.hpp"
 
-template <ConType CT> bool karbtest (Connector<CT>& rc) {
+bool karbtest (Connector& rc) {
 
 	GradientParams gp;
 
-	std::string in_file;// = std::string (base + "/" + std::string(rc.GetElement("/config/data-in")->Attribute("fname")));
-	std::string out_file;// = std::string (base + "/" + rc.GetElement("/config/data-out")->Attribute("fname"));
+	std::string in_file;// = std::string (base_dir + "/" + std::string(rc.GetElement("/config/data-in")->Attribute("fname")));
+	std::string out_file;// = std::string (base_dir + "/" + rc.GetElement("/config/data-out")->Attribute("fname"));
 
 	bool   simann  = false;
 	size_t hpoints = 1;

@@ -20,14 +20,14 @@
 
 #include "matrix/io/IOContext.hpp"
 
-template <ConType CT> bool sensetest (Connector<CT>& rc) {
+bool sensetest (Connector& rc) {
 	
     using namespace codeare::matrix::io;
 	// Incoming
 	Matrix<cxfl> fimgs;   // Folded images O (Nc, RO, PE/AF, PE2)
 	Matrix<cxfl> smaps;   // Sensitivity maps O (Nc, RO, PE, PE2)
 	
-    IOContext ic (rc.GetElement("/config/data-in"), base, READ);
+    IOContext ic (rc.GetElement("/config/data-in"), base_dir, READ);
     fimgs = ic.Read<cxfl>(rc.GetElement("/config/data-in/in"));
     smaps = ic.Read<cxfl>(rc.GetElement("/config/data-in/sm"));
     ic.Close();
@@ -63,7 +63,7 @@ template <ConType CT> bool sensetest (Connector<CT>& rc) {
 	
 	rc.Finalise   (test);
 	
-	IOContext oc (rc.GetElement("/config/data-out"), base, WRITE);
+	IOContext oc (rc.GetElement("/config/data-out"), base_dir, WRITE);
     oc.Write(ufimg, "image");
     oc.Close();
 

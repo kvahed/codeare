@@ -148,32 +148,26 @@ endif()
 # Test macro -------------------------------------------------------- 
 include (TestMacro)
 
-set (TEST_CALL codeare -t SENSE -b
-  ${PROJECT_SOURCE_DIR}/share/sense -c 3fold.xml)  
+set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/sense -c 3fold.xml)  
 MP_TESTS ("sense" "${TEST_CALL}")
 
-set (TEST_CALL codeare -t KTPoints -b
-  ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml)  
+set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml)  
 MP_TESTS ("ktpoints" "${TEST_CALL}")
 
-set (TEST_CALL codeare -t CompressedSensing -b
-  ${PROJECT_SOURCE_DIR}/share/compressedsensing -c phantom_denoising.xml) 
+set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c phantom_denoising.xml) 
 MP_TESTS ("compressedsensing" "${TEST_CALL}")
 
-if (${GSL_FOUND})
-   set (TEST_CALL codeare -t VDSpiral -b
-     ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml) 
-   MP_TESTS ("vdspiral" "${TEST_CALL}")
-endif()
+#if (${GSL_FOUND})
+#   set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml) 
+#   MP_TESTS ("vdspiral" "${TEST_CALL}")
+#endif()
 
 if (${NFFT_FOUND})
 
-  set (TEST_CALL codeare -t NuFFT -b ${PROJECT_SOURCE_DIR}/share/nufft/ -c
-    16shot.xml) 
+  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/nufft -c 16shot.xml)
   MP_TESTS ("nufft" "${TEST_CALL}")
 
-  set (TEST_CALL codeare -t CGSENSE -b
-    ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
+  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
   MP_TESTS ("cgsense" "${TEST_CALL}")
 
 endif()

@@ -71,7 +71,7 @@ namespace RRStrategy {
 		
 	private:
 		
-		NFFT<float> ft;
+		NFFT<double> ft;
 
 	};
 	

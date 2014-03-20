@@ -116,7 +116,7 @@ namespace RRClient {
 	
 	
 	codeare::error_code
-	RemoteConnector::Init (const std::string& name) {
+	RemoteConnector::Init (const std::string& name, const std::string& configuration) {
 		
 		// Prepare configuration for the journey
 		std::stringstream  temp;
@@ -124,7 +124,7 @@ namespace RRClient {
 		m_rrsi->config  (temp.str().c_str());
 		
 		// Initialise back end
-        if (m_rrsi->Init (name.c_str(), m_client_id.c_str()) != codeare::OK)
+        if (m_rrsi->Init (name.c_str(), configuration.c_str(), m_client_id.c_str()) != codeare::OK)
 	  return codeare::CANNOT_LOAD_LIBRARY;
 		
 		return (codeare::error_code)codeare::OK;

@@ -144,7 +144,7 @@ module RRSModule {
 		 * @param  name   Name of recontruction method
 		 * @return        Unique identifier 
 		 */
-		short      Init (in string name, in string client_id);
+		short      Init (in string name, in string config, in string client_id);
 
 		/**
 		 * @brief         Clear RAM

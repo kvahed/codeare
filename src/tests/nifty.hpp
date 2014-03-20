@@ -5,10 +5,10 @@ nitest (Connector<T>* rc) {
 
 #ifdef HAVE_NIFTI1_IO_H
 	
-	std::string    cf  = std::string (base + std::string(config));
-	std::string    df  = std::string (base + std::string(data));
-	std::string    mat = std::string (base + std::string("betted.mat"));
-	std::string    nii = std::string (base + std::string("betted2.nii.gz"));
+	std::string    cf  = std::string (base_dir + std::string(config));
+	std::string    df  = std::string (base_dir + std::string(data));
+	std::string    mat = std::string (base_dir + std::string("betted.mat"));
+	std::string    nii = std::string (base_dir + std::string("betted2.nii.gz"));
 	
 	Matrix<double> d;
 	NIRead (d, df);

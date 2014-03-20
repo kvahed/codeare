@@ -20,7 +20,7 @@
 
 #include "matrix/io/IOContext.hpp"
 
-template <ConType CT> bool cstest (Connector<CT>& con) {
+bool cstest (Connector& con) {
 
     using namespace codeare::matrix::io;
 
@@ -31,7 +31,7 @@ template <ConType CT> bool cstest (Connector<CT>& con) {
 	Matrix<cxfl>  pc;
 	
     // Read data
-    IOContext ic (con.GetElement("/config/data-in"), base, READ);
+    IOContext ic (con.GetElement("/config/data-in"), base_dir, READ);
     indata = ic.Read<cxfl>(con.GetElement("/config/data-in/data"));
     mask   = ic.Read<float>(con.GetElement("/config/data-in/mask"));
     pdf    = ic.Read<float>(con.GetElement("/config/data-in/pdf"));
@@ -61,7 +61,7 @@ template <ConType CT> bool cstest (Connector<CT>& con) {
 	con.Finalise   (test);
 	
     // Write images
-    IOContext oc (con.GetElement("/config/data-out"), base, WRITE);
+    IOContext oc (con.GetElement("/config/data-out"), base_dir, WRITE);
     oc.Write(im_dc, "im_dc");
     oc.Close();
 	

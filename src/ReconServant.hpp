@@ -121,7 +121,7 @@ namespace RRServer {
 		 * @return     success
 		 */
 		virtual short
-		Init          (const char* name, const char* client_id);
+		Init          (const char* name, const char* config, const char* client_id);
 		
 
 		/**

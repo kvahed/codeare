@@ -92,7 +92,7 @@ namespace RRClient {
 		 * @return     Success
 		 */
 		virtual short
-		Init           (const char* name);
+		Init           (const char* name, const char* configuration);
 		
 
 		/**

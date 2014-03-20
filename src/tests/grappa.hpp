@@ -19,14 +19,14 @@
  */
 
 
-template <ConType CT> bool grappatest (Connector<CT>& rc) {
+bool grappatest (Connector& rc) {
 
     using namespace codeare::matrix::io;
 	// Incoming
 	Matrix<cxdb> scan;   // Folded images O (Nc, RO, PE/AF, PE2)
 	Matrix<cxdb> acs;   // Sensitivity maps O (Nc, RO, PE, PE2)
 	
-    IOContext ic (rc.GetElement("/config/data-in"), base, READ);
+    IOContext ic (rc.GetElement("/config/data-in"), base_dir, READ);
     scan = ic.Read<cxdb>(rc.GetElement("/config/data-in/scan"));
     acs = ic.Read<cxdb>(rc.GetElement("/config/data-in/acs"));
     ic.Close();
@@ -58,7 +58,7 @@ template <ConType CT> bool grappatest (Connector<CT>& rc) {
 	
 	rc.Finalise   (test);
 	
-	IOContext oc (rc.GetElement("/config/data-out"), base, WRITE);
+	IOContext oc (rc.GetElement("/config/data-out"), base_dir, WRITE);
     oc.Write(recon, "recon");
     oc.Close();
 

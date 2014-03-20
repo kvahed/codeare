@@ -32,6 +32,9 @@ template<> struct TypeTraits<float> {
     inline static const std::string Name () {
         return std::string("single");
     }
+    inline static const std::string Abbrev () {
+        return std::string("float");
+    }
     inline static const bool IsComplex() {
         return SameType<T,CT>::val;
     }
@@ -61,6 +64,9 @@ template<> struct TypeTraits<double> {
     static const bool Supported;
     
     inline static const std::string Name () {
+        return std::string("double");
+    }
+    inline static const std::string Abbrev () {
         return std::string("double");
     }
     inline static const bool IsComplex() {
@@ -94,6 +100,9 @@ template<> struct TypeTraits<cxfl> {
     inline static const std::string Name () {
         return std::string("complex single");
     }
+    inline static const std::string Abbrev () {
+        return std::string("cxfl");
+    }
     inline static const bool IsComplex() {
         return SameType<T,CT>::val;
     }
@@ -123,6 +132,9 @@ template<> struct TypeTraits<cxdb> {
     static const bool Supported;
     inline static const std::string Name () {
         return std::string("complex double");
+    }
+    inline static const std::string Abbrev () {
+        return std::string("cxdb");
     }
     inline static const bool IsComplex() {
         return SameType<T,CT>::val;
@@ -154,6 +166,9 @@ template<> struct TypeTraits<short> {
     inline static const std::string Name () {
         return std::string("short int");
     }
+    inline static const std::string Abbrev () {
+        return std::string("short");
+    }
     inline static const bool IsComplex() {
         return SameType<T,CT>::val;
     }
@@ -177,6 +192,9 @@ template<> struct TypeTraits<unsigned char> {
     static const bool Supported;
     inline static const std::string Name () {
         return std::string("codeare bool");
+    }
+    inline static const std::string Abbrev () {
+        return std::string("uchar");
     }
     inline static const bool IsComplex() {
         return SameType<T,CT>::val;
@@ -204,6 +222,9 @@ template<> struct TypeTraits<long> {
     inline static const std::string Name () {
         return std::string("long int");
     }
+    inline static const std::string Abbrev () {
+        return std::string("long");
+    }
     inline static const bool IsComplex() {
         return SameType<T,CT>::val;
     }
@@ -226,6 +247,9 @@ template<> struct TypeTraits<int> {
     typedef void   CT;
     static const bool Supported;
     inline static const std::string Name () {
+        return std::string("int");
+    }
+    inline static const std::string Abbrev () {
         return std::string("int");
     }
     inline static const bool IsComplex() {
@@ -251,6 +275,9 @@ template<> struct TypeTraits<size_t> {
     static const bool Supported;
     inline static const std::string Name () {
         return std::string("size type");
+    }
+    inline static const std::string Abbrev () {
+        return std::string("size_t");
     }
     inline static const bool IsComplex() {
         return SameType<T,CT>::val;

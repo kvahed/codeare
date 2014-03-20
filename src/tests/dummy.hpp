@@ -1,5 +1,5 @@
 
-template <ConType CT> bool  dummytest (Connector<CT>& rc) {
+bool  dummytest (Connector& rc) {
 
     if (rc.Init (test) != codeare::OK) {
         printf ("Intialising failed ... bailing out!"); 

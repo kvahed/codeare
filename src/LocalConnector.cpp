@@ -36,14 +36,14 @@ namespace RRClient {
 	}
 	
 	short
-	LocalConnector::Init (const char* name) {
+	LocalConnector::Init (const char* name, const char* configuration) {
 		
 		std::stringstream  temp;
 		temp << GetConfig();
 		
 		Queue::config  (temp.str().c_str());
 		
-		return Queue::Init (name);
+		return Queue::Init (name, configuration);
 		
 	}
 	

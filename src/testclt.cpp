@@ -19,38 +19,78 @@
  */
 
 #include "testclt.hpp"
+#include "IOContext.hpp"
+
+using namespace codeare::matrix::io;
 
 int main (int argc, char** argv) {
 
-    int error =1;
+    int error = 1;
 	
-	if (init (argc, argv)) {
+	if (commandline_opts (argc, argv)) {
 
-		Connector<LOCAL> con;
-		
-		std::string cf = base;
-		cf += "/"; 
-		cf += std::string(config);
-		if (cf.compare(std::string(base)) != 0)
-          con.ReadConfig (cf.c_str());
+		// Make local or remote connection
+		Connector con (argc, argv, name, verbose);
+		con.ReadConfig (config_file_uri.c_str());
 
-		if      (!strcmp (test, "CGSENSE"))               cgsensetest  (con);
-		else if (!strcmp (test, "SENSE"))                 sensetest    (con);
-		else if (!strcmp (test, "NuFFT"))                 nuffttest    (con);
-		else if (!strcmp (test, "GRAPPA"))                grappatest   (con);
-		else if (!strcmp (test, "KTPoints"))              ktptest      (con);
-		else if (!strcmp (test, "CompressedSensing"))     cstest       (con);
-#ifdef HAVE_GSL
-        else if (!strcmp (test, "VDSpiral"))              vdspiraltest (con);
-		else if (!strcmp (test, "KArb"))                  karbtest     (con);
-        else if (!strcmp (test, "SliceGrad"))             slicegrad    (con);
-#endif
-        else if (!strcmp (test, "DummyRecon"))            dummytest    (con);
-        /*
-		else if (!strcmp (test, "DirectMethod"))          dmtest       (con);
-		else if (!strcmp (test, "RelativeSensitivities")) resetest     (con);
-        */
-        else    {printf ("ERROR: Cannot call unknow module %s\n", test); return 1;}
+		TiXmlElement* datain = con.GetElement("/config/data-in");
+	    TiXmlElement* datain_entry = datain->FirstChildElement("item");
+	    IOContext ic (datain, base_dir, READ);
+
+	    while (datain_entry) {
+	    	const std::string data_name = datain_entry->Attribute("uri");
+	    	const std::string data_type = datain_entry->Attribute("dtype");
+	    	if (!(data_name.length() && data_type.length()))
+	    		printf("Error reading binary data %s with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
+	    	if        (TypeTraits<float>::Abbrev().compare(data_type) == 0)  {
+	    		Matrix<float> M = ic.Read<float>(datain_entry);
+	    		con.SetMatrix(data_name, M);
+	    	} else if (TypeTraits<double>::Abbrev().compare(data_type) == 0) {
+	    		Matrix<double> M = ic.Read<double>(datain_entry);
+	    		con.SetMatrix(data_name, M);
+	    	} else if (TypeTraits<cxfl>::Abbrev().compare(data_type) == 0)   {
+	    		Matrix<cxfl> M = ic.Read<cxfl>(datain_entry);
+	    		con.SetMatrix(data_name, M);
+	    	} else if (TypeTraits<cxdb>::Abbrev().compare(data_type) == 0)   {
+	    		Matrix<cxdb> M = ic.Read<cxdb>(datain_entry);
+	    		con.SetMatrix(data_name, M);
+	    	}
+	    	datain_entry = datain_entry->NextSiblingElement();
+	    }
+
+		TiXmlElement* chain = con.GetElement("/config/chain");
+	    TiXmlElement* module = chain->FirstChildElement("config");
+	    size_t nmodules = 0;
+
+	    while (module) {
+
+	    	std::string config;
+	    	config << *module;
+	    	std::string module_name = module->Attribute("name");
+	    	if (module_name.length() == 0) {
+	    		printf ("  *** ERROR: Module has no name \"%s\" ... bailing out\n", module_name.c_str());
+	    		nmodules = 0;
+	    		break;
+	    	}
+
+	    	printf ("Initialising %s ...\n", module_name.c_str());
+	    	if (con.Init (module->Attribute("name"), config.c_str()) != codeare::OK) {
+	    		printf ("  *** ERROR: Intialising failed ... bailing out!");
+	    		return false;
+	    	}
+	    	module = module->NextSiblingElement();
+	    	nmodules++;
+	    }
+
+
+	    if (nmodules > 0) {
+	    	con.Prepare("");
+	    	con.Process("");
+	    } else {
+	    	printf ("Warning! No modules were found in the configuration file. Exiting\n");
+	    }
+
+	    con.Finalise("");
 
         error = 0;
 
