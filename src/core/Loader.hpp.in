@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <omp.h>
+#include <sstream>
 
 // Thus far only cl.exe and g++
 #if defined(_MSC_VER)
@@ -47,9 +48,10 @@ void*  LoadModule        (char* name) {
 
     void* handle = 0;
     char* error = 0;
-    std::string fname = std::string(name) + std::string(LIB_SUFFIX);
+    std::stringstream fname;
+    fname << std::string(name) << std::string(LIB_SUFFIX);
 
-    std::cout << "Loading library ... " << fname.c_str() << std::endl;
+    std::cout << "Loading library ... " << fname.str().c_str() << std::endl;
     
 #if defined(_MSC_VER) 
     handle = (void*) LoadLibrary(name);

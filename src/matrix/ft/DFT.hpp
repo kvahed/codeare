@@ -37,7 +37,7 @@
  * @return        Shifted
  */
 template <class T> inline Matrix<T>
-fftshift (const Matrix<T>& m, const bool& fw = true) {
+fftshift (const Matrix<T>& m, const bool fw = true) {
 
 	assert (isvec(m) || is2d(m) || is3d(m));
 
