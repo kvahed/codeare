@@ -8,14 +8,14 @@
 
 #include <boost/any.hpp>
 #ifdef HAVE_CXX11_SHARED_PTR
+#  include <memory>
+#  define  shrd_ptr std::shared_ptr
+#  define  mk_shared std::make_shared
+#else
 #  include <boost/shared_ptr.hpp>
 #  include <boost/make_shared.hpp>
 #  define  shrd_ptr boost::shared_ptr
 #  define  mk_shared boost::make_shared
-#else
-#  include <memory>
-#  define  shrd_ptr std::shared_ptr
-#  define  mk_shared std::make_shared
 #endif
 
 #include <map>
