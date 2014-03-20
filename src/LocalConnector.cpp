@@ -24,9 +24,7 @@ namespace RRClient {
 
 	LocalConnector::LocalConnector (int, char**, const char*, const char*) {}
 
-	LocalConnector::~LocalConnector ()               {
-		Queue::Finalise ();
-	}
+	LocalConnector::~LocalConnector () {}
 	
 	short
 	LocalConnector::CleanUp () {	
@@ -47,8 +45,8 @@ namespace RRClient {
 	}
 	
 	
-	short
-	LocalConnector::Process  (const char* name)       {
+    short
+    LocalConnector::Process  (const char* name)       {
 		return Queue::Process (name);
 	}
 	

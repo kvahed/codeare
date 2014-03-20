@@ -60,7 +60,7 @@ namespace RRServer {
 		return Queue::Finalise(name);
 	}
 	
-	short
+    short
 	ReconServant::Process  (const char* name) {
 		return Queue::Process(name);
 	}

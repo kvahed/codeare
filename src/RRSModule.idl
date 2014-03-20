@@ -32,7 +32,8 @@ module RRSModule {
 	typedef sequence<short>  shorts;   /*!< pixel data repositories                 */
 	typedef sequence<long>   longs;    /*!< dimension reositories                   */
 
-
+    typedef short error_code;
+    
 	/**
 	 * @brief   Complex data
 	 */
@@ -116,7 +117,8 @@ module RRSModule {
 		 *
 		 * @param  name   Name of strategy
 		 * @return        Status
-		 */
+
+         */
 		short       Process (in string name);
 		
 		/**

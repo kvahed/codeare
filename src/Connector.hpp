@@ -66,9 +66,7 @@ public:
 	virtual 
 	~Connector () {
 #ifndef _MSC_VER
-		(m_ct == LOCAL) ?
-			delete ((LocalConnector*)m_conn):
-			delete ((RemoteConnector*)m_conn);
+        delete m_conn;
 #endif
 	}
 

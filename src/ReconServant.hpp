@@ -99,7 +99,6 @@ namespace RRServer {
 		virtual short
 		Process        (const char* name);
 		
-		
 		/**
 		 * @brief      Prepare startegy (Needs initialisation @see Init)
 		 *

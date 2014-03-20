@@ -21,10 +21,7 @@
 #include "Queue.hpp"
 
 Queue::~Queue ()               {
-
-    
-	this->Finalise();
-	
+	//this->Finalise();
 }
 
 
@@ -56,7 +53,6 @@ short Queue::Init (const char* name, const char* config, const char* client_id) 
 
 short Queue::Finalise (const char* name) {
 	
-
 	if (name) {
 		map<string, ReconContext*>::iterator it = m_contexts.find (name);
         
@@ -68,7 +64,6 @@ short Queue::Finalise (const char* name) {
 		}
 	}
 	
-    Workspace::Instance().Finalise();
 	return (short) codeare::OK;
 	
 }
@@ -76,7 +71,7 @@ short Queue::Finalise (const char* name) {
 
 short Queue::Process  (const char* name)       {
 	
-	short ret = 0;
+    codeare::error_code ret = codeare::OK;
 	map<string, ReconContext*>::iterator it;
 
 	for (it = m_contexts.begin(); it != m_contexts.end(); ++it)
@@ -85,7 +80,7 @@ short Queue::Process  (const char* name)       {
 			break;
 		}
 
-	return (short)ret;
+	return (short) ret;
 	
 }
 

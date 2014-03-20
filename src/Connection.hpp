@@ -5,7 +5,10 @@
 #include "Configurable.hpp"
 
 namespace RRClient {
-    class Connection {};
+    class Connection {
+    public:
+        virtual ~Connection() {}
+    };
 }
 
 #endif
