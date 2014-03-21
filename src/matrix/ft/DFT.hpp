@@ -388,14 +388,24 @@ public:
 
 
 private:
-	
 
 	inline Matrix<CT>
 	shift (const Matrix<CT>& m, const bool& fw = true) const {
+		switch (ndims(m)) {
+		case  2: return shift2 (m, fw); 
+		case  3: return shift3 (m, fw);
+		default: return shift2 (m, fw);
+		}
+	}
+
+
+	inline Matrix<CT>
+	shift3 (const Matrix<CT>& m, const bool& fw = true) const {
 
 		Matrix<CT> res (vsize(m));
 
 		size_t xi,yi,zi,xs,ys,zs;
+		
 		for (zi = 0; zi < d[2]; zi++) {
 			zs = (zi + c[2]) % d[2];
 			for (yi = 0; yi < d[1]; yi++) {
@@ -414,11 +424,38 @@ private:
 
 	}
 
+	inline Matrix<CT>
+	shift2 (const Matrix<CT>& m, const bool& fw = true) const {
+
+		Matrix<CT> res (vsize(m));
+
+		size_t xi,yi,xs,ys;
+		
+			for (yi = 0; yi < d[1]; yi++) {
+				ys = (yi + c[1]) % d[1];
+				for (xi = 0; xi < d[0]; xi++) {
+					xs = (xi + c[0]) % d[0];
+					if (fw)
+						res(xs,ys) = m(xi,yi);
+					else
+						res(xi,yi) = m(xs,ys);
+				}
+			}
+
+		return res;
+
+	}
+
+
 
 	inline Matrix<CT>
 	ishift(const Matrix<CT>& m) const {
 
-		return shift(m,false);
+		switch (ndims(m)) {
+		case  2: return shift2 (m, false); 
+		case  3: return shift3 (m, false);
+		default: return shift2 (m, false);
+		}
 
 	}
 
