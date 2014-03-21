@@ -91,7 +91,6 @@ if(${MATLAB_FOUND})
     link_directories ("${MATLAB_LIBRARY_DIRS}")
   endif()
 endif()
-message (${MATLAB_LIBRARY_DIRS})
 
 # Linear algebra -----------------------------------------------------
 find_package(LAPACK REQUIRED)

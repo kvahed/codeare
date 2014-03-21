@@ -25,7 +25,7 @@ SENSE::Prepare () {
 
 	printf ("Preparing Cartesian SENSE ...\n");
 
-    AddMatrix<cxfl> ("image");
+    AddMatrix<cxfl> ("unaliased");
 
 	printf ("  allocating Cartesian SENSE operator: ... "); fflush(stdout);
 
@@ -52,7 +52,7 @@ SENSE::Process () {
 
     SimpleTimer st ("SENSE");
 
-    Matrix<cxfl>& out = Get<cxfl>("image");
+    Matrix<cxfl>& out = Get<cxfl>("unaliased");
     Matrix<cxfl>& in = Get<cxfl>("aliased");
 
     out = m_cs ->* in;

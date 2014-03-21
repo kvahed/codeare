@@ -87,6 +87,38 @@ int main (int argc, char** argv) {
 	    } else {
 	    	printf ("Warning! No modules were found in the configuration file. Exiting\n");
 	    }
+
+		TiXmlElement* dataout = con.GetElement("/config/data-out");
+	    TiXmlElement* dataout_entry = dataout->FirstChildElement("item");
+	    IOContext out = IOContext (dataout, base_dir, WRITE);
+
+		while (dataout_entry) {
+	    	const std::string data_name = dataout_entry->Attribute("uri");
+	    	const std::string data_type = dataout_entry->Attribute("dtype");
+	    	if (!(data_name.length() && data_type.length()))
+	    		printf("Error writing binary data %s with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
+			
+	    	if        (TypeTraits<float>::Abbrev().compare(data_type) == 0)  {
+				Matrix<float> M;
+				con.GetMatrix(data_name, M);
+				out.Write<float>(M, dataout_entry);
+	    	} else if (TypeTraits<double>::Abbrev().compare(data_type) == 0) {
+	    		Matrix<double> M;
+				con.GetMatrix(data_name, M);
+				out.Write<double>(M, dataout_entry);
+	    	} else if (TypeTraits<cxfl>::Abbrev().compare(data_type) == 0)   {
+	    		Matrix<cxfl> M;
+				con.GetMatrix(data_name, M);
+				out.Write<cxfl>(M, dataout_entry);
+	    	} else if (TypeTraits<cxdb>::Abbrev().compare(data_type) == 0)   {
+	    		Matrix<cxdb> M;
+				con.GetMatrix(data_name, M);
+				out.Write<cxdb>(M, dataout_entry);
+	    	}
+
+	    	dataout_entry = dataout_entry->NextSiblingElement();
+	    }
+		
 		
 	    con.Finalise();
 

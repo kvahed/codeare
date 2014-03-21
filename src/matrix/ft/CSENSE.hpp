@@ -147,7 +147,7 @@ public:
 				for (int y = 0; y < dims[1]; y++)
 					for (int z = 0; z < dims[2]; z++) {
 						for (int c = 0; c < nc; c++) {
-                            
+
 							ra [c] = (ndim == 3) ? tmp (x, y, z, c) : tmp (x, y, c);
 							
 							for (int zi = 0, i = 0; zi < af[2]; zi++)
@@ -178,16 +178,22 @@ public:
                         for (int zi = 0, i = 0; zi < af[2]; zi++)
                             for (int yi = 0; yi < af[1]; yi++)
                                 for (int xi = 0; xi < af[0]; xi++, i++) {
-                                    res (x + xi * dims[0], y + yi * dims[1] , z + zi * dims[2], 0) = rp [i];
+									if (ndim == 3)
+										res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 0) = rp [i];
+									else
+										res (x + xi * dims[0], y + yi * dims[1], 0) = rp [i];
                                     if (compgfm)
-                                        res (x + xi * dims[0], y + yi * dims[1] , z + zi * dims[2], 1) = sqrt(abs(gf [i]));
+										if (ndim == 3)
+											res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 1) = sqrt(abs(gf [i]));
+										else
+											res (x + xi * dims[0], y + yi * dims[1], 1) = sqrt(abs(gf [i]));
                                 }
-                        
+
                         
 					}
-            
+
         }
-        
+
 		return res;
 		
 	}
