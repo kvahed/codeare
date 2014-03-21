@@ -34,14 +34,19 @@ int main (int argc, char** argv) {
 		con.ReadConfig (config_file_uri.c_str());
 
 		TiXmlElement* datain = con.GetElement("/config/data-in");
-	    TiXmlElement* datain_entry = datain->FirstChildElement("item");
+	    TiXmlElement* datain_entry = datain->FirstChildElement();
 	    IOContext ic (datain, base_dir, READ);
 
 		while (datain_entry) {
-	    	const std::string data_name = datain_entry->Attribute("uri");
+			
+	    	const std::string data_name = datain_entry->Value();
 	    	const std::string data_type = datain_entry->Attribute("dtype");
-	    	if (!(data_name.length() && data_type.length()))
-	    		printf("Error reading binary data %s with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
+
+	    	if (data_name.length() == 0)
+				printf ("***ERROR: specify a non-empty name\n");
+			if (data_type.length() == 0)
+				printf ("***ERROR: reading binary data %s with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
+
 	    	if        (TypeTraits<float>::Abbrev().compare(data_type) == 0)  {
 	    		Matrix<float> M = ic.Read<float>(datain_entry);
 	    		con.SetMatrix(data_name, M);
@@ -55,6 +60,7 @@ int main (int argc, char** argv) {
 	    		Matrix<cxdb> M = ic.Read<cxdb>(datain_entry);
 	    		con.SetMatrix(data_name, M);
 	    	}
+			
 	    	datain_entry = datain_entry->NextSiblingElement();
 	    }
 
@@ -89,11 +95,11 @@ int main (int argc, char** argv) {
 	    }
 
 		TiXmlElement* dataout = con.GetElement("/config/data-out");
-	    TiXmlElement* dataout_entry = dataout->FirstChildElement("item");
+	    TiXmlElement* dataout_entry = dataout->FirstChildElement();
 	    IOContext out = IOContext (dataout, base_dir, WRITE);
 
 		while (dataout_entry) {
-	    	const std::string data_name = dataout_entry->Attribute("uri");
+	    	const std::string data_name = dataout_entry->Value();
 	    	const std::string data_type = dataout_entry->Attribute("dtype");
 	    	if (!(data_name.length() && data_type.length()))
 	    		printf("Error writing binary data %s with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
