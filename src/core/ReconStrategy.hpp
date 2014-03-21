@@ -140,7 +140,7 @@ namespace RRStrategy {
 		 * @return      Reference to matrix
 		 */
 		template <class T> Matrix<T>& 
-		AddMatrix         (const std::string& name, boost::shared_ptr< Matrix<T> > p) const {
+		AddMatrix         (const std::string& name, shared_ptr< Matrix<T> > p) const {
 			return global->AddMatrix(name, p);
 		}
 

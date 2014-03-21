@@ -84,8 +84,12 @@ int main (int argc, char** argv) {
 
 
 	    if (nmodules > 0) {
+	    	cout << "OOps" << endl;
 	    	con.Prepare();
+	    	cout << "OOps" << endl;
 	    	con.Process();
+	    	cout << "OOps" << endl;
+
 	    } else {
 	    	printf ("Warning! No modules were found in the configuration file. Exiting\n");
 	    }

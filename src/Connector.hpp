@@ -80,7 +80,7 @@ public:
 	 * @return          Error code
 	 */ 
 	virtual inline codeare::error_code              
-	Process             (const char* name = 0) {
+	Process             (const char* name = "") {
 		return (m_ct == LOCAL) ? 
 			(codeare::error_code) ( (LocalConnector*) m_conn)->Process(name):
 			(codeare::error_code) ((RemoteConnector*) m_conn)->Process(name);
@@ -96,7 +96,7 @@ public:
 	 * @return          Error code
 	 */ 
 	virtual inline codeare::error_code              
-	Prepare             (const char* name = 0) {
+	Prepare             (const char* name = "") {
 		return (m_ct == LOCAL) ?
 			(codeare::error_code) ( (LocalConnector*) m_conn)->Prepare(name):
 			(codeare::error_code) ((RemoteConnector*) m_conn)->Prepare(name);
@@ -128,7 +128,7 @@ public:
 	 * @return          Error error
 	 */ 
 	virtual inline codeare::error_code              
-	Finalise            (const char* name = 0) {
+	Finalise            (const char* name = "") {
 		return (m_ct == LOCAL) ?
 			(codeare::error_code) ( (LocalConnector*) m_conn)->Finalise(name):
 			(codeare::error_code) ((RemoteConnector*) m_conn)->Finalise(name);

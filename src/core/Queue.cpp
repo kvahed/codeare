@@ -51,17 +51,14 @@ short Queue::Init (const char* name, const char* config, const char* client_id) 
 
 short Queue::Finalise (const char* name) {
 	
-	if (name) {
-		map<string, ReconContext*>::iterator it = m_contexts.find (name);
-        
-		if (it == m_contexts.end())
-			return codeare::CONTEXT_NOT_FOUND;
-		else {
-			delete it->second;
-			m_contexts.erase(it);
-		}
+	map<string, ReconContext*>::iterator it;
+
+	while (!m_contexts.empty()) {
+		it = m_contexts.begin();
+		delete it->second;
+		m_contexts.erase(it);
 	}
-	
+
 	Workspace::Instance().Finalise();
 	return (short) codeare::OK;
 	

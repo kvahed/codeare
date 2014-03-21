@@ -125,7 +125,7 @@ namespace RRClient {
 		
 		// Initialise back end
         if (m_rrsi->Init (name.c_str(), configuration.c_str(), m_client_id.c_str()) != codeare::OK)
-	  return codeare::CANNOT_LOAD_LIBRARY;
+        	return codeare::CANNOT_LOAD_LIBRARY;
 		
 		return (codeare::error_code)codeare::OK;
 		
