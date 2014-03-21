@@ -37,8 +37,7 @@ set (prefix ${CMAKE_INSTALL_PREFIX})
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp.in"
   "${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.hpp" @ONLY) 
 list (APPEND SOURCES GitSHA1.hpp)
-list (APPEND SOURCES options.h options.cpp core/Workspace.hpp
-  core/Workspace.cpp) 
+list (APPEND SOURCES options.h options.cpp) 
 
 if (WINDOWS)
   list (APPEND COMLIBS hdf5 hdf5_cpp)

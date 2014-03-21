@@ -37,7 +37,7 @@ int main (int argc, char** argv) {
 	    TiXmlElement* datain_entry = datain->FirstChildElement("item");
 	    IOContext ic (datain, base_dir, READ);
 
-	    while (datain_entry) {
+		while (datain_entry) {
 	    	const std::string data_name = datain_entry->Attribute("uri");
 	    	const std::string data_type = datain_entry->Attribute("dtype");
 	    	if (!(data_name.length() && data_type.length()))
@@ -58,10 +58,9 @@ int main (int argc, char** argv) {
 	    	datain_entry = datain_entry->NextSiblingElement();
 	    }
 
-	    TiXmlElement* chain = con.GetElement("/config/chain");
+		TiXmlElement* chain = con.GetElement("/config/chain");
 	    TiXmlElement* module = chain->FirstChildElement();
 	    size_t nmodules = 0;
-
 	    while (module) {
 
 	    	std::string config;
@@ -82,18 +81,13 @@ int main (int argc, char** argv) {
 	    	nmodules++;
 	    }
 
-
 	    if (nmodules > 0) {
-	    	cout << "OOps" << endl;
 	    	con.Prepare();
-	    	cout << "OOps" << endl;
 	    	con.Process();
-	    	cout << "OOps" << endl;
-
 	    } else {
 	    	printf ("Warning! No modules were found in the configuration file. Exiting\n");
 	    }
-
+		
 	    con.Finalise();
 
         error = 0;

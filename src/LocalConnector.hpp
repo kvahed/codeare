@@ -121,7 +121,7 @@ namespace RRClient {
 		 * @param  m        Data
 		 */
 		template <class T> void 
-		SetMatrix           (const std::string& name, Matrix<T>& m) const {
+		SetMatrix           (const std::string& name, Matrix<T>& m) const {			
 			Workspace::Instance().SetMatrix(name, m);
 		}
 		

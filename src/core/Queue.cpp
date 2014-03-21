@@ -70,13 +70,14 @@ short Queue::Process  (const char* name)       {
     codeare::error_code ret = codeare::OK;
 	map<string, ReconContext*>::iterator it;
 
-	for (it = m_contexts.begin(); it != m_contexts.end(); ++it)
+	for (it = m_contexts.begin(); it != m_contexts.end(); ++it) {
+		cout << it->first << endl;
 		if ((ret = it->second->Process()) != codeare::OK) {
-			printf ("Procession of %s \n", it->first.c_str());
+			printf ("Procession of %s failed\n", it->first.c_str());
 			break;
 		}
-
-	return (short) ret;
+	}
+	return (short)ret;
 	
 }
 

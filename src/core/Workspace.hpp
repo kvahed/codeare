@@ -122,7 +122,7 @@ class DLLEXPORT Workspace {
 	template <class T> inline void
 	SetMatrix          (const std::string& name, Matrix<T>& m) {
 
-	  std::vector<std::string> tag(2);
+	    std::vector<std::string> tag(2);
 		tag[0] = sha256(name);
 		tag[1] = typeid(T).name();
 

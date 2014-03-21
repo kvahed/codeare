@@ -45,7 +45,11 @@ digest (const std::string& in, const std::string& type) {
 
 inline static std::string 
 sha256 (const std::string& in) {
+#if defined(_MSC_VER) && (_MSC_VER < 1600)
+	return in;
+#else
 	return digest (in, "sha256");
+#endif
 }
 
 
