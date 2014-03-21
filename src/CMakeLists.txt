@@ -105,7 +105,7 @@ endif()
 ### codeare ###
 add_executable (codeare ${OMNIORB_GENERATED} ${SOURCES}
   Connector.hpp LocalConnector.hpp LocalConnector.cpp
-  ${NETWORKING_SOURCES} testclt.cpp)  
+  ${NETWORKING_SOURCES} codeare.hpp codeare.cpp)  
 target_compile_definitions (codeare PRIVATE ${OORB_DEFINES})
 target_link_libraries (codeare ${COMLIBS})
 

@@ -18,7 +18,7 @@
  *  02110-1301  USA
  */
 
-#include "testclt.hpp"
+#include "codeare.hpp"
 #include "IOContext.hpp"
 
 using namespace codeare::matrix::io;
@@ -84,13 +84,13 @@ int main (int argc, char** argv) {
 
 
 	    if (nmodules > 0) {
-	    	con.Prepare("");
-	    	con.Process("");
+	    	con.Prepare();
+	    	con.Process();
 	    } else {
 	    	printf ("Warning! No modules were found in the configuration file. Exiting\n");
 	    }
 
-	    con.Finalise("");
+	    con.Finalise();
 
         error = 0;
 

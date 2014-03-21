@@ -20,9 +20,7 @@
 
 #include "Queue.hpp"
 
-Queue::~Queue ()               {
-	//this->Finalise();
-}
+Queue::~Queue () {}
 
 
 short Queue::CleanUp () {
@@ -64,6 +62,7 @@ short Queue::Finalise (const char* name) {
 		}
 	}
 	
+	Workspace::Instance().Finalise();
 	return (short) codeare::OK;
 	
 }
