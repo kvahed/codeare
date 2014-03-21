@@ -65,9 +65,7 @@ public:
 	 */
 	virtual 
 	~Connector () {
-#ifndef _MSC_VER
         delete m_conn;
-#endif
 	}
 
 
