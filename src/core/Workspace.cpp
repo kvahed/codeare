@@ -43,22 +43,22 @@ void Workspace::Print (std::ostream& os) const {
 	    const size_t kl = k_name.length();
 
 	    os << setw(24) << k_name << " | ";
-	    if (b.type() == typeid(shared_ptr<Matrix<float> >))
-		    os << "           float |" << setw(8) << size(*boost::any_cast<shared_ptr<Matrix<float> > >(b));
-	    else if (b.type() == typeid(shared_ptr<Matrix<double> >))
-		    os << "          double |" << setw(8) << size(*boost::any_cast<shared_ptr<Matrix<double> > >(b));
-	    else if (b.type() == typeid(shared_ptr<Matrix<cxfl> >))
-		    os << "  complex<float> |" << setw(8) << size(*boost::any_cast<shared_ptr<Matrix<cxfl> > >(b));
-	    else if (b.type() == typeid(shared_ptr<Matrix<cxdb> >))
-		    os << " complex<double> |" << setw(8) << size(*boost::any_cast<shared_ptr<Matrix<cxdb> > >(b));
-	    else if (b.type() == typeid(shared_ptr<Matrix<short> >))
-		    os << "           short |" << setw(8) << size(*boost::any_cast<shared_ptr<Matrix<short> > >(b));
-	    else if (b.type() == typeid(shared_ptr<Matrix<long> >))
-		    os << "            long |" << setw(8) << size(*boost::any_cast<shared_ptr<Matrix<long> > >(b));
-	    else if (b.type() == typeid(shared_ptr<Matrix<size_t> >))
-		    os << "          size_t |" << setw(8) << size(*boost::any_cast<shared_ptr<Matrix<size_t> > >(b));
-	    else if (b.type() == typeid(shared_ptr<Matrix<cbool> >))
-		    os << "            bool |" << setw(8) << size(*boost::any_cast<shared_ptr<Matrix<cbool> > >(b));
+	    if (b.type() == typeid(shrd_ptr<Matrix<float> >))
+		    os << "           float |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<float> > >(b));
+	    else if (b.type() == typeid(shrd_ptr<Matrix<double> >))
+		    os << "          double |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<double> > >(b));
+	    else if (b.type() == typeid(shrd_ptr<Matrix<cxfl> >))
+		    os << "  complex<float> |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<cxfl> > >(b));
+	    else if (b.type() == typeid(shrd_ptr<Matrix<cxdb> >))
+		    os << " complex<double> |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<cxdb> > >(b));
+	    else if (b.type() == typeid(shrd_ptr<Matrix<short> >))
+		    os << "           short |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<short> > >(b));
+	    else if (b.type() == typeid(shrd_ptr<Matrix<long> >))
+		    os << "            long |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<long> > >(b));
+	    else if (b.type() == typeid(shrd_ptr<Matrix<size_t> >))
+		    os << "          size_t |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<size_t> > >(b));
+	    else if (b.type() == typeid(shrd_ptr<Matrix<cbool> >))
+		    os << "            bool |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<cbool> > >(b));
 	}
 
     os << "\n\nParameters\n" ;
