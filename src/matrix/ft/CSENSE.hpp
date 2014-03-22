@@ -179,6 +179,18 @@ public:
                         for (int zi = 0, i = 0; zi < af[2]; zi++)
                             for (int yi = 0; yi < af[1]; yi++)
                                 for (int xi = 0; xi < af[0]; xi++, i++) {
+#if defined (_MSC_VER) && (_MSC_VER < 1600)
+									if (ndim == 3)
+										res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 0) = rp [i];
+									else
+										res (x + xi * dims[0], y + yi * dims[1],                   0) = rp [i];
+                                    if (compgfm) {
+										if (ndim == 3)
+											res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 1) = sqrt(abs(gf [i]));
+										else
+											res (x + xi * dims[0], y + yi * dims[1],                   1) = sqrt(abs(gf [i]));
+                                    }
+#else
 									if (ndim == 3)
 										res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 0) = rp [i];
 									else
@@ -189,8 +201,9 @@ public:
 										else
 											res (x + xi * dims[0], y + yi * dims[1],                0, 1) = sqrt(abs(gf [i]));
                                     }
-                                }
-
+                                
+#endif
+								}
                         
 					}
 
