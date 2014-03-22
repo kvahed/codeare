@@ -49,8 +49,9 @@ if (${MATLAB_FOUND})
   else ()
     set (LD_ENV "${LD_ENV}:${MATLAB_LIBRARY_DIRS};Release")
   endif ()
-  set (TEST_CALL t_matlab)  
-  MP_TESTS ("matlab" "${TEST_CALL}")
+
+  #set (TEST_CALL t_matlab -b 2)  
+  #MP_TESTS ("matlab" "${TEST_CALL}")
   
 endif()
 

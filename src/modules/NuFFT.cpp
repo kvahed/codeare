@@ -121,7 +121,7 @@ NuFFT::Process () {
 
     SimpleTimer st ("NuFFT");
 
-    Matrix<cxdb> img =  ft ->* Get<cxfl> ("data");
+    Matrix<cxfl> img =  ft ->* Get<cxfl> ("data");
     wspace.Add ("img", img);
 
 	clear (data);

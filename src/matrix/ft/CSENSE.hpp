@@ -142,6 +142,7 @@ public:
 					Volume (tmp, i, ft ->* Volume (tmp, i));
 
 			// Antialiasing
+
 #pragma omp for
 			for (int x = 0; x < dims[0]; x++)
 				for (int y = 0; y < dims[1]; y++)
@@ -181,16 +182,18 @@ public:
 									if (ndim == 3)
 										res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 0) = rp [i];
 									else
-										res (x + xi * dims[0], y + yi * dims[1], 0) = rp [i];
-                                    if (compgfm)
+										res (x + xi * dims[0], y + yi * dims[1],                0, 0) = rp [i];
+                                    if (compgfm) {
 										if (ndim == 3)
 											res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 1) = sqrt(abs(gf [i]));
 										else
-											res (x + xi * dims[0], y + yi * dims[1], 1) = sqrt(abs(gf [i]));
+											res (x + xi * dims[0], y + yi * dims[1],                0, 1) = sqrt(abs(gf [i]));
+                                    }
                                 }
 
                         
 					}
+
 
         }
 

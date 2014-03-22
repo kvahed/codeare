@@ -155,13 +155,8 @@ public:
 		
 		size_t cpsz = k.Size();
 		assert (cpsz = m_fplan.M_total * m_rank);
+		std::copy (k.Begin(), k.End(), m_fplan.x);
 
-		if (sizeof(T) == sizeof(double))
-			memcpy (m_fplan.x, k.Ptr(), cpsz * sizeof(double));
-		else 
-			for (size_t i = 0; i < cpsz; ++i)
-				m_fplan.x[i] = k[i];
-		
 	}
 	
 	
@@ -175,13 +170,8 @@ public:
 		
 		size_t cpsz = w.Size();
 		assert (cpsz = m_fplan.M_total);
+		std::copy (w.Begin(), w.End(), m_iplan.w);
 
-		if (sizeof(T) == sizeof(double))
-			memcpy (m_iplan.w, w.Ptr(), cpsz * sizeof(double));
-		else 
-			for (size_t i = 0; i < cpsz; ++i)
-				m_iplan.w[i] = w[i];
-		
 		NFFTTraits<double>::Weights (m_fplan, m_iplan);
 		NFFTTraits<double>::Psi     (m_fplan);
 		
