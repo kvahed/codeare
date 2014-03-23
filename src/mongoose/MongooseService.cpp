@@ -13,9 +13,11 @@
 #  include <atomic>         // std::atomic
 #  define thread_i std::thread
 #else
+#ifndef __clang__
 #  include <boost/thread.hpp>
 #  include <boost/bind.hpp>
 #  define thread_i boost::thread
+#endif
 #endif
 namespace codeare {
 namespace service {
@@ -61,7 +63,9 @@ namespace service {
     }
 
     MongooseService::MongooseService() {
+#ifndef __clang__
         thread_i thrd (Serve);
+#endif
     }
     
     MongooseService::~MongooseService() {}
