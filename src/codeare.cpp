@@ -33,7 +33,7 @@ int main (int argc, char** argv) {
 		// Make local or remote connection
 		Connector con (argc, argv, name, verbose);
 		if (!con.ReadConfig (config_file_uri.c_str())) {
-            printf ("*** ERROR: No or corrupt configuration file specified to algorithm! \n", config_file_uri.c_str());
+            printf ("*** ERROR: No or corrupt configuration file specified to algorithm! \n");
             return (int)codeare::CONFIG_LOAD_FILE_FAILED;
         }
 
@@ -42,7 +42,7 @@ int main (int argc, char** argv) {
 
 
 		if (!datain) {
-			printf ("*** WARNING: No input data specified to algorithm! \n", config_file_uri.c_str());
+			printf ("*** WARNING: No input data specified to algorithm! \n");
 		} else {
 			TiXmlElement* datain_entry = datain->FirstChildElement();
 			IOContext ic (datain, base_dir, READ);
@@ -57,7 +57,7 @@ int main (int argc, char** argv) {
 
 				if (data_name.length() == 0) {
 					printf ("*** ERROR: specify a non-empty name for a data set\n");
-					printf ("           Entry: %s\n", datain_entry);
+					std::cout << "           Entry: " << *datain_entry << std::endl;
 				}
 
 				if (data_type.length() == 0)
@@ -78,7 +78,7 @@ int main (int argc, char** argv) {
 					con.SetMatrix(data_name, M);
 				} else  {
 					printf ("*** ERROR: Couldn't load a data set specified in\n");
-					printf ("           Entry: %s\n", datain_entry);
+					std::cout << "           Entry: " << *datain_entry << std::endl;
 					return codeare::WRONG_OR_NO_DATASET;
 				}
 
@@ -129,7 +129,7 @@ int main (int argc, char** argv) {
 
 		TiXmlElement* dataout = con.GetElement("/config/data-out");
 		if (!dataout)
-			printf ("*** WARNING: No output data expected from algorithm? \n", config_file_uri.c_str());
+			printf ("*** WARNING: No output data expected from algorithm? \n");
 
 		else {
 
