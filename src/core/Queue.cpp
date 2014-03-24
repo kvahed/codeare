@@ -70,7 +70,10 @@ short Queue::Process  (const char* name)       {
 
 	for (it = m_contexts.begin(); it != m_contexts.end(); ++it) {
 		cout << it->first << endl;
-		if ((ret = it->second->Process()) != codeare::OK) {
+		SimpleTimer t(name);
+		ret = it->second->Process();
+		t.Stop();
+		if (ret != codeare::OK) {
 			printf ("Procession of %s failed\n", it->first.c_str());
 			break;
 		}

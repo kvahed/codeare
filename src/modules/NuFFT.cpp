@@ -119,13 +119,8 @@ NuFFT::Prepare () {
 codeare::error_code
 NuFFT::Process () {
 
-    SimpleTimer st ("NuFFT");
-
     Matrix<cxfl> img =  ft ->* Get<cxfl> ("data");
     wspace.Add ("img", img);
-
-	clear (data);
-	
 	return codeare::OK;
 
 }

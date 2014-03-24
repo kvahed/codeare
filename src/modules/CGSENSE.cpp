@@ -158,9 +158,7 @@ CGSENSE::Process () {
     if (m_noise)
         data += m_noise * randn<cxfl>(size(data));
 
-    SimpleTimer st("CGSENSE");
     Matrix<cxfl> img = m_ncs ->* data;
-    st.Stop();
     
     wspace.Add("image", img);
 	return error;

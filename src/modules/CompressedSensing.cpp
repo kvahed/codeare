@@ -125,14 +125,11 @@ CompressedSensing::Process () {
 	
 	printf ("  Running ?? %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
-
-	SimpleTimer st ("CompressedSensing");
 	for (size_t i = 0; i < (size_t)m_csiter; i++) {
 		NLCG (im_dc, data, m_csparam);
 		if (m_verbose)
 			vc.push_back(dwt ->* im_dc*ma);
 	}
-    st.Stop();
     
     if (m_verbose) {
         size_t cpsz = numel(im_dc);

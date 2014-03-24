@@ -133,10 +133,10 @@ int main (int argc, char** argv) {
 
 		else {
 
-	    TiXmlElement* dataout_entry = dataout->FirstChildElement();
-	    IOContext out = IOContext (dataout, base_dir, WRITE);
+			TiXmlElement* dataout_entry = dataout->FirstChildElement();
+			IOContext out = IOContext (dataout, base_dir, WRITE);
 
-		while (dataout_entry) {
+			while (dataout_entry) {
 				const std::string data_name = dataout_entry->Value();
 				const std::string data_type = dataout_entry->Attribute("dtype");
 				codeare::error_code ec;
@@ -147,25 +147,28 @@ int main (int argc, char** argv) {
 				if        (TypeTraits<float>::Abbrev().compare(data_type) == 0)  {
 					Matrix<float> M;
 					if ((ec = con.GetMatrix(data_name, M)) == codeare::OK)
-						out.Write<float>(M, dataout_entry);
+						out.Write(M, dataout_entry);
 				} else if (TypeTraits<double>::Abbrev().compare(data_type) == 0) {
 					Matrix<double> M;
 					if ((ec = con.GetMatrix(data_name, M)) == codeare::OK)
-						out.Write<double>(M, dataout_entry);
+						out.Write(M, dataout_entry);
 				} else if (TypeTraits<cxfl>::Abbrev().compare(data_type) == 0)   {
 					Matrix<cxfl> M;
 					if ((ec = con.GetMatrix(data_name, M)) == codeare::OK)
-						out.Write<cxfl>(M, dataout_entry);
+						out.Write(M, dataout_entry);
 				} else if (TypeTraits<cxdb>::Abbrev().compare(data_type) == 0)   {
 					Matrix<cxdb> M;
 					if ((ec = con.GetMatrix(data_name, M)) == codeare::OK)
-						out.Write<cxdb>(M, dataout_entry);
+						out.Write(M, dataout_entry);
 				}
 
-				if (ec == codeare::NO_MATRIX_IN_WORKSPACE_BY_NAME)
+				if (ec == codeare::NO_MATRIX_IN_WORKSPACE_BY_NAME) {
 					printf ("*** ERROR: No dataset by name \"%s\" found ... bailing out!\n", data_name.c_str());
-				else if (ec == codeare::WRONG_MATRIX_TYPE)
+					return (int) ec;
+				} else if (ec == codeare::WRONG_MATRIX_TYPE) {
 					printf ("*** ERROR: Dataset by name \"%s\" found. Wrong type requested though ... bailing out!\n", data_name.c_str());
+					return (int) ec;
+				}
 
 				dataout_entry = dataout_entry->NextSiblingElement();
 			}

@@ -460,8 +460,6 @@ KTPoints::Process   ()     {
 	Matrix<float>& res  = AddMatrix<float> ("nrmse");
     res = Matrix<float> (m_maxiter,1);
 
-    SimpleTimer st ("KT-Points");
-
     while (!amps_ok) {
         
 		// Compute SEM
