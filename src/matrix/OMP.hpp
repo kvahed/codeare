@@ -21,7 +21,6 @@
 #ifndef _OMP_H_
 #define _OMP_H_
 #ifdef _OPENMP
-#warning "_OPENMP"
 #include <omp.h>
 #else
 inline int  omp_get_thread_num () { return 0;}
