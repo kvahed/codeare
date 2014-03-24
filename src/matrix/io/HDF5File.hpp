@@ -113,7 +113,7 @@ namespace io {
 
 
 		template<class T> Matrix<T>
-		Read (const std::string& uri) const {
+		Read (const std::string& uri) const throw () {
 
 			T         t       = (T) 0;
 			DataSet   dataset = m_file.openDataSet(uri);
@@ -141,7 +141,6 @@ namespace io {
 			Matrix<T> M (mdims);
 			dataset.read (&M[0], *type);
 
-
 			if (this->m_verb)
 				printf ("O(%s) done\n", DimsToCString(M));
 
@@ -155,7 +154,7 @@ namespace io {
 
 
 		template<class T> bool
-		Write (const Matrix<T>& M, const std::string& uri) {
+		Write (const Matrix<T>& M, const std::string& uri) throw () {
 
 			T t = (T)0;
 			Group group, *tmp;

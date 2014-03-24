@@ -203,7 +203,7 @@ namespace RRClient {
 		 * @param  name     Name
 		 * @param  m        Receive storage
 		 */
-		template <class T> void 
+		template <class T> codeare::error_code
 		GetMatrix           (const std::string& name, Matrix<T>& m) const {
 
 			typename RemoteTraits<T>::CORBA_Type ct;
@@ -222,6 +222,8 @@ namespace RRClient {
 			m = Matrix<T> (mdims, mress);
 			size_t ms = m.Size();
 			memcpy (&m[0], &ct.vals[0], ms * sizeof(T));
+
+			return codeare::OK;
 
 		}
 		

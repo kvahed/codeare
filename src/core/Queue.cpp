@@ -33,17 +33,15 @@ short Queue::CleanUp () {
 
 short Queue::Init (const char* name, const char* config, const char* client_id) {
 	
-	ReconContext* rc;
+	ReconContext* rc = new ReconContext(name);
 	
-	m_contexts.insert (pair< std::string, ReconContext* > (std::string(client_id) + std::string(name), rc = new ReconContext(name)));
-
     rc->SetConfig (config);
-
 	if ((rc->Init()) != codeare::OK) {
 		this->Finalise();
-		return codeare::CONTEXT_CONFIGURATION_FAILED;
+		return (short) codeare::CONTEXT_CONFIGURATION_FAILED;
 	}
 
+	m_contexts.insert (pair< std::string, ReconContext* > (std::string(client_id) + std::string(name), rc));
 	return (short) codeare::OK;
 	
 }

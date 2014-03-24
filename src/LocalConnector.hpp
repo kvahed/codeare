@@ -132,9 +132,9 @@ namespace RRClient {
 		 * @param  name     Name
 		 * @param  m        Receive storage
 		 */
-		template <class T> void 
+		template <class T> codeare::error_code
 		GetMatrix           (const std::string& name, Matrix<T>& m) const {
-			Workspace::Instance().GetMatrix(name, m);
+			return Workspace::Instance().GetMatrix(name, m);
 		}
 		
 		

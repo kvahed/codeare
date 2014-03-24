@@ -29,10 +29,11 @@ namespace RRStrategy {
 ReconContext::~ReconContext () {
 	
 	std::cout << "Deleting context " << m_strategy->Name() << " ..." << std::endl;
-
-	destroy_t* destroy = (destroy_t*) GetFunction(m_dlib, (char*)"destroy");
-	destroy(m_strategy);
-	CloseModule (m_dlib);
+	if (m_dlib) {
+		destroy_t* destroy = (destroy_t*) GetFunction(m_dlib, (char*)"destroy");
+		destroy(m_strategy);
+		CloseModule (m_dlib);
+	}
 
 	std::cout << "... done." << std::endl << "-----------------------------" << std::endl; 
 	
@@ -42,11 +43,14 @@ ReconContext::~ReconContext () {
 ReconContext::ReconContext (const char* name) {
 
 	m_dlib = LoadModule ((char*)name);
-	create_t* create = (create_t*) GetFunction (m_dlib, (char*)"create");
-	m_strategy = create();
-	m_strategy->Name (name);
-    m_strategy->WSpace (&Workspace::Instance());
-	
+    if (m_dlib) {
+        create_t* create = (create_t*) GetFunction (m_dlib, (char*)"create");
+        m_strategy = create();
+        m_strategy->Name (name);
+        m_strategy->WSpace (&Workspace::Instance());
+	} else
+		m_strategy = 0;
+     
 }
 
 
@@ -56,48 +60,52 @@ ReconContext::ReconContext     () : m_strategy(0), m_dlib(0) {}
 		
 codeare::error_code
 ReconContext::Process          () {
-	return m_strategy->Process();
+    return (m_strategy) ? m_strategy->Process() : codeare::NULL_STRATEGY;
 }
 
 
 codeare::error_code
 ReconContext::Init             () {
-	return m_strategy->Init();
+    return (m_strategy) ? m_strategy->Init() : codeare::NULL_STRATEGY;
 }
 
 
 codeare::error_code
 ReconContext::Prepare             () {
-	return m_strategy->Prepare();
+    return (m_strategy) ? m_strategy->Prepare() : codeare::NULL_STRATEGY;
 }
 
 
 codeare::error_code
 ReconContext::Finalise     () {
-	return m_strategy->Finalise();
+    return (m_strategy) ? m_strategy->Finalise() : codeare::NULL_STRATEGY;
 }
 
 
 void
 ReconContext::SetConfig        (const char* cstr) {
-	m_strategy->SetConfig(cstr);
+    if (m_strategy)
+        m_strategy->SetConfig(cstr);
 }
 
 
-void
+bool
 ReconContext::ReadConfig       (const char* fname) {
-	m_strategy->ReadConfig(fname);
+    return (m_strategy) ? m_strategy->ReadConfig(fname) : false;
 }
 
 
 void 
 ReconContext::Name (const char* name) { 
-	m_strategy->Name(name);
+	if (m_strategy)
+        m_strategy->Name(name);
 }
 
 
 const char* 
-ReconContext::Name () {return m_strategy->Name();}
+ReconContext::Name () {
+    return (m_strategy) ? m_strategy->Name() : 0;
+}
 
 
 }

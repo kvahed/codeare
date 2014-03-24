@@ -78,19 +78,19 @@ class DLLEXPORT Workspace {
 	
 	
     template <class T> inline Matrix<T>&
-	Get              (const std::string& name) {
+	Get              (const std::string& name) throw () {
 
 		reflist::iterator it = m_ref.find(name);
 
         if (it == m_ref.end())
-            printf ("**WARNING**: Matrix %s could not be found in workspace!\n", name.c_str());
+            printf ("*** WARNING: Matrix %s could not be found in workspace!\n", name.c_str());
 
         const boost::any& ba = m_store[it->second[0]];
 
         try {
 			boost::any_cast<shrd_ptr<Matrix<T> > >(m_store[it->second[0]]);
 		} catch (const boost::bad_any_cast& e) {
-			printf ("**WARNING**: Failed to retrieve %s - %s.\n             Requested %s - have %s.\n",
+			printf ("*** WARNING: Failed to retrieve %s - %s.\n             Requested %s - have %s.\n",
 					name.c_str(), e.what(),
                     demangle(typeid(shrd_ptr<Matrix<T> >).name()).c_str(),
                     demangle(ba.type().name()).c_str());
@@ -106,9 +106,13 @@ class DLLEXPORT Workspace {
 	 * @param  name  Name
 	 * @param  m     CXFL data storage 
 	 */
-	template <class T> inline void
+	template <class T> inline codeare::error_code
 	GetMatrix          (const std::string& name, Matrix<T>& m) {
-        m = Get<T>(name);
+		codeare::error_code ec = Exists<T>(name);
+		if (ec == codeare::OK)
+        	m = Get<T>(name);
+		return ec;
+
 	}
 
 	
@@ -226,11 +230,15 @@ class DLLEXPORT Workspace {
 	 * @param  name  Name
 	 * @return       Success
 	 */
-	inline bool
+	template<class T> inline codeare::error_code
 	Exists (const std::string& name) const {
 
         reflist::const_iterator nit = m_ref.find(name);
-        return (nit == m_ref.end()) ? false : true;
+        if (nit == m_ref.end())
+        	return codeare::NO_MATRIX_IN_WORKSPACE_BY_NAME;
+        else if (nit->second[1].compare(typeid(T).name()))
+        	return codeare::WRONG_MATRIX_TYPE;
+        return codeare::OK;
 
     }
 

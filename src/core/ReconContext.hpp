@@ -113,7 +113,7 @@ namespace RRStrategy {
 		 *
 		 * @param  fname File name
 		 */
-		void
+		bool
 		ReadConfig       (const char* fname);
 		
 		

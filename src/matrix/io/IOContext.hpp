@@ -420,7 +420,7 @@ namespace io{
 		 * @brief   Return concrete handle's status
 		 */
 		template <class T>
-		bool Write (const Matrix<T>& M, const std::string& uri) {
+		bool Write (const Matrix<T>& M, const std::string& uri) throw () {
 
 			if (m_iof) {
 				switch (m_ios) {
@@ -450,7 +450,7 @@ namespace io{
 		 * @brief   Return concrete handle's status
 		 */
 		template<class T> Matrix<T>
-		Read (const TiXmlElement* txe) const {
+		Read (const TiXmlElement* txe) const throw () {
 
 			if (m_iof) {
 				switch (m_ios) {

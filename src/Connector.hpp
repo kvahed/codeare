@@ -157,9 +157,9 @@ public:
 	 * @param  name     Name
 	 * @param  m        Receive storage
 	 */
-	template <class S> inline void 
+	template <class S> inline codeare::error_code
 	GetMatrix           (const std::string& name, Matrix<S>& m) const {
-		(m_ct == LOCAL) ?
+		return (m_ct == LOCAL) ?
 			( (LocalConnector*) m_conn)->GetMatrix(name, m):
 			((RemoteConnector*) m_conn)->GetMatrix(name, m);
 	}
