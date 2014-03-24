@@ -388,9 +388,9 @@ class Configurable {
 	 *
 	 * @param  fname   Name of input file
 	 */
-	void 
+	bool 
 	ReadConfig        (const char* fname) {
-		m_config_doc->LoadFile (fname);
+		return m_config_doc->LoadFile (fname);
 	}
 	
 
@@ -399,9 +399,9 @@ class Configurable {
 	 *
 	 * @param  file    File pointer
 	 */
-	void 
+	bool 
 	ReadConfig        (FILE* file) {
-		m_config_doc->LoadFile (file);
+		return m_config_doc->LoadFile (file);
 	}
 	
 

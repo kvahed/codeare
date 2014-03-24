@@ -32,7 +32,10 @@ int main (int argc, char** argv) {
 
 		// Make local or remote connection
 		Connector con (argc, argv, name, verbose);
-		con.ReadConfig (config_file_uri.c_str());
+		if (!con.ReadConfig (config_file_uri.c_str())) {
+            printf ("*** ERROR: Cannot read configuration %s ... bailing out!\n", config_file_uri.c_str());
+            return (int)codeare::CONFIG_LOAD_FILE_FAILED;
+        }
 
 		TiXmlElement* datain = con.GetElement("/config/data-in");
 	    TiXmlElement* datain_entry = datain->FirstChildElement();
@@ -47,12 +50,12 @@ int main (int argc, char** argv) {
 	    	const std::string data_type = datain_entry->Attribute("dtype");
 
 	    	if (data_name.length() == 0) {
-				printf ("***ERROR: specify a non-empty name for a data set\n");
-				printf ("          Entry: %s\n", datain_entry);
+				printf ("*** ERROR: specify a non-empty name for a data set\n");
+				printf ("           Entry: %s\n", datain_entry);
 	    	}
 
 			if (data_type.length() == 0)
-				printf ("***ERROR: reading binary data %s with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
+				printf ("*** ERROR: reading binary data %s with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
 
 			// TODO: check first if entry exists and has right format
 	    	if        (TypeTraits<float>::Abbrev().compare(data_type) == 0)  {
@@ -68,8 +71,8 @@ int main (int argc, char** argv) {
 	    		Matrix<cxdb> M = ic.Read<cxdb>(datain_entry);
 	    		con.SetMatrix(data_name, M);
 	    	} else  {
-				printf ("***ERROR: Couldn't load a data set specified in\n");
-				printf ("          Entry: %s\n", datain_entry);
+				printf ("*** ERROR: Couldn't load a data set specified in\n");
+				printf ("           Entry: %s\n", datain_entry);
 	    	}
 			
 	    	datain_entry = datain_entry->NextSiblingElement();

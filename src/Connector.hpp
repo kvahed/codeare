@@ -173,9 +173,9 @@ public:
 	 *
 	 * @param config   Name of input file or file access pointer
 	 */
-	template <class S> inline void 
+	template <class S> inline bool 
 	ReadConfig        (S config) {
-		(m_ct == LOCAL) ?
+		return (m_ct == LOCAL) ?
 			( (LocalConnector*) m_conn)->ReadConfig(config):
 			((RemoteConnector*) m_conn)->ReadConfig(config);
 	}

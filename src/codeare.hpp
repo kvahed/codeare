@@ -1,6 +1,5 @@
 #include "options.h"
 #include "GitSHA1.hpp"
-
 #include "Connector.hpp"
 
 #ifndef __WIN32__
@@ -50,8 +49,8 @@ bool commandline_opts (int argc, char** argv) {
 	opt.addUsage  ("");
 	opt.addUsage  (" -n, --name    Remote service name (for example: ReconService)");
 	opt.addUsage  (" -v, --verbose Debug level 0-40 (default: 0)");
-	opt.addUsage  (" -b, --base    Base directory of approved files.");
-	opt.addUsage  (" -c, --config  Configuration XML (NuFFT, CGSENSE).");
+	opt.addUsage  (" -b, --base    Base directory of approved files. Default: current directory ('.').");
+	opt.addUsage  (" -c, --config  Configuration XML. Default: codeare.xml.");
 	opt.addUsage  ("");
 	opt.addUsage  (" -h, --help    Print this help screen");
 	opt.addUsage  ("");
@@ -65,27 +64,26 @@ bool commandline_opts (int argc, char** argv) {
 	opt.processCommandArgs(argc, argv);
 	
 	// Help screen
-	if ( !(opt.hasOptions()) || opt.getFlag("help")) {
+	if (/* !(opt.hasOptions()) ||*/ opt.getFlag("help")) {
 		opt.printUsage();
 		return false;
 	} 
 	
 	// Debug level
-	verbose = (opt.getValue("verbose" )         &&
-		  atoi(opt.getValue("verbose"))  >= 0   &&
-		  atoi(opt.getValue("verbose"))  <= 40) ? opt.getValue("verbose") : ZERO;
+    char* tmp = opt.getValue("verbose");
+	verbose  = (tmp && atoi(tmp) >= 0 && atoi(tmp)  <= 40) ? tmp : ZERO;
 
-	// Remote service's CORBA name default ""
-	name    = (opt.getValue("name")   &&
-			   opt.getValue("name")   != EMPTY) ? opt.getValue(   "name") : 0;
+	// Remote service's CORBA name default "" if specified, remote access is assumed
+    tmp      = opt.getValue("name");
+	name     = (tmp && tmp != EMPTY) ? tmp : 0;
 
 	// Base directory for data
-	base_dir    = (opt.getValue("base")   &&
-			   opt.getValue("base")   != EMPTY) ? opt.getValue(   "base") : 0;
+    tmp      = opt.getValue("base");
+	base_dir = (tmp && tmp != EMPTY) ? tmp : (char*) ".";
 
-	// Configuration file
-	config  = (opt.getValue("config") &&
-			   opt.getValue("config") != EMPTY) ? opt.getValue( "config") : 0;
+	// Configuration file, default: config.xml
+    tmp      = opt.getValue("config");
+	config   = (tmp && tmp != EMPTY) ? tmp : (char*) "config.xml";
 
 	config_file_uri  = base_dir;
 	config_file_uri += "/";
@@ -95,10 +93,3 @@ bool commandline_opts (int argc, char** argv) {
 	
 }
 
-
-/*#ifdef HAVE_MAT_H
-bool init (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
-	//std::string("codeare").c_str();
-	return true;
-}
-#endif*/
