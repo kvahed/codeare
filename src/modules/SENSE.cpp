@@ -50,8 +50,6 @@ SENSE::Prepare () {
 codeare::error_code
 SENSE::Process () { 
 
-    SimpleTimer st ("SENSE");
-
     Matrix<cxfl>& out = Get<cxfl>("unaliased");
     Matrix<cxfl>& in = Get<cxfl>("aliased");
 
