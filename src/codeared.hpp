@@ -40,6 +40,7 @@
 #endif
 
 #include "options.h"
+#include "GitSHA1.hpp"
 
 #ifndef SVN_REVISION
     #define SVN_REVISION "unkown"
@@ -52,10 +53,18 @@ using namespace RRServer;
 
 bool init (int argc, char** argv) {
 
+#ifdef HAVE_MPI
+  //Grid& gd = Grid::Instance();
+  //if (gd.rk == 0) {
+#endif
+    cout << endl << "codeare service " << VERSION ; 
+
+#ifdef GIT_SHA1
+    cout << " [" << GIT_SHA1 << "]";
+#endif
     cout << endl;
-    cout << "codeare service "         << VERSION                                     << endl;
-#ifdef GIT_COMMIT
-    cout << "Commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
+#ifdef HAVE_MPI
+//  }
 #endif
 
     Options *opt = new Options();
