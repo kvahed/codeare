@@ -92,7 +92,7 @@ if (${OMNIORB4_FOUND})
   
   ### codeared ###
   add_executable (codeared ${OMNIORB_GENERATED} ${SOURCES}
-    codeared.cpp ReconServant.hpp ReconServant.cpp)
+    codeared.cpp codeared.hpp ReconServant.hpp ReconServant.cpp)
   target_compile_definitions (codeared PRIVATE ${OORB_DEFINES})
   target_link_libraries (codeared mongoose ${COMLIBS} ${Boost_THREAD_LIBRARY})  
   

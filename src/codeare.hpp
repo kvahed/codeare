@@ -16,7 +16,7 @@ using namespace RRClient;
 #include <time.h>
 #include <stdio.h>
 
-char  *name = 0, *base_dir = 0, *config = 0, *verbose = 0, *EMPTY = (char*)"", *ZERO = (char*)"0";
+char  *name = 0, *base_dir = 0, *config = 0, *debug = 0, *EMPTY = (char*)"", *ZERO = (char*)"0";
 const char *test;
 std::string config_file_uri;
 bool   pulses;
@@ -48,18 +48,18 @@ bool commandline_opts (int argc, char** argv) {
 	opt.addUsage  ("codeare -c <configuration_file> -b <base_dir> [OPTIONS]");
 	opt.addUsage  ("");
 	opt.addUsage  (" -n, --name    Remote service name (for example: ReconService)");
-	opt.addUsage  (" -v, --verbose Debug level 0-40 (default: 0)");
+	opt.addUsage  (" -d, --debug   Debug level 0-40 (default: 0)");
 	opt.addUsage  (" -b, --base    Base directory of approved files. Default: current directory ('.').");
 	opt.addUsage  (" -c, --config  Configuration XML. Default: codeare.xml.");
 	opt.addUsage  ("");
 	opt.addUsage  (" -h, --help    Print this help screen");
 	opt.addUsage  ("");
 	
-	opt.setFlag   ("help"    ,'h');
-	opt.setOption ("name"   , 'n');
-	opt.setOption ("verbose", 'v');
-	opt.setOption ("config" , 'c');
-	opt.setOption ("base"   , 'b');
+	opt.setFlag   ("help"  , 'h');
+	opt.setOption ("name"  , 'n');
+	opt.setOption ("debug" , 'd');
+	opt.setOption ("config", 'c');
+	opt.setOption ("base"  , 'b');
 	
 	opt.processCommandArgs(argc, argv);
 	
@@ -70,8 +70,8 @@ bool commandline_opts (int argc, char** argv) {
 	} 
 	
 	// Debug level
-	char* tmp = opt.getValue("verbose");
-	verbose  = (tmp && atoi(tmp) >= 0 && atoi(tmp)  <= 40) ? tmp : ZERO;
+	char* tmp = opt.getValue("debug");
+	debug  = (tmp && atoi(tmp) >= 0 && atoi(tmp)  <= 40) ? tmp : ZERO;
 	
 	// Remote service's CORBA name default "" if specified, remote access is assumed
 	tmp      = opt.getValue("name");

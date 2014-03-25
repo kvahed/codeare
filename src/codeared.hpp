@@ -45,10 +45,7 @@
     #define SVN_REVISION "unkown"
 #endif
 
-char*  name;
-char*  debug;
-char*  logfile;
-char*  port;
+char  *name, *debug, *logfile, *port, *EMPTY = (char*)"", *FIVE = (char*)"5";
 
 using namespace std;
 using namespace RRServer;
@@ -63,15 +60,15 @@ bool init (int argc, char** argv) {
 
     Options *opt = new Options();
 
-    opt->addUsage  ("Copyright (C) 2010-2012");
+    opt->addUsage  ("Copyright (C) 2010-2014");
     opt->addUsage  ("Kaveh Vahedipour<k.vahedipour@fz-juelich.de>");
     opt->addUsage  ("Juelich Research Centre");
     opt->addUsage  ("Medical Imaging Physics");
     opt->addUsage  ("");
     opt->addUsage  ("Usage:");
-    opt->addUsage  ("reconserver -n <servicename> [-l <logfile> -d <debuglevel>]");
+    opt->addUsage  ("codeared -n <servicename> [-l <logfile> -d <debuglevel>]");
     opt->addUsage  ("");
-    opt->addUsage  (" -n, --name     Service name");
+    opt->addUsage  (" -n, --name     Service name (default: codeared)");
     opt->addUsage  (" -d, --debug    Debug level 0-40 (default: 5)");
     opt->addUsage  (" -l, --logfile  Log file (default: ./reconserver.log)");
     opt->addUsage  (" -p, --httpport http service port (default 8080)");
@@ -88,7 +85,7 @@ bool init (int argc, char** argv) {
 
     opt->processCommandArgs(argc, argv);
 
-    if ( !(opt->hasOptions()) || opt->getFlag("help") ) {
+    if (/* !(opt->hasOptions()) ||*/ opt->getFlag("help") ) {
 
         opt->printUsage();
         delete opt;
@@ -96,23 +93,17 @@ bool init (int argc, char** argv) {
 
     }
 
-    debug   = (opt->getValue("debug")                &&
-               atoi(opt->getValue("debug")) >= 0     &&
-               atoi(opt->getValue("debug")) <= 40)    ?
-            		   opt->getValue("debug")   : (char*)"5";
+    char* tmp = opt->getValue("debug");
+    debug   = (tmp && atoi(tmp) >= 0 && atoi(tmp)  <= 40) ? tmp : FIVE;
 
-    logfile = (opt->getValue("logfile")              &&
-               opt->getValue("logfile") != (char*)"") ?
-            		   opt->getValue("logfile") : (char*)"./codeared.log";
+    tmp = opt->getValue("logfile");
+    logfile = (tmp && strcmp(tmp,EMPTY)) ? tmp : (char*)"./codeared.log";
 
-    name    = (opt->getValue("name")                 &&
-               opt->getValue("name") != (char*)"")    ?
-            		   opt->getValue("name")    : (char*)"ReconService";
+    tmp = opt->getValue("name");
+    name    = (tmp && strcmp(tmp,EMPTY)) ? tmp : (char*) "codeared";
 
-    port    = (opt->getValue("httpport")             &&
-            atoi(opt->getValue("httpport")) >= 0     &&
-            atoi(opt->getValue("httpport")) <= 65536) ?
-            		  opt->getValue("httpport") : (char*)"8080";
+    tmp = opt->getValue("httpport");
+    port    = (tmp && atoi(tmp) >= 0 && atoi(tmp) <= 65536) ? tmp : (char*)"8080";
 
     delete opt;
     return true;

@@ -31,7 +31,7 @@ int main (int argc, char** argv) {
 	if (commandline_opts (argc, argv)) {
 
 		// Make local or remote connection
-		Connector con (argc, argv, name, verbose);
+		Connector con (argc, argv, name, debug);
 		if (!con.ReadConfig (config_file_uri.c_str())) {
             printf ("*** ERROR: No or corrupt configuration file specified to algorithm! \n");
             return (int)codeare::CONFIG_LOAD_FILE_FAILED;
