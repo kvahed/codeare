@@ -75,15 +75,15 @@ bool commandline_opts (int argc, char** argv) {
 	
 	// Remote service's CORBA name default "" if specified, remote access is assumed
 	tmp      = opt.getValue("name");
-	name     = (tmp && strcmp(tmp,EMPTY)==0) ? tmp : 0;
+	name     = (tmp && strcmp(tmp,EMPTY)) ? tmp : 0;
 	
 	// Base directory for data
 	tmp      = opt.getValue("base");
-	base_dir = (tmp && strcmp(tmp,EMPTY)==0) ? tmp : EMPTY;
+	base_dir = (tmp && strcmp(tmp,EMPTY)) ? tmp : EMPTY;
 	
 	// Configuration file, default: config.xml
 	tmp      = opt.getValue("config");
-	config   = (tmp && strcmp(tmp,EMPTY)==0) ? tmp : (char*) "config.xml";
+	config   = (tmp && strcmp(tmp,EMPTY)) ? tmp : (char*) "config.xml";
 	
 	config_file_uri  = base_dir;
 	config_file_uri += "/";

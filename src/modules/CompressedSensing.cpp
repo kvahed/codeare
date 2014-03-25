@@ -123,7 +123,7 @@ CompressedSensing::Process () {
 	
 	im_dc    = dwt * im_dc;
 	
-	printf ("  Running ?? %i NLCG iterations ... \n", m_csiter); fflush(stdout);
+	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
 	for (size_t i = 0; i < (size_t)m_csiter; i++) {
 		NLCG (im_dc, data, m_csparam);
