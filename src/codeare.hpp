@@ -36,9 +36,9 @@ bool commandline_opts (int argc, char** argv) {
 #ifdef HAVE_MPI
 //  }
 #endif
-
+	
 	Options opt;
-		
+	
 	opt.addUsage  ("Copyright (C) 2010-2014");
 	opt.addUsage  ("Kaveh Vahedipour<k.vahedipour@fz-juelich.de>");
 	opt.addUsage  ("Juelich Research Centre");
@@ -65,26 +65,26 @@ bool commandline_opts (int argc, char** argv) {
 	
 	// Help screen
 	if (/* !(opt.hasOptions()) ||*/ opt.getFlag("help")) {
-		opt.printUsage();
-		return false;
+	    opt.printUsage();
+	    return false;
 	} 
 	
 	// Debug level
-    char* tmp = opt.getValue("verbose");
+	char* tmp = opt.getValue("verbose");
 	verbose  = (tmp && atoi(tmp) >= 0 && atoi(tmp)  <= 40) ? tmp : ZERO;
-
+	
 	// Remote service's CORBA name default "" if specified, remote access is assumed
-    tmp      = opt.getValue("name");
-	name     = (tmp && tmp != EMPTY) ? tmp : 0;
-
+	tmp      = opt.getValue("name");
+	name     = (tmp && strcmp(tmp,EMPTY)==0) ? tmp : 0;
+	
 	// Base directory for data
-    tmp      = opt.getValue("base");
-	base_dir = (tmp && tmp != EMPTY) ? tmp : (char*) ".";
-
+	tmp      = opt.getValue("base");
+	base_dir = (tmp && strcmp(tmp,EMPTY)==0) ? tmp : EMPTY;
+	
 	// Configuration file, default: config.xml
-    tmp      = opt.getValue("config");
-	config   = (tmp && tmp != EMPTY) ? tmp : (char*) "config.xml";
-
+	tmp      = opt.getValue("config");
+	config   = (tmp && strcmp(tmp,EMPTY)==0) ? tmp : (char*) "config.xml";
+	
 	config_file_uri  = base_dir;
 	config_file_uri += "/";
 	config_file_uri += std::string(config);
