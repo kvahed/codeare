@@ -25,7 +25,6 @@
 #include <string.h>
 #include <cstdlib>
 #include <iostream>
-#include <omp.h>
 #include <sstream>
 
 // Thus far only cl.exe and g++

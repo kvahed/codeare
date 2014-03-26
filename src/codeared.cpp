@@ -18,7 +18,7 @@
  *  02110-1301  USA
  */
 
-#include "codeared.h"
+#include "codeared.hpp"
 #include "MongooseService.hpp"
 
 void http_service () {

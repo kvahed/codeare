@@ -3,6 +3,7 @@
 	* CMake wins
 	* Windows build includes all tests 
 	* Windows build has been tested with VS 2008, 2010 and 2013
+	* Testcases now entirely XML configured
 
 2012-12-27 Kaveh Vahedpour <k.vahedipour@fz-juelich.de> (1.1)
 
