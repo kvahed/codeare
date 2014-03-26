@@ -27,7 +27,6 @@
 									   selective excitation, open-source, Non-Uniform FFT, NUFFT" /> 
 		
 		<link rel="stylesheet" href="screen.css" type="text/css" media="screen" />
-		<link rel="stylesheet" href="codeare.css" type="text/css" media="screen" />
 				
 		<script type="text/javascript" src="sh_main.js"></script>
 		<script type="text/javascript" src="sh_cpp.js"></script>
@@ -45,7 +44,7 @@
 		<div id="topborder"></div>
 		
 		<div id="sidebar">
-		  <h1><a href="http://codeare.org/">codeare<em>1.0b</em></a></h1>
+		  <h1><a href="http://codeare.org/">codeare<em>1.2</em></a></h1>
 		  
 		  <ul id="nav">
 			<li><a id="index" href="index.html">home</a></li>
@@ -60,8 +59,8 @@
 			navhl();
 		  </script>
 		  <div class="callout">
-			<a href="download.html" >v1.0b released<br />
-			<span class="date">on <script type="text/javascript" language="JavaScript">document.write(document.lastModified);</script></span>
+			<a href="download.html" >v1.2 released<br />
+			<span class="date">on Mar 26 2014 </span>
 			<br/>by kaveh vahedipour</a>
 		  </div>
 		  <br/>

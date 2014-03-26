@@ -6,7 +6,7 @@
 
     \subsection matrixla Linear algebra
 	
-	\li ::chol Cholesky factorisation
+	\li ::chol() Cholesky factorisation
 	\li ::dot  Dot product
 	\li ::dotc Dot product with complex cojugate transpose
 	\li ::eig  Eigenvalue decomposition

@@ -21,11 +21,11 @@
 	<p>
 	  Download test data for the available modules<br/>(unpack in top
 	  codeare folder):<br/>
-	  <a href="http://codeare.org/download/matlab_share.tar.gz">
+	  <a href="http://codeare.org/download/matlab_share.zip">
 	  <code>If you built codeare <b>with</b> MATLAB support</code>
 	  </a>
-<br/>
-	  <a href="http://codeare.org/download/hdf5_share.tar.gz">
+      <br/>
+	  <a href="http://codeare.org/download/hdf5_share.zip">
 	  <code>If you built codeare <b>without</b> MATLAB support</code>
 	  </a>
 

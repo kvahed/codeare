@@ -1,5 +1,5 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
+w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -123,7 +123,7 @@ CompressedSensing::Process () {
 	
 	im_dc    = dwt * im_dc;
 	
-	printf ("  Running ?? %i NLCG iterations ... \n", m_csiter); fflush(stdout);
+	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
 	for (size_t i = 0; i < (size_t)m_csiter; i++) {
 		NLCG (im_dc, data, m_csparam);
