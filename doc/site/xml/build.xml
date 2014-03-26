@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<main>
+  <title>install</title>
+  <article>  
+    <![CDATA[
+	
+    <h2>Building codeare</h2>
+    
+    <p class="lead">
+      Windows 64
+    </p>
+    
+    <p>
+      These steps have been tested with Visual Studio 8 and 10.
+    </p>
+    
+	<h3>Getting prerequisites</h3>
+    You will need to download 64 bit versions of FFTW, boost, ACML (or
+    any other feasible BLAS implementation)
+    <pre class="sh_sh">
+      
+    </pre>
+
+    ]]>
+  </article>
+</main>
