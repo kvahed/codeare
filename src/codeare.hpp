@@ -16,7 +16,7 @@ using namespace RRClient;
 #include <time.h>
 #include <stdio.h>
 
-char  *name = 0, *base_dir = 0, *config = 0, *debug = 0, *EMPTY = (char*)"", *ZERO = (char*)"0";
+char  *name = 0, *base_dir = 0, *config = 0, *debug = 0, *EMPTY = (char*)"", *ZERO = (char*)"0", *CURRENT = (char*)".";
 std::string config_file_uri;
 bool   pulses;
 int    rank;
@@ -79,7 +79,7 @@ bool commandline_opts (int argc, char** argv) {
     
     // Base directory for data
     tmp      = opt.getValue("base");
-    base_dir = (tmp && strcmp(tmp,EMPTY)) ? tmp : EMPTY;
+    base_dir = (tmp && strcmp(tmp,EMPTY)) ? tmp : CURRENT;
     
     // Configuration file, default: config.xml
     tmp      = opt.getValue("config");
