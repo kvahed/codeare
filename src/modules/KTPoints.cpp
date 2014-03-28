@@ -128,15 +128,17 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
 
     d[nk-1] = 1.0e-5 * pd[nk-1] / 2;
 
-    cxfl pgd ((float)0.f, (float)(10.f*TWOPI*GAMMA));
+    cxfl pgd (0.f, 10.f*TWOPI*GAMMA);
 
-    #pragma omp parallel for
-    for (int k = 0; k < nk; k++) 
+#pragma omp parallel for default (shared)
+    for (int k = 0; k < nk; k++) {
+        float tpdk = TWOPI * d[k];
         for (int s = 0; s < ns; s++) {
-            cxfl eikr = pgd * exp (cxfl(0, ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s) + TWOPI * d[k] * b0(s)));
+            cxfl eikr = pgd * std::polar (1.f, ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s) + tpdk * b0(s));
             for (int c = 0; c < nc; c++)
                 m(s,c*nk+k) =  b1(s,c) * eikr;
         }
+    }
     
 	printf ("  ... done.\n");
 
