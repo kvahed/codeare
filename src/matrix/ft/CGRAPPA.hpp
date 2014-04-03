@@ -118,10 +118,8 @@ public:
 	 */
 	Matrix<CT>
 	Adjoint (const Matrix<CT>& kspace) const {
-
 		Matrix<T> res;
 		return res;
-
 	}
 
 
@@ -130,10 +128,8 @@ public:
 	 */
 	Matrix<CT>
 	Trafo (const Matrix<CT>& image) const {
-
 		Matrix<T> res;
 		return res;
-
 	}
 
 private:

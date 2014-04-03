@@ -27,10 +27,12 @@
 #include "Algos.hpp"
 #include "Complex.hpp"
 
+#include <algorithm>
+
 #include "nfft3util.h"
 #include "nfft3.h"
 
-#include "../config.h"
+#include "config.h"
 
 template <class T> struct NFFTTraits { };
 
@@ -65,7 +67,7 @@ template <> struct NFFTTraits<float> {
 			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
 		
 		solverf_init_advanced_complex 
-			(&inp, (nfftf_nfft_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
+			(&inp, (nfftf_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
 		
 		return 0;
 		
@@ -93,7 +95,7 @@ template <> struct NFFTTraits<float> {
 		container<int> _N(N), _n(n);
 		int _d (N.size()), _M(M), _m(m);
 
-		return Init (_d, &_N[0], _M, &_n[0], _m, np, inp);
+		return Init (_d, _N.ptr(), _M, _n.ptr(), _m, np, inp);
 
 	}
 
@@ -111,18 +113,18 @@ template <> struct NFFTTraits<float> {
 	ITrafo              (Plan& np, Solver& spc,
 			const int maxiter = 3, const double epsilon = 3e-7) {
 		
-		int k, l;
+		int k;
 		
 		/* init some guess */
-		for (k = 0; k < np.N_total; k++) {
-			spc.f_hat_iter[k][0] = 0.0;
-			spc.f_hat_iter[k][1] = 0.0;
+		for (k = 0; k < np.N_total; ++k) {
+			spc.f_hat_iter[k][0] = 0.;
+			spc.f_hat_iter[k][1] = 0.;
 		}
 		
 		/* inverse trafo */
 		solverf_before_loop_complex(&spc);
 		
-		for (l = 0; l < maxiter; l++) {
+		for (k = 0; k < maxiter; ++k) {
 			if (spc.dot_r_iter < epsilon) 
 				break;
 			solverf_loop_one_step_complex(&spc);
@@ -305,13 +307,11 @@ template <> struct NFFTTraits<double> {
 	 * @return success
 	 */
 	inline static int
-	Init  (const container<size_t>& N, const size_t& M, const container<size_t>& n,
-			const size_t& m, Plan& np, Solver& inp) {
+	Init  (const container<size_t>& N, size_t M, const container<size_t>& n,
+		size_t m, Plan& np, Solver& inp) {
 
 		container<int> _N(N), _n(n);
-		int _d (N.size()), _M(M), _m(m);
-
-		return Init (_d, &_N[0], _M, &_n[0], _m, np, inp);
+		return Init ((int)N.size(), _N.ptr(), (int)M, _n.ptr(), m, np, inp);
 
 	}
 
@@ -327,22 +327,14 @@ template <> struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	ITrafo              (Plan& np, Solver& spc, const int maxiter = 3, const double epsilon = 3e-7) {
-		
-		int k, l;
-		
-		/* init some guess */
-		for (k = 0; k < np.N_total; k++) {
-			spc.f_hat_iter[k][0] = 0.0;
-			spc.f_hat_iter[k][1] = 0.0;
-		}
+	ITrafo              (Plan& np, Solver& spc, int maxiter = 3, const double epsilon = 3.e-7) {
+
+		double* dptr = (double*)spc.f_hat_iter;
+	    std::fill_n(dptr, 2*np.N_total, 0.);
 		
 		/* inverse trafo */
 		solver_before_loop_complex(&spc);
-		
-		for (l = 0; l < maxiter; l++) {
-			if (spc.dot_r_iter < epsilon) 
-				break;
+		while (maxiter-- && spc.dot_r_iter > epsilon) {
 			solver_loop_one_step_complex(&spc);
 		}
 		
@@ -395,32 +387,34 @@ template <> struct NFFTTraits<double> {
 	inline static int
 	Weights              (const Plan& np, const Solver& spc) {
 		
-		int j, k, z, N = np.N[0];
+		int j, k, z, N = np.N[0], N2 = N*N, NH = .5*N;
 		
-		if (spc.flags & PRECOMPUTE_DAMP) {
+		if (spc.flags & PRECOMPUTE_DAMP)
 			if (np.d == 3) {
-				for (j = 0; j < N; j++) {
-					int    j2 = j - N/2; 
-					for (k = 0; k < N; k++) {
-						int    k2 = k - N/2;
-						for (z = 0; z < N; z++) {
-							int    z2 = z - N/2;
-							double r  = sqrt(j2*j2+k2*k2+z2*z2);
-							spc.w_hat[z*N*N+j*N+k] = (r > (double) N/2) ? 0.0 : 1.0;
+				for (j = 0; j < N; ++j) {
+					int  j2 = j - NH;
+					j2 *= j2;
+					for (k = 0; k < N; ++k) {
+						int    k2 = k - NH;
+						k2 *= k2;
+						for (z = 0; z < N; ++z) {
+							int    z2 = z - NH;
+							double r  = sqrt(j2+k2+z2*z2);
+							spc.w_hat[z*N2+j*N+k] = (r > NH) ? 0. : 1.;
 						}
 					}
 				}
 			} else {
 				for (j = 0; j < N; j++) {
-					int    j2 = j-N/2;
+					int j2 = j-NH;
+					j2 *= j2;
 					for (k = 0; k < N; k++) {
-						int    k2 = k-N/2;
-						double r  = sqrt(j2*j2+k2*k2);
-						spc.w_hat[j*N+k]       = (r > (double) N/2) ? 0.0 : 1.0;
+						int    k2 = k-NH;
+						double r  = sqrt(j2+k2*k2);
+						spc.w_hat[j*N+k] = (r > NH) ? 0. : 1.;
 					}
 				}
 			}
-		}
 		
 		return np.M_total;
 		
@@ -463,7 +457,6 @@ template <> struct NFFTTraits<double> {
 		
 		solver_finalize_complex(&spc);
 		nfft_finalize(&np);
-		
 		return 0;
 		
 	}

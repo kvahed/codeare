@@ -84,7 +84,7 @@ eig2 (const Matrix<T>& m, char jobvl = 'N', char jobvr = 'N') {
 
     // Workspace for real numbers
     container<T2> rwork = (is_complex(t)) ?
-        container<T2>(2*N) : container<T2>(1);
+    container<T2>(2*N) : container<T2>(1);
 
     // Workspace for complex numbers
     container<T>  work = container<T>(1);
@@ -93,19 +93,19 @@ eig2 (const Matrix<T>& m, char jobvl = 'N', char jobvr = 'N') {
     Matrix<T> a = m;
     
     // Work space query
-    LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, &work[0], lwork, &rwork[0], info);
+    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ev.Ptr(), lv.Ptr(), ldvl, rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
     
     // Initialize work space
     lwork = (int) TypeTraits<T>::Real (work[0]);
     work.resize(lwork);
     
     // Actual Eigenvalue computation
-    LapackTraits<T>::geev (jobvl, jobvr, N, &a[0], lda, &ev[0], &lv[0], ldvl, &rv[0], ldvr, &work[0], lwork, &rwork[0], info);
+    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ev.Ptr(), lv.Ptr(), ldvl, rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
 
-    if (info > 0) {
+    if (info > 0)
         printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have " \
                 "been computed;\n elements %d+1:N of ev contain eigenvalues which\n have converged.\n\n", info) ;
-    } else if (info < 0)
+    else if (info < 0)
         printf ("\nERROR - XGEEV: the %d-th argument had an illegal value.\n\n", -info);
     
     return ret;
@@ -203,15 +203,15 @@ svd2 (const Matrix<T>& M, char jobz = 'N') {
     rwork.resize(nr);
 
     // Workspace query
-    LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0],
-            ldvt, &work[0], lwork, &rwork[0], &iwork[0], info);
+    LapackTraits<T>::gesdd (jobz, m, n, A.Ptr(), lda, s.Ptr(), U.Ptr(), ldu, V.Ptr(),
+            ldvt, work.ptr(), lwork, rwork.ptr(), iwork.ptr(), info);
     
     lwork = (int) TypeTraits<T>::Real(work[0]);
     work.resize(lwork);
     
     // SVD
-    LapackTraits<T>::gesdd (jobz, m, n, &A[0], lda, &s[0], &U[0], ldu, &V[0],
-            ldvt, &work[0], lwork, &rwork[0], &iwork[0], info);
+    LapackTraits<T>::gesdd (jobz, m, n, A.Ptr(), lda, s.Ptr(), U.Ptr(), ldu, V.Ptr(),
+            ldvt, work.ptr(), lwork, rwork.ptr(), iwork.ptr(), info);
     
     
     // Traspose the baby
@@ -268,7 +268,7 @@ inv (const Matrix<T>& m) {
     container<int> ipiv = container<int>(N);
     
     // LU Factorisation -------------------
-    LapackTraits<T>::getrf (N, N, &res[0], N, &ipiv[0], info);
+    LapackTraits<T>::getrf (N, N, res.Ptr(), N, ipiv.ptr(), info);
     
     if (info < 0)
         printf ("\nERROR - DPOTRI: the %i-th argument had an illegal value.\n\n", -info);
@@ -280,14 +280,14 @@ inv (const Matrix<T>& m) {
     container<T> work = container<T>(1);
     
     // Workspace determination ------------
-    LapackTraits<T>::getri (N, &res[0], N, &ipiv[0], &work[0], lwork, info);
+    LapackTraits<T>::getri (N, res.Ptr(), N, ipiv.ptr(), work.ptr(), lwork, info);
     
     // Work memory allocation -------------
     lwork = (int) TypeTraits<T>::Real (work[0]);
     work.resize(lwork);
     
     // Inversion --------------------------
-    LapackTraits<T>::getri (N, &res[0], N, &ipiv[0], &work[0], lwork, info);
+    LapackTraits<T>::getri (N, res.Ptr(), N, ipiv.ptr(), work.ptr(), lwork, info);
 
     if (info < 0)
         printf ("\nERROR - XGETRI: The %i-th argument had an illegal value.\n\n", -info);
@@ -343,9 +343,10 @@ pinv (const Matrix<T>& m, char trans = 'N') {
 
     LapackTraits<T>::gels (trans, M, N, nrhs, mm, lda, b, ldb, work, lwork, info);
     
+    size_t cpsz = N * sizeof(T);
     if (M > N)
         for (int i = 0; i < M; i++)
-            memcpy (&b[i*N], &b[i*M], N * sizeof(T));
+            memcpy (&b[i*N], &b[i*M], cpsz);
     
     b = resize (b, N, M);
 
@@ -385,7 +386,7 @@ chol (const Matrix<T>& A, char uplo = 'U') {
     Matrix<T> res  = A;
     int       info = 0, n = A.Height();
     
-    LapackTraits<T>::potrf (uplo, n, &res[0], n, info);
+    LapackTraits<T>::potrf (uplo, n, res.Ptr(), n, info);
     
     if (info > 0)
         printf ("\nERROR - XPOTRF: the leading minor of order %i is not\n positive definite, and the factorization " \
@@ -453,7 +454,7 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
 
 	Matrix<T> C(m,n);
 	
-	LapackTraits<T>::gemm (transa, transb, m, n, k, alpha, A.Ptr(), ah, B.Ptr(), bh, beta, &C[0], m);
+	LapackTraits<T>::gemm (transa, transb, m, n, k, alpha, A.Ptr(), ah, B.Ptr(), bh, beta, C.Ptr(), m);
     
 	return C;
 	
@@ -514,7 +515,7 @@ gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
 
 	Matrix<T> y ((trans == 'N') ? m : n, 1);
     
-	LapackTraits<T>::gemv (trans, m, n, alpha, A.Ptr(), ah, x.Ptr(), one, beta, &y[0], one);
+	LapackTraits<T>::gemv (trans, m, n, alpha, A.Ptr(), ah, x.Ptr(), one, beta, y.Ptr(), one);
 	
 	return y;
 	
@@ -559,7 +560,7 @@ template <class T> inline T
 dotc (const Matrix<T>& A, const Matrix<T>& B) {
     
 	int n = (int) numel(A), one = 1;
-	T   res = (T)0.;
+	T res;// = (T)0.;
     
 	assert (n == (int) numel(B));
 
@@ -593,14 +594,11 @@ DOTC (const Matrix<T>& A, const Matrix<T>& B) {
 template <class T> inline T 
 dot  (const Matrix<T>& A, const Matrix<T>& B) {
     
-    int n, one;
+    int n, one = 1;
     T   res;
     
     n   = (int) numel(A);
     assert (n == (int) numel(B));
-    
-    res = T(0.0);
-    one = 1;
     
     LapackTraits<T>::dot (n, A.Ptr(), one, B.Ptr(), one, &res);
     

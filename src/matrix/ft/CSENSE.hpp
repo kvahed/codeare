@@ -160,15 +160,18 @@ public:
                             
 						}
 
-						si = gemm (s,   s, 'C', 'N') ;
+						si = gemm (s, s, 'C', 'N') ;
 
-						if (treg > 0.0)
+						if (treg > 0.)
 							si += reg;
                         
 						if (compgfm)
 							gf = diag (si);
                         
-						si = inv (si);
+						if (treg > 0.)
+							si = inv (si);
+						else
+							si = pinv (si);
                         
 						if (compgfm)
 							gf = diag (si) * gf;
