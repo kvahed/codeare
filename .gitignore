@@ -12,6 +12,9 @@
 /.autotools
 /.csettings
 /.settings
+/src/config.h
+/src/RRSModule.hh
+/src/RRSModule.hh
 /src/matrix/arithmetic/AVXTraits.hpp
 /src/matrix/arithmetic/t_acos
 /src/matrix/arithmetic/t_asin
@@ -83,6 +86,9 @@ test.cpp
 *.html
 *.log
 *.trs
+*.mat
+*.h5
+*.zip
 *~
 
 Makefile
