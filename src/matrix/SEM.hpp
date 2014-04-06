@@ -21,7 +21,7 @@
 #include "OMP.hpp"
 #include "Access.hpp"
 #include "NFFT.hpp"
-#include "HDF5File.hpp"
+
 /**
  * @brief Right hand side operator E (i.e. forward transform) 
  *
