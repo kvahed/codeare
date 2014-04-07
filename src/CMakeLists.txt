@@ -122,7 +122,7 @@ endif()
 
 if (${MATLAB_FOUND})
   if (${WINDOWS}) 
-    set (LD_ENV "${LD_ENV}\;${MATLAB_LIBRARY_DIRS}")
+    set (LD_ENV "${LD_ENV}\;${MATLAB_ROOT}/bin/win64")
   else ()
     set (LD_ENV "${LD_ENV}:${MATLAB_LIBRARY_DIRS}")
   endif ()
