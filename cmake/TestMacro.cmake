@@ -8,7 +8,6 @@ macro (MP_TESTS TEST_NAME TEST_CALL)
     add_test (${TEST_NAME} ${bat_file})
   else ()
     add_test (${TEST_NAME} ${TEST_CALL})
-    set_tests_properties (${TEST_NAME} PROPERTIES ENVIRONMENT
-      ${LD_ENV})
+    set_tests_properties (${TEST_NAME} PROPERTIES ENVIRONMENT "${LD_ENV}")
   endif()
 endmacro()

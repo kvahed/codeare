@@ -9,6 +9,8 @@ set (PACKAGE_NAME "codeare")
 set (PACKAGE_VERSION "${PROJECT_VERSION}")
 set (top_srcdir "${PROJECT_SOURCE_DIR}")
 
+#include(CMakeFortranCompiler)
+
 # CMake --------------------------------------------------------------
 cmake_minimum_required (VERSION 2.8)
 enable_testing()
@@ -83,12 +85,12 @@ set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 # MATLAB --------------------------------------------------------------
 find_package(Matlab)
 if(${MATLAB_FOUND})
-  include_directories (${MATLAB_INCLUDE_DIRS})
+  include_directories (${MATLAB_INCLUDE_DIR})
   add_definitions (-DHAVE_MAT_H)
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    link_directories ("${MATLAB_ROOT_DIR}/extern/lib/win64/microsoft")
+    link_directories ("${MATLAB_ROOT}/extern/lib/win64/microsoft")
   else()
-    link_directories ("${MATLAB_LIBRARY_DIRS}")
+    link_directories ("${MATLAB_LIBRARIES_PATHS}")
   endif()
 endif()
 

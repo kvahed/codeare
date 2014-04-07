@@ -27,7 +27,7 @@ else()
   target_link_libraries (t_hdf5 hdf5 hdf5_cpp)
 endif()
 
-if (${MATLAB_FOUND})
+if(${MATLAB_FOUND})
   include (TestMacro)
   add_executable (t_matlab t_matlab.cpp)
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -50,8 +50,8 @@ if (${MATLAB_FOUND})
     set (LD_ENV "${LD_ENV}:${MATLAB_LIBRARY_DIRS};Release")
   endif ()
 
-  #set (TEST_CALL t_matlab -b 2)  
-  #MP_TESTS ("matlab" "${TEST_CALL}")
+  set (TEST_CALL t_matlab -b 2)  
+  MP_TESTS ("matlab" "${TEST_CALL}")
   
 endif()
 

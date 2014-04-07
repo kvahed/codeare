@@ -1,199 +1,280 @@
-# ----- Find Matlab/Octave -----
+# - Try to find a version of Matlab and headers/library required by the 
+#   used compiler. It determines the right MEX-File extension and add 
+#   a macro to help the build of MEX-functions.
 #
-# OpenCVFindMatlab.cmake attempts to locate the install path of Matlab in order
-# to extract the mex headers, libraries and shell scripts. If found
-# successfully, the following variables will be defined
+# This module detects a Matlab's version between Matlab 7.0 (R14)
+# and Matlab 8.3 (r2014a).
 #
-#   MATLAB_FOUND:       true/false
-#   MATLAB_ROOT_DIR:    Root of Matlab installation
-#   MATLAB_BIN:         The main Matlab "executable" (shell script)
-#   MATLAB_MEX_SCRIPT:  The mex script used to compile mex files
-#   MATLAB_INCLUDE_DIRS:Path to "mex.h"
-#   MATLAB_LIBRARY_DIRS:Path to mex and matrix libraries
-#   MATLAB_LIBRARIES:   The Matlab libs, usually mx, mex, mat
-#   MATLAB_MEXEXT:      The mex library extension. It will be one of:
-#                         mexwin32, mexwin64,  mexglx, mexa64, mexmac,
-#                         mexmaci,  mexmaci64, mexsol, mexs64
-#   MATLAB_ARCH:        The installation architecture. It is **usually**
-#                       the MEXEXT with the preceding "mex" removed,
-#                       though it's different for linux distros.
+# This module defines: 
+#  MATLAB_ROOT:               Matlab installation path
+#  MATLAB_EXECUTABLE:         Path to the Matlab executable
+#  MATLAB_INCLUDE_DIR:        Include path for mex.h, engine.h
+#  MATLAB_MEX_LIBRARY:        Path to libmex.lib
+#  MATLAB_MX_LIBRARY:         Path to libmx.lib
+#  MATLAB_MAT_LIBRARY:        Path to libeng.lib
+#  MATLAB_LIBRARIES:          Required libraries: libmex, libmx, libeng
+#  MATLAB_MEXFILE_EXT:        MEX extension required for the current platform
+#  MATLAB_CREATE_MEX:         Macro to build a MEX-file
+#  MATLAB_MATLABR2010B_FOUND: Variable only available under Windows (used to fix compilation issue with MSVC 2010)
 #
-# There doesn't appear to be an elegant way to detect all versions of Matlab
-# across different platforms. If you know the matlab path and want to avoid
-# the search, you can define the path to the Matlab root when invoking cmake:
-#
-#   cmake -DMATLAB_ROOT_DIR='/PATH/TO/ROOT_DIR' ..
+# The macro MATLAB_CREATE_MEX requires in this order:
+#  - function's name which will be called in Matlab;
+#  - C/C++ source files;
+#  - third libraries required.
 
+# Copyright (c) 2009-2014 Arnaud Barré <arnaud.barre@gmail.com>
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
+IF(MATLAB_ROOT AND MATLAB_EXECUTABLE AND MATLAB_INCLUDE_DIR AND MATLAB_LIBRARIES)
+   # in cache already
+   SET(Matlab_FIND_QUIETLY TRUE)
+ENDIF(MATLAB_ROOT AND MATLAB_EXECUTABLE AND MATLAB_INCLUDE_DIR AND MATLAB_LIBRARIES)
 
-# ----- set_library_presuffix -----
-#
-# Matlab tends to use some non-standard prefixes and suffixes on its libraries.
-# For example, libmx.dll on Windows (Windows does not add prefixes) and
-# mkl.dylib on OS X (OS X uses "lib" prefixes).
-# On some versions of Windows the .dll suffix also appears to not be checked.
-#
-# This function modifies the library prefixes and suffixes used by
-# find_library when finding Matlab libraries. It does not affect scopes
-# outside of this file.
-function(set_libarch_prefix_suffix)
-  if (UNIX AND NOT APPLE)
-    set(CMAKE_FIND_LIBRARY_PREFIXES "lib" PARENT_SCOPE)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a" PARENT_SCOPE)
-  elseif (APPLE)
-    set(CMAKE_FIND_LIBRARY_PREFIXES "lib" PARENT_SCOPE)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".a" PARENT_SCOPE)
-  elseif (WIN32)
-    set(CMAKE_FIND_LIBRARY_PREFIXES "lib" PARENT_SCOPE)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll" PARENT_SCOPE)
-  endif()
-endfunction()
+IF(WIN32)
+  # Default paths
+  SET(MATLAB_PATHS 
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\8.3;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\8.2;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\8.1;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\8.0;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.15;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.14;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.13;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.12;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.11;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.10;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.9;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.8;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.7;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.6;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.5;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.4;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.3;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.2;MATLABROOT]"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.1;MATLABROOT]"
+  )
+  FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS} NO_DEFAULT_PATH)
+  # Paths for Matlab 32-bit under Windows 64-bit
+  IF(NOT MATLAB_ROOT)
+    SET(MATLAB_PATHS 
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\8.3;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\8.2;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\8.1;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\8.0;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.15;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.14;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.13;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.12;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.11;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.10;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.9;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.8;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.7;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.6;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.5;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.4;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.3;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.2;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.1;MATLABROOT]"
+    )
+    FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS} NO_DEFAULT_PATH)
+  ENDIF(NOT MATLAB_ROOT)
+  IF(NOT MATLAB_ROOT)
+    SET(MATLAB_PATHS 
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.0;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.0;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\6.5;MATLABROOT]"
+    )
+    FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS} NO_DEFAULT_PATH)
+    IF(MATLAB_ROOT)
+      SET(MATLAB_OLD_WIN_MEXFILE_EXT 1 CACHE STRING "Old MEX extension for Windows")
+    ENDIF(MATLAB_ROOT)
+  ENDIF(NOT MATLAB_ROOT)
+  
+  FIND_PATH(MATLABR2010B_TEMP "license.txt" "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.11;MATLABROOT]" NO_DEFAULT_PATH)
+  IF(MATLABR2010B_TEMP)
+    SET(MATLAB_MATLABR2010B_FOUND 1)
+  ENDIF(MATLABR2010B_TEMP)
+  
+  SET(MATLAB_LIBRARIES_PATHS
+      "${MATLAB_ROOT}/extern/lib/win64/microsoft"
+      "${MATLAB_ROOT}/extern/lib/win32/microsoft"
+      "${MATLAB_ROOT}/extern/lib/win32/microsoft/msvc70"
+      "${MATLAB_ROOT}/extern/lib/win32/microsoft/msvc71")
+  SET(MATLAB_INCLUDE_PATHS "${MATLAB_ROOT}/extern/include")
 
+  # MEX files extension
+  IF(CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$" OR CMAKE_CXX_COMPILER MATCHES "^.*cl$")
+    IF(MATLAB_OLD_WIN_MEXFILE_EXT)
+      SET(MATLAB_MEXFILE_EXT dll)
+    ELSE(MATLAB_OLD_WIN_MEXFILE_EXT)
+      IF(CMAKE_CL_64)
+        SET(MATLAB_MEXFILE_EXT mexw64)
+      ELSE(CMAKE_CL_64)
+        SET(MATLAB_MEXFILE_EXT mexw32)
+      ENDIF(CMAKE_CL_64)
+    ENDIF (MATLAB_OLD_WIN_MEXFILE_EXT)
+  ELSE(CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$" OR CMAKE_CXX_COMPILER MATCHES "^.*cl$")
+    MESSAGE(FATAL_ERROR "Matlab Mex files are only supported by MS Visual Studio")
+  ENDIF(CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$" OR CMAKE_CXX_COMPILER MATCHES "^.*cl$")
+  #MESSAGE(STATUS "MATLAB_MEXFILE_EXT: ${MATLAB_MEXFILE_EXT}")
 
+  # LIBMEX, LIBMX, LIBENG names
+  SET(LIBMEX "libmex")
+  SET(LIBMX "libmx")
+  SET(LIBMAT "libmat")
+ELSE(WIN32)
+  # MEX files extension
+  IF(APPLE)
+    FILE(GLOB MATLAB_PATHS "/Applications/MATLAB_*")
+    FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS})
+    IF(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      IF(CMAKE_OSX_ARCHITECTURES MATCHES ppc)
+        SET(MATLAB_LIBRARIES_PATHS "${MATLAB_ROOT}/bin/mac")
+          SET(MATLAB_MEXFILE_EXT mexmac)
+        ELSE(CMAKE_OSX_ARCHITECTURES MATCHES ppc)
+        SET(MATLAB_LIBRARIES_PATHS "${MATLAB_ROOT}/bin/maci")
+          SET(MATLAB_MEXFILE_EXT mexmaci)
+        ENDIF(CMAKE_OSX_ARCHITECTURES MATCHES ppc)
+    ELSE(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      # To force the compilation in 32-bit
+      IF(CMAKE_OSX_ARCHITECTURES MATCHES i386)
+        MESSAGE("The compilation of the Matlab MEX functions is forced to 32-bit mode as the architecture is set to i386.")
+        SET(FORCE_COMPILE_32BIT_MODE 1)
+      ELSE(CMAKE_OSX_ARCHITECTURES MATCHES i386)
+        IF(EXISTS "${MATLAB_ROOT}/bin/maci64/")
+          SET(MATLAB_LIBRARIES_PATHS "${MATLAB_ROOT}/bin/maci64")
+          SET(MATLAB_MEXFILE_EXT mexmaci64)
+          SET(FORCE_COMPILE_32BIT_MODE 0)
+        ELSEIF(EXISTS "${MATLAB_ROOT}/bin/maci/")
+          MESSAGE("You use a Matlab 32-bit version on a 64-bit OS. BTK will be compiled in 32-bit to be useable with your Matlab version.")
+          SET(FORCE_COMPILE_32BIT_MODE 1)
+        ENDIF(EXISTS "${MATLAB_ROOT}/bin/maci64/")
+      ENDIF(CMAKE_OSX_ARCHITECTURES MATCHES i386)
+      IF(FORCE_COMPILE_32BIT_MODE)
+        SET(MATLAB_LIBRARIES_PATHS "${MATLAB_ROOT}/bin/maci")
+        SET(MATLAB_MEXFILE_EXT mexmaci)
+        SET(CMAKE_CXX_FLAGS "-O3 -DNDEBUG -m32" CACHE STRING "Flags used by the compiler during all build types." FORCE)
+        SET(CMAKE_C_FLAGS "-O3 -DNDEBUG -m32" CACHE STRING "Flags used by the compiler during all build types." FORCE)
+      ENDIF(FORCE_COMPILE_32BIT_MODE)
+    ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 4)
+  
+    SET(LIBMEX "libmex.dylib")
+    SET(LIBMX "libmx.dylib")
+    SET(LIBMAT "libmat.dylib")
+  ELSE(APPLE)
+    FILE(GLOB MATLAB_LOCAL_PATHS "/usr/local/[Mm][Aa][Tt][Ll][Aa][Bb]*")
+    FILE(GLOB MATLAB_LOCAL_PATHS_BIS "/usr/local/[Mm][Aa][Tt][Ll][Aa][Bb]/R*")
+    FILE(GLOB MATLAB_OPT_PATHS "/opt/[Mm][Aa][Tt][Ll][Aa][Bb]*")
+    FILE(GLOB MATLAB_USR_PATHS "/usr/[Mm][Aa][Tt][Ll][Aa][Bb]*")
+    SET(MATLAB_PATHS ${MATLAB_LOCAL_PATHS} ${MATLAB_LOCAL_PATHS_BIS} ${MATLAB_OPT_PATHS} ${MATLAB_USR_PATHS})
+  
+    SET(LIBMEX "libmex.so")
+    SET(LIBMX "libmx.so")
+    SET(LIBMAT "libmat.so")
+  
+    FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS})
+    IF(NOT MATLAB_ROOT)
+      MESSAGE("Linux users have to set the Matlab installation path into the MATLAB_ROOT variable.")
+    ENDIF(NOT MATLAB_ROOT)
+  
+    IF(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      # Regular x86
+      SET(MATLAB_LIBRARIES_PATHS "${MATLAB_ROOT}/bin/glnx86")
+      SET(MATLAB_MEXFILE_EXT mexglx)
+    ELSE(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      # AMD64:
+      SET(MATLAB_LIBRARIES_PATHS "${MATLAB_ROOT}/bin/glnxa64")
+      SET(MATLAB_MEXFILE_EXT mexa64)
+    ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 4)
+  ENDIF(APPLE)
+  
+  # Common for UNIX
+  SET(MATLAB_INCLUDE_PATHS "${MATLAB_ROOT}/extern/include")
+ENDIF(WIN32)
 
-# ----- locate_matlab_root -----
-#
-# Attempt to find the path to the Matlab installation. If successful, sets
-# the absolute path in the variable MATLAB_ROOT_DIR
-function(locate_matlab_root)
+FIND_PROGRAM(MATLAB_EXECUTABLE
+    "matlab"
+    PATHS ${MATLAB_ROOT}
+    PATH_SUFFIXES "bin" NO_DEFAULT_PATH
+    )
+FIND_LIBRARY(MATLAB_MEX_LIBRARY
+    ${LIBMEX}
+    ${MATLAB_LIBRARIES_PATHS} NO_DEFAULT_PATH
+    )
+FIND_LIBRARY(MATLAB_MX_LIBRARY
+    ${LIBMX}
+    ${MATLAB_LIBRARIES_PATHS} NO_DEFAULT_PATH
+    )
+FIND_LIBRARY(MATLAB_MAT_LIBRARY
+    ${LIBMAT}
+    ${MATLAB_LIBRARIES_PATHS} NO_DEFAULT_PATH
+    )
+FIND_PATH(MATLAB_INCLUDE_DIR
+    "mex.h"
+    ${MATLAB_INCLUDE_PATHS} NO_DEFAULT_PATH
+    )
 
-  # --- UNIX/APPLE ---
-  if (UNIX)
-    # possible root locations, in order of likelihood
-    set(SEARCH_DIRS_ /Applications /usr/local /opt/local /usr /opt)
-    foreach (DIR_ ${SEARCH_DIRS_})
-      file(GLOB MATLAB_ROOT_DIR_ ${DIR_}/*matlab*)
-      if (MATLAB_ROOT_DIR_)
-        # sort in order from highest to lowest
-        # normally it's in the format MATLAB_R[20XX][A/B]
-        # TODO: numerical rather than lexicographic sort. However,
-        # CMake does not support floating-point MATH(EXPR ...) at this time.
-        list(SORT MATLAB_ROOT_DIR_)
-        list(REVERSE MATLAB_ROOT_DIR_)
-        list(GET MATLAB_ROOT_DIR_ 0 MATLAB_ROOT_DIR_)
-        set(MATLAB_ROOT_DIR ${MATLAB_ROOT_DIR_} PARENT_SCOPE)
-        return()
-      endif()
-    endforeach()
+# This is common to UNIX and Win32:
+SET(MATLAB_LIBRARIES
+  ${MATLAB_MEX_LIBRARY}
+  ${MATLAB_MX_LIBRARY}
+  ${MATLAB_MAT_LIBRARY}  
+)
 
-  # --- WINDOWS ---
-  elseif (WIN32)
-    # 1. search the path environment variable
-    find_program(MATLAB_ROOT_DIR_ matlab PATHS ENV PATH)
-    if (MATLAB_ROOT_DIR_)
-      # get the root directory from the full path
-      # /path/to/matlab/rootdir/bin/matlab.exe
-      get_filename_component(MATLAB_ROOT_DIR_ ${MATLAB_ROOT_DIR_} PATH)
-      get_filename_component(MATLAB_ROOT_DIR_ ${MATLAB_ROOT_DIR_} PATH)
-      set(MATLAB_ROOT_DIR ${MATLAB_ROOT_DIR_} PARENT_SCOPE)
-      return()
-    endif()
+# Fix for Matlab 2007b under MacOS X
+IF(APPLE)
+  FIND_FILE(MATLAB_BOOST_FILESYSTEM_LIBRARY "libboost_filesystem-1_33_1.dylib" "${MATLAB_ROOT}/bin/maci/")
+  IF(MATLAB_BOOST_FILESYSTEM_LIBRARY)
+    SET(MATLAB_LIBRARIES
+      ${MATLAB_LIBRARIES}
+      ${MATLAB_BOOST_FILESYSTEM_LIBRARY}
+    )
+  ENDIF(MATLAB_BOOST_FILESYSTEM_LIBRARY)
+ENDIF(APPLE)
 
-    # 2. search the registry
-    # determine the available Matlab versions
-    set(REG_EXTENSION_ "SOFTWARE\\Mathworks\\MATLAB")
-    set(REG_ROOTS_ "HKEY_LOCAL_MACHINE" "HKEY_CURRENT_USER")
-    foreach(REG_ROOT_ ${REG_ROOTS_})
-      execute_process(COMMAND reg query "${REG_ROOT_}\\${REG_EXTENSION_}" OUTPUT_VARIABLE QUERY_RESPONSE_)
-      if (QUERY_RESPONSE_)
-        string(REGEX MATCHALL "[0-9]\\.[0-9]" VERSION_STRINGS_ ${QUERY_RESPONSE_})
-        list(APPEND VERSIONS_ ${VERSION_STRINGS_})
-      endif()
-    endforeach()
+# Macros for building MEX-files
+MACRO(MATLAB_EXTRACT_SOURCES_LIBRARIES sources thirdlibraries)
+  SET(${sources})
+  SET(${thirdlibraries})
+  FOREACH(_arg ${ARGN})
+    GET_FILENAME_COMPONENT(_ext ${_arg} EXT)
+    IF("${_ext}" STREQUAL "")
+      LIST(APPEND ${thirdlibraries} "${_arg}")
+    ELSE("${_ext}" STREQUAL "")
+      LIST(APPEND ${sources} "${_arg}")
+    ENDIF ("${_ext}" STREQUAL "")
+  ENDFOREACH(_arg)
+ENDMACRO(MATLAB_EXTRACT_SOURCES_LIBRARIES)
 
-    # select the highest version
-    list(APPEND VERSIONS_ "0.0")
-    list(SORT VERSIONS_)
-    list(REVERSE VERSIONS_)
-    list(GET VERSIONS_ 0 VERSION_)
+# MATLAB_MEX_CREATE(functionname inputfiles thridlibraries)
+MACRO(MATLAB_MEX_CREATE functionname)
+  MATLAB_EXTRACT_SOURCES_LIBRARIES(sources thirdlibraries ${ARGN})
+  ADD_LIBRARY(${functionname} SHARED ${sources} mexFunction.def)
+  TARGET_LINK_LIBRARIES(${functionname} ${MATLAB_LIBRARIES} ${thirdlibraries})
+  SET_TARGET_PROPERTIES(${functionname} PROPERTIES
+    PREFIX ""
+    SUFFIX  ".${MATLAB_MEXFILE_EXT}"
+  )
+ENDMACRO(MATLAB_MEX_CREATE)
 
-    # request the MATLABROOT from the registry
-    foreach(REG_ROOT_ ${REG_ROOTS_})
-      get_filename_component(QUERY_RESPONSE_ [${REG_ROOT_}\\${REG_EXTENSION_}\\${VERSION_};MATLABROOT] ABSOLUTE)
-      if (NOT ${QUERY_RESPONSE_} MATCHES "registry$")
-        set(MATLAB_ROOT_DIR ${QUERY_RESPONSE_} PARENT_SCOPE)
-        return()
-      endif()
-    endforeach()
-  endif()
-endfunction()
+IF(MATLAB_ROOT)
+  INCLUDE(FindPackageHandleStandardArgs)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Matlab DEFAULT_MSG MATLAB_ROOT MATLAB_EXECUTABLE MATLAB_INCLUDE_DIR MATLAB_MEX_LIBRARY MATLAB_MX_LIBRARY MATLAB_MAT_LIBRARY)
+ENDIF(MATLAB_ROOT)
 
+MARK_AS_ADVANCED(
+  MATLAB_EXECUTABLE
+  MATLAB_MEX_LIBRARY
+  MATLAB_MX_LIBRARY
+  MATLAB_MAT_LIBRARY
+  MATLAB_LIBRARIES
+  MATLAB_INCLUDE_DIR
+  MATLAB_MEXFILE_EXT
+  MATLAB_OLD_WIN_MEXFILE_EXT
+)
 
-
-# ----- locate_matlab_components -----
-#
-# Given a directory MATLAB_ROOT_DIR, attempt to find the Matlab components
-# (include directory and libraries) under the root. If everything is found,
-# sets the variable MATLAB_FOUND to TRUE
-function(locate_matlab_components MATLAB_ROOT_DIR)
-  # get the mex extension
-  find_file(MATLAB_MEXEXT_SCRIPT_ NAMES mexext mexext.bat PATHS ${MATLAB_ROOT_DIR}/bin NO_DEFAULT_PATH)
-  execute_process(COMMAND ${MATLAB_MEXEXT_SCRIPT_}
-                  OUTPUT_VARIABLE MATLAB_MEXEXT_
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if (NOT MATLAB_MEXEXT_)
-    return()
-  endif()
-
-  # map the mexext to an architecture extension
-  set(ARCHITECTURES_ "maci64" "maci" "glnxa64" "glnx64" "sol64" "sola64" "win32" "win64" )
-  foreach(ARCHITECTURE_ ${ARCHITECTURES_})
-    if(EXISTS ${MATLAB_ROOT_DIR}/bin/${ARCHITECTURE_})
-      set(MATLAB_ARCH_ ${ARCHITECTURE_})
-      break()
-    endif()
-  endforeach()
-
-  # get the path to the libraries
-  set(MATLAB_LIBRARY_DIRS_ ${MATLAB_ROOT_DIR}/bin/${MATLAB_ARCH_})
-
-  # get the libraries
-  set_libarch_prefix_suffix()
-  find_library(MATLAB_LIB_MX_  mx  PATHS ${MATLAB_LIBRARY_DIRS_} NO_DEFAULT_PATH)
-  find_library(MATLAB_LIB_MEX_ mex PATHS ${MATLAB_LIBRARY_DIRS_} NO_DEFAULT_PATH)
-  find_library(MATLAB_LIB_MAT_ mat PATHS ${MATLAB_LIBRARY_DIRS_} NO_DEFAULT_PATH)
-  set(MATLAB_LIBRARIES_ ${MATLAB_LIB_MX_} ${MATLAB_LIB_MEX_} ${MATLAB_LIB_MAT_})
-
-  # get the include path
-  find_path(MATLAB_INCLUDE_DIRS_ mex.h ${MATLAB_ROOT_DIR}/extern/include)
-
-  # get the mex shell script
-  find_program(MATLAB_MEX_SCRIPT_ NAMES mex mex.bat PATHS ${MATLAB_ROOT_DIR}/bin NO_DEFAULT_PATH)
-
-  # get the Matlab executable
-  find_program(MATLAB_BIN_ NAMES matlab PATHS ${MATLAB_ROOT_DIR}/bin NO_DEFAULT_PATH)
-
-  # export into parent scope
-  if (MATLAB_MEX_SCRIPT_ AND MATLAB_LIBRARIES_ AND MATLAB_INCLUDE_DIRS_)
-    set(MATLAB_BIN          ${MATLAB_BIN_}          PARENT_SCOPE)
-    set(MATLAB_MEX_SCRIPT   ${MATLAB_MEX_SCRIPT_}   PARENT_SCOPE)
-    set(MATLAB_INCLUDE_DIRS ${MATLAB_INCLUDE_DIRS_} PARENT_SCOPE)
-    set(MATLAB_LIBRARIES    ${MATLAB_LIBRARIES_}    PARENT_SCOPE)
-    set(MATLAB_LIBRARY_DIRS ${MATLAB_LIBRARY_DIRS_} PARENT_SCOPE)
-    set(MATLAB_MEXEXT       ${MATLAB_MEXEXT_}       PARENT_SCOPE)
-    set(MATLAB_ARCH         ${MATLAB_ARCH_}         PARENT_SCOPE)
-  endif()
-endfunction()
-
-
-
-# ----------------------------------------------------------------------------
-# FIND MATLAB COMPONENTS
-# ----------------------------------------------------------------------------
-if (NOT MATLAB_FOUND)
-
-  # attempt to find the Matlab root folder
-  if (NOT MATLAB_ROOT_DIR)
-    locate_matlab_root()
-  endif()
-
-  # given the matlab root folder, find the library locations
-  if (MATLAB_ROOT_DIR)
-    locate_matlab_components(${MATLAB_ROOT_DIR})
-  endif()
-  find_package_handle_standard_args(Matlab DEFAULT_MSG
-                                           MATLAB_MEX_SCRIPT   MATLAB_INCLUDE_DIRS
-                                           MATLAB_ROOT_DIR     MATLAB_LIBRARIES
-                                           MATLAB_LIBRARY_DIRS MATLAB_MEXEXT
-                                           MATLAB_ARCH         MATLAB_BIN)
-endif()
+IF(WIN32)
+  MARK_AS_ADVANCED(MATLAB_MATLABR2010B_FOUND)
+ENDIF(WIN32)
