@@ -14,7 +14,7 @@
 /.settings
 /src/config.h
 /src/RRSModule.hh
-/src/RRSModule.hh
+/src/RRSModuleSK.cc
 /src/matrix/arithmetic/AVXTraits.hpp
 /src/matrix/arithmetic/t_acos
 /src/matrix/arithmetic/t_asin
