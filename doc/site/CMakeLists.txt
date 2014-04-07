@@ -32,7 +32,10 @@ if (${XSLTPROC_FOUND})
 
   list (APPEND jsfiles nav.js sh_cpp.js sh_main.js sh_sh.js sh_xml.js)
   list (APPEND cssfiles screen.css sh_style.css)
+
+  if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/index.html")
   install (FILES ${cssfiles} ${htmlfiles} ${jsfiles}
     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/codeare) 
+  endif()
 
 endif()

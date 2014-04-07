@@ -12,7 +12,9 @@ if (${DOXYGEN_FOUND})
     COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
 
+  if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/api")
   install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/api 
     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/codeare)
+  endif()
 
 endif()
