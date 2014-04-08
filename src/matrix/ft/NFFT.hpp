@@ -72,7 +72,7 @@ public:
 				 const T eps = 7.0e-4, const size_t maxit = 1) : m_prepared (false) {
 		
 		m_M     = nk;
-		m_imgsz = 1;
+		m_imgsz = 2;
 		m_m = m;
 		
 		m_N = imsize.Container();
@@ -80,7 +80,7 @@ public:
 
 		m_rank = numel(imsize);
 		
-		m_imgsz = prod(m_N);
+		m_imgsz = 2*prod(m_N);
 
 		m_epsilon = eps;
 		m_maxit   = maxit;
@@ -188,22 +188,18 @@ public:
 	Trafo       (const Matrix< std::complex<T> >& m) const {
 
 		Matrix< std::complex<T> > out (m_M,1);
+		double* tmp;
+		T* tmpo;
 		
-		if (sizeof(T) == sizeof(double))
-			memcpy (m_fplan.f_hat, m.Ptr(), m_imgsz * sizeof (std::complex<T>));
-		else 
-			for (size_t i = 0; i < m_imgsz; ++i) {
-				m_fplan.f_hat[i][0] = real(m[i]);
-				m_fplan.f_hat[i][1] = imag(m[i]);
-			}
+		tmp  = (double*) m_fplan.f_hat;
+		tmpo = (T*) m.Ptr();
+		std::copy (tmpo, tmpo+m_imgsz, tmp);
 		
 		NFFTTraits<double>::Trafo (m_fplan);
 		
-		if (sizeof(T) == sizeof(double))
-			memcpy (&out[0], m_fplan.f, m_M * sizeof (std::complex<T>));
-		else 
-			for (size_t i = 0; i < m_M; ++i)
-				out[i] = std::complex<T>(m_fplan.f[i][0],m_fplan.f[i][1]);
+		tmp  = (double*) m_fplan.f;
+		tmpo = (T*) out.Ptr();
+		std::copy (tmp, tmp+2*m_M, tmpo);
 		
 		return out;
 
@@ -220,22 +216,18 @@ public:
 	Adjoint     (const Matrix< std::complex<T> >& m) const {
 
         Matrix< std::complex<T> > out (m_N);
-		
-		if (sizeof(T) == sizeof(double))
-			memcpy (m_iplan.y, m.Ptr(), m_M * sizeof ( std::complex<T> ));
-		else 
-			for (size_t i = 0; i < m_M; ++i) {
-				m_iplan.y[i][0] = real(m[i]);
-				m_iplan.y[i][1] = imag(m[i]);
-			}
+        double* tmp;
+        T* tmpo;
+
+        tmp  = (double*) m_iplan.y;
+        tmpo = (T*) m.Ptr();
+        std::copy (tmpo, tmpo+2*m_M, tmp);
 
 		NFFTTraits<double>::ITrafo ((Plan&) m_fplan, (Solver&) m_iplan, m_maxit, m_epsilon);
 
-		if (sizeof(T) == sizeof(double))
-			memcpy (&out[0], m_iplan.f_hat_iter, m_imgsz*sizeof ( std::complex<T> ));
-		else 
-			for (size_t i = 0; i < m_imgsz; ++i)
-				out[i] = std::complex<T>(m_iplan.f_hat_iter[i][0],m_iplan.f_hat_iter[i][1]);
+		tmp  = (double*) m_iplan.f_hat_iter;
+		tmpo = (T*) out.Ptr();
+		std::copy (tmp, tmp+m_imgsz, tmpo);
 		
 		return out;
 		
@@ -249,9 +241,7 @@ public:
 	 */
 	Plan*
 	FPlan         () {
-
 		return &m_fplan;
-
 	}
 	
 	/**
@@ -261,9 +251,7 @@ public:
 	 */
 	Solver*
 	IPlan         () {
-		
 		return &m_iplan;
-		
 	}
 	
 private:
@@ -289,8 +277,8 @@ private:
 	
 	bool       m_prepared;
 
-    fftw_complex *         m_y;
-    fftw_complex *         m_f;
+    fftw_complex* m_y;
+    fftw_complex* m_f;
 
     size_t     m_m;
 
