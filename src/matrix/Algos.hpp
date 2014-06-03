@@ -897,8 +897,8 @@ SOS (const Matrix<T>& M, size_t d) {
 template <class T> inline  Matrix<T>
 squeeze (const Matrix<T>& M) {
 	
-	std::vector<size_t> dim;
-	std::vector<float>  res;
+	container<size_t> dim;
+	container<float>  res;
 
 	for (size_t i = 0; i < M.NDim(); ++i)
 		if (size(M, i) > 1) {
@@ -906,7 +906,7 @@ squeeze (const Matrix<T>& M) {
 			res.push_back(resol(M,i));
 		}
 	
-	Matrix<T> ret (dim,res);
+	Matrix<T> ret (dim);
 	ret.Container() = M.Container();
 	
 	return ret;
@@ -938,7 +938,7 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	assert (ndnew == ndold);
 
 	// Every number between 0 and ndnew must appear exactly once
-	std::vector<bool> occupied;
+	container<bool> occupied;
 	occupied.resize(ndnew);
 	for (i = 0; i < ndnew; ++i) {
 		assert (!occupied[perm[i]]);

@@ -21,6 +21,7 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
 #include "DFT.hpp"
+#include "NCSENSE.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
 
@@ -34,24 +35,46 @@ CompressedSensing::Init () {
 	for (size_t i = 0; i < 3; i++)
 		m_N[i] = 1;
 
-	int m_fft = 0;
-
 	Attribute ("tvw",     &m_csparam.tvw);
 	Attribute ("xfmw",    &m_csparam.xfmw);
 	Attribute ("l1",      &m_csparam.l1);
 	Attribute ("pnorm",   &m_csparam.pnorm);
 	Attribute ("verbose", &m_verbose);
+	Attribute ("image_size", &m_image_size);
+	Attribute ("test_case", &m_test_case);
 
     printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
     printf ("  Pnorm: %.2e\n", m_csparam.pnorm);
 	
-	Attribute ("fft",     &m_csparam.fft);
+    int ft_type;
+
+	Attribute ("ft",     &ft_type);
 	printf ("  FFT class: ");
-	switch (m_fft) 
+	switch (ft_type)
 		{
-		case 0:  printf ("%s", "Cartesian"); break;
-		case 1:  printf ("%s", "Non-Cartesian"); break;
-		default: printf ("%s", "Cartesian"); m_fft = 0; break;
+		case 0:
+			printf ("%s", "DFT");
+			m_ftparams["rank"] = 2;
+			m_csparam.ft  = (FT<float>*) new DFT<float> (m_ftparams/*size(data), mask, pc*/);
+			break;
+		case 1:  printf ("%s", "SENSE"); break;
+		case 2:  printf ("%s", "NUFFT"); break;
+		case 3:
+			printf ("%s", "NCSENSE");
+			m_ftparams["sens_maps"]    = std::string("sensitivities");
+			m_ftparams["weights_name"] = std::string("weights");
+		    m_ftparams["verbose"]      = m_verbose;
+		    m_ftparams["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
+		    m_ftparams["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
+		    m_ftparams["cgeps"]        = RHSAttribute<double>("cgeps");
+		    m_ftparams["lambda"]       = RHSAttribute<double>("lambda");
+		    m_ftparams["np"]           = RHSAttribute<int>("threads");
+			m_csparam.ft = (FT<float>*) new NCSENSE<float> (m_ftparams);
+			break;
+		default:
+			printf ("No FT strategy defined");
+			assert (false);
+			break;
 		}
 	printf ("\n");
 
@@ -81,30 +104,45 @@ CompressedSensing::Init () {
 
 
 codeare::error_code
+CompressedSensing::Prepare () {
+
+	codeare::error_code error = codeare::OK;
+
+	FT<float>& dft = *m_csparam.ft;
+
+	dft.KSpace (Get<float>("kspace"));
+	dft.Weights (Get<float>("weights"));
+
+	Free ("weights");
+	Free ("kspace");
+
+	m_initialised = true;
+
+	return error;
+
+}
+
+codeare::error_code
 CompressedSensing::Process () {
 
 	float ma;
 
-	Matrix<cxfl>&  data  = Get<cxfl>   ("data");
+	FT<float>& dft = *m_csparam.ft;
+
+	Matrix<cxfl>  data  = m_test_case ?
+    		dft*phantom<cxfl>(256) : Get<cxfl>   ("data");
 	Matrix<float>& pdf   = Get<float>  ("pdf" );
-	Matrix<float>& mask  = Get<float>  ("mask");
+	//Matrix<float>& mask  = Get<float>  ("mask");
 	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
     Matrix<cxfl> im_dc;
-
+    /*m_test_case ?
+        		dft*phantom<cxfl>(256) : */
 	printf ("  Geometry: " JL_SIZE_T_SPECIFIER "D (" JL_SIZE_T_SPECIFIER ","
-            JL_SIZE_T_SPECIFIER "," JL_SIZE_T_SPECIFIER ")\n", ndims (data), 
-		size(data,0), size(data,1), size(data,2));
-	m_csparam.dwt = new DWT <cxfl> (data.Height(), (wlfamily) m_wf, m_wm);
-
-	/** -----  Which Fourier transform? **/
-	m_csparam.ft  = (FT<float>*) new DFT<float> (size(data), mask, pc);
-	// m_csparam.ft = (FT<float>*) new NFFT<float> (params);
-	// m_csparam.ft = (FT<float>*) new NCSENSE<float> (params);
-	/*************************************/
-
+            JL_SIZE_T_SPECIFIER ")\n", ndims (data),
+            m_image_size, m_image_size);
+	m_csparam.dwt = new DWT <cxfl> (m_image_size, (wlfamily) m_wf, m_wm);
 	m_csparam.tvt = new TVOP ();
 
-	FT<float>& dft = *m_csparam.ft;
 	DWT<cxfl>& dwt = *m_csparam.dwt;
     std::vector< Matrix<cxfl> > vc;
 	
@@ -122,7 +160,7 @@ CompressedSensing::Process () {
 	data    /= ma;
 	
 	im_dc    = dwt * im_dc;
-	
+
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
 	for (size_t i = 0; i < (size_t)m_csiter; i++) {
@@ -130,7 +168,7 @@ CompressedSensing::Process () {
 		if (m_verbose)
 			vc.push_back(dwt ->* im_dc*ma);
 	}
-    
+
     if (m_verbose) {
         size_t cpsz = numel(im_dc);
         im_dc = zeros<cxfl> (size(im_dc,0), size(im_dc,1), (m_dim == 3) ? size(im_dc,2) : 1, vc.size());

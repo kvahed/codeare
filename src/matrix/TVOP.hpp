@@ -46,19 +46,17 @@ public:
 		
 		Matrix<T> res (M, N, 2); 
 		
-#pragma omp for
-			for (int i = 0; i < N; i++) {
-				for (int j = 0; j < M-1; j++)
-					res(j,i,0) = m(j+1,i) - m(j,i);
-				res (M-1,i,0) = T(0.0);
-			}
-			
-#pragma omp for
-			for (int i = 0; i < M; i++) {
-				for (int j = 0; j < N-1; j++)
-					res(i,j,1) = m(i,j+1) - m(i,j);
-				res (i,N-1,1) = T(0.0);
-			}
+		for (int i = 0; i < N; ++i) {
+			for (int j = 0; j < M-1; ++j)
+				res(j,i,0) = m(j+1,i) - m(j,i);
+			res (M-1,i,0) = T(0.0);
+		}
+
+		for (int i = 0; i < M; ++i) {
+			for (int j = 0; j < N-1; ++j)
+				res(i,j,1) = m(i,j+1) - m(i,j);
+			res (i,N-1,1) = T(0.0);
+		}
 		
 		return res;
 		
@@ -79,21 +77,19 @@ public:
 		Matrix<T> resx (M, N);
 		Matrix<T> resy (M, N);
 
-#pragma omp for
-			for (int i = 0; i < M; i++) {
-				resy (0,i) = -m(0,i,0);
-				for (int j = 1; j < N-1; j++)
-					resy (j,i) = m(j-1,i,0) - m(j,i,0);
-				resy (N-1,i) = m(N-2,i,0);
-			}
-			
-#pragma omp for
-			for (int i = 0; i < N; i++) {
-				resx (i,0) = -m(i,0,1);
-				for (int j = 1; j < M-1; j++)
-					resx (i,j) = m(i,j-1,1) - m(i,j,1);
-				resx (i,M-1) = m(i,M-2,1);
-			}
+		for (int i = 0; i < M; ++i) {
+			resy (0,i) = -m(0,i,0);
+			for (int j = 1; j < N-1; ++j)
+				resy (j,i) = m(j-1,i,0) - m(j,i,0);
+			resy (N-1,i) = m(N-2,i,0);
+		}
+
+		for (int i = 0; i < N; ++i) {
+			resx (i,0) = -m(i,0,1);
+			for (int j = 1; j < M-1; ++j)
+				resx (i,j) = m(i,j-1,1) - m(i,j,1);
+			resx (i,M-1) = m(i,M-2,1);
+		}
 		
 		resx += resy;
 		

@@ -38,6 +38,7 @@ inline static void report (const int res, const char* name) {
             printf ("**WARNING! Attribute '%s' does not exist in parameter list.\n", name);
 }
 
+
 /**
  * @brief Skeleton of an XML configurable class
  */
@@ -270,6 +271,20 @@ class Configurable {
 		report (res, name);
         return res;
 	}
+
+	/**
+	 * @brief           Set a double type attribute
+	 *
+	 * @param  name     Attribute name
+	 * @param  value    Attribute value
+	 * @return          Status
+	 */
+    template<class T> T
+    RHSAttribute (const std::string& key) {
+    	T val;
+        int res = Configuration()->QueryValueAttribute<T>(key, &val);
+        return val;
+    }
 
 
 	/**

@@ -635,6 +635,10 @@ meshgrid (const Matrix<T>& x, const Matrix<T>& y, const Matrix<T>& z = Matrix<T>
 
 }
 
+template<class T> inline static Matrix<T>
+zpad (const Matrix<T>& x, container<size_t>& n) {
+
+}
 
 #endif
 

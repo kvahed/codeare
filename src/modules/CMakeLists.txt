@@ -20,12 +20,7 @@ list (APPEND COMLIBS tinyxml core ${BLAS_LINKER_FLAGS}
   ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
   ${FFTW3_LIBRARIES} ${OPENSSL_LIBRARIES} ${Boost_CHRONO_LIBRARY}
   ${Boost_SYSTEM_LIBRARY} ${Boost_CHRONO_LIBRARY}
-  ${Boost_TIMER_LIBRARY})   
-
-add_library (CompressedSensing MODULE CompressedSensing.hpp
-  CompressedSensing.cpp) 
-set_target_properties(CompressedSensing PROPERTIES PREFIX "")
-target_link_libraries (CompressedSensing ${COMLIBS}) 
+  ${Boost_TIMER_LIBRARY} ${HDF5_LIBRARIES})   
 
 add_library (KTPoints MODULE KTPoints.hpp KTPoints.cpp)
 set_target_properties(KTPoints PROPERTIES PREFIX "")
@@ -39,21 +34,33 @@ add_library (DummyRecon MODULE DummyRecon.hpp DummyRecon.cpp)
 set_target_properties(DummyRecon PROPERTIES PREFIX "")
 target_link_libraries (DummyRecon ${COMLIBS})
 
-list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE DummyRecon)
+add_library (MyAlgo MODULE MyAlgo.hpp MyAlgo.cpp)
+set_target_properties(MyAlgo PROPERTIES PREFIX "")
+target_link_libraries (MyAlgo ${COMLIBS})
+# ${MATLAB_MX_LIBRARY}
+
+list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE DummyRecon MyAlgo)
 
 if (${NFFT_FOUND})
 
+  list (APPEND COMLIBS ${NFFT_LIBRARIES})
+
   add_library (NuFFT MODULE NuFFT.hpp NuFFT.cpp)
   set_target_properties(NuFFT PROPERTIES PREFIX "")
-  target_link_libraries (NuFFT ${COMLIBS} ${NFFT_LIBRARIES}) 
+  target_link_libraries (NuFFT ${COMLIBS}) 
 
   add_library (CGSENSE MODULE CGSENSE.hpp CGSENSE.cpp)
   set_target_properties(CGSENSE PROPERTIES PREFIX "")
-  target_link_libraries (CGSENSE ${COMLIBS} ${NFFT_LIBRARIES})   
+  target_link_libraries (CGSENSE ${COMLIBS})   
 
   list (APPEND INST_TARGETS NuFFT CGSENSE)
 
 endif()
+
+add_library (CompressedSensing MODULE CompressedSensing.hpp
+  CompressedSensing.cpp) 
+set_target_properties(CompressedSensing PROPERTIES PREFIX "")
+target_link_libraries (CompressedSensing ${COMLIBS}) 
 
 if (${ITK_FOUND})
 

@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0"
 				xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="html" encoding="ISO-8859-15" indent="yes"/>
+  <xsl:output method="html" encoding="utf-8" indent="yes"/>
   
   <xsl:template match="br">
 	<br/>
@@ -11,7 +11,11 @@
 	<a href="{@href}"><xsl:apply-templates/></a>
   </xsl:template>
   
-  <xsl:template match="main">
+  <xsl:template match="main"> 
+
+    <xsl:text disable-output-escaping='yes'>&lt;?xml version="1.0" standalone="yes" ?></xsl:text>
+    <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+    "http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd"></xsl:text>
 	<html>
 	  <head>
 		

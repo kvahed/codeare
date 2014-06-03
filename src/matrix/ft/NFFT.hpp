@@ -36,7 +36,6 @@ class NFFT : public FT<T> {
 
 	typedef typename NFFTTraits<double>::Plan   Plan;
 	typedef typename NFFTTraits<double>::Solver Solver;
-  //typedef typename std::vector<std::complex<double> >::iterator it;
     typedef typename std::complex<T> CT;
 	
 public:

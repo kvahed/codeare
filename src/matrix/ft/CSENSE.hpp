@@ -149,7 +149,7 @@ public:
 					for (int z = 0; z < dims[2]; z++) {
 						for (int c = 0; c < nc; c++) {
 
-							ra [c] = (ndim == 3) ? tmp (x, y, z, c) : tmp (x, y, c);
+							ra[c] = (ndim == 3) ? tmp (x, y, z, c) : tmp (x, y, c);
 							
 							for (int zi = 0, i = 0; zi < af[2]; zi++)
 								for (int yi = 0; yi < af[1]; yi++)

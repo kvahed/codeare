@@ -251,13 +251,15 @@ public:
 		x  = zeros<CT>(size(p));
         xn = real(p.dotc(p));
         rn = xn;
+
         if (m_verbose)
             vc.push_back (p);
 
 		for (size_t i = 0; i < m_cgiter; i++) {
 			res.push_back(rn/xn);
 			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps)  break;
- 			printf ("    %03lu %.7f\n", i, res.at(i)); fflush (stdout);
+			if (m_verbose)
+				printf ("    %03lu %.7f\n", i, res.at(i));
 			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
 			if (m_lambda)
 				q  += m_lambda * p;

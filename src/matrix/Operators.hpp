@@ -246,7 +246,7 @@
     inline Matrix<cbool>
     operator!=          (const Matrix<T,P>& M) const {
 
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
 
         Matrix<cbool> res(_dim,_res);
 #ifdef EW_OMP
@@ -268,7 +268,7 @@
     inline Matrix<cbool>
     operator>=          (const Matrix<T,P>& M) const {
 
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
 
         Matrix<cbool> res(_dim);
 
@@ -292,7 +292,7 @@
     inline Matrix<cbool>
     operator<=          (const Matrix<T,P>& M) const {
 
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
 
         Matrix<cbool> res(_dim);
 
@@ -316,7 +316,7 @@
     inline Matrix<cbool>
     operator>           (const Matrix<T,P>& M) const {
 
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
 
         Matrix<cbool> res(_dim,_res);
 
@@ -340,7 +340,7 @@
     inline Matrix<cbool>
     operator<           (const Matrix<T,P>& M) const {
 
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
 
         Matrix<cbool> res(_dim,_res);
 
@@ -364,7 +364,7 @@
     inline Matrix<cbool>
     operator||          (const Matrix<T,P>& M) const {
 
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
 
         Matrix<cbool> res(_dim);
 
@@ -389,7 +389,7 @@
     inline Matrix<cbool>
     operator&&          (const Matrix<T,P>& M) const {
 
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
 
         Matrix<cbool> res(_dim);
 
@@ -499,7 +499,7 @@
      */
     inline Matrix<T,P>&
     operator+=         (const Matrix<T,P>& M) {
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
         return *this;
     }
@@ -587,7 +587,7 @@
      */
     inline Matrix<T,P>&
     operator-=         (const Matrix<T,P>& M) {
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
         return *this;
     }
@@ -675,7 +675,7 @@
      */
     inline Matrix<T,P>&
     operator*=         (const Matrix<T,P>& M) {
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
         return *this;
     }
@@ -762,7 +762,7 @@
      */
     inline Matrix<T,P>&
     operator/=         (const Matrix<T,P>& M) {
-        assert (_dim == M._dim);
+        assert (Size() == M.Size());
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
         return *this;
     }
@@ -856,6 +856,19 @@
      * @return          m * s
      */
     inline friend Matrix<T,P>
+    operator*  (const int s, const Matrix<T,P> &m) {
+        return   m * s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
     operator*  (const long s, const Matrix<T,P> &m) {
         return   m * s;
     }
@@ -935,6 +948,19 @@
      * @return          m * s
      */
     inline friend Matrix<T,P>
+    operator+  (const int s, const Matrix<T,P> &m) {
+        return   m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
     operator+  (const long s, const Matrix<T,P> &m) {
         return   m + s;
     }
@@ -1002,6 +1028,19 @@
      */
     inline friend Matrix<T,P>
     operator-  (const short s, const Matrix<T,P> &m) {
+        return -m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator-  (const int s, const Matrix<T,P> &m) {
         return -m + s;
     }
 

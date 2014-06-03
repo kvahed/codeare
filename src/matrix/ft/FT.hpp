@@ -97,6 +97,25 @@ public:
 	}
 
 
+	/**
+	 * @brief      Assign k-space trajectory
+	 *
+	 * @param  k   K-space trajectory
+	 */
+	virtual void
+	KSpace (const Matrix<T>& k) {}
+
+
+	/**
+	 * @brief      Assign k-space weigths (jacobian of k in t)
+	 *
+	 * @param  w   Weights
+	 */
+	virtual void
+	Weights (const Matrix<T>& w) {}
+
+
+
 protected:
 
     void Validate (double& t) const {};

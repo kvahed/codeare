@@ -29,40 +29,40 @@
 	  etc. 
 	  A comprehensive and extansible toolbox has been programmed
 	  for operations on the matrix objects like ...
-	  <ul>
-		<li>
-		  <strong>Arithmetic (elementwise):</strong> *, *=, /, /=,
-		  +, +=, -, -=, ^, ^=, &gt;, &gt;=, &lt;, &lt;=, ... 
-		</li>
-		<li>
-		  <strong>Lineare algebra:</strong> inv, pinv, svd, chol,
-		  gemm, gemv, dot, dotc, ... 
-		</li>
-		<li>
-		  <strong>Statistics:</strong> cov, mean, sos, norm, std,
-		  tv, ... 
-		</li>
-		<li>
-		  <strong>Signal and image processing:</strong> fft,
-		  nufft, dwt, ... 
-		</li>
-		<li>
-		  <strong>Interpolation:</strong> polynomial, cspline,
-		  akima, ... ND interpolations 
-		</li>
-	  </ul>
-	</p>
+    </p>
+	<ul>
+	  <li>
+		<strong>Arithmetic (elementwise):</strong> *, *=, /, /=,
+		+, +=, -, -=, ^, ^=, &gt;, &gt;=, &lt;, &lt;=, ... 
+	  </li>
+	  <li>
+		<strong>Lineare algebra:</strong> inv, pinv, svd, chol,
+		gemm, gemv, dot, dotc, ... 
+	  </li>
+	  <li>
+		<strong>Statistics:</strong> cov, mean, sos, norm, std,
+		tv, ... 
+	  </li>
+	  <li>
+		<strong>Signal and image processing:</strong> fft,
+		nufft, dwt, ... 
+	  </li>
+	  <li>
+		<strong>Interpolation:</strong> polynomial, cspline,
+		akima, ... ND interpolations 
+	  </li>
+	</ul>
 	<p>
 	  Futhermore, IO routines and drivers are provided for
 	  multiple binary formats as ...
-	  <ul>
-		<li><strong>NIFTI</strong></li> 
-		<li><strong>MATLAB</strong></li>
-		<li><strong>HDF5</strong></li>
-		<li><strong>CDF</strong></li> 
-		<li><strong>Syngo MR</strong> &gt;= VB15 (readonly)</li>
-	  </ul>
 	</p>
+	<ul>
+	  <li><strong>NIFTI</strong></li> 
+	  <li><strong>MATLAB</strong></li>
+	  <li><strong>HDF5</strong></li>
+	  <li><strong>CDF</strong></li> 
+	  <li><strong>Syngo MR</strong> &gt;= VB15 (readonly)</li>
+	</ul>
 	
     ]]>
   </article>

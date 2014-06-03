@@ -49,7 +49,6 @@ namespace RRStrategy {
      */
     struct CSParam {
         
-        int    fft;
         int    lsiter;
         int    lsto ;
         int    cgiter;
@@ -103,6 +102,11 @@ namespace RRStrategy {
         virtual codeare::error_code 
         Init ();
         
+        /**
+         * @brief Do nothing
+         */
+        virtual codeare::error_code
+        Prepare ();
         
         /**
          * @brief Do nothing 
@@ -117,11 +121,15 @@ namespace RRStrategy {
         int            m_dim;    /**< Image recon dim */
         int            m_N[3];   /**< Data side lengths */
         int            m_csiter; /**< # global iterations */
+        int         m_image_size;
+        int         m_test_case;
 
         CSParam        m_csparam;
         int            m_wf;
         int            m_wm;
         int            m_verbose;
+
+        Params         m_ftparams;
         
     };
     
@@ -295,7 +303,7 @@ namespace RRStrategy {
         
         if (cgp.tvw)
             g += GradTV  (x, wx, cgp);
-        
+
         return g;
         
     } 
@@ -315,12 +323,12 @@ namespace RRStrategy {
         TVOP&      tvt = *cgp.tvt;
         
         wx  = dwt->*x;
-        
+
         g0 = Gradient (x, wx, data, cgp);
         dx = -g0;
         
         wdx = dwt->*dx;
-        
+
         for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
             
             t = t0;
@@ -375,7 +383,7 @@ namespace RRStrategy {
                 break;
             
         } 
-        
+
     }
     
 }

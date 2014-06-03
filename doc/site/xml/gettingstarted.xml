@@ -46,9 +46,9 @@
 	<p>
 	  We concentrate the above setup in a package file in
 	  XML <code>brain512.xml:</code>
-
+    </p>
 	  <pre class="sh_xml">
-&lt?xml version="1.0" ?&gt;
+&lt;?xml version="1.0" ?&gt;
 
 &lt;!--
   dim:    Dimension
@@ -72,20 +72,19 @@
   lsto:   Line search TO
 --&gt;
 
-&ltconfig csiter="2" tvw="0.002" xfmw="0.005" fft="0" cgiter="8"
+&lt; config; csiter="2" tvw="0.002" xfmw="0.005" fft="0" cgiter="8"
     cgconv="5.0e-3" l1="1.0e-15" lsiter="10" pnorm="1" lslim="10"
     lsa="0.01" lsb="0.6" wl_family="0" wl_member="4"/&gt;
 
-  &ltdata&gt; 
-    &ltdata dname="data" fname="brain512.mat" dtype="float"
+  &lt;data&gt; 
+    &lt;data dname="data" fname="brain512.mat" dtype="float"
         ftype="MATLAB"/&gt; 
-    &ltmask dname="mask" fname="brain512.mat" dtype="float"
+    &lt;mask dname="mask" fname="brain512.mat" dtype="float"
         ftype="MATLAB"/&gt;
-  &lt/data&gt;
+  &lt;/data&gt;
 
-&lt/config&gt;
+&lt;/config&gt;
 	</pre>
-	</p>
 
 	<h3>
 	  Binary file
@@ -202,27 +201,27 @@ int main (int argc, char** argv) {
       deriving from the base class. We then only need to implement the
       algorithm in 4 contextually different
       functions, 
+      </p>
 	  <ul>
 		<li>
-		  <code>Initialise:</code><br/> Intialise global variables,
+		  <code>Initialise:</code><br> Intialise global variables,
 		  allocate memory, etc. Things that are initiallly setup
 		  possible time and memory consuming. For example, allocate the
 		  FT operator if enough information is avalable at this point.
 		</li>
 		<li>
-		  <code>Prepare:</code><br/> Prepare the earlier initialised
+		  <code>Prepare:</code><br> Prepare the earlier initialised
 		  functionality and globals. For example, reset the Tikhonov
 		  regularisation weight to a new value before next processing.
 		</li> 
 		<li>
-		  <code>Process:</code><br/> Actually process the algorithm on
+		  <code>Process:</code><br> Actually process the algorithm on
 		  the data.
 		</li>
 		<li>
-		  <code>Finalise:</code><br/> Clean up before leaving.
+		  <code>Finalise:</code><br> Clean up before leaving.
 		</li>
 	  </ul>
-	</p>
 
 	<p>
 	  We start by deriving a class <code>CompressedSensing</code> from
@@ -335,10 +334,10 @@ int main (int argc, char** argv) {
 	  and <code>dwt</code>). 
 	</p>
 	<p>
-	  <b>NOTE<b>: The transform operators can be used like
+	  <b>NOTE</b>: The transform operators can be used like
 	  mathematical operators (i.e. <code>mhat = ft * m</code> is the forward
 	  and <code>m = ft ->* mhat</code> is the inverse transform). 
-	<p>
+	</p>
 
 	<pre class="sh_cpp">RRSModule::error_code CompressedSensing::Process () {
 

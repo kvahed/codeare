@@ -128,7 +128,6 @@ CGSENSE::Prepare () {
     cgp["cgiter"]       = (size_t) m_cgmaxit;
     cgp["cgeps"]        = m_cgeps;
     cgp["lambda"]       = m_lambda;
-    cgp["lambda"]       = m_lambda;
     cgp["np"]           = m_nthreads;
 
 	m_ncs = NCSENSE<float>(cgp);

@@ -46,13 +46,14 @@
 		The bulk of operation on matrices are provided as static
 		functions. The vast majority allows one to assign the result
 		to a new matrix i.e.:
-		<ul>
-		  <li><code>A = pinv(B);</code></li>
-		  <li><code>A = fft (B);</code></li>
-		  <li><code>A = dwt (B);</code></li>
-		  <li><code>A = sin (B);</code></li>
-		</ul>
-	  </p>
+      </p>
+	  <ul>
+	    <li><code>A = pinv(B);</code></li>
+	    <li><code>A = fft (B);</code></li>
+	    <li><code>A = dwt (B);</code></li>
+		<li><code>A = sin (B);</code></li>
+      </ul>
+
 	  <p>
 		etc. However as the return type of C++ functions can only be a
 		generic type, a reference, a pointer or an object, the nice
@@ -73,18 +74,18 @@
 		names. 
 	  </p>
 	  <p>For example one would declare a system wide known matrix
-		inside and <a href="#module">module</a> with<br/> 
+		inside and <a href="#module">module</a> with<br> 
 		<code>
-		  Matrix&lt; complex&lt;float&gt; &gt;& A =<br/>
+		  Matrix&lt; complex&lt;float&gt; &gt;& A =<br>
 		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  DataBase::Instance()-&gt;AddMatrix <br/>
+		  DataBase::Instance()-&gt;AddMatrix <br>
 		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		  ("A", NEW
 		  Matrix&lt; complex&lt;float&gt; >(300,100,8,8));
-		</code><br/>
-		and retrieve a Matrix from the database with<br/>
+		</code><br>
+		and retrieve a Matrix from the database with<br>
 		<code>
-		  Matrix&lt; complex&lt;float&gt; &gt;& A =<br/>
+		  Matrix&lt; complex&lt;float&gt; &gt;& A =<br>
 		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		  DataBase::Instance()-&gt;GetCXFL ("A");</code>.
 	  </p>
@@ -122,7 +123,7 @@
 	  </p>
 
 	  <a name="connector"></a>
-	  <h2>Connector<T></h2>
+	  <h2>Connector&lt;T&gt;</h2>
 	  <p class="lead">
 		One potentially very valuable feature of codeare is that it
 		provides an asynchroenous communication to send and receive

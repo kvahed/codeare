@@ -8,23 +8,23 @@
 
 	<p>
 	  The package is hosted on <strong>github</strong>
-	  under<br/> <a href="https://github.com/kvahed/codeare"
+	  under<br> <a href="https://github.com/kvahed/codeare"
 			   target="_github">
 		<code>https://github.com/kvahed/codeare</code></a>
 	</p>
 
 	<p>
-	  Download a copy including test data for all available modules:<br/>
+	  Download a copy including test data for all available modules:<br>
 	  <code>git clone http://github.com/kvahed/codeare.git</code>
 	</p>
 
 	<p>
-	  Download test data for the available modules<br/>(unpack in top
-	  codeare folder):<br/>
+	  Download test data for the available modules<br>(unpack in top
+	  codeare folder):<br>
 	  <a href="http://codeare.org/download/matlab_share.zip">
 	  <code>If you built codeare <b>with</b> MATLAB support</code>
 	  </a>
-      <br/>
+      <br>
 	  <a href="http://codeare.org/download/hdf5_share.zip">
 	  <code>If you built codeare <b>without</b> MATLAB support</code>
 	  </a>
