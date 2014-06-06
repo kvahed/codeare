@@ -34,12 +34,7 @@ add_library (DummyRecon MODULE DummyRecon.hpp DummyRecon.cpp)
 set_target_properties(DummyRecon PROPERTIES PREFIX "")
 target_link_libraries (DummyRecon ${COMLIBS})
 
-add_library (MyAlgo MODULE MyAlgo.hpp MyAlgo.cpp)
-set_target_properties(MyAlgo PROPERTIES PREFIX "")
-target_link_libraries (MyAlgo ${COMLIBS})
-# ${MATLAB_MX_LIBRARY}
-
-list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE DummyRecon MyAlgo)
+list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE DummyRecon)
 
 if (${NFFT_FOUND})
 

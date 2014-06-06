@@ -129,8 +129,6 @@ public:
 
 		ft_params["imsz"] = ms;
 
-		std::cout << ms << std::endl;
-
 		for (size_t i = 0; i < m_np; ++i) // FFTW planning not thread-safe
 			m_fts.push_back(NFFT<T>(ft_params));
 		

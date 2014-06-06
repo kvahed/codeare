@@ -106,7 +106,7 @@ public:
 				assert(false);
 			}
 		} else {
-			printf ("**ERROR - NFFT: Numer of ksppace samples need to be specified\n%");
+			printf ("**ERROR - NFFT: Numer of ksppace samples need to be specified\n");
 			assert(false);
 		}
 
