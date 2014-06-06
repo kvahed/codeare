@@ -114,6 +114,13 @@ public:
 	virtual void
 	Weights (const Matrix<T>& w) {}
 
+	/**
+	 * @brief      Assign k-space weigths (jacobian of k in t)
+	 *
+	 * @param  w   Weights
+	 */
+	virtual void
+	Mask (const Matrix<T>& m) {}
 
 
 protected:

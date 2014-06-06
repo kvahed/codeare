@@ -23,6 +23,8 @@
 
 #include "tinyxml.h"
 #include "xpath_static.h"
+#include "Tokenizer.hpp"
+#include "Container.hpp"
 
 #include <string>
 
@@ -285,6 +287,32 @@ class Configurable {
         int res = Configuration()->QueryValueAttribute<T>(key, &val);
         return val;
     }
+
+    /**
+	 * @brief           Set a double type attribute
+	 *
+	 * @param  name     Attribute name
+	 * @param  value    Attribute value
+	 * @return          Status
+	 */
+	template<class T> container<T>
+	RHSList (const std::string& key) {
+		container<T> v;
+		T value;
+		std::string vstr;
+        int res = Configuration()->QueryValueAttribute<std::string>(key, &vstr);
+        if (res==TIXML_SUCCESS) {
+        	std::stringstream ss(vstr);
+			while(ss >> value) {
+				v.push_back(value);
+				if (ss.peek() == ',')
+					ss.ignore();
+			}
+        } else {
+        	printf ("  WARNING - Configurable: No list %s found in configuration\n", key.c_str());
+        }
+		return v;
+	}
 
 
 	/**

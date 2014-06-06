@@ -121,16 +121,18 @@ namespace RRStrategy {
         int            m_dim;    /**< Image recon dim */
         int            m_N[3];   /**< Data side lengths */
         int            m_csiter; /**< # global iterations */
-        int         m_image_size;
-        int         m_test_case;
+        container<size_t> m_image_size;
+        int            m_test_case;
+
+        double m_noise;
 
         CSParam        m_csparam;
         int            m_wf;
         int            m_wm;
         int            m_verbose;
-
-        Params         m_ftparams;
         
+        int            m_ft_type;
+
     };
     
     

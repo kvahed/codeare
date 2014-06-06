@@ -32,6 +32,8 @@ CompressedSensing::Init () {
 
 	printf ("Intialising CompressedSensing ...\n");
 
+	Params ft_params;
+
 	for (size_t i = 0; i < 3; i++)
 		m_N[i] = 1;
 
@@ -40,36 +42,55 @@ CompressedSensing::Init () {
 	Attribute ("l1",      &m_csparam.l1);
 	Attribute ("pnorm",   &m_csparam.pnorm);
 	Attribute ("verbose", &m_verbose);
-	Attribute ("image_size", &m_image_size);
+    m_image_size   = RHSList<size_t>("ftdims");
+
+	printf ("  Geometry: " JL_SIZE_T_SPECIFIER "D (" JL_SIZE_T_SPECIFIER ","
+            JL_SIZE_T_SPECIFIER "," JL_SIZE_T_SPECIFIER ")\n", m_image_size.size(),
+            m_image_size[0], m_image_size[1], (m_image_size.size()==3) ? m_image_size[2] : 1);
+
 	Attribute ("test_case", &m_test_case);
+	Attribute ("noise",     &m_noise);
 
     printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
     printf ("  Pnorm: %.2e\n", m_csparam.pnorm);
 	
-    int ft_type;
+    Attribute ("ft", &m_ft_type);
 
-	Attribute ("ft",     &ft_type);
 	printf ("  FFT class: ");
-	switch (ft_type)
+	switch (m_ft_type)
 		{
 		case 0:
 			printf ("%s", "DFT");
-			m_ftparams["rank"] = 2;
-			m_csparam.ft  = (FT<float>*) new DFT<float> (m_ftparams/*size(data), mask, pc*/);
+			ft_params["dims"] = m_image_size;
+			ft_params["mask"] = Get<float>("mask");
+			m_csparam.ft = (FT<float>*) new DFT<float> (ft_params);
 			break;
-		case 1:  printf ("%s", "SENSE"); break;
-		case 2:  printf ("%s", "NUFFT"); break;
+		case 1:
+			printf ("%s", "SENSE");
+			assert(false);
+			break;
+		case 2:
+			printf ("%s", "NUFFT");
+			ft_params["epsilon"] = RHSAttribute<double>("fteps");
+			ft_params["alpha"]   = RHSAttribute<double>("ftalpha");
+			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
+			ft_params["m"]       = RHSAttribute<size_t>("ftm");
+	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
+	        ft_params["imsz"]    = m_image_size;
+	        m_csparam.ft = (FT<float>*) new NFFT<float> (ft_params);
+			break;
 		case 3:
 			printf ("%s", "NCSENSE");
-			m_ftparams["sens_maps"]    = std::string("sensitivities");
-			m_ftparams["weights_name"] = std::string("weights");
-		    m_ftparams["verbose"]      = m_verbose;
-		    m_ftparams["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
-		    m_ftparams["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
-		    m_ftparams["cgeps"]        = RHSAttribute<double>("cgeps");
-		    m_ftparams["lambda"]       = RHSAttribute<double>("lambda");
-		    m_ftparams["np"]           = RHSAttribute<int>("threads");
-			m_csparam.ft = (FT<float>*) new NCSENSE<float> (m_ftparams);
+			ft_params["sens_maps"]    = std::string("sensitivities");
+			ft_params["weights_name"] = std::string("weights");
+		    ft_params["verbose"]      = m_verbose;
+		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
+		    ft_params["fteps"]        = RHSAttribute<double>("fteps");
+		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
+		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
+		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
+		    ft_params["np"]           = RHSAttribute<int>("threads");
+			m_csparam.ft = (FT<float>*) new NCSENSE<float> (ft_params);
 			break;
 		default:
 			printf ("No FT strategy defined");
@@ -78,7 +99,7 @@ CompressedSensing::Init () {
 		}
 	printf ("\n");
 
-	Attribute ("csiter", &m_csiter);
+	Attribute ("csiter",    &m_csiter);
 	Attribute ("wl_family", &m_wf);
 	Attribute ("wl_member", &m_wm);
 	printf ("  DWT(%i,%i)", m_wf, m_wm);
@@ -110,8 +131,12 @@ CompressedSensing::Prepare () {
 
 	FT<float>& dft = *m_csparam.ft;
 
-	dft.KSpace (Get<float>("kspace"));
-	dft.Weights (Get<float>("weights"));
+	if (m_ft_type == 2 || m_ft_type == 3) {
+		dft.KSpace (Get<float>("kspace"));
+		dft.Weights (Get<float>("weights"));
+	} else {
+		dft.Mask (Get<float>("mask"));
+	}
 
 	Free ("weights");
 	Free ("kspace");
@@ -129,37 +154,35 @@ CompressedSensing::Process () {
 
 	FT<float>& dft = *m_csparam.ft;
 
-	Matrix<cxfl>  data  = m_test_case ?
-    		dft*phantom<cxfl>(256) : Get<cxfl>   ("data");
+	Matrix<cxfl> data  = m_test_case ?
+		dft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
+
+	if (m_noise > 0.)
+		data += m_noise * randn<cxfl>(size(data));
+
 	Matrix<float>& pdf   = Get<float>  ("pdf" );
-	//Matrix<float>& mask  = Get<float>  ("mask");
 	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
     Matrix<cxfl> im_dc;
-    /*m_test_case ?
-        		dft*phantom<cxfl>(256) : */
-	printf ("  Geometry: " JL_SIZE_T_SPECIFIER "D (" JL_SIZE_T_SPECIFIER ","
-            JL_SIZE_T_SPECIFIER ")\n", ndims (data),
-            m_image_size, m_image_size);
-	m_csparam.dwt = new DWT <cxfl> (m_image_size, (wlfamily) m_wf, m_wm);
+
+    m_csparam.dwt = new DWT <cxfl> (m_image_size[0], (wlfamily) m_wf, m_wm);
 	m_csparam.tvt = new TVOP ();
 
 	DWT<cxfl>& dwt = *m_csparam.dwt;
     std::vector< Matrix<cxfl> > vc;
 	
-	im_dc    = data;
-	im_dc   /= pdf;
+	im_dc  = data;
+	if (m_ft_type != 2 && m_ft_type != 3)
+		im_dc /= pdf;
+	im_dc  = dft ->* im_dc;
 
-	im_dc    = dft ->* im_dc;
-	
 	ma       = m_max(abs(im_dc));
 
-    if (m_verbose)
+	if (m_verbose)
 		vc.push_back(im_dc);
 
-	im_dc   /= ma;
-	data    /= ma;
-	
-	im_dc    = dwt * im_dc;
+	im_dc /= ma;
+	data  /= ma;
+	im_dc  = dwt * im_dc;
 
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 

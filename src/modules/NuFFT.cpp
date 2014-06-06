@@ -121,6 +121,7 @@ NuFFT::Process () {
 
     Matrix<cxfl> img =  ft ->* Get<cxfl> ("data");
     wspace.Add ("img", img);
+    wspace.Add ("orig", Get<cxfl> ("data"));
 	return codeare::OK;
 
 }

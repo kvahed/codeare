@@ -69,17 +69,16 @@ public:
                 m_verbose (false),
 		m_np(0) {
 
-		T fteps = 7.0e-4, alpha = 1.0;
-		size_t ftiter = 3, m = 1;
+		Params ft_params;
 
 		if (params.exists("fteps"))
-			fteps = boost::any_cast<T>(params["fteps"]);
+			ft_params["epsilon"] = fp_cast(params["fteps"]);
 		if (params.exists("alpha"))
-			alpha = boost::any_cast<T>(params["alpha"]);
+			ft_params["alpha"] = fp_cast(params["alpha"]);
 		if (params.exists("ftiter"))
-			ftiter = boost::any_cast<size_t>(params["ftiter"]);
+			ft_params["maxit"] = unsigned_cast(params["ftiter"]);
 		if (params.exists("m"))
-			m      = boost::any_cast<size_t>(params["m"]);
+			ft_params["m"] = unsigned_cast(params["m"]);
 
 		Workspace& ws = Workspace::Instance();
 		Matrix<T> b0;
@@ -97,13 +96,14 @@ public:
 			m_pc = ws.Get<T>(params.Get<std::string>("b0"));
 
 		m_nx.push_back(ndims(m_sm)-1);
-		Matrix<size_t> ms (m_nx[0],1);
+		container<size_t> ms (m_nx[0]);
 		for (size_t i = 0; i < m_nx[0]; i++)
 			ms[i] = size(m_sm,i);
 
         container<size_t> sizesm = vsize(m_sm);
         m_nx.push_back(sizesm.back());             // NC
         m_nx.push_back(numel(ws.Get<T>(m_wname))); // NK
+        ft_params["nk"] = m_nx[2];
         m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, c_multiply<size_t>)/m_nx[1]); //NR
 
 		m_cgiter  = params.Get<size_t>("cgiter");
@@ -125,10 +125,14 @@ public:
         printf ("  Channels: " JL_SIZE_T_SPECIFIER "\n", m_nx[1]);
         printf ("  Space size: " JL_SIZE_T_SPECIFIER "\n", m_nx[3]);
 		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
-		printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
+		//printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
 
-		for (size_t i = 0; i < m_np; i++) // FFTW planning not thread-safe
-			m_fts.push_back(NFFT<T> (ms, m_nx[2], m, alpha, b0, m_pc, fteps, ftiter));
+		ft_params["imsz"] = ms;
+
+		std::cout << ms << std::endl;
+
+		for (size_t i = 0; i < m_np; ++i) // FFTW planning not thread-safe
+			m_fts.push_back(NFFT<T>(ft_params));
 		
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
@@ -329,7 +333,7 @@ private:
 	std::string m_smname;
 	std::string m_wname;
 
-    std::vector<size_t> m_nx;
+    container<size_t> m_nx;
     
 	size_t     m_cgiter;         /**< Max # CG iterations */
 	double     m_cgeps;          /**< Convergence limit */

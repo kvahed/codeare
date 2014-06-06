@@ -16,6 +16,150 @@
 #include <map>
 #include <string>
 
+inline static int signed_cast (const boost::any& b) throw (boost::bad_any_cast) {
+    int ret;
+    try {
+        ret = boost::any_cast<int> (b);
+    } catch (const boost::bad_any_cast& e) {
+        try {
+            ret = boost::any_cast<long> (b);
+        } catch (const boost::bad_any_cast& e) {
+            try {
+                ret = boost::any_cast<short> (b);
+            } catch (const boost::bad_any_cast& e) {
+                try {
+                    ret = boost::any_cast<size_t> (b);
+                } catch (const boost::bad_any_cast& e) {
+                    try {
+                        ret = boost::any_cast<unsigned> (b);
+                    } catch (const boost::bad_any_cast& e) {
+                        try {
+                            ret = boost::any_cast<unsigned long> (b);
+                        } catch (const boost::bad_any_cast& e) {
+                            throw e;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+inline static size_t unsigned_cast (const boost::any& b) throw (boost::bad_any_cast) {
+    size_t ret;
+    try {
+        ret = boost::any_cast<int> (b);
+    } catch (const boost::bad_any_cast& e) {
+        try {
+            ret = boost::any_cast<long> (b);
+        } catch (const boost::bad_any_cast& e) {
+            try {
+                ret = boost::any_cast<short> (b);
+            } catch (const boost::bad_any_cast& e) {
+                try {
+                    ret = boost::any_cast<size_t> (b);
+                } catch (const boost::bad_any_cast& e) {
+                    try {
+                        ret = boost::any_cast<unsigned> (b);
+                    } catch (const boost::bad_any_cast& e) {
+                        try {
+                            ret = boost::any_cast<unsigned long> (b);
+                        } catch (const boost::bad_any_cast& e) {
+                            throw e;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+inline static std::complex<float> complex_cast (const boost::any& b) throw (boost::bad_any_cast) {
+    std::complex<float> ret;
+    try {
+        ret = boost::any_cast<std::complex<float> > (b);
+    } catch (const boost::bad_any_cast& e) {
+        try {
+            ret = boost::any_cast<std::complex<double> > (b);
+        } catch (const boost::bad_any_cast& e) {
+            try {
+                ret = boost::any_cast<float> (b);
+            } catch (const boost::bad_any_cast& e) {
+                try {
+                    ret = boost::any_cast<double> (b);
+                } catch (const boost::bad_any_cast& e) {
+                    try {
+                        ret = boost::any_cast<int> (b);
+                    } catch (const boost::bad_any_cast& e) {
+                        try {
+                            ret = boost::any_cast<long> (b);
+                        } catch (const boost::bad_any_cast& e) {
+                            try {
+                                ret = boost::any_cast<short> (b);
+                            } catch (const boost::bad_any_cast& e) {
+                                try {
+                                    ret = boost::any_cast<size_t> (b);
+                                } catch (const boost::bad_any_cast& e) {
+                                    try {
+                                        ret = boost::any_cast<unsigned> (b);
+                                    } catch (const boost::bad_any_cast& e) {
+                                        try {
+                                            ret = boost::any_cast<unsigned long> (b);
+                                        } catch (const boost::bad_any_cast& e) {
+                                            throw e;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+inline static float fp_cast (const boost::any& b) throw (boost::bad_any_cast) {
+    float ret;
+    try {
+        ret = boost::any_cast<float> (b);
+    } catch (const boost::bad_any_cast& e) {
+        try {
+            ret = boost::any_cast<double> (b);
+        } catch (const boost::bad_any_cast& e) {
+            try {
+                ret = boost::any_cast<int> (b);
+            } catch (const boost::bad_any_cast& e) {
+                try {
+                    ret = boost::any_cast<long> (b);
+                } catch (const boost::bad_any_cast& e) {
+                    try {
+                        ret = boost::any_cast<short> (b);
+                    } catch (const boost::bad_any_cast& e) {
+                        try {
+                            ret = boost::any_cast<size_t> (b);
+                        } catch (const boost::bad_any_cast& e) {
+                            try {
+                                ret = boost::any_cast<unsigned> (b);
+                            } catch (const boost::bad_any_cast& e) {
+                                try {
+                                    ret = boost::any_cast<unsigned long> (b);
+                                } catch (const boost::bad_any_cast& e) {
+                                    throw e;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+
 /**
  * @brief  General parameter container
  */
@@ -74,7 +218,7 @@ public:
 	 * @return      Casted value
 	 */
 	template <class T> inline
-	T Get (const std::string& key) const {
+	T Get (const std::string& key) const throw (boost::bad_any_cast) {
 		const boost::any& ba = (*this)[key];
 		try {
 			return boost::any_cast<T>(ba);
@@ -83,6 +227,7 @@ public:
 					key.c_str(), e.what(),
                     demangle(typeid(T).name()).c_str(),
                     demangle(ba.type().name()).c_str());
+			throw e;
 		}
 		return T(0);
 	}

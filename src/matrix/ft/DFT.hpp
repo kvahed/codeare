@@ -204,6 +204,54 @@ public:
 
 	}
 
+	DFT        (const Params& p) :
+		FT<T>::FT(p), m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
+		m_initialised(false), m_have_mask(false) {
+
+		size_t rank;
+		container<int> n;
+
+		if (p.exists("dims")) {
+			try {
+				n = (container<int>)p.Get<container<size_t> >("dims");
+				rank = n.size();
+			} catch (const boost::bad_any_cast& e){
+
+			}
+		} else if (p.exists("rank") && p.exists("dim")) {
+			int dim;
+			try {
+				rank = unsigned_cast (p["rank"]);
+			} catch (const boost::bad_any_cast& e) {
+				printf ("**ERROR - DFT: cannot interpret FT rank.\n%s\n", e.what());
+				assert (false);
+			}
+			try {
+				dim = unsigned_cast (p["dim"]);
+			} catch (const boost::bad_any_cast& e) {
+				printf ("**ERROR - DFT: cannot interpret FT dim.\n%s\n", e.what());
+				assert (false);
+			}
+			n = container<int>(rank,dim);
+		} else {
+			printf ("**ERROR - DFT: either vector with FT dimensions or rank and single dimension must be specified.\n");
+			assert (false);
+		}
+
+
+		d = n;
+		c = n;
+		for (size_t i = 0; i < n.size(); ++i)
+			c[i] /= 2;
+
+		m_N = prod(n);
+		std::reverse(n.begin(),n.end());
+		Allocate (rank, &n[0]);
+
+		m_initialised = true;
+
+	}
+
 
 	DFT (const DFT<T>& ft) {
 		*this = ft;
@@ -291,11 +339,6 @@ public:
 	}
 	
 	
-	DFT        (const Params& params) :
-		FT<T>::FT(params), m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
-		m_initialised(false), m_have_mask(false) {
-
-	}
 
 
     DFT () :
@@ -361,6 +404,15 @@ public:
 	}
 	
 	
+	/**
+	 * @brief   Set k-space mask
+	 * @param   mask  k-space mask
+	 */
+	inline void Mask (const Matrix<T>& mask) {
+		m_mask = mask;
+		m_have_mask = true;
+	}
+
 	/**
 	 * @brief    Forward transform
 	 *

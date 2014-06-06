@@ -80,11 +80,20 @@ public:
      * @brief Default constructor
      */
 	explicit inline container () {}
+
     /**
      * @brief Construct with size
      * @bparam  n  New size
      */
 	explicit inline container (const size_t n) { _data = VECTOR_CONSTR (T,n); }
+
+    /**
+     * @brief Construct with size and preset value
+     * @param  n  New size
+     * @param  val Preset value
+     */
+	explicit inline container (const size_t n, const T& val) { _data = VECTOR_CONSTR_VAL(T,n,val); }
+
     /**
      * @brief Copy constructor from different type
      * @param  cs  To copy

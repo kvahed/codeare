@@ -49,7 +49,6 @@ public:
 		m_imgsz (0),
 		m_M (0),
 		m_maxit (0),
-		m_prepared (false),
 		m_rank (0),
 		m_m(0) {};
 
@@ -68,7 +67,7 @@ public:
 	NFFT        (const Matrix<size_t>& imsize, const size_t& nk, const size_t m = 1, 
 				 const T alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1),
 				 const Matrix< std::complex<T> > pc = Matrix< std::complex<T> >(1),
-				 const T eps = 7.0e-4, const size_t maxit = 1) : m_prepared (false) {
+				 const T eps = 7.0e-4, const size_t maxit = 2) {
 		
 		m_M     = nk;
 		m_imgsz = 2;
@@ -85,9 +84,6 @@ public:
 		m_maxit   = maxit;
 		
 		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
-		
-        m_y = m_iplan.y;
-        m_f = m_iplan.f_hat_iter;
 
 		if (pc.Size() > 1)
 			m_have_pc = true;
@@ -100,6 +96,98 @@ public:
 	}
 	
 	
+	NFFT (const Params& p) {
+
+		if (p.exists("nk")) {// Number of kspace samples
+			try {
+				m_M = unsigned_cast(p["nk"]);
+			} catch (const boost::bad_any_cast& e) {
+				printf ("**ERROR - NFFT: Numer of ksppace samples need to be specified\n%s\n", e.what());
+				assert(false);
+			}
+		} else {
+			printf ("**ERROR - NFFT: Numer of ksppace samples need to be specified\n%");
+			assert(false);
+		}
+
+		if (p.exists("imsz")) {// Image domain size
+			try {
+				m_N = boost::any_cast<container<size_t> >(p["imsz"]);
+			} catch (const boost::bad_any_cast& e) {
+				printf ("**ERROR - NFFT: Image domain dimensions need to be specified\n%s\n", e.what());
+				assert(false);
+			}
+		} else {
+			printf ("**ERROR - NFFT: Image domain dimensions need to be specified\n");
+			assert(false);
+		}
+		m_n = m_N;
+
+		if (p.exists("m")) {
+			try {
+				m_m = unsigned_cast (p["m"]);
+			} catch (const boost::bad_any_cast& e) {
+				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor m. Defaulting to 1.");
+				m_m = 1;
+			}
+		} else {
+			m_m = 1;
+		}
+
+		T alpha = 1.;
+		if (p.exists("alpha")) {
+			try {
+				alpha = fp_cast(p["alpha"]);
+			} catch (const boost::bad_any_cast& e) {
+				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor alpha. Defaulting to 1.0");
+			}
+		}
+
+		for (size_t i = 0; i < m_N.size(); ++i)
+			m_n[i] = ceil(alpha*m_N[i]);
+
+		m_rank = m_N.size();
+
+		m_imgsz = 2*prod(m_N);
+
+		if (p.exists("epsilon")) {
+			try {
+				m_epsilon = fp_cast (p["epsilon"]);
+			} catch (const boost::bad_any_cast& e) {
+				printf ("  WARNING - NFFT: Could not interpret input for convergence criterium epsilon. Defaulting to 0.0007");
+				m_epsilon = 7.e-4;
+			}
+		} else {
+			m_epsilon = 7.e-4;
+		}
+
+		if (p.exists("maxit")) {
+			try {
+				m_maxit = unsigned_cast (p["maxit"]);
+			} catch (const boost::bad_any_cast& e) {
+				printf ("  WARNING - NFFT: Could not interpret input for maximum NFFT steps. Defaulting to 3");
+				m_maxit = 3;
+			}
+		} else {
+			m_maxit = 3;
+		}
+
+		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
+
+		if (p.exists("pc")) {
+			try {
+				m_pc = boost::any_cast<std::complex<T> >(p["pc"]);
+			} catch (const boost::bad_any_cast& e) {
+				printf ("  WARNING - NFFT: Phase correction matrix corrupt?\n%s\n", e.what());
+			}
+			m_cpc = conj(m_pc);
+			m_have_pc = true;
+		}
+
+		m_initialised = true;
+
+	}
+
 	/**
 	 * @brief Copy conctructor
 	 */
@@ -137,9 +225,6 @@ public:
 		m_imgsz       = ft.m_imgsz;
 		m_m           = ft.m_m;
 		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
-		m_prepared    = ft.m_prepared;
-	    m_y           = ft.m_y;
-	    m_f           = ft.m_f;
 	    return *this;
 		
 	}
@@ -187,20 +272,20 @@ public:
 	Trafo       (const Matrix< std::complex<T> >& m) const {
 
 		Matrix< std::complex<T> > out (m_M,1);
-		double* tmp;
-		T* tmpo;
+		double* tmpd;
+		T* tmpt;
 		
-		tmp  = (double*) m_fplan.f_hat;
-		tmpo = (T*) m.Ptr();
-		std::copy (tmpo, tmpo+m_imgsz, tmp);
+		tmpd = (double*) m_fplan.f_hat;
+		tmpt = (T*) m.Ptr();
+		std::copy (tmpt, tmpt+m_imgsz, tmpd);
 		
 		NFFTTraits<double>::Trafo (m_fplan);
 		
-		tmp  = (double*) m_fplan.f;
-		tmpo = (T*) out.Ptr();
-		std::copy (tmp, tmp+2*m_M, tmpo);
+		tmpd = (double*) m_fplan.f;
+		tmpt = (T*) out.Ptr();
+		std::copy (tmpd, tmpd+2*m_M, tmpt);
 		
-		return out;
+		return squeeze(out);
 
 	}
 	
@@ -215,18 +300,18 @@ public:
 	Adjoint     (const Matrix< std::complex<T> >& m) const {
 
         Matrix< std::complex<T> > out (m_N);
-        double* tmp;
-        T* tmpo;
+        double* tmpd;
+        T* tmpt;
 
-        tmp  = (double*) m_iplan.y;
-        tmpo = (T*) m.Ptr();
-        std::copy (tmpo, tmpo+2*m_M, tmp);
+        tmpd = (double*) m_iplan.y;
+        tmpt = (T*) m.Ptr();
+        std::copy (tmpt, tmpt+2*m_M, tmpd);
 
 		NFFTTraits<double>::ITrafo ((Plan&) m_fplan, (Solver&) m_iplan, m_maxit, m_epsilon);
 
-		tmp  = (double*) m_iplan.f_hat_iter;
-		tmpo = (T*) out.Ptr();
-		std::copy (tmp, tmp+m_imgsz, tmpo);
+		tmpd = (double*) m_iplan.f_hat_iter;
+		tmpt = (T*) out.Ptr();
+		std::copy (tmpd, tmpd+m_imgsz, tmpt);
 		
 		return out;
 		
@@ -269,16 +354,12 @@ private:
 	size_t     m_M;             /**< @brief Number of k-space knots */
 	size_t     m_maxit;         /**< @brief Number of Recon iterations (NFFT 3) */
 	T          m_epsilon;       /**< @brief Convergence criterium */
+	T          m_alpha;
 	size_t     m_imgsz;
 	
 	Plan       m_fplan;         /**< nfft  plan */
 	Solver     m_iplan;         /**< infft plan */
 	
-	bool       m_prepared;
-
-    fftw_complex* m_y;
-    fftw_complex* m_f;
-
     size_t     m_m;
 
 };

@@ -33,7 +33,7 @@
  */
 template <class T> inline static Matrix< std::complex<T> >
 E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
-   const std::vector<size_t>& nx, const std::vector<NFFT<T> >& fts) {
+   const container<size_t>& nx, const std::vector<NFFT<T> >& fts) {
 	Matrix< std::complex<T> > out (nx[2],nx[1]);
 #pragma omp parallel for default (shared)
     for (int j = 0; j < nx[1]; j++)
@@ -53,7 +53,7 @@ E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
  */
 template <class T> inline static Matrix< std::complex<T> >
 EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
-    const std::vector<size_t>& nx, const std::vector<NFFT<T> >& fts) {
+    const container<size_t>& nx, const std::vector<NFFT<T> >& fts) {
 	Matrix< std::complex<T> > out = zeros< std::complex<T> > (size(sm));
 #pragma omp parallel for default (shared)
 	for (int j = 0; j < nx[1]; j++)
