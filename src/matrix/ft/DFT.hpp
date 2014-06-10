@@ -216,7 +216,7 @@ public:
 				n = (container<int>)p.Get<container<size_t> >("dims");
 				rank = n.size();
 			} catch (const boost::bad_any_cast& e){
-
+				printf("**ERROR - DFT: cannot interpret dimensions vector (container<size_t>)\n%s\n", e.what());
 			}
 		} else if (p.exists("rank") && p.exists("dim")) {
 			int dim;

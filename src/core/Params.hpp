@@ -16,23 +16,23 @@
 #include <map>
 #include <string>
 
-inline static int signed_cast (const boost::any& b) throw (boost::bad_any_cast) {
+inline static int signed_cast (const boost::any& b)  {
     int ret;
     try {
         ret = boost::any_cast<int> (b);
-    } catch (const boost::bad_any_cast& e) {
+    } catch (const boost::bad_any_cast&) {
         try {
             ret = boost::any_cast<long> (b);
-        } catch (const boost::bad_any_cast& e) {
+        } catch (const boost::bad_any_cast&) {
             try {
                 ret = boost::any_cast<short> (b);
-            } catch (const boost::bad_any_cast& e) {
+            } catch (const boost::bad_any_cast&) {
                 try {
                     ret = boost::any_cast<size_t> (b);
-                } catch (const boost::bad_any_cast& e) {
+                } catch (const boost::bad_any_cast&) {
                     try {
                         ret = boost::any_cast<unsigned> (b);
-                    } catch (const boost::bad_any_cast& e) {
+                    } catch (const boost::bad_any_cast&) {
                         try {
                             ret = boost::any_cast<unsigned long> (b);
                         } catch (const boost::bad_any_cast& e) {
@@ -46,23 +46,23 @@ inline static int signed_cast (const boost::any& b) throw (boost::bad_any_cast) 
     return ret;
 }
 
-inline static size_t unsigned_cast (const boost::any& b) throw (boost::bad_any_cast) {
+inline static size_t unsigned_cast (const boost::any& b) {
     size_t ret;
     try {
         ret = boost::any_cast<int> (b);
-    } catch (const boost::bad_any_cast& e) {
+    } catch (const boost::bad_any_cast&) {
         try {
             ret = boost::any_cast<long> (b);
-        } catch (const boost::bad_any_cast& e) {
+        } catch (const boost::bad_any_cast&) {
             try {
                 ret = boost::any_cast<short> (b);
-            } catch (const boost::bad_any_cast& e) {
+            } catch (const boost::bad_any_cast&) {
                 try {
                     ret = boost::any_cast<size_t> (b);
-                } catch (const boost::bad_any_cast& e) {
+                } catch (const boost::bad_any_cast&) {
                     try {
                         ret = boost::any_cast<unsigned> (b);
-                    } catch (const boost::bad_any_cast& e) {
+                    } catch (const boost::bad_any_cast&) {
                         try {
                             ret = boost::any_cast<unsigned long> (b);
                         } catch (const boost::bad_any_cast& e) {
@@ -76,35 +76,35 @@ inline static size_t unsigned_cast (const boost::any& b) throw (boost::bad_any_c
     return ret;
 }
 
-inline static std::complex<float> complex_cast (const boost::any& b) throw (boost::bad_any_cast) {
+inline static std::complex<float> complex_cast (const boost::any& b)  {
     std::complex<float> ret;
     try {
         ret = boost::any_cast<std::complex<float> > (b);
-    } catch (const boost::bad_any_cast& e) {
+    } catch (const boost::bad_any_cast&) {
         try {
             ret = boost::any_cast<std::complex<double> > (b);
-        } catch (const boost::bad_any_cast& e) {
+        } catch (const boost::bad_any_cast&) {
             try {
                 ret = boost::any_cast<float> (b);
-            } catch (const boost::bad_any_cast& e) {
+            } catch (const boost::bad_any_cast&) {
                 try {
                     ret = boost::any_cast<double> (b);
-                } catch (const boost::bad_any_cast& e) {
+                } catch (const boost::bad_any_cast&) {
                     try {
                         ret = boost::any_cast<int> (b);
-                    } catch (const boost::bad_any_cast& e) {
+                    } catch (const boost::bad_any_cast&) {
                         try {
                             ret = boost::any_cast<long> (b);
-                        } catch (const boost::bad_any_cast& e) {
+                        } catch (const boost::bad_any_cast&) {
                             try {
                                 ret = boost::any_cast<short> (b);
-                            } catch (const boost::bad_any_cast& e) {
+                            } catch (const boost::bad_any_cast&) {
                                 try {
                                     ret = boost::any_cast<size_t> (b);
-                                } catch (const boost::bad_any_cast& e) {
+                                } catch (const boost::bad_any_cast&) {
                                     try {
                                         ret = boost::any_cast<unsigned> (b);
-                                    } catch (const boost::bad_any_cast& e) {
+                                    } catch (const boost::bad_any_cast&) {
                                         try {
                                             ret = boost::any_cast<unsigned long> (b);
                                         } catch (const boost::bad_any_cast& e) {
@@ -122,29 +122,29 @@ inline static std::complex<float> complex_cast (const boost::any& b) throw (boos
     return ret;
 }
 
-inline static float fp_cast (const boost::any& b) throw (boost::bad_any_cast) {
+inline static float fp_cast (const boost::any& b) {
     float ret;
     try {
         ret = boost::any_cast<float> (b);
-    } catch (const boost::bad_any_cast& e) {
+    } catch (const boost::bad_any_cast&) {
         try {
             ret = boost::any_cast<double> (b);
-        } catch (const boost::bad_any_cast& e) {
+        } catch (const boost::bad_any_cast&) {
             try {
                 ret = boost::any_cast<int> (b);
-            } catch (const boost::bad_any_cast& e) {
+            } catch (const boost::bad_any_cast&) {
                 try {
                     ret = boost::any_cast<long> (b);
-                } catch (const boost::bad_any_cast& e) {
+                } catch (const boost::bad_any_cast&) {
                     try {
                         ret = boost::any_cast<short> (b);
-                    } catch (const boost::bad_any_cast& e) {
+                    } catch (const boost::bad_any_cast&) {
                         try {
                             ret = boost::any_cast<size_t> (b);
-                        } catch (const boost::bad_any_cast& e) {
+                        } catch (const boost::bad_any_cast&) {
                             try {
                                 ret = boost::any_cast<unsigned> (b);
-                            } catch (const boost::bad_any_cast& e) {
+                            } catch (const boost::bad_any_cast&) {
                                 try {
                                     ret = boost::any_cast<unsigned long> (b);
                                 } catch (const boost::bad_any_cast& e) {
@@ -218,7 +218,7 @@ public:
 	 * @return      Casted value
 	 */
 	template <class T> inline
-	T Get (const std::string& key) const throw (boost::bad_any_cast) {
+	T Get (const std::string& key) const {
 		const boost::any& ba = (*this)[key];
 		try {
 			return boost::any_cast<T>(ba);
