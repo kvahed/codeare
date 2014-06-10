@@ -64,13 +64,13 @@ public:
 		dims = params.Get<Matrix<size_t> > ("fdims");
 
 		// Channels
-		nc = size (sens, ndims(sens)-1);
+		nc   = size (sens, ndims(sens)-1);
 		assert (nc > 1);
 
 		// 3D acceleration
-		af = size(sens) / dims;
+		af   = size(sens) / dims;
 		std::cout << "\n  acceleration vector: " << af;
-		aaf = prod (af);
+		aaf  = prod (af);
 
 
 		// Can only handle 2D/3D SENSE
@@ -101,9 +101,7 @@ public:
 	 * @brief          Clean up and destruct
 	 */
 	virtual
-	~CSENSE            () {
-
-	}
+	~CSENSE            () {}
 
 
 	/**
@@ -300,7 +298,7 @@ private:
 
 	std::vector<DFT<T> > m_dft;
 	Matrix <CT>          sens;
-	Matrix<size_t> d; /* Bug in MSVC 10? Do not touch */
+	Matrix <size_t> d; /* Bug in MSVC 10? Do not touch */
 	Matrix <size_t>      dims;
 	int                  nthreads;
 	Matrix <size_t>      af;

@@ -209,7 +209,7 @@ CompressedSensing::Process () {
 
 
 CompressedSensing::CompressedSensing() :
-	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0) {}
+	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_ft_type(0), m_noise(0.), m_test_case(0) {}
 
 
 CompressedSensing::~CompressedSensing() {}

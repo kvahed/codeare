@@ -257,7 +257,8 @@ struct NFFTTraits<double> {
 	 * @return success
 	 */
 	inline static int
-	Init  (const container<int>& N, size_t M, const container<int>& n, const int m, nfft_plan& np, solver_plan_complex& inp) {
+	Init  (const container<int>& N, size_t M, const container<int>& n,
+			int m, nfft_plan& np, solver_plan_complex& inp) {
 		
 		container<int> _N(N), _n(n);
 		int _d (N.size()), _M(M), _m(m);
