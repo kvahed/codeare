@@ -113,6 +113,8 @@ include_directories(${FFTW3_INCLUDE_DIR})
 find_package(NFFT)
 if(${NFFT_INCLUDE_DIR} MATCHES "")
   set (NFFT_INCLUDE_DIR "")
+else ()
+  add_definitions (-DHAVE_NFFT)
 endif()
 
 # Interpolations -----------------------------------------------------

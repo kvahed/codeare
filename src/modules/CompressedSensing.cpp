@@ -21,7 +21,9 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
 #include "DFT.hpp"
-#include "NCSENSE.hpp"
+#ifdef HAVE_NFFT
+	#include "NCSENSE.hpp"
+#endif
 #include "Algos.hpp"
 #include "Creators.hpp"
 
@@ -71,6 +73,7 @@ CompressedSensing::Init () {
 			break;
 		case 2:
 			printf ("%s", "NUFFT");
+#ifdef HAVE_NFFT
 			ft_params["epsilon"] = RHSAttribute<double>("fteps");
 			ft_params["alpha"]   = RHSAttribute<double>("ftalpha");
 			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
@@ -78,10 +81,15 @@ CompressedSensing::Init () {
 	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
 	        ft_params["imsz"]    = m_image_size;
 	        m_csparam.ft = (FT<float>*) new NFFT<float> (ft_params);
+#else
+			printf("**ERROR - CompressedSensing: NUFFT support not available.");
+			assert(false);
+#endif
 			break;
 		case 3:
 			printf ("%s", "NCSENSE");
-			ft_params["sens_maps"]    = std::string("sensitivities");
+#ifdef HAVE_NFFT
+			ft_params["sens_maps"] = std::string("sensitivities");
 			ft_params["weights_name"] = std::string("weights");
 		    ft_params["verbose"]      = m_verbose;
 		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
@@ -91,6 +99,10 @@ CompressedSensing::Init () {
 		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
 		    ft_params["np"]           = RHSAttribute<int>("threads");
 			m_csparam.ft = (FT<float>*) new NCSENSE<float> (ft_params);
+#else
+			printf("**ERROR - CompressedSensing: NUFFT support not available.");
+			assert(false);
+#endif
 			break;
 		default:
 			printf ("No FT strategy defined");
