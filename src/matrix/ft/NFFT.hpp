@@ -126,7 +126,7 @@ public:
 		if (p.exists("m")) {
 			try {
 				m_m = unsigned_cast (p["m"]);
-			} catch (const boost::bad_any_cast& e) {
+			} catch (const boost::bad_any_cast&) {
 				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor m. Defaulting to 1.");
 				m_m = 1;
 			}
@@ -138,7 +138,7 @@ public:
 		if (p.exists("alpha")) {
 			try {
 				alpha = fp_cast(p["alpha"]);
-			} catch (const boost::bad_any_cast& e) {
+			} catch (const boost::bad_any_cast&) {
 				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor alpha. Defaulting to 1.0");
 			}
 		}
@@ -153,18 +153,18 @@ public:
 		if (p.exists("epsilon")) {
 			try {
 				m_epsilon = fp_cast (p["epsilon"]);
-			} catch (const boost::bad_any_cast& e) {
+			} catch (const boost::bad_any_cast&) {
 				printf ("  WARNING - NFFT: Could not interpret input for convergence criterium epsilon. Defaulting to 0.0007");
-				m_epsilon = 7.e-4;
+				m_epsilon = 7.e-4f;
 			}
 		} else {
-			m_epsilon = 7.e-4;
+			m_epsilon = 7.e-4f;
 		}
 
 		if (p.exists("maxit")) {
 			try {
 				m_maxit = unsigned_cast (p["maxit"]);
-			} catch (const boost::bad_any_cast& e) {
+			} catch (const boost::bad_any_cast&) {
 				printf ("  WARNING - NFFT: Could not interpret input for maximum NFFT steps. Defaulting to 3");
 				m_maxit = 3;
 			}

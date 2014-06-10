@@ -31,6 +31,7 @@
 #include "Workspace.hpp"
 
 #include <numeric>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 /**
  * @brief Non-Cartesian SENSE<br/>
@@ -109,7 +110,7 @@ public:
 		m_cgiter  = params.Get<size_t>("cgiter");
 		m_cgeps   = params.Get<double>("cgeps");
 		m_lambda  = params.Get<double>("lambda");
-		m_verbose = params.Get<int>("verbose");
+		m_verbose = (params.Get<int>("verbose") > 0);
 		
 #pragma omp parallel 
 		{
@@ -259,7 +260,7 @@ public:
 
 		for (size_t i = 0; i < m_cgiter; i++) {
 			res.push_back(rn/xn);
-			if (std::isnan(res.at(i)) || res.at(i) <= m_cgeps)  break;
+			if (boost::math::isnan(res.at(i)) || res.at(i) <= m_cgeps)  break;
 			if (m_verbose)
 				printf ("    %03lu %.7f\n", i, res.at(i));
 			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;

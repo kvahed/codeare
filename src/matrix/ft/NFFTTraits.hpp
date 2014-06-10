@@ -163,23 +163,23 @@ struct NFFTTraits<float> {
 		if (spc.flags & PRECOMPUTE_DAMP) {
 			if (np.d == 3) {
 				for (j = 0; j < N; j++) {
-					int    j2 = j - N/2; 
+					float    j2 = j - N/2; 
 					for (k = 0; k < N; k++) {
-						int    k2 = k - N/2;
+						float    k2 = k - N/2;
 						for (z = 0; z < N; z++) {
-							int    z2 = z - N/2;
-							double r  = sqrt(j2*j2+k2*k2+z2*z2);
-							spc.w_hat[z*N*N+j*N+k] = (r > (double) N/2) ? 0.0 : 1.0;
+							float    z2 = z - N/2;
+							float r  = sqrt(j2*j2+k2*k2+z2*z2);
+							spc.w_hat[z*N*N+j*N+k] = (r > (float) N/2) ? 0.0 : 1.0;
 						}
 					}
 				}
 			} else {
 				for (j = 0; j < N; j++) {
-					int    j2 = j-N/2;
+					float    j2 = j-N/2;
 					for (k = 0; k < N; k++) {
-						int    k2 = k-N/2;
+						float    k2 = k-N/2;
 						double r  = sqrt(j2*j2+k2*k2);
-						spc.w_hat[j*N+k]       = (r > (double) N/2) ? 0.0 : 1.0;
+						spc.w_hat[j*N+k]       = (r > (float) N/2) ? 0.0 : 1.0;
 					}
 				}
 			}
@@ -290,7 +290,7 @@ struct NFFTTraits<double> {
 	inline static int
 	ITrafo              (nfft_plan& np, solver_plan_complex& spc, size_t maxiter = 3, double epsilon = 3e-7) {
 		
-		int k, l;
+		int l;
 		
 		/* init some guess */
         std::fill_n ((double*)spc.f_hat_iter, 2*np.N_total, 0.);
@@ -353,7 +353,8 @@ struct NFFTTraits<double> {
 	inline static int
 	Weights              (const nfft_plan& np, const solver_plan_complex& spc) {
 		
-		int j, j2, k, k2, z, z2, N = np.N[0], N2 = N*N, NH = .5*N;
+		int j, k, z, N = np.N[0], N2 = N*N, NH = .5*N;
+		float k2, j2, z2;
 		
 		if (spc.flags & PRECOMPUTE_DAMP)
 			if (np.d == 3) {

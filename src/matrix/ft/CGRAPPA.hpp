@@ -88,8 +88,8 @@ public:
 		std::cout << size(trg);
 		std::cout << err++ << std::endl;
 
-		for (size_t y = floor(m_kdims[1]/2); y < m_adims[1]-floor(m_kdims[1]/2); ++y)
-			for (size_t x = floor(m_kdims[0]/2); x < m_adims[0]-floor(m_kdims[0]/2); ++x) // f.e. 2-253
+		for (size_t y = floor((float)m_kdims[1]/2); y < m_adims[1]-floor((float)m_kdims[1]/2); ++y)
+			for (size_t x = floor((float)m_kdims[0]/2); x < m_adims[0]-floor((float)m_kdims[0]/2); ++x) // f.e. 2-253
 				for (size_t c = 0, /*srci = 0,*/ trgi = 0; c < m_nc; ++c) {
 					for (size_t yt = y; yt < af; ++yt, ++trgi) {
 						printf ("" JL_SIZE_T_SPECIFIER ", " JL_SIZE_T_SPECIFIER ", " JL_SIZE_T_SPECIFIER

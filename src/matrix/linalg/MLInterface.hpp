@@ -162,10 +162,10 @@ extern "C" {
 
 #endif
 
-#ifdef _MSC_VER
-extern "C" long _ftol( double ); //defined by VC6 C libs
-extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
-#endif
+//#ifdef _MSC_VER
+//extern "C" long _ftol( double ); //defined by VC6 C libs
+//extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
+//#endif
 
 #define SDOT   F77name(sdot,SDOT)
 #define SNRM2  F77name(snrm2,SNRM2)
