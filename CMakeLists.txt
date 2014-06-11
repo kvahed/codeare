@@ -103,8 +103,9 @@ endif ()
 # OmniORB ------------------------------------------------------------
 find_package (OmniORB)
 if (${OMNIORB4_FOUND})
-  message ("OmniORB4 library not found. Networking infrastructure will not bebuilt.")
   include_directories (${OMNIORB4_INCLUDE_DIR})
+else ()
+  message ("OmniORB4 library not found. Networking infrastructure will not bebuilt.")
 endif ()
 
 # Fourier transform --------------------------------------------------
