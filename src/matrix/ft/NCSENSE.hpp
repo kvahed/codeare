@@ -80,38 +80,35 @@ public:
 			ft_params["maxit"] = unsigned_cast(params["ftiter"]);
 		if (params.exists("m"))
 			ft_params["m"] = unsigned_cast(params["m"]);
+		if (params.exists("nk"))
+			ft_params["nk"] = unsigned_cast(params["nk"]);
 
 		Workspace& ws = Workspace::Instance();
 		Matrix<T> b0;
 
-		assert (params.exists("sens_maps"));
-		m_smname = params.Get<std::string>("sens_maps");
-        m_sm = ws.Get<CT>(m_smname);
+		assert (params.exists("sensitivities"));
+		m_sm = params.Get<Matrix<CT> >("sensitivities");
 
-		assert (params.exists("weights_name"));
-		m_wname  = params.Get<std::string>("weights_name");
-        
 		if (params.exists("phase_cor"))
 			m_pc = ws.Get<CT>(params.Get<std::string>("phase_cor"));
 		if (params.exists("b0"))
 			m_pc = ws.Get<T>(params.Get<std::string>("b0"));
-
+		
 		m_nx.push_back(ndims(m_sm)-1);
 		container<size_t> ms (m_nx[0]);
 		for (size_t i = 0; i < m_nx[0]; i++)
 			ms[i] = size(m_sm,i);
 
-        container<size_t> sizesm = vsize(m_sm);
+		container<size_t> sizesm = vsize(m_sm);
         m_nx.push_back(sizesm.back());             // NC
-        m_nx.push_back(numel(ws.Get<T>(m_wname))); // NK
-        ft_params["nk"] = m_nx[2];
+		m_nx.push_back(unsigned_cast(params["nk"])); // NK
         m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, c_multiply<size_t>)/m_nx[1]); //NR
 
 		m_cgiter  = params.Get<size_t>("cgiter");
 		m_cgeps   = params.Get<double>("cgeps");
 		m_lambda  = params.Get<double>("lambda");
 		m_verbose = (params.Get<int>("verbose") > 0);
-		
+			
 #pragma omp parallel 
 		{
 			m_np = omp_get_num_threads ();
@@ -132,10 +129,10 @@ public:
 
 		for (size_t i = 0; i < m_np; ++i) // FFTW planning not thread-safe
 			m_fts.push_back(NFFT<T>(ft_params));
-		
+
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
-        
+
 		printf ("  ...done.\n\n");
 		
 	}
@@ -160,12 +157,10 @@ public:
 	 */
 	void
 	KSpace (const Matrix<T>& k) {
-		
 #pragma omp parallel 
 		{
             m_fts[omp_get_thread_num()].KSpace(k);
 		}
-		
 	}
 	
 
@@ -175,13 +170,11 @@ public:
 	 * @param  w   Weights
 	 */
 	void
-	Weights (const Matrix<T>& w) {
-		
+	Weights (const Matrix<T>& w) {		
 #pragma omp parallel 
 		{
             m_fts[omp_get_thread_num()].Weights(w);
 		}
-		
 	}
 
 

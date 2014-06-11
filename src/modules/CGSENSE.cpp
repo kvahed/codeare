@@ -67,6 +67,12 @@ CGSENSE::Init() {
 
 	// Tikhonov ----------------------------
 
+	Attribute("nk",       &m_nk);
+	printf("  nk       : %i \n", m_nk);
+	// --------------------------------------
+
+	// Tikhonov ----------------------------
+
 	Attribute ("lambda",  &m_lambda);
 	// --------------------------------------
 
@@ -121,23 +127,23 @@ CGSENSE::Prepare () {
 	codeare::error_code error = codeare::OK;
 
 	Params cgp;
-	cgp["sens_maps"]    = std::string("sensitivities");
-    cgp["weights_name"] = std::string("weights");
-    cgp["verbose"]      = m_verbose;
-    cgp["ftiter"]       = (size_t) m_ftmaxit;
-    cgp["cgiter"]       = (size_t) m_cgmaxit;
-    cgp["cgeps"]        = m_cgeps;
-    cgp["lambda"]       = m_lambda;
-    cgp["np"]           = m_nthreads;
+	cgp["sensitivities"] = Get<cxfl>("sensitivities");
+    cgp["nk"]            = (size_t) m_nk;
+    cgp["verbose"]       = m_verbose;
+    cgp["ftiter"]        = (size_t) m_ftmaxit;
+    cgp["cgiter"]        = (size_t) m_cgmaxit;
+    cgp["cgeps"]         = m_cgeps;
+    cgp["lambda"]        = m_lambda;
+    cgp["np"]            = m_nthreads;
 
 	m_ncs = NCSENSE<float>(cgp);
 
 	m_ncs.KSpace (Get<float>("kspace"));
 	m_ncs.Weights (Get<float>("weights"));
-	
+
 	Free ("weights");
-	Free ("kspace");
-	
+	Free("kspace");
+
 	m_initialised = true;
 
 	return error;
@@ -159,7 +165,7 @@ CGSENSE::Process () {
 
     Matrix<cxfl> img = m_ncs ->* data;
     
-    wspace.Add("image", img);
+    Add("image", img);
 	return error;
 
 }

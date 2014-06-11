@@ -86,6 +86,7 @@ namespace RRStrategy {
 		int             m_ftmaxit;   /**< Maximum number of NuFFT solver iterations           */
 		int             m_cgmaxit;   /**< Maximum number of CG iterations                     */
 		int             m_nthreads;  /**< Number of threads                                   */
+		int             m_nk;        /**< Number of kspace samples                            */
 		
 		double          m_noise;     /**< Add noise?                                          */
 		double          m_lambda;    /**< Tikhonov factor                                     */
