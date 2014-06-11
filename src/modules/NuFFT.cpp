@@ -119,7 +119,8 @@ NuFFT::Prepare () {
 codeare::error_code
 NuFFT::Process () {
 
-    Add ("img", ft ->* Get<cxfl> ("data"));
+    Matrix<cxfl> img =  ft ->* Get<cxfl> ("data");
+    Add ("img", img);
 	return codeare::OK;
 
 }
