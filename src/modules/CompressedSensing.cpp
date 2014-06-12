@@ -89,7 +89,8 @@ CompressedSensing::Init () {
 		case 3:
 			printf ("%s", "NCSENSE");
 #ifdef HAVE_NFFT
-			ft_params["sens_maps"] = std::string("sensitivities");
+			ft_params["sensitivities"] = Get<cxfl>("sensitivities");
+            ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
 			ft_params["weights_name"] = std::string("weights");
 		    ft_params["verbose"]      = m_verbose;
 		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");

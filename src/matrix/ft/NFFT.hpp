@@ -236,8 +236,7 @@ public:
 	 */
 	inline void 
 	KSpace (const Matrix<T>& k) {		
-		size_t cpsz = k.Size();
-		assert (cpsz == m_fplan.M_total * m_rank);
+		assert (k.Size() == m_fplan.M_total*m_rank);
 		std::copy (k.Begin(), k.End(), m_fplan.x);
 	}
 	
@@ -249,8 +248,7 @@ public:
 	 */
 	inline void 
 	Weights (const Matrix<T>& w) {
-		size_t cpsz = w.Size();
-		assert (cpsz == m_fplan.M_total);
+		assert (w.Size() == m_fplan.M_total);
 		std::copy (w.Begin(), w.End(), m_iplan.w);
 		NFFTTraits<double>::Weights (m_fplan, m_iplan);
 		NFFTTraits<double>::Psi     (m_fplan);
