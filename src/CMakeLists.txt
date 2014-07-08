@@ -181,5 +181,8 @@ if (${NFFT_FOUND})
   set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c nufft_cs.xml) 
   MP_TESTS ("nufft_cs" "${TEST_CALL}")
 
+  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c cgsense_r3_cs.xml) 
+  MP_TESTS ("cgsense_cs" "${TEST_CALL}")
+
 endif()
 

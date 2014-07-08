@@ -113,9 +113,10 @@ public:
 		{
 			m_np = omp_get_num_threads ();
 		}
-		
 		if (params.exists("np") && boost::any_cast<int>(params["np"]) > 0)
-			omp_set_num_threads(boost::any_cast<int>(params["np"]));
+			m_np = boost::any_cast<int>(params["np"]);
+		
+		omp_set_num_threads(m_np);
 
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  No of threads: %i\n", m_np);
@@ -157,7 +158,7 @@ public:
 	 */
 	void
 	KSpace (const Matrix<T>& k) {
-#pragma omp parallel 
+#pragma omp parallel
 		{
             m_fts[omp_get_thread_num()].KSpace(k);
 		}
