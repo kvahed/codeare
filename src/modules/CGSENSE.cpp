@@ -74,6 +74,7 @@ CGSENSE::Init() {
 	// Tikhonov ----------------------------
 
 	Attribute ("lambda",  &m_lambda);
+	Attribute ("m",  &m_m);
 	// --------------------------------------
 
 	// Verbosity ----------------------------
@@ -135,6 +136,7 @@ CGSENSE::Prepare () {
     cgp["cgeps"]         = m_cgeps;
     cgp["lambda"]        = m_lambda;
     cgp["np"]            = m_nthreads;
+    cgp["m"]             = m_m;
 
 	m_ncs = NCSENSE<float>(cgp);
 

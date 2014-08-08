@@ -14,10 +14,10 @@
     <pre class="sh_sh">
       > sudo apt-get install git build-essential fftw3-dev itk3-dev \
         libboost-dev libboost-system-dev libboost-thread-dev \
-        libboost-program-options-dev libnifti-dev liblapack-dev \
-        libgsl0-dev omniorb-nameserver libomniorb4-dev omniidl \
-        libatlas-dev libatlas-base-dev autoconf libtool \
-	libinsighttoolkit3-dev  
+        libboost-program-options-dev libboos-timer libnifti-dev \
+        liblapack-dev libgsl0-dev omniorb-nameserver libomniorb4-dev \
+        omniidl libatlas-dev libatlas-base-dev autoconf libtool \
+	    libinsighttoolkit3-dev libhdf5-dev  
     </pre>
 
     <h3>HDF5 (&gt;=1.8)</h3>
