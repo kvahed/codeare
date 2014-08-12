@@ -243,9 +243,10 @@ public:
 		vector<T> res;
         std::vector<Matrix<cxfl> > vc;
 
+        typedef typename container<CT>::iterator it_type;
+
 		p  = EH (m, sens, m_nx, m_fts) * m_ic;
 		r  = p;
-		x  = zeros<CT>(size(p));
         xn = real(p.dotc(p));
         rn = xn;
 
@@ -254,7 +255,10 @@ public:
 
 		for (size_t i = 0; i < m_cgiter; i++) {
 			res.push_back(rn/xn);
-			if (boost::math::isnan(res.at(i)) || res.at(i) <= m_cgeps)  break;
+			if (i==0)
+				x  = zeros<CT>(size(p));
+			if (boost::math::isnan(res.at(i)) || res.at(i) <= m_cgeps)
+				break;
 			if (m_verbose)
 				printf ("    %03lu %.7f\n", i, res.at(i));
 			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
@@ -274,10 +278,10 @@ public:
         if (m_verbose) { // Keep intermediate results
             size_t cpsz = numel(x);
             x = Matrix<CT> (size(x,0), size(x,1), (m_nx[0] == 3) ? size(x,2) : 1, vc.size());
-            typename container<CT>::iterator ti = x.Begin();
+            it_type it = x.Begin();
             for (size_t i = 0; i < vc.size(); i++) {
-                std::copy (vc[i].Begin(), vc[i].End(), ti);
-                ti += cpsz;
+                std::copy (vc[i].Begin(), vc[i].End(), it);
+                it += cpsz;
             }
             vc.clear();
         } else

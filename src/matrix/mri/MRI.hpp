@@ -17,21 +17,16 @@ IntensityMap (const Matrix< std::complex <T> >& sens, bool sqroot = true) {
 	
 #pragma omp parallel default (shared)
 	{		
-		
 #pragma omp for schedule (guided)
 		for (int i = 0; i < nr; i++) {
-			
 			for (size_t j = 0; j < nc; j++)
 				res[i] += real(sens(i+j*nr) * TypeTraits<std::complex<T> >::Conj(sens(i+j*nr)));
-			
-			res[i] = 1.0 / (((sqroot) ? sqrt (res[i]) : res[i]) + 1.0e-10);
-			
+			res[i] = (sqroot) ?
+				1. / (sqrt(res[i]) + 1.e-9):
+				1. / (     res[i]  + 1.e-9);
 		}
-		
 	}
-
 	return res;
-
 }
 
 template <class T> inline static Matrix<T>
