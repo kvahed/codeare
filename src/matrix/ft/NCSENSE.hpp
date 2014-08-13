@@ -128,8 +128,9 @@ public:
 
 		ft_params["imsz"] = ms;
 
-		for (size_t i = 0; i < m_np; ++i) // FFTW planning not thread-safe
-			m_fts.push_back(NFFT<T>(ft_params));
+		//for (size_t i = 0; i < m_np; ++i) // FFTW planning not thread-safe
+		//	m_fts.push_back(NFFT<T>(ft_params));
+        m_fts = NFFT<T>(ft_params);
 
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
@@ -143,9 +144,9 @@ public:
 	 */ 
 	virtual ~NCSENSE () {
 		
-		do {
+		/*do {
 			m_fts.pop_back();
-		} while (m_fts.size());
+            } while (m_fts.size());*/
 
 	}
 	
@@ -158,10 +159,11 @@ public:
 	 */
 	void
 	KSpace (const Matrix<T>& k) {
-#pragma omp parallel
+/*#pragma omp parallel
 		{
             m_fts[omp_get_thread_num()].KSpace(k);
-		}
+            }*/
+        m_fts.KSpace(k);
 	}
 	
 
@@ -172,10 +174,11 @@ public:
 	 */
 	void
 	Weights (const Matrix<T>& w) {		
-#pragma omp parallel 
+/*#pragma omp parallel 
 		{
             m_fts[omp_get_thread_num()].Weights(w);
-		}
+		}*/
+        m_fts.Weights(w);
 	}
 
 
@@ -319,7 +322,8 @@ public:
 	
 private:
 
-    std::vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
+    //std::vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
+    NFFT<T>    m_fts;
 	bool       m_initialised; /**< All initialised? */
     bool       m_verbose;
 

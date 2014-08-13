@@ -64,10 +64,10 @@ struct NFFTTraits<float> {
 	 */
 	inline static int
 	Init  (const int d, int* N, const int M, int* n, const int m, nfftf_plan& np, solverf_plan_complex& inp) {
-		
+
 		nfftf_init_guru 
 			(&np, d, N, M, n, m,
-			 PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
+			 NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
 			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
 		
 		solverf_init_advanced_complex 
@@ -265,7 +265,7 @@ struct NFFTTraits<double> {
 
 		nfft_init_guru 
 			(&np, _d, _N.ptr(), _M, _n.ptr(), _m,
-			 PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
+			 NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
 			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
 		
 		solver_init_advanced_complex 
