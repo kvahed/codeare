@@ -67,7 +67,8 @@ struct NFFTTraits<float> {
 
 		nfftf_init_guru 
 			(&np, d, N, M, n, m,
-			 NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
+			 /*NFFT_SORT_NODES | */NFFT_OMP_BLOCKWISE_ADJOINT | 
+             PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
 			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
 		
 		solverf_init_advanced_complex 
@@ -76,8 +77,8 @@ struct NFFTTraits<float> {
 		return 0;
 		
 	}
-
-
+    
+    
 
 	/**
 	 * @brief            Inverse FT
@@ -265,7 +266,8 @@ struct NFFTTraits<double> {
 
 		nfft_init_guru 
 			(&np, _d, _N.ptr(), _M, _n.ptr(), _m,
-			 NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
+			 /*NFFT_SORT_NODES |*/ NFFT_OMP_BLOCKWISE_ADJOINT | 
+             PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
 			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
 		
 		solver_init_advanced_complex 

@@ -109,15 +109,6 @@ public:
 		m_lambda  = params.Get<double>("lambda");
 		m_verbose = (params.Get<int>("verbose") > 0);
 			
-#pragma omp parallel 
-		{
-			m_np = omp_get_num_threads ();
-		}
-		if (params.exists("np") && boost::any_cast<int>(params["np"]) > 0)
-			m_np = boost::any_cast<int>(params["np"]);
-		
-		omp_set_num_threads(m_np);
-
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  No of threads: %i\n", m_np);
 		printf ("  Signal nodes: %li\n", m_nx[2]);
@@ -128,8 +119,6 @@ public:
 
 		ft_params["imsz"] = ms;
 
-		//for (size_t i = 0; i < m_np; ++i) // FFTW planning not thread-safe
-		//	m_fts.push_back(NFFT<T>(ft_params));
         m_fts = NFFT<T>(ft_params);
 
 		m_ic     = IntensityMap (m_sm);
@@ -139,17 +128,11 @@ public:
 		
 	}
 
+
 	/**
 	 * @brief        Clean up and destruct NFFT plans
 	 */ 
-	virtual ~NCSENSE () {
-		
-		/*do {
-			m_fts.pop_back();
-            } while (m_fts.size());*/
-
-	}
-	
+	virtual ~NCSENSE () {}
 	
 
 	/**
@@ -159,10 +142,6 @@ public:
 	 */
 	void
 	KSpace (const Matrix<T>& k) {
-/*#pragma omp parallel
-		{
-            m_fts[omp_get_thread_num()].KSpace(k);
-            }*/
         m_fts.KSpace(k);
 	}
 	
@@ -174,10 +153,6 @@ public:
 	 */
 	void
 	Weights (const Matrix<T>& w) {		
-/*#pragma omp parallel 
-		{
-            m_fts[omp_get_thread_num()].Weights(w);
-		}*/
         m_fts.Weights(w);
 	}
 
@@ -190,9 +165,7 @@ public:
 	 */
 	virtual Matrix<CT>
 	Trafo       (const Matrix<CT>& m) const {
-
 		return E (m, m_sm, m_nx, m_fts);
-
 	}
 
 	
@@ -207,9 +180,7 @@ public:
 	 */
 	virtual Matrix<CT>
 	Trafo       (const Matrix<CT>& m, const Matrix<CT>& sens, const bool& recal = true) const {
-
 		return E (m, sens, m_nx, m_fts);
-
 	}
 
 	
@@ -221,9 +192,7 @@ public:
 	 */
 	virtual Matrix<CT>
 	Adjoint     (const Matrix<CT>& m) const {
-
 		return this->Adjoint (m, m_sm, false);
-
 	}
 	
 	
