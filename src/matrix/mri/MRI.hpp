@@ -26,7 +26,7 @@ IntensityMap (const Matrix< std::complex <T> >& sens, bool sqroot = true) {
 				1. / (     res[i]  + 1.e-9);
 		}
 	}
-	return res;
+	return squeeze(res);
 }
 
 template <class T> inline static Matrix<T>

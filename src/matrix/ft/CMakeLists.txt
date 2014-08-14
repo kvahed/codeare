@@ -10,6 +10,9 @@ include_directories (${PROJECT_SOURCE_DIR}/src/matrix/io
     ${NFFT_INCLUDE_DIR}
   endif()
 )
+if(POLICY CMP0042)
+  cmake_policy(SET CMP0042 NEW) # CMake 3.0
+endif()
 
 if (${NFFT_FOUND})
   add_library (codeare-ft SHARED DFT.hpp DFT.cpp CSENSE.hpp CSENSE.cpp CGRAPPA.hpp CGRAPPA.cpp NCSENSE.hpp NCSENSE.cpp)
