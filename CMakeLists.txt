@@ -91,6 +91,7 @@ if(${MATLAB_FOUND})
     link_directories ("${MATLAB_ROOT}/extern/lib/win64/microsoft")
   else()
     link_directories ("${MATLAB_LIBRARIES_PATHS}")
+    set(MACOSX_RPATH ${MATLAB_LIBRARIES_PATHS})
   endif()
 endif()
 
