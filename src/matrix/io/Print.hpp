@@ -88,9 +88,13 @@ template<class T> inline std::ostream&
 operator<< (std::ostream& os, const Matrix<T>& v) {
     size_t i,j;
     for (i = 0; i < v.Dim(0); ++i) {
-        for (j = 0; j < v.Dim(1); ++j)
-            TypeTraits<T>::print(os, v(i,j)) << " ";
-        os << std::endl;
+        for (j = 0; j < v.Dim(1); ++j) {
+            TypeTraits<T>::print(os, v(i,j));
+            if (j<v.Dim(1)-1)
+            	 os << " ";
+        }
+        if (i<v.Dim(0)-1)
+        	os << std::endl;
     }
     return os;
 }

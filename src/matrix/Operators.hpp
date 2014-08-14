@@ -6,8 +6,6 @@
      */
     
     //@{
-    
-
 
     template<paradigm Q> Matrix<T,P>&
     operator= (const Matrix<T,Q>&);
@@ -246,7 +244,7 @@
     inline Matrix<cbool>
     operator!=          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
 
         Matrix<cbool> res(_dim,_res);
 #ifdef EW_OMP
@@ -268,8 +266,7 @@
     inline Matrix<cbool>
     operator>=          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
-
+    	op_assert (_dim == M.Dim(), *this, M);
         Matrix<cbool> res(_dim);
 
 #ifdef EW_OMP
@@ -292,7 +289,7 @@
     inline Matrix<cbool>
     operator<=          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
 
         Matrix<cbool> res(_dim);
 
@@ -316,7 +313,7 @@
     inline Matrix<cbool>
     operator>           (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
 
         Matrix<cbool> res(_dim,_res);
 
@@ -340,7 +337,7 @@
     inline Matrix<cbool>
     operator<           (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
 
         Matrix<cbool> res(_dim,_res);
 
@@ -364,7 +361,7 @@
     inline Matrix<cbool>
     operator||          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
 
         Matrix<cbool> res(_dim);
 
@@ -389,7 +386,7 @@
     inline Matrix<cbool>
     operator&&          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
 
         Matrix<cbool> res(_dim);
 
@@ -499,8 +496,8 @@
      */
     inline Matrix<T,P>&
     operator+=         (const Matrix<T,P>& M) {
-        assert (Size() == M.Size());
-        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
+    	op_assert (_dim == M.Dim(), *this, M);
+   		std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
         return *this;
     }
 
@@ -514,7 +511,7 @@
     template <class S> inline Matrix<T,P>&
     operator+=         (const Matrix<S,P>& M) {
 
-        assert (_dim == M.Dim());
+        op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
 		return *this;
 
@@ -587,7 +584,7 @@
      */
     inline Matrix<T,P>&
     operator-=         (const Matrix<T,P>& M) {
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
         return *this;
     }
@@ -601,7 +598,7 @@
      */
     template <class S> inline Matrix<T,P>&
     operator-=          (const Matrix<S,P>& M) {
-        assert (_dim == M.Dim());
+        op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
         return *this;
     }
@@ -675,7 +672,7 @@
      */
     inline Matrix<T,P>&
     operator*=         (const Matrix<T,P>& M) {
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
         return *this;
     }
@@ -689,7 +686,7 @@
      */
     template <class S> inline Matrix<T,P>&
     operator*=         (const Matrix<S,P>& M) {
-        assert (_dim == M.Dim());
+        op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
         return *this;
     }
@@ -762,7 +759,7 @@
      */
     inline Matrix<T,P>&
     operator/=         (const Matrix<T,P>& M) {
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
         return *this;
     }
@@ -776,7 +773,7 @@
      */
     template <class S> inline Matrix<T,P>&
     operator/=         (const Matrix<S,P> &M) {
-        assert (_dim == M.Dim());
+        op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
         return *this;
     }
@@ -1210,7 +1207,7 @@
     inline Matrix<cbool>
     operator==          (const Matrix<T,P>& M) const {
 
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
 
         Matrix<cbool> res(_dim);
 #ifdef EW_OMP
@@ -1234,7 +1231,7 @@
 	inline Matrix<cbool>
 	operator==          (const Matrix<S,P>& M) const {
 
-        assert (Size() == M.Size());
+        op_assert (_dim == M.Dim(), *this, M);
 
 		Matrix<cbool> res (_dim);
 
