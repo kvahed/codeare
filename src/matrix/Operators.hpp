@@ -7,10 +7,27 @@
     
     //@{
 
-    template<paradigm Q> Matrix<T,P>&
-    operator= (const Matrix<T,Q>&);
+#ifdef HAVE_CXX11_RVALUE_REFERENCES
+    Matrix<T,P>&
+    operator= (Matrix<T,P>&& M) {
+        _M = std::move(M._M);
+        _name = std::move(M._name);
+        _res = std::move(M._res);
+        _dsz = std::move(M._dsz);
+        _dim = std::move(M._dim);
+        return *this;
+    }
+#endif	
+    Matrix<T,P>&
+    operator= (const Matrix<T,P>& M) {
+        _M = M._M;
+        _name = M._name;
+        _res = M._res;
+        _dsz = M._dsz;
+        _dim = M._dim;
+        return *this;
+    }
 
-	
     /**
      * @brief           Assignment data
      *

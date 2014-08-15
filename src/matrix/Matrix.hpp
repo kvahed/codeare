@@ -55,6 +55,7 @@
 #include <string>
 #include <cstring>
 #include <algorithm>
+#include <utility>
 
 #define stringize(s) #s
 #define XSTR(s) stringize(s)
@@ -357,10 +358,6 @@ public:
 
 	}
 
-    
-
-    
-
 
     /**
      * @brief           Copy constructor
@@ -373,10 +370,27 @@ public:
      * @param  M        Right hand side
      */
     inline
-    Matrix             (const Matrix<T,P> &M) { 
-            *this = M;
-	}
+    Matrix             (const Matrix<T,P> &M) {
+        *this = M;
+    }
 
+
+#ifdef HAVE_CXX11_RVALUE_REFERENCES
+    /**
+     * @brief           Copy constructor
+     *
+     * Usage:
+     * @code{.cpp}
+     *   Matrix<cxfl> m (n); // Copy n into m
+     * @endcode
+     *
+     * @param  M        Right hand side
+     */
+    inline
+    Matrix             (Matrix<T,P>&& M) :
+        _res(std::move(M._res)), _dim(std::move(M._dim)), _dsz(std::move(M._dsz)),
+        _M(std::move(M._M)), _name(std::move(M._name)) {}
+#endif
 
     //@}
 
