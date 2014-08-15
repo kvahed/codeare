@@ -202,7 +202,7 @@ template<> struct TypeTraits<unsigned char> {
     inline static  bool IsReal() {
         return SameType<T,RT>::val;
     }
-    inline static const T Pow (const T& x, const T& y) { return x;} 
+    inline static T Pow (const T& x, const T& y) { return x;}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << boost::format("%d") % (unsigned short)t;
@@ -279,10 +279,10 @@ template<> struct TypeTraits<size_t> {
     inline static const std::string Abbrev () {
         return std::string("size_t");
     }
-    inline static const bool IsComplex() {
+    inline static bool IsComplex() {
         return SameType<T,CT>::val;
     }
-    inline static const bool IsReal() {
+    inline static bool IsReal() {
         return SameType<T,RT>::val;
     }
     inline static const T Pow (const T& x, const T& y) { return (T)pow((double)x,(double)y);} 
