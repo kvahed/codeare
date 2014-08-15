@@ -35,18 +35,18 @@ template<> struct TypeTraits<float> {
     inline static const std::string Abbrev () {
         return std::string("float");
     }
-    inline static const bool IsComplex() {
+    inline static bool IsComplex() {
         return SameType<T,CT>::val;
     }
-    inline static const bool IsReal() {
+    inline static bool IsReal() {
         return SameType<T,RT>::val;
     }
-    inline static const RT Real (const T t) {return t;}
-    inline static const RT Imag (const T) {return 0.;}
-    inline static const RT Abs (const T t) {return t;}
-    inline static const RT Arg (const T) {return 0.;}
-    inline static const RT Conj (const T t) {return t;}
-    inline static const RT Pow (const T& x, const T& y) {return std::pow(x,y);}
+    inline static RT Real (const T t) {return t;}
+    inline static RT Imag (const T) {return 0.;}
+    inline static RT Abs (const T t) {return t;}
+    inline static RT Arg (const T) {return 0.;}
+    inline static RT Conj (const T t) {return t;}
+    inline static RT Pow (const T& x, const T& y) {return std::pow(x,y);}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << boost::format("%+.4e") % t;
@@ -69,18 +69,18 @@ template<> struct TypeTraits<double> {
     inline static const std::string Abbrev () {
         return std::string("double");
     }
-    inline static const bool IsComplex() {
+    inline static bool IsComplex() {
         return SameType<T,CT>::val;
     }
-    inline static const bool IsReal() {
+    inline static bool IsReal() {
         return SameType<T,RT>::val;
     }
-    inline static const RT Real (const T t) {return t;}
-    inline static const RT Imag (const T) {return 0.;}
-    inline static const RT Abs (const T t) {return t;}
-    inline static const RT Arg (const T) {return 0.;}
-    inline static const RT Conj (const T t) {return t;}
-    inline static const RT Pow (const T& x, const T& y) {return std::pow(x,y);}
+    inline static RT Real (const T t) {return t;}
+    inline static RT Imag (const T) {return 0.;}
+    inline static RT Abs (const T t) {return t;}
+    inline static RT Arg (const T) {return 0.;}
+    inline static RT Conj (const T t) {return t;}
+    inline static RT Pow (const T& x, const T& y) {return std::pow(x,y);}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << boost::format("%+.4e") % t;
@@ -103,18 +103,18 @@ template<> struct TypeTraits<cxfl> {
     inline static const std::string Abbrev () {
         return std::string("cxfl");
     }
-    inline static const bool IsComplex() {
+    inline static bool IsComplex() {
         return SameType<T,CT>::val;
     }
-    inline static const bool IsReal() {
+    inline static bool IsReal() {
         return SameType<T,RT>::val;
     }
-    inline static const RT Real (const T t) {return std::real(t);}
-    inline static const RT Imag (const T t) {return std::imag(t);}
-    inline static const RT Abs (const T t) {return std::abs(t);}
-    inline static const RT Arg (const T t) {return std::arg(t);}
-    inline static const CT Conj (const T t) {return std::conj(t);}
-    inline static const CT Pow (const CT& x, const T& y) {return pow(x,y);} 
+    inline static RT Real (const T t) {return std::real(t);}
+    inline static RT Imag (const T t) {return std::imag(t);}
+    inline static RT Abs (const T t) {return std::abs(t);}
+    inline static RT Arg (const T t) {return std::arg(t);}
+    inline static CT Conj (const T t) {return std::conj(t);}
+    inline static CT Pow (const CT& x, const T& y) {return pow(x,y);}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << boost::format("%+.4e+1i*%+.4e") % t.real() % t.imag();
@@ -136,18 +136,18 @@ template<> struct TypeTraits<cxdb> {
     inline static const std::string Abbrev () {
         return std::string("cxdb");
     }
-    inline static const bool IsComplex() {
+    inline static bool IsComplex() {
         return SameType<T,CT>::val;
     }
-    inline static const bool IsReal() {
+    inline static bool IsReal() {
         return SameType<T,RT>::val;
     }
-    inline static const RT Real (const T t) {return std::real(t);}
-    inline static const RT Imag (const T t) {return std::imag(t);}
-    inline static const RT Abs (const T t) {return std::abs(t);}
-    inline static const RT Arg (const T t) {return std::arg(t);}
-    inline static const CT Conj (const T t) {return std::conj(t);}
-    inline static const CT Pow (const CT& x, const T& y) {return pow(x,y);} 
+    inline static RT Real (const T t) {return std::real(t);}
+    inline static RT Imag (const T t) {return std::imag(t);}
+    inline static RT Abs (const T t) {return std::abs(t);}
+    inline static RT Arg (const T t) {return std::arg(t);}
+    inline static CT Conj (const T t) {return std::conj(t);}
+    inline static CT Pow (const CT& x, const T& y) {return pow(x,y);}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << boost::format("%+.4e+1i*%+.4e") % t.real() % t.imag();
@@ -169,10 +169,10 @@ template<> struct TypeTraits<short> {
     inline static const std::string Abbrev () {
         return std::string("short");
     }
-    inline static const bool IsComplex() {
+    inline static bool IsComplex() {
         return SameType<T,CT>::val;
     }
-    inline static const bool IsReal() {
+    inline static bool IsReal() {
         return SameType<T,RT>::val;
     }
     inline static std::ostream& print (std::ostream& os, const T t) {
@@ -196,10 +196,10 @@ template<> struct TypeTraits<unsigned char> {
     inline static const std::string Abbrev () {
         return std::string("uchar");
     }
-    inline static const bool IsComplex() {
+    inline static bool IsComplex() {
         return SameType<T,CT>::val;
     }
-    inline static const bool IsReal() {
+    inline static  bool IsReal() {
         return SameType<T,RT>::val;
     }
     inline static const T Pow (const T& x, const T& y) { return x;} 
@@ -225,10 +225,10 @@ template<> struct TypeTraits<long> {
     inline static const std::string Abbrev () {
         return std::string("long");
     }
-    inline static const bool IsComplex() {
+    inline static bool IsComplex() {
         return SameType<T,CT>::val;
     }
-    inline static const bool IsReal() {
+    inline static bool IsReal() {
         return SameType<T,RT>::val;
     }
     inline static std::ostream& print (std::ostream& os, const T t) {
@@ -252,10 +252,10 @@ template<> struct TypeTraits<int> {
     inline static const std::string Abbrev () {
         return std::string("int");
     }
-    inline static const bool IsComplex() {
+    inline static bool IsComplex() {
         return SameType<T,CT>::val;
     }
-    inline static const bool IsReal() {
+    inline static bool IsReal() {
         return SameType<T,RT>::val;
     }
     inline static std::ostream& print (std::ostream& os, const T t) {
