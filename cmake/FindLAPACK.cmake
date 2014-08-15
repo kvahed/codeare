@@ -1,27 +1,37 @@
-# - Find LAPACK library
-# This module finds an installed fortran library that implements the LAPACK
-# linear-algebra interface (see http://www.netlib.org/lapack/).
+#.rst:
+# FindLAPACK
+# ----------
 #
-# The approach follows that taken for the autoconf macro file, acx_lapack.m4
-# (distributed at http://ac-archive.sourceforge.net/ac-archive/acx_lapack.html).
+# Find LAPACK library
+#
+# This module finds an installed fortran library that implements the
+# LAPACK linear-algebra interface (see http://www.netlib.org/lapack/).
+#
+# The approach follows that taken for the autoconf macro file,
+# acx_lapack.m4 (distributed at
+# http://ac-archive.sourceforge.net/ac-archive/acx_lapack.html).
 #
 # This module sets the following variables:
-#  LAPACK_FOUND - set to true if a library implementing the LAPACK interface
-#    is found
-#  LAPACK_LINKER_FLAGS - uncached list of required linker flags (excluding -l
-#    and -L).
-#  LAPACK_LIBRARIES - uncached list of libraries (using full path name) to
-#    link against to use LAPACK
-#  LAPACK95_LIBRARIES - uncached list of libraries (using full path name) to
-#    link against to use LAPACK95
-#  LAPACK95_FOUND - set to true if a library implementing the LAPACK f95
-#    interface is found
-#  BLA_STATIC  if set on this determines what kind of linkage we do (static)
-#  BLA_VENDOR  if set checks only the specified vendor, if not set checks
-#     all the possibilities
-#  BLA_F95     if set on tries to find the f95 interfaces for BLAS/LAPACK
-### List of vendors (BLA_VENDOR) valid in this module
-##  Intel(mkl), ACML,Apple, NAS, Generic
+#
+# ::
+#
+#   LAPACK_FOUND - set to true if a library implementing the LAPACK interface
+#     is found
+#   LAPACK_LINKER_FLAGS - uncached list of required linker flags (excluding -l
+#     and -L).
+#   LAPACK_LIBRARIES - uncached list of libraries (using full path name) to
+#     link against to use LAPACK
+#   LAPACK95_LIBRARIES - uncached list of libraries (using full path name) to
+#     link against to use LAPACK95
+#   LAPACK95_FOUND - set to true if a library implementing the LAPACK f95
+#     interface is found
+#   BLA_STATIC  if set on this determines what kind of linkage we do (static)
+#   BLA_VENDOR  if set checks only the specified vendor, if not set checks
+#      all the possibilities
+#   BLA_F95     if set on tries to find the f95 interfaces for BLAS/LAPACK
+#
+# ## List of vendors (BLA_VENDOR) valid in this module # Intel(mkl),
+# ACML,Apple, NAS, Generic
 
 #=============================================================================
 # Copyright 2007-2009 Kitware, Inc.
@@ -229,57 +239,61 @@ if (BLA_VENDOR MATCHES "Intel*" OR BLA_VENDOR STREQUAL "All")
     else()
       find_package(Threads REQUIRED)
     endif()
+
+    set(LAPACK_SEARCH_LIBS "")
+
     if (BLA_F95)
-      if(NOT LAPACK95_LIBRARIES)
-        # old
-        check_lapack_libraries(
-          LAPACK95_LIBRARIES
-          LAPACK
-          cheev
-          ""
-          "mkl_lapack95"
-          "${BLAS95_LIBRARIES}"
-          "${CMAKE_THREAD_LIBS_INIT};${LM}"
-          )
-      endif()
-      if(NOT LAPACK95_LIBRARIES)
-        # new >= 10.3
-        check_lapack_libraries(
-          LAPACK95_LIBRARIES
-          LAPACK
-          CHEEV
-          ""
-          "mkl_intel_lp64"
-          "${BLAS95_LIBRARIES}"
-          "${CMAKE_THREAD_LIBS_INIT};${LM}"
-          )
-      endif()
+      set(LAPACK_mkl_SEARCH_SYMBOL "CHEEV")
+      set(_LIBRARIES LAPACK95_LIBRARIES)
+      set(_BLAS_LIBRARIES ${BLAS95_LIBRARIES})
+
+      # old
+      list(APPEND LAPACK_SEARCH_LIBS
+        "mkl_lapack95")
+      # new >= 10.3
+      list(APPEND LAPACK_SEARCH_LIBS
+        "mkl_intel_c")
+      list(APPEND LAPACK_SEARCH_LIBS
+        "mkl_intel_lp64")
     else()
-      if(NOT LAPACK_LIBRARIES)
-        # old
-        check_lapack_libraries(
-          LAPACK_LIBRARIES
-          LAPACK
-          cheev
-          ""
-          "mkl_lapack"
-          "${BLAS_LIBRARIES}"
-          "${CMAKE_THREAD_LIBS_INIT};${LM}"
-          )
-      endif()
-      if(NOT LAPACK_LIBRARIES)
-        # new >= 10.3
-        check_lapack_libraries(
-          LAPACK_LIBRARIES
-          LAPACK
-          cheev
-          ""
-          "mkl_gf_lp64"
-          "${BLAS_LIBRARIES}"
-          "${CMAKE_THREAD_LIBS_INIT};${LM}"
-          )
-      endif()
+      set(LAPACK_mkl_SEARCH_SYMBOL "cheev")
+      set(_LIBRARIES LAPACK_LIBRARIES)
+      set(_BLAS_LIBRARIES ${BLAS_LIBRARIES})
+
+      # old
+      list(APPEND LAPACK_SEARCH_LIBS
+        "mkl_lapack")
+      # new >= 10.3
+      list(APPEND LAPACK_SEARCH_LIBS
+        "mkl_gf_lp64")
     endif()
+
+    # First try empty lapack libs
+    if (NOT ${_LIBRARIES})
+      check_lapack_libraries(
+        ${_LIBRARIES}
+        BLAS
+        ${LAPACK_mkl_SEARCH_SYMBOL}
+        ""
+        ""
+        "${_BLAS_LIBRARIES}"
+        "${CMAKE_THREAD_LIBS_INIT};${LM}"
+        )
+    endif ()
+    # Then try the search libs
+    foreach (IT ${LAPACK_SEARCH_LIBS})
+      if (NOT ${_LIBRARIES})
+        check_lapack_libraries(
+          ${_LIBRARIES}
+          BLAS
+          ${LAPACK_mkl_SEARCH_SYMBOL}
+          ""
+          "${IT}"
+          "${_BLAS_LIBRARIES}"
+          "${CMAKE_THREAD_LIBS_INIT};${LM}"
+          )
+      endif ()
+    endforeach ()
   endif ()
 endif()
 else()
