@@ -285,7 +285,7 @@ template<> struct TypeTraits<size_t> {
     inline static bool IsReal() {
         return SameType<T,RT>::val;
     }
-    inline static const T Pow (const T& x, const T& y) { return (T)pow((double)x,(double)y);} 
+    inline static T Pow (const T& x, const T& y) { return (T)pow((double)x,(double)y);}
     inline static std::ostream& print (std::ostream& os, const T t) {
 #ifndef MSVC60
         os << (unsigned long)t;
