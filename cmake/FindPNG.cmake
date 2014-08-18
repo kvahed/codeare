@@ -1,19 +1,34 @@
-# - Find the native PNG includes and library
+#.rst:
+# FindPNG
+# -------
+#
+# Find the native PNG includes and library
+#
+#
 #
 # This module searches libpng, the library for working with PNG images.
 #
 # It defines the following variables
-#  PNG_INCLUDE_DIRS, where to find png.h, etc.
-#  PNG_LIBRARIES, the libraries to link against to use PNG.
-#  PNG_DEFINITIONS - You should add_definitons(${PNG_DEFINITIONS}) before compiling code that includes png library files.
-#  PNG_FOUND, If false, do not try to use PNG.
-#  PNG_VERSION_STRING - the version of the PNG library found (since CMake 2.8.8)
-# Also defined, but not for general use are
-#  PNG_LIBRARY, where to find the PNG library.
-# For backward compatiblity the variable PNG_INCLUDE_DIR is also set. It has the same value as PNG_INCLUDE_DIRS.
 #
-# Since PNG depends on the ZLib compression library, none of the above will be
-# defined unless ZLib can be found.
+# ::
+#
+#   PNG_INCLUDE_DIRS, where to find png.h, etc.
+#   PNG_LIBRARIES, the libraries to link against to use PNG.
+#   PNG_DEFINITIONS - You should add_definitons(${PNG_DEFINITIONS}) before compiling code that includes png library files.
+#   PNG_FOUND, If false, do not try to use PNG.
+#   PNG_VERSION_STRING - the version of the PNG library found (since CMake 2.8.8)
+#
+# Also defined, but not for general use are
+#
+# ::
+#
+#   PNG_LIBRARY, where to find the PNG library.
+#
+# For backward compatiblity the variable PNG_INCLUDE_DIR is also set.
+# It has the same value as PNG_INCLUDE_DIRS.
+#
+# Since PNG depends on the ZLib compression library, none of the above
+# will be defined unless ZLib can be found.
 
 #=============================================================================
 # Copyright 2002-2009 Kitware, Inc.
@@ -38,8 +53,42 @@ if(ZLIB_FOUND)
   /usr/local/include/libpng             # OpenBSD
   )
 
-  set(PNG_NAMES ${PNG_NAMES} png libpng png15 libpng15 png15d libpng15d png14 libpng14 png14d libpng14d png12 libpng12 png12d libpng12d)
-  find_library(PNG_LIBRARY NAMES ${PNG_NAMES} )
+  list(APPEND PNG_NAMES png libpng)
+  unset(PNG_NAMES_DEBUG)
+  set(_PNG_VERSION_SUFFIXES 17 16 15 14 12)
+  if (PNG_FIND_VERSION MATCHES "^[0-9]+\\.[0-9]+(\\..*)?$")
+    string(REGEX REPLACE
+        "^([0-9]+)\\.([0-9]+).*" "\\1\\2"
+        _PNG_VERSION_SUFFIX_MIN "${PNG_FIND_VERSION}")
+    if (PNG_FIND_VERSION_EXACT)
+      set(_PNG_VERSION_SUFFIXES ${_PNG_VERSION_SUFFIX_MIN})
+    else ()
+      string(REGEX REPLACE
+          "${_PNG_VERSION_SUFFIX_MIN}.*" "${_PNG_VERSION_SUFFIX_MIN}"
+          _PNG_VERSION_SUFFIXES "${_PNG_VERSION_SUFFIXES}")
+    endif ()
+    unset(_PNG_VERSION_SUFFIX_MIN)
+  endif ()
+  foreach(v IN LISTS _PNG_VERSION_SUFFIXES)
+    list(APPEND PNG_NAMES png${v} libpng${v})
+    list(APPEND PNG_NAMES_DEBUG png${v}d libpng${v}d)
+  endforeach()
+  unset(_PNG_VERSION_SUFFIXES)
+  # For compatiblity with versions prior to this multi-config search, honor
+  # any PNG_LIBRARY that is already specified and skip the search.
+  if(NOT PNG_LIBRARY)
+    find_library(PNG_LIBRARY_RELEASE NAMES ${PNG_NAMES})
+    find_library(PNG_LIBRARY_DEBUG NAMES ${PNG_NAMES_DEBUG})
+    include(${CMAKE_CURRENT_LIST_DIR}/SelectLibraryConfigurations.cmake)
+    select_library_configurations(PNG)
+    mark_as_advanced(PNG_LIBRARY_RELEASE PNG_LIBRARY_DEBUG)
+  endif()
+  unset(PNG_NAMES)
+  unset(PNG_NAMES_DEBUG)
+
+  # Set by select_library_configurations(), but we want the one from
+  # find_package_handle_standard_args() below.
+  unset(PNG_FOUND)
 
   if (PNG_LIBRARY AND PNG_PNG_INCLUDE_DIR)
       # png.h includes zlib.h. Sigh.

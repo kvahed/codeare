@@ -160,7 +160,7 @@ if (${MPI_FOUND})
 endif()
 
 # File IO ------------------------------------------------------------
-find_package(HDF5 REQUIRED)
+find_package(HDF5 "1.8.5" REQUIRED COMPONENTS C CXX)
 message (STATUS ${HDF5_LIBRARIES})
 include_directories (${HDF5_INCLUDE_DIRS})
 link_directories (${HDF5_LIBRARY_DIRS})

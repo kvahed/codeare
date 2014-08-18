@@ -523,8 +523,10 @@ private:
 		
 		m_in     = container<CT> (m_N);
 
-		m_fwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0], FFTW_FORWARD,  FFTW_MEASURE);
-		m_bwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0], FFTW_BACKWARD, FFTW_MEASURE);
+		m_fwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0],
+				FFTW_FORWARD,  FFTW_MEASURE | FFTW_DESTROY_INPUT);
+		m_bwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0],
+				FFTW_BACKWARD, FFTW_MEASURE | FFTW_DESTROY_INPUT);
 
 		m_cs     = m_N * sizeof(Type);
 		m_sn     = sqrt ((T)m_N);

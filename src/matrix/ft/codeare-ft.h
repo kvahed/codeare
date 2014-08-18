@@ -27,6 +27,18 @@ public:
 	virtual Matrix< std::complex<T> > operator->* (const Matrix< std::complex<T> >&) const;
 };
 
+template<class T> class CSENSE : public FT<T> {
+public:
+    CSENSE ();
+	CSENSE (const Matrix<size_t>&);
+	CSENSE (const Params&);
+	virtual ~CSENSE ();
+	virtual Matrix< std::complex<T> > Trafo (const Matrix< std::complex<T> >&) const;
+	virtual Matrix< std::complex<T> > Adjoint (const Matrix< std::complex<T> >& m) const;
+	virtual Matrix< std::complex<T> > operator* (const Matrix< std::complex<T> >&) const;
+	virtual Matrix< std::complex<T> > operator->* (const Matrix< std::complex<T> >&) const;
+};
+
 template<class T> class NCSENSE : public FT<T> {
 public:
 	NCSENSE ();
