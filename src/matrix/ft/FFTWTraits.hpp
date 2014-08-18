@@ -57,7 +57,9 @@ struct FTTraits<float> {
 	 */
 	static inline Plan 
 	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags) {
-		InitThreads();
+#ifdef _OPENMP
+		fftwf_plan_with_nthreads (8);
+#endif
 		return fftwf_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
@@ -184,7 +186,9 @@ struct FTTraits<double> {
 	 */
 	static inline Plan 
 	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags) {
-		InitThreads();
+#ifdef _OPENMP
+		fftwf_plan_with_nthreads (8);
+#endif
 	    return fftw_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
