@@ -80,7 +80,7 @@ struct FTTraits<float> {
 			nt = omp_get_num_threads();
 		}		
 
-#ifdef HAVE_FFTWF_THREADS
+#ifdef _OPENMP
 		if (fftwf_init_threads()) {
 			fftwf_plan_with_nthreads (nt);
 			p["FFTWThreads"] = nt;
@@ -207,7 +207,7 @@ struct FTTraits<double> {
 			nt = omp_get_num_threads();
 		}		
 
-#ifdef HAVE_FFTWF_THREADS
+#ifdef _OPENMP
 		if (fftw_init_threads()) {
 			fftw_plan_with_nthreads (nt);
 			p["FFTWThreads"] = nt;

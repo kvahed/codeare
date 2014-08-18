@@ -65,15 +65,30 @@ struct NFFTTraits<float> {
 	inline static int
 	Init  (const int d, int* N, const int M, int* n, const int m, nfftf_plan& np, solverf_plan_complex& inp) {
 
-        nfftf_init_guru 
+		fftwf_init_threads();
+		
+#ifdef _OPENMP
+		fftwf_import_wisdom_from_filename("nfft_threads.plan");
+#else
+		fftwf_import_wisdom_from_filename("nfft_single.plan");
+#endif
+
+		nfftf_init_guru
 			(&np, d, N, M, n, m,
-			 NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | 
-             PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
-			 FFTW_MEASURE| FFTW_DESTROY_INPUT);
-		
-		solverf_init_advanced_complex 
+					NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT |
+					PRE_PHI_HUT | PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE,
+					FFTW_MEASURE| FFTW_DESTROY_INPUT);
+
+
+		solverf_init_advanced_complex
 			(&inp, (nfftf_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
-		
+
+#ifdef _OPENMP
+		fftwf_export_wisdom_to_filename("nfft_threads.plan");
+#else
+		fftwf_export_wisdom_to_filename("nfft_single.plan");
+#endif
+
 		return 0;
 		
 	}
@@ -227,7 +242,9 @@ struct NFFTTraits<float> {
 		
 		solverf_finalize_complex(&spc);
 		nfftf_finalize(&np);
-		
+#ifdef _OPENMP
+		fftwf_cleanup_threads();
+#endif
 		return 0;
 		
 	}
@@ -260,9 +277,17 @@ struct NFFTTraits<double> {
 	inline static int
 	Init  (const container<int>& N, size_t M, const container<int>& n,
 			int m, nfft_plan& np, solver_plan_complex& inp) {
-		
+
+
 		container<int> _N(N), _n(n);
 		int _d (N.size()), _M(M), _m(m);
+
+
+#ifdef _OPENMP
+		fftw_import_wisdom_from_filename("nfft_threads.plan");
+#else
+		fftw_import_wisdom_from_filename("nfft_single.plan");
+#endif
 
 		nfft_init_guru 
 			(&np, _d, _N.ptr(), _M, _n.ptr(), _m,
@@ -273,6 +298,12 @@ struct NFFTTraits<double> {
 		solver_init_advanced_complex 
 			(&inp, (nfft_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
 		
+#ifdef _OPENMP
+		fftw_export_wisdom_to_filename("nfft_threads.plan");
+#else
+		fftw_export_wisdom_to_filename("nfft_single.plan");
+#endif
+
 		return 0;
 		
 	}
@@ -424,7 +455,6 @@ struct NFFTTraits<double> {
 		
 		solver_finalize_complex(&spc);
 		nfft_finalize(&np);
-		
 		return 0;
 		
 	}
