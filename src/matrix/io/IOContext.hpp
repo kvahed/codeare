@@ -598,7 +598,7 @@ namespace io{
 		}
 
 
-		const IOStrategy Strategy () const {
+		const IOStrategy& Strategy () const {
 			return m_ios;
 		}
 

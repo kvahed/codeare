@@ -41,7 +41,7 @@ void Workspace::Print (std::ostream& os) const {
 	    const boost::any& b = m_store.find (i->second[0])->second;
 	    const std::string k_name = i->first;
 	    const size_t kl = k_name.length();
-
+#ifndef __INTEL_COMPILER
 	    os << setw(24) << k_name << " | ";
 	    if (b.type() == typeid(shrd_ptr<Matrix<float> >))
 		    os << "           float |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<float> > >(b));
@@ -59,8 +59,8 @@ void Workspace::Print (std::ostream& os) const {
 		    os << "          size_t |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<size_t> > >(b));
 	    else if (b.type() == typeid(shrd_ptr<Matrix<cbool> >))
 		    os << "            bool |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<cbool> > >(b));
+#endif
 	}
-
     os << "\n\nParameters\n" ;
     os <<       "----------\n\n";
 
