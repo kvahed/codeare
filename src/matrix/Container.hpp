@@ -104,12 +104,12 @@ public:
 			_data[i] = (T)cs[i];
 	}
 
-#ifdef HAVE_CXX11_RVALUE_REFERENCES
+/*#ifdef HAVE_CXX11_RVALUE_REFERENCES
 	inline container (const container& c) : _data(c._data) {}
 	inline container (container&& c) : _data(std::move(_data)) {}
 	inline container& operator= (const container& c) {_data = c._data; return *this;}
 	inline container& operator= (container&& c) {_data = std::move (c._data); return *this;}
-#endif
+    #endif*/
 
 	/**
      * @brief Elementwise access (lhs)
