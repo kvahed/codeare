@@ -42,66 +42,28 @@ public:
 
 	
 	/**
-	 * @brief          Default constructor
-	 */
-	CGRAPPA           () {
-		m_af  = 1;
-		m_nc  = 1;
-	}
-
-
-	/**
 	 * @brief Construct with parameters
 	 */
-	CGRAPPA (const Params& p) : m_nc(1) {
+	CGRAPPA (const Params& p) {
 
-		Workspace& ws = Workspace::Instance();
-		printf ("Initialising GRAPPA operator ...\n");
+		// Number of coils
+		if (p.exists("n_coils"))
+			m_nc = unsigned_cast(p["n_coils"]);
+		else {
+			std::cerr << "  ERROR - CGRAPPA: Operator coil dimension definition" << std::endl;
+			assert (false);
+		}
 
-		// Scan and ACS sizes
-		CheckScan (p);
-		CheckACS (p,ws);
-		int err = 0;
-		assert (m_sdims[0] == m_adims[0]);
+		// Kernel size
+		if (p.exists("kernel_size")) {
+			/*try {
+				m_kernel_size = p.Get<Matrix<size_t>&>("kernel_size");
+			} catch (const std::exception& e) {
+				std::cerr << "  ERROR - CGRAPPA: Operator needs kernel size definition" << std::endl;
+				assert (false);
+			}*/
+		}
 
-		// Kernel dims usually ROxPExSS = 5x4x4
-		CheckKernel (p);
-
-		// Acceleartion factors
-		m_af    = p.Get<Matrix<size_t> >("acc_factors");
-		size_t af = prod(m_af);
-		std::cout << err++ << std::endl;
-
-		// Source and target matrices
-		size_t nr = (m_adims[1]-m_kdims[1]-1) * (m_adims[2]-m_kdims[2]-1) * af;
-		std::cout << err++ << std::endl;
-
-		Matrix<CT> src = zeros<CT>(m_nc * prod(m_kdims), nr);
-		std::cout << err++ << std::endl;
-		Matrix<CT> trg = zeros<CT>(m_nc * af           , nr);
-
-		std::cout << err++ << std::endl;
-
-		std::cout << size(src);
-		std::cout << err++ << std::endl;
-
-		std::cout << size(trg);
-		std::cout << err++ << std::endl;
-
-		for (size_t y = floor((float)m_kdims[1]/2); y < m_adims[1]-floor((float)m_kdims[1]/2); ++y)
-			for (size_t x = floor((float)m_kdims[0]/2); x < m_adims[0]-floor((float)m_kdims[0]/2); ++x) // f.e. 2-253
-				for (size_t c = 0, /*srci = 0,*/ trgi = 0; c < m_nc; ++c) {
-					for (size_t yt = y; yt < af; ++yt, ++trgi) {
-						printf ("" JL_SIZE_T_SPECIFIER ", " JL_SIZE_T_SPECIFIER ", " JL_SIZE_T_SPECIFIER
-                                ", " JL_SIZE_T_SPECIFIER ", " JL_SIZE_T_SPECIFIER "\n", c, trgi, c, x, yt);
-						trg (c,trgi) = m_acs (c,x,yt);
-					}
-					/*
-					for (size_t ys = 0; ys < y+(m_kdims[1]-1)*af; ys += m_af[1]) {
-						for (size_t xs = x-floor(m_kdims[0]/2); xs < x+floor(m_kdims[0]/2); ++xs, ++srci)
-							src (c,srci) = m_acs (c,xs,ys);
-					}*/
-				}
 
 	}
 
@@ -133,33 +95,6 @@ public:
 	}
 
 private:
-
-
-	bool CheckScan (const Params& p) {
-		m_sdims = p.Get<Matrix<size_t> >("scan_dims");
-		std::cout << "  Data dims: " << m_sdims;
-		return true;
-	}
-
-	bool CheckKernel (const Params& p) {
-		m_kdims = p.Get<Matrix<size_t> >("kern_dims");
-		std::cout << "  Kernel dims: " << m_kdims;
-		return true;
-	}
-
-	bool CheckACS (const Params& p, Workspace& ws) {
-		bool integrated_acs = (p.exists("acs_integrated")) ? p.Get<bool>("integrated_acs") : false;
-		assert((p.exists("acs_dims") && integrated_acs) || p.exists("acs_name"));
-		m_acs   = integrated_acs ?
-				  zeros<CT>(p.Get<Matrix<size_t> >("acs_dims")) :
-				  ws.Get<CT>(p.Get<std::string>("acs_name"));
-		m_adims = size(m_acs);
-		m_nc    = m_adims[0];
-		std::cout << "  ACS dims: " << m_adims;
-		std::cout << "  NC: " << m_nc << std::endl;
-
-		return true;
-	}
 
 	Matrix<CT>           m_weights; /**< @brief Correction patch  */
 	Matrix<CT>           m_acs;     /**< @brief ACS lines         */

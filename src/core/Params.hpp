@@ -217,8 +217,8 @@ public:
 	 * @param  key  Key
 	 * @return      Casted value
 	 */
-	template <class T> inline
-	T Get (const std::string& key) const {
+	template <class T> inline T
+	Get (const std::string& key) const {
 		const boost::any& ba = (*this)[key];
 		try {
 			return boost::any_cast<T>(ba);

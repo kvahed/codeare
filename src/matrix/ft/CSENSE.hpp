@@ -140,7 +140,6 @@ public:
 					Volume (tmp, i, ft ->* Volume (tmp, i));
 
 			// Antialiasing
-
 #pragma omp for
 			for (int x = 0; x < dims[0]; x++)
 				for (int y = 0; y < dims[1]; y++)

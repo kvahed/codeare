@@ -371,7 +371,8 @@ public:
      */
     inline
     Matrix             (const Matrix<T,P> &M) {
-        *this = M;
+    	if (this != &M)
+    		*this = M;
     }
 
 
@@ -387,9 +388,10 @@ public:
      * @param  M        Right hand side
      */
     inline
-    Matrix             (Matrix<T,P>&& M) :
-        _res(std::move(M._res)), _dim(std::move(M._dim)), _dsz(std::move(M._dsz)),
-        _M(std::move(M._M)), _name(std::move(M._name)) {}
+    Matrix             (Matrix<T,P>&& M) {
+    	if (this != &M)
+    		*this = M;
+    }
 #endif
 
     //@}

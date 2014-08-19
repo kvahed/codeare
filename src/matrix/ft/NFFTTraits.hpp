@@ -68,9 +68,9 @@ struct NFFTTraits<float> {
 		fftwf_init_threads();
 		
 #ifdef _OPENMP
-		fftwf_import_wisdom_from_filename("nfft_threads.plan");
+		fftwf_import_wisdom_from_filename("codeare_threads.plan");
 #else
-		fftwf_import_wisdom_from_filename("nfft_single.plan");
+		fftwf_import_wisdom_from_filename("codeare_single.plan");
 #endif
 
 		nfftf_init_guru
@@ -84,9 +84,9 @@ struct NFFTTraits<float> {
 			(&inp, (nfftf_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
 
 #ifdef _OPENMP
-		fftwf_export_wisdom_to_filename("nfft_threads.plan");
+		fftwf_export_wisdom_to_filename("codeare_threads.plan");
 #else
-		fftwf_export_wisdom_to_filename("nfft_single.plan");
+		fftwf_export_wisdom_to_filename("codeare_single.plan");
 #endif
 
 		return 0;
@@ -284,9 +284,9 @@ struct NFFTTraits<double> {
 
 
 #ifdef _OPENMP
-		fftw_import_wisdom_from_filename("nfft_threads.plan");
+		fftw_import_wisdom_from_filename("codeare_threads.plan");
 #else
-		fftw_import_wisdom_from_filename("nfft_single.plan");
+		fftw_import_wisdom_from_filename("codeare_single.plan");
 #endif
 
 		nfft_init_guru 
@@ -299,9 +299,9 @@ struct NFFTTraits<double> {
 			(&inp, (nfft_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
 		
 #ifdef _OPENMP
-		fftw_export_wisdom_to_filename("nfft_threads.plan");
+		fftw_export_wisdom_to_filename("codeare_threads.plan");
 #else
-		fftw_export_wisdom_to_filename("nfft_single.plan");
+		fftw_export_wisdom_to_filename("codeare_single.plan");
 #endif
 
 		return 0;
