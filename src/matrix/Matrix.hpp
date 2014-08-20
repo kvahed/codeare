@@ -1090,12 +1090,10 @@ public:
      */
     inline void
     Clear               ()                                      {
-
-    	_dim.resize(1,1);
-        _dsz.resize(1,1);
-        _res.resize(1,1.0);
-        _M.resize(1);
-
+    	_dim.clear();
+        _dsz.clear();
+        _res.clear();
+        _M.clear();
     }
 
 
@@ -2218,16 +2216,10 @@ public:
      */
     inline Matrix<cbool>
     operator==          (const Matrix<T,P>& M) const {
-
         op_assert (_dim == M.Dim(), *this, M);
-
         Matrix<cbool> res(_dim);
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			res[i] = (_M[i] == M[i]) ? 1 : 0;
-
         return res;
 
     }
@@ -2242,19 +2234,11 @@ public:
     template<class S>
 	inline Matrix<cbool>
 	operator==          (const Matrix<S,P>& M) const {
-
         op_assert (_dim == M.Dim(), *this, M);
-
 		Matrix<cbool> res (_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			res[i] = (_M[i] == (T)M[i]) ? 1 : 0;
-
 		return res;
-
      }
 
     /**
@@ -2265,19 +2249,11 @@ public:
      */
     inline Matrix<cbool>
     operator==          (const T s) const {
-
     	T t = (T) s;
-
         Matrix<cbool> res (_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			res[i] =  (_M[i] == s) ? 1 : 0;
-
         return res;
-
     }
 
 
@@ -2299,16 +2275,13 @@ protected:
      */
     inline void
     Allocate () {
-
         size_t ds = _dim.size(), i;
 		_dsz.resize(ds,1);
 	    for (i = 1; i < ds; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-
         size_t  n = DimProd(); 
         if (n != _M.size())
             _M.resize(n);
-        
     }
 
     // Structure
@@ -2317,7 +2290,7 @@ protected:
     std::vector<float>  _res; /// Resolutions
     
     //Data
-    container<T>    _M; /// Data container
+    container<T>        _M; /// Data container
 
     // Name
     std::string         _name; /// Name
