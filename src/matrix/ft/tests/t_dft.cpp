@@ -8,10 +8,8 @@
 int main (int args, char** argv) {
 
     Matrix<cxfl> A = rand<cxfl> (8,8), B;
-    Vector<size_t> sz (2,1);
-    sz[0] = 8; sz[1] = 8;
-    
-    DFT<> ft (sz);
+
+    DFT<> ft (size(A));
     B = ft * A;
     
     return 0;
