@@ -149,8 +149,8 @@ namespace RRServer {
 			typedef typename RemoteTraits<CORBA_Type>::Type T;
 
 			size_t nd = c.dims.length();
-			std::vector<size_t> mdims (nd);
-			std::vector<float>  mress (nd);
+			Vector<size_t> mdims (nd);
+			Vector<float>  mress (nd);
 
 			for (int i = 0; i < nd; i++) {
 				mdims[i] = c.dims[i];

@@ -112,7 +112,7 @@ inline static Matrix<cxfl>
 STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, const Matrix<float>& b0, 
      const size_t nc, const size_t nk, const size_t ns, const size_t gd, const Matrix<short>& pd, const size_t n) {
 
-    container<float> d (nk);
+    Vector<float> d (nk);
 	Matrix<cxfl>  m (ns,nc*nk);
 
     printf ("  Computing STA encoding matrix ..."); 

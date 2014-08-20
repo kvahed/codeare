@@ -28,7 +28,7 @@
 #include "nfft3util.h"
 #include "nfft3.h"
 
-#include "Container.hpp"
+#include "Vector.hpp"
 
 #define USE_NFFT_32_NAMING 1
 
@@ -275,11 +275,11 @@ struct NFFTTraits<double> {
 	 * @return success
 	 */
 	inline static int
-	Init  (const container<int>& N, size_t M, const container<int>& n,
+	Init  (const Vector<int>& N, size_t M, const Vector<int>& n,
 			int m, nfft_plan& np, solver_plan_complex& inp) {
 
 
-		container<int> _N(N), _n(n);
+		Vector<int> _N(N), _n(n);
 		int _d (N.size()), _M(M), _m(m);
 
 

@@ -83,11 +83,11 @@ eig2 (const Matrix<T>& m, char jobvl = 'N', char jobvr = 'N') {
 
 
     // Workspace for real numbers
-    container<T2> rwork = (is_complex(t)) ?
-    container<T2>(2*N) : container<T2>(1);
+    Vector<T2> rwork = (is_complex(t)) ?
+    Vector<T2>(2*N) : Vector<T2>(1);
 
     // Workspace for complex numbers
-    container<T>  work = container<T>(1);
+    Vector<T>  work = Vector<T>(1);
     
     // Need copy. Lapack destroys A on output.
     Matrix<T> a = m;
@@ -171,8 +171,8 @@ svd2 (const Matrix<T>& M, char jobz = 'N') {
     
     int   m, n, lwork, info = 0, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vtcol = 1;
 
-    container<T2> rwork;
-    container<T>  work = container<T>(1);
+    Vector<T2> rwork;
+    Vector<T>  work = Vector<T>(1);
     
     m     =  A.Height(); n = A.Width();
     lwork = -1;
@@ -196,7 +196,7 @@ svd2 (const Matrix<T>& M, char jobz = 'N') {
     Matrix<T>& U = boost::get<0>(ret) = Matrix<T>( ldu,  ucol);
     Matrix<T>& V = boost::get<2>(ret) = Matrix<T>(ldvt, vtcol);
     
-    container<int> iwork = container<int>(8 * mn);
+    Vector<int> iwork = Vector<int>(8 * mn);
     
     size_t nr = (typeid(T) == typeid(cxfl) || typeid(T) == typeid(cxdb)) ?
             ((jobz == 'N') ? mn * 7 : mn * (5 * mn + 7)) : 1;
@@ -265,7 +265,7 @@ inv (const Matrix<T>& m) {
     Matrix<T> res = m;
 
     int  info = 0;
-    container<int> ipiv = container<int>(N);
+    Vector<int> ipiv = Vector<int>(N);
     
     // LU Factorisation -------------------
     LapackTraits<T>::getrf (N, N, res.Ptr(), N, ipiv.ptr(), info);
@@ -277,7 +277,7 @@ inv (const Matrix<T>& m) {
                 "computed.\n\n", info, info);
     
     int lwork = -1; 
-    container<T> work = container<T>(1);
+    Vector<T> work = Vector<T>(1);
     
     // Workspace determination ------------
     LapackTraits<T>::getri (N, res.Ptr(), N, ipiv.ptr(), work.ptr(), lwork, info);
@@ -323,7 +323,7 @@ pinv (const Matrix<T>& m, char trans = 'N') {
     
     assert (is2d(m));
 
-    container<T> work = container<T>(1);
+    Vector<T> work = Vector<T>(1);
     
     int  M      =  size(m, 0);
     int  N      =  size(m, 1);

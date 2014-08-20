@@ -106,7 +106,7 @@ class DWT {
               _modd (_fl/2),
               _meven ((_fl+1)/2),
               _num_threads (num_threads),
-              _temp (container <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
+              _temp (Vector <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
               dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
               idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3) {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
@@ -141,7 +141,7 @@ class DWT {
           _modd (_fl/2),
           _meven ((_fl+1)/2),
           _num_threads (num_threads),
-          _temp (container <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
+          _temp (Vector <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
           dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
           idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3) {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
@@ -176,7 +176,7 @@ class DWT {
           _modd (_fl/2),
           _meven ((_fl+1)/2),
           _num_threads (num_threads),
-          _temp (container <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
+          _temp (Vector <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
           dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
           idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3) {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
@@ -307,7 +307,7 @@ class DWT {
         const int _num_threads;
 
         // temporary memory used in transform algorithms
-        container<T> _temp;
+        Vector<T> _temp;
 
         // used transform functions
         void (DWT <T> :: * dpwt) (const Matrix <T> &, Matrix <T> &);

@@ -156,7 +156,7 @@ template <> struct MXTraits<short> {
 
 			assert (MXValidate (M, mxa));
 
-			std::vector<size_t> mdims(ndim,1);
+			Vector<size_t> mdims(ndim,1);
 
 			for (; i < ndim; ++i)
 				mdims[i] = (size_t)dim[i];
@@ -180,7 +180,7 @@ template <> struct MXTraits<short> {
 
 			// Declare dimensions and allocate array
 			size_t nd = M.NDim();
-			std::vector<mwSize> dim(nd);
+			Vector<mwSize> dim(nd);
 			for (size_t i = 0; i < nd; ++i)
 				dim[i] = (mwSize)M.Dim(i);
 			mxArray*  mxa = mxCreateNumericArray (nd, &dim[0], MXTraits<T>::prec, MXTraits<T>::cplx);

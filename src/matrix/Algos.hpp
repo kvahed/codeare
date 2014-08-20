@@ -448,7 +448,7 @@ size               (const Matrix<T,P>& M) {
  * @param   M       Matrix
  * @return          Dimension vector.
  */
-template <class T>  inline  container<size_t>
+template <class T>  inline  Vector<size_t>
 vsize               (const Matrix<T>& M) {
 
 	return size(M).Container();
@@ -659,8 +659,8 @@ resize (const Matrix<T>& M, size_t sz) {
 	Matrix<T> res = zeros<T> (sz,1);
 	size_t copysz = MIN(numel(M), sz);
 
-    typename container<T>::      iterator rb = res.Begin ();
-    typename container<T>::const_iterator mb =   M.Begin ();
+    typename Vector<T>::      iterator rb = res.Begin ();
+    typename Vector<T>::const_iterator mb =   M.Begin ();
     
     std::copy (mb, mb+copysz, rb);
 
@@ -685,8 +685,8 @@ resize (const Matrix<T>& M, const Matrix<size_t>& sz) {
 	Matrix<T> res  = zeros<T>(sz);
 	size_t copysz  = MIN(numel(M), numel(res));
 
-    typename container<T>::      iterator rb = res.Begin ();
-    typename container<T>::const_iterator mb =   M.Begin ();
+    typename Vector<T>::      iterator rb = res.Begin ();
+    typename Vector<T>::const_iterator mb =   M.Begin ();
 
     std::copy (mb, mb+copysz, rb);
 
@@ -810,7 +810,7 @@ prod (const Matrix<T>& M, size_t d) {
 		return res;
 
 	// Inner and outer sizes
-    container<size_t>::const_iterator ci = sz.Begin();
+    Vector<size_t>::const_iterator ci = sz.Begin();
 	size_t insize = std::accumulate (ci, ci+d, 1, c_multiply<size_t>);
     size_t outsize = std::accumulate (ci+d+1, ci+d+MIN(M.NDim(),numel(sz)), 1, c_multiply<size_t>);
         
@@ -897,8 +897,8 @@ SOS (const Matrix<T>& M, size_t d) {
 template <class T> inline  Matrix<T>
 squeeze (const Matrix<T>& M) {
 	
-	container<size_t> dim;
-	container<float>  res;
+	Vector<size_t> dim;
+	Vector<float>  res;
 
 	for (size_t i = 0; i < M.NDim(); ++i)
 		if (size(M, i) > 1) {
@@ -938,7 +938,7 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	assert (ndnew == ndold);
 
 	// Every number between 0 and ndnew must appear exactly once
-	container<bool> occupied;
+	Vector<bool> occupied;
 	occupied.resize(ndnew);
 	for (i = 0; i < ndnew; ++i) {
 		assert (!occupied[perm[i]]);
@@ -1010,7 +1010,7 @@ flipud (const Matrix<T>& M)  {
     if (scol == 1) // trivial
         return res;
 
-    typedef typename container<T>::iterator VI;
+    typedef typename Vector<T>::iterator VI;
     
     VI rb = res.Container().begin();
 

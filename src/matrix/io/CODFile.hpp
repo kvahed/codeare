@@ -94,8 +94,8 @@ namespace io{
 
 			int dt;
 			size_t n;
-			std::vector<size_t> dim;
-			std::vector<float>  res;
+			Vector<size_t> dim;
+			Vector<float>  res;
 			char* name;
 			Matrix<T> M;
 
@@ -108,8 +108,8 @@ namespace io{
 
 				if (!mread (&n, 1, m_file, "dimensions"))
 					return M;
-				dim = std::vector<size_t>(n,1);
-				res = std::vector<float>(n,1.0);
+				dim = Vector<size_t>(n,1);
+				res = Vector<float>(n,1.0);
 
 				// Read dimensions and allocate matrix
 				if (!mread (dim, m_file, "dimensions"))

@@ -56,14 +56,38 @@ public:
 
 		// Kernel size
 		if (p.exists("kernel_size")) {
-			/*try {
-				m_kernel_size = p.Get<Matrix<size_t>&>("kernel_size");
+			try {
+				m_kernel = zeros<CT>(p.Get<Vector<size_t> >("kernel_size"));
 			} catch (const std::exception& e) {
-				std::cerr << "  ERROR - CGRAPPA: Operator needs kernel size definition" << std::endl;
-				assert (false);
-			}*/
+				std::cerr << "  WARNING - CGRAPPA: invalid kernel size definition, defaulting to 4x5" << std::endl;
+			}
+		} else {
+			std::cerr << "  WARNING - CGRAPPA: kernel size unspecified, defaulting to 4x5" << std::endl;
+			m_kernel = zeros<CT>(4,5);
 		}
 
+		// AC data
+		if (p.exists("acs_data")) {
+			try {
+				m_ac_data = p.Get<Matrix<CT> >("ac_data");
+			} catch (const std::exception& e) {
+				std::cerr << "  ERROR - CGRAPPA: auto calibration data is mandatory input.";
+				assert (false);
+			}
+		}
+
+		// Tikhonov lambda
+		if (p.exists("lambda"))
+			m_lambda = fp_cast(p["lambda"]);
+		else
+			m_lambda = T(0.);
+
+	}
+
+
+	inline void CalcCalibMatrix () {
+
+		//Vector<T> (vsize(m_ac_data));
 
 	}
 
@@ -96,19 +120,21 @@ public:
 
 private:
 
-	Matrix<CT>           m_weights; /**< @brief Correction patch  */
-	Matrix<CT>           m_acs;     /**< @brief ACS lines         */
+	Matrix<CT>           m_weights; /**< @brief Correction patch     */
+	Matrix<CT>           m_ac_data;     /**< @brief ACS lines            */
+	Matrix<CT>           m_kernel;  /**< @brief GRAPPA kernel        */
 
-	Matrix<size_t>       m_kdims;   /**< @brief Kernel dimensions */
+	Matrix<size_t>       m_kdims;   /**< @brief Kernel dimensions    */
 	Matrix<size_t>       m_adims;
-	Matrix<size_t>       m_d;       /**< @brief Dimensions        */
+	Matrix<size_t>       m_d;       /**< @brief Dimensions           */
 	Matrix<size_t>       m_af;      /**< @brief Acceleration factors */
-	Matrix<size_t>       m_sdims;   /**< @brief Scan dimensions */
+	Matrix<size_t>       m_sdims;   /**< @brief Scan dimensions      */
 
-	std::vector<DFT<T> > m_dft;     /**< @brief DFT operator      */
+	T m_lambda;
+
+	std::vector<DFT<T> > m_dft;     /**< @brief DFT operator         */
 
 	size_t               m_nc;      /**< @brief Number of receive channels */
-
 
 };
 

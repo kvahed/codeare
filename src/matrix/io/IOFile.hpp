@@ -77,7 +77,7 @@ namespace io      {
 	 * @return          Success
 	 */
 	template<class T> inline static bool
-	mwrite (const container<T>& d, FILE* f, std::string desc) {
+	mwrite (const Vector<T>& d, FILE* f, std::string desc) {
 		size_t n = d.size();
 		size_t sz = sizeof(T);
 		if (size_t l = fwrite (d.ptr(), sz, n, f) != n) {
@@ -150,7 +150,7 @@ namespace io      {
 	 * @return          Success
 	 */
 	template<class T> inline static bool
-	mread (container<T>& d, FILE* f, const std::string desc) {
+	mread (Vector<T>& d, FILE* f, const std::string desc) {
 
 		size_t sz = sizeof(T);
 		size_t n  = d.size();

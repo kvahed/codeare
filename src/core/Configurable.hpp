@@ -24,7 +24,7 @@
 #include "tinyxml.h"
 #include "xpath_static.h"
 #include "Tokenizer.hpp"
-#include "Container.hpp"
+#include "Vector.hpp"
 
 #include <string>
 
@@ -295,9 +295,9 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	template<class T> container<T>
+	template<class T> Vector<T>
 	RHSList (const std::string& key) {
-		container<T> v;
+		Vector<T> v;
 		T value;
 		std::string vstr;
         int res = Configuration()->QueryValueAttribute<std::string>(key, &vstr);

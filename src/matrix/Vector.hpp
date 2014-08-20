@@ -1,12 +1,12 @@
 /*
- * Container.hpp
+ * Vector.hpp
  *
  *  Created on: May 28, 2013
  *      Author: kvahed
  */
 
-#ifndef CONTAINER_HPP_
-#define CONTAINER_HPP_
+#ifndef __VECTOR_HPP__
+#define __VECTOR_HPP__
 
 #include <iostream>
 #include <assert.h>
@@ -65,9 +65,9 @@ enum    paradigm {
 
 
 /**
- * @brief Alligned data container for Matrix<T>
+ * @brief Alligned data Vector for Matrix<T>
  */
-template <class T, paradigm P=SHM> class container {
+template <class T, paradigm P=SHM> class Vector {
 public:
 
     /**
@@ -79,40 +79,40 @@ public:
     /**
      * @brief Default constructor
      */
-	explicit inline container () {}
+	explicit inline Vector () {}
 
     /**
      * @brief Construct with size
      * @bparam  n  New size
      */
-	explicit inline container (const size_t n) { _data = VECTOR_CONSTR (T,n); }
+	explicit inline Vector (const size_t n) { _data = VECTOR_CONSTR (T,n); }
 
     /**
      * @brief Construct with size and preset value
      * @param  n  New size
      * @param  val Preset value
      */
-	explicit inline container (const size_t n, const T& val) { _data = VECTOR_CONSTR_VAL(T,n,val); }
+	explicit inline Vector (const size_t n, const T& val) { _data = VECTOR_CONSTR_VAL(T,n,val); }
 
     /**
      * @brief Copy constructor from different type
      * @param  cs  To copy
      */
-	template<class S> inline container (const container<S>& cs) {
+	template<class S> inline Vector (const Vector<S>& cs) {
 		_data.resize(cs.size());
 		for (size_t i = 0; i < _data.size(); ++i)
 			_data[i] = (T)cs[i];
 	}
 
 #ifdef HAVE_CXX11_RVALUE_REFERENCES
-	inline container (const container<T>& other) : _data(other._data) {}
-	inline container (container<T>&& other) : _data(std::move(other._data)) {}
-	inline container& operator= (const container<T>& other) {
+	inline Vector (const Vector<T>& other) : _data(other._data) {}
+	inline Vector (Vector<T>&& other) : _data(std::move(other._data)) {}
+	inline Vector& operator= (const Vector<T>& other) {
 		if (this != &other)
 			_data = other._data;
 		return *this;
 	}
-	inline container& operator= (container<T>&& other) {
+	inline Vector& operator= (Vector<T>&& other) {
 		if (this != &other)
 			_data = std::move(other._data);
 		return *this;
@@ -215,18 +215,27 @@ public:
      */
 	inline void push_back (const T& t) { _data.push_back(t);}
 
+	inline void Clear() {_data.clear();}
+
+	inline bool Empty() const {return _data.empty();}
+
+	inline bool operator== (const Vector<T>& other) const {return _data == other._data;}
+
+	inline void PopBack () {_data.pop_back();}
+	inline void PushBack (const T& t) {_data.push_back(t);}
+
 private:
 	VECTOR_TYPE(T) _data;
 };
 
-template <class T> class container_inserter {
+template <class T> class vector_inserter {
 public:
-    container<T>& _ct;
-    container_inserter (container<T>& ct):_ct(ct) {}
-    inline container_inserter& operator, (const T& val) {_ct.push_back(val);return *this;}
+    Vector<T>& _ct;
+    vector_inserter (Vector<T>& ct):_ct(ct) {}
+    inline vector_inserter& operator, (const T& val) {_ct.push_back(val);return *this;}
 };
-template <class T> inline container_inserter<T>& operator+= (container<T>& ct,const T& x) {
-    return container_inserter<T>(ct),x;
+template <class T> inline vector_inserter<T>& operator+= (Vector<T>& ct,const T& x) {
+    return vector_inserter<T>(ct),x;
 }
 
 
@@ -234,40 +243,40 @@ template<class T> inline T ct_real (const std::complex<T> ct) {return ct.real();
 template<class T> inline T ct_imag (const std::complex<T> ct) {return ct.imag();}
 template<class T> inline T ct_conj (const T ct) {return std::conj(ct);}
 
-template<class T> inline static container<T>
-real (const container<std::complex<T> >& c) {
-	container<T> res (c.size());
+template<class T> inline static Vector<T>
+real (const Vector<std::complex<T> >& c) {
+	Vector<T> res (c.size());
 	std::transform (c.begin(), c.end(), res.begin(), ct_real<T>);
 	return res;
 }
-template<class T> inline static container<T>
-imag (const container<std::complex<T> >& c) {
-	container<T> res (c.size());
+template<class T> inline static Vector<T>
+imag (const Vector<std::complex<T> >& c) {
+	Vector<T> res (c.size());
 	std::transform (c.begin(), c.end(), res.begin(), ct_imag<T>);
 	return res;
 }
-template<class T> inline static container<T>
-conj (const container<T>& c) {
-	container<T> res (c.size());
+template<class T> inline static Vector<T>
+conj (const Vector<T>& c) {
+	Vector<T> res (c.size());
 	std::transform (c.begin(), c.end(), res.begin(), ct_conj<T>);
 	return res;
 }
 template<class T> inline std::ostream&
-operator<< (std::ostream& os, const container<T>& ct) {
-    for (typename container<T>::const_iterator it = ct.begin(); it != ct.end(); ++it)
+operator<< (std::ostream& os, const Vector<T>& ct) {
+    for (typename Vector<T>::const_iterator it = ct.begin(); it != ct.end(); ++it)
         os << *it << " ";
     return os;
 }
 template<class T> inline static T multiply (const T& a, const T& b) {
     return a*b;
 }
-template<class T> inline static T prod (const container<T>& ct) {
+template<class T> inline static T prod (const Vector<T>& ct) {
 	return std::accumulate(ct.begin(), ct.end(), (T)1, multiply<T>);
 }
-template<class T> inline static T sum (const container<T>& ct) {
+template<class T> inline static T sum (const Vector<T>& ct) {
 	return std::accumulate(ct.begin(), ct.end(), (T)0);
 }
 
 template<class T> inline static void swapd (T& x,T& y) {T temp=x; x=y; y=temp;}
 
-#endif /* CONTAINER_HPP_ */
+#endif /* Vector_HPP_ */

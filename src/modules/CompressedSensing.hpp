@@ -121,7 +121,7 @@ namespace RRStrategy {
         int            m_dim;    /**< Image recon dim */
         int            m_N[3];   /**< Data side lengths */
         int            m_csiter; /**< # global iterations */
-        container<size_t> m_image_size;
+        Vector<size_t> m_image_size;
         int            m_test_case;
 
         double m_noise;

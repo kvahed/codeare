@@ -35,13 +35,12 @@
 
 #include "OMP.hpp"
 #include "Complex.hpp"
-#include "Container.hpp"
+#include "Vector.hpp"
 
 #ifdef EXPLICIT_SIMD
 #    include "SIMD.hpp"
 #endif
 
-#include <assert.h>
 #include <iostream>
 #include <memory>
 #include <fstream>
@@ -57,37 +56,7 @@
 #include <algorithm>
 #include <utility>
 
-#define stringize(s) #s
-#define XSTR(s) stringize(s)
-#if !defined NDEBUG
-void abort (void);
-# if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
-# define op_assert(a, b, c) \
-do { \
-    if (0 == (a)) { \
-    	fprintf(stderr, "    ERROR: assertion failed: %s, %s(), %d at \'%s\'\n", \
-		    __FILE__, __func__, __LINE__, XSTR(a)); \
-		    std::cerr << "           Matrix dimensions do not match: (" << \
-		    		size(b) << ") != (" << size(c) << ")\n"; \
-        abort(); \
-    } \
-} while (0)
-# else
-# define op_assert(a, b, c) \
-do { \
-	if (0 == (a)) { \
-		fprintf(stderr, "    ERROR: assertion failed: %s, %d at \'%s\'\n", \
-			__FILE__, __LINE__, XSTR(a)); \
-		std::cerr << "           Matrix dimensions do not match: (" << \
-				size(b) << ") != (" << size(c) << ")\n"; \
-		abort(); \
-	} \
-} while (0)
-# endif
-#else
-# define op_assert(a, b, c) (void)0
-#endif
-
+#include <Assert.hpp>
 
 
 /**
@@ -157,32 +126,12 @@ public:
 	
 	
     /**
-     * @brief           Construct matrix with dimension array
-     *
-     * @param  dim      All dimensions
-     */
-	inline explicit
-    Matrix              (const std::vector<size_t>& dim) {
-		
-	    assert(!dim.empty() &&
-	    		std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
-
-		_dim = dim;
-		_res.resize(dim.size(),1.0);
-
-        Allocate();
-        
-	}
-	
-	
-    
-    /**
      * @brief           Construct matrix with aligned dimension vector
      *
      * @param  dim      All dimensions
      */
 	inline
-    Matrix              (const container<size_t>& dim) {
+    Matrix              (const Vector<size_t>& dim) {
 		
 	    size_t ds = dim.size();
 	    assert(ds &&
@@ -204,9 +153,9 @@ public:
      * @param  res      All 16 Resolutions
      */
 	inline explicit
-    Matrix              (const std::vector<size_t>& dim, const std::vector<float>& res) {
+    Matrix              (const Vector<size_t>& dim, const Vector<float>& res) {
 		
-	    assert(!dim.empty() &&
+	    assert(!dim.Empty() &&
 	    	    std::find(dim.begin(),dim.end(),size_t(0))==dim.end() &&
 	    	    dim.size() == res.size());
 
@@ -485,7 +434,7 @@ public:
      *  
      * @return          Data container
      */
-    inline container<T>&
+    inline Vector<T>&
     Container           ()  {
         return _M;
     }
@@ -496,7 +445,7 @@ public:
      *  
      * @return          Data container
      */
-    inline container<T>
+    inline Vector<T>
     Container           ()  const {
         return _M;
     }
@@ -507,7 +456,7 @@ public:
      *
      * @return          Container iterator
      */
-    inline typename container<T>::iterator
+    inline typename Vector<T>::iterator
 
     Begin               () {
     	return _M.begin ();
@@ -519,7 +468,7 @@ public:
      *
      * @return          Container const iterator
      */
-    inline typename container<T>::const_iterator
+    inline typename Vector<T>::const_iterator
     Begin               ()  const {
     	return _M.begin ();
     }
@@ -530,7 +479,7 @@ public:
      *
      * @return          Container iterator
      */
-    inline typename container<T>::iterator
+    inline typename Vector<T>::iterator
     End                 () {
     	return _M.end ();
     }
@@ -541,7 +490,7 @@ public:
      *
      * @return          Container const iterator
      */
-    inline typename container<T>::const_iterator
+    inline typename Vector<T>::const_iterator
     End                 ()  const {
     	return _M.end ();
     }
@@ -1038,7 +987,7 @@ public:
      *
      * @return          All resolutions
      */
-    inline const std::vector<float>&
+    inline const Vector<float>&
     Res                 () const {
         return _res;
     }
@@ -1062,7 +1011,7 @@ public:
      *
      * @return          All dimensions
      */
-    inline const std::vector<size_t>&
+    inline const Vector<size_t>&
     Dim                 ()                  const {
         return _dim;
     }
@@ -1079,7 +1028,7 @@ public:
      *
      * @return          All dimensions
      */
-    inline const std::vector<size_t>&
+    inline const Vector<size_t>&
     Dsz                 ()                  const {
         return _dsz;
     }
@@ -1090,10 +1039,10 @@ public:
      */
     inline void
     Clear               ()                                      {
-    	_dim.clear();
-        _dsz.clear();
-        _res.clear();
-        _M.clear();
+    	_dim.Clear();
+        _dsz.Clear();
+        _res.Clear();
+        _M.Clear();
     }
 
 
@@ -1192,7 +1141,7 @@ public:
      * @param  v        Data vector (size must match numel(M)).
      */
     inline Matrix<T,P>&
-    operator=           (const container<T>& v) {
+    operator=           (const Vector<T>& v) {
 
     	assert (_M.size() == v.size());
 
@@ -2285,12 +2234,12 @@ protected:
     }
 
     // Structure
-    std::vector<size_t> _dim; /// Dimensions
-    std::vector<size_t> _dsz; /// Dimension size.
-    std::vector<float>  _res; /// Resolutions
+    Vector<size_t> _dim; /// Dimensions
+    Vector<size_t> _dsz; /// Dimension size.
+    Vector<float>  _res; /// Resolutions
     
     //Data
-    container<T>        _M; /// Data container
+    Vector<T>        _M; /// Data container
 
     // Name
     std::string         _name; /// Name

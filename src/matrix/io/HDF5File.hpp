@@ -118,7 +118,7 @@ namespace io {
 			T         t       = (T) 0;
 			DataSet   dataset = m_file.openDataSet(uri);
 			DataSpace space   = dataset.getSpace();
-			std::vector<hsize_t> dims (space.getSimpleExtentNdims());
+			Vector<hsize_t> dims (space.getSimpleExtentNdims());
 			size_t    ndim    = space.getSimpleExtentDims(&dims[0], NULL);
 
 			if (this->m_verb) {
@@ -127,11 +127,11 @@ namespace io {
 			}
 
 			if (is_complex(t)) {
-				dims.pop_back();
+				dims.PopBack();
 				--ndim;
 			}
 
-			std::vector<size_t> mdims (ndim,1);
+			Vector<size_t> mdims (ndim,1);
 
 			for (size_t i = 0; i < ndim; ++i)
 				mdims[i] = dims[ndim-i-1];
@@ -207,7 +207,7 @@ namespace io {
 			// One more field for complex numbers
 			size_t tmpdim = ndims(M);
 
-			std::vector<hsize_t> dims (tmpdim);
+			Vector<hsize_t> dims (tmpdim);
 
 			for (size_t i = 0; i < tmpdim; i++)
 				dims[i] = M.Dim(tmpdim-1-i);

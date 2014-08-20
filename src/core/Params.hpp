@@ -229,7 +229,8 @@ public:
                     demangle(ba.type().name()).c_str());
 			throw e;
 		}
-		return T(0);
+		T t = T();
+		return t;
 	}
 
 

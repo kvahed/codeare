@@ -95,11 +95,11 @@ public:
 			m_pc = ws.Get<T>(params.Get<std::string>("b0"));
 		
 		m_nx.push_back(ndims(m_sm)-1);
-		container<size_t> ms (m_nx[0]);
+		Vector<size_t> ms (m_nx[0]);
 		for (size_t i = 0; i < m_nx[0]; i++)
 			ms[i] = size(m_sm,i);
 
-		container<size_t> sizesm = vsize(m_sm);
+		Vector<size_t> sizesm = vsize(m_sm);
         m_nx.push_back(sizesm.back());             // NC
 		m_nx.push_back(unsigned_cast(params["nk"])); // NK
         m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, c_multiply<size_t>)/m_nx[1]); //NR
@@ -213,9 +213,9 @@ public:
         T rn, rno, xn, ts;
 		Matrix<CT> p, r, x, q;
 		vector<T> res;
-        std::vector<Matrix<cxfl> > vc;
+        Vector<Matrix<cxfl> > vc;
 
-        typedef typename container<CT>::iterator it_type;
+        typedef typename Vector<CT>::iterator it_type;
 
 		p  = EH (m, sens, m_nx, m_fts) * m_ic;
 		r  = p;
@@ -255,7 +255,7 @@ public:
                 std::copy (vc[i].Begin(), vc[i].End(), it);
                 it += cpsz;
             }
-            vc.clear();
+            vc.Clear();
         } else
             x *= m_ic;
 
@@ -291,7 +291,7 @@ public:
 	
 private:
 
-    //std::vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
+    //Vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
     NFFT<T>    m_fts;
 	bool       m_initialised; /**< All initialised? */
     bool       m_verbose;
@@ -303,7 +303,7 @@ private:
 	std::string m_smname;
 	std::string m_wname;
 
-    container<size_t> m_nx;
+    Vector<size_t> m_nx;
     
 	size_t     m_cgiter;         /**< Max # CG iterations */
 	double     m_cgeps;          /**< Convergence limit */

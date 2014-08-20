@@ -36,42 +36,42 @@ template<class T> struct ITraits;
 
 template<> struct ITraits<float> {
 	typedef float T;
-	static void ac (const container<T>& data, std::vector<container<double> >& y){
+	static void ac (const Vector<T>& data, std::vector<Vector<double> >& y){
 		size_t n = data.size();
-		y.push_back(container<double>(n));
+		y.push_back(Vector<double>(n));
 		for (size_t i = 0; i < n; ++i)
 			y[0][i] = data[i];
 	}
-	static void ac (const T* data, const size_t n, std::vector<container<double> >& y){
-		y.push_back(container<double>(n));
+	static void ac (const T* data, const size_t n, std::vector<Vector<double> >& y){
+		y.push_back(Vector<double>(n));
 		for (size_t i = 0; i < n; ++i)
 			y[0][i] = data[i];
 	}
 };
 template<> struct ITraits<double> {
 	typedef double T;
-	static void ac (const container<T>& data, std::vector<container<double> >& y){
+	static void ac (const Vector<T>& data, std::vector<Vector<double> >& y){
 		y.push_back(data);
 	}
-	static void ac (const T* data, const size_t n, std::vector<container<double> >& y){
-		y.push_back(container<double>(n));
+	static void ac (const T* data, const size_t n, std::vector<Vector<double> >& y){
+		y.push_back(Vector<double>(n));
 		for (size_t i = 0; i < n; ++i)
 			y[0][i] = data[i];
 	}
 };
 template<> struct ITraits<cxfl> {
 	typedef cxfl T;
-	static void ac (const container<T>& data, std::vector<container<double> >& y){
+	static void ac (const Vector<T>& data, std::vector<Vector<double> >& y){
 		size_t n = data.size();
-		y.push_back(container<double>(n));
-		y.push_back(container<double>(n));
+		y.push_back(Vector<double>(n));
+		y.push_back(Vector<double>(n));
 		for (size_t i = 0; i < n; ++i) {
 			y[0][i] = real(data[i]); y[1][i] = imag(data[i]);
 		}
 	}
-	static void ac (const T* data, const size_t n, std::vector<container<double> >& y){
-		y.push_back(container<double>(n));
-		y.push_back(container<double>(n));
+	static void ac (const T* data, const size_t n, std::vector<Vector<double> >& y){
+		y.push_back(Vector<double>(n));
+		y.push_back(Vector<double>(n));
 		for (size_t i = 0; i < n; ++i) {
 			y[0][i] = real(data[i]); y[1][i] = imag(data[i]);
 		}
@@ -79,13 +79,13 @@ template<> struct ITraits<cxfl> {
 };
 template<> struct ITraits<cxdb> {
 	typedef cxdb T;
-	static void ac (const container<T>& data, std::vector<container<double> >& y){
+	static void ac (const Vector<T>& data, std::vector<Vector<double> >& y){
 		y.push_back(real(data));
 		y.push_back(imag(data));
 	}
-	static void ac (const T* data, const size_t n, std::vector<container<double> >& y){
-		y.push_back(container<double>(n));
-		y.push_back(container<double>(n));
+	static void ac (const T* data, const size_t n, std::vector<Vector<double> >& y){
+		y.push_back(Vector<double>(n));
+		y.push_back(Vector<double>(n));
 		for (size_t i = 0; i < n; ++i) {
 			y[0][i] = real(data[i]); y[1][i] = imag(data[i]);
 		}
@@ -156,7 +156,7 @@ public:
 	 *
 	 * @return       Success
 	 */ 
-	PolyVal (const container<double>& x, const container<T>& y, const INTERP::Method intm = INTERP::CSPLINE) {
+	PolyVal (const Vector<double>& x, const Vector<T>& y, const INTERP::Method intm = INTERP::CSPLINE) {
 		
 		assert (x.size() == y.size());
 
@@ -192,7 +192,7 @@ public:
 	 *
 	 * @return       Success
 	 */ 
-	PolyVal (const Matrix<double>& x, const container<T>& y, const INTERP::Method intm = INTERP::CSPLINE) {
+	PolyVal (const Matrix<double>& x, const Vector<T>& y, const INTERP::Method intm = INTERP::CSPLINE) {
 
 		assert (x.Size() == y.size());
 
@@ -230,7 +230,7 @@ public:
 protected:
 	
 
-	inline bool InitGSL (const container<double>& x, const INTERP::Method intm) {
+	inline bool InitGSL (const Vector<double>& x, const INTERP::Method intm) {
 
 		size_t n = x.size();
 
@@ -244,14 +244,14 @@ protected:
 
 	}
 
-	bool Initialise (const container<double>& x, const container<T>& y, const INTERP::Method intm) {
+	bool Initialise (const Vector<double>& x, const Vector<T>& y, const INTERP::Method intm) {
 
 		ITraits<T>::ac (y, m_y);
 		return InitGSL (x, intm);
 
 	}
 
-	bool Initialise (const container<double>& x, const T* y, const INTERP::Method intm) {
+	bool Initialise (const Vector<double>& x, const T* y, const INTERP::Method intm) {
 
 		ITraits<T>::ac(y, x.size(), m_y);
 		return InitGSL (x, intm);
@@ -275,7 +275,7 @@ protected:
 
 	}
 		
-	std::vector<container<double> > m_y;
+	std::vector<Vector<double> > m_y;
 	std::vector<gsl_interp_accel*> m_acc;    /**< @brief Accelerators for real / imaginary interpolations */
 	std::vector<gsl_spline*>       m_spline; /**< @brief Spline finction for real / imaginary      */
 	

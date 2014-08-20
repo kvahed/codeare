@@ -211,8 +211,8 @@ namespace RRClient {
 			RemoteTraits<T>::Retrieve (m_rrsi, name, ct);
 			size_t nd = ct.dims.length();
 
-			std::vector<size_t> mdims (nd);
-			std::vector<float>  mress (nd);
+			Vector<size_t> mdims (nd);
+			Vector<float>  mress (nd);
 
 			for (int j = 0; j < nd; j++) {
 				mdims[j] = ct.dims[j];

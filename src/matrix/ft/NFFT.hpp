@@ -112,7 +112,7 @@ public:
 
 		if (p.exists("imsz")) {// Image domain size
 			try {
-				m_N = boost::any_cast<container<size_t> >(p["imsz"]);
+				m_N = boost::any_cast<Vector<size_t> >(p["imsz"]);
 			} catch (const boost::bad_any_cast& e) {
 				printf ("**ERROR - NFFT: Image domain dimensions need to be specified\n%s\n", e.what());
 				assert(false);
@@ -343,8 +343,8 @@ private:
 	Matrix<CT> m_pc;            /**< @brief Phase correction (applied after inverse trafo)*/
 	Matrix<CT> m_cpc;           /**< @brief Phase correction (applied before forward trafo)*/
 	
-	container<size_t> m_N;      /**< @brief Image matrix side length (incl. k_{\\omega})*/
-	container<size_t> m_n;      /**< @brief Oversampling */
+	Vector<size_t> m_N;      /**< @brief Image matrix side length (incl. k_{\\omega})*/
+	Vector<size_t> m_n;      /**< @brief Oversampling */
 
 	size_t     m_M;             /**< @brief Number of k-space knots */
 	size_t     m_maxit;         /**< @brief Number of Recon iterations (NFFT 3) */

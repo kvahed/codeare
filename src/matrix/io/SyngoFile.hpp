@@ -124,9 +124,9 @@ namespace io      {
 	 */
 	template<class T>
 	struct Data {
-		std::vector<size_t> dims;
-		std::vector<size_t> idx;
-		std::vector<float> ress;
+		Vector<size_t> dims;
+		Vector<size_t> idx;
+		Vector<float> ress;
 		std::valarray<T>   data;
 
 		/**
@@ -198,7 +198,7 @@ namespace io      {
 			}
 
 			m_initialised = true;
-			m_meas_dims = std::vector<size_t>(MAX_ICE_DIM,(size_t)1);
+			m_meas_dims = Vector<size_t>(MAX_ICE_DIM,(size_t)1);
 
 			dnames["NImageCols"] =  0; dnames["NLinMeas"] =  1; dnames["NSlcMeas"] =  2; dnames["NParMeas"] =  3;
 			dnames[  "NEcoMeas"] =  4; dnames["NPhsMeas"] =  5; dnames["NRepMeas"] =  6; dnames["NSetMeas"] =  7;
@@ -633,7 +633,7 @@ namespace io      {
 
 		sMDH        m_cur_mdh;
 
-		std::vector<size_t> m_meas_dims;
+		Vector<size_t> m_meas_dims;
 
 
 

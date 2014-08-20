@@ -87,7 +87,7 @@ struct LapackTraits<float> {
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
-          container<Type>& work, const int& lwork, int& info) {
+          Vector<Type>& work, const int& lwork, int& info) {
         
         SGELS (&trans, &m, &n, &nrhs, &a[0], &lda, &b[0], &ldb, &work[0], &lwork, &info);
         
@@ -185,7 +185,7 @@ struct LapackTraits<double> {
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
-          container<Type>& work,
+          Vector<Type>& work,
           const int& lwork, int& info) {
         
         DGELS (&trans, &m, &n, &nrhs, &a[0], &lda, &b[0], &ldb, &work[0], &lwork, &info);
@@ -289,7 +289,7 @@ struct LapackTraits<cxfl> {
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
-          container<Type>& work, const int& lwork, int& info) {
+          Vector<Type>& work, const int& lwork, int& info) {
         
         CGELS (&trans, &m, &n, &nrhs, &a[0], &lda, &b[0], &ldb, &work[0], &lwork, &info);
         
@@ -392,7 +392,7 @@ struct LapackTraits<cxdb> {
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
-          container<Type>& work, const int& lwork, int& info) {
+          Vector<Type>& work, const int& lwork, int& info) {
         
         ZGELS (&trans, &m, &n, &nrhs, &a[0], &lda, &b[0], &ldb, &work[0], &lwork, &info);
         
@@ -464,7 +464,7 @@ struct LapackTraits<unsigned char> {
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
-          container<Type>& work, const int& lwork, int& info) {}
+          Vector<Type>& work, const int& lwork, int& info) {}
 
     inline static void
     gesdd (const char& jobz, const int& m, const int& n, Type *a, const int& lda, RType *s,
@@ -528,7 +528,7 @@ struct LapackTraits<size_t> {
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>&, const int& ldb,
-          container<Type>& work, const int& lwork, int& info) {}
+          Vector<Type>& work, const int& lwork, int& info) {}
 
     inline static void
     gesdd (const char& jobz, const int& m, const int& n, Type *a, const int& lda, RType *s,

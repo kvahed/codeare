@@ -46,8 +46,8 @@ fftshift (const Matrix<T>& m, const bool fw = true) {
 		if (tmp[i] == 0)
 			tmp[i] = 1;
 
-	container<size_t> d = tmp.Container(); // data side lengths
-	container<size_t> c = floor(tmp/2).Container(); // center coords
+	Vector<size_t> d = tmp.Container(); // data side lengths
+	Vector<size_t> c = floor(tmp/2).Container(); // center coords
 
     Matrix<T> res (vsize(m));
 
@@ -176,7 +176,7 @@ public:
 
 		size_t rank = numel(sl);
 
-		container<int> n (rank);
+		Vector<int> n (rank);
 		
 		if (numel(mask) > 1) {
 			m_have_mask = true;	m_mask = mask;
@@ -209,14 +209,14 @@ public:
 		m_initialised(false), m_have_mask(false) {
 
 		size_t rank;
-		container<int> n;
+		Vector<int> n;
 
 		if (p.exists("dims")) {
 			try {
-				n = (container<int>)p.Get<container<size_t> >("dims");
+				n = (Vector<int>)p.Get<Vector<size_t> >("dims");
 				rank = n.size();
 			} catch (const boost::bad_any_cast& e){
-				printf("**ERROR - DFT: cannot interpret dimensions vector (container<size_t>)\n%s\n", e.what());
+				printf("**ERROR - DFT: cannot interpret dimensions vector (Vector<size_t>)\n%s\n", e.what());
 			}
 		} else if (p.exists("rank") && p.exists("dim")) {
 			int dim;
@@ -232,7 +232,7 @@ public:
 				printf ("**ERROR - DFT: cannot interpret FT dim.\n%s\n", e.what());
 				assert (false);
 			}
-			n = container<int>(rank,dim);
+			n = Vector<int>(rank,dim);
 		} else {
 			printf ("**ERROR - DFT: either vector with FT dimensions or rank and single dimension must be specified.\n");
 			assert (false);
@@ -279,7 +279,7 @@ public:
 		d=ft.d;
 		c=ft.c;
 
-		container<int> n (d);
+		Vector<int> n (d);
 		std::reverse(n.begin(),n.end());
 		int rank = d.size();
 
@@ -521,7 +521,7 @@ private:
 	inline void
 	Allocate (const int rank, const int* n) {
 		
-		m_in     = container<CT> (m_N);
+		m_in     = Vector<CT> (m_N);
 
 		m_fwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0],
 				FFTW_FORWARD,  FFTW_MEASURE | FFTW_DESTROY_INPUT);
@@ -553,10 +553,10 @@ private:
 	bool       m_have_pc;      /**< @brief Apply phase correction?*/
 	bool       m_zpad;         /**< @brief Zero padding? (!!!NOT OPERATIONAL YET!!!)*/
 	
-	container<CT> m_in;           /**< @brief Aligned fftw input*/
+	Vector<CT> m_in;           /**< @brief Aligned fftw input*/
 
-	container<size_t> d;
-	container<size_t> c;
+	Vector<size_t> d;
+	Vector<size_t> c;
 
 	//Type*      m_in;           /**< @brief Aligned fftw input*/
 
