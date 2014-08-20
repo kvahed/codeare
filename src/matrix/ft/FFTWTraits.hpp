@@ -208,6 +208,7 @@ struct FTTraits<double> {
 #else
 		fftw_export_wisdom_to_filename("codeare_single.plan");
 #endif
+		return plan;
 	}
 	
 
