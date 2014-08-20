@@ -315,22 +315,10 @@ public:
      * @param  ave      Averages
      */
     inline
-    Matrix              (const size_t col,
-                         const size_t lin,
-                         const size_t cha,
-                         const size_t set,
-                         const size_t eco = 1,
-                         const size_t phs = 1,
-                         const size_t rep = 1,
-                         const size_t seg = 1,
-                         const size_t par = 1,
-                         const size_t slc = 1,
-                         const size_t ida = 1,
-                         const size_t idb = 1,
-                         const size_t idc = 1,
-                         const size_t idd = 1,
-                         const size_t ide = 1,
-                         const size_t ave = 1) {
+    Matrix              (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
+                         const size_t eco = 1, const size_t phs = 1, const size_t rep = 1, const size_t seg = 1,
+                         const size_t par = 1, const size_t slc = 1, const size_t ida = 1, const size_t idb = 1,
+                         const size_t idc = 1, const size_t idd = 1, const size_t ide = 1, const size_t ave = 1) {
 
 		assert (col && lin && cha && set && eco && phs && rep && seg &&
 				par && slc && ida && idb && idc && idd && ide && ave );
@@ -359,8 +347,9 @@ public:
 	}
 
 
+#ifdef HAVE_CXX11_RVALUE_REFERENCES
     /**
-     * @brief           Copy constructor
+     * @brief           Default copy constructor
      *
      * Usage:
      * @code{.cpp}
@@ -374,11 +363,8 @@ public:
     	if (this != &M)
     		*this = M;
     }
-
-
-#ifdef HAVE_CXX11_RVALUE_REFERENCES
     /**
-     * @brief           Copy constructor
+     * @brief           Default move constructor
      *
      * Usage:
      * @code{.cpp}
@@ -596,33 +582,13 @@ public:
      *
      * @return          Value
      */
-    inline const T&
-    At                  (const size_t x, const size_t y) const {
-
-    	assert ((!x || x < _dim[0]) &&
-    			(!y || y < _dim[1]));
-
-        return _M[x + _dim[0]*y];
-
-    }
-
-    
-
-    /**
-     * @brief            Reference to element in (first) slice (rhs)
-     *  
-     * @param  x         Column
-     * @param  y         Line
-     *
-     * @return           Reference
-     */
-    inline T&           
-    At                  (const size_t x, const size_t y) {
-
+    inline const T& At (const size_t x, const size_t y) const {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]));
-
         return _M[x + _dim[0]*y];
-
+    }
+    inline T&       At (const size_t x, const size_t y) {
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]));
+        return _M[x + _dim[0]*y];
     }
 
     
@@ -635,35 +601,36 @@ public:
      *
      * @return         Value
      */
-    inline const T&
-    At                   (const size_t x, const size_t y, const size_t z) const {
-
+    inline const T& At (const size_t x, const size_t y, const size_t z) const {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
-
         return _M[x + _dsz[1]*y + _dsz[2]*z];
-
     }
-    
+    inline T&       At (const size_t x, const size_t y, const size_t z) {
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
+        return _M[x + _dsz[1]*y + _dsz[2]*z];
+    }
     
 
     /**
      * @brief            Reference to element in (first) volume (lhs)
-     *  
+     *
      * @param  x         Column
      * @param  y         Line
      * @param  z         Slice
      *
      * @return           Reference
      */
-    inline T&            
-    At                   (const size_t x, const size_t y, const size_t z) {
-
-    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
-
-        return _M[x + _dsz[1]*y + _dsz[2]*z];
-
+    inline const T&
+    At                   (const size_t x, const size_t y, const size_t z, const size_t w) const {
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
+        return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]];
     }
-    
+    inline T&
+    At                   (const size_t x, const size_t y, const size_t z, const size_t w) {
+    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
+        return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]];
+    }
+
     
 
     /**
@@ -688,107 +655,30 @@ public:
      * @return           Value at position
      */
     inline const T&
-    At                   (const size_t col,
-                          const size_t lin,
-                          const size_t cha,
-                          const size_t set,
-                          const size_t eco,
-                          const size_t phs = 0,
-                          const size_t rep = 0,
-                          const size_t seg = 0,
-                          const size_t par = 0,
-                          const size_t slc = 0,
-                          const size_t ida = 0,
-                          const size_t idb = 0,
-                          const size_t idc = 0,
-                          const size_t idd = 0,
-                          const size_t ide = 0,
-                          const size_t ave = 0) const {
-
-    	assert ((!col || col < _dim[ 0])&&
-    	        (!lin || lin < _dim[ 1])&&
-    	        (!cha || cha < _dim[ 2])&&
-    	        (!set || set < _dim[ 3])&&
-    	        (!eco || eco < _dim[ 4])&&
-    	        (!phs || phs < _dim[ 5])&&
-    	        (!rep || rep < _dim[ 6])&&
-    	        (!seg || seg < _dim[ 7])&&
-    	        (!par || par < _dim[ 8])&&
-    	        (!slc || slc < _dim[ 9])&&
-    	        (!ida || ida < _dim[10])&&
-    	        (!idb || idb < _dim[11])&&
-    	        (!idc || idc < _dim[12])&&
-    	        (!idd || idd < _dim[13])&&
-    	        (!ide || ide < _dim[14])&&
-    	        (!ave || ave < _dim[15]));
-
+    At                   (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
+                          const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
+                          const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
+                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) const {
+    	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
+    	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
+    	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
+    	        (!idc || idc < _dim[12])&& (!idd || idd < _dim[13])&& (!ide || ide < _dim[14])&& (!ave || ave < _dim[15]));
         return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
    	               seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
    	               idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
-
     }
-    
-    
-    /**
-     * @brief            Reference to value in volume (rhs)
-     *  
-     * @param  col       Column
-     * @param  lin       Line
-     * @param  cha       Channel
-     * @param  set       Set
-     * @param  eco       Echo
-     * @param  phs       Phase
-     * @param  rep       Repetition
-     * @param  seg       Segment
-     * @param  par       Partition
-     * @param  slc       Slice
-     * @param  ida       Free index A
-     * @param  idb       Free index B
-     * @param  idc       Free index C
-     * @param  idd       Free index D
-     * @param  ide       Free index E
-     * @param  ave       Average
-     * @return           Reference to position
-     */
-    inline T&            
-    At                   (const size_t col,
-                          const size_t lin,
-                          const size_t cha,
-                          const size_t set,
-                          const size_t eco = 0,
-                          const size_t phs = 0,
-                          const size_t rep = 0,
-                          const size_t seg = 0,
-                          const size_t par = 0,
-                          const size_t slc = 0,
-                          const size_t ida = 0,
-                          const size_t idb = 0,
-                          const size_t idc = 0,
-                          const size_t idd = 0,
-                          const size_t ide = 0,
-                          const size_t ave = 0) {
-
-    	assert ((!col || col < _dim[ 0])&&
-    	       (!lin || lin < _dim[ 1])&&
-    	       (!cha || cha < _dim[ 2])&&
-    	       (!set || set < _dim[ 3])&&
-    	       (!eco || eco < _dim[ 4])&&
-    	       (!phs || phs < _dim[ 5])&&
-    	       (!rep || rep < _dim[ 6])&&
-    	       (!seg || seg < _dim[ 7])&&
-    	       (!par || par < _dim[ 8])&&
-    	       (!slc || slc < _dim[ 9])&&
-    	       (!ida || ida < _dim[10])&&
-    	       (!idb || idb < _dim[11])&&
-    	       (!idc || idc < _dim[12])&&
-    	       (!idd || idd < _dim[13])&&
-    	       (!ide || ide < _dim[14])&&
-    	       (!ave || ave < _dim[15]));
-
-    	return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
-    	                 seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
-    	                 idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
-
+    inline T&
+    At                   (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
+                          const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
+                          const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
+                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) {
+    	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
+    	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
+    	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
+    	        (!idc || idc < _dim[12])&& (!idd || idd < _dim[13])&& (!ide || ide < _dim[14])&& (!ave || ave < _dim[15]));
+        return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
+   	               seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
+   	               idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
     }
     
 
@@ -799,17 +689,10 @@ public:
      */
     template<class S>
     inline operator Matrix<S,P> () const {
-
 		Matrix<S,P> m (_dim);
-
-#ifdef EW_OMP
-    #pragma omp parallel for
-#endif
 		for (size_t i = 0; i < Size(); ++i)
 			m[i] = (S)_M[i];
-
 		return m;
-
 	}
 
 
@@ -895,6 +778,36 @@ public:
     }
     
     
+    /**
+     * @brief            Get value in volume
+     *
+     * @param  x         Column
+     * @param  y         Line
+     * @param  z         Slice
+     *
+     * @return           Value
+     */
+    inline const T&
+    operator()           (const size_t x, const size_t y, const size_t z, const size_t w) const {
+        return this->At(x,y,z,w);
+    }
+
+
+    /**
+     * @brief            Reference to value in volume
+     *
+     * @param  x         Column
+     * @param  y         Line
+     * @param  z         Slice
+     *
+     * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
+     */
+    inline T&
+    operator()           (const size_t x, const size_t y, const size_t z, const size_t w) {
+        return this->At(x,y,z,w);
+    }
+
+
     /** 
      * @brief            Reference to element
      *
@@ -917,24 +830,21 @@ public:
      * @return          Reference to position
      */
     inline T&                 
-    operator()           (const size_t col,
-                          const size_t lin,
-                          const size_t cha,
-                          const size_t set,
-                          const size_t eco = 0,
-                          const size_t phs = 0,
-                          const size_t rep = 0,
-                          const size_t seg = 0,
-                          const size_t par = 0,
-                          const size_t slc = 0,
-                          const size_t ida = 0,
-                          const size_t idb = 0,
-                          const size_t idc = 0,
-                          const size_t idd = 0,
-                          const size_t ide = 0,
-                          const size_t ave = 0) {
-        return this->At (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-    }
+    operator()     (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
+					const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
+					const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
+					const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) {
+
+		assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
+		  (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
+		  (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
+		  (!idc || idc < _dim[12])&& (!idd || idd < _dim[13])&& (!ide || ide < _dim[14])&& (!ave || ave < _dim[15]));
+
+		return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
+				seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
+				idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
+
+	}
 
     /** 
      * @brief            Value at ...
@@ -958,32 +868,27 @@ public:
      * @return          Value
      */
     inline const T&
-    operator()           (const size_t col,
-                          const size_t lin,
-                          const size_t cha,
-                          const size_t set,
-                          const size_t eco = 0,
-                          const size_t phs = 0,
-                          const size_t rep = 0,
-                          const size_t seg = 0,
-                          const size_t par = 0,
-                          const size_t slc = 0,
-                          const size_t ida = 0,
-                          const size_t idb = 0,
-                          const size_t idc = 0,
-                          const size_t idd = 0,
-                          const size_t ide = 0,
-                          const size_t ave = 0) const {
-        return this->At (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
+    operator()           (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
+                          const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
+                          const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
+                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) const {
+
+    	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
+    	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
+    	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
+    	        (!idc || idc < _dim[12])&& (!idd || idd < _dim[13])&& (!ide || ide < _dim[14])&& (!ave || ave < _dim[15]));
+
+        return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
+   	               seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
+   	               idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
+
     }
+
 
     //@}
     
 
     
-#if !defined(_MSC_VER) || _MSC_VER>1200
-	#include "Operators.hpp"
-#endif
     
 #ifndef NO_LAPACK
     /**
@@ -1241,6 +1146,1140 @@ public:
     }
 
     //@}
+
+
+#include <functional>
+
+/**
+     * @name            Some operators
+     *                  Operator definitions. Needs big expansion still.
+     */
+
+    //@{
+
+#ifdef HAVE_CXX11_RVALUE_REFERENCES
+	/**
+	 * @brief  Move assignment operator
+	 * @param  rhs  Right hand side reference
+	 * @return      Left hand side
+	 */
+    inline Matrix<T,P>&
+    operator= (Matrix<T,P>&& rhs) {
+        _M    = std::move(rhs._M);
+        _name = std::move(rhs._name);
+        _res  = std::move(rhs._res);
+        _dsz  = std::move(rhs._dsz);
+        _dim  = std::move(rhs._dim);
+        return *this;
+    }
+#endif
+	/**
+	 * @brief  Copy assignment operator
+	 * @param  rhs  Right hand side
+	 * @return      Left hand side
+	 */
+    inline Matrix<T,P>&
+    operator= (const Matrix<T,P>& rhs) {
+        _M    = rhs._M;
+        _name = rhs._name;
+        _res  = rhs._res;
+        _dsz  = rhs._dsz;
+        _dim  = rhs._dim;
+        return *this;
+    }
+
+    /**
+     * @brief           Assignment data
+     *
+     * @param  v        Data vector (size must match numel(M)).
+     */
+    inline Matrix<T,P>&
+    operator=           (const container<T>& v) {
+
+    	assert (_M.size() == v.size());
+
+        if (&_M != &v)
+            _M = v;
+
+        return *this;
+
+    }
+
+
+
+    /**
+     * @brief           Assignment operator. Sets all elements s.
+     *
+     * @param  s        The assigned scalar.
+     */
+    inline const Matrix<T,P>&
+    operator=           (const T s) {
+        T t = T(s);
+        std::fill(_M.begin(), _M.end(), t);
+        return *this;
+    }
+
+
+    /**
+     * @brief           Unary minus (additive inverse)
+     *
+     * @return          Negation
+     */
+    inline Matrix<T,P>
+    operator-           () const {
+        Matrix<T,P> res (_dim);
+        std::transform (_M.begin(), _M.end(), res.Begin(), std::negate<T>());
+        return res;
+    }
+
+
+    /**
+     * @brief           Unary plus
+     *
+     * @return          Identity
+     */
+    inline Matrix<T,P>
+    operator+           () const {
+        return *this;
+    }
+
+
+    /**
+     * @brief           Transposition / Complex conjugation. i.e. this'.
+     *
+     * @return          Matrix::tr()
+     */
+    inline Matrix<T,P>
+    operator!           () const {
+    	assert(_dim.size() ==2);
+    	Matrix<T,P> res = *this;
+		for (size_t i = 0; i < _dim[1]; ++i)
+			for (size_t j = 0; j < i; j++)
+				swapd(res(j,i),res(i,j));
+        return res;
+    }
+
+
+
+    /**
+     * @brief           Return a matrix with result[i] = (m[i] ? this[i] : 0).
+     *
+     * @param  M        The operand
+     * @return          Cross-section or zero
+     */
+    //inline Matrix<T,P>
+    //operator&           (const Matrix<cbool>& M) const ;
+
+
+     /**
+     * @brief           Scalar inequality. result[i] = (this[i] != m). i.e. this ~= m
+     *
+     * @param  s        Comparing scalar.
+     * @return          Matrix of false where elements are equal s and true else.
+     */
+    inline Matrix<cbool>
+    operator!=          (const T s) const {
+        Matrix<cbool> res(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = (_M[i] != s) ? 1 : 0;
+        return res;
+    }
+
+
+
+    /**
+     * @brief           Scalar greater comaprison, result[i] = (this[i] > m). i.e. this > m
+     *
+     * @param  s        Comparing scalar.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator>           (const T s) const {
+        Matrix<cbool> res(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::greater(_M[i], s);
+        return res;
+
+    }
+
+
+
+    /**
+     * @brief           Scalar greater or equal comparison. result[i] = (this[i] >= m). i.e. this >= m
+     *
+     * @param  s        Comparing scalar.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator>=          (const T s) const {
+		Matrix<cbool> res(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::greater_or_equal(_M[i], s);
+        return res;
+	}
+
+
+    /**
+     * @brief           Scalar minor or equal comparison. result[i] = (this[i] <= m). i.e. this <= m
+     *
+     * @param  s        Comparing scalar.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator<=          (const T s) const {
+        Matrix<cbool> res(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::less_or_equal(_M[i], s);
+        return res;
+    }
+
+
+    /**
+     * @brief           Scalar minor or equal comparison. result[i] = (this[i] < m). i.e. this < m
+     *
+     * @param  s        Comparing scalar.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator<           (const T s) const {
+        Matrix<cbool> res(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::less(_M[i], s);
+        return res;
+    }
+
+
+    /**
+     * @brief           Elementwise equality, result[i] = (this[i] != m[i]). i.e. this ~= m
+     *
+     * @param  M        Comparing matrix.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator!=          (const Matrix<T,P>& M) const {
+        op_assert (_dim == M.Dim(), *this, M);
+        Matrix<cbool> res(_dim,_res);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = (_M[i]!= M[i]) ? 1 : 0;
+        return res;
+    }
+
+
+    /**
+     * @brief           Matrix comparison, result[i] = (this[i] >= m[i]). i.e. this >= m
+     *
+     * @param  M        Comparing matrix.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator>=          (const Matrix<T,P>& M) const {
+    	op_assert (_dim == M.Dim(), *this, M);
+        Matrix<cbool> res(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::greater_or_equal(_M[i], M[i]);
+        return res;
+    }
+
+
+    /**
+     * @brief           Matrix comparison, result[i] = (this[i] <= m[i]). i.e. this <= m.
+     *
+     * @param  M        Comparing matrix.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator<=          (const Matrix<T,P>& M) const {
+        op_assert (_dim == M.Dim(), *this, M);
+        Matrix<cbool> res(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::less_or_equal(_M[i], M[i]);
+        return res;
+    }
+
+
+    /**
+     * @brief           Matrix comparison, result[i] = (this[i] > m[i]). i.e. this > m.
+     *
+     * @param  M        Comparing matrix.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator>           (const Matrix<T,P>& M) const {
+        op_assert (_dim == M.Dim(), *this, M);
+        Matrix<cbool> res(_dim,_res);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::greater(_M[i], M[i]);
+        return res;
+    }
+
+
+    /**
+     * @brief           Matrix comparison, result[i] = (this[i] < m[i]). i.e. this < m.
+     *
+     * @param  M        Comparing matrix.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator<           (const Matrix<T,P>& M) const {
+        op_assert (_dim == M.Dim(), *this, M);
+        Matrix<cbool> res(_dim,_res);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::less(_M[i], M[i]);
+        return res;
+    }
+
+
+    /**
+     * @brief           Matrix comparison, result[i] = (m[i] || this[i] ? 1 : 0). i.e. this | m.
+     *
+     * @param  M        Comparing matrix.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator||          (const Matrix<T,P>& M) const {
+        Matrix<cbool> res(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::logical_or(_M[i], M[i]);
+        return res;
+    }
+
+
+
+    /**
+     * @brief           Matrix comparison, result[i] = (m[i] && this[i] ? 1 : 0). i.e. this & m.
+     *
+     * @param  M        Comparing matrix.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator&&          (const Matrix<T,P>& M) const {
+        op_assert (_dim == M.Dim(), *this, M);
+        Matrix<cbool> res(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	res[i] = CompTraits<T>::logical_and(_M[i], M[i]);
+        return res;
+    }
+
+
+    /**
+     * @brief           Elementwise raise of power. i.e. this .^ p.
+     *
+     * @param  p        Power.
+     * @return          Result
+     */
+    inline Matrix<T,P>
+    operator^           (const float p) const {
+    	Matrix<T,P> res = *this;
+		for (size_t i = 0; i < Size(); ++i)
+			res[i] = (p == 0) ? T(1) : TypeTraits<T>::Pow(res[i],  p);
+        return res;
+    }
+
+
+    /**
+     * @brief           Elementwise raise of power. i.e. this .^ p.
+     *
+     * @param  p        Power.
+     * @return          Result
+     */
+    inline Matrix<T,P>&
+    operator^=          (const float p) {
+		for (size_t i = 0; i < Size(); ++i)
+			_M[i] = TypeTraits<T>::Pow(_M[i],  p);
+        return *this;
+    }
+
+
+    /**
+     * @brief           Elementwise addition. i.e. this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    inline Matrix<T,P>
+    operator+          (const Matrix<T,P> &M) const {
+		Matrix<T,P> res = *this;
+		return res += M;
+    }
+
+
+    /**
+     * @brief           Elementwise addition of two matrices
+     *
+     * @param  M        Matrix additive.
+     */
+    template <class S>
+    inline const Matrix<T,P>
+    operator+          (const Matrix<S,P>& M) const {
+		Matrix<T,P> res = *this;
+		return res += M;
+    }
+
+
+    /**
+     * @brief           Elementwise addition iof all elements with a scalar
+     *
+     * @param  s        Scalar additive.
+     */
+    template <class S>
+    inline Matrix<T,P>
+    operator+           (const S s) const {
+        Matrix<T,P> res = *this;
+        return res += s;
+    }
+
+
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    inline Matrix<T,P>&
+    operator+=         (const Matrix<T,P>& M) {
+    	op_assert (_dim == M.Dim(), *this, M);
+   		std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
+        return *this;
+    }
+
+
+/**
+ * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
+ *
+ * @param  M        Added matrix.
+ * @return          Result
+ */
+    template <class S> inline Matrix<T,P>&
+    operator+=         (const Matrix<S,P>& M) {
+        op_assert (_dim == M.Dim(), *this, M);
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
+		return *this;
+    }
+
+
+    /**
+     * @brief           ELementwise addition with scalar and assignment operator. i.e. this = m.
+     *
+     * @param  s        Added scalar.
+     * @return          Result
+     */
+    template <class S > inline Matrix<T,P>&
+    operator+=          (const S s) {
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),(T)s));
+        return *this;
+    }
+
+
+
+    /**
+     * @brief           Elementwise substruction of two matrices
+     *
+     * @param  M        Matrix substruent.
+     */
+    inline Matrix<T,P>
+    operator-           (const Matrix<T,P>& M) const {
+		Matrix<T,P> res = *this;
+		return res -= M;
+    }
+
+
+    /**
+     * @brief           Elementwise substruction of two matrices
+     *
+     * @param  M        Matrix substruent.
+     */
+    template <class S> inline Matrix<T,P>
+    operator-           (const Matrix<S,P>& M) const {
+		Matrix<T,P> res = *this;
+		return res -= M;
+    }
+
+
+    /**
+     * @brief           Elementwise subtraction all elements by a scalar
+     *
+     * @param  s        Scalar substruent.
+     */
+    template <class S>
+    inline Matrix<T,P>
+    operator-           (const S s) const {
+		Matrix<T,P> res = *this;
+		return res -= s;
+    }
+
+
+
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    inline Matrix<T,P>&
+    operator-=         (const Matrix<T,P>& M) {
+        op_assert (_dim == M.Dim(), *this, M);
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
+        return *this;
+    }
+
+
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
+     *
+     * @param  M        Added matrix.
+     * @return          Result
+     */
+    template <class S> inline Matrix<T,P>&
+    operator-=          (const Matrix<S,P>& M) {
+        op_assert (_dim == M.Dim(), *this, M);
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
+        return *this;
+    }
+
+    /**
+     * @brief           ELementwise substration with scalar and assignment operator. i.e. this = m.
+     *
+     * @param  s        Added scalar.
+     * @return          Result
+     */
+    template <class S >
+    inline Matrix<T,P>&
+    operator-=          (const S s) {
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::minus<T>(),(T)s));
+		return *this;
+    }
+
+    /**
+     * @brief           Elementwise multiplication. i.e. this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    inline Matrix<T,P>
+    operator*          (const Matrix<T,P> &M) const {
+		Matrix<T,P> res = *this;
+		return res *= M;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication. i.e. this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>
+    operator*          (const Matrix<S,P> &M) const {
+		Matrix<T,P> res = *this;
+		return res *= M;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
+     *
+     * @param  s        Factor scalar
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>
+    operator*          (const S s) const  {
+        Matrix<T,P> res = *this;
+        return res *= s;
+    }
+
+
+
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    inline Matrix<T,P>&
+    operator*=         (const Matrix<T,P>& M) {
+        op_assert (_dim == M.Dim(), *this, M);
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
+        return *this;
+    }
+
+
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    template <class S> inline Matrix<T,P>&
+    operator*=         (const Matrix<S,P>& M) {
+        op_assert (_dim == M.Dim(), *this, M);
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
+        return *this;
+    }
+
+
+    /**
+     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this *= s.
+     *
+     * @param  s        Factor scalar.
+     * @return          Result
+     */
+    template <class S> inline Matrix<T,P>&
+    operator*=         (const S s) {
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
+		return *this;
+    }
+
+
+    /**
+     * @brief           Elementwise substruction of two matrices
+     *
+     * @param  M        Matrix substruent.
+     */
+    inline Matrix<T,P>
+    operator/           (const Matrix<T,P>& M) const {
+		Matrix<T,P> res = *this;
+		return res /= M;
+    }
+
+
+    /**
+     * @brief           Elelemtwise division by M.
+     *
+     * @param  M        The divisor.
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>
+    operator/          (const Matrix<S,P>& M) const {
+		Matrix<T,P> res = *this;
+		return res /= M;
+    }
+
+
+    /**
+     * @brief           Elementwise division by scalar. i.e. this * m.
+     *
+     * @param  s        The divisor.
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>
+    operator/           (const S s) const {
+		Matrix<T,P> res = *this;
+		return res /= s;
+	}
+
+
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    inline Matrix<T,P>&
+    operator/=         (const Matrix<T,P>& M) {
+        op_assert (_dim == M.Dim(), *this, M);
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
+        return *this;
+    }
+
+
+    /**
+     * @brief           ELementwise division and assignment operator. i.e. this = this ./ M.
+     *
+     * @param  M        Divisor matrix.
+     * @return          Result
+     */
+    template <class S> inline Matrix<T,P>&
+    operator/=         (const Matrix<S,P> &M) {
+        op_assert (_dim == M.Dim(), *this, M);
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
+        return *this;
+    }
+
+
+
+    /**
+     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
+     *
+     * @param  s        Divisor scalar.
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>&
+    operator/=         (const S s) {
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::divides<T>(),(T)s));
+        return *this;
+    }
+
+
+    //@}
+
+
+    /**
+     * @name            Friend operators
+     *                  Who doesn't need friends
+     */
+
+    //@{
+
+
+    //--
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator*  (const double s, const Matrix<T,P>& m) {
+        return   m * s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator*  (const float s, const Matrix<T,P> &m) {
+        return   m * s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator*  (const short s, const Matrix<T,P> &m) {
+        return   m * s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator*  (const int s, const Matrix<T,P> &m) {
+        return   m * s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator*  (const long s, const Matrix<T,P> &m) {
+        return   m * s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator*  (const cxfl s, const Matrix<T,P> &m) {
+        return   m * s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator*  (const cxdb s, const Matrix<T,P> &m) {
+        return   m * s;
+    }
+
+
+    //--
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator+  (const double s, const Matrix<T,P> &m) {
+        return   m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator+  (const float s, const Matrix<T,P> &m) {
+        return   m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator+  (const short s, const Matrix<T,P> &m) {
+        return   m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator+  (const int s, const Matrix<T,P> &m) {
+        return   m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator+  (const long s, const Matrix<T,P> &m) {
+        return   m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator+  (const cxfl s, const Matrix<T,P> &m) {
+        return   m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator+  (const cxdb s, const Matrix<T,P> &m) {
+        return   m + s;
+    }
+
+
+    //--
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator-  (const double s, const Matrix<T,P> &m) {
+        return -m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator-  (const float s, const Matrix<T,P> &m) {
+        return -m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator-  (const short s, const Matrix<T,P> &m) {
+        return -m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator-  (const int s, const Matrix<T,P> &m) {
+        return -m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator-  (const long s, const Matrix<T,P> &m) {
+        return   -m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator-  (const cxfl s, const Matrix<T,P> &m) {
+        return   -m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator-  (const cxdb s, const Matrix<T,P> &m) {
+        return   -m + s;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P>
+    operator/  (const T s, const Matrix<T,P> &m) {
+        Matrix<T,P> res = m;
+        for (size_t i = 0; i < m.Size(); ++i)
+            res[i] = s / res[i];
+        return res;
+    }
+
+    /**
+     * @brief           Elementwise equality with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m == s
+     */
+    inline friend Matrix<cbool>
+    operator== (const T s, const Matrix<T,P>& m) {
+        return   m == s;
+    }
+
+
+    /**
+     * @brief           Elementwise >= with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m <= t
+     */
+    inline friend Matrix<cbool>
+    operator>= (const T s, const Matrix<T,P>& m) {
+        return   m <= s;
+    }
+
+
+    /**
+     * @brief           Elementwise <= with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          T<=M
+     */
+    inline friend Matrix<cbool>
+    operator<= (const T s, const Matrix<T,P>& m) {
+        return   m >= s;
+    }
+
+
+    /**
+     * @brief           Elementwise unequality with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          T!=M
+     */
+    inline friend Matrix<cbool>
+    operator!= (const T s, const Matrix<T,P>& m) {
+        return   m != s;
+    }
+
+
+    /**
+     * @brief           Elementwise equality with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          T+M
+     */
+    inline friend Matrix<cbool>
+    operator>  (const T s, const Matrix<T,P>& m) {
+        return   m <  s;
+    }
+
+
+    /**
+     * @brief           Elementwise < with scalar (lhs)
+     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          T+M
+     */
+    inline friend Matrix<cbool>
+    operator<  (const T s, const Matrix<T,P>& m) {
+        return   m >  s;
+    }
+
+
+    /**
+     * @brief           Elementwise equality with scalar (lhs)
+     *
+     * @param  mb       Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          T+M
+     */
+    //inline friend Matrix<T,P>
+    //operator&  (const Matrix<cbool>& mb, const Matrix<T,P>& m) {
+    //    return   m & mb;
+// }
+
+    //@}
+
+
+    /**
+     * @brief           Elementwise equality, result[i] = (this[i] == m[i]). i.e. this == m
+     *
+     * @param  M        Comparing matrix.
+     * @return          Hit list
+     */
+    inline Matrix<cbool>
+    operator==          (const Matrix<T,P>& M) const {
+
+        op_assert (_dim == M.Dim(), *this, M);
+
+        Matrix<cbool> res(_dim);
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); ++i)
+			res[i] = (_M[i] == M[i]) ? 1 : 0;
+
+        return res;
+
+    }
+
+
+    /**
+	 * @brief           Elementwise equality, result[i] = (this[i] == m[i]). i.e. this == m
+	 *
+	 * @param  M        Comparing matrix.
+	 * @return          Hit list
+	 */
+    template<class S>
+	inline Matrix<cbool>
+	operator==          (const Matrix<S,P>& M) const {
+
+        op_assert (_dim == M.Dim(), *this, M);
+
+		Matrix<cbool> res (_dim);
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); ++i)
+			res[i] = (_M[i] == (T)M[i]) ? 1 : 0;
+
+		return res;
+
+     }
+
+    /**
+     * @brief           Scalar equality. result[i] = (this[i] == m).
+     *
+     * @param  s        Comparing scalar.
+     * @return          Matrix of true where elements are equal s and false else.
+     */
+    inline Matrix<cbool>
+    operator==          (const T s) const {
+
+    	T t = (T) s;
+
+        Matrix<cbool> res (_dim);
+
+#ifdef EW_OMP
+    #pragma omp parallel for
+#endif
+		for (size_t i = 0; i < Size(); ++i)
+			res[i] =  (_M[i] == s) ? 1 : 0;
+
+        return res;
+
+    }
+
 
 
 protected:
