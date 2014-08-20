@@ -10,7 +10,7 @@ IntensityMap (const Matrix< std::complex <T> >& sens, bool sqroot = true) {
 	size_t nc  = size(sens,dim);
 	size_t nr  = numel(sens)/nc;
 	
-	Matrix<size_t> dims = size (sens);
+	Vector<size_t> dims = size (sens);
 	dims [dim] = 1;
 
 	Matrix<T> res = zeros<T> (dims);
@@ -32,8 +32,8 @@ IntensityMap (const Matrix< std::complex <T> >& sens, bool sqroot = true) {
 template <class T> inline static Matrix<T>
 phase_combine (const Matrix<T>& M, const size_t d) {
     
-	Matrix<size_t> sz = size(M);
-	assert (d < sz.Size());
+	Vector<size_t> sz = size(M);
+	assert (d < sz.size());
 	size_t        dim = sz[d];
 	assert (dim == 2);
 	Matrix<T>     ret;
@@ -49,7 +49,7 @@ phase_combine (const Matrix<T>& M, const size_t d) {
 
 	// Outer size
 	size_t outsize = 1;
-	for (size_t i = d+1; i < MIN(M.NDim(),numel(sz)); ++i)
+	for (size_t i = d+1; i < MIN(M.NDim(),sz.size()); ++i)
 		outsize *= sz[i];
 
 	// Adjust size vector and allocate

@@ -393,7 +393,7 @@ size               (const Matrix<T,MPI>& M, size_t d) {
 template <class T> inline  Matrix<T>
 resize (const Matrix<T>& M, size_t sc, size_t sl) {
 
-	Matrix<size_t> sz (2,1);
+	Vector<size_t> sz (2);
 	sz[0] = sc; sz[1] = sl;
 
 	return resize (M, sz);
@@ -431,27 +431,13 @@ resize (const Matrix<T>& M, size_t sc, size_t sl, size_t ss) {
  * @param   M       Matrix
  * @return          Dimension vector.
  */
-template <class T,paradigm P>  inline  Matrix<size_t>
+template <class T,paradigm P>  inline  Vector<size_t>
 size               (const Matrix<T,P>& M) {
 	
-	Matrix<size_t> ret (1,M.NDim());
-	for (size_t i = 0; i < numel(ret); ++i)
+	Vector<size_t> ret (M.NDim());
+	for (size_t i = 0; i < ret.size(); ++i)
 		ret[i] = size(M,i);
 	return ret;
-
-}
-
-
-/**
- * @brief           Get vector of dimensions
- *
- * @param   M       Matrix
- * @return          Dimension vector.
- */
-template <class T>  inline  Vector<size_t>
-vsize               (const Matrix<T>& M) {
-
-	return size(M).Container();
 
 }
 
@@ -680,7 +666,7 @@ resize (const Matrix<T>& M, size_t sz) {
  * @return          Resized copy
  */
 template <class T> inline  Matrix<T>
-resize (const Matrix<T>& M, const Matrix<size_t>& sz) {
+resize (const Matrix<T>& M, const Vector<size_t>& sz) {
 
 	Matrix<T> res  = zeros<T>(sz);
 	size_t copysz  = MIN(numel(M), numel(res));
@@ -731,7 +717,7 @@ sum (const Matrix<T>& M, size_t d) {
 	
 	// Outer size
 	size_t outsize = 1;
-	for (size_t i = d+1; i < MIN(M.NDim(),numel(sz)); ++i)
+	for (size_t i = d+1; i < MIN(M.NDim(),sz.Size()); ++i)
 		outsize *= sz[i];
 	
 	// Adjust size vector and allocate
@@ -812,7 +798,7 @@ prod (const Matrix<T>& M, size_t d) {
 	// Inner and outer sizes
     Vector<size_t>::const_iterator ci = sz.Begin();
 	size_t insize = std::accumulate (ci, ci+d, 1, c_multiply<size_t>);
-    size_t outsize = std::accumulate (ci+d+1, ci+d+MIN(M.NDim(),numel(sz)), 1, c_multiply<size_t>);
+    size_t outsize = std::accumulate (ci+d+1, ci+d+MIN(M.NDim(),sz.Size()), 1, c_multiply<size_t>);
         
     // Adjust size vector and allocate
 	sz [d] = 1;
@@ -931,7 +917,7 @@ template <class T> inline  Matrix<T>
 permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	
 	// Check that perm only includes one number between 0 and INVALID_DIM once
-	size_t ndnew = numel(perm), i, j;
+	size_t ndnew = perm.Size(), i, j;
 	size_t ndold = ndims (M); 
 
 	// Must have same number of dimensions

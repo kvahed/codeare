@@ -49,7 +49,7 @@ fftshift (const Matrix<T>& m, const bool fw = true) {
 	Vector<size_t> d = tmp.Container(); // data side lengths
 	Vector<size_t> c = floor(tmp/2).Container(); // center coords
 
-    Matrix<T> res (vsize(m));
+    Matrix<T> res (size(m));
 
     size_t oi[3];
     size_t si[3];
@@ -159,16 +159,17 @@ class DFT : public FT<T> {
 	
 public:
 	
-	
+
+
 	/**
 	 * @brief        Construct FFTW plans for forward and backward FT with credentials
-	 * 
+	 *
 	 * @param  sl    Matrix of side length of the FT range
 	 * @param  mask  K-Space mask (if left empty no mask is applied)
 	 * @param  pc    Phase correction (or target phase)
 	 * @param  b0    Field distortion
 	 */
-	explicit DFT         (const Matrix<size_t>& sl,
+	explicit DFT         (const Vector<size_t>& sl,
 				 const Matrix<T>& mask = Matrix<T>(1),
 				 const Matrix<CT>& pc = Matrix<CT>(1),
 				 const Matrix<T>& b0 = Matrix<T>(1)) :
@@ -177,25 +178,26 @@ public:
 		size_t rank = numel(sl);
 
 		Vector<int> n (rank);
-		
+
 		if (numel(mask) > 1) {
 			m_have_mask = true;	m_mask = mask;
 		}
-		
+
 		if (numel(pc)   > 1) {
 			m_have_pc = true; m_pc = pc; m_cpc = conj(pc);
 		}
-		
+
 		for (int i = 0; i < rank; i++)
 			n[i]  = (int) sl [rank-1-i];
 
 		m_N = std::accumulate(n.begin(), n.end(), 1, std::multiplies<int>());
 
-		Matrix<size_t> tmp = resize(sl,3,1);
+		Vector<size_t> tmp = sl;
+		tmp.resize(3);
 		for (size_t i = 0; i < 3; ++i)
 			tmp[i] = (tmp[i] > 0) ? tmp[i] : 1;
 
-		d = tmp.Container(); // data side lengths
+		d = tmp; // data side lengths
 		c = floor((Matrix<float>)tmp/2).Container(); // center coords
 
  		Allocate (rank, &n[0]);
@@ -454,7 +456,7 @@ private:
 	inline Matrix<CT>
 	shift3 (const Matrix<CT>& m, const bool& fw = true) const {
 
-		Matrix<CT> res (vsize(m));
+		Matrix<CT> res (size(m));
 
 		size_t xi,yi,zi,xs,ys,zs;
 		
@@ -479,7 +481,7 @@ private:
 	inline Matrix<CT>
 	shift2 (const Matrix<CT>& m, const bool& fw = true) const {
 
-		Matrix<CT> res (vsize(m));
+		Matrix<CT> res (size(m));
 
 		size_t xi,yi,xs,ys;
 		

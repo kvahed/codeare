@@ -99,7 +99,7 @@ public:
 		for (size_t i = 0; i < m_nx[0]; i++)
 			ms[i] = size(m_sm,i);
 
-		Vector<size_t> sizesm = vsize(m_sm);
+		Vector<size_t> sizesm = size(m_sm);
         m_nx.push_back(sizesm.back());             // NC
 		m_nx.push_back(unsigned_cast(params["nk"])); // NK
         m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, c_multiply<size_t>)/m_nx[1]); //NR

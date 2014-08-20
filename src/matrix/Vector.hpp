@@ -223,10 +223,24 @@ public:
 
 	inline void PopBack () {_data.pop_back();}
 	inline void PushBack (const T& t) {_data.push_back(t);}
+	template<class S> inline Vector<T>& operator/= (const S& s) {
+		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::divides<T>(),(T)s));
+		return *this;
+	}
+	template<class S> inline Vector<T>& operator/= (const Vector<S>& v) {
+		std::transform (_data.begin(), _data.end(), v.begin(), _data.begin(), std::divides<T>());
+		return *this;
+	}
+	template<class S> inline Vector<T> operator/ (const S& s) const {
+		Vector<T> ret = *this;
+		return ret/=s;
+	}
 
 private:
 	VECTOR_TYPE(T) _data;
 };
+
+template<class T> inline static size_t numel (const Vector<T>& v) {return v.size();}
 
 template <class T> class vector_inserter {
 public:

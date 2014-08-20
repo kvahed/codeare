@@ -63,9 +63,9 @@ zeros           (const size_t& col,
  *
  */
 template <class T> inline static Matrix<T> 
-zeros           (const Matrix<size_t>& sz) {
+zeros           (const Vector<size_t>& sz) {
 
- 	return Matrix<T> (sz.Container());
+ 	return Matrix<T> (sz);
 
 }
 
@@ -151,8 +151,8 @@ ones            (const size_t& n) {
  *
  */
 template <class T> inline static Matrix<T>
-ones           (const Matrix<size_t>& sz) {
- 	return Matrix<T> (sz.Container()) = (T)1;
+ones           (const Vector<size_t>& sz) {
+ 	return Matrix<T>(sz) = (T)1;
 }
 
 
@@ -213,9 +213,9 @@ rand           (const size_t& col,
  *
  */
 template <class T> inline static Matrix<T>
-rand           (const Matrix<size_t>& sz) {
+rand           (const Vector<size_t>& sz) {
 
-	Matrix<T> res (sz.Container());
+	Matrix<T> res (sz);
     Random<T>::Uniform(res);
  	return res;
 
@@ -289,9 +289,9 @@ randn          (const size_t& col,
  *
  */
 template <class T> inline static Matrix<T>
-randn          (const Matrix<size_t>& sz) {
+randn          (const Vector<size_t>& sz) {
 
-	Matrix<T> res (sz.Container());
+	Matrix<T> res (sz);
 	Random<T>::Normal(res);
  	return res;
 
@@ -607,7 +607,7 @@ linspace (const T& start, const T& end, const size_t& n) {
  * @return   Mesh grid O (Ny x Nx x Nz x 3) (if z specified) else O (Ny x Nx x 2)<br/>
  */
 template <class T> inline static Matrix<T>
-meshgrid (const Matrix<T>& x, const Matrix<T>& y, const Matrix<T>& z = Matrix<T>(1)) {
+meshgrid (const Vector<T>& x, const Vector<T>& y, const Vector<T>& z = Vector<T>(1)) {
 
 	size_t nx = numel(x);
 	size_t ny = numel(y);

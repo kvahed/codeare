@@ -24,7 +24,7 @@ t_compare (const void* a, const void* b) {
 template <class T> inline Matrix<T>
 medfilt2 (const Matrix<T>& M, const size_t fh = 3, const size_t fw = 3) {
 
-    Matrix<T> ret (vsize(M));
+    Matrix<T> ret (size(M));
 
     size_t ih = size(M,0);
     size_t iw = size(M,1);

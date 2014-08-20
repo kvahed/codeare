@@ -61,7 +61,7 @@ public:
 
 		// Maps & 1st set of images
 		sens = params.Get<Matrix<cxfl> > ("smaps");
-		dims = params.Get<Matrix<size_t> > ("fdims");
+		dims = params.Get<Vector<size_t> > ("fdims");
 
 		// Channels
 		nc   = size (sens, ndims(sens)-1);
@@ -69,7 +69,7 @@ public:
 
 		// 3D acceleration
 		af   = size(sens) / dims;
-		std::cout << "\n  acceleration vector: " << af;
+		std::cout << "\n  acceleration vector: " << af << std::endl;
 		aaf  = prod (af);
 
 
@@ -78,8 +78,8 @@ public:
 		assert (ndim == 2 || ndim == 3);
 
 		// We expect sensitivities O (X,Y,Z,CH)
-		dims = resize(dims,1,size(dims,1)-1);
-		std::cout << "  fft dims: " << dims ;
+		dims.PopBack();
+		std::cout << "  fft dims: " << dims << std::endl;
 
 		TikhonovMat(params);
 
@@ -87,7 +87,7 @@ public:
 
 		// Need 3-dimensional extents even if 2D
 		if (numel(dims) == 2) {
-			dims = resize (dims,1,3);
+			dims.resize(3);
 			dims[2] = 1;
 		}
 
@@ -298,9 +298,9 @@ private:
 	std::vector<DFT<T> > m_dft;
 	Matrix <CT>          sens;
 	Matrix <size_t> d; /* Bug in MSVC 10? Do not touch */
-	Matrix <size_t>      dims;
+	Vector <size_t>      dims;
 	int                  nthreads;
-	Matrix <size_t>      af;
+	Vector <size_t>      af;
 	size_t               ndim;
 	size_t               nc;
 	bool                 compgfm;

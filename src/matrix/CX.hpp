@@ -36,7 +36,7 @@
  */
 template<class T> inline static Matrix<typename TypeTraits<T>::RT>
 abs (const Matrix<T>& m) {
-	Matrix<typename TypeTraits<T>::RT> res (vsize(m));
+	Matrix<typename TypeTraits<T>::RT> res (size(m));
 	for (size_t i = 0; i < numel(m); i++)
 		res[i] = TypeTraits<T>::Abs(m[i]);
 	return res;
@@ -52,7 +52,7 @@ abs (const Matrix<T>& m) {
  */
 template<class T> inline static Matrix<typename TypeTraits<T>::RT>
 arg (const Matrix<T>& m) {
-	Matrix<typename TypeTraits<T>::RT> res (vsize(m));
+	Matrix<typename TypeTraits<T>::RT> res (size(m));
 	for (size_t i = 0; i < numel(m); i++)
 		res[i] = TypeTraits<T>::Arg(m[i]);
 	return res;
@@ -67,7 +67,7 @@ arg (const Matrix<T>& m) {
  */
 template<class T> inline static Matrix<typename TypeTraits<T>::RT>
 real (const Matrix<T>& m) {
-	Matrix<typename TypeTraits<T>::RT> res (vsize(m));
+	Matrix<typename TypeTraits<T>::RT> res (size(m));
 	for (size_t i = 0; i < numel(m); i++)
 		res[i] = TypeTraits<T>::Real(m[i]);
 	return res;
@@ -82,7 +82,7 @@ real (const Matrix<T>& m) {
  */
 template<class T> inline static Matrix<typename TypeTraits<T>::RT>
 imag (const Matrix<T>& m) {
-	Matrix<typename TypeTraits<T>::RT> res (vsize(m));
+	Matrix<typename TypeTraits<T>::RT> res (size(m));
 	for (size_t i = 0; i < numel(m); i++)
 		res[i] = TypeTraits<T>::Imag(m[i]);
 	return res;
@@ -99,7 +99,7 @@ imag (const Matrix<T>& m) {
  */
 template<class T> inline static Matrix<T>
 conj (const Matrix<T>& m) {
-	Matrix<T> res (vsize(m));
+	Matrix<T> res (size(m));
 	for (size_t i = 0; i < numel(m); i++)
 		res[i] = TypeTraits<T>::Conj(m[i]);
 	return res;
@@ -111,7 +111,7 @@ using namespace codeare::matrix::arithmetic;
 template <class T, class S> inline static Matrix<std::complex<T> > 
 complex (const Matrix<T>& re, const Matrix<S>& im) {
     assert (numel(re) == numel(im));
-    Matrix<std::complex<T> > ret (vsize(re));
+    Matrix<std::complex<T> > ret (size(re));
     for (size_t i = 0; i < numel(re); ++i)
         ret[i] = std::complex<T>(re[i],im[i]);
     return ret;
@@ -120,14 +120,14 @@ complex (const Matrix<T>& re, const Matrix<S>& im) {
 template <class T, class S> inline static Matrix<std::complex<T> > 
 	complex2 (const Matrix<T>& mag, const Matrix<S>& arg) {
     assert (numel(mag) == numel(arg));
-    Matrix<std::complex<T> > ret (vsize(arg));
+    Matrix<std::complex<T> > ret (size(arg));
     for (size_t i = 0; i < numel(arg); ++i)
         ret[i] = std::polar(mag[i],arg[i]);
     return ret;
 }
 template <class T, class S> inline static Matrix<std::complex<T> > 
 complex2 (const T mag, const Matrix<S>& arg) {
-    Matrix<std::complex<T> > ret (vsize(arg));
+    Matrix<std::complex<T> > ret (size(arg));
     for (size_t i = 0; i < numel(arg); ++i)
         ret[i] = std::polar(mag[i],arg[i]);
     return ret;
