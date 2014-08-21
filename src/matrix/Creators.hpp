@@ -635,11 +635,54 @@ meshgrid (const Vector<T>& x, const Vector<T>& y, const Vector<T>& z = Vector<T>
 
 }
 
-template<class T> inline static Matrix<T>
-zpad (const Matrix<T>& x, Vector<size_t>& n) {
 
+template<class T> inline static Matrix<T>
+zpad (const Matrix<T>& a, size_t m, size_t n) {
+	assert(is2d(a));
+
+	size_t am = size(a,0), an = size(a,1);
+	assert(am<=m);
+	assert(an<=n);
+
+	Matrix<T> ret(m,n);
+	for (size_t i = 0; i < an; ++i)
+		std::copy(&a(0,i), &a(am-1,i), &ret((m-am)/2,i+(n-an)/2));
+	return ret;
 }
 
+template<class T> inline static Matrix<T>
+zpad (const Matrix<T>& a, size_t m, size_t n, size_t o) {
+	assert(is3d(a));
+
+	size_t am = size(a,0), an = size(a,1), ao = size(a,2);
+	assert(am<=m);
+	assert(an<=n);
+	assert(ao<=o);
+
+	Matrix<T> ret(m,n,o);
+	for (size_t j = 0; j < ao; ++j)
+		for (size_t i = 0; i < an; ++i)
+			std::copy(&a(0,i,j), &a(am-1,i,j), &ret((m-am)/2,i+(n-an)/2,j+(o-ao)/2));
+	return ret;
+}
+
+template<class T> inline static Matrix<T>
+zpad (const Matrix<T>& a, size_t m, size_t n, size_t o, size_t p) {
+	assert(is4d(a));
+
+	size_t am = size(a,0), an = size(a,1), ao = size(a,2), ap = size(a,3);
+	assert(am<=m);
+	assert(an<=n);
+	assert(ao<=o);
+	assert(ap<=p);
+
+	Matrix<T> ret(m,n,o,p);
+	for (size_t k = 0; k < ap; ++k)
+		for (size_t j = 0; j < ao; ++j)
+			for (size_t i = 0; i < an; ++i)
+				std::copy(&a(0,i,j), &a(am-1,i,j), &ret((m-am)/2, i+(n-an)/2, j+(o-ao)/2, k+(p-ap)/2));
+	return ret;
+}
 #endif
 
 

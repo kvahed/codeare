@@ -45,9 +45,11 @@ GRAPPA::Prepare     () {
 	printf ("  Preparing %s ...\n", Name());
 	p.Set("n_threads", m_nthreads);
 	p.Set("lambda", m_lambda);
+	p.Set("kernel_size", m_kernel_size);
 	p.Set("acceleration_factors", m_acceleration_factors);
 	p.Set("ac_data", Get<cxfl>("ac_data"));       // Sensitivities
-    m_ft = new CGRAPPA<double>(p);
+    m_ft = CGRAPPA<float>(p);
+    AddMatrix<cxfl> ("full_data");
 	printf ("  ... done.\n\n");
 	return codeare::OK;
 }
@@ -70,11 +72,10 @@ GRAPPA::Process     () {
 
 	printf ("  Processing GRAPPA ...\n");
 
-	//Matrix<cxdb>& scan = Get<cxdb>("scan");
+	Matrix<cxfl>& undersampled_data = Get<cxfl>("undersampled_data");
+	Matrix<cxfl>& full_data = Get<cxfl>("full_data");
 
-
-	printf ("... done.. WTime: %.4f seconds.\n\n",
-			elapsed(getticks(), cgstart) / Toolbox::Instance()->ClockRate());
+	full_data = m_ft ->* undersampled_data;
 
 	return codeare::OK;
 

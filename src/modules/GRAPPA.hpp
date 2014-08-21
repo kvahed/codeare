@@ -43,7 +43,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		GRAPPA () : m_ft(0) {};
+		GRAPPA () {};
 
 
 		/**
@@ -80,7 +80,7 @@ namespace RRStrategy {
 
 	private: 
 		
-        CGRAPPA<double>* m_ft;
+        CGRAPPA<float> m_ft;
         Vector<size_t> m_kernel_size, m_acceleration_factors;
         size_t m_nthreads;
         float m_lambda;

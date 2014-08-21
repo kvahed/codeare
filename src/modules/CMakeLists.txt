@@ -38,7 +38,7 @@ add_library (DummyRecon MODULE DummyRecon.hpp DummyRecon.cpp)
 set_target_properties(DummyRecon PROPERTIES PREFIX "")
 target_link_libraries (DummyRecon ${COMLIBS})
 
-list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE DummyRecon)
+list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE GRAPPA DummyRecon)
 
 if (${NFFT_FOUND})
 

@@ -291,6 +291,7 @@ template<class T> inline static T sum (const Vector<T>& ct) {
 	return std::accumulate(ct.begin(), ct.end(), (T)0);
 }
 
+
 template<class T> inline static void swapd (T& x,T& y) {T temp=x; x=y; y=temp;}
 
 #endif /* Vector_HPP_ */
