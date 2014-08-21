@@ -696,7 +696,7 @@ resize (const Matrix<T>& M, const Vector<size_t>& sz) {
 template <class T> inline  Matrix<T>
 sum (const Matrix<T>& M, size_t d) {
 	
-	Matrix<size_t> sz = size(M);
+	Vector<size_t> sz = size(M);
 	size_t        dim = sz[d];
 	Matrix<T>     res;
 
@@ -717,7 +717,7 @@ sum (const Matrix<T>& M, size_t d) {
 	
 	// Outer size
 	size_t outsize = 1;
-	for (size_t i = d+1; i < MIN(M.NDim(),sz.Size()); ++i)
+	for (size_t i = d+1; i < MIN(M.NDim(),sz.size()); ++i)
 		outsize *= sz[i];
 	
 	// Adjust size vector and allocate

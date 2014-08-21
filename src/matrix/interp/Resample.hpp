@@ -24,13 +24,13 @@
 #include "Matrix.hpp"
 
 #ifdef HAVE_INSIGHT
-    #include <itkImage.h>
-    #include <itkMinimumMaximumImageFilter.h>
-//    #include <itkOrientedImage.h>
-    #include <itkIdentityTransform.h>
-    #include <itkLinearInterpolateImageFunction.h>
-    #include <itkBSplineInterpolateImageFunction.h>
-    #include <itkResampleImageFilter.h>
+    #include "itkImage.h"
+    #include "itkMinimumMaximumImageFilter.h"
+    #include "itkOrientedImage.h"
+    #include "itkIdentityTransform.h"
+    #include "itkLinearInterpolateImageFunction.h"
+    #include "itkBSplineInterpolateImageFunction.h"
+    #include "itkResampleImageFilter.h"
 #endif
 
 	
@@ -58,30 +58,29 @@ resample (const Matrix<T>& M, const Matrix<double>& f, const InterpMethod& im) {
 	
 #ifdef HAVE_INSIGHT
 	
-	typedef typename itk::Image< T, 3 > InputImageType;
-	typedef typename itk::Image< T, 3 > OutputImageType;
+	typedef typename itk::OrientedImage< T, 3 > ImageType;
 	typedef typename itk::IdentityTransform< double, 3 > TransformType;
-	typedef typename itk::LinearInterpolateImageFunction< InputImageType, double > InterpolatorType;
-	typedef typename itk::ResampleImageFilter< InputImageType, InputImageType > ResampleFilterType;
+	typedef typename itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
+	typedef typename itk::ResampleImageFilter< ImageType, ImageType > ResampleFilterType;
 	
 	typename InterpolatorType::Pointer linterp = InterpolatorType::New();
 	
 	TransformType::Pointer trafo = TransformType::New();
 	trafo->SetIdentity();
 	
-	typename InputImageType::SpacingType space;
+	typename ImageType::SpacingType space;
 	space[0] = 1.0/f[0];
 	space[1] = 1.0/f[1];
 	space[2] = 1.0/f[2];
 	
-	typedef typename InputImageType::SizeType::SizeValueType SizeValueType;
-	typename InputImageType::SizeType size; 
+	typedef typename ImageType::SizeType::SizeValueType SizeValueType;
+	typename ImageType::SizeType size; 
 	size[0] = static_cast<SizeValueType>(res.Dim(0));
 	size[1] = static_cast<SizeValueType>(res.Dim(1));
 	size[2] = static_cast<SizeValueType>(res.Dim(2));
 	
-	typename itk::Image< T, 3 >::Pointer input = itk::Image< T, 3 >::New();
-	typename itk::Image< T, 3 >::Pointer output = itk::Image< T, 3 >::New();
+	typename ImageType::Pointer input = ImageType::New();
+	typename ImageType::Pointer output = ImageType::New();
 	
 	typename itk::Image< T, 3 >::IndexType ipos;
 	ipos[0] = 0; ipos[1] = 0; ipos[2] = 0;

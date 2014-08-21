@@ -41,13 +41,13 @@ fftshift (const Matrix<T>& m, const bool fw = true) {
 
 	assert (isvec(m) || is2d(m) || is3d(m));
 
-	Matrix<size_t> tmp = resize(size(m),ndims(m),1);
-	for (size_t i = 0; i<ndims(m); i++)
-		if (tmp[i] == 0)
-			tmp[i] = 1;
-
-	Vector<size_t> d = tmp.Container(); // data side lengths
-	Vector<size_t> c = floor(tmp/2).Container(); // center coords
+	Vector<size_t> d = size(m);
+	Vector<size_t> c = d;
+	for (size_t i = 0; i<ndims(m); i++) {
+		if (d[i] == 0)
+			d[i] = 1;
+		c[i] = floor((float)d[i]/2);
+	}
 
     Matrix<T> res (size(m));
 

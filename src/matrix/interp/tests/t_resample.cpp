@@ -18,11 +18,11 @@ check_resample () {
 
 int main (int args, char** argv) {
 
-    if (!check_resample<float>())
+/*    if (!check_resample<float>())
         return 1;
     if (!check_resample<double>())
     	return 1;
-/*    if (!check_interp1<cxfl>())
+    if (!check_interp1<cxfl>())
         return 1;
 //    if (!check_ppval<cxdb>())
         return 1;

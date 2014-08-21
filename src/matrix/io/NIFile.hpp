@@ -145,8 +145,8 @@ public:
 		if (ni == NULL)
 			return M;
 
-		std::vector<size_t> ndims;
-		std::vector<float>  nress;
+		Vector<size_t> ndims;
+		Vector<float>  nress;
 
 		for (; i < ni->dim[0]; ++i)
 			if (ni->dim[i+1] > 1) {
