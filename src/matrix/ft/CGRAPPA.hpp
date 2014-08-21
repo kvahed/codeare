@@ -67,9 +67,10 @@ public:
 		}
 
 		// AC data
-		if (p.exists("acs_data")) {
+		if (p.exists("ac_data")) {
 			try {
 				m_ac_data = p.Get<Matrix<CT> >("ac_data");
+				m_nc = size(m_ac_data,2); // # Coils
 			} catch (const std::exception& e) {
 				std::cerr << "  ERROR - CGRAPPA: auto calibration data is mandatory input.";
 				assert (false);
@@ -83,14 +84,56 @@ public:
 			m_lambda = T(0.);
 
 	}
+/*
+	[sx,sy,nc] = size(data);
 
+	tmp = im2row(data,kSize);
+	[tsx,tsy,tsz] = size(tmp);
+	A = reshape(tmp,tsx,tsy*tsz);
 
+	AtA = A'*A;
+
+	kernel = AtA;
+	kernel = reshape(kernel,kSize(1),kSize(2),nc,size(kernel,2));
+*/
 	inline void CalcCalibMatrix () {
-
-		//Vector<T> (vsize(m_ac_data));
-
+		Matrix<CT> tmp = Im2Row();
 	}
 
+	/*
+	 *
+	 function res = im2row(im, winSize)
+%res = im2row(im, winSize)
+[sx,sy,sz] = size(im);
+
+res = zeros((sx-winSize(1)+1)*(sy-winSize(2)+1),prod(winSize),sz);
+count=0;
+for y=1:winSize(2)
+    for x=1:winSize(1)
+        count = count+1;
+        res(:,count,:) = reshape(im(x:sx-winSize(1)+x,y:sy-winSize(2)+y,:),...
+            (sx-winSize(1)+1)*(sy-winSize(2)+1),1,sz);
+    end
+end
+	 *
+	 */
+
+	inline Matrix<CT> Im2Row () {
+		Vector<size_t> ac_size = size(m_ac_data);
+		Vector<size_t> kernel_size = size(m_kernel);
+		Vector<size_t> calib_mat_size (3);
+		calib_mat_size[0] = (ac_size[0] - kernel_size[0] + 1) * (ac_size[1] - kernel_size[1] + 1);
+		calib_mat_size[1] = prod (kernel_size);
+		calib_mat_size[2] = ac_size[2];
+		Matrix<CT> ret (calib_mat_size);
+		for (size_t j = 0, count = 0; j < kernel_size[1]; ++j)
+			for (size_t i = 0; i < kernel_size[0]; ++i)
+				for (size_t l = 0; l < calib_mat_size[0]; ++l)
+					for (size_t m = 0; l < calib_mat_size[1]; ++m)
+						for (size_t n = 0; n < ac_size[2]; ++n)
+							ret (l, count, n) = m_ac_data(i+l,j+m,n);
+		return ret;
+	}
 
 	/**
 	 * @brief    Clean up and destroy

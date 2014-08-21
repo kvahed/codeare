@@ -26,10 +26,15 @@ using namespace RRStrategy;
 codeare::error_code
 GRAPPA::Init () {
 
-	printf ("  Initialising %s ...\n", Name());
+	printf ("Intialising GRAPPA ...\n");
 
+	Attribute ("nthreads",  &m_nthreads);
+	Attribute ("lambda", &m_lambda);
+	m_kernel_size = RHSList<size_t>("kernel_size");
+	m_acceleration_factors = RHSList<size_t>("acceleration_factors");
 
-	printf ("  ... done.\n\n");
+	printf ("... done.\n\n");
+
 	return codeare::OK;
 
 }
@@ -37,30 +42,14 @@ GRAPPA::Init () {
 
 codeare::error_code
 GRAPPA::Prepare     () { 
-
 	printf ("  Preparing %s ...\n", Name());
-
-    Matrix<size_t> scan_dims = size(Get<cxdb>("scan"));
-
-    Matrix<size_t> acc_factors (2,1);
-    acc_factors[0] = 1; acc_factors[1] = 3;
-
-    Matrix<size_t> kern_dims (2,1);
-    acc_factors[0] = 5; acc_factors[1] = 4;
-
-    Params p;
-    p.Set("acs_name", std::string("acs"));
-    p.Set("scan_dims", scan_dims);
-    p.Set("kern_dims", kern_dims);
-    p.Set("acc_factors", acc_factors);
-
+	p.Set("n_threads", m_nthreads);
+	p.Set("lambda", m_lambda);
+	p.Set("acceleration_factors", m_acceleration_factors);
+	p.Set("ac_data", Get<cxfl>("ac_data"));       // Sensitivities
     m_ft = new CGRAPPA<double>(p);
-
 	printf ("  ... done.\n\n");
-
 	return codeare::OK;
-	
-
 }
 
 // On entry ------------------------

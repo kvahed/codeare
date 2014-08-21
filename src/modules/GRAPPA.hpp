@@ -81,7 +81,9 @@ namespace RRStrategy {
 	private: 
 		
         CGRAPPA<double>* m_ft;
-        
+        Vector<size_t> m_kernel_size, m_acceleration_factors;
+        size_t m_nthreads;
+        float m_lambda;
 	  
 	};
 

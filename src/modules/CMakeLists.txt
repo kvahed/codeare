@@ -30,6 +30,10 @@ add_library (SENSE MODULE SENSE.hpp SENSE.cpp)
 set_target_properties(SENSE PROPERTIES PREFIX "")
 target_link_libraries (SENSE ${COMLIBS})
 
+add_library (GRAPPA MODULE GRAPPA.hpp GRAPPA.cpp)
+set_target_properties(GRAPPA PROPERTIES PREFIX "")
+target_link_libraries (GRAPPA ${COMLIBS})
+
 add_library (DummyRecon MODULE DummyRecon.hpp DummyRecon.cpp)
 set_target_properties(DummyRecon PROPERTIES PREFIX "")
 target_link_libraries (DummyRecon ${COMLIBS})
