@@ -26,7 +26,6 @@
 #ifdef HAVE_INSIGHT
     #include "itkImage.h"
     #include "itkMinimumMaximumImageFilter.h"
-    #include "itkOrientedImage.h"
     #include "itkIdentityTransform.h"
     #include "itkLinearInterpolateImageFunction.h"
     #include "itkBSplineInterpolateImageFunction.h"
@@ -58,7 +57,7 @@ resample (const Matrix<T>& M, const Matrix<double>& f, const InterpMethod& im) {
 	
 #ifdef HAVE_INSIGHT
 	
-	typedef typename itk::OrientedImage< T, 3 > ImageType;
+	typedef typename itk::Image< T, 3 > ImageType;
 	typedef typename itk::IdentityTransform< double, 3 > TransformType;
 	typedef typename itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
 	typedef typename itk::ResampleImageFilter< ImageType, ImageType > ResampleFilterType;
