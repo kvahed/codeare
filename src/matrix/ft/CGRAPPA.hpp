@@ -27,7 +27,25 @@
 #include "Lapack.hpp"
 #include "Print.hpp"
 #include "Access.hpp"
+#include "Algos.hpp"
 
+template<class T> inline static bool eq (const Matrix<T>& A, const Matrix<T>& B) {
+	assert(A.Dim() == B.Dim());
+	return A.Container() == B.Container();
+}
+
+template<class T> inline static Vector<size_t> find (const Matrix<T>& M) {
+	Vector<size_t> ret;
+	T zero_t = (T)0;
+	for (size_t i = 0; i < M.Size(); ++i)
+		if (M[i]!=zero_t)
+			ret.PushBack(i);
+	return ret;
+}
+
+template<class T> inline static Matrix<T> col (const Matrix<T>& M) {
+	return resize(M,prod(size(M)),1);
+}
 
 /**
  * @brief GRAPPA operator<br/>
@@ -63,7 +81,7 @@ public:
 			}
 		} else {
 			std::cerr << "  WARNING - CGRAPPA: kernel size unspecified, defaulting to 4x5" << std::endl;
-			m_kernel = zeros<CT>(4,5);
+			m_kernel = zeros<CT>(5,5);
 		}
 		std::cout << "  kernel size: " << size(m_kernel) << std::endl;
 
@@ -112,10 +130,11 @@ public:
 	Matrix<CT>
 	Adjoint (const Matrix<CT>& kspace) const {
 		Matrix<CT> res = kspace;
-		//for (size_t coil = 0; coil < m_nc; ++coil)
-			//Slice(res, coil, ReconstructSingle(Slice(kspace, coil)));
+#pragma omp parallel for default (shared)
+		for (size_t coil = 0; coil < m_nc; ++coil)
+			Slice(res, coil, ARC(kspace,coil));
 
-		return zpad(kspace, 300, 300, 10);
+		return ARC(kspace,0);
 	}
 
 
@@ -153,56 +172,66 @@ public:
 
 private:
 
-	/*
-	function [res] = ARC(kData, AtA, kSize, c,lambda)
 
-	[sx,sy,nCoil] = size(kData);
-
-
-	kData = zpad(kData,[sx+kSize(1)-1, sy+kSize(2)-1,nCoil]);
-	dummyK = zeros(kSize(1),kSize(2),nCoil); dummyK((end+1)/2,(end+1)/2,c) = 1;
+/*
+	dummyK = zeros(kernel_size[0],kernel_size[1],nCoil); dummyK((end+1)/2,(end+1)/2,c) = 1;
 	idxy = find(dummyK);
 	res = zeros(sx,sy);
-
-	MaxListLen = 100;
-	LIST = zeros(kSize(1)*kSize(2)*nCoil,MaxListLen);
-	KEY =  zeros(kSize(1)*kSize(2)*nCoil,MaxListLen);
-	count = 0;
-
-	%H = waitbar(0);
-	for y = 1:sy
-		for x=1:sx
-		%	waitbar((x + (y-1)*sx)/sx/sy,H);
-			tmp = kData(x:x+kSize(1)-1,y:y+kSize(2)-1,:);
-			pat = abs(tmp)>0;
-			if pat(idxy) | sum(pat)==0
-				res(x,y) = tmp(idxy);
-			else
-				key = pat(:);
-	            idx = 0;
-				for nn=1:size(KEY,2);
-					if sum(key==KEY(:,nn))==length(key)
-					   idx = nn;
-					   break;
-				   	end
-				end
-				if idx == 0
-					count = count + 1;
-					kernel = calibrate(AtA,kSize,nCoil,c,lambda,pat);
-					KEY(:,mod(count,MaxListLen)+1) = key(:);
-					LIST(:,mod(count,MaxListLen)+1) = kernel(:);
-					%disp('add another key');size(KEY,2)
-				else
-					kernel = LIST(:,idx);
-				end
-				res(x,y) = sum(kernel(:).*tmp(:));
-			end
-
-		end
-	end
 */
-	inline const Matrix<CT>& ReconstructSingle (const Matrix<CT>& coil) const {
-		return coil;
+	inline Matrix<CT> ARC (const Matrix<CT>& data, size_t coil_num) const {
+
+		Vector<size_t> data_size = size(data);
+		Vector<size_t> kernel_size = size(m_kernel);
+		Matrix<CT> kdata = zpad (data, data_size[0]+kernel_size[0]-1, data_size[1]+kernel_size[1]-1, m_nc);
+		Matrix<CT> dummy (kernel_size[0],kernel_size[1],m_nc);
+		dummy (kernel_size[0]/2,kernel_size[0]/2,coil_num) = 1.;
+		size_t idxy = find(dummy)[0];
+		Matrix<CT> ret (data_size[0],data_size[1]);
+		size_t max_list_len = 100;
+		size_t list_len = 0;
+		Matrix<CT> kernels (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
+		Matrix<CT> kernel;
+		Matrix<short> patterns (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
+		Matrix<short> pattern;
+		Matrix<CT> tmp (kernel_size[0],kernel_size[1],m_nc);
+
+		for (size_t y = 0; y < data_size[1]; ++y)
+			for (size_t x = 0, idx=0; x < data_size[0]; ++x) {
+				for (size_t ny = 0; ny < kernel_size[1]; ++ny)
+					for (size_t nx = 0; nx < kernel_size[0]; ++nx)
+						for (size_t nc = 0; nc < m_nc; ++nc)
+							tmp (nx,ny,nc) = kdata(x+nx,y+ny,nc);
+				pattern = col(tmp>0);
+
+				for (size_t i = 0; i < list_len; ++i)
+					if (eq(pattern,Column(patterns,i))) {     // Do we know the pattern?
+						idx=i; break;
+					}
+				if (idx == 0) {                      // No
+					Column(patterns, list_len, pattern);   // Add new pattern
+					//Column(kernels, list_len, Calibrate(pattern, idxy));
+					list_len++;
+				} else {
+					0;//kernel = Column (kernels, idx);
+				}
+
+				//ret (x,y) = sum(col(kernel*tmp))[0];
+
+			}
+
+		return ret;
+	}
+
+	inline Matrix<CT> Calibrate (Matrix<CT> pattern, size_t idxy) const {
+		Vector<size_t> kernel_size = size(m_kernel);
+		pattern (idxy) = 0;
+		Vector<size_t> idxA = find(pattern);
+
+		// Aty = AtA(:,idxY); Aty = Aty(idxA);
+		// AtA = AtA(idxA,:); AtA =  AtA(:,idxA);
+
+		Matrix<CT> ret;
+		return ret;
 	}
 
 	inline void CalcCalibMatrix () {
@@ -224,7 +253,7 @@ private:
  		calib_mat_size[1]  = calib_mat_size[2] * calib_mat_size[3];
  		calib_mat_size.PopBack();
  		calib_mat_size.PopBack();
- 		m_coil_calib = resize(m_coil_calib, calib_mat_size);
+ 		m_coil_calib = resize (m_coil_calib, calib_mat_size);
 		m_coil_calib = gemm (m_coil_calib, m_coil_calib, 'C');
 	}
 
@@ -232,6 +261,9 @@ private:
 	Matrix<CT>           m_ac_data;     /**< @brief ACS lines            */
 	Matrix<CT>           m_kernel;  /**< @brief GRAPPA kernel        */
 	Matrix<CT>           m_coil_calib;
+	std::vector<shrd_ptr<Matrix<short> > > m_pat_key; /**< @brief Undersampling pattern collection */
+	std::vector<Matrix<CT> > m_pat_list; /**< @brief Undersampling pattern collection */
+
 
 	Matrix<size_t>       m_kdims;   /**< @brief Kernel dimensions    */
 	Matrix<size_t>       m_adims;

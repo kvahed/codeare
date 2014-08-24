@@ -1391,6 +1391,20 @@ public:
     }
 
 
+    /**
+     * @brief           Matrix comparison, result[i] = (m[i] || this[i] ? 1 : 0). i.e. this | m.
+     *
+     * @param  M        Comparing matrix.
+     * @return          Hit list
+     */
+    inline Matrix<short>
+    operator|          (const Matrix<T,P>& rhs) const {
+        Matrix<cbool> ret(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+        	ret[i] = (short)CompTraits<T>::logical_or(_M[i], ret[i]);
+        return ret;
+    }
+
 
     /**
      * @brief           Matrix comparison, result[i] = (m[i] && this[i] ? 1 : 0). i.e. this & m.

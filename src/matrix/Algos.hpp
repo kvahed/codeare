@@ -760,7 +760,7 @@ sum (const Matrix<T>& M, size_t d) {
  * @return    Sum of M along dimension d
  */
 template <class T> inline T
-sum (Matrix<T>& M) {
+sum (const Matrix<T>& M) {
 	return std::accumulate(M.Begin(),M.End(),(T)0);
 }
 

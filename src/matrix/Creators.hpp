@@ -645,7 +645,7 @@ zpad (const Matrix<T>& a, size_t m, size_t n) {
 	size_t am2 = (m-am)/2, an2 = (n-an)/2;
 	Matrix<T> ret(m,n);
 	for (size_t i = 0; i < an; ++i)
-		std::copy(&a(0,i), &a(am-1,i), &ret(am2,i+an2));
+		std::copy(&a(0,i), &a(0,i)+am, &ret(am2,i+an2));
 	return ret;
 }
 
@@ -660,7 +660,7 @@ zpad (const Matrix<T>& a, size_t m, size_t n, size_t o) {
 	Matrix<T> ret(m,n,o);
 	for (size_t j = 0; j < ao; ++j)
 		for (size_t i = 0; i < an; ++i)
-			std::copy(&a(0,i,j), &a(am-1,i,j), &ret(am2,i+an2,j+ao2));
+			std::copy(&a(0,i,j), &a(0,i,j)+am, &ret(am2,i+an2,j+ao2));
 	return ret;
 }
 
@@ -677,7 +677,7 @@ zpad (const Matrix<T>& a, size_t m, size_t n, size_t o, size_t p) {
 	for (size_t k = 0; k < ap; ++k)
 		for (size_t j = 0; j < ao; ++j)
 			for (size_t i = 0; i < an; ++i)
-				std::copy(&a(0,i,j), &a(am-1,i,j), &ret(am2, i+an2, j+ao2, k+ap2));
+				std::copy(&a(0,i,j,k), &a(0,i,j,k)+am, &ret(am2,i+an2,j+ao2,k+ap2));
 	return ret;
 }
 #endif
