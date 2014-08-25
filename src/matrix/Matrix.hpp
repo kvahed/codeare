@@ -653,8 +653,9 @@ public:
     inline Matrix<T> operator() (const Vector<size_t>& indices, size_t col = 0) const {
     	size_t indices_size = indices.size();
     	assert (indices_size);
-    	assert (indices_size < Size());
-    	assert (mmax(indices) < Size());
+    	assert (col < _dim[1]);
+    	assert (indices_size < _dim[0]);
+    	assert (mmax(indices) < _dim[0]);
     	Matrix<T> ret (indices_size,1);
     	for (size_t i = 0; i < indices_size; ++i)
     		ret[i] = At(indices[i],col);
@@ -670,8 +671,9 @@ public:
     inline Matrix<T> operator() (size_t row, const Vector<size_t>& indices) const {
     	size_t indices_size = indices.size();
     	assert (indices_size);
-    	assert (indices_size < Size());
-    	assert (mmax(indices) < Size());
+    	assert (row < _dim[0]);
+    	assert (indices_size < _dim[1]);
+    	assert (mmax(indices) < _dim[1]);
     	Matrix<T> ret (1,indices_size);
     	for (size_t i = 0; i < indices_size; ++i)
     		ret[i] = At(row,indices[i]);

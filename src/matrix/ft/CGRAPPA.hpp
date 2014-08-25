@@ -133,7 +133,6 @@ public:
 #pragma omp parallel for default (shared)
 		for (int coil = 0; coil < m_nc; ++coil)
 			Slice(res, coil, ARC(kspace,coil));
-        
 		return res;
 	}
     
@@ -182,7 +181,6 @@ private:
 	inline Matrix<CT> ARC (const Matrix<CT>& data, size_t coil_num) const {
         
 		size_t max_list_len = 100;
-		size_t list_len = 0;
 
 		Vector<size_t> data_size = size(data);
 		Vector<size_t> kernel_size = size(m_kernel);
@@ -195,22 +193,25 @@ private:
 		Matrix<short> pattern, patterns (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
 		Matrix<CT> tmp (kernel_size[0],kernel_size[1],m_nc);
         
-		for (size_t y = 0, idx=0; y < data_size[1]; ++y) // Scan k-space for
+		for (size_t y = 0, list_len = 0; y < data_size[1]; ++y) // Scan k-space for
 			for (size_t x = 0; x < data_size[0]; ++x) {
+
 				for (size_t ny = 0; ny < kernel_size[1]; ++ny)
 					for (size_t nx = 0; nx < kernel_size[0]; ++nx)
 						for (size_t nc = 0; nc < m_nc; ++nc)
 							tmp (nx,ny,nc) = kdata(x+nx,y+ny,nc);
-				pattern = col(tmp>0);
+				pattern = col(abs(tmp)>0);
+				size_t idx = 0;
                 
 				for (size_t i = 0; i < list_len; ++i)
-					if (eq(pattern,Column(patterns,i))) {     // Do we know the pattern?
-						idx=i; break;
+					if (pattern.Container()==Column(patterns,i).Container()) {     // Do we know the pattern?
+						idx = i;
+						break;
 					}
 				if (idx == 0) {                            // No
-					kernel = Calibrate(pattern, idxy);     // Calculate kernel
-					Column(kernels, list_len, kernel);     // Save kernel and pattern
-					Column(patterns, list_len, pattern);
+					kernel = Calibrate(tmp, idxy);     // Calculate kernel
+					Column (kernels, list_len, kernel);     // Save kernel and pattern
+					Column (patterns, list_len, pattern);
 					list_len++;
 				} else
 					kernel = Column (kernels, idx);
@@ -219,10 +220,13 @@ private:
                 
 			}
 
-		using namespace codeare::matrix::io;
-		IOContext ioc ("patters.mat", WRITE);
-		fclose(ioc);
-        
+		if (coil_num == 0) {
+			using namespace codeare::matrix::io;
+			std::stringstream fname;
+			fname << "pattern" << coil_num << ".h5";
+			h5write (patterns, fname.str().c_str());
+		}
+
 		return ret;
 	}
     

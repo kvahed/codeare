@@ -12,7 +12,8 @@
 #  MATLAB_MEX_LIBRARY:        Path to libmex.lib
 #  MATLAB_MX_LIBRARY:         Path to libmx.lib
 #  MATLAB_ENG_LIBRARY:        Path to libeng.lib
-#  MATLAB_LIBRARIES:          Required libraries: libmex, libmx, libeng
+#  MATLAB_MAT_LIBRARY:        Path to libmat.lib
+#  MATLAB_LIBRARIES:          Required libraries: libmex, libmx, libeng, libmat
 #  MATLAB_MEXFILE_EXT:        MEX extension required for the current platform
 #  MATLAB_CREATE_MEX:         Macro to build a MEX-file
 #  MATLAB_MATLABR2010B_FOUND: Variable only available under Windows (used to fix compilation issue with MSVC 2010)
@@ -124,6 +125,7 @@ IF(WIN32)
   SET(LIBMEX "libmex")
   SET(LIBMX "libmx")
   SET(LIBENG "libeng")
+  SET(LIBMAT "libmat")
 ELSE(WIN32)
   # MEX files extension
   IF(APPLE)
@@ -163,6 +165,7 @@ ELSE(WIN32)
     SET(LIBMEX "libmex.dylib")
     SET(LIBMX "libmx.dylib")
     SET(LIBENG "libeng.dylib")
+    SET(LIBMAT "libmat.dylib")
   ELSE(APPLE)
     FILE(GLOB MATLAB_LOCAL_PATHS "/usr/local/[Mm][Aa][Tt][Ll][Aa][Bb]*")
     FILE(GLOB MATLAB_LOCAL_PATHS_BIS "/usr/local/[Mm][Aa][Tt][Ll][Aa][Bb]/R*")
@@ -173,6 +176,7 @@ ELSE(WIN32)
     SET(LIBMEX "libmex.so")
     SET(LIBMX "libmx.so")
     SET(LIBENG "libeng.so")
+    SET(LIBMAT "libmat.so")
   
     FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS})
     IF(NOT MATLAB_ROOT)
@@ -211,6 +215,10 @@ FIND_LIBRARY(MATLAB_ENG_LIBRARY
     ${LIBENG}
     ${MATLAB_LIBRARIES_PATHS} NO_DEFAULT_PATH
     )
+FIND_LIBRARY(MATLAB_MAT_LIBRARY
+    ${LIBMAT}
+    ${MATLAB_LIBRARIES_PATHS} NO_DEFAULT_PATH
+    )
 FIND_PATH(MATLAB_INCLUDE_DIR
     "mex.h"
     ${MATLAB_INCLUDE_PATHS} NO_DEFAULT_PATH
@@ -221,6 +229,7 @@ SET(MATLAB_LIBRARIES
   ${MATLAB_MEX_LIBRARY}
   ${MATLAB_MX_LIBRARY}
   ${MATLAB_ENG_LIBRARY}  
+  ${MATLAB_MAT_LIBRARY}  
 )
 
 # Fix for Matlab 2007b under MacOS X
@@ -261,7 +270,7 @@ ENDMACRO(MATLAB_MEX_CREATE)
 
 IF(MATLAB_ROOT)
   INCLUDE(FindPackageHandleStandardArgs)
-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Matlab DEFAULT_MSG MATLAB_ROOT MATLAB_EXECUTABLE MATLAB_INCLUDE_DIR MATLAB_MEX_LIBRARY MATLAB_MX_LIBRARY MATLAB_ENG_LIBRARY)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Matlab DEFAULT_MSG MATLAB_ROOT MATLAB_EXECUTABLE MATLAB_INCLUDE_DIR MATLAB_MEX_LIBRARY MATLAB_MX_LIBRARY MATLAB_ENG_LIBRARY MATLAB_MAT_LIBRARY)
 ENDIF(MATLAB_ROOT)
 
 MARK_AS_ADVANCED(
@@ -269,6 +278,7 @@ MARK_AS_ADVANCED(
   MATLAB_MEX_LIBRARY
   MATLAB_MX_LIBRARY
   MATLAB_ENG_LIBRARY
+  MATLAB_MAT_LIBRARY
   MATLAB_LIBRARIES
   MATLAB_INCLUDE_DIR
   MATLAB_MEXFILE_EXT
