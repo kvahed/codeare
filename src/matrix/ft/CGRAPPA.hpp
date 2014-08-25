@@ -193,15 +193,14 @@ private:
 		Matrix<short> pattern, patterns (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
 		Matrix<CT> tmp (kernel_size[0],kernel_size[1],m_nc);
         
-		for (size_t y = 0, list_len = 0; y < data_size[1]; ++y) // Scan k-space for
-			for (size_t x = 0; x < data_size[0]; ++x) {
+		for (size_t y = 0, list_len = 1; y < data_size[1]; ++y) // Scan k-space for
+			for (size_t x = 0, idx = 0; x < data_size[0]; ++x, idx=0) {
 
 				for (size_t ny = 0; ny < kernel_size[1]; ++ny)
 					for (size_t nx = 0; nx < kernel_size[0]; ++nx)
 						for (size_t nc = 0; nc < m_nc; ++nc)
 							tmp (nx,ny,nc) = kdata(x+nx,y+ny,nc);
 				pattern = col(abs(tmp)>0);
-				size_t idx = 0;
                 
 				for (size_t i = 0; i < list_len; ++i)
 					if (pattern.Container()==Column(patterns,i).Container()) {     // Do we know the pattern?
@@ -209,7 +208,7 @@ private:
 						break;
 					}
 				if (idx == 0) {                            // No
-					kernel = Calibrate(tmp, idxy);     // Calculate kernel
+					kernel = Calibrate(pattern, idxy);     // Calculate kernel
 					Column (kernels, list_len, kernel);     // Save kernel and pattern
 					Column (patterns, list_len, pattern);
 					list_len++;
@@ -223,20 +222,24 @@ private:
 		if (coil_num == 0) {
 			using namespace codeare::matrix::io;
 			std::stringstream fname;
-			fname << "pattern" << coil_num << ".h5";
+			fname << "kernels" << coil_num << ".h5";
+			h5write (kernels, fname.str().c_str());
+			fname.str("");
+			fname << "patterns" << coil_num << ".h5";
 			h5write (patterns, fname.str().c_str());
+
 		}
 
 		return ret;
 	}
     
-	inline Matrix<CT> Calibrate (Matrix<CT> pattern, size_t idxy) const {
+	inline Matrix<CT> Calibrate (Matrix<short> pattern, size_t idxy) const {
 		Vector<size_t> kernel_size = size(m_kernel);
 		pattern (idxy) = 0;
 		Vector<size_t> idxA = find(pattern);
 		Matrix<CT> Aty = m_coil_calib (idxA,idxy);
 		Matrix<CT> AtA = m_coil_calib (idxA,idxA);
-	    T lambda = norm(AtA,'F')/size(AtA,0)*m_lambda;
+	    T lambda = m_lambda*norm(AtA,'F')/size(AtA,0);
 	    Matrix<CT> rawkernel = gemm(inv(AtA + lambda * eye<CT>(idxA.size())),Aty);
 		Matrix<CT> kernel(prod(kernel_size)*m_nc,1);
 		for (size_t i = 0; i < idxA.size(); ++i)

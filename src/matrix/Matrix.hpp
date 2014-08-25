@@ -698,7 +698,7 @@ public:
     	Matrix<T> ret (row_inds_size, col_inds_size);
     	for (size_t j = 0; j < col_inds_size; ++j)
     		for (size_t i = 0; i < row_inds_size; ++i)
-    			ret(i,j) = At(row_inds[i],col_inds[i]);
+    			ret(i,j) = At(row_inds[i],col_inds[j]);
     	return ret;
     }
 
