@@ -132,7 +132,7 @@ public:
      */
 	inline
     Matrix              (const Vector<size_t>& dim) {
-		
+
 	    size_t ds = dim.size();
 	    assert(ds &&
 	    	   std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
