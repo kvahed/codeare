@@ -20,7 +20,16 @@ list (APPEND COMLIBS tinyxml core ${BLAS_LINKER_FLAGS}
   ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
   ${FFTW3_LIBRARIES} ${OPENSSL_LIBRARIES} ${Boost_CHRONO_LIBRARY}
   ${Boost_SYSTEM_LIBRARY} ${Boost_CHRONO_LIBRARY}
-  ${Boost_TIMER_LIBRARY} )   
+  ${Boost_TIMER_LIBRARY}  hdf5 hdf5_cpp)
+if (${MATLAB_FOUND})
+  ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY}
+#  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+#    list (APPEND COMLIBS libmx libmat)           
+#  else ()
+#    list (APPEND COMLIBS )
+#  endif ()
+endif ()
+
 
 add_library (KTPoints MODULE KTPoints.hpp KTPoints.cpp)
 set_target_properties(KTPoints PROPERTIES PREFIX "")

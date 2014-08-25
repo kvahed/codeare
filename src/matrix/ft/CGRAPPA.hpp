@@ -29,6 +29,7 @@
 #include "Access.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "IOContext.hpp"
 
 
 template<class T> inline static bool eq (const Matrix<T>& A, const Matrix<T>& B) {
@@ -137,28 +138,6 @@ public:
 	}
     
     
-	inline void CalcCalibMatrix () {
-		Vector<size_t> ac_size = size(m_ac_data);
-		Vector<size_t> kernel_size = size(m_kernel);
-		Vector<size_t> calib_mat_size (4);
-		calib_mat_size[0] = ac_size[0] - kernel_size[0] + 1;
-		calib_mat_size[1] = ac_size[1] - kernel_size[1] + 1;
-		calib_mat_size[2] = prod (kernel_size);
-		calib_mat_size[3] = ac_size[2];
-		m_coil_calib = Matrix<CT> (calib_mat_size);
- 		for (size_t j = 0, count = 0; j < kernel_size[1]; ++j)
-			for (size_t i = 0; i < kernel_size[0]; ++i, ++count)
-				for (size_t m = 0; m < calib_mat_size[1]; ++m)
-					for (size_t l = 0; l < calib_mat_size[0]; ++l)
-						for (size_t n = 0; n < ac_size[2]; ++n)
-							m_coil_calib (l, m, count, n) = m_ac_data (i+l,j+m,n);
- 		calib_mat_size[0] *= calib_mat_size[1];
- 		calib_mat_size[1]  = calib_mat_size[2] * calib_mat_size[3];
- 		calib_mat_size.resize(2);
- 		m_coil_calib = resize (m_coil_calib, calib_mat_size);
-		m_coil_calib = gemm (m_coil_calib, m_coil_calib, 'C');
-	}
-    
 	/**
 	 * @brief    Forward transform
 	 */
@@ -193,6 +172,13 @@ public:
     
 private:
     
+	/**
+	 * @brief GRAPPA/ARC reconstruction
+	 *
+	 * @param  data      Under-sampled measurement reference
+	 * @param  coil_num  Number of coil to reconstruct for
+	 * @return           Reconstructed full k-space
+	 */
 	inline Matrix<CT> ARC (const Matrix<CT>& data, size_t coil_num) const {
         
 		size_t max_list_len = 100;
@@ -232,6 +218,10 @@ private:
 				ret (x,y) = sum(kernel*col(tmp));
                 
 			}
+
+		using namespace codeare::matrix::io;
+		IOContext ioc ("patters.mat", WRITE);
+		fclose(ioc);
         
 		return ret;
 	}
@@ -242,7 +232,7 @@ private:
 		Vector<size_t> idxA = find(pattern);
 		Matrix<CT> Aty = m_coil_calib (idxA,idxy);
 		Matrix<CT> AtA = m_coil_calib (idxA,idxA);
-	    T lambda = norm(AtA)/size(AtA,0)*m_lambda;
+	    T lambda = norm(AtA,'F')/size(AtA,0)*m_lambda;
 	    Matrix<CT> rawkernel = gemm(inv(AtA + lambda * eye<CT>(idxA.size())),Aty);
 		Matrix<CT> kernel(prod(kernel_size)*m_nc,1);
 		for (size_t i = 0; i < idxA.size(); ++i)
@@ -250,13 +240,35 @@ private:
 		return kernel;
 	}
     
+	/**
+	 * @brief Setup calibration matrix
+	 */
+	inline void CalcCalibMatrix () {
+		Vector<size_t> ac_size = size(m_ac_data);
+		Vector<size_t> kernel_size = size(m_kernel);
+		Vector<size_t> calib_mat_size (4);
+		calib_mat_size[0] = ac_size[0] - kernel_size[0] + 1;
+		calib_mat_size[1] = ac_size[1] - kernel_size[1] + 1;
+		calib_mat_size[2] = prod (kernel_size);
+		calib_mat_size[3] = ac_size[2];
+		m_coil_calib = Matrix<CT> (calib_mat_size);
+ 		for (size_t j = 0, count = 0; j < kernel_size[1]; ++j)
+			for (size_t i = 0; i < kernel_size[0]; ++i, ++count)
+				for (size_t m = 0; m < calib_mat_size[1]; ++m)
+					for (size_t l = 0; l < calib_mat_size[0]; ++l)
+						for (size_t n = 0; n < ac_size[2]; ++n)
+							m_coil_calib (l, m, count, n) = m_ac_data (i+l,j+m,n);
+ 		calib_mat_size[0] *= calib_mat_size[1];
+ 		calib_mat_size[1]  = calib_mat_size[2] * calib_mat_size[3];
+ 		calib_mat_size.resize(2);
+ 		m_coil_calib = resize (m_coil_calib, calib_mat_size);
+		m_coil_calib = gemm (m_coil_calib, m_coil_calib, 'C');
+	}
+
 	Matrix<CT>           m_weights; /**< @brief Correction patch     */
 	Matrix<CT>           m_ac_data; /**< @brief ACS lines            */
 	Matrix<CT>           m_kernel;  /**< @brief GRAPPA kernel        */
 	Matrix<CT>           m_coil_calib;
-	std::vector<shrd_ptr<Matrix<short> > > m_pat_key; /**< @brief Undersampling pattern collection */
-	std::vector<Matrix<CT> > m_pat_list; /**< @brief Undersampling pattern collection */
-    
     
 	Matrix<size_t>       m_kdims;   /**< @brief Kernel dimensions    */
 	Matrix<size_t>       m_adims;

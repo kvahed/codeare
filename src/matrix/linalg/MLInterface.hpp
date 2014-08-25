@@ -83,9 +83,14 @@ extern "C" {
     double F77name(dznrm2,DZNRM2) (const int* n, const cxdb* x, const int* incx);
 
 	// 1-, Frobenius- or zero-norm
+#ifdef __APPLE__ 
+	double F77name(slange,SLANGE) (const char* norm, const int* m, const int* n, const  float* A, const int* lda,  float* work);
+	double F77name(clange,CLANGE) (const char* norm, const int* m, const int* n, const   cxfl* A, const int* lda,  float* work);
+#else
 	float  F77name(slange,SLANGE) (const char* norm, const int* m, const int* n, const  float* A, const int* lda,  float* work);
-	double F77name(dlange,DLANGE) (const char* norm, const int* m, const int* n, const double* A, const int* lda, double* work);
 	float  F77name(clange,CLANGE) (const char* norm, const int* m, const int* n, const   cxfl* A, const int* lda,  float* work);
+#endif
+	double F77name(dlange,DLANGE) (const char* norm, const int* m, const int* n, const double* A, const int* lda, double* work);
 	double F77name(zlange,ZLANGE) (const char* norm, const int* m, const int* n, const   cxdb* A, const int* lda, double* work);
 
 	// Matrix inversion through cholesky decomposition

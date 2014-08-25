@@ -14,10 +14,21 @@ if(POLICY CMP0042)
   cmake_policy(SET CMP0042 NEW) # CMake 3.0
 endif()
 
+list (APPEND COMLIBS core ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${FFTW3_LIBRARIES} hdf5 hdf5_cpp)
+if (${MATLAB_FOUND})
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    list (APPEND COMLIBS libmx libmat)           
+  else ()
+    list (APPEND COMLIBS mx mat)
+  endif ()
+endif ()
+
+list (APPEND SOURCES DFT.hpp DFT.cpp CSENSE.hpp CSENSE.cpp CGRAPPA.cpp)
+
 if (${NFFT_FOUND})
-  add_library (codeare-ft SHARED DFT.hpp DFT.cpp CSENSE.hpp CSENSE.cpp CGRAPPA.hpp CGRAPPA.cpp NCSENSE.hpp NCSENSE.cpp)
-  target_link_libraries (codeare-ft core ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${FFTW3_LIBRARIES} ${NFFT_LIBRARIES})
-else ()
-  add_library (codeare-ft SHARED DFT.hpp DFT.cpp CSENSE.hpp CSENSE.cpp )
-  target_link_libraries (codeare-ft core ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${FFTW3_LIBRARIES})
-endif()
+  list (APPEND SOURCES NCSENSE.hpp NCSENSE.cpp NFFT.hpp NFFT.cpp)
+  list (APPEND COMLIBS ${NFFT_LIBRARIES})
+endif ()
+
+add_library (codeare-ft SHARED ${SOURCES})
+target_link_libraries (codeare-ft ${COMLIBS})
