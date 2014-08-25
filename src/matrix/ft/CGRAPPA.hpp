@@ -131,7 +131,7 @@ public:
         
 		Matrix<CT> res = kspace;
 #pragma omp parallel for default (shared)
-		for (size_t coil = 0; coil < m_nc; ++coil)
+		for (int coil = 0; coil < m_nc; ++coil)
 			Slice(res, coil, ARC(kspace,coil));
         
 		return res;
