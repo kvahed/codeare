@@ -195,6 +195,9 @@ private:
 
 	inline Matrix<CT> ARC (const Matrix<CT>& data, size_t coil_num) const {
 
+		size_t max_list_len = 100;
+		size_t list_len = 0;
+
 		Vector<size_t> data_size = size(data);
 		Vector<size_t> kernel_size = size(m_kernel);
 		Matrix<CT> kdata = zpad (data, data_size[0]+kernel_size[0]-1, data_size[1]+kernel_size[1]-1, m_nc);
@@ -202,16 +205,12 @@ private:
 		dummy (kernel_size[0]/2,kernel_size[0]/2,coil_num) = 1.;
 		size_t idxy = find(dummy)[0];
 		Matrix<CT> ret (data_size[0],data_size[1]);
-		size_t max_list_len = 100;
-		size_t list_len = 0;
-		Matrix<CT> kernels (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
-		Matrix<CT> kernel;
-		Matrix<short> patterns (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
-		Matrix<short> pattern;
+		Matrix<CT> kernel, kernels (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
+		Matrix<short> pattern, patterns (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
 		Matrix<CT> tmp (kernel_size[0],kernel_size[1],m_nc);
 
-		for (size_t y = 0; y < data_size[1]; ++y) // Scan k-space for
-			for (size_t x = 0, idx=0; x < data_size[0]; ++x) {
+		for (size_t y = 0, idx=0; y < data_size[1]; ++y) // Scan k-space for
+			for (size_t x = 0; x < data_size[0]; ++x) {
 				for (size_t ny = 0; ny < kernel_size[1]; ++ny)
 					for (size_t nx = 0; nx < kernel_size[0]; ++nx)
 						for (size_t nc = 0; nc < m_nc; ++nc)
@@ -230,7 +229,7 @@ private:
 				} else
 					kernel = Column (kernels, idx);
 
-				ret (x,y) = sum(kernel*col(tmp),0)[0];
+				ret (x,y) = sum(kernel*col(tmp));
 
 			}
 
