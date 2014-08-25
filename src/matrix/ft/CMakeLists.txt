@@ -16,11 +16,7 @@ endif()
 
 list (APPEND COMLIBS core ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${FFTW3_LIBRARIES} hdf5 hdf5_cpp)
 if (${MATLAB_FOUND})
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    list (APPEND COMLIBS libmx libmat)           
-  else ()
-    list (APPEND COMLIBS mx mat)
-  endif ()
+  list (APPEND COMLIBS ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY})
 endif ()
 
 list (APPEND SOURCES DFT.hpp DFT.cpp CSENSE.hpp CSENSE.cpp CGRAPPA.cpp)

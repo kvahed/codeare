@@ -23,11 +23,6 @@ list (APPEND COMLIBS tinyxml core ${BLAS_LINKER_FLAGS}
   ${Boost_TIMER_LIBRARY}  hdf5 hdf5_cpp)
 if (${MATLAB_FOUND})
   list (APPEND COMLIBS ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY})
-#  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-#    list (APPEND COMLIBS libmx libmat)           
-#  else ()
-#    list (APPEND COMLIBS )
-#  endif ()
 endif ()
 
 
