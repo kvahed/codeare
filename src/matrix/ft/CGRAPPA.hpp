@@ -181,7 +181,6 @@ private:
 	inline Matrix<CT> ARC (const Matrix<CT>& data, size_t coil_num) const {
         
 		size_t max_list_len = 100;
-
 		Vector<size_t> data_size = size(data);
 		Vector<size_t> kernel_size = size(m_kernel);
 		Matrix<CT> kdata = zpad (data, data_size[0]+kernel_size[0]-1, data_size[1]+kernel_size[1]-1, m_nc);
@@ -218,17 +217,6 @@ private:
 				ret (x,y) = sum(kernel*col(tmp));
                 
 			}
-
-		if (coil_num == 0) {
-			using namespace codeare::matrix::io;
-			std::stringstream fname;
-			fname << "kernels" << coil_num << ".h5";
-			h5write (kernels, fname.str().c_str());
-			fname.str("");
-			fname << "patterns" << coil_num << ".h5";
-			h5write (patterns, fname.str().c_str());
-
-		}
 
 		return ret;
 	}
