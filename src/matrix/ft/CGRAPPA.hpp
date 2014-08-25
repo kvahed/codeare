@@ -55,20 +55,20 @@ template<class T> inline static Matrix<T> col (const Matrix<T>& M) {
  */
 template <class T>
 class CGRAPPA : public FT<T> {
-
-
+    
+    
 	typedef std::complex<T> CT;
-
-
+    
+    
 public:
-
+    
 	
 	/**
 	 * @brief          Default constructor
 	 */
 	CGRAPPA() :  m_nthreads(1), m_lambda(0), m_nc(1) {}
-
-
+    
+    
 	/**
 	 * @brief Construct with parameters
 	 */
@@ -98,45 +98,45 @@ public:
 		}
 		m_nc = size(m_ac_data,2); // # Coils
 		std::cout << "\n  # coils: " << m_nc << std::endl;
-
+        
 		// Tikhonov lambda
 		if (p.exists("lambda"))
 			m_lambda = fp_cast(p["lambda"]);
 		else
 			m_lambda = T(0.);
-
+        
 		// Parallelisation
 		if (p.exists("nthreads"))
 			m_nthreads = fp_cast(p["threads"]);
 		else
 			m_nthreads = 1;
-
+        
 		CalcCalibMatrix();
-
+        
 	}
-
+    
 	/**
 	 * @brief    Clean up and destroy
 	 */
 	virtual
 	~CGRAPPA () {};
-
+    
 
 	/**
 	 * @brief    Adjoint transform
 	 */
 	Matrix<CT>
 	Adjoint (const Matrix<CT>& kspace) const {
-
+        
 		Matrix<CT> res = kspace;
 #pragma omp parallel for default (shared)
 		for (size_t coil = 0; coil < m_nc; ++coil)
 			Slice(res, coil, ARC(kspace,coil));
-
+        
 		return res;
 	}
-
-
+    
+    
 	inline void CalcCalibMatrix () {
 		Vector<size_t> ac_size = size(m_ac_data);
 		Vector<size_t> kernel_size = size(m_kernel);
@@ -158,7 +158,7 @@ public:
  		m_coil_calib = resize (m_coil_calib, calib_mat_size);
 		m_coil_calib = gemm (m_coil_calib, m_coil_calib, 'C');
 	}
-
+    
 	/**
 	 * @brief    Forward transform
 	 */
@@ -167,7 +167,7 @@ public:
 		Matrix<CT> res;
 		return res;
 	}
-
+    
 	/**
 	 * @brief    Forward transform
 	 *
@@ -178,8 +178,8 @@ public:
 	operator* (const Matrix<CT>& m) const {
 		return Trafo(m);
 	}
-
-
+    
+    
 	/**
 	 * @brief    Backward transform
 	 *
@@ -190,11 +190,11 @@ public:
 	operator->* (const Matrix<CT>& m) const {
 		return Adjoint (m);
 	}
-
+    
 private:
-
+    
 	inline Matrix<CT> ARC (const Matrix<CT>& data, size_t coil_num) const {
-
+        
 		size_t max_list_len = 100;
 		size_t list_len = 0;
 
@@ -208,7 +208,7 @@ private:
 		Matrix<CT> kernel, kernels (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
 		Matrix<short> pattern, patterns (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
 		Matrix<CT> tmp (kernel_size[0],kernel_size[1],m_nc);
-
+        
 		for (size_t y = 0, idx=0; y < data_size[1]; ++y) // Scan k-space for
 			for (size_t x = 0; x < data_size[0]; ++x) {
 				for (size_t ny = 0; ny < kernel_size[1]; ++ny)
@@ -216,7 +216,7 @@ private:
 						for (size_t nc = 0; nc < m_nc; ++nc)
 							tmp (nx,ny,nc) = kdata(x+nx,y+ny,nc);
 				pattern = col(tmp>0);
-
+                
 				for (size_t i = 0; i < list_len; ++i)
 					if (eq(pattern,Column(patterns,i))) {     // Do we know the pattern?
 						idx=i; break;
@@ -228,14 +228,14 @@ private:
 					list_len++;
 				} else
 					kernel = Column (kernels, idx);
-
+                
 				ret (x,y) = sum(kernel*col(tmp));
-
+                
 			}
-
+        
 		return ret;
 	}
-
+    
 	inline Matrix<CT> Calibrate (Matrix<CT> pattern, size_t idxy) const {
 		Vector<size_t> kernel_size = size(m_kernel);
 		pattern (idxy) = 0;
@@ -249,28 +249,28 @@ private:
 			kernel[idxA[i]] = rawkernel[i];
 		return kernel;
 	}
-
+    
 	Matrix<CT>           m_weights; /**< @brief Correction patch     */
 	Matrix<CT>           m_ac_data; /**< @brief ACS lines            */
 	Matrix<CT>           m_kernel;  /**< @brief GRAPPA kernel        */
 	Matrix<CT>           m_coil_calib;
 	std::vector<shrd_ptr<Matrix<short> > > m_pat_key; /**< @brief Undersampling pattern collection */
 	std::vector<Matrix<CT> > m_pat_list; /**< @brief Undersampling pattern collection */
-
-
+    
+    
 	Matrix<size_t>       m_kdims;   /**< @brief Kernel dimensions    */
 	Matrix<size_t>       m_adims;
 	Matrix<size_t>       m_d;       /**< @brief Dimensions           */
 	Matrix<size_t>       m_af;      /**< @brief Acceleration factors */
 	Matrix<size_t>       m_sdims;   /**< @brief Scan dimensions      */
-
+    
 	T m_lambda;
-
+    
 	std::vector<DFT<T> > m_dft;     /**< @brief DFT operator         */
-
+    
 	size_t               m_nc;      /**< @brief Number of receive channels */
 	size_t               m_nthreads;
-
+    
 };
 
 #endif /* __CGRAPPA_HPP__ */
