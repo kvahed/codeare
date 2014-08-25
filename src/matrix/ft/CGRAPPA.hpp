@@ -230,7 +230,7 @@ private:
 				} else
 					kernel = Column (kernels, idx);
 
-				ret (x,y) = sum(kernel*col(tmp));
+				ret (x,y) = sum(kernel*col(tmp),0)[0];
 
 			}
 
@@ -252,7 +252,7 @@ private:
 	}
 
 	Matrix<CT>           m_weights; /**< @brief Correction patch     */
-	Matrix<CT>           m_ac_data;     /**< @brief ACS lines            */
+	Matrix<CT>           m_ac_data; /**< @brief ACS lines            */
 	Matrix<CT>           m_kernel;  /**< @brief GRAPPA kernel        */
 	Matrix<CT>           m_coil_calib;
 	std::vector<shrd_ptr<Matrix<short> > > m_pat_key; /**< @brief Undersampling pattern collection */
