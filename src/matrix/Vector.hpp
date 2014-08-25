@@ -290,6 +290,9 @@ template<class T> inline static T prod (const Vector<T>& ct) {
 template<class T> inline static T sum (const Vector<T>& ct) {
 	return std::accumulate(ct.begin(), ct.end(), (T)0);
 }
+template<class T> inline static T mmax (const Vector<T>& ct) {
+	return *std::max_element(ct.begin(), ct.end());
+}
 
 
 template<class T> inline static void swapd (T& x,T& y) {T temp=x; x=y; y=temp;}

@@ -28,6 +28,8 @@
 #include "Print.hpp"
 #include "Access.hpp"
 #include "Algos.hpp"
+#include "Creators.hpp"
+
 
 template<class T> inline static bool eq (const Matrix<T>& A, const Matrix<T>& B) {
 	assert(A.Dim() == B.Dim());
@@ -113,10 +115,6 @@ public:
 
 	}
 
-//	printf( "ret(%zu, %zu, %zu, %zu) = m_ac_data(%zu, %zu, %zu)\n", l, m, count, n, i+l, j+m, n); fflush(stdout);
-
-
-
 	/**
 	 * @brief    Clean up and destroy
 	 */
@@ -129,14 +127,37 @@ public:
 	 */
 	Matrix<CT>
 	Adjoint (const Matrix<CT>& kspace) const {
+
 		Matrix<CT> res = kspace;
 #pragma omp parallel for default (shared)
 		for (size_t coil = 0; coil < m_nc; ++coil)
 			Slice(res, coil, ARC(kspace,coil));
 
-		return ARC(kspace,0);
+		return res;
 	}
 
+
+	inline void CalcCalibMatrix () {
+		Vector<size_t> ac_size = size(m_ac_data);
+		Vector<size_t> kernel_size = size(m_kernel);
+		Vector<size_t> calib_mat_size (4);
+		calib_mat_size[0] = ac_size[0] - kernel_size[0] + 1;
+		calib_mat_size[1] = ac_size[1] - kernel_size[1] + 1;
+		calib_mat_size[2] = prod (kernel_size);
+		calib_mat_size[3] = ac_size[2];
+		m_coil_calib = Matrix<CT> (calib_mat_size);
+ 		for (size_t j = 0, count = 0; j < kernel_size[1]; ++j)
+			for (size_t i = 0; i < kernel_size[0]; ++i, ++count)
+				for (size_t m = 0; m < calib_mat_size[1]; ++m)
+					for (size_t l = 0; l < calib_mat_size[0]; ++l)
+						for (size_t n = 0; n < ac_size[2]; ++n)
+							m_coil_calib (l, m, count, n) = m_ac_data (i+l,j+m,n);
+ 		calib_mat_size[0] *= calib_mat_size[1];
+ 		calib_mat_size[1]  = calib_mat_size[2] * calib_mat_size[3];
+ 		calib_mat_size.resize(2);
+ 		m_coil_calib = resize (m_coil_calib, calib_mat_size);
+		m_coil_calib = gemm (m_coil_calib, m_coil_calib, 'C');
+	}
 
 	/**
 	 * @brief    Forward transform
@@ -172,12 +193,6 @@ public:
 
 private:
 
-
-/*
-	dummyK = zeros(kernel_size[0],kernel_size[1],nCoil); dummyK((end+1)/2,(end+1)/2,c) = 1;
-	idxy = find(dummyK);
-	res = zeros(sx,sy);
-*/
 	inline Matrix<CT> ARC (const Matrix<CT>& data, size_t coil_num) const {
 
 		Vector<size_t> data_size = size(data);
@@ -195,7 +210,7 @@ private:
 		Matrix<short> pattern;
 		Matrix<CT> tmp (kernel_size[0],kernel_size[1],m_nc);
 
-		for (size_t y = 0; y < data_size[1]; ++y)
+		for (size_t y = 0; y < data_size[1]; ++y) // Scan k-space for
 			for (size_t x = 0, idx=0; x < data_size[0]; ++x) {
 				for (size_t ny = 0; ny < kernel_size[1]; ++ny)
 					for (size_t nx = 0; nx < kernel_size[0]; ++nx)
@@ -207,15 +222,15 @@ private:
 					if (eq(pattern,Column(patterns,i))) {     // Do we know the pattern?
 						idx=i; break;
 					}
-				if (idx == 0) {                      // No
-					Column(patterns, list_len, pattern);   // Add new pattern
-					//Column(kernels, list_len, Calibrate(pattern, idxy));
+				if (idx == 0) {                            // No
+					kernel = Calibrate(pattern, idxy);     // Calculate kernel
+					Column(kernels, list_len, kernel);     // Save kernel and pattern
+					Column(patterns, list_len, pattern);
 					list_len++;
-				} else {
-					0;//kernel = Column (kernels, idx);
-				}
+				} else
+					kernel = Column (kernels, idx);
 
-				//ret (x,y) = sum(col(kernel*tmp))[0];
+				ret (x,y) = sum(kernel*col(tmp));
 
 			}
 
@@ -226,35 +241,14 @@ private:
 		Vector<size_t> kernel_size = size(m_kernel);
 		pattern (idxy) = 0;
 		Vector<size_t> idxA = find(pattern);
-
-		// Aty = AtA(:,idxY); Aty = Aty(idxA);
-		// AtA = AtA(idxA,:); AtA =  AtA(:,idxA);
-
-		Matrix<CT> ret;
-		return ret;
-	}
-
-	inline void CalcCalibMatrix () {
-		Vector<size_t> ac_size = size(m_ac_data);
-		Vector<size_t> kernel_size = size(m_kernel);
-		Vector<size_t> calib_mat_size (4);
-		calib_mat_size[0] = ac_size[0] - kernel_size[0] + 1;
-		calib_mat_size[1] = ac_size[1] - kernel_size[1] + 1;
-		calib_mat_size[2] = prod (kernel_size);
-		calib_mat_size[3] = ac_size[2];
-		m_coil_calib = Matrix<CT> (calib_mat_size);
- 		for (size_t j = 0, count = 0; j < kernel_size[1]; ++j)
-			for (size_t i = 0; i < kernel_size[0]; ++i, ++count)
-				for (size_t m = 0; m < calib_mat_size[1]; ++m)
-					for (size_t l = 0; l < calib_mat_size[0]; ++l)
-						for (size_t n = 0; n < ac_size[2]; ++n)
-							m_coil_calib (l, m, count, n) = m_ac_data(i+l,j+m,n);
- 		calib_mat_size[0] *= calib_mat_size[1];
- 		calib_mat_size[1]  = calib_mat_size[2] * calib_mat_size[3];
- 		calib_mat_size.PopBack();
- 		calib_mat_size.PopBack();
- 		m_coil_calib = resize (m_coil_calib, calib_mat_size);
-		m_coil_calib = gemm (m_coil_calib, m_coil_calib, 'C');
+		Matrix<CT> Aty = m_coil_calib (idxA,idxy);
+		Matrix<CT> AtA = m_coil_calib (idxA,idxA);
+	    T lambda = norm(AtA)/size(AtA,0)*m_lambda;
+	    Matrix<CT> rawkernel = gemm(inv(AtA + lambda * eye<CT>(idxA.size())),Aty);
+		Matrix<CT> kernel(prod(kernel_size)*m_nc,1);
+		for (size_t i = 0; i < idxA.size(); ++i)
+			kernel[idxA[i]] = rawkernel[i];
+		return kernel;
 	}
 
 	Matrix<CT>           m_weights; /**< @brief Correction patch     */

@@ -572,12 +572,12 @@ public:
     inline const T&
     At                   (const size_t x, const size_t y, const size_t z, const size_t w) const {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
-        return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]];
+        return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]*w];
     }
     inline T&
     At                   (const size_t x, const size_t y, const size_t z, const size_t w) {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
-        return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]];
+        return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]*w];
     }
 
     
@@ -643,6 +643,62 @@ public:
 			m[i] = (S)_M[i];
 		return m;
 	}
+
+    /**
+     * @brief Deliver range of values with indices
+     *
+     * @param indices List of indices
+     * @return        Matrix containing values at indices
+     */
+    inline Matrix<T> operator() (const Vector<size_t>& indices, size_t col = 0) const {
+    	size_t indices_size = indices.size();
+    	assert (indices_size);
+    	assert (indices_size < Size());
+    	assert (mmax(indices) < Size());
+    	Matrix<T> ret (indices_size,1);
+    	for (size_t i = 0; i < indices_size; ++i)
+    		ret[i] = At(indices[i],col);
+    	return ret;
+    }
+
+    /**
+     * @brief Deliver range of values with indices
+     *
+     * @param indices List of indices
+     * @return        Matrix containing values at indices
+     */
+    inline Matrix<T> operator() (size_t row, const Vector<size_t>& indices) const {
+    	size_t indices_size = indices.size();
+    	assert (indices_size);
+    	assert (indices_size < Size());
+    	assert (mmax(indices) < Size());
+    	Matrix<T> ret (1,indices_size);
+    	for (size_t i = 0; i < indices_size; ++i)
+    		ret[i] = At(row,indices[i]);
+    	return ret;
+    }
+
+    /**
+     * @brief Deliver range of values with indices
+     *
+     * @param indices List of indices
+     * @return        Matrix containing values at indices
+     */
+    inline Matrix<T> operator() (const Vector<size_t>& row_inds, const Vector<size_t>& col_inds) const {
+    	size_t row_inds_size = row_inds.size();
+    	size_t col_inds_size = col_inds.size();
+    	assert (row_inds_size);
+    	assert (col_inds_size);
+    	assert (row_inds_size < _dim[0]);
+    	assert (col_inds_size < _dim[1]);
+    	assert (mmax(row_inds) < _dim[0]);
+    	assert (mmax(col_inds) < _dim[1]);
+    	Matrix<T> ret (row_inds_size, col_inds_size);
+    	for (size_t j = 0; j < col_inds_size; ++j)
+    		for (size_t i = 0; i < row_inds_size; ++i)
+    			ret(i,j) = At(row_inds[i],col_inds[i]);
+    	return ret;
+    }
 
 
 

@@ -531,14 +531,17 @@ gemv (const Matrix<T>& A, const Matrix<T>& x, char trans = 'N') {
  * @endcode
  *
  * @param  M           Input
- * @return             Eclidean norm
+ * @param  what        Which norm (E, F, 0, 1)
+ * @return             Eclidean norm ('E', default) 0, Frobenius, 1 ('0', 'F', '1')
  */
-template<class T> inline double
-norm (const Matrix<T>& M) {
-    
-    int incx = 1;
-    return LapackTraits<T>::nrm2 (M.Size(), M.Ptr(), incx);
-    
+template<class T> inline typename LapackTraits<T>::RType
+norm (const Matrix<T>& M, const char what = 'E') {
+	switch (what)
+	{
+		case 'E': return LapackTraits<T>::nrm2 (M.Size(), M.Ptr(), 1); break;
+		case 'e': return LapackTraits<T>::nrm2 (M.Size(), M.Ptr(), 1); break;
+		default : return LapackTraits<T>::lange (what, size(M,0), size(M,1), M.Container()); break;
+	}
 }
 
 

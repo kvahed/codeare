@@ -49,11 +49,19 @@ struct LapackTraits<float> {
         SGEMM (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
     }
     
-    inline static double
+    inline static RType
     nrm2 (const int N, const Type *X, const int incX) {
         return SNRM2 (&N, X, &incX);
     }
     
+    inline static RType
+    lange (const char what, const int m, const int n, const Vector<Type>& A) {
+    	Vector<RType> work;
+    	if (what == 'I' || what =='i')
+    		work.resize(m);
+        return SLANGE (&what, &m, &n, A.ptr(), &m, work.ptr());
+    }
+
     inline static void
     dot  (const int N, const Type *X, const int incX, const Type *Y, 
           const int incY, Type* res) {
@@ -145,7 +153,15 @@ struct LapackTraits<double> {
         DGEMM (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
     }
 
-    inline static double
+    inline static RType
+    lange (const char what, const int m, const int n, const Vector<Type>& A) {
+    	Vector<RType> work;
+    	if (what == 'I' || what =='i')
+    		work.resize(m);
+        return DLANGE (&what, &m, &n, A.ptr(), &m, work.ptr());
+    }
+
+    inline static RType
     nrm2 (const int N, const Type *X, const int incX) {
         return DNRM2 (&N, X, &incX);
     }
@@ -245,7 +261,15 @@ struct LapackTraits<cxfl> {
         CGEMM (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
     }
     
-    inline static double
+    inline static RType
+    lange (const char what, const int m, const int n, const Vector<Type>& A) {
+    	Vector<RType> work;
+    	if (what == 'I' || what =='i')
+    		work.resize(m);
+        return CLANGE (&what, &m, &n, A.ptr(), &m, work.ptr());
+    }
+
+    inline static RType
     nrm2 (const int N, const Type *X, const int incX) {
         return SCNRM2 (&N, X, &incX);
     }
@@ -348,7 +372,15 @@ struct LapackTraits<cxdb> {
         ZGEMM (&transa, &transb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
     }
     
-    inline static double
+    inline static RType
+    lange (const char what, const int m, const int n, const Vector<Type>& A) {
+    	Vector<RType> work;
+    	if (what == 'I' || what =='i')
+    		work.resize(m);
+        return ZLANGE (&what, &m, &n, A.ptr(), &m, work.ptr());
+    }
+
+    inline static RType
     nrm2 (const int N, const Type *X, const int incX) {
         return DZNRM2 (&N, X, &incX);
     }

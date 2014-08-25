@@ -72,7 +72,7 @@ extern "C" {
 #endif
     double F77name(ddot, DDOT)  (const int* n, const double* x, const int* incx, const double* y, const int* incy);
 
-#ifdef __APPLE__
+#ifdef __APPLE__ // Euclidean norm
     double F77name(snrm2,SNRM2) (const int* n, const float* x, const int* incx);
     double F77name(scnrm2,SCNRM2) (const int* n, const cxfl* x, const int* incx);
 #else
@@ -81,6 +81,12 @@ extern "C" {
 #endif
     double F77name(dnrm2,DNRM2) (const int* n, const double* x, const int* incx);
     double F77name(dznrm2,DZNRM2) (const int* n, const cxdb* x, const int* incx);
+
+	// 1-, Frobenius- or zero-norm
+	float  F77name(slange,SLANGE) (const char* norm, const int* m, const int* n, const  float* A, const int* lda,  float* work);
+	double F77name(dlange,DLANGE) (const char* norm, const int* m, const int* n, const double* A, const int* lda, double* work);
+	float  F77name(clange,CLANGE) (const char* norm, const int* m, const int* n, const   cxfl* A, const int* lda,  float* work);
+	double F77name(zlange,ZLANGE) (const char* norm, const int* m, const int* n, const   cxdb* A, const int* lda, double* work);
 
 	// Matrix inversion through cholesky decomposition
 	void F77name(sgetri,SGETRI) (const int *n,  float *a, const int* lda, int *ipiv,  float *work, const int *lwork,
@@ -169,6 +175,7 @@ extern "C" {
 
 #define SDOT   F77name(sdot,SDOT)
 #define SNRM2  F77name(snrm2,SNRM2)
+#define SLANGE F77name(slange,SLANGE)
 #define SGEEV  F77name(sgeev,SGEEV)
 #define SGETRF F77name(sgetrf,SGETRF)
 #define SGETRI F77name(sgetri,SGETRI) 
@@ -181,6 +188,7 @@ extern "C" {
 
 #define DDOT   F77name(ddot,DDOT)
 #define DNRM2  F77name(dnrm2,DNRM2)
+#define DLANGE F77name(dlange,DLANGE)
 #define DGEEV  F77name(dgeev,DGEEV)
 #define DGETRF F77name(dgetrf,DGETRF)
 #define DGETRI F77name(dgetri,DGETRI) 
@@ -194,6 +202,7 @@ extern "C" {
 #define CDOTU  F77name(cdotu,CDOTU)
 #define CDOTC  F77name(cdotc,CDOTC)
 #define SCNRM2 F77name(scnrm2,SCNRM2)
+#define CLANGE F77name(clange,CLANGE)
 #define CGEEV  F77name(cgeev,CGEEV)
 #define CGETRF F77name(cgetrf,CGETRF)
 #define CGETRI F77name(cgetri,CGETRI) 
@@ -207,6 +216,7 @@ extern "C" {
 #define ZDOTU  F77name(zdotu,ZDOTU)
 #define ZDOTC  F77name(zdotc,ZDOTC)
 #define DZNRM2 F77name(dznrm2,DZNRM2)
+#define ZLANGE F77name(zlange,ZLANGE)
 #define ZGEEV  F77name(zgeev,ZGEEV)
 #define ZGETRF F77name(zgetrf,ZGETRF)
 #define ZGETRI F77name(zgetri,ZGETRI) 
