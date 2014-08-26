@@ -308,7 +308,7 @@ public:
      * @param  M        Right hand side
      */
     inline
-    Matrix             (const Matrix<T,P> &M) {
+    Matrix             (const Matrix<T,P> &M) noexcept {
     	if (this != &M)
     		*this = M;
     }
@@ -323,7 +323,7 @@ public:
      * @param  M        Right hand side
      */
     inline
-    Matrix             (Matrix<T,P>&& M) {
+    Matrix             (Matrix<T,P>&& M) noexcept {
     	if (this != &M)
     		*this = M;
     }
@@ -1169,7 +1169,7 @@ public:
 	 * @return      Left hand side
 	 */
     inline Matrix<T,P>&
-    operator= (Matrix<T,P>&& rhs) {
+    operator= (Matrix<T,P>&& rhs) noexcept {
         _M    = std::move(rhs._M);
         _name = std::move(rhs._name);
         _res  = std::move(rhs._res);
@@ -1177,14 +1177,13 @@ public:
         _dim  = std::move(rhs._dim);
         return *this;
     }
-#endif
 	/**
 	 * @brief  Copy assignment operator
 	 * @param  rhs  Right hand side
 	 * @return      Left hand side
 	 */
     inline Matrix<T,P>&
-    operator= (const Matrix<T,P>& rhs) {
+    operator= (const Matrix<T,P>& rhs) noexcept {
         _M    = rhs._M;
         _name = rhs._name;
         _res  = rhs._res;
@@ -1192,7 +1191,7 @@ public:
         _dim  = rhs._dim;
         return *this;
     }
-
+#endif
     /**
      * @brief           Assignment data
      *
@@ -1510,32 +1509,6 @@ public:
 
 
     /**
-     * @brief           Elementwise addition. i.e. this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    inline Matrix<T,P>
-    operator+          (const Matrix<T,P> &M) const {
-		Matrix<T,P> res = *this;
-		return res += M;
-    }
-
-
-    /**
-     * @brief           Elementwise addition of two matrices
-     *
-     * @param  M        Matrix additive.
-     */
-    template <class S>
-    inline const Matrix<T,P>
-    operator+          (const Matrix<S,P>& M) const {
-		Matrix<T,P> res = *this;
-		return res += M;
-    }
-
-
-    /**
      * @brief           Elementwise addition iof all elements with a scalar
      *
      * @param  s        Scalar additive.
@@ -1562,12 +1535,12 @@ public:
     }
 
 
-/**
- * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
- *
- * @param  M        Added matrix.
- * @return          Result
- */
+	/**
+	 * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
+	 *
+	 * @param  M        Added matrix.
+	 * @return          Result
+	 */
     template <class S> inline Matrix<T,P>&
     operator+=         (const Matrix<S,P>& M) {
         op_assert (_dim == M.Dim(), *this, M);
@@ -1588,39 +1561,12 @@ public:
         return *this;
     }
 
-
-
-    /**
-     * @brief           Elementwise substruction of two matrices
-     *
-     * @param  M        Matrix substruent.
-     */
-    inline Matrix<T,P>
-    operator-           (const Matrix<T,P>& M) const {
-		Matrix<T,P> res = *this;
-		return res -= M;
-    }
-
-
-    /**
-     * @brief           Elementwise substruction of two matrices
-     *
-     * @param  M        Matrix substruent.
-     */
-    template <class S> inline Matrix<T,P>
-    operator-           (const Matrix<S,P>& M) const {
-		Matrix<T,P> res = *this;
-		return res -= M;
-    }
-
-
     /**
      * @brief           Elementwise subtraction all elements by a scalar
      *
      * @param  s        Scalar substruent.
      */
-    template <class S>
-    inline Matrix<T,P>
+    template <class S> inline Matrix<T,P>
     operator-           (const S s) const {
 		Matrix<T,P> res = *this;
 		return res -= s;
@@ -1661,8 +1607,7 @@ public:
      * @param  s        Added scalar.
      * @return          Result
      */
-    template <class S >
-    inline Matrix<T,P>&
+    template <class S> inline Matrix<T,P>&
     operator-=          (const S s) {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::minus<T>(),(T)s));
 		return *this;
@@ -1674,11 +1619,11 @@ public:
      * @param  M        Factor matrix.
      * @return          Result
      */
-    inline Matrix<T,P>
+    /*inline Matrix<T,P>
     operator*          (const Matrix<T,P> &M) const {
 		Matrix<T,P> res = *this;
 		return res *= M;
-    }
+    }*/
 
 
     /**
@@ -1687,12 +1632,12 @@ public:
      * @param  M        Factor matrix.
      * @return          Result
      */
-    template <class S>
+    /*template <class S>
     inline Matrix<T,P>
     operator*          (const Matrix<S,P> &M) const {
 		Matrix<T,P> res = *this;
 		return res *= M;
-    }
+    }*/
 
 
     /**
@@ -1748,32 +1693,6 @@ public:
     operator*=         (const S s) {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
 		return *this;
-    }
-
-
-    /**
-     * @brief           Elementwise substruction of two matrices
-     *
-     * @param  M        Matrix substruent.
-     */
-    inline Matrix<T,P>
-    operator/           (const Matrix<T,P>& M) const {
-		Matrix<T,P> res = *this;
-		return res /= M;
-    }
-
-
-    /**
-     * @brief           Elelemtwise division by M.
-     *
-     * @param  M        The divisor.
-     * @return          Result
-     */
-    template <class S>
-    inline Matrix<T,P>
-    operator/          (const Matrix<S,P>& M) const {
-		Matrix<T,P> res = *this;
-		return res /= M;
     }
 
 
@@ -2324,7 +2243,55 @@ protected:
 #endif
     
 };
+/*
+template<typename T, paradigm P>
+inline Matrix<T,P> operator+( const Matrix<T,P>& lhs, const Matrix<T,P>& rhs ) noexcept {
+  Matrix<T,P> nrv( lhs );
+  nrv += rhs;
+  return nrv;
+}
+#ifdef HAVE_CXX11_RVALUE_REFERENCES
+template<typename T, paradigm P>
+inline Matrix<T,P>&& operator+( Matrix<T,P>&& lhs, const Matrix<T,P>& rhs ) noexcept {
+  lhs += rhs;
+  return std::move( lhs );
+}
+template<typename T, paradigm P>
+inline Matrix<T,P>&& operator+( const Matrix<T,P>& lhs, Matrix<T,P>&& rhs ) noexcept {
+  rhs += lhs;
+  return std::move( rhs );
+}
+template<typename T, paradigm P>
+inline Matrix<T,P>&& operator+( Matrix<T,P>&& lhs, Matrix<T,P>&& rhs ) noexcept {
+  lhs += std::move( rhs );
+  return std::move( lhs );
+}
+#endif // HAVE_CXX11_RVALUE_REFERENCES
 
+template<typename T, paradigm P>
+inline Matrix<T,P> operator*( const Matrix<T,P>& lhs, const Matrix<T,P>& rhs ) noexcept {
+  Matrix<T,P> nrv( lhs );
+  nrv *= rhs;
+  return nrv;
+}
+#ifdef HAVE_CXX11_RVALUE_REFERENCES
+template<typename T, paradigm P>
+inline Matrix<T,P>&& operator*( Matrix<T,P>&& lhs, const Matrix<T,P>& rhs ) noexcept {
+  lhs *= rhs;
+  return std::move( lhs );
+}
+template<typename T, paradigm P>
+inline Matrix<T,P>&& operator*( const Matrix<T,P>& lhs, Matrix<T,P>&& rhs ) noexcept {
+  rhs *= lhs;
+  return std::move( rhs );
+}
+template<typename T, paradigm P>
+inline Matrix<T,P>&& operator*( Matrix<T,P>&& lhs, Matrix<T,P>&& rhs ) noexcept {
+  lhs *= std::move( rhs );
+  return std::move( lhs );
+}
+#endif // HAVE_CXX11_RVALUE_REFERENCES
+*/
 #endif // __MATRIX_H__
 
 

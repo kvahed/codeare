@@ -168,7 +168,7 @@ public:
 		return E (m, m_sm, m_nx, m_fts);
 	}
 
-	
+
 	/**
 	 * @brief    Forward transform
 	 *
