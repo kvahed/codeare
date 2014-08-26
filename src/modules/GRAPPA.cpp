@@ -42,33 +42,20 @@ GRAPPA::Init () {
 
 codeare::error_code
 GRAPPA::Prepare     () { 
-	printf ("  Preparing %s ...\n", Name());
+	printf ("Preparing %s ...\n", Name());
 	p.Set("nthreads", m_nthreads);
 	p.Set("lambda", m_lambda);
 	p.Set("kernel_size", m_kernel_size);
-	p.Set("acceleration_factors", m_acceleration_factors);
 	p.Set("ac_data", Get<cxfl>("ac_data"));       // Sensitivities
     m_ft = CGRAPPA<float>(p);
     AddMatrix<cxfl> ("full_data");
-	printf ("  ... done.\n\n");
+	printf ("... done.\n\n");
 	return codeare::OK;
 }
 
-// On entry ------------------------
-//
-// m_raw:     Measured k-spaces      O (Nc x NKx/RX x NKy/RY x NKz/RZ)
-// m_rhelper: ACS scans if external  O (Nc x NACSX  x NACSY  x NACSZ)
-// ---------------------------------
-
-// On exit -------------------------
-//
-// m_raw:     Reconstructed k-spaces O (Nc x NKx    x NKy    x NKz)
-// ---------------------------------
 
 codeare::error_code
 GRAPPA::Process     () { 
-
-	ticks cgstart = getticks();
 
 	Matrix<cxfl>& undersampled_data = Get<cxfl>("undersampled_data");
 	Matrix<cxfl>& full_data = Get<cxfl>("full_data");
@@ -78,7 +65,6 @@ GRAPPA::Process     () {
 	return codeare::OK;
 
 }
-
 
 
 codeare::error_code

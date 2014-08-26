@@ -99,7 +99,7 @@ public:
 		}
 		m_nc = size(m_ac_data,2); // # Coils
 		std::cout << "  # coils: " << m_nc << std::endl;
-        
+
 		// Tikhonov lambda
 		if (p.exists("lambda"))
 			m_lambda = fp_cast(p["lambda"]);
@@ -225,7 +225,7 @@ private:
 				fully_sampled(x,y) = sum(kernel*col(tmp));
                 
 			}
-        
+
 		return fully_sampled;
 	}
 
