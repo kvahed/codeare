@@ -21,8 +21,8 @@ list (APPEND COMLIBS tinyxml core ${BLAS_LINKER_FLAGS}
   ${FFTW3_LIBRARIES} ${OPENSSL_LIBRARIES} ${Boost_CHRONO_LIBRARY}
   ${Boost_SYSTEM_LIBRARY} ${Boost_CHRONO_LIBRARY}
   ${Boost_TIMER_LIBRARY}  hdf5 hdf5_cpp)
-if (${MATLAB_FOUND} AND NOT ${MACOSX})
-  list (APPEND COMLIBS ${MATLAB_LIBRARIES} mat)
+if (${MATLAB_FOUND})
+  list (APPEND COMLIBS ${MATLAB_LIBRARIES})
 endif ()
 
 add_library (KTPoints MODULE KTPoints.hpp KTPoints.cpp)
