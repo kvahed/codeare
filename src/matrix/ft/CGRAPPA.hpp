@@ -114,9 +114,9 @@ public:
 			omp_set_num_threads(m_nthreads);
 		} else {
 #pragma omp parallel default (shared)
-		{
-			m_nthreads = omp_get_num_threads();
-		}
+            {
+                m_nthreads = omp_get_num_threads();
+            }
 		}
 		std::cout << "  # threads: " << m_nthreads << std::endl;
         
@@ -191,11 +191,11 @@ private:
 		size_t max_list_len = 100;
 		Vector<size_t> data_size = size(data);
 		Vector<size_t> kernel_size = size(m_kernel);
-		Matrix<CT> kdata = zpad (data, data_size[0]+kernel_size[0]-1, data_size[1]+kernel_size[1]-1, m_nc);
-		Matrix<CT> dummy (kernel_size[0],kernel_size[1],m_nc);
-		dummy (kernel_size[0]/2,kernel_size[0]/2,coil_num) = 1.;
-		size_t idxy = find(dummy)[0];
-		Matrix<CT> ret (data_size[0],data_size[1]);
+		Matrix<CT> under_sampled = zpad (data, data_size[0]+kernel_size[0]-1, data_size[1]+kernel_size[1]-1, m_nc);
+		Matrix<CT> dummy (kernel_size[0], kernel_size[1], m_nc);
+		dummy (kernel_size[0]/2, kernel_size[0]/2, coil_num) = 1.;
+		size_t center = find(dummy)[0];
+		Matrix<CT> fully_sampled (data_size[0],data_size[1]);
 		Matrix<CT> kernel, kernels (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
 		Matrix<short> pattern, patterns (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
 		Matrix<CT> tmp (kernel_size[0],kernel_size[1],m_nc);
@@ -206,7 +206,7 @@ private:
 				for (size_t ny = 0; ny < kernel_size[1]; ++ny)
 					for (size_t nx = 0; nx < kernel_size[0]; ++nx)
 						for (size_t nc = 0; nc < m_nc; ++nc)
-							tmp (nx,ny,nc) = kdata(x+nx,y+ny,nc);
+							tmp (nx,ny,nc) = under_sampled(x+nx,y+ny,nc);
 				pattern = col(abs(tmp)>0);
                 
 				for (size_t i = 0; i < list_len; ++i)
@@ -215,31 +215,32 @@ private:
 						break;
 					}
 				if (idx == 0) {                            // No
-					kernel = Calibrate(pattern, idxy);     // Calculate kernel
+					kernel = Solve (pattern, center);     // Calculate kernel
 					Column (kernels, list_len, kernel);     // Save kernel and pattern
 					Column (patterns, list_len, pattern);
 					list_len++;
 				} else
 					kernel = Column (kernels, idx);
                 
-				ret (x,y) = sum(kernel*col(tmp));
+				fully_sampled(x,y) = sum(kernel*col(tmp));
                 
 			}
-
-		return ret;
+        
+		return fully_sampled;
 	}
-    
-	inline Matrix<CT> Calibrate (Matrix<short> pattern, size_t idxy) const {
+
+    // Solve Ax=b
+	inline Matrix<CT> Solve (Matrix<short> pattern, size_t center) const {
 		Vector<size_t> kernel_size = size(m_kernel);
-		pattern (idxy) = 0;
-		Vector<size_t> idxA = find(pattern);
-		Matrix<CT> Aty = m_coil_calib (idxA,idxy);
-		Matrix<CT> AtA = m_coil_calib (idxA,idxA);
-	    T lambda = m_lambda*norm(AtA,'F')/size(AtA,0);
-	    Matrix<CT> rawkernel = gemm(inv(AtA + lambda * eye<CT>(idxA.size())),Aty);
+		pattern (center) = 0;
+		Vector<size_t> pat_ind = find(pattern);
+		Matrix<CT> b = m_coil_calib (pat_ind,center);
+		Matrix<CT> A = m_coil_calib (pat_ind,pat_ind);
+	    T lambda = m_lambda*norm(A,'F')/size(A,0);
+	    Matrix<CT> rawkernel = gemm(inv(A + lambda * eye<CT>(pat_ind.size())),b);
 		Matrix<CT> kernel(prod(kernel_size)*m_nc,1);
-		for (size_t i = 0; i < idxA.size(); ++i)
-			kernel[idxA[i]] = rawkernel[i];
+		for (size_t i = 0; i < pat_ind.size(); ++i)
+			kernel[pat_ind[i]] = rawkernel[i];
 		return kernel;
 	}
     

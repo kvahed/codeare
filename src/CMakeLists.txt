@@ -159,6 +159,9 @@ include (TestMacro)
 set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/sense -c 3fold.xml)  
 MP_TESTS ("csense" "${TEST_CALL}")
 
+set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/grappa -c 4fold.xml)  
+MP_TESTS ("grappa" "${TEST_CALL}")
+
 set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml)  
 MP_TESTS ("ktpoints" "${TEST_CALL}")
 
