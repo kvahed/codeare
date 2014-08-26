@@ -79,7 +79,7 @@ public:
 		if (p.exists("kernel_size")) {
 			try {
 				m_kernel = zeros<CT>(p.Get<Vector<size_t> >("kernel_size"));
-			} catch (const std::exception& e) {
+			} catch (const std::exception&) {
 				std::cerr << "  WARNING - CGRAPPA: invalid kernel size definition, defaulting to 4x5" << std::endl;
 			}
 		} else {
@@ -92,7 +92,7 @@ public:
 		if (p.exists("ac_data")) {
 			try {
 				m_ac_data = p.Get<Matrix<CT> >("ac_data");
-			} catch (const std::exception& e) {
+			} catch (const std::exception&) {
 				std::cerr << "  ERROR - CGRAPPA: auto calibration data is mandatory input.";
 				assert (false);
 			}
