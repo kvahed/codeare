@@ -43,7 +43,7 @@ GRAPPA::Init () {
 codeare::error_code
 GRAPPA::Prepare     () { 
 	printf ("  Preparing %s ...\n", Name());
-	p.Set("n_threads", m_nthreads);
+	p.Set("nthreads", m_nthreads);
 	p.Set("lambda", m_lambda);
 	p.Set("kernel_size", m_kernel_size);
 	p.Set("acceleration_factors", m_acceleration_factors);
@@ -69,8 +69,6 @@ codeare::error_code
 GRAPPA::Process     () { 
 
 	ticks cgstart = getticks();
-
-	printf ("  Processing GRAPPA ...\n");
 
 	Matrix<cxfl>& undersampled_data = Get<cxfl>("undersampled_data");
 	Matrix<cxfl>& full_data = Get<cxfl>("full_data");

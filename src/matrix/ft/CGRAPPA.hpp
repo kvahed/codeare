@@ -98,19 +98,27 @@ public:
 			}
 		}
 		m_nc = size(m_ac_data,2); // # Coils
-		std::cout << "\n  # coils: " << m_nc << std::endl;
+		std::cout << "  # coils: " << m_nc << std::endl;
         
 		// Tikhonov lambda
 		if (p.exists("lambda"))
 			m_lambda = fp_cast(p["lambda"]);
 		else
 			m_lambda = T(0.);
+		std::cout << "  Tikh lambda: " << m_lambda << std::endl;
+
         
 		// Parallelisation
-		if (p.exists("nthreads"))
-			m_nthreads = fp_cast(p["threads"]);
-		else
-			m_nthreads = 1;
+		if (p.exists("nthreads")) {
+			m_nthreads = unsigned_cast(p["nthreads"]);
+			omp_set_num_threads(m_nthreads);
+		} else {
+#pragma omp parallel default (shared)
+		{
+			m_nthreads = omp_get_num_threads();
+		}
+		}
+		std::cout << "  # threads: " << m_nthreads << std::endl;
         
 		CalcCalibMatrix();
         
