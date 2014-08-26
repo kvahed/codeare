@@ -21,7 +21,8 @@
 #  HAS_CXX11_STATIC_ASSERT      - static_assert()
 #  HAS_CXX11_VARIADIC_TEMPLATES - variadic templates
 #  HAS_CXX11_SHARED_PTR         - Shared Pointer
-#  HAS_CXX11_THREAD             - Shared Pointer
+#  HAS_CXX11_THREAD             - thread
+#  HAS_CXX11_MUTEX              - mutex 
 
 #=============================================================================
 # Copyright 2011,2012 Rolf Eike Beer <eike@sf-mail.de>
@@ -128,21 +129,22 @@ function(cxx11_check_feature FEATURE_NAME RESULT_VAR)
     endif (NOT DEFINED ${RESULT_VAR})
 endfunction(cxx11_check_feature)
 
-#cxx11_check_feature("__func__" HAS_CXX11_FUNC)
+cxx11_check_feature("__func__" HAS_CXX11_FUNC)
 cxx11_check_feature("auto" HAS_CXX11_AUTO)
 cxx11_check_feature("auto_ret_type" HAS_CXX11_AUTO_RET_TYPE)
 #cxx11_check_feature("class_override_final" HAS_CXX11_CLASS_OVERRIDE)
-#cxx11_check_feature("constexpr" HAS_CXX11_CONSTEXPR)
+cxx11_check_feature("constexpr" HAS_CXX11_CONSTEXPR)
 #cxx11_check_feature("cstdint" HAS_CXX11_CSTDINT_H)
 #cxx11_check_feature("decltype" HAS_CXX11_DECLTYPE)
 #cxx11_check_feature("initializer_list" HAS_CXX11_INITIALIZER_LIST)
 cxx11_check_feature("lambda" HAS_CXX11_LAMBDA)
 #cxx11_check_feature("long_long" HAS_CXX11_LONG_LONG)
 cxx11_check_feature("nullptr" HAS_CXX11_NULLPTR)
-#cxx11_check_feature("regex" HAS_CXX11_LIB_REGEX)
+cxx11_check_feature("regex" HAS_CXX11_LIB_REGEX)
 cxx11_check_feature("rvalue-references" HAS_CXX11_RVALUE_REFERENCES)
-#cxx11_check_feature("sizeof_member" HAS_CXX11_SIZEOF_MEMBER)
-#cxx11_check_feature("static_assert" HAS_CXX11_STATIC_ASSERT)
+cxx11_check_feature("sizeof_member" HAS_CXX11_SIZEOF_MEMBER)
+cxx11_check_feature("static_assert" HAS_CXX11_STATIC_ASSERT)
 cxx11_check_feature("variadic_templates" HAS_CXX11_VARIADIC_TEMPLATES)
 cxx11_check_feature("shared_ptr" HAS_CXX11_SHARED_PTR)
 cxx11_check_feature("thread" HAS_CXX11_THREAD)
+cxx11_check_feature("mutex" HAS_CXX11_MUTEX)
