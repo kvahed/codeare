@@ -115,7 +115,7 @@ public:
      * @brief           Contruct 1-dim with single element.
      */
 	inline
-    Matrix              () {
+    Matrix              () NOEXCEPT {
 
         _dim.resize(1,1);
         _res.resize(1,1.0);
@@ -131,7 +131,7 @@ public:
      * @param  dim      All dimensions
      */
 	inline
-    Matrix              (const Vector<size_t>& dim) {
+    Matrix              (const Vector<size_t>& dim) NOEXCEPT {
 
 	    size_t ds = dim.size();
 	    assert(ds &&
@@ -153,7 +153,7 @@ public:
      * @param  res      All 16 Resolutions
      */
 	inline explicit
-    Matrix              (const Vector<size_t>& dim, const Vector<float>& res) {
+    Matrix              (const Vector<size_t>& dim, const Vector<float>& res) NOEXCEPT {
 		
 	    assert(!dim.Empty() &&
 	    	    std::find(dim.begin(),dim.end(),size_t(0))==dim.end() &&
@@ -178,7 +178,7 @@ public:
      * @param  n        Rows & Columns
      */
     inline explicit
-    Matrix (const size_t n) {
+    Matrix (const size_t n) NOEXCEPT {
 
 	    assert (n);
 
@@ -205,7 +205,7 @@ public:
      * @param  n        Columns
      */
     inline
-    Matrix              (const size_t m, const size_t n) {
+    Matrix              (const size_t m, const size_t n) NOEXCEPT {
 
     	assert (m && n);
 
@@ -231,7 +231,7 @@ public:
      * @param  k        Slices
      */
     inline
-    Matrix (const size_t m, const size_t n, const size_t k) {
+    Matrix (const size_t m, const size_t n, const size_t k) NOEXCEPT {
 
 	    assert (m && n && k);
 
@@ -267,7 +267,7 @@ public:
     Matrix              (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
                          const size_t eco = 1, const size_t phs = 1, const size_t rep = 1, const size_t seg = 1,
                          const size_t par = 1, const size_t slc = 1, const size_t ida = 1, const size_t idb = 1,
-                         const size_t idc = 1, const size_t idd = 1, const size_t ide = 1, const size_t ave = 1) {
+                         const size_t idc = 1, const size_t idd = 1, const size_t ide = 1, const size_t ave = 1) NOEXCEPT {
 
 		assert (col && lin && cha && set && eco && phs && rep && seg &&
 				par && slc && ida && idb && idc && idd && ide && ave );
@@ -308,7 +308,7 @@ public:
      * @param  M        Right hand side
      */
     inline
-    Matrix             (const Matrix<T,P> &M) noexcept {
+    Matrix             (const Matrix<T,P> &M) NOEXCEPT {
     	if (this != &M)
     		*this = M;
     }
@@ -323,7 +323,7 @@ public:
      * @param  M        Right hand side
      */
     inline
-    Matrix             (Matrix<T,P>&& M) noexcept {
+    Matrix             (Matrix<T,P>&& M) NOEXCEPT {
     	if (this != &M)
     		*this = M;
     }
@@ -370,7 +370,7 @@ public:
      * @return          Value at _M[p].
      */
     inline T
-    operator[]          (const size_t p) const {
+    operator[]          (const size_t p) const NOEXCEPT {
         assert(p <  Size());
         return _M[p];
     }
@@ -389,7 +389,7 @@ public:
      * @return          Reference to _M[p].
      */
     inline T&
-    operator[] (const size_t p) {
+    operator[] (const size_t p) NOEXCEPT {
         assert(p <  Size());
         return _M[p];
     }
@@ -409,7 +409,7 @@ public:
      * @return          Data 
      */
     inline const T*            
-    Ptr             (const size_t p = 0)  const {
+    Ptr             (const size_t p = 0)  const NOEXCEPT {
         assert (p < Size());
         return _M.ptr(p);
     }
@@ -422,7 +422,7 @@ public:
      * @return          Data
      */
     inline T*
-    Ptr             (const size_t p = 0) {
+    Ptr             (const size_t p = 0) NOEXCEPT {
         assert (p < Size());
         return _M.ptr(p);
     }
@@ -435,7 +435,7 @@ public:
      * @return          Data container
      */
     inline Vector<T>&
-    Container           ()  {
+    Container           ()  NOEXCEPT {
         return _M;
     }
 
@@ -446,7 +446,7 @@ public:
      * @return          Data container
      */
     inline Vector<T>
-    Container           ()  const {
+    Container           ()  const NOEXCEPT {
         return _M;
     }
 
@@ -458,7 +458,7 @@ public:
      */
     inline typename Vector<T>::iterator
 
-    Begin               () {
+    Begin               () NOEXCEPT {
     	return _M.begin ();
     }
 
@@ -469,7 +469,7 @@ public:
      * @return          Container const iterator
      */
     inline typename Vector<T>::const_iterator
-    Begin               ()  const {
+    Begin               ()  const NOEXCEPT {
     	return _M.begin ();
     }
 
@@ -480,7 +480,7 @@ public:
      * @return          Container iterator
      */
     inline typename Vector<T>::iterator
-    End                 () {
+    End                 () NOEXCEPT {
     	return _M.end ();
     }
 
@@ -491,7 +491,7 @@ public:
      * @return          Container const iterator
      */
     inline typename Vector<T>::const_iterator
-    End                 ()  const {
+    End                 ()  const NOEXCEPT {
     	return _M.end ();
     }
 
@@ -503,7 +503,7 @@ public:
      * @return          Value at _M[p]
      */
     inline const T&
-    At                  (const size_t p) const {
+    At                  (const size_t p) const NOEXCEPT {
         assert (p < Size());
         return _M[p];
     }
@@ -516,7 +516,7 @@ public:
      * @return           Reference to _M[p]
      */
     inline T&           
-    At                  (const size_t pos) {
+    At                  (const size_t pos) NOEXCEPT {
         assert (pos < Size());
         return _M[pos];
     }
@@ -531,11 +531,11 @@ public:
      *
      * @return          Value
      */
-    inline const T& At (const size_t x, const size_t y) const {
+    inline const T& At (const size_t x, const size_t y) const NOEXCEPT {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]));
         return _M[x + _dim[0]*y];
     }
-    inline T&       At (const size_t x, const size_t y) {
+    inline T&       At (const size_t x, const size_t y) NOEXCEPT {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]));
         return _M[x + _dim[0]*y];
     }
@@ -550,11 +550,11 @@ public:
      *
      * @return         Value
      */
-    inline const T& At (const size_t x, const size_t y, const size_t z) const {
+    inline const T& At (const size_t x, const size_t y, const size_t z) const NOEXCEPT {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
         return _M[x + _dsz[1]*y + _dsz[2]*z];
     }
-    inline T&       At (const size_t x, const size_t y, const size_t z) {
+    inline T&       At (const size_t x, const size_t y, const size_t z) NOEXCEPT {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
         return _M[x + _dsz[1]*y + _dsz[2]*z];
     }
@@ -570,12 +570,12 @@ public:
      * @return           Reference
      */
     inline const T&
-    At                   (const size_t x, const size_t y, const size_t z, const size_t w) const {
+    At                   (const size_t x, const size_t y, const size_t z, const size_t w) const NOEXCEPT {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
         return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]*w];
     }
     inline T&
-    At                   (const size_t x, const size_t y, const size_t z, const size_t w) {
+    At                   (const size_t x, const size_t y, const size_t z, const size_t w) NOEXCEPT {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
         return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]*w];
     }
@@ -607,7 +607,7 @@ public:
     At                   (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
                           const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
                           const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
-                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) const {
+                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) const NOEXCEPT {
     	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
     	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
     	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
@@ -620,7 +620,7 @@ public:
     At                   (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
                           const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
                           const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
-                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) {
+                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) NOEXCEPT {
     	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
     	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
     	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
@@ -637,7 +637,7 @@ public:
      * @return         Casted copy
      */
     template<class S>
-    inline operator Matrix<S,P> () const {
+    inline operator Matrix<S,P> () const NOEXCEPT {
 		Matrix<S,P> m (_dim);
 		for (size_t i = 0; i < Size(); ++i)
 			m[i] = (S)_M[i];
@@ -650,7 +650,7 @@ public:
      * @param indices List of indices
      * @return        Matrix containing values at indices
      */
-    inline Matrix<T> operator() (const Vector<size_t>& indices, size_t col = 0) const {
+    inline Matrix<T> operator() (const Vector<size_t>& indices, size_t col = 0) const NOEXCEPT {
     	size_t indices_size = indices.size();
     	assert (indices_size);
     	assert (col < _dim[1]);
@@ -668,7 +668,7 @@ public:
      * @param indices List of indices
      * @return        Matrix containing values at indices
      */
-    inline Matrix<T> operator() (size_t row, const Vector<size_t>& indices) const {
+    inline Matrix<T> operator() (size_t row, const Vector<size_t>& indices) const NOEXCEPT {
     	size_t indices_size = indices.size();
     	assert (indices_size);
     	assert (row < _dim[0]);
@@ -686,7 +686,7 @@ public:
      * @param indices List of indices
      * @return        Matrix containing values at indices
      */
-    inline Matrix<T> operator() (const Vector<size_t>& row_inds, const Vector<size_t>& col_inds) const {
+    inline Matrix<T> operator() (const Vector<size_t>& row_inds, const Vector<size_t>& col_inds) const NOEXCEPT {
     	size_t row_inds_size = row_inds.size();
     	size_t col_inds_size = col_inds.size();
     	assert (row_inds_size);
@@ -712,7 +712,7 @@ public:
      * @return          Requested scalar value.
      */
     inline const T&
-    operator()          (const size_t p) const {
+    operator()          (const size_t p) const NOEXCEPT {
         return this->At(p);
     }
 
@@ -724,7 +724,7 @@ public:
      * @return          Requested scalar value.
      */
     inline T&
-    operator()          (const size_t p) {
+    operator()          (const size_t p) NOEXCEPT {
         return this->At(p);
     }
 
@@ -737,7 +737,7 @@ public:
      * @return          Value
      */
     inline const T&
-    operator()          (const size_t x, const size_t y) const {
+    operator()          (const size_t x, const size_t y) const NOEXCEPT {
         return this->At(x,y);
     }
     
@@ -750,7 +750,7 @@ public:
      * @return          Reference
      */
     inline T&
-    operator()           (const size_t x, const size_t y) {
+    operator()           (const size_t x, const size_t y) NOEXCEPT {
         return this->At(x,y);
     }
     
@@ -765,7 +765,7 @@ public:
      * @return           Value
      */
     inline const T&
-    operator()           (const size_t x, const size_t y, const size_t z) const {
+    operator()           (const size_t x, const size_t y, const size_t z) const NOEXCEPT {
         return this->At(x,y,z);
     }
     
@@ -780,7 +780,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&
-    operator()           (const size_t x, const size_t y, const size_t z) {
+    operator()           (const size_t x, const size_t y, const size_t z) NOEXCEPT {
         return this->At(x,y,z);
     }
     
@@ -795,7 +795,7 @@ public:
      * @return           Value
      */
     inline const T&
-    operator()           (const size_t x, const size_t y, const size_t z, const size_t w) const {
+    operator()           (const size_t x, const size_t y, const size_t z, const size_t w) const NOEXCEPT {
         return this->At(x,y,z,w);
     }
 
@@ -810,7 +810,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&
-    operator()           (const size_t x, const size_t y, const size_t z, const size_t w) {
+    operator()           (const size_t x, const size_t y, const size_t z, const size_t w) NOEXCEPT {
         return this->At(x,y,z,w);
     }
 
@@ -840,7 +840,7 @@ public:
     operator()     (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
 					const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
 					const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
-					const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) {
+					const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) NOEXCEPT {
 
 		assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
 		  (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
@@ -878,7 +878,7 @@ public:
     operator()           (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
                           const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
                           const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
-                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) const {
+                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) const NOEXCEPT {
 
     	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
     	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
@@ -962,7 +962,7 @@ public:
      * @return          Number of rows.
      */
     inline size_t
-    Height              () const {
+    Height              () const NOEXCEPT {
         return _dim[0];
     }
 
@@ -973,7 +973,7 @@ public:
      * @return          Number of columns.
      */
     inline size_t
-    Width               () const {
+    Width               () const NOEXCEPT {
         return (_dim.size()>1) ? _dim[1] : 1;
     }
 
@@ -985,7 +985,7 @@ public:
      * @return          Number of rows.
      */
     inline size_t
-    GHeight              () const {
+    GHeight              () const NOEXCEPT {
         return _gdim[0];
     }
 
@@ -996,7 +996,7 @@ public:
      * @return          Number of columns.
      */
     inline size_t
-    GWidth               () const {
+    GWidth               () const NOEXCEPT {
         return _gdim[1];
     }
 
@@ -1007,7 +1007,7 @@ public:
      * @return          Number of columns.
      */
     inline const int*
-    Desc               () const {
+    Desc               () const NOEXCEPT {
         return _desc;
     }
 #endif
@@ -1020,7 +1020,7 @@ public:
      * @return          Resolution .
      */
     inline float
-    Res                 (const size_t i) const {
+    Res                 (const size_t i) const NOEXCEPT {
         assert (i < _res.size());
         return _res[i];
     }
@@ -1033,7 +1033,7 @@ public:
      * @return          Resolution
      */
     inline float&
-    Res                 (const size_t i)       {
+    Res                 (const size_t i)       NOEXCEPT {
         assert (i < _res.size());
         return _res[i];
     }
@@ -1046,7 +1046,7 @@ public:
      * @return          All resolutions
      */
     inline const Vector<float>&
-    Res                 () const {
+    Res                 () const NOEXCEPT {
         return _res;
     }
 
@@ -1059,7 +1059,7 @@ public:
      * @return          Dimension
      */
     inline size_t
-    Dim                 (const size_t i)  const {
+    Dim                 (const size_t i)  const NOEXCEPT {
         return (i < _dim.size()) ? _dim[i]: 1;
     }
 
@@ -1070,13 +1070,13 @@ public:
      * @return          All dimensions
      */
     inline const Vector<size_t>&
-    Dim                 ()                  const {
+    Dim                 ()                  const NOEXCEPT {
         return _dim;
     }
 
 
     inline size_t
-    NDim() const {
+    NDim() const NOEXCEPT {
     	return _dim.size();
     }
 
@@ -1087,7 +1087,7 @@ public:
      * @return          All dimensions
      */
     inline const Vector<size_t>&
-    Dsz                 ()                  const {
+    Dsz                 ()                  const NOEXCEPT {
         return _dsz;
     }
 
@@ -1096,7 +1096,7 @@ public:
      * @brief           Purge data and free RAM.
      */
     inline void
-    Clear               ()                                      {
+    Clear               ()                                      NOEXCEPT {
     	_dim.Clear();
         _dsz.Clear();
         _res.Clear();
@@ -1124,7 +1124,7 @@ public:
      * @return          Class name
      */ 
     inline const char*
-    GetClassName        () const { 
+    GetClassName        () const NOEXCEPT { 
         return _name.c_str(); 
     }
 
@@ -1135,7 +1135,7 @@ public:
      * @return          Class name
      */ 
     inline void
-    SetClassName        (const char* name) { 
+    SetClassName        (const char* name) NOEXCEPT { 
         _name = name; 
     }
 
@@ -1146,7 +1146,7 @@ public:
      * @return          Size
      */
     inline size_t
-    Size () const {        
+    Size () const NOEXCEPT {        
         return _M.size();
     }
 
@@ -1169,7 +1169,7 @@ public:
 	 * @return      Left hand side
 	 */
     inline Matrix<T,P>&
-    operator= (Matrix<T,P>&& rhs) noexcept {
+    operator= (Matrix<T,P>&& rhs) NOEXCEPT {
         _M    = std::move(rhs._M);
         _name = std::move(rhs._name);
         _res  = std::move(rhs._res);
@@ -1183,7 +1183,7 @@ public:
 	 * @return      Left hand side
 	 */
     inline Matrix<T,P>&
-    operator= (const Matrix<T,P>& rhs) noexcept {
+    operator= (const Matrix<T,P>& rhs) NOEXCEPT {
         _M    = rhs._M;
         _name = rhs._name;
         _res  = rhs._res;
@@ -1198,7 +1198,7 @@ public:
      * @param  v        Data vector (size must match numel(M)).
      */
     inline Matrix<T,P>&
-    operator=           (const Vector<T>& v) {
+    operator=           (const Vector<T>& v) NOEXCEPT {
 
     	assert (_M.size() == v.size());
 
@@ -1217,7 +1217,7 @@ public:
      * @param  s        The assigned scalar.
      */
     inline const Matrix<T,P>&
-    operator=           (const T s) {
+    operator=           (const T s) NOEXCEPT {
         T t = T(s);
         std::fill(_M.begin(), _M.end(), t);
         return *this;
@@ -1230,7 +1230,7 @@ public:
      * @return          Negation
      */
     inline Matrix<T,P>
-    operator-           () const {
+    operator-           () const NOEXCEPT {
         Matrix<T,P> res (_dim);
         std::transform (_M.begin(), _M.end(), res.Begin(), std::negate<T>());
         return res;
@@ -1243,7 +1243,7 @@ public:
      * @return          Identity
      */
     inline Matrix<T,P>
-    operator+           () const {
+    operator+           () const NOEXCEPT {
         return *this;
     }
 
@@ -1254,7 +1254,7 @@ public:
      * @return          Matrix::tr()
      */
     inline Matrix<T,P>
-    operator!           () const {
+    operator!           () const NOEXCEPT {
     	assert(_dim.size() ==2);
     	Matrix<T,P> res = *this;
 		for (size_t i = 0; i < _dim[1]; ++i)
@@ -1282,7 +1282,7 @@ public:
      * @return          Matrix of false where elements are equal s and true else.
      */
     inline Matrix<cbool>
-    operator!=          (const T s) const {
+    operator!=          (const T s) const NOEXCEPT {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = (_M[i] != s) ? 1 : 0;
@@ -1298,7 +1298,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator>           (const T s) const {
+    operator>           (const T s) const NOEXCEPT {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater(_M[i], s);
@@ -1315,7 +1315,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator>=          (const T s) const {
+    operator>=          (const T s) const NOEXCEPT {
 		Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater_or_equal(_M[i], s);
@@ -1330,7 +1330,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator<=          (const T s) const {
+    operator<=          (const T s) const NOEXCEPT {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less_or_equal(_M[i], s);
@@ -1345,7 +1345,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator<           (const T s) const {
+    operator<           (const T s) const NOEXCEPT {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less(_M[i], s);
@@ -1360,7 +1360,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator!=          (const Matrix<T,P>& M) const {
+    operator!=          (const Matrix<T,P>& M) const NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         Matrix<cbool> res(_dim,_res);
         for (size_t i = 0; i < Size(); ++i)
@@ -1376,7 +1376,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator>=          (const Matrix<T,P>& M) const {
+    operator>=          (const Matrix<T,P>& M) const NOEXCEPT {
     	op_assert (_dim == M.Dim(), *this, M);
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
@@ -1392,7 +1392,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator<=          (const Matrix<T,P>& M) const {
+    operator<=          (const Matrix<T,P>& M) const NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
@@ -1408,7 +1408,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator>           (const Matrix<T,P>& M) const {
+    operator>           (const Matrix<T,P>& M) const NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         Matrix<cbool> res(_dim,_res);
         for (size_t i = 0; i < Size(); ++i)
@@ -1424,7 +1424,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator<           (const Matrix<T,P>& M) const {
+    operator<           (const Matrix<T,P>& M) const NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         Matrix<cbool> res(_dim,_res);
         for (size_t i = 0; i < Size(); ++i)
@@ -1440,7 +1440,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator||          (const Matrix<T,P>& M) const {
+    operator||          (const Matrix<T,P>& M) const NOEXCEPT {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::logical_or(_M[i], M[i]);
@@ -1455,7 +1455,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<short>
-    operator|          (const Matrix<T,P>& rhs) const {
+    operator|          (const Matrix<T,P>& rhs) const NOEXCEPT {
         Matrix<cbool> ret(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	ret[i] = (short)CompTraits<T>::logical_or(_M[i], ret[i]);
@@ -1470,7 +1470,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator&&          (const Matrix<T,P>& M) const {
+    operator&&          (const Matrix<T,P>& M) const NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
@@ -1486,7 +1486,7 @@ public:
      * @return          Result
      */
     inline Matrix<T,P>
-    operator^           (const float p) const {
+    operator^           (const float p) const NOEXCEPT {
     	Matrix<T,P> res = *this;
 		for (size_t i = 0; i < Size(); ++i)
 			res[i] = (p == 0) ? T(1) : TypeTraits<T>::Pow(res[i],  p);
@@ -1501,7 +1501,7 @@ public:
      * @return          Result
      */
     inline Matrix<T,P>&
-    operator^=          (const float p) {
+    operator^=          (const float p) NOEXCEPT {
 		for (size_t i = 0; i < Size(); ++i)
 			_M[i] = TypeTraits<T>::Pow(_M[i],  p);
         return *this;
@@ -1515,7 +1515,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator+           (const S s) const {
+    operator+           (const S s) const NOEXCEPT {
         Matrix<T,P> res = *this;
         return res += s;
     }
@@ -1528,7 +1528,7 @@ public:
      * @return          Result
      */
     inline Matrix<T,P>&
-    operator+=         (const Matrix<T,P>& M) {
+    operator+=         (const Matrix<T,P>& M) NOEXCEPT {
     	op_assert (_dim == M.Dim(), *this, M);
    		std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
         return *this;
@@ -1542,7 +1542,7 @@ public:
 	 * @return          Result
 	 */
     template <class S> inline Matrix<T,P>&
-    operator+=         (const Matrix<S,P>& M) {
+    operator+=         (const Matrix<S,P>& M) NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
 		return *this;
@@ -1556,7 +1556,7 @@ public:
      * @return          Result
      */
     template <class S > inline Matrix<T,P>&
-    operator+=          (const S s) {
+    operator+=          (const S s) NOEXCEPT {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),(T)s));
         return *this;
     }
@@ -1567,7 +1567,7 @@ public:
      * @param  s        Scalar substruent.
      */
     template <class S> inline Matrix<T,P>
-    operator-           (const S s) const {
+    operator-           (const S s) const NOEXCEPT {
 		Matrix<T,P> res = *this;
 		return res -= s;
     }
@@ -1581,7 +1581,7 @@ public:
      * @return          Result
      */
     inline Matrix<T,P>&
-    operator-=         (const Matrix<T,P>& M) {
+    operator-=         (const Matrix<T,P>& M) NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
         return *this;
@@ -1595,7 +1595,7 @@ public:
      * @return          Result
      */
     template <class S> inline Matrix<T,P>&
-    operator-=          (const Matrix<S,P>& M) {
+    operator-=          (const Matrix<S,P>& M) NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
         return *this;
@@ -1608,7 +1608,7 @@ public:
      * @return          Result
      */
     template <class S> inline Matrix<T,P>&
-    operator-=          (const S s) {
+    operator-=          (const S s) NOEXCEPT {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::minus<T>(),(T)s));
 		return *this;
     }
@@ -1620,7 +1620,7 @@ public:
      * @return          Result
      */
     /*inline Matrix<T,P>
-    operator*          (const Matrix<T,P> &M) const {
+    operator*          (const Matrix<T,P> &M) const NOEXCEPT {
 		Matrix<T,P> res = *this;
 		return res *= M;
     }*/
@@ -1634,7 +1634,7 @@ public:
      */
     /*template <class S>
     inline Matrix<T,P>
-    operator*          (const Matrix<S,P> &M) const {
+    operator*          (const Matrix<S,P> &M) const NOEXCEPT {
 		Matrix<T,P> res = *this;
 		return res *= M;
     }*/
@@ -1648,7 +1648,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator*          (const S s) const  {
+    operator*          (const S s) const  NOEXCEPT {
         Matrix<T,P> res = *this;
         return res *= s;
     }
@@ -1662,7 +1662,7 @@ public:
      * @return          Result
      */
     inline Matrix<T,P>&
-    operator*=         (const Matrix<T,P>& M) {
+    operator*=         (const Matrix<T,P>& M) NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
         return *this;
@@ -1676,7 +1676,7 @@ public:
      * @return          Result
      */
     template <class S> inline Matrix<T,P>&
-    operator*=         (const Matrix<S,P>& M) {
+    operator*=         (const Matrix<S,P>& M) NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
         return *this;
@@ -1690,7 +1690,7 @@ public:
      * @return          Result
      */
     template <class S> inline Matrix<T,P>&
-    operator*=         (const S s) {
+    operator*=         (const S s) NOEXCEPT {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
 		return *this;
     }
@@ -1704,7 +1704,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator/           (const S s) const {
+    operator/           (const S s) const NOEXCEPT {
 		Matrix<T,P> res = *this;
 		return res /= s;
 	}
@@ -1717,7 +1717,7 @@ public:
      * @return          Result
      */
     inline Matrix<T,P>&
-    operator/=         (const Matrix<T,P>& M) {
+    operator/=         (const Matrix<T,P>& M) NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
         return *this;
@@ -1731,7 +1731,7 @@ public:
      * @return          Result
      */
     template <class S> inline Matrix<T,P>&
-    operator/=         (const Matrix<S,P> &M) {
+    operator/=         (const Matrix<S,P> &M) NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
         return *this;
@@ -1747,7 +1747,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>&
-    operator/=         (const S s) {
+    operator/=         (const S s) NOEXCEPT {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::divides<T>(),(T)s));
         return *this;
     }
@@ -1773,7 +1773,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator*  (const double s, const Matrix<T,P>& m) {
+    operator*  (const double s, const Matrix<T,P>& m) NOEXCEPT {
         return   m * s;
     }
 
@@ -1786,7 +1786,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator*  (const float s, const Matrix<T,P> &m) {
+    operator*  (const float s, const Matrix<T,P> &m) NOEXCEPT {
         return   m * s;
     }
 
@@ -1799,7 +1799,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator*  (const short s, const Matrix<T,P> &m) {
+    operator*  (const short s, const Matrix<T,P> &m) NOEXCEPT {
         return   m * s;
     }
 
@@ -1812,7 +1812,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator*  (const int s, const Matrix<T,P> &m) {
+    operator*  (const int s, const Matrix<T,P> &m) NOEXCEPT {
         return   m * s;
     }
 
@@ -1825,7 +1825,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator*  (const long s, const Matrix<T,P> &m) {
+    operator*  (const long s, const Matrix<T,P> &m) NOEXCEPT {
         return   m * s;
     }
 
@@ -1838,7 +1838,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator*  (const cxfl s, const Matrix<T,P> &m) {
+    operator*  (const cxfl s, const Matrix<T,P> &m) NOEXCEPT {
         return   m * s;
     }
 
@@ -1851,7 +1851,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator*  (const cxdb s, const Matrix<T,P> &m) {
+    operator*  (const cxdb s, const Matrix<T,P> &m) NOEXCEPT {
         return   m * s;
     }
 
@@ -1865,7 +1865,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator+  (const double s, const Matrix<T,P> &m) {
+    operator+  (const double s, const Matrix<T,P> &m) NOEXCEPT {
         return   m + s;
     }
 
@@ -1878,7 +1878,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator+  (const float s, const Matrix<T,P> &m) {
+    operator+  (const float s, const Matrix<T,P> &m) NOEXCEPT {
         return   m + s;
     }
 
@@ -1891,7 +1891,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator+  (const short s, const Matrix<T,P> &m) {
+    operator+  (const short s, const Matrix<T,P> &m) NOEXCEPT {
         return   m + s;
     }
 
@@ -1904,7 +1904,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator+  (const int s, const Matrix<T,P> &m) {
+    operator+  (const int s, const Matrix<T,P> &m) NOEXCEPT {
         return   m + s;
     }
 
@@ -1917,7 +1917,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator+  (const long s, const Matrix<T,P> &m) {
+    operator+  (const long s, const Matrix<T,P> &m) NOEXCEPT {
         return   m + s;
     }
 
@@ -1930,7 +1930,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator+  (const cxfl s, const Matrix<T,P> &m) {
+    operator+  (const cxfl s, const Matrix<T,P> &m) NOEXCEPT {
         return   m + s;
     }
 
@@ -1943,7 +1943,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator+  (const cxdb s, const Matrix<T,P> &m) {
+    operator+  (const cxdb s, const Matrix<T,P> &m) NOEXCEPT {
         return   m + s;
     }
 
@@ -1957,7 +1957,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator-  (const double s, const Matrix<T,P> &m) {
+    operator-  (const double s, const Matrix<T,P> &m) NOEXCEPT {
         return -m + s;
     }
 
@@ -1970,7 +1970,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator-  (const float s, const Matrix<T,P> &m) {
+    operator-  (const float s, const Matrix<T,P> &m) NOEXCEPT {
         return -m + s;
     }
 
@@ -1983,7 +1983,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator-  (const short s, const Matrix<T,P> &m) {
+    operator-  (const short s, const Matrix<T,P> &m) NOEXCEPT {
         return -m + s;
     }
 
@@ -1996,7 +1996,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator-  (const int s, const Matrix<T,P> &m) {
+    operator-  (const int s, const Matrix<T,P> &m) NOEXCEPT {
         return -m + s;
     }
 
@@ -2009,7 +2009,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator-  (const long s, const Matrix<T,P> &m) {
+    operator-  (const long s, const Matrix<T,P> &m) NOEXCEPT {
         return   -m + s;
     }
 
@@ -2022,7 +2022,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator-  (const cxfl s, const Matrix<T,P> &m) {
+    operator-  (const cxfl s, const Matrix<T,P> &m) NOEXCEPT {
         return   -m + s;
     }
 
@@ -2035,7 +2035,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator-  (const cxdb s, const Matrix<T,P> &m) {
+    operator-  (const cxdb s, const Matrix<T,P> &m) NOEXCEPT {
         return   -m + s;
     }
 
@@ -2048,7 +2048,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator/  (const T s, const Matrix<T,P> &m) {
+    operator/  (const T s, const Matrix<T,P> &m) NOEXCEPT {
         Matrix<T,P> res = m;
         for (size_t i = 0; i < m.Size(); ++i)
             res[i] = s / res[i];
@@ -2063,7 +2063,7 @@ public:
      * @return          m == s
      */
     inline friend Matrix<cbool>
-    operator== (const T s, const Matrix<T,P>& m) {
+    operator== (const T s, const Matrix<T,P>& m) NOEXCEPT {
         return   m == s;
     }
 
@@ -2076,7 +2076,7 @@ public:
      * @return          m <= t
      */
     inline friend Matrix<cbool>
-    operator>= (const T s, const Matrix<T,P>& m) {
+    operator>= (const T s, const Matrix<T,P>& m) NOEXCEPT {
         return   m <= s;
     }
 
@@ -2089,7 +2089,7 @@ public:
      * @return          T<=M
      */
     inline friend Matrix<cbool>
-    operator<= (const T s, const Matrix<T,P>& m) {
+    operator<= (const T s, const Matrix<T,P>& m) NOEXCEPT {
         return   m >= s;
     }
 
@@ -2102,7 +2102,7 @@ public:
      * @return          T!=M
      */
     inline friend Matrix<cbool>
-    operator!= (const T s, const Matrix<T,P>& m) {
+    operator!= (const T s, const Matrix<T,P>& m) NOEXCEPT {
         return   m != s;
     }
 
@@ -2115,7 +2115,7 @@ public:
      * @return          T+M
      */
     inline friend Matrix<cbool>
-    operator>  (const T s, const Matrix<T,P>& m) {
+    operator>  (const T s, const Matrix<T,P>& m) NOEXCEPT {
         return   m <  s;
     }
 
@@ -2128,7 +2128,7 @@ public:
      * @return          T+M
      */
     inline friend Matrix<cbool>
-    operator<  (const T s, const Matrix<T,P>& m) {
+    operator<  (const T s, const Matrix<T,P>& m) NOEXCEPT {
         return   m >  s;
     }
 
@@ -2155,7 +2155,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator==          (const Matrix<T,P>& M) const {
+    operator==          (const Matrix<T,P>& M) const NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
         Matrix<cbool> res(_dim);
 		for (size_t i = 0; i < Size(); ++i)
@@ -2173,7 +2173,7 @@ public:
 	 */
     template<class S>
 	inline Matrix<cbool>
-	operator==          (const Matrix<S,P>& M) const {
+	operator==          (const Matrix<S,P>& M) const NOEXCEPT {
         op_assert (_dim == M.Dim(), *this, M);
 		Matrix<cbool> res (_dim);
 		for (size_t i = 0; i < Size(); ++i)
@@ -2188,7 +2188,7 @@ public:
      * @return          Matrix of true where elements are equal s and false else.
      */
     inline Matrix<cbool>
-    operator==          (const T s) const {
+    operator==          (const T s) const NOEXCEPT {
     	T t = (T) s;
         Matrix<cbool> res (_dim);
 		for (size_t i = 0; i < Size(); ++i)
@@ -2206,7 +2206,7 @@ protected:
      * @return          Size
      */
     inline size_t
-    DimProd () const {
+    DimProd () const NOEXCEPT {
       return std::accumulate(_dim.begin(), _dim.end(), size_t(1), c_multiply<size_t>);
     }
 
@@ -2214,7 +2214,7 @@ protected:
      * @brief          Allocate RAM
      */
     inline void
-    Allocate () {
+    Allocate () NOEXCEPT {
         size_t ds = _dim.size(), i;
 		_dsz.resize(ds,1);
 	    for (i = 1; i < ds; ++i)
@@ -2243,55 +2243,7 @@ protected:
 #endif
     
 };
-/*
-template<typename T, paradigm P>
-inline Matrix<T,P> operator+( const Matrix<T,P>& lhs, const Matrix<T,P>& rhs ) noexcept {
-  Matrix<T,P> nrv( lhs );
-  nrv += rhs;
-  return nrv;
-}
-#ifdef HAVE_CXX11_RVALUE_REFERENCES
-template<typename T, paradigm P>
-inline Matrix<T,P>&& operator+( Matrix<T,P>&& lhs, const Matrix<T,P>& rhs ) noexcept {
-  lhs += rhs;
-  return std::move( lhs );
-}
-template<typename T, paradigm P>
-inline Matrix<T,P>&& operator+( const Matrix<T,P>& lhs, Matrix<T,P>&& rhs ) noexcept {
-  rhs += lhs;
-  return std::move( rhs );
-}
-template<typename T, paradigm P>
-inline Matrix<T,P>&& operator+( Matrix<T,P>&& lhs, Matrix<T,P>&& rhs ) noexcept {
-  lhs += std::move( rhs );
-  return std::move( lhs );
-}
-#endif // HAVE_CXX11_RVALUE_REFERENCES
 
-template<typename T, paradigm P>
-inline Matrix<T,P> operator*( const Matrix<T,P>& lhs, const Matrix<T,P>& rhs ) noexcept {
-  Matrix<T,P> nrv( lhs );
-  nrv *= rhs;
-  return nrv;
-}
-#ifdef HAVE_CXX11_RVALUE_REFERENCES
-template<typename T, paradigm P>
-inline Matrix<T,P>&& operator*( Matrix<T,P>&& lhs, const Matrix<T,P>& rhs ) noexcept {
-  lhs *= rhs;
-  return std::move( lhs );
-}
-template<typename T, paradigm P>
-inline Matrix<T,P>&& operator*( const Matrix<T,P>& lhs, Matrix<T,P>&& rhs ) noexcept {
-  rhs *= lhs;
-  return std::move( rhs );
-}
-template<typename T, paradigm P>
-inline Matrix<T,P>&& operator*( Matrix<T,P>&& lhs, Matrix<T,P>&& rhs ) noexcept {
-  lhs *= std::move( rhs );
-  return std::move( lhs );
-}
-#endif // HAVE_CXX11_RVALUE_REFERENCES
-*/
 #endif // __MATRIX_H__
 
 

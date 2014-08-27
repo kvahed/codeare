@@ -23,6 +23,7 @@
 #  HAS_CXX11_SHARED_PTR         - Shared Pointer
 #  HAS_CXX11_THREAD             - thread
 #  HAS_CXX11_MUTEX              - mutex 
+#  HAS_CXX11_NOEXCEPT           - noexcept 
 
 #=============================================================================
 # Copyright 2011,2012 Rolf Eike Beer <eike@sf-mail.de>
@@ -148,3 +149,4 @@ cxx11_check_feature("variadic_templates" HAS_CXX11_VARIADIC_TEMPLATES)
 cxx11_check_feature("shared_ptr" HAS_CXX11_SHARED_PTR)
 cxx11_check_feature("thread" HAS_CXX11_THREAD)
 cxx11_check_feature("mutex" HAS_CXX11_MUTEX)
+cxx11_check_feature("noexcept" HAS_CXX11_NOEXCEPT)
