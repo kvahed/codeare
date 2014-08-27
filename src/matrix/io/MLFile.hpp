@@ -16,7 +16,7 @@
 template <class T> inline static bool
 MXValidate  (const Matrix<T>& M, const mxArray* mxa) {
 
-	T t;
+	T t = (T)0;
 	mxClassID     mcid = mxGetClassID(mxa);
 	std::string cplx = (mxIsComplex(mxa)) ? "complex" : "real";
 
