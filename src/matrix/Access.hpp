@@ -4,31 +4,31 @@
 #include "Algos.hpp"
 
 template<class T> inline size_t
-ind2i (const Matrix<T>& M, const size_t& ind) {
+ind2i (const Matrix<T>& M, const size_t& ind) NOEXCEPT {
     return (size_t) ind % size(M,0);
 }
 
 
 template<class T> inline size_t
-ind2j (const Matrix<T>& M, const size_t& ind) {
+ind2j (const Matrix<T>& M, const size_t& ind) NOEXCEPT {
     return (size_t) floor (ind/size(M,0)) % (size(M,1)-1);
 }
 
 
 template<class T> inline size_t
-ind2k (const Matrix<T>& M, const size_t& ind) {
+ind2k (const Matrix<T>& M, const size_t& ind) NOEXCEPT {
     return (size_t) floor (ind/(size(M,0)*size(M,1))) % (size(M,2)-1);
 }
 
 
 template<class T> inline size_t
-ind2l (const Matrix<T>& M, const size_t& ind) {
+ind2l (const Matrix<T>& M, const size_t& ind) NOEXCEPT {
     return (size_t) floor (ind/(size(M,0)*size(M,1)*size(M,2))) % (size(M,3)-1);
 }
 
 
 template<class T> inline size_t
-ind2x (const Matrix<T>& M, const size_t& ind, const size_t& dim) {
+ind2x (const Matrix<T>& M, const size_t& ind, const size_t& dim) NOEXCEPT {
 
     size_t x = 1;
 
@@ -43,7 +43,7 @@ ind2x (const Matrix<T>& M, const size_t& ind, const size_t& dim) {
 
 
 template<class T> inline Matrix<size_t>
-ind2sub2d (const Matrix<T>& M, const Matrix<size_t>& inds) {
+ind2sub2d (const Matrix<T>& M, const Matrix<size_t>& inds) NOEXCEPT {
 
     Matrix<T>      tmp = squeeze(M);
     Matrix<size_t> subs (inds.Size(), 2);
@@ -58,7 +58,7 @@ ind2sub2d (const Matrix<T>& M, const Matrix<size_t>& inds) {
 
 
 template <class T> inline Matrix<size_t>
-ind2sub3d (const Matrix<T>& M, const Matrix<size_t>& inds) {
+ind2sub3d (const Matrix<T>& M, const Matrix<size_t>& inds) NOEXCEPT {
 
     Matrix <size_t> subs (inds.Size(), 3);
 
@@ -72,7 +72,7 @@ ind2sub3d (const Matrix<T>& M, const Matrix<size_t>& inds) {
 
 
 template <class T> inline Matrix<size_t>
-sub2ind  (const Matrix<T>& M, const Matrix<size_t>& subs) {
+sub2ind  (const Matrix<T>& M, const Matrix<size_t>& subs) NOEXCEPT {
 
     size_t n = size(subs,0);
 
@@ -93,7 +93,7 @@ sub2ind  (const Matrix<T>& M, const Matrix<size_t>& subs) {
  * @return             Desired volume of M
  */
 template <class T> inline Matrix<T>
-Volume (const Matrix<T>& M, const size_t& s) {
+Volume (const Matrix<T>& M, const size_t& s) NOEXCEPT {
 	
 	Matrix<T> res (size(M,0), size(M,1), size(M,2));
 	size_t nc = numel (res);
@@ -113,7 +113,7 @@ Volume (const Matrix<T>& M, const size_t& s) {
  * @param  A           Matrix to insert
  */
 template <class T> inline void
-Volume (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
+Volume (Matrix<T>& M, const size_t& s, const Matrix<T> A) NOEXCEPT {
 	
 	assert (size(M,0) == size(A,0));
 	assert (size(M,1) == size(A,1));
@@ -134,7 +134,7 @@ Volume (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
  * @return             Desired slice of M
  */
 template <class T> inline Matrix<T>
-Slice (const Matrix<T>& M, const size_t& s) {
+Slice (const Matrix<T>& M, const size_t& s) NOEXCEPT {
 	
 	Matrix<T> res (size(M,0),size(M,1));
 	size_t nc = numel (res);
@@ -154,7 +154,7 @@ Slice (const Matrix<T>& M, const size_t& s) {
  * @param  A           New slice
  */
 template <class T> inline void
-Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
+Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) NOEXCEPT {
 	
 	assert (size(M,0) == size(A,0));
 	assert (size(M,1) == size(A,1));
@@ -174,7 +174,7 @@ Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) {
  * @param  v           Scalar value           
  */
 template <class T> inline void
-Slice (Matrix<T>& M, const size_t& s, const T& v) {
+Slice (Matrix<T>& M, const size_t& s, const T& v) NOEXCEPT {
 	size_t ns = size(M,0) * size(M,1);
 	Vector<T> vv;
 	vv.resize(ns, v);
@@ -190,7 +190,7 @@ Slice (Matrix<T>& M, const size_t& s, const T& v) {
  * @return             Desired row of M
  */
 template <class T> inline Matrix<T>
-Row (const Matrix<T>& M, const size_t& r)  {
+Row (const Matrix<T>& M, const size_t& r)  NOEXCEPT {
 	
 	size_t nc, nr, ns, s, rr;
 	Matrix<T> res (1, size(M, 1));
@@ -218,7 +218,7 @@ Row (const Matrix<T>& M, const size_t& r)  {
  * @param  A           Matrix to copy from
  */
 template <class T> inline void
-Row (Matrix<T>& M, const size_t& r, const Matrix<T> A)  {
+Row (Matrix<T>& M, const size_t& r, const Matrix<T> A)  NOEXCEPT {
 	
 	size_t nc, nr, ns, s, rr;
 
@@ -245,7 +245,7 @@ Row (Matrix<T>& M, const size_t& r, const Matrix<T> A)  {
  * @param  v           Scalar value
  */
 template <class T> inline void
-Row (Matrix<T>& M, const size_t& r, const T& v)  {
+Row (Matrix<T>& M, const size_t& r, const T& v)  NOEXCEPT {
 	
 	size_t nc, nr, ns, s, rr;
 
@@ -270,7 +270,7 @@ Row (Matrix<T>& M, const size_t& r, const T& v)  {
  * @return             Desired row of M
  */
 template <class T> inline Matrix<T>
-Column (const Matrix<T>& M, const size_t& c) {
+Column (const Matrix<T>& M, const size_t& c) NOEXCEPT {
 	
 	Matrix<T> res (size(M, 0),1);
 	
@@ -289,7 +289,7 @@ Column (const Matrix<T>& M, const size_t& c) {
  * @param  A           Vector to copy from
  */
 template <class T> inline void
-Column (Matrix<T>& M, const size_t& c, const Matrix<T> A) {
+Column (Matrix<T>& M, const size_t& c, const Matrix<T> A) NOEXCEPT {
 	
 	assert (size(M,0) == size (A,0));
 	size_t nc = size(M,0);

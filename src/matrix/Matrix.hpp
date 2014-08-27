@@ -2210,6 +2210,7 @@ protected:
       return std::accumulate(_dim.begin(), _dim.end(), size_t(1), c_multiply<size_t>);
     }
 
+
     /**
      * @brief          Allocate RAM
      */
@@ -2224,13 +2225,16 @@ protected:
             _M.resize(n);
     }
 
+
     // Structure
     Vector<size_t> _dim; /// Dimensions
     Vector<size_t> _dsz; /// Dimension size.
     Vector<float>  _res; /// Resolutions
     
+
     //Data
     Vector<T>        _M; /// Data container
+
 
     // Name
     std::string         _name; /// Name

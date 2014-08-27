@@ -43,7 +43,7 @@ public:
 	/**
 	 * @brief         Default constructor
 	 */
-	NFFT() :
+	NFFT() NOEXCEPT :
 		m_initialised (false),
 		m_have_pc (false),
 		m_imgsz (0),
@@ -64,10 +64,10 @@ public:
 	 * @param  eps     Convergence criterium for inverse transform (default: 1.0e-7)
 	 * @param  maxit   Maximum # NFFT iterations (default: 3)
 	 */
-	NFFT        (const Matrix<size_t>& imsize, const size_t& nk, const size_t m = 1, 
+	inline NFFT        (const Matrix<size_t>& imsize, const size_t& nk, const size_t m = 1, 
 				 const T alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1),
 				 const Matrix< std::complex<T> > pc = Matrix< std::complex<T> >(1),
-				 const T eps = 7.0e-4, const size_t maxit = 2) {
+				 const T eps = 7.0e-4, const size_t maxit = 2) NOEXCEPT {
 		
 		m_M     = nk;
 		m_imgsz = 2;
@@ -96,7 +96,7 @@ public:
 	}
 	
 	
-	NFFT (const Params& p) {
+	inline NFFT (const Params& p) NOEXCEPT {
 
 		if (p.exists("nk")) {// Number of kspace samples
 			try {
@@ -191,7 +191,7 @@ public:
 	/**
 	 * @brief Copy conctructor
 	 */
-	NFFT (const NFFT<T>& ft) {
+	NFFT (const NFFT<T>& ft) NOEXCEPT {
 		*this = ft;
 	}
 
@@ -199,7 +199,7 @@ public:
 	/**
 	 * @brief        Clean up and destruct
 	 */ 
-	~NFFT () {
+	~NFFT () NOEXCEPT {
 		
 		if (m_initialised)
 			NFFTTraits<double>::Finalize (m_fplan, m_iplan);
@@ -210,7 +210,7 @@ public:
 	/**
 	 * @brief 	Assignement
 	 */
-	inline NFFT<T>& operator= (const NFFT<T>& ft) {
+	inline NFFT<T>& operator= (const NFFT<T>& ft) NOEXCEPT {
 
 		m_initialised = ft.m_initialised;
 		m_have_pc     = ft.m_have_pc;
@@ -235,7 +235,7 @@ public:
 	 * @param  k   Kspace trajectory
 	 */
 	inline void 
-	KSpace (const Matrix<T>& k) {		
+	KSpace (const Matrix<T>& k) NOEXCEPT {		
 		assert (k.Size() == m_fplan.M_total*m_rank);
 		std::copy (k.Begin(), k.End(), m_fplan.x);
 	}
@@ -247,7 +247,7 @@ public:
 	 * @param  w   Weights
 	 */
 	inline void 
-	Weights (const Matrix<T>& w) {
+	Weights (const Matrix<T>& w) NOEXCEPT {
 		assert (w.Size() == m_fplan.M_total);
 		std::copy (w.Begin(), w.End(), m_iplan.w);
 		NFFTTraits<double>::Weights (m_fplan, m_iplan);
@@ -262,7 +262,7 @@ public:
 	 * @return   Transform
 	 */
 	Matrix< std::complex<T> >
-	Trafo       (const Matrix< std::complex<T> >& m) const {
+	Trafo       (const Matrix< std::complex<T> >& m) const NOEXCEPT {
 
 		Matrix< std::complex<T> > out (m_M,1);
 		double* tmpd;
@@ -290,7 +290,7 @@ public:
 	 * @return   Transform
 	 */
 	Matrix< std::complex<T> >
-	Adjoint     (const Matrix< std::complex<T> >& m) const {
+	Adjoint     (const Matrix< std::complex<T> >& m) const NOEXCEPT {
 
         Matrix< std::complex<T> > out (m_N);
         double* tmpd;
@@ -317,7 +317,7 @@ public:
 	 * @return    Plan
 	 */
 	Plan*
-	FPlan         () {
+	FPlan         () NOEXCEPT {
 		return &m_fplan;
 	}
 	
@@ -327,11 +327,11 @@ public:
 	 * @return    Plan
 	 */
 	Solver*
-	IPlan         () {
+	IPlan         () NOEXCEPT {
 		return &m_iplan;
 	}
 	
-	inline size_t Rank() const { return m_rank; }
+	inline size_t Rank() const NOEXCEPT { return m_rank; }
 
 private:
 	

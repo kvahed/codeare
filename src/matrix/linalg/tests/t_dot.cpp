@@ -19,7 +19,8 @@ template<class T> bool dot_check () {
 	}
 
 #ifdef VERBOSE
-    std::cout << "x=\n" << x << "y=\n" << y;
+    std::cout << "x=\n" << x  << std::endl;
+    std::cout << "y=\n" << y  << std::endl;
     std::cout << "y * y=\n" << a << " " << c << std::endl;
     std::cout << "x**H * y=\n" << b << " " << d << "\n" << std::endl;
 #endif

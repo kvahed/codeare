@@ -89,7 +89,7 @@ class DWT {
          * @param  num_threads  Number of OMP threads used in parallel regions.
          */
         DWT (const size_t sl1, const size_t sl2, const size_t sl3, const wlfamily wl_fam = WL_FAM,
-        		const int wl_mem = WL_MEM, const int wl_scale = WL_SCALE, const int num_threads = NUM_THREADS_DWT)
+        		const int wl_mem = WL_MEM, const int wl_scale = WL_SCALE, const int num_threads = NUM_THREADS_DWT) NOEXCEPT
             : _sl1 (sl1),
               _sl2 (sl2),
               _sl3 (sl3),
@@ -124,7 +124,7 @@ class DWT {
          * @param  num_threads  Number of OMP threads used in parallel regions.
          */
         DWT (const size_t sl1, const size_t sl2, const wlfamily wl_fam = WL_FAM, const int wl_mem = WL_MEM,
-        		const int wl_scale = WL_SCALE, const int num_threads = NUM_THREADS_DWT)
+        		const int wl_scale = WL_SCALE, const int num_threads = NUM_THREADS_DWT) NOEXCEPT
         : _sl1 (sl1),
           _sl2 (sl2),
           _sl3 (1),
@@ -184,7 +184,7 @@ class DWT {
 
 
         virtual
-        ~DWT () { }
+        ~DWT () NOEXCEPT { }
 
 
         /**
@@ -194,7 +194,7 @@ class DWT {
          * @param  res  Resulting DWT
          */
         inline void
-        Trafo        (const Matrix <T> & m, Matrix <T> & res) {
+        Trafo        (const Matrix <T> & m, Matrix <T> & res) NOEXCEPT {
 
             assert (   m.Dim (0) == _sl1
                     && m.Dim (1) == _sl2
@@ -214,7 +214,7 @@ class DWT {
          * @param  res  Reconstructed signal
          */
         inline void
-        Adjoint      (const Matrix <T> & m, Matrix <T> & res) {
+        Adjoint      (const Matrix <T> & m, Matrix <T> & res) NOEXCEPT {
 
             assert (   m.Dim (0) == _sl1
                     && m.Dim (1) == _sl2
@@ -234,7 +234,7 @@ class DWT {
          * @return   Transform
          */
         inline Matrix <T>
-        operator*    (const Matrix <T> & m) {
+        operator*    (const Matrix <T> & m) NOEXCEPT {
 
             if (_wl_fam == ID)
                 return m;
@@ -254,7 +254,7 @@ class DWT {
          * @return   Transform
          */
         inline Matrix <T>
-        operator->* (const Matrix <T> & m) {
+        operator->* (const Matrix <T> & m) NOEXCEPT {
 
             if (_wl_fam == ID)
                 return m;
@@ -334,7 +334,7 @@ class DWT {
          * @return          Start level.
          */
         inline int
-        MaxLevel            () const {
+        MaxLevel            () const NOEXCEPT {
             // create vars from mex function
             size_t nn = 1, max_level = 0;
             for (; nn < _min_sl; nn *= 2 )
@@ -359,7 +359,7 @@ class DWT {
          * @param  res  Decomposed signal.
          */
         inline void
-        dpwt2		(const Matrix <T> & sig, Matrix <T> & res) {
+        dpwt2		(const Matrix <T> & sig, Matrix <T> & res) NOEXCEPT {
 
             // assign signal to result matrix
             res = sig;
@@ -445,7 +445,7 @@ class DWT {
          * @param  res  Decomposed signal.
          */
         void
-        dpwt3       (const Matrix <T> & sig, Matrix <T> & res) {
+        dpwt3       (const Matrix <T> & sig, Matrix <T> & res) NOEXCEPT {
 
             // assign signal to result matrix
             res = sig;
@@ -567,7 +567,7 @@ class DWT {
          * @param  y        Data array to be written to.
          */
         inline static void
-        unpackdouble	(const T * const x, const int n, const int stride, const int offset, T * const y) {
+        unpackdouble	(const T * const x, const int n, const int stride, const int offset, T * const y) NOEXCEPT {
             for (int i = 0; i < n; i++)
                 y [i] = x [offset + stride * i];
         }
@@ -583,7 +583,7 @@ class DWT {
          * @param  y        Data array to be written to.
          */
         inline static void
-        packdouble		(const T * const x, const int n, const int stride, const int offset, T * const y) {
+        packdouble		(const T * const x, const int n, const int stride, const int offset, T * const y) NOEXCEPT {
             for (int i = 0; i < n; i++)
                 y [offset + stride * i] = x [i];
         }
@@ -596,7 +596,7 @@ class DWT {
          * @param  n    Number of data elements.
          */
         inline static void
-        copydouble (const T * const src, T * const dest, const int n) {
+        copydouble (const T * const src, T * const dest, const int n) NOEXCEPT {
         	std::copy (src, src + n, dest);
         }
 
@@ -610,7 +610,7 @@ class DWT {
          * @param  z    Result vector.
          */
         inline static void
-        adddouble (const T * const x, const T * const y, const int n, T * const z) {
+        adddouble (const T * const x, const T * const y, const int n, T * const z) NOEXCEPT {
             for (int i = 0; i < n; ++i)
                 z[i] = x[i] + y[i];
         }
@@ -624,7 +624,7 @@ class DWT {
          * @param  dwt_high     Resulting DWT.
          */
         inline void
-        downhi			(const T * const signal, const int side_length, T * const dwt_high) {
+        downhi			(const T * const signal, const int side_length, T * const dwt_high) NOEXCEPT {
 
             int j;
             T s;
@@ -691,7 +691,7 @@ class DWT {
          * @param  dwt_low      Resulting DWT.
          */
         void
-        downlo  		        (const T * const signal, const int side_length, T * const dwt_low) {
+        downlo  		        (const T * const signal, const int side_length, T * const dwt_low) NOEXCEPT {
 
             int j;
             T s;
@@ -765,7 +765,7 @@ class DWT {
          * @param  img  Reconstructed signal.
          */
         inline void
-        idpwt2		(const Matrix <T> & wc, Matrix <T> & img) {
+        idpwt2		(const Matrix <T> & wc, Matrix <T> & img) NOEXCEPT {
 
             // assign dwt to result image
             img = wc;
@@ -858,7 +858,7 @@ class DWT {
          * @param  wc   Wavelet presentation of 3D data.
          * @param  img  Reconstructed signal.
          */
-        inline  void idpwt3      (const Matrix <T> & wc, Matrix <T> & img)  {
+        inline  void idpwt3      (const Matrix <T> & wc, Matrix <T> & img)  NOEXCEPT {
 
             // assign dwt to result image
             img = wc;
@@ -994,7 +994,7 @@ class DWT {
          * @param  signal       Reconstructed signal.
          */
         inline void
-        uplo		(const T * const wc, const int side_length, T * const signal) {
+        uplo		(const T * const wc, const int side_length, T * const signal) NOEXCEPT {
 
             int j;
             T s, s_odd;
@@ -1089,7 +1089,7 @@ class DWT {
          * @param  signal       Reconstructed signal.
          */
         inline void
-        uphi		(const T * const wc, const int side_length, T * const signal) {
+        uphi		(const T * const wc, const int side_length, T * const signal) NOEXCEPT {
 
             int j;
             T s, s_odd;

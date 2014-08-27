@@ -32,12 +32,12 @@
 #include "IOContext.hpp"
 
 
-template<class T> inline static bool eq (const Matrix<T>& A, const Matrix<T>& B) {
+template<class T> inline static bool eq (const Matrix<T>& A, const Matrix<T>& B) NOEXCEPT {
 	assert(A.Dim() == B.Dim());
 	return A.Container() == B.Container();
 }
 
-template<class T> inline static Vector<size_t> find (const Matrix<T>& M) {
+template<class T> inline static Vector<size_t> find (const Matrix<T>& M) NOEXCEPT {
 	Vector<size_t> ret;
 	T zero_t = (T)0;
 	for (size_t i = 0; i < M.Size(); ++i)
@@ -46,7 +46,7 @@ template<class T> inline static Vector<size_t> find (const Matrix<T>& M) {
 	return ret;
 }
 
-template<class T> inline static Matrix<T> col (const Matrix<T>& M) {
+template<class T> inline static Matrix<T> col (const Matrix<T>& M) NOEXCEPT {
 	return resize(M,prod(size(M)),1);
 }
 
@@ -67,13 +67,13 @@ public:
 	/**
 	 * @brief          Default constructor
 	 */
-	CGRAPPA() :  m_nthreads(1), m_lambda(0), m_nc(1) {}
+	CGRAPPA() NOEXCEPT :  m_nthreads(1), m_lambda(0), m_nc(1) {}
     
     
 	/**
 	 * @brief Construct with parameters
 	 */
-	CGRAPPA (const Params& p) {
+	CGRAPPA (const Params& p) NOEXCEPT {
 
 		// Kernel size
 		if (p.exists("kernel_size")) {
@@ -128,14 +128,14 @@ public:
 	 * @brief    Clean up and destroy
 	 */
 	virtual
-	~CGRAPPA () {};
+	~CGRAPPA () NOEXCEPT {};
     
 
 	/**
 	 * @brief    Adjoint transform
 	 */
 	Matrix<CT>
-	Adjoint (const Matrix<CT>& kspace) const {
+	Adjoint (const Matrix<CT>& kspace) const NOEXCEPT {
         
 		Matrix<CT> res = kspace;
 #pragma omp parallel for default (shared)
@@ -149,7 +149,7 @@ public:
 	 * @brief    Forward transform
 	 */
 	Matrix<CT>
-	Trafo (const Matrix<CT>& image) const {
+	Trafo (const Matrix<CT>& image) const NOEXCEPT {
 		Matrix<CT> res;
 		return res;
 	}
@@ -161,7 +161,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<CT>
-	operator* (const Matrix<CT>& m) const {
+	operator* (const Matrix<CT>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
     
@@ -173,7 +173,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<CT>
-	operator->* (const Matrix<CT>& m) const {
+	operator->* (const Matrix<CT>& m) const NOEXCEPT {
 		return Adjoint (m);
 	}
     
@@ -186,7 +186,7 @@ private:
 	 * @param  coil_num  Number of coil to reconstruct for
 	 * @return           Reconstructed full k-space
 	 */
-	inline Matrix<CT> ARC (const Matrix<CT>& data, size_t coil_num) const {
+	inline Matrix<CT> ARC (const Matrix<CT>& data, size_t coil_num) const NOEXCEPT {
         
 		size_t max_list_len = 100;
 		Vector<size_t> data_size = size(data);
@@ -230,7 +230,7 @@ private:
 	}
 
     // Solve Ax=b
-	inline Matrix<CT> Solve (Matrix<short> pattern, size_t center) const {
+	inline Matrix<CT> Solve (Matrix<short> pattern, size_t center) const NOEXCEPT {
 		Vector<size_t> kernel_size = size(m_kernel);
 		pattern (center) = 0;
 		Vector<size_t> pat_ind = find(pattern);
@@ -247,7 +247,7 @@ private:
 	/**
 	 * @brief Setup calibration matrix
 	 */
-	inline void CalcCalibMatrix () {
+	inline void CalcCalibMatrix () NOEXCEPT {
 		Vector<size_t> ac_size = size(m_ac_data);
 		Vector<size_t> kernel_size = size(m_kernel);
 		Vector<size_t> calib_mat_size (4);

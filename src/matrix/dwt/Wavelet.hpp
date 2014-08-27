@@ -10,7 +10,7 @@
  * @brief               Construct mirror filter of given low pass filter.
  */
 template <class T> static inline void
-mirrorfilt (T * lpf, T * hpf, const int fl) {
+mirrorfilt (T * lpf, T * hpf, const int fl) NOEXCEPT {
     int isign = 1;
     for (int i = 0; i < fl; i++)  {
         hpf [i] = isign * lpf [i];
@@ -38,7 +38,7 @@ public:
         /**
          * @ brief              Assign memory to wavelet filters.
          */
-        static inline void Malloc (RT* & lpf_d, RT* & lpf_r, RT* & hpf_d, RT* & hpf_r) {
+        static inline void Malloc (RT* & lpf_d, RT* & lpf_r, RT* & hpf_d, RT* & hpf_r) NOEXCEPT {
             RT* tmp = (RT*) malloc (4 * wl_mem * sizeof (typename TypeTraits <T>::RT));
             lpf_d = & tmp [0         ];
             lpf_r = & tmp [    wl_mem];
@@ -51,7 +51,7 @@ public:
          *
          * @return              Low pass reconstruction filter.
          */
-        static inline void DecomFilters (RT* lpf_d, RT* hpf_d){
+        static inline void DecomFilters (RT* lpf_d, RT* hpf_d)NOEXCEPT {
             RT norm_factor = 1 / sqrt (2.f);
             lpf_d [0] = norm_factor; lpf_d [1] = norm_factor;
             mirrorfilt (lpf_d, hpf_d, 2);
@@ -62,7 +62,7 @@ public:
          *
          * @return              Low pass decomposition filter.
          */
-        static inline void ReconFilters (RT* lpf_r, RT* hpf_r) {
+        static inline void ReconFilters (RT* lpf_r, RT* hpf_r) NOEXCEPT {
             DecomFilters (lpf_r, hpf_r);
         }
 
@@ -82,7 +82,7 @@ template <class T> class WaveletTraits <T, WL_DAUBECHIES, 4> {
         /**
          * @ brief              Assign memory to wavelet filters.
          */
-        static inline void Malloc  (RT* & lpf_d, RT* & lpf_r, RT* & hpf_d, RT* & hpf_r) {
+        static inline void Malloc  (RT* & lpf_d, RT* & lpf_r, RT* & hpf_d, RT* & hpf_r) NOEXCEPT {
             RT* tmp = (RT*) malloc (4 * 4 * sizeof (typename TypeTraits <T>::RT));
             lpf_d = & tmp [0    ];
             lpf_r = & tmp [    4];
@@ -95,7 +95,7 @@ template <class T> class WaveletTraits <T, WL_DAUBECHIES, 4> {
          *
          * @return              Low pass reconstruction filter.
          */
-        static inline void DecomFilters (RT* lpf_d, RT* hpf_d) {
+        static inline void DecomFilters (RT* lpf_d, RT* hpf_d) NOEXCEPT {
             lpf_d[0] = (RT)0.48296291314453414337487159986; lpf_d[1] = (RT) 0.83651630373780790557529378092;
             lpf_d[2] = (RT)0.22414386804201338102597276224; lpf_d[3] = (RT)-0.12940952255126038117444941881;
             mirrorfilt (lpf_d, hpf_d, 4);
@@ -106,7 +106,7 @@ template <class T> class WaveletTraits <T, WL_DAUBECHIES, 4> {
          *
          * @return              Low pass decomposition filter.
          */
-        static inline void ReconFilters (RT* lpf_r, RT* hpf_r) {
+        static inline void ReconFilters (RT* lpf_r, RT* hpf_r) NOEXCEPT {
             DecomFilters (lpf_r, hpf_r);
         }
 
@@ -126,7 +126,7 @@ template<class T> class WaveletTraits <T, WL_DAUBECHIES, 8> {
         /**
          * @ brief              Assign memory to wavelet filters.
          */
-        static inline void Malloc (RT* & lpf_d, RT* & lpf_r, RT* & hpf_d, RT* & hpf_r) {
+        static inline void Malloc (RT* & lpf_d, RT* & lpf_r, RT* & hpf_d, RT* & hpf_r) NOEXCEPT {
             RT* tmp = (RT*) malloc (4 * 8 * sizeof (typename TypeTraits <T>::RT));
             lpf_d = & tmp [0    ];
             lpf_r = & tmp [    8];
@@ -139,7 +139,7 @@ template<class T> class WaveletTraits <T, WL_DAUBECHIES, 8> {
          *
          * @return              Low pass reconstruction filter.
          */
-        static inline void DecomFilters (RT* lpf_d, RT* hpf_d) {
+        static inline void DecomFilters (RT* lpf_d, RT* hpf_d) NOEXCEPT {
             lpf_d[0] = (RT) 0.23037781330889650086329118304; lpf_d[1] = (RT) 0.71484657055291564708992195527;
             lpf_d[2] = (RT) 0.63088076792985890788171633830; lpf_d[3] = (RT)-0.02798376941685985421141374718;
             lpf_d[4] = (RT)-0.18703481171909308407957067279; lpf_d[5] = (RT) 0.03084138183556076362721936253;
@@ -152,7 +152,7 @@ template<class T> class WaveletTraits <T, WL_DAUBECHIES, 8> {
          *
          * @return              Low pass decomposition filter.
          */
-        static inline void ReconFilters (RT* lpf_r, RT* hpf_r) {
+        static inline void ReconFilters (RT* lpf_r, RT* hpf_r) NOEXCEPT {
             DecomFilters        (lpf_r, hpf_r);
         }
 
@@ -164,7 +164,7 @@ template<class T> class WaveletTraits <T, WL_DAUBECHIES, 8> {
  */
 template <class T> static void setupWlFilters (const wlfamily wl_fam, const int wl_mem,
 		typename TypeTraits<T>::RT* & lpf_d, typename TypeTraits<T>::RT* & lpf_r,
-		typename TypeTraits<T>::RT* & hpf_d, typename TypeTraits<T>::RT* & hpf_r) {
+		typename TypeTraits<T>::RT* & hpf_d, typename TypeTraits<T>::RT* & hpf_r) NOEXCEPT {
 
 	switch (wl_fam) {
     case ID: break;

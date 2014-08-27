@@ -39,7 +39,7 @@ public:
 	 * @return   Transform
 	 */
 	template <class T> inline static Matrix<T> 
-	Trafo (const Matrix<T>& m) {
+	Trafo (const Matrix<T>& m) NOEXCEPT {
 		
 		size_t M = m.Dim(0);
 		size_t N = m.Dim(1);
@@ -69,7 +69,7 @@ public:
 	 * @return   Transform
 	 */
 	template <class T> inline static Matrix<T> 
-	Adjoint    (const Matrix<T>& m) {
+	Adjoint    (const Matrix<T>& m) NOEXCEPT {
 
 		size_t M = m.Dim(0);
 		size_t N = m.Dim(1);
@@ -106,7 +106,7 @@ public:
 	 * @return   Transform
 	 */
 	template <class T> Matrix<T> 
-	operator*    (const Matrix<T>& m) {
+	operator*    (const Matrix<T>& m) NOEXCEPT {
 		return Trafo (m);
 	}
 
@@ -118,7 +118,7 @@ public:
 	 * @return   Transform
 	 */
 	template <class T> Matrix<T> 
-	operator->*  (const Matrix<T>& m) {
+	operator->*  (const Matrix<T>& m) NOEXCEPT {
 		return Adjoint (m);
 	}
 
@@ -126,13 +126,13 @@ public:
 	/**
 	 * @brief Default constructor
 	 */
-	TVOP()  {};
+	TVOP()  NOEXCEPT {};
 
 
 	/**
 	 * @brief Default destructor
 	 */
-	~TVOP() {};
+	~TVOP() NOEXCEPT {};
 
 };
 

@@ -48,7 +48,7 @@ public:
 	/**
 	 * @brief         Default constructor
 	 */
-	NCSENSE() : m_initialised (false),
+	NCSENSE() NOEXCEPT : m_initialised (false),
                 m_cgiter(30),
                 m_cgeps (1.0e-6),
                 m_lambda (1.0e-6),
@@ -61,7 +61,7 @@ public:
 	 *
 	 * @param  params  Configuration parameters
 	 */
-	NCSENSE        (const Params& params)
+	NCSENSE        (const Params& params) NOEXCEPT 
               : FT<T>::FT(params),
                 m_cgiter(30),
                 m_initialised(false),
@@ -132,7 +132,7 @@ public:
 	/**
 	 * @brief        Clean up and destruct NFFT plans
 	 */ 
-	virtual ~NCSENSE () {}
+	virtual ~NCSENSE () NOEXCEPT {}
 	
 
 	/**
@@ -141,7 +141,7 @@ public:
 	 * @param  k   K-space trajectory
 	 */
 	void
-	KSpace (const Matrix<T>& k) {
+	KSpace (const Matrix<T>& k) NOEXCEPT {
         m_fts.KSpace(k);
 	}
 	
@@ -152,7 +152,7 @@ public:
 	 * @param  w   Weights
 	 */
 	void
-	Weights (const Matrix<T>& w) {		
+	Weights (const Matrix<T>& w) NOEXCEPT {		
         m_fts.Weights(w);
 	}
 
@@ -164,7 +164,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<CT>
-	Trafo       (const Matrix<CT>& m) const {
+	Trafo       (const Matrix<CT>& m) const NOEXCEPT {
 		return E (m, m_sm, m_nx, m_fts);
 	}
 
@@ -179,7 +179,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<CT>
-	Trafo       (const Matrix<CT>& m, const Matrix<CT>& sens, const bool& recal = true) const {
+	Trafo       (const Matrix<CT>& m, const Matrix<CT>& sens, const bool& recal = true) const NOEXCEPT {
 		return E (m, sens, m_nx, m_fts);
 	}
 
@@ -191,7 +191,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<CT>
-	Adjoint     (const Matrix<CT>& m) const {
+	Adjoint     (const Matrix<CT>& m) const NOEXCEPT {
 		return this->Adjoint (m, m_sm, false);
 	}
 	
@@ -208,7 +208,7 @@ public:
 	virtual Matrix<CT>
 	Adjoint (const Matrix<CT>& m,
 			 const Matrix<CT>& sens,
-			 const bool recal = false) const {
+			 const bool recal = false) const NOEXCEPT {
 
         T rn, rno, xn, ts;
 		Matrix<CT> p, r, x, q;
@@ -271,7 +271,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<CT>
-	operator* (const Matrix<CT>& m) const {
+	operator* (const Matrix<CT>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	
@@ -283,7 +283,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<CT>
-	operator->* (const Matrix<CT>& m) const {
+	operator->* (const Matrix<CT>& m) const NOEXCEPT {
 		return Adjoint (m);
 	}
 

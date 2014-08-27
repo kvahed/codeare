@@ -63,7 +63,7 @@ struct NFFTTraits<float> {
 	 * @return success
 	 */
 	inline static int
-	Init  (const int d, int* N, const int M, int* n, const int m, nfftf_plan& np, solverf_plan_complex& inp) {
+	Init  (const int d, int* N, const int M, int* n, const int m, nfftf_plan& np, solverf_plan_complex& inp) NOEXCEPT {
 
 		fftwf_init_threads();
 		
@@ -106,7 +106,7 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	ITrafo              (nfftf_plan& np, solverf_plan_complex& spc, const int maxiter = 3, const double epsilon = 3e-7) {
+	ITrafo              (nfftf_plan& np, solverf_plan_complex& spc, const int maxiter = 3, const double epsilon = 3e-7) NOEXCEPT {
 		
 		int k, l;
 		
@@ -139,7 +139,7 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Trafo                (const nfftf_plan& np) {
+	Trafo                (const nfftf_plan& np) NOEXCEPT {
 		
 		nfftf_trafo ((nfftf_plan*) &np);
 		return 0;
@@ -156,7 +156,7 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Adjoint              (const nfftf_plan& np) {
+	Adjoint              (const nfftf_plan& np) NOEXCEPT {
 		
 		nfftf_adjoint ((nfftf_plan*) &np);
 		return 0;
@@ -172,7 +172,7 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Weights              (const nfftf_plan& np, const solverf_plan_complex& spc) {
+	Weights              (const nfftf_plan& np, const solverf_plan_complex& spc) NOEXCEPT {
 		
 		int j, k, z, N = np.N[0];
 		
@@ -214,7 +214,7 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Psi                  (nfftf_plan& np) {
+	Psi                  (nfftf_plan& np) NOEXCEPT {
 		
 		/* precompute full psi */
 		if(np.nfft_flags & PRE_PSI)
@@ -238,7 +238,7 @@ struct NFFTTraits<float> {
 	 * @return           Success
 	 */
 	inline static int
-	Finalize             (nfftf_plan& np, solverf_plan_complex& spc) {
+	Finalize             (nfftf_plan& np, solverf_plan_complex& spc) NOEXCEPT {
 		
 		solverf_finalize_complex(&spc);
 		nfftf_finalize(&np);
@@ -276,7 +276,7 @@ struct NFFTTraits<double> {
 	 */
 	inline static int
 	Init  (const Vector<int>& N, size_t M, const Vector<int>& n,
-			int m, nfft_plan& np, solver_plan_complex& inp) {
+			int m, nfft_plan& np, solver_plan_complex& inp) NOEXCEPT {
 
 
 		Vector<int> _N(N), _n(n);
@@ -321,7 +321,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	ITrafo              (nfft_plan& np, solver_plan_complex& spc, size_t maxiter = 3, double epsilon = 3e-7) {
+	ITrafo              (nfft_plan& np, solver_plan_complex& spc, size_t maxiter = 3, double epsilon = 3e-7) NOEXCEPT {
 		
 		int l;
 		
@@ -351,7 +351,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Trafo                (const nfft_plan& np) {
+	Trafo                (const nfft_plan& np) NOEXCEPT {
 		
 		nfft_trafo ((nfft_plan*) &np);
 		return 0;
@@ -368,7 +368,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Adjoint              (const nfft_plan& np) {
+	Adjoint              (const nfft_plan& np) NOEXCEPT {
 		
 		nfft_adjoint ((nfft_plan*) &np);
 		return 0;
@@ -384,7 +384,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Weights              (const nfft_plan& np, const solver_plan_complex& spc) {
+	Weights              (const nfft_plan& np, const solver_plan_complex& spc) NOEXCEPT {
 		
 		int j, k, z, N = np.N[0], N2 = N*N, NH = .5*N;
 		float k2, j2, z2;
@@ -427,7 +427,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Psi                  (nfft_plan& np) {
+	Psi                  (nfft_plan& np) NOEXCEPT {
 		
 		/* precompute full psi */
 		if(np.nfft_flags & PRE_PSI)
@@ -451,7 +451,7 @@ struct NFFTTraits<double> {
 	 * @return           Success
 	 */
 	inline static int
-	Finalize             (nfft_plan& np, solver_plan_complex& spc) {
+	Finalize             (nfft_plan& np, solver_plan_complex& spc) NOEXCEPT {
 		
 		solver_finalize_complex(&spc);
 		nfft_finalize(&np);

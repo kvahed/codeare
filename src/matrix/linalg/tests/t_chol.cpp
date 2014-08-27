@@ -3,20 +3,21 @@
 #include "Creators.hpp"
 #include "Lapack.hpp"
 
+#define VERBOSE
+
 template<class T> void chol_check () {
 
     Matrix<T> A = rand<T> (4,3);
     
 #ifdef VERBOSE
-    std::cout << "A=\n" << A;
+    std::cout << "A=\n" << A << std::endl;
 #endif
     
     A = A.prodt(A); // m*m' (Must be positive definite)
     A = chol (A);
 
 #ifdef VERBOSE
-    std::cout << "chol(A)=\n" << A ;
-    std::cout << std::endl;
+    std::cout << "chol(A)=\n" << A  << std::endl;
 #endif
 
 }

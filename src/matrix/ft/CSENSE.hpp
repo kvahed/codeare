@@ -48,7 +48,7 @@ public:
 	/**
 	 * @brief          Default constructor
 	 */
-	CSENSE() :  nthreads(1), compgfm(0), aaf(1), nc(1), initialised(0), ndim(1) {}
+	CSENSE() NOEXCEPT :  nthreads(1), compgfm(0), aaf(1), nc(1), initialised(0), ndim(1) {}
 
 
 	/**
@@ -56,7 +56,7 @@ public:
 	 *
 	 * @param  params  Configuration parameters
 	 */
-	CSENSE        (const Params& params) :
+	CSENSE        (const Params& params) NOEXCEPT :
 		FT<T>::FT(params), nthreads (1), treg(0.), compgfm(1) {
 
 		// Maps & 1st set of images
@@ -101,7 +101,7 @@ public:
 	 * @brief          Clean up and destruct
 	 */
 	virtual
-	~CSENSE            () {}
+	~CSENSE            () {};
 
 
 	/**
@@ -111,7 +111,7 @@ public:
 	 * @return         Transform
 	 */
 	Matrix<CT>
-	Adjoint       (const Matrix<CT>& m) const {
+	Adjoint       (const Matrix<CT>& m) const NOEXCEPT {
 
 		Matrix<CT> res (dims[0]*af[0], dims[1]*af[1], (ndim == 3) ? dims[2]*af[2] : 1, (compgfm) ? 2 : 1);
 		Matrix<CT> tmp = m;
@@ -221,7 +221,7 @@ public:
 	 * @return         Bummer! (This is not nice, right?)
 	 */
 	Matrix<CT>
-	Trafo             (const Matrix<CT>& m) const {
+	Trafo             (const Matrix<CT>& m) const NOEXCEPT {
 		Matrix <CT> res;
 		return res;
 	}
@@ -234,7 +234,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<CT>
-	operator* (const Matrix<CT>& m) const {
+	operator* (const Matrix<CT>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	
@@ -246,7 +246,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<CT>
-	operator->* (const Matrix<CT>& m) const {
+	operator->* (const Matrix<CT>& m) const NOEXCEPT {
 		return Adjoint (m);
 	}
 
@@ -258,7 +258,7 @@ private:
 	 * @param  params Parameters
 	 */
 	inline void
-	AllocateDFTs (const Params& params) {
+	AllocateDFTs (const Params& params) NOEXCEPT {
 
 		if (params.exists("nthreads"))
 			nthreads = params.Get<unsigned short>("nthreads");
@@ -285,8 +285,7 @@ private:
 	 *
 	 * @param  params Parameters
 	 */
-	inline void
-	TikhonovMat (const Params& params) {
+	inline void TikhonovMat (const Params& params) NOEXCEPT {
 		treg = (params.exists("lambda")) ? params.Get<T>("lambda"): 0.0;
 		printf ("  Tikhonov lambda (%.2e)\n", treg);
 		assert (treg >= 0.0);

@@ -16,7 +16,7 @@ template<class T> bool norm_check () {
 	nrm2 = sqrt(nrm2);
     
 #ifdef VERBOSE
-    std::cout << "A=\n" << A;
+    std::cout << "A=\n" << A << std::endl;
     std::cout << "norm(A)=" << nrm1 << " " << nrm2 << std::endl;
 #endif
 

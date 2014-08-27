@@ -37,7 +37,7 @@
  * @return        Shifted
  */
 template <class T> inline Matrix<T>
-fftshift (const Matrix<T>& m, const bool fw = true) {
+fftshift (const Matrix<T>& m, const bool fw = true) NOEXCEPT {
 
 	assert (isvec(m) || is2d(m) || is3d(m));
 
@@ -80,7 +80,7 @@ fftshift (const Matrix<T>& m, const bool fw = true) {
  * @return        Inversely shifted
  */
 template<class T> inline Matrix<T>
-ifftshift (const Matrix<T>& m) {
+ifftshift (const Matrix<T>& m) NOEXCEPT {
 
 	return fftshift (m,false);
 
@@ -95,7 +95,7 @@ ifftshift (const Matrix<T>& m) {
  * @return        Window
  */
 template <class T> inline Matrix< std::complex<T> >
-hannwindow (const Matrix<size_t>& size, const T& t) {
+hannwindow (const Matrix<size_t>& size, const T& t) NOEXCEPT {
 	
 	size_t dim = size.Dim(0);
 	assert (dim > 1 && dim < 4);
@@ -172,7 +172,7 @@ public:
 	explicit DFT         (const Vector<size_t>& sl,
 				 const Matrix<T>& mask = Matrix<T>(1),
 				 const Matrix<CT>& pc = Matrix<CT>(1),
-				 const Matrix<T>& b0 = Matrix<T>(1)) :
+				 const Matrix<T>& b0 = Matrix<T>(1)) NOEXCEPT :
 		m_N(1), m_have_mask (false), m_have_pc (false) {
 
 		size_t rank = numel(sl);
@@ -206,7 +206,7 @@ public:
 
 	}
 
-	DFT        (const Params& p) :
+	DFT        (const Params& p) NOEXCEPT :
 		FT<T>::FT(p), m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
 		m_initialised(false), m_have_mask(false) {
 
@@ -255,12 +255,12 @@ public:
 	}
 
 
-	DFT (const DFT<T>& ft) {
+	DFT (const DFT<T>& ft) NOEXCEPT {
 		*this = ft;
 	}
 
 	
-	DFT<T>& operator= (const DFT<T>& ft) {
+	DFT<T>& operator= (const DFT<T>& ft) NOEXCEPT {
 
 		m_mask = ft.m_mask;
 
@@ -302,9 +302,9 @@ public:
 	 * @param  b0    Static field distortion
 	 */
 	DFT         (const size_t rank, const size_t sl, const Matrix<T>& mask = Matrix<T>(),
-				 const Matrix<CT>& pc = Matrix<CT>(), const Matrix<T>& b0 = Matrix<T>()) :
-		m_have_mask (false), m_have_pc (false) {
-
+				 const Matrix<CT>& pc = Matrix<CT>(), const Matrix<T>& b0 = Matrix<T>()) NOEXCEPT :
+    m_have_mask (false), m_have_pc (false) {
+        
 		std::vector<int> n (rank);
 		
 		size_t i;
@@ -343,7 +343,7 @@ public:
 	
 
 
-    DFT () :
+    DFT () NOEXCEPT :
     	m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
     	m_initialised(false), m_have_mask(false){}
     
@@ -351,7 +351,7 @@ public:
 	 * @brief        Clean up RAM, destroy plans
 	 */
 	virtual 
-	~DFT        () {
+	~DFT        () NOEXCEPT {
 
 		FTTraits<T>::Destroy (m_fwplan);
 		FTTraits<T>::Destroy (m_bwplan);
@@ -367,7 +367,7 @@ public:
 	 * @return   Transform
 	 */
 	inline virtual Matrix<CT>
-	Trafo       (const Matrix<CT>& m) const {
+	Trafo       (const Matrix<CT>& m) const NOEXCEPT {
 		
 		Matrix<CT> res = ishift((m_have_pc) ? m * m_pc : m);
 
@@ -390,7 +390,7 @@ public:
 	 * @return   Transform
 	 */
 	inline virtual Matrix<CT>
-	Adjoint     (const Matrix<CT>& m) const {
+	Adjoint     (const Matrix<CT>& m) const NOEXCEPT {
 
 		Matrix<CT> res = ishift((m_have_mask) ? m * m_mask : m);
 
@@ -410,7 +410,7 @@ public:
 	 * @brief   Set k-space mask
 	 * @param   mask  k-space mask
 	 */
-	inline void Mask (const Matrix<T>& mask) {
+	inline void Mask (const Matrix<T>& mask) NOEXCEPT {
 		m_mask = mask;
 		m_have_mask = true;
 	}
@@ -422,7 +422,7 @@ public:
 	 * @return   Transform
 	 */
 	inline virtual Matrix<CT>
-	operator* (const Matrix<CT>& m) const {
+	operator* (const Matrix<CT>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	
@@ -434,7 +434,7 @@ public:
 	 * @return   Transform
 	 */
 	inline virtual Matrix<CT>
-	operator->* (const Matrix<CT>& m) const {
+	operator->* (const Matrix<CT>& m) const NOEXCEPT {
 		return Adjoint (m);
 	}
 
@@ -444,7 +444,7 @@ public:
 private:
 
 	inline Matrix<CT>
-	shift (const Matrix<CT>& m, const bool& fw = true) const {
+	shift (const Matrix<CT>& m, const bool& fw = true) const NOEXCEPT {
 		switch (ndims(m)) {
 		case  2: return shift2 (m, fw); 
 		case  3: return shift3 (m, fw);
@@ -454,7 +454,7 @@ private:
 
 
 	inline Matrix<CT>
-	shift3 (const Matrix<CT>& m, const bool& fw = true) const {
+	shift3 (const Matrix<CT>& m, const bool& fw = true) const NOEXCEPT {
 
 		Matrix<CT> res (size(m));
 
@@ -479,7 +479,7 @@ private:
 	}
 
 	inline Matrix<CT>
-	shift2 (const Matrix<CT>& m, const bool& fw = true) const {
+	shift2 (const Matrix<CT>& m, const bool& fw = true) const NOEXCEPT {
 
 		Matrix<CT> res (size(m));
 
@@ -503,7 +503,7 @@ private:
 
 
 	inline Matrix<CT>
-	ishift(const Matrix<CT>& m) const {
+	ishift(const Matrix<CT>& m) const NOEXCEPT {
 
 		switch (ndims(m)) {
 		case  2: return shift2 (m, false); 
@@ -521,7 +521,7 @@ private:
 	 * @param  n    Side lengths
 	 */
 	inline void
-	Allocate (const int rank, const int* n) {
+	Allocate (const int rank, const int* n) NOEXCEPT {
 		
 		m_in     = Vector<CT> (m_N);
 
