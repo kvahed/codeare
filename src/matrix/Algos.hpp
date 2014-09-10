@@ -60,7 +60,7 @@ nnz (const Matrix<T>& M) {
 	
 	size_t nz   = 0;
 	
-	for (int i = 0; i < M.Size(); ++i)
+	for (size_t i = 0; i < M.Size(); ++i)
 		if (M[i] != T(0))
 			++nz;
 	

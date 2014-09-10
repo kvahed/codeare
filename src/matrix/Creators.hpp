@@ -402,7 +402,7 @@ ellipse (const float* p, const size_t n, const T s = T(1)) {
 	{
 #pragma omp for schedule (dynamic, n / omp_get_num_threads())
 		
-	for (int r = 0; r < n; r++)
+	for (int r = 0; r < (int)n; r++)
 		for (size_t c = 0; c < n; c++) {
 			float x = (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1];
 			float y = (((float)r-m[0])*cosp-((float)c-m[1])*sinp)/a[0];

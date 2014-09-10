@@ -323,7 +323,7 @@ struct NFFTTraits<double> {
 	inline static int
 	ITrafo              (nfft_plan& np, solver_plan_complex& spc, size_t maxiter = 3, double epsilon = 3e-7) NOEXCEPT {
 		
-		int l;
+		size_t l;
 		
 		/* init some guess */
         std::fill_n ((double*)spc.f_hat_iter, 2*np.N_total, 0.);

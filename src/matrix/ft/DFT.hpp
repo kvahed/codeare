@@ -187,7 +187,7 @@ public:
 			m_have_pc = true; m_pc = pc; m_cpc = conj(pc);
 		}
 
-		for (int i = 0; i < rank; i++)
+		for (size_t i = 0; i < rank; i++)
 			n[i]  = (int) sl [rank-1-i];
 
 		m_N = std::accumulate(n.begin(), n.end(), 1, std::multiplies<int>());
