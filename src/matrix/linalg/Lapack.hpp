@@ -394,8 +394,8 @@ chol (const Matrix<T>& A, char uplo = 'U') {
     else if (info < 0)
         printf ("\nERROR - XPOTRF: the %i-th argument had an illegal value.\n\n!", -info);
     
-    for (size_t i = 0; i < n-1; i++)
-        for (size_t j = i+1; j < n; j++)
+    for (size_t i = 0; i < (size_t)n-1; i++)
+        for (size_t j = i+1; j < (size_t)n; j++)
             res(j,i) = T(0);
     
     return res;

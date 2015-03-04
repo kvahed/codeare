@@ -43,7 +43,7 @@ NRMSE                         (const Matrix<cxfl>& target, const Matrix<cxfl>& r
     float nrmse = 0.0;
 
 #pragma omp parallel for reduction (+:nrmse)
-    for (int i = 0; i < numel(target); i++ )
+    for (int i = 0; i < (int)numel(target); i++ )
         nrmse += pow(abs(target[i]) - abs(result[i]), 2);
     nrmse = sqrt(nrmse)/norm(target);
     
@@ -66,7 +66,7 @@ NOHO                         (const Matrix<cxfl>& target, const Matrix<cxfl>& re
     float nrmse = 0.f;
 
 #pragma omp parallel for default (shared) reduction (+:nrmse)
-	for (int i = 0; i < numel(target); i++ )
+	for (int i = 0; i < (int)numel(target); i++ )
 		nrmse += pow(abs(target[i]) - abs(result[i]), 2);
     return nrmse;
 
@@ -87,7 +87,7 @@ PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
     size_t n = target.Size();
     
 #pragma omp parallel for
-    for (int i = 0; i < n; i++) 
+    for (int i = 0; i < (int)n; i++) 
         target[i] = abs(target[i]) * result[i] / abs(result[i]);
 
 }
@@ -131,11 +131,11 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
     cxfl pgd (0.f, 10.f*TWOPI*GAMMA);
 
 #pragma omp parallel for default (shared)
-    for (int k = 0; k < nk; k++) {
+    for (int k = 0; k < (int)nk; k++) {
         float tpdk = TWOPI * d[k];
-        for (int s = 0; s < ns; s++) {
+        for (size_t s = 0; s < ns; s++) {
             cxfl eikr = pgd * std::polar (1.f, ks(0,k)*r(0,s) + ks(1,k)*r(1,s) + ks(2,k)*r(2,s) + tpdk * b0(s));
-            for (int c = 0; c < nc; c++)
+            for (size_t c = 0; c < nc; c++)
                 m(s,c*nk+k) =  b1(s,c) * eikr;
         }
     }

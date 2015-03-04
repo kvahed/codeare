@@ -10,7 +10,7 @@
 
 #include "TypeTraits.hpp"
 #include "Matrix.hpp"
-
+#include <time.h>
 #include <limits>
 
 #include <limits>
@@ -116,7 +116,7 @@ class Random {
 public:
     
     inline static void Normal (Matrix<T>& vt, const RT mean = 0.0, const RT sigma = 1.0) {
-        RNG rng (static_cast<unsigned> (getticks()));
+        RNG rng (static_cast<unsigned> ((unsigned)clock()));
         boost::variate_generator<RNG&,typename RandTraits<T>::normal>
             generator (rng, typename RandTraits<T>::normal(mean,sigma));
         RandTraits<T>::Populate(vt, generator);
@@ -124,7 +124,7 @@ public:
     
     inline static void Uniform (Matrix<T>& vt, const RT min = RandTraits<T>::stdmin(),
                                 const RT max = RandTraits<T>::stdmax()) {
-        RNG rng (static_cast<unsigned> (getticks()));
+        RNG rng (static_cast<unsigned> ((unsigned)clock()));
         boost::variate_generator<RNG&,typename RandTraits<T>::uniform>
             generator (rng, typename RandTraits<T>::uniform(min,max));
         RandTraits<T>::Populate(vt, generator);

@@ -38,10 +38,10 @@ medfilt2 (const Matrix<T>& M, const size_t fh = 3, const size_t fw = 3) {
         size_t ne = fw*fh;
         
 #pragma omp for schedule(dynamic,chunk)
-        for (x=ex; x<iw-ex; ++x)
-            for (y=ey; y<ih-ey; ++y) {
-                for (fx=0; fx<fw; ++fx)
-                    for (fy=0; fy<fh; ++fy)
+        for (x=ex; x<(int)iw-ex; ++x)
+            for (y=ey; y<(int)ih-ey; ++y) {
+                for (fx=0; fx<(int)fw; ++fx)
+                    for (fy=0; fy<(int)fh; ++fy)
                         local(fy,fx) = M(y+fy-ey,x+fx-ex); 
                 qsort(&local[0], ne, sizeof(T), t_compare);
                 ret(y,x) = local[ne/2];
