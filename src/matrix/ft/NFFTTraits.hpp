@@ -179,11 +179,11 @@ struct NFFTTraits<float> {
 		if (spc.flags & PRECOMPUTE_DAMP) {
 			if (np.d == 3) {
 				for (j = 0; j < N; j++) {
-					float    j2 = j - N/2; 
+					float j2 = j - N/2;
 					for (k = 0; k < N; k++) {
-						float    k2 = k - N/2;
+						float k2 = k - N/2;
 						for (z = 0; z < N; z++) {
-							float    z2 = z - N/2;
+							float z2 = z - N/2;
 							float r  = sqrt(j2*j2+k2*k2+z2*z2);
 							spc.w_hat[z*N*N+j*N+k] = (r > (float) N/2) ? 0.0 : 1.0;
 						}
