@@ -50,7 +50,9 @@ public:
 		m_M (0),
 		m_maxit (0),
 		m_rank (0),
-		m_m(0) {};
+		m_m(0),
+		m_have_timing(false),
+		m_have_b0(false) {};
 
 	/**
 	 * @brief          Construct NFFT plans for forward and backward FT with credentials
@@ -67,7 +69,8 @@ public:
 	inline NFFT        (const Matrix<size_t>& imsize, const size_t& nk, const size_t m = 1, 
 				 const T alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1),
 				 const Matrix< std::complex<T> > pc = Matrix< std::complex<T> >(1),
-				 const T eps = 7.0e-4, const size_t maxit = 2) NOEXCEPT {
+				 const T eps = 7.0e-4, const size_t maxit = 2) NOEXCEPT :
+						 m_have_b0(false), m_have_timing(false) {
 		
 		m_M     = nk;
 		m_imgsz = 2;
@@ -96,7 +99,11 @@ public:
 	}
 	
 	
-	inline NFFT (const Params& p) NOEXCEPT {
+	inline NFFT (const Params& p) NOEXCEPT :
+			m_have_b0(false), m_have_timing(false),
+			m_t (Matrix<T>(1)), m_b0 (Matrix<T>(1)) {
+
+		T sigma = 1.25, min_time, max_time, min_inh, max_inh, t, w, ts;
 
 		if (p.exists("nk")) {// Number of kspace samples
 			try {
@@ -127,7 +134,8 @@ public:
 			try {
 				m_m = unsigned_cast (p["m"]);
 			} catch (const boost::bad_any_cast&) {
-				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor m. Defaulting to 1.");
+				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor m. "
+						"Defaulting to 1.");
 				m_m = 1;
 			}
 		} else {
@@ -139,7 +147,8 @@ public:
 			try {
 				alpha = fp_cast(p["alpha"]);
 			} catch (const boost::bad_any_cast&) {
-				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor alpha. Defaulting to 1.0");
+				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor alpha. "
+						"Defaulting to 1.0");
 			}
 		}
 
@@ -154,7 +163,8 @@ public:
 			try {
 				m_epsilon = fp_cast (p["epsilon"]);
 			} catch (const boost::bad_any_cast&) {
-				printf ("  WARNING - NFFT: Could not interpret input for convergence criterium epsilon. Defaulting to 0.0007");
+				printf ("  WARNING - NFFT: Could not interpret input for convergence criterium epsilon. "
+						"Defaulting to 0.0007");
 				m_epsilon = 7.e-4f;
 			}
 		} else {
@@ -165,11 +175,70 @@ public:
 			try {
 				m_maxit = unsigned_cast (p["maxit"]);
 			} catch (const boost::bad_any_cast&) {
-				printf ("  WARNING - NFFT: Could not interpret input for maximum NFFT steps. Defaulting to 3");
+				printf ("  WARNING - NFFT: Could not interpret input for maximum NFFT steps. "
+						"Defaulting to 3");
 				m_maxit = 3;
 			}
 		} else {
 			m_maxit = 3;
+		}
+
+		if (p.exists("b0")) {
+			try {
+				m_b0 = p.Get<Matrix<T> >("b0");
+				if (numel(m_b0) != prod(m_N))
+					printf ("  WARNING - NFFT: b0 field does not fit to image space. "
+							"Defaulting to flat b0 = 0");
+				else
+					m_have_b0 = true;
+			} catch (const boost::bad_any_cast&) {
+				printf ("  WARNING - NFFT: Could not interpret input for b0. "
+						"Defaulting to flat b0 = 0");
+			}
+		}
+
+		if (p.exists("times")) {
+			try {
+				m_t = p.Get<Matrix<T> >("time");
+				if (numel(m_t) != m_M)
+					printf ("  WARNING - NFFT: b0 field does not fit to image space. "
+							"Defaulting to flat b0 = 0");
+				else
+					m_have_timing = true;
+			} catch (const boost::bad_any_cast&) {
+				printf ("  WARNING - NFFT: Could not interpret input for trajectory timing. "
+						"Defaulting to flat b0 = 0");
+			}
+		}
+
+		if (m_have_b0 && m_have_timing) {
+
+			m_min_t  = min(m_t);
+			m_max_t  = max(m_t);
+
+			m_min_b0 = min(m_b0);
+			m_max_b0 = max(m_b0);
+
+			T sigma = 1.2;
+
+			m_N.push_back(std::ceil(std::max(fabs(m_min_b0),fabs(m_max_b0)) *
+					m_max_t-m_min_t/2.+(m_m)/(2.*sigma))*4.*sigma);
+
+			if(m_N[2]%2!=0)
+			  m_N[2]++;
+
+			m_n.push_back(m_N[2]);
+
+			ts = (m_min_t+m_max_t)/2.;
+			t  = ((m_max_t-m_min_t)/2.0)/(0.5-((T) (m_m))/m_N[2]);
+			w  = m_N[2]/t;
+
+			for (size_t j=0; j < m_N[0]*m_N[1]; ++j)
+				m_b0[j] /= w;
+
+			for (size_t j = 0; j < m_M;  ++j)
+				m_t[j]   = (m_t[j]-ts) / t;
+
 		}
 
 		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
@@ -224,6 +293,14 @@ public:
 		m_epsilon     = ft.m_epsilon;
 		m_imgsz       = ft.m_imgsz;
 		m_m           = ft.m_m;
+		m_have_timing = ft.m_have_timing;
+		m_have_b0     = ft.m_have_b0;
+		m_b0          = ft.m_b0;
+		m_t           = ft.m_t;
+		m_min_t       = ft.m_min_t;
+		m_max_t       = ft.m_max_t;
+		m_min_b0      = ft.m_min_b0;
+		m_max_b0      = ft.m_max_b0;
 		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
 	    return *this;
 		
@@ -336,13 +413,18 @@ public:
 private:
 	
 	bool       m_initialised;   /**< @brief Memory allocated / Plans, well, planned! :)*/
-	bool       m_have_pc;
+	bool       m_have_pc, m_have_b0, m_have_timing;
 
 	size_t     m_rank;
 
 	Matrix<CT> m_pc;            /**< @brief Phase correction (applied after inverse trafo)*/
 	Matrix<CT> m_cpc;           /**< @brief Phase correction (applied before forward trafo)*/
 	
+	Matrix<T>  m_b0;
+	Matrix<T>  m_t;
+
+	T m_min_t, m_max_t, m_min_b0, m_max_b0;
+
 	Vector<size_t> m_N;      /**< @brief Image matrix side length (incl. k_{\\omega})*/
 	Vector<size_t> m_n;      /**< @brief Oversampling */
 

@@ -570,6 +570,43 @@ m_max (const Matrix<T>& M) {
 	
 }
 
+/**
+ * @brief           Maximal element
+ *
+ * @param  M        Matrix
+ * @return          Maximum
+ */
+template <class T> inline  T
+max (const Matrix<T>& M) {
+
+	T mx = (T)INT_MIN;
+
+	for (size_t i = 0; i < numel(M); ++i)
+		if (M[i] > mx)
+			mx = M[i];
+
+	return mx;
+
+}
+
+/**
+ * @brief           Maximal element
+ *
+ * @param  M        Matrix
+ * @return          Maximum
+ */
+template <class T> inline  T
+min (const Matrix<T>& M) {
+
+	T mn = (T)INT_MAX;
+
+	for (size_t i = 0; i < numel(M); ++i)
+		if (M[i] < mn)
+			mn= M[i];
+
+	return mn;
+
+}
 
 /**
  * @brief           Minimal element
