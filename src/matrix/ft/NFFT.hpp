@@ -229,15 +229,15 @@ public:
 
 			m_n.push_back(m_N[2]);
 
-			ts = (m_min_t+m_max_t)/2.;
+			m_ts = (m_min_t+m_max_t)/2.;
 			t  = ((m_max_t-m_min_t)/2.0)/(0.5-((T) (m_m))/m_N[2]);
-			w  = m_N[2]/t;
+			m_w  = m_N[2]/t;
 
 			for (size_t j=0; j < m_N[0]*m_N[1]; ++j)
-				m_b0[j] /= w;
+				m_b0[j] /= m_w;
 
 			for (size_t j = 0; j < m_M;  ++j)
-				m_t[j]   = (m_t[j]-ts) / t;
+				m_t[j]   = (m_t[j]-m_ts) / t;
 
 		}
 
@@ -313,8 +313,16 @@ public:
 	 */
 	inline void 
 	KSpace (const Matrix<T>& k) NOEXCEPT {		
-		assert (k.Size() == m_fplan.M_total*m_rank);
-		std::copy (k.Begin(), k.End(), m_fplan.x);
+		if (m_have_b0 && m_have_timing) {
+			for (size_t j = 0; j < m_fplan.M_total; ++j) {
+				m_fplan.x[3*j+0] = real(k[2*j+0]);
+				m_fplan.x[3*j+1] = imag(k[2*j+1]);
+				m_fplan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N[2];
+			}
+		} else {
+			assert (k.Size() == m_fplan.M_total*m_rank);
+			std::copy (k.Begin(), k.End(), m_fplan.x);
+		}
 	}
 	
 	
@@ -347,7 +355,14 @@ public:
 		
 		tmpd = (double*) m_fplan.f_hat;
 		tmpt = (T*) m.Ptr();
-		std::copy (tmpt, tmpt+m_imgsz, tmpd);
+		if (m_have_b0 && m_have_timing)
+			for (size_t j = 0; j < m.Size(); ++j) {
+				CT val = m[j] * std::polar<T> ((T)1., (T)2. * PI * m_ts * m_b0[j] * m_w);
+				tmpd[2*j+0] = (double)real(val);
+				tmpd[2*j+1] = (double)imag(val);
+			}
+		else
+			std::copy (tmpt, tmpt+m_imgsz, tmpd);
 		
 		NFFTTraits<double>::Trafo (m_fplan);
 		
@@ -383,6 +398,10 @@ public:
 		tmpt = (T*) out.Ptr();
 		std::copy (tmpd, tmpd+m_imgsz, tmpt);
 		
+		if (m_have_b0 && m_have_timing)
+			for (size_t j = 0; j < out.Size(); ++j)
+				out[j] *= std::polar<T> ((T)1., (T)-2. * PI * m_ts * m_b0[j] * m_w);
+
 		return out;
 		
 	}
@@ -423,7 +442,7 @@ private:
 	Matrix<T>  m_b0;
 	Matrix<T>  m_t;
 
-	T m_min_t, m_max_t, m_min_b0, m_max_b0;
+	T m_min_t, m_max_t, m_min_b0, m_max_b0, m_w, m_ts;
 
 	Vector<size_t> m_N;      /**< @brief Image matrix side length (incl. k_{\\omega})*/
 	Vector<size_t> m_n;      /**< @brief Oversampling */
