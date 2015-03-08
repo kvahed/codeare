@@ -25,9 +25,148 @@
 #include <math.h>
 #include <stdlib.h>
 #include "Complex.hpp"
+#include "Vector.hpp"
 
 #include "nfft3util.h"
 #include "nfft3.h"
+
+
+
+
+
+
+template<class T>
+struct Window {
+
+	static const T KPI;
+	static const T K2PI;
+	static const T KE;
+
+	static const T P1[];
+	static const T Q1[];
+	static const T P2[];
+	static const T Q2[];
+
+	static const size_t N1;
+	static const size_t M1;
+	static const size_t N2;
+	static const size_t M2;
+
+	int d;
+	int m;
+	Vector<int> n;
+	T sigma;
+	Vector<T> b;
+	Vector<T> spline_coeffs;
+	Window () : d(1), m(1), sigma(1.), n(Vector<int>(1,1)) { }
+	Window (size_t m, size_t n, double sigma) : d(1), m(m), sigma(sigma), n(Vector<int>(1,n)) { }
+	friend std::ostream& operator<< (std::ostream& os, const Window<T>& win) {
+		printf ("      Window:\n");
+		printf ("        d(%d) m(%d) sigma(.3f)\n", win.d, win.m, win.sigma);
+		printf ("        n()\n");
+		printf ("        spline_coeffs()\n");
+		printf ("        b()\n");
+		return os;
+	}
+
+};
+
+template<class T> const T Window<T>::KPI = 3.1415926535897932384626433832795028841971693993751;
+template<class T> const T Window<T>::K2PI = 6.2831853071795864769252867665590057683943387987502;
+template<class T> const T Window<T>::KE = 2.7182818284590452353602874713526624977572470937000;
+template<class T> const T Window<T>::P1[] = {
+	1.006897990143384859657820271920512961153421109156614230747188622,
+	0.242805341483041870658834102275462978674549112393424086979586278,
+	0.006898486035482686938510112687043665965094733332210445239567379,
+	0.000081165067173822070066416843139523709162208390998449005642346,
+	4.95896034564955471201271060753697747487292805350402943964e-7,
+	1.769262324717844587819564151110983803173733141412266849e-9,
+	3.936742942676484111899247866083681245613312522754135e-12,
+	5.65030097981781148787580946077568408874044779529e-15,
+	5.267856044117588097078633338366456262960465052e-18,
+	3.111192981528832405775039015470693622536939e-21,
+	1.071238669051606108411504195862449904664e-24,
+	1.66685455020362122704904175079692613e-28
+};
+template<class T> const T Window<T>::Q1[] = {
+	1.000013770640886533569435896302721489503868900260448440877422679934,
+   -0.007438195256024963574139196893944950727405523418354136393367554385,
+	0.000013770655915064256304772604385297068669909609091264440116789601,
+   -1.6794623118559896441239590667288215019925076196457659206142e-8,
+	1.50285363491992136130760477001818578470292828225498818e-11,
+   -1.0383232801211938342796582949062551517465351830706356e-14,
+	5.66233115275307483428203764087829782195312564006e-18,
+   -2.44062252162491829675666639093292109472275754e-21,
+	8.15441695513966815222186223740016719597617e-25,
+   -2.01117218503954384746303760121365911698e-28,
+	3.2919820158429806312377323449729691e-32,
+   -2.70343047912331415988664032397e-36
+};
+template<class T> const T Window<T>::P2[] = {
+    0.4305671332839579065931339658100499864903788418438938270811,
+   -0.2897224581554843285637983312103876003389911968369470222427,
+    0.0299419330186508349765969995362253891383950029259740306077,
+   -0.0010756807437990349677633120240742396555192749710627626584,
+    0.0000116485185631252780743187413946316104574410146692335443,
+   -1.89995137955806752293614125586568854200245376235433e-08
+};
+template<class T> const T Window<T>::Q2[] = {
+	1.0762291019783101702628805159947862543863829764738274558421,
+   -0.7279167074883770739509279847502106137135422309409220238564,
+	0.0762629142282649564822465976300194596092279190843683614797,
+   -0.0028345107938479082322784040228834113914746923069059932628,
+	0.0000338122499547862193660816352332052228449426105409056376,
+   -8.28850093512263912295888947693700479250899073022595e-08
+};
+template<class T> const size_t Window<T>::N1 = sizeof(Window<T>::P1)/sizeof(T);
+template<class T> const size_t Window<T>::M1 = sizeof(Window<T>::Q1)/sizeof(T);
+template<class T> const size_t Window<T>::N2 = sizeof(Window<T>::P2)/sizeof(T);
+template<class T> const size_t Window<T>::M2 = sizeof(Window<T>::Q2)/sizeof(T);
+
+template<class T>
+static inline T chebyshev (const size_t n, const T *c, const T x) NOEXCEPT {
+	T a = c[n-2], b = c[n-1], t;
+	int j;
+	for (size_t j = n - 2; j > 0; j--) {
+		t = c[j-1] - b;
+		b = a + 2.0 * x * b;
+		a = t;
+	}
+	return a + x * b;
+}
+
+template<class T>
+inline static T bessel_i0 (T x) NOEXCEPT {
+	if (x < 0) /* even function */
+		x = -x;
+	if (x == 0.0)
+		return 1.0;
+	if (x <= 15.0) {
+		const T y = x * x;
+		return chebyshev(Window<T>::N1, Window<T>::P1, y)/
+			   chebyshev(Window<T>::M1, Window<T>::Q1, y);
+	} else {
+		const T y = (30.0 - x) / x;
+		return (std::exp(x) / std::sqrt(x)) *
+				(chebyshev(Window<T>::N2, Window<T>::P2, y)/
+				 chebyshev(Window<T>::M2, Window<T>::Q2, y));
+	}
+}
+template <class T>
+inline static T phi_hut (T k, int d, const Window<T>& win) NOEXCEPT {
+	return bessel_i0 (win.m * std::sqrt(std::pow(win.b[d], 2.0) -
+			std::pow(2.0 * Window<T>::KPI * k / win.n[d], 2.0)));
+}
+template<class T>
+inline static T phi (T x, int d, const Window<T>& win) NOEXCEPT {
+	return (std::pow(win.m, 2.0) - std::pow(x*win.n[d],2.0) > 0) ?
+			std::sinh(win.b[d] * std::sqrt(std::pow((T)win.m,2.0) -
+					std::pow(x*win.n[d],2.0)))/(Window<T>::KPI*std::sqrt(std::pow((T)win.m,2.0) -
+							std::pow(x*win.n[d],2.0))) :
+			(std::pow((T)win.m,2.0) - std::pow((T)x*win.n[d],2.0)) < 0 ?
+					std::sin(win.b[d] * std::sqrt(std::pow((T)win.n[d]*x,2.0) - std::pow((T)win.m, 2.0))) /
+					(Window<T>::KPI*std::sqrt(std::pow((T)win.n[d]*x,2.0) - std::pow((T)win.m,2.0))) : 1.0;
+}
 
 #include "Vector.hpp"
 
@@ -38,16 +177,14 @@
     #define nfftf_mv_plan_complex mv_plan_complex
 #endif
 
-enum nfft_startegy {WITHOUT_B0, WITH_B0};
-
-template <class T, nfft_startegy S = WITHOUT_B0>
+template <class T>
 struct NFFTTraits { };
 
 #ifdef USE_NFFT_32_NAMING
 
 
 template <>
-struct NFFTTraits<float, WITHOUT_B0> {
+struct NFFTTraits<float> {
 
 	typedef nfftf_plan           Plan;    /**< @brief nfft plan (float precision) */
 	typedef solverf_plan_complex Solver;  /**< @brief nfft solver plan (float precision) */
@@ -262,7 +399,7 @@ struct NFFTTraits<float, WITHOUT_B0> {
 
 
 template <>
-struct NFFTTraits<double, WITHOUT_B0> {
+struct NFFTTraits<double> {
 
 	typedef nfft_plan           Plan;    /**< @brief nfft plan (double precision) */
 	typedef solver_plan_complex Solver;  /**< @brief nfft solver plan (double precision) */

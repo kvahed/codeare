@@ -26,18 +26,20 @@
 #include "FT.hpp"
 #include "CX.hpp"
 #include "Creators.hpp"
+
 /**
  * @brief Matrix templated ND non-equidistand Fourier transform with NFFT 3 (TU Chemnitz)<br/>
  *        Double and single precision
+
  */
 template <class T>
 class NFFT : public FT<T> {
 
-
 	typedef typename NFFTTraits<double>::Plan   Plan;
 	typedef typename NFFTTraits<double>::Solver Solver;
     typedef typename std::complex<T> CT;
-	
+
+
 public:
 
 	/**
@@ -224,20 +226,18 @@ public:
 			m_N.push_back(std::ceil(std::max(fabs(m_min_b0),fabs(m_max_b0)) *
 					m_max_t-m_min_t/2.+(m_m)/(2.*sigma))*4.*sigma);
 
-			if(m_N[2]%2!=0)
-			  m_N[2]++;
-
+			if (m_N[2]%2!=0)
+				m_N[2]++; // need even dimension
 			m_n.push_back(m_N[2]);
 
-			m_ts = (m_min_t+m_max_t)/2.;
-			t  = ((m_max_t-m_min_t)/2.0)/(0.5-((T) (m_m))/m_N[2]);
-			m_w  = m_N[2]/t;
+			m_w = std::max(std::abs(m_min_b0),std::abs(m_max_b0))/(.5-((T) m_m)/m_N[2]);
+			m_ts =  (m_min_t+m_max_t)/2.;
+			t    = ((m_max_t-m_min_t)/2.)/(.5-((T) (m_m))/m_N[2]);
 
-			for (size_t j=0; j < m_N[0]*m_N[1]; ++j)
+			for (size_t j = 0; j < m_N[0]*m_N[1]; ++j)
 				m_b0[j] /= m_w;
 
-			for (size_t j = 0; j < m_M;  ++j)
-				m_t[j]   = (m_t[j]-m_ts) / t;
+			m_win = Window<T> (m_m, m_N[2], sigma);
 
 		}
 
@@ -313,7 +313,7 @@ public:
 	 */
 	inline void 
 	KSpace (const Matrix<T>& k) NOEXCEPT {		
-		if (m_have_b0 && m_have_timing) {
+		if (m_have_b0 && m_have_timing) { // +1D for omega
 			for (size_t j = 0; j < m_fplan.M_total; ++j) {
 				m_fplan.x[3*j+0] = real(k[2*j+0]);
 				m_fplan.x[3*j+1] = imag(k[2*j+1]);
@@ -336,7 +336,7 @@ public:
 		assert (w.Size() == m_fplan.M_total);
 		std::copy (w.Begin(), w.End(), m_iplan.w);
 		NFFTTraits<double>::Weights (m_fplan, m_iplan);
-		NFFTTraits<double>::Psi     (m_fplan);
+		NFFTTraits<double>::Psi (m_fplan);
 	}
 	
 	
@@ -357,15 +357,36 @@ public:
 		tmpt = (T*) m.Ptr();
 		if (m_have_b0 && m_have_timing)
 			for (size_t j = 0; j < m.Size(); ++j) {
-				CT val = m[j] * std::polar<T> ((T)1., (T)2. * PI * m_ts * m_b0[j] * m_w);
+				CT val = m[j] * std::polar<T> (1., 2. * PI * m_ts * m_b0[j] * m_w);
 				tmpd[2*j+0] = (double)real(val);
 				tmpd[2*j+1] = (double)imag(val);
 			}
 		else
 			std::copy (tmpt, tmpt+m_imgsz, tmpd);
-		
+
+	    for (size_t j = 0; j < m_fplan.N_total; ++j)
+	        for (int l = -m_win.n[0]/2; l < m_win.n[0]/2; ++l) {
+	        	T tmp = m_b0[j]-((T)l)/((T)m_win.n[0]);
+	        	T w   = phi(tmp, 0, m_win);
+	        	size_t c = j*m_win.n[0]+(l+m_win.n[0]/2);
+	        	if (std::abs(tmp) < m_win.m/((T)m_win.n[0])) { /* PHI has compact support */
+	        		m_fplan.f_hat[c][0] = m_fplan.f_hat[j][0]*w;
+	        		m_fplan.f_hat[c][1] = m_fplan.f_hat[j][1]*w;
+	        	} else {
+	        		m_fplan.f_hat[c][0] = 0.;
+	        		m_fplan.f_hat[c][1] = 0.;
+	        	}
+	        }
+
 		NFFTTraits<double>::Trafo (m_fplan);
 		
+        if (m_have_b0 && m_have_timing)
+        	for (size_t j = 0; j < m_fplan.M_total; ++j) {
+        		T w = phi_hut((T)m_win.n[0] * (T)m_fplan.x[3*j+2], 0, m_win);
+        		m_fplan.f[j][0] /= w;
+        		m_fplan.f[j][1] /= w;
+        	}
+
 		tmpd = (double*) m_fplan.f;
 		tmpt = (T*) out.Ptr();
 		std::copy (tmpd, tmpd+2*m_M, tmpt);
@@ -374,7 +395,7 @@ public:
 
 	}
 	
-	
+
 	/**
 	 * @brief    Backward transform
 	 *
@@ -392,7 +413,28 @@ public:
         tmpt = (T*) m.Ptr();
         std::copy (tmpt, tmpt+2*m_M, tmpd);
 
+        if (m_have_b0 && m_have_timing)
+        	for (size_t j = 0; j < m_fplan.M_total; ++j) {
+        		T w = phi_hut((T)m_win.n[0] * (T)m_fplan.x[3*j+2], 0, m_win);
+        		m_fplan.f[j][0] /= w;
+        		m_fplan.f[j][1] /= w;
+        	}
+
 		NFFTTraits<double>::ITrafo ((Plan&) m_fplan, (Solver&) m_iplan, m_maxit, m_epsilon);
+
+        if (m_have_b0 && m_have_timing)
+        	for(size_t j = 0; j < m_N[0]*m_N[1]; ++j) {
+				for(int l = -m_win.n[0]/2;l < m_win.n[0]/2; ++l) {
+					/* PHI has compact support */
+					T tmp = m_b0[j] - ((T)l)/((T)m_win.m);
+					size_t c = j*m_win.n[0]+(l+m_win.n[0]/2);
+					if (std::abs(tmp) < m_win.m/((T)m_win.n[0])) {
+						T w = phi(tmp, 0, m_win);
+						m_fplan.f_hat[j][0] += m_fplan.f_hat[c][1] * w;
+						m_fplan.f_hat[j][1] += m_fplan.f_hat[c][1] * w;
+					}
+				}
+			}
 
 		tmpd = (double*) m_iplan.f_hat_iter;
 		tmpt = (T*) out.Ptr();
@@ -400,7 +442,7 @@ public:
 		
 		if (m_have_b0 && m_have_timing)
 			for (size_t j = 0; j < out.Size(); ++j)
-				out[j] *= std::polar<T> ((T)1., (T)-2. * PI * m_ts * m_b0[j] * m_w);
+				out[j] *= std::polar<T> (1., -2. * PI * m_ts * m_b0[j] * m_w);
 
 		return out;
 		
@@ -457,6 +499,8 @@ private:
 	Solver     m_iplan;         /**< infft plan */
 	
     size_t     m_m;
+
+    Window<T>  m_win;
 
 };
 

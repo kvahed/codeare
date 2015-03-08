@@ -1,18 +1,27 @@
-# - Check if a C function can be linked
+#.rst:
+# CheckFunctionExists
+# -------------------
+#
+# Check if a C function can be linked
+#
 # CHECK_FUNCTION_EXISTS(<function> <variable>)
 #
 # Check that the <function> is provided by libraries on the system and
 # store the result in a <variable>.  This does not verify that any
-# system header file declares the function, only that it can be found
-# at link time (consider using CheckSymbolExists).
+# system header file declares the function, only that it can be found at
+# link time (consider using CheckSymbolExists).
+# <variable> will be created as an internal cache variable.
 #
-# The following variables may be set before calling this macro to
-# modify the way the check is run:
+# The following variables may be set before calling this macro to modify
+# the way the check is run:
 #
-#  CMAKE_REQUIRED_FLAGS = string of compile command line flags
-#  CMAKE_REQUIRED_DEFINITIONS = list of macros to define (-DFOO=bar)
-#  CMAKE_REQUIRED_INCLUDES = list of include directories
-#  CMAKE_REQUIRED_LIBRARIES = list of libraries to link
+# ::
+#
+#   CMAKE_REQUIRED_FLAGS = string of compile command line flags
+#   CMAKE_REQUIRED_DEFINITIONS = list of macros to define (-DFOO=bar)
+#   CMAKE_REQUIRED_INCLUDES = list of include directories
+#   CMAKE_REQUIRED_LIBRARIES = list of libraries to link
+#   CMAKE_REQUIRED_QUIET = execute quietly without messages
 
 #=============================================================================
 # Copyright 2002-2011 Kitware, Inc.
@@ -30,10 +39,12 @@
 
 
 macro(CHECK_FUNCTION_EXISTS FUNCTION VARIABLE)
-  if("${VARIABLE}" MATCHES "^${VARIABLE}$")
+  if(NOT DEFINED "${VARIABLE}" OR "x${${VARIABLE}}" STREQUAL "x${VARIABLE}")
     set(MACRO_CHECK_FUNCTION_DEFINITIONS
       "-DCHECK_FUNCTION_EXISTS=${FUNCTION} ${CMAKE_REQUIRED_FLAGS}")
-    message(STATUS "Looking for ${FUNCTION}")
+    if(NOT CMAKE_REQUIRED_QUIET)
+      message(STATUS "Looking for ${FUNCTION}")
+    endif()
     if(CMAKE_REQUIRED_LIBRARIES)
       set(CHECK_FUNCTION_EXISTS_ADD_LIBRARIES
         LINK_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
@@ -56,12 +67,16 @@ macro(CHECK_FUNCTION_EXISTS FUNCTION VARIABLE)
       OUTPUT_VARIABLE OUTPUT)
     if(${VARIABLE})
       set(${VARIABLE} 1 CACHE INTERNAL "Have function ${FUNCTION}")
-      message(STATUS "Looking for ${FUNCTION} - found")
+      if(NOT CMAKE_REQUIRED_QUIET)
+        message(STATUS "Looking for ${FUNCTION} - found")
+      endif()
       file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
         "Determining if the function ${FUNCTION} exists passed with the following output:\n"
         "${OUTPUT}\n\n")
     else()
-      message(STATUS "Looking for ${FUNCTION} - not found")
+      if(NOT CMAKE_REQUIRED_QUIET)
+        message(STATUS "Looking for ${FUNCTION} - not found")
+      endif()
       set(${VARIABLE} "" CACHE INTERNAL "Have function ${FUNCTION}")
       file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeError.log
         "Determining if the function ${FUNCTION} exists failed with the following output:\n"
