@@ -37,15 +37,11 @@ add_library (GRAPPA MODULE GRAPPA.hpp GRAPPA.cpp)
 set_target_properties(GRAPPA PROPERTIES PREFIX "")
 target_link_libraries (GRAPPA ${COMLIBS})
 
-add_library (MyAlgo MODULE MyAlgo.hpp MyAlgo.cpp)
-set_target_properties(MyAlgo PROPERTIES PREFIX "")
-target_link_libraries (MyAlgo ${COMLIBS})
-
 add_library (DummyRecon MODULE DummyRecon.hpp DummyRecon.cpp)
 set_target_properties(DummyRecon PROPERTIES PREFIX "")
 target_link_libraries (DummyRecon ${COMLIBS})
 
-list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE GRAPPA MyAlgo DummyRecon)
+list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE GRAPPA DummyRecon)
 
 if (${NFFT_FOUND})
 

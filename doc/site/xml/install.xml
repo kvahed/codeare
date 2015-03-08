@@ -14,45 +14,12 @@
     <pre class="sh_sh">
       > sudo apt-get install git build-essential fftw3-dev itk3-dev \
         libboost-dev libboost-system-dev libboost-thread-dev \
-        libboost-program-options-dev libboos-timer libnifti-dev \
+        libboost-program-options-dev libboost-timer-dev libnifti-dev \
         liblapack-dev libgsl0-dev omniorb-nameserver libomniorb4-dev \
         omniidl libatlas-dev libatlas-base-dev autoconf libtool \
-	    libinsighttoolkit3-dev libhdf5-dev  
+	    libinsighttoolkit3-dev libhdf5-dev libnfft3-dev
     </pre>
 
-    <h3>HDF5 (&gt;=1.8)</h3>
-    <p>
-      Unfortunately somebody has broken the HDF5 library which is
-      shipped with Ubuntu (12.10-13.04). So either you take 12.04LTS or
-      you will have to build HDF5 yourself. Download HDF5 from here:
-      <a href="http://www.hdfgroup.org/ftp/HDF5/current/src/"
-         target="hdf5"> 
-        http://www.hdfgroup.org/ftp/HDF5/current/src/
-      </a>
-      Build as follows. This will take a little while
-    </p>
-    
-    <pre class="sh_sh">
-      > cd hdf5-1.x.xx;
-      > ./configure --enable-cxx --prefix=/usr/local
-      > make 
-      > make check 
-      > sudo make install 
-    </pre>
-
-    <h3>NFFT 3</h3>
-    <p>
-      Get NFFT3 from here: 
-      <a href="http://www-user.tu-chemnitz.de/~potts/nfft/download.php" target="nfft">
-        http://www-user.tu-chemnitz.de/~potts/nfft/download.php
-      </a>
-    </p>
-    <pre class="sh_sh">
-      > tar xzf nfft-x.x.x/
-      > CXXFLAGS="-Ofast -march=native" CFLAGS=$CXXFLAGS ./configure  --enable-all
-      > make 
-      > sudo make install 
-    </pre>
 
 	<h3>ISMRMRD</h3>
     <p>Stronlgy suggested for building in ISMRMRD support</p>
@@ -84,19 +51,21 @@
 	<p>
 	  Fairly easy (f.e. ubuntu with MATLAB 2012a at the default location)
 	</p>
-    Configure with MATLAB and ISMRMRD support:
     <pre class="sh_sh">
-      > CPPFLAGS="-I/usr/include/nifti" CXXFLAGS="-Ofast -march=native"\
-        CFLAGS=$CXXFLAGS ./configure --with-matlabroot=/opt/MATLAB/... \ 
-        --with-fftw=/usr --with-itkroot=/usr --disable-static
-      > make
-      > wget http://codeare.org/download/matlab_share.tar.gz 
+      > cd codeare 
+      > mkdir build
+      > cd build
+      > cmake .. -Wno-dev
+      > make 
+      > make test
+      > cd ..
+      > wget http://codeare.org/download/matlab_share.zip
         #if built with MATLAB support else:
-      > wget http://codeare.org/download/hdf5_share.tar.gz
-        # Unpack with tar xzf
-      > export LD_LIBRARY_PATH=/usr/local/lib 
-      > make check
-      > make install
+      > wget http://codeare.org/download/hdf5_share.zip
+      > unzip *_share.zip
+      > cd build
+      > make test
+      > sudo make install
     </pre>
     ]]>
   </article>
