@@ -80,17 +80,17 @@ foreach(_library ${_list})
   if(_libraries_work)
     if (BLA_STATIC)
       if (WIN32)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
+	set(CMAKE_FIND_LIBRARY_SUFFIXES .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
       endif ()
       if (APPLE)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
+	set(CMAKE_FIND_LIBRARY_SUFFIXES .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
       else ()
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+	set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
       endif ()
     else ()
 			if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        # for ubuntu's libblas3gf and liblapack3gf packages
-        set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} .so.3gf)
+	# for ubuntu's libblas3gf and liblapack3gf packages
+	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} .so.3gf)
       endif ()
     endif ()
     find_library(${_prefix}_${_library}_LIBRARY
@@ -231,53 +231,53 @@ if (BLA_VENDOR MATCHES "Intel*" OR BLA_VENDOR STREQUAL "All")
     endif()
     if (BLA_F95)
       if(NOT LAPACK95_LIBRARIES)
-        # old
-        check_lapack_libraries(
-          LAPACK95_LIBRARIES
-          LAPACK
-          cheev
-          ""
-          "mkl_lapack95"
-          "${BLAS95_LIBRARIES}"
-          "${CMAKE_THREAD_LIBS_INIT};${LM}"
-          )
+	# old
+	check_lapack_libraries(
+	  LAPACK95_LIBRARIES
+	  LAPACK
+	  cheev
+	  ""
+	  "mkl_lapack95"
+	  "${BLAS95_LIBRARIES}"
+	  "${CMAKE_THREAD_LIBS_INIT};${LM}"
+	  )
       endif()
       if(NOT LAPACK95_LIBRARIES)
-        # new >= 10.3
-        check_lapack_libraries(
-          LAPACK95_LIBRARIES
-          LAPACK
-          CHEEV
-          ""
-          "mkl_intel_lp64"
-          "${BLAS95_LIBRARIES}"
-          "${CMAKE_THREAD_LIBS_INIT};${LM}"
-          )
+	# new >= 10.3
+	check_lapack_libraries(
+	  LAPACK95_LIBRARIES
+	  LAPACK
+	  CHEEV
+	  ""
+	  "mkl_intel_lp64"
+	  "${BLAS95_LIBRARIES}"
+	  "${CMAKE_THREAD_LIBS_INIT};${LM}"
+	  )
       endif()
     else()
       if(NOT LAPACK_LIBRARIES)
-        # old
-        check_lapack_libraries(
-          LAPACK_LIBRARIES
-          LAPACK
-          cheev
-          ""
-          "mkl_lapack"
-          "${BLAS_LIBRARIES}"
-          "${CMAKE_THREAD_LIBS_INIT};${LM}"
-          )
+	# old
+	check_lapack_libraries(
+	  LAPACK_LIBRARIES
+	  LAPACK
+	  cheev
+	  ""
+	  "mkl_lapack"
+	  "${BLAS_LIBRARIES}"
+	  "${CMAKE_THREAD_LIBS_INIT};${LM}"
+	  )
       endif()
       if(NOT LAPACK_LIBRARIES)
-        # new >= 10.3
-        check_lapack_libraries(
-          LAPACK_LIBRARIES
-          LAPACK
-          cheev
-          ""
-          "mkl_gf_lp64"
-          "${BLAS_LIBRARIES}"
-          "${CMAKE_THREAD_LIBS_INIT};${LM}"
-          )
+	# new >= 10.3
+	check_lapack_libraries(
+	  LAPACK_LIBRARIES
+	  LAPACK
+	  cheev
+	  ""
+	  "mkl_gf_lp64"
+	  "${BLAS_LIBRARIES}"
+	  "${CMAKE_THREAD_LIBS_INIT};${LM}"
+	  )
       endif()
     endif()
   endif ()

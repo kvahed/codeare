@@ -93,17 +93,17 @@ foreach(_library ${_list})
   if(_libraries_work)
     if (BLA_STATIC)
       if (WIN32)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
+	set(CMAKE_FIND_LIBRARY_SUFFIXES .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
       endif ()
       if (APPLE)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
+	set(CMAKE_FIND_LIBRARY_SUFFIXES .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
       else ()
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+	set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
       endif ()
     else ()
       if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        # for ubuntu's libblas3gf and liblapack3gf packages
-        set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} .so.3gf)
+	# for ubuntu's libblas3gf and liblapack3gf packages
+	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} .so.3gf)
       endif ()
     endif ()
     find_library(${_prefix}_${_library}_LIBRARY
@@ -470,71 +470,71 @@ if (BLA_VENDOR MATCHES "Intel*" OR BLA_VENDOR STREQUAL "All")
     set(_LIBRARIES BLAS95_LIBRARIES)
     if (WIN32)
       list(APPEND BLAS_SEARCH_LIBS
-        "mkl_blas95 mkl_intel_c mkl_intel_thread mkl_core libguide40")
+	"mkl_blas95 mkl_intel_c mkl_intel_thread mkl_core libguide40")
     else ()
       if (BLA_VENDOR STREQUAL "Intel10_32" OR BLA_VENDOR STREQUAL "All")
-        list(APPEND BLAS_SEARCH_LIBS
-          "mkl_blas95 mkl_intel mkl_intel_thread mkl_core guide")
+	list(APPEND BLAS_SEARCH_LIBS
+	  "mkl_blas95 mkl_intel mkl_intel_thread mkl_core guide")
       endif ()
       if (BLA_VENDOR STREQUAL "Intel10_64lp" OR BLA_VENDOR STREQUAL "All")
-        # old version
-        list(APPEND BLAS_SEARCH_LIBS
-          "mkl_blas95 mkl_intel_lp64 mkl_intel_thread mkl_core guide")
+	# old version
+	list(APPEND BLAS_SEARCH_LIBS
+	  "mkl_blas95 mkl_intel_lp64 mkl_intel_thread mkl_core guide")
 
-        # mkl >= 10.3
-        if (CMAKE_C_COMPILER MATCHES ".+gcc.*")
-          list(APPEND BLAS_SEARCH_LIBS
-            "mkl_blas95_lp64 mkl_intel_lp64 mkl_gnu_thread mkl_core gomp")
-        else ()
-          list(APPEND BLAS_SEARCH_LIBS
-            "mkl_blas95_lp64 mkl_intel_lp64 mkl_intel_thread mkl_core iomp5")
-        endif ()
+	# mkl >= 10.3
+	if (CMAKE_C_COMPILER MATCHES ".+gcc.*")
+	  list(APPEND BLAS_SEARCH_LIBS
+	    "mkl_blas95_lp64 mkl_intel_lp64 mkl_gnu_thread mkl_core gomp")
+	else ()
+	  list(APPEND BLAS_SEARCH_LIBS
+	    "mkl_blas95_lp64 mkl_intel_lp64 mkl_intel_thread mkl_core iomp5")
+	endif ()
       endif ()
     endif ()
     if (BLA_VENDOR STREQUAL "Intel10_64lp_seq" OR BLA_VENDOR STREQUAL "All")
       list(APPEND BLAS_SEARCH_LIBS
-        "mkl_blas95_lp64 mkl_intel_lp64 mkl_sequential mkl_core")
+	"mkl_blas95_lp64 mkl_intel_lp64 mkl_sequential mkl_core")
     endif ()
   else ()
     set(BLAS_mkl_SEARCH_SYMBOL sgemm)
     set(_LIBRARIES BLAS_LIBRARIES)
     if (WIN32)
       list(APPEND BLAS_SEARCH_LIBS
-        "mkl_c_dll mkl_intel_thread_dll mkl_core_dll libguide40")
+	"mkl_c_dll mkl_intel_thread_dll mkl_core_dll libguide40")
     else ()
       if (BLA_VENDOR STREQUAL "Intel10_32" OR BLA_VENDOR STREQUAL "All")
-        list(APPEND BLAS_SEARCH_LIBS
-          "mkl_intel mkl_intel_thread mkl_core guide")
+	list(APPEND BLAS_SEARCH_LIBS
+	  "mkl_intel mkl_intel_thread mkl_core guide")
       endif ()
       if (BLA_VENDOR STREQUAL "Intel10_64lp" OR BLA_VENDOR STREQUAL "All")
 
-        # old version
-        list(APPEND BLAS_SEARCH_LIBS
-          "mkl_intel_lp64 mkl_intel_thread mkl_core guide")
+	# old version
+	list(APPEND BLAS_SEARCH_LIBS
+	  "mkl_intel_lp64 mkl_intel_thread mkl_core guide")
 
-        # mkl >= 10.3
-        if (CMAKE_C_COMPILER MATCHES ".+gcc.*")
-          list(APPEND BLAS_SEARCH_LIBS
-            "mkl_intel_lp64 mkl_gnu_thread mkl_core gomp")
-        else ()
-          list(APPEND BLAS_SEARCH_LIBS
-            "mkl_intel_lp64 mkl_intel_thread mkl_core iomp5")
-        endif ()
+	# mkl >= 10.3
+	if (CMAKE_C_COMPILER MATCHES ".+gcc.*")
+	  list(APPEND BLAS_SEARCH_LIBS
+	    "mkl_intel_lp64 mkl_gnu_thread mkl_core gomp")
+	else ()
+	  list(APPEND BLAS_SEARCH_LIBS
+	    "mkl_intel_lp64 mkl_intel_thread mkl_core iomp5")
+	endif ()
       endif ()
 
       #older vesions of intel mkl libs
       if (BLA_VENDOR STREQUAL "Intel" OR BLA_VENDOR STREQUAL "All")
-        list(APPEND BLAS_SEARCH_LIBS
-          "mkl")
-        list(APPEND BLAS_SEARCH_LIBS
-          "mkl_ia32")
-        list(APPEND BLAS_SEARCH_LIBS
-          "mkl_em64t")
+	list(APPEND BLAS_SEARCH_LIBS
+	  "mkl")
+	list(APPEND BLAS_SEARCH_LIBS
+	  "mkl_ia32")
+	list(APPEND BLAS_SEARCH_LIBS
+	  "mkl_em64t")
       endif ()
     endif ()
     if (BLA_VENDOR STREQUAL "Intel10_64lp_seq" OR BLA_VENDOR STREQUAL "All")
       list(APPEND BLAS_SEARCH_LIBS
-        "mkl_intel_lp64 mkl_sequential mkl_core")
+	"mkl_intel_lp64 mkl_sequential mkl_core")
     endif ()
   endif ()
 
@@ -543,13 +543,13 @@ if (BLA_VENDOR MATCHES "Intel*" OR BLA_VENDOR STREQUAL "All")
     if (${_LIBRARIES})
     else ()
       check_fortran_libraries(
-        ${_LIBRARIES}
-        BLAS
-        ${BLAS_mkl_SEARCH_SYMBOL}
-        ""
-        "${SEARCH_LIBS}"
-        "${CMAKE_THREAD_LIBS_INIT};${LM}"
-        )
+	${_LIBRARIES}
+	BLAS
+	${BLAS_mkl_SEARCH_SYMBOL}
+	""
+	"${SEARCH_LIBS}"
+	"${CMAKE_THREAD_LIBS_INIT};${LM}"
+	)
     endif ()
   endforeach ()
 
@@ -569,11 +569,11 @@ if(BLA_F95)
       message(STATUS "A library with BLAS95 API found.")
     else()
       if(BLAS_FIND_REQUIRED)
-        message(FATAL_ERROR
-        "A required library with BLAS95 API not found. Please specify library location.")
+	message(FATAL_ERROR
+	"A required library with BLAS95 API not found. Please specify library location.")
       else()
-        message(STATUS
-        "A library with BLAS95 API not found. Please specify library location.")
+	message(STATUS
+	"A library with BLAS95 API not found. Please specify library location.")
       endif()
     endif()
   endif()
@@ -591,13 +591,13 @@ else()
       message(STATUS "A library with BLAS API found.")
     else()
       if(BLAS_FIND_REQUIRED)
-        message(FATAL_ERROR
-        "A required library with BLAS API not found. Please specify library location."
-        )
+	message(FATAL_ERROR
+	"A required library with BLAS API not found. Please specify library location."
+	)
       else()
-        message(STATUS
-        "A library with BLAS API not found. Please specify library location."
-        )
+	message(STATUS
+	"A library with BLAS API not found. Please specify library location."
+	)
       endif()
     endif()
   endif()
