@@ -185,6 +185,19 @@ namespace RRStrategy {
 		
 		
 		/**
+		 * @brief       Get reference to complex single matrix by name from database
+		 *              @see Workspace::Get<T>(const string)
+		 *
+		 * @param  name Name
+		 * @return      Reference to data
+		 */
+		template <class T> codeare::error_code
+		Exists            (const std::string& name) const {
+			return global->Exists<T>(name);
+		}
+
+
+		/**
 		 * @brief       Clear database of complex single matrix by name
 		 *              @see Workspace::FreeCXFL(const string)
 		 * 

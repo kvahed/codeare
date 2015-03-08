@@ -55,17 +55,30 @@ struct Window {
 	int d;
 	int m;
 	Vector<int> n;
-	T sigma;
+	Vector<T> sigma;
 	Vector<T> b;
 	Vector<T> spline_coeffs;
-	Window () : d(1), m(1), sigma(1.), n(Vector<int>(1,1)) { }
-	Window (size_t m, size_t n, double sigma) : d(1), m(m), sigma(sigma), n(Vector<int>(1,n)) { }
+	Window () : d(1), m(1), sigma(Vector<T>(1,1.)), n(Vector<int>(1,1)) { }
+	Window (size_t _m, size_t _n, double _sigma) : d(1), m(_m), sigma(Vector<T>(d,_sigma)), n(Vector<int>(d,_n)) {
+		b.resize(1);
+		for (size_t i = 0; i < d; ++i)
+			b[i] = KPI*(2.0-1.0/sigma[i]);
+	}
+	Window (const Window& win) {
+		*this = win;
+	}
+
 	friend std::ostream& operator<< (std::ostream& os, const Window<T>& win) {
 		printf ("      Window:\n");
-		printf ("        d(%d) m(%d) sigma(.3f)\n", win.d, win.m, win.sigma);
-		printf ("        n()\n");
-		printf ("        spline_coeffs()\n");
-		printf ("        b()\n");
+		printf ("        d(%d) m(%d)\n", win.d, win.m);
+		printf ("        n(");
+		std::cout << win.n << ")" << std::endl;
+		printf ("        sigma(");
+		std::cout << win.sigma << ")" << std::endl;
+		printf ("        spline_coeffs(");
+		std::cout << win.spline_coeffs << ")" << std::endl;
+		printf ("        b(");
+		std::cout << win.b << ")" << std::endl;
 		return os;
 	}
 
@@ -450,66 +463,6 @@ struct NFFTTraits<double> {
 
 	}
 
-	/**
-	 * @brief            Initialise plan
-	 *
-	 * @param  d         Number of dimension (i.e. {1..3})
-	 * @param  N         Actual dimensions
-	 * @param  M         Number of k-space samples
-	 * @param  n         Oversampled N
-	 * @param  m         Spatial cutoff
-	 * @param  np        Forward FT plan
-	 * @param  inp       Inverse FT plan
-	 *
-	 * @return success
-	 */
-	inline static int
-	Init  (const Vector<int>& N, size_t M, const Vector<int>& n, int m, const Vector<T>& b0,
-			const Vector<T>& t, Plan& np, Solver& inp) NOEXCEPT {
-
-
-		Vector<int> _N(N), _n(n);
-		int _d (N.size()), _M(M), _m(m);
-		unsigned nfft_flags, infft_flags, solver_flags;
-
-		infft_flags  = FFTW_MEASURE| FFTW_DESTROY_INPUT;
-		solver_flags = CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
-		nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
-				PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
-
-/*
-		  ths->N3=N[2];
-		  ths->sigma3=sigma;
-		  nfft_init_guru(&ths->plan,3,N,M,n,m,nfft_flags,fftw_flags);
-		  ths->N_total = N[0]*N[1];
-		  ths->M_total = ths->plan.M_total;
-		  ths->f = ths->plan.f;
-		  ths->f_hat = (double _Complex*) nfft_malloc(ths->N_total*sizeof(double _Complex));
-		  ths->w = (double*) nfft_malloc(ths->N_total*sizeof(double));
-
-		  ths->mv_trafo = (void (*) (void* ))mri_inh_3d_trafo;
-		  ths->mv_adjoint = (void (*) (void* ))mri_inh_3d_adjoint;
-*/
-
-#ifdef _OPENMP
-		fftw_import_wisdom_from_filename("codeare_threads.plan");
-#else
-		fftw_import_wisdom_from_filename("codeare_single.plan");
-#endif
-
-		nfft_init_guru (&np, _d, _N.ptr(), _M, _n.ptr(), _m, nfft_flags, infft_flags);
-		solver_init_advanced_complex (&inp, (nfft_mv_plan_complex*) &np, solver_flags);
-
-#ifdef _OPENMP
-		fftw_export_wisdom_to_filename("codeare_threads.plan");
-#else
-		fftw_export_wisdom_to_filename("codeare_single.plan");
-#endif
-
-		return 0;
-
-	}
-
 
 
 	/**
@@ -554,10 +507,8 @@ struct NFFTTraits<double> {
 	 */
 	inline static int
 	Trafo                (const Plan& np) NOEXCEPT {
-
 		nfft_trafo ((Plan*) &np);
 		return 0;
-
 	}
 
 
@@ -587,25 +538,24 @@ struct NFFTTraits<double> {
 	 */
 	inline static int
 	Weights              (const Plan& np, const Solver& spc) NOEXCEPT {
-
+		int error = 0;
 		int j, k, z, N = np.N[0], N2 = N*N, NH = .5*N;
 		T k2, j2, z2;
-
 		if (spc.flags & PRECOMPUTE_DAMP)
-			if (np.d == 3) {
-				for (j = 0; j < N; ++j) {
-					j2 = j - NH;
-					j2 *= j2;
-					for (k = 0; k < N; ++k) {
-						k2 = k - NH;
-						k2 *= k2;
-						for (z = 0; z < N; ++z) {
-							z2 = z - NH;
-							spc.w_hat[z*N2+j*N+k] = (sqrt(j2+k2+z2*z2) > NH) ? 0. : 1.;
-						}
-					}
-				}
-			} else {
+//			if (np.d == 3) {
+//				for (j = 0; j < N; ++j) {
+//					j2 = j - NH;
+//					j2 *= j2;
+//					for (k = 0; k < N; ++k) {
+//						k2 = k - NH;
+//						k2 *= k2;
+//						for (z = 0; z < N; ++z) {
+//							z2 = z - NH;
+//							spc.w_hat[z*N2+j*N+k] = (sqrt(j2+k2+z2*z2) > NH) ? 0. : 1.;
+//						}
+//					}
+//				}
+//			} else {
 				for (j = 0; j < N; j++) {
 					j2 = j-NH;
 					j2 *= j2;
@@ -614,8 +564,7 @@ struct NFFTTraits<double> {
 						spc.w_hat[j*N+k] = (sqrt(j2+k2*k2) > NH) ? 0. : 1.;
 					}
 				}
-			}
-
+//			}
 		return np.M_total;
 
 	}
@@ -630,17 +579,11 @@ struct NFFTTraits<double> {
 	 */
 	inline static int
 	Psi                  (Plan& np) NOEXCEPT {
-
-		/* precompute full psi */
-		if(np.nfft_flags & PRE_PSI)
+		if(np.nfft_flags & PRE_PSI) /* precompute full psi */
 			nfft_precompute_one_psi(&np);
-
-		/* precompute full psi */
-		if(np.nfft_flags & PRE_FULL_PSI)
+		if(np.nfft_flags & PRE_FULL_PSI) /* precompute full psi */
 			nfft_precompute_full_psi(&np);
-
 		return 0;
-
 	}
 
 

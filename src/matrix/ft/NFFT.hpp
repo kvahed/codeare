@@ -68,7 +68,7 @@ public:
 	 * @param  eps     Convergence criterium for inverse transform (default: 1.0e-7)
 	 * @param  maxit   Maximum # NFFT iterations (default: 3)
 	 */
-	inline NFFT        (const Matrix<size_t>& imsize, const size_t& nk, const size_t m = 1, 
+	inline NFFT        (const Vector<size_t>& imsize, const size_t& nk, const size_t m = 1,
 				 const T alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1),
 				 const Matrix< std::complex<T> > pc = Matrix< std::complex<T> >(1),
 				 const T eps = 7.0e-4, const size_t maxit = 2) NOEXCEPT :
@@ -78,7 +78,7 @@ public:
 		m_imgsz = 2;
 		m_m = m;
 		
-		m_N = imsize.Container();
+		m_N = imsize;
 		m_n = m_N;//ceil (alpha*m_N);
 
 		m_rank = numel(imsize);
@@ -137,7 +137,7 @@ public:
 				m_m = unsigned_cast (p["m"]);
 			} catch (const boost::bad_any_cast&) {
 				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor m. "
-						"Defaulting to 1.");
+						"Defaulting to 1.\n");
 				m_m = 1;
 			}
 		} else {
@@ -150,7 +150,7 @@ public:
 				alpha = fp_cast(p["alpha"]);
 			} catch (const boost::bad_any_cast&) {
 				printf ("  WARNING - NFFT: Could not interpret input for oversampling factor alpha. "
-						"Defaulting to 1.0");
+						"Defaulting to 1.0\n");
 			}
 		}
 
@@ -166,7 +166,7 @@ public:
 				m_epsilon = fp_cast (p["epsilon"]);
 			} catch (const boost::bad_any_cast&) {
 				printf ("  WARNING - NFFT: Could not interpret input for convergence criterium epsilon. "
-						"Defaulting to 0.0007");
+						"Defaulting to 0.0007\n");
 				m_epsilon = 7.e-4f;
 			}
 		} else {
@@ -178,7 +178,7 @@ public:
 				m_maxit = unsigned_cast (p["maxit"]);
 			} catch (const boost::bad_any_cast&) {
 				printf ("  WARNING - NFFT: Could not interpret input for maximum NFFT steps. "
-						"Defaulting to 3");
+						"Defaulting to 3\n");
 				m_maxit = 3;
 			}
 		} else {
@@ -190,28 +190,29 @@ public:
 				m_b0 = p.Get<Matrix<T> >("b0");
 				if (numel(m_b0) != prod(m_N))
 					printf ("  WARNING - NFFT: b0 field does not fit to image space. "
-							"Defaulting to flat b0 = 0");
+							"Defaulting to flat b0 = 0\n");
 				else
 					m_have_b0 = true;
 			} catch (const boost::bad_any_cast&) {
 				printf ("  WARNING - NFFT: Could not interpret input for b0. "
-						"Defaulting to flat b0 = 0");
+						"Defaulting to flat b0 = 0\n");
 			}
 		}
 
-		if (p.exists("times")) {
+		if (p.exists("timing")) {
 			try {
-				m_t = p.Get<Matrix<T> >("time");
+				m_t = p.Get<Matrix<T> >("timing");
 				if (numel(m_t) != m_M)
-					printf ("  WARNING - NFFT: b0 field does not fit to image space. "
-							"Defaulting to flat b0 = 0");
+					printf ("  WARNING - NFFT: kspace trajectory timing fit to trajectory. "
+							"Defaulting to flat b0 = 0\n");
 				else
 					m_have_timing = true;
 			} catch (const boost::bad_any_cast&) {
-				printf ("  WARNING - NFFT: Could not interpret input for trajectory timing. "
-						"Defaulting to flat b0 = 0");
+				printf ("  WARNING - NFFT: Could not interpret input for kspace trajectory timing. "
+						"Defaulting to flat b0 = 0\n");
 			}
 		}
+
 
 		if (m_have_b0 && m_have_timing) {
 
@@ -269,10 +270,8 @@ public:
 	 * @brief        Clean up and destruct
 	 */ 
 	~NFFT () NOEXCEPT {
-		
 		if (m_initialised)
 			NFFTTraits<double>::Finalize (m_fplan, m_iplan);
-
 	}
 
 
@@ -301,6 +300,7 @@ public:
 		m_max_t       = ft.m_max_t;
 		m_min_b0      = ft.m_min_b0;
 		m_max_b0      = ft.m_max_b0;
+		m_win         = ft.m_win;
 		NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
 	    return *this;
 		
@@ -312,7 +312,7 @@ public:
 	 * @param  k   Kspace trajectory
 	 */
 	inline void 
-	KSpace (const Matrix<T>& k) NOEXCEPT {		
+	KSpace (const Matrix<T>& k) NOEXCEPT {
 		if (m_have_b0 && m_have_timing) { // +1D for omega
 			for (size_t j = 0; j < m_fplan.M_total; ++j) {
 				m_fplan.x[3*j+0] = real(k[2*j+0]);
@@ -348,11 +348,9 @@ public:
 	 */
 	Matrix< std::complex<T> >
 	Trafo       (const Matrix< std::complex<T> >& m) const NOEXCEPT {
-
 		Matrix< std::complex<T> > out (m_M,1);
 		double* tmpd;
 		T* tmpt;
-		
 		tmpd = (double*) m_fplan.f_hat;
 		tmpt = (T*) m.Ptr();
 		if (m_have_b0 && m_have_timing)
@@ -363,23 +361,23 @@ public:
 			}
 		else
 			std::copy (tmpt, tmpt+m_imgsz, tmpd);
-
-	    for (size_t j = 0; j < m_fplan.N_total; ++j)
-	        for (int l = -m_win.n[0]/2; l < m_win.n[0]/2; ++l) {
-	        	T tmp = m_b0[j]-((T)l)/((T)m_win.n[0]);
-	        	T w   = phi(tmp, 0, m_win);
-	        	size_t c = j*m_win.n[0]+(l+m_win.n[0]/2);
-	        	if (std::abs(tmp) < m_win.m/((T)m_win.n[0])) { /* PHI has compact support */
-	        		m_fplan.f_hat[c][0] = m_fplan.f_hat[j][0]*w;
-	        		m_fplan.f_hat[c][1] = m_fplan.f_hat[j][1]*w;
-	        	} else {
-	        		m_fplan.f_hat[c][0] = 0.;
-	        		m_fplan.f_hat[c][1] = 0.;
-	        	}
-	        }
+        if (m_have_b0 && m_have_timing)
+			for (size_t j = 0; j < m_fplan.N_total; ++j)
+				for (int l = -m_win.n[0]/2; l < m_win.n[0]/2; ++l) {
+					T tmp = m_b0[j]-((T)l)/((T)m_win.n[0]);
+					T w   = phi(tmp, 0, m_win);
+					size_t c = j*m_win.n[0]+(l+m_win.n[0]/2);
+					if (std::abs(tmp) < m_win.m/((T)m_win.n[0])) { /* PHI has compact support */
+						m_fplan.f_hat[c][0] = m_fplan.f_hat[j][0]*w;
+						m_fplan.f_hat[c][1] = m_fplan.f_hat[j][1]*w;
+					} else {
+						m_fplan.f_hat[c][0] = 0.;
+						m_fplan.f_hat[c][1] = 0.;
+					}
+				}
 
 		NFFTTraits<double>::Trafo (m_fplan);
-		
+
         if (m_have_b0 && m_have_timing)
         	for (size_t j = 0; j < m_fplan.M_total; ++j) {
         		T w = phi_hut((T)m_win.n[0] * (T)m_fplan.x[3*j+2], 0, m_win);
@@ -390,7 +388,7 @@ public:
 		tmpd = (double*) m_fplan.f;
 		tmpt = (T*) out.Ptr();
 		std::copy (tmpd, tmpd+2*m_M, tmpt);
-		
+
 		return squeeze(out);
 
 	}
@@ -405,7 +403,10 @@ public:
 	Matrix< std::complex<T> >
 	Adjoint     (const Matrix< std::complex<T> >& m) const NOEXCEPT {
 
-        Matrix< std::complex<T> > out (m_N);
+		Vector<size_t> N = m_N;
+		if (m_have_b0 && m_have_timing)
+			N.PopBack();
+        Matrix< std::complex<T> > out (N);
         double* tmpd;
         T* tmpt;
 
@@ -439,7 +440,7 @@ public:
 		tmpd = (double*) m_iplan.f_hat_iter;
 		tmpt = (T*) out.Ptr();
 		std::copy (tmpd, tmpd+m_imgsz, tmpt);
-		
+
 		if (m_have_b0 && m_have_timing)
 			for (size_t j = 0; j < out.Size(); ++j)
 				out[j] *= std::polar<T> (1., -2. * PI * m_ts * m_b0[j] * m_w);

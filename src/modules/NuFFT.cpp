@@ -57,7 +57,7 @@ NuFFT::Init () {
 	m_initialised               = false;
 
 	int shots, M, dim, maxit, m, N[4];
-	double epsilon, alpha;
+	float epsilon, alpha;
  
 
 	for (int i = 0; i < 4; i++)
@@ -88,11 +88,25 @@ NuFFT::Init () {
 
 	// --------------------------------------
 
-	Matrix<size_t> ms (dim,1);
+	Vector<size_t> ms (dim,1);
 	for (size_t i = 0; i < (size_t)dim; i++)
 		ms[i] = N[i];
 
-	ft = NFFT<float> (ms, M * shots, m, alpha);
+
+	Matrix<float> b0 = (Exists<float>("b0")==codeare::OK) ?
+			Get<float>("b0") : Matrix<float>(1);
+	Matrix<float> timing = (Exists<float>("timing")==codeare::OK) ?
+			Get<float>("timing") : Matrix<float>(1);
+
+	Params p;
+	p["alpha"]  = alpha;
+	p["m"]      = m;
+	p["b0"]     = b0;
+	p["timing"] = timing;
+	p["nk"]     = M*shots;
+	p["imsz"]   = ms;
+
+	ft = NFFT<float> (p);
 
 	m_initialised = true;
 
