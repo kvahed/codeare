@@ -77,7 +77,7 @@ template <> struct MXTraits<float> {
 	static const mxClassID prec = mxSINGLE_CLASS;
 	static const mxComplexity cplx = mxREAL;
 	typedef float T;
-	static void Write (mxArray* mxa, const Matrix<T>& M) {write_real(mxa,M);}
+	static void Write (mxArray* mxa, const Matrix<float>& M) {write_real(mxa,M);}
 	static void Read (Matrix<T>& M, const mxArray* mxa) {read_real(M,mxa);}
 };
 template <> struct MXTraits<double> {
