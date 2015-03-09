@@ -243,6 +243,18 @@ public:
 		Vector<T> ret = *this;
 		return ret/=s;
 	}
+	template<class S> inline Vector<T>& operator*= (const S& s) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
+		return *this;
+	}
+	template<class S> inline Vector<T>& operator*= (const Vector<S>& v) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), v.begin(), _data.begin(), std::multiplies<T>());
+		return *this;
+	}
+	template<class S> inline Vector<T> operator* (const S& s) const NOEXCEPT {
+		Vector<T> ret = *this;
+		return ret/=s;
+	}
 
 private:
 	VECTOR_TYPE(T) _data;

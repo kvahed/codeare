@@ -118,12 +118,18 @@ codeare::error_code
 NuFFT::Prepare () {
 
 	codeare::error_code error = codeare::OK;
+	int err =0;
 
 	ft.KSpace  (Get<float> ("kspace"));
+	std::cout << err++ << std::endl;
+
 	ft.Weights (Get<float> ("weights"));
+	std::cout << err++ << std::endl;
 
 	clear (kspace);
+		std::cout << err++ << std::endl;
 	clear (weights);
+	std::cout << err++ << std::endl;
 
 	return error;
 

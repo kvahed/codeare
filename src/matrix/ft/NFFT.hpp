@@ -36,6 +36,7 @@ template <class T>
 class NFFT : public FT<T> {
 
     typedef typename NFFTTraits<double>::Plan   Plan;
+    typedef typename NFFTTraits<double>::B0Plan B0Plan;
     typedef typename NFFTTraits<double>::Solver Solver;
     typedef typename std::complex<T> CT;
 
@@ -88,7 +89,7 @@ public:
         m_epsilon = eps;
         m_maxit   = maxit;
         
-        NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
+        NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
         
         if (pc.Size() > 1)
             m_have_pc = true;
@@ -101,11 +102,11 @@ public:
     }
     
     
-    inline NFFT (const Params& p) NOEXCEPT :
-        m_have_b0(false), m_have_timing(false),
-        m_t (Matrix<T>(1)), m_b0 (Matrix<T>(1)) {
+    inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_have_timing(false),
+        m_t (Matrix<T>(1)), m_b0 (Matrix<T>(1)), m_maxit(3), m_m(1), m_alpha(1.), m_epsilon(7.e-4f),
+        m_sigma(1.0) {
         
-        T sigma = 1.25, min_time, max_time, min_inh, max_inh, t, w, ts;
+        T min_time, max_time, min_inh, max_inh, t, w, ts;
         
         if (p.exists("nk")) {// Number of kspace samples
             try {
@@ -138,16 +139,12 @@ public:
             } catch (const boost::bad_any_cast&) {
                 printf ("  WARNING - NFFT: Could not interpret input for oversampling factor m. "
                         "Defaulting to 1.\n");
-                m_m = 1;
             }
-        } else {
-            m_m = 1;
         }
         
-        T alpha = 1.;
         if (p.exists("alpha")) {
             try {
-                alpha = fp_cast(p["alpha"]);
+                m_alpha = fp_cast(p["alpha"]);
             } catch (const boost::bad_any_cast&) {
                 printf ("  WARNING - NFFT: Could not interpret input for oversampling factor alpha. "
                         "Defaulting to 1.0\n");
@@ -155,10 +152,9 @@ public:
         }
         
         for (size_t i = 0; i < m_N.size(); ++i)
-            m_n[i] = ceil(alpha*m_N[i]);
+            m_n[i] = ceil(m_alpha*m_N[i]);
         
         m_rank = m_N.size();
-        
         m_imgsz = 2*prod(m_N);
 
         if (p.exists("epsilon")) {
@@ -167,10 +163,7 @@ public:
             } catch (const boost::bad_any_cast&) {
                 printf ("  WARNING - NFFT: Could not interpret input for convergence criterium epsilon. "
                         "Defaulting to 0.0007\n");
-                m_epsilon = 7.e-4f;
             }
-        } else {
-            m_epsilon = 7.e-4f;
         }
         
         if (p.exists("maxit")) {
@@ -179,10 +172,7 @@ public:
             } catch (const boost::bad_any_cast&) {
                 printf ("  WARNING - NFFT: Could not interpret input for maximum NFFT steps. "
                         "Defaulting to 3\n");
-                m_maxit = 3;
             }
-        } else {
-            m_maxit = 3;
         }
         
         if (p.exists("b0")) {
@@ -206,7 +196,7 @@ public:
                     printf ("  WARNING - NFFT: kspace trajectory timing fit to trajectory. "
                             "Defaulting to flat b0 = 0\n");
                 else
-                    m_have_timing = true;
+                    m_have_b0 = (m_have_b0 && true);
             } catch (const boost::bad_any_cast&) {
                 printf ("  WARNING - NFFT: Could not interpret input for kspace trajectory timing. "
                         "Defaulting to flat b0 = 0\n");
@@ -214,7 +204,7 @@ public:
         }
         
         
-        if (m_have_b0 && m_have_timing) {
+        if (m_have_b0) {
             
             m_min_t  = min(m_t);
             m_max_t  = max(m_t);
@@ -222,10 +212,10 @@ public:
             m_min_b0 = min(m_b0);
             m_max_b0 = max(m_b0);
             
-            T sigma = 1.2;
+            m_sigma = 1.2;
             
             m_N.push_back(std::ceil(std::max(fabs(m_min_b0),fabs(m_max_b0)) *
-                                    m_max_t-m_min_t/2.+(m_m)/(2.*sigma))*4.*sigma);
+                                    m_max_t-m_min_t/2.+(m_m)/(2.*m_sigma))*4.*m_sigma);
             
             if (m_N[2]%2!=0)
                 m_N[2]++; // need even dimension
@@ -234,15 +224,19 @@ public:
             m_w = std::max(std::abs(m_min_b0),std::abs(m_max_b0))/(.5-((T) m_m)/m_N[2]);
             m_ts =  (m_min_t+m_max_t)/2.;
             t    = ((m_max_t-m_min_t)/2.)/(.5-((T) (m_m))/m_N[2]);
-            
-            for (size_t j = 0; j < m_N[0]*m_N[1]; ++j)
-                m_b0[j] /= m_w;
-            
-            m_win = Window<T> (m_m, m_N[2], sigma);
-            
-        }
 
-        NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
+            m_win = Window<T> (m_m, m_N[2], m_sigma);
+            
+        	NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);
+
+            for (size_t j = 0; j < m_N[0]*m_N[1]; ++j)
+                m_b0_plan.w[j] = m_b0[j] / m_w;
+
+
+        } else {
+
+        	NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
+        }
         
         if (p.exists("pc")) {
             try {
@@ -271,7 +265,10 @@ public:
      */ 
     ~NFFT () NOEXCEPT {
         if (m_initialised)
-            NFFTTraits<double>::Finalize (m_fplan, m_iplan);
+        	if (m_have_b0)
+        		NFFTTraits<double>::Finalize (m_b0_plan, m_solver);
+        	else
+        		NFFTTraits<double>::Finalize (m_plan, m_solver);
     }
     
     
@@ -301,7 +298,11 @@ public:
         m_min_b0      = ft.m_min_b0;
         m_max_b0      = ft.m_max_b0;
         m_win         = ft.m_win;
-        NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_fplan, m_iplan);
+        m_sigma       = ft.m_sigma;
+        if (m_have_b0)
+        	NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);
+        else
+        	NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
         return *this;
         
     }
@@ -313,15 +314,15 @@ public:
      */
     inline void 
     KSpace (const Matrix<T>& k) NOEXCEPT {
-        if (m_have_b0 && m_have_timing) { // +1D for omega
-            for (size_t j = 0; j < m_fplan.M_total; ++j) {
-                m_fplan.x[3*j+0] = real(k[2*j+0]);
-                m_fplan.x[3*j+1] = imag(k[2*j+1]);
-                m_fplan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N[2];
+        if (m_have_b0) { // +1D for omega
+            for (size_t j = 0; j < m_b0_plan.M_total; ++j) {
+                m_b0_plan.plan.x[3*j+0] = real(k[2*j+0]);
+                m_b0_plan.plan.x[3*j+1] = imag(k[2*j+1]);
+                m_b0_plan.plan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N[2];
             }
         } else {
-            assert (k.Size() == m_fplan.M_total*m_rank);
-            std::copy (k.Begin(), k.End(), m_fplan.x);
+            assert (k.Size() == m_plan.M_total*m_rank);
+            std::copy (k.Begin(), k.End(), m_plan.x);
         }
     }
     
@@ -333,10 +334,23 @@ public:
      */
     inline void 
     Weights (const Matrix<T>& w) NOEXCEPT {
-        assert (w.Size() == m_fplan.M_total);
-        std::copy (w.Begin(), w.End(), m_iplan.w);
-        NFFTTraits<double>::Weights (m_fplan, m_iplan);
-        NFFTTraits<double>::Psi (m_fplan);
+
+    	int err = 0;
+    	if (m_have_b0)
+    		assert (w.Size() == m_b0_plan.M_total);
+    	else
+    		assert (w.Size() == m_plan.M_total);
+    	std::cout << err++ << std::endl;
+        std::copy (w.Begin(), w.End(), m_solver.w);
+        std::cout << err++ << std::endl;
+        if (m_have_b0) {
+            NFFTTraits<double>::Weights (m_b0_plan.plan, m_solver, m_rank);
+            NFFTTraits<double>::Psi (m_b0_plan.plan);
+        } else {
+        	NFFTTraits<double>::Weights (m_plan, m_solver, m_rank);
+        	NFFTTraits<double>::Psi (m_plan);
+        }
+        std::cout << err++ << std::endl;
     }
     
     
@@ -351,9 +365,9 @@ public:
         Matrix< std::complex<T> > out (m_M,1);
         double* tmpd;
         T* tmpt;
-        tmpd = (double*) m_fplan.f_hat;
+        tmpd = (double*) m_plan.f_hat;
         tmpt = (T*) m.Ptr();
-        if (m_have_b0 && m_have_timing)
+        if (m_have_b0)
             for (size_t j = 0; j < m.Size(); ++j) {
                 CT val = m[j] * std::polar<T> (1., 2. * PI * m_ts * m_b0[j] * m_w);
                 tmpd[2*j+0] = (double)real(val);
@@ -361,31 +375,13 @@ public:
             }
         else
             std::copy (tmpt, tmpt+m_imgsz, tmpd);
-        if (m_have_b0 && m_have_timing)
-            for (size_t j = 0; j < m_fplan.N_total; ++j)
-                for (int l = -m_win.n[0]/2; l < m_win.n[0]/2; ++l) {
-                    T tmp = m_b0[j]-((T)l)/((T)m_win.n[0]);
-                    T w   = phi(tmp, 0, m_win);
-                    size_t c = j*m_win.n[0]+(l+m_win.n[0]/2);
-                    if (std::abs(tmp) < m_win.m/((T)m_win.n[0])) { /* PHI has compact support */
-                        m_fplan.f_hat[c][0] = m_fplan.f_hat[j][0]*w;
-                        m_fplan.f_hat[c][1] = m_fplan.f_hat[j][1]*w;
-                    } else {
-                        m_fplan.f_hat[c][0] = 0.;
-                        m_fplan.f_hat[c][1] = 0.;
-                    }
-                }
 
-        NFFTTraits<double>::Trafo (m_fplan);
-        
-        if (m_have_b0 && m_have_timing)
-            for (size_t j = 0; j < m_fplan.M_total; ++j) {
-                T w = phi_hut((T)m_win.n[0] * (T)m_fplan.x[3*j+2], 0, m_win);
-                m_fplan.f[j][0] /= w;
-                m_fplan.f[j][1] /= w;
-            }
-        
-        tmpd = (double*) m_fplan.f;
+        if (m_have_b0)
+        	NFFTTraits<double>::Trafo (m_b0_plan);
+        else
+        	NFFTTraits<double>::Trafo (m_plan);
+
+        tmpd = (double*) m_plan.f;
         tmpt = (T*) out.Ptr();
         std::copy (tmpd, tmpd+2*m_M, tmpt);
         
@@ -404,44 +400,26 @@ public:
     Adjoint     (const Matrix< std::complex<T> >& m) const NOEXCEPT {
 
         Vector<size_t> N = m_N;
-        if (m_have_b0 && m_have_timing)
+        if (m_have_b0)
             N.PopBack();
         Matrix< std::complex<T> > out (N);
         double* tmpd;
         T* tmpt;
         
-        tmpd = (double*) m_iplan.y;
+        tmpd = (double*) m_solver.y;
         tmpt = (T*) m.Ptr();
         std::copy (tmpt, tmpt+2*m_M, tmpd);
+
+        if (m_have_b0)
+        	NFFTTraits<double>::ITrafo ((B0Plan&) m_b0_plan, (Solver&) m_solver, m_maxit, m_epsilon);
+        else
+        	NFFTTraits<double>::ITrafo ((Plan&) m_plan, (Solver&) m_solver, m_maxit, m_epsilon);
         
-        if (m_have_b0 && m_have_timing)
-            for (size_t j = 0; j < m_fplan.M_total; ++j) {
-                T w = phi_hut((T)m_win.n[0] * (T)m_fplan.x[3*j+2], 0, m_win);
-                m_fplan.f[j][0] /= w;
-                m_fplan.f[j][1] /= w;
-            }
-        
-        NFFTTraits<double>::ITrafo ((Plan&) m_fplan, (Solver&) m_iplan, m_maxit, m_epsilon);
-        
-        if (m_have_b0 && m_have_timing)
-            for(size_t j = 0; j < m_N[0]*m_N[1]; ++j) {
-                for(int l = -m_win.n[0]/2;l < m_win.n[0]/2; ++l) {
-                    /* PHI has compact support */
-                    T tmp = m_b0[j] - ((T)l)/((T)m_win.m);
-                    size_t c = j*m_win.n[0]+(l+m_win.n[0]/2);
-                    if (std::abs(tmp) < m_win.m/((T)m_win.n[0])) {
-                        T w = phi(tmp, 0, m_win);
-                        m_fplan.f_hat[j][0] += m_fplan.f_hat[c][1] * w;
-                        m_fplan.f_hat[j][1] += m_fplan.f_hat[c][1] * w;
-                    }
-                }
-            }
-        
-        tmpd = (double*) m_iplan.f_hat_iter;
+        tmpd = (double*) m_solver.f_hat_iter;
         tmpt = (T*) out.Ptr();
         std::copy (tmpd, tmpd+m_imgsz, tmpt);
         
-        if (m_have_b0 && m_have_timing)
+        if (m_have_b0)
             for (size_t j = 0; j < out.Size(); ++j)
                 out[j] *= std::polar<T> (1., -2. * PI * m_ts * m_b0[j] * m_w);
         
@@ -449,26 +427,6 @@ public:
         
     }
     
-    
-    /**
-     * @brief     NFFT plan
-     *
-     * @return    Plan
-     */
-    Plan*
-    FPlan         () NOEXCEPT {
-        return &m_fplan;
-    }
-    
-    /**
-     * @brief     NFFT plan
-     *
-     * @return    Plan
-     */
-    Solver*
-    IPlan         () NOEXCEPT {
-        return &m_iplan;
-    }
     
     inline size_t Rank() const NOEXCEPT { return m_rank; }
     
@@ -493,11 +451,12 @@ private:
     size_t     m_M;             /**< @brief Number of k-space knots */
     size_t     m_maxit;         /**< @brief Number of Recon iterations (NFFT 3) */
     T          m_epsilon;       /**< @brief Convergence criterium */
-    T          m_alpha;
+    T          m_alpha, m_sigma;
     size_t     m_imgsz;
     
-    Plan       m_fplan;         /**< nfft  plan */
-    Solver     m_iplan;         /**< infft plan */
+    Plan       m_plan;         /**< nfft  plan */
+    B0Plan     m_b0_plan;
+    Solver     m_solver;         /**< infft plan */
     
     size_t     m_m;
 

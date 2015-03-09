@@ -211,14 +211,14 @@ struct NFFTTraits<float> {
      * @param  M         Number of k-space samples
      * @param  n         Oversampled N
      * @param  m         Spatial cutoff
-     * @param  np        Forward FT plan
-     * @param  inp       Inverse FT plan
+     * @param  plan        Forward FT plan
+     * @param  solver       Inverse FT plan
      *
      * @return success
      */
     inline static int
-    Init  (const int d, int* N, const int M, int* n, const int m, nfftf_plan& np,
-            solverf_plan_complex& inp) NOEXCEPT {
+    Init  (const int d, int* N, const int M, int* n, const int m, nfftf_plan& plan,
+            solverf_plan_complex& solver) NOEXCEPT {
 
         fftwf_init_threads();
         
@@ -229,14 +229,14 @@ struct NFFTTraits<float> {
 #endif
 
         nfftf_init_guru
-            (&np, d, N, M, n, m,
+            (&plan, d, N, M, n, m,
                     NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                     PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT |
                     FFT_OUT_OF_PLACE, FFTW_MEASURE| FFTW_DESTROY_INPUT);
 
 
         solverf_init_advanced_complex
-            (&inp, (nfftf_mv_plan_complex*) &np, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
+            (&solver, (nfftf_mv_plan_complex*) &plan, CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT);
 
 #ifdef _OPENMP
         fftwf_export_wisdom_to_filename("codeare_threads.plan");
@@ -254,31 +254,31 @@ struct NFFTTraits<float> {
      * @brief            Inverse FT
      * 
      * @param  np        NFFT plan
-     * @param  spc       iNFFT plan
+     * @param  solver       iNFFT plan
      * @param  maxiter   Maximum NFFT iterations        
      * @param  epsilon   Convergence criterium
      *
      * @return           Success
      */
     inline static int
-    ITrafo              (nfftf_plan& np, solverf_plan_complex& spc, const int maxiter = 3,
+    ITrafo              (nfftf_plan& plan, solverf_plan_complex& solver, const int maxiter = 3,
             const T epsilon = 3e-7) NOEXCEPT {
         
         int k, l;
         
         /* init some guess */
-        for (k = 0; k < np.N_total; k++) {
-            spc.f_hat_iter[k][0] = 0.0;
-            spc.f_hat_iter[k][1] = 0.0;
+        for (k = 0; k < plan.N_total; k++) {
+            solver.f_hat_iter[k][0] = 0.0;
+            solver.f_hat_iter[k][1] = 0.0;
         }
         
         /* inverse trafo */
-        solverf_before_loop_complex(&spc);
+        solverf_before_loop_complex(&solver);
         
         for (l = 0; l < maxiter; l++) {
-            if (spc.dot_r_iter < epsilon) 
+            if (solver.dot_r_iter < epsilon)
                 break;
-            solverf_loop_one_step_complex(&spc);
+            solverf_loop_one_step_complex(&solver);
         }
         
         return 0;
@@ -290,14 +290,14 @@ struct NFFTTraits<float> {
     /**
      * @brief            Forward FT
      *
-     * @param  np        NFFT plan
+     * @param  plan        NFFT plan
      *
      * @return           Success
      */
     inline static int
-    Trafo                (const nfftf_plan& np) NOEXCEPT {
+    Trafo                (const nfftf_plan& plan) NOEXCEPT {
         
-        nfftf_trafo ((nfftf_plan*) &np);
+        nfftf_trafo ((nfftf_plan*) &plan);
         return 0;
         
     }
@@ -307,14 +307,14 @@ struct NFFTTraits<float> {
     /**
      * @brief            Adjoint FT
      *
-     * @param  np        NFFT plan
+     * @param  plan        NFFT plan
      *
      * @return           Success
      */
     inline static int
-    Adjoint              (const nfftf_plan& np) NOEXCEPT {
+    Adjoint              (const nfftf_plan& plan) NOEXCEPT {
         
-        nfftf_adjoint ((nfftf_plan*) &np);
+        nfftf_adjoint ((nfftf_plan*) &plan);
         return 0;
         
     }
@@ -323,17 +323,17 @@ struct NFFTTraits<float> {
     /**
      * @brief            Set weights
      *
-     * @param  np        Plan
-     * @param  spc       Solver plan
+     * @param  plan        Plan
+     * @param  solver       Solver plan
      * @return           Success
      */
     inline static int
-    Weights              (const nfftf_plan& np, const solverf_plan_complex& spc) NOEXCEPT {
+    Weights              (const nfftf_plan& plan, const solverf_plan_complex& solver) NOEXCEPT {
 
-        int j, k, z, N = np.N[0];
+        int j, k, z, N = plan.N[0];
 
-        if (spc.flags & PRECOMPUTE_DAMP) {
-            if (np.d == 3) {
+        if (solver.flags & PRECOMPUTE_DAMP) {
+            if (plan.d == 3) {
                 for (j = 0; j < N; j++) {
                     T j2 = j - N/2;
                     for (k = 0; k < N; k++) {
@@ -341,7 +341,7 @@ struct NFFTTraits<float> {
                         for (z = 0; z < N; z++) {
                             T z2 = z - N/2;
                             T r  = sqrt(j2*j2+k2*k2+z2*z2);
-                            spc.w_hat[z*N*N+j*N+k] = (r > (T) N/2) ? 0.0 : 1.0;
+                            solver.w_hat[z*N*N+j*N+k] = (r > (T) N/2) ? 0.0 : 1.0;
                         }
                     }
                 }
@@ -351,13 +351,13 @@ struct NFFTTraits<float> {
                     for (k = 0; k < N; k++) {
                         T    k2 = k-N/2;
                         T r  = sqrt(j2*j2+k2*k2);
-                        spc.w_hat[j*N+k]       = (r > (T) N/2) ? 0.0 : 1.0;
+                        solver.w_hat[j*N+k]       = (r > (T) N/2) ? 0.0 : 1.0;
                     }
                 }
             }
         }
 
-        return np.M_total;
+        return plan.M_total;
 
     }
 
@@ -366,19 +366,19 @@ struct NFFTTraits<float> {
     /**
      * @brief            Precompute PSI
      *
-     * @param  np        NFFT plan
+     * @param  plan        NFFT plan
      * @return           Success
      */
     inline static int
-    Psi                  (nfftf_plan& np) NOEXCEPT {
+    Psi                  (nfftf_plan& plan) NOEXCEPT {
         
         /* precompute full psi */
-        if(np.nfft_flags & PRE_PSI)
-            nfftf_precompute_one_psi(&np);
+        if(plan.nfft_flags & PRE_PSI)
+            nfftf_precompute_one_psi(&plan);
         
         /* precompute full psi */
-        if(np.nfft_flags & PRE_FULL_PSI)
-            nfftf_precompute_full_psi(&np);
+        if(plan.nfft_flags & PRE_FULL_PSI)
+            nfftf_precompute_full_psi(&plan);
 
         return 0;
         
@@ -389,15 +389,15 @@ struct NFFTTraits<float> {
     /**
      * @brief            Finalise plans
      *
-     * @param  np        Plan
-     * @param  spc       Solver plan
+     * @param  plan        Plan
+     * @param  solver       Solver plan
      * @return           Success
      */
     inline static int
-    Finalize             (nfftf_plan& np, solverf_plan_complex& spc) NOEXCEPT {
+    Finalize             (nfftf_plan& plan, solverf_plan_complex& solver) NOEXCEPT {
         
-        solverf_finalize_complex(&spc);
-        nfftf_finalize(&np);
+        solverf_finalize_complex(&solver);
+        nfftf_finalize(&plan);
 #ifdef _OPENMP
         fftwf_cleanup_threads();
 #endif
@@ -415,6 +415,7 @@ template <>
 struct NFFTTraits<double> {
 
     typedef nfft_plan           Plan;    /**< @brief nfft plan (double precision) */
+    typedef mri_inh_3d_plan     B0Plan;    /**< @brief nfft plan (double precision) */
     typedef solver_plan_complex Solver;  /**< @brief nfft solver plan (double precision) */
     typedef double              T;
 
@@ -426,21 +427,21 @@ struct NFFTTraits<double> {
      * @param  M         Number of k-space samples
      * @param  n         Oversampled N
      * @param  m         Spatial cutoff
-     * @param  np        Forward FT plan
-     * @param  inp       Inverse FT plan
+     * @param  plan        Forward FT plan
+     * @param  solver       Inverse FT plan
      *
      * @return success
      */
     inline static int
-    Init  (const Vector<int>& N, size_t M, const Vector<int>& n, int m, Plan& np, Solver& inp) NOEXCEPT {
+    Init (const Vector<int>& N, size_t M, const Vector<int>& n, int m, Plan& plan, Solver& solver) NOEXCEPT {
 
 
         Vector<int> _N(N), _n(n);
         int _d (N.size()), _M(M), _m(m);
-        unsigned nfft_flags, infft_flags, solver_flags;
+        unsigned nfft_flags, fftw_flags, solver_flags;
 
-        infft_flags  = FFTW_MEASURE| FFTW_DESTROY_INPUT;
-        solver_flags = CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
+        fftw_flags  = FFTW_MEASURE| FFTW_DESTROY_INPUT;
+        solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
@@ -450,8 +451,53 @@ struct NFFTTraits<double> {
         fftw_import_wisdom_from_filename("codeare_single.plan");
 #endif
 
-        nfft_init_guru (&np, _d, _N.ptr(), _M, _n.ptr(), _m, nfft_flags, infft_flags);
-        solver_init_advanced_complex (&inp, (nfft_mv_plan_complex*) &np, solver_flags);
+        nfft_init_guru (&plan, _d, _N.ptr(), _M, _n.ptr(), _m, nfft_flags, fftw_flags);
+        solver_init_advanced_complex (&solver, (nfft_mv_plan_complex*) &plan, solver_flags);
+
+#ifdef _OPENMP
+        fftw_export_wisdom_to_filename("codeare_threads.plan");
+#else
+        fftw_export_wisdom_to_filename("codeare_single.plan");
+#endif
+
+        return 0;
+
+    }
+
+    /**
+     * @brief            Initialise plan
+     *
+     * @param  d         Number of dimension (i.e. {1..3})
+     * @param  N         Actual dimensions
+     * @param  M         Number of k-space samples
+     * @param  n         Oversampled N
+     * @param  m         Spatial cutoff
+     * @param  plan        Forward FT plan
+     * @param  solver       Inverse FT plan
+     *
+     * @return success
+     */
+    inline static int
+    Init (const Vector<int>& N, size_t M, const Vector<int>& n, int m, T sigma, B0Plan& plan, Solver& solver) NOEXCEPT {
+
+
+        Vector<int> _N(N), _n(n);
+        int _d (N.size()), _M(M), _m(m);
+        unsigned nfft_flags, fftw_flags, solver_flags;
+
+        fftw_flags  = FFTW_MEASURE| FFTW_DESTROY_INPUT;
+        solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
+        nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
+                PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
+
+#ifdef _OPENMP
+        fftw_import_wisdom_from_filename("codeare_threads.plan");
+#else
+        fftw_import_wisdom_from_filename("codeare_single.plan");
+#endif
+
+        mri_inh_3d_init_guru (&plan, _N.ptr(), _M, _n.ptr(), _m, sigma, nfft_flags, fftw_flags);
+        solver_init_advanced_complex (&solver, (nfft_mv_plan_complex*) &plan, solver_flags);
 
 #ifdef _OPENMP
         fftw_export_wisdom_to_filename("codeare_threads.plan");
@@ -468,28 +514,53 @@ struct NFFTTraits<double> {
     /**
      * @brief            Inverse FT
      *
-     * @param  np        NFFT plan
-     * @param  spc       iNFFT plan
+     * @param  plan        NFFT plan
+     * @param  solver       iNFFT plan
      * @param  maxiter   Maximum NFFT iterations
      * @param  epsilon   Convergence criterium
      *
      * @return           Success
      */
     inline static int
-    ITrafo              (Plan& np, Solver& spc, size_t maxiter = 3,    T epsilon = 3e-7) NOEXCEPT {
+    ITrafo (Plan& plan, Solver& solver, size_t maxiter = 3, T epsilon = 3.e-7) NOEXCEPT {
 
-        size_t l;
+    	/* Initial guess */
+    	std::fill_n ((T*)solver.f_hat_iter, 2*plan.N_total, 0.);
 
-        /* init some guess */
-        std::fill_n ((T*)spc.f_hat_iter, 2*np.N_total, 0.);
+        solver_before_loop_complex(&solver);
 
-        /* inverse trafo */
-        solver_before_loop_complex(&spc);
-
-        for (l = 0; l < maxiter; l++) {
-            if (spc.dot_r_iter < epsilon)
+        for (size_t l = 0; l < maxiter; l++) {
+            if (solver.dot_r_iter < epsilon)
                 break;
-            solver_loop_one_step_complex(&spc);
+            solver_loop_one_step_complex(&solver);
+        }
+
+        return 0;
+
+    }
+
+    /**
+     * @brief            Inverse FT
+     *
+     * @param  plan        NFFT plan
+     * @param  solver       iNFFT plan
+     * @param  maxiter   Maximum NFFT iterations
+     * @param  epsilon   Convergence criterium
+     *
+     * @return           Success
+     */
+    inline static int
+    ITrafo (B0Plan& plan, Solver& solver, size_t maxiter = 3, T epsilon = 3.e-7) NOEXCEPT {
+
+    	/* Initial guess */
+    	std::fill_n ((T*)solver.f_hat_iter, 2*plan.N_total, 0.);
+
+        solver_before_loop_complex(&solver);
+
+        for (size_t l = 0; l < maxiter; l++) {
+            if (solver.dot_r_iter < epsilon)
+                break;
+            solver_loop_one_step_complex(&solver);
         }
 
         return 0;
@@ -497,52 +568,75 @@ struct NFFTTraits<double> {
     }
 
 
-
     /**
      * @brief            Forward FT
      *
-     * @param  np        NFFT plan
+     * @param  plan        NFFT plan
      *
      * @return           Success
      */
     inline static int
-    Trafo                (const Plan& np) NOEXCEPT {
-        nfft_trafo ((Plan*) &np);
+    Trafo (const Plan& plan) NOEXCEPT {
+        nfft_trafo ((Plan*) &plan);
         return 0;
     }
 
+    /**
+     * @brief            Forward FT
+     *
+     * @param  plan        NFFT plan
+     *
+     * @return           Success
+     */
+    inline static int
+    Trafo (const B0Plan& plan) NOEXCEPT {
+    	mri_inh_3d_trafo ((B0Plan*) &plan);
+        return 0;
+    }
 
 
     /**
      * @brief            Adjoint FT
      *
-     * @param  np        NFFT plan
+     * @param  plan        NFFT plan
      *
      * @return           Success
      */
     inline static int
-    Adjoint              (const Plan& np) NOEXCEPT {
-
-        nfft_adjoint ((Plan*) &np);
+    Adjoint (const Plan& plan) NOEXCEPT {
+        nfft_adjoint ((Plan*) &plan);
         return 0;
-
     }
 
+    /**
+     * @brief            Adjoint FT
+     *
+     * @param  plan        NFFT plan
+     *
+     * @return           Success
+     */
+    inline static int
+    Adjoint  (const B0Plan& plan) NOEXCEPT {
+    	mri_inh_3d_adjoint ((B0Plan*) &plan);
+        return 0;
+    }
 
     /**
      * @brief            Set weights
      *
-     * @param  np        Plan
-     * @param  spc       Solver plan
+     * @param  plan        Plan
+     * @param  solver       Solver plan
      * @return           Success
      */
     inline static int
-    Weights              (const Plan& np, const Solver& spc) NOEXCEPT {
-        int error = 0;
-        int j, k, z, N = np.N[0], N2 = N*N, NH = .5*N;
+    Weights (const Plan& plan, const Solver& solver, const size_t& rank) NOEXCEPT {
+
+    	int err = 0;
+        int j, k, z, N = plan.N[0], N2 = N*N, NH = .5*N;
         T k2, j2, z2;
-        if (spc.flags & PRECOMPUTE_DAMP)
-            if (np.d == 3) {
+
+        if (solver.flags & PRECOMPUTE_DAMP)
+            if (rank == 3) {
                 for (j = 0; j < N; ++j) {
                     j2 = j - NH;
                     j2 *= j2;
@@ -551,7 +645,7 @@ struct NFFTTraits<double> {
                         k2 *= k2;
                         for (z = 0; z < N; ++z) {
                             z2 = z - NH;
-                            spc.w_hat[z*N2+j*N+k] = (sqrt(j2+k2+z2*z2) > NH) ? 0. : 1.;
+                            solver.w_hat[z*N2+j*N+k] = (sqrt(j2+k2+z2*z2) > NH) ? 0. : 1.;
                         }
                     }
                 }
@@ -561,28 +655,28 @@ struct NFFTTraits<double> {
                     j2 *= j2;
                     for (k = 0; k < N; k++) {
                         k2 = k-NH;
-                        spc.w_hat[j*N+k] = (sqrt(j2+k2*k2) > NH) ? 0. : 1.;
+                        solver.w_hat[j*N+k] = (sqrt(j2+k2*k2) > NH) ? 0. : 1.;
                     }
                 }
             }
-        return np.M_total;
+
+        return plan.M_total;
 
     }
-
 
 
     /**
      * @brief            Precompute PSI
      *
-     * @param  np        NFFT plan
+     * @param  plan        NFFT plan
      * @return           Success
      */
     inline static int
-    Psi                  (Plan& np) NOEXCEPT {
-        if(np.nfft_flags & PRE_PSI) /* precompute full psi */
-            nfft_precompute_one_psi(&np);
-        if(np.nfft_flags & PRE_FULL_PSI) /* precompute full psi */
-            nfft_precompute_full_psi(&np);
+    Psi                  (Plan& plan) NOEXCEPT {
+        if(plan.nfft_flags & PRE_PSI) /* precompute full psi */
+            nfft_precompute_one_psi(&plan);
+        if(plan.nfft_flags & PRE_FULL_PSI) /* precompute full psi */
+            nfft_precompute_full_psi(&plan);
         return 0;
     }
 
@@ -591,18 +685,35 @@ struct NFFTTraits<double> {
     /**
      * @brief            Finalise plans
      *
-     * @param  np        Plan
-     * @param  spc       Solver plan
+     * @param  plan        Plan
+     * @param  solver       Solver plan
      * @return           Success
      */
     inline static int
-    Finalize             (Plan& np, Solver& spc) NOEXCEPT {
+    Finalize             (Plan& plan, Solver& solver) NOEXCEPT {
 
-        solver_finalize_complex(&spc);
-        nfft_finalize(&np);
+        solver_finalize_complex(&solver);
+        nfft_finalize(&plan);
         return 0;
 
     }
+
+    /**
+     * @brief            Finalise plans
+     *
+     * @param  plan        Plan
+     * @param  solver       Solver plan
+     * @return           Success
+     */
+    inline static int
+    Finalize             (B0Plan& plan, Solver& solver) NOEXCEPT {
+
+        solver_finalize_complex(&solver);
+        mri_inh_3d_finalize(&plan);
+        return 0;
+
+    }
+
 
 
 };
