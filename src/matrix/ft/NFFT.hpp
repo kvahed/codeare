@@ -335,14 +335,13 @@ public:
     inline void 
     Weights (const Matrix<T>& w) NOEXCEPT {
 
-    	int err = 0;
     	if (m_have_b0)
     		assert (w.Size() == m_b0_plan.M_total);
     	else
     		assert (w.Size() == m_plan.M_total);
-    	std::cout << err++ << std::endl;
+
         std::copy (w.Begin(), w.End(), m_solver.w);
-        std::cout << err++ << std::endl;
+
         if (m_have_b0) {
             NFFTTraits<double>::Weights (m_b0_plan.plan, m_solver, m_rank);
             NFFTTraits<double>::Psi (m_b0_plan.plan);
@@ -350,7 +349,7 @@ public:
         	NFFTTraits<double>::Weights (m_plan, m_solver, m_rank);
         	NFFTTraits<double>::Psi (m_plan);
         }
-        std::cout << err++ << std::endl;
+
     }
     
     

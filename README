@@ -6,6 +6,7 @@ BUILD & INSTALL
 For example:
 # cd codeare
 # mkdir build
+# cd build
 # cmake ../
 # make 
 # make test
