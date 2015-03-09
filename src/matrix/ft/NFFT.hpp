@@ -208,19 +208,19 @@ public:
             
             m_min_t  = min(m_t);
             m_max_t  = max(m_t);
-            
             m_min_b0 = min(m_b0);
             m_max_b0 = max(m_b0);
-            
-            m_sigma = 1.2;
+            m_sigma  = 1.2;
             
             m_N.push_back(std::ceil(std::max(fabs(m_min_b0),fabs(m_max_b0)) *
                                     m_max_t-m_min_t/2.+(m_m)/(2.*m_sigma))*4.*m_sigma);
             
             if (m_N[2]%2!=0)
                 m_N[2]++; // need even dimension
+
             m_n.push_back(m_N[2]);
-            
+            m_n *= m_sigma;
+
             m_w = std::max(std::abs(m_min_b0),std::abs(m_max_b0))/(.5-((T) m_m)/m_N[2]);
             m_ts =  (m_min_t+m_max_t)/2.;
             t    = ((m_max_t-m_min_t)/2.)/(.5-((T) (m_m))/m_N[2]);
