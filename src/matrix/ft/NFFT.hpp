@@ -54,8 +54,9 @@ public:
         m_maxit (0),
         m_rank (0),
         m_m(0),
-        m_have_timing(false),
-        m_have_b0(false) {};
+        m_have_b0(false),
+        m_3rd_dim_cart(false),
+        m_ncart(1) {};
 
     /**
      * @brief          Construct NFFT plans for forward and backward FT with credentials
@@ -73,7 +74,7 @@ public:
                         const T alpha = 1.0, const Matrix<T> b0 = Matrix<T>(1),
                         const Matrix< std::complex<T> > pc = Matrix< std::complex<T> >(1),
                         const T eps = 7.0e-4, const size_t maxit = 2) NOEXCEPT :
-        m_have_b0(false), m_have_timing(false) {
+        m_have_b0(false), m_3rd_dim_cart(false), m_ncart(1){
         
         m_M     = nk;
         m_imgsz = 2;
@@ -102,9 +103,9 @@ public:
     }
     
     
-    inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_have_timing(false),
+    inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_3rd_dim_cart(false),
         m_t (Matrix<T>(1)), m_b0 (Matrix<T>(1)), m_maxit(3), m_m(1), m_alpha(1.), m_epsilon(7.e-4f),
-        m_sigma(1.0) {
+        m_sigma(1.0), m_ncart(1) {
         
         T min_time, max_time, min_inh, max_inh, t, w, ts;
         
@@ -120,6 +121,14 @@ public:
             assert(false);
         }
 
+        if (p.exists("3rd_dim_cart")) {
+        	try {
+        		m_3rd_dim_cart = p.Get<bool>("3rd_dim_cart");
+        	} catch (const boost::bad_any_cast&) {
+        		printf ("  WARNING - NFFT: Could not interpret input for Cartesian nature of 3rd dimension. \n");
+        	}
+        }
+
         if (p.exists("imsz")) {// Image domain size
             try {
                 m_N = boost::any_cast<Vector<size_t> >(p["imsz"]);
@@ -130,6 +139,11 @@ public:
         } else {
             printf ("**ERROR - NFFT: Image domain dimensions need to be specified\n");
             assert(false);
+        }
+
+        if (m_3rd_dim_cart) { // 3rd dimension is Cartesian
+        	m_ncart = m_N.back();
+        	m_N.PopBack();
         }
         m_n = m_N;
         
@@ -154,7 +168,7 @@ public:
         for (size_t i = 0; i < m_N.size(); ++i)
             m_n[i] = ceil(m_alpha*m_N[i]);
         
-        m_rank = m_N.size();
+        m_rank  = m_N.size();
         m_imgsz = 2*prod(m_N);
 
         if (p.exists("epsilon")) {
@@ -174,7 +188,7 @@ public:
                         "Defaulting to 3\n");
             }
         }
-        
+
         if (p.exists("b0")) {
             try {
                 m_b0 = p.Get<Matrix<T> >("b0");
@@ -215,17 +229,17 @@ public:
             m_N.push_back(std::ceil(std::max(fabs(m_min_b0),fabs(m_max_b0)) *
                                     m_max_t-m_min_t/2.+(m_m)/(2.*m_sigma))*4.*m_sigma);
             
-            if (m_N[2]%2!=0)
-                m_N[2]++; // need even dimension
+            if (m_N.back()%2!=0)
+                m_N.back()++; // need even dimension
 
-            m_n.push_back(m_N[2]);
+            m_n.push_back(m_N.back());
             m_n *= m_sigma;
 
             m_w = std::max(std::abs(m_min_b0),std::abs(m_max_b0))/(.5-((T) m_m)/m_N[2]);
             m_ts =  (m_min_t+m_max_t)/2.;
             t    = ((m_max_t-m_min_t)/2.)/(.5-((T) (m_m))/m_N[2]);
 
-            m_win = Window<T> (m_m, m_N[2], m_sigma);
+            m_win = Window<T> (m_m, m_N.back(), m_sigma);
             
         	NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);
 
@@ -289,7 +303,6 @@ public:
         m_epsilon     = ft.m_epsilon;
         m_imgsz       = ft.m_imgsz;
         m_m           = ft.m_m;
-        m_have_timing = ft.m_have_timing;
         m_have_b0     = ft.m_have_b0;
         m_b0          = ft.m_b0;
         m_t           = ft.m_t;
@@ -299,6 +312,8 @@ public:
         m_max_b0      = ft.m_max_b0;
         m_win         = ft.m_win;
         m_sigma       = ft.m_sigma;
+        m_3rd_dim_cart = ft.m_3rd_dim_cart;
+        m_ncart       = ft.m_ncart;
         if (m_have_b0)
         	NFFTTraits<double>::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);
         else
@@ -318,7 +333,7 @@ public:
             for (size_t j = 0; j < m_b0_plan.M_total; ++j) {
                 m_b0_plan.plan.x[3*j+0] = real(k[2*j+0]);
                 m_b0_plan.plan.x[3*j+1] = imag(k[2*j+1]);
-                m_b0_plan.plan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N[2];
+                m_b0_plan.plan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N.back();
             }
         } else {
             assert (k.Size() == m_plan.M_total*m_rank);
@@ -361,28 +376,34 @@ public:
      */
     Matrix< std::complex<T> >
     Trafo       (const Matrix< std::complex<T> >& m) const NOEXCEPT {
+
+		double* tmpd;
+		T* tmpt;
         Matrix< std::complex<T> > out (m_M,1);
-        double* tmpd;
-        T* tmpt;
-        tmpd = (double*) m_plan.f_hat;
-        tmpt = (T*) m.Ptr();
-        if (m_have_b0)
-            for (size_t j = 0; j < m.Size(); ++j) {
-                CT val = m[j] * std::polar<T> (1., 2. * PI * m_ts * m_b0[j] * m_w);
-                tmpd[2*j+0] = (double)real(val);
-                tmpd[2*j+1] = (double)imag(val);
-            }
-        else
-            std::copy (tmpt, tmpt+m_imgsz, tmpd);
+        size_t iskip = 0, kskip = 0;
 
-        if (m_have_b0)
-        	NFFTTraits<double>::Trafo (m_b0_plan);
-        else
-        	NFFTTraits<double>::Trafo (m_plan);
+        for (size_t i = 0; i < m_ncart; ++i) {
 
-        tmpd = (double*) m_plan.f;
-        tmpt = (T*) out.Ptr();
-        std::copy (tmpd, tmpd+2*m_M, tmpt);
+			tmpd = (double*) m_plan.f_hat;
+			tmpt = (T*) m.Ptr() + m_imgsz;
+			if (m_have_b0)
+				for (size_t j = 0; j < m.Size(); ++j) {
+					CT val = m[j] * std::polar<T> (1., 2. * PI * m_ts * m_b0[j] * m_w);
+					tmpd[2*j+0] = (double)real(val);
+					tmpd[2*j+1] = (double)imag(val);
+				}
+			else
+				std::copy (tmpt, tmpt+m_imgsz, tmpd);
+
+			if (m_have_b0)
+				NFFTTraits<double>::Trafo (m_b0_plan);
+			else
+				NFFTTraits<double>::Trafo (m_plan);
+
+			tmpd = (double*) m_plan.f;
+			tmpt = (T*) out.Ptr() + i*2*m_M;
+			std::copy (tmpd, tmpd+2*m_M, tmpt);
+        }
         
         return squeeze(out);
         
@@ -399,29 +420,38 @@ public:
     Adjoint     (const Matrix< std::complex<T> >& m) const NOEXCEPT {
 
         Vector<size_t> N = m_N;
-        if (m_have_b0)
-            N.PopBack();
-        Matrix< std::complex<T> > out (N);
         double* tmpd;
         T* tmpt;
-        
-        tmpd = (double*) m_solver.y;
-        tmpt = (T*) m.Ptr();
-        std::copy (tmpt, tmpt+2*m_M, tmpd);
 
         if (m_have_b0)
-        	NFFTTraits<double>::ITrafo ((B0Plan&) m_b0_plan, (Solver&) m_solver, m_maxit, m_epsilon);
-        else
-        	NFFTTraits<double>::ITrafo ((Plan&) m_plan, (Solver&) m_solver, m_maxit, m_epsilon);
-        
-        tmpd = (double*) m_solver.f_hat_iter;
-        tmpt = (T*) out.Ptr();
-        std::copy (tmpd, tmpd+m_imgsz, tmpt);
-        
-        if (m_have_b0)
-            for (size_t j = 0; j < out.Size(); ++j)
-                out[j] *= std::polar<T> (1., -2. * PI * m_ts * m_b0[j] * m_w);
-        
+            N.PopBack();
+        if (m_3rd_dim_cart)
+        	N.PushBack(m_ncart);
+
+        Matrix<std::complex<T> > out (N);
+
+        for (size_t i = 0; i < m_ncart; ++i) {
+
+			tmpd = (double*) m_solver.y;
+			tmpt = (T*) m.Ptr() + i*2*m_M;
+			std::copy (tmpt, tmpt+2*m_M, tmpd);
+
+			if (m_have_b0)
+				NFFTTraits<double>::ITrafo ((B0Plan&) m_b0_plan, (Solver&) m_solver, m_maxit, m_epsilon);
+			else
+				NFFTTraits<double>::ITrafo (  (Plan&)    m_plan, (Solver&) m_solver, m_maxit, m_epsilon);
+
+			tmpd = (double*) m_solver.f_hat_iter;
+			tmpt = (T*) out.Ptr() + i*m_imgsz;
+			std::copy (tmpd, tmpd+m_imgsz, tmpt);
+
+			//TODO: b0 not 2D+1D+1D
+			if (m_have_b0)
+				for (size_t j = 0; j < out.Size(); ++j)
+					out[j + i*m_imgsz/2] *= std::polar<T> (1., -2. * PI * m_ts * m_b0[j] * m_w);
+
+        }
+
         return out;
         
     }
@@ -432,7 +462,7 @@ public:
 private:
     
     bool       m_initialised;   /**< @brief Memory allocated / Plans, well, planned! :)*/
-    bool       m_have_pc, m_have_b0, m_have_timing;
+    bool       m_have_pc, m_have_b0;
     
     size_t     m_rank;
     
@@ -457,7 +487,9 @@ private:
     B0Plan     m_b0_plan;
     Solver     m_solver;         /**< infft plan */
     
-    size_t     m_m;
+    bool       m_3rd_dim_cart;
+
+    size_t     m_m, m_ncart;
 
     Window<T>  m_win;
 

@@ -21,6 +21,7 @@
 #include "NuFFT.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
+#include "Access.hpp"
 
 using namespace RRStrategy;
 
@@ -29,23 +30,17 @@ using namespace RRStrategy;
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
 
-NuFFT::NuFFT () {
-
-}
+NuFFT::NuFFT () : m_dft_3rd_dim(false) {}
 
 
 NuFFT::~NuFFT () {
-
 	this->Finalise();
-
 }
 
 
 codeare::error_code 
 NuFFT::Finalise () {
-
 	return codeare::OK;
-
 }
 
 
@@ -77,6 +72,8 @@ NuFFT::Init () {
 
 	Attribute("maxit",   &maxit);
 	Attribute("epsilon", &epsilon);
+	Attribute("dft_3rd_dim", &m_dft_3rd_dim);
+	Attribute("channel_dim");
 
 	// Oversampling -------------------------
 
@@ -104,6 +101,7 @@ NuFFT::Init () {
 	p["b0"]     = b0;
 	p["timing"] = timing;
 	p["nk"]     = M*shots;
+	p["3rd_dim_cart"] = m_dft_3rd_dim;
 	p["imsz"]   = ms;
 
 	ft = NFFT<float> (p);
@@ -133,7 +131,11 @@ NuFFT::Prepare () {
 codeare::error_code
 NuFFT::Process () {
 
-    Matrix<cxfl> img =  ft ->* Get<cxfl> ("data");
+	Matrix<cxfl> img;
+	Matrix<cxfl>& data = Get<cxfl> ("data");
+
+	img = ft ->* data;
+
     Add ("img", img);
 	return codeare::OK;
 

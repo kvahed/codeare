@@ -113,7 +113,7 @@ Volume (const Matrix<T>& M, const size_t& s) NOEXCEPT {
  * @param  A           Matrix to insert
  */
 template <class T> inline void
-Volume (Matrix<T>& M, const size_t& s, const Matrix<T> A) NOEXCEPT {
+Volume (Matrix<T>& M, const size_t& s, const Matrix<T>& A) NOEXCEPT {
 	
 	assert (size(M,0) == size(A,0));
 	assert (size(M,1) == size(A,1));
@@ -154,7 +154,7 @@ Slice (const Matrix<T>& M, const size_t& s) NOEXCEPT {
  * @param  A           New slice
  */
 template <class T> inline void
-Slice (Matrix<T>& M, const size_t& s, const Matrix<T> A) NOEXCEPT {
+Slice (Matrix<T>& M, const size_t& s, const Matrix<T>& A) NOEXCEPT {
 	
 	assert (size(M,0) == size(A,0));
 	assert (size(M,1) == size(A,1));
@@ -289,7 +289,7 @@ Column (const Matrix<T>& M, const size_t& c) NOEXCEPT {
  * @param  A           Vector to copy from
  */
 template <class T> inline void
-Column (Matrix<T>& M, const size_t& c, const Matrix<T> A) NOEXCEPT {
+Column (Matrix<T>& M, const size_t& c, const Matrix<T>& A) NOEXCEPT {
 	
 	assert (size(M,0) == size (A,0));
 	size_t nc = size(M,0);

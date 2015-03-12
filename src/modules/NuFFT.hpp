@@ -72,6 +72,7 @@ namespace RRStrategy {
 	private:
 		
 		NFFT<float> ft;
+		bool m_dft_3rd_dim;
 
 	};
 	

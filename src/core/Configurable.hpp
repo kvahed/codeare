@@ -255,7 +255,10 @@ class Configurable {
 		int ival, res;
 		res = Configuration()->QueryIntAttribute (name, &ival);
 		report (res, name);
-		*value = ival>0;
+		if (res == TIXML_SUCCESS)
+			*value = ival>0;
+		else
+			*value = false;
 		return res;
 	}
 

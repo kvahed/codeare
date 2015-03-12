@@ -45,7 +45,7 @@ namespace RRStrategy {
 		 */
 		CGSENSE () : m_cgeps(1.0e-7), m_fteps(1.0e-3), m_cgmaxit(10),
 					 m_ftmaxit(3), m_noise(0.0), m_lambda(1.0e-6), m_testcase(0),
-					 m_verbose(0), m_nthreads (0), m_m(1) {}
+					 m_verbose(0), m_nthreads (0), m_m(1), m_nk(1) {}
 		
 		/**
 		 * @brief Default destructor
@@ -88,6 +88,8 @@ namespace RRStrategy {
 		int             m_nthreads;  /**< Number of threads                                   */
 		int             m_nk;        /**< Number of kspace samples                            */
         int             m_m;
+
+        bool            m_3rd_dim_cart; /**< 3rd NUFFT direction is Cartesian (stack(spirals/stars)) */
 		
 		double          m_noise;     /**< Add noise?                                          */
 		double          m_lambda;    /**< Tikhonov factor                                     */
