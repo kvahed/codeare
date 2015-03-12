@@ -380,12 +380,11 @@ public:
 		double* tmpd;
 		T* tmpt;
         Matrix< std::complex<T> > out (m_M,1);
-        size_t iskip = 0, kskip = 0;
 
         for (size_t i = 0; i < m_ncart; ++i) {
 
 			tmpd = (double*) m_plan.f_hat;
-			tmpt = (T*) m.Ptr() + m_imgsz;
+			tmpt = (T*) m.Ptr() + i*m_imgsz;
 			if (m_have_b0)
 				for (size_t j = 0; j < m.Size(); ++j) {
 					CT val = m[j] * std::polar<T> (1., 2. * PI * m_ts * m_b0[j] * m_w);

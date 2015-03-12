@@ -53,7 +53,8 @@ public:
                 m_cgeps (1.0e-6),
                 m_lambda (1.0e-6),
                 m_verbose (false),
-                m_np(0) {}
+                m_np(0),
+                m_3rd_dim_cart(false) {}
     
     
 	/**
@@ -68,7 +69,8 @@ public:
                 m_cgeps(1.0e-6),
                 m_lambda(1.0e-6),
                 m_verbose (false),
-		m_np(0) {
+                m_np(0),
+                m_3rd_dim_cart(false) {
 
 		Params ft_params;
 
@@ -82,6 +84,16 @@ public:
 			ft_params["m"] = unsigned_cast(params["m"]);
 		if (params.exists("nk"))
 			ft_params["nk"] = unsigned_cast(params["nk"]);
+
+		if (params.exists("3rd_dim_cart")) {
+			try {
+				m_3rd_dim_cart = params.Get<bool>("3rd_dim_cart");
+			} catch (const boost::bad_any_cast&) {
+				printf ("  WARNING - NCSENSE: Could not interpret input for Cartesian "
+						"nature of 3rd dimension. \n");
+			}
+		}
+		ft_params["3rd_dim_cart"] = m_3rd_dim_cart;
 
 		Workspace& ws = Workspace::Instance();
 		Matrix<T> b0;
@@ -112,6 +124,7 @@ public:
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  No of threads: %i\n", m_np);
 		printf ("  Signal nodes: %li\n", m_nx[2]);
+		printf ("  Cartesian 3rd dimension: %d\n", m_3rd_dim_cart);
         printf ("  Channels: " JL_SIZE_T_SPECIFIER "\n", m_nx[1]);
         printf ("  Space size: " JL_SIZE_T_SPECIFIER "\n", m_nx[3]);
 		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
@@ -294,14 +307,15 @@ private:
     //Vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
     NFFT<T>    m_fts;
 	bool       m_initialised; /**< All initialised? */
-    bool       m_verbose;
+    bool       m_verbose;	  /**< Verbose binary output (keep all intermediate steps) */
+    bool       m_3rd_dim_cart; /**< 3rd FT dimension is Cartesian (stack of ...) */
 
 	Matrix<CT> m_sm;          /**< Sensitivities */
 	Matrix<T>  m_ic;     /**< Intensity correction I(r) */
 	Matrix<CT> m_pc; /**< @brief Correction phase */
 
-	std::string m_smname;
-	std::string m_wname;
+	std::string m_smname;     /**< Sensitivity map name */
+	std::string m_wname;	  /**< Weights name */
 
     Vector<size_t> m_nx;
     
