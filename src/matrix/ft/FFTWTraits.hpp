@@ -101,7 +101,13 @@ struct FTTraits<float> {
 		return true;
 		
 	}
+
 	
+	static inline Plan DFTPlanMany (int rank, const int* n, int howmany, T* in, T* out, int dir) {
+		InitThreads();
+		return fftwf_plan_many_dft (rank, n, howmany, in, NULL, 1, *n, out, NULL, 1, *n, dir, FFTW_ESTIMATE);
+	}
+
 
 	/**
 	 * @brief        Inlined memory allocation for performance
@@ -242,6 +248,10 @@ struct FTTraits<double> {
 	}
 	
 
+	static inline Plan DFTPlanMany (int rank, const int* n, int howmany, T* in, T* out, int dir) {
+		InitThreads();
+		return fftw_plan_many_dft (rank, n, howmany, in, NULL, 1, *n, out, NULL, 1, *n, dir, FFTW_ESTIMATE);
+	}
 
 	/**
 	 * @brief        Inlined memory allocation for performance

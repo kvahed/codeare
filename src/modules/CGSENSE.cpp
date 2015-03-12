@@ -95,6 +95,12 @@ CGSENSE::Init() {
 	printf ("  verbose feedback: %i \n", m_verbose);
 	// --------------------------------------
 
+	// Verbosity ----------------------------
+
+	Attribute ("dft_3rd_dim", &m_3rd_dim_cart);
+	printf ("  Cartesian 3rd dimension: %d \n", m_3rd_dim_cart);
+	// --------------------------------------
+
 	// Noise --------------------------------
 
 	Attribute ("noise",   &m_noise);
@@ -137,6 +143,7 @@ CGSENSE::Prepare () {
     cgp["lambda"]        = m_lambda;
     cgp["np"]            = m_nthreads;
     cgp["m"]             = m_m;
+    cgp["3rd_dim_cart"]  = m_3rd_dim_cart;
 
 	m_ncs = NCSENSE<float>(cgp);
 

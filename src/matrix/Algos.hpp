@@ -939,6 +939,75 @@ squeeze (const Matrix<T>& M) {
 
 /**
  * @brief           MATLAB-like permute
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (2,3,4);
+ *   m = permute (m, 0, 1, 2); // new dims: (4,2,3);
+ * @endcode
+ *
+ * @param   M       Input matrix
+ * @param   perm    New permuted dimensions
+ * @return          Permuted matrix
+ */
+
+template<class T> inline Matrix<T>
+permute (const Matrix<T>& M, const size_t& n0, const size_t& n1, const size_t& n2) {
+	Vector<size_t> odims = size(M);
+	assert (numel(odims)==3); // Must be 3d
+	Matrix<T> ret(odims[n0], odims[n1], odims[n2]);
+
+	if        (n0 == 0) {
+		if (n1 == 1) {
+			assert (n2 == 2); // 0,1,2 : nothing to do
+			return M;
+		} else {
+			assert (n2 == 1); // 0,2,1 : n1*n2 copies
+			for (size_t k = 0; k < odims[n2]; ++k)
+				for (size_t j = 0; j < odims[n1]; ++j)
+					std::copy (&M(0,k,j), &M(0,k,j)+odims[0], &ret(0,j,k));
+		}
+	} else if (n0 == 1) {
+		if (n1 == 0) {
+			assert (n2 == 2); // 1,0,2
+			for (size_t k = 0; k < odims[n2]; ++k)
+				for (size_t j = 0; j < odims[n1]; ++j)
+					for (size_t i = 0; i < odims[n0]; ++i)
+						ret(i,j,k) = M(j,i,k);
+		} else {
+			assert (n2 == 0); // 1,2,0
+			for (size_t k = 0; k < odims[n2]; ++k)
+				for (size_t j = 0; j < odims[n1]; ++j)
+					for (size_t i = 0; i < odims[n0]; ++i)
+						ret(i,j,k) = M(k,i,j);
+		}
+	} else if (n0 == 2) {
+		if (n1 == 1) {
+			assert (n2 == 0); // 2,1,0
+			for (size_t k = 0; k < odims[n2]; ++k)
+				for (size_t j = 0; j < odims[n1]; ++j)
+					for (size_t i = 0; i < odims[n0]; ++i)
+						ret(i,j,k) = M(k,j,i);
+		} else {
+			assert (n2 == 1); // 2,0,1
+			for (size_t k = 0; k < odims[n2]; ++k)
+				for (size_t j = 0; j < odims[n1]; ++j)
+					for (size_t i = 0; i < odims[n0]; ++i)
+						ret(i,j,k) = M(j,k,i);
+		}
+	} else {
+
+		assert(false);
+	}
+
+	return ret;
+
+}
+
+
+
+/**
+ * @brief           MATLAB-like permute
  * 
  * Usage:
  * @code

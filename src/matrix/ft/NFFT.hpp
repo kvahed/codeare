@@ -22,6 +22,7 @@
 #define __NFFT_HPP__
 
 #include "NFFTTraits.hpp"
+#include "FFTWTraits.hpp"
 #include "Algos.hpp"
 #include "FT.hpp"
 #include "CX.hpp"
@@ -38,6 +39,7 @@ class NFFT : public FT<T> {
     typedef typename NFFTTraits<double>::Plan   Plan;
     typedef typename NFFTTraits<double>::B0Plan B0Plan;
     typedef typename NFFTTraits<double>::Solver Solver;
+    typedef typename FTTraits<T>::Plan CartPlan;
     typedef typename std::complex<T> CT;
 
 
@@ -261,7 +263,7 @@ public:
             m_cpc = conj(m_pc);
             m_have_pc = true;
         }
-        
+
         m_initialised = true;
         
     }
@@ -451,11 +453,26 @@ public:
 
         }
 
+
+        if (m_3rd_dim_cart && m_ncart > 1) {
+        	int rank = 1, n = (int)m_ncart, howmany = (int)m_imgsz;
+        	typedef typename FTTraits<T>::T fttype;
+        	fttype *ftin, *ftout;
+        	out = permute (out, 2, 0, 1);
+        	ftin  = (fttype*)out.Ptr();
+        	ftout = (fttype*)out.Ptr();
+        	CartPlan cp = FTTraits<T>::DFTPlanMany (rank, &n, m_imgsz/2, ftin, ftout, FFTW_BACKWARD);
+        	FTTraits<T>::Execute(cp);
+        	FTTraits<T>::Destroy(cp);
+        	out = permute (out, 1, 2, 0);
+        }
+
         return out;
         
     }
+
     
-    
+
     inline size_t Rank() const NOEXCEPT { return m_rank; }
     
 private:
@@ -485,6 +502,7 @@ private:
     Plan       m_plan;         /**< nfft  plan */
     B0Plan     m_b0_plan;
     Solver     m_solver;         /**< infft plan */
+    CartPlan   m_cart_plan;
     
     bool       m_3rd_dim_cart;
 
