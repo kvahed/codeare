@@ -24,13 +24,14 @@
 #include "NFFTTraits.hpp"
 #include "FFTWTraits.hpp"
 #include "Algos.hpp"
+#include "Access.hpp"
 #include "FT.hpp"
 #include "CX.hpp"
 #include "Creators.hpp"
 
 /**
  * @brief Matrix templated ND non-equidistand Fourier transform with NFFT 3 (TU Chemnitz)<br/>
- *        Double and single precision
+ *        T and single precision
 
  */
 template <class T>
@@ -40,6 +41,8 @@ class NFFT : public FT<T> {
     typedef typename NFFTTraits<double>::B0Plan B0Plan;
     typedef typename NFFTTraits<double>::Solver Solver;
     typedef typename FTTraits<T>::Plan CartPlan;
+	typedef typename FTTraits<T>::T FTType;
+
     typedef typename std::complex<T> CT;
 
 
@@ -381,17 +384,43 @@ public:
 
 		double* tmpd;
 		T* tmpt;
-        Matrix< std::complex<T> > out (m_M,1);
+        Matrix< std::complex<T> > out (m_M * ((m_3rd_dim_cart && m_ncart > 1) ? m_ncart : 1), 1);
+        Matrix< std::complex<T> > tmpm = m;
+
+        if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
+        	int n = static_cast<int>(m_ncart);
+        	tmpm = permute (tmpm, 2, 0, 1);
+        	size_t cent = floor(m_ncart/2);
+        	Matrix< std::complex<T> > tmp;
+        	for (size_t i = 0; i < m_imgsz/2; ++i) { // fftshift colums
+				tmp = Column (tmpm,i);
+				std::rotate(tmp.Begin(), tmp.Begin()+cent, tmp.End());
+				Column (tmpm, i, tmp);
+        	}
+        	CartPlan cp = FTTraits<T>::DFTPlanMany (1, &n, m_imgsz/2,
+        			(FTType*)tmpm.Ptr(), (FTType*)tmpm.Ptr(), FFTW_FORWARD);
+        	FTTraits<T>::Execute(cp);
+        	FTTraits<T>::Destroy(cp);
+        	for (size_t i = 0; i < m_imgsz/2; ++i) { // fftshift colums
+				tmp = Column (tmpm,i);
+				std::rotate(tmp.Begin(), tmp.Begin()+cent, tmp.End());
+				Column (tmpm, i, tmp);
+        	}
+        	tmpm = permute (tmpm, 1, 2, 0);
+        }
+
 
         for (size_t i = 0; i < m_ncart; ++i) {
 
 			tmpd = (double*) m_plan.f_hat;
-			tmpt = (T*) m.Ptr() + i*m_imgsz;
+			tmpt = (T*) tmpm.Ptr() + i*m_imgsz;
+
+			//TODO: b0 not 2D+1D+1D
 			if (m_have_b0)
 				for (size_t j = 0; j < m.Size(); ++j) {
-					CT val = m[j] * std::polar<T> (1., 2. * PI * m_ts * m_b0[j] * m_w);
-					tmpd[2*j+0] = (double)real(val);
-					tmpd[2*j+1] = (double)imag(val);
+					CT val = tmpm[j] * std::polar<T> (1., 2. * PI * m_ts * m_b0[j] * m_w);
+					tmpd[2*j+0] = (T)real(val);
+					tmpd[2*j+1] = (T)imag(val);
 				}
 			else
 				std::copy (tmpt, tmpt+m_imgsz, tmpd);
@@ -405,7 +434,7 @@ public:
 			tmpt = (T*) out.Ptr() + i*2*m_M;
 			std::copy (tmpd, tmpd+2*m_M, tmpt);
         }
-        
+
         return squeeze(out);
         
     }
@@ -426,11 +455,10 @@ public:
 
         if (m_have_b0)
             N.PopBack();
-        if (m_3rd_dim_cart)
+        if (m_3rd_dim_cart && m_ncart > 1) // Cartesian FT 3rd dim
         	N.PushBack(m_ncart);
 
         Matrix<std::complex<T> > out (N);
-
         for (size_t i = 0; i < m_ncart; ++i) {
 
 			tmpd = (double*) m_solver.y;
@@ -453,17 +481,25 @@ public:
 
         }
 
-
-        if (m_3rd_dim_cart && m_ncart > 1) {
-        	int rank = 1, n = (int)m_ncart, howmany = (int)m_imgsz;
-        	typedef typename FTTraits<T>::T fttype;
-        	fttype *ftin, *ftout;
+        if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
+        	int n = static_cast<int>(m_ncart);
         	out = permute (out, 2, 0, 1);
-        	ftin  = (fttype*)out.Ptr();
-        	ftout = (fttype*)out.Ptr();
-        	CartPlan cp = FTTraits<T>::DFTPlanMany (rank, &n, m_imgsz/2, ftin, ftout, FFTW_BACKWARD);
+        	size_t cent = floor(m_ncart/2);
+        	Matrix< std::complex<T> > tmp;
+        	for (size_t i = 0; i < m_imgsz/2; ++i) { // fftshift colums
+				tmp = Column (out,i);
+				std::rotate(tmp.Begin(), tmp.Begin()+cent, tmp.End());
+				Column (out, i, tmp);
+        	}
+        	CartPlan cp = FTTraits<T>::DFTPlanMany (1, &n, m_imgsz/2,
+        			(FTType*)out.Ptr(),	(FTType*)out.Ptr(), FFTW_BACKWARD);
         	FTTraits<T>::Execute(cp);
         	FTTraits<T>::Destroy(cp);
+        	for (size_t i = 0; i < m_imgsz/2; ++i) { // fftshift colums
+				tmp = Column (out,i);
+				std::rotate(tmp.Begin(), tmp.Begin()+cent, tmp.End());
+				Column (out, i, tmp);
+        	}
         	out = permute (out, 1, 2, 0);
         }
 

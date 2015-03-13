@@ -73,6 +73,7 @@ public:
                 m_3rd_dim_cart(false) {
 
 		Params ft_params;
+		size_t cart_dim = 1;
 
 		if (params.exists("fteps"))
 			ft_params["epsilon"] = fp_cast(params["fteps"]);
@@ -100,6 +101,8 @@ public:
 
 		assert (params.exists("sensitivities"));
 		m_sm = params.Get<Matrix<CT> >("sensitivities");
+		if (m_3rd_dim_cart)
+			cart_dim = size(m_sm,2);
 
 		if (params.exists("phase_cor"))
 			m_pc = ws.Get<CT>(params.Get<std::string>("phase_cor"));
@@ -113,7 +116,7 @@ public:
 
 		Vector<size_t> sizesm = size(m_sm);
         m_nx.push_back(sizesm.back());             // NC
-		m_nx.push_back(unsigned_cast(params["nk"])); // NK
+		m_nx.push_back(unsigned_cast(params["nk"])*cart_dim); // NK
         m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, c_multiply<size_t>)/m_nx[1]); //NR
 
 		m_cgiter  = params.Get<size_t>("cgiter");
@@ -122,7 +125,7 @@ public:
 		m_verbose = (params.Get<int>("verbose") > 0);
 			
 		printf ("  Initialising NCSENSE:\n");
-		printf ("  No of threads: %i\n", m_np);
+		printf ("  No of threads: %i\n", m_np); // TODO: Thread num not passed on
 		printf ("  Signal nodes: %li\n", m_nx[2]);
 		printf ("  Cartesian 3rd dimension: %d\n", m_3rd_dim_cart);
         printf ("  Channels: " JL_SIZE_T_SPECIFIER "\n", m_nx[1]);
@@ -230,7 +233,10 @@ public:
 
         typedef typename Vector<CT>::iterator it_type;
 
-		p  = EH (m, sens, m_nx, m_fts) * m_ic;
+		p = EH (m, sens, m_nx, m_fts)* m_ic;
+		if (m_cgiter == 0)
+			return p;
+
 		r  = p;
         xn = real(p.dotc(p));
         rn = xn;
@@ -247,17 +253,18 @@ public:
 			if (m_verbose)
 				printf ("    %03lu %.7f\n", i, res.at(i));
 			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
+
 			if (m_lambda)
 				q  += m_lambda * p;
-            ts  = rn / real(p.dotc(q));
+			ts  = rn / real(p.dotc(q));
 			x  += ts * p;
 			r  -= ts * q;
 			rno = rn;
 			rn  = real(r.dotc(r));
 			p  *= rn / rno;
 			p  += r;
-            if (m_verbose)
-                vc.push_back(x * m_ic);
+			if (m_verbose)
+				vc.push_back(x * m_ic);
 		}
 
         if (m_verbose) { // Keep intermediate results

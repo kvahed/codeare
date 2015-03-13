@@ -482,24 +482,41 @@ private:
 	shift2 (const Matrix<CT>& m, const bool& fw = true) const NOEXCEPT {
 
 		Matrix<CT> res (size(m));
-
 		size_t xi,yi,xs,ys;
 		
-			for (yi = 0; yi < d[1]; yi++) {
-				ys = (yi + c[1]) % d[1];
-				for (xi = 0; xi < d[0]; xi++) {
-					xs = (xi + c[0]) % d[0];
-					if (fw)
-						res(xs,ys) = m(xi,yi);
-					else
-						res(xi,yi) = m(xs,ys);
-				}
+		for (yi = 0; yi < d[1]; yi++) {
+			ys = (yi + c[1]) % d[1];
+			for (xi = 0; xi < d[0]; xi++) {
+				xs = (xi + c[0]) % d[0];
+				if (fw)
+					res(xs,ys) = m(xi,yi);
+				else
+					res(xi,yi) = m(xs,ys);
 			}
+		}
 
 		return res;
 
 	}
 
+	inline Matrix<CT>
+	shift1 (const Matrix<CT>& m, const bool& fw = true) const NOEXCEPT {
+
+		Matrix<CT> res (size(m));
+		size_t xi,xs;
+
+		for (xi = 0; xi < d[0]; xi++) {
+			xs = (xi + c[0]) % d[0];
+			if (fw)
+				res(xs) = m(xi);
+			else
+				res(xi) = m(xs);
+		}
+
+
+		return res;
+
+	}
 
 
 	inline Matrix<CT>
