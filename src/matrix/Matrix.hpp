@@ -58,6 +58,7 @@
 
 #include <Assert.hpp>
 
+#include <boost/lexical_cast.hpp>
 
 /**
  * @brief Is matrix is a vector.
@@ -85,6 +86,29 @@
  */
 # define ROUND(A) ( floor(A) + ((A - floor(A) >= 0.5) ? (A>0 ? 1 : 0) : 0))
 
+static inline std::vector<std::string>
+Parse     (const std::string& str, const std::string& dlm) {
+
+	assert (dlm.size() > 0);
+
+	std::vector<std::string> sv;
+	size_t  start = 0, end = 0;
+
+	while (end != std::string::npos) {
+
+		end = str.find (dlm, start);
+
+		// If at end, use length=maxLength.  Else use length=end-start.
+		sv.push_back(str.substr(start, (end == std::string::npos) ? std::string::npos : end - start));
+
+		// If at end, use start=maxSize.  Else use start=end+delimiter.
+		start = ((end > (std::string::npos - dlm.size())) ? std::string::npos : end + dlm.size());
+
+	}
+
+	return sv;
+
+}
 
 /**
  * @brief   Matrix template.<br/>
@@ -2197,6 +2221,92 @@ public:
     }
 
 
+    inline Matrix<T>
+    operator() (const std::string& range_0) const {
+    	Matrix<T> ret;
+    	if (range_0 == std::string(":")) { // ":"
+    		ret = Matrix<T>(this->Size(),1);
+    		ret.Container() = this->Container();
+    	} else {
+    		std::vector<std::string> parts = Parse (range_0, ":");
+			Vector<int> lims;
+			for (size_t i = 0; i < parts.size(); ++i) {
+				if (parts[i] == "end") {
+					lims.push_back(this->Size()-1);
+				} else {
+					try {
+						lims.push_back(boost::lexical_cast<int>(parts[i]));
+					} catch(const boost::bad_lexical_cast &) {
+						printf ("Improper range declaration, %s\n", range_0.c_str());
+						assert (false);
+					}
+				}
+			}
+			if (parts.size() < 2 || parts.size() > 3) {
+    			printf ("Improper range declaration, %s\n", range_0.c_str());
+    			assert (false);
+    		} else if (parts.size() == 2) { // "x:y"
+
+    			lims[1]++;
+    			if (lims[0]>this->Size() || lims[1]>this->Size()) {
+    				printf ("Exceeding range, %s\n", range_0.c_str());
+    				assert (false);
+    			}
+    			if (lims[0]>=lims[1] || lims[0]<0 || lims[1]<0) {
+    				printf ("Improper range declaration, %s\n", range_0.c_str());
+    				assert (false);
+    			} else {
+    				ret = Matrix<T>(lims[1]-lims[0],1);
+    				std::copy (_M.begin()+lims[0], _M.begin()+lims[1], ret.Begin());
+    			}
+    		} else if (parts.size() == 3) { // "x:y:z"
+    			if (lims[1] > 0)
+    			    lims[2]++;
+    			if (lims[1] < 0)
+    				lims[0]++;
+    			if (lims[0]>this->Size() || lims[2]>this->Size()) {
+					printf ("Exceeding range, %s\n", range_0.c_str());
+					assert (false);
+				}
+    			if (lims[1] == 0 || (lims[2]<lims[0] && lims[1]>0) ||
+    					(lims[2]>lims[0] && lims[1]<0) || lims[0] < 0 || lims[2] < 0) {
+    				printf ("Improper range declaration, %s\n", range_0.c_str());
+    				assert (false);
+    			} else {
+    				size_t n = floor(((float)lims[2]-(float)lims[0])/(float)lims[1]);
+    				ret = Matrix<T>(n,1);
+    				if (lims[1] > 0)
+    					for (size_t i = 0; i < n; ++i)
+    						ret[i] = _M[lims[0]+i*lims[1]];
+    				else
+    					for (size_t i = 0; i < n; ++i)
+    					    ret[i] = _M[lims[0]+i*lims[1]-1];
+    			}
+    		}
+
+    	}
+    	return ret;
+    }
+
+    inline Matrix<T>
+    operator() (const std::string& range_0, const std::string& range_1) const {
+    	Matrix<T> ret;
+    	return ret;
+    }
+
+    inline Matrix<T>
+    operator() (const std::string& range_0, const std::string& range_1,
+    		const std::string& range_2) const {
+    	Matrix<T> ret;
+    	return ret;
+    }
+
+    inline Matrix<T>
+    operator() (const std::string& range_0, const std::string& range_1,
+    		const std::string& range_2, const std::string& range_3) const {
+    	Matrix<T> ret;
+    	return ret;
+    }
 
 protected:
 	

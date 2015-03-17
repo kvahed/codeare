@@ -55,7 +55,15 @@ if (${NFFT_FOUND})
   set_target_properties(CGSENSE PROPERTIES PREFIX "")
   target_link_libraries (CGSENSE ${COMLIBS})   
 
-  list (APPEND INST_TARGETS NuFFT CGSENSE)
+  add_library (GRASP MODULE GRASP.hpp GRASP.cpp)
+  set_target_properties(GRASP PROPERTIES PREFIX "")
+  target_link_libraries (GRASP ${COMLIBS})   
+
+  add_library (XDGRASP MODULE XDGRASP.hpp XDGRASP.cpp)
+  set_target_properties(XDGRASP PROPERTIES PREFIX "")
+  target_link_libraries (XDGRASP ${COMLIBS})   
+
+  list (APPEND INST_TARGETS NuFFT CGSENSE GRASP XDGRASP)
 
 endif()
 

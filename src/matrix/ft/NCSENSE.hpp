@@ -48,13 +48,8 @@ public:
 	/**
 	 * @brief         Default constructor
 	 */
-	NCSENSE() NOEXCEPT : m_initialised (false),
-                m_cgiter(30),
-                m_cgeps (1.0e-6),
-                m_lambda (1.0e-6),
-                m_verbose (false),
-                m_np(0),
-                m_3rd_dim_cart(false) {}
+	NCSENSE() NOEXCEPT : m_initialised (false), m_cgiter(30), m_cgeps (1.0e-6), m_lambda (1.0e-6),
+                m_verbose (false), m_np(0), m_3rd_dim_cart(false) {}
     
     
 	/**
@@ -63,28 +58,17 @@ public:
 	 * @param  params  Configuration parameters
 	 */
 	NCSENSE        (const Params& params) NOEXCEPT 
-              : FT<T>::FT(params),
-                m_cgiter(30),
-                m_initialised(false),
-                m_cgeps(1.0e-6),
-                m_lambda(1.0e-6),
-                m_verbose (false),
-                m_np(0),
-                m_3rd_dim_cart(false) {
+              : FT<T>::FT(params), m_cgiter(30), m_initialised(false), m_cgeps(1.0e-6),
+                m_lambda(1.0e-6), m_verbose (false), m_np(0), m_3rd_dim_cart(false) {
 
 		Params ft_params;
 		size_t cart_dim = 1;
 
-		if (params.exists("fteps"))
-			ft_params["epsilon"] = fp_cast(params["fteps"]);
-		if (params.exists("alpha"))
-			ft_params["alpha"] = fp_cast(params["alpha"]);
-		if (params.exists("ftiter"))
-			ft_params["maxit"] = unsigned_cast(params["ftiter"]);
-		if (params.exists("m"))
-			ft_params["m"] = unsigned_cast(params["m"]);
-		if (params.exists("nk"))
-			ft_params["nk"] = unsigned_cast(params["nk"]);
+		ft_params["epsilon"] = (params.exists("fteps")) ? fp_cast(params["fteps"]): 1.0e-3;
+		ft_params["alpha"] = params.exists("alpha") ? fp_cast(params["alpha"]) : 1.;
+		ft_params["maxit"] = (params.exists("ftiter")) ? unsigned_cast(params["ftiter"]) : 3;
+		ft_params["m"] = (params.exists("m")) ? unsigned_cast(params["m"]) : 1;
+		ft_params["nk"] = (params.exists("nk")) ? unsigned_cast(params["nk"]) : 1;
 
 		if (params.exists("3rd_dim_cart")) {
 			try {
@@ -131,7 +115,9 @@ public:
         printf ("  Channels: " JL_SIZE_T_SPECIFIER "\n", m_nx[1]);
         printf ("  Space size: " JL_SIZE_T_SPECIFIER "\n", m_nx[3]);
 		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
-		//printf ("  FT: eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", fteps, ftiter, m, alpha);
+		printf ("  NUFFT: nodes(%lu) eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", unsigned_cast(ft_params["nk"]),
+				fp_cast(ft_params["epsilon"]), unsigned_cast(ft_params["maxit"]), unsigned_cast(ft_params["m"]),
+				fp_cast(ft_params["alpha"]));
 
 		ft_params["imsz"] = ms;
 

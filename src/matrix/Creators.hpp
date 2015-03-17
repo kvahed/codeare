@@ -49,9 +49,7 @@ zeros           (const size_t& col,
 		 const size_t& idd = 1,
 		 const size_t& ide = 1,
 		 const size_t& ave = 1) {
-  
   return Matrix<T> (col, lin, cha, set, eco, phs, rep, seg, par, slc, ida, idb, idc, idd, ide, ave);
-  
 }
 
 
@@ -64,9 +62,7 @@ zeros           (const size_t& col,
  */
 template <class T> inline static Matrix<T> 
 zeros           (const Vector<size_t>& sz) {
-
  	return Matrix<T> (sz);
-
 }
 
 /**
