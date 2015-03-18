@@ -341,7 +341,6 @@ public:
                 m_b0_plan.plan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N.back();
             }
         } else {
-        	std::cout << k.Size() << " " << m_plan.M_total*m_rank << std::endl;
             assert (k.Size() == m_plan.M_total*m_rank);
             std::copy (k.Begin(), k.End(), m_plan.x);
         }

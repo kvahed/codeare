@@ -1005,6 +1005,43 @@ permute (const Matrix<T>& M, const size_t& n0, const size_t& n1, const size_t& n
 }
 
 
+/**
+ * @brief           MATLAB-like permute
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (2,3,4);
+ *   m = permute (m, 0, 1, 2); // new dims: (4,2,3);
+ * @endcode
+ *
+ * @param   M       Input matrix
+ * @param   perm    New permuted dimensions
+ * @return          Permuted matrix
+ */
+
+template<class T> inline static Matrix<T>
+permute (const Matrix<T>& M, const size_t& n0, const size_t& n1) {
+	Vector<size_t> odims = size(M);
+	assert (numel(odims)==2); // Must be 3d
+	Matrix<T> ret(odims[n0], odims[n1]);
+
+	if        (n0 == 0) {// 0,1: nothing to do
+		assert (n1 == 1);
+		return M;
+	} else if (n0 == 1) {// 1,0: transpose
+		assert (n0 == 1);
+		for (size_t j = 0; j < odims[n1]; ++j)
+			for (size_t i = 0; i < odims[n0]; ++i)
+				ret(i,j) = M(j,i);
+	} else { // We should never be here
+		assert(false);
+	}
+
+	return ret;
+
+}
+
+
 
 /**
  * @brief           MATLAB-like permute
@@ -1019,18 +1056,19 @@ permute (const Matrix<T>& M, const size_t& n0, const size_t& n1, const size_t& n
  * @param   perm    New permuted dimensions
  * @return          Permuted matrix
  */
+#include "Print.hpp"
 template <class T> inline static Matrix<T>
-permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
+permute (const Matrix<T>& M, const Vector<size_t>& perm) {
 	
 	// Check that perm only includes one number between 0 and INVALID_DIM once
-	size_t ndnew = perm.Size(), i, j;
+	size_t ndnew = perm.size(), i, j;
 	size_t ndold = ndims (M); 
 
 	// Must have same number of dimensions
 	assert (ndnew == ndold);
 
 	// Every number between 0 and ndnew must appear exactly once
-	Vector<bool> occupied;
+	Vector<cbool> occupied;
 	occupied.resize(ndnew);
 	for (i = 0; i < ndnew; ++i) {
 		assert (!occupied[perm[i]]);
@@ -1038,8 +1076,8 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	}			
 
 	// Old and new sizes
-	Matrix<size_t> so = size (M);
-	Matrix<size_t> sn (16,1);
+	Vector<size_t> so = size (M);
+	Vector<size_t> sn (16,1);
 
 	for (i = 0; i < ndnew; ++i)
 		sn[i] = so[perm[i]];
@@ -1048,37 +1086,38 @@ permute (const Matrix<T>& M, const Matrix<size_t>& perm) {
 	Matrix<T> res(sn);
 
 	// Relation of old to new indices
-	size_t  d[16];
-	size_t od[16];
+    Vector<size_t>  d(16), od(16);
 	for (i = 0; i < ndnew; ++i) od[i] = perm[i];
 	for (     ; i <    16; ++i)	od[i] =      i;
-	
+
 	// Copy data accordingly
-	for (d[15] = 0; d[15] < size(res,15); d[15]++)
-		for (d[14] = 0; d[14] < size(res,14); d[14]++)
-			for (d[13] = 0; d[13] < size(res,13); d[13]++)
-				for (d[12] = 0; d[12] < size(res,12); d[12]++)
-					for (d[11] = 0; d[11] < size(res,11); d[11]++)
-						for (d[10] = 0; d[10] < size(res,10); d[10]++)
-							for (d[ 9] = 0; d[ 9] < size(res, 9); d[ 9]++)
-								for (d[ 8] = 0; d[ 8] < size(res, 8); d[ 8]++)
-									for (d[ 7] = 0; d[ 7] < size(res, 7); d[ 7]++)
-										for (d[ 6] = 0; d[ 6] < size(res, 6); d[ 6]++)
-											for (d[ 5] = 0; d[ 5] < size(res, 5); d[ 5]++)
-												for (d[ 4] = 0; d[ 4] < size(res, 4); d[ 4]++)
-													for (d[ 3] = 0; d[ 3] < size(res, 3); d[ 3]++)
-														for (d[ 2] = 0; d[ 2] < size(res, 2); d[ 2]++)
-															for (d[ 1] = 0; d[ 1] < size(res, 1); d[ 1]++)
-																for (d[ 0] = 0; d[ 0] < size(res, 0); d[ 0]++) 
-																	res (d[ 0],d[ 1],d[ 2],d[ 3],d[ 4],d[ 5],
-																		 d[ 6],d[ 7],d[ 8],d[ 9],d[10],d[11],
-																		 d[12],d[13],d[14],d[15]) =
-																	  M (d[od[ 0]],d[od[ 1]],d[od[ 2]],d[od[ 3]], 
+	for (d[15] = 0; d[15] < size(M,15); d[15]++)
+		for (d[14] = 0; d[14] < size(M,14); d[14]++)
+			for (d[13] = 0; d[13] < size(M,13); d[13]++)
+				for (d[12] = 0; d[12] < size(M,12); d[12]++)
+					for (d[11] = 0; d[11] < size(M,11); d[11]++)
+						for (d[10] = 0; d[10] < size(M,10); d[10]++)
+							for (d[ 9] = 0; d[ 9] < size(M, 9); d[ 9]++)
+								for (d[ 8] = 0; d[ 8] < size(M, 8); d[ 8]++)
+									for (d[ 7] = 0; d[ 7] < size(M, 7); d[ 7]++)
+										for (d[ 6] = 0; d[ 6] < size(M, 6); d[ 6]++)
+											for (d[ 5] = 0; d[ 5] < size(M, 5); d[ 5]++)
+												for (d[ 4] = 0; d[ 4] < size(M, 4); d[ 4]++)
+													for (d[ 3] = 0; d[ 3] < size(M, 3); d[ 3]++)
+														for (d[ 2] = 0; d[ 2] < size(M, 2); d[ 2]++)
+															for (d[ 1] = 0; d[ 1] < size(M, 1); d[ 1]++)
+																for (d[ 0] = 0; d[ 0] < size(M, 0); d[ 0]++) 
+																	res (d[od[ 0]],d[od[ 1]],d[od[ 2]],d[od[ 3]], 
 																		 d[od[ 4]],d[od[ 5]],d[od[ 6]],d[od[ 7]], 
 																		 d[od[ 8]],d[od[ 9]],d[od[10]],d[od[11]],
-																		 d[od[12]],d[od[13]],d[od[14]],d[od[15]]);
+																		 d[od[12]],d[od[13]],d[od[14]],d[od[15]]) =
+																	  M (d[ 0],d[ 1],d[ 2],d[ 3],d[ 4],d[ 5],
+																		 d[ 6],d[ 7],d[ 8],d[ 9],d[10],d[11],
+																		 d[12],d[13],d[14],d[15]);
 
-	return res;
+    // Remove trailing singelton dimensions
+    sn.Erase(sn.begin()+ndnew, sn.begin()+16);
+	return resize(res, sn);
 
 																		
 }

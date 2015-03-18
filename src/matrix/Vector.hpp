@@ -222,6 +222,10 @@ public:
      * @param t  Element to be added
      */
 	inline void push_back (const T& t) NOEXCEPT { _data.push_back(t);}
+	inline void Erase (const iterator& i) NOEXCEPT { _data.erase(i);}
+	inline void Erase (const iterator& start, const iterator& end) NOEXCEPT { _data.erase(start, end);}
+	inline void Insert (const iterator& i, const T& val) NOEXCEPT { _data.insert(i, val);}
+
 
 	inline void Clear() NOEXCEPT {_data.clear();}
 

@@ -36,6 +36,7 @@
 #include "OMP.hpp"
 #include "Complex.hpp"
 #include "Vector.hpp"
+#include "RangeParser.hpp"
 
 #ifdef EXPLICIT_SIMD
 #    include "SIMD.hpp"
@@ -57,8 +58,6 @@
 #include <utility>
 
 #include <Assert.hpp>
-
-#include <boost/lexical_cast.hpp>
 
 /**
  * @brief Is matrix is a vector.
@@ -86,29 +85,7 @@
  */
 # define ROUND(A) ( floor(A) + ((A - floor(A) >= 0.5) ? (A>0 ? 1 : 0) : 0))
 
-static inline std::vector<std::string>
-Parse     (const std::string& str, const std::string& dlm) {
 
-	assert (dlm.size() > 0);
-
-	std::vector<std::string> sv;
-	size_t  start = 0, end = 0;
-
-	while (end != std::string::npos) {
-
-		end = str.find (dlm, start);
-
-		// If at end, use length=maxLength.  Else use length=end-start.
-		sv.push_back(str.substr(start, (end == std::string::npos) ? std::string::npos : end - start));
-
-		// If at end, use start=maxSize.  Else use start=end+delimiter.
-		start = ((end > (std::string::npos - dlm.size())) ? std::string::npos : end + dlm.size());
-
-	}
-
-	return sv;
-
-}
 
 /**
  * @brief   Matrix template.<br/>
@@ -2220,93 +2197,63 @@ public:
         return res;
     }
 
-
     inline Matrix<T>
-    operator() (const std::string& range_0) const {
+    operator() (const std::string& range) const {
     	Matrix<T> ret;
-    	if (range_0 == std::string(":")) { // ":"
-    		ret = Matrix<T>(this->Size(),1);
-    		ret.Container() = this->Container();
-    	} else {
-    		std::vector<std::string> parts = Parse (range_0, ":");
-			Vector<int> lims;
-			for (size_t i = 0; i < parts.size(); ++i) {
-				if (parts[i] == "end") {
-					lims.push_back(this->Size()-1);
-				} else {
-					try {
-						lims.push_back(boost::lexical_cast<int>(parts[i]));
-					} catch(const boost::bad_lexical_cast &) {
-						printf ("Improper range declaration, %s\n", range_0.c_str());
-						assert (false);
-					}
-				}
-			}
-			if (parts.size() < 2 || parts.size() > 3) {
-    			printf ("Improper range declaration, %s\n", range_0.c_str());
-    			assert (false);
-    		} else if (parts.size() == 2) { // "x:y"
+    	Vector<Vector<size_t> > view;
 
-    			lims[1]++;
-    			if (lims[0]>this->Size() || lims[1]>this->Size()) {
-    				printf ("Exceeding range, %s\n", range_0.c_str());
-    				assert (false);
-    			}
-    			if (lims[0]>=lims[1] || lims[0]<0 || lims[1]<0) {
-    				printf ("Improper range declaration, %s\n", range_0.c_str());
-    				assert (false);
-    			} else {
-    				ret = Matrix<T>(lims[1]-lims[0],1);
-    				std::copy (_M.begin()+lims[0], _M.begin()+lims[1], ret.Begin());
-    			}
-    		} else if (parts.size() == 3) { // "x:y:z"
-    			if (lims[1] > 0)
-    			    lims[2]++;
-    			if (lims[1] < 0)
-    				lims[0]++;
-    			if (lims[0]>this->Size() || lims[2]>this->Size()) {
-					printf ("Exceeding range, %s\n", range_0.c_str());
-					assert (false);
-				}
-    			if (lims[1] == 0 || (lims[2]<lims[0] && lims[1]>0) ||
-    					(lims[2]>lims[0] && lims[1]<0) || lims[0] < 0 || lims[2] < 0) {
-    				printf ("Improper range declaration, %s\n", range_0.c_str());
-    				assert (false);
-    			} else {
-    				size_t n = floor(((float)lims[2]-(float)lims[0])/(float)lims[1]);
-    				ret = Matrix<T>(n,1);
-    				if (lims[1] > 0)
-    					for (size_t i = 0; i < n; ++i)
-    						ret[i] = _M[lims[0]+i*lims[1]];
-    				else
-    					for (size_t i = 0; i < n; ++i)
-    					    ret[i] = _M[lims[0]+i*lims[1]-1];
-    			}
-    		}
-
+    	try {
+    		view = RangeParser (range, _dim);
+    	} catch (const RangeParseException& e) {
+    		std::cout << "  ** Bailing out **" << std::endl;
+    		assert (false);
     	}
+
+    	if (view.size() == 1) {
+    		ret = Matrix<T>(view[0].size(),1);
+    		for (size_t i = 0; i < view[0].size(); ++i)
+    			ret[i] = _M[i];
+    	} else if (view.size() == 2) {
+            ret = Matrix<T>(view[0].size(),view[1].size());
+    		for (size_t j = 0; j < view[1].size(); ++j)
+                for (size_t i = 0; i < view[0].size(); ++i)
+                    ret (i,j) = (*this)(view[0][i],view[1][j]);
+        } else if (view.size() == 3) {
+            ret = Matrix<T>(view[0].size(),view[1].size(),view[2].size());
+    		for (size_t k = 0; k < view[2].size(); ++k)
+                for (size_t j = 0; j < view[1].size(); ++j)
+                    for (size_t i = 0; i < view[0].size(); ++i)
+                        ret (i,j,k) = (*this)(view[0][i],view[1][j],view[2][k]);
+        } else if (view.size() == 4) {
+            ret = Matrix<T>(view[0].size(),view[1].size(),view[2].size(),view[3].size());
+    		for (size_t l = 0; l < view[3].size(); ++l)
+                for (size_t k = 0; k < view[2].size(); ++k)
+                    for (size_t j = 0; j < view[1].size(); ++j)
+                        for (size_t i = 0; i < view[0].size(); ++i)
+                            ret (i,j,k,l) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l]);
+        } else if (view.size() == 5) {
+            ret = Matrix<T>(view[0].size(),view[1].size(),view[2].size(),view[3].size(),view[4].size());
+    		for (size_t m = 0; m < view[4].size(); ++m)
+                for (size_t l = 0; l < view[3].size(); ++l)
+                    for (size_t k = 0; k < view[2].size(); ++k)
+                        for (size_t j = 0; j < view[1].size(); ++j)
+                            for (size_t i = 0; i < view[0].size(); ++i)
+                                ret (i,j,k,l,m) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l],view[4][l]);
+        } else if (view.size() == 6) {
+            ret = Matrix<T>(view[0].size(),view[1].size(),view[2].size(),view[3].size(),view[4].size(),view[5].size());
+    		for (size_t n = 0; n < view[5].size(); ++n)
+                for (size_t m = 0; m < view[4].size(); ++m)
+                    for (size_t l = 0; l < view[3].size(); ++l)
+                        for (size_t k = 0; k < view[2].size(); ++k)
+                            for (size_t j = 0; j < view[1].size(); ++j)
+                                for (size_t i = 0; i < view[0].size(); ++i)
+                                    ret (i,j,k,l,m,n) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l],view[4][l],view[5][n]);
+        }
+        
     	return ret;
+        
     }
 
-    inline Matrix<T>
-    operator() (const std::string& range_0, const std::string& range_1) const {
-    	Matrix<T> ret;
-    	return ret;
-    }
-
-    inline Matrix<T>
-    operator() (const std::string& range_0, const std::string& range_1,
-    		const std::string& range_2) const {
-    	Matrix<T> ret;
-    	return ret;
-    }
-
-    inline Matrix<T>
-    operator() (const std::string& range_0, const std::string& range_1,
-    		const std::string& range_2, const std::string& range_3) const {
-    	Matrix<T> ret;
-    	return ret;
-    }
 
 protected:
 	
@@ -2358,6 +2305,18 @@ protected:
     
 };
 
+/*
+template<class T>
+class MatrixProxy {
+public:
+    MatrixProxy (Matrix<T>& M) : _Mptr(&M) {}
+    virtual ~MatrixProxy () { _Mptr = 0; }
+    //friend operator= (const Matrix<T>& M) { *_Mptr = M; }
+private:
+    MatrixProxy () : _Mptr(0) {}
+    Matrix<T>* _Mptr;
+}
+*/
 #endif // __MATRIX_H__
 
 

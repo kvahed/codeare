@@ -19,6 +19,7 @@
  */
 
 #include "XDGRASP.hpp"
+#include "DFT.hpp"
 
 using namespace RRStrategy;
 
@@ -72,7 +73,7 @@ codeare::error_code XDGRASP::Prepare () {
 	m_ft = NCSENSE<float>(m_params);
 
 	m_ft.KSpace (Get<float>("kspace"));
-	m_ft.Weights (Get<float>("weights"));
+	//m_ft.Weights (Get<float>("weights"));
 	Free ("weights");
 	Free("kspace");
 
@@ -80,9 +81,62 @@ codeare::error_code XDGRASP::Prepare () {
 }
 
 
+
 codeare::error_code XDGRASP::Process () {
 	const Matrix<cxfl>& kdata = Get<cxfl>("signals");
+
+	const Matrix<float>& w = Get<float>("weights");
+	size_t X = 0, Y = 1, Z = 2, C = 3;
+	// Cut edges
+	Matrix<cxfl> M = fftshift(fft(kdata,2),2);//sqrt(size(kdata,2));
+/*
+	M  = M(":",":","1:end-1",":");
+	Vector<size_t> n = size (M);
+	M *= repmat(sqrt(w),"1,1,n[Z],n[C]");
 	//kdata = permute (kdata());
+
+	ntres=4;nline=84/ntres;
+	nt=floor(ntviews/ntres/nline);
+*/
+	// sort the data into two dynamic dimensions
+	// one for contrast enhancement and one for respiration
+	/*for ii=1:nt
+	    kdata_Under(:,:,:,:,ii)=kdata(:,(ii-1)*ntres*nline+1:ii*ntres*nline,:,:);
+	    Traj_Under(:,:,ii)=Traj(:,(ii-1)*ntres*nline+1:ii*ntres*nline);
+	    DensityComp_Under(:,:,ii)=DensityComp(:,(ii-1)*ntres*nline+1:ii*ntres*nline);
+	    Res_Signal_Under(:,ii)=Res_Signal((ii-1)*ntres*nline+1:ii*ntres*nline);
+	end
+	for ii=1:nt
+	    tmp1=kdata_Under(:,:,:,:,ii);
+	    tmp2=Traj_Under(:,:,ii);
+	    tmp3=DensityComp_Under(:,:,ii);
+	    [~,index]=sort(Res_Signal_Under(:,ii),'descend');
+	    tmp1=tmp1(:,index,:,:);
+	    tmp2=tmp2(:,index,:);
+	    tmp3=tmp3(:,index);
+	    for jj=1:ntres
+	        kdata_Under1(:,:,:,:,jj,ii)=tmp1(:,(jj-1)*nline+1:jj*nline,:,:);
+	        Traj_Under1(:,:,jj,ii)=tmp2(:,(jj-1)*nline+1:jj*nline);
+	        DensityComp_Under1(:,:,jj,ii)=tmp3(:,(jj-1)*nline+1:jj*nline);
+	    end
+	end
+
+	param.y=squeeze(double(kdata_Under1));
+	b1=squeeze(double(b1));b1=b1/max(abs(b1(:)));
+	param.E=MCNUFFT3D_MP(squeeze(Traj_Under1),squeeze(DensityComp_Under1(:,:,:,:)),b1);
+	recon_cs=param.E'*param.y;
+
+	param.TV=TV_Temp4D; % TV constraint along contrast dimension
+	param.W=TV_Temp3DRes; % % TV constraint along respiratory dimension
+	param.TVWeight=max(abs(recon_cs(:)))*0.03;
+	param.L1Weight=max(abs(recon_cs(:)))*0.01;
+	param.nite = 8;param.display=1;
+
+
+	for n=1:3
+	    recon_cs = CSL1NlCg(recon_cs,param);
+	end
+	*/
 	return codeare::OK;
 }
 
