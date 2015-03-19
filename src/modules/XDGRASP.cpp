@@ -83,21 +83,21 @@ codeare::error_code XDGRASP::Prepare () {
 
 
 codeare::error_code XDGRASP::Process () {
-	const Matrix<cxfl>& kdata = Get<cxfl>("signals");
-
+    Matrix<cxfl> kdata = Get<cxfl>("signals");
 	const Matrix<float>& w = Get<float>("weights");
+    
 	size_t X = 0, Y = 1, Z = 2, C = 3;
 	// Cut edges
-	Matrix<cxfl> M = fftshift(fft(kdata,2),2);//sqrt(size(kdata,2));
-/*
-	M  = M(":",":","1:end-1",":");
-	Vector<size_t> n = size (M);
-	M *= repmat(sqrt(w),"1,1,n[Z],n[C]");
+	kdata = fftshift(fft(kdata,2),2)/sqrt(size(kdata,2));
+    kdata=kdata(":,:,2:end-1,:");
+	Vector<size_t> n = size(kdata);
+	std::cout << n << std::endl;
+	//M *= repmat(sqrt(w),"1,1,1:end-1,n[C]");
 	//kdata = permute (kdata());
 
-	ntres=4;nline=84/ntres;
-	nt=floor(ntviews/ntres/nline);
-*/
+	//ntres=4;nline=84/ntres;
+	//nt=floor(ntviews/ntres/nline);
+
 	// sort the data into two dynamic dimensions
 	// one for contrast enhancement and one for respiration
 	/*for ii=1:nt
