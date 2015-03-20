@@ -200,15 +200,12 @@ template<class T> inline static Matrix<std::complex<T> > ifft (
           (FTType*)ret.Ptr(), (FTType*)ret.Ptr(), FFTW_BACKWARD);
     FTTraits<T>::Execute(cp);
     FTTraits<T>::Destroy(cp);
-
-    std::cout << "fted" << std::endl;
     
 	for (size_t i = 0; i < ndims; ++i)
 		order[i] = i;
 	order.Erase(order.begin());
 	order.Insert(order.begin()+dim, 0);
 
-    std::cout << "done" << std::endl;
 	return permute (ret, order);
 
 }
