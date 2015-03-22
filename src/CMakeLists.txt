@@ -50,7 +50,7 @@ list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}
   ${Boost_TIMER_LIBRARY})  
 
 if (${MATLAB_FOUND})
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  if (${MSVC})
     list (APPEND COMLIBS libmx libmat)           
   else ()
     list (APPEND COMLIBS mx mat)
@@ -81,7 +81,7 @@ if (${OMNIORB4_FOUND})
       ${CMAKE_CURRENT_SOURCE_DIR}/RRSModule.idl
 	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/RRSModule.idl) 
   
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  if (${MSVC})
     list (APPEND OORB_DEFINES __WIN32__ __x86__ _WIN32_WINNT=0x0400)
     list (APPEND OMNIORB4_LIBRARIES ws2_32 mswsock advapi32)
   else()
