@@ -1,4 +1,4 @@
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
 endif()
 
@@ -16,7 +16,7 @@ target_link_libraries (t_dft ${FFTW3_LIBRARIES})
 add_test(dft t_dft)
 
 add_executable(t_fftshift t_fftshift.cpp)
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+if (${MSVC})
   target_link_libraries (t_fftshift libmx libmat ${FFTW3_LIBRARIES} hdf5 hdf5_cpp)
 else()
   target_link_libraries (t_fftshift mx mat ${FFTW3_LIBRARIES} ${HDF5_LIBRARIES})

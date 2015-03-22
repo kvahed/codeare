@@ -50,7 +50,7 @@ list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}
   ${Boost_TIMER_LIBRARY})  
 
 if (${MATLAB_FOUND})
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  if (${MSVC})
     list (APPEND COMLIBS libmx libmat)           
   else ()
     list (APPEND COMLIBS mx mat)
