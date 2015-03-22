@@ -111,9 +111,7 @@ public:
     inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_3rd_dim_cart(false),
         m_t (Matrix<T>(1)), m_b0 (Matrix<T>(1)), m_maxit(3), m_m(1), m_alpha(1.), m_epsilon(7.e-4f),
         m_sigma(1.0), m_ncart(1) {
-        
-        T min_time, max_time, min_inh, max_inh, t, w, ts;
-        
+                
         if (p.exists("nk")) {// Number of kspace samples
             try {
                 m_M = unsigned_cast(p["nk"]);
@@ -242,7 +240,7 @@ public:
 
             m_w = std::max(std::abs(m_min_b0),std::abs(m_max_b0))/(.5-((T) m_m)/m_N[2]);
             m_ts =  (m_min_t+m_max_t)/2.;
-            t    = ((m_max_t-m_min_t)/2.)/(.5-((T) (m_m))/m_N[2]);
+            T t    = ((m_max_t-m_min_t)/2.)/(.5-((T) (m_m))/m_N[2]);
 
             m_win = Window<T> (m_m, m_N.back(), m_sigma);
             
@@ -418,7 +416,7 @@ public:
 			//TODO: b0 not 2D+1D+1D
 			if (m_have_b0)
 				for (size_t j = 0; j < m.Size(); ++j) {
-					CT val = tmpm[j] * std::polar<T> (1., 2. * PI * m_ts * m_b0[j] * m_w);
+					CT val = tmpm[j] * std::polar<T> ((T)1., (T)(2. * PI * m_ts * m_b0[j] * m_w));
 					tmpd[2*j+0] = (T)real(val);
 					tmpd[2*j+1] = (T)imag(val);
 				}
@@ -477,7 +475,7 @@ public:
 			//TODO: b0 not 2D+1D+1D
 			if (m_have_b0)
 				for (size_t j = 0; j < out.Size(); ++j)
-					out[j + i*m_imgsz/2] *= std::polar<T> (1., -2. * PI * m_ts * m_b0[j] * m_w);
+					out[j + i*m_imgsz / 2] *= std::polar<T>((T)1., (T)(-2. * PI * m_ts * m_b0[j] * m_w));
 
         }
 

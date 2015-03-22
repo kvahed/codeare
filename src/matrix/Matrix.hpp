@@ -2204,7 +2204,7 @@ public:
 
     	try {
     		view = RangeParser (range, _dim);
-    	} catch (const RangeParseException& e) {
+    	} catch (const RangeParseException&) {
     		std::cout << "  ** Bailing out **" << std::endl;
     		assert (false);
     	}

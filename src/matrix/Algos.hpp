@@ -557,6 +557,9 @@ round (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Maximum
  */
+#ifdef max
+#undef max
+#endif
 template <class T> inline static  T
 m_max (const Matrix<T>& M) {
 
@@ -576,6 +579,11 @@ m_max (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Maximum
  */
+#ifdef _MSC_VER
+#  ifdef max
+#    undef max
+#  endif
+#endif
 template <class T> inline static  T
 max (const Matrix<T>& M) {
 
@@ -595,6 +603,11 @@ max (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Maximum
  */
+#ifdef _MSC_VER
+#  ifdef min
+#    undef min
+#  endif
+#endif
 template <class T> inline static  T
 min (const Matrix<T>& M) {
 
@@ -1061,7 +1074,7 @@ template <class T> inline static Matrix<T>
 permute (const Matrix<T>& M, const Vector<size_t>& perm) {
 	
 	// Check that perm only includes one number between 0 and INVALID_DIM once
-	size_t ndnew = perm.size(), i, j;
+	size_t ndnew = perm.size(), i = 0;
 	size_t ndold = ndims (M); 
 
 	// Must have same number of dimensions
