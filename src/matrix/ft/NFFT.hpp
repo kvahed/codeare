@@ -334,8 +334,8 @@ public:
     KSpace (const Matrix<T>& k) NOEXCEPT {
         if (m_have_b0) { // +1D for omega
             for (size_t j = 0; j < m_b0_plan.M_total; ++j) {
-                m_b0_plan.plan.x[3*j+0] = real(k[2*j+0]);
-                m_b0_plan.plan.x[3*j+1] = imag(k[2*j+1]);
+				m_b0_plan.plan.x[3*j+0] = k[2*j+0];
+				m_b0_plan.plan.x[3*j+1] = k[2*j+1];
                 m_b0_plan.plan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N.back();
             }
         } else {
@@ -388,7 +388,7 @@ public:
         if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
         	int n = static_cast<int>(m_ncart);
         	tmpm = permute (tmpm, 2, 0, 1);
-        	size_t cent = floor(m_ncart/2);
+        	size_t cent = floor((T)m_ncart/2);
         	Matrix< std::complex<T> > tmp;
         	for (size_t i = 0; i < m_imgsz/2; ++i) { // fftshift colums
 				tmp = Column (tmpm,i);
@@ -482,7 +482,7 @@ public:
         if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
         	int n = static_cast<int>(m_ncart);
         	out = permute (out, 2, 0, 1);
-        	size_t cent = floor(m_ncart/2);
+        	size_t cent = floor(.5*m_ncart);
         	Matrix< std::complex<T> > tmp;
         	for (size_t i = 0; i < m_imgsz/2; ++i) { // fftshift colums
 				tmp = Column (out,i);
