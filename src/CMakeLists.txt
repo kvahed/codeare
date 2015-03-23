@@ -97,9 +97,9 @@ if (${OMNIORB4_FOUND})
   target_compile_definitions (codeared PRIVATE ${OORB_DEFINES})
   target_link_libraries (codeared mongoose ${COMLIBS} ${Boost_THREAD_LIBRARY})  
   
-install (TARGETS codeared DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/bin) 
-
+  install (TARGETS codeared DESTINATION
+	${CMAKE_INSTALL_PREFIX}/bin) 
+  
 endif()  
 
 ### codeare ###
@@ -134,6 +134,16 @@ if (${ISMRMRD_FOUND})
   else ()
     set (LD_ENV "${LD_ENV}:${ISMRMRD_INCLUDE_DIR}/../lib")
   endif ()
+endif()
+
+if (${OMNIORB4_FOUND})
+  if (${WINDOWS}) 
+    set (LD_ENV "${LD_ENV}\;${OMNIORB4_BIN_DIR_WIN32}")
+  endif()
+endif()
+
+if (${WINDOWS}) 
+  list (APPEND LD_ENV ${HDF5_TOOLS_DIR})
 endif()
 
 if (${WINDOWS}) 
