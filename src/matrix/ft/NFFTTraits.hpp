@@ -200,9 +200,9 @@ template <>
 struct NFFTTraits<float> {
 
     typedef nfftf_plan           Plan;    /**< @brief nfft plan (single precision) */
-    typedef mri_inh_3d_plan     B0Plan;    /**< @brief nfft plan (single precision) */
+    typedef mri_inh_3d_plan      B0Plan;    /**< @brief nfft plan (single precision) */
     typedef solverf_plan_complex Solver;  /**< @brief nfft solver plan (single precision) */
-    typedef float              T;
+    typedef float                T;
 
     /**
      * @brief            Initialise plan
@@ -225,7 +225,7 @@ struct NFFTTraits<float> {
         int _d (N.size()), _M(M), _m(m);
         unsigned nfft_flags, fftw_flags, solver_flags;
 
-        fftw_flags  = FFTW_MEASURE| FFTW_DESTROY_INPUT;
+        fftw_flags  = FFTW_MEASURE | FFTW_DESTROY_INPUT;
         solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;

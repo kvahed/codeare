@@ -298,7 +298,7 @@ public:
 				 const Matrix<T>& mask = Matrix<T>(1),
 				 const Matrix<CT>& pc = Matrix<CT>(1),
 				 const Matrix<T>& b0 = Matrix<T>(1)) NOEXCEPT :
-		m_N(1), m_have_mask (false), m_have_pc (false) {
+    m_N(1), m_have_mask (false), m_have_pc (false), m_threads(0) {
 
 		size_t rank = numel(sl);
 
@@ -333,11 +333,11 @@ public:
 
 	DFT        (const Params& p) NOEXCEPT :
 		FT<T>::FT(p), m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
-		m_initialised(false), m_have_mask(false) {
+		m_initialised(false), m_have_mask(false), m_threads(0) {
 
 		size_t rank;
 		Vector<int> n;
-
+        
 		if (p.exists("dims")) {
 			try {
 				n = (Vector<int>)p.Get<Vector<size_t> >("dims");
@@ -364,6 +364,12 @@ public:
 			printf ("**ERROR - DFT: either vector with FT dimensions or rank and single dimension must be specified.\n");
 			assert (false);
 		}
+
+        try {
+            m_threads = unsigned_cast (p["threads"]);
+        } catch (const boost::bad_any_cast& e) {
+            printf ("**WARNING - DFT: cannot interpret FT threads.\n%s\n", e.what());
+        }
 
 
 		d = n;
@@ -397,6 +403,7 @@ public:
 		m_cs = ft.m_cs;
 
 		m_sn = ft.m_sn;
+        m_threads = ft.m_threads;
 
 		m_have_mask=ft.m_have_mask;
 		m_have_pc=ft.m_have_pc;
@@ -428,7 +435,7 @@ public:
 	 */
 	DFT         (const size_t rank, const size_t sl, const Matrix<T>& mask = Matrix<T>(),
 				 const Matrix<CT>& pc = Matrix<CT>(), const Matrix<T>& b0 = Matrix<T>()) NOEXCEPT :
-    m_have_mask (false), m_have_pc (false) {
+    m_have_mask (false), m_have_pc (false), m_threads(0) {
         
 		std::vector<int> n (rank);
 		
@@ -668,9 +675,9 @@ private:
 		m_in     = Vector<CT> (m_N);
 
 		m_fwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0],
-				FFTW_FORWARD,  FFTW_MEASURE | FFTW_DESTROY_INPUT);
+                FFTW_FORWARD,  FFTW_ESTIMATE | FFTW_DESTROY_INPUT, m_threads);
 		m_bwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0],
-				FFTW_BACKWARD, FFTW_MEASURE | FFTW_DESTROY_INPUT);
+                FFTW_BACKWARD, FFTW_ESTIMATE | FFTW_DESTROY_INPUT, m_threads);
 
 		m_cs     = m_N * sizeof(Type);
 		m_sn     = sqrt ((T)m_N);
@@ -701,6 +708,8 @@ private:
 
 	Vector<size_t> d;
 	Vector<size_t> c;
+
+    int m_threads;
 
 	//Type*      m_in;           /**< @brief Aligned fftw input*/
 

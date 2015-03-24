@@ -106,8 +106,15 @@ public:
 		m_cgiter  = params.Get<size_t>("cgiter");
 		m_cgeps   = params.Get<double>("cgeps");
 		m_lambda  = params.Get<double>("lambda");
-		m_verbose = (params.Get<int>("verbose") > 0);
-			
+        try {
+            m_np  = params.Get<int>("threads");
+        } catch (const boost::bad_any_cast&) {
+            m_np  = 1;
+        }
+        omp_set_num_threads(m_np);
+        m_verbose = (params.Get<int>("verbose") > 0);
+        m_nx.push_back(m_np);
+        
 		printf ("  Initialising NCSENSE:\n");
 		printf ("  No of threads: %i\n", m_np); // TODO: Thread num not passed on
 		printf ("  Signal nodes: %li\n", m_nx[2]);
@@ -121,7 +128,8 @@ public:
 
 		ft_params["imsz"] = ms;
 
-        m_fts = NFFT<T>(ft_params);
+        for (size_t i = 0; i < m_np; ++i)
+            m_fts.PushBack(NFFT<T>(ft_params));
 
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
@@ -144,7 +152,8 @@ public:
 	 */
 	void
 	KSpace (const Matrix<T>& k) NOEXCEPT {
-        m_fts.KSpace(k);
+        for (size_t i = 0; i < m_fts.size(); ++i)
+            m_fts[i].KSpace(k);
 	}
 	
 
@@ -155,7 +164,8 @@ public:
 	 */
 	void
 	Weights (const Matrix<T>& w) NOEXCEPT {		
-        m_fts.Weights(w);
+        for (size_t i = 0; i < m_fts.size(); ++i)
+            m_fts[i].Weights(w);
 	}
 
 
@@ -297,8 +307,8 @@ public:
 	
 private:
 
-    //Vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
-    NFFT<T>    m_fts;
+    Vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
+    //NFFT<T>    m_fts;
 	bool       m_initialised; /**< All initialised? */
     bool       m_verbose;	  /**< Verbose binary output (keep all intermediate steps) */
     bool       m_3rd_dim_cart; /**< 3rd FT dimension is Cartesian (stack of ...) */

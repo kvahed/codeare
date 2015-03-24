@@ -44,6 +44,31 @@ struct FTTraits<float> {
 	
 
 	/**
+	 * @brief         Initialise FFTWF threads (Should only be done once)
+	 *
+	 * @return        Success
+	 */
+	static inline bool
+	InitThreads (int nt = 0) {
+		if (p.exists("FFTWThreads"))
+			return true;
+        if (nt==0) {
+#pragma omp parallel
+            {
+                nt = omp_get_num_threads();
+            }
+        } 
+#ifdef _OPENMP
+		if (fftwf_init_threads()) {
+			fftwf_plan_with_nthreads (nt);
+			p["FFTWThreads"] = nt;
+		}
+#endif
+		return true;
+	}
+
+	
+	/**
 	 * @brief         DFT plan
 	 *
 	 * @param  rank   FT dimesionality
@@ -52,12 +77,13 @@ struct FTTraits<float> {
 	 * @param  out    Output memory
 	 * @param  sign   FT direction
 	 * @param  flags  FFTW flags
+     * @prama  threads #of fftw threads. (default 0 = #cpus.)
 	 *
 	 * @return        Plan
 	 */
 	static inline Plan 
-	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags) {
-		InitThreads();
+	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags, int threads = 0) {
+		InitThreads(threads);
 #ifdef _OPENMP
 		fftwf_import_wisdom_from_filename("codeare_threads.plan");
 #else
@@ -73,38 +99,8 @@ struct FTTraits<float> {
 	}
 	
 
-	/**
-	 * @brief         Initialise FFTWF threads (Should only be done once)
-	 *
-	 * @return        Success
-	 */
-	static inline bool
-	InitThreads () {
-
-		if (p.exists("FFTWThreads"))
-			return true;
-
-		int nt;
-
-#pragma omp parallel
-		{
-			nt = omp_get_num_threads();
-		}		
-
-#ifdef _OPENMP
-		if (fftwf_init_threads()) {
-			fftwf_plan_with_nthreads (nt);
-			p["FFTWThreads"] = nt;
-		}
-#endif
-
-		return true;
-		
-	}
-
-	
-	static inline Plan DFTPlanMany (int rank, const int* n, int howmany, T* in, T* out, int dir) {
-		InitThreads();
+	static inline Plan DFTPlanMany (int rank, const int* n, int howmany, T* in, T* out, int dir, int threads = 0) {
+		InitThreads(threads);
 		return fftwf_plan_many_dft (rank, n, howmany, in, NULL, 1, *n, out, NULL, 1, *n, dir, FFTW_ESTIMATE);
 	}
 
@@ -189,6 +185,31 @@ struct FTTraits<double> {
 	typedef double      otype;
 
 	/**
+	 * @brief         Initialise FFTWF threads (Should only be done once)
+	 *
+	 * @return        Success
+	 */
+	static inline bool
+	InitThreads (int nt = 0) {
+		if (p.exists("FFTWThreads"))
+			return true;
+        if (nt==0) {
+#pragma omp parallel
+            {
+                nt = omp_get_num_threads();
+            }
+        } 
+#ifdef _OPENMP
+		if (fftw_init_threads()) {
+			fftw_plan_with_nthreads (nt);
+			p["FFTWThreads"] = nt;
+		}
+#endif
+		return true;
+	}
+
+	
+	/**
 	 * @brief         DFT plan
 	 *
 	 * @param  rank   FT dimesionality
@@ -197,12 +218,13 @@ struct FTTraits<double> {
 	 * @param  out    Output memory
 	 * @param  sign   FT direction
 	 * @param  flags  FFTW flags
+     * @prama  threads #of fftw threads. (default 0 = #cpus.)
 	 *
 	 * @return        Plan
 	 */
 	static inline Plan 
-	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags) {
-		InitThreads();
+	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags, int threads = 0) {
+		InitThreads(threads);
 #ifdef _OPENMP
 		fftw_import_wisdom_from_filename("codeare_threads.plan");
 #else
@@ -218,40 +240,11 @@ struct FTTraits<double> {
 	}
 	
 
-	/**
-	 * @brief         Initialise FFTW threads (Should only be done once)
-	 *
-	 * @return        Success
-	 */
-	static inline bool
-	InitThreads () {
-
-		if (p.exists("FFTWThreads"))
-			return true;
-
-		int nt;
-
-#pragma omp parallel
-		{
-			nt = omp_get_num_threads();
-		}		
-
-#ifdef _OPENMP
-		if (fftw_init_threads()) {
-			fftw_plan_with_nthreads (nt);
-			p["FFTWThreads"] = nt;
-		}
-#endif
-
-		return true;
-		
-	}
-	
-
-	static inline Plan DFTPlanMany (int rank, const int* n, int howmany, T* in, T* out, int dir) {
-		InitThreads();
+	static inline Plan DFTPlanMany (int rank, const int* n, int howmany, T* in, T* out, int dir, int threads = 0) {
+		InitThreads(threads);
 		return fftw_plan_many_dft (rank, n, howmany, in, NULL, 1, *n, out, NULL, 1, *n, dir, FFTW_ESTIMATE);
 	}
+
 
 	/**
 	 * @brief        Inlined memory allocation for performance

@@ -65,6 +65,7 @@ CompressedSensing::Init () {
 			printf ("%s", "DFT");
 			ft_params["dims"] = m_image_size;
 			ft_params["mask"] = Get<float>("mask");
+		    ft_params["threads"] = RHSAttribute<int>("threads");
 			m_csparam.ft = (FT<float>*) new DFT<float> (ft_params);
 			break;
 		case 1:
@@ -98,7 +99,7 @@ CompressedSensing::Init () {
 		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
 		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
 		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
-		    ft_params["np"]           = RHSAttribute<int>("threads");
+		    ft_params["threads"]      = RHSAttribute<int>("threads");
 			m_csparam.ft = (FT<float>*) new NCSENSE<float> (ft_params);
 #else
 			printf("**ERROR - CompressedSensing: NUFFT support not available.");

@@ -141,7 +141,7 @@ CGSENSE::Prepare () {
     cgp["cgiter"]        = (size_t) m_cgmaxit;
     cgp["cgeps"]         = m_cgeps;
     cgp["lambda"]        = m_lambda;
-    cgp["np"]            = m_nthreads;
+    cgp["threads"]       = m_nthreads;
     cgp["m"]             = m_m;
     cgp["3rd_dim_cart"]  = m_3rd_dim_cart;
 
