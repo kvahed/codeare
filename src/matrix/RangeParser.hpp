@@ -66,6 +66,8 @@ inline static Vector<Vector<size_t> > RangeParser (const std::string& range, con
                     assert (false);
                 }
             }
+            if (lims.size()==1)
+            	lims.PushBack(lims[0]);
         }
 
         if (ranges.size() == 1) {
@@ -82,10 +84,10 @@ inline static Vector<Vector<size_t> > RangeParser (const std::string& range, con
             throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
         }
         
-        if (parts.size() < 2 || parts.size() > 3) {
+        if (parts.size() < 1 || parts.size() > 3) {
             printf ("Improper range declaration, %s\n", ranges[j].c_str());
             assert (false);
-        } else if (parts.size() == 2) { // "x:y"
+        } else if (parts.size() < 3) { // "x:y"
             lims[1]++;
             if (lims[0]>dims[j] || lims[1]>dims[j]) {
                 std::cout << lims << std::endl;

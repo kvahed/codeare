@@ -20,6 +20,8 @@ int main (int narg, char** argv) {
     std::cout << "A(\"6:end\")" << std::endl;
     std::cout << A("6:end-3") << std::endl;
 
+    std::cout << "A(\"0,0:2\")" << std::endl;
+    std::cout << A("0,0:2") << std::endl;
     std::cout << "A(\"0:1,0:2\")" << std::endl;
     std::cout << A("0:1,0:2") << std::endl;
     std::cout << "A(\"1:1,0:2\")" << std::endl;

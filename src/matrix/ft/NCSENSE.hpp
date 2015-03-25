@@ -41,6 +41,8 @@
 template <class T>
 class NCSENSE : public FT<T> {
 
+	// TODO: Check if k-space and weights have been assigned
+
     typedef std::complex<T> CT;
 	
 public:
@@ -57,11 +59,10 @@ public:
 	 *
 	 * @param  params  Configuration parameters
 	 */
-	NCSENSE        (const Params& params) NOEXCEPT 
+	NCSENSE        (const Params& params) NOEXCEPT
               : FT<T>::FT(params), m_cgiter(30), m_initialised(false), m_cgeps(1.0e-6),
                 m_lambda(1.0e-6), m_verbose (false), m_np(0), m_3rd_dim_cart(false) {
 
-		Params ft_params;
 		size_t cart_dim = 1;
 
 		ft_params["epsilon"] = (params.exists("fteps")) ? fp_cast(params["fteps"]): 1.0e-3;
@@ -209,6 +210,23 @@ public:
 	
 	
 	/**
+	 * @brief Estimate coil sensitivities
+	 * @param  data  measurement
+	 */
+	virtual void
+	EstimateSensitivities (const Matrix<CT>& data, size_t nk = 128) const {
+		Vector<NFFT<T> > fts;
+		Params ftp = ft_params;
+		ftp["nk"] = nk;
+        for (size_t i = 0; i < m_np; ++i)
+            fts.PushBack(NFFT<T>(ftp));
+        std::cout << size(data) << std::endl;
+        std::cout << ftp << std::endl;
+        fts[0]->*data("0:127,0");
+	}
+
+
+	/**
 	 * @brief Backward transform
 	 *
 	 * @param  m     To transform
@@ -221,6 +239,9 @@ public:
 	Adjoint (const Matrix<CT>& m,
 			 const Matrix<CT>& sens,
 			 const bool recal = false) const NOEXCEPT {
+
+		//if (m_sm.Size() == 1)
+			EstimateSensitivities(m);
 
         T rn, rno, xn, ts;
 		Matrix<CT> p, r, x, q;
@@ -313,7 +334,7 @@ private:
     bool       m_verbose;	  /**< Verbose binary output (keep all intermediate steps) */
     bool       m_3rd_dim_cart; /**< 3rd FT dimension is Cartesian (stack of ...) */
 
-	Matrix<CT> m_sm;          /**< Sensitivities */
+	mutable Matrix<CT> m_sm;          /**< Sensitivities */
 	Matrix<T>  m_ic;     /**< Intensity correction I(r) */
 	Matrix<CT> m_pc; /**< @brief Correction phase */
 
@@ -327,6 +348,8 @@ private:
 	double     m_lambda;         /**< Tikhonov weight */
 	
 	int        m_np;
+
+	Params ft_params;
 
 };
 
