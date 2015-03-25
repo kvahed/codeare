@@ -28,6 +28,7 @@
 #=============================================================================
 # Copyright 2011,2012 Rolf Eike Beer <eike@sf-mail.de>
 # Copyright 2012 Andreas Weis
+# Copyright 2014 Kaveh Vahedipour <kaveh@codeare.org>
 #
 # Distributed under the OSI-approved BSD License (the "License");
 # see accompanying file Copyright.txt for details.
@@ -149,6 +150,8 @@ cxx11_check_feature("sizeof_member" HAS_CXX11_SIZEOF_MEMBER)
 cxx11_check_feature("static_assert" HAS_CXX11_STATIC_ASSERT)
 cxx11_check_feature("variadic_templates" HAS_CXX11_VARIADIC_TEMPLATES)
 cxx11_check_feature("shared_ptr" HAS_CXX11_SHARED_PTR)
+cxx11_check_feature("unique_ptr" HAS_CXX11_UNIQUE_PTR)
+cxx11_check_feature("weak_ptr" HAS_CXX11_WEAK_PTR)
 cxx11_check_feature("thread" HAS_CXX11_THREAD)
 cxx11_check_feature("mutex" HAS_CXX11_MUTEX)
 cxx11_check_feature("noexcept" HAS_CXX11_NOEXCEPT)
