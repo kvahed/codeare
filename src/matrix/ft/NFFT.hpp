@@ -506,6 +506,9 @@ public:
     }
 
     
+    Plan& NFFTPlan() {return m_plan;}
+    Plan NFFTPlan() const {return m_plan;}
+
 
     inline size_t Rank() const NOEXCEPT { return m_rank; }
     

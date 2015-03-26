@@ -27,6 +27,7 @@
 #include "mri/MRI.hpp"
 #include "Lapack.hpp"
 #include "tinyxml.h"
+#include "IOContext.hpp"
 
 #include "Workspace.hpp"
 
@@ -153,6 +154,7 @@ public:
 	 */
 	void
 	KSpace (const Matrix<T>& k) NOEXCEPT {
+		m_k = k;
         for (size_t i = 0; i < m_fts.size(); ++i)
             m_fts[i].KSpace(k);
 	}
@@ -164,7 +166,8 @@ public:
 	 * @param  w   Weights
 	 */
 	void
-	Weights (const Matrix<T>& w) NOEXCEPT {		
+	Weights (const Matrix<T>& w) NOEXCEPT {
+		m_w = w;
         for (size_t i = 0; i < m_fts.size(); ++i)
             m_fts[i].Weights(w);
 	}
@@ -214,17 +217,29 @@ public:
 	 * @param  data  measurement
 	 */
 	virtual void
-	EstimateSensitivities (const Matrix<CT>& data, size_t nk = 128) const {
-		Vector<NFFT<T> > fts;
-		Params ftp = ft_params;
-		ftp["nk"] = nk;
-        for (size_t i = 0; i < m_np; ++i)
-            fts.PushBack(NFFT<T>(ftp));
-        std::cout << size(data) << std::endl;
-        std::cout << ftp << std::endl;
-        fts[0]->*data("0:127,0");
+	EstimateSensitivities (const Matrix<CT>& data, size_t nk = 8192) const {
+		Matrix< std::complex<T> > out (size(m_sm));
+#pragma omp parallel for schedule (guided,1)
+		for (int i = 0; i < m_nx[1]; ++i) {
+			m_fts[omp_get_thread_num()].NFFTPlan().M_total = nk;
+			if (m_nx[0] == 2)
+				Slice  (out, i, m_fts[omp_get_thread_num()] ->* data(std::string("0:8191,") + std::to_string(i)));
+			else
+				Volume (out, i, m_fts[omp_get_thread_num()] ->* data(std::string("0:8191,") + std::to_string(i)));
+            m_fts[omp_get_thread_num()].NFFTPlan().M_total = m_nx[2];
+		}
 	}
 
+
+	/**
+	 * @brief Image size
+	 * @return image size
+	 */
+	inline Vector<size_t> ImageSize () {
+		Vector<size_t> ret;
+		//TODO: Image size, K-space size
+		return ret;
+	}
 
 	/**
 	 * @brief Backward transform
@@ -240,7 +255,8 @@ public:
 			 const Matrix<CT>& sens,
 			 const bool recal = false) const NOEXCEPT {
 
-		//if (m_sm.Size() == 1)
+		// TODO: Not functional yet
+		if (m_sm.Size() == 1)
 			EstimateSensitivities(m);
 
         T rn, rno, xn, ts;
@@ -328,7 +344,7 @@ public:
 	
 private:
 
-    Vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
+	mutable Vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
     //NFFT<T>    m_fts;
 	bool       m_initialised; /**< All initialised? */
     bool       m_verbose;	  /**< Verbose binary output (keep all intermediate steps) */
@@ -350,6 +366,7 @@ private:
 	int        m_np;
 
 	Params ft_params;
+	Matrix<T> m_k, m_w;
 
 };
 

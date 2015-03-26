@@ -34,9 +34,8 @@
 template <class T> inline static Matrix< std::complex<T> >
 E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
    const Vector<size_t>& nx, const Vector<NFFT<T> >& ft) {
-
-	Matrix< std::complex<T> > out (nx[2],nx[1]);//nk*nc
-#pragma omp parallel for
+	Matrix< std::complex<T> > out (nx[2],nx[1]);
+#pragma omp parallel for schedule (guided, 1)
     for (size_t j = 0; j < nx[1]; ++j) {
         int k = omp_get_thread_num();
         Column (out, j, ft[k] * (resize(((nx[0] == 2) ? Slice (sm, j) : Volume (sm, j)),size(in)) * in));
@@ -57,10 +56,8 @@ E (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
 template <class T> inline static Matrix< std::complex<T> >
 EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
     const Vector<size_t>& nx, const Vector<NFFT<T> >& ft) {
-
 	Matrix< std::complex<T> > out (size((nx[0] == 2) ? Slice (sm, 0) : Volume (sm, 0)));
-    
-#pragma omp parallel for
+#pragma omp parallel for schedule (guided, 1)
 	for (size_t j = 0; j < nx[1]; ++j) {
         int k = omp_get_thread_num();
         out += ft[k] ->* Column (in,j) * conj((nx[0] == 2) ? Slice (sm, j) : Volume (sm, j));
