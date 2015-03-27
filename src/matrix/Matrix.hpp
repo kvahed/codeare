@@ -96,7 +96,7 @@
  */
 template <class T, paradigm P=SHM
 #if !defined(_MSC_VER) || _MSC_VER>1200
-    ,const bool& b = TypeTraits<T>::Supported
+    ,const bool b = TypeTraits<T>::Supported
 #endif
 >
 class Matrix {
