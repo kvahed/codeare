@@ -18,11 +18,10 @@ Other examples:
 # cd codeare
 # mkdir build
 # cd build
-# cmake -DCMAKE_C_COMPILER=icc -DCMAKE_CC_COMPILER=icpc -DBLA_VENDOR:STRING="Intel10_64lp" \
+# cmake -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc -DBLA_VENDOR:STRING="Intel10_64lp" \
   -DBLAS_mkl_core_LIBRARY:FILEPATH="/opt/intel/mkl/lib/intel64/libmkl_core.so" \
   -DLAPACK_mkl_lapack_LIBRARY:FILEPATH="/opt/intel/mkl/lib/intel64/libmkl_core.so" \
   -DBLAS_mkl_intel_thread_LIBRARY:FILEPATH="/opt/intel/mkl/lib/intel64/libmkl_intel_thread.so" \
-  -DLAPACK_mkl_gf_lp64_LIBRARY:FILEPATH="/opt/intel/mkl/lib/intel64/libmkl_intel_lp64.so" \
   -DBLAS_mkl_intel_lp64_LIBRARY:FILEPATH="/opt/intel/mkl/lib/intel64/libmkl_intel_lp64.so" ..
 
 For more information refer to http://codeare.org
