@@ -21,6 +21,8 @@
 #include "RelativeSensitivities.hpp"
 #include "Print.hpp"
 #include "Resample.hpp"
+#include "SimpleTimer.hpp"
+
 
 
 using namespace RRStrategy;
@@ -52,7 +54,7 @@ RelativeSensitivities::Process     () {
     Matrix<cxfl>& mask = Get<cxfl>("mask");
 
     printf ("  Processing map generation ...\n");
-    ticks start = getticks();
+//    ticks start = getticks();
 
 
     // Squeeze matrices ---------------------------
@@ -159,7 +161,7 @@ RelativeSensitivities::Process     () {
     Free ("meas");
     // -----------------------------------------
     
-    printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
+//    printf ("... done. Overall WTime: %.4f seconds.\n\n", elapsed(getticks(), start) / Toolbox::Instance()->ClockRate());
     return codeare::OK;
 	
 }
