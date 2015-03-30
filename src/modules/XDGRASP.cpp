@@ -38,6 +38,9 @@ codeare::error_code XDGRASP::Init () {
 	m_params["nx"] = s;
 	Attribute ("ntres", &s);
 	m_params["ntres"] = s;
+	Attribute ("nlines", &s);
+	m_params["nlines"] = s;
+
 	printf ("  Image side length (%lu) Resp phases (%lu)\n",
 			unsigned_cast(m_params["nx"]), unsigned_cast(m_params["ntres"]));
 
@@ -50,6 +53,7 @@ codeare::error_code XDGRASP::Init () {
 	m_params["cgeps"]   = (Attribute ("cgeps",   &f) == TIXML_SUCCESS) ? f : 0.;
 	m_params["lambda"]  = (Attribute ("lambda",  &f) == TIXML_SUCCESS) ? f : 0.;
 	m_params["3rd_dim_cart"] = (Attribute ("cart_3rd_dim", &b) == TIXML_SUCCESS) ? b : false;
+	m_params["threads"] = (Attribute ("nthreads", &i) == TIXML_SUCCESS) ? i : 1;
 	m_params["m"]       = (Attribute ("m",       &s) == TIXML_SUCCESS) ? s : 1;
 
 #pragma omp parallel default (shared)
@@ -64,18 +68,25 @@ codeare::error_code XDGRASP::Init () {
 
 
 codeare::error_code XDGRASP::Prepare () {
+
+	// data from scanner
 	const Matrix<cxfl>& b1 = Get<cxfl>("sensitivities");
 	const Matrix<float>& k = Get<float>("kspace");
 	const Matrix<float>& w = Get<float>("weights");
 
+	// sensitivity maps
 	m_params["sensitivities"] = Get<cxfl>("sensitivities");
 
+	// setup ft oper
 	m_ft = NCSENSE<float>(m_params);
-
 	m_ft.KSpace (Get<float>("kspace"));
-	//m_ft.Weights (Get<float>("weights"));
+	m_ft.Weights (Get<float>("weights"));
+
+	// release RAM
 	Free ("weights");
 	Free("kspace");
+
+	// prepare output
 	Matrix<cxfl> img;
 	Add ("image", img);
 
@@ -86,17 +97,12 @@ codeare::error_code XDGRASP::Prepare () {
 
 codeare::error_code XDGRASP::Process () {
     Matrix<cxfl> kdata = Get<cxfl>("signals");
-	//const Matrix<float>& w = Get<float>("weights");
     
 	size_t X = 0, Y = 1, Z = 2, C = 3;
 	// Cut edges
-	kdata = fftshift(fft(kdata,1),1);///sqrt(size(kdata,2));
-    kdata=kdata(":,1:end-1,:");
-	Vector<size_t> n = size(kdata);
-
-
-	//M *= repmat(sqrt(w),"1,1,1:end-1,n[C]");
-	//kdata = permute (kdata());
+	kdata = fftshift(fft(kdata,1),1)/sqrt(size(kdata,2));
+    kdata = kdata(Range(), Range(1,size(kdata,1)-1), Range());
+	//Vector<size_t> n = size(kdata);
 
 	//ntres=4;nline=84/ntres;
 	//nt=floor(ntviews/ntres/nline);

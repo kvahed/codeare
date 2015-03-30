@@ -145,7 +145,7 @@ public:
     /**
      * @brief Access last element (rhs)
      */
-	inline const T& back () const NOEXCEPT { return _data.back; }
+	inline const T& back () const NOEXCEPT { return _data.back(); }
 
     /**
      * @brief Access first element (lhs)
@@ -154,7 +154,7 @@ public:
     /**
      * @brief Access first element (rhs)
      */
-	inline const T& front () const NOEXCEPT { return _data.front; }
+	inline const T& front () const NOEXCEPT { return _data.front(); }
 
     /**
      * @brief Access RAM address (lhs)
