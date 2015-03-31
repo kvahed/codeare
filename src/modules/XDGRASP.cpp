@@ -36,8 +36,11 @@ codeare::error_code XDGRASP::Init () {
 	// XD GRASP specific
 	Attribute ("nx", &s);
 	m_params["nx"] = s;
-	Attribute ("ntres", &s);
-	m_params["ntres"] = s;
+	Attribute ("ntres", &m_ntres);
+	m_params["ntres"] = m_ntres;
+	m_nlines = 84/m_ntres;
+	m_params["nlines"] = m_nlines;
+
 	printf ("  Image side length (%lu) Resp phases (%lu)\n",
 			unsigned_cast(m_params["nx"]), unsigned_cast(m_params["ntres"]));
 
@@ -50,6 +53,7 @@ codeare::error_code XDGRASP::Init () {
 	m_params["cgeps"]   = (Attribute ("cgeps",   &f) == TIXML_SUCCESS) ? f : 0.;
 	m_params["lambda"]  = (Attribute ("lambda",  &f) == TIXML_SUCCESS) ? f : 0.;
 	m_params["3rd_dim_cart"] = (Attribute ("cart_3rd_dim", &b) == TIXML_SUCCESS) ? b : false;
+	m_params["threads"] = (Attribute ("nthreads", &i) == TIXML_SUCCESS) ? i : 1;
 	m_params["m"]       = (Attribute ("m",       &s) == TIXML_SUCCESS) ? s : 1;
 
 #pragma omp parallel default (shared)
@@ -64,18 +68,25 @@ codeare::error_code XDGRASP::Init () {
 
 
 codeare::error_code XDGRASP::Prepare () {
+
+	// data from scanner
 	const Matrix<cxfl>& b1 = Get<cxfl>("sensitivities");
 	const Matrix<float>& k = Get<float>("kspace");
 	const Matrix<float>& w = Get<float>("weights");
 
+	// sensitivity maps
 	m_params["sensitivities"] = Get<cxfl>("sensitivities");
 
+	// setup ft oper
 	m_ft = NCSENSE<float>(m_params);
-
 	m_ft.KSpace (Get<float>("kspace"));
-	//m_ft.Weights (Get<float>("weights"));
+	m_ft.Weights (Get<float>("weights"));
+
+	// release RAM
 	Free ("weights");
 	Free("kspace");
+
+	// prepare output
 	Matrix<cxfl> img;
 	Add ("image", img);
 
@@ -86,23 +97,27 @@ codeare::error_code XDGRASP::Prepare () {
 
 codeare::error_code XDGRASP::Process () {
     Matrix<cxfl> kdata = Get<cxfl>("signals");
-	//const Matrix<float>& w = Get<float>("weights");
+    const Matrix<float>& traj = Get<float>("kspace");
+    const Matrix<float>& resp = Get<float>("resp");
     
-	size_t X = 0, Y = 1, Z = 2, C = 3;
+	size_t RO = 0, VIEW = 1, Z = 2, C = 3;
 	// Cut edges
-	kdata = fftshift(fft(kdata,1),1);///sqrt(size(kdata,2));
-    kdata=kdata(":,1:end-1,:");
+	kdata = fftshift(fft(kdata,1),1)/sqrt(size(kdata,2));
+    kdata = kdata(Range(), Range(1,size(kdata,1)-1), Range());
 	Vector<size_t> n = size(kdata);
 
 
-	//M *= repmat(sqrt(w),"1,1,1:end-1,n[C]");
-	//kdata = permute (kdata());
-
-	//ntres=4;nline=84/ntres;
-	//nt=floor(ntviews/ntres/nline);
+	m_nt = (size_t)std::floor((float)n[VIEW]/
+			(float)(unsigned_cast(m_params["ntres"])*unsigned_cast(m_params["nlines"])));
+	m_params["nt"] = m_nt;
 
 	// sort the data into two dynamic dimensions
 	// one for contrast enhancement and one for respiration
+	for (size_t i = 0; i < m_nt; ++i) {
+		Matrix<cxfl> kdata_under = kdata(Range(), Range(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines), Range());
+		Matrix<float> traj_under = traj (Range(), Range(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
+		Matrix<float> resp_under = resp (Range(         i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
+	}
 	/*for ii=1:nt
 	    kdata_Under(:,:,:,:,ii)=kdata(:,(ii-1)*ntres*nline+1:ii*ntres*nline,:,:);
 	    Traj_Under(:,:,ii)=Traj(:,(ii-1)*ntres*nline+1:ii*ntres*nline);

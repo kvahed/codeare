@@ -76,16 +76,12 @@
  */
 # define MIN(A,B) (A < B ? A : B)
 
-
-/**
- * Return rounded value as in MATLAB.
- * i.e. ROUND( 0.1) ->  0
- *      ROUND(-0.5) -> -1
- *      ROUND( 0.5) ->  1
- */
-# define ROUND(A) ( floor(A) + ((A - floor(A) >= 0.5) ? (A>0 ? 1 : 0) : 0))
-
-
+// Pretty print function names
+#if (0 < _MSC_VER)
+  #define PRETTY_FUNCTION __FUNCSIG__
+#else
+  #define PRETTY_FUNCTION __PRETTY_FUNCTION__
+#endif
 
 /**
  * @brief   Matrix template.<br/>
@@ -96,7 +92,7 @@
  */
 template <class T, paradigm P=SHM
 #if !defined(_MSC_VER) || _MSC_VER>1200
-    ,const bool& b = TypeTraits<T>::Supported
+    ,const bool b = TypeTraits<T>::Supported
 #endif
 >
 class Matrix {
@@ -646,67 +642,6 @@ public:
 	}
 
     /**
-     * @brief Deliver range of values with indices
-     *
-     * @param indices List of indices
-     * @return        Matrix containing values at indices
-     */
-    inline Matrix<T> operator() (const Vector<size_t>& indices, size_t col = 0) const NOEXCEPT {
-    	size_t indices_size = indices.size();
-    	assert (indices_size);
-    	assert (col < _dim[1]);
-    	assert (indices_size < _dim[0]);
-    	assert (mmax(indices) < _dim[0]);
-    	Matrix<T> ret (indices_size,1);
-    	for (size_t i = 0; i < indices_size; ++i)
-    		ret[i] = At(indices[i],col);
-    	return ret;
-    }
-
-    /**
-     * @brief Deliver range of values with indices
-     *
-     * @param indices List of indices
-     * @return        Matrix containing values at indices
-     */
-    inline Matrix<T> operator() (size_t row, const Vector<size_t>& indices) const NOEXCEPT {
-    	size_t indices_size = indices.size();
-    	assert (indices_size);
-    	assert (row < _dim[0]);
-    	assert (indices_size < _dim[1]);
-    	assert (mmax(indices) < _dim[1]);
-    	Matrix<T> ret (1,indices_size);
-    	for (size_t i = 0; i < indices_size; ++i)
-    		ret[i] = At(row,indices[i]);
-    	return ret;
-    }
-
-    /**
-     * @brief Deliver range of values with indices
-     *
-     * @param indices List of indices
-     * @return        Matrix containing values at indices
-     */
-    inline Matrix<T> operator() (const Vector<size_t>& row_inds, const Vector<size_t>& col_inds) const NOEXCEPT {
-    	size_t row_inds_size = row_inds.size();
-    	size_t col_inds_size = col_inds.size();
-    	assert (row_inds_size);
-    	assert (col_inds_size);
-    	assert (row_inds_size < _dim[0]);
-    	assert (col_inds_size < _dim[1]);
-    	assert (mmax(row_inds) < _dim[0]);
-    	assert (mmax(col_inds) < _dim[1]);
-    	Matrix<T> ret (row_inds_size, col_inds_size);
-    	for (size_t j = 0; j < col_inds_size; ++j)
-    		for (size_t i = 0; i < row_inds_size; ++i)
-    			ret(i,j) = At(row_inds[i],col_inds[j]);
-    	return ret;
-    }
-
-
-
-
-    /**
      * @brief           @see At(const size_t)
      *
      * @param  p        Requested position.
@@ -1200,14 +1135,19 @@ public:
      */
     inline Matrix<T,P>&
     operator=           (const Vector<T>& v) NOEXCEPT {
-
-    	assert (_M.size() == v.size());
-
-        if (&_M != &v)
+    	if (_M.size() == 1) { // we are being assigned out of nothing
+    		_dim.resize(1,v.size());
+    	    _res.resize(1,1.0);
+    	    Allocate();
+    	} else {              // we have been allocated already
+    		if (_M.size() != v.size()) {
+    			printf ("%s: lhs size (%lu) does not match rhs (%lu)", PRETTY_FUNCTION, _M.size(), v.size());
+    			throw 1;
+    		}
+    	}
+    	if (&_M != &v)
             _M = v;
-
         return *this;
-
     }
 
 
@@ -2193,8 +2133,151 @@ public:
     	T t = (T) s;
         Matrix<cbool> res (_dim);
 		for (size_t i = 0; i < Size(); ++i)
-			res[i] =  (_M[i] == s) ? 1 : 0;
+			res[i] = (_M[i] == s) ? 1 : 0;
         return res;
+    }
+
+    inline Matrix<T>& operator= (const boost::tuple<Matrix<T>&, Vector<Vector<size_t> > >& rhs) {
+    	*this = boost::get<0>(rhs);
+    	return *this;
+    }
+
+    typedef typename boost::tuple<Matrix<T>&, Vector<Vector<size_t> > > MRange;
+    typedef typename boost::tuple<const Matrix<T>&, const Vector<const Vector<size_t>& > > ConstMRange;
+
+    inline const Matrix<T> operator() (Vector<size_t> range) const {
+    	Matrix<T> ret;
+    	if (range.size() == 0) {
+    		ret = _M;
+    	} else {
+        	if (range.front() > Size() || range.back() > Size())
+        		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+			ret = Matrix<T>(range.size(),1);
+			for (size_t i = 0; i < ret.Size(); ++i)
+				ret[i] = _M[range[i]];
+    	}
+    	return ret;
+    }
+
+    inline Matrix<T>
+    operator() (Vector<size_t> range0, Vector<size_t> range1) const {
+    	if (range0.size() == 0) {
+			range0.resize(_dim[0]);
+			for (size_t i = 0; i < _dim[0]; ++i)
+				range0[i] = i;
+		} else if (range0.front() > _dim[0] || range0.back() > _dim[0])
+    		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+
+    	if (range1.size() == 0) {
+    		range1.resize(_dim[1]);
+    		for (size_t i = 0; i < _dim[1]; ++i)
+    			range1[i] = i;
+    	} else if (range1.front() > _dim[1] || range1.back() > _dim[1])
+    		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+
+    	Matrix<T> ret (range0.size(),range1.size());
+
+		for (size_t j = 0; j < range1.size(); ++j)
+			for (size_t i = 0; i < range0.size(); ++i)
+				ret (i,j) = At(range0[i],range1[j]);
+		return ret;
+    }
+    /**
+     * @brief Deliver range of values with indices
+     *
+     * @param indices List of indices
+     * @return        Matrix containing values at indices
+     */
+    inline Matrix<T> operator() (const Vector<size_t>& indices, size_t col) const NOEXCEPT {
+    	return (*this)(indices,Vector<size_t>(1,col));
+    }
+
+    /**
+     * @brief Deliver range of values with indices
+     *
+     * @param indices List of indices
+     * @return        Matrix containing values at indices
+     */
+    inline Matrix<T> operator() (size_t row, const Vector<size_t>& indices) const NOEXCEPT {
+    	return (*this)(Vector<size_t>(1,row),indices);
+    }
+
+
+    inline Matrix<T>
+    operator() (Vector<size_t> range0, Vector<size_t> range1,
+    		Vector<size_t> range2) const {
+    	if (range0.size() == 0) {
+			range0.resize(_dim[0]);
+			for (size_t i = 0; i < _dim[0]; ++i)
+				range0[i] = i;
+		} else if (range0.front() > _dim[0] || range0.back() > _dim[0])
+    		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+
+    	if (range1.size() == 0) {
+    		range1.resize(_dim[1]);
+    		for (size_t i = 0; i < _dim[1]; ++i)
+    			range1[i] = i;
+    	} else if (range1.front() > _dim[1] || range1.back() > _dim[1])
+    		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+
+    	if (range2.size() == 0) {
+    		range2.resize(_dim[2]);
+    		for (size_t i = 0; i < _dim[2]; ++i)
+    			range2[i] = i;
+    	} else if (range2.front() > _dim[2] || range2.back() > _dim[2])
+    		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+
+    	Matrix<T> ret (range0.size(),range1.size(),range2.size());
+
+		for (size_t k = 0; k < range2.size(); ++k)
+			for (size_t j = 0; j < range1.size(); ++j)
+				for (size_t i = 0; i < range0.size(); ++i)
+					ret (i,j,k) = At(range0[i],range1[j],range2[k]);
+		return ret;
+    }
+
+
+
+
+    inline Matrix<T>
+    operator() (Vector<size_t> range0, Vector<size_t> range1,
+    		Vector<size_t> range2, Vector<size_t> range3) const {
+    	if (range0.size() == 0) {
+			range0.resize(_dim[0]);
+			for (size_t i = 0; i < _dim[0]; ++i)
+				range0[i] = i;
+		} else if (range0.front() > _dim[0] || range0.back() > _dim[0])
+    		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+
+    	if (range1.size() == 0) {
+    		range1.resize(_dim[1]);
+    		for (size_t i = 0; i < _dim[1]; ++i)
+    			range1[i] = i;
+    	} else if (range1.front() > _dim[1] || range1.back() > _dim[1])
+    		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+
+    	if (range2.size() == 0) {
+    		range2.resize(_dim[2]);
+    		for (size_t i = 0; i < _dim[2]; ++i)
+    			range2[i] = i;
+    	} else if (range2.front() > _dim[2] || range2.back() > _dim[2])
+    		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+
+    	if (range3.size() == 0) {
+    		range3.resize(_dim[3]);
+    		for (size_t i = 0; i < _dim[3]; ++i)
+    			range3[i] = i;
+    	} else if (range3.front() > _dim[3] || range3.back() > _dim[3])
+    		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
+
+    	Matrix<T> ret (range0.size(),range1.size(),range2.size(),range3.size());
+
+		for (size_t l = 0; l < range3.size(); ++l)
+			for (size_t k = 0; k < range2.size(); ++k)
+				for (size_t j = 0; j < range1.size(); ++j)
+					for (size_t i = 0; i < range0.size(); ++i)
+						ret (i,j,k,l) = At(range0[i],range1[j],range2[k],range3[l]);
+		return ret;
     }
 
     inline Matrix<T>
@@ -2254,6 +2337,11 @@ public:
         
     }
 
+/*    inline MRange& operator() (const Vector<size_t>& range) {
+    	Vector<Vector<size_t> > ranges;
+    	ranges.PushBack(Vector<size_t>(range));
+    	return MRange(*this,ranges);
+    }*/
 
 protected:
 	
@@ -2305,18 +2393,32 @@ protected:
     
 };
 
-/*
 template<class T>
-class MatrixProxy {
-public:
-    MatrixProxy (Matrix<T>& M) : _Mptr(&M) {}
-    virtual ~MatrixProxy () { _Mptr = 0; }
-    //friend operator= (const Matrix<T>& M) { *_Mptr = M; }
-private:
-    MatrixProxy () : _Mptr(0) {}
-    Matrix<T>* _Mptr;
+std::ostream& operator<< (std::ostream& os, const typename Matrix<T>::ConstMRange& mr) {
+		os << boost::get<0>(mr);
+	return os;
+}
+
+/*
+template<class T> static void
+copy (const Matrix<T>& rhs, typename Matrix<T>::MRange& lhs) {
+	Matrix<T>& mlhs = boost::get<0>(lhs);
+	Vector<Vector<size_t> >& rlhs = boost::get<1>(lhs);
+}
+
+template<class T> static void
+copy (const typename Matrix<T>::MRange& rhs, typename Matrix<T>::MRange& lhs) {
+	Matrix<T>& mlhs = boost::get<0>(lhs);
+	Vector<Vector<size_t> >& rlhs = boost::get<1>(lhs);
+}
+
+template<class T> static void
+copy (typename Matrix<T>::MRange& rhs, typename Matrix<T>::MRange& lhs) {
+	Matrix<T>& mlhs = boost::get<0>(lhs);
+	Vector<Vector<size_t> >& rlhs = boost::get<1>(lhs);
 }
 */
+
 #endif // __MATRIX_H__
 
 

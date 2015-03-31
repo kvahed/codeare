@@ -223,9 +223,9 @@ public:
 		for (int i = 0; i < m_nx[1]; ++i) {
 			m_fts[omp_get_thread_num()].NFFTPlan().M_total = nk;
 			if (m_nx[0] == 2)
-				Slice  (out, i, m_fts[omp_get_thread_num()] ->* data(std::string("0:8191,") + std::to_string(i)));
+				Slice  (out, i, m_fts[omp_get_thread_num()] ->* data(Range(0,8191), Range(i)));
 			else
-				Volume (out, i, m_fts[omp_get_thread_num()] ->* data(std::string("0:8191,") + std::to_string(i)));
+				Volume (out, i, m_fts[omp_get_thread_num()] ->* data(Range(0,8191), Range(i)));
             m_fts[omp_get_thread_num()].NFFTPlan().M_total = m_nx[2];
 		}
 	}

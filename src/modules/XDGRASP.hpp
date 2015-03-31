@@ -40,7 +40,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		XDGRASP  () {}
+		XDGRASP  () : m_ntres(0), m_nt(0), m_nlines(0) {}
 		
 		/**
 		 * @brief Default destructor
@@ -71,22 +71,13 @@ namespace RRStrategy {
 		
 
 	private:
-/*
-		size_t m_nx;
-		size_t m_ntres;
-		size_t m_nline;
-	    size_t m_nk;
-	    bool m_verbose;
-	    size_t m_ftmaxit;
-	    size_t m_cgmaxit;
-	    float m_cgeps;
-	    float m_lambda;
-	    size_t m_nthreads;
-	    size_t m_m;
-	    bool m_3rd_dim_cart;
-*/
+
 		NCSENSE<float> m_ft;
 		Params m_params;
+
+		size_t m_ntres;
+		size_t m_nlines;
+		size_t m_nt;
 
 	};
 

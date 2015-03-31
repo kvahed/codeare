@@ -38,19 +38,11 @@ template<> struct TypeTraits<float> {
     typedef float  T;
     typedef float RT;
     typedef cxfl  CT;
-    static const bool Supported;
-    inline static const std::string Name () NOEXCEPT {
-        return std::string("single");
-    }
-    inline static const std::string Abbrev () NOEXCEPT {
-        return std::string("float");
-    }
-    inline static bool IsComplex() NOEXCEPT {
-        return SameType<T,CT>::val;
-    }
-    inline static bool IsReal() NOEXCEPT {
-        return SameType<T,RT>::val;
-    }
+    static const bool Supported = true;
+    inline static const std::string Name () NOEXCEPT { return std::string("single"); }
+    inline static const std::string Abbrev () NOEXCEPT { return std::string("float"); }
+    inline static bool IsComplex() NOEXCEPT { return SameType<T,CT>::val; }
+    inline static bool IsReal() NOEXCEPT { return SameType<T,RT>::val; }
     inline static RT Real (const T t) NOEXCEPT {return t;}
     inline static RT Imag (const T) NOEXCEPT {return 0.;}
     inline static RT Abs (const T t) NOEXCEPT {return t;}
@@ -71,20 +63,11 @@ template<> struct TypeTraits<double> {
     typedef double  T;
     typedef double RT;
     typedef cxdb  CT;
-    static const bool Supported;
-    
-    inline static const std::string Name () NOEXCEPT {
-        return std::string("double");
-    }
-    inline static const std::string Abbrev () NOEXCEPT {
-        return std::string("double");
-    }
-    inline static bool IsComplex() NOEXCEPT {
-        return SameType<T,CT>::val;
-    }
-    inline static bool IsReal() NOEXCEPT {
-        return SameType<T,RT>::val;
-    }
+    static const bool Supported = true;
+    inline static const std::string Name () NOEXCEPT { return std::string("double"); }
+    inline static const std::string Abbrev () NOEXCEPT { return std::string("double"); }
+    inline static bool IsComplex() NOEXCEPT { return SameType<T,CT>::val; }
+    inline static bool IsReal() NOEXCEPT { return SameType<T,RT>::val; }
     inline static RT Real (const T t) NOEXCEPT {return t;}
     inline static RT Imag (const T) NOEXCEPT {return 0.;}
     inline static RT Abs (const T t) NOEXCEPT {return t;}
@@ -106,19 +89,11 @@ template<> struct TypeTraits<cxfl> {
     typedef cxfl T;
     typedef float RT;
     typedef cxfl  CT;
-    static const bool Supported;
-    inline static const std::string Name () NOEXCEPT {
-        return std::string("complex single");
-    }
-    inline static const std::string Abbrev () NOEXCEPT {
-        return std::string("cxfl");
-    }
-    inline static bool IsComplex() NOEXCEPT {
-        return SameType<T,CT>::val;
-    }
-    inline static bool IsReal() NOEXCEPT {
-        return SameType<T,RT>::val;
-    }
+    static const bool Supported = true;
+    inline static const std::string Name () NOEXCEPT { return std::string("complex single"); }
+    inline static const std::string Abbrev () NOEXCEPT { return std::string("cxfl"); }
+    inline static bool IsComplex() NOEXCEPT { return SameType<T,CT>::val; }
+    inline static bool IsReal() NOEXCEPT { return SameType<T,RT>::val; }
     inline static RT Real (const T t) NOEXCEPT {return std::real(t);}
     inline static RT Imag (const T t) NOEXCEPT {return std::imag(t);}
     inline static RT Abs (const T t) NOEXCEPT {return std::abs(t);}
@@ -139,19 +114,11 @@ template<> struct TypeTraits<cxdb> {
     typedef cxdb  T;
     typedef double RT;
     typedef cxdb  CT;
-    static const bool Supported;
-    inline static const std::string Name () NOEXCEPT {
-        return std::string("complex double");
-    }
-    inline static const std::string Abbrev () NOEXCEPT {
-        return std::string("cxdb");
-    }
-    inline static bool IsComplex() NOEXCEPT {
-        return SameType<T,CT>::val;
-    }
-    inline static bool IsReal() NOEXCEPT {
-        return SameType<T,RT>::val;
-    }
+    static const bool Supported = true;
+    inline static const std::string Name () NOEXCEPT { return std::string("complex double"); }
+    inline static const std::string Abbrev () NOEXCEPT { return std::string("cxdb"); }
+    inline static bool IsComplex() NOEXCEPT { return SameType<T,CT>::val; }
+    inline static bool IsReal() NOEXCEPT { return SameType<T,RT>::val; }
     inline static RT Real (const T t) NOEXCEPT {return std::real(t);}
     inline static RT Imag (const T t) NOEXCEPT {return std::imag(t);}
     inline static RT Abs (const T t) NOEXCEPT {return std::abs(t);}
@@ -172,19 +139,11 @@ template<> struct TypeTraits<short> {
     typedef short  T;
     typedef short  RT;
     typedef void   CT;
-    static const bool Supported;
-    inline static const std::string Name () NOEXCEPT {
-        return std::string("short int");
-    }
-    inline static const std::string Abbrev () NOEXCEPT {
-        return std::string("short");
-    }
-    inline static bool IsComplex() NOEXCEPT {
-        return SameType<T,CT>::val;
-    }
-    inline static bool IsReal() NOEXCEPT {
-        return SameType<T,RT>::val;
-    }
+    static const bool Supported = true;
+    inline static const std::string Name () NOEXCEPT { return std::string("short int"); }
+    inline static const std::string Abbrev () NOEXCEPT { return std::string("short"); }
+    inline static bool IsComplex() NOEXCEPT { return SameType<T,CT>::val; }
+    inline static bool IsReal() NOEXCEPT { return SameType<T,RT>::val; }
     inline static std::ostream& print (std::ostream& os, const T t) NOEXCEPT {
 #ifndef MSVC60
         os << boost::format("%+.4e") % t;
@@ -199,19 +158,11 @@ template<> struct TypeTraits<unsigned char> {
     typedef unsigned char  T;
     typedef unsigned char  RT;
     typedef void   CT;
-    static const bool Supported;
-    inline static const std::string Name () NOEXCEPT {
-        return std::string("codeare bool");
-    }
-    inline static const std::string Abbrev () NOEXCEPT {
-        return std::string("uchar");
-    }
-    inline static bool IsComplex() NOEXCEPT {
-        return SameType<T,CT>::val;
-    }
-    inline static  bool IsReal() NOEXCEPT {
-        return SameType<T,RT>::val;
-    }
+    static const bool Supported = true;
+    inline static const std::string Name () NOEXCEPT { return std::string("codeare bool"); }
+    inline static const std::string Abbrev () NOEXCEPT { return std::string("uchar"); }
+    inline static bool IsComplex() NOEXCEPT { return SameType<T,CT>::val; }
+    inline static  bool IsReal() NOEXCEPT { return SameType<T,RT>::val; }
     inline static T Pow (const T& x, const T& y) NOEXCEPT { return x;}
     inline static std::ostream& print (std::ostream& os, const T t) NOEXCEPT {
 #ifndef MSVC60
@@ -228,19 +179,11 @@ template<> struct TypeTraits<long> {
     typedef long   T;
     typedef long   RT;
     typedef void   CT;
-    static const bool Supported;
-    inline static const std::string Name () NOEXCEPT {
-        return std::string("long int");
-    }
-    inline static const std::string Abbrev () NOEXCEPT {
-        return std::string("long");
-    }
-    inline static bool IsComplex() NOEXCEPT {
-        return SameType<T,CT>::val;
-    }
-    inline static bool IsReal() NOEXCEPT {
-        return SameType<T,RT>::val;
-    }
+    static const bool Supported = true;
+    inline static const std::string Name () NOEXCEPT { return std::string("long int"); }
+    inline static const std::string Abbrev () NOEXCEPT { return std::string("long"); }
+    inline static bool IsComplex() NOEXCEPT { return SameType<T,CT>::val; }
+    inline static bool IsReal() NOEXCEPT { return SameType<T,RT>::val; }
     inline static std::ostream& print (std::ostream& os, const T t) NOEXCEPT {
 #ifndef MSVC60
         os << boost::format("%li") % t;
@@ -255,19 +198,11 @@ template<> struct TypeTraits<int> {
     typedef long   T;
     typedef long   RT;
     typedef void   CT;
-    static const bool Supported;
-    inline static const std::string Name () NOEXCEPT {
-        return std::string("int");
-    }
-    inline static const std::string Abbrev () NOEXCEPT {
-        return std::string("int");
-    }
-    inline static bool IsComplex() NOEXCEPT {
-        return SameType<T,CT>::val;
-    }
-    inline static bool IsReal() NOEXCEPT {
-        return SameType<T,RT>::val;
-    }
+    static const bool Supported = true;
+    inline static const std::string Name () NOEXCEPT { return std::string("int"); }
+    inline static const std::string Abbrev () NOEXCEPT { return std::string("int"); }
+    inline static bool IsComplex() NOEXCEPT { return SameType<T,CT>::val; }
+    inline static bool IsReal() NOEXCEPT { return SameType<T,RT>::val; }
     inline static std::ostream& print (std::ostream& os, const T t) NOEXCEPT {
 #ifndef MSVC60
         os << boost::format("%d") % t;
@@ -282,19 +217,11 @@ template<> struct TypeTraits<size_t> {
     typedef size_t  T;
     typedef size_t RT;
     typedef void   CT;
-    static const bool Supported;
-    inline static const std::string Name () NOEXCEPT {
-        return std::string("size type");
-    }
-    inline static const std::string Abbrev () NOEXCEPT {
-        return std::string("size_t");
-    }
-    inline static bool IsComplex() NOEXCEPT {
-        return SameType<T,CT>::val;
-    }
-    inline static bool IsReal() NOEXCEPT {
-        return SameType<T,RT>::val;
-    }
+    static const bool Supported = true;
+    inline static const std::string Name () NOEXCEPT { return std::string("size type"); }
+    inline static const std::string Abbrev () NOEXCEPT { return std::string("size_t"); }
+    inline static bool IsComplex() NOEXCEPT { return SameType<T,CT>::val; }
+    inline static bool IsReal() NOEXCEPT { return SameType<T,RT>::val; }
     inline static T Pow (const T& x, const T& y) NOEXCEPT { return (T)pow((double)x,(double)y);}
     inline static std::ostream& print (std::ostream& os, const T t) NOEXCEPT {
 #ifndef MSVC60

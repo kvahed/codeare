@@ -107,7 +107,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 	size_t volsize = imgs.Dim(0) * imgs.Dim(1) * imgs.Dim(2);
 	size_t  rtmsiz = nrxc * ntxc;
 	size_t    rtms = imgs.Size() / rtmsiz / 2;  // division by 2 (Echoes)
-	ticks      tic = getticks();
+//	ticks      tic = getticks();
 	
 	printf ("  SVDing " JL_SIZE_T_SPECIFIER " matrices of " JL_SIZE_T_SPECIFIER "x" JL_SIZE_T_SPECIFIER " ... ", rtms, nrxc, ntxc); fflush(stdout);
 	
@@ -163,7 +163,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 		
 	}
 	
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+//	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
 	return codeare::OK;
 	
@@ -174,7 +174,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 codeare::error_code
 FTVolumes (Matrix<cxfl>& r) {
 	
-	ticks        tic     = getticks();
+//	ticks        tic     = getticks();
 	
 	long         imsize  = r.Dim(0) * r.Dim(1) * r.Dim(2);
 	size_t       vols    = r.Size() / (imsize);
@@ -235,7 +235,7 @@ FTVolumes (Matrix<cxfl>& r) {
 	for (int i = 0; i < threads; i++)
 		fftwf_destroy_plan(p[i]);
 	
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+//	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
 	return codeare::OK;
 	
@@ -248,7 +248,7 @@ RemoveOS (Matrix<cxfl>& imgs) {
 	
 	printf ("  Removing RO oversampling ... "); fflush(stdout);
 	
-	ticks tic = getticks();
+//	ticks tic = getticks();
 	Matrix<cxfl> tmp = imgs;
 
 	imgs = Matrix<cxfl> (imgs.Dim(0)/2, imgs.Dim(1), imgs.Dim(2), imgs.Dim(3), imgs.Dim(4), imgs.Dim(5));
@@ -261,7 +261,7 @@ RemoveOS (Matrix<cxfl>& imgs) {
 	for (size_t i = 0; i < nscans; i++)
 		memcpy (&imgs[i*nssiz], &tmp[i*ossiz+offset], nssiz * sizeof(cxfl));
 	
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+//	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
 	return codeare::OK;
 		
@@ -274,7 +274,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 	
 	printf ("  Computing b0 maps ... "); fflush(stdout);
 	
-	ticks  tic = getticks();
+//	ticks  tic = getticks();
 	Matrix<cxfl> tmp;
 	
 	tmp = mean(imgs,4);
@@ -301,7 +301,7 @@ B0Map (const Matrix<cxfl>& imgs, Matrix<double>& b0, const float& dTE) {
 		
 	}
 	
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+//	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 	
 	return codeare::OK;
 	
@@ -321,7 +321,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 
     printf ("  Brain segmentation with FSL(bet2) ... "); fflush(stdout);
 
-	ticks  tic = getticks();
+//	ticks  tic = getticks();
 	
 	std::string orig = "orig.nii.gz";
 	std::string mask = "mask_mask.nii.gz";
@@ -342,7 +342,7 @@ SegmentBrain (Matrix<double>& img, Matrix<short>& msk) {
 	printf ("exited with %i, importing ... ", i); fflush(stdout);
 	msk = niread<short>(mask);
 	
-	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
+//	printf ("done. (%.4f s)\n", elapsed(getticks(), tic) / Toolbox::Instance()->ClockRate());
 
 #else
 

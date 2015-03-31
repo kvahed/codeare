@@ -1189,4 +1189,30 @@ fliplr (const Matrix<T>& M)  {
 
 }
 
+/**
+ * @brief Sort keep original indices
+ */
+typedef enum sort_dir {
+	ASCENDING, DESCENDING
+} sort_dir;
+template <typename T> inline static Vector<size_t>
+sort (const Matrix<T> &m, const sort_dir sd = ASCENDING) {
+
+  // initialize original index locations
+  Vector<size_t> idx(m.Size());
+  for (size_t i = 0; i < idx.size(); ++i)
+	  idx[i] = i;
+
+  // sort indexes based on comparing values in v
+  if (sd == ASCENDING)
+	  sort(idx.begin(), idx.end(),
+		   [&m](size_t i1, size_t i2) {return m[i1] < m[i2];});
+  else
+	  sort(idx.begin(), idx.end(),
+		   [&m](size_t i1, size_t i2) {return m[i1] > m[i2];});
+
+  return idx;
+
+}
+
 #endif 

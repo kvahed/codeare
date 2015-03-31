@@ -73,13 +73,11 @@ set_target_properties(CompressedSensing PROPERTIES PREFIX "")
 target_link_libraries (CompressedSensing ${COMLIBS}) 
 
 if (${ITK_FOUND})
-
   add_library (RelativeSensitivities MODULE RelativeSensitivities.cpp
     RelativeSensitivities.hpp)
   set_target_properties(RelativeSensitivities PROPERTIES PREFIX "")
   target_link_libraries (RelativeSensitivities ${COMLIBS}
     ${ITK_LIBRARIES})
-
   list (APPEND INST_TARGETS RelativeSensitivities)
 endif()
 
