@@ -6,7 +6,7 @@ int main (int narg, char** argv) {
     Matrix<float> A = randn<float>(8,2);
     std::cout << "A" << std::endl;
     std::cout << A << std::endl;
-    Vector<size_t> idx = sort (A(":,1"), DESCENDING);
+    Vector<size_t> idx = sort (A(Range(),1), DESCENDING);
     std::cout << "idx = sort(A(\":,1\"), DESCENDING)" << std::endl;
     std::cout << idx << std::endl;
     std::cout << "A(\"idx,:\")" << std::endl;

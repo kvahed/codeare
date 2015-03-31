@@ -642,42 +642,6 @@ public:
 	}
 
     /**
-     * @brief Deliver range of values with indices
-     *
-     * @param indices List of indices
-     * @return        Matrix containing values at indices
-     */
-    inline Matrix<T> operator() (const Vector<size_t>& indices, size_t col) const NOEXCEPT {
-    	size_t indices_size = indices.size();
-    	assert (indices_size);
-    	assert (col < _dim[1]);
-    	assert (indices_size < _dim[0]);
-    	assert (mmax(indices) < _dim[0]);
-    	Matrix<T> ret (indices_size,1);
-    	for (size_t i = 0; i < indices_size; ++i)
-    		ret[i] = At(indices[i],col);
-    	return ret;
-    }
-
-    /**
-     * @brief Deliver range of values with indices
-     *
-     * @param indices List of indices
-     * @return        Matrix containing values at indices
-     */
-    inline Matrix<T> operator() (size_t row, const Vector<size_t>& indices) const NOEXCEPT {
-    	size_t indices_size = indices.size();
-    	assert (indices_size);
-    	assert (row < _dim[0]);
-    	assert (indices_size < _dim[1]);
-    	assert (mmax(indices) < _dim[1]);
-    	Matrix<T> ret (1,indices_size);
-    	for (size_t i = 0; i < indices_size; ++i)
-    		ret[i] = At(row,indices[i]);
-    	return ret;
-    }
-
-    /**
      * @brief           @see At(const size_t)
      *
      * @param  p        Requested position.
@@ -2218,6 +2182,26 @@ public:
 				ret (i,j) = At(range0[i],range1[j]);
 		return ret;
     }
+    /**
+     * @brief Deliver range of values with indices
+     *
+     * @param indices List of indices
+     * @return        Matrix containing values at indices
+     */
+    inline Matrix<T> operator() (const Vector<size_t>& indices, size_t col) const NOEXCEPT {
+    	return (*this)(indices,Vector<size_t>(1,col));
+    }
+
+    /**
+     * @brief Deliver range of values with indices
+     *
+     * @param indices List of indices
+     * @return        Matrix containing values at indices
+     */
+    inline Matrix<T> operator() (size_t row, const Vector<size_t>& indices) const NOEXCEPT {
+    	return (*this)(Vector<size_t>(1,row),indices);
+    }
+
 
     inline Matrix<T>
     operator() (Vector<size_t> range0, Vector<size_t> range1,
@@ -2251,6 +2235,9 @@ public:
 					ret (i,j,k) = At(range0[i],range1[j],range2[k]);
 		return ret;
     }
+
+
+
 
     inline Matrix<T>
     operator() (Vector<size_t> range0, Vector<size_t> range1,
