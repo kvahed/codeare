@@ -13,3 +13,5 @@ include_directories(
 add_executable(t_colon t_colon.cpp)
 add_test(colon t_colon)
 
+add_executable(t_sort t_sort.cpp)
+add_test(sort t_sort)

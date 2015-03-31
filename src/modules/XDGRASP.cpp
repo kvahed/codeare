@@ -36,10 +36,10 @@ codeare::error_code XDGRASP::Init () {
 	// XD GRASP specific
 	Attribute ("nx", &s);
 	m_params["nx"] = s;
-	Attribute ("ntres", &s);
-	m_params["ntres"] = s;
-	Attribute ("nlines", &s);
-	m_params["nlines"] = s;
+	Attribute ("ntres", &m_ntres);
+	m_params["ntres"] = m_ntres;
+	m_nlines = 84/m_ntres;
+	m_params["nlines"] = m_nlines;
 
 	printf ("  Image side length (%lu) Resp phases (%lu)\n",
 			unsigned_cast(m_params["nx"]), unsigned_cast(m_params["ntres"]));
@@ -97,18 +97,27 @@ codeare::error_code XDGRASP::Prepare () {
 
 codeare::error_code XDGRASP::Process () {
     Matrix<cxfl> kdata = Get<cxfl>("signals");
+    const Matrix<float>& traj = Get<float>("kspace");
+    const Matrix<float>& resp = Get<float>("resp");
     
-	size_t X = 0, Y = 1, Z = 2, C = 3;
+	size_t RO = 0, VIEW = 1, Z = 2, C = 3;
 	// Cut edges
 	kdata = fftshift(fft(kdata,1),1)/sqrt(size(kdata,2));
     kdata = kdata(Range(), Range(1,size(kdata,1)-1), Range());
-	//Vector<size_t> n = size(kdata);
+	Vector<size_t> n = size(kdata);
 
-	//ntres=4;nline=84/ntres;
-	//nt=floor(ntviews/ntres/nline);
+
+	m_nt = (size_t)std::floor((float)n[VIEW]/
+			(float)(unsigned_cast(m_params["ntres"])*unsigned_cast(m_params["nlines"])));
+	m_params["nt"] = m_nt;
 
 	// sort the data into two dynamic dimensions
 	// one for contrast enhancement and one for respiration
+	for (size_t i = 0; i < m_nt; ++i) {
+		Matrix<cxfl> kdata_under = kdata(Range(), Range(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines), Range());
+		Matrix<float> traj_under = traj (Range(), Range(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
+		Matrix<float> resp_under = resp (Range(         i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
+	}
 	/*for ii=1:nt
 	    kdata_Under(:,:,:,:,ii)=kdata(:,(ii-1)*ntres*nline+1:ii*ntres*nline,:,:);
 	    Traj_Under(:,:,ii)=Traj(:,(ii-1)*ntres*nline+1:ii*ntres*nline);
