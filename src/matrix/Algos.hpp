@@ -27,6 +27,7 @@
 #include <limits>
 #include <vector>
 #include <algorithm>    // std::reverse
+#include <numeric>
 
 
 #if !defined(_MSC_VER) || _MSC_VER>1200
@@ -1195,13 +1196,14 @@ fliplr (const Matrix<T>& M)  {
 typedef enum sort_dir {
 	ASCENDING, DESCENDING
 } sort_dir;
+
+
 template <typename T> inline static Vector<size_t>
 sort (const Matrix<T> &m, const sort_dir sd = ASCENDING) {
 
   // initialize original index locations
   Vector<size_t> idx(m.Size());
-  for (size_t i = 0; i < idx.size(); ++i)
-	  idx[i] = i;
+  std::iota(idx.begin(), idx.end(), 0);
 
   // sort indexes based on comparing values in v
   if (sd == ASCENDING)
