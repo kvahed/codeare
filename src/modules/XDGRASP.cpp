@@ -118,6 +118,8 @@ codeare::error_code XDGRASP::Process () {
 		Matrix<float> traj_under = traj (Range(), Range(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
 		Matrix<float> resp_under = resp (Range(         i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
 	}
+	for (size_t i = 0; i < m_nt; ++i) {
+	}
 	/*for ii=1:nt
 	    kdata_Under(:,:,:,:,ii)=kdata(:,(ii-1)*ntres*nline+1:ii*ntres*nline,:,:);
 	    Traj_Under(:,:,ii)=Traj(:,(ii-1)*ntres*nline+1:ii*ntres*nline);

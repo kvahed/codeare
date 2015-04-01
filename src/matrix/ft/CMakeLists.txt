@@ -28,3 +28,6 @@ endif ()
 
 add_library (codeare-ft SHARED ${SOURCES})
 target_link_libraries (codeare-ft ${COMLIBS})
+
+list (APPEND INST_TARGETS codeare-ft)
+install (TARGETS ${INST_TARGETS} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib) 
