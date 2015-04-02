@@ -1,6 +1,7 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Juelich, Germany
+ *  codeare Copyright (C) 2007-2015 Kaveh Vahedipour
+ *                                  Forschungszentrum Juelich, Germany
+ *                                  NYU School of Medicine, New York, USA
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -64,4 +65,3 @@ EH (const Matrix< std::complex<T> >& in, const Matrix< std::complex<T> >& sm,
     }
     return out;
 }
-
