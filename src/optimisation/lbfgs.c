@@ -76,6 +76,8 @@ licence.
 #define inline  __inline
 #endif/*_MSC_VER*/
 
+#define USE_SSE
+
 #if     defined(USE_SSE) && defined(__SSE2__) && LBFGS_FLOAT == 64
 /* Use SSE2 optimization for 64bit double precision. */
 #include "arithmetic_sse_double.h"

@@ -84,17 +84,17 @@ struct FTTraits<float> {
 	static inline Plan 
 	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags, int threads = 0) {
 		InitThreads(threads);
-#ifdef _OPENMP
+/*#ifdef _OPENMP
 		fftwf_import_wisdom_from_filename("codeare_threads.plan");
 #else
 		fftwf_import_wisdom_from_filename("codeare_single.plan");
-#endif
+#endif*/
 		Plan plan = fftwf_plan_dft (rank, n, in, out, sign, flags);
-#ifdef _OPENMP
+/*#ifdef _OPENMP
 		fftwf_export_wisdom_to_filename("codeare_threads.plan");
 #else
 		fftwf_export_wisdom_to_filename("codeare_single.plan");
-#endif
+#endif*/
 		return plan;
 	}
 	
@@ -225,17 +225,17 @@ struct FTTraits<double> {
 	static inline Plan 
 	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags, int threads = 0) {
 		InitThreads(threads);
-#ifdef _OPENMP
+/*#ifdef _OPENMP
 		fftw_import_wisdom_from_filename("codeare_threads.plan");
 #else
 		fftw_import_wisdom_from_filename("codeare_single.plan");
-#endif
+#endif*/
 		Plan plan = fftw_plan_dft (rank, n, in, out, sign, flags);
-#ifdef _OPENMP
+/*#ifdef _OPENMP
 		fftw_export_wisdom_to_filename("codeare_threads.plan");
 #else
 		fftw_export_wisdom_to_filename("codeare_single.plan");
-#endif
+#endif*/
 		return plan;
 	}
 	

@@ -230,20 +230,20 @@ struct NFFTTraits<float> {
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
-#ifdef _OPENMP
+/*#ifdef _OPENMP
         fftw_import_wisdom_from_filename("codeare_threads.plan");
 #else
         fftw_import_wisdom_from_filename("codeare_single.plan");
-#endif
+#endif*/
 
         nfftf_init_guru (&plan, _d, _N.ptr(), _M, _n.ptr(), _m, nfft_flags, fftw_flags);
         solverf_init_advanced_complex (&solver, (nfftf_mv_plan_complex*) &plan, solver_flags);
 
-#ifdef _OPENMP
+/*#ifdef _OPENMP
         fftwf_export_wisdom_to_filename("codeare_threads.plan");
 #else
         fftwf_export_wisdom_to_filename("codeare_single.plan");
-#endif
+#endif*/
 
         return 0;
 
@@ -275,20 +275,20 @@ struct NFFTTraits<float> {
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
-#ifdef _OPENMP
+/*#ifdef _OPENMP
         fftwf_import_wisdom_from_filename("codeare_threads.plan");
 #else
         fftwf_import_wisdom_from_filename("codeare_single.plan");
 #endif
-
+		*/
         mri_inh_3d_init_guru (&plan, _N.ptr(), _M, _n.ptr(), _m, sigma, nfft_flags, fftw_flags);
         solverf_init_advanced_complex (&solver, (nfftf_mv_plan_complex*) &plan, solver_flags);
 
-#ifdef _OPENMP
+/*#ifdef _OPENMP
         fftwf_export_wisdom_to_filename("codeare_threads.plan");
 #else
         fftwf_export_wisdom_to_filename("codeare_single.plan");
-#endif
+#edif*/
 
         return 0;
 
@@ -537,22 +537,22 @@ struct NFFTTraits<double> {
         solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
-
+		/*
 #ifdef _OPENMP
         fftw_import_wisdom_from_filename("codeare_threads.plan");
 #else
         fftw_import_wisdom_from_filename("codeare_single.plan");
 #endif
-
+		*/
         nfft_init_guru (&plan, _d, _N.ptr(), _M, _n.ptr(), _m, nfft_flags, fftw_flags);
         solver_init_advanced_complex (&solver, (nfft_mv_plan_complex*) &plan, solver_flags);
-
+		/*
 #ifdef _OPENMP
         fftw_export_wisdom_to_filename("codeare_threads.plan");
 #else
         fftw_export_wisdom_to_filename("codeare_single.plan");
 #endif
-
+		*/
         return 0;
 
     }
@@ -582,22 +582,22 @@ struct NFFTTraits<double> {
         solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
-
+		/*
 #ifdef _OPENMP
         fftw_import_wisdom_from_filename("codeare_threads.plan");
 #else
         fftw_import_wisdom_from_filename("codeare_single.plan");
 #endif
-
+		*/
         mri_inh_3d_init_guru (&plan, _N.ptr(), _M, _n.ptr(), _m, sigma, nfft_flags, fftw_flags);
         solver_init_advanced_complex (&solver, (nfft_mv_plan_complex*) &plan, solver_flags);
-
+		/*
 #ifdef _OPENMP
         fftw_export_wisdom_to_filename("codeare_threads.plan");
 #else
         fftw_export_wisdom_to_filename("codeare_single.plan");
 #endif
-
+		*/
         return 0;
 
     }

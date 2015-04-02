@@ -1134,7 +1134,7 @@ public:
      * @param  v        Data vector (size must match numel(M)).
      */
     inline Matrix<T,P>&
-    operator=           (const Vector<T>& v) NOEXCEPT {
+    operator=           (const Vector<T>& v) {
     	if (_M.size() == 1) { // we are being assigned out of nothing
     		_dim.resize(1,v.size());
     	    _res.resize(1,1.0);
