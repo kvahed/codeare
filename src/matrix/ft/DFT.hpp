@@ -298,7 +298,7 @@ public:
 				 const Matrix<T>& mask = Matrix<T>(1),
 				 const Matrix<CT>& pc = Matrix<CT>(1),
 				 const Matrix<T>& b0 = Matrix<T>(1)) NOEXCEPT :
-    m_N(1), m_have_mask (false), m_have_pc (false), m_threads(1) {
+    m_N(1), m_have_mask (false), m_have_pc (false), m_threads(8) {
 
 		size_t rank = numel(sl);
 
@@ -333,7 +333,7 @@ public:
 
 	DFT        (const Params& p) NOEXCEPT :
 		FT<T>::FT(p), m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
-		m_initialised(false), m_have_mask(false), m_threads(1) {
+		m_initialised(false), m_have_mask(false), m_threads(8) {
 
 		size_t rank;
 		Vector<int> n;
