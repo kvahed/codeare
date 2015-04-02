@@ -17,7 +17,7 @@ namespace codeare {
         class LBFGS : public NonLinear<T> {
             
         public:
-            LBFGS (size_t iterations) : NonLinear<T>::NonLinear (iterations)  {};
+            LBFGS (const size_t& iterations) : NonLinear<T>::NonLinear(iterations)  {};
             virtual ~LBFGS() {};
         private:
             

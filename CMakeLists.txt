@@ -112,9 +112,6 @@ if (${WINDOWS})
    link_directories (${INTEL_COMPILER_DIR}/lib/intel64)
 endif ()
 
-# LBFGS --------------------------------------------------------------
-find_package(LBFGS)
-
 # OmniORB ------------------------------------------------------------
 find_package (OmniORB)
 if (${OMNIORB4_FOUND})

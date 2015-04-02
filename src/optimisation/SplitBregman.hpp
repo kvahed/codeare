@@ -17,7 +17,7 @@ namespace codeare {
         class SplitBregman : public NonLinear<T> {
             
         public:
-            SplitBregman (size_t iterations) : NonLinear<T>::NonLinear (iterations) {};
+            SplitBregman (const size_t& iterations) : NonLinear<T>::NonLinear (iterations) {};
             virtual ~SplitBregman() {};
         private:
             

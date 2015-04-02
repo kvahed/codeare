@@ -17,7 +17,7 @@ namespace codeare {
         class NLCG : public NonLinear<T> {
             
         public:
-            NLCG (size_t iterations) : NonLinear<T>::NonLinear (iterations)  {};
+            NLCG (const size_t& iterations) : NonLinear<T>::NonLinear (iterations)  {};
             virtual ~NLCG() {};
         private:
             

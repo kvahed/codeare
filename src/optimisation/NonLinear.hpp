@@ -17,7 +17,7 @@ namespace codeare {
         class NonLinear {
             
         public:
-            NonLinear (size_t iterations) : _iterations(iterations) {}
+            NonLinear (const size_t& iterations) : _iterations(iterations) {}
             virtual ~NonLinear () {}
         protected:
             size_t _iterations;
