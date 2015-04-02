@@ -53,6 +53,9 @@ elseif (${MSVC})
     "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
 endif()
 
+include(CheckIncludeFileCXX)
+CHECK_INCLUDE_FILE_CXX("emmintrin.h" HAVE_EMMINTRIN_H)
+
 # C++ 0x/11 ----------------------------------------------------------
 include (CheckCXX11Features)
 if (${HAS_CXX11_SHARED_PTR}) 
