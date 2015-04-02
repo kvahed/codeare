@@ -140,17 +140,13 @@ namespace RRStrategy {
     Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg, 
          const Matrix<cxfl>&  data, const float             t) {
         
-        Matrix<cxfl> om;
-        float        o = 0.0;
-        
-        om  = ffdbx;
+        Matrix<cxfl> om = ffdbx;
+
         if (t > 0.0) 
             om += t * ffdbg;
         om -= data;
-        
-        o = real(om.dotc(om));
-        
-        return o;
+
+        return real(om.dotc(om));
 
     }
     
@@ -159,10 +155,9 @@ namespace RRStrategy {
     ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg, 
            const float             t, const CSParam&        cgp) {
         
-        Matrix<cxfl> om;
-        float        o = 0.0, p = 0.5*cgp.pnorm;
+        float o = 0.0, p = 0.5*cgp.pnorm;
+        Matrix<cxfl> om = ttdbx;
         
-        om  = ttdbx;
         if (t > 0.0)
             om += t * ttdbg;
         om *= conj(om);
@@ -184,10 +179,9 @@ namespace RRStrategy {
     ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g, 
             const float         t, const CSParam&    cgp) {
         
-        Matrix<cxfl> om;
-        float        o = 0.0, p = 0.5*cgp.pnorm;
-        
-        om  = x;
+        float o = 0.0, p = 0.5*cgp.pnorm;
+        Matrix<cxfl> om = x;
+
         if (t > 0.0)
             om += t * g;
         om *= conj(om);
@@ -209,15 +203,11 @@ namespace RRStrategy {
                const Matrix<cxfl>&  data, const float             t, 
                      float&         rmse, const CSParam&        cgp) {
         
-        float obj;
-        float nz = (float) nnz (data); 
+        float obj = Obj (ffdbx, ffdbg, data, t);
         
-        obj  = Obj (ffdbx, ffdbg, data, t);
-        rmse = sqrt(obj/nz);
-        
+        rmse = sqrt(obj/(float)nnz(data));
         if (cgp.tvw)
             obj += ObjTV (ttdbx, ttdbg, t, cgp);
-        
         if (cgp.xfmw)
             obj += ObjXFM (x, g, t, cgp);
         
@@ -235,13 +225,8 @@ namespace RRStrategy {
         
         FT<float>& ft = *(cgp.ft);
         DWT<cxfl>& dwt = *(cgp.dwt);
-        
-        Matrix<cxfl> g;
-        
-        g  = ft ->* (- data + (ft * wx));
-        g  = dwt * g;
-        
-        return (2.0 * g);
+
+        return (2.0 * (dwt * (ft ->* ((ft * wx) - data))));
         
     }
 
@@ -257,7 +242,6 @@ namespace RRStrategy {
     GradXFM   (const Matrix<T>& x, const CSParam& cgp) {
         
         float pn = 0.5*cgp.pnorm-1.0, l1 = cgp.l1, xfm = cgp.xfmw;
-        
         return xfm * (x * ((x * conj(x) + l1) ^ pn));
         
     }
@@ -276,13 +260,11 @@ namespace RRStrategy {
         DWT<cxfl>&  dwt = *cgp.dwt;
         TVOP& tvt = *cgp.tvt;
         float p   = 0.5*cgp.pnorm-1.0;
-        
         Matrix<cxfl> dx, g;
         
         dx = tvt * wx;
-
         g  = dx * conj(dx);
-        g += cxfl(cgp.l1);
+        g += cgp.l1;
         g ^= p;
         g *= dx;
         g *= cgp.pnorm;
@@ -295,28 +277,17 @@ namespace RRStrategy {
     
     Matrix<cxfl> 
     Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CSParam& cgp) {
-        
-        Matrix<cxfl> g;
-        
-        g = GradObj (x, wx, data, cgp);
-        
-        if (cgp.xfmw)
-            g += GradXFM (x, cgp);
-        
-        if (cgp.tvw)
-            g += GradTV  (x, wx, cgp);
 
-        return g;
-        
+        Matrix<cxfl> g = GradObj (x, wx, data, cgp);
+        return g += (cgp.xfmw) ? GradXFM (x, cgp) : GradTV  (x, wx, cgp);
+
     } 
     
 
     void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
 
         
-        float     t0  = 1.0, t = 1.0, z = 0.0;
-        float     xn  = TypeTraits<cxfl>::Real(norm(x));
-        float     rmse, bk, f0, f1;
+        float     t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
         
         Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
         
@@ -325,10 +296,8 @@ namespace RRStrategy {
         TVOP&      tvt = *cgp.tvt;
         
         wx  = dwt->*x;
-
         g0 = Gradient (x, wx, data, cgp);
         dx = -g0;
-        
         wdx = dwt->*dx;
 
         for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
@@ -346,15 +315,13 @@ namespace RRStrategy {
             f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
             
             int i = 0;
-            
             while (i < cgp.lsiter) {
                 
                 t *= cgp.lsb;
                 f1 = Objective(ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
                 if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
                     break;
-                i++;
-                
+                ++i;
             } 
             
             printf (ofstr.c_str(), k, rmse, i); fflush (stdout);
@@ -376,10 +343,9 @@ namespace RRStrategy {
             bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
             g0  =  g1;
             dx  = -g1 + dx * bk;
+            wdx =  dwt->*dx;
+            dxn =  norm(dx)/xn;
             
-            wdx = dwt->*dx;
-            
-            float dxn = norm(dx)/xn;
             printf ("dxnrm: %0.4f\n", dxn);
             if (dxn < cgp.cgconv) 
                 break;

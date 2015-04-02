@@ -112,6 +112,9 @@ if (${WINDOWS})
    link_directories (${INTEL_COMPILER_DIR}/lib/intel64)
 endif ()
 
+# LBFGS --------------------------------------------------------------
+find_package(LBFGS)
+
 # OmniORB ------------------------------------------------------------
 find_package (OmniORB)
 if (${OMNIORB4_FOUND})
@@ -168,7 +171,7 @@ endif()
 
 # File IO ------------------------------------------------------------
 find_package(HDF5 "1.8.5" REQUIRED COMPONENTS C CXX)
-message (STATUS ${HDF5_LIBRARIES})
+message (STATUS "HDF5 Found")
 include_directories (${HDF5_INCLUDE_DIRS})
 link_directories (${HDF5_LIBRARY_DIRS})
 if (${MSVC})

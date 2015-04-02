@@ -25,6 +25,7 @@ add_subdirectory (core)
 add_subdirectory (matrix)
 add_subdirectory (modules)
 add_subdirectory (tinyxml)
+add_subdirectory (optimisation)
 
 if (${OMNIORB4_FOUND})
   add_subdirectory (mongoose)

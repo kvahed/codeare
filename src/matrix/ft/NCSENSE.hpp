@@ -114,7 +114,9 @@ public:
             m_np  = 1;
         }
         omp_set_num_threads(m_np);
-        m_verbose = (params.Get<int>("verbose") > 0);
+        try {
+        	m_verbose = (params.Get<int>("verbose") > 0);
+        } catch (const boost::bad_any_cast&) {}
         m_nx.push_back(m_np);
         
 		printf ("  Initialising NCSENSE:\n");
