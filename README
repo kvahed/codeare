@@ -12,7 +12,8 @@ For example:
 # make test
 # sudo make install
 
-Linus optimised compilation example:
+Linux optimised compilation examples:
+
 (64bit Linux, Intel Composer XE 2015, MKL, MATLAB 2015a)
 # cd codeare
 # mkdir build
@@ -23,11 +24,19 @@ Linus optimised compilation example:
   -DLAPACK_mkl_lapack_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_core.so \
   -DBLAS_mkl_intel_thread_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_intel_thread.so \
   -DBLAS_mkl_intel_lp64_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_gf_lp64.so \
-  -DFFTW3F_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.lib \
-  -DFFTW3F_THREADS_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.lib \
-  -DFFTW3_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.lib \
-  -DFFTW3F_THREADS_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.lib \
+  -DFFTW3F_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.so \
+  -DFFTW3F_THREADS_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.so \
+  -DFFTW3_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.so \
+  -DFFTW3F_THREADS_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.so \
   -DFFTW3_INCLUDE_DIR=/opt/intel/mkl/include/fftw \
   -DMATLAB_ROOT=/usr/local/MATLAB/R2015a ..
+
+(64bit Linux, ACML 6.1, MATLAB 2015a)
+# cd codeare
+# mkdir build
+# cd build
+# cmake -DBLA_VENDOR=ACML_MP \ 
+  -DBLAS_acml_mp_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so \
+  -DBLAS_acml_mv_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so ..
 
 For more information refer to http://codeare.org
