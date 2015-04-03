@@ -15,21 +15,13 @@ For example:
 Linux optimised compilation examples:
 
 (64bit Linux, Intel Composer XE 2015, MKL, MATLAB 2015a)
+# . /opt/intel/bin/compilervars.sh intel64
 # cd codeare
 # mkdir build
 # cd build
-# cmake -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc \
-  -DBLA_VENDOR:STRING=Intel10_64lp \
-  -DBLAS_mkl_core_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_core.so \
-  -DLAPACK_mkl_lapack_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_core.so \
-  -DBLAS_mkl_intel_thread_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_intel_thread.so \
-  -DBLAS_mkl_intel_lp64_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_gf_lp64.so \
-  -DFFTW3F_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.so \
-  -DFFTW3F_THREADS_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.so \
-  -DFFTW3_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.so \
-  -DFFTW3F_THREADS_LIBRARY=/opt/intel/mkl/lib/intel64/libmkl_rt.so \
-  -DFFTW3_INCLUDE_DIR=/opt/intel/mkl/include/fftw \
-  -DMATLAB_ROOT=/usr/local/MATLAB/R2015a ..
+# cmake -DCMAKE_C_COMPILER=icc \
+        -DCMAKE_CXX_COMPILER=icpc \
+        -DBLA_VENDOR=Intel10_64lp ..
 
 (64bit Linux, ACML 6.1, MATLAB 2015a)
 # cd codeare
