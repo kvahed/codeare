@@ -13,7 +13,6 @@ For example:
 # sudo make install
 
 Linux optimised compilation examples:
-
 (64bit Linux, Intel Composer XE 2015, MKL, MATLAB 2015a)
 # . /opt/intel/bin/compilervars.sh intel64
 # export LD_LIBRARY_PATH=/opt/intel/lib/intel64:/opt/intel/mkl/lib/intel64
@@ -29,7 +28,11 @@ Linux optimised compilation examples:
 # mkdir build
 # cd build
 # cmake -DBLA_VENDOR=ACML_MP \ 
-  -DBLAS_acml_mp_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so \
   -DBLAS_acml_mv_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so ..
+
+Test run On Intel Xeon E5-2680v3 @ 2.50GHz: 
+OpenBLAS + ATLAS: 27.6s
+MKL:              21.5s
+ACML:             32.7s
 
 For more information refer to http://codeare.org
