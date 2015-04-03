@@ -479,21 +479,21 @@ if (BLA_VENDOR MATCHES "Intel*" OR BLA_VENDOR STREQUAL "All")
       if (BLA_VENDOR STREQUAL "Intel10_64lp" OR BLA_VENDOR STREQUAL "All")
 	# old version
 	list(APPEND BLAS_SEARCH_LIBS
-	  "mkl_blas95 mkl_intel_lp64 mkl_intel_thread mkl_core guide")
+	  "mkl_blas95 mkl_gf_lp64 mkl_intel_thread mkl_core guide")
 
 	# mkl >= 10.3
 	if (CMAKE_C_COMPILER MATCHES ".+gcc.*")
 	  list(APPEND BLAS_SEARCH_LIBS
-	    "mkl_blas95_lp64 mkl_intel_lp64 mkl_gnu_thread mkl_core gomp")
+	    "mkl_blas95_lp64 mkl_gf_lp64 mkl_gnu_thread mkl_core gomp")
 	else ()
 	  list(APPEND BLAS_SEARCH_LIBS
-	    "mkl_blas95_lp64 mkl_intel_lp64 mkl_intel_thread mkl_core iomp5")
+	    "mkl_blas95_lp64 mkl_gf_lp64 mkl_intel_thread mkl_core iomp5")
 	endif ()
       endif ()
     endif ()
     if (BLA_VENDOR STREQUAL "Intel10_64lp_seq" OR BLA_VENDOR STREQUAL "All")
       list(APPEND BLAS_SEARCH_LIBS
-	"mkl_blas95_lp64 mkl_intel_lp64 mkl_sequential mkl_core")
+	"mkl_blas95_lp64 mkl_gf_lp64 mkl_sequential mkl_core")
     endif ()
   else ()
     set(BLAS_mkl_SEARCH_SYMBOL sgemm)
@@ -510,18 +510,18 @@ if (BLA_VENDOR MATCHES "Intel*" OR BLA_VENDOR STREQUAL "All")
 
 	# old version
 	list(APPEND BLAS_SEARCH_LIBS
-	  "mkl_intel_lp64 mkl_intel_thread mkl_core guide")
+	  "mkl_gf_lp64 mkl_intel_thread mkl_core guide")
 
 	# mkl >= 10.3
 	if (CMAKE_C_COMPILER MATCHES ".+gcc.*")
 	  list(APPEND BLAS_SEARCH_LIBS
-	    "mkl_intel_lp64 mkl_gnu_thread mkl_core gomp")
+	    "mkl_gf_lp64 mkl_gnu_thread mkl_core gomp")
 	else ()
 	  list(APPEND BLAS_SEARCH_LIBS
-	    "mkl_intel_lp64 mkl_intel_thread mkl_core iomp5")
+	    "mkl_gf_lp64 mkl_intel_thread mkl_core iomp5")
 	endif ()
       endif ()
-
+message (${BLAS_SEARCH_LIBS})
       #older vesions of intel mkl libs
       if (BLA_VENDOR STREQUAL "Intel" OR BLA_VENDOR STREQUAL "All")
 	list(APPEND BLAS_SEARCH_LIBS
@@ -534,7 +534,7 @@ if (BLA_VENDOR MATCHES "Intel*" OR BLA_VENDOR STREQUAL "All")
     endif ()
     if (BLA_VENDOR STREQUAL "Intel10_64lp_seq" OR BLA_VENDOR STREQUAL "All")
       list(APPEND BLAS_SEARCH_LIBS
-	"mkl_intel_lp64 mkl_sequential mkl_core")
+	"mkl_gf_lp64 mkl_sequential mkl_core")
     endif ()
   endif ()
 

@@ -16,7 +16,7 @@ Linux optimised compilation examples:
 
 (64bit Linux, Intel Composer XE 2015, MKL, MATLAB 2015a)
 # . /opt/intel/bin/compilervars.sh intel64
-# export LD_LIBRARY_PATH=/opt/intel/mkl/lib/intel64
+# export LD_LIBRARY_PATH=/opt/intel/lib/intel64:/opt/intel/mkl/lib/intel64
 # cd codeare
 # mkdir build
 # cd build
