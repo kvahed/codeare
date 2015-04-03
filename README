@@ -29,7 +29,6 @@ Linux optimised compilation examples:
 # mkdir build
 # cd build
 # cmake -DBLA_VENDOR=ACML_MP \ 
-  -DBLAS_acml_mp_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so \
   -DBLAS_acml_mv_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so ..
 
 For more information refer to http://codeare.org
