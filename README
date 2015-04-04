@@ -31,8 +31,8 @@ Linux optimised compilation examples:
   -DBLAS_acml_mv_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so ..
 
 Test run On Intel Xeon E5-2680v3 @ 2.50GHz: 
+MKL:              22.0s
+ACML:             23.8s
 OpenBLAS + ATLAS: 27.6s
-MKL:              21.5s
-ACML:             32.7s
 
 For more information refer to http://codeare.org
