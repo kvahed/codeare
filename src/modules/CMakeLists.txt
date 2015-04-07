@@ -6,6 +6,7 @@ include_directories (${PROJECT_SOURCE_DIR}/src/matrix/io
   ${PROJECT_SOURCE_DIR}/src/matrix/io
   ${PROJECT_SOURCE_DIR}/src/matrix/linalg
   ${PROJECT_SOURCE_DIR}/src/matrix/interp
+  ${PROJECT_SOURCE_DIR}/src/optimisation
   ${FFTW3_INCLUDE_DIR}
   if (${ITK_FOUND})
     ${ITK_INCLUDE_DIRS}

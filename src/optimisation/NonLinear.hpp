@@ -9,6 +9,7 @@
 #define _NON_LINEAR_
 
 #include "Matrix.hpp"
+#include "Optimisable.hpp"
 
 namespace codeare {
     namespace optimisation {

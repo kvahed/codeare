@@ -30,9 +30,20 @@ Linux optimised compilation examples:
 # cmake -DBLA_VENDOR=ACML_MP \ 
   -DBLAS_acml_mv_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so ..
 
-Test run On Intel Xeon E5-2680v3 @ 2.50GHz: 
+Test runs:
+
+Mac OS X, Quad-core Intel Core i7 @ 2.5GHz
+Accelerate framework: 20.1s
+
+Ubuntu Linux, 12-core Intel Xeon E5-2680v3 @ 2.50GHz
 OpenBLAS + ATLAS: 27.6s
 MKL:              21.5s
 ACML:             32.7s
+
+Ubuntu Linux, 16-core AMD Opteron 6300 @ 2.4GHz
+OpenBLAS + ATLAS: 66.6s
+MKL:              67.0s
+ACML:             32.7s
+
 
 For more information refer to http://codeare.org

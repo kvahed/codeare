@@ -23,7 +23,7 @@
 
 #include "NFFT.hpp"
 #include "CX.hpp"
-#include "SEM.hpp"
+//#include "SEM.hpp"
 #include "mri/MRI.hpp"
 #include "Lapack.hpp"
 #include "tinyxml.h"
@@ -138,6 +138,9 @@ public:
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
 
+		m_fwd_out = Matrix<CT> (m_nx[2],m_nx[1]);
+		m_bwd_out = Matrix<CT> (size(m_sm));
+
 		printf ("  ...done.\n\n");
 		
 	}
@@ -183,7 +186,12 @@ public:
 	 */
 	virtual Matrix<CT>
 	Trafo       (const Matrix<CT>& m) const NOEXCEPT {
-		return E (m, m_sm, m_nx, m_fts);
+#pragma omp parallel for schedule (guided, 1)
+	    for (int j = 0; j < m_nx[1]; ++j) {
+	        int k = omp_get_thread_num();
+	        Column (m_fwd_out, j, m_fts[k] * (resize(((m_nx[0] == 2) ? Slice (m_sm, j) : Volume (m_sm, j)),size(m)) * m));
+	    }
+	    return m_fwd_out;
 	}
 
 
@@ -198,7 +206,7 @@ public:
 	 */
 	virtual Matrix<CT>
 	Trafo       (const Matrix<CT>& m, const Matrix<CT>& sens, const bool& recal = true) const NOEXCEPT {
-		return E (m, sens, m_nx, m_fts);
+		return Trafo(m);
 	}
 
 	
@@ -268,7 +276,9 @@ public:
 
         typedef typename Vector<CT>::iterator it_type;
 
-		p = EH (m, sens, m_nx, m_fts)* m_ic;
+        const NCSENSE& E = *this;
+
+		p = (E/m) * m_ic;
 		if (m_cgiter == 0)
 			return p;
 
@@ -287,8 +297,8 @@ public:
 				break;
 			if (m_verbose)
 				printf ("    %03lu %.7f\n", i, res.at(i));
-			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
 
+			q  = (E/(E*p)) * m_ic;
 			if (m_lambda)
 				q  += m_lambda * p;
 			ts  = rn / real(p.dotc(q));
@@ -298,6 +308,7 @@ public:
 			rn  = real(r.dotc(r));
 			p  *= rn / rno;
 			p  += r;
+
 			if (m_verbose)
 				vc.push_back(x * m_ic);
 		}
@@ -330,6 +341,20 @@ public:
 		return Trafo(m);
 	}
 	
+
+	virtual Matrix<CT>
+	operator/ (const Matrix<CT>& m) const NOEXCEPT {
+	#pragma omp parallel for schedule (guided, 1)
+		for (int j = 0; j < m_nx[1]; ++j) {
+	        int k = omp_get_thread_num();
+	        if (m_nx[0] == 2)
+	            Slice  (m_bwd_out, j, m_fts[k] ->* Column (m,j) * conj(Slice  (m_sm, j)));
+	        else
+	            Volume (m_bwd_out, j, m_fts[k] ->* Column (m,j) * conj(Volume (m_sm, j)));
+	    }
+	    return squeeze(sum(m_bwd_out,size(m_sm).size()-1));
+	}
+
 
 	/**
 	 * @brief    Backward transform
@@ -369,6 +394,8 @@ private:
 
 	Params ft_params;
 	Matrix<T> m_k, m_w;
+
+	mutable Matrix< std::complex<T> > m_fwd_out, m_bwd_out;
 
 };
 

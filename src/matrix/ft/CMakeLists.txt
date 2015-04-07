@@ -5,6 +5,7 @@ include_directories (${PROJECT_SOURCE_DIR}/src/matrix/io
   ${PROJECT_SOURCE_DIR}/src/matrix/arithmetic  
   ${PROJECT_SOURCE_DIR}/src/matrix/ft 
   ${PROJECT_SOURCE_DIR}/src/matrix/linalg
+  ${PROJECT_SOURCE_DIR}/src/optimisation
   ${FFTW3_INCLUDE_DIR}
   if(${NFFT_FOUND})
     ${NFFT_INCLUDE_DIR}
