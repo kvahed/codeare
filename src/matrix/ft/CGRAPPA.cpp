@@ -1,5 +1,5 @@
 #include "CGRAPPA.hpp"
 
-template class CGRAPPA<float>;
-template class CGRAPPA<double>;
+template class CGRAPPA<std::complex<float> >;
+template class CGRAPPA<std::complex<double> >;
 

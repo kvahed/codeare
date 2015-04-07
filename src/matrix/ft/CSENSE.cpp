@@ -1,4 +1,4 @@
 #include "CSENSE.hpp"
 
-template class CSENSE<float>;
-template class CSENSE<double>;
+template class CSENSE<std::complex<float> >;
+template class CSENSE<std::complex<double> >;

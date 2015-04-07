@@ -43,7 +43,7 @@ class CSENSE : public FT<T> {
 	
 public:
 	
-	typedef std::complex<T> CT;
+	typedef typename TypeTraits<T>::RT RT;
 
 	/**
 	 * @brief          Default constructor
@@ -60,7 +60,7 @@ public:
 		FT<T>::FT(params), nthreads (1), treg(0.), compgfm(1) {
 
 		// Maps & 1st set of images
-		sens = params.Get<Matrix<cxfl> > ("smaps");
+		sens = params.Get<Matrix<T> > ("smaps");
 		dims = params.Get<Vector<size_t> > ("fdims");
 
 		// Channels
@@ -110,11 +110,11 @@ public:
 	 * @param  m       To transform
 	 * @return         Transform
 	 */
-	Matrix<CT>
-	Adjoint       (const Matrix<CT>& m) const NOEXCEPT {
+	Matrix<T>
+	Adjoint       (const Matrix<T>& m) const NOEXCEPT {
 
-		Matrix<CT> res (dims[0]*af[0], dims[1]*af[1], (ndim == 3) ? dims[2]*af[2] : 1, (compgfm) ? 2 : 1);
-		Matrix<CT> tmp = m;
+		Matrix<T> res (dims[0]*af[0], dims[1]*af[1], (ndim == 3) ? dims[2]*af[2] : 1, (compgfm) ? 2 : 1);
+		Matrix<T> tmp = m;
 
 		omp_set_num_threads(nthreads);
 
@@ -122,11 +122,11 @@ public:
 		{
 			
 			int tid = omp_get_thread_num ();
-			Matrix<CT> s  (nc,  aaf);
-			Matrix<CT> si (aaf, aaf);
-			Matrix<CT> ra (nc,    1);
-			Matrix<CT> rp (aaf,   1);
-			Matrix<CT> gf (aaf,   1);
+			Matrix<T> s  (nc,  aaf);
+			Matrix<T> si (aaf, aaf);
+			Matrix<T> ra (nc,    1);
+			Matrix<T> rp (aaf,   1);
+			Matrix<T> gf (aaf,   1);
 			
 			const DFT<T>& ft = m_dft[tid];
 
@@ -220,9 +220,9 @@ public:
 	 * @param  m       To transform
 	 * @return         Bummer! (This is not nice, right?)
 	 */
-	Matrix<CT>
-	Trafo             (const Matrix<CT>& m) const NOEXCEPT {
-		Matrix <CT> res;
+	Matrix<T>
+	Trafo             (const Matrix<T>& m) const NOEXCEPT {
+		Matrix <T> res;
 		return res;
 	}
 
@@ -233,8 +233,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
-	operator* (const Matrix<CT>& m) const NOEXCEPT {
+	virtual Matrix<T>
+	operator* (const Matrix<T>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	
@@ -245,8 +245,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
-	operator->* (const Matrix<CT>& m) const NOEXCEPT {
+	virtual Matrix<T>
+	operator->* (const Matrix<T>& m) const NOEXCEPT {
 		return Adjoint (m);
 	}
 
@@ -286,16 +286,16 @@ private:
 	 * @param  params Parameters
 	 */
 	inline void TikhonovMat (const Params& params) NOEXCEPT {
-		treg = (params.exists("lambda")) ? params.Get<T>("lambda"): 0.0;
+		treg = (params.exists("lambda")) ? params.Get<RT>("lambda"): 0.0;
 		printf ("  Tikhonov lambda (%.2e)\n", treg);
 		assert (treg >= 0.0);
 		if (treg > 0.0)
-			reg = treg * eye<T>(aaf);
+			reg = treg * eye<RT>(aaf);
 	}
 
 
 	std::vector<DFT<T> > m_dft;
-	Matrix <CT>          sens;
+	Matrix <T>          sens;
 	Matrix <size_t> d; /* Bug in MSVC 10? Do not touch */
 	Vector <size_t>      dims;
 	int                  nthreads;
@@ -303,8 +303,8 @@ private:
 	size_t               ndim;
 	size_t               nc;
 	bool                 compgfm;
-	T            		 treg;
-	Matrix<T>            reg;
+	RT            		 treg;
+	Matrix<RT>            reg;
 	bool                 initialised;
 	size_t               aaf;
 

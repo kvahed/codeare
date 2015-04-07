@@ -140,8 +140,8 @@ template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, size_t 
 
 }
 
-template<class T> inline static Matrix<std::complex<T> > fft (
-		const Matrix<std::complex<T> >& in, size_t dim) NOEXCEPT {
+template<class T> inline static Matrix<T> fft (
+		const Matrix<T>& in, size_t dim) NOEXCEPT {
 
 	Vector<size_t> in_dims = size(in);
 	size_t cent = floor((float)in_dims[dim]/2);
@@ -154,7 +154,7 @@ template<class T> inline static Matrix<std::complex<T> > fft (
 	order.Erase(order.begin()+dim);
 	order.Insert(order.begin(), dim);
 
-	Matrix<std::complex<T> > ret = permute (in, order);
+	Matrix<T> ret = permute (in, order);
 	in_dims.Erase(in_dims.begin()+dim);
 	size_t howmany = prod(in_dims);
 	int n = static_cast<int>(size(ret,0));
@@ -175,8 +175,8 @@ template<class T> inline static Matrix<std::complex<T> > fft (
 
 }
 
-template<class T> inline static Matrix<std::complex<T> > ifft (
-		const Matrix<std::complex<T> >& in, size_t dim) NOEXCEPT {
+template<class T> inline static Matrix<T> ifft (
+		const Matrix<T>& in, size_t dim) NOEXCEPT {
 
 	Vector<size_t> in_dims = size(in);
 	size_t cent = floor((float)in_dims[dim]/2);
@@ -189,7 +189,7 @@ template<class T> inline static Matrix<std::complex<T> > ifft (
 	order.Erase(order.begin()+dim);
 	order.Insert(order.begin(), dim);
 
-	Matrix<std::complex<T> > ret = permute (in, order), tmp;
+	Matrix<T> ret = permute (in, order), tmp;
 	in_dims.Erase(in_dims.begin()+dim);
 	size_t howmany = prod(in_dims);
 	int n = static_cast<int>(size(ret,0));
@@ -272,20 +272,15 @@ hannwindow (const Matrix<size_t>& size, const T& t) NOEXCEPT {
 /**
  * @brief Matrix templated 1-3D Discrete Cartesian Fourier transform
  */
-template <class T=float>
+template <class T=std::complex<float> >
 class DFT : public FT<T> {
 
-
 	typedef typename FTTraits<T>::Plan Plan;
-	typedef typename FTTraits<T>::T Type;
-	typedef typename std::complex<T>   CT;
-
-
+	typedef typename FTTraits<T>::T FTT;
+	typedef typename FTTraits<T>::RT RT;
 	
 public:
 	
-
-
 	/**
 	 * @brief        Construct FFTW plans for forward and backward FT with credentials
 	 *
@@ -294,11 +289,9 @@ public:
 	 * @param  pc    Phase correction (or target phase)
 	 * @param  b0    Field distortion
 	 */
-	explicit DFT         (const Vector<size_t>& sl,
-				 const Matrix<T>& mask = Matrix<T>(1),
-				 const Matrix<CT>& pc = Matrix<CT>(1),
-				 const Matrix<T>& b0 = Matrix<T>(1)) NOEXCEPT :
-    m_N(1), m_have_mask (false), m_have_pc (false), m_threads(1) {
+	explicit DFT (const Vector<size_t>& sl, const Matrix<RT>& mask = Matrix<RT>(1),
+				 const Matrix<T>& pc = Matrix<T>(1), const Matrix<RT>& b0 = Matrix<RT>(1)) NOEXCEPT :
+				 	 m_N(1), m_have_mask (false), m_have_pc (false), m_threads(1) {
 
 		size_t rank = numel(sl);
 
@@ -433,8 +426,8 @@ public:
 	 * @param  pc    Phase correction (or target phase)
 	 * @param  b0    Static field distortion
 	 */
-	DFT         (const size_t rank, const size_t sl, const Matrix<T>& mask = Matrix<T>(),
-				 const Matrix<CT>& pc = Matrix<CT>(), const Matrix<T>& b0 = Matrix<T>()) NOEXCEPT :
+	DFT         (const size_t rank, const size_t sl, const Matrix<RT>& mask = Matrix<RT>(),
+				 const Matrix<T>& pc = Matrix<T>(), const Matrix<RT>& b0 = Matrix<RT>()) NOEXCEPT :
     m_have_mask (false), m_have_pc (false), m_threads(0) {
         
 		std::vector<int> n (rank);
@@ -498,12 +491,12 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline virtual Matrix<CT>
-	Trafo       (const Matrix<CT>& m) const NOEXCEPT {
+	inline virtual Matrix<T>
+	Trafo       (const Matrix<T>& m) const NOEXCEPT {
 		
-		Matrix<CT> res = ishift((m_have_pc) ? m * m_pc : m);
+		Matrix<T> res = ishift((m_have_pc) ? m * m_pc : m);
 
-		FTTraits<T>::Execute (m_fwplan, (Type*)&res[0], (Type*)&res[0]);
+		FTTraits<T>::Execute (m_fwplan, (FTT*)&res[0], (FTT*)&res[0]);
 
 		res = shift(res);
 
@@ -521,12 +514,12 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline virtual Matrix<CT>
-	Adjoint     (const Matrix<CT>& m) const NOEXCEPT {
+	inline virtual Matrix<T>
+	Adjoint     (const Matrix<T>& m) const NOEXCEPT {
 
-		Matrix<CT> res = ishift((m_have_mask) ? m * m_mask : m);
+		Matrix<T> res = ishift((m_have_mask) ? m * m_mask : m);
 
-		FTTraits<T>::Execute (m_bwplan, (Type*)&res[0], (Type*)&res[0]);
+		FTTraits<T>::Execute (m_bwplan, (FTT*)&res[0], (FTT*)&res[0]);
 
 		res = shift(res);
 
@@ -542,7 +535,7 @@ public:
 	 * @brief   Set k-space mask
 	 * @param   mask  k-space mask
 	 */
-	inline void Mask (const Matrix<T>& mask) NOEXCEPT {
+	inline void Mask (const Matrix<RT>& mask) NOEXCEPT {
 		m_mask = mask;
 		m_have_mask = true;
 	}
@@ -553,8 +546,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline virtual Matrix<CT>
-	operator* (const Matrix<CT>& m) const NOEXCEPT {
+	inline virtual Matrix<T>
+	operator* (const Matrix<T>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	
@@ -565,8 +558,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline virtual Matrix<CT>
-	operator->* (const Matrix<CT>& m) const NOEXCEPT {
+	inline virtual Matrix<T>
+	operator->* (const Matrix<T>& m) const NOEXCEPT {
 		return Adjoint (m);
 	}
 
@@ -575,8 +568,8 @@ public:
 
 private:
 
-	inline Matrix<CT>
-	shift (const Matrix<CT>& m, const bool& fw = true) const NOEXCEPT {
+	inline Matrix<T>
+	shift (const Matrix<T>& m, const bool& fw = true) const NOEXCEPT {
 		switch (ndims(m)) {
 		case  2: return shift2 (m, fw); 
 		case  3: return shift3 (m, fw);
@@ -585,10 +578,10 @@ private:
 	}
 
 
-	inline Matrix<CT>
-	shift3 (const Matrix<CT>& m, const bool& fw = true) const NOEXCEPT {
+	inline Matrix<T>
+	shift3 (const Matrix<T>& m, const bool& fw = true) const NOEXCEPT {
 
-		Matrix<CT> res (size(m));
+		Matrix<T> res (size(m));
 
 		size_t xi,yi,zi,xs,ys,zs;
 		
@@ -610,10 +603,10 @@ private:
 
 	}
 
-	inline Matrix<CT>
-	shift2 (const Matrix<CT>& m, const bool& fw = true) const NOEXCEPT {
+	inline Matrix<T>
+	shift2 (const Matrix<T>& m, const bool& fw = true) const NOEXCEPT {
 
-		Matrix<CT> res (size(m));
+		Matrix<T> res (size(m));
 		size_t xi,yi,xs,ys;
 		
 		for (yi = 0; yi < d[1]; yi++) {
@@ -631,10 +624,10 @@ private:
 
 	}
 
-	inline Matrix<CT>
-	shift1 (const Matrix<CT>& m, const bool& fw = true) const NOEXCEPT {
+	inline Matrix<T>
+	shift1 (const Matrix<T>& m, const bool& fw = true) const NOEXCEPT {
 
-		Matrix<CT> res (size(m));
+		Matrix<T> res (size(m));
 		size_t xi,xs;
 
 		for (xi = 0; xi < d[0]; xi++) {
@@ -651,8 +644,8 @@ private:
 	}
 
 
-	inline Matrix<CT>
-	ishift(const Matrix<CT>& m) const NOEXCEPT {
+	inline Matrix<T>
+	ishift(const Matrix<T>& m) const NOEXCEPT {
 
 		switch (ndims(m)) {
 		case  2: return shift2 (m, false); 
@@ -672,14 +665,14 @@ private:
 	inline void
 	Allocate (const int rank, const int* n) NOEXCEPT {
 		
-		m_in     = Vector<CT> (m_N);
+		m_in     = Vector<T> (m_N);
 
-		m_fwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0],
+		m_fwplan = FTTraits<T>::DFTPlan (rank, n, (FTT*)&m_in[0], (FTT*)&m_in[0],
                 FFTW_FORWARD,  FFTW_ESTIMATE | FFTW_DESTROY_INPUT, m_threads);
-		m_bwplan = FTTraits<T>::DFTPlan (rank, n, (Type*)&m_in[0], (Type*)&m_in[0],
+		m_bwplan = FTTraits<T>::DFTPlan (rank, n, (FTT*)&m_in[0], (FTT*)&m_in[0],
                 FFTW_BACKWARD, FFTW_ESTIMATE | FFTW_DESTROY_INPUT, m_threads);
 
-		m_cs     = m_N * sizeof(Type);
+		m_cs     = m_N * sizeof(FTT);
 		m_sn     = sqrt ((T)m_N);
 
 	}
@@ -687,10 +680,10 @@ private:
 
 	bool       m_initialised;  /**< @brief Memory allocated / Plans, well, planned! :)*/
 	
-	Matrix<T>  m_mask;         /**< @brief K-space mask (applied before inverse and after forward transforms) (double precision)*/
+	Matrix<RT>  m_mask;         /**< @brief K-space mask (applied before inverse and after forward transforms) (double precision)*/
 	
-	Matrix<CT> m_pc;           /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
-	Matrix<CT> m_cpc;          /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
+	Matrix<T> m_pc;           /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
+	Matrix<T> m_cpc;          /**< @brief Phase correction (applied after inverse and before forward trafos) (double precision)*/
 	
 	Plan       m_fwplan;       /**< @brief Forward plan (double precision)*/
 	Plan       m_bwplan;       /**< @brief Backward plan (double precision)*/
@@ -704,14 +697,14 @@ private:
 	bool       m_have_pc;      /**< @brief Apply phase correction?*/
 	bool       m_zpad;         /**< @brief Zero padding? (!!!NOT OPERATIONAL YET!!!)*/
 	
-	Vector<CT> m_in;           /**< @brief Aligned fftw input*/
+	Vector<T> m_in;           /**< @brief Aligned fftw input*/
 
 	Vector<size_t> d;
 	Vector<size_t> c;
 
     int m_threads;
 
-	//Type*      m_in;           /**< @brief Aligned fftw input*/
+	//FTT*      m_in;           /**< @brief Aligned fftw input*/
 
 	
 };

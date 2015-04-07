@@ -66,7 +66,7 @@ CompressedSensing::Init () {
 			ft_params["dims"] = m_image_size;
 			ft_params["mask"] = Get<float>("mask");
 		    ft_params["threads"] = RHSAttribute<int>("threads");
-			m_csparam.ft = (FT<float>*) new DFT<float> (ft_params);
+			m_csparam.ft = (FT<cxfl>*) new DFT<cxfl> (ft_params);
 			break;
 		case 1:
 			printf ("%s", "SENSE");
@@ -81,7 +81,7 @@ CompressedSensing::Init () {
 			ft_params["m"]       = RHSAttribute<size_t>("ftm");
 	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
 	        ft_params["imsz"]    = m_image_size;
-	        m_csparam.ft = (FT<float>*) new NFFT<float> (ft_params);
+	        m_csparam.ft = (FT<cxfl>*) new NFFT<cxfl> (ft_params);
 #else
 			printf("**ERROR - CompressedSensing: NUFFT support not available.");
 			assert(false);
@@ -91,15 +91,15 @@ CompressedSensing::Init () {
 			printf ("%s", "NCSENSE");
 #ifdef HAVE_NFFT
 			ft_params["sensitivities"] = Get<cxfl>("sensitivities");
-            ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
-			ft_params["weights_name"] = std::string("weights");
-		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
-		    ft_params["fteps"]        = RHSAttribute<double>("fteps");
-		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
-		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
-		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
-		    ft_params["threads"]      = RHSAttribute<int>("threads");
-			m_csparam.ft = (FT<float>*) new NCSENSE<float> (ft_params);
+            ft_params["nk"]            = (size_t) RHSAttribute<int>("nk");
+			ft_params["weights_name"]  = std::string("weights");
+		    ft_params["ftiter"]        = (size_t) RHSAttribute<int>("ftmaxit");
+		    ft_params["fteps"]         = RHSAttribute<double>("fteps");
+		    ft_params["cgiter"]        = (size_t) RHSAttribute<int>("cgmaxit");
+		    ft_params["cgeps"]         = RHSAttribute<double>("cgeps");
+		    ft_params["lambda"]        = RHSAttribute<double>("lambda");
+		    ft_params["threads"]       = RHSAttribute<int>("threads");
+			m_csparam.ft = (FT<cxfl>*) new NCSENSE<cxfl> (ft_params);
 #else
 			printf("**ERROR - CompressedSensing: NUFFT support not available.");
 			assert(false);
@@ -142,13 +142,13 @@ CompressedSensing::Prepare () {
 
 	codeare::error_code error = codeare::OK;
 
-	FT<float>& dft = *m_csparam.ft;
+	FT<cxfl>& ft = *m_csparam.ft;
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
-		dft.KSpace (Get<float>("kspace"));
-		dft.Weights (Get<float>("weights"));
+		ft.KSpace (Get<float>("kspace"));
+		ft.Weights (Get<float>("weights"));
 	} else {
-		dft.Mask (Get<float>("mask"));
+		ft.Mask (Get<float>("mask"));
 	}
 
 	Free ("weights");
@@ -165,10 +165,12 @@ CompressedSensing::Process () {
 
 	float ma;
 
-	FT<float>& dft = *m_csparam.ft;
+	FT<cxfl>& ft = *m_csparam.ft;
+
+	ft->*
 
 	Matrix<cxfl> data  = m_test_case ?
-		dft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
+		ft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
 
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
@@ -182,11 +184,12 @@ CompressedSensing::Process () {
 
 	DWT<cxfl>& dwt = *m_csparam.dwt;
     std::vector< Matrix<cxfl> > vc;
-	
+	std::cout << "Hello?" << std::endl;
 	im_dc  = data;
 	if (m_ft_type != 2 && m_ft_type != 3)
 		im_dc /= pdf;
-	im_dc  = dft ->* im_dc;
+	im_dc  = ft ->* im_dc;
+	std::cout << "Hello?" << std::endl;
 
 	ma       = m_max(abs(im_dc));
 
@@ -196,6 +199,7 @@ CompressedSensing::Process () {
 	im_dc /= ma;
 	data  /= ma;
 	im_dc  = dwt * im_dc;
+	std::cout << "Hello?" << std::endl;
 
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 

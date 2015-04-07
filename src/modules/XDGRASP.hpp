@@ -72,7 +72,7 @@ namespace RRStrategy {
 
 	private:
 
-		NCSENSE<float> m_ft;
+		NCSENSE<cxfl> m_ft;
 		Params m_params;
 
 		size_t m_ntres;

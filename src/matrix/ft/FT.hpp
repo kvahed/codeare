@@ -25,7 +25,7 @@
 #include "Params.hpp"
 
 /**
- * @brief  Base class for single and double precision Fourier transforms
+ * @brief  Base class for single and double precision complex Fourier transforms
  */
 template <class T>
 class FT {
@@ -35,10 +35,7 @@ public:
 	/**
 	 * @brief    Default constructor
 	 */
-	FT () {
-		T t;
-		Validate (t);
-	};
+	FT () {};
 
 
 	/**
@@ -59,8 +56,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	Trafo       (const Matrix< std::complex<T> >& m) const = 0;
+	virtual Matrix<T> Trafo (const Matrix<T>& m) const = 0;
 	
 	
 	/**
@@ -69,8 +65,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	Adjoint     (const Matrix< std::complex<T> >& m) const = 0;
+	virtual Matrix<T> Adjoint (const Matrix<T>& m) const = 0;
 	
 	
 	/**
@@ -79,8 +74,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	operator* (const Matrix< std::complex<T> >& m) const {
+	virtual Matrix<T> operator* (const Matrix<T>& m) const {
 		return Trafo(m);
 	}
 	
@@ -91,8 +85,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix< std::complex<T> >
-	operator->* (const Matrix< std::complex<T> >& m) const {
+	virtual Matrix<T> operator->* (const Matrix<T>& m) const {
 		return Adjoint (m);
 	}
 
@@ -102,8 +95,7 @@ public:
 	 *
 	 * @param  k   K-space trajectory
 	 */
-	virtual void
-	KSpace (const Matrix<T>& k) {}
+	virtual void KSpace (const Matrix<T>& k) {}
 
 
 	/**
@@ -111,22 +103,17 @@ public:
 	 *
 	 * @param  w   Weights
 	 */
-	virtual void
-	Weights (const Matrix<T>& w) {}
+	virtual void Weights (const Matrix<T>& w) {}
 
 	/**
 	 * @brief      Assign k-space weigths (jacobian of k in t)
 	 *
 	 * @param  w   Weights
 	 */
-	virtual void
-	Mask (const Matrix<T>& m) {}
+	virtual void Mask (const Matrix<T>& m) {}
 
 
 protected:
-
-    void Validate (double& t) const {};
-	void Validate (float&  t) const {};
 	
 	Params m_params;
 

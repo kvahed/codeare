@@ -38,7 +38,7 @@ SENSE::Prepare () {
 	p.Set("nthreads", m_nthreads);            // Number of threads for FFT
 	p.Set("lambda", m_lambda);                // Tikhonov regularizing term
 
-	m_cs = CSENSE<float> (p);                 // Cartesian SENSE operator
+	m_cs = CSENSE<cxfl> (p);                 // Cartesian SENSE operator
 
 	printf ("... done.\n\n");
 

@@ -40,11 +40,11 @@
  *
  */
 template <class T>
-class NCSENSE : public FT<T> {
+class NCSENSE : public FT<T>{
 
 	// TODO: Check if k-space and weights have been assigned
 
-    typedef std::complex<T> CT;
+    typedef typename TypeTraits<T>::RT RT;
 	
 public:
 
@@ -83,17 +83,17 @@ public:
 		ft_params["3rd_dim_cart"] = m_3rd_dim_cart;
 
 		Workspace& ws = Workspace::Instance();
-		Matrix<T> b0;
+		Matrix<RT> b0;
 
 		assert (params.exists("sensitivities"));
-		m_sm = params.Get<Matrix<CT> >("sensitivities");
+		m_sm = params.Get<Matrix<T> >("sensitivities");
 		if (m_3rd_dim_cart)
 			cart_dim = size(m_sm,2);
 
 		if (params.exists("phase_cor"))
-			m_pc = ws.Get<CT>(params.Get<std::string>("phase_cor"));
+			m_pc = ws.Get<T>(params.Get<std::string>("phase_cor"));
 		if (params.exists("b0"))
-			m_pc = ws.Get<T>(params.Get<std::string>("b0"));
+			m_pc = ws.Get<RT>(params.Get<std::string>("b0"));
 		
 		m_nx.push_back(ndims(m_sm)-1);
 		Vector<size_t> ms (m_nx[0]);
@@ -138,8 +138,8 @@ public:
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
 
-		m_fwd_out = Matrix<CT> (m_nx[2],m_nx[1]);
-		m_bwd_out = Matrix<CT> (size(m_sm));
+		m_fwd_out = Matrix<T> (m_nx[2],m_nx[1]);
+		m_bwd_out = Matrix<T> (size(m_sm));
 
 		printf ("  ...done.\n\n");
 		
@@ -158,7 +158,7 @@ public:
 	 * @param  k   K-space trajectory
 	 */
 	void
-	KSpace (const Matrix<T>& k) NOEXCEPT {
+	KSpace (const Matrix<RT>& k) NOEXCEPT {
 		m_k = k;
         for (size_t i = 0; i < m_fts.size(); ++i)
             m_fts[i].KSpace(k);
@@ -171,7 +171,7 @@ public:
 	 * @param  w   Weights
 	 */
 	void
-	Weights (const Matrix<T>& w) NOEXCEPT {
+	Weights (const Matrix<RT>& w) NOEXCEPT {
 		m_w = w;
         for (size_t i = 0; i < m_fts.size(); ++i)
             m_fts[i].Weights(w);
@@ -184,8 +184,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
-	Trafo       (const Matrix<CT>& m) const NOEXCEPT {
+	virtual Matrix<T>
+	Trafo       (const Matrix<T>& m) const NOEXCEPT {
 #pragma omp parallel for schedule (guided, 1)
 	    for (int j = 0; j < m_nx[1]; ++j) {
 	        int k = omp_get_thread_num();
@@ -204,8 +204,8 @@ public:
 	 *
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
-	Trafo       (const Matrix<CT>& m, const Matrix<CT>& sens, const bool& recal = true) const NOEXCEPT {
+	virtual Matrix<T>
+	Trafo       (const Matrix<T>& m, const Matrix<T>& sens, const bool& recal = true) const NOEXCEPT {
 		return Trafo(m);
 	}
 
@@ -216,8 +216,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
-	Adjoint     (const Matrix<CT>& m) const NOEXCEPT {
+	virtual Matrix<T>
+	Adjoint     (const Matrix<T>& m) const NOEXCEPT {
 		return this->Adjoint (m, m_sm, false);
 	}
 	
@@ -227,8 +227,8 @@ public:
 	 * @param  data  measurement
 	 */
 	virtual void
-	EstimateSensitivities (const Matrix<CT>& data, size_t nk = 8192) const {
-		Matrix< std::complex<T> > out (size(m_sm));
+	EstimateSensitivities (const Matrix<T>& data, size_t nk = 8192) const {
+		Matrix<T> out (size(m_sm));
 #pragma omp parallel for schedule (guided,1)
 		for (int i = 0; i < m_nx[1]; ++i) {
 			m_fts[omp_get_thread_num()].NFFTPlan().M_total = nk;
@@ -260,21 +260,21 @@ public:
 	 *
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
-	Adjoint (const Matrix<CT>& m,
-			 const Matrix<CT>& sens,
+	virtual Matrix<T>
+	Adjoint (const Matrix<T>& m,
+			 const Matrix<T>& sens,
 			 const bool recal = false) const NOEXCEPT {
 
 		// TODO: Not functional yet
 		if (m_sm.Size() == 1)
 			EstimateSensitivities(m);
 
-        T rn, rno, xn, ts;
-		Matrix<CT> p, r, x, q;
-		vector<T> res;
-        Vector<Matrix<cxfl> > vc;
+        RT rn, rno, xn, ts;
+		Matrix<T> p, r, x, q;
+		vector<RT> res;
+        Vector<Matrix<T> > vc;
 
-        typedef typename Vector<CT>::iterator it_type;
+        typedef typename Vector<T>::iterator it_type;
 
         const NCSENSE& E = *this;
 
@@ -292,7 +292,7 @@ public:
 		for (size_t i = 0; i < m_cgiter; i++) {
 			res.push_back(rn/xn);
 			if (i==0)
-				x  = zeros<CT>(size(p));
+				x  = zeros<T>(size(p));
 			if (boost::math::isnan(res.at(i)) || res.at(i) <= m_cgeps)
 				break;
 			if (m_verbose)
@@ -315,7 +315,7 @@ public:
 
         if (m_verbose) { // Keep intermediate results
             size_t cpsz = numel(x);
-            x = Matrix<CT> (size(x,0), size(x,1), (m_nx[0] == 3) ? size(x,2) : 1, vc.size());
+            x = Matrix<T> (size(x,0), size(x,1), (m_nx[0] == 3) ? size(x,2) : 1, vc.size());
             it_type it = x.Begin();
             for (size_t i = 0; i < vc.size(); i++) {
                 std::copy (vc[i].Begin(), vc[i].End(), it);
@@ -336,14 +336,14 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
-	operator* (const Matrix<CT>& m) const NOEXCEPT {
+	virtual Matrix<T>
+	operator* (const Matrix<T>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	
 
-	virtual Matrix<CT>
-	operator/ (const Matrix<CT>& m) const NOEXCEPT {
+	virtual Matrix<T>
+	operator/ (const Matrix<T>& m) const NOEXCEPT {
 	#pragma omp parallel for schedule (guided, 1)
 		for (int j = 0; j < m_nx[1]; ++j) {
 	        int k = omp_get_thread_num();
@@ -362,8 +362,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<CT>
-	operator->* (const Matrix<CT>& m) const NOEXCEPT {
+	virtual Matrix<T>
+	operator->* (const Matrix<T>& m) const NOEXCEPT {
 		return Adjoint (m);
 	}
 
@@ -377,9 +377,9 @@ private:
     bool       m_verbose;	  /**< Verbose binary output (keep all intermediate steps) */
     bool       m_3rd_dim_cart; /**< 3rd FT dimension is Cartesian (stack of ...) */
 
-	mutable Matrix<CT> m_sm;          /**< Sensitivities */
-	Matrix<T>  m_ic;     /**< Intensity correction I(r) */
-	Matrix<CT> m_pc; /**< @brief Correction phase */
+	mutable Matrix<T> m_sm;          /**< Sensitivities */
+	Matrix<RT>  m_ic;     /**< Intensity correction I(r) */
+	Matrix<T> m_pc; /**< @brief Correction phase */
 
 	std::string m_smname;     /**< Sensitivity map name */
 	std::string m_wname;	  /**< Weights name */
@@ -393,9 +393,9 @@ private:
 	int        m_np;
 
 	Params ft_params;
-	Matrix<T> m_k, m_w;
+	Matrix<RT> m_k, m_w;
 
-	mutable Matrix< std::complex<T> > m_fwd_out, m_bwd_out;
+	mutable Matrix<T> m_fwd_out, m_bwd_out;
 
 };
 

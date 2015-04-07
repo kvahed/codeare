@@ -36,11 +36,11 @@ struct FTTraits { };
  * @brief C++ friendly interface to complex FFTW (single precision)
  */
 template<>
-struct FTTraits<float> {
+struct FTTraits<std::complex<float> > {
 	
 	typedef fftwf_plan    Plan; /**< @brief fftw plan (float precision) */
-	typedef fftwf_complex T; /**< @brief fftw complex data type (float precision) */
-	typedef float         otype;
+	typedef fftwf_complex T;    /**< @brief fftw complex data type (float precision) */
+	typedef float         RT;
 	
 
 	/**
@@ -48,8 +48,7 @@ struct FTTraits<float> {
 	 *
 	 * @return        Success
 	 */
-	static inline bool
-	InitThreads (int nt = 0) {
+	static inline bool InitThreads (int nt = 0) {
 		if (p.exists("FFTWThreads"))
 			return true;
         if (nt==0) {
@@ -81,27 +80,18 @@ struct FTTraits<float> {
 	 *
 	 * @return        Plan
 	 */
-	static inline Plan 
-	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags, int threads = 0) {
+	static inline Plan DFTPlan (int rank, const int *n, T *in, T *out,
+			int sign, unsigned flags, int threads = 0) {
 		InitThreads(threads);
-/*#ifdef _OPENMP
-		fftwf_import_wisdom_from_filename("codeare_threads.plan");
-#else
-		fftwf_import_wisdom_from_filename("codeare_single.plan");
-#endif*/
-		Plan plan = fftwf_plan_dft (rank, n, in, out, sign, flags);
-/*#ifdef _OPENMP
-		fftwf_export_wisdom_to_filename("codeare_threads.plan");
-#else
-		fftwf_export_wisdom_to_filename("codeare_single.plan");
-#endif*/
-		return plan;
+		return fftwf_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
 
-	static inline Plan DFTPlanMany (int rank, const int* n, int howmany, T* in, T* out, int dir, int threads = 0) {
+	static inline Plan DFTPlanMany (int rank, const int* n, int howmany,
+			T* in, T* out, int dir, int threads = 0) {
 		InitThreads(threads);
-		return fftwf_plan_many_dft (rank, n, howmany, in, NULL, 1, *n, out, NULL, 1, *n, dir, FFTW_ESTIMATE);
+		return fftwf_plan_many_dft (rank, n, howmany, in, NULL, 1, *n, out,
+				NULL, 1, *n, dir, FFTW_ESTIMATE);
 	}
 
 
@@ -111,8 +101,7 @@ struct FTTraits<float> {
 	 * @param  n     # of elements
 	 * @return       Memory address
 	 */
-	static inline T*
-	Malloc (size_t n) {
+	static inline T* Malloc (size_t n) {
 		return (T*) fftwf_malloc (n * sizeof(T));
 	}
 	
@@ -122,8 +111,7 @@ struct FTTraits<float> {
 	 *
 	 * @param  p     Memory address
 	 */
-	static inline void 
-	Free (void* p) {
+	static inline void Free (void* p) {
 		fftwf_free (p);
 	}
 	
@@ -131,8 +119,7 @@ struct FTTraits<float> {
 	/**
 	 * @brief        Clean up tools
 	 */
-	static inline void 
-	CleanUp () {
+	static inline void CleanUp () {
 #ifdef _OPENMP
 		fftwf_cleanup_threads();
 #endif
@@ -145,8 +132,7 @@ struct FTTraits<float> {
 	 *
 	 * @param  p     Plan to be destroyed
 	 */
-	static inline void 
-	Destroy (Plan p) {
+	static inline void Destroy (Plan p) {
 		fftwf_destroy_plan (p); 
 	}
 	
@@ -156,8 +142,7 @@ struct FTTraits<float> {
 	 *
 	 * @param  p     Plan to be executed
 	 */
-	static inline void 
-	Execute (Plan p) {
+	static inline void Execute (Plan p) {
 		fftwf_execute (p); 
 	}        
 	
@@ -166,8 +151,7 @@ struct FTTraits<float> {
 	 *
 	 * @param  p     Plan to be executed
 	 */
-	static inline void
-	Execute (Plan p, T* in, T* out) {
+	static inline void Execute (Plan p, T* in, T* out) {
 		fftwf_execute_dft (p, in, out);
 	}
 
@@ -178,19 +162,18 @@ struct FTTraits<float> {
  * @brief C++ friendly interface to complex FFTW (double precision)
  */
 template<>
-struct FTTraits<double> {
+struct FTTraits<std::complex<double> > {
 	
 	typedef fftw_plan    Plan;  /**< @brief fftw plan (double precision) */
 	typedef fftw_complex T;  /**< @brief fftw complex data type (double precision) */
-	typedef double      otype;
+	typedef double       RT;
 
 	/**
 	 * @brief         Initialise FFTWF threads (Should only be done once)
 	 *
 	 * @return        Success
 	 */
-	static inline bool
-	InitThreads (int nt = 0) {
+	static inline bool InitThreads (int nt = 0) {
 		if (p.exists("FFTWThreads"))
 			return true;
         if (nt==0) {
@@ -222,27 +205,18 @@ struct FTTraits<double> {
 	 *
 	 * @return        Plan
 	 */
-	static inline Plan 
-	DFTPlan (int rank, const int *n, T *in, T *out, int sign, unsigned flags, int threads = 0) {
+	static inline Plan DFTPlan (int rank, const int *n, T *in, T *out, int sign,
+			unsigned flags, int threads = 0) {
 		InitThreads(threads);
-/*#ifdef _OPENMP
-		fftw_import_wisdom_from_filename("codeare_threads.plan");
-#else
-		fftw_import_wisdom_from_filename("codeare_single.plan");
-#endif*/
-		Plan plan = fftw_plan_dft (rank, n, in, out, sign, flags);
-/*#ifdef _OPENMP
-		fftw_export_wisdom_to_filename("codeare_threads.plan");
-#else
-		fftw_export_wisdom_to_filename("codeare_single.plan");
-#endif*/
-		return plan;
+		return fftw_plan_dft (rank, n, in, out, sign, flags);
 	}
 	
 
-	static inline Plan DFTPlanMany (int rank, const int* n, int howmany, T* in, T* out, int dir, int threads = 0) {
+	static inline Plan DFTPlanMany (int rank, const int* n, int howmany, T* in,
+			T* out, int dir, int threads = 0) {
 		InitThreads(threads);
-		return fftw_plan_many_dft (rank, n, howmany, in, NULL, 1, *n, out, NULL, 1, *n, dir, FFTW_ESTIMATE);
+		return fftw_plan_many_dft (rank, n, howmany, in, NULL, 1, *n, out, NULL,
+				1, *n, dir, FFTW_ESTIMATE);
 	}
 
 
@@ -252,8 +226,7 @@ struct FTTraits<double> {
 	 * @param  n     # of elements
 	 * @return       Memory address
 	 */
-	static inline T*
-	Malloc (size_t n) {
+	static inline T* Malloc (size_t n) {
 		return (T*) fftw_malloc (n * sizeof(T));
 	}
 	
@@ -263,8 +236,7 @@ struct FTTraits<double> {
 	 *
 	 * @param  p     Memory address
 	 */
-	static inline void
-	Free (void* p) {
+	static inline void Free (void* p) {
 		fftw_free(p);
 	}
 
@@ -272,8 +244,7 @@ struct FTTraits<double> {
 	/**
 	 * @brief        Clean up tools
 	 */
-	static inline void 
-	CleanUp () {
+	static inline void CleanUp () {
 #ifdef _OPENMP
 		fftw_cleanup_threads();
 #endif
@@ -286,8 +257,7 @@ struct FTTraits<double> {
 	 *
 	 * @param   p    Plan to be destroyed
 	 */
-	static inline void 
-	Destroy (Plan p) {
+	static inline void Destroy (Plan p) {
 		fftw_destroy_plan (p); 
 	}
 
@@ -297,8 +267,7 @@ struct FTTraits<double> {
 	 *
 	 * @param  p    Plan to be executed
 	 */
-	static inline void
-	Execute (Plan p) {
+	static inline void Execute (Plan p) {
 		fftw_execute (p); 
 	}        
 
@@ -307,8 +276,7 @@ struct FTTraits<double> {
 	 *
 	 * @param  p     Plan to be executed
 	 */
-	static inline void
-	Execute (Plan p, T* in, T* out) {
+	static inline void Execute (Plan p, T* in, T* out) {
 		fftw_execute_dft (p, in, out);
 	}
 

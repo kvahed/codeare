@@ -104,7 +104,7 @@ NuFFT::Init () {
 	p["3rd_dim_cart"] = m_dft_3rd_dim;
 	p["imsz"]   = ms;
 
-	ft = NFFT<float> (p);
+	ft = NFFT<cxfl> (p);
 
 	m_initialised = true;
 

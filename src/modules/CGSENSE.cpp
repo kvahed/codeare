@@ -145,7 +145,7 @@ CGSENSE::Prepare () {
     cgp["m"]             = m_m;
     cgp["3rd_dim_cart"]  = m_3rd_dim_cart;
 
-	m_ncs = NCSENSE<float>(cgp);
+	m_ncs = NCSENSE<cxfl>(cgp);
 
 	m_ncs.KSpace (Get<float>("kspace"));
 	m_ncs.Weights (Get<float>("weights"));

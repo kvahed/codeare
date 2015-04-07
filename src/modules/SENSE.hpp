@@ -81,7 +81,7 @@ namespace RRStrategy {
 
 	private:
 
-		CSENSE<float>  m_cs;      /**< Cartesian sense operators (Multi-Core Reco)*/
+		CSENSE<cxfl>  m_cs;      /**< Cartesian sense operators (Multi-Core Reco)*/
 
 		unsigned short m_nthreads;   /**< Number of threads */
 		unsigned short m_af;      /**< Acceleration factor */

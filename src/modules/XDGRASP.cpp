@@ -78,7 +78,7 @@ codeare::error_code XDGRASP::Prepare () {
 	m_params["sensitivities"] = Get<cxfl>("sensitivities");
 
 	// setup ft oper
-	m_ft = NCSENSE<float>(m_params);
+	m_ft = NCSENSE<cxfl>(m_params);
 	m_ft.KSpace (Get<float>("kspace"));
 	m_ft.Weights (Get<float>("weights"));
 

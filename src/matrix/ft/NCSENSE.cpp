@@ -1,4 +1,4 @@
 #include "NCSENSE.hpp"
 
-template class NCSENSE<float>;
-template class NCSENSE<double>;
+template class NCSENSE<std::complex<float> >;
+template class NCSENSE<std::complex<double> >;

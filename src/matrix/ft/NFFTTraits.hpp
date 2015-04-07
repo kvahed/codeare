@@ -197,12 +197,13 @@ struct NFFTTraits { };
 
 
 template <>
-struct NFFTTraits<float> {
+struct NFFTTraits<std::complex<float> > {
 
     typedef nfftf_plan           Plan;    /**< @brief nfft plan (single precision) */
     typedef mri_inh_3d_plan      B0Plan;    /**< @brief nfft plan (single precision) */
     typedef solverf_plan_complex Solver;  /**< @brief nfft solver plan (single precision) */
-    typedef float                T;
+    typedef std::complex<float>  T;
+    typedef float                RT;
 
     /**
      * @brief            Initialise plan
@@ -217,33 +218,20 @@ struct NFFTTraits<float> {
      *
      * @return success
      */
-    inline static int
-    Init (const Vector<int>& N, size_t M, const Vector<int>& n, int m, Plan& plan, Solver& solver) NOEXCEPT {
-
+    inline static int Init (const Vector<int>& N, size_t M, const Vector<int>& n,
+    		int m, Plan& plan, Solver& solver) NOEXCEPT {
 
         Vector<int> _N(N), _n(n);
         int _d (N.size()), _M(M), _m(m);
         unsigned nfft_flags, fftw_flags, solver_flags;
 
-        fftw_flags  = FFTW_MEASURE | FFTW_DESTROY_INPUT;
+        fftw_flags   = FFTW_MEASURE | FFTW_DESTROY_INPUT;
         solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
-/*#ifdef _OPENMP
-        fftw_import_wisdom_from_filename("codeare_threads.plan");
-#else
-        fftw_import_wisdom_from_filename("codeare_single.plan");
-#endif*/
-
         nfftf_init_guru (&plan, _d, _N.ptr(), _M, _n.ptr(), _m, nfft_flags, fftw_flags);
         solverf_init_advanced_complex (&solver, (nfftf_mv_plan_complex*) &plan, solver_flags);
-
-/*#ifdef _OPENMP
-        fftwf_export_wisdom_to_filename("codeare_threads.plan");
-#else
-        fftwf_export_wisdom_to_filename("codeare_single.plan");
-#endif*/
 
         return 0;
 
@@ -262,8 +250,8 @@ struct NFFTTraits<float> {
      *
      * @return success
      */
-    inline static int
-    Init (const Vector<int>& N, size_t M, const Vector<int>& n, int m, T sigma, B0Plan& plan, Solver& solver) NOEXCEPT {
+    inline static int Init (const Vector<int>& N, size_t M, const Vector<int>& n,
+    		int m, RT sigma, B0Plan& plan, Solver& solver) NOEXCEPT {
 
 
         Vector<int> _N(N), _n(n);
@@ -275,20 +263,8 @@ struct NFFTTraits<float> {
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
-/*#ifdef _OPENMP
-        fftwf_import_wisdom_from_filename("codeare_threads.plan");
-#else
-        fftwf_import_wisdom_from_filename("codeare_single.plan");
-#endif
-		*/
         mri_inh_3d_init_guru (&plan, _N.ptr(), _M, _n.ptr(), _m, sigma, nfft_flags, fftw_flags);
         solverf_init_advanced_complex (&solver, (nfftf_mv_plan_complex*) &plan, solver_flags);
-
-/*#ifdef _OPENMP
-        fftwf_export_wisdom_to_filename("codeare_threads.plan");
-#else
-        fftwf_export_wisdom_to_filename("codeare_single.plan");
-#edif*/
 
         return 0;
 
@@ -307,10 +283,10 @@ struct NFFTTraits<float> {
      * @return           Success
      */
     inline static int
-    ITrafo (Plan& plan, Solver& solver, size_t maxiter = 3, T epsilon = 3.e-7) NOEXCEPT {
+    ITrafo (Plan& plan, Solver& solver, size_t maxiter = 3, RT epsilon = 3.e-7) NOEXCEPT {
 
     	/* Initial guess */
-    	std::fill_n ((T*)solver.f_hat_iter, 2*plan.N_total, 0.);
+    	std::fill_n ((RT*)solver.f_hat_iter, 2*plan.N_total, 0.);
 
         solverf_before_loop_complex(&solver);
 
@@ -335,10 +311,10 @@ struct NFFTTraits<float> {
      * @return           Success
      */
     inline static int
-    ITrafo (B0Plan& plan, Solver& solver, size_t maxiter = 3, T epsilon = 3.e-7) NOEXCEPT {
+    ITrafo (B0Plan& plan, Solver& solver, size_t maxiter = 3, RT epsilon = 3.e-7) NOEXCEPT {
 
     	/* Initial guess */
-    	std::fill_n ((T*)solver.f_hat_iter, 2*plan.N_total, 0.);
+    	std::fill_n ((RT*)solver.f_hat_iter, 2*plan.N_total, 0.);
 
         solverf_before_loop_complex(&solver);
 
@@ -360,8 +336,7 @@ struct NFFTTraits<float> {
      *
      * @return           Success
      */
-    inline static int
-    Trafo (const Plan& plan) NOEXCEPT {
+    inline static int Trafo (const Plan& plan) NOEXCEPT {
         nfftf_trafo ((Plan*) &plan);
         return 0;
     }
@@ -373,8 +348,7 @@ struct NFFTTraits<float> {
      *
      * @return           Success
      */
-    inline static int
-    Trafo (const B0Plan& plan) NOEXCEPT {
+    inline static int rafo (const B0Plan& plan) NOEXCEPT {
     	mri_inh_3d_trafo ((B0Plan*) &plan);
         return 0;
     }
@@ -387,8 +361,7 @@ struct NFFTTraits<float> {
      *
      * @return           Success
      */
-    inline static int
-    Adjoint (const Plan& plan) NOEXCEPT {
+    inline static int Adjoint (const Plan& plan) NOEXCEPT {
         nfftf_adjoint ((Plan*) &plan);
         return 0;
     }
@@ -400,8 +373,7 @@ struct NFFTTraits<float> {
      *
      * @return           Success
      */
-    inline static int
-    Adjoint  (const B0Plan& plan) NOEXCEPT {
+    inline static int Adjoint  (const B0Plan& plan) NOEXCEPT {
     	mri_inh_3d_adjoint ((B0Plan*) &plan);
         return 0;
     }
@@ -413,12 +385,12 @@ struct NFFTTraits<float> {
      * @param  solver       Solver plan
      * @return           Success
      */
-    inline static int
-    Weights (const Plan& plan, const Solver& solver, const size_t& rank) NOEXCEPT {
+    inline static int Weights (const Plan& plan, const Solver& solver,
+    		const size_t& rank) NOEXCEPT {
 
     	int err = 0;
         int j, k, z, N = plan.N[0], N2 = N*N, NH = .5*N;
-        T k2, j2, z2;
+        RT k2, j2, z2;
 
         if (solver.flags & PRECOMPUTE_DAMP)
             if (rank == 3) {
@@ -456,8 +428,7 @@ struct NFFTTraits<float> {
      * @param  plan        NFFT plan
      * @return           Success
      */
-    inline static int
-    Psi                  (Plan& plan) NOEXCEPT {
+    inline static int Psi (Plan& plan) NOEXCEPT {
         if(plan.nfft_flags & PRE_PSI) /* precompute full psi */
             nfftf_precompute_one_psi(&plan);
         if(plan.nfft_flags & PRE_FULL_PSI) /* precompute full psi */
@@ -474,13 +445,10 @@ struct NFFTTraits<float> {
      * @param  solver       Solver plan
      * @return           Success
      */
-    inline static int
-    Finalize             (Plan& plan, Solver& solver) NOEXCEPT {
-
+    inline static int Finalize (Plan& plan, Solver& solver) NOEXCEPT {
         solverf_finalize_complex(&solver);
         nfftf_finalize(&plan);
         return 0;
-
     }
 
     /**
@@ -490,13 +458,10 @@ struct NFFTTraits<float> {
      * @param  solver       Solver plan
      * @return           Success
      */
-    inline static int
-    Finalize             (B0Plan& plan, Solver& solver) NOEXCEPT {
-
+    inline static int Finalize (B0Plan& plan, Solver& solver) NOEXCEPT {
         solverf_finalize_complex(&solver);
         mri_inh_3d_finalize(&plan);
         return 0;
-
     }
 
 
@@ -505,12 +470,13 @@ struct NFFTTraits<float> {
 
 
 template <>
-struct NFFTTraits<double> {
+struct NFFTTraits<std::complex<double> > {
 
-    typedef nfft_plan           Plan;    /**< @brief nfft plan (double precision) */
-    typedef mri_inh_3d_plan     B0Plan;    /**< @brief nfft plan (double precision) */
-    typedef solver_plan_complex Solver;  /**< @brief nfft solver plan (double precision) */
-    typedef double              T;
+    typedef nfft_plan            Plan;    /**< @brief nfft plan (double precision) */
+    typedef mri_inh_3d_plan      B0Plan;    /**< @brief nfft plan (double precision) */
+    typedef solver_plan_complex  Solver;  /**< @brief nfft solver plan (double precision) */
+    typedef std::complex<double> T;
+    typedef double               RT;
 
     /**
      * @brief            Initialise plan
@@ -525,9 +491,8 @@ struct NFFTTraits<double> {
      *
      * @return success
      */
-    inline static int
-    Init (const Vector<int>& N, size_t M, const Vector<int>& n, int m, Plan& plan, Solver& solver) NOEXCEPT {
-
+    inline static int Init (const Vector<int>& N, size_t M, const Vector<int>& n,
+    		int m, Plan& plan, Solver& solver) NOEXCEPT {
 
         Vector<int> _N(N), _n(n);
         int _d (N.size()), _M(M), _m(m);
@@ -537,22 +502,10 @@ struct NFFTTraits<double> {
         solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
-		/*
-#ifdef _OPENMP
-        fftw_import_wisdom_from_filename("codeare_threads.plan");
-#else
-        fftw_import_wisdom_from_filename("codeare_single.plan");
-#endif
-		*/
+
         nfft_init_guru (&plan, _d, _N.ptr(), _M, _n.ptr(), _m, nfft_flags, fftw_flags);
         solver_init_advanced_complex (&solver, (nfft_mv_plan_complex*) &plan, solver_flags);
-		/*
-#ifdef _OPENMP
-        fftw_export_wisdom_to_filename("codeare_threads.plan");
-#else
-        fftw_export_wisdom_to_filename("codeare_single.plan");
-#endif
-		*/
+
         return 0;
 
     }
@@ -570,9 +523,8 @@ struct NFFTTraits<double> {
      *
      * @return success
      */
-    inline static int
-    Init (const Vector<int>& N, size_t M, const Vector<int>& n, int m, T sigma, B0Plan& plan, Solver& solver) NOEXCEPT {
-
+    inline static int Init (const Vector<int>& N, size_t M, const Vector<int>& n,
+    		int m, RT sigma, B0Plan& plan, Solver& solver) NOEXCEPT {
 
         Vector<int> _N(N), _n(n);
         int _d (N.size()), _M(M), _m(m);
@@ -582,22 +534,10 @@ struct NFFTTraits<double> {
         solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
-		/*
-#ifdef _OPENMP
-        fftw_import_wisdom_from_filename("codeare_threads.plan");
-#else
-        fftw_import_wisdom_from_filename("codeare_single.plan");
-#endif
-		*/
+
         mri_inh_3d_init_guru (&plan, _N.ptr(), _M, _n.ptr(), _m, sigma, nfft_flags, fftw_flags);
         solver_init_advanced_complex (&solver, (nfft_mv_plan_complex*) &plan, solver_flags);
-		/*
-#ifdef _OPENMP
-        fftw_export_wisdom_to_filename("codeare_threads.plan");
-#else
-        fftw_export_wisdom_to_filename("codeare_single.plan");
-#endif
-		*/
+
         return 0;
 
     }
@@ -614,8 +554,8 @@ struct NFFTTraits<double> {
      *
      * @return           Success
      */
-    inline static int
-    ITrafo (Plan& plan, Solver& solver, size_t maxiter = 3, T epsilon = 3.e-7) NOEXCEPT {
+    inline static int ITrafo (Plan& plan, Solver& solver, size_t maxiter = 3,
+    		RT epsilon = 3.e-7) NOEXCEPT {
 
     	/* Initial guess */
     	std::fill_n ((T*)solver.f_hat_iter, 2*plan.N_total, 0.);
@@ -642,8 +582,8 @@ struct NFFTTraits<double> {
      *
      * @return           Success
      */
-    inline static int
-    ITrafo (B0Plan& plan, Solver& solver, size_t maxiter = 3, T epsilon = 3.e-7) NOEXCEPT {
+    inline static int ITrafo (B0Plan& plan, Solver& solver, size_t maxiter = 3,
+    		RT epsilon = 3.e-7) NOEXCEPT {
 
     	/* Initial guess */
     	std::fill_n ((T*)solver.f_hat_iter, 2*plan.N_total, 0.);
@@ -668,8 +608,7 @@ struct NFFTTraits<double> {
      *
      * @return           Success
      */
-    inline static int
-    Trafo (const Plan& plan) NOEXCEPT {
+    inline static int Trafo (const Plan& plan) NOEXCEPT {
         nfft_trafo ((Plan*) &plan);
         return 0;
     }
@@ -681,8 +620,7 @@ struct NFFTTraits<double> {
      *
      * @return           Success
      */
-    inline static int
-    Trafo (const B0Plan& plan) NOEXCEPT {
+    inline static int Trafo (const B0Plan& plan) NOEXCEPT {
     	mri_inh_3d_trafo ((B0Plan*) &plan);
         return 0;
     }
@@ -695,8 +633,7 @@ struct NFFTTraits<double> {
      *
      * @return           Success
      */
-    inline static int
-    Adjoint (const Plan& plan) NOEXCEPT {
+    inline static int Adjoint (const Plan& plan) NOEXCEPT {
         nfft_adjoint ((Plan*) &plan);
         return 0;
     }
@@ -708,8 +645,7 @@ struct NFFTTraits<double> {
      *
      * @return           Success
      */
-    inline static int
-    Adjoint  (const B0Plan& plan) NOEXCEPT {
+    inline static int Adjoint  (const B0Plan& plan) NOEXCEPT {
     	mri_inh_3d_adjoint ((B0Plan*) &plan);
         return 0;
     }
@@ -721,12 +657,12 @@ struct NFFTTraits<double> {
      * @param  solver       Solver plan
      * @return           Success
      */
-    inline static int
-    Weights (const Plan& plan, const Solver& solver, const size_t& rank) NOEXCEPT {
+    inline static int Weights (const Plan& plan, const Solver& solver,
+    		const size_t& rank) NOEXCEPT {
 
     	int err = 0;
         int j, k, z, N = plan.N[0], N2 = N*N, NH = .5*N;
-        T k2, j2, z2;
+        RT k2, j2, z2;
 
         if (solver.flags & PRECOMPUTE_DAMP)
             if (rank == 3) {
@@ -764,8 +700,7 @@ struct NFFTTraits<double> {
      * @param  plan        NFFT plan
      * @return           Success
      */
-    inline static int
-    Psi                  (Plan& plan) NOEXCEPT {
+    inline static int Psi (Plan& plan) NOEXCEPT {
         if(plan.nfft_flags & PRE_PSI) /* precompute full psi */
             nfft_precompute_one_psi(&plan);
         if(plan.nfft_flags & PRE_FULL_PSI) /* precompute full psi */
@@ -782,13 +717,10 @@ struct NFFTTraits<double> {
      * @param  solver       Solver plan
      * @return           Success
      */
-    inline static int
-    Finalize             (Plan& plan, Solver& solver) NOEXCEPT {
-
+    inline static int Finalize (Plan& plan, Solver& solver) NOEXCEPT {
         solver_finalize_complex(&solver);
         nfft_finalize(&plan);
         return 0;
-
     }
 
     /**
@@ -798,16 +730,11 @@ struct NFFTTraits<double> {
      * @param  solver       Solver plan
      * @return           Success
      */
-    inline static int
-    Finalize             (B0Plan& plan, Solver& solver) NOEXCEPT {
-
+    inline static int Finalize (B0Plan& plan, Solver& solver) NOEXCEPT {
         solver_finalize_complex(&solver);
         mri_inh_3d_finalize(&plan);
         return 0;
-
     }
-
-
 
 };
 

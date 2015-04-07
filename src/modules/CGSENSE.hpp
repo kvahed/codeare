@@ -79,7 +79,7 @@ namespace RRStrategy {
 		
 	private:
 
-		NCSENSE<float>  m_ncs;
+		NCSENSE<cxfl>  m_ncs;
 		
 		int             m_verbose;   /**< Verbose should give back the reconstruction series? */
 		int             m_testcase;  /**< Test case. Generate forward data first.             */

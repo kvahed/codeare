@@ -47,7 +47,7 @@ GRAPPA::Prepare     () {
 	p.Set("lambda", m_lambda);
 	p.Set("kernel_size", m_kernel_size);
 	p.Set("ac_data", Get<cxfl>("ac_data"));       // Sensitivities
-    m_ft = CGRAPPA<float>(p);
+    m_ft = CGRAPPA<cxfl>(p);
     AddMatrix<cxfl> ("full_data");
 	printf ("... done.\n\n");
 	return codeare::OK;
