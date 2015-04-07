@@ -167,8 +167,6 @@ CompressedSensing::Process () {
 
 	FT<cxfl>& ft = *m_csparam.ft;
 
-	ft->*
-
 	Matrix<cxfl> data  = m_test_case ?
 		ft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
 
