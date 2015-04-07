@@ -36,9 +36,10 @@ Mac OS X, Quad-core Intel Core i7 @ 2.5GHz
 Accelerate framework: 20.1s
 
 Ubuntu Linux, 12-core Intel Xeon E5-2680v3 @ 2.50GHz
+Test run On Intel Xeon E5-2680v3 @ 2.50GHz: 
+MKL:              22.0s
+ACML:             23.8s
 OpenBLAS + ATLAS: 27.6s
-MKL:              21.5s
-ACML:             32.7s
 
 Ubuntu Linux, 16-core AMD Opteron 6300 @ 2.4GHz
 OpenBLAS + ATLAS: 66.6s
