@@ -29,8 +29,7 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 
 using namespace RRStrategy;
 
-codeare::error_code
-CompressedSensing::Init () {
+codeare::error_code CompressedSensing::Init () {
 
 	printf ("Intialising CompressedSensing ...\n");
 
@@ -91,14 +90,14 @@ CompressedSensing::Init () {
 			printf ("%s", "NCSENSE");
 #ifdef HAVE_NFFT
 			ft_params["sensitivities"] = Get<cxfl>("sensitivities");
-            ft_params["nk"]            = (size_t) RHSAttribute<int>("nk");
-			ft_params["weights_name"]  = std::string("weights");
-		    ft_params["ftiter"]        = (size_t) RHSAttribute<int>("ftmaxit");
-		    ft_params["fteps"]         = RHSAttribute<double>("fteps");
-		    ft_params["cgiter"]        = (size_t) RHSAttribute<int>("cgmaxit");
-		    ft_params["cgeps"]         = RHSAttribute<double>("cgeps");
-		    ft_params["lambda"]        = RHSAttribute<double>("lambda");
-		    ft_params["threads"]       = RHSAttribute<int>("threads");
+            ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
+			ft_params["weights_name"] = std::string("weights");
+		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
+		    ft_params["fteps"]        = RHSAttribute<double>("fteps");
+		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
+		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
+		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
+		    ft_params["threads"]      = RHSAttribute<int>("threads");
 			m_csparam.ft = (FT<cxfl>*) new NCSENSE<cxfl> (ft_params);
 #else
 			printf("**ERROR - CompressedSensing: NUFFT support not available.");
@@ -137,18 +136,17 @@ CompressedSensing::Init () {
 }
 
 
-codeare::error_code
-CompressedSensing::Prepare () {
+codeare::error_code CompressedSensing::Prepare () {
 
 	codeare::error_code error = codeare::OK;
 
-	FT<cxfl>& ft = *m_csparam.ft;
+	FT<cxfl>& dft = *m_csparam.ft;
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
-		ft.KSpace (Get<float>("kspace"));
-		ft.Weights (Get<float>("weights"));
+		dft.KSpace (Get<float>("kspace"));
+		dft.Weights (Get<float>("weights"));
 	} else {
-		ft.Mask (Get<float>("mask"));
+		dft.Mask (Get<float>("mask"));
 	}
 
 	Free ("weights");
@@ -160,15 +158,14 @@ CompressedSensing::Prepare () {
 
 }
 
-codeare::error_code
-CompressedSensing::Process () {
+codeare::error_code CompressedSensing::Process () {
 
 	float ma;
 
-	FT<cxfl>& ft = *m_csparam.ft;
+	FT<cxfl>& dft = *m_csparam.ft;
 
 	Matrix<cxfl> data  = m_test_case ?
-		ft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
+		dft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
 
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
@@ -182,12 +179,11 @@ CompressedSensing::Process () {
 
 	DWT<cxfl>& dwt = *m_csparam.dwt;
     std::vector< Matrix<cxfl> > vc;
-	std::cout << "Hello?" << std::endl;
+	
 	im_dc  = data;
 	if (m_ft_type != 2 && m_ft_type != 3)
 		im_dc /= pdf;
-	im_dc  = ft ->* im_dc;
-	std::cout << "Hello?" << std::endl;
+	im_dc  = dft ->* im_dc;
 
 	ma       = m_max(abs(im_dc));
 
@@ -197,7 +193,6 @@ CompressedSensing::Process () {
 	im_dc /= ma;
 	data  /= ma;
 	im_dc  = dwt * im_dc;
-	std::cout << "Hello?" << std::endl;
 
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
@@ -209,7 +204,8 @@ CompressedSensing::Process () {
 
     if (m_verbose) {
         size_t cpsz = numel(im_dc);
-        im_dc = zeros<cxfl> (size(im_dc,0), size(im_dc,1), (m_dim == 3) ? size(im_dc,2) : 1, vc.size());
+        im_dc = zeros<cxfl> (size(im_dc,0), size(im_dc,1), (m_dim == 3) ?
+        		size(im_dc,2) : 1, vc.size());
         for (size_t i = 0; i < vc.size(); i++)
             memcpy (&im_dc[i*cpsz], &(vc[i][0]), cpsz*sizeof(cxfl));
 
@@ -224,7 +220,8 @@ CompressedSensing::Process () {
 
 
 CompressedSensing::CompressedSensing() :
-	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_ft_type(0), m_noise(0.), m_test_case(0) {}
+	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_ft_type(0),
+	m_noise(0.), m_test_case(0) {}
 
 
 CompressedSensing::~CompressedSensing() {}

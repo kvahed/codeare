@@ -140,8 +140,6 @@ public:
 
 		m_fwd_out = Matrix<T> (m_nx[2],m_nx[1]);
 		m_bwd_out = Matrix<T> (size(m_sm));
-
-		printf ("  ...done.\n\n");
 		
 	}
 

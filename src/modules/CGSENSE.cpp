@@ -152,6 +152,7 @@ CGSENSE::Prepare () {
 
 	Free ("weights");
 	Free("kspace");
+	std::cout << std::endl;
 
 	m_initialised = true;
 

@@ -60,6 +60,7 @@ namespace RRStrategy {
         double l1;
         double lsa;
         double lsb;
+
         DWT<cxfl>* dwt;
         FT<cxfl>*  ft;
         TVOP*      tvt;
@@ -275,11 +276,14 @@ namespace RRStrategy {
     
     
     Matrix<cxfl> 
-    Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx,
-    		const Matrix<cxfl>& data, const CSParam& cgp) {
+    Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const Matrix<cxfl>& data, const CSParam& cgp) {
 
         Matrix<cxfl> g = GradObj (x, wx, data, cgp);
-        return g += (cgp.xfmw) ? GradXFM (x, cgp) : GradTV  (x, wx, cgp);
+        if (cgp.xfmw)
+        	g += GradXFM (x, cgp);
+        if (cgp.tvw)
+        	g += GradTV  (x, wx, cgp);
+        return g;
 
     } 
     
@@ -287,7 +291,7 @@ namespace RRStrategy {
     void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
 
         
-        float  t0 = 1.0, t = 1.0, z = 0.0, xn = norm(x), rmse, bk, f0, f1, dxn;
+        float     t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
         
         Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
         
@@ -296,22 +300,27 @@ namespace RRStrategy {
         TVOP&      tvt = *cgp.tvt;
         
         wx  = dwt->*x;
-        g0  = Gradient (x, wx, data, cgp);
-        dx  = -g0;
+        g0 = Gradient (x, wx, data, cgp);
+        dx = -g0;
         wdx = dwt->*dx;
 
-        for (size_t k = 0, i = 0; k < (size_t)cgp.cgiter; k++, i = 0) {
+        for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
             
-            t     = t0;
+            t = t0;
+            
             ffdbx = ft * wx;
             ffdbg = ft * wdx;
+            
             if (cgp.tvw) {
                 ttdbx = tvt * wx;
                 ttdbg = tvt * wdx;
             }
+            
             f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
             
+            int i = 0;
             while (i < cgp.lsiter) {
+                
                 t *= cgp.lsb;
                 f1 = Objective(ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
                 if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
