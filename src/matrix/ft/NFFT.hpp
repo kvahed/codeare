@@ -511,6 +511,14 @@ public:
 
     inline size_t Rank() const NOEXCEPT { return m_rank; }
     
+    inline size_t ImageSize () const {return m_plan.N[0];}
+
+    friend std::ostream& operator<< (std::ostream& os, const NFFT<T>& ft) {
+    	os << "  NFFT<" << demangle(typeid(T).name()).c_str() << ">" << std::endl;
+
+    	return os;
+    }
+
 private:
     
     bool       m_initialised;   /**< @brief Memory allocated / Plans, well, planned! :)*/

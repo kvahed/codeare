@@ -45,7 +45,8 @@ namespace RRStrategy {
 		 */
 		CGSENSE () : m_cgeps(1.0e-7), m_fteps(1.0e-3), m_cgmaxit(10),
 					 m_ftmaxit(3), m_noise(0.0), m_lambda(1.0e-6), m_testcase(0),
-					 m_verbose(0), m_nthreads (0), m_m(1), m_nk(1) {}
+					 m_verbose(0), m_nthreads (0), m_m(1), m_nk(1),
+					 m_test_case(false), m_3rd_dim_cart(false) {}
 		
 		/**
 		 * @brief Default destructor
@@ -95,6 +96,7 @@ namespace RRStrategy {
 		double          m_lambda;    /**< Tikhonov factor                                     */
 		double          m_fteps;     /**< NuFFT convergence criterium                         */
 		double          m_cgeps;     /**< CG SENSE convergence criterium                      */
+		bool            m_test_case;
 
 	};
 

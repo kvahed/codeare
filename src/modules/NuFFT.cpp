@@ -30,7 +30,7 @@ using namespace RRStrategy;
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
 
-NuFFT::NuFFT () : m_dft_3rd_dim(false) {}
+NuFFT::NuFFT () : m_dft_3rd_dim(false), m_test_case(false) {}
 
 
 NuFFT::~NuFFT () {
@@ -73,7 +73,7 @@ NuFFT::Init () {
 	Attribute("maxit",   &maxit);
 	Attribute("epsilon", &epsilon);
 	Attribute("dft_3rd_dim", &m_dft_3rd_dim);
-	Attribute("channel_dim");
+	Attribute("test_case", &m_test_case);
 
 	// Oversampling -------------------------
 
@@ -106,6 +106,8 @@ NuFFT::Init () {
 
 	ft = NFFT<cxfl> (p);
 
+	std::cout << ft << std::endl;
+
 	m_initialised = true;
 
 	return error;
@@ -132,8 +134,8 @@ codeare::error_code
 NuFFT::Process () {
 
 	Matrix<cxfl> img;
-	Matrix<cxfl>& data = Get<cxfl> ("data");
-
+	const Matrix<cxfl>& data = (m_test_case) ?
+			ft * phantom<cxfl>(ft.ImageSize()) : Get<cxfl> ("data");
 	img = ft ->* data;
 
     Add ("img", img);

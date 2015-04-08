@@ -20,7 +20,7 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
-#include "DFT.hpp"
+#include "ft.hpp"
 #ifdef HAVE_NFFT
 	#include "NCSENSE.hpp"
 #endif
@@ -61,7 +61,7 @@ codeare::error_code CompressedSensing::Init () {
 	switch (m_ft_type)
 		{
 		case 0:
-			printf ("%s", "DFT");
+			printf ("%s", "ft");
 			ft_params["dims"] = m_image_size;
 			ft_params["mask"] = Get<float>("mask");
 		    ft_params["threads"] = RHSAttribute<int>("threads");
@@ -141,13 +141,13 @@ codeare::error_code CompressedSensing::Prepare () {
 
 	codeare::error_code error = codeare::OK;
 
-	FT<cxfl>& dft = *m_csparam.ft;
+	FT<cxfl>& ft = *m_csparam.ft;
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
-		dft.KSpace (Get<float>("kspace"));
-		dft.Weights (Get<float>("weights"));
+		ft.KSpace (Get<float>("kspace"));
+		ft.Weights (Get<float>("weights"));
 	} else {
-		dft.Mask (Get<float>("mask"));
+		ft.Mask (Get<float>("mask"));
 	}
 
 	Free ("weights");
@@ -163,10 +163,10 @@ codeare::error_code CompressedSensing::Process () {
 
 	float ma;
 
-	FT<cxfl>& dft = *m_csparam.ft;
+	FT<cxfl>& ft = *m_csparam.ft;
 
 	Matrix<cxfl> data  = m_test_case ?
-		dft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
+		ft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
 
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
@@ -184,7 +184,7 @@ codeare::error_code CompressedSensing::Process () {
 	im_dc  = data;
 	if (m_ft_type != 2 && m_ft_type != 3)
 		im_dc /= pdf;
-	im_dc  = dft ->* im_dc;
+	im_dc  = ft ->* im_dc;
 
 	ma       = max(abs(im_dc));
 

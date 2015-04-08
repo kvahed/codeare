@@ -2,12 +2,11 @@
 #define __DEMANGLE_HPP__
 
 #include "../config.h"
-
+#define HAVE_DEMANGLE
 #ifdef HAVE_DEMANGLE
 #include <cxxabi.h>
 
-static inline const std::string
-demangle(const char* name) {
+static inline const std::string demangle(const char* name) {
     int status = -4;
     char* res = abi::__cxa_demangle(name, NULL, NULL, &status);
     const char* const demangled_name = (status==0)?res:name;
