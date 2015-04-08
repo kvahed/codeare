@@ -42,7 +42,7 @@ class NFFT : public FT<T> {
     typedef typename NFFTTraits<std::complex<double> >::Solver Solver;
     typedef typename FTTraits<T>::Plan CartPlan;
 	typedef typename FTTraits<T>::T FTType;
-    typedef typename TypeTraits<T>::RT RT;
+	typedef typename TypeTraits<T>::RT RT;
 
 
 public:
@@ -74,10 +74,10 @@ public:
      * @param  eps     Convergence criterium for inverse transform (default: 1.0e-7)
      * @param  maxit   Maximum # NFFT iterations (default: 3)
      */
-    inline NFFT (const Vector<size_t>& imsize, const size_t& nk, const size_t m = 1,
-                 const T alpha = 1.0, const Matrix<RT> b0 = Matrix<RT>(1),
-                 const Matrix<T> pc = Matrix<T>(1), const RT eps = 7.0e-4,
-				 const size_t maxit = 2) NOEXCEPT :
+    inline NFFT        (const Vector<size_t>& imsize, const size_t& nk, const size_t m = 1,
+                        const RT alpha = 1.0, const Matrix<RT> b0 = Matrix<RT>(1),
+                        const Matrix<T> pc = Matrix<T>(1),
+                        const RT eps = 7.0e-4, const size_t maxit = 2) NOEXCEPT :
         m_have_b0(false), m_3rd_dim_cart(false), m_ncart(1){
         
         m_M     = nk;
@@ -108,8 +108,8 @@ public:
     
     
     inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_3rd_dim_cart(false),
-        m_t (Matrix<RT>(1)), m_b0 (Matrix<RT>(1)), m_maxit(3), m_m(1), m_alpha(1.),
-		m_epsilon(7.e-4f), m_sigma(1.0), m_ncart(1) {
+        m_t (Matrix<RT>(1)), m_b0 (Matrix<RT>(1)), m_maxit(3), m_m(1), m_alpha(1.), m_epsilon(7.e-4f),
+        m_sigma(1.0), m_ncart(1) {
                 
         if (p.exists("nk")) {// Number of kspace samples
             try {
@@ -241,7 +241,7 @@ public:
             m_ts =  (m_min_t+m_max_t)/2.;
             RT t    = ((m_max_t-m_min_t)/2.)/(.5-((RT) (m_m))/m_N[2]);
 
-            m_win = Window<RT> (m_m, m_N.back(), m_sigma);
+            //m_win = Window<RT> (m_m, m_N.back(), m_sigma);
             
         	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);
 
@@ -312,7 +312,7 @@ public:
         m_max_t       = ft.m_max_t;
         m_min_b0      = ft.m_min_b0;
         m_max_b0      = ft.m_max_b0;
-        m_win         = ft.m_win;
+        //m_win         = ft.m_win;
         m_sigma       = ft.m_sigma;
         m_3rd_dim_cart = ft.m_3rd_dim_cart;
         m_ncart       = ft.m_ncart;
@@ -406,22 +406,27 @@ public:
         	tmpm = permute (tmpm, 1, 2, 0);
         }
 
+
         for (size_t i = 0; i < m_ncart; ++i) {
+
 			tmpd = (double*) m_plan.f_hat;
 			tmpt = (RT*) tmpm.Ptr() + i*m_imgsz;
+
 			//TODO: b0 not 2D+1D+1D
 			if (m_have_b0)
 				for (size_t j = 0; j < m.Size(); ++j) {
-					T val = tmpm[j] * std::polar ((RT)1., (RT)(2. * PI * m_ts * m_b0[j] * m_w));
+					T val = tmpm[j] * std::polar<RT> ((RT)1., (RT)(2. * PI * m_ts * m_b0[j] * m_w));
 					tmpd[2*j+0] = real(val);
 					tmpd[2*j+1] = imag(val);
 				}
 			else
 				std::copy (tmpt, tmpt+m_imgsz, tmpd);
- 			if (m_have_b0)
+
+			if (m_have_b0)
 				NFFTTraits<std::complex<double> >::Trafo (m_b0_plan);
 			else
 				NFFTTraits<std::complex<double> >::Trafo (m_plan);
+
 			tmpd = (double*) m_plan.f;
 			tmpt = (RT*) out.Ptr() + i*2*m_M;
 			std::copy (tmpd, tmpd+2*m_M, tmpt);
@@ -469,7 +474,7 @@ public:
 			//TODO: b0 not 2D+1D+1D
 			if (m_have_b0)
 				for (size_t j = 0; j < out.Size(); ++j)
-					out[j + i*m_imgsz / 2] *= std::polar((RT)1., (RT)(-2. * PI * m_ts * m_b0[j] * m_w));
+					out[j + i*m_imgsz / 2] *= std::polar<RT>((RT)1., (RT)(-2. * PI * m_ts * m_b0[j] * m_w));
 
         }
 
@@ -501,7 +506,7 @@ public:
 
     
     Plan& NFFTPlan() {return m_plan;}
-    Plan NFFTPlan() const {return m_plan;}
+    const Plan& NFFTPlan() const {return m_plan;}
 
 
     inline size_t Rank() const NOEXCEPT { return m_rank; }
@@ -539,7 +544,7 @@ private:
 
     size_t     m_m, m_ncart;
 
-    Window<RT> m_win;
+    //Window<RT>  m_win;
 
 };
 

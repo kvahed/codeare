@@ -164,8 +164,10 @@ codeare::error_code CompressedSensing::Process () {
 
 	FT<cxfl>& dft = *m_csparam.ft;
 
+	std::cout << "What the ... " << std::endl;
 	Matrix<cxfl> data  = m_test_case ?
 		dft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
+	std::cout << "fuck?" << std::endl;
 
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
