@@ -150,6 +150,8 @@ codeare::error_code CompressedSensing::Prepare () {
 		ft.Mask (Get<float>("mask"));
 	}
 
+	std::cout << ft << std::endl;
+
 	Free ("weights");
 	Free ("kspace");
 

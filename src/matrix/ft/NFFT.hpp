@@ -511,11 +511,22 @@ public:
 
     inline size_t Rank() const NOEXCEPT { return m_rank; }
     
-    inline size_t ImageSize () const {return m_plan.N[0];}
+    inline size_t ImageSize () const {return (size_t)m_plan.N[0];}
+    inline size_t KSpaceSize () const {return (size_t)m_plan.M_total;}
+    inline size_t Maxit () const {return m_maxit;}
+    inline RT Alpha() const {return m_alpha;}
+    inline RT Sigma() const {return m_sigma;}
+    inline RT Epsilon() const {return m_epsilon;}
 
-    friend std::ostream& operator<< (std::ostream& os, const NFFT<T>& ft) {
-    	os << "  NFFT<" << demangle(typeid(T).name()).c_str() << ">" << std::endl;
-
+    virtual std::ostream& Print (std::ostream& os) const {
+    	FT<T>::Print(os);
+    	os << "    image size: rank(" << Rank() << ") side(" <<	ImageSize() << ")"
+    			<< std::endl;
+    	os << "    k-spce size: rank(" << Rank() << ") nodes(" << KSpaceSize() << ")"
+    			<< std::endl;
+    	os << "    nfft: maxit(" << Maxit() << ") eps(" << Epsilon() <<	") alpha("
+    			<< Alpha() << ") sigma(" << Sigma() << ")" << std::endl;
+    	os << "    " << std::endl;
     	return os;
     }
 

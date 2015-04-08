@@ -112,6 +112,15 @@ public:
 	 */
 	virtual void Mask (const Matrix<T>& m) {}
 
+	virtual std::ostream& Print (std::ostream& os) const {
+    	os << "  " << demangle(typeid(*this).name()).c_str() <<  std::endl;
+		return os;
+	};
+
+    friend std::ostream& operator<< (std::ostream& os, const FT<T>& ft) {
+    	return ft.Print(os);
+    }
+
 
 protected:
 	

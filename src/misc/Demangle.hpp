@@ -1,9 +1,7 @@
 #ifndef __DEMANGLE_HPP__
 #define __DEMANGLE_HPP__
 
-#include "../config.h"
-#define HAVE_DEMANGLE
-#ifdef HAVE_DEMANGLE
+#ifdef HAVE_CXXABI_H
 #include <cxxabi.h>
 
 static inline const std::string demangle(const char* name) {

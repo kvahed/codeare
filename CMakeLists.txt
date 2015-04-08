@@ -17,6 +17,8 @@ enable_testing()
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 include(CheckIncludeFiles)
 check_include_files(assert.h HAVE_ASSERT_H)
+include(CheckIncludeFileCXX)
+check_include_file_cxx(cxxabi.h HAVE_CXXABI_H)
 add_definitions(-DHAVE_CONFIG_H)
 
 # Git ----------------------------------------------------------------
@@ -37,11 +39,11 @@ endif()
 # C++ flags ----------------------------------------------------------
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC -Ofast")
+    "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC -Ofast -DHAVE_CXXABI_H")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DTIXML_USE_STL -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DTIXML_USE_STL -fPIC -DHAVE_CXXABI_H")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL -DHAVE_CXXABI_H")
 elseif (${MSVC})
   set(CMAKE_CXX_FLAGS 
     "${CMAKE_CXX_FLAGS} /DTIXML_USE_STL /EHsc /Ox /nologo /wd4267 /wd4244 /wd4190 /wd4996 /wd4251 /wd4305 /LD /MT /DEXP_STL") 

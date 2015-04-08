@@ -119,17 +119,6 @@ public:
         } catch (const boost::bad_any_cast&) {}
         m_nx.push_back(m_np);
         
-		printf ("  Initialising NCSENSE:\n");
-		printf ("  No of threads: %i\n", m_np); // TODO: Thread num not passed on
-		printf ("  Signal nodes: %li\n", m_nx[2]);
-		printf ("  Cartesian 3rd dimension: %d\n", m_3rd_dim_cart);
-        printf ("  Channels: " JL_SIZE_T_SPECIFIER "\n", m_nx[1]);
-        printf ("  Space size: " JL_SIZE_T_SPECIFIER "\n", m_nx[3]);
-		printf ("  CG: eps(%.3e) iter(%li) lambda(%.3e)\n", m_cgeps, m_cgiter, m_lambda);
-		printf ("  NUFFT: nodes(%lu) eps(%.3e) iter(%li) m(%li) alpha(%.3e)\n", unsigned_cast(ft_params["nk"]),
-				fp_cast(ft_params["epsilon"]), unsigned_cast(ft_params["maxit"]), unsigned_cast(ft_params["m"]),
-				fp_cast(ft_params["alpha"]));
-
 		ft_params["imsz"] = ms;
 
         for (size_t i = 0; i < m_np; ++i)
@@ -365,12 +354,18 @@ public:
 		return Adjoint (m);
 	}
 
-	
+	virtual std::ostream& Print (std::ostream& os) const {
+		FT<T>::Print(os);
+		os << "    NCCG: eps("<< m_cgeps << ") iter(" << m_cgiter <<
+				") lambda(" << m_lambda << ")" << std::endl;
+		os << "    threads(" << m_np << ") channels(" << m_nx[1] << ")" << std::endl;
+		os << m_fts[0];
+		return os;
+	}
 	
 private:
 
 	mutable Vector<NFFT<T> > m_fts; /**< Non-Cartesian FT operators (Multi-Core?) */
-    //NFFT<T>    m_fts;
 	bool       m_initialised; /**< All initialised? */
     bool       m_verbose;	  /**< Verbose binary output (keep all intermediate steps) */
     bool       m_3rd_dim_cart; /**< 3rd FT dimension is Cartesian (stack of ...) */
