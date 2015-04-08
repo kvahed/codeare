@@ -27,6 +27,7 @@
 #include "ReconStrategy.hpp"
 #include "Algos.hpp"
 #include "DFT.hpp"
+
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
