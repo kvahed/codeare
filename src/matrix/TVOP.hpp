@@ -27,6 +27,7 @@
 /**
  * @brief 2D Finite difference operator
  */
+template <class T>
 class TVOP {
 	
 
@@ -38,8 +39,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> inline static Matrix<T> 
-	Trafo (const Matrix<T>& m) NOEXCEPT {
+	inline static Matrix<T> Trafo (const Matrix<T>& m) NOEXCEPT {
 		
 		size_t M = m.Dim(0);
 		size_t N = m.Dim(1);
@@ -68,8 +68,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> inline static Matrix<T> 
-	Adjoint    (const Matrix<T>& m) NOEXCEPT {
+	inline static Matrix<T> Adjoint (const Matrix<T>& m) NOEXCEPT {
 
 		size_t M = m.Dim(0);
 		size_t N = m.Dim(1);
@@ -105,8 +104,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
-	operator*    (const Matrix<T>& m) NOEXCEPT {
+	inline Matrix<T> operator* (const Matrix<T>& m) NOEXCEPT {
 		return Trafo (m);
 	}
 
@@ -117,8 +115,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	template <class T> Matrix<T> 
-	operator->*  (const Matrix<T>& m) NOEXCEPT {
+	inline Matrix<T> operator->* (const Matrix<T>& m) NOEXCEPT {
 		return Adjoint (m);
 	}
 

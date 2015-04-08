@@ -63,7 +63,7 @@ namespace RRStrategy {
 
         DWT<cxfl>* dwt;
         FT<cxfl>*  ft;
-        TVOP*      tvt;
+        TVOP<cxfl>* tvt;
         
     };
 
@@ -258,7 +258,7 @@ namespace RRStrategy {
     GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {
         
         DWT<cxfl>& dwt = *cgp.dwt;
-        TVOP& tvt = *cgp.tvt;
+        TVOP<cxfl>& tvt = *cgp.tvt;
         float p   = 0.5*cgp.pnorm-1.0;
         Matrix<cxfl> dx, g;
         
@@ -297,7 +297,7 @@ namespace RRStrategy {
         
         DWT<cxfl>& dwt = *cgp.dwt;
         FT<cxfl>&  ft  = *cgp.ft;
-        TVOP&      tvt = *cgp.tvt;
+        TVOP<cxfl>&      tvt = *cgp.tvt;
         
         wx  = dwt->*x;
         g0 = Gradient (x, wx, data, cgp);

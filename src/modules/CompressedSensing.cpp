@@ -98,6 +98,7 @@ codeare::error_code CompressedSensing::Init () {
 		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
 		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
 		    ft_params["threads"]      = RHSAttribute<int>("threads");
+		    ft_params["verbose"]      = 0;
 			m_csparam.ft = (FT<cxfl>*) new NCSENSE<cxfl> (ft_params);
 #else
 			printf("**ERROR - CompressedSensing: NUFFT support not available.");
@@ -164,10 +165,8 @@ codeare::error_code CompressedSensing::Process () {
 
 	FT<cxfl>& dft = *m_csparam.ft;
 
-	std::cout << "What the ... " << std::endl;
 	Matrix<cxfl> data  = m_test_case ?
 		dft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
-	std::cout << "fuck?" << std::endl;
 
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
@@ -177,7 +176,7 @@ codeare::error_code CompressedSensing::Process () {
     Matrix<cxfl> im_dc;
 
     m_csparam.dwt = new DWT <cxfl> (m_image_size[0], (wlfamily) m_wf, m_wm);
-	m_csparam.tvt = new TVOP ();
+	m_csparam.tvt = new TVOP<cxfl> ();
 
 	DWT<cxfl>& dwt = *m_csparam.dwt;
     std::vector< Matrix<cxfl> > vc;
@@ -187,7 +186,7 @@ codeare::error_code CompressedSensing::Process () {
 		im_dc /= pdf;
 	im_dc  = dft ->* im_dc;
 
-	ma       = m_max(abs(im_dc));
+	ma       = max(abs(im_dc));
 
 	if (m_verbose)
 		vc.push_back(im_dc);

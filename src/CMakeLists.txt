@@ -121,6 +121,13 @@ elseif (${WINDOWS})
   set (LD_ENV "PATH=%PATH%")
 endif()
 
+if (${WINDOWS}) 
+  set (LD_ENV "${LD_ENV}\;${Boost_LIBRARY_DIRS}")
+else ()
+  set (LD_ENV "${LD_ENV}:${Boost_LIBRARY_DIRS}")
+endif ()
+
+
 if (${MATLAB_FOUND})
   if (${WINDOWS}) 
     set (LD_ENV "${LD_ENV}\;${MATLAB_ROOT}/bin/win64")
@@ -163,6 +170,8 @@ endif ()
 if (${WINDOWS})
   string(REPLACE "/" "\\" LD_ENV "${LD_ENV}")
 endif()
+
+message(${LD_ENV})
 
 # Test macro -------------------------------------------------------- 
 include (TestMacro)
