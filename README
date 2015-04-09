@@ -21,14 +21,16 @@ Linux optimised compilation examples:
 # cd build
 # cmake -DCMAKE_C_COMPILER=icc \
         -DCMAKE_CXX_COMPILER=icpc \
-        -DBLA_VENDOR=Intel10_64lp ..
+        -DBLA_VENDOR=Intel10_64lp \
+        -DMATLAB_ROOT=/usr/local/MATLAB/R2015a ..
 
 (64bit Linux, ACML 6.1, MATLAB 2015a)
 # cd codeare
 # mkdir build
 # cd build
 # cmake -DBLA_VENDOR=ACML_MP \ 
-  -DBLAS_acml_mv_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so ..
+        -DBLAS_acml_mv_LIBRARY=/opt/acml/gfortran64_mp/lib/libacml_mp.so \
+        -DMATLAB_ROOT=/usr/local/MATLAB/R2015a ..
 
 Test runs:
 
@@ -37,9 +39,9 @@ Accelerate framework: 17.9s
 
 Ubuntu Linux, 12-core Intel Xeon E5-2680v3 @ 2.50GHz
 Test run On Intel Xeon E5-2680v3 @ 2.50GHz: 
-MKL:              22.0s
-ACML:             23.8s
-OpenBLAS + ATLAS: 27.6s
+MKL:              27.3s
+ACML:             23.0s
+OpenBLAS + ATLAS: 30.1s
 
 Ubuntu Linux, 16-core AMD Opteron 6300 @ 2.4GHz
 OpenBLAS + ATLAS: 46.6s
