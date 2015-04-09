@@ -33,7 +33,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINUX TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(MACOSX TRUE)
-  set (Boost_USE_STATIC_LIBS ON)
+  #set (Boost_USE_STATIC_LIBS ON)
 endif()
 
 # C++ flags ----------------------------------------------------------
