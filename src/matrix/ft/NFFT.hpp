@@ -323,7 +323,6 @@ public:
      * @param  k   Kspace trajectory
      */
     inline virtual void KSpace (const Matrix<RT>& k) NOEXCEPT {
-    	std::cout << "weights" << std::endl;
         if (m_have_b0) { // +1D for omega
             for (size_t j = 0; j < m_b0_plan.M_total; ++j) {
 				m_b0_plan.plan.x[3*j+0] = k[2*j+0];
@@ -335,7 +334,6 @@ public:
             std::copy (k.Begin(), k.End(), m_plan.x);
         }
         m_have_kspace = true;
-    	std::cout << "set" << std::endl;
     }
     
     
@@ -345,7 +343,6 @@ public:
      * @param  w   Weights
      */
     inline virtual void Weights (const Matrix<RT>& w) NOEXCEPT {
-    	std::cout << "weights" << std::endl;
     	if (m_have_b0)
     		assert (w.Size() == m_b0_plan.M_total);
     	else
@@ -359,7 +356,6 @@ public:
         	NFFTTraits<std::complex<double> >::Psi (m_plan);
         }
         m_have_weights = true;
-    	std::cout << "set" << std::endl;
     }
     
     

@@ -143,10 +143,8 @@ codeare::error_code CompressedSensing::Prepare () {
 	FT<cxfl>& ft = *m_csparam.ft;
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
-		std::cout << "setting kspce and weights" << std::endl;
 		ft.KSpace (Get<float>("kspace"));
 		ft.Weights (Get<float>("weights"));
-		std::cout << "done" << std::endl;
 	} else {
 		ft.Mask (Get<float>("mask"));
 	}
