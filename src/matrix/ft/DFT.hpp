@@ -564,6 +564,10 @@ public:
 	}
 
 
+	std::ostream& Print (std::ostream& os) {
+		FT<T>::Print(os);
+		return os;
+	}
 
 
 private:
