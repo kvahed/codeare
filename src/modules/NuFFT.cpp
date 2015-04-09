@@ -106,8 +106,6 @@ NuFFT::Init () {
 
 	ft = NFFT<cxfl> (p);
 
-	std::cout << ft << std::endl;
-
 	m_initialised = true;
 
 	return error;
@@ -121,6 +119,8 @@ NuFFT::Prepare () {
 
 	ft.KSpace  (Get<float> ("kspace"));
 	ft.Weights (Get<float> ("weights"));
+
+	std::cout << ft << std::endl;
 
 	clear (kspace);
 	clear (weights);

@@ -30,6 +30,8 @@
 template <class T>
 class FT {
 
+	typedef typename TypeTraits<T>::RT RT;
+
 public:
 
 	/**
@@ -95,7 +97,7 @@ public:
 	 *
 	 * @param  k   K-space trajectory
 	 */
-	virtual void KSpace (const Matrix<T>& k) {}
+	virtual void KSpace (const Matrix<RT>& k) {}
 
 
 	/**
@@ -103,14 +105,14 @@ public:
 	 *
 	 * @param  w   Weights
 	 */
-	virtual void Weights (const Matrix<T>& w) {}
+	virtual void Weights (const Matrix<RT>& w) {}
 
 	/**
 	 * @brief      Assign k-space weigths (jacobian of k in t)
 	 *
 	 * @param  w   Weights
 	 */
-	virtual void Mask (const Matrix<T>& m) {}
+	virtual void Mask (const Matrix<RT>& m) {}
 
 	virtual std::ostream& Print (std::ostream& os) const {
     	os << "  " << demangle(typeid(*this).name()).c_str() <<  std::endl;

@@ -50,17 +50,10 @@ public:
     /**
      * @brief         Default constructor
      */
-    NFFT() NOEXCEPT :
-        m_initialised (false),
-        m_have_pc (false),
-        m_imgsz (0),
-        m_M (0),
-        m_maxit (0),
-        m_rank (0),
-        m_m(0),
-        m_have_b0(false),
-        m_3rd_dim_cart(false),
-        m_ncart(1) {};
+    NFFT() NOEXCEPT :  m_initialised (false), m_have_pc (false), m_imgsz (0),
+        m_M (0), m_maxit (0), m_rank (0), m_m(0), m_have_b0(false),
+        m_3rd_dim_cart(false),m_ncart(1), m_alpha(1.), m_have_weights(false),
+		m_have_kspace(false) {};
 
     /**
      * @brief          Construct NFFT plans for forward and backward FT with credentials
@@ -74,11 +67,12 @@ public:
      * @param  eps     Convergence criterium for inverse transform (default: 1.0e-7)
      * @param  maxit   Maximum # NFFT iterations (default: 3)
      */
-    inline NFFT        (const Vector<size_t>& imsize, const size_t& nk, const size_t m = 1,
-                        const RT alpha = 1.0, const Matrix<RT> b0 = Matrix<RT>(1),
-                        const Matrix<T> pc = Matrix<T>(1),
-                        const RT eps = 7.0e-4, const size_t maxit = 2) NOEXCEPT :
-        m_have_b0(false), m_3rd_dim_cart(false), m_ncart(1){
+    inline NFFT (const Vector<size_t>& imsize, const size_t& nk, const size_t m = 1,
+    		const RT alpha = 1.0, const Matrix<RT> b0 = Matrix<RT>(1),
+            const Matrix<T> pc = Matrix<T>(1), const RT eps = 7.0e-4,
+			const size_t maxit = 2) NOEXCEPT :
+        m_have_b0(false), m_3rd_dim_cart(false), m_ncart(1), m_have_weights(false),
+		m_have_kspace(false){
         
         m_M     = nk;
         m_imgsz = 2;
@@ -108,8 +102,8 @@ public:
     
     
     inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_3rd_dim_cart(false),
-        m_t (Matrix<RT>(1)), m_b0 (Matrix<RT>(1)), m_maxit(3), m_m(1), m_alpha(1.), m_epsilon(7.e-4f),
-        m_sigma(1.0), m_ncart(1) {
+        m_t (Matrix<RT>(1)), m_b0 (Matrix<RT>(1)), m_maxit(3), m_m(1), m_alpha(1.),
+		m_epsilon(7.e-4f), m_sigma(1.0), m_ncart(1),  m_have_weights(false), m_have_kspace(false){
                 
         if (p.exists("nk")) {// Number of kspace samples
             try {
@@ -166,7 +160,6 @@ public:
                         "Defaulting to 1.0\n");
             }
         }
-        
         for (size_t i = 0; i < m_N.size(); ++i)
             m_n[i] = ceil(m_alpha*m_N[i]);
         
@@ -329,8 +322,8 @@ public:
      * 
      * @param  k   Kspace trajectory
      */
-    inline void 
-    KSpace (const Matrix<RT>& k) NOEXCEPT {
+    inline virtual void KSpace (const Matrix<RT>& k) NOEXCEPT {
+    	std::cout << "weights" << std::endl;
         if (m_have_b0) { // +1D for omega
             for (size_t j = 0; j < m_b0_plan.M_total; ++j) {
 				m_b0_plan.plan.x[3*j+0] = k[2*j+0];
@@ -341,6 +334,8 @@ public:
             assert (k.Size() == m_plan.M_total*m_rank);
             std::copy (k.Begin(), k.End(), m_plan.x);
         }
+        m_have_kspace = true;
+    	std::cout << "set" << std::endl;
     }
     
     
@@ -349,16 +344,13 @@ public:
      * 
      * @param  w   Weights
      */
-    inline void 
-    Weights (const Matrix<RT>& w) NOEXCEPT {
-
+    inline virtual void Weights (const Matrix<RT>& w) NOEXCEPT {
+    	std::cout << "weights" << std::endl;
     	if (m_have_b0)
     		assert (w.Size() == m_b0_plan.M_total);
     	else
     		assert (w.Size() == m_plan.M_total);
-
         std::copy (w.Begin(), w.End(), m_solver.w);
-
         if (m_have_b0) {
             NFFTTraits<std::complex<double> >::Weights (m_b0_plan.plan, m_solver, m_rank);
             NFFTTraits<std::complex<double> >::Psi (m_b0_plan.plan);
@@ -366,7 +358,8 @@ public:
         	NFFTTraits<std::complex<double> >::Weights (m_plan, m_solver, m_rank);
         	NFFTTraits<std::complex<double> >::Psi (m_plan);
         }
-
+        m_have_weights = true;
+    	std::cout << "set" << std::endl;
     }
     
     
@@ -520,13 +513,12 @@ public:
 
     virtual std::ostream& Print (std::ostream& os) const {
     	FT<T>::Print(os);
-    	os << "    image size: rank(" << Rank() << ") side(" <<	ImageSize() << ")"
-    			<< std::endl;
-    	os << "    k-spce size: rank(" << Rank() << ") nodes(" << KSpaceSize() << ")"
-    			<< std::endl;
+    	os << "    image size: rank(" << Rank() << ") side(" <<
+    			ImageSize() << ") nodes(" << KSpaceSize() << ")" << std::endl;
     	os << "    nfft: maxit(" << Maxit() << ") eps(" << Epsilon() <<	") alpha("
     			<< Alpha() << ") sigma(" << Sigma() << ")" << std::endl;
-    	os << "    " << std::endl;
+    	os << "    have_kspace(" << m_have_kspace << ") have_weights(" <<
+    			m_have_weights << ") have_b0(" << m_have_b0 << ")" << std::endl;
     	return os;
     }
 
@@ -550,8 +542,8 @@ private:
 
     size_t     m_M;             /**< @brief Number of k-space knots */
     size_t     m_maxit;         /**< @brief Number of Recon iterations (NFFT 3) */
-    RT          m_epsilon;       /**< @brief Convergence criterium */
-    RT          m_alpha, m_sigma;
+    RT         m_epsilon;       /**< @brief Convergence criterium */
+    RT         m_alpha, m_sigma;
     size_t     m_imgsz;
     
     Plan       m_plan;         /**< nfft  plan */
@@ -559,7 +551,7 @@ private:
     Solver     m_solver;         /**< infft plan */
     CartPlan   m_cart_plan;
     
-    bool       m_3rd_dim_cart;
+    bool       m_3rd_dim_cart, m_have_weights, m_have_kspace;
 
     size_t     m_m, m_ncart;
 
