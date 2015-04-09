@@ -279,7 +279,7 @@ public:
     /**
      * @brief        Clean up and destruct
      */ 
-    ~NFFT () NOEXCEPT {
+    virtual ~NFFT () NOEXCEPT {
         if (m_initialised)
         	if (m_have_b0)
         		NFFTTraits<std::complex<double> >::Finalize (m_b0_plan, m_solver);

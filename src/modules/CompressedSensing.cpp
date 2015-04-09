@@ -20,7 +20,6 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
-#include "ft.hpp"
 #ifdef HAVE_NFFT
 	#include "NCSENSE.hpp"
 #endif
