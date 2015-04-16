@@ -370,13 +370,13 @@ public:
 
 		double* tmpd;
 		RT* tmpt;
-        Matrix<T> out (m_M * ((m_3rd_dim_cart && m_ncart > 1) ? m_ncart : 1), 1);
+        Matrix<T> out (m_M, ((m_3rd_dim_cart && m_ncart > 1) ? m_ncart : 1));
         Matrix<T> tmpm = m;
 
         if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
         	int n = static_cast<int>(m_ncart);
         	tmpm = permute (tmpm, 2, 0, 1);
-        	size_t cent = floor((RT)m_ncart/2);
+        	size_t cent = std::ceil(.5*m_ncart);
         	Matrix<T> tmp;
         	for (size_t i = 0; i < m_imgsz/2; ++i) { // fftshift colums
 				tmp = Column (tmpm,i);
@@ -392,7 +392,7 @@ public:
 				std::rotate(tmp.Begin(), tmp.Begin()+cent, tmp.End());
 				Column (tmpm, i, tmp);
         	}
-        	tmpm = permute (tmpm, 1, 2, 0);
+        	tmpm = permute (tmpm, 1, 2, 0)/sqrt((RT)m_ncart);
         }
 
 
@@ -470,7 +470,7 @@ public:
         if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
         	int n = static_cast<int>(m_ncart);
         	out = permute (out, 2, 0, 1);
-        	size_t cent = floor(.5*m_ncart);
+        	size_t cent = std::ceil(.5*m_ncart);
         	Matrix<T> tmp;
         	for (size_t i = 0; i < m_imgsz/2; ++i) { // fftshift colums
 				tmp = Column (out,i);
@@ -486,7 +486,7 @@ public:
 				std::rotate(tmp.Begin(), tmp.Begin()+cent, tmp.End());
 				Column (out, i, tmp);
         	}
-        	out = permute (out, 1, 2, 0);
+        	out = permute (out, 1, 2, 0)/sqrt((RT)m_ncart);
         }
 
         return out;
@@ -515,6 +515,8 @@ public:
     			<< Alpha() << ") sigma(" << Sigma() << ")" << std::endl;
     	os << "    have_kspace(" << m_have_kspace << ") have_weights(" <<
     			m_have_weights << ") have_b0(" << m_have_b0 << ")" << std::endl;
+    	if (m_3rd_dim_cart)
+    		os << "    3rd dimension is Cartesian" << std::endl;
     	return os;
     }
 

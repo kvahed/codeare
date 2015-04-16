@@ -39,23 +39,34 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline static Matrix<T> Trafo (const Matrix<T>& m) NOEXCEPT {
+	inline static Matrix<T> Trafo (const Matrix<T>& A) NOEXCEPT {
 		
-		size_t M = m.Dim(0);
-		size_t N = m.Dim(1);
-		
-		Matrix<T> res (M, N, 2); 
-		
-		for (size_t i = 0; i < N; ++i) {
-			for (size_t j = 0; j < M-1; ++j)
-				res(j,i,0) = m(j+1,i) - m(j,i);
-			res (M-1,i,0) = T(0.0);
-		}
+		Matrix<T> res;
 
-		for (size_t i = 0; i < M; ++i) {
-			for (size_t j = 0; j < N-1; ++j)
-				res(i,j,1) = m(i,j+1) - m(i,j);
-			res (i,N-1,1) = T(0.0);
+		if (ndims(A)==2) {
+			size_t M = A.Dim(0), N = A.Dim(1);
+			res = Matrix<T>(M, N, 2);
+			for (size_t n = 0; n < N; ++n)
+				for (size_t m = 0; m < M-1; ++m)
+					res(m,n,0) = A(m+1,n) - A(m,n);
+			for (size_t n = 0; n < N-1; ++n)
+				for (size_t m = 0; m < M; ++m)
+					res(m,n,1) = A(m,n+1) - A(m,n);
+		} else if (ndims(A)==3) {
+			size_t M = A.Dim(0), N = A.Dim(1), L = A.Dim(2);
+			res = Matrix<T>(M, N, L, 3);
+			for (size_t l = 0; l < L; ++l)
+				for (size_t n = 0; n < N; ++n)
+					for (size_t m = 0; m < M-1; ++m)
+						res(m,n,l,0) = A(m+1,n,l) - A(m,n,l);
+			for (size_t l = 0; l < L; ++l)
+				for (size_t n = 0; n < N-1; ++n)
+					for (size_t m = 0; m < M; ++m)
+						res(m,n,l,1) = A(m,n+1,l) - A(m,n,l);
+			for (size_t l = 0; l < L-1; ++l)
+				for (size_t n = 0; n < N; ++n)
+					for (size_t m = 0; m < M; ++m)
+						res(m,n,l,1) = A(m,n,l+1) - A(m,n,l);
 		}
 		
 		return res;
@@ -68,29 +79,40 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline static Matrix<T> Adjoint (const Matrix<T>& m) NOEXCEPT {
+	inline static Matrix<T> Adjoint (const Matrix<T>& A) NOEXCEPT {
 
-		size_t M = m.Dim(0);
-		size_t N = m.Dim(1);
-		
-		Matrix<T> resx (M, N);
-		Matrix<T> resy (M, N);
+		Matrix<T> resx, resy;
 
-		for (size_t i = 0; i < M; ++i) {
-			resy (0,i) = -m(0,i,0);
-			for (size_t j = 1; j < N-1; ++j)
-				resy (j,i) = m(j-1,i,0) - m(j,i,0);
-			resy (N-1,i) = m(N-2,i,0);
+		if (ndims(A)==3) {
+			size_t M = A.Dim(0), N = A.Dim(1);
+			resx = Matrix<T>(M,N);
+			resy = Matrix<T>(M,N);
+			for (size_t m = 0; m < M; ++m)
+				for (size_t n = 1; n < N-1; ++n)
+					resy (n,m) = A(n-1,m,0) - A(n,m,0);
+			for (size_t m = 1; m < M-1; ++m)
+				for (size_t n = 0; n < N; ++n)
+					resx (n,m) = A(n,m-1,1) - A(n,m,1);
+			resx += resy;
+		} else if (ndims(A)==4) {
+			size_t M = A.Dim(0), N = A.Dim(1), L = A.Dim(2);
+			resx = Matrix<T>(M,N,L);
+			resy = Matrix<T>(M,N,L);
+			Matrix<T> resz = Matrix<T>(M,N,L);
+			for (size_t l = 0; l < L; ++l)
+				for (size_t m = 0; m < M; ++m)
+					for (size_t n = 1; n < N-1; ++n)
+						resy (n,m,l) = A(n-1,m,l,0) - A(n,m,l,0);
+			for (size_t l = 0; l < L; ++l)
+				for (size_t m = 1; m < M-1; ++m)
+					for (size_t n = 0; n < N; ++n)
+						resx (n,m,l) = A(n,m-1,l,1) - A(n,m,l,1);
+			for (size_t l = 1; l < L-1; ++l)
+				for (size_t m = 0; m < M; ++m)
+					for (size_t n = 0; n < N; ++n)
+						resz (n,m,l) = A(n,m,l-1,2) - A(n,m,l,2);
+			resx += resy + resz;
 		}
-
-		for (size_t i = 0; i < N; ++i) {
-			resx (i,0) = -m(i,0,1);
-			for (size_t j = 1; j < M-1; ++j)
-				resx (i,j) = m(i,j-1,1) - m(i,j,1);
-			resx (i,M-1) = m(i,M-2,1);
-		}
-		
-		resx += resy;
 		
 		return resx;
 		

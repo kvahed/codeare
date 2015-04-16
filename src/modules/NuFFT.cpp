@@ -22,6 +22,7 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 #include "Access.hpp"
+#include "IOContext.hpp"
 
 using namespace RRStrategy;
 
@@ -30,7 +31,7 @@ using namespace RRStrategy;
 std::string sides[3] = {"Nx", "Ny", "Nz"};
 
 
-NuFFT::NuFFT () : m_dft_3rd_dim(false), m_test_case(false) {}
+NuFFT::NuFFT () : m_dft_3rd_dim(false), m_test_case(false), m_dim(2) {}
 
 
 NuFFT::~NuFFT () {
@@ -51,7 +52,7 @@ NuFFT::Init () {
 	codeare::error_code error = codeare::OK; 
 	m_initialised               = false;
 
-	int shots, M, dim, maxit, m, N[4];
+	int shots, M, maxit, m, N[4];
 	float epsilon, alpha;
  
 
@@ -60,9 +61,9 @@ NuFFT::Init () {
 
 	// Dimensions ---------------------------
 
-	Attribute("dim",       &dim);
+	Attribute("dim",       &m_dim);
 
-	for (int i = 0; i < dim; i++)
+	for (int i = 0; i < m_dim; i++)
 		Attribute (sides[i].c_str(),       &N[i]);
 
 	Attribute("M",         &M);
@@ -85,8 +86,8 @@ NuFFT::Init () {
 
 	// --------------------------------------
 
-	Vector<size_t> ms (dim,1);
-	for (size_t i = 0; i < (size_t)dim; i++)
+	Vector<size_t> ms (m_dim,1);
+	for (size_t i = 0; i < m_dim; i++)
 		ms[i] = N[i];
 
 
@@ -135,7 +136,9 @@ NuFFT::Process () {
 
 	Matrix<cxfl> img;
 	const Matrix<cxfl>& data = (m_test_case) ?
-			ft * phantom<cxfl>(ft.ImageSize()) : Get<cxfl> ("data");
+			ft * phantom<cxfl>(ft.ImageSize(), ft.ImageSize(), (m_dim == 3) ?
+					ft.ImageSize() : 1) : Get<cxfl> ("data");
+
 	img = ft ->* data;
 
     Add ("img", img);

@@ -26,7 +26,236 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 #include "Algos.hpp"
 #include "Creators.hpp"
 
+
 using namespace RRStrategy;
+
+inline static float
+Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg,
+	 const Matrix<cxfl>&  data, const float             t) {
+
+	Matrix<cxfl> om = ffdbx;
+
+	if (t > 0.0)
+		om += t * ffdbg;
+	om -= data;
+
+	return real(om.dotc(om));
+
+}
+
+
+inline static float
+ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg,
+	   const float             t, const CSParam&        cgp) {
+
+	float o = 0.0, p = 0.5*cgp.pnorm;
+	Matrix<cxfl> om = ttdbx;
+
+	if (t > 0.0)
+		om += t * ttdbg;
+	om *= conj(om);
+	om += cgp.l1;
+	om ^= p;
+
+	for (size_t i = 0; i < om.Size(); i++)
+		o += real(om[i]);
+
+	return cgp.tvw * o;
+
+}
+
+
+/**
+ *
+ */
+inline static float
+ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g,
+		const float         t, const CSParam&    cgp) {
+
+	float o = 0.0, p = 0.5*cgp.pnorm;
+	Matrix<cxfl> om = x;
+
+	if (t > 0.0)
+		om += t * g;
+	om *= conj(om);
+	om += cgp.l1;
+	om ^= p;
+
+	for (size_t i = 0; i < om.Size(); i++)
+		o += om[i].real();
+
+	return cgp.xfmw * o;
+
+}
+
+
+static float
+Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg,
+		   const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg,
+		   const Matrix<cxfl>&     x, const Matrix<cxfl>&     g,
+		   const Matrix<cxfl>&  data, const float             t,
+				 float&         rmse, const CSParam&        cgp) {
+
+	float obj = Obj (ffdbx, ffdbg, data, t);
+
+	rmse = sqrt(obj/(float)nnz(data));
+
+	if (cgp.tvw)
+		obj += ObjTV (ttdbx, ttdbg, t, cgp);
+	if (cgp.xfmw)
+		obj += ObjXFM (x, g, t, cgp);
+
+	return obj;
+
+}
+
+
+/**
+ * @brief Compute gradient of the data consistency
+ */
+static Matrix<cxfl>
+GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx,
+		 const Matrix<cxfl>& data, const CSParam& cgp) {
+
+	FT<cxfl>& ft = *(cgp.ft);
+	DWT<cxfl>& dwt = *(cgp.dwt);
+
+	return (2.0 * (dwt * (ft ->* ((ft * wx) - data))));
+
+}
+
+
+/**
+ * @brief Compute gradient of L1-transform operator
+ *
+ * @param  x   X
+ * @param  cgp CG parameters
+ * @return     The gradient
+ */
+template <class T> inline static Matrix<T>
+GradXFM   (const Matrix<T>& x, const CSParam& cgp) {
+
+	float pn = 0.5*cgp.pnorm-1.0, l1 = cgp.l1, xfm = cgp.xfmw;
+	return xfm * (x * ((x * conj(x) + l1) ^ pn));
+
+}
+
+
+/**
+ * @brief Compute gradient of the total variation operator
+ *
+ * @param  x   Image space original
+ * @param  wx  Image space perturbance
+ * @param  cgp Parameters
+ */
+Matrix<cxfl>
+GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {
+
+	DWT<cxfl>& dwt = *cgp.dwt;
+	TVOP<cxfl>& tvt = *cgp.tvt;
+	float p   = 0.5*cgp.pnorm-1.0;
+	Matrix<cxfl> dx, g;
+
+
+	dx = tvt * wx;
+	g  = dx * conj(dx);
+	g += cgp.l1;
+	g ^= p;
+	g *= dx;
+	g *= cgp.pnorm;
+	g  = dwt * (tvt->*g);
+
+	return (cgp.tvw * g);
+
+}
+
+
+Matrix<cxfl> Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx,
+		const Matrix<cxfl>& data, const CSParam& cgp) {
+
+	Matrix<cxfl> g = GradObj (x, wx, data, cgp);
+
+	if (cgp.xfmw)
+		g += GradXFM (x, cgp);
+	if (cgp.tvw)
+		g += GradTV  (x, wx, cgp);
+	return g;
+
+}
+
+
+void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
+
+
+	float     t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
+
+	Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
+
+	DWT<cxfl>& dwt = *cgp.dwt;
+	FT<cxfl>&  ft  = *cgp.ft;
+	TVOP<cxfl>&      tvt = *cgp.tvt;
+
+	wx  = dwt->*x;
+
+	g0 = Gradient (x, wx, data, cgp);
+	dx = -g0;
+	wdx = dwt->*dx;
+
+	for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
+
+		t = t0;
+
+		ffdbx = ft * wx;
+		ffdbg = ft * wdx;
+
+		if (cgp.tvw) {
+			ttdbx = tvt * wx;
+			ttdbg = tvt * wdx;
+		}
+
+		f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
+
+		int i = 0;
+		while (i < cgp.lsiter) {
+
+			t *= cgp.lsb;
+			f1 = Objective(ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
+			if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
+				break;
+			++i;
+		}
+
+		printf (ofstr.c_str(), k, rmse, i); fflush (stdout);
+
+		if (i == cgp.lsiter) {
+			printf ("Reached max line search, exiting... \n");
+			return;
+		}
+
+		if      (i > 2) t0 *= cgp.lsb;
+		else if (i < 1) t0 /= cgp.lsb;
+
+		// Update image
+		x  += (dx * t);
+		wx  = dwt->*x;
+
+		// CG computation
+		g1  =  Gradient (x, wx, data, cgp);
+		bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
+		g0  =  g1;
+		dx  = -g1 + dx * bk;
+		wdx =  dwt->*dx;
+		dxn =  norm(dx)/xn;
+
+		printf ("dxnrm: %0.4f\n", dxn);
+		if (dxn < cgp.cgconv)
+			break;
+
+	}
+
+
+}
+
 
 codeare::error_code CompressedSensing::Init () {
 
@@ -43,9 +272,10 @@ codeare::error_code CompressedSensing::Init () {
 	Attribute ("pnorm",   &m_csparam.pnorm);
 	Attribute ("verbose", &m_verbose);
     m_image_size   = RHSList<size_t>("ftdims");
+    m_dim = m_image_size.size();
 
 	printf ("  Geometry: " JL_SIZE_T_SPECIFIER "D (" JL_SIZE_T_SPECIFIER ","
-            JL_SIZE_T_SPECIFIER "," JL_SIZE_T_SPECIFIER ")\n", m_image_size.size(),
+            JL_SIZE_T_SPECIFIER "," JL_SIZE_T_SPECIFIER ")\n", m_dim,
             m_image_size[0], m_image_size[1], (m_image_size.size()==3) ? m_image_size[2] : 1);
 
 	Attribute ("test_case", &m_test_case);
@@ -78,6 +308,7 @@ codeare::error_code CompressedSensing::Init () {
 			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
 			ft_params["m"]       = RHSAttribute<size_t>("ftm");
 	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
+	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
 	        ft_params["imsz"]    = m_image_size;
 	        m_csparam.ft = (FT<cxfl>*) new NFFT<cxfl> (ft_params);
 #else
@@ -163,20 +394,19 @@ codeare::error_code CompressedSensing::Prepare () {
 codeare::error_code CompressedSensing::Process () {
 
 	float ma;
-
 	FT<cxfl>& ft = *m_csparam.ft;
 
-	Matrix<cxfl> data  = m_test_case ?
-		ft * phantom<cxfl>(m_image_size[0]) : Get<cxfl>("data");
+	Matrix<cxfl> data = (m_test_case) ?
+		ft * phantom<cxfl>(m_image_size[0], m_image_size[0], (m_dim == 3) ?
+				m_image_size[0] : 1) : Get<cxfl> ("data");
 
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
 
-	Matrix<float>& pdf   = Get<float>  ("pdf" );
-	Matrix<cxfl>&  pc    = Get<cxfl>   ("pc");
-    Matrix<cxfl> im_dc;
+	Matrix<float>& pdf   = Get<float>("pdf");
+	Matrix<cxfl> im_dc;
 
-    m_csparam.dwt = new DWT <cxfl> (m_image_size[0], (wlfamily) m_wf, m_wm);
+    m_csparam.dwt = new DWT <cxfl> (m_image_size[0], (wlfamily)m_wf, m_wm);
 	m_csparam.tvt = new TVOP<cxfl> ();
 
 	DWT<cxfl>& dwt = *m_csparam.dwt;
@@ -212,7 +442,7 @@ codeare::error_code CompressedSensing::Process () {
             memcpy (&im_dc[i*cpsz], &(vc[i][0]), cpsz*sizeof(cxfl));
 
     } else
-        im_dc = dwt ->* im_dc * ma;
+        im_dc = dwt ->* im_dc*ma;
 
     Add ("im_dc", im_dc);
 

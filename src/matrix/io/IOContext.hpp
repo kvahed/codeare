@@ -663,5 +663,6 @@ namespace io{
 
 }}}
 
+using namespace codeare::matrix::io;
 
 #endif /* __IOCONTEXT_HPP__ */

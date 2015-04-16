@@ -74,6 +74,7 @@ namespace RRStrategy {
 		NFFT<cxfl> ft;
 		bool m_dft_3rd_dim;
 		bool m_test_case;
+		size_t m_dim;
 
 	};
 	

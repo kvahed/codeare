@@ -509,7 +509,11 @@ phantom (const size_t& n) {
 
 }
 
-
+template<class T> inline static Matrix<T>
+phantom (const size_t& n, const size_t& m) {
+	assert (n==m);
+	return phantom<T>(n);
+}
 
 
 
@@ -554,6 +558,15 @@ phantom3D (const size_t& n) {
 
 	return res;
 
+}
+template<class T> inline static Matrix<T>
+phantom (const size_t& n, const size_t& m, const size_t& l) {
+	assert (n==m);
+	assert (n==l || l==1);
+	if (l==n)
+		return phantom3D<T>(n);
+	else
+		return phantom<T>(n);
 }
 
 

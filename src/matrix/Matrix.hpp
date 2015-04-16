@@ -1060,7 +1060,7 @@ public:
      * @return          Class name
      */ 
     inline const char*
-    GetClassName        () const NOEXCEPT { 
+    GetClassName        () const NOEXCEPT {
         return _name.c_str(); 
     }
 
@@ -1071,7 +1071,7 @@ public:
      * @return          Class name
      */ 
     inline void
-    SetClassName        (const char* name) NOEXCEPT { 
+    SetClassName        (const char* name) NOEXCEPT {
         _name = name; 
     }
 
@@ -1082,7 +1082,7 @@ public:
      * @return          Size
      */
     inline size_t
-    Size () const NOEXCEPT {        
+    Size () const NOEXCEPT {
         return _M.size();
     }
 
