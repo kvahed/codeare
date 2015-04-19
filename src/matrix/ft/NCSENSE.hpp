@@ -28,6 +28,7 @@
 #include "Lapack.hpp"
 #include "tinyxml.h"
 #include "IOContext.hpp"
+#include "CGLS.hpp"
 
 #include "Workspace.hpp"
 
@@ -103,7 +104,8 @@ public:
 		Vector<size_t> sizesm = size(m_sm);
         m_nx.push_back(sizesm.back());             // NC
 		m_nx.push_back(unsigned_cast(params["nk"])*cart_dim); // NK
-        m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1, c_multiply<size_t>)/m_nx[1]); //NR
+        m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1,
+        		c_multiply<size_t>) / m_nx[1]); //NR
 
 		m_cgiter  = params.Get<size_t>("cgiter");
 		m_cgeps   = params.Get<double>("cgeps");
@@ -130,6 +132,8 @@ public:
 		m_fwd_out = Matrix<T> (m_nx[2],m_nx[1]);
 		m_bwd_out = Matrix<T> (size(m_sm));
 		
+		m_cgls = codeare::optimisation::CGLS<T>(m_cgiter, m_cgeps, m_lambda, m_verbose);
+
 	}
 
 
@@ -176,7 +180,8 @@ public:
 #pragma omp parallel for schedule (guided, 1)
 	    for (int j = 0; j < m_nx[1]; ++j) {
 	        int k = omp_get_thread_num();
-	        Column (m_fwd_out, j, m_fts[k] * (resize(((m_nx[0] == 2) ? Slice (m_sm, j) : Volume (m_sm, j)),size(m)) * m));
+	        Column (m_fwd_out, j, m_fts[k] * (resize(((m_nx[0] == 2) ?
+	        		Slice (m_sm, j) : Volume (m_sm, j)),size(m)) * m));
 	    }
 	    return m_fwd_out;
 	}
@@ -192,7 +197,8 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<T>
-	Trafo       (const Matrix<T>& m, const Matrix<T>& sens, const bool& recal = true) const NOEXCEPT {
+	Trafo       (const Matrix<T>& m, const Matrix<T>& sens,
+			const bool& recal = true) const NOEXCEPT {
 		return Trafo(m);
 	}
 
@@ -220,9 +226,11 @@ public:
 		for (int i = 0; i < m_nx[1]; ++i) {
 			m_fts[omp_get_thread_num()].NFFTPlan().M_total = nk;
 			if (m_nx[0] == 2)
-				Slice  (out, i, m_fts[omp_get_thread_num()] ->* data(Range(0,8191), Range(i)));
+				Slice  (out, i,
+						m_fts[omp_get_thread_num()] ->* data(Range(0,8191), Range(i)));
 			else
-				Volume (out, i, m_fts[omp_get_thread_num()] ->* data(Range(0,8191), Range(i)));
+				Volume (out, i,
+						m_fts[omp_get_thread_num()] ->* data(Range(0,8191), Range(i)));
             m_fts[omp_get_thread_num()].NFFTPlan().M_total = m_nx[2];
 		}
 	}
@@ -256,63 +264,7 @@ public:
 		if (m_sm.Size() == 1)
 			EstimateSensitivities(m);
 
-        RT rn, rno, xn, ts;
-		Matrix<T> p, r, x, q;
-		vector<RT> res;
-        Vector<Matrix<T> > vc;
-
-        typedef typename Vector<T>::iterator it_type;
-
-        const NCSENSE& E = *this;
-
-		p = (E/m) * m_ic;
-		if (m_cgiter == 0)
-			return p;
-
-		r  = p;
-        xn = real(p.dotc(p));
-        rn = xn;
-
-        if (m_verbose)
-            vc.push_back (p);
-
-		for (size_t i = 0; i < m_cgiter; i++) {
-			res.push_back(rn/xn);
-			if (i==0)
-				x  = zeros<T>(size(p));
-			if (boost::math::isnan(res.at(i)) || res.at(i) <= m_cgeps)
-				break;
-			if (m_verbose)
-				printf ("    %03lu %.7f\n", i, res.at(i));
-
-			q  = (E/(E*p)) * m_ic;
-			if (m_lambda)
-				q  += m_lambda * p;
-			ts  = rn / real(p.dotc(q));
-			x  += ts * p;
-			r  -= ts * q;
-			rno = rn;
-			rn  = real(r.dotc(r));
-			p  *= rn / rno;
-			p  += r;
-
-			if (m_verbose)
-				vc.push_back(x * m_ic);
-		}
-
-        if (m_verbose) { // Keep intermediate results
-            size_t cpsz = numel(x);
-            x = Matrix<T> (size(x,0), size(x,1), (m_nx[0] == 3) ? size(x,2) : 1, vc.size());
-            it_type it = x.Begin();
-            for (size_t i = 0; i < vc.size(); i++) {
-                std::copy (vc[i].Begin(), vc[i].End(), it);
-                it += cpsz;
-            }
-            vc.Clear();
-        } else
-            x *= m_ic;
-
-        return x;
+        return m_cgls.Solve(*this, m);
 
 	}
 	
@@ -335,11 +287,13 @@ public:
 		for (int j = 0; j < m_nx[1]; ++j) {
 	        int k = omp_get_thread_num();
 	        if (m_nx[0] == 2)
-	            Slice  (m_bwd_out, j, m_fts[k] ->* Column (m,j) * conj(Slice  (m_sm, j)));
+	            Slice  (m_bwd_out, j, m_fts[k] ->*
+	            		Column (m,j) * conj(Slice  (m_sm, j)));
 	        else
-	            Volume (m_bwd_out, j, m_fts[k] ->* Column (m,j) * conj(Volume (m_sm, j)));
+	            Volume (m_bwd_out, j, m_fts[k] ->*
+	            		Column (m,j) * conj(Volume (m_sm, j)));
 	    }
-	    return squeeze(sum(m_bwd_out,size(m_sm).size()-1));
+	    return squeeze(sum(m_bwd_out,size(m_sm).size()-1)) * m_ic;
 	}
 
 
@@ -389,6 +343,8 @@ private:
 	Matrix<RT> m_k, m_w;
 
 	mutable Matrix<T> m_fwd_out, m_bwd_out;
+
+	mutable codeare::optimisation::CGLS<T> m_cgls;
 
 };
 

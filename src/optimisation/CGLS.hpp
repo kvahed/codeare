@@ -9,81 +9,85 @@
 #define SRC_OPTIMISATION_CGLS_HPP_
 
 #include <Linear.hpp>
+#include <Lapack.hpp>
+#include <CX.hpp>
 
 namespace codeare {
 namespace optimisation {
 
 template<class T>
 class CGLS : public Linear<T> {
+	typedef typename TypeTraits<T>::RT RT;
 public:
-	CGLS (Optimisable* opt = 0, const int& verbosity = 0) :
-		Linear<T>::Linear(opt, verbosity), _nrows(1), _ncols(1), _epsilon(1.e-15) {
-	}
+	CGLS (const size_t& maxit = 10, const RT& epsilon = 1.0e-6,
+			const RT& lambda = 1.0e-6, const int& verbosity = 0) :
+				Linear<T>::Linear(verbosity), _verbosity(verbosity), _nrows(1),
+				_ncols(1), _maxit(maxit), _epsilon(epsilon), _lambda(lambda) {}
+
 	virtual ~CGLS () {}
-	int Solve () {
 
-		int ret = 0;
+	inline Matrix<T> Solve (const Operator<T>& A, const Matrix<T>& x) {
 
-		/*
-        T rn, rno, xn, ts;
-		Matrix<CT> p, r, x, q;
-		vector<T> res;
-        Vector<Matrix<cxfl> > vc;
+		Matrix<T> ret;
+        Vector<Matrix<T> > vc;
 
-        typedef typename Vector<CT>::iterator it_type;
+        typedef typename Vector<T>::iterator it_type;
 
-		p = EH (m, sens, m_nx, m_fts)* m_ic;
-		if (m_cgiter == 0)
-			return p;
+		_p = (A/x);// * m_ic;
+		if (_maxit == 0)
+			return _p;
 
-		r  = p;
-        xn = real(p.dotc(p));
-        rn = xn;
+		_r  = _p;
+        _xn = std::real(_p.dotc(_p));
+        _rn = _xn;
 
-        if (m_verbose)
-            vc.push_back (p);
-
-		for (size_t i = 0; i < m_cgiter; i++) {
-			res.push_back(rn/xn);
+		for (size_t i = 0; i < _maxit; i++) {
+			_res.push_back(_rn/_xn);
 			if (i==0)
-				x  = zeros<CT>(size(p));
-			if (boost::math::isnan(res.at(i)) || res.at(i) <= m_cgeps)
+				ret = zeros<T>(size(_p));
+			if (boost::math::isnan(_res[i]) || _res[i] <= _epsilon)
 				break;
-			if (m_verbose)
-				printf ("    %03lu %.7f\n", i, res.at(i));
-			q  = EH(E(p * m_ic, sens, m_nx, m_fts), sens, m_nx, m_fts) * m_ic;
-
-			if (m_lambda)
-				q  += m_lambda * p;
-			ts  = rn / real(p.dotc(q));
-			x  += ts * p;
-			r  -= ts * q;
-			rno = rn;
-			rn  = real(r.dotc(r));
-			p  *= rn / rno;
-			p  += r;
-			if (m_verbose)
-				vc.push_back(x * m_ic);
+			if (_verbosity)
+				printf ("    %03lu %.7f\n", i, _res[i]);
+			_q  = A/(A*_p);
+			if (_lambda)
+				_q += _lambda * _p;
+			_ts  = _rn / std::real(_p.dotc(_q));
+			ret += _ts * _p;
+			_r  -= _ts * _q;
+			_rno = _rn;
+			_rn  = std::real(_r.dotc(_r));
+			_p  *= _rn / _rno;
+			_p  += _r;
+			if (_verbosity)
+				vc.push_back(ret);
 		}
 
+		/*
         if (m_verbose) { // Keep intermediate results
-            size_t cpsz = numel(x);
-            x = Matrix<CT> (size(x,0), size(x,1), (m_nx[0] == 3) ? size(x,2) : 1, vc.size());
+            size_t cpsz = numel(ret);
+            ret = Matrix<T> (size(ret,0), size(ret,1), (m_nx[0] == 3) ?
+            		size(x,2) : 1, vc.size());
             it_type it = x.Begin();
             for (size_t i = 0; i < vc.size(); i++) {
                 std::copy (vc[i].Begin(), vc[i].End(), it);
                 it += cpsz;
             }
             vc.Clear();
-        } else
-            x *= m_ic;
-
- */
-		return ret;
+        }
+*/
+		return ret;// * m_ic;
 	}
+
 protected:
-	size_t _nrows, _ncols;
-	T _epsilon, _rel_mat_err, _rel_rhs_err, _lambda;
+	size_t _nrows, _ncols, _maxit;
+	RT _epsilon, _rel_mat_err, _rel_rhs_err, _lambda, _ts;
+	RT _rn, _xn, _rno;
+	Matrix<T> _p, _r, _q;
+    Vector<Matrix<cxfl> > vc;
+    Vector<RT> _res;
+	int _verbosity;
+
 };
 }}
 

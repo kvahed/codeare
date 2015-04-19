@@ -9,7 +9,7 @@
 #define _LINEAR_HPP_
 
 #include "Matrix.hpp"
-#include "Optimisable.hpp"
+#include "Operator.hpp"
 
 namespace codeare {
 namespace optimisation {
@@ -17,13 +17,12 @@ namespace optimisation {
 template<class T>
 class Linear {
 public:
-	Linear (Optimisable* opt = 0, const int& verbosity = 0) :
-		_opt(opt), _verbosity(verbosity) {}
+	Linear (const int& verbosity = 0) :	_verbosity(verbosity) {}
 	virtual ~Linear () {}
-	virtual int Minimise () = 0;
+	virtual Matrix<T> Solve (const Operator<T>& A, const Matrix<T>& b) = 0;
 protected:
 	int _verbosity;
-	Optimisable* _opt;
+	//const Operator<T>& _E;
 };
 
 }

@@ -56,60 +56,19 @@ public:
 		m_have_kspace(false) {};
 
     /**
-     * @brief          Construct NFFT plans for forward and backward FT with credentials
-     * 
-     * @param  imsize  Matrix of side length of the image space
-     * @param  nk      # k-space points
-     * @param  m       Spatial cut-off of FT
-     * @param  alpha   Oversampling factor
-     * @param  b0      Off-resonance maps if available
-     * @param  pc      Phase correction applied before forward or after adjoint transforms (default: empty)
-     * @param  eps     Convergence criterium for inverse transform (default: 1.0e-7)
-     * @param  maxit   Maximum # NFFT iterations (default: 3)
+     * @brief        Construct with parameter set
      */
-    inline NFFT (const Vector<size_t>& imsize, const size_t& nk, const size_t m = 1,
-    		const RT alpha = 1.0, const Matrix<RT> b0 = Matrix<RT>(1),
-            const Matrix<T> pc = Matrix<T>(1), const RT eps = 7.0e-4,
-			const size_t maxit = 2) NOEXCEPT :
-        m_have_b0(false), m_3rd_dim_cart(false), m_ncart(1), m_have_weights(false),
-		m_have_kspace(false){
-        
-        m_M     = nk;
-        m_imgsz = 2;
-        m_m = m;
-        
-        m_N = imsize;
-        m_n = m_N;//ceil (alpha*m_N);
-        
-        m_rank = numel(imsize);
-        
-        m_imgsz = 2*prod(m_N);
-        
-        m_epsilon = eps;
-        m_maxit   = maxit;
-        
-        NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
-        
-        if (pc.Size() > 1)
-            m_have_pc = true;
-        
-        m_pc   = pc;
-        m_cpc  = conj(pc);
-        
-        m_initialised = true;
-        
-    }
-    
-    
     inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_3rd_dim_cart(false),
-        m_t (Matrix<RT>(1)), m_b0 (Matrix<RT>(1)), m_maxit(3), m_m(1), m_alpha(1.),
-		m_epsilon(7.e-4f), m_sigma(1.0), m_ncart(1),  m_have_weights(false), m_have_kspace(false){
+        m_t (Matrix<RT>()), m_b0 (Matrix<RT>()), m_maxit(3), m_m(1), m_alpha(1.),
+		m_epsilon(7.e-4f), m_sigma(1.0), m_ncart(1),  m_have_weights(false),
+		m_have_kspace(false) {
                 
         if (p.exists("nk")) {// Number of kspace samples
             try {
                 m_M = unsigned_cast(p["nk"]);
             } catch (const boost::bad_any_cast& e) {
-                printf ("**ERROR - NFFT: Numer of ksppace samples need to be specified\n%s\n", e.what());
+                printf ("**ERROR - NFFT: Numer of ksppace samples need to be "
+                		"specified\n%s\n", e.what());
                 assert(false);
             }
         } else {
@@ -121,7 +80,8 @@ public:
         	try {
         		m_3rd_dim_cart = p.Get<bool>("3rd_dim_cart");
         	} catch (const boost::bad_any_cast&) {
-        		printf ("  WARNING - NFFT: Could not interpret input for Cartesian nature of 3rd dimension. \n");
+        		printf ("  WARNING - NFFT: Could not interpret input for "
+        				"Cartesian nature of 3rd dimension. \n");
         	}
         }
 
@@ -129,7 +89,8 @@ public:
             try {
                 m_N = boost::any_cast<Vector<size_t> >(p["imsz"]);
             } catch (const boost::bad_any_cast& e) {
-                printf ("**ERROR - NFFT: Image domain dimensions need to be specified\n%s\n", e.what());
+                printf ("**ERROR - NFFT: Image domain dimensions need to be "
+                		"specified\n%s\n", e.what());
                 assert(false);
             }
         } else {
@@ -147,8 +108,8 @@ public:
             try {
                 m_m = unsigned_cast (p["m"]);
             } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for oversampling factor m. "
-                        "Defaulting to 1.\n");
+                printf ("  WARNING - NFFT: Could not interpret input for "
+                		"oversampling factor m. Defaulting to 1.\n");
             }
         }
         
@@ -156,8 +117,8 @@ public:
             try {
                 m_alpha = fp_cast(p["alpha"]);
             } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for oversampling factor alpha. "
-                        "Defaulting to 1.0\n");
+                printf ("  WARNING - NFFT: Could not interpret input for "
+                		"oversampling factor alpha. Defaulting to 1.0\n");
             }
         }
         for (size_t i = 0; i < m_N.size(); ++i)
@@ -170,8 +131,8 @@ public:
             try {
                 m_epsilon = fp_cast (p["epsilon"]);
             } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for convergence criterium epsilon. "
-                        "Defaulting to 0.0007\n");
+                printf ("  WARNING - NFFT: Could not interpret input for "
+                		"convergence criterium epsilon. Defaulting to 0.0007\n");
             }
         }
         
@@ -179,8 +140,8 @@ public:
             try {
                 m_maxit = unsigned_cast (p["maxit"]);
             } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for maximum NFFT steps. "
-                        "Defaulting to 3\n");
+                printf ("  WARNING - NFFT: Could not interpret input for maximum "
+                		"NFFT steps. Defaulting to 3\n");
             }
         }
 
@@ -202,18 +163,18 @@ public:
             try {
                 m_t = p.Get<Matrix<RT> >("timing");
                 if (numel(m_t) != m_M)
-                    printf ("  WARNING - NFFT: kspace trajectory timing fit to trajectory. "
-                            "Defaulting to flat b0 = 0\n");
+                    printf ("  WARNING - NFFT: kspace trajectory timing fit "
+                    		"to trajectory. Defaulting to flat b0 = 0\n");
                 else
                     m_have_b0 = (m_have_b0 && true);
             } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for kspace trajectory timing. "
-                        "Defaulting to flat b0 = 0\n");
+                printf ("  WARNING - NFFT: Could not interpret input for kspace "
+                		"trajectory timing. Defaulting to flat b0 = 0\n");
             }
         }
         
         
-        if (m_have_b0) {
+        if (m_have_b0) { // b0
             
             m_min_t  = min(m_t);
             m_max_t  = max(m_t);
@@ -221,8 +182,9 @@ public:
             m_max_b0 = max(m_b0);
             m_sigma  = 1.2;
             
-            m_N.push_back(std::ceil(std::max(fabs(m_min_b0),fabs(m_max_b0)) *
-                                    m_max_t-m_min_t/2.+(m_m)/(2.*m_sigma))*4.*m_sigma);
+            m_N.push_back(std::ceil(std::max(
+            		fabs(m_min_b0),fabs(m_max_b0)) * m_max_t-m_min_t/2. +
+            		(m_m)/(2.*m_sigma))*4.*m_sigma);
             
             if (m_N.back()%2!=0)
                 m_N.back()++; // need even dimension
@@ -234,16 +196,14 @@ public:
             m_ts =  (m_min_t+m_max_t)/2.;
             RT t    = ((m_max_t-m_min_t)/2.)/(.5-((RT) (m_m))/m_N[2]);
 
-            //m_win = Window<RT> (m_m, m_N.back(), m_sigma);
-            
-        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);
+        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_sigma,
+        			m_b0_plan, m_solver);
 
             for (size_t j = 0; j < m_N[0]*m_N[1]; ++j)
                 m_b0_plan.w[j] = m_b0[j] / m_w;
 
 
         } else {
-
         	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
         }
         
@@ -310,9 +270,11 @@ public:
         m_3rd_dim_cart = ft.m_3rd_dim_cart;
         m_ncart       = ft.m_ncart;
         if (m_have_b0)
-        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);
+        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_sigma,
+        			m_b0_plan, m_solver);
         else
-        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
+        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_plan,
+        			m_solver);
         return *this;
         
     }
@@ -404,7 +366,8 @@ public:
 			//TODO: b0 not 2D+1D+1D
 			if (m_have_b0)
 				for (size_t j = 0; j < m.Size(); ++j) {
-					T val = tmpm[j] * std::polar<RT> ((RT)1., (RT)(2. * PI * m_ts * m_b0[j] * m_w));
+					T val = tmpm[j] * std::polar<RT> ((RT)1.,
+							(RT)(2. * PI * m_ts * m_b0[j] * m_w));
 					tmpd[2*j+0] = real(val);
 					tmpd[2*j+1] = imag(val);
 				}
@@ -452,9 +415,11 @@ public:
 			std::copy (tmpt, tmpt+2*m_M, tmpd);
 
 			if (m_have_b0)
-				NFFTTraits<std::complex<double> >::ITrafo ((B0Plan&) m_b0_plan, (Solver&) m_solver, m_maxit, m_epsilon);
+				NFFTTraits<std::complex<double> >::ITrafo ((B0Plan&) m_b0_plan,
+						(Solver&) m_solver, m_maxit, m_epsilon);
 			else
-				NFFTTraits<std::complex<double> >::ITrafo (  (Plan&)    m_plan, (Solver&) m_solver, m_maxit, m_epsilon);
+				NFFTTraits<std::complex<double> >::ITrafo (  (Plan&)    m_plan,
+						(Solver&) m_solver, m_maxit, m_epsilon);
 
 			tmpd = (double*) m_solver.f_hat_iter;
 			tmpt = (RT*) out.Ptr() + i*m_imgsz;
@@ -463,7 +428,8 @@ public:
 			//TODO: b0 not 2D+1D+1D
 			if (m_have_b0)
 				for (size_t j = 0; j < out.Size(); ++j)
-					out[j + i*m_imgsz / 2] *= std::polar<RT>((RT)1., (RT)(-2. * PI * m_ts * m_b0[j] * m_w));
+					out[j + i*m_imgsz / 2] *= std::polar<RT>((RT)1.,
+							(RT)(-2. * PI * m_ts * m_b0[j] * m_w));
 
         }
 

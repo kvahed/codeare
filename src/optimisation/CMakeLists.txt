@@ -16,5 +16,7 @@ if (${HAVE_EMMINTRIN_H})
 endif()
 
 add_library (codeare-optimisation SHARED ${OPMTIMISATION_SOURCE})
+target_link_libraries (codeare-optimisation  ${BLAS_LINKER_FLAGS}
+  ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES})
 list (APPEND INST_TARGETS codeare-optimisation)
 install (TARGETS ${INST_TARGETS} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib) 

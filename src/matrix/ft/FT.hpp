@@ -23,12 +23,13 @@
 
 #include "CX.hpp"
 #include "Params.hpp"
+#include "Operator.hpp"
 
 /**
  * @brief  Base class for single and double precision complex Fourier transforms
  */
 template <class T>
-class FT {
+class FT : public Operator<T> {
 
 	typedef typename TypeTraits<T>::RT RT;
 

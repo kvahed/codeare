@@ -48,7 +48,8 @@ public:
 	/**
 	 * @brief          Default constructor
 	 */
-	CSENSE() NOEXCEPT :  nthreads(1), compgfm(0), aaf(1), nc(1), initialised(0), ndim(1) {}
+	CSENSE() NOEXCEPT :  nthreads(1), compgfm(0), aaf(1), nc(1), initialised(0),
+			ndim(1) {}
 
 
 	/**
@@ -113,7 +114,8 @@ public:
 	Matrix<T>
 	Adjoint       (const Matrix<T>& m) const NOEXCEPT {
 
-		Matrix<T> res (dims[0]*af[0], dims[1]*af[1], (ndim == 3) ? dims[2]*af[2] : 1, (compgfm) ? 2 : 1);
+		Matrix<T> res (dims[0]*af[0], dims[1]*af[1], (ndim == 3) ?
+				dims[2]*af[2] : 1, (compgfm) ? 2 : 1);
 		Matrix<T> tmp = m;
 
 		omp_set_num_threads(nthreads);
@@ -152,7 +154,8 @@ public:
 								for (size_t yi = 0; yi < af[1]; yi++)
 									for (size_t xi = 0; xi < af[0]; xi++, i++) 
                                         s (c, i) = (ndim == 3) ?
-											sens (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], c):
+											sens (x + xi * dims[0], y + yi * dims[1],
+													z + zi * dims[2], c):
 											sens (x + xi * dims[0], y + yi * dims[1],                   c);
                             
 						}
@@ -181,25 +184,32 @@ public:
                                 for (size_t xi = 0; xi < af[0]; xi++, i++) {
 #if defined (_MSC_VER) && (_MSC_VER < 1600)
 									if (ndim == 3)
-										res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 0) = rp [i];
+										res (x + xi * dims[0], y + yi * dims[1],
+												z + zi * dims[2], 0) = rp [i];
 									else
-										res (x + xi * dims[0], y + yi * dims[1],                   0) = rp [i];
+										res (x + xi * dims[0], y + yi * dims[1],
+												0) = rp [i];
                                     if (compgfm) {
 										if (ndim == 3)
-											res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 1) = sqrt(abs(gf [i]));
+											res (x + xi * dims[0], y + yi * dims[1],
+													z + zi * dims[2], 1) = sqrt(abs(gf [i]));
 										else
 											res (x + xi * dims[0], y + yi * dims[1],                   1) = sqrt(abs(gf [i]));
                                     }
 #else
 									if (ndim == 3)
-										res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 0) = rp [i];
+										res (x + xi * dims[0], y + yi * dims[1],
+												z + zi * dims[2], 0) = rp [i];
 									else
-										res (x + xi * dims[0], y + yi * dims[1],                0, 0) = rp [i];
+										res (x + xi * dims[0], y + yi * dims[1],
+												0, 0) = rp [i];
                                     if (compgfm) {
 										if (ndim == 3)
-											res (x + xi * dims[0], y + yi * dims[1], z + zi * dims[2], 1) = sqrt(abs(gf [i]));
+											res (x + xi * dims[0], y + yi * dims[1],
+													z + zi * dims[2], 1) = sqrt(abs(gf [i]));
 										else
-											res (x + xi * dims[0], y + yi * dims[1],                0, 1) = sqrt(abs(gf [i]));
+											res (x + xi * dims[0], y + yi * dims[1],
+													0, 1) = sqrt(abs(gf [i]));
                                     }
                                 
 #endif
