@@ -29,18 +29,12 @@ public:
 	inline Matrix<T> Solve (const Operator<T>& A, const Matrix<T>& x) {
 
 		Matrix<T> ret;
-        Vector<Matrix<T> > vc;
 
-        typedef typename Vector<T>::iterator it_type;
-
-		_p = (A/x);// * m_ic;
+		_p = (A/x);
 		if (_maxit == 0)
 			return _p;
-
 		_r  = _p;
-        _xn = std::real(_p.dotc(_p));
-        _rn = _xn;
-
+        _rn = _xn = std::real(_p.dotc(_p));
 		for (size_t i = 0; i < _maxit; i++) {
 			_res.push_back(_rn/_xn);
 			if (i==0)
@@ -59,23 +53,8 @@ public:
 			_rn  = std::real(_r.dotc(_r));
 			_p  *= _rn / _rno;
 			_p  += _r;
-			if (_verbosity)
-				vc.push_back(ret);
 		}
 
-		/*
-        if (m_verbose) { // Keep intermediate results
-            size_t cpsz = numel(ret);
-            ret = Matrix<T> (size(ret,0), size(ret,1), (m_nx[0] == 3) ?
-            		size(x,2) : 1, vc.size());
-            it_type it = x.Begin();
-            for (size_t i = 0; i < vc.size(); i++) {
-                std::copy (vc[i].Begin(), vc[i].End(), it);
-                it += cpsz;
-            }
-            vc.Clear();
-        }
-*/
 		return ret;// * m_ic;
 	}
 
