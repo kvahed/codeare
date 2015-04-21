@@ -13,15 +13,15 @@
 namespace codeare {
     namespace optimisation {
         
-        template<class T>
-        class LBFGS : public NonLinear<T> {
-            
-        public:
-            LBFGS (const size_t& iterations) : NonLinear<T>::NonLinear(iterations)  {};
-            virtual ~LBFGS() {};
-        private:
-            
-        };
+template<class T>
+class LBFGS : public NonLinear<T> {
+
+public:
+	LBFGS (const size_t& iterations) : NonLinear<T>::NonLinear(iterations)  {};
+	virtual ~LBFGS() {};
+private:
+
+};
         
     }}
 

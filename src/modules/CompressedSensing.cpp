@@ -417,7 +417,7 @@ codeare::error_code CompressedSensing::Process () {
 		im_dc /= pdf;
 	im_dc  = ft ->* im_dc;
 
-	ma       = max(abs(im_dc));
+	ma     = max(abs(im_dc));
 
 	if (m_verbose)
 		vc.push_back(im_dc);
@@ -439,8 +439,7 @@ codeare::error_code CompressedSensing::Process () {
         im_dc = zeros<cxfl> (size(im_dc,0), size(im_dc,1), (m_dim == 3) ?
         		size(im_dc,2) : 1, vc.size());
         for (size_t i = 0; i < vc.size(); i++)
-            memcpy (&im_dc[i*cpsz], &(vc[i][0]), cpsz*sizeof(cxfl));
-
+        	std::copy (&vc[i][0], &vc[i][0]+cpsz, &im_dc[i*cpsz]);
     } else
         im_dc = dwt ->* im_dc*ma;
 
@@ -467,7 +466,6 @@ CompressedSensing::Finalise() {return codeare::OK;}
 extern "C" DLLEXPORT ReconStrategy* create  ()                 {
     return new CompressedSensing;
 }
-
 
 extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
     delete p;

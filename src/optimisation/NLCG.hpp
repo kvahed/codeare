@@ -13,15 +13,15 @@
 namespace codeare {
     namespace optimisation {
         
-        template<class T>
-        class NLCG : public NonLinear<T> {
-            
-        public:
-            NLCG (const size_t& iterations) : NonLinear<T>::NonLinear (iterations)  {};
-            virtual ~NLCG() {};
-        private:
-            
-        };
+template<class T> class NLCG : public NonLinear<T> {
+
+public:
+	NLCG (const size_t& iterations) : NonLinear<T>::NonLinear (iterations)  {};
+	virtual ~NLCG() {};
+	inline Matrix<T> Minimize () {	}
+private:
+
+};
         
     }}
 

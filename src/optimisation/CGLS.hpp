@@ -15,9 +15,10 @@
 namespace codeare {
 namespace optimisation {
 
-template<class T>
-class CGLS : public Linear<T> {
+template<class T> class CGLS : public Linear<T> {
+
 	typedef typename TypeTraits<T>::RT RT;
+
 public:
 	CGLS (const size_t& maxit = 10, const RT& epsilon = 1.0e-6,
 			const RT& lambda = 1.0e-6, const int& verbosity = 0) :
