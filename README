@@ -35,7 +35,7 @@ Linux optimised compilation examples:
 Test runs:
 
 Mac OS X, Quad-core Intel Core i7 @ 2.5GHz
-Accelerate framework: 17.9s
+Accelerate framework: 17.8s
 
 Ubuntu Linux, 12-core Intel Xeon E5-2680v3 @ 2.50GHz
 Test run On Intel Xeon E5-2680v3 @ 2.50GHz: 
@@ -49,6 +49,6 @@ MKL:              43.2s
 OpenBLAS + ATLAS: 46.6s
 
 Windows 8.1, 4-core Core i5 @ 1.9GHz
-MKL 15.0:         44.0s
+MKL 15.0:         42.7s
 
 For more information refer to http://codeare.org
