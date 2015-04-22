@@ -18,7 +18,7 @@ template<class T> class NLCG : public NonLinear<T> {
 public:
 	NLCG (const size_t& iterations) : NonLinear<T>::NonLinear (iterations)  {};
 	virtual ~NLCG() {};
-	inline Matrix<T> Minimize () {	}
+	inline Matrix<T> Minimize() { return Matrix<T>(); }
 private:
 
 };

@@ -48,5 +48,7 @@ OpenBLAS + ATLAS: 46.6s
 MKL:              47.0s
 ACML:             42.7s
 
+Windows 8.1, 4-core Core i5 @ 1.9GHz
+MKL 15.0:         44.0s
 
 For more information refer to http://codeare.org

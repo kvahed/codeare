@@ -428,7 +428,6 @@ ellipsoid (const float* p, const size_t n, const T s) {
 
 	float m[3];
 	float a[3];
-	float d;
 
 	a[0] = p[0] * float(n) / 2.0;
 	a[1] = p[1] * float(n) / 2.0;
