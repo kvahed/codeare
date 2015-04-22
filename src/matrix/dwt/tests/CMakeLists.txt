@@ -17,15 +17,7 @@ if (${MSVC})
 else()
   set (COMLIBS ${HDF5_LIBRARIES})
   if(${MATLAB_FOUND})
-<<<<<<< HEAD
     list (APPEND COMLIBS  mx mat)
-=======
-<<<<<<< HEAD
-    list (APPEND COMLIBS ${MATLAB_LIBRARY_DIRS})
-=======
-    list (APPEND COMLIBS  mx mat)
->>>>>>> b450193f5e531dabcc0a09ff5224acc1ca2fbbfc
->>>>>>> c264ad4da08f67481e56e8e9e9cae9c4638a29fa
   endif()
 endif()
 
