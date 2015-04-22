@@ -16,11 +16,39 @@ add_test(colon t_colon)
 add_executable(t_sort t_sort.cpp)
 add_test(sort t_sort)
 
-add_executable(t_tvop t_tvop.cpp)
+set (COMLIBS ${FFTW3_LIBRARIES})
 if (${MSVC})
-  target_link_libraries (t_tvop ${FFTW3_LIBRARIES} hdf5 hdf5_cpp)
+  list (APPEND COMLIBS hdf5 hdf5_cpp)
+  if(${MATLAB_FOUND})
+    list (APPEND COMLIBS libmx libmat)
+  endif()
 else()
-  target_link_libraries (t_tvop ${FFTW3_LIBRARIES} ${HDF5_LIBRARIES})
+  list (APPEND COMLIBS ${HDF5_LIBRARIES})
+  if(${MATLAB_FOUND})
+    list (APPEND COMLIBS ${MATLAB_LIBRARY_DIRS})
+  endif()
 endif()
-add_test(tvop t_tvop)
+
+add_executable(t_tvop t_tvop.cpp)
+target_link_libraries (t_tvop ${COMLIBS})
+
+include (TestMacro)
+
+if (${WINDOWS})
+  set (LD_ENV "PATH=%PATH%")
+  list (APPEND LD_ENV ${HDF5_TOOLS_DIR})
+  list (APPEND LD_ENV Release)
+endif()
+
+if(${MATLAB_FOUND})
+  if (${WINDOWS}) 
+    set (LD_ENV "${LD_ENV}\;${MATLAB_ROOT}/bin/win64") 
+  else ()
+    set (LD_ENV "${LD_ENV}:${MATLAB_LIBRARY_DIRS}")
+  endif ()
+endif()
+
+set (TEST_CALL t_tvop)  
+MP_TESTS ("tvop" "${TEST_CALL}")
+
 

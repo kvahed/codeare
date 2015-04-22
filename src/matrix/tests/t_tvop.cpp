@@ -14,6 +14,7 @@ int test_2d () {
     fwrite (f, B);
     fwrite (f, C);
     fclose (f);
+	return 0;
 }
 
 int test_3d () {
@@ -26,6 +27,7 @@ int test_3d () {
     fwrite (f, B);
     fwrite (f, C);
     fclose (f);
+	return 0;
 }
 
 int main (int narg, char** argv) {

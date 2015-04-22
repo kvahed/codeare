@@ -123,10 +123,12 @@ endif()
 
 if (${WINDOWS}) 
   set (LD_ENV "${LD_ENV}\;${Boost_LIBRARY_DIRS}")
+  set (LD_ENV "${LD_ENV}\;${OPENSSL_ROOT_DIR}")
+  set (LD_ENV "${LD_ENV}\;${FFTW3_INCLUDE_DIR}")
+  set (LD_ENV "${LD_ENV}\;${NFFT_INCLUDE_DIR}/../bin")
 else ()
   set (LD_ENV "${LD_ENV}:${Boost_LIBRARY_DIRS}")
 endif ()
-
 
 if (${MATLAB_FOUND})
   if (${WINDOWS}) 
@@ -170,8 +172,6 @@ endif ()
 if (${WINDOWS})
   string(REPLACE "/" "\\" LD_ENV "${LD_ENV}")
 endif()
-
-message(${LD_ENV})
 
 # Test macro -------------------------------------------------------- 
 include (TestMacro)

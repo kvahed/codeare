@@ -14,9 +14,9 @@ template<class T> class Operator {
 public:
 	Operator () {}
 	virtual ~Operator () {}
-	virtual Matrix<T> operator* (const Matrix<T>&) const {};
-	virtual Matrix<T> operator->* (const Matrix<T>&) const {};
-	virtual Matrix<T> operator/ (const Matrix<T>&) const {};
+	virtual Matrix<T> operator* (const Matrix<T>&) const { return Matrix<T>(); }
+	virtual Matrix<T> operator->* (const Matrix<T>&) const { return Matrix<T>(); }
+	virtual Matrix<T> operator/ (const Matrix<T>&) const { return Matrix<T>(); }
 };
 
 
