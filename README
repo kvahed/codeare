@@ -39,9 +39,9 @@ Accelerate framework: 17.9s
 
 Ubuntu Linux, 12-core Intel Xeon E5-2680v3 @ 2.50GHz
 Test run On Intel Xeon E5-2680v3 @ 2.50GHz: 
-MKL:              27.3s
-ACML:             23.0s
-OpenBLAS + ATLAS: 30.1s
+MKL:              26.0s
+ACML:             28.0s
+OpenBLAS + ATLAS: 29.2s
 
 Ubuntu Linux, 16-core AMD Opteron 6300 @ 2.4GHz
 OpenBLAS + ATLAS: 46.6s

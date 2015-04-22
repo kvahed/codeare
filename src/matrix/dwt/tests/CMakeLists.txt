@@ -17,7 +17,7 @@ if (${MSVC})
 else()
   set (COMLIBS ${HDF5_LIBRARIES})
   if(${MATLAB_FOUND})
-    list (APPEND COMLIBS ${MATLAB_LIBRARY_DIRS})
+    list (APPEND COMLIBS  mx mat)
   endif()
 endif()
 
