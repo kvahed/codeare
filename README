@@ -44,9 +44,9 @@ ACML:             28.0s
 OpenBLAS + ATLAS: 29.2s
 
 Ubuntu Linux, 16-core AMD Opteron 6300 @ 2.4GHz
-OpenBLAS + ATLAS: 46.6s
-MKL:              47.0s
 ACML:             42.7s
+MKL:              43.2s
+OpenBLAS + ATLAS: 46.6s
 
 
 For more information refer to http://codeare.org
