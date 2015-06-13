@@ -335,7 +335,7 @@ public:
         Matrix<T> out (m_M, ((m_3rd_dim_cart && m_ncart > 1) ? m_ncart : 1));
         Matrix<T> tmpm = m;
 
-        if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
+/*        if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
         	int n = static_cast<int>(m_ncart);
         	tmpm = permute (tmpm, 2, 0, 1);
         	size_t cent = std::ceil(.5*m_ncart);
@@ -355,7 +355,7 @@ public:
 				Column (tmpm, i, tmp);
         	}
         	tmpm = permute (tmpm, 1, 2, 0)/sqrt((RT)m_ncart);
-        }
+            }*/
 
 
         for (size_t i = 0; i < m_ncart; ++i) {
@@ -433,7 +433,7 @@ public:
 
         }
 
-        if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
+/*        if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
         	int n = static_cast<int>(m_ncart);
         	out = permute (out, 2, 0, 1);
         	size_t cent = std::ceil(.5*m_ncart);
@@ -453,7 +453,7 @@ public:
 				Column (out, i, tmp);
         	}
         	out = permute (out, 1, 2, 0)/sqrt((RT)m_ncart);
-        }
+            }*/
 
         return out;
         

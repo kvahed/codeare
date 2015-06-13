@@ -91,10 +91,6 @@ inline static Vector<size_t> Range (int begin, int end) {
 	return Range(begin, 1, end);
 }
 
-#include <boost/tuple/tuple.hpp>
-
-
-
 //template<class T> class Matrix;
 #include "Vector.hpp"
 

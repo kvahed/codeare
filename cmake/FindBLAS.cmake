@@ -521,7 +521,6 @@ if (BLA_VENDOR MATCHES "Intel*" OR BLA_VENDOR STREQUAL "All")
 	    "mkl_gf_lp64 mkl_intel_thread mkl_core iomp5")
 	endif ()
       endif ()
-message (${BLAS_SEARCH_LIBS})
       #older vesions of intel mkl libs
       if (BLA_VENDOR STREQUAL "Intel" OR BLA_VENDOR STREQUAL "All")
 	list(APPEND BLAS_SEARCH_LIBS

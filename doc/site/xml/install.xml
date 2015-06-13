@@ -16,10 +16,20 @@
         libboost-dev libboost-system-dev libboost-thread-dev \
         libboost-program-options-dev libboost-timer-dev libnifti-dev \
         liblapack-dev libgsl0-dev omniorb-nameserver libomniorb4-dev \
-        omniidl libatlas-dev libatlas-base-dev autoconf libtool \
-	    libinsighttoolkit3-dev libhdf5-dev libnfft3-dev
+        omniidl libatlas-dev libatlas-base-dev libtool cmake \
+	    libinsighttoolkit3-dev libhdf5-serial-dev libnfft3-dev
     </pre>
 
+    <p class="lead">
+      Fedora
+    </p>
+    
+	<h3>Installing prerequisites</h3>
+    <pre class="sh_sh">
+      > sudo yum -y install boost-devel gcc-g++ fftw-devel \
+      openblas-devel lapack-devel libgsl0-dev omniorb-nameserver \
+      libomniorb4-dev cmake openssl-devel 
+    </pre>
 
 	<h3>ISMRMRD</h3>
     <p>Stronlgy suggested for building in ISMRMRD support</p>

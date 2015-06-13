@@ -6,13 +6,15 @@
  */
 #include "CGLS.hpp"
 
-using namespace codeare::optimisation;
+namespace codeare {
+    namespace optimisation {
 
 template class CGLS<float>;
 template class CGLS<double>;
 template class CGLS<std::complex<float> >;
 template class CGLS<std::complex<double> >;
 
+    }}
 
 
 

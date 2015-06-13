@@ -106,6 +106,8 @@ codeare::error_code XDGRASP::Process () {
     kdata = kdata(Range(), Range(1,size(kdata,1)-1), Range());
 	Vector<size_t> n = size(kdata);
 
+	size_t nspokes = 28;// the trajectory has 2328 interleaves
+	                    // and each interleave has 28 spokes
 
 	m_nt = (size_t)std::floor((float)n[VIEW]/
 			(float)(unsigned_cast(m_params["ntres"])*unsigned_cast(m_params["nlines"])));

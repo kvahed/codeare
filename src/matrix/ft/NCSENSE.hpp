@@ -129,7 +129,10 @@ public:
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
 
-		m_fwd_out = Matrix<T> (m_nx[2],m_nx[1]);
+		if (m_3rd_dim_cart)
+            m_fwd_out = Matrix<T> (m_nx[2]/cart_dim,cart_dim,m_nx[1]);
+        else
+            m_fwd_out = Matrix<T> (m_nx[2],cart_dim,m_nx[1]);
 		m_bwd_out = Matrix<T> (size(m_sm));
 		
 		m_cgls = codeare::optimisation::CGLS<T>(m_cgiter, m_cgeps, m_lambda, m_verbose);
@@ -180,8 +183,11 @@ public:
 #pragma omp parallel for schedule (guided, 1)
 	    for (int j = 0; j < m_nx[1]; ++j) {
 	        int k = omp_get_thread_num();
-	        Column (m_fwd_out, j, m_fts[k] * (resize(((m_nx[0] == 2) ?
-	        		Slice (m_sm, j) : Volume (m_sm, j)),size(m)) * m));
+            if (m_3rd_dim_cart)
+                Slice  (m_fwd_out, j, m_fts[k] * (resize(Volume (m_sm, j),size(m)) * m));
+            else
+                Column (m_fwd_out, j, m_fts[k] * (resize(((m_nx[0] == 2) ?
+                        Slice (m_sm, j) : Volume (m_sm, j)),size(m)) * m));
 	    }
 	    return m_fwd_out;
 	}

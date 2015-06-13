@@ -9,8 +9,6 @@ set (PACKAGE_NAME "codeare")
 set (PACKAGE_VERSION "${PROJECT_VERSION}")
 set (top_srcdir "${PROJECT_SOURCE_DIR}")
 
-#include(CMakeFortranCompiler)
-
 # CMake --------------------------------------------------------------
 cmake_minimum_required (VERSION 2.8)
 enable_testing()
@@ -72,6 +70,12 @@ endif ()
 if (${HAS_CXX11_NOEXCEPT}) 
   add_definitions (-DHAVE_CXX11_NOEXCEPT)
 endif ()
+if (${HAS_CXX11_TUPLE}) 
+  add_definitions (-DHAVE_CXX11_TUPLE)
+endif ()
+if (${HAS_CXX11_CONDITIONAL}) 
+  add_definitions (-DHAVE_CXX11_CONDITIONAL)
+endif ()
 #if (${HAS_CXX11_THREAD})  IMMATURE IMPL?
 #  add_definitions (-DHAVE_CXX11_THREAD)
 #endif ()
@@ -96,7 +100,6 @@ link_directories (${BOOST_LIBRARYDIR})
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
-
 
 # MATLAB --------------------------------------------------------------
 find_package(Matlab)

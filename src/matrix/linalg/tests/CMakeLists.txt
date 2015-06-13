@@ -16,6 +16,10 @@ add_executable (t_svd t_svd.cpp)
 target_link_libraries (t_svd ${COMMON_LIBS})
 add_test (svd t_svd)
 
+add_executable (t_pca t_pca.cpp)
+target_link_libraries (t_pca ${COMMON_LIBS})
+add_test (pca t_pca)
+
 add_executable (t_gemv t_gemv.cpp)
 target_link_libraries (t_gemv ${COMMON_LIBS})
 add_test (gemv t_gemv)

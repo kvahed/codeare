@@ -24,6 +24,7 @@
 #  HAS_CXX11_THREAD             - thread
 #  HAS_CXX11_MUTEX              - mutex 
 #  HAS_CXX11_NOEXCEPT           - noexcept 
+#  HAS_CXX11_CONDITIONAL        - conditional type definitions
 
 #=============================================================================
 # Copyright 2011,2012 Rolf Eike Beer <eike@sf-mail.de>
@@ -155,3 +156,4 @@ cxx11_check_feature("weak_ptr" HAS_CXX11_WEAK_PTR)
 cxx11_check_feature("thread" HAS_CXX11_THREAD)
 cxx11_check_feature("mutex" HAS_CXX11_MUTEX)
 cxx11_check_feature("noexcept" HAS_CXX11_NOEXCEPT)
+cxx11_check_feature("conditional" HAS_CXX11_CONDITIONAL)

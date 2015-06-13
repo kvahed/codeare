@@ -56,6 +56,14 @@
 #include <cstring>
 #include <algorithm>
 #include <utility>
+#include <typeinfo>
+
+#ifdef HAS_CXX11_TUPLE
+	#include <tuple>
+#else
+	#include <boost/tuple/tuple.hpp>
+#endif
+
 
 #include <Assert.hpp>
 
@@ -100,7 +108,138 @@ class Matrix {
 	
 public:
     
-    
+#ifdef HAVE_CXX11_CONDITIONAL
+
+    template<bool is_const = true> class ConstNoConstView {
+    public:
+
+        class Range {
+        public:
+            Range () :
+                _stride(1), _begin(0), _end(0) {}
+            Range (const size_t& begin, const size_t& end) :
+                _stride(1), _begin(begin), _end(end) {
+                assert (_end>=_begin);
+                _idx.resize(_end-begin+1);
+                for (size_t i = 0; i < _idx.size(); ++i)
+                    _idx[i] = _begin + i;
+            }
+            Range (const size_t& begin, const size_t& stride, const size_t& end) :
+                _stride(stride), _begin(begin), _end(end){
+                assert (_stride != 0);
+                if (_stride > 0)
+                    assert (_end>=_begin);
+                else
+                    assert (_end<=_begin);
+                _idx.resize(std::floor(((float)_end-(float)_begin)/(float)_stride)+1);
+                for (size_t i = 0; i < _idx.size(); ++i)
+                    _idx[i] = _begin + i*_stride;
+            }
+            Range (const std::string& rs) {
+                ParseRange(rs);
+            }
+            Range (const char* rcs) {
+                ParseRange(std::string(rcs));
+            }
+            void ParseRange (const std::string& rs) {
+                // TODO: Parse string
+            }
+            virtual ~Range() {}
+            const size_t Begin() const {
+                return _begin;
+            }
+            const size_t End() const {
+                return _end;
+            }
+            inline size_t Size() const {
+                return _idx.size();
+            }
+            inline size_t IsSingleton() const {
+                return (_idx.size()==1);
+            }
+            inline size_t operator[] (const size_t& i) const { return _idx[i]; }
+        private:
+            friend std::ostream& operator<< (std::ostream &os, const Range& r) {
+                return os << r._idx.size() << ": " << r._begin << ":"
+                          << r._stride << ":" << r._end;
+            }
+            long _stride;
+            size_t _begin, _end;
+            std::vector<size_t> _idx;
+        };
+
+        typedef typename std::conditional<is_const, const Matrix, Matrix>::type MatrixType;
+        typedef typename std::conditional<is_const, const T, T>::type Type;
+
+        ConstNoConstView () : _matrix(0) {}
+        ConstNoConstView (MatrixType* matrix, std::vector<Range> range) :
+            _matrix(matrix), _range(range) {
+            assert (_range.size());
+            for (size_t i = 0; i < _range.size(); ++i)
+                if (!_range[i].IsSingleton())
+                    _nsdims.push_back(i);
+            if (_range.size() == 1)
+                for (size_t i = 0; i < _range[0].Size(); ++i)
+                    _pointers.push_back(matrix->ptr()+_range[0][i]);
+            if (_range.size() == 2)
+                for (size_t j = 0; j < _range[1].Size(); ++j)
+                    for (size_t i = 0; i < _range[0].Size(); ++i)
+                        _pointers.push_back(&((*_matrix)(range[0][i],range[1][j])));
+            for (auto it = _range.begin(); it != _range.end();)
+                if(it->IsSingleton())
+                    it = _range.erase(it);
+                else
+                    ++it;
+            std::cout << *this << std::endl;
+        }
+
+        virtual ~ConstNoConstView () { _matrix = 0; }
+
+        ConstNoConstView& operator= (const ConstNoConstView<true>& v) {
+            Matrix& lhs = *_matrix;
+            const Matrix& rhs = *(v._matrix);
+            assert (_nsdims.size() == v._nsdims.size());
+            for (size_t i = 0; i < _nsdims.size(); ++i)
+                assert(_range[i].Size()==v._range[i].Size());
+            for (size_t i = 0; i < _pointers.size(); ++i)
+                *_pointers[i] = *(v._pointers)[i];
+            return *this;
+        }
+        ConstNoConstView& operator= (const Type& t) {
+            assert (_matrix);
+            for (size_t i = 0; i < _pointers.size(); ++i)
+                *_pointers[i] = t;
+            return *this;
+        }
+
+        Range& Rng() { return _range; }
+        const size_t Size() const {return _range[0].End() - _range[0].Begin();}
+
+        MatrixType* _matrix;
+        std::vector<Range> _range;
+        std::vector<Type*> _pointers;
+        std::vector<size_t> _nsdims;
+
+    private:
+        friend std::ostream& operator<< (std::ostream &os, const ConstNoConstView& r) {
+            os << "(";
+            for (size_t i = 0; i < r._range.size(); ++i) {
+                if (i)
+                    os << ",";
+                os << r._range[i];
+            }
+            return os << ")" << std::endl;
+        }
+
+    };
+
+    typedef ConstNoConstView<true> ConstView;
+    typedef ConstNoConstView<false> View;
+    typedef typename ConstNoConstView<true>::Range ConstRange;
+    typedef typename ConstNoConstView<false>::Range Range;
+
+#endif
+
     /**
      * @name Constructors and destructors
      *       Constructors and destructors
@@ -111,14 +250,10 @@ public:
     /**
      * @brief           Contruct 1-dim with single element.
      */
-	inline
-    Matrix              () NOEXCEPT {
-
+	inline Matrix () NOEXCEPT {
         _dim.resize(1,1);
         _res.resize(1,1.0);
-        
         Allocate();
-        
     }
 	
 	
@@ -127,19 +262,14 @@ public:
      *
      * @param  dim      All dimensions
      */
-	inline
-    Matrix              (const Vector<size_t>& dim) NOEXCEPT {
-
+	inline Matrix (const Vector<size_t>& dim) NOEXCEPT {
 	    size_t ds = dim.size();
 	    assert(ds &&
 	    	   std::find(dim.begin(),dim.end(),size_t(0))==dim.end());
-
 		_dim.resize(ds);
 		std::copy (dim.begin(),dim.end(),_dim.begin());
 		_res.resize(ds,1.0);
-
         Allocate();
-		
 	}
 	
 	
@@ -149,18 +279,13 @@ public:
      * @param  dim      All 16 Dimensions
      * @param  res      All 16 Resolutions
      */
-	inline explicit
-    Matrix              (const Vector<size_t>& dim, const Vector<float>& res) NOEXCEPT {
-		
+	inline explicit Matrix (const Vector<size_t>& dim, const Vector<float>& res) NOEXCEPT {
 	    assert(!dim.Empty() &&
 	    	    std::find(dim.begin(),dim.end(),size_t(0))==dim.end() &&
 	    	    dim.size() == res.size());
-
 		_dim = dim;
 		_res = res;
-
         Allocate();
-		
 	}
 
     
@@ -176,18 +301,11 @@ public:
      */
     inline explicit
     Matrix (const size_t n) NOEXCEPT {
-
 	    assert (n);
-
 		_dim.resize(2,n);
 	    _res.resize(2,1.0);
-
         Allocate();
-        
 	}
-
-
-
     
     
     /**
@@ -201,20 +319,14 @@ public:
      * @param  m        Rows
      * @param  n        Columns
      */
-    inline
-    Matrix              (const size_t m, const size_t n) NOEXCEPT {
-
+    inline Matrix (const size_t m, const size_t n) NOEXCEPT {
     	assert (m && n);
-
     	_dim.resize(2); _dim[0] = m; _dim[1] = n;
 		_res.resize(2,1.0);
-
         Allocate();
-
     }
 
-    
-    
+
     /**
      * @brief           Construct 3D volume
      *
@@ -227,16 +339,11 @@ public:
      * @param  n        Columns
      * @param  k        Slices
      */
-    inline
-    Matrix (const size_t m, const size_t n, const size_t k) NOEXCEPT {
-
+    inline Matrix (const size_t m, const size_t n, const size_t k) NOEXCEPT {
 	    assert (m && n && k);
-
     	_dim.resize(3); _dim[0] = m; _dim[1] = n; _dim[2] = k;
 		_res.resize(3,1.0);
-
         Allocate();
-
     }
     
 
@@ -2142,8 +2249,13 @@ public:
     	return *this;
     }
 
+#ifdef HAVE_CXX11_TUPLE
+    typedef typename std::tuple<Matrix<T>&, Vector<Vector<size_t> > > MRange;
+    typedef typename std::tuple<const Matrix<T>&, const Vector<const Vector<size_t>& > > ConstMRange;
+#else
     typedef typename boost::tuple<Matrix<T>&, Vector<Vector<size_t> > > MRange;
     typedef typename boost::tuple<const Matrix<T>&, const Vector<const Vector<size_t>& > > ConstMRange;
+#endif
 
     inline const Matrix<T> operator() (Vector<size_t> range) const {
     	Matrix<T> ret;
@@ -2242,6 +2354,7 @@ public:
     inline Matrix<T>
     operator() (Vector<size_t> range0, Vector<size_t> range1,
     		Vector<size_t> range2, Vector<size_t> range3) const {
+
     	if (range0.size() == 0) {
 			range0.resize(_dim[0]);
 			for (size_t i = 0; i < _dim[0]; ++i)
@@ -2271,20 +2384,21 @@ public:
     		throw RANGE_DOES_NOT_FIT_MATRIX_DIMS;
 
     	Matrix<T> ret (range0.size(),range1.size(),range2.size(),range3.size());
-
+        
 		for (size_t l = 0; l < range3.size(); ++l)
 			for (size_t k = 0; k < range2.size(); ++k)
 				for (size_t j = 0; j < range1.size(); ++j)
 					for (size_t i = 0; i < range0.size(); ++i)
 						ret (i,j,k,l) = At(range0[i],range1[j],range2[k],range3[l]);
 		return ret;
+        
     }
 
     inline Matrix<T>
     operator() (const std::string& range) const {
+
     	Matrix<T> ret;
     	Vector<Vector<size_t> > view;
-
     	try {
     		view = RangeParser (range, _dim);
     	} catch (const RangeParseException&) {
@@ -2321,7 +2435,7 @@ public:
                     for (size_t k = 0; k < view[2].size(); ++k)
                         for (size_t j = 0; j < view[1].size(); ++j)
                             for (size_t i = 0; i < view[0].size(); ++i)
-                                ret (i,j,k,l,m) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l],view[4][l]);
+                                ret (i,j,k,l,m) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l],view[4][m]);
         } else if (view.size() == 6) {
             ret = Matrix<T>(view[0].size(),view[1].size(),view[2].size(),view[3].size(),view[4].size(),view[5].size());
     		for (size_t n = 0; n < view[5].size(); ++n)
@@ -2330,7 +2444,7 @@ public:
                         for (size_t k = 0; k < view[2].size(); ++k)
                             for (size_t j = 0; j < view[1].size(); ++j)
                                 for (size_t i = 0; i < view[0].size(); ++i)
-                                    ret (i,j,k,l,m,n) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l],view[4][l],view[5][n]);
+                                    ret (i,j,k,l,m,n) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l],view[4][m],view[5][n]);
         }
         
     	return ret;

@@ -27,7 +27,17 @@
 #include "LapackTraits.hpp"
 #include "CX.hpp"
 
+#ifdef HAVE_CXX11_TUPLE
+#include <tuple>
+#define TUPLE std::tuple
+#define GET std::get
+#else
 #include <boost/tuple/tuple.hpp>
+#define TUPLE boost::tuple
+#define GET boost::get
+#endif
+
+
 
 /**
  * @brief         Eigenvalue decomposition
@@ -36,11 +46,11 @@
  * @code{.cpp}
  *   Matrix<cxfl> m = rand<cxfl> (10,10), ev;
  *   Matrix<float> lv, rv;
- *   boost::tuple<Matrix<float>,Matrix<cxfl>,Matrix<float>> ler
+ *   TUPLE<Matrix<float>,Matrix<cxfl>,Matrix<float>> ler
  *   ler = eig2 (m);
- *   lv = boost::get<0>(ler)
- *   ev = boost::get<1>(ler);
- *   rv = boost::get<2>(ler)
+ *   lv = GET<0>(ler)
+ *   ev = GET<1>(ler);
+ *   rv = GET<2>(ler)
  * @endcode
  * where m is the complex decomposed matrix, lv and rv are the left hand and right 
  * hand side eigen vectors and ev is the eigenvalue vector.
@@ -52,14 +62,12 @@
  * @param  jobvr  Compute right vectors ('N'/'V')
  * @return        Eigenvectors and values
  */
-template <class T, class S> inline boost::tuple< Matrix<T>, Matrix<S>, Matrix<T> >
+template <class T> inline TUPLE< Matrix<T>, Matrix<typename TypeTraits<T>::CT>, Matrix<T> >
 eig2 (const Matrix<T>& m, char jobvl = 'N', char jobvr = 'N') {
     
-    typedef typename LapackTraits<T>::RType T2;
-    T t = (T)0;
-    
-    boost::tuple< Matrix<T>, Matrix<S>, Matrix<T> > ret;
-    
+    typedef typename TypeTraits<T>::CT CT;
+    typedef typename TypeTraits<T>::RT RT;
+    TUPLE< Matrix<T>, Matrix<CT>, Matrix<T> > ret;
     
     assert (jobvl == 'N' || jobvl =='V');
     assert (jobvr == 'N' || jobvr =='V');
@@ -73,18 +81,17 @@ eig2 (const Matrix<T>& m, char jobvl = 'N', char jobvr = 'N') {
     int    lwork = -1;
     
     // Appropriately resize the output
-    boost::get<1>(ret) = Matrix<S>(N,1);
+    GET<1>(ret) = Matrix<CT>(N,1);
     
-    if (jobvl == 'V') boost::get<0>(ret) = Matrix<T>(N,N);
-    if (jobvr == 'V') boost::get<2>(ret) = Matrix<T>(N,N);
+    if (jobvl == 'V') GET<0>(ret) = Matrix<T>(N,N);
+    if (jobvr == 'V') GET<2>(ret) = Matrix<T>(N,N);
     
-    Matrix<S>& ev = boost::get<1>(ret);
-    Matrix<T> &lv = boost::get<0>(ret), &rv = boost::get<2>(ret);
-
+    Matrix<CT>& ev = GET<1>(ret);
+    Matrix<T> &lv = GET<0>(ret), &rv = GET<2>(ret);
 
     // Workspace for real numbers
-    Vector<T2> rwork = (is_complex(t)) ?
-    Vector<T2>(2*N) : Vector<T2>(1);
+    Vector<RT> rwork = (TypeTraits<T>::IsComplex()) ?
+    		Vector<RT>(2*N) : Vector<RT>(1);
 
     // Workspace for complex numbers
     Vector<T>  work = Vector<T>(1);
@@ -93,37 +100,32 @@ eig2 (const Matrix<T>& m, char jobvl = 'N', char jobvr = 'N') {
     Matrix<T> a = m;
     
     // Work space query
-    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ev.Ptr(), lv.Ptr(), ldvl, rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
+    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ev.Ptr(), lv.Ptr(),
+    		ldvl, rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
     
     // Initialize work space
     lwork = (int) TypeTraits<T>::Real (work[0]);
     work.resize(lwork);
     
     // Actual Eigenvalue computation
-    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ev.Ptr(), lv.Ptr(), ldvl, rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
+    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ev.Ptr(), lv.Ptr(),
+    		ldvl, rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
 
     if (info > 0)
-        printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n eigenvalues, and no eigenvectors have " \
-                "been computed;\n elements %d+1:N of ev contain eigenvalues which\n have converged.\n\n", info) ;
+        printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n "
+        		"eigenvalues, and no eigenvectors have " \
+                "been computed;\n elements %d+1:N of ev contain eigenvalues "
+                "which\n have converged.\n\n", info) ;
     else if (info < 0)
         printf ("\nERROR - XGEEV: the %d-th argument had an illegal value.\n\n", -info);
     
     return ret;
     
 }
+template<class T> inline Matrix<typename TypeTraits<T>::CT> eig (const Matrix<T>& m) {
+    return GET<1>(eig2<T>(m,'N','N'));
+}
 
-inline Matrix<cxfl> eig (const Matrix<float>& m) {
-    return boost::get<1>(eig2<float,cxfl>(m,'N','N'));
-}
-inline Matrix<cxdb> eig (const Matrix<double>& m) {
-    return boost::get<1>(eig2<double,cxdb>(m,'N','N'));
-}
-inline Matrix<cxfl> eig (const Matrix<cxfl>& m) {
-    return boost::get<1>(eig2<cxfl,cxfl>(m,'N','N'));
-}
-inline Matrix<cxdb> eig (const Matrix<cxdb>& m) {
-    return boost::get<1>(eig2<cxdb,cxdb>(m,'N','N'));
-}
 
 
 /**
@@ -133,11 +135,11 @@ inline Matrix<cxdb> eig (const Matrix<cxdb>& m) {
  * @code{.cpp}
  *   Matrix<cxfl>  m = rand<cxfl> (20,10), u, v;
  *   Matrix<float> s;
- *   boost::tuple<Matrix<cxfl>, Matrix<float>, Matrix<cxfl>> usv;
+ *   TUPLE<Matrix<cxfl>, Matrix<float>, Matrix<cxfl>> usv;
  *   usv = svd2 (m);
- *   u = boost::get<0>(usv);
- *   s = boost::get<1>(usv);
- *   v = boost::get<2>(usv);
+ *   u = GET<0>(usv);
+ *   s = GET<1>(usv);
+ *   v = GET<2>(usv);
  * @endcode
  * where m is the complex decomposed matrix, u and v are the left hand and right 
  * hand side singular vectors and s is the vector of real singular values.
@@ -158,11 +160,11 @@ inline Matrix<cxdb> eig (const Matrix<cxdb>& m) {
  * @return          Signular vectors and values
  */
 
-template<class T, class S> inline boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> >
+template<class T> inline TUPLE<Matrix<T>,Matrix<typename TypeTraits<T>::RT>,Matrix<T> >
 svd2 (const Matrix<T>& M, char jobz = 'N') {
     
-    typedef typename LapackTraits<T>::RType T2;
-    boost::tuple<Matrix<T>,Matrix<S>,Matrix<T> > ret;
+    typedef typename TypeTraits<T>::RT RT;
+    TUPLE<Matrix<T>,Matrix<RT>,Matrix<T> > ret;
     
     assert (is2d(M));
     assert (jobz == 'N' || jobz == 'S' || jobz == 'A');
@@ -171,7 +173,7 @@ svd2 (const Matrix<T>& M, char jobz = 'N') {
     
     int   m, n, lwork, info = 0, lda, mn, ldu = 1, ucol = 1, ldvt = 1, vtcol = 1;
 
-    Vector<T2> rwork;
+    Vector<RT> rwork;
     Vector<T>  work = Vector<T>(1);
     
     m     =  A.Height(); n = A.Width();
@@ -192,9 +194,9 @@ svd2 (const Matrix<T>& M, char jobz = 'N') {
         vtcol = (m>=n) ? mn : n;
     }
 
-    Matrix<S>& s = boost::get<1>(ret) = Matrix<S>(  mn,  IONE);
-    Matrix<T>& U = boost::get<0>(ret) = Matrix<T>( ldu,  ucol);
-    Matrix<T>& V = boost::get<2>(ret) = Matrix<T>(ldvt, vtcol);
+    Matrix<RT>& s = GET<1>(ret) = Matrix<RT>(  mn,  IONE);
+    Matrix<T>&  U = GET<0>(ret) = Matrix<T> ( ldu,  ucol);
+    Matrix<T>&  V = GET<2>(ret) = Matrix<T> (ldvt, vtcol);
     
     Vector<int> iwork = Vector<int>(8 * mn);
     
@@ -226,18 +228,22 @@ svd2 (const Matrix<T>& M, char jobz = 'N') {
     return ret;
     
 } 
-// Convenience calls (for s = svd (A))    
-inline Matrix<float> svd (const Matrix<float>& A) {
-    return boost::get<1>(svd2<float,float>(A));
+// Convenience calls (for s = svd (A))
+template<class T>
+inline Matrix<typename TypeTraits<T>::RT> svd (const Matrix<T>& A) {
+    return GET<1>(svd2<T>(A));
 }
-inline Matrix<double> svd (const Matrix<double>& A) {
-    return boost::get<1>(svd2<double,double>(A));
+template<class T> inline Matrix<T> pca (const Matrix<T>& A) {
+	return GET<2>(svd2<T>(A));
 }
-inline Matrix<float> svd (const Matrix<cxfl>& A) {
-    return boost::get<1>(svd2<cxfl,float>(A));
-} 
-inline Matrix<double> svd (const Matrix<cxdb>& A) {
-    return boost::get<1>(svd2<cxdb,double>(A));
+template<class T>
+inline TUPLE<Matrix<typename TypeTraits<T>::RT>,Matrix<T>> pca2 (const Matrix<T>& A) {
+	typedef typename TypeTraits<T>::RT RT;
+	TUPLE<Matrix<T>,Matrix<typename TypeTraits<T>::RT>,Matrix<T> > ret = svd2<T>(A,'S');
+	Matrix<RT>& S = GET<1>(ret);
+	S *= S/numel(S);
+	Matrix<T>& V = GET<2>(ret);
+	return TUPLE<Matrix<typename TypeTraits<T>::RT>,Matrix<T> > (S,V);
 }
 
 /**
@@ -255,16 +261,13 @@ inline Matrix<double> svd (const Matrix<cxdb>& A) {
  * @param  m             Matrix
  * @return               Inverse
  */
-template <class T> inline Matrix<T> 
-inv (const Matrix<T>& m) {
+template <class T> inline Matrix<T> inv (const Matrix<T>& m) {
     
     // 2D 
     assert(issquare(m));
     
-    int N = (int) size (m,0);    
+    int N = (int) size (m,0), lwork = -1, info = 0;
     Matrix<T> res = m;
-
-    int  info = 0;
     Vector<int> ipiv = Vector<int>(N);
     
     // LU Factorisation -------------------
@@ -273,20 +276,16 @@ inv (const Matrix<T>& m) {
     if (info < 0)
         printf ("\nERROR - DPOTRI: the %i-th argument had an illegal value.\n\n", -info);
     else if (info > 1)
-        printf ("\nERROR - DPOTRI: the (%i,%i) element of the factor U or L is\n zero, and the inverse could not be " \
-                "computed.\n\n", info, info);
-    
-    int lwork = -1; 
-    Vector<T> work = Vector<T>(1);
+        printf ("\nERROR - DPOTRI: the (%i,%i) element of the factor U or L is\n "
+        		"zero, and the inverse could not be computed.\n\n", info, info);
     
     // Workspace determination ------------
+    Vector<T> work = Vector<T>(1);
     LapackTraits<T>::getri (N, res.Ptr(), N, ipiv.ptr(), work.ptr(), lwork, info);
     
-    // Work memory allocation -------------
+    // Inversion --------------------------
     lwork = (int) TypeTraits<T>::Real (work[0]);
     work.resize(lwork);
-    
-    // Inversion --------------------------
     LapackTraits<T>::getri (N, res.Ptr(), N, ipiv.ptr(), work.ptr(), lwork, info);
 
     if (info < 0)
@@ -316,31 +315,27 @@ inv (const Matrix<T>& m) {
  * @param  trans         Transpose m before pinv?
  * @return               Pseudo-inverse
  */
-template<class T> inline Matrix<T>
-pinv (const Matrix<T>& m, char trans = 'N') {
-    
-    Matrix<T> mm (m);
+template<class T> inline Matrix<T> pinv (const Matrix<T>& m, char trans = 'N') {
     
     assert (is2d(m));
-
-    Vector<T> work = Vector<T>(1);
     
     int  M      =  size(m, 0);
     int  N      =  size(m, 1);
-    
     int  nrhs   =  M;
     int  lda    =  M;
     int  ldb    =  MAX(M,N);
     int  lwork  = -1;
     int  info   =  0;
 
-    Matrix<T> b = eye<T>(ldb);
+    Matrix<T> mm (m), b = eye<T>(ldb);
+    Vector<T> work = Vector<T>(1);
     
+    // Workspace determination
     LapackTraits<T>::gels (trans, M, N, nrhs, mm, lda, b, ldb, work, lwork, info);
     
+    // Solving
     lwork = (int) TypeTraits<T>::Real(work[0]);
     work.resize(lwork);
-
     LapackTraits<T>::gels (trans, M, N, nrhs, mm, lda, b, ldb, work, lwork, info);
     
     size_t cpsz = N * sizeof(T);
