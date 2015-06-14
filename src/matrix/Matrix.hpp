@@ -1011,7 +1011,8 @@ public:
 
 
     /**
-     * @brief           Scalar product (complex: conjugate first vector) using <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTC and XDOT
+     * @brief           Scalar product (complex: conjugate first vector) using
+     *                  <a href="http://www.netlib.org/blas/">BLAS</a> routines XDOTC and XDOT
      *
      * @param  M        Factor
      * @return          Scalar product
