@@ -179,12 +179,51 @@ public:
                 if (!_range[i].IsSingleton())
                     _nsdims.push_back(i);
             if (_range.size() == 1)
-                for (size_t i = 0; i < _range[0].Size(); ++i)
-                    _pointers.push_back(matrix->ptr()+_range[0][i]);
-            if (_range.size() == 2)
-                for (size_t j = 0; j < _range[1].Size(); ++j)
-                    for (size_t i = 0; i < _range[0].Size(); ++i)
-                        _pointers.push_back(&((*_matrix)(range[0][i],range[1][j])));
+                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                    _pointers.push_back(matrix->ptr()+_range[0][n0]);
+            else if (_range.size() == 2)
+                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                        _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1])));
+            else if (_range.size() == 3)
+                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                            _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],range[2][n2])));
+            else if (_range.size() == 4)
+                for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+                    for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                        for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                            for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                                _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],
+                                              range[2][n2],range[3][n3])));
+            else if (_range.size() == 5)
+                for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+                    for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+                        for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                            for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                                    _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],
+                                              range[2][n2],range[3][n3],range[4][n4])));
+            else if (_range.size() == 6)
+                for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
+                    for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+                        for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+                            for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                                        _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],
+                                              range[2][n2],range[3][n3],range[4][n4],range[5][n5])));
+            else if (_range.size() == 7)
+                for (size_t n6 = 0; n6 < _range[6].Size(); ++n6)
+                    for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
+                        for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+                            for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+                                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                                            _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],
+                                              range[2][n2],range[3][n3],range[4][n4],range[5][n5],range[6][n6])));
             for (auto it = _range.begin(); it != _range.end();)
                 if(it->IsSingleton())
                     it = _range.erase(it);
@@ -230,7 +269,6 @@ public:
             }
             return os << ")" << std::endl;
         }
-
     };
 
     typedef ConstNoConstView<true> ConstView;
