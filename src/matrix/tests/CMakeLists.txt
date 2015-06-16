@@ -47,8 +47,11 @@ if(${MATLAB_FOUND})
     set (LD_ENV "${LD_ENV}:${MATLAB_LIBRARY_DIRS}")
   endif ()
 endif()
-
 set (TEST_CALL t_tvop)  
 MP_TESTS ("tvop" "${TEST_CALL}")
+
+add_executable(t_view t_view.cpp)
+add_test(view t_view)
+
 
 

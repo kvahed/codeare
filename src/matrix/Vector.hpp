@@ -18,9 +18,11 @@
 
 #ifndef NOEXCEPT
 #  ifdef HAVE_CXX11_NOEXCEPT
-#    define NOEXCEPT noexcept(true)
+#    define NOEXCEPT 
+//noexcept(true)
 #  else
-#    define NOEXCEPT throw()
+#    define NOEXCEPT
+//throw()
 #  endif
 #endif
 
@@ -222,8 +224,8 @@ public:
      * @param t  Element to be added
      */
 	inline void push_back (const T& t) NOEXCEPT { _data.push_back(t);}
-	inline void Erase (const iterator& i) NOEXCEPT { _data.erase(i);}
-	inline void Erase (const iterator& start, const iterator& end) NOEXCEPT { _data.erase(start, end);}
+	inline iterator Erase (const iterator& i) NOEXCEPT { return _data.erase(i);}
+	inline iterator Erase (const iterator& start, const iterator& end) NOEXCEPT { return _data.erase(start, end);}
 	inline void Insert (const iterator& i, const T& val) NOEXCEPT { _data.insert(i, val);}
 
 

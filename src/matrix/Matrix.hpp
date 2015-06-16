@@ -1,7 +1,8 @@
 /*
- *  codeare Copyright (C) 2007-2010 
+ *  codeare Copyright (C) 2010-2014
  *                        Kaveh Vahedipour
  *                        Forschungszentrum Juelich, Germany
+ *                        NYU School of Medicine, New York, USA
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,7 +37,40 @@
 #include "OMP.hpp"
 #include "Complex.hpp"
 #include "Vector.hpp"
-#include "RangeParser.hpp"
+
+static inline std::vector<std::string>
+Parse     (const std::string& str, const std::string& dlm) {
+
+	assert (dlm.size() > 0);
+	std::vector<std::string> sv;
+	size_t  start = 0, end = 0;
+
+	while (end != std::string::npos) {
+		end = str.find (dlm, start);
+		sv.push_back(str.substr(start, (end == std::string::npos) ?
+				std::string::npos : end - start));
+		start = ((end > (std::string::npos - dlm.size())) ?
+				std::string::npos : end + dlm.size());
+	}
+
+	return sv;
+
+}
+
+enum RangeParseException {
+	IMPROPER_RANGE_DECLARATION = 301,
+	RANGE_DOES_NOT_FIT_MATRIX_DIMS,
+	RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS,
+	FAILED_TO_PARSE_RANGE,
+	EXCEEDING_MATRIX_DIMENSIONS,
+	YET_TO_BE_CODED,
+	NEGATIVE_BEGIN_INDEX,
+	NEGATIVE_END_INDEX,
+	NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE,
+	POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE,
+	STRIDE_MUST_NOT_BE_ZERO
+};
+
 
 #ifdef EXPLICIT_SIMD
 #    include "SIMD.hpp"
@@ -110,171 +144,249 @@ public:
     
 #ifdef HAVE_CXX11_CONDITIONAL
 
-    template<bool is_const = true> class ConstNoConstView {
-    public:
+	    template<bool is_const = true> class ConstNoConstView {
+	    public:
 
-        class Range {
-        public:
-            Range () :
-                _stride(1), _begin(0), _end(0) {}
-            Range (const size_t& begin, const size_t& end) :
-                _stride(1), _begin(begin), _end(end) {
-                assert (_end>=_begin);
-                _idx.resize(_end-begin+1);
-                for (size_t i = 0; i < _idx.size(); ++i)
-                    _idx[i] = _begin + i;
-            }
-            Range (const size_t& begin, const size_t& stride, const size_t& end) :
-                _stride(stride), _begin(begin), _end(end){
-                assert (_stride != 0);
-                if (_stride > 0)
-                    assert (_end>=_begin);
-                else
-                    assert (_end<=_begin);
-                _idx.resize(std::floor(((float)_end-(float)_begin)/(float)_stride)+1);
-                for (size_t i = 0; i < _idx.size(); ++i)
-                    _idx[i] = _begin + i*_stride;
-            }
-            Range (const std::string& rs) {
-                ParseRange(rs);
-            }
-            Range (const char* rcs) {
-                ParseRange(std::string(rcs));
-            }
-            void ParseRange (const std::string& rs) {
-                // TODO: Parse string
-            }
-            virtual ~Range() {}
-            const size_t Begin() const {
-                return _begin;
-            }
-            const size_t End() const {
-                return _end;
-            }
-            inline size_t Size() const {
-                return _idx.size();
-            }
-            inline size_t IsSingleton() const {
-                return (_idx.size()==1);
-            }
-            inline size_t operator[] (const size_t& i) const { return _idx[i]; }
-        private:
-            friend std::ostream& operator<< (std::ostream &os, const Range& r) {
-                return os << r._idx.size() << ": " << r._begin << ":"
-                          << r._stride << ":" << r._end;
-            }
-            long _stride;
-            size_t _begin, _end;
-            std::vector<size_t> _idx;
-        };
+	        class Range {
+	        public:
+	            inline Range () :
+	                _stride(1), _begin(0), _end(0) {}
+	            inline Range (const size_t& begend) :
+	                _stride(1), _begin(begend), _end(begend) {
+                    if (_begin < 0)
+                        throw  NEGATIVE_BEGIN_INDEX;                           
+                    _idx.push_back(_begin);
+                }
+	            inline Range (const size_t& begin, const size_t& end) :
+	                _stride(1), _begin(begin), _end(end) {
+                    if (_begin < 0) {
+                        printf ("NEGATIVE_BEGIN_INDEX\n");
+                        throw NEGATIVE_BEGIN_INDEX;
+                    }
+                    if (_end < 0) {
+                        printf ("NEGATIVE_END_INDEX\n");
+                        throw NEGATIVE_END_INDEX;
+                    }
+                    if (_end < begin) {
+                        printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
+                        throw STRIDE_MUST_NOT_BE_ZERO;
+                    }
+	                _idx.resize(_end-begin+1);
+	                for (size_t i = 0; i < _idx.size(); ++i)
+	                    _idx[i] = _begin + i;
+	            }
+	            inline Range (const size_t& begin, const size_t& stride, const size_t& end) :
+	                _stride(stride), _begin(begin), _end(end){
+                    if (_begin < 0) {
+                        printf ("NEGATIVE_BEGIN_INDEX\n");
+                        throw NEGATIVE_BEGIN_INDEX;
+                    }
+                    if (_end < 0) {
+                        printf ("NEGATIVE_END_INDEX\n");
+                        throw NEGATIVE_END_INDEX;
+                    }
+                    if (_stride == 0) {
+                        printf ("STRIDE_MUST_NOT_BE_ZERO\n");
+                        throw STRIDE_MUST_NOT_BE_ZERO;
+                    }
+                    if (_stride > 0 && _end < _begin) {
+                        printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
+                        throw POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE;
+                    }
+                    if (_stride < 0 && _end > _begin) {
+                        printf ("NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE\n");
+                        throw NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE;
+                    }
+	                _idx.resize(std::floor(((float)_end-(float)_begin)/(float)_stride)+1);
+	                for (size_t i = 0; i < _idx.size(); ++i)
+	                    _idx[i] = _begin + i*_stride;
+	            }
+                inline Range (const Vector<size_t>& v) : _stride(0), _begin(0), _end(0) {
+                    _idx = v;
+                }
+                    
+	            inline Range (const std::string& rs) {
+	                ParseRange(rs);
+	            }
+	            inline Range (const char* rcs) {
+	                ParseRange(std::string(rcs));
+	            }
+	            inline void ParseRange (const std::string& rs) {
+                    
+	                // TODO: Parse string
+	            }
+	            virtual ~Range() {}
 
-        typedef typename std::conditional<is_const, const Matrix, Matrix>::type MatrixType;
-        typedef typename std::conditional<is_const, const T, T>::type Type;
+                inline void Reset (const size_t& begin, const size_t& end) {
+                    _begin = begin;
+                    _end = end;
+                    _stride = 1;
+	                assert (_end>=_begin);
+	                _idx.resize(_end-_begin+1);
+	                for (size_t i = 0; i < _idx.size(); ++i)
+	                    _idx[i] = _begin + i;
+	            }
+                inline const size_t Begin() const {
+	                return _begin;
+	            }
+	            inline const size_t End() const {
+	                return _end;
+	            }
+	            inline size_t Size() const {
+	                return _idx.size();
+	            }
+	            inline size_t IsSingleton() const {
+	                return (_idx.size()==1);
+	            }
+	            inline size_t operator[] (const size_t& i) const { return _idx[i]; }
+	        private:
+	            friend std::ostream& operator<< (std::ostream &os, const Range& r) {
+	                return os << r._idx.size() << ": " << r._begin << ":"
+	                          << r._stride << ":" << r._end;
+	            }
+	            long _begin, _end, _stride;
+	            Vector<size_t> _idx;
+	        };
 
-        ConstNoConstView () : _matrix(0) {}
-        ConstNoConstView (MatrixType* matrix, std::vector<Range> range) :
-            _matrix(matrix), _range(range) {
-            assert (_range.size());
-            for (size_t i = 0; i < _range.size(); ++i)
-                if (!_range[i].IsSingleton())
-                    _nsdims.push_back(i);
-            if (_range.size() == 1)
-                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-                    _pointers.push_back(matrix->ptr()+_range[0][n0]);
-            else if (_range.size() == 2)
-                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-                        _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1])));
-            else if (_range.size() == 3)
-                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-                            _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],range[2][n2])));
-            else if (_range.size() == 4)
-                for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
-                    for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-                        for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-                            for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-                                _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],
-                                              range[2][n2],range[3][n3])));
-            else if (_range.size() == 5)
-                for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
-                    for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
-                        for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-                            for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-                                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-                                    _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],
-                                              range[2][n2],range[3][n3],range[4][n4])));
-            else if (_range.size() == 6)
-                for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
-                    for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
-                        for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
-                            for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-                                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-                                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-                                        _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],
-                                              range[2][n2],range[3][n3],range[4][n4],range[5][n5])));
-            else if (_range.size() == 7)
-                for (size_t n6 = 0; n6 < _range[6].Size(); ++n6)
-                    for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
-                        for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
-                            for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
-                                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-                                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-                                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-                                            _pointers.push_back(&((*_matrix)(range[0][n0],range[1][n1],
-                                              range[2][n2],range[3][n3],range[4][n4],range[5][n5],range[6][n6])));
-            for (auto it = _range.begin(); it != _range.end();)
-                if(it->IsSingleton())
-                    it = _range.erase(it);
-                else
-                    ++it;
-            std::cout << *this << std::endl;
-        }
+	        typedef typename std::conditional<is_const, const Matrix, Matrix>::type MatrixType;
+	        typedef typename std::conditional<is_const, const T, T>::type Type;
 
-        virtual ~ConstNoConstView () { _matrix = 0; }
+	        inline ConstNoConstView () : _matrix(0) {}
+	        inline ConstNoConstView (MatrixType* matrix, Vector<Range>& range) :
+	            _matrix(matrix), _range(range) {
+	            assert (_range.size());
+	            for (size_t i = 0; i < _range.size(); ++i) 
+	                if (!_range[i].IsSingleton()) {
+                        if (_range[i].Size() == 0) 
+                            _range[i].Reset (0,_matrix->Dim(i)-1);
+	                    _nsdims.push_back(i);
+                    }
+	            if (_range.size() == 1)
+	                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+	                    _pointers.push_back(matrix->Ptr()+_range[0][n0]);
+	            else if (_range.size() == 2)
+	                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+	                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+	                        _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1])));
+	            else if (_range.size() == 3)
+	                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+	                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+	                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+	                            _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],_range[2][n2])));
+	            else if (_range.size() == 4)
+	                for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+	                    for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+	                        for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+	                            for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+	                                _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
+	                                              _range[2][n2],_range[3][n3])));
+	            else if (_range.size() == 5)
+	                for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+	                    for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+	                        for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+	                            for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+	                                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+	                                    _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
+	                                              _range[2][n2],_range[3][n3],_range[4][n4])));
+	            else if (_range.size() == 6)
+	                for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
+	                    for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+	                        for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+	                            for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+	                                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+	                                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+	                                        _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
+	                                              _range[2][n2],_range[3][n3],_range[4][n4],_range[5][n5])));
+	            else if (_range.size() == 7)
+	                for (size_t n6 = 0; n6 < _range[6].Size(); ++n6)
+	                    for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
+	                        for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+	                            for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+	                                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+	                                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+	                                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+	                                            _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
+	                                              _range[2][n2],_range[3][n3],_range[4][n4],_range[5][n5],_range[6][n6])));
+	            else if (_range.size() == 8)
+	                for (size_t n7 = 0; n7 < _range[7].Size(); ++n7)
+	                    for (size_t n6 = 0; n6 < _range[6].Size(); ++n6)
+	                        for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
+	                            for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+	                                for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+	                                    for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+	                                        for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+	                                            for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+	                                                _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
+	                                                     _range[2][n2],_range[3][n3],_range[4][n4],_range[5][n5],
+	                                                     _range[6][n6],_range[7][n7])));
 
-        ConstNoConstView& operator= (const ConstNoConstView<true>& v) {
-            Matrix& lhs = *_matrix;
-            const Matrix& rhs = *(v._matrix);
-            assert (_nsdims.size() == v._nsdims.size());
-            for (size_t i = 0; i < _nsdims.size(); ++i)
-                assert(_range[i].Size()==v._range[i].Size());
-            for (size_t i = 0; i < _pointers.size(); ++i)
-                *_pointers[i] = *(v._pointers)[i];
-            return *this;
-        }
-        ConstNoConstView& operator= (const Type& t) {
-            assert (_matrix);
-            for (size_t i = 0; i < _pointers.size(); ++i)
-                *_pointers[i] = t;
-            return *this;
-        }
+	            for (auto it = _range.begin(); it != _range.end();) {
+	            	_dim.push_back(it->Size());
+	                if(it->IsSingleton())
+	                    it = _range.Erase(it);
+	                else
+	                    ++it;
+	            }
+	        }
 
-        Range& Rng() { return _range; }
-        const size_t Size() const {return _range[0].End() - _range[0].Begin();}
-
-        MatrixType* _matrix;
-        std::vector<Range> _range;
-        std::vector<Type*> _pointers;
-        std::vector<size_t> _nsdims;
-
-    private:
-        friend std::ostream& operator<< (std::ostream &os, const ConstNoConstView& r) {
-            os << "(";
-            for (size_t i = 0; i < r._range.size(); ++i) {
-                if (i)
-                    os << ",";
-                os << r._range[i];
+            operator Matrix() const {
+                Matrix res (_dim);
+                for (size_t i = 0; i < Size(); ++i)
+                    res[i] = *(_pointers[i]);
+                return res;
             }
-            return os << ")" << std::endl;
-        }
-    };
 
-    typedef ConstNoConstView<true> ConstView;
-    typedef ConstNoConstView<false> View;
-    typedef typename ConstNoConstView<true>::Range ConstRange;
-    typedef typename ConstNoConstView<false>::Range Range;
+            inline ConstNoConstView& operator= (const Matrix& M) {
+                assert(_dim == M.Dim());
+                for (size_t i = 0; i < Size(); ++i)
+                    *(_pointers[i]) = M[i];
+                return *this;
+            }
+
+	        virtual ~ConstNoConstView () { _matrix = 0; }
+
+	        inline ConstNoConstView& operator= (const ConstNoConstView<true>& v) {
+	            Matrix& lhs = *_matrix;
+	            const Matrix& rhs = *(v._matrix);
+	            assert (_nsdims.size() == v._nsdims.size());
+	            for (size_t i = 0; i < _nsdims.size(); ++i)
+	                assert(_range[i].Size()==v._range[i].Size());
+	            for (size_t i = 0; i < _pointers.size(); ++i)
+	                *_pointers[i] = *(v._pointers)[i];
+	            return *this;
+	        }
+	        inline ConstNoConstView& operator= (const Type& t) {
+	            assert (_matrix);
+	            for (size_t i = 0; i < _pointers.size(); ++i)
+	                *_pointers[i] = t;
+	            return *this;
+	        }
+
+	        inline Range& Rng() { return _range; }
+	        inline const size_t Size() const {return _pointers.size();}
+
+	        MatrixType* _matrix;
+	        Vector<Range> _range;
+	        Vector<Type*> _pointers;
+	        Vector<size_t> _nsdims;
+            Vector<size_t> _dim;
+
+	    private:
+	        friend std::ostream& operator<< (std::ostream &os, const ConstNoConstView& r) {
+	            os << "(";
+	            for (size_t i = 0; i < r._range.size(); ++i) {
+	                if (i)
+	                    os << ",";
+	                os << r._range[i];
+	            }
+	            return os << ")" << std::endl;
+	        }
+	    };
+
+	    typedef ConstNoConstView<true> ConstView;
+	    typedef ConstNoConstView<false> View;
+	    typedef typename ConstNoConstView<true>::Range ConstRange;
+	    typedef typename ConstNoConstView<false>::Range Range;
 
 #endif
 
@@ -470,6 +582,14 @@ public:
     		*this = M;
     }
 #endif
+
+
+    inline Matrix (ConstView& v) {
+        _dim = v._dim;
+        Allocate();
+        for (size_t i = 0; i < Size(); ++i)
+            _M[0] = *(v._pointers[i]);
+    }
 
     //@}
 
@@ -1296,6 +1416,13 @@ public:
         return *this;
     }
 
+    inline Matrix<T,P>& operator= (const ConstView& v) {
+        _dim = v._dim;
+        Allocate();
+        for (size_t i = 0; i < Size(); ++i)
+            _M[i] = *(v._pointers[i]);
+        return *this;
+    }
 
 
     /**
@@ -2288,14 +2415,6 @@ public:
     	return *this;
     }
 
-#ifdef HAVE_CXX11_TUPLE
-    typedef typename std::tuple<Matrix<T>&, Vector<Vector<size_t> > > MRange;
-    typedef typename std::tuple<const Matrix<T>&, const Vector<const Vector<size_t>& > > ConstMRange;
-#else
-    typedef typename boost::tuple<Matrix<T>&, Vector<Vector<size_t> > > MRange;
-    typedef typename boost::tuple<const Matrix<T>&, const Vector<const Vector<size_t>& > > ConstMRange;
-#endif
-
     inline const Matrix<T> operator() (Vector<size_t> range) const {
     	Matrix<T> ret;
     	if (range.size() == 0) {
@@ -2433,6 +2552,8 @@ public:
         
     }
 
+
+    /*
     inline Matrix<T>
     operator() (const std::string& range) const {
 
@@ -2489,12 +2610,56 @@ public:
     	return ret;
         
     }
+    */
 
-/*    inline MRange& operator() (const Vector<size_t>& range) {
-    	Vector<Vector<size_t> > ranges;
-    	ranges.PushBack(Vector<size_t>(range));
-    	return MRange(*this,ranges);
-    }*/
+    View operator() (Range r) {
+        Vector<Range> vr;
+        vr.push_back (r);
+        return View(this, vr);
+    }
+    ConstView operator() (const ConstRange r) const {
+        Vector<ConstRange> vr;
+        vr.push_back (r);
+        return ConstView(this, vr);
+    }
+    ConstView operator() (const Range r, const size_t& n) {
+        Vector<ConstRange> vr;
+        vr.push_back (r);
+        vr.push_back (ConstRange(n,n));
+        return ConstView(this, vr);
+    }
+    ConstView operator() (const ConstRange r, const size_t& n) const {
+        Vector<ConstRange> vr;
+        vr.push_back (r);
+        vr.push_back (ConstRange(n,n));
+        return ConstView(this, vr);
+    }
+    View operator() (Range r0, Range r1) {
+        Vector<Range> vr;
+        vr.push_back (r0);
+        vr.push_back (r1);
+        return View(this, vr);
+    }
+    ConstView operator() (ConstRange r0, ConstRange r1) const {
+        Vector<ConstRange> vr;
+        vr.push_back (r0);
+        vr.push_back (r1);
+        return ConstView(this, vr);
+    }
+    View operator() (Range r0, Range r1, Range r2) {
+        Vector<Range> vr;
+        vr.push_back (r0);
+        vr.push_back (r1);
+        vr.push_back (r2);        
+        return View(this, vr);
+    }
+    ConstView operator() (ConstRange r0, ConstRange r1, ConstRange r2) const {
+        Vector<ConstRange> vr;
+        vr.push_back (r0);
+        vr.push_back (r1);
+        vr.push_back (r2);
+        return ConstView(this, vr);
+    }
 
 protected:
 	
@@ -2545,32 +2710,6 @@ protected:
 #endif
     
 };
-
-template<class T>
-std::ostream& operator<< (std::ostream& os, const typename Matrix<T>::ConstMRange& mr) {
-		os << boost::get<0>(mr);
-	return os;
-}
-
-/*
-template<class T> static void
-copy (const Matrix<T>& rhs, typename Matrix<T>::MRange& lhs) {
-	Matrix<T>& mlhs = boost::get<0>(lhs);
-	Vector<Vector<size_t> >& rlhs = boost::get<1>(lhs);
-}
-
-template<class T> static void
-copy (const typename Matrix<T>::MRange& rhs, typename Matrix<T>::MRange& lhs) {
-	Matrix<T>& mlhs = boost::get<0>(lhs);
-	Vector<Vector<size_t> >& rlhs = boost::get<1>(lhs);
-}
-
-template<class T> static void
-copy (typename Matrix<T>::MRange& rhs, typename Matrix<T>::MRange& lhs) {
-	Matrix<T>& mlhs = boost::get<0>(lhs);
-	Vector<Vector<size_t> >& rlhs = boost::get<1>(lhs);
-}
-*/
 
 #endif // __MATRIX_H__
 

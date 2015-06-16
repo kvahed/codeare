@@ -94,6 +94,10 @@ codeare::error_code XDGRASP::Prepare () {
 }
 
 
+typedef typename Matrix<cxfl>::View::Range R;
+typedef typename Matrix<cxfl>::ConstView::Range CR;
+typedef typename Matrix<float>::View::Range RF;
+typedef typename Matrix<float>::ConstView::Range CRF;
 
 codeare::error_code XDGRASP::Process () {
     Matrix<cxfl> kdata = Get<cxfl>("signals");
@@ -103,7 +107,7 @@ codeare::error_code XDGRASP::Process () {
 	size_t RO = 0, VIEW = 1, Z = 2, C = 3;
 	// Cut edges
 	kdata = fftshift(fft(kdata,1),1)/sqrt(size(kdata,2));
-    kdata = kdata(Range(), Range(1,size(kdata,1)-1), Range());
+    kdata = kdata(CR(), CR(1,size(kdata,1)-1), CR());
 	Vector<size_t> n = size(kdata);
 
 	size_t nspokes = 28;// the trajectory has 2328 interleaves
@@ -116,9 +120,9 @@ codeare::error_code XDGRASP::Process () {
 	// sort the data into two dynamic dimensions
 	// one for contrast enhancement and one for respiration
 	for (size_t i = 0; i < m_nt; ++i) {
-		Matrix<cxfl> kdata_under = kdata(Range(), Range(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines), Range());
-		Matrix<float> traj_under = traj (Range(), Range(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
-		Matrix<float> resp_under = resp (Range(         i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
+		Matrix<cxfl> kdata_under = kdata(CR (), CR (i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines), CR());
+		Matrix<float> traj_under = traj (CRF(), CRF(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
+		Matrix<float> resp_under = resp (CRF(      i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
 	}
 	for (size_t i = 0; i < m_nt; ++i) {
 

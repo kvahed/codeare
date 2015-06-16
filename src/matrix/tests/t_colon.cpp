@@ -2,16 +2,19 @@
 #include "Creators.hpp"
 #include "Print.hpp"
 
+typedef typename Matrix<float>::View::Range R;
+typedef typename Matrix<float>::ConstView::Range CR;
+
 int main (int narg, char** argv) {
     Matrix<float> A = randn<float>(3,4);
 
-    
+
     std::cout << "A" << std::endl;
     std::cout << A << std::endl;
-    std::cout << "A(\":\")" << std::endl;
+/*    std::cout << "A(\":\")" << std::endl;
     std::cout << A(":") << std::endl;
     std::cout << "A(Range())" << std::endl;
-    std::cout << A(Range()) << std::endl;
+    std::cout << A(CR()) << std::endl;
 
     std::cout << "A(\"0:6\")" << std::endl;
     std::cout << A("0:6") << std::endl;
@@ -36,19 +39,15 @@ int main (int narg, char** argv) {
     std::cout << A(":,2:2") << std::endl;
     std::cout << "A(\":,1:2\")" << std::endl;
     std::cout << A(":,1:2") << std::endl;
-
+*/
     std::cout << "A(Range(2,1,3))" << std::endl;
-    std::cout << A(Range(2,1,3)) << std::endl;
+    std::cout << Matrix<float>(A(CR(2,1,3))) << std::endl;
     std::cout << "A(Range(0,2),Range(2,2))" << std::endl;
-    std::cout << A(Range(0,2),Range(2,2)) << std::endl;
+    std::cout << Matrix<float>(A(CR(0,2),CR(2,2))) << std::endl;
     std::cout << "A(Range(0,2),Range(2))" << std::endl;
-    std::cout << A(Range(0,2),Range(2)) << std::endl;
+    std::cout << Matrix<float>(A(CR(0,2),CR(2))) << std::endl;
     std::cout << "A(Range(),Range(3,-1,2))" << std::endl;
-    std::cout << A(Range(),Range(3,-1,2)) << std::endl;
-
-    //Matrix<float> B;
-    //copy (A(Range(2,1,3)), B(Range(2,1,3)));
-
+    std::cout << Matrix<float>(A(CR(),CR(3,-1,2))) << std::endl;
 
     /*std::cout << "A(\"3:-1:2\")" << std::endl;
     std::cout << A("3:-1:2") << std::endl;
