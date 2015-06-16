@@ -2,8 +2,8 @@
 #include "Creators.hpp"
 #include "Print.hpp"
 
-typedef typename Matrix<double>::View::Range R;
-typedef typename Matrix<double>::ConstView::Range CR;
+typedef Matrix<double>::Range R;
+typedef Matrix<double>::ConstRange CR;
 
 int main (int narg, const char** argv) {
 
