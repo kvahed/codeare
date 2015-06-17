@@ -1,27 +1,3 @@
-# - Find NFFT library
-# Find the native NFFT includes and library
-# This module defines
-#  NFFT_INCLUDE_DIR, where to find hdf5.h, etc.
-#  NFFT_LIBRARIES, libraries to link against to use NFFT.
-#  NFFT_FOUND, If false, do not try to use NFFT.
-# also defined, but not for general use are
-#  NFFT_LIBRARY, where to find the NFFT library.
-
-#FIND_PATH(NFFT_INCLUDE_DIR nfft3.h PATH_SUFFIXES nfft)
-
-#SET(NFFT_NAMES ${NFFT_NAMES} nfft_threads nfft3_threads)
-#FIND_LIBRARY(NFFT_LIBRARY NAMES ${NFFT_NAMES} )
-
-# handle the QUIETLY and REQUIRED arguments and set NFFT_FOUND to TRUE if 
-# all listed variables are TRUE
-#INCLUDE(FindPackageHandleStandardArgs)
-#FIND_PACKAGE_HANDLE_STANDARD_ARGS(NFFT DEFAULT_MSG NFFT_LIBRARY NFFT_INCLUDE_DIR)
-
-#IF(NFFT_FOUND)
-#  SET( NFFT_LIBRARIES ${NFFT_LIBRARY} )
-#ENDIF(NFFT_FOUND)
-
-
 # - Try to find NFFT3.
 # Usage: find_package(NFFT3 [COMPONENTS [single double long-double threads]])
 #
@@ -56,7 +32,7 @@
 # You should have received a copy of the GNU General Public License along
 # with the LOFAR software suite. If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id: FindNFFT3.cmake 15918 2010-06-25 11:12:42Z loose $
+# $Id: FindNFFT3.cmake 15918 2010-06-25 11:12:42Z kvahed $
 
 # Use double precision by default.
 if(NFFT3_FIND_COMPONENTS MATCHES "^$")

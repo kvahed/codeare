@@ -275,7 +275,7 @@ codeare::error_code CompressedSensing::Init () {
     m_dim = m_image_size.size();
 
 	printf ("  Geometry: " JL_SIZE_T_SPECIFIER "D (" JL_SIZE_T_SPECIFIER ","
-            JL_SIZE_T_SPECIFIER "," JL_SIZE_T_SPECIFIER ")\n", m_dim,
+            JL_SIZE_T_SPECIFIER "," JL_SIZE_T_SPECIFIER ")\n", (size_t)m_dim,
             m_image_size[0], m_image_size[1], (m_image_size.size()==3) ? m_image_size[2] : 1);
 
 	Attribute ("test_case", &m_test_case);
