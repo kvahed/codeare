@@ -27,7 +27,6 @@
 #include "Complex.hpp"
 #include "Vector.hpp"
 
-//#include "nfft3util.h"
 #include "nfft3.h"
 
 #include "Vector.hpp"

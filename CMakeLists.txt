@@ -147,6 +147,8 @@ if (NFFT3_FOUND)
   else ()
     add_definitions(-DHAVE_NFFT3F)
   endif()
+  message ("${NFFT3_INCLUDE_DIR}")
+  include_directories (${NFFT3_INCLUDE_DIR})
 endif()
 
 # Interpolations -----------------------------------------------------
