@@ -37,11 +37,15 @@
 template <class T>
 class NFFT : public FT<T> {
 
-	typedef typename FTTraits<T>::T FTType;
+#ifdef HAVE_NFFT3F
+    typedef T NFFTType;
+#else
+    typedef double NFFTType;
+#endif
 	typedef typename TypeTraits<T>::RT RT;
-    typedef typename NFFTTraits<T>::Plan   Plan;
-    typedef typename NFFTTraits<T>::B0Plan B0Plan;
-    typedef typename NFFTTraits<T>::Solver Solver;
+    typedef typename NFFTTraits<NFFTType>::Plan   Plan;
+    typedef typename NFFTTraits<NFFTType>::B0Plan B0Plan;
+    typedef typename NFFTTraits<NFFTType>::Solver Solver;
     typedef typename FTTraits<T>::Plan CartPlan;
 
 public:
@@ -195,7 +199,7 @@ public:
             m_ts =  (m_min_t+m_max_t)/2.;
             RT t    = ((m_max_t-m_min_t)/2.)/(.5-((RT) (m_m))/m_N[2]);
 
-        	NFFTTraits<T>::Init (m_N, m_M, m_n, m_m, m_sigma,
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_sigma,
         			m_b0_plan, m_solver);
 
             for (size_t j = 0; j < m_N[0]*m_N[1]; ++j)
@@ -203,7 +207,7 @@ public:
 
 
         } else {
-        	NFFTTraits<T>::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
         }
         
         if (p.exists("pc")) {
@@ -234,9 +238,9 @@ public:
     virtual ~NFFT () NOEXCEPT {
         if (m_initialised)
         	if (m_have_b0)
-        		NFFTTraits<T>::Finalize (m_b0_plan, m_solver);
+        		NFFTTraits<NFFTType>::Finalize (m_b0_plan, m_solver);
         	else
-        		NFFTTraits<T>::Finalize (m_plan, m_solver);
+        		NFFTTraits<NFFTType>::Finalize (m_plan, m_solver);
     }
     
     
@@ -269,10 +273,10 @@ public:
         m_3rd_dim_cart = ft.m_3rd_dim_cart;
         m_ncart       = ft.m_ncart;
         if (m_have_b0)
-        	NFFTTraits<T>::Init (m_N, m_M, m_n, m_m, m_sigma,
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_sigma,
         			m_b0_plan, m_solver);
         else
-        	NFFTTraits<T>::Init (m_N, m_M, m_n, m_m, m_plan,
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_plan,
         			m_solver);
         return *this;
         
@@ -310,11 +314,11 @@ public:
     		assert (w.Size() == m_plan.M_total);
         std::copy (w.Begin(), w.End(), m_solver.w);
         if (m_have_b0) {
-            NFFTTraits<T>::Weights (m_b0_plan.plan, m_solver, m_rank);
-            NFFTTraits<T>::Psi (m_b0_plan.plan);
+            NFFTTraits<NFFTType>::Weights (m_b0_plan.plan, m_solver, m_rank);
+            NFFTTraits<NFFTType>::Psi (m_b0_plan.plan);
         } else {
-        	NFFTTraits<T>::Weights (m_plan, m_solver, m_rank);
-        	NFFTTraits<T>::Psi (m_plan);
+        	NFFTTraits<NFFTType>::Weights (m_plan, m_solver, m_rank);
+        	NFFTTraits<NFFTType>::Psi (m_plan);
         }
         m_have_weights = true;
     }
@@ -374,9 +378,9 @@ public:
 				std::copy (tmpt, tmpt+m_imgsz, tmpd);
 
 			if (m_have_b0)
-				NFFTTraits<T>::Trafo (m_b0_plan);
+				NFFTTraits<NFFTType>::Trafo (m_b0_plan);
 			else
-				NFFTTraits<T>::Trafo (m_plan);
+				NFFTTraits<NFFTType>::Trafo (m_plan);
 
 			tmpd = (RT*) m_plan.f;
 			tmpt = (RT*) out.Ptr() + i*2*m_M;
@@ -414,10 +418,10 @@ public:
 			std::copy (tmpt, tmpt+2*m_M, tmpd);
 
 			if (m_have_b0)
-				NFFTTraits<T>::ITrafo ((B0Plan&) m_b0_plan,
+				NFFTTraits<NFFTType>::ITrafo ((B0Plan&) m_b0_plan,
 						(Solver&) m_solver, m_maxit, m_epsilon);
 			else
-				NFFTTraits<T>::ITrafo (  (Plan&)    m_plan,
+				NFFTTraits<NFFTType>::ITrafo (  (Plan&)    m_plan,
 						(Solver&) m_solver, m_maxit, m_epsilon);
 
 			tmpd = (RT*) m_solver.f_hat_iter;
