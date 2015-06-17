@@ -20,7 +20,7 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 
 #include "CompressedSensing.hpp"
 #include "Toolbox.hpp"
-#ifdef HAVE_NFFT
+#ifdef HAVE_NFFT3
 	#include "NCSENSE.hpp"
 #endif
 #include "Algos.hpp"
@@ -302,7 +302,7 @@ codeare::error_code CompressedSensing::Init () {
 			break;
 		case 2:
 			printf ("%s", "NUFFT");
-#ifdef HAVE_NFFT
+#ifdef HAVE_NFFT3
 			ft_params["epsilon"] = RHSAttribute<double>("fteps");
 			ft_params["alpha"]   = RHSAttribute<double>("ftalpha");
 			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
@@ -318,7 +318,7 @@ codeare::error_code CompressedSensing::Init () {
 			break;
 		case 3:
 			printf ("%s", "NCSENSE");
-#ifdef HAVE_NFFT
+#ifdef HAVE_NFFT3
 			ft_params["sensitivities"] = Get<cxfl>("sensitivities");
             ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
 			ft_params["weights_name"] = std::string("weights");
