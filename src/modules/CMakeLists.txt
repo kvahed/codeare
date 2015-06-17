@@ -60,11 +60,13 @@ if (${NFFT_FOUND})
   set_target_properties(GRASP PROPERTIES PREFIX "")
   target_link_libraries (GRASP ${COMLIBS})   
 
+if (${HAS_CXX11_CONDITIONAL}) 
   add_library (XDGRASP MODULE XDGRASP.hpp XDGRASP.cpp)
   set_target_properties(XDGRASP PROPERTIES PREFIX "")
-  target_link_libraries (XDGRASP ${COMLIBS})   
-
-  list (APPEND INST_TARGETS NuFFT CGSENSE GRASP XDGRASP)
+  target_link_libraries (XDGRASP ${COMLIBS})
+  list (APPEND INST_TARGETS XDGRASP)
+endif()
+  list (APPEND INST_TARGETS NuFFT CGSENSE GRASP)
 
 endif()
 

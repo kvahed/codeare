@@ -112,7 +112,7 @@ template <> struct NFFTTraits<std::complex<double> > {
         nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
-        mri_inh_3d_init_guru (&plan, _N.ptr(), _M, _n.ptr(), _m, sigma, nfft_flags, fftw_flags);
+        //mri_inh_3d_init_guru (&plan, _N.ptr(), _M, _n.ptr(), _m, sigma, nfft_flags, fftw_flags);
         solver_init_advanced_complex (&solver, (nfft_mv_plan_complex*) &plan, solver_flags);
 
         return 0;
@@ -198,7 +198,7 @@ template <> struct NFFTTraits<std::complex<double> > {
      * @return           Success
      */
     inline static int Trafo (const B0Plan& plan) NOEXCEPT {
-    	mri_inh_3d_trafo ((B0Plan*) &plan);
+    	//mri_inh_3d_trafo ((B0Plan*) &plan);
         return 0;
     }
 
@@ -223,7 +223,7 @@ template <> struct NFFTTraits<std::complex<double> > {
      * @return           Success
      */
     inline static int Adjoint  (const B0Plan& plan) NOEXCEPT {
-    	mri_inh_3d_adjoint ((B0Plan*) &plan);
+    	//mri_inh_3d_adjoint ((B0Plan*) &plan);
         return 0;
     }
 
@@ -309,7 +309,7 @@ template <> struct NFFTTraits<std::complex<double> > {
      */
     inline static int Finalize (B0Plan& plan, Solver& solver) NOEXCEPT {
         solver_finalize_complex(&solver);
-        mri_inh_3d_finalize(&plan);
+        //mri_inh_3d_finalize(&plan);
         return 0;
     }
 

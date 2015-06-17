@@ -10,12 +10,6 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/src/matrix/arithmetic
         ${PROJECT_SOURCE_DIR}/src/matrix/io)
 
-add_executable(t_colon t_colon.cpp)
-add_test(colon t_colon)
-
-add_executable(t_sort t_sort.cpp)
-add_test(sort t_sort)
-
 set (COMLIBS ${FFTW3_LIBRARIES})
 if (${MSVC})
   list (APPEND COMLIBS hdf5 hdf5_cpp)
@@ -50,8 +44,14 @@ endif()
 set (TEST_CALL t_tvop)  
 MP_TESTS ("tvop" "${TEST_CALL}")
 
+add_executable(t_sort t_sort.cpp)
+add_test(sort t_sort)
+
+if (${HAS_CXX11_CONDITIONAL}) 
+add_executable(t_colon t_colon.cpp)
+add_test(colon t_colon)
 add_executable(t_view t_view.cpp)
 add_test(view t_view)
-
+endif()
 
 

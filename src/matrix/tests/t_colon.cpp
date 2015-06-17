@@ -2,8 +2,8 @@
 #include "Creators.hpp"
 #include "Print.hpp"
 
-typedef typename Matrix<float>::View::Range R;
-typedef typename Matrix<float>::ConstView::Range CR;
+typedef Matrix<float>::Range R;
+typedef Matrix<float>::ConstRange CR;
 
 int main (int narg, char** argv) {
     Matrix<float> A = randn<float>(3,4);

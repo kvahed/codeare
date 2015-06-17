@@ -583,13 +583,14 @@ public:
     }
 #endif
 
-
+#ifdef HAVE_CXX11_CONDITIONAL
     inline Matrix (ConstView& v) {
         _dim = v._dim;
         Allocate();
         for (size_t i = 0; i < Size(); ++i)
             _M[0] = *(v._pointers[i]);
     }
+#endif
 
     //@}
 
@@ -1416,6 +1417,7 @@ public:
         return *this;
     }
 
+#ifdef HAVE_CXX11_CONDITIONAL
     inline Matrix<T,P>& operator= (const ConstView& v) {
         _dim = v._dim;
         Allocate();
@@ -1423,6 +1425,7 @@ public:
             _M[i] = *(v._pointers[i]);
         return *this;
     }
+#endif
 
 
     /**
@@ -2612,6 +2615,8 @@ public:
     }
     */
 
+#ifdef HAVE_CXX11_CONDITIONAL
+
     View operator() (Range r) {
         Vector<Range> vr;
         vr.push_back (r);
@@ -2660,6 +2665,7 @@ public:
         vr.push_back (r2);
         return ConstView(this, vr);
     }
+#endif
 
 protected:
 	

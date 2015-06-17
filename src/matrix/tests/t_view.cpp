@@ -2,12 +2,12 @@
 #include "Creators.hpp"
 #include "Print.hpp"
 
-typedef typename Matrix<double>::View::Range R;
-typedef typename Matrix<double>::ConstView::Range CR;
-
 int main (int narg, const char** argv) {
 
-    Matrix<double> M1(10,1), M2, M3(M1), M4(3,4), M6(4,3), M5(3,4,2), M7(3,4,2), M8;
+	typedef Matrix<double>::Range R;
+	typedef Matrix<double>::ConstRange CR;
+
+	Matrix<double> M1(10, 1), M2, M3(M1), M4(3, 4), M6(4, 3), M5(3, 4, 2), M7(3, 4, 2), M8;
     M1 = 0.0;
     M2 = M1;
 

@@ -94,10 +94,10 @@ codeare::error_code XDGRASP::Prepare () {
 }
 
 
-typedef typename Matrix<cxfl>::View::Range R;
-typedef typename Matrix<cxfl>::ConstView::Range CR;
-typedef typename Matrix<float>::View::Range RF;
-typedef typename Matrix<float>::ConstView::Range CRF;
+typedef Matrix<cxfl>::Range R;
+typedef Matrix<cxfl>::ConstRange CR;
+typedef Matrix<float>::Range RF;
+typedef Matrix<float>::ConstRange CRF;
 
 codeare::error_code XDGRASP::Process () {
     Matrix<cxfl> kdata = Get<cxfl>("signals");
