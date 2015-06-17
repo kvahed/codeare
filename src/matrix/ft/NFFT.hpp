@@ -39,8 +39,10 @@ class NFFT : public FT<T> {
 
 #ifdef HAVE_NFFT3F
     typedef T NFFTType;
+    typedef typename TypeTraits<T>::RT NFFTRType;
 #else
-    typedef double NFFTType;
+    typedef std::complex<double> NFFTType;
+    typedef double NFFTRType;
 #endif
 	typedef typename TypeTraits<T>::RT RT;
     typedef typename NFFTTraits<NFFTType>::Plan   Plan;
@@ -333,7 +335,7 @@ public:
     Matrix<T>
     Trafo       (const Matrix<T>& m) const NOEXCEPT {
 
-		RT* tmpd;
+		NFFTRType* tmpd;
 		RT* tmpt;
         Matrix<T> out (m_M, ((m_3rd_dim_cart && m_ncart > 1) ? m_ncart : 1));
         Matrix<T> tmpm = m;
@@ -363,7 +365,7 @@ public:
 
         for (size_t i = 0; i < m_ncart; ++i) {
 
-			tmpd = (RT*) m_plan.f_hat;
+			tmpd = (NFFTRType*) m_plan.f_hat;
 			tmpt = (RT*) tmpm.Ptr() + i*m_imgsz;
 
 			//TODO: b0 not 2D+1D+1D
@@ -382,7 +384,7 @@ public:
 			else
 				NFFTTraits<NFFTType>::Trafo (m_plan);
 
-			tmpd = (RT*) m_plan.f;
+			tmpd = (NFFTRType*) m_plan.f;
 			tmpt = (RT*) out.Ptr() + i*2*m_M;
 			std::copy (tmpd, tmpd+2*m_M, tmpt);
         }
@@ -402,7 +404,7 @@ public:
     Adjoint     (const Matrix<T>& m) const NOEXCEPT {
 
         Vector<size_t> N = m_N;
-        RT* tmpd;
+        NFFTRType* tmpd;
         RT* tmpt;
 
         if (m_have_b0)
@@ -413,7 +415,7 @@ public:
         Matrix<T> out (N);
         for (size_t i = 0; i < m_ncart; ++i) {
 
-			tmpd = (RT*) m_solver.y;
+			tmpd = (NFFTRType*) m_solver.y;
 			tmpt = (RT*) m.Ptr() + i*2*m_M;
 			std::copy (tmpt, tmpt+2*m_M, tmpd);
 
@@ -424,7 +426,7 @@ public:
 				NFFTTraits<NFFTType>::ITrafo (  (Plan&)    m_plan,
 						(Solver&) m_solver, m_maxit, m_epsilon);
 
-			tmpd = (RT*) m_solver.f_hat_iter;
+			tmpd = (NFFTRType*) m_solver.f_hat_iter;
 			tmpt = (RT*) out.Ptr() + i*m_imgsz;
 			std::copy (tmpd, tmpd+m_imgsz, tmpt);
 

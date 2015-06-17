@@ -273,10 +273,17 @@ template <> struct NFFTTraits<std::complex<double> > {
      * @return           Success
      */
     inline static int Psi (Plan& plan) NOEXCEPT {
+#ifdef HAVE_NFFTF3
         if(plan.flags & PRE_PSI) /* precompute full psi */
             nfft_precompute_one_psi(&plan);
         if(plan.flags & PRE_FULL_PSI) /* precompute full psi */
             nfft_precompute_full_psi(&plan);
+#else
+        if(plan.nfft_flags & PRE_PSI) /* precompute full psi */
+            nfft_precompute_one_psi(&plan);
+        if(plan.nfft_flags & PRE_FULL_PSI) /* precompute full psi */
+            nfft_precompute_full_psi(&plan);
+#endif
         return 0;
     }
 
@@ -310,6 +317,7 @@ template <> struct NFFTTraits<std::complex<double> > {
 
 };
 
+#ifdef HAVE_NFFTF3
 
 template <> struct NFFTTraits<std::complex<float> > {
 
@@ -580,7 +588,7 @@ template <> struct NFFTTraits<std::complex<float> > {
 
 };
 
-
+#endif
 
 //
 //template<class T> const T Window<T>::KPI = 3.1415926535897932384626433832795028841971693993751;
