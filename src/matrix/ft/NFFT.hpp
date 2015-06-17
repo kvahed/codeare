@@ -37,13 +37,12 @@
 template <class T>
 class NFFT : public FT<T> {
 
-    typedef typename NFFTTraits<std::complex<double> >::Plan   Plan;
-    typedef typename NFFTTraits<std::complex<double> >::B0Plan B0Plan;
-    typedef typename NFFTTraits<std::complex<double> >::Solver Solver;
-    typedef typename FTTraits<T>::Plan CartPlan;
 	typedef typename FTTraits<T>::T FTType;
 	typedef typename TypeTraits<T>::RT RT;
-
+    typedef typename NFFTTraits<T>::Plan   Plan;
+    typedef typename NFFTTraits<T>::B0Plan B0Plan;
+    typedef typename NFFTTraits<T>::Solver Solver;
+    typedef typename FTTraits<T>::Plan CartPlan;
 
 public:
 
@@ -196,7 +195,7 @@ public:
             m_ts =  (m_min_t+m_max_t)/2.;
             RT t    = ((m_max_t-m_min_t)/2.)/(.5-((RT) (m_m))/m_N[2]);
 
-        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_sigma,
+        	NFFTTraits<T>::Init (m_N, m_M, m_n, m_m, m_sigma,
         			m_b0_plan, m_solver);
 
             for (size_t j = 0; j < m_N[0]*m_N[1]; ++j)
@@ -204,7 +203,7 @@ public:
 
 
         } else {
-        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
+        	NFFTTraits<T>::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
         }
         
         if (p.exists("pc")) {
@@ -235,9 +234,9 @@ public:
     virtual ~NFFT () NOEXCEPT {
         if (m_initialised)
         	if (m_have_b0)
-        		NFFTTraits<std::complex<double> >::Finalize (m_b0_plan, m_solver);
+        		NFFTTraits<T>::Finalize (m_b0_plan, m_solver);
         	else
-        		NFFTTraits<std::complex<double> >::Finalize (m_plan, m_solver);
+        		NFFTTraits<T>::Finalize (m_plan, m_solver);
     }
     
     
@@ -270,10 +269,10 @@ public:
         m_3rd_dim_cart = ft.m_3rd_dim_cart;
         m_ncart       = ft.m_ncart;
         if (m_have_b0)
-        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_sigma,
+        	NFFTTraits<T>::Init (m_N, m_M, m_n, m_m, m_sigma,
         			m_b0_plan, m_solver);
         else
-        	NFFTTraits<std::complex<double> >::Init (m_N, m_M, m_n, m_m, m_plan,
+        	NFFTTraits<T>::Init (m_N, m_M, m_n, m_m, m_plan,
         			m_solver);
         return *this;
         
@@ -311,11 +310,11 @@ public:
     		assert (w.Size() == m_plan.M_total);
         std::copy (w.Begin(), w.End(), m_solver.w);
         if (m_have_b0) {
-            NFFTTraits<std::complex<double> >::Weights (m_b0_plan.plan, m_solver, m_rank);
-            NFFTTraits<std::complex<double> >::Psi (m_b0_plan.plan);
+            NFFTTraits<T>::Weights (m_b0_plan.plan, m_solver, m_rank);
+            NFFTTraits<T>::Psi (m_b0_plan.plan);
         } else {
-        	NFFTTraits<std::complex<double> >::Weights (m_plan, m_solver, m_rank);
-        	NFFTTraits<std::complex<double> >::Psi (m_plan);
+        	NFFTTraits<T>::Weights (m_plan, m_solver, m_rank);
+        	NFFTTraits<T>::Psi (m_plan);
         }
         m_have_weights = true;
     }
@@ -330,7 +329,7 @@ public:
     Matrix<T>
     Trafo       (const Matrix<T>& m) const NOEXCEPT {
 
-		double* tmpd;
+		RT* tmpd;
 		RT* tmpt;
         Matrix<T> out (m_M, ((m_3rd_dim_cart && m_ncart > 1) ? m_ncart : 1));
         Matrix<T> tmpm = m;
@@ -360,7 +359,7 @@ public:
 
         for (size_t i = 0; i < m_ncart; ++i) {
 
-			tmpd = (double*) m_plan.f_hat;
+			tmpd = (RT*) m_plan.f_hat;
 			tmpt = (RT*) tmpm.Ptr() + i*m_imgsz;
 
 			//TODO: b0 not 2D+1D+1D
@@ -375,11 +374,11 @@ public:
 				std::copy (tmpt, tmpt+m_imgsz, tmpd);
 
 			if (m_have_b0)
-				NFFTTraits<std::complex<double> >::Trafo (m_b0_plan);
+				NFFTTraits<T>::Trafo (m_b0_plan);
 			else
-				NFFTTraits<std::complex<double> >::Trafo (m_plan);
+				NFFTTraits<T>::Trafo (m_plan);
 
-			tmpd = (double*) m_plan.f;
+			tmpd = (RT*) m_plan.f;
 			tmpt = (RT*) out.Ptr() + i*2*m_M;
 			std::copy (tmpd, tmpd+2*m_M, tmpt);
         }
@@ -399,7 +398,7 @@ public:
     Adjoint     (const Matrix<T>& m) const NOEXCEPT {
 
         Vector<size_t> N = m_N;
-        double* tmpd;
+        RT* tmpd;
         RT* tmpt;
 
         if (m_have_b0)
@@ -410,18 +409,18 @@ public:
         Matrix<T> out (N);
         for (size_t i = 0; i < m_ncart; ++i) {
 
-			tmpd = (double*) m_solver.y;
+			tmpd = (RT*) m_solver.y;
 			tmpt = (RT*) m.Ptr() + i*2*m_M;
 			std::copy (tmpt, tmpt+2*m_M, tmpd);
 
 			if (m_have_b0)
-				NFFTTraits<std::complex<double> >::ITrafo ((B0Plan&) m_b0_plan,
+				NFFTTraits<T>::ITrafo ((B0Plan&) m_b0_plan,
 						(Solver&) m_solver, m_maxit, m_epsilon);
 			else
-				NFFTTraits<std::complex<double> >::ITrafo (  (Plan&)    m_plan,
+				NFFTTraits<T>::ITrafo (  (Plan&)    m_plan,
 						(Solver&) m_solver, m_maxit, m_epsilon);
 
-			tmpd = (double*) m_solver.f_hat_iter;
+			tmpd = (RT*) m_solver.f_hat_iter;
 			tmpt = (RT*) out.Ptr() + i*m_imgsz;
 			std::copy (tmpd, tmpd+m_imgsz, tmpt);
 

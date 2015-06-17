@@ -193,7 +193,7 @@ MP_TESTS ("denoise_cs" "${TEST_CALL}")
 #   MP_TESTS ("vdspiral" "${TEST_CALL}")
 #endif()
 
-if (${NFFT_FOUND})
+if (${NFFT3_FOUND})
 
   set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/nufft -c 16shot.xml)
   MP_TESTS ("nufft" "${TEST_CALL}")

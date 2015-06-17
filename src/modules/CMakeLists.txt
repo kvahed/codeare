@@ -44,9 +44,9 @@ target_link_libraries (DummyRecon ${COMLIBS})
 
 list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE GRAPPA DummyRecon)
 
-if (${NFFT_FOUND})
-
-  list (APPEND COMLIBS ${NFFT_LIBRARIES})
+if (${NFFT3_FOUND})
+  message(${NFFT3_LIBRARIES})
+  list (APPEND COMLIBS ${NFFT3_LIBRARIES})
 
   add_library (NuFFT MODULE NuFFT.hpp NuFFT.cpp)
   set_target_properties(NuFFT PROPERTIES PREFIX "")

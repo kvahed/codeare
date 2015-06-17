@@ -226,10 +226,10 @@ public:
 	                for (size_t i = 0; i < _idx.size(); ++i)
 	                    _idx[i] = _begin + i;
 	            }
-                inline const size_t Begin() const {
+                inline size_t Begin() const {
 	                return _begin;
 	            }
-	            inline const size_t End() const {
+	            inline size_t End() const {
 	                return _end;
 	            }
 	            inline size_t Size() const {
@@ -363,7 +363,7 @@ public:
 	        }
 
 	        inline Range& Rng() { return _range; }
-	        inline const size_t Size() const {return _pointers.size();}
+	        inline size_t Size() const {return _pointers.size();}
 
 	        MatrixType* _matrix;
 	        Vector<Range> _range;
@@ -387,6 +387,10 @@ public:
 	    typedef ConstNoConstView<false> View;
 	    typedef typename ConstNoConstView<true>::Range ConstRange;
 	    typedef typename ConstNoConstView<false>::Range Range;
+	    typedef ConstNoConstView<true> CV;
+	    typedef ConstNoConstView<false> V;
+	    typedef typename ConstNoConstView<true>::Range CR;
+	    typedef typename ConstNoConstView<false>::Range R;
 
 #endif
 
