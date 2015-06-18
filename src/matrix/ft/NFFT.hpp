@@ -291,14 +291,14 @@ public:
      */
     inline virtual void KSpace (const Matrix<RT>& k) NOEXCEPT {
         if (m_have_b0) { // +1D for omega
-            for (size_t j = 0; j < m_b0_plan.M_total; ++j) {
+            for (size_t j = 0; j < (size_t)m_b0_plan.M_total; ++j) {
 				m_b0_plan.plan.x[3*j+0] = k[2*j+0];
 				m_b0_plan.plan.x[3*j+1] = k[2*j+1];
                 m_b0_plan.plan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N.back();
             }
         } else {
             assert (k.Size() == m_plan.M_total*m_rank);
-            std::copy (k.Begin(), k.End(), m_plan.x);
+            std::copy (k.Begin(), k.End(), m_plan.x);		
         }
         m_have_kspace = true;
     }
