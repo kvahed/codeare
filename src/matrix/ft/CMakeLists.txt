@@ -7,8 +7,8 @@ include_directories (${PROJECT_SOURCE_DIR}/src/matrix/io
   ${PROJECT_SOURCE_DIR}/src/matrix/linalg
   ${PROJECT_SOURCE_DIR}/src/optimisation
   ${FFTW3_INCLUDE_DIR}
-  if(${NFFT_FOUND})
-    ${NFFT_INCLUDE_DIR}
+  if(${NFFT3_FOUND})
+    ${NFFT3_INCLUDE_DIR}
   endif()
 )
 if(POLICY CMP0042)
@@ -22,7 +22,7 @@ endif ()
 
 list (APPEND SOURCES DFT.hpp DFT.cpp CSENSE.hpp CSENSE.cpp CGRAPPA.cpp)
 
-if (${NFFT_FOUND})
+if (${NFFT3_FOUND})
   list (APPEND SOURCES NCSENSE.hpp NCSENSE.cpp NFFT.hpp NFFT.cpp)
   list (APPEND COMLIBS ${NFFT3_LIBRARIES})
 endif ()

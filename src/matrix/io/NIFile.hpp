@@ -36,7 +36,7 @@ template<> struct NITraits<long> {
 	static const int native = DT_SIGNED_INT;
 };
 template<> struct NITraits<size_t> {
-	static const int native = (SIZEOF_VOIDP == 8) ? DT_UINT64 : DT_UINT32;
+	static const int native = (sizeof(void*) == 8) ? DT_UINT64 : DT_UINT32;
 };
 
 
