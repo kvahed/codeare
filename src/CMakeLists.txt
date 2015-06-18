@@ -173,6 +173,8 @@ if (${WINDOWS})
   string(REPLACE "/" "\\" LD_ENV "${LD_ENV}")
 endif()
 
+message (${LD_ENV})
+
 # Test macro -------------------------------------------------------- 
 include (TestMacro)
 
