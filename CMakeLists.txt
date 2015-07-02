@@ -31,7 +31,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINUX TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(MACOSX TRUE)
-  set (Boost_USE_STATIC_LIBS ON)
+#  set (Boost_USE_STATIC_LIBS ON)
 endif()
 
 # C++ flags ----------------------------------------------------------
@@ -196,7 +196,7 @@ if (${MSVC})
   set(ZLIB_INCLUDE_DIR "${HDF5_DIR}/../../include")
   set(ZLIB_FOUND "1")
 else()
-  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -lhdf5 -lhdf5_cpp")
+  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${HDF5_LIBRARIES}")
   find_package(ZLIB REQUIRED)
 endif()
 

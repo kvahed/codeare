@@ -98,6 +98,7 @@ enum RangeParseException {
 	#include <boost/tuple/tuple.hpp>
 #endif
 
+#include <boost/lexical_cast.hpp>
 
 #include <Assert.hpp>
 
@@ -149,71 +150,74 @@ public:
 
 	        class Range {
 	        public:
+
 	            inline Range () :
 	                _stride(1), _begin(0), _end(0) {}
+
 	            inline Range (const size_t& begend) :
 	                _stride(1), _begin(begend), _end(begend) {
-                    if (_begin < 0)
-                        throw  NEGATIVE_BEGIN_INDEX;                           
-                    _idx.push_back(_begin);
+                    HandleSingleInput();
                 }
+
 	            inline Range (const size_t& begin, const size_t& end) :
 	                _stride(1), _begin(begin), _end(end) {
-                    if (_begin < 0) {
-                        printf ("NEGATIVE_BEGIN_INDEX\n");
-                        throw NEGATIVE_BEGIN_INDEX;
-                    }
-                    if (_end < 0) {
-                        printf ("NEGATIVE_END_INDEX\n");
-                        throw NEGATIVE_END_INDEX;
-                    }
-                    if (_end < begin) {
-                        printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
-                        throw STRIDE_MUST_NOT_BE_ZERO;
-                    }
-	                _idx.resize(_end-begin+1);
-	                for (size_t i = 0; i < _idx.size(); ++i)
-	                    _idx[i] = _begin + i;
+                    HandleTwoInputs();
 	            }
+
 	            inline Range (const size_t& begin, const size_t& stride, const size_t& end) :
-	                _stride(stride), _begin(begin), _end(end){
-                    if (_begin < 0) {
-                        printf ("NEGATIVE_BEGIN_INDEX\n");
-                        throw NEGATIVE_BEGIN_INDEX;
-                    }
-                    if (_end < 0) {
-                        printf ("NEGATIVE_END_INDEX\n");
-                        throw NEGATIVE_END_INDEX;
-                    }
-                    if (_stride == 0) {
-                        printf ("STRIDE_MUST_NOT_BE_ZERO\n");
-                        throw STRIDE_MUST_NOT_BE_ZERO;
-                    }
-                    if (_stride > 0 && _end < _begin) {
-                        printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
-                        throw POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE;
-                    }
-                    if (_stride < 0 && _end > _begin) {
-                        printf ("NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE\n");
-                        throw NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE;
-                    }
-	                _idx.resize(std::floor(((float)_end-(float)_begin)/(float)_stride)+1);
-	                for (size_t i = 0; i < _idx.size(); ++i)
-	                    _idx[i] = _begin + i*_stride;
+	                _stride(stride), _begin(begin), _end(end) {
+                    HandleThreeInputs();
 	            }
                 inline Range (const Vector<size_t>& v) : _stride(0), _begin(0), _end(0) {
                     _idx = v;
                 }
-                    
+
 	            inline Range (const std::string& rs) {
 	                ParseRange(rs);
 	            }
 	            inline Range (const char* rcs) {
 	                ParseRange(std::string(rcs));
 	            }
-	            inline void ParseRange (const std::string& rs) {
-                    
-	                // TODO: Parse string
+	            inline void ParseRange (std::string rs) {
+                    // remove white spaces
+                    rs.erase(std::remove_if(rs.begin(), rs.end(), ::isspace), rs.end());
+                    // split delimited by kommas
+                    std::vector<std::string> parts = Parse(rs,":");
+                    switch (parts.size()) {
+                    case 1:
+                        _begin  = boost::lexical_cast<int>(parts[0]);
+                        _stride = 1;
+                        _end    = _begin;
+                        HandleSingleInput();
+                        break;
+                    case 2:
+                        _begin  = boost::lexical_cast<int>(parts[0]);
+                        _stride = 1;
+                        _end    = boost::lexical_cast<int>(parts[1]);
+                        try {
+                            HandleTwoInputs();
+                        } catch (const RangeParseException& pe) {
+                            std::cout << rs.c_str() << std::endl;
+                            std::cout << _begin << ":" << _stride << ":" << _end << std::endl;
+                            throw pe;
+                        }
+                        break;
+                    case 3:
+                        _begin  = boost::lexical_cast<int>(parts[0]);
+                        _stride = boost::lexical_cast<int>(parts[1]);
+                        _end    = boost::lexical_cast<int>(parts[2]);
+                        try {
+                            HandleThreeInputs();
+                        } catch (const RangeParseException& pe) {
+                            std::cout << rs.c_str() << std::endl;
+                            std::cout << _begin << ":" << _stride << ":" << _end << std::endl;
+                            throw pe;
+                        }
+                        break;
+                    default:
+                        throw RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS;
+                        break;
+                    }
 	            }
 	            virtual ~Range() {}
 
@@ -240,6 +244,57 @@ public:
 	            }
 	            inline size_t operator[] (const size_t& i) const { return _idx[i]; }
 	        private:
+
+                inline void HandleSingleInput () {
+                    if (_begin < 0)
+                        throw  NEGATIVE_BEGIN_INDEX;                           
+                    _idx.push_back(_begin);
+                }
+                
+                inline void HandleThreeInputs () {
+                    if (_begin < 0) {
+                        printf ("NEGATIVE_BEGIN_INDEX\n");
+                        throw NEGATIVE_BEGIN_INDEX;
+                    }
+                    if (_end < 0) {
+                        printf ("NEGATIVE_END_INDEX\n");
+                        throw NEGATIVE_END_INDEX;
+                    }
+                    if (_stride == 0) {
+                        printf ("STRIDE_MUST_NOT_BE_ZERO\n");
+                        throw STRIDE_MUST_NOT_BE_ZERO;
+                    }
+                    if (_stride > 0 && _end < _begin) {
+                        printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
+                        throw POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE;
+                    }
+                    if (_stride < 0 && _end > _begin) {
+                        printf ("NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE\n");
+                        throw NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE;
+                    }
+	                _idx.resize(std::floor(((float)_end-(float)_begin)/(float)_stride)+1);
+	                for (size_t i = 0; i < _idx.size(); ++i)
+	                    _idx[i] = _begin + i*_stride;
+                }
+                
+                inline void HandleTwoInputs () {
+                    if (_begin < 0) {
+                        printf ("NEGATIVE_BEGIN_INDEX\n");
+                        throw NEGATIVE_BEGIN_INDEX;
+                    }
+                    if (_end < 0) {
+                        printf ("%d: NEGATIVE_END_INDEX\n", _end);
+                        throw NEGATIVE_END_INDEX;
+                    }
+                    if (_end < _begin) {
+                        printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
+                        throw STRIDE_MUST_NOT_BE_ZERO;
+                    }
+	                _idx.resize(_end-_begin+1);
+	                for (size_t i = 0; i < _idx.size(); ++i)
+	                    _idx[i] = _begin + i;
+                }
+                
 	            friend std::ostream& operator<< (std::ostream &os, const Range& r) {
 	                return os << r._idx.size() << ": " << r._begin << ":"
 	                          << r._stride << ":" << r._end;

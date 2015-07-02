@@ -32,7 +32,7 @@ Parse     (const std::string& str, const std::string& dlm) {
 
 }
 
-enum RangeParseException {
+/*enum RangeParseException {
 	IMPROPER_RANGE_DECLARATION = 301,
 	RANGE_DOES_NOT_FIT_MATRIX_DIMS,
 	RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS,
@@ -44,7 +44,7 @@ enum RangeParseException {
 	NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE,
 	POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE,
 	STRIDE_MUST_NOT_BE_ZERO
-};
+    };*/
 
 /**
  * @brief

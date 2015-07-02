@@ -29,7 +29,11 @@ Workspace::Finalise () {
 
 void Workspace::Print (std::ostream& os) const {
 
-	os << "codeare service " << VERSION << endl;
+    os << "codeare service ";
+#ifdef VERSION
+	od << VERSION;
+#endif
+    os << endl;
 #ifdef GIT_COMMIT
 	os << "commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
 #endif
