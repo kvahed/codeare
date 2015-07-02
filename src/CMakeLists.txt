@@ -111,12 +111,12 @@ target_compile_definitions (codeare PRIVATE ${OORB_DEFINES})
 target_link_libraries (codeare ${COMLIBS})
 
 install (TARGETS codeare DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/bin) 
+  ${CMAKE_INSTALL_PREFIX}/bin)
 
 if (${LINUX})
-  set (LD_ENV "LD_LIBRARY_PATH=$LD_LIBRARY_PATH")
+  set (LD_ENV $ENV{LD_LIBRARY_PATH})
 elseif (${MACOSX})
-  set (LD_ENV "DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH")
+  set (LD_ENV $ENV{DYLD_LIBRARY_PATH})
 elseif (${WINDOWS})
   set (LD_ENV "PATH=%PATH%")
 endif()

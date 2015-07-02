@@ -37,9 +37,9 @@ endif()
 # C++ flags ----------------------------------------------------------
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC -Ofast -DHAVE_CXXABI_H")
+    "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC -Ofast -march=native -DHAVE_CXXABI_H")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DTIXML_USE_STL -fPIC -DHAVE_CXXABI_H")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL -march=native -Ofast -fPIC -DHAVE_CXXABI_H")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL -DHAVE_CXXABI_H")
 elseif (${MSVC})
