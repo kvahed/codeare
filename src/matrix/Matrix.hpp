@@ -57,6 +57,8 @@ Parse     (const std::string& str, const std::string& dlm) {
 
 }
 
+static const int end = -1;
+
 enum RangeParseException {
 	IMPROPER_RANGE_DECLARATION = 301,
 	RANGE_DOES_NOT_FIT_MATRIX_DIMS,
@@ -145,307 +147,309 @@ public:
     
 #ifdef HAVE_CXX11_CONDITIONAL
 
-	    template<bool is_const = true> class ConstNoConstView {
-	    public:
-
-	        class Range {
-	        public:
-
-	            inline Range () :
-	                _stride(1), _begin(0), _end(0) {}
-
-	            inline Range (const size_t& begend) :
-	                _stride(1), _begin(begend), _end(begend) {
-                    HandleSingleInput();
-                }
-
-	            inline Range (const size_t& begin, const size_t& end) :
-	                _stride(1), _begin(begin), _end(end) {
-                    HandleTwoInputs();
-	            }
-
-	            inline Range (const size_t& begin, const size_t& stride, const size_t& end) :
-	                _stride(stride), _begin(begin), _end(end) {
-                    HandleThreeInputs();
-	            }
-                inline Range (const Vector<size_t>& v) : _stride(0), _begin(0), _end(0) {
-                    _idx = v;
-                }
-
-	            inline Range (const std::string& rs) {
-	                ParseRange(rs);
-	            }
-	            inline Range (const char* rcs) {
-	                ParseRange(std::string(rcs));
-	            }
-	            inline void ParseRange (std::string rs) {
-                    // remove white spaces
-                    rs.erase(std::remove_if(rs.begin(), rs.end(), ::isspace), rs.end());
-                    // split delimited by kommas
-                    std::vector<std::string> parts = Parse(rs,":");
-                    switch (parts.size()) {
-                    case 1:
-                        _begin  = boost::lexical_cast<int>(parts[0]);
-                        _stride = 1;
-                        _end    = _begin;
-                        HandleSingleInput();
-                        break;
-                    case 2:
-                        _begin  = boost::lexical_cast<int>(parts[0]);
-                        _stride = 1;
-                        _end    = boost::lexical_cast<int>(parts[1]);
-                        try {
-                            HandleTwoInputs();
-                        } catch (const RangeParseException& pe) {
-                            std::cout << rs.c_str() << std::endl;
-                            std::cout << _begin << ":" << _stride << ":" << _end << std::endl;
-                            throw pe;
-                        }
-                        break;
-                    case 3:
-                        _begin  = boost::lexical_cast<int>(parts[0]);
-                        _stride = boost::lexical_cast<int>(parts[1]);
-                        _end    = boost::lexical_cast<int>(parts[2]);
-                        try {
-                            HandleThreeInputs();
-                        } catch (const RangeParseException& pe) {
-                            std::cout << rs.c_str() << std::endl;
-                            std::cout << _begin << ":" << _stride << ":" << _end << std::endl;
-                            throw pe;
-                        }
-                        break;
-                    default:
-                        throw RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS;
-                        break;
-                    }
-	            }
-	            virtual ~Range() {}
-
-                inline void Reset (const size_t& begin, const size_t& end) {
-                    _begin = begin;
-                    _end = end;
+    template<bool is_const = true> class ConstNoConstView {
+    public:
+        
+        class Range {
+            typedef typename std::conditional<is_const, const Matrix, Matrix>::type MatrixType;
+            
+        public:
+            
+            inline Range () :
+                _stride(1), _begin(0), _end(0) {}
+            
+            inline Range (const size_t& begend) :
+                _stride(1), _begin(begend), _end(begend) {
+                HandleSingleInput();
+            }
+            
+            inline Range (const size_t& begin, const size_t& end) :
+                _stride(1), _begin(begin), _end(end) {
+                HandleTwoInputs();
+            }
+            
+            inline Range (const size_t& begin, const size_t& stride, const size_t& end) :
+                _stride(stride), _begin(begin), _end(end) {
+                HandleThreeInputs();
+            }
+            inline Range (const Vector<size_t>& v) : _stride(0), _begin(0), _end(0) {
+                _idx = v;
+            }
+            
+            inline Range (const std::string& rs) {
+                ParseRange(rs);
+            }
+            inline Range (const char* rcs) {
+                ParseRange(std::string(rcs));
+            }
+            inline void ParseRange (std::string rs) {
+                // remove white spaces
+                rs.erase(std::remove_if(rs.begin(), rs.end(), ::isspace), rs.end());
+                // split delimited by kommas
+                std::vector<std::string> parts = Parse(rs,":");
+                switch (parts.size()) {
+                case 1:
+                    _begin  = boost::lexical_cast<int>(parts[0]);
                     _stride = 1;
-	                assert (_end>=_begin);
-	                _idx.resize(_end-_begin+1);
-	                for (size_t i = 0; i < _idx.size(); ++i)
-	                    _idx[i] = _begin + i;
-	            }
-                inline size_t Begin() const {
-	                return _begin;
-	            }
-	            inline size_t End() const {
-	                return _end;
-	            }
-	            inline size_t Size() const {
-	                return _idx.size();
-	            }
-	            inline size_t IsSingleton() const {
-	                return (_idx.size()==1);
-	            }
-	            inline size_t operator[] (const size_t& i) const { return _idx[i]; }
-	        private:
-
-                inline void HandleSingleInput () {
-                    if (_begin < 0)
-                        throw  NEGATIVE_BEGIN_INDEX;                           
-                    _idx.push_back(_begin);
+                    _end    = _begin;
+                    break;
+                case 2:
+                    _begin  = boost::lexical_cast<int>(parts[0]);
+                    _stride = 1;
+                    _end    = boost::lexical_cast<int>(parts[1]);
+                    break;
+                case 3:
+                    _begin  = boost::lexical_cast<int>(parts[0]);
+                    _stride = boost::lexical_cast<int>(parts[1]);
+                    _end    = boost::lexical_cast<int>(parts[2]);
+                    break;
+                default:
+                    throw RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS;
+                    break;
                 }
-                
-                inline void HandleThreeInputs () {
-                    if (_begin < 0) {
-                        printf ("NEGATIVE_BEGIN_INDEX\n");
-                        throw NEGATIVE_BEGIN_INDEX;
-                    }
-                    if (_end < 0) {
-                        printf ("NEGATIVE_END_INDEX\n");
-                        throw NEGATIVE_END_INDEX;
-                    }
-                    if (_stride == 0) {
-                        printf ("STRIDE_MUST_NOT_BE_ZERO\n");
-                        throw STRIDE_MUST_NOT_BE_ZERO;
-                    }
-                    if (_stride > 0 && _end < _begin) {
-                        printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
-                        throw POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE;
-                    }
-                    if (_stride < 0 && _end > _begin) {
-                        printf ("NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE\n");
-                        throw NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE;
-                    }
-	                _idx.resize(std::floor(((float)_end-(float)_begin)/(float)_stride)+1);
-	                for (size_t i = 0; i < _idx.size(); ++i)
-	                    _idx[i] = _begin + i*_stride;
-                }
-                
-                inline void HandleTwoInputs () {
-                    if (_begin < 0) {
-                        printf ("NEGATIVE_BEGIN_INDEX\n");
-                        throw NEGATIVE_BEGIN_INDEX;
-                    }
-                    if (_end < 0) {
-                        printf ("%d: NEGATIVE_END_INDEX\n", _end);
-                        throw NEGATIVE_END_INDEX;
-                    }
-                    if (_end < _begin) {
-                        printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
-                        throw STRIDE_MUST_NOT_BE_ZERO;
-                    }
-	                _idx.resize(_end-_begin+1);
-	                for (size_t i = 0; i < _idx.size(); ++i)
-	                    _idx[i] = _begin + i;
-                }
-                
-	            friend std::ostream& operator<< (std::ostream &os, const Range& r) {
-	                return os << r._idx.size() << ": " << r._begin << ":"
-	                          << r._stride << ":" << r._end;
-	            }
-	            long _begin, _end, _stride;
-	            Vector<size_t> _idx;
-	        };
-
-	        typedef typename std::conditional<is_const, const Matrix, Matrix>::type MatrixType;
-	        typedef typename std::conditional<is_const, const T, T>::type Type;
-
-	        inline ConstNoConstView () : _matrix(0) {}
-	        inline ConstNoConstView (MatrixType* matrix, Vector<Range>& range) :
-	            _matrix(matrix), _range(range) {
-	            assert (_range.size());
-	            for (size_t i = 0; i < _range.size(); ++i) 
-	                if (!_range[i].IsSingleton()) {
-                        if (_range[i].Size() == 0) 
-                            _range[i].Reset (0,_matrix->Dim(i)-1);
-	                    _nsdims.push_back(i);
-                    }
-	            if (_range.size() == 1)
-	                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-	                    _pointers.push_back(matrix->Ptr()+_range[0][n0]);
-	            else if (_range.size() == 2)
-	                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-	                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-	                        _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1])));
-	            else if (_range.size() == 3)
-	                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-	                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-	                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-	                            _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],_range[2][n2])));
-	            else if (_range.size() == 4)
-	                for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
-	                    for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-	                        for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-	                            for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-	                                _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
-	                                              _range[2][n2],_range[3][n3])));
-	            else if (_range.size() == 5)
-	                for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
-	                    for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
-	                        for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-	                            for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-	                                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-	                                    _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
-	                                              _range[2][n2],_range[3][n3],_range[4][n4])));
-	            else if (_range.size() == 6)
-	                for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
-	                    for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
-	                        for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
-	                            for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-	                                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-	                                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-	                                        _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
-	                                              _range[2][n2],_range[3][n3],_range[4][n4],_range[5][n5])));
-	            else if (_range.size() == 7)
-	                for (size_t n6 = 0; n6 < _range[6].Size(); ++n6)
-	                    for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
-	                        for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
-	                            for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
-	                                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-	                                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-	                                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-	                                            _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
-	                                              _range[2][n2],_range[3][n3],_range[4][n4],_range[5][n5],_range[6][n6])));
-	            else if (_range.size() == 8)
-	                for (size_t n7 = 0; n7 < _range[7].Size(); ++n7)
-	                    for (size_t n6 = 0; n6 < _range[6].Size(); ++n6)
-	                        for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
-	                            for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
-	                                for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
-	                                    for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
-	                                        for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
-	                                            for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
-	                                                _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],
-	                                                     _range[2][n2],_range[3][n3],_range[4][n4],_range[5][n5],
-	                                                     _range[6][n6],_range[7][n7])));
-
-	            for (auto it = _range.begin(); it != _range.end();) {
-	            	_dim.push_back(it->Size());
-	                if(it->IsSingleton())
-	                    it = _range.Erase(it);
-	                else
-	                    ++it;
-	            }
-	        }
-
-            operator Matrix() const {
-                Matrix res (_dim);
-                for (size_t i = 0; i < Size(); ++i)
-                    res[i] = *(_pointers[i]);
-                return res;
             }
-
-            inline ConstNoConstView& operator= (const Matrix& M) {
-                assert(_dim == M.Dim());
-                for (size_t i = 0; i < Size(); ++i)
-                    *(_pointers[i]) = M[i];
-                return *this;
+            virtual ~Range() {}
+            
+            inline void Reset (const size_t& begin, const size_t& end) {
+                _begin = begin;
+                _end = end;
+                _stride = 1;
+                assert (_end>=_begin);
+                _idx.resize(_end-_begin+1);
+                for (size_t i = 0; i < _idx.size(); ++i)
+                    _idx[i] = _begin + i;
             }
-
-	        virtual ~ConstNoConstView () { _matrix = 0; }
-
-	        inline ConstNoConstView& operator= (const ConstNoConstView<true>& v) {
-	            Matrix& lhs = *_matrix;
-	            const Matrix& rhs = *(v._matrix);
-	            assert (_nsdims.size() == v._nsdims.size());
-	            for (size_t i = 0; i < _nsdims.size(); ++i)
-	                assert(_range[i].Size()==v._range[i].Size());
-	            for (size_t i = 0; i < _pointers.size(); ++i)
-	                *_pointers[i] = *(v._pointers)[i];
-	            return *this;
-	        }
-	        inline ConstNoConstView& operator= (const Type& t) {
-	            assert (_matrix);
-	            for (size_t i = 0; i < _pointers.size(); ++i)
-	                *_pointers[i] = t;
-	            return *this;
-	        }
-
-	        inline Range& Rng() { return _range; }
-	        inline size_t Size() const {return _pointers.size();}
-
-	        MatrixType* _matrix;
-	        Vector<Range> _range;
-	        Vector<Type*> _pointers;
-	        Vector<size_t> _nsdims;
-            Vector<size_t> _dim;
-
-	    private:
-	        friend std::ostream& operator<< (std::ostream &os, const ConstNoConstView& r) {
-	            os << "(";
-	            for (size_t i = 0; i < r._range.size(); ++i) {
-	                if (i)
-	                    os << ",";
-	                os << r._range[i];
-	            }
-	            return os << ")" << std::endl;
-	        }
-	    };
-
-	    typedef ConstNoConstView<true> ConstView;
-	    typedef ConstNoConstView<false> View;
-	    typedef typename ConstNoConstView<true>::Range ConstRange;
-	    typedef typename ConstNoConstView<false>::Range Range;
-	    typedef ConstNoConstView<true> CV;
-	    typedef ConstNoConstView<false> V;
-	    typedef typename ConstNoConstView<true>::Range CR;
-	    typedef typename ConstNoConstView<false>::Range R;
+            inline size_t Begin() const {
+                return _begin;
+            }
+            inline size_t End() const {
+                return _end;
+            }
+            inline size_t Size() const {
+                return _idx.size();
+            }
+            inline size_t IsSingleton() const {
+                return (_idx.size()==1);
+            }
+            inline void Parent (MatrixType* p) {
+                HandleThreeInputs();
+            }
+            inline size_t operator[] (const size_t& i) const { return _idx[i]; }
+        private:
+            
+            inline void HandleSingleInput () {
+                if (_begin < 0)
+                    throw  NEGATIVE_BEGIN_INDEX;                           
+                _idx.push_back(_begin);
+            }
+            
+            inline void HandleThreeInputs () {
+                if (_begin < 0) {
+                    printf ("NEGATIVE_BEGIN_INDEX\n");
+                    throw NEGATIVE_BEGIN_INDEX;
+                }
+                if (_end < 0) {
+                    printf ("NEGATIVE_END_INDEX\n");
+                    throw NEGATIVE_END_INDEX;
+                }
+                if (_stride == 0) {
+                    printf ("STRIDE_MUST_NOT_BE_ZERO\n");
+                    throw STRIDE_MUST_NOT_BE_ZERO;
+                    }
+                if (_stride > 0 && _end < _begin) {
+                    printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
+                    throw POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE;
+                }
+                if (_stride < 0 && _end > _begin) {
+                    printf ("NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE\n");
+                    throw NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE;
+                }
+                _idx.resize(std::floor(((float)_end-(float)_begin)/(float)_stride)+1);
+                for (size_t i = 0; i < _idx.size(); ++i)
+                    _idx[i] = _begin + i*_stride;
+            }
+            
+            inline void HandleTwoInputs () {
+                if (_begin < 0) {
+                    printf ("NEGATIVE_BEGIN_INDEX\n");
+                    throw NEGATIVE_BEGIN_INDEX;
+                }
+                if (_end < 0) {
+                    printf ("%d: NEGATIVE_END_INDEX\n", _end);
+                    throw NEGATIVE_END_INDEX;
+                }
+                if (_end < _begin) {
+                    printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
+                    throw STRIDE_MUST_NOT_BE_ZERO;
+                }
+                _idx.resize(_end-_begin+1);
+                for (size_t i = 0; i < _idx.size(); ++i)
+                    _idx[i] = _begin + i;
+            }
+            
+            friend std::ostream& operator<< (std::ostream &os, const Range& r) {
+                return os << r._idx.size() << ": " << r._begin << ":"
+                          << r._stride << ":" << r._end;
+            }
+            long _begin, _end, _stride;
+            Vector<size_t> _idx;
+        };
+        
+        typedef typename std::conditional<is_const, const Matrix, Matrix>::type MatrixType;
+        typedef typename std::conditional<is_const, const T, T>::type Type;
+        
+        inline ConstNoConstView () : _matrix(0) {}
+        inline ConstNoConstView (MatrixType* matrix, Vector<Range>& range) :
+            _matrix(matrix), _range(range) {
+            assert (_range.size());
+            for (size_t i = 0; i < _range.size(); ++i) {
+                if (!_range[i].IsSingleton()) {
+                    if (_range[i].Size() == 0) 
+                        _range[i].Reset (0,_matrix->Dim(i)-1);
+                    _nsdims.push_back(i);
+                }
+            }
+            
+            if (_range.size() == 1)
+                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                    _pointers.push_back(matrix->Ptr()+_range[0][n0]);
+            else if (_range.size() == 2)
+                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                        _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1])));
+            else if (_range.size() == 3)
+                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                            _pointers.push_back(&((*_matrix)(_range[0][n0],_range[1][n1],_range[2][n2])));
+            else if (_range.size() == 4)
+                for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+                    for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                        for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                            for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                                _pointers.push_back(&((*_matrix)
+                                                      (_range[0][n0],_range[1][n1],
+                                                       _range[2][n2],_range[3][n3])));
+            else if (_range.size() == 5)
+                for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+                    for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+                        for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                            for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                                for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                                    _pointers.push_back(&((*_matrix)
+                                                          (_range[0][n0],_range[1][n1],
+                                                           _range[2][n2],_range[3][n3],
+                                                           _range[4][n4])));
+            else if (_range.size() == 6)
+                for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
+                    for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+                        for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+                            for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                                for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                                    for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                                        _pointers.push_back(&((*_matrix)
+                                                              (_range[0][n0],_range[1][n1],
+                                                               _range[2][n2],_range[3][n3],
+                                                               _range[4][n4],_range[5][n5])));
+            else if (_range.size() == 7)
+                for (size_t n6 = 0; n6 < _range[6].Size(); ++n6)
+                    for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
+                        for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+                            for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+                                for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                                    for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                                        for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                                            _pointers.push_back(&((*_matrix)
+                                                                  (_range[0][n0],_range[1][n1],
+                                                                   _range[2][n2],_range[3][n3],
+                                                                   _range[4][n4],_range[5][n5],
+                                                                   _range[6][n6])));
+            else if (_range.size() == 8)
+                for (size_t n7 = 0; n7 < _range[7].Size(); ++n7)
+                    for (size_t n6 = 0; n6 < _range[6].Size(); ++n6)
+                        for (size_t n5 = 0; n5 < _range[5].Size(); ++n5)
+                            for (size_t n4 = 0; n4 < _range[4].Size(); ++n4)
+                                for (size_t n3 = 0; n3 < _range[3].Size(); ++n3)
+                                    for (size_t n2 = 0; n2 < _range[2].Size(); ++n2)
+                                        for (size_t n1 = 0; n1 < _range[1].Size(); ++n1)
+                                            for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
+                                                _pointers.push_back(&((*_matrix)
+                                                                      (_range[0][n0],_range[1][n1],
+                                                                       _range[2][n2],_range[3][n3],
+                                                                       _range[4][n4],_range[5][n5],
+                                                                       _range[6][n6],_range[7][n7])));
+            
+            for (auto it = _range.begin(); it != _range.end();) {
+                _dim.push_back(it->Size());
+                if(it->IsSingleton())
+                    it = _range.Erase(it);
+                else
+                    ++it;
+            }
+        }
+        
+        operator Matrix() const {
+            Matrix res (_dim);
+            for (size_t i = 0; i < Size(); ++i)
+                res[i] = *(_pointers[i]);
+            return res;
+        }
+        
+        inline ConstNoConstView& operator= (const Matrix& M) {
+            assert(_dim == M.Dim());
+            for (size_t i = 0; i < Size(); ++i)
+                *(_pointers[i]) = M[i];
+            return *this;
+        }
+        
+        virtual ~ConstNoConstView () { _matrix = 0; }
+        
+        inline ConstNoConstView& operator= (const ConstNoConstView<true>& v) {
+            Matrix& lhs = *_matrix;
+            const Matrix& rhs = *(v._matrix);
+            assert (_nsdims.size() == v._nsdims.size());
+            for (size_t i = 0; i < _nsdims.size(); ++i)
+                assert(_range[i].Size()==v._range[i].Size());
+            for (size_t i = 0; i < _pointers.size(); ++i)
+                *_pointers[i] = *(v._pointers)[i];
+            return *this;
+        }
+        inline ConstNoConstView& operator= (const Type& t) {
+            assert (_matrix);
+            for (size_t i = 0; i < _pointers.size(); ++i)
+                *_pointers[i] = t;
+            return *this;
+        }
+        
+        inline Range& Rng() { return _range; }
+        inline size_t Size() const {return _pointers.size();}
+        
+        MatrixType* _matrix;
+        Vector<Range> _range;
+        Vector<Type*> _pointers;
+        Vector<size_t> _nsdims;
+        Vector<size_t> _dim;
+        
+    private:
+        friend std::ostream& operator<< (std::ostream &os, const ConstNoConstView& r) {
+            os << "(";
+            for (size_t i = 0; i < r._range.size(); ++i) {
+                if (i)
+                    os << ",";
+                os << r._range[i];
+            }
+            return os << ")" << std::endl;
+        }
+    };
+    
+    typedef ConstNoConstView<true> ConstView;
+    typedef ConstNoConstView<false> View;
+    typedef typename ConstNoConstView<true>::Range ConstRange;
+    typedef typename ConstNoConstView<false>::Range Range;
+    typedef ConstNoConstView<true> CV;
+    typedef ConstNoConstView<false> V;
+    typedef typename ConstNoConstView<true>::Range CR;
+    typedef typename ConstNoConstView<false>::Range R;
 
 #endif
 
@@ -2614,65 +2618,6 @@ public:
         
     }
 
-
-    /*
-    inline Matrix<T>
-    operator() (const std::string& range) const {
-
-    	Matrix<T> ret;
-    	Vector<Vector<size_t> > view;
-    	try {
-    		view = RangeParser (range, _dim);
-    	} catch (const RangeParseException&) {
-    		std::cout << "  ** Bailing out **" << std::endl;
-    		assert (false);
-    	}
-
-    	if (view.size() == 1) {
-    		ret = Matrix<T>(view[0].size(),1);
-    		for (size_t i = 0; i < view[0].size(); ++i)
-    			ret[i] = _M[i];
-    	} else if (view.size() == 2) {
-            ret = Matrix<T>(view[0].size(),view[1].size());
-    		for (size_t j = 0; j < view[1].size(); ++j)
-                for (size_t i = 0; i < view[0].size(); ++i)
-                    ret (i,j) = (*this)(view[0][i],view[1][j]);
-        } else if (view.size() == 3) {
-            ret = Matrix<T>(view[0].size(),view[1].size(),view[2].size());
-    		for (size_t k = 0; k < view[2].size(); ++k)
-                for (size_t j = 0; j < view[1].size(); ++j)
-                    for (size_t i = 0; i < view[0].size(); ++i)
-                        ret (i,j,k) = (*this)(view[0][i],view[1][j],view[2][k]);
-        } else if (view.size() == 4) {
-            ret = Matrix<T>(view[0].size(),view[1].size(),view[2].size(),view[3].size());
-    		for (size_t l = 0; l < view[3].size(); ++l)
-                for (size_t k = 0; k < view[2].size(); ++k)
-                    for (size_t j = 0; j < view[1].size(); ++j)
-                        for (size_t i = 0; i < view[0].size(); ++i)
-                            ret (i,j,k,l) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l]);
-        } else if (view.size() == 5) {
-            ret = Matrix<T>(view[0].size(),view[1].size(),view[2].size(),view[3].size(),view[4].size());
-    		for (size_t m = 0; m < view[4].size(); ++m)
-                for (size_t l = 0; l < view[3].size(); ++l)
-                    for (size_t k = 0; k < view[2].size(); ++k)
-                        for (size_t j = 0; j < view[1].size(); ++j)
-                            for (size_t i = 0; i < view[0].size(); ++i)
-                                ret (i,j,k,l,m) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l],view[4][m]);
-        } else if (view.size() == 6) {
-            ret = Matrix<T>(view[0].size(),view[1].size(),view[2].size(),view[3].size(),view[4].size(),view[5].size());
-    		for (size_t n = 0; n < view[5].size(); ++n)
-                for (size_t m = 0; m < view[4].size(); ++m)
-                    for (size_t l = 0; l < view[3].size(); ++l)
-                        for (size_t k = 0; k < view[2].size(); ++k)
-                            for (size_t j = 0; j < view[1].size(); ++j)
-                                for (size_t i = 0; i < view[0].size(); ++i)
-                                    ret (i,j,k,l,m,n) = (*this)(view[0][i],view[1][j],view[2][k],view[3][l],view[4][m],view[5][n]);
-        }
-        
-    	return ret;
-        
-    }
-    */
 
 #ifdef HAVE_CXX11_CONDITIONAL
 
