@@ -8,7 +8,7 @@ int main (int narg, const char** argv) {
 	typedef Matrix<double>::Range R;
 	typedef Matrix<double>::ConstRange CR;
 
-	Matrix<double> M1(10, 1), M2, M3(M1), M4(3, 4), M6(4, 3), M5(3, 4, 2), M7(3, 4, 2), M8, M9, M10;
+	Matrix<double> M1(10, 1), M2, M3(M1), M4(3, 4), M6(4, 3), M5(3, 4, 2), M7(3, 4, 2), M8, M9, M10, M11;
     M1 = 0.0;
     M2 = M1;
 
@@ -25,7 +25,8 @@ int main (int narg, const char** argv) {
     M8 = M6(CR(1,-1,0),CR(1,2));
     M6(R(0,1),R(1,2)) = M8;
     M9 = M6(CR("1:-1:0"),CR("1:2"));
-//    M10 = M6 (CR(0,end));
+    M10 = M6(CR("1:-1:0,1"),CR("1:2"));
+    M11 = M6(CR(),CR());
     std::cout << M3 << std::endl<< std::endl;
     std::cout << M4 << std::endl<< std::endl;
     std::cout << M6 << std::endl<< std::endl;
@@ -33,7 +34,8 @@ int main (int narg, const char** argv) {
     std::cout << M7 << std::endl<< std::endl;
     std::cout << M8 << std::endl<< std::endl;
     std::cout << M9 << std::endl<< std::endl;
-//    std::cout << M10 << std::endl<< std::endl;
+    std::cout << M10 << std::endl<< std::endl;
+    std::cout << M11 << std::endl<< std::endl;
     return 0;
 }
 

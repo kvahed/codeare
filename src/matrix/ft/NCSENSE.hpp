@@ -180,15 +180,12 @@ public:
 	 */
 	virtual Matrix<T>
 	Trafo       (const Matrix<T>& m) const NOEXCEPT {
-#pragma omp parallel for schedule (guided, 1)
-	    for (int j = 0; j < m_nx[1]; ++j) {
-	        int k = omp_get_thread_num();
-            if (m_3rd_dim_cart)
-                Slice  (m_fwd_out, j, m_fts[k] * (resize(Volume (m_sm, j),size(m)) * m));
-            else
-                Column (m_fwd_out, j, m_fts[k] * (resize(((m_nx[0] == 2) ?
-                        Slice (m_sm, j) : Volume (m_sm, j)),size(m)) * m));
-	    }
+        typedef typename Matrix<T>::Range R;
+        typedef typename Matrix<T>::ConstRange CR;
+#pragma omp parallel for
+	    for (int j = 0; j < m_nx[1]; ++j)
+            m_fwd_out(R(),R(),R(j)) = m_fts[omp_get_thread_num()] *
+                (m * ((m_nx[0] == 2) ? m_sm(CR(),CR(),CR(j)) : m_sm(CR(),CR(),CR(),CR(j))));
 	    return m_fwd_out;
 	}
 

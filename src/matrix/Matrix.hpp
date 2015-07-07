@@ -62,6 +62,7 @@ static const int end = -1;
 enum RangeParseException {
 	IMPROPER_RANGE_DECLARATION = 301,
 	RANGE_DOES_NOT_FIT_MATRIX_DIMS,
+    CONCAT_MUST_CONSIST_OF_MINIMUM_ONE_PARTS,
 	RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS,
 	FAILED_TO_PARSE_RANGE,
 	EXCEEDING_MATRIX_DIMENSIONS,
@@ -155,75 +156,72 @@ public:
             
         public:
             
-            inline Range () :
-                _stride(1), _begin(0), _end(0) {}
+            inline Range () {}
             
-            inline Range (const size_t& begend) :
-                _stride(1), _begin(begend), _end(begend) {
-                HandleSingleInput();
+            inline Range (const size_t& begend) {
+                HandleSingleInput(begend);
             }
             
-            inline Range (const size_t& begin, const size_t& end) :
-                _stride(1), _begin(begin), _end(end) {
-                HandleTwoInputs();
+            inline Range (const size_t& begin, const size_t& end) {
+                HandleTwoInputs(begin, end);
             }
             
-            inline Range (const size_t& begin, const size_t& stride, const size_t& end) :
-                _stride(stride), _begin(begin), _end(end) {
-                HandleThreeInputs();
+            inline Range (const size_t& begin, const size_t& stride, const size_t& end) {
+                HandleThreeInputs(begin, stride, end);
             }
-            inline Range (const Vector<size_t>& v) : _stride(0), _begin(0), _end(0) {
+            inline Range (const Vector<size_t>& v) {
                 _idx = v;
             }
             
             inline Range (const std::string& rs) {
                 ParseRange(rs);
             }
+
             inline Range (const char* rcs) {
                 ParseRange(std::string(rcs));
             }
+            
             inline void ParseRange (std::string rs) {
                 // remove white spaces
                 rs.erase(std::remove_if(rs.begin(), rs.end(), ::isspace), rs.end());
                 // split delimited by kommas
-                std::vector<std::string> parts = Parse(rs,":");
-                switch (parts.size()) {
-                case 1:
-                    _begin  = boost::lexical_cast<int>(parts[0]);
-                    _stride = 1;
-                    _end    = _begin;
-                    break;
-                case 2:
-                    _begin  = boost::lexical_cast<int>(parts[0]);
-                    _stride = 1;
-                    _end    = boost::lexical_cast<int>(parts[1]);
-                    break;
-                case 3:
-                    _begin  = boost::lexical_cast<int>(parts[0]);
-                    _stride = boost::lexical_cast<int>(parts[1]);
-                    _end    = boost::lexical_cast<int>(parts[2]);
-                    break;
-                default:
-                    throw RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS;
-                    break;
+                std::vector<std::string> concat = Parse(rs,",");
+                if (concat.empty())
+                    throw CONCAT_MUST_CONSIST_OF_MINIMUM_ONE_PARTS;
+                for (size_t i = 0; i < concat.size(); ++i) {
+                    std::vector<std::string> parts = Parse(concat[i],":");
+                    switch (parts.size()) {
+                    case 1:
+                        HandleSingleInput(boost::lexical_cast<int>(parts[0]));
+                        break;
+                    case 2:
+                        HandleTwoInputs(boost::lexical_cast<int>(parts[0]),
+                                        boost::lexical_cast<int>(parts[1]));
+                        break;
+                    case 3:
+                        HandleThreeInputs(boost::lexical_cast<int>(parts[0]),
+                                          boost::lexical_cast<int>(parts[1]),
+                                          boost::lexical_cast<int>(parts[2]));
+                        break;
+                    default:
+                        throw RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS;
+                        break;
+                    }
                 }
             }
             virtual ~Range() {}
             
-            inline void Reset (const size_t& begin, const size_t& end) {
-                _begin = begin;
-                _end = end;
-                _stride = 1;
-                assert (_end>=_begin);
-                _idx.resize(_end-_begin+1);
-                for (size_t i = 0; i < _idx.size(); ++i)
-                    _idx[i] = _begin + i;
+            inline void Reset (const int& begin) {
+                _idx.Clear();
+                HandleSingleInput (begin);
             }
-            inline size_t Begin() const {
-                return _begin;
+            inline void Reset (const int& begin, const int& end) {
+                _idx.Clear();
+                HandleTwoInputs (begin, end);
             }
-            inline size_t End() const {
-                return _end;
+            inline void Reset (const int& begin, const int& stride, const int& end) {
+                _idx.Clear();
+                HandleThreeInputs (begin, stride, end);
             }
             inline size_t Size() const {
                 return _idx.size();
@@ -231,67 +229,64 @@ public:
             inline size_t IsSingleton() const {
                 return (_idx.size()==1);
             }
-            inline void Parent (MatrixType* p) {
-                HandleThreeInputs();
-            }
             inline size_t operator[] (const size_t& i) const { return _idx[i]; }
         private:
             
-            inline void HandleSingleInput () {
-                if (_begin < 0)
+            inline void HandleSingleInput (const int& pos) {
+                if (pos < 0)
                     throw  NEGATIVE_BEGIN_INDEX;                           
-                _idx.push_back(_begin);
+                _idx.push_back(pos);
             }
             
-            inline void HandleThreeInputs () {
-                if (_begin < 0) {
+            inline void HandleThreeInputs (const int& begin, const int& stride, const int& end) {
+                if (begin < 0) {
                     printf ("NEGATIVE_BEGIN_INDEX\n");
                     throw NEGATIVE_BEGIN_INDEX;
                 }
-                if (_end < 0) {
+                if (end < 0) {
                     printf ("NEGATIVE_END_INDEX\n");
                     throw NEGATIVE_END_INDEX;
                 }
-                if (_stride == 0) {
+                if (stride == 0) {
                     printf ("STRIDE_MUST_NOT_BE_ZERO\n");
                     throw STRIDE_MUST_NOT_BE_ZERO;
                     }
-                if (_stride > 0 && _end < _begin) {
+                if (stride > 0 && end < begin) {
                     printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
                     throw POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE;
                 }
-                if (_stride < 0 && _end > _begin) {
+                if (stride < 0 && end > begin) {
                     printf ("NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE\n");
                     throw NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE;
                 }
-                _idx.resize(std::floor(((float)_end-(float)_begin)/(float)_stride)+1);
-                for (size_t i = 0; i < _idx.size(); ++i)
-                    _idx[i] = _begin + i*_stride;
+                size_t cur = _idx.size();
+                _idx.resize(cur+std::floor(((float)end-(float)begin)/(float)stride)+1);
+                for (size_t i = cur; i < _idx.size(); ++i)
+                    _idx[i] = begin + i*stride;
             }
             
-            inline void HandleTwoInputs () {
-                if (_begin < 0) {
+            inline void HandleTwoInputs (const int& begin, const int& end) {
+                if (begin < 0) {
                     printf ("NEGATIVE_BEGIN_INDEX\n");
                     throw NEGATIVE_BEGIN_INDEX;
                 }
-                if (_end < 0) {
-                    printf ("%d: NEGATIVE_END_INDEX\n", _end);
+                if (end < 0) {
+                    printf ("%d: NEGATIVE_END_INDEX\n", end);
                     throw NEGATIVE_END_INDEX;
                 }
-                if (_end < _begin) {
+                if (end < begin) {
                     printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
                     throw STRIDE_MUST_NOT_BE_ZERO;
                 }
-                _idx.resize(_end-_begin+1);
-                for (size_t i = 0; i < _idx.size(); ++i)
-                    _idx[i] = _begin + i;
+                size_t cur = _idx.size();
+                _idx.resize(cur+end-begin+1);
+                for (size_t i = cur; i < _idx.size(); ++i)
+                    _idx[i] = begin + i;
             }
             
             friend std::ostream& operator<< (std::ostream &os, const Range& r) {
-                return os << r._idx.size() << ": " << r._begin << ":"
-                          << r._stride << ":" << r._end;
+                return os << r._idx;
             }
-            long _begin, _end, _stride;
             Vector<size_t> _idx;
         };
         
@@ -396,10 +391,21 @@ public:
         }
         
         inline ConstNoConstView& operator= (const Matrix& M) {
-            assert(_dim == M.Dim());
+            // TODO: Check if not more meaningful to test for exact dimensions
+            assert(Size() == M.Size());
             for (size_t i = 0; i < Size(); ++i)
                 *(_pointers[i]) = M[i];
             return *this;
+        }
+        
+        inline T& operator[] (const size_t& pos) {
+            assert(pos < Size());
+            return *(_pointers[pos]);
+        }
+        
+        inline const T& operator[] (const size_t& pos) const {
+            assert(pos < Size());
+            return *(_pointers[pos]);
         }
         
         virtual ~ConstNoConstView () { _matrix = 0; }
@@ -858,11 +864,13 @@ public:
      * @return          Value
      */
     inline const T& At (const size_t x, const size_t y) const NOEXCEPT {
-    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]));
+    	assert (x < _dim[0]);
+        assert (y < _dim[1]);
         return _M[x + _dim[0]*y];
     }
     inline T&       At (const size_t x, const size_t y) NOEXCEPT {
-    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]));
+    	assert (x < _dim[0]);
+        assert (y < _dim[1]);
         return _M[x + _dim[0]*y];
     }
 
@@ -1894,46 +1902,16 @@ public:
     }
 
     /**
-     * @brief           Elementwise multiplication. i.e. this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    /*inline Matrix<T,P>
-    operator*          (const Matrix<T,P> &M) const NOEXCEPT {
-		Matrix<T,P> res = *this;
-		return res *= M;
-    }*/
-
-
-    /**
-     * @brief           Elementwise multiplication. i.e. this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    /*template <class S>
-    inline Matrix<T,P>
-    operator*          (const Matrix<S,P> &M) const NOEXCEPT {
-		Matrix<T,P> res = *this;
-		return res *= M;
-    }*/
-
-
-    /**
      * @brief           Elementwise multiplication with a scalar. i.e. this * m.
      *
      * @param  s        Factor scalar
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>
+    template <class S> inline Matrix<T,P>
     operator*          (const S s) const  NOEXCEPT {
         Matrix<T,P> res = *this;
         return res *= s;
     }
-
-
 
     /**
      * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
@@ -1948,7 +1926,6 @@ public:
         return *this;
     }
 
-
     /**
      * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
      *
@@ -1962,6 +1939,19 @@ public:
         return *this;
     }
 
+    /**
+     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
+     *
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    inline Matrix<T,P>&
+    operator*=         (const ConstView& M) NOEXCEPT {
+        //op_assert (_dim == M.Dim(), *this, M);
+        for (size_t i = 0; i < Size(); ++i)
+            _M[i] *= M[i];
+        return *this;
+    }
 
     /**
      * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this *= s.
@@ -1974,7 +1964,6 @@ public:
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
 		return *this;
     }
-
 
     /**
      * @brief           Elementwise division by scalar. i.e. this * m.
@@ -2634,13 +2623,13 @@ public:
     ConstView operator() (const Range r, const size_t& n) {
         Vector<ConstRange> vr;
         vr.push_back (r);
-        vr.push_back (ConstRange(n,n));
+        vr.push_back (ConstRange(n));
         return ConstView(this, vr);
     }
     ConstView operator() (const ConstRange r, const size_t& n) const {
         Vector<ConstRange> vr;
         vr.push_back (r);
-        vr.push_back (ConstRange(n,n));
+        vr.push_back (ConstRange(n));
         return ConstView(this, vr);
     }
     View operator() (Range r0, Range r1) {
@@ -2667,6 +2656,22 @@ public:
         vr.push_back (r0);
         vr.push_back (r1);
         vr.push_back (r2);
+        return ConstView(this, vr);
+    }
+    View operator() (Range r0, Range r1, Range r2, Range r3) {
+        Vector<Range> vr;
+        vr.push_back (r0);
+        vr.push_back (r1);
+        vr.push_back (r2);        
+        vr.push_back (r3);        
+        return View(this, vr);
+    }
+    ConstView operator() (ConstRange r0, ConstRange r1, ConstRange r2, ConstRange r3) const {
+        Vector<ConstRange> vr;
+        vr.push_back (r0);
+        vr.push_back (r1);
+        vr.push_back (r2);
+        vr.push_back (r3);
         return ConstView(this, vr);
     }
 #endif
