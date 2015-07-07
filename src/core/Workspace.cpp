@@ -31,7 +31,7 @@ void Workspace::Print (std::ostream& os) const {
 
     os << "codeare service ";
 #ifdef VERSION
-	od << VERSION;
+	os << VERSION;
 #endif
     os << endl;
 #ifdef GIT_COMMIT
