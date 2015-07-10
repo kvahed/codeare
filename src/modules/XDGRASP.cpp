@@ -94,11 +94,6 @@ codeare::error_code XDGRASP::Prepare () {
 }
 
 
-typedef Matrix<cxfl>::Range R;
-typedef Matrix<cxfl>::ConstRange CR;
-typedef Matrix<float>::Range RF;
-typedef Matrix<float>::ConstRange CRF;
-
 codeare::error_code XDGRASP::Process () {
     Matrix<cxfl> kdata = Get<cxfl>("signals");
     const Matrix<float>& traj = Get<float>("kspace");
@@ -121,8 +116,8 @@ codeare::error_code XDGRASP::Process () {
 	// one for contrast enhancement and one for respiration
 	for (size_t i = 0; i < m_nt; ++i) {
 		Matrix<cxfl> kdata_under = kdata(CR (), CR (i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines), CR());
-		Matrix<float> traj_under = traj (CRF(), CRF(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
-		Matrix<float> resp_under = resp (CRF(      i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
+		Matrix<float> traj_under = traj (CR(), CR(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
+		Matrix<float> resp_under = resp (CR(      i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
 	}
 	for (size_t i = 0; i < m_nt; ++i) {
 

@@ -59,7 +59,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T> Trafo (const Matrix<T>& m) const = 0;
+//	virtual Matrix<T> Trafo (const Matrix<T>& m) const { return Matrix<T>();}
+	virtual Matrix<T> Trafo (const MatrixType<T>& m) const {return Matrix<T>();}
 	
 	
 	/**
@@ -68,7 +69,8 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T> Adjoint (const Matrix<T>& m) const = 0;
+//	virtual Matrix<T> Adjoint (const Matrix<T>& m) const {return Matrix<T>();}
+	virtual Matrix<T> Adjoint (const MatrixType<T>& m) const {return Matrix<T>();}
 	
 	
 	/**
@@ -80,6 +82,9 @@ public:
 	virtual Matrix<T> operator* (const Matrix<T>& m) const {
 		return Trafo(m);
 	}
+	virtual Matrix<T> operator* (const MatrixType<T>& m) const {
+		return Trafo(m);
+	}
 	
 
 	/**
@@ -89,6 +94,9 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<T> operator->* (const Matrix<T>& m) const {
+		return Adjoint (m);
+	}
+	virtual Matrix<T> operator->* (const MatrixType<T>& m) const {
 		return Adjoint (m);
 	}
 

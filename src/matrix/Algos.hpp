@@ -345,7 +345,7 @@ SizeInRAM          (const Matrix<T>& M) {
  * @return          Number of cells.
  */
 template <class T, paradigm P> inline static  size_t
-numel               (const Matrix<T,P>& M) {
+numel               (const MatrixType<T,P>& M) {
 	return M.Size();
 }
 
@@ -370,11 +370,11 @@ all (const Matrix<T>& M) {
  * @return          Number of cells.
  */
 template <class T>  size_t
-size               (const Matrix<T>& M, size_t d) {
+size               (const MatrixType<T>& M, size_t d) {
 	return M.Dim(d);
 }
 template <class T>  size_t
-size               (const Matrix<T,MPI>& M, size_t d) {
+size               (const MatrixType<T,MPI>& M, size_t d) {
 	return M.Dim(d);
 }
 
@@ -433,7 +433,7 @@ resize (const Matrix<T>& M, size_t sc, size_t sl, size_t ss) {
  * @return          Dimension vector.
  */
 template <class T,paradigm P>  inline static  Vector<size_t>
-size               (const Matrix<T,P>& M) {
+size               (const MatrixType<T,P>& M) {
 	
 	Vector<size_t> ret (M.NDim());
 	for (size_t i = 0; i < ret.size(); ++i)

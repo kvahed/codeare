@@ -97,8 +97,21 @@ imag (const Matrix<T>& m) {
  * @param  m Input
  * @return   Imaginary part
  */
+//template<class T> inline static Matrix<T>
+//conj (const Matrix<T>& m) {
+	//Matrix<T> res (size(m));
+	//for (size_t i = 0; i < numel(m); i++)
+		//res[i] = TypeTraits<T>::Conj(m[i]);
+	//return res;
+//}
+/**
+ * @brief    Dummy for double
+ *
+ * @param  m Input
+ * @return   Imaginary part
+ */
 template<class T> inline static Matrix<T>
-conj (const Matrix<T>& m) {
+conj (const MatrixType<T>& m) {
 	Matrix<T> res (size(m));
 	for (size_t i = 0; i < numel(m); i++)
 		res[i] = TypeTraits<T>::Conj(m[i]);

@@ -17,6 +17,7 @@ public:
 	virtual Matrix<T> operator* (const Matrix<T>&) const { return Matrix<T>(); }
 	virtual Matrix<T> operator->* (const Matrix<T>&) const { return Matrix<T>(); }
 	virtual Matrix<T> operator/ (const Matrix<T>&) const { return Matrix<T>(); }
+	virtual Matrix<T> operator/ (const MatrixType<T>&) const { return Matrix<T>(); }
 };
 
 

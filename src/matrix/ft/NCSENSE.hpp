@@ -46,6 +46,8 @@ class NCSENSE : public FT<T>{
 	// TODO: Check if k-space and weights have been assigned
 
     typedef typename TypeTraits<T>::RT RT;
+    typedef Range<false> R;
+    typedef Range<true> CR;
 	
 public:
 
@@ -179,13 +181,13 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<T>
-	Trafo       (const Matrix<T>& m) const NOEXCEPT {
-        typedef typename Matrix<T>::Range R;
-        typedef typename Matrix<T>::ConstRange CR;
+	Trafo       (const MatrixType<T>& m) const NOEXCEPT {
+        std::cout << "operator*" << std::endl;
 #pragma omp parallel for
 	    for (int j = 0; j < m_nx[1]; ++j)
             m_fwd_out(R(),R(),R(j)) = m_fts[omp_get_thread_num()] *
                 (m * ((m_nx[0] == 2) ? m_sm(CR(),CR(),CR(j)) : m_sm(CR(),CR(),CR(),CR(j))));
+	    std::cout << "operator*" << std::endl;
 	    return m_fwd_out;
 	}
 
@@ -200,7 +202,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<T>
-	Trafo       (const Matrix<T>& m, const Matrix<T>& sens,
+	Trafo       (const MatrixType<T>& m, const MatrixType<T>& sens,
 			const bool& recal = true) const NOEXCEPT {
 		return Trafo(m);
 	}
@@ -213,7 +215,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<T>
-	Adjoint     (const Matrix<T>& m) const NOEXCEPT {
+	Adjoint     (const MatrixType<T>& m) const NOEXCEPT {
 		return this->Adjoint (m, m_sm, false);
 	}
 	
@@ -223,9 +225,9 @@ public:
 	 * @param  data  measurement
 	 */
 	virtual void
-	EstimateSensitivities (const Matrix<T>& data, size_t nk = 8192) const {
+	EstimateSensitivities (const MatrixType<T>& data, size_t nk = 8192) const {
 		Matrix<T> out (size(m_sm));
-#pragma omp parallel for schedule (guided,1)
+#pragma omp parallel for
 		for (int i = 0; i < m_nx[1]; ++i) {
 			m_fts[omp_get_thread_num()].NFFTPlan().M_total = nk;
 /*			if (m_nx[0] == 2)
@@ -259,14 +261,13 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<T>
-	Adjoint (const Matrix<T>& m,
-			 const Matrix<T>& sens,
+	Adjoint (const MatrixType<T>& m,
+			 const MatrixType<T>& sens,
 			 const bool recal = false) const NOEXCEPT {
 
 		// TODO: Not functional yet
 		if (m_sm.Size() == 1)
 			EstimateSensitivities(m);
-
         return m_cgls.Solve(*this, m);
 
 	}
@@ -279,24 +280,29 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<T>
-	operator* (const Matrix<T>& m) const NOEXCEPT {
+	operator* (const MatrixType<T>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	
 
 	virtual Matrix<T>
-	operator/ (const Matrix<T>& m) const NOEXCEPT {
-	#pragma omp parallel for schedule (guided, 1)
+	operator/ (const MatrixType<T>& m) const NOEXCEPT {
+		std::cout << "operator/" << std::endl;
+#pragma omp parallel for
 		for (int j = 0; j < m_nx[1]; ++j) {
 	        int k = omp_get_thread_num();
 	        if (m_nx[0] == 2)
-	            Slice  (m_bwd_out, j, m_fts[k] ->*
-	            		Column (m,j) * conj(Slice  (m_sm, j)));
+	        	/*m_bwd_out (R(),R(),    R(j)) =*/
+	        			m_fts[k] ->* (m(CR(),CR(j)) * conj(m_sm(CR(),CR(),     CR(j))));
 	        else
-	            Volume (m_bwd_out, j, m_fts[k] ->*
-	            		Column (m,j) * conj(Volume (m_sm, j)));
+	        	/*m_bwd_out (R(),R(),R(),R(j)) =*/
+	        		    m_fts[k] ->* (m(CR(),CR(j)) * conj(m_sm(CR(),CR(),CR(),CR(j))));
+
 	    }
+		std::cout << "operator/" << std::endl;
+
 	    return squeeze(sum(m_bwd_out,size(m_sm).size()-1)) * m_ic;
+
 	}
 
 
@@ -307,7 +313,7 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<T>
-	operator->* (const Matrix<T>& m) const NOEXCEPT {
+	operator->* (const MatrixType<T>& m) const NOEXCEPT {
 		return Adjoint (m);
 	}
 

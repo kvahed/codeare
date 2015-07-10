@@ -27,7 +27,7 @@ public:
 
 	virtual ~CGLS () {}
 
-	inline Matrix<T> Solve (const Operator<T>& A, const Matrix<T>& x) {
+	inline Matrix<T> Solve (const Operator<T>& A, const MatrixType<T>& x) {
 
 		Matrix<T> ret;
 

@@ -332,13 +332,12 @@ public:
      * @param  m To transform
      * @return   Transform
      */
-    Matrix<T>
-    Trafo       (const Matrix<T>& m) const NOEXCEPT {
+    inline virtual Matrix<T>
+    Trafo       (const MatrixType<T>& m) const NOEXCEPT {
 
 		NFFTRType* tmpd;
 		RT* tmpt;
         Matrix<T> out (m_M, ((m_3rd_dim_cart && m_ncart > 1) ? m_ncart : 1));
-        Matrix<T> tmpm = m;
 
 /*        if (m_3rd_dim_cart && m_ncart > 1) { // Cartesian FT 3rd dim
         	int n = static_cast<int>(m_ncart);
@@ -362,22 +361,15 @@ public:
         	tmpm = permute (tmpm, 1, 2, 0)/sqrt((RT)m_ncart);
             }*/
 
-
         for (size_t i = 0; i < m_ncart; ++i) {
 
 			tmpd = (NFFTRType*) m_plan.f_hat;
-			tmpt = (RT*) tmpm.Ptr() + i*m_imgsz;
-
-			//TODO: b0 not 2D+1D+1D
-			if (m_have_b0)
-				for (size_t j = 0; j < m.Size(); ++j) {
-					T val = tmpm[j] * std::polar<RT> ((RT)1.,
-							(RT)(2. * PI * m_ts * m_b0[j] * m_w));
-					tmpd[2*j+0] = real(val);
-					tmpd[2*j+1] = imag(val);
-				}
-			else
-				std::copy (tmpt, tmpt+m_imgsz, tmpd);
+            for (size_t j = 0; j < m.Size(); ++j) {
+                T val = (!m_have_b0) ? m[j] : m[j] *
+                    std::polar<RT>((RT)1., (RT)(2. * PI * m_ts * m_b0[j] * m_w));
+                tmpd[2*j+0] = real(m[j]);
+                tmpd[2*j+1] = imag(m[j]);
+            }
 
 			if (m_have_b0)
 				NFFTTraits<NFFTType>::Trafo (m_b0_plan);
@@ -400,35 +392,39 @@ public:
      * @param  m To transform
      * @return   Transform
      */
-    Matrix<T>
-    Adjoint     (const Matrix<T>& m) const NOEXCEPT {
+	virtual Matrix<T> Adjoint (const MatrixType<T>& m) const {
 
         Vector<size_t> N = m_N;
         NFFTRType* tmpd;
         RT* tmpt;
-
+        
         if (m_have_b0)
             N.PopBack();
         if (m_3rd_dim_cart && m_ncart > 1) // Cartesian FT 3rd dim
         	N.PushBack(m_ncart);
-
+        
         Matrix<T> out (N);
         for (size_t i = 0; i < m_ncart; ++i) {
-
+            
 			tmpd = (NFFTRType*) m_solver.y;
-			tmpt = (RT*) m.Ptr() + i*2*m_M;
-			std::copy (tmpt, tmpt+2*m_M, tmpd);
-
+            
+            size_t os = i*2*m_M;
+            for (size_t j = 0; j < m_M; ++j) {
+                tmpd[2*j+0] = real(m[os+j]);
+                tmpd[2*j+1] = imag(m[os+j]);
+            }
+            
 			if (m_have_b0)
-				NFFTTraits<NFFTType>::ITrafo ((B0Plan&) m_b0_plan,
-						(Solver&) m_solver, m_maxit, m_epsilon);
+				NFFTTraits<NFFTType>::ITrafo
+                    ((B0Plan&) m_b0_plan, (Solver&) m_solver, m_maxit, m_epsilon);
 			else
-				NFFTTraits<NFFTType>::ITrafo (  (Plan&)    m_plan,
-						(Solver&) m_solver, m_maxit, m_epsilon);
-
+				NFFTTraits<NFFTType>::ITrafo
+                    ((Plan&)    m_plan,   (Solver&) m_solver, m_maxit, m_epsilon);
+            
 			tmpd = (NFFTRType*) m_solver.f_hat_iter;
 			tmpt = (RT*) out.Ptr() + i*m_imgsz;
-			std::copy (tmpd, tmpd+m_imgsz, tmpt);
+
+            std::copy (tmpd, tmpd+m_imgsz, tmpt);
 
 			//TODO: b0 not 2D+1D+1D
 			if (m_have_b0)

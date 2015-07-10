@@ -53,7 +53,7 @@ namespace RRStrategy {
 		/**
 		 * @brief       Default constructor
 		 */ 
-		ReconStrategy   () : m_initialised (false), global (0) {}
+		ReconStrategy   () : m_initialised (false), global (0), _successor(0) {}
 		
 
 		/**

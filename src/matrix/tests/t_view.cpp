@@ -5,8 +5,8 @@
 
 int main (int narg, const char** argv) {
 
-	typedef Matrix<double>::Range R;
-	typedef Matrix<double>::ConstRange CR;
+	typedef Range<false> R;
+	typedef Range<true> CR;
 
 	Matrix<double> M1(10, 1), M2, M3(M1), M4(3, 4), M6(4, 3), M5(3, 4, 2), M7(3, 4, 2), M8, M9, M10, M11;
     M1 = 0.0;

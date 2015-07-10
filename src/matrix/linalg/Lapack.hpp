@@ -455,16 +455,16 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
 	
 }
 
-template<class T, paradigm P, const bool b> Matrix<T,P>
-Matrix<T,P,b>::prod  (const Matrix<T,P> &M, char transa, char transb) const {
+template<class T, paradigm P> Matrix<T,P>
+Matrix<T,P>::prod  (const Matrix<T,P> &M, char transa, char transb) const {
     return gemm (*this, M, transa, transb);
 }
-template<class T, paradigm P, const bool b> inline Matrix<T,P>
-Matrix<T,P,b>::prodt (const Matrix<T,P> &M) const {
+template<class T, paradigm P> inline Matrix<T,P>
+Matrix<T,P>::prodt (const Matrix<T,P> &M) const {
     return gemm (*this, M, 'C');
 }
-template<class T, paradigm P, const bool b> inline Matrix<T,P>
-Matrix<T,P,b>::operator->* (const Matrix<T,P> &M) const {
+template<class T, paradigm P> inline Matrix<T,P>
+Matrix<T,P>::operator->* (const Matrix<T,P> &M) const {
     return gemm (*this, M);
 }
 
@@ -610,12 +610,12 @@ template <class T> inline T
 DOT  (const Matrix<T>& A, const Matrix<T>& B) {
     return dot (A, B);
 }
-template<class T, paradigm P, const bool b> inline T
-Matrix<T,P,b>::dotc (const Matrix<T,P>& M) const  {
+template<class T, paradigm P> inline T
+Matrix<T,P>::dotc (const Matrix<T,P>& M) const  {
     return DOTC (*this, M);
 }
-template<class T, paradigm P, const bool b> inline T
-Matrix<T,P,b>::dot (const Matrix<T,P>& M) const {
+template<class T, paradigm P> inline T
+Matrix<T,P>::dot (const Matrix<T,P>& M) const {
     return DOT  (*this, M);
 }
 
