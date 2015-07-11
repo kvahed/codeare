@@ -123,6 +123,13 @@ static const char* MatrixExceptionMessages[] = {
 	"Index exceeds number of elements"
 };
 
+// Pretty print function names
+#if (0 < _MSC_VER)
+  #define PRETTY_FUNCTION __FUNCSIG__
+#else
+  #define PRETTY_FUNCTION __PRETTY_FUNCTION__
+#endif
+
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
                               const char* func, const MatrixException& x) {
     std::cerr << fname << ":" << lnumber << "\n \t " << func << ": " 
@@ -133,7 +140,7 @@ inline static void report_and_throw (const char* fname, const size_t& lnumber,
 #ifndef DNDEBUG
 #  ifndef MATRIX_ASSERT
 #    define MATRIX_ASSERT(c,x) if (!(c)) \
-		report_and_throw (__FILE__, __LINE__, __func__, x)
+		report_and_throw (__FILE__, __LINE__, PRETTY_FUNCTION, x)
 #  endif
 #endif
 
@@ -157,13 +164,6 @@ inline static void report_and_throw (const char* fname, const size_t& lnumber,
  * Return maximum of two numbers 
  */
 # define MIN(A,B) (A < B ? A : B)
-
-// Pretty print function names
-#if (0 < _MSC_VER)
-  #define PRETTY_FUNCTION __FUNCSIG__
-#else
-  #define PRETTY_FUNCTION __PRETTY_FUNCTION__
-#endif
 
 template<bool is_const>
 class Range {
