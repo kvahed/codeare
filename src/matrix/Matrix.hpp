@@ -38,6 +38,32 @@
 #include "Complex.hpp"
 #include "Vector.hpp"
 
+#include <iostream>
+#include <memory>
+#include <fstream>
+#include <typeinfo>
+#include <stdio.h>
+#include <time.h>
+#include <limits.h>
+#include <numeric>
+
+#include <ostream>
+#include <string>
+#include <cstring>
+#include <algorithm>
+#include <utility>
+#include <typeinfo>
+
+#ifdef HAS_CXX11_TUPLE
+	#include <tuple>
+#else
+	#include <boost/tuple/tuple.hpp>
+#endif
+
+#include <boost/lexical_cast.hpp>
+
+#include <Assert.hpp>
+
 static inline std::vector<std::string>
 Parse     (const std::string& str, const std::string& dlm) {
 
@@ -77,12 +103,24 @@ enum RangeParseException {
 
 enum MatrixException {
     DIMS_VECTOR_EMPTY,
-    DIMS_VECTOR_CONTAINS_ZEROS
+    DIMS_VECTOR_CONTAINS_ZEROS,
+	MUST_HAVE_MATCHING_DIMENSIONS_AND_RESOLUTIONS_VECTORS,
+	ZERO_SIDE_LENGTH,
+	ZERO_NUMBER_COLUMNS,
+	ZERO_NUMBER_ROWS,
+	ZERO_NUMBER_SLICES,
+	INDEX_EXCEEDS_NUMBER_ELEMENTS
 };
 
 static const char* MatrixExceptionMessages[] = {
     "Empty dimensions vector",
     "Dimensions vector contains 0s"
+	"Specified dimensions and resolutions vectors have different lengths",
+	"Matrix with zero side length",
+	"Matrix with zero height",
+	"Matrix with zero width",
+	"Matrix with zero slices",
+	"Index exceeds number of elements"
 };
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
@@ -92,39 +130,16 @@ inline static void report_and_throw (const char* fname, const size_t& lnumber,
     throw x;
 }
 
-#ifndef MATRIX_THROW
-#define MATRIX_THROW(x) report_and_throw (__FILE__, __LINE__, __func__, x)
+#ifndef DNDEBUG
+#  ifndef MATRIX_ASSERT
+#    define MATRIX_ASSERT(c,x) if (!(c)) \
+		report_and_throw (__FILE__, __LINE__, __func__, x)
+#  endif
 #endif
 
 #ifdef EXPLICIT_SIMD
 #    include "SIMD.hpp"
 #endif
-
-#include <iostream>
-#include <memory>
-#include <fstream>
-#include <typeinfo>
-#include <stdio.h>
-#include <time.h>
-#include <limits.h>
-#include <numeric>
-
-#include <ostream>
-#include <string>
-#include <cstring>
-#include <algorithm>
-#include <utility>
-#include <typeinfo>
-
-#ifdef HAS_CXX11_TUPLE
-	#include <tuple>
-#else
-	#include <boost/tuple/tuple.hpp>
-#endif
-
-#include <boost/lexical_cast.hpp>
-
-#include <Assert.hpp>
 
 /**
  * @brief Is matrix is a vector.
@@ -151,144 +166,144 @@ inline static void report_and_throw (const char* fname, const size_t& lnumber,
 #endif
 
 template<bool is_const>
-        class Range {
+class Range {
 
-            
-        public:
-            
-            inline Range () {}
-            
-            inline Range (const size_t& begend) {
-                HandleSingleInput(begend);
-            }
-            
-            inline Range (const size_t& begin, const size_t& end) {
-                HandleTwoInputs(begin, end);
-            }
-            
-            inline Range (const size_t& begin, const size_t& stride, const size_t& end) {
-                HandleThreeInputs(begin, stride, end);
-            }
-            inline Range (const Vector<size_t>& v) {
-                _idx = v;
-            }
-            
-            inline Range (const std::string& rs) {
-                ParseRange(rs);
-            }
 
-            inline Range (const char* rcs) {
-                ParseRange(std::string(rcs));
-            }
-            
-            inline void ParseRange (std::string rs) {
-                // remove white spaces
-                rs.erase(std::remove_if(rs.begin(), rs.end(), ::isspace), rs.end());
-                // split delimited by kommas
-                std::vector<std::string> concat = Parse(rs,",");
-                if (concat.empty())
-                    throw CONCAT_MUST_CONSIST_OF_MINIMUM_ONE_PARTS;
-                for (size_t i = 0; i < concat.size(); ++i) {
-                    std::vector<std::string> parts = Parse(concat[i],":");
-                    switch (parts.size()) {
-                    case 1:
-                        HandleSingleInput(boost::lexical_cast<int>(parts[0]));
-                        break;
-                    case 2:
-                        HandleTwoInputs(boost::lexical_cast<int>(parts[0]),
-                                        boost::lexical_cast<int>(parts[1]));
-                        break;
-                    case 3:
-                        HandleThreeInputs(boost::lexical_cast<int>(parts[0]),
-                                          boost::lexical_cast<int>(parts[1]),
-                                          boost::lexical_cast<int>(parts[2]));
-                        break;
-                    default:
-                        throw RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS;
-                        break;
-                    }
-                }
-            }
-            virtual ~Range() {}
-            
-            inline void Reset (const int& begin) {
-                _idx.Clear();
-                HandleSingleInput (begin);
-            }
-            inline void Reset (const int& begin, const int& end) {
-                _idx.Clear();
-                HandleTwoInputs (begin, end);
-            }
-            inline void Reset (const int& begin, const int& stride, const int& end) {
-                _idx.Clear();
-                HandleThreeInputs (begin, stride, end);
-            }
-            inline size_t Size() const {
-                return _idx.size();
-            }
-            inline size_t IsSingleton() const {
-                return (_idx.size()==1);
-            }
-            inline size_t operator[] (const size_t& i) const { return _idx[i]; }
-        private:
-            
-            inline void HandleSingleInput (const int& pos) {
-                if (pos < 0)
-                    throw  NEGATIVE_BEGIN_INDEX;                           
-                _idx.push_back(pos);
-            }
-            
-            inline void HandleThreeInputs (const int& begin, const int& stride, const int& end) {
-                if (begin < 0) {
-                    printf ("NEGATIVE_BEGIN_INDEX\n");
-                    throw NEGATIVE_BEGIN_INDEX;
-                }
-                if (end < 0) {
-                    printf ("NEGATIVE_END_INDEX\n");
-                    throw NEGATIVE_END_INDEX;
-                }
-                if (stride == 0) {
-                    printf ("STRIDE_MUST_NOT_BE_ZERO\n");
-                    throw STRIDE_MUST_NOT_BE_ZERO;
-                    }
-                if (stride > 0 && end < begin) {
-                    printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
-                    throw POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE;
-                }
-                if (stride < 0 && end > begin) {
-                    printf ("NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE\n");
-                    throw NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE;
-                }
-                size_t cur = _idx.size();
-                _idx.resize(cur+std::floor(((float)end-(float)begin)/(float)stride)+1);
-                for (size_t i = cur; i < _idx.size(); ++i)
-                    _idx[i] = begin + i*stride;
-            }
-            
-            inline void HandleTwoInputs (const int& begin, const int& end) {
-                if (begin < 0) {
-                    printf ("NEGATIVE_BEGIN_INDEX\n");
-                    throw NEGATIVE_BEGIN_INDEX;
-                }
-                if (end < 0) {
-                    printf ("%d: NEGATIVE_END_INDEX\n", end);
-                    throw NEGATIVE_END_INDEX;
-                }
-                if (end < begin) {
-                    printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
-                    throw STRIDE_MUST_NOT_BE_ZERO;
-                }
-                size_t cur = _idx.size();
-                _idx.resize(cur+end-begin+1);
-                for (size_t i = cur; i < _idx.size(); ++i)
-                    _idx[i] = begin + i;
-            }
-            
-            friend std::ostream& operator<< (std::ostream &os, const Range& r) {
-                return os << r._idx;
-            }
-            Vector<size_t> _idx;
-        };
+public:
+
+	inline Range () {}
+
+	inline Range (const size_t& begend) {
+		HandleSingleInput(begend);
+	}
+
+	inline Range (const size_t& begin, const size_t& end) {
+		HandleTwoInputs(begin, end);
+	}
+
+	inline Range (const size_t& begin, const size_t& stride, const size_t& end) {
+		HandleThreeInputs(begin, stride, end);
+	}
+	inline Range (const Vector<size_t>& v) {
+		_idx = v;
+	}
+
+	inline Range (const std::string& rs) {
+		ParseRange(rs);
+	}
+
+	inline Range (const char* rcs) {
+		ParseRange(std::string(rcs));
+	}
+
+	inline void ParseRange (std::string rs) {
+		// remove white spaces
+		rs.erase(std::remove_if(rs.begin(), rs.end(), ::isspace), rs.end());
+		// split delimited by kommas
+		std::vector<std::string> concat = Parse(rs,",");
+		if (concat.empty())
+			throw CONCAT_MUST_CONSIST_OF_MINIMUM_ONE_PARTS;
+		for (size_t i = 0; i < concat.size(); ++i) {
+			std::vector<std::string> parts = Parse(concat[i],":");
+			switch (parts.size()) {
+			case 1:
+				HandleSingleInput(boost::lexical_cast<int>(parts[0]));
+				break;
+			case 2:
+				HandleTwoInputs(boost::lexical_cast<int>(parts[0]),
+								boost::lexical_cast<int>(parts[1]));
+				break;
+			case 3:
+				HandleThreeInputs(boost::lexical_cast<int>(parts[0]),
+								  boost::lexical_cast<int>(parts[1]),
+								  boost::lexical_cast<int>(parts[2]));
+				break;
+			default:
+				throw RANGE_MUST_CONSIST_OF_ONE_THROUGH_THREE_PARTS;
+				break;
+			}
+		}
+	}
+	virtual ~Range() {}
+
+	inline void Reset (const int& begin) {
+		_idx.Clear();
+		HandleSingleInput (begin);
+	}
+	inline void Reset (const int& begin, const int& end) {
+		_idx.Clear();
+		HandleTwoInputs (begin, end);
+	}
+	inline void Reset (const int& begin, const int& stride, const int& end) {
+		_idx.Clear();
+		HandleThreeInputs (begin, stride, end);
+	}
+	inline size_t Size() const {
+		return _idx.size();
+	}
+	inline size_t IsSingleton() const {
+		return (_idx.size()==1);
+	}
+	inline size_t operator[] (const size_t& i) const { return _idx[i]; }
+private:
+
+	inline void HandleSingleInput (const int& pos) {
+		if (pos < 0)
+			throw  NEGATIVE_BEGIN_INDEX;
+		_idx.push_back(pos);
+	}
+
+	inline void HandleThreeInputs (const int& begin, const int& stride, const int& end) {
+		if (begin < 0) {
+			printf ("NEGATIVE_BEGIN_INDEX\n");
+			throw NEGATIVE_BEGIN_INDEX;
+		}
+		if (end < 0) {
+			printf ("NEGATIVE_END_INDEX\n");
+			throw NEGATIVE_END_INDEX;
+		}
+		if (stride == 0) {
+			printf ("STRIDE_MUST_NOT_BE_ZERO\n");
+			throw STRIDE_MUST_NOT_BE_ZERO;
+			}
+		if (stride > 0 && end < begin) {
+			printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
+			throw POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE;
+		}
+		if (stride < 0 && end > begin) {
+			printf ("NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE\n");
+			throw NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE;
+		}
+		size_t cur = _idx.size();
+		_idx.resize(cur+std::floor(((float)end-(float)begin)/(float)stride)+1);
+		for (size_t i = cur; i < _idx.size(); ++i)
+			_idx[i] = begin + i*stride;
+	}
+
+	inline void HandleTwoInputs (const int& begin, const int& end) {
+		if (begin < 0) {
+			printf ("NEGATIVE_BEGIN_INDEX\n");
+			throw NEGATIVE_BEGIN_INDEX;
+		}
+		if (end < 0) {
+			printf ("%d: NEGATIVE_END_INDEX\n", end);
+			throw NEGATIVE_END_INDEX;
+		}
+		if (end < begin) {
+			printf ("POSITIVE_STRIDE_REQUIRES_POSITIV_RANGE\n");
+			throw STRIDE_MUST_NOT_BE_ZERO;
+		}
+		size_t cur = _idx.size();
+		_idx.resize(cur+end-begin+1);
+		for (size_t i = cur; i < _idx.size(); ++i)
+			_idx[i] = begin + i;
+	}
+
+	friend std::ostream& operator<< (std::ostream &os, const Range& r) {
+		return os << r._idx;
+	}
+	Vector<size_t> _idx;
+};
 
 typedef Range<true> CR;
 typedef Range<false> R;
@@ -498,14 +513,12 @@ private:
  * @author  Kaveh Vahedipour
  * @date    Mar 2010
  */
-template <class T, paradigm P>
-class Matrix : public MatrixType<T,P> {
+template <class T, paradigm P> class Matrix : public MatrixType<T,P> {
 
 public:
 
     typedef ConstNoConstView<T,true> ConstView;
     typedef ConstNoConstView<T,false> View;
-
     
 #endif
 
@@ -519,7 +532,7 @@ public:
     /**
      * @brief           Contruct 1-dim with single element.
      */
-	inline Matrix ()  {
+	inline Matrix () NOEXCEPT {
         _dim.resize(1,1);
         _res.resize(1,1.0);
         Allocate();
@@ -531,13 +544,12 @@ public:
      *
      * @param  dim      All dimensions
      */
-	inline Matrix (const Vector<size_t>& dim)  {
+	inline Matrix (const Vector<size_t>& dim) {
 	    _dim = dim;
-        if (_dim.Empty())
-            MATRIX_THROW(DIMS_VECTOR_EMPTY);
-        else if (std::find(dim.begin(),dim.end(),size_t(0))!=dim.end())
-            MATRIX_THROW(DIMS_VECTOR_CONTAINS_ZEROS);
-		_res.resize(_dim.size(),1.0);
+		MATRIX_ASSERT(!_dim.Empty(), DIMS_VECTOR_EMPTY);
+        MATRIX_ASSERT(std::find(dim.begin(),dim.end(),size_t(0))==dim.end(),
+        		DIMS_VECTOR_CONTAINS_ZEROS);
+        _res.resize(_dim.size(),1.0);
         Allocate();
 	}
 	
@@ -548,11 +560,13 @@ public:
      * @param  dim      All 16 Dimensions
      * @param  res      All 16 Resolutions
      */
-	inline explicit Matrix (const Vector<size_t>& dim, const Vector<float>& res)  {
-	    assert(!dim.Empty() &&
-	    	    std::find(dim.begin(),dim.end(),size_t(0))==dim.end() &&
-	    	    dim.size() == res.size());
+	inline explicit Matrix (const Vector<size_t>& dim, const Vector<float>& res) {
 		_dim = dim;
+        MATRIX_ASSERT(_dim.Empty(),DIMS_VECTOR_EMPTY);
+        MATRIX_ASSERT(std::find(dim.begin(),dim.end(),size_t(0))==dim.end(),
+            DIMS_VECTOR_CONTAINS_ZEROS);
+        MATRIX_ASSERT(dim.size()==res.size(),
+        		MUST_HAVE_MATCHING_DIMENSIONS_AND_RESOLUTIONS_VECTORS);
 		_res = res;
         Allocate();
 	}
@@ -568,9 +582,8 @@ public:
      *
      * @param  n        Rows & Columns
      */
-    inline explicit
-    Matrix (const size_t& n)  {
-	    assert (n);
+    inline explicit Matrix (const size_t& n)  {
+    	MATRIX_ASSERT(n!=0,ZERO_SIDE_LENGTH);
 		_dim.resize(2,n);
 	    _res.resize(2,1.0);
         Allocate();
@@ -589,7 +602,8 @@ public:
      * @param  n        Columns
      */
     inline Matrix (const size_t& m, const size_t& n)  {
-    	assert (m && n);
+    	MATRIX_ASSERT(n!=0,ZERO_NUMBER_COLUMNS);
+    	MATRIX_ASSERT(m!=0,ZERO_NUMBER_ROWS);
     	_dim.resize(2); _dim[0] = m; _dim[1] = n;
 		_res.resize(2,1.0);
         Allocate();
@@ -609,7 +623,9 @@ public:
      * @param  k        Slices
      */
     inline Matrix (const size_t& m, const size_t& n, const size_t& k)  {
-	    assert (m && n && k);
+   		MATRIX_ASSERT(n!=0,ZERO_NUMBER_COLUMNS);
+   		MATRIX_ASSERT(m!=0,ZERO_NUMBER_ROWS);
+   		MATRIX_ASSERT(k!=0,ZERO_NUMBER_SLICES);
     	_dim.resize(3); _dim[0] = m; _dim[1] = n; _dim[2] = k;
 		_res.resize(3,1.0);
         Allocate();
@@ -636,17 +652,15 @@ public:
      * @param  ide      IDE
      * @param  ave      Averages
      */
-    inline
-    Matrix              (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
-                         const size_t& eco = 1, const size_t& phs = 1, const size_t& rep = 1, const size_t& seg = 1,
-                         const size_t& par = 1, const size_t& slc = 1, const size_t& ida = 1, const size_t& idb = 1,
-                         const size_t& idc = 1, const size_t& idd = 1, const size_t& ide = 1, const size_t& ave = 1)  {
+    inline Matrix (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
+                   const size_t& eco = 1, const size_t& phs = 1, const size_t& rep = 1, const size_t& seg = 1,
+                   const size_t& par = 1, const size_t& slc = 1, const size_t& ida = 1, const size_t& idb = 1,
+                   const size_t& idc = 1, const size_t& idd = 1, const size_t& ide = 1, const size_t& ave = 1)  {
 
-		assert (col && lin && cha && set && eco && phs && rep && seg &&
-				par && slc && ida && idb && idc && idd && ide && ave );
+		MATRIX_ASSERT(col && lin && cha && set && eco && phs && rep && seg &&
+				par && slc && ida && idb && idc && idd && ide && ave, ZERO_SIDE_LENGTH);
 
 	    size_t nd = 16, n = nd, i;
-
 	    _dim.resize(n);
 	    _dim[ 0] = col; _dim[ 1] = lin; _dim[ 2] = cha; _dim[ 3] = set;
 	    _dim[ 4] = eco; _dim[ 5] = phs; _dim[ 6] = rep; _dim[ 7] = seg;
@@ -663,7 +677,6 @@ public:
         // Resize skeleton
         _dim.resize(n);
 		_res.resize(n,1.0);
-
         Allocate();
 
 	}
@@ -680,8 +693,7 @@ public:
      *
      * @param  M        Right hand side
      */
-    inline
-    Matrix             (const Matrix<T,P> &M)  {
+    inline Matrix (const Matrix<T,P> &M) NOEXCEPT {
     	if (this != &M)
     		*this = M;
     }
@@ -695,16 +707,20 @@ public:
      *
      * @param  M        Right hand side
      */
-    inline
-    Matrix             (Matrix<T,P>&& M)  {
+    inline Matrix (Matrix<T,P>&& M) NOEXCEPT {
     	if (this != &M)
     		*this = M;
     }
+
+    inline virtual ~Matrix() {}
 #endif
 
 #ifdef HAVE_CXX11_CONDITIONAL
     inline Matrix (ConstView& v) {
-        _dim = v._dim;
+		_dim = v._dim;
+        MATRIX_ASSERT(!_dim.Empty(),DIMS_VECTOR_EMPTY);
+        MATRIX_ASSERT(std::find(_dim.begin(),_dim.end(),size_t(0))==_dim.end(),
+        		DIMS_VECTOR_CONTAINS_ZEROS);
         Allocate();
         for (size_t i = 0; i < Size(); ++i)
             _M[0] = *(v._pointers[i]);
@@ -752,7 +768,7 @@ public:
      * @return          Value at _M[p].
      */
     inline const T& operator[] (const size_t& p) const {
-        assert(p <  Size());
+        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
         return _M[p];
     }
     
@@ -770,7 +786,7 @@ public:
      * @return          Reference to _M[p].
      */
     inline T& operator[] (const size_t& p) {
-        assert(p <  Size());
+        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
         return _M[p];
     }
 
