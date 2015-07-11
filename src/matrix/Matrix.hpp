@@ -562,7 +562,7 @@ public:
      */
 	inline explicit Matrix (const Vector<size_t>& dim, const Vector<float>& res) {
 		_dim = dim;
-        MATRIX_ASSERT(_dim.Empty(),DIMS_VECTOR_EMPTY);
+        MATRIX_ASSERT(!_dim.Empty(),DIMS_VECTOR_EMPTY);
         MATRIX_ASSERT(std::find(dim.begin(),dim.end(),size_t(0))==dim.end(),
             DIMS_VECTOR_CONTAINS_ZEROS);
         MATRIX_ASSERT(dim.size()==res.size(),
