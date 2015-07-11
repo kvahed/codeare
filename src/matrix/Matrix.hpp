@@ -569,7 +569,7 @@ public:
      * @param  n        Rows & Columns
      */
     inline explicit
-    Matrix (const size_t n)  {
+    Matrix (const size_t& n)  {
 	    assert (n);
 		_dim.resize(2,n);
 	    _res.resize(2,1.0);
@@ -588,7 +588,7 @@ public:
      * @param  m        Rows
      * @param  n        Columns
      */
-    inline Matrix (const size_t m, const size_t n)  {
+    inline Matrix (const size_t& m, const size_t& n)  {
     	assert (m && n);
     	_dim.resize(2); _dim[0] = m; _dim[1] = n;
 		_res.resize(2,1.0);
@@ -608,7 +608,7 @@ public:
      * @param  n        Columns
      * @param  k        Slices
      */
-    inline Matrix (const size_t m, const size_t n, const size_t k)  {
+    inline Matrix (const size_t& m, const size_t& n, const size_t& k)  {
 	    assert (m && n && k);
     	_dim.resize(3); _dim[0] = m; _dim[1] = n; _dim[2] = k;
 		_res.resize(3,1.0);
@@ -637,10 +637,10 @@ public:
      * @param  ave      Averages
      */
     inline
-    Matrix              (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
-                         const size_t eco = 1, const size_t phs = 1, const size_t rep = 1, const size_t seg = 1,
-                         const size_t par = 1, const size_t slc = 1, const size_t ida = 1, const size_t idb = 1,
-                         const size_t idc = 1, const size_t idd = 1, const size_t ide = 1, const size_t ave = 1)  {
+    Matrix              (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
+                         const size_t& eco = 1, const size_t& phs = 1, const size_t& rep = 1, const size_t& seg = 1,
+                         const size_t& par = 1, const size_t& slc = 1, const size_t& ida = 1, const size_t& idb = 1,
+                         const size_t& idc = 1, const size_t& idd = 1, const size_t& ide = 1, const size_t& ave = 1)  {
 
 		assert (col && lin && cha && set && eco && phs && rep && seg &&
 				par && slc && ida && idb && idc && idd && ide && ave );
@@ -789,7 +789,7 @@ public:
      * @return          Data 
      */
     inline const T*            
-    Ptr             (const size_t p = 0)  const  {
+    Ptr             (const size_t& p = 0)  const  {
         assert (p < Size());
         return _M.ptr(p);
     }
@@ -802,7 +802,7 @@ public:
      * @return          Data
      */
     inline T*
-    Ptr             (const size_t p = 0)  {
+    Ptr             (const size_t& p = 0)  {
         assert (p < Size());
         return _M.ptr(p);
     }
@@ -883,7 +883,7 @@ public:
      * @return          Value at _M[p]
      */
     inline const T&
-    At                  (const size_t p) const  {
+    At                  (const size_t& p) const  {
         assert (p < Size());
         return _M[p];
     }
@@ -896,7 +896,7 @@ public:
      * @return           Reference to _M[p]
      */
     inline T&           
-    At                  (const size_t pos)  {
+    At                  (const size_t& pos)  {
         assert (pos < Size());
         return _M[pos];
     }
@@ -911,12 +911,12 @@ public:
      *
      * @return          Value
      */
-    inline const T& At (const size_t x, const size_t y) const  {
+    inline const T& At (const size_t& x, const size_t& y) const  {
     	assert (x < _dim[0]);
         assert (y < _dim[1]);
         return _M[x + _dim[0]*y];
     }
-    inline T&       At (const size_t x, const size_t y)  {
+    inline T&       At (const size_t& x, const size_t& y)  {
     	assert (x < _dim[0]);
         assert (y < _dim[1]);
         return _M[x + _dim[0]*y];
@@ -932,11 +932,11 @@ public:
      *
      * @return         Value
      */
-    inline const T& At (const size_t x, const size_t y, const size_t z) const  {
+    inline const T& At (const size_t& x, const size_t& y, const size_t& z) const  {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
         return _M[x + _dsz[1]*y + _dsz[2]*z];
     }
-    inline T&       At (const size_t x, const size_t y, const size_t z)  {
+    inline T&       At (const size_t& x, const size_t& y, const size_t& z)  {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
         return _M[x + _dsz[1]*y + _dsz[2]*z];
     }
@@ -952,12 +952,12 @@ public:
      * @return           Reference
      */
     inline const T&
-    At                   (const size_t x, const size_t y, const size_t z, const size_t w) const  {
+    At                   (const size_t& x, const size_t& y, const size_t& z, const size_t& w) const  {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
         return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]*w];
     }
     inline T&
-    At                   (const size_t x, const size_t y, const size_t z, const size_t w)  {
+    At                   (const size_t& x, const size_t& y, const size_t& z, const size_t& w)  {
     	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
         return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]*w];
     }
@@ -986,10 +986,10 @@ public:
      * @return           Value at position
      */
     inline const T&
-    At                   (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
-                          const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
-                          const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
-                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) const  {
+    At                   (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
+                          const size_t& eco,     const size_t& phs = 0, const size_t& rep = 0, const size_t& seg = 0,
+                          const size_t& par = 0, const size_t& slc = 0, const size_t& ida = 0, const size_t& idb = 0,
+                          const size_t& idc = 0, const size_t& idd = 0, const size_t& ide = 0, const size_t& ave = 0) const  {
     	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
     	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
     	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
@@ -999,10 +999,10 @@ public:
    	               idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
     }
     inline T&
-    At                   (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
-                          const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
-                          const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
-                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0)  {
+    At                   (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
+                          const size_t& eco,     const size_t& phs = 0, const size_t& rep = 0, const size_t& seg = 0,
+                          const size_t& par = 0, const size_t& slc = 0, const size_t& ida = 0, const size_t& idb = 0,
+                          const size_t& idc = 0, const size_t& idd = 0, const size_t& ide = 0, const size_t& ave = 0)  {
     	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
     	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
     	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
@@ -1033,7 +1033,7 @@ public:
      * @return          Requested scalar value.
      */
     inline const T&
-    operator()          (const size_t p) const  {
+    operator()          (const size_t& p) const  {
         return this->At(p);
     }
 
@@ -1045,7 +1045,7 @@ public:
      * @return          Requested scalar value.
      */
     inline T&
-    operator()          (const size_t p)  {
+    operator()          (const size_t& p)  {
         return this->At(p);
     }
 
@@ -1058,7 +1058,7 @@ public:
      * @return          Value
      */
     inline const T&
-    operator()          (const size_t x, const size_t y) const  {
+    operator()          (const size_t& x, const size_t& y) const  {
         return this->At(x,y);
     }
     
@@ -1071,7 +1071,7 @@ public:
      * @return          Reference
      */
     inline T&
-    operator()           (const size_t x, const size_t y)  {
+    operator()           (const size_t& x, const size_t& y)  {
         return this->At(x,y);
     }
     
@@ -1086,7 +1086,7 @@ public:
      * @return           Value
      */
     inline const T&
-    operator()           (const size_t x, const size_t y, const size_t z) const  {
+    operator()           (const size_t& x, const size_t& y, const size_t& z) const  {
         return this->At(x,y,z);
     }
     
@@ -1101,7 +1101,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&
-    operator()           (const size_t x, const size_t y, const size_t z)  {
+    operator()           (const size_t& x, const size_t& y, const size_t& z)  {
         return this->At(x,y,z);
     }
     
@@ -1116,7 +1116,7 @@ public:
      * @return           Value
      */
     inline const T&
-    operator()           (const size_t x, const size_t y, const size_t z, const size_t w) const  {
+    operator()           (const size_t& x, const size_t& y, const size_t& z, const size_t& w) const  {
         return this->At(x,y,z,w);
     }
 
@@ -1131,7 +1131,7 @@ public:
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
     inline T&
-    operator()           (const size_t x, const size_t y, const size_t z, const size_t w)  {
+    operator()           (const size_t& x, const size_t& y, const size_t& z, const size_t& w)  {
         return this->At(x,y,z,w);
     }
 
@@ -1158,10 +1158,10 @@ public:
      * @return          Reference to position
      */
     inline T&                 
-    operator()     (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
-					const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
-					const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
-					const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0)  {
+    operator()     (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
+					const size_t& eco,     const size_t& phs = 0, const size_t& rep = 0, const size_t& seg = 0,
+					const size_t& par = 0, const size_t& slc = 0, const size_t& ida = 0, const size_t& idb = 0,
+					const size_t& idc = 0, const size_t& idd = 0, const size_t& ide = 0, const size_t& ave = 0)  {
 
 		assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
 		  (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
@@ -1196,10 +1196,10 @@ public:
      * @return          Value
      */
     inline const T&
-    operator()           (const size_t col,     const size_t lin,     const size_t cha,     const size_t set,
-                          const size_t eco,     const size_t phs = 0, const size_t rep = 0, const size_t seg = 0,
-                          const size_t par = 0, const size_t slc = 0, const size_t ida = 0, const size_t idb = 0,
-                          const size_t idc = 0, const size_t idd = 0, const size_t ide = 0, const size_t ave = 0) const  {
+    operator()           (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
+                          const size_t& eco,     const size_t& phs = 0, const size_t& rep = 0, const size_t& seg = 0,
+                          const size_t& par = 0, const size_t& slc = 0, const size_t& ida = 0, const size_t& idb = 0,
+                          const size_t& idc = 0, const size_t& idd = 0, const size_t& ide = 0, const size_t& ave = 0) const  {
 
     	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
     	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
@@ -1342,7 +1342,7 @@ public:
      * @return          Resolution .
      */
     inline float
-    Res                 (const size_t i) const  {
+    Res                 (const size_t& i) const  {
         assert (i < _res.size());
         return _res[i];
     }
@@ -1355,7 +1355,7 @@ public:
      * @return          Resolution
      */
     inline float&
-    Res                 (const size_t i)        {
+    Res                 (const size_t& i)        {
         assert (i < _res.size());
         return _res[i];
     }
@@ -1552,7 +1552,7 @@ public:
      * @param  s        The assigned scalar.
      */
     inline const Matrix<T,P>&
-    operator=           (const T s)  {
+    operator=           (const T& s)  {
         T t = T(s);
         std::fill(_M.begin(), _M.end(), t);
         return *this;
@@ -1617,7 +1617,7 @@ public:
      * @return          Matrix of false where elements are equal s and true else.
      */
     inline Matrix<cbool>
-    operator!=          (const T s) const  {
+    operator!=          (const T& s) const  {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = (_M[i] != s) ? 1 : 0;
@@ -1633,7 +1633,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator>           (const T s) const  {
+    operator>           (const T& s) const  {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater(_M[i], s);
@@ -1650,7 +1650,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator>=          (const T s) const  {
+    operator>=          (const T& s) const  {
 		Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater_or_equal(_M[i], s);
@@ -1665,7 +1665,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator<=          (const T s) const  {
+    operator<=          (const T& s) const  {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less_or_equal(_M[i], s);
@@ -1680,7 +1680,7 @@ public:
      * @return          Hit list
      */
     inline Matrix<cbool>
-    operator<           (const T s) const  {
+    operator<           (const T& s) const  {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less(_M[i], s);
@@ -1850,7 +1850,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator+           (const S s) const  {
+    operator+           (const S& s) const  {
         Matrix<T,P> res = *this;
         return res += s;
     }
@@ -1891,7 +1891,7 @@ public:
      * @return          Result
      */
     template <class S > inline Matrix<T,P>&
-    operator+=          (const S s)  {
+    operator+=          (const S& s)  {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),(T)s));
         return *this;
     }
@@ -1902,7 +1902,7 @@ public:
      * @param  s        Scalar substruent.
      */
     template <class S> inline Matrix<T,P>
-    operator-           (const S s) const  {
+    operator-           (const S& s) const  {
 		Matrix<T,P> res = *this;
 		return res -= s;
     }
@@ -1943,7 +1943,7 @@ public:
      * @return          Result
      */
     template <class S> inline Matrix<T,P>&
-    operator-=          (const S s)  {
+    operator-=          (const S& s)  {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::minus<T>(),(T)s));
 		return *this;
     }
@@ -1955,7 +1955,7 @@ public:
      * @return          Result
      */
     template <class S> inline Matrix<T,P>
-    operator*          (const S s) const   {
+    operator*          (const S& s) const   {
         Matrix<T,P> res = *this;
         return res *= s;
     }
@@ -2007,7 +2007,7 @@ public:
      * @return          Result
      */
     template <class S> inline Matrix<T,P>&
-    operator*=         (const S s)  {
+    operator*=         (const S& s)  {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
 		return *this;
     }
@@ -2020,7 +2020,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>
-    operator/           (const S s) const  {
+    operator/           (const S& s) const  {
 		Matrix<T,P> res = *this;
 		return res /= s;
 	}
@@ -2063,7 +2063,7 @@ public:
      */
     template <class S>
     inline Matrix<T,P>&
-    operator/=         (const S s)  {
+    operator/=         (const S& s)  {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::divides<T>(),(T)s));
         return *this;
     }
@@ -2364,7 +2364,7 @@ public:
      * @return          m * s
      */
     inline friend Matrix<T,P>
-    operator/  (const T s, const Matrix<T,P> &m)  {
+    operator/  (const T& s, const Matrix<T,P> &m)  {
         Matrix<T,P> res = m;
         for (size_t i = 0; i < m.Size(); ++i)
             res[i] = s / res[i];
@@ -2379,7 +2379,7 @@ public:
      * @return          m == s
      */
     inline friend Matrix<cbool>
-    operator== (const T s, const Matrix<T,P>& m)  {
+    operator== (const T& s, const Matrix<T,P>& m)  {
         return   m == s;
     }
 
@@ -2392,7 +2392,7 @@ public:
      * @return          m <= t
      */
     inline friend Matrix<cbool>
-    operator>= (const T s, const Matrix<T,P>& m)  {
+    operator>= (const T& s, const Matrix<T,P>& m)  {
         return   m <= s;
     }
 
@@ -2405,7 +2405,7 @@ public:
      * @return          T<=M
      */
     inline friend Matrix<cbool>
-    operator<= (const T s, const Matrix<T,P>& m)  {
+    operator<= (const T& s, const Matrix<T,P>& m)  {
         return   m >= s;
     }
 
@@ -2418,7 +2418,7 @@ public:
      * @return          T!=M
      */
     inline friend Matrix<cbool>
-    operator!= (const T s, const Matrix<T,P>& m)  {
+    operator!= (const T& s, const Matrix<T,P>& m)  {
         return   m != s;
     }
 
@@ -2431,7 +2431,7 @@ public:
      * @return          T+M
      */
     inline friend Matrix<cbool>
-    operator>  (const T s, const Matrix<T,P>& m)  {
+    operator>  (const T& s, const Matrix<T,P>& m)  {
         return   m <  s;
     }
 
@@ -2444,7 +2444,7 @@ public:
      * @return          T+M
      */
     inline friend Matrix<cbool>
-    operator<  (const T s, const Matrix<T,P>& m)  {
+    operator<  (const T& s, const Matrix<T,P>& m)  {
         return   m >  s;
     }
 
@@ -2504,7 +2504,7 @@ public:
      * @return          Matrix of true where elements are equal s and false else.
      */
     inline Matrix<cbool>
-    operator==          (const T s) const  {
+    operator==          (const T& s) const  {
     	T t = (T) s;
         Matrix<cbool> res (_dim);
 		for (size_t i = 0; i < Size(); ++i)

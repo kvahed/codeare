@@ -292,11 +292,11 @@ public:
 		for (int j = 0; j < m_nx[1]; ++j) {
 	        int k = omp_get_thread_num();
 	        if (m_nx[0] == 2)
-	        	/*m_bwd_out (R(),R(),    R(j)) =*/
-	        			m_fts[k] ->* (m(CR(),CR(j)) * conj(m_sm(CR(),CR(),     CR(j))));
+	        	m_bwd_out (R(),R(),    R(j)) =
+                    m_fts[k] ->* (m(CR(),CR(j)) * conj(m_sm(CR(),CR(),     CR(j))));
 	        else
-	        	/*m_bwd_out (R(),R(),R(),R(j)) =*/
-	        		    m_fts[k] ->* (m(CR(),CR(j)) * conj(m_sm(CR(),CR(),CR(),CR(j))));
+	        	m_bwd_out (R(),R(),R(),R(j)) =
+                    m_fts[k] ->* (m(CR(),CR(j)) * conj(m_sm(CR(),CR(),CR(),CR(j))));
 
 	    }
 		std::cout << "operator/" << std::endl;
