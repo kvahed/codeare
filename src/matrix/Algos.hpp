@@ -434,12 +434,7 @@ resize (const Matrix<T>& M, size_t sc, size_t sl, size_t ss) {
  */
 template <class T,paradigm P>  inline static  Vector<size_t>
 size               (const MatrixType<T,P>& M) {
-	
-	Vector<size_t> ret (M.NDim());
-	for (size_t i = 0; i < ret.size(); ++i)
-		ret[i] = size(M,i);
-	return ret;
-
+	return M.Dim();
 }
 
 

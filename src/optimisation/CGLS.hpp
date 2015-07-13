@@ -31,7 +31,7 @@ public:
 
 		Matrix<T> ret;
 
-		_p = (A/x);
+		_p = A/x;
 		if (_maxit == 0)
 			return _p;
 		_r  = _p;
@@ -44,7 +44,7 @@ public:
 				break;
 			if (_verbosity)
 				printf ("    %03lu %.7f\n", i, _res[i]);
-			_q  = A/(A*_p);
+            _q  = A/(A*_p);
 			if (_lambda)
 				_q += _lambda * _p;
 			_ts  = _rn / std::real(_p.dotc(_q));

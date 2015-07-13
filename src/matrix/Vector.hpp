@@ -234,6 +234,7 @@ public:
 	inline bool Empty() const NOEXCEPT {return _data.empty();}
 
 	inline bool operator== (const Vector<T>& other) const NOEXCEPT {return _data == other._data;}
+	inline bool operator!= (const Vector<T>& other) const NOEXCEPT {return _data != other._data;}
 
 	inline void PopBack () NOEXCEPT {_data.pop_back();}
 	inline void PushBack (const T& t) NOEXCEPT {_data.push_back(t);}

@@ -29,7 +29,7 @@ int main (int narg, const char** argv) {
     M11 = M6(CR(),CR()) * M6(CR(),CR());
     M11 = M6(CR(),CR()) + M6(CR(),CR());
     M11 = M6(CR(),CR()) / M6(CR(),CR());
-    M11 = M6(CR(),CR()) - M6(CR(),CR());
+    M11 = M6 * M6(CR(),CR());
     std::cout << M3 << std::endl<< std::endl;
     std::cout << M4 << std::endl<< std::endl;
     std::cout << M6 << std::endl<< std::endl;

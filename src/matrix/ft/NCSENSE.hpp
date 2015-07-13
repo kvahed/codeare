@@ -183,18 +183,14 @@ public:
 	 */
 	virtual Matrix<T>
 	Trafo       (const MatrixType<T>& m) const NOEXCEPT {
-        std::cout << "operator*" << std::endl;
 #pragma omp parallel for
 	    for (int j = 0; j < m_nx[1]; ++j)
             if (m_3rd_dim_cart)
                 0;//Slice  (m_fwd_out, j, m_fts[k] * (resize(Volume (m_sm, j),size(m)) * m));
             else
-                std::cout << "now" << size(m * m_sm(CR(),CR(),CR(j))) << std::endl;
-//                m_fwd_out(R(),R(),R(j)) = m_fts[omp_get_thread_num()] * (m * m_sm(CR(),CR(),CR(j)));
+                m_fwd_out(R(),R(),R(j)) = m_fts[omp_get_thread_num()] * (m_sm(CR(),CR(),CR(j))*m);
 //                    (m /* * ((m_nx[0] == 2) ? m_sm(CR(),CR(),CR(j)) : m_sm(CR(),CR(),CR(),CR(j)))*/);
-        std::cout << size(m_fwd_out) << std::endl;
-	    std::cout << "operator*" << std::endl;
-	    return m_fwd_out;
+	    return squeeze(m_fwd_out);
 	}
 
 

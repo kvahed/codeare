@@ -103,7 +103,8 @@ enum MatrixException {
 	ZERO_NUMBER_COLUMNS,
 	ZERO_NUMBER_ROWS,
 	ZERO_NUMBER_SLICES,
-	INDEX_EXCEEDS_NUMBER_ELEMENTS
+	INDEX_EXCEEDS_NUMBER_ELEMENTS,
+    DIMENSIONS_MUST_MATCH
 };
 
 static const char* MatrixExceptionMessages[] = {
@@ -114,7 +115,8 @@ static const char* MatrixExceptionMessages[] = {
 	"Matrix with zero height",
 	"Matrix with zero width",
 	"Matrix with zero slices",
-	"Index exceeds number of elements"
+	"Index exceeds number of elements",
+	"Dimensions must match"
 };
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
@@ -1179,11 +1181,13 @@ public:
     }
 
 #ifdef HAVE_CXX11_CONDITIONAL
-    inline Matrix<T,P>& operator= (const ConstView& v) {
+    template<class S>
+    inline Matrix<T,P>& operator= (const ConstNoConstView<S,true>& v) {
         _dim = v._dim;
         Allocate();
+        std::cout << _dim << std::endl;
         for (size_t i = 0; i < Size(); ++i)
-            _M[i] = *(v._pointers[i]);
+            _M[i] = v[i];
         return *this;
     }
 #endif
@@ -1597,8 +1601,8 @@ public:
      * @param  s        Factor scalar
      * @return          Result
      */
-    template <class S> inline Matrix<T,P>
-    operator*          (const S& s) const   {
+    template <class S>
+    inline Matrix<T,P> operator* (const S& s) const {
         Matrix<T,P> res = *this;
         return res *= s;
     }
@@ -1611,8 +1615,7 @@ public:
      */
     inline Matrix<T,P>&
     operator*=         (const Matrix<T,P>& M)  {
-//        std::cout << PRETTY_FUNCTION << std::endl;
-        op_assert (_dim == M.Dim(), *this, M);
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
         return *this;
     }
@@ -1623,10 +1626,9 @@ public:
      * @param  M        Factor matrix.
      * @return          Result
      */
-    template <class S> inline Matrix<T,P>&
-    operator*=         (const Matrix<S,P>& M)  {
-        //      std::cout << PRETTY_FUNCTION << std::endl;
-        op_assert (_dim == M.Dim(), *this, M);
+    template <class S>
+    inline Matrix<T,P>& operator*= (const Matrix<S,P>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
         return *this;
     }
@@ -1637,9 +1639,9 @@ public:
      * @param  M        Factor matrix.
      * @return          Result
      */
-    inline Matrix<T,P>&
-    operator*=         (const ConstView& M)  {
-//        std::cout << PRETTY_FUNCTION << std::endl;
+    template <class S>
+    inline Matrix<T,P>& operator*= (const ConstNoConstView<S,true>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         for (size_t i = 0; i < Size(); ++i)
             _M[i] *= M[i];
         return *this;
@@ -1651,9 +1653,8 @@ public:
      * @param  s        Factor scalar.
      * @return          Result
      */
-    template <class S> inline Matrix<T,P>&
-    operator*=         (const S& s)  {
-        //      std::cout << PRETTY_FUNCTION << std::endl;
+    template <class S>
+    inline Matrix<T,P>& operator*= (const S& s) {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
 		return *this;
     }
