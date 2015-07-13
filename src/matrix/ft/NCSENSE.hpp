@@ -90,6 +90,7 @@ public:
 
 		assert (params.exists("sensitivities"));
 		m_sm = params.Get<Matrix<T> >("sensitivities");
+        m_csm = conj(m_sm);
 		if (m_3rd_dim_cart)
 			cart_dim = size(m_sm,2);
 
@@ -185,8 +186,13 @@ public:
         std::cout << "operator*" << std::endl;
 #pragma omp parallel for
 	    for (int j = 0; j < m_nx[1]; ++j)
-            m_fwd_out(R(),R(),R(j)) = m_fts[omp_get_thread_num()] *
-                (m * ((m_nx[0] == 2) ? m_sm(CR(),CR(),CR(j)) : m_sm(CR(),CR(),CR(),CR(j))));
+            if (m_3rd_dim_cart)
+                0;//Slice  (m_fwd_out, j, m_fts[k] * (resize(Volume (m_sm, j),size(m)) * m));
+            else
+                std::cout << "now" << size(m * m_sm(CR(),CR(),CR(j))) << std::endl;
+//                m_fwd_out(R(),R(),R(j)) = m_fts[omp_get_thread_num()] * (m * m_sm(CR(),CR(),CR(j)));
+//                    (m /* * ((m_nx[0] == 2) ? m_sm(CR(),CR(),CR(j)) : m_sm(CR(),CR(),CR(),CR(j)))*/);
+        std::cout << size(m_fwd_out) << std::endl;
 	    std::cout << "operator*" << std::endl;
 	    return m_fwd_out;
 	}
@@ -279,30 +285,21 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T>
-	operator* (const MatrixType<T>& m) const NOEXCEPT {
+	virtual Matrix<T> operator* (const MatrixType<T>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	
 
-	virtual Matrix<T>
-	operator/ (const MatrixType<T>& m) const NOEXCEPT {
-		std::cout << "operator/" << std::endl;
+	virtual Matrix<T> operator/ (const MatrixType<T>& m) const NOEXCEPT {
 #pragma omp parallel for
-		for (int j = 0; j < m_nx[1]; ++j) {
-	        int k = omp_get_thread_num();
+		for (int j = 0; j < m_nx[1]; ++j) 
 	        if (m_nx[0] == 2)
 	        	m_bwd_out (R(),R(),    R(j)) =
-                    m_fts[k] ->* (m(CR(),CR(j)) * conj(m_sm(CR(),CR(),     CR(j))));
+                    m_fts[omp_get_thread_num()] ->* m(CR(),     CR(j));
 	        else
 	        	m_bwd_out (R(),R(),R(),R(j)) =
-                    m_fts[k] ->* (m(CR(),CR(j)) * conj(m_sm(CR(),CR(),CR(),CR(j))));
-
-	    }
-		std::cout << "operator/" << std::endl;
-
-	    return squeeze(sum(m_bwd_out,size(m_sm).size()-1)) * m_ic;
-
+                    m_fts[omp_get_thread_num()] ->* m(CR(),CR(),CR(j));
+	    return squeeze(sum(m_bwd_out*m_csm,size(m_sm).size()-1)) * m_ic;
 	}
 
 
@@ -334,6 +331,7 @@ private:
     bool       m_3rd_dim_cart; /**< 3rd FT dimension is Cartesian (stack of ...) */
 
 	mutable Matrix<T> m_sm;          /**< Sensitivities */
+	mutable Matrix<T> m_csm;          /**< Sensitivities */
 	Matrix<RT>  m_ic;     /**< Intensity correction I(r) */
 	Matrix<T> m_pc; /**< @brief Correction phase */
 

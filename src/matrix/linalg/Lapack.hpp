@@ -179,7 +179,7 @@ svd2 (const Matrix<T>& M, char jobz = 'N') {
     m     =  A.Height(); n = A.Width();
     lwork = -1;
     lda   =  m;
-    mn    =  MIN(m,n);
+    mn    =  std::min(m,n);
     
     if (jobz != 'N')
         ldu = m;
@@ -323,7 +323,7 @@ template<class T> inline Matrix<T> pinv (const Matrix<T>& m, char trans = 'N') {
     int  N      =  size(m, 1);
     int  nrhs   =  M;
     int  lda    =  M;
-    int  ldb    =  MAX(M,N);
+    int  ldb    =  std::max(M,N);
     int  lwork  = -1;
     int  info   =  0;
 

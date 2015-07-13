@@ -94,7 +94,7 @@ class DWT {
               _sl2 (sl2),
               _sl3 (sl3),
               _dim (_sl3 == 1 ? 2 : 3),
-              _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
+              _min_sl (_dim == 2 ? std::min (_sl1, _sl2) : std::min (std::min (_sl1, _sl2),_sl3)),
               _min_level (wl_scale),
               _max_level (MaxLevel ()),
               _sl1_scale (_sl1 / pow ((RT)2, (RT)_max_level - _min_level)),
@@ -106,7 +106,7 @@ class DWT {
               _modd (_fl/2),
               _meven ((_fl+1)/2),
               _num_threads (num_threads),
-              _temp (Vector <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
+              _temp (Vector <T> (_num_threads * std::max (6 * _sl3, std::max (6 * _sl2, 5 * sl1)))),
               dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
               idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3) {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
@@ -129,7 +129,7 @@ class DWT {
           _sl2 (sl2),
           _sl3 (1),
           _dim (_sl3 == 1 ? 2 : 3),
-          _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
+          _min_sl (_dim == 2 ? std::min (_sl1, _sl2) : std::min (std::min (_sl1, _sl2),_sl3)),
           _min_level (wl_scale),
           _max_level (MaxLevel ()),
           _sl1_scale (_sl1 / pow ((RT)2, (RT)_max_level - _min_level)),
@@ -141,7 +141,7 @@ class DWT {
           _modd (_fl/2),
           _meven ((_fl+1)/2),
           _num_threads (num_threads),
-          _temp (Vector <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
+          _temp (Vector <T> (_num_threads * std::max (6 * _sl3, std::max (6 * _sl2, 5 * sl1)))),
           dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
           idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3) {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);
@@ -164,7 +164,7 @@ class DWT {
           _sl2 (_sl1),
           _sl3 (1),
           _dim (_sl3 == 1 ? 2 : 3),
-          _min_sl (_dim == 2 ? MIN (_sl1, _sl2) : MIN (MIN (_sl1, _sl2),_sl3)),
+          _min_sl (_dim == 2 ? std::min (_sl1, _sl2) : std::min (std::min (_sl1, _sl2),_sl3)),
           _min_level (wl_scale),
           _max_level (MaxLevel ()),
           _sl1_scale (_sl1 / pow ((RT)2, (RT)_max_level - _min_level)),
@@ -176,7 +176,7 @@ class DWT {
           _modd (_fl/2),
           _meven ((_fl+1)/2),
           _num_threads (num_threads),
-          _temp (Vector <T> (_num_threads * MAX (6 * _sl3, MAX (6 * _sl2, 5 * sl1)))),
+          _temp (Vector <T> (_num_threads * std::max (6 * _sl3, std::max (6 * _sl2, 5 * sl1)))),
           dpwt (_dim == 2 ? & DWT <T> :: dpwt2 : & DWT <T> :: dpwt3),
           idpwt (_dim == 2 ? & DWT <T> :: idpwt2 : & DWT <T> :: idpwt3) {
             setupWlFilters <T> (wl_fam, wl_mem, _lpf_d, _lpf_r, _hpf_d, _hpf_r);

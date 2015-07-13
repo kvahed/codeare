@@ -138,7 +138,7 @@ SVDCalibrate (const Matrix<cxfl>& imgs, Matrix<cxfl>& rxm, Matrix<cxfl>& txm, Ma
 		m[i] = Matrix<cxfl>     (nrxc, ntxc);
 		u[i] = Matrix<cxfl>     (nrxc, ntxc);
 		v[i] = Matrix<cxfl>     (ntxc, ntxc);
-		s[i] = Matrix<float> (MIN(ntxc, nrxc), 1);
+		s[i] = Matrix<float> (std::min(ntxc, nrxc), 1);
 	}
 	
 #pragma omp parallel default (shared) 

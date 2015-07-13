@@ -312,7 +312,7 @@ diag (const Matrix<T>& M) {
 	
 	assert (is2d(M));
 
-	size_t sz = MIN(size(M,0),size(M,1));
+	size_t sz = std::min(size(M,0),size(M,1));
 
 	Matrix<T> res (sz,1);
 
@@ -694,7 +694,7 @@ template <class T> inline static  Matrix<T>
 resize (const Matrix<T>& M, size_t sz) {
 
 	Matrix<T> res (sz,1);
-	size_t copysz = MIN(numel(M), sz);
+	size_t copysz = std::min(numel(M), sz);
 
     typename Vector<T>::      iterator rb = res.Begin ();
     typename Vector<T>::const_iterator mb =   M.Begin ();
@@ -720,7 +720,7 @@ template <class T> inline static Matrix<T>
 resize (const Matrix<T>& M, const Vector<size_t>& sz) {
 
 	Matrix<T> res (sz);
-	size_t copysz  = MIN(numel(M), numel(res));
+	size_t copysz  = std::min(numel(M), numel(res));
 
     typename Vector<T>::      iterator rb = res.Begin ();
     typename Vector<T>::const_iterator mb =   M.Begin ();
@@ -768,7 +768,7 @@ sum (const Matrix<T>& M, size_t d) {
 	
 	// Outer size
 	size_t outsize = 1;
-	for (size_t i = d+1; i < MIN(M.NDim(),sz.size()); ++i)
+	for (size_t i = d+1; i < std::min(M.NDim(),sz.size()); ++i)
 		outsize *= sz[i];
 	
 	// Adjust size vector and allocate
@@ -849,7 +849,7 @@ prod (const Matrix<T>& M, size_t d) {
 	// Inner and outer sizes
     Vector<size_t>::const_iterator ci = sz.Begin();
 	size_t insize = std::accumulate (ci, ci+d, 1, c_multiply<size_t>);
-    size_t outsize = std::accumulate (ci+d+1, ci+d+MIN(M.NDim(),sz.Size()), 1, c_multiply<size_t>);
+    size_t outsize = std::accumulate (ci+d+1, ci+d+std::min(M.NDim(),sz.Size()), 1, c_multiply<size_t>);
         
     // Adjust size vector and allocate
 	sz [d] = 1;
