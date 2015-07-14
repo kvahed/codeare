@@ -167,28 +167,30 @@ public:
 	virtual ~MatrixType() {}
     virtual const T& operator[] (const size_t& n) const { return _M[0]; }
     virtual size_t Size () const { return 0; }
-    virtual Matrix<T> operator* (const MatrixType<T>& d) const {}
-    virtual Matrix<T> operator/ (const MatrixType<T>& d) const {}
-    virtual Matrix<T> operator+ (const MatrixType<T>& d) const {}
-    virtual Matrix<T> operator- (const MatrixType<T>& d) const {}
-    virtual Matrix<T> operator= (const MatrixType<T>& d) const {}
+	virtual Matrix<T> operator* (const MatrixType<T>& d) const { return Matrix<T>(); }
+	virtual Matrix<T> operator/ (const MatrixType<T>& d) const { return Matrix<T>(); }
+	virtual Matrix<T> operator+ (const MatrixType<T>& d) const { return Matrix<T>(); }
+	virtual Matrix<T> operator- (const MatrixType<T>& d) const { return Matrix<T>(); }
+	virtual Matrix<T> operator= (const MatrixType<T>& d) const { return Matrix<T>(); }
     virtual size_t NDim() const  { return 0; }
-    virtual const Vector<size_t>& Dim() const {}
+	virtual const Vector<size_t>& Dim() const { return _dim; }
     virtual size_t Dim(const size_t& d) const {return 0;}
-    virtual View operator() (R r) {}
-    virtual ConstView operator() (const CR r) const {}
-    virtual View operator() (const R r, const size_t& n) {}
-    virtual ConstView operator() (const CR r, const size_t& n) const {}
-    virtual View operator() (R r0, R r1) {}
-    virtual ConstView operator() (CR r0, CR r1) const {}
-    virtual View operator() (R r0, R r1, R r2) {}
-    virtual ConstView operator() (CR r0, CR r1, CR r2) const {}
-    virtual View operator() (R r0, R r1, R r2, R r3) {}
-    virtual ConstView operator() (CR r0, CR r1, CR r2, CR r3) const {}
-    virtual View operator() (R r0, R r1, R r2, R r3, R r4) {}
-    virtual ConstView operator() (CR r0, CR r1, CR r2, CR r3, CR r4) const {}
+	virtual View operator() (R r) { return View(); }
+	virtual ConstView operator() (const CR r) const { return ConstView(); }
+	virtual View operator() (const R r, const size_t& n) { return View(); }
+	virtual ConstView operator() (const CR r, const size_t& n) const { return ConstView(); }
+	virtual View operator() (R r0, R r1) { return View(); }
+	virtual ConstView operator() (CR r0, CR r1) const { return ConstView(); }
+	virtual View operator() (R r0, R r1, R r2) { return View(); }
+	virtual ConstView operator() (CR r0, CR r1, CR r2) const { return ConstView(); }
+	virtual View operator() (R r0, R r1, R r2, R r3) { return View(); }
+	virtual ConstView operator() (CR r0, CR r1, CR r2, CR r3) const { return ConstView(); }
+	virtual View operator() (R r0, R r1, R r2, R r3, R r4) { return View(); }
+	virtual ConstView operator() (CR r0, CR r1, CR r2, CR r3, CR r4) const { return ConstView(); }
+
 private:
     Vector<T> _M;
+	Vector<size_t> _dim;
 };
 
 template<class T, bool is_const = true> class ConstNoConstView : public MatrixType<T> {

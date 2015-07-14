@@ -22,6 +22,8 @@
 #ifndef __ALGOS_HPP__
 #define __ALGOS_HPP__
 
+#define NOMINMAX
+
 #include "Matrix.hpp"
 #include "math.h"
 #include <limits>
@@ -312,7 +314,7 @@ diag (const Matrix<T>& M) {
 	
 	assert (is2d(M));
 
-	size_t sz = std::min(size(M,0),size(M,1));
+	size_t sz = (std::min)(size(M,0),size(M,1));
 
 	Matrix<T> res (sz,1);
 
