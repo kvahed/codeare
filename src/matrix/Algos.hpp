@@ -312,7 +312,7 @@ diag (const Matrix<T>& M) {
 	
 	assert (is2d(M));
 
-	size_t sz = std::min(size(M,0),size(M,1));
+	size_t sz = (std::min)(size(M,0),size(M,1));
 
 	Matrix<T> res (sz,1);
 
