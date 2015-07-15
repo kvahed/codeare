@@ -64,13 +64,11 @@
 
 #include <Assert.hpp>
 
-static inline std::vector<std::string>
-Parse     (const std::string& str, const std::string& dlm) {
-
+static inline std::vector<std::string> Parse (const std::string& str,
+		const std::string& dlm) {
 	assert (dlm.size() > 0);
 	std::vector<std::string> sv;
 	size_t  start = 0, end = 0;
-
 	while (end != std::string::npos) {
 		end = str.find (dlm, start);
 		sv.push_back(str.substr(start, (end == std::string::npos) ?
@@ -78,9 +76,7 @@ Parse     (const std::string& str, const std::string& dlm) {
 		start = ((end > (std::string::npos - dlm.size())) ?
 				std::string::npos : end + dlm.size());
 	}
-
 	return sv;
-
 }
 
 static const int end = -1;
@@ -104,7 +100,12 @@ enum MatrixException {
 	ZERO_NUMBER_ROWS,
 	ZERO_NUMBER_SLICES,
 	INDEX_EXCEEDS_NUMBER_ELEMENTS,
-    DIMENSIONS_MUST_MATCH
+    DIMENSIONS_MUST_MATCH,
+	INDEX_EXCEEDS_DIMENSION,
+	DIMENSION_ECXEEDS_DIMENSIONALITY,
+	CONTAINER_SIZE_MUST_MATCH,
+	TWO_DIMENSIONAL_OPERATION,
+	NEGATIVE_INDEX
 };
 
 static const char* MatrixExceptionMessages[] = {
@@ -116,7 +117,12 @@ static const char* MatrixExceptionMessages[] = {
 	"Matrix with zero width",
 	"Matrix with zero slices",
 	"Index exceeds number of elements",
-	"Dimensions must match"
+	"Dimensions must match",
+	"Index exceeds dimension",
+	"Dimension exceeds dimensionality",
+	"Container size must match",
+	"2D operation only",
+	"Negative index"
 };
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
@@ -420,12 +426,6 @@ public:
     }
 
 
-	//#include "AssignmentHandler.hpp"
-    
-    //inline AssignmentHandler<T> operator[] (const int, const int) {
-
-    //}
-
     /**
      * @brief           Get pointer to memory starting at p-th (default:0) element.
      *  
@@ -433,9 +433,8 @@ public:
      *
      * @return          Data 
      */
-    inline const T*            
-    Ptr             (const size_t& p = 0)  const  {
-        assert (p < Size());
+    inline const T* Ptr (const size_t& p = 0) const {
+        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
         return _M.ptr(p);
     }
 
@@ -446,9 +445,8 @@ public:
      *
      * @return          Data
      */
-    inline T*
-    Ptr             (const size_t& p = 0)  {
-        assert (p < Size());
+    inline T* Ptr (const size_t& p = 0) {
+        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
         return _M.ptr(p);
     }
 
@@ -459,8 +457,7 @@ public:
      *  
      * @return          Data container
      */
-    inline Vector<T>&
-    Container           ()   {
+    inline Vector<T>& Container () {
         return _M;
     }
 
@@ -470,8 +467,7 @@ public:
      *  
      * @return          Data container
      */
-    inline Vector<T>
-    Container           ()  const  {
+    inline Vector<T> Container () const {
         return _M;
     }
 
@@ -481,9 +477,7 @@ public:
      *
      * @return          Container iterator
      */
-    inline typename Vector<T>::iterator
-
-    Begin               ()  {
+    inline typename Vector<T>::iterator Begin () {
     	return _M.begin ();
     }
 
@@ -493,8 +487,7 @@ public:
      *
      * @return          Container const iterator
      */
-    inline typename Vector<T>::const_iterator
-    Begin               ()  const  {
+    inline typename Vector<T>::const_iterator Begin () const {
     	return _M.begin ();
     }
 
@@ -504,8 +497,7 @@ public:
      *
      * @return          Container iterator
      */
-    inline typename Vector<T>::iterator
-    End                 ()  {
+    inline typename Vector<T>::iterator End () {
     	return _M.end ();
     }
 
@@ -515,8 +507,7 @@ public:
      *
      * @return          Container const iterator
      */
-    inline typename Vector<T>::const_iterator
-    End                 ()  const  {
+    inline typename Vector<T>::const_iterator End () const {
     	return _M.end ();
     }
 
@@ -527,9 +518,8 @@ public:
      * @param  p        Position
      * @return          Value at _M[p]
      */
-    inline const T&
-    At                  (const size_t& p) const  {
-        assert (p < Size());
+    inline const T& At (const size_t& p) const {
+        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
         return _M[p];
     }
 
@@ -540,10 +530,9 @@ public:
      * @param  pos       Position
      * @return           Reference to _M[p]
      */
-    inline T&           
-    At                  (const size_t& pos)  {
-        assert (pos < Size());
-        return _M[pos];
+    inline T& At (const size_t& p) {
+        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
+        return _M[p];
     }
 
 
@@ -556,14 +545,14 @@ public:
      *
      * @return          Value
      */
-    inline const T& At (const size_t& x, const size_t& y) const  {
-    	assert (x < _dim[0]);
-        assert (y < _dim[1]);
+    inline const T& At (const size_t& x, const size_t& y) const {
+        MATRIX_ASSERT(x<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
         return _M[x + _dim[0]*y];
     }
     inline T&       At (const size_t& x, const size_t& y)  {
-    	assert (x < _dim[0]);
-        assert (y < _dim[1]);
+        MATRIX_ASSERT(x<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
         return _M[x + _dim[0]*y];
     }
 
@@ -577,12 +566,16 @@ public:
      *
      * @return         Value
      */
-    inline const T& At (const size_t& x, const size_t& y, const size_t& z) const  {
-    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
+    inline const T& At (const size_t& x, const size_t& y, const size_t& z) const {
+        MATRIX_ASSERT(x<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(z<_dim[2],INDEX_EXCEEDS_DIMENSION);
         return _M[x + _dsz[1]*y + _dsz[2]*z];
     }
     inline T&       At (const size_t& x, const size_t& y, const size_t& z)  {
-    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]));
+        MATRIX_ASSERT(x<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(z<_dim[2],INDEX_EXCEEDS_DIMENSION);
         return _M[x + _dsz[1]*y + _dsz[2]*z];
     }
     
@@ -596,14 +589,20 @@ public:
      *
      * @return           Reference
      */
-    inline const T&
-    At                   (const size_t& x, const size_t& y, const size_t& z, const size_t& w) const  {
-    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
+    inline const T& At (const size_t& x, const size_t& y, const size_t& z,
+    		const size_t& w) const  {
+        MATRIX_ASSERT(x<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(z<_dim[2],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(w<_dim[3],INDEX_EXCEEDS_DIMENSION);
         return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]*w];
     }
-    inline T&
-    At                   (const size_t& x, const size_t& y, const size_t& z, const size_t& w)  {
-    	assert ((!x || x < _dim[0]) && (!y || y < _dim[1]) && (!z || z < _dim[2]) && (!w || w < _dim[3]));
+    inline T& At (const size_t& x, const size_t& y, const size_t& z,
+    		const size_t& w)  {
+        MATRIX_ASSERT(x<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(z<_dim[2],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(w<_dim[3],INDEX_EXCEEDS_DIMENSION);
         return _M[x + _dsz[1]*y + _dsz[2]*z + _dsz[3]*w];
     }
 
@@ -630,31 +629,47 @@ public:
      * @param  ave       Average
      * @return           Value at position
      */
-    inline const T&
-    At                   (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
-                          const size_t& eco,     const size_t& phs = 0, const size_t& rep = 0, const size_t& seg = 0,
-                          const size_t& par = 0, const size_t& slc = 0, const size_t& ida = 0, const size_t& idb = 0,
-                          const size_t& idc = 0, const size_t& idd = 0, const size_t& ide = 0, const size_t& ave = 0) const  {
-    	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
-    	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
-    	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
-    	        (!idc || idc < _dim[12])&& (!idd || idd < _dim[13])&& (!ide || ide < _dim[14])&& (!ave || ave < _dim[15]));
-        return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
-   	               seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
-   	               idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
+    inline const T& At
+		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
+		 const size_t& n03,     const size_t& n04,     const size_t& n05 = 0,
+		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
+		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
+		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
+		 const size_t& n15 = 0) const  {
+    	MATRIX_ASSERT (n00>=0 && n01>=0 && n02>=0 && n03>=0 && n04>=0 &&
+    			       n05>=0 && n06>=0 && n07>=0 && n08>=0 && n09>=0 &&
+					   n10>=0 && n11>=0 && n12>=0 && n13>=0 && n14>=0 &&
+					   n15>=0, NEGATIVE_INDEX);
+    	MATRIX_ASSERT (n00<_dim[ 0] && n01<_dim[ 1] && n02<_dim[ 2] && n03<_dim[ 3]
+				    && n04<_dim[ 4] && n05<_dim[ 5] && n06<_dim[ 6] && n07<_dim[ 7]
+					&& n08<_dim[ 8] && n09<_dim[ 9] && n10<_dim[10] && n11<_dim[11]
+                    && n12<_dim[12] && n13<_dim[13] && n14<_dim[14] && n15<_dim[15],
+					   INDEX_EXCEEDS_DIMENSION);
+        return _M [n00          + n01*_dsz[ 1] + n02*_dsz[ 2] + n03*_dsz[ 3] +
+				   n04*_dsz[ 4] + n05*_dsz[ 5] + n06*_dsz[ 6] + n07*_dsz[ 7] +
+				   n08*_dsz[ 8] + n09*_dsz[ 9] + n10*_dsz[10] + n11*_dsz[11] +
+				   n12*_dsz[12] + n13*_dsz[13] + n14*_dsz[14] + n15*_dsz[15]];
     }
-    inline T&
-    At                   (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
-                          const size_t& eco,     const size_t& phs = 0, const size_t& rep = 0, const size_t& seg = 0,
-                          const size_t& par = 0, const size_t& slc = 0, const size_t& ida = 0, const size_t& idb = 0,
-                          const size_t& idc = 0, const size_t& idd = 0, const size_t& ide = 0, const size_t& ave = 0)  {
-    	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
-    	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
-    	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
-    	        (!idc || idc < _dim[12])&& (!idd || idd < _dim[13])&& (!ide || ide < _dim[14])&& (!ave || ave < _dim[15]));
-        return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
-   	               seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
-   	               idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
+    inline T& At
+		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
+   		 const size_t& n03,     const size_t& n04,     const size_t& n05 = 0,
+   		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
+   		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
+   		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
+   		 const size_t& n15 = 0) {
+    	MATRIX_ASSERT (n00>=0 && n01>=0 && n02>=0 && n03>=0 && n04>=0 &&
+    			       n05>=0 && n06>=0 && n07>=0 && n08>=0 && n09>=0 &&
+					   n10>=0 && n11>=0 && n12>=0 && n13>=0 && n14>=0 &&
+					   n15>=0, NEGATIVE_INDEX);
+    	MATRIX_ASSERT (n00<_dim[ 0] && n01<_dim[ 1] && n02<_dim[ 2] && n03<_dim[ 3]
+				    && n04<_dim[ 4] && n05<_dim[ 5] && n06<_dim[ 6] && n07<_dim[ 7]
+					&& n08<_dim[ 8] && n09<_dim[ 9] && n10<_dim[10] && n11<_dim[11]
+                    && n12<_dim[12] && n13<_dim[13] && n14<_dim[14] && n15<_dim[15],
+					   INDEX_EXCEEDS_DIMENSION);
+           return _M [n00          + n01*_dsz[ 1] + n02*_dsz[ 2] + n03*_dsz[ 3] +
+   				   n04*_dsz[ 4] + n05*_dsz[ 5] + n06*_dsz[ 6] + n07*_dsz[ 7] +
+   				   n08*_dsz[ 8] + n09*_dsz[ 9] + n10*_dsz[10] + n11*_dsz[11] +
+   				   n12*_dsz[12] + n13*_dsz[13] + n14*_dsz[14] + n15*_dsz[15]];
     }
     
 
@@ -664,8 +679,8 @@ public:
      * @return         Casted copy
      */
     template<class S>
-    inline operator Matrix<S,P> () const  {
-		Matrix<S,P> m (_dim);
+    inline operator Matrix<S,P> () const {
+		Matrix<S,P> m(_dim);
 		for (size_t i = 0; i < Size(); ++i)
 			m[i] = (S)_M[i];
 		return m;
@@ -677,8 +692,7 @@ public:
      * @param  p        Requested position.
      * @return          Requested scalar value.
      */
-    inline const T&
-    operator()          (const size_t& p) const  {
+    inline const T& operator() (const size_t& p) const {
         return this->At(p);
     }
 
@@ -689,8 +703,7 @@ public:
      * @param  p        Requested position.
      * @return          Requested scalar value.
      */
-    inline T&
-    operator()          (const size_t& p)  {
+    inline T& operator() (const size_t& p) {
         return this->At(p);
     }
 
@@ -702,8 +715,7 @@ public:
      * @param  y        Line
      * @return          Value
      */
-    inline const T&
-    operator()          (const size_t& x, const size_t& y) const  {
+    inline const T& operator() (const size_t& x, const size_t& y) const {
         return this->At(x,y);
     }
     
@@ -715,8 +727,7 @@ public:
      * @param  y        Line
      * @return          Reference
      */
-    inline T&
-    operator()           (const size_t& x, const size_t& y)  {
+    inline T& operator() (const size_t& x, const size_t& y)  {
         return this->At(x,y);
     }
     
@@ -730,8 +741,8 @@ public:
      *
      * @return           Value
      */
-    inline const T&
-    operator()           (const size_t& x, const size_t& y, const size_t& z) const  {
+    inline const T& operator() (const size_t& x, const size_t& y,
+    		const size_t& z) const  {
         return this->At(x,y,z);
     }
     
@@ -745,8 +756,7 @@ public:
      *
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
-    inline T&
-    operator()           (const size_t& x, const size_t& y, const size_t& z)  {
+    inline T& operator() (const size_t& x, const size_t& y, const size_t& z) {
         return this->At(x,y,z);
     }
     
@@ -760,8 +770,8 @@ public:
      *
      * @return           Value
      */
-    inline const T&
-    operator()           (const size_t& x, const size_t& y, const size_t& z, const size_t& w) const  {
+    inline const T& operator() (const size_t& x, const size_t& y, const size_t& z,
+    		const size_t& w) const  {
         return this->At(x,y,z,w);
     }
 
@@ -775,8 +785,8 @@ public:
      *
      * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
      */
-    inline T&
-    operator()           (const size_t& x, const size_t& y, const size_t& z, const size_t& w)  {
+    inline T& operator() (const size_t& x, const size_t& y, const size_t& z,
+    		const size_t& w) {
         return this->At(x,y,z,w);
     }
 
@@ -802,21 +812,26 @@ public:
      * @param  ave      Average
      * @return          Reference to position
      */
-    inline T&                 
-    operator()     (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
-					const size_t& eco,     const size_t& phs = 0, const size_t& rep = 0, const size_t& seg = 0,
-					const size_t& par = 0, const size_t& slc = 0, const size_t& ida = 0, const size_t& idb = 0,
-					const size_t& idc = 0, const size_t& idd = 0, const size_t& ide = 0, const size_t& ave = 0)  {
-
-		assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
-		  (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
-		  (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
-		  (!idc || idc < _dim[12])&& (!idd || idd < _dim[13])&& (!ide || ide < _dim[14])&& (!ave || ave < _dim[15]));
-
-		return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
-				seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
-				idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
-
+    inline T& operator()
+    		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
+      		 const size_t& n03,     const size_t& n04,     const size_t& n05 = 0,
+      		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
+      		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
+      		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
+      		 const size_t& n15 = 0) {
+    	MATRIX_ASSERT (n00>=0 && n01>=0 && n02>=0 && n03>=0 && n04>=0 &&
+    			       n05>=0 && n06>=0 && n07>=0 && n08>=0 && n09>=0 &&
+					   n10>=0 && n11>=0 && n12>=0 && n13>=0 && n14>=0 &&
+					   n15>=0, NEGATIVE_INDEX);
+    	MATRIX_ASSERT (n00<_dim[ 0] && n01<_dim[ 1] && n02<_dim[ 2] && n03<_dim[ 3]
+				    && n04<_dim[ 4] && n05<_dim[ 5] && n06<_dim[ 6] && n07<_dim[ 7]
+					&& n08<_dim[ 8] && n09<_dim[ 9] && n10<_dim[10] && n11<_dim[11]
+                    && n12<_dim[12] && n13<_dim[13] && n14<_dim[14] && n15<_dim[15],
+					   INDEX_EXCEEDS_DIMENSION);
+        return _M [n00          + n01*_dsz[ 1] + n02*_dsz[ 2] + n03*_dsz[ 3] +
+				   n04*_dsz[ 4] + n05*_dsz[ 5] + n06*_dsz[ 6] + n07*_dsz[ 7] +
+				   n08*_dsz[ 8] + n09*_dsz[ 9] + n10*_dsz[10] + n11*_dsz[11] +
+				   n12*_dsz[12] + n13*_dsz[13] + n14*_dsz[14] + n15*_dsz[15]];
 	}
 
     /** 
@@ -840,22 +855,27 @@ public:
      * @param  ave      Average
      * @return          Value
      */
-    inline const T&
-    operator()           (const size_t& col,     const size_t& lin,     const size_t& cha,     const size_t& set,
-                          const size_t& eco,     const size_t& phs = 0, const size_t& rep = 0, const size_t& seg = 0,
-                          const size_t& par = 0, const size_t& slc = 0, const size_t& ida = 0, const size_t& idb = 0,
-                          const size_t& idc = 0, const size_t& idd = 0, const size_t& ide = 0, const size_t& ave = 0) const  {
-
-    	assert ((!col || col < _dim[ 0])&& (!lin || lin < _dim[ 1])&& (!cha || cha < _dim[ 2])&& (!set || set < _dim[ 3])&&
-    	        (!eco || eco < _dim[ 4])&& (!phs || phs < _dim[ 5])&& (!rep || rep < _dim[ 6])&& (!seg || seg < _dim[ 7])&&
-    	        (!par || par < _dim[ 8])&& (!slc || slc < _dim[ 9])&& (!ida || ida < _dim[10])&& (!idb || idb < _dim[11])&&
-    	        (!idc || idc < _dim[12])&& (!idd || idd < _dim[13])&& (!ide || ide < _dim[14])&& (!ave || ave < _dim[15]));
-
-        return _M [col + lin*_dsz[ 1] + cha*_dsz[ 2] + set*_dsz[ 3] + eco*_dsz[ 4] + phs*_dsz[ 5] + rep*_dsz[ 6] +
-   	               seg*_dsz[ 7] + par*_dsz[ 8] + slc*_dsz[ 9] + ida*_dsz[10] + idb*_dsz[11] + idc*_dsz[12] +
-   	               idd*_dsz[13] + ide*_dsz[14] + ave*_dsz[15]];
-
-    }
+    inline const T& operator()
+    		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
+     		 const size_t& n03,     const size_t& n04,     const size_t& n05 = 0,
+     		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
+     		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
+     		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
+     		 const size_t& n15 = 0) const {
+    	MATRIX_ASSERT (n00>=0 && n01>=0 && n02>=0 && n03>=0 && n04>=0 &&
+   			       	   n05>=0 && n06>=0 && n07>=0 && n08>=0 && n09>=0 &&
+					   n10>=0 && n11>=0 && n12>=0 && n13>=0 && n14>=0 &&
+					   n15>=0, NEGATIVE_INDEX);
+    	MATRIX_ASSERT (n00<_dim[ 0] && n01<_dim[ 1] && n02<_dim[ 2] && n03<_dim[ 3]
+				    && n04<_dim[ 4] && n05<_dim[ 5] && n06<_dim[ 6] && n07<_dim[ 7]
+					&& n08<_dim[ 8] && n09<_dim[ 9] && n10<_dim[10] && n11<_dim[11]
+                    && n12<_dim[12] && n13<_dim[13] && n14<_dim[14] && n15<_dim[15],
+					   INDEX_EXCEEDS_DIMENSION);
+       return _M [n00          + n01*_dsz[ 1] + n02*_dsz[ 2] + n03*_dsz[ 3] +
+				  n04*_dsz[ 4] + n05*_dsz[ 5] + n06*_dsz[ 6] + n07*_dsz[ 7] +
+				  n08*_dsz[ 8] + n09*_dsz[ 9] + n10*_dsz[10] + n11*_dsz[11] +
+				  n12*_dsz[12] + n13*_dsz[13] + n14*_dsz[14] + n15*_dsz[15]];
+	}
 
 
     //@}
@@ -869,8 +889,7 @@ public:
      *
      * @param  M        The factor.
      */
-    inline Matrix<T,P>
-    operator->*         (const Matrix<T,P>& M) const;
+    Matrix<T,P> operator->* (const Matrix<T,P>& M) const;
 
     /**
      * @brief           Matrix Product.
@@ -880,8 +899,8 @@ public:
      * @param   transb  Transpose ('T') / Conjugate transpose ('C') the right matrix. Default: No transposition 'N'
      * @return          Product of this and M.
      */
-    Matrix<T,P>
-    prod                (const Matrix<T,P> &M, const char transa = 'N', const char transb = 'N') const;
+    Matrix<T,P> prod (const Matrix<T,P> &M, const char transa = 'N',
+    		const char transb = 'N') const;
 
 
 
@@ -891,8 +910,7 @@ public:
      * @param   M       Factor
      * @return          Product of conj(this) and M.
      */
-    Matrix<T,P>
-    prodt               (const Matrix<T,P> &M) const;
+    Matrix<T,P> prodt  (const Matrix<T,P> &M) const;
 
 
     /**
@@ -902,8 +920,7 @@ public:
      * @param  M        Factor
      * @return          Scalar product
      */
-    inline T
-    dotc (const Matrix<T,P>& M) const;
+     T dotc (const Matrix<T,P>& M) const;
 
 
     /**
@@ -912,8 +929,7 @@ public:
      * @param  M        Factor
      * @return          Scalar product
      */
-    inline T
-    dot (const Matrix<T,P>& M) const;
+    T dot (const Matrix<T,P>& M) const;
     
 #endif
     /**
@@ -928,9 +944,8 @@ public:
      *
      * @return          Number of rows.
      */
-    inline size_t
-    Height              () const  {
-        return _dim[0];
+    inline size_t Height () const {
+    	return _dim[0];
     }
 
 
@@ -939,8 +954,7 @@ public:
      *
      * @return          Number of columns.
      */
-    inline size_t
-    Width               () const  {
+    inline size_t Width () const {
         return (_dim.size()>1) ? _dim[1] : 1;
     }
 
@@ -951,8 +965,7 @@ public:
      *
      * @return          Number of rows.
      */
-    inline size_t
-    GHeight              () const  {
+    inline size_t GHeight () const {
         return _gdim[0];
     }
 
@@ -962,8 +975,7 @@ public:
      *
      * @return          Number of columns.
      */
-    inline size_t
-    GWidth               () const  {
+    inline size_t GWidth () const {
         return _gdim[1];
     }
 
@@ -973,8 +985,7 @@ public:
      *
      * @return          Number of columns.
      */
-    inline const int*
-    Desc               () const  {
+    inline const int* Desc () const NOEXCEPT {
         return _desc;
     }
 #endif
@@ -986,9 +997,8 @@ public:
      * @param   i       Dimension
      * @return          Resolution .
      */
-    inline float
-    Res                 (const size_t& i) const  {
-        assert (i < _res.size());
+    inline float Res (const size_t& i) const {
+        MATRIX_ASSERT (i < _dim.size(), DIMENSION_ECXEEDS_DIMENSIONALITY);
         return _res[i];
     }
 
@@ -999,9 +1009,8 @@ public:
      * @param   i       Dimension
      * @return          Resolution
      */
-    inline float&
-    Res                 (const size_t& i)        {
-        assert (i < _res.size());
+    inline float& Res (const size_t& i) {
+        MATRIX_ASSERT (i < _dim.size(), DIMENSION_ECXEEDS_DIMENSIONALITY);
         return _res[i];
     }
 
@@ -1012,8 +1021,7 @@ public:
      *
      * @return          All resolutions
      */
-    inline const Vector<float>&
-    Res                 () const  {
+    inline const Vector<float>& Res () const NOEXCEPT {
         return _res;
     }
 
@@ -1025,8 +1033,7 @@ public:
      * @param   i       Dimension
      * @return          Dimension
      */
-    inline virtual size_t
-    Dim                 (const size_t& i)  const {
+    inline virtual size_t Dim (const size_t& i) const {
         return (i < _dim.size()) ? _dim[i]: 1;
     }
 
@@ -1036,13 +1043,16 @@ public:
      *
      * @return          All dimensions
      */
-    inline virtual const Vector<size_t>& Dim() const {
+    inline virtual const Vector<size_t>& Dim() const NOEXCEPT {
         return _dim;
     }
 
 
-    inline size_t
-    NDim() const  {
+    /**
+     * @brief           Number of dimensions
+     * @return          Number of dimensions
+     */
+    inline size_t NDim() const NOEXCEPT {
     	return _dim.size();
     }
 
@@ -1052,8 +1062,7 @@ public:
      *
      * @return          All dimensions
      */
-    inline const Vector<size_t>&
-    Dsz                 ()                  const  {
+    inline const Vector<size_t>& Dsz () const NOEXCEPT {
         return _dsz;
     }
 
@@ -1061,8 +1070,7 @@ public:
     /**
      * @brief           Purge data and free RAM.
      */
-    inline void
-    Clear               ()                                       {
+    inline void Clear() NOEXCEPT {
     	_dim.Clear();
         _dsz.Clear();
         _res.Clear();
@@ -1089,19 +1097,16 @@ public:
      *
      * @return          Class name
      */ 
-    inline const char*
-    GetClassName        () const  {
+    inline const char* GetClassName () const NOEXCEPT {
         return _name.c_str(); 
     }
-
 
     /**
      * @brief           Who are we?
      *
      * @return          Class name
      */ 
-    inline void
-    SetClassName        (const char* name)  {
+    inline void SetClassName (const char* name) NOEXCEPT {
         _name = name; 
     }
 
@@ -1111,8 +1116,7 @@ public:
      *
      * @return          Size
      */
-    inline virtual size_t
-    Size () const  {
+    inline virtual size_t Size () const NOEXCEPT {
         return _M.size();
     }
 
@@ -1134,8 +1138,7 @@ public:
 	 * @param  rhs  Right hand side reference
 	 * @return      Left hand side
 	 */
-    inline Matrix<T,P>&
-    operator= (Matrix<T,P>&& rhs)  {
+    inline Matrix<T,P>& operator= (Matrix<T,P>&& rhs) NOEXCEPT {
         _M    = std::move(rhs._M);
         _name = std::move(rhs._name);
         _res  = std::move(rhs._res);
@@ -1148,8 +1151,7 @@ public:
 	 * @param  rhs  Right hand side
 	 * @return      Left hand side
 	 */
-    inline Matrix<T,P>&
-    operator= (const Matrix<T,P>& rhs)  {
+    inline Matrix<T,P>& operator= (const Matrix<T,P>& rhs) NOEXCEPT {
         _M    = rhs._M;
         _name = rhs._name;
         _res  = rhs._res;
@@ -1163,17 +1165,13 @@ public:
      *
      * @param  v        Data vector (size must match numel(M)).
      */
-    inline Matrix<T,P>&
-    operator=           (const Vector<T>& v) {
+    inline Matrix<T,P>& operator= (const Vector<T>& v) {
     	if (_M.size() == 1) { // we are being assigned out of nothing
     		_dim.resize(1,v.size());
     	    _res.resize(1,1.0);
     	    Allocate();
     	} else {              // we have been allocated already
-    		if (_M.size() != v.size()) {
-    			printf ("%s: lhs size (%lu) does not match rhs (%lu)", PRETTY_FUNCTION, _M.size(), v.size());
-    			throw 1;
-    		}
+    		MATRIX_ASSERT(_M.size() == v.size(), CONTAINER_SIZE_MUST_MATCH);
     	}
     	if (&_M != &v)
             _M = v;
@@ -1185,7 +1183,6 @@ public:
     inline Matrix<T,P>& operator= (const ConstNoConstView<S,true>& v) {
         _dim = v._dim;
         Allocate();
-        std::cout << _dim << std::endl;
         for (size_t i = 0; i < Size(); ++i)
             _M[i] = v[i];
         return *this;
@@ -1198,10 +1195,8 @@ public:
      *
      * @param  s        The assigned scalar.
      */
-    inline const Matrix<T,P>&
-    operator=           (const T& s)  {
-        T t = T(s);
-        std::fill(_M.begin(), _M.end(), t);
+    inline const Matrix<T,P>& operator= (const T& s) {
+        std::fill (_M.begin(), _M.end(), s);
         return *this;
     }
 
@@ -1211,8 +1206,7 @@ public:
      *
      * @return          Negation
      */
-    inline Matrix<T,P>
-    operator-           () const  {
+    inline Matrix<T,P> operator- () const {
         Matrix<T,P> res (_dim);
         std::transform (_M.begin(), _M.end(), res.Begin(), std::negate<T>());
         return res;
@@ -1224,8 +1218,7 @@ public:
      *
      * @return          Identity
      */
-    inline Matrix<T,P>
-    operator+           () const  {
+    inline Matrix<T,P> operator+ () const {
         return *this;
     }
 
@@ -1235,9 +1228,8 @@ public:
      *
      * @return          Matrix::tr()
      */
-    inline Matrix<T,P>
-    operator!           () const  {
-    	assert(_dim.size() ==2);
+    inline Matrix<T,P> operator! () const {
+    	MATRIX_ASSERT(_dim.size()==2, TWO_DIMENSIONAL_OPERATION);
     	Matrix<T,P> res = *this;
 		for (size_t i = 0; i < _dim[1]; ++i)
 			for (size_t j = 0; j < i; j++)
@@ -1263,8 +1255,7 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of false where elements are equal s and true else.
      */
-    inline Matrix<cbool>
-    operator!=          (const T& s) const  {
+    inline Matrix<cbool> operator!= (const T& s) const {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = (_M[i] != s) ? 1 : 0;
@@ -1279,13 +1270,11 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator>           (const T& s) const  {
+    inline Matrix<cbool> operator> (const T& s) const {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater(_M[i], s);
         return res;
-
     }
 
 
@@ -1296,8 +1285,7 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator>=          (const T& s) const  {
+    inline Matrix<cbool> operator>= (const T& s) const {
 		Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater_or_equal(_M[i], s);
@@ -1311,8 +1299,7 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator<=          (const T& s) const  {
+    inline Matrix<cbool> operator<= (const T& s) const {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less_or_equal(_M[i], s);
@@ -1326,8 +1313,7 @@ public:
      * @param  s        Comparing scalar.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator<           (const T& s) const  {
+    inline Matrix<cbool> operator< (const T& s) const {
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less(_M[i], s);
@@ -1341,9 +1327,9 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator!=          (const Matrix<T,P>& M) const  {
-        op_assert (_dim == M.Dim(), *this, M);
+    template<class S>
+    inline Matrix<cbool> operator!= (const Matrix<S,P>& M) const {
+        MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
         Matrix<cbool> res(_dim,_res);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = (_M[i]!= M[i]) ? 1 : 0;
@@ -1357,9 +1343,9 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator>=          (const Matrix<T,P>& M) const  {
-    	op_assert (_dim == M.Dim(), *this, M);
+    template<class S>
+    inline Matrix<cbool>operator>= (const Matrix<S,P>& M) const {
+    	MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater_or_equal(_M[i], M[i]);
@@ -1373,9 +1359,9 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator<=          (const Matrix<T,P>& M) const  {
-        op_assert (_dim == M.Dim(), *this, M);
+    template<class S>
+    inline Matrix<cbool> operator<= (const Matrix<S,P>& M) const {
+    	MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less_or_equal(_M[i], M[i]);
@@ -1389,10 +1375,10 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator>           (const Matrix<T,P>& M) const  {
-        op_assert (_dim == M.Dim(), *this, M);
-        Matrix<cbool> res(_dim,_res);
+    template<class S>
+    inline Matrix<cbool> operator> (const Matrix<S,P>& M) const {
+    	MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
+        Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::greater(_M[i], M[i]);
         return res;
@@ -1405,10 +1391,10 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator<           (const Matrix<T,P>& M) const  {
-        op_assert (_dim == M.Dim(), *this, M);
-        Matrix<cbool> res(_dim,_res);
+    template<class S>
+    inline Matrix<cbool> operator< (const Matrix<S,P>& M) const {
+    	MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
+        Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::less(_M[i], M[i]);
         return res;
@@ -1421,8 +1407,9 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator||          (const Matrix<T,P>& M) const  {
+    template<class S>
+    inline Matrix<cbool> operator|| (const Matrix<S,P>& M) const {
+    	MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::logical_or(_M[i], M[i]);
@@ -1436,11 +1423,12 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<short>
-    operator|          (const Matrix<T,P>& rhs) const  {
+    template<class S>
+    inline Matrix<short> operator| (const Matrix<S,P>& rhs) const {
+    	MATRIX_ASSERT (_dim == rhs.Dim(), DIMENSIONS_MUST_MATCH);
         Matrix<cbool> ret(_dim);
         for (size_t i = 0; i < Size(); ++i)
-        	ret[i] = (short)CompTraits<T>::logical_or(_M[i], ret[i]);
+        	ret[i] = CompTraits<T>::logical_or(_M[i], ret[i]);
         return ret;
     }
 
@@ -1451,9 +1439,9 @@ public:
      * @param  M        Comparing matrix.
      * @return          Hit list
      */
-    inline Matrix<cbool>
-    operator&&          (const Matrix<T,P>& M) const  {
-        op_assert (_dim == M.Dim(), *this, M);
+    template<class S>
+    inline Matrix<cbool> operator&& (const Matrix<S,P>& M) const {
+    	MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
         Matrix<cbool> res(_dim);
         for (size_t i = 0; i < Size(); ++i)
         	res[i] = CompTraits<T>::logical_and(_M[i], M[i]);
@@ -1467,12 +1455,10 @@ public:
      * @param  p        Power.
      * @return          Result
      */
-    inline Matrix<T,P>
-    operator^           (const float p) const  {
+    template<class S>
+    inline Matrix<T,P> operator^ (const S& p) const  {
     	Matrix<T,P> res = *this;
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (p == 0) ? T(1) : TypeTraits<T>::Pow(res[i],  p);
-        return res;
+        return res ^= p;
     }
 
 
@@ -1482,13 +1468,12 @@ public:
      * @param  p        Power.
      * @return          Result
      */
-    inline Matrix<T,P>&
-    operator^=          (const float p)  {
+    template<class S>
+    inline Matrix<T,P>& operator^= (const S& p) {
 		for (size_t i = 0; i < Size(); ++i)
-			_M[i] = TypeTraits<T>::Pow(_M[i],  p);
+			_M[i] = TypeTraits<T>::Pow(_M[i], p);
         return *this;
     }
-
 
     /**
      * @brief           Elementwise addition iof all elements with a scalar
@@ -1496,26 +1481,10 @@ public:
      * @param  s        Scalar additive.
      */
     template <class S>
-    inline Matrix<T,P>
-    operator+           (const S& s) const  {
+    inline Matrix<T,P> operator+ (const S& s) const {
         Matrix<T,P> res = *this;
         return res += s;
     }
-
-
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    inline Matrix<T,P>&
-    operator+=         (const Matrix<T,P>& M)  {
-    	op_assert (_dim == M.Dim(), *this, M);
-   		std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
-        return *this;
-    }
-
 
 	/**
 	 * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
@@ -1525,13 +1494,26 @@ public:
 	 */
     template <class S> inline Matrix<T,P>&
     operator+=         (const Matrix<S,P>& M)  {
-        op_assert (_dim == M.Dim(), *this, M);
+        MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
 		return *this;
     }
 
+	/**
+	 * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
+	 *
+	 * @param  M        Added matrix.
+	 * @return          Result
+	 */
+    template <class S> inline Matrix<T,P>&
+    operator+=         (const ConstNoConstView<S,true>& M)  {
+        MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
+        for (size_t i = 0; i < Size(); ++i)
+        	_M[i] += M[i]; // Cannot use std::transform just like that
+		return *this;
+    }
 
-    /**
+   /**
      * @brief           ELementwise addition with scalar and assignment operator. i.e. this = m.
      *
      * @param  s        Added scalar.
