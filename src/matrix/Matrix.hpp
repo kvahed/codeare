@@ -1476,9 +1476,9 @@ public:
     }
 
     /**
-     * @brief           Elementwise addition iof all elements with a scalar
-     *
-     * @param  s        Scalar additive.
+     * @brief           Elementwise multiplication (calls one of the below 3)
+     * @param  s        Factor
+     * @return          Result
      */
     template <class S>
     inline Matrix<T,P> operator+ (const S& s) const {
@@ -1486,101 +1486,97 @@ public:
         return res += s;
     }
 
-	/**
-	 * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
-	 *
-	 * @param  M        Added matrix.
-	 * @return          Result
-	 */
-    template <class S> inline Matrix<T,P>&
-    operator+=         (const Matrix<S,P>& M)  {
-        MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
-        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
-		return *this;
-    }
-
-	/**
-	 * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
-	 *
-	 * @param  M        Added matrix.
-	 * @return          Result
-	 */
-    template <class S> inline Matrix<T,P>&
-    operator+=         (const ConstNoConstView<S,true>& M)  {
-        MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
-        for (size_t i = 0; i < Size(); ++i)
-        	_M[i] += M[i]; // Cannot use std::transform just like that
-		return *this;
-    }
-
-   /**
-     * @brief           ELementwise addition with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Added scalar.
-     * @return          Result
-     */
-    template <class S > inline Matrix<T,P>&
-    operator+=          (const S& s)  {
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),(T)s));
-        return *this;
-    }
-
     /**
-     * @brief           Elementwise subtraction all elements by a scalar
-     *
-     * @param  s        Scalar substruent.
-     */
-    template <class S> inline Matrix<T,P>
-    operator-           (const S& s) const  {
-		Matrix<T,P> res = *this;
-		return res -= s;
-    }
-
-
-
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
+     * @brief           Elementwise multiplication and assignment operator with
+     * 					other matrix; i.e. A = A.*B.
      * @param  M        Factor matrix.
      * @return          Result
      */
-    inline Matrix<T,P>&
-    operator-=         (const Matrix<T,P>& M)  {
-        op_assert (_dim == M.Dim(), *this, M);
-        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
-        return *this;
-    }
-
-
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = m.
-     *
-     * @param  M        Added matrix.
-     * @return          Result
-     */
-    template <class S> inline Matrix<T,P>&
-    operator-=          (const Matrix<S,P>& M)  {
-        op_assert (_dim == M.Dim(), *this, M);
-        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
+    template <class S>
+    inline Matrix<T,P>& operator+= (const Matrix<S,P>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
         return *this;
     }
 
     /**
-     * @brief           ELementwise substration with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Added scalar.
+     * @brief           Elementwise multiplication and assignment operator with.
+     *                  view; i.e. A = A.*B(...,...).
+     * @param  M        Factor view.
      * @return          Result
      */
-    template <class S> inline Matrix<T,P>&
-    operator-=          (const S& s)  {
+    template <class S>
+    inline Matrix<T,P>& operator+= (const ConstNoConstView<S,true>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
+        for (size_t i = 0; i < Size(); ++i)
+            _M[i] += M[i];
+        return *this;
+    }
+
+    /**
+     * @brief           ELementwise multiplication with scalar; i.e. A = A.*s;
+     * @param  s        Factor scalar.
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>& operator+= (const S& s) {
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),(T)s));
+		return *this;
+    }
+
+
+    /**
+     * @brief           Elementwise multiplication (calls one of the below 3)
+     * @param  s        Factor
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P> operator- (const S& s) const {
+        Matrix<T,P> res = *this;
+        return res -= s;
+    }
+
+    /**
+     * @brief           Elementwise multiplication and assignment operator with
+     * 					other matrix; i.e. A = A.*B.
+     * @param  M        Factor matrix.
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>& operator-= (const Matrix<S,P>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
+        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
+        return *this;
+    }
+
+    /**
+     * @brief           Elementwise multiplication and assignment operator with.
+     *                  view; i.e. A = A.*B(...,...).
+     * @param  M        Factor view.
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>& operator-= (const ConstNoConstView<S,true>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
+        for (size_t i = 0; i < Size(); ++i)
+            _M[i] -= M[i];
+        return *this;
+    }
+
+    /**
+     * @brief           ELementwise multiplication with scalar; i.e. A = A.*s;
+     * @param  s        Factor scalar.
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>& operator-= (const S& s) {
         std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::minus<T>(),(T)s));
 		return *this;
     }
 
     /**
-     * @brief           Elementwise multiplication with a scalar. i.e. this * m.
-     *
-     * @param  s        Factor scalar
+     * @brief           Elementwise multiplication (calls one of the below 3)
+     * @param  s        Factor
      * @return          Result
      */
     template <class S>
@@ -1590,21 +1586,8 @@ public:
     }
 
     /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
-     * @param  M        Factor matrix.
-     * @return          Result
-     */
-    inline Matrix<T,P>&
-    operator*=         (const Matrix<T,P>& M)  {
-        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
-        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
-        return *this;
-    }
-
-    /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
+     * @brief           Elementwise multiplication and assignment operator with
+     * 					other matrix; i.e. A = A.*B.
      * @param  M        Factor matrix.
      * @return          Result
      */
@@ -1616,9 +1599,9 @@ public:
     }
 
     /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
-     * @param  M        Factor matrix.
+     * @brief           Elementwise multiplication and assignment operator with.
+     *                  view; i.e. A = A.*B(...,...).
+     * @param  M        Factor view.
      * @return          Result
      */
     template <class S>
@@ -1630,8 +1613,7 @@ public:
     }
 
     /**
-     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this *= s.
-     *
+     * @brief           ELementwise multiplication with scalar; i.e. A = A.*s;
      * @param  s        Factor scalar.
      * @return          Result
      */
@@ -1642,63 +1624,55 @@ public:
     }
 
     /**
-     * @brief           Elementwise division by scalar. i.e. this * m.
-     *
-     * @param  s        The divisor.
+     * @brief           Elementwise multiplication (calls one of the below 3)
+     * @param  s        Factor
      * @return          Result
      */
     template <class S>
-    inline Matrix<T,P>
-    operator/           (const S& s) const  {
-		Matrix<T,P> res = *this;
-		return res /= s;
-	}
-
+    inline Matrix<T,P> operator/ (const S& s) const {
+        Matrix<T,P> res = *this;
+        return res /= s;
+    }
 
     /**
-     * @brief           ELementwise multiplication and assignment operator. i.e. this = this .* M.
-     *
+     * @brief           Elementwise multiplication and assignment operator with
+     * 					other matrix; i.e. A = A.*B.
      * @param  M        Factor matrix.
      * @return          Result
      */
-    inline Matrix<T,P>&
-    operator/=         (const Matrix<T,P>& M)  {
-        op_assert (_dim == M.Dim(), *this, M);
+    template <class S>
+    inline Matrix<T,P>& operator/= (const Matrix<S,P>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
         return *this;
     }
 
-
     /**
-     * @brief           ELementwise division and assignment operator. i.e. this = this ./ M.
-     *
-     * @param  M        Divisor matrix.
-     * @return          Result
-     */
-    template <class S> inline Matrix<T,P>&
-    operator/=         (const Matrix<S,P> &M)  {
-        op_assert (_dim == M.Dim(), *this, M);
-        std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
-        return *this;
-    }
-
-
-
-    /**
-     * @brief           ELementwise multiplication with scalar and assignment operator. i.e. this = m.
-     *
-     * @param  s        Divisor scalar.
+     * @brief           Elementwise multiplication and assignment operator with.
+     *                  view; i.e. A = A.*B(...,...).
+     * @param  M        Factor view.
      * @return          Result
      */
     template <class S>
-    inline Matrix<T,P>&
-    operator/=         (const S& s)  {
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::divides<T>(),(T)s));
+    inline Matrix<T,P>& operator/= (const ConstNoConstView<S,true>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
+        for (size_t i = 0; i < Size(); ++i)
+            _M[i] /= M[i];
         return *this;
     }
 
+    /**
+     * @brief           ELementwise multiplication with scalar; i.e. A = A.*s;
+     * @param  s        Factor scalar.
+     * @return          Result
+     */
+    template <class S>
+    inline Matrix<T,P>& operator/= (const S& s) NOEXCEPT {
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::divides<T>(),(T)s));
+		return *this;
+    }
 
-    //@}
+   //@}
 
 
     /**
@@ -1711,16 +1685,50 @@ public:
 
     //--
     /**
+     * @brief           Elementwise multiplication with scalar (lhs)     *
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P> operator* (const double s, const Matrix<T,P>& m)
+    		NOEXCEPT { return m*s; }
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P> operator* (const float s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m*s; }
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P> operator* (const short s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m*s; }
+
+    /**
+     * @brief           Elementwise multiplication with scalar (lhs)
+     * @param  s        Scalar lhs
+     * @param  m        Matrix rhs
+     * @return          m * s
+     */
+    inline friend Matrix<T,P> operator* (const int s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m*s; }
+
+    /**
      * @brief           Elementwise multiplication with scalar (lhs)
      *
      * @param  s        Scalar lhs
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator*  (const double s, const Matrix<T,P>& m)  {
-        return   m * s;
-    }
+    inline friend Matrix<T,P> operator* (const long s, const Matrix<T,P> &m)
+    		NOEXCEPT { return   m*s; }
 
 
     /**
@@ -1730,10 +1738,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator*  (const float s, const Matrix<T,P> &m)  {
-        return   m * s;
-    }
+    inline friend Matrix<T,P> operator* (const cxfl s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m*s; }
 
 
     /**
@@ -1743,62 +1749,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator*  (const short s, const Matrix<T,P> &m)  {
-        return   m * s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const int s, const Matrix<T,P> &m)  {
-        return   m * s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const long s, const Matrix<T,P> &m)  {
-        return   m * s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const cxfl s, const Matrix<T,P> &m)  {
-        return   m * s;
-    }
-
-
-    /**
-     * @brief           Elementwise multiplication with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m * s
-     */
-    inline friend Matrix<T,P>
-    operator*  (const cxdb s, const Matrix<T,P> &m)  {
-        return   m * s;
-    }
+    inline friend Matrix<T,P> operator* (const cxdb s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m*s; }
 
 
     //--
@@ -1809,10 +1761,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator+  (const double s, const Matrix<T,P> &m)  {
-        return   m + s;
-    }
+    inline friend Matrix<T,P> operator+ (const double s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m+s; }
 
 
     /**
@@ -1822,10 +1772,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator+  (const float s, const Matrix<T,P> &m)  {
-        return   m + s;
-    }
+    inline friend Matrix<T,P> operator+ (const float s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m+s; }
 
 
     /**
@@ -1835,10 +1783,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator+  (const short s, const Matrix<T,P> &m)  {
-        return   m + s;
-    }
+    inline friend Matrix<T,P> operator+ (const short s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m+s; }
 
 
     /**
@@ -1848,10 +1794,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator+  (const int s, const Matrix<T,P> &m)  {
-        return   m + s;
-    }
+    inline friend Matrix<T,P> operator+ (const int s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m+s; }
 
 
     /**
@@ -1861,10 +1805,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator+  (const long s, const Matrix<T,P> &m)  {
-        return   m + s;
-    }
+    inline friend Matrix<T,P> operator+ (const long s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m+s; }
 
 
     /**
@@ -1874,10 +1816,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator+  (const cxfl s, const Matrix<T,P> &m)  {
-        return   m + s;
-    }
+    inline friend Matrix<T,P> operator+ (const cxfl s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m+s; }
 
 
     /**
@@ -1887,10 +1827,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator+  (const cxdb s, const Matrix<T,P> &m)  {
-        return   m + s;
-    }
+    inline friend Matrix<T,P> operator+ (const cxdb s, const Matrix<T,P> &m)
+    		NOEXCEPT { return m+s; }
 
 
     //--
@@ -1901,10 +1839,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator-  (const double s, const Matrix<T,P> &m)  {
-        return -m + s;
-    }
+    inline friend Matrix<T,P> operator- (const double s, const Matrix<T,P> &m)
+    		NOEXCEPT { return -m+s; }
 
 
     /**
@@ -1914,10 +1850,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator-  (const float s, const Matrix<T,P> &m)  {
-        return -m + s;
-    }
+    inline friend Matrix<T,P> operator- (const float s, const Matrix<T,P> &m)
+    		NOEXCEPT { return -m+s; }
 
 
     /**
@@ -1927,10 +1861,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator-  (const short s, const Matrix<T,P> &m)  {
-        return -m + s;
-    }
+    inline friend Matrix<T,P> operator- (const short s, const Matrix<T,P> &m)
+    		NOEXCEPT { return -m+s; }
 
 
     /**
@@ -1940,10 +1872,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator-  (const int s, const Matrix<T,P> &m)  {
-        return -m + s;
-    }
+    inline friend Matrix<T,P> operator- (const int s, const Matrix<T,P> &m)
+    		NOEXCEPT { return -m+s; }
 
 
     /**
@@ -1953,10 +1883,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator-  (const long s, const Matrix<T,P> &m)  {
-        return   -m + s;
-    }
+    inline friend Matrix<T,P> operator- (const long s, const Matrix<T,P> &m)
+    		NOEXCEPT { return -m+s; }
 
 
     /**
@@ -1966,10 +1894,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator-  (const cxfl s, const Matrix<T,P> &m)  {
-        return   -m + s;
-    }
+    inline friend Matrix<T,P> operator- (const cxfl s, const Matrix<T,P> &m)
+    		NOEXCEPT { return -m+s; }
 
 
     /**
@@ -1979,10 +1905,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator-  (const cxdb s, const Matrix<T,P> &m)  {
-        return   -m + s;
-    }
+    inline friend Matrix<T,P> operator- (const cxdb s, const Matrix<T,P> &m)
+    		NOEXCEPT { return -m+s; }
 
 
     /**
@@ -1992,8 +1916,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m * s
      */
-    inline friend Matrix<T,P>
-    operator/  (const T& s, const Matrix<T,P> &m)  {
+    inline friend Matrix<T,P> operator/ (const T& s, const Matrix<T,P> &m)
+    		NOEXCEPT {
         Matrix<T,P> res = m;
         for (size_t i = 0; i < m.Size(); ++i)
             res[i] = s / res[i];
@@ -2007,10 +1931,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m == s
      */
-    inline friend Matrix<cbool>
-    operator== (const T& s, const Matrix<T,P>& m)  {
-        return   m == s;
-    }
+    inline friend Matrix<cbool> operator== (const T& s, const Matrix<T,P>& m)
+    		NOEXCEPT { return m==s; }
 
 
     /**
@@ -2020,10 +1942,8 @@ public:
      * @param  m        Matrix rhs
      * @return          m <= t
      */
-    inline friend Matrix<cbool>
-    operator>= (const T& s, const Matrix<T,P>& m)  {
-        return   m <= s;
-    }
+    inline friend Matrix<cbool> operator>= (const T& s, const Matrix<T,P>& m)
+    		NOEXCEPT { return m<=s; }
 
 
     /**
@@ -2033,10 +1953,8 @@ public:
      * @param  m        Matrix rhs
      * @return          T<=M
      */
-    inline friend Matrix<cbool>
-    operator<= (const T& s, const Matrix<T,P>& m)  {
-        return   m >= s;
-    }
+    inline friend Matrix<cbool> operator<= (const T& s, const Matrix<T,P>& m)
+    		NOEXCEPT { return m>=s; }
 
 
     /**
@@ -2046,10 +1964,8 @@ public:
      * @param  m        Matrix rhs
      * @return          T!=M
      */
-    inline friend Matrix<cbool>
-    operator!= (const T& s, const Matrix<T,P>& m)  {
-        return   m != s;
-    }
+    inline friend Matrix<cbool> operator!= (const T& s, const Matrix<T,P>& m)
+    		NOEXCEPT { return m!=s; }
 
 
     /**
@@ -2059,10 +1975,8 @@ public:
      * @param  m        Matrix rhs
      * @return          T+M
      */
-    inline friend Matrix<cbool>
-    operator>  (const T& s, const Matrix<T,P>& m)  {
-        return   m <  s;
-    }
+    inline friend Matrix<cbool> operator> (const T& s, const Matrix<T,P>& m)
+    		NOEXCEPT { return m<s; }
 
 
     /**
@@ -2072,42 +1986,11 @@ public:
      * @param  m        Matrix rhs
      * @return          T+M
      */
-    inline friend Matrix<cbool>
-    operator<  (const T& s, const Matrix<T,P>& m)  {
-        return   m >  s;
-    }
+    inline friend Matrix<cbool> operator< (const T& s, const Matrix<T,P>& m)
+    		NOEXCEPT { return m>s; }
 
-
-    /**
-     * @brief           Elementwise equality with scalar (lhs)
-     *
-     * @param  mb       Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T+M
-     */
-    //inline friend Matrix<T,P>
-    //operator&  (const Matrix<cbool>& mb, const Matrix<T,P>& m) {
-    //    return   m & mb;
-// }
 
     //@}
-
-
-    /**
-     * @brief           Elementwise equality, result[i] = (this[i] == m[i]). i.e. this == m
-     *
-     * @param  M        Comparing matrix.
-     * @return          Hit list
-     */
-    inline Matrix<cbool>
-    operator==          (const Matrix<T,P>& M) const  {
-        op_assert (_dim == M.Dim(), *this, M);
-        Matrix<cbool> res(_dim);
-		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (_M[i] == M[i]) ? 1 : 0;
-        return res;
-
-    }
 
 
     /**
@@ -2117,14 +2000,14 @@ public:
 	 * @return          Hit list
 	 */
     template<class S>
-	inline Matrix<cbool>
-	operator==          (const Matrix<S,P>& M) const  {
-        op_assert (_dim == M.Dim(), *this, M);
+	inline Matrix<cbool> operator== (const Matrix<S,P>& M) const {
+        MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
 		Matrix<cbool> res (_dim);
 		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (_M[i] == (T)M[i]) ? 1 : 0;
+			res[i] = (_M[i] == M[i]);
 		return res;
      }
+
 
     /**
      * @brief           Scalar equality. result[i] = (this[i] == m).
@@ -2132,12 +2015,11 @@ public:
      * @param  s        Comparing scalar.
      * @return          Matrix of true where elements are equal s and false else.
      */
-    inline Matrix<cbool>
-    operator==          (const T& s) const  {
-    	T t = (T) s;
+    inline Matrix<cbool> operator== (const T& s) const {
+    	T t(s);
         Matrix<cbool> res (_dim);
 		for (size_t i = 0; i < Size(); ++i)
-			res[i] = (_M[i] == s) ? 1 : 0;
+			res[i] = (_M[i] == s);
         return res;
     }
 
@@ -2231,42 +2113,28 @@ public:
 protected:
 	
     /**
-     * @brief           Number of elements
-     *
-     * @return          Size
-     */
-    inline size_t DimProd () const {
-        return std::accumulate(_dim.begin(), _dim.end(), size_t(1), c_multiply<size_t>);
-    }
-    
-
-    /**
      * @brief          Allocate RAM
      */
-    inline void
-    Allocate ()  {
+    inline void Allocate () {
         size_t ds = _dim.size(), i;
 		_dsz.resize(ds,1);
 	    for (i = 1; i < ds; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-        size_t  n = DimProd(); 
+        size_t n = std::accumulate(_dim.begin(), _dim.end(), size_t(1), c_multiply<size_t>);
         if (n != _M.size())
             _M.resize(n);
     }
-
 
     // Structure
     Vector<size_t> _dim; /// Dimensions
     Vector<size_t> _dsz; /// Dimension size.
     Vector<float>  _res; /// Resolutions
-    
 
     //Data
     Vector<T>        _M; /// Data container
 
-
     // Name
-    std::string         _name; /// Name
+    std::string      _name; /// Name
     
 #ifdef HAVE_SCALAPACK
     // BLACS 
