@@ -227,8 +227,7 @@ public:
 	 * @param  m       To transform
 	 * @return         Bummer! (This is not nice, right?)
 	 */
-	Matrix<T>
-	Trafo             (const Matrix<T>& m) const NOEXCEPT {
+	Matrix<T> Trafo (const Matrix<T>& m) const NOEXCEPT {
 		Matrix <T> res;
 		return res;
 	}
@@ -240,8 +239,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T>
-	operator* (const Matrix<T>& m) const NOEXCEPT {
+	virtual Matrix<T> operator* (const Matrix<T>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	

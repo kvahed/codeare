@@ -138,7 +138,7 @@ public:
 		Matrix<T> res = kspace;
 #pragma omp parallel for default (shared)
 		for (int coil = 0; coil < (int)m_nc; ++coil)
-			Slice(res, coil, ARC(kspace,coil));
+			res (R(),R(),R(coil)) = ARC(kspace,coil);
 		return res;
 	}
     
@@ -208,17 +208,17 @@ private:
 				pattern = col(abs(tmp)>0);
                 
 				for (size_t i = 0; i < list_len; ++i)
-					if (pattern.Container()==Column(patterns,i).Container()) {     // Do we know the pattern?
+					if (eq(pattern, patterns(CR(),CR(i)))) {     // Do we know the pattern?
 						idx = i;
 						break;
 					}
 				if (idx == 0) {                            // No
 					kernel = Solve (pattern, center);     // Calculate kernel
-					Column (kernels, list_len, kernel);     // Save kernel and pattern
-					Column (patterns, list_len, pattern);
+					kernels(R(),R(list_len)) = kernel;  // Save kernel and pattern
+					patterns(R(),R(list_len)) = pattern;
 					list_len++;
 				} else
-					kernel = Column (kernels, idx);
+					kernel = kernels(CR(),CR(idx));
                 
 				fully_sampled(x,y) = sum(kernel*col(tmp));
                 
