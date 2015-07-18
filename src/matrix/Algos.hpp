@@ -43,7 +43,7 @@ template <class T> inline static bool is_inf (T const& x) {
 
 
 template<class T, class S>
-inline static bool eq (const MatrixType& A, const MatrixType& B) {
+inline static bool eq (const MatrixType<T>& A, const MatrixType<S>& B) {
     assert (A.Size() == B.Size());
     for (size_t i = 0; i < A.Size(); ++i)
         if (A[i]!=B[i])
