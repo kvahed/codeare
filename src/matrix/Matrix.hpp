@@ -550,7 +550,7 @@ public:
         MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
         return _M[x + _dim[0]*y];
     }
-    inline T&       At (const size_t& x, const size_t& y)  {
+    inline       T& At (const size_t& x, const size_t& y)       {
         MATRIX_ASSERT(x<_dim[0],INDEX_EXCEEDS_DIMENSION);
         MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
         return _M[x + _dim[0]*y];

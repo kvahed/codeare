@@ -197,16 +197,14 @@ private:
 		Matrix<T> kernel, kernels (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
 		Matrix<short> pattern, patterns (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
 		Matrix<T> tmp (kernel_size[0],kernel_size[1],m_nc);
-        
+
 		for (size_t y = 0, list_len = 1; y < data_size[1]; ++y) // Scan k-space for
 			for (size_t x = 0, idx = 0; x < data_size[0]; ++x, idx=0) {
-
 				for (size_t ny = 0; ny < kernel_size[1]; ++ny)
 					for (size_t nx = 0; nx < kernel_size[0]; ++nx)
 						for (size_t nc = 0; nc < m_nc; ++nc)
 							tmp (nx,ny,nc) = under_sampled(x+nx,y+ny,nc);
 				pattern = col(abs(tmp)>0);
-                
 				for (size_t i = 0; i < list_len; ++i)
 					if (eq(pattern, patterns(CR(),CR(i)))) {     // Do we know the pattern?
 						idx = i;
@@ -217,12 +215,11 @@ private:
 					kernels(R(),R(list_len)) = kernel;  // Save kernel and pattern
 					patterns(R(),R(list_len)) = pattern;
 					list_len++;
-				} else
+				} else {
 					kernel = kernels(CR(),CR(idx));
-                
+				}
 				fully_sampled(x,y) = sum(kernel*col(tmp));
-                
-			}
+			} // x
 
 		return fully_sampled;
 	}
