@@ -1,5 +1,5 @@
-#ifndef __CONST_NO_CONST_VIEW_HPP__
-#define __CONST_NO_CONST_VIEW_HPP__
+#ifndef __VIEW_HPP__
+#define __VIEW_HPP__
 
 #include <type_traits>
 #include <string>
@@ -25,21 +25,14 @@ template<bool is_const> class Range {
 public:
 
 	inline Range () {}
-
 	inline Range (const size_t& begend) { HandleSingleInput(begend); }
-    
 	inline Range (const size_t& begin, const size_t& end) { HandleTwoInputs(begin, end); }
-    
 	inline Range (const size_t& begin, const size_t& stride, const size_t& end) {
 		HandleThreeInputs(begin, stride, end);
 	}
-    
 	inline Range (const Vector<size_t>& v) { _idx = v; }
-
 	inline Range (const std::string& rs) { ParseRange(rs); }
-
 	inline Range (const char* rcs) { ParseRange(std::string(rcs)); }
-
 	inline void ParseRange (std::string rs) {
 		// remove white spaces
 		rs.erase(std::remove_if(rs.begin(), rs.end(), ::isspace), rs.end());
@@ -68,28 +61,21 @@ public:
 			}
 		}
 	}
-    
 	virtual ~Range() {}
-
 	inline void Reset (const int& begin) {
 		_idx.Clear();
 		HandleSingleInput (begin);
 	}
-    
 	inline void Reset (const int& begin, const int& end) {
 		_idx.Clear();
 		HandleTwoInputs (begin, end);
 	}
-    
 	inline void Reset (const int& begin, const int& stride, const int& end) {
 		_idx.Clear();
 		HandleThreeInputs (begin, stride, end);
 	}
-    
 	inline size_t Size() const { return _idx.size(); }
-    
 	inline bool IsSingleton() const { return (_idx.size()==1);}
-    
 	inline size_t operator[] (const size_t& i) const { return _idx[i]; }
     
 private:
@@ -99,7 +85,6 @@ private:
 			throw  NEGATIVE_BEGIN_INDEX;
 		_idx.push_back(pos);
 	}
-
 	inline void HandleThreeInputs (const int& begin, const int& stride, const int& end) {
 		if (begin < 0) {
 			printf ("NEGATIVE_BEGIN_INDEX\n");
@@ -126,7 +111,6 @@ private:
 		for (size_t i = cur; i < _idx.size(); ++i)
 			_idx[i] = begin + i*stride;
 	}
-
 	inline void HandleTwoInputs (const int& begin, const int& end) {
 		if (begin < 0) {
 			printf ("NEGATIVE_BEGIN_INDEX\n");
@@ -145,7 +129,6 @@ private:
 		for (size_t i = cur; i < _idx.size(); ++i)
 			_idx[i] = begin + i;
 	}
-
 	friend std::ostream& operator<< (std::ostream &os, const Range& r) {
 		return os << r._idx;
 	}
@@ -155,14 +138,14 @@ private:
 typedef Range<true> CR;
 typedef Range<false> R;
 
-template <class T, bool is_const> class ConstNoConstView;
+template <class T, bool is_const> class View;
 template <class T, paradigm P=SHM> class Matrix;
 
 template<class T, paradigm P=SHM>
 class MatrixType {
 public:
-    typedef ConstNoConstView<T,true> ConstView;
-    typedef ConstNoConstView<T,false> View;
+    typedef View<T,true> RHSView;
+    typedef View<T,false> LHSView;
 
 	virtual ~MatrixType() {}
     virtual const T& operator[] (const size_t& n) const { return _M[0]; }
@@ -175,31 +158,31 @@ public:
     virtual size_t NDim() const  { return 0; }
 	virtual const Vector<size_t>& Dim() const { return _dim;  }
 	virtual size_t Dim(const size_t& d) const { return _dim[0]; }
-	virtual View operator() (R r) { return View(); }
-	virtual ConstView operator() (const CR r) const { return ConstView(); }
-	virtual View operator() (const R r, const size_t& n) { return View(); }
-	virtual ConstView operator() (const CR r, const size_t& n) const { return ConstView(); }
-	virtual View operator() (R r0, R r1) { return View(); }
-	virtual ConstView operator() (CR r0, CR r1) const { return ConstView(); }
-	virtual View operator() (R r0, R r1, R r2) { return View(); }
-	virtual ConstView operator() (CR r0, CR r1, CR r2) const { return ConstView(); }
-	virtual View operator() (R r0, R r1, R r2, R r3) { return View(); }
-	virtual ConstView operator() (CR r0, CR r1, CR r2, CR r3) const { return ConstView(); }
-	virtual View operator() (R r0, R r1, R r2, R r3, R r4) { return View(); }
-	virtual ConstView operator() (CR r0, CR r1, CR r2, CR r3, CR r4) const { return ConstView(); }
+	virtual LHSView operator() (R r) { return LHSView(); }
+	virtual RHSView operator() (const CR r) const { return RHSView(); }
+	virtual LHSView operator() (const R r, const size_t& n) { return LHSView(); }
+	virtual RHSView operator() (const CR r, const size_t& n) const { return RHSView(); }
+	virtual LHSView operator() (R r0, R r1) { return LHSView(); }
+	virtual RHSView operator() (CR r0, CR r1) const { return RHSView(); }
+	virtual LHSView operator() (R r0, R r1, R r2) { return LHSView(); }
+	virtual RHSView operator() (CR r0, CR r1, CR r2) const { return RHSView(); }
+	virtual LHSView operator() (R r0, R r1, R r2, R r3) { return LHSView(); }
+	virtual RHSView operator() (CR r0, CR r1, CR r2, CR r3) const { return RHSView(); }
+	virtual LHSView operator() (R r0, R r1, R r2, R r3, R r4) { return LHSView(); }
+	virtual RHSView operator() (CR r0, CR r1, CR r2, CR r3, CR r4) const { return RHSView(); }
 private:
     Vector<T> _M;
 	Vector<size_t> _dim;
 };
 
-template<class T, bool is_const = true> class ConstNoConstView : public MatrixType<T> {
+template<class T, bool is_const = true> class View : public MatrixType<T> {
 public:
     
     typedef typename std::conditional<is_const, const Matrix<T>, Matrix<T> >::type MatrixTypeType;
     typedef typename std::conditional<is_const, const T, T>::type Type;
     
-    inline ConstNoConstView () : _matrix(0) {}
-    inline ConstNoConstView (MatrixTypeType* matrix, Vector<Range<is_const> >& range) :
+    inline View () : _matrix(0) {}
+    inline View (MatrixTypeType* matrix, Vector<Range<is_const> >& range) :
         _matrix(matrix), _range(range) {
         assert (_range.size());
         for (size_t i = 0; i < _range.size(); ++i) {
@@ -299,7 +282,7 @@ public:
             return res;
     }
     
-    inline ConstNoConstView& operator= (const Matrix<T>& M) {
+    inline View& operator= (const Matrix<T>& M) {
         assert (Size() == M.Size());
         for (size_t i = 0; i < Size(); ++i)
             *(_pointers[i]) = M[i];
@@ -341,9 +324,9 @@ public:
         return M;
     }
 
-    virtual ~ConstNoConstView () { _matrix = 0; }
+    virtual ~View () { _matrix = 0; }
     
-    inline ConstNoConstView& operator= (const ConstNoConstView<T,true>& v) {
+    inline View& operator= (const View<T,true>& v) {
         Matrix<T>& lhs = *_matrix;
         const Matrix<T>& rhs = *(v._matrix);
         assert (_nsdims.size() == v._nsdims.size());
@@ -353,7 +336,7 @@ public:
             *_pointers[i] = *(v._pointers)[i];
         return *this;
     }
-    inline ConstNoConstView& operator= (const Type& t) {
+    inline View& operator= (const Type& t) {
         assert (_matrix);
         for (size_t i = 0; i < _pointers.size(); ++i)
             *_pointers[i] = t;
@@ -373,7 +356,7 @@ public:
     Vector<size_t> _dim;
     
 private:
-    friend std::ostream& operator<< (std::ostream &os, const ConstNoConstView& r) {
+    friend std::ostream& operator<< (std::ostream &os, const View& r) {
         os << "(";
         for (size_t i = 0; i < r._range.size(); ++i) {
             if (i)
@@ -384,4 +367,4 @@ private:
     }
 };
 
-#endif
+#endif // __VIEW_HPP__
