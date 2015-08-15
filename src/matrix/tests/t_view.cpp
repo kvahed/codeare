@@ -27,6 +27,7 @@ int main (int narg, const char** argv) {
     M9 = M6(CR("1:-1:0"),CR("1:2"));
     M10 = M6(CR("1:-1:0,1"),CR("1:2"));
     M11 = M6(CR(),CR()) * M6(CR(),CR());
+//    M12 = M5(CR("1:end"),CR("1:end"));
 //    M11 = M6(CR(),CR()) + M6(CR(),CR());
   //  M11 = M6(CR(),CR()) / M6(CR(),CR());
     M11 = M6 * M6(CR(),CR());

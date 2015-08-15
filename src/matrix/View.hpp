@@ -51,6 +51,7 @@ public:
     typedef typename std::conditional<is_const, const T, T>::type Type;
     
     inline View () : _matrix(0) {}
+
     inline View (MatrixTypeType* matrix, Vector<Range<is_const> >& range) :
         _matrix(matrix), _range(range) {
         assert (_range.size());
@@ -138,9 +139,6 @@ public:
             else
                 ++it;
         }
-
-        while (_range.back().IsSingleton())
-            _range.PopBack();
 
     }
     

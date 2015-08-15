@@ -118,6 +118,11 @@ public:
             }
         }
         
+        try {
+            m_np  = p.Get<int>("threads");
+            omp_set_num_threads(m_np);
+        } catch (const boost::bad_any_cast&) {}
+
         if (p.exists("alpha")) {
             try {
                 m_alpha = fp_cast(p["alpha"]);
@@ -482,8 +487,10 @@ public:
     			<< Alpha() << ") sigma(" << Sigma() << ")" << std::endl;
     	os << "    have_kspace(" << m_have_kspace << ") have_weights(" <<
     			m_have_weights << ") have_b0(" << m_have_b0 << ")" << std::endl;
+    	os << "    ft-threads(" << m_np << ")";
     	if (m_3rd_dim_cart)
-    		os << "    3rd dimension is Cartesian" << std::endl;
+    		os << " 3rd dimension is Cartesian";
+        os << std::endl;
     	return os;
     }
 
@@ -519,6 +526,8 @@ private:
     bool       m_3rd_dim_cart, m_have_weights, m_have_kspace;
 
     size_t     m_m, m_ncart;
+
+    int m_np;
 
     //Window<RT>  m_win;
 
