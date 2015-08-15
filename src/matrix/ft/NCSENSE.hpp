@@ -115,10 +115,10 @@ public:
 		m_lambda  = params.Get<double>("lambda");
         try {
             m_np  = params.Get<int>("threads");
-        } catch (const boost::bad_any_cast&) {
-            m_np  = 1;
-        }
-        omp_set_num_threads(m_np);
+            omp_set_num_threads(m_np);
+        } catch (const boost::bad_any_cast&) {}
+        ft_params["threads"] = 4;
+
         try {
         	m_verbose = (params.Get<int>("verbose") > 0);
         } catch (const boost::bad_any_cast&) {}
