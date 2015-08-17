@@ -64,7 +64,8 @@ if(_use_threads)
   foreach(_lib ${_libraries})
     list(APPEND _thread_libs ${_lib}_threads)
   endforeach(_lib ${_libraries})
-  set(_libraries ${_thread_libs} ${_libraries})
+  #  set(_libraries ${_thread_libs} ${_libraries})
+  set(_libraries ${_thread_libs})
 endif(_use_threads)
 
 # Keep a list of variable names that we need to pass on to

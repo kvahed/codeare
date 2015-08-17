@@ -89,7 +89,7 @@ static const int end = -1;
 #endif
 
 
-#include "ConstNoConstView.hpp"
+#include "View.hpp"
 
 enum MatrixException {
     DIMS_VECTOR_EMPTY,
@@ -154,8 +154,8 @@ template <class T, paradigm P> class Matrix : public MatrixType<T,P> {
 
 public:
 
-    typedef ConstNoConstView<T,true> ConstView;
-    typedef ConstNoConstView<T,false> View;
+    typedef View<T,true>  RHSView;
+    typedef View<T,false> LHSView;
     
     /**
      * @name Constructors and destructors
@@ -351,7 +351,7 @@ public:
 #endif
 
 #ifdef HAVE_CXX11_CONDITIONAL
-    inline Matrix (ConstView& v) {
+    inline Matrix (RHSView& v) {
 		_dim = v._dim;
         MATRIX_ASSERT(!_dim.Empty(),DIMS_VECTOR_EMPTY);
         MATRIX_ASSERT(std::find(_dim.begin(),_dim.end(),size_t(0))==_dim.end(),
@@ -1180,7 +1180,7 @@ public:
 
 #ifdef HAVE_CXX11_CONDITIONAL
     template<class S>
-    inline Matrix<T,P>& operator= (const ConstNoConstView<S,true>& v) {
+    inline Matrix<T,P>& operator= (const View<S,true>& v) {
         _dim = v._dim;
         Allocate();
         for (size_t i = 0; i < Size(); ++i)
@@ -1506,7 +1506,7 @@ public:
      * @return          Result
      */
     template <class S>
-    inline Matrix<T,P>& operator+= (const ConstNoConstView<S,true>& M) {
+    inline Matrix<T,P>& operator+= (const View<S,true>& M) {
         MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         for (size_t i = 0; i < Size(); ++i)
             _M[i] += M[i];
@@ -1556,7 +1556,7 @@ public:
      * @return          Result
      */
     template <class S>
-    inline Matrix<T,P>& operator-= (const ConstNoConstView<S,true>& M) {
+    inline Matrix<T,P>& operator-= (const View<S,true>& M) {
         MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         for (size_t i = 0; i < Size(); ++i)
             _M[i] -= M[i];
@@ -1605,7 +1605,7 @@ public:
      * @return          Result
      */
     template <class S>
-    inline Matrix<T,P>& operator*= (const ConstNoConstView<S,true>& M) {
+    inline Matrix<T,P>& operator*= (const View<S,true>& M) {
         MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         for (size_t i = 0; i < Size(); ++i)
             _M[i] *= M[i];
@@ -1654,7 +1654,7 @@ public:
      * @return          Result
      */
     template <class S>
-    inline Matrix<T,P>& operator/= (const ConstNoConstView<S,true>& M) {
+    inline Matrix<T,P>& operator/= (const View<S,true>& M) {
         MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         for (size_t i = 0; i < Size(); ++i)
             _M[i] /= M[i];
@@ -2026,87 +2026,87 @@ public:
 
 #ifdef HAVE_CXX11_CONDITIONAL
 
-    View operator() (R r) {
+    inline LHSView operator() (R r) {
         Vector<R> vr;
         vr.push_back (r);
-        return View(this, vr);
+        return LHSView(this, vr);
     }
-    ConstView operator() (const CR r) const {
+    inline RHSView operator() (const CR r) const {
         Vector<CR> vr;
         vr.push_back (r);
-        return ConstView(this, vr);
+        return RHSView(this, vr);
     }
-    View operator() (const R r, const size_t& n) {
+    inline LHSView operator() (const R r, const size_t& n) {
         Vector<R> vr;
         vr.push_back (r);
         vr.push_back (R(n));
-        return View(this, vr);
+        return LHSView(this, vr);
     }
-    ConstView operator() (const CR r, const size_t& n) const {
+    inline RHSView operator() (const CR r, const size_t& n) const {
         Vector<CR> vr;
         vr.push_back (r);
         vr.push_back (CR(n));
-        return ConstView(this, vr);
+        return RHSView(this, vr);
     }
-    View operator() (R r0, R r1) {
+    inline LHSView operator() (R r0, R r1) {
         Vector<R> vr;
         vr.push_back (r0);
         vr.push_back (r1);
-        return View(this, vr);
+        return LHSView(this, vr);
     }
-    ConstView operator() (CR r0, CR r1) const {
+    inline RHSView operator() (CR r0, CR r1) const {
         Vector<CR> vr;
         vr.push_back (r0);
         vr.push_back (r1);
-        return ConstView(this, vr);
+        return RHSView(this, vr);
     }
-    View operator() (R r0, R r1, R r2) {
+    inline LHSView operator() (R r0, R r1, R r2) {
         Vector<R> vr;
         vr.push_back (r0);
         vr.push_back (r1);
         vr.push_back (r2);        
-        return View(this, vr);
+        return LHSView(this, vr);
     }
-    ConstView operator() (CR r0, CR r1, CR r2) const {
+    inline RHSView operator() (CR r0, CR r1, CR r2) const {
         Vector<CR> vr;
         vr.push_back (r0);
         vr.push_back (r1);
         vr.push_back (r2);
-        return ConstView(this, vr);
+        return RHSView(this, vr);
     }
-    View operator() (R r0, R r1, R r2, R r3) {
+    inline LHSView operator() (R r0, R r1, R r2, R r3) {
         Vector<R> vr;
         vr.push_back (r0);
         vr.push_back (r1);
         vr.push_back (r2);        
         vr.push_back (r3);        
-        return View(this, vr);
+        return LHSView(this, vr);
     }
-    ConstView operator() (CR r0, CR r1, CR r2, CR r3) const {
+    inline RHSView operator() (CR r0, CR r1, CR r2, CR r3) const {
         Vector<CR> vr;
         vr.push_back (r0);
         vr.push_back (r1);
         vr.push_back (r2);
         vr.push_back (r3);
-        return ConstView(this, vr);
+        return RHSView(this, vr);
     }
-    View operator() (R r0, R r1, R r2, R r3, R r4) {
+    inline LHSView operator() (R r0, R r1, R r2, R r3, R r4) {
         Vector<R> vr;
         vr.push_back (r0);
         vr.push_back (r1);
         vr.push_back (r2);        
         vr.push_back (r3);        
         vr.push_back (r4);
-        return View(this, vr);
+        return LHSView(this, vr);
     }
-    ConstView operator() (CR r0, CR r1, CR r2, CR r3, CR r4) const {
+    inline RHSView operator() (CR r0, CR r1, CR r2, CR r3, CR r4) const {
         Vector<CR> vr;
         vr.push_back (r0);
         vr.push_back (r1);
         vr.push_back (r2);
         vr.push_back (r3);
         vr.push_back (r4);
-        return ConstView(this, vr);
+        return RHSView(this, vr);
     }
 #endif
 

@@ -29,6 +29,8 @@
 #include "CX.hpp"
 #include "Creators.hpp"
 
+#include <thread>
+
 /**
  * @brief Matrix templated ND non-equidistand Fourier transform with NFFT 3 (TU Chemnitz)<br/>
  *        T and single precision
@@ -58,7 +60,7 @@ public:
     NFFT() NOEXCEPT :  m_initialised (false), m_have_pc (false), m_imgsz (0),
         m_M (0), m_maxit (0), m_rank (0), m_m(0), m_have_b0(false),
         m_3rd_dim_cart(false),m_ncart(1), m_alpha(1.), m_have_weights(false),
-		m_have_kspace(false) {};
+		m_have_kspace(false), m_np(std::thread::hardware_concurrency()) {};
 
     /**
      * @brief        Construct with parameter set
@@ -66,7 +68,7 @@ public:
     inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_3rd_dim_cart(false),
         m_t (Matrix<RT>()), m_b0 (Matrix<RT>()), m_maxit(3), m_m(1), m_alpha(1.),
 		m_epsilon(7.e-4f), m_sigma(1.0), m_ncart(1),  m_have_weights(false),
-		m_have_kspace(false) {
+        m_have_kspace(false), m_np(std::thread::hardware_concurrency()) {
                 
         if (p.exists("nk")) {// Number of kspace samples
             try {
@@ -117,6 +119,11 @@ public:
                 		"oversampling factor m. Defaulting to 1.\n");
             }
         }
+        
+        try {
+            m_np  = p.Get<int>("threads");
+        } catch (const boost::bad_any_cast&) {}
+        omp_set_num_threads(m_np);
         
         if (p.exists("alpha")) {
             try {
@@ -482,8 +489,10 @@ public:
     			<< Alpha() << ") sigma(" << Sigma() << ")" << std::endl;
     	os << "    have_kspace(" << m_have_kspace << ") have_weights(" <<
     			m_have_weights << ") have_b0(" << m_have_b0 << ")" << std::endl;
+    	os << "    ft-threads(" << m_np << ")";
     	if (m_3rd_dim_cart)
-    		os << "    3rd dimension is Cartesian" << std::endl;
+    		os << " 3rd dimension is Cartesian";
+        os << std::endl;
     	return os;
     }
 
@@ -519,6 +528,8 @@ private:
     bool       m_3rd_dim_cart, m_have_weights, m_have_kspace;
 
     size_t     m_m, m_ncart;
+
+    int m_np;
 
     //Window<RT>  m_win;
 

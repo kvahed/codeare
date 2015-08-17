@@ -20,6 +20,7 @@
 
 #include "codeare.hpp"
 #include "IOContext.hpp"
+#include <thread>
 
 using namespace codeare::matrix::io;
 

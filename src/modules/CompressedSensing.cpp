@@ -309,6 +309,7 @@ codeare::error_code CompressedSensing::Init () {
 			ft_params["m"]       = RHSAttribute<size_t>("ftm");
 	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
 	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
+		    ft_params["threads"] = RHSAttribute<int>("threads");
 	        ft_params["imsz"]    = m_image_size;
 	        m_csparam.ft = (FT<cxfl>*) new NFFT<cxfl> (ft_params);
 #else

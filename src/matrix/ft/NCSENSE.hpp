@@ -33,6 +33,8 @@
 #include "Workspace.hpp"
 
 #include <numeric>
+#include <thread>
+
 #include <boost/math/special_functions/fpclassify.hpp>
 
 /**
@@ -116,9 +118,11 @@ public:
         try {
             m_np  = params.Get<int>("threads");
         } catch (const boost::bad_any_cast&) {
-            m_np  = 1;
+            m_np  = std::thread::hardware_concurrency();
         }
         omp_set_num_threads(m_np);
+        ft_params["threads"] = m_np;
+
         try {
         	m_verbose = (params.Get<int>("verbose") > 0);
         } catch (const boost::bad_any_cast&) {}

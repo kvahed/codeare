@@ -64,6 +64,7 @@ template <> struct NFFTTraits<std::complex<double> > {
     inline static int Init (const Vector<int>& N, size_t M, const Vector<int>& n,
     		int m, Plan& plan, Solver& solver) NOEXCEPT {
 
+        fftw_init_threads();
 
         Vector<int> _N(N), _n(n);
         int _d (N.size()), _M(M), _m(m);
@@ -341,7 +342,6 @@ template <> struct NFFTTraits<std::complex<float> > {
     inline static int Init (const Vector<int>& N, size_t M, const Vector<int>& n,
     		int m, Plan& plan, Solver& solver) NOEXCEPT {
 
-
         Vector<int> _N(N), _n(n);
         int _d (N.size()), _M(M), _m(m);
         unsigned nfft_flags, fftw_flags, solver_flags;
@@ -373,7 +373,6 @@ template <> struct NFFTTraits<std::complex<float> > {
      */
     inline static int Init (const Vector<int>& N, size_t M, const Vector<int>& n,
     		int m, RT sigma, B0Plan& plan, Solver& solver) NOEXCEPT {
-
 
         Vector<int> _N(N), _n(n);
         int _d (N.size()), _M(M), _m(m);
