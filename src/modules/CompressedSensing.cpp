@@ -29,6 +29,8 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 
 using namespace RRStrategy;
 
+Matrix<cxfl> ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
+
 template<class T> inline static typename TypeTraits<T>::RT Obj (
     const Matrix<T>& ffdbx, const Matrix<T>& ffdbg, const Matrix<T>&
     data, const typename TypeTraits<T>::RT t) {
@@ -82,9 +84,8 @@ template<class T> inline static typename TypeTraits<T>::RT XFM (
 
 
 template<class T> inline static typename TypeTraits<T>::RT f (
-    const Matrix<T>& ffdbx, const Matrix<T>& ffdbg, const Matrix<T>& ttdbx, const Matrix<T>& ttdbg,
-    const Matrix<T>& x, const Matrix<T>& g, const Matrix<T>& data, const typename TypeTraits<T>::RT t,
-    typename TypeTraits<T>::RT& rmse, const CSParam& cgp) {
+    const Matrix<T>& x, const Matrix<T>& g, const Matrix<T>& data,
+    const typename TypeTraits<T>::RT t, typename TypeTraits<T>::RT& rmse, const CSParam& cgp) {
     
 	typename TypeTraits<T>::RT obj = Obj (ffdbx, ffdbg, data, t);
 	rmse = sqrt(obj/(typename TypeTraits<T>::RT)nnz(data));
@@ -153,10 +154,10 @@ template<class T> inline static Matrix<T> dTV (
 
 
 template<class T> inline static Matrix<T> df (
-    const Matrix<T>& x/*, const Matrix<T>& wx*/, const Matrix<T>& data, const CSParam& cgp) {
+    const Matrix<T>& x, const Matrix<T>& data, const CSParam& cgp) {
 
 	DWT<T>& dwt = *cgp.dwt;
-    Matrix<T> wx = dwt->*x;
+    wx = dwt->*x;
 	Matrix<T> g = dObj (x, wx, data, cgp);
 	if (cgp.xfmw)
 		g += dXFM (x, cgp);
@@ -166,38 +167,40 @@ template<class T> inline static Matrix<T> df (
 
 }
 
-
-template<class T> inline void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
-
-	typename TypeTraits<T>::RT t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
-	Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
+template<class T> inline static void Update (const Matrix<T>& dx, const CSParam& cgp) {
 	DWT<cxfl>&  dwt = *cgp.dwt;
 	FT<cxfl>&   ft  = *cgp.ft;
 	TVOP<cxfl>& tvt = *cgp.tvt;
+    wdx =  dwt->*dx;
+    ffdbx = ft * wx;
+    ffdbg = ft * wdx;
+    if (cgp.tvw) {
+        ttdbx = tvt * wx;
+        ttdbg = tvt * wdx;
+    }
+}
 
-	g0  = df (x/*, wx*/, data, cgp);
+template<class T> inline static void NLCG (
+    Matrix<T>& x, const Matrix<T>& data, const CSParam& cgp) {
+
+	typename TypeTraits<T>::RT t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
+	Matrix<T> dx, g0, g1;
+
+	g0  = df (x, data, cgp);
 	dx  = -g0;
 
 	for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
 
+        Update(dx, cgp);
+
 		t = t0;
 
-        wx  = dwt->*x;
-		wdx =  dwt->*dx;
-		ffdbx = ft * wx;
-		ffdbg = ft * wdx;
-
-		if (cgp.tvw) {
-			ttdbx = tvt * wx;
-			ttdbg = tvt * wdx;
-		}
-
-		f0 = f (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
+		f0 = f (x, dx, data, z, rmse, cgp);
 
 		int i = 0;
 		while (i < cgp.lsiter) {
 			t *= cgp.lsb;
-			f1 = f (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
+			f1 = f (x, dx, data, t, rmse, cgp);
 			if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
 				break;
 			++i;
@@ -217,7 +220,7 @@ template<class T> inline void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, c
 		x  += dx * t;
 
 		// CG computation
-		g1  =  df (x/*, wx*/, data, cgp);
+		g1  =  df (x, data, cgp);
 		bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
 		g0  =  g1;
 		dx  = -g1 + dx * bk;
