@@ -126,9 +126,9 @@ template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, size_t 
 	size_t howmany = prod(in_dims);
 
 	for (size_t i = 0; i < howmany; ++i) {
-		tmp = Column (ret,i);
+		tmp = ret(CR(),CR(i));
 		std::rotate(tmp.Begin(), tmp.Begin()+cent, tmp.End());
-		Column (ret, i, tmp);
+		ret(R(),R(i)) = tmp;
 	}
 
 	for (size_t i = 0; i < ndims; ++i)

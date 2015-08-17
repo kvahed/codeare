@@ -169,12 +169,21 @@ public:
     virtual size_t Size () const { return 0; }
 	virtual Matrix<T> operator* (const MatrixType<T>& d) const { return Matrix<T>(); }
 	virtual Matrix<T> operator/ (const MatrixType<T>& d) const { return Matrix<T>(); }
+<<<<<<< HEAD
 	virtual Matrix<T> operator+ (const MatrixType<T>& d) const { return Matrix<T>(); }
 	virtual Matrix<T> operator- (const MatrixType<T>& d) const { return Matrix<T>(); }
 	virtual Matrix<T> operator= (const MatrixType<T>& d) const { return Matrix<T>(); }
     virtual size_t NDim() const  { return 0; }
 	virtual const Vector<size_t>& Dim() const { return _dim; }
     virtual size_t Dim(const size_t& d) const {return 0;}
+=======
+    virtual Matrix<T> operator+ (const MatrixType<T>& d) const { return Matrix<T>(); }
+	virtual Matrix<T> operator- (const MatrixType<T>& d) const { return Matrix<T>(); }
+	virtual Matrix<T> operator= (const MatrixType<T>& d) const { return Matrix<T>(); }
+    virtual size_t NDim() const  { return 0; }
+	virtual const Vector<size_t>& Dim() const { return _dim;  }
+	virtual size_t Dim(const size_t& d) const { return _dim[0]; }
+>>>>>>> 4f03a26f41b0d2c11920062ae2ec7e68034271ee
 	virtual View operator() (R r) { return View(); }
 	virtual ConstView operator() (const CR r) const { return ConstView(); }
 	virtual View operator() (const R r, const size_t& n) { return View(); }
@@ -187,7 +196,10 @@ public:
 	virtual ConstView operator() (CR r0, CR r1, CR r2, CR r3) const { return ConstView(); }
 	virtual View operator() (R r0, R r1, R r2, R r3, R r4) { return View(); }
 	virtual ConstView operator() (CR r0, CR r1, CR r2, CR r3, CR r4) const { return ConstView(); }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4f03a26f41b0d2c11920062ae2ec7e68034271ee
 private:
     Vector<T> _M;
 	Vector<size_t> _dim;

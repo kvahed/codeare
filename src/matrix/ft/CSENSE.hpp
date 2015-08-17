@@ -111,8 +111,7 @@ public:
 	 * @param  m       To transform
 	 * @return         Transform
 	 */
-	Matrix<T>
-	Adjoint       (const Matrix<T>& m) const NOEXCEPT {
+	Matrix<T> Adjoint (const Matrix<T>& m) const NOEXCEPT {
 
 		Matrix<T> res (dims[0]*af[0], dims[1]*af[1], (ndim == 3) ?
 				dims[2]*af[2] : 1, (compgfm) ? 2 : 1);
@@ -129,17 +128,15 @@ public:
 			Matrix<T> ra (nc,    1);
 			Matrix<T> rp (aaf,   1);
 			Matrix<T> gf (aaf,   1);
-			
 			const DFT<T>& ft = m_dft[tid];
 
-			
 			// FT individual channels
 #pragma omp for
 			for (int i = 0; i < (int)nc; i++)
 				if (ndim == 2)
-					Slice  (tmp, i, ft ->* Slice  (tmp, i));
+					tmp(R(),R(),    R(i)) = ft ->* tmp(CR(),CR(),     CR(i));
 				else
-					Volume (tmp, i, ft ->* Volume (tmp, i));
+					tmp(R(),R(),R(),R(i)) = ft ->* tmp(CR(),CR(),CR(),CR(i));
 
 			// Antialiasing
 #pragma omp for
@@ -230,8 +227,7 @@ public:
 	 * @param  m       To transform
 	 * @return         Bummer! (This is not nice, right?)
 	 */
-	Matrix<T>
-	Trafo             (const Matrix<T>& m) const NOEXCEPT {
+	Matrix<T> Trafo (const Matrix<T>& m) const NOEXCEPT {
 		Matrix <T> res;
 		return res;
 	}
@@ -243,8 +239,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T>
-	operator* (const Matrix<T>& m) const NOEXCEPT {
+	virtual Matrix<T> operator* (const Matrix<T>& m) const NOEXCEPT {
 		return Trafo(m);
 	}
 	
