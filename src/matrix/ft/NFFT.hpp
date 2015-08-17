@@ -122,7 +122,10 @@ public:
         
         try {
             m_np  = p.Get<int>("threads");
+        } catch (const PARAMETER_MAP_EXCEPTION& ) {
         } catch (const boost::bad_any_cast&) {}
+
+        
         omp_set_num_threads(m_np);
         
         if (p.exists("alpha")) {
