@@ -21,10 +21,10 @@ template<class T> class CGLS : public Linear<T> {
 
 public:
 	CGLS (const size_t& maxit = 10, const RT& epsilon = 1.0e-6,
-			const RT& lambda = 1.0e-6, const int& verbosity = 0) :
-				Linear<T>::Linear(verbosity), _verbosity(verbosity), _nrows(1),
-				_ncols(1), _maxit(maxit), _epsilon(epsilon), _lambda(lambda) {}
-
+          const RT& lambda = 1.0e-6, const int& verbosity = 0) :
+        Linear<T>::Linear(verbosity), _verbosity(verbosity), _nrows(1),
+        _ncols(1), _maxit(maxit), _epsilon(epsilon), _lambda(lambda) {}
+    
 	virtual ~CGLS () {}
 
 	inline Matrix<T> Solve (const Operator<T>& A, const MatrixType<T>& x) {
