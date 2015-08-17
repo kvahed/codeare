@@ -177,12 +177,13 @@ template<class T> inline void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, c
 
 	g0  = df (x/*, wx*/, data, cgp);
 	dx  = -g0;
-	wdx = dwt->*dx;
 
 	for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
 
 		t = t0;
 
+        wx  = dwt->*x;
+		wdx =  dwt->*dx;
 		ffdbx = ft * wx;
 		ffdbg = ft * wdx;
 
@@ -220,7 +221,6 @@ template<class T> inline void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, c
 		bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
 		g0  =  g1;
 		dx  = -g1 + dx * bk;
-		wdx =  dwt->*dx;
 		dxn =  norm(dx)/xn;
 
 		printf ("dxnrm: %0.4f\n", dxn);
