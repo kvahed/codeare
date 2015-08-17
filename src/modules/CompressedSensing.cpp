@@ -32,8 +32,8 @@ using namespace RRStrategy;
 Matrix<cxfl> ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
 
 template<class T> inline static typename TypeTraits<T>::RT Obj (
-    const Matrix<T>& ffdbx, const Matrix<T>& ffdbg, const Matrix<T>&
-    data, const typename TypeTraits<T>::RT t) {
+    const Matrix<T>& ffdbx, const Matrix<T>& ffdbg, const Matrix<T>& data,
+    const typename TypeTraits<T>::RT t) {
 
 	Matrix<T> om = ffdbx;
 	if (t > 0.0)
@@ -83,16 +83,16 @@ template<class T> inline static typename TypeTraits<T>::RT XFM (
 }
 
 
-template<class T> inline static typename TypeTraits<T>::RT f (
-    const Matrix<T>& x, const Matrix<T>& g, const Matrix<T>& data,
-    const typename TypeTraits<T>::RT t, typename TypeTraits<T>::RT& rmse, const CSParam& cgp) {
+template<class T> inline typename TypeTraits<T>::RT CompressedSensing::f (
+    const Matrix<T>& x, const Matrix<T>& dx, const typename TypeTraits<T>::RT& t,
+    typename TypeTraits<T>::RT& rmse) {
     
 	typename TypeTraits<T>::RT obj = Obj (ffdbx, ffdbg, data, t);
-	rmse = sqrt(obj/(typename TypeTraits<T>::RT)nnz(data));
-	if (cgp.tvw)
-		obj += TV (ttdbx, ttdbg, t, cgp);
-	if (cgp.xfmw)
-		obj += XFM (x, g, t, cgp);
+	rmse = sqrt(obj/m_ndnz);
+	if (m_csparam.tvw)
+		obj += TV (ttdbx, ttdbg, t, m_csparam);
+	if (m_csparam.xfmw)
+		obj += XFM (x, dx, t, m_csparam);
 	return obj;
 
 }
@@ -104,8 +104,8 @@ template<class T> inline static typename TypeTraits<T>::RT f (
 template<class T> inline static Matrix<T> dObj (
     const Matrix<T>& x, const Matrix<T>& wx, const Matrix<T>& data, const CSParam& cgp) {
     
-	FT<T>& ft = *(cgp.ft);
-	DWT<T>& dwt = *(cgp.dwt);
+	FT<T>& ft = *cgp.ft;
+    DWT<T>& dwt = *cgp.dwt;
 	return (2.0 * (dwt * (ft ->* ((ft * wx) - data))));
 
 }
@@ -139,7 +139,7 @@ template<class T> inline static Matrix<T> dTV (
 
 	DWT<T>& dwt = *cgp.dwt;
 	TVOP<T>& tvt = *cgp.tvt;
-	typename TypeTraits<T>::RT p   = 0.5*cgp.pnorm-1.0;
+	typename TypeTraits<T>::RT p = 0.5*cgp.pnorm-1.0;
 	Matrix<T> dx, g;
 	dx = tvt * wx;
 	g  = dx * conj(dx);
@@ -153,85 +153,82 @@ template<class T> inline static Matrix<T> dTV (
 }
 
 
-template<class T> inline static Matrix<T> df (
-    const Matrix<T>& x, const Matrix<T>& data, const CSParam& cgp) {
+template<class T> inline Matrix<T> CompressedSensing::df (const Matrix<T>& x) {
 
-	DWT<T>& dwt = *cgp.dwt;
+	DWT<T>& dwt = *m_csparam.dwt;
     wx = dwt->*x;
-	Matrix<T> g = dObj (x, wx, data, cgp);
-	if (cgp.xfmw)
-		g += dXFM (x, cgp);
-	if (cgp.tvw)
-		g += dTV  (x, wx, cgp);
+	Matrix<T> g = dObj (x, wx, data, m_csparam);
+	if (m_csparam.xfmw)
+		g += dXFM (x, m_csparam);
+	if (m_csparam.tvw)
+		g += dTV  (x, wx, m_csparam);
 	return g;
 
 }
 
-template<class T> inline static void Update (const Matrix<T>& dx, const CSParam& cgp) {
-	DWT<cxfl>&  dwt = *cgp.dwt;
-	FT<cxfl>&   ft  = *cgp.ft;
-	TVOP<cxfl>& tvt = *cgp.tvt;
+template<class T> inline void CompressedSensing::Update (const Matrix<T>& dx) {
+	DWT<cxfl>&  dwt = *m_csparam.dwt;
+	FT<cxfl>&   ft  = *m_csparam.ft;
+	TVOP<cxfl>& tvt = *m_csparam.tvt;
     wdx =  dwt->*dx;
     ffdbx = ft * wx;
     ffdbg = ft * wdx;
-    if (cgp.tvw) {
+    if (m_csparam.tvw) {
         ttdbx = tvt * wx;
         ttdbg = tvt * wdx;
     }
 }
 
-template<class T> inline static void NLCG (
-    Matrix<T>& x, const Matrix<T>& data, const CSParam& cgp) {
-
+template<class T> inline void CompressedSensing::NLCG (Matrix<T>& x) {
+    
 	typename TypeTraits<T>::RT t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
 	Matrix<T> dx, g0, g1;
-
-	g0  = df (x, data, cgp);
+    
+	g0  = df (x);
 	dx  = -g0;
-
-	for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
-
-        Update(dx, cgp);
-
+    
+	for (size_t k = 0; k < (size_t)m_csparam.cgiter; k++) {
+        
+        Update(dx);
+        
 		t = t0;
-
-		f0 = f (x, dx, data, z, rmse, cgp);
-
+        
+		f0 = f (x, dx, z, rmse);
+        
 		int i = 0;
-		while (i < cgp.lsiter) {
-			t *= cgp.lsb;
-			f1 = f (x, dx, data, t, rmse, cgp);
-			if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
+		while (i < m_csparam.lsiter) {
+			t *= m_csparam.lsb;
+			f1 = f (x, dx, t, rmse);
+			if (f1 <= f0 - (m_csparam.lsa * t * abs(g0.dotc(dx))))
 				break;
 			++i;
 		}
-
+        
 		printf (ofstr.c_str(), k, rmse, i); fflush (stdout);
-
-		if (i == cgp.lsiter) {
+        
+		if (i == m_csparam.lsiter) {
 			printf ("Reached max line search, exiting... \n");
 			return;
 		}
-
-		if      (i > 2) t0 *= cgp.lsb;
-		else if (i < 1) t0 /= cgp.lsb;
-
+        
+		if      (i > 2) t0 *= m_csparam.lsb;
+		else if (i < 1) t0 /= m_csparam.lsb;
+        
 		// Update image
 		x  += dx * t;
-
+        
 		// CG computation
-		g1  =  df (x, data, cgp);
+		g1  =  df (x);
 		bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
 		g0  =  g1;
 		dx  = -g1 + dx * bk;
 		dxn =  norm(dx)/xn;
-
+        
 		printf ("dxnrm: %0.4f\n", dxn);
-		if (dxn < cgp.cgconv)
+		if (dxn < m_csparam.cgconv)
 			break;
-
+        
 	}
-
 
 }
 
@@ -377,9 +374,9 @@ codeare::error_code CompressedSensing::Process () {
 	float ma;
 	FT<cxfl>& ft = *m_csparam.ft;
 
-	Matrix<cxfl> data = (m_test_case) ?
+	data = (m_test_case) ?
 		ft * phantom<cxfl>(m_image_size[0], m_image_size[0], (m_dim == 3) ?
-				m_image_size[0] : 1) : Get<cxfl> ("data");
+                           m_image_size[0] : 1) : Get<cxfl> ("data");
 
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
@@ -405,12 +402,13 @@ codeare::error_code CompressedSensing::Process () {
 
 	im_dc /= ma;
 	data  /= ma;
+    m_ndnz = (float)nnz(data);
 	im_dc  = dwt * im_dc;
 
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
 	for (size_t i = 0; i < (size_t)m_csiter; i++) {
-		NLCG<cxfl> (im_dc, data, m_csparam);
+		NLCG (im_dc);
 		if (m_verbose)
 			vc.push_back(dwt ->* im_dc*ma);
 	}

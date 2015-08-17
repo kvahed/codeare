@@ -85,35 +85,35 @@ namespace RRStrategy {
         /**
          * @brief Default destructor
          */
-        virtual 
-        ~CompressedSensing ();
+        virtual ~CompressedSensing ();
         
         
         /**
          * @brief Do nothing 
          */
-        virtual codeare::error_code
-        Process ();
+        virtual codeare::error_code Process ();
         
         
         /**
          * @brief Do nothing 
          */
-        virtual codeare::error_code 
-        Init ();
+        virtual codeare::error_code Init ();
         
         /**
          * @brief Do nothing
          */
-        virtual codeare::error_code
-        Prepare ();
+        virtual codeare::error_code Prepare ();
         
         /**
          * @brief Do nothing 
          */
-        virtual codeare::error_code
-        Finalise ();
+        virtual codeare::error_code Finalise ();
         
+        template<class T> typename TypeTraits<T>::RT f (const Matrix<T>& x, const Matrix<T>& dx,
+                            const typename TypeTraits<T>::RT& t, typename TypeTraits<T>::RT& rmse);
+        template<class T> Matrix<T> df (const Matrix<T>& x);
+        template<class T> void Update (const Matrix<T>& dx);
+        template<class T> void NLCG (Matrix<T>& x);
         
         
     private:
@@ -123,6 +123,7 @@ namespace RRStrategy {
         int            m_csiter; /**< # global iterations */
         Vector<size_t> m_image_size;
         int            m_test_case;
+        float          m_ndnz;
 
         double m_noise;
 
@@ -132,6 +133,8 @@ namespace RRStrategy {
         int            m_verbose;
         
         int            m_ft_type;
+
+        Matrix<cxfl> data;
 
     };
     

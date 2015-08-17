@@ -20,32 +20,25 @@ public:
 	virtual ~NLCG() {};
     
 	inline Matrix<T> Minimize(/*const Operator<T>& A, */const MatrixType<T>& x, const MatrixType<T>& data) {
-/*
-        xn  = norm(x);
-        wx  = dwt->*x;
+/*        
+        typename TypeTraits<T>::RT t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
+        Matrix<T> dx, g0, g1;
         
-        g0  = A.df (x, wx, data, cgp);
+        g0  = df (x, data, cgp);
         dx  = -g0;
-        wdx = dwt->*dx;
         
         for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
+
+            Update(dx, cgp);
             
             t = t0;
             
-            ffdbx = ft * wx;
-            ffdbg = ft * wdx;
-            
-            if (cgp.tvw) {
-                ttdbx = tvt * wx;
-                ttdbg = tvt * wdx;
-            }
-            
-            f0 = A.f (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
+            f0 = f (x, dx, data, z, rmse, cgp);
             
             int i = 0;
             while (i < cgp.lsiter) {
                 t *= cgp.lsb;
-                f1 = A.f (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
+                f1 = f (x, dx, data, t, rmse, cgp);
                 if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
                     break;
                 ++i;
@@ -63,14 +56,12 @@ public:
             
             // Update image
             x  += dx * t;
-            wx  = dwt->*x;
             
             // CG computation
-            g1  =  df (x, wx, data, cgp);
+            g1  =  df (x, data, cgp);
             bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
             g0  =  g1;
             dx  = -g1 + dx * bk;
-            wdx =  dwt->*dx;
             dxn =  norm(dx)/xn;
             
             printf ("dxnrm: %0.4f\n", dxn);
@@ -78,9 +69,7 @@ public:
                 break;
             
         }
-*/
-
-        
+*/        
     }
         
 private:
