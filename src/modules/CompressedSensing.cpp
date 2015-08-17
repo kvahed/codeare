@@ -29,37 +29,32 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 
 using namespace RRStrategy;
 
-inline static float
-Obj (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg,
-	 const Matrix<cxfl>&  data, const float             t) {
+template<class T> inline static typename TypeTraits<T>::RT Obj (
+    const Matrix<T>& ffdbx, const Matrix<T>& ffdbg, const Matrix<T>&
+    data, const typename TypeTraits<T>::RT t) {
 
-	Matrix<cxfl> om = ffdbx;
-
+	Matrix<T> om = ffdbx;
 	if (t > 0.0)
 		om += t * ffdbg;
 	om -= data;
-
 	return real(om.dotc(om));
 
 }
 
 
-inline static float
-ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg,
-	   const float             t, const CSParam&        cgp) {
+template<class T> inline static typename TypeTraits<T>::RT TV (
+    const Matrix<T>& ttdbx, const Matrix<T>& ttdbg, const typename TypeTraits<T>::RT t,
+    const CSParam& cgp) {
 
-	float o = 0.0, p = 0.5*cgp.pnorm;
-	Matrix<cxfl> om = ttdbx;
-
+	typename TypeTraits<T>::RT o = 0.0, p = 0.5*cgp.pnorm;
+	Matrix<T> om = ttdbx;
 	if (t > 0.0)
 		om += t * ttdbg;
 	om *= conj(om);
 	om += cgp.l1;
 	om ^= p;
-
 	for (size_t i = 0; i < om.Size(); i++)
 		o += real(om[i]);
-
 	return cgp.tvw * o;
 
 }
@@ -68,43 +63,35 @@ ObjTV (const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg,
 /**
  *
  */
-inline static float
-ObjXFM (const Matrix<cxfl>& x, const Matrix<cxfl>& g,
-		const float         t, const CSParam&    cgp) {
-
-	float o = 0.0, p = 0.5*cgp.pnorm;
-	Matrix<cxfl> om = x;
-
+template<class T> inline static typename TypeTraits<T>::RT XFM (
+    const Matrix<T>& x, const Matrix<T>& g, const typename TypeTraits<T>::RT t,
+    const CSParam& cgp) {
+    
+	typename TypeTraits<T>::RT o = 0.0, p = 0.5*cgp.pnorm;
+	Matrix<T> om = x;
 	if (t > 0.0)
 		om += t * g;
 	om *= conj(om);
 	om += cgp.l1;
 	om ^= p;
-
 	for (size_t i = 0; i < om.Size(); i++)
 		o += om[i].real();
-
 	return cgp.xfmw * o;
 
 }
 
 
-static float
-Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg,
-		   const Matrix<cxfl>& ttdbx, const Matrix<cxfl>& ttdbg,
-		   const Matrix<cxfl>&     x, const Matrix<cxfl>&     g,
-		   const Matrix<cxfl>&  data, const float             t,
-				 float&         rmse, const CSParam&        cgp) {
-
-	float obj = Obj (ffdbx, ffdbg, data, t);
-
-	rmse = sqrt(obj/(float)nnz(data));
-
+template<class T> inline static typename TypeTraits<T>::RT f (
+    const Matrix<T>& ffdbx, const Matrix<T>& ffdbg, const Matrix<T>& ttdbx, const Matrix<T>& ttdbg,
+    const Matrix<T>& x, const Matrix<T>& g, const Matrix<T>& data, const typename TypeTraits<T>::RT t,
+    typename TypeTraits<T>::RT& rmse, const CSParam& cgp) {
+    
+	typename TypeTraits<T>::RT obj = Obj (ffdbx, ffdbg, data, t);
+	rmse = sqrt(obj/(typename TypeTraits<T>::RT)nnz(data));
 	if (cgp.tvw)
-		obj += ObjTV (ttdbx, ttdbg, t, cgp);
+		obj += TV (ttdbx, ttdbg, t, cgp);
 	if (cgp.xfmw)
-		obj += ObjXFM (x, g, t, cgp);
-
+		obj += XFM (x, g, t, cgp);
 	return obj;
 
 }
@@ -113,13 +100,11 @@ Objective (const Matrix<cxfl>& ffdbx, const Matrix<cxfl>& ffdbg,
 /**
  * @brief Compute gradient of the data consistency
  */
-static Matrix<cxfl>
-GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx,
-		 const Matrix<cxfl>& data, const CSParam& cgp) {
-
-	FT<cxfl>& ft = *(cgp.ft);
-	DWT<cxfl>& dwt = *(cgp.dwt);
-
+template<class T> inline static Matrix<T> dObj (
+    const Matrix<T>& x, const Matrix<T>& wx, const Matrix<T>& data, const CSParam& cgp) {
+    
+	FT<T>& ft = *(cgp.ft);
+	DWT<T>& dwt = *(cgp.dwt);
 	return (2.0 * (dwt * (ft ->* ((ft * wx) - data))));
 
 }
@@ -132,10 +117,10 @@ GradObj (const Matrix<cxfl>& x, const Matrix<cxfl>& wx,
  * @param  cgp CG parameters
  * @return     The gradient
  */
-template <class T> inline static Matrix<T>
-GradXFM   (const Matrix<T>& x, const CSParam& cgp) {
-
-	float pn = 0.5*cgp.pnorm-1.0, l1 = cgp.l1, xfm = cgp.xfmw;
+template <class T> inline static Matrix<T> dXFM (
+    const Matrix<T>& x, const CSParam& cgp) {
+    
+	typename TypeTraits<T>::RT pn = 0.5*cgp.pnorm-1.0, l1 = cgp.l1, xfm = cgp.xfmw;
 	return xfm * (x * ((x * conj(x) + l1) ^ pn));
 
 }
@@ -148,15 +133,13 @@ GradXFM   (const Matrix<T>& x, const CSParam& cgp) {
  * @param  wx  Image space perturbance
  * @param  cgp Parameters
  */
-Matrix<cxfl>
-GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {
+template<class T> inline static Matrix<T> dTV (
+    const Matrix<T>& x, const Matrix<T>& wx, const CSParam& cgp) {
 
-	DWT<cxfl>& dwt = *cgp.dwt;
-	TVOP<cxfl>& tvt = *cgp.tvt;
-	float p   = 0.5*cgp.pnorm-1.0;
-	Matrix<cxfl> dx, g;
-
-
+	DWT<T>& dwt = *cgp.dwt;
+	TVOP<T>& tvt = *cgp.tvt;
+	typename TypeTraits<T>::RT p   = 0.5*cgp.pnorm-1.0;
+	Matrix<T> dx, g;
 	dx = tvt * wx;
 	g  = dx * conj(dx);
 	g += cgp.l1;
@@ -164,41 +147,36 @@ GradTV    (const Matrix<cxfl>& x, const Matrix<cxfl>& wx, const CSParam& cgp) {
 	g *= dx;
 	g *= cgp.pnorm;
 	g  = dwt * (tvt->*g);
-
 	return (cgp.tvw * g);
 
 }
 
 
-Matrix<cxfl> Gradient (const Matrix<cxfl>& x, const Matrix<cxfl>& wx,
-		const Matrix<cxfl>& data, const CSParam& cgp) {
+template<class T> inline static Matrix<T> df (
+    const Matrix<T>& x/*, const Matrix<T>& wx*/, const Matrix<T>& data, const CSParam& cgp) {
 
-	Matrix<cxfl> g = GradObj (x, wx, data, cgp);
-
+	DWT<T>& dwt = *cgp.dwt;
+    Matrix<T> wx = dwt->*x;
+	Matrix<T> g = dObj (x, wx, data, cgp);
 	if (cgp.xfmw)
-		g += GradXFM (x, cgp);
+		g += dXFM (x, cgp);
 	if (cgp.tvw)
-		g += GradTV  (x, wx, cgp);
+		g += dTV  (x, wx, cgp);
 	return g;
 
 }
 
 
-void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
+template<class T> inline void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
 
-
-	float     t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
-
+	typename TypeTraits<T>::RT t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
 	Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
+	DWT<cxfl>&  dwt = *cgp.dwt;
+	FT<cxfl>&   ft  = *cgp.ft;
+	TVOP<cxfl>& tvt = *cgp.tvt;
 
-	DWT<cxfl>& dwt = *cgp.dwt;
-	FT<cxfl>&  ft  = *cgp.ft;
-	TVOP<cxfl>&      tvt = *cgp.tvt;
-
-	wx  = dwt->*x;
-
-	g0 = Gradient (x, wx, data, cgp);
-	dx = -g0;
+	g0  = df (x/*, wx*/, data, cgp);
+	dx  = -g0;
 	wdx = dwt->*dx;
 
 	for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
@@ -213,13 +191,12 @@ void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
 			ttdbg = tvt * wdx;
 		}
 
-		f0 = Objective (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
+		f0 = f (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
 
 		int i = 0;
 		while (i < cgp.lsiter) {
-
 			t *= cgp.lsb;
-			f1 = Objective(ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
+			f1 = f (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
 			if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
 				break;
 			++i;
@@ -236,11 +213,10 @@ void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
 		else if (i < 1) t0 /= cgp.lsb;
 
 		// Update image
-		x  += (dx * t);
-		wx  = dwt->*x;
+		x  += dx * t;
 
 		// CG computation
-		g1  =  Gradient (x, wx, data, cgp);
+		g1  =  df (x/*, wx*/, data, cgp);
 		bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
 		g0  =  g1;
 		dx  = -g1 + dx * bk;
@@ -431,7 +407,7 @@ codeare::error_code CompressedSensing::Process () {
 	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
 
 	for (size_t i = 0; i < (size_t)m_csiter; i++) {
-		NLCG (im_dc, data, m_csparam);
+		NLCG<cxfl> (im_dc, data, m_csparam);
 		if (m_verbose)
 			vc.push_back(dwt ->* im_dc*ma);
 	}
