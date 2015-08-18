@@ -9,7 +9,9 @@
 #define _NON_LINEAR_
 
 #include "Matrix.hpp"
-#include "Optimisable.hpp"
+#include "Operator.hpp"
+#include "Params.hpp"
+#include "Lapack.hpp"
 
 namespace codeare {
     namespace optimisation {
@@ -18,8 +20,9 @@ namespace codeare {
         class NonLinear {
             
         public:
-            NonLinear (const size_t& iterations) : _iterations(iterations) {}
+            NonLinear (const Params& p) {}
             virtual ~NonLinear () {}
+            virtual void Minimise (Operator<T>& A, Matrix<T>& x) {}
         protected:
             size_t _iterations;
             

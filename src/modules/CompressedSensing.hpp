@@ -32,11 +32,6 @@
 #include "CX.hpp"
 #include "linalg/Lapack.hpp"
 
-#ifdef _MSC_VER
-std::string ofstr = "    %02Iu - nrms: %1.7f, l-search: %d, ";
-#else
-std::string ofstr = "    %02zu - nrms: %1.7f, l-search: %d, ";
-#endif
 //#include <pthread.h>
 /**
  * @brief Reconstruction startegies
@@ -60,7 +55,6 @@ namespace RRStrategy {
         double l1;
         double lsa;
         double lsb;
-
         DWT<cxfl>* dwt;
         FT<cxfl>*  ft;
         TVOP<cxfl>* tvt;
@@ -109,7 +103,7 @@ namespace RRStrategy {
          */
         virtual codeare::error_code Finalise ();
         
-        template<class T> typename TypeTraits<T>::RT f (const Matrix<T>& x, const Matrix<T>& dx,
+        template<class T> typename TypeTraits<T>::RT obj (const Matrix<T>& x, const Matrix<T>& dx,
                             const typename TypeTraits<T>::RT& t, typename TypeTraits<T>::RT& rmse);
         template<class T> Matrix<T> df (const Matrix<T>& x);
         template<class T> void Update (const Matrix<T>& dx);

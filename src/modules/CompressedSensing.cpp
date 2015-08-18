@@ -23,9 +23,9 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 #ifdef HAVE_NFFT3
 	#include "NCSENSE.hpp"
 #endif
+#include "CS_XSENSE.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
-
 
 using namespace RRStrategy;
 
@@ -42,7 +42,6 @@ template<class T> inline static typename TypeTraits<T>::RT Obj (
 	return real(om.dotc(om));
 
 }
-
 
 template<class T> inline static typename TypeTraits<T>::RT TV (
     const Matrix<T>& ttdbx, const Matrix<T>& ttdbg, const typename TypeTraits<T>::RT t,
@@ -83,7 +82,7 @@ template<class T> inline static typename TypeTraits<T>::RT XFM (
 }
 
 
-template<class T> inline typename TypeTraits<T>::RT CompressedSensing::f (
+template<class T> inline typename TypeTraits<T>::RT CompressedSensing::obj (
     const Matrix<T>& x, const Matrix<T>& dx, const typename TypeTraits<T>::RT& t,
     typename TypeTraits<T>::RT& rmse) {
     
@@ -193,12 +192,12 @@ template<class T> inline void CompressedSensing::NLCG (Matrix<T>& x) {
         
 		t = t0;
         
-		f0 = f (x, dx, z, rmse);
+		f0 = obj (x, dx, z, rmse);
         
 		int i = 0;
 		while (i < m_csparam.lsiter) {
 			t *= m_csparam.lsb;
-			f1 = f (x, dx, t, rmse);
+			f1 = obj (x, dx, t, rmse);
 			if (f1 <= f0 - (m_csparam.lsa * t * abs(g0.dotc(dx))))
 				break;
 			++i;
@@ -319,6 +318,10 @@ codeare::error_code CompressedSensing::Init () {
 			break;
 		}
 	printf ("\n");
+
+    
+    //ft_params["ft"] = 0;
+    //CS_XSENSE<cxfl> c = CS_XSENSE<cxfl>(ft_params);
 
 	Attribute ("csiter",    &m_csiter);
 	Attribute ("wl_family", &m_wf);

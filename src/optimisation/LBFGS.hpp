@@ -17,7 +17,7 @@ template<class T>
 class LBFGS : public NonLinear<T> {
 
 public:
-	LBFGS (const size_t& iterations) : NonLinear<T>::NonLinear(iterations)  {};
+	LBFGS (const Params& p) : NonLinear<T>::NonLinear(p)  {};
 	virtual ~LBFGS() {};
 private:
 
@@ -26,3 +26,4 @@ private:
     }}
 
 #endif // _LBFGS_HPP_
+

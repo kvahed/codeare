@@ -42,8 +42,7 @@
  *        According Pruessmann et al. (2001). MRM, 46(4), 638-51.
  *
  */
-template <class T>
-class NCSENSE : public FT<T>{
+template <class T> class NCSENSE : public FT<T>{
 
 	// TODO: Check if k-space and weights have been assigned
 
