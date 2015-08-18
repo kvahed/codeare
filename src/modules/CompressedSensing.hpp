@@ -27,6 +27,7 @@
 #include "ReconStrategy.hpp"
 #include "Algos.hpp"
 #include "DFT.hpp"
+#include "CS_XSENSE.hpp"
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
@@ -103,12 +104,6 @@ namespace RRStrategy {
          */
         virtual codeare::error_code Finalise ();
         
-        template<class T> typename TypeTraits<T>::RT obj (const Matrix<T>& x, const Matrix<T>& dx,
-                            const typename TypeTraits<T>::RT& t, typename TypeTraits<T>::RT& rmse);
-        template<class T> Matrix<T> df (const Matrix<T>& x);
-        template<class T> void Update (const Matrix<T>& dx);
-        template<class T> void NLCG (Matrix<T>& x);
-        
         
     private:
         
@@ -129,6 +124,8 @@ namespace RRStrategy {
         int            m_ft_type;
 
         Matrix<cxfl> data;
+
+        CS_XSENSE<cxfl>* csx;
 
     };
     

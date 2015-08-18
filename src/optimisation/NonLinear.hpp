@@ -20,9 +20,11 @@ namespace codeare {
         class NonLinear {
             
         public:
-            NonLinear (const Params& p) {}
+            NonLinear () {}
+            NonLinear (const Params& params) {}
+            NonLinear (const NonLinear& tocopy) {}
             virtual ~NonLinear () {}
-            virtual void Minimise (Operator<T>& A, Matrix<T>& x) {}
+            inline virtual void Minimise (Operator<T>* A, Matrix<T>& x) {}
         protected:
             size_t _iterations;
             

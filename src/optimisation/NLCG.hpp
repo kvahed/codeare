@@ -24,9 +24,9 @@ template<class T> inline T try_to_fetch (const Params& p, const std::string& key
 
 
 #ifdef _MSC_VER
-std::string ofstr = "    %02Iu - nrms: %1.7f, l-search: %d, ";
+std::string ofstr = "    %02Iu - nrms: %1.4e, l-search: %d, ";
 #else
-std::string ofstr = "    %02zu - nrms: %1.7f, l-search: %d, ";
+std::string ofstr = "    %02zu - nrms: %1.4e, l-search: %d, ";
 #endif
 
 namespace codeare {
@@ -37,35 +37,37 @@ template<class T> class NLCG : public NonLinear<T> {
 public:
     
     NLCG (const Params& p) : NonLinear<T>::NonLinear (p) {
-        _csiter = try_to_fetch<int> (p, "csiter", 0);
-        _wf = try_to_fetch<int> (p, "wl_family", 0.);
-        _wm = try_to_fetch<int> (p, "wl_member", 0.);
         _cgiter = try_to_fetch<int> (p, "cgiter", 0);
+        _cgconv = try_to_fetch<float> (p, "cgconv", 0);
         _lsiter = try_to_fetch<int> (p, "lsiter", 0);
-        _lsa = try_to_fetch<int> (p, "lsa", 0);
-        _lsb = try_to_fetch<int> (p, "lsb", 0);
+        _lsa = try_to_fetch<float> (p, "lsa", 0);
+        _lsb = try_to_fetch<float> (p, "lsb", 0);
+        printf ("  Iterations: CG(%i) LS(%i)\n", _cgiter, _lsiter);
+        printf ("  Conv: CG(%.2e)\n", _cgconv);
+        printf ("  LS brackets: lsa(%.2e) lsb(%.2e)", _lsa, _lsb);
+        
     }
     
 	virtual ~NLCG() {};
     
-	inline void Minimise(Operator<T>& A, Matrix<T>& x) {
+    inline virtual void Minimise (Operator<T>* A, Matrix<T>& x) {
 
         typename TypeTraits<T>::RT t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
     
-        _g0  = A.df (x);
+        _g0  = A->df (x);
         _dx  = -_g0;
     
         for (size_t k = 0; k < (size_t)_cgiter; k++) {
         
-            A.Update(_dx);
+            A->Update(_dx);
             t = t0;
         
-            f0 = A.obj (x, _dx, z, rmse);
+            f0 = A->obj (x, _dx, z, rmse);
         
             int i = 0;
             while (i < _lsiter) {
                 t *= _lsb;
-                f1 = A.obj (x, _dx, t, rmse);
+                f1 = A->obj (x, _dx, t, rmse);
                 if (f1 <= f0 - (_lsa * t * abs(_g0.dotc(_dx))))
                     break;
                 ++i;
@@ -85,7 +87,7 @@ public:
             x  += _dx * t;
         
             // CG computation
-            _g1 =  A.df (x);
+            _g1 =  A->df (x);
             bk  =  real(_g1.dotc(_g1)) / real(_g0.dotc(_g0));
             _g0 =  _g1;
             _dx = -_g1 + _dx * bk;
@@ -102,8 +104,8 @@ public:
 private:    
 
     Matrix<T> _dx, _g0, _g1;
-    typename TypeTraits<T>::RT _tvw, _xfmw, _l1, _pnorm, _cgconv, _lsa, _lsb, _wf, _wm;
-    int _verbose, _lsiter, _lsto, _cgiter, _csiter;
+    typename TypeTraits<T>::RT _cgconv, _lsa, _lsb;
+    int _lsiter, _cgiter;
     
 
 };
