@@ -58,14 +58,14 @@ enum wlfamily {
 
 # include "Matrix.hpp"
 # include "Wavelet.hpp"
-
+# include "Operator.hpp"
 
 
 /**
  * @brief   Discrete wavelet transform (periodic boundaries) for 2d and 3D case for Matrix template.
  */
 template<class T>
-class DWT {
+class DWT : public Operator<T> {
 
 
         /**
@@ -266,6 +266,12 @@ class DWT {
 
         }
 
+
+    inline virtual std::ostream& Print (std::ostream& os) const {
+        Operator<T>::Print(os);
+        return os;
+    }
+    
 
     private:
 

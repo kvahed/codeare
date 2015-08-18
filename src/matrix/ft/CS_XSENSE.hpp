@@ -51,10 +51,10 @@ public:
 
     typedef typename TypeTraits<T>::RT RT;
 
-    CS_XSENSE () : _ft(0), dwt(0), nlopt(0), tvt(0) {/*TODO: Default constructor*/}
+    CS_XSENSE () : ft(0), dwt(0), nlopt(0), tvt(0) {/*TODO: Default constructor*/}
     virtual ~CS_XSENSE () {
-        if (_ft)
-            delete _ft;
+        if (ft)
+            delete ft;
         if (nlopt)
             delete nlopt;
         if (dwt)
@@ -63,9 +63,9 @@ public:
             delete tvt;
     }
 
-    CS_XSENSE (const Params& p) : _ft(0), dwt(0), nlopt(0), tvt(0) {
+    CS_XSENSE (const Params& p) : ft(0), dwt(0), nlopt(0), tvt(0) {
         
-        printf ("Intialising CompressedSensing ...\n");
+        printf ("Intialising CS_XSENSE ...\n");
         std::string key;
 
         _tvw = try_to_fetch<float> (p, "tvw", 0.);
@@ -79,31 +79,28 @@ public:
         _verbose = try_to_fetch<int> (p, "verbose", 0.);
         _nlopt_type = try_to_fetch<int> (p, "nlopt", 0.);
 
-        printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", _tvw, _xfmw, _l1);
-        printf ("  Pnorm: %.2e\n", _pnorm);
-
         _ft_type = try_to_fetch<int> (p, "ft", 4);
 
         switch (_ft_type)
         {
 		case 0: // Regular cartesian 
-			_ft = (FT<T>*) new DFT<T> (p);
+			ft = (FT<T>*) new DFT<T> (p);
 			break;
         case 1: // Cartesian SENSE
-			_ft = (FT<T>*) new CSENSE<T> (p);
+			ft = (FT<T>*) new CSENSE<T> (p);
             break;
         case 2: // Regualar non-Cartesian 
-			_ft = (FT<T>*) new NFFT<T> (p);
+			ft = (FT<T>*) new NFFT<T> (p);
             break;
         case 3: // Regualar non-Cartesian 
-			_ft = (FT<T>*) new CS_XSENSE<T> (p);
+			ft = (FT<T>*) new NCSENSE<T> (p);
             break;
 		default:
+            printf ("**ERROR - CS_XSENSE: Invalid or unspecified FT operator\n");
 			throw UNDEFINED_FT_OPERATOR;
 			break;
         }
 
-        _nlopt_type = 0;
         switch (_nlopt_type)
         {
         case 0: // NLCG (demo only very slow)
@@ -116,6 +113,7 @@ public:
             nlopt = (NonLinear<T>*) new SplitBregman<T> (p);
             break;
         default:
+            printf ("**ERROR - CS_XSENSE: Invalid or unspecified optimisation algorithm\n");
             throw UNDEFINED_OPTIMISATION_ALGORITHM;
             break;
         }
@@ -141,7 +139,7 @@ public:
 
     inline CS_XSENSE& operator= (const CS_XSENSE& rhs) {
         /*
-        FT<T>* _ft;
+        FT<T>* ft;
         DWT<T>* dwt;
         TVOP<T>* tvt;
         NonLinear<T>* nlopt;
@@ -163,7 +161,7 @@ public:
 	 */
     
 	inline void KSpace (const Matrix<RT>& k) NOEXCEPT {
-        _ft->KSpace(k);
+        ft->KSpace(k);
 	}
 	
     
@@ -173,7 +171,7 @@ public:
 	 * @param  w   Weights
 	 */
 	inline void Weights (const Matrix<RT>& w) NOEXCEPT {
-        _ft->Weights(w);
+        ft->Weights(w);
 	}
 
     /**
@@ -181,7 +179,7 @@ public:
 	 * @param   mask  k-space mask
 	 */
 	inline void Mask (const Matrix<RT>& mask) NOEXCEPT {
-        _ft->Mask(mask);
+        ft->Mask(mask);
 	}
     
 
@@ -208,8 +206,8 @@ public:
     
     inline virtual void Update (const Matrix<T>& dx) {
         wdx =  *dwt->*dx;
-        ffdbx = *_ft * wx;
-        ffdbg = *_ft * wdx;
+        ffdbx = *ft * wx;
+        ffdbg = *ft * wdx;
         if (_tvw) {
             ttdbx = *tvt * wx;
             ttdbg = *tvt * wdx;
@@ -218,7 +216,11 @@ public:
 
 	virtual std::ostream& Print (std::ostream& os) const {
 		FT<T>::Print(os);
-        os << *_ft;
+        os << "    Weights: TV("<< _tvw <<") XF("<< _xfmw <<") L1("<<_l1<<")"<<std::endl;
+        os << "    Pnorm: "<<_pnorm<< std::endl;
+        os << *ft << std::endl;
+        os << *dwt << std::endl;
+        os << *nlopt ;
 		return os;
 	}
 
@@ -228,7 +230,7 @@ public:
     }
 
     inline virtual Matrix<T> Trafo (const Matrix<T>& m) const {
-        return *_ft * m;
+        return *ft * m;
     }
 
     inline virtual Matrix<T> operator->* (const Matrix<T>& k_space)  {
@@ -246,7 +248,7 @@ public:
         im_dc  = data;
         if (_ft_type != 2 && _ft_type != 3)
             im_dc /= pdf;
-        im_dc  = *_ft ->* im_dc;
+        im_dc  = *ft ->* im_dc;
         ma     = max(abs(im_dc));
 
         if (_verbose)
@@ -320,7 +322,7 @@ private:
      * @brief Compute gradient of the data consistency
      */
     inline Matrix<T> dObj (const Matrix<T>& x) {
-        return 2.0 * (*dwt * (*_ft ->* ((*_ft * wx) - data)));
+        return 2.0 * (*dwt * (*ft ->* ((*ft * wx) - data)));
     }
     
     
@@ -357,7 +359,7 @@ private:
     
 
     Params p;
-    FT<T>* _ft;
+    FT<T>* ft;
     DWT<T>* dwt;
     TVOP<T>* tvt;
     NonLinear<T>* nlopt;

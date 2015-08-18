@@ -121,11 +121,13 @@ codeare::error_code CompressedSensing::Init () {
     ft_params["wl_family"] = RHSAttribute<int>("wl_family");    
     ft_params["wl_member"] = RHSAttribute<int>("wl_member");
     ft_params["csiter"] = RHSAttribute<int>("csiter");
-    ft_params["cgiter"] = RHSAttribute<int>("cgiter");
+    ft_params["nliter"] = RHSAttribute<int>("cgiter");
     ft_params["cgconv"] = RHSAttribute<float>("cgconv");
     ft_params["lsiter"] = RHSAttribute<int>("lsiter");
     ft_params["ft"] = RHSAttribute<int>("ft");
     csx = new CS_XSENSE<cxfl>(ft_params);
+	std::cout << *csx << std::endl;
+
 
 	m_initialised = true;
 	printf ("... done.\n\n");
@@ -147,8 +149,6 @@ codeare::error_code CompressedSensing::Prepare () {
 	} else {
 		ft.Mask (Get<float>("mask"));
 	}
-
-	std::cout << *csx << std::endl;
 
 	Free ("weights");
 	Free ("kspace");

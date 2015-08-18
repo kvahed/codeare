@@ -37,15 +37,11 @@ template<class T> class NLCG : public NonLinear<T> {
 public:
     
     NLCG (const Params& p) : NonLinear<T>::NonLinear (p) {
-        _cgiter = try_to_fetch<int> (p, "cgiter", 0);
+        _nliter = try_to_fetch<int> (p, "nliter", 0);
         _cgconv = try_to_fetch<float> (p, "cgconv", 0);
         _lsiter = try_to_fetch<int> (p, "lsiter", 0);
         _lsa = try_to_fetch<float> (p, "lsa", 0);
         _lsb = try_to_fetch<float> (p, "lsb", 0);
-        printf ("  Iterations: CG(%i) LS(%i)\n", _cgiter, _lsiter);
-        printf ("  Conv: CG(%.2e)\n", _cgconv);
-        printf ("  LS brackets: lsa(%.2e) lsb(%.2e)", _lsa, _lsb);
-        
     }
     
 	virtual ~NLCG() {};
@@ -57,7 +53,7 @@ public:
         _g0  = A->df (x);
         _dx  = -_g0;
     
-        for (size_t k = 0; k < (size_t)_cgiter; k++) {
+        for (size_t k = 0; k < (size_t)_nliter; k++) {
         
             A->Update(_dx);
             t = t0;
@@ -100,12 +96,20 @@ public:
         }
 
     }
-        
+
+
+    virtual std::ostream& Print (std::ostream& os) const {
+		NonLinear<T>::Print(os);
+        os << "    Iterations: NLCG(" << _nliter << ") LS(" << _lsiter << ")" << std::endl;
+        os << "    Conv: CG(" << _cgconv << ")" << std::endl;
+        os << "    LS brackets: lsa(" << _lsa << ") lsb(" << _lsb << ")";
+    }
+    
 private:    
 
     Matrix<T> _dx, _g0, _g1;
     typename TypeTraits<T>::RT _cgconv, _lsa, _lsb;
-    int _lsiter, _cgiter;
+    int _lsiter, _nliter;
     
 
 };

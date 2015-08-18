@@ -314,7 +314,7 @@ public:
 	}
 
 	virtual std::ostream& Print (std::ostream& os) const {
-		FT<T>::Print(os);
+		Operator<T>::Print(os);
 		os << "    NCCG: eps("<< m_cgeps << ") iter(" << m_cgiter <<
 				") lambda(" << m_lambda << ")" << std::endl;
 		os << "    threads(" << m_np << ") channels(" << m_nx[1] << ")" << std::endl;

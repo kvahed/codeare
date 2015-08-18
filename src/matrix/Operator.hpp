@@ -9,6 +9,7 @@
 #define SRC_MATRIX_OPERATOR_HPP_
 
 #include "Matrix.hpp"
+#include "Demangle.hpp"
 
 template<class T> class Operator {
 public:
@@ -21,7 +22,13 @@ public:
     virtual RT obj ( const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) {return 0.;}
     virtual Matrix<T> df (const Matrix<T>& x) {return Matrix<T>();}
     virtual void Update (const Matrix<T>& dx) {}
-
+    virtual std::ostream& Print (std::ostream& os) const {
+    	os << "  " << demangle(typeid(*this).name()).c_str() <<  std::endl;
+		return os;
+	};
+    friend std::ostream& operator<< (std::ostream& os, const Operator<T>& oper) {
+    	return oper.Print(os);
+    }
 };
 
 
