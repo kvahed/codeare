@@ -103,6 +103,7 @@ public:
         os << "    Iterations: NLCG(" << _nliter << ") LS(" << _lsiter << ")" << std::endl;
         os << "    Conv: CG(" << _cgconv << ")" << std::endl;
         os << "    LS brackets: lsa(" << _lsa << ") lsb(" << _lsb << ")";
+		return os;
     }
     
 private:    
