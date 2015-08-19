@@ -244,10 +244,10 @@ public:
         RT ma;
         Matrix<T> im_dc;
         std::vector< Matrix<T> > vc;
-	
+        
         im_dc  = data;
         if (_ft_type != 2 && _ft_type != 3)
-            im_dc /= pdf;
+            im_dc /= wspace.Get<RT>("pdf");
         im_dc  = *ft ->* im_dc;
         ma     = max(abs(im_dc));
 
@@ -367,7 +367,7 @@ private:
     RT _tvw, _xfmw, _l1, _pnorm;
     mutable RT _ndnz;
     int _verbose, _ft_type, _csiter, _wf, _wm, _nlopt_type, _dim;
-    Matrix<T> ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx, om, pdf;
+    Matrix<T> ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx, om;
     mutable Matrix<T> data;
 
     
