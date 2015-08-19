@@ -109,6 +109,7 @@ codeare::error_code CompressedSensing::Init () {
 		}
 	printf ("\n");
 
+    ft_params["imsz"]  = m_image_size;
     ft_params["nlopt"] = RHSAttribute<int>("nlopt");
     ft_params["tvw"] = RHSAttribute<float>("tvw");
     ft_params["xfmw"] = RHSAttribute<float>("xfmw");

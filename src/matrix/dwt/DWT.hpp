@@ -267,10 +267,12 @@ class DWT : public Operator<T> {
         }
 
 
-    inline virtual std::ostream& Print (std::ostream& os) const {
-        Operator<T>::Print(os);
-        return os;
-    }
+        inline virtual std::ostream& Print (std::ostream& os) const {
+            Operator<T>::Print(os);
+            os << "    dims(" << _sl1 << "," << _sl2 << "," << _sl3 << ")" <<
+                " WL(" << _wl_fam << "," << _fl << ") threads(" << _num_threads << ")";
+            return os;
+        }
     
 
     private:

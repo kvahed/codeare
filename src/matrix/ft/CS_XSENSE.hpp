@@ -72,7 +72,7 @@ public:
         _xfmw = try_to_fetch<float> (p, "xfmw", 0.);
         _l1 = try_to_fetch<float> (p, "l1", 0.);
         _pnorm = try_to_fetch<float> (p, "pnorm", 0.);
-        _image_size = try_to_fetch<Vector<size_t> > (p, "image_size", _image_size);
+        _image_size = try_to_fetch<Vector<size_t> > (p, "imsz", _image_size);
         _dim = _image_size.size();
         Vector<size_t> dims = try_to_fetch<Vector<size_t> > (p, "dims", _image_size);
         
@@ -125,7 +125,7 @@ public:
         if (_wf < -1 || _wf > 5)
             _wf = -1;
 
-        dwt = new DWT <T> (256, (wlfamily)_wf, _wm);
+        dwt = new DWT<T> (dims[0], (wlfamily)_wf, _wm);
         
         printf ("... done.\n\n");
 
