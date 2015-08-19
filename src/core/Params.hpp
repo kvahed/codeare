@@ -160,6 +160,8 @@ inline static float fp_cast (const boost::any& b) {
     return ret;
 }
 
+enum PARAMETER_MAP_EXCEPTION {KEY_NOT_FOUND};
+
 /**
  * @brief  General parameter container
  */
@@ -205,7 +207,8 @@ public:
 		if (pi != pl.end())
 			return pi->second;
 		else
-			printf ("**WARNING**: operator[] failed for key %s\n", key.c_str());
+			throw KEY_NOT_FOUND;
+                //printf ("**WARNING**: operator[] failed for key %s\n", key.c_str());
 		return key;
 	}
 

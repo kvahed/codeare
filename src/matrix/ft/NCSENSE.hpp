@@ -42,8 +42,7 @@
  *        According Pruessmann et al. (2001). MRM, 46(4), 638-51.
  *
  */
-template <class T>
-class NCSENSE : public FT<T>{
+template <class T> class NCSENSE : public FT<T>{
 
 	// TODO: Check if k-space and weights have been assigned
 
@@ -315,7 +314,7 @@ public:
 	}
 
 	virtual std::ostream& Print (std::ostream& os) const {
-		FT<T>::Print(os);
+		Operator<T>::Print(os);
 		os << "    NCCG: eps("<< m_cgeps << ") iter(" << m_cgiter <<
 				") lambda(" << m_lambda << ")" << std::endl;
 		os << "    threads(" << m_np << ") channels(" << m_nx[1] << ")" << std::endl;

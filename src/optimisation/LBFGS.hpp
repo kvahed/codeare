@@ -17,8 +17,12 @@ template<class T>
 class LBFGS : public NonLinear<T> {
 
 public:
-	LBFGS (const size_t& iterations) : NonLinear<T>::NonLinear(iterations)  {};
+    LBFGS () {};
+	LBFGS (const Params& p) : NonLinear<T>::NonLinear(p)  {};
+    LBFGS (const LBFGS& tocopy) {};
+    inline virtual void Minimise (Operator<T>* A, Matrix<T>& x) {}
 	virtual ~LBFGS() {};
+    
 private:
 
 };
@@ -26,3 +30,4 @@ private:
     }}
 
 #endif // _LBFGS_HPP_
+

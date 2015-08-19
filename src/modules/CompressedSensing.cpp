@@ -23,215 +23,11 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 #ifdef HAVE_NFFT3
 	#include "NCSENSE.hpp"
 #endif
+#include "CS_XSENSE.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
 
-
 using namespace RRStrategy;
-
-template<class T> inline static typename TypeTraits<T>::RT Obj (
-    const Matrix<T>& ffdbx, const Matrix<T>& ffdbg, const Matrix<T>&
-    data, const typename TypeTraits<T>::RT t) {
-
-	Matrix<T> om = ffdbx;
-	if (t > 0.0)
-		om += t * ffdbg;
-	om -= data;
-	return real(om.dotc(om));
-
-}
-
-
-template<class T> inline static typename TypeTraits<T>::RT TV (
-    const Matrix<T>& ttdbx, const Matrix<T>& ttdbg, const typename TypeTraits<T>::RT t,
-    const CSParam& cgp) {
-
-	typename TypeTraits<T>::RT o = 0.0, p = 0.5*cgp.pnorm;
-	Matrix<T> om = ttdbx;
-	if (t > 0.0)
-		om += t * ttdbg;
-	om *= conj(om);
-	om += cgp.l1;
-	om ^= p;
-	for (size_t i = 0; i < om.Size(); i++)
-		o += real(om[i]);
-	return cgp.tvw * o;
-
-}
-
-
-/**
- *
- */
-template<class T> inline static typename TypeTraits<T>::RT XFM (
-    const Matrix<T>& x, const Matrix<T>& g, const typename TypeTraits<T>::RT t,
-    const CSParam& cgp) {
-    
-	typename TypeTraits<T>::RT o = 0.0, p = 0.5*cgp.pnorm;
-	Matrix<T> om = x;
-	if (t > 0.0)
-		om += t * g;
-	om *= conj(om);
-	om += cgp.l1;
-	om ^= p;
-	for (size_t i = 0; i < om.Size(); i++)
-		o += om[i].real();
-	return cgp.xfmw * o;
-
-}
-
-
-template<class T> inline static typename TypeTraits<T>::RT f (
-    const Matrix<T>& ffdbx, const Matrix<T>& ffdbg, const Matrix<T>& ttdbx, const Matrix<T>& ttdbg,
-    const Matrix<T>& x, const Matrix<T>& g, const Matrix<T>& data, const typename TypeTraits<T>::RT t,
-    typename TypeTraits<T>::RT& rmse, const CSParam& cgp) {
-    
-	typename TypeTraits<T>::RT obj = Obj (ffdbx, ffdbg, data, t);
-	rmse = sqrt(obj/(typename TypeTraits<T>::RT)nnz(data));
-	if (cgp.tvw)
-		obj += TV (ttdbx, ttdbg, t, cgp);
-	if (cgp.xfmw)
-		obj += XFM (x, g, t, cgp);
-	return obj;
-
-}
-
-
-/**
- * @brief Compute gradient of the data consistency
- */
-template<class T> inline static Matrix<T> dObj (
-    const Matrix<T>& x, const Matrix<T>& wx, const Matrix<T>& data, const CSParam& cgp) {
-    
-	FT<T>& ft = *(cgp.ft);
-	DWT<T>& dwt = *(cgp.dwt);
-	return (2.0 * (dwt * (ft ->* ((ft * wx) - data))));
-
-}
-
-
-/**
- * @brief Compute gradient of L1-transform operator
- *
- * @param  x   X
- * @param  cgp CG parameters
- * @return     The gradient
- */
-template <class T> inline static Matrix<T> dXFM (
-    const Matrix<T>& x, const CSParam& cgp) {
-    
-	typename TypeTraits<T>::RT pn = 0.5*cgp.pnorm-1.0, l1 = cgp.l1, xfm = cgp.xfmw;
-	return xfm * (x * ((x * conj(x) + l1) ^ pn));
-
-}
-
-
-/**
- * @brief Compute gradient of the total variation operator
- *
- * @param  x   Image space original
- * @param  wx  Image space perturbance
- * @param  cgp Parameters
- */
-template<class T> inline static Matrix<T> dTV (
-    const Matrix<T>& x, const Matrix<T>& wx, const CSParam& cgp) {
-
-	DWT<T>& dwt = *cgp.dwt;
-	TVOP<T>& tvt = *cgp.tvt;
-	typename TypeTraits<T>::RT p   = 0.5*cgp.pnorm-1.0;
-	Matrix<T> dx, g;
-	dx = tvt * wx;
-	g  = dx * conj(dx);
-	g += cgp.l1;
-	g ^= p;
-	g *= dx;
-	g *= cgp.pnorm;
-	g  = dwt * (tvt->*g);
-	return (cgp.tvw * g);
-
-}
-
-
-template<class T> inline static Matrix<T> df (
-    const Matrix<T>& x/*, const Matrix<T>& wx*/, const Matrix<T>& data, const CSParam& cgp) {
-
-	DWT<T>& dwt = *cgp.dwt;
-    Matrix<T> wx = dwt->*x;
-	Matrix<T> g = dObj (x, wx, data, cgp);
-	if (cgp.xfmw)
-		g += dXFM (x, cgp);
-	if (cgp.tvw)
-		g += dTV  (x, wx, cgp);
-	return g;
-
-}
-
-
-template<class T> inline void NLCG (Matrix<cxfl>& x, const Matrix<cxfl>& data, const CSParam& cgp) {
-
-	typename TypeTraits<T>::RT t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
-	Matrix<cxfl> g0, g1, dx, ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx;
-	DWT<cxfl>&  dwt = *cgp.dwt;
-	FT<cxfl>&   ft  = *cgp.ft;
-	TVOP<cxfl>& tvt = *cgp.tvt;
-
-	g0  = df (x/*, wx*/, data, cgp);
-	dx  = -g0;
-
-	for (size_t k = 0; k < (size_t)cgp.cgiter; k++) {
-
-		t = t0;
-
-        wx  = dwt->*x;
-		wdx =  dwt->*dx;
-		ffdbx = ft * wx;
-		ffdbg = ft * wdx;
-
-		if (cgp.tvw) {
-			ttdbx = tvt * wx;
-			ttdbg = tvt * wdx;
-		}
-
-		f0 = f (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, z, rmse, cgp);
-
-		int i = 0;
-		while (i < cgp.lsiter) {
-			t *= cgp.lsb;
-			f1 = f (ffdbx, ffdbg, ttdbx, ttdbg, x, dx, data, t, rmse, cgp);
-			if (f1 <= f0 - (cgp.lsa * t * abs(g0.dotc(dx))))
-				break;
-			++i;
-		}
-
-		printf (ofstr.c_str(), k, rmse, i); fflush (stdout);
-
-		if (i == cgp.lsiter) {
-			printf ("Reached max line search, exiting... \n");
-			return;
-		}
-
-		if      (i > 2) t0 *= cgp.lsb;
-		else if (i < 1) t0 /= cgp.lsb;
-
-		// Update image
-		x  += dx * t;
-
-		// CG computation
-		g1  =  df (x/*, wx*/, data, cgp);
-		bk  =  real(g1.dotc(g1)) / real(g0.dotc(g0));
-		g0  =  g1;
-		dx  = -g1 + dx * bk;
-		dxn =  norm(dx)/xn;
-
-		printf ("dxnrm: %0.4f\n", dxn);
-		if (dxn < cgp.cgconv)
-			break;
-
-	}
-
-
-}
-
 
 codeare::error_code CompressedSensing::Init () {
 
@@ -242,10 +38,6 @@ codeare::error_code CompressedSensing::Init () {
 	for (size_t i = 0; i < 3; i++)
 		m_N[i] = 1;
 
-	Attribute ("tvw",     &m_csparam.tvw);
-	Attribute ("xfmw",    &m_csparam.xfmw);
-	Attribute ("l1",      &m_csparam.l1);
-	Attribute ("pnorm",   &m_csparam.pnorm);
 	Attribute ("verbose", &m_verbose);
     m_image_size   = RHSList<size_t>("ftdims");
     m_dim = m_image_size.size();
@@ -257,8 +49,8 @@ codeare::error_code CompressedSensing::Init () {
 	Attribute ("test_case", &m_test_case);
 	Attribute ("noise",     &m_noise);
 
-    printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
-    printf ("  Pnorm: %.2e\n", m_csparam.pnorm);
+/*    printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
+      printf ("  Pnorm: %.2e\n", m_csparam.pnorm);*/
 	
     Attribute ("ft", &m_ft_type);
 
@@ -270,7 +62,6 @@ codeare::error_code CompressedSensing::Init () {
 			ft_params["dims"] = m_image_size;
 			ft_params["mask"] = Get<float>("mask");
 		    ft_params["threads"] = RHSAttribute<int>("threads");
-			m_csparam.ft = (FT<cxfl>*) new DFT<cxfl> (ft_params);
 			break;
 		case 1:
 			printf ("%s", "SENSE");
@@ -287,7 +78,6 @@ codeare::error_code CompressedSensing::Init () {
 	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
 		    ft_params["threads"] = RHSAttribute<int>("threads");
 	        ft_params["imsz"]    = m_image_size;
-	        m_csparam.ft = (FT<cxfl>*) new NFFT<cxfl> (ft_params);
 #else
 			printf("**ERROR - CompressedSensing: NUFFT support not available.");
 			assert(false);
@@ -307,7 +97,6 @@ codeare::error_code CompressedSensing::Init () {
 		    ft_params["threads"]      = RHSAttribute<int>("threads");
 	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
 		    ft_params["verbose"]      = 0;
-			m_csparam.ft = (FT<cxfl>*) new NCSENSE<cxfl> (ft_params);
 #else
 			printf("**ERROR - CompressedSensing: NUFFT support not available.");
 			assert(false);
@@ -320,22 +109,26 @@ codeare::error_code CompressedSensing::Init () {
 		}
 	printf ("\n");
 
-	Attribute ("csiter",    &m_csiter);
-	Attribute ("wl_family", &m_wf);
-	Attribute ("wl_member", &m_wm);
-	printf ("  DWT(%i,%i)", m_wf, m_wm);
-	
-	if (m_wf < -1 || m_wf > 5)
-		m_wf = -1;
+    ft_params["imsz"]  = m_image_size;
+    ft_params["nlopt"] = RHSAttribute<int>("nlopt");
+    ft_params["tvw"] = RHSAttribute<float>("tvw");
+    ft_params["xfmw"] = RHSAttribute<float>("xfmw");
+    ft_params["l1"] = RHSAttribute<float>("l1");
+    ft_params["lsa"] = RHSAttribute<float>("lsa");
+    ft_params["lsb"] = RHSAttribute<float>("lsb");
+    ft_params["pnorm"] = RHSAttribute<float>("pnorm");    
+    ft_params["threads"] = RHSAttribute<int>("threads");
+    ft_params["verbose"] = RHSAttribute<int>("verbose");    
+    ft_params["wl_family"] = RHSAttribute<int>("wl_family");    
+    ft_params["wl_member"] = RHSAttribute<int>("wl_member");
+    ft_params["csiter"] = RHSAttribute<int>("csiter");
+    ft_params["nliter"] = RHSAttribute<int>("cgiter");
+    ft_params["cgconv"] = RHSAttribute<float>("cgconv");
+    ft_params["lsiter"] = RHSAttribute<int>("lsiter");
+    ft_params["ft"] = RHSAttribute<int>("ft");
+    csx = new CS_XSENSE<cxfl>(ft_params);
+	std::cout << *csx << std::endl;
 
-	Attribute ("cgconv", &m_csparam.cgconv);
-	Attribute ("cgiter", &m_csparam.cgiter);
-	Attribute ("lsiter", &m_csparam.lsiter);
-	Attribute ("lsa",    &m_csparam.lsa);
-	Attribute ("lsb",    &m_csparam.lsb);
-    printf ("  Iterations: CS(%i) CG(%i) LS(%i)\n", m_csiter, m_csparam.cgiter, m_csparam.lsiter);
-	printf ("  Conv: CG(%.4f)\n", m_csparam.cgconv);
-	printf ("  LS brackets: lsa(%.2e) lsb(%.2e)", m_csparam.lsa, m_csparam.lsb);
 
 	m_initialised = true;
 	printf ("... done.\n\n");
@@ -349,7 +142,7 @@ codeare::error_code CompressedSensing::Prepare () {
 
 	codeare::error_code error = codeare::OK;
 
-	FT<cxfl>& ft = *m_csparam.ft;
+	FT<cxfl>& ft = *csx;
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
 		ft.KSpace (Get<float>("kspace"));
@@ -357,8 +150,6 @@ codeare::error_code CompressedSensing::Prepare () {
 	} else {
 		ft.Mask (Get<float>("mask"));
 	}
-
-	std::cout << ft << std::endl;
 
 	Free ("weights");
 	Free ("kspace");
@@ -371,56 +162,16 @@ codeare::error_code CompressedSensing::Prepare () {
 
 codeare::error_code CompressedSensing::Process () {
 
-	float ma;
-	FT<cxfl>& ft = *m_csparam.ft;
 
-	Matrix<cxfl> data = (m_test_case) ?
-		ft * phantom<cxfl>(m_image_size[0], m_image_size[0], (m_dim == 3) ?
-				m_image_size[0] : 1) : Get<cxfl> ("data");
-
+	data = (m_test_case) ?
+		*csx * phantom<cxfl>(m_image_size[0], m_image_size[0], (m_dim == 3) ?
+                             m_image_size[0] : 1) : Get<cxfl> ("data");
+    
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
 
-	Matrix<float>& pdf   = Get<float>("pdf");
-	Matrix<cxfl> im_dc;
-
-    m_csparam.dwt = new DWT <cxfl> (m_image_size[0], (wlfamily)m_wf, m_wm);
-	m_csparam.tvt = new TVOP<cxfl> ();
-
-	DWT<cxfl>& dwt = *m_csparam.dwt;
-    std::vector< Matrix<cxfl> > vc;
-	
-	im_dc  = data;
-	if (m_ft_type != 2 && m_ft_type != 3)
-		im_dc /= pdf;
-	im_dc  = ft ->* im_dc;
-
-	ma     = max(abs(im_dc));
-
-	if (m_verbose)
-		vc.push_back(im_dc);
-
-	im_dc /= ma;
-	data  /= ma;
-	im_dc  = dwt * im_dc;
-
-	printf ("  Running %i NLCG iterations ... \n", m_csiter); fflush(stdout);
-
-	for (size_t i = 0; i < (size_t)m_csiter; i++) {
-		NLCG<cxfl> (im_dc, data, m_csparam);
-		if (m_verbose)
-			vc.push_back(dwt ->* im_dc*ma);
-	}
-
-    if (m_verbose) {
-        size_t cpsz = numel(im_dc);
-        im_dc = zeros<cxfl> (size(im_dc,0), size(im_dc,1), (m_dim == 3) ?
-        		size(im_dc,2) : 1, vc.size());
-        for (size_t i = 0; i < vc.size(); i++)
-        	std::copy (&vc[i][0], &vc[i][0]+cpsz, &im_dc[i*cpsz]);
-    } else
-        im_dc = dwt ->* im_dc*ma;
-
+	Matrix<cxfl> im_dc = *csx->*data;
+    
     Add ("im_dc", im_dc);
 
     return codeare::OK;

@@ -27,16 +27,12 @@
 #include "ReconStrategy.hpp"
 #include "Algos.hpp"
 #include "DFT.hpp"
+#include "CS_XSENSE.hpp"
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
 #include "linalg/Lapack.hpp"
 
-#ifdef _MSC_VER
-std::string ofstr = "    %02Iu - nrms: %1.7f, l-search: %d, ";
-#else
-std::string ofstr = "    %02zu - nrms: %1.7f, l-search: %d, ";
-#endif
 //#include <pthread.h>
 /**
  * @brief Reconstruction startegies
@@ -60,7 +56,6 @@ namespace RRStrategy {
         double l1;
         double lsa;
         double lsb;
-
         DWT<cxfl>* dwt;
         FT<cxfl>*  ft;
         TVOP<cxfl>* tvt;
@@ -85,35 +80,29 @@ namespace RRStrategy {
         /**
          * @brief Default destructor
          */
-        virtual 
-        ~CompressedSensing ();
+        virtual ~CompressedSensing ();
         
         
         /**
          * @brief Do nothing 
          */
-        virtual codeare::error_code
-        Process ();
+        virtual codeare::error_code Process ();
         
         
         /**
          * @brief Do nothing 
          */
-        virtual codeare::error_code 
-        Init ();
+        virtual codeare::error_code Init ();
         
         /**
          * @brief Do nothing
          */
-        virtual codeare::error_code
-        Prepare ();
+        virtual codeare::error_code Prepare ();
         
         /**
          * @brief Do nothing 
          */
-        virtual codeare::error_code
-        Finalise ();
-        
+        virtual codeare::error_code Finalise ();
         
         
     private:
@@ -123,6 +112,7 @@ namespace RRStrategy {
         int            m_csiter; /**< # global iterations */
         Vector<size_t> m_image_size;
         int            m_test_case;
+        float          m_ndnz;
 
         double m_noise;
 
@@ -132,6 +122,10 @@ namespace RRStrategy {
         int            m_verbose;
         
         int            m_ft_type;
+
+        Matrix<cxfl> data;
+
+        CS_XSENSE<cxfl>* csx;
 
     };
     

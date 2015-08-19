@@ -122,7 +122,10 @@ public:
         
         try {
             m_np  = p.Get<int>("threads");
+        } catch (const PARAMETER_MAP_EXCEPTION& ) {
         } catch (const boost::bad_any_cast&) {}
+
+        
         omp_set_num_threads(m_np);
         
         if (p.exists("alpha")) {
@@ -482,7 +485,7 @@ public:
     inline RT Epsilon() const {return m_epsilon;}
 
     virtual std::ostream& Print (std::ostream& os) const {
-    	FT<T>::Print(os);
+		Operator<T>::Print(os);
     	os << "    image size: rank(" << Rank() << ") side(" <<
     			ImageSize() << ") nodes(" << KSpaceSize() << ")" << std::endl;
     	os << "    nfft: maxit(" << Maxit() << ") eps(" << Epsilon() <<	") alpha("
@@ -492,7 +495,6 @@ public:
     	os << "    ft-threads(" << m_np << ")";
     	if (m_3rd_dim_cart)
     		os << " 3rd dimension is Cartesian";
-        os << std::endl;
     	return os;
     }
 
