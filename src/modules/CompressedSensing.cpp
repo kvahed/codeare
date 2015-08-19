@@ -169,10 +169,7 @@ codeare::error_code CompressedSensing::Process () {
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
 
-	Matrix<float>& pdf   = Get<float>("pdf");
-	Matrix<cxfl> im_dc;
-
-    im_dc = *csx->*data;
+	Matrix<cxfl> im_dc = *csx->*data;
     
     Add ("im_dc", im_dc);
 
