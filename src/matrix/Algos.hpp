@@ -22,6 +22,8 @@
 #ifndef __ALGOS_HPP__
 #define __ALGOS_HPP__
 
+#define NOMINMAX
+
 #include "Matrix.hpp"
 #include "math.h"
 #include <limits>
