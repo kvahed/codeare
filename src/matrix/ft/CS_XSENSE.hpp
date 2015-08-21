@@ -37,6 +37,8 @@
 
 enum CS_EXCEPTION {UNDEFINED_FT_OPERATOR, UNDEFINED_OPTIMISATION_ALGORITHM};
 
+const char* nlopt_names[] = {"NLCG", "L-BFGS", "Split Bregman"};
+
     using namespace codeare::optimisation;
 
 /**
@@ -117,7 +119,7 @@ public:
             throw UNDEFINED_OPTIMISATION_ALGORITHM;
             break;
         }
-
+        
         _csiter = try_to_fetch<int> (p, "csiter", 0);
         _wf = try_to_fetch<int> (p, "wl_family", 0.);
         _wm = try_to_fetch<int> (p, "wl_member", 0.);
@@ -241,7 +243,6 @@ public:
 
         data = m;
 
-        RT ma;
         Matrix<T> im_dc;
         std::vector< Matrix<T> > vc;
         
@@ -249,22 +250,19 @@ public:
         if (_ft_type != 2 && _ft_type != 3)
             im_dc /= wspace.Get<RT>("pdf");
         im_dc  = *ft ->* im_dc;
-        ma     = max(abs(im_dc));
 
         if (_verbose)
             vc.push_back(im_dc);
 
-        im_dc /= ma;
-        data  /= ma;
         _ndnz = (RT)nnz(data);
         im_dc  = *dwt * im_dc;
 
-        printf ("  Running %i NLCG iterations ... \n", _csiter); fflush(stdout);
+        printf ("  Running %i %s iterations ... \n", _csiter+1, nlopt_names[_nlopt_type]); fflush(stdout);
 
         for (size_t i = 0; i < (size_t)_csiter; i++) {
             nlopt->Minimise ((Operator<T>*)this, im_dc);
             if (_verbose)
-                vc.push_back(*dwt ->* im_dc*ma);
+                vc.push_back(*dwt ->* im_dc);
         }
 
         if (_verbose) {
@@ -274,7 +272,7 @@ public:
             for (size_t i = 0; i < vc.size(); i++)
                 std::copy (&vc[i][0], &vc[i][0]+cpsz, &im_dc[i*cpsz]);
         } else
-            im_dc = *dwt ->* im_dc*ma;
+            im_dc = *dwt ->* im_dc;
         
         return im_dc;
 

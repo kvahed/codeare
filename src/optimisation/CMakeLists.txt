@@ -7,7 +7,7 @@ include_directories (${PROJECT_SOURCE_DIR}/src/optimisation
 
 list (APPEND OPMTIMISATION_SOURCE Linear.hpp CGLS.hpp CGLS.cpp
   NonLinear.hpp NLCG.hpp NLCG.cpp SplitBregman.hpp SplitBregman.cpp
-  LBFGS.hpp LBFGS.cpp lbfgs.h arithmetic_ansi.h lbfgs.h lbfgs.c
+  LBFGS.hpp LBFGS.cpp lbfgs.h arithmetic_ansi.h lbfgs.h
   arithmetic_sse_double.h arithmetic_sse_float.h) 
 
 SET_PROPERTY(SOURCE lbfgs.c PROPERTY COMPILE_FLAGS "-DHAVE_SSE2")

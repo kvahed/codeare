@@ -10,19 +10,6 @@
 
 #include <NonLinear.hpp>
 
-template<class T> inline T try_to_fetch (const Params& p, const std::string& key, const T& def) {
-    try {
-        return p.Get<T>(key);
-    } catch (const PARAMETER_MAP_EXCEPTION& e) {
-        printf ("**WARNING**: key %s not in parameter map.\n", key.c_str());
-        return def;
-    } catch (const boost::bad_any_cast& e) {
-        printf ("**WARNING**: conversion failed on parameter %s", key.c_str());
-        return def;
-    }
-}
-
-
 #ifdef _MSC_VER
 std::string ofstr = "    %02Iu - nrms: %1.4e, l-search: %d, ";
 #else
@@ -100,7 +87,7 @@ public:
 
     virtual std::ostream& Print (std::ostream& os) const {
 		NonLinear<T>::Print(os);
-        os << "    Iterations: NLCG(" << _nliter << ") LS(" << _lsiter << ")" << std::endl;
+        os << "    Iterations: (" << _nliter << ") LS(" << _lsiter << ")" << std::endl;
         os << "    Conv: CG(" << _cgconv << ")" << std::endl;
         os << "    LS brackets: lsa(" << _lsa << ") lsb(" << _lsb << ")";
     }
