@@ -25,8 +25,8 @@
 #include "Complex.hpp"
 #include "Creators.hpp"
 #include "Algos.hpp"
-#include "Trigonometry.hpp"
-#include "Print.hpp"
+//#include "Trigonometry.hpp"
+//#include "Print.hpp"
 
 /**
  * @brief    Absolute values 
@@ -97,19 +97,6 @@ imag (const Matrix<T>& m) {
  * @param  m Input
  * @return   Imaginary part
  */
-//template<class T> inline static Matrix<T>
-//conj (const Matrix<T>& m) {
-	//Matrix<T> res (size(m));
-	//for (size_t i = 0; i < numel(m); i++)
-		//res[i] = TypeTraits<T>::Conj(m[i]);
-	//return res;
-//}
-/**
- * @brief    Dummy for double
- *
- * @param  m Input
- * @return   Imaginary part
- */
 template<class T> inline static Matrix<T>
 conj (const MatrixType<T>& m) {
 	Matrix<T> res (size(m));
@@ -119,7 +106,7 @@ conj (const MatrixType<T>& m) {
 }
 
 
-using namespace codeare::matrix::arithmetic;
+//using namespace codeare::matrix::arithmetic;
 
 template <class T, class S> inline static Matrix<std::complex<T> > 
 complex (const Matrix<T>& re, const Matrix<S>& im) {

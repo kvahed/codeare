@@ -349,6 +349,7 @@ SizeInRAM          (const Matrix<T>& M) {
 }
 
 
+
 /**
  * @brief           Get the number of matrix cells, i.e. dim_0*...*dim_16.
  *
@@ -648,6 +649,7 @@ m_min (const Matrix<T>& M) {
 }
 
 
+#include "CX.hpp"
 /**
  * @brief           Transpose
  *
@@ -1076,7 +1078,7 @@ permute (const Matrix<T>& M, const size_t& n0, const size_t& n1) {
  * @param   perm    New permuted dimensions
  * @return          Permuted matrix
  */
-#include "Print.hpp"
+//#include "Print.hpp"
 template <class T> inline static Matrix<T>
 permute (const Matrix<T>& M, const Vector<size_t>& perm) {
 	
@@ -1144,48 +1146,120 @@ permute (const Matrix<T>& M, const Vector<size_t>& perm) {
 
 
 /**
+ * @brief           MATLAB-like diff
+ */
+template<class T> inline static Matrix<T>
+diff (const Matrix<T>& rhs, const size_t& n = 1, const size_t& dim = 0) {
+    Matrix<T> ret, tmp;
+    Vector<size_t> rhssize = size(rhs), pdims = rhssize, dim_ord;
+    size_t ndims = rhssize.size();
+
+    if (dim > ndims) {
+        printf ("  *** ERROR (%s:%s) - diff dimension %zu"
+                "exceeds matrix dimension %zu", __FILE__, __LINE__, dim, ndims);
+        throw 404;
+    }
+
+    if (dim == 0) {
+        ret = rhs;
+    } else { 
+        if (dim == 1) {
+            if (ndims == 2) {
+                ret = permute (rhs,1,0);
+            } else if (ndims == 3) {
+                ret = permute (rhs,1,0,2);
+            } else {
+                dim_ord.resize(ndims);
+                std::iota(dim_ord.begin(), dim_ord.end(), 1);
+                std::iter_swap(dim_ord.begin(), dim_ord.begin()+1);
+                ret = permute (rhs,dim_ord);
+            }
+        } else if (dim == 2) {
+            if (ndims == 3)
+                ret = permute (rhs,2,0,1);
+            else {
+                dim_ord.resize(ndims);
+                std::iota(dim_ord.begin(), dim_ord.end(), 1);                
+                std::iter_swap(pdims.begin(), pdims.begin()+2);
+                ret = permute (rhs,dim_ord);
+            }
+        }
+    }
+    
+    
+    Vector<T> col (size(rhs,0));
+    typename Vector<T>::iterator b, e, m;
+    typename Vector<T>::const_iterator rb;
+    size_t col_len = col.size();
+    for (size_t i = 0 ; i < n; ++i) {
+        tmp = ret;
+        for (b = ret.Begin(), e = b+col_len, m = b+1, rb = tmp.Begin();
+             b < ret.End(); b += col_len, e += col_len, m += col_len, rb += col_len) {
+            std::rotate (b, m, e);
+            std::transform (b, e, rb, b, std::minus<T>());
+        }
+    }
+    
+    if (dim == 1) {
+        if (ndims == 2) {
+            ret = permute (rhs,1,0);
+        } else if (ndims == 3) {
+            ret = permute (rhs,1,0,2);
+        } else {
+            dim_ord.resize(ndims);
+            std::iota(dim_ord.begin(), dim_ord.end(), 1);
+            std::iter_swap(dim_ord.begin(), dim_ord.begin()+1);
+            ret = permute (rhs,dim_ord);
+        }
+    } else if (dim == 2) {
+        if (ndims == 3)
+                ret = permute (rhs,2,0,1);
+        else {
+            dim_ord.resize(ndims);
+            std::iota(dim_ord.begin(), dim_ord.end(), 1);                
+            std::iter_swap(pdims.begin(), pdims.begin()+2);
+            ret = permute (rhs,dim_ord);
+        }
+    }
+    
+    return ret;
+    
+}
+
+
+
+/**
  * @brief          FLip up down
  * 
  * @param   M      Matrix
  * @return         Flipped matrix
  */
 
-template <class T> inline static Matrix<T>
-flipud (const Matrix<T>& M)  {
+template <class T> inline static Matrix<T> flipud (const Matrix<T>& M)  {
 
-	size_t scol = size(M,0);
-	size_t ncol = numel (M)/scol;
-
+	size_t scol = size(M,0), ncol = numel(M)/scol;
 	Matrix<T> res = M;
 
     if (scol == 1) // trivial
         return res;
 
     typedef typename Vector<T>::iterator VI;
-    
-    VI rb = res.Container().begin();
-
-	for (size_t i = 0; i < ncol; ++i)
-        std::reverse(rb+i*scol, rb+(i+1)*scol);
-
+	for (VI i = res.Container().begin(); i < res.Container().end(); i += scol)
+        std::reverse(i, i+scol);
 	return res;
 
 }
 
 /**
- * @brief          FLip up down
+ * @brief          FLip left right
  * 
  * @param  M        Matrix
  * @return         Flipped matrix
  */
 
-template <class T> inline static Matrix<T>
-fliplr (const Matrix<T>& M)  {
+template <class T> inline static Matrix<T> fliplr (const Matrix<T>& M)  {
 
-	size_t srow = size(M,1);
-	size_t scol = size(M,0);
-	size_t nrow = numel (M)/srow;
-
+	size_t srow = size(M,1), scol = size(M,0), nrow = numel (M)/srow;
 	Matrix<T> res (M.Dim());
 
     for (size_t i = 0; i < nrow; ++i)

@@ -44,8 +44,17 @@ endif()
 set (TEST_CALL t_tvop)  
 MP_TESTS ("tvop" "${TEST_CALL}")
 
+add_executable(t_cast t_cast.cpp)
+add_test(cast t_cast)
+
 add_executable(t_sort t_sort.cpp)
 add_test(sort t_sort)
+
+add_executable(t_diff t_diff.cpp)
+add_test(diff t_diff)
+
+add_executable(t_flip t_flip.cpp)
+add_test(flip t_flip)
 
 if (${HAS_CXX11_CONDITIONAL}) 
 add_executable(t_colon t_colon.cpp)

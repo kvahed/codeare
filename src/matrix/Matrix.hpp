@@ -64,8 +64,7 @@
 
 #include <Assert.hpp>
 
-static inline std::vector<std::string> Parse (const std::string& str,
-		const std::string& dlm) {
+static inline std::vector<std::string> Parse (const std::string& str, const std::string& dlm) {
 	assert (dlm.size() > 0);
 	std::vector<std::string> sv;
 	size_t  start = 0, end = 0;
@@ -126,7 +125,7 @@ static const char* MatrixExceptionMessages[] = {
 };
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
-                              const char* func, const MatrixException& x) {
+                                     const char* func, const MatrixException& x) {
     std::cerr << fname << ":" << lnumber << "\n \t " << func << ": " 
               << MatrixExceptionMessages[(short)x] << std::endl;
     throw x;
@@ -134,7 +133,7 @@ inline static void report_and_throw (const char* fname, const size_t& lnumber,
 
 #ifndef DNDEBUG
 #  ifndef MATRIX_ASSERT
-#    define MATRIX_ASSERT(c,x) if (!(c)) \
+#    define MATRIX_ASSERT(c,x) if (!(c))                            \
 		report_and_throw (__FILE__, __LINE__, PRETTY_FUNCTION, x)
 #  endif
 #endif

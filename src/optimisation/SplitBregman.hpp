@@ -10,6 +10,18 @@
 
 #include <NonLinear.hpp>
 
+template<class T> inline static Matrix<T>
+shrink(const Matrix<T>& rhs, const typename TypeTraits<T>::RT& t) {
+    Matrix<T> ret = rhs;
+    typename TypeTraits<T>::RT rhsa = 0.;
+    for (size_t i = 0; i < rhs.Size(); ++i) {
+        rhsa = std::abs(rhs[i]);
+        ret[i] = (rhsa > t) ? (1.0 - t/rhsa) * rhs[i] : T(0.); 
+    }
+    return ret;
+}
+
+
 namespace codeare {
     namespace optimisation {
         

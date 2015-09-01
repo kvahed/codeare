@@ -61,7 +61,7 @@ public:
         lbfgsfloatval_t fx;
         int ret = lbfgs(2*x.Size(), (lbfgsfloatval_t*)&x[0], &fx, evaluate, progress, NULL, &_p);
         printf("    L-BFGS optimization terminated with status code = %d\n", ret);
-        printf("  fx = %f, x[0] = %f, x[1] = %f\n", fx, x[0], x[1]);
+        printf("      fx = %f, x[0] = %f, x[1] = %f\n", fx, x[0], x[1]);
 
     }
     virtual std::ostream& Print(std::ostream& os) const {
