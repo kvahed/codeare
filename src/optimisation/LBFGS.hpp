@@ -60,9 +60,8 @@ public:
         _g = x;
         lbfgsfloatval_t fx;
         int ret = lbfgs(2*x.Size(), (lbfgsfloatval_t*)&x[0], &fx, evaluate, progress, NULL, &_p);
-        printf("    L-BFGS optimization terminated with status code = %d\n", ret);
-        printf("      fx = %f, x[0] = %f, x[1] = %f\n", fx, x[0], x[1]);
-
+        std::cout << "    L-BFGS optimization terminated with status code = " <<ret << std::endl;
+        std::cout << "      fx = "<< fx << ", x[0] = "<< x[0] << ", " << x[1] << std::endl;
     }
     virtual std::ostream& Print(std::ostream& os) const {
         NonLinear<T>::Print(os);
