@@ -34,7 +34,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 #  set (Boost_USE_STATIC_LIBS ON)
 endif()
 
-# Architecture
+# Architecture -------------------------------------------------------
 include (VcMacros)
 include (OptimizeForArchitecture)
 OptimizeForArchitecture()
