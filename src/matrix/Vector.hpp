@@ -42,15 +42,15 @@ extern "C" inline long _ftol( double d) { return (long) d;}
 #        define VECTOR_TYPE(A) std::valarray<A>
 #        define VECTOR_CONSTR(A,B) std::valarray<A>(B)
 #    else
-#        include "simd/AlignmentAllocator.hpp"
+#        include "Allocator.hpp"
 #        if defined __AVX__
 #            define ALIGNEMENT 32
 #        else
 #            define ALIGNEMENT 16
 #        endif
-#        define VECTOR_TYPE(A) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >
-#        define VECTOR_CONSTR(A,B) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B)
-#        define VECTOR_CONSTR_VAL(A,B,C) std::vector<A,AlignmentAllocator<A,ALIGNEMENT> >(B,C)
+#        define VECTOR_TYPE(A) std::vector<A,Allocator<A,ALIGNEMENT> >
+#        define VECTOR_CONSTR(A,B) std::vector<A,Allocator<A,ALIGNEMENT> >(B)
+#        define VECTOR_CONSTR_VAL(A,B,C) std::vector<A,Allocator<A,ALIGNEMENT> >(B,C)
 #    endif
 #endif
 template<class T> inline static std::ostream&
