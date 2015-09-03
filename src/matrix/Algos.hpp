@@ -24,8 +24,8 @@
 
 #define NOMINMAX
 
-#include "Matrix.hpp"
-#include "math.h"
+#include <Matrix.hpp>
+#include <math.h>
 #include <limits>
 #include <vector>
 #include <algorithm>    // std::reverse
@@ -818,8 +818,7 @@ sum (const Matrix<T>& M, size_t d) {
  * @param  M  Matrix
  * @return    Sum of M along dimension d
  */
-template <class T> inline static T
-sum (const Matrix<T>& M) {
+template <class T> inline static T sum (const Matrix<T>& M) {
 	return std::accumulate(M.Begin(),M.End(),(T)0);
 }
 
@@ -837,8 +836,7 @@ sum (const Matrix<T>& M) {
  * @param  d  Dimension
  * @return    Sum of M along dimension d
  */
-template <class T> inline static Matrix<T>
-prod (const Matrix<T>& M, size_t d) {
+template <class T> inline static Matrix<T> prod (const Matrix<T>& M, size_t d) {
 
 	Matrix<size_t> sz = size(M);
 	size_t        dim = sz[d];
@@ -866,21 +864,15 @@ prod (const Matrix<T>& M, size_t d) {
 	// Sum
 #pragma omp parallel default (shared)
 	{
-
 #pragma omp for
-
-		for (size_t i = 0; i < outsize; ++i) {
-
+		for (size_t i = 0; i < outsize; ++i)
 			for (size_t j = 0; j < insize; ++j) {
 				res[i*insize + j] = T(0);
 				for (size_t k = 0; k < dim; ++k)
 					res[i*insize + j] += M[i*insize*dim + j + k*insize];
 			}
 
-		}
-
 	}
-
 	return res;
 
 }
@@ -898,8 +890,7 @@ prod (const Matrix<T>& M, size_t d) {
  * @param  M  Matrix
  * @return    Sum of M along dimension d
  */
-template <class T> inline static T
-prod (const Matrix<T>& M) {
+template <class T> inline static T prod (const Matrix<T>& M) {
 	return std::accumulate(M.Begin(), M.End(), T(1), c_multiply<T>);
 }
 
@@ -916,8 +907,7 @@ prod (const Matrix<T>& M) {
  * @param  d    Dimension
  * @return      Sum of squares
  */
-template <class T> inline static  Matrix<T>
-SOS (const Matrix<T>& M, size_t d) {
+template <class T> inline static  Matrix<T> SOS (const Matrix<T>& M, size_t d) {
 	
 	assert (M.Dim(d) > 1);
 	
@@ -939,8 +929,7 @@ SOS (const Matrix<T>& M, size_t d) {
  * @param  M       Matrix
  * @return         Squeezed matrix
  */
-template <class T> inline static Matrix<T>
-squeeze (const Matrix<T>& M) {
+template <class T> inline static Matrix<T> squeeze (const Matrix<T>& M) {
 	
 	Vector<size_t> dim;
 	Vector<float>  res;
@@ -973,8 +962,8 @@ squeeze (const Matrix<T>& M) {
  * @return          Permuted matrix
  */
 
-template<class T> inline static Matrix<T>
-permute (const Matrix<T>& M, const size_t& n0, const size_t& n1, const size_t& n2) {
+template<class T> inline static Matrix<T> permute (const Matrix<T>& M, const size_t& n0,
+		const size_t& n1, const size_t& n2) {
 	Vector<size_t> odims = size(M);
 	assert (numel(odims)==3); // Must be 3d
 	Matrix<T> ret(odims[n0], odims[n1], odims[n2]);
@@ -1041,8 +1030,8 @@ permute (const Matrix<T>& M, const size_t& n0, const size_t& n1, const size_t& n
  * @return          Permuted matrix
  */
 
-template<class T> inline static Matrix<T>
-permute (const Matrix<T>& M, const size_t& n0, const size_t& n1) {
+template<class T> inline static Matrix<T> permute (const Matrix<T>& M, const size_t& n0,
+		const size_t& n1) {
 	Vector<size_t> odims = size(M);
 	assert (numel(odims)==2); // Must be 3d
 	Matrix<T> ret(odims[n0], odims[n1]);
@@ -1079,8 +1068,7 @@ permute (const Matrix<T>& M, const size_t& n0, const size_t& n1) {
  * @return          Permuted matrix
  */
 //#include "Print.hpp"
-template <class T> inline static Matrix<T>
-permute (const Matrix<T>& M, const Vector<size_t>& perm) {
+template <class T> inline static Matrix<T> permute (const Matrix<T>& M, const Vector<size_t>& perm) {
 	
 	// Check that perm only includes one number between 0 and INVALID_DIM once
 	size_t ndnew = perm.size(), i = 0;
@@ -1148,8 +1136,8 @@ permute (const Matrix<T>& M, const Vector<size_t>& perm) {
 /**
  * @brief           MATLAB-like diff
  */
-template<class T> inline static Matrix<T>
-diff (const Matrix<T>& rhs, const size_t& n = 1, const size_t& dim = 0) {
+template<class T> inline static Matrix<T> diff (const Matrix<T>& rhs, const size_t& n = 1,
+		const size_t& dim = 0) {
     Matrix<T> ret, tmp;
     Vector<size_t> rhssize = size(rhs), pdims = rhssize, dim_ord;
     size_t ndims = rhssize.size();
@@ -1234,7 +1222,6 @@ diff (const Matrix<T>& rhs, const size_t& n = 1, const size_t& dim = 0) {
  * @param   M      Matrix
  * @return         Flipped matrix
  */
-
 template <class T> inline static Matrix<T> flipud (const Matrix<T>& M)  {
 
 	size_t scol = size(M,0), ncol = numel(M)/scol;
@@ -1256,7 +1243,6 @@ template <class T> inline static Matrix<T> flipud (const Matrix<T>& M)  {
  * @param  M        Matrix
  * @return         Flipped matrix
  */
-
 template <class T> inline static Matrix<T> fliplr (const Matrix<T>& M)  {
 
 	size_t srow = size(M,1), scol = size(M,0), nrow = numel (M)/srow;
@@ -1277,15 +1263,14 @@ typedef enum sort_dir {
 	ASCENDING, DESCENDING
 } sort_dir;
 
-
 /**
  * @brief   Get sort indices sorting elements of m
  * @param  m Data to sort
  * @param  sd Sort direction
  * @return sort indices
  */
-template <typename T> inline static Vector<size_t>
-sort (const Matrix<T> &m, const sort_dir sd = ASCENDING) {
+template <typename T> inline static Vector<size_t> sort (const Matrix<T> &m,
+		const sort_dir sd = ASCENDING) {
   Vector<size_t> idx(m.Size());
   std::iota(idx.begin(), idx.end(), 0);
   if (sd == ASCENDING)

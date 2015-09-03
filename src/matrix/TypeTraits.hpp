@@ -27,7 +27,6 @@ struct SameType { static const bool val = false; };
 template <class T>
 struct SameType<T,T> { static const bool val = true; };
 
-
 template<class T> struct TypeTraits {
     inline static const std::type_info& Info () NOEXCEPT {
         return typeid(T);

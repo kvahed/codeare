@@ -517,7 +517,9 @@ public:
 	inline virtual Matrix<T>
 	Adjoint     (const Matrix<T>& m) const NOEXCEPT {
 
-		Matrix<T> res = ishift((m_have_mask) ? m * m_mask : m);
+		Matrix<T> res = m;
+        if (m_have_mask)
+            res *= m_mask;
 
 		FTTraits<T>::Execute (m_bwplan, (FTT*)&res[0], (FTT*)&res[0]);
 

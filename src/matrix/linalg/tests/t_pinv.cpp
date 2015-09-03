@@ -2,6 +2,7 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 #include "Lapack.hpp"
+#include "Print.hpp"
 
 template<class T> void check () {
 

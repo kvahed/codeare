@@ -56,6 +56,9 @@ add_test(diff t_diff)
 add_executable(t_flip t_flip.cpp)
 add_test(flip t_flip)
 
+add_executable(t_friends t_friends.cpp)
+add_test(friends t_friends)
+
 if (${HAS_CXX11_CONDITIONAL}) 
 add_executable(t_colon t_colon.cpp)
 add_test(colon t_colon)
