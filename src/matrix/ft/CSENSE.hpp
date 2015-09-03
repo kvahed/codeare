@@ -131,13 +131,13 @@ public:
 			const DFT<T>& ft = m_dft[tid];
 
 			// FT individual channels
-#pragma omp for
-			for (int i = 0; i < (int)nc; i++)
+//#pragma omp for
+/*			for (int i = 0; i < (int)nc; i++)
 				if (ndim == 2)
 					tmp(R(),R(),    R(i)) = ft ->* tmp(CR(),CR(),     CR(i));
 				else
 					tmp(R(),R(),R(),R(i)) = ft ->* tmp(CR(),CR(),CR(),CR(i));
-
+					*/
 			// Antialiasing
 #pragma omp for
 			for (int x = 0; x < (int)dims[0]; x++)

@@ -19,7 +19,6 @@ class Linear {
 public:
 	Linear (const int& verbosity = 0) :	_verbosity(verbosity) {}
 	virtual ~Linear () {}
-//	virtual Matrix<T> Solve (const Operator<T>& A, const Matrix<T>& b);
 	virtual Matrix<T> Solve(const Operator<T>& A, const MatrixType<T>& b) { return Matrix<T>(); }
 
 protected:

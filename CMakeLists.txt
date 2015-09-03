@@ -34,6 +34,11 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 #  set (Boost_USE_STATIC_LIBS ON)
 endif()
 
+# Architecture
+include (VcMacros)
+include (OptimizeForArchitecture)
+OptimizeForArchitecture()
+
 # C++ flags ----------------------------------------------------------
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS 
@@ -55,6 +60,11 @@ elseif (${MSVC})
     "${CMAKE_SHARED_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
   set (CMAKE_EXE_LINKER_FLAGS 
     "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
+  if (${AVX_FOUND})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX")
+  elseif (${SSE2_FOUND})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
+  endif()
 endif()
 
 include(CheckIncludeFileCXX)
@@ -85,9 +95,7 @@ endif ()
 #endif ()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_COMPILER_FLAGS}")
 
-# Architecture -------------------------------------------------------
-include (VcMacros)
-include (OptimizeForArchitecture)
+# OpenMP  -------------------------------------------------------
 find_package (OpenMP)
 if(OPENMP_FOUND)
   message("OPENMP FOUND")

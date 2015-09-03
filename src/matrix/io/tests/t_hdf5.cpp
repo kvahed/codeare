@@ -5,6 +5,7 @@
  *      Author: kvahed
  */
 
+#include "Matrix.hpp"
 #include "HDF5File.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"

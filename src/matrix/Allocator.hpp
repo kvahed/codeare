@@ -21,6 +21,8 @@ struct static_allocator {
         void* ret =
 #if defined(__GNUC__) || defined (__INTEL_COMPILER)
             _mm_malloc
+#elif defined (_MSC_VER)
+			_aligned_malloc
 #else
             _malloc
 #endif
@@ -35,8 +37,10 @@ struct static_allocator {
 
     static void deallocate (void* p) {
 
-#if defined(__GNUC__) || defined (__INTEL_COMPILER)
+#if defined(__GNUC__) || defined (__INTEL_COMPILER) 
         _mm_free
+#elif defined (_MSC_VER)
+		_aligned_free
 #else
         _free
 #endif

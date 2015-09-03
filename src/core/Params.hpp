@@ -370,10 +370,10 @@ operator<< (std::ostream& os, const Params& p) {
 template<class T> inline T try_to_fetch (const Params& p, const std::string& key, const T& def) {
     try {
         return p.Get<T>(key);
-    } catch (const PARAMETER_MAP_EXCEPTION& e) {
+    } catch (const PARAMETER_MAP_EXCEPTION&) {
         printf ("**WARNING**: key %s not in parameter map.\n", key.c_str());
         return def;
-    } catch (const boost::bad_any_cast& e) {
+    } catch (const boost::bad_any_cast&) {
         printf ("**WARNING**: conversion failed on parameter %s", key.c_str());
         return def;
     }
