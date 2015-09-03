@@ -24,10 +24,6 @@ int main (int args, char** argv) {
         return 1;
     if (!check_medfilt2<cxdb>())
         return 1;
-    if (!check_medfilt2<short>())
-        return 1;
-    if (!check_medfilt2<long>())
-        return 1;
 
     return 0;
     
