@@ -11,6 +11,7 @@ template<class T> int check () {
     std::cout << flipud(A) << std::endl;
     std::cout << "]\n fliplr(A)" << std::endl;
     std::cout << fliplr(A) << std::endl;
+    return 0;
 }
 
 int main (int args, char** argv) {
