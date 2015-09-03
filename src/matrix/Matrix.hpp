@@ -1495,6 +1495,11 @@ public:
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::plus<T>());
         return *this;
     }
+    inline Matrix<T,P>& operator+= (const Matrix<T,P>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
+        Vec(_M, M._M, _M, codeare::plus<T>());
+        return *this;
+    }
 
     /**
      * @brief           Elementwise multiplication and assignment operator with.
@@ -1515,9 +1520,8 @@ public:
      * @param  s        Factor scalar.
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>& operator+= (const S& s) {
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),(T)s));
+    inline Matrix<T,P>& operator+= (const T& t) {
+        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),t));
 		return *this;
     }
 
@@ -1543,6 +1547,11 @@ public:
     inline Matrix<T,P>& operator-= (const Matrix<S,P>& M) {
         MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::minus<T>());
+        return *this;
+    }
+    inline Matrix<T,P>& operator-= (const Matrix<T,P>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
+        Vec(_M, M._M, _M, codeare::minus<T>());
         return *this;
     }
 
@@ -1594,6 +1603,12 @@ public:
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::multiplies<T>());
         return *this;
     }
+    inline Matrix<T,P>& operator*= (const Matrix<T,P>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
+        Vec(_M, M._M, _M, codeare::multiplies<T>());
+        return *this;
+    }
+
 
     /**
      * @brief           Elementwise multiplication and assignment operator with.
@@ -1641,6 +1656,11 @@ public:
     inline Matrix<T,P>& operator/= (const Matrix<S,P>& M) {
         MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
         std::transform (_M.begin(), _M.end(), M.Begin(), _M.begin(), std::divides<T>());
+        return *this;
+    }
+    inline Matrix<T,P>& operator/= (const Matrix<T,P>& M) {
+        MATRIX_ASSERT (_dim==M.Dim(), DIMENSIONS_MUST_MATCH);
+        Vec(_M, M._M, _M, codeare::divides<T>());
         return *this;
     }
 
