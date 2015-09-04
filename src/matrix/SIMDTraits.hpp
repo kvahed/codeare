@@ -12,8 +12,6 @@
 #include "TypeTraits.hpp"
 #include <algorithm>
 
-#include <immintrin.h>
-
 template<class T> struct VecTraits;
 
 #if defined (__AVX__)
@@ -145,6 +143,8 @@ template<> struct VecTraits<cxdb> {
     }
 };
 #elif defined (__SSE2__)
+#include <emmintrin.h>
+
 template <int i0, int i1, int i2, int i3>
 static inline __m128i constant4i() {
     static const union {
@@ -325,7 +325,6 @@ inline static void Vec (const Vector<T>& a, const T& b, Vector<T>& c, const Op& 
     typedef typename TypeTraits<T>::RT RT;
     typedef typename VecTraits<T>::reg_type reg_type;
     Vector<T> B (VecTraits<T>::stride,b);
-//    reg_type scalar = VecTraits<T>::setp(b);
     const reg_type* va = (const reg_type*) &a[0];
     const reg_type* vb = (const reg_type*) &B[0];
     reg_type* vc = (reg_type*) &c[0];
