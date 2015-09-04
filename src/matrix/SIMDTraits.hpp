@@ -31,6 +31,7 @@ static inline __m256 constant8f() {
 template<> struct VecTraits<float> {
     typedef __m256 reg_type;
     static const int stride = 8;
+    inline static reg_type setp (const float& s) { return _mm256_set1_ps(s); }
     inline static reg_type plus (const reg_type& a, const reg_type& b) {return _mm256_add_ps(a, b);}
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm256_sub_ps(a, b);}
     inline static reg_type multiplies (const reg_type& a, const reg_type& b) {return _mm256_mul_ps(a, b);}
@@ -40,6 +41,7 @@ template<> struct VecTraits<float> {
 template<> struct VecTraits<double> {
     typedef __m256d reg_type;
     static const int stride = 4;
+    inline static reg_type setp (const double& s) { return _mm256_set1_pd(s); }
     inline static reg_type plus (const reg_type& a, const reg_type& b) {return _mm256_add_pd(a, b);}
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm256_sub_pd(a, b);}
     inline static reg_type multiplies (const reg_type& a, const reg_type& b) {return _mm256_mul_pd(a, b);}
@@ -49,6 +51,8 @@ template<> struct VecTraits<double> {
 template<> struct VecTraits<cxfl> {
     typedef __m256 reg_type;
     static const int stride = 4;
+    inline static reg_type setp (const cxfl& s) {
+        return _mm256_set_ps(real(s),imag(s),real(s),imag(s),real(s),imag(s),real(s),imag(s)); }
     inline static reg_type plus (const reg_type& a, const reg_type& b) {return _mm256_add_ps(a, b);}
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm256_sub_ps(a, b);}
     inline static reg_type multiplies (const reg_type &a, const reg_type &b) {
@@ -96,6 +100,8 @@ template<> struct VecTraits<cxfl> {
 template<> struct VecTraits<cxdb> {
     typedef __m256d reg_type;
     static const int stride = 2;
+    inline static reg_type setp (const cxdb& s) {
+        return _mm256_set_pd(real(s),imag(s),real(s),imag(s)); }
     inline static reg_type plus (const reg_type& a, const reg_type& b) {return _mm256_add_pd(a, b);}
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm256_sub_pd(a, b);}
     inline static reg_type multiplies (const reg_type &a, const reg_type &b) {
@@ -138,49 +144,6 @@ template<> struct VecTraits<cxdb> {
         return _mm256_div_pd(n, bsq); // n /
     }
 };
-
-namespace codeare {
-	template<class T> class plus {
-	public:
-		typedef typename VecTraits<T>::reg_type reg_type;
-		inline static reg_type packed (const reg_type& a, const reg_type& b) {
-			return VecTraits<T>::plus(a, b);
-		}
-		inline T operator()( const T& x, const T& y ) const {
-			return std::plus<T>()( x, y );
-		}
-	};
-	template<class T> class minus {
-	public:
-		typedef typename VecTraits<T>::reg_type reg_type;
-		inline static reg_type packed (const reg_type& a, const reg_type& b) {
-			return VecTraits<T>::minus(a, b);
-		}
-		inline T operator()( const T& x, const T& y ) const {
-			return std::minus<T>()( x, y );
-		}
-	};
-	template<class T> class multiplies {
-	public:
-		typedef typename VecTraits<T>::reg_type reg_type;
-		inline static reg_type packed (const reg_type& a, const reg_type& b) {
-			return VecTraits<T>::multiplies(a, b);
-		}
-		inline T operator()( const T& x, const T& y ) const {
-			return std::multiplies<T>()( x, y );
-		}
-	};
-	template<class T> class divides {
-	public:
-		typedef typename VecTraits<T>::reg_type reg_type;
-		inline static reg_type packed (const reg_type& a, const reg_type& b) {
-			return VecTraits<T>::divides(a, b);
-		}
-		inline T operator()( const T& x, const T& y ) const {
-			return std::divides<T>()( x, y );
-		}
-	};
-}
 #elif defined (__SSE2__)
 template <int i0, int i1, int i2, int i3>
 static inline __m128i constant4i() {
@@ -291,12 +254,16 @@ template<> struct VecTraits<cxdb> {
     #endif
     }
 };
+#endif
 
 namespace codeare {
 	template<class T> class plus {
 	public:
 		typedef typename VecTraits<T>::reg_type reg_type;
-		inline static reg_type packed (const reg_type& a, const reg_type& b) {
+        typedef T first_argument_type;
+        typedef T second_argument_type;
+        typedef T result_type;
+        inline static reg_type packed (const reg_type& a, const reg_type& b) {
 			return VecTraits<T>::plus(a, b);
 		}
 		inline T operator()( const T& x, const T& y ) const {
@@ -316,7 +283,10 @@ namespace codeare {
 	template<class T> class multiplies {
 	public:
 		typedef typename VecTraits<T>::reg_type reg_type;
-		inline static reg_type packed (const reg_type& a, const reg_type& b) {
+        typedef T first_argument_type;
+        typedef T second_argument_type;
+        typedef T result_type;
+        inline static reg_type packed (const reg_type& a, const reg_type& b) {
 			return VecTraits<T>::multiplies(a, b);
 		}
 		inline T operator()( const T& x, const T& y ) const {
@@ -334,7 +304,6 @@ namespace codeare {
 		}
 	};
 }
-#endif
 
 template<class T, class Op> 
 inline static void Vec (const Vector<T>& a, const Vector<T>& b, Vector<T>& c, const Op& op) {
@@ -349,6 +318,23 @@ inline static void Vec (const Vector<T>& a, const Vector<T>& b, Vector<T>& c, co
     for (int i = 0; i < simd_n; ++i)
         vc[i] = op.packed(va[i], vb[i]);
     std::transform(a.begin()+start_r, a.end(), b.begin()+start_r, c.begin()+start_r, op);
+}
+
+template<class T, class Op> 
+inline static void Vec (const Vector<T>& a, const T& b, Vector<T>& c, const Op& op) {
+    typedef typename TypeTraits<T>::RT RT;
+    typedef typename VecTraits<T>::reg_type reg_type;
+    Vector<T> B (VecTraits<T>::stride,b);
+//    reg_type scalar = VecTraits<T>::setp(b);
+    const reg_type* va = (const reg_type*) &a[0];
+    const reg_type* vb = (const reg_type*) &B[0];
+    reg_type* vc = (reg_type*) &c[0];
+    int simd_n = std::floor(a.size()/VecTraits<T>::stride);
+    size_t start_r = simd_n*VecTraits<T>::stride;
+#pragma omp parallel for
+    for (int i = 0; i < simd_n; ++i)
+        vc[i] = op.packed(va[i], *vb);
+    std::transform(a.begin()+start_r, a.end(), c.begin()+start_r, std::bind2nd(op,b));
 }
 
 #endif /* SRC_MATRIX_SIMDTRAITS_HPP_ */
