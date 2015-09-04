@@ -15,6 +15,7 @@ using namespace RRClient;
 
 #include <time.h>
 #include <stdio.h>
+#include <sstream>
 
 char  *name = 0, *base_dir = 0, *config = 0, *debug = 0, *EMPTY = (char*)"", *ZERO = (char*)"0", *CURRENT = (char*)".";
 std::string config_file_uri;
@@ -36,14 +37,39 @@ bool commandline_opts (int argc, char** argv) {
 #ifdef HAVE_MPI
 //  }
 #endif
-	
+
+    std::stringstream intrinsics;
+#ifdef __MMX__
+    intrinsics << "MMX ";
+#endif
+#ifdef __SSE__
+    intrinsics << "SSE ";
+#endif
+#ifdef __SSE2__
+    intrinsics << "SSE2 ";
+#endif
+#ifdef __SSSE3__
+    intrinsics << "SSSE3 ";
+#endif
+#ifdef __AVX__
+    intrinsics << "AVX ";
+#endif
+#ifdef __AVX2__
+    intrinsics << "AVX2 ";
+#endif
+#ifdef __FMA__
+    intrinsics << "FMA ";
+#endif
+#ifdef __FMA4__
+    intrinsics << "FMA4 ";
+#endif
+    
     Options opt;
 	
     opt.addUsage  ("Copyright (C) 2010-2014");
-    opt.addUsage  ("Kaveh Vahedipour<k.vahedipour@fz-juelich.de>");
-    opt.addUsage  ("Juelich Research Centre");
-    opt.addUsage  ("Medical Imaging Physics");
-    opt.addUsage  ("");
+    opt.addUsage  ("Kaveh Vahedipour<kaveh@codeare.org>");
+    opt.addUsage  ("NYU School of Medicine");
+    opt.addUsage  (intrinsics.str().c_str());
     opt.addUsage  ("Usage:");
     opt.addUsage  ("codeare -c <configuration_file> -b <base_dir> [OPTIONS]");
     opt.addUsage  ("");
