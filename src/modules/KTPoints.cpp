@@ -110,7 +110,7 @@ PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
  */
 inline static Matrix<cxfl>
 STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, const Matrix<float>& b0, 
-     const size_t nc, const size_t nk, const size_t ns, const size_t gd, const Matrix<short>& pd, const size_t n) {
+     const size_t nc, const size_t nk, const size_t ns, const size_t gd, const Matrix<float>& pd, const size_t n) {
 
     Vector<float> d (nk);
 	Matrix<cxfl>  m (ns,nc*nk);
@@ -153,7 +153,7 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
  *
  */
 static inline void
-PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<short>& pd, const size_t gd, 
+PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<float>& pd, const size_t gd, 
            const size_t nk, const size_t nc, Matrix<cxfl>& rf, Matrix<float>& grad) {
     
     
@@ -280,7 +280,7 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
 
 
 inline static bool 
-CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk, 
+CheckAmps (const Matrix<cxfl>& solution, Matrix<float>& pd, const size_t& nk, 
 		   const size_t& nc, Matrix<float>& max_rf, const float& rflim) {
 
 	bool amps_ok = true;
@@ -310,7 +310,7 @@ CheckAmps (const Matrix<cxfl>& solution, Matrix<short>& pd, const size_t& nk,
 		printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
         
 		for (size_t i = 0; i < nk; i++) {
-			pd[i] = 1 + (short) (max_rf[i] * pd[i] / rflim); 
+			pd[i] = 1 + (float) (max_rf[i] * pd[i] / rflim); 
 			printf ("%i ", 10*pd[i]); fflush(stdout);
 		}
         
@@ -441,7 +441,7 @@ KTPoints::Process   ()     {
     printf ("  # kt points: " JL_SIZE_T_SPECIFIER " \n", nk);
 
     Matrix<float> max_rf (nk,1);
-    Matrix<short> pd = ones<short>(nk,1); // Starting with shortest pulses possible 
+    Matrix<float> pd = ones<float>(nk,1); // Starting with shortest pulses possible 
 	pd *= 5;
 
     Matrix<cxfl>    solution; // Solution for timing calculation

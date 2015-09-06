@@ -1520,11 +1520,6 @@ public:
      * @param  s        Factor scalar.
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>& operator+= (const S& s) {
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::plus<T>(),(T)s));
-		return *this;
-    }
     inline Matrix<T,P>& operator+= (const T& t) {
         Vec(_M, t, _M, codeare::plus<T>());
 		return *this;
@@ -1579,9 +1574,8 @@ public:
      * @param  s        Factor scalar.
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>& operator-= (const S& s) {
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::minus<T>(),(T)s));
+    inline Matrix<T,P>& operator-= (const T& t) {
+        Vec(_M, t, _M, codeare::minus<T>()); 
 		return *this;
     }
 
@@ -1634,11 +1628,6 @@ public:
      * @param  s        Factor scalar.
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>& operator*= (const S& s) {
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
-		return *this;
-    }
     inline Matrix<T,P>& operator*= (const T& t) {
         Vec(_M, t, _M, codeare::multiplies<T>());
 		return *this;
@@ -1692,9 +1681,8 @@ public:
      * @param  s        Factor scalar.
      * @return          Result
      */
-    template <class S>
-    inline Matrix<T,P>& operator/= (const S& s) NOEXCEPT {
-        std::transform (_M.begin(), _M.end(), _M.begin(), std::bind2nd(std::divides<T>(),(T)s));
+    inline Matrix<T,P>& operator/= (const T& t) NOEXCEPT {
+        Vec(_M, t, _M, codeare::divides<T>());
 		return *this;
     }
 

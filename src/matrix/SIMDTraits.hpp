@@ -273,6 +273,9 @@ namespace codeare {
 	template<class T> class minus {
 	public:
 		typedef typename VecTraits<T>::reg_type reg_type;
+        typedef T first_argument_type;
+        typedef T second_argument_type;
+        typedef T result_type;
 		inline static reg_type packed (const reg_type& a, const reg_type& b) {
 			return VecTraits<T>::minus(a, b);
 		}
@@ -296,6 +299,9 @@ namespace codeare {
 	template<class T> class divides {
 	public:
 		typedef typename VecTraits<T>::reg_type reg_type;
+        typedef T first_argument_type;
+        typedef T second_argument_type;
+        typedef T result_type;
 		inline static reg_type packed (const reg_type& a, const reg_type& b) {
 			return VecTraits<T>::divides(a, b);
 		}

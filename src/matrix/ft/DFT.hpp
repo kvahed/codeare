@@ -310,13 +310,15 @@ public:
 
 		m_N = std::accumulate(n.begin(), n.end(), 1, std::multiplies<int>());
 
-		Vector<size_t> tmp = sl;
+		Vector<float> tmp = sl;
 		tmp.resize(3);
 		for (size_t i = 0; i < 3; ++i)
 			tmp[i] = (tmp[i] > 0) ? tmp[i] : 1;
 
 		d = tmp; // data side lengths
-		c = floor((Matrix<float>)tmp/2).Container(); // center coords
+		c = d; 
+        for (size_t i = 0; i < c.size(); ++i)
+            c[i] /= 2;
 
  		Allocate (rank, &n[0]);
 
@@ -450,7 +452,7 @@ public:
 			m_N  *= n[i];
 		}
 		
-		Matrix<size_t> tmp (3,1);
+		Matrix<float> tmp (3,1);
 		for (i = 0; i < rank; ++i)
 			tmp[i] = sl;
 		for (     ; i < 3;    ++i)
