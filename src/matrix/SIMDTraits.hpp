@@ -207,7 +207,7 @@ template<> struct VecTraits<cxfl> {
         return _mm_add_ps(arb, aib_m);              // add
     #endif
     }
-    inline static reg_type operator / (reg_type const & a, reg_type const & b) {
+    inline static reg_type divides (reg_type const & a, reg_type const & b) {
         // The following code is made similar to the operator * to enable common
         // subexpression elimination in code that contains both operator * and
         // operator / where one or both operands are the same
@@ -236,22 +236,45 @@ template<> struct VecTraits<cxdb> {
     inline static reg_type plus (const reg_type& a, const reg_type& b) {return _mm_add_pd(a, b);}
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm_sub_pd(a, b);}
     inline static reg_type multiplies (reg_type const & a, reg_type const & b) {
-        __m128d b_flip = _mm_shuffle_pd(b,b,1);      // Swap b.re and b.im
-        __m128d a_im   = _mm_shuffle_pd(a,a,3);      // Imag. part of a in both
-        __m128d a_re   = _mm_shuffle_pd(a,a,0);      // Real part of a in both
-        __m128d aib    = _mm_mul_pd(a_im, b_flip);   // (a.im*b.im, a.im*b.re)
+        reg_type b_flip = _mm_shuffle_pd(b,b,1);      // Swap b.re and b.im
+        reg_type a_im   = _mm_shuffle_pd(a,a,3);      // Imag. part of a in both
+        reg_type a_re   = _mm_shuffle_pd(a,a,0);      // Real part of a in both
+        reg_type aib    = _mm_mul_pd(a_im, b_flip);   // (a.im*b.im, a.im*b.re)
     #if defined (__FMA__)      // FMA3
         return  _mm_fmaddsub_pd(a_re, b, aib);       // a_re * b +/- aib
     #elif defined (__FMA4__)  // FMA4
         return  _mm_maddsub_pd (a_re, b, aib);       // a_re * b +/- aib
     #elif  defined (__SSSE3__)  // SSE3
-        __m128d arb    = _mm_mul_pd(a_re, b);        // (a.re*b.re, a.re*b.im)
+        reg_type arb    = _mm_mul_pd(a_re, b);        // (a.re*b.re, a.re*b.im)
         return _mm_addsub_pd(arb, aib);              // subtract/add
     #else
-        __m128d arb    = _mm_mul_pd(a_re, b);        // (a.re*b.re, a.re*b.im)
-        __m128d aib_m  = change_sign<1,0>(aib); // change sign of low part
+        reg_type arb    = _mm_mul_pd(a_re, b);        // (a.re*b.re, a.re*b.im)
+        reg_type aib_m  = change_sign<1,0>(aib); // change sign of low part
         return _mm_add_pd(arb, aib_m);               // add
     #endif
+    }
+    static inline reg_type divides (reg_type const & a, reg_type const & b) {
+        reg_type a_re   = _mm_shuffle_pd(a,a,0);      // Real part of a in both
+        reg_type arb    = _mm_mul_pd(a_re, b);        // (a.re*b.re, a.re*b.im)
+        reg_type b_flip = _mm_shuffle_pd(b,b,1);      // Swap b.re and b.im
+        reg_type a_im   = _mm_shuffle_pd(a,a,3);      // Imag. part of a in both
+#ifdef __FMA__      // FMA3
+        reg_type n      = _mm_fmsubadd_pd(a_im, b_flip, arb);
+#elif defined (__FMA4__)  // FMA4
+        reg_type n      = _mm_msubadd_pd (a_im, b_flip, arb);
+        #else
+        reg_type aib    = _mm_mul_pd(a_im, b_flip);   // (a.im*b.im, a.im*b.re)
+        reg_type arbm   = change_sign<0,1>(Vec2d(arb));
+        reg_type n      = _mm_add_pd(arbm, aib);      // arbm + aib
+#endif  // FMA
+        reg_type bb     = _mm_mul_pd(b, b);           // (b.re*b.re, b.im*b.im)
+#if INSTRSET >= 3  // SSE3
+        reg_type bsq    = _mm_hadd_pd(bb,bb);         // (b.re*b.re + b.im*b.im) dublicated
+        #else
+        reg_type bb1    = _mm_shuffle_pd(bb,bb,1);
+        reg_type bsq    = _mm_add_pd(bb,bb1);
+#endif // SSE3
+        return           _mm_div_pd(n, bsq);         // n / bsq
     }
 };
 #endif
@@ -320,7 +343,7 @@ inline static void Vec (const Vector<T>& a, const Vector<T>& b, Vector<T>& c, co
     reg_type* vc = (reg_type*) &c[0];
     int simd_n = std::floor(a.size()/VecTraits<T>::stride);
     size_t start_r = simd_n*VecTraits<T>::stride;
-#pragma omp parallel for
+
     for (int i = 0; i < simd_n; ++i)
         vc[i] = op.packed(va[i], vb[i]);
     std::transform(a.begin()+start_r, a.end(), b.begin()+start_r, c.begin()+start_r, op);
@@ -336,7 +359,7 @@ inline static void Vec (const Vector<T>& a, const T& b, Vector<T>& c, const Op& 
     reg_type* vc = (reg_type*) &c[0];
     int simd_n = std::floor(a.size()/VecTraits<T>::stride);
     size_t start_r = simd_n*VecTraits<T>::stride;
-#pragma omp parallel for
+
     for (int i = 0; i < simd_n; ++i)
         vc[i] = op.packed(va[i], *vb);
     std::transform(a.begin()+start_r, a.end(), c.begin()+start_r, std::bind2nd(op,b));

@@ -56,6 +56,12 @@ add_test(eadd t_eadd)
 add_executable(t_esub t_esub.cpp)
 add_test(esub t_esub)
 
+#add_executable(t_speed t_speed.cpp)
+#add_test(speed t_speed)
+#target_link_libraries (t_speed ${Boost_CHRONO_LIBRARY}
+#  ${Boost_SYSTEM_LIBRARY} ${Boost_CHRONO_LIBRARY}
+#  ${Boost_TIMER_LIBRARY})
+
 add_executable(t_cast t_cast.cpp)
 add_test(cast t_cast)
 
