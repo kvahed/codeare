@@ -208,9 +208,6 @@ template<> struct VecTraits<cxfl> {
     #endif
     }
     inline static reg_type divides (reg_type const & a, reg_type const & b) {
-        // The following code is made similar to the operator * to enable common
-        // subexpression elimination in code that contains both operator * and
-        // operator / where one or both operands are the same
         __m128 a_re   = _mm_shuffle_ps(a,a,0xA0);   // Real part of a in both
         __m128 arb    = _mm_mul_ps(a_re, b);        // (a.re*b.re, a.re*b.im)
         __m128 b_flip = _mm_shuffle_ps(b,b,0xB1);   // Swap b.re and b.im
