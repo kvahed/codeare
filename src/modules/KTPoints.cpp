@@ -180,7 +180,7 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<f
         for (size_t k = 0; k < nk; k++) {
             
             // RF action
-            for (short p = 0; p < pd[k]; p++, i++)
+            for (short p = 0; p < (short)pd[k]; p++, i++)
                 rf (i,rc) = solution(k + rc*nk) / (float) pd[k] * cxfl(1000.0,0.0);
 
             // Gradient action, no RF
@@ -310,8 +310,8 @@ CheckAmps (const Matrix<cxfl>& solution, Matrix<float>& pd, const size_t& nk,
 		printf ("Pulse amplitudes to high!\n  Updating pulse durations ... to "); fflush(stdout);
         
 		for (size_t i = 0; i < nk; i++) {
-			pd[i] = 1 + (float) (max_rf[i] * pd[i] / rflim); 
-			printf ("%i ", 10*pd[i]); fflush(stdout);
+			pd[i] = (short) (1 + (float) (max_rf[i] * pd[i] / rflim)); 
+			printf ("%.0f ", 10*pd[i]); fflush(stdout);
 		}
         
 		printf ("[us] ... done.\n\n");
