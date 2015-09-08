@@ -88,15 +88,6 @@ imag (const Matrix<T>& m) {
 	return res;
 }
  
-
-
-
-/**
- * @brief    Dummy for double
- *
- * @param  m Input
- * @return   Imaginary part
- */
 template<class T> inline static Matrix<T>
 conj (const MatrixType<T>& m) {
 	Matrix<T> res (size(m));
@@ -105,8 +96,9 @@ conj (const MatrixType<T>& m) {
 	return res;
 }
 
-
-//using namespace codeare::matrix::arithmetic;
+template<class T> inline static Matrix<T> conj (const Matrix<T>& m) {
+	return (!m);
+}
 
 template <class T, class S> inline static Matrix<std::complex<T> > 
 complex (const Matrix<T>& re, const Matrix<S>& im) {

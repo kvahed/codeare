@@ -34,6 +34,7 @@ template<> struct VecTraits<float> {
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm256_sub_ps(a, b);}
     inline static reg_type multiplies (const reg_type& a, const reg_type& b) {return _mm256_mul_ps(a, b);}
     inline static reg_type divides (const reg_type& a, const reg_type& b) {return _mm256_div_ps(a, b);}
+    inline static reg_type conjugate (const reg_type& a) { return a; }
 };
 
 template<> struct VecTraits<double> {
@@ -44,6 +45,7 @@ template<> struct VecTraits<double> {
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm256_sub_pd(a, b);}
     inline static reg_type multiplies (const reg_type& a, const reg_type& b) {return _mm256_mul_pd(a, b);}
     inline static reg_type divides (const reg_type& a, const reg_type& b) {return _mm256_div_pd(a, b);}
+    inline static reg_type conjugate (const reg_type& a) { return a; }
 };
 
 template<> struct VecTraits<cxfl> {
@@ -68,13 +70,13 @@ template<> struct VecTraits<cxfl> {
 #endif                   // FMA
     }
     template <int i0, int i1, int i2, int i3, int i4, int i5, int i6, int i7>
-    static inline reg_type change_sign (const reg_type & a) {
+    inline static reg_type change_sign (const reg_type & a) {
         if ((i0 | i1 | i2 | i3 | i4 | i5 | i6 | i7) == 0) return a;
         reg_type mask = constant8f<i0 ? 0x80000000 : 0, i1 ? 0x80000000 : 0, i2 ? 0x80000000 : 0, i3 ? 0x80000000 : 0,
                                  i4 ? 0x80000000 : 0, i5 ? 0x80000000 : 0, i6 ? 0x80000000 : 0, i7 ? 0x80000000 : 0> ();
         return _mm256_xor_ps(a, mask);
     }
-    static inline reg_type divides (const reg_type &a, const reg_type &b) {
+    inline static reg_type divides (const reg_type &a, const reg_type &b) {
         reg_type a_re   = _mm256_shuffle_ps(a,a,0xA0);   // Real part of a in both
         reg_type arb    = _mm256_mul_ps(a_re, b);        // (a.re*b.re, a.re*b.im)
         reg_type b_flip = _mm256_shuffle_ps(b,b,0xB1);   // Swap b.re and b.im
@@ -85,7 +87,7 @@ template<> struct VecTraits<cxfl> {
         reg_type n      = _mm256_msubadd_ps (a_im, b_flip, arb);
 #else
         reg_type aib    = _mm256_mul_ps(a_im, b_flip);   // (a.im*b.im, a.im*b.re)
-        reg_type arbm   = change_sign<0,1,0,1,0,1,0,1>(reg_type(arb)); // (a.re*b.re,-a.re*b.im)
+        reg_type arbm   = change_sign<0,1,0,1,0,1,0,1>(arb); // (a.re*b.re,-a.re*b.im)
         reg_type n      = _mm256_add_ps(arbm, aib);      // arbm + aib
 #endif  // FMA
         reg_type bb     = _mm256_mul_ps(b, b);           // (b.re*b.re, b.im*b.im)
@@ -93,6 +95,9 @@ template<> struct VecTraits<cxfl> {
         reg_type bsq    = _mm256_add_ps(bb,bb2);         // (b.re*b.re + b.im*b.im) dublicated
         return          _mm256_div_ps(n, bsq);         // n / bsq
     }
+  inline static reg_type conjugate (const reg_type& a) {
+    return change_sign<0,1,0,1,0,1,0,1>(a);
+  }
 };
 
 template<> struct VecTraits<cxdb> {
@@ -141,12 +146,15 @@ template<> struct VecTraits<cxdb> {
         reg_type bsq    = _mm256_hadd_pd(bb,bb); // (b.re*b.re + b.im*b.im) dublicated
         return _mm256_div_pd(n, bsq); // n /
     }
+  inline static reg_type conjugate (const reg_type& a) {
+    return change_sign<0,1,0,1>(a);
+  }
 };
 #elif defined (__SSE2__)
 #include <emmintrin.h>
 
 template <int i0, int i1, int i2, int i3>
-static inline __m128i constant4i() {
+inline static __m128i constant4i() {
     static const union {
         int     i[4];
         __m128i xmm;
@@ -155,7 +163,7 @@ static inline __m128i constant4i() {
 }
 
 template <int i0, int i1, int i2, int i3>
-static inline __m128 change_sign(__m128 const & a) {
+inline static __m128 change_sign(__m128 const & a) {
     if ((i0 | i1 | i2 | i3) == 0) return a;
     __m128i mask = constant4i<i0 ? 0x80000000 : 0, i1 ? 0x80000000 : 0, i2 ? 0x80000000 : 0, i3 ? 0x80000000 : 0>();
     return  _mm_xor_ps(a, _mm_castsi128_ps(mask));     // flip sign bits
@@ -168,6 +176,8 @@ template<> struct VecTraits<float> {
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm_sub_ps(a, b);}
     inline static reg_type multiplies (const reg_type& a, const reg_type& b) {return _mm_mul_ps(a, b);}
     inline static reg_type divides (const reg_type& a, const reg_type& b) {return _mm_div_ps(a, b);}
+    inline static reg_type conjugate (const reg_type& a) { return a; }
+
 };
 
 template<> struct VecTraits<double> {
@@ -177,6 +187,7 @@ template<> struct VecTraits<double> {
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm_sub_pd(a, b);}
     inline static reg_type multiplies (const reg_type& a, const reg_type& b) {return _mm_mul_pd(a, b);}
     inline static reg_type divides (const reg_type& a, const reg_type& b) {return _mm_div_pd(a, b);}
+    inline static reg_type conjugate (const reg_type& a) { return a; }
 };
 template<> struct VecTraits<cxfl> {
     typedef __m128 reg_type;
@@ -184,7 +195,7 @@ template<> struct VecTraits<cxfl> {
     inline static reg_type plus (const reg_type& a, const reg_type& b) {return _mm_add_ps(a, b);}
     inline static reg_type minus (const reg_type& a, const reg_type& b) {return _mm_sub_ps(a, b);}
     template <int i0, int i1, int i2, int i3>
-    static inline reg_type change_sign(reg_type const & a) {
+    inline static reg_type change_sign(reg_type const & a) {
         if ((i0 | i1 | i2 | i3) == 0) return a;
         __m128i mask = constant4i<i0 ? 0x80000000 : 0, i1 ? 0x80000000 : 0, i2 ? 0x80000000 : 0, i3 ? 0x80000000 : 0>();
         return  _mm_xor_ps(a, _mm_castsi128_ps(mask));     // flip sign bits
@@ -226,6 +237,9 @@ template<> struct VecTraits<cxfl> {
         __m128 bb2    = _mm_add_ps(bb,bb1);         // add pairwise into both positions
         return          _mm_div_ps(n, bb2);         // n / bb3
     }
+  inline static reg_type conjugate (const reg_type& a) {
+    return change_sign<0,1,0,1>(a);
+  }
 };
 template<> struct VecTraits<cxdb> {
     typedef __m128d reg_type;
@@ -250,7 +264,7 @@ template<> struct VecTraits<cxdb> {
         return _mm_add_pd(arb, aib_m);               // add
     #endif
     }
-    static inline reg_type divides (reg_type const & a, reg_type const & b) {
+    inline static reg_type divides (reg_type const & a, reg_type const & b) {
         reg_type a_re   = _mm_shuffle_pd(a,a,0);      // Real part of a in both
         reg_type arb    = _mm_mul_pd(a_re, b);        // (a.re*b.re, a.re*b.im)
         reg_type b_flip = _mm_shuffle_pd(b,b,1);      // Swap b.re and b.im
@@ -273,6 +287,9 @@ template<> struct VecTraits<cxdb> {
 #endif // SSE3
         return           _mm_div_pd(n, bsq);         // n / bsq
     }
+  inline static reg_type conjugate (const reg_type& a) {
+    return change_sign<0,1>(a);
+  }
 };
 #endif
 
@@ -329,7 +346,24 @@ namespace codeare {
 			return std::divides<T>()( x, y );
 		}
 	};
+	template<class T> class conjugate {
+	public:
+		typedef typename VecTraits<T>::reg_type reg_type;
+        typedef T first_argument_type;
+        typedef T second_argument_type;
+        typedef T result_type;
+		inline static reg_type packed (const reg_type& a) {
+			return VecTraits<T>::conjugate(a);
+		}
+		T operator()( const T& x) const;
+	};
+	template<> inline float conjugate<float>::operator() (const float& f) const { return f; }
+	template<> inline double conjugate<double>::operator() (const double& d) const { return d; }
+	template<> inline cxfl conjugate<cxfl>::operator() (const cxfl& cf) const { return std::conj(cf); }
+	template<> inline cxdb conjugate<cxdb>::operator() (const cxdb& cd) const { return std::conj(cd); }
+
 }
+
 
 template<class T, class Op> 
 inline static void Vec (const Vector<T>& a, const Vector<T>& b, Vector<T>& c, const Op& op) {
@@ -340,10 +374,22 @@ inline static void Vec (const Vector<T>& a, const Vector<T>& b, Vector<T>& c, co
     reg_type* vc = (reg_type*) &c[0];
     int simd_n = std::floor(a.size()/VecTraits<T>::stride);
     size_t start_r = simd_n*VecTraits<T>::stride;
-
-    for (int i = 0; i < simd_n; ++i)
+    for (size_t i = 0; i < simd_n; ++i)
         vc[i] = op.packed(va[i], vb[i]);
     std::transform(a.begin()+start_r, a.end(), b.begin()+start_r, c.begin()+start_r, op);
+}
+
+template<class T, class Op> 
+inline static void Vec (const Vector<T>& a, Vector<T>& c, const Op& op) {
+    typedef typename TypeTraits<T>::RT RT;
+    typedef typename VecTraits<T>::reg_type reg_type;
+    const reg_type* va = (const reg_type*) &a[0];
+    reg_type* vc = (reg_type*) &c[0];
+    size_t simd_n = std::floor(a.size()/VecTraits<T>::stride),
+      start_r = simd_n*VecTraits<T>::stride;
+    for (size_t i = 0; i < simd_n; ++i)
+        vc[i] = op.packed(va[i]);
+    std::transform(a.begin()+start_r, a.end(), c.begin()+start_r, op);
 }
 
 template<class T, class Op> 
@@ -354,10 +400,9 @@ inline static void Vec (const Vector<T>& a, const T& b, Vector<T>& c, const Op& 
     const reg_type* va = (const reg_type*) &a[0];
     const reg_type* vb = (const reg_type*) &B[0];
     reg_type* vc = (reg_type*) &c[0];
-    int simd_n = std::floor(a.size()/VecTraits<T>::stride);
-    size_t start_r = simd_n*VecTraits<T>::stride;
-
-    for (int i = 0; i < simd_n; ++i)
+    size_t simd_n = std::floor(a.size()/VecTraits<T>::stride),
+      start_r = simd_n*VecTraits<T>::stride;
+    for (size_t i = 0; i < simd_n; ++i)
         vc[i] = op.packed(va[i], *vb);
     std::transform(a.begin()+start_r, a.end(), c.begin()+start_r, std::bind2nd(op,b));
 }

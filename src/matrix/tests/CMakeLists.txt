@@ -44,6 +44,9 @@ endif()
 set (TEST_CALL t_tvop)  
 MP_TESTS ("tvop" "${TEST_CALL}")
 
+add_executable(t_econj t_econj.cpp)
+add_test(conj t_econj)
+
 add_executable(t_emul t_emul.cpp)
 add_test(emul t_emul)
 

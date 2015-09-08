@@ -1221,29 +1221,15 @@ public:
 
 
     /**
-     * @brief           Transposition / Complex conjugation. i.e. this'.
+     * @brief           Complex conjugation. i.e. this.'
      *
      * @return          Matrix::tr()
      */
     inline Matrix<T,P> operator! () const {
-    	MATRIX_ASSERT(_dim.size()==2, TWO_DIMENSIONAL_OPERATION);
     	Matrix<T,P> res = *this;
-		for (size_t i = 0; i < _dim[1]; ++i)
-			for (size_t j = 0; j < i; j++)
-				swapd(res(j,i),res(i,j));
-        return res;
+    	Vec(_M, res._M, codeare::conjugate<T>());
+    	return res;
     }
-
-
-
-    /**
-     * @brief           Return a matrix with result[i] = (m[i] ? this[i] : 0).
-     *
-     * @param  M        The operand
-     * @return          Cross-section or zero
-     */
-    //inline Matrix<T,P>
-    //operator&           (const Matrix<cbool>& M) const ;
 
 
      /**
@@ -1575,7 +1561,7 @@ public:
      * @return          Result
      */
     inline Matrix<T,P>& operator-= (const T& t) {
-        Vec(_M, t, _M, codeare::minus<T>()); 
+        Vec(_M, t, _M, codeare::minus<T>());
 		return *this;
     }
 
