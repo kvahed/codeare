@@ -30,8 +30,36 @@ int test_3d () {
 	return 0;
 }
 
+int test_5d4 () {
+    Matrix<cxfl> A = randn<cxfl>(4,5,3,4,3), B, C;
+    TVOP<cxfl> tv = TVOP<cxfl>(0,0,0,1,0) ;
+    B = tv * A;
+    C = tv ->* B;
+    IOContext f ("tvop_5d4.h5", WRITE);
+    fwrite (f, A);
+    fwrite (f, B);
+    fwrite (f, C);
+    fclose (f);
+	return 0;
+}
+
+int test_5d5 () {
+    Matrix<cxfl> A = randn<cxfl>(4,5,3,4,3), B, C;
+    TVOP<cxfl> tv = TVOP<cxfl>(0,0,0,0,1) ;
+    B = tv * A;
+    C = tv ->* B;
+    IOContext f ("tvop_5d5.h5", WRITE);
+    fwrite (f, A);
+    fwrite (f, B);
+    fwrite (f, C);
+    fclose (f);
+	return 0;
+}
+
 int main (int narg, char** argv) {
     test_2d();
     test_3d();
+    test_5d4();
+    test_5d5();
     return 0;
 }

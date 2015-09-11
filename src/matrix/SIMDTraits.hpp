@@ -361,7 +361,6 @@ namespace codeare {
 	template<> inline double conjugate<double>::operator() (const double& d) const { return d; }
 	template<> inline cxfl conjugate<cxfl>::operator() (const cxfl& cf) const { return std::conj(cf); }
 	template<> inline cxdb conjugate<cxdb>::operator() (const cxdb& cd) const { return std::conj(cd); }
-
 }
 
 

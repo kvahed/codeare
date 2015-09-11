@@ -24,6 +24,129 @@
 #include "Matrix.hpp"
 
 
+template<class T, bool b0, bool b1> struct TV2D {};
+template<class T> struct TV2D<T,1,1> {
+    Matrix<T> inline static fwd (const Matrix<T>& A) {
+        size_t M = A.Dim(0), N = A.Dim(1);
+        Matrix<T> res (M, N, 2);
+        for (size_t n = 0; n < N; ++n)
+            for (size_t m = 0; m < M-1; ++m)
+                res(m,n,0) = A(m+1,n) - A(m,n);
+        for (size_t n = 0; n < N-1; ++n)
+            for (size_t m = 0; m < M; ++m)
+                res(m,n,1) = A(m,n+1) - A(m,n);
+        return res;
+    }
+    Matrix<T> inline static adj (const Matrix<T>& A) {
+        size_t M = A.Dim(0), N = A.Dim(1);
+        Matrix<T> res = Matrix<T>(M,N);
+        for (size_t m = 0; m < M; ++m)
+            for (size_t n = 1; n < N-1; ++n)
+                res (n,m) = A(n-1,m,0) - A(n,m,0);
+        for (size_t m = 1; m < M-1; ++m)
+            for (size_t n = 0; n < N; ++n)
+                res (n,m) += A(n,m-1,1) - A(n,m,1);
+        return res;
+    }
+};
+
+template<class T, bool b0, bool b1, bool b2> struct TV3D {};
+template<class T> struct TV3D<T,1,1,1> {
+    Matrix<T> inline static fwd (const Matrix<T>& A) {
+        size_t M = A.Dim(0), N = A.Dim(1), L = A.Dim(2);
+        Matrix<T> res = Matrix<T>(M, N, L, 3);
+        for (size_t l = 0; l < L; ++l)
+            for (size_t n = 0; n < N; ++n)
+                for (size_t m = 0; m < M-1; ++m)
+                    res(m,n,l,0) = A(m+1,n,l) - A(m,n,l);
+        for (size_t l = 0; l < L; ++l)
+            for (size_t n = 0; n < N-1; ++n)
+                for (size_t m = 0; m < M; ++m)
+                    res(m,n,l,1) = A(m,n+1,l) - A(m,n,l);
+        for (size_t l = 0; l < L-1; ++l)
+            for (size_t n = 0; n < N; ++n)
+                for (size_t m = 0; m < M; ++m)
+                    res(m,n,l,1) = A(m,n,l+1) - A(m,n,l);
+        return res;
+    }
+    Matrix<T> inline static adj (const Matrix<T>& A) {
+        size_t M = A.Dim(0), N = A.Dim(1), L = A.Dim(2);
+        Matrix<T> res = Matrix<T>(M,N,L);
+        for (size_t l = 0; l < L; ++l)
+            for (size_t m = 0; m < M; ++m)
+                for (size_t n = 1; n < N-1; ++n)
+                    res (n,m,l) = A(n-1,m,l,0) - A(n,m,l,0);
+        for (size_t l = 0; l < L; ++l)
+            for (size_t m = 1; m < M-1; ++m)
+                for (size_t n = 0; n < N; ++n)
+                    res (n,m,l) += A(n,m-1,l,1) - A(n,m,l,1);
+        for (size_t l = 1; l < L-1; ++l)
+            for (size_t m = 0; m < M; ++m)
+                for (size_t n = 0; n < N; ++n)
+                    res (n,m,l) += A(n,m,l-1,2) - A(n,m,l,2);
+        return res;
+    }
+};
+
+template<class T, bool b0, bool b1, bool b2, bool b3, bool b4> struct TV5D {};
+template<class T> struct TV5D<T,0,0,0,1,0> {
+    Matrix<T> inline static fwd (const Matrix<T>& A) {
+        Vector<size_t> dims = size(A);
+        Matrix<T> ret (dims);
+        size_t stride = dims[0]*dims[1]*dims[2];
+        for (size_t j = 0; j < dims[4]; ++j)
+            for (size_t i = 0; i < dims[3]-1; ++i)
+                std::transform(A.Begin()+(j*dims[3]+i+1)*stride, A.Begin()+(j*dims[3]+i+2)*stride,
+                               A.Begin()+(j*dims[3]+i  )*stride, ret.Begin()+(j*dims[3]+i)*stride,
+                               std::minus<T>());
+        return ret;
+    }
+    Matrix<T> inline static adj (const Matrix<T>& A) {
+        Vector<size_t> dims = size(A);
+        Matrix<T> ret (dims);
+        size_t stride = dims[0]*dims[1]*dims[2];
+        for (size_t j = 0; j < dims[4]; ++j) {
+            size_t offset = j*dims[3];
+            for (size_t i = 1; i < dims[3]-1; ++i)
+                std::transform(A.Begin()+(offset+i-1)*stride, A.Begin()+(offset+i)*stride,
+                               A.Begin()+(offset+i)*stride, ret.Begin()+(offset+i)*stride,
+                               std::minus<T>());
+        }
+        for (size_t j = 0; j < dims[4]; ++j) {
+            size_t offset = j*dims[3];
+            std::copy_n(A.Begin()+(offset+dims[3]-2)*stride, stride, ret.Begin()+(offset+dims[3]-1)*stride);
+            for (size_t i = 0; i < stride; ++i)
+                ret[offset*stride+i] = -A[offset*stride+i];
+        }
+        return ret;
+    }
+};
+template<class T> struct TV5D<T,0,0,0,0,1> {
+    Matrix<T> inline static fwd (const Matrix<T>& A) {
+        Vector<size_t> dims = size(A);
+        Matrix<T> ret (dims);
+        size_t stride = dims[0]*dims[1]*dims[2]*dims[3];
+        for (size_t i = 0; i < dims[4]-1; i++)
+            std::transform(A.Begin()+(i+1)*stride, A.Begin()+(i+2)*stride, A.Begin()+i*stride,
+                           ret.Begin()+i*stride, std::minus<T>());
+        return ret;
+    }
+    Matrix<T> inline static adj (const Matrix<T>& A) {
+        Vector<size_t> dims = size(A);
+        size_t stride = dims[0]*dims[1]*dims[2]*dims[3];
+        Matrix<T> ret (dims);
+        for (size_t i = 1; i < dims[4]-1; i++)
+            std::transform(A.Begin()+(i-1)*stride, A.Begin()+i*stride, A.Begin()+i*stride,
+                           ret.Begin()+i*stride, std::minus<T>());
+        for (size_t i = 0; i < stride; ++i)
+            ret[i] = -A[i];
+        std::copy_n(A.Begin()+(dims[4]-2)*stride, stride, ret.Begin()+(dims[4]-1)*stride);
+        return ret;
+    }
+};
+
+enum TVOP_EXCEPTION {UNDEFINED_TV_OPERATOR};
+
 /**
  * @brief 2D Finite difference operator
  */
@@ -34,43 +157,49 @@ class TVOP {
 public:
 
 	/**
+	 * @brief Default constructor
+	 */
+	TVOP()  NOEXCEPT {};
+    TVOP (const Vector<size_t>& dims) : _dims(dims) {}
+    TVOP (const unsigned short dim0, const unsigned short dim1,
+          const unsigned short dim2, const unsigned short dim3, const unsigned short dim4) {
+        _dims.resize(5);
+        _dims[0] = dim0;
+        _dims[1] = dim1;
+        _dims[2] = dim2;
+        _dims[3] = dim3;
+        _dims[4] = dim4;
+    }
+
+
+	/**
+	 * @brief Default destructor
+	 */
+	~TVOP() NOEXCEPT {};
+
+
+	/**
 	 * @brief    2D Forward transform
 	 *
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline static Matrix<T> Trafo (const Matrix<T>& A) NOEXCEPT {
-		
-		Matrix<T> res;
+    
+	inline Matrix<T> Trafo (const Matrix<T>& A) const {
 
-		if (ndims(A)==2) {
-			size_t M = A.Dim(0), N = A.Dim(1);
-			res = Matrix<T>(M, N, 2);
-			for (size_t n = 0; n < N; ++n)
-				for (size_t m = 0; m < M-1; ++m)
-					res(m,n,0) = A(m+1,n) - A(m,n);
-			for (size_t n = 0; n < N-1; ++n)
-				for (size_t m = 0; m < M; ++m)
-					res(m,n,1) = A(m,n+1) - A(m,n);
-		} else if (ndims(A)==3) {
-			size_t M = A.Dim(0), N = A.Dim(1), L = A.Dim(2);
-			res = Matrix<T>(M, N, L, 3);
-			for (size_t l = 0; l < L; ++l)
-				for (size_t n = 0; n < N; ++n)
-					for (size_t m = 0; m < M-1; ++m)
-						res(m,n,l,0) = A(m+1,n,l) - A(m,n,l);
-			for (size_t l = 0; l < L; ++l)
-				for (size_t n = 0; n < N-1; ++n)
-					for (size_t m = 0; m < M; ++m)
-						res(m,n,l,1) = A(m,n+1,l) - A(m,n,l);
-			for (size_t l = 0; l < L-1; ++l)
-				for (size_t n = 0; n < N; ++n)
-					for (size_t m = 0; m < M; ++m)
-						res(m,n,l,1) = A(m,n,l+1) - A(m,n,l);
-		}
-		
-		return res;
-		
+		if (ndims(A)==2 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 2))) 
+            return TV2D<T,1,1>::fwd(A);
+		else if (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1 && _dims[2] == 1))) 
+            return TV3D<T,1,1,1>::fwd(A);
+		else if (ndims(A)==5 && (_dims.size()==5 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 1 && _dims[4] == 0))
+            return TV5D<T,0,0,0,1,0>::fwd(A);
+        else if (ndims(A)==5 && (_dims.size()==5 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 0 && _dims[4] == 1))
+            return TV5D<T,0,0,0,0,1>::fwd(A);
+        else
+            throw UNDEFINED_TV_OPERATOR;
+
+        return Matrix<T>();
+        
 	}	
 	
 	/**
@@ -79,42 +208,20 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	inline static Matrix<T> Adjoint (const Matrix<T>& A) NOEXCEPT {
+	inline Matrix<T> Adjoint (const Matrix<T>& A) const {
 
-		Matrix<T> resx, resy;
-
-		if (ndims(A)==3) {
-			size_t M = A.Dim(0), N = A.Dim(1);
-			resx = Matrix<T>(M,N);
-			resy = Matrix<T>(M,N);
-			for (size_t m = 0; m < M; ++m)
-				for (size_t n = 1; n < N-1; ++n)
-					resy (n,m) = A(n-1,m,0) - A(n,m,0);
-			for (size_t m = 1; m < M-1; ++m)
-				for (size_t n = 0; n < N; ++n)
-					resx (n,m) = A(n,m-1,1) - A(n,m,1);
-			resx += resy;
-		} else if (ndims(A)==4) {
-			size_t M = A.Dim(0), N = A.Dim(1), L = A.Dim(2);
-			resx = Matrix<T>(M,N,L);
-			resy = Matrix<T>(M,N,L);
-			Matrix<T> resz = Matrix<T>(M,N,L);
-			for (size_t l = 0; l < L; ++l)
-				for (size_t m = 0; m < M; ++m)
-					for (size_t n = 1; n < N-1; ++n)
-						resy (n,m,l) = A(n-1,m,l,0) - A(n,m,l,0);
-			for (size_t l = 0; l < L; ++l)
-				for (size_t m = 1; m < M-1; ++m)
-					for (size_t n = 0; n < N; ++n)
-						resx (n,m,l) = A(n,m-1,l,1) - A(n,m,l,1);
-			for (size_t l = 1; l < L-1; ++l)
-				for (size_t m = 0; m < M; ++m)
-					for (size_t n = 0; n < N; ++n)
-						resz (n,m,l) = A(n,m,l-1,2) - A(n,m,l,2);
-			resx += resy + resz;
-		}
+		if (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1))) 
+            return TV2D<T,1,1>::adj(A);
+		else if (ndims(A)==4 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1 && _dims[2] == 1))) 
+            return TV3D<T,1,1,1>::adj(A);
+		else if (ndims(A)==5 && (_dims.size()==5 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 1 && _dims[4] == 0))
+            return TV5D<T,0,0,0,1,0>::adj(A);
+        else if (ndims(A)==5 && (_dims.size()==5 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 0 && _dims[4] == 1))
+            return TV5D<T,0,0,0,0,1>::adj(A);
+        else
+            throw UNDEFINED_TV_OPERATOR;
 		
-		return resx;
+		return Matrix<T>();
 		
 	}
 	
@@ -142,16 +249,8 @@ public:
 	}
 
 
-	/**
-	 * @brief Default constructor
-	 */
-	TVOP()  NOEXCEPT {};
-
-
-	/**
-	 * @brief Default destructor
-	 */
-	~TVOP() NOEXCEPT {};
+private:
+    Vector<unsigned short> _dims;
 
 };
 
