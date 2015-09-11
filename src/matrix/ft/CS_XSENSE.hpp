@@ -131,6 +131,9 @@ public:
             dwt = new DWT<T> (dims[0], (wlfamily)_wf, _wm);
         else 
             dwt = new DWT<T> (16, (wlfamily)_wf, _wm);
+
+        tvt = new TVOP<T>();
+        
         printf ("... done.\n\n");
 
     }
@@ -209,7 +212,7 @@ public:
     }
     
     inline virtual void Update (const Matrix<T>& dx) {
-        wdx =  *dwt->*dx;
+        wdx =  *dwt->*dx;        
         ffdbx = *ft * wx;
         ffdbg = *ft * wdx;
         if (_tvw) {
@@ -223,7 +226,8 @@ public:
         os << "    Weights: TV("<< _tvw <<") XF("<< _xfmw <<") L1("<<_l1<<")"<<std::endl;
         os << "    Pnorm: "<<_pnorm<< std::endl;
         os << *ft << std::endl;
-        os << *dwt << std::endl;
+        if (dwt)
+            os << *dwt << std::endl;
         os << *nlopt ;
 		return os;
 	}
@@ -243,20 +247,21 @@ public:
 
     inline virtual Matrix<T> Adjoint (const Matrix<T>& m)  {
 
-        data = m;
+                data = m;
 
         Matrix<T> im_dc;
         std::vector< Matrix<T> > vc;
-        
+                
         im_dc  = data;
         if (_ft_type != 2 && _ft_type != 3)
             im_dc /= wspace.Get<RT>("pdf");
         im_dc  = *ft ->* im_dc;
-
+        
         if (_verbose)
             vc.push_back(im_dc);
 
-        _ndnz = (RT)nnz(data);
+                _ndnz = (RT)nnz(data);
+
         im_dc  = *dwt * im_dc;
 
         printf ("  Running %i %s iterations ... \n", _csiter+1, nlopt_names[_nlopt_type]); fflush(stdout);
