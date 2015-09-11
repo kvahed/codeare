@@ -1,6 +1,5 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Juelich, Germany
+ *  codeare Copyright (C) 2007-2012 Kaveh Vahedipour
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,69 +17,118 @@
  *  02110-1301  USA
  */
 
-#ifndef __XD_GRASP_HPP__
-#define __XD_GRASP_HPP__
+#ifndef __XDGRASP_HPP__
+#define __XDGRASP_HPP__
 
 #include "ReconStrategy.hpp"
-#include "NCSENSE.hpp"
+#include "Algos.hpp"
+#include "DFT.hpp"
+#include "CS_XSENSE.hpp"
+#include "DWT.hpp"
+#include "TVOP.hpp"
+#include "CX.hpp"
+#include "linalg/Lapack.hpp"
 
+//#include <pthread.h>
 /**
  * @brief Reconstruction startegies
  */
 namespace RRStrategy {
 
-	/**
-	 * @brief Empty recon for test purposes
-	 */
-	class XDGRASP : public ReconStrategy {
-		
-		
-	public:
-		
-		/**
-		 * @brief Default constructor
-		 */
-		XDGRASP  () : m_ntres(0), m_nt(0), m_nlines(0) {}
-		
-		/**
-		 * @brief Default destructor
-		 */
-		virtual 
-		~XDGRASP () {}
-		
-		
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual codeare::error_code Process ();
-		
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual codeare::error_code Prepare ();
 
-		/**
-		 * @brief Do nothing
-		 */
-		virtual codeare::error_code	Init ();
-		
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual codeare::error_code	Finalise ();
-		
+    /**
+     * @brief CG parameters
+     */
+    struct CSParam {
+        
+        int    lsiter;
+        int    lsto ;
+        int    cgiter;
+        
+        double pnorm;
+        double tvw;
+        double xfmw;
+        double cgconv;
+        double l1;
+        double lsa;
+        double lsb;
+        DWT<cxfl>* dwt;
+        FT<cxfl>*  ft;
+        TVOP<cxfl>* tvt;
+        
+    };
 
-	private:
+    
+    /**
+     * @brief CS reconstruction based on Sparse MRI v0.2 by Michael Lustig
+     */
+    class XDGRASP : public ReconStrategy {
+            
+        
+    public:
+        
+        /**
+         * @brief Default constructor
+         */
+        XDGRASP  ();
+        
+        
+        /**
+         * @brief Default destructor
+         */
+        virtual ~XDGRASP ();
+        
+        
+        /**
+         * @brief Do nothing 
+         */
+        virtual codeare::error_code Process ();
+        
+        
+        /**
+         * @brief Do nothing 
+         */
+        virtual codeare::error_code Init ();
+        
+        /**
+         * @brief Do nothing
+         */
+        virtual codeare::error_code Prepare ();
+        
+        /**
+         * @brief Do nothing 
+         */
+        virtual codeare::error_code Finalise ();
+        
+        
+    private:
+        
+        int            m_dim;    /**< Image recon dim */
+        int            m_N[3];   /**< Data side lengths */
+        int            m_csiter; /**< # global iterations */
+        Vector<size_t> m_image_size;
+        int            m_test_case;
+        float          m_ndnz;
 
-		NCSENSE<cxfl> m_ft;
-		Params m_params;
+        double m_noise;
 
-		size_t m_ntres;
-		size_t m_nlines;
-		size_t m_nt;
+        CSParam        m_csparam;
+        int            m_wf;
+        int            m_wm;
+        int            m_verbose;
+        
+        int            m_ft_type;
 
-	};
+        Matrix<cxfl> data;
 
+        int            m_nrespiratory;
+        int            m_ncardiac;
+        int            m_ncontrast;
+
+        CS_XSENSE<cxfl>* csx;
+
+    };
+    
 }
-#endif /* __DUMMY_RECON_H__ */
+#endif /* __XDGRASP_H__ */
 

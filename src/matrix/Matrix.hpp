@@ -607,6 +607,34 @@ public:
     }
 
     
+    /**
+     * @brief            Reference to element in (first) volume (lhs)
+     *
+     * @param  x         Column
+     * @param  y         Line
+     * @param  z         Slice
+     *
+     * @return           Reference
+     */
+    inline const T& At (const size_t& n0, const size_t& n1, const size_t& n2,
+                        const size_t& n3, const size_t& n4) const  {
+        MATRIX_ASSERT(n0<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n1<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n2<_dim[2],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n3<_dim[3],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n4<_dim[4],INDEX_EXCEEDS_DIMENSION);
+        return _M[n0 + _dsz[1]*n1 + _dsz[2]*n2 + _dsz[3]*n3 + _dsz[4]*n4];
+    }
+    inline       T& At (const size_t& n0, const size_t& n1, const size_t& n2,
+                        const size_t& n3, const size_t& n4) {
+        MATRIX_ASSERT(n0<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n1<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n2<_dim[2],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n3<_dim[3],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n4<_dim[4],INDEX_EXCEEDS_DIMENSION);
+        return _M[n0 + _dsz[1]*n1 + _dsz[2]*n2 + _dsz[3]*n3 + _dsz[4]*n4];
+    }
+    
 
     /**
      * @brief            Get value at position (lhs)
@@ -631,7 +659,7 @@ public:
      */
     inline const T& At
 		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
-		 const size_t& n03,     const size_t& n04,     const size_t& n05 = 0,
+		 const size_t& n03,     const size_t& n04,     const size_t& n05,
 		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
 		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
 		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
@@ -648,7 +676,7 @@ public:
     }
     inline T& At
 		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
-   		 const size_t& n03,     const size_t& n04,     const size_t& n05 = 0,
+   		 const size_t& n03,     const size_t& n04,     const size_t& n05,
    		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
    		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
    		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
@@ -781,6 +809,37 @@ public:
     }
 
 
+    /**
+     * @brief            Get value in volume
+     *
+     * @param  x         Column
+     * @param  y         Line
+     * @param  z         Slice
+     *
+     * @return           Value
+     */
+    inline const T& operator() (const size_t& n0, const size_t& n1, const size_t& n2,
+                                const size_t& n3, const size_t& n4) const {
+        return this->At(n0,n1,n2,n3,n4);
+    }
+
+
+    /**
+     * @brief            Reference to value in volume
+     *
+     * @param  x         Column
+     * @param  y         Line
+     * @param  z         Slice
+     *
+     * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
+     */
+    inline T& operator() (const size_t& n0, const size_t& n1, const size_t& n2,
+                          const size_t& n3, const size_t& n4) {
+        return this->At(n0,n1,n2,n3,n4);
+    }
+
+
+
     /** 
      * @brief            Reference to element
      *
@@ -804,15 +863,11 @@ public:
      */
     inline T& operator()
     		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
-      		 const size_t& n03,     const size_t& n04,     const size_t& n05 = 0,
+      		 const size_t& n03,     const size_t& n04,     const size_t& n05,
       		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
       		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
       		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
       		 const size_t& n15 = 0) {
-    	MATRIX_ASSERT (n00>=0 && n01>=0 && n02>=0 && n03>=0 && n04>=0 &&
-    			       n05>=0 && n06>=0 && n07>=0 && n08>=0 && n09>=0 &&
-					   n10>=0 && n11>=0 && n12>=0 && n13>=0 && n14>=0 &&
-					   n15>=0, NEGATIVE_INDEX);
     	MATRIX_ASSERT (n00<_dim[ 0] && n01<_dim[ 1] && n02<_dim[ 2] && n03<_dim[ 3]
 				    && n04<_dim[ 4] && n05<_dim[ 5] && n06<_dim[ 6] && n07<_dim[ 7]
 					&& n08<_dim[ 8] && n09<_dim[ 9] && n10<_dim[10] && n11<_dim[11]
@@ -847,15 +902,11 @@ public:
      */
     inline const T& operator()
     		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
-     		 const size_t& n03,     const size_t& n04,     const size_t& n05 = 0,
+     		 const size_t& n03,     const size_t& n04,     const size_t& n05,
      		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
      		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
      		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
      		 const size_t& n15 = 0) const {
-    	MATRIX_ASSERT (n00>=0 && n01>=0 && n02>=0 && n03>=0 && n04>=0 &&
-   			       	   n05>=0 && n06>=0 && n07>=0 && n08>=0 && n09>=0 &&
-					   n10>=0 && n11>=0 && n12>=0 && n13>=0 && n14>=0 &&
-					   n15>=0, NEGATIVE_INDEX);
     	MATRIX_ASSERT (n00<_dim[ 0] && n01<_dim[ 1] && n02<_dim[ 2] && n03<_dim[ 3]
 				    && n04<_dim[ 4] && n05<_dim[ 5] && n06<_dim[ 6] && n07<_dim[ 7]
 					&& n08<_dim[ 8] && n09<_dim[ 9] && n10<_dim[10] && n11<_dim[11]

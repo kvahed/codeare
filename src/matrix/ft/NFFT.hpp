@@ -408,13 +408,13 @@ public:
             N.PopBack();
         if (m_3rd_dim_cart && m_ncart > 1) // Cartesian FT 3rd dim
         	N.PushBack(m_ncart);
-        
+
         Matrix<T> out (N);
         for (size_t i = 0; i < m_ncart; ++i) {
             
 			tmpd = (NFFTRType*) m_solver.y;
             
-            size_t os = i*2*m_M;
+            size_t os = i*m_M;
             for (size_t j = 0; j < m_M; ++j) {
                 tmpd[2*j+0] = real(m[os+j]);
                 tmpd[2*j+1] = imag(m[os+j]);
@@ -483,14 +483,14 @@ public:
     virtual std::ostream& Print (std::ostream& os) const {
 		Operator<T>::Print(os);
     	os << "    image size: rank(" << Rank() << ") side(" <<
-    			ImageSize() << ") nodes(" << KSpaceSize() << ")" << std::endl;
+            ImageSize() << ") nodes(" << KSpaceSize() << ")" << std::endl;
     	os << "    nfft: maxit(" << Maxit() << ") eps(" << Epsilon() <<	") alpha("
-    			<< Alpha() << ") sigma(" << Sigma() << ")" << std::endl;
+           << Alpha() << ") m("<< m_m <<") sigma(" << Sigma() << ")" << std::endl;
     	os << "    have_kspace(" << m_have_kspace << ") have_weights(" <<
-    			m_have_weights << ") have_b0(" << m_have_b0 << ")" << std::endl;
+            m_have_weights << ") have_b0(" << m_have_b0 << ")" << std::endl;
     	os << "    ft-threads(" << m_np << ")";
     	if (m_3rd_dim_cart)
-    		os << " 3rd dimension is Cartesian";
+    		os << " 3rd dimension (" << m_ncart << ") is Cartesian.";
     	return os;
     }
 

@@ -63,12 +63,6 @@ public:
 	inline Range (const std::string& rs) { ParseRange(rs); }
 
     /**
-     * @brief construct with matlab-like string
-     * @see Range (const std::string& rs)
-     */
-	inline Range (const char* rcs) { ParseRange(std::string(rcs)); }
-    
-    /**
      * @brief default destructor
      */
     virtual ~Range() {}

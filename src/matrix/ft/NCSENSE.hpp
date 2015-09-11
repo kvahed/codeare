@@ -321,6 +321,10 @@ public:
 		os << m_fts[0];
 		return os;
 	}
+
+    virtual FT<T>* getFT () {
+        return (FT<T>*) &m_fts[0];
+    }
 	
 private:
 

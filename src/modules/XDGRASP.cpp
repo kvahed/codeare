@@ -1,5 +1,5 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
+w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -7,171 +7,211 @@
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but 
+ *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301  USA
  */
 
 #include "XDGRASP.hpp"
-#include "DFT.hpp"
+#include "Toolbox.hpp"
+#ifdef HAVE_NFFT3
+	#include "NCSENSE.hpp"
+#endif
+#include "CS_XSENSE.hpp"
+#include "Algos.hpp"
+#include "Creators.hpp"
 
 using namespace RRStrategy;
 
-
 codeare::error_code XDGRASP::Init () {
 
-	size_t s;
-	bool b;
-	float f;
-	int i;
+	printf ("Intialising XDGRASP ...\n");
 
-	std::cout << "Intialising XDGRASP ..." << std::endl;
+	Params ft_params;
 
-	// XD GRASP specific
-	Attribute ("nx", &s);
-	m_params["nx"] = s;
-	Attribute ("ntres", &m_ntres);
-	m_params["ntres"] = m_ntres;
-	m_nlines = 84/m_ntres;
-	m_params["nlines"] = m_nlines;
+	for (size_t i = 0; i < 3; i++)
+		m_N[i] = 1;
 
-	printf ("  Image side length (%lu) Resp phases (%lu)\n",
-			unsigned_cast(m_params["nx"]), unsigned_cast(m_params["ntres"]));
+	Attribute ("verbose", &m_verbose);
+    m_image_size   = RHSList<size_t>("ftdims");
+    m_dim = m_image_size.size();
 
-	// NC SENSE specific
-	assert (Attribute ("nk", &s) == TIXML_SUCCESS);
-	m_params["nk"] = s;
-	m_params["ftiter"]  = (Attribute ("ftmaxit", &s) == TIXML_SUCCESS) ? s : 3;
-	m_params["verbose"] = (Attribute ("verbose", &i) == TIXML_SUCCESS) ? i : 0;
-	m_params["cgiter"]  = (Attribute ("cgmaxit", &s) == TIXML_SUCCESS) ? s : 10;
-	m_params["cgeps"]   = (Attribute ("cgeps",   &f) == TIXML_SUCCESS) ? f : 0.;
-	m_params["lambda"]  = (Attribute ("lambda",  &f) == TIXML_SUCCESS) ? f : 0.;
-	m_params["3rd_dim_cart"] = (Attribute ("cart_3rd_dim", &b) == TIXML_SUCCESS) ? b : false;
-	m_params["threads"] = (Attribute ("nthreads", &i) == TIXML_SUCCESS) ? i : 1;
-	m_params["m"]       = (Attribute ("m",       &s) == TIXML_SUCCESS) ? s : 1;
+	printf ("  Geometry: " JL_SIZE_T_SPECIFIER "D (" JL_SIZE_T_SPECIFIER ","
+            JL_SIZE_T_SPECIFIER "," JL_SIZE_T_SPECIFIER ")\n", (size_t)m_dim,
+            m_image_size[0], m_image_size[1], (m_image_size.size()==3) ? m_image_size[2] : 1);
 
-#pragma omp parallel default (shared)
-	{
-		if (omp_get_thread_num() == 0)
-			m_params["np"] = (Attribute ("nthreads", &s) == TIXML_SUCCESS) ? s : omp_get_num_threads();
-	}
+	Attribute ("test_case", &m_test_case);
+	Attribute ("noise",     &m_noise);
+	Attribute ("nrespiratory",     &m_nrespiratory);
+	Attribute ("ncardiac",     &m_ncardiac);
+	Attribute ("ncontrast",     &m_ncontrast);
 
-	std::cout << "... done." << std::endl;
+/*    printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
+      printf ("  Pnorm: %.2e\n", m_csparam.pnorm);*/
+	
+    Attribute ("ft", &m_ft_type);
+
+	printf ("  FFT class: ");
+	switch (m_ft_type)
+		{
+		case 0:
+			printf ("%s", "ft");
+			ft_params["dims"] = m_image_size;
+			ft_params["mask"] = Get<float>("mask");
+		    ft_params["threads"] = RHSAttribute<int>("threads");
+			break;
+		case 1:
+			printf ("%s", "SENSE");
+			assert(false);
+			break;
+		case 2:
+			printf ("%s", "NUFFT");
+#ifdef HAVE_NFFT3
+			ft_params["epsilon"] = RHSAttribute<double>("fteps");
+			ft_params["alpha"]   = RHSAttribute<double>("ftalpha");
+			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
+			ft_params["m"]       = RHSAttribute<size_t>("ftm");
+	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
+	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
+		    ft_params["threads"] = RHSAttribute<int>("threads");
+	        ft_params["imsz"]    = m_image_size;
+#else
+			printf("**ERROR - XDGRASP: NUFFT support not available.");
+			assert(false);
+#endif
+			break;
+		case 3:
+			printf ("%s", "NCSENSE");
+#ifdef HAVE_NFFT3
+			ft_params["sensitivities"] = Get<cxfl>("sensitivities");
+            ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
+			ft_params["weights_name"] = std::string("weights");
+		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
+		    ft_params["fteps"]        = RHSAttribute<double>("fteps");
+		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
+		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
+		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
+		    ft_params["threads"]      = RHSAttribute<int>("threads");
+	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
+		    ft_params["verbose"]      = 0;
+#else
+			printf("**ERROR - XDGRASP: NUFFT support not available.");
+			assert(false);
+#endif
+			break;
+		default:
+			printf ("No FT strategy defined");
+			assert (false);
+			break;
+		}
+	printf ("\n");
+
+    ft_params["imsz"]  = m_image_size;
+    ft_params["nlopt"] = RHSAttribute<int>("nlopt");
+    ft_params["tvw"] = RHSAttribute<float>("tvw");
+    ft_params["xfmw"] = RHSAttribute<float>("xfmw");
+    ft_params["l1"] = RHSAttribute<float>("l1");
+    ft_params["lsa"] = RHSAttribute<float>("lsa");
+    ft_params["lsb"] = RHSAttribute<float>("lsb");
+    ft_params["pnorm"] = RHSAttribute<float>("pnorm");    
+    ft_params["threads"] = RHSAttribute<int>("threads");
+    ft_params["verbose"] = RHSAttribute<int>("verbose");    
+    ft_params["wl_family"] = RHSAttribute<int>("wl_family");    
+    ft_params["wl_member"] = RHSAttribute<int>("wl_member");
+    ft_params["csiter"] = RHSAttribute<int>("csiter");
+    ft_params["nliter"] = RHSAttribute<int>("cgiter");
+    ft_params["cgconv"] = RHSAttribute<float>("cgconv");
+    ft_params["lsiter"] = RHSAttribute<int>("lsiter");
+    ft_params["ft"] = RHSAttribute<int>("ft");
+    csx = new CS_XSENSE<cxfl>(ft_params);
+	std::cout << *csx << std::endl;
+
+
+	m_initialised = true;
+	printf ("... done.\n\n");
+
 	return codeare::OK;
+
 }
 
 
 codeare::error_code XDGRASP::Prepare () {
 
-	// data from scanner
-	const Matrix<cxfl>& b1 = Get<cxfl>("sensitivities");
-	const Matrix<float>& k = Get<float>("kspace");
-	const Matrix<float>& w = Get<float>("weights");
+	codeare::error_code error = codeare::OK;
 
-	// sensitivity maps
-	m_params["sensitivities"] = Get<cxfl>("sensitivities");
+	FT<cxfl>& ft = *csx;
 
-	// setup ft oper
-	m_ft = NCSENSE<cxfl>(m_params);
-	m_ft.KSpace (Get<float>("kspace"));
-	m_ft.Weights (Get<float>("weights"));
+	if (m_ft_type == 2 || m_ft_type == 3) {
+		0;//ft.Weights (Get<float>("weights"));
+	} else {
+		ft.Mask (Get<float>("mask"));
+	}
 
-	// release RAM
-	Free ("weights");
-	Free("kspace");
+//	Free ("weights");
 
-	// prepare output
-	Matrix<cxfl> img;
-	Add ("image", img);
+	m_initialised = true;
 
-	return codeare::OK;
+	return error;
+
 }
-
 
 codeare::error_code XDGRASP::Process () {
-    Matrix<cxfl> kdata = Get<cxfl>("signals");
-    const Matrix<float>& traj = Get<float>("kspace");
-    const Matrix<float>& resp = Get<float>("resp");
+
+    m_image_size.push_back (m_ncontrast);
+    m_image_size.push_back (m_nrespiratory);
+    m_image_size.push_back (m_ncardiac);
+    Matrix<cxfl> im_dc (m_image_size);
+    Matrix<cxfl>& data = Get<cxfl>("data");
+    Matrix<float>& kspace = Get<float>("kspace");
+    Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
+
+    std::cout << size(sensitivities)
+              << std::endl;
+    FT<cxfl>& ft = *csx;
+
+    Matrix<cxfl> data1 = data(CR(),CR(),CR(0),CR(0),CR(6));
+    Matrix<cxfl> kspace1 = kspace(CR(),CR(),CR(0),CR(0));
+    ft.KSpace(kspace1);
+    ft.Weights (Get<float>("weights"));
+
+    data1 = *(csx->getFT()->getFT()) ->* data1;
     
-	size_t RO = 0, VIEW = 1, Z = 2, C = 3;
-	// Cut edges
-	kdata = fftshift(fft(kdata,1),1)/sqrt(size(kdata,2));
-    kdata = kdata(CR(), CR(1,size(kdata,1)-1), CR());
-	Vector<size_t> n = size(kdata);
+//	Matrix<cxfl> im_dc = *csx->*data;
+    
+    Add ("im_dc", im_dc);
+    Add ("data1", data1);
+    Add ("kspace1", kspace1);
 
-	size_t nspokes = 28;// the trajectory has 2328 interleaves
-	                    // and each interleave has 28 spokes
+    return codeare::OK;
 
-	m_nt = (size_t)std::floor((float)n[VIEW]/
-			(float)(unsigned_cast(m_params["ntres"])*unsigned_cast(m_params["nlines"])));
-	m_params["nt"] = m_nt;
-
-	// sort the data into two dynamic dimensions
-	// one for contrast enhancement and one for respiration
-	for (size_t i = 0; i < m_nt; ++i) {
-		Matrix<cxfl> kdata_under = kdata(CR (), CR (i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines), CR());
-		Matrix<float> traj_under = traj (CR(), CR(i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
-		Matrix<float> resp_under = resp (CR(      i*m_ntres*m_nlines,(i+1)*m_ntres*m_nlines));
-	}
-	for (size_t i = 0; i < m_nt; ++i) {
-
-	}
-	/*for ii=1:nt
-	    kdata_Under(:,:,:,:,ii)=kdata(:,(ii-1)*ntres*nline+1:ii*ntres*nline,:,:);
-	    Traj_Under(:,:,ii)=Traj(:,(ii-1)*ntres*nline+1:ii*ntres*nline);
-	    DensityComp_Under(:,:,ii)=DensityComp(:,(ii-1)*ntres*nline+1:ii*ntres*nline);
-	    Res_Signal_Under(:,ii)=Res_Signal((ii-1)*ntres*nline+1:ii*ntres*nline);
-	end
-	for ii=1:nt
-	    tmp1=kdata_Under(:,:,:,:,ii);
-	    tmp2=Traj_Under(:,:,ii);
-	    tmp3=DensityComp_Under(:,:,ii);
-	    [~,index]=sort(Res_Signal_Under(:,ii),'descend');
-	    tmp1=tmp1(:,index,:,:);
-	    tmp2=tmp2(:,index,:);
-	    tmp3=tmp3(:,index);
-	    for jj=1:ntres
-	        kdata_Under1(:,:,:,:,jj,ii)=tmp1(:,(jj-1)*nline+1:jj*nline,:,:);
-	        Traj_Under1(:,:,jj,ii)=tmp2(:,(jj-1)*nline+1:jj*nline);
-	        DensityComp_Under1(:,:,jj,ii)=tmp3(:,(jj-1)*nline+1:jj*nline);
-	    end
-	end
-
-	param.y=squeeze(double(kdata_Under1));
-	b1=squeeze(double(b1));b1=b1/max(abs(b1(:)));
-	param.E=MCNUFFT3D_MP(squeeze(Traj_Under1),squeeze(DensityComp_Under1(:,:,:,:)),b1);
-	recon_cs=param.E'*param.y;
-
-	param.TV=TV_Temp4D; % TV constraint along contrast dimension
-	param.W=TV_Temp3DRes; % % TV constraint along respiratory dimension
-	param.TVWeight=max(abs(recon_cs(:)))*0.03;
-	param.L1Weight=max(abs(recon_cs(:)))*0.01;
-	param.nite = 8;param.display=1;
-
-
-	for n=1:3
-	    recon_cs = CSL1NlCg(recon_cs,param);
-	end
-	*/
-	return codeare::OK;
 }
 
 
-codeare::error_code XDGRASP::Finalise () {
-	return codeare::OK;
-}
+XDGRASP::XDGRASP() :
+	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_ft_type(0),
+	m_noise(0.), m_test_case(0) {}
 
 
-// the class factory
-extern "C" DLLEXPORT ReconStrategy* create  ()                  {
+XDGRASP::~XDGRASP() {}
+
+
+codeare::error_code
+XDGRASP::Finalise() {return codeare::OK;}
+
+
+// the class facxflories
+extern "C" DLLEXPORT ReconStrategy* create  ()                 {
     return new XDGRASP;
 }
-extern "C" DLLEXPORT void           destroy (ReconStrategy* p)  {
-	delete p;
+
+extern "C" DLLEXPORT void           destroy (ReconStrategy* p) {
+    delete p;
 }
+
+
