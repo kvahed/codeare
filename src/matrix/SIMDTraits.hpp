@@ -303,8 +303,8 @@ namespace codeare {
         inline static reg_type packed (const reg_type& a, const reg_type& b) {
 			return VecTraits<T>::plus(a, b);
 		}
-		inline T operator()( const T& x, const T& y ) const {
-			return std::plus<T>()( x, y );
+		inline T operator() (const T& x, const T& y) const {
+			return std::plus<T>()(x, y);
 		}
 	};
 	template<class T> class minus {
@@ -316,8 +316,8 @@ namespace codeare {
 		inline static reg_type packed (const reg_type& a, const reg_type& b) {
 			return VecTraits<T>::minus(a, b);
 		}
-		inline T operator()( const T& x, const T& y ) const {
-			return std::minus<T>()( x, y );
+		inline T operator() (const T& x, const T& y) const {
+			return std::minus<T>()(x, y);
 		}
 	};
 	template<class T> class multiplies {
@@ -329,8 +329,8 @@ namespace codeare {
         inline static reg_type packed (const reg_type& a, const reg_type& b) {
 			return VecTraits<T>::multiplies(a, b);
 		}
-		inline T operator()( const T& x, const T& y ) const {
-			return std::multiplies<T>()( x, y );
+		inline T operator() (const T& x, const T& y) const {
+			return std::multiplies<T>()(x, y);
 		}
 	};
 	template<class T> class divides {
@@ -342,8 +342,8 @@ namespace codeare {
 		inline static reg_type packed (const reg_type& a, const reg_type& b) {
 			return VecTraits<T>::divides(a, b);
 		}
-		inline T operator()( const T& x, const T& y ) const {
-			return std::divides<T>()( x, y );
+		inline T operator() (const T& x, const T& y) const {
+			return std::divides<T>()(x, y);
 		}
 	};
 	template<class T> class conjugate {
@@ -355,7 +355,7 @@ namespace codeare {
 		inline static reg_type packed (const reg_type& a) {
 			return VecTraits<T>::conjugate(a);
 		}
-		T operator()( const T& x) const;
+		T operator() (const T& x) const;
 	};
 	template<> inline float conjugate<float>::operator() (const float& f) const { return f; }
 	template<> inline double conjugate<double>::operator() (const double& d) const { return d; }
