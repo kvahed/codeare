@@ -100,6 +100,7 @@ public:
 		return Adjoint (m);
 	}
 
+    virtual FT<T>* getFT() { return this; }
 
 	/**
 	 * @brief      Assign k-space trajectory
@@ -107,7 +108,6 @@ public:
 	 * @param  k   K-space trajectory
 	 */
 	virtual void KSpace (const Matrix<RT>& k) {}
-
 
 	/**
 	 * @brief      Assign k-space weigths (jacobian of k in t)

@@ -127,8 +127,10 @@ public:
         if (_wf < -1 || _wf > 5)
             _wf = -1;
 
-        dwt = new DWT<T> (dims[0], (wlfamily)_wf, _wm);
-        
+        if (_wf>-1)
+            dwt = new DWT<T> (dims[0], (wlfamily)_wf, _wm);
+        else 
+            dwt = new DWT<T> (16, (wlfamily)_wf, _wm);
         printf ("... done.\n\n");
 
     }
@@ -278,6 +280,9 @@ public:
 
     }
 
+    virtual FT<T>* getFT () {
+        return ft;
+    }
     
 private:
     

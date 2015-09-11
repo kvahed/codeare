@@ -1,9 +1,5 @@
 /*
  *  codeare Copyright (C) 2007-2012 Kaveh Vahedipour
- *                                  Daniel Joergens
- *                                  Forschungszentrum Juelich, Germany
- *
- *  Stolen ;) from sparse MRI 0.2 by Michael Lustig
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +27,6 @@
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
-#include "linalg/Lapack.hpp"
 
 //#include <pthread.h>
 /**
