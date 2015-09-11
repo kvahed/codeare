@@ -176,7 +176,7 @@ codeare::error_code XDGRASP::Process () {
     FT<cxfl>& ft = *csx;
 
     Matrix<cxfl> data1 = data(CR(),CR(),CR(0),CR(0),CR(6));
-    Matrix<cxfl> kspace1 = kspace(CR(),CR(),CR(0),CR(0));
+    Matrix<float> kspace1 = kspace(CR(),CR(),CR(0),CR(0));
     ft.KSpace(kspace1);
     ft.Weights (Get<float>("weights"));
 
