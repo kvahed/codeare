@@ -30,6 +30,7 @@ add_test (cod t_codeare)
 
 add_executable (t_dicom t_dicom.cpp)
 add_test (dicom t_dicom)
+target_link_libraries (t_dicom itksys ITKCommon ITKIOImageBase)
 
 add_executable (t_hdf5 t_hdf5.cpp)
 if (!${WINDOWS})

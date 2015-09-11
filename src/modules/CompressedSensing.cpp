@@ -166,12 +166,12 @@ codeare::error_code CompressedSensing::Process () {
 	data = (m_test_case) ?
 		*csx * phantom<cxfl>(m_image_size[0], m_image_size[0], (m_dim == 3) ?
                              m_image_size[0] : 1) : Get<cxfl> ("data");
-    
+            
 	if (m_noise > 0.)
 		data += m_noise * randn<cxfl>(size(data));
-
+        
 	Matrix<cxfl> im_dc = *csx->*data;
-    
+            
     Add ("im_dc", im_dc);
 
     return codeare::OK;
