@@ -1,6 +1,5 @@
 /*
  *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
- *                                  Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,8 +32,6 @@
 
 /**
  * @brief Matrix templated ND non-equidistand Fourier transform with NFFT 3 (TU Chemnitz)<br/>
- *        T and single precision
-
  */
 template <class T>
 class NFFT : public FT<T> {
@@ -280,7 +277,6 @@ public:
         m_max_t       = ft.m_max_t;
         m_min_b0      = ft.m_min_b0;
         m_max_b0      = ft.m_max_b0;
-        //m_win         = ft.m_win;
         m_sigma       = ft.m_sigma;
         m_3rd_dim_cart = ft.m_3rd_dim_cart;
         m_ncart       = ft.m_ncart;

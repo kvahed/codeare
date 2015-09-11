@@ -28,6 +28,9 @@ endif()
 add_executable (t_codeare t_codeare.cpp)
 add_test (cod t_codeare)
 
+add_executable (t_dicom t_dicom.cpp)
+add_test (dicom t_dicom)
+
 add_executable (t_hdf5 t_hdf5.cpp)
 if (!${WINDOWS})
   target_link_libraries (t_hdf5 ${HDF5_LIBRARIES})
