@@ -13,7 +13,7 @@
 using namespace codeare::matrix::io;
 
 std::string mname = "A";
-std::string fname = "test.cod";
+std::string fname = "test.dcm";
 
 template <class T> inline static bool write (const Matrix<T> A) {
 	DicomFile dcm (fname, WRITE);
@@ -30,6 +30,7 @@ template <class T> inline static bool read (Matrix<T>& A) {
 template<class T> inline static bool check () {
 
 	Matrix<T> A = rand<T>(3,4), B;
+	Matrix<cbool> C;
 
 	write(A);
 	read(B);
@@ -37,7 +38,14 @@ template<class T> inline static bool check () {
 #if defined (VERBOSE)
 	std::cout << A << std::endl;
 	std::cout << B << std::endl;
-	std::cout << (A==B) << std::endl;
+#endif
+	try {
+		C = (A==B);
+	} catch (const MatrixException&) {
+		return false;
+	}
+#if defined (VERBOSE)
+	std::cout << C << std::endl;
 	std::cout << std::endl;
 #endif
 

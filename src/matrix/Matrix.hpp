@@ -92,43 +92,43 @@ static const int end = -1;
 #include "View.hpp"
 
 enum MatrixException {
-    DIMS_VECTOR_EMPTY,
-    DIMS_VECTOR_CONTAINS_ZEROS,
-	MUST_HAVE_MATCHING_DIMENSIONS_AND_RESOLUTIONS_VECTORS,
-	ZERO_SIDE_LENGTH,
-	ZERO_NUMBER_COLUMNS,
-	ZERO_NUMBER_ROWS,
-	ZERO_NUMBER_SLICES,
-	INDEX_EXCEEDS_NUMBER_ELEMENTS,
-    DIMENSIONS_MUST_MATCH,
-	INDEX_EXCEEDS_DIMENSION,
-	DIMENSION_ECXEEDS_DIMENSIONALITY,
-	CONTAINER_SIZE_MUST_MATCH,
-	TWO_DIMENSIONAL_OPERATION,
-	NEGATIVE_INDEX
+    DIMS_VECTOR_EMPTY, //0
+    DIMS_VECTOR_CONTAINS_ZEROS, //1
+	MUST_HAVE_MATCHING_DIMENSIONS_AND_RESOLUTIONS_VECTORS, //2
+	ZERO_SIDE_LENGTH, //3
+	ZERO_NUMBER_COLUMNS, //4
+	ZERO_NUMBER_ROWS, //5
+	ZERO_NUMBER_SLICES, //6
+	INDEX_EXCEEDS_NUMBER_ELEMENTS, //7
+    DIMENSIONS_MUST_MATCH, //8
+	INDEX_EXCEEDS_DIMENSION, //9
+	DIMENSION_ECXEEDS_DIMENSIONALITY, //10
+	CONTAINER_SIZE_MUST_MATCH, //11
+	TWO_DIMENSIONAL_OPERATION, //12
+	NEGATIVE_INDEX //13
 };
 
 static const char* MatrixExceptionMessages[] = {
-    "Empty dimensions vector",
-    "Dimensions vector contains 0s"
-	"Specified dimensions and resolutions vectors have different lengths",
-	"Matrix with zero side length",
-	"Matrix with zero height",
-	"Matrix with zero width",
-	"Matrix with zero slices",
-	"Index exceeds number of elements",
-	"Dimensions must match",
-	"Index exceeds dimension",
-	"Dimension exceeds dimensionality",
-	"Container size must match",
-	"2D operation only",
-	"Negative index"
+    "Empty dimensions vector", //0
+    "Dimensions vector contains 0s" //1
+	"Specified dimensions and resolutions vectors have different lengths", //2
+	"Matrix with zero side length", //3
+	"Matrix with zero height", //4
+	"Matrix with zero width", //5
+	"Matrix with zero slices", //6
+	"Index exceeds number of elements", //7
+	"Dimensions must match", //8
+	"Index exceeds dimension", //9
+	"Dimension exceeds dimensionality", //10
+	"Container size must match", //11
+	"2D operation only", //12
+	"Negative index" //13
 };
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
                                      const char* func, const MatrixException& x) {
-    std::cerr << fname << ":" << lnumber << "\n \t " << func << ": " 
-              << MatrixExceptionMessages[(short)x] << std::endl;
+    std::cerr << fname << ":" << lnumber << "\n \t" << func << "\n \t"
+              << "*** ERROR: " << MatrixExceptionMessages[x-1] << std::endl;
     throw x;
 }
 
@@ -1775,71 +1775,6 @@ public:
         return res;
     }
 
-    /**
-     * @brief           Elementwise equality with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m == s
-     */
-    template<class S> inline friend Matrix<cbool> operator== (const S& s, const Matrix<T,P>& m)
-    		NOEXCEPT { return m==s; }
-
-
-    /**
-     * @brief           Elementwise >= with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          m <= t
-     */
-    template<class S> inline friend Matrix<cbool> operator>= (const S& s, const Matrix<T,P>& m)
-    		NOEXCEPT { return m<=s; }
-
-
-    /**
-     * @brief           Elementwise <= with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T<=M
-     */
-    inline friend Matrix<cbool> operator<= (const T& s, const Matrix<T,P>& m)
-    		NOEXCEPT { return m>=s; }
-
-
-    /**
-     * @brief           Elementwise unequality with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T!=M
-     */
-    inline friend Matrix<cbool> operator!= (const T& s, const Matrix<T,P>& m)
-    		NOEXCEPT { return m!=s; }
-
-
-    /**
-     * @brief           Elementwise equality with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T+M
-     */
-    template<class S> inline friend Matrix<cbool> operator> (const S& s, const Matrix<T,P>& m)
-    		NOEXCEPT { return m<s; }
-
-
-    /**
-     * @brief           Elementwise < with scalar (lhs)
-     *
-     * @param  s        Scalar lhs
-     * @param  m        Matrix rhs
-     * @return          T+M
-     */
-    template<class S> inline friend Matrix<cbool> operator< (const S& s, const Matrix<T,P>& m)
-    		NOEXCEPT { return m>s; }
-
 
     //@}
 
@@ -1851,7 +1786,7 @@ public:
 	 * @return          Hit list
 	 */
     template<class S> inline Matrix<cbool> operator== (const Matrix<S,P>& M) const {
-        MATRIX_ASSERT (_dim == M.Dim(), DIMENSIONS_MUST_MATCH);
+        MATRIX_ASSERT (_dim == M._dim, DIMENSIONS_MUST_MATCH);
 		Matrix<cbool> res (_dim);
 		for (size_t i = 0; i < Size(); ++i)
 			res[i] = (_M[i] == M[i]);
