@@ -38,32 +38,31 @@ namespace io {
 class DicomFile : public IOFile {
 public:
 
-//	typedef signed short PixelType;
-//	typedef itk::NumericSeriesFileNames OutputNamesGeneratorType;
-//	typedef itk::Image< PixelType, InputDimension > InputImageType;
-//	typedef itk::Image< PixelType, OutputDimension > OutputImageType;
-//	typedef itk::ImageSeriesWriter< InputImageType, OutputImageType > SeriesWriterType;
-//	typedef itk::GDCMSeriesFileNames InputNamesGeneratorType;
-
-
-
 	DicomFile  (const std::string& fname, const IOMode mode = READ,
 			Params params = Params(), const bool verbose = false) :
 				IOFile(fname, mode, params, verbose) {
-
+		std::stringstream testfilestr;
+		testfilestr << std::string(".");
+		testfilestr << fname;
+		ofstream testfile(testfilestr.str());
+		if (!testfile.is_open())
+			throw OPEN_RW_FAILED;
+		std::remove(testfilestr.str().c_str());
 		typedef itk::NumericSeriesFileNames OutputNamesGeneratorType;
 		OutputNamesGeneratorType::Pointer outputNames = OutputNamesGeneratorType::New();
-
 		this->m_status = OK;
-
 	}
 
 	template<class T> Matrix<T>
 			Read (const std::string& uri) throw () {
 		return Matrix<T>();
 	}
+
 	template<class T> bool
-			Write (const Matrix<T>& M, const std::string& uri) throw () {return true;}
+			Write (const Matrix<T>& M, const std::string& uri) throw () {
+
+		return true;
+	}
 
 
 	/**
