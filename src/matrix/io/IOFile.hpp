@@ -19,7 +19,9 @@ namespace io      {
 
 	enum dtype {RLFL, RLDB, CXFL, CXDB, LONG, SHRT};
 	enum IOMode {READ, WRITE};
-	static const char* IOModeStr[] = {"READ_ONLY", "READ_WRITE"};
+
+	static const char* IOModeStr[] {"READ_ONLY", "READ_WRITE"};
+
 	enum FileIOException {FILE_NOT_FOUND, OPEN_RO_FAILED, OPEN_RW_FAILED};
 
     
