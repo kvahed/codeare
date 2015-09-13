@@ -17,13 +17,13 @@ std::string fname = "test.dcm";
 
 template <class T> inline static bool write (const Matrix<T> A) {
 	DicomFile dcm (fname, WRITE);
-	dcm.Write (A, mname);
+//	dcm.Write (A, mname);
     return true;
 }
 
 template <class T> inline static bool read (Matrix<T>& A) {
 	DicomFile mfr (fname, READ);
-	A = mfr.Read<T>(mname);
+//	A = mfr.Read<T>(mname);
     return true;
 }
 
