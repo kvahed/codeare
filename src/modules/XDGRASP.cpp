@@ -99,6 +99,13 @@ codeare::error_code XDGRASP::Init () {
 		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
 		    ft_params["threads"]      = RHSAttribute<int>("threads");
 	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
+            try {
+                size_t n  = GetAttr<size_t> ("nmany");
+                ft_params["nmany"] = n;
+            } catch (const TinyXMLQueryException&) {
+                ft_params["nmany"] = 1;                
+            }
+
 		    ft_params["verbose"]      = 0;
 #else
 			printf("**ERROR - XDGRASP: NUFFT support not available.");
@@ -148,12 +155,12 @@ codeare::error_code XDGRASP::Prepare () {
 	FT<cxfl>& ft = *csx;
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
-		0;//ft.Weights (Get<float>("weights"));
+		ft.Weights (Get<float>("weights"));
 	} else {
 		ft.Mask (Get<float>("mask"));
 	}
 
-//	Free ("weights");
+	Free ("weights");
 
 	m_initialised = true;
 
@@ -170,23 +177,20 @@ codeare::error_code XDGRASP::Process () {
     Matrix<cxfl>& data = Get<cxfl>("data");
     Matrix<float>& kspace = Get<float>("kspace");
     Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
-
-    std::cout << size(sensitivities)
-              << std::endl;
     FT<cxfl>& ft = *csx;
 
-    Matrix<cxfl> data1 = data(CR(),CR(),CR(0),CR(0),CR(6));
-    Matrix<float> kspace1 = kspace(CR(),CR(),CR(0),CR(0));
-    ft.KSpace(kspace1);
-    ft.Weights (Get<float>("weights"));
+    Matrix<cxfl> data1;
+    Matrix<float> kspace1;
 
-    data1 = *(csx->getFT()->getFT()) ->* data1;
-    
-//	Matrix<cxfl> im_dc = *csx->*data;
+    for (size_t j = 0; j < 7; ++j) 
+        for (size_t i = 0; i < 4; ++i) {
+            kspace1 = kspace(CR(),CR(),CR(i),CR(j));
+            ft.KSpace (kspace1);
+            data1 = data(CR(),CR(),CR(),CR(i),CR(j));
+            im_dc(R(),R(),R(),R(i),R(j)) = *csx->*data1;
+        }
     
     Add ("im_dc", im_dc);
-    Add ("data1", data1);
-    Add ("kspace1", kspace1);
 
     return codeare::OK;
 

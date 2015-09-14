@@ -29,7 +29,7 @@
 /**
  * @brief OMP related makros
  */
-# define NUM_THREADS_DWT 4
+# define NUM_THREADS_DWT omp_get_num_threads()
 # define OMP_SCHEDULE guided
 
 /**

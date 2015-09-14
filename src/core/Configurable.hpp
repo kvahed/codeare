@@ -28,6 +28,11 @@
 
 #include <string>
 
+enum TinyXMLQueryException { 
+	NO_ATTRIBUTE = 1,
+	WRONG_TYPE
+};
+
 using namespace TinyXPath;
 
 inline static void report (const int res, const char* name) {
@@ -449,7 +454,15 @@ class Configurable {
 	ReadConfig        (FILE* file) {
 		return m_config_doc->LoadFile (file);
 	}
-	
+
+
+    template<class T> inline T GetAttr (const std::string& key) const {
+        T t;
+        int success = Configuration()->QueryValueAttribute (key, &t);
+        if (success != TIXML_SUCCESS)
+            throw (TinyXMLQueryException)success;
+        return t;
+    }
 
 
  protected:

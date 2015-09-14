@@ -223,8 +223,8 @@ public:
 
 	virtual std::ostream& Print (std::ostream& os) const {
 		FT<T>::Print(os);
-        os << "    Weights: TV("<< _tvw <<") XF("<< _xfmw <<") L1("<<_l1<<")"<<std::endl;
-        os << "    Pnorm: "<<_pnorm<< std::endl;
+        os << "    Weights: TV("<< _tvw <<") XF("<< _xfmw <<") L1("<<_l1<<") Pnorm: "
+           <<_pnorm<< std::endl;
         os << *ft << std::endl;
         if (dwt)
             os << *dwt << std::endl;
@@ -260,7 +260,7 @@ public:
         if (_verbose)
             vc.push_back(im_dc);
 
-                _ndnz = (RT)nnz(data);
+        _ndnz = (RT)nnz(data);
 
         im_dc  = *dwt * im_dc;
 

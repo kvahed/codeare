@@ -56,7 +56,7 @@ public:
 	 * @brief         Default constructor
 	 */
 	NCSENSE() NOEXCEPT : m_initialised (false), m_cgiter(30), m_cgeps (1.0e-6), m_lambda (1.0e-6),
-                m_verbose (false), m_np(0), m_3rd_dim_cart(false) {}
+        m_verbose (false), m_np(0), m_3rd_dim_cart(false), m_nmany(1) {}
     
     
 	/**
@@ -66,7 +66,7 @@ public:
 	 */
 	NCSENSE        (const Params& params) NOEXCEPT
               : FT<T>::FT(params), m_cgiter(30), m_initialised(false), m_cgeps(1.0e-6),
-                m_lambda(1.0e-6), m_verbose (false), m_np(0), m_3rd_dim_cart(false) {
+                m_lambda(1.0e-6), m_verbose (false), m_np(0), m_3rd_dim_cart(false), m_nmany(1)  {
 
 		size_t cart_dim = 1;
 
@@ -123,13 +123,18 @@ public:
         ft_params["threads"] = m_np;
 
         try {
+            m_nmany = params.Get<size_t>("nmany");
+        } catch (PARAMETER_MAP_EXCEPTION) {
+        } catch (const boost::bad_any_cast&) {}
+        
+        try {
         	m_verbose = (params.Get<int>("verbose") > 0);
         } catch (const boost::bad_any_cast&) {}
         m_nx.push_back(m_np);
         
 		ft_params["imsz"] = ms;
 
-        for (size_t i = 0; i < m_np; ++i)
+        for (size_t i = 0; i < m_np*m_nmany; ++i)
             m_fts.PushBack(NFFT<T>(ft_params));
 
 		m_ic     = IntensityMap (m_sm);
@@ -291,6 +296,7 @@ public:
 
 	virtual Matrix<T> operator/ (const MatrixType<T>& m) const NOEXCEPT {
 #pragma omp parallel for
+        
 		for (int j = 0; j < m_nx[1]; ++j) 
 	        if (m_nx[0] == 2)
 	        	m_bwd_out (R(),R(),    R(j)) =
@@ -317,7 +323,7 @@ public:
 		Operator<T>::Print(os);
 		os << "    NCCG: eps("<< m_cgeps << ") iter(" << m_cgiter <<
 				") lambda(" << m_lambda << ")" << std::endl;
-		os << "    threads(" << m_np << ") channels(" << m_nx[1] << ")" << std::endl;
+		os << "    threads(" << m_np << ") channels(" << m_nx[1] << ") nmany(" << m_nmany << ")" << std::endl;
 		os << m_fts[0];
 		return os;
 	}
@@ -340,12 +346,15 @@ private:
 
 	std::string m_smname;     /**< Sensitivity map name */
 	std::string m_wname;	  /**< Weights name */
+    
 
     Vector<size_t> m_nx;
     
 	size_t     m_cgiter;         /**< Max # CG iterations */
 	double     m_cgeps;          /**< Convergence limit */
 	double     m_lambda;         /**< Tikhonov weight */
+
+    size_t     m_nmany;          /**< Recounstruct multiple volumes with same k-space and maps */
 	
 	int        m_np;
 
