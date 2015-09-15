@@ -1143,7 +1143,7 @@ template<class T> inline static Matrix<T> diff (const Matrix<T>& rhs, const size
     size_t ndims = rhssize.size();
 
     if (dim > ndims) {
-        printf ("  *** ERROR (%s:%s) - diff dimension %zu"
+        printf ("  *** ERROR (%s:%d) - diff dimension %zu"
                 "exceeds matrix dimension %zu", __FILE__, __LINE__, dim, ndims);
         throw 404;
     }
