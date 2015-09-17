@@ -289,8 +289,7 @@ dofinite (const Matrix<T>& M, const T& v = 0) {
  * @param  M  Matrix
  * @return    Highest non-one dimension
  */
-template <class T> inline static  size_t
-ndims (const Matrix<T>& M) {
+template <class T> inline static size_t ndims (const MatrixType<T>& M) {
 	
 	size_t nd = 0;
 	

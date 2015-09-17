@@ -107,7 +107,7 @@ public:
 
 		Vector<size_t> sizesm = size(m_sm);
         m_nx.push_back(sizesm.back());             // NC
-		m_nx.push_back(unsigned_cast(params["nk"])*cart_dim); // NK
+		m_nx.push_back(unsigned_cast(params["nk"])); // NK
         m_nx.push_back(std::accumulate(sizesm.begin(), sizesm.end(), 1,
         		c_multiply<size_t>) / m_nx[1]); //NR
 
@@ -119,9 +119,10 @@ public:
         } catch (const boost::bad_any_cast&) {
             m_np  = std::thread::hardware_concurrency();
         }
+
         omp_set_num_threads(m_np);
         ft_params["threads"] = m_np;
-
+        
         try {
             m_nmany = params.Get<size_t>("nmany");
         } catch (PARAMETER_MAP_EXCEPTION) {
@@ -134,17 +135,23 @@ public:
         
 		ft_params["imsz"] = ms;
 
-        for (size_t i = 0; i < m_np*m_nmany; ++i)
-            m_fts.PushBack(NFFT<T>(ft_params));
+        if (m_nmany > 1)
+            for (size_t i = 0; i < m_nmany; ++i)
+                m_fts.PushBack(NFFT<T>(ft_params));
+        else
+            for (size_t i = 0; i < m_np; ++i)
+                m_fts.PushBack(NFFT<T>(ft_params));
 
+        omp_set_num_threads(m_fts.size());
+        
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
 
-		if (m_3rd_dim_cart)
-            m_fwd_out = Matrix<T> (m_nx[2]/cart_dim,cart_dim,m_nx[1]);
-        else
-            m_fwd_out = Matrix<T> (m_nx[2],cart_dim,m_nx[1]);
-		m_bwd_out = Matrix<T> (size(m_sm));
+        m_fwd_out = Matrix<T> (m_nx[2],cart_dim,m_nx[1],m_nmany); // nodes x slices x channels
+        Vector<size_t> tmp = size(m_sm);
+        if (m_nmany > 1)
+            tmp.PushBack(m_nmany);
+		m_bwd_out = Matrix<T> (tmp);               // size of sensitivity maps
 		
 		m_cgls = codeare::optimisation::CGLS<T>(m_cgiter, m_cgeps, m_lambda, m_verbose);
 
@@ -162,46 +169,47 @@ public:
 	 * 
 	 * @param  k   K-space trajectory
 	 */
-	void
-	KSpace (const Matrix<RT>& k) NOEXCEPT {
+	void KSpace (const Matrix<RT>& k) NOEXCEPT {
 		m_k = k;
-        for (size_t i = 0; i < m_fts.size(); ++i)
-            m_fts[i].KSpace(k);
+        if (size(k,1) == KSpaceSize() && m_nmany == 1)
+            for (size_t i = 0; i < m_fts.size(); ++i)
+                m_fts[i].KSpace(k);
+        else if (size(m_k,2) == m_nmany)
+            for (size_t i = 0; i < m_fts.size(); ++i)
+                m_fts[i].KSpace(k(CR(),CR(),CR(i)));
+            
 	}
 	
-
+    
 	/**
 	 * @brief      Assign k-space weigths (jacobian of k in t) 
 	 * 
 	 * @param  w   Weights
 	 */
-	void
-	Weights (const Matrix<RT>& w) NOEXCEPT {
+	void Weights (const Matrix<RT>& w) NOEXCEPT {
 		m_w = w;
         for (size_t i = 0; i < m_fts.size(); ++i)
             m_fts[i].Weights(w);
 	}
-
-
+    
+    
 	/**
-	 * @brief    Forward transform
+  	 * @brief    Forward transform
 	 *
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T>
-	Trafo       (const MatrixType<T>& m) const NOEXCEPT {
+	virtual Matrix<T> Trafo (const MatrixType<T>& m) const NOEXCEPT {
 #pragma omp parallel for
 	    for (int j = 0; j < m_nx[1]; ++j)
             if (m_3rd_dim_cart)
-                0;//Slice  (m_fwd_out, j, m_fts[k] * (resize(Volume (m_sm, j),size(m)) * m));
+                m_fwd_out(R(),R(),R(),R(j)) = m_fts[omp_get_thread_num()] * (m_sm(CR(),CR(),CR(),CR(j))*m);
             else
-                m_fwd_out(R(),R(),R(j)) = m_fts[omp_get_thread_num()] * (m_sm(CR(),CR(),CR(j))*m);
-//                    (m /* * ((m_nx[0] == 2) ? m_sm(CR(),CR(),CR(j)) : m_sm(CR(),CR(),CR(),CR(j)))*/);
+                m_fwd_out(R(),R(),    R(j)) = m_fts[omp_get_thread_num()] * (m_sm(CR(),CR(),     CR(j))*m);
 	    return squeeze(m_fwd_out);
 	}
-
-
+    
+    
 	/**
 	 * @brief    Forward transform
 	 *
@@ -211,12 +219,11 @@ public:
 	 *
 	 * @return   Transform
 	 */
-	virtual Matrix<T>
-	Trafo       (const MatrixType<T>& m, const MatrixType<T>& sens,
-			const bool& recal = true) const NOEXCEPT {
+	virtual Matrix<T> Trafo (const MatrixType<T>& m, const MatrixType<T>& sens,
+                             const bool& recal = true) const NOEXCEPT {
 		return Trafo(m);
 	}
-
+    
 	
 	/**
 	 * @brief Backward transform
@@ -224,8 +231,7 @@ public:
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T>
-	Adjoint     (const MatrixType<T>& m) const NOEXCEPT {
+	virtual Matrix<T> Adjoint (const MatrixType<T>& m) const NOEXCEPT {
 		return this->Adjoint (m, m_sm, false);
 	}
 	
@@ -234,22 +240,13 @@ public:
 	 * @brief Estimate coil sensitivities
 	 * @param  data  measurement
 	 */
-	virtual void
-	EstimateSensitivities (const MatrixType<T>& data, size_t nk = 8192) const {
+	virtual void EstimateSensitivities (const MatrixType<T>& data, size_t nk) const {
 		Matrix<T> out (size(m_sm));
 #pragma omp parallel for
-		for (int i = 0; i < m_nx[1]; ++i) {
+		for (int i = 0; i < m_nx[1]; ++i)
 			m_fts[omp_get_thread_num()].NFFTPlan().M_total = nk;
-/*			if (m_nx[0] == 2)
-				Slice  (out, i,
-						m_fts[omp_get_thread_num()] ->* data(CR(0,8191), CR(i)));
-			else
-				Volume (out, i,
-                m_fts[omp_get_thread_num()] ->* data(CR(0,8191), CR(i)));*/
-            m_fts[omp_get_thread_num()].NFFTPlan().M_total = m_nx[2];
-		}
 	}
-
+    
 
 	/**
 	 * @brief Image size
@@ -270,16 +267,12 @@ public:
 	 *
 	 * @return   Transform
 	 */
-	virtual Matrix<T>
-	Adjoint (const MatrixType<T>& m,
-			 const MatrixType<T>& sens,
-			 const bool recal = false) const NOEXCEPT {
-
+	virtual Matrix<T> Adjoint (const MatrixType<T>& m, const MatrixType<T>& sens,
+                               const bool recal = false) const NOEXCEPT {
 		// TODO: Not functional yet
 		if (m_sm.Size() == 1)
-			EstimateSensitivities(m);
+			EstimateSensitivities(m, m_nx[2]);
         return m_cgls.Solve(*this, m);
-
 	}
 	
 	
@@ -293,36 +286,46 @@ public:
 		return Trafo(m);
 	}
 	
-
+    
 	virtual Matrix<T> operator/ (const MatrixType<T>& m) const NOEXCEPT {
+        Matrix<T> ret;
+        if (m_nmany > 1) {
 #pragma omp parallel for
-        
-		for (int j = 0; j < m_nx[1]; ++j) 
-	        if (m_nx[0] == 2)
-	        	m_bwd_out (R(),R(),    R(j)) =
-                    m_fts[omp_get_thread_num()] ->* m(CR(),     CR(j));
-	        else
-	        	m_bwd_out (R(),R(),R(),R(j)) =
-                    m_fts[omp_get_thread_num()] ->* m(CR(),CR(),CR(j));
-	    return squeeze(sum(m_bwd_out*m_csm,size(m_sm).size()-1)) * m_ic;
+            for (int k = 0; k < m_nmany; ++k) {
+                for (int j = 0; j < m_nx[1]; ++j)
+                    if (m_nx[0] == 2)
+                        m_bwd_out (R(),R(),    R(j),R(k)) = m_fts[k] ->* m(CR(),     CR(j),CR(k));
+                    else
+                        m_bwd_out (R(),R(),R(),R(j),R(k)) = m_fts[k] ->* m(CR(),CR(),CR(j),CR(k));
+                m_bwd_out(R(),R(),R(),R(),R(k)) *= m_csm;
+            }
+            ret = squeeze(sum(m_bwd_out,3));
+        } else {
+#pragma omp parallel for
+            for (int j = 0; j < m_nx[1]; ++j) 
+                if (m_nx[0] == 2)
+                    m_bwd_out (R(),R(),    R(j)) = m_fts[omp_get_thread_num()] ->* m(CR(),     CR(j));
+                else
+                    m_bwd_out (R(),R(),R(),R(j)) = m_fts[omp_get_thread_num()] ->* m(CR(),CR(),CR(j));
+            ret = squeeze(sum(m_bwd_out*m_csm,size(m_sm).size()-1)) * m_ic;
+        }
+	    return ret;
 	}
-
-
+    
+    
 	/**
 	 * @brief    Backward transform
 	 *
 	 * @param  m To transform
 	 * @return   Transform
 	 */
-	virtual Matrix<T>
-	operator->* (const MatrixType<T>& m) const NOEXCEPT {
+	virtual Matrix<T> operator->* (const MatrixType<T>& m) const NOEXCEPT {
 		return Adjoint (m);
 	}
-
+    
 	virtual std::ostream& Print (std::ostream& os) const {
 		Operator<T>::Print(os);
-		os << "    NCCG: eps("<< m_cgeps << ") iter(" << m_cgiter <<
-				") lambda(" << m_lambda << ")" << std::endl;
+		os << "    NCCG: eps("<< m_cgeps << ") iter(" << m_cgiter << ") lambda(" << m_lambda << ")" << std::endl;
 		os << "    threads(" << m_np << ") channels(" << m_nx[1] << ") nmany(" << m_nmany << ")" << std::endl;
 		os << m_fts[0];
 		return os;
@@ -330,6 +333,10 @@ public:
 
     virtual FT<T>* getFT () {
         return (FT<T>*) &m_fts[0];
+    }
+
+    inline size_t KSpaceSize () const {
+        return m_fts[0].KSpaceSize();
     }
 	
 private:

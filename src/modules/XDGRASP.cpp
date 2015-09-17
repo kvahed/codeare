@@ -156,11 +156,13 @@ codeare::error_code XDGRASP::Prepare () {
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
 		ft.Weights (Get<float>("weights"));
+//        ft.KSpace (Get<float>("kspace"));
 	} else {
 		ft.Mask (Get<float>("mask"));
 	}
 
 	Free ("weights");
+//	Free ("kspace");
 
 	m_initialised = true;
 
@@ -170,25 +172,25 @@ codeare::error_code XDGRASP::Prepare () {
 
 codeare::error_code XDGRASP::Process () {
 
-    m_image_size.push_back (m_ncontrast);
+/*    m_image_size.push_back (m_ncontrast);
     m_image_size.push_back (m_nrespiratory);
-    m_image_size.push_back (m_ncardiac);
+    m_image_size.push_back (m_ncardiac);*/
+    m_image_size.push_back (28);
+
     Matrix<cxfl> im_dc (m_image_size);
-    Matrix<cxfl>& data = Get<cxfl>("data");
-    Matrix<float>& kspace = Get<float>("kspace");
-    Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
+    Vector<size_t> dsz;
+    dsz = size(Get<cxfl>("data"));
+    dsz[3] *= dsz[4];
+    dsz.PopBack();
+    Matrix<cxfl> data = resize(Get<cxfl>("data"),dsz);
+    dsz = size(Get<float>("kspace"));
+    dsz[2] *= dsz[3];
+    dsz.PopBack();
+    Matrix<float> kspace = resize(Get<float>("kspace"),dsz);
     FT<cxfl>& ft = *csx;
 
-    Matrix<cxfl> data1;
-    Matrix<float> kspace1;
-
-    for (size_t j = 0; j < 7; ++j) 
-        for (size_t i = 0; i < 4; ++i) {
-            kspace1 = kspace(CR(),CR(),CR(i),CR(j));
-            ft.KSpace (kspace1);
-            data1 = data(CR(),CR(),CR(),CR(i),CR(j));
-            im_dc(R(),R(),R(),R(i),R(j)) = *csx->*data1;
-        }
+    ft.KSpace(kspace);
+    im_dc = ft ->* data;
     
     Add ("im_dc", im_dc);
 

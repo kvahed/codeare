@@ -241,13 +241,12 @@ public:
         return *ft * m;
     }
 
-    inline virtual Matrix<T> operator->* (const Matrix<T>& k_space)  {
+    inline virtual Matrix<T> operator->* (const Matrix<T>& k_space) const {
         return Adjoint(k_space);
     }
 
-    inline virtual Matrix<T> Adjoint (const Matrix<T>& m)  {
-
-                data = m;
+    inline virtual Matrix<T> Adjoint (const Matrix<T>& m) const {
+        data = m;
 
         Matrix<T> im_dc;
         std::vector< Matrix<T> > vc;

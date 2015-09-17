@@ -161,13 +161,18 @@ public:
         return *(_pointers[pos]);
     }
 
-    template<class S>
-    inline Matrix<T> operator* (const MatrixType<S>& d) const {
+    template<class S> inline Matrix<T> operator* (const MatrixType<S>& d) const {
         assert (Size() == d.Size());
         Matrix<T> M(_dim);
         for (size_t i = 0; i < Size(); ++i)
             M[i] = *(_pointers[i])*d[i];
         return M;
+    }
+    template<class S> inline MatrixType<T>& operator*= (const MatrixType<S>& d)  {
+        assert (Size() == d.Size());
+        for (size_t i = 0; i < Size(); ++i)
+            *(_pointers[i]) *= d[i];
+        return *this;
     }
     
     inline virtual Matrix<T> operator/ (const MatrixTypeType& d) const {
@@ -176,6 +181,12 @@ public:
             M[i] = *(_pointers[i])/d[i];
         return M;
     }
+    template<class S> inline MatrixType<T>& operator/= (const MatrixType<S>& d)  {
+        assert (Size() == d.Size());
+        for (size_t i = 0; i < Size(); ++i)
+            *(_pointers[i]) /= d[i];
+        return *this;
+    }
     
     inline virtual Matrix<T> operator+ (const MatrixTypeType& d) const {
         Matrix<T> M(_dim);
@@ -183,12 +194,24 @@ public:
             M[i] = *(_pointers[i])+d[i];
         return M;
     }
+    template<class S> inline MatrixType<T>& operator+= (const MatrixType<S>& d)  {
+        assert (Size() == d.Size());
+        for (size_t i = 0; i < Size(); ++i)
+            *(_pointers[i]) += d[i];
+        return *this;
+    }
 
     inline virtual Matrix<T> operator- (const MatrixTypeType& d) const {
         Matrix<T> M(_dim);
         for (size_t i = 0; i < Size(); ++i)
             M[i] = *(_pointers[i])-d[i];
         return M;
+    }
+    template<class S> inline MatrixType<T>& operator-= (const MatrixType<S>& d)  {
+        assert (Size() == d.Size());
+        for (size_t i = 0; i < Size(); ++i)
+            *(_pointers[i]) -= d[i];
+        return *this;
     }
 
     virtual ~View () { _matrix = 0; }
