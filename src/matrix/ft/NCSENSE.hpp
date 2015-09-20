@@ -147,10 +147,12 @@ public:
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
 
-        m_fwd_out = Matrix<T> (m_nx[2],cart_dim,m_nx[1],m_nmany); // nodes x slices x channels
+        m_fwd_out = Matrix<T> (m_nx[2],cart_dim,m_nx[1],4,7); // nodes x slices x channels
         Vector<size_t> tmp = size(m_sm);
-        if (m_nmany > 1)
-            tmp.PushBack(m_nmany);
+        if (m_nmany > 1) {
+            tmp.PushBack(4);
+           tmp.PushBack(7);
+        }
 		m_bwd_out = Matrix<T> (tmp);               // size of sensitivity maps
 		
 		m_cgls = codeare::optimisation::CGLS<T>(m_cgiter, m_cgeps, m_lambda, m_verbose);
@@ -174,10 +176,9 @@ public:
         if (size(k,1) == KSpaceSize() && m_nmany == 1)
             for (size_t i = 0; i < m_fts.size(); ++i)
                 m_fts[i].KSpace(k);
-        else if (size(m_k,2) == m_nmany)
+        else if (size(m_k,2)*size(m_k,3) == m_nmany) 
             for (size_t i = 0; i < m_fts.size(); ++i)
-                m_fts[i].KSpace(k(CR(),CR(),CR(i)));
-            
+                m_fts[i].KSpace(k(CR(),CR(),CR(i%size(m_k,2)),CR(i/size(m_k,2))));
 	}
 	
     
@@ -289,15 +290,17 @@ public:
     
 	virtual Matrix<T> operator/ (const MatrixType<T>& m) const NOEXCEPT {
         Matrix<T> ret;
+        std::cout << size(m_bwd_out) << std::endl;
+        std::cout << size(m) << std::endl;
         if (m_nmany > 1) {
 #pragma omp parallel for
             for (int k = 0; k < m_nmany; ++k) {
                 for (int j = 0; j < m_nx[1]; ++j)
                     if (m_nx[0] == 2)
-                        m_bwd_out (R(),R(),    R(j),R(k)) = m_fts[k] ->* m(CR(),     CR(j),CR(k));
+                        m_bwd_out (R(),R(),    R(j),R(k%size(m,2)),R(k/size(m,2))) = m_fts[k] ->* m(CR(),     CR(j),CR(k%size(m,2)),CR(k/size(m,2)));
                     else
-                        m_bwd_out (R(),R(),R(),R(j),R(k)) = m_fts[k] ->* m(CR(),CR(),CR(j),CR(k));
-                m_bwd_out(R(),R(),R(),R(),R(k)) *= m_csm;
+                        m_bwd_out (R(),R(),R(),R(j),R(k%size(m,3)),R(k/size(m,3))) = m_fts[k] ->* m(CR(),CR(),CR(j),CR(k%size(m,3)),CR(k/size(m,3)));
+                m_bwd_out(R(),R(),R(),R(),R(k%size(m,3)),R(k/size(m,3))) *= m_csm;
             }
             ret = squeeze(sum(m_bwd_out,3));
         } else {

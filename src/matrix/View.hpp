@@ -39,6 +39,8 @@ public:
 	virtual RHSView operator() (CR r0, CR r1, CR r2, CR r3) const { return RHSView(); }
 	virtual LHSView operator() (R r0, R r1, R r2, R r3, R r4) { return LHSView(); }
 	virtual RHSView operator() (CR r0, CR r1, CR r2, CR r3, CR r4) const { return RHSView(); }
+	virtual LHSView operator() (R r0, R r1, R r2, R r3, R r4, R r5) { return LHSView(); }
+	virtual RHSView operator() (CR r0, CR r1, CR r2, CR r3, CR r4, CR r5) const { return RHSView(); }
 private:
     Vector<T> _M;
 	Vector<size_t> _dim;

@@ -121,8 +121,13 @@ public:
         }
         
         _csiter = try_to_fetch<int> (p, "csiter", 0);
-        _wf = try_to_fetch<int> (p, "wl_family", 0.);
-        _wm = try_to_fetch<int> (p, "wl_member", 0.);
+        _wf     = try_to_fetch<int> (p, "wl_family", -1);
+        _wm     = try_to_fetch<int> (p, "wl_member", 0);
+
+        std::cout << std::endl << _wf << "," << _wm << std::endl;
+
+        _tv1w   = try_to_fetch<RT>  (p, "tv1w", 0.);
+        _tv2w   = try_to_fetch<RT>  (p, "tv2w", 0.);
         
         if (_wf < -1 || _wf > 5)
             _wf = -1;
@@ -371,7 +376,7 @@ private:
     TVOP<T>* tvt;
     NonLinear<T>* nlopt;
     Vector<size_t> _image_size;
-    RT _tvw, _xfmw, _l1, _pnorm;
+    RT _tvw, _xfmw, _l1, _pnorm, _tv1w, _tv2w;
     mutable RT _ndnz;
     int _verbose, _ft_type, _csiter, _wf, _wm, _nlopt_type, _dim;
     Matrix<T> ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx, om;

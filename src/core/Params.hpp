@@ -208,7 +208,7 @@ public:
 			return pi->second;
 		else
 			throw KEY_NOT_FOUND;
-                //printf ("**WARNING**: operator[] failed for key %s\n", key.c_str());
+        //printf ("**WARNING**: operator[] failed for key %s\n", key.c_str());
 		return key;
 	}
 
@@ -220,8 +220,7 @@ public:
 	 * @param  key  Key
 	 * @return      Casted value
 	 */
-	template <class T> inline T
-	Get (const std::string& key) const {
+	template <class T> inline T Get (const std::string& key) const {
 		const boost::any& ba = (*this)[key];
 		try {
 			return boost::any_cast<T>(ba);
@@ -243,8 +242,7 @@ public:
 	 * @param  key  Key
 	 * @return      Casted value
 	 */
-	template <class T> inline T
-	Get (const char* key) const {
+	template <class T> inline T Get (const char* key) const {
 		return Get<T> (std::string(key));
 	}
 
@@ -255,8 +253,7 @@ public:
 	 * @param  key  Key
 	 * @param  val  Casted value
 	 */
-	template <class T> inline void
-	Get (const char* key, T& val) const {
+	template <class T> inline void Get (const char* key, T& val) const {
 		val = Get<T>(key);
 	}
 
@@ -300,13 +297,9 @@ public:
 	 *
 	 * @return       String representation of workspace content
 	 */
-	void
-	Print            (std::ostream& os) const {
-
+	void Print (std::ostream& os) const {
 		typedef std::map<std::string, boost::any>::const_iterator it;
-
 		for (it i = pl.begin(); i != pl.end(); i++) {
-
 			const boost::any& b = i->second;
 			std::string v_name  = demangle(i->second.type().name()),
 					    k_name  = i->first;
@@ -340,9 +333,7 @@ public:
 			else if (b.type() == typeid(std::string))
 				os << boost::any_cast<std::string>(b).c_str();
 			os << "\n";
-
 		}
-
 	}
 
 
@@ -371,12 +362,27 @@ template<class T> inline T try_to_fetch (const Params& p, const std::string& key
     try {
         return p.Get<T>(key);
     } catch (const PARAMETER_MAP_EXCEPTION&) {
+        std::cout << "**WARNING**: key " << key.c_str() << " not in parameter map." << std::endl;
+        std::cout << "             Returning default" << def;
+        return def;
+    } catch (const boost::bad_any_cast&) {
+        std::cout << "**WARNING**: conversion failed on parameter " <<  key.c_str() << "." << std::endl;
+        std::cout << "             Returning default" << def;
+        return def;
+    }
+}
+
+template<class T> inline Vector<T> try_to_list (const Params& p, const std::string& key, const std::string& def) {
+    try {
+        return p.Get<std::string>(key);
+    } catch (const PARAMETER_MAP_EXCEPTION&) {
         printf ("**WARNING**: key %s not in parameter map.\n", key.c_str());
         return def;
     } catch (const boost::bad_any_cast&) {
         printf ("**WARNING**: conversion failed on parameter %s", key.c_str());
         return def;
     }
+    return (T)0;
 }
 
 #endif /* PARAMS_HPP_ */

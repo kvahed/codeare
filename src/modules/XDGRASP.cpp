@@ -33,6 +33,8 @@ codeare::error_code XDGRASP::Init () {
 
 	printf ("Intialising XDGRASP ...\n");
 
+    std::cout << *this << std::endl;
+
 	Params ft_params;
 
 	for (size_t i = 0; i < 3; i++)
@@ -128,7 +130,9 @@ codeare::error_code XDGRASP::Init () {
     ft_params["lsb"] = RHSAttribute<float>("lsb");
     ft_params["pnorm"] = RHSAttribute<float>("pnorm");    
     ft_params["threads"] = RHSAttribute<int>("threads");
-    ft_params["verbose"] = RHSAttribute<int>("verbose");    
+    ft_params["verbose"] = RHSAttribute<int>("verbose");
+
+    //Aaaargh!
     ft_params["wl_family"] = RHSAttribute<int>("wl_family");    
     ft_params["wl_member"] = RHSAttribute<int>("wl_member");
     ft_params["csiter"] = RHSAttribute<int>("csiter");
@@ -137,7 +141,6 @@ codeare::error_code XDGRASP::Init () {
     ft_params["lsiter"] = RHSAttribute<int>("lsiter");
     ft_params["ft"] = RHSAttribute<int>("ft");
     csx = new CS_XSENSE<cxfl>(ft_params);
-	std::cout << *csx << std::endl;
 
 
 	m_initialised = true;
@@ -156,13 +159,12 @@ codeare::error_code XDGRASP::Prepare () {
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
 		ft.Weights (Get<float>("weights"));
-//        ft.KSpace (Get<float>("kspace"));
-	} else {
+        Free ("weights");
+    } else {
 		ft.Mask (Get<float>("mask"));
-	}
+    }
 
-	Free ("weights");
-//	Free ("kspace");
+	std::cout << *csx << std::endl;
 
 	m_initialised = true;
 
@@ -172,24 +174,20 @@ codeare::error_code XDGRASP::Prepare () {
 
 codeare::error_code XDGRASP::Process () {
 
-/*    m_image_size.push_back (m_ncontrast);
+    m_image_size.push_back (m_ncontrast);
     m_image_size.push_back (m_nrespiratory);
-    m_image_size.push_back (m_ncardiac);*/
-    m_image_size.push_back (28);
-
+    m_image_size.push_back (m_ncardiac);
+    
     Matrix<cxfl> im_dc (m_image_size);
-    Vector<size_t> dsz;
-    dsz = size(Get<cxfl>("data"));
-    dsz[3] *= dsz[4];
-    dsz.PopBack();
-    Matrix<cxfl> data = resize(Get<cxfl>("data"),dsz);
-    dsz = size(Get<float>("kspace"));
-    dsz[2] *= dsz[3];
-    dsz.PopBack();
-    Matrix<float> kspace = resize(Get<float>("kspace"),dsz);
-    FT<cxfl>& ft = *csx;
+    Matrix<cxfl>& data = Get<cxfl>("data");
+    Matrix<float>& kspace = Get<float>("kspace");
 
+    FT<cxfl>& ft = *csx;
     ft.KSpace(kspace);
+
+    std::cout << size(data) << std::endl;
+    std::cout << size(kspace) << std::endl;
+
     im_dc = ft ->* data;
     
     Add ("im_dc", im_dc);
