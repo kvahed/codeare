@@ -50,9 +50,8 @@ codeare::error_code XDGRASP::Init () {
 
 	Attribute ("test_case", &m_test_case);
 	Attribute ("noise",     &m_noise);
-	Attribute ("nrespiratory",     &m_nrespiratory);
-	Attribute ("ncardiac",     &m_ncardiac);
-	Attribute ("ncontrast",     &m_ncontrast);
+	Attribute ("dim4",     &m_dim4);
+	Attribute ("dim5",     &m_dim5);
 
 /*    printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
       printf ("  Pnorm: %.2e\n", m_csparam.pnorm);*/
@@ -140,6 +139,9 @@ codeare::error_code XDGRASP::Init () {
     ft_params["cgconv"] = RHSAttribute<float>("cgconv");
     ft_params["lsiter"] = RHSAttribute<int>("lsiter");
     ft_params["ft"] = RHSAttribute<int>("ft");
+    ft_params["dim4"] = m_dim4;
+    ft_params["dim5"] = m_dim5;
+
     csx = new CS_XSENSE<cxfl>(ft_params);
 
 
@@ -174,9 +176,8 @@ codeare::error_code XDGRASP::Prepare () {
 
 codeare::error_code XDGRASP::Process () {
 
-    m_image_size.push_back (m_ncontrast);
-    m_image_size.push_back (m_nrespiratory);
-    m_image_size.push_back (m_ncardiac);
+    m_image_size.push_back (m_dim4);
+    m_image_size.push_back (m_dim5);
     
     Matrix<cxfl> im_dc (m_image_size);
     Matrix<cxfl>& data = Get<cxfl>("data");
@@ -184,9 +185,6 @@ codeare::error_code XDGRASP::Process () {
 
     FT<cxfl>& ft = *csx;
     ft.KSpace(kspace);
-
-    std::cout << size(data) << std::endl;
-    std::cout << size(kspace) << std::endl;
 
     im_dc = ft ->* data;
     

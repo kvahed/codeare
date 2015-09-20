@@ -53,7 +53,7 @@ public:
 
     typedef typename TypeTraits<T>::RT RT;
 
-    CS_XSENSE () : ft(0), dwt(0), nlopt(0), tvt(0) {/*TODO: Default constructor*/}
+    CS_XSENSE () : ft(0), dwt(0), nlopt(0) {/*TODO: Default constructor*/}
     virtual ~CS_XSENSE () {
         if (ft)
             delete ft;
@@ -61,16 +61,18 @@ public:
             delete nlopt;
         if (dwt)
             delete dwt;
-        if (tvt)
-            delete tvt;
+        for (size_t i = 0; i < tvt.size(); ++i)
+            delete tvt[i];
     }
 
-    CS_XSENSE (const Params& p) : ft(0), dwt(0), nlopt(0), tvt(0) {
+    CS_XSENSE (const Params& p) : ft(0), dwt(0), nlopt(0) {
         
         printf ("Intialising CS_XSENSE ...\n");
         std::string key;
 
-        _tvw = try_to_fetch<float> (p, "tvw", 0.);
+        _tvw.resize(2);
+        _tvw[0] = try_to_fetch<float> (p, "tvw1", 0.);
+        _tvw[1] = try_to_fetch<float> (p, "tvw2", 0.);
         _xfmw = try_to_fetch<float> (p, "xfmw", 0.);
         _l1 = try_to_fetch<float> (p, "l1", 0.);
         _pnorm = try_to_fetch<float> (p, "pnorm", 0.);
@@ -124,11 +126,6 @@ public:
         _wf     = try_to_fetch<int> (p, "wl_family", -1);
         _wm     = try_to_fetch<int> (p, "wl_member", 0);
 
-        std::cout << std::endl << _wf << "," << _wm << std::endl;
-
-        _tv1w   = try_to_fetch<RT>  (p, "tv1w", 0.);
-        _tv2w   = try_to_fetch<RT>  (p, "tv2w", 0.);
-        
         if (_wf < -1 || _wf > 5)
             _wf = -1;
 
@@ -137,7 +134,8 @@ public:
         else 
             dwt = new DWT<T> (16, (wlfamily)_wf, _wm);
 
-        tvt = new TVOP<T>();
+        tvt.PushBack(new TVOP<T>());
+        tvt.PushBack(new TVOP<T>());
         
         printf ("... done.\n\n");
 
@@ -149,23 +147,6 @@ public:
     }
 
 
-    inline CS_XSENSE& operator= (const CS_XSENSE& rhs) {
-        /*
-        FT<T>* ft;
-        DWT<T>* dwt;
-        TVOP<T>* tvt;
-        NonLinear<T>* nlopt;
-        Vector<size_t> _image_size;
-        RT _tvw, _xfmw, _l1, _pnorm, _cgconv, _lsa, _lsb, _t;
-        mutable RT _ndnz;
-        int _verbose, _ft_type, _lsiter, _lsto, _cgiter, _csiter, _wf, _wm, _nlopt_type, _dim;
-        Matrix<T> ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx, om, pdf;
-        mutable Matrix<T> data;*/
-        return *this;
-    }
-    
-
-   
     /**
 	 * @brief      Assign k-space trajectory
 	 * 
@@ -198,8 +179,10 @@ public:
     inline virtual RT obj (const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) {
         RT obj = Obj (t);
         rmse = sqrt(obj/_ndnz);
-        if (_tvw)
-            obj += TV (t);
+        if (_tvw[0])
+            obj += TV (t,0);
+        if (_tvw[1])
+            obj += TV (t,1);
         if (_xfmw)
             obj += XFM (x, dx, t);
         return obj;
@@ -211,8 +194,10 @@ public:
         Matrix<T> g = dObj (x);
         if (_xfmw)
             g += dXFM (x);
-        if (_tvw)
-            g += dTV  (x);
+        if (_tvw[0])
+            g += dTV  (x,0);
+        if (_tvw[1])
+            g += dTV  (x,1);
         return g;
     }
     
@@ -220,15 +205,15 @@ public:
         wdx =  *dwt->*dx;        
         ffdbx = *ft * wx;
         ffdbg = *ft * wdx;
-        if (_tvw) {
-            ttdbx = *tvt * wx;
-            ttdbg = *tvt * wdx;
+        if (_tvw[0]) {
+            ttdbx = *tvt[0] * wx;
+            ttdbg = *tvt[0] * wdx;
         }
     }
 
 	virtual std::ostream& Print (std::ostream& os) const {
 		FT<T>::Print(os);
-        os << "    Weights: TV("<< _tvw <<") XF("<< _xfmw <<") L1("<<_l1<<") Pnorm: "
+        os << "    Weights: TV("<< _tvw[0] <<") TV("<< _tvw[1] <<") XF("<< _xfmw <<") L1("<<_l1<<") Pnorm: "
            <<_pnorm<< std::endl;
         os << *ft << std::endl;
         if (dwt)
@@ -303,7 +288,7 @@ private:
         return real(om.dotc(om));
     }
     
-    inline RT TV (const RT& t) {
+    inline RT TV (const RT& t, size_t i) {
         RT o = 0.0;
         om = ttdbx;
         if (t > 0.0)
@@ -313,10 +298,10 @@ private:
         om ^= 0.5*_pnorm;
         for (size_t i = 0; i < om.Size(); i++)
             o += real(om[i]);
-        return _tvw * o;
+        return _tvw[i] * o;
     }
     
-        inline RT XFM (const Matrix<T>& x, const Matrix<T>& g, const RT& t) {
+    inline RT XFM (const Matrix<T>& x, const Matrix<T>& g, const RT& t) {
         RT o = 0.;
         om = x;
         if (t > 0.0)
@@ -357,26 +342,27 @@ private:
      * @param  wx  Image space perturbance
      * @param  cgp Parameters
      */
-    inline Matrix<T> dTV (const Matrix<T>& x) {
+    inline Matrix<T> dTV (const Matrix<T>& x, const size_t& i) {
         Matrix<T> dx, g;
-        dx = *tvt * wx;
+        dx = *tvt[i] * wx;
         g  = dx * conj(dx);
         g += _l1;
         g ^= 0.5*_pnorm-1.0;
         g *= dx;
         g *= _pnorm;
-        g  = *dwt * (*tvt->*g);
-        return (_tvw * g);
+        g  = *dwt * (*(tvt[i])->*g);
+        return (_tvw[i] * g);
     }
     
 
     Params p;
     FT<T>* ft;
     DWT<T>* dwt;
-    TVOP<T>* tvt;
+    Vector<TVOP<T>* > tvt;
     NonLinear<T>* nlopt;
     Vector<size_t> _image_size;
-    RT _tvw, _xfmw, _l1, _pnorm, _tv1w, _tv2w;
+    RT _xfmw, _l1, _pnorm, _tv1w, _tv2w;
+    Vector<RT> _tvw;
     mutable RT _ndnz;
     int _verbose, _ft_type, _csiter, _wf, _wm, _nlopt_type, _dim;
     Matrix<T> ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx, om;

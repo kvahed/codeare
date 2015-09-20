@@ -56,7 +56,7 @@ public:
 	 * @brief         Default constructor
 	 */
 	NCSENSE() NOEXCEPT : m_initialised (false), m_cgiter(30), m_cgeps (1.0e-6), m_lambda (1.0e-6),
-        m_verbose (false), m_np(0), m_3rd_dim_cart(false), m_nmany(1) {}
+        m_verbose (false), m_np(0), m_3rd_dim_cart(false), m_nmany(1), m_dim4(1), m_dim5(1) {}
     
     
 	/**
@@ -66,7 +66,7 @@ public:
 	 */
 	NCSENSE        (const Params& params) NOEXCEPT
               : FT<T>::FT(params), m_cgiter(30), m_initialised(false), m_cgeps(1.0e-6),
-                m_lambda(1.0e-6), m_verbose (false), m_np(0), m_3rd_dim_cart(false), m_nmany(1)  {
+                m_lambda(1.0e-6), m_verbose (false), m_np(0), m_3rd_dim_cart(false), m_nmany(1), m_dim4(1), m_dim5(1)  {
 
 		size_t cart_dim = 1;
 
@@ -112,6 +112,8 @@ public:
         		c_multiply<size_t>) / m_nx[1]); //NR
 
 		m_cgiter  = params.Get<size_t>("cgiter");
+		m_dim4    = params.Get<int>("dim4");
+		m_dim5    = params.Get<int>("dim5");
 		m_cgeps   = params.Get<double>("cgeps");
 		m_lambda  = params.Get<double>("lambda");
         try {
@@ -147,11 +149,11 @@ public:
 		m_ic     = IntensityMap (m_sm);
 		m_initialised = true;
 
-        m_fwd_out = Matrix<T> (m_nx[2],cart_dim,m_nx[1],4,7); // nodes x slices x channels
+        m_fwd_out = Matrix<T> (m_nx[2],cart_dim,m_nx[1],m_dim4,m_dim5); // nodes x slices x channels
         Vector<size_t> tmp = size(m_sm);
         if (m_nmany > 1) {
-            tmp.PushBack(4);
-           tmp.PushBack(7);
+            tmp.PushBack(m_dim4);
+            tmp.PushBack(m_dim5);
         }
 		m_bwd_out = Matrix<T> (tmp);               // size of sensitivity maps
 		
@@ -290,16 +292,16 @@ public:
     
 	virtual Matrix<T> operator/ (const MatrixType<T>& m) const NOEXCEPT {
         Matrix<T> ret;
-        std::cout << size(m_bwd_out) << std::endl;
-        std::cout << size(m) << std::endl;
         if (m_nmany > 1) {
 #pragma omp parallel for
             for (int k = 0; k < m_nmany; ++k) {
                 for (int j = 0; j < m_nx[1]; ++j)
                     if (m_nx[0] == 2)
-                        m_bwd_out (R(),R(),    R(j),R(k%size(m,2)),R(k/size(m,2))) = m_fts[k] ->* m(CR(),     CR(j),CR(k%size(m,2)),CR(k/size(m,2)));
+                        m_bwd_out (R(),R(),    R(j),R(k%size(m,2)),R(k/size(m,2))) =
+                            m_fts[k] ->* m(CR(),     CR(j),CR(k%size(m,2)),CR(k/size(m,2)));
                     else
-                        m_bwd_out (R(),R(),R(),R(j),R(k%size(m,3)),R(k/size(m,3))) = m_fts[k] ->* m(CR(),CR(),CR(j),CR(k%size(m,3)),CR(k/size(m,3)));
+                        m_bwd_out (R(),R(),R(),R(j),R(k%size(m,3)),R(k/size(m,3))) =
+                            m_fts[k] ->* m(CR(),CR(),CR(j),CR(k%size(m,3)),CR(k/size(m,3)));
                 m_bwd_out(R(),R(),R(),R(),R(k%size(m,3)),R(k/size(m,3))) *= m_csm;
             }
             ret = squeeze(sum(m_bwd_out,3));
@@ -365,7 +367,7 @@ private:
 	double     m_lambda;         /**< Tikhonov weight */
 
     size_t     m_nmany;          /**< Recounstruct multiple volumes with same k-space and maps */
-	
+	size_t m_dim4, m_dim5;
 	int        m_np;
 
 	Params ft_params;

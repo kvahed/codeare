@@ -121,9 +121,8 @@ namespace RRStrategy {
 
         Matrix<cxfl> data;
 
-        int            m_nrespiratory;
-        int            m_ncardiac;
-        int            m_ncontrast;
+        int            m_dim4;
+        int            m_dim5;
 
         CS_XSENSE<cxfl>* csx;
 
