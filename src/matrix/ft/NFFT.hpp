@@ -368,14 +368,18 @@ public:
         	tmpm = permute (tmpm, 1, 2, 0)/sqrt((RT)m_ncart);
             }*/
 
+        size_t tmp = numel(m)/m_ncart;
         for (size_t i = 0; i < m_ncart; ++i) {
 
 			tmpd = (NFFTRType*) m_plan.f_hat;
-            for (size_t j = 0; j < m.Size(); ++j) {
-                T val = (!m_have_b0) ? m[j] : m[j] *
+            size_t os = i*tmp;
+                
+            for (size_t j = 0; j < tmp; ++j) {
+
+                T val = (!m_have_b0) ? m[j+os] : m[j+os] *
                     std::polar<RT>((RT)1., (RT)(2. * PI * m_ts * m_b0[j] * m_w));
-                tmpd[2*j+0] = real(m[j]);
-                tmpd[2*j+1] = imag(m[j]);
+                tmpd[2*j+0] = real(m[j+os]);
+                tmpd[2*j+1] = imag(m[j+os]);
             }
 
 			if (m_have_b0)
@@ -384,8 +388,9 @@ public:
 				NFFTTraits<NFFTType>::Trafo (m_plan);
 
 			tmpd = (NFFTRType*) m_plan.f;
-			tmpt = (RT*) out.Ptr() + i*2*m_M;
+			tmpt = (RT*) (out.Ptr() + i*m_M);
 			std::copy (tmpd, tmpd+2*m_M, tmpt);
+
         }
 
         return squeeze(out);

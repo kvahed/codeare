@@ -122,7 +122,8 @@ codeare::error_code XDGRASP::Init () {
 
     ft_params["imsz"]  = m_image_size;
     ft_params["nlopt"] = RHSAttribute<int>("nlopt");
-    ft_params["tvw"] = RHSAttribute<float>("tvw");
+    ft_params["tvw1"] = RHSAttribute<float>("tvw1");
+    ft_params["tvw1"] = RHSAttribute<float>("tvw2");
     ft_params["xfmw"] = RHSAttribute<float>("xfmw");
     ft_params["l1"] = RHSAttribute<float>("l1");
     ft_params["lsa"] = RHSAttribute<float>("lsa");
@@ -146,6 +147,8 @@ codeare::error_code XDGRASP::Init () {
 
 
 	m_initialised = true;
+	std::cout << *csx << std::endl;
+
 	printf ("... done.\n\n");
 
 	return codeare::OK;
@@ -160,13 +163,13 @@ codeare::error_code XDGRASP::Prepare () {
 	FT<cxfl>& ft = *csx;
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
+        ft.KSpace(Get<float>("kspace"));
 		ft.Weights (Get<float>("weights"));
         Free ("weights");
+        Free ("kspace");
     } else {
 		ft.Mask (Get<float>("mask"));
     }
-
-	std::cout << *csx << std::endl;
 
 	m_initialised = true;
 
@@ -181,13 +184,11 @@ codeare::error_code XDGRASP::Process () {
     
     Matrix<cxfl> im_dc (m_image_size);
     Matrix<cxfl>& data = Get<cxfl>("data");
-    Matrix<float>& kspace = Get<float>("kspace");
 
     FT<cxfl>& ft = *csx;
-    ft.KSpace(kspace);
 
     im_dc = ft ->* data;
-    
+    data = ft * im_dc;    
     Add ("im_dc", im_dc);
 
     return codeare::OK;

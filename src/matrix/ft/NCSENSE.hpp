@@ -112,8 +112,6 @@ public:
         		c_multiply<size_t>) / m_nx[1]); //NR
 
 		m_cgiter  = params.Get<size_t>("cgiter");
-		m_dim4    = params.Get<int>("dim4");
-		m_dim5    = params.Get<int>("dim5");
 		m_cgeps   = params.Get<double>("cgeps");
 		m_lambda  = params.Get<double>("lambda");
         try {
@@ -126,7 +124,9 @@ public:
         ft_params["threads"] = m_np;
         
         try {
-            m_nmany = params.Get<size_t>("nmany");
+            m_dim4  = params.Get<int>("dim4");
+            m_dim5  = params.Get<int>("dim5");
+            m_nmany = m_dim4*m_dim5;
         } catch (PARAMETER_MAP_EXCEPTION) {
         } catch (const boost::bad_any_cast&) {}
         
@@ -196,6 +196,34 @@ public:
 	}
     
     
+	virtual Matrix<T> operator/ (const MatrixType<T>& m) const NOEXCEPT {
+        Matrix<T> ret;
+        if (m_nmany > 1) {
+#pragma omp parallel for
+            for (int k = 0; k < m_nmany; ++k) {
+                for (int j = 0; j < m_nx[1]; ++j)
+                    if (m_nx[0] == 2)
+                        m_bwd_out (R(),R(),    R(j),R(k%size(m,2)),R(k/size(m,2))) =
+                            m_fts[k] ->* m(CR(),     CR(j),CR(k%size(m,2)),CR(k/size(m,2)));
+                    else
+                        m_bwd_out (R(),R(),R(),R(j),R(k%m_dim4),R(k/m_dim4)) =
+                            m_fts[k] ->* m(CR(),CR(),CR(j),CR(k%m_dim4),CR(k/m_dim4));
+                m_bwd_out(R(),R(),R(),R(),R(k%m_dim4),R(k/m_dim4)) *= m_csm;
+            }
+            ret = squeeze(sum(m_bwd_out,3));
+        } else {
+#pragma omp parallel for
+            for (int j = 0; j < m_nx[1]; ++j) 
+                if (m_nx[0] == 2)
+                    m_bwd_out (R(),R(),    R(j)) = m_fts[omp_get_thread_num()] ->* m(CR(),     CR(j));
+                else
+                    m_bwd_out (R(),R(),R(),R(j)) = m_fts[omp_get_thread_num()] ->* m(CR(),CR(),CR(j));
+            ret = squeeze(sum(m_bwd_out*m_csm,size(m_sm).size()-1)) * m_ic;
+        }
+	    return ret;
+	}
+    
+    
 	/**
   	 * @brief    Forward transform
 	 *
@@ -203,12 +231,26 @@ public:
 	 * @return   Transform
 	 */
 	virtual Matrix<T> Trafo (const MatrixType<T>& m) const NOEXCEPT {
+        if (m_nmany > 1) {
+#pragma omp parallel for
+            for (int k = 0; k < m_nmany; ++k) {
+                if (m_nx[0] == 2)
+                    for (int j = 0; j < m_nx[1]; ++j)
+                        m_fwd_out(R(),    R(j),R(k%size(m,2)),R(k/size(m,2))) =
+                            m_fts[k] * (m_sm(CR(),CR(),     CR(j))*m(CR(),CR(),     CR(k%size(m,2)),CR(k/size(m,2))));
+                else
+                    for (int j = 0; j < m_nx[1]; ++j)
+                        m_fwd_out(R(),R(),R(j),R(k%m_dim4),R(k/m_dim4)) =
+                            m_fts[k] * (m_sm(CR(),CR(),CR(),CR(j))*m(CR(),CR(),CR(),CR(k%m_dim4),CR(k/m_dim4)));
+            }            
+        } else {
 #pragma omp parallel for
 	    for (int j = 0; j < m_nx[1]; ++j)
             if (m_3rd_dim_cart)
                 m_fwd_out(R(),R(),R(),R(j)) = m_fts[omp_get_thread_num()] * (m_sm(CR(),CR(),CR(),CR(j))*m);
             else
                 m_fwd_out(R(),R(),    R(j)) = m_fts[omp_get_thread_num()] * (m_sm(CR(),CR(),     CR(j))*m);
+        }
 	    return squeeze(m_fwd_out);
 	}
     
@@ -289,34 +331,6 @@ public:
 		return Trafo(m);
 	}
 	
-    
-	virtual Matrix<T> operator/ (const MatrixType<T>& m) const NOEXCEPT {
-        Matrix<T> ret;
-        if (m_nmany > 1) {
-#pragma omp parallel for
-            for (int k = 0; k < m_nmany; ++k) {
-                for (int j = 0; j < m_nx[1]; ++j)
-                    if (m_nx[0] == 2)
-                        m_bwd_out (R(),R(),    R(j),R(k%size(m,2)),R(k/size(m,2))) =
-                            m_fts[k] ->* m(CR(),     CR(j),CR(k%size(m,2)),CR(k/size(m,2)));
-                    else
-                        m_bwd_out (R(),R(),R(),R(j),R(k%size(m,3)),R(k/size(m,3))) =
-                            m_fts[k] ->* m(CR(),CR(),CR(j),CR(k%size(m,3)),CR(k/size(m,3)));
-                m_bwd_out(R(),R(),R(),R(),R(k%size(m,3)),R(k/size(m,3))) *= m_csm;
-            }
-            ret = squeeze(sum(m_bwd_out,3));
-        } else {
-#pragma omp parallel for
-            for (int j = 0; j < m_nx[1]; ++j) 
-                if (m_nx[0] == 2)
-                    m_bwd_out (R(),R(),    R(j)) = m_fts[omp_get_thread_num()] ->* m(CR(),     CR(j));
-                else
-                    m_bwd_out (R(),R(),R(),R(j)) = m_fts[omp_get_thread_num()] ->* m(CR(),CR(),CR(j));
-            ret = squeeze(sum(m_bwd_out*m_csm,size(m_sm).size()-1)) * m_ic;
-        }
-	    return ret;
-	}
-    
     
 	/**
 	 * @brief    Backward transform
