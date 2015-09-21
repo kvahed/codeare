@@ -184,11 +184,10 @@ codeare::error_code XDGRASP::Process () {
     
     Matrix<cxfl> im_dc (m_image_size);
     Matrix<cxfl>& data = Get<cxfl>("data");
-
     FT<cxfl>& ft = *csx;
 
     im_dc = ft ->* data;
-    data = ft * im_dc;    
+
     Add ("im_dc", im_dc);
 
     return codeare::OK;

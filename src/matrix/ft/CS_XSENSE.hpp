@@ -134,8 +134,8 @@ public:
         else 
             dwt = new DWT<T> (16, (wlfamily)_wf, _wm);
 
-        tvt.PushBack(new TVOP<T>());
-        tvt.PushBack(new TVOP<T>());
+        tvt.PushBack(new TVOP<T>(0,0,0,1,0));
+        tvt.PushBack(new TVOP<T>(0,0,0,0,1));
         
         printf ("... done.\n\n");
 
@@ -194,10 +194,9 @@ public:
         Matrix<T> g = dObj (x);
         if (_xfmw)
             g += dXFM (x);
-        if (_tvw[0])
-            g += dTV  (x,0);
-        if (_tvw[1])
-            g += dTV  (x,1);
+        for (size_t i = 0; i < _tvw.size(); ++i)
+            if (_tvw[i])
+                g += dTV  (x,i);
         return g;
     }
     
@@ -206,9 +205,23 @@ public:
         ffdbx = *ft * wx;
         ffdbg = *ft * wdx;
         if (_tvw[0]) {
-            ttdbx = *tvt[0] * wx;
-            ttdbg = *tvt[0] * wdx;
-        }
+            if (ttdbx.size() == 0) {
+                ttdbx.push_back(*tvt[0] * wx);
+                ttdbg.push_back(*tvt[0] * wdx);
+            } else {
+                ttdbx[0] = *tvt[0] * wx;
+                ttdbg[0] = *tvt[0] * wdx;
+            }
+        } 
+        if (_tvw[1]) {
+            if (ttdbx.size() == 1) {
+                ttdbx.push_back(*tvt[1] * wx);
+                ttdbg.push_back(*tvt[1] * wdx);
+            } else {
+                ttdbx[1] = *tvt[1] * wx;
+                ttdbg[1] = *tvt[1] * wdx;
+            }
+        } 
     }
 
 	virtual std::ostream& Print (std::ostream& os) const {
@@ -263,8 +276,7 @@ public:
 
         if (_verbose) {
             size_t cpsz = numel(im_dc);
-            im_dc = zeros<T> (size(im_dc,0), size(im_dc,1), (_dim == 3) ?
-                                  size(im_dc,2) : 1, vc.size());
+            im_dc = zeros<T> (size(im_dc,0), size(im_dc,1), (_dim == 3) ? size(im_dc,2) : 1, vc.size());
             for (size_t i = 0; i < vc.size(); i++)
                 std::copy (&vc[i][0], &vc[i][0]+cpsz, &im_dc[i*cpsz]);
         } else
@@ -290,9 +302,9 @@ private:
     
     inline RT TV (const RT& t, size_t i) {
         RT o = 0.0;
-        om = ttdbx;
+        om = ttdbx[i];
         if (t > 0.0)
-            om += t * ttdbg;
+            om += t * ttdbg[i];
         om *= conj(om);
         om += _l1;
         om ^= 0.5*_pnorm;
@@ -365,7 +377,8 @@ private:
     Vector<RT> _tvw;
     mutable RT _ndnz;
     int _verbose, _ft_type, _csiter, _wf, _wm, _nlopt_type, _dim;
-    Matrix<T> ffdbx, ffdbg, ttdbx, ttdbg, wx, wdx, om;
+    Matrix<T> ffdbx, ffdbg, wx, wdx, om;
+    Vector<Matrix<T> > ttdbx, ttdbg;
     mutable Matrix<T> data;
 
     
