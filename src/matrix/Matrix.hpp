@@ -190,6 +190,22 @@ public:
 	
 	
     /**
+     * @brief           Construct matrix with aligned dimension vector
+     *
+     * @param  dim      All dimensions
+     */
+	inline Matrix (const size_t* dims, const size_t ndims) {
+	    _dim.resize(ndims);
+	    std::copy(dims, dims+ndims, _dim.begin());
+		MATRIX_ASSERT(!_dim.Empty(), DIMS_VECTOR_EMPTY);
+        MATRIX_ASSERT(std::find(_dim.begin(),_dim.end(),size_t(0))==_dim.end(),
+        		DIMS_VECTOR_CONTAINS_ZEROS);
+        _res.resize(_dim.size(),1.0);
+        Allocate();
+	}
+
+
+    /**
      * @brief           Construct matrix with dimension and resolution arrays
      *
      * @param  dim      All 16 Dimensions

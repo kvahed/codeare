@@ -23,7 +23,7 @@
 #define __IOCONTEXT_HPP__
 
 #include "HDF5File.hpp"
-#include "SyngoFile.hpp"
+#include "VXFile.hpp" // Syngo VB/VD
 #include "CODFile.hpp"
 #include "Demangle.hpp"
 
@@ -245,7 +245,7 @@ namespace io{
 	
 	template<>
 	struct IOTraits<SYNGO> {
-		typedef SyngoFile IOClass;
+		typedef VXFile IOClass;
 		
 		static const std::string
 		Suffix () {
