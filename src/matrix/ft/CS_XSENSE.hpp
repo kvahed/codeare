@@ -134,8 +134,8 @@ public:
         else 
             dwt = new DWT<T> (16, (wlfamily)_wf, _wm);
 
-        tvt.PushBack(new TVOP<T>());
-        tvt.PushBack(new TVOP<T>());
+        tvt.PushBack(new TVOP<T>(0,0,0,1,0));
+        tvt.PushBack(new TVOP<T>(0,0,0,0,1));
         
         printf ("... done.\n\n");
 
@@ -266,7 +266,11 @@ public:
 
         im_dc  = *dwt * im_dc;
 
-        printf ("  Running %i %s iterations ... \n", _csiter+1, nlopt_names[_nlopt_type]); fflush(stdout);
+        RT ma = max(abs(im_dc));
+        _tvw[0] *= ma;
+        _tvw[1] *= ma;
+
+        printf ("  Running %i %s iterations ... \n", _csiter, nlopt_names[_nlopt_type]); fflush(stdout);
 
         for (size_t i = 0; i < (size_t)_csiter; i++) {
             nlopt->Minimise ((Operator<T>*)this, im_dc);
@@ -373,8 +377,8 @@ private:
     Vector<TVOP<T>* > tvt;
     NonLinear<T>* nlopt;
     Vector<size_t> _image_size;
-    RT _xfmw, _l1, _pnorm, _tv1w, _tv2w;
-    Vector<RT> _tvw;
+    RT _xfmw, _l1, _pnorm;
+    mutable Vector<RT> _tvw;
     mutable RT _ndnz;
     int _verbose, _ft_type, _csiter, _wf, _wm, _nlopt_type, _dim;
     Matrix<T> ffdbx, ffdbg, wx, wdx, om;

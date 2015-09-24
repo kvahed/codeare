@@ -43,7 +43,6 @@
 #ifndef USE_IN_MATLAB
 
 #include <cassert>
-class mxArray {};
 #define prtmsg printf
 #define prtwrn printf
 #define prterr(x) printf(x); assert(false);
