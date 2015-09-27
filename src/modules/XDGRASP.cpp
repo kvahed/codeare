@@ -182,13 +182,13 @@ codeare::error_code XDGRASP::Process () {
     m_image_size.push_back (m_dim4);
     m_image_size.push_back (m_dim5);
     
-    Matrix<cxfl> im_dc (m_image_size);
+    Matrix<cxfl> im_xd (m_image_size);
     Matrix<cxfl>& data = Get<cxfl>("data");
     FT<cxfl>& ft = *csx;
 
-    im_dc = ft ->* data;
+    im_xd = ft ->* data;
 
-    Add ("im_dc", im_dc);
+    Add ("im_xd", im_xd);
 
     return codeare::OK;
 

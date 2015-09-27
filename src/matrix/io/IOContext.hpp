@@ -449,8 +449,7 @@ namespace io{
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		template<class T> Matrix<T>
-		Read (const TiXmlElement* txe) const throw () {
+		template<class T> Matrix<T> Read (const TiXmlElement* txe) const throw () {
 
 			if (m_iof) {
 				switch (m_ios) {
@@ -566,7 +565,7 @@ namespace io{
 				return HDF5;
 			else if (lname.compare(IOTraits<MATLAB>::CName()) == 0)
 				return NIFTI;
-			else if (lname.compare(IOTraits<MATLAB>::CName()) == 0)
+			else if (lname.compare(IOTraits<SYNGO>::CName()) == 0)
 				return SYNGO;
 			else
 				return HDF5;

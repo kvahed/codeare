@@ -28,8 +28,8 @@ endif()
 add_executable (t_codeare t_codeare.cpp)
 add_test (cod t_codeare)
 
-add_executable (t_vxfile t_vxfile.cpp)
-add_test (vx t_vxfile)
+#add_executable (t_vxfile t_vxfile.cpp)
+#add_test (vx t_vxfile)
 
 if (${ITK_FOUND})
   add_executable (t_dicom t_dicom.cpp)

@@ -22,9 +22,13 @@
 #define _VB_FILE_HPP_
 
 #include "SyngoFile.hpp"
+#include "Workspace.hpp"
 #ifdef USE_IN_MATLAB
   #include "waitmex.h"
 #endif
+
+#include "SimpleTimer.hpp"
+
 namespace codeare {
 namespace matrix  {
 namespace io      {
@@ -46,7 +50,7 @@ namespace VB {
             _measdims = std::vector<uint32_t>(16);
             _rtfbdims = std::vector<uint32_t>(16);
             _syncdims = std::vector<uint32_t>( 2);
-            prtmsg("     VB file contains %.3fGB of raw data starting at position %d.\n", 1e-9f*iGB*_data_len, _header_len);
+            prtmsg("     VB file contains %.2fGB of raw data starting at position %d.\n", 1e-9f*iGB*_data_len, _header_len);
         }
 #else
         VBFile (const std::string& fname, const IOMode mode, const Params& params, const bool verbosity) :
@@ -76,11 +80,11 @@ namespace VB {
         
         
         virtual void Digest () {
-            //waitbar* h;
-            //int64_t start = GetTimeMs64();
+
             MeasHeader mh;
             size_t i = 0;
             char* wbm = const_cast<char*>("reading ...");
+            SimpleTimer st;
             
             _file.seekg (_header_len);
             
@@ -129,7 +133,7 @@ namespace VB {
             if (_meas_r){
                 //waitbar_destroy(h);
             }
-            prtmsg ("     done - wtime (%d ms).\n", 0/*GetTimeMs64()-start*/);
+            prtmsg ("     done - wtime (%s ms).\n", st.Format().c_str());
             
             if (!_meas_r) {
                 _measdims = _raise_one (_measdims);
@@ -154,17 +158,12 @@ namespace VB {
         
         template<class T> Matrix<T> Read (const std::string& data_name) {
 
-        	if (!_digested)
+        	if (!_digested) {
         		this->Digest();
-
-        	if (data_name.compare("meas")==0)
-        		return _meas;
-        	else if (data_name.compare("sync")==0)
-        		return _sync;
-        	else if (data_name.compare("rtfb")==0)
-        		return _rtfb;
-        	else
-        		throw UNKNOWN_SYNGO_DATATYPE;
+                wspace.Add<cxfl>("meas", _meas);
+                wspace.Add<cxfl>("rtfb", _rtfb);
+                wspace.Add<float>("sync", _sync);
+            }
 
         	return Matrix<T>();
         }
@@ -281,7 +280,7 @@ namespace VB {
         }
 
         bool _digested;
-        uint32_t _data_len;
+        size_t _data_len;
         unsigned _nmeas, _nrtfb, _nnoise, _lines;
         float *_meas_r, *_meas_i, *_rtfb_r, *_rtfb_i, *_noise_r, *_noise_i, *_sync_r;
         std::vector<uint32_t> _syncdims, _measdims, _rtfbdims, _noisedims;

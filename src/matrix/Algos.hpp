@@ -906,13 +906,17 @@ template <class T> inline static T prod (const Matrix<T>& M) {
  * @param  d    Dimension
  * @return      Sum of squares
  */
-template <class T> inline static  Matrix<T> SOS (const Matrix<T>& M, size_t d) {
-	
-	assert (M.Dim(d) > 1);
-	
-	Matrix<T> res = M ^ 2;
+template <class T> inline static Matrix<typename TypeTraits<T>::RT>
+    sos (const Matrix<T>& M, long d = -1) {
+    typedef typename TypeTraits<T>::RT real_type;
+    if (d == -1)
+        d = ndims(M)-1;
+    assert (d <= ndims(M)-1);
+    const real_type* rt = (real_type*)&M[0];
+	Matrix<real_type> res(size(M));
+    for (size_t i = 0; i < numel(M); ++i)
+        res[i] = rt[2*i]*rt[2*i]+rt[2*i+1]*rt[2*i+1];
 	return sum (res, d);
-  
 }
 
 
@@ -928,22 +932,33 @@ template <class T> inline static  Matrix<T> SOS (const Matrix<T>& M, size_t d) {
  * @param  M       Matrix
  * @return         Squeezed matrix
  */
-template <class T> inline static Matrix<T> squeeze (const Matrix<T>& M) {
-	
+template <class T> inline static void squeeze_ip (Matrix<T>& M) {
 	Vector<size_t> dim;
 	Vector<float>  res;
-
 	for (size_t i = 0; i < M.NDim(); ++i)
 		if (size(M, i) > 1) {
 			dim.push_back(size (M,i));
 			res.push_back(resol(M,i));
 		}
-	
-	Matrix<T> ret (dim);
-	ret.Container() = M.Container();
-	
+	M.Dim(dim);
+}
+
+/**
+ * @brief          Get rid of unused dimensions
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (1,8,7,1,6);
+ *   m = squeeze (m); // dims: (8,7,6); 
+ * @endcode
+ *
+ * @param  M       Matrix
+ * @return         Squeezed matrix
+ */
+template <class T> inline static Matrix<T> squeeze (const Matrix<T>& M) {
+    Matrix<T> ret = M;
+    squeeze_ip(ret);
 	return ret;
-	
 }
 
 

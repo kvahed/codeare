@@ -51,10 +51,12 @@ int main (int argc, char** argv) {
 			while (datain_entry) {
 
 				const std::string data_name = datain_entry->Value();
-				printf ("  Reading %s\n", data_name.c_str());
-
 				const std::string data_uri = datain_entry->Attribute("uri");
 				const std::string data_type = datain_entry->Attribute("dtype");
+                if (data_type.compare("SYNGO")==0)
+                    break;
+                        
+				printf ("  Reading %s\n", data_name.c_str());
 
 				if (data_name.length() == 0) {
 					printf ("*** ERROR: specify a non-empty name for a data set\n");
