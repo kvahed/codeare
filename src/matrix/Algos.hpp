@@ -960,7 +960,16 @@ template <class T> inline static Matrix<T> squeeze (const Matrix<T>& M) {
     squeeze_ip(ret);
 	return ret;
 }
-
+template<class T> inline static Matrix<T> squeeze (const View<T,true>& V) {
+	Vector<size_t> vdim = size(V), dim;
+	for (size_t i = 0; i < vdim.size(); ++i)
+		if (vdim[i] > 1)
+			dim.push_back(vdim[i]);
+    Matrix<T> ret(dim);
+    for (size_t i = 0; i < numel(V); ++i)
+        ret[i] = V[i];
+    return ret;
+}
 
 /**
  * @brief           MATLAB-like permute
@@ -1054,7 +1063,7 @@ template<class T> inline static Matrix<T> permute (const Matrix<T>& M, const siz
 		assert (n1 == 1);
 		return M;
 	} else if (n0 == 1) {// 1,0: transpose
-		assert (n0 == 1);
+		assert (n1 == 0);
 		for (size_t j = 0; j < odims[n1]; ++j)
 			for (size_t i = 0; i < odims[n0]; ++i)
 				ret(i,j) = M(j,i);

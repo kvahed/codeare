@@ -530,6 +530,11 @@ namespace io{
 
 		}
 
+        inline IOStrategy Strategy() const {
+            return m_ios;
+        }
+        
+
 	private:
 
 
@@ -596,10 +601,6 @@ namespace io{
 
 		}
 
-
-		const IOStrategy& Strategy () const {
-			return m_ios;
-		}
 
 		IOStrategy m_ios;
 		IOFile* m_iof; /**< @brief  My actual context */

@@ -80,14 +80,7 @@ public:
             assert(false);
         }
 
-        if (p.exists("3rd_dim_cart")) {
-        	try {
-        		m_3rd_dim_cart = p.Get<bool>("3rd_dim_cart");
-        	} catch (const boost::bad_any_cast&) {
-        		printf ("  WARNING - NFFT: Could not interpret input for "
-        				"Cartesian nature of 3rd dimension. \n");
-        	}
-        }
+        m_3rd_dim_cart = try_to_fetch (p, "3rd_dim_cart", false);
 
         if (p.exists("imsz")) {// Image domain size
             try {
@@ -106,57 +99,18 @@ public:
         	m_ncart = m_N.back();
         	m_N.PopBack();
         }
-        m_n = m_N;
+        m_n       = m_N;
         
-        if (p.exists("m")) {
-            try {
-                m_m = unsigned_cast (p["m"]);
-            } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for "
-                		"oversampling factor m. Defaulting to 1.\n");
-            }
-        }
-
-        /*
-        try {
-            m_np  = p.Get<int>("threads");
-        } catch (const PARAMETER_MAP_EXCEPTION& ) {
-        } catch (const boost::bad_any_cast&) {}
-        */
-        
-//        omp_set_num_threads(m_np);
-        
-        if (p.exists("alpha")) {
-            try {
-                m_alpha = fp_cast(p["alpha"]);
-            } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for "
-                		"oversampling factor alpha. Defaulting to 1.0\n");
-            }
-        }
+        m_m       = try_to_fetch(p, "m", 1);
+        m_alpha   = try_to_fetch(p, "alpha", 1.5f);
         for (size_t i = 0; i < m_N.size(); ++i)
             m_n[i] = ceil(m_alpha*m_N[i]);
         
-        m_rank  = m_N.size();
-        m_imgsz = 2*prod(m_N);
+        m_rank    = m_N.size();
+        m_imgsz   = 2*prod(m_N);
 
-        if (p.exists("epsilon")) {
-            try {
-                m_epsilon = fp_cast (p["epsilon"]);
-            } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for "
-                		"convergence criterium epsilon. Defaulting to 0.0007\n");
-            }
-        }
-        
-        if (p.exists("maxit")) {
-            try {
-                m_maxit = unsigned_cast (p["maxit"]);
-            } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for maximum "
-                		"NFFT steps. Defaulting to 3\n");
-            }
-        }
+        m_epsilon = try_to_fetch(p, "epsilon", 7.0e-4);
+        m_maxit   = try_to_fetch(p, "maxit", 3);
 
         if (p.exists("b0")) {
             try {

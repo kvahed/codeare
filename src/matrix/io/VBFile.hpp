@@ -50,7 +50,7 @@ namespace VB {
             _measdims = std::vector<uint32_t>(16);
             _rtfbdims = std::vector<uint32_t>(16);
             _syncdims = std::vector<uint32_t>( 2);
-            prtmsg("     VB file contains %.2fGB of raw data starting at position %d.\n", 1e-9f*iGB*_data_len, _header_len);
+            prtmsg("     VB file contains %.1fGB of raw data starting at position %d.\n", 1e-9f*iGB*_data_len, _header_len);
         }
 #else
         VBFile (const std::string& fname, const IOMode mode, const Params& params, const bool verbosity) :
@@ -65,7 +65,11 @@ namespace VB {
             _measdims = std::vector<uint32_t>(16);
             _rtfbdims = std::vector<uint32_t>(16);
             _syncdims = std::vector<uint32_t>( 2);
-            prtmsg("     VB file contains %.3fGB of raw data starting at position %d.\n", 1e-9f*iGB*_data_len, _header_len);
+            prtmsg("     VB file contains %.1fGB of raw data starting at position %d.\n", 1e-9f*iGB*_data_len, _header_len);
+            Digest();
+            wspace.Add<cxfl>("meas", _meas);
+            wspace.Add<cxfl>("rtfb", _rtfb);
+            wspace.Add<float>("sync", _sync);
         }
 #endif
 
@@ -133,7 +137,7 @@ namespace VB {
             if (_meas_r){
                 //waitbar_destroy(h);
             }
-            prtmsg ("     done - wtime (%s ms).\n", st.Format().c_str());
+            prtmsg ("     done - wtime %s", st.Format().c_str());
             
             if (!_meas_r) {
                 _measdims = _raise_one (_measdims);
