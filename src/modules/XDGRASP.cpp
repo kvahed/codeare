@@ -74,8 +74,8 @@ codeare::error_code XDGRASP::Init () {
 		case 2:
 			printf ("%s", "NUFFT");
 #ifdef HAVE_NFFT3
-			ft_params["epsilon"] = RHSAttribute<double>("fteps");
-			ft_params["alpha"]   = RHSAttribute<double>("ftalpha");
+			ft_params["epsilon"] = RHSAttribute<float>("fteps");
+			ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
 			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
 			ft_params["m"]       = RHSAttribute<size_t>("ftm");
 	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
@@ -94,10 +94,10 @@ codeare::error_code XDGRASP::Init () {
             ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
 			ft_params["weights_name"] = std::string("weights");
 		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
-		    ft_params["fteps"]        = RHSAttribute<double>("fteps");
+		    ft_params["fteps"]        = RHSAttribute<float>("fteps");
 		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
-		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
-		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
+		    ft_params["cgeps"]        = RHSAttribute<float>("cgeps");
+		    ft_params["lambda"]       = RHSAttribute<float>("lambda");
 		    ft_params["threads"]      = RHSAttribute<int>("threads");
 	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
             try {

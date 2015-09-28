@@ -135,8 +135,8 @@ public:
         else 
             dwt = new DWT<T> (16, (wlfamily)_wf, _wm);
 
-        tvt.PushBack(new TVOP<T>());
-        tvt.PushBack(new TVOP<T>());
+        tvt.PushBack(new TVOP<T>(0,0,0,1,0));
+        tvt.PushBack(new TVOP<T>(0,0,0,0,1));
         
         printf ("... done.\n\n");
 
