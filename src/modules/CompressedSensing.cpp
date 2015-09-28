@@ -90,10 +90,10 @@ codeare::error_code CompressedSensing::Init () {
             ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
 			ft_params["weights_name"] = std::string("weights");
 		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
-		    ft_params["fteps"]        = RHSAttribute<double>("fteps");
+		    ft_params["fteps"]        = RHSAttribute<float>("fteps");
 		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
-		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
-		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
+		    ft_params["cgeps"]        = RHSAttribute<float>("cgeps");
+		    ft_params["lambda"]       = RHSAttribute<float>("lambda");
 		    ft_params["threads"]      = RHSAttribute<int>("threads");
 	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
 		    ft_params["verbose"]      = 0;

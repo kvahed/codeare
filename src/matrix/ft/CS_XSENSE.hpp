@@ -178,11 +178,11 @@ public:
     
 
     inline virtual RT obj (const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) const {
-        RT obj = Obj (t), objtv1 = 0, objtv2 = 0;
+        RT obj = Obj (t), objtv1 = 0, objtv2 = 0, objxfm = 0;
         rmse = sqrt(obj/_ndnz);
 #pragma omp parallel num_threads(3)
         {
-        	switch (omp_get_thread_num())
+        switch (omp_get_thread_num())
         	{
         	case 0:
         		if (_tvw[0])
@@ -192,14 +192,13 @@ public:
         		if (_tvw[1])
         			objtv2 = TV (t,1);
         		break;
-        	case 2:
-        		if (_tvw[0])
-        			objtv1 = TV (t,0);
-        		break;
+            case 2:
+                if (_xfmw)
+                    objxfm = XFM (x, dx, t);
         	default: break;
         	}
         }
-        return obj + objtv1+ objtv2;
+        return obj + objtv1 + objtv2 + objxfm;
     }
     
 

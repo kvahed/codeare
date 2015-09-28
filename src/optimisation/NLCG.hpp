@@ -43,7 +43,7 @@ public:
         for (size_t k = 0; k < (size_t)_nliter; k++) {
         
             A->Update(_dx);
-                t = t0;
+            t = t0;
         
             f0 = A->obj (x, _dx, z, rmse);
         
