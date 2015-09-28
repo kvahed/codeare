@@ -461,7 +461,7 @@ public:
 		d = tmp.Container(); // data side lengths
 		c = (floor(tmp/2)).Container(); // center coords
 
-		Allocate (rank, &n[0]);
+		Allocate ((int)rank, (const int*)&n[0]);
 		
 		m_initialised = true;
 	

@@ -260,7 +260,31 @@ public:
 	}
 	template<class S> inline Vector<T> operator* (const S& s) const NOEXCEPT {
 		Vector<T> ret = *this;
-		return ret/=s;
+		return ret*=s;
+	}
+	template<class S> inline Vector<T>& operator-= (const S& s) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::minus<T>(),(T)s));
+		return *this;
+	}
+	template<class S> inline Vector<T>& operator-= (const Vector<S>& v) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), v.begin(), _data.begin(), std::minus<T>());
+		return *this;
+	}
+	template<class S> inline Vector<T> operator- (const S& s) const NOEXCEPT {
+		Vector<T> ret = *this;
+		return ret-=s;
+	}
+	template<class S> inline Vector<T>& operator+= (const S& s) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::plus<T>(),(T)s));
+		return *this;
+	}
+	template<class S> inline Vector<T>& operator+= (const Vector<S>& v) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), v.begin(), _data.begin(), std::plus<T>());
+		return *this;
+	}
+	template<class S> inline Vector<T> operator+ (const S& s) const NOEXCEPT {
+		Vector<T> ret = *this;
+		return ret+=s;
 	}
 
 private:
