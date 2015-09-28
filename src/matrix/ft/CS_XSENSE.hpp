@@ -53,7 +53,8 @@ public:
 
     typedef typename TypeTraits<T>::RT RT;
 
-    CS_XSENSE () : ft(0), dwt(0), nlopt(0) {/*TODO: Default constructor*/}
+    CS_XSENSE () : ft(0), dwt(0), nlopt(0), _ft_type(0), _wm(0), _wf(-1), _nlopt_type(0), _dim(2),
+    		{/*TODO: Default constructor*/}
     virtual ~CS_XSENSE () {
         if (ft)
             delete ft;
@@ -179,13 +180,13 @@ public:
     inline virtual RT obj (const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) {
         RT obj = Obj (t);
         rmse = sqrt(obj/_ndnz);
-        if (_tvw[0])
-            obj += TV (t,0);
-        if (_tvw[1])
-            obj += TV (t,1);
+#pragma omp parallel for default (share) 
+        for (size_t i = 0; i < _tvw.size(); ++i)
+            if (_tvw[0])
+                obj += TV (t,0);
         if (_xfmw)
             obj += XFM (x, dx, t);
-        return obj;
+        return obj + objtv1 + objtv2 + objxfm;
     }
     
 
