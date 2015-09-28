@@ -80,6 +80,7 @@ class SyngoFile : public IOFile {
     
 public:
     
+#ifdef USE_IN_MATLAB
     /**
      * @brief Construct with filename and left hand side 
      */
@@ -94,22 +95,7 @@ public:
         }
         prtmsg("     done.\n");
     }
-    
-    /**
-     * @brief Construct with filename and left hand side 
-     */
-    SyngoFile (const std::string& fname, Matrix<raw>* buf) :
-        _fname(fname), _header_len(0), _nlhs(0), _lhs(0), _status(0) {
-        prtmsg ("   Opening %s ...\n", _fname.c_str());
-        std::string line;
-        _file.open (fname.c_str(), std::ios::in|std::ios::binary);
-        if (!_file.is_open()) {
-            prterr ("     FAILED! Unable to open file\n");
-            _status = 1;
-        }
-        prtmsg("     done.\n");
-    }
-    
+#else
     /**
      * @brief Construct with filename and left hand side
      */
@@ -125,8 +111,23 @@ public:
         }
         prtmsg("     done.\n");
     }
+#endif
 
-
+    /**
+     * @brief Construct with filename and left hand side 
+     */
+/*    SyngoFile (const std::string& fname, Matrix<raw>* buf) :
+        _fname(fname), _header_len(0), _nlhs(0), _lhs(0), _status(0) {
+        prtmsg ("   Opening %s ...\n", _fname.c_str());
+        std::string line;
+        _file.open (fname.c_str(), std::ios::in|std::ios::binary);
+        if (!_file.is_open()) {
+            prterr ("     FAILED! Unable to open file\n");
+            _status = 1;
+        }
+        prtmsg("     done.\n");
+        }*/
+    
     /**
      * @brief Close file
      */
@@ -166,8 +167,12 @@ protected:
     std::string _fname;    /**< File name */
     
     uint32_t _header_len;  /**< Header length */
-    int _nlhs;             /**< # Left hand sides */ 
+    int _nlhs;             /**< # Left hand sides */
+#ifdef USE_IN_MATLAB
     mxArray** _lhs;        /**< Left hand side */
+#else
+    void* _lhs;
+#endif
 
 };
 

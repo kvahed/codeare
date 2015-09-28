@@ -17,3 +17,10 @@ cumsum (const Matrix<T>& m) {
 	return res;
 
 }
+
+template<class T> inline static Matrix<T> exp (const Matrix<T>& M) {
+    Matrix<T> ret(M.Dim());
+    for (size_t i = 0; i < M.Size(); ++i)
+        ret[i] = exp(M[i]);
+    return M;
+}

@@ -137,21 +137,14 @@ public:
     
     template<class T> Matrix<T> Read (const std::string& data_name) {
 
-    	if (!_digested)
-    		this->Digest();
-
-    	std::cout << size(_meas) << std::endl;
-
-    	if (data_name.compare("meas")==0)
-    		return _meas;
-    	else if (data_name.compare("sync")==0)
-    		return _sync;
-    	else if (data_name.compare("rtfb")==0)
-    		return _rtfb;
-    	else
-    		throw UNKNOWN_SYNGO_DATATYPE;
-
-    	return Matrix<T>();
+        if (!_digested)
+            this->Digest();
+        
+        wspace.Add<cxfl>("meas", _meas);
+        wspace.Add<cxfl>("rtfb", _rtfb);
+        wspace.Add<float>("sync", _sync);
+        
+        return Matrix<T>();
     }
 
 private:

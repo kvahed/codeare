@@ -29,8 +29,8 @@
 #include <string>
 
 enum TinyXMLQueryException { 
-	NO_ATTRIBUTE = 1,
-	WRONG_TYPE
+	CONFIG_KEY_NOT_FOUND = 1,
+	CONFIG_WRONG_TYPE
 };
 
 using namespace TinyXPath;
@@ -433,6 +433,31 @@ public:
     }
 
     
+    /**
+	 * @brief           Set a double type attribute
+	 *
+	 * @param  name     Attribute name
+	 * @param  value    Attribute value
+	 * @return          Status
+	 */
+	template<class T> Vector<T>	GetList (const std::string& key) {
+		Vector<T> v;
+		T value;
+		std::string vstr;
+        int res = Configuration()->QueryValueAttribute<std::string>(key, &vstr);
+        if (res==TIXML_SUCCESS) {
+        	std::stringstream ss(vstr);
+			while(ss >> value) {
+				v.push_back(value);
+				if (ss.peek() == ',')
+					ss.ignore();
+			}
+        } else {
+        	throw CONFIG_KEY_NOT_FOUND;
+        }
+		return v;
+	}
+
     friend std::ostream& operator<< (std::ostream& os, const Configurable& conf) {
         os << conf.GetConfig();
     }

@@ -123,7 +123,7 @@ codeare::error_code XDGRASP::Init () {
     ft_params["imsz"]  = m_image_size;
     ft_params["nlopt"] = RHSAttribute<int>("nlopt");
     ft_params["tvw1"] = RHSAttribute<float>("tvw1");
-    ft_params["tvw1"] = RHSAttribute<float>("tvw2");
+    ft_params["tvw2"] = RHSAttribute<float>("tvw2");
     ft_params["xfmw"] = RHSAttribute<float>("xfmw");
     ft_params["l1"] = RHSAttribute<float>("l1");
     ft_params["lsa"] = RHSAttribute<float>("lsa");
@@ -182,13 +182,13 @@ codeare::error_code XDGRASP::Process () {
     m_image_size.push_back (m_dim4);
     m_image_size.push_back (m_dim5);
     
-    Matrix<cxfl> im_dc (m_image_size);
+    Matrix<cxfl> im_xd (m_image_size);
     Matrix<cxfl>& data = Get<cxfl>("data");
     FT<cxfl>& ft = *csx;
 
-    im_dc = ft ->* data;
+    im_xd = ft ->* data;
 
-    Add ("im_dc", im_dc);
+    Add ("im_xd", im_xd);
 
     return codeare::OK;
 

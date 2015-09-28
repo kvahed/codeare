@@ -48,44 +48,46 @@ int main (int argc, char** argv) {
 			TiXmlElement* datain_entry = datain->FirstChildElement();
 			IOContext ic (datain, base_dir, READ);
 
-			while (datain_entry) {
-
-				const std::string data_name = datain_entry->Value();
-				printf ("  Reading %s\n", data_name.c_str());
-
-				const std::string data_uri = datain_entry->Attribute("uri");
-				const std::string data_type = datain_entry->Attribute("dtype");
-
-				if (data_name.length() == 0) {
-					printf ("*** ERROR: specify a non-empty name for a data set\n");
-					std::cout << "           Entry: " << *datain_entry << std::endl;
-				}
-
-				if (data_type.length() == 0)
-					printf ("*** ERROR: reading binary data \"%s\" with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
-
-				// TODO: check first if entry exists and has right format
-				if        (TypeTraits<float>::Abbrev().compare(data_type) == 0)  {
-					Matrix<float> M = ic.Read<float>(datain_entry);
-					con.SetMatrix(data_name, M);
-				} else if (TypeTraits<double>::Abbrev().compare(data_type) == 0) {
-					Matrix<double> M = ic.Read<double>(datain_entry);
-					con.SetMatrix(data_name, M);
-				} else if (TypeTraits<cxfl>::Abbrev().compare(data_type) == 0)   {
-					Matrix<cxfl> M = ic.Read<cxfl>(datain_entry);
-					con.SetMatrix(data_name, M);
-				} else if (TypeTraits<cxdb>::Abbrev().compare(data_type) == 0)   {
-					Matrix<cxdb> M = ic.Read<cxdb>(datain_entry);
-					con.SetMatrix(data_name, M);
-				} else  {
-					printf ("*** ERROR: Couldn't load a data set specified in\n");
-					std::cout << "           Entry: " << *datain_entry << std::endl;
-					return codeare::WRONG_OR_NO_DATASET;
-				}
-
-				datain_entry = datain_entry->NextSiblingElement();
-			}
-		}
+            if (!ic.Strategy()!=SYNGO) {
+                while (datain_entry) {
+                    
+                    const std::string data_name = datain_entry->Value();
+                    const std::string data_uri = datain_entry->Attribute("uri");
+                    const std::string data_type = datain_entry->Attribute("dtype");
+                    
+                    printf ("  Reading %s\n", data_name.c_str());
+                    
+                    if (data_name.length() == 0) {
+                        printf ("*** ERROR: specify a non-empty name for a data set\n");
+                        std::cout << "           Entry: " << *datain_entry << std::endl;
+                    }
+                    
+                    if (data_type.length() == 0)
+                        printf ("*** ERROR: reading binary data \"%s\" with type %s. Exiting.\n", data_name.c_str(), data_type.c_str());
+                    
+                    // TODO: check first if entry exists and has right format
+                    if        (TypeTraits<float>::Abbrev().compare(data_type) == 0)  {
+                        Matrix<float> M = ic.Read<float>(datain_entry);
+                        con.SetMatrix(data_name, M);
+                    } else if (TypeTraits<double>::Abbrev().compare(data_type) == 0) {
+                        Matrix<double> M = ic.Read<double>(datain_entry);
+                        con.SetMatrix(data_name, M);
+                    } else if (TypeTraits<cxfl>::Abbrev().compare(data_type) == 0)   {
+                        Matrix<cxfl> M = ic.Read<cxfl>(datain_entry);
+                        con.SetMatrix(data_name, M);
+                    } else if (TypeTraits<cxdb>::Abbrev().compare(data_type) == 0)   {
+                        Matrix<cxdb> M = ic.Read<cxdb>(datain_entry);
+                        con.SetMatrix(data_name, M);
+                    } else  {
+                        printf ("*** ERROR: Couldn't load a data set specified in\n");
+                        std::cout << "           Entry: " << *datain_entry << std::endl;
+                        return codeare::WRONG_OR_NO_DATASET;
+                    }
+                    
+                    datain_entry = datain_entry->NextSiblingElement();
+                }
+            }
+        }
 
 		TiXmlElement* chain = con.GetElement("/config/chain");
 		if (!chain) {

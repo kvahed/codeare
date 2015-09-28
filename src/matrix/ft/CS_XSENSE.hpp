@@ -53,7 +53,7 @@ public:
 
     typedef typename TypeTraits<T>::RT RT;
 
-    CS_XSENSE () : ft(0), dwt(0), nlopt(0), _ft_type(0), _wm(0), _wf(-1), _nlopt_type(0), _dim(2),
+    CS_XSENSE () : ft(0), dwt(0), nlopt(0), _ft_type(0), _wm(0), _wf(-1), _nlopt_type(0), _dim(2)
     		{/*TODO: Default constructor*/}
     virtual ~CS_XSENSE () {
         if (ft)
@@ -135,8 +135,8 @@ public:
         else 
             dwt = new DWT<T> (16, (wlfamily)_wf, _wm);
 
-        tvt.PushBack(new TVOP<T>());
-        tvt.PushBack(new TVOP<T>());
+        tvt.PushBack(new TVOP<T>(0,0,0,1,0));
+        tvt.PushBack(new TVOP<T>(0,0,0,0,1));
         
         printf ("... done.\n\n");
 
@@ -177,16 +177,29 @@ public:
 	}
     
 
-    inline virtual RT obj (const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) {
-        RT obj = Obj (t);
+    inline virtual RT obj (const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) const {
+        RT obj = Obj (t), objtv1 = 0, objtv2 = 0;
         rmse = sqrt(obj/_ndnz);
-#pragma omp parallel for default (share) 
-        for (size_t i = 0; i < _tvw.size(); ++i)
-            if (_tvw[0])
-                obj += TV (t,0);
-        if (_xfmw)
-            obj += XFM (x, dx, t);
-        return obj + objtv1 + objtv2 + objxfm;
+#pragma omp parallel num_threads(3)
+        {
+        	switch (omp_get_thread_num())
+        	{
+        	case 0:
+        		if (_tvw[0])
+        			objtv1 = TV (t,0);
+        		break;
+        	case 1:
+        		if (_tvw[1])
+        			objtv2 = TV (t,1);
+        		break;
+        	case 2:
+        		if (_tvw[0])
+        			objtv1 = TV (t,0);
+        		break;
+        	default: break;
+        	}
+        }
+        return obj + objtv1+ objtv2;
     }
     
 
@@ -267,7 +280,11 @@ public:
 
         im_dc  = *dwt * im_dc;
 
-        printf ("  Running %i %s iterations ... \n", _csiter+1, nlopt_names[_nlopt_type]); fflush(stdout);
+        RT ma = max(abs(im_dc));
+        _tvw[0] *= ma;
+        _tvw[1] *= ma;
+
+        printf ("  Running %i %s iterations ... \n", _csiter, nlopt_names[_nlopt_type]); fflush(stdout);
 
         for (size_t i = 0; i < (size_t)_csiter; i++) {
             nlopt->Minimise ((Operator<T>*)this, im_dc);
@@ -293,17 +310,17 @@ public:
     
 private:
     
-    inline RT Obj (const RT& t) {
-        om = ffdbx;
+    inline RT Obj (const RT& t) const {
+        Matrix<T> om = ffdbx;
         if (t > 0.0)
             om += t * ffdbg;
         om -= data;
         return real(om.dotc(om));
     }
     
-    inline RT TV (const RT& t, size_t i) {
+    inline RT TV (const RT& t, size_t i) const {
         RT o = 0.0;
-        om = ttdbx[i];
+        Matrix<T> om = ttdbx[i];
         if (t > 0.0)
             om += t * ttdbg[i];
         om *= conj(om);
@@ -314,9 +331,9 @@ private:
         return _tvw[i] * o;
     }
     
-    inline RT XFM (const Matrix<T>& x, const Matrix<T>& g, const RT& t) {
+    inline RT XFM (const Matrix<T>& x, const Matrix<T>& g, const RT& t) const {
         RT o = 0.;
-        om = x;
+        Matrix<T> om = x;
         if (t > 0.0)
             om += t * g;
         om *= conj(om);
@@ -331,7 +348,7 @@ private:
     /**
      * @brief Compute gradient of the data consistency
      */
-    inline Matrix<T> dObj (const Matrix<T>& x) {
+    inline Matrix<T> dObj (const Matrix<T>& x) const {
         return 2.0 * (*dwt * (*ft ->* ((*ft * wx) - data)));
     }
     
@@ -343,7 +360,7 @@ private:
      * @param  cgp CG parameters
      * @return     The gradient
      */
-    inline Matrix<T> dXFM (const Matrix<T>& x) {
+    inline Matrix<T> dXFM (const Matrix<T>& x) const {
         return _xfmw * (x * ((x * conj(x) + _l1) ^ (0.5*_pnorm-1.0)));
     }
     
@@ -355,7 +372,7 @@ private:
      * @param  wx  Image space perturbance
      * @param  cgp Parameters
      */
-    inline Matrix<T> dTV (const Matrix<T>& x, const size_t& i) {
+    inline Matrix<T> dTV (const Matrix<T>& x, const size_t& i) const {
         Matrix<T> dx, g;
         dx = *tvt[i] * wx;
         g  = dx * conj(dx);
@@ -374,11 +391,11 @@ private:
     Vector<TVOP<T>* > tvt;
     NonLinear<T>* nlopt;
     Vector<size_t> _image_size;
-    RT _xfmw, _l1, _pnorm, _tv1w, _tv2w;
-    Vector<RT> _tvw;
+    RT _xfmw, _l1, _pnorm;
+    mutable Vector<RT> _tvw;
     mutable RT _ndnz;
     int _verbose, _ft_type, _csiter, _wf, _wm, _nlopt_type, _dim;
-    Matrix<T> ffdbx, ffdbg, wx, wdx, om;
+    Matrix<T> ffdbx, ffdbg, wx, wdx;
     Vector<Matrix<T> > ttdbx, ttdbg;
     mutable Matrix<T> data;
 

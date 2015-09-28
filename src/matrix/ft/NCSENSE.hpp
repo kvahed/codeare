@@ -137,13 +137,21 @@ public:
         
 		ft_params["imsz"] = ms;
 
-        if (m_nmany > 1)
-            for (size_t i = 0; i < m_nmany; ++i)
-                m_fts.PushBack(NFFT<T>(ft_params));
-        else
-            for (size_t i = 0; i < m_np; ++i)
-                m_fts.PushBack(NFFT<T>(ft_params));
-
+        
+        if (m_nmany > 1) {
+            m_fts.resize(m_nmany);
+#pragma omp parallel num_threads((int)m_nmany)
+            {
+                m_fts[omp_get_thread_num()] = NFFT<T>(ft_params);
+            }
+        } else{
+            m_fts.resize(m_nx[1]);
+#pragma omp parallel num_threads((int)m_nx[1])
+            {
+                m_fts[omp_get_thread_num()] = NFFT<T>(ft_params);
+            }
+        }
+        
         omp_set_num_threads(m_fts.size());
         
 		m_ic     = IntensityMap (m_sm);
@@ -175,13 +183,19 @@ public:
 	 */
 	void KSpace (const Matrix<RT>& k) NOEXCEPT {
 		m_k = k;
-        if (size(k,1) == KSpaceSize() && m_nmany == 1)
-            for (size_t i = 0; i < m_fts.size(); ++i)
-                m_fts[i].KSpace(k);
-        else if (size(m_k,2)*size(m_k,3) == m_nmany) 
-            for (size_t i = 0; i < m_fts.size(); ++i)
-                m_fts[i].KSpace(k(CR(),CR(),CR(i%size(m_k,2)),CR(i/size(m_k,2))));
-	}
+        if (size(k,1) == KSpaceSize() && m_nmany == 1) {
+#pragma omp parallel num_threads (m_fts.size())
+            {
+                m_fts[omp_get_thread_num()].KSpace(k);
+            }
+        } else if (size(m_k,2)*size(m_k,3) == m_nmany) {
+#pragma omp parallel num_threads (m_fts.size())
+            {
+                size_t i = omp_get_thread_num(), l=i%size(m_k,2), n = i/size(m_k,2);
+                m_fts[i].KSpace(k(CR(),CR(),CR(l),CR(n)));
+            }
+        }
+    }
 	
     
 	/**
@@ -199,25 +213,28 @@ public:
 	virtual Matrix<T> operator/ (const MatrixType<T>& m) const NOEXCEPT {
         Matrix<T> ret;
         if (m_nmany > 1) {
-#pragma omp parallel for
-            for (int k = 0; k < m_nmany; ++k) {
+#pragma omp parallel num_threads (m_nmany)
+            {
+                size_t k = omp_get_thread_num(), l = k%m_dim4, n = k/m_dim4;
                 for (int j = 0; j < m_nx[1]; ++j)
                     if (m_nx[0] == 2)
-                        m_bwd_out (R(),R(),    R(j),R(k%size(m,2)),R(k/size(m,2))) =
-                            m_fts[k] ->* m(CR(),     CR(j),CR(k%size(m,2)),CR(k/size(m,2)));
+                        m_bwd_out (R(),R(),    R(j),R(l),R(n)) =
+                            m_fts[k] ->* m(CR(),     CR(j),CR(l),CR(n));
                     else
-                        m_bwd_out (R(),R(),R(),R(j),R(k%m_dim4),R(k/m_dim4)) =
-                            m_fts[k] ->* m(CR(),CR(),CR(j),CR(k%m_dim4),CR(k/m_dim4));
-                m_bwd_out(R(),R(),R(),R(),R(k%m_dim4),R(k/m_dim4)) *= m_csm;
+                        m_bwd_out (R(),R(),R(),R(j),R(l),R(n)) =
+                            m_fts[k] ->* m(CR(),CR(),CR(j),CR(l),CR(n));
+                m_bwd_out(R(),R(),R(),R(),R(l),R(n)) *= m_csm;
             }
             ret = squeeze(sum(m_bwd_out,3));
         } else {
-#pragma omp parallel for
-            for (int j = 0; j < m_nx[1]; ++j) 
+#pragma omp parallel num_threads (m_nx[1])
+            {
+                size_t k = omp_get_thread_num();
                 if (m_nx[0] == 2)
-                    m_bwd_out (R(),R(),    R(j)) = m_fts[omp_get_thread_num()] ->* m(CR(),     CR(j));
+                    m_bwd_out (R(),R(),    R(k)) = m_fts[k] ->* m(CR(),     CR(k));
                 else
-                    m_bwd_out (R(),R(),R(),R(j)) = m_fts[omp_get_thread_num()] ->* m(CR(),CR(),CR(j));
+                    m_bwd_out (R(),R(),R(),R(k)) = m_fts[k] ->* m(CR(),CR(),CR(k));
+            }
             ret = squeeze(sum(m_bwd_out*m_csm,size(m_sm).size()-1)) * m_ic;
         }
 	    return ret;
@@ -232,24 +249,27 @@ public:
 	 */
 	virtual Matrix<T> Trafo (const MatrixType<T>& m) const NOEXCEPT {
         if (m_nmany > 1) {
-#pragma omp parallel for
-            for (int k = 0; k < m_nmany; ++k) {
+#pragma omp parallel num_threads (m_nmany)
+            {
+                size_t k = omp_get_thread_num(), l = k%m_dim4, n = k/m_dim4;
                 if (m_nx[0] == 2)
                     for (int j = 0; j < m_nx[1]; ++j)
-                        m_fwd_out(R(),    R(j),R(k%size(m,2)),R(k/size(m,2))) =
-                            m_fts[k] * (m_sm(CR(),CR(),     CR(j))*m(CR(),CR(),     CR(k%size(m,2)),CR(k/size(m,2))));
+                        m_fwd_out(R(),    R(j),R(l),R(n)) =
+                            m_fts[k] * (m_sm(CR(),CR(),     CR(j))*m(CR(),CR(),     CR(l),CR(n)));
                 else
                     for (int j = 0; j < m_nx[1]; ++j)
-                        m_fwd_out(R(),R(),R(j),R(k%m_dim4),R(k/m_dim4)) =
-                            m_fts[k] * (m_sm(CR(),CR(),CR(),CR(j))*m(CR(),CR(),CR(),CR(k%m_dim4),CR(k/m_dim4)));
+                        m_fwd_out(R(),R(),R(j),R(l),R(n)) =
+                            m_fts[k] * (m_sm(CR(),CR(),CR(),CR(j))*m(CR(),CR(),CR(),CR(l),CR(n)));
             }            
         } else {
-#pragma omp parallel for
-	    for (int j = 0; j < m_nx[1]; ++j)
-            if (m_3rd_dim_cart)
-                m_fwd_out(R(),R(),R(),R(j)) = m_fts[omp_get_thread_num()] * (m_sm(CR(),CR(),CR(),CR(j))*m);
-            else
-                m_fwd_out(R(),R(),    R(j)) = m_fts[omp_get_thread_num()] * (m_sm(CR(),CR(),     CR(j))*m);
+#pragma omp parallel num_threads (m_fts.size())
+            {
+                size_t j = omp_get_thread_num();
+                if (m_3rd_dim_cart)
+                    m_fwd_out(R(),R(),R(),R(j)) = m_fts[j] * (m_sm(CR(),CR(),CR(),CR(j))*m);
+                else
+                    m_fwd_out(R(),R(),    R(j)) = m_fts[j] * (m_sm(CR(),CR(),     CR(j))*m);
+            }
         }
 	    return squeeze(m_fwd_out);
 	}

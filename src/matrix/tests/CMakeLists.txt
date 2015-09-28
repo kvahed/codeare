@@ -80,6 +80,9 @@ add_test(flip t_flip)
 add_executable(t_friends t_friends.cpp)
 add_test(friends t_friends)
 
+add_executable(t_squeeze t_squeeze.cpp)
+add_test(squeeze t_squeeze)
+
 if (${HAS_CXX11_CONDITIONAL}) 
 add_executable(t_colon t_colon.cpp)
 add_test(colon t_colon)

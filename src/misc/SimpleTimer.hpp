@@ -18,16 +18,21 @@ class SimpleTimer {
 
 public:
 
-    inline SimpleTimer (const std::string& identifier = "",
-                        std::ostream& os = std::cout) : _os(&os) { 
+    inline SimpleTimer () : _verbose(false) { 
+        _timer.start();
+    }
+
+    inline SimpleTimer (const std::string& identifier,
+                        std::ostream& os = std::cout) : _os(&os), _verbose(true) { 
         *_os << "Processing " << identifier.c_str() << " ... \n";
         _timer.start();
     }
 
     inline ~SimpleTimer () {
-        if (!_timer.is_stopped())
+        if (!_timer.is_stopped()) 
             _timer.stop();
-        *_os << "... done. WTime: " << boost::format("%.4f") % (_timer.format()) << "\n\n";
+        if (_verbose)
+            *_os << "... done. WTime: " << boost::format("%.4f") % (_timer.format()) << "\n\n";
     }
 
     inline void Stop () {
@@ -38,10 +43,19 @@ public:
         _timer.resume();
     }
 
+    inline boost::timer::cpu_times Elapsed () const {
+        return _timer.elapsed();
+    }
+
+    inline std::string Format () const {
+        return _timer.format();
+    }
+
 private:
 
     boost::timer::cpu_timer _timer;
     std::ostream  *_os;
+    bool _verbose;
     
 };
 

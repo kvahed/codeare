@@ -99,6 +99,11 @@ public:
     		return ((VD::VDFile*)_context)->Read<T>(data_name);
     }
 
+    template<class T> Matrix<T> Read  (const TiXmlElement * txe) {
+        std::string uri (txe->Attribute("uri"));
+        return this->Read<T>(uri);
+    }
+        
 private:
 
     idea_version CheckVersion (const std::string& fname) {

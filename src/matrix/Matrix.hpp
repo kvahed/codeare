@@ -105,7 +105,8 @@ enum MatrixException {
 	DIMENSION_ECXEEDS_DIMENSIONALITY, //10
 	CONTAINER_SIZE_MUST_MATCH, //11
 	TWO_DIMENSIONAL_OPERATION, //12
-	NEGATIVE_INDEX //13
+	NEGATIVE_INDEX, //13
+    REDIM_MUST_PRESERVE_SIZE
 };
 
 static const char* MatrixExceptionMessages[] = {
@@ -122,7 +123,8 @@ static const char* MatrixExceptionMessages[] = {
 	"Dimension exceeds dimensionality", //10
 	"Container size must match", //11
 	"2D operation only", //12
-	"Negative index" //13
+	"Negative index", //13
+    "Redimensioning must preserve size" //14
 };
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
@@ -1143,6 +1145,25 @@ public:
 
 
     /**
+     * @brief           Get dimension array
+     *
+     * @return          All dimensions
+     */
+    inline virtual void Dim (const Vector<size_t>& dim) {
+        if (vprod(dim) == vprod(_dim)) {
+            _dim = dim;
+            _dsz.resize(_dim.size(),1);
+            for (size_t i = 1; i < _dim.size(); ++i) {
+                _dsz[i] = _dsz[i-1]*_dim[i-1];
+            }
+        } else {
+            throw REDIM_MUST_PRESERVE_SIZE;
+        }
+    }
+
+
+
+    /**
      * @brief           Number of dimensions
      * @return          Number of dimensions
      */
@@ -1979,7 +2000,7 @@ protected:
 		_dsz.resize(ds,1);
 	    for (i = 1; i < ds; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-        size_t n = std::accumulate(_dim.begin(), _dim.end(), size_t(1), c_multiply<size_t>);
+        size_t n = vprod(_dim);
         if (n != _M.size())
             _M.resize(n);
     }
