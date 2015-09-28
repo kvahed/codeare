@@ -58,18 +58,18 @@ if (${NFFT3_FOUND})
   add_library (GRASP MODULE GRASP.hpp GRASP.cpp)
   set_target_properties(GRASP PROPERTIES PREFIX "")
   target_link_libraries (GRASP ${COMLIBS})   
-
+  
   add_library (EstimateSensitivities MODULE EstimateSensitivities.hpp
-  EstimateSensitivities.cpp) 
+    EstimateSensitivities.cpp) 
   set_target_properties(EstimateSensitivities PROPERTIES PREFIX "")
-  target_link_libraries (EstimateSensitivities ${COMLIBS})   
-
-if (${HAS_CXX11_CONDITIONAL}) 
-  add_library (XDGRASP MODULE XDGRASP.hpp XDGRASP.cpp)
-  set_target_properties(XDGRASP PROPERTIES PREFIX "")
-  target_link_libraries (XDGRASP ${COMLIBS})
-  list (APPEND INST_TARGETS XDGRASP)
-endif()
+  target_link_libraries (EstimateSensitivities ${COMLIBS} ${GSL_LIBRARIES})   
+  
+  if (${HAS_CXX11_CONDITIONAL}) 
+    add_library (XDGRASP MODULE XDGRASP.hpp XDGRASP.cpp)
+    set_target_properties(XDGRASP PROPERTIES PREFIX "")
+    target_link_libraries (XDGRASP ${COMLIBS})
+    list (APPEND INST_TARGETS XDGRASP)
+  endif()
   list (APPEND INST_TARGETS NuFFT CGSENSE GRASP EstimateSensitivities)
 
 endif()

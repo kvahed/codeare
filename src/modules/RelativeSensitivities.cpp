@@ -103,7 +103,7 @@ RelativeSensitivities::Process     () {
         FTVolumes (mask);
         RemoveOS  (mask);
 
-		SOS (mask, ndims(mask)-1);
+		sos (mask, ndims(mask)-1);
         
         Matrix<double> bet(mask.Dim());
         double         tmp = 0.0;

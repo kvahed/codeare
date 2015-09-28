@@ -70,8 +70,8 @@ public:
 
 		size_t cart_dim = 1;
 
-		ft_params["epsilon"] = (params.exists("fteps")) ? fp_cast(params["fteps"]): 1.0e-3;
-		ft_params["alpha"] = params.exists("alpha") ? fp_cast(params["alpha"]) : 1.;
+		ft_params["epsilon"] = (params.exists("fteps")) ? fp_cast(params["fteps"]): (RT)1.0e-3;
+		ft_params["alpha"] = params.exists("alpha") ? fp_cast(params["alpha"]) : (RT)1.;
 		ft_params["maxit"] = (params.exists("ftiter")) ? unsigned_cast(params["ftiter"]) : 3;
 		ft_params["m"] = (params.exists("m")) ? unsigned_cast(params["m"]) : 1;
 		ft_params["nk"] = (params.exists("nk")) ? unsigned_cast(params["nk"]) : 1;
@@ -112,8 +112,8 @@ public:
         		c_multiply<size_t>) / m_nx[1]); //NR
 
 		m_cgiter  = params.Get<size_t>("cgiter");
-		m_cgeps   = params.Get<double>("cgeps");
-		m_lambda  = params.Get<double>("lambda");
+		m_cgeps   = params.Get<RT>("cgeps");
+		m_lambda  = params.Get<RT>("lambda");
         try {
             m_np  = params.Get<int>("threads");
         } catch (const boost::bad_any_cast&) {
@@ -139,17 +139,21 @@ public:
 
         
         if (m_nmany > 1) {
+            for (size_t i = 0; i < m_nmany; ++i)
+                m_fts.push_back(NFFT<T>(ft_params));
+/*#pragma omp parallel num_threads((int)m_nmany)
             m_fts.resize(m_nmany);
-#pragma omp parallel num_threads((int)m_nmany)
             {
                 m_fts[omp_get_thread_num()] = NFFT<T>(ft_params);
-            }
+                }*/
         } else{
-            m_fts.resize(m_nx[1]);
+            for (size_t i = 0; i < m_nx[1]; ++i)
+                m_fts.push_back(NFFT<T>(ft_params));
+/*            m_fts.resize(m_nx[1]);
 #pragma omp parallel num_threads((int)m_nx[1])
             {
                 m_fts[omp_get_thread_num()] = NFFT<T>(ft_params);
-            }
+                }*/
         }
         
         omp_set_num_threads(m_fts.size());
@@ -397,8 +401,8 @@ private:
     Vector<size_t> m_nx;
     
 	size_t     m_cgiter;         /**< Max # CG iterations */
-	double     m_cgeps;          /**< Convergence limit */
-	double     m_lambda;         /**< Tikhonov weight */
+	RT     m_cgeps;          /**< Convergence limit */
+	RT     m_lambda;         /**< Tikhonov weight */
 
     size_t     m_nmany;          /**< Recounstruct multiple volumes with same k-space and maps */
 	size_t m_dim4, m_dim5;

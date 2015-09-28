@@ -101,7 +101,7 @@ public:
         }
         m_n       = m_N;
         
-        m_m       = try_to_fetch(p, "m", 1);
+        m_m       = try_to_fetch<size_t>(p, "m", 1);
         m_alpha   = try_to_fetch(p, "alpha", 1.5f);
         for (size_t i = 0; i < m_N.size(); ++i)
             m_n[i] = ceil(m_alpha*m_N[i]);
@@ -109,8 +109,8 @@ public:
         m_rank    = m_N.size();
         m_imgsz   = 2*prod(m_N);
 
-        m_epsilon = try_to_fetch(p, "epsilon", 7.0e-4);
-        m_maxit   = try_to_fetch(p, "maxit", 3);
+        m_epsilon = try_to_fetch(p, "epsilon", 7.0e-4f);
+        m_maxit   = try_to_fetch<size_t>(p, "maxit", 3);
 
         if (p.exists("b0")) {
             try {

@@ -70,8 +70,8 @@ codeare::error_code CompressedSensing::Init () {
 		case 2:
 			printf ("%s", "NUFFT");
 #ifdef HAVE_NFFT3
-			ft_params["epsilon"] = RHSAttribute<double>("fteps");
-			ft_params["alpha"]   = RHSAttribute<double>("ftalpha");
+			ft_params["epsilon"] = RHSAttribute<float>("fteps");
+			ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
 			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
 			ft_params["m"]       = RHSAttribute<size_t>("ftm");
 	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");

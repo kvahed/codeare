@@ -92,10 +92,10 @@ namespace RRStrategy {
 
         bool            m_3rd_dim_cart; /**< 3rd NUFFT direction is Cartesian (stack(spirals/stars)) */
 		
-		double          m_noise;     /**< Add noise?                                          */
-		double          m_lambda;    /**< Tikhonov factor                                     */
-		double          m_fteps;     /**< NuFFT convergence criterium                         */
-		double          m_cgeps;     /**< CG SENSE convergence criterium                      */
+		float          m_noise;     /**< Add noise?                                          */
+		float          m_lambda;    /**< Tikhonov factor                                     */
+		float          m_fteps;     /**< NuFFT convergence criterium                         */
+		float          m_cgeps;     /**< CG SENSE convergence criterium                      */
 		bool            m_test_case;
 
 	};
