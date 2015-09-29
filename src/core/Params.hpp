@@ -372,9 +372,18 @@ template<class T> inline T try_to_fetch (const Params& p, const std::string& key
     }
 }
 
-template<class T> inline Vector<T> try_to_list (const Params& p, const std::string& key, const std::string& def) {
+template<class T> inline Vector<T> try_to_fetch_list (const Params& p, const std::string& key, const Vector<T>& def) {
     try {
-        return p.Get<std::string>(key);
+        std::string vstr = p.Get<std::string>(key);
+        T value;
+        Vector<T> v;
+        std::stringstream ss(vstr);
+		while (ss >> value) {
+			v.push_back(value);
+			if (ss.peek() == ',')
+				ss.ignore();
+		}
+		return v;
     } catch (const PARAMETER_MAP_EXCEPTION&) {
         printf ("**WARNING**: key %s not in parameter map.\n", key.c_str());
         return def;
@@ -382,7 +391,6 @@ template<class T> inline Vector<T> try_to_list (const Params& p, const std::stri
         printf ("**WARNING**: conversion failed on parameter %s", key.c_str());
         return def;
     }
-    return (T)0;
 }
 
 #endif /* PARAMS_HPP_ */

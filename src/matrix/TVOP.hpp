@@ -191,7 +191,7 @@ public:
 
         Matrix<T> ret;
         
-        if (ndims(A)==2 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1))) 
+        if      (ndims(A)==2 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1)))
             ret = TV2D<T,1,1>::fwd(A);
         else if (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1 && _dims[2] == 1))) 
             ret = TV3D<T,1,1,1>::fwd(A);
@@ -216,7 +216,7 @@ public:
 
         Matrix<T> ret;
         
-		if (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1)))
+		if      (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1)))
             ret = TV2D<T,1,1>::adj(A);
 		else if (ndims(A)==4 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1 && _dims[2] == 1)))
             ret = TV3D<T,1,1,1>::adj(A);

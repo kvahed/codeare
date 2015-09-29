@@ -53,8 +53,8 @@ public:
 
     typedef typename TypeTraits<T>::RT RT;
 
-    CS_XSENSE () : ft(0), dwt(0), nlopt(0), _ft_type(0), _wm(0), _wf(-1), _nlopt_type(0), _dim(2)
-    		{/*TODO: Default constructor*/}
+    CS_XSENSE () : ft(0), dwt(0), nlopt(0), _ft_type(0), _wm(0), _wf(-1), _nlopt_type(0), _dim(2),
+    		_csiter(0), _verbose(0){/*TODO: Default constructor*/}
     virtual ~CS_XSENSE () {
         if (ft)
             delete ft;
@@ -72,8 +72,11 @@ public:
         std::string key;
 
         _tvw.resize(2);
+        _tvv.resize(2);
         _tvw[0] = try_to_fetch<float> (p, "tvw1", 0.);
+        _tvv[0] = try_to_fetch_list<size_t> (p, "tv1", Vector<size_t>());
         _tvw[1] = try_to_fetch<float> (p, "tvw2", 0.);
+        _tvv[1] = try_to_fetch_list<size_t> (p, "tv2", Vector<size_t>());
         _xfmw = try_to_fetch<float> (p, "xfmw", 0.);
         _l1 = try_to_fetch<float> (p, "l1", 0.);
         _pnorm = try_to_fetch<float> (p, "pnorm", 0.);
@@ -195,6 +198,7 @@ public:
             case 2:
                 if (_xfmw)
                     objxfm = XFM (x, dx, t);
+                break;
         	default: break;
         	}
         }
@@ -388,6 +392,7 @@ private:
     FT<T>* ft;
     DWT<T>* dwt;
     Vector<TVOP<T>* > tvt;
+    Vector<Vector<size_t> > _tvv;
     NonLinear<T>* nlopt;
     Vector<size_t> _image_size;
     RT _xfmw, _l1, _pnorm;
