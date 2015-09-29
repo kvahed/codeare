@@ -73,6 +73,7 @@ enum    paradigm {
 
 };
 
+template<class T, paradigm P> class Matrix;
 
 /**
  * @brief Alligned data Vector for Matrix<T>
@@ -219,6 +220,12 @@ public:
 			_data.assign(n,val);
 	}
 
+	inline Vector<T>& operator= (const Matrix<T,P>& M) {
+		if (this != &M.Container())
+			*this->_data = M.Container();
+		return *this;
+	}
+
     /**
      * @brief Add elemet at end
      * @param t  Element to be added
@@ -238,11 +245,11 @@ public:
 
 	inline void PopBack () NOEXCEPT {_data.pop_back();}
 	inline void PushBack (const T& t) NOEXCEPT {_data.push_back(t);}
-	template<class S> inline Vector<T>& operator/= (const S& s) NOEXCEPT {
-		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::divides<T>(),(T)s));
+	inline Vector<T>& operator/= (const T& t) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::divides<T>(),t));
 		return *this;
 	}
-	template<class S> inline Vector<T>& operator/= (const Vector<S>& v) NOEXCEPT {
+	inline Vector<T>& operator/= (const Vector<T>& v) NOEXCEPT {
 		std::transform (_data.begin(), _data.end(), v.begin(), _data.begin(), std::divides<T>());
 		return *this;
 	}
@@ -250,11 +257,11 @@ public:
 		Vector<T> ret = *this;
 		return ret/=s;
 	}
-	template<class S> inline Vector<T>& operator*= (const S& s) NOEXCEPT {
-		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::multiplies<T>(),(T)s));
+	inline Vector<T>& operator*= (const T& t) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::multiplies<T>(),t));
 		return *this;
 	}
-	template<class S> inline Vector<T>& operator*= (const Vector<S>& v) NOEXCEPT {
+	inline Vector<T>& operator*= (const Vector<T>& v) NOEXCEPT {
 		std::transform (_data.begin(), _data.end(), v.begin(), _data.begin(), std::multiplies<T>());
 		return *this;
 	}
@@ -262,11 +269,11 @@ public:
 		Vector<T> ret = *this;
 		return ret*=s;
 	}
-	template<class S> inline Vector<T>& operator-= (const S& s) NOEXCEPT {
-		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::minus<T>(),(T)s));
+	inline Vector<T>& operator-= (const T& t) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::minus<T>(),t));
 		return *this;
 	}
-	template<class S> inline Vector<T>& operator-= (const Vector<S>& v) NOEXCEPT {
+	inline Vector<T>& operator-= (const Vector<T>& v) NOEXCEPT {
 		std::transform (_data.begin(), _data.end(), v.begin(), _data.begin(), std::minus<T>());
 		return *this;
 	}
@@ -274,15 +281,15 @@ public:
 		Vector<T> ret = *this;
 		return ret-=s;
 	}
-	template<class S> inline Vector<T>& operator+= (const S& s) NOEXCEPT {
-		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::plus<T>(),(T)s));
+	inline Vector<T>& operator+= (const T& t) NOEXCEPT {
+		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::plus<T>(),t));
 		return *this;
 	}
-	template<class S> inline Vector<T>& operator+= (const Vector<S>& v) NOEXCEPT {
+	inline Vector<T>& operator+= (const Vector<T>& v) NOEXCEPT {
 		std::transform (_data.begin(), _data.end(), v.begin(), _data.begin(), std::plus<T>());
 		return *this;
 	}
-	template<class S> inline Vector<T> operator+ (const S& s) const NOEXCEPT {
+	template<class S> inline Vector<T> operator+ (const T& s) const NOEXCEPT {
 		Vector<T> ret = *this;
 		return ret+=s;
 	}
