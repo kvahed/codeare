@@ -59,6 +59,12 @@ add_test(eadd t_eadd)
 add_executable(t_esub t_esub.cpp)
 add_test(esub t_esub)
 
+add_executable(t_sum t_sum.cpp)
+add_test(sum t_sum)
+
+add_executable(t_mean t_mean.cpp)
+add_test(mean t_mean)
+
 #add_executable(t_speed t_speed.cpp)
 #add_test(speed t_speed)
 #target_link_libraries (t_speed ${Boost_CHRONO_LIBRARY}

@@ -218,7 +218,7 @@ private:
 				} else {
 					kernel = kernels(CR(),CR(idx));
 				}
-				fully_sampled(x,y) = sum(kernel*col(tmp));
+				fully_sampled(x,y) = sum2(kernel*col(tmp));
 			} // x
 
 		return fully_sampled;

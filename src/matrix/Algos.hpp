@@ -195,7 +195,7 @@ iszero (const Matrix<T>& M) {
  * @return      Empty?
  */
 template <class T> inline static  bool
-isempty (const Matrix<T>& M) {
+isempty (const MatrixType<T>& M) {
 	
 	return (numel(M) == 1);
 	
@@ -355,8 +355,7 @@ SizeInRAM          (const Matrix<T>& M) {
  * @param   M       Matrix
  * @return          Number of cells.
  */
-template <class T, paradigm P> inline static  size_t
-numel               (const MatrixType<T,P>& M) {
+template <class T, paradigm P> inline static size_t numel (const MatrixType<T,P>& M) {
 	return M.Size();
 }
 
@@ -738,6 +737,9 @@ resize (const Matrix<T>& M, const Vector<size_t>& sz) {
 	
 }
 
+template <class T> inline static T sum2 (const Matrix<T>& M) {
+	return std::accumulate (M.Begin(), M.End(), (T)1, std::plus<T>());
+}
 /**
  * @brief     Sum along a dimension
  *
@@ -751,8 +753,7 @@ resize (const Matrix<T>& M, const Vector<size_t>& sz) {
  * @param  d  Dimension
  * @return    Sum of M along dimension d
  */
-template <class T> inline static Matrix<T>
-sum (const Matrix<T>& M, size_t d) {
+template <class T> inline static Matrix<T> sum (const MatrixType<T>& M, const size_t& d = 0) {
 	
 	Vector<size_t> sz = size(M);
 	size_t        dim = sz[d];
@@ -805,22 +806,9 @@ sum (const Matrix<T>& M, size_t d) {
 }
 
 
-/**
- * @brief     Sum of all elements
- *
- * Usage:
- * @code
- *   Matrix<cxfl> m   = rand<double> (8,7,6);
- *   m = sum (m);
- * @endcode
- *
- * @param  M  Matrix
- * @return    Sum of M along dimension d
- */
-template <class T> inline static T sum (const Matrix<T>& M) {
-	return std::accumulate(M.Begin(),M.End(),(T)0);
+template <class T> inline static Matrix<T> mean (const MatrixType<T>& M, const size_t& d = 0) {
+	return sum(M,d)/size(M,d);
 }
-
 
 /**
  * @brief     Product along a dimension

@@ -36,7 +36,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Prepare() {
 
 codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
-	Matrix<cxfl> kdata = Get<cxfl>("kdata"), zip;
+	Matrix<cxfl> kdata = Get<cxfl>("kdata");
+	Matrix<float> zip, tmp;
 	Vector<float> f_x;
 	float f_s;
 	size_t nn;
@@ -67,6 +68,25 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
 	// Remove some edge slices
 	zip   = zip(CR(21,size(zip,0)-40),CR(),CR());
+
+	// Normalization the projection profiles
+	for (size_t i=1; i < _nc; ++i) {
+	    tmp=squeeze(mean(zip(CR(),CR(),CR(i)),1));
+	    zip(R(),R(),R(i)) /= repmat(tmp,size(zip,0),1);
+	}
+
+	/*
+	%Do PCA or SVD in each coil element to extract motion signal
+	SI=permute(ZIP,[1,3,2]);
+	SI=abs(reshape(SI,[size(SI,1)*nc,ntviews]))';
+	covariance=cov(SI);
+	[PC, V] = eig(covariance);
+	V = diag(V);
+	[junk, rindices] = sort(-1*V);
+	V = V(rindices);
+	PC = PC(:,rindices);
+	MotionSignal = (PC' * SI')';
+	*/
 
 	Add ("zip", zip);
 
