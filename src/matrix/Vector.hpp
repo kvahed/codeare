@@ -221,8 +221,7 @@ public:
 	}
 
 	inline Vector<T>& operator= (const Matrix<T,P>& M) {
-		if (this != &M.Container())
-			*this->_data = M.Container();
+		_data = M.Container().data();
 		return *this;
 	}
 

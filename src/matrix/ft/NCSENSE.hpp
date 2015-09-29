@@ -23,7 +23,6 @@
 
 #include "NFFT.hpp"
 #include "CX.hpp"
-//#include "SEM.hpp"
 #include "mri/MRI.hpp"
 #include "Lapack.hpp"
 #include "tinyxml.h"
@@ -42,6 +41,9 @@
  *        According Pruessmann et al. (2001). MRM, 46(4), 638-51.
  *
  */
+
+enum FT_EXCEPTION {NCSENSE_KSPACE_DIMENSIONS};
+
 template <class T> class NCSENSE : public FT<T>{
 
 	// TODO: Check if k-space and weights have been assigned
@@ -137,23 +139,12 @@ public:
         
 		ft_params["imsz"] = ms;
 
-        
         if (m_nmany > 1) {
             for (size_t i = 0; i < m_nmany; ++i)
                 m_fts.push_back(NFFT<T>(ft_params));
-/*#pragma omp parallel num_threads((int)m_nmany)
-            m_fts.resize(m_nmany);
-            {
-                m_fts[omp_get_thread_num()] = NFFT<T>(ft_params);
-                }*/
         } else{
             for (size_t i = 0; i < m_nx[1]; ++i)
                 m_fts.push_back(NFFT<T>(ft_params));
-/*            m_fts.resize(m_nx[1]);
-#pragma omp parallel num_threads((int)m_nx[1])
-            {
-                m_fts[omp_get_thread_num()] = NFFT<T>(ft_params);
-                }*/
         }
         
         omp_set_num_threads(m_fts.size());
@@ -185,7 +176,7 @@ public:
 	 * 
 	 * @param  k   K-space trajectory
 	 */
-	void KSpace (const Matrix<RT>& k) NOEXCEPT {
+	void KSpace (const Matrix<RT>& k) {
 		m_k = k;
         if (size(k,1) == KSpaceSize() && m_nmany == 1) {
 #pragma omp parallel num_threads (m_fts.size())
@@ -196,9 +187,17 @@ public:
 #pragma omp parallel num_threads (m_fts.size())
             {
                 size_t i = omp_get_thread_num(), l=i%size(m_k,2), n = i/size(m_k,2);
-                m_fts[i].KSpace(k(CR(),CR(),CR(l),CR(n)));
+                if (ndims(k)==4)
+                    m_fts[i].KSpace(k(CR(),CR(),CR(l),CR(n)));
+                else if (ndims(k) == 5)
+                    m_fts[i].KSpace(k(CR(),CR(),CR(),CR(l),CR(n)));
+                else 
+                    throw NCSENSE_KSPACE_DIMENSIONS;
             }
+        } else {
+            throw NCSENSE_KSPACE_DIMENSIONS;
         }
+                                
     }
 	
     
@@ -407,6 +406,8 @@ private:
     size_t     m_nmany;          /**< Recounstruct multiple volumes with same k-space and maps */
 	size_t m_dim4, m_dim5;
 	int        m_np;
+
+    
 
 	Params ft_params;
 	Matrix<RT> m_k, m_w;

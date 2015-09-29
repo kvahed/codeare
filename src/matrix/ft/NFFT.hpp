@@ -57,7 +57,8 @@ public:
     NFFT() NOEXCEPT :  m_initialised (false), m_have_pc (false), m_imgsz (0),
         m_M (0), m_maxit (0), m_rank (0), m_m(0), m_have_b0(false),
         m_3rd_dim_cart(false),m_ncart(1), m_alpha(1.), m_have_weights(false),
-		m_have_kspace(false), m_np(std::thread::hardware_concurrency()) {};
+		m_have_kspace(false), m_np(std::thread::hardware_concurrency()),
+        m_per_slice_kspace(false) {};
 
     /**
      * @brief        Construct with parameter set
@@ -65,7 +66,8 @@ public:
     inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_3rd_dim_cart(false),
         m_t (Matrix<RT>()), m_b0 (Matrix<RT>()), m_maxit(3), m_m(1), m_alpha(1.),
 		m_epsilon(7.e-4f), m_sigma(1.0), m_ncart(1),  m_have_weights(false),
-        m_have_kspace(false), m_np(std::thread::hardware_concurrency()) {
+        m_have_kspace(false), m_np(std::thread::hardware_concurrency()),
+        m_per_slice_kspace(false) {
                 
         if (p.exists("nk")) {// Number of kspace samples
             try {
@@ -212,7 +214,6 @@ public:
      * @brief     Assignement
      */
     inline NFFT<T>& operator= (const NFFT<T>& ft) NOEXCEPT {
-        
         m_initialised = ft.m_initialised;
         m_have_pc     = ft.m_have_pc;
         m_rank        = ft.m_rank;
@@ -233,16 +234,15 @@ public:
         m_min_b0      = ft.m_min_b0;
         m_max_b0      = ft.m_max_b0;
         m_sigma       = ft.m_sigma;
+        m_alpha       = ft.m_alpha;
         m_3rd_dim_cart = ft.m_3rd_dim_cart;
         m_ncart       = ft.m_ncart;
+        m_per_slice_kspace = ft.m_per_slice_kspace;
         if (m_have_b0)
-        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_sigma,
-        			m_b0_plan, m_solver);
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);
         else
-        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_plan,
-        			m_solver);
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m,          m_plan,    m_solver);
         return *this;
-        
     }
     
     /**
@@ -250,7 +250,8 @@ public:
      * 
      * @param  k   Kspace trajectory
      */
-    inline virtual void KSpace (const Matrix<RT>& k) NOEXCEPT {
+    inline virtual void KSpace (const Matrix<RT>& k) {
+        m_k = k;
         if (m_have_b0) { // +1D for omega
             for (size_t j = 0; j < (size_t)m_b0_plan.M_total; ++j) {
 				m_b0_plan.plan.x[3*j+0] = k[2*j+0];
@@ -258,8 +259,10 @@ public:
                 m_b0_plan.plan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N.back();
             }
         } else {
-            assert (k.Size() == m_plan.M_total*m_rank);
-            std::copy (k.Begin(), k.End(), m_plan.x);		
+            if (k.Size() == m_plan.M_total*m_rank)
+                std::copy (k.Begin(), k.End(), m_plan.x);
+            else if (k.Size() == m_plan.M_total*m_rank*m_ncart)
+                m_per_slice_kspace = true;
         }
         m_have_kspace = true;
     }
@@ -271,6 +274,7 @@ public:
      * @param  w   Weights
      */
     inline virtual void Weights (const Matrix<RT>& w) NOEXCEPT {
+        m_kw = w;
     	if (m_have_b0)
     		assert (w.Size() == m_b0_plan.M_total);
     	else
@@ -471,6 +475,7 @@ private:
 
     Vector<size_t> m_N;      /**< @brief Image matrix side length (incl. k_{\\omega})*/
     Vector<size_t> m_n;      /**< @brief Oversampling */
+    Vector<RT> m_k, m_kw;
 
     size_t     m_M;             /**< @brief Number of k-space knots */
     size_t     m_maxit;         /**< @brief Number of Recon iterations (NFFT 3) */
@@ -483,7 +488,7 @@ private:
     Solver     m_solver;         /**< infft plan */
     CartPlan   m_cart_plan;
     
-    bool       m_3rd_dim_cart, m_have_weights, m_have_kspace;
+    bool       m_3rd_dim_cart, m_have_weights, m_have_kspace, m_per_slice_kspace;
 
     size_t     m_m, m_ncart;
 

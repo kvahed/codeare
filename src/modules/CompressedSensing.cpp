@@ -96,6 +96,7 @@ codeare::error_code CompressedSensing::Init () {
 		    ft_params["lambda"]       = RHSAttribute<float>("lambda");
 		    ft_params["threads"]      = RHSAttribute<int>("threads");
 	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
+            ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
 		    ft_params["verbose"]      = 0;
 #else
 			printf("**ERROR - CompressedSensing: NUFFT support not available.");
