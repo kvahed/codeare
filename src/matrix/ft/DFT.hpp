@@ -472,7 +472,7 @@ public:
 
     DFT () NOEXCEPT :
     	m_cs(0), m_N(0), m_in(0), m_have_pc(false), m_zpad(false),
-    	m_initialised(false), m_have_mask(false){}
+    	m_initialised(false), m_have_mask(false), m_threads(8){}
     
 	/**
 	 * @brief        Clean up RAM, destroy plans

@@ -63,7 +63,7 @@
  * @return        Eigenvectors and values
  */
 template <class T> inline TUPLE< Matrix<T>, Matrix<typename TypeTraits<T>::CT>, Matrix<T> >
-eig2 (const Matrix<T>& m, char jobvl = 'N', char jobvr = 'N') {
+eig2 (const Matrix<T>& m, char jobvl = 'V', char jobvr = 'N') {
     
     typedef typename TypeTraits<T>::CT CT;
     typedef typename TypeTraits<T>::RT RT;

@@ -21,6 +21,11 @@
 #include "Creators.hpp"
 #include "MotionDetectionXDGRASPLiver.hpp"
 #include "DFT.hpp"
+#include "Lapack.hpp"
+#include "Statistics.hpp"
+#include "Smooth.hpp"
+
+typedef TUPLE< Matrix<float>, Matrix<cxfl>, Matrix<float> > eig_t;
 
 using namespace RRStrategy;
 
@@ -36,11 +41,13 @@ codeare::error_code MotionDetectionXDGRASPLiver::Prepare() {
 
 codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
-	Matrix<cxfl> kdata = Get<cxfl>("kdata");
-	Matrix<float> zip, tmp;
+	Matrix<cxfl> kdata = Get<cxfl>("kdata"), motion_signal_fft;
+	Matrix<float> zip, tmp, si, covariance, pc, v, motion_signal, motion_signal_new;
 	Vector<float> f_x;
+	Vector<size_t> idx;
 	float f_s;
-	size_t nn;
+	size_t nn, span = 5, pc_sel = 5;
+	eig_t et;
 
 	_nx = size(kdata,0);
 	_ntviews = size(kdata,1);
@@ -59,15 +66,15 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	if (_ntviews/2%2==0)
 	    f_x += f_x[_ntviews/4];
 
-	nn = 400; // Interpolation along z dimension
+	nn  = 400; // Interpolation along z dimension
 	// Take the central k-space points
 	kdata = squeeze(kdata(CR(_nx/2+1),CR(),CR(),CR()));
 	kdata = zpad(kdata,size(kdata,0),400,size(kdata,2));
-	zip   = abs(fftshift(fft(squeeze(kdata),2),2));
-	zip   = flipud(zip);
+	zip = abs(fftshift(fft(squeeze(kdata),2),2));
+	zip = flipud(zip);
 
 	// Remove some edge slices
-	zip   = zip(CR(21,size(zip,0)-40),CR(),CR());
+	zip = zip(CR(21,size(zip,0)-40),CR(),CR());
 
 	// Normalization the projection profiles
 	for (size_t i=1; i < _nc; ++i) {
@@ -75,18 +82,30 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	    zip(R(),R(),R(i)) /= repmat(tmp,size(zip,0),1);
 	}
 
-	/*
-	%Do PCA or SVD in each coil element to extract motion signal
-	SI=permute(ZIP,[1,3,2]);
-	SI=abs(reshape(SI,[size(SI,1)*nc,ntviews]))';
-	covariance=cov(SI);
-	[PC, V] = eig(covariance);
-	V = diag(V);
-	[junk, rindices] = sort(-1*V);
-	V = V(rindices);
-	PC = PC(:,rindices);
-	MotionSignal = (PC' * SI')';
-	*/
+	// Do PCA or SVD in each coil element to extract motion signal
+	si  = permute (zip, 1, 3, 2);
+	si  = !resize(si, size(si,0)*_nc, _ntviews);
+	covariance = cov(si);
+	et  = eig2(covariance);
+	pc  = GET<0>(et);
+	v   = abs(GET<1>(et));
+	v   = diag(v);
+	idx = sort(-1*v);
+	v   = v(idx);
+	pc  = pc(CR(),CR(idx));
+	motion_signal = gemm(pc, si, 'C', 'C');
+
+	for (size_t i = 0; i < pc_sel; ++i) {
+		//motion_signal_new(R(),R(i)) = smooth (motion_signal(CR(),CR(i)),span,INTERP::AKIMA); // TODO: smooth
+		//tmp = abs(fftshift(fft(motion_signal(CR(_ntviews/2+1,size(motion_signal,0)),CR(i))))); // TODO: fft (view)
+		motion_signal_fft(R(),R(i)) = tmp/max(tmp(CR()));
+	}
+
+	/*for ii=1:PC_Sel
+	    MotionSignal_new(:,ii)=smooth(MotionSignal(:,ii),Span,'lowess');
+	    temp=abs(fftshift(fft(MotionSignal(ntviews/2+1:end,ii))));
+	    MotionSignal_FFT(:,ii)=temp/max(temp(:));clear temp
+	end*/
 
 	Add ("zip", zip);
 

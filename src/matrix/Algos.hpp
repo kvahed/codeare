@@ -317,20 +317,13 @@ template <class T> inline static size_t ndims (const MatrixType<T>& M) {
  * @param  M  Matrix
  * @return    Highest non-one dimension
  */
-template <class T> inline static  Matrix<T>
-diag (const Matrix<T>& M) {
-	
+template <class T> inline static  Matrix<T> diag (const Matrix<T>& M) {
 	assert (is2d(M));
-
 	size_t sz = (std::min)(size(M,0),size(M,1));
-
 	Matrix<T> res (sz,1);
-
 	for (size_t i = 0; i < sz; ++i)
 		res(i) = M(i,i); 
-
 	return res;
-	
 }
 
 
@@ -590,17 +583,15 @@ m_max (const Matrix<T>& M) {
 #    undef max
 #  endif
 #endif
-template <class T> inline static  T
-max (const Matrix<T>& M) {
-
+template<class T> inline static T max (const Matrix<T>& M) {
+	return *std::max_element(M.Begin(), M.End());
+}
+template <class T> inline static T max (const View<T, true>& V) {
 	T mx = (T)INT_MIN;
-
-	for (size_t i = 0; i < numel(M); ++i)
-		if (M[i] > mx)
-			mx = M[i];
-
+	for (size_t i = 0; i < numel(V); ++i)
+		if (V[i] > mx)
+			mx = V[i];
 	return mx;
-
 }
 
 /**
@@ -614,17 +605,15 @@ max (const Matrix<T>& M) {
 #    undef min
 #  endif
 #endif
-template <class T> inline static  T
-min (const Matrix<T>& M) {
-
+template <class T> inline static  T min (const Matrix<T>& M) {
+	return *std::min_element(M.Begin(), M.End());
+}
+template <class T> inline static  T min (const View<T, true>& M) {
 	T mn = (T)INT_MAX;
-
 	for (size_t i = 0; i < numel(M); ++i)
 		if (M[i] < mn)
 			mn= M[i];
-
 	return mn;
-
 }
 
 /**
@@ -1282,16 +1271,14 @@ typedef enum sort_dir {
  */
 template <typename T> inline static Vector<size_t> sort (const Matrix<T> &m,
 		const sort_dir sd = ASCENDING) {
-  Vector<size_t> idx(m.Size());
-  std::iota(idx.begin(), idx.end(), 0);
-  if (sd == ASCENDING)
-	  sort(idx.begin(), idx.end(),
-		   [&m](size_t i1, size_t i2) {return m[i1] < m[i2];});
-  else
-	  sort(idx.begin(), idx.end(),
-		   [&m](size_t i1, size_t i2) {return m[i1] > m[i2];});
+	Vector<size_t> idx(m.Size());
+	std::iota(idx.begin(), idx.end(), 0);
+	if (sd == ASCENDING)
+		sort(idx.begin(), idx.end(), [&m](size_t i1, size_t i2) {return m[i1] < m[i2];});
+	else
+		sort(idx.begin(), idx.end(), [&m](size_t i1, size_t i2) {return m[i1] > m[i2];});
 
-  return idx;
+	return idx;
 }
 
 #endif 
