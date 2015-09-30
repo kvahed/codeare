@@ -460,6 +460,7 @@ public:
 
     friend std::ostream& operator<< (std::ostream& os, const Configurable& conf) {
         os << conf.GetConfig();
+        return os;
     }
 
  protected:

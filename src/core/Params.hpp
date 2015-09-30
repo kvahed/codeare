@@ -372,27 +372,6 @@ template<class T> inline T try_to_fetch (const Params& p, const std::string& key
     }
 }
 
-template<class T> inline Vector<T> try_to_fetch_list (const Params& p, const std::string& key, const Vector<T>& def) {
-    try {
-        std::string vstr = p.Get<std::string>(key);
-        T value;
-        Vector<T> v;
-        std::stringstream ss(vstr);
-		while (ss >> value) {
-			v.push_back(value);
-			if (ss.peek() == ',')
-				ss.ignore();
-		}
-		return v;
-    } catch (const PARAMETER_MAP_EXCEPTION&) {
-        printf ("**WARNING**: key %s not in parameter map.\n", key.c_str());
-        return def;
-    } catch (const boost::bad_any_cast&) {
-        printf ("**WARNING**: conversion failed on parameter %s", key.c_str());
-        return def;
-    }
-}
-
 #endif /* PARAMS_HPP_ */
 
 

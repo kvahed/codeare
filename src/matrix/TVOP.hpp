@@ -22,6 +22,7 @@
 #define __TVOP_HPP__
 
 #include "Matrix.hpp"
+#include "Operator.hpp"
 
 
 template<class T, bool b0, bool b1> struct TV2D {};
@@ -152,7 +153,7 @@ enum TVOP_EXCEPTION {UNDEFINED_TV_OPERATOR};
  * @brief 2D Finite difference operator
  */
 template <class T>
-class TVOP {
+class TVOP : public Operator<T> {
 	
 
 public:
@@ -176,7 +177,7 @@ public:
 	/**
 	 * @brief Default destructor
 	 */
-	~TVOP() NOEXCEPT {};
+	virtual ~TVOP() NOEXCEPT {};
 
 
 	/**
@@ -254,6 +255,15 @@ public:
 		return Adjoint (m);
 	}
 
+
+	inline virtual std::ostream& Print (std::ostream& os) const {
+		Operator<T>::Print(os);
+		if (_dims.size() == 0)
+			os << "    all dims";
+		else
+			os << "    tv'ed dims: " << _dims;
+		return os;
+	}
 
 private:
     Vector<unsigned short> _dims;

@@ -74,9 +74,9 @@ public:
         _tvw.resize(2);
         _tvv.resize(2);
         _tvw[0] = try_to_fetch<float> (p, "tvw1", 0.);
-        _tvv[0] = try_to_fetch_list<size_t> (p, "tv1", Vector<size_t>());
+        _tvv[0] = try_to_fetch<Vector<size_t> > (p, "tv1", Vector<size_t>());
         _tvw[1] = try_to_fetch<float> (p, "tvw2", 0.);
-        _tvv[1] = try_to_fetch_list<size_t> (p, "tv2", Vector<size_t>());
+        _tvv[1] = try_to_fetch<Vector<size_t> > (p, "tv2", Vector<size_t>());
         _xfmw = try_to_fetch<float> (p, "xfmw", 0.);
         _l1 = try_to_fetch<float> (p, "l1", 0.);
         _pnorm = try_to_fetch<float> (p, "pnorm", 0.);
@@ -138,8 +138,8 @@ public:
         else 
             dwt = new DWT<T> (16, (wlfamily)_wf, _wm);
 
-        tvt.PushBack(new TVOP<T>());
-        tvt.PushBack(new TVOP<T>());
+        tvt.PushBack(new TVOP<T>(_tvv[0]));
+        tvt.PushBack(new TVOP<T>(_tvv[1]));
         
         printf ("... done.\n\n");
 
@@ -246,6 +246,10 @@ public:
         os << "    Weights: TV("<< _tvw[0] <<") TV("<< _tvw[1] <<") XF("<< _xfmw <<") L1("<<_l1<<") Pnorm: "
            <<_pnorm<< std::endl;
         os << *ft << std::endl;
+        if (_tvw[0])
+            os << *tvt[0] << std::endl;
+        if (_tvw[1])
+            os << *tvt[1] << std::endl;
         if (dwt)
             os << *dwt << std::endl;
         os << *nlopt ;

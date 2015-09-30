@@ -113,6 +113,7 @@ codeare::error_code CompressedSensing::Init () {
     ft_params["imsz"]  = m_image_size;
     ft_params["nlopt"] = RHSAttribute<int>("nlopt");
     ft_params["tvw1"] = RHSAttribute<float>("tvw1");
+    ft_params["tv1"] = RHSList<size_t>("tv1");
     ft_params["xfmw"] = RHSAttribute<float>("xfmw");
     ft_params["l1"] = RHSAttribute<float>("l1");
     ft_params["lsa"] = RHSAttribute<float>("lsa");
