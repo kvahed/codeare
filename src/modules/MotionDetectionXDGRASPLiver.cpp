@@ -43,9 +43,9 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
 	Matrix<cxfl> kdata = Get<cxfl>("kdata"), motion_signal_fft;
 	Matrix<float> zip, tmp, si, covariance, pc, v, motion_signal, motion_signal_new;
-	Vector<float> f_x;
-	Vector<size_t> idx;
-	float f_s;
+	Vector<float> f_x, res_peak, tmp_peak, res_peak_nor;
+	Vector<size_t> idx, tmp_idx, fr_idx;
+	float f_s, lf, hf;
 	size_t nn, span = 5, pc_sel = 5;
 	eig_t et;
 
@@ -96,16 +96,43 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	motion_signal = gemm(pc, si, 'C', 'C');
 
 	for (size_t i = 0; i < pc_sel; ++i) {
-		//motion_signal_new(R(),R(i)) = smooth (motion_signal(CR(),CR(i)),span,INTERP::AKIMA); // TODO: smooth
-		//tmp = abs(fftshift(fft(motion_signal(CR(_ntviews/2+1,size(motion_signal,0)),CR(i))))); // TODO: fft (view)
+		motion_signal_new(R(),R(i)) = smooth (motion_signal(CR(),CR(i)),span,INTERP::AKIMA); // TODO: smooth
+		tmp = abs(fftshift(fft(motion_signal(CR(_ntviews/2+1,size(motion_signal,0)),CR(i))))); // TODO: fft (view)
 		motion_signal_fft(R(),R(i)) = tmp/max(tmp(CR()));
 	}
 
-	/*for ii=1:PC_Sel
-	    MotionSignal_new(:,ii)=smooth(MotionSignal(:,ii),Span,'lowess');
-	    temp=abs(fftshift(fft(MotionSignal(ntviews/2+1:end,ii))));
-	    MotionSignal_FFT(:,ii)=temp/max(temp(:));clear temp
-	end*/
+	// Take the component with the highest peak in respiratory motion range
+	lf = 0.1; hf = 0.5; //Respiratory frequency range
+	tmp_idx = find(f_x>hf);
+	ft_idx=find(f_x<hf & f_x>lf);
+
+	tmp_peak = squeeze(motion_signal_fft(CR(tmp_idx),CR(),CR()));
+	res_peak = squeeze(motion_signal_fft(CR(fr_idx),CR(),CR()));
+
+	for (size_t i = 0; i < pc; ++i)
+		res_peak_nor(R(),R(i)) = res_peak(R(),R(i))/max(tmp_peak(CR(),CR(i)));
+
+	tt = max(res_peak_nor);
+	tt = find(tt==max(tt));
+
+	//Find the peak points
+	t = 10;
+	peaks = findpeaks (res_signal, 'MINPEAKDISTANCE', t);
+
+	// Here the contrast enhancement curve need to be found and demodulated.
+	ft = fittype( 'smoothingspline' );
+	opts = fitoptions( ft );
+	opts.SmoothingParam = 0.015;
+
+	res_signal=motionsignal_new(:,t);
+
+	curve_data = prepareCurveData(Peak_Index,double(Res_Signal(Peak_Index)));
+	fit_result = fit( curve_data.xData, curvedata.yData, ft, opts );
+
+	cfval = coeffvalues(fit_result);
+	ftmax = feval(CR(ft,cfval(1)),CR(1,ntviews));
+
+	res_signal = res_signal-ftmax;
 
 	Add ("zip", zip);
 

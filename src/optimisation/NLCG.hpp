@@ -35,7 +35,12 @@ public:
     
     inline virtual void Minimise (Operator<T>* A, Matrix<T>& x) {
 
-        typename TypeTraits<T>::RT t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
+    	typedef typename TypeTraits<T>::RT real_t;
+
+        real_t t0  = 1.0, t = 1.0, z = 0., xn = norm(x), rmse, bk, f0, f1, dxn;
+        Vector<real_t> rms(_lsiter);
+        Vector<size_t> pos(_lsiter);
+
     
         _g0  = A->df (x);
         _dx  = -_g0;
@@ -44,6 +49,7 @@ public:
         
             A->Update(_dx);
             t = t0;
+
         
             f0 = A->obj (x, _dx, z, rmse);
         
@@ -55,7 +61,7 @@ public:
                     break;
                 ++i;
             }
-        
+
             printf (ofstr.c_str(), k, rmse, i); fflush (stdout);
         
             if (i == _lsiter) {
