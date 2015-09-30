@@ -124,7 +124,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	opts = fitoptions( ft );
 	opts.SmoothingParam = 0.015;
 
-	res_signal=motionsignal_new(:,t);
+	res_signal=motionsignal_new(CR(),CR(t));
 
 	curve_data = prepareCurveData(Peak_Index,double(Res_Signal(Peak_Index)));
 	fit_result = fit( curve_data.xData, curvedata.yData, ft, opts );
