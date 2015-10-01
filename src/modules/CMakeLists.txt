@@ -71,12 +71,12 @@ if (${NFFT3_FOUND})
     target_link_libraries (XDGRASP ${COMLIBS})
     list (APPEND INST_TARGETS XDGRASP)
 
-    add_library (MotionDetectionXDGRASPLiver MODULE
-      MotionDetectionXDGRASPLiver.hpp MotionDetectionXDGRASPLiver.cpp) 
-    set_target_properties(MotionDetectionXDGRASPLiver PROPERTIES
-      PREFIX "") 
-    target_link_libraries (MotionDetectionXDGRASPLiver ${COMLIBS})
-    list (APPEND INST_TARGETS MotionDetectionXDGRASPLiver)
+#    add_library (MotionDetectionXDGRASPLiver MODULE
+#      MotionDetectionXDGRASPLiver.hpp MotionDetectionXDGRASPLiver.cpp) 
+#    set_target_properties(MotionDetectionXDGRASPLiver PROPERTIES
+#      PREFIX "") 
+#    target_link_libraries (MotionDetectionXDGRASPLiver ${COMLIBS})
+#    list (APPEND INST_TARGETS MotionDetectionXDGRASPLiver)
   endif()
 
   list (APPEND INST_TARGETS NuFFT CGSENSE GRASP EstimateSensitivities)

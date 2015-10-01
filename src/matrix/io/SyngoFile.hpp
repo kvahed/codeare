@@ -114,21 +114,6 @@ public:
 #endif
 
     /**
-     * @brief Construct with filename and left hand side 
-     */
-/*    SyngoFile (const std::string& fname, Matrix<raw>* buf) :
-        _fname(fname), _header_len(0), _nlhs(0), _lhs(0), _status(0) {
-        prtmsg ("   Opening %s ...\n", _fname.c_str());
-        std::string line;
-        _file.open (fname.c_str(), std::ios::in|std::ios::binary);
-        if (!_file.is_open()) {
-            prterr ("     FAILED! Unable to open file\n");
-            _status = 1;
-        }
-        prtmsg("     done.\n");
-        }*/
-    
-    /**
      * @brief Close file
      */
     virtual ~SyngoFile () {
