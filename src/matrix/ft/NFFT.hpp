@@ -57,7 +57,8 @@ public:
     NFFT() NOEXCEPT :  m_initialised (false), m_have_pc (false), m_imgsz (0),
         m_M (0), m_maxit (0), m_rank (0), m_m(0), m_have_b0(false),
         m_3rd_dim_cart(false),m_ncart(1), m_alpha(1.), m_have_weights(false),
-		m_have_kspace(false), m_np(std::thread::hardware_concurrency()), m_nmany(4) {};
+		m_have_kspace(false), m_np(std::thread::hardware_concurrency()),
+        m_per_slice_kspace(false) {};
 
     /**
      * @brief        Construct with parameter set
@@ -65,7 +66,8 @@ public:
     inline NFFT (const Params& p) NOEXCEPT : m_have_b0(false), m_3rd_dim_cart(false),
         m_t (Matrix<RT>()), m_b0 (Matrix<RT>()), m_maxit(3), m_m(1), m_alpha(1.),
 		m_epsilon(7.e-4f), m_sigma(1.0), m_ncart(1),  m_have_weights(false),
-        m_have_kspace(false), m_np(std::thread::hardware_concurrency()), m_nmany(4) {
+        m_have_kspace(false), m_np(std::thread::hardware_concurrency()),
+        m_per_slice_kspace(false) {
                 
         if (p.exists("nk")) {// Number of kspace samples
             try {
@@ -80,14 +82,7 @@ public:
             assert(false);
         }
 
-        if (p.exists("3rd_dim_cart")) {
-        	try {
-        		m_3rd_dim_cart = p.Get<bool>("3rd_dim_cart");
-        	} catch (const boost::bad_any_cast&) {
-        		printf ("  WARNING - NFFT: Could not interpret input for "
-        				"Cartesian nature of 3rd dimension. \n");
-        	}
-        }
+        m_3rd_dim_cart = try_to_fetch (p, "3rd_dim_cart", false);
 
         if (p.exists("imsz")) {// Image domain size
             try {
@@ -106,56 +101,18 @@ public:
         	m_ncart = m_N.back();
         	m_N.PopBack();
         }
-        m_n = m_N;
+        m_n       = m_N;
         
-        if (p.exists("m")) {
-            try {
-                m_m = unsigned_cast (p["m"]);
-            } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for "
-                		"oversampling factor m. Defaulting to 1.\n");
-            }
-        }
-        
-        try {
-            m_np  = p.Get<int>("threads");
-        } catch (const PARAMETER_MAP_EXCEPTION& ) {
-        } catch (const boost::bad_any_cast&) {}
-
-        
-        omp_set_num_threads(m_np);
-        
-        if (p.exists("alpha")) {
-            try {
-                m_alpha = fp_cast(p["alpha"]);
-            } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for "
-                		"oversampling factor alpha. Defaulting to 1.0\n");
-            }
-        }
+        m_m       = try_to_fetch<size_t>(p, "m", 1);
+        m_alpha   = try_to_fetch(p, "alpha", 1.5f);
         for (size_t i = 0; i < m_N.size(); ++i)
             m_n[i] = ceil(m_alpha*m_N[i]);
         
-        m_rank  = m_N.size();
-        m_imgsz = 2*prod(m_N);
+        m_rank    = m_N.size();
+        m_imgsz   = 2*prod(m_N);
 
-        if (p.exists("epsilon")) {
-            try {
-                m_epsilon = fp_cast (p["epsilon"]);
-            } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for "
-                		"convergence criterium epsilon. Defaulting to 0.0007\n");
-            }
-        }
-        
-        if (p.exists("maxit")) {
-            try {
-                m_maxit = unsigned_cast (p["maxit"]);
-            } catch (const boost::bad_any_cast&) {
-                printf ("  WARNING - NFFT: Could not interpret input for maximum "
-                		"NFFT steps. Defaulting to 3\n");
-            }
-        }
+        m_epsilon = try_to_fetch(p, "epsilon", 7.0e-4f);
+        m_maxit   = try_to_fetch<size_t>(p, "maxit", 3);
 
         if (p.exists("b0")) {
             try {
@@ -186,8 +143,6 @@ public:
         }
         
         
-        m_solvers.resize(m_nmany);
-
         if (m_have_b0) { // b0
             
             m_min_t  = min(m_t);
@@ -210,18 +165,15 @@ public:
             m_ts =  (m_min_t+m_max_t)/2.;
             RT t    = ((m_max_t-m_min_t)/2.)/(.5-((RT) (m_m))/m_N[2]);
 
-            m_b0_plans.resize(m_nmany);
-            for (size_t i = 0; i < m_nmany; ++i) {
-                NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plans[i], m_solvers[i]);
-                for (size_t j = 0; j < m_N[0]*m_N[1]; ++j)
-                    m_b0_plans[i].w[j] = m_b0[j] / m_w;
-            }
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_sigma,
+        			m_b0_plan, m_solver);
+
+            for (size_t j = 0; j < m_N[0]*m_N[1]; ++j)
+                m_b0_plan.w[j] = m_b0[j] / m_w;
 
 
         } else {
-            m_plans.resize(m_nmany);
-            for (size_t i = 0; i < m_nmany; ++i)
-                NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_plans[i], m_solvers[i]);
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_plan, m_solver);
         }
         
         if (p.exists("pc")) {
@@ -252,11 +204,9 @@ public:
     virtual ~NFFT () NOEXCEPT {
         if (m_initialised)
         	if (m_have_b0)
-                for (size_t i = 0; i < m_nmany; ++i)
-                    NFFTTraits<NFFTType>::Finalize (m_b0_plans[i], m_solvers[i]);
+        		NFFTTraits<NFFTType>::Finalize (m_b0_plan, m_solver);
         	else
-                for (size_t i = 0; i < m_nmany; ++i)
-                    NFFTTraits<NFFTType>::Finalize (m_plans[i], m_solvers[i]);
+        		NFFTTraits<NFFTType>::Finalize (m_plan, m_solver);
     }
     
     
@@ -264,7 +214,6 @@ public:
      * @brief     Assignement
      */
     inline NFFT<T>& operator= (const NFFT<T>& ft) NOEXCEPT {
-        
         m_initialised = ft.m_initialised;
         m_have_pc     = ft.m_have_pc;
         m_rank        = ft.m_rank;
@@ -285,21 +234,15 @@ public:
         m_min_b0      = ft.m_min_b0;
         m_max_b0      = ft.m_max_b0;
         m_sigma       = ft.m_sigma;
+        m_alpha       = ft.m_alpha;
         m_3rd_dim_cart = ft.m_3rd_dim_cart;
         m_ncart       = ft.m_ncart;
-        m_nmany       = ft.m_nmany;
-        m_solvers.resize(m_nmany);
-        if (m_have_b0) {
-            m_b0_plans.resize(m_nmany);
-            for (size_t i = 0; i < m_nmany; ++i)
-                NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plans[i], m_solvers[i]);
-        } else {
-            m_plans.resize(m_nmany);
-            for (size_t i = 0; i < m_nmany; ++i)
-                NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_plans[i], m_solvers[i]);
-        }
+        m_per_slice_kspace = ft.m_per_slice_kspace;
+        if (m_have_b0)
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);
+        else
+        	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m,          m_plan,    m_solver);
         return *this;
-        
     }
     
     /**
@@ -307,18 +250,19 @@ public:
      * 
      * @param  k   Kspace trajectory
      */
-    inline virtual void KSpace (const Matrix<RT>& k) NOEXCEPT {
+    inline virtual void KSpace (const Matrix<RT>& k) {
+        m_k = k;
         if (m_have_b0) { // +1D for omega
-            for (size_t i = 0; i < m_nmany; ++i)
-                for (size_t j = 0; j < (size_t)m_b0_plans[i].M_total; ++j) {
-                    m_b0_plans[i].plan.x[3*j+0] = k[2*j+0];
-                    m_b0_plans[i].plan.x[3*j+1] = k[2*j+1];
-                    m_b0_plans[i].plan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N.back();
-                }
+            for (size_t j = 0; j < (size_t)m_b0_plan.M_total; ++j) {
+				m_b0_plan.plan.x[3*j+0] = k[2*j+0];
+				m_b0_plan.plan.x[3*j+1] = k[2*j+1];
+                m_b0_plan.plan.x[3*j+2] = (m_t[j]-m_ts)*m_w/m_N.back();
+            }
         } else {
-            assert (k.Size() == m_plans[0].M_total*m_rank);
-            for (size_t i = 0; i < m_nmany; ++i)
-                std::copy (k.Begin(), k.End(), m_plans[i].x);		
+            if (k.Size() == m_plan.M_total*m_rank)
+                std::copy (k.Begin(), k.End(), m_plan.x);
+            else if (k.Size() == m_plan.M_total*m_rank*m_ncart)
+                m_per_slice_kspace = true;
         }
         m_have_kspace = true;
     }
@@ -330,16 +274,18 @@ public:
      * @param  w   Weights
      */
     inline virtual void Weights (const Matrix<RT>& w) NOEXCEPT {
-        assert (w.Size() == (m_have_b0) ? m_b0_plans[0].M_total : m_plans[0].M_total);
-        for (size_t i = 0; i < m_nmany; ++i) {
-            std::copy (w.Begin(), w.End(), m_solvers[i].w);
-            if (m_have_b0) {
-                NFFTTraits<NFFTType>::Weights (m_b0_plans[i].plan, m_solvers[i], m_rank);
-                NFFTTraits<NFFTType>::Psi (m_b0_plans[i].plan);
-            } else {
-                NFFTTraits<NFFTType>::Weights (m_plans[i], m_solvers[i], m_rank);
-                NFFTTraits<NFFTType>::Psi (m_plans[i]);
-            }
+        m_kw = w;
+    	if (m_have_b0)
+    		assert (w.Size() == m_b0_plan.M_total);
+    	else
+    		assert (w.Size() == m_plan.M_total);
+        std::copy (w.Begin(), w.End(), m_solver.w);
+        if (m_have_b0) {
+            NFFTTraits<NFFTType>::Weights (m_b0_plan.plan, m_solver, m_rank);
+            NFFTTraits<NFFTType>::Psi (m_b0_plan.plan);
+        } else {
+        	NFFTTraits<NFFTType>::Weights (m_plan, m_solver, m_rank);
+        	NFFTTraits<NFFTType>::Psi (m_plan);
         }
         m_have_weights = true;
     }
@@ -380,25 +326,29 @@ public:
         	tmpm = permute (tmpm, 1, 2, 0)/sqrt((RT)m_ncart);
             }*/
 
-#pragma omp parallel for default(shared) private (tmpd,tmpt) num_threads(m_nmany)
-        for (int i = 0; i < m_ncart; ++i) {
-            size_t np = i%m_nmany;
-			tmpd = (NFFTRType*) m_plans[np].f_hat;
-            for (size_t j = 0; j < m.Size(); ++j) {
-                T val = (!m_have_b0) ? m[j] : m[j] *
+        size_t tmp = numel(m)/m_ncart;
+        for (size_t i = 0; i < m_ncart; ++i) {
+
+			tmpd = (NFFTRType*) m_plan.f_hat;
+            size_t os = i*tmp;
+                
+            for (size_t j = 0; j < tmp; ++j) {
+
+                T val = (!m_have_b0) ? m[j+os] : m[j+os] *
                     std::polar<RT>((RT)1., (RT)(2. * PI * m_ts * m_b0[j] * m_w));
-                tmpd[2*j+0] = real(m[j]);
-                tmpd[2*j+1] = imag(m[j]);
+                tmpd[2*j+0] = real(m[j+os]);
+                tmpd[2*j+1] = imag(m[j+os]);
             }
 
 			if (m_have_b0)
-				NFFTTraits<NFFTType>::Trafo (m_b0_plans[np]);
+				NFFTTraits<NFFTType>::Trafo (m_b0_plan);
 			else
-				NFFTTraits<NFFTType>::Trafo (m_plans[np]);
+				NFFTTraits<NFFTType>::Trafo (m_plan);
 
-			tmpd = (NFFTRType*) m_plans[np].f;
-			tmpt = (RT*) out.Ptr() + i*2*m_M;
+			tmpd = (NFFTRType*) m_plan.f;
+			tmpt = (RT*) (out.Ptr() + i*m_M);
 			std::copy (tmpd, tmpd+2*m_M, tmpt);
+
         }
 
         return squeeze(out);
@@ -424,12 +374,9 @@ public:
         	N.PushBack(m_ncart);
 
         Matrix<T> out (N);
-#pragma omp parallel for default(shared) private (tmpd,tmpt) num_threads(m_nmany)
         for (size_t i = 0; i < m_ncart; ++i) {
-
-            size_t np = i%m_nmany;
             
-			tmpd = (NFFTRType*) m_solvers[np].y;
+			tmpd = (NFFTRType*) m_solver.y;
             
             size_t os = i*m_M;
             for (size_t j = 0; j < m_M; ++j) {
@@ -439,12 +386,12 @@ public:
             
 			if (m_have_b0)
 				NFFTTraits<NFFTType>::ITrafo
-                    ((B0Plan&) m_b0_plans[np], (Solver&) m_solvers[np], m_maxit, m_epsilon);
+                    ((B0Plan&) m_b0_plan, (Solver&) m_solver, m_maxit, m_epsilon);
 			else
 				NFFTTraits<NFFTType>::ITrafo
-                    ((Plan&)    m_plans[np],   (Solver&) m_solvers[np], m_maxit, m_epsilon);
+                    ((Plan&)    m_plan,   (Solver&) m_solver, m_maxit, m_epsilon);
             
-			tmpd = (NFFTRType*) m_solvers[np].f_hat_iter;
+			tmpd = (NFFTRType*) m_solver.f_hat_iter;
 			tmpt = (RT*) out.Ptr() + i*m_imgsz;
 
             std::copy (tmpd, tmpd+m_imgsz, tmpt);
@@ -484,14 +431,14 @@ public:
     }
 
     
-    Plan& NFFTPlan() {return m_plans[0];}
-    const Plan& NFFTPlan() const {return m_plans[0];}
+    Plan& NFFTPlan() {return m_plan;}
+    const Plan& NFFTPlan() const {return m_plan;}
 
 
     inline size_t Rank() const NOEXCEPT { return m_rank; }
     
-    inline size_t ImageSize () const {return (size_t)m_plans[0].N[0];}
-    inline size_t KSpaceSize () const {return (size_t)m_plans[0].M_total;}
+    inline size_t ImageSize () const {return (size_t)m_plan.N[0];}
+    inline size_t KSpaceSize () const {return (size_t)m_plan.M_total;}
     inline size_t Maxit () const {return m_maxit;}
     inline RT Alpha() const {return m_alpha;}
     inline RT Sigma() const {return m_sigma;}
@@ -528,24 +475,22 @@ private:
 
     Vector<size_t> m_N;      /**< @brief Image matrix side length (incl. k_{\\omega})*/
     Vector<size_t> m_n;      /**< @brief Oversampling */
+    Vector<RT> m_k, m_kw;
 
     size_t     m_M;             /**< @brief Number of k-space knots */
     size_t     m_maxit;         /**< @brief Number of Recon iterations (NFFT 3) */
     RT         m_epsilon;       /**< @brief Convergence criterium */
     RT         m_alpha, m_sigma;
     size_t     m_imgsz;
-
-    std::vector<Plan> m_plans;
-    std::vector<B0Plan> m_b0_plans;
-    std::vector<Solver> m_solvers;
-    //Plan       m_plan;         /**< nfft  plan */
-    // B0Plan     m_b0_plan;
-    //Solver     m_solver;         /**< infft plan */
+    
+    Plan       m_plan;         /**< nfft  plan */
+    B0Plan     m_b0_plan;
+    Solver     m_solver;         /**< infft plan */
     CartPlan   m_cart_plan;
     
-    bool       m_3rd_dim_cart, m_have_weights, m_have_kspace;
+    bool       m_3rd_dim_cart, m_have_weights, m_have_kspace, m_per_slice_kspace;
 
-    size_t     m_m, m_ncart, m_nmany;
+    size_t     m_m, m_ncart;
 
     int m_np;
 

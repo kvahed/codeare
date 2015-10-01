@@ -33,6 +33,8 @@ codeare::error_code XDGRASP::Init () {
 
 	printf ("Intialising XDGRASP ...\n");
 
+    std::cout << *this << std::endl;
+
 	Params ft_params;
 
 	for (size_t i = 0; i < 3; i++)
@@ -48,9 +50,8 @@ codeare::error_code XDGRASP::Init () {
 
 	Attribute ("test_case", &m_test_case);
 	Attribute ("noise",     &m_noise);
-	Attribute ("nrespiratory",     &m_nrespiratory);
-	Attribute ("ncardiac",     &m_ncardiac);
-	Attribute ("ncontrast",     &m_ncontrast);
+	Attribute ("dim4",     &m_dim4);
+	Attribute ("dim5",     &m_dim5);
 
 /*    printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
       printf ("  Pnorm: %.2e\n", m_csparam.pnorm);*/
@@ -73,8 +74,8 @@ codeare::error_code XDGRASP::Init () {
 		case 2:
 			printf ("%s", "NUFFT");
 #ifdef HAVE_NFFT3
-			ft_params["epsilon"] = RHSAttribute<double>("fteps");
-			ft_params["alpha"]   = RHSAttribute<double>("ftalpha");
+			ft_params["epsilon"] = RHSAttribute<float>("fteps");
+			ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
 			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
 			ft_params["m"]       = RHSAttribute<size_t>("ftm");
 	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
@@ -93,10 +94,10 @@ codeare::error_code XDGRASP::Init () {
             ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
 			ft_params["weights_name"] = std::string("weights");
 		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
-		    ft_params["fteps"]        = RHSAttribute<double>("fteps");
+		    ft_params["fteps"]        = RHSAttribute<float>("fteps");
 		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
-		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
-		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
+		    ft_params["cgeps"]        = RHSAttribute<float>("cgeps");
+		    ft_params["lambda"]       = RHSAttribute<float>("lambda");
 		    ft_params["threads"]      = RHSAttribute<int>("threads");
 	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
             try {
@@ -121,14 +122,19 @@ codeare::error_code XDGRASP::Init () {
 
     ft_params["imsz"]  = m_image_size;
     ft_params["nlopt"] = RHSAttribute<int>("nlopt");
-    ft_params["tvw"] = RHSAttribute<float>("tvw");
+    ft_params["tvw1"] = RHSAttribute<float>("tvw1");
+    ft_params["tv1"] = RHSList<size_t>("tv1");
+    ft_params["tvw2"] = RHSAttribute<float>("tvw2");
+    ft_params["tv2"] = RHSList<size_t>("tv2");
     ft_params["xfmw"] = RHSAttribute<float>("xfmw");
     ft_params["l1"] = RHSAttribute<float>("l1");
     ft_params["lsa"] = RHSAttribute<float>("lsa");
     ft_params["lsb"] = RHSAttribute<float>("lsb");
     ft_params["pnorm"] = RHSAttribute<float>("pnorm");    
     ft_params["threads"] = RHSAttribute<int>("threads");
-    ft_params["verbose"] = RHSAttribute<int>("verbose");    
+    ft_params["verbose"] = RHSAttribute<int>("verbose");
+
+    //Aaaargh!
     ft_params["wl_family"] = RHSAttribute<int>("wl_family");    
     ft_params["wl_member"] = RHSAttribute<int>("wl_member");
     ft_params["csiter"] = RHSAttribute<int>("csiter");
@@ -136,11 +142,15 @@ codeare::error_code XDGRASP::Init () {
     ft_params["cgconv"] = RHSAttribute<float>("cgconv");
     ft_params["lsiter"] = RHSAttribute<int>("lsiter");
     ft_params["ft"] = RHSAttribute<int>("ft");
+    ft_params["dim4"] = m_dim4;
+    ft_params["dim5"] = m_dim5;
+
     csx = new CS_XSENSE<cxfl>(ft_params);
-	std::cout << *csx << std::endl;
 
 
 	m_initialised = true;
+	std::cout << *csx << std::endl;
+
 	printf ("... done.\n\n");
 
 	return codeare::OK;
@@ -155,12 +165,13 @@ codeare::error_code XDGRASP::Prepare () {
 	FT<cxfl>& ft = *csx;
 
 	if (m_ft_type == 2 || m_ft_type == 3) {
+        ft.KSpace(Get<float>("kspace"));
 		ft.Weights (Get<float>("weights"));
-	} else {
+        Free ("weights");
+        Free ("kspace");
+    } else {
 		ft.Mask (Get<float>("mask"));
-	}
-
-	Free ("weights");
+    }
 
 	m_initialised = true;
 
@@ -170,27 +181,16 @@ codeare::error_code XDGRASP::Prepare () {
 
 codeare::error_code XDGRASP::Process () {
 
-    m_image_size.push_back (m_ncontrast);
-    m_image_size.push_back (m_nrespiratory);
-    m_image_size.push_back (m_ncardiac);
-    Matrix<cxfl> im_dc (m_image_size);
+    m_image_size.push_back (m_dim4);
+    m_image_size.push_back (m_dim5);
+    
+    Matrix<cxfl> im_xd (m_image_size);
     Matrix<cxfl>& data = Get<cxfl>("data");
-    Matrix<float>& kspace = Get<float>("kspace");
-    Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
     FT<cxfl>& ft = *csx;
 
-    Matrix<cxfl> data1;
-    Matrix<float> kspace1;
+    im_xd = ft ->* data;
 
-    for (size_t j = 0; j < 7; ++j) 
-        for (size_t i = 0; i < 4; ++i) {
-            kspace1 = kspace(CR(),CR(),CR(i),CR(j));
-            ft.KSpace (kspace1);
-            data1 = data(CR(),CR(),CR(),CR(i),CR(j));
-            im_dc(R(),R(),R(),R(i),R(j)) = *csx->*data1;
-        }
-    
-    Add ("im_dc", im_dc);
+    Add ("im_xd", im_xd);
 
     return codeare::OK;
 

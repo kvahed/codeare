@@ -1,7 +1,6 @@
 #include "Matrix.hpp"
 #include "Creators.hpp"
 #include "Print.hpp"
-#include "IOContext.hpp"
 #include "TVOP.hpp"
 
 int test_2d () {
@@ -9,11 +8,6 @@ int test_2d () {
     TVOP<cxfl> tv ;
     B = tv * A;
     C = tv ->* B;
-    IOContext f ("tvop_2d.h5", WRITE);
-    fwrite (f, A);
-    fwrite (f, B);
-    fwrite (f, C);
-    fclose (f);
 	return 0;
 }
 
@@ -22,11 +16,6 @@ int test_3d () {
     TVOP<cxfl> tv ;
     B = tv * A;
     C = tv ->* B;
-    IOContext f ("tvop_3d.h5", WRITE);
-    fwrite (f, A);
-    fwrite (f, B);
-    fwrite (f, C);
-    fclose (f);
 	return 0;
 }
 
@@ -35,11 +24,6 @@ int test_5d4 () {
     TVOP<cxfl> tv = TVOP<cxfl>(0,0,0,1,0) ;
     B = tv * A;
     C = tv ->* B;
-    IOContext f ("tvop_5d4.h5", WRITE);
-    fwrite (f, A);
-    fwrite (f, B);
-    fwrite (f, C);
-    fclose (f);
 	return 0;
 }
 
@@ -48,11 +32,6 @@ int test_5d5 () {
     TVOP<cxfl> tv = TVOP<cxfl>(0,0,0,0,1) ;
     B = tv * A;
     C = tv ->* B;
-    IOContext f ("tvop_5d5.h5", WRITE);
-    fwrite (f, A);
-    fwrite (f, B);
-    fwrite (f, C);
-    fclose (f);
 	return 0;
 }
 

@@ -195,7 +195,7 @@ iszero (const Matrix<T>& M) {
  * @return      Empty?
  */
 template <class T> inline static  bool
-isempty (const Matrix<T>& M) {
+isempty (const MatrixType<T>& M) {
 	
 	return (numel(M) == 1);
 	
@@ -289,8 +289,7 @@ dofinite (const Matrix<T>& M, const T& v = 0) {
  * @param  M  Matrix
  * @return    Highest non-one dimension
  */
-template <class T> inline static  size_t
-ndims (const Matrix<T>& M) {
+template <class T> inline static size_t ndims (const MatrixType<T>& M) {
 	
 	size_t nd = 0;
 	
@@ -318,20 +317,13 @@ ndims (const Matrix<T>& M) {
  * @param  M  Matrix
  * @return    Highest non-one dimension
  */
-template <class T> inline static  Matrix<T>
-diag (const Matrix<T>& M) {
-	
+template <class T> inline static  Matrix<T> diag (const Matrix<T>& M) {
 	assert (is2d(M));
-
 	size_t sz = (std::min)(size(M,0),size(M,1));
-
 	Matrix<T> res (sz,1);
-
 	for (size_t i = 0; i < sz; ++i)
 		res(i) = M(i,i); 
-
 	return res;
-	
 }
 
 
@@ -356,8 +348,7 @@ SizeInRAM          (const Matrix<T>& M) {
  * @param   M       Matrix
  * @return          Number of cells.
  */
-template <class T, paradigm P> inline static  size_t
-numel               (const MatrixType<T,P>& M) {
+template <class T, paradigm P> inline static size_t numel (const MatrixType<T,P>& M) {
 	return M.Size();
 }
 
@@ -592,17 +583,15 @@ m_max (const Matrix<T>& M) {
 #    undef max
 #  endif
 #endif
-template <class T> inline static  T
-max (const Matrix<T>& M) {
-
+template<class T> inline static T max (const Matrix<T>& M) {
+	return *std::max_element(M.Begin(), M.End());
+}
+template <class T> inline static T max (const View<T, true>& V) {
 	T mx = (T)INT_MIN;
-
-	for (size_t i = 0; i < numel(M); ++i)
-		if (M[i] > mx)
-			mx = M[i];
-
+	for (size_t i = 0; i < numel(V); ++i)
+		if (V[i] > mx)
+			mx = V[i];
 	return mx;
-
 }
 
 /**
@@ -616,17 +605,15 @@ max (const Matrix<T>& M) {
 #    undef min
 #  endif
 #endif
-template <class T> inline static  T
-min (const Matrix<T>& M) {
-
+template <class T> inline static  T min (const Matrix<T>& M) {
+	return *std::min_element(M.Begin(), M.End());
+}
+template <class T> inline static  T min (const View<T, true>& M) {
 	T mn = (T)INT_MAX;
-
 	for (size_t i = 0; i < numel(M); ++i)
 		if (M[i] < mn)
 			mn= M[i];
-
 	return mn;
-
 }
 
 /**
@@ -739,6 +726,9 @@ resize (const Matrix<T>& M, const Vector<size_t>& sz) {
 	
 }
 
+template <class T> inline static T sum2 (const Matrix<T>& M) {
+	return std::accumulate (M.Begin(), M.End(), (T)1, std::plus<T>());
+}
 /**
  * @brief     Sum along a dimension
  *
@@ -752,8 +742,7 @@ resize (const Matrix<T>& M, const Vector<size_t>& sz) {
  * @param  d  Dimension
  * @return    Sum of M along dimension d
  */
-template <class T> inline static Matrix<T>
-sum (const Matrix<T>& M, size_t d) {
+template <class T> inline static Matrix<T> sum (const MatrixType<T>& M, const size_t& d = 0) {
 	
 	Vector<size_t> sz = size(M);
 	size_t        dim = sz[d];
@@ -806,22 +795,9 @@ sum (const Matrix<T>& M, size_t d) {
 }
 
 
-/**
- * @brief     Sum of all elements
- *
- * Usage:
- * @code
- *   Matrix<cxfl> m   = rand<double> (8,7,6);
- *   m = sum (m);
- * @endcode
- *
- * @param  M  Matrix
- * @return    Sum of M along dimension d
- */
-template <class T> inline static T sum (const Matrix<T>& M) {
-	return std::accumulate(M.Begin(),M.End(),(T)0);
+template <class T> inline static Matrix<T> mean (const MatrixType<T>& M, const size_t& d = 0) {
+	return sum(M,d)/size(M,d);
 }
-
 
 /**
  * @brief     Product along a dimension
@@ -907,13 +883,17 @@ template <class T> inline static T prod (const Matrix<T>& M) {
  * @param  d    Dimension
  * @return      Sum of squares
  */
-template <class T> inline static  Matrix<T> SOS (const Matrix<T>& M, size_t d) {
-	
-	assert (M.Dim(d) > 1);
-	
-	Matrix<T> res = M ^ 2;
+template <class T> inline static Matrix<typename TypeTraits<T>::RT>
+    sos (const Matrix<T>& M, long d = -1) {
+    typedef typename TypeTraits<T>::RT real_type;
+    if (d == -1)
+        d = ndims(M)-1;
+    assert (d <= ndims(M)-1);
+    const real_type* rt = (real_type*)&M[0];
+	Matrix<real_type> res(size(M));
+    for (size_t i = 0; i < numel(M); ++i)
+        res[i] = rt[2*i]*rt[2*i]+rt[2*i+1]*rt[2*i+1];
 	return sum (res, d);
-  
 }
 
 
@@ -929,24 +909,44 @@ template <class T> inline static  Matrix<T> SOS (const Matrix<T>& M, size_t d) {
  * @param  M       Matrix
  * @return         Squeezed matrix
  */
-template <class T> inline static Matrix<T> squeeze (const Matrix<T>& M) {
-	
+template <class T> inline static void squeeze_ip (Matrix<T>& M) {
 	Vector<size_t> dim;
 	Vector<float>  res;
-
 	for (size_t i = 0; i < M.NDim(); ++i)
 		if (size(M, i) > 1) {
 			dim.push_back(size (M,i));
 			res.push_back(resol(M,i));
 		}
-	
-	Matrix<T> ret (dim);
-	ret.Container() = M.Container();
-	
-	return ret;
-	
+	M.Dim(dim);
 }
 
+/**
+ * @brief          Get rid of unused dimensions
+ *
+ * Usage:
+ * @code
+ *   Matrix<cxfl> m   = rand<double> (1,8,7,1,6);
+ *   m = squeeze (m); // dims: (8,7,6); 
+ * @endcode
+ *
+ * @param  M       Matrix
+ * @return         Squeezed matrix
+ */
+template <class T> inline static Matrix<T> squeeze (const Matrix<T>& M) {
+    Matrix<T> ret = M;
+    squeeze_ip(ret);
+	return ret;
+}
+template<class T> inline static Matrix<T> squeeze (const View<T,true>& V) {
+	Vector<size_t> vdim = size(V), dim;
+	for (size_t i = 0; i < vdim.size(); ++i)
+		if (vdim[i] > 1)
+			dim.push_back(vdim[i]);
+    Matrix<T> ret(dim);
+    for (size_t i = 0; i < numel(V); ++i)
+        ret[i] = V[i];
+    return ret;
+}
 
 /**
  * @brief           MATLAB-like permute
@@ -1040,7 +1040,7 @@ template<class T> inline static Matrix<T> permute (const Matrix<T>& M, const siz
 		assert (n1 == 1);
 		return M;
 	} else if (n0 == 1) {// 1,0: transpose
-		assert (n0 == 1);
+		assert (n1 == 0);
 		for (size_t j = 0; j < odims[n1]; ++j)
 			for (size_t i = 0; i < odims[n0]; ++i)
 				ret(i,j) = M(j,i);
@@ -1143,7 +1143,7 @@ template<class T> inline static Matrix<T> diff (const Matrix<T>& rhs, const size
     size_t ndims = rhssize.size();
 
     if (dim > ndims) {
-        printf ("  *** ERROR (%s:%s) - diff dimension %zu"
+        printf ("  *** ERROR (%s:%d) - diff dimension %zu"
                 "exceeds matrix dimension %zu", __FILE__, __LINE__, dim, ndims);
         throw 404;
     }
@@ -1271,16 +1271,14 @@ typedef enum sort_dir {
  */
 template <typename T> inline static Vector<size_t> sort (const Matrix<T> &m,
 		const sort_dir sd = ASCENDING) {
-  Vector<size_t> idx(m.Size());
-  std::iota(idx.begin(), idx.end(), 0);
-  if (sd == ASCENDING)
-	  sort(idx.begin(), idx.end(),
-		   [&m](size_t i1, size_t i2) {return m[i1] < m[i2];});
-  else
-	  sort(idx.begin(), idx.end(),
-		   [&m](size_t i1, size_t i2) {return m[i1] > m[i2];});
+	Vector<size_t> idx(m.Size());
+	std::iota(idx.begin(), idx.end(), 0);
+	if (sd == ASCENDING)
+		sort(idx.begin(), idx.end(), [&m](size_t i1, size_t i2) {return m[i1] < m[i2];});
+	else
+		sort(idx.begin(), idx.end(), [&m](size_t i1, size_t i2) {return m[i1] > m[i2];});
 
-  return idx;
+	return idx;
 }
 
 #endif 

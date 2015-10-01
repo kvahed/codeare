@@ -105,7 +105,8 @@ enum MatrixException {
 	DIMENSION_ECXEEDS_DIMENSIONALITY, //10
 	CONTAINER_SIZE_MUST_MATCH, //11
 	TWO_DIMENSIONAL_OPERATION, //12
-	NEGATIVE_INDEX //13
+	NEGATIVE_INDEX, //13
+    REDIM_MUST_PRESERVE_SIZE
 };
 
 static const char* MatrixExceptionMessages[] = {
@@ -122,7 +123,8 @@ static const char* MatrixExceptionMessages[] = {
 	"Dimension exceeds dimensionality", //10
 	"Container size must match", //11
 	"2D operation only", //12
-	"Negative index" //13
+	"Negative index", //13
+    "Redimensioning must preserve size" //14
 };
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
@@ -189,6 +191,22 @@ public:
 	}
 	
 	
+    /**
+     * @brief           Construct matrix with aligned dimension vector
+     *
+     * @param  dim      All dimensions
+     */
+	inline Matrix (const size_t* dims, const size_t ndims) {
+	    _dim.resize(ndims);
+	    std::copy(dims, dims+ndims, _dim.begin());
+		MATRIX_ASSERT(!_dim.Empty(), DIMS_VECTOR_EMPTY);
+        MATRIX_ASSERT(std::find(_dim.begin(),_dim.end(),size_t(0))==_dim.end(),
+        		DIMS_VECTOR_CONTAINS_ZEROS);
+        _res.resize(_dim.size(),1.0);
+        Allocate();
+	}
+
+
     /**
      * @brief           Construct matrix with dimension and resolution arrays
      *
@@ -634,7 +652,37 @@ public:
         MATRIX_ASSERT(n4<_dim[4],INDEX_EXCEEDS_DIMENSION);
         return _M[n0 + _dsz[1]*n1 + _dsz[2]*n2 + _dsz[3]*n3 + _dsz[4]*n4];
     }
-    
+
+        /**
+     * @brief            Reference to element in (first) volume (lhs)
+     *
+     * @param  x         Column
+     * @param  y         Line
+     * @param  z         Slice
+     *
+     * @return           Reference
+     */
+    inline const T& At (const size_t& n0, const size_t& n1, const size_t& n2,
+                        const size_t& n3, const size_t& n4, const size_t& n5) const  {
+        MATRIX_ASSERT(n0<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n1<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n2<_dim[2],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n3<_dim[3],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n4<_dim[4],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n5<_dim[5],INDEX_EXCEEDS_DIMENSION);
+        return _M[n0 + _dsz[1]*n1 + _dsz[2]*n2 + _dsz[3]*n3 + _dsz[4]*n4 + _dsz[5]*n5];
+    }
+    inline       T& At (const size_t& n0, const size_t& n1, const size_t& n2,
+                        const size_t& n3, const size_t& n4, const size_t& n5) {
+        MATRIX_ASSERT(n0<_dim[0],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n1<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n2<_dim[2],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n3<_dim[3],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n4<_dim[4],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT(n5<_dim[5],INDEX_EXCEEDS_DIMENSION);
+        return _M[n0 + _dsz[1]*n1 + _dsz[2]*n2 + _dsz[3]*n3 + _dsz[4]*n4+ _dsz[5]*n5];
+    }
+
 
     /**
      * @brief            Get value at position (lhs)
@@ -660,7 +708,7 @@ public:
     inline const T& At
 		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
 		 const size_t& n03,     const size_t& n04,     const size_t& n05,
-		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
+		 const size_t& n06,     const size_t& n07 = 0, const size_t& n08 = 0,
 		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
 		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
 		 const size_t& n15 = 0) const  {
@@ -677,7 +725,7 @@ public:
     inline T& At
 		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
    		 const size_t& n03,     const size_t& n04,     const size_t& n05,
-   		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
+   		 const size_t& n06,     const size_t& n07 = 0, const size_t& n08 = 0,
    		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
    		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
    		 const size_t& n15 = 0) {
@@ -822,20 +870,28 @@ public:
                                 const size_t& n3, const size_t& n4) const {
         return this->At(n0,n1,n2,n3,n4);
     }
+    inline T& operator() (const size_t& n0, const size_t& n1, const size_t& n2,
+                          const size_t& n3, const size_t& n4) {
+        return this->At(n0,n1,n2,n3,n4);
+    }
 
 
     /**
-     * @brief            Reference to value in volume
+     * @brief            Get value in volume
      *
      * @param  x         Column
      * @param  y         Line
      * @param  z         Slice
      *
-     * @return           Reference to _M[col + _dim[COL]*lin + _dim[COL]*_dim[LIN]*slc]
+     * @return           Value
      */
+    inline const T& operator() (const size_t& n0, const size_t& n1, const size_t& n2,
+                                const size_t& n3, const size_t& n4, const size_t& n5) const {
+        return this->At(n0,n1,n2,n3,n4,n5);
+    }
     inline T& operator() (const size_t& n0, const size_t& n1, const size_t& n2,
-                          const size_t& n3, const size_t& n4) {
-        return this->At(n0,n1,n2,n3,n4);
+                          const size_t& n3, const size_t& n4, const size_t& n5) {
+        return this->At(n0,n1,n2,n3,n4,n5);
     }
 
 
@@ -864,7 +920,7 @@ public:
     inline T& operator()
     		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
       		 const size_t& n03,     const size_t& n04,     const size_t& n05,
-      		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
+      		 const size_t& n06,     const size_t& n07 = 0, const size_t& n08 = 0,
       		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
       		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
       		 const size_t& n15 = 0) {
@@ -903,7 +959,7 @@ public:
     inline const T& operator()
     		(const size_t& n00,     const size_t& n01,	   const size_t& n02,
      		 const size_t& n03,     const size_t& n04,     const size_t& n05,
-     		 const size_t& n06 = 0, const size_t& n07 = 0, const size_t& n08 = 0,
+     		 const size_t& n06,     const size_t& n07 = 0, const size_t& n08 = 0,
      		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
      		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
      		 const size_t& n15 = 0) const {
@@ -1086,6 +1142,25 @@ public:
     inline virtual const Vector<size_t>& Dim() const NOEXCEPT {
         return _dim;
     }
+
+
+    /**
+     * @brief           Get dimension array
+     *
+     * @return          All dimensions
+     */
+    inline virtual void Dim (const Vector<size_t>& dim) {
+        if (vprod(dim) == vprod(_dim)) {
+            _dim = dim;
+            _dsz.resize(_dim.size(),1);
+            for (size_t i = 1; i < _dim.size(); ++i) {
+                _dsz[i] = _dsz[i-1]*_dim[i-1];
+            }
+        } else {
+            throw REDIM_MUST_PRESERVE_SIZE;
+        }
+    }
+
 
 
     /**
@@ -1893,6 +1968,26 @@ public:
         vr.push_back (r4);
         return RHSView(this, vr);
     }
+    inline LHSView operator() (R r0, R r1, R r2, R r3, R r4, R r5) {
+        Vector<R> vr;
+        vr.push_back (r0);
+        vr.push_back (r1);
+        vr.push_back (r2);        
+        vr.push_back (r3);        
+        vr.push_back (r4);
+        vr.push_back (r5);
+        return LHSView(this, vr);
+    }
+    inline RHSView operator() (CR r0, CR r1, CR r2, CR r3, CR r4, CR r5) const {
+        Vector<CR> vr;
+        vr.push_back (r0);
+        vr.push_back (r1);
+        vr.push_back (r2);
+        vr.push_back (r3);
+        vr.push_back (r4);
+        vr.push_back (r4);
+        return RHSView(this, vr);
+    }
 #endif
 
 protected:
@@ -1905,7 +2000,7 @@ protected:
 		_dsz.resize(ds,1);
 	    for (i = 1; i < ds; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-        size_t n = std::accumulate(_dim.begin(), _dim.end(), size_t(1), c_multiply<size_t>);
+        size_t n = vprod(_dim);
         if (n != _M.size())
             _M.resize(n);
     }

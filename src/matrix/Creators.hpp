@@ -532,6 +532,7 @@ phantom3D (const size_t& n) {
 	const size_t ne = 10; // Number o ellipses
 	const size_t np =  9; // Number o geometrical parameters
 
+#pragma warning( disable : 4838)
     float p[ne][np] = {
 		{ .69,  .92,  .9,   .0,   .0,   .0,   .0, .0, .0 },
         { .662, .874, .88,  .0,   .0,   .0,   .0, .0, .0 },
@@ -544,6 +545,8 @@ phantom3D (const size_t& n) {
         { .056, .04,  .1,  -.06, -.105, .625, .0, .0, .0 },
         { .056, .056, .1,   .0,   .1,   .625, .0, .0, .0 }
 	};
+#pragma warning( default : 4838)
+
 
 	double v[ne] = {2., -.8, -.2, -.2, .2, .2, .1, .1, .2, -.2};
 
@@ -688,6 +691,23 @@ zpad (const Matrix<T>& a, size_t m, size_t n, size_t o, size_t p) {
 				std::copy(&a(0,i,j,k), &a(0,i,j,k)+am, &ret(am2,i+an2,j+ao2,k+ap2));
 	return ret;
 }
+
+template<class T> inline static Matrix<T> repmat (const Matrix<T>& M, const size_t m,
+                                                 const size_t n) {
+//    assert (is2d(M));
+    assert (m>=1);
+    assert (n>=1);
+    Vector<size_t> odims = size(M), ndims = odims;
+    ndims[0] *= m;
+    ndims[1] *= n;
+    Matrix<T> ret(ndims);
+    for (size_t j = 0; j < n*odims[1]; ++j)
+        for (size_t i = 0; i < m*odims[0]; ++i)
+            ret(i,j) = M(i%odims[0],j%odims[1]);
+            //std::copy(M.Begin()+j*odims[0],M.Begin()+(j+1)*odims[0],ret.Begin()+i*odims[0]+j*ndims[0]);
+    return ret;
+}
+
 #endif
 
 

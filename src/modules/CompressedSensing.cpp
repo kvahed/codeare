@@ -70,8 +70,8 @@ codeare::error_code CompressedSensing::Init () {
 		case 2:
 			printf ("%s", "NUFFT");
 #ifdef HAVE_NFFT3
-			ft_params["epsilon"] = RHSAttribute<double>("fteps");
-			ft_params["alpha"]   = RHSAttribute<double>("ftalpha");
+			ft_params["epsilon"] = RHSAttribute<float>("fteps");
+			ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
 			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
 			ft_params["m"]       = RHSAttribute<size_t>("ftm");
 	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
@@ -90,12 +90,13 @@ codeare::error_code CompressedSensing::Init () {
             ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
 			ft_params["weights_name"] = std::string("weights");
 		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
-		    ft_params["fteps"]        = RHSAttribute<double>("fteps");
+		    ft_params["fteps"]        = RHSAttribute<float>("fteps");
 		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
-		    ft_params["cgeps"]        = RHSAttribute<double>("cgeps");
-		    ft_params["lambda"]       = RHSAttribute<double>("lambda");
+		    ft_params["cgeps"]        = RHSAttribute<float>("cgeps");
+		    ft_params["lambda"]       = RHSAttribute<float>("lambda");
 		    ft_params["threads"]      = RHSAttribute<int>("threads");
 	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
+            ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
 		    ft_params["verbose"]      = 0;
 #else
 			printf("**ERROR - CompressedSensing: NUFFT support not available.");
@@ -111,7 +112,8 @@ codeare::error_code CompressedSensing::Init () {
 
     ft_params["imsz"]  = m_image_size;
     ft_params["nlopt"] = RHSAttribute<int>("nlopt");
-    ft_params["tvw"] = RHSAttribute<float>("tvw");
+    ft_params["tvw1"] = RHSAttribute<float>("tvw1");
+    ft_params["tv1"] = RHSList<size_t>("tv1");
     ft_params["xfmw"] = RHSAttribute<float>("xfmw");
     ft_params["l1"] = RHSAttribute<float>("l1");
     ft_params["lsa"] = RHSAttribute<float>("lsa");

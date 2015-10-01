@@ -23,7 +23,7 @@
 #define __IOCONTEXT_HPP__
 
 #include "HDF5File.hpp"
-#include "SyngoFile.hpp"
+#include "VXFile.hpp" // Syngo VB/VD
 #include "CODFile.hpp"
 #include "Demangle.hpp"
 
@@ -245,7 +245,7 @@ namespace io{
 	
 	template<>
 	struct IOTraits<SYNGO> {
-		typedef SyngoFile IOClass;
+		typedef VXFile IOClass;
 		
 		static const std::string
 		Suffix () {
@@ -449,8 +449,7 @@ namespace io{
 		/**
 		 * @brief   Return concrete handle's status
 		 */
-		template<class T> Matrix<T>
-		Read (const TiXmlElement* txe) const throw () {
+		template<class T> Matrix<T> Read (const TiXmlElement* txe) const throw () {
 
 			if (m_iof) {
 				switch (m_ios) {
@@ -531,6 +530,11 @@ namespace io{
 
 		}
 
+        inline IOStrategy Strategy() const {
+            return m_ios;
+        }
+        
+
 	private:
 
 
@@ -566,7 +570,7 @@ namespace io{
 				return HDF5;
 			else if (lname.compare(IOTraits<MATLAB>::CName()) == 0)
 				return NIFTI;
-			else if (lname.compare(IOTraits<MATLAB>::CName()) == 0)
+			else if (lname.compare(IOTraits<SYNGO>::CName()) == 0)
 				return SYNGO;
 			else
 				return HDF5;
@@ -597,10 +601,6 @@ namespace io{
 
 		}
 
-
-		const IOStrategy& Strategy () const {
-			return m_ios;
-		}
 
 		IOStrategy m_ios;
 		IOFile* m_iof; /**< @brief  My actual context */

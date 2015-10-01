@@ -29,8 +29,8 @@
 #include <string>
 
 enum TinyXMLQueryException { 
-	NO_ATTRIBUTE = 1,
-	WRONG_TYPE
+	CONFIG_KEY_NOT_FOUND = 1,
+	CONFIG_WRONG_TYPE
 };
 
 using namespace TinyXPath;
@@ -50,31 +50,29 @@ inline static void report (const int res, const char* name) {
  * @brief Skeleton of an XML configurable class
  */
 class Configurable {
-
-
-
- public:
-
-
+    
+    
+    
+public:
+    
+    
 	/**
 	 * @brief           Construct and initialise configuration DOM
 	 */
 	Configurable() {
-
 		m_config_doc             = new TiXmlDocument    ();
 		m_config_doc->LinkEndChild(new TiXmlDeclaration ("1.0", "", ""));
 		m_config_doc->LinkEndChild(new TiXmlElement     ("config"));
-		
 	}
-
-
+    
+    
 	/**
 	 * @brief           Delete configuration DOM
 	 */
 	virtual ~Configurable() {
 		delete m_config_doc;
 	}
-
+    
 	
 	/**
 	 * @brief           Set a string type attribute
@@ -82,11 +80,10 @@ class Configurable {
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
 	 */
-	inline void
-	SetAttribute        (const char* name, const char* value) {
+	inline void SetAttribute (const char* name, const char* value) {
 		Configuration()->SetAttribute (name, value);
 	}
-
+    
 	
 	/**
 	 * @brief           Set a string type attribute
@@ -94,11 +91,10 @@ class Configurable {
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
 	 */
-	inline void
-	SetAttribute        (const char* name, const std::string& value) {
+	inline void SetAttribute (const char* name, const std::string& value) {
 		Configuration()->SetAttribute (name, value.c_str());
 	}
-
+    
 	
 	/**
 	 * @brief           Set a integer type attribute
@@ -106,11 +102,10 @@ class Configurable {
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
 	 */
-	inline void
-	SetAttribute        (const char* name, int value) {
+	inline void SetAttribute (const char* name, int value) {
 		Configuration()->SetAttribute (name, value);
 	}
-
+    
 	
 	/**
 	 * @brief           Set a bool type attribute
@@ -118,8 +113,7 @@ class Configurable {
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
 	 */
-	inline void
-	SetAttribute        (const char* name, bool value) {
+	inline void SetAttribute (const char* name, bool value) {
 		Configuration()->SetAttribute (name, (int)value);
 	}
 
@@ -130,11 +124,10 @@ class Configurable {
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
 	 */
-	inline void
-	SetAttribute        (const char* name, size_t value) {
+	inline void SetAttribute (const char* name, size_t value) {
 		Configuration()->SetAttribute (name, (int)value);
 	}
-
+    
 	
 	/**
 	 * @brief           Set a size type attribute
@@ -142,11 +135,10 @@ class Configurable {
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
 	 */
-	inline void
-	SetAttribute        (const char* name, unsigned short value) {
+	inline void SetAttribute (const char* name, unsigned short value) {
 		Configuration()->SetAttribute (name, (int)value);
 	}
-
+    
 	
 	/**
 	 * @brief           Set a float type attribute
@@ -154,8 +146,7 @@ class Configurable {
 	 * @param  name     Attribute name 
 	 * @param  value    Attribute value
 	 */
-	inline void 
-	SetAttribute        (const char* name, double value) {
+	inline void SetAttribute (const char* name, double value) {
 		Configuration()->SetDoubleAttribute (name, value);
 	}
 
@@ -166,8 +157,7 @@ class Configurable {
 	 * @param  name     Attribute name
 	 * @param  value    Attribute value
 	 */
-	inline void
-	SetAttribute        (const char* name, float value) {
+	inline void SetAttribute (const char* name, float value) {
 		Configuration()->SetDoubleAttribute (name, (double)value);
 	}
 
@@ -178,10 +168,9 @@ class Configurable {
 	 * @param  name     Attribute name 
 	 * @return          String representation of value
 	 */
-	inline const char*
-	Attribute           (const char* name) const {
+	inline const char* Attribute (const char* name) const {
 		return Configuration()->Attribute (name);
-	}
+    }
 	
 
 	/**
@@ -191,8 +180,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Length
 	 */
-	inline int
-	Attribute           (const char* name, std::string* value) const {
+	inline int Attribute (const char* name, std::string* value) const {
         int res = Configuration()->QueryStringAttribute (name, value);
 		report (res, name);
         return res;
@@ -206,8 +194,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	inline int
-	Attribute           (const char* name, int* value) const {
+	inline int Attribute (const char* name, int* value) const {
         int res = Configuration()->QueryIntAttribute (name, value);
 		report (res, name);
         return res;
@@ -221,8 +208,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	inline int
-	Attribute           (const char* name, unsigned short* value) const {
+	inline int Attribute (const char* name, unsigned short* value) const {
 		int ival, res;
 		res = Configuration()->QueryIntAttribute (name, &ival);
 		report (res, name);
@@ -238,8 +224,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	inline int
-	Attribute           (const char* name, size_t* value) const {
+	inline int Attribute (const char* name, size_t* value) const {
 		int ival, res;
 		res = Configuration()->QueryIntAttribute (name, &ival);
 		report (res, name);
@@ -255,15 +240,11 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	inline int
-	Attribute           (const char* name, bool* value) const {
+	inline int Attribute (const char* name, bool* value) const {
 		int ival, res;
 		res = Configuration()->QueryIntAttribute (name, &ival);
 		report (res, name);
-		if (res == TIXML_SUCCESS)
-			*value = ival>0;
-		else
-			*value = false;
+        *value = (res == TIXML_SUCCESS) ? ival>0 : false;
 		return res;
 	}
 
@@ -275,8 +256,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	inline int
-	Attribute           (const char* name, double* value) const {
+	inline int Attribute (const char* name, double* value) const {
         int res = Configuration()->QueryDoubleAttribute (name, value);
 		report (res, name);
         return res;
@@ -289,8 +269,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-    template<class T> T
-    RHSAttribute (const std::string& key) {
+    template<class T> T RHSAttribute (const std::string& key) {
     	T val;
         int res = Configuration()->QueryValueAttribute<T>(key, &val);
         return val;
@@ -303,8 +282,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	template<class T> Vector<T>
-	RHSList (const std::string& key) {
+	template<class T> Vector<T>	RHSList (const std::string& key) {
 		Vector<T> v;
 		T value;
 		std::string vstr;
@@ -330,8 +308,7 @@ class Configurable {
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-	inline int
-	Attribute           (const char* name, float* value) const {
+	inline int Attribute (const char* name, float* value) const {
 		double val;
         int res;
 		res = Configuration()->QueryDoubleAttribute (name, &val);
@@ -347,8 +324,7 @@ class Configurable {
 	 * @param  path     Path to node
 	 * @return          Value
 	 */
-	inline const char* 
-	GetText             (const char* path) const {
+	inline const char* GetText (const char* path) const {
 		return ((TiXmlElement*) TinyXPath::XNp_xpath_node (Configuration(), path))->GetText();
 	}
 
@@ -359,19 +335,17 @@ class Configurable {
 	 * @param  path     Path to node
 	 * @return          Value
 	 */
-	inline TiXmlElement*
-	GetElement          (const char* path) const {
+	inline TiXmlElement* GetElement (const char* path) const {
 		return (TiXmlElement*) TinyXPath::XNp_xpath_node (Configuration(), path);
 	}
-
-		
+    
+	
 	/**
 	 * @brief Serialize configuration to string
 	 *
 	 * @return          String representation of configuration
 	 */
-	inline const char*
-	GetConfig           ()       const {
+	inline const char* GetConfig () const {
 
 		TiXmlPrinter printer;
 		std::string  tstr;
@@ -392,8 +366,7 @@ class Configurable {
 	 *
 	 * @param  cstr    Serialized configuration
 	 */
-	inline void 
-	SetConfig          (const char* cstr) {
+	inline void SetConfig (const char* cstr) {
 
 		m_config_doc = new TiXmlDocument();
 		m_config_doc->Parse(cstr);
@@ -406,8 +379,7 @@ class Configurable {
 	 *
 	 * @return         Pointer root element "config"
 	 */
-	TiXmlElement* 
-	Configuration      () {
+	TiXmlElement* Configuration () {
 		return m_config_doc->RootElement();
 	}
 
@@ -417,8 +389,7 @@ class Configurable {
 	 *
 	 * @return         Const pointer to Element "Config"
 	 */
-	const TiXmlElement* 
-	Configuration      () const {
+	const TiXmlElement* Configuration () const {
 		return m_config_doc->RootElement();
 	}
 
@@ -428,8 +399,7 @@ class Configurable {
 	 *
 	 * @param  fname   Name of output file
 	 */
-	inline void 
-	DumpConfig        (const char* fname) {
+	inline void DumpConfig (const char* fname) {
 		m_config_doc->SaveFile (fname);
 	}
 	
@@ -439,8 +409,7 @@ class Configurable {
 	 *
 	 * @param  fname   Name of input file
 	 */
-	bool 
-	ReadConfig        (const char* fname) {
+	bool ReadConfig (const char* fname) {
 		return m_config_doc->LoadFile (fname);
 	}
 	
@@ -450,8 +419,7 @@ class Configurable {
 	 *
 	 * @param  file    File pointer
 	 */
-	bool 
-	ReadConfig        (FILE* file) {
+	bool ReadConfig (FILE* file) {
 		return m_config_doc->LoadFile (file);
 	}
 
@@ -464,6 +432,36 @@ class Configurable {
         return t;
     }
 
+    
+    /**
+	 * @brief           Set a double type attribute
+	 *
+	 * @param  name     Attribute name
+	 * @param  value    Attribute value
+	 * @return          Status
+	 */
+	template<class T> Vector<T>	GetList (const std::string& key) {
+		Vector<T> v;
+		T value;
+		std::string vstr;
+        int res = Configuration()->QueryValueAttribute<std::string>(key, &vstr);
+        if (res==TIXML_SUCCESS) {
+        	std::stringstream ss(vstr);
+			while(ss >> value) {
+				v.push_back(value);
+				if (ss.peek() == ',')
+					ss.ignore();
+			}
+        } else {
+        	throw CONFIG_KEY_NOT_FOUND;
+        }
+		return v;
+	}
+
+    friend std::ostream& operator<< (std::ostream& os, const Configurable& conf) {
+        os << conf.GetConfig();
+        return os;
+    }
 
  protected:
 	

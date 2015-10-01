@@ -19,7 +19,7 @@ public:
 	virtual Matrix<T> operator* (const MatrixType<T>&) const { return Matrix<T>(); }
 	virtual Matrix<T> operator->* (const Matrix<T>&) const { return Matrix<T>(); }
 	virtual Matrix<T> operator/ (const MatrixType<T>&) const { return Matrix<T>(); }
-    virtual RT obj ( const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) {return 0.;}
+    virtual RT obj ( const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) const {return 0.;}
     virtual Matrix<T> df (const Matrix<T>& x) {return Matrix<T>();}
     virtual void Update (const Matrix<T>& dx) {}
     virtual std::ostream& Print (std::ostream& os) const {

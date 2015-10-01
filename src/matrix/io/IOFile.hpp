@@ -22,7 +22,7 @@ namespace io      {
 
 	static const char* IOModeStr[] {"READ_ONLY", "READ_WRITE"};
 
-	enum FileIOException {FILE_NOT_FOUND, OPEN_RO_FAILED, OPEN_RW_FAILED};
+	enum FileIOException {FILE_NOT_FOUND, OPEN_RO_FAILED, OPEN_RW_FAILED, UNKNOWN_SYNGO_DATATYPE};
 
     
 	/**
@@ -35,18 +35,14 @@ namespace io      {
 	 * @param  desc     Description
 	 * @return          Success
 	 */
-	template<class T> inline static bool
-	mwrite (const T* d, const size_t n, FILE* f, std::string desc) {
-
+	template<class T> inline static bool mwrite (const T* d, const size_t n, FILE* f, 
+		std::string desc) {
 		size_t sz = sizeof(T);
-
 		if (size_t l = fwrite (d, sz, n, f) != n) {
-			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
+			printf("File write error - %s: %zu != %zu!\n", desc.c_str(), l, n);
 			return false;
 		}
-
 		return true;
-
 	}
 
 	/**
@@ -85,7 +81,7 @@ namespace io      {
 		size_t n = d.size();
 		size_t sz = sizeof(T);
 		if (size_t l = fwrite (d.ptr(), sz, n, f) != n) {
-			printf("File write error - %s: %li != %li!\n", desc.c_str(), l, n);
+			printf("File write error - %s: %zu != %zu!\n", desc.c_str(), l, n);
 			return false;
 		}
 		return true;
@@ -103,18 +99,14 @@ namespace io      {
 	 * @param  desc     Description
 	 * @return          Success
 	 */
-	template<class T> inline static bool
-	mread (T* d, const size_t n, FILE* f, const std::string desc) {
-
+	template<class T> inline static bool mread (T* d, const size_t n, FILE* f, 
+		const std::string desc) {
 		size_t sz = sizeof(T);
-
 		if (size_t l = fread (d, sz, n, f) != n) {
-			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
+			printf("File read error - %s: %zu != %zu!\n", desc.c_str(), l, n);
 			return false;
 		}
-
 		return true;
-
 	}
 
 
@@ -160,7 +152,7 @@ namespace io      {
 		size_t n  = d.size();
 
 		if (size_t l = fread (&d[0], sz, n, f) != n) {
-			printf("File read error - %s: %li != %li!\n", desc.c_str(), l, n);
+			printf("File read error - %s: %zu != %zu!\n", desc.c_str(), l, n);
 			return false;
 		}
 

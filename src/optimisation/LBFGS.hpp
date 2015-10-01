@@ -41,7 +41,6 @@ public:
         printf("Iteration %d:\n", k);
         printf("  fx = %f, x[0] = %f, x[1] = %f\n", fx, x[0], x[1]);
         printf("  xnorm = %f, gnorm = %f, step = %f\n", xnorm, gnorm, step);
-        printf("\n");
         return 0;
     }
 
@@ -50,18 +49,18 @@ public:
         std::copy (x, x+n, (lbfgsfloatval_t*)&_x[0]);
         _g = _A->df (_x);
         (_A)->Update(_g);
-        std::copy ((lbfgsfloatval_t*)&_g[0], (lbfgsfloatval_t*)&g[0]+n, &_x[0]);
-        return (lbfgsfloatval_t) _A->obj(_x, _g, step, _rmse) / (lbfgsfloatval_t)n;
+        std::copy ((lbfgsfloatval_t*)&_g[0], (lbfgsfloatval_t*)&_g[0]+n, &g[0]);
+        T t = abs(_A->obj(_x, _g, step, _rmse)) / (lbfgsfloatval_t)(n*n/4) ;
+        lbfgsfloatval_t ret = (lbfgsfloatval_t) std::real(t) ;
+        return ret;
     }
     
     inline virtual void Minimise (Operator<T>* A, Matrix<T>& x) {
         _A = A;
         _x = x;
         _g = x;
-        lbfgsfloatval_t fx;
+        lbfgsfloatval_t fx = 0;
         int ret = lbfgs(2*x.Size(), (lbfgsfloatval_t*)&x[0], &fx, evaluate, progress, NULL, &_p);
-        std::cout << "    L-BFGS optimization terminated with status code = " <<ret << std::endl;
-        std::cout << "      fx = "<< fx << ", x[0] = "<< x[0] << ", " << x[1] << std::endl;
     }
     virtual std::ostream& Print(std::ostream& os) const {
         NonLinear<T>::Print(os);
@@ -85,8 +84,8 @@ public:
 };
 
         template<class T> Operator<T>* LBFGS<T>::_A = 0;
-        template<class T> Matrix<T> LBFGS<T>::_x = Matrix<T>(256,256);
-        template<class T> Matrix<T> LBFGS<T>::_g = Matrix<T>(256,256);
+        template<class T> Matrix<T> LBFGS<T>::_x = Matrix<T>();
+        template<class T> Matrix<T> LBFGS<T>::_g = Matrix<T>();
         template<class T> typename LBFGS<T>::RT LBFGS<T>::_rmse = 0;
         
         

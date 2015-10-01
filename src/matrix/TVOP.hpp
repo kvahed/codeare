@@ -22,6 +22,7 @@
 #define __TVOP_HPP__
 
 #include "Matrix.hpp"
+#include "Operator.hpp"
 
 
 template<class T, bool b0, bool b1> struct TV2D {};
@@ -152,7 +153,7 @@ enum TVOP_EXCEPTION {UNDEFINED_TV_OPERATOR};
  * @brief 2D Finite difference operator
  */
 template <class T>
-class TVOP {
+class TVOP : public Operator<T> {
 	
 
 public:
@@ -176,7 +177,7 @@ public:
 	/**
 	 * @brief Default destructor
 	 */
-	~TVOP() NOEXCEPT {};
+	virtual ~TVOP() NOEXCEPT {};
 
 
 	/**
@@ -191,7 +192,7 @@ public:
 
         Matrix<T> ret;
         
-        if (ndims(A)==2 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1))) 
+        if      (ndims(A)==2 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1)))
             ret = TV2D<T,1,1>::fwd(A);
         else if (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1 && _dims[2] == 1))) 
             ret = TV3D<T,1,1,1>::fwd(A);
@@ -216,7 +217,7 @@ public:
 
         Matrix<T> ret;
         
-		if (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1)))
+		if      (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1)))
             ret = TV2D<T,1,1>::adj(A);
 		else if (ndims(A)==4 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1 && _dims[2] == 1)))
             ret = TV3D<T,1,1,1>::adj(A);
@@ -254,6 +255,15 @@ public:
 		return Adjoint (m);
 	}
 
+
+	inline virtual std::ostream& Print (std::ostream& os) const {
+		Operator<T>::Print(os);
+		if (_dims.size() == 0)
+			os << "    all dims";
+		else
+			os << "    tv'ed dims: " << _dims;
+		return os;
+	}
 
 private:
     Vector<unsigned short> _dims;

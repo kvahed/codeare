@@ -3,9 +3,7 @@
 #include "Creators.hpp"
 #include "Params.hpp"
 #include "DWT.hpp"
-#include "IOContext.hpp"
 
-using namespace codeare::matrix::io;
 
 int main (int args, char** argv) {
 
@@ -20,15 +18,6 @@ int main (int args, char** argv) {
     E = wt3 * D;
     F = wt3 ->* E;
     
-    IOContext f = fopen ("dwt.h5", WRITE);
-    fwrite (f, A);
-    fwrite (f, B);
-    fwrite (f, C);
-    fwrite (f, D);
-    fwrite (f, E);
-    fwrite (f, F);
-    fclose (f);
-
     return 0;
     
 }
