@@ -17,7 +17,7 @@ if (${ITK_FOUND})
   add_executable (t_resample t_resample.cpp)
   set_target_properties (t_resample 
     PROPERTIES COMPILE_FLAGS "-DHAVE_INSIGHT -fpermissive") 
-  target_link_libraries (t_resample ${ITK_LIBRARIES})
+  target_link_libraries (t_resample ${ITK_LIBRARIES} ${OPENSSL_LIBRARIES})
   add_test (resample t_resample)
 #  set_tests_properties (resample PROPERTIES ENVIRONMENT ${LD_ENV})
 endif()
