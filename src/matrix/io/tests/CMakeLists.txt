@@ -35,7 +35,7 @@ target_link_libraries (t_vxfile ${OPENSSL_LIBRARIES} boost_timer boost_system co
 if (${ITK_FOUND})
   add_executable (t_dicom t_dicom.cpp)
   add_test (dicom t_dicom)
-  target_link_libraries (t_dicom itksys ITKCommon ITKIOImageBase ITKIOGDCM)
+  target_link_libraries (t_dicom ${OPENSSL_LIBRARIES} itksys ITKCommon ITKIOImageBase ITKIOGDCM)
 endif ()
 
 add_executable (t_hdf5 t_hdf5.cpp)
