@@ -128,16 +128,26 @@ static const char* MatrixExceptionMessages[] = {
 };
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
-                                     const char* func, const MatrixException& x) {
+                                     const char*  func, const MatrixException& x, 
+				     const long&   n1 = -1, const long& n2 = -1) {
     std::cerr << fname << ":" << lnumber << "\n \t" << func << "\n \t"
-              << "*** ERROR: " << MatrixExceptionMessages[x-1] << std::endl;
+              << "*** ERROR: " << MatrixExceptionMessages[x-1];
+    if (n1 > -1)
+      std::cerr << " n1: " << n1;
+    if (n2 > -1)
+      std::cerr << " n2: " << n2;
+	std::cerr << std::endl;
     throw x;
 }
 
 #ifndef DNDEBUG
 #  ifndef MATRIX_ASSERT
-#    define MATRIX_ASSERT(c,x) if (!(c))                            \
+#    define MATRIX_ASSERT(c,x) if (!(c))				\
 		report_and_throw (__FILE__, __LINE__, PRETTY_FUNCTION, x)
+#  endif
+#  ifndef MATRIX_ASSERT2
+#    define MATRIX_ASSERT2(c,x,n1,n2) if (!(c))				\
+       report_and_throw (__FILE__, __LINE__, PRETTY_FUNCTION, x, n1, n2)
 #  endif
 #endif
 
@@ -564,13 +574,13 @@ public:
      * @return          Value
      */
     inline const T& At (const size_t& x, const size_t& y) const {
-        MATRIX_ASSERT(x<_dim[0],INDEX_EXCEEDS_DIMENSION);
-        MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT2(x<_dim[0],INDEX_EXCEEDS_DIMENSION,x,_dim[0]);
+        MATRIX_ASSERT2(y<_dim[1],INDEX_EXCEEDS_DIMENSION,y,_dim[1]);
         return _M[x + _dim[0]*y];
     }
     inline       T& At (const size_t& x, const size_t& y)       {
-        MATRIX_ASSERT(x<_dim[0],INDEX_EXCEEDS_DIMENSION);
-        MATRIX_ASSERT(y<_dim[1],INDEX_EXCEEDS_DIMENSION);
+        MATRIX_ASSERT2(x<_dim[0],INDEX_EXCEEDS_DIMENSION,x,_dim[0]);
+        MATRIX_ASSERT2(y<_dim[1],INDEX_EXCEEDS_DIMENSION,x,_dim[0]);
         return _M[x + _dim[0]*y];
     }
 
