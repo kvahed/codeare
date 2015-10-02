@@ -1,0 +1,10 @@
+#include "Smooth.hpp"
+
+template<class T> int check () {
+    Matrix<T> A = randn<T>(10,1);
+    A = smooth(A);
+}
+
+int main (int, char**) {
+    return check<float>();
+}

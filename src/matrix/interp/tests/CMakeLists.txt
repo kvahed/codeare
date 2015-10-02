@@ -10,6 +10,9 @@ include_directories (
 add_executable (t_medfilt2 t_medfilt2.cpp)
 add_test (medfilt2 t_medfilt2)
 
+add_executable (t_lowess t_lowess.cpp)
+add_test (lowess t_lowess)
+
 if (${ITK_FOUND})
   add_executable (t_resample t_resample.cpp)
   set_target_properties (t_resample 
