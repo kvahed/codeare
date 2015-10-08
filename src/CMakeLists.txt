@@ -43,7 +43,7 @@ list (APPEND SOURCES options.h options.cpp)
 if (WINDOWS)
   list (APPEND COMLIBS hdf5 hdf5_cpp)
 else ()
-  list (APPEND COMLIBS ${HDF5_LIBRARIES})
+  list (APPEND COMLIBS ${HDF5_LIBRARIES} ${OPENSSL_LIBRARIES})
 endif()
 
 list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}

@@ -18,7 +18,7 @@
 using namespace std;
 
 template<class T> inline static Matrix<T>
-smooth (const Matrix<T>& x, const size_t& span, const INTERP::Method& method) {
+smooth (const Matrix<T>& x, const size_t& span = 3, const INTERP::Method& method = INTERP::AKIMA) {
 	Matrix<T> ret = x;
 	return x;
 }
