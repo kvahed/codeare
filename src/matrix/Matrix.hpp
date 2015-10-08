@@ -128,9 +128,14 @@ static const char* MatrixExceptionMessages[] = {
 };
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
-                                     const char* func, const MatrixException& x) {
+                                     const char* func, const MatrixException& x,
+                                     const long n = -1, const long m = -1) {
     std::cerr << fname << ":" << lnumber << "\n \t" << func << "\n \t"
-              << "*** ERROR: " << MatrixExceptionMessages[x-1] << std::endl;
+              << "*** ERROR: " << MatrixExceptionMessages[x-1];
+    if (n > -1)
+        std::cerr << "("<< n << "," << m << ")" << std::endl;
+    else
+        std::cerr << std::endl;
     throw x;
 }
 
@@ -138,6 +143,10 @@ inline static void report_and_throw (const char* fname, const size_t& lnumber,
 #  ifndef MATRIX_ASSERT
 #    define MATRIX_ASSERT(c,x) if (!(c))                            \
 		report_and_throw (__FILE__, __LINE__, PRETTY_FUNCTION, x)
+#  endif
+#  ifndef MATRIX_ASSERT2
+#    define MATRIX_ASSERT2(c,x,n,m) if (!(c))                        \
+		report_and_throw (__FILE__, __LINE__, PRETTY_FUNCTION, x, n, m)
 #  endif
 #endif
 
