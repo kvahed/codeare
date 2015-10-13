@@ -18,8 +18,11 @@
 using namespace std;
 
 template<class T> inline static Matrix<T>
-smooth (const Matrix<T>& x, const size_t& span = 3, const INTERP::Method& method = INTERP::AKIMA) {
-	Matrix<T> ret = x;
+smooth (const Matrix<T>& y, const size_t& span = 3, const INTERP::Method& method = INTERP::AKIMA) {
+	typedef typename TypeTraits<T>::RT RT;
+	Matrix<T> ys = y;
+	Matrix<RT> x = linspace<RT>(0,1,size(y,0));
+	//lowess (x, y, 1.0, 10, x[1]-x[0], );
 	return x;
 }
 

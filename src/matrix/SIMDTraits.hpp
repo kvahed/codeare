@@ -366,7 +366,6 @@ namespace codeare {
 
 template<class T, class Op> 
 inline static void Vec (const Vector<T>& a, const Vector<T>& b, Vector<T>& c, const Op& op) {
-    typedef typename TypeTraits<T>::RT RT;
     typedef typename VecTraits<T>::reg_type reg_type;
     const reg_type* va = (const reg_type*) &a[0];
     const reg_type* vb = (const reg_type*) &b[0];
@@ -380,7 +379,6 @@ inline static void Vec (const Vector<T>& a, const Vector<T>& b, Vector<T>& c, co
 
 template<class T, class Op> 
 inline static void Vec (const Vector<T>& a, Vector<T>& c, const Op& op) {
-    typedef typename TypeTraits<T>::RT RT;
     typedef typename VecTraits<T>::reg_type reg_type;
     const reg_type* va = (const reg_type*) &a[0];
     reg_type* vc = (reg_type*) &c[0];
@@ -393,7 +391,6 @@ inline static void Vec (const Vector<T>& a, Vector<T>& c, const Op& op) {
 
 template<class T, class Op> 
 inline static void Vec (const Vector<T>& a, const T& b, Vector<T>& c, const Op& op) {
-    typedef typename TypeTraits<T>::RT RT;
     typedef typename VecTraits<T>::reg_type reg_type;
     Vector<T> B (VecTraits<T>::stride,b);
     const reg_type* va = (const reg_type*) &a[0];
