@@ -23,7 +23,7 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 #ifdef HAVE_NFFT3
 	#include "NCSENSE.hpp"
 #endif
-#include "CS_XSENSE.hpp"
+#include "CS_TSENSE.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
 
@@ -145,7 +145,7 @@ codeare::error_code XDGRASP::Init () {
     ft_params["dim4"] = m_dim4;
     ft_params["dim5"] = m_dim5;
 
-    csx = new CS_XSENSE<cxfl>(ft_params);
+    csx = new CS_TSENSE<cxfl>(ft_params);
 
 
 	m_initialised = true;
