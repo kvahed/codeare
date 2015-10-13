@@ -129,13 +129,13 @@ static const char* MatrixExceptionMessages[] = {
 
 inline static void report_and_throw (const char* fname, const size_t& lnumber,
                                      const char*  func, const MatrixException& x, 
-				     const long&   n1 = -1, const long& n2 = -1) {
+                                     const long&   n1 = -1, const long& n2 = -1) {
     std::cerr << fname << ":" << lnumber << "\n \t" << func << "\n \t"
               << "*** ERROR: " << MatrixExceptionMessages[x-1];
     if (n1 > -1)
-      std::cerr << " n1: " << n1;
+        std::cerr << " n1: " << n1;
     if (n2 > -1)
-      std::cerr << " n2: " << n2;
+        std::cerr << " n2: " << n2;
 	std::cerr << std::endl;
     throw x;
 }
@@ -431,7 +431,7 @@ public:
      * @return          Value at _M[p].
      */
     inline const T& operator[] (const size_t& p) const {
-        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
+        MATRIX_ASSERT2(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS,p,Size());
         return _M[p];
     }
     
@@ -449,7 +449,7 @@ public:
      * @return          Reference to _M[p].
      */
     inline T& operator[] (const size_t& p) {
-        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
+        MATRIX_ASSERT2(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS,p,Size());
         return _M[p];
     }
 

@@ -104,7 +104,7 @@ public:
         m_n       = m_N;
         
         m_m       = try_to_fetch<size_t>(p, "m", 1);
-        m_alpha   = try_to_fetch(p, "alpha", 1.5f);
+        m_alpha   = try_to_fetch(p, "alpha", 1.0f);
         for (size_t i = 0; i < m_N.size(); ++i)
             m_n[i] = ceil(m_alpha*m_N[i]);
         

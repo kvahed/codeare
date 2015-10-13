@@ -39,7 +39,7 @@ namespace VB {
     public:
 #ifdef USE_MATLAB
         VBFile (const std::string fname, int nlhs = 0, mxArray *lhs[] = 0) :
-            SyngoFile(fname, nlhs, lhs), _nnoise (0), _nmeas(0), _data_len(0),
+            SyngoFile(fname, nlhs, lhs), _nnoise (0), _nmeas(0), _nctnorm(0), _data_len(0),
             _meas_r(0), _meas_i(0), _noise_r(0), _noise_i(0), _sync_r(0), _lines(0),
             _nrtfb(0), _rtfb_r(0), _rtfb_i(0), _meas(0) {
             _file.seekg (0, _file.end);
@@ -54,7 +54,7 @@ namespace VB {
         }
 #else
         VBFile (const std::string& fname, const IOMode mode, const Params& params, const bool verbosity) :
-        	SyngoFile(fname, mode, params, verbosity), _nnoise (0), _nmeas(0), _data_len(0),
+        	SyngoFile(fname, mode, params, verbosity), _nnoise (0), _nmeas(0), _nctnorm(0), _data_len(0),
 			_meas_r(0), _meas_i(0), _noise_r(0), _noise_i(0), _sync_r(0), _lines(0), _nrtfb(0),
 			_rtfb_r(0), _rtfb_i(0), _digested(false) {
             _file.seekg (0, _file.end);
@@ -120,6 +120,10 @@ namespace VB {
                         _rtfbdims[1] = mh.ushUsedChannels;
                     }
                     ParseFeedback (mh);
+                } else if (bit_set(mh.aulEvalInfoMask[1], ONLINE)) {
+                    if ( _meas_r && mh.ushChannelId == 0)
+                        prtmsg ("        %10d: CT_NORMALIZE\n", mh.ulScanCounter);
+                    ParseCTNormalize (mh);
                 } else {
                     if (_nmeas == 0 && !_meas_r) {
                         _measdims[0] = mh.ushSamplesInScan;
@@ -243,6 +247,11 @@ namespace VB {
                 _nnoise++;
         }
         
+        inline void ParseCTNormalize (const MeasHeader& mh) {
+            std::vector<std::complex<float> > buf (mh.ushSamplesInScan);
+            _file.read((char*)&buf[0], mh.ushSamplesInScan*sizeof(std::complex<float>));
+        }
+        
         inline void ParseMeas (const MeasHeader& mh) {
             size_t pos (_file.tellg());
             if (!_meas_r) {
@@ -285,11 +294,11 @@ namespace VB {
 
         bool _digested;
         size_t _data_len;
-        unsigned _nmeas, _nrtfb, _nnoise, _lines;
+        unsigned _nmeas, _nrtfb, _nnoise, _lines, _nctnorm;
         float *_meas_r, *_meas_i, *_rtfb_r, *_rtfb_i, *_noise_r, *_noise_i, *_sync_r;
         std::vector<uint32_t> _syncdims, _measdims, _rtfbdims, _noisedims;
 #ifndef USE_IN_MATLAB
-        Matrix<raw> _meas, _rtfb;
+        Matrix<raw> _meas, _rtfb, _ctnorm;
         Matrix<float> _sync;
 #else
         void _meas;
