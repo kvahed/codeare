@@ -167,38 +167,6 @@ public:
 	}
     
 
-    inline virtual RT obj (const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) const {
-        RT obj = Obj (x,dx,t), objtv1 = 0, objtv2 = 0;
-        rmse = sqrt(obj/_ndnz);
-#pragma omp parallel num_threads(2)
-        {
-        switch (omp_get_thread_num())
-        	{
-        	case 0:
-        		if (_tvw[0])
-        			objtv1 = TV (x,dx,t,0);
-        		break;
-        	case 1:
-        		if (_tvw[1])
-        			objtv2 = TV (x,dx,t,1);
-        		break;
-        	default: break;
-        	}
-        }
-        return obj + objtv1 + objtv2;
-    }
-    
-
-    inline virtual Matrix<T> df (const Matrix<T>& x) {
-        Matrix<T> g = dObj (x);
-        for (size_t i = 0; i < _tvw.size(); ++i)
-            if (_tvw[i])
-                g += dTV  (x,i);
-        return g;
-    }
-    
-    inline virtual void Update (const Matrix<T>& dx) {}
-
 	virtual std::ostream& Print (std::ostream& os) const {
 		FT<T>::Print(os);
         os << "    Weights: TV("<< _tvw[0] <<") TV("<< _tvw[1] <<") XF("<< _xfmw <<") L1("<<_l1<<") Pnorm: "
@@ -255,6 +223,39 @@ public:
         return ft;
     }
     
+    inline virtual RT obj (const Matrix<T>& x, const Matrix<T>& dx, const RT& t, RT& rmse) const {
+        RT obj = Obj (x,dx,t), objtv1 = 0, objtv2 = 0;
+        rmse = sqrt(obj/_ndnz);
+#pragma omp parallel num_threads(2)
+        {
+            size_t tn = omp_get_thread_num();
+            switch (tn)
+        	{
+        	case 0:
+        		if (_tvw[tn])
+        			objtv1 = TV (x,dx,t,tn);
+        		break;
+        	case 1:
+        		if (_tvw[tn])
+        			objtv2 = TV (x,dx,t,tn);
+        		break;
+        	default: break;
+        	}
+        }
+        return obj + objtv1 + objtv2;
+    }
+    
+    inline virtual Matrix<T> df (const Matrix<T>& x) {
+        Matrix<T> g = dObj (x);
+        for (size_t i = 0; i < _tvw.size(); ++i)
+            if (_tvw[i])
+                g += dTV  (x,i);
+        return g;
+    }
+    
+    inline virtual void Update (const Matrix<T>& dx) {
+    }
+
 private:
     
     inline RT Obj (const Matrix<T>& x, const Matrix<T>& dx, const RT& t) const {
@@ -288,7 +289,7 @@ private:
      */
     inline Matrix<T> dTV (const Matrix<T>& x, const size_t& i) const {
         Matrix<T> w = *tvt[i] * x;
-        return _tvw[i] * (*tvt[i]) ->* (w*(w*conj(w)+_l1)^(-.5));
+        return _tvw[i] * (*tvt[i]) ->* (w * ((w*conj(w)+_l1)^(-.5)));
     }
     
 

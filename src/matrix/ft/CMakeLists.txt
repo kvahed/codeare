@@ -23,7 +23,7 @@ endif ()
 list (APPEND SOURCES DFT.cpp CSENSE.cpp CGRAPPA.cpp)
 
 if (${NFFT3_FOUND})
-  list (APPEND SOURCES NCSENSE.cpp NFFT.cpp CS_XSENSE.cpp CS_TSENSE.cpp)
+  list (APPEND SOURCES NCSENSE.cpp NFFT.cpp CS_XSENSE.cpp)
   list (APPEND COMLIBS ${NFFT3_LIBRARIES})
 endif ()
 

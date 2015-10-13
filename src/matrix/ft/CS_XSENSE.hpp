@@ -334,8 +334,9 @@ private:
         om *= conj(om);
         om += _l1;
         om ^= 0.5*_pnorm;
+#pragma omp parallel for default(shared) schedule(static,16) reduction(+:o)
         for (size_t i = 0; i < om.Size(); i++)
-            o += real(om[i]);
+            o = o + real(om[i]);
         return _tvw[i] * o;
     }
     
@@ -347,8 +348,9 @@ private:
         om *= conj(om);
         om += _l1;
         om ^= 0.5*_pnorm;
+#pragma omp parallel for default(shared) schedule(static,16) reduction(+:o)
         for (size_t i = 0; i < om.Size(); i++)
-            o += om[i].real();
+            o = o + real(om[i]);
         return _xfmw * o;
     }
     
