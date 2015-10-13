@@ -43,7 +43,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Vc_ARCHITECTURE_FLAGS}")
 # C++ flags ----------------------------------------------------------
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -Wall -Wno-error=unknown-pragmas -Wno-error=switch -DTIXML_USE_STL -fPIC -Ofast -DHAVE_CXXABI_H")
+    "${CMAKE_CXX_FLAGS} -Wno-psabi -DTIXML_USE_STL -fPIC -Ofast -DHAVE_CXXABI_H")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
   if (${MACOSX})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL -Ofast -DHAVE_CXXABI_H")
