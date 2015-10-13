@@ -431,7 +431,7 @@ public:
      * @return          Value at _M[p].
      */
     inline const T& operator[] (const size_t& p) const {
-        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
+        MATRIX_ASSERT2(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS,p,Size());
         return _M[p];
     }
     
@@ -449,7 +449,7 @@ public:
      * @return          Reference to _M[p].
      */
     inline T& operator[] (const size_t& p) {
-        MATRIX_ASSERT(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS);
+        MATRIX_ASSERT2(p<Size(),INDEX_EXCEEDS_NUMBER_ELEMENTS,p,Size());
         return _M[p];
     }
 
