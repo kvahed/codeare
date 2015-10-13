@@ -233,9 +233,8 @@ namespace RRStrategy {
 		
 		std::string    m_name;         /*!< @brief Name                        */
 		bool           m_initialised;  /*!< @brief Reco is initialised         */
-		ReconStrategy* _successor;
-
         Workspace*     global;
+		ReconStrategy* _successor;
 		
 	};
 	

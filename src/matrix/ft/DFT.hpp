@@ -696,16 +696,16 @@ private:
 	Plan       m_fwplan;       /**< @brief Forward plan (double precision)*/
 	Plan       m_bwplan;       /**< @brief Backward plan (double precision)*/
 
-	size_t     m_N;            /**< @brief # Nodes */
 	size_t     m_cs;
+	size_t     m_N;            /**< @brief # Nodes */
 
 	T          m_sn;
 
+	Vector<T> m_in;           /**< @brief Aligned fftw input*/
 	bool       m_have_mask;    /**< @brief Apply mask?*/
 	bool       m_have_pc;      /**< @brief Apply phase correction?*/
 	bool       m_zpad;         /**< @brief Zero padding? (!!!NOT OPERATIONAL YET!!!)*/
 	
-	Vector<T> m_in;           /**< @brief Aligned fftw input*/
 
 	Vector<size_t> d;
 	Vector<size_t> c;

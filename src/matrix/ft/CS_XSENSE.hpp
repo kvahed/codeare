@@ -135,8 +135,6 @@ public:
 
         if (_wf>-1)
             dwt = new DWT<T> (dims[0], (wlfamily)_wf, _wm);
-        else 
-            dwt = new DWT<T> (16, (wlfamily)_wf, _wm);
 
         tvt.PushBack(new TVOP<T>(_tvv[0]));
         tvt.PushBack(new TVOP<T>(_tvv[1]));
@@ -207,7 +205,7 @@ public:
     
 
     inline virtual Matrix<T> df (const Matrix<T>& x) {
-        wx = *dwt->*x;
+        wx = (dwt) ? *dwt->*x : x;
         Matrix<T> g = dObj (x);
         if (_xfmw)
             g += dXFM (x);
@@ -218,7 +216,7 @@ public:
     }
     
     inline virtual void Update (const Matrix<T>& dx) {
-        wdx =  *dwt->*dx;        
+        wdx =  (dwt) ? *dwt->*dx : dx;
         ffdbx = *ft * wx;
         ffdbg = *ft * wdx;
         if (_tvw[0]) {
@@ -285,7 +283,8 @@ public:
 
         _ndnz = (RT)nnz(data);
 
-        im_dc  = *dwt * im_dc;
+        if (dwt)
+            im_dc  = *dwt * im_dc;
 
         RT ma = max(abs(im_dc));
         _tvw[0] *= ma;
@@ -296,7 +295,7 @@ public:
         for (size_t i = 0; i < (size_t)_csiter; i++) {
             nlopt->Minimise ((Operator<T>*)this, im_dc);
             if (_verbose)
-                vc.push_back(*dwt ->* im_dc);
+                vc.push_back((dwt) ? *dwt ->* im_dc : im_dc);
         }
 
         if (_verbose) {
@@ -304,8 +303,10 @@ public:
             im_dc = zeros<T> (size(im_dc,0), size(im_dc,1), (_dim == 3) ? size(im_dc,2) : 1, vc.size());
             for (size_t i = 0; i < vc.size(); i++)
                 std::copy (&vc[i][0], &vc[i][0]+cpsz, &im_dc[i*cpsz]);
-        } else
-            im_dc = *dwt ->* im_dc;
+        } else {
+            if (dwt)
+                im_dc = *dwt ->* im_dc;
+        }
         
         return im_dc;
 
@@ -356,7 +357,10 @@ private:
      * @brief Compute gradient of the data consistency
      */
     inline Matrix<T> dObj (const Matrix<T>& x) const {
-        return 2.0 * (*dwt * (*ft ->* ((*ft * wx) - data)));
+        if (dwt)
+            return 2.0 * (*dwt * (*ft ->* ((*ft * wx) - data)));
+        else
+            return 2.0 * (*ft ->* ((*ft * x) - data));
     }
     
     
@@ -387,7 +391,7 @@ private:
         g ^= 0.5*_pnorm-1.0;
         g *= dx;
         g *= _pnorm;
-        g  = *dwt * (*(tvt[i])->*g);
+        g  = (dwt) ? *dwt * (*(tvt[i])->*g) : *(tvt[i])->*g;
         return (_tvw[i] * g);
     }
     

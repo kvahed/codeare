@@ -303,7 +303,6 @@ public:
 			const boost::any& b = i->second;
 			std::string v_name  = demangle(i->second.type().name()),
 					    k_name  = i->first;
-			size_t vl = v_name.length(), kl = k_name.length();
 
 			os << setw(24) << k_name << " | "
 			   << setw(16) << v_name << " | "

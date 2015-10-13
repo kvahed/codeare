@@ -152,7 +152,7 @@ namespace RRServer {
 			Vector<size_t> mdims (nd);
 			Vector<float>  mress (nd);
 
-			for (int i = 0; i < nd; i++) {
+			for (size_t i = 0; i < nd; i++) {
 				mdims[i] = c.dims[i];
 				mress[i] = c.res[i];
 			}
@@ -164,8 +164,7 @@ namespace RRServer {
 
 		}
 
-		template <class CORBA_Type> void
-		GetMatrix (const char* name, CORBA_Type& c) {
+		template <class CORBA_Type> void GetMatrix (const char* name, CORBA_Type& c) {
 
 			typedef typename RemoteTraits<CORBA_Type>::Type T;
 
@@ -175,7 +174,7 @@ namespace RRServer {
 			c.dims.length(nd);
 			c.res.length (nd);
 
-			for (int j = 0; j < nd; j++) {
+			for (size_t j = 0; j < nd; j++) {
 				c.dims[j] = tmp.Dim(j);
 				c.res[j]  = tmp.Res(j);
 			}
