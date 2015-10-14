@@ -23,7 +23,7 @@
 #include "ReconStrategy.hpp"
 #include "Algos.hpp"
 #include "DFT.hpp"
-#include "CS_TSENSE.hpp"
+#include "CS_XSENSE.hpp"
 #include "DWT.hpp"
 #include "TVOP.hpp"
 #include "CX.hpp"
@@ -124,7 +124,7 @@ namespace RRStrategy {
         int            m_dim4;
         int            m_dim5;
 
-        CS_TSENSE<cxfl>* csx;
+        CS_XSENSE<cxfl>* csx;
 
     };
     

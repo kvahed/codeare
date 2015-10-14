@@ -71,8 +71,8 @@ template <> struct NFFTTraits<std::complex<double> > {
         unsigned nfft_flags, fftw_flags, solver_flags;
 
         fftw_flags  = FFTW_ESTIMATE | FFTW_DESTROY_INPUT;
-        solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
-        nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
+        solver_flags = CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
+        nfft_flags   = NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
         nfft_init_guru (&plan, _d, _N.ptr(), _M, _n.ptr(), _m, nfft_flags, fftw_flags);
@@ -103,8 +103,8 @@ template <> struct NFFTTraits<std::complex<double> > {
         unsigned nfft_flags, fftw_flags, solver_flags;
 
         fftw_flags  = FFTW_ESTIMATE | FFTW_DESTROY_INPUT;
-        solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
-        nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
+        solver_flags = CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
+        nfft_flags   = NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
         mri_inh_3d_init_guru (&plan, _N.ptr(), _M, _n.ptr(), _m, sigma, nfft_flags, fftw_flags);
@@ -347,8 +347,8 @@ template <> struct NFFTTraits<std::complex<float> > {
         unsigned nfft_flags, fftw_flags, solver_flags;
 
         fftw_flags  = FFTW_ESTIMATE | FFTW_DESTROY_INPUT;
-        solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
-        nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
+        solver_flags = CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
+        nfft_flags   = NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
         nfftf_init_guru (&plan, _d, _N.ptr(), _M, _n.ptr(), _m, nfft_flags, fftw_flags);
@@ -379,8 +379,8 @@ template <> struct NFFTTraits<std::complex<float> > {
         unsigned nfft_flags, fftw_flags, solver_flags;
 
         fftw_flags  = FFTW_ESTIMATE | FFTW_DESTROY_INPUT;
-        solver_flags = STEEPEST_DESCENT | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
-        nfft_flags   = NFFT_SORT_NODES | NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
+        solver_flags = CGNR | PRECOMPUTE_DAMP | PRECOMPUTE_WEIGHT;
+        nfft_flags   = NFFT_OMP_BLOCKWISE_ADJOINT | PRE_PHI_HUT |
                 PRE_PSI | MALLOC_X | MALLOC_F_HAT| MALLOC_F | FFTW_INIT | FFT_OUT_OF_PLACE;
 
         //mrif_inh_3d_init_guru (&plan, _N.ptr(), _M, _n.ptr(), _m, sigma, nfft_flags, fftw_flags);

@@ -23,7 +23,7 @@ w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
 #ifdef HAVE_NFFT3
 	#include "NCSENSE.hpp"
 #endif
-#include "CS_TSENSE.hpp"
+#include "CS_XSENSE.hpp"
 #include "Algos.hpp"
 #include "Creators.hpp"
 
@@ -93,7 +93,10 @@ codeare::error_code XDGRASP::Init () {
 			ft_params["sensitivities"] = Get<cxfl>("sensitivities");
             ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
 			ft_params["weights_name"] = std::string("weights");
+			ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
+			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
 		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
+			ft_params["m"]       = RHSAttribute<size_t>("ftm");
 		    ft_params["fteps"]        = RHSAttribute<float>("fteps");
 		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
 		    ft_params["cgeps"]        = RHSAttribute<float>("cgeps");
@@ -133,8 +136,7 @@ codeare::error_code XDGRASP::Init () {
     ft_params["pnorm"] = RHSAttribute<float>("pnorm");    
     ft_params["threads"] = RHSAttribute<int>("threads");
     ft_params["verbose"] = RHSAttribute<int>("verbose");
-
-    //Aaaargh!
+    ft_params["parallel_linesearch"] = RHSAttribute<bool>("parallel_linesearch");
     ft_params["wl_family"] = RHSAttribute<int>("wl_family");    
     ft_params["wl_member"] = RHSAttribute<int>("wl_member");
     ft_params["csiter"] = RHSAttribute<int>("csiter");
@@ -145,7 +147,7 @@ codeare::error_code XDGRASP::Init () {
     ft_params["dim4"] = m_dim4;
     ft_params["dim5"] = m_dim5;
 
-    csx = new CS_TSENSE<cxfl>(ft_params);
+    csx = new CS_XSENSE<cxfl>(ft_params);
 
 
 	m_initialised = true;
