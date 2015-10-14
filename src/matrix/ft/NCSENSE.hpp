@@ -229,6 +229,11 @@ public:
                 m_bwd_out(R(),R(),R(),R(),R(l),R(n)) *= m_csm;
             }
             ret = squeeze(sum(m_bwd_out,3));
+#pragma omp parallel num_threads (m_nmany)
+            {
+                size_t k = omp_get_thread_num(), l = k%m_dim4, n = k/m_dim4;
+                ret(R(),R(),R(),R(l),R(n)) *= m_ic;
+            }
         } else {
 #pragma omp parallel num_threads (m_nx[1])
             {
