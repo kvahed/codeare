@@ -65,6 +65,13 @@ if (${NFFT3_FOUND})
   target_link_libraries (EstimateSensitivities ${COMLIBS}
     ${GSL_LIBRARIES})
   
+  add_library (EstimateSensitivitiesRadialVIBE MODULE EstimateSensitivitiesRadialVIBE.hpp
+    EstimateSensitivitiesRadialVIBE.cpp) 
+  set_target_properties(EstimateSensitivitiesRadialVIBE PROPERTIES PREFIX "")
+  target_link_libraries (EstimateSensitivitiesRadialVIBE ${COMLIBS}
+    ${GSL_LIBRARIES})
+  list (APPEND INST_TARGETS EstimateSensitivitiesRadialVIBE)
+  
   if (${HAS_CXX11_CONDITIONAL}) 
     add_library (XDGRASP MODULE XDGRASP.hpp XDGRASP.cpp)
     set_target_properties(XDGRASP PROPERTIES PREFIX "")

@@ -68,4 +68,217 @@ inline Matrix<size_t> sub2ind (const Matrix<T>& M, const Matrix<size_t>& subs)
     return subs;
 }
 
+/**
+ * @brief              Get a volume
+ *
+ * @param  M           Matrix
+ * @param  s           # of volume
+ * @return             Desired volume of M
+ */
+template <class T> inline Matrix<T>
+Volume (const Matrix<T>& M, const size_t& s) NOEXCEPT {
+
+    Matrix<T> res (size(M,0), size(M,1), size(M,2));
+    size_t nc = numel (res);
+
+    memcpy (&res[0], M.Ptr(s*nc), nc * sizeof(T));
+
+    return res;
+
+}
+
+
+/**
+ * @brief              Set a volume in a matrix
+ *
+ * @param  M           Matrix to insert to
+ * @param  s           # of volume
+ * @param  A           Matrix to insert
+ */
+template <class T> inline void
+Volume (Matrix<T>& M, const size_t& s, const Matrix<T>& A) NOEXCEPT {
+
+    assert (size(M,0) == size(A,0));
+    assert (size(M,1) == size(A,1));
+    assert (size(M,2) == size(A,2));
+
+    size_t nc = size(M,0) * size(M,1) * size(M,2);
+
+    memcpy (&M[s*nc], A.Ptr(), nc*sizeof(T));
+
+}
+
+
+/**
+ * @brief              Get a slice
+ *
+ * @param  M           Matrix
+ * @param  s           # of slice
+ * @return             Desired slice of M
+ */
+template <class T> inline Matrix<T>
+Slice (const Matrix<T>& M, const size_t& s) NOEXCEPT {
+
+    Matrix<T> res (size(M,0),size(M,1));
+    size_t nc = numel (res);
+
+    memcpy (&res[0], M.Ptr(s*nc), nc*sizeof(T));
+
+    return res;
+
+}
+
+
+/**
+ * @brief              Set a slice
+ *
+ * @param  M           Matrix
+ * @param  s           # of slice
+ * @param  A           New slice
+ */
+template <class T> inline void
+Slice (Matrix<T>& M, const size_t& s, const Matrix<T>& A) NOEXCEPT {
+
+    assert (size(M,0) == size(A,0));
+    assert (size(M,1) == size(A,1));
+
+    size_t ns = size(M,0) * size(M,1);
+
+    memcpy (&M[s * ns], A.Ptr(), ns * sizeof(T));
+
+}
+
+
+/**
+ * @brief              Set a slice
+ *
+ * @param  M           Matrix
+ * @param  s           # of slice
+ * @param  v           Scalar value
+ */
+template <class T> inline void
+Slice (Matrix<T>& M, const size_t& s, const T& v) NOEXCEPT {
+    size_t ns = size(M,0) * size(M,1);
+    Vector<T> vv;
+    vv.resize(ns, v);
+    std::copy (vv.begin(), vv.end(), M.begin()+s*ns);
+}
+
+
+/**
+ * @brief              Get a row
+ *
+ * @param  M           Matrix
+ * @param  r           # of row
+ * @return             Desired row of M
+ */
+template <class T> inline Matrix<T>
+Row (const Matrix<T>& M, const size_t& r)  NOEXCEPT {
+
+    size_t nc, nr, ns, s, rr;
+    Matrix<T> res (1, size(M, 1));
+
+    nc = size(M,1);
+    nr = size(M,0);
+    ns = nc * nr;
+
+    s  = floor (r/nr);
+    rr = r % nr;
+
+    for (size_t i = 0; i < nc; i++)
+        res[i] = M[rr + i * nr + s * ns];
+
+    return res;
+
+}
+
+
+/**
+ * @brief              Copy a row (A) into matrix M
+ *
+ * @param  M           Matrix to copy into
+ * @param  r           # of row
+ * @param  A           Matrix to copy from
+ */
+template <class T> inline void
+Row (Matrix<T>& M, const size_t& r, const Matrix<T> A)  NOEXCEPT {
+
+    size_t nc, nr, ns, s, rr;
+
+    nc = size(M,1);
+    nr = size(M,0);
+    ns = nc * nr;
+
+    assert (size(M,1) == numel (A));
+
+    s  = floor (r/nr);
+    rr = r % nr;
+
+    for (size_t i = 0; i < nc; i++)
+        M[rr + i * nr + s * ns] = A[i];
+
+}
+
+
+/**
+ * @brief              Copy a row (A) into matrix M
+ *
+ * @param  M           Matrix to copy into
+ * @param  r           # of row
+ * @param  v           Scalar value
+ */
+template <class T> inline void
+Row (Matrix<T>& M, const size_t& r, const T& v)  NOEXCEPT {
+
+    size_t nc, nr, ns, s, rr;
+
+    nc = size(M,1);
+    nr = size(M,0);
+    ns = nc * nr;
+
+    s  = floor (r/nr);
+    rr = r % nr;
+
+    for (size_t i = 0; i < nc; i++)
+        M[rr + i * nr + s * ns] = v;
+
+}
+
+
+/**
+ * @brief              Get a row
+ *
+ * @param  M           Matrix
+ * @param  c           # of row
+ * @return             Desired row of M
+ */
+template <class T> inline Matrix<T>
+Column (const Matrix<T>& M, const size_t& c) NOEXCEPT {
+
+    Matrix<T> res (size(M, 0),1);
+
+    memcpy (&res[0], M.Ptr(c*size(M, 0)), size(M, 0) * sizeof(T));
+
+    return res;
+
+}
+
+
+/**
+ * @brief              Get a row
+ *
+ * @param  M           Matrix
+ * @param  c           # of row
+ * @param  A           Vector to copy from
+ */
+template <class T> inline void
+Column (Matrix<T>& M, const size_t& c, const Matrix<T>& A) NOEXCEPT {
+
+    assert (size(M,0) == size (A,0));
+    size_t nc = size(M,0);
+
+    memcpy (&M[c*nc], A.Ptr(), nc * sizeof(T));
+
+}
+
 #endif

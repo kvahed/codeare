@@ -67,8 +67,7 @@ codeare::error_code EstimateSensitivities::Init () {
 
 }
 
-codeare::error_code 
-EstimateSensitivities::Prepare () {
+codeare::error_code EstimateSensitivities::Prepare () {
 
 	codeare::error_code error = codeare::OK;
 
@@ -83,8 +82,7 @@ EstimateSensitivities::Prepare () {
 }
 
 
-codeare::error_code
-EstimateSensitivities::Process () {
+codeare::error_code EstimateSensitivities::Process () {
 
     Matrix<float> sos_all, xi, XI;
 	Matrix<cxfl>& data = Get<cxfl>("meas");
