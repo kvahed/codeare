@@ -31,7 +31,10 @@
 
 #include "Vector.hpp"
 
-#define USE_NFFT_32_NAMING 1
+#ifndef USE_NFFT_32_NAMING
+#  define nfft_mv_plan_complex mv_plan_complex
+#  define nfft_mv_plan_complex mv_plan_complex
+#endif
 
 template <class T>
 struct NFFTTraits { };
@@ -230,8 +233,12 @@ template <> struct NFFTTraits<std::complex<double> > {
     	int err = 0;
         int j, k, z, N = plan.N[0], N2 = N*N, NH = .5*N;
         RT k2, j2, z2;
-
+        
+#ifdef NFFT_HAS_MEMBER_FLAGS
         if (solver.flags & PRECOMPUTE_DAMP)
+#else
+        if (solver.nfft_flags & PRECOMPUTE_DAMP)
+#endif
             if (rank == 3) {
                 for (j = 0; j < N; ++j) {
                     j2 = j - NH;
@@ -268,7 +275,7 @@ template <> struct NFFTTraits<std::complex<double> > {
      * @return           Success
      */
     inline static int Psi (Plan& plan) NOEXCEPT {
-#ifdef HAVE_NFFT3F
+#ifdef NFFT_HAS_MEMBER_FLAGS
         if(plan.flags & PRE_PSI) /* precompute full psi */
             nfft_precompute_one_psi(&plan);
         if(plan.flags & PRE_FULL_PSI) /* precompute full psi */
@@ -506,7 +513,11 @@ template <> struct NFFTTraits<std::complex<float> > {
         int j, k, z, N = plan.N[0], N2 = N*N, NH = .5*N;
         RT k2, j2, z2;
 
+#ifdef NFFT_HAS_MEMBER_FLAGS
         if (solver.flags & PRECOMPUTE_DAMP)
+#else
+        if (solver.nfft_flags & PRECOMPUTE_DAMP)
+#endif
             if (rank == 3) {
                 for (j = 0; j < N; ++j) {
                     j2 = j - NH;
