@@ -39,7 +39,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		EstimateSensitivitiesRadialVIBE  () {}
+		EstimateSensitivitiesRadialVIBE  () : _cart_3rd_dim(false) {}
 		
 		/**
 		 * @brief Default destructor
@@ -67,6 +67,11 @@ namespace RRStrategy {
 		 */
 		virtual codeare::error_code Finalise ();
 		
+	private:
+
+		Vector<size_t> _image_space_dims;
+		bool _cart_3rd_dim;
+
 	};
 
 }

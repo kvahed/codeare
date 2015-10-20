@@ -405,29 +405,6 @@ resize (const Matrix<T>& M, size_t sc, size_t sl) {
 }
 
 
-/**
- * @brief           Create new vector
- *                  and copy the data into the new vector. If the target
- *                  is bigger, the remaining space is set 0. If it is 
- *                  smaller data is truncted.
- * 
- * @param   M       The matrix to resize
- * @param   sc      New height
- * @param   sl      New width
- * @param   ss      New # of slices
- *
- * @return          Resized vector
- */
-template <class T> inline static  Matrix<T>
-resize (const Matrix<T>& M, size_t sc, size_t sl, size_t ss) {
-
-	Matrix<size_t> sz (3,1);
-	sz[0] = sc; sz[1] = sl; sz[2] = ss;
-
-	return resize (M, sz);
-	
-}
-
 
 /**
  * @brief           Get vector of dimensions
@@ -698,6 +675,24 @@ resize (const Matrix<T>& M, size_t sz) {
 
 	return res;
 	
+}
+
+/*
+ * @brief           Create new vector
+ *                  and copy the data into the new vector. If the target
+ *                  is bigger, the remaining space is set 0. If it is
+ *                  smaller data is truncted.
+ *
+ * @param   M       The matrix to resize
+ * @param   sz      New length
+ * @return          Resized vector
+ */
+template <class T> inline static Matrix<T> resize (const Matrix<T>& M, const size_t& s0,
+		const size_t& s1, const size_t& s2) {
+	assert (numel(M)==s0*s1*s2);
+	Matrix<T> res (s0,s1,s2);
+	res.Container() = M.Container();
+	return res;
 }
 
 

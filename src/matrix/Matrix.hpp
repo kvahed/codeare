@@ -934,11 +934,6 @@ public:
       		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
       		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
       		 const size_t& n15 = 0) {
-    	MATRIX_ASSERT (n00<_dim[ 0] && n01<_dim[ 1] && n02<_dim[ 2] && n03<_dim[ 3]
-				    && n04<_dim[ 4] && n05<_dim[ 5] && n06<_dim[ 6] && n07<_dim[ 7]
-					&& n08<_dim[ 8] && n09<_dim[ 9] && n10<_dim[10] && n11<_dim[11]
-                    && n12<_dim[12] && n13<_dim[13] && n14<_dim[14] && n15<_dim[15],
-					   INDEX_EXCEEDS_DIMENSION);
         return _M [n00          + n01*_dsz[ 1] + n02*_dsz[ 2] + n03*_dsz[ 3] +
 				   n04*_dsz[ 4] + n05*_dsz[ 5] + n06*_dsz[ 6] + n07*_dsz[ 7] +
 				   n08*_dsz[ 8] + n09*_dsz[ 9] + n10*_dsz[10] + n11*_dsz[11] +
@@ -973,11 +968,6 @@ public:
      		 const size_t& n09 = 0, const size_t& n10 = 0, const size_t& n11 = 0,
      		 const size_t& n12 = 0, const size_t& n13 = 0, const size_t& n14 = 0,
      		 const size_t& n15 = 0) const {
-    	MATRIX_ASSERT (n00<_dim[ 0] && n01<_dim[ 1] && n02<_dim[ 2] && n03<_dim[ 3]
-				    && n04<_dim[ 4] && n05<_dim[ 5] && n06<_dim[ 6] && n07<_dim[ 7]
-					&& n08<_dim[ 8] && n09<_dim[ 9] && n10<_dim[10] && n11<_dim[11]
-                    && n12<_dim[12] && n13<_dim[13] && n14<_dim[14] && n15<_dim[15],
-					   INDEX_EXCEEDS_DIMENSION);
        return _M [n00          + n01*_dsz[ 1] + n02*_dsz[ 2] + n03*_dsz[ 3] +
 				  n04*_dsz[ 4] + n05*_dsz[ 5] + n06*_dsz[ 6] + n07*_dsz[ 7] +
 				  n08*_dsz[ 8] + n09*_dsz[ 9] + n10*_dsz[10] + n11*_dsz[11] +

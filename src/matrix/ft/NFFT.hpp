@@ -237,6 +237,7 @@ public:
         m_alpha       = ft.m_alpha;
         m_3rd_dim_cart = ft.m_3rd_dim_cart;
         m_ncart       = ft.m_ncart;
+        m_np          = ft.m_np;
         m_per_slice_kspace = ft.m_per_slice_kspace;
         if (m_have_b0)
         	NFFTTraits<NFFTType>::Init (m_N, m_M, m_n, m_m, m_sigma, m_b0_plan, m_solver);

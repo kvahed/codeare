@@ -26,7 +26,9 @@
 #include "Interpolate.hpp"
 #include "Math.hpp"
 
-#define NYUGA 111.246117975
+#ifndef NYUGA
+	#define NYUGA 111.246117975
+#endif
 
 using namespace RRStrategy;
 

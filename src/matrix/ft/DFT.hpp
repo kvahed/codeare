@@ -108,7 +108,7 @@ ifftshift (const Matrix<T>& m) NOEXCEPT {
 
 #include "Access.hpp"
 
-template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, size_t dim) NOEXCEPT {
+template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, const size_t& dim) NOEXCEPT {
 
 	Vector<size_t> in_dims = size(in);
 	size_t cent = floor((float)in_dims[dim]/2);
@@ -140,8 +140,40 @@ template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, size_t 
 
 }
 
-template<class T> inline static Matrix<T> fft (
-		const Matrix<T>& in, size_t dim) NOEXCEPT {
+template<class T> inline static Matrix<T> ifftshift (const Matrix<T>& in, const size_t& dim) NOEXCEPT {
+
+	Vector<size_t> in_dims = size(in);
+	size_t cent = floor((float)in_dims[dim]/2);
+	size_t ndims = numel(in_dims);
+	assert(ndims>=dim);
+
+	Vector<size_t> order;
+	for (size_t i = 0; i < ndims; ++i)
+		order.PushBack(i);
+	order.Erase(order.begin()+dim);
+	order.Insert(order.begin(), dim);
+
+	Matrix<T> ret = permute (in, order), tmp;
+	in_dims.Erase(in_dims.begin()+dim);
+	size_t howmany = prod(in_dims);
+
+	for (size_t i = 0; i < howmany; ++i) {
+		tmp = ret(CR(),CR(i));
+		std::rotate(tmp.Begin(), tmp.Begin()+cent, tmp.End());
+		ret(R(),R(i)) = tmp;
+	}
+
+	for (size_t i = 0; i < ndims; ++i)
+		order[i] = i;
+	order.Erase(order.begin());
+	order.Insert(order.begin()+dim, 0);
+
+	return permute (ret, order);
+
+}
+
+
+template<class T> inline static Matrix<T> fft (const Matrix<T>& in, size_t dim) NOEXCEPT {
 
 	Vector<size_t> in_dims = size(in);
 	size_t cent = floor((float)in_dims[dim]/2);
@@ -175,38 +207,59 @@ template<class T> inline static Matrix<T> fft (
 
 }
 
-template<class T> inline static Matrix<T> ifft (
-		const Matrix<T>& in, size_t dim) NOEXCEPT {
+template<class T> inline static Matrix<T> ifft (const Matrix<T>& in, size_t dim = 0) NOEXCEPT {
 
-	Vector<size_t> in_dims = size(in);
-	size_t cent = floor((float)in_dims[dim]/2);
-	size_t ndims = numel(in_dims);
-	assert(ndims>=dim);
-
+	Matrix<T> ret, tmp;
 	Vector<size_t> order;
-	for (size_t i = 0; i < ndims; ++i)
-		order.PushBack(i);
-	order.Erase(order.begin()+dim);
-	order.Insert(order.begin(), dim);
+	size_t ndims;
 
-	Matrix<T> ret = permute (in, order), tmp;
-	in_dims.Erase(in_dims.begin()+dim);
-	size_t howmany = prod(in_dims);
+	if (dim > 0) {
+		Vector<size_t> in_dims = size(in);
+		size_t cent = floor((float)in_dims[dim]/2);
+		ndims = numel(in_dims);
+		assert(ndims>=dim);
+
+		for (size_t i = 0; i < ndims; ++i)
+			order.PushBack(i);
+		order.Erase(order.begin()+dim);
+		order.Insert(order.begin(), dim);
+		ret = permute (in, order);
+		in_dims.Erase(in_dims.begin()+dim);
+	} else {
+		ret = in;
+	}
+
 	int n = static_cast<int>(size(ret,0));
+	int n2 = n/2;
+	int howmany = numel(ret)/n;
 
+	// shift
+	for (auto os = ret.Begin(); os < ret.End(); os += n)
+		std::rotate(os, os+n2, os+n);
+
+	// 1d-fft
 	typedef typename FTTraits<T>::Plan FTPlan;
 	typedef typename FTTraits<T>::T FTType;
     FTPlan cp = FTTraits<T>::DFTPlanMany (1, &n, howmany,
           (FTType*)ret.Ptr(), (FTType*)ret.Ptr(), FFTW_BACKWARD);
     FTTraits<T>::Execute(cp);
     FTTraits<T>::Destroy(cp);
+    ret /= n;
     
-	for (size_t i = 0; i < ndims; ++i)
-		order[i] = i;
-	order.Erase(order.begin());
-	order.Insert(order.begin()+dim, 0);
+    // ishift
+	for (auto os = ret.Begin(); os < ret.End(); os += n)
+		std::rotate(os, os+n2, os+n);
 
-	return permute (ret, order);
+	if (dim > 0) {
+		for (size_t i = 0; i < ndims; ++i)
+			order[i] = i;
+		order.Erase(order.begin());
+		order.Insert(order.begin()+dim, 0);
+		return permute (ret, order);
+	} else {
+		return ret;
+	}
+
 
 }
 
