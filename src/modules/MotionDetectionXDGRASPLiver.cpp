@@ -101,8 +101,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	}*
 	// Take the component with the highest peak in respiratory motion range
 	lf = 0.1; hf = 0.5; //Respiratory frequency range
-	tmp_idx = find(f_x>hf);
-	ft_idx=find(f_x<hf & f_x>lf);
+	//tmp_idx = find(f_x>hf);
+	//ft_idx=find(f_x<hf & f_x>lf);
 /*
 	tmp_peak = squeeze(motion_signal_fft(CR(tmp_idx),CR(),CR()));
 	res_peak = squeeze(motion_signal_fft(CR(fr_idx),CR(),CR()));
