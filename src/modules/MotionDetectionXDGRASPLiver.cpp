@@ -91,13 +91,14 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	v   = v(CR(idx));
 	pc  = pc(CR(),CR(idx));
 	motion_signal = transpose(gemm(pc, si, 'C', 'C'));
-/*
+
+
 	for (size_t i = 0; i < pc_sel; ++i) {
-		motion_signal_new(R(),R(i)) = smooth (motion_signal(CR(),CR(i)),span,INTERP::AKIMA); // TODO: smooth
-		tmp = abs(fftshift(fft(motion_signal(CR(_ntviews/2+1,size(motion_signal,0)),CR(i))))); // TODO: fft (view)
+		//motion_signal_new(R(),R(i)) = smooth (motion_signal(CR(),CR(i)),span,INTERP::AKIMA); // TODO: smooth
+		tmp = abs(fftshift(fft(motion_signal(CR(_nv/2+1,size(motion_signal,0)),CR(i))))); // TODO: fft (view)
 		motion_signal_fft(R(),R(i)) = tmp/max(tmp(CR()));
 	}
-
+/*
 	// Take the component with the highest peak in respiratory motion range
 	lf = 0.1; hf = 0.5; //Respiratory frequency range
 	tmp_idx = find(f_x>hf);
