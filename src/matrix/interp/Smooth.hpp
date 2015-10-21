@@ -21,16 +21,16 @@ using namespace std;
 template<class T> inline static Matrix<T>
 smooth (const Matrix<T>& y, const size_t& span = 3, const INTERP::Method& method = INTERP::AKIMA) {
 	typedef typename TypeTraits<T>::RT RT;
-	size_t rows = size(y,0);
-    Matrix<T> ret(size(y));
-    Matrix<RT> x = linspace<RT>(0,1,rows);
-    Loess<T> l;
-    Vector<T> yy;
-    for (size_t i = 0; i < numel(y)/rows; ++i) {
-    	yy = l.lowess(&x.Container()[0],&y.Container()[i*rows],rows);
-        std::copy(yy.begin(), yy.end(), &ret.Container()[i*rows]);
-    }
+    Loess<T> l ((RT)span/(RT)size(y,0));
+    Matrix<T> ret = l.lowess(y);
+    std::cout << size(ret) << std::endl;
 	return ret;
+}
+
+template<class T> inline static Matrix<T>
+smooth (const View<T,false>& y, const size_t& span = 3, const INTERP::Method& method = INTERP::AKIMA) {
+	Matrix<T> yy = y;
+	return smooth(yy, span, method);
 }
 
 #endif /* SRC_MATRIX_INTERP_SMOOTH_HPP_ */

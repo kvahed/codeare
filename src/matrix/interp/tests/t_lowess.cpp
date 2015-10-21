@@ -11,10 +11,9 @@ template<class T> int check () {
     Matrix<T> A = randn<T>(100,1)+t;
     std::cout << "A = [" <<std::endl;
     std::cout << A << "];" << std::endl;
-    A = smooth(A);
-    std::cout << "smooth(A)" <<std::endl;
+    A = smooth(A, 9);
+    std::cout << "smooth(A,9)" <<std::endl;
     std::cout << A << std::endl;
-
     return 0;
 }
 

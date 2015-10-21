@@ -38,7 +38,7 @@
 #ifndef LOESS_STATS_H
 #define LOESS_STATS_H
 #include <stdint.h>
-#include <Vector.hpp>
+#include <Matrix.hpp>
 #include <memory>
 
 #define imin2(a,b) std::min(a,b)
@@ -51,41 +51,39 @@ template<class T> class Loess {
 	typedef typename TypeTraits<T>::RT RT;
 
 public:
-	Loess() : smoother_span(2./10.), nsteps(3), delta_speed(-1.), paranoid(false) {};
+	Loess (const RT& span = 2./3., const size_t& steps = 3, const RT& speed = -1.,
+			bool paranoid = false) : _span(span), _nsteps(steps), _speed(speed), _paranoid(paranoid) {};
 
 	~Loess() {};
 
-	RT smoother_span; // span
-	size_t nsteps;       // robustness iterations
-	RT delta_speed;   // speedup
-	bool paranoid;        // paranoid checks
+	RT _span; // span
+	size_t _nsteps;       // robustness iterations
+	RT _speed;   // speedup
+	bool _paranoid;        // paranoid checks
 
-	Vector<T> lowess(const RT *x, const T *y, size_t n) {
+	inline Matrix<T> lowess (const Matrix<T>& y) const {
 
-	    assert(n>1);
+		size_t n = y.Dim(0), howmany = numel(y)/n;
+		assert(n>1);
 
-	    if(paranoid) {
-	    	/*
-              for(size_t i=0;i< n;++i) {
-              if(isnan(x[i])) THROW("NAN: x["<<i<<"]");
-              if(isnan(y[i])) THROW("NAN: y["<<i<<"]");
-              if(i>0)
-              if(x[i-1]> x[i]) THROW("Data not sorted on x");
-              }
-		    */
-		}
+		const Matrix<T>& x = linspace(0.,100.,n);
 
-	    RT delta=this->delta_speed;
-	    if(delta<0.0)
-	    	delta=.01*(x[n-1]-x[0]);
+	    //TODO: Check for NaN
+	    Matrix<T> ret(size(y));
 
-	    Vector<RT> rw(n);
-	    Vector<RT> ys(n);
-	    Vector<RT> res(n);
+	    RT delta=_speed;
+	    if (delta < 0.0)
+	    	delta = .01*(x[n-1]-x[0]);
 
-	    clowess(x, y, n, this->smoother_span, this->nsteps, delta, &ys[0], &rw[0], &res[0]);
-
-	    return ys;
+#pragma omp parallel default (shared)
+	    {
+		    Vector<RT> rw(n);
+		    Vector<RT> res(n);
+#pragma omp	for schedule (static,1)
+			for (size_t i = 0; i < howmany; ++i)
+				clowess(&x[0], &y[0+i*n], n, _span, _nsteps, delta, &ret[0+i*n], &rw[0], &res[0]);
+	    }
+	    return ret;
 
     }
 
@@ -95,7 +93,7 @@ private:
 	inline static T fsquare(T x) {return x*x; }
     
 	void lowest (const RT *x, const RT *y, int n, const RT *xs, RT *ys, int nleft,
-                 int nright, RT *w, bool userw, RT *rw, bool *ok) {
+                 int nright, RT *w, bool userw, RT *rw, bool *ok) const {
 
         int nrt, j;
         RT a, b, c, h, h1, h9, r, range;
@@ -177,9 +175,9 @@ private:
         }
     }
 
-	void clowess(const RT  *x, const RT *y, int n,
-			     RT f, int nsteps, RT delta,
-			     RT *ys, RT *rw, RT *res) {
+	void clowess (const RT  *x, const RT *y, int n, RT f, int nsteps, RT delta, RT *ys, RT *rw,
+			RT *res) const {
+
         int i, iter, j, last, m1, m2, nleft, nright, ns;
         bool ok;
         RT alpha, c1, c9, cmad, cut, d1, d2, denom, r, sc;
@@ -192,7 +190,6 @@ private:
         x--;
         y--;
         ys--;
-
 
         /* at least two, at most n points */
         ns = imax2(2, imin2(n, (int)(f*n + 1e-7)));
@@ -305,9 +302,7 @@ private:
             else { /* n odd */
                 cmad = 6.*rw[m1];
             }
-#ifdef DEBUG_lowess
-            REprintf("   cmad = %12g\n", cmad);
-#endif
+
             if(cmad < 1e-7 * sc) /* effectively zero */
                 break;
             c9 = 0.999*cmad;
