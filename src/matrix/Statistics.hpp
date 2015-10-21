@@ -31,16 +31,9 @@
  * @param  d   Dimension
  * @return     Average of M reducing d matrix
  */
-template <class T> static inline Matrix<T>
-mean (const Matrix<T>& M, size_t d) {
-	
+template <class T> static inline Matrix<T> mean (const Matrix<T>& M, size_t d) {
 	Matrix<T> res  = M;
-	float     quot = (float) res.Dim(d);
-		
-	res = sum (res, d);
-	
-	return res / quot;
-	
+	return sum (res, d)/(T)res.Dim(d);
 }
 
 
@@ -51,27 +44,12 @@ mean (const Matrix<T>& M, size_t d) {
  * @param  m  Matrix of measurements (columns)
  * @return    Covariance
  */
-template <class T> static inline Matrix<T> 
-cov (const Matrix<T>& m) {
-
+template <class T> static inline Matrix<T> cov (const Matrix<T>& m) {
 	size_t mm    = size(m,0);
 	size_t mn    = size(m,1);
-
-	Matrix<T> mh = mean(m,0);
-	Matrix<T> tmp = m;
-
-#pragma omp parallel
-	{
-
-#pragma omp for schedule (guided)
-		for (size_t i = 0; i < mm; i++)
-			for (size_t j = 0; j < mn; j++)
-				tmp [i*mn+j] -= mh[j];
-		
-	}	
-
-	return gemm(tmp, tmp, 'C') / (double)(mm-1);
-
+	Matrix<T> mh = -repmat(mean(m,0),size(m,0),1);
+	mh += m;
+	return gemm(mh, mh, 'C') / (double)(mm-1);
 }
 
 

@@ -18,8 +18,8 @@
  *  02110-1301  USA
  */
 
-#ifndef __ESTIMATE_SENSITIVITIES_RADIAL_VIBE_HPP__
-#define __ESTIMATE_SENSITIVITIES_RADIAL_VIBE_HPP__
+#ifndef __COIL_COMRESSION_HPP__
+#define __COIL_COMRESSION_HPP__
 
 #include "ReconStrategy.hpp"
 
@@ -31,7 +31,7 @@ namespace RRStrategy {
 	/**
 	 * @brief Empty recon for test purposes
 	 */
-	class EstimateSensitivitiesRadialVIBE : public ReconStrategy {
+	class CoilCompression : public ReconStrategy {
 		
 		
 	public:
@@ -39,40 +39,39 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		EstimateSensitivitiesRadialVIBE  () : _cart_3rd_dim(false) {}
+		CoilCompression () : _coil_dimension(3), _coils_left(10) {}
 		
 		/**
 		 * @brief Default destructor
 		 */
-		virtual ~EstimateSensitivitiesRadialVIBE () {}
+		virtual ~CoilCompression () {}
 		
 		
 		/**
 		 * @brief Do nothing 
 		 */
-		virtual codeare::error_code Process ();
-		
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual codeare::error_code Init ();
-		
-		/**
-		 * @brief Do nothing 
-		 */
-		virtual codeare::error_code Prepare ();
+		virtual codeare::error_code	Init ();
 
 		/**
 		 * @brief Do nothing
 		 */
-		virtual codeare::error_code Finalise ();
+		virtual codeare::error_code	Prepare ();
+		
+		/**
+		 * @brief Do nothing 
+		 */
+		virtual codeare::error_code	Process ();
+		
+		/**
+		 * @brief Do nothing 
+		 */
+		virtual codeare::error_code	Finalise () {
+			return codeare::OK;
+		}
 		
 	private:
-
-		void FormGARadialKSpace (const size_t&, const size_t&) const;
-
-		Vector<size_t> _image_space_dims;
-		bool _cart_3rd_dim;
+		size_t _coil_dimension;
+		size_t _coils_left;
 
 	};
 

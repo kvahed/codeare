@@ -46,32 +46,10 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Prepare () {
 	return codeare::OK;
 }
 
-codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
-	// Matrices
-	Matrix<cxfl>& meas = Get<cxfl>("meas");
-	meas = squeeze(1.e8*meas);
-	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
+inline void EstimateSensitivitiesRadialVIBE::FormGARadialKSpace (
+		const size_t& nk, const size_t& nv) const {
 	Matrix<float>& kspace = Get<float>("kspace");
 	Matrix<float>& weights = Get<float>("weights");
-	Matrix<cxfl> orig = meas;
-	size_t nk = size(meas,0), nc = size(meas,1), nv = size(meas,2), nz = size(meas,3);
-
-	// slices, samples, coils, projections [3 0 1 2]
-	Vector<size_t> perm(4);
-	perm[0]=3; perm[1]=0; perm[2]=1; perm[3]=2;
-	meas = permute(meas,perm);
-
-	// FFT slice dimension
-	// permute dims for NuFFT
-	// samples, projections, slices, coils [1 3 0 2]
-	perm[0]=1; perm[1]=3; perm[2]=0; perm[3]=2;
-	meas = permute(ifft(meas), perm);
-
-	// Remove top and bottom slices
-	meas = meas(CR(),CR(),CR(2,nz-3),CR()); nz -= 4;
-	meas = resize(meas,nv*nk,nz,nc);
-
-	// Sort for channel NuFFT: samples, slices,
 	kspace = zeros<float>(2,nk,nv);
 	kspace(R(0),R(),R(0)) = linspace<float>(-.5, .5, nk);
 	cxfl rot = std::polar<float>(1.0f,NYUGA_RAD);
@@ -83,24 +61,62 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 		}
 	kspace = resize(kspace,2,nv*nk);
 	weights = ones<float>(nv*nk,1);
+}
 
+
+codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
+	// Matrices
+	Matrix<cxfl>& meas = Get<cxfl>("meas");
+	meas = squeeze(1.e8*meas);
+	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
+	Matrix<float>& kspace = Get<float>("kspace");
+	Matrix<float>& weights = Get<float>("weights");
+	std::cout << "  Incoming: " << size(meas) << std::endl;
+	size_t nk = size(meas,0), nv = size(meas,1), nz = size(meas,2), nc = size(meas,3);
+
+	// Permute for slice FFT [2 0 1 3] & FFT
+	Vector<size_t> perm(4);
+	perm[0]=2; perm[1]=0; perm[2]=1; perm[3]=3;
+	meas = permute(meas,perm);
+	std::cout << "  Permuted for slice FFT: " << size(meas) << std::endl;
+
+	// Slice FFT
+	std::cout << "  Performing slice FFT ..." << std::endl;
+	meas = ifft(meas);
+
+	// Removing top and bottom slices
+	meas = meas(CR(2,nz-3),CR(),CR(),CR()); nz -= 4;
+	std::cout << "  Slice direction reduced: " << size(meas) << std::endl;
+
+	// Permute for global coil nufft [1 2 0 3]
+	perm[0]=1; perm[1]=2; perm[2]=0; perm[3]=3;
+	meas = permute(meas, perm);
+	std::cout << "  Permuted for channel NuFFTs: " << size(meas) << std::endl;
+	meas = resize(meas,nv*nk,nz,nc);
+	std::cout << "  Collapsed samples and views dimensions: " << size(meas) << std::endl;
+
+	// Sort for channel NuFFT: samples, slices,
+	std::cout << "  Building GA stack of star k-space trajectory ..." << std::endl;
+	FormGARadialKSpace(nk, nv);
+
+	// FT operators
+	std::cout << "  Building NuFFT operator(s) ..." << std::endl;
 	Vector<size_t> sens_dims = _image_space_dims;
 	sens_dims.PushBack(nc);
 	sensitivities = Matrix<cxfl>(sens_dims);
 	Matrix<float> density_comp = zeros<float>(nk,1);
-
-	// FT operators
 	Vector<NFFT<cxfl> > FTOP;
 	Params p;
-	p["nk"]           = 4096;
-	p["imsz"]         = _image_space_dims;
-	p["3rd_dim_cart"] = _cart_3rd_dim;
+	p["nk"] = 4096; p["imsz"] = _image_space_dims; p["3rd_dim_cart"] = _cart_3rd_dim;
+	p["m"] = (size_t)1; p["alpha"] = 1.0f; p["epsilon"]=7.e-4f; p["maxit"]=(size_t)2;
 	FTOP.PushBack(NFFT<cxfl>(p));
 	FTOP[0].KSpace(kspace(CR(),CR(0,4095)));
 	FTOP[0].Weights(weights(CR(0,4095)));
 	std::cout << FTOP[0] << std::endl;
+
+	// Channel NuFFTs
+	std::cout << "  NuFFTing ..." << std::endl;
 	sensitivities (R(),R(),R(),R(0)) = FTOP[0] ->* meas(CR(0,4095),CR(),CR(0));
-	Add<cxfl>("orig", orig);
 	Add<float>("weights", weights);
 
 	return codeare::OK;

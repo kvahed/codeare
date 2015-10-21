@@ -121,8 +121,8 @@ namespace VB {
                     }
                     ParseFeedback (mh);
                 } else if (bit_set(mh.aulEvalInfoMask[1], ONLINE)) {
-                    if ( _meas_r && mh.ushChannelId == 0)
-                        prtmsg ("        %10d: CT_NORMALIZE\n", mh.ulScanCounter);
+                    //if ( _meas_r && mh.ushChannelId == 0)
+                      //  prtmsg ("        %10d: CT_NORMALIZE\n", mh.ulScanCounter);
                     ParseCTNormalize (mh);
                 } else {
                     if (_nmeas == 0 && !_meas_r) {

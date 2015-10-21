@@ -6,6 +6,7 @@ include_directories (${PROJECT_SOURCE_DIR}/src/matrix/io
   ${PROJECT_SOURCE_DIR}/src/matrix/io
   ${PROJECT_SOURCE_DIR}/src/matrix/linalg
   ${PROJECT_SOURCE_DIR}/src/matrix/interp
+  ${PROJECT_SOURCE_DIR}/src/matrix/curves
   ${PROJECT_SOURCE_DIR}/src/optimisation
   ${FFTW3_INCLUDE_DIR}
   if (${ITK_FOUND})
@@ -38,11 +39,15 @@ add_library (GRAPPA MODULE GRAPPA.hpp GRAPPA.cpp)
 set_target_properties(GRAPPA PROPERTIES PREFIX "")
 target_link_libraries (GRAPPA ${COMLIBS})
 
+add_library (CoilCompression MODULE CoilCompression.hpp CoilCompression.cpp)
+set_target_properties(CoilCompression PROPERTIES PREFIX "")
+target_link_libraries (CoilCompression ${COMLIBS})
+
 add_library (DummyRecon MODULE DummyRecon.hpp DummyRecon.cpp)
 set_target_properties(DummyRecon PROPERTIES PREFIX "")
 target_link_libraries (DummyRecon ${COMLIBS})
 
-list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE GRAPPA DummyRecon)
+list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE GRAPPA CoilCompression DummyRecon)
 
 if (${NFFT3_FOUND})
   list (APPEND COMLIBS ${NFFT3_LIBRARIES})
@@ -78,12 +83,12 @@ if (${NFFT3_FOUND})
     target_link_libraries (XDGRASP ${COMLIBS})
     list (APPEND INST_TARGETS XDGRASP)
 
-#    add_library (MotionDetectionXDGRASPLiver MODULE
-#      MotionDetectionXDGRASPLiver.hpp MotionDetectionXDGRASPLiver.cpp) 
-#    set_target_properties(MotionDetectionXDGRASPLiver PROPERTIES
-#      PREFIX "") 
-#    target_link_libraries (MotionDetectionXDGRASPLiver ${COMLIBS})
-#    list (APPEND INST_TARGETS MotionDetectionXDGRASPLiver)
+    add_library (MotionDetectionXDGRASPLiver MODULE
+      MotionDetectionXDGRASPLiver.hpp MotionDetectionXDGRASPLiver.cpp) 
+    set_target_properties(MotionDetectionXDGRASPLiver PROPERTIES
+      PREFIX "") 
+    target_link_libraries (MotionDetectionXDGRASPLiver ${COMLIBS})
+    list (APPEND INST_TARGETS MotionDetectionXDGRASPLiver)
   endif()
 
   list (APPEND INST_TARGETS NuFFT CGSENSE GRASP EstimateSensitivities)

@@ -47,6 +47,10 @@ MP_TESTS ("tvop" "${TEST_CALL}")
 add_executable(t_econj t_econj.cpp)
 add_test(conj t_econj)
 
+add_executable(t_cov t_cov.cpp)
+add_test(cov t_cov)
+target_link_libraries (t_cov ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES})
+
 add_executable(t_emul t_emul.cpp)
 add_test(emul t_emul)
 

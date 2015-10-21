@@ -467,6 +467,17 @@ template<class T, paradigm P> inline Matrix<T,P>
 Matrix<T,P>::operator->* (const Matrix<T,P> &M) const {
     return gemm (*this, M);
 }
+template<class T> Matrix<std::complex<T> >
+gemm (const Matrix<T>& A, const Matrix<std::complex<T> >& B, char transa = 'N', char transb = 'N') {
+	Matrix<std::complex<T> > AC = A;
+	return gemm(AC,B,transa,transb);
+}
+template<class T> Matrix<std::complex<T> >
+gemm (const Matrix<std::complex<T> >& A, const Matrix<T>& B, char transa = 'N', char transb = 'N') {
+	Matrix<std::complex<T> > BC = B;
+	return gemm(A,BC,transa,transb);
+}
+
 
 /**
  * @brief             Matrix vector product A*x

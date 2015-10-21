@@ -24,6 +24,7 @@
 #include "Lapack.hpp"
 #include "Statistics.hpp"
 #include "Smooth.hpp"
+#include "LocalMaxima.hpp"
 
 typedef TUPLE< Matrix<float>, Matrix<cxfl>, Matrix<float> > eig_t;
 
@@ -41,7 +42,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Prepare() {
 
 codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
-	Matrix<cxfl> kdata = Get<cxfl>("kdata"), motion_signal_fft;
+	Matrix<cxfl>& meas = Get<cxfl>("meas"), motion_signal_fft;
 	Matrix<float> zip, tmp, si, covariance, pc, v, motion_signal, motion_signal_new;
 	Vector<float> f_x, res_peak, tmp_peak, res_peak_nor;
 	Vector<size_t> idx, tmp_idx, fr_idx;
@@ -49,52 +50,49 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	size_t nn, span = 5, pc_sel = 5;
 	eig_t et;
 
-	_nx = size(kdata,0);
-	_ntviews = size(kdata,1);
-	_nz = size(kdata,2);
-	_nc = size(kdata,3);
+	_nx = size(meas,0);
+	_nv = size(meas,1);
+	_nz = size(meas,2);
+	_nc = size(meas,3);
 
 	_ta = 95; // from raw data
-	_tr = _ta/_ntviews;
+	_tr = _ta/_nv;
 
-	_time = (linspace<float>(1,_ntviews,1)).Container()*_tr;
-
+	_time = _tr*linspace<float>(1,_nv,1);
 	// Frequency stamp (only for the delay enhanced part)
 	f_s = 1./_tr;
-	f_x = linspace<float>(0,f_s,_ntviews).Container();
+	f_x = linspace<float>(0,f_s,_nv).Container();
 	f_x = f_x - .5*f_s; // frequency after FFT of the motion signal
-	if (_ntviews/2%2==0)
-	    f_x += f_x[_ntviews/4];
+	if (_nv/2%2==0)
+	    f_x += f_x[_nv/4];
 
 	nn  = 400; // Interpolation along z dimension
-	// Take the central k-space points
-	kdata = squeeze(kdata(CR(_nx/2+1),CR(),CR(),CR()));
-	kdata = zpad(kdata,size(kdata,0),400,size(kdata,2));
-	zip = abs(fftshift(fft(squeeze(kdata),2),2));
-	zip = flipud(zip);
+	// Take the central k-space points (c++ indexing)
+	meas = squeeze(meas(CR(_nx/2),CR(),CR(),CR()));
+	meas = zpad(meas,size(meas,0),nn,size(meas,2));
+	meas = permute (meas,1,0,2);
 
+	zip = flipud(abs(fftshift(fft(meas,0),0)));
+	meas = permute (meas,1,0,2);
 	// Remove some edge slices
 	zip = zip(CR(21,size(zip,0)-40),CR(),CR());
 
 	// Normalization the projection profiles
-	for (size_t i=1; i < _nc; ++i) {
-	    tmp=squeeze(mean(zip(CR(),CR(),CR(i)),1));
-	    zip(R(),R(),R(i)) /= repmat(tmp,size(zip,0),1);
-	}
+	for (size_t i = 0; i < _nc; ++i)
+	    zip(R(),R(),R(i)) /= squeeze(repmat(mean(zip(CR(),CR(),CR(i)),0),size(zip,0),1));
 
 	// Do PCA or SVD in each coil element to extract motion signal
-	si  = permute (zip, 1, 3, 2);
-	si  = !resize(si, size(si,0)*_nc, _ntviews);
+	si  = permute (zip, 0, 2, 1);
+	si  = transpose(resize(si, size(si,0)*_nc, _nv));
 	covariance = cov(si);
-	et  = eig2(covariance);
-	pc  = GET<0>(et);
+	/*et  = eig2(covariance);
+	pc  = transpose(GET<0>(et));
 	v   = abs(GET<1>(et));
-	v   = diag(v);
 	idx = sort(-1*v);
-	v   = v(idx);
-	pc  = pc(CR(),CR(idx));
-	motion_signal = gemm(pc, si, 'C', 'C');
-
+	v   = v(CR(idx));
+	//pc  = pc(CR(),CR(idx));
+	motion_signal = si;//transpose(gemm(pc, si, 'C', 'C'));
+/*
 	for (size_t i = 0; i < pc_sel; ++i) {
 		motion_signal_new(R(),R(i)) = smooth (motion_signal(CR(),CR(i)),span,INTERP::AKIMA); // TODO: smooth
 		tmp = abs(fftshift(fft(motion_signal(CR(_ntviews/2+1,size(motion_signal,0)),CR(i))))); // TODO: fft (view)
@@ -133,9 +131,9 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	ftmax = feval(CR(ft,cfval(1)),CR(1,ntviews));
 
 	res_signal = res_signal-ftmax;
-
+*/
 	Add ("zip", zip);
-
+	Add ("motion_signal", covariance);
 	return codeare::OK;
 
 }

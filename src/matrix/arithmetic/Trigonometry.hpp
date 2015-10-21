@@ -70,15 +70,6 @@ namespace codeare {
             }
 
             template<class T> inline static Matrix<T>
-            atan2 (const Matrix<T>& m) {
-                Matrix<T> ret (m.Dim(), m.Res());
-                #pragma omp parallel for
-                for (int i = 0; i < numel(m); i++)
-                    ret[i] = std::atan2(m[i]);
-                return ret;
-            }
-
-            template<class T> inline static Matrix<T>
             sinh (const Matrix<T>& m) {
                 Matrix<T> ret (m.Dim(), m.Res());
                 #pragma omp parallel for

@@ -110,33 +110,40 @@ ifftshift (const Matrix<T>& m) NOEXCEPT {
 
 template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, const size_t& dim) NOEXCEPT {
 
-	Vector<size_t> in_dims = size(in);
-	size_t cent = floor((float)in_dims[dim]/2);
-	size_t ndims = numel(in_dims);
-	assert(ndims>=dim);
-
+	size_t howmany;
+	Matrix<T> ret, tmp;
 	Vector<size_t> order;
-	for (size_t i = 0; i < ndims; ++i)
-		order.PushBack(i);
-	order.Erase(order.begin()+dim);
-	order.Insert(order.begin(), dim);
+	size_t cent, ndims, n;
 
-	Matrix<T> ret = permute (in, order), tmp;
-	in_dims.Erase(in_dims.begin()+dim);
-	size_t howmany = prod(in_dims);
-
-	for (size_t i = 0; i < howmany; ++i) {
-		tmp = ret(CR(),CR(i));
-		std::rotate(tmp.Begin(), tmp.Begin()+cent, tmp.End());
-		ret(R(),R(i)) = tmp;
+	if (dim > 0) {
+		Vector<size_t> in_dims = size(in);
+		ndims = numel(in_dims);
+		assert(ndims>=dim);
+		for (size_t i = 0; i < ndims; ++i)
+			order.PushBack(i);
+		order.Erase(order.begin()+dim);
+		order.Insert(order.begin(), dim);
+		ret = permute (in, order);
+		in_dims.Erase(in_dims.begin()+dim);
+	} else {
+		ret = in;
 	}
 
-	for (size_t i = 0; i < ndims; ++i)
-		order[i] = i;
-	order.Erase(order.begin());
-	order.Insert(order.begin()+dim, 0);
+	howmany = numel(in)/size(in,0);
+	n = size(ret,0);
+	cent = floor((float)n/2);
+	for (auto i = ret.Begin(); i < ret.End(); i += size(ret,0))
+		std::rotate(i, i+cent, i+n);
 
-	return permute (ret, order);
+	if (dim>0) {
+		for (size_t i = 0; i < ndims; ++i)
+			order[i] = i;
+		order.Erase(order.begin());
+		order.Insert(order.begin()+dim, 0);
+		return permute (ret, order);
+	} else {
+		return ret;
+	}
 
 }
 

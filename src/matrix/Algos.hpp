@@ -383,28 +383,6 @@ size               (const MatrixType<T,MPI>& M, size_t d) {
 
 
 
-/**
- * @brief           Create new vector
- *                  and copy the data into the new vector. If the target
- *                  is bigger, the remaining space is set 0. If it is 
- *                  smaller data is truncted.
- * 
- * @param   M       The matrix to resize
- * @param   sc      New height
- * @param   sl      New width
- * @return          Resized vector
- */
-template <class T> inline static  Matrix<T>
-resize (const Matrix<T>& M, size_t sc, size_t sl) {
-
-	Vector<size_t> sz (2);
-	sz[0] = sc; sz[1] = sl;
-
-	return resize (M, sz);
-	
-}
-
-
 
 /**
  * @brief           Get vector of dimensions
@@ -622,19 +600,13 @@ m_min (const Matrix<T>& M) {
  *
  * @return          Non conjugate transpose
  */
-template <class T> inline static  Matrix<T>
-transpose (const Matrix<T>& M, bool c = false) {
-
+template <class T> inline static  Matrix<T> transpose (const Matrix<T>& M, bool c = false) {
 	assert (is2d(M));
-	size_t m = size(M,0), n = size(M,1), i, j;
-	Matrix<T> res (M);
-
-	for (j = 0; j < n; ++j)
-		for (i = 0; i < j; ++i)
-			swapd(res(j,i),res(i,j));
-	
+	Matrix<T> res (size(M,1),size(M,0));
+	for (size_t j = 0; j < size(res,1); ++j)
+		for (size_t i = 0; i < size(res,0); ++i)
+			res(i,j) = M(j,i);
 	return c ? conj(res) : res;
-
 }
 
 
@@ -662,8 +634,7 @@ ctranspose (const Matrix<T>& M) {
  * @param   sz      New length
  * @return          Resized vector
  */
-template <class T> inline static  Matrix<T>
-resize (const Matrix<T>& M, size_t sz) {
+template <class T> inline static  Matrix<T> resize (const Matrix<T>& M, size_t sz) {
 
 	Matrix<T> res (sz,1);
 	size_t copysz = std::min(numel(M), sz);
@@ -676,6 +647,26 @@ resize (const Matrix<T>& M, size_t sz) {
 	return res;
 	
 }
+
+
+/**
+ * @brief           Create new vector
+ *                  and copy the data into the new vector. If the target
+ *                  is bigger, the remaining space is set 0. If it is
+ *                  smaller data is truncted.
+ *
+ * @param   M       The matrix to resize
+ * @param   sc      New height
+ * @param   sl      New width
+ * @return          Resized vector
+ */
+template <class T> inline static  Matrix<T> resize (const Matrix<T>& M, size_t sc, size_t sl) {
+	assert(sl*sc==numel(M));
+	Matrix<T> ret(sc,sl);
+	ret.Container() = M.Container();
+	return ret;
+}
+
 
 /*
  * @brief           Create new vector
