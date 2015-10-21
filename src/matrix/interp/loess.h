@@ -38,9 +38,8 @@
 #ifndef LOESS_STATS_H
 #define LOESS_STATS_H
 #include <stdint.h>
-#include <Vector>
+#include <Vector.hpp>
 #include <memory>
-#include "throw.h"
 
 #define imin2(a,b) std::min(a,b)
 #define imax2(a,b) std::max(a,b)
@@ -63,7 +62,7 @@ public:
 
 	Vector<T> lowess(const RT *x, const T *y, size_t n) {
 
-	    if(n<1) THROW("n =" << n << "<1");
+	    assert(n>1);
 
 	    if(paranoid) {
 	    	/*
