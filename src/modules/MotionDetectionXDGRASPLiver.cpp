@@ -43,7 +43,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Prepare() {
 codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
 	Matrix<cxfl>& meas = Get<cxfl>("meas"), motion_signal_fft;
-	Matrix<float> zip, tmp, si, covariance, pc, v, motion_signal, motion_signal_new;
+	Matrix<float> zip, tmp, si, cv, pc, v, motion_signal, motion_signal_new;
 	Vector<float> f_x, res_peak, tmp_peak, res_peak_nor;
 	Vector<size_t> idx, tmp_idx, fr_idx;
 	float f_s, lf, hf;
@@ -84,14 +84,13 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	// Do PCA or SVD in each coil element to extract motion signal
 	si  = permute (zip, 0, 2, 1);
 	si  = transpose(resize(si, size(si,0)*_nc, _nv));
-	covariance = cov(si);
-	/*et  = eig2(covariance);
-	pc  = transpose(GET<0>(et));
+	cv  = cov(si);
+	et  = eig2(cv);
+	pc  = GET<0>(et);
 	v   = abs(GET<1>(et));
-	idx = sort(-1*v);
 	v   = v(CR(idx));
-	//pc  = pc(CR(),CR(idx));
-	motion_signal = si;//transpose(gemm(pc, si, 'C', 'C'));
+	pc  = pc(CR(),CR(idx));
+	motion_signal = transpose(gemm(pc, si, 'C', 'C'));
 /*
 	for (size_t i = 0; i < pc_sel; ++i) {
 		motion_signal_new(R(),R(i)) = smooth (motion_signal(CR(),CR(i)),span,INTERP::AKIMA); // TODO: smooth
@@ -133,7 +132,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	res_signal = res_signal-ftmax;
 */
 	Add ("zip", zip);
-	Add ("motion_signal", covariance);
+	Add ("motion_signal", pc);
 	return codeare::OK;
 
 }
