@@ -82,7 +82,7 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 
 	// Slice FFT
 	std::cout << "  Performing slice FFT ..." << std::endl;
-	meas = ifft(meas);
+	meas = ifft(meas,0,true);
 
 	// Removing top and bottom slices
 	meas = meas(CR(2,nz-3),CR(),CR(),CR()); nz -= 4;

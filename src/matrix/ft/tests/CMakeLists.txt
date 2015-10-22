@@ -29,6 +29,15 @@ endif()
 add_executable(t_dft t_dft.cpp)
 target_link_libraries (t_dft ${FFTW3_LIBRARIES})
 
+add_executable(t_fft t_fft.cpp)
+target_link_libraries (t_fft ${FFTW3_LIBRARIES} boost_system core)
+add_executable(t_ifft t_ifft.cpp)
+target_link_libraries (t_ifft ${FFTW3_LIBRARIES} boost_system core)
+add_executable(t_fftshift t_fftshift.cpp)
+target_link_libraries (t_fftshift ${FFTW3_LIBRARIES} boost_system core)
+add_executable(t_ifftshift t_ifftshift.cpp)
+target_link_libraries (t_ifftshift ${FFTW3_LIBRARIES} boost_system core)
+
 include (TestMacro)
 
 # if(${MATLAB_FOUND})

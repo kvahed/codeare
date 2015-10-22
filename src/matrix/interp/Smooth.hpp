@@ -23,7 +23,6 @@ smooth (const Matrix<T>& y, const size_t& span = 3, const INTERP::Method& method
 	typedef typename TypeTraits<T>::RT RT;
     Loess<T> l ((RT)span/(RT)size(y,0));
     Matrix<T> ret = l.lowess(y);
-    std::cout << size(ret) << std::endl;
 	return ret;
 }
 
