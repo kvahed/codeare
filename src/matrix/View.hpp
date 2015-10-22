@@ -151,7 +151,7 @@ public:
             return res;
     }
     
-    inline View& operator= (const Matrix<T>& M) {
+    template<class S> inline View& operator= (const Matrix<S>& M) {
         assert (Size() == M.Size());
         for (size_t i = 0; i < Size(); ++i)
             *(_pointers[i]) = M[i];

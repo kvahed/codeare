@@ -70,12 +70,23 @@ template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, const s
 
 }
 
-template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, const size_t& dim = 0) NOEXCEPT {
+template<class T> inline static Matrix<T>
+fftshift (const Matrix<T>& in, const size_t& dim = 0) NOEXCEPT {
 	return fftshift(in, dim, true);
 }
-
-template<class T> inline static Matrix<T> ifftshift (const Matrix<T>& in, const size_t& dim = 0) NOEXCEPT {
+template<class T> inline static Matrix<T>
+ifftshift (const Matrix<T>& in, const size_t& dim = 0) NOEXCEPT {
 	return fftshift(in, dim, false);
+}
+template<class T> inline static Matrix<T>
+fftshift (const View<T,true>& in, const size_t& dim = 0) NOEXCEPT {
+	Matrix<T> inn = in;
+	return fftshift(inn, dim, true);
+}
+template<class T> inline static Matrix<T>
+ifftshift (const View<T,true>& in, const size_t& dim = 0) NOEXCEPT {
+	Matrix<T> inn = in;
+	return fftshift(inn, dim, false);
 }
 
 
@@ -143,12 +154,33 @@ template<class T> inline static Matrix<T> fft (const Matrix<T>& in, size_t dim, 
 
 }
 
-template<class T> inline static Matrix<T> fft (const Matrix<T>& in, size_t dim = 0, bool shift = true) NOEXCEPT {
-	return fft(in, dim, shift, true);
+template<class T> inline static Matrix<typename TypeTraits<T>::CT>
+fft (const Matrix<T>& in, size_t dim = 0, bool shift = true) NOEXCEPT {
+	typedef typename TypeTraits<T>::CT CT;
+	return fft<CT>(in, dim, shift, true);
 }
-template<class T> inline static Matrix<T> ifft (const Matrix<T>& in, size_t dim = 0, bool shift = true) NOEXCEPT {
-	return fft(in, dim, shift, false);
+template<class T> inline static Matrix<typename TypeTraits<T>::CT>
+ifft (const Matrix<T>& in, size_t dim = 0, bool shift = true) NOEXCEPT {
+	typedef typename TypeTraits<T>::CT CT;
+	return fft<CT>(in, dim, shift, false);
 }
+template<class T> inline static Matrix<typename TypeTraits<T>::CT>
+fft (const View<T,true>& in, size_t dim = 0, bool shift = true) NOEXCEPT {
+	typedef typename TypeTraits<T>::CT CT;
+	Matrix<CT> inn(size(in));
+	for (size_t i =0; i < numel(inn); ++ i)
+		inn[i] = in[i];
+	return fft(inn, dim, shift, true);
+}
+template<class T> inline static Matrix<typename TypeTraits<T>::CT>
+ifft (const View<T,true>& in, size_t dim = 0, bool shift = true) NOEXCEPT {
+	typedef typename TypeTraits<T>::CT CT;
+	Matrix<CT> inn(size(in));
+	for (size_t i =0; i < numel(inn); ++ i)
+		inn[i] = in[i];
+	return fft(inn, dim, shift, false);
+}
+
 
 /**
  * @brief         Hann window
