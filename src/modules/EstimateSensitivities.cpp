@@ -119,7 +119,7 @@ codeare::error_code EstimateSensitivities::Process () {
     Matrix<cxfl> ktmp = repmat(ccomplex(kspace(CR(),CR(0)),kspace(CR(),CR(1))),1,nv);
     Matrix<cxfl> ga = repmat(resize(cpolar(1.0f,exp(linspace<float>(0,nv-1,nv)*NYUGA)),1,nv),nk,1);
     ktmp *= ga;
-    ktmp /= 2.*max(abs(ktmp));
+    ktmp /= 2.*mmax(abs(ktmp));
     ktmp  = resize(ktmp,nk*nv,1);
     kspace = Matrix<float>(nk*nv,2);
     kspace (R(),0) = real(ktmp);

@@ -286,7 +286,7 @@ public:
         if (dwt)
             im_dc  = *dwt * im_dc;
 
-        RT ma = max(abs(im_dc));
+        RT ma = max(abs(im_dc).Container());
         _tvw[0] *= ma;
         _tvw[1] *= ma;
 

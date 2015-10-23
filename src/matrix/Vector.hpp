@@ -8,6 +8,8 @@
 #ifndef __VECTOR_HPP__
 #define __VECTOR_HPP__
 
+#include "Complex.hpp"
+
 #include <iostream>
 #include <assert.h>
 #include <string.h>
@@ -130,6 +132,45 @@ public:
 	}
 #endif
 
+	template<class S> inline Vector<T>& operator= (const Matrix<S,P>& M) {
+		*this = M.Container();
+		return *this;
+	}
+
+	inline Vector<short> operator> (const Vector<T>& v) const {
+		assert(v._data.size() == _data.size());
+		Vector<short>ret (_data.size());
+		for (size_t i = 0; i < _data.size(); ++i)
+			ret[i] = CompTraits<T>::greater(_data[i], v[i]);
+		return ret;
+	}
+	inline Vector<short> operator> (const T& t) const {
+		Vector<short>ret (_data.size());
+		for (size_t i = 0; i < _data.size(); ++i)
+			ret[i] = CompTraits<T>::greater(_data[i], t);
+		return ret;
+	}
+	inline Vector<short> operator< (const Vector<T>& v) const {
+		assert(v._data.size() == _data.size());
+		Vector<short>ret (_data.size());
+		for (size_t i = 0; i < _data.size(); ++i)
+			ret[i] = CompTraits<T>::less(_data[i], v[i]);
+		return ret;
+	}
+	inline Vector<short> operator< (const T& t) const {
+		Vector<short>ret (_data.size());
+		for (size_t i = 0; i < _data.size(); ++i)
+			ret[i] = CompTraits<T>::less(_data[i], t);
+		return ret;
+	}
+	inline Vector<T> operator& (const Vector<T>& v) const {
+		assert(v._data.size() == _data.size());
+		Vector<T> ret(_data.size());
+		for (size_t i = 0; i < _data.size(); ++i)
+			ret[i] = _data[i]&v._data[i];
+		return ret;
+	}
+
 	/**
      * @brief Elementwise access (lhs)
      * @param  n  n-th element 
@@ -218,11 +259,6 @@ public:
 			_data.resize(n,val);
 		else
 			_data.assign(n,val);
-	}
-
-	inline Vector<T>& operator= (const Matrix<T,P>& M) {
-		*this = M.Container();
-		return *this;
 	}
 
     /**
@@ -350,11 +386,21 @@ template<class T> inline static T prod (const Vector<T>& ct) NOEXCEPT {
 template<class T> inline static T sum (const Vector<T>& ct) NOEXCEPT {
 	return std::accumulate(ct.begin(), ct.end(), (T)0);
 }
-template<class T> inline static T mmax (const Vector<T>& ct) NOEXCEPT {
+template<class T> inline static T max (const Vector<T>& ct) NOEXCEPT {
+	return *std::max_element(ct.begin(), ct.end());
+}
+template<class T> inline static T min (const Vector<T>& ct) NOEXCEPT {
 	return *std::max_element(ct.begin(), ct.end());
 }
 
-
 template<class T> inline static void swapd (T& x,T& y) NOEXCEPT {T temp=x; x=y; y=temp;}
+
+inline static Vector<size_t> find (const Vector<short>& v) {
+	Vector<size_t> ret;
+	for (size_t i = 0; i < v.size(); ++i)
+		if (v[i])
+			ret.PushBack(i);
+	return ret;
+}
 
 #endif /* Vector_HPP_ */

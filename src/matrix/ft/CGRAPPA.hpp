@@ -37,7 +37,7 @@ template<class T> inline static bool eq (const Matrix<T>& A, const Matrix<T>& B)
     return A.Container() == B.Container();
 }
 
-template<class T> inline static Vector<size_t> find (const Matrix<T>& M) NOEXCEPT {
+template<class T> inline static Vector<size_t> _find (const Matrix<T>& M) NOEXCEPT {
     Vector<size_t> ret;
     T zero_t = (T)0;
     for (size_t i = 0; i < M.Size(); ++i)
@@ -196,7 +196,7 @@ private:
         Matrix<T> under_sampled = zpad (data, data_size[0]+kernel_size[0]-1, data_size[1]+kernel_size[1]-1, m_nc);
         Matrix<T> dummy (kernel_size[0], kernel_size[1], m_nc);
         dummy (kernel_size[0]/2, kernel_size[0]/2, coil_num) = 1.;
-        size_t center = find(dummy)[0];
+        size_t center = _find(dummy)[0];
         Matrix<T> fully_sampled (data_size[0],data_size[1]);
         Matrix<T> kernel, kernels (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
         Matrix<short> pattern, patterns (kernel_size[0]*kernel_size[1]*m_nc,max_list_len);
@@ -235,7 +235,7 @@ private:
     inline Matrix<T> Solve (Matrix<short> pattern, size_t center) const NOEXCEPT {
         Vector<size_t> kernel_size = size(m_kernel);
         pattern (center) = 0;
-        Vector<size_t> pat_ind = find(pattern);
+        Vector<size_t> pat_ind = _find(pattern);
         Matrix<T> b = m_coil_calib (pat_ind,center);
         Matrix<T> A = m_coil_calib (pat_ind,pat_ind);
         RT lambda = m_lambda*norm(A,'F')/size(A,0);

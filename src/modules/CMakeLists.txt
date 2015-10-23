@@ -87,7 +87,7 @@ if (${NFFT3_FOUND})
       MotionDetectionXDGRASPLiver.hpp MotionDetectionXDGRASPLiver.cpp) 
     set_target_properties(MotionDetectionXDGRASPLiver PROPERTIES
       PREFIX "") 
-    target_link_libraries (MotionDetectionXDGRASPLiver ${COMLIBS})
+    target_link_libraries (MotionDetectionXDGRASPLiver ${COMLIBS} ${GSL_LIBRARIES}) 
     list (APPEND INST_TARGETS MotionDetectionXDGRASPLiver)
   endif()
 

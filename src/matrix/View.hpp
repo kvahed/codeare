@@ -183,10 +183,21 @@ public:
             M[i] = *(_pointers[i])/d[i];
         return M;
     }
+    inline virtual Matrix<T> operator/ (const T& t) const {
+        Matrix<T> M(_dim);
+        for (size_t i = 0; i < Size(); ++i)
+            M[i] = *(_pointers[i])/t;
+        return M;
+    }
     template<class S> inline MatrixType<T>& operator/= (const MatrixType<S>& d)  {
         assert (Size() == d.Size());
         for (size_t i = 0; i < Size(); ++i)
             *(_pointers[i]) /= d[i];
+        return *this;
+    }
+    inline MatrixType<T>& operator/= (const T& t)  {
+        for (size_t i = 0; i < Size(); ++i)
+            *(_pointers[i]) /= t;
         return *this;
     }
     

@@ -24,6 +24,7 @@
 #include "Lapack.hpp"
 #include "Statistics.hpp"
 #include "Smooth.hpp"
+#include "Interpolate.hpp"
 #include "LocalMaxima.hpp"
 
 typedef TUPLE< Matrix<float>, Matrix<cxfl>, Matrix<float> > eig_t;
@@ -42,10 +43,14 @@ codeare::error_code MotionDetectionXDGRASPLiver::Prepare() {
 
 codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
-	Matrix<cxfl>& meas = Get<cxfl>("meas"), motion_signal_fft;
-	Matrix<float> zip, tmp, si, cv, pc, v, motion_signal, motion_signal_new;
-	Vector<float> f_x, res_peak, tmp_peak, res_peak_nor;
-	Vector<size_t> idx, tmp_idx, fr_idx;
+	typedef float real_t;
+	typedef cxfl  complex_t;
+
+	Matrix<cxfl>& meas = Get<cxfl>("meas");
+	Matrix<float> zip, tmp, si, cv, pc, v, motion_signal, motion_signal_new, motion_signal_fft,
+		res_peak, tmp_peak, res_peak_nor, tt, res_signal, ftmax;
+	Vector<float> f_x;
+	Vector<size_t> idx, tmp_idx, fr_idx, ft_idx, peaks;
 	float f_s, lf, hf;
 	size_t nn, span = 5, pc_sel = 5;
 	eig_t et;
@@ -61,7 +66,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	_time = _tr*linspace<float>(1,_nv,1);
 	// Frequency stamp (only for the delay enhanced part)
 	f_s = 1./_tr;
-	f_x = linspace<float>(0,f_s,_nv).Container();
+	f_x = linspace<float>(0,f_s,_nv/2).Container();
 	f_x = f_x - .5*f_s; // frequency after FFT of the motion signal
 	if (_nv/2%2==0)
 	    f_x += f_x[_nv/4];
@@ -92,48 +97,44 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	pc  = pc(CR(),CR(idx));
 	motion_signal = transpose(gemm(pc, si, 'C', 'C'));
 
-	motion_signal_new = Matrix<float>(size(motion_signal,0),pc_sel);
-	motion_signal_fft = motion_signal_new;
+	motion_signal_new = Matrix<float>(_nv  ,pc_sel);
+	motion_signal_fft = Matrix<float>(_nv/2,pc_sel);
 	for (size_t i = 0; i < pc_sel; ++i) {
 		motion_signal_new(R(),R(i)) = smooth<float>(motion_signal(CR(),CR(i)),span); // TODO: smooth
-		tmp = abs(fftshift(fft(motion_signal(CR(_nv/2+1,size(motion_signal,0)),CR(i))))); // TODO: fft (view)
-		motion_signal_fft(R(),R(i)) = tmp/max(tmp(CR()));
+		tmp = abs(fftshift(fft(motion_signal(CR(_nv/2,size(motion_signal,0)-1),CR(i)),0,false))); // TODO: fft (view)
+		motion_signal_fft(R(),R(i)) = tmp/max(tmp.Container());
 	}
 	// Take the component with the highest peak in respiratory motion range
 	lf = 0.1; hf = 0.5; //Respiratory frequency range
-	//tmp_idx = find(f_x>hf);
-	//ft_idx=find(f_x<hf & f_x>lf);
-/*
-	tmp_peak = squeeze(motion_signal_fft(CR(tmp_idx),CR(),CR()));
-	res_peak = squeeze(motion_signal_fft(CR(fr_idx),CR(),CR()));
-
-	for (size_t i = 0; i < pc; ++i)
-		res_peak_nor(R(),R(i)) = res_peak(R(),R(i))/max(tmp_peak(CR(),CR(i)));
-
+	tmp_idx = find(f_x>hf);
+	fr_idx=find(f_x<hf & f_x>lf);
+	tmp_peak = squeeze(motion_signal_fft(CR(tmp_idx),CR()));
+	res_peak = squeeze(motion_signal_fft(CR(fr_idx),CR()));
+	res_peak_nor = res_peak;
+	for (size_t i = 0; i < pc_sel; ++i)
+		res_peak_nor(R(),R(i)) /= mmax(tmp_peak(CR(),CR(i)));
 	tt = max(res_peak_nor);
-	tt = find(tt==max(tt));
+	res_signal = motion_signal_new(CR(),CR(sort(tt,DESCENDING)[0]));
 
-	//Find the peak points
-	t = 10;
-	peaks = findpeaks (res_signal, 'MINPEAKDISTANCE', t);
+	// Find peaks
+	peaks = findLocalMaxima(res_signal);
+	Matrix<float> peaks_i(peaks.size()+2,1), peaks_v = peaks_i;
+	std::copy(peaks.begin(),peaks.end(),&peaks_i[1]);
+	peaks_i[peaks.size()+1] = _nv+1e-6;
+	peaks_v(R(1,peaks.size()),R(0)) = res_signal(CR(peaks),CR(0));
+	peaks_v[0] = peaks_v[1];
+	peaks_v[peaks.size()+1] = peaks_v[peaks.size()];
 
-	// Here the contrast enhancement curve need to be found and demodulated.
-	ft = fittype( 'smoothingspline' );
-	opts = fitoptions( ft );
-	opts.SmoothingParam = 0.015;
-
-	res_signal=motionsignal_new(CR(),CR(t));
-
-	curve_data = prepareCurveData(Peak_Index,double(Res_Signal(Peak_Index)));
-	fit_result = fit( curve_data.xData, curvedata.yData, ft, opts );
-
-	cfval = coeffvalues(fit_result);
-	ftmax = feval(CR(ft,cfval(1)),CR(1,ntviews));
-
+	// Interpolate peaks
+	ftmax = interp1(peaks_i, peaks_v, linspace<float>(0.,_nv-1,_nv));
 	res_signal = res_signal-ftmax;
-*/
-	Add ("zip", zip);
+
+	Add ("ftmax", ftmax);
 	Add ("motion_signal", motion_signal_new);
+	Add ("peaks_i", peaks_i);
+	Add ("peaks_v", peaks_v);
+	Add ("res_signal", res_signal);
+
 	return codeare::OK;
 
 }

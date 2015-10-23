@@ -145,10 +145,10 @@ public:
         
         if (m_have_b0) { // b0
             
-            m_min_t  = min(m_t);
-            m_max_t  = max(m_t);
-            m_min_b0 = min(m_b0);
-            m_max_b0 = max(m_b0);
+            m_min_t  = min(m_t.Container());
+            m_max_t  = max(m_t.Container());
+            m_min_b0 = min(m_b0.Container());
+            m_max_b0 = max(m_b0.Container());
             m_sigma  = 1.2;
             
             m_N.push_back(std::ceil(std::max(

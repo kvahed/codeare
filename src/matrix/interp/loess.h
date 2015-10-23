@@ -51,7 +51,7 @@ template<class T> class Loess {
 	typedef typename TypeTraits<T>::RT RT;
 
 public:
-	Loess (const RT& span = 2./3., const size_t& steps = 3, const RT& speed = -1.,
+	Loess (const RT& span = 2./3., const size_t& steps = 1, const RT& speed = -1.,
 			bool paranoid = false) : _span(span), _nsteps(steps), _speed(speed), _paranoid(paranoid) {};
 
 	~Loess() {};

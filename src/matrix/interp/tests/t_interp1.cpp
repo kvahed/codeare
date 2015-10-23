@@ -23,9 +23,7 @@ check_interp1 () {
 
 	yi = interp1(x, y, xi, INTERP::AKIMA);
 
-#ifdef VERBOSE
 	std::cout << yi << "\n";
-#endif
 
 	return true;
 

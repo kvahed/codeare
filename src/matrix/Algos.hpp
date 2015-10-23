@@ -511,40 +511,37 @@ round (const Matrix<T>& M) {
  * @param  M        Matrix
  * @return          Maximum
  */
-#ifdef max
-#undef max
-#endif
-template <class T> inline static  T
-m_max (const Matrix<T>& M) {
-
-	T mx = std::abs(M[0]);
-
-	for (size_t i = 0; i < numel(M); ++i)
-		if (std::abs(M[i]) > mx)
-			mx = M[i];
-
-	return mx;
-	
-}
-
-/**
- * @brief           Maximal element
- *
- * @param  M        Matrix
- * @return          Maximum
- */
 #ifdef _MSC_VER
 #  ifdef max
 #    undef max
 #  endif
 #endif
-template<class T> inline static T max (const Matrix<T>& M) {
+template<class T> inline static Matrix<T> max (const Matrix<T>& M, const size_t& dim = 0) {
+	Vector<size_t> dims = size(M); size_t m = dims[0]; size_t n = numel(M)/m;
+	dims[dim] = 1;
+	Matrix<T> ret(dims);
+	for (size_t i = 0; i < n; ++i)
+		ret[i] = *std::max_element(M.Begin()+i*m,M.Begin()+(i+1)*m);
+	return ret;
+}
+template<class T> inline static Matrix<T> max (const View<T,true>& M, const size_t& dim = 0) {
+	Vector<size_t> dims = size(M); size_t m = dims[0]; size_t n = numel(M)/m;
+	dims.Erase(dims.begin());
+	Matrix<T> ret(dims);
+	for (size_t j = 0; j < n; ++j) {
+		ret[j] = -1e20;
+		for (size_t i = 0; i < m; ++i)
+			if (ret[j]<=M[j*m+i]) ret[j] = M[j*m+i];
+	}
+	return ret;
+}
+template<class T> inline static T mmax (const Matrix<T>& M) {
 	return *std::max_element(M.Begin(), M.End());
 }
-template <class T> inline static T max (const View<T, true>& V) {
-	T mx = (T)INT_MIN;
+template <class T> inline static T mmax (const View<T, true>& V) {
+	T mx = -1e20;
 	for (size_t i = 0; i < numel(V); ++i)
-		if (V[i] > mx)
+		if (V[i] >= mx)
 			mx = V[i];
 	return mx;
 }
@@ -560,36 +557,35 @@ template <class T> inline static T max (const View<T, true>& V) {
 #    undef min
 #  endif
 #endif
-template <class T> inline static  T min (const Matrix<T>& M) {
+template<class T> inline static Matrix<T> min (const Matrix<T>& M, const size_t& dim = 0) {
+	Vector<size_t> dims = size(M); size_t m = dims[0]; size_t n = numel(M)/m;
+	dims[dim] = 1;
+	Matrix<T> ret(dims);
+	for (size_t i = 0; i < n; ++i)
+		ret[i] = *std::min_element(M.Begin()+i*m,M.Begin()+(i+1)*m);
+	return ret;
+}
+template<class T> inline static Matrix<T> min (const View<T,true>& M, const size_t& dim = 0) {
+	Vector<size_t> dims = size(M); size_t m = dims[0]; size_t n = numel(M)/m;
+	dims.Erase(dims.begin());
+	Matrix<T> ret(dims);
+	for (size_t j = 0; j < n; ++j) {
+		ret[j] = 1e20;
+		for (size_t i = 0; i < m; ++i)
+			if (ret[j]>=M[j*m+i]) ret[j] = M[j*m+i];
+	}
+	return ret;
+}
+template<class T> inline static T mmin (const Matrix<T>& M) {
 	return *std::min_element(M.Begin(), M.End());
 }
-template <class T> inline static  T min (const View<T, true>& M) {
-	T mn = (T)INT_MAX;
-	for (size_t i = 0; i < numel(M); ++i)
-		if (M[i] < mn)
-			mn= M[i];
-	return mn;
+template <class T> inline static T mmin (const View<T, true>& V) {
+	T mx = 1e-20;
+	for (size_t i = 0; i < numel(V); ++i)
+		if (V[i] <= mx)
+			mx = V[i];
+	return mx;
 }
-
-/**
- * @brief           Minimal element
- *
- * @param  M        Matrix
- * @return          Minimum
- */
-template <class T> inline static  T
-m_min (const Matrix<T>& M) {
-
-	T mn = abs(M[0]);
-
-	for (size_t i = 0; i < numel(M); ++i)
-		if (abs(M[i]) < mn)
-			mn = M[i];
-
-	return mn;
-	
-}
-
 
 #include "CX.hpp"
 /**

@@ -259,7 +259,10 @@ namespace VB {
                 _file.seekg (pos + _measdims[0]*sizeof(std::complex<float>));
             } else {
 #ifndef USE_IN_MATLAB
-                _file.read((char*)&_meas[_nmeas*_measdims[0]], mh.ushSamplesInScan*sizeof(std::complex<float>));
+               	_file.read ((char*)&_meas(0, mh.ushChannelId, mh.sLC[0], mh.sLC[1], mh.sLC[2],
+               			mh.sLC[3], mh.sLC[4], mh.sLC[5], mh.sLC[6], mh.sLC[7], mh.sLC[8], mh.sLC[9],
+						mh.sLC[10], mh.sLC[11], mh.sLC[12], mh.sLC[13]),
+						mh.ushSamplesInScan*sizeof(std::complex<float>));
 #else
                 std::vector<std::complex<float> >buf (mh.ushSamplesInScan);
                 _file.read((char*)&buf[0], mh.ushSamplesInScan*sizeof(std::complex<float>));
