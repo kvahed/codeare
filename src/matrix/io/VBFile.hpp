@@ -56,7 +56,7 @@ namespace VB {
         VBFile (const std::string& fname, const IOMode mode, const Params& params, const bool verbosity) :
         	SyngoFile(fname, mode, params, verbosity), _nnoise (0), _nmeas(0), _nctnorm(0), _data_len(0),
 			_meas_r(0), _meas_i(0), _noise_r(0), _noise_i(0), _sync_r(0), _lines(0), _nrtfb(0),
-			_rtfb_r(0), _rtfb_i(0), _digested(false) {
+			_rtfb_r(0), _rtfb_i(0), _digested(false), _tend(0), _tstart(0) {
             _file.seekg (0, _file.end);
             _data_len = _file.tellg();
             _file.seekg (0, _file.beg);
@@ -100,8 +100,10 @@ namespace VB {
             }
             
             while (true) {
+
                 _file.read ((char*)&mh, MEAS_HEADER_LEN);
                 fflush(stdout);
+
                 if (bit_set(mh.aulEvalInfoMask[0], ACQEND)) {
                     prtmsg ("     Hit ACQEND\n");
                     break;
@@ -112,17 +114,15 @@ namespace VB {
                     tmp1 = ((tmp2-tmp1)%32);
                     if (tmp1)
                         _file.seekg (tmp2 + 32-tmp1);
-                } else if (bit_set(mh.aulEvalInfoMask[0], NOISEADJSCAN)){
+                } else if (bit_set(mh.aulEvalInfoMask[0], NOISEADJSCAN)) {
                     ParseNoise (mh);
-                } else if (bit_set(mh.aulEvalInfoMask[0], RTFEEDBACK)){
+                } else if (bit_set(mh.aulEvalInfoMask[0], RTFEEDBACK)) {
                     if (_nrtfb == 0 && !_rtfb_r) {
                         _rtfbdims[0] = mh.ushSamplesInScan;
                         _rtfbdims[1] = mh.ushUsedChannels;
                     }
                     ParseFeedback (mh);
                 } else if (bit_set(mh.aulEvalInfoMask[1], ONLINE)) {
-                    //if ( _meas_r && mh.ushChannelId == 0)
-                      //  prtmsg ("        %10d: CT_NORMALIZE\n", mh.ulScanCounter);
                     ParseCTNormalize (mh);
                 } else {
                     if (_nmeas == 0 && !_meas_r) {
@@ -131,14 +131,14 @@ namespace VB {
                     }
                     ParseMeas (mh);
                 }
-                if (_meas_r && i%1000==0){
+                if (_meas_r && i%1000==0) {
                     //waitbar_update ((double)i/(double)_lines, h, wbm);
                 }
                 
                 ++i;
             }
             _lines = i;
-            if (_meas_r){
+            if (_meas_r) {
                 //waitbar_destroy(h);
             }
             prtmsg ("     done - wtime %s", st.Format().c_str());
@@ -146,7 +146,12 @@ namespace VB {
             if (!_meas_r) {
                 _measdims = _raise_one (_measdims);
                 _rtfbdims = _raise_one (_rtfbdims);
+                _measdims[5] = (_measdims[5]-_cent_par)*2;
+                _ta = 2.e-3*(_tend-_tstart);
+                _tr = _ta/_nmeas;
                 prtmsg ("     Found %d lines (data: (Meas: %d, Noise: %d, Sync: %d))\n", i, _nmeas, _nnoise, _syncdims[1]);
+                prtmsg ("     Centres: column: %zu, line: %zu, partition: %zu\n", _cent_col, _cent_lin, _cent_par);
+                prtmsg ("     Measurement TA: %.1fs, TR: %.2fms\n", _ta, 1000.*_tr);
                 prtmsg ("       Data dims ( ");
                 for (size_t i = 0; i < 15; ++i)
                     prtmsg ("%d ", _measdims[i]);
@@ -255,6 +260,14 @@ namespace VB {
         inline void ParseMeas (const MeasHeader& mh) {
             size_t pos (_file.tellg());
             if (!_meas_r) {
+            	if (_nmeas == 0 && mh.ushChannelId == 0) {
+            		_tstart   = mh.ulTimeStamp;
+            		_cent_par = mh.ushKSpaceCentrePartitionNo;
+            		_cent_lin = mh.ushKSpaceCentreLineNo;
+            		_cent_col = mh.ushKSpaceCentreColumn;
+            	} else if (bit_set(mh.aulEvalInfoMask[0], LASTSCANINMEAS) && mh.ushChannelId == 0) {
+            		_tend = mh.ulTimeStamp;
+            	}
                 _measdims = _max (_measdims, mh.sLC);
                 _file.seekg (pos + _measdims[0]*sizeof(std::complex<float>));
             } else {
@@ -296,9 +309,11 @@ namespace VB {
         }
 
         bool _digested;
-        size_t _data_len;
+        size_t _data_len, _cent_par, _cent_lin, _cent_col;
+
         unsigned _nmeas, _nrtfb, _nnoise, _lines, _nctnorm;
-        float *_meas_r, *_meas_i, *_rtfb_r, *_rtfb_i, *_noise_r, *_noise_i, *_sync_r;
+        float *_meas_r, *_meas_i, *_rtfb_r, *_rtfb_i, *_noise_r, *_noise_i, *_sync_r, _ta, _tr;
+        size_t _tend, _tstart;
         std::vector<uint32_t> _syncdims, _measdims, _rtfbdims, _noisedims;
 #ifndef USE_IN_MATLAB
         Matrix<raw> _meas, _rtfb, _ctnorm;

@@ -682,6 +682,23 @@ template <class T> inline static Matrix<T> resize (const Matrix<T>& M, const siz
 	return res;
 }
 
+/*
+ * @brief           Create new vector
+ *                  and copy the data into the new vector. If the target
+ *                  is bigger, the remaining space is set 0. If it is
+ *                  smaller data is truncted.
+ *
+ * @param   M       The matrix to resize
+ * @param   sz      New length
+ * @return          Resized vector
+ */
+template <class T> inline static Matrix<T> resize (const Matrix<T>& M, const size_t& s0,
+		const size_t& s1, const size_t& s2, const size_t& s3) {
+	assert (numel(M)==s0*s1*s2*s3);
+	Matrix<T> res (s0,s1,s2,s3);
+	res.Container() = M.Container();
+	return res;
+}
 
 /**
  * @brief           Create new matrix with the new dimensions 

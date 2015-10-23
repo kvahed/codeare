@@ -46,7 +46,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	typedef float real_t;
 	typedef cxfl  complex_t;
 
-	Matrix<cxfl>& meas = Get<cxfl>("meas");
+	Matrix<cxfl> meas = Get<cxfl>("meas");
 	Matrix<float> zip, tmp, si, cv, pc, v, motion_signal, motion_signal_new, motion_signal_fft,
 		res_peak, tmp_peak, res_peak_nor, tt, res_signal, ftmax;
 	Vector<float> f_x;
@@ -55,6 +55,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	size_t nn, span = 5, pc_sel = 5;
 	eig_t et;
 
+	std::cout << "  Incoming: " << size(meas) << std::endl;
 	_nx = size(meas,0);
 	_nv = size(meas,1);
 	_nz = size(meas,2);
@@ -62,6 +63,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
 	_ta = 95; // from raw data
 	_tr = _ta/_nv;
+
+	std::cout << "  Analyse channel motion data ..." << std::endl;
 
 	_time = _tr*linspace<float>(1,_nv,1);
 	// Frequency stamp (only for the delay enhanced part)
@@ -82,10 +85,12 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	// Remove some edge slices
 	zip = zip(CR(21,size(zip,0)-40),CR(),CR());
 
+	std::cout << "  Mormalise projection profiles ..." << std::endl;
 	// Normalization the projection profiles
 	for (size_t i = 0; i < _nc; ++i)
 	    zip(R(),R(),R(i)) /= squeeze(repmat(mean(zip(CR(),CR(),CR(i)),0),size(zip,0),1));
 
+	std::cout << "  Perform coil-wise PCA ..." << std::endl;
 	// Do PCA or SVD in each coil element to extract motion signal
 	si  = permute (zip, 0, 2, 1);
 	si  = transpose(resize(si, size(si,0)*_nc, _nv));
@@ -97,6 +102,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	pc  = pc(CR(),CR(idx));
 	motion_signal = transpose(gemm(pc, si, 'C', 'C'));
 
+	std::cout << "  Choose component with highest respiratory amplitude ..." << std::endl;
 	motion_signal_new = Matrix<float>(_nv  ,pc_sel);
 	motion_signal_fft = Matrix<float>(_nv/2,pc_sel);
 	for (size_t i = 0; i < pc_sel; ++i) {
@@ -104,6 +110,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 		tmp = abs(fftshift(fft(motion_signal(CR(_nv/2,size(motion_signal,0)-1),CR(i)),0,false))); // TODO: fft (view)
 		motion_signal_fft(R(),R(i)) = tmp/max(tmp.Container());
 	}
+
+	std::cout << "  Detect peaks ..." << std::endl;
 	// Take the component with the highest peak in respiratory motion range
 	lf = 0.1; hf = 0.5; //Respiratory frequency range
 	tmp_idx = find(f_x>hf);
@@ -126,6 +134,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	peaks_v[peaks.size()+1] = peaks_v[peaks.size()];
 
 	// Interpolate peaks
+	std::cout << "  CSPLINE fit peaks ..." << std::endl;
 	ftmax = interp1(peaks_i, peaks_v, linspace<float>(0.,_nv-1,_nv));
 	res_signal = res_signal-ftmax;
 

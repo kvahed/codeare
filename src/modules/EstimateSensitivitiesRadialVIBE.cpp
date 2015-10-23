@@ -38,11 +38,11 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Init () {
 
 codeare::error_code EstimateSensitivitiesRadialVIBE::Prepare () {
 	Matrix<cxfl> sensitivities;
-	Matrix<float> kspace, weights;
+	Matrix<float> kspace, weights, sos;
 	Add<cxfl>("sensitivities", sensitivities);
 	Add<float>("kspace", kspace);
 	Add<float>("weights", weights);
-
+	Add<float>("sos", sos);
 	return codeare::OK;
 }
 
@@ -71,6 +71,7 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
 	Matrix<float>& kspace = Get<float>("kspace");
 	Matrix<float>& weights = Get<float>("weights");
+	Matrix<float>& sos = Get<float>("sos");
 	std::cout << "  Incoming: " << size(meas) << std::endl;
 	size_t nk = size(meas,0), nv = size(meas,1), nz = size(meas,2), nc = size(meas,3);
 
@@ -85,7 +86,8 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	meas = ifft(meas,0,true);
 
 	// Removing top and bottom slices
-	meas = meas(CR(2,nz-3),CR(),CR(),CR()); nz -= 4;
+    size_t pad = (nz - _image_space_dims[2])/2;
+    meas = meas(CR(7,nz-8),CR(),CR(),CR()); nz = size(meas,0);
 	std::cout << "  Slice direction reduced: " << size(meas) << std::endl;
 
 	// Permute for global coil nufft [1 2 0 3]
@@ -107,17 +109,28 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	Matrix<float> density_comp = zeros<float>(nk,1);
 	Vector<NFFT<cxfl> > FTOP;
 	Params p;
-	p["nk"] = 4096; p["imsz"] = _image_space_dims; p["3rd_dim_cart"] = _cart_3rd_dim;
+	p["nk"] = nv*nk; p["imsz"] = _image_space_dims; p["3rd_dim_cart"] = _cart_3rd_dim;
 	p["m"] = (size_t)1; p["alpha"] = 1.0f; p["epsilon"]=7.e-4f; p["maxit"]=(size_t)2;
-	FTOP.PushBack(NFFT<cxfl>(p));
-	FTOP[0].KSpace(kspace(CR(),CR(0,4095)));
-	FTOP[0].Weights(weights(CR(0,4095)));
+    size_t threads = 1;
+    for (size_t i = 0; i < threads; ++i) {
+        FTOP.PushBack(NFFT<cxfl>(p));
+        FTOP[i].KSpace(kspace);
+        FTOP[i].Weights(weights);
+    }
 	std::cout << FTOP[0] << std::endl;
-
+    
 	// Channel NuFFTs
 	std::cout << "  NuFFTing ..." << std::endl;
-	sensitivities (R(),R(),R(),R(0)) = FTOP[0] ->* meas(CR(0,4095),CR(),CR(0));
-	Add<float>("weights", weights);
+#pragma omp parallel for default (shared) num_threads(threads)
+    for (size_t i = 0; i < nc; ++i) 
+        sensitivities (R(),R(),R(),R(i)) = FTOP[omp_get_thread_num()] ->* meas(CR(),CR(),CR(i));
+
+    sos = sum(abs(sensitivities),3)+1.e-9;
+    
+    for (size_t i = 0; i < nc; ++i)
+        sensitivities (R(),R(),R(),R(i)) /= sos;
+
+    meas = resize(meas,nk,nv,nz,nc);
 
 	return codeare::OK;
 }
