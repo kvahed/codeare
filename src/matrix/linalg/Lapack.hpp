@@ -50,22 +50,32 @@ template<class T> inline static eig_t<T> eigs (const Matrix<T>& A, char jobz = '
 	typedef typename TypeTraits<T>::CT cplx;
 	char uplo = 'U';
 	assert((TypeTraits<T>::IsReal()&&issymmetric(A)) || (TypeTraits<T>::IsComplex()&&ishermitian(A)));
+	int n = size(A,0), lwork = -1, liwork = -1, lrwork=-1, info;
 	eig_t<T> e;
-	const int n = size(A,0);
-	Vector<T> work(1);
 	Vector<real> rwork(1), w(n);
-	int lwork = -1, liwork = -1, lrwork=-1;
 	Vector<int> iwork(1);
-	int info;
+	Vector<T> work(1);
 	e.lv = A;
 	e.ev = Matrix<cplx>(n,1);
 	LapackTraits<T>::syevd (jobz, uplo, n, e.lv.Container(), w, work, lwork, rwork, lrwork, iwork, liwork, info);
-	assert(info==0);
 	lwork = 1.5*TypeTraits<T>::Real(work[0]); work.resize(lwork);
 	liwork = iwork[0]; iwork.resize(liwork);
 	lrwork = (TypeTraits<T>::IsComplex()) ? rwork[0] : 1;
 	rwork.resize(lrwork);
 	LapackTraits<T>::syevd (jobz, uplo, n, e.lv.Container(), w, work, lwork, rwork, lrwork, iwork, liwork, info);
+    if (info > 0) {
+        printf ("\nERROR**: X(SY/HE)VD: ");
+        if (jobz=='N') {
+        	printf ("the algorithm failed to converge; %dth off-diagonal elements of an intermediate "
+        			"tridiagonal form did not converge to zero;\n\n", info);
+        } else {
+        	printf ("the algorithm failed to compute an eigenvalue while working on the submatrix "
+        			"lying in rows and columns %d through %d.", info/(n+1), info%(n+1));
+
+        }
+    } else if (info < 0) {
+        printf ("\nERROR - XGEEV: the %d-th argument had an illegal value.\n\n", -info);
+    }
 	for (size_t i = 0; i < n; ++i)
 		e.ev[i] = w[i];
 	return e;
