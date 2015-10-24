@@ -12,6 +12,10 @@ add_executable (t_eig t_eig.cpp)
 target_link_libraries (t_eig ${COMMON_LIBS})
 add_test (eig t_eig)
 
+add_executable (t_eigs t_eigs.cpp)
+target_link_libraries (t_eigs ${COMMON_LIBS})
+add_test (eigs t_eigs)
+
 add_executable (t_svd t_svd.cpp)
 target_link_libraries (t_svd ${COMMON_LIBS})
 add_test (svd t_svd)

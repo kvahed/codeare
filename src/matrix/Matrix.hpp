@@ -575,12 +575,12 @@ public:
      */
     inline const T& At (const size_t& x, const size_t& y) const {
         MATRIX_ASSERT2(x<_dim[0],INDEX_EXCEEDS_DIMENSION,x,_dim[0]);
-        MATRIX_ASSERT2(y<_dim[1],INDEX_EXCEEDS_DIMENSION,y,_dim[1]);
+        MATRIX_ASSERT2(y==0 || y<_dim[1],INDEX_EXCEEDS_DIMENSION,y,_dim[1]);
         return _M[x + _dim[0]*y];
     }
     inline       T& At (const size_t& x, const size_t& y)       {
         MATRIX_ASSERT2(x<_dim[0],INDEX_EXCEEDS_DIMENSION,x,_dim[0]);
-        MATRIX_ASSERT2(y<_dim[1],INDEX_EXCEEDS_DIMENSION,x,_dim[0]);
+        MATRIX_ASSERT2(y==0 || y<_dim[1],INDEX_EXCEEDS_DIMENSION,y,_dim[1]);
         return _M[x + _dim[0]*y];
     }
 

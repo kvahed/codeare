@@ -98,6 +98,14 @@ add_test(friends t_friends)
 add_executable(t_squeeze t_squeeze.cpp)
 add_test(squeeze t_squeeze)
 
+add_executable(t_issymmetric t_issymmetric.cpp)
+add_test(issymmetric t_issymmetric)
+target_link_libraries(t_issymmetric ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+
+add_executable(t_ishermitian t_ishermitian.cpp)
+add_test(ishermitian t_ishermitian)
+target_link_libraries(t_ishermitian ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+
 if (${HAS_CXX11_CONDITIONAL}) 
 add_executable(t_colon t_colon.cpp)
 add_test(colon t_colon)

@@ -25,6 +25,7 @@
 #include "Algos.hpp"
 #include "Creators.hpp"
 #include "LapackTraits.hpp"
+#include "Symmetry.hpp"
 #include "CX.hpp"
 
 #ifdef HAVE_CXX11_TUPLE
@@ -37,6 +38,38 @@
 #define GET boost::get
 #endif
 
+
+template<class T> struct eig_t {
+	Matrix<T> lv;
+	Matrix<typename TypeTraits<T>::CT> ev;
+	Matrix<T> rv;
+};
+
+template<class T> inline static eig_t<T> eigs (const Matrix<T>& A, char jobz = 'N') {
+	typedef typename TypeTraits<T>::RT real;
+	typedef typename TypeTraits<T>::CT cplx;
+	char uplo = 'U';
+	assert((TypeTraits<T>::IsReal()&&issymmetric(A)) || (TypeTraits<T>::IsComplex()&&ishermitian(A)));
+	eig_t<T> e;
+	const int n = size(A,0);
+	Vector<T> work(1);
+	Vector<real> rwork(1), w(n);
+	int lwork = -1, liwork = -1, lrwork=-1;
+	Vector<int> iwork(1);
+	int info;
+	e.lv = A;
+	e.ev = Matrix<cplx>(n,1);
+	LapackTraits<T>::syevd (jobz, uplo, n, e.lv.Container(), w, work, lwork, rwork, lrwork, iwork, liwork, info);
+	assert(info==0);
+	lwork = TypeTraits<T>::Real(work[0]); work.resize(lwork);
+	liwork = iwork[0]; iwork.resize(liwork);
+	lrwork = (TypeTraits<T>::IsComplex()) ? rwork[0] : 1;
+	rwork.resize(lrwork);
+	LapackTraits<T>::syevd (jobz, uplo, n, e.lv.Container(), w, work, lwork, rwork, lrwork, iwork, liwork, info);
+	for (size_t i = 0; i < n; ++i)
+		e.ev[i] = w[i];
+	return e;
+}
 
 
 /**
@@ -62,12 +95,11 @@
  * @param  jobvr  Compute right vectors ('N'/'V')
  * @return        Eigenvectors and values
  */
-template <class T> inline TUPLE< Matrix<T>, Matrix<typename TypeTraits<T>::CT>, Matrix<T> >
-eig2 (const Matrix<T>& m, char jobvl = 'V', char jobvr = 'N') {
+template <class T> inline static eig_t<T> eigu (const Matrix<T>& m, char jobvl = 'V', char jobvr = 'N') {
     
     typedef typename TypeTraits<T>::CT CT;
     typedef typename TypeTraits<T>::RT RT;
-    TUPLE< Matrix<T>, Matrix<CT>, Matrix<T> > ret;
+    eig_t<T> ret;
     
     assert (jobvl == 'N' || jobvl =='V');
     assert (jobvr == 'N' || jobvr =='V');
@@ -81,14 +113,11 @@ eig2 (const Matrix<T>& m, char jobvl = 'V', char jobvr = 'N') {
     int    lwork = -1;
     
     // Appropriately resize the output
-    GET<1>(ret) = Matrix<CT>(N,1);
+    ret.ev = Matrix<CT>(N,1);
     
-    if (jobvl == 'V') GET<0>(ret) = Matrix<T>(N,N);
-    if (jobvr == 'V') GET<2>(ret) = Matrix<T>(N,N);
+    if (jobvl == 'V') ret.lv = Matrix<T>(N,N);
+    if (jobvr == 'V') ret.rv = Matrix<T>(N,N);
     
-    Matrix<CT>& ev = GET<1>(ret);
-    Matrix<T> &lv = GET<0>(ret), &rv = GET<2>(ret);
-
     // Workspace for real numbers
     Vector<RT> rwork = (TypeTraits<T>::IsComplex()) ?
     		Vector<RT>(2*N) : Vector<RT>(1);
@@ -98,18 +127,18 @@ eig2 (const Matrix<T>& m, char jobvl = 'V', char jobvr = 'N') {
     
     // Need copy. Lapack destroys A on output.
     Matrix<T> a = m;
-    
+
     // Work space query
-    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ev.Ptr(), lv.Ptr(),
-    		ldvl, rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
+    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ret.ev.Ptr(), ret.lv.Ptr(),
+    		ldvl, ret.rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
     
     // Initialize work space
     lwork = (int) TypeTraits<T>::Real (work[0]);
     work.resize(lwork);
     
     // Actual Eigenvalue computation
-    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ev.Ptr(), lv.Ptr(),
-    		ldvl, rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
+    LapackTraits<T>::geev (jobvl, jobvr, N, a.Ptr(), lda, ret.ev.Ptr(), ret.lv.Ptr(),
+    		ldvl, ret.rv.Ptr(), ldvr, work.ptr(), lwork, rwork.ptr(), info);
 
     if (info > 0)
         printf ("\nERROR - XGEEV: the QR algorithm failed to compute all the\n "
@@ -122,8 +151,15 @@ eig2 (const Matrix<T>& m, char jobvl = 'V', char jobvr = 'N') {
     return ret;
     
 }
-template<class T> inline Matrix<typename TypeTraits<T>::CT> eig (const Matrix<T>& m) {
-    return GET<1>(eig2<T>(m,'N','N'));
+template<class T> inline static eig_t<T> eig2 (const Matrix<T>& A, char c1 = 'V', char c2 = 'N') {
+	if ((TypeTraits<T>::IsReal()&&issymmetric(A)) || (TypeTraits<T>::IsComplex()&&ishermitian(A)))
+		return eigs (A, c1);
+	else
+		return eigu (A, c1, c2);
+}
+template<class T> inline static Matrix<typename TypeTraits<T>::CT> eig (const Matrix<T>& m) {
+	eig_t<T> e = eig2<T>(m, 'N', 'N');
+	return e.ev;
 }
 
 

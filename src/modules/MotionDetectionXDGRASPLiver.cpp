@@ -27,8 +27,6 @@
 #include "Interpolate.hpp"
 #include "LocalMaxima.hpp"
 
-typedef TUPLE< Matrix<float>, Matrix<cxfl>, Matrix<float> > eig_t;
-
 using namespace RRStrategy;
 
 codeare::error_code MotionDetectionXDGRASPLiver::Init() {
@@ -53,7 +51,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	Vector<size_t> idx, tmp_idx, fr_idx, ft_idx, peaks;
 	float f_s, lf, hf;
 	size_t nn, span = 5, pc_sel = 5;
-	eig_t et;
+	eig_t<float> et;
 
 	std::cout << "  Incoming: " << size(meas) << std::endl;
 	_nx = size(meas,0);
@@ -96,8 +94,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	si  = transpose(resize(si, size(si,0)*_nc, _nv));
 	cv  = cov(si);
 	et  = eig2(cv);
-	pc  = GET<0>(et);
-	v   = abs(GET<1>(et));
+	pc  = et.lv;
+	v   = real(et.ev);
 	v   = v(CR(idx));
 	pc  = pc(CR(),CR(idx));
 	motion_signal = transpose(gemm(pc, si, 'C', 'C'));

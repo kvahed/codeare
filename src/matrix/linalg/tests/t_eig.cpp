@@ -9,20 +9,35 @@
 template<class T> void eig_check () {
 
     Matrix<T> A = rand<T>(4,4);
-    typedef typename TypeTraits<T>::CT CT;
-    TUPLE <Matrix<T>,Matrix<CT>,Matrix<T> > lev;
+    eig_t<T> e;
 
 #ifdef VERBOSE    
     std::cout << "A =\n" << A << std::endl;
 #endif
     
-    lev = eig2<T> (A, 'V', 'V');
+    e = eig2<T> (A, 'V', 'V');
     
 #ifdef VERBOSE    
-    std::cout << "ev=\n" << GET<1>(lev) << std::endl;
+    std::cout << "ev=\n" << e.ev << std::endl;
     std::cout << "ev=\n" << eig(A) << std::endl;
-    std::cout << "lv=\n" << GET<0>(lev) << std::endl;
-    std::cout << "rv=\n" << GET<2>(lev) << std::endl;
+    std::cout << "lv=\n" << e.lv << std::endl;
+    std::cout << "rv=\n" << e.rv << std::endl;
+    std::cout << std::endl;
+#endif
+
+    A = gemm(A,A,'N','C');
+
+#ifdef VERBOSE    
+    std::cout << "A*A' =\n" << A << std::endl;
+#endif
+    
+    e = eig2<T> (A, 'V', 'V');
+    
+#ifdef VERBOSE    
+    std::cout << "ev=\n" << e.ev << std::endl;
+    std::cout << "ev=\n" << eig(A) << std::endl;
+    std::cout << "lv=\n" << e.lv << std::endl;
+    std::cout << "rv=\n" << e.rv << std::endl;
     std::cout << std::endl;
 #endif
 

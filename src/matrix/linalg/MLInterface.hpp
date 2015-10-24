@@ -168,6 +168,18 @@ extern "C" {
 	void F77name(zgemm,ZGEMM)  (const char *transa, const char *transb, const int *m, const int *n, const int *k,
                                 const   cxdb *alpha, const   cxdb *a, const int *lda, const   cxdb *b, const int *ldb,
                                 const   cxdb *beta,   cxdb *c, const int *ldc);
+
+    void F77name(ssyevd,SSYEVD) (const char* jobz, const char* uplo, const int* n, float* a, const int* lda,
+    							   float* w, float* work, const int* lwork, int* iwork, const int* liwork, int* info);
+    void F77name(dsyevd,DSYEVD) (const char* jobz, const char* uplo, const int* n, double* a, const int* lda,
+    							   double* w, double* work, const int* lwork, int* iwork, const int* liwork, int* info);
+    void F77name(cheevd,CHEEVD) (const char* jobz, const char* uplo, const int* n, cxfl* a, const int* lda,
+    							 float* w, cxfl* work, const int* lwork, float* rwork, const int* lrwork, int* iwork,
+								 const int* liwork, int* info);
+    void F77name(zheevd,ZHEEVD) (const char* jobz, const char* uplo, const int* n, cxdb* a, const int* lda,
+			 	 	 	 	 	 double* w, cxdb* work, const int* lwork, double* rwork, const int* lrwork, int* iwork,
+								 const int* liwork, int* info);
+
     
 }	
 
@@ -182,6 +194,7 @@ extern "C" {
 #define SNRM2  F77name(snrm2,SNRM2)
 #define SLANGE F77name(slange,SLANGE)
 #define SGEEV  F77name(sgeev,SGEEV)
+#define SSYEVD F77name(ssyevd,SSYEVD)
 #define SGETRF F77name(sgetrf,SGETRF)
 #define SGETRI F77name(sgetri,SGETRI) 
 #define SPOTRF F77name(spotrf,SPOTRF)
@@ -195,6 +208,7 @@ extern "C" {
 #define DNRM2  F77name(dnrm2,DNRM2)
 #define DLANGE F77name(dlange,DLANGE)
 #define DGEEV  F77name(dgeev,DGEEV)
+#define DSYEVD F77name(dsyevd,DSYEVD)
 #define DGETRF F77name(dgetrf,DGETRF)
 #define DGETRI F77name(dgetri,DGETRI) 
 #define DPOTRF F77name(dpotrf,DPOTRF)
@@ -209,6 +223,7 @@ extern "C" {
 #define SCNRM2 F77name(scnrm2,SCNRM2)
 #define CLANGE F77name(clange,CLANGE)
 #define CGEEV  F77name(cgeev,CGEEV)
+#define CHEEVD F77name(cheevd,CHEEVD)
 #define CGETRF F77name(cgetrf,CGETRF)
 #define CGETRI F77name(cgetri,CGETRI) 
 #define CPOTRF F77name(cpotrf,CPOTRF)
@@ -223,6 +238,7 @@ extern "C" {
 #define DZNRM2 F77name(dznrm2,DZNRM2)
 #define ZLANGE F77name(zlange,ZLANGE)
 #define ZGEEV  F77name(zgeev,ZGEEV)
+#define ZHEEVD F77name(zheevd,ZHEEVD)
 #define ZGETRF F77name(zgetrf,ZGETRF)
 #define ZGETRI F77name(zgetri,ZGETRI) 
 #define ZPOTRF F77name(zpotrf,ZPOTRF)

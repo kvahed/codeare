@@ -78,27 +78,25 @@ struct LapackTraits<float> {
     geev (const char& jvl, const char &jvr, const int& n, Type *a, const int& lda,
           CType *w, Type *vl, const int& ldvl, Type *vr, const int& ldvr, Type *work,
           const int& lwork, Type* rwork, int& info) {
-        
-        Type* dwr = (Type*) malloc (n * sizeof(Type));
-        Type* dwi = (Type*) malloc (n * sizeof(Type));
-        
-        SGEEV (&jvl, &jvr, &n, a, &lda, dwr, dwi, vl, &ldvl, vr, &ldvr, work, &lwork,
+        Vector<Type> dwr (n), dwi (n);
+        SGEEV (&jvl, &jvr, &n, a, &lda, &dwr[0], &dwi[0], vl, &ldvl, vr, &ldvr, work, &lwork,
                &info);
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
             w[i] = CType (dwr[i], dwi[i]);
-        
-        free (dwr);
-        free (dwi);
-        
     }
     
+    inline static void
+    syevd (const char& jobz, const char &uplo, const int& n, Vector<Type>& a,
+          Vector<Type>& w, Vector<Type>& work, const int& lwork, Vector<Type>& rwork, const int& lrwork,
+		  Vector<int>& iwork, const int& liwork, int& info) {
+        SSYEVD (&jobz, &uplo, &n, &a[0], &n, &w[0], &work[0], &lwork, &iwork[0], &liwork, &info);
+    }
+
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
           Vector<Type>& work, const int& lwork, int& info) {
-        
         SGELS (&trans, &m, &n, &nrhs, &a[0], &lda, &b[0], &ldb, &work[0], &lwork, &info);
-        
     }
     
     inline static void 
@@ -182,22 +180,20 @@ struct LapackTraits<double> {
     geev (const char& jvl, const char &jvr, const int& n, Type *a, const int& lda,
           CType *w, Type *vl, const int& ldvl, Type *vr, const int& ldvr, Type *work,
           const int& lwork, Type* rwork, int& info) {
-        
-        Type* dwr = (Type*) malloc (n * sizeof(Type));
-        Type* dwi = (Type*) malloc (n * sizeof(Type));
-        
-        DGEEV (&jvl, &jvr, &n, a, &lda, dwr, dwi, vl, &ldvl, vr, &ldvr, work, &lwork,
+        Vector<Type> dwr (n), dwi (n);
+        DGEEV (&jvl, &jvr, &n, a, &lda, &dwr[0], &dwi[0], vl, &ldvl, vr, &ldvr, work, &lwork,
                &info);
-        
-        for (int i = 0; i < n; i++) {
+        for (size_t i = 0; i < n; i++)
             w[i] = CType (dwr[i], dwi[i]);
-        }
-        
-        free (dwr);
-        free (dwi);
-        
     }
     
+    inline static void
+    syevd (const char& jobz, const char &uplo, const int& n, Vector<Type>& a,
+          Vector<Type>& w, Vector<Type>& work, const int& lwork, Vector<Type>& rwork, const int& lrwork,
+		  Vector<int>& iwork, const int& liwork, int& info) {
+        DSYEVD (&jobz, &uplo, &n, &a[0], &n, &w[0], &work[0], &lwork, &iwork[0], &liwork, &info);
+    }
+
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
@@ -309,14 +305,19 @@ struct LapackTraits<cxfl> {
         CGEEV  (&jvl, &jvr, &n, a, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork,
                 rwork, &info);
     }
-    
+
+    inline static void
+    syevd (const char& jobz, const char &uplo, const int& n, Vector<Type>& a,
+          Vector<RType>& w, Vector<Type>& work, const int& lwork, Vector<RType>& rwork, const int& lrwork,
+		  Vector<int>& iwork, const int& liwork, int& info) {
+        CHEEVD (&jobz, &uplo, &n, &a[0], &n, &w[0], &work[0], &lwork, &rwork[0], &lrwork, &iwork[0], &liwork, &info);
+    }
+
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
           Vector<Type>& work, const int& lwork, int& info) {
-        
         CGELS (&trans, &m, &n, &nrhs, &a[0], &lda, &b[0], &ldb, &work[0], &lwork, &info);
-        
     }
     
     inline static void 
@@ -417,17 +418,21 @@ struct LapackTraits<cxdb> {
     geev (const char& jvl, const char& jvr, const int& n, Type *a, const int& lda,
           Type *w, Type *vl, const int& ldvl, Type *vr, const int& ldvr, cxdb *work,
           const int& lwork, double* rwork, int& info) {
-        ZGEEV  (&jvl, &jvr, &n, a, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork,
-                rwork, &info);
+        ZGEEV  (&jvl, &jvr, &n, a, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
     }
     
+    inline static void
+	syevd (const char& jobz, const char &uplo, const int& n, Vector<Type>& a,
+	   Vector<RType>& w, Vector<Type>& work, const int& lwork, Vector<RType>& rwork, const int& lrwork,
+	  Vector<int>& iwork, const int& liwork, int& info) {
+	 ZHEEVD (&jobz, &uplo, &n, &a[0], &n, &w[0], &work[0], &lwork, &rwork[0], &lrwork, &iwork[0], &liwork, &info);
+	}
+
     inline static void
     gels (const char& trans, const int& m, const int& n, const int& nrhs,
           Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
           Vector<Type>& work, const int& lwork, int& info) {
-        
         ZGELS (&trans, &m, &n, &nrhs, &a[0], &lda, &b[0], &ldb, &work[0], &lwork, &info);
-        
     }
     
     inline static void 
@@ -437,134 +442,6 @@ struct LapackTraits<cxdb> {
         ZGESDD (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
     }
     
-    
 };
 
 
-template <>
-struct LapackTraits<unsigned char> {
-
-    typedef unsigned char Type;
-    typedef unsigned char RType;
-    typedef unsigned char CType;
-
-    inline static void
-    potrf (const char& uplo, const int& n, Type* a, const int& lda, int& info) {}
-
-    inline static void
-	getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {}
-
-    inline static void
-    potri (const char* uplo, int*n, void *a, int* lda, int*info) {}
-
-    inline static void
-    getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
-           int& info) {}
-
-    inline static void
-    gemv (const char& trans, const int& m, const int& n, const Type& alpha, const Type *a,
-          const int& lda, const Type *x, const int& incx, const Type& beta, Type *y,
-          const int& incy) {}
-
-    inline static void
-    gemm (const char& transa, const char& transb, const int& m, const int& n, const int& k,
-          const Type& alpha, const Type *a, const int& lda, const Type *b, const int& ldb,
-          const Type& beta, Type *c, const int& ldc) {}
-
-    inline static Type
-    nrm2 (const int N, const Type *X, const int incX) {
-    	return false;
-    }
-
-    inline static Type
-    dot  (const int N, const Type *X, const int incX, const Type *Y,
-          const int incY, void* res) {
-    	return false;
-    }
-
-    inline static Type
-    dotc (const int N, const Type *X, const int incX, const Type *Y,
-          const int incY, void* res) {
-    	return false;
-    }
-
-    inline static void
-    geev (const char& jvl, const char &jvr, const int& n, Type *a, const int& lda,
-          CType *w, Type *vl, const int& ldvl, Type *vr, const int& ldvr, Type *work,
-          const int& lwork, Type* rwork, int& info) {}
-
-    inline static void
-    gels (const char& trans, const int& m, const int& n, const int& nrhs,
-          Matrix<Type>& a, const int& lda, Matrix<Type>& b, const int& ldb,
-          Vector<Type>& work, const int& lwork, int& info) {}
-
-    inline static void
-    gesdd (const char& jobz, const int& m, const int& n, Type *a, const int& lda, RType *s,
-           Type* u, const int& ldu, Type *vt, const int& ldvt, Type* work, const int& lwork,
-           RType *rwork, int* iwork, int& info) {}
-
-};
-
-template <>
-struct LapackTraits<size_t> {
-
-    typedef size_t Type;
-    typedef size_t RType;
-    typedef size_t CType;
-
-    inline static void
-    potrf (const char& uplo, const int& n, Type* a, const int& lda, int& info) {}
-
-    inline static void
-	getrf (const int& m, const int& n, Type *a, const int& lda, int* ipiv, int& info) {}
-
-    inline static void
-    potri (const char* uplo, int*n, void *a, int* lda, int*info) {}
-
-    inline static void
-    getri (const int& n, Type *a, const int& lda, int *ipiv, Type *work, const int& lwork,
-           int& info) {}
-
-    inline static void
-    gemv (const char& trans, const int& m, const int& n, const Type& alpha, const Type *a,
-          const int& lda, const Type *x, const int& incx, const Type& beta, Type *y,
-          const int& incy) {}
-
-    inline static void
-    gemm (const char& transa, const char& transb, const int& m, const int& n, const int& k,
-          const Type& alpha, const Type *a, const int& lda, const Type *b, const int& ldb,
-          const Type& beta, Type *c, const int& ldc) {}
-
-    inline static Type
-    nrm2 (const int N, const Type *X, const int incX) {
-    	return false;
-    }
-
-    inline static Type
-    dot  (const int N, const Type *X, const int incX, const Type *Y,
-          const int incY, void* res) {
-    	return false;
-    }
-
-    inline static Type
-    dotc (const int N, const Type *X, const int incX, const Type *Y,
-          const int incY, void* res) {
-    	return false;
-    }
-
-    inline static void
-    geev (const char& jvl, const char &jvr, const int& n, Type *a, const int& lda,
-          CType *w, Type *vl, const int& ldvl, Type *vr, const int& ldvr, Type *work,
-          const int& lwork, Type* rwork, int& info) {}
-
-    inline static void
-    gels (const char& trans, const int& m, const int& n, const int& nrhs,
-          Matrix<Type>& a, const int& lda, Matrix<Type>&, const int& ldb,
-          Vector<Type>& work, const int& lwork, int& info) {}
-
-    inline static void
-    gesdd (const char& jobz, const int& m, const int& n, Type *a, const int& lda, RType *s,
-           Type* u, const int& ldu, Type *vt, const int& ldvt, Type* work, const int& lwork,
-           RType *rwork, int* iwork, int& info) {}
-
-};
