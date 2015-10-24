@@ -96,8 +96,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	et  = eig2(cv);
 	pc  = et.lv;
 	v   = real(et.ev);
-	v   = v(CR(idx));
-	pc  = pc(CR(),CR(idx));
+	v   = flipud(v);
+	pc  = fliplr(pc); //(CR(),CR(idx));
 	motion_signal = transpose(gemm(pc, si, 'C', 'C'));
 
 	std::cout << "  Choose component with highest respiratory amplitude ..." << std::endl;

@@ -45,7 +45,7 @@ template<class T> struct eig_t {
 	Matrix<T> rv;
 };
 
-template<class T> inline static eig_t<T> eigs (const Matrix<T>& A, char jobz = 'N') {
+template<class T> inline static eig_t<T> eigs (const Matrix<T>& A, char jobz = 'V') {
 	typedef typename TypeTraits<T>::RT real;
 	typedef typename TypeTraits<T>::CT cplx;
 	char uplo = 'U';
@@ -61,7 +61,7 @@ template<class T> inline static eig_t<T> eigs (const Matrix<T>& A, char jobz = '
 	e.ev = Matrix<cplx>(n,1);
 	LapackTraits<T>::syevd (jobz, uplo, n, e.lv.Container(), w, work, lwork, rwork, lrwork, iwork, liwork, info);
 	assert(info==0);
-	lwork = TypeTraits<T>::Real(work[0]); work.resize(lwork);
+	lwork = 1.5*TypeTraits<T>::Real(work[0]); work.resize(lwork);
 	liwork = iwork[0]; iwork.resize(liwork);
 	lrwork = (TypeTraits<T>::IsComplex()) ? rwork[0] : 1;
 	rwork.resize(lrwork);
