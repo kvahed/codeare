@@ -72,7 +72,7 @@ public:
      * @see Range(const int& begin)
      */
 	inline void Reset (const int& begin) {
-		_idx.Clear();
+		_idx.clear();
 		HandleSingleInput (begin);
 	}
 
@@ -81,7 +81,7 @@ public:
      * @see Range(const int& begin, const int& end)
      */
     inline void Reset (const int& begin, const int& end) {
-		_idx.Clear();
+		_idx.clear();
 		HandleTwoInputs (begin, end);
 	}
 
@@ -90,7 +90,7 @@ public:
      * @see Range(const int& begin, const int& stride, const int& end)
      */
     inline void Reset (const int& begin, const int& stride, const int& end) {
-		_idx.Clear();
+		_idx.clear();
 		HandleThreeInputs (begin, stride, end);
 	}
 

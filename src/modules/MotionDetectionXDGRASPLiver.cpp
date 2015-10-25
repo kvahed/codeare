@@ -50,7 +50,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	Vector<float> f_x;
 	Vector<size_t> idx, tmp_idx, fr_idx, ft_idx, peaks;
 	float f_s, lf, hf;
-	size_t nn, span = 5, pc_sel = 5;
+	size_t nn, span = 10, min_dist=5, pc_sel = 5;
 	eig_t<float> et;
 
 	std::cout << "  Incoming: " << size(meas) << std::endl;
@@ -123,12 +123,12 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	res_signal = motion_signal_new(CR(),CR(sort(tt,DESCENDING)[0]));
 
 	// Find peaks
-	peaks = findLocalMaxima(res_signal);
+	peaks = findLocalMaxima(res_signal,min_dist);
 	Matrix<float> peaks_i(peaks.size()+2,1), peaks_v = peaks_i;
 	std::copy(peaks.begin(),peaks.end(),&peaks_i[1]);
 	peaks_i[peaks.size()+1] = _nv+1e-6;
 	peaks_v(R(1,peaks.size()),R(0)) = res_signal(CR(peaks),CR(0));
-	peaks_v[0] = peaks_v[1];
+	peaks_v[0] = max(res_signal[0],peaks_v[1]);
 	peaks_v[peaks.size()+1] = peaks_v[peaks.size()];
 
 	// Interpolate peaks

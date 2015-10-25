@@ -48,8 +48,8 @@ codeare::error_code CoilCompression::Process () {
 	// Permute coils to outermost dimension
 	Vector<size_t> dims = size(meas), order(dims.size());
 	std::iota(order.begin(), order.end(), 0);
-	order.Erase(order.begin()+_coil_dimension);
-	order.PushBack(_coil_dimension);
+	order.erase(order.begin()+_coil_dimension);
+	order.push_back(_coil_dimension);
 	std::cout << "  Incoming: " << dims << std::endl;
 	meas = permute(meas,order);
 	dims = size(meas);

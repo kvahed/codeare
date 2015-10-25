@@ -42,7 +42,7 @@ template<class T> inline static Vector<size_t> _find (const Matrix<T>& M) NOEXCE
     T zero_t = (T)0;
     for (size_t i = 0; i < M.Size(); ++i)
         if (M[i]!=zero_t)
-            ret.PushBack(i);
+            ret.push_back(i);
     return ret;
 }
 

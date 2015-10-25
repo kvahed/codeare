@@ -526,7 +526,7 @@ template<class T> inline static Matrix<T> max (const Matrix<T>& M, const size_t&
 }
 template<class T> inline static Matrix<T> max (const View<T,true>& M, const size_t& dim = 0) {
 	Vector<size_t> dims = size(M); size_t m = dims[0]; size_t n = numel(M)/m;
-	dims.Erase(dims.begin());
+	dims.erase(dims.begin());
 	Matrix<T> ret(dims);
 	for (size_t j = 0; j < n; ++j) {
 		ret[j] = -1e20;
@@ -567,7 +567,7 @@ template<class T> inline static Matrix<T> min (const Matrix<T>& M, const size_t&
 }
 template<class T> inline static Matrix<T> min (const View<T,true>& M, const size_t& dim = 0) {
 	Vector<size_t> dims = size(M); size_t m = dims[0]; size_t n = numel(M)/m;
-	dims.Erase(dims.begin());
+	dims.erase(dims.begin());
 	Matrix<T> ret(dims);
 	for (size_t j = 0; j < n; ++j) {
 		ret[j] = 1e20;
@@ -1125,7 +1125,7 @@ template <class T> inline static Matrix<T> permute (const Matrix<T>& M, const Ve
 																		 d[12],d[13],d[14],d[15]);
 
     // Remove trailing singelton dimensions
-    sn.Erase(sn.begin()+ndnew, sn.begin()+16);
+    sn.erase(sn.begin()+ndnew, sn.begin()+16);
 	return resize(res, sn);
 
 																		

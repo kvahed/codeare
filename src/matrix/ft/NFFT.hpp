@@ -99,7 +99,7 @@ public:
 
         if (m_3rd_dim_cart) { // 3rd dimension is Cartesian
         	m_ncart = m_N.back();
-        	m_N.PopBack();
+        	m_N.pop_back();
         }
         m_n       = m_N;
         
@@ -370,9 +370,9 @@ public:
         RT* tmpt;
         
         if (m_have_b0)
-            N.PopBack();
+            N.pop_back();
         if (m_3rd_dim_cart && m_ncart > 1) // Cartesian FT 3rd dim
-        	N.PushBack(m_ncart);
+        	N.push_back(m_ncart);
 
         Matrix<T> out (N);
         for (size_t i = 0; i < m_ncart; ++i) {

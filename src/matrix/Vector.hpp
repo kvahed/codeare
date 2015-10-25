@@ -266,20 +266,17 @@ public:
      * @param t  Element to be added
      */
 	inline void push_back (const T& t) NOEXCEPT { _data.push_back(t);}
-	inline iterator Erase (const iterator& i) NOEXCEPT { return _data.erase(i);}
-	inline iterator Erase (const iterator& start, const iterator& end) NOEXCEPT { return _data.erase(start, end);}
-	inline void Insert (const iterator& i, const T& val) NOEXCEPT { _data.insert(i, val);}
+	inline void pop_back () NOEXCEPT { _data.pop_back();}
+	inline iterator erase (const iterator& i) NOEXCEPT { return _data.erase(i);}
+	inline iterator erase (const iterator& start, const iterator& end) NOEXCEPT { return _data.erase(start, end);}
+	inline void insert (const iterator& i, const T& val) NOEXCEPT { _data.insert(i, val);}
 
 
-	inline void Clear() NOEXCEPT {_data.clear();}
+	inline void clear() NOEXCEPT {_data.clear();}
 
-	inline bool Empty() const NOEXCEPT {return _data.empty();}
-
+	inline bool empty() const NOEXCEPT {return _data.empty();}
 	inline bool operator== (const Vector<T>& other) const NOEXCEPT {return _data == other._data;}
 	inline bool operator!= (const Vector<T>& other) const NOEXCEPT {return _data != other._data;}
-
-	inline void PopBack () NOEXCEPT {_data.pop_back();}
-	inline void PushBack (const T& t) NOEXCEPT {_data.push_back(t);}
 	inline Vector<T>& operator/= (const T& t) NOEXCEPT {
 		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind2nd(std::divides<T>(),t));
 		return *this;
@@ -350,26 +347,22 @@ template<class T> inline T ct_real (const std::complex<T> ct) NOEXCEPT {return c
 template<class T> inline T ct_imag (const std::complex<T> ct) NOEXCEPT {return ct.imag();}
 template<class T> inline T ct_conj (const T ct) NOEXCEPT {return std::conj(ct);}
 
-template<class T> inline static Vector<T>
-real (const Vector<std::complex<T> >& c) NOEXCEPT {
+template<class T> inline static Vector<T> real (const Vector<std::complex<T> >& c) NOEXCEPT {
 	Vector<T> res (c.size());
 	std::transform (c.begin(), c.end(), res.begin(), ct_real<T>);
 	return res;
 }
-template<class T> inline static Vector<T>
-imag (const Vector<std::complex<T> >& c) NOEXCEPT {
+template<class T> inline static Vector<T> imag (const Vector<std::complex<T> >& c) NOEXCEPT {
 	Vector<T> res (c.size());
 	std::transform (c.begin(), c.end(), res.begin(), ct_imag<T>);
 	return res;
 }
-template<class T> inline static Vector<T>
-conj (const Vector<T>& c) NOEXCEPT {
+template<class T> inline static Vector<T> conj (const Vector<T>& c) NOEXCEPT {
 	Vector<T> res (c.size());
 	std::transform (c.begin(), c.end(), res.begin(), ct_conj<T>);
 	return res;
 }
-template<class T> inline std::ostream&
-operator<< (std::ostream& os, const Vector<T>& ct) NOEXCEPT {
+template<class T> inline std::ostream& operator<< (std::ostream& os, const Vector<T>& ct) NOEXCEPT {
     for (typename Vector<T>::const_iterator it = ct.begin(); it != ct.end(); ++it)
         os << *it << " ";
     return os;
@@ -399,7 +392,7 @@ inline static Vector<size_t> find (const Vector<short>& v) {
 	Vector<size_t> ret;
 	for (size_t i = 0; i < v.size(); ++i)
 		if (v[i])
-			ret.PushBack(i);
+			ret.push_back(i);
 	return ret;
 }
 

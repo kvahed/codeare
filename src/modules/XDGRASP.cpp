@@ -201,7 +201,7 @@ codeare::error_code XDGRASP::Process () {
 
 XDGRASP::XDGRASP() :
 	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_ft_type(0),
-	m_noise(0.), m_test_case(0) {}
+	m_noise(0.), m_test_case(0), csx(0), m_dim4(1), m_dim5(1), m_ndnz(1) {}
 
 
 XDGRASP::~XDGRASP() {}

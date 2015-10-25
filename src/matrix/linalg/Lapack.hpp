@@ -57,11 +57,15 @@ template<class T> inline static eig_t<T> eigs (const Matrix<T>& A, char jobz = '
 	Vector<T> work(1);
 	e.lv = A;
 	e.ev = Matrix<cplx>(n,1);
+
+	// Workspace query
 	LapackTraits<T>::syevd (jobz, uplo, n, e.lv.Container(), w, work, lwork, rwork, lrwork, iwork, liwork, info);
 	lwork = 1.5*TypeTraits<T>::Real(work[0]); work.resize(lwork);
 	liwork = iwork[0]; iwork.resize(liwork);
 	lrwork = (TypeTraits<T>::IsComplex()) ? rwork[0] : 1;
 	rwork.resize(lrwork);
+
+	// Eigen solving
 	LapackTraits<T>::syevd (jobz, uplo, n, e.lv.Container(), w, work, lwork, rwork, lrwork, iwork, liwork, info);
     if (info > 0) {
         printf ("\nERROR**: X(SY/HE)VD: ");
@@ -76,6 +80,7 @@ template<class T> inline static eig_t<T> eigs (const Matrix<T>& A, char jobz = '
     } else if (info < 0) {
         printf ("\nERROR - XGEEV: the %d-th argument had an illegal value.\n\n", -info);
     }
+
 	for (size_t i = 0; i < n; ++i)
 		e.ev[i] = w[i];
 	return e;

@@ -127,7 +127,7 @@ namespace io {
 			}
 
 			if (is_complex(t)) {
-				dims.PopBack();
+				dims.pop_back();
 				--ndim;
 			}
 

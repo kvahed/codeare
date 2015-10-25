@@ -79,7 +79,7 @@ public:
 		assert (ndim == 2 || ndim == 3);
 
 		// We expect sensitivities O (X,Y,Z,CH)
-		dims.PopBack();
+		dims.pop_back();
 		std::cout << "  fft dims: " << dims << std::endl;
 
 		TikhonovMat(params);

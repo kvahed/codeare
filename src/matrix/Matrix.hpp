@@ -193,7 +193,7 @@ public:
      */
 	inline Matrix (const Vector<size_t>& dim) {
 	    _dim = dim;
-		MATRIX_ASSERT(!_dim.Empty(), DIMS_VECTOR_EMPTY);
+		MATRIX_ASSERT(!_dim.empty(), DIMS_VECTOR_EMPTY);
         MATRIX_ASSERT(std::find(dim.begin(),dim.end(),size_t(0))==dim.end(),
         		DIMS_VECTOR_CONTAINS_ZEROS);
         _res.resize(_dim.size(),1.0);
@@ -209,7 +209,7 @@ public:
 	inline Matrix (const size_t* dims, const size_t ndims) {
 	    _dim.resize(ndims);
 	    std::copy(dims, dims+ndims, _dim.begin());
-		MATRIX_ASSERT(!_dim.Empty(), DIMS_VECTOR_EMPTY);
+		MATRIX_ASSERT(!_dim.empty(), DIMS_VECTOR_EMPTY);
         MATRIX_ASSERT(std::find(_dim.begin(),_dim.end(),size_t(0))==_dim.end(),
         		DIMS_VECTOR_CONTAINS_ZEROS);
         _res.resize(_dim.size(),1.0);
@@ -225,7 +225,7 @@ public:
      */
 	inline explicit Matrix (const Vector<size_t>& dim, const Vector<float>& res) {
 		_dim = dim;
-        MATRIX_ASSERT(!_dim.Empty(),DIMS_VECTOR_EMPTY);
+        MATRIX_ASSERT(!_dim.empty(),DIMS_VECTOR_EMPTY);
         MATRIX_ASSERT(std::find(dim.begin(),dim.end(),size_t(0))==dim.end(),
             DIMS_VECTOR_CONTAINS_ZEROS);
         MATRIX_ASSERT(dim.size()==res.size(),
@@ -381,7 +381,7 @@ public:
 #ifdef HAVE_CXX11_CONDITIONAL
     inline Matrix (RHSView& v) {
 		_dim = v._dim;
-        MATRIX_ASSERT(!_dim.Empty(),DIMS_VECTOR_EMPTY);
+        MATRIX_ASSERT(!_dim.empty(),DIMS_VECTOR_EMPTY);
         MATRIX_ASSERT(std::find(_dim.begin(),_dim.end(),size_t(0))==_dim.end(),
         		DIMS_VECTOR_CONTAINS_ZEROS);
         Allocate();
@@ -1186,9 +1186,9 @@ public:
      * @brief           Purge data and free RAM.
      */
     inline void Clear() NOEXCEPT {
-    	_dim.Clear();
-        _dsz.Clear();
-        _res.Clear();
+    	_dim.clear();
+        _dsz.clear();
+        _res.clear();
         _M.Clear();
     }
 

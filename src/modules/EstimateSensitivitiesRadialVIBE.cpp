@@ -104,7 +104,7 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	// FT operators
 	std::cout << "  Building NuFFT operator(s) ..." << std::endl;
 	Vector<size_t> sens_dims = _image_space_dims;
-	sens_dims.PushBack(nc);
+	sens_dims.push_back(nc);
 	sensitivities = Matrix<cxfl>(sens_dims);
 	Matrix<float> density_comp = zeros<float>(nk,1);
 	Vector<NFFT<cxfl> > FTOP;
@@ -113,7 +113,7 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	p["m"] = (size_t)1; p["alpha"] = 1.0f; p["epsilon"]=7.e-4f; p["maxit"]=(size_t)2;
     size_t threads = 1;
     for (size_t i = 0; i < threads; ++i) {
-        FTOP.PushBack(NFFT<cxfl>(p));
+        FTOP.push_back(NFFT<cxfl>(p));
         FTOP[i].KSpace(kspace);
         FTOP[i].Weights(weights);
     }

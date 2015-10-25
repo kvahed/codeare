@@ -137,7 +137,7 @@ public:
         for (auto it = _range.begin(); it != _range.end();) {
             _dim.push_back(it->Size());
             if(it->IsSingleton())
-                it = _range.Erase(it);
+                it = _range.erase(it);
             else
                 ++it;
         }

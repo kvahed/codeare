@@ -155,8 +155,8 @@ public:
         m_fwd_out = Matrix<T> (m_nx[2],cart_dim,m_nx[1],m_dim4,m_dim5); // nodes x slices x channels
         Vector<size_t> tmp = size(m_sm);
         if (m_nmany > 1) {
-            tmp.PushBack(m_dim4);
-            tmp.PushBack(m_dim5);
+            tmp.push_back(m_dim4);
+            tmp.push_back(m_dim5);
         }
 		m_bwd_out = Matrix<T> (tmp);               // size of sensitivity maps
 		

@@ -43,11 +43,11 @@ template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, const s
 		ndims = numel(in_dims);
 		assert(ndims>=dim);
 		for (size_t i = 0; i < ndims; ++i)
-			order.PushBack(i);
-		order.Erase(order.begin()+dim);
-		order.Insert(order.begin(), dim);
+			order.push_back(i);
+		order.erase(order.begin()+dim);
+		order.insert(order.begin(), dim);
 		ret = permute (in, order);
-		in_dims.Erase(in_dims.begin()+dim);
+		in_dims.erase(in_dims.begin()+dim);
 	} else {
 		ret = in;
 	}
@@ -61,8 +61,8 @@ template<class T> inline static Matrix<T> fftshift (const Matrix<T>& in, const s
 	if (dim > 0) {
 		for (size_t i = 0; i < ndims; ++i)
 			order[i] = i;
-		order.Erase(order.begin());
-		order.Insert(order.begin()+dim, 0);
+		order.erase(order.begin());
+		order.insert(order.begin()+dim, 0);
 		return permute (ret, order);
 	} else {
 		return ret;
@@ -104,11 +104,11 @@ template<class T> inline static Matrix<T> fft (const Matrix<T>& in, size_t dim, 
 		assert(ndims>=dim);
 
 		for (size_t i = 0; i < ndims; ++i)
-			order.PushBack(i);
-		order.Erase(order.begin()+dim);
-		order.Insert(order.begin(), dim);
+			order.push_back(i);
+		order.erase(order.begin()+dim);
+		order.insert(order.begin(), dim);
 		ret = permute (in, order);
-		in_dims.Erase(in_dims.begin()+dim);
+		in_dims.erase(in_dims.begin()+dim);
 	} else {
 		ret = in;
 	}
@@ -138,8 +138,8 @@ template<class T> inline static Matrix<T> fft (const Matrix<T>& in, size_t dim, 
 	if (dim > 0) {
 		for (size_t i = 0; i < ndims; ++i)
 			order[i] = i;
-		order.Erase(order.begin());
-		order.Insert(order.begin()+dim, 0);
+		order.erase(order.begin());
+		order.insert(order.begin()+dim, 0);
 		if (fwd)
 			return permute (ret, order)*sqrt((RT)numel(in));
 		else
