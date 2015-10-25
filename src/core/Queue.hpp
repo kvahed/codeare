@@ -26,6 +26,13 @@
 using namespace RRStrategy;
 
 
+struct QEntry {
+    std::string name;
+    ReconContext* context;
+    QEntry() : name(""), context(0) {}
+    QEntry(const std::string& n, ReconContext* c) : name(n), context(c) {}
+};
+
 /**
  * @brief Container for data and reconstructions
  */
@@ -119,7 +126,7 @@ public:
 protected:
 
 	char*                                m_config;   /**< Serialised XML document  */
-	std::map<std::string, ReconContext*> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
+	std::vector<QEntry> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 
 };
 

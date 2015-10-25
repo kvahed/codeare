@@ -53,12 +53,17 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	size_t nn, span = 10, min_dist=5, pc_sel = 5;
 	eig_t<float> et;
 
+    meas = squeeze(meas);
 	std::cout << "  Incoming: " << size(meas) << std::endl;
 	_nx = size(meas,0);
-	_nv = size(meas,1);
-	_nz = size(meas,2);
-	_nc = size(meas,3);
-
+	_nc = size(meas,1);
+	_nv = size(meas,2);
+	_nz = size(meas,3);
+	// Take the central k-space points (c++ indexing)
+    meas = squeeze(meas(CR(_nx/2),CR(),CR(),CR()));
+    meas = permute(meas,1,2,0);
+	std::cout << "  Reduced to center column and permuted: " << size(meas) << std::endl;
+    
 	_ta = 95; // from raw data
 	_tr = _ta/_nv;
 
@@ -73,8 +78,6 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	    f_x += f_x[_nv/4];
 
 	nn  = 400; // Interpolation along z dimension
-	// Take the central k-space points (c++ indexing)
-	meas = squeeze(meas(CR(_nx/2),CR(),CR(),CR()));
 	meas = zpad(meas,size(meas,0),nn,size(meas,2));
 	meas = permute (meas,1,0,2);
 

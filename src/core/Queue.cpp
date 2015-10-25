@@ -34,14 +34,12 @@ short Queue::CleanUp () {
 short Queue::Init (const char* name, const char* config, const char* client_id) {
 	
 	ReconContext* rc = new ReconContext(name);
-	
     rc->SetConfig (config);
 	if ((rc->Init()) != codeare::OK) {
 		this->Finalise();
 		return (short) codeare::CONTEXT_CONFIGURATION_FAILED;
 	}
-
-	m_contexts.insert (pair< std::string, ReconContext* > (std::string(client_id) + std::string(name), rc));
+	m_contexts.push_back (QEntry(std::string(client_id) + std::string(name), rc));
 	return (short) codeare::OK;
 	
 }
@@ -49,14 +47,11 @@ short Queue::Init (const char* name, const char* config, const char* client_id) 
 
 short Queue::Finalise (const char* name) {
 	
-	map<string, ReconContext*>::iterator it;
-
 	while (!m_contexts.empty()) {
-		it = m_contexts.begin();
-		delete it->second;
+		auto it = m_contexts.begin();
+		delete it->context;
 		m_contexts.erase(it);
 	}
-
 	Workspace::Instance().Finalise();
 	return (short) codeare::OK;
 	
@@ -66,15 +61,13 @@ short Queue::Finalise (const char* name) {
 short Queue::Process  (const char* name)       {
 	
     codeare::error_code ret = codeare::OK;
-	map<string, ReconContext*>::iterator it;
-
-	for (it = m_contexts.begin(); it != m_contexts.end(); ++it) {
-		cout << it->first << endl;
+	for (auto it = m_contexts.begin(); it != m_contexts.end(); ++it) {
+		cout << it->name << endl;
 		SimpleTimer t(name);
-		ret = it->second->Process();
+		ret = it->context->Process();
 		t.Stop();
 		if (ret != codeare::OK) {
-			printf ("Procession of %s failed\n", it->first.c_str());
+			printf ("Procession of %s failed\n", it->name.c_str());
 			break;
 		}
 	}
@@ -86,14 +79,11 @@ short Queue::Process  (const char* name)       {
 short Queue::Prepare  (const char* name)       {
 	
 	short ret = 0;
-	map<string, ReconContext*>::iterator it;
-
-	for (it = m_contexts.begin(); it != m_contexts.end(); ++it)
-		if ((ret = it->second->Prepare()) != codeare::OK) {
-			printf ("Preparation of %s \n", it->first.c_str());
+	for (auto it = m_contexts.begin(); it != m_contexts.end(); ++it)
+		if ((ret = it->context->Prepare()) != codeare::OK) {
+			printf ("Preparation of %s \n", it->name.c_str());
 			break;
 		}
-
 	return (short)ret;
 	
 }
