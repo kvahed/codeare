@@ -50,7 +50,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	Vector<float> f_x;
 	Vector<size_t> idx, tmp_idx, fr_idx, ft_idx, peaks;
 	float f_s, lf, hf;
-	size_t nn, span = 10, min_dist=5, pc_sel = 5;
+	size_t nn, span = 5, min_dist = 15, pc_sel = 5;
 	eig_t<float> et;
 
     meas = squeeze(meas);
@@ -144,6 +144,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	Add ("peaks_i", peaks_i);
 	Add ("peaks_v", peaks_v);
 	Add ("res_signal", res_signal);
+	Add ("zip", zip);
 
 	return codeare::OK;
 

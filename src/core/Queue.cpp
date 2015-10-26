@@ -24,15 +24,12 @@ Queue::~Queue () {}
 
 
 short Queue::CleanUp () {
-
 	this->Finalise();
 	return (short) codeare::OK;
-	
 }
 
 
 short Queue::Init (const char* name, const char* config, const char* client_id) {
-	
 	ReconContext* rc = new ReconContext(name);
     rc->SetConfig (config);
 	if ((rc->Init()) != codeare::OK) {
@@ -41,12 +38,10 @@ short Queue::Init (const char* name, const char* config, const char* client_id) 
 	}
 	m_contexts.push_back (QEntry(std::string(client_id) + std::string(name), rc));
 	return (short) codeare::OK;
-	
 }
 
 
 short Queue::Finalise (const char* name) {
-	
 	while (!m_contexts.empty()) {
 		auto it = m_contexts.begin();
 		delete it->context;
@@ -54,12 +49,10 @@ short Queue::Finalise (const char* name) {
 	}
 	Workspace::Instance().Finalise();
 	return (short) codeare::OK;
-	
 }
 
 
 short Queue::Process  (const char* name)       {
-	
     codeare::error_code ret = codeare::OK;
 	for (auto it = m_contexts.begin(); it != m_contexts.end(); ++it) {
 		cout << it->name << endl;
@@ -72,12 +65,10 @@ short Queue::Process  (const char* name)       {
 		}
 	}
 	return (short)ret;
-	
 }
 
 
 short Queue::Prepare  (const char* name)       {
-	
 	short ret = 0;
 	for (auto it = m_contexts.begin(); it != m_contexts.end(); ++it)
 		if ((ret = it->context->Prepare()) != codeare::OK) {
@@ -85,18 +76,13 @@ short Queue::Prepare  (const char* name)       {
 			break;
 		}
 	return (short)ret;
-	
 }
 
 
-
 void Queue::config (const char* c)    {
-		
 	std::stringstream tmp;
-	
 	tmp << c;
 	m_config = new char[tmp.str().length() + 1];
 	strcpy (m_config, tmp.str().c_str());
-		
 }
 	

@@ -25,7 +25,9 @@
 
 using namespace RRStrategy;
 
-
+/**
+ * @brief Entry in reconstruction queue
+ */
 struct QEntry {
     std::string name;
     ReconContext* context;
@@ -38,86 +40,53 @@ struct QEntry {
  */
 class Queue {
 
-
-
 public:
-
-
 	
 	/**
 	 * @brief      Default constructor
 	 */
 	Queue () : m_config(0) {}
 
-
 	/**
 	 * @brief      Destructor
 	 */
-	virtual
-	~Queue ();
-
+	virtual	~Queue ();
 	
 	/**
 	 * @brief      Process startegy (Needs initialisation @see Init)
-	 *
 	 * @param name Name of library
 	 * @return     Sucess
 	 */
-	virtual short
-	Process        (const char* name);
-	
+	virtual short Process (const char* name);
 	
 	/**
 	 * @brief      Prepare startegy (Needs initialisation @see Init)
-	 *
 	 * @param name Name of library
 	 * @return     Sucess
 	 */
-	virtual short
-	Prepare        (const char* name);
-	
+	virtual short Prepare (const char* name);
 	
 	/**
 	 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
-	 * 
 	 * @param name Name of processing library
 	 * @return     success
 	 */
-	virtual short
-	Init          (const char* name, const char* config, const char* client_id = "");
+	virtual short Init (const char* name, const char* config, const char* client_id = "");
 	
-	
-	/**
-	 * @brief      Initialise strategy (Configuration document needs to be set first @see config)
-	 *
-	 * @param name Name of processing library
-	 * @return     success
-	 */
-	//virtual short
-	//Init          (const char* client_id = "");
-
-
 	/**
 	 * @brief      Finalise algorithm
-	 *
 	 * @param name Name of processing library
 	 */
-	virtual short
-	Finalise       (const char* name = 0);
-	
+	virtual short Finalise (const char* name = 0);
 	
 	/**
 	 * @brief      Clean up left over objects
-	 *
 	 * @return     Success
 	 */
-	virtual short
-	CleanUp        ();
+	virtual short CleanUp ();
 	
-
 	/**
 	 * @brief      Set configuration
-	 *
 	 * @param c    Configuration string
 	 */
 	virtual void 
@@ -125,7 +94,7 @@ public:
 	
 protected:
 
-	char*                                m_config;   /**< Serialised XML document  */
+	char*               m_config;   /**< Serialised XML document  */
 	std::vector<QEntry> m_contexts; /**< Reconstruction contexts (Abstraction layer to algorithms)*/
 
 };

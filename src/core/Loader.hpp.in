@@ -50,7 +50,8 @@ void*  LoadModule        (char* name) {
     std::stringstream fname;
     fname << std::string(name) << std::string(LIB_SUFFIX);
 
-    std::cout << "Loading library ... " << fname.str().c_str() << std::endl;
+    std::cout << "Loading " << fname.str().c_str();
+    fflush(stdout);
     
 #if defined(_MSC_VER) 
     handle = (void*) LoadLibrary(name);
@@ -61,9 +62,9 @@ void*  LoadModule        (char* name) {
 #endif
     
     if (NULL == handle) 
-        std::cerr << "... FAILED!\n" << error << std::endl;
+        std::cerr << " FAILED!\n" << error << std::endl;
     else
-        std::cout << "... done.\n" << std::endl;
+        std::cout << " done.\n" << std::endl;
     
 	return handle;
 

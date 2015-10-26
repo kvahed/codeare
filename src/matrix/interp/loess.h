@@ -81,7 +81,7 @@ public:
 		    Vector<RT> res(n);
 #pragma omp	for schedule (static,1)
 			for (size_t i = 0; i < howmany; ++i)
-				clowess(&x[0], &y[0+i*n], n, _span, _nsteps, delta, &ret[0+i*n], &rw[0], &res[0]);
+				clowess(&x[0], &y[0+i*n], n, 2*_span, _nsteps, delta, &ret[0+i*n], &rw[0], &res[0]);
 	    }
 	    return ret;
 
