@@ -82,7 +82,10 @@ include(CheckIncludeFile)
 include(CheckIncludeFileCXX)
 
 cmake_policy(PUSH)
-cmake_policy(SET CMP0054 NEW)
+if(CMAKE_VERSION VERSION_GREATER 3)
+  cmake_policy(SET CMP0054 NEW)
+endif() 
+
 
 get_filename_component(__check_type_size_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
