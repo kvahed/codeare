@@ -362,6 +362,7 @@ namespace io {
             std::cout << std::endl;
             std::string wname = name.substr(1,name.length()-1);
             std::replace(wname.begin(), wname.end(), '/', '_');
+            std::cout << wname << std::endl;
             if (h5d.getTypeClass() == H5T_FLOAT) {
             	if (h5d.getFloatType() == PredType::NATIVE_FLOAT) {
             		if (is_complex) {
