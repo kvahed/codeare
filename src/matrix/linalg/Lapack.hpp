@@ -394,7 +394,7 @@ template<class T> inline Matrix<T> pinv (const Matrix<T>& m, char trans = 'N') {
         for (int i = 0; i < M; i++)
             memcpy (&b[i*N], &b[i*M], cpsz);
     
-    b = resize (b, N, M);
+    b = b(CR(0,N-1),CR(0,M-1));
 
     if (info > 0)
         printf ("ERROR XGELS: the algorithm for computing the SVD failed to converge;\n %i off-diagonal elements " \

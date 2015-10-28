@@ -489,7 +489,7 @@ KTPoints::Process   ()     {
     stringstream ofname;
 
 	// Resize NRMSE vector
-	res = resize (res,gc,1);
+	res = res(CR(0,gc-1));
 
     ofname << m_ptxfname << ".sag_ap";
     PTXWriteSiemensINIFile (rf, grad, 2, 3, nc, 10, max_rf[0], ofname.str(), "s");

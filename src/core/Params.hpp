@@ -363,12 +363,11 @@ template<class T> inline T try_to_fetch (const Params& p, const std::string& key
     } catch (const PARAMETER_MAP_EXCEPTION&) {
         std::cout << "**WARNING**: key " << key.c_str() << " not in parameter map." << std::endl;
         std::cout << "             Returning default " << def << std::endl;
-        return def;
     } catch (const boost::bad_any_cast&) {
         std::cout << "**WARNING**: conversion failed on parameter " <<  key.c_str() << "." << std::endl;
         std::cout << "             Returning default " << def << std::endl;
-        return def;
     }
+    return def;
 }
 
 #endif /* PARAMS_HPP_ */

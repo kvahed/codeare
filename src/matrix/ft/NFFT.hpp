@@ -68,7 +68,7 @@ public:
 		m_epsilon(7.e-4f), m_sigma(1.0), m_ncart(1),  m_have_weights(false),
         m_have_kspace(false), m_np(std::thread::hardware_concurrency()),
         m_per_slice_kspace(false) {
-                
+
         if (p.exists("nk")) {// Number of kspace samples
             try {
                 m_M = unsigned_cast(p["nk"]);
@@ -142,7 +142,7 @@ public:
             }
         }
         
-        
+
         if (m_have_b0) { // b0
             
             m_min_t  = min(m_t.Container());
