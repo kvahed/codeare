@@ -266,7 +266,7 @@ namespace io {
             h5g.close();
         }
 
-        inline void DoAttribute (const H5::Attribute& h5a, const H5std_string& name) const {
+        inline void DoAttribute (const H5::Attribute& h5a) const {
             std::cout << " (" << h5a.getName();
             DataSpace space = h5a.getSpace();
             H5T_class_t dtypeclass = h5a.getTypeClass();
@@ -291,7 +291,7 @@ namespace io {
             int na = h5g.getNumAttrs();
             for (int i = 0; i < na; ++i) {
                 H5::Attribute h5a = h5g.openAttribute(i);
-                DoAttribute(h5a, "");
+                DoAttribute(h5a);
                 h5a.close();
             }
 
@@ -356,7 +356,7 @@ namespace io {
             int na = h5d.getNumAttrs();
             for (int i = 0; i < na; ++i) {
                 H5::Attribute h5a = h5d.openAttribute(i);
-                DoAttribute(h5a,"");
+                DoAttribute(h5a);
                 h5a.close();
             }
             std::cout << std::endl;
