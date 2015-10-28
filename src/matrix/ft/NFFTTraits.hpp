@@ -319,7 +319,7 @@ template <> struct NFFTTraits<std::complex<double> > {
 
 };
 
-#ifdef HAVE_NFFT3F
+#ifdef HAVE_NFFT3F_UNUSED
 
 template <> struct NFFTTraits<std::complex<float> > {
 

@@ -36,7 +36,7 @@
 template <class T>
 class NFFT : public FT<T> {
 
-#ifdef HAVE_NFFT3F
+#ifdef HAVE_NFFT3F_UNUSED
     typedef T NFFTType;
     typedef typename TypeTraits<T>::RT NFFTRType;
 #else

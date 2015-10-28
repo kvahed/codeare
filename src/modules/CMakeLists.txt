@@ -75,13 +75,13 @@ if (${NFFT3_FOUND})
     EstimateSensitivitiesRadialVIBE.cpp)  
   set_target_properties(EstimateSensitivitiesRadialVIBE PROPERTIES PREFIX "")
   target_link_libraries (EstimateSensitivitiesRadialVIBE ${COMLIBS}
-    nfft3_threads nfft3f_threads ${GSL_LIBRARIES})
+    nfft3_threads ${GSL_LIBRARIES})
   list (APPEND INST_TARGETS EstimateSensitivitiesRadialVIBE)
   
   if (${HAS_CXX11_CONDITIONAL}) 
     add_library (XDGRASP MODULE XDGRASP.hpp XDGRASP.cpp)
     set_target_properties(XDGRASP PROPERTIES PREFIX "")
-    target_link_libraries (XDGRASP ${COMLIBS} nfft3 nfft3f)
+    target_link_libraries (XDGRASP ${COMLIBS} nfft3)
     list (APPEND INST_TARGETS XDGRASP)
 
     add_library (MotionDetectionXDGRASPLiver MODULE
@@ -95,12 +95,16 @@ if (${NFFT3_FOUND})
 
   list (APPEND INST_TARGETS NuFFT CGSENSE GRASP EstimateSensitivities)
 
+  add_library (CompressedSensing MODULE CompressedSensing.hpp
+    CompressedSensing.cpp) 
+  set_target_properties(CompressedSensing PROPERTIES PREFIX "")
+  target_link_libraries (CompressedSensing ${COMLIBS} nfft3_threads) 
+else ()
+  add_library (CompressedSensing MODULE CompressedSensing.hpp
+    CompressedSensing.cpp) 
+  set_target_properties(CompressedSensing PROPERTIES PREFIX "")
+  target_link_libraries (CompressedSensing ${COMLIBS}) 
 endif()
-
-add_library (CompressedSensing MODULE CompressedSensing.hpp
-  CompressedSensing.cpp) 
-set_target_properties(CompressedSensing PROPERTIES PREFIX "")
-target_link_libraries (CompressedSensing ${COMLIBS}) 
 
 if (${ITK_FOUND})
   add_library (RelativeSensitivities MODULE RelativeSensitivities.cpp
