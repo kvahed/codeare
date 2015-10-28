@@ -50,44 +50,46 @@ target_link_libraries (DummyRecon ${COMLIBS})
 list (APPEND INST_TARGETS CompressedSensing KTPoints SENSE GRAPPA CoilCompression DummyRecon)
 
 if (${NFFT3_FOUND})
-  list (APPEND COMLIBS ${NFFT3_LIBRARIES})
+  list (APPEND COMLIBS)
 
   add_library (NuFFT MODULE NuFFT.hpp NuFFT.cpp)
   set_target_properties(NuFFT PROPERTIES PREFIX "")
-  target_link_libraries (NuFFT ${COMLIBS}) 
+  target_link_libraries (NuFFT ${COMLIBS} ${NFFT3_LIBRARIES}) 
 
   add_library (CGSENSE MODULE CGSENSE.hpp CGSENSE.cpp)
   set_target_properties(CGSENSE PROPERTIES PREFIX "")
-  target_link_libraries (CGSENSE ${COMLIBS})   
+  target_link_libraries (CGSENSE ${COMLIBS} ${NFFT3_LIBRARIES})   
 
   add_library (GRASP MODULE GRASP.hpp GRASP.cpp)
   set_target_properties(GRASP PROPERTIES PREFIX "")
-  target_link_libraries (GRASP ${COMLIBS})   
+  target_link_libraries (GRASP ${COMLIBS} ${NFFT3_LIBRARIES})   
   
   add_library (EstimateSensitivities MODULE EstimateSensitivities.hpp
     EstimateSensitivities.cpp) 
   set_target_properties(EstimateSensitivities PROPERTIES PREFIX "")
   target_link_libraries (EstimateSensitivities ${COMLIBS}
-    ${GSL_LIBRARIES})
+    ${NFFT3_LIBRARIES} ${GSL_LIBRARIES})
   
-  add_library (EstimateSensitivitiesRadialVIBE MODULE EstimateSensitivitiesRadialVIBE.hpp
-    EstimateSensitivitiesRadialVIBE.cpp) 
+  add_library (EstimateSensitivitiesRadialVIBE MODULE
+    EstimateSensitivitiesRadialVIBE.hpp
+    EstimateSensitivitiesRadialVIBE.cpp)  
   set_target_properties(EstimateSensitivitiesRadialVIBE PROPERTIES PREFIX "")
   target_link_libraries (EstimateSensitivitiesRadialVIBE ${COMLIBS}
-    ${GSL_LIBRARIES})
+    nfft3_threads nfft3f_threads ${GSL_LIBRARIES})
   list (APPEND INST_TARGETS EstimateSensitivitiesRadialVIBE)
   
   if (${HAS_CXX11_CONDITIONAL}) 
     add_library (XDGRASP MODULE XDGRASP.hpp XDGRASP.cpp)
     set_target_properties(XDGRASP PROPERTIES PREFIX "")
-    target_link_libraries (XDGRASP ${COMLIBS})
+    target_link_libraries (XDGRASP ${COMLIBS} nfft3 nfft3f)
     list (APPEND INST_TARGETS XDGRASP)
 
     add_library (MotionDetectionXDGRASPLiver MODULE
-      MotionDetectionXDGRASPLiver.hpp MotionDetectionXDGRASPLiver.cpp) 
+      MotionDetectionXDGRASPLiver.hpp MotionDetectionXDGRASPLiver.cpp)  
     set_target_properties(MotionDetectionXDGRASPLiver PROPERTIES
       PREFIX "") 
-    target_link_libraries (MotionDetectionXDGRASPLiver ${COMLIBS} ${GSL_LIBRARIES}) 
+    target_link_libraries (MotionDetectionXDGRASPLiver ${COMLIBS}
+      ${GSL_LIBRARIES})
     list (APPEND INST_TARGETS MotionDetectionXDGRASPLiver)
   endif()
 
