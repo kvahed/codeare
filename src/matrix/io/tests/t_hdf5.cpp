@@ -63,16 +63,24 @@ inline static bool check () {
 
 int main (int args, char** argv) {
 
-	if (!check<float>())
+	if (args == 1) {
+		if (!check<float>())
+			return 1;
+		if (!check<double>())
+			return 1;
+		if (!check<cxfl>())
+			return 1;
+		if (!check<cxdb>())
+			return 1;
+		if (!check<short>())
+			return 1;
+	} else if (args == 2) {
+		HDF5File h5f (argv[1]);
+		h5f.Load();
+		std::cout << wspace << std::endl;
+	} else {
 		return 1;
-	if (!check<double>())
-		return 1;
-	if (!check<cxfl>())
-		return 1;
-	if (!check<cxdb>())
-		return 1;
-	if (!check<short>())
-		return 1;
+	}
 
 	return 0;
 

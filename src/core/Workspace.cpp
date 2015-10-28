@@ -64,6 +64,7 @@ void Workspace::Print (std::ostream& os) const {
 	    else if (b.type() == typeid(shrd_ptr<Matrix<cbool> >))
 		    os << "            bool |" << setw(8) << size(*boost::any_cast<shrd_ptr<Matrix<cbool> > >(b));
 #endif
+	    os << std::endl;
 	}
     os << "\n\nParameters\n" ;
     os <<       "----------\n\n";

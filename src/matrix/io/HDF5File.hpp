@@ -11,6 +11,7 @@
 #include "IOFile.hpp"
 #include "Matrix.hpp"
 #include "Tokenizer.hpp"
+#include "Workspace.hpp"
 
 #include <boost/tokenizer.hpp>
 
@@ -21,272 +22,416 @@ namespace codeare {
 namespace matrix {
 namespace io {
 
-	template<class T> struct HDF5Traits;
+    template<class T> struct HDF5Traits;
 
-	template<> struct HDF5Traits<float> {
-		static PredType* PType () {
-			return (PredType*) new FloatType (PredType::NATIVE_FLOAT);
-		}
-	};
-	template<> struct HDF5Traits<double> {
-		static PredType* PType () {
-			return (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
-		}
-	};
-	template<> struct HDF5Traits<cxfl> {
-		static PredType* PType () {
-			return (PredType*) new FloatType (PredType::NATIVE_FLOAT);
-		}
-	};
-	template<> struct HDF5Traits<cxdb> {
-		static PredType* PType () {
-			return (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
-		}
-	};
-	template<> struct HDF5Traits<short> {
-		static PredType* PType () {
-			return (PredType*) new FloatType (PredType::NATIVE_SHORT);
-		}
-	};
+    template<> struct HDF5Traits<float> {
+        static PredType* PType () {
+            return (PredType*) new FloatType (PredType::NATIVE_FLOAT);
+        }
+    };
+    template<> struct HDF5Traits<double> {
+        static PredType* PType () {
+            return (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
+        }
+    };
+    template<> struct HDF5Traits<cxfl> {
+        static PredType* PType () {
+            return (PredType*) new FloatType (PredType::NATIVE_FLOAT);
+        }
+    };
+    template<> struct HDF5Traits<cxdb> {
+        static PredType* PType () {
+            return (PredType*) new FloatType (PredType::NATIVE_DOUBLE);
+        }
+    };
+    template<> struct HDF5Traits<short> {
+        static PredType* PType () {
+            return (PredType*) new FloatType (PredType::NATIVE_SHORT);
+        }
+    };
 
-	class HDF5File : public IOFile {
+    class HDF5File : public IOFile {
 
-	public:
+    public:
 
-		/**
-		 * @brief   Open HDF5 file
-		 *
-		 * @param  fname   File name
-		 * @param  mode    IO mode (R/RW)
-		 * @param  params  Optional params
-		 * @param  verbose Verbosity
-		 */
-		HDF5File  (const std::string& fname, const IOMode mode = READ,
-				Params params = Params(), const bool verbose = false) :
-					IOFile(fname, mode, params, verbose) {
+        /**
+         * @brief   Open HDF5 file
+         *
+         * @param  fname   File name
+         * @param  mode    IO mode (R/RW)
+         * @param  params  Optional params
+         * @param  verbose Verbosity
+         */
+        HDF5File  (const std::string& fname, const IOMode mode = READ,
+                Params params = Params(), const bool verbose = false) :
+                    IOFile(fname, mode, params, verbose) {
 
-			Exception::dontPrint();
+            Exception::dontPrint();
 
-			try {
-				m_file = H5File (fname, (mode == READ) ? H5F_ACC_RDONLY :H5F_ACC_TRUNC);
-				if (this->m_verb)
-					printf ("File %s opened %s\n", fname.c_str(), (mode == READ) ? "R" : "RW");
-			} catch (const FileIException& e) {
-				printf ("Opening %s failed\n", fname.c_str());
-				e.printError();
-			}
+            try {
+                m_file = H5File (fname, (mode == READ) ? H5F_ACC_RDONLY :H5F_ACC_TRUNC);
+                if (this->m_verb)
+                    printf ("File %s opened %s\n", fname.c_str(), (mode == READ) ? "R" : "RW");
+            } catch (const FileIException& e) {
+                printf ("Opening %s failed\n", fname.c_str());
+                e.printError();
+            }
 
-			this->m_status = OK;
+            this->m_status = OK;
 
-		}
-
-
-
-		/**
-		 * @brief  Default destructor
-		 */
-		virtual ~HDF5File () {
-			Close ();
-		}
+        }
 
 
 
-		/**
-		 * @brief   Clean up and close file
-		 */
-		virtual void
-		Close () {
-			try {
-				m_file.flush(H5F_SCOPE_LOCAL);
-			} catch (const Exception& e) {
-				this->m_status = HDF5_ERROR_FFLUSH;
-				printf ("Couldn't flush HDF5 file %s!\n%s\n", this->FileName().c_str(), e.getDetailMsg().c_str());
-			}
-			try {
-				m_file.close();
-			} catch (const Exception& e) {
-				this->m_status = HDF5_ERROR_FCLOSE;
-				printf ("Couldn't close HDF5 file %s!\n%s\n", this->FileName().c_str(), e.getDetailMsg().c_str());
-			}
-		}
+        /**
+         * @brief  Default destructor
+         */
+        virtual ~HDF5File () {
+            Close ();
+        }
 
 
 
-		template<class T> Matrix<T>
-		Read (const std::string& uri) const throw () {
-
-			T         t       = (T) 0;
-			DataSet   dataset = m_file.openDataSet(uri);
-			DataSpace space   = dataset.getSpace();
-			Vector<hsize_t> dims (space.getSimpleExtentNdims());
-			size_t    ndim    = space.getSimpleExtentDims(&dims[0], NULL);
-
-			if (this->m_verb) {
-				printf ("Reading dataset %s ... ", uri.c_str());
-				fflush(stdout);
-			}
-
-			if (is_complex(t)) {
-				dims.pop_back();
-				--ndim;
-			}
-
-			Vector<size_t> mdims (ndim,1);
-
-			for (size_t i = 0; i < ndim; ++i)
-				mdims[i] = dims[ndim-i-1];
-
-			PredType* type = HDF5Traits<T>::PType();
-
-			Matrix<T> M (mdims);
-			dataset.read (&M[0], *type);
-
-			if (this->m_verb)
-				printf ("O(%s) done\n", DimsToCString(M));
-
-			space.close();
-			dataset.close();
-
-			return M;
-
-		}
+        /**
+         * @brief   Clean up and close file
+         */
+        virtual void Close () {
+            try {
+                m_file.flush(H5F_SCOPE_LOCAL);
+            } catch (const Exception& e) {
+                this->m_status = HDF5_ERROR_FFLUSH;
+                printf ("Couldn't flush HDF5 file %s!\n%s\n", this->FileName().c_str(), e.getDetailMsg().c_str());
+            }
+            try {
+                m_file.close();
+            } catch (const Exception& e) {
+                this->m_status = HDF5_ERROR_FCLOSE;
+                printf ("Couldn't close HDF5 file %s!\n%s\n", this->FileName().c_str(), e.getDetailMsg().c_str());
+            }
+        }
 
 
 
-		template<class T> bool
-		Write (const Matrix<T>& M, const std::string& uri) throw () {
+        template<class T> Matrix<T> Read (const std::string& uri) const throw () {
 
-			T t = (T)0;
-			Group group, *tmp;
-			std::string path;
+            T         t       = (T) 0;
+            DataSet   dataset = m_file.openDataSet(uri);
+            DataSpace space   = dataset.getSpace();
+            Vector<hsize_t> dims (space.getSimpleExtentNdims());
+            size_t    ndim    = space.getSimpleExtentDims(&dims[0], NULL);
+
+            if (this->m_verb) {
+                printf ("Reading dataset %s ... ", uri.c_str());
+                fflush(stdout);
+            }
+
+            if (is_complex(t)) {
+                dims.pop_back();
+                --ndim;
+            }
+
+            Vector<size_t> mdims (ndim,1);
+
+            for (size_t i = 0; i < ndim; ++i)
+                mdims[i] = dims[ndim-i-1];
+
+            PredType* type = HDF5Traits<T>::PType();
+
+            Matrix<T> M (mdims);
+            dataset.read (&M[0], *type);
+
+            if (this->m_verb)
+                printf ("O(%s) done\n", DimsToCString(M));
+
+            space.close();
+            dataset.close();
+
+            return M;
+
+        }
+
+
+
+        template<class T> bool Write (const Matrix<T>& M, const std::string& uri) throw () {
+
+            T t = (T)0;
+            Group group, *tmp;
+            std::string path;
 
             boost::tokenizer<> tok(uri);
-			std::vector<std::string> sv (Split (uri, "/"));
-			std::string name = sv[sv.size() - 1];
-			sv.pop_back(); // data name not part of path
+            std::vector<std::string> sv (Split (uri, "/"));
+            std::string name = sv[sv.size() - 1];
+            sv.pop_back(); // data name not part of path
 
-			if (sv.size() == 0)
-				path = "/";
-			else
-				for (size_t i = 0; i < sv.size(); i++) {
-					if (sv[i].compare(""))
-						path += "/";
-						path += sv[i];
-				}
+            if (sv.size() == 0)
+                path = "/";
+            else
+                for (size_t i = 0; i < sv.size(); i++) {
+                    if (sv[i].compare(""))
+                        path += "/";
+                        path += sv[i];
+                }
 
-			if (this->m_verb)
-				printf ("Creating dataset %s at path (%s)\n", name.c_str(), path.c_str());
+            if (this->m_verb)
+                printf ("Creating dataset %s at path (%s)\n", name.c_str(), path.c_str());
 
-			try {
+            try {
 
-				group = m_file.openGroup(path);
-				if (this->m_verb)
-					printf ("Group %s opened for writing\n", path.c_str()) ;
+                group = m_file.openGroup(path);
+                if (this->m_verb)
+                    printf ("Group %s opened for writing\n", path.c_str()) ;
 
-			} catch (const Exception&) {
+            } catch (const Exception&) {
 
-				for (size_t i = 0, depth = 0; i < sv.size(); i++) {
+                for (size_t i = 0, depth = 0; i < sv.size(); i++) {
 
-					if (sv[i].compare("")) {
+                    if (sv[i].compare("")) {
 
-						try {
-							group = (depth) ? (*tmp).openGroup(sv[i])   : m_file.openGroup(sv[i]);
-						} catch (const Exception&) {
-							group = (depth) ? (*tmp).createGroup(sv[i]) : m_file.createGroup(sv[i]);
-						}
+                        try {
+                            group = (depth) ? (*tmp).openGroup(sv[i])   : m_file.openGroup(sv[i]);
+                        } catch (const Exception&) {
+                            group = (depth) ? (*tmp).createGroup(sv[i]) : m_file.createGroup(sv[i]);
+                        }
 
-						tmp = &group;
-						depth++;
+                        tmp = &group;
+                        depth++;
 
-					}
+                    }
 
-				}
+                }
 
-			}
+            }
 
-			// One more field for complex numbers
-			size_t tmpdim = ndims(M);
+            // One more field for complex numbers
+            size_t tmpdim = ndims(M);
 
-			Vector<hsize_t> dims (tmpdim);
+            Vector<hsize_t> dims (tmpdim);
 
-			for (size_t i = 0; i < tmpdim; i++)
-				dims[i] = M.Dim(tmpdim-1-i);
+            for (size_t i = 0; i < tmpdim; i++)
+                dims[i] = M.Dim(tmpdim-1-i);
 
-			if (is_complex(t)) {
-				dims.push_back(2);
-				tmpdim++;
-			}
+            if (is_complex(t)) {
+                dims.push_back(2);
+                tmpdim++;
+            }
 
-			DataSpace space (tmpdim, &dims[0]);
-			PredType*  type = HDF5Traits<T>::PType();
+            DataSpace space (tmpdim, &dims[0]);
+            PredType*  type = HDF5Traits<T>::PType();
 
-			DataSet set = group.createDataSet(name, (*type), space);
+            DataSet set = group.createDataSet(name, (*type), space);
 
-			set.write   (M.Ptr(), (*type));
-			set.close   ();
-			space.close ();
+            set.write   (M.Ptr(), (*type));
+            set.close   ();
+            space.close ();
 
             return true;
 
-		}
+        }
 
 
-		/**
-		 * @brief Read a particular data set from file
-		 *
-		 * @return  Success
-		 */
-		template<class T> Matrix<T>
-		Read (const TiXmlElement* txe) const {
-			std::string uri (txe->Attribute("uri"));
-			return this->Read<T>(uri);
-		}
+        /**
+         * @brief Read a particular data set from file
+         *
+         * @return  Success
+         */
+        template<class T> Matrix<T>    Read (const TiXmlElement* txe) const {
+            std::string uri (txe->Attribute("uri"));
+            return this->Read<T>(uri);
+        }
 
 
-		/**
-		 * @brief  Write data to file
-		 *
-		 * @return  Success
-		 */
-		template<class T> bool
-		Write (const Matrix<T>& M, const TiXmlElement* txe) {
-			std::string uri (txe->Attribute("uri"));
-			return this->Write (M, uri);
-		}
+        /**
+         * @brief  Write data to file
+         *
+         * @return  Success
+         */
+        template<class T> bool Write (const Matrix<T>& M, const TiXmlElement* txe) {
+            std::string uri (txe->Attribute("uri"));
+            return this->Write (M, uri);
+        }
+
+        inline void DoGroup (const H5::Group& h5g) const {
+            std::cout << std::string(_depth, ' ') << "Group: " << h5g.getObjName() << std::endl;
+            _depth += 2;
+            ScanAttrs(h5g);
+            _depth -= 2;
+        }
+
+        inline void Load () const {
+        	_depth = 4;
+            std::cout << std::string(_depth, ' ') << "File name: " << m_file.getFileName() << std::endl;
+            H5::Group h5g = m_file.openGroup("/");
+            DoGroup(h5g);
+            h5g.close();
+        }
+
+        inline void DoAttribute (const H5::Attribute& h5a) const {
+            std::cout << " (" << h5a.getName();
+            DataSpace space = h5a.getSpace();
+            H5T_class_t dtypeclass = h5a.getTypeClass();
+            hsize_t a = h5a.getStorageSize();
+            switch (dtypeclass)
+            {
+            case H5T_INTEGER:
+				break;
+            case H5T_FLOAT:
+            	break;
+            case H5T_STRING:
+            	break;
+            default:
+            	break;
+            }
+            std::cout << ")";
+            space.close();
+         }
+
+        inline void ScanAttrs (const H5::Group& h5g) const {
+
+            int na = h5g.getNumAttrs();
+            for (int i = 0; i < na; ++i) {
+                H5::Attribute h5a = h5g.openAttribute(i);
+                DoAttribute(h5a);
+                h5a.close();
+            }
+
+            hsize_t no = h5g.getNumObjs();
+            for (hsize_t i = 0; i < no; ++i) {
+                int otype = h5g.getObjTypeByIdx(i);
+                std::string oname = h5g.getObjnameByIdx(i);
+                switch(otype)
+                {
+                case H5G_LINK:
+                    break;
+                case H5G_GROUP:
+                {
+                    H5::Group grpid = h5g.openGroup(oname);
+                    DoGroup(grpid);
+                    grpid.close();
+                    _depth--;
+                }
+                break;
+                case H5G_DATASET:
+                {
+                    H5::DataSet dsid = h5g.openDataSet(oname);
+                    DoDataset(dsid);
+                    dsid.close();
+                }
+                break;
+                case H5G_TYPE:
+                    printf(" DATA TYPE:\n");
+                    {
+                        H5::DataType dtid = h5g.openDataType(oname);
+                        DoDatatype(dtid);
+                        dtid.close();
+                    }
+                    break;
+                default:
+                    printf(" unknown?\n");
+                    break;
+                }
+                
+            }
+
+        }
+
+        inline void DoDataset (const H5::DataSet& h5d) const {
+            std::string name = h5d.getObjName();
+            std::cout << std::string(_depth, ' ') << "Dataset: " << name;
+            H5::DataSpace space = h5d.getSpace();
+            Vector<hsize_t> dims (space.getSimpleExtentNdims());
+            size_t    ndim    = space.getSimpleExtentDims(&dims[0], NULL); //wspace.Add(name, )
+            bool is_complex = false;
+            if (dims[ndim-1]==2) {
+                dims.pop_back();
+                --ndim;
+                is_complex = true;
+            }
+
+            Vector<size_t> mdims (ndim,1);
+            for (size_t i = 0; i < ndim; ++i)
+                mdims[i] = dims[ndim-i-1];
+
+            std::cout << " (" << mdims << ")";
+
+            int na = h5d.getNumAttrs();
+            for (int i = 0; i < na; ++i) {
+                H5::Attribute h5a = h5d.openAttribute(i);
+                DoAttribute(h5a);
+                h5a.close();
+            }
+            std::cout << std::endl;
+            std::string wname = name.substr(1,name.length()-1);
+            std::replace(wname.begin(), wname.end(), '/', '_');
+            if (h5d.getTypeClass() == H5T_FLOAT) {
+            	if (h5d.getFloatType() == PredType::NATIVE_FLOAT) {
+            		if (is_complex) {
+            			Matrix<cxfl> M = Read<cxfl>(name);
+            			wspace.Add(wname,M);
+            		} else {
+            			Matrix<float> M = Read<float>(name);
+            			wspace.Add(wname,M);
+            		}
+            	} else if (h5d.getFloatType() == PredType::NATIVE_DOUBLE) {
+            		if (is_complex) {
+            			Matrix<cxdb> M(mdims);
+            			wspace.Add(wname,M);
+            		} else {
+            			Matrix<double> M(mdims);
+            			wspace.Add(wname,M);
+            		}
+            	}
+            }
+
+/*
+            PredType* type = HDF5Traits<T>::PType();
+
+            Matrix<T> M (mdims);
+            dataset.read (&M[0], *type);
+
+            if (this->m_verb)
+                printf ("O(%s) done\n", DimsToCString(M));
+*/
+            space.close();
+
+        }
 
 
+        inline void DoDatatype (const H5::DataType& h5t) const {
 
-	private:
+        }
 
-		HDF5File (const HDF5File&) {}
-		HDF5File  () {}
+    private:
 
-		H5File m_file; /// @brief My file
+        HDF5File (const HDF5File&) : _depth(0) {}
+        HDF5File  () : _depth(0) {}
+
+        H5File m_file; /// @brief My file
+        mutable size_t _depth;
 
 
-	};
+    };
 
 }// namespace io
 }// namespace matrix
 }// namespace codeare
 
 
-	template<class T> inline static bool
-	_h5write (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
-		using namespace codeare::matrix::io;
-		HDF5File h5f (fname, WRITE);
-		h5f.Write(M, uri);
-		return true;
-	}
+    template<class T> inline static bool
+    _h5write (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
+        using namespace codeare::matrix::io;
+        HDF5File h5f (fname, WRITE);
+        h5f.Write(M, uri);
+        return true;
+    }
 #define h5write(X,Y) _h5write (X,Y,#X)
 
 
-	template<class T> inline static Matrix<T>
-	h5read (const std::string& fname, const std::string& uri) {
-		using namespace codeare::matrix::io;
-		HDF5File h5f (fname, READ);
-		return h5f.Read<T>(uri);
-	}
+    template<class T> inline static Matrix<T>
+    h5read (const std::string& fname, const std::string& uri) {
+        using namespace codeare::matrix::io;
+        HDF5File h5f (fname, READ);
+        return h5f.Read<T>(uri);
+    }
 
 
 
