@@ -250,8 +250,8 @@ namespace io {
             return this->Write (M, uri);
         }
 
-        inline void DoGroup (const H5::Group& h5g) const {
-            std::cout << std::string(_depth, ' ') << "Group: " << h5g.getObjName() << std::endl;
+        inline void DoGroup (const H5::Group& h5g, const H5std_string& name) const {
+            std::cout << std::string(_depth, ' ') << "Group: " << name << std::endl;
             _depth += 2;
             ScanAttrs(h5g);
             _depth -= 2;
@@ -260,12 +260,13 @@ namespace io {
         inline void Load () const {
         	_depth = 4;
             std::cout << std::string(_depth, ' ') << "File name: " << m_file.getFileName() << std::endl;
-            H5::Group h5g = m_file.openGroup("/");
-            DoGroup(h5g);
+            H5std_string root_str = "/";
+            H5::Group h5g = m_file.openGroup(root_str);
+            DoGroup(h5g,root_str);
             h5g.close();
         }
 
-        inline void DoAttribute (const H5::Attribute& h5a) const {
+        inline void DoAttribute (const H5::Attribute& h5a, const H5std_string& name) const {
             std::cout << " (" << h5a.getName();
             DataSpace space = h5a.getSpace();
             H5T_class_t dtypeclass = h5a.getTypeClass();
@@ -290,7 +291,7 @@ namespace io {
             int na = h5g.getNumAttrs();
             for (int i = 0; i < na; ++i) {
                 H5::Attribute h5a = h5g.openAttribute(i);
-                DoAttribute(h5a);
+                DoAttribute(h5a, "");
                 h5a.close();
             }
 
@@ -305,7 +306,7 @@ namespace io {
                 case H5G_GROUP:
                 {
                     H5::Group grpid = h5g.openGroup(oname);
-                    DoGroup(grpid);
+                    DoGroup(grpid,oname);
                     grpid.close();
                     _depth--;
                 }
@@ -313,7 +314,7 @@ namespace io {
                 case H5G_DATASET:
                 {
                     H5::DataSet dsid = h5g.openDataSet(oname);
-                    DoDataset(dsid);
+                    DoDataset(dsid,oname);
                     dsid.close();
                 }
                 break;
@@ -321,7 +322,7 @@ namespace io {
                     printf(" DATA TYPE:\n");
                     {
                         H5::DataType dtid = h5g.openDataType(oname);
-                        DoDatatype(dtid);
+                        DoDatatype(dtid,oname);
                         dtid.close();
                     }
                     break;
@@ -334,8 +335,7 @@ namespace io {
 
         }
 
-        inline void DoDataset (const H5::DataSet& h5d) const {
-            std::string name = h5d.getObjName();
+        inline void DoDataset (const H5::DataSet& h5d, const H5std_string& name) const {
             std::cout << std::string(_depth, ' ') << "Dataset: " << name;
             H5::DataSpace space = h5d.getSpace();
             Vector<hsize_t> dims (space.getSimpleExtentNdims());
@@ -356,7 +356,7 @@ namespace io {
             int na = h5d.getNumAttrs();
             for (int i = 0; i < na; ++i) {
                 H5::Attribute h5a = h5d.openAttribute(i);
-                DoAttribute(h5a);
+                DoAttribute(h5a,"");
                 h5a.close();
             }
             std::cout << std::endl;
@@ -396,7 +396,7 @@ namespace io {
         }
 
 
-        inline void DoDatatype (const H5::DataType& h5t) const {
+        inline void DoDatatype (const H5::DataType& h5t, const H5std_string& name) const {
 
         }
 
