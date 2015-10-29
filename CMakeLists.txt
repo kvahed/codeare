@@ -31,7 +31,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINUX TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(MACOSX TRUE)
-#  set (Boost_USE_STATIC_LIBS ON)
+  set (Boost_USE_STATIC_LIBS ON)
 endif()
 
 # Architecture -------------------------------------------------------
@@ -115,16 +115,10 @@ include_directories(${OPENSSL_INCLUDE_DIR})
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
 # MATLAB --------------------------------------------------------------
-find_package(Matlab)
-if(${MATLAB_FOUND})
-  include_directories (${MATLAB_INCLUDE_DIR})
+find_package(Matlab COMPONENTS MX_LIBRARY MAT_LIBRARY)
+if(Matlab_ROOT_DIR)
+  include_directories (${Matlab_INCLUDE_DIRS})
   add_definitions (-DHAVE_MAT_H)
-  if (${MSVC})
-    link_directories ("${MATLAB_ROOT}/extern/lib/win64/microsoft")
-  else()
-    link_directories ("${MATLAB_LIBRARIES_PATHS}")
-    set(MACOSX_RPATH ${MATLAB_LIBRARIES_PATHS})
-  endif()
 endif()
 
 # Linear algebra -----------------------------------------------------
@@ -230,9 +224,6 @@ find_package(Ismrmrd)
 if (${ISMRMRD_FOUND})
   include_directories(${ISMRMRD_INCLUDE_DIR})
   link_directories(${ISMRMRD_INCLUDE_DIR})
-else ()
-  message (WARNING 
-    "Couldn't find ISMRMRD installation. Support will not be built in.") 
 endif()
 
 if (${ZLIB_FOUND}) 
