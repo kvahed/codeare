@@ -74,7 +74,7 @@ public:
         _tvw.resize(2);
         _tvv.resize(2);
         _tvw[0] = try_to_fetch<float> (p, "tvw1", 0.);
-        if (_tvw[1])
+        if (_tvw[0])
         	_tvv[0] = try_to_fetch<Vector<size_t> > (p, "tv1", _tvv[0]);
         _tvw[1] = try_to_fetch<float> (p, "tvw2", 0.);
         if (_tvw[1])
