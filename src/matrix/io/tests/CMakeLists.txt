@@ -49,14 +49,9 @@ MP_TESTS ("hdf5" "${TEST_CALL}")
 set_tests_properties (hdf5 PROPERTIES ENVIRONMENT
   "HDF5_DISABLE_VERSION_CHECK=2") 
 
-
-if(${MATLAB_FOUND})
+if(Matlab_ROOT_DIR)
   add_executable (t_matlab t_matlab.cpp)
-  if (${MSVC})
-    target_link_libraries (t_matlab libmx libmat)
-  else()
-    target_link_libraries (t_matlab mx mat)
-  endif()
+  target_link_libraries (t_matlab ${Matlab_MX_LIBRARY} ${Matlab_MAT_LIBRARY})
   
   if (${WINDOWS}) 
     set (LD_ENV "${LD_ENV}\;${MATLAB_ROOT}/bin/win64") 
