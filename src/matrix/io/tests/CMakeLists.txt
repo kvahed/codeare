@@ -44,7 +44,7 @@ if (!${WINDOWS})
 else()
   target_link_libraries (t_hdf5 ${HDF5_LIBRARIES} core)
 endif()
-set (TEST_CALL t_hdf5 -b 2)  
+set (TEST_CALL t_hdf5)  
 MP_TESTS ("hdf5" "${TEST_CALL}")
 set_tests_properties (hdf5 PROPERTIES ENVIRONMENT
   "HDF5_DISABLE_VERSION_CHECK=2") 
