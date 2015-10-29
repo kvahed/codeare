@@ -25,13 +25,13 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
 # OS type ------------------------------------------------------------
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-  set(WINDOWS TRUE)
   set (Boost_USE_STATIC_LIBS ON)
+  set(WINDOWS TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINUX TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set(MACOSX TRUE)
   set (Boost_USE_STATIC_LIBS ON)
+  set(MACOSX TRUE)
 endif()
 
 # Architecture -------------------------------------------------------
