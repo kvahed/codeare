@@ -19,5 +19,5 @@ template<class T> inline int check () {
 }
 
 int main (int args, const char** argv) {
-	return check<float>() + check<double>() + check<cxfl>() + check<cxdb>();
+	return check<float>() + check<double>();
 }
