@@ -16,22 +16,19 @@ using namespace codeare::matrix::io;
 std::string mname = "A";
 std::string fname = "test.h5";
 
-template <class T>
-inline static bool write (const Matrix<T> A) {
+template <class T> inline static bool write (const Matrix<T> A) {
 	HDF5File nf (fname, WRITE);
 	nf.Write (A, mname);
     return true;
 }
 
-template <class T>
-inline static bool read (Matrix<T>& A) {
+template <class T> inline static bool read (Matrix<T>& A) {
 	HDF5File nf (fname, READ);
 	A = nf.Read<T>(mname);
     return true;
 }
 
-template<class T>
-inline static bool check () {
+template<class T> inline static bool check () {
 
 	Matrix<T> A = rand<T>(3,4), B;
 
@@ -39,23 +36,19 @@ inline static bool check () {
 	write(A);
 	read(B);
 
-#if defined (VERBOSE)
-	std::cout << A;
-	std::cout << B;
+//	std::cout << A;
+//	std::cout << B;
 	std::cout << (A == B);
 	std::cout << std::endl;
-#endif
 
 	// Convenience interface
 	h5write (A,fname);
     B = h5read<T> (fname,"/A");
 
-#if defined (VERBOSE)
-	std::cout << A;
-	std::cout << B;
+//	std::cout << A;
+//	std::cout << B;
 	std::cout << (A == B);
 	std::cout << std::endl;
-#endif
 
 	return true;
 
@@ -81,6 +74,8 @@ int main (int args, char** argv) {
 	} else {
 		return 1;
 	}
+
+	std::cout << "done" << std::endl;
 
 	return 0;
 
