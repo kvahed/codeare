@@ -22,7 +22,9 @@
 #define __CS_XSENSE_HPP__
 
 #include "CSENSE.hpp"
+#ifdef HAVE_NFFT3
 #include "NCSENSE.hpp"
+#endif
 #include "CX.hpp"
 #include "NLCG.hpp"
 #include "LBFGS.hpp"
@@ -99,11 +101,13 @@ public:
         case 1: // Cartesian SENSE
 			ft = (FT<T>*) new CSENSE<T> (p);
             break;
+#ifdef HAVE_NFFT3
         case 2: // Regualar non-Cartesian 
 			ft = (FT<T>*) new NFFT<T> (p);
             break;
         case 3: // Regualar non-Cartesian 
 			ft = (FT<T>*) new NCSENSE<T> (p);
+#endif
             break;
 		default:
             printf ("**ERROR - CS_XSENSE: Invalid or unspecified FT operator\n");

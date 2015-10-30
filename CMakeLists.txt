@@ -166,7 +166,9 @@ if (NFFT3_FOUND)
     add_definitions(-DUSE_NFFT_32_NAMING)
   endif()
 endif()
-
+if (NOT NFFT3_INCLUDE_DIR)
+   set(NFFT3_INCLUDE_DIR "")
+endif()
 # Interpolations -----------------------------------------------------
 find_package (PNG)
 find_package (TIFF)
