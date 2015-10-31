@@ -147,11 +147,12 @@ namespace VB {
                 _measdims = _raise_one (_measdims);
                 _rtfbdims = _raise_one (_rtfbdims);
                 _measdims[5] = (_measdims[5]-_cent_par)*2;
-                _ta = 2.e-3*(_tend-_tstart);
+                _ta = 2.5e-3*(_tend-_tstart);
+                wspace.PSet("TA", _ta);
                 _tr = _ta/_nmeas;
                 prtmsg ("     Found %d lines (data: (Meas: %d, Noise: %d, Sync: %d))\n", i, _nmeas, _nnoise, _syncdims[1]);
                 prtmsg ("     Centres: column: %zu, line: %zu, partition: %zu\n", _cent_col, _cent_lin, _cent_par);
-                prtmsg ("     Measurement TA: %.1fs, TR: %.2fms\n", _ta, 1000.*_tr);
+                prtmsg ("     Measurement TA: %.2fs, TR: %.2fms\n", _ta, 1000.*_tr);
                 prtmsg ("       Data dims ( ");
                 for (size_t i = 0; i < 15; ++i)
                     prtmsg ("%d ", _measdims[i]);

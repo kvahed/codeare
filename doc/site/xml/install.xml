@@ -26,9 +26,11 @@
     
 	<h3>Installing prerequisites</h3>
     <pre class="sh_sh">
+      > sudo yum -y groupinstall "Development Tools" "Development Libraries"
+      > yum -y install epel-release
       > sudo yum -y install boost-devel gcc-g++ fftw-devel \
-      openblas-devel lapack-devel libgsl0-dev omniorb-nameserver \
-      libomniorb4-dev cmake openssl-devel 
+        openblas-devel lapack-devel libgsl0-dev omniorb-nameserver \
+        libomniorb4-dev cmake openssl-devel
     </pre>
 
 	<h3>ISMRMRD</h3>

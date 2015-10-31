@@ -31,6 +31,14 @@ using namespace RRStrategy;
 
 codeare::error_code MotionDetectionXDGRASPLiver::Init() {
 
+	try {
+		_ntres = GetAttr<size_t>("ntres");
+	} catch (const TinyXMLQueryException&) {}
+
+	try {
+		_tf = GetAttr<size_t>("frame_duration");
+	} catch (const TinyXMLQueryException&) {}
+
 	return codeare::OK;
 }
 
@@ -49,8 +57,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 		res_peak, tmp_peak, res_peak_nor, tt, res_signal, ftmax;
 	Vector<float> f_x;
 	Vector<size_t> idx, tmp_idx, fr_idx, ft_idx, peaks;
-	float f_s, lf, hf;
-	size_t nn, span = 5, min_dist = 15, pc_sel = 5;
+	float f_s, lf, ta = wspace.PGet<float>("TA"), hf;
+	size_t nn, span = 5, min_dist = 15, pc_sel = 5, ntres, nline, nt;
 	eig_t<float> et;
 
     meas = squeeze(meas);
@@ -64,14 +72,10 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
     meas = permute(meas,1,2,0);
 	std::cout << "  Reduced to center column and permuted: " << size(meas) << std::endl;
     
-	_ta = 95; // from raw data
-	_tr = _ta/_nv;
-
 	std::cout << "  Analyse channel motion data ..." << std::endl;
 
-	_time = _tr*linspace<float>(1,_nv,1);
 	// Frequency stamp (only for the delay enhanced part)
-	f_s = 1./_tr;
+	f_s = _ta/_nv;
 	f_x = linspace<float>(0,f_s,_nv/2).Container();
 	f_x = f_x - .5*f_s; // frequency after FFT of the motion signal
 	if (_nv/2%2==0)
@@ -86,7 +90,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	// Remove some edge slices
 	zip = zip(CR(21,size(zip,0)-40),CR(),CR());
 
-	std::cout << "  Mormalise projection profiles ..." << std::endl;
+	std::cout << "  Normalise projection profiles ..." << std::endl;
 	// Normalization the projection profiles
 	for (size_t i = 0; i < _nc; ++i)
 	    zip(R(),R(),R(i)) /= squeeze(repmat(mean(zip(CR(),CR(),CR(i)),0),size(zip,0),1));
@@ -107,8 +111,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	motion_signal_new = Matrix<float>(_nv  ,pc_sel);
 	motion_signal_fft = Matrix<float>(_nv/2,pc_sel);
 	for (size_t i = 0; i < pc_sel; ++i) {
-		motion_signal_new(R(),R(i)) = smooth<float>(motion_signal(CR(),CR(i)),span); // TODO: smooth
-		tmp = abs(fftshift(fft(motion_signal(CR(_nv/2,size(motion_signal,0)-1),CR(i)),0,false))); // TODO: fft (view)
+		motion_signal_new(R(),R(i)) = smooth(motion_signal(CR(),CR(i)),span);
+		tmp = abs(fftshift(fft(motion_signal(CR(_nv/2,size(motion_signal,0)-1),CR(i)),0,false)));
 		motion_signal_fft(R(),R(i)) = tmp/max(tmp.Container());
 	}
 
@@ -129,15 +133,22 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	peaks = findLocalMaxima(res_signal,min_dist);
 	Matrix<float> peaks_i(peaks.size()+2,1), peaks_v = peaks_i;
 	std::copy(peaks.begin(),peaks.end(),&peaks_i[1]);
-	peaks_i[peaks.size()+1] = _nv+1e-6;
+	peaks_i[peaks.size()+1] = _nv+1.e-6;
 	peaks_v(R(1,peaks.size()),R(0)) = res_signal(CR(peaks),CR(0));
 	peaks_v[0] = max(res_signal[0],peaks_v[1]);
 	peaks_v[peaks.size()+1] = peaks_v[peaks.size()];
 
 	// Interpolate peaks
-	std::cout << "  CSPLINE fit peaks ..." << std::endl;
+	std::cout << "  CSPLINE fit peaks and subtract..." << std::endl;
 	ftmax = interp1(peaks_i, peaks_v, linspace<float>(0.,_nv-1,_nv));
 	res_signal = res_signal-ftmax;
+
+	// Sort k-space
+	ntres = 4;
+	nt = ceil(ta/_tf);
+	nline = ceil(_nv/(ntres*nt));
+	std::cout << "  Data acquired within " << ta << std::endl;
+	std::cout << "  Sorting data in  " << ntres << " respiratory and " << nt << " contrast gates" << std::endl;
 
 	Add ("ftmax", ftmax);
 	Add ("motion_signal", motion_signal_new);

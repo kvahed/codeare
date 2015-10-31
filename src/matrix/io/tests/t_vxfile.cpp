@@ -12,6 +12,7 @@ template<class T> inline static bool check () {
   
     Matrix<T> A;
     read("test.dat", A);
+    std::cout << wspace << std::endl;
     return true;
   
 }

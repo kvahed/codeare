@@ -27,7 +27,7 @@ smooth (const Matrix<T>& y, const size_t& span = 3, const INTERP::Method& method
 }
 
 template<class T> inline static Matrix<T>
-smooth (const View<T,false>& y, const size_t& span = 3, const INTERP::Method& method = INTERP::AKIMA) {
+smooth (const View<T,true>& y, const size_t& span = 3, const INTERP::Method& method = INTERP::AKIMA) {
 	Matrix<T> yy = y;
 	return smooth(yy, span, method);
 }
