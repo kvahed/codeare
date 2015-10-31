@@ -11,9 +11,9 @@ template<class T> void check () {
 int main (int args, char** argv) {
 
     check<float>();
-/*    check<double>();
+    check<double>();
     check<cxfl>();
-    check<cxdb>();*/
+    check<cxdb>();
     
     return 0;
     

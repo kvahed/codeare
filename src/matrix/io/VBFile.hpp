@@ -150,7 +150,7 @@ namespace VB {
                 _ta = 2.5e-3*(_tend-_tstart);
                 wspace.PSet("TA", _ta);
                 _tr = _ta/_nmeas;
-                prtmsg ("     Found %d lines (data: (Meas: %d, Noise: %d, Sync: %d))\n", i, _nmeas, _nnoise, _syncdims[1]);
+                prtmsg ("     Found %zu lines (data: (Meas: %ui, Noise: %ui, Sync: %ui))\n", i, _nmeas, _nnoise, _syncdims[1]);
                 prtmsg ("     Centres: column: %zu, line: %zu, partition: %zu\n", _cent_col, _cent_lin, _cent_par);
                 prtmsg ("     Measurement TA: %.2fs, TR: %.2fms\n", _ta, 1000.*_tr);
                 prtmsg ("       Data dims ( ");

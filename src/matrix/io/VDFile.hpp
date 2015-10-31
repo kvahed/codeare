@@ -248,14 +248,14 @@ private:
      * @brief Print parsing results
      */
     void PrintParse () const {
-        prtmsg ("     Found %d lines (data: (Meas: %d, Noise: %d, Sync: %d))\n",
+        prtmsg ("     Found %zu lines (data: (Meas: %zu, Noise: %d, Sync: %ui))\n",
         		_nlines, _nmeas, 0, _syncdims[1]);
         prtmsg ("       Data dims ( ");
         for (size_t i = 0; i < 15; ++i)
-            prtmsg ("%d ", _measdims[i]);
+            prtmsg ("%ui ", _measdims[i]);
         prtmsg(")\n");
         if (_syncdims[1])
-            prtmsg ("       Sync dims ( %d %d)\n", _syncdims[0], _syncdims[1] );
+            prtmsg ("       Sync dims ( %ui %ui)\n", _syncdims[0], _syncdims[1] );
 
     }
     
