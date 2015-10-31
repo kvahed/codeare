@@ -394,10 +394,6 @@ ellipse (const float* p, const size_t n, const T s = T(1)) {
 	float cosp = cos(p[4]);
 	float sinp = sin(p[4]);
 	
-#pragma omp parallel default (shared) 
-	{
-#pragma omp for schedule (dynamic, n / omp_get_num_threads())
-		
 	for (int r = 0; r < (int)n; r++)
 		for (size_t c = 0; c < n; c++) {
 			float x = (((float)c-m[1])*cosp+((float)r-m[0])*sinp)/a[1];
@@ -405,7 +401,6 @@ ellipse (const float* p, const size_t n, const T s = T(1)) {
 
 			res(c,r) = (x*x + y*y) <= 1.0 ? s : T(0.0);
 		}
-	}
 
 	return res;
 
@@ -440,10 +435,6 @@ ellipsoid (const float* p, const size_t n, const T s) {
 	float cosp = cos(p[6]);
 	float sinp = sin(p[6]);
 	
-#pragma omp parallel default (shared) 
-	{
-#pragma omp for schedule (dynamic, n / omp_get_num_threads())
-		
 		for (int s = 0; s < n; s++)
 			for (size_t r = 0; r < n; r++)
 				for (size_t c = 0; c < n; c++) {
@@ -452,9 +443,8 @@ ellipsoid (const float* p, const size_t n, const T s) {
 					float z =  ((float)s-m[2])/a[2];
 					res(c,r,s) = (x*x + y*y + z*z) <= 1.0 ? s : T(0.0);
 				}
-	}
 
-	return res;
+        return res;
 
 }
 
@@ -489,7 +479,6 @@ phantom (const size_t& n) {
 		{ .023f,  .023f,  .0f,  -.606f,   .0f },
 		{ .023f,  .046f, -.06f, -.605f,   .0f }
 	};
-
 	// Size_Tensities
 #pragma warning (disable : 4305)
 	T v[ne] = {(T)1., (T)-.8, (T)-.2, (T)-.2, (T).1, (T).1, (T).1, (T).1, (T).1, (T).1};

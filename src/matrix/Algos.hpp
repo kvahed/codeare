@@ -1186,6 +1186,7 @@ template<class T> inline static Matrix<T> diff (const Matrix<T>& rhs, const size
             std::transform (b, e, rb, b, std::minus<T>());
         }
     }
+
     
     if (dim == 1) {
         if (ndims == 2) {
