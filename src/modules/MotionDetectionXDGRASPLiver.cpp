@@ -58,7 +58,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	Vector<float> f_x;
 	Vector<size_t> idx, tmp_idx, fr_idx, ft_idx, peaks;
 	float f_s, lf, ta = wspace.PGet<float>("TA"), hf;
-	size_t nn, span = 5, min_dist = 15, pc_sel = 5, ntres, nline, nt;
+	size_t nn, span = 10.0, min_dist = 20, pc_sel = 5, ntres, nline, nt;
 	eig_t<float> et;
 
     meas = squeeze(meas);

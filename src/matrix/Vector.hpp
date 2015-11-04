@@ -363,9 +363,11 @@ template<class T> inline static Vector<T> conj (const Vector<T>& c) NOEXCEPT {
 	return res;
 }
 template<class T> inline std::ostream& operator<< (std::ostream& os, const Vector<T>& ct) NOEXCEPT {
-    for (auto it = ct.begin(); it < ct.end()-1; ++it)
-        os << *it << " ";
-    os << *(ct.end()-1);
+	if (ct.size()) {
+		for (auto it = ct.begin(); it < ct.end()-1; ++it)
+			os << *it << " ";
+		os << *(ct.end()-1);
+	}
     return os;
 }
 template<class T> inline static T multiply (const T& a, const T& b) NOEXCEPT {
