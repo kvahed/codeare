@@ -32,33 +32,22 @@ template<class T>
 inline static bool check () {
 
 	Matrix<T> A = rand<T>(3,4), B;
-
 	write(A);
 	read(B);
-
-
-#if defined (VERBOSE)
-	std::cout << (A==B);
-	std::cout << std::endl;
-#endif
-
-	return true;
+	return issame(A,B);
 
 }
 
 int main (int args, char** argv) {
-
-	if (!check<float>())
-		return 1;
-	if (!check<double>())
-		return 1;
-	if (!check<cxfl>())
-		return 1;
-	if (!check<cxdb>())
-		return 1;
-
-	return 0;
-
+    if (args == 1) {
+        if (check<float>() && check<double>() && check<cxfl>() && check<cxdb>())
+            return 0;
+    } else {
+        MLFile mf (argv[1],READ);
+        mf.Load();
+        std::cout << wspace << std::endl;
+    }
+    return 1;
 }
 
 

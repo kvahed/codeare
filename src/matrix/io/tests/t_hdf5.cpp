@@ -71,8 +71,6 @@ int main (int args, char** argv) {
 		return 1;
 	}
 
-	std::cout << "done" << std::endl;
-
 	return 0;
 
 }

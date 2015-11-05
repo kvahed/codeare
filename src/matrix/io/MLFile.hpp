@@ -8,6 +8,7 @@
 #ifndef MATFILE_HPP_
 #define MATFILE_HPP_
 
+#include "Workspace.hpp"
 #include "IOFile.hpp"
 #include "mat.h"
 
@@ -215,12 +216,98 @@ template <> struct MXTraits<short> {
 
 
         inline void Load () const {
+            std::cout  << "    File name: " << m_fname << std::endl;
         	int vars = 0;
         	char** dir = matGetDir(m_file, &vars);
         	for (auto i = 0; i < vars; ++i)
-        		std::cout << dir[i] << std::endl;
+        		DoDataset (dir[i]);
         }
 
+        inline void DoDataset (char* name) const {
+        	std::cout << "      Dataset: " << name << ": ("; fflush(stdout);
+    		mxArray* mxa = matGetVariable (m_file, name);
+			mwSize        ndim = mxGetNumberOfDimensions(mxa);
+			const mwSize*  dim = mxGetDimensions(mxa);
+			for (mwSize i=0; i < ndim-1; ++i)
+				std::cout << dim[i] << " ";
+			std::cout << dim[ndim-1] << ") [";
+			switch (mxGetClassID(mxa))
+			{
+				case mxUNKNOWN_CLASS:
+					std::cout << "unknown";
+					break;
+				case mxSINGLE_CLASS:
+					if (mxIsComplex(mxa)) {
+						std::cout << "complex ";
+						Matrix<cxfl> M = Read<cxfl>(name);
+						wspace.Add(name, M);
+					} else {
+						Matrix<float> M = Read<float>(name);
+						wspace.Add(name, M);
+					}
+					std::cout << "float";
+					break;
+				case mxDOUBLE_CLASS:
+					if (mxIsComplex(mxa)) {
+						std::cout << "complex ";
+						Matrix<cxdb> M = Read<cxdb>(name);
+						wspace.Add(name, M);
+					} else {
+						Matrix<double> M = Read<double>(name);
+						wspace.Add(name, M);
+					}
+					std::cout << "double";
+					break;
+		        case mxCELL_CLASS:
+					std::cout << "cell";
+					break;
+				case mxSTRUCT_CLASS:
+					std::cout << "struct";
+					break;
+				case mxLOGICAL_CLASS:
+					std::cout << "logical";
+					break;
+				case mxCHAR_CLASS:
+					std::cout << "char";
+					break;
+				case mxVOID_CLASS:
+					std::cout << "void";
+					break;
+				case mxINT8_CLASS:
+					std::cout << "int8_t";
+					break;
+				case mxUINT8_CLASS:
+					std::cout << "uint8_t";
+					break;
+				case mxINT16_CLASS:
+					std::cout << "int16_t";
+					break;
+				case mxUINT16_CLASS:
+					std::cout << "uint16_t";
+					break;
+				case mxINT32_CLASS:
+					std::cout << "int32_t";
+					break;
+				case mxUINT32_CLASS:
+					std::cout << "uint32_t";
+					break;
+				case mxINT64_CLASS:
+					std::cout << "int64_t";
+					break;
+				case mxUINT64_CLASS:
+					std::cout << "uint16_t";
+					break;
+				case mxFUNCTION_CLASS:
+					std::cout << "function";
+					break;
+				default:
+					std::cout << "unknown";
+					break;
+			}
+
+			std::cout << "]" << std::endl;
+
+        }
 
 	private:
 

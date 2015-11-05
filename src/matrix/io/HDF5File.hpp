@@ -336,7 +336,7 @@ namespace io {
             Vector<hsize_t> dims (space.getSimpleExtentNdims());
             size_t    ndim    = space.getSimpleExtentDims(&dims[0], NULL); //wspace.Add(name, )
             bool is_complex = false;
-            if (dims[ndim-1]==2) {
+            if (dims[ndim-1]==2 && h5d.attrExists("complex")) {
                 dims.pop_back();
                 --ndim;
                 is_complex = true;
@@ -355,9 +355,10 @@ namespace io {
                 h5a.close();
             }
             std::cout << std::endl;
-            std::string wname = name.substr(1,name.length()-1);
+            std::string wname = name;
+            if (wname[0]=='/')
+            	wname = wname.substr(1,wname.length());
             std::replace(wname.begin(), wname.end(), '/', '_');
-            std::cout << wname << std::endl;
             if (h5d.getTypeClass() == H5T_FLOAT) {
             	if (h5d.getFloatType() == PredType::NATIVE_FLOAT) {
             		if (is_complex) {

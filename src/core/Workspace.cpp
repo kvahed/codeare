@@ -29,7 +29,7 @@ Workspace::Finalise () {
 
 void Workspace::Print (std::ostream& os) const {
 
-    os << "codeare service ";
+    os << "\n    codeare workspace ----- ";
 #ifdef VERSION
 	os << VERSION;
 #endif
@@ -38,8 +38,7 @@ void Workspace::Print (std::ostream& os) const {
 	os << "commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
 #endif
 
-	os << "\nMatrices\n";
-	os <<   "--------\n\n";
+	os << "      Matrices:\n";
 	for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++) {
 
 	    const boost::any& b = m_store.find (i->second[0])->second;
@@ -66,9 +65,8 @@ void Workspace::Print (std::ostream& os) const {
 #endif
 	    os << std::endl;
 	}
-    os << "\n\nParameters\n" ;
-    os <<       "----------\n\n";
-
+    os << "      Parameters:\n" ;
+    os << "    ----------------------- ";
     os << p;
 
 }
