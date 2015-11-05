@@ -31,6 +31,7 @@ add_test (cod t_codeare)
 add_executable (t_vxfile t_vxfile.cpp)
 add_test (vx t_vxfile)
 target_link_libraries (t_vxfile ${OPENSSL_LIBRARIES} boost_timer boost_system core)
+set_tests_properties(vx PROPERTIES REQUIRED_FILES "test.dat")
 
 # if (${ITK_FOUND})
 #   add_executable (t_dicom t_dicom.cpp)

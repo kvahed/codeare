@@ -36,8 +36,6 @@ template<class T> inline static bool check () {
 	write(A);
 	read(B);
 
-//	std::cout << A;
-//	std::cout << B;
 	std::cout << (A == B);
 	std::cout << std::endl;
 
@@ -45,9 +43,7 @@ template<class T> inline static bool check () {
 	h5write (A,fname);
     B = h5read<T> (fname,"/A");
 
-//	std::cout << A;
-//	std::cout << B;
-	std::cout << (A == B);
+ 	std::cout << (A == B);
 	std::cout << std::endl;
 
 	return true;

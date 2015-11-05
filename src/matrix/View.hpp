@@ -28,9 +28,9 @@ public:
 	virtual const Vector<size_t>& Dim() const { return _dim;  }
 	virtual size_t Dim(const size_t& d) const { return _dim[0]; }
 	virtual LHSView operator() (R r) { return LHSView(); }
-	virtual RHSView operator() (const CR r) const { return RHSView(); }
-	virtual LHSView operator() (const R r, const size_t& n) { return LHSView(); }
-	virtual RHSView operator() (const CR r, const size_t& n) const { return RHSView(); }
+	virtual RHSView operator() (CR r) const { return RHSView(); }
+	virtual LHSView operator() (R r, const size_t& n) { return LHSView(); }
+	virtual RHSView operator() (CR r, const size_t& n) const { return RHSView(); }
 	virtual LHSView operator() (R r0, R r1) { return LHSView(); }
 	virtual RHSView operator() (CR r0, CR r1) const { return RHSView(); }
 	virtual LHSView operator() (R r0, R r1, R r2) { return LHSView(); }
@@ -57,14 +57,21 @@ public:
     inline View (MatrixTypeType* matrix, Vector<Range<is_const> >& range) :
         _matrix(matrix), _range(range) {
         assert (_range.size());
-        for (size_t i = 0; i < _range.size(); ++i) {
-            if (!_range[i].IsSingleton()) {
-                if (_range[i].Size() == 0) 
-                    _range[i].Reset (0,_matrix->Dim(i)-1);
-                _nsdims.push_back(i);
-            }
+        if (_range.size() == 1) {
+        	if (!_range[0].IsSingleton()) {
+				if (_range[0].Size() == 0)
+					_range[0].Reset (0,_matrix->Size()-1);
+				_nsdims.push_back(0);
+			}
+        } else {
+			for (size_t i = 0; i < _range.size(); ++i) {
+				if (!_range[i].IsSingleton()) {
+					if (_range[i].Size() == 0)
+						_range[i].Reset (0,_matrix->Dim(i)-1);
+					_nsdims.push_back(i);
+				}
+			}
         }
-        
         if (_range.size() == 1)
             for (size_t n0 = 0; n0 < _range[0].Size(); ++n0)
                 _pointers.push_back(matrix->Ptr()+_range[0][n0]);

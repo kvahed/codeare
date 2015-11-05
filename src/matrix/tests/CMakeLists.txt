@@ -106,6 +106,10 @@ add_executable(t_ishermitian t_ishermitian.cpp)
 add_test(ishermitian t_ishermitian)
 target_link_libraries(t_ishermitian ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
+add_executable(t_issame t_issame.cpp)
+add_test(issame t_issame)
+target_link_libraries(t_issame)
+
 if (${HAS_CXX11_CONDITIONAL}) 
 add_executable(t_colon t_colon.cpp)
 add_test(colon t_colon)

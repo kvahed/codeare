@@ -67,17 +67,23 @@ inline static bool eq (const MatrixType<T>& A, const MatrixType<S>& B) {
  * @param M  Matrix
  * @return   Number of non-zero elements of matrix M
  */
-template <class T> inline static  size_t
-nnz (const Matrix<T>& M) {
-	
+template <class T> inline static  size_t nnz (const Matrix<T>& M) {
 	size_t nz   = 0;
-	
 	for (size_t i = 0; i < M.Size(); ++i)
 		if (M[i] != T(0))
 			++nz;
-	
 	return nz;
-	
+}
+
+template<class T, class S> inline unsigned short issame (const Matrix<T>& A, const Matrix<S>& B) {
+	if (numel(A) != numel(B))
+		return 0;
+	for (auto i = 0; i < numel(A); ++i)
+		if (A[i]!=B[i])
+			return 0;
+	if (size(A)==size(B))
+		return 2;
+	return 1;
 }
 
 
@@ -88,8 +94,7 @@ nnz (const Matrix<T>& M) {
  * @param  d  Dimension
  * @return    X-dimensional?
  */
-template <class T>  inline static  bool
-isxd (const Matrix<T>& M, size_t d) {
+template <class T>  inline static  bool isxd (const Matrix<T>& M, size_t d) {
 
 	size_t l = 0;
 
@@ -106,8 +111,7 @@ isxd (const Matrix<T>& M, size_t d) {
  * @param M  Matrix
  * @return   1D?
  */
-template <class T>  inline static  bool
-isvec (const Matrix<T>& M) {
+template <class T>  inline static bool isvec (const Matrix<T>& M) {
 	
 	return isxd(M, 1);
 	

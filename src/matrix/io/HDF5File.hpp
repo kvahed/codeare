@@ -64,7 +64,7 @@ namespace io {
          */
         HDF5File  (const std::string& fname, const IOMode mode = READ,
                 Params params = Params(), const bool verbose = false) :
-                    IOFile(fname, mode, params, verbose) {
+                    IOFile(fname, mode, params, verbose), _depth(0) {
 
             Exception::dontPrint();
 
@@ -89,7 +89,6 @@ namespace io {
         virtual ~HDF5File () {
             Close ();
         }
-
 
 
         /**
@@ -184,9 +183,7 @@ namespace io {
             } catch (const Exception&) {
 
                 for (size_t i = 0, depth = 0; i < sv.size(); i++) {
-
                     if (sv[i].compare("")) {
-
                         try {
                             group = (depth) ? (*tmp).openGroup(sv[i])   : m_file.openGroup(sv[i]);
                         } catch (const Exception&) {
@@ -195,9 +192,7 @@ namespace io {
 
                         tmp = &group;
                         depth++;
-
                     }
-
                 }
 
             }
@@ -397,9 +392,7 @@ namespace io {
         }
 
 
-        inline void DoDatatype (const H5::DataType& h5t, const H5std_string& name) const {
-
-        }
+        inline void DoDatatype (const H5::DataType& h5t, const H5std_string& name) const {}
 
     private:
 
@@ -417,8 +410,8 @@ namespace io {
 }// namespace codeare
 
 
-    template<class T> inline static bool
-    _h5write (const Matrix<T>& M, const std::string& fname, const std::string& uri) {
+    template<class T> inline static bool _h5write (const Matrix<T>& M, const std::string& fname,
+    		const std::string& uri) {
         using namespace codeare::matrix::io;
         HDF5File h5f (fname, WRITE);
         h5f.Write(M, uri);
@@ -426,9 +419,8 @@ namespace io {
     }
 #define h5write(X,Y) _h5write (X,Y,#X)
 
-
-    template<class T> inline static Matrix<T>
-    h5read (const std::string& fname, const std::string& uri) {
+    template<class T> inline static Matrix<T> h5read (const std::string& fname,
+    		const std::string& uri) {
         using namespace codeare::matrix::io;
         HDF5File h5f (fname, READ);
         return h5f.Read<T>(uri);

@@ -13,8 +13,7 @@
 
 #include "Demangle.hpp"
 
-template <class T> inline static bool
-MXValidate  (const Matrix<T>& M, const mxArray* mxa) {
+template <class T> inline static bool MXValidate  (const Matrix<T>& M, const mxArray* mxa) {
 
 	T t = (T)0;
 	mxClassID     mcid = mxGetClassID(mxa);
@@ -44,18 +43,15 @@ namespace io {
 template <class T>
 struct MXTraits;
 
-template <class T>
-static void write_real (mxArray* mxa, const Matrix<T>& M) {
+template <class T> static void write_real (mxArray* mxa, const Matrix<T>& M) {
 	memcpy(mxGetData(mxa), M.Ptr(), numel(M) * sizeof(T));
 }
 
-template <class T>
-static void read_real (Matrix<T>& M, const mxArray* mxa) {
+template <class T> static void read_real (Matrix<T>& M, const mxArray* mxa) {
 	memcpy (&M[0], mxGetPr(mxa), numel(M) * sizeof (T));
 }
 
-template <class T>
-static void write_complex (mxArray* mxa, const Matrix<std::complex<T> >& M) {
+template <class T> static void write_complex (mxArray* mxa, const Matrix<std::complex<T> >& M) {
 	T* re = (T*)mxGetPr(mxa);
 	T* im = (T*)mxGetPi(mxa);
 	for (size_t i = 0; i < numel(M); ++i) {
@@ -64,8 +60,7 @@ static void write_complex (mxArray* mxa, const Matrix<std::complex<T> >& M) {
 	}
 }
 
-template <class T>
-static void read_complex (Matrix<std::complex<T> >& M, const mxArray* mxa) {
+template <class T> static void read_complex (Matrix<std::complex<T> >& M, const mxArray* mxa) {
 	T* re = (T*)mxGetPr(mxa);
 	T* im = (T*)mxGetPi(mxa);
 	bool cplx = (im != NULL);
@@ -115,31 +110,24 @@ template <> struct MXTraits<short> {
 
 	public:
 
-		MLFile (const std::string& fname, const IOMode mode, const Params& params = Params(), const bool verbose = false) :
-			IOFile (fname, mode, params, verbose) {
-
+		MLFile (const std::string& fname, const IOMode mode, const Params& params = Params(),
+				const bool verbose = false) : IOFile (fname, mode, params, verbose) {
 			if (verbose)
 				printf ("Opening %s (%s).\n", fname.c_str(), (mode == READ) ? "r" : "w");
-
 			m_file = matOpen (fname.c_str(), (mode == READ) ? "r" : "w" );
-
 			if (m_file == NULL) {
 				printf ("Error opening MATLAB file %s\n", fname.c_str());
 				assert (false);
 			}
-
 		}
 
 		virtual ~MLFile () {
-
 			if (m_file)
 				if (matClose(m_file) != 0)
 				printf ("Error closing file %s\n",this->m_fname.c_str());
-
 		}
 
-		template<class T> Matrix<T>
-		Read (const std::string& uri) const {
+		template<class T> Matrix<T>	Read (const std::string& uri) const {
 
 			mxArray*      mxa = matGetVariable (m_file, uri.c_str());
 			Matrix<T> M;
@@ -175,8 +163,7 @@ template <> struct MXTraits<short> {
 
 		}
 
-		template <class T> bool
-		Write (const Matrix<T>& M, const std::string& uri) {
+		template <class T> bool	Write (const Matrix<T>& M, const std::string& uri) {
 
 			// Declare dimensions and allocate array
 			size_t nd = M.NDim();
@@ -210,8 +197,7 @@ template <> struct MXTraits<short> {
 		 *
 		 * @return  Success
 		 */
-		template<class T> Matrix<T>
-		Read (const TiXmlElement* txe) const {
+		template<class T> Matrix<T>	Read (const TiXmlElement* txe) const {
 			std::string uri (txe->Attribute("uri"));
 			return this->Read<T>(uri);
 		}
@@ -222,19 +208,24 @@ template <> struct MXTraits<short> {
 		 *
 		 * @return  Success
 		 */
-		template<class T> bool
-		Write (const Matrix<T>& M, const TiXmlElement* txe) {
+		template<class T> bool Write (const Matrix<T>& M, const TiXmlElement* txe) {
 			std::string uri (txe->Attribute("uri"));
 			return this->Write (M, uri);
 		}
 
+
+        inline void Load () const {
+        	int vars = 0;
+        	char** dir = matGetDir(m_file, &vars);
+        	for (auto i = 0; i < vars; ++i)
+        		std::cout << dir[i] << std::endl;
+        }
 
 
 	private:
 
 		MLFile (const MLFile& mf) : m_file(0) {}
 		MLFile ()                 : m_file(0) {}
-
 		MATFile*                    m_file;
 
 	};
