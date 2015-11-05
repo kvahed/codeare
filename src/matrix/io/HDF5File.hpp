@@ -130,12 +130,9 @@ namespace io {
             }
 
             Vector<size_t> mdims (ndim,1);
-
             for (size_t i = 0; i < ndim; ++i)
                 mdims[i] = dims[ndim-i-1];
-
             PredType* type = HDF5Traits<T>::PType();
-
             Matrix<T> M (mdims);
             dataset.read (&M[0], *type);
 
@@ -175,13 +172,10 @@ namespace io {
                 printf ("Creating dataset %s at path (%s)\n", name.c_str(), path.c_str());
 
             try {
-
                 group = m_file.openGroup(path);
                 if (this->m_verb)
                     printf ("Group %s opened for writing\n", path.c_str()) ;
-
             } catch (const Exception&) {
-
                 for (size_t i = 0, depth = 0; i < sv.size(); i++) {
                     if (sv[i].compare("")) {
                         try {
@@ -194,17 +188,13 @@ namespace io {
                         depth++;
                     }
                 }
-
             }
 
             // One more field for complex numbers
             size_t tmpdim = ndims(M);
-
             Vector<hsize_t> dims (tmpdim);
-
             for (size_t i = 0; i < tmpdim; i++)
                 dims[i] = M.Dim(tmpdim-1-i);
-
             if (is_complex(t)) {
                 dims.push_back(2);
                 tmpdim++;
@@ -212,7 +202,6 @@ namespace io {
 
             DataSpace space (tmpdim, &dims[0]);
             PredType*  type = HDF5Traits<T>::PType();
-
             DataSet set = group.createDataSet(name, (*type), space);
 
             set.write   (M.Ptr(), (*type));
