@@ -321,11 +321,10 @@ KTPoints::KTPoints  () : m_verbose(false), m_rflim(1.0), m_conv(1.0e-6), m_lambd
         m_breakearly(true), m_gd(1.0e-5), m_max_rf(0), m_maxiter(1000), ns(0), nk(0), nc(0) {}
 
 
-KTPoints::~KTPoints ()     {}
+KTPoints::~KTPoints () {}
 
 
-codeare::error_code
-KTPoints::Init      ()     {
+codeare::error_code KTPoints::Init () {
 
     printf ("Intialising KTPoints ...\n");
     
@@ -383,16 +382,12 @@ KTPoints::Init      ()     {
 }
 
 
-codeare::error_code
-KTPoints::Finalise  ()     {
-
+codeare::error_code KTPoints::Finalise () {
     return codeare::OK;
-
 }
 
 
-codeare::error_code
-KTPoints::Process   ()     {
+codeare::error_code KTPoints::Process () {
 
     // On entry -------------------
     //
@@ -486,18 +481,11 @@ KTPoints::Process   ()     {
 
 
 // Factory
-extern "C" DLLEXPORT ReconStrategy*
-create  ()                 {
-
+extern "C" DLLEXPORT ReconStrategy* create () {
     return new KTPoints;
-
 }
 
-
 // Trash bin
-extern "C" DLLEXPORT void
-destroy (ReconStrategy* p) {
-
+extern "C" DLLEXPORT void destroy (ReconStrategy* p) {
     delete p;
-
 }
