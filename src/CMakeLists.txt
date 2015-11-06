@@ -191,7 +191,7 @@ MP_TESTS ("denoise_cs" "${TEST_CALL}")
 
 if (${NFFT3_FOUND})
 
-  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/nufft -c 16shot.xml)
+  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/nufft -c 8shot_spiral.xml)
   MP_TESTS ("nufft" "${TEST_CALL}")
 
   set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
