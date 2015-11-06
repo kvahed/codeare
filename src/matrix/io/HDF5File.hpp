@@ -65,7 +65,6 @@ namespace io {
         HDF5File  (const std::string& fname, const IOMode mode = READ,
                 Params params = Params(), const bool verbose = false) :
                     IOFile(fname, mode, params, verbose), _depth(0) {
-            H5::H5Library::getLibVersion(_lib_version[0],_lib_version[1],_lib_version[2]);
             Exception::dontPrint();
             try {
                 m_file = H5File (fname, (mode == READ) ? H5F_ACC_RDONLY :H5F_ACC_TRUNC);
@@ -317,8 +316,15 @@ namespace io {
 
         inline void DoDataset (const H5::DataSet& h5d, const H5std_string& name) const {
             bool is_complex = false;
-            if (_lib_version[0] >= 1 && _lib_version[1] >= 12)
-            h5d.attrExists("complex");
+#ifdef HDF5_HAS_LOCATION
+            is_complex = h5d.attrExists("complex");
+#else
+            for (int i = 0; i < h5d.getNumAttrs(); ++i) {
+                H5::Attribute h5a = h5d.openAttribute(i);
+                if (h5a.getName().compare(H5std_string("complex")) == 0)
+                    is_complex=true;
+            }
+#endif
             std::cout << std::string(_depth, ' ') << "Dataset: " << name; fflush(stdout);
             std::string wname = name;
             if (wname[0]=='/')
@@ -355,8 +361,6 @@ namespace io {
         HDF5File  () : _depth(0) {}
         H5File m_file; /// @brief My file
         mutable size_t _depth;
-        unsigned lib_version[3];
-
 
     };
 
