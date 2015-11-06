@@ -181,8 +181,8 @@ MP_TESTS ("grappa" "${TEST_CALL}")
 set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/ktpoints -c 7t-8ch-8p.xml)  
 MP_TESTS ("ktpoints" "${TEST_CALL}")
 
-set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c phantom_denoising.xml) 
-MP_TESTS ("denoise_cs" "${TEST_CALL}")
+#set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c phantom_denoising.xml) 
+#MP_TESTS ("denoise_cs" "${TEST_CALL}")
 
 #if (${GSL_FOUND})
 #   set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/gradients -c config_vdcs.xml) 
@@ -191,16 +191,16 @@ MP_TESTS ("denoise_cs" "${TEST_CALL}")
 
 if (${NFFT3_FOUND})
 
-  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/nufft -c 16shot.xml)
+  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/nufft -c 8shot_spiral.xml)
   MP_TESTS ("nufft" "${TEST_CALL}")
 
   set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
   MP_TESTS ("cgsense" "${TEST_CALL}")
 
-  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c nufft_cs.xml) 
+  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c nufft_cs_lbfgs.xml) 
   MP_TESTS ("nufft_cs" "${TEST_CALL}")
 
-  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c cgsense_r3_cs.xml) 
+  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c cgsense_r3_cs_nlcg.xml) 
   MP_TESTS ("cgsense_cs" "${TEST_CALL}")
 
 endif()

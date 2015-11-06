@@ -30,13 +30,6 @@ Workspace::Finalise () {
 void Workspace::Print (std::ostream& os) const {
 
     os << "\n    codeare workspace ----- ";
-#ifdef VERSION
-	os << VERSION;
-#endif
-    os << endl;
-#ifdef GIT_COMMIT
-	os << "commit " << GIT_COMMIT << " [" << GIT_COMMIT_DATE << "]" << endl;
-#endif
 
 	os << "      Matrices:\n";
 	for (reflist::const_iterator i = m_ref.begin(); i != m_ref.end(); i++) {

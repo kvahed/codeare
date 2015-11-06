@@ -122,21 +122,21 @@ endif()
 
 # try to find the HDF5 wrapper compilers
 find_program( HDF5_C_COMPILER_EXECUTABLE
-    NAMES ${HDF5_C_COMPILER_NAMES} NAMES_PER_DIR
+    NAMES ${HDF5_C_COMPILER_NAMES} #NAMES_PER_DIR
     HINTS ENV HDF5_ROOT
     PATH_SUFFIXES bin Bin
     DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
 mark_as_advanced( HDF5_C_COMPILER_EXECUTABLE )
 
 find_program( HDF5_CXX_COMPILER_EXECUTABLE
-    NAMES ${HDF5_CXX_COMPILER_NAMES} NAMES_PER_DIR
+    NAMES ${HDF5_CXX_COMPILER_NAMES}# NAMES_PER_DIR
     HINTS ENV HDF5_ROOT
     PATH_SUFFIXES bin Bin
     DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
 mark_as_advanced( HDF5_CXX_COMPILER_EXECUTABLE )
 
 find_program( HDF5_Fortran_COMPILER_EXECUTABLE
-    NAMES ${HDF5_Fortran_COMPILER_NAMES} NAMES_PER_DIR
+    NAMES ${HDF5_Fortran_COMPILER_NAMES} #NAMES_PER_DIR
     HINTS ENV HDF5_ROOT
     PATH_SUFFIXES bin Bin
     DOC "HDF5 Fortran Wrapper compiler.  Used only to detect HDF5 compile flags." )
