@@ -31,6 +31,12 @@
 # Find module will then look in this path when searching for HDF5
 # executables, paths, and libraries.
 #
+# Both the serial and parallel HDF5 wrappers are considered and the first
+# directory to contain either one will be used.  In the event that both appear
+# in the same directory the serial version is preferentially selected. This
+# behavior can be reversed by setting the variable HDF5_PREFER_PARALLEL to
+# true.
+#
 # In addition to finding the includes and libraries required to compile
 # an HDF5 client application, this module also makes an effort to find
 # tools that come with the HDF5 distribution that may be useful for
@@ -51,6 +57,7 @@
 #                               bindings.
 #   HDF5_LIBRARIES - Required libraries for all requested bindings
 #   HDF5_FOUND - true if HDF5 was found on the system
+#   HDF5_VERSION - HDF5 version in format Major.Minor.Release
 #   HDF5_LIBRARY_DIRS - the full set of library directories
 #   HDF5_IS_PARALLEL - Whether or not HDF5 was found with parallel IO support
 #   HDF5_C_COMPILER_EXECUTABLE - the path to the HDF5 C wrapper compiler
@@ -59,6 +66,7 @@
 #   HDF5_DIFF_EXECUTABLE - the path to the HDF5 dataset comparison tool
 
 #=============================================================================
+# Copyright 2015 Axel Huebl, Helmholtz-Zentrum Dresden - Rossendorf
 # Copyright 2009 Kitware, Inc.
 #
 # Distributed under the OSI-approved BSD License (the "License");
@@ -101,27 +109,42 @@ else()
     endforeach()
 endif()
 
+# Determine whether to search for serial or parallel executable first
+if(HDF5_PREFER_PARALLEL)
+  set(HDF5_C_COMPILER_NAMES h5pcc h5cc)
+  set(HDF5_CXX_COMPILER_NAMES h5pc++ h5c++)
+  set(HDF5_Fortran_COMPILER_NAMES h5pfc h5fc)
+else()
+  set(HDF5_C_COMPILER_NAMES h5cc h5pcc)
+  set(HDF5_CXX_COMPILER_NAMES h5c++ h5pc++)
+  set(HDF5_Fortran_COMPILER_NAMES h5fc h5pfc)
+endif()
+
 # try to find the HDF5 wrapper compilers
 find_program( HDF5_C_COMPILER_EXECUTABLE
-    NAMES h5cc h5pcc
+    NAMES ${HDF5_C_COMPILER_NAMES} NAMES_PER_DIR
     HINTS ENV HDF5_ROOT
     PATH_SUFFIXES bin Bin
     DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
 mark_as_advanced( HDF5_C_COMPILER_EXECUTABLE )
 
 find_program( HDF5_CXX_COMPILER_EXECUTABLE
-    NAMES h5c++ h5pc++
+    NAMES ${HDF5_CXX_COMPILER_NAMES} NAMES_PER_DIR
     HINTS ENV HDF5_ROOT
     PATH_SUFFIXES bin Bin
     DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
 mark_as_advanced( HDF5_CXX_COMPILER_EXECUTABLE )
 
 find_program( HDF5_Fortran_COMPILER_EXECUTABLE
-    NAMES h5fc h5pfc
+    NAMES ${HDF5_Fortran_COMPILER_NAMES} NAMES_PER_DIR
     HINTS ENV HDF5_ROOT
     PATH_SUFFIXES bin Bin
     DOC "HDF5 Fortran Wrapper compiler.  Used only to detect HDF5 compile flags." )
 mark_as_advanced( HDF5_Fortran_COMPILER_EXECUTABLE )
+
+unset(HDF5_C_COMPILER_NAMES)
+unset(HDF5_CXX_COMPILER_NAMES)
+unset(HDF5_Fortran_COMPILER_NAMES)
 
 find_program( HDF5_DIFF_EXECUTABLE
     NAMES h5diff
@@ -162,7 +185,7 @@ macro( _HDF5_parse_compile_line
     )
     foreach( IPATH ${include_path_flags} )
         string( REGEX REPLACE "^-I" "" IPATH ${IPATH} )
-        string( REGEX REPLACE "//" "/" IPATH ${IPATH} )
+        string( REPLACE "//" "/" IPATH ${IPATH} )
         list( APPEND ${include_paths} ${IPATH} )
     endforeach()
 
@@ -179,7 +202,7 @@ macro( _HDF5_parse_compile_line
 
     foreach( LPATH ${library_path_flags} )
         string( REGEX REPLACE "^-L" "" LPATH ${LPATH} )
-        string( REGEX REPLACE "//" "/" LPATH ${LPATH} )
+        string( REPLACE "//" "/" LPATH ${LPATH} )
         list( APPEND ${library_paths} ${LPATH} )
     endforeach()
 
@@ -200,7 +223,6 @@ if( NOT HDF5_FOUND )
     find_package( HDF5 QUIET NO_MODULE )
     if( HDF5_FOUND )
         set( HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIR} )
-        set( HDF5_BIN_DIR ${HDF5_INCLUDE_DIR}/../bin )
         set( HDF5_LIBRARIES )
         set( HDF5_C_TARGET hdf5 )
         set( HDF5_CXX_TARGET hdf5_cpp )
@@ -224,6 +246,8 @@ if( NOT HDF5_FOUND )
     _HDF5_invoke_compiler( C HDF5_C_COMPILE_LINE HDF5_C_RETURN_VALUE )
     _HDF5_invoke_compiler( CXX HDF5_CXX_COMPILE_LINE HDF5_CXX_RETURN_VALUE )
     _HDF5_invoke_compiler( Fortran HDF5_Fortran_COMPILE_LINE HDF5_Fortran_RETURN_VALUE )
+    set(HDF5_HL_COMPILE_LINE ${HDF5_C_COMPILE_LINE})
+    set(HDF5_Fortran_HL_COMPILE_LINE ${HDF5_Fortran_COMPILE_LINE})
 
     # seed the initial lists of libraries to find with items we know we need
     set( HDF5_C_LIBRARY_NAMES_INIT hdf5 )
@@ -231,7 +255,7 @@ if( NOT HDF5_FOUND )
     set( HDF5_CXX_LIBRARY_NAMES_INIT hdf5_cpp ${HDF5_C_LIBRARY_NAMES_INIT} )
     set( HDF5_Fortran_LIBRARY_NAMES_INIT hdf5_fortran
         ${HDF5_C_LIBRARY_NAMES_INIT} )
-    set( HDF5_Fortran_HL_LIBRARY_NAMES_INIT hdf5hl_fortran
+    set( HDF5_Fortran_HL_LIBRARY_NAMES_INIT hdf5hl_fortran hdf5_hl
         ${HDF5_Fortran_LIBRARY_NAMES_INIT} )
 
     foreach( LANGUAGE ${HDF5_LANGUAGE_BINDINGS} )
@@ -254,7 +278,7 @@ if( NOT HDF5_FOUND )
         list( APPEND HDF5_DEFINITIONS ${HDF5_${LANGUAGE}_DEFINITIONS} )
 
         # find the HDF5 include directories
-        if(${LANGUAGE} MATCHES "Fortran.*")
+        if(${LANGUAGE} MATCHES "Fortran")
             set(HDF5_INCLUDE_FILENAME hdf5.mod)
         else()
             set(HDF5_INCLUDE_FILENAME hdf5.h)
@@ -283,7 +307,7 @@ if( NOT HDF5_FOUND )
             if( UNIX AND HDF5_USE_STATIC_LIBRARIES )
                 # According to bug 1643 on the CMake bug tracker, this is the
                 # preferred method for searching for a static library.
-                # See http://www.cmake.org/Bug/view.php?id=1643.  We search
+                # See https://cmake.org/Bug/view.php?id=1643.  We search
                 # first for the full static library name, but fall back to a
                 # generic search on the name if the static search fails.
                 set( THIS_LIBRARY_SEARCH_DEBUG lib${LIB}d.a ${LIB}d )
@@ -336,15 +360,28 @@ if( NOT HDF5_FOUND )
     # If the HDF5 include directory was found, open H5pubconf.h to determine if
     # HDF5 was compiled with parallel IO support
     set( HDF5_IS_PARALLEL FALSE )
+    set( HDF5_VERSION "" )
     foreach( _dir IN LISTS HDF5_INCLUDE_DIRS )
-        if( EXISTS "${_dir}/H5pubconf.h" )
-            file( STRINGS "${_dir}/H5pubconf.h"
+      foreach(_hdr "${_dir}/H5pubconf.h" "${_dir}/H5pubconf-64.h" "${_dir}/H5pubconf-32.h")
+        if( EXISTS "${_hdr}" )
+            file( STRINGS "${_hdr}"
                 HDF5_HAVE_PARALLEL_DEFINE
                 REGEX "HAVE_PARALLEL 1" )
             if( HDF5_HAVE_PARALLEL_DEFINE )
                 set( HDF5_IS_PARALLEL TRUE )
             endif()
+            unset(HDF5_HAVE_PARALLEL_DEFINE)
+
+            file( STRINGS "${_hdr}"
+                HDF5_VERSION_DEFINE
+                REGEX "^[ \t]*#[ \t]*define[ \t]+H5_VERSION[ \t]+" )
+            if( "${HDF5_VERSION_DEFINE}" MATCHES
+                "H5_VERSION[ \t]+\"([0-9]+\\.[0-9]+\\.[0-9]+).*\"" )
+                set( HDF5_VERSION "${CMAKE_MATCH_1}" )
+            endif()
+            unset(HDF5_VERSION_DEFINE)
         endif()
+      endforeach()
     endforeach()
     set( HDF5_IS_PARALLEL ${HDF5_IS_PARALLEL} CACHE BOOL
         "HDF5 library compiled with parallel IO support" )
@@ -358,8 +395,7 @@ if( NOT HDF5_FOUND )
 
 endif()
 
-find_package_handle_standard_args( HDF5 DEFAULT_MSG
-    HDF5_LIBRARIES
-    HDF5_INCLUDE_DIRS
+find_package_handle_standard_args( HDF5
+    REQUIRED_VARS HDF5_LIBRARIES HDF5_INCLUDE_DIRS
+    VERSION_VAR   HDF5_VERSION
 )
-
