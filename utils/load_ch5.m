@@ -1,21 +1,14 @@
 function [] = load_ch5 (fname)
 %LOAD_CH5 Reads data from HDF5 files.
 %    
-%   Read codeare hdf5 output.
+%   usage: load_ch5 (filename)
 %   
-%   codeare_hdf5read (fname);
-%
-%   IN: 
-%     fname: File name
-%   
-%   Kaveh Vahedipour - Research Centre Juelich, 2013
+%   Kaveh Vahedipour - NYU School of Medicine, 2015
     
     hinfo = h5info(fname);
     nsets = numel(hinfo.Datasets);
     dsets = hinfo.Datasets;
     names = cell(nsets);
-    
-    %display (sprintf('   reading %d datasets ...', nsets));
     
     for i = 1:nsets
         names{i} = dsets(i).Name;
@@ -40,9 +33,4 @@ function [] = load_ch5 (fname)
         end
         assignin ('caller',names{i},tmp);
     end
-
-    clear tmp names tsz tn data dsets nsets hinfo cmd i fname;
-    
-    %display ('   done.');
-    
 end

@@ -1,6 +1,10 @@
 function [] = save_ch5 (varargin) 
-    fname = varargin{1};
-    display(sprintf('filename = %s',fname));
+%SAVE_CH5 Writes data into codeare HDF5 files.
+%    
+%   usage: save_ch5 (filename, data1, data2, ...)
+%   
+%   Kaveh Vahedipour - NYU School of Medicine, 2015
+
     delf = sprintf('rm %s', fname);
     [~,~] = system(delf);
     for i=2:nargin
