@@ -215,7 +215,7 @@ template <> struct MXTraits<short> {
 		}
 
 
-        inline void Load () const {
+        inline void Read () const {
             std::cout  << "    File name: " << m_fname << std::endl;
         	int vars = 0;
         	char** dir = matGetDir(m_file, &vars);

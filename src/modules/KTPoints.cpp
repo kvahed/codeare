@@ -81,15 +81,11 @@ NOHO                         (const Matrix<cxfl>& target, const Matrix<cxfl>& re
  * @param  result   Achieved result
  * @return          Phase corrected 
  */
-inline static void
-PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
-    
+inline static void PhaseCorrection (Matrix<cxfl>& target, const Matrix<cxfl>& result) {
     size_t n = target.Size();
-    
 #pragma omp parallel for
     for (int i = 0; i < (int)n; i++) 
         target[i] = abs(target[i]) * result[i] / abs(result[i]);
-
 }
 
 
@@ -152,9 +148,9 @@ STA (const Matrix<float>& ks, const Matrix<float>& r, const Matrix<cxfl>& b1, co
  *
  *
  */
-static inline void
-PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<float>& pd, const size_t gd, 
-           const size_t nk, const size_t nc, Matrix<cxfl>& rf, Matrix<float>& grad) {
+static inline void PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks,
+		const Matrix<float>& pd, const size_t gd, const size_t nk, const size_t nc,
+		Matrix<cxfl>& rf, Matrix<float>& grad) {
     
     
     // Total pulse duration --------------
@@ -236,11 +232,9 @@ PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>& ks, const Matrix<f
 
 
 
-static inline void
-KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
-          Matrix<cxfl>& solution, const double& lambda, const size_t& mxit, 
-          const float& conv, const bool& breakearly, size_t& gc, 
-		  Matrix<float>& res) {
+static inline void KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
+     Matrix<cxfl>& solution, const double& lambda, const size_t& mxit,  const float& conv,
+	 const bool& breakearly, size_t& gc, Matrix<float>& res) {
 
     Matrix<cxfl> minv;
 
@@ -251,9 +245,8 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
 
     // Variable exchange method --------------
     while (gc < mxit) {
-		
-        solution = minv ->* target;
-        final    = m    ->* solution;
+        solution = gemm(minv,target);
+        final    = gemm(m,solution);
         
         res[gc]  = NRMSE (target, final);
         PhaseCorrection  (target, final);
@@ -279,9 +272,8 @@ KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix<cxfl>& final,
 
 
 
-inline static bool 
-CheckAmps (const Matrix<cxfl>& solution, Matrix<float>& pd, const size_t& nk, 
-		   const size_t& nc, Matrix<float>& max_rf, const float& rflim) {
+inline static bool CheckAmps (const Matrix<cxfl>& solution, Matrix<float>& pd, const size_t& nk,
+	const size_t& nc, Matrix<float>& max_rf, const float& rflim) {
 
 	bool amps_ok = true;
 
@@ -325,18 +317,8 @@ CheckAmps (const Matrix<cxfl>& solution, Matrix<float>& pd, const size_t& nk,
 }
 
 
-KTPoints::KTPoints  () :
-        m_verbose   (false),
-        m_rflim     (1.0),
-        m_conv      (1.0e-6),
-        m_lambda    (1.0e-6),
-        m_breakearly(true),
-        m_gd        (1.0e-5),
-        m_max_rf    (0),
-        m_maxiter   (1000),
-        ns(0), nk(0), nc(0) {
-
-}
+KTPoints::KTPoints  () : m_verbose(false), m_rflim(1.0), m_conv(1.0e-6), m_lambda(1.0e-6),
+        m_breakearly(true), m_gd(1.0e-5), m_max_rf(0), m_maxiter(1000), ns(0), nk(0), nc(0) {}
 
 
 KTPoints::~KTPoints ()     {}
@@ -432,6 +414,7 @@ KTPoints::Process   ()     {
     Matrix<cxfl>&  b1     = Get<cxfl>  ("b1");
     Matrix<float>& b0     = Get<float> ("b0");
     Matrix<cxfl>&  target = Get<cxfl>  ("target");
+
     size_t ns = size( r,1); // # of spatial positions
     size_t nk = size( k,1); // # of kt points
     size_t nc = size(b1,1); // # of RF channels

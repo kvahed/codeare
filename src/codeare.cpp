@@ -1,6 +1,6 @@
 /*
- *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
- *                               Forschungszentrum Juelich, Germany
+ *  codeare Copyright (C) 2007-2015 Kaveh Vahedipour
+ *                                  NYU School of Madicine
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,17 +30,16 @@ int main (int argc, char** argv) {
     int error = 1;
 	
 	if (commandline_opts (argc, argv)) {
-
+        
 		// Make local or remote connection
 		Connector con (argc, argv, name, debug);
 		if (!con.ReadConfig (config_file_uri.c_str())) {
             printf ("*** ERROR: No or corrupt configuration file specified to algorithm! \n");
             return (int)codeare::CONFIG_LOAD_FILE_FAILED;
         }
-
+        
 		// Read binary data from file
 		TiXmlElement* datain = con.GetElement("/config/data-in");
-
 
 		if (!datain) {
 			printf ("*** WARNING: No input data specified to algorithm! \n");

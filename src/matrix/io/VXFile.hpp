@@ -67,43 +67,44 @@ public:
     /**
      * @brief Cleanup memory and close file
      */
-    virtual ~VXFile () {
-        delete (_context);
-    }
+    virtual ~VXFile () { delete (_context); }
 
     /**
      * @return Current status
      */
-    int Status () {
-        return _context->Status();
-    }
+    int Status () const { return _context->Status(); }
 
     /**
      * @brief Digest ingredients
      */
-    void Digest () {
-        _context->Digest();
-    }
+    void Digest () { _context->Digest(); }
 
     /**
      * @brief Close file
      */
-    void Close () {
-        _context->Close();
-    }
+    void Close () { _context->Close(); }
     
-    template<class T> Matrix<T> Read (const std::string& data_name = "meas") {
+    void Read () {
     	if (_version == IDEA_VB)
-    		return ((VB::VBFile*)_context)->Read<T>(data_name);
+    		((VB::VBFile*)_context)->Read();
     	else
-    		return ((VD::VDFile*)_context)->Read<T>(data_name);
+    		((VD::VDFile*)_context)->Read();
     }
 
     template<class T> Matrix<T> Read  (const TiXmlElement * txe) {
-        std::string uri (txe->Attribute("uri"));
-        return this->Read<T>(uri);
+    	assert(false);
+    	return Matrix<T>();
+        //std::string uri (txe->Attribute("uri"));
+        //this->Read<T>(uri);
     }
-        
+
+    template<class T> Matrix<T> Read  (const std::string& uri) {
+    	assert(false);
+    	return Matrix<T>();
+        //std::string uri (txe->Attribute("uri"));
+        //this->Read<T>(uri);
+    }
+
 private:
 
     idea_version CheckVersion (const std::string& fname) {

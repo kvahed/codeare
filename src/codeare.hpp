@@ -18,7 +18,7 @@ using namespace RRClient;
 #include <sstream>
 
 char  *name = 0, *base_dir = 0, *config = 0, *debug = 0, *EMPTY = (char*)"", *ZERO = (char*)"0",
-		*CURRENT = (char*)".", *data = (char*)0;
+    *CURRENT = (char*)".", *data = 0, *infile = 0, *outfile = 0;
 std::string config_file_uri;
 bool   pulses;
 int    rank;
@@ -76,7 +76,7 @@ bool commandline_opts (int argc, char** argv) {
     opt.addUsage  ("");
     opt.addUsage  (" -n, --name     Remote service name (optional)");
     opt.addUsage  (" -d, --debug    Debug level 0-40 (default: 0)");
-    opt.addUsage  (" -b, --base     Base directory of approved files");
+    opt.addUsage  (" -b, --base     Base directory of files");
     opt.addUsage  ("                (default: current directory, i.e. '.'");
     opt.addUsage  (" -c, --config   Configuration XML file name (default: codeare.xml");
     opt.addUsage  (" -i, --infile   Binary data input file name");

@@ -240,18 +240,13 @@ namespace io      {
 		/**
 		 * @brief  Default destructor
 		 */
-		virtual ~IOFile () {
-			CleanUp();
-		}
+		virtual ~IOFile () { CleanUp(); }
 
 
 		/**
 		 * @brief Clean up
 		 */
-		virtual error_code
-		CleanUp () {
-			return OK;
-		}
+		virtual error_code CleanUp () { return OK; }
 
 
 		/**
@@ -259,10 +254,7 @@ namespace io      {
 		 *
 		 * @return  File name
 		 */
-		inline std::string
-		FileName() const {
-			return m_fname;
-		}
+		inline std::string FileName() const { return m_fname; }
 
 
 		/**
@@ -270,10 +262,7 @@ namespace io      {
 		 *
 		 * @return Verbosity
 		 */
-		inline bool
-		Verbosity() const {
-			return m_verb;
-		}
+		inline bool	Verbosity() const { return m_verb; }
 
 
 		/**
@@ -281,10 +270,7 @@ namespace io      {
 		 *
 		 * @return Status
 		 */
-		inline error_code
-		Status () const {
-			return m_status;
-		}
+		inline error_code Status () const { return m_status; }
 
 
 		/**
@@ -292,10 +278,7 @@ namespace io      {
 		 *
 		 * @return Memory allocated?
 		 */
-		inline bool
-		Allocated () const {
-			return m_alloc;
-		}
+		inline bool	Allocated () const { return m_alloc; }
 
 
 		/**
@@ -303,10 +286,7 @@ namespace io      {
 		 *
 		 * @return Write lock?
 		 */
-		inline bool
-		Locked () const {
-			return (m_mode == WRITE);
-		}
+		inline bool	Locked () const { return (m_mode == WRITE); }
 
 
 		/**
@@ -314,26 +294,14 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		template<class T> Matrix<T>
-		Read (const std::string& uri) const;
-
-
-		/**
-		 * @brief  Write data to file
-		 *
-		 * @return  Success
-		 */
-		template<class T> bool
-		Write (const Matrix<T>& M, const std::string& uri);
-
+		template<class T> Matrix<T> Read (const std::string& uri) const;
 
 		/**
 		 * @brief Read a particular data set from file
 		 *
 		 * @return  Success
 		 */
-		template<class T> Matrix<T>
-		Read (const TiXmlElement* txe) const {
+		template<class T> Matrix<T>	Read (const TiXmlElement* txe) const {
 			std::string uri (txe->Attribute("uri"));
 			return this->Read<T>(uri);
 		}
@@ -344,8 +312,14 @@ namespace io      {
 		 *
 		 * @return  Success
 		 */
-		template<class T> bool
-		Write (const Matrix<T>& M, const TiXmlElement* txe) {
+		template<class T> bool Write (const Matrix<T>& M, const std::string& uri);
+
+		/**
+		 * @brief  Write data to file
+		 *
+		 * @return  Success
+		 */
+		template<class T> bool Write (const Matrix<T>& M, const TiXmlElement* txe) {
 			std::string uri (txe->Attribute("uri"));
 			return this->Write (M, uri);
 		}

@@ -60,7 +60,7 @@ if(Matlab_ROOT_DIR)
     set (LD_ENV "${LD_ENV}:${MATLAB_LIBRARY_DIRS}")
   endif ()
 
-  set (TEST_CALL t_matlab -b 2)  
+  set (TEST_CALL t_matlab)  
   MP_TESTS ("matlab" "${TEST_CALL}")
   
 endif()

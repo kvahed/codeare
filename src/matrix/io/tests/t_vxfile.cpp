@@ -4,7 +4,7 @@ using namespace codeare::matrix::io;
 
 template<class T> inline static bool read (const std::string& fname, Matrix<T>& A) {
     VXFile vxf (fname, READ);
-    vxf.Read<T>();
+    vxf.Read();
     return true;
 }
 

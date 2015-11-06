@@ -44,8 +44,9 @@ int main (int args, char** argv) {
             return 0;
     } else {
         MLFile mf (argv[1],READ);
-        mf.Load();
+        mf.Read();
         std::cout << wspace << std::endl;
+        return 0;
     }
     return 1;
 }

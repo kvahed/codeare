@@ -135,16 +135,12 @@ public:
         _digested = true;
     }
     
-    template<class T> Matrix<T> Read (const std::string& data_name) {
-
+    void Read () {
         if (!_digested)
             this->Digest();
-        
         wspace.Add<cxfl>("meas", _meas);
         wspace.Add<cxfl>("rtfb", _rtfb);
         wspace.Add<float>("sync", _sync);
-        
-        return Matrix<T>();
     }
 
 private:
