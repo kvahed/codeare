@@ -1,7 +1,7 @@
 # Project ------------------------------------------------------------
 project (codeare CXX C)
-set (codeare_VERSION_MAJOR 1)
-set (codeare_VERSION_MINOR 2)
+set (codeare_VERSION_MAJOR 2)
+set (codeare_VERSION_MINOR 0)
 set (PROJECT_URL "http://codeare.org/")
 set (PROJECT_VERSION
   "${codeare_VERSION_MAJOR}.${codeare_VERSION_MINOR}")
@@ -209,9 +209,15 @@ endif()
 
 # File IO ------------------------------------------------------------
 find_package(HDF5 "1.8.5" REQUIRED COMPONENTS C CXX)
-message (STATUS "HDF5 Found")
 include_directories (${HDF5_INCLUDE_DIRS})
 link_directories (${HDF5_LIBRARY_DIRS})
+string(REPLACE "." ";" HDF5_VERSION_LIST ${HDF5_VERSION})
+list(GET HDF5_VERSION_LIST 0 HDF5_VERSION_MAJ)
+list(GET HDF5_VERSION_LIST 1 HDF5_VERSION_MIN)
+list(GET HDF5_VERSION_LIST 2 HDF5_VERSION_REL)
+if (HDF5_VERSION_MAJ>=1 AND HDF5_VERSION_MIN>=8 AND HDF5_VERSION_REL>=12)
+  add_definitions(-DHDF5_HAS_LOCATION)
+endif() 
 if (${MSVC})
   set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} hdf5.lib hdf5_cpp.lib")
   set(ZLIB_LIBRARY "${HDF5_DIR}/../../lib/zlib.lib")

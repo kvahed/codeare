@@ -23,7 +23,7 @@ namespace matrix {
 namespace io {
 
     template<class T> struct HDF5Traits;
-
+    
     template<> struct HDF5Traits<float> {
         static PredType* PType () {
             return (PredType*) new FloatType (PredType::NATIVE_FLOAT);
@@ -65,7 +65,7 @@ namespace io {
         HDF5File  (const std::string& fname, const IOMode mode = READ,
                 Params params = Params(), const bool verbose = false) :
                     IOFile(fname, mode, params, verbose), _depth(0) {
-
+            H5::H5Library::getLibVersion(_lib_version[0],_lib_version[1],_lib_version[2]);
             Exception::dontPrint();
             try {
                 m_file = H5File (fname, (mode == READ) ? H5F_ACC_RDONLY :H5F_ACC_TRUNC);
@@ -316,7 +316,9 @@ namespace io {
         }
 
         inline void DoDataset (const H5::DataSet& h5d, const H5std_string& name) const {
-            bool is_complex = h5d.attrExists("complex");
+            bool is_complex = false;
+            if (_lib_version[0] >= 1 && _lib_version[1] >= 12)
+            h5d.attrExists("complex");
             std::cout << std::string(_depth, ' ') << "Dataset: " << name; fflush(stdout);
             std::string wname = name;
             if (wname[0]=='/')
@@ -353,6 +355,7 @@ namespace io {
         HDF5File  () : _depth(0) {}
         H5File m_file; /// @brief My file
         mutable size_t _depth;
+        unsigned lib_version[3];
 
 
     };
@@ -360,6 +363,8 @@ namespace io {
 }// namespace io
 }// namespace matrix
 }// namespace codeare
+
+
 
     template<class T> inline static bool _h5write (const Matrix<T>& M, const std::string& fname,
     		const std::string& uri) {
