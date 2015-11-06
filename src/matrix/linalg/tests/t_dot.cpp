@@ -28,11 +28,12 @@ template<class T> bool dot_check () {
 #ifdef VERBOSE
     std::cout << "x**H * y=\n" << b << " " << d << "\n" << std::endl;
 #endif
-	return (TypeTraits<T>::Abs((a-c)/a)<1.e-6 && 
-			TypeTraits<T>::Abs((b-d)/b)<1.e-6);
+    std::cout << TypeTraits<T>::Abs((a-c)/a) << " " << TypeTraits<T>::Abs((b-d)/b) << std::endl;
+	return (TypeTraits<T>::Abs((a-c)/a)<1.e-4 && 
+			TypeTraits<T>::Abs((b-d)/b)<1.e-4);
 }
 
 int main (int args, char** argv) {
 	return (dot_check<float>() && dot_check<double>() && 
-            dot_check<cxdb>() && dot_check<cxfl>()) ? 0 : 1;
+            dot_check<cxfl>() && dot_check<cxdb>()) ? 0 : 1;
 }

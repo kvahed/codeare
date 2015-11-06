@@ -616,17 +616,11 @@ norm (const Matrix<T>& M, const char what = 'E') {
  * @param  B           Right factor
  * @return             A'*B
  */
-template <class T> inline T 
-dotc (const Matrix<T>& A, const Matrix<T>& B) {
+template <class T> inline T dotc (const Matrix<T>& A, const Matrix<T>& B) {
     
-	int n = (int) numel(A), one = 1;
-	T res;// = (T)0.;
-    
-	assert (n == (int) numel(B));
-
-	LapackTraits<T>::dotc (n, A.Ptr(), one, B.Ptr(), one, &res);
-	
-	return res;
+    Matrix<T> C = conj(A);
+    Vec(C.Container(), B.Container(), C.Container(), codeare::multiplies<T>());
+	return std::accumulate(C.Container().begin(), C.Container().end(), (T)0);
 
 }
 
@@ -651,19 +645,10 @@ DOTC (const Matrix<T>& A, const Matrix<T>& B) {
  * @param  B           Right factor
  * @return             A*B
  */
-template <class T> inline T 
-dot  (const Matrix<T>& A, const Matrix<T>& B) {
-    
-    int n, one = 1;
-    T   res;
-    
-    n   = (int) numel(A);
-    assert (n == (int) numel(B));
-    
-    LapackTraits<T>::dot (n, A.Ptr(), one, B.Ptr(), one, &res);
-    
-    return res;
-    
+template <class T> inline T dot (const Matrix<T>& A, const Matrix<T>& B) {
+    Matrix<T> C = A;
+    Vec(C.Container(), B.Container(), C.Container(), codeare::multiplies<T>());
+	return std::accumulate(C.Container().begin(), C.Container().end(), (T)0);
 }
 
 
