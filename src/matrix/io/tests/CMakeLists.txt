@@ -52,7 +52,7 @@ set_tests_properties (hdf5 PROPERTIES ENVIRONMENT
 
 if(Matlab_ROOT_DIR)
   add_executable (t_matlab t_matlab.cpp)
-  target_link_libraries (t_matlab ${Matlab_MX_LIBRARY} ${Matlab_MAT_LIBRARY} core)
+  target_link_libraries (t_matlab ${OPENSSL_LIBRARIES} ${Matlab_MX_LIBRARY} ${Matlab_MAT_LIBRARY} core)
   
   if (${WINDOWS}) 
     set (LD_ENV "${LD_ENV}\;${MATLAB_ROOT}/bin/win64") 

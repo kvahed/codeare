@@ -197,10 +197,10 @@ if (${NFFT3_FOUND})
   set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/cgsense -c 3fold.xml) 
   MP_TESTS ("cgsense" "${TEST_CALL}")
 
-  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c nufft_cs.xml) 
+  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c nufft_cs_lbfgs.xml) 
   MP_TESTS ("nufft_cs" "${TEST_CALL}")
 
-  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c cgsense_r3_cs.xml) 
+  set (TEST_CALL codeare -b ${PROJECT_SOURCE_DIR}/share/compressedsensing -c cgsense_r3_cs_nlcg.xml) 
   MP_TESTS ("cgsense_cs" "${TEST_CALL}")
 
 endif()
