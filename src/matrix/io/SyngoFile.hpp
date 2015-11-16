@@ -57,8 +57,13 @@ inline static std::vector<uint32_t>& _max (std::vector<uint32_t>& dims, const ui
  * @brief Helper. Increment all values but first 2 in v.
  */
 inline static std::vector<uint32_t>& _raise_one (std::vector<uint32_t>& v) {
-    for (size_t i = 2; i < v.size(); ++i)
-        v[i]++;
+    if (v[0]==0)
+        v[0] = 1;
+    if (v[1]==0)
+        v[1] = 1;
+    if (v.size()>2)
+        for (size_t i = 2; i < v.size(); ++i)
+            v[i]++;
     return v;
 }
 

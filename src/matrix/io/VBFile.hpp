@@ -66,10 +66,6 @@ namespace VB {
             _rtfbdims = std::vector<uint32_t>(16);
             _syncdims = std::vector<uint32_t>( 2);
             prtmsg("     VB file contains %.1fGB of raw data starting at position %d.\n", 1e-9f*iGB*_data_len, _header_len);
-            Digest();
-            wspace.Add<cxfl>("meas", _meas);
-            wspace.Add<cxfl>("rtfb", _rtfb);
-            wspace.Add<float>("sync", _sync);
         }
 #endif
 
@@ -146,6 +142,7 @@ namespace VB {
             if (!_meas_r) {
                 _measdims = _raise_one (_measdims);
                 _rtfbdims = _raise_one (_rtfbdims);
+                _syncdims = _raise_one (_syncdims);
                 _measdims[5] = (_measdims[5]-_cent_par)*2;
                 _ta = 2.5e-3*(_tend-_tstart);
                 wspace.PSet("TA", _ta);
@@ -161,7 +158,7 @@ namespace VB {
                 for (size_t i = 0; i < 15; ++i)
                     prtmsg ("%d ", _rtfbdims[i]);
                 prtmsg(")\n");
-                prtmsg ("       Sync dims ( %d %d)\n", _syncdims[0], _syncdims[1] );
+                prtmsg ("       Sync dims ( %d %d )\n", _syncdims[0], _syncdims[1] );
                 evalstr("drawnow;");
                 this->Allocate();
                 this->Digest();

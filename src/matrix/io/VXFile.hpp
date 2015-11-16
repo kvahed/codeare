@@ -45,8 +45,8 @@ public:
      */
 #ifdef USE_MATLAB
     VXFile (const std::string& fname, int nlhs = 0, mxArray *lhs[] = 0) {
-        idea_version iv = CheckVersion (fname);
-        _context = (iv == IDEA_VD) ?
+        CheckVersion (fname);
+        _context = (_version == IDEA_VD) ?
             (SyngoFile*) new VD::VDFile(fname, nlhs, lhs) :
             (SyngoFile*) new VB::VBFile(fname, nlhs, lhs);
     }
@@ -56,8 +56,8 @@ public:
      */
     VXFile (const std::string& fname, const IOMode mode = READ,
 			  const Params& params = Params(), const bool verbosity = false) : _context(0) {
-        idea_version iv = CheckVersion (fname);
-        if (iv == IDEA_VD)
+        CheckVersion (fname);
+        if (_version == IDEA_VD)
         	_context = (SyngoFile*) new VD::VDFile(fname, mode, params, verbosity);
         else
         	_context = (SyngoFile*) new VB::VBFile(fname, mode, params, verbosity);
@@ -94,25 +94,21 @@ public:
     template<class T> Matrix<T> Read  (const TiXmlElement * txe) {
     	assert(false);
     	return Matrix<T>();
-        //std::string uri (txe->Attribute("uri"));
-        //this->Read<T>(uri);
     }
 
     template<class T> Matrix<T> Read  (const std::string& uri) {
     	assert(false);
     	return Matrix<T>();
-        //std::string uri (txe->Attribute("uri"));
-        //this->Read<T>(uri);
     }
 
 private:
 
-    idea_version CheckVersion (const std::string& fname) {
+    void CheckVersion (const std::string& fname) {
         std::ifstream file (fname.c_str());
         uint32_t x[2];
         file.read ((char*)x, 2*sizeof(uint32_t));
         file.close();
-        return (x[0] == 0 && x[1] <= 64) ? IDEA_VD : IDEA_VB;
+        _version = (x[0] == 0 && x[1] <= 64) ? IDEA_VD : IDEA_VB;
     }
     
     /**
