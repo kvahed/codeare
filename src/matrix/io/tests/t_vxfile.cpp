@@ -18,8 +18,14 @@ template<class T> inline static bool check () {
 }
 
 int main (int args, char** argv) {
-    if (check<cxfl>())
+    if (args == 1) {
+        if (check<cxfl>())
+            return 0;
+    } else {
+        VXFile vxf (argv[1],READ);
+        vxf.Read();
+        std::cout << wspace << std::endl;
         return 0;
-    else
-        return 1;
+    }
+    return 1;
 }
