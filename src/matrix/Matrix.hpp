@@ -996,7 +996,7 @@ public:
      * @param   transb  Transpose ('T') / Conjugate transpose ('C') the right matrix. Default: No transposition 'N'
      * @return          Product of this and M.
      */
-    Matrix<T,P> prod (const Matrix<T,P> &M, const char transa = 'N', const char transb = 'N') const;
+    Matrix<T,P> mul (const Matrix<T,P> &M, const char transa = 'N', const char transb = 'N') const;
 
 
 
@@ -1006,7 +1006,7 @@ public:
      * @param   M       Factor
      * @return          Product of conj(this) and M.
      */
-    Matrix<T,P> prodt  (const Matrix<T,P> &M) const;
+    Matrix<T,P> mult  (const Matrix<T,P> &M) const;
 
 
     /**
@@ -1150,7 +1150,7 @@ public:
      * @return          All dimensions
      */
     inline virtual void Dim (const Vector<size_t>& dim) {
-        if (vprod(dim) == vprod(_dim)) {
+        if (prod(dim) == prod(_dim)) {
             _dim = dim;
             _dsz.resize(_dim.size(),1);
             for (size_t i = 1; i < _dim.size(); ++i) {
@@ -2000,7 +2000,7 @@ protected:
 		_dsz.resize(ds,1);
 	    for (i = 1; i < ds; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-        size_t n = vprod(_dim);
+        size_t n = prod(_dim);
         if (n != _M.size())
             _M.resize(n);
     }

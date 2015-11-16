@@ -507,11 +507,11 @@ gemm (const Matrix<T>& A, const Matrix<T>& B, char transa = 'N', char transb = '
 }
 
 template<class T, paradigm P> Matrix<T,P>
-Matrix<T,P>::prod  (const Matrix<T,P> &M, char transa, char transb) const {
+Matrix<T,P>::mul  (const Matrix<T,P> &M, char transa, char transb) const {
     return gemm (*this, M, transa, transb);
 }
 template<class T, paradigm P> inline Matrix<T,P>
-Matrix<T,P>::prodt (const Matrix<T,P> &M) const {
+Matrix<T,P>::mult (const Matrix<T,P> &M) const {
     return gemm (*this, M, 'C');
 }
 template<class T, paradigm P> inline Matrix<T,P>
