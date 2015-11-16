@@ -239,7 +239,7 @@ static inline void KTPSolve (const Matrix<cxfl>& m, Matrix<cxfl>& target, Matrix
     Matrix<cxfl> minv;
 
     // Regularised inverse (E^H*E)^-1*E^H
-    minv  = pinv(m.prodt(m) + lambda*eye<cxfl>(size(m,1))).prod(m, 'N', 'C');
+    minv  = pinv(m.mult(m) + lambda*eye<cxfl>(size(m,1))).mul(m, 'N', 'C');
     
     size_t j = 0;
 

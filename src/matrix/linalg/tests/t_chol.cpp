@@ -14,7 +14,7 @@ template<class T> void chol_check () {
     std::cout << "A=\n" << A << std::endl;
 #endif
     
-    A = A.prodt(A); // m*m' (Must be positive definite)
+    A = A.mult(A); // m*m' (Must be positive definite)
     A = chol (A);
 
 #ifdef VERBOSE
