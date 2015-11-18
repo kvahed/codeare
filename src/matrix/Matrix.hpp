@@ -1144,21 +1144,12 @@ public:
     }
 
 
-    /**
-     * @brief           Get dimension array
-     *
-     * @return          All dimensions
-     */
-    inline virtual void Dim (const Vector<size_t>& dim) {
-        if (prod(dim) == prod(_dim)) {
-            _dim = dim;
-            _dsz.resize(_dim.size(),1);
-            for (size_t i = 1; i < _dim.size(); ++i) {
-                _dsz[i] = _dsz[i-1]*_dim[i-1];
+    inline void Squeeze () {
+        for (auto i = _dim.begin(), j = _dsz.begin(); i != _dim.end(); ++i, ++j)
+            if (*i == 1) {
+                _dsz.erase(j--);
+                _dim.erase(i--);
             }
-        } else {
-            throw REDIM_MUST_PRESERVE_SIZE;
-        }
     }
 
 
@@ -1997,10 +1988,11 @@ protected:
      */
     inline void Allocate () {
         size_t ds = _dim.size(), i;
-		_dsz.resize(ds,1);
+		_dsz.resize(ds);
+        _dsz[0] = 1;
 	    for (i = 1; i < ds; ++i)
 	        _dsz[i] = _dsz[i-1]*_dim[i-1];
-        size_t n = prod(_dim);
+        size_t n = _dsz.back()*_dim.back(); 
         if (n != _M.size())
             _M.resize(n);
     }

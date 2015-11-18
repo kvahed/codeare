@@ -930,32 +930,9 @@ template <class T> inline static Matrix<typename TypeTraits<T>::RT>
  * @param  M       Matrix
  * @return         Squeezed matrix
  */
-template <class T> inline static void squeeze_ip (Matrix<T>& M) {
-	Vector<size_t> dim;
-	Vector<float>  res;
-	for (size_t i = 0; i < M.NDim(); ++i)
-		if (size(M, i) > 1) {
-			dim.push_back(size (M,i));
-			res.push_back(resol(M,i));
-		}
-	M.Dim(dim);
-}
-
-/**
- * @brief          Get rid of unused dimensions
- *
- * Usage:
- * @code
- *   Matrix<cxfl> m   = rand<double> (1,8,7,1,6);
- *   m = squeeze (m); // dims: (8,7,6); 
- * @endcode
- *
- * @param  M       Matrix
- * @return         Squeezed matrix
- */
 template <class T> inline static Matrix<T> squeeze (const Matrix<T>& M) {
     Matrix<T> ret = M;
-    squeeze_ip(ret);
+    ret.Squeeze();
 	return ret;
 }
 template<class T> inline static Matrix<T> squeeze (const View<T,true>& V) {

@@ -98,7 +98,7 @@ codeare::error_code EstimateSensitivities::Process () {
     // Get rid of singleton dimensions
     std::cout << "    * Get rid of singleton dimensions" << std::endl;
     data *= 1e6;
-    squeeze_ip(data);
+    data.Squeeze();
     nk = size(data,0);
     nc = size(data,1);
     nl = size(data,2);

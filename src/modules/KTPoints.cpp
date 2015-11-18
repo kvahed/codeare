@@ -422,6 +422,7 @@ codeare::error_code KTPoints::Process () {
     Matrix<float> pd = ones<float>(nk,1); // Starting with shortest pulses possible 
 	pd *= 5;
 
+    
     Matrix<cxfl>    solution; // Solution for timing calculation
     Matrix<cxfl>&   final = AddMatrix<cxfl> ("final");   // Excitation profile
 

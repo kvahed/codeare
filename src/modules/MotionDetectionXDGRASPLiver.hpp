@@ -71,7 +71,6 @@ namespace RRStrategy {
 		}
 		
 		size_t _nx, _nv, _nz, _nc, _ntres, _tf;
-		float _ta, _tr; // acquisition time
 		Vector<float> _time;
 
 
