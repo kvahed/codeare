@@ -125,6 +125,7 @@ codeare::error_code XDGRASP::Process () {
     m_image_size.push_back (m_dim5);
     Matrix<cxfl>& data = Get<cxfl>("meas");
     Matrix<float>& kspace = Get<float>("kspace");
+    Matrix<float>& weights = Get<float>("weights");
     Matrix<float>& res_signal = Get<float>("res_signal");
     size_t nline, nv, nt, nx, nz, nc;
     float ta = wspace.PGet<float>("TA");
@@ -168,22 +169,28 @@ codeare::error_code XDGRASP::Process () {
 	data = resize(data,nx*nline,nt,_ntres,nz,nc);
 	std::cout << "  Reshaped and permuted:    " << std::endl;
 	Vector<size_t> order(5); order[0]=0; order[1]=3; order[2]=4; order[3]=1; order[4]=2;
-	std::cout << "    data:     " << size(data) << std::endl;
+	std::cout << "    data:          " << size(data) << std::endl;
 	data = permute (data,order);
-	std::cout << "    data:     " << size(data) << std::endl;
+	std::cout << "    data:          " << size(data) << std::endl;
 	kspace = resize(kspace,size(kspace,0),nx*nline,nt,_ntres);
-	std::cout << "    kspace:   " << size(kspace) << std::endl;
+	std::cout << "    kspace:        " << size(kspace) << std::endl;
+    weights = zeros<float>(nx*nline,1);
+    weights (R( 0,nx/2-1),0) = linspace<float>(1.,1./nx,nx/2);
+    weights (R(nx/2,nx-1),0) = linspace<float>(1./nx,1.,nx/2);
+    for (auto i = weights.Begin()+nx; i < weights.End(); i += nx)
+        std::copy (weights.Begin(), weights.Begin()+nx, i);
+	std::cout << "    weights:       " << size(weights) << std::endl;
+	ft_params["sensitivities"] = Get<cxfl>("sensitivities");
     
     Matrix<cxfl> im_xd (m_image_size);
-	ft_params["sensitivities"] = Get<cxfl>("sensitivities");
     csx = new CS_XSENSE<cxfl>(ft_params);
 	std::cout << *csx << std::endl;
 
-/*    FT<cxfl>& ft = *csx;
-    ft.KSpace(Get<float>("kspace"));
-	ft.Weights (Get<float>("weights"));*/
+    FT<cxfl>& ft = *csx;
+    ft.KSpace(kspace);
+	ft.Weights (weights);
 
-    //im_xd = ft ->* data;
+    im_xd = ft ->* data;
 
     Add ("im_xd", im_xd);
 

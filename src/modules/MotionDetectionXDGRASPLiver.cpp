@@ -76,16 +76,11 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	std::cout << "  Analyse channel motion data ..." << std::endl;
 
 	// Frequency stamp (only for the delay enhanced part)
-    std::cout << _nv << std::endl;
 	f_s = ta/_nv;
-    std::cout << f_s << std::endl;
 	f_x = linspace<float>(0,f_s,_nv/2).Container();
 	f_x = f_x - .5*f_s; // frequency after FFT of the motion signal
-        std::cout << f_x << std::endl;
-
 	if (_nv/2%2==0)
 	    f_x += f_x[_nv/4];
-    std::cout << f_x << std::endl;
 
 	nn  = 400; // Interpolation along z dimension
 	meas = zpad(meas,size(meas,0),nn,size(meas,2));
@@ -125,8 +120,6 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	std::cout << "  Detect peaks ..." << std::endl;
 	// Take the component with the highest peak in respiratory motion range
 	lf = 0.1; hf = 0.5; //Respiratory frequency range
-    std::cout << f_x << std::endl;
-    std::cout << hf << std::endl;
 	tmp_idx = find(f_x>hf);
 	fr_idx=find(f_x<hf & f_x>lf);
 	tmp_peak = squeeze(motion_signal_fft(CR(tmp_idx),CR()));
