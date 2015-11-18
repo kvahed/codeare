@@ -65,6 +65,9 @@ codeare::error_code EstimateSensitivities::Init () {
 
 	m_initialised = true;
 
+	Matrix<cxfl> sensitivities;
+	Add ("sensitivities", sensitivities);
+
 	return error;
 
 }

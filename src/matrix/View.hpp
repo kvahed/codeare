@@ -240,8 +240,11 @@ public:
         Matrix<T>& lhs = *_matrix;
         const Matrix<T>& rhs = *(v._matrix);
         assert (_nsdims.size() == v._nsdims.size());
-        for (size_t i = 0; i < _nsdims.size(); ++i)
+        for (size_t i = 0; i < _nsdims.size(); ++i) {
+        	if (_range[i].Size()!=v._range[i].Size())
+        		std::cout << _range[i].Size() << " != " << v._range[i].Size() << std::endl;
             assert(_range[i].Size()==v._range[i].Size());
+        }
         for (size_t i = 0; i < _pointers.size(); ++i)
             *_pointers[i] = *(v._pointers)[i];
         return *this;

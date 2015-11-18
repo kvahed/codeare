@@ -39,8 +39,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		MotionDetectionXDGRASPLiver  () : _nx(280), _nv(600), _nz(38), _nc(15), _ta(105.),
-			_tr(0.), _ntres(4), _tf(15.0) {}
+		MotionDetectionXDGRASPLiver  () : _nx(280), _nv(600), _nz(38), _nc(15) {}
 		
 		/**
 		 * @brief Default destructor

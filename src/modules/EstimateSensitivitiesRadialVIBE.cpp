@@ -32,14 +32,13 @@ using namespace RRStrategy;
 codeare::error_code EstimateSensitivitiesRadialVIBE::Init () {
 	_image_space_dims = GetList<size_t>("image_space_dims");
 	_cart_3rd_dim     = GetAttr<bool>("cart_3rd_dim");
-
+	Matrix<cxfl> sensitivities;
+	Add ("sensitivities", sensitivities);
 	return codeare::OK;
 }
 
 codeare::error_code EstimateSensitivitiesRadialVIBE::Prepare () {
-	Matrix<cxfl> sensitivities;
 	Matrix<float> kspace, weights, sos;
-	Add<cxfl>("sensitivities", sensitivities);
 	Add<float>("kspace", kspace);
 	Add<float>("weights", weights);
 	Add<float>("sos", sos);
@@ -131,6 +130,7 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
         sensitivities (R(),R(),R(),R(i)) /= sos;
 
     meas = resize(meas,nk,nv,nz,nc);
+    kspace = resize(kspace,size(kspace,0),nk,nv);
 
 	return codeare::OK;
 }

@@ -57,8 +57,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 		res_peak, tmp_peak, res_peak_nor, tt, res_signal, ftmax;
 	Vector<float> f_x;
 	Vector<size_t> idx, tmp_idx, fr_idx, ft_idx, peaks;
-	float f_s, lf, ta = wspace.PGet<float>("TA"), hf;
-	size_t nn, span = 10.0, min_dist = 20, pc_sel = 5, ntres, nline, nt;
+	float f_s, lf, hf;
+	size_t nn, span = 10.0, min_dist = 20, pc_sel = 5;
 	eig_t<float> et;
 
     meas = squeeze(meas);
@@ -142,13 +142,6 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	std::cout << "  CSPLINE fit peaks and subtract..." << std::endl;
 	ftmax = interp1(peaks_i, peaks_v, linspace<float>(0.,_nv-1,_nv));
 	res_signal = res_signal-ftmax;
-
-	// Sort k-space
-	ntres = 4;
-	nt = ceil(ta/_tf);
-	nline = ceil(_nv/(ntres*nt));
-	std::cout << "  Data acquired within " << ta << std::endl;
-	std::cout << "  Sorting data in  " << ntres << " respiratory and " << nt << " contrast gates" << std::endl;
 
 	Add ("ftmax", ftmax);
 	Add ("motion_signal", motion_signal_new);

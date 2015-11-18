@@ -109,6 +109,8 @@ namespace RRStrategy {
         Vector<size_t> m_image_size;
         int            m_test_case;
         float          m_ndnz;
+        float          _tf;
+        size_t         _ntres;
 
         double m_noise;
 
@@ -123,7 +125,7 @@ namespace RRStrategy {
 
         int            m_dim4;
         int            m_dim5;
-
+        Params ft_params;
         CS_XSENSE<cxfl>* csx;
 
     };

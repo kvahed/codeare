@@ -47,7 +47,7 @@ int main (int argc, char** argv) {
 			TiXmlElement* datain_entry = datain->FirstChildElement();
 			IOContext ic (datain, base_dir, READ);
 
-            if (!ic.Strategy()!=SYNGO) {
+            if (ic.Strategy()!=SYNGO) {
                 while (datain_entry) {
                     
                     const std::string data_name = datain_entry->Value();
@@ -85,6 +85,8 @@ int main (int argc, char** argv) {
                     
                     datain_entry = datain_entry->NextSiblingElement();
                 }
+            } else {
+            	ic.Read();
             }
         }
 

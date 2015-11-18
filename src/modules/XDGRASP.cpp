@@ -35,8 +35,6 @@ codeare::error_code XDGRASP::Init () {
 
     std::cout << *this << std::endl;
 
-	Params ft_params;
-
 	for (size_t i = 0; i < 3; i++)
 		m_N[i] = 1;
 
@@ -53,75 +51,26 @@ codeare::error_code XDGRASP::Init () {
 	Attribute ("dim4",     &m_dim4);
 	Attribute ("dim5",     &m_dim5);
 
-/*    printf ("  Weights: TV(%.2e) XF(%.2e) L1(%.2e)\n", m_csparam.tvw, m_csparam.xfmw, m_csparam.l1);
-      printf ("  Pnorm: %.2e\n", m_csparam.pnorm);*/
-	
-    Attribute ("ft", &m_ft_type);
+	ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
+	ft_params["weights_name"] = std::string("weights");
+	ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
+	ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
+	ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
+	ft_params["m"]       = RHSAttribute<size_t>("ftm");
+	ft_params["fteps"]        = RHSAttribute<float>("fteps");
+	ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
+	ft_params["cgeps"]        = RHSAttribute<float>("cgeps");
+	ft_params["lambda"]       = RHSAttribute<float>("lambda");
+	ft_params["threads"]      = RHSAttribute<int>("threads");
+	ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
+	try {
+		size_t n  = GetAttr<size_t> ("nmany");
+		ft_params["nmany"] = n;
+	} catch (const TinyXMLQueryException&) {
+		ft_params["nmany"] = 1;
+	}
 
-	printf ("  FFT class: ");
-	switch (m_ft_type)
-		{
-		case 0:
-			printf ("%s", "ft");
-			ft_params["dims"] = m_image_size;
-			ft_params["mask"] = Get<float>("mask");
-		    ft_params["threads"] = RHSAttribute<int>("threads");
-			break;
-		case 1:
-			printf ("%s", "SENSE");
-			assert(false);
-			break;
-		case 2:
-			printf ("%s", "NUFFT");
-#ifdef HAVE_NFFT3
-			ft_params["epsilon"] = RHSAttribute<float>("fteps");
-			ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
-			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
-			ft_params["m"]       = RHSAttribute<size_t>("ftm");
-	        ft_params["nk"]      = RHSAttribute<size_t>("ftnk");
-	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
-		    ft_params["threads"] = RHSAttribute<int>("threads");
-	        ft_params["imsz"]    = m_image_size;
-#else
-			printf("**ERROR - XDGRASP: NUFFT support not available.");
-			assert(false);
-#endif
-			break;
-		case 3:
-			printf ("%s", "NCSENSE");
-#ifdef HAVE_NFFT3
-			ft_params["sensitivities"] = Get<cxfl>("sensitivities");
-            ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
-			ft_params["weights_name"] = std::string("weights");
-			ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
-			ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
-		    ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
-			ft_params["m"]       = RHSAttribute<size_t>("ftm");
-		    ft_params["fteps"]        = RHSAttribute<float>("fteps");
-		    ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
-		    ft_params["cgeps"]        = RHSAttribute<float>("cgeps");
-		    ft_params["lambda"]       = RHSAttribute<float>("lambda");
-		    ft_params["threads"]      = RHSAttribute<int>("threads");
-	        ft_params["3rd_dim_cart"] = RHSAttribute<bool>("cart_3rd_dim");
-            try {
-                size_t n  = GetAttr<size_t> ("nmany");
-                ft_params["nmany"] = n;
-            } catch (const TinyXMLQueryException&) {
-                ft_params["nmany"] = 1;                
-            }
-
-		    ft_params["verbose"]      = 0;
-#else
-			printf("**ERROR - XDGRASP: NUFFT support not available.");
-			assert(false);
-#endif
-			break;
-		default:
-			printf ("No FT strategy defined");
-			assert (false);
-			break;
-		}
-	printf ("\n");
+	ft_params["verbose"]      = 0;
 
     ft_params["imsz"]  = m_image_size;
     ft_params["nlopt"] = RHSAttribute<int>("nlopt");
@@ -147,11 +96,16 @@ codeare::error_code XDGRASP::Init () {
     ft_params["dim4"] = m_dim4;
     ft_params["dim5"] = m_dim5;
 
-    csx = new CS_XSENSE<cxfl>(ft_params);
 
+	try {
+		_ntres = GetAttr<size_t>("_ntres");
+	} catch (const TinyXMLQueryException&) {}
+
+	try {
+		_tf = GetAttr<size_t>("frame_duration");
+	} catch (const TinyXMLQueryException&) {}
 
 	m_initialised = true;
-	std::cout << *csx << std::endl;
 
 	printf ("... done.\n\n");
 
@@ -161,36 +115,75 @@ codeare::error_code XDGRASP::Init () {
 
 
 codeare::error_code XDGRASP::Prepare () {
-
 	codeare::error_code error = codeare::OK;
-
-	FT<cxfl>& ft = *csx;
-
-	if (m_ft_type == 2 || m_ft_type == 3) {
-        ft.KSpace(Get<float>("kspace"));
-		ft.Weights (Get<float>("weights"));
-        Free ("weights");
-        Free ("kspace");
-    } else {
-		ft.Mask (Get<float>("mask"));
-    }
-
-	m_initialised = true;
-
 	return error;
-
 }
 
 codeare::error_code XDGRASP::Process () {
 
     m_image_size.push_back (m_dim4);
     m_image_size.push_back (m_dim5);
+    Matrix<cxfl>& data = Get<cxfl>("meas");
+    Matrix<float>& kspace = Get<float>("kspace");
+    Matrix<float>& res_signal = Get<float>("res_signal");
+    size_t nline, nv, nt, nx, nz, nc;
+    float ta = wspace.PGet<float>("TA");
+    Vector<size_t> n = size(data);
+    nx = n[0]; nv = n[1]; nz = n[2]; nc = n[3];
+
+    // Timing
+	nt = ceil(ta/_tf);
+	nline = floor(nv/(_ntres*nt));
+	std::cout << "  Data acquired within " << ta << std::endl;
+	std::cout << "  Sorting data in " << _ntres << " respiratory and " << nt
+			  << " contrast gates with "	<< nline << " views each." <<std::endl;
+
+	// Clip over the time data, kspace and signal
+	data = data(CR(),CR(0,nt*_ntres*nline-1),CR(),CR());
+	res_signal = res_signal(CR(0,nt*_ntres*nline-1));
+	kspace = kspace(CR(),CR(),CR(0,nt*_ntres*nline-1));
+	nv = size(data,1);
+
+	std::cout << "  Incoming    " << std::endl;
+	std::cout << "    data:     " << size(data) << std::endl;
+	std::cout << "    kspace:   " << size(kspace) << std::endl;
+	std::cout << "    resp sig: " << size(res_signal) << std::endl;
+
+	// Contrasts
+	std::cout << "  Reshaped:    " << std::endl;
+	data = resize(data,nx,nv/nt,nt,nz,nc);
+	std::cout << "    data:     " << size(data) << std::endl;
+	kspace = resize(kspace,size(kspace,0),nx,nv/nt,nt);
+	std::cout << "    kspace:   " << size(kspace) << std::endl;
+	res_signal = resize(res_signal,nv/nt,nt);
+	std::cout << "    resp sig: " << size(res_signal) << std::endl;
+
+	// Respiration
+	for (size_t i = 0; i < nt; ++i) {
+		Matrix<float> res_gate = res_signal(CR(),CR(i));
+		Vector<size_t> index = sort(res_gate);
+		data(R(),R(),R(i),R(),R()) = data (CR(),CR(index),CR(i),CR(),CR());
+		kspace (R(),R(),R(),R(i)) = kspace (CR(),CR(),CR(index),CR(i));
+	}
+	data = resize(data,nx*nline,nt,_ntres,nz,nc);
+	std::cout << "  Reshaped and permuted:    " << std::endl;
+	Vector<size_t> order(5); order[0]=0; order[1]=3; order[2]=4; order[3]=1; order[4]=2;
+	std::cout << "    data:     " << size(data) << std::endl;
+	data = permute (data,order);
+	std::cout << "    data:     " << size(data) << std::endl;
+	kspace = resize(kspace,size(kspace,0),nx*nline,nt,_ntres);
+	std::cout << "    kspace:   " << size(kspace) << std::endl;
     
     Matrix<cxfl> im_xd (m_image_size);
-    Matrix<cxfl>& data = Get<cxfl>("data");
-    FT<cxfl>& ft = *csx;
+	ft_params["sensitivities"] = Get<cxfl>("sensitivities");
+    csx = new CS_XSENSE<cxfl>(ft_params);
+	std::cout << *csx << std::endl;
 
-    im_xd = ft ->* data;
+/*    FT<cxfl>& ft = *csx;
+    ft.KSpace(Get<float>("kspace"));
+	ft.Weights (Get<float>("weights"));*/
+
+    //im_xd = ft ->* data;
 
     Add ("im_xd", im_xd);
 
@@ -200,8 +193,8 @@ codeare::error_code XDGRASP::Process () {
 
 
 XDGRASP::XDGRASP() :
-	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_ft_type(0),
-	m_noise(0.), m_test_case(0), csx(0), m_dim4(1), m_dim5(1), m_ndnz(1) {}
+	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_ft_type(0), m_noise(0.), m_test_case(0),
+    csx(0), m_dim4(1), m_dim5(1), m_ndnz(1), _ntres(4), _tf(15.0) {}
 
 
 XDGRASP::~XDGRASP() {}

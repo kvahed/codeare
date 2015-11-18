@@ -283,15 +283,11 @@ namespace io{
 		 */
 		IOContext (const TiXmlElement* txe, const std::string& base = ".", const IOMode mode = READ,
 				const bool verbosity = false) :	m_iof(0), m_ios(HDF5) {
-
 			if (!txe)
 				printf ("Ouch, XML element for construction is 0!\n");
 			std::string fname = base + "/" + std::string(txe->Attribute("fname"));
-			std::string ftype (txe->Attribute("ftype"));
-			m_ios = TypeByName (ftype);
-
+			m_ios = TypeBySuffix (fname);
 			this->Concretize(fname, mode, Params(), verbosity);
-
 		}
 
 
