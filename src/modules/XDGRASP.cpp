@@ -39,17 +39,10 @@ codeare::error_code XDGRASP::Init () {
 		m_N[i] = 1;
 
 	Attribute ("verbose", &m_verbose);
-    m_image_size   = RHSList<size_t>("ftdims");
-    m_dim = m_image_size.size();
-
-	printf ("  Geometry: " JL_SIZE_T_SPECIFIER "D (" JL_SIZE_T_SPECIFIER ","
-            JL_SIZE_T_SPECIFIER "," JL_SIZE_T_SPECIFIER ")\n", (size_t)m_dim,
-            m_image_size[0], m_image_size[1], (m_image_size.size()==3) ? m_image_size[2] : 1);
 
 	Attribute ("test_case", &m_test_case);
 	Attribute ("noise",     &m_noise);
-	Attribute ("dim4",     &m_dim4);
-	Attribute ("dim5",     &m_dim5);
+
 
 	ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
 	ft_params["weights_name"] = std::string("weights");
@@ -72,7 +65,6 @@ codeare::error_code XDGRASP::Init () {
 
 	ft_params["verbose"]      = 0;
 
-    ft_params["imsz"]  = m_image_size;
     ft_params["nlopt"] = RHSAttribute<int>("nlopt");
     ft_params["tvw1"] = RHSAttribute<float>("tvw1");
     ft_params["tv1"] = RHSList<size_t>("tv1");
@@ -93,9 +85,6 @@ codeare::error_code XDGRASP::Init () {
     ft_params["cgconv"] = RHSAttribute<float>("cgconv");
     ft_params["lsiter"] = RHSAttribute<int>("lsiter");
     ft_params["ft"] = RHSAttribute<int>("ft");
-    ft_params["dim4"] = m_dim4;
-    ft_params["dim5"] = m_dim5;
-
 
 	try {
 		_ntres = GetAttr<size_t>("_ntres");
@@ -113,7 +102,6 @@ codeare::error_code XDGRASP::Init () {
 
 }
 
-
 codeare::error_code XDGRASP::Prepare () {
 	codeare::error_code error = codeare::OK;
 	return error;
@@ -121,8 +109,6 @@ codeare::error_code XDGRASP::Prepare () {
 
 codeare::error_code XDGRASP::Process () {
 
-    m_image_size.push_back (m_dim4);
-    m_image_size.push_back (m_dim5);
     Matrix<cxfl>& data = Get<cxfl>("meas");
     Matrix<float>& kspace = Get<float>("kspace");
     Matrix<float>& weights = Get<float>("weights");
@@ -151,12 +137,13 @@ codeare::error_code XDGRASP::Process () {
 	std::cout << "    resp sig: " << size(res_signal) << std::endl;
 
 	// Contrasts
-	std::cout << "  Reshaped:    " << std::endl;
 	data = resize(data,nx,nv/nt,nt,nz,nc);
-	std::cout << "    data:     " << size(data) << std::endl;
 	kspace = resize(kspace,size(kspace,0),nx,nv/nt,nt);
-	std::cout << "    kspace:   " << size(kspace) << std::endl;
 	res_signal = resize(res_signal,nv/nt,nt);
+
+	std::cout << "  Reshaped:    " << std::endl;
+	std::cout << "    data:     " << size(data) << std::endl;
+	std::cout << "    kspace:   " << size(kspace) << std::endl;
 	std::cout << "    resp sig: " << size(res_signal) << std::endl;
 
 	// Respiration
@@ -167,30 +154,35 @@ codeare::error_code XDGRASP::Process () {
 		kspace (R(),R(),R(),R(i)) = kspace (CR(),CR(),CR(index),CR(i));
 	}
 	data = resize(data,nx*nline,nt,_ntres,nz,nc);
-	std::cout << "  Reshaped and permuted:    " << std::endl;
 	Vector<size_t> order(5); order[0]=0; order[1]=3; order[2]=4; order[3]=1; order[4]=2;
-	std::cout << "    data:          " << size(data) << std::endl;
 	data = permute (data,order);
-	std::cout << "    data:          " << size(data) << std::endl;
 	kspace = resize(kspace,size(kspace,0),nx*nline,nt,_ntres);
-	std::cout << "    kspace:        " << size(kspace) << std::endl;
-    weights = zeros<float>(nx*nline,1);
+	weights = zeros<float>(nx*nline,1);
     weights (R( 0,nx/2-1),0) = linspace<float>(1.,1./nx,nx/2);
     weights (R(nx/2,nx-1),0) = linspace<float>(1./nx,1.,nx/2);
     for (auto i = weights.Begin()+nx; i < weights.End(); i += nx)
         std::copy (weights.Begin(), weights.Begin()+nx, i);
-	std::cout << "    weights:       " << size(weights) << std::endl;
-	ft_params["sensitivities"] = Get<cxfl>("sensitivities");
-    
-    Matrix<cxfl> im_xd (m_image_size);
-    csx = new CS_XSENSE<cxfl>(ft_params);
-	std::cout << *csx << std::endl;
 
-    FT<cxfl>& ft = *csx;
+	std::cout << "  Reshaped and permuted:    " << std::endl;
+	std::cout << "    data:          " << size(data) << std::endl;
+	std::cout << "    data:          " << size(data) << std::endl;
+	std::cout << "    kspace:        " << size(kspace) << std::endl;
+	std::cout << "    weights:       " << size(weights) << std::endl;
+
+	// FT operator
+	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");;
+	ft_params["sensitivities"] = sensitivities;
+	Vector<size_t> image_size = size(sensitivities); image_size.pop_back();
+	ft_params["imsz"] = image_size;
+	ft_params["dim4"] = nt;
+	ft_params["dim5"] = _ntres;
+
+    CS_XSENSE<cxfl> ft(ft_params);
+	std::cout << ft << std::endl;
     ft.KSpace(kspace);
 	ft.Weights (weights);
 
-    im_xd = ft ->* data;
+	Matrix<cxfl> im_xd = ft ->* data;
 
     Add ("im_xd", im_xd);
 
@@ -200,8 +192,8 @@ codeare::error_code XDGRASP::Process () {
 
 
 XDGRASP::XDGRASP() :
-	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_ft_type(0), m_noise(0.), m_test_case(0),
-    csx(0), m_dim4(1), m_dim5(1), m_ndnz(1), _ntres(4), _tf(15.0) {}
+	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_noise(0.), m_test_case(0),
+    _ntres(4), _tf(15.0) {}
 
 
 XDGRASP::~XDGRASP() {}

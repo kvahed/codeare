@@ -106,27 +106,16 @@ namespace RRStrategy {
         int            m_dim;    /**< Image recon dim */
         int            m_N[3];   /**< Data side lengths */
         int            m_csiter; /**< # global iterations */
-        Vector<size_t> m_image_size;
         int            m_test_case;
-        float          m_ndnz;
         float          _tf;
         size_t         _ntres;
 
         double m_noise;
 
-        CSParam        m_csparam;
         int            m_wf;
         int            m_wm;
         int            m_verbose;
-        
-        int            m_ft_type;
-
-        Matrix<cxfl> data;
-
-        int            m_dim4;
-        int            m_dim5;
-        Params ft_params;
-        CS_XSENSE<cxfl>* csx;
+        Params         ft_params;
 
     };
     

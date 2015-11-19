@@ -50,7 +50,7 @@ inline void EstimateSensitivitiesRadialVIBE::FormGARadialKSpace (
 	Matrix<float>& kspace = Get<float>("kspace");
 	Matrix<float>& weights = Get<float>("weights");
 	kspace = zeros<float>(2,nk,nv);
-	kspace(R(0),R(),R(0)) = linspace<float>(-.5, .5, nk);
+	kspace(R(0),R(),R(0)) = linspace<float>(-.45, .45, nk);
 	cxfl rot = std::polar<float>(1.0f,NYUGA_RAD);
 	for (size_t j = 1; j < nv; ++j)
 		for (size_t i = 0; i < nk; ++i) {
@@ -66,7 +66,7 @@ inline void EstimateSensitivitiesRadialVIBE::FormGARadialKSpace (
 codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	// Matrices
 	Matrix<cxfl>& meas = Get<cxfl>("meas");
-	meas = squeeze(1.e8*meas);
+	meas = squeeze(2.e6*meas);
 	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
 	Matrix<float>& kspace = Get<float>("kspace");
 	Matrix<float>& weights = Get<float>("weights");
