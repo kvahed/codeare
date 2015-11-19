@@ -176,7 +176,7 @@ codeare::error_code XDGRASP::Process () {
 	Vector<size_t> image_size = size(sensitivities); image_size.pop_back();
 	ft_params["imsz"] = image_size;
 	ft_params["dim4"] = (int)nt;
-	ft_params["dim5"] = _ntres;
+	ft_params["dim5"] = (int)_ntres;
 	ft_params["nk"]   = size(data,0);
 
     CS_XSENSE<cxfl> ft(ft_params);
