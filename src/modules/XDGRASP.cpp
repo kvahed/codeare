@@ -166,13 +166,13 @@ codeare::error_code XDGRASP::Process () {
 		data(R(),R(),R(i),R(),R()) = data (CR(),CR(index),CR(i),CR(),CR());
 		kspace (R(),R(),R(),R(i)) = kspace (CR(),CR(),CR(index),CR(i));
 	}
-	data = resize(data,nx*nline,nt,_ntres,nz,nc);
+	data = resize(data,nx*nline,_ntres,nt,nz,nc);
 	std::cout << "  Reshaped and permuted:    " << std::endl;
 	Vector<size_t> order(5); order[0]=0; order[1]=3; order[2]=4; order[3]=1; order[4]=2;
 	std::cout << "    data:          " << size(data) << std::endl;
 	data = permute (data,order);
 	std::cout << "    data:          " << size(data) << std::endl;
-	kspace = resize(kspace,size(kspace,0),nx*nline,nt,_ntres);
+	kspace = resize(kspace,size(kspace,0),nx*nline,_ntres,nt);
 	std::cout << "    kspace:        " << size(kspace) << std::endl;
     weights = zeros<float>(nx*nline,1);
     weights (R( 0,nx/2-1),0) = linspace<float>(1.,1./nx,nx/2);
