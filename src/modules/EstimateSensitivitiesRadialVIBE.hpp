@@ -39,7 +39,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		EstimateSensitivitiesRadialVIBE  () : _cart_3rd_dim(false) {}
+		EstimateSensitivitiesRadialVIBE  () : _cart_3rd_dim(false), _kmax_r(.5) {}
 		
 		/**
 		 * @brief Default destructor
@@ -73,6 +73,7 @@ namespace RRStrategy {
 
 		Vector<size_t> _image_space_dims;
 		bool _cart_3rd_dim;
+		float _kmax_r;
 
 	};
 

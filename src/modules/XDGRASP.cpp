@@ -44,7 +44,6 @@ codeare::error_code XDGRASP::Init () {
 	Attribute ("noise",     &m_noise);
 
 
-	ft_params["nk"]           = (size_t) RHSAttribute<int>("nk");
 	ft_params["weights_name"] = std::string("weights");
 	ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
 	ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
@@ -136,7 +135,7 @@ codeare::error_code XDGRASP::Process () {
 	std::cout << "    kspace:   " << size(kspace) << std::endl;
 	std::cout << "    resp sig: " << size(res_signal) << std::endl;
 
-	// Contrasts
+	// Contrasts sorting
 	data = resize(data,nx,nv/nt,nt,nz,nc);
 	kspace = resize(kspace,size(kspace,0),nx,nv/nt,nt);
 	res_signal = resize(res_signal,nv/nt,nt);
@@ -146,13 +145,14 @@ codeare::error_code XDGRASP::Process () {
 	std::cout << "    kspace:   " << size(kspace) << std::endl;
 	std::cout << "    resp sig: " << size(res_signal) << std::endl;
 
-	// Respiration
+	// Respiration sorting
 	for (size_t i = 0; i < nt; ++i) {
 		Matrix<float> res_gate = res_signal(CR(),CR(i));
 		Vector<size_t> index = sort(res_gate);
 		data(R(),R(),R(i),R(),R()) = data (CR(),CR(index),CR(i),CR(),CR());
 		kspace (R(),R(),R(),R(i)) = kspace (CR(),CR(),CR(index),CR(i));
 	}
+
 	data = resize(data,nx*nline,nt,_ntres,nz,nc);
 	Vector<size_t> order(5); order[0]=0; order[1]=3; order[2]=4; order[3]=1; order[4]=2;
 	data = permute (data,order);
@@ -176,12 +176,14 @@ codeare::error_code XDGRASP::Process () {
 	ft_params["imsz"] = image_size;
 	ft_params["dim4"] = nt;
 	ft_params["dim5"] = _ntres;
+	ft_params["nk"]   = size(data,0);
 
     CS_XSENSE<cxfl> ft(ft_params);
 	std::cout << ft << std::endl;
     ft.KSpace(kspace);
 	ft.Weights (weights);
 
+	// 1-3 NuFFT 4,5 TV CS
 	Matrix<cxfl> im_xd = ft ->* data;
 
     Add ("im_xd", im_xd);

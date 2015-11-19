@@ -30,8 +30,13 @@ static const float NYUGA_RAD = PI*111.246117975f/180.0f;
 using namespace RRStrategy;
 
 codeare::error_code EstimateSensitivitiesRadialVIBE::Init () {
+
+	try {
+		_kmax_r = GetAttr<float>("kmax_r");
+	} catch (const TinyXMLQueryException&) {}
+
 	_image_space_dims = GetList<size_t>("image_space_dims");
-	_cart_3rd_dim     = GetAttr<bool>("cart_3rd_dim");
+	_cart_3rd_dim = GetAttr<bool>("cart_3rd_dim");
 	Matrix<cxfl> sensitivities;
 	Add ("sensitivities", sensitivities);
 	return codeare::OK;
@@ -50,7 +55,7 @@ inline void EstimateSensitivitiesRadialVIBE::FormGARadialKSpace (
 	Matrix<float>& kspace = Get<float>("kspace");
 	Matrix<float>& weights = Get<float>("weights");
 	kspace = zeros<float>(2,nk,nv);
-	kspace(R(0),R(),R(0)) = linspace<float>(-.45, .45, nk);
+	kspace(R(0),R(),R(0)) = linspace<float>(-_kmax_r , _kmax_r, nk);
 	cxfl rot = std::polar<float>(1.0f,NYUGA_RAD);
 	for (size_t j = 1; j < nv; ++j)
 		for (size_t i = 0; i < nk; ++i) {
