@@ -179,9 +179,9 @@ codeare::error_code XDGRASP::Process () {
 	ft_params["nk"]   = size(data,0);
 
     CS_XSENSE<cxfl> ft(ft_params);
-	std::cout << ft << std::endl;
     ft.KSpace(kspace);
 	ft.Weights (weights);
+	std::cout << ft << std::endl;
 
 	// 1-3 NuFFT 4,5 TV CS
 	Matrix<cxfl> im_xd = ft ->* data;
