@@ -39,7 +39,8 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		MotionDetectionXDGRASPLiver  () : _nx(280), _nv(600), _nz(38), _nc(15) {}
+		MotionDetectionXDGRASPLiver  () : _nx(280), _nv(600), _nz(38), _nc(15), _tf(15.0),
+                                          _ntres(4), _span(5), _min_dist(10), _pc_sel(5) {}
 		
 		/**
 		 * @brief Default destructor
@@ -70,7 +71,7 @@ namespace RRStrategy {
 			return codeare::OK;
 		}
 		
-		size_t _nx, _nv, _nz, _nc, _ntres, _tf;
+		size_t _nx, _nv, _nz, _nc, _ntres, _tf, _pc_sel, _min_dist, _span;
 		Vector<float> _time;
 
 

@@ -39,6 +39,18 @@ codeare::error_code MotionDetectionXDGRASPLiver::Init() {
 		_tf = GetAttr<size_t>("frame_duration");
 	} catch (const TinyXMLQueryException&) {}
 
+	try {
+		_span = GetAttr<size_t>("smoothing_span");
+	} catch (const TinyXMLQueryException&) {}
+
+	try {
+		_min_dist = GetAttr<size_t>("min_peak_dist");
+	} catch (const TinyXMLQueryException&) {}
+
+	try {
+		_pc_sel = GetAttr<size_t>("n_pc_comp");
+	} catch (const TinyXMLQueryException&) {}
+
 	return codeare::OK;
 }
 
@@ -58,7 +70,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	Vector<float> f_x;
 	Vector<size_t> idx, tmp_idx, fr_idx, ft_idx, peaks;
 	float f_s, lf, hf, ta;
-	size_t nn, span = 10.0, min_dist = 20, pc_sel = 5;
+	size_t nn;
 	eig_t<float> et;
     ta = wspace.PGet<float>("TA");
 
@@ -109,10 +121,10 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	motion_signal = transpose(gemm(pc, si, 'C', 'C'));
 
 	std::cout << "  Choose component with highest respiratory amplitude ..." << std::endl;
-	motion_signal_new = Matrix<float>(_nv  ,pc_sel);
-	motion_signal_fft = Matrix<float>(_nv/2,pc_sel);
-	for (size_t i = 0; i < pc_sel; ++i) {
-		motion_signal_new(R(),R(i)) = smooth(motion_signal(CR(),CR(i)),span);
+	motion_signal_new = Matrix<float>(_nv  ,_pc_sel);
+	motion_signal_fft = Matrix<float>(_nv/2,_pc_sel);
+	for (size_t i = 0; i < _pc_sel; ++i) {
+		motion_signal_new(R(),R(i)) = -smooth(motion_signal(CR(),CR(i)),_span);
 		tmp = abs(fftshift(fft(motion_signal(CR(_nv/2,size(motion_signal,0)-1),CR(i)),0,false)));
 		motion_signal_fft(R(),R(i)) = tmp/max(tmp.Container());
 	}
@@ -125,12 +137,12 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	tmp_peak = squeeze(motion_signal_fft(CR(tmp_idx),CR()));
 	res_peak = squeeze(motion_signal_fft(CR(fr_idx),CR()));
 	res_peak_nor = res_peak;
-	for (size_t i = 0; i < pc_sel; ++i)
+	for (size_t i = 0; i < _pc_sel; ++i)
 		res_peak_nor(R(),R(i)) /= mmax(tmp_peak(CR(),CR(i)));
 	tt = max(res_peak_nor);
-	res_signal = motion_signal_new(CR(),CR(sort(tt,DESCENDING)[0]));
+	res_signal = motion_signal_new(CR(),CR(2/*sort(tt,DESCENDING)[0]*/));
 	// Find peaks
-	peaks = findLocalMaxima(res_signal,min_dist);
+	peaks = findLocalMaxima(res_signal,_min_dist);
 	Matrix<float> peaks_i(peaks.size()+2,1), peaks_v = peaks_i;
 	std::copy(peaks.begin(),peaks.end(),&peaks_i[1]);
 	peaks_i[peaks.size()+1] = _nv+1.e-6;
