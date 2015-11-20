@@ -39,7 +39,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		CoilCompression () : _coil_dimension(3), _coils_left(10) {}
+		CoilCompression () : _coil_dimension(1), _coils_left(10) {}
 		
 		/**
 		 * @brief Default destructor
