@@ -105,7 +105,7 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	std::cout << "  Building GA stack of star k-space trajectory ..." << std::endl;
 	FormGARadialKSpace(nk, nv);
 
-	// FT operators
+	// FT operator
 	std::cout << "  Building NuFFT operator(s) ..." << std::endl;
 	Vector<size_t> sens_dims = _image_space_dims;
 	sens_dims.push_back(nc);

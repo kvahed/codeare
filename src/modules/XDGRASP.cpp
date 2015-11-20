@@ -176,7 +176,6 @@ codeare::error_code XDGRASP::Process () {
 	ft_params["dim4"] = (int)_ntres;
 	ft_params["dim5"] = (int) nt;
 	ft_params["nk"]   = size(data,0);
-
     CS_XSENSE<cxfl> ft(ft_params);
     ft.KSpace(kspace);
 	ft.Weights (weights);
@@ -192,16 +191,14 @@ codeare::error_code XDGRASP::Process () {
 }
 
 
-XDGRASP::XDGRASP() :
-	m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_noise(0.), m_test_case(0),
-    _ntres(4), _tf(15.0) {}
+XDGRASP::XDGRASP() : m_wm(0), m_csiter(0), m_wf(0), m_dim(0), m_verbose(0), m_noise(0.),
+		m_test_case(0), _ntres(4), _tf(15.0) {}
 
 
 XDGRASP::~XDGRASP() {}
 
 
-codeare::error_code
-XDGRASP::Finalise() {return codeare::OK;}
+codeare::error_code XDGRASP::Finalise() {return codeare::OK;}
 
 
 // the class facxflories
