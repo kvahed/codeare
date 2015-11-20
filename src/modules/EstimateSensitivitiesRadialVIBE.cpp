@@ -36,7 +36,7 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Init () {
 	} catch (const TinyXMLQueryException&) {}
 
 	_image_space_dims = GetList<size_t>("image_space_dims");
-	_cart_3rd_dim = GetAttr<bool>("cart_3rd_dim");
+
 	Matrix<cxfl> sensitivities;
 	Add ("sensitivities", sensitivities);
 	return codeare::OK;
@@ -111,23 +111,18 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	sens_dims.push_back(nc);
 	sensitivities = Matrix<cxfl>(sens_dims);
 	Matrix<float> density_comp = zeros<float>(nk,1);
-	Vector<NFFT<cxfl> > FTOP;
 	Params p;
-	p["nk"] = nv*nk; p["imsz"] = _image_space_dims; p["3rd_dim_cart"] = _cart_3rd_dim;
-	p["m"] = (size_t)1; p["alpha"] = 1.0f; p["epsilon"]=7.e-4f; p["maxit"]=(size_t)2;
-    size_t threads = 1;
-    for (size_t i = 0; i < threads; ++i) {
-        FTOP.push_back(NFFT<cxfl>(p));
-        FTOP[i].KSpace(kspace);
-        FTOP[i].Weights(weights);
-    }
-	std::cout << FTOP[0] << std::endl;
+	p["nk"] = nv*nk; p["imsz"] = _image_space_dims; p["3rd_dim_cart"] = true;
+	p["m"] = (size_t)1; p["alpha"] = 1.0f; p["epsilon"]=7.e-4f; p["maxit"]=(size_t)1;
+	NFFT<cxfl> ft(p);
+    ft.KSpace(kspace);
+    ft.Weights(weights);
+	std::cout << ft << std::endl;
     
 	// Channel NuFFTs
 	std::cout << "  NuFFTing ..." << std::endl;
-#pragma omp parallel for default (shared) num_threads(threads)
     for (size_t i = 0; i < nc; ++i) 
-        sensitivities (R(),R(),R(),R(i)) = FTOP[omp_get_thread_num()] ->* meas(CR(),CR(),CR(i));
+        sensitivities (R(),R(),R(),R(i)) = ft ->* meas(CR(),CR(),CR(i));
 
     sos = sum(abs(sensitivities),3)+1.e-9;
     

@@ -227,6 +227,8 @@ public:
         m_imgsz       = ft.m_imgsz;
         m_m           = ft.m_m;
         m_have_b0     = ft.m_have_b0;
+        m_have_kspace = ft.m_have_kspace;
+        m_have_weights= ft.m_have_weights;
         m_b0          = ft.m_b0;
         m_t           = ft.m_t;
         m_min_t       = ft.m_min_t;

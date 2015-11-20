@@ -27,13 +27,19 @@ using namespace RRStrategy;
 static const char ECON = 'S';
 
 codeare::error_code CoilCompression::Init () {
-	_coil_dimension = GetAttr<size_t>("coil_dimension");
-	_coils_left = GetAttr<size_t>("coils_remaining");
+
+    try {
+		_coil_dimension = GetAttr<size_t>("coil_dimension");
+	} catch (const TinyXMLQueryException&) {}
+
+	try {
+        _coils_left = GetAttr<size_t>("coils_remaining");
+	} catch (const TinyXMLQueryException&) {}
+        
 	return codeare::OK;
 }
 
 codeare::error_code CoilCompression::Prepare () {
-
 	return codeare::OK;
 }
 

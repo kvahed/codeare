@@ -86,7 +86,6 @@ public:
         _pnorm = try_to_fetch<float> (p, "pnorm", 0.);
         _image_size = try_to_fetch<Vector<size_t> > (p, "imsz", _image_size);
         _dim = _image_size.size();
-        Vector<size_t> dims = try_to_fetch<Vector<size_t> > (p, "dims", _image_size);
         
         _verbose = try_to_fetch<int> (p, "verbose", 0.);
         _nlopt_type = try_to_fetch<int> (p, "nlopt", 0.);
@@ -140,7 +139,7 @@ public:
             _wf = -1;
 
         if (_wf>-1)
-            dwt = new DWT<T> (dims[0], (wlfamily)_wf, _wm);
+            dwt = new DWT<T> (_image_size[0], (wlfamily)_wf, _wm);
 
         tvt.push_back(new TVOP<T>(_tvv[0]));
         tvt.push_back(new TVOP<T>(_tvv[1]));
