@@ -190,7 +190,8 @@ namespace io {
             }
 
             // One more field for complex numbers
-            size_t tmpdim = ndims(M);
+            size_t tmpdim = ndims(M), one = 1;
+            const hsize_t hone = 1;
             Vector<hsize_t> dims (tmpdim);
             for (size_t i = 0; i < tmpdim; i++)
                 dims[i] = M.Dim(tmpdim-1-i);
@@ -199,9 +200,12 @@ namespace io {
                 tmpdim++;
             }
 
-            DataSpace space (tmpdim, &dims[0]);
+            
+            DataSpace space (tmpdim, &dims[0]), attr_space(one, &hone);
             PredType*  type = HDF5Traits<T>::PType();
             DataSet set = group.createDataSet(name, (*type), space);
+            if (is_complex(t))
+                set.createAttribute("complex", H5::PredType::NATIVE_INT, attr_space).write(H5::PredType::NATIVE_INT, &one);
 
             set.write   (M.Ptr(), (*type));
             set.close   ();

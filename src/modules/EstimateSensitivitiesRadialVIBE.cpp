@@ -35,6 +35,14 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Init () {
 		_kmax_r = GetAttr<float>("kmax_r");
 	} catch (const TinyXMLQueryException&) {}
 
+	try {
+		_margin_top = GetAttr<float>("margin_top");
+	} catch (const TinyXMLQueryException&) {}
+
+	try {
+		_margin_bottom = GetAttr<float>("margin_bottom");
+	} catch (const TinyXMLQueryException&) {}
+
 	_image_space_dims = GetList<size_t>("image_space_dims");
 
 	Matrix<cxfl> sensitivities;
@@ -90,8 +98,8 @@ codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	meas = ifft(meas,0,true);
 
 	// Removing top and bottom slices
-    size_t pad = (nz - _image_space_dims[2])/2;
-    meas = meas(CR(7,nz-8),CR(),CR(),CR()); nz = size(meas,0);
+    meas = meas(CR(_margin_top,nz-1-_margin_bottom),CR(),CR(),CR()); nz = size(meas,0);
+    _image_space_dims[2] = nz; 
 	std::cout << "  Slice direction reduced: " << size(meas) << std::endl;
 
 	// Permute for global coil nufft [1 2 0 3]

@@ -77,8 +77,7 @@ codeare::error_code XDGRASP::Init () {
     ft_params["threads"] = RHSAttribute<int>("threads");
     ft_params["verbose"] = RHSAttribute<int>("verbose");
     ft_params["parallel_linesearch"] = RHSAttribute<bool>("parallel_linesearch");
-    ft_params["wl_family"] = RHSAttribute<int>("wl_family");    
-    ft_params["wl_member"] = RHSAttribute<int>("wl_member");
+
     ft_params["csiter"] = RHSAttribute<int>("csiter");
     ft_params["nliter"] = RHSAttribute<int>("cgiter");
     ft_params["cgconv"] = RHSAttribute<float>("cgconv");
