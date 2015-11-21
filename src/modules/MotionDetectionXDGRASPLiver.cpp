@@ -157,7 +157,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	res_signal = res_signal-ftmax;
 
 	Add ("ftmax", ftmax);
-	Add ("motion_signal", motion_signal_new);
+	Add ("motion_signal", motion_signal);
+	Add ("motion_signal_new", motion_signal_new);
 	Add ("motion_signal_fft", motion_signal_fft);
 	Add ("res_peak", res_peak);
 	Add ("res_peak_nor", res_peak_nor);
