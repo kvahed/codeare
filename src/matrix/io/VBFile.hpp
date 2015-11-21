@@ -159,7 +159,7 @@ namespace VB {
                     prtmsg ("%d ", _rtfbdims[i]);
                 prtmsg(")\n");
                 prtmsg ("       Sync dims ( %d %d )\n", _syncdims[0], _syncdims[1] );
-                evalstr("drawnow;");
+                const char ret[9] = evalstr("drawnow;");
                 this->Allocate();
                 this->Digest();
             }

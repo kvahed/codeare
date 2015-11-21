@@ -202,11 +202,13 @@ public:
      * @brief        Clean up and destruct
      */ 
     virtual ~NFFT () NOEXCEPT {
-        if (m_initialised)
-        	if (m_have_b0)
+        if (m_initialised) {
+        	if (m_have_b0) {
         		NFFTTraits<NFFTType>::Finalize (m_b0_plan, m_solver);
-        	else
+        	} else {
         		NFFTTraits<NFFTType>::Finalize (m_plan, m_solver);
+        	}
+        }
     }
     
     

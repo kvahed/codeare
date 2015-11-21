@@ -197,6 +197,7 @@ static inline void PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>&
     for (size_t gc = 0; gc < 3; gc++) {
         
         size_t i = 1;
+        size_t j = 0;
         
         for (size_t k = 0; k < nk-1; k++) {
             
@@ -216,7 +217,7 @@ static inline void PTXTiming (const Matrix<cxfl>& solution, const Matrix<float>&
                     if(g < gd/2)             // ramp up
                         gr = sr * (0.5 + g);
                     else if (g < gd/2+1)     // flat top
-                        0;
+                        j=0;
                     else                     // ramp down
                         gr -= sr;
 
@@ -318,7 +319,7 @@ inline static bool CheckAmps (const Matrix<cxfl>& solution, Matrix<float>& pd, c
 
 
 KTPoints::KTPoints  () : m_verbose(false), m_rflim(1.0), m_conv(1.0e-6), m_lambda(1.0e-6),
-        m_breakearly(true), m_gd(1.0e-5), m_max_rf(0), m_maxiter(1000), ns(0), nk(0), nc(0) {}
+        m_breakearly(true), m_gd(10), m_max_rf(0), m_maxiter(1000), ns(0), nk(0), nc(0) {}
 
 
 KTPoints::~KTPoints () {}
