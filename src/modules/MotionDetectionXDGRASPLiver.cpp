@@ -82,7 +82,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	_nv = size(meas,2);
 	_nz = size(meas,3);
 	// Take the central k-space points (c++ indexing)
-    meas = squeeze(meas(CR(_nx/2),CR(),CR(),CR()));
+    meas = 1.0e6*squeeze(meas(CR(_nx/2),CR(),CR(),CR()));
     meas = permute(meas,1,2,0);
 	std::cout << "  Reduced to center column and permuted: " << size(meas) << std::endl;
     
@@ -114,7 +114,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	si = permute (zip, 0, 2, 1);
 	si = transpose(resize(si, size(si,0)*_nc, _nv));
 	cv = cov(si);
-	et = eig2(cv);
+	et = eigs(cv);
 	pc = et.lv;
 	v  = real(et.ev);
 	v  = flipud(v);

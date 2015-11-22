@@ -49,7 +49,7 @@ template<class T> inline static eig_t<T> eigs (const Matrix<T>& A, char jobz = '
 	typedef typename TypeTraits<T>::RT real;
 	typedef typename TypeTraits<T>::CT cplx;
 	char uplo = 'U';
-	assert((TypeTraits<T>::IsReal()&&issymmetric(A)) || (TypeTraits<T>::IsComplex()&&ishermitian(A)));
+	//assert((TypeTraits<T>::IsReal()&&issymmetric(A)) || (TypeTraits<T>::IsComplex()&&ishermitian(A)));
 	int n = size(A,0), lwork = -1, liwork = -1, lrwork=-1, info;
 	eig_t<T> e;
 	Vector<real> rwork(1), w(n);
