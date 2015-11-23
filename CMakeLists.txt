@@ -226,6 +226,7 @@ if (${MSVC})
 else()
   set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${HDF5_LIBRARIES}")
   find_package(ZLIB REQUIRED)
+  list (APPEND HDF5_LIBRARIES "z")
 endif()
 
 find_package(Ismrmrd)
