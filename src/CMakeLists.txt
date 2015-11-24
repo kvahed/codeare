@@ -46,7 +46,7 @@ else ()
   list (APPEND COMLIBS ${HDF5_LIBRARIES} ${OPENSSL_LIBRARIES})
 endif()
 
-list (APPEND COMLIBS core tinyxml ${GSL_LIBRARIES}
+list (APPEND COMLIBS core tinyxml 
   ${OPENSSL_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_CHRONO_LIBRARY}
   ${Boost_TIMER_LIBRARY})  
 
