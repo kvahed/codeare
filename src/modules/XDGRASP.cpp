@@ -1,5 +1,5 @@
 /*
-w *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
+ *  codeare Copyright (C) 2007-2010 Kaveh Vahedipour
  *                               Forschungszentrum Juelich, Germany
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -168,7 +168,7 @@ codeare::error_code XDGRASP::Process () {
 	std::cout << "    weights:  " << size(weights) << std::endl;
 
 	// FT operator
-	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");;
+	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
 	ft_params["sensitivities"] = sensitivities;
 	Vector<size_t> image_size = size(sensitivities); image_size.pop_back();
 	ft_params["imsz"] = image_size;

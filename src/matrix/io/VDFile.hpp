@@ -135,6 +135,7 @@ public:
             _ta = 2.5e-3*(_tend-_tstart);
             wspace.PSet("TA", _ta);
             _tr = _ta/_nmeas;                            
+            wspace.PSet("TR", _tr);
             PrintParse(); 
             Allocate(); 
             Digest(); 

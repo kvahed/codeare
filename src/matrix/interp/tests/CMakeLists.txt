@@ -24,10 +24,10 @@ endif()
 
 if (${GSL_FOUND})
   add_executable (t_ppval t_ppval.cpp)
-  target_link_libraries (t_ppval ${GSL_LIBRARIES})
+  target_link_libraries (t_ppval ${GSL_LIBRARIES} ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES})
   add_test (ppval t_ppval)
   add_executable (t_interp1 t_interp1.cpp)
-  target_link_libraries (t_interp1 ${GSL_LIBRARIES})
+  target_link_libraries (t_interp1 ${GSL_LIBRARIES} ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES})
   add_test (interp1 t_interp1)
 endif()
 

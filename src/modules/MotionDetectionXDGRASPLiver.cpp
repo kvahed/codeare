@@ -32,11 +32,11 @@ using namespace RRStrategy;
 codeare::error_code MotionDetectionXDGRASPLiver::Init() {
 
 	try {
-		_ntres = GetAttr<size_t>("ntres");
+		_margin_top = GetAttr<float>("margin_top");
 	} catch (const TinyXMLQueryException&) {}
 
 	try {
-		_tf = GetAttr<size_t>("frame_duration");
+		_margin_bottom = GetAttr<float>("margin_bottom");
 	} catch (const TinyXMLQueryException&) {}
 
 	try {
@@ -89,7 +89,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	std::cout << "  Analyse channel motion data ..." << std::endl;
 
 	// Frequency stamp (only for the delay enhanced part)
-	f_s = 1.0/(38*tr);
+	f_s = 1.0/(_nz*tr);
 	f_x = linspace<float>(0,f_s,_nv/2).Container();
 	f_x = f_x - .5*f_s; // frequency after FFT of the motion signal
 	if (_nv/2%2==0)
@@ -102,7 +102,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	zip = flipud(abs(fftshift(fft(meas,0),0)));
 	meas = permute (meas,1,0,2);
 	// Remove some edge slices
-	zip = zip(CR(21,size(zip,0)-40),CR(),CR());
+	zip = zip(CR(_margin_top,size(zip,0)-1-_margin_bottom),CR(),CR());
 
 	std::cout << "  Normalise projection profiles ..." << std::endl;
 	// Normalization the projection profiles
@@ -125,7 +125,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	motion_signal_new = Matrix<float>(_nv  ,_pc_sel);
 	motion_signal_fft = Matrix<float>(_nv/2,_pc_sel);
 	for (size_t i = 0; i < _pc_sel; ++i) {
-		motion_signal_new(R(),R(i)) = -smooth(motion_signal(CR(),CR(i)),_span);
+		motion_signal_new(R(),R(i)) = smooth(motion_signal(CR(),CR(i)),_span);
 		tmp = abs(fftshift(fft(motion_signal(CR(_nv/2,size(motion_signal,0)-1),CR(i)),0,false)));
 		motion_signal_fft(R(),R(i)) = tmp/max(tmp.Container());
 	}
@@ -141,9 +141,9 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	for (size_t i = 0; i < _pc_sel; ++i)
 		res_peak_nor(R(),R(i)) /= mmax(motion_signal_fft(CR(),CR(i)));
 	tt = max(res_peak_nor);
-	res_signal = motion_signal_new(CR(),CR(sort(tt,DESCENDING)[0]));
+	res_signal = motion_signal_new(CR(),CR(2/*sort(tt,DESCENDING)[0]*/));
 	// Find peaks
-	peaks = findLocalMaxima(res_signal,_min_dist);
+	peaks = findLocalMaxima(res_signal,_min_dist,mean(res_signal)[0]);
 	Matrix<float> peaks_i(peaks.size()+2,1), peaks_v = peaks_i;
 	std::copy(peaks.begin(),peaks.end(),&peaks_i[1]);
 	peaks_i[peaks.size()+1] = _nv+1.e-6;
