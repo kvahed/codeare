@@ -235,9 +235,9 @@ template <> struct NFFTTraits<std::complex<double> > {
         RT k2, j2, z2;
         
 #ifdef NFFT_HAS_MEMBER_FLAGS
-        if (solver.flags & PRECOMPUTE_DAMP)
+        if (solver.flags & PRECOMPUTE_DAMP) {
 #else
-        if (solver.nfft_flags & PRECOMPUTE_DAMP)
+        if (solver.nfft_flags & PRECOMPUTE_DAMP) {
 #endif
             if (rank == 3) {
                 for (j = 0; j < N; ++j) {
@@ -262,6 +262,7 @@ template <> struct NFFTTraits<std::complex<double> > {
                     }
                 }
             }
+        }
 
         return plan.M_total;
 

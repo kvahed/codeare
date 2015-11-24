@@ -15,16 +15,16 @@ using namespace codeare::matrix::io;
 std::string fname = "test.nii";
 std::string mname = "t_nifti";
 
-template <class T>
-inline static bool write (const Matrix<T> A) {
+template <class T> inline static bool write (const Matrix<T> A) {
 	NIFile nf (fname, WRITE);
 	nf.Write (A, mname);
+	return true;
 }
 
-template <class T>
-inline static bool read (Matrix<T>& A) {
+template <class T> inline static bool read (Matrix<T>& A) {
 	NIFile nf (fname, READ);
 	A = nf.Read<T>(mname);
+	return true;
 }
 
 template<class T>

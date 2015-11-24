@@ -69,12 +69,12 @@ ELSE(WIN32)
 
       # set link libraries and link flags
       EXEC_PROGRAM(${GSL_CONFIG}
-          ARGS --libs
+          ARGS --libs-without-cblas
           OUTPUT_VARIABLE GSL_LIBRARIES)
       
       ## extract link dirs for rpath  
       EXEC_PROGRAM(${GSL_CONFIG}
-        ARGS --libs
+        ARGS --libs-without-cblas
         OUTPUT_VARIABLE GSL_CONFIG_LIBS )
 
       ## split off the link dirs (for rpath)

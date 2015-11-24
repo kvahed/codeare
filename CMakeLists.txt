@@ -188,6 +188,7 @@ find_package(GSL)
 if (${GSL_FOUND})
   include_directories (${GSL_INCLUDE_DIR})
   add_definitions (-DHAVE_GSL)
+message("${GSL_LIBRARIES}")
 endif()
 
 # OpenCL -------------------------------------------------------------

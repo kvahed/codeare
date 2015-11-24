@@ -52,7 +52,7 @@ public:
 #else
     VDFile (const std::string& fname, const IOMode mode, const Params& params, const bool verbosity) :
     	SyngoFile(fname, mode, params, verbosity), _id(0), _ndset(1), _meas_r(0), _meas_i(0),
-		_sync_r(0), _nmeas(0), _nlines(0), _nsync(0), _digested(false) {
+		_sync_r(0), _nmeas(0), _nlines(0), _nsync(0), _digested(false), _tend(0), _tstart(0)  {
         _file.seekg(0);
         _file.read ((char*)&_id, sizeof(uint32_t));      // ID
         _file.read ((char*)&_ndset, sizeof(uint32_t));   // # data sets
@@ -87,7 +87,7 @@ public:
         
         uint32_t cur_pos;
         MeasHeader sh;
-        //int64_t start = GetTimeMs64();
+        SimpleTimer st;
         
         if (_meas_r == 0)
             prtmsg ("   Parsing ... \n");
@@ -111,6 +111,8 @@ public:
                 tmp1 = ((tmp2-tmp1)%32);
                 if (tmp1)
                     _file.seekg (tmp2 + 32-tmp1);
+            } else if (bit_set(sh.aulEvalInfoMask[1], ONLINE)) { // CT_NORMALIZE
+                    ParseCTNormalize (sh);
             } else if (bit_set (sh.aulEvalInfoMask[0], ONLINE)) { // Actual data
                 if (_nmeas == 0) {
                     _measdims[0] = sh.ushSamplesInScan;
@@ -124,10 +126,15 @@ public:
             }
             _nlines++;
         }
-        prtmsg ("     done - wtime (%d ms).\n", 0/*GetTimeMs64()-start*/);
+        prtmsg ("     done - wtime %s", st.Format().c_str());
+
+        //prtmsg ("     done - wtime (%d ms).\n", 0/*GetTimeMs64()-start*/);
         
         if (_meas_r == 0) {
             _measdims = _raise_one (_measdims); // Dimensions one higher that highest counter
+            _ta = 2.5e-3*(_tend-_tstart);
+            wspace.PSet("TA", _ta);
+            _tr = _ta/_nmeas;                            
             PrintParse(); 
             Allocate(); 
             Digest(); 
@@ -157,13 +164,31 @@ private:
         if (!_meas_r) {
             _measdims = _max (_measdims, mh.sLC);  // Keep track of highest counter
             _file.seekg (pos + (mh.ushSamplesInScan*sizeof(std::complex<float>)
-            + CHANNEL_HEADER_LEN)*mh.ushUsedChannels);
+                             + CHANNEL_HEADER_LEN)*mh.ushUsedChannels);
+            if (_nmeas == 0) {
+                _tstart   = mh.ulTimeStamp;
+                _cent_par = mh.ushKSpaceCentrePartitionNo;
+                _cent_lin = mh.ushKSpaceCentreLineNo;
+                _cent_col = mh.ushKSpaceCentreColumn;
+            } else if (bit_set(mh.aulEvalInfoMask[0], LASTSCANINMEAS)) {
+                _tend = mh.ulTimeStamp;
+            }
+
         } else {
+#ifndef USE_IN_MATLAB
+            for (size_t i = 0; i < mh.ushUsedChannels; ++i) {
+                _file.read((char*)&ch, CHANNEL_HEADER_LEN);
+                _file.read ((char*)&_meas(0, i, mh.sLC[0], mh.sLC[1], mh.sLC[2],
+                        mh.sLC[3], mh.sLC[4], mh.sLC[5], mh.sLC[6], mh.sLC[7], mh.sLC[8], mh.sLC[9],
+                        mh.sLC[10], mh.sLC[11], mh.sLC[12], mh.sLC[13]),
+						mh.ushSamplesInScan*sizeof(std::complex<float>));
+            }
+#else
             std::vector<std::complex<float> > buf (mh.ushSamplesInScan*mh.ushUsedChannels);
             for (size_t i = 0; i < mh.ushUsedChannels; ++i) {
                 _file.read((char*)&ch, CHANNEL_HEADER_LEN);
                 _file.read((char*)&buf[i*mh.ushSamplesInScan],
-                		mh.ushSamplesInScan*sizeof(std::complex<float>));
+                           mh.ushSamplesInScan*sizeof(std::complex<float>));
             }
             size_t offset = 0;
             for (size_t i = 0; i < 14; ++i)
@@ -171,16 +196,27 @@ private:
             for (size_t j = 0; j < mh.ushUsedChannels; ++j) {
                 for (size_t i = 0; i < mh.ushSamplesInScan; ++i) {
                     _meas_r[offset + j*mh.ushSamplesInScan + i] =
-                    		std::real(buf[j*mh.ushSamplesInScan + i]);
+                        std::real(buf[j*mh.ushSamplesInScan + i]);
                     _meas_i[offset + j*mh.ushSamplesInScan + i] =
-                    		std::imag(buf[j*mh.ushSamplesInScan + i]);
+                        std::imag(buf[j*mh.ushSamplesInScan + i]);
                 }
             }
+#endif
         }
         _nmeas++;
     }
 
 
+    inline void ParseCTNormalize (const MeasHeader& mh) {
+        ChannelHeader ch;
+        std::vector<std::complex<float> > buf (mh.ushSamplesInScan*mh.ushUsedChannels);
+        for (size_t i = 0; i < mh.ushUsedChannels; ++i) {
+            _file.read((char*)&ch, CHANNEL_HEADER_LEN);
+            _file.read((char*)&buf[i*mh.ushSamplesInScan],
+                       mh.ushSamplesInScan*sizeof(std::complex<float>));
+        }
+    }
+        
     /**
      * @brief Parse SyncData
      */
@@ -244,14 +280,16 @@ private:
      * @brief Print parsing results
      */
     void PrintParse () const {
-        prtmsg ("     Found %zu lines (data: (Meas: %zu, Noise: %d, Sync: %ui))\n",
+        prtmsg ("     Found %zu lines (data: (Meas: %zu, Noise: %d, Sync: %u))\n",
         		_nlines, _nmeas, 0, _syncdims[1]);
         prtmsg ("       Data dims ( ");
         for (size_t i = 0; i < 15; ++i)
-            prtmsg ("%ui ", _measdims[i]);
+            prtmsg ("%u ", _measdims[i]);
         prtmsg(")\n");
         if (_syncdims[1])
             prtmsg ("       Sync dims ( %ui %ui)\n", _syncdims[0], _syncdims[1] );
+        prtmsg ("     Centres: column: %zu, line: %zu, partition: %zu\n", _cent_col, _cent_lin, _cent_par);
+        prtmsg ("     Measurement TA: %.2fs, TR: %.2fms\n", _ta, 1000.*_tr);
 
     }
     
@@ -260,10 +298,11 @@ private:
     std::vector<EntryHeader> _veh; // Entry headers
     std::vector<uint32_t> _measdims, _syncdims;
     std::vector<size_t> _measdims_sizes; 
-    size_t _nmeas, _nlines, _nsync;
+    size_t _nmeas, _nlines, _nsync, _cent_par, _cent_lin, _cent_col;
     bool _digested;
+    size_t _tend, _tstart;
 
-    float *_meas_r, *_meas_i, *_sync_r;
+    float *_meas_r, *_meas_i, *_sync_r, _ta, _tr;
 #ifndef USE_IN_MATLAB
         Matrix<raw> _meas, _rtfb;
         Matrix<float> _sync;

@@ -69,10 +69,11 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 		res_peak, tmp_peak, res_peak_nor, tt, res_signal, ftmax;
 	Vector<float> f_x;
 	Vector<size_t> idx, tmp_idx, fr_idx, ft_idx, peaks;
-	float f_s, lf, hf, ta;
+	float f_s, lf, hf, ta, tr;
 	size_t nn;
 	eig_t<float> et;
     ta = wspace.PGet<float>("TA");
+    tr = wspace.PGet<float>("TR");
 
     meas = squeeze(meas);
 	std::cout << "  Incoming: " << size(meas) << std::endl;
@@ -81,14 +82,14 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	_nv = size(meas,2);
 	_nz = size(meas,3);
 	// Take the central k-space points (c++ indexing)
-    meas = squeeze(meas(CR(_nx/2),CR(),CR(),CR()));
+    meas = 1.0e6*squeeze(meas(CR(_nx/2),CR(),CR(),CR()));
     meas = permute(meas,1,2,0);
 	std::cout << "  Reduced to center column and permuted: " << size(meas) << std::endl;
     
 	std::cout << "  Analyse channel motion data ..." << std::endl;
 
 	// Frequency stamp (only for the delay enhanced part)
-	f_s = ta/_nv;
+	f_s = 1.0/(38*tr);
 	f_x = linspace<float>(0,f_s,_nv/2).Container();
 	f_x = f_x - .5*f_s; // frequency after FFT of the motion signal
 	if (_nv/2%2==0)
@@ -110,14 +111,14 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
 	std::cout << "  Perform coil-wise PCA ..." << std::endl;
 	// Do PCA or SVD in each coil element to extract motion signal
-	si  = permute (zip, 0, 2, 1);
-	si  = transpose(resize(si, size(si,0)*_nc, _nv));
-	cv  = cov(si);
-	et  = eig2(cv);
-	pc  = et.lv;
-	v   = real(et.ev);
-	v   = flipud(v);
-	pc  = fliplr(pc); //(CR(),CR(idx));
+	si = permute (zip, 0, 2, 1);
+	si = transpose(resize(si, size(si,0)*_nc, _nv));
+	cv = cov(si);
+	et = eigs(cv);
+	pc = et.lv;
+	v  = real(et.ev);
+	v  = flipud(v);
+	pc = fliplr(pc);
 	motion_signal = transpose(gemm(pc, si, 'C', 'C'));
 
 	std::cout << "  Choose component with highest respiratory amplitude ..." << std::endl;
@@ -138,9 +139,9 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	res_peak = squeeze(motion_signal_fft(CR(fr_idx),CR()));
 	res_peak_nor = res_peak;
 	for (size_t i = 0; i < _pc_sel; ++i)
-		res_peak_nor(R(),R(i)) /= mmax(tmp_peak(CR(),CR(i)));
+		res_peak_nor(R(),R(i)) /= mmax(motion_signal_fft(CR(),CR(i)));
 	tt = max(res_peak_nor);
-	res_signal = motion_signal_new(CR(),CR(2/*sort(tt,DESCENDING)[0]*/));
+	res_signal = motion_signal_new(CR(),CR(sort(tt,DESCENDING)[0]));
 	// Find peaks
 	peaks = findLocalMaxima(res_signal,_min_dist);
 	Matrix<float> peaks_i(peaks.size()+2,1), peaks_v = peaks_i;
@@ -156,7 +157,11 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	res_signal = res_signal-ftmax;
 
 	Add ("ftmax", ftmax);
-	Add ("motion_signal", motion_signal_new);
+	Add ("motion_signal", motion_signal);
+	Add ("motion_signal_new", motion_signal_new);
+	Add ("motion_signal_fft", motion_signal_fft);
+	Add ("res_peak", res_peak);
+	Add ("res_peak_nor", res_peak_nor);
 	Add ("peaks_i", peaks_i);
 	Add ("peaks_v", peaks_v);
 	Add ("res_signal", res_signal);

@@ -77,8 +77,7 @@ codeare::error_code XDGRASP::Init () {
     ft_params["threads"] = RHSAttribute<int>("threads");
     ft_params["verbose"] = RHSAttribute<int>("verbose");
     ft_params["parallel_linesearch"] = RHSAttribute<bool>("parallel_linesearch");
-    ft_params["wl_family"] = RHSAttribute<int>("wl_family");    
-    ft_params["wl_member"] = RHSAttribute<int>("wl_member");
+
     ft_params["csiter"] = RHSAttribute<int>("csiter");
     ft_params["nliter"] = RHSAttribute<int>("cgiter");
     ft_params["cgconv"] = RHSAttribute<float>("cgconv");
@@ -140,7 +139,7 @@ codeare::error_code XDGRASP::Process () {
 	kspace = resize(kspace,size(kspace,0),nx,nv/nt,nt);
 	res_signal = resize(res_signal,nv/nt,nt);
 
-	std::cout << "  Reshaped:    " << std::endl;
+	std::cout << "  Reshaped:   " << std::endl;
 	std::cout << "    data:     " << size(data) << std::endl;
 	std::cout << "    kspace:   " << size(kspace) << std::endl;
 	std::cout << "    resp sig: " << size(res_signal) << std::endl;
@@ -164,9 +163,9 @@ codeare::error_code XDGRASP::Process () {
         std::copy (weights.Begin(), weights.Begin()+nx, i);
 
 	std::cout << "  Reshaped and permuted:    " << std::endl;
-	std::cout << "    data:    " << size(data) << std::endl;
-	std::cout << "    kspace:  " << size(kspace) << std::endl;
-	std::cout << "    weights: " << size(weights) << std::endl;
+	std::cout << "    data:     " << size(data) << std::endl;
+	std::cout << "    kspace:   " << size(kspace) << std::endl;
+	std::cout << "    weights:  " << size(weights) << std::endl;
 
 	// FT operator
 	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");;

@@ -39,7 +39,7 @@ namespace RRStrategy {
 		/**
 		 * @brief Default constructor
 		 */
-		EstimateSensitivitiesRadialVIBE  () : _kmax_r(.5) {}
+		EstimateSensitivitiesRadialVIBE  () : _kmax_r(.5), _margin_top(4), _margin_bottom(4) {}
 		
 		/**
 		 * @brief Default destructor
@@ -73,6 +73,7 @@ namespace RRStrategy {
 
 		Vector<size_t> _image_space_dims;
 		float _kmax_r;
+        size_t _margin_top, _margin_bottom;
 
 	};
 

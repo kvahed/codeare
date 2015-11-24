@@ -19,7 +19,7 @@ template<class T> struct VecTraits;
 #include <immintrin.h>
 
 template <int i0, int i1, int i2, int i3, int i4, int i5, int i6, int i7>
-static inline __m256 constant8f() {
+static inline __m256 constant8i() {
     static const union {
         int     i[8];
         __m256  ymm;
@@ -73,7 +73,7 @@ template<> struct VecTraits<cxfl> {
     template <int i0, int i1, int i2, int i3, int i4, int i5, int i6, int i7>
     inline static reg_type change_sign (const reg_type & a) {
         if ((i0 | i1 | i2 | i3 | i4 | i5 | i6 | i7) == 0) return a;
-        reg_type mask = constant8f<i0 ? INT_MIN : 0, i1 ? INT_MIN : 0, i2 ? INT_MIN : 0, i3 ? INT_MIN : 0,
+        reg_type mask = constant8i<i0 ? INT_MIN : 0, i1 ? INT_MIN : 0, i2 ? INT_MIN : 0, i3 ? INT_MIN : 0,
                                  i4 ? INT_MIN : 0, i5 ? INT_MIN : 0, i6 ? INT_MIN : 0, i7 ? INT_MIN : 0> ();
         return _mm256_xor_ps(a, mask);
     }
@@ -126,7 +126,7 @@ template<> struct VecTraits<cxdb> {
     inline static reg_type change_sign (const reg_type& a) {
         if ((i0 | i1 | i2 | i3) == 0)
             return a;
-        __m256 mask = constant8f<0, i0 ? INT_MIN : 0, 0, i1 ? INT_MIN : 0, 0, i2 ? INT_MIN : 0, 0, i3 ? INT_MIN : 0> ();
+        __m256 mask = constant8i<0, i0 ? INT_MIN : 0, 0, i1 ? INT_MIN : 0, 0, i2 ? INT_MIN : 0, 0, i3 ? INT_MIN : 0> ();
         return _mm256_xor_pd(a, _mm256_castps_pd(mask));
     }
     inline static reg_type divides (const reg_type &a, const reg_type &b) {
