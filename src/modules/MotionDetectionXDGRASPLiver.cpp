@@ -132,7 +132,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 
 	std::cout << "  Detect peaks ..." << std::endl;
 	// Take the component with the highest peak in respiratory motion range
-	lf = 0.1; hf = 0.5; //Respiratory frequency range
+	lf = 0.08; hf = 0.5; //Respiratory frequency range
 	tmp_idx = find(f_x>hf);
 	fr_idx=find(f_x<hf & f_x>lf);
 	tmp_peak = squeeze(motion_signal_fft(CR(tmp_idx),CR()));
@@ -141,7 +141,8 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	for (size_t i = 0; i < _pc_sel; ++i)
 		res_peak_nor(R(),R(i)) /= mmax(motion_signal_fft(CR(),CR(i)));
 	tt = max(res_peak_nor);
-	res_signal = motion_signal_new(CR(),CR(2/*sort(tt,DESCENDING)[0]*/));
+	std::cout << "  Respiration is component  " << sort(tt,DESCENDING)[0] << " ..." << std::endl;
+	res_signal = motion_signal_new(CR(),CR(sort(tt,DESCENDING)[0]));
 	// Find peaks
 	peaks = findLocalMaxima(res_signal,_min_dist,mean(res_signal)[0]);
 	Matrix<float> peaks_i(peaks.size()+2,1), peaks_v = peaks_i;
