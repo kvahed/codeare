@@ -79,7 +79,7 @@ inline void EstimateSensitivitiesRadialVIBE::FormGARadialKSpace (
 codeare::error_code EstimateSensitivitiesRadialVIBE::Process () {
 	// Matrices
 	Matrix<cxfl>& meas = Get<cxfl>("meas");
-	meas = squeeze(6.e5*meas);
+	meas = squeeze(1.0e8*meas);
 	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
 	Matrix<float>& kspace = Get<float>("kspace");
 	Matrix<float>& weights = Get<float>("weights");
