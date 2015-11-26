@@ -141,7 +141,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	for (size_t i = 0; i < _pc_sel; ++i)
 		res_peak_nor(R(),R(i)) /= mmax(motion_signal_fft(CR(),CR(i)));
 	tt = max(res_peak_nor);
-	std::cout << "  Respiration is component  " << sort(tt,DESCENDING)[0] << " ..." << std::endl;
+	std::cout << "  Respiration is component " << sort(tt,DESCENDING)[0] << " ..." << std::endl;
 	res_signal = motion_signal_new(CR(),CR(sort(tt,DESCENDING)[0]));
 	// Find peaks
 	peaks = findLocalMaxima(res_signal,_min_dist,mean(res_signal)[0]);
