@@ -153,7 +153,8 @@ template<> struct VecTraits<cxdb> {
 };
 #elif defined (__SSE2__)
 #include <emmintrin.h>
-
+#include <xmmintrin.h>
+#include <pmmintrin.h>
 template <int i0, int i1, int i2, int i3>
 inline static __m128i constant4i() {
     static const union {
@@ -163,11 +164,16 @@ inline static __m128i constant4i() {
     return u.xmm;
 }
 
-template <int i0, int i1, int i2, int i3>
-inline static __m128 change_sign(__m128 const & a) {
+template <int i0, int i1, int i2, int i3> inline static __m128 change_sign(__m128 const & a) {
     if ((i0 | i1 | i2 | i3) == 0) return a;
     __m128i mask = constant4i<i0 ? INT_MIN : 0, i1 ? INT_MIN : 0, i2 ? INT_MIN : 0, i3 ? INT_MIN : 0>();
     return  _mm_xor_ps(a, _mm_castsi128_ps(mask));     // flip sign bits
+}
+
+template <int i0, int i1> static inline __m128d change_sign(__m128d const & a) {
+    if ((i0 | i1) == 0) return a;
+    __m128i mask = constant4i<0, i0 ? INT_MIN : 0, 0, i1 ? INT_MIN : 0> ();
+    return  _mm_xor_pd(a, _mm_castsi128_pd(mask));     // flip sign bits
 }
 
 template<> struct VecTraits<float> {
@@ -276,7 +282,7 @@ template<> struct VecTraits<cxdb> {
         reg_type n      = _mm_msubadd_pd (a_im, b_flip, arb);
         #else
         reg_type aib    = _mm_mul_pd(a_im, b_flip);   // (a.im*b.im, a.im*b.re)
-        reg_type arbm   = change_sign<0,1>(Vec2d(arb));
+        reg_type arbm   = change_sign<0,1>(reg_type(arb));
         reg_type n      = _mm_add_pd(arbm, aib);      // arbm + aib
 #endif  // FMA
         reg_type bb     = _mm_mul_pd(b, b);           // (b.re*b.re, b.im*b.im)
