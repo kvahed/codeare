@@ -56,7 +56,9 @@ namespace VB {
         VBFile (const std::string& fname, const IOMode mode, const Params& params, const bool verbosity) :
         	SyngoFile(fname, mode, params, verbosity), _nnoise (0), _nmeas(0), _nctnorm(0), _data_len(0),
 			_meas_r(0), _meas_i(0), _noise_r(0), _noise_i(0), _sync_r(0), _lines(0), _nrtfb(0),
-			_rtfb_r(0), _rtfb_i(0), _digested(false), _tend(0), _tstart(0) {
+			_rtfb_r(0), _rtfb_i(0), _digested(false), _tend(0), _tstart(0), _cent_par(0),
+        	_cent_lin(0), _cent_col(0), _ta(0), _tr(0) {
+
             _file.seekg (0, _file.end);
             _data_len = _file.tellg();
             _file.seekg (0, _file.beg);
@@ -144,11 +146,15 @@ namespace VB {
                 _rtfbdims = _raise_one (_rtfbdims);
                 _syncdims = _raise_one (_syncdims);
                 _measdims[5] = (_measdims[5]-_cent_par)*2;
-                _ta = 2.5e-3*(_tend-_tstart); wspace.PSet("TA", _ta);
-                _tr = _ta/(_nmeas/_measdims[1]); wspace.PSet("TR", _tr);
+                //_ta = 2.5e-3*(_tend-_tstart);
+                _ta = _protocol.Get<long>("XProtocol.ASCCONV.lScanTimeSec");
+                _tr = _protocol.Get<long>("XProtocol.ASCCONV.alTR[0]")/1000;
+                wspace.PSet("TA", _ta);
+                wspace.PSet("TR", _tr);
+                wspace.PSet("Protocol", _protocol.Properties());
                 prtmsg ("     Found %zu lines (data: (Meas: %u, Noise: %u, Sync: %u))\n", i, _nmeas, _nnoise, _syncdims[1]);
                 prtmsg ("     Centres: column: %zu, line: %zu, partition: %zu\n", _cent_col, _cent_lin, _cent_par);
-                prtmsg ("     Measurement TA: %.2fs, TR: %.2fms\n", _ta, 1000.*_tr);
+                prtmsg ("     Measurement TA: %.2fs, TR: %.2fms\n", _ta, _tr);
                 prtmsg ("       Data dims ( ");
                 for (size_t i = 0; i < 15; ++i)
                     prtmsg ("%d ", _measdims[i]);

@@ -373,9 +373,6 @@ template<class T> inline std::ostream& operator<< (std::ostream& os, const Vecto
 template<class T> inline static T multiply (const T& a, const T& b) NOEXCEPT {
     return a*b;
 }
-template<class T> inline static T vprod (const Vector<T>& ct) NOEXCEPT {
-	return std::accumulate(ct.begin(), ct.end(), (T)1, multiply<T>);
-}
 template<class T> inline static T prod (const Vector<T>& ct) NOEXCEPT {
 	return std::accumulate(ct.begin(), ct.end(), (T)1, multiply<T>);
 }

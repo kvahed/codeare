@@ -5,11 +5,12 @@ function [] = save_ch5 (varargin)
 %   
 %   Kaveh Vahedipour - NYU School of Medicine, 2015
 
+    fname = varargin{1};
     delf = sprintf('rm %s', fname);
     [~,~] = system(delf);
     for i=2:nargin
         vname = sprintf('/%s',inputname(i));
-        cplx  = iscomplex(varargin{i});
+        cplx  =~ isreal(varargin{i});
         if (cplx)
             varargin{i} = reshape([real(varargin{i}(:))';imag(varargin{i}(:))'],[2 size(varargin{i})]);
         end

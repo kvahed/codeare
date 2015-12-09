@@ -1,3 +1,13 @@
+# CMake --------------------------------------------------------------
+cmake_minimum_required (VERSION 2.8)
+enable_testing()
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
+include(CheckIncludeFiles)
+check_include_files(assert.h HAVE_ASSERT_H)
+include(CheckIncludeFileCXX)
+check_include_file_cxx(cxxabi.h HAVE_CXXABI_H)
+add_definitions(-DHAVE_CONFIG_H)
+
 # Project ------------------------------------------------------------
 project (codeare CXX C)
 set (codeare_VERSION_MAJOR 2)
@@ -8,16 +18,6 @@ set (PROJECT_VERSION
 set (PACKAGE_NAME "codeare")
 set (PACKAGE_VERSION "${PROJECT_VERSION}")
 set (top_srcdir "${PROJECT_SOURCE_DIR}")
-
-# CMake --------------------------------------------------------------
-cmake_minimum_required (VERSION 2.8)
-enable_testing()
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
-include(CheckIncludeFiles)
-check_include_files(assert.h HAVE_ASSERT_H)
-include(CheckIncludeFileCXX)
-check_include_file_cxx(cxxabi.h HAVE_CXXABI_H)
-add_definitions(-DHAVE_CONFIG_H)
 
 # Git ----------------------------------------------------------------
 include(GetGitRevisionDescription)
@@ -107,7 +107,7 @@ if(OPENMP_FOUND)
 endif()
 
 # Core ---------------------------------------------------------------
-find_package(Boost COMPONENTS thread chrono timer system REQUIRED)
+find_package(Boost COMPONENTS thread chrono timer system regex REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories (${BOOST_LIBRARYDIR})
 find_package(OpenSSL REQUIRED)

@@ -27,10 +27,10 @@ public:
     
     NLCG (const Params& p) : NonLinear<T>::NonLinear (p) {
         _nliter = try_to_fetch<int> (p, "nliter", 0);
-        _cgconv = try_to_fetch<float> (p, "cgconv", 0);
+        _cgconv = try_to_fetch<float> (p, "cgconv", 0.0f);
         _lsiter = try_to_fetch<int> (p, "lsiter", 0);
-        _lsa = try_to_fetch<float> (p, "lsa", 0);
-        _lsb = try_to_fetch<float> (p, "lsb", 0);
+        _lsa = try_to_fetch<float> (p, "lsa", 0.0f);
+        _lsb = try_to_fetch<float> (p, "lsb", 0.0f);
         _pls = try_to_fetch<bool> (p, "parallel_linesearch", false);
     }
     
@@ -78,9 +78,10 @@ public:
         Vector<real_t> rms(_lsiter);
         Vector<size_t> pos(_lsiter);
 
-        _g0  = A->df (x);
+        _g0  = A->df(x);
+
         _dx  = -_g0;
-    
+
         for (size_t k = 0; k < _nliter; k++) {
         
             A->Update(_dx);
@@ -98,7 +99,7 @@ public:
         
             if      (li > 2) t0 *= _lsb;
             else if (li < 1) t0 /= _lsb;
-        
+
             // Update image
             x  += _dx * t;
         
@@ -108,7 +109,7 @@ public:
             _g0 =  _g1;
             _dx = -_g1 + _dx * bk;
             dxn =  norm(_dx)/xn;
-        
+
             printf ("dxnrm: %0.4f\n", dxn);
             if (dxn < _cgconv)
                 break;

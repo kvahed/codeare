@@ -212,6 +212,7 @@ public:
     inline virtual Matrix<T> df (const Matrix<T>& x) {
         wx = (dwt) ? *dwt->*x : x;
         Matrix<T> g = dObj (x);
+
         if (_xfmw)
             g += dXFM (x);
         for (size_t i = 0; i < _tvw.size(); ++i)
@@ -281,22 +282,20 @@ public:
         im_dc  = data;
         if (_ft_type != 2 && _ft_type != 3)
             im_dc /= wspace.Get<RT>("pdf");
+
         im_dc  = *ft ->* im_dc;
-        
+
         if (_verbose)
             vc.push_back(im_dc);
-
         _ndnz = (RT)nnz(data);
 
         if (dwt)
             im_dc  = *dwt * im_dc;
-
         RT ma = max(abs(im_dc).Container());
         _tvw[0] *= ma;
         _tvw[1] *= ma;
 
         printf ("  Running %i %s iterations ... \n", _csiter, nlopt_names[_nlopt_type]); fflush(stdout);
-
         for (size_t i = 0; i < (size_t)_csiter; i++) {
             nlopt->Minimise ((Operator<T>*)this, im_dc);
             if (_verbose)
@@ -312,7 +311,7 @@ public:
             if (dwt)
                 im_dc = *dwt ->* im_dc;
         }
-        
+
         return im_dc;
 
     }

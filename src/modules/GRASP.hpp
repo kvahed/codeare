@@ -29,7 +29,6 @@
 #include "CX.hpp"
 #include "linalg/Lapack.hpp"
 
-//#include <pthread.h>
 /**
  * @brief Reconstruction startegies
  */
@@ -80,18 +79,9 @@ namespace RRStrategy {
         
     private:
         
-        int            m_dim;    /**< Image recon dim */
-        int            m_N[3];   /**< Data side lengths */
-        int            m_csiter; /**< # global iterations */
-        int            m_test_case;
-        float          _tf;
-
-        double         m_noise;
-
-        int            m_wf;
-        int            m_wm;
-        int            m_verbose;
-        Params         ft_params;
+        Params ft_params;
+        size_t _tf;
+        float _ta;
 
     };
     

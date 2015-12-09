@@ -48,7 +48,7 @@ endif()
 
 list (APPEND COMLIBS core tinyxml 
   ${OPENSSL_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_CHRONO_LIBRARY}
-  ${Boost_TIMER_LIBRARY})  
+  ${Boost_TIMER_LIBRARY} ${Boost_REGEX_LIBRARY})  
 
 if (${Matlab_FOUND})
     list (APPEND COMLIBS ${Matlab_MX_LIBRARY} ${Matlab_MAT_LIBRARY})

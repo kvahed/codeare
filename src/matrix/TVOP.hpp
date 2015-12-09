@@ -90,6 +90,57 @@ template<class T> struct TV3D<T,1,1,1> {
     }
 };
 
+template<class T> struct TV3D<T,0,0,1> {
+    Matrix<T> inline static fwd (const Matrix<T>& A) {
+        Vector<size_t> dims = size(A);
+        Matrix<T> ret (dims);
+        size_t stride = dims[0]*dims[1];
+        for (size_t i = 0; i < dims[2]-1; i++)
+            std::transform(A.Begin()+(i+1)*stride, A.Begin()+(i+2)*stride, A.Begin()+i*stride,
+                           ret.Begin()+i*stride, std::minus<T>());
+        return ret;
+    }
+    Matrix<T> inline static adj (const Matrix<T>& A) {
+        Vector<size_t> dims = size(A);
+        size_t stride = dims[0]*dims[1];
+        Matrix<T> ret (dims);
+        for (size_t i = 1; i < dims[2]-1; i++)
+            std::transform(A.Begin()+(i-1)*stride, A.Begin()+i*stride, A.Begin()+i*stride,
+                           ret.Begin()+i*stride, std::minus<T>());
+        for (size_t i = 0; i < stride; ++i)
+            ret[i] = -A[i];
+        std::copy_n(A.Begin()+(dims[2]-2)*stride, stride, ret.Begin()+(dims[2]-1)*stride);
+        return ret;
+    }
+};
+
+
+template<class T, bool b0, bool b1, bool b2, bool b3> struct TV4D {};
+template<class T> struct TV4D<T,0,0,0,1> {
+    Matrix<T> inline static fwd (const Matrix<T>& A) {
+        Vector<size_t> dims = size(A);
+        Matrix<T> ret (dims);
+        size_t stride = dims[0]*dims[1]*dims[2];
+        for (size_t i = 0; i < dims[3]-1; i++)
+            std::transform(A.Begin()+(i+1)*stride, A.Begin()+(i+2)*stride, A.Begin()+i*stride,
+                           ret.Begin()+i*stride, std::minus<T>());
+        return ret;
+    }
+    Matrix<T> inline static adj (const Matrix<T>& A) {
+        Vector<size_t> dims = size(A);
+        size_t stride = dims[0]*dims[1]*dims[2];
+        Matrix<T> ret (dims);
+        for (size_t i = 1; i < dims[3]-1; i++)
+            std::transform(A.Begin()+(i-1)*stride, A.Begin()+i*stride, A.Begin()+i*stride,
+                           ret.Begin()+i*stride, std::minus<T>());
+        for (size_t i = 0; i < stride; ++i)
+            ret[i] = -A[i];
+        std::copy_n(A.Begin()+(dims[3]-2)*stride, stride, ret.Begin()+(dims[3]-1)*stride);
+        return ret;
+    }
+};
+
+
 template<class T, bool b0, bool b1, bool b2, bool b3, bool b4> struct TV5D {};
 template<class T> struct TV5D<T,0,0,0,1,0> {
     Matrix<T> inline static fwd (const Matrix<T>& A) {
@@ -191,11 +242,15 @@ public:
     inline Matrix<T> Trafo (const Matrix<T>& A) const {
 
         Matrix<T> ret;
-        
+
         if      (ndims(A)==2 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1)))
             ret = TV2D<T,1,1>::fwd(A);
         else if (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1 && _dims[2] == 1))) 
             ret = TV3D<T,1,1,1>::fwd(A);
+        else if (ndims(A)==3 && (_dims[0] == 0 && _dims[1] == 0 && _dims[2] == 1))
+            ret = TV3D<T,0,0,1>::fwd(A);
+        else if (ndims(A)==4 && (_dims.size()==4 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 1))
+        	ret = TV4D<T,0,0,0,1>::fwd(A);
         else if (ndims(A)==5 && (_dims.size()==5 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 1 && _dims[4] == 0))
             ret = TV5D<T,0,0,0,1,0>::fwd(A);
         else if (ndims(A)==5 && (_dims.size()==5 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 0 && _dims[4] == 1))
@@ -216,11 +271,15 @@ public:
 	inline Matrix<T> Adjoint (const Matrix<T>& A) const {
 
         Matrix<T> ret;
-        
-		if      (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1)))
+
+        if      (ndims(A)==3 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1)))
             ret = TV2D<T,1,1>::adj(A);
 		else if (ndims(A)==4 && (_dims.size()==0 || (_dims[0] == 1 && _dims[1] == 1 && _dims[2] == 1)))
             ret = TV3D<T,1,1,1>::adj(A);
+		else if (ndims(A)==3 && (_dims[0] == 0 && _dims[1] == 0 && _dims[2] == 1))
+            ret = TV3D<T,0,0,1>::adj(A);
+        else if (ndims(A)==4 && (_dims.size()==4 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 1))
+        	ret = TV4D<T,0,0,0,1>::adj(A);
 		else if (ndims(A)==5 && (_dims.size()==5 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 1 && _dims[4] == 0))
             ret = TV5D<T,0,0,0,1,0>::adj(A);
         else if (ndims(A)==5 && (_dims.size()==5 && _dims[0] == 0 && _dims[1] == 0 && _dims[2] == 0 && _dims[3] == 0 && _dims[4] == 1))

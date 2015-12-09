@@ -52,7 +52,9 @@ public:
 #else
     VDFile (const std::string& fname, const IOMode mode, const Params& params, const bool verbosity) :
     	SyngoFile(fname, mode, params, verbosity), _id(0), _ndset(1), _meas_r(0), _meas_i(0),
-		_sync_r(0), _nmeas(0), _nlines(0), _nsync(0), _digested(false), _tend(0), _tstart(0)  {
+		_sync_r(0), _nmeas(0), _nlines(0), _nsync(0), _digested(false), _tend(0), _tstart(0),
+		_cent_par(0), _cent_col(0), _cent_lin(0), _ta(0), _tr(0) {
+    	std::cout << _protocol.Get<long>("XProtocol.ASCCONV.lTotalScanTimeSec") << std::endl;
         _file.seekg(0);
         _file.read ((char*)&_id, sizeof(uint32_t));      // ID
         _file.read ((char*)&_ndset, sizeof(uint32_t));   // # data sets
@@ -180,9 +182,9 @@ private:
             for (size_t i = 0; i < mh.ushUsedChannels; ++i) {
                 _file.read((char*)&ch, CHANNEL_HEADER_LEN);
                 _file.read ((char*)&_meas(0, i, mh.sLC[0], mh.sLC[1], mh.sLC[2],
-                        mh.sLC[3], mh.sLC[4], mh.sLC[5], mh.sLC[6], mh.sLC[7], mh.sLC[8], mh.sLC[9],
-                        mh.sLC[10], mh.sLC[11], mh.sLC[12], mh.sLC[13]),
-						mh.ushSamplesInScan*sizeof(std::complex<float>));
+                    mh.sLC[3], mh.sLC[4], mh.sLC[5], mh.sLC[6], mh.sLC[7],
+					mh.sLC[8], mh.sLC[9], mh.sLC[10], mh.sLC[11], mh.sLC[12],
+					mh.sLC[13]), mh.ushSamplesInScan*sizeof(std::complex<float>));
             }
 #else
             std::vector<std::complex<float> > buf (mh.ushSamplesInScan*mh.ushUsedChannels);

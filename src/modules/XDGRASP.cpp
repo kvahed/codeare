@@ -85,7 +85,7 @@ codeare::error_code XDGRASP::Init () {
     ft_params["ft"] = RHSAttribute<int>("ft");
 
 	try {
-		_ntres = GetAttr<size_t>("_ntres");
+		_ntres = GetAttr<size_t>("nt_resp");
 	} catch (const TinyXMLQueryException&) {}
 
 	try {

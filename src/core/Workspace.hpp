@@ -26,6 +26,8 @@
   #include "Digest.hpp"
 #endif
 
+#include <boost/property_tree/ptree.hpp>
+
 typedef map<string, std::vector<std::string> > reflist;
 typedef pair<string, std::vector<std::string> > refent;
 typedef map<string, boost::any> store;

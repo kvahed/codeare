@@ -30,7 +30,7 @@ add_test (cod t_codeare)
 
 add_executable (t_vxfile t_vxfile.cpp)
 add_test (vx t_vxfile)
-target_link_libraries (t_vxfile ${OPENSSL_LIBRARIES} ${Boost_TIMER_LIBRARY} ${Boost_CHRONO_LIBRARY} ${Boost_SYSTEM_LIBRARY} core)
+target_link_libraries (t_vxfile ${OPENSSL_LIBRARIES} ${Boost_TIMER_LIBRARY} ${Boost_CHRONO_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_REGEX_LIBRARY} core)
 set_tests_properties(vx PROPERTIES REQUIRED_FILES "test.dat")
 
 # if (${ITK_FOUND})

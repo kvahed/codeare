@@ -59,7 +59,7 @@ void Workspace::Print (std::ostream& os) const {
 	    os << std::endl;
 	}
     os << "      Parameters:\n" ;
-    os << "    ----------------------- ";
+    os << "    -----------------------\n";
     os << p;
 
 }

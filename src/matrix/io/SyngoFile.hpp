@@ -34,6 +34,8 @@
 #endif
 #include <algorithm>
 
+#include "SyngoMRProtocol.hpp"
+
 static const float kB = 1.f/1024.f, iMB = 1.f/1.31072f, iGB = 1.f/1.073741824f;
 static uint32_t header_len, data_len;
 
@@ -115,6 +117,8 @@ public:
             _status = 1;
         }
         prtmsg("     done.\n");
+    	_protocol = SyngoMRProtocol (fname);
+
     }
 #endif
 
@@ -157,6 +161,8 @@ protected:
     std::string _fname;    /**< File name */
     
     uint32_t _header_len;  /**< Header length */
+    SyngoMRProtocol _protocol;
+
     int _nlhs;             /**< # Left hand sides */
 #ifdef USE_IN_MATLAB
     mxArray** _lhs;        /**< Left hand side */
