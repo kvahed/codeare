@@ -82,6 +82,7 @@ namespace RRStrategy {
         Params ft_params;
         size_t _tf;
         float _ta;
+        size_t _margin_top, _margin_bottom;
 
     };
     

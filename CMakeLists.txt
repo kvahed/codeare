@@ -1,5 +1,7 @@
 # CMake --------------------------------------------------------------
 cmake_minimum_required (VERSION 2.8)
+enable_language(C)
+enable_language(CXX)
 enable_testing()
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 include(CheckIncludeFiles)
@@ -30,7 +32,6 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINUX TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set (Boost_USE_STATIC_LIBS ON)
   set(MACOSX TRUE)
 endif()
 
@@ -118,11 +119,11 @@ set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
 
 # MATLAB --------------------------------------------------------------
-find_package(Matlab COMPONENTS MX_LIBRARY MAT_LIBRARY)
-if(Matlab_ROOT_DIR)
-  include_directories (${Matlab_INCLUDE_DIRS})
-  add_definitions (-DHAVE_MAT_H)
-endif()
+#find_package(Matlab COMPONENTS MX_LIBRARY MAT_LIBRARY)
+#if(Matlab_ROOT_DIR)
+#  include_directories (${Matlab_INCLUDE_DIRS})
+#  add_definitions (-DHAVE_MAT_H)
+#endif()
 
 # Linear algebra -----------------------------------------------------
 find_package(LAPACK REQUIRED)
@@ -191,7 +192,6 @@ find_package(GSL)
 if (${GSL_FOUND})
   include_directories (${GSL_INCLUDE_DIR})
   add_definitions (-DHAVE_GSL)
-message("${GSL_LIBRARIES}")
 endif()
 
 # OpenCL -------------------------------------------------------------

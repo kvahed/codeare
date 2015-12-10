@@ -58,6 +58,8 @@ GRASP::GRASP() {
 	ft_params["ftiter"]  = 1; // NuFFT gridding iterations
 	_tf                  = 15;
 	ft_params["nliter"]  = 6;
+    _margin_top = 0;
+    _margin_bottom = 0;
 }
 
 codeare::error_code GRASP::Init () {
@@ -125,6 +127,12 @@ codeare::error_code GRASP::Init () {
 	} catch (const TinyXMLQueryException&) {
 		_ta = wspace.PGet<float>("TA");
 	}
+	try {
+		_margin_top = GetAttr<size_t>("margin_top");
+	} catch (const TinyXMLQueryException&) {}
+	try {
+		_margin_bottom = GetAttr<size_t>("margin_bottom");
+	} catch (const TinyXMLQueryException&) {}
 
 
 
@@ -144,11 +152,17 @@ codeare::error_code GRASP::Process () {
     Matrix<cxfl>& data = Get<cxfl>("meas");
     Matrix<float>& kspace = Get<float>("kspace");
     Matrix<float>& weights = Get<float>("weights");
+	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
 	Vector<size_t> order(4); order[0]=0; order[1]=2; order[2]=3; order[3]=1;
 
     size_t nline, nv, nt, nx, nz, nc;
     Vector<size_t> n = size(data);
     nx = n[0]; nv = n[1]; nz = n[2]; nc = n[3];
+
+    // Slice clipping?
+    data = data(CR(),CR(),CR(_margin_top,nz-1-_margin_bottom),CR());
+    sensitivities = sensitivities(CR(),CR(),CR(_margin_top,nz-1-_margin_bottom),CR());
+    nz = size(data,2);
 
     // Timing
 	nt = ceil(_ta/_tf);
@@ -178,18 +192,17 @@ codeare::error_code GRASP::Process () {
 	data   = permute (data,order);
 	kspace = resize(kspace,size(kspace,0),nx*nv,nt);
 	weights = zeros<float>(nx*nv,1);
-    weights (R( 0,nx/2-1),0) = linspace<float>(1.,0.01,nx/2);
-    weights (R(nx/2,nx-1),0) = linspace<float>(0.01,1.,nx/2);
+    weights (R( 0,nx/2-1),0) = linspace<float>(1.,0.002,nx/2)^.75;
+    weights (R(nx/2,nx-1),0) = linspace<float>(0.002,1.,nx/2)^.75;
     for (auto i = weights.Begin()+nx; i < weights.End(); i += nx)
         std::copy (weights.Begin(), weights.Begin()+nx, i);
 
-	std::cout << "  Reshaped and permuted:    " << std::endl;
-	std::cout << "    data:     " << size(data) << std::endl;
-	std::cout << "    k-space:  " << size(kspace) << std::endl;
+	std::cout << "  Reshaped and permuted:    "    << std::endl;
+	std::cout << "    data:     " << size(data)    << std::endl;
+	std::cout << "    k-space:  " << size(kspace)  << std::endl;
 	std::cout << "    weights:  " << size(weights) << std::endl;
 
 	// FT operator
-	Matrix<cxfl>& sensitivities = Get<cxfl>("sensitivities");
 	ft_params["sensitivities"] = sensitivities;
 	Vector<size_t> image_size = size(sensitivities);
 	image_size.pop_back(); image_size.pop_back();
@@ -198,7 +211,7 @@ codeare::error_code GRASP::Process () {
 	ft_params["nk"]   = size(data,0);
 
 	Matrix<cxfl> im_xd (image_size[0], image_size[1], nz, nt);
-	for (size_t i = 0; i < 4; ++i) {
+	for (size_t i = 0; i < nz; ++i) {
         ft_params["sensitivities"] = squeeze(sensitivities(CR(),CR(),CR(i),CR()));
         CS_XSENSE<cxfl> ft(ft_params);
         ft.KSpace(kspace);

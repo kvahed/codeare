@@ -157,8 +157,8 @@ codeare::error_code XDGRASP::Process () {
 	data = permute (data,order);
 	kspace = resize(kspace,size(kspace,0),nx*nline,_ntres,nt);
 	weights = zeros<float>(nx*nline,1);
-    weights (R( 0,nx/2-1),0) = linspace<float>(1.,0.005,nx/2);
-    weights (R(nx/2,nx-1),0) = linspace<float>(0.005,1.,nx/2);
+    weights (R( 0,nx/2-1),0) = linspace<float>(1.,0.002,nx/2)^.5;
+    weights (R(nx/2,nx-1),0) = linspace<float>(0.002,1.,nx/2)^.5;
     for (auto i = weights.Begin()+nx; i < weights.End(); i += nx)
         std::copy (weights.Begin(), weights.Begin()+nx, i);
 

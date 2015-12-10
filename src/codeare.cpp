@@ -119,7 +119,7 @@ int main (int argc, char** argv) {
 	    		break;
 	    	}
 
-	    	printf ("Initialising %s ...\n", module_name.c_str());
+	    	//printf ("Initialising %s ...\n", module_name.c_str());
 	    	codeare::error_code ce = con.Init (module_name.c_str(), config.c_str());
 	    	if (ce != codeare::OK) {
 	    		printf ("  *** ERROR: Intialising failed ... bailing out!\n");
