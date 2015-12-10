@@ -174,6 +174,18 @@ public:
         ft->Weights(w);
 	}
 
+
+	/**
+	 * @brief      (Re-)Assign coil sensitivities
+	 * 
+	 * @param  sm  Sensitivity maps
+	 */
+    inline void Sensitivities (const Matrix<T>& sm) {
+        ft->Sensitivities(sm);
+    }
+    
+
+
     /**
 	 * @brief   Set k-space mask
 	 * @param   mask  k-space mask

@@ -121,6 +121,13 @@ public:
 	 *
 	 * @param  w   Weights
 	 */
+	virtual void Sensitivities (const Matrix<T>& sm) {}
+
+	/**
+	 * @brief      Assign k-space weigths (jacobian of k in t)
+	 *
+	 * @param  w   Weights
+	 */
 	virtual void Mask (const Matrix<RT>& m) {}
 
 

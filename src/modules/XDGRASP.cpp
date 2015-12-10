@@ -45,10 +45,10 @@ codeare::error_code XDGRASP::Init () {
 
 
 	ft_params["weights_name"] = std::string("weights");
-	ft_params["alpha"]   = RHSAttribute<float>("ftalpha");
-	ft_params["maxit"]   = RHSAttribute<size_t>("ftiter");
+	ft_params["alpha"]        = RHSAttribute<float>("ftalpha");
+	ft_params["maxit"]        = RHSAttribute<size_t>("ftiter");
 	ft_params["ftiter"]       = (size_t) RHSAttribute<int>("ftmaxit");
-	ft_params["m"]       = RHSAttribute<size_t>("ftm");
+	ft_params["m"]            = RHSAttribute<size_t>("ftm");
 	ft_params["fteps"]        = RHSAttribute<float>("fteps");
 	ft_params["cgiter"]       = (size_t) RHSAttribute<int>("cgmaxit");
 	ft_params["cgeps"]        = RHSAttribute<float>("cgeps");
@@ -157,8 +157,8 @@ codeare::error_code XDGRASP::Process () {
 	data = permute (data,order);
 	kspace = resize(kspace,size(kspace,0),nx*nline,_ntres,nt);
 	weights = zeros<float>(nx*nline,1);
-    weights (R( 0,nx/2-1),0) = linspace<float>(1.,1./nx,nx/2);
-    weights (R(nx/2,nx-1),0) = linspace<float>(1./nx,1.,nx/2);
+    weights (R( 0,nx/2-1),0) = linspace<float>(1.,0.005,nx/2);
+    weights (R(nx/2,nx-1),0) = linspace<float>(0.005,1.,nx/2);
     for (auto i = weights.Begin()+nx; i < weights.End(); i += nx)
         std::copy (weights.Begin(), weights.Begin()+nx, i);
 

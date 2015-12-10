@@ -41,7 +41,7 @@ GRASP::GRASP() {
 	ft_params["lsiter"]  = 6;
 	ft_params["verbose"] = false;
     ft_params["xfmw"]    = 0.0f;
-	ft_params["m"]       = RHSAttribute<size_t>("ftm");
+	ft_params["m"]       = (size_t)1;
 	ft_params["cgiter"]  = (size_t)0;
 	ft_params["lambda"]  = 1.0e-9f;
 	ft_params["tvw1"]    = 0.02f;
@@ -55,7 +55,6 @@ GRASP::GRASP() {
 	ft_params["fteps"]   = 7.e-4f; // NuFFT gridding convergence
 	ft_params["parallel_linesearch"]   = true; // Line search parallelism
 	ft_params["ft"]      = 3; // NC SENSE
-	ft_params["m"]       = 1; // NuFFT oversampling
 	ft_params["ftiter"]  = 1; // NuFFT gridding iterations
 	_tf                  = 15;
 	ft_params["nliter"]  = 6;
@@ -72,6 +71,9 @@ codeare::error_code GRASP::Init () {
 	} catch (const TinyXMLQueryException&) {}
 	try {
 		ft_params["lsiter"] = GetAttr<int>("lsiter");
+	} catch (const TinyXMLQueryException&) {}
+	try {
+		ft_params["cgiter"] = GetAttr<size_t>("cgmaxit");
 	} catch (const TinyXMLQueryException&) {}
 	try {
 		ft_params["tvw1"] = GetAttr<float>("tvw");
@@ -98,7 +100,7 @@ codeare::error_code GRASP::Init () {
 		ft_params["alpha"] = GetAttr<float>("ftalpha");
 	} catch (const TinyXMLQueryException&) {}
 	try {
-		ft_params["m"] = GetAttr<int>("ftm");
+		ft_params["m"] = GetAttr<size_t>("ftm");
 	} catch (const TinyXMLQueryException&) {}
 	try {
 		ft_params["ftiter"] = GetAttr<int>("ftiter");
@@ -176,8 +178,8 @@ codeare::error_code GRASP::Process () {
 	data   = permute (data,order);
 	kspace = resize(kspace,size(kspace,0),nx*nv,nt);
 	weights = zeros<float>(nx*nv,1);
-    weights (R( 0,nx/2-1),0) = linspace<float>(1.,1./nx,nx/2);
-    weights (R(nx/2,nx-1),0) = linspace<float>(1./nx,1.,nx/2);
+    weights (R( 0,nx/2-1),0) = linspace<float>(1.,0.005,nx/2);
+    weights (R(nx/2,nx-1),0) = linspace<float>(0.005,1.,nx/2);
     for (auto i = weights.Begin()+nx; i < weights.End(); i += nx)
         std::copy (weights.Begin(), weights.Begin()+nx, i);
 
@@ -195,17 +197,14 @@ codeare::error_code GRASP::Process () {
 	ft_params["dim4"] = (int) nt;
 	ft_params["nk"]   = size(data,0);
 
-	Matrix<cxfl> im_xd;// (image_size[0], image_size[1], nz, nt);
-	for (size_t i = 20; i < 21; ++i) {
-		ft_params["sensitivities"] = squeeze(sensitivities(CR(),CR(),CR(i),CR()));
-		CS_XSENSE<cxfl> ft(ft_params);
-		std::cout << ft << std::endl;
-    	ft.KSpace(kspace);
-    	ft.Weights (weights);
-		/*im_xd(R(),R(),R(i),R()) = */
-    	im_xd = ft ->* squeeze(data(CR(),CR(i),CR(),CR()));
+	Matrix<cxfl> im_xd (image_size[0], image_size[1], nz, nt);
+	for (size_t i = 0; i < 4; ++i) {
+        ft_params["sensitivities"] = squeeze(sensitivities(CR(),CR(),CR(i),CR()));
+        CS_XSENSE<cxfl> ft(ft_params);
+        ft.KSpace(kspace);
+        ft.Weights (weights);
+		im_xd(R(),R(),R(i),R()) = ft ->* squeeze(data(CR(),CR(i),CR(),CR()));
 	}
-
 
     Add ("im_xd", im_xd);
 

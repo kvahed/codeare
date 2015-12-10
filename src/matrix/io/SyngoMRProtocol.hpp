@@ -15,6 +15,13 @@
 #include <fstream>
 #include <iostream>
 
+#if (Boost_MINOR_VERSION>55)
+typedef boost::property_tree::ptree::key_type settings_key_t;
+#else
+typedef char settings_key_t;
+#endif
+
+
 /**
  * @brief Type conversion from string
  */
@@ -576,13 +583,13 @@ inline const std::string& SyngoMRProtocol::Raw () const {
 }
 
 inline std::ostream& SyngoMRProtocol::ToXML (std::ostream& os) const {
-	boost::property_tree::xml_writer_settings<boost::property_tree::ptree::key_type> settings(' ', 2u);
+	boost::property_tree::xml_writer_settings<settings_key_t> settings(' ', 2u);
 	write_xml(os, _props, settings);
 	return os;
 };
 
 inline void SyngoMRProtocol::ToXML (const std::string& filename) const {
-	boost::property_tree::xml_writer_settings<boost::property_tree::ptree::key_type> settings(' ', 2u);
+	boost::property_tree::xml_writer_settings<settings_key_t> settings(' ', 2u);
 	write_xml(filename, _props, std::locale(), settings);
 };
 

@@ -109,10 +109,13 @@ endif()
 # Core ---------------------------------------------------------------
 find_package(Boost COMPONENTS thread chrono timer system regex REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
+add_definitions(-DBoost_MAJOR_VERSION=${Boost_MAJOR_VERSION})
+add_definitions(-DBoost_MINOR_VERSION=${Boost_MINOR_VERSION})
 link_directories (${BOOST_LIBRARYDIR})
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
+
 
 # MATLAB --------------------------------------------------------------
 find_package(Matlab COMPONENTS MX_LIBRARY MAT_LIBRARY)

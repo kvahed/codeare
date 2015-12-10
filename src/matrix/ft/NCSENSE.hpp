@@ -190,6 +190,12 @@ public:
 	virtual ~NCSENSE () NOEXCEPT {}
 	
 
+    inline void Sensitivities (const Matrix<T>& sm) {
+        m_sm = sm;
+        m_csm = conj(sm);
+        m_ic = IntensityMap(sm);
+    }
+    
 	/**
 	 * @brief      Assign k-space trajectory
 	 * 
@@ -213,7 +219,6 @@ public:
 				else
 					throw NCSENSE_KSPACE_DIMENSIONS;
         	}
-
 		} else if (size(m_k,2)*size(m_k,3) == m_nmany) {
 #pragma omp parallel num_threads (m_fts.size())
             {
@@ -225,7 +230,6 @@ public:
                 else 
                     throw NCSENSE_KSPACE_DIMENSIONS;
             }
-
         } else {
             throw NCSENSE_KSPACE_DIMENSIONS;
         }
@@ -249,13 +253,12 @@ public:
 
         if (m_nmany > 1) {
         	if (ndims(m) == 3) {
-#pragma omp parallel num_threads (m_nmany)
-				{
-					size_t k = omp_get_thread_num();
+#pragma omp parallel for
+                for (int k = 0; k < m_nmany; ++k) {
 					for (int j = 0; j < m_nx[1]; ++j)
 						m_bwd_out (R(),R(),R(j),R(k)) = m_fts[k] ->* m(CR(),CR(j),CR(k));
 					m_bwd_out(R(),R(),R(),R(k)) *= m_csm;
-				}
+                }
 				ret = squeeze(sum(m_bwd_out,2));
 #pragma omp parallel num_threads (m_nmany)
 				{
