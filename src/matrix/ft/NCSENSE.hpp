@@ -338,7 +338,10 @@ public:
                 if (m_3rd_dim_cart)
                     m_fwd_out(R(),R(),R(),R(j)) = m_fts[j] * (m_sm(CR(),CR(),CR(),CR(j))*m);
                 else
-                    m_fwd_out(R(),R(),    R(j)) = m_fts[j] * (m_sm(CR(),CR(),     CR(j))*m);
+                    if (m_nx[0] == 2)
+                        m_fwd_out(R(),     R(j)) = m_fts[j] * (m_sm(CR(),CR(),     CR(j))*m);
+                    else
+                        m_fwd_out(R(),R(), R(j)) = m_fts[j] * (m_sm(CR(),CR(),     CR(j))*m);
             }
         }
 	    return squeeze(m_fwd_out);

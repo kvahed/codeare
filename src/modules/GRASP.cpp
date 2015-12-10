@@ -178,8 +178,8 @@ codeare::error_code GRASP::Process () {
 	data   = permute (data,order);
 	kspace = resize(kspace,size(kspace,0),nx*nv,nt);
 	weights = zeros<float>(nx*nv,1);
-    weights (R( 0,nx/2-1),0) = linspace<float>(1.,0.005,nx/2);
-    weights (R(nx/2,nx-1),0) = linspace<float>(0.005,1.,nx/2);
+    weights (R( 0,nx/2-1),0) = linspace<float>(1.,0.01,nx/2);
+    weights (R(nx/2,nx-1),0) = linspace<float>(0.01,1.,nx/2);
     for (auto i = weights.Begin()+nx; i < weights.End(); i += nx)
         std::copy (weights.Begin(), weights.Begin()+nx, i);
 

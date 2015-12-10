@@ -39,7 +39,13 @@ int main (int argc, char** argv) {
         }
         
 		// Read binary data from file
-		TiXmlElement* datain = con.GetElement("/config/data-in");
+        TiXmlElement* datain;
+        if (infile) { 
+            datain = new TiXmlElement("data-in");       // file specified in command line
+            datain->SetAttribute("fname", infile);
+        } else {                                        
+            datain = con.GetElement("/config/data-in"); // file specified in xml
+        }
 
 		if (!datain) {
 			printf ("*** WARNING: No input data specified to algorithm! \n");
@@ -51,7 +57,7 @@ int main (int argc, char** argv) {
                 while (datain_entry) {
                     
                     const std::string data_name = datain_entry->Value();
-                    const std::string data_uri = datain_entry->Attribute("uri");
+                    const std::string data_uri  = datain_entry->Attribute("uri");
                     const std::string data_type = datain_entry->Attribute("dtype");
                     
                     printf ("  Reading %s\n", data_name.c_str());

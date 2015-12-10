@@ -92,6 +92,7 @@ bool commandline_opts (int argc, char** argv) {
     opt.setOption ("debug" , 'd');
     opt.setOption ("config", 'c');
     opt.setOption ("base"  , 'b');
+    opt.setOption ("infile", 'i');
     
     opt.processCommandArgs(argc, argv);
     
@@ -116,7 +117,10 @@ bool commandline_opts (int argc, char** argv) {
     // Configuration file, default: config.xml
     tmp      = opt.getValue("config");
     config   = (tmp && strcmp(tmp,EMPTY)) ? tmp : (char*) "config.xml";
-    
+
+    // Input file specified in command line
+    infile   = opt.getValue("infile");
+
     config_file_uri  = base_dir;
     config_file_uri += "/";
     config_file_uri += std::string(config);
