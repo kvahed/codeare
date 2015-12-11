@@ -254,7 +254,7 @@ rand (const size_t n) {
  */
 template<class T> static Matrix<T>
 randn          (const size_t& col, 
-		const size_t& lin,
+		const size_t& lin = 1,
 		const size_t& cha = 1,
 		const size_t& set = 1,
 		const size_t& eco = 1,
@@ -286,23 +286,12 @@ randn          (const size_t& col,
  */
 template <class T> inline static Matrix<T>
 randn          (const Vector<size_t>& sz) {
-
 	Matrix<T> res (sz);
 	Random<T>::Normal(res);
  	return res;
 
 }
 
-/**
- * @brief       Random square matrix
- *
- * @param  n    Side length
- * @return      Random matrix
- */
-template<class T> static Matrix<T>
-randn (const size_t n) {
-	return rand<T>(n,n);
-}
 #endif
 
 /**

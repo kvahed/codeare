@@ -245,9 +245,10 @@ public:
      *
      * @param  n        Rows & Columns
      */
-    inline explicit Matrix (const size_t& n)  {
+    inline explicit Matrix (const size_t& n) {
     	MATRIX_ASSERT(n!=0,ZERO_SIDE_LENGTH);
 		_dim.resize(2,n);
+    	std::cout << _dim << std::endl;
 	    _res.resize(2,1.0);
         Allocate();
 	}
@@ -268,6 +269,7 @@ public:
     	MATRIX_ASSERT(n!=0,ZERO_NUMBER_COLUMNS);
     	MATRIX_ASSERT(m!=0,ZERO_NUMBER_ROWS);
     	_dim.resize(2); _dim[0] = m; _dim[1] = n;
+    	std::cout << _dim << std::endl;
 		_res.resize(2,1.0);
         Allocate();
     }
@@ -330,8 +332,8 @@ public:
 	    _dim[ 8] = par; _dim[ 9] = slc; _dim[10] = ida; _dim[11] = idb;
 	    _dim[12] = idc; _dim[13] = idd; _dim[14] = ide; _dim[15] = ave;
 
-        // Remove trailing singleton dimensions
-        for (i = 0; i < nd; i++)
+        // Remove trailing singleton dimensions except of first :)
+        for (i = 1; i < nd; i++)
             if (_dim[i] == 1)
                 n--;
             else
