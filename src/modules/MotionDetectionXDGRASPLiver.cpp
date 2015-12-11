@@ -73,7 +73,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	size_t nn;
 	eig_t<float> et;
     ta = wspace.PGet<float>("TA");
-    tr = wspace.PGet<float>("TR");
+    tr = wspace.PGet<float>("TR")*1.e-3; // ms
 
     meas = squeeze(meas);
 	std::cout << "  Incoming: " << size(meas) << std::endl;
@@ -139,7 +139,7 @@ codeare::error_code MotionDetectionXDGRASPLiver::Process     () {
 	res_peak = squeeze(motion_signal_fft(CR(fr_idx),CR()));
 	res_peak_nor = res_peak;
 	for (size_t i = 0; i < _pc_sel; ++i)
-		res_peak_nor(R(),R(i)) /= mmax(motion_signal_fft(CR(),CR(i)));
+		res_peak_nor(R(),R(i)) /= mmax(tmp_peak(CR(),CR(i)));
 	tt = max(res_peak_nor);
 	std::cout << "  Respiration is component " << sort(tt,DESCENDING)[0] << " ..." << std::endl;
 	res_signal = motion_signal_new(CR(),CR(sort(tt,DESCENDING)[0]));
