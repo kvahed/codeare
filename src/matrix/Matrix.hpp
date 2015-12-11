@@ -248,7 +248,6 @@ public:
     inline explicit Matrix (const size_t& n) {
     	MATRIX_ASSERT(n!=0,ZERO_SIDE_LENGTH);
 		_dim.resize(2,n);
-    	std::cout << _dim << std::endl;
 	    _res.resize(2,1.0);
         Allocate();
 	}
@@ -269,7 +268,6 @@ public:
     	MATRIX_ASSERT(n!=0,ZERO_NUMBER_COLUMNS);
     	MATRIX_ASSERT(m!=0,ZERO_NUMBER_ROWS);
     	_dim.resize(2); _dim[0] = m; _dim[1] = n;
-    	std::cout << _dim << std::endl;
 		_res.resize(2,1.0);
         Allocate();
     }

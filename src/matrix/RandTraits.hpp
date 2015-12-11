@@ -36,7 +36,6 @@ struct RandTraits<float> {
     inline static RT stdmax () {return +1.0;}
     template <class G>
     inline static void Populate (Matrix<T>& rta, G& generator) {
-    	std::cout << "+++" << rta.Size() << std::endl;
 		for (size_t i = 0; i < rta.Size(); ++i)
 			rta[i] = generator();
 	}
