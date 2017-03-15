@@ -75,13 +75,13 @@ if (${NFFT3_FOUND})
     EstimateSensitivitiesRadialVIBE.cpp)  
   set_target_properties(EstimateSensitivitiesRadialVIBE PROPERTIES PREFIX "")
   target_link_libraries (EstimateSensitivitiesRadialVIBE ${COMLIBS}
-    nfft3_threads ${GSL_LIBRARIES})
+     ${NFFT3_LIBRARIES} ${GSL_LIBRARIES})
   list (APPEND INST_TARGETS EstimateSensitivitiesRadialVIBE)
   
   if (${HAS_CXX11_CONDITIONAL}) 
     add_library (XDGRASP MODULE XDGRASP.hpp XDGRASP.cpp)
     set_target_properties(XDGRASP PROPERTIES PREFIX "")
-    target_link_libraries (XDGRASP ${COMLIBS} nfft3)
+    target_link_libraries (XDGRASP ${COMLIBS} ${NFFT3_LIBRARIES} )
     list (APPEND INST_TARGETS XDGRASP)
 
     add_library (MotionDetectionXDGRASPLiver MODULE
@@ -98,7 +98,7 @@ if (${NFFT3_FOUND})
   add_library (CompressedSensing MODULE CompressedSensing.hpp
     CompressedSensing.cpp) 
   set_target_properties(CompressedSensing PROPERTIES PREFIX "")
-  target_link_libraries (CompressedSensing ${COMLIBS} nfft3_threads) 
+  target_link_libraries (CompressedSensing ${COMLIBS} ${NFFT3_LIBRARIES}) 
 else ()
   add_library (CompressedSensing MODULE CompressedSensing.hpp
     CompressedSensing.cpp) 

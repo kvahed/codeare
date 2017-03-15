@@ -119,11 +119,11 @@ set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
 
 # MATLAB --------------------------------------------------------------
-#find_package(Matlab COMPONENTS MX_LIBRARY MAT_LIBRARY)
-#if(Matlab_ROOT_DIR)
-#  include_directories (${Matlab_INCLUDE_DIRS})
-#  add_definitions (-DHAVE_MAT_H)
-#endif()
+find_package(Matlab COMPONENTS MX_LIBRARY MAT_LIBRARY)
+if(Matlab_ROOT_DIR)
+  include_directories (${Matlab_INCLUDE_DIRS})
+  add_definitions (-DHAVE_MAT_H)
+endif()
 
 # Linear algebra -----------------------------------------------------
 find_package(LAPACK REQUIRED)

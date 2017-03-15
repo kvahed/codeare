@@ -32,19 +32,19 @@ public:
 		if (_maxit == 0)
 			return _p;
 		_r  = _p;
-        _rn = _xn = std::real(dotc(_r,_p));
-        Matrix<T> ret;
-        for (size_t i = 0; i < _maxit; i++) {
-            _res.push_back(_rn/_xn);
-            if (i==0)
+    _rn = _xn = std::real(dotc(_r,_p));
+    Matrix<T> ret;
+    for (size_t i = 0; i < _maxit; i++) {
+      _res.push_back(_rn/_xn);
+      if (i==0)
 				ret = zeros<T>(size(_p));
 			if (boost::math::isnan(_res[i]) || _res[i] <= _epsilon) {
 				printf ("    %03zu %.7f\n", i, _res[i]);
 				break;
-            }
+      }
 			if (_verbosity)
 				printf ("    %03zu %.7f\n", i, _res[i]);
-            _q  = A/(A*_p);
+      _q  = A/(A*_p);
 			if (_lambda)
 				_q += _lambda * _p;
 			_ts  = _rn / std::real(dotc(_p,_q));
