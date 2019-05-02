@@ -9,11 +9,11 @@
 #define _SYNGO_MR_PROTOCOL_H_
 
 #include <boost/property_tree/ptree.hpp>
-#include <boost/regex.hpp>
 
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <regex>
 
 #if (Boost_MINOR_VERSION>55)
 typedef boost::property_tree::ptree::key_type settings_key_t;
@@ -263,7 +263,7 @@ private:
 
 inline static const std::string RegexReplace (const std::string& str,
 		const std::string& what, const std::string& by = "") {
-	std::string ret = boost::regex_replace(str, boost::regex(what), by);
+	std::string ret = std::regex_replace(str, std::regex(what), by);
 	return ret;
 }
 
@@ -455,7 +455,7 @@ inline void SyngoMRProtocol::HandleCloseBracket (std::vector<stack_item*>& stack
 inline static search_result RegexSearch (std::string::const_iterator from,
 		std::string::const_iterator to,	const std::string& what) {
 	boost::match_results<std::string::const_iterator> mr;
-	if (boost::regex_search (from, to, mr, boost::regex(what)))
+	if (std::regex_search (from, to, mr, std::regex(what)))
 		return search_result(mr.position(), mr.str());
 	return search_result();
 }

@@ -114,6 +114,7 @@ codeare::error_code CompressedSensing::Init () {
     ft_params["nlopt"] = RHSAttribute<int>("nlopt");
     ft_params["parallel_linesearch"] = RHSAttribute<bool>("parallel_linesearch");
     ft_params["tvw1"] = RHSAttribute<float>("tvw1");
+    ft_params["tvw2"] = RHSAttribute<float>("tvw2");
     ft_params["tv1"] = RHSList<size_t>("tv1");
     ft_params["xfmw"] = RHSAttribute<float>("xfmw");
     ft_params["l1"] = RHSAttribute<float>("l1");

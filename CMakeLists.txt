@@ -92,9 +92,9 @@ endif ()
 if (${HAS_CXX11_CONDITIONAL}) 
   add_definitions (-DHAVE_CXX11_CONDITIONAL)
 endif ()
-#if (${HAS_CXX11_THREAD})  IMMATURE IMPL?
-#  add_definitions (-DHAVE_CXX11_THREAD)
-#endif ()
+if (${HAS_CXX11_THREAD})
+  add_definitions (-DHAVE_CXX11_THREAD)
+endif ()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_COMPILER_FLAGS}")
 
 # OpenMP  -------------------------------------------------------
@@ -108,7 +108,7 @@ if(OPENMP_FOUND)
 endif()
 
 # Core ---------------------------------------------------------------
-find_package(Boost COMPONENTS thread chrono timer system regex REQUIRED)
+find_package(Boost COMPONENTS chrono timer system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 add_definitions(-DBoost_MAJOR_VERSION=${Boost_MAJOR_VERSION})
 add_definitions(-DBoost_MINOR_VERSION=${Boost_MINOR_VERSION})

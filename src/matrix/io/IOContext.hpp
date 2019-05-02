@@ -23,7 +23,7 @@
 #define __IOCONTEXT_HPP__
 
 #include "HDF5File.hpp"
-#include "VXFile.hpp" // Syngo VB/VD
+//#include "VXFile.hpp" // Syngo VB/VD
 #include "CODFile.hpp"
 #include "Demangle.hpp"
 
@@ -192,7 +192,7 @@ namespace io{
 	};
 
 	
-	template<>
+/*	template<>
 	struct IOTraits<SYNGO> {
 		typedef VXFile IOClass;
 		
@@ -224,7 +224,7 @@ namespace io{
 	};
 
 	
-	
+*/	
 	
 	/**
 	 * @brief       Interface to concrete IO implementation
@@ -326,7 +326,7 @@ namespace io{
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  return IOTraits< NIFTI>::Read<T>(m_iof, uri);
 #endif
-				case SYNGO:  return IOTraits< SYNGO>::Read<T>(m_iof, uri);
+//				case SYNGO:  return IOTraits< SYNGO>::Read<T>(m_iof, uri);
 				case GE:     break;
 				case PHILIPS: break;
 				default:     break;
@@ -351,7 +351,7 @@ namespace io{
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  return IOTraits< NIFTI>::Write<T>(m_iof, M, uri);
 #endif
-				case SYNGO:  return IOTraits< SYNGO>::Write<T>(m_iof, M, uri);
+//				case SYNGO:  return IOTraits< SYNGO>::Write<T>(m_iof, M, uri);
 				case GE:     break;
 				case PHILIPS: break;
 				default:     break;
@@ -376,7 +376,7 @@ namespace io{
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  return IOTraits< NIFTI>::Read<T>(m_iof, txe);
 #endif
-				case SYNGO:  return IOTraits< SYNGO>::Read<T>(m_iof, txe);
+//				case SYNGO:  return IOTraits< SYNGO>::Read<T>(m_iof, txe);
 				case GE:     break;
 				case PHILIPS: break;
 				default:     break;
@@ -401,7 +401,7 @@ namespace io{
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  return IOTraits< NIFTI>::Read(m_iof);
 #endif
-				case SYNGO:  return IOTraits< SYNGO>::Read(m_iof);
+//				case SYNGO:  return IOTraits< SYNGO>::Read(m_iof);
 				case GE:     break;
 				case PHILIPS: break;
 				default:     break;
@@ -426,7 +426,7 @@ namespace io{
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  return IOTraits< NIFTI>::Write<T>(m_iof, M, txe);
 #endif
-				case SYNGO:  return IOTraits< SYNGO>::Write<T>(m_iof, M, txe);
+//				case SYNGO:  return IOTraits< SYNGO>::Write<T>(m_iof, M, txe);
 				case GE:     break;
 				case PHILIPS: break;
 				default:     break;
@@ -468,8 +468,8 @@ namespace io{
 				return MATLAB;
 			else if (HasSuffix (lfname, IOTraits<NIFTI>::Suffix()))
 				return NIFTI;
-			else if (HasSuffix (lfname, IOTraits<SYNGO>::Suffix()))
-				return SYNGO;
+//			else if (HasSuffix (lfname, IOTraits<SYNGO>::Suffix()))
+//				return SYNGO;
 			else
 				return HDF5;
 		}
@@ -483,8 +483,8 @@ namespace io{
 				return MATLAB;
 			else if (lname.compare(IOTraits<NIFTI>::CName()) == 0)
 				return NIFTI;
-			else if (lname.compare(IOTraits<SYNGO>::CName()) == 0)
-				return SYNGO;
+//			else if (lname.compare(IOTraits<SYNGO>::CName()) == 0)
+//				return SYNGO;
 			else
 				return HDF5;
 		}
@@ -503,7 +503,7 @@ namespace io{
 #ifdef HAVE_NIFTI1_IO_H
 				case NIFTI:  m_iof = IOTraits< NIFTI>::Open(fname, mode, params, verbosity); break;
 #endif
-				case SYNGO:  m_iof = IOTraits< SYNGO>::Open(fname, mode, params, verbosity); break;
+//				case SYNGO:  m_iof = IOTraits< SYNGO>::Open(fname, mode, params, verbosity); break;
 				case GE:      break;
 				case PHILIPS: break;
 				default:      printf ("Failed to make IO context concrete!\n ");  break;
