@@ -28,7 +28,8 @@
 #  endif
 #endif
 
-#if (_MSC_VER >= 1300) && (WINVER < 0x0500) && !defined(_ftol)
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1300) && (WINVER < 0x0500) && !defined(_ftol)
 #ifndef _ftol
 extern "C" inline long _ftol( double d) { return (long) d;}
 #endif

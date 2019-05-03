@@ -15,9 +15,11 @@
 #define stringize(s) #s
 #define XSTR(s) stringize(s)
 #if !defined NDEBUG
+#ifdef _MSC_VER
 #pragma warning (disable : 4273)
 	void abort (void);
 #pragma warning (default : 4273)
+#endif
 # if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
 # define op_assert(a, b, c) \
 do { \

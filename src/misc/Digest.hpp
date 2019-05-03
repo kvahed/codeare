@@ -1,5 +1,3 @@
-#include <openssl/evp.h>
-
 
 inline static char* 
 charstar (const std::string& in) {
@@ -12,7 +10,7 @@ charstar (const std::string& in) {
 
 }
 
-
+/*
 inline static std::string
 digest (const std::string& in, const std::string& type) {
 
@@ -40,22 +38,14 @@ digest (const std::string& in, const std::string& type) {
 	delete[] str;
 	return out;
 
-}
+  }*/
 
 
 inline static std::string 
 sha256 (const std::string& in) {
-#if defined(_MSC_VER) && (_MSC_VER < 1600)
+
 	return in;
-#else
-	return digest (in, "sha256");
-#endif
 }
 
-
-inline static std::string
-sha512 (const std::string& in) {
-	return digest (in, "sha512");
-}
 
 
