@@ -113,16 +113,18 @@ include_directories(${Boost_INCLUDE_DIRS})
 add_definitions(-DBoost_MAJOR_VERSION=${Boost_MAJOR_VERSION})
 add_definitions(-DBoost_MINOR_VERSION=${Boost_MINOR_VERSION})
 link_directories (${BOOST_LIBRARYDIR})
-find_package(OpenSSL REQUIRED)
-include_directories(${OPENSSL_INCLUDE_DIR})
-set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
+#find_package(OpenSSL REQUIRED)
+#include_directories(${OPENSSL_INCLUDE_DIR})
+#set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${OPENSSL_LIBRARIES}")
 
 
 # MATLAB --------------------------------------------------------------
-find_package(Matlab COMPONENTS MX_LIBRARY MAT_LIBRARY)
-if(Matlab_ROOT_DIR)
-  include_directories (${Matlab_INCLUDE_DIRS})
-  add_definitions (-DHAVE_MAT_H)
+if (BUILD_MATLAB_SUPPORT) 
+  find_package(Matlab COMPONENTS MX_LIBRARY MAT_LIBRARY)
+  if(Matlab_ROOT_DIR)
+    include_directories (${Matlab_INCLUDE_DIRS})
+    add_definitions (-DHAVE_MAT_H)
+  endif()
 endif()
 
 # Linear algebra -----------------------------------------------------
