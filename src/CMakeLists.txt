@@ -1,5 +1,5 @@
 if (POLICY CMP0021)
-  cmake_policy(SET CMP0021 OLD)
+  cmake_policy(SET CMP0021 NEW)
 endif()
 
 include_directories (

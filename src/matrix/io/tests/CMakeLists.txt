@@ -7,7 +7,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src/matrix/simd
   ${HDF5_INCLUDE_DIRS}
   ${MATLAB_INCLUDE_DIRS}
-  if (${NIFTI_FOUND})
+  if (${NIFTI_INCLUDE_DIR})
     ${NIFTI_INCLUDE_DIR}
   endif()
   }
