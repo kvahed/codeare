@@ -148,7 +148,7 @@ ones            (const size_t& n) {
  */
 template <class T> inline static Matrix<T>
 ones           (const Vector<size_t>& sz) {
- 	return Matrix<T>(sz) = (T)1;
+ 	return Matrix<T>(sz) = reinterpret_cast<T>(1);
 }
 
 
@@ -469,9 +469,13 @@ phantom (const size_t& n) {
 		{ .023f,  .046f, -.06f, -.605f,   .0f }
 	};
 	// Size_Tensities
+#ifdef _MSC_VER
 #pragma warning (disable : 4305)
-	T v[ne] = {(T)1., (T)-.8, (T)-.2, (T)-.2, (T).1, (T).1, (T).1, (T).1, (T).1, (T).1};
+#endif
+	T v[ne] = {1., -.8, -.2, -.2, .1, .1, .1, .1, .1, .1};
+#ifdef _MSC_VER
 #pragma warning (default : 4305)
+#endif
 
 	// Empty matrix
 	Matrix<T> res (n);

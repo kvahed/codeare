@@ -82,7 +82,7 @@ static inline std::vector<std::string> Parse (const std::string& str, const std:
 static const int end = -1;
 
 // Pretty print function names
-#if (0 < _MSC_VER)
+#if defined(MSCVER) && (0 < _MSC_VER)
   #define PRETTY_FUNCTION __FUNCSIG__
 #else
   #define PRETTY_FUNCTION __PRETTY_FUNCTION__
