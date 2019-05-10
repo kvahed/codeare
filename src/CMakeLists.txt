@@ -153,6 +153,8 @@ endif()
 
 if (${WINDOWS}) 
   set (LD_ENV
+    "${LD_ENV}\;${CMAKE_CURRENT_BINARY_DIR}")
+  set (LD_ENV
     "${LD_ENV}\;${CMAKE_CURRENT_BINARY_DIR}/modules")
   set (LD_ENV
     "${LD_ENV}\;${CMAKE_CURRENT_BINARY_DIR}/modules/Release")
@@ -161,6 +163,8 @@ if (${WINDOWS})
 else ()
   set (LD_ENV
     "${LD_ENV}:${CMAKE_CURRENT_BINARY_DIR}/modules")
+  set (LD_ENV
+    "${LD_ENV}:${CMAKE_CURRENT_BINARY_DIR}")
   set (LD_ENV "${LD_ENV}:${BOOST_LIBRARYDIR}")
 endif ()
 
