@@ -100,7 +100,7 @@ elseif(Vc_COMPILER_IS_MSVC)
   AddCompilerFlag("/wd4290")
 endif()
 
-vc_set_preferred_compiler_flags(WARNING_FLAGS BUILDTYPE_FLAGS)
+vc_set_preferred_compiler_flags(BUILDTYPE_FLAGS)
 
 add_definitions(${Vc_DEFINITIONS})
 add_compile_options(${Vc_COMPILE_FLAGS})
