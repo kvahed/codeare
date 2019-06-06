@@ -36,13 +36,13 @@ enum TinyXMLQueryException {
 using namespace TinyXPath;
 
 inline static void report (const int res, const char* name) {
-    if (res == TIXML_SUCCESS)
-        return;
+  if (res == TIXML_SUCCESS)
+    return;
+  else
+    if (res == TIXML_WRONG_TYPE)
+      printf ("**WARNING! Trying to access attribute '%s' with wrong type.\n", name);
     else
-        if (res == TIXML_WRONG_TYPE)
-            printf ("**WARNING! Trying to access attribute '%s' with wrong type.\n", name);
-        else
-            printf ("**WARNING! Attribute '%s' does not exist in parameter list.\n", name);
+      printf ("**WARNING! Attribute '%s' does not exist in parameter list.\n", name);
 }
 
 
@@ -114,7 +114,7 @@ public:
 	 * @param  value    Attribute value
 	 */
 	inline void SetAttribute (const char* name, bool value) {
-		Configuration()->SetAttribute (name, (int)value);
+		Configuration()->SetAttribute (name, int(value));
 	}
 
 	
@@ -125,7 +125,7 @@ public:
 	 * @param  value    Attribute value
 	 */
 	inline void SetAttribute (const char* name, size_t value) {
-		Configuration()->SetAttribute (name, (int)value);
+		Configuration()->SetAttribute (name, int(value));
 	}
     
 	
@@ -136,7 +136,7 @@ public:
 	 * @param  value    Attribute value
 	 */
 	inline void SetAttribute (const char* name, unsigned short value) {
-		Configuration()->SetAttribute (name, (int)value);
+		Configuration()->SetAttribute (name, int(value));
 	}
     
 	
@@ -158,7 +158,7 @@ public:
 	 * @param  value    Attribute value
 	 */
 	inline void SetAttribute (const char* name, float value) {
-		Configuration()->SetDoubleAttribute (name, (double)value);
+		Configuration()->SetDoubleAttribute (name, double(value));
 	}
 
 
@@ -170,7 +170,7 @@ public:
 	 */
 	inline const char* Attribute (const char* name) const {
 		return Configuration()->Attribute (name);
-    }
+  }
 	
 
 	/**
@@ -181,9 +181,9 @@ public:
 	 * @return          Length
 	 */
 	inline int Attribute (const char* name, std::string* value) const {
-        int res = Configuration()->QueryStringAttribute (name, value);
+    int res = Configuration()->QueryStringAttribute (name, value);
 		report (res, name);
-        return res;
+    return res;
 	}
 	
 
@@ -195,9 +195,9 @@ public:
 	 * @return          Status
 	 */
 	inline int Attribute (const char* name, int* value) const {
-        int res = Configuration()->QueryIntAttribute (name, value);
+    int res = Configuration()->QueryIntAttribute (name, value);
 		report (res, name);
-        return res;
+    return res;
 	}
 
 	
@@ -212,7 +212,7 @@ public:
 		int ival, res;
 		res = Configuration()->QueryIntAttribute (name, &ival);
 		report (res, name);
-		*value = (unsigned short) ival;
+		*value = ival;
 		return res;
 	}
 
@@ -228,7 +228,7 @@ public:
 		int ival, res;
 		res = Configuration()->QueryIntAttribute (name, &ival);
 		report (res, name);
-		*value = (size_t) ival;
+		*value = size_t(ival);
 		return res;
 	}
 
@@ -244,7 +244,7 @@ public:
 		int ival, res;
 		res = Configuration()->QueryIntAttribute (name, &ival);
 		report (res, name);
-        *value = (res == TIXML_SUCCESS) ? ival>0 : false;
+    *value = (res == TIXML_SUCCESS) ? ival>0 : false;
 		return res;
 	}
 
@@ -257,9 +257,9 @@ public:
 	 * @return          Status
 	 */
 	inline int Attribute (const char* name, double* value) const {
-        int res = Configuration()->QueryDoubleAttribute (name, value);
+    int res = Configuration()->QueryDoubleAttribute (name, value);
 		report (res, name);
-        return res;
+    return res;
 	}
 
 	/**
@@ -269,13 +269,13 @@ public:
 	 * @param  value    Attribute value
 	 * @return          Status
 	 */
-    template<class T> T RHSAttribute (const std::string& key) {
-    	T val;
-        int res = Configuration()->QueryValueAttribute<T>(key, &val);
-        return val;
-    }
+  template<class T> T RHSAttribute (const std::string& key) {
+    T val;
+    int res = Configuration()->QueryValueAttribute<T>(key, &val);
+    return val;
+  }
 
-    /**
+  /**
 	 * @brief           Set a double type attribute
 	 *
 	 * @param  name     Attribute name
@@ -286,17 +286,17 @@ public:
 		Vector<T> v;
 		T value;
 		std::string vstr;
-        int res = Configuration()->QueryValueAttribute<std::string>(key, &vstr);
-        if (res==TIXML_SUCCESS) {
-        	std::stringstream ss(vstr);
+    int res = Configuration()->QueryValueAttribute<std::string>(key, &vstr);
+    if (res==TIXML_SUCCESS) {
+      std::stringstream ss(vstr);
 			while(ss >> value) {
 				v.push_back(value);
 				if (ss.peek() == ',')
 					ss.ignore();
 			}
-        } else {
-        	printf ("  WARNING - Configurable: No list %s found in configuration\n", key.c_str());
-        }
+    } else {
+      printf ("  WARNING - Configurable: No list %s found in configuration\n", key.c_str());
+    }
 		return v;
 	}
 
@@ -310,10 +310,10 @@ public:
 	 */
 	inline int Attribute (const char* name, float* value) const {
 		double val;
-        int res;
+    int res;
 		res = Configuration()->QueryDoubleAttribute (name, &val);
 		report (res, name);
-		*value = (float) val;
+		*value = float(val);
 		return res;
 	}
 
@@ -424,16 +424,16 @@ public:
 	}
 
 
-    template<class T> inline T GetAttr (const std::string& key) const {
-        T t;
-        int success = Configuration()->QueryValueAttribute (key, &t);
-        if (success != TIXML_SUCCESS)
-            throw (TinyXMLQueryException)success;
-        return t;
-    }
+  template<class T> inline T GetAttr (const std::string& key) const {
+    T t;
+    int success = Configuration()->QueryValueAttribute (key, &t);
+    if (success != TIXML_SUCCESS)
+      throw TinyXMLQueryException(success);
+    return t;
+  }
 
     
-    /**
+  /**
 	 * @brief           Set a double type attribute
 	 *
 	 * @param  name     Attribute name
@@ -444,32 +444,29 @@ public:
 		Vector<T> v;
 		T value;
 		std::string vstr;
-        int res = Configuration()->QueryValueAttribute<std::string>(key, &vstr);
-        if (res==TIXML_SUCCESS) {
-        	std::stringstream ss(vstr);
+    int res = Configuration()->QueryValueAttribute<std::string>(key, &vstr);
+    if (res==TIXML_SUCCESS) {
+      std::stringstream ss(vstr);
 			while(ss >> value) {
 				v.push_back(value);
 				if (ss.peek() == ',')
 					ss.ignore();
 			}
-        } else {
-        	throw CONFIG_KEY_NOT_FOUND;
-        }
+    } else {
+      throw CONFIG_KEY_NOT_FOUND;
+    }
 		return v;
 	}
 
-    friend std::ostream& operator<< (std::ostream& os, const Configurable& conf) {
-        os << conf.GetConfig();
-        return os;
-    }
+  friend std::ostream& operator<< (std::ostream& os, const Configurable& conf) {
+    os << conf.GetConfig();
+    return os;
+  }
 
- protected:
+protected:
 	
 	TiXmlDocument*      m_config_doc;  /**< @brief DOM docuemnt holding the configuration */ 
 
 };
-
-
-
 
 #endif

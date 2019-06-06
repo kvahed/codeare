@@ -115,7 +115,7 @@ public:
 	template<class S> inline Vector (const Vector<S>& cs) NOEXCEPT {
 		_data.resize(cs.size());
 		for (size_t i = 0; i < _data.size(); ++i)
-			_data[i] = (T)cs[i];
+			_data[i] = cs[i];
 	}
 
 #ifdef HAVE_CXX11_RVALUE_REFERENCES
@@ -375,10 +375,10 @@ template<class T> inline static T multiply (const T& a, const T& b) NOEXCEPT {
     return a*b;
 }
 template<class T> inline static T prod (const Vector<T>& ct) NOEXCEPT {
-	return std::accumulate(ct.begin(), ct.end(), (T)1, multiply<T>);
+	return std::accumulate(ct.begin(), ct.end(), T(1), multiply<T>);
 }
 template<class T> inline static T sum (const Vector<T>& ct) NOEXCEPT {
-	return std::accumulate(ct.begin(), ct.end(), (T)0);
+	return std::accumulate(ct.begin(), ct.end(), T(0));
 }
 template<class T> inline static T max (const Vector<T>& ct) NOEXCEPT {
 	return *std::max_element(ct.begin(), ct.end());

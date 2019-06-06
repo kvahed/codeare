@@ -338,9 +338,13 @@ public:
 
 
 private:
+#ifdef _MSC_VER
 #pragma warning (disable : 4251)
+#endif
 	std::map<std::string, boost::any> pl; /**< @brief Parameter list */
+#ifdef _MSC_VER
 #pragma warning (default : 4251)
+  #endif
 };
 
 

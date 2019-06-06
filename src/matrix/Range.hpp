@@ -169,7 +169,7 @@ private:
 			throw NEGATIVE_STRIDE_REQUIRES_NEGATIV_RANGE;
 		}
 		size_t cur = _idx.size();
-		_idx.resize(cur+std::floor(((float)end-(float)begin)/(float)stride)+1);
+		_idx.resize(cur+std::floor(float(end)-float(begin))/float(stride)+1);
 		for (size_t i = cur; i < _idx.size(); ++i)
 			_idx[i] = begin + i*stride;
 	}
